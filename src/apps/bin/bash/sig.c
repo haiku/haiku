@@ -445,6 +445,19 @@ sigint_sighandler (sig)
   if (interrupt_immediately)
     {
       interrupt_immediately = 0;
+#ifdef __BEOS__
+      /* XXXdbg -- throw_to_top_level() calls longjmp() which leaves our
+	 sigmask in a screwed up state so we reset it here. */
+      /* FIXME - fnf: Is this a generic problem with bash, or something
+	 Be specific? */
+      {
+	sigset_t oset;
+	sigemptyset(&oset);
+	sigprocmask(SIG_BLOCK, NULL, &oset);
+	sigdelset(&oset, SIGINT);
+	sigprocmask(SIG_SETMASK, &oset, NULL);
+      }
+#endif
       throw_to_top_level ();
     }
 

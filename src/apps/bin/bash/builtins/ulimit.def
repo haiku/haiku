@@ -238,6 +238,9 @@ ulimit (cmd, newlim)
      int cmd;
      long newlim;
 {
+  if (cmd == 1)
+    return RLIM_INFINITY;  /* A system without ulimit() and getrlimit() */
+                           /* probably dosen't support limits at all.   */
   errno = EINVAL;
   return -1;
 }

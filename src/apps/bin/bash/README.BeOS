@@ -1,0 +1,18 @@
+Notes for the BeOS and Zeta port of bash.
+This port merges the 2.03 version from Be and the 2.04 GeekGadgets patch.
+Some stuff which isn't needed anymore have been removed.
+
+./configure --prefix=/ --disable-job-control --disable-net-redirections --enable-static-link
+
+Notes:
+* added checks for libsocket and libbind (BONE) to configure.in
+* mkfifo() exists, but no filesystem currently supports creating a fifo, so 
+process substitutions won't work.
+* job control isn't implemented in BeOS, but configure tries to use it anyway.
+* No /dev/tcp in BeOS.
+* O_TRUNC seems fixed at least since R5.1 (BONE)
+* select() does work since R5.1
+* old ports set SYS_PROFILE to /boot/beos/etc/profile, which is unneeded, since the kernel does symlink /boot/beos/etc to /etc at boot.
+* about input.c:sync_buffered_stream: not casting to off_t makes the result on the heredoc test to be such as lseek fails but the fd is reset (seeked to 0L) so the script is read again, and again). Seems a bug in BeOS, but the operation was wrong anyway.
+* sig.c: not sure this is still required.
+

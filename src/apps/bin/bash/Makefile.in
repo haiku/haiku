@@ -138,6 +138,8 @@ GCC_LINT_FLAGS = -Wall -Wshadow -Wpointer-arith -Wcast-qual \
 
 GCC_LINT_CFLAGS = $(BASE_CCFLAGS) $(CPPFLAGS) $(GCC_LINT_FLAGS)
 
+BEOSSETVERSION = 
+
 #
 # Support libraries
 # 
@@ -464,7 +466,7 @@ CREATED_MAKEFILES = Makefile builtins/Makefile doc/Makefile \
 # Keep GNU Make from exporting the entire environment for small machines.
 .NOEXPORT:
 
-.made: $(Program) bashbug
+.made: $(Program) $(BEOSSETVERSION) bashbug
 	@echo "$(Program) last made for a $(Machine) running $(OS)" >.made
 
 $(Program):  .build $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP)
@@ -481,6 +483,11 @@ $(Program):  .build $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP)
 	@echo "	  *                                                         *"
 	@echo "	  ***********************************************************"
 	@echo
+
+beos-setversion:
+	setversion $(Program) -app `$(BUILD_DIR)/$(VERSPROG) -r` \
+`$(BUILD_DIR)/$(VERSPROG) -v | sed 's/./& /g'` $(PatchLevel) \
+-short "$(Version)" -long "$(Version) `echo -n -e '\302\251'` 2002 The Free Software Foundation"
 
 bashbug: $(SUPPORT_SRC)bashbug.sh config.h Makefile $(VERSPROG)
 	@sed -e "s%!MACHINE!%$(Machine)%" -e "s%!OS!%$(OS)%" \

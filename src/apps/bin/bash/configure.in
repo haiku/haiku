@@ -617,7 +617,11 @@ dnl check for GNU libintl if gettext/textdomain/bindtextdomain
 dnl are not found in libc
 if test "$ac_cv_func_bindtextdomain" = "no"; then
     AC_CHECK_LIB(intl,bindtextdomain)
-    if test "$ac_cv_lib_intl" = "yes"; then
+    if test "$ac_cv_lib_intl_bindtextdomain" = "yes"; then
+	dnl undo caching
+	unset ac_cv_func_gettext
+	unset ac_cv_func_textdomain
+	unset ac_cv_func_bindtextdomain
 	AC_CHECK_FUNCS(gettext textdomain bindtextdomain)
     fi
 fi
@@ -633,16 +637,18 @@ fi
 dnl this defines SYS_SIGLIST_DECLARED
 AC_DECL_SYS_SIGLIST
 
-dnl network functions -- check for inet_aton again
-if test "$ac_cv_func_inet_aton" != 'yes'; then
-BASH_FUNC_INET_ATON
-fi
-
 dnl libraries
 dnl this is reportedly no longer necessary for irix[56].?
 case "$host_os" in
 irix4*)	AC_CHECK_LIB(sun, getpwent) ;;
+*beos*) AC_CHECK_LIB(bind, gethostbyname) 
+        AC_CHECK_LIB(socket, getpeername) ;;
 esac
+
+dnl network functions -- check for inet_aton again
+if test "$ac_cv_func_inet_aton" != 'yes'; then
+BASH_FUNC_INET_ATON
+fi
 
 dnl check for getpeername in the socket library only if it's not in libc
 if test "$ac_cv_func_getpeername" = no; then

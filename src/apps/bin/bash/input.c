@@ -490,7 +490,7 @@ sync_buffered_stream (bfd)
   if (buffers == 0 || (bp = buffers[bfd]) == 0)
     return (-1);
 
-  chars_left = bp->b_used - bp->b_inputp;
+  chars_left = bp->b_used - (off_t)bp->b_inputp; /* mmu_man: force substract on LL for BeOS. */
   if (chars_left)
     lseek (bp->b_fd, -chars_left, SEEK_CUR);
   bp->b_used = bp->b_inputp = 0;

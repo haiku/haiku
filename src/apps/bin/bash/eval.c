@@ -43,7 +43,7 @@
 #  include "bashhist.h"
 #endif
 
-extern int EOF_reached;
+extern int EOF_Reached;
 extern int indirection_level;
 extern int posixly_correct;
 extern int subshell_environment, running_under_emacs;
