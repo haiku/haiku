@@ -13,7 +13,7 @@
 
 
 #include <stdio.h> 
-#include <memheap.h> 
+#include <malloc.h> 
 #include <OS.h>
 #include <string.h>
 #include <debug.h>
@@ -223,10 +223,12 @@ __inline unsigned __int8 chrand8 (ch_randgen *prandgen)
 /* Initializes Yarrow 2000 Chuma Random Number Generator */ 
 /* reseeding about 8 times prior to the first use is recommended. */ 
 /* more than 16 will probably be a bit too much as time increases by n^2 */ 
-__inline ch_randgen *new_chrand (const unsigned int inittimes) 
+
+__inline ch_randgen *
+new_chrand(const unsigned int inittimes) 
 { 
 	ch_randgen *prandgen; 
-	prandgen = (ch_randgen *)kmalloc (sizeof (ch_randgen)); 
+	prandgen = (ch_randgen *)malloc(sizeof(ch_randgen)); 
 	prandgen->seedptr = prandgen->ira; 
 	prandgen->rndptrX = prandgen->ira; 
 	prandgen->rndptrA = prandgen->ira; 
@@ -239,13 +241,16 @@ __inline ch_randgen *new_chrand (const unsigned int inittimes)
 	prandgen->rndptrA = prandgen->ira + chrand (prandgen) % NK; 
 	prandgen->rndptrB = prandgen->ira + chrand (prandgen) % NK; 
 	return prandgen; 
-} 
+}
+
 /* Clean up after chuma */ 
-__inline void kill_chrand (ch_randgen *randgen) 
+__inline void
+kill_chrand(ch_randgen *randgen) 
 { 
-	memset (randgen, 0, sizeof (ch_randgen)); 
-	kfree (randgen); 
-} 
+	memset(randgen, 0, sizeof (ch_randgen)); 
+	free(randgen); 
+}
+
 /* ++++++++++
    driver.c
    A skeletal device driver
