@@ -2283,16 +2283,17 @@ uint32 BWindow::WindowLookToInteger(window_look wl)
 	switch(wl)
 	{
 		case B_BORDERED_WINDOW_LOOK:
-			return 1;
+			return 20;
 		case B_TITLED_WINDOW_LOOK:
-			return 2;
+			return 1;
 		case B_DOCUMENT_WINDOW_LOOK:
-			return 3;
+			return 11;
 		case B_MODAL_WINDOW_LOOK:
-			return 4;
+			return 3;
 		case B_FLOATING_WINDOW_LOOK:
-			return 5;
+			return 7;
 		case B_NO_BORDER_WINDOW_LOOK:
+			return 19;
 		default:
 			return 0;
 	}
@@ -2305,15 +2306,15 @@ uint32 BWindow::WindowFeelToInteger(window_feel wf)
 	switch(wf)
 	{
 		case B_MODAL_SUBSET_WINDOW_FEEL:
-			return 1;
-		case B_MODAL_APP_WINDOW_FEEL:
 			return 2;
+		case B_MODAL_APP_WINDOW_FEEL:
+			return 1;
 		case B_MODAL_ALL_WINDOW_FEEL:
 			return 3;
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
-			return 4;
-		case B_FLOATING_APP_WINDOW_FEEL:
 			return 5;
+		case B_FLOATING_APP_WINDOW_FEEL:
+			return 4;
 		case B_FLOATING_ALL_WINDOW_FEEL:
 			return 6;
 
