@@ -138,42 +138,21 @@ class DisplayDriver {
 												const BRect &dest,
 												const DrawData *d);
 
-/*	virtual	void				DrawBitmap(		ServerBitmap *bitmap,
-												const BRect &source,
-												const BRect &dest,
-												const DrawData *d);*/
-
 	virtual	void				CopyRegionList(	BList* list,
 												BList* pList,
 												int32 rCount,
 												BRegion* clipReg);
-
-/*	virtual	void				FillArc(		const BRect &r,
-												const float &angle,
-												const float &span,
-												const RGBColor &color);*/
 
 	virtual	void				FillArc(		const BRect &r,
 												const float &angle,
 												const float &span,
 												const DrawData *d);
 
-/*	virtual	void				FillBezier(		BPoint *pts,
-												const RGBColor &color);*/
-
 	virtual	void				FillBezier(		BPoint *pts,
 												const DrawData *d);
 
-/*	virtual	void				FillEllipse(	const BRect &r,
-												const RGBColor &color);*/
-
 	virtual	void				FillEllipse(	const BRect &r,
 												const DrawData *d);
-
-/*	virtual	void				FillPolygon(	BPoint *ptlist,
-												int32 numpts,
-												const BRect &bounds,
-												const RGBColor &color);*/
 
 	virtual	void				FillPolygon(	BPoint *ptlist,
 												int32 numpts,
@@ -186,16 +165,8 @@ class DisplayDriver {
 	virtual	void				FillRect(		const BRect &r,
 												const DrawData *d);
 
-/*	virtual	void				FillRegion(		BRegion &r,
-												const RGBColor &color);*/
-
 	virtual	void				FillRegion(		BRegion &r,
 												const DrawData *d);
-
-/*	virtual	void				FillRoundRect(	const BRect &r,
-												const float &xrad,
-												const float &yrad,
-												const RGBColor &color);*/
 
 	virtual	void				FillRoundRect(	const BRect &r,
 												const float &xrad,
@@ -209,32 +180,17 @@ class DisplayDriver {
 												const BPoint *ptlist,
 												const DrawData *d);
 
-/*	virtual	void				FillTriangle(	BPoint *pts,
-												const BRect &bounds,
-												const RGBColor &color);*/
-
 	virtual	void				FillTriangle(	BPoint *pts,
 												const BRect &bounds,
 												const DrawData *d);
-
-/*	virtual	void				StrokeArc(		const BRect &r,
-												const float &angle,
-												const float &span,
-												const RGBColor &color);*/
 
 	virtual	void				StrokeArc(		const BRect &r,
 												const float &angle,
 												const float &span,
 												const DrawData *d);
 
-/*	virtual	void				StrokeBezier(	BPoint *pts,
-												const RGBColor &color);*/
-
 	virtual	void				StrokeBezier(	BPoint *pts,
 												const DrawData *d);
-
-/*	virtual	void				StrokeEllipse(	const BRect &r,
-												const RGBColor &color);*/
 
 	virtual	void				StrokeEllipse(	const BRect &r,
 												const DrawData *d);
@@ -255,12 +211,6 @@ class DisplayDriver {
 	virtual	void				StrokePoint(	const BPoint &pt,
 												const DrawData *d);
 
-/*	virtual	void				StrokePolygon(	BPoint *ptlist,
-												int32 numpts,
-												const BRect &bounds,
-												const RGBColor &color,
-												bool is_closed=true);*/
-
 	virtual	void				StrokePolygon(	BPoint *ptlist,
 												int32 numpts,
 												const BRect &bounds,
@@ -274,16 +224,8 @@ class DisplayDriver {
 	virtual	void				StrokeRect(		const BRect &r,
 												const DrawData *d);
 
-/*	virtual	void				StrokeRegion(	BRegion &r,
-												const RGBColor &color);*/
-
 	virtual	void				StrokeRegion(	BRegion &r,
 												const DrawData *d);
-
-/*	virtual	void				StrokeRoundRect(const BRect &r,
-												const float &xrad,
-												const float &yrad,
-												const RGBColor &color);*/
 
 	virtual	void				StrokeRoundRect(const BRect &r,
 												const float &xrad,
@@ -296,10 +238,6 @@ class DisplayDriver {
 												const int32 &ptcount,
 												const BPoint *ptlist,
 												const DrawData *d);
-
-/*	virtual	void				StrokeTriangle(	BPoint *pts,
-												const BRect &bounds,
-												const RGBColor &color);*/
 
 	virtual	void				StrokeTriangle(	BPoint *pts,
 												const BRect &bounds,
@@ -504,11 +442,6 @@ friend CursorHandler;
 	int fLineThickness;
 	
 	BLocker *_locker;
-//	bool _is_cursor_hidden;
-//	bool _is_cursor_obscured;
-
-//	ServerCursor *_cursor;
-//	UtilityBitmap *_cursorsave;
 
 	uint32 fDPMSState;
 	uint32 fDPMSCaps;
@@ -517,7 +450,6 @@ friend CursorHandler;
 	
 	CursorHandler fCursorHandler;
 	
-//	BRect oldcursorframe, cursorframe, saveframe;
 	DrawData fDrawData;
 };
 
