@@ -74,7 +74,7 @@ int32 count_font_styles(font_family name)
 	\param flags iF non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
 	\return B_ERROR if the index does not correspond to a font family
 */
-status_t get_font_family(int32 index, font_family *name, uint32 *flags=NULL)
+status_t get_font_family(int32 index, font_family *name, uint32 *flags)
 {
 	// Fix over R5, which does not check for NULL font family names - it just crashes
 	if(!name)
@@ -153,41 +153,6 @@ status_t set_font_cache_info(uint32 id, void *set)
 	// is a completely different font engine.
 }
 
-/*
-class BFontPrivate
-{
-public:
-	BFontPrivate(void);
-	BFontPrivate &operator=(const BFontPrivate &fontdata);
-	
-	BRect fBox;
-	font_family fFamily;
-	font_style fStyle;
-	bool fFixed;
-	font_file_format fFormat;
-	font_direction fDirection;
-	int32 fPrivateFlags;
-};
-
-BFontPrivate::BFontPrivate(void)
-{
-	fBox=BRect(0,0,0,0);
-	fFixed=false;
-	fFormat=B_TRUETYPE_WINDOWS;
-	fDirection=B_FONT_LEFT_TO_RIGHT;
-}
-
-BFontPrivate & BFontPrivate::operator=(const BFontPrivate &fontdata)
-{
-	fBox=fontdata.fBox;
-	*fFamily=*(fontdata.fFamily);
-	*fStyle=*(fontdata.fStyle);
-	fFixed=fontdata.fFixed;
-	fFormat=fontdata.fFormat;
-	fDirection=fontdata.fDirection;
-	return *this;
-}
-*/
 
 //----------------------------------------------------------------------------------------
 //		BFont Class Definition
