@@ -45,6 +45,7 @@ class DataChange {
 
 		virtual void Apply(off_t offset, uint8 *buffer, size_t size) = 0;
 		virtual void Revert(off_t offset, uint8 *buffer, size_t size) = 0;
+		virtual bool Merge(DataChange *change);
 		virtual void GetRange(off_t fileSize, off_t &_offset, off_t &_size) = 0;
 };
 
@@ -55,6 +56,7 @@ class ReplaceChange : public DataChange {
 
 		virtual void Apply(off_t offset, uint8 *buffer, size_t size);
 		virtual void Revert(off_t offset, uint8 *buffer, size_t size);
+		virtual bool Merge(DataChange *change);
 		virtual void GetRange(off_t fileSize, off_t &_offset, off_t &_size);
 
 	private:
@@ -75,7 +77,7 @@ class ReplaceChange : public DataChange {
 
 #define DUMPED_BLOCK_SIZE 16
 
-void
+static void
 dump_block(const uint8 *buffer, int size, const char *prefix)
 {
 	for (int i = 0; i < size;) {
@@ -159,6 +161,13 @@ DataChange::~DataChange()
 }
 
 
+bool 
+DataChange::Merge(DataChange *change)
+{
+	return false;
+}
+
+
 //	#pragma mark -
 
 
@@ -219,10 +228,10 @@ ReplaceChange::Apply(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 	if (size == 0)
 		return;
 
-#if TRACE_DATA_EDITOR
+#ifdef TRACE_DATA_EDITOR
 	printf("Apply %p (buffer offset = %Ld):\n", this, bufferOffset);
-	dumpBlock(buffer + offset - bufferOffset, size, "old:");
-	dumpBlock(fNewData + dataOffset, size, "new:");
+	dump_block(buffer + offset - bufferOffset, size, "old:");
+	dump_block(fNewData + dataOffset, size, "new:");
 #endif
 
 	// now we can safely exchange the buffer!
@@ -248,12 +257,66 @@ ReplaceChange::Revert(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 
 #ifdef TRACE_DATA_EDITOR
 	printf("Revert %p (buffer offset = %Ld):\n", this, bufferOffset);
-	dumpBlock(buffer + offset - bufferOffset, size, "old:");
-	dumpBlock(fOldData + dataOffset, size, "new:");
+	dump_block(buffer + offset - bufferOffset, size, "old:");
+	dump_block(fOldData + dataOffset, size, "new:");
 #endif
 
 	// now we can safely revert the buffer!
 	memcpy(buffer + offset - bufferOffset, fOldData + dataOffset, size);
+}
+
+
+bool 
+ReplaceChange::Merge(DataChange *_change)
+{
+	ReplaceChange *change = dynamic_cast<ReplaceChange *>(_change);
+	if (change == NULL)
+		return false;
+
+	// are the changes adjacent?
+
+	if (change->fOffset + change->fSize != fOffset
+		&& fOffset + fSize != change->fOffset)
+		return false;
+
+	// okay, we can try to merge the two changes
+
+	uint8 *newData = fOffset < change->fOffset ? fNewData : change->fNewData;
+	size_t size = fSize + change->fSize;
+
+	if ((newData = (uint8 *)realloc(newData, size)) == NULL)
+		return false;
+
+	uint8 *oldData = fOffset < change->fOffset ? fOldData : change->fOldData;
+	if ((oldData = (uint8 *)realloc(oldData, size)) == NULL) {
+		fNewData = (uint8 *)realloc(newData, fSize);
+			// if this fails, we can't do anything about it
+		return false;
+	}
+	
+	if (fOffset < change->fOffset) {
+		memcpy(newData + fSize, change->fNewData, change->fSize);
+		memcpy(oldData + fSize, change->fOldData, change->fSize);
+	} else {
+		memcpy(newData + change->fSize, fNewData, fSize);
+		memcpy(oldData + change->fSize, fOldData, fSize);
+		change->fNewData = fNewData;
+		change->fOldData = fOldData;
+			// transfer ownership, so that they will be deleted with the change
+		fOffset = change->fOffset;
+	}
+
+	fNewData = newData;
+	fOldData = oldData;
+	fSize = size;
+
+#ifdef TRACE_DATA_EDITOR
+	printf("Merge %p (offset = %Ld, size = %lu):\n", this, fOffset, fSize);
+	dump_block(fOldData, fSize, "old:");
+	dump_block(fNewData, fSize, "new:");
+#endif
+
+	return true;
 }
 
 
@@ -405,17 +468,18 @@ DataEditor::AddChange(DataChange *change)
 		// update state observers
 
 	RemoveRedos();
+	change->Apply(fRealViewOffset, fView, fRealViewSize);
 
-	fChanges.AddItem(change);
-	fLastChange = change;
-	fChangesFromSaved++;
+	SendNotices(change);
+		// update observers
 
-	fLastChange->Apply(fRealViewOffset, fView, fRealViewSize);
-	// ToDo: try to join changes
-
-	// update observers
-
-	SendNotices(fLastChange);
+	// try to join changes
+	if (fLastChange == NULL || !fLastChange->Merge(change)) {
+		fChanges.AddItem(change);
+		fLastChange = change;
+		fChangesFromSaved++;
+	} else
+		delete change;
 }
 
 
