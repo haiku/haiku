@@ -182,8 +182,6 @@ MMediaFilesManager::SaveState()
 	}
 	file.Write(&zero, sizeof(uint32));
 	
-	printf("save state ok\n");
-	
 	return B_OK;
 }
 
