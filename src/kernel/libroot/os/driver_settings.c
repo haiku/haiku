@@ -41,8 +41,19 @@ typedef struct settings_handle {
 } settings_handle;
 
 
+enum assignment_mode {
+	NO_ASSIGNMENT,
+	ALLOW_ASSIGNMENT,
+	IGNORE_ASSIGNMENT
+};
+
 //	Functions not part of the public API
 
+
+/** Returns true for any characters that separate parameters -
+ *	those are ignored in the input stream and won't be added
+ *	to any words.
+ */
 
 static inline bool
 is_parameter_separator(char c)
@@ -51,17 +62,13 @@ is_parameter_separator(char c)
 }
 
 
-static inline bool
-is_parameter_assignment(char c)
-{
-	return isspace(c) || c == '=';
-}
-
+/** Indicates if "c" begins a new word or not.
+ */
 
 static inline bool
 is_word_break(char c)
 {
-	return c == ' ' || c == '\t' || is_parameter_separator(c);
+	return isspace(c) || is_parameter_separator(c);
 }
 
 
@@ -88,8 +95,22 @@ get_parameter(settings_handle *handle, const char *name)
 }
 
 
+/** Returns the next word in the input buffer passed in via "_pos" - if
+ *	this function returns, it will bump the input position after the word.
+ *	It automatically cares about quoted strings and escaped characters.
+ *	If "allowNewLine" is true, it reads over comments to get to the next
+ *	word.
+ *	Depending on the "assignmentMode" parameter, the '=' sign is either
+ *	used as a work break, or not.
+ *	The input buffer will be changed to contain the word without quotes
+ *	or escaped characters and adds a terminating NULL byte. The "_word"
+ *	parameter will be set to the beginning of the word.
+ *	If the word is followed by a newline it will return B_OK, if white
+ *	spaces follows, it will return CONTINUE_PARAMETER.
+ */
+
 static status_t
-get_word(char **_pos, char **_word, bool allowNewLine)
+get_word(char **_pos, char **_word, int32 assignmentMode, bool allowNewLine)
 {
 	char *pos = *_pos;
 	char quoted = 0;
@@ -100,7 +121,8 @@ get_word(char **_pos, char **_word, bool allowNewLine)
 	// Skip any white space and comments
 	while (pos[0]
 		&& ((allowNewLine && (isspace(pos[0]) || is_parameter_separator(pos[0]) || pos[0] == '#'))
-		|| (!allowNewLine && (pos[0] == '\t' || pos[0] == ' ')))) {
+			|| (!allowNewLine && (pos[0] == '\t' || pos[0] == ' '))
+			|| (assignmentMode == ALLOW_ASSIGNMENT && pos[0] == '='))) {
 		// skip any comment lines
 		if (pos[0] == '#') {
 			while (pos[0] && pos[0] != '\n')
@@ -131,8 +153,11 @@ get_word(char **_pos, char **_word, bool allowNewLine)
 		else if (pos[0] == '\\') {
 			charEscaped = true;
 			escaped++;
-		} else if ((!quoted && is_word_break(pos[0])) || (quoted && pos[0] == quoted))
+		} else if ((!quoted && (is_word_break(pos[0])
+				|| (assignmentMode != IGNORE_ASSIGNMENT && pos[0] == '=')))
+			|| (quoted && pos[0] == quoted))
 			break;
+
 		pos++;
 	}
 
@@ -201,20 +226,13 @@ parse_parameter(struct driver_parameter *parameter, char **_pos, int32 level)
 	// initialize parameter first
 	memset(parameter, 0, sizeof(struct driver_parameter));
 
-	status = get_word(&pos, &parameter->name, true);
+	status = get_word(&pos, &parameter->name, NO_ASSIGNMENT, true);
 	if (status == CONTINUE_PARAMETER) {
 		while (status == CONTINUE_PARAMETER) {
 			char **newArray, *value;
-			status = get_word(&pos, &value, false);
+			status = get_word(&pos, &value, parameter->value_count == 0 ? ALLOW_ASSIGNMENT : IGNORE_ASSIGNMENT, false);
 			if (status < B_OK)
 				break;
-
-			// the flat settings style allows to put a '=' between the
-			// parameter name and its values
-			// ToDo: should this symbol be allowed without surrounding
-			//	white space? like "key=value" instead of "key = value"?
-			if (!strcmp(value, "=") && parameter->value_count == 0)
-				continue;
 
 			// enlarge value array and save the value
 
@@ -368,29 +386,68 @@ load_driver_settings_from_file(int file)
 static bool
 put_string(char **_buffer, size_t *_bufferSize, char *string)
 {
-	char *buffer = *_buffer;
-	size_t length;
+	size_t length, reserved, quotes, sizeNeeded;
+	char *buffer = *_buffer, c;
+	bool quoted;
 
 	if (string == NULL)
 		return true;
 
-	// ToDo: we might have to quote the string in question or
-	//	want to escape several of its characters - that's not
-	//	yet implemented!
-	length = strlen(string);
+	for (length = reserved = quotes = 0; c = string[length]; length++) {
+		if (c == '"')
+			quotes++;
+		else if (is_word_break(c))
+			reserved++;
+	}
+	quoted = reserved || quotes;
 
 	// update _bufferSize in any way, so that we can chain several
 	// of these calls without having to check the return value
 	// everytime
+	*_bufferSize -= length + (quoted ? 2 + quotes : 0);
+
+	if (*_bufferSize <= 0)
+		return false;
+
+	if (quoted)
+		*(buffer++) = '"';
+
+	for (;c = string[0]; string++) {
+		if (c == '"')
+			*(buffer++) = '\\';
+
+		*(buffer++) = c;
+	}
+
+	if (quoted)
+		*(buffer++) = '"';
+
+	buffer[0] = '\0';
+
+	// update the buffer position
+	*_buffer = buffer;
+
+	return true;
+}
+
+
+static bool
+put_chars(char **_buffer, size_t *_bufferSize, char *chars)
+{
+	char *buffer = *_buffer;
+	size_t length;
+
+	if (chars == NULL)
+		return true;
+
+	length = strlen(chars);
 	*_bufferSize -= length;
 
 	if (*_bufferSize <= 0)
 		return false;
 
-	length = strlen(string);
-	memcpy(buffer, string, length);
+	memcpy(buffer, chars, length);
 	buffer += length;
-
 	buffer[0] = '\0';
 
 	// update the buffer position
@@ -438,7 +495,7 @@ put_parameter(char **_buffer, size_t *_bufferSize, struct driver_parameter *para
 
 	put_string(_buffer, _bufferSize, parameter->name);
 	if (flat && parameter->value_count > 0)
-		put_string(_buffer, _bufferSize, " =");
+		put_chars(_buffer, _bufferSize, " =");
 
 	for (i = 0; i < parameter->value_count; i++) {
 		put_char(_buffer, _bufferSize, ' ');
@@ -446,7 +503,7 @@ put_parameter(char **_buffer, size_t *_bufferSize, struct driver_parameter *para
 	}
 
 	if (parameter->parameter_count > 0) {
-		put_string(_buffer, _bufferSize, " {");
+		put_chars(_buffer, _bufferSize, " {");
 		if (!flat)
 			put_char(_buffer, _bufferSize, '\n');
 
@@ -454,12 +511,12 @@ put_parameter(char **_buffer, size_t *_bufferSize, struct driver_parameter *para
 			put_parameter(_buffer, _bufferSize, &parameter->parameters[i], level + 1, flat);
 
 			if (parameter->parameters[i].parameter_count == 0)
-				put_string(_buffer, _bufferSize, flat ? "; " : "\n");
+				put_chars(_buffer, _bufferSize, flat ? "; " : "\n");
 		}
 
 		if (!flat)
 			put_level_space(_buffer, _bufferSize, level);
-		put_string(_buffer, _bufferSize, flat ? "}" : "}\n");
+		put_chars(_buffer, _bufferSize, flat ? "}" : "}\n");
 	}
 
 	return *_bufferSize >= 0;
