@@ -58,7 +58,7 @@ TIFFTranslatorTest::tearDown()
 }
 
 void
-CheckBits(translator_info *pti)
+CheckBits_Tiff(translator_info *pti)
 {
 	CPPUNIT_ASSERT(pti->type == B_TRANSLATOR_BITMAP);
 	CPPUNIT_ASSERT(pti->translator != 0);
@@ -106,7 +106,7 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 		memset(&ti, 0, sizeof(translator_info));
 		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti) == B_OK);
 		if (bbits)
-			CheckBits(&ti);
+			CheckBits_Tiff(&ti);
 		else
 			CheckTiff(&ti, pinfo[i].identifyString);
 	
@@ -116,7 +116,7 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti, 0, NULL,
 			B_TRANSLATOR_BITMAP) == B_OK);
 		if (bbits)
-			CheckBits(&ti);
+			CheckBits_Tiff(&ti);
 		else
 			CheckTiff(&ti, pinfo[i].identifyString);
 	
@@ -126,7 +126,7 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti, 0, NULL,
 			B_TIFF_FORMAT) == B_OK);
 		if (bbits)
-			CheckBits(&ti);
+			CheckBits_Tiff(&ti);
 		else
 			CheckTiff(&ti, pinfo[i].identifyString);
 	}
