@@ -648,6 +648,7 @@ BlockAllocator::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks
 	// b) reduce the maximum amount of blocks per block_run, so that the remaining
 	//    number of free blocks can be used in a useful manner (like 4 blocks) -
 	//    but that would also reduce the maximum file size
+	// c) have BlockRun::Length() return (length + 1).
 	if (numBlocks > MAX_BLOCK_RUN_LENGTH)
 		numBlocks = MAX_BLOCK_RUN_LENGTH;
 
