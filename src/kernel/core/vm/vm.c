@@ -2993,10 +2993,14 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 
 	reservedAddress = (void *)area->base;
 	remove_area_from_virtual_map(sourceAddressSpace, area, true);
-	insert_area(sourceAddressSpace, &reservedAddress, B_EXACT_ADDRESS, area->size, reserved);
+	status = insert_area(sourceAddressSpace, &reservedAddress, B_EXACT_ADDRESS,
+		area->size, reserved);
 		// famous last words: this cannot fail :)
 
 	release_sem_etc(sourceAddressSpace->virtual_map.sem, WRITE_COUNT, 0);
+
+	if (status != B_OK)
+		goto err3;
 
 	// unmap the area in the source address space
 	map = &sourceAddressSpace->translation_map;
@@ -3012,12 +3016,12 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 		// okay, someone is trying to delete this aspace now, so we can't
 		// insert the area, so back out
 		status = B_BAD_TEAM_ID;
-		goto err3;
+		goto err4;
 	}
 
 	status = insert_area(targetAddressSpace, _address, addressSpec, area->size, area);
 	if (status < B_OK)
-		goto err3;
+		goto err4;
 
 	// The area was successfully transferred to the new team when we got here
 	area->aspace = targetAddressSpace;
@@ -3032,9 +3036,9 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 
 	return B_OK;
 
-err3:
+err4:
 	release_sem_etc(targetAddressSpace->virtual_map.sem, WRITE_COUNT, 0);
-
+err3:
 	// insert the area again into the source address space
 	acquire_sem_etc(sourceAddressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
 	// check to see if this aspace has entered DELETE state
