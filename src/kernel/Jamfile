@@ -118,6 +118,7 @@ KernelLd kernel
 	<$(SOURCE_GRIST)!core>main.o 
 	<$(SOURCE_GRIST)!core>misc.o
 	<$(SOURCE_GRIST)!core>module.o 
+	<$(SOURCE_GRIST)!core>pools.o 
 	<$(SOURCE_GRIST)!core>port.o
 	<$(SOURCE_GRIST)!core>queue.o 
 	<$(SOURCE_GRIST)!core>sem.o 
@@ -161,6 +162,7 @@ KernelLd kernel.so
 	<$(SOURCE_GRIST)!core>main.o 
 	<$(SOURCE_GRIST)!core>misc.o
 	<$(SOURCE_GRIST)!core>module.o 
+	<$(SOURCE_GRIST)!core>pools.o 
 	<$(SOURCE_GRIST)!core>port.o
 	<$(SOURCE_GRIST)!core>queue.o 
 	<$(SOURCE_GRIST)!core>sem.o 
@@ -182,19 +184,6 @@ KernelLd kernel.so
 	$(SUBDIR)/core/arch/$(OBOS_ARCH)/kernel.ld 
 	:
 	-Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
-	;
-
-KernelLd isa
-	:
-	<$(SOURCE_GRIST)!core!addons!bus_managers!isa>isa.o
-	kernel.so
-	:
-	$(SUBDIR)/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
-	:
-	-Bdynamic -shared
-	:
-	:
-	addons/bus_managers/isa user-addons/bus_managers/isa
 	;
 
 KernelLd libglue.o :
@@ -725,22 +714,22 @@ KernelLd loop :
 	addons/network/interface/loop
 	;
 
-if $(OS) = "BEOS" 
-{
-	KernelConfigSection addons/drivers/dev/misc/speaker 
-		: 
-		elf32 
-		:
-		/boot/beos/system/add-ons/kernel/drivers/bin/speaker 
-		;
+#if $(OS) = "BEOS" 
+#{
+#	KernelConfigSection addons/drivers/dev/misc/pcspeaker 
+#		: 
+#		elf32 
+#		:
+#		/boot/home/config/add-ons/kernel/drivers/bin/pcspeaker 
+#		;
 
-	KernelConfigSection addons/drivers/dev/net/tulip 
-		: 
-		elf32 
-		: 
-		/boot/beos/system/add-ons/kernel/drivers/bin/tulip 
-		;
-}
+#	KernelConfigSection addons/drivers/dev/net/tulip 
+#		: 
+#		elf32 
+#		: 
+#		/boot/beos/system/add-ons/kernel/drivers/bin/tulip 
+#		;
+#}
 
 KernelLd testdigit :
 	libglue2.o
@@ -754,29 +743,7 @@ KernelLd testdigit :
         bin/testdigit
         ; 
 
-KernelLd thread_test :
-	libglue2.o
-        <$(SOURCE_GRIST)!apps!tests>thread_test.o
-        libc.so
-        :
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-        :
-        :
-        :
-        bin/thread_test
-        ; 
 
-KernelLd fops_test :
-	libglue2.o
-        <$(SOURCE_GRIST)!apps!tests>fops_test.o
-        libc.so
-        :
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-        :
-        :
-        :
-        bin/fops_test
-        ; 
 
 KernelLd ps :
 	libglue2.o
