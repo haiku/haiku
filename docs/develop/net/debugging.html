@@ -2,7 +2,7 @@
 
 <HTML> 
 <HEAD> 
-<TITLE>OpenBeOS Network Kit</TITLE> 
+<TITLE>Haiku Network Kit</TITLE> 
 <META http-equiv=Content-Type content="text/html; charset=windows-1252"> 
 <STYLE type="text/css"> 
 body 
@@ -24,7 +24,7 @@ body
 </HEAD> 
 <BODY text=#000000 vLink=#0000a0 aLink=#0000ff link=#0000c0 bgColor=#ffffff> 
 
-<H1>OpenBeOS Network Kit: Debugging instructions</H1>
+<H1>Haiku Network Kit: Debugging instructions</H1>
 
 <P>For debugging purpose, and eventually stack internals learning purpose, we have develop
 an userland stack version, sharing most of the <A href="stack.html">network stack</A>
@@ -34,7 +34,7 @@ source code but hosted by a app, <i>net_stack_tester</i>, in contrast with the r
 
 <P>The following image shows this debug platform overall design:</P>
 
-<IMG ALT="OpenBeOS Network Stack debugging platform block diagram" SRC="obos_net_server_design_1.gif"><BR>
+<IMG ALT="Haiku Network Stack debugging platform block diagram" SRC="obos_net_server_design_1.gif"><BR>
 
 <P>The <A href="libs.html#libnet">libnet.so</A> library was modified to check if the NET_STACK_DRIVER_PATH
 environment variable is defined and use his value as driver path to interface with. 
@@ -51,7 +51,7 @@ from a Terminal:</P>
 </P>
 
 <HR>
-<H6>Philippe Houdoin, January 12th, 2004</H6>
+<H6>Philippe Houdoin, July 30th, 2004</H6>
 
 </BODY>
 </HTML>
