@@ -228,8 +228,10 @@ typedef struct {
 		bool tmds2_active;			/* found panel on CRTC2 that is active */
 		uint16 panel1_width;		/* native horizontal resolution for digital panels */
 		uint16 panel1_height;		/* navive vertical resolution for digital panels */
+		float panel1_aspect;		/* panel's aspect ratio */
 		uint16 panel2_width;		/* native horizontal resolution for digital panels */
 		uint16 panel2_height;		/* navive vertical resolution for digital panels */
+		float panel2_aspect;		/* panel's aspect ratio */
 		uint32 tvout_chip_type;     /* see tvchip_type enum above */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
 

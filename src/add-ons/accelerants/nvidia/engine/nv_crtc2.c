@@ -97,9 +97,11 @@ status_t nv_crtc2_set_timing(display_mode target)
 		LOG(2,("CRTC2: DFP active: tuning modeline\n"));
 
 		/* horizontal timing */
-		target.timing.h_total = target.timing.h_display + 128;
-		target.timing.h_sync_start = target.timing.h_total - 112;
-		target.timing.h_sync_end = target.timing.h_total - 16;
+		//fixme (?): maybe we need real modeline calculations here...
+		//testing (640x480): total = 135% is too much, 120% to small...
+		target.timing.h_total = target.timing.h_display + 160;//128
+		target.timing.h_sync_start = target.timing.h_total - 144;//112
+		target.timing.h_sync_end = target.timing.h_total - 48;//16
 
 		/* vertical timing */
 		target.timing.v_total = target.timing.v_display + 6;
@@ -244,7 +246,6 @@ status_t nv_crtc2_set_timing(display_mode target)
 	{
 		uint32 iscale_x, iscale_y;
 
-		//fixme: checkout upscaling and aspect!!!
 		/* calculate needed inverse scaling factors in 20.12 format */
 		iscale_x = (((1 << 12) * target.timing.h_display) / si->ps.panel2_width);
 		iscale_y = (((1 << 12) * target.timing.v_display) / si->ps.panel2_height);
@@ -254,7 +255,7 @@ status_t nv_crtc2_set_timing(display_mode target)
 		CRTC2W(FP_VTIMING, 0);
 
 		/* nVidia cards support upscaling except on NV11 */
-		if (si->ps.card_arch == NV11)
+		if (si->ps.card_type == NV11)
 		{
 			/* disable last fetched line limiting */
 			DAC2W(FP_DEBUG2, 0x00000000);
@@ -274,22 +275,44 @@ status_t nv_crtc2_set_timing(display_mode target)
 		{
 			LOG(2,("CRTC2: GPU scales for DFP if needed\n"));
 
-			/* GPU scaling is automatically setup by hardware */
-//fixme: checkout non 4:3 aspect scaling.
-//			DAC2W(FP_DEBUG3, (iscale_x & 0x00001fff) | ((iscale_y & 0x00001fff) << 16));
-//			temp = (((iscale_x >> 1) & 0x00000fff) | (((iscale_y >> 1) & 0x00000fff) << 16));
-//			DAC2W(FP_DEBUG1, (temp | (1 << 12) | (1 << 28)));
-
 			/* limit last fetched line if vertical scaling is done */
 			if (iscale_y != (1 << 12))
 				DAC2W(FP_DEBUG2, ((1 << 28) | ((target.timing.v_display - 1) << 16)));
-//not needed apparantly:
-//								((1 << 12) | ((target.timing.h_display - 1) <<  0)));
 			else
 				DAC2W(FP_DEBUG2, 0x00000000);
 
 			/* inform panel not to scale */
 			DAC2W(FP_TG_CTRL, (DAC2R(FP_TG_CTRL) & 0xfffffeff));
+
+			/* disable GPU scaling testmode so automatic scaling is done */
+			DAC2W(FP_DEBUG1, 0);
+
+			/* GPU scaling is automatically setup by hardware, so only modify this
+			 * scalingfactor for non 4:3 (1.33) aspect panels;
+			 * let's consider 1280x1024 1:33 aspect (it's 1.25 aspect actually!) */
+
+			/* correct for landscape non 4:3 aspect panels... */
+			/* known non 4:3 aspect panels:
+			 * 1280 x  800 (1.60),
+			 * 1440 x  900 (1.60),
+			 * 1680 x 1050 (1.60). */
+			/* known 4:3 aspect non-standard resolution panels:
+			 * 1400 x 1050 (1.33). */
+			if ((iscale_x != (1 << 12)) && (si->ps.panel2_aspect > 1.34))
+			{
+				LOG(2,("CRTC2: non 4:3 aspect landscape panel: tuning horizontal scaling\n"));
+				/* X-scaling should be the same as Y-scaling,
+				 * except for 1280 x 1024 panels(!) */
+				iscale_x = iscale_y * (1.33333333 / si->ps.panel2_aspect);
+				/* enable testmode (b12) and program new X-scaling factor */
+				DAC2W(FP_DEBUG1, (((iscale_x >> 1) & 0x00000fff) | (1 << 12)));
+			}
+			/* correct for portrait panels... */
+			if ((iscale_y != (1 << 12)) && (si->ps.panel2_aspect < 1.25))
+			{
+				LOG(2,("CRTC2: portrait aspect panel: should tune vertical scaling\n"));
+				/* fixme?: implement... */
+			}
 		}
 
 		/* do some logging.. */

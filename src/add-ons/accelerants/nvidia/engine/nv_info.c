@@ -296,8 +296,10 @@ static void detect_panels()
 		/* do some presets */
 		si->ps.panel1_width = 0;
 		si->ps.panel1_height = 0;
+		si->ps.panel1_aspect = 0;
 		si->ps.panel2_width = 0;
 		si->ps.panel2_height = 0;
+		si->ps.panel2_aspect = 0;
 		si->ps.slaved_tmds1 = false;
 		si->ps.slaved_tmds2 = false;
 		si->ps.master_tmds1 = false;
@@ -324,7 +326,7 @@ static void detect_panels()
 				si->ps.panel1_height = height;
 			}
 		}
-		if ((si->ps.card_arch != NV11) &&
+		if ((si->ps.card_type != NV11) &&
 			si->ps.secondary_head && slaved_for_dev2 && !tvout2)
 		{
 			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
@@ -349,7 +351,7 @@ static void detect_panels()
 				si->ps.panel1_height = height;
 			}
 		}
-		if ((si->ps.card_arch != NV11) &&
+		if ((si->ps.card_type != NV11) &&
 			si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
 		{
 			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
@@ -363,6 +365,12 @@ static void detect_panels()
 			}
 		}
 	}
+
+	/* determine panel(s) aspect ratio(s) */
+	if (si->ps.tmds1_active)
+		si->ps.panel1_aspect = (si->ps.panel1_width / ((float)si->ps.panel1_height));
+	if (si->ps.tmds2_active)
+		si->ps.panel2_aspect = (si->ps.panel2_width / ((float)si->ps.panel2_height));
 
 	/* dump some panel configuration registers... */
 	LOG(2,("INFO: Dumping flatpanel registers:\n"));
@@ -864,15 +872,15 @@ void dump_pins(void)
 	{
 		LOG(2,("found DFP (digital flatpanel) on CRTC1; CRTC1 is "));
 		if (si->ps.slaved_tmds1) LOG(2,("slaved\n")); else LOG(2,("master\n"));
-		LOG(2,("panel width: %d, height: %d\n",
-			si->ps.panel1_width, si->ps.panel1_height));
+		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
+			si->ps.panel1_width, si->ps.panel1_height, si->ps.panel1_aspect));
 	}
 	if (si->ps.tmds2_active)
 	{
 		LOG(2,("found DFP (digital flatpanel) on CRTC2; CRTC2 is "));
 		if (si->ps.slaved_tmds2) LOG(2,("slaved\n")); else LOG(2,("master\n"));
-		LOG(2,("panel width: %d, height: %d\n",
-			si->ps.panel2_width, si->ps.panel2_height));
+		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
+			si->ps.panel2_width, si->ps.panel2_height, si->ps.panel2_aspect));
 	}
 	LOG(2,("INFO: end pinsdump.\n"));
 }
