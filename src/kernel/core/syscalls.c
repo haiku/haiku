@@ -47,12 +47,9 @@ _user_system_time()
 	return system_time();
 }
 
-// XXX: Do we need this?
-// Once there was
-// case SYSCALL_RETURN_FROM_SIGNAL: *call_ret = _user_restore_signal_frame();
-// But it is not defined in syscalls.h.
+// map to the arch specific call
 static inline
-uint64
+int64
 _user_restore_signal_frame()
 {
 	return arch_restore_signal_frame();
