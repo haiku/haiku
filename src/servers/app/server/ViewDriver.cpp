@@ -1057,7 +1057,8 @@ void ViewDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRe
 		return;
 	}
 	
-	SetDrawData(d);
+	// DON't set draw data here! your existing clipping region will be deleted
+//	SetDrawData(d);
 	
 	// Oh, wow, is this going to be slow. Then again, ViewDriver was never meant to be very fast. It could
 	// be made significantly faster by directly copying from the source to the destination, but that would
