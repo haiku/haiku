@@ -986,13 +986,22 @@ status_t control_scrollbar(int8 command, void *data, BScrollBar *sb)
 		
 		case 1:		// Set Double
 		{
-			// TODO: Implement code to add or remove the inside pair of arrow buttons
-
 			if(!data)
 				return B_BAD_VALUE;
-			
+
 			bool datavalue=*((bool *)data);
+
+			if(sb->privatedata->sbinfo.double_arrows==datavalue)
+				return B_OK;
+
 			sb->privatedata->sbinfo.double_arrows=datavalue;
+			
+			int8 multiplier=(datavalue)?1:-1;
+			
+			if(sb->fOrientation==B_VERTICAL)
+				sb->privatedata->thumbframe.OffsetBy(0,multiplier*B_H_SCROLL_BAR_HEIGHT);
+			else
+				sb->privatedata->thumbframe.OffsetBy(multiplier*B_V_SCROLL_BAR_WIDTH,0);
 			return B_OK;
 		}
 		
