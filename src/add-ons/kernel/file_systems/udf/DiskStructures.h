@@ -37,6 +37,9 @@
 	- \c udf_logical_volume_integrity_descriptor
 	- \c udf_space_bitmap_descriptor
 
+	Other links of interest:
+	- <a href='http://www.extra.research.philips.com/udf/'>Philips UDF verifier</a>
+
 */
 
 namespace Udf {
