@@ -5,6 +5,7 @@
  ***********************************************************************/
 #include <MediaDefs.h>
 #include <MediaNode.h>
+#include <stdio.h>
 #include <string.h>
 #include "debug.h"
 
@@ -417,9 +418,90 @@ bool format_is_compatible(const media_format & a, const media_format & b)	/* a i
 
 bool string_for_format(const media_format & f, char * buf, size_t size)
 {
-	UNIMPLEMENTED();
-	strcpy(buf, "No string_for_format string!");
-	return true;
+	char encoding[10]; /* maybe Be wanted to use some 4CCs ? */
+	const char *video_orientation = "0"; /* I'd use "NC", R5 uses 0. */
+	
+	if (buf == NULL)
+		return false;
+	switch (f.type) {
+	case B_MEDIA_RAW_AUDIO:
+		snprintf(buf, size, 
+				_string_fmt_raw_audio, 
+				f.u.raw_audio.frame_rate, 
+				f.u.raw_audio.channel_count, 
+				f.u.raw_audio.format, 
+				f.u.raw_audio.byte_order, 
+				f.u.raw_audio.buffer_size);
+		return true;
+	case B_MEDIA_RAW_VIDEO:
+		if (f.u.raw_video.orientation == B_VIDEO_TOP_LEFT_RIGHT)
+			video_orientation = "TopLR";
+		else if (f.u.raw_video.orientation == B_VIDEO_BOTTOM_LEFT_RIGHT)
+			video_orientation = "BotLR";
+		snprintf(buf, size, 
+				_string_fmt_raw_video, 
+				f.u.raw_video.field_rate,
+				f.u.raw_video.display.format,
+				f.u.raw_video.interlace,
+				f.u.raw_video.display.line_width,
+				f.u.raw_video.display.line_count,
+				f.u.raw_video.first_active,
+				video_orientation,
+				f.u.raw_video.pixel_width_aspect,
+				f.u.raw_video.pixel_height_aspect);
+		return true;
+	case B_MEDIA_ENCODED_AUDIO:
+		snprintf(encoding, 10, "%d", f.u.encoded_audio.encoding);
+		snprintf(buf, size, 
+				_string_fmt_caudio, 
+				encoding, // f.u.encoded_audio.encoding, 
+				f.u.encoded_audio.bit_rate, 
+				f.u.encoded_audio.frame_size, 
+				// (
+				f.u.encoded_audio.output.frame_rate, 
+				f.u.encoded_audio.output.channel_count, 
+				f.u.encoded_audio.output.format, 
+				f.u.encoded_audio.output.byte_order, 
+				f.u.encoded_audio.output.buffer_size);
+				// )
+		return true;
+	case B_MEDIA_ENCODED_VIDEO:
+		snprintf(encoding, 10, "%d", f.u.encoded_video.encoding);
+		if (f.u.encoded_video.output.orientation == B_VIDEO_TOP_LEFT_RIGHT)
+			video_orientation = "TopLR";
+		else if (f.u.encoded_video.output.orientation == B_VIDEO_BOTTOM_LEFT_RIGHT)
+			video_orientation = "BotLR";
+		snprintf(buf, size, 
+				_string_fmt_cvideo,
+				encoding, 
+				f.u.encoded_video.avg_bit_rate, 
+				f.u.encoded_video.max_bit_rate, 
+				f.u.encoded_video.frame_size,
+				// (
+				f.u.encoded_video.output.field_rate,
+				f.u.encoded_video.output.display.format,
+				f.u.encoded_video.output.interlace,
+				f.u.encoded_video.output.display.line_width, 
+				f.u.encoded_video.output.display.line_count,
+				f.u.encoded_video.output.first_active,
+				video_orientation,
+				f.u.encoded_video.output.pixel_width_aspect,
+				f.u.encoded_video.output.pixel_height_aspect);
+				// )
+		return true;
+	default:
+		snprintf(buf, size, "%d-", f.type);
+		unsigned char *p = (unsigned char *)&(f.u);
+		size -= strlen(buf);
+		buf += strlen(buf);
+		for (int i = 0; (size > 2) && (i < 96); i++) {
+			snprintf(buf, 3, "%2.2x", *(p + i));
+			buf+=2;
+			size-=2;
+		}
+		return true; // ?
+	}
+	return false;
 }
 
 /*************************************************************
