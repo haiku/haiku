@@ -1,3 +1,9 @@
+/* 
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+
 #include <driver_settings.h>
 #include <Directory.h>
 #include <Entry.h>
