@@ -150,12 +150,12 @@ STRACESTREAM();
 			SearchAndSetNewFront(nextItem? nextItem->layerPtr: NULL);
 
 			// remove some windows.
-		if (item && item->layerPtr->_level == B_NORMAL_FEEL)
+		if (item && item->layerPtr->fLevel == B_NORMAL_FEEL)
 		{
 			ListData	*listItem = item->lowerItem;
-			while(listItem && (listItem->layerPtr->_level == B_FLOATING_SUBSET_FEEL
-								|| listItem->layerPtr->_level == B_FLOATING_APP_FEEL
-								|| listItem->layerPtr->_level == B_MODAL_SUBSET_FEEL))
+			while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
+								|| listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL
+								|| listItem->layerPtr->fLevel == B_MODAL_SUBSET_FEEL))
 			{
 					// *carefuly* remove the item from the list
 				ListData	*itemX = listItem;
@@ -209,12 +209,12 @@ bool Workspace::HideSubsetWindows(WinBorder* layer){
 		//SearchAndSetNewFocus(nextItem? nextItem->layerPtr: NULL);
 
 			// remove some windows.
-		if (item && item->layerPtr->_level == B_NORMAL_FEEL)
+		if (item && item->layerPtr->fLevel == B_NORMAL_FEEL)
 		{
 			ListData	*listItem = item->lowerItem;
-			while(listItem && (listItem->layerPtr->_level == B_FLOATING_SUBSET_FEEL
-								|| listItem->layerPtr->_level == B_FLOATING_APP_FEEL
-								|| listItem->layerPtr->_level == B_MODAL_SUBSET_FEEL))
+			while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
+								|| listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL
+								|| listItem->layerPtr->fLevel == B_MODAL_SUBSET_FEEL))
 			{
 					// *carefuly* remove the item from the list
 				ListData	*itemX = listItem;
@@ -493,7 +493,7 @@ ListData* Workspace::FindPlace(ListData* pref){
 	
 	switch(feel){
 		case B_NORMAL_WINDOW_FEEL:{
-			while(cursor &&	cursor->layerPtr->_level > B_MODAL_APP_FEEL){
+			while(cursor &&	cursor->layerPtr->fLevel > B_MODAL_APP_FEEL){
 				cursor	= cursor->upperItem;
 			}
 			InsertItem(pref, cursor? cursor->lowerItem: NULL);
@@ -501,7 +501,7 @@ ListData* Workspace::FindPlace(ListData* pref){
 		}
 		
 		case B_SYSTEM_LAST:{
-			while(cursor &&	cursor->layerPtr->_level > pref->layerPtr->_level){
+			while(cursor &&	cursor->layerPtr->fLevel > pref->layerPtr->fLevel){
 				cursor	= cursor->upperItem;
 			}
 			InsertItem(pref, cursor? cursor->lowerItem: fTopItem);
@@ -512,7 +512,7 @@ ListData* Workspace::FindPlace(ListData* pref){
 		case B_FLOATING_ALL_WINDOW_FEEL:
 		case B_MODAL_ALL_WINDOW_FEEL:
 		case B_MODAL_APP_WINDOW_FEEL:{
-			while(cursor &&	cursor->layerPtr->_level > pref->layerPtr->_level){
+			while(cursor &&	cursor->layerPtr->fLevel > pref->layerPtr->fLevel){
 				cursor	= cursor->upperItem;
 			}
 			InsertItem(pref, cursor? cursor->lowerItem: NULL);
@@ -524,13 +524,13 @@ ListData* Workspace::FindPlace(ListData* pref){
 			// NOTE that this happens only if its main window is the front most one.
 		case B_FLOATING_SUBSET_WINDOW_FEEL:{
 			for(cursor = fBottomItem; cursor; cursor = cursor->upperItem){
-				if (cursor->layerPtr->_level <= pref->layerPtr->_level
+				if (cursor->layerPtr->fLevel <= pref->layerPtr->fLevel
 					&& (cursor->layerPtr == pref->layerPtr->MainWinBorder()
 						|| cursor->layerPtr->MainWinBorder() == pref->layerPtr->MainWinBorder())
 					)
 				{ break; }
-				else if(pref->layerPtr->_level == B_FLOATING_SUBSET_FEEL
-						&& cursor->layerPtr->_level == B_FLOATING_APP_FEEL)
+				else if(pref->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
+						&& cursor->layerPtr->fLevel == B_FLOATING_APP_FEEL)
 				{ break; }
 			}
 			if (cursor)
@@ -543,10 +543,10 @@ ListData* Workspace::FindPlace(ListData* pref){
 			// it belongs to another application
 		case B_MODAL_SUBSET_WINDOW_FEEL:{
 			for(cursor = fBottomItem; cursor; cursor = cursor->upperItem){
-				if (cursor->layerPtr->_level <= pref->layerPtr->_level)
+				if (cursor->layerPtr->fLevel <= pref->layerPtr->fLevel)
 					break;
-				else if(pref->layerPtr->_level == B_MODAL_SUBSET_FEEL
-					&& cursor->layerPtr->_level == B_MODAL_APP_FEEL
+				else if(pref->layerPtr->fLevel == B_MODAL_SUBSET_FEEL
+					&& cursor->layerPtr->fLevel == B_MODAL_APP_FEEL
 					&& pref->layerPtr->Window()->ClientTeamID()
 						!=  cursor->layerPtr->Window()->ClientTeamID())
 					break;
@@ -560,7 +560,7 @@ ListData* Workspace::FindPlace(ListData* pref){
 			// NOTE that this happens only if its main window is the front most one.
 		case B_FLOATING_APP_WINDOW_FEEL:{
 			for(cursor = fBottomItem; cursor; cursor = cursor->upperItem){
-				if (cursor->layerPtr->_level <= pref->layerPtr->_level
+				if (cursor->layerPtr->fLevel <= pref->layerPtr->fLevel
 					&& pref->layerPtr->Window()->ClientTeamID() ==
 						cursor->layerPtr->Window()->ClientTeamID())
 				{ break; }
@@ -752,8 +752,8 @@ STRACE((" SAME TeamID\n"));
 STRACE((" DIFERRENT TeamID\n"));
 					// remove front window's floating(_SUBSET_/_APP_) windows, if any.
 				ListData	*listItem = fFrontItem->lowerItem;
-				while(listItem && (listItem->layerPtr->_level == B_FLOATING_SUBSET_FEEL
-									|| listItem->layerPtr->_level == B_FLOATING_APP_FEEL))
+				while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
+									|| listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL))
 				{		// *carefully* remove the item from the list
 					ListData	*item = listItem;
 					listItem	= listItem->lowerItem;
@@ -866,12 +866,12 @@ STRACE((" MODAL_APP/SUBSET Window '%s'\n", preferred? preferred->GetName(): "NUL
 			int32		count = 0, i;
 			int32		prefIndex = -1;
 
-			if (fFrontItem && fFrontItem->layerPtr->_level == B_NORMAL_FEEL)
+			if (fFrontItem && fFrontItem->layerPtr->fLevel == B_NORMAL_FEEL)
 			{
 					// remove front window's floating(_SUBSET_/_APP_) windows, if any.
 				ListData	*listItem = fFrontItem->lowerItem;
-				while(listItem && (listItem->layerPtr->_level == B_FLOATING_SUBSET_FEEL
-									|| listItem->layerPtr->_level == B_FLOATING_APP_FEEL))
+				while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
+									|| listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL))
 				{		// *carefully* remove the item from the list
 					ListData	*item = listItem;
 					listItem	= listItem->lowerItem;
@@ -968,12 +968,12 @@ STRACE((" MODAL_APP/SUBSET Window '%s'\n", preferred? preferred->GetName(): "NUL
 		{
 STRACE((" MODAL ALL/SYSTEM FIRST Window '%s'\n", preferred? preferred->GetName(): "NULL"));
 				// remove all application's floating windows.
-			if (fFrontItem && fFrontItem->layerPtr->_level == B_NORMAL_FEEL)
+			if (fFrontItem && fFrontItem->layerPtr->fLevel == B_NORMAL_FEEL)
 			{
 				ListData	*listItem = fFrontItem->lowerItem;
 				while(listItem &&
-						(listItem->layerPtr->_level == B_FLOATING_SUBSET_FEEL
-						|| listItem->layerPtr->_level == B_FLOATING_APP_FEEL))
+						(listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
+						|| listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL))
 				{
 						// *carefully* remove the item from the list
 					ListData	*item = listItem;
@@ -999,9 +999,9 @@ STRACE((" MODAL ALL/SYSTEM FIRST Window '%s'\n", preferred? preferred->GetName()
 		int32		feel = fBottomItem->layerPtr->Window()->Feel();
 
 			// if preferred is one of these *don't* give front state to it!
-		if(preferred->_level == B_FLOATING_SUBSET_FEEL
-			|| preferred->_level == B_FLOATING_APP_FEEL
-			|| preferred->_level == B_FLOATING_ALL_FEEL)
+		if(preferred->fLevel == B_FLOATING_SUBSET_FEEL
+			|| preferred->fLevel == B_FLOATING_APP_FEEL
+			|| preferred->fLevel == B_FLOATING_ALL_FEEL)
 		{
 			newFrontItem	= exFrontItem;
 		}
@@ -1013,7 +1013,7 @@ STRACE((" MODAL ALL/SYSTEM FIRST Window '%s'\n", preferred? preferred->GetName()
 		}
 			// the SYSTEM_LAST will get the front status, only if it's the only
 			// WinBorder in this workspace.
-		else if (preferred->_level == B_SYSTEM_LAST
+		else if (preferred->fLevel == B_SYSTEM_LAST
 				 && !(preferred->IsHidden()) )
 		{
 			if(fBottomItem->layerPtr == preferred)
@@ -1068,25 +1068,25 @@ STRACE(("*WS(%ld)::SASNFocus(%s)\n", ID(), preferred? preferred->GetName(): "NUL
 			}
 		}
 
-		if (item->layerPtr->_level == B_SYSTEM_FIRST || item->layerPtr->_level == B_MODAL_ALL_FEEL)
+		if (item->layerPtr->fLevel == B_SYSTEM_FIRST || item->layerPtr->fLevel == B_MODAL_ALL_FEEL)
 		{
 			break;
 		}
 
-		if (item->layerPtr->_level == B_MODAL_APP_FEEL
+		if (item->layerPtr->fLevel == B_MODAL_APP_FEEL
 			 && (preferred && preferred->Window()->ClientTeamID() == item->layerPtr->Window()->ClientTeamID()))
 		{
 			break;
 		}
 
-		if (item->layerPtr->_level == B_MODAL_SUBSET_FEEL
+		if (item->layerPtr->fLevel == B_MODAL_SUBSET_FEEL
 			&& (preferred && item->layerPtr->MainWinBorder() == preferred))
 		{
 			break;
 		}
 
 			// select one window, other than a system_last one!
-		if (selectOthers && item->layerPtr->_level != B_SYSTEM_LAST){
+		if (selectOthers && item->layerPtr->fLevel != B_SYSTEM_LAST){
 			break;
 		}
 	}
@@ -1156,12 +1156,12 @@ STRACE(("\n!MoveToBack(%s) -", newLast? newLast->GetName(): "NULL"));
 	if(item){
 		ListData	*listItem = NULL;
 
-		switch(item->layerPtr->_level){
+		switch(item->layerPtr->fLevel){
 			case B_FLOATING_ALL_FEEL:{
 STRACE((" B_FLOATING_ALL_FEEL window\n"));
 					// search the place where we should insert it later
 				listItem		= item->upperItem;
-				while(listItem && (listItem->layerPtr->_level == item->layerPtr->_level))
+				while(listItem && (listItem->layerPtr->fLevel == item->layerPtr->fLevel))
 					listItem = listItem->upperItem;
 
 				break;
@@ -1176,8 +1176,8 @@ STRACE((" B_FLOATING_SUBSET_FEEL/B_FLOATING_APP_FEEL window\n"));
 					// search the place where we should insert it later
 				listItem		= item->upperItem;
 				while(listItem &&
-						(listItem->layerPtr->_level == B_FLOATING_SUBSET_FEEL
-						|| listItem->layerPtr->_level == B_FLOATING_APP_FEEL))
+						(listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
+						|| listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL))
 					listItem = listItem->upperItem;
 
 				break;
@@ -1190,9 +1190,9 @@ STRACE((" B_MODAL_SUBSET_FEEL/B_MODAL_APP_FEEL window\n"));
 					// search the place where we should insert it later
 				listItem		= item->upperItem;
 				while(listItem &&
-						(listItem->layerPtr->_level == B_MODAL_SUBSET_FEEL
-						|| listItem->layerPtr->_level == B_MODAL_APP_FEEL
-						|| listItem->layerPtr->_level == B_NORMAL_FEEL))
+						(listItem->layerPtr->fLevel == B_MODAL_SUBSET_FEEL
+						|| listItem->layerPtr->fLevel == B_MODAL_APP_FEEL
+						|| listItem->layerPtr->fLevel == B_NORMAL_FEEL))
 					listItem = listItem->upperItem;
 
 				break;
@@ -1202,7 +1202,7 @@ STRACE((" B_MODAL_SUBSET_FEEL/B_MODAL_APP_FEEL window\n"));
 			case B_NORMAL_FEEL:{
 STRACE((" B_NORMAL_FEEL window\n"));
 				listItem		= item->upperItem;
-				while(listItem && (listItem->layerPtr->_level >= item->layerPtr->_level)){
+				while(listItem && (listItem->layerPtr->fLevel >= item->layerPtr->fLevel)){
 					listItem = listItem->upperItem;
 				}
 												
@@ -1218,11 +1218,11 @@ STRACE((" B_NORMAL_FEEL window\n"));
 		else{
 				// if it's a normal window, first remove any floating windows,
 				// it or its application has
-			if(newLast->_level == B_NORMAL_FEEL && fFrontItem->layerPtr == newLast){
+			if(newLast->fLevel == B_NORMAL_FEEL && fFrontItem->layerPtr == newLast){
 				ListData	*iter = item->lowerItem;
 				while(iter &&
-						(iter->layerPtr->_level == B_FLOATING_SUBSET_FEEL
-						|| iter->layerPtr->_level == B_FLOATING_APP_FEEL))
+						(iter->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
+						|| iter->layerPtr->fLevel == B_FLOATING_APP_FEEL))
 				{
 						// *carefully* remove the item from the list
 					ListData	*itemX = iter;

@@ -255,7 +255,7 @@ void Desktop::AddWinBorder(WinBorder* winBorder)
 		return;
 
 	// special case for Tracker background window.
-	if (winBorder->_level == B_SYSTEM_LAST)
+	if (winBorder->fLevel == B_SYSTEM_LAST)
 	{
 		// it's added in all RottLayers
 		for(int32 i=0; i<fRootLayerList.CountItems(); i++)
@@ -277,7 +277,7 @@ void Desktop::AddWinBorder(WinBorder* winBorder)
 
 void Desktop::RemoveWinBorder(WinBorder* winBorder)
 {
-	if(winBorder->_level == B_SYSTEM_LAST)
+	if(winBorder->fLevel == B_SYSTEM_LAST)
 	{
 		for(int32 i=0; i<fRootLayerList.CountItems(); i++)
 			((RootLayer*)fRootLayerList.ItemAt(i))->RemoveWinBorder(winBorder);
@@ -835,7 +835,7 @@ void Desktop::RemoveSubsetWindow(WinBorder* wb)
 	for(int32 i=0; i < count; i++)
 	{
 		winBorder	= static_cast<WinBorder*>(fWinBorderList.ItemAt(i));
-		if (winBorder->_level == B_NORMAL_FEEL)
+		if (winBorder->fLevel == B_NORMAL_FEEL)
 			winBorder->Window()->fWinFMWList.RemoveItem(wb);
 	}
 	fLayerLock.Unlock();

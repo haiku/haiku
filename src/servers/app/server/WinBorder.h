@@ -60,7 +60,7 @@ public:
 	void UpdateFont(void);
 	void UpdateScreen(void);
 	
-	ServerWindow *Window(void) const { return _serverwin; }
+	ServerWindow *Window(void) const { return fServerWin; }
 	Decorator *GetDecorator(void) const { return fDecorator; }
 	WinBorder *MainWinBorder() const;
 	

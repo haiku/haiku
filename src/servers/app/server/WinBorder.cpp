@@ -84,8 +84,8 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	: Layer(r, name, B_NULL_TOKEN, B_FOLLOW_NONE, flags, driver)
 {
 	// unlike BViews, windows start off as hidden
-	_hidden			= true;
-	_serverwin		= win;
+	fHidden			= true;
+	fServerWin		= win;
 
 	fMouseButtons	= 0;
 	fKeyModifiers	= 0;
@@ -101,7 +101,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 
 	fLastMousePosition.Set(-1,-1);
 	SetLevel();
-	fNewTopLayerFrame = &(win->fTopLayer->_frame);
+	fNewTopLayerFrame = &(win->fTopLayer->fFrame);
 
 	if (feel!= B_NO_BORDER_WINDOW_LOOK)
 	{
@@ -110,7 +110,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 		fDecorator->GetFootprint(fDecFull);
 	}
 
-	_full.MakeEmpty();
+	fFull.MakeEmpty();
 
 	STRACE(("WinBorder %s:\n",GetName()));
 	STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
@@ -134,13 +134,13 @@ void WinBorder::RebuildFullRegion(void)
 {
 	STRACE(("WinBorder(%s):~RebuildFullRegion()\n",GetName()));
 	BRegion			topLayerFull;
-	Layer			*topLayer = _serverwin->fTopLayer;
+	Layer			*topLayer = fServerWin->fTopLayer;
 	topLayerFull.Set( ConvertToTop(*fNewTopLayerFrame) );
-	fNewTopLayerFrame = &(_serverwin->fTopLayer->_frame);
+	fNewTopLayerFrame = &(fServerWin->fTopLayer->fFrame);
 
 	// TODO: Convert to screen coordinates
 	LayerData	*ld;
-	ld = topLayer->_layerdata;
+	ld = topLayer->fLayerData;
 	do
 	{
 		// clip to user region
@@ -158,14 +158,14 @@ void WinBorder::RebuildFullRegion(void)
 			topLayerFull.IntersectWith( topLayer->clipToPicture );
 	}
 	
-	_full.MakeEmpty();
-	_full = topLayerFull;
+	fFull.MakeEmpty();
+	fFull = topLayerFull;
 
 	if (fDecorator)
 	{
 		fDecFull->MakeEmpty();
 		fDecorator->GetFootprint(fDecFull);
-		_full.Include(fDecFull);
+		fFull.Include(fDecFull);
 	}
 }
 
@@ -371,7 +371,7 @@ void WinBorder::Draw(const BRect &r)
 	if(fDecorator)
 	{
 		// decorator is allowed to draw in its entire visible region, not just in the update one.
-		fUpdateReg		= _visible;
+		fUpdateReg = fVisible;
 		fUpdateReg.IntersectWith(fDecFull);
 		// restrict Decorator drawing to the update region only.
 		fDriver->ConstrainClippingRegion(&fUpdateReg);
@@ -410,7 +410,7 @@ void WinBorder::ResizeBy(float x, float y)
 	if(fDecorator)
 		fDecorator->ResizeBy(x,y);
 	
-	BRect		*localRect = new BRect(_serverwin->fTopLayer->_frame);
+	BRect		*localRect = new BRect(fServerWin->fTopLayer->fFrame);
 	fNewTopLayerFrame			= localRect;
 
 	// force topLayer's frame to resize
@@ -423,7 +423,7 @@ void WinBorder::ResizeBy(float x, float y)
 
 bool WinBorder::HasPoint(BPoint& pt) const
 {
-	return _fullVisible.Contains(pt);
+	return fFullVisible.Contains(pt);
 }
 
 void WinBorder::SetMainWinBorder(WinBorder *newMain)
@@ -437,28 +437,28 @@ WinBorder* WinBorder::MainWinBorder() const{
 
 void WinBorder::SetLevel()
 {
-	switch(_serverwin->Feel())
+	switch(fServerWin->Feel())
 	{
 		case B_NORMAL_WINDOW_FEEL:
-			_level	= B_NORMAL_FEEL;
+			fLevel	= B_NORMAL_FEEL;
 			break;
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
-			_level	= B_FLOATING_SUBSET_FEEL;
+			fLevel	= B_FLOATING_SUBSET_FEEL;
 			break;
 		case B_FLOATING_APP_WINDOW_FEEL:
-			_level	= B_FLOATING_APP_FEEL;
+			fLevel	= B_FLOATING_APP_FEEL;
 			break;
 		case B_FLOATING_ALL_WINDOW_FEEL:
-			_level	= B_FLOATING_ALL_FEEL;
+			fLevel	= B_FLOATING_ALL_FEEL;
 			break;
 		case B_MODAL_SUBSET_WINDOW_FEEL:
-			_level	= B_MODAL_SUBSET_FEEL;
+			fLevel	= B_MODAL_SUBSET_FEEL;
 			break;
 		case B_MODAL_APP_WINDOW_FEEL:
-			_level	= B_MODAL_APP_FEEL;
+			fLevel	= B_MODAL_APP_FEEL;
 			break;
 		case B_MODAL_ALL_WINDOW_FEEL:
-			_level	= B_MODAL_ALL_FEEL;
+			fLevel	= B_MODAL_ALL_FEEL;
 			break;
 		case B_SYSTEM_LAST:
 		case B_SYSTEM_FIRST:
@@ -467,11 +467,11 @@ void WinBorder::SetLevel()
 //			if(_win->ServerTeamID() != _win->ClientTeamID())
 //				_win->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
 //			else
-				_level	= _serverwin->Feel();
+				fLevel	= fServerWin->Feel();
 			break;
 		default:
-			_serverwin->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
-			_level	= B_NORMAL_FEEL;
+			fServerWin->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
+			fLevel	= B_NORMAL_FEEL;
 			break;
 	}
 }
@@ -490,7 +490,7 @@ void WinBorder::AddToSubsetOf(WinBorder* main)
 	{
 		// if the main window is hidden also hide this one.
 		if(main->IsHidden())
-			_hidden = true;
+			fHidden = true;
 
 		// add to main window's subset
 		main->Window()->fWinFMWList.AddItem(this);
@@ -577,28 +577,28 @@ void WinBorder::PrintToStream()
 {
 	printf("\t%s", GetName());
 
-	if (_level == B_FLOATING_SUBSET_FEEL)
+	if (fLevel == B_FLOATING_SUBSET_FEEL)
 		printf("\t%s", "B_FLOATING_SUBSET_WINDOW_FEEL");
 
-	if (_level == B_FLOATING_APP_FEEL)
+	if (fLevel == B_FLOATING_APP_FEEL)
 		printf("\t%s", "B_FLOATING_APP_WINDOW_FEEL");
 
-	if (_level == B_FLOATING_ALL_FEEL)
+	if (fLevel == B_FLOATING_ALL_FEEL)
 		printf("\t%s", "B_FLOATING_ALL_WINDOW_FEEL");
 
-	if (_level == B_MODAL_SUBSET_FEEL)
+	if (fLevel == B_MODAL_SUBSET_FEEL)
 		printf("\t%s", "B_MODAL_SUBSET_WINDOW_FEEL");
 
-	if (_level == B_MODAL_APP_FEEL)
+	if (fLevel == B_MODAL_APP_FEEL)
 		printf("\t%s", "B_MODAL_APP_WINDOW_FEEL");
 
-	if (_level == B_MODAL_ALL_FEEL)
+	if (fLevel == B_MODAL_ALL_FEEL)
 		printf("\t%s", "B_MODAL_ALL_WINDOW_FEEL");
 
-	if (_level == B_NORMAL_FEEL)
+	if (fLevel == B_NORMAL_FEEL)
 		printf("\t%s", "B_NORMAL_WINDOW_FEEL");
 
-	printf("\t%s\n", _hidden?"hidden" : "not hidden");
+	printf("\t%s\n", fHidden?"hidden" : "not hidden");
 }
 
 void WinBorder::UpdateColors(void)

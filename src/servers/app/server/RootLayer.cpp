@@ -71,8 +71,8 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fScreenYResolution = 0;
 	fColorSpace = B_RGB32;
 	
-	_view_token = 0; // is this used for WinBorders?
-	_hidden	= false;
+	fViewToken = 0; // is this used for WinBorders?
+	fHidden	= false;
 	
 	SetWorkspaceCount(workspaceCount);
 }
@@ -133,28 +133,28 @@ void RootLayer::Draw(const BRect &r)
 	polygon[5].x = 200;
 	polygon[5].y = 200;
 	
-	_layerdata->highcolor.SetColor(255,0,0,255);
-	_layerdata->lowcolor.SetColor(255,255,255,255);
-	_driver->FillRect(r1,_layerdata,pattern);
+	fLayerData->highcolor.SetColor(255,0,0,255);
+	fLayerData->lowcolor.SetColor(255,255,255,255);
+	_driver->FillRect(r1,fLayerData,pattern);
 	
-	_layerdata->highcolor.SetColor(255,255,0,255);
-	_driver->StrokeLine(BPoint(100,100),BPoint(1500,1100),_layerdata,pattern);
+	fLayerData->highcolor.SetColor(255,255,0,255);
+	_driver->StrokeLine(BPoint(100,100),BPoint(1500,1100),fLayerData,pattern);
 	
-	_layerdata->highcolor.SetColor(0,0,255,255);
-	_driver->StrokeBezier(pts,_layerdata,pattern);
-	_driver->StrokeArc(BRect(200,300,400,600),30,270,_layerdata,pattern);
-	_driver->StrokeEllipse(BRect(200,700,400,900),_layerdata,pattern);
-	_driver->StrokeRect(BRect(650,1000,750,1090),_layerdata,pattern);
-	_driver->StrokeRoundRect(BRect(200,1000,600,1090),30,40,_layerdata,pattern);
-//	_driver->StrokePolygon(polygon,6,polygonRect,_layerdata,pattern);
-//	_driver->StrokeTriangle(triangle,triangleRect,_layerdata,pattern);
-	_layerdata->highcolor.SetColor(255,0,255,255);
-	_driver->FillArc(BRect(1250,300,1450,600),30,270,_layerdata,pattern);
-//	_driver->FillBezier(pts,_layerdata,pattern);
-	_driver->FillEllipse(BRect(800,300,1200,600),_layerdata,pattern);
-	_driver->FillRoundRect(BRect(800,1000,1200,1090),30,40,_layerdata,pattern2);
-	_driver->FillPolygon(polygon,6,polygonRect,_layerdata,pattern);
-//	_driver->FillTriangle(triangle,triangleRect,_layerdata,pattern);
+	fLayerData->highcolor.SetColor(0,0,255,255);
+	_driver->StrokeBezier(pts,fLayerData,pattern);
+	_driver->StrokeArc(BRect(200,300,400,600),30,270,fLayerData,pattern);
+	_driver->StrokeEllipse(BRect(200,700,400,900),fLayerData,pattern);
+	_driver->StrokeRect(BRect(650,1000,750,1090),fLayerData,pattern);
+	_driver->StrokeRoundRect(BRect(200,1000,600,1090),30,40,fLayerData,pattern);
+//	_driver->StrokePolygon(polygon,6,polygonRect,fLayerData,pattern);
+//	_driver->StrokeTriangle(triangle,triangleRect,fLayerData,pattern);
+	fLayerData->highcolor.SetColor(255,0,255,255);
+	_driver->FillArc(BRect(1250,300,1450,600),30,270,fLayerData,pattern);
+//	_driver->FillBezier(pts,fLayerData,pattern);
+	_driver->FillEllipse(BRect(800,300,1200,600),fLayerData,pattern);
+	_driver->FillRoundRect(BRect(800,1000,1200,1090),30,40,fLayerData,pattern2);
+	_driver->FillPolygon(polygon,6,polygonRect,fLayerData,pattern);
+//	_driver->FillTriangle(triangle,triangleRect,fLayerData,pattern);
 	
 #endif // end DISPLAYDRIVER_TEST_HACK
 
@@ -389,7 +389,7 @@ void RootLayer::RemoveWinBorder(WinBorder* winBorder)
 void RootLayer::ChangeWorkspacesFor(WinBorder* winBorder, uint32 newWorkspaces)
 {
 	// only normal windows are affected by this change
-	if(!winBorder->_level != B_NORMAL_FEEL)
+	if(!winBorder->fLevel != B_NORMAL_FEEL)
 		return;
 
 	uint32 oldWorkspaces = winBorder->Window()->Workspaces();
@@ -489,7 +489,7 @@ void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns)
 	newFrame.right	-= 1;
 	newFrame.bottom	-= 1;
 	
-	_frame = newFrame;
+	fFrame = newFrame;
 	fRows = rows;
 	fColumns = columns;
 	fScreenXResolution = (int32)(screen[0]->Resolution().x);
@@ -645,14 +645,14 @@ void RootLayer::SetBGColor(const RGBColor &col)
 {
 	ActiveWorkspace()->SetBGColor(col);
 	
-	_layerdata->viewcolor	= col;
+	fLayerData->viewcolor	= col;
 	
 //	Invalidate(Frame());
 }
 
 RGBColor RootLayer::BGColor(void) const
 {
-	return _layerdata->viewcolor;
+	return fLayerData->viewcolor;
 }
 
 void RootLayer::RemoveAppWindow(WinBorder *wb)
