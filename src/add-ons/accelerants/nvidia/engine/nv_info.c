@@ -316,10 +316,11 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 
 			/* execute */
 			adress += 1;
-			LOG(8,("cmd 'setup RAM config'\n"));
+			LOG(8,("cmd 'setup RAM config' (always done)\n"));
 			//fixme: setup_ram_config is also used on NV11 (at least), which means the
 			//       routine should function differently there!
-			if (exec) setup_ram_config(rom);
+			/* always done */
+			setup_ram_config(rom);
 			break;
 		case 0x65:
 			*size -= 13;
@@ -339,17 +340,16 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 4;
 			data2 = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'WR 32bit REG $%08x with $%08x, then with $%08x'\n", reg, data, data2));
-			if (exec)
-			{
-				/* alternate NV-specific access to PCI config space registers: */
-				safe32 = NV_REG32(0x00001800 + NVCFG_AGPCMD);
-				NV_REG32(0x00001800 + NVCFG_AGPCMD) = 0x00000000;
-				NV_REG32(reg) = data;
-				NV_REG32(reg) = data2;
-				NV_REG32(0x00001800 + NVCFG_AGPCMD) = safe32;
-				NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
-			}
+			LOG(8,("cmd 'WR 32bit REG $%08x with $%08x, then with $%08x' (always done)\n",
+				reg, data, data2));
+			/* always done */
+			/* (alternate NV-specific access to PCI config space registers:) */
+			safe32 = NV_REG32(0x00001800 + NVCFG_AGPCMD);
+			NV_REG32(0x00001800 + NVCFG_AGPCMD) = 0x00000000;
+			NV_REG32(reg) = data;
+			NV_REG32(reg) = data2;
+			NV_REG32(0x00001800 + NVCFG_AGPCMD) = safe32;
+			NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
 			break;
 		case 0x66: /* new on NV11 */
 			LOG(8,("NV11+ xxx cmd, skipping...\n"));
@@ -421,6 +421,38 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				ISAWB(reg, byte);
 			}
 			break;
+		case 0x6d:
+			*size -= 3;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			//fixme: setup_ram_config is also used on NV11 (at least), which means the
+			//       routine should function differently there?!?
+			adress += 1;
+			data = NV_REG32(NV32_NV4STRAPINFO);
+			and_out = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			byte = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			data &= (uint32)and_out;
+			LOG(8,("cmd 'CHK bits AND-out $%02x RAMCFG for $%02x, stop PGM on no match'\n",
+				and_out, byte));
+			if (((uint8)data) != byte)
+			{
+				LOG(8,("INFO: ---No match: not executing following commands:\n"));
+				exec = false;
+			}
+			else
+			{
+				LOG(8,("INFO: ---Match, so this cmd has no effect.\n"));
+			}
+			break;
 		case 0x6e:
 			*size -= 13;
 			if (*size < 0)
@@ -474,8 +506,9 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 1;
 			data = *((uint16*)(&(rom[adress])));
 			adress += 2;
-			LOG(8,("cmd 'SNOOZE for %d ($%04x) microSeconds'\n", data, data));
-			if (exec) snooze(data);
+			LOG(8,("cmd 'SNOOZE for %d ($%04x) microSeconds' (always done)\n", data, data));
+			/* always done */
+			snooze(data);
 			break;
 		case 0x77:
 			*size -= 7;
