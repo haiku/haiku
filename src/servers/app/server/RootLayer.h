@@ -94,7 +94,17 @@ public:
 	virtual bool HasClient(void) { return false; }
 	
 	void AddWinBorderToWorkspaces(WinBorder *winBorder, uint32 wks);
+
+	// Input related methods
+	void MouseEventHandler(int32 code, BPortLink& link);
+	void KeyboardEventHandler(int32 code, BPortLink& link);
 	
+	void SetDragMessage(BMessage *msg);
+	BMessage *DragMessage(void) const;
+
+	static int32 WorkingThread(void *data);
+
+	// Debug methods
 	void PrintToStream(void);
 	
 	// "Private" to app_server :-) - they should not be used
@@ -105,6 +115,11 @@ public:
 
 private:
 	Desktop *fDesktop;
+	BMessage *fDragMessage;
+	WinBorder *fMouseTarget;
+
+	thread_id fThreadID;
+	port_id fListenPort;
 	
 	BList fScreenPtrList;
 	int32 fRows;
@@ -115,6 +130,9 @@ private:
 	
 	BList fWorkspaceList;
 	Workspace *fActiveWorkspace;
+
+	int32 fScreenShotIndex;
+	bool fQuiting;
 };
 
 #endif

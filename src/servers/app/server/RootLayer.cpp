@@ -31,7 +31,9 @@
 #include <Window.h>
 #include <List.h>
 #include <Message.h>
+#include <Entry.h>
 #include <File.h>
+#include <PortLink.h>
 
 #include "Globals.h"
 #include "RootLayer.h"
@@ -45,6 +47,7 @@
 #include "ServerConfig.h"
 #include "FMWList.h"
 #include "DisplayDriver.h"
+#include "ServerProtocol.h"
 
 //#define DEBUG_ROOTLAYER
 
@@ -62,7 +65,13 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
  : Layer(BRect(0,0,0,0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver)
 {
 	fDesktop = desktop;
-	
+
+	fMouseTarget		= NULL;
+	fDragMessage		= NULL;
+	fScreenShotIndex	= 1;
+
+	fQuiting			= false;
+
 	//NOTE: be careful about this one.
 	fRootLayer = this;
 	fActiveWorkspace = NULL;
@@ -81,12 +90,92 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	// easy way to identify this class.
 	fClassID = AS_ROOTLAYER_CLASS;
 	fHidden	= false;
-	
+
+	fListenPort = find_port(SERVER_INPUT_PORT);
+	if (fListenPort == B_NAME_NOT_FOUND)
+		return;
+
+	// Spawn our working thread
+	fThreadID= spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
+	if (fThreadID >= 0)
+		resume_thread(fThreadID);
+
 }
 
 RootLayer::~RootLayer()
 {
+	int32		exitValue;
+	fQuiting	= true;
+	BPortLink	msg(fListenPort, -1);
+	msg.StartMessage(B_QUIT_REQUESTED);
+	msg.EndMessage();
+	msg.Flush();
+
+	wait_for_thread(fThreadID, &exitValue);
+
+	if (fDragMessage)
+		delete fDragMessage;
+
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
+}
+
+/*!
+	\brief Thread function for handling input messages and calculating visible regions.
+	\param data Pointer to the app_server to which the thread belongs
+	\return Throwaway value - always 0
+*/
+int32 RootLayer::WorkingThread(void *data)
+{
+	int32		code = 0;
+	status_t	err = B_OK;
+	RootLayer	*oneRootLayer	= (RootLayer*)data;
+	BPortLink	messageQueue(-1, oneRootLayer->fListenPort);
+	
+	for(;;)
+	{
+		STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->GetName(), oneRootLayer->fListenPort));
+		err = messageQueue.GetNextReply(&code);
+		
+		if(err < B_OK)
+		{
+			STRACE(("WorkingThread: messageQueue.GetNextReply failed\n"));
+			continue;
+		}
+		
+		switch(code)
+		{
+			// We don't need to do anything with these two, so just pass them
+			// onto the active application. Eventually, we will end up passing 
+			// them onto the window which is currently under the cursor.
+			case B_MOUSE_DOWN:
+			case B_MOUSE_UP:
+			case B_MOUSE_WHEEL_CHANGED:
+			case B_MOUSE_MOVED:
+				oneRootLayer->MouseEventHandler(code, messageQueue);
+				break;
+
+			case B_KEY_DOWN:
+			case B_KEY_UP:
+			case B_UNMAPPED_KEY_DOWN:
+			case B_UNMAPPED_KEY_UP:
+			case B_MODIFIERS_CHANGED:
+				oneRootLayer->KeyboardEventHandler(code, messageQueue);
+				break;
+
+			case B_QUIT_REQUESTED:
+				exit_thread(0);
+				break;
+
+			default:
+				STRACE(("RootLayer(%s)::WorkingThread received unexpected code %lx\n",oneRootLayer->GetName(), oneRootLayer->code));
+				break;
+		}
+
+		// if we still have other messages in our queue, but we really want to quit
+		if (oneRootLayer->fQuiting)
+			break;
+	}
+	return 0;
 }
 
 void RootLayer::MoveBy(float x, float y)
@@ -679,6 +768,603 @@ void RootLayer::RemoveAppWindow(WinBorder *wb)
 	for(int32 i=0; i < count; i++)
 		WorkspaceAt(i+1)->RemoveWinBorder(wb);
 }
+
+//---------------------------------------------------------------------------
+//				Input related methods
+//---------------------------------------------------------------------------
+void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
+{
+	// TODO: locking mechanism needs SERIOUS rethought
+	switch(code)
+	{
+		case B_MOUSE_DOWN:
+		{
+			// Attached data:
+			// 1) int64 - time of mouse click
+			// 2) float - x coordinate of mouse click
+			// 3) float - y coordinate of mouse click
+			// 4) int32 - modifier keys down
+			// 5) int32 - buttons down
+			// 6) int32 - clicks
+
+			PointerEvent evt;	
+			evt.code = B_MOUSE_DOWN;
+			msg.Read<int64>(&evt.when);
+			msg.Read<float>(&evt.where.x);
+			msg.Read<float>(&evt.where.y);
+			msg.Read<int32>(&evt.modifiers);
+			msg.Read<int32>(&evt.buttons);
+			msg.Read<int32>(&evt.clicks);
+			
+			// printf("MOUSE DOWN: at (%f, %f)\n", evt.where.x, evt.where.y);
+			
+			WinBorder	*target=NULL;
+			Workspace	*ws=NULL;
+			ws			= ActiveWorkspace();
+			target		= WinBorderAt(evt.where);
+			if (target)
+			{
+				desktop->fGeneralLock.Lock();
+				fMainLock.Lock();
+				
+				STRACE(("Target: %s\n", target->GetName()));
+				STRACE(("Front: %s\n", ws->FrontLayer()->GetName()));
+				STRACE(("Focus: %s\n", ws->FocusLayer()->GetName()));
+				
+				WinBorder		*previousFocus=NULL;
+				WinBorder		*activeFocus=NULL;
+				BRegion			invalidRegion;
+				
+				BMessage downmsg(B_MOUSE_DOWN);
+				downmsg.AddInt64("when",evt.when);
+				downmsg.AddPoint("where",evt.where);
+				downmsg.AddInt32("modifiers",evt.modifiers);
+				downmsg.AddInt32("buttons",evt.buttons);
+				downmsg.AddInt32("clicks",evt.clicks);
+				
+				if (target!=ws->FrontLayer())
+				{
+					ws->BringToFrontANormalWindow(target);
+					ws->SearchAndSetNewFront(target);
+					previousFocus	= ws->FocusLayer();
+					ws->SearchAndSetNewFocus(target);
+					activeFocus		= ws->FocusLayer();
+
+					activeFocus->Window()->Lock();
+
+					if (target == activeFocus && target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
+						target->MouseDown(evt, true);
+					else
+						target->MouseDown(evt, false);
+
+					// may or may not be empty.
+					
+					// TODO: B_MOUSE_DOWN: what if modal of floating windows are in front of us?
+					invalidRegion.Include(&(activeFocus->fFull));
+					invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
+					activeFocus->fParent->RebuildAndForceRedraw(invalidRegion, activeFocus);
+
+					if (previousFocus != activeFocus && previousFocus)
+					{
+						if (previousFocus->fVisible.CountRects() > 0)
+						{
+							invalidRegion.MakeEmpty();
+							invalidRegion.Include(&(previousFocus->fVisible));
+							activeFocus->fParent->Invalidate(invalidRegion);
+						}
+					}
+
+					fMouseTarget = target;
+					
+					STRACE(("2Target: %s\n", target->GetName()));
+					STRACE(("2Front: %s\n", ws->FrontLayer()->GetName()));
+					STRACE(("2Focus: %s\n", ws->FocusLayer()->GetName()));
+
+					fMouseTarget->Window()->SendMessageToClient(&downmsg);
+					activeFocus->Window()->Unlock();
+				}
+				else // target == ws->FrontLayer()
+				{
+					// only if target has the focus!
+					if (target == ws->FocusLayer())
+					{
+						target->Window()->Lock();
+						target->MouseDown(evt, true);
+						target->Window()->SendMessageToClient(&downmsg);
+						target->Window()->Unlock();
+					}
+					else
+					{
+						previousFocus	= ws->FocusLayer();
+						ws->SearchAndSetNewFocus(target);
+						activeFocus		= ws->FocusLayer();
+					
+						activeFocus->Window()->Lock();
+	
+						if (target == activeFocus && target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
+							target->MouseDown(evt, true);
+						else
+							target->MouseDown(evt, false);
+	
+						// may or may not be empty.
+						
+						// TODO: B_MOUSE_DOWN: what if modal of floating windows are in front of us?
+						invalidRegion.Include(&(activeFocus->fFull));
+						invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
+						activeFocus->fParent->RebuildAndForceRedraw(invalidRegion, activeFocus);
+	
+						if (previousFocus != activeFocus && previousFocus)
+						{
+							if (previousFocus->fVisible.CountRects() > 0)
+							{
+								invalidRegion.MakeEmpty();
+								invalidRegion.Include(&(previousFocus->fVisible));
+								activeFocus->fParent->Invalidate(invalidRegion);
+							}
+						}
+						fMouseTarget = target;
+						fMouseTarget->Window()->SendMessageToClient(&downmsg);
+						
+						activeFocus->Window()->Unlock();
+					}
+				}
+
+				fMainLock.Unlock();
+				desktop->fGeneralLock.Unlock();
+			}
+			else // target == NULL
+			{
+			}
+			break;
+		}
+		case B_MOUSE_UP:
+		{
+			// Attached data:
+			// 1) int64 - time of mouse click
+			// 2) float - x coordinate of mouse click
+			// 3) float - y coordinate of mouse click
+			// 4) int32 - modifier keys down
+
+			PointerEvent evt;	
+			evt.code = B_MOUSE_UP;
+			msg.Read<int64>(&evt.when);
+			msg.Read<float>(&evt.where.x);
+			msg.Read<float>(&evt.where.y);
+			msg.Read<int32>(&evt.modifiers);
+
+			if (!fMouseTarget)
+			{
+				WinBorder *target = WinBorderAt(BPoint(evt.where.x, evt.where.y));
+				if(!target)
+					break;
+				fMouseTarget=target;
+			}
+
+			fMouseTarget->Window()->Lock();
+			fMouseTarget->MouseUp(evt);
+			
+			BMessage upmsg(B_MOUSE_UP);
+			upmsg.AddInt64("when",evt.when);
+			upmsg.AddPoint("where",evt.where);
+			upmsg.AddInt32("modifiers",evt.modifiers);
+			
+			fMouseTarget->Window()->SendMessageToClient(&upmsg);
+			fMouseTarget->Window()->Unlock();
+
+			STRACE(("MOUSE UP: at (%f, %f)\n", evt.where.x, evt.where.y));
+
+			break;
+		}
+		case B_MOUSE_MOVED:
+		{
+			// Attached data:
+			// 1) int64 - time of mouse click
+			// 2) float - x coordinate of mouse click
+			// 3) float - y coordinate of mouse click
+			// 4) int32 - buttons down
+			
+			PointerEvent evt;	
+			evt.code = B_MOUSE_MOVED;
+			msg.Read<int64>(&evt.when);
+			msg.Read<float>(&evt.where.x);
+			msg.Read<float>(&evt.where.y);
+			msg.Read<int32>(&evt.buttons);
+
+			GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
+			
+			if (!fMouseTarget)
+			{
+				WinBorder *target = WinBorderAt(BPoint(evt.where.x, evt.where.y));
+				if(!target)
+					break;
+				fMouseTarget=target;
+			}
+			
+			fMouseTarget->Window()->Lock();
+			fMouseTarget->MouseMoved(evt);
+			
+			BMessage movemsg(B_MOUSE_MOVED);
+			movemsg.AddInt64("when",evt.when);
+			movemsg.AddPoint("where",evt.where);
+			movemsg.AddInt32("buttons",evt.buttons);
+			
+			fMouseTarget->Window()->SendMessageToClient(&movemsg);
+			fMouseTarget->Window()->Unlock();
+
+			break;
+		}
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			// FEATURE: This is a tentative change: mouse wheel messages are always sent to the window
+			// under the cursor. It's pretty stupid to send it to the active window unless a particular
+			// view has locked focus via SetMouseEventMask
+						
+			PointerEvent evt;	
+			evt.code = B_MOUSE_WHEEL_CHANGED;
+			msg.Read<int64>(&evt.when);
+			msg.Read<float>(&evt.wheel_delta_x);
+			msg.Read<float>(&evt.wheel_delta_y);
+			
+			BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
+			wheelmsg.AddInt64("when",evt.when);
+			wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
+			wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
+			
+			if(!fMouseTarget)
+			{
+				fMouseTarget = WinBorderAt(GetDisplayDriver()->GetCursorPosition());
+				
+				// We do nothing because there ain't a window to receive the message
+				if(!fMouseTarget)
+					break;
+			}
+			
+			fMouseTarget->Window()->Lock();
+			fMouseTarget->Window()->SendMessageToClient(&wheelmsg);
+			fMouseTarget->Window()->Unlock();
+			
+			break;
+		}
+		default:
+		{
+			printf("\nDesktop::MouseEventHandler(): WARNING: unknown message\n\n");
+			break;
+		}
+	}
+}
+
+void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
+{
+
+	switch(code)
+	{
+		case B_KEY_DOWN:
+		{
+			// Attached Data:
+			// 1) int64 bigtime_t object of when the message was sent
+			// 2) int32 raw key code (scancode)
+			// 3) int32 modifier-independent ASCII code for the character
+			// 4) int32 repeat count
+			// 5) int32 modifiers
+			// 6) int8[3] UTF-8 data generated
+			// 7) int8 number of bytes to follow containing the 
+			//		generated string
+			// 8) Character string generated by the keystroke
+			// 9) int8[16] state of all keys
+	
+			bigtime_t time;
+			int32 scancode, modifiers;
+			int8 utf[3];
+			char *string = NULL;
+			int32 keystate;
+	
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&modifiers);
+			msg.Read(utf, sizeof(utf));
+			msg.ReadString(&string);
+			msg.Read<int32>(&keystate);
+			if (string)
+				free(string);
+	
+			if(DISPLAYDRIVER==HWDRIVER)
+			{
+				// Check for workspace change or safe video mode
+				if(scancode>0x01 && scancode<0x0e)
+				{
+					if(scancode==0x0d)
+					{
+						if(modifiers & (B_LEFT_COMMAND_KEY |
+							B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY))
+						{
+							// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
+							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+							break;
+						}
+					}
+				}
+			
+				if(modifiers & B_CONTROL_KEY)
+				{
+					STRACE(("Set Workspace %ld\n",scancode-1));
+					
+					//TODO: SetWorkspace in KeyboardEventHandler
+					//SetWorkspace(scancode-2);
+					break;
+				}	
+
+				// Tab key
+				if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
+				{
+					//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
+					//if(deskbar)
+					//{
+						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						break;
+					//}
+				}
+
+				// PrintScreen
+				if(scancode==0xe)
+				{
+					if(GetDisplayDriver())
+					{
+						char filename[128];
+						BEntry entry;
+						
+						sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
+						entry.SetTo(filename);
+						
+						while(entry.Exists())
+						{
+							fScreenShotIndex++;
+							sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
+						}
+						fScreenShotIndex++;
+						GetDisplayDriver()->DumpToFile(filename);
+						break;
+					}
+				}
+			}
+			else
+			{
+				// F12
+				if(scancode>0x1 && scancode<0xe)
+				{
+					if(scancode==0xd)
+					{
+						if(modifiers & (B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY | B_LEFT_OPTION_KEY))
+						{
+							// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
+							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+							break;
+						}
+					}
+					if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
+					{
+						STRACE(("Set Workspace %ld\n",scancode-1));
+						//TODO: SetWorkspace in KeyboardEventHandler
+						//SetWorkspace(scancode-2);
+						break;
+					}	
+				}
+				
+				//Tab
+				if(scancode==0x26 && (modifiers & B_SHIFT_KEY))
+				{
+					STRACE(("Twitcher\n"));
+					//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
+					//if(deskbar)
+					//{
+						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						break;
+					//}
+				}
+
+				// Pause/Break
+				if(scancode==0x7f)
+				{
+					if(GetDisplayDriver())
+					{
+						char filename[128];
+						BEntry entry;
+						
+						sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
+						entry.SetTo(filename);
+						
+						while(entry.Exists())
+						{
+							fScreenShotIndex++;
+							sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
+						}
+						fScreenShotIndex++;
+
+						GetDisplayDriver()->DumpToFile(filename);
+						break;
+					}
+				}
+			}
+			
+			// We got this far, so apparently it's safe to pass to the active
+			// window.
+
+			// TODO: Pass on key down message to client window with the focus
+			break;
+		}
+		case B_KEY_UP:
+		{
+			// Attached Data:
+			// 1) int64 bigtime_t object of when the message was sent
+			// 2) int32 raw key code (scancode)
+			// 3) int32 modifier-independent ASCII code for the character
+			// 4) int32 modifiers
+			// 5) int8[3] UTF-8 data generated
+			// 6) int8 number of bytes to follow containing the 
+			//		generated string
+			// 7) Character string generated by the keystroke
+			// 8) int8[16] state of all keys
+			
+			bigtime_t time;
+			int32 scancode;
+			int32 ascii;
+			int32 modifiers;
+			int8 utf[3];
+			int8 bytes;
+			char *string;
+			int8 keystate[16];
+			
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&ascii);
+			msg.Read<int32>(&modifiers);
+			msg.Read(utf, sizeof(utf));
+			msg.Read<int8>(&bytes);
+			msg.ReadString(&string);
+			msg.Read(keystate, sizeof(keystate));
+			if (string)
+				free(string);
+	
+			STRACE(("Key Up: 0x%lx\n",scancode));
+			
+			if(DISPLAYDRIVER==HWDRIVER)
+			{
+				// Tab key
+				if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
+				{
+					//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
+					//if(deskbar)
+					//{
+						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						break;
+					//}
+				}
+			}
+			else
+			{
+				if(scancode==0x26 && (modifiers & B_LEFT_SHIFT_KEY))
+				{
+					//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
+					//if(deskbar)
+					//{
+						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						break;
+					//}
+				}
+			}
+
+			// We got this far, so apparently it's safe to pass to the active
+			// window.
+			
+			// TODO: Pass on key up message to client window with the focus
+			break;
+		}
+		case B_UNMAPPED_KEY_DOWN:
+		{
+			// Attached Data:
+			// 1) int64 bigtime_t object of when the message was sent
+			// 2) int32 raw key code (scancode)
+			// 3) int32 modifiers
+			// 4) int32 number of elements in the key state array to follow
+			// 5) int8 state of all keys
+
+			bigtime_t time;
+			int32 scancode;
+			int32 modifiers;
+			int32 elements;
+			//int8 keystate[16];
+			
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&modifiers);
+			msg.Read<int32>(&elements);
+			//msg.Read(keystate, elements);
+
+			#ifdef DEBUG_KEYHANDLING
+			printf("Unmapped Key Down: 0x%lx\n", scancode);
+			#endif
+			
+			// TODO: Pass on unmapped key down message to client window with the focus
+			break;
+		}
+		case B_UNMAPPED_KEY_UP:
+		{
+			// Attached Data:
+			// 1) int64 bigtime_t object of when the message was sent
+			// 2) int32 raw key code (scancode)
+			// 3) int32 modifiers
+			// 4) int32 number of elements in the key state array to follow
+			// 5) int8 state of all keys
+
+			bigtime_t time;
+			int32 scancode;
+			int32 modifiers;
+			int32 elements;
+			//int8 keystate[16];
+			
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&modifiers);
+			msg.Read<int32>(&elements);
+			//msg.Read(keystate, elements);
+
+			#ifdef DEBUG_KEYHANDLING
+			printf("Unmapped Key Up: 0x%lx\n", scancode);
+			#endif
+
+			// TODO: Pass on unmapped key up message to client window with the focus
+			break;
+		}
+		case B_MODIFIERS_CHANGED:
+		{
+			// Attached Data:
+			// 1) int64 bigtime_t object of when the message was sent
+			// 2) int32 modifiers
+			// 3) int32 old modifiers
+			// 4) int32 number of elements in the key state array to follow
+			// 5) int8 state of all keys
+			
+			bigtime_t time;
+			int32 scancode;
+			int32 modifiers;
+			int32 elements;
+			//int8 keystate[16];
+			
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&modifiers);
+			msg.Read<int32>(&elements);
+			//msg.Read(keystate, elements);
+
+			#ifdef DEBUG_KEYHANDLING
+			printf("Modifiers Changed\n");
+			#endif
+
+			// TODO: Pass on modifier change message to client window with the focus
+			break;
+		}
+		default:
+			break;
+	}
+}
+
+void RootLayer::SetDragMessage(BMessage* msg)
+{
+	if (fDragMessage)
+	{
+		delete fDragMessage;
+		fDragMessage = NULL;
+	}
+
+	if (msg)
+		fDragMessage	= new BMessage(*msg);
+}
+
+BMessage* RootLayer::DragMessage(void) const
+{
+	return fDragMessage;
+}
+
+// DEBUG methods
 
 void RootLayer::PrintToStream()
 {

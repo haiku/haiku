@@ -2215,7 +2215,7 @@ int32 ServerWindow::MonitorWin(void *data)
 	
 	while(!quitting)
 	{
-		printf("info: ServerWindow::MonitorWin listening on port %ld.\n", win->fMessagePort);
+//		printf("info: ServerWindow::MonitorWin listening on port %ld.\n", win->fMessagePort);
 		code = AS_CLIENT_DEAD;
 		err = ses->GetNextMessage(&code);
 		if (err < B_OK)

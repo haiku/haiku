@@ -83,7 +83,13 @@ VDView::VDView(BRect bounds)
 
 	// This link for sending mouse messages to the OBAppServer.
 	// This is only to take the place of the Input Server. 
-	serverlink = new BPortLink(find_port(SERVER_INPUT_PORT));
+	port_id		serverInputPort = create_port(200, SERVER_INPUT_PORT);
+	if (serverInputPort == B_NO_MORE_PORTS)
+	{
+		debugger("ViewDriver: out of ports\n");
+		return;
+	}
+	serverlink = new BPortLink(serverInputPort);
 
 	// Create a cursor which isn't just a box
 	cursor=new BBitmap(BRect(0,0,20,20),B_RGBA32,true);

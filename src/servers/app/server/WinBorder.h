@@ -101,7 +101,7 @@ public:
 protected:
 	friend class Layer;
 	friend class ServerWindow;
-	friend class Desktop;
+	friend class RootLayer;
 
 	Decorator *fDecorator;
 	Layer *fTopLayer;

@@ -56,19 +56,16 @@ private:
 	// global function pointer
 	create_decorator	*make_decorator;
 	
-	port_id	fMessagePort,
-			fMousePort;
+	port_id	fMessagePort;
 	
 	image_id fDecoratorID;
 	
 	BString fDecoratorName;
 	
-	bool fQuittingServer,
-		fExitPoller;
+	bool fQuittingServer;
 	
 	BList *fAppList;
-	thread_id fPollerThreadID,
-			  fPicassoThreadID;
+	thread_id fPicassoThreadID;
 	
 	sem_id 	fActiveAppLock,
 			fAppListLock,

@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Desktop.cpp
-//	Author:			Adi Oanca <adioanca@mymail.ro>
+//	Author:			Adi Oanca <adioanca@cotty.iren.ro>
 //	Description:	Class used to encapsulate desktop management
 //
 //------------------------------------------------------------------------------
@@ -69,20 +69,12 @@ public:
 	void RemoveWinBorder(WinBorder *winBorder);
 	bool HasWinBorder(WinBorder *winBorder);
 
-	// Input related methods
-	void MouseEventHandler(int32 code, BPortLink& link);
-	void KeyboardEventHandler(int32 code, BPortLink& link);
-	
-	void SetDragMessage(BMessage *msg);
-	BMessage *DragMessage(void) const;
-	
 	// Methods for various desktop stuff handled by the server
 	void SetScrollBarInfo(const scroll_bar_info &info);
 	scroll_bar_info		ScrollBarInfo(void) const;
 	
 	void SetMenuInfo(const menu_info &info);
 	menu_info MenuInfo(void) const;
-	
 	
 	void UseFFMouse(const bool &useffm);
 	bool FFMouseInUse(void) const;
@@ -102,13 +94,9 @@ public:
 	BList fWinBorderList;
 	
 private:
-	BMessage *fDragMessage;
-	
 	BList fRootLayerList;
 	RootLayer *fActiveRootLayer;
 
-	WinBorder *fMouseTarget;
-	
 	BList fScreenList;
 	Screen *fActiveScreen;
 	
@@ -116,7 +104,6 @@ private:
 	menu_info fMenuInfo;
 	mode_mouse fMouseMode;
 	bool fFFMouseMode;
-	int32 fScreenShotIndex;
 };
 
 extern Desktop *desktop;

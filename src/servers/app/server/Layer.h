@@ -21,7 +21,7 @@
 //
 //	File Name:		Layer.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@myrealbox.com>
+//					Adi Oanca <adioanca@cotty.iren.com>
 //	Description:	Class used for rendering to the frame buffer. One layer per 
 //					view on screen and also for window decorators
 //  
@@ -133,6 +133,7 @@ public:
 	ServerWindow *Window(void) const { return fServerWin; }
 	virtual bool HasClient(void) { return true; }
 	bool IsServerLayer() const;
+	int32 Level() const { return fLevel; }
 
 	void PruneTree(void);
 	
@@ -155,7 +156,6 @@ protected:
 	friend class WinBorder;
 	friend class Screen;
 	friend class ServerWindow;
-	friend class Desktop;
 	friend class Workspace;
 
 	BRect fFrame;

@@ -90,12 +90,10 @@ AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE)
 AppServer::AppServer(void)
 #endif
 {
-	fMousePort= create_port(200,SERVER_INPUT_PORT);
 	fMessagePort= create_port(200,SERVER_PORT_NAME);
 
 	fAppList= new BList(0);
 	fQuittingServer= false;
-	fExitPoller= false;
 	make_decorator= NULL;
 	
 	// We need this in order for new_decorator to be able to instantiate new decorators
@@ -153,11 +151,6 @@ AppServer::AppServer(void)
 	// This locker is to mediate access to the make_decorator pointer
 	fDecoratorLock= create_sem(1,"app_server_decor_sem");
 	
-	// Spawn our input-polling thread
-	fPollerThreadID= spawn_thread(PollerThread, "Poller", B_NORMAL_PRIORITY, this);
-	if (fPollerThreadID >= 0)
-		resume_thread(fPollerThreadID);
-
 	// Spawn our thread-monitoring thread
 	fPicassoThreadID= spawn_thread(PicassoThread,"Picasso", B_NORMAL_PRIORITY, this);
 	if (fPicassoThreadID >= 0)
@@ -195,67 +188,11 @@ AppServer::~AppServer(void)
 	// If these threads are still running, kill them - after this, if exit_poller
 	// is deleted, who knows what will happen... These things will just return an
 	// error and fail if the threads have already exited.
-	kill_thread(fPollerThreadID);
 	kill_thread(fPicassoThreadID);
 
 	delete fontserver;
 	
 	make_decorator=NULL;
-}
-
-/*!
-	\brief Thread function for polling and handling input messages
-	\param data Pointer to the app_server to which the thread belongs
-	\return Throwaway value - always 0
-*/
-int32 AppServer::PollerThread(void *data)
-{
-	// This thread handles nothing but input messages for mouse and keyboard
-	AppServer *appserver=(AppServer*)data;
-	BPortLink mousequeue(-1,appserver->fMousePort);
-	int32 code=0;
-	status_t err=B_OK;
-	
-	for(;;)
-	{
-		STRACE(("info: AppServer::PollerThread listening on port %ld.\n", appserver->fMousePort));
-		err=mousequeue.GetNextReply(&code);
-		
-		if(err<B_OK)
-		{
-			STRACE(("PollerThread:mousequeue.GetNextReply failed\n"));
-			continue;
-		}
-		
-		switch(code)
-		{
-			// We don't need to do anything with these two, so just pass them
-			// onto the active application. Eventually, we will end up passing 
-			// them onto the window which is currently under the cursor.
-			case B_MOUSE_DOWN:
-			case B_MOUSE_UP:
-			case B_MOUSE_WHEEL_CHANGED:
-			case B_MOUSE_MOVED:
-				desktop->MouseEventHandler(code,mousequeue);
-				break;
-
-			case B_KEY_DOWN:
-			case B_KEY_UP:
-			case B_UNMAPPED_KEY_DOWN:
-			case B_UNMAPPED_KEY_UP:
-			case B_MODIFIERS_CHANGED:
-				desktop->KeyboardEventHandler(code,mousequeue);
-				break;
-
-			default:
-				STRACE(("AppServer::Poller received unexpected code %lx\n",code));
-				break;
-		}
-		
-		if(appserver->fExitPoller)
-			break;
-	}
-	return err;
 }
 
 /*!
@@ -270,24 +207,17 @@ int32 AppServer::PicassoThread(void *data)
 	ServerApp	*app;
 	for(;;)
 	{
+		i = 0;
 		acquire_sem(appserver->fAppListLock);
-		for(i= 0; i < appserver->fAppList->CountItems(); i++)
+		for(;;)
 		{
-			app=(ServerApp*)appserver->fAppList->ItemAt(i);
+			app=(ServerApp*)appserver->fAppList->ItemAt(i++);
 			if(!app)
-			{
-				printf("PANIC: NULL app in app list\n");
-				continue;
-			}
+				break;
+
 			app->PingTarget();
 		}
-		release_sem(appserver->fAppListLock);
-		
-		// if poller thread has to exit, so do we - I just was too lazy
-		// to rename the variable name. ;)
-		if(appserver->fExitPoller)
-			break;
-
+		release_sem(appserver->fAppListLock);		
 		// we do this every other second so as not to suck *too* many CPU cycles
 		snooze(2000000);
 	}
@@ -746,14 +676,6 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 
 			// When we delete the last ServerApp, we can exit the server
 			fQuittingServer=true;
-			fExitPoller=true;
-
-			// also wait for picasso thread
-			kill_thread(fPicassoThreadID);
-
-			// poller thread is stuck reading messages from its input port
-			// so, there is no cleaner way to make it quit, other than killing it!
-			kill_thread(fPollerThreadID);
 
 			// we are now clear to exit
 			break;

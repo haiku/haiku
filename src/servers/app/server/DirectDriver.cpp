@@ -794,7 +794,13 @@ DDView::DDView(BRect bounds)
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
 #ifdef ENABLE_INPUT_SERVER_EMULATION
-	serverlink.SetSendPort(find_port(SERVER_INPUT_PORT));
+	port_id		serverInputPort = create_port(200, SERVER_INPUT_PORT);
+	if (serverInputPort == B_NO_MORE_PORTS)
+	{
+		debugger("ViewDriver: out of ports\n");
+		return;
+	}
+	serverlink.SetSendPort(serverInputPort);
 #endif
 
 }
