@@ -110,6 +110,7 @@ class HeaderView : public BView, public BInvoker {
 		virtual ~HeaderView();
 
 		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
 		virtual void Draw(BRect updateRect);
 		virtual void GetPreferredSize(float *_width, float *_height);
 		virtual void MessageReceived(BMessage *message);
@@ -573,7 +574,7 @@ HeaderView::~HeaderView()
 }
 
 
-void 
+void
 HeaderView::AttachedToWindow()
 {
 	SetTarget(Window());
@@ -581,10 +582,30 @@ HeaderView::AttachedToWindow()
 	fStopButton->SetTarget(Parent());
 	fPositionControl->SetTarget(this);
 	fPositionSlider->SetTarget(this);
+	
+	BMessage *message;
+	Window()->AddShortcut(B_HOME, B_COMMAND_KEY, message = new BMessage(kMsgPositionUpdate), this);
+	message->AddInt64("block", 0);
+	Window()->AddShortcut(B_END, B_COMMAND_KEY, message = new BMessage(kMsgPositionUpdate), this);
+	message->AddInt64("block", -1);
+	Window()->AddShortcut(B_PAGE_UP, B_COMMAND_KEY, message = new BMessage(kMsgPositionUpdate), this);
+	message->AddInt32("delta", -1);
+	Window()->AddShortcut(B_PAGE_DOWN, B_COMMAND_KEY, message = new BMessage(kMsgPositionUpdate), this);
+	message->AddInt32("delta", 1);
 }
 
 
-void 
+void
+HeaderView::DetachedFromWindow()
+{
+	Window()->RemoveShortcut(B_HOME, B_COMMAND_KEY);
+	Window()->RemoveShortcut(B_END, B_COMMAND_KEY);
+	Window()->RemoveShortcut(B_PAGE_UP, B_COMMAND_KEY);
+	Window()->RemoveShortcut(B_PAGE_DOWN, B_COMMAND_KEY);
+}
+
+
+void
 HeaderView::Draw(BRect updateRect)
 {
 	BRect rect = Bounds();
@@ -779,9 +800,11 @@ HeaderView::MessageReceived(BMessage *message)
 			int32 delta;
 			if (message->FindInt64("position", &position) == B_OK)
 				fPosition = position;
-			else if (message->FindInt64("block", &position) == B_OK)
+			else if (message->FindInt64("block", &position) == B_OK) {
+				if (position < 0)
+					position += (fFileSize - 1) / fBlockSize + 1;
 				fPosition = position * fBlockSize;
-			else if (message->FindInt32("delta", &delta) == B_OK)
+			} else if (message->FindInt32("delta", &delta) == B_OK)
 				fPosition += delta * off_t(fBlockSize);
 			else
 				fPosition = strtoll(fPositionControl->Text(), NULL, 0) * fBlockSize;
