@@ -182,6 +182,13 @@ if $(OS) = BEOS
 	CP = copyattr --data ;
 }
 
+# for builds of tools in the current environment
+if $(OS) = BEOS {
+	BUILD_LIBSTDC++ = stdc++.r4 ;
+} else {
+	BUILD_LIBSTDC++ = stdc++ ;
+}
+
 # If no OBOS_OBJECT_TARGET is not defined yet, use our default directory and
 # include our "OBOS_TARGET" as subdirectory in there (to prevent different
 # builds mixing objects from different targets).
