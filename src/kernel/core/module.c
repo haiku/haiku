@@ -787,18 +787,18 @@ static inline int
 module_enter_base_path(module_iterator *iter)
 {
 	char path[SYS_MAX_PATH_LEN];
-	
+
 	++iter->base_path_id;
 
-	if (iter->base_path_id >= (int)num_module_paths ) {
-		SHOW_FLOW0( 3, "no locations left\n" );
+	if (iter->base_path_id >= (int)num_module_paths) {
+		SHOW_FLOW0(3, "no locations left\n");
 		return ENOENT;
 	}
 
 	SHOW_FLOW(3, "trying base path (%s)\n", module_paths[iter->base_path_id]);
-	
+
 	if (iter->base_path_id == 0 && modules_disable_user_addons) {
-		SHOW_FLOW0( 3, "ignoring user add-ons (they are disabled)\n" );
+		SHOW_FLOW0(3, "ignoring user add-ons (they are disabled)\n");
 		return B_NO_ERROR;
 	}
 	strcpy(path, module_paths[iter->base_path_id]);
@@ -825,9 +825,9 @@ void *
 open_module_list(const char *prefix)
 {
 	module_iterator *iter;
-	
-	SHOW_FLOW( 3, "prefix: %s\n", prefix );
-	
+
+	SHOW_FLOW(3, "prefix: %s\n", prefix);
+
 	iter = (module_iterator *)malloc(sizeof( module_iterator));
 	if (!iter)
 		return NULL;
@@ -837,12 +837,12 @@ open_module_list(const char *prefix)
 		free(iter);
 		return NULL;
 	}
-	
+
 	iter->base_path_id = -1;
 	iter->base_dir = iter->cur_dir = NULL;
 	iter->err = B_NO_ERROR;
 	iter->module_pos = 0;
-		
+
 	return (void *)iter;
 }
 
@@ -860,7 +860,7 @@ read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 	int res;
 
 	*buf = '\0';
-		
+
 	if (!iter)
 		return EINVAL;
 
@@ -885,9 +885,9 @@ read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 	/* did we get something?? */
 	if (*buf == '\0')
 		res = ENOENT;
-		
+
 	iter->err = res;
-	
+
 	SHOW_FLOW(3, "finished with status %s\n", strerror(iter->err));
 	return iter->err;
 }
@@ -897,13 +897,13 @@ status_t
 close_module_list(void *cookie)
 {
 	module_iterator *iter = (module_iterator *)cookie;
-	
-	SHOW_FLOW0( 3, "\n" );
-	
-	if (!iter )
+
+	SHOW_FLOW0(3, "\n");
+
+	if (!iter)
 		return EINVAL;
-		
-	while(iter->cur_dir)
+
+	while (iter->cur_dir)
 		module_leave_dir(iter);
 
 	free(iter->prefix);
@@ -912,14 +912,16 @@ close_module_list(void *cookie)
 	return 0;
 }
 
+
 /* module_init
  * setup module structures and data for use
  */
+
 status_t
 module_init(kernel_args *ka, module_info **sys_module_headers)
 {
-	SHOW_FLOW0( 0, "\n" );
-	recursive_lock_create( &modules_lock );
+	SHOW_FLOW0(0, "\n");
+	recursive_lock_create(&modules_lock);
 	
 	modules_list = hash_make();
 	module_files = hash_make();
@@ -927,8 +929,8 @@ module_init(kernel_args *ka, module_info **sys_module_headers)
 	if (modules_list == NULL || module_files == NULL)
 		return ENOMEM;
 
-	loaded_modules.next = loaded_modules.prev = &loaded_modules;
-	known_modules.next = known_modules.prev = &known_modules;
+	initque(&loaded_modules);
+	initque(&known_modules);
 
 /*
 	if (sys_module_headers) { 
@@ -936,8 +938,8 @@ module_init(kernel_args *ka, module_info **sys_module_headers)
 			return ENOMEM;
 	}
 */	
-	
-	return B_NO_ERROR;
+
+	return B_OK;
 }
 
 

@@ -100,11 +100,9 @@ install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	state = disable_interrupts();
 	acquire_spinlock(&io_vectors[vector].vector_lock);
 
-	/* Make sure our list is init'd or bad things will happen */ //XXX this should not be needed
-	if (io_vectors[vector].handler_list.next == NULL) {
-		io_vectors[vector].handler_list.next = &io_vectors[vector].handler_list;
-		io_vectors[vector].handler_list.prev = &io_vectors[vector].handler_list;
-	}
+	/* The list must be inited before the first item is inserted */
+	if (io_vectors[vector].handler_list.next == NULL)
+		initque(&io_vectors[vector].handler_list);
 
 	insque(io, &io_vectors[vector].handler_list);
 
