@@ -10,8 +10,6 @@
 #include "mpglib.h"
 #include "huffman.h"
 
-extern struct mpstr *gmp;
-
 #define MPEG1
 
 
@@ -1812,12 +1810,12 @@ static void dct12(real *in,real *rawout1,real *rawout2,register real *wi,registe
 /*
  * III_hybrid
  */
-static void III_hybrid(real fsIn[SBLIMIT][SSLIMIT],real tsOut[SSLIMIT][SBLIMIT],
+static void III_hybrid(struct mpstr *mp, real fsIn[SBLIMIT][SSLIMIT],real tsOut[SSLIMIT][SBLIMIT],
    int ch,struct gr_info_s *gr_info)
 {
    real *tspnt = (real *) tsOut;
-   real (*block)[2][SBLIMIT*SSLIMIT] = gmp->hybrid_block;
-   int *blc = gmp->hybrid_blc;
+   real (*block)[2][SBLIMIT*SSLIMIT] = mp->hybrid_block;
+   int *blc = mp->hybrid_blc;
    real *rawout1,*rawout2;
    int bt;
    int sb = 0;
@@ -1840,13 +1838,13 @@ static void III_hybrid(real fsIn[SBLIMIT][SSLIMIT],real tsOut[SSLIMIT][SBLIMIT],
  
    bt = gr_info->block_type;
    if(bt == 2) {
-     for (; sb<gr_info->maxb; sb+=2,tspnt+=2,rawout1+=36,rawout2+=36) {
+     for (; sb<(int)gr_info->maxb; sb+=2,tspnt+=2,rawout1+=36,rawout2+=36) {
        dct12(fsIn[sb],rawout1,rawout2,win[2],tspnt);
        dct12(fsIn[sb+1],rawout1+18,rawout2+18,win1[2],tspnt+1);
      }
    }
    else {
-     for (; sb<gr_info->maxb; sb+=2,tspnt+=2,rawout1+=36,rawout2+=36) {
+     for (; sb<(int)gr_info->maxb; sb+=2,tspnt+=2,rawout1+=36,rawout2+=36) {
        dct36(fsIn[sb],rawout1,rawout2,win[bt],tspnt);
        dct36(fsIn[sb+1],rawout1+18,rawout2+18,win1[bt],tspnt+1);
      }
@@ -1864,7 +1862,7 @@ static void III_hybrid(real fsIn[SBLIMIT][SSLIMIT],real tsOut[SSLIMIT][SBLIMIT],
 /*
  * main layer3 handler
  */
-int do_layer3(struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
+int do_layer3(struct mpstr *mp, struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
 {
   int gr, ch, ss,clip=0;
   int scalefacs[2][39]; /* max 39 for short[13][3] mode, mixed: 38, long: 22 */
@@ -1906,7 +1904,7 @@ int do_layer3(struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
 #endif
   }
 
-  if(set_pointer(sideinfo.main_data_begin) == MP3_ERR)
+  if(set_pointer(mp, sideinfo.main_data_begin) == MP3_ERR)
     return -1;
 
   for (gr=0;gr<granules;gr++) 
@@ -1971,7 +1969,7 @@ int do_layer3(struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
           {
             register int i;
             register real *in0 = (real *) hybridIn[0],*in1 = (real *) hybridIn[1];
-            for(i=0;i<SSLIMIT*gr_info->maxb;i++,in0++)
+            for(i=0;i<(int)(SSLIMIT*gr_info->maxb);i++,in0++)
               *in0 = (*in0 + *in1++); /* *0.5 done by pow-scale */ 
           }
           break;
@@ -1979,7 +1977,7 @@ int do_layer3(struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
           {
             register int i;
             register real *in0 = (real *) hybridIn[0],*in1 = (real *) hybridIn[1];
-            for(i=0;i<SSLIMIT*gr_info->maxb;i++)
+            for(i=0;i<(int)(SSLIMIT*gr_info->maxb);i++)
               *in0++ = *in1++;
           }
           break;
@@ -1989,17 +1987,17 @@ int do_layer3(struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
     for(ch=0;ch<stereo1;ch++) {
       struct gr_info_s *gr_info = &(sideinfo.ch[ch].gr[gr]);
       III_antialias(hybridIn[ch],gr_info);
-      III_hybrid(hybridIn[ch], hybridOut[ch], ch,gr_info);
+      III_hybrid(mp, hybridIn[ch], hybridOut[ch], ch,gr_info);
     }
 
     for(ss=0;ss<SSLIMIT;ss++) {
       if(single >= 0) {
-        clip += synth_1to1_mono(hybridOut[0][ss],pcm_sample,pcm_point);
+        clip += synth_1to1_mono(mp, hybridOut[0][ss],pcm_sample,pcm_point);
       }
       else {
         int p1 = *pcm_point;
-        clip += synth_1to1(hybridOut[0][ss],0,pcm_sample,&p1);
-        clip += synth_1to1(hybridOut[1][ss],1,pcm_sample,pcm_point);
+        clip += synth_1to1(mp, hybridOut[0][ss],0,pcm_sample,&p1);
+        clip += synth_1to1(mp, hybridOut[1][ss],1,pcm_sample,pcm_point);
       }
     }
   }

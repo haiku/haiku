@@ -1,18 +1,18 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "mpg123.h"
 #include "mpglib.h"
 
-/* Global mp .. it's a hack */
-struct mpstr *gmp;
-
-
-BOOL InitMP3(struct mpstr *mp) 
+void InitMpgLib(void)
 {
-	static int init = 0;
+	make_decode_tables(32767);
+	init_layer2();
+	init_layer3(SBLIMIT);
+}
 
+void InitMP3(struct mpstr *mp) 
+{
 	memset(mp,0,sizeof(struct mpstr));
 
 	mp->framesize = 0;
@@ -22,15 +22,6 @@ BOOL InitMP3(struct mpstr *mp)
 	mp->fr.single = -1;
 	mp->bsnum = 0;
 	mp->synth_bo = 1;
-
-	if(!init) {
-		init = 1;
-		make_decode_tables(32767);
-		init_layer2();
-		init_layer3(SBLIMIT);
-	}
-
-	return !0;
 }
 
 void ExitMP3(struct mpstr *mp)
@@ -139,8 +130,6 @@ int decodeMP3(struct mpstr *mp,char *in,int isize,char *out,
 {
 	int len;
 
-	gmp = mp;
-
 	if(osize < 4608) {
 		fprintf(stderr,"To less out space\n");
 		return MP3_ERR;
@@ -193,13 +182,13 @@ int decodeMP3(struct mpstr *mp,char *in,int isize,char *out,
            getbits(16);
         switch(mp->fr.lay) {
           case 1:
-	    do_layer1(&mp->fr,(unsigned char *) out,done);
+	    do_layer1(mp, &mp->fr,(unsigned char *) out,done);
             break;
           case 2:
-	    do_layer2(&mp->fr,(unsigned char *) out,done);
+	    do_layer2(mp, &mp->fr,(unsigned char *) out,done);
             break;
           case 3:
-	    do_layer3(&mp->fr,(unsigned char *) out,done);
+	    do_layer3(mp, &mp->fr,(unsigned char *) out,done);
             break;
         }
 
@@ -209,21 +198,17 @@ int decodeMP3(struct mpstr *mp,char *in,int isize,char *out,
 	return MP3_OK;
 }
 
-int set_pointer(long backstep)
+int set_pointer(struct mpstr *mp, long backstep)
 {
   unsigned char *bsbufold;
-  if(gmp->fsizeold < 0 && backstep > 0) {
+  if(mp->fsizeold < 0 && backstep > 0) {
     fprintf(stderr,"Can't step back %ld!\n",backstep);
     return MP3_ERR;
   }
-  bsbufold = gmp->bsspace[gmp->bsnum] + 512;
+  bsbufold = mp->bsspace[mp->bsnum] + 512;
   wordpointer -= backstep;
   if (backstep)
-    memcpy(wordpointer,bsbufold+gmp->fsizeold-backstep,backstep);
+    memcpy(wordpointer,bsbufold+mp->fsizeold-backstep,backstep);
   bitindex = 0;
   return MP3_OK;
 }
-
-
-
-

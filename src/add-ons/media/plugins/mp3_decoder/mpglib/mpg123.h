@@ -1,27 +1,8 @@
 #include        <stdio.h>
 #include        <string.h>
 #include        <signal.h>
-
-#ifndef WIN32
-#include        <sys/signal.h>
 #include        <unistd.h>
-#endif
-
 #include        <math.h>
-
-#ifdef _WIN32
-# undef WIN32
-# define WIN32
-
-# define M_PI       3.14159265358979323846
-# define M_SQRT2	1.41421356237309504880
-# define REAL_IS_FLOAT
-# define NEW_DCT9
-
-# define random rand
-# define srandom srand
-
-#endif
 
 #ifdef REAL_IS_FLOAT
 #  define real float
@@ -40,13 +21,6 @@
 /* AUDIOBUFSIZE = n*64 with n=1,2,3 ...  */
 #define		AUDIOBUFSIZE		16384
 
-#ifndef FALSE
-#define         FALSE                   0
-#endif
-#ifndef FALSE
-#define         TRUE                    1
-#endif
-
 #define         SBLIMIT                 32
 #define         SSLIMIT                 18
 
@@ -63,6 +37,8 @@
 
 /* Pre Shift fo 16 to 8 bit converter table */
 #define AUSHIFT (3)
+
+struct mpstr;
 
 struct frame {
     int stereo;
@@ -99,15 +75,15 @@ struct parameter {
 extern unsigned int   get1bit(void);
 extern unsigned int   getbits(int);
 extern unsigned int   getbits_fast(int);
-extern int set_pointer(long);
+extern int set_pointer(struct mpstr *mp, long backstep);
 
 extern unsigned char *wordpointer;
 extern int bitindex;
 
 extern void make_decode_tables(long scaleval);
-extern int do_layer3(struct frame *fr,unsigned char *,int *);
-extern int do_layer2(struct frame *fr,unsigned char *,int *);
-extern int do_layer1(struct frame *fr,unsigned char *,int *);
+extern int do_layer3(struct mpstr *mp, struct frame *fr,unsigned char *,int *);
+extern int do_layer2(struct mpstr *mp, struct frame *fr,unsigned char *,int *);
+extern int do_layer1(struct mpstr *mp, struct frame *fr,unsigned char *,int *);
 extern int decode_header(struct frame *fr,unsigned long newhead);
 
 
@@ -142,9 +118,9 @@ struct III_sideinfo
   } ch[2];
 };
 
-extern int synth_1to1 (real *,int,unsigned char *,int *);
+extern int synth_1to1 (struct mpstr *mp, real *,int,unsigned char *,int *);
 extern int synth_1to1_8bit (real *,int,unsigned char *,int *);
-extern int synth_1to1_mono (real *,unsigned char *,int *);
+extern int synth_1to1_mono (struct mpstr *mp, real *,unsigned char *,int *);
 extern int synth_1to1_mono2stereo (real *,unsigned char *,int *);
 extern int synth_1to1_8bit_mono (real *,unsigned char *,int *);
 extern int synth_1to1_8bit_mono2stereo (real *,unsigned char *,int *);
@@ -189,5 +165,3 @@ extern real decwin[512+32];
 extern real *pnts[5];
 
 extern struct parameter param;
-
-

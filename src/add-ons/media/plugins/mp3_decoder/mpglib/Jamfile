@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src add-ons media plugins mp3_decoder mpglib ;
+
+StaticLibrary mpglib :
+	common.c
+	dct64_i386.c
+	decode_i386.c
+	interface.c
+	layer1.c
+	layer2.c
+	layer3.c
+	tabinit.c
+;

@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src add-ons media plugins mp3_decoder ;
+
+UsePrivateHeaders media ;
+
+Addon mp3_decoder : media plugins :
+	mp3DecoderPlugin.cpp
+;
+
+LinkSharedOSLibs mp3_decoder : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins mp3_decoder mpglib ;

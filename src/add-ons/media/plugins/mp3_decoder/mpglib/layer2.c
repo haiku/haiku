@@ -14,6 +14,9 @@ static int grp_9tab[1024 * 3] = { 0, }; /* used: 729 */
 
 real muls[27][64];	/* also used by layer 1 */
 
+void II_step_one(unsigned int *bit_alloc,int *scale,struct frame *fr);
+void II_step_two(unsigned int *bit_alloc,real fraction[2][4][SBLIMIT],int *scale,struct frame *fr,int x1);
+
 void init_layer2(void)
 {
   static double mulmul[27] = {
@@ -247,7 +250,7 @@ static void II_select_table(struct frame *fr)
   fr->II_sblimit = sblim;
 }
 
-int do_layer2(struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
+int do_layer2(struct mpstr *mp, struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
 {
   int clip=0;
   int i,j;
@@ -271,12 +274,12 @@ int do_layer2(struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
     II_step_two(bit_alloc,fraction,scale,fr,i>>2);
     for (j=0;j<3;j++) {
       if(single >= 0) {
-        clip += synth_1to1_mono(fraction[0][j],pcm_sample,pcm_point);
+        clip += synth_1to1_mono(mp, fraction[0][j],pcm_sample,pcm_point);
       }
       else {
         int p1 = *pcm_point;
-        clip += synth_1to1(fraction[0][j],0,pcm_sample,&p1);
-        clip += synth_1to1(fraction[1][j],1,pcm_sample,pcm_point);
+        clip += synth_1to1(mp, fraction[0][j],0,pcm_sample,&p1);
+        clip += synth_1to1(mp, fraction[1][j],1,pcm_sample,pcm_point);
       }
 
     }

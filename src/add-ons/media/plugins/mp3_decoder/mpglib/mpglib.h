@@ -1,3 +1,5 @@
+#ifndef _MPGLIB_H
+#define _MPGLIB_H
 
 struct buf {
         unsigned char *pnt;
@@ -29,20 +31,16 @@ struct mpstr {
         int  synth_bo;
 };
 
-#ifndef BOOL
-#define BOOL int
-#endif
-
 #define MP3_ERR -1
 #define MP3_OK  0
 #define MP3_NEED_MORE 1
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-  
-BOOL InitMP3(struct mpstr *mp);
+
+void InitMpgLib(void);  
+void InitMP3(struct mpstr *mp);
 int decodeMP3(struct mpstr *mp,char *inmemory,int inmemsize,
      char *outmemory,int outmemsize,int *done);
 void ExitMP3(struct mpstr *mp);
@@ -51,4 +49,4 @@ void ExitMP3(struct mpstr *mp);
 }
 #endif
 
-
+#endif

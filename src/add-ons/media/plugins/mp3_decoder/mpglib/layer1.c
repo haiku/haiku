@@ -10,6 +10,10 @@
 
 #include "mpg123.h"
 
+void I_step_one(unsigned int balloc[], unsigned int scale_index[2][SBLIMIT],struct frame *fr);
+void I_step_two(real fraction[2][SBLIMIT],unsigned int balloc[2*SBLIMIT],
+	unsigned int scale_index[2][SBLIMIT],struct frame *fr);
+
 void I_step_one(unsigned int balloc[], unsigned int scale_index[2][SBLIMIT],struct frame *fr)
 {
   unsigned int *ba=balloc;
@@ -111,7 +115,7 @@ void I_step_two(real fraction[2][SBLIMIT],unsigned int balloc[2*SBLIMIT],
   }
 }
 
-int do_layer1(struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
+int do_layer1(struct mpstr *mp, struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
 {
   int clip=0;
   int i,stereo = fr->stereo;
@@ -132,12 +136,12 @@ int do_layer1(struct frame *fr,unsigned char *pcm_sample,int *pcm_point)
     I_step_two(fraction,balloc,scale_index,fr);
 
       if(single >= 0) {
-        clip += synth_1to1_mono( (real*)fraction[single],pcm_sample,pcm_point);
+        clip += synth_1to1_mono(mp, (real*)fraction[single],pcm_sample,pcm_point);
       }
       else {
         int p1 = *pcm_point;
-        clip += synth_1to1( (real*)fraction[0],0,pcm_sample,&p1);
-        clip += synth_1to1( (real*)fraction[1],1,pcm_sample,pcm_point);
+        clip += synth_1to1(mp, (real*)fraction[0],0,pcm_sample,&p1);
+        clip += synth_1to1(mp, (real*)fraction[1],1,pcm_sample,pcm_point);
       }
   }
 
