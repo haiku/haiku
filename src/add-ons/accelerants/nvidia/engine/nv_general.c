@@ -6,6 +6,7 @@
 
 #define MODULE_BIT 0x00008000
 
+#include <unistd.h>
 #include "nv_std.h"
 
 static status_t test_ram(void);
@@ -990,10 +991,6 @@ status_t nv_general_head_select(bool cross)
  * Should work from VGA BIOS POST init state. */
 static status_t nv_general_bios_to_powergraphics()
 {
-	uint32 agp_ident, agp_stat, agp_cmd;
-	bool agp_1x, agp_2x, agp_4x, agp3_4x, agp3_8x;
-	uint8 agp_speed;
-
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 
 	/* let acc engine make power off/power on cycle to start 'fresh' */
@@ -1188,7 +1185,7 @@ static status_t nv_general_setup_agp(void)
 		{
 			LOG(4,("INIT: host bridge failed to respond correctly, aborting AGP setup!\n"));
 			/* close host bridge driver */
-//			close(agp_fd);
+			close(agp_fd);
 			/* program card for PCI access */
 			CFGW(AGPCMD, 0x00000000);
 
@@ -1201,13 +1198,13 @@ static status_t nv_general_setup_agp(void)
 			((ai_bridge.config.agp_cap_id & AGP_rev_minor) >> AGP_rev_minor_shift)));
 		nv_general_list_AGP_caps(ai_bridge);
 
-		//fixme: abort if specified by user in nv.settings!
-		if (0)
+		/* abort if specified by user in nv.settings */
+		if (si->settings.force_pci)
 		{
 			/* user specified not to use AGP */
 			LOG(4,("INIT: forcing PCI mode (specified in nv.settings).\n"));
 			/* close host bridge driver */
-//			close(agp_fd);
+			close(agp_fd);
 			/* program card for PCI access */
 			CFGW(AGPCMD, 0x00000000);
 
@@ -1220,7 +1217,7 @@ static status_t nv_general_setup_agp(void)
 		{
 			LOG(4,("INIT: compatibility problem detected, aborting AGP setup!\n"));
 			/* close host bridge driver */
-//			close(agp_fd);
+			close(agp_fd);
 			/* program card for PCI access */
 			CFGW(AGPCMD, 0x00000000);
 
@@ -1314,6 +1311,10 @@ static status_t nv_general_setup_agp(void)
 		}
 
 		/* set the enable AGP bits */
+		/* note:
+		 * the AGP standard defines that this bit may be written to the AGPCMD
+		 * registers simultanously with the other bits if a single 32bit write
+		 * to each register is used. */
 		ai_card.config.agp_cmd |= AGP_enable;
 		ai_bridge.config.agp_cmd |= AGP_enable;
 
@@ -1326,7 +1327,7 @@ static status_t nv_general_setup_agp(void)
 		LOG(4,("INIT: graphics card AGPCMD register readback $%08x\n", CFGR(AGPCMD)));
 
 		/* close host bridge driver */
-//		close(agp_fd);
+		close(agp_fd);
 	}
 	else
 	{

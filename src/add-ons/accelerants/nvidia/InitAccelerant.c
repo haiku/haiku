@@ -38,8 +38,8 @@ static status_t init_common(int the_fd) {
 			goto error0;
 	}
 	// LOG is now available, si !NULL
-	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d, switchhead %d\n",
-		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.switchhead));
+	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d, switchhead %d, force_pci %d\n",
+		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.switchhead, si->settings.force_pci));
 
  	/*Check for R4.5.0 and if it is running, use work around*/
  	{
