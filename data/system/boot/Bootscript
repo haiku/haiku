@@ -67,6 +67,7 @@ runprog beos/bin/clockconfig
 # We must wait for the app_server and registrar to be ready
 #launch $SERVERS/app_server picasso			# launch app_server
 launch $SERVERS/registrar _roster_thread_	# launch registrar
+launch $SERVERS/debug_server				# launch debug_server
 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/syslog_daemon
