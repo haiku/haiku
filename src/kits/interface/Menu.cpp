@@ -430,7 +430,8 @@ BMenu::ItemAt(int32 index) const
 BMenu *
 BMenu::SubmenuAt(int32 index) const
 {
-	return static_cast<BMenuItem *>(fItems.ItemAt(index))->Submenu();
+	BMenuItem *tempItem=static_cast<BMenuItem *>(fItems.ItemAt(index));
+	return (tempItem) ? tempItem->Submenu() : NULL;
 }
 
 
