@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include "OpenDMLFile.h"
 
-#if 0
+//#define TRACE_ODML_FILE
+#ifdef TRACE_ODML_FILE
   #define TRACE printf
 #else
   #define TRACE(a...)
 #endif
+
+#define ERROR(a...) fprintf(stderr, a)
 
 #define INDEX_CHUNK_SIZE 32768
 
@@ -66,10 +69,13 @@ OpenDMLFile::SetTo(BPositionIO *source)
 	delete fParser;
 	fSource = source;
 	fParser = new OpenDMLParser;
-	fParser->Parse(source);
+
+	if (!fParser->Parse(source)) {
+		ERROR("OpenDMLFile::SetTo: warning, file parsing failed\n");		
+	}
 	
 	if (!fParser->AviMainHeader()) {
-		TRACE("OpenDMLFile::SetTo: avi main header not found\n");
+		ERROR("OpenDMLFile::SetTo: avi main header not found\n");
 		return B_ERROR;
 	}
 	
@@ -83,7 +89,7 @@ OpenDMLFile::SetTo(BPositionIO *source)
 			}
 		}
 		if (!found_odml_index) {
-			TRACE("OpenDMLFile::SetTo file has no standard avi index, and no OpenDML track index found\n");
+			ERROR("OpenDMLFile::SetTo file has no standard avi index, and no OpenDML track index found\n");
 			return B_ERROR;
 		}
 	}
@@ -115,6 +121,8 @@ OpenDMLFile::InitData()
 		standard_index_entry_size = 16;
 		standard_index_entry_count = fParser->StandardIndexSize() / 16;
 	} else {
+		standard_index_start = -1;
+		standard_index_entry_size = 0;
 		standard_index_entry_count = 0;
 	}
  	
@@ -160,12 +168,12 @@ OpenDMLFile::InitData()
 				((odml_superindex_entry *)fStreamData[stream].odml_superindex)->duration = 0;
 				fStreamData[stream].has_odml_index = true;
 			} else if (h.index_type == AVI_INDEX_IS_DATA){
-				TRACE("OpenDMLFile::InitData: AVI_INDEX_IS_DATA not supported\n");
+				ERROR("OpenDMLFile::InitData: AVI_INDEX_IS_DATA not supported\n");
 				fStreamData[stream].odml_superindex = 0;
 				fStreamData[stream].odml_superindex_entry_count = 0;
 				fStreamData[stream].odml_superindex_entry_pos = 0;
 			} else {
-				TRACE("OpenDMLFile::InitData: index type not recongnized\n");
+				ERROR("OpenDMLFile::InitData: index type not recongnized\n");
 				fStreamData[stream].odml_superindex = 0;
 				fStreamData[stream].odml_superindex_entry_count = 0;
 				fStreamData[stream].odml_superindex_entry_pos = 0;
@@ -220,7 +228,7 @@ OpenDMLFile::OdmlReadIndexInfo(int stream_index)
 	odml_chunk_index_header chunk_index_header;
 	
 	if (sizeof(chunk_index_header) != fSource->ReadAt(entry->start + 8, &chunk_index_header, sizeof(chunk_index_header))) {
-		TRACE("read error\n");
+		ERROR("OpenDMLFile::OdmlReadIndexInfo: read error\n");
 		return false;
 	}
 
@@ -260,7 +268,7 @@ OpenDMLFile::OdmlReadIndexChunk(int stream_index)
 		stream_index, data->index_chunk_entry_count, size, start);
 	
 	if (size != fSource->ReadAt(start, data->index_chunk, size)) {
-		TRACE("read error\n");
+		ERROR("OpenDMLFile::OdmlReadIndexChunk read error\n");
 		return false;
 	}
 
@@ -288,7 +296,7 @@ OpenDMLFile::OdmlGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, 
 	
 	data->index_chunk_entry_pos++;
 	
-	printf("OpenDMLFile::GetNextChunkInfo: stream %d: start %15Ld, size %6d%s\n",
+	printf("OpenDMLFile::GetNextChunkInfo: stream %d: start %15Ld, size %6ld%s\n",
 		stream_index, *start, *size, *keyframe ? ", keyframe" : "");
 	return true;
 }
@@ -309,7 +317,7 @@ OpenDMLFile::AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, b
 			TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, index_chunk_entry_count %d, size %d, start %lu\n",
 				stream_index, data->index_chunk_entry_count, size, start);
 			if (size != fSource->ReadAt(start, data->index_chunk, size)) {
-				TRACE("OpenDMLFile::AviGetNextChunkInfo: read error\n");
+				ERROR("OpenDMLFile::AviGetNextChunkInfo: read error\n");
 				return false;
 			}
 		}

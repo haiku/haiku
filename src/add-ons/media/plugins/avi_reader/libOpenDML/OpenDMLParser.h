@@ -24,7 +24,7 @@ class OpenDMLParser
 public:
 					OpenDMLParser();
 					~OpenDMLParser();
-	void	 		Parse(BPositionIO *source);
+	bool	 		Parse(BPositionIO *source);
 	
 	int				StreamCount();
 
@@ -39,17 +39,17 @@ public:
 	const odml_extended_header * OdmlExtendedHeader();
 
 private:
-	void	 		ParseChunk_AVI(int number, uint64 start, uint32 size);
-	void	 		ParseChunk_LIST(uint64 start, uint32 size);
-	void	 		ParseChunk_idx1(uint64 start, uint32 size);
-	void	 		ParseChunk_indx(uint64 start, uint32 size);
-	void	 		ParseChunk_avih(uint64 start, uint32 size);
-	void	 		ParseChunk_strh(uint64 start, uint32 size);
-	void	 		ParseChunk_strf(uint64 start, uint32 size);
-	void	 		ParseChunk_dmlh(uint64 start, uint32 size);
-	void	 		ParseList_movi(uint64 start, uint32 size);
-	void	 		ParseList_generic(uint64 start, uint32 size);
-	void	 		ParseList_strl(uint64 start, uint32 size);
+	bool	 		ParseChunk_AVI(int number, uint64 start, uint32 size);
+	bool	 		ParseChunk_LIST(uint64 start, uint32 size);
+	bool	 		ParseChunk_idx1(uint64 start, uint32 size);
+	bool	 		ParseChunk_indx(uint64 start, uint32 size);
+	bool	 		ParseChunk_avih(uint64 start, uint32 size);
+	bool	 		ParseChunk_strh(uint64 start, uint32 size);
+	bool	 		ParseChunk_strf(uint64 start, uint32 size);
+	bool	 		ParseChunk_dmlh(uint64 start, uint32 size);
+	bool	 		ParseList_movi(uint64 start, uint32 size);
+	bool	 		ParseList_generic(uint64 start, uint32 size);
+	bool	 		ParseList_strl(uint64 start, uint32 size);
 
 private:
 	void			CreateNewStreamInfo();
