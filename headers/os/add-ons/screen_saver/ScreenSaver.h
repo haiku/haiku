@@ -79,6 +79,6 @@ private:
 
 extern "C" _EXPORT BScreenSaver *instantiate_screen_saver(BMessage *msg, image_id id);
 
-_EXPORT int32 saverVersionID;
+//_EXPORT int32 saverVersionID;
 
 #endif
