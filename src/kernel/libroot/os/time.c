@@ -70,7 +70,7 @@ set_timezone(char *timezone)
 	time(&t);
 	tm = localtime(&t);
 
-	if ((err = _kern_set_tzspecs(tm->tm_gmtoff, tm->tm_isdst))<B_OK)
+	if ((err = _kern_set_timezone(tm->tm_gmtoff, tm->tm_isdst)) < B_OK)
 		return err;
 
 	return B_OK;
