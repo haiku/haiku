@@ -53,11 +53,11 @@ ipro1000_read_settings(ipro1000_device *device)
 	if (!handle)
 		return;
 	
-	param = get_driver_parameter(handle, "mtu", "0", "0");
+	param = get_driver_parameter(handle, "mtu", "-1", "-1");
 	mtu = atoi(param);
 	if (mtu >= 50 && mtu <= 1500)
 		device->maxframesize = mtu + ENET_HEADER_SIZE;
-	else
+	else if (mtu != -1)
 		dprintf("ipro1000: unsupported mtu setting '%s' ignored\n", param);
 
 	unload_driver_settings(handle);
