@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <sys/param.h>
 
 
 /* the root directory in /dev where all tty devices reside */
