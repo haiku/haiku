@@ -29,8 +29,8 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include "TIFFTranslator.h"
 #include "TIFFView.h"
 #include "TiffIfd.h"
@@ -531,9 +531,6 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 			ifd.GetCount(TAG_STRIP_BYTE_COUNTS) != stripsPerImage)
 			return B_NO_TRANSLATOR;
 		
-		printf("width: %d\nheight: %d\ncompression: %d\ninterpretation: %d\nbits per pixel: %d\n",
-			width, height, compression, interpretation, bitsPerPixel);
-		
 		// return read in details if output pointer is supplied
 		pdetails->width				= width;
 		pdetails->height			= height;
@@ -555,9 +552,6 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 		}
 			
 	} catch (TiffIfdException) {
-	
-		printf("-- Caught TiffIfdException --\n");
-
 		return B_NO_TRANSLATOR;
 	}
 		
@@ -643,21 +637,18 @@ identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
 	uint32 firstIFDOffset = 0;
 	ssize_t nread = inSource->Read(&firstIFDOffset, 4);
 	if (nread != 4) {
-		printf("Unable to read first IFD offset\n");
+		// Unable to read first IFD offset
 		return B_NO_TRANSLATOR;
 	}
 	if (swap_data(B_UINT32_TYPE, &firstIFDOffset,
 		sizeof(uint32), swp) != B_OK) {
-		printf("swap_data() error\n");
+		// swap_data() error
 		return B_ERROR;
 	}
-	printf("First IFD: 0x%.8lx\n", firstIFDOffset);
 	TiffIfd ifd(firstIFDOffset, *inSource, swp);
 	
 	status_t initcheck;
 	initcheck = ifd.InitCheck();
-	printf("Init Check: %d\n",
-		static_cast<int>(initcheck));
 		
 	// Read in some fields in order to determine whether or not
 	// this particular TIFF image is supported by this translator
@@ -789,13 +780,13 @@ TIFFTranslator::Identify(BPositionIO *inSource,
 		swap_action swp;
 		if (memcmp(ch, kleSig, 4) == 0) {
 			swp = B_SWAP_LENDIAN_TO_HOST;
-			printf("Byte Order: little endian\n");
+				// Byte Order: little endian
 		} else if (memcmp(ch, kbeSig, 4) == 0) {
 			swp = B_SWAP_BENDIAN_TO_HOST;
-			printf("Byte Order: big endian\n");		
+				// Byte Order: big endian
 		} else {
 			// If not a TIFF or a Be Bitmap image
-			printf("Invalid byte order value\n");
+			// (invalid byte order value)
 			return B_NO_TRANSLATOR;
 		}
 		
@@ -1147,11 +1138,6 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 			}
 			// If while loop was broken...
 			if (read < details.pstripByteCounts[i]) {
-				printf("-- WHILE LOOP BROKEN!!\n");
-				printf("i: %d\n", i);
-				printf("ByteCount: %d\n",
-					details.pstripByteCounts[i]);
-				printf("read: %d\n", read);
 				debugger("while loop broken");
 				break;
 			}
@@ -1262,13 +1248,13 @@ TIFFTranslator::Translate(BPositionIO *inSource,
 		swap_action swp;
 		if (memcmp(ch, kleSig, 4) == 0) {
 			swp = B_SWAP_LENDIAN_TO_HOST;
-			printf("Byte Order: little endian\n");
+				// Byte Order: little endian
 		} else if (memcmp(ch, kbeSig, 4) == 0) {
 			swp = B_SWAP_BENDIAN_TO_HOST;
-			printf("Byte Order: big endian\n");		
+				// Byte Order: big endian
 		} else {
 			// If not a TIFF or a Be Bitmap image
-			printf("Invalid byte order value\n");
+			// (invalid byte order value)
 			return B_NO_TRANSLATOR;
 		}
 		

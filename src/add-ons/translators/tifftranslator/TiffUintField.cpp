@@ -28,7 +28,6 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
 #include "TiffUintField.h"
 
@@ -167,22 +166,6 @@ TiffUintField::TiffUintField(IFDEntry &entry, BPositionIO &io, swap_action swp)
 		}
 	} else
 		finitStatus = B_BAD_VALUE;
-		
-	printf("TiffUintField::finitStatus: %d\n",
-		static_cast<int>(finitStatus));
-
-	// print out numbers stored by this field
-	if (finitStatus == B_OK) {
-		uint32 count = GetCount(), out = 0;
-		printf("TiffUintField::value: ");
-		for (uint32 i = 1; i && i <= count; i++) {
-			GetUint(out, i);
-			if (i > 1)
-				printf(", ");
-			printf("%d", static_cast<unsigned>(out));
-		}
-		printf("\n");
-	}
 }
 
 TiffUintField::~TiffUintField()

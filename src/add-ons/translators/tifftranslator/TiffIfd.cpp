@@ -28,7 +28,6 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
 #include "TiffIfd.h"
 #include "TiffUintField.h"
@@ -45,8 +44,6 @@ TiffIfd::LoadFields(uint32 offset, BPositionIO &io, swap_action swp)
 			finitStatus = B_ERROR;
 			return;
 		} else {
-			printf("TiffIfd::ffieldCount: %d\n", ffieldCount);
-			
 			fpfields = new TiffField *[ffieldCount];
 			if (!fpfields) {
 				finitStatus = B_NO_MEMORY;

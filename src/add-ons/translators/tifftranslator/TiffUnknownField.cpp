@@ -29,16 +29,12 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include <stdio.h>
 #include "TiffUnknownField.h"
 
 TiffUnknownField::TiffUnknownField(IFDEntry &entry)
 	: TiffField(entry)
 {
 	finitStatus = B_OK;
-	
-	printf("TiffUnknownField::finitStatus: %d\n",
-		static_cast<int>(finitStatus));
 }
 
 TiffUnknownField::~TiffUnknownField()

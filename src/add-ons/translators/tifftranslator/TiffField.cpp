@@ -29,7 +29,6 @@
 /*****************************************************************************/
 
 #include <Errors.h>
-#include <stdio.h>
 #include "TiffField.h"
 
 TiffField::TiffField(IFDEntry &entry)
@@ -40,9 +39,4 @@ TiffField::TiffField(IFDEntry &entry)
 	ftag = entry.tag;
 	ffieldType = entry.fieldType;
 	fcount = entry.count;
-	
-	printf("TiffField::ftag: %d\n", ftag);
-	printf("TiffField::ffieldType: %d\n", ffieldType);
-	printf("TiffField::fcount: %d\n",
-		static_cast<int>(fcount));
 }
