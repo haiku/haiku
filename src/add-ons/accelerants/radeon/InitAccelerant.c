@@ -195,7 +195,7 @@ status_t CLONE_ACCELERANT( void *data )
 	int fd;
 
 	// create full device name
-	strcpy(path, "/dev");
+	strcpy(path, "/dev/");//added trailing '/', this fixes cloning accelerant!
 	strcat(path, (const char *)data);
 
 	// open device; according to Be, permissions aren't important
