@@ -96,7 +96,7 @@ find_physical_memory_ranges(size_t &total)
 
 	for (int32 i = 0; i < count; i++) {
 		if (regions[i].size <= 0) {
-			printf("%ld: empty region", i);
+			printf("%ld: empty region\n", i);
 			continue;
 		}
 		printf("%ld: base = %p, size = %lu\n", i, regions[i].base, regions[i].size);
@@ -252,7 +252,7 @@ find_allocated_ranges(void *pageTable, void **_physicalPageTable)
 	} translations[64];
 	int length = of_getprop(mmu, "translations", &translations, sizeof(translations));
 	if (length == OF_FAILED)
-		printf("getting translations failed\n");
+		return B_ERROR;
 	length = length / sizeof(struct translation_map);
 	uint32 total = 0;
 	printf("found %d translations\n", length);
