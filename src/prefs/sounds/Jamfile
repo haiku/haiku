@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs sounds ;
 
-AddResources Sounds : Sounds.rsrc ;
+AddResources Sounds : Sounds.rdef ;
 
 Preference Sounds : 
 	HApp.cpp 

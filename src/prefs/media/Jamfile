@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs media ;
 
-AddResources Media : media.rsrc ;
+AddResources Media : media.rdef ;
 
 UsePrivateHeaders media ;
 

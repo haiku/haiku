@@ -2,7 +2,7 @@ SubDir OBOS_TOP src prefs backgrounds ;
 
 UsePrivateHeaders shared ;
 
-AddResources Backgrounds : Backgrounds.rsrc ;
+AddResources Backgrounds : Backgrounds.rdef ;
 
 Preference Backgrounds : BackgroundImage.cpp BGMain.cpp BGView.cpp BGWindow.cpp ;
 
