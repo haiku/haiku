@@ -34,14 +34,14 @@ extern "C" {
 
 #include <KernelExport.h>
 
-
-
 area_id alloc_mem(void **phy, void **log, size_t size, const char *name);
 
 cpu_status lock(void);
 void unlock(cpu_status status);
 
 extern spinlock	slock;
+
+area_id map_mem(void **log, void *phy, size_t size, const char *name);
 
 #ifdef __cplusplus
 }

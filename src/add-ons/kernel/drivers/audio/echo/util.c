@@ -86,3 +86,31 @@ area_id alloc_mem(void **phy, void **log, size_t size, const char *name)
 	return areaid;
 }
 
+
+/* This is not the most advanced method to map physical memory for io access.
+ * Perhaps using B_ANY_KERNEL_ADDRESS instead of B_ANY_KERNEL_BLOCK_ADDRESS
+ * makes the whole offset calculation and relocation obsolete. But the code
+ * below does work, and I can't test if using B_ANY_KERNEL_ADDRESS also works.
+ */
+area_id 
+map_mem(void **log, void *phy, size_t size, const char *name)
+{
+	uint32 offset;
+	void *phyadr;
+	void *mapadr;
+	area_id area;
+
+	LOG(("mapping physical address %p with %#x bytes for %s\n",phy,size,name));
+
+	offset = (uint32)phy & (B_PAGE_SIZE - 1);
+	phyadr = (void*)((uint32)phy - offset);
+	size = round_to_pagesize(size + offset);
+	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &mapadr);
+	*log = (void*) ((uint32)mapadr + offset);
+
+	LOG(("physical = %p, logical = %p, offset = %#x, phyadr = %p, mapadr = %p, size = %#x, area = %#x\n",
+		phy, *log, offset, phyadr, mapadr, size, area));
+	
+	return area;
+}
+
