@@ -35,6 +35,7 @@
 // System Includes -------------------------------------------------------------
 #include <AppFileInfo.h>
 #include <Application.h>
+#include <AppMisc.h>
 #include <Cursor.h>
 #include <Entry.h>
 #include <File.h>
@@ -74,8 +75,6 @@ enum {
 // prototypes of helper functions
 static const char* looper_name_for(const char *signature);
 static void assert_app_signature(const char *signature);
-static status_t get_app_path(char *buffer);
-static thread_id main_thread_for(team_id team);
 
 //------------------------------------------------------------------------------
 BApplication::BApplication(const char* signature)
@@ -114,6 +113,9 @@ BApplication::~BApplication()
 {
 	// unregister from the roster
 	be_roster->RemoveApp(Team());
+	// uninitialize be_app and be_app_messenger
+	be_app = NULL;
+	be_app_messenger = BMessenger();
 }
 //------------------------------------------------------------------------------
 BApplication::BApplication(BMessage* data)
@@ -447,6 +449,9 @@ void BApplication::run_task()
 //------------------------------------------------------------------------------
 void BApplication::InitData(const char* signature, status_t* error)
 {
+	// check whether there exists already an application
+	if (be_app)
+		debugger("2 BApplication objects were created. Only one is allowed.");
 	// check signature
 	assert_app_signature(signature);
 	fAppName = signature;
@@ -456,12 +461,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 	thread_id thread = main_thread_for(team);
 	// get app executable ref
 	entry_ref ref;
-	char appFilePath[B_PATH_NAME_LENGTH + 1];
-	fInitError = get_app_path(appFilePath);
-	if (fInitError == B_OK) {
-		BEntry entry(appFilePath, true);
-		fInitError = entry.GetRef(&ref);
-	}
+	fInitError = get_app_ref(&ref);
 	// get the BAppFileInfo and extract the information we need
 	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
 	if (fInitError == B_OK) {
@@ -550,9 +550,11 @@ void BApplication::InitData(const char* signature, status_t* error)
 		} else
 			fInitError = regError;
 	}
-	// init be_app_messenger
-	if (fInitError == B_OK)
+	// init be_app and be_app_messenger
+	if (fInitError == B_OK) {
+		be_app = this;
 		be_app_messenger = BMessenger(NULL, this);
+	}
 	// TODO: SetName()
 	// TODO: create_app_meta_mime()
 	// return the error
@@ -693,51 +695,6 @@ looper_name_for(const char *signature)
 	if (signature && !strcmp(signature, kRegistrarSignature))
 		return kRosterPortName;
 	return "AppLooperPort";
-}
-
-// get_app_path
-//
-// Returns the path of the application. buffer must be of length
-// B_PATH_NAME_LENGTH + 1.
-static
-status_t
-get_app_path(char *buffer)
-{
-	status_t error = (buffer ? B_OK : B_BAD_VALUE);
-	image_info info;
-	int32 cookie = 0;
-	bool found = false;
-	if (error == B_OK) {
-		while (!found && get_next_image_info(0, &cookie, &info) == B_OK) {
-			if (info.type == B_APP_IMAGE) {
-				strncpy(buffer, info.name, B_PATH_NAME_LENGTH);
-				buffer[B_PATH_NAME_LENGTH] = 0;
-				found = true;
-			}
-		}
-	}
-	if (error == B_OK && !found)
-		error = B_ENTRY_NOT_FOUND;
-	return error;
-}
-
-// main_thread_for
-//
-// Returns the ID of the supplied team's main thread.
-static
-thread_id
-main_thread_for(team_id team)
-{
-	// For I can't find any trace of how to explicitly get the main thread,
-	// I assume the main thread is the one with the least thread ID.
-	thread_id thread = -1;
-	int32 cookie = 0;
-	thread_info info;
-	while (get_next_thread_info(team, &cookie, &info) == B_OK) {
-		if (thread < 0 || info.thread < thread)
-			thread = info.thread;
-	}
-	return thread;
 }
 
 
