@@ -637,3 +637,49 @@ dprintf(const char *format,...)
 	va_end(args);
 }
 
+extern "C" int user_memcpy(void *to, const void *from, size_t size);
+extern "C" int user_strlcpy(char *to, const char *from, size_t size);
+
+// user_memcpy
+int
+user_memcpy(void *to, const void *from, size_t size)
+{
+	char *tmp = (char *)to;
+	char *s = (char *)from;
+
+	while (size--)
+		*tmp++ = *s++;
+
+	return 0;
+}
+
+// user_strlcpy
+/*!	\brief Copies at most (\a size - 1) characters from the string in \a from to
+	the string in \a to, NULL-terminating the result.
+
+	\param to Pointer to the destination C-string.
+	\param from Pointer to the source C-string.
+	\param size Size in bytes of the string buffer pointed to by \a to.
+	
+	\return strlen(\a from).
+*/
+int
+user_strlcpy(char *to, const char *from, size_t size)
+{
+	int from_length = 0;
+
+	if (size > 0) {
+		to[--size] = '\0';
+		// copy 
+		for ( ; size; size--, from_length++, to++, from++) {
+			if ((*to = *from) == '\0')
+				break;
+		}
+	}
+	// count any leftover from chars
+	while (*from++ != '\0')
+		from_length++;
+
+	return from_length;
+}
+
