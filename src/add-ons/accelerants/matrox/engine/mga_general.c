@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-2/2004
+   Rudolf Cornelissen 10/2002-3/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -54,7 +54,7 @@ status_t gx00_general_powerup()
 	status_t status;
 	uint32 card_class;
 
-	LOG(1,("POWERUP: Matrox (open)BeOS Accelerant 0.16-final running.\n"));
+	LOG(1,("POWERUP: Matrox (open)BeOS Accelerant 0.17-1 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
