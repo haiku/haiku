@@ -51,6 +51,7 @@ _atomic_or1:
 FUNCTION(atomic_set):
 	movl	4(%esp),%edx
 	movl	8(%esp),%eax
+	lock
 	xchg	%eax,(%edx)
 	ret
 
