@@ -56,18 +56,35 @@ ParallelPort::ParallelPort(BDirectory* printer, BMessage* msg)
 {
 	char address[80];
 	char device[B_PATH_NAME_LENGTH];
-
-	int size = printer->ReadAttr("transport_address", B_STRING_TYPE, 0, address, sizeof(address));
+	bool bidirectional = true;
+	
+	unsigned int size = printer->ReadAttr("transport_address", B_STRING_TYPE, 0, address, sizeof(address));
 	if (size <= 0 || size >= sizeof(address)) return;
 	address[size] = 0; // make sure string is 0-terminated
 		
 	strcat(strcpy(device, "/dev/parallel/"), address);
 	fFile = open(device, O_RDWR | O_EXCL | O_BINARY, 0);
+	if (fFile < 0) {
+		// Try unidirectional access mode
+		bidirectional = false;
+		fFile = open(device, O_WRONLY | O_EXCL | O_BINARY, 0);
+	}
+
+	if (fFile < 0)
+		return;
+
+	if (! msg)
+		// Caller don't care about transport init message output content...
+		return;
+	
+	msg->AddBool("bidirectional", bidirectional);
+	msg->AddString("_parallel/DeviceName", device);
 }
 
 ParallelPort::~ParallelPort() {
 	if (InitCheck() == B_OK) {
-		close(fFile); fFile = -1;
+		close(fFile);
+		fFile = -1;
 	}
 }
 
@@ -82,6 +99,8 @@ ssize_t ParallelPort::Write(const void* buffer, size_t size) {
 BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg) {
 	ParallelPort* transport = new ParallelPort(printer, msg);
 	if (transport->InitCheck() == B_OK) {
+		if (msg)
+			msg->what = 'okok';
 		return transport;
 	} else {
 		delete transport; return NULL;

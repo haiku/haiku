@@ -26,6 +26,9 @@ extern "C" _EXPORT BDataIO *init_transport(BMessage *msg)
 		exit_transport();
 	}
 
+	if (msg)
+		msg->what = 'okok';
+
 	DBGMSG(("< init_transport\n"));
 	return transport;
 }

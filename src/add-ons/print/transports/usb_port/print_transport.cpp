@@ -65,7 +65,8 @@ class UsbPort : public BDataIO {
 BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg) {
 	UsbPort* transport = new UsbPort(printer, msg);
 	if (transport->IsOk()) {
-		msg->what = 'okok';
+		if (msg)
+			msg->what = 'okok';
 		return transport;
 	} else {
 		delete transport; return NULL;
@@ -84,6 +85,7 @@ UsbPort::UsbPort(BDirectory* printer, BMessage *msg)
 	char *value;
 	int ret;
 	bool bidirectional = true;
+	char *next_token;
 	
 	// We support only one USB printer, so does BeOS R5.
 	fFile = open("/dev/printer/usb/0", O_RDWR | O_EXCL | O_BINARY, 0);
@@ -104,21 +106,25 @@ UsbPort::UsbPort(BDirectory* printer, BMessage *msg)
 		return;
 	}
 	
+	if (! msg)
+		// Caller don't care about transport init message output content...
+		return;
+	
 	// Fill up the message
 	msg->AddBool("bidirectional", bidirectional);
 	msg->AddString("device_id", device_id);
 
 	// parse and split the device_id string into separate parameters
-	desc = strtok(device_id, ":");	
+	desc = strtok_r(device_id, ":", &next_token);	
 	while (desc) {
 		snprintf(name, sizeof(name), "DEVID:%s", desc);
-		value = strtok(NULL, ";");
+		value = strtok_r(NULL, ";", &next_token);
 		if (!value)
 			break;
 		msg->AddString(name, value);
 		
 		// next device descriptor
-		desc = strtok(NULL, ":");	
+		desc = strtok_r(NULL, ":", &next_token);	
 	}
 }
 

@@ -57,7 +57,8 @@ extern "C" _EXPORT BDataIO * init_transport(BMessage *msg)
 
 			if (transport->Ready()) {
 				g_transport = transport;
-				msg->what = 'okok';
+				if (msg)
+					msg->what = 'okok';
 				return g_transport;
 			};
 

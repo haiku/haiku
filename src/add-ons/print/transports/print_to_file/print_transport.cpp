@@ -65,7 +65,8 @@ extern "C" _EXPORT BDataIO * init_transport
 
 	file = new BFile(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	if ( file->InitCheck() != B_OK ) {
-		msg->what = 'canc';	// Indicates user cancel the panel...
+		if (msg)
+			msg->what = 'canc';	// Indicates user cancel the panel...
 		delete file;
 		return NULL;
 	};
@@ -75,9 +76,11 @@ extern "C" _EXPORT BDataIO * init_transport
 	BPath path;
 	path.SetTo(&ref);
 	
-	// Print transport add-ons should set to 'okok' the message on success 
-	msg->what = 'okok';	
-	msg->AddString("path", path.Path()); // Add path of new choosen file to transport message
+	if (msg) {
+		// Print transport add-ons should set to 'okok' the message on success
+		msg->what = 'okok';	
+		msg->AddString("path", path.Path()); // Add path of new choosen file to transport message
+	}
 	return file;
 }
 
