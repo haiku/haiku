@@ -29,7 +29,7 @@ enum {
 int smp_init(struct kernel_args *ka);
 int smp_trap_non_boot_cpus(struct kernel_args *ka, int cpu);
 void smp_wake_up_all_non_boot_cpus(void);
-void smp_wait_for_ap_cpus(kernel_args *ka);
+void smp_wait_for_ap_cpus(struct kernel_args *ka);
 void smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long data2, unsigned long data3, void *data_ptr, int flags);
 void smp_send_broadcast_ici(int message, unsigned long data, unsigned long data2, unsigned long data3, void *data_ptr, int flags);
 int smp_enable_ici(void);
