@@ -8,13 +8,15 @@ if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
 }
 
-if $(TARGET_PLATFORM) = r5 {
-	SubDirC++Flags -DBUILDING_R5_LIBNET ;
-} else {
+if $(BONE_COMPATIBLE) {
 	SubDirC++Flags -DBONE ;
+} else {
+	SubDirC++Flags -DBUILDING_R5_LIBNET ;
 }
 
 SubDirC++Flags -D_BUILDING_mail=1 -DUSE_NASTY_SYNC_THREAD_HACK=1 ;
+
+UsePrivateHeaders textencoding ;
 
 SharedLibrary mail :
 	b_mail_message.cpp
@@ -46,15 +48,15 @@ SharedLibrary mail :
 
 LinkSharedOSLibs libmail.so :
 	be
-	textencoding
+	libtextencoding.so
 	tracker
 	stdc++.r4
 ;
 
-if $(TARGET_PLATFORM) = r5 {
-	LinkSharedOSLibs libmail.so : net ;
-} else {
+if $(BONE_COMPATIBLE) {
 	LinkSharedOSLibs libmail.so : socket ;
+} else {
+	LinkSharedOSLibs libmail.so : net ;
 }
 
 MakeLocate <develop>libmail.so : $(OBOS_STLIB_DIR) ;
