@@ -4,6 +4,6 @@ GENERATE_C++ on [ FGristFiles lexer.l parser.y ] = true ;
 
 SharedLibrary rdef : compile.cpp decompile.cpp lexer.l parser.y rdef.cpp : be ;
 AbsSymLink <boot!home!config!lib>librdef.so : librdef.so
-		   : /boot/home/config/lib ;
+		   : /boot/home/config/lib : false ;
 
 BinCommand rc : rc.cpp : <boot!home!config!lib>librdef.so be ;

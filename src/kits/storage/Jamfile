@@ -29,4 +29,4 @@ SharedLibrary diskdevice
 	: <boot!home!config!lib>libdisk_device_manager.so be
 ;
 AbsSymLink <boot!home!config!lib>libdiskdevice.so : libdiskdevice.so
-	: /boot/home/config/lib ;
+	: /boot/home/config/lib : false ;

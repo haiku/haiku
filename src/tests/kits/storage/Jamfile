@@ -33,12 +33,12 @@ CommonTestLib libstoragetest.so
 	# OBOS
 	local resdir = <storage!kit!test!files>resources ;
 	MakeLocate $(resdir) : [ on UnitTesterHelper return $(LOCATE[1]) ] ;
-	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] ;
+	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] : false ;
 	DEPENDS libstoragetest.so : $(resdir) ;
 	# R5
 	local resdir_r5 = <storage!kit!test!files!r5>resources ;
 	MakeLocate $(resdir_r5) : [ on UnitTesterHelper_r5 return $(LOCATE[1]) ] ;
-	RelSymLink $(resdir_r5) : [ FDirName $(SUBDIR) resources ] ;
+	RelSymLink $(resdir_r5) : [ FDirName $(SUBDIR) resources ] : false ;
 	DEPENDS libstoragetest_r5.so : $(resdir_r5) ;
 }
 

@@ -21,6 +21,6 @@ FT2_LinkLibrary  $(FT2_LIB) ;
 # install libfreetype.so into /boot/home/config/lib
 #
 AbsSymLink <boot!home!config!lib>libfreetype.so : libfreetype.so
-		   : /boot/home/config/lib ;
+		   : /boot/home/config/lib : false ;
 
 # end of src Jamfile
