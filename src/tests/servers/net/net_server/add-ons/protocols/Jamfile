@@ -1,8 +1,0 @@
-SubDir OBOS_TOP src tests servers net net_server add-ons protocols ;
-
-SubInclude OBOS_TOP src tests servers net net_server add-ons protocols raw ;
-SubInclude OBOS_TOP src tests servers net net_server add-ons protocols ipv4 ;
-SubInclude OBOS_TOP src tests servers net net_server add-ons protocols icmp ;
-SubInclude OBOS_TOP src tests servers net net_server add-ons protocols udp ;
-SubInclude OBOS_TOP src tests servers net net_server add-ons protocols tcp ;
-
