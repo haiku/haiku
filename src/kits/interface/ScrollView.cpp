@@ -226,9 +226,10 @@ BScrollView::SetBorder(border_style border)
 		if (fVerticalScrollBar != NULL)
 			horizontalGap = border != B_NO_BORDER ? 1 : -1;
 
-		change = border != B_NO_BORDER ? -2 : 1;
+		change = border != B_NO_BORDER ? -1 : 1;
+		if (fHorizontalScrollBar == NULL || fVerticalScrollBar == NULL)
+			change *= 2;
 	}
-
 
 	fBorder = border;
 
@@ -376,9 +377,44 @@ BScrollView::FrameResized(float width, float height)
 {
 	BView::FrameResized(width, height);
 
-	// ToDo: what are fPreviousWidth/fPreviousHeight used for?
-	//		I would guess there could be some problems with resizing,
-	//		but I haven't investigated it yet.
+	if (fBorder == B_NO_BORDER)
+		return;
+
+	// changes in width
+
+	BRect bounds = Bounds();
+	float border = BorderSize(fBorder) - 1;
+
+	if (bounds.Width() > fPreviousWidth) {
+		// invalidate the region between the old and the new right border
+		BRect rect = bounds;
+		rect.left += fPreviousWidth - border;
+		rect.right--;
+		Invalidate(rect);
+	} else if (bounds.Width() < fPreviousWidth) {
+		// invalidate the region of the new right border
+		BRect rect = bounds;
+		rect.left = rect.right - border;
+		Invalidate(rect);
+	}
+
+	// changes in height
+
+	if (bounds.Height() > fPreviousHeight) {
+		// invalidate the region between the old and the new bottom border
+		BRect rect = bounds;
+		rect.top += fPreviousHeight - border;
+		rect.bottom--;
+		Invalidate(rect);
+	} else if (bounds.Height() < fPreviousHeight) {
+		// invalidate the region of the new bottom border
+		BRect rect = bounds;
+		rect.top = rect.bottom - border;
+		Invalidate(rect);
+	}
+
+	fPreviousWidth = uint16(bounds.Width());
+	fPreviousHeight = uint16(bounds.Height());
 }
 
 
@@ -463,10 +499,12 @@ BScrollView::BorderSize(border_style border)
 int32
 BScrollView::ModifyFlags(int32 flags, border_style border)
 {
+	// We either need B_FULL_UPDATE_ON_RESIZE or
+	// B_FRAME_EVENTS if we have to draw a border
 	if (border != B_NO_BORDER)
-		return flags | B_WILL_DRAW;
+		return flags | B_WILL_DRAW | (flags & B_FULL_UPDATE_ON_RESIZE ? 0 : B_FRAME_EVENTS);
 
-	return flags & ~B_WILL_DRAW;
+	return flags & ~(B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
 }
 
 
