@@ -23,6 +23,7 @@ extern status_t 		delete_buffer(net_buffer *buffer, bool interrupt_safe);
 extern net_buffer *		duplicate_buffer(net_buffer *from);
 extern net_buffer *		clone_buffer(net_buffer *from);
 extern net_buffer *		split_buffer(net_buffer *from, uint32 offset);
+extern status_t			merge_buffers(net_buffer *begin, net_buffer *end);
 
 extern	status_t		add_to_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes, buffer_chunk_free_func freethis);
 extern	status_t		remove_from_buffer(net_buffer *buffer, uint32 offset, uint32 bytes);

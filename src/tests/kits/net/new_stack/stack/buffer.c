@@ -95,7 +95,7 @@ status_t start_buffers_service()
 #endif
 
 	// fire buffers_purgatory_thread
-	g_buffers_purgatory_thread = spawn_kernel_thread(buffers_purgatory_thread, "net buffers serial killer", B_LOW_PRIORITY, 0);
+	g_buffers_purgatory_thread = spawn_kernel_thread(buffers_purgatory_thread, "buffers serial killer", B_LOW_PRIORITY, 0);
 	if (g_buffers_purgatory_thread < B_OK)
 		return g_buffers_purgatory_thread;
 
@@ -240,6 +240,12 @@ net_buffer * clone_buffer(net_buffer *buffer)
 net_buffer * split_buffer(net_buffer *buffer, uint32 offset)
 {
 	return NULL; // B_UNSUPPORTED;
+}
+
+// --------------------------------------------------
+status_t merge_buffers(net_buffer *begin_buffer, net_buffer *end_buffer)
+{
+	return B_ERROR;
 }
 
 
@@ -514,7 +520,7 @@ status_t find_buffer_attribut(net_buffer *buffer, const char *name, int *type, v
 }
 
 
-//	#pragma mark [data(s) queues functions]
+//	#pragma mark [buffer(s) queues functions]
 
 // --------------------------------------------------
 net_buffer_queue * new_buffer_queue(size_t max_bytes)
@@ -834,7 +840,7 @@ void dump_memory
 			
 		for (j = i; j < len && j < i+16;j++)
 			{
-			if ( byte[j] >= ' ' && byte[j] < 0x7e )
+			if ( byte[j] >= 0x20 && byte[j] < 0x7e )
 				*ptr = byte[j];
 			else
 				*ptr = '.';

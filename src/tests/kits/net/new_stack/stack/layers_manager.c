@@ -211,6 +211,30 @@ status_t unregister_layer(net_layer *layer)
 
 
 // --------------------------------------------------
+net_layer * find_layer(const char *name)
+{
+	net_layer *layer;
+	status_t status;
+	
+	if (!name)
+		return NULL;
+
+	status = acquire_sem(g_layers.lock);
+	if (status != B_OK)
+		return NULL;
+
+	layer = g_layers.first;
+	while (layer) {
+		if (strcmp(layer->name, name) == 0)
+			break;
+		layer = layer->next;
+	}
+	release_sem(g_layers.lock);
+	return layer;	
+}
+
+
+// --------------------------------------------------
 status_t add_layer_attribut(net_layer *layer, const char *name, int type, ...)
 {
 	va_list args;

@@ -73,6 +73,7 @@ struct net_stack_module_info nsmi = {
 	// Layers handling
 	register_layer,
 	unregister_layer,
+	find_layer,
 	add_layer_attribut,
 	remove_layer_attribut,
 	find_layer_attribut,
