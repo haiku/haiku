@@ -205,14 +205,16 @@ do_read_test(int argc, char **argv)
         buff[i] = (char)0xff;
 
     err = sys_read(1, cur_fd, buff, len);
-    
-    if (len < 512)
-        hexdump(buff, len);
-    else
-        hexdump(buff, 512);
 
-    free(buff);
-    printf("read read %lu bytes and returned %d\n", len, err);
+	if (len <= 1024)
+		hexdump(buff, len);
+	else {
+		printf("Hex dump shows only the first 1024 bytes:\n");
+		hexdump(buff, 1024);
+	}
+
+	free(buff);
+	printf("read read %lu bytes and returned %d\n", len, err);
 }
 
 
