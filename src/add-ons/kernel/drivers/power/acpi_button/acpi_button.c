@@ -77,7 +77,7 @@ acpi_button_control (void* cookie, uint32 op, void* arg, size_t len)
 		case ~ACPI_BITREG_SLEEP_BUTTON_ENABLE:
 		case ~ACPI_BITREG_POWER_BUTTON_STATUS:
 		case ~ACPI_BITREG_SLEEP_BUTTON_STATUS:
-			acpi->write_acpi_reg(op,*((uint32 *)(arg)));
+			acpi->write_acpi_reg(~op,*((uint32 *)(arg)));
 			break;
 		case ACPI_BITREG_POWER_BUTTON_STATUS:
 		case ACPI_BITREG_SLEEP_BUTTON_STATUS:
