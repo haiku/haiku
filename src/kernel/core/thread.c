@@ -81,11 +81,10 @@ static struct thread *thread_get_thread_struct_locked(thread_id id);
 static void thread_kthread_exit(void);
 static void deliver_signal(struct thread *t, int signal);
 
-#ifdef NEW_SCHEDULER
 
-#endif /* NEW_SCHEDULER */
 // insert a thread onto the tail of a queue
-void thread_enqueue(struct thread *t, struct thread_queue *q)
+void
+thread_enqueue(struct thread *t, struct thread_queue *q)
 {
 	t->q_next = NULL;
 	if(q->head == NULL) {
@@ -97,17 +96,21 @@ void thread_enqueue(struct thread *t, struct thread_queue *q)
 	}
 }
 
-struct thread *thread_lookat_queue(struct thread_queue *q)
+
+struct thread *
+thread_lookat_queue(struct thread_queue *q)
 {
 	return q->head;
 }
 
-struct thread *thread_dequeue(struct thread_queue *q)
+
+struct thread *
+thread_dequeue(struct thread_queue *q)
 {
 	struct thread *t;
 
 	t = q->head;
-	if(t != NULL) {
+	if (t != NULL) {
 		q->head = t->q_next;
 		if(q->tail == t)
 			q->tail = NULL;
@@ -115,20 +118,22 @@ struct thread *thread_dequeue(struct thread_queue *q)
 	return t;
 }
 
-struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
+
+struct thread *
+thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
 {
 	struct thread *t;
 	struct thread *last = NULL;
 
 	t = q->head;
-	while(t != NULL) {
-		if(t->id == thr_id) {
-			if(last == NULL) {
+	while (t != NULL) {
+		if (t->id == thr_id) {
+			if (last == NULL)
 				q->head = t->q_next;
-			} else {
+			else
 				last->q_next = t->q_next;
-			}
-			if(q->tail == t)
+
+			if (q->tail == t)
 				q->tail = last;
 			break;
 		}
@@ -139,51 +144,59 @@ struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
 }
 
 #ifndef NEW_SCHEDULER
-struct thread *thread_lookat_run_q(int priority)
+struct thread *
+thread_lookat_run_q(int priority)
 {
 	return thread_lookat_queue(&run_q[(priority + 1) >> 1]);
 }
 
-void thread_enqueue_run_q(struct thread *t)
+
+void
+thread_enqueue_run_q(struct thread *t)
 {
 	// these shouldn't exist
-	if(t->priority > B_MAX_PRIORITY)
+	if (t->priority > B_MAX_PRIORITY)
 		t->priority = B_MAX_PRIORITY;
-	if(t->priority < B_MIN_PRIORITY)
+	else if (t->priority < B_MIN_PRIORITY)
 		t->priority = B_MIN_PRIORITY;
 
 	thread_enqueue(t, &run_q[(t->priority + 1) >> 1]);
 }
 
-struct thread *thread_dequeue_run_q(int priority)
+
+struct thread *
+thread_dequeue_run_q(int priority)
 {
 	return thread_dequeue(&run_q[(priority + 1) >> 1]);
 }
-
 #endif /* not NEW_SCHEDULER */
-static void insert_thread_into_team(struct team *p, struct thread *t)
+
+static void
+insert_thread_into_team(struct team *p, struct thread *t)
 {
 	t->team_next = p->thread_list;
 	p->thread_list = t;
 	p->num_threads++;
-	if(p->num_threads == 1) {
+	if (p->num_threads == 1) {
 		// this was the first thread
 		p->main_thread = t;
 	}
 	t->team = p;
 }
 
-static void remove_thread_from_team(struct team *p, struct thread *t)
+
+static void
+remove_thread_from_team(struct team *p, struct thread *t)
 {
 	struct thread *temp, *last = NULL;
 
-	for(temp = p->thread_list; temp != NULL; temp = temp->team_next) {
-		if(temp == t) {
-			if(last == NULL) {
+	for (temp = p->thread_list; temp != NULL; temp = temp->team_next) {
+		if (temp == t) {
+			if (last == NULL)
 				p->thread_list = temp->team_next;
-			} else {
+			else
 				last->team_next = temp->team_next;
-			}
+
 			p->num_threads--;
 			break;
 		}
@@ -191,27 +204,35 @@ static void remove_thread_from_team(struct team *p, struct thread *t)
 	}
 }
 
-static int thread_struct_compare(void *_t, const void *_key)
+
+static int
+thread_struct_compare(void *_t, const void *_key)
 {
 	struct thread *t = _t;
 	const struct thread_key *key = _key;
 
-	if(t->id == key->id) return 0;
-	else return 1;
+	if (t->id == key->id)
+		return 0;
+
+	return 1;
 }
 
-static unsigned int thread_struct_hash(void *_t, const void *_key, unsigned int range)
+
+static unsigned int
+thread_struct_hash(void *_t, const void *_key, unsigned int range)
 {
 	struct thread *t = _t;
 	const struct thread_key *key = _key;
 
-	if(t != NULL)
+	if (t != NULL)
 		return (t->id % range);
-	else
-		return (key->id % range);
+
+	return (key->id % range);
 }
 
-static struct thread *create_thread_struct(const char *name)
+
+static struct thread *
+create_thread_struct(const char *name)
 {
 	struct thread *t;
 	int state;
@@ -223,9 +244,9 @@ static struct thread *create_thread_struct(const char *name)
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	if(t == NULL) {
+	if (t == NULL) {
 		t = (struct thread *)kmalloc(sizeof(struct thread));
-		if(t == NULL)
+		if (t == NULL)
 			goto err;
 	}
 
@@ -253,7 +274,7 @@ static struct thread *create_thread_struct(const char *name)
 
 	sprintf(temp, "thread_0x%lx_retcode_sem", t->id);
 	t->return_code_sem = create_sem(0, temp);
-	if(t->return_code_sem < 0)
+	if (t->return_code_sem < 0)
 		goto err1;
 
 	sprintf(temp, "%s data write sem", t->name);
@@ -266,7 +287,7 @@ static struct thread *create_thread_struct(const char *name)
 	if (t->msg.read_sem < 0)
 		goto err3;
 
-	if(arch_thread_init_thread_struct(t) < 0)
+	if (arch_thread_init_thread_struct(t) < 0)
 		goto err4;
 
 	return t;
@@ -283,7 +304,9 @@ err:
 	return NULL;
 }
 
-static void delete_thread_struct(struct thread *t)
+
+static void
+delete_thread_struct(struct thread *t)
 {
 	if (t->return_code_sem >= 0)
 		delete_sem_etc(t->return_code_sem, -1);
@@ -294,7 +317,9 @@ static void delete_thread_struct(struct thread *t)
 	kfree(t);
 }
 
-static int _create_user_thread_kentry(void)
+
+static int
+_create_user_thread_kentry(void)
 {
 	struct thread *t;
 
@@ -310,7 +335,9 @@ static int _create_user_thread_kentry(void)
 	return 0;
 }
 
-static int _create_kernel_thread_kentry(void)
+
+static int
+_create_kernel_thread_kentry(void)
 {
 	int (*func)(void *args);
 	struct thread *t;
@@ -338,6 +365,7 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 		return ENOMEM;
 
 	t->priority = priority == -1 ? B_NORMAL_PRIORITY : priority;
+	// ToDo: revisit this one - the thread might go to early to B_THREAD_SUSPENDED
 //	t->state = THREAD_STATE_BIRTH;
 	t->state = B_THREAD_SUSPENDED;	// Is this right?
 	t->next_state = B_THREAD_SUSPENDED;
@@ -352,11 +380,11 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 	GRAB_TEAM_LOCK();
 	// look at the team, make sure it's not being deleted
 	p = team_get_team_struct_locked(pid);
-	if (p != NULL && p->state != TEAM_STATE_DEATH) {
+	if (p != NULL && p->state != TEAM_STATE_DEATH)
 		insert_thread_into_team(p, t);
-	} else {
+	else
 		abort = true;
-	}
+
 	RELEASE_TEAM_LOCK();
 	if (abort) {
 		GRAB_THREAD_LOCK();
@@ -413,41 +441,30 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 	return t->id;
 }
 
-thread_id user_thread_create_user_thread(addr entry, team_id pid, const char *uname, int priority,
-                                         void *args)
-{
-	char name[SYS_MAX_OS_NAME_LEN];
-	int rc;
 
-	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if(entry >= KERNEL_BASE && entry <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-	if(rc < 0)
-		return rc;
-	name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-	return _create_thread(name, pid, entry, args, priority, false);
-}
-
-thread_id thread_create_user_thread(char *name, team_id pid, addr entry, void *args)
+thread_id
+thread_create_user_thread(char *name, team_id pid, addr entry, void *args)
 {
 	return _create_thread(name, pid, entry, args, -1, false);
 }
 
-thread_id thread_create_kernel_thread(const char *name, int (*func)(void *), void *args)
+
+thread_id
+thread_create_kernel_thread(const char *name, int (*func)(void *), void *args)
 {
 	return _create_thread(name, team_get_kernel_team()->id, (addr)func, args, -1, true);
 }
 
-thread_id thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct team *p)
+
+thread_id
+thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct team *p)
 {
 	return _create_thread(name, p->id, (addr)func, args, -1, true);
 }
 
-int thread_suspend_thread(thread_id id)
+
+int
+thread_suspend_thread(thread_id id)
 {
 	int state;
 	struct thread *t;
@@ -458,7 +475,7 @@ int thread_suspend_thread(thread_id id)
 	GRAB_THREAD_LOCK();
 
 	t = thread_get_current_thread();
-	if(t->id != id) {
+	if (t->id != id) {
 		t = thread_get_thread_struct_locked(id);
 	}
 
@@ -474,21 +491,21 @@ int thread_suspend_thread(thread_id id)
 			global_resched = true;
 			retval = B_NO_ERROR;
 		}
-	} else {
+	} else
 		retval = ERR_INVALID_HANDLE;
-	}
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	if(global_resched) {
+	if (global_resched)
 		smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
-	}
 
 	return retval;
 }
 
-int thread_resume_thread(thread_id id)
+
+int
+thread_resume_thread(thread_id id)
 {
 	int state;
 	struct thread *t;
@@ -498,15 +515,14 @@ int thread_resume_thread(thread_id id)
 	GRAB_THREAD_LOCK();
 
 	t = thread_get_thread_struct_locked(id);
-	if(t != NULL && t->state == B_THREAD_SUSPENDED) {
+	if (t != NULL && t->state == B_THREAD_SUSPENDED) {
 		t->state = B_THREAD_READY;
 		t->next_state = B_THREAD_READY;
 
 		thread_enqueue_run_q(t);
 		retval = B_NO_ERROR;
-	} else {
+	} else
 		retval = ERR_INVALID_HANDLE;
-	}
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
@@ -515,19 +531,20 @@ int thread_resume_thread(thread_id id)
 }
 
 #ifndef NEW_SCHEDULER
-int thread_set_priority(thread_id id, int priority)
+int
+thread_set_priority(thread_id id, int32 priority)
 {
 	struct thread *t;
 	int retval;
 
 	// make sure the passed in priority is within bounds
-	if(priority > B_MAX_PRIORITY)
+	if (priority > B_MAX_PRIORITY)
 		priority = B_MAX_PRIORITY;
-	if(priority < B_MIN_PRIORITY)
+	if (priority < B_MIN_PRIORITY)
 		priority = B_MIN_PRIORITY;
 
 	t = thread_get_current_thread();
-	if(t->id == id) {
+	if (t->id == id) {
 		// it's ourself, so we know we aren't in a run queue, and we can manipulate
 		// our structure directly
 		t->priority = priority;
@@ -537,19 +554,18 @@ int thread_set_priority(thread_id id, int priority)
 		GRAB_THREAD_LOCK();
 
 		t = thread_get_thread_struct_locked(id);
-		if(t) {
-			if(t->state == B_THREAD_READY && t->priority != priority) {
+		if (t) {
+			if (t->state == B_THREAD_READY && t->priority != priority) {
 				// this thread is in a ready queue right now, so it needs to be reinserted
 				thread_dequeue_id(&run_q[(t->priority + 1) >> 1], t->id);
 				t->priority = priority;
 				thread_enqueue_run_q(t);
-			} else {
+			} else
 				t->priority = priority;
-			}
+
 			retval = B_NO_ERROR;
-		} else {
+		} else
 			retval = ERR_INVALID_HANDLE;
-		}
 
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
@@ -643,9 +659,8 @@ dump_thread_info(int argc, char **argv)
 			// XXX semi-hack
 			_dump_thread_info((struct thread *)num);
 			return 0;
-		} else {
+		} else
 			id = num;
-		}
 	}
 
 	// walk through the thread list, trying to match name or id
@@ -698,11 +713,11 @@ dump_next_thread_in_q(int argc, char **argv)
 	}
 
 	dprintf("next thread in queue after thread @ %p\n", t);
-	if (t->q_next != NULL) {
+	if (t->q_next != NULL)
 		_dump_thread_info(t->q_next);
-	} else {
+	else
 		dprintf("NULL\n");
-	}
+
 	return 0;
 }
 
@@ -718,11 +733,11 @@ dump_next_thread_in_all_list(int argc, char **argv)
 	}
 
 	dprintf("next thread in global list after thread @ %p\n", t);
-	if (t->all_next != NULL) {
+	if (t->all_next != NULL)
 		_dump_thread_info(t->all_next);
-	} else {
+	else
 		dprintf("NULL\n");
-	}
+
 	return 0;
 }
 
@@ -738,11 +753,11 @@ dump_next_thread_in_team(int argc, char **argv)
 	}
 
 	dprintf("next thread in team after thread @ %p\n", t);
-	if (t->team_next != NULL) {
+	if (t->team_next != NULL)
 		_dump_thread_info(t->team_next);
-	} else {
+	else
 		dprintf("NULL\n");
-	}
+
 	return 0;
 }
 
@@ -879,7 +894,7 @@ thread_init(kernel_args *ka)
 	{
 		char temp[64];
 
-		for(i = 0; i < num_death_stacks; i++) {
+		for (i = 0; i < num_death_stacks; i++) {
 			sprintf(temp, "death_stack%d", i);
 			death_stacks[i].rid = vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp,
 				(void **)&death_stacks[i].address,
@@ -1015,7 +1030,7 @@ thread_exit(int retcode)
 		GRAB_TEAM_LOCK();
 		remove_thread_from_team(p, t);
 		insert_thread_into_team(team_get_kernel_team(), t);
-		if(p->main_thread == t) {
+		if (p->main_thread == t) {
 			// this was main thread in this team
 			delete_team = true;
 			team_remove_team_from_hash(p);
@@ -1028,7 +1043,7 @@ thread_exit(int retcode)
 
 //		dprintf("thread_exit: thread 0x%x now a kernel thread!\n", t->id);
 	}
-	
+
 	cached_death_sem = p->death_sem;
 
 	// delete the team
@@ -1133,9 +1148,8 @@ _thread_kill_thread(thread_id id, bool wait_on)
 			if (t->id == thread_get_current_thread()->id)
 				wait_on = false; // can't wait on ourself
 		}
-	} else {
+	} else
 		rc = ERR_INVALID_HANDLE;
-	}
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
@@ -1167,25 +1181,6 @@ static void
 thread_kthread_exit(void)
 {
 	thread_exit(0);
-}
-
-
-int
-user_thread_wait_on_thread(thread_id id, int *uretcode)
-{
-	int retcode;
-	int rc, rc2;
-
-	if ((addr)uretcode >= KERNEL_BASE && (addr)uretcode <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = thread_wait_on_thread(id, &retcode);
-
-	rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
-	if (rc2 < 0)
-		return rc2;
-
-	return rc;
 }
 
 
@@ -1381,15 +1376,6 @@ thread_atkernel_exit(void)
 
 
 status_t
-user_send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
-{
-	if (((addr)buffer >= KERNEL_BASE) && ((addr)buffer <= KERNEL_TOP))
-		return B_BAD_ADDRESS;
-	return send_data(tid, code, buffer, buffer_size);
-}
-
-
-status_t
 send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 {
 	struct thread *target;
@@ -1397,7 +1383,7 @@ send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 	int state;
 	status_t rv;
 	cbuf *data;
-	
+
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 	target = thread_get_thread_struct_locked(tid);
@@ -1409,7 +1395,7 @@ send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 	cached_sem = target->msg.write_sem;
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
-	
+
 	if (buffer_size > THREAD_MAX_MESSAGE_SIZE)
 		return B_NO_MEMORY;
 
@@ -1420,7 +1406,7 @@ send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 	if (rv != B_OK)
 		// Any other acquisition problems may be due to thread deletion
 		return B_BAD_THREAD_ID;
-	
+
 	if (buffer_size > 0) {
 		data = cbuf_get_chain(buffer_size);
 		if (!data)
@@ -1432,10 +1418,10 @@ send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 		}
 	} else
 		data = NULL;
-	
+
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
-	
+
 	// The target thread could have been deleted at this point
 	target = thread_get_thread_struct_locked(tid);
 	if (!target) {
@@ -1444,42 +1430,20 @@ send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 		cbuf_free_chain(data);
 		return B_BAD_THREAD_ID;
 	}
-	
+
 	// Save message informations
 	target->msg.sender = thread_get_current_thread()->id;
 	target->msg.code = code;
 	target->msg.size = buffer_size;
 	target->msg.buffer = data;
 	cached_sem = target->msg.read_sem;
-	
+
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
-	
+
 	release_sem(cached_sem);
-	
+
 	return B_OK;
-}
-
-
-status_t
-user_receive_data(thread_id *sender, void *buffer, size_t buffer_size)
-{
-	thread_id ksender;
-	status_t code;
-	status_t rv;
-
-	if (((addr)sender >= KERNEL_BASE) && ((addr)sender <= KERNEL_TOP))
-		return B_BAD_ADDRESS;
-	if (((addr)buffer >= KERNEL_BASE) && ((addr)buffer <= KERNEL_TOP))
-		return B_BAD_ADDRESS;
-	
-	code = receive_data(&ksender, buffer, buffer_size);
-	
-	rv = user_memcpy(sender, &ksender, sizeof(thread_id));
-	if (rv < 0)
-		return rv;
-	
-	return code;
 }
 
 
@@ -1490,9 +1454,9 @@ receive_data(thread_id *sender, void *buffer, size_t buffer_size)
 	status_t rv;
 	size_t size;
 	int32 code;
-	
+
 	acquire_sem(t->msg.read_sem);
-	
+
 	size = min(buffer_size, t->msg.size);
 	rv = cbuf_user_memcpy_from_chain(buffer, t->msg.buffer, 0, size);
 	if (rv < 0) {
@@ -1500,13 +1464,13 @@ receive_data(thread_id *sender, void *buffer, size_t buffer_size)
 		release_sem(t->msg.write_sem);
 		return rv;
 	}
-	
+
 	*sender = t->msg.sender;
 	code = t->msg.code;
-	
+
 	cbuf_free_chain(t->msg.buffer);
 	release_sem(t->msg.write_sem);
-	
+
 	return code;
 }
 
@@ -1515,32 +1479,10 @@ bool
 has_data(thread_id thread)
 {
 	int32 count;
-	
+
 	if (get_sem_count(thread_get_current_thread()->msg.read_sem, &count) != B_OK)
 		return false;
 	return count == 0 ? false : true;
-}
-
-
-status_t
-user_get_thread_info(thread_id id, thread_info *info)
-{
-	thread_info kinfo;
-	status_t rc = B_OK;
-	status_t rc2;
-	
-	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-		
-	rc = _get_thread_info(id, &kinfo, sizeof(thread_info));
-	if (rc != B_OK)
-		return rc;
-	
-	rc2 = user_memcpy(info, &kinfo, sizeof(thread_info));
-	if (rc2 < 0)
-		return rc2;
-	
-	return rc;
 }
 
 
@@ -1550,10 +1492,10 @@ _get_thread_info(thread_id id, thread_info *info, size_t size)
 	int state;
 	status_t rc = B_OK;
 	struct thread *t;
-	
+
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
-	
+
 	t = thread_get_thread_struct_locked(id);
 	if (!t) {
 		rc = B_BAD_VALUE;
@@ -1578,9 +1520,154 @@ _get_thread_info(thread_id id, thread_info *info, size_t size)
 	info->kernel_time = t->kernel_time;
 	info->stack_base = (void *)t->user_stack_base;
 	info->stack_end = (void *)(t->user_stack_base + STACK_SIZE);
+
 err:
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
+
+	return rc;
+}
+
+
+status_t
+_get_next_thread_info(team_id tid, int32 *cookie, thread_info *info, size_t size)
+{
+	int state;
+	int slot;
+	status_t rc = B_BAD_VALUE;
+	struct team *team;
+	struct thread *t = NULL;
+
+	if (tid == 0)
+		tid = team_get_current_team_id();
+	team = team_get_team_struct(tid);
+	if (!team)
+		return B_BAD_VALUE;
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	if (*cookie == 0)
+		slot = 0;
+	else {
+		slot = *cookie;
+		if (slot >= next_thread_id)
+			goto err;
+	}
+
+	while ((slot < next_thread_id) && (!(t = thread_get_thread_struct_locked(slot)) || (t->team->id != tid)))
+		slot++;
+
+	if ((t) && (t->team->id == tid)) {
+		info->thread = t->id;
+		info->team = t->team->id;
+		strncpy(info->name, t->name, B_OS_NAME_LENGTH);
+		info->name[B_OS_NAME_LENGTH - 1] = '\0';
+		if (t->state == B_THREAD_WAITING) {
+			if (t->sem_blocking == snooze_sem)
+				info->state = B_THREAD_ASLEEP;
+			else if (t->sem_blocking == t->msg.read_sem)
+				info->state = B_THREAD_RECEIVING;
+			else
+				info->state = B_THREAD_WAITING;
+		} else
+			info->state = t->state;
+		info->priority = t->priority;
+		info->sem = t->sem_blocking;
+		info->user_time = t->user_time;
+		info->kernel_time = t->kernel_time;
+		info->stack_base = (void *)t->user_stack_base;
+		info->stack_end = (void *)(t->user_stack_base + STACK_SIZE);
+		slot++;
+		*cookie = slot;
+		rc = B_OK;
+	}
+err:
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	return rc;
+}
+
+
+int
+getrlimit(int resource, struct rlimit * rlp)
+{
+	if (!rlp)
+		return -1;
+
+	switch (resource) {
+		case RLIMIT_NOFILE:
+			return vfs_getrlimit(resource, rlp);
+
+		default:
+			return -1;
+	}
+
+	return 0;
+}
+
+
+int
+setrlimit(int resource, const struct rlimit * rlp)
+{
+	if (!rlp)
+		return -1;
+
+	switch (resource) {
+		case RLIMIT_NOFILE:
+			return vfs_setrlimit(resource, rlp);
+
+		default:
+			return -1;
+	}
+
+	return 0;
+}
+
+
+//	#pragma mark -
+/* user calls */
+
+
+thread_id
+user_thread_create_user_thread(addr entry, team_id pid, const char *uname, int priority,
+	void *args)
+{
+	char name[SYS_MAX_OS_NAME_LEN];
+	int rc;
+
+	if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+	if (entry >= KERNEL_BASE && entry <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
+	if (rc < 0)
+		return rc;
+	name[SYS_MAX_OS_NAME_LEN-1] = 0;
+
+	return _create_thread(name, pid, entry, args, priority, false);
+}
+
+
+status_t
+user_get_thread_info(thread_id id, thread_info *info)
+{
+	thread_info kinfo;
+	status_t rc = B_OK;
+	status_t rc2;
+	
+	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+		
+	rc = _get_thread_info(id, &kinfo, sizeof(thread_info));
+	if (rc != B_OK)
+		return rc;
+	
+	rc2 = user_memcpy(info, &kinfo, sizeof(thread_info));
+	if (rc2 < 0)
+		return rc2;
 	
 	return rc;
 }
@@ -1619,142 +1706,99 @@ user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info)
 }
 
 
-status_t
-_get_next_thread_info(team_id tid, int32 *cookie, thread_info *info, size_t size)
+int
+user_thread_wait_on_thread(thread_id id, int *uretcode)
 {
-	int state;
-	int slot;
-	status_t rc = B_BAD_VALUE;
-	struct team *team;
-	struct thread *t = NULL;
-	
-	if (tid == 0)
-		tid = team_get_current_team_id();
-	team = team_get_team_struct(tid);
-	if (!team)
-		return B_BAD_VALUE;
-	
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-	
-	if (*cookie == 0)
-		slot = 0;
-	else {
-		slot = *cookie;
-		if (slot >= next_thread_id)
-			goto err;
-	}
-	
-	while ((slot < next_thread_id) && (!(t = thread_get_thread_struct_locked(slot)) || (t->team->id != tid)))
-		slot++;
-			
-	if ((t) && (t->team->id == tid)) {
-		info->thread = t->id;
-		info->team = t->team->id;
-		strncpy(info->name, t->name, B_OS_NAME_LENGTH);
-		info->name[B_OS_NAME_LENGTH - 1] = '\0';
-		if (t->state == B_THREAD_WAITING) {
-			if (t->sem_blocking == snooze_sem)
-				info->state = B_THREAD_ASLEEP;
-			else if (t->sem_blocking == t->msg.read_sem)
-				info->state = B_THREAD_RECEIVING;
-			else
-				info->state = B_THREAD_WAITING;
-		} else
-			info->state = t->state;
-		info->priority = t->priority;
-		info->sem = t->sem_blocking;
-		info->user_time = t->user_time;
-		info->kernel_time = t->kernel_time;
-		info->stack_base = (void *)t->user_stack_base;
-		info->stack_end = (void *)(t->user_stack_base + STACK_SIZE);
-		slot++;
-		*cookie = slot;
-		rc = B_OK;
-	}
-err:
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-	
+	int retcode;
+	int rc, rc2;
+
+	if ((addr)uretcode >= KERNEL_BASE && (addr)uretcode <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = thread_wait_on_thread(id, &retcode);
+
+	rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
+	if (rc2 < 0)
+		return rc2;
+
 	return rc;
 }
 
 
-int user_getrlimit(int resource, struct rlimit * urlp)
+status_t
+user_send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 {
-	int				ret;
-	struct rlimit	rl;
+	if (((addr)buffer >= KERNEL_BASE) && ((addr)buffer <= KERNEL_TOP))
+		return B_BAD_ADDRESS;
+	return send_data(tid, code, buffer, buffer_size);
+}
 
-	if (urlp == NULL) {
+
+status_t
+user_receive_data(thread_id *sender, void *buffer, size_t buffer_size)
+{
+	thread_id ksender;
+	status_t code;
+	status_t rv;
+
+	if (((addr)sender >= KERNEL_BASE) && ((addr)sender <= KERNEL_TOP))
+		return B_BAD_ADDRESS;
+	if (((addr)buffer >= KERNEL_BASE) && ((addr)buffer <= KERNEL_TOP))
+		return B_BAD_ADDRESS;
+	
+	code = receive_data(&ksender, buffer, buffer_size);
+	
+	rv = user_memcpy(sender, &ksender, sizeof(thread_id));
+	if (rv < 0)
+		return rv;
+	
+	return code;
+}
+
+
+int
+user_getrlimit(int resource, struct rlimit * urlp)
+{
+	struct rlimit rl;
+	int ret;
+
+	if (urlp == NULL)
 		return EINVAL;
-	}
-	if((addr)urlp >= KERNEL_BASE && (addr)urlp <= KERNEL_TOP) {
+
+	if ((addr)urlp >= KERNEL_BASE && (addr)urlp <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
-	}
 
 	ret = getrlimit(resource, &rl);
 
 	if (ret == 0) {
 		ret = user_memcpy(urlp, &rl, sizeof(struct rlimit));
-		if (ret < 0) {
+		if (ret < 0)
 			return ret;
-		}
+
 		return 0;
 	}
 
 	return ret;
 }
 
-int getrlimit(int resource, struct rlimit * rlp)
+
+int
+user_setrlimit(int resource, const struct rlimit * urlp)
 {
-	if (!rlp) {
-		return -1;
-	}
+	struct rlimit rl;
+	int err;
 
-	switch(resource) {
-		case RLIMIT_NOFILE:
-			return vfs_getrlimit(resource, rlp);
-
-		default:
-			return -1;
-	}
-
-	return 0;
-}
-
-int user_setrlimit(int resource, const struct rlimit * urlp)
-{
-	int				err;
-	struct rlimit	rl;
-
-	if (urlp == NULL) {
+	if (urlp == NULL)
 		return EINVAL;
-	}
-	if((addr)urlp >= KERNEL_BASE && (addr)urlp <= KERNEL_TOP) {
+
+	if ((addr)urlp >= KERNEL_BASE && (addr)urlp <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
-	}
 
 	err = user_memcpy(&rl, urlp, sizeof(struct rlimit));
-	if (err < 0) {
+	if (err < 0)
 		return err;
-	}
 
 	return setrlimit(resource, &rl);
 }
 
-int setrlimit(int resource, const struct rlimit * rlp)
-{
-	if (!rlp) {
-		return -1;
-	}
 
-	switch(resource) {
-		case RLIMIT_NOFILE:
-			return vfs_setrlimit(resource, rlp);
-
-		default:
-			return -1;
-	}
-
-	return 0;
-}
