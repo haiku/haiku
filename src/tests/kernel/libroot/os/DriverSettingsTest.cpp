@@ -14,6 +14,8 @@
 
 bool gVerbose = false;
 
+// Just add your test settings here, they will be picked
+// up automatically
 
 const char *kSettings[] = {
 	"keyA b c d {\n"
@@ -156,7 +158,7 @@ print_settings(void *handle)
 
 
 void
-check_settings_string(int32 num)
+check_settings_string(uint32 num)
 {
 	const char *string = kSettings[num];
 
@@ -219,7 +221,7 @@ main(int argc, char **argv)
 
 	// check fixed settings strings
 
-	for (int32 i = 0; i < 3; i++)
+	for (uint32 i = 0; i < sizeof(kSettings) / sizeof(char *); i++)
 		check_settings_string(i);
 	
 	return 0;
