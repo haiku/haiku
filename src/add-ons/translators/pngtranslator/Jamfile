@@ -1,10 +1,54 @@
 SubDir OBOS_TOP src add-ons translators pngtranslator ;
 
+UseLibraryHeaders zlib ;
+UseLibraryHeaders png ;
+
+# Include zlib and libpng source files
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src libs zlib ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src libs png ] ;
+
 Translator PNGTranslator : 
+	# zlib
+	adler32.c
+	compress.c
+	crc32.c
+	deflate.c
+	gzio.c
+	infblock.c
+	infcodes.c
+	inffast.c
+	inflate.c
+	inftrees.c
+	infutil.c
+	trees.c
+	uncompr.c
+	zutil.c
+
+	# libpng
+	png.c
+	pngerror.c
+	pnggccrd.c
+	pngget.c
+	pngmem.c
+	pngpread.c
+	pngread.c
+	pngrio.c
+	pngrtran.c
+	pngrutil.c
+	pngset.c
+	pngtrans.c
+	pngvcrd.c
+	pngwio.c
+	pngwrite.c
+	pngwtran.c
+	pngwutil.c
+
+	# PNGTranslator
 	PNGMain.cpp
 	PNGTranslator.cpp
 	PNGView.cpp
 	PNGWindow.cpp
 	PNGTranslatorSettings.cpp ;
 
-LinkSharedOSLibs PNGTranslator : be translation png ;
+LinkSharedOSLibs PNGTranslator : be translation ;
+
