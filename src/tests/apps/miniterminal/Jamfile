@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src tests apps miniterminal ;
+
+UseHeaders [ FDirName $(OBOS_TOP) src tests apps miniterminal ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src apps terminal MYOB ] ;
+
+App MiniTerminal :
+	MiniApp.cpp
+	MiniWin.cpp
+	MiniView.cpp 
+	Console.cpp
+	ViewBuffer.cpp ;
+
+LinkSharedOSLibs MiniTerminal : libbe.so ;
