@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src tools gensyscalls ;
+
+BuildPlatformMain gensyscalls : gensyscalls.cpp ;
+LinkSharedOSLibs gensyscalls : stdc++.r4 ;
