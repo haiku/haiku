@@ -71,11 +71,16 @@ MouseSettings::RetrieveSettings()
 {
 	// retrieve current values
 
-	get_mouse_map(&fSettings.map);
-	get_click_speed(&fSettings.click_speed);
-	get_mouse_speed(&fSettings.accel.speed);
-	get_mouse_acceleration(&fSettings.accel.accel_factor);
-	get_mouse_type(&fSettings.type);
+	if (get_mouse_map(&fSettings.map)!=B_OK)
+		fprintf(stderr, "error when get_mouse_map\n");
+	if (get_click_speed(&fSettings.click_speed)!=B_OK)
+		fprintf(stderr, "error when get_click_speed\n");
+	if (get_mouse_speed(&fSettings.accel.speed)!=B_OK)
+		fprintf(stderr, "error when get_mouse_speed\n");
+	if (get_mouse_acceleration(&fSettings.accel.accel_factor)!=B_OK)
+		fprintf(stderr, "error when get_mouse_acceleration\n");
+	if (get_mouse_type(&fSettings.type)!=B_OK)
+		fprintf(stderr, "error when get_mouse_type\n");
 
 	fMode = mouse_mode();
 
@@ -130,8 +135,6 @@ MouseSettings::SaveSettings()
 #endif
 
 	file.WriteAt(kOffset, &fWindowPosition, sizeof(BPoint));
-
-	// who is responsible for saving the mouse mode?
 
 	return B_OK;
 }
@@ -217,6 +220,8 @@ MouseSettings::SetMouseType(int32 type)
 {
 	if (set_mouse_type(type) == B_OK)
 		fSettings.type = type;
+	else
+		fprintf(stderr, "error when set_mouse_type\n");
 }
 
 
@@ -235,6 +240,8 @@ MouseSettings::SetClickSpeed(bigtime_t clickSpeed)
 
 	if (set_click_speed(clickSpeed) == B_OK)
 		fSettings.click_speed = clickSpeed;
+	else
+		fprintf(stderr, "error when set_click_speed\n");
 }
 
 
@@ -243,6 +250,8 @@ MouseSettings::SetMouseSpeed(int32 speed)
 {
 	if (set_mouse_speed(speed) == B_OK)
 		fSettings.accel.speed = speed;
+	else
+		fprintf(stderr, "error when set_mouse_speed\n");
 }
 
 
@@ -251,6 +260,8 @@ MouseSettings::SetAccelerationFactor(int32 factor)
 {
 	if (set_mouse_acceleration(factor) == B_OK)
 		fSettings.accel.accel_factor = factor;
+	else
+		fprintf(stderr, "error when set_mouse_acceleration\n");
 }
 
 
@@ -272,8 +283,8 @@ void
 MouseSettings::SetMapping(int32 index, uint32 button)
 {
 	fSettings.map.button[index] = button;
-	if (set_mouse_map(&fSettings.map) != B_OK)	// message better for syslog?
-		fprintf(stderr, "could not set mouse mapping\n");
+	if (set_mouse_map(&fSettings.map) != B_OK)
+		fprintf(stderr, "error when set_mouse_map\n");
 }
 
 
@@ -282,6 +293,8 @@ MouseSettings::SetMapping(mouse_map &map)
 {
 	if (set_mouse_map(&map) == B_OK)
 		fSettings.map = map;
+	else
+		fprintf(stderr, "error when set_mouse_map\n");
 }
 
 
