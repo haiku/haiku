@@ -14,7 +14,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
 		malloc_debug_flags = -fcheck-memory-usage ;
 	}
 
-	local defines = [ FDefines USER DEBUG
+	local defines = [ FDefines USER DEBUG USED_IN_FS_SHELL
 		#BFS_BIG_ENDIAN_ONLY
 		$(malloc_debug_defines) ] ;
 	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
