@@ -601,6 +601,9 @@ BMessenger::InitData(const char *signature, team_id team, status_t *result)
 	// check, whether the signature is correct
 	if (error == B_OK && signature && strcmp(signature, info.signature) != 0)
 		error = B_BAD_VALUE;
+	// check whether it the app flags say B_ARGV_ONLY
+	if (error == B_OK && (info.flags & B_ARGV_ONLY))
+		error = B_BAD_TYPE;
 	// init our members
 	if (error == B_OK) {
 		fTeam = team;
