@@ -80,14 +80,14 @@ Directory::Close(void *cookie)
 Node *
 Directory::Lookup(const char *name, bool traverseLinks)
 {
-	HashIterator iterator(fVolume.Device(), fNode);
-	if (iterator.InitCheck() != B_OK)
-		return NULL;
-
 	if (!strcmp(name, ".")) {
 		Acquire();
 		return this;
 	}
+
+	HashIterator iterator(fVolume.Device(), fNode);
+	if (iterator.InitCheck() != B_OK)
+		return NULL;
 
 	iterator.Goto(fNode.HashIndexFor(fVolume.Type(), name));
 
@@ -137,6 +137,14 @@ Directory::Rewind(void *cookie)
 	iterator->Rewind();
 
 	return B_OK;
+}
+
+
+bool 
+Directory::IsEmpty()
+{
+	int32 index;
+	return fNode.FirstHashValue(index) == -1;
 }
 
 

@@ -32,6 +32,7 @@ class Directory : public ::Directory {
 		virtual status_t GetNextEntry(void *cookie, char *nameBuffer, size_t bufferSize);
 		virtual status_t GetNextNode(void *cookie, Node **_node);
 		virtual status_t Rewind(void *cookie);
+		virtual bool IsEmpty();
 
 		virtual status_t GetName(char *name, size_t size) const;
 
