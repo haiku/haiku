@@ -1,4 +1,7 @@
 /*
+** Copyright 2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -13,6 +16,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 struct console {
@@ -98,7 +102,6 @@ start_console(struct console *con)
 				continue;
 	
 			sprintf(name, "/dev/pt/%s", entry->d_name);
-			puts(name);
 	
 			con->tty_master_fd = open(name, O_RDWR);
 			if (con->tty_master_fd >= 0) {
@@ -117,12 +120,14 @@ start_console(struct console *con)
 						termios.c_oflag = OPOST | ONLCR;
 						termios.c_lflag = ISIG | ICANON | ECHO | ECHOE | ECHONL;
 
-						tcsetattr(con->tty_slave_fd, TCSETA, &termios);
+						tcsetattr(con->tty_slave_fd, TCSANOW, &termios);
 					}
 				}
 				break;
 			}
 		}
+
+		setenv("TTY", name, true);
 	}
 
 	if (con->tty_master_fd < 0 || con->tty_slave_fd < 0)
@@ -196,7 +201,7 @@ main(void)
 		status_t retcode;
 		const char *argv[3];
 
-		argv[0] = "/bin/shell";
+		argv[0] = "/bin/sh";
 //		argv[1] = "-s";
 //		argv[2] = "/boot/loginscript";
 		shell_process = start_process(1, argv, &theconsole);
