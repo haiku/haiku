@@ -9,6 +9,9 @@ App FileType-F :
 	FileTypeApp.cpp
 	FileTypeView.cpp
 	FileTypeWindow.cpp
+	AppTypeWindow.cpp
+	AppTypeView.cpp
+	AppTypeVersionInfoView.cpp
 	process_refs.cpp
 	;
 

@@ -1,7 +1,10 @@
+#include <Node.h>
+#include <NodeInfo.h>
 #include <Path.h>
 #include <Roster.h>
 #include <stdio.h>
 
+#include <AppTypeWindow.h>
 #include <FileTypeApp.h>
 #include <FileTypeConstants.h>
 #include <FileTypeWindow.h>
@@ -38,6 +41,20 @@ void FileTypeApp::DispatchMessage(BMessage * msg, BHandler * handler)
 	}
 }
 
+void
+FileTypeApp::MessageReceived(BMessage *message)
+{
+	switch(message->what) {
+		case B_CANCEL:
+			if (fWindow == 0) {
+				Quit();
+			}			
+		break;
+		default:
+			BApplication::MessageReceived(message);
+		break;
+	} 
+}
 
 void
 FileTypeApp::RefsReceived(BMessage * message)
@@ -56,6 +73,28 @@ FileTypeApp::RefsReceived(BMessage * message)
 	}
 	if (entryList.CountItems() == 0) {
 		return;
+	}
+	if (entryList.CountItems() == 1) {
+		BEntry * entry = static_cast<BEntry*>(entryList.FirstItem()); 
+		BNode node(entry);
+		if (node.InitCheck() != B_OK) {
+			delete entry;
+			return;
+		}
+		BNodeInfo nodeInfo(&node);
+		if (nodeInfo.InitCheck() != B_OK) {
+			delete entry;
+			return;
+		}
+		char string[MAXPATHLEN];
+		if ((nodeInfo.GetType(string) == B_OK)
+		    && (strcmp(string,"application/x-vnd.Be-elfexecutable") == 0)) {
+		    AppTypeWindow * window = new AppTypeWindow(entry);
+		    if (window->InitCheck() == B_OK) {
+		    	fWindow = window;
+		    }
+		    return;
+		}
 	}
 	FileTypeWindow * window = new FileTypeWindow(&entryList);
 	if (window->InitCheck() == B_OK) {

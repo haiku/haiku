@@ -170,9 +170,10 @@ FileTypeWindow::SetEntries(const BList * entryList)
 			continue; // can't proceed with an invalid nodeinfo
 		}
 		char string[MAXPATHLEN];
-		if (nodeInfo.GetType(string) != B_OK) {
-			// errors are ignored: there's usually no good way for the user to recover
-		} else {
+		switch (nodeInfo.GetType(string)) {
+		case B_ENTRY_NOT_FOUND:
+			strcpy(string,"");
+		case B_OK:
 			if (fileType == 0) {
 				fileType = new BString(string);
 			} else if (fileType->Compare(string) != 0) {
@@ -181,10 +182,15 @@ FileTypeWindow::SetEntries(const BList * entryList)
 					break; // stop now, don't waste time checking the rest
 				}
 			}
-		}
-		if (nodeInfo.GetPreferredApp(string) != B_OK) {
+		break;
+		default:
 			// errors are ignored: there's usually no good way for the user to recover
-		} else {
+			break;
+		}
+		switch (nodeInfo.GetPreferredApp(string)) {
+		case B_ENTRY_NOT_FOUND:
+			strcpy(string,"");
+		case B_OK:
 			if (preferredApplication == 0) {
 				preferredApplication = new BString(string);
 			} else if (preferredApplication->Compare(string) != 0) {
@@ -193,13 +199,17 @@ FileTypeWindow::SetEntries(const BList * entryList)
 					break; // stop now, don't waste time checking the rest
 				}
 			}
+		break;
+		default:
+			// errors are ignored: there's usually no good way for the user to recover
+			break;
 		}
 	}
 	if (fileType != 0) {
 		fView->SetFileType(fileType->String());
 		delete fileType;
 	}
-	if (preferredApplication != 0) {
+	if ((preferredApplication != 0) && (preferredApplication->Length() > 0)) {
 		fView->SetPreferredApplication(preferredApplication->String());
 		delete preferredApplication;
 	}

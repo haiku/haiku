@@ -11,6 +11,7 @@ class FileTypeApp
 {
 public:
 					FileTypeApp();
+	virtual void 	MessageReceived(BMessage *message);
 	virtual	void	ArgvReceived(int32 argc, const char *argv[], const char * cwd);
 	virtual void	RefsReceived(BMessage *message);
 	virtual void	ReadyToRun();
@@ -21,7 +22,7 @@ private:
 	BFilePanel *	OpenPanel();
 	void			PrintUsage(const char * execname);
 
-	FileTypeWindow	* fWindow;
+	BWindow			* fWindow;
 	BFilePanel		* fOpenPanel;
 
 	bool			fArgvOkay;
