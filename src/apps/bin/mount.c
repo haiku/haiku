@@ -20,7 +20,7 @@ usage(const char *programName)
 	
 	printf("usage: %s [-ro] [-t fstype] device directory\n"
 		"\t-ro\tmounts the volume read-only\n"
-		"\t-t\tspecifies the file system to use (defaults to \"bfs\")\n",programName);
+		"\t-t\tspecifies the file system to use (defaults to automatic recognition)\n",programName);
 	exit(0);
 }
 
@@ -60,9 +60,6 @@ main(int argc, char **argv)
 
 	/* check the arguments */
 
-	if (fs == NULL)
-		fs = "bfs";
-
 	device = argv[0];
 	mountPoint = argv[1];
 
@@ -80,7 +77,7 @@ main(int argc, char **argv)
 
 	/* do the work */
 
-	status = fs_mount_volume(fs, mountPoint, device, flags, parameter);
+	status = fs_mount_volume(mountPoint, device, fs, flags, parameter);
 	if (status != B_OK) {
 		fprintf(stderr, "%s: %s\n", programName, strerror(status));
 		return -1;
