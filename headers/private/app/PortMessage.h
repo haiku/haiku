@@ -49,6 +49,7 @@ public:
 	ssize_t BufferSize(void) { return _buffersize; }
 	
 	status_t Read(void *data, ssize_t size);
+	status_t ReadString(char **string);
 	template <class Type> status_t Read(Type *data)
 		{
 			int32 size = sizeof(Type);

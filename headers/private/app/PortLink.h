@@ -23,6 +23,7 @@ public:
 	
 	void MakeEmpty();
 	status_t Attach(const void *data, size_t size);
+	status_t AttachString(const char *string);
 	template <class Type> status_t Attach(Type data)
 	{
 		int32 size	= sizeof(Type);
