@@ -6,8 +6,9 @@ if ! $(BONE_COMPATIBLE) {
 	SubDirCcFlags -DBUILDING_R5_LIBNET -Dclose=closesocket ;
 }
 
-SimpleTest netperf : 
-	netperf.c
+SubDirCcFlags -w ;
+
+local net_files =
 	netsh.c
 	netlib.c
 	nettest_bsd.c
@@ -16,19 +17,19 @@ SimpleTest netperf :
 	nettest_xti.c
 	nettest_ipv6.c
 	nettest_dns.c
+	;
+
+Objects $(net_files) ;
+
+SimpleTest netperf : 
+	netperf.c
+	[ FGristFiles $(net_files:S=$(SUFOBJ)) ]
 	: $(NETWORK_LIBS)
 ;
 
 SimpleTest netserver : 
 	netserver.c
-	netsh.c
-	netlib.c
-	nettest_bsd.c
-	nettest_dlpi.c
-	nettest_unix.c
-	nettest_xti.c
-	nettest_ipv6.c
-	nettest_dns.c
+	[ FGristFiles $(net_files:S=$(SUFOBJ)) ]
 	: $(NETWORK_LIBS)
 ;
 
