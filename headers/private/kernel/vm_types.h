@@ -134,9 +134,9 @@ typedef struct vm_store {
 typedef struct vm_store_ops {
 	void (*destroy)(struct vm_store *backing_store);
 	off_t (*commit)(struct vm_store *backing_store, off_t size);
-	int (*has_page)(struct vm_store *backing_store, off_t offset);
-	ssize_t (*read)(struct vm_store *backing_store, off_t offset, iovecs *vecs);
-	ssize_t (*write)(struct vm_store *backing_store, off_t offset, iovecs *vecs);
+	bool (*has_page)(struct vm_store *backing_store, off_t offset);
+	status_t (*read)(struct vm_store *backing_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes);
+	status_t (*write)(struct vm_store *backing_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes);
 	int (*fault)(struct vm_store *backing_store, struct vm_address_space *aspace, off_t offset);
 	void (*acquire_ref)(struct vm_store *backing_store);
 	void (*release_ref)(struct vm_store *backing_store);

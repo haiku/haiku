@@ -75,9 +75,9 @@ status_t vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode);
 int vfs_put_vnode_ptr(void *vnode);
 void vfs_vnode_acquire_ref(void *vnode);
 void vfs_vnode_release_ref(void *vnode);
-ssize_t vfs_can_page(void *vnode);
-ssize_t vfs_read_page(void *vnode, iovecs *vecs, off_t pos);
-ssize_t vfs_write_page(void *vnode, iovecs *vecs, off_t pos);
+bool vfs_can_page(void *vnode);
+status_t vfs_read_pages(void *vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
+status_t vfs_write_pages(void *vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
 status_t vfs_get_vnode_cache(void *vnode, void **_cache);
 
 /* special module convenience call */
