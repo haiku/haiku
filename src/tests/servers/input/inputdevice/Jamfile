@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src tests servers input inputdevice ;
+
+if $(COMPILE_FOR_R5) {
+	SubDirC++Flags -DCOMPILE_FOR_R5 ;
+}
+
+UsePrivateHeaders input ;
+
+SimpleTest input_device_test :
+	main.cpp
+
+	Input.cpp
+	: be
+	 ;
+
+
+SEARCH on [ FGristFiles Input.cpp ] 
+	= [ FDirName $(OBOS_TOP) src kits interface ] ;
