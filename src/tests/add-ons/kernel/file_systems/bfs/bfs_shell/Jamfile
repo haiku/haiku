@@ -3,6 +3,7 @@ SubDir OBOS_TOP src tests add-ons kernel file_systems bfs bfs_shell ;
 SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
 
+UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
 
 {
 	# set CHECK_MALLOC to something when doing tests against memory corruption
@@ -20,14 +21,13 @@ SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
 }
 
-SimpleTest bfs_shell
-	:
+SimpleTest bfs_shell :
 	fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c tracker.cpp
 	sysdep.c hexdump.c argv.c
 
 	Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
 	BlockAllocator.cpp kernel_interface.cpp Utility.cpp BufferPool.cpp
-	Debug.cpp cpp.cpp
+	Debug.cpp kernel_cpp.cpp
 	:
 	;
 
@@ -37,6 +37,10 @@ SEARCH on [ FGristFiles
 		BlockAllocator.cpp kernel_interface.cpp Utility.cpp BufferPool.cpp
 		Debug.cpp cpp.cpp
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp
+	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
 
 SEARCH on [ FGristFiles
 		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c tracker.cpp

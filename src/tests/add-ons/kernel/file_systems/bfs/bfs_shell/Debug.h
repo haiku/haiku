@@ -50,9 +50,9 @@
 //	D()
 //		the statements in D() are only included if DEBUG is defined
 
-	#include <KernelExport.h>
-	#define kprintf printf
-	#define dprintf printf
+#include <KernelExport.h>
+#define kprintf printf
+#define dprintf printf
 
 #ifdef DEBUG
 	#define PRINT(x) { __out("bfs: "); __out x; }
@@ -95,6 +95,9 @@
 	extern void dump_bplustree_header(bplustree_header *header);
 	extern void dump_bplustree_node(bplustree_node *node,bplustree_header *header = NULL,Volume *volume = NULL);
 	extern void dump_block(const char *buffer, int size);
+
+	extern void add_debugger_commands();
+	extern void remove_debugger_commands();
 #endif
 
 #endif	/* DEBUG_H */
