@@ -6,11 +6,12 @@
 
 #include <KernelExport.h>
 
+#include <safemode.h>
 #include <kernel.h>
 #include <syscalls.h>
 
 
-static status_t
+extern "C" status_t
 get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize)
 {
 	// ToDo: implement me for real!
