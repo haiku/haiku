@@ -184,26 +184,6 @@ virtual	void LatencyChanged(					//	used to be Reserved 1
 /* BControllable */
 /*****************/
 
-public:
-		// these three are related:
-		// DEFAULT_CHUNK_SIZE = (DEFAULT_BIT_RATE * 1024) * (DEFAULT_BUFFER_PERIOD / 8000000)
-		static const int32 DEFAULT_CHUNK_SIZE_PARAM;    // in bytes
-		static const int32 DEFAULT_BIT_RATE_PARAM;      // in 1000*kilobits/sec
-		static const int32 DEFAULT_BUFFER_PERIOD_PARAM; // milliseconds
-
-private:
-		size_t defaultChunkSizeParam;				
-		bigtime_t defaultChunkSizeParamChangeTime;
-		float defaultBitRateParam;				
-		bigtime_t defaultBitRateParamChangeTime;
-		int32 defaultBufferPeriodParam;				
-		bigtime_t defaultBufferPeriodParamChangeTime;
-
-		// This is used to figure out which parameter to compute
-		// when enforcing the above constraint relating the three params
-		int32 lastUpdatedParameter;
-		int32 leastRecentlyUpdatedParameter;
-
 /*********************/
 /* BMediaEventLooper */
 /*********************/
@@ -221,7 +201,7 @@ virtual status_t HandleDataStatus(
 
 public:
 
-static flavor_info * GetFlavor(int32 id);
+static void GetFlavor(flavor_info * info, int32 id);
 static media_format * GetFormat();
 static media_file_format * GetFileFormat();
 

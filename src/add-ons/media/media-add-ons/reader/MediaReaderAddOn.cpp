@@ -58,7 +58,9 @@ status_t MediaReaderAddOn::GetFlavorAt(
 		fprintf(stderr,"<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
 	}
-	(*out_info) = MediaReader::GetFlavor(n);
+	flavor_info * infos = new flavor_info[1];
+	MediaReader::GetFlavor(&infos[0],n);
+	(*out_info) = infos;
 	return B_OK;
 }
 

@@ -274,6 +274,7 @@ bool format_is_acceptible(
 				break;
 			default:
 				fprintf(stderr,"format_is_acceptible : unimplemented type.\n");
+				return format_is_compatible(producer_format,consumer_format);
 				break;
 		}
 	}
@@ -741,21 +742,16 @@ status_t MediaReader::HandleDataStatus(
 
 // static:
 
-flavor_info * MediaReader::GetFlavor(int32 id)
+void MediaReader::GetFlavor(flavor_info * info, int32 id)
 {
 	fprintf(stderr,"MediaReader::GetFlavor\n");
-	static bool initialized = false;
-	static flavor_info * info;
-	if (initialized == false) {
-		info = AbstractFileInterfaceNode::GetFlavor(id);
-		info->name = "OpenBeOS Media Reader";
-		info->info = "The OpenBeOS Media Reader reads a file and produces a multistream.";
-		info->kinds |= B_BUFFER_PRODUCER;
-		info->out_format_count = 1; // 1 output
-		info->out_formats = GetFormat();
-		initialized = true;
-	}
-	return info;
+	AbstractFileInterfaceNode::GetFlavor(info,id);
+	info->name = "OpenBeOS Media Reader";
+	info->info = "The OpenBeOS Media Reader reads a file and produces a multistream.";
+	info->kinds |= B_BUFFER_PRODUCER;
+	info->out_format_count = 1; // 1 output
+	info->out_formats = GetFormat();
+	return;
 }
 
 media_format * MediaReader::GetFormat()

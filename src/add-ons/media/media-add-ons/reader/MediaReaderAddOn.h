@@ -52,7 +52,6 @@ virtual	status_t SniffTypeKind(				//	Like SniffType, but for the specific kind(
 				int32 * out_internal_id,
 				void * _reserved);
 
-
 /* end from BMediaAddOn */
 /************************/
 
