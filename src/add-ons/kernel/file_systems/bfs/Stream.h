@@ -24,7 +24,7 @@ namespace Access {
 class Uncached {
 	public:
 		Uncached(Volume *volume);
-		Uncached(Volume *volume,off_t block, bool empty = false);
+		Uncached(Volume *volume, off_t block, bool empty = false);
 		Uncached(Volume *volume, block_run run, bool empty = false);
 		~Uncached();
 
@@ -35,11 +35,13 @@ class Uncached {
 
 		uint8 *Block() const { return fBlock; }
 		off_t BlockNumber() const { return fBlockNumber; }
+		uint32 BlockSize() const { return fVolume->BlockSize(); }
+		uint32 BlockShift() const { return fVolume->BlockShift(); }
 
 		static status_t Read(Volume *volume, block_run run, uint8 *buffer);
 		static status_t Write(Transaction *transaction, Volume *volume, block_run run, const uint8 *buffer);
 
-	protected:
+	private:
 		Volume	*fVolume;
 		off_t	fBlockNumber;
 		uint8	*fBlock;
@@ -48,7 +50,7 @@ class Uncached {
 class Cached : public CachedBlock {
 	public:
 		Cached(Volume *volume);
-		Cached(Volume *volume,off_t block, bool empty = false);
+		Cached(Volume *volume, off_t block, bool empty = false);
 		Cached(Volume *volume, block_run run, bool empty = false);
 
 		status_t WriteBack(Transaction *transaction);
@@ -116,18 +118,18 @@ Uncached::SetTo(off_t block, bool empty = false)
 		return NULL;
 
 	if (empty)
-		memset(fBlock, 0, fVolume->BlockSize());
+		memset(fBlock, 0, BlockSize());
 	else
-		read_pos(fVolume->Device(), fBlockNumber << fVolume->BlockShift(), fBlock, fVolume->BlockSize());
+		read_pos(fVolume->Device(), fBlockNumber << BlockShift(), fBlock, BlockSize());
 
 	return fBlock;
 }
 
 
 uint8 *
-Uncached::SetTo(block_run run,bool empty = false)
+Uncached::SetTo(block_run run, bool empty = false)
 {
-	return SetTo(fVolume->ToBlock(run),empty);
+	return SetTo(fVolume->ToBlock(run), empty);
 }
 
 
@@ -137,7 +139,7 @@ Uncached::WriteBack(Transaction *transaction)
 	if (fBlock == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	return write_pos(fVolume->Device(), fBlockNumber << fVolume->BlockShift(), fBlock, fVolume->BlockSize());
+	return write_pos(fVolume->Device(), fBlockNumber << BlockShift(), fBlock, BlockSize());
 }
 
 
@@ -209,13 +211,13 @@ Logged::Logged(Volume *volume)
 }
 
 
-Logged::Logged(Volume *volume,off_t block,bool empty = false)
+Logged::Logged(Volume *volume, off_t block, bool empty = false)
 	: CachedBlock(volume, block, empty)
 {
 }
 
 
-Logged::Logged(Volume *volume,block_run run,bool empty = false)
+Logged::Logged(Volume *volume, block_run run, bool empty = false)
 	: CachedBlock(volume, run, empty)
 {
 }
@@ -247,15 +249,15 @@ Logged::Write(Transaction *transaction, Volume *volume, block_run run, const uin
 
 template<class Cache>
 class Stream : public Inode {
-	public:
+	private:
 		// The constructor only exists to make the compiler happy - it
 		// is never called in the code itself
 		Stream() : Inode(NULL, -1) {}
 
+	public:
 		status_t FindBlockRun(off_t pos, block_run &run, off_t &offset);
 		status_t ReadAt(off_t pos, uint8 *buffer, size_t *length);
 		status_t WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer, size_t *length);
-
 };
 
 
@@ -263,7 +265,7 @@ class Stream : public Inode {
 
 template<class Cache>
 status_t
-Stream<Cache>::FindBlockRun(off_t pos,block_run &run,off_t &offset)
+Stream<Cache>::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 {
 	data_stream *data = &Node()->data;
 
@@ -276,11 +278,11 @@ Stream<Cache>::FindBlockRun(off_t pos,block_run &run,off_t &offset)
 			Cache cached(fVolume);
 
 			off_t start = pos - data->max_indirect_range;
-			int32 indirectSize = (1L << (INDIRECT_BLOCKS_SHIFT + fVolume->BlockShift()))
+			int32 indirectSize = (1L << (INDIRECT_BLOCKS_SHIFT + cached.BlockShift()))
 				* (fVolume->BlockSize() / sizeof(block_run));
-			int32 directSize = NUM_ARRAY_BLOCKS << fVolume->BlockShift();
+			int32 directSize = NUM_ARRAY_BLOCKS << cached.BlockShift();
 			int32 index = start / indirectSize;
-			int32 runsPerBlock = fVolume->BlockSize() / sizeof(block_run);
+			int32 runsPerBlock = cached.BlockSize() / sizeof(block_run);
 
 			block_run *indirect = (block_run *)cached.SetTo(
 					fVolume->ToBlock(data->double_indirect) + index / runsPerBlock);
@@ -319,10 +321,10 @@ Stream<Cache>::FindBlockRun(off_t pos,block_run &run,off_t &offset)
 					if (indirect[current].IsZero())
 						break;
 
-					runBlockEnd += indirect[current].length << fVolume->BlockShift();
+					runBlockEnd += indirect[current].length << cached.BlockShift();
 					if (runBlockEnd > pos) {
 						run = indirect[current];
-						offset = runBlockEnd - (run.length << fVolume->BlockShift());
+						offset = runBlockEnd - (run.length << cached.BlockShift());
 						//printf("reading from indirect block: %ld,%d\n",fRun.allocation_group,fRun.start);
 						//printf("### indirect-run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
 						return fVolume->IsValidBlockRun(run);
@@ -358,7 +360,7 @@ Stream<Cache>::FindBlockRun(off_t pos,block_run &run,off_t &offset)
 
 template<class Cache>
 status_t
-Stream<Cache>::ReadAt(off_t pos,uint8 *buffer,size_t *_length)
+Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 {
 	// set/check boundaries for pos/length
 
@@ -376,7 +378,7 @@ Stream<Cache>::ReadAt(off_t pos,uint8 *buffer,size_t *_length)
 
 	block_run run;
 	off_t offset;
-	if (FindBlockRun(pos,run,offset) < B_OK) {
+	if (FindBlockRun(pos, run, offset) < B_OK) {
 		*_length = 0;
 		RETURN_ERROR(B_BAD_VALUE);
 	}
@@ -404,7 +406,7 @@ Stream<Cache>::ReadAt(off_t pos,uint8 *buffer,size_t *_length)
 		if (length < bytesRead)
 			bytesRead = length;
 
-		memcpy(buffer,block + (pos % blockSize),bytesRead);
+		memcpy(buffer, block + (pos % blockSize), bytesRead);
 		pos += bytesRead;
 
 		length -= bytesRead;
@@ -413,7 +415,7 @@ Stream<Cache>::ReadAt(off_t pos,uint8 *buffer,size_t *_length)
 			return B_OK;
 		}
 
-		if (FindBlockRun(pos,run,offset) < B_OK) {
+		if (FindBlockRun(pos, run, offset) < B_OK) {
 			*_length = bytesRead;
 			RETURN_ERROR(B_BAD_VALUE);
 		}
@@ -432,12 +434,12 @@ Stream<Cache>::ReadAt(off_t pos,uint8 *buffer,size_t *_length)
 
 		if ((run.length << blockShift) > length) {
 			if (length < blockSize) {
-				Cache cached(fVolume,run);
+				Cache cached(fVolume, run);
 				if ((block = cached.Block()) == NULL) {
 					*_length = bytesRead;
 					RETURN_ERROR(B_BAD_VALUE);
 				}
-				memcpy(buffer + bytesRead,block,length);
+				memcpy(buffer + bytesRead, block, length);
 				bytesRead += length;
 				break;
 			}
@@ -506,19 +508,19 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 		// If the position of the write was beyond the file size, we
 		// have to fill the gap between that position and the old file
 		// size with zeros.
-		FillGapWithZeros(oldSize,pos);
+		FillGapWithZeros(oldSize, pos);
 	}
 
 	block_run run;
 	off_t offset;
-	if (FindBlockRun(pos,run,offset) < B_OK) {
+	if (FindBlockRun(pos, run, offset) < B_OK) {
 		*_length = 0;
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
 	bool logStream = (Flags() & INODE_LOGGED) == INODE_LOGGED;
 	if (logStream)
-		transaction->Start(fVolume,BlockNumber());
+		transaction->Start(fVolume, BlockNumber());
 
 	uint32 bytesWritten = 0;
 	uint32 blockSize = fVolume->BlockSize();
@@ -533,7 +535,7 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 		run.start += (pos - offset) / blockSize;
 		run.length -= (pos - offset) / blockSize;
 
-		Cache cached(fVolume,run);
+		Cache cached(fVolume, run);
 		if ((block = cached.Block()) == NULL) {
 			*_length = 0;
 			RETURN_ERROR(B_BAD_VALUE);
@@ -555,7 +557,7 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 			return B_OK;
 		}
 
-		if (FindBlockRun(pos,run,offset) < B_OK) {
+		if (FindBlockRun(pos, run, offset) < B_OK) {
 			*_length = bytesWritten;
 			RETURN_ERROR(B_BAD_VALUE);
 		}
@@ -579,7 +581,7 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 					*_length = bytesWritten;
 					RETURN_ERROR(B_BAD_VALUE);
 				}
-				memcpy(block,buffer + bytesWritten,length);
+				memcpy(block, buffer + bytesWritten, length);
 
 				cached.WriteBack(transaction);
 
@@ -609,7 +611,7 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 			run.start += run.length;
 			run.length = 1;
 			offset = pos;
-		} else if (FindBlockRun(pos,run,offset) < B_OK) {
+		} else if (FindBlockRun(pos, run, offset) < B_OK) {
 			*_length = bytesWritten;
 			RETURN_ERROR(B_BAD_VALUE);
 		}

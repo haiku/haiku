@@ -1452,7 +1452,7 @@ Inode::ShrinkStream(Transaction *transaction, off_t size)
 	}
 	if (data->max_direct_range > size) {
 		off_t offset = 0;
-		FreeStreamArray(transaction,data->direct,NUM_DIRECT_BLOCKS,size,offset,data->max_direct_range);
+		FreeStreamArray(transaction, data->direct, NUM_DIRECT_BLOCKS, size, offset, data->max_direct_range);
 	}
 
 	data->size = size;
@@ -1464,7 +1464,9 @@ status_t
 Inode::SetFileSize(Transaction *transaction, off_t size)
 {
 	if (size < 0
-		// uncached files can't be resized
+		// uncached files can't be resized (Stream<Cache>::WriteAt() specifically
+		// denies growing uncached files because of efficiency, so it had to be
+		// adapted if this ever changes [which will probably happen in OpenBeOS]).
 		|| Flags() & INODE_NO_CACHE)
 		return B_BAD_VALUE;
 

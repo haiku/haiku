@@ -57,20 +57,20 @@ class CachedBlock {
 		{
 		}
 
-		CachedBlock(Volume *volume,off_t block,bool empty = false)
+		CachedBlock(Volume *volume, off_t block, bool empty = false)
 			:
 			fVolume(volume),
 			fBlock(NULL)
 		{
-			SetTo(block,empty);
+			SetTo(block, empty);
 		}
 
-		CachedBlock(Volume *volume,block_run run,bool empty = false)
+		CachedBlock(Volume *volume, block_run run, bool empty = false)
 			:
 			fVolume(volume),
 			fBlock(NULL)
 		{
-			SetTo(volume->ToBlock(run),empty);
+			SetTo(volume->ToBlock(run), empty);
 		}
 
 		~CachedBlock()
@@ -81,20 +81,20 @@ class CachedBlock {
 		void Unset()
 		{
 			if (fBlock != NULL)
-				release_block(fVolume->Device(),fBlockNumber);
+				release_block(fVolume->Device(), fBlockNumber);
 		}
 
 		uint8 *SetTo(off_t block, bool empty = false)
 		{
 			Unset();
 			fBlockNumber = block;
-			return fBlock = empty ? (uint8 *)get_empty_block(fVolume->Device(),block,fVolume->BlockSize())
-								  : (uint8 *)get_block(fVolume->Device(),block,fVolume->BlockSize());
+			return fBlock = empty ? (uint8 *)get_empty_block(fVolume->Device(), block, BlockSize())
+								  : (uint8 *)get_block(fVolume->Device(), block, BlockSize());
 		}
 
 		uint8 *SetTo(block_run run, bool empty = false)
 		{
-			return SetTo(fVolume->ToBlock(run),empty);
+			return SetTo(fVolume->ToBlock(run), empty);
 		}
 
 		status_t WriteBack(Transaction *transaction)
@@ -102,11 +102,13 @@ class CachedBlock {
 			if (transaction == NULL || fBlock == NULL)
 				RETURN_ERROR(B_BAD_VALUE);
 
-			return transaction->WriteBlocks(fBlockNumber,fBlock);
+			return transaction->WriteBlocks(fBlockNumber, fBlock);
 		}
 
 		uint8 *Block() const { return fBlock; }
 		off_t BlockNumber() const { return fBlockNumber; }
+		uint32 BlockSize() const { return fVolume->BlockSize(); }
+		uint32 BlockShift() const { return fVolume->BlockShift(); }
 
 	protected:
 		Volume	*fVolume;
