@@ -4468,7 +4468,7 @@ void
 BTextView::LockWidthBuffer()
 {
 	CALLED();
-	if (atomic_add(&sWidthAtom, 1) > 0) {
+	if (atomic_add(&sWidthAtom, -1) <= 0) {
 		while (acquire_sem(sWidthSem) == B_INTERRUPTED)
 			;
 	}
@@ -4481,6 +4481,6 @@ void
 BTextView::UnlockWidthBuffer()
 {
 	CALLED();
-	if (atomic_add(&sWidthAtom, -1) > 1)
+	if (atomic_add(&sWidthAtom, 1) < 0)
 		release_sem(sWidthSem);
 }
