@@ -49,12 +49,11 @@ MediaListItem::MediaListItem(const char *label, int32 MediaName, BBitmap *bitmap
 //MediaListItem - DrawItem
 void MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 {
-	rgb_color kHighlight = { 220,220,220,0 };
+	rgb_color kHighlight = { 140,140,140,0 };
 	rgb_color kBlackColor = { 0,0,0,0 };
 	rgb_color kMedGray = { 140,140,140,0 };
 	
 	BRect r;
-	
 	r.top = frame.top;
 	r.left = frame.left-10;
 	r.right = frame.right;
@@ -70,10 +69,11 @@ void MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 			color = owner->ViewColor();
 		}
 		owner->SetHighColor(color);
+		owner->SetLowColor(color);
 		owner->FillRect(r);
 	}
 	
-	owner->MovePenTo(frame.left-10,frame.bottom-13);
+	owner->MovePenTo(frame.left-10,frame.top);
 	owner->DrawBitmap(icon);
 	
 	owner->MovePenTo(frame.left+10, frame.bottom-2);
@@ -83,8 +83,9 @@ void MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 	} else {
 		owner->SetHighColor(kMedGray);
 	}
+
 	owner->DrawString(media_names[kMediaName]);
-	
 	owner->AttachedToWindow();
 }
 //--------------------------------------------------------------------------------------------------------------//
+

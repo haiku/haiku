@@ -46,7 +46,9 @@ Media - MediaWindow by Sikosis
 #include "mixer.h"
 #include "tv.h"
 
-const uint32 NEW_MSG = 'nwm';
+const uint32 ML_AUDIO_SETTINGS = 'MlAS';
+const uint32 ML_AUDIO_MIXER = 'MlAM';
+const uint32 NEW_MSG = 'nmsg';
 
 // CenterWindowOnScreen -- Centers the BWindow to the Current Screen
 static void CenterWindowOnScreen(BWindow* w)
@@ -101,20 +103,23 @@ void MediaWindow::InitWindow(void)
 	BRect AvailableRect(r.left+160,r.top+12,r.right-10,r.bottom-10);
 	BRect TitleRect(0,0,140,16);
 	BRect AudioMixerRect(0,30,470,400);
+	
 	BOutlineListView *outline;
-	MediaListItem 		 *topmenu;
-	MediaListItem 		 *submenu;
-	BScrollView 	 *outlinesv;
-	BStringView 	 *stvAudioSettings;
-	BStringView 	 *stvAudioMixer;
+	//MediaListItem    *topmenu;
+	//MediaListItem    *submenu;
+	BListItem        *topmenu;
+	BListItem        *submenu;
+	BScrollView      *outlinesv;
+	BStringView      *stvAudioSettings;
+	BStringView      *stvAudioMixer;
 
 	outline = new BOutlineListView(outlinerect,"audio_list", B_SINGLE_SELECTION_LIST);
-	/*outline->AddItem(topmenu = new BStringItem("Audio Settings"));
+	outline->AddItem(topmenu = new BStringItem("Audio Settings"));
 	outline->AddUnder(submenu = new BStringItem("Audio Mixer"), topmenu);
 	outline->AddUnder(new BStringItem("None Out"), submenu);
 	outline->AddUnder(new BStringItem("None In"), submenu);
 	outline->AddItem(topmenu = new BStringItem("Video Settings"));
-	outline->AddUnder(submenu = new BStringItem("Video Window Consumer"), topmenu);*/
+	outline->AddUnder(submenu = new BStringItem("Video Window Consumer"), topmenu);
 	
 	// Bitmaps
 	BRect BitmapFrame(0,0,15,15);
@@ -125,14 +130,16 @@ void MediaWindow::InitWindow(void)
 	BBitmap *TVIcon = new BBitmap(BitmapFrame,B_RGB32);
 	TVIcon->SetBits(tvicon,768,0,B_RGB32);
 	
-	outline->AddItem(topmenu = new MediaListItem("Audio Settings", MediaListItem::AS, DevicesIcon, new BMessage(NEW_MSG)));
-	topmenu->SetHeight(30);
-	outline->AddItem(submenu = new MediaListItem("Audio Mixer", MediaListItem::AM, MixerIcon, new BMessage(NEW_MSG)));
+	/*outline->AddItem(topmenu = new MediaListItem("Audio Settings", MediaListItem::AS, DevicesIcon, new BMessage(ML_AUDIO_SETTINGS)));
+	outline->AddItem(submenu = new MediaListItem("Audio Mixer", MediaListItem::AM, MixerIcon, new BMessage(ML_AUDIO_MIXER)));
 	outline->AddUnder(new BStringItem("None Out"), submenu);
 	outline->AddUnder(new BStringItem("None In"), submenu);
 	outline->AddItem(topmenu = new MediaListItem("Video Settings", MediaListItem::VS, DevicesIcon, new BMessage(NEW_MSG)));
-	outline->AddItem(submenu = new MediaListItem("Video Window Consumer", MediaListItem::VWC, TVIcon, new BMessage(NEW_MSG)));
-		
+	outline->AddItem(submenu = new MediaListItem("Video Window Consumer", MediaListItem::VWC, TVIcon, new BMessage(NEW_MSG)));*/
+	
+	topmenu->SetHeight(18);
+	submenu->SetHeight(18);
+			
 	// Add ScrollView to Media Menu
 	outlinesv = new BScrollView("scroll_audio", outline, B_FOLLOW_LEFT|B_FOLLOW_TOP, 0, false, false, B_FANCY_BORDER);
 	
@@ -148,6 +155,7 @@ void MediaWindow::InitWindow(void)
 	stvAudioMixer->SetHighColor(TitleFontColor);
 	
 	// Setup the OutlineView 
+	outline->AllAttached();
 	outlinesv->SetBorderHighlighted(true);
 	
 	// Back and Fore ground Colours
@@ -203,7 +211,7 @@ void ErrorAlert(char* errorMessage) {
 	printf("%s\n", errorMessage);
 	BAlert *alert = new BAlert("BAlert", errorMessage, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT); 
 	alert->Go();
-	//exit(1);
+	exit(1);
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
@@ -213,10 +221,9 @@ void MediaWindow::MessageReceived (BMessage *message)
 {
 	switch(message->what)
 	{	
-		char* myerror;
-		sprintf(myerror,"%s",message->what);
-		ErrorAlert(myerror);
-		
+		case ML_AUDIO_SETTINGS:
+			exit(1); // debug of course ;)
+			break;
 		default:
 			BWindow::MessageReceived(message);
 			break;
