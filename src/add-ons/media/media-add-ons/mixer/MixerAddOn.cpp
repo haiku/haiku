@@ -110,6 +110,12 @@ AudioMixerAddon::AutoStart(int in_index, BMediaNode ** out_node,
 		return B_ERROR;
 
 	*out_internal_id = 0;
-	*out_node = new AudioMixer(this);	
+	AudioMixer *mixer = new AudioMixer(this);
+
+	// disable stop on the auto started (system) mixer
+	mixer->DisableNodeStop();
+
+	*out_node = mixer;
+	
 	return B_OK;
 }

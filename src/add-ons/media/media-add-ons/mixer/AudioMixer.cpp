@@ -231,7 +231,8 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 			fFramesSent(0),
 			fOutputEnabled(true),
 			fBufferGroup(NULL),
-			fNextFreeID(1)
+			fNextFreeID(1),
+			fDisableStop(false)
 			
 			
 {
@@ -287,6 +288,22 @@ AudioMixer::~AudioMixer()
 
 	// any other cleanup goes here
 
+}
+
+void
+AudioMixer::DisableNodeStop()
+{
+	fDisableStop = true;
+}
+
+void AudioMixer::Stop(bigtime_t performance_time, bool immediate)
+{
+	if (fDisableStop) {
+		printf("AudioMixer STOP is disabled\n");
+		return;
+	} else {
+		BMediaEventLooper::Stop(performance_time, immediate);
+	}
 }
 
 //
@@ -522,6 +539,7 @@ AudioMixer::DisposeInputCookie(int32 cookie)
 void
 AudioMixer::BufferReceived(BBuffer *buffer)
 {
+
 	if (buffer->Header()->type == B_MEDIA_PARAMETERS) {
 		printf("Control Buffer Received\n");
 		ApplyParameterData(buffer->Data(), buffer->SizeUsed());
@@ -544,17 +562,18 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 void
 AudioMixer::HandleInputBuffer(BBuffer *buffer, bigtime_t lateness)
 {
+static char lastIndata = 0;
 	media_header *hdr = buffer->Header();
 
 //	printf("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), buffer->Header()->start_time, TimeSource()->Now(), lateness);
 
 	// check input
 	int inputcount = fMixerInputs.CountItems();
-	
+//if (inputcount == 0)
+//	printf("**** input count == 0\n");
 	for (int i = 0; i < inputcount; i++) {
-	
 		mixer_input *channel = (mixer_input *)fMixerInputs.ItemAt(i);
-				
+
 		if (channel->fInput.destination.id != hdr->destination)
 			continue;
 
@@ -580,12 +599,17 @@ AudioMixer::HandleInputBuffer(BBuffer *buffer, bigtime_t lateness)
 */
 		if (channel->fDataSize == 0)
 			break;
-		
+
 		// XXX this is probably broken now
 		size_t total_offset = int(channel->fEventOffset + channel->fInput.format.u.raw_audio.buffer_size)  % int(channel->fDataSize);
 		
 		char *indata = (char *)buffer->Data();
-														
+
+//if (indata[0] != lastIndata) {
+//	printf("**** inbuffer changed to %d\n", indata[0]);
+//	lastIndata = indata[0];
+//}
+
 		if (buffer->SizeUsed() > (channel->fDataSize - total_offset))
 		{
 			memcpy(channel->fData + total_offset, indata, channel->fDataSize - total_offset);
@@ -620,13 +644,21 @@ AudioMixer::SendNewBuffer(bigtime_t event_time)
 	}
 				
 	FillMixBuffer(outbuffer->Data(), outbuffer->SizeAvailable());
-					
+
 	media_header *outheader = outbuffer->Header();
 	outheader->type = B_MEDIA_RAW_AUDIO;
 	outheader->size_used = fOutput.format.u.raw_audio.buffer_size;
 	outheader->time_source = TimeSource()->ID();
 	outheader->start_time = event_time;
-	
+
+//static char lastOutdata = 0;
+//char *outdata = (char *)outbuffer->Data();
+//if (outdata[0] != lastOutdata) {
+//	printf("**** outbuffer changed to %d\n", outdata[0]);
+//	lastOutdata = outdata[0];
+//}
+//printf("**** send new buffer *******\n");
+
 	bigtime_t start2 = system_time();
 	if (B_OK != SendBuffer(outbuffer, fOutput.destination)) {
 		printf("AudioMixer: Could not send buffer to output : %s\n", fOutput.name);

@@ -35,7 +35,10 @@ class AudioMixer :
 					
 					AudioMixer(BMediaAddOn *addOn);
 					~AudioMixer();
-					
+		
+		
+		void				DisableNodeStop();
+		
 	// AudioMixer support
 					
 		bool				IsValidDest( media_destination dest);
@@ -60,7 +63,7 @@ class AudioMixer :
 	//	status_t RequestCompleted(const media_request_info & info);
 	
 	protected:
-
+	
 	// BControllable methods
 	
 		status_t 			GetParameterValue( int32 id, bigtime_t* last_change,
@@ -176,6 +179,9 @@ class AudioMixer :
 	// BMediaEventLooper methods
 	
 		virtual	void 		NodeRegistered();
+
+		virtual	void Stop(bigtime_t performance_time,
+							bool immediate);
 	
 		void				HandleEvent( const media_timed_event *event, 
 								bigtime_t lateness,	
@@ -214,6 +220,8 @@ class AudioMixer :
 		BList				fMixerInputs;
 		
 		int					fNextFreeID;
+		
+		bool				fDisableStop;
 		
 };		
 			

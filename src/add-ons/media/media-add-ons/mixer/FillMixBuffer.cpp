@@ -263,7 +263,7 @@ AudioMixer::FillMixBuffer(void *outbuffer, size_t ioSize)
 								} else if (mix) {
 									printf("#### FillMixBuffer(): 4.Should mix from B_AUDIO_SHORT!\n");
 								} else {					
-									printf("#### FillMixBuffer(): 4.Should copy from B_AUDIO_SHORT!\n");
+								//	printf("#### FillMixBuffer(): 4.Should copy from B_AUDIO_SHORT!\n");
 									int baseOffset = channel->fEventOffset / 2;
 									int maxOffset = int(channel->fDataSize / 2);
 
