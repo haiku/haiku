@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Header: /tmp/bonefish/open-beos/current/src/apps/bin/spamfilter.cpp,v 1.1 2004/11/12 02:55:04 nwhitehorn Exp $
+ * $Header: /tmp/bonefish/open-beos/current/src/apps/bin/spamfilter.cpp,v 1.2 2004/12/07 01:14:05 nwhitehorn Exp $
  *
  * This is a BeOS program for classifying e-mail messages as spam (unwanted
  * junk mail) or as genuine mail using a Bayesian statistical approach.  There
@@ -64,8 +64,8 @@
  * rule chain can delete the message or otherwise manipulate it.
  *
  * $Log: spamfilter.cpp,v $
- * Revision 1.1  2004/11/12 02:55:04  nwhitehorn
- * Added AGMS's excellent spam detection software. Still some weirdness with the configuration interface from E-mail prefs.
+ * Revision 1.2  2004/12/07 01:14:05  nwhitehorn
+ * Fixed the spam filter so it works correctly now.
  *
  * Revision 1.87  2004/09/20 15:57:26  nwhitehorn
  * Mostly updated the tree to Be/Haiku style identifier naming conventions. I have a few more things to work out, mostly in mail_util.h, and then I'm proceeding to jamify the build system. Then we go into Haiku CVS.
@@ -411,6 +411,7 @@ static long long atoll (const char *str) {
 #include <Beep.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <Cursor.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -524,6 +525,10 @@ static BMessenger *g_CommanderMessenger = NULL;
   /* Some globals for use with the looper which processes external commands
   (arguments received, file references received), needed for avoiding deadlocks
   which would happen if the BApplication sent a scripting message to itself. */
+
+static BCursor *g_BusyCursor = NULL;
+  /* The busy cursor, will be loaded from the resource file during application
+  startup. */
 
 typedef enum PropertyNumbersEnum
 {
@@ -1505,7 +1510,7 @@ ostream& PrintUsage (ostream& OutputStream)
   OutputStream << "Copyright © 2002 by Alexander G. M. Smith.  ";
   OutputStream << "Released to the public domain.\n\n";
   WrapTextToStream (OutputStream, "Compiled on " __DATE__ " at " __TIME__
-".  $Revision: 1.1 $  $Header: /tmp/bonefish/open-beos/current/src/apps/bin/spamfilter.cpp,v 1.1 2004/11/12 02:55:04 nwhitehorn Exp $");
+".  $Revision: 1.2 $  $Header: /tmp/bonefish/open-beos/current/src/apps/bin/spamfilter.cpp,v 1.2 2004/12/07 01:14:05 nwhitehorn Exp $");
   OutputStream << "\n"
 "This is a program for classifying e-mail messages as spam (junk mail which\n"
 "you don't want to read) and regular genuine messages.  It can learn what's\n"
@@ -1850,6 +1855,9 @@ ABSApp::ABSApp ()
   status_t    ErrorCode;
   int         HalvingCount;
   int         i;
+  const void *ResourceData;
+  size_t      ResourceSize;
+  BResources *ResourcesPntr;
 
   MakeDatabaseEmpty ();
 
@@ -1882,6 +1890,13 @@ ABSApp::ABSApp ()
     m_SpaceCharacters[i] = false;
   for (i = 'a'; i <= 'z'; i++)
     m_SpaceCharacters[i] = false;
+
+  /* Initialise the busy cursor from data in the application's resources. */
+
+  if ((ResourcesPntr = AppResources ()) != NULL && (ResourceData =
+  ResourcesPntr->LoadResource ('CURS', "Busy Cursor", &ResourceSize)) != NULL
+  && ResourceSize >= 68 /* Size of a raw 2x16x16x8+4 cursor is 68 bytes */)
+    g_BusyCursor = new BCursor (ResourceData);
 
   /* Find out the smallest usable double by seeing how small we can make it. */
 
@@ -1917,6 +1932,8 @@ ABSApp::~ABSApp ()
     LoadSaveSettings (false /* DoLoad */);
   if ((ErrorCode = SaveDatabaseIfNeeded (ErrorMessage)) != B_OK)
     DisplayErrorMessage (ErrorMessage, ErrorCode, "Exiting Error");
+  delete g_BusyCursor;
+  g_BusyCursor = NULL;
 }
 
 
@@ -1949,7 +1966,7 @@ developed the even better chi-squared scoring method.\n\n"
 doesn't want their meat product associated with junk e-mail.\n\n"
 
 "Released to the public domain, with no warranty.\n"
-"$Revision: 1.1 $\n"
+"$Revision: 1.2 $\n"
 "Compiled on " __DATE__ " at " __TIME__ ".", "Done");
   if (AboutAlertPntr != NULL)
   {
@@ -3067,7 +3084,7 @@ status_t ABSApp::LoadSaveDatabase (bool DoLoad, char *ErrorMessage)
   {
     CurrentTime = time (NULL);
     if (fprintf (DatabaseFile, "%s V1 (word, age, genuine count, spam count)\t"
-    "Written by AGMSBayesianSpamServer $Revision: 1.1 $\t"
+    "Written by AGMSBayesianSpamServer $Revision: 1.2 $\t"
     "Compiled on " __DATE__ " at " __TIME__ "\tThis file saved on %s",
     g_DatabaseRecognitionString, ctime (&CurrentTime)) <= 0)
     {
@@ -3589,6 +3606,9 @@ void ABSApp::ProcessScriptingMessage (
     cerr << "Quit countdown aborted due to a scripting command arriving.\n";
   }
 
+  if (g_BusyCursor != NULL)
+  	SetCursor (g_BusyCursor);
+
   ErrorCode = MessagePntr->FindData (g_DataName, B_STRING_TYPE,
     (const void **) &ArgumentString, &StringBufferSize);
   if (ErrorCode == B_OK)
@@ -4056,6 +4076,7 @@ void ABSApp::ProcessScriptingMessage (
     cerr << "ProcessScriptingMessage failed to send a reply message, code " <<
     ErrorCode << " (" << strerror (ErrorCode) << ")" << " for " <<
     CommandText.String () << endl;
+  SetCursor (B_CURSOR_SYSTEM_DEFAULT);
   return;
 
 ErrorExit: /* Error message in TempString, return code in ErrorCode. */
@@ -4068,6 +4089,7 @@ ErrorExit: /* Error message in TempString, return code in ErrorCode. */
     cerr << "ProcessScriptingMessage failed to send an error message, code " <<
     ErrorCode << " (" << strerror (ErrorCode) << ")" << " for " <<
     CommandText.String () << endl;
+  SetCursor (B_CURSOR_SYSTEM_DEFAULT);
 }
 
 

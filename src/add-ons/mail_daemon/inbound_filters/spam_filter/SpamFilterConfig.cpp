@@ -3,6 +3,9 @@
  * settings related to the add-on, but not the server.
  *
  * $Log: SpamFilterConfig.cpp,v $
+ * Revision 1.4  2004/12/07 01:14:05  nwhitehorn
+ * Fixed the spam filter so it works correctly now.
+ *
  * Revision 1.3  2004/11/21 08:38:07  shatty
  * remove unused variables
  *
@@ -383,8 +386,6 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 					goto ErrorExit;
 			}
 		}
-	
-	snooze (2000000);
 	
 	// Set up the messenger to the database server.
 	messengerToServer =
