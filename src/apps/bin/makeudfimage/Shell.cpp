@@ -36,9 +36,10 @@ Shell::Run(int argc, char *argv[])
 	if (!error) {
 		ConsoleListener listener(fVerbosityLevel);
 		UdfBuilder builder("./output.img", fBlockSize, fDoUdf, fDoIso,
-		                   "(Unnamed UDF volume)", "ISO_VOLUME", listener);
+		                   "(Unnamed UDF volume)", "ISO_VOLUME",
+		                   "/boot/home/Desktop/udftest", listener);
 		error = builder.InitCheck();
-		if (!error)
+		if (!error) 
 			error = builder.Build();
 	}
 	
