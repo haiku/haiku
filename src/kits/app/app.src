@@ -27,5 +27,6 @@ APP_KIT_SOURCE =
 	RegistrarThreadManager.cpp
 	Roster.cpp
 	RosterPrivate.cpp
+	ServerMemIO.cpp
 	TokenSpace.cpp
 ;
