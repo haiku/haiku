@@ -12,24 +12,29 @@ ScreenView::ScreenView(BRect rect, char *name)
 void
 ScreenView::AttachedToWindow()
 {
-	SetViewColor(greyColor);
+	rgb_color grey = ui_color(B_PANEL_BACKGROUND_COLOR);
+	SetViewColor(grey);
 }
 
 
 void
 ScreenView::Draw(BRect updateRect)
 {
-	rgb_color darkColor = {128, 128, 128, 255};
+	rgb_color white = { 255, 255, 255, 255 };
+	rgb_color dark3 = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_3_TINT);
+	rgb_color black = { 0, 0, 0, 255 };
 	
-	SetHighColor(whiteColor);
+	BRect bounds(Bounds());
 	
-	StrokeLine(BPoint(Bounds().left, Bounds().top), BPoint(Bounds().right, Bounds().top));
-	StrokeLine(BPoint(Bounds().left, Bounds().top), BPoint(Bounds().left, Bounds().bottom));
+	SetHighColor(white);
 	
-	SetHighColor(darkColor);
+	StrokeLine(BPoint(bounds.left, bounds.top), BPoint(bounds.right, bounds.top));
+	StrokeLine(BPoint(bounds.left, bounds.top), BPoint(bounds.left, bounds.bottom));
 	
-	StrokeLine(BPoint(Bounds().left, Bounds().bottom), BPoint(Bounds().right, Bounds().bottom));
-	StrokeLine(BPoint(Bounds().right, Bounds().bottom), BPoint(Bounds().right, Bounds().top));
+	SetHighColor(dark3);
 	
-	SetHighColor(blackColor);
+	StrokeLine(BPoint(bounds.left, bounds.bottom), BPoint(bounds.right, bounds.bottom));
+	StrokeLine(BPoint(bounds.right, bounds.bottom), BPoint(bounds.right, bounds.top));
+	
+	SetHighColor(black);
 }

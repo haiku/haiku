@@ -26,9 +26,8 @@ RefreshSlider::~RefreshSlider()
 void
 RefreshSlider::DrawFocusMark()
 {
-	if (IsFocus())
-	{
-		rgb_color blueColor = { 0, 0, 229, 255 };
+	if (IsFocus()) {
+		rgb_color blue = { 0, 0, 229, 255 };
 		
 		BRect rect(ThumbFrame());		
 		BView *view = OffscreenView();
@@ -37,7 +36,7 @@ RefreshSlider::DrawFocusMark()
 		rect.right--;
 		rect.bottom--;
 		
-		view->SetHighColor(blueColor);
+		view->SetHighColor(blue);
 		view->StrokeRect(rect);
 	}
 }
@@ -46,7 +45,7 @@ RefreshSlider::DrawFocusMark()
 void
 RefreshSlider::KeyDown(const char *bytes, int32 numBytes)
 {
-	switch ( *bytes )
+	switch (*bytes)
 	{
 		case B_LEFT_ARROW:
 		{
@@ -75,14 +74,11 @@ RefreshSlider::KeyDown(const char *bytes, int32 numBytes)
 char*
 RefreshSlider::UpdateText() const
 {
-	if (fStatus && Window()->Lock())
-	{
+	if (fStatus) {
 		sprintf(fStatus, "%.1f Hz", (float)Value() / 10);
 		return fStatus;
 	}
-	else
-	{
+	else 
 		return NULL;
-	}
 }
 

@@ -13,9 +13,9 @@
 RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	: BWindow(frame, "Refresh Rate", B_MODAL_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
 {
-	frame = Bounds();
+	BRect bounds(Bounds());
 	
-	fRefreshView = new RefreshView(frame, "RefreshView");
+	fRefreshView = new RefreshView(bounds, "RefreshView");
 	
 	AddChild(fRefreshView);
 	
@@ -55,9 +55,7 @@ RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	fCancelButton->ResizeToPreferred();
 	
 	fRefreshView->AddChild(fCancelButton);
-	
-	Show();
-	
+		
 	PostMessage(SLIDER_INVOKE_MSG);
 }
 
@@ -76,14 +74,13 @@ RefreshWindow::MessageReceived(BMessage* message)
 	{
 		case BUTTON_DONE_MSG:
 		{
-			BMessenger Messenger(kAppSignature);	
-			BMessage Message(SET_CUSTOM_REFRESH_MSG);
+			BMessenger messenger(kAppSignature);	
+			BMessage message(SET_CUSTOM_REFRESH_MSG);
 			
-			float Value = (float)fRefreshSlider->Value() / 10;
+			float value = (float)fRefreshSlider->Value() / 10;
 					
-			Message.AddFloat("refresh", Value);
-
-			Messenger.SendMessage(&Message);
+			message.AddFloat("refresh", value);
+			messenger.SendMessage(&message);
 			
 			PostMessage(B_QUIT_REQUESTED);
 			

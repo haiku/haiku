@@ -7,9 +7,8 @@
 
 #include <cstdlib>
 
-#include "ScreenDrawView.h"
 #include "Constants.h"
-#include "Utility.h"
+#include "ScreenDrawView.h"
 
 ScreenDrawView::ScreenDrawView(BRect rect, char *name)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)	
@@ -45,16 +44,18 @@ ScreenDrawView::MouseDown(BPoint point)
 void
 ScreenDrawView::Draw(BRect updateRect)
 {
+	rgb_color red = { 228, 0, 0, 255 };
+	rgb_color black = { 0, 0, 0, 255 };
+	rgb_color darkColor = {160, 160, 160, 255};
+	
 	//FIXME: Make the draw code resolution independent
-	if (fResolution == 1600)
-	{
-		rgb_color darkColor = {160, 160, 160, 255};
-		
+	if (fResolution == 1600) 
+	{	
 		SetHighColor(darkColor);
 	
 		FillRoundRect(Bounds(), 3.0, 3.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(Bounds(), 3.0, 3.0);
 		
@@ -62,23 +63,21 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		FillRoundRect(BRect(4.0, 4.0, 98.0, 73.0), 2.0, 2.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(4.0, 4.0, 98.0, 73.0), 2.0, 2.0);
 		
-		SetHighColor(redColor);
+		SetHighColor(red);
 		
 		StrokeLine(BPoint(4.0, 75.0), BPoint(5.0, 75.0));
 	}
 	else if(fResolution == 1280)
 	{
-		rgb_color darkColor = {160, 160, 160, 255};
-		
 		SetHighColor(darkColor);
 	
 		FillRoundRect(BRect(10.0, 6.0, 92.0, 72.0), 3.0, 3.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(10.0, 6.0, 92.0, 72.0), 3.0, 3.0);
 		
@@ -86,23 +85,21 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		FillRoundRect(BRect(14.0, 10.0, 88.0, 68.0), 2.0, 2.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(14.0, 10.0, 88.0, 68.0), 2.0, 2.0);
 		
-		SetHighColor(redColor);
+		SetHighColor(red);
 		
 		StrokeLine(BPoint(15.0, 70.0), BPoint(16.0, 70.0));
 	}
 	else if(fResolution == 1152)
 	{
-		rgb_color darkColor = {160, 160, 160, 255};
-		
 		SetHighColor(darkColor);
 	
 		FillRoundRect(BRect(15.0, 9.0, 89.0, 68.0), 3.0, 3.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(15.0, 9.0, 89.0, 68.0), 3.0, 3.0);
 		
@@ -110,23 +107,21 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		FillRoundRect(BRect(19.0, 13.0, 85.0, 64.0), 2.0, 2.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(19.0, 13.0, 85.0, 64.0), 2.0, 2.0);
 		
-		SetHighColor(redColor);
+		SetHighColor(red);
 		
 		StrokeLine(BPoint(19.0, 66.0), BPoint(20.0, 66.0));
 	}
 	else if(fResolution == 1024)
 	{
-		rgb_color darkColor = {160, 160, 160, 255};
-		
 		SetHighColor(darkColor);
 	
 		FillRoundRect(BRect(18.0, 14.0, 84.0, 64.0), 3.0, 3.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(18.0, 14.0, 84.0, 64.0), 3.0, 3.0);
 		
@@ -134,24 +129,21 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		FillRoundRect(BRect(22.0, 18.0, 80.0, 60.0), 2.0, 2.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(22.0, 18.0, 80.0, 60.0), 2.0, 2.0);
 		
-		SetHighColor(redColor);
+		SetHighColor(red);
 		
 		StrokeLine(BPoint(22.0, 62.0), BPoint(23.0, 62.0));
 	}
 	else if(fResolution == 800)
 	{
-		rgb_color darkColor = {160, 160, 160, 255};
-		rgb_color redColor = {228, 0, 0, 255};
-		
 		SetHighColor(darkColor);
 	
 		FillRoundRect(BRect(25.0, 19.0, 77.0, 58.0), 3.0, 3.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(25.0, 19.0, 77.0, 58.0), 3.0, 3.0);
 		
@@ -159,23 +151,21 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		FillRoundRect(BRect(29.0, 23.0, 73.0, 54.0), 2.0, 2.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(29.0, 23.0, 73.0, 54.0), 2.0, 2.0);
 		
-		SetHighColor(redColor);
+		SetHighColor(red);
 		
 		StrokeLine(BPoint(29.0, 56.0), BPoint(30.0, 56.0));
 	}
 	else if(fResolution == 640)
 	{
-		rgb_color darkColor = {160, 160, 160, 255};
-		
 		SetHighColor(darkColor);
 	
 		FillRoundRect(BRect(31.0, 23.0, 73.0, 55.0), 3.0, 3.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(31.0, 23.0, 73.0, 55.0), 3.0, 3.0);
 		
@@ -183,11 +173,11 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		FillRoundRect(BRect(35.0, 27.0, 69.0, 51.0), 2.0, 2.0);
 		
-		SetHighColor(blackColor);
+		SetHighColor(black);
 		
 		StrokeRoundRect(BRect(35.0, 27.0, 69.0, 51.0), 2.0, 2.0);
 		
-		SetHighColor(redColor);
+		SetHighColor(red);
 		
 		StrokeLine(BPoint(35.0, 53.0), BPoint(36.0, 53.0));
 	}
@@ -201,14 +191,13 @@ ScreenDrawView::MessageReceived(BMessage* message)
 	{
 		case UPDATE_DESKTOP_MSG:
 		{
-			BString Resolution;		
-			message->FindString("resolution", &Resolution);
+			BString resolution;		
+			message->FindString("resolution", &resolution);
 			
-			int32 NextfResolution = atoi(Resolution.String());
+			int32 nextfResolution = atoi(resolution.String());
 			
-			if (fResolution != NextfResolution)
-			{
-				fResolution = NextfResolution;
+			if (fResolution != nextfResolution)	{
+				fResolution = nextfResolution;
 				
 				Invalidate();
 			}
@@ -226,8 +215,7 @@ ScreenDrawView::MessageReceived(BMessage* message)
 		}
 		
 		default:
-			BView::MessageReceived(message);
-			
+			BView::MessageReceived(message);	
 			break;
 	}
 }

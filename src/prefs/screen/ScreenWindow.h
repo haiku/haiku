@@ -1,5 +1,5 @@
-#ifndef SCREENWINDOW_H
-#define SCREENWINDOW_H
+#ifndef __SCREENWINDOW_H
+#define __SCREENWINDOW_H
 
 #include <PopUpMenu.h>
 #include <MenuField.h>
@@ -26,10 +26,10 @@ public:
 
 private:
 	void				CheckApplyEnabled();
+	
 	ScreenSettings		*fSettings;
 	ScreenView			*fScreenView;
 	ScreenDrawView		*fScreenDrawView;
-	RefreshWindow		*fRefreshWindow;
 	BPopUpMenu			*fWorkspaceMenu;
 	BMenuField			*fWorkspaceField;
 	BPopUpMenu			*fWorkspaceCountMenu;

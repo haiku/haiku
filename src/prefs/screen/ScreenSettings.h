@@ -1,21 +1,20 @@
-#ifndef SCREENSETTINGS_H
-#define SCREENSETTINGS_H
+#ifndef __SCREENSETTINGS_H
+#define __SCREENSETTINGS_H
 
 #include <View.h>
 
 class ScreenSettings
 {
-
 public:
-						ScreenSettings();
-	virtual 			~ScreenSettings();
+	ScreenSettings();
+	virtual ~ScreenSettings();
 
-	BRect 				WindowFrame() const { return fWindowFrame; };
-	void 				SetWindowFrame(BRect);
+	BRect WindowFrame() const { return fWindowFrame; };
+	void SetWindowFrame(BRect);
 
 private:
-	static const char 	fScreenSettingsFile[];
-	BRect 				fWindowFrame;
+	static const char fScreenSettingsFile[];
+	BRect fWindowFrame;
 };
 
 #endif

@@ -45,8 +45,6 @@ AlertWindow::AlertWindow(BRect frame)
 	BMessenger Messenger(this);
 	
 	fRunner = new BMessageRunner(Messenger, new BMessage(DIM_COUNT_MSG), 1000000, 10);
-	
-	Show();
 }
 
 
@@ -86,11 +84,11 @@ AlertWindow::MessageReceived(BMessage *message)
 		
 		case DIM_COUNT_MSG:
 		{
-			fAlertView->Count = fAlertView->Count - 1;
+			fAlertView->count -= 1;
 			
 			fAlertView->Invalidate(BRect(180.0, 20.0, 260.0, 50.0));
 			
-			if (fAlertView->Count == 0)
+			if (fAlertView->count == 0)
 				PostMessage(BUTTON_REVERT_MSG);
 		
 			break;

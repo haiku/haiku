@@ -27,53 +27,46 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	BRect frame(Bounds());
 	BScreen screen(B_MAIN_SCREEN_ID);
 	
-	if (!screen.IsValid()) {
-		//What could we do?
-		//debugger() ?
-	}
+	if (!screen.IsValid())
+		;//debugger() ?
+		
 	screen.GetModeList(&fSupportedModes, &fTotalModes);
 	
 	fScreenView = new ScreenView(frame, "ScreenView");
-	
 	AddChild(fScreenView);
 	
 	fSettings = Settings;
 	
-	BRect ScreenBoxRect;
-	BRect ScreenDrawViewRect;
+	BRect ScreenBoxRect(11.0, 18.0, 153.0, 155.0);
+	BRect ScreenDrawViewRect(20.0, 16.0, 122.0, 93.0);
 	BRect ControlsBoxRect;
 	BRect WorkspaceMenuRect;
 	BRect WorkspaceCountMenuRect;
 	BRect ControlMenuRect;
 	BRect ButtonRect;
-	
-	ScreenBoxRect.Set(11.0, 18.0, 153.0, 155.0);
-	
+		
 	fScreenBox = new BBox(ScreenBoxRect);
 	fScreenBox->SetBorder(B_FANCY_BORDER);
-	
-	ScreenDrawViewRect.Set(20.0, 16.0, 122.0, 93.0);
-	
+		
 	fScreenDrawView = new ScreenDrawView(ScreenDrawViewRect, "ScreenDrawView");
 	
-	BString String;
+	BString string;
 	
-	String << count_workspaces();
+	string << count_workspaces();
 	
-	fWorkspaceCountMenu = new BPopUpMenu(String.String(), true, true);
+	fWorkspaceCountMenu = new BPopUpMenu(string.String(), true, true);
 	
-	for (int32 Count = 1; Count <= 32; Count++)
-	{
-		String.Truncate(0);
-		String << Count;
-		fWorkspaceCountMenu->AddItem(new BMenuItem(String.String(), new BMessage(POP_WORKSPACE_CHANGED_MSG)));
+	for (int32 count = 1; count <= 32; count++) {
+		string.Truncate(0);
+		string << count;
+		fWorkspaceCountMenu->AddItem(new BMenuItem(string.String(), new BMessage(POP_WORKSPACE_CHANGED_MSG)));
 	}
 	
-	String.Truncate(0);
-	String << count_workspaces();
+	string.Truncate(0);
+	string << count_workspaces();
 	
-	BMenuItem *Marked = fWorkspaceCountMenu->FindItem(String.String());
-	Marked->SetMarked(true);
+	BMenuItem *marked = fWorkspaceCountMenu->FindItem(string.String());
+	marked->SetMarked(true);
 	
 	WorkspaceCountMenuRect.Set(7.0, 107.0, 135.0, 127.0);
 	
@@ -81,10 +74,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fWorkspaceCountField->SetDivider(91.0);
 	
-	fScreenBox->AddChild(fScreenDrawView);
-	
-	fScreenBox->AddChild(fWorkspaceCountField);
-	
+	fScreenBox->AddChild(fScreenDrawView);	
+	fScreenBox->AddChild(fWorkspaceCountField);	
 	fScreenView->AddChild(fScreenBox);
 	
 	fWorkspaceMenu = new BPopUpMenu("Current Workspace", true, true);
@@ -107,7 +98,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	ButtonRect.Set(88.0, 114.0, 200.0, 150.0);
 	
 	fApplyButton = new BButton(ButtonRect, "ApplyButton", "Apply", 
-	new BMessage(BUTTON_APPLY_MSG));
+		new BMessage(BUTTON_APPLY_MSG));
 	
 	fApplyButton->AttachedToWindow();
 	fApplyButton->ResizeToPreferred();
@@ -115,7 +106,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fControlsBox->AddChild(fApplyButton);
 	
-	fResolutionMenu = new BPopUpMenu("640 x 480", true, true);
+	fResolutionMenu = new BPopUpMenu("", true, true);
 	for (uint32 c = 0; c < fTotalModes; c++) {
 		BString mode;
 		mode << (int32)fSupportedModes[c].virtual_width << " x " << (int32)fSupportedModes[c].virtual_height;
@@ -123,19 +114,18 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 			fResolutionMenu->AddItem(new BMenuItem(mode.String(),
 				new BMessage(POP_RESOLUTION_MSG)));
 	}
-	
 	ControlMenuRect.Set(33.0, 30.0, 171.0, 48.0);
 	
 	fResolutionField = new BMenuField(ControlMenuRect, "ResolutionMenu", "Resolution:", fResolutionMenu, true);
 	
-	Marked = fResolutionMenu->ItemAt(0);
-	Marked->SetMarked(true);
+	marked = fResolutionMenu->ItemAt(0);
+	marked->SetMarked(true);
 	
 	fResolutionField->SetDivider(55.0);
 	
 	fControlsBox->AddChild(fResolutionField);
 	
-	fColorsMenu = new BPopUpMenu("8 Bits/Pixel", true, true);
+	fColorsMenu = new BPopUpMenu("", true, true);
 	
 	// Get the supported colorspaces
 	for (uint32 c = 0; c < fTotalModes; c++) {
@@ -154,24 +144,24 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 				colorSpace = "32 Bits/Pixel";
 				break;
 		}
+		
 		if (!fColorsMenu->FindItem(colorSpace.String()))
 			fColorsMenu->AddItem(new BMenuItem(colorSpace.String(),
-				new BMessage(POP_COLORS_MSG)));
-		
+				new BMessage(POP_COLORS_MSG)));		
 	}
 	
 	ControlMenuRect.Set(50.0, 58.0, 171.0, 76.0);
 	
 	fColorsField = new BMenuField(ControlMenuRect, "ColorsMenu", "Colors:", fColorsMenu, true);
 	
-	Marked = fColorsMenu->ItemAt(0);
-	Marked->SetMarked(true);
+	marked = fColorsMenu->ItemAt(0);
+	marked->SetMarked(true);
 	
 	fColorsField->SetDivider(38.0);
 	
 	fControlsBox->AddChild(fColorsField);	
 	
-	fRefreshMenu = new BPopUpMenu("60 Hz", true, true);
+	fRefreshMenu = new BPopUpMenu("", true, true);
 	fRefreshMenu->AddItem(new BMenuItem("56 Hz", new BMessage(POP_REFRESH_MSG)));
 	fRefreshMenu->AddItem(new BMenuItem("60 Hz", new BMessage(POP_REFRESH_MSG)));
 	fRefreshMenu->AddItem(new BMenuItem("70 Hz", new BMessage(POP_REFRESH_MSG)));
@@ -183,8 +173,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fRefreshField = new BMenuField(ControlMenuRect, "RefreshMenu", "Refresh Rate:", fRefreshMenu, true);
 	
-	Marked = fRefreshMenu->FindItem("60 Hz");
-	Marked->SetMarked(true);
+	marked = fRefreshMenu->FindItem("60 Hz");
+	marked->SetMarked(true);
 	
 	fRefreshField->SetDivider(69.0);
 	
@@ -219,35 +209,38 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fInitialMode = mode;
 	
-	String.Truncate(0);
+	string.Truncate(0);
 	
-	String << (uint32)mode.virtual_width << " x " << (uint32)mode.virtual_height;
+	string << (uint32)mode.virtual_width << " x " << (uint32)mode.virtual_height;
 
-	Marked = fResolutionMenu->FindItem(String.String());
-	Marked->SetMarked(true);
+	marked = fResolutionMenu->FindItem(string.String());
+	marked->SetMarked(true);
 	
-	fInitialResolution = Marked;
+	fInitialResolution = marked;
 	
-	if (mode.space == B_CMAP8){
-		Marked = fColorsMenu->FindItem("8 Bits/Pixel");
-		Marked->SetMarked(true);
-	
-	} else if (mode.space == B_RGB15) {
-		Marked = fColorsMenu->FindItem("15 Bits/Pixel");
-		Marked->SetMarked(true);
+	switch (mode.space) {
+		case B_RGB32:
+			marked = fColorsMenu->FindItem("32 Bits/Pixel");
+			break;
 		
-	} else if (mode.space == B_RGB16) {
-		Marked = fColorsMenu->FindItem("16 Bits/Pixel");
-		Marked->SetMarked(true);
+		case B_RGB16:
+			marked = fColorsMenu->FindItem("16 Bits/Pixel");
+			break;
+			
+		case B_RGB15:
+			marked = fColorsMenu->FindItem("15 Bits/Pixel");
+			break;
 		
-	} else if (mode.space == B_RGB32) {
-		Marked = fColorsMenu->FindItem("32 Bits/Pixel");
-		Marked->SetMarked(true);
+		case B_CMAP8:
+		default:		
+			marked = fColorsMenu->FindItem("8 Bits/Pixel");
+			break;
 	}
 	
-	fInitialColors = Marked;
+	marked->SetMarked(true);
+	fInitialColors = marked;
 	
-	String.Truncate(0);
+	string.Truncate(0);
 	
 	float total_size = mode.timing.h_total * mode.timing.v_total;
 	
@@ -255,39 +248,37 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fCustomRefresh = fInitialRefreshN;
 	
-	String << fInitialRefreshN << " Hz";
+	string << fInitialRefreshN << " Hz";
 	
-	Marked = fRefreshMenu->FindItem(String.String());
+	marked = fRefreshMenu->FindItem(string.String());
 	
-	if (Marked != NULL)	{
+	if (marked != NULL)	{
 	
-		Marked->SetMarked(true);	
-		fInitialRefresh = Marked;
+		marked->SetMarked(true);	
+		fInitialRefresh = marked;
 		
 	} else 	{
 		
-		BMenuItem *Other = fRefreshMenu->FindItem("Other...");	
-		String.Truncate(0);
+		BMenuItem *other = fRefreshMenu->FindItem("Other...");	
+		string.Truncate(0);
 	
-		String << fInitialRefreshN;
+		string << fInitialRefreshN;
 		
-		int32 point = String.FindFirst('.');
-		String.Truncate(point + 2);
+		int32 point = string.FindFirst('.');
+		string.Truncate(point + 2);
 		
-		String << " Hz/Other...";
+		string << " Hz/Other...";
 	
-		Other->SetLabel(String.String());
-		Other->SetMarked(true);
+		other->SetLabel(string.String());
+		other->SetMarked(true);
 		
-		point = String.FindFirst('/');
-		String.Truncate(point);
+		point = string.FindFirst('/');
+		string.Truncate(point);
 		
-		fRefreshMenu->Superitem()->SetLabel(String.String());
+		fRefreshMenu->Superitem()->SetLabel(string.String());
 		
-		fInitialRefresh = Other;
+		fInitialRefresh = other;
 	}
-	
-	Show();
 }
 
 ScreenWindow::~ScreenWindow()
@@ -384,13 +375,13 @@ ScreenWindow::MessageReceived(BMessage* message)
 		{
 			CheckApplyEnabled();
 		
-			BMessage *Message = new BMessage(UPDATE_DESKTOP_MSG);
+			BMessage *newMessage = new BMessage(UPDATE_DESKTOP_MSG);
 			
-			const char *Resolution = fResolutionMenu->FindMarked()->Label();
+			const char *resolution = fResolutionMenu->FindMarked()->Label();
 			
-			Message->AddString("resolution", Resolution);
+			newMessage->AddString("resolution", resolution);
 		
-			PostMessage(Message, fScreenDrawView);
+			PostMessage(newMessage, fScreenDrawView);
 			
 			break;
 		}
@@ -404,30 +395,32 @@ ScreenWindow::MessageReceived(BMessage* message)
 		
 		case POP_REFRESH_MSG:
 		{
-			CheckApplyEnabled();
-			
+			CheckApplyEnabled();		
 			break;
 		}
 		
 		case POP_OTHER_REFRESH_MSG:
 		{
+			BRect frame(Frame());
+			
 			CheckApplyEnabled();
 			int32 value = (int32)(fCustomRefresh * 10);		
-
-			fRefreshWindow = new RefreshWindow(BRect((Frame().left + 201.0),
-				(Frame().top + 34.0), (Frame().left + 509.0),
-				(Frame().top + 169.0)), value);
-		
-			BMenuItem *Other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);
 			
-			BString String;
+			RefreshWindow *fRefreshWindow = new RefreshWindow(BRect((frame.left + 201.0),
+				(frame.top + 34.0), (frame.left + 509.0),
+				(frame.top + 169.0)), value);
+			fRefreshWindow->Show();
 			
-			String << Other->Label();
+			BMenuItem *other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);
 			
-			int32 point = String.FindFirst('z');
-			String.Truncate(point + 1);
+			BString string;
 			
-			fRefreshMenu->Superitem()->SetLabel(String.String());
+			string << other->Label();
+			
+			int32 point = string.FindFirst('z');
+			string.Truncate(point + 1);
+			
+			fRefreshMenu->Superitem()->SetLabel(string.String());
 			
 			break;
 		}
@@ -452,10 +445,9 @@ ScreenWindow::MessageReceived(BMessage* message)
 			
 			CheckApplyEnabled();
 			
-			BMenuItem *Other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);
+			BMenuItem *other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);
 			
-			if (fInitialRefresh == Other)
-			{
+			if (fInitialRefresh == other) {
 				BString string;			
 				string << fInitialRefreshN;
 				
@@ -472,13 +464,13 @@ ScreenWindow::MessageReceived(BMessage* message)
 				fRefreshMenu->Superitem()->SetLabel(string.String());
 			}
 			
-			if (message->what == SET_INITIAL_MODE_MSG)
-			{
+			if (message->what == SET_INITIAL_MODE_MSG) {
+				
 				BScreen screen(B_MAIN_SCREEN_ID);
 				if (!screen.IsValid())
 					break;
 							
-				screen.SetMode(&fInitialMode);
+				screen.SetMode(&fInitialMode, true);
 			}
 			break;
 		}
@@ -509,8 +501,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 			else
 				refresh = atof(fRefreshMenu->FindMarked()->Label());
 			
-			for(uint32 c = 0; c < fTotalModes; c++)
-			{
+			for (uint32 c = 0; c < fTotalModes; c++) {
+				
 				if ((fSupportedModes[c].virtual_width == width)
 					&& (fSupportedModes[c].virtual_height == height))
 					
@@ -520,29 +512,22 @@ ScreenWindow::MessageReceived(BMessage* message)
 			mode->timing.pixel_clock = (uint32)((mode->timing.h_total * mode->timing.v_total) * refresh / 1000);
 					
 			
-			if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("8 Bits/Pixel"))
-			{	
+			if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("8 Bits/Pixel"))	
 				mode->space = B_CMAP8;
-			}
-			else if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("15 Bits/Pixel"))
-			{	
+			else if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("15 Bits/Pixel"))		
 				mode->space = B_RGB15;
-			}
-			else if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("16 Bits/Pixel"))
-			{	
+			else if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("16 Bits/Pixel"))	
 				mode->space = B_RGB16;
-			}
 			else if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("32 Bits/Pixel"))
-			{	
 				mode->space = B_RGB32;
-			}
 			
 			mode->h_display_start = 0;
 			mode->v_display_start = 0;
 
-			if (fWorkspaceMenu->FindMarked() == fWorkspaceMenu->FindItem("All Workspaces"))
-			{			
-				BAlert *WorkspacesAlert = new BAlert("WorkspacesAlert", "Change all workspaces?\nThis action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			if (fWorkspaceMenu->FindMarked() == fWorkspaceMenu->FindItem("All Workspaces")) {			
+				BAlert *WorkspacesAlert =
+					new BAlert("WorkspacesAlert", "Change all workspaces?\nThis action cannot be reverted",
+						"Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
  				
  				int32 button = WorkspacesAlert->Go();
  				
@@ -552,8 +537,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 				int32 old = current_workspace();
 				int32 totalWorkspaces = count_workspaces();
 				
-				for (int32 count = 0; count < totalWorkspaces; count ++)
-				{
+				for (int32 count = 0; count < totalWorkspaces; count ++) {
 					activate_workspace(count);
 					screen.SetMode(mode, true);
 				}
@@ -563,14 +547,14 @@ ScreenWindow::MessageReceived(BMessage* message)
 			else
 				screen.SetMode(mode);
 				
-			BRect Rect(100.0, 100.0, 400.0, 193.0);
+			BRect rect(100.0, 100.0, 400.0, 193.0);
 			
-			Rect.left = (screen.Frame().right / 2) - 150;
-			Rect.top = (screen.Frame().bottom / 2) - 42;
-			Rect.right = Rect.left + 300.0;
-			Rect.bottom = Rect.top + 93.0;
+			rect.left = (screen.Frame().right / 2) - 150;
+			rect.top = (screen.Frame().bottom / 2) - 42;
+			rect.right = rect.left + 300.0;
+			rect.bottom = rect.top + 93.0;
 			
-		 	new AlertWindow(Rect);
+		 	(new AlertWindow(rect))->Show();
 									
 			fApplyButton->SetEnabled(false);
 			
@@ -581,26 +565,25 @@ ScreenWindow::MessageReceived(BMessage* message)
 		{
 			message->FindFloat("refresh", &fCustomRefresh);
 		
-			BMenuItem *Other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);	
+			BMenuItem *other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);	
 				
-			Other->SetMarked(true);
+			other->SetMarked(true);
 				
-			BString String;			
-			String << fCustomRefresh;
-			int32 point = String.FindFirst('.');
-			String.Truncate(point + 2);
+			BString string;			
+			string << fCustomRefresh;
+			int32 point = string.FindFirst('.');
+			string.Truncate(point + 2);
 			
-			String << " Hz/Other...";
+			string << " Hz/Other...";
 			
-			fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(String.String());
+			fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(string.String());
 			
-			point = String.FindFirst('/');
-			String.Truncate(point);
+			point = string.FindFirst('/');
+			string.Truncate(point);
 			
-			fRefreshMenu->Superitem()->SetLabel(String.String());
+			fRefreshMenu->Superitem()->SetLabel(string.String());
 			
-			if (fCustomRefresh != fInitialRefreshN)
-			{
+			if (fCustomRefresh != fInitialRefreshN) {
 				fApplyButton->SetEnabled(true);
 				fRevertButton->SetEnabled(true);
 			}

@@ -1,7 +1,7 @@
-// Screen V1.00 by Rafael Romo for the OpenBeOS Preferences team.
+// Screen V0.80 by Rafael Romo for the OpenBeOS Preferences team.
 // web.tiscalinet.it/rockman
 // rockman@tiscalinet.it
-// Modified by Stefano Ceccherini ( burton666@freemail.it ) 
+// Additional code by Stefano Ceccherini ( burton666@freemail.it ) 
 
 #include <Application.h>
 #include <Alert.h>
@@ -15,10 +15,10 @@
 #include "Constants.h"
 
 ScreenApplication::ScreenApplication()
-	:
-		BApplication(kAppSignature),
+	:	BApplication(kAppSignature),
 		fScreenWindow(new ScreenWindow(new ScreenSettings()))
 {
+	fScreenWindow->Show();
 }
 
 
@@ -54,9 +54,9 @@ ScreenApplication::MessageReceived(BMessage* message)
 int
 main()
 {
-	ScreenApplication Application;
+	ScreenApplication app;
 	
-	Application.Run();
+	app.Run();
 	
-	return(0);
+	return 0;
 }
