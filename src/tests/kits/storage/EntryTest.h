@@ -3,10 +3,8 @@
 #ifndef __sk_entry_test_h__
 #define __sk_entry_test_h__
 
+#include <TestUtils.h>
 #include "StatableTest.h"
-
-#include "StorageKitTester.h"
-#include "TestUtils.h"
 
 class BEntry;
 struct TestEntry;

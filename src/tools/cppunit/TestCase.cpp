@@ -18,7 +18,7 @@ BTestCase::tearDown() {
 
 void
 BTestCase::NextSubTest() {
-	if (BeVerbose()) {
+	if (BTestShell::GlobalBeVerbose()) {
 		printf("[%ld]", fSubTestNum++);
 		fflush(stdout);
 	}
@@ -26,13 +26,13 @@ BTestCase::NextSubTest() {
 
 void
 BTestCase::NextSubTestBlock() {
-	if (BeVerbose()) 
+	if (BTestShell::GlobalBeVerbose()) 
 		printf("\n");
 }
 
 void
 BTestCase::Outputf(const char *str, ...) {
-	if (BeVerbose()) {
+	if (BTestShell::GlobalBeVerbose()) {
 		va_list args;
 		va_start(args, str);
 		vprintf(str, args);
@@ -60,8 +60,3 @@ BTestCase::RestoreCWD(const char *alternate) {
 		chdir(alternate);
 }
 
-bool
-BTestCase::BeVerbose() {
-	BTestShell *shell = BTestShell::Shell();
-	return ((shell && shell->BeVerbose()) || !shell);
-}

@@ -17,8 +17,7 @@
 #include <ResourceStrings.h>
 #include <String.h>
 #include <TypeConstants.h>
-
-#include "StorageKitTester.h"
+#include <TestShell.h>
 
 
 static const char *testDir		= "/tmp/testDir";
@@ -186,7 +185,7 @@ void
 ResourceStringsTest::setUp()
 {
 	BasicTest::setUp();
-	string resourcesTestDir(shell.TestDir());
+	string resourcesTestDir(BTestShell::GlobalTestDir());
 	resourcesTestDir += "/resources";
 	execCommand(string("mkdir ") + testDir
 				+ " ; cp " + resourcesTestDir + "/" + x86ResName + " "
@@ -235,7 +234,7 @@ void
 ResourceStringsTest::InitTest1()
 {
 	// default constructor
-	nextSubTest();
+	NextSubTest();
 	{
 		BResourceStrings resourceStrings;
 		CPPUNIT_ASSERT( resourceStrings.InitCheck() == B_OK );
@@ -244,7 +243,7 @@ ResourceStringsTest::InitTest1()
 						== B_ENTRY_NOT_FOUND );
 	}
 	// application file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = get_app_ref();
 		BResourceStrings resourceStrings(ref);
@@ -254,7 +253,7 @@ ResourceStringsTest::InitTest1()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// x86 resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(x86ResFile, &ref) == B_OK );
@@ -265,7 +264,7 @@ ResourceStringsTest::InitTest1()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// ppc resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(ppcResFile, &ref) == B_OK );
@@ -276,7 +275,7 @@ ResourceStringsTest::InitTest1()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// ELF executable
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(elfFile, &ref) == B_OK );
@@ -287,7 +286,7 @@ ResourceStringsTest::InitTest1()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// PEF executable
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(pefFile, &ref) == B_OK );
@@ -298,7 +297,7 @@ ResourceStringsTest::InitTest1()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// test file 1
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(testFile1, &ref) == B_OK );
@@ -309,7 +308,7 @@ ResourceStringsTest::InitTest1()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// test file 2
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(testFile1, &ref) == B_OK );
@@ -320,7 +319,7 @@ ResourceStringsTest::InitTest1()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// empty file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(emptyFile, &ref) == B_OK );
@@ -331,7 +330,7 @@ ResourceStringsTest::InitTest1()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// non-resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(noResFile, &ref) == B_OK );
@@ -343,7 +342,7 @@ ResourceStringsTest::InitTest1()
 							   B_IO_ERROR) );
 	}
 	// non-existing file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(noSuchFile, &ref) == B_OK );
@@ -355,8 +354,8 @@ ResourceStringsTest::InitTest1()
 	}
 	// bad args (GetStringFile)
 // R5: crashes
-#if !SK_TEST_R5
-	nextSubTest();
+#if !TEST_R5
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(testFile1, &ref) == B_OK );
@@ -372,7 +371,7 @@ void
 ResourceStringsTest::InitTest2()
 {
 	// application file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = get_app_ref();
 		BResourceStrings resourceStrings;
@@ -383,7 +382,7 @@ ResourceStringsTest::InitTest2()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// x86 resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(x86ResFile, &ref) == B_OK );
@@ -395,7 +394,7 @@ ResourceStringsTest::InitTest2()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// ppc resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(ppcResFile, &ref) == B_OK );
@@ -407,7 +406,7 @@ ResourceStringsTest::InitTest2()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// ELF executable
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(elfFile, &ref) == B_OK );
@@ -419,7 +418,7 @@ ResourceStringsTest::InitTest2()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// PEF executable
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(pefFile, &ref) == B_OK );
@@ -431,7 +430,7 @@ ResourceStringsTest::InitTest2()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// test file 1
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(testFile1, &ref) == B_OK );
@@ -443,7 +442,7 @@ ResourceStringsTest::InitTest2()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// test file 2
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(testFile1, &ref) == B_OK );
@@ -455,7 +454,7 @@ ResourceStringsTest::InitTest2()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// empty file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(emptyFile, &ref) == B_OK );
@@ -467,7 +466,7 @@ ResourceStringsTest::InitTest2()
 		CPPUNIT_ASSERT( BEntry(&ref, true) == BEntry(&ref2, true) );
 	}
 	// non-resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(noResFile, &ref) == B_OK );
@@ -481,7 +480,7 @@ ResourceStringsTest::InitTest2()
 							   B_IO_ERROR) );
 	}
 	// non-existing file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref;
 		CPPUNIT_ASSERT( get_ref_for_path(noSuchFile, &ref) == B_OK );
@@ -494,7 +493,7 @@ ResourceStringsTest::InitTest2()
 						== B_ENTRY_NOT_FOUND );
 	}
 	// NULL ref -> app file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResourceStrings resourceStrings;
 		CPPUNIT_ASSERT( resourceStrings.SetStringFile(NULL) == B_OK );
@@ -527,7 +526,7 @@ void
 ResourceStringsTest::FindStringTest()
 {
 	// app file (default constructor)
-	nextSubTest();
+	NextSubTest();
 	{
 		BResourceStrings resourceStrings;
 		CPPUNIT_ASSERT( resourceStrings.InitCheck() == B_OK );
@@ -542,7 +541,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, false);
 	}
 	// app file (explicitely)
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = get_app_ref();
 		BResourceStrings resourceStrings(ref);
@@ -558,7 +557,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, false);
 	}
 	// test file 1
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = ref_for(testFile1);
 		BResourceStrings resourceStrings(ref);
@@ -574,7 +573,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, false);
 	}
 	// test file 2
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = ref_for(testFile2);
 		BResourceStrings resourceStrings(ref);
@@ -590,7 +589,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, false);
 	}
 	// x86 resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = ref_for(x86ResFile);
 		BResourceStrings resourceStrings(ref);
@@ -606,7 +605,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, true);
 	}
 	// ppc resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = ref_for(ppcResFile);
 		BResourceStrings resourceStrings(ref);
@@ -622,7 +621,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, true);
 	}
 	// ELF executable
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = ref_for(elfFile);
 		BResourceStrings resourceStrings(ref);
@@ -638,7 +637,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, true);
 	}
 	// PEF executable
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = ref_for(pefFile);
 		BResourceStrings resourceStrings(ref);
@@ -654,7 +653,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, true);
 	}
 	// empty file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = ref_for(emptyFile);
 		BResourceStrings resourceStrings(ref);
@@ -670,7 +669,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, false);
 	}
 	// non-resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = ref_for(noResFile);
 		BResourceStrings resourceStrings(ref);
@@ -687,7 +686,7 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, false);
 	}
 	// non-existing file
-	nextSubTest();
+	NextSubTest();
 	{
 		entry_ref ref = ref_for(noSuchFile);
 		BResourceStrings resourceStrings(ref);
@@ -703,4 +702,8 @@ ResourceStringsTest::FindStringTest()
 		::FindStringTest(resourceStrings, testResource1, false);
 	}
 }
+
+
+
+
 

@@ -45,3 +45,7 @@ public:
 
 
 #endif	// __sk_resource_strings_test_h__
+
+
+
+

@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 	// ##### Add test suites for statically linked tests here #####
 //	shell.AddTest( "Example", ExampleTest::Suite() );
 
-	BTestShell::SetShell(&shell);
+	BTestShell::SetGlobalShell(&shell);
 
 	// Load our dynamically linked tests
 

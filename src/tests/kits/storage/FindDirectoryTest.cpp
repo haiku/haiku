@@ -13,7 +13,6 @@
 #include <Path.h>
 #include <Volume.h>
 
-#include "StorageKitTester.h"
 
 
 const directory_which directories[] = {
@@ -363,30 +362,30 @@ void
 FindDirectoryTest::Test()
 {
 	// /boot
-	nextSubTest();
+	NextSubTest();
 	dev_t device = dev_for_path("/boot");
 	CPPUNIT_ASSERT( device > 0 );
 	TestDirectories(device);
 	// /dev
-	nextSubTest();
+	NextSubTest();
 	device = dev_for_path("/dev");
 	CPPUNIT_ASSERT( device > 0 );
 	TestDirectories(device);
 	// /
-	nextSubTest();
+	NextSubTest();
 	device = dev_for_path("/");
 	CPPUNIT_ASSERT( device > 0 );
 	TestDirectories(device);
 	// test image
-	nextSubTest();
+	NextSubTest();
 	device = dev_for_path(testMountPoint);
 	CPPUNIT_ASSERT( device > 0 );
 	TestDirectories(device);
 	// invalid device ID
-	nextSubTest();
+	NextSubTest();
 	TestDirectories(-1);
 	// NULL BVolume
-	nextSubTest();
+	NextSubTest();
 	for (int32 i = 0; i < directoryCount; i++) {
 		BPath path;
 		BPath path2;
@@ -397,7 +396,7 @@ FindDirectoryTest::Test()
 			CPPUNIT_ASSERT( path == path2 );
 	}
 	// no such volume
-	nextSubTest();
+	NextSubTest();
 	device = 213;
 	fs_info info;
 	while (fs_stat_dev(device, &info) == 0)
@@ -417,19 +416,23 @@ FindDirectoryTest::Test()
 	}
 	// bad args
 	// R5: crashes
-	nextSubTest();
+	NextSubTest();
 	device = dev_for_path("/boot");
 	CPPUNIT_ASSERT( device > 0 );
-#if !SK_TEST_R5
+#if !TEST_R5
 	CPPUNIT_ASSERT( find_directory(B_BEOS_DIRECTORY, NULL, false, NULL)
 					== B_BAD_VALUE );
 	CPPUNIT_ASSERT( find_directory(B_BEOS_DIRECTORY, device, false, NULL, 50)
 					== B_BAD_VALUE );
 #endif
 	// small buffer
-	nextSubTest();
+	NextSubTest();
 	char path3[7];
 	CPPUNIT_ASSERT( find_directory(B_BEOS_DIRECTORY, device, false, path3, 7)
 					== E2BIG );
 }
+
+
+
+
 

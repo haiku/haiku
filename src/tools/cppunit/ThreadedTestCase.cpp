@@ -1,3 +1,4 @@
+#include <TestShell.h>
 #include <ThreadedTestCase.h>
 #include <Autolock.h>
 #include <stdio.h>	
@@ -48,7 +49,7 @@ BThreadedTestCase::NextSubTest() {
 
 void
 BThreadedTestCase::Outputf(const char *str, ...) {
-	if (BeVerbose()) {
+	if (BTestShell::GlobalBeVerbose()) {
 		// Figure out if this is a multithreaded test or not
 		thread_id id = find_thread(NULL);
 		bool isSingleThreaded;

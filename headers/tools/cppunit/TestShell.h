@@ -30,7 +30,8 @@ typedef CppUnit::SynchronizedObject::SynchronizationObject SyncObject;
 */
 class BTestShell {
 public:
-	BTestShell(const std::string &description = "", SyncObject *syncObject = 0);
+	BTestShell(const std::string &description = "", SyncObject *syncObject = 0);	
+	virtual ~BTestShell();
 	
 	// This function is used to add the tests for a given kit (as contained
 	// in a BTestSuite object) to the list of available tests. The shell assumes
@@ -72,11 +73,15 @@ public:
 	// access to verbosity information. Don't rely on it if you don't
 	// have to (and always make sure the pointer it returns isn't NULL
 	// before you try to use it :-).
-	static BTestShell* Shell() { return fGlobalShell; };
+	static BTestShell* GlobalShell() { return fGlobalShell; };
 	
 	// Sets the global BTestShell pointer. The BTestShell class does
 	// not assume ownership of the object. 
-	static void SetShell(BTestShell *shell) { fGlobalShell = shell; };
+	static void SetGlobalShell(BTestShell *shell) { fGlobalShell = shell; };
+
+	const char* TestDir() const;
+	static const char* GlobalTestDir() { return (fGlobalShell ? fGlobalShell->TestDir() : NULL); };
+
 
 protected:	
 	VerbosityLevel fVerbosityLevel;
@@ -90,6 +95,7 @@ protected:
 	static BTestShell* fGlobalShell;
 	static const char indent[];
 	bool fListTestsAndExit;
+	BPath *fTestDir;
 
 	//! Prints a brief description of the program.
 	virtual void PrintDescription(int argc, char *argv[]);
@@ -126,6 +132,10 @@ protected:
 		loadable suites it finds.
 	*/
 	virtual void LoadDynamicSuites();
+	
+	//! Sets the current test directory.
+	void UpdateTestDir(char *argv[]);
+	
 	
 private:
   //! Prevents the use of the copy constructor.

@@ -1,25 +1,21 @@
 SubDir OBOS_TOP src tests kits storage ;
 
-#		EntryTest.cpp
-#		FileTest.cpp
-#		FindDirectoryTest.cpp
-#		MimeTypeTest.cpp
-#		PathTest.cpp
-#		QueryTest.cpp
-#		ResourcesTest.cpp
-#		ResourceStringsTest.cpp
-#		StatableTest.cpp
-#		SymLinkTest.cpp
-#		TestApp.cpp
 
 CommonTestLib libstoragetest.so
 	: StorageKitTestAddon.cpp
 		BasicTest.cpp
 		DirectoryTest.cpp
+		EntryTest.cpp
+		FindDirectoryTest.cpp
+		FileTest.cpp
+		MimeTypeTest.cpp
 		NodeTest.cpp
 		PathTest.cpp
+		QueryTest.cpp
+		ResourcesTest.cpp
+		ResourceStringsTest.cpp
 		StatableTest.cpp
-		TestUtils.cpp
+		SymLinkTest.cpp
 	: <$(SOURCE_GRIST)>libstorage.so be stdc++.r4
 	: be stdc++.r4
 	: storage
@@ -39,7 +35,7 @@ CommonTestLib libstoragetest.so
 # To run the tests some test files must be around.
 {
 	local resdir = <storage!kit!test!files>resources ;
-	MakeLocate $(resdir) : [ on libstoragetest.so return $(LOCATE[1]) ] ;
+	MakeLocate $(resdir) : [ on UnitTester return $(LOCATE[1]) ] ;
 	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] ;
 	DEPENDS libstoragetest.so : $(resdir) ;
 }

@@ -23,8 +23,14 @@ BTestShell::BTestShell(const std::string &description, SyncObject *syncObject)
 	, fDescription(description)
 	, fTestResults(syncObject)
 	, fListTestsAndExit(false)
+	, fTestDir(NULL)
 {
 };
+
+BTestShell::~BTestShell() {
+	delete fTestDir;
+}
+
 
 status_t
 BTestShell::AddSuite(BTestSuite *suite) {
@@ -95,6 +101,9 @@ BTestShell::LoadSuitesFrom(BDirectory *libDir) {
 
 int
 BTestShell::Run(int argc, char *argv[]) {
+	// Make note of which directory we started in
+	UpdateTestDir(argv);	
+
 	// Parse the command line args
 	if (!ProcessArguments(argc, argv))
 		return 0;		
@@ -153,6 +162,11 @@ BTestShell::VerbosityLevel
 BTestShell::Verbosity() const {
 	return fVerbosityLevel;
 } 
+
+const char*
+BTestShell::TestDir() const {
+	return (fTestDir ? fTestDir->Path() : NULL);
+}
 
 void
 BTestShell::PrintDescription(int argc, char *argv[]) {
@@ -253,8 +267,8 @@ BTestShell::InitOutput() {
 		cout << "Tests" << endl;
 		cout << "------------------------------------------------------------------------------" << endl;
 		fTestResults.addListener(new BTestListener);
-		fTestResults.addListener(&fResultsCollector);
 	}
+	fTestResults.addListener(&fResultsCollector);
 }
 
 void
@@ -319,3 +333,16 @@ BTestShell::LoadDynamicSuites() {
 		}
 	}
 }
+
+void
+BTestShell::UpdateTestDir(char *argv[]) {
+	BPath path(argv[0]);
+	if (path.InitCheck() == B_OK) {
+		delete fTestDir;
+		fTestDir = new BPath();
+		if (path.GetParent(fTestDir) != B_OK)
+			cout << "Couldn't get test dir." << endl;
+	} else
+		cout << "Couldn't find the path to the test app." << endl;
+}
+

@@ -331,7 +331,7 @@ EntryTest::InitTest1Paths(TestEntry &_testEntry, status_t error, bool traverse)
 {
 	TestEntry *testEntry = &_testEntry;
 	// absolute path
-	nextSubTest();
+	NextSubTest();
 	{
 //printf("%s\n", testEntry->cpath);
 		BEntry entry(testEntry->cpath, traverse);
@@ -343,7 +343,7 @@ printf("error: %lx (%lx)\n", result, error);
 			examine_entry(entry, testEntry, traverse);
 	}
 	// relative path
-	nextSubTest();
+	NextSubTest();
 	{
 //printf("%s\n", testEntry->cpath);
 		if (chdir(testEntry->super->cpath) == 0) {
@@ -365,7 +365,7 @@ EntryTest::InitTest1Refs(TestEntry &_testEntry, status_t error, bool traverse)
 {
 	TestEntry *testEntry = &_testEntry;
 	// absolute path
-	nextSubTest();
+	NextSubTest();
 	{
 //printf("%s\n", testEntry->cpath);
 		BEntry entry(&testEntry->get_ref(), traverse);
@@ -385,7 +385,7 @@ EntryTest::InitTest1DirPaths(TestEntry &_testEntry, status_t error,
 {
 	TestEntry *testEntry = &_testEntry;
 	// absolute path
-	nextSubTest();
+	NextSubTest();
 	{
 		if (!testEntry->isBad()
 			&& testEntry->path.length() < B_PATH_NAME_LENGTH) {
@@ -402,7 +402,7 @@ printf("error: %lx (%lx)\n", result, error);
 		}
 	}
 	// relative path (one level)
-	nextSubTest();
+	NextSubTest();
 	{
 		if (!testEntry->isBad()
 			&& testEntry->super->path.length() < B_PATH_NAME_LENGTH) {
@@ -419,7 +419,7 @@ printf("error: %lx (%lx)\n", result, error);
 		}
 	}
 	// relative path (two levels)
-	nextSubTest();
+	NextSubTest();
 	{
 		if (!testEntry->super->isBad() && !testEntry->super->super->isBad()) {
 			string entryName  = testEntry->super->name + "/" + testEntry->name;
@@ -442,7 +442,7 @@ void
 EntryTest::InitTest1()
 {
 	// 1. default constructor
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry;
 		CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
@@ -541,19 +541,19 @@ EntryTest::InitTest1()
 	InitTest1Paths(tooLongDir16, fuzzy_error(B_ERROR, B_NAME_TOO_LONG), true);
 
 	// special cases (root dir)
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry("/");
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
 	}
 	// special cases (fs root dir)
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry("/boot");
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
 	}
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry((const char*)NULL);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_BAD_VALUE );
@@ -641,7 +641,7 @@ EntryTest::InitTest1()
 	InitTest1Refs(relVeryBadLink3, B_ENTRY_NOT_FOUND, true);
 	InitTest1Refs(relVeryBadLink4, B_ENTRY_NOT_FOUND, true);
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry((const entry_ref*)NULL);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_BAD_VALUE );
@@ -693,7 +693,7 @@ EntryTest::InitTest1()
 	InitTest1DirPaths(tooLongEntry1, fuzzy_error(E2BIG, B_NAME_TOO_LONG));
 // OBOS: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
-#if !SK_TEST_OBOS_POSIX
+#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	InitTest1DirPaths(tooLongDir16, B_OK, true);
 #endif
 	// traverse
@@ -741,26 +741,26 @@ EntryTest::InitTest1()
 	InitTest1DirPaths(tooLongEntry1, fuzzy_error(E2BIG, B_NAME_TOO_LONG), true);
 // OBOS: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
-#if !SK_TEST_OBOS_POSIX
+#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	InitTest1DirPaths(tooLongDir16, B_OK, true);
 #endif
 
 	// special cases (root dir)
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory dir("/");
 		BEntry entry(&dir, ".");
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
 	}
 	// special cases (fs root dir)
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory dir("/");
 		BEntry entry(&dir, "boot");
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
 	}
 	// NULL path
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory dir("/");
 		BEntry entry(&dir, (const char*)NULL);
@@ -768,8 +768,8 @@ EntryTest::InitTest1()
 	}
 	// bad args (NULL dir)
 // R5: crashs
-#if !SK_TEST_R5
-	nextSubTest();
+#if !TEST_R5
+	NextSubTest();
 	{
 		chdir("/");
 		BEntry entry((const BDirectory*)NULL, "tmp");
@@ -778,7 +778,7 @@ EntryTest::InitTest1()
 	}
 #endif
 	// strange args (badly initialized dir, absolute path)
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory dir(badEntry1.cpath);
 		CPPUNIT_ASSERT( dir.InitCheck() == B_ENTRY_NOT_FOUND );
@@ -787,8 +787,8 @@ EntryTest::InitTest1()
 	}
 	// bad args (NULL dir and path)
 // R5: crashs
-#if !SK_TEST_R5
-	nextSubTest();
+#if !TEST_R5
+	NextSubTest();
 	{
 		BEntry entry((const BDirectory*)NULL, (const char*)NULL);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_BAD_VALUE );
@@ -796,8 +796,8 @@ EntryTest::InitTest1()
 #endif
 	// bad args(NULL dir, absolute path)
 // R5: crashs
-#if !SK_TEST_R5
-	nextSubTest();
+#if !TEST_R5
+	NextSubTest();
 	{
 		BEntry entry((const BDirectory*)NULL, "/tmp");
 		CPPUNIT_ASSERT( entry.InitCheck() == B_BAD_VALUE );
@@ -812,7 +812,7 @@ EntryTest::InitTest2Paths(TestEntry &_testEntry, status_t error, bool traverse)
 	TestEntry *testEntry = &_testEntry;
 	BEntry entry;
 	// absolute path
-	nextSubTest();
+	NextSubTest();
 	{
 //printf("%s\n", testEntry->cpath);
 		status_t result = entry.SetTo(testEntry->cpath, traverse);
@@ -824,7 +824,7 @@ printf("error: %lx (%lx)\n", result, error);
 			examine_entry(entry, testEntry, traverse);
 	}
 	// relative path
-	nextSubTest();
+	NextSubTest();
 	{
 //printf("%s\n", testEntry->cpath);
 		if (chdir(testEntry->super->cpath) == 0) {
@@ -847,7 +847,7 @@ EntryTest::InitTest2Refs(TestEntry &_testEntry, status_t error, bool traverse)
 	TestEntry *testEntry = &_testEntry;
 	BEntry entry;
 	// absolute path
-	nextSubTest();
+	NextSubTest();
 	{
 //printf("%s\n", testEntry->cpath);
 		status_t result = entry.SetTo(&testEntry->get_ref(), traverse);
@@ -868,7 +868,7 @@ EntryTest::InitTest2DirPaths(TestEntry &_testEntry, status_t error,
 	TestEntry *testEntry = &_testEntry;
 	BEntry entry;
 	// absolute path
-	nextSubTest();
+	NextSubTest();
 	{
 		if (!testEntry->isBad()
 			&& testEntry->path.length() < B_PATH_NAME_LENGTH) {
@@ -885,7 +885,7 @@ printf("error: %lx (%lx)\n", result, error);
 		}
 	}
 	// relative path (one level)
-	nextSubTest();
+	NextSubTest();
 	{
 		if (!testEntry->isBad()
 			&& testEntry->super->path.length() < B_PATH_NAME_LENGTH) {
@@ -902,7 +902,7 @@ printf("error: %lx (%lx)\n", result, error);
 		}
 	}
 	// relative path (two levels)
-	nextSubTest();
+	NextSubTest();
 	{
 		if (!testEntry->super->isBad() && !testEntry->super->super->isBad()) {
 			string entryName  = testEntry->super->name + "/" + testEntry->name;
@@ -1017,17 +1017,17 @@ EntryTest::InitTest2()
 // R5: returns B_ERROR instead of B_NAME_TOO_LONG
 	InitTest2Paths(tooLongDir16, fuzzy_error(B_ERROR, B_NAME_TOO_LONG), true);
 	// special cases (root dir)
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo("/") == B_OK );
 	CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
 	entry.Unset();
 	// special cases (fs root dir)
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo("/boot") == B_OK );
 	CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
 	entry.Unset();
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo((const char*)NULL) == B_BAD_VALUE );
 	CPPUNIT_ASSERT( entry.InitCheck() == B_BAD_VALUE );
 	entry.Unset();
@@ -1114,7 +1114,7 @@ EntryTest::InitTest2()
 	InitTest2Refs(relVeryBadLink3, B_ENTRY_NOT_FOUND, true);
 	InitTest2Refs(relVeryBadLink4, B_ENTRY_NOT_FOUND, true);
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo((const entry_ref*)NULL) == B_BAD_VALUE );
 	CPPUNIT_ASSERT( entry.InitCheck() == B_BAD_VALUE );
 	entry.Unset();
@@ -1165,7 +1165,7 @@ EntryTest::InitTest2()
 	InitTest2DirPaths(tooLongEntry1, fuzzy_error(E2BIG, B_NAME_TOO_LONG));
 // OBOS: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
-#if !SK_TEST_OBOS_POSIX
+#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	InitTest2DirPaths(tooLongDir16, B_OK, true);
 #endif
 	// traverse
@@ -1213,11 +1213,11 @@ EntryTest::InitTest2()
 	InitTest2DirPaths(tooLongEntry1, fuzzy_error(E2BIG, B_NAME_TOO_LONG), true);
 // OBOS: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
-#if !SK_TEST_OBOS_POSIX
+#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	InitTest2DirPaths(tooLongDir16, B_OK, true);
 #endif
 	// special cases (root dir)
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory dir("/");
 		CPPUNIT_ASSERT( entry.SetTo(&dir, ".") == B_OK );
@@ -1225,7 +1225,7 @@ EntryTest::InitTest2()
 		entry.Unset();
 	}
 	// special cases (fs root dir)
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory dir("/");
 		CPPUNIT_ASSERT( entry.SetTo(&dir, "boot") == B_OK );
@@ -1233,7 +1233,7 @@ EntryTest::InitTest2()
 		entry.Unset();
 	}
 	// NULL path
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory dir("/");
 		CPPUNIT_ASSERT( entry.SetTo(&dir, (const char*)NULL) == B_OK );
@@ -1242,8 +1242,8 @@ EntryTest::InitTest2()
 	}
 	// bad args (NULL dir)
 // R5: crashs
-#if !SK_TEST_R5
-	nextSubTest();
+#if !TEST_R5
+	NextSubTest();
 	{
 		chdir("/");
 		CPPUNIT_ASSERT( entry.SetTo((const BDirectory*)NULL, "tmp")
@@ -1254,7 +1254,7 @@ EntryTest::InitTest2()
 	}
 #endif
 	// strange args (badly initialized dir, absolute path)
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory dir(badEntry1.cpath);
 		CPPUNIT_ASSERT( dir.InitCheck() == B_ENTRY_NOT_FOUND );
@@ -1263,8 +1263,8 @@ EntryTest::InitTest2()
 	}
 	// bad args (NULL dir and path)
 // R5: crashs
-#if !SK_TEST_R5
-	nextSubTest();
+#if !TEST_R5
+	NextSubTest();
 	{
 		CPPUNIT_ASSERT( entry.SetTo((const BDirectory*)NULL, (const char*)NULL)
 						== B_BAD_VALUE );
@@ -1274,8 +1274,8 @@ EntryTest::InitTest2()
 #endif
 	// bad args(NULL dir, absolute path)
 // R5: crashs
-#if !SK_TEST_R5
-	nextSubTest();
+#if !TEST_R5
+	NextSubTest();
 	{
 		CPPUNIT_ASSERT( entry.SetTo((const BDirectory*)NULL, "/tmp")
 						== B_BAD_VALUE );
@@ -1296,17 +1296,17 @@ EntryTest::SpecialGetCasesTest()
 	BEntry entry;
 	// 1. Exists()
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
 	CPPUNIT_ASSERT( entry.Exists() == false );
 	entry.Unset();	
 	// badly initialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(badEntry1.cpath) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( entry.Exists() == false );
 	entry.Unset();	
 	// root
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo("/") == B_OK );
 	CPPUNIT_ASSERT( entry.Exists() == true );
 	entry.Unset();	
@@ -1314,20 +1314,20 @@ EntryTest::SpecialGetCasesTest()
 	// 2. GetPath()
 	BPath path;
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
 	CPPUNIT_ASSERT( entry.GetPath(&path) == B_NO_INIT );
 	entry.Unset();	
 	// badly initialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(badEntry1.cpath) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( entry.GetPath(&path) == B_NO_INIT );
 	entry.Unset();	
 	// too long pathname
 // OBOS: Fails, because the implementation concatenates the dir and leaf
 // 		 name.
-#if !SK_TEST_OBOS_POSIX
-	nextSubTest();
+#if !TEST_OBOS /* !!!POSIX ONLY!!! */
+	NextSubTest();
 	BDirectory dir(tooLongDir16.super->super->cpath);
 	string entryName = tooLongDir16.super->name + "/" + tooLongDir16.name;
 	CPPUNIT_ASSERT( entry.SetTo(&dir, entryName.c_str()) == B_OK );
@@ -1339,12 +1339,12 @@ EntryTest::SpecialGetCasesTest()
 	// 3. GetName()
 	char name[B_FILE_NAME_LENGTH + 1];
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
 	CPPUNIT_ASSERT( entry.GetName(name) == B_NO_INIT );
 	entry.Unset();	
 	// badly initialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(badEntry1.cpath) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( entry.GetName(name) == B_NO_INIT );
 	entry.Unset();	
@@ -1352,17 +1352,17 @@ EntryTest::SpecialGetCasesTest()
 	// 4. GetParent(BEntry *)
 	BEntry parentEntry;
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
 	CPPUNIT_ASSERT( entry.GetParent(&parentEntry) == B_NO_INIT );
 	entry.Unset();	
 	// badly initialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(badEntry1.cpath) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( entry.GetParent(&parentEntry) == B_NO_INIT );
 	entry.Unset();	
 	// parent of root dir
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo("/") == B_OK );
 	CPPUNIT_ASSERT( entry.GetParent(&parentEntry) == B_ENTRY_NOT_FOUND );
 	entry.Unset();	
@@ -1370,17 +1370,17 @@ EntryTest::SpecialGetCasesTest()
 	// 5. GetParent(BDirectory *)
 	BDirectory parentDir;
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
 	CPPUNIT_ASSERT( entry.GetParent(&parentDir) == B_NO_INIT );
 	entry.Unset();	
 	// badly initialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(badEntry1.cpath) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( entry.GetParent(&parentDir) == B_NO_INIT );
 	entry.Unset();	
 	// parent of root dir
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo("/") == B_OK );
 	CPPUNIT_ASSERT( entry.GetParent(&parentDir) == B_ENTRY_NOT_FOUND );
 	entry.Unset();	
@@ -1388,17 +1388,17 @@ EntryTest::SpecialGetCasesTest()
 	// 6. GetRef()
 	entry_ref ref, ref2;
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
 	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_NO_INIT );
 	entry.Unset();	
 	// badly initialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(badEntry1.cpath) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_NO_INIT );
 	entry.Unset();	
 	// ref for root dir
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo("/") == B_OK );
 	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
 	entry.Unset();	
@@ -1410,7 +1410,7 @@ EntryTest::RenameTestEntry(TestEntry *testEntry, TestEntry *newTestEntry,
 						   string newName, bool existing, bool clobber,
 						   status_t error, uint32 kind)
 {
-	nextSubTest();
+	NextSubTest();
 	BEntry entry;
 	BDirectory dir;
 	// get all the names
@@ -1565,7 +1565,7 @@ EntryTest::RenameTest()
 	RenameTestLink(&file2, &file3, true, false, B_FILE_EXISTS);
 
 	// try to clobber a non-empty directory
-	nextSubTest();
+	NextSubTest();
 	CreateFile(file3.cpath);
 	CPPUNIT_ASSERT( entry.SetTo(file3.cpath) == B_OK );
 	CPPUNIT_ASSERT( entry.Rename(dir1.cpath, true) == B_DIRECTORY_NOT_EMPTY );
@@ -1575,7 +1575,7 @@ EntryTest::RenameTest()
 	entry.Unset();
 	dir.Unset();
 	// clobber an empty directory
-	nextSubTest();
+	NextSubTest();
 	CreateFile(file3.cpath);
 	CPPUNIT_ASSERT( entry.SetTo(file3.cpath) == B_OK );
 	CPPUNIT_ASSERT( entry.Rename(subDir1.cpath, true) == B_OK );
@@ -1585,30 +1585,30 @@ EntryTest::RenameTest()
 	entry.Unset();
 	dir.Unset();
 	// abstract entry
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(file2.cpath) == B_OK );
 	CPPUNIT_ASSERT( entry.Rename(file4.cname) == B_ENTRY_NOT_FOUND );
 	entry.Unset();
 	dir.Unset();
 	// uninitialized entry
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
 	CPPUNIT_ASSERT( entry.Rename(file4.cpath) == B_NO_INIT );
 	entry.Unset();
 	dir.Unset();
 	// badly initialized entry
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(badEntry1.cpath) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( entry.Rename(file4.cpath) == B_NO_INIT );
 	entry.Unset();
 	dir.Unset();
 	// Verify attempts to rename root
-	nextSubTest();
+	NextSubTest();
 	BEntry root("/");
 	CPPUNIT_ASSERT( root.Rename("/", false) == B_FILE_EXISTS );
 	CPPUNIT_ASSERT( root.Rename("/", true) == B_NOT_ALLOWED );
 	// Verify abstract entries
-	nextSubTest();
+	NextSubTest();
 	BEntry abstract(abstractEntry1.cpath);
 	CPPUNIT_ASSERT( abstract.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( !abstract.Exists() );
@@ -1617,7 +1617,7 @@ EntryTest::RenameTest()
 	CPPUNIT_ASSERT( abstract.Rename("/DoesntMatter") == B_CROSS_DEVICE_LINK );
 	CPPUNIT_ASSERT( abstract.Rename("/DontMatter", true) == B_CROSS_DEVICE_LINK );
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(file1.cpath) == B_OK );
 	CPPUNIT_ASSERT( equals(entry.Rename(NULL, false), B_FILE_EXISTS,
 						   B_BAD_VALUE) );
@@ -1631,7 +1631,7 @@ EntryTest::MoveToTestEntry(TestEntry *testEntry, TestEntry *testDir,
 						   string newName, bool existing, bool clobber,
 						   status_t error, uint32 kind)
 {
-	nextSubTest();
+	NextSubTest();
 	BEntry entry;
 	BDirectory dir;
 	// get all the names
@@ -1888,7 +1888,7 @@ EntryTest::MoveToTest()
 	dir.Unset();
 	// bad args (NULL dir)
 // R5: crashs
-#if !SK_TEST_R5
+#if !TEST_R5
 	CreateFile(file2.cpath);
 	CPPUNIT_ASSERT( entry.SetTo(file2.cpath) == B_OK );
 	CPPUNIT_ASSERT( entry.MoveTo(NULL, file3.cpath) == B_BAD_VALUE );
@@ -1912,41 +1912,41 @@ EntryTest::RemoveTest()
 {
 	BEntry entry;
 	// file
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(file1.cpath) == B_OK );
 	CPPUNIT_ASSERT( entry.Remove() == B_OK );
 	CPPUNIT_ASSERT( !PingFile(file1.cpath) );
 	entry.Unset();
 	// symlink
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(absFileLink1.cpath) == B_OK );
 	CPPUNIT_ASSERT( entry.Remove() == B_OK );
 	CPPUNIT_ASSERT( !PingLink(absFileLink1.cpath) );
 	entry.Unset();
 	// empty dir
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(subDir1.cpath) == B_OK );
 	CPPUNIT_ASSERT( entry.Remove() == B_OK );
 	CPPUNIT_ASSERT( !PingDir(subDir1.cpath) );
 	entry.Unset();
 	// non-empty dir
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(dir1.cpath) == B_OK );
 	CPPUNIT_ASSERT( entry.Remove() == B_DIRECTORY_NOT_EMPTY );
 	CPPUNIT_ASSERT( PingDir(dir1.cpath) );
 	entry.Unset();
 	// abstract entry
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(abstractEntry1.cpath) == B_OK );
 	CPPUNIT_ASSERT( entry.Remove() == B_ENTRY_NOT_FOUND );
 	entry.Unset();
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
 	CPPUNIT_ASSERT( entry.Remove() == B_NO_INIT );
 	entry.Unset();
 	// badly initialized
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(badEntry1.cpath) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( entry.Remove() == B_NO_INIT );
 	entry.Unset();
@@ -1976,7 +1976,7 @@ void
 EntryTest::ComparisonTest()
 {
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry;
 		BEntry entry2;
@@ -1986,7 +1986,7 @@ EntryTest::ComparisonTest()
 		CPPUNIT_ASSERT( !(entry2 != entry) );
 	}
 	// initialized + uninitialized
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(file1.cpath);
 		BEntry entry2;
@@ -2017,7 +2017,7 @@ EntryTest::ComparisonTest()
 	};
 	int32 testEntryCount = sizeof(testEntries) / sizeof(TestEntry*);
 	for (int32 i = 0; i < testEntryCount; i++) {
-		nextSubTest();
+		NextSubTest();
 		TestEntry *testEntry = testEntries[i];
 		TestEntry *traversedTestEntry = resolve_link(testEntry);
 		BEntry entry(testEntry->cpath);
@@ -2045,7 +2045,7 @@ EntryTest::AssignmentTest()
 {
 	// 1. copy constructor
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry;
 		CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
@@ -2068,7 +2068,7 @@ EntryTest::AssignmentTest()
 	};
 	int32 testEntryCount = sizeof(testEntries) / sizeof(TestEntry*);
 	for (int32 i = 0; i < testEntryCount; i++) {
-		nextSubTest();
+		NextSubTest();
 		TestEntry *testEntry = testEntries[i];
 		BEntry entry(testEntry->cpath);
 		BEntry entry2(entry);
@@ -2080,7 +2080,7 @@ EntryTest::AssignmentTest()
 
 	// 2. assignment operator
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry;
 		CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
@@ -2090,7 +2090,7 @@ EntryTest::AssignmentTest()
 		CPPUNIT_ASSERT( equals(entry2.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
 		CPPUNIT_ASSERT( entry == entry2 );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry;
 		CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
@@ -2102,7 +2102,7 @@ EntryTest::AssignmentTest()
 	}
 	// initialized
 	for (int32 i = 0; i < testEntryCount; i++) {
-		nextSubTest();
+		NextSubTest();
 		TestEntry *testEntry = testEntries[i];
 		BEntry entry(testEntry->cpath);
 		BEntry entry2;
@@ -2167,7 +2167,7 @@ EntryTest::CFunctionsTest()
 	};
 	int32 testEntryCount = sizeof(testEntries) / sizeof(TestEntry*);
 	for (int32 i = 0; i < testEntryCount; i++) {
-		nextSubTest();
+		NextSubTest();
 		TestEntry *testEntry = testEntries[i];
 		const char *path = testEntry->cpath;
 		entry_ref ref;
@@ -2205,7 +2205,7 @@ EntryTest::CFunctionsTest()
 		}
 	}
 	// root dir
-	nextSubTest();
+	NextSubTest();
 	entry_ref ref, ref2;
 	CPPUNIT_ASSERT( get_ref_for_path("/", &ref) == B_OK );
 	CPPUNIT_ASSERT( get_entry_ref_for_entry("/", ".", &ref2) == B_OK );
@@ -2214,7 +2214,7 @@ EntryTest::CFunctionsTest()
 	CPPUNIT_ASSERT( strcmp(ref.name, ref2.name) == 0 );
 	CPPUNIT_ASSERT(  ref == ref2 );
 	// fs root dir
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( get_ref_for_path("/boot", &ref) == B_OK );
 	CPPUNIT_ASSERT( get_entry_ref_for_entry("/", "boot", &ref2) == B_OK );
 	CPPUNIT_ASSERT( ref.device == ref2.device );
@@ -2222,7 +2222,7 @@ EntryTest::CFunctionsTest()
 	CPPUNIT_ASSERT( strcmp(ref.name, ref2.name) == 0 );
 	CPPUNIT_ASSERT(  ref == ref2 );
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	ref = entry_ref();
 	ref2 = entry_ref();
 	CPPUNIT_ASSERT(  ref == ref2 );
@@ -2670,3 +2670,7 @@ resolve_link(TestEntry *entry)
 	}
 	return entry;
 }
+
+
+
+

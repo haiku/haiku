@@ -7,8 +7,8 @@
 
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
+#include <TestShell.h>
 
-#include "StorageKitTester.h"	// For "shell" global variable
 #include "FileTest.h"
 
 // Suite
@@ -87,13 +87,13 @@ FileTest::InitTest1()
 		void testAll() const
 		{
 			for (int32 i = 0; i < initTestCasesCount; i++) {
-				if (shell.BeVerbose()) {
+				if (BTestShell::GlobalBeVerbose()) {
 					printf("[%ld]", i);
 					fflush(stdout);
 				}
 				test(initTestCases[i]);
 			}
-			if (shell.BeVerbose()) 
+			if (BTestShell::GlobalBeVerbose()) 
 				printf("\n");
 		}
 
@@ -196,13 +196,13 @@ FileTest::InitTest2()
 		void testAll() const
 		{
 			for (int32 i = 0; i < initTestCasesCount; i++) {
-				if (shell.BeVerbose()) {
+				if (BTestShell::GlobalBeVerbose()) {
 					printf("[%ld]", i);
 					fflush(stdout);
 				}
 				test(initTestCases[i]);
 			}
-			if (shell.BeVerbose()) 
+			if (BTestShell::GlobalBeVerbose()) 
 				printf("\n");
 		}
 
@@ -310,31 +310,31 @@ FileTest::InitTest2()
 void
 FileTest::RWAbleTest()
 {
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file;
 		CPPUNIT_ASSERT( file.IsReadable() == false );
 		CPPUNIT_ASSERT( file.IsWritable() == false );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(existingFilename, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.IsReadable() == true );
 		CPPUNIT_ASSERT( file.IsWritable() == false );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(existingFilename, B_WRITE_ONLY);
 		CPPUNIT_ASSERT( file.IsReadable() == false );
 		CPPUNIT_ASSERT( file.IsWritable() == true );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(existingFilename, B_READ_WRITE);
 		CPPUNIT_ASSERT( file.IsReadable() == true );
 		CPPUNIT_ASSERT( file.IsWritable() == true );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(nonExistingFilename, B_READ_WRITE);
 		CPPUNIT_ASSERT( file.IsReadable() == false );
@@ -347,7 +347,7 @@ void
 FileTest::RWTest()
 {
 	// read/write an uninitialized BFile
-	nextSubTest();
+	NextSubTest();
 	BFile file;
 	char buffer[10];
 	CPPUNIT_ASSERT( file.Read(buffer, sizeof(buffer)) < 0 );
@@ -356,7 +356,7 @@ FileTest::RWTest()
 	CPPUNIT_ASSERT( file.WriteAt(0, buffer, sizeof(buffer)) < 0 );
 	file.Unset();
 	// read/write an file opened for writing/reading only
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(existingFilename, B_WRITE_ONLY);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.Read(buffer, sizeof(buffer)) < 0 );
@@ -367,14 +367,14 @@ FileTest::RWTest()
 	CPPUNIT_ASSERT( file.WriteAt(0, buffer, sizeof(buffer)) < 0 );
 	file.Unset();
 	// read from an empty file
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(existingFilename, B_READ_ONLY);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.Read(buffer, sizeof(buffer)) == 0 );
 	CPPUNIT_ASSERT( file.ReadAt(0, buffer, sizeof(buffer)) == 0 );
 	file.Unset();
 	// read from past an empty file
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(existingFilename, B_READ_ONLY);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.Seek(10, SEEK_SET) == 10 );
@@ -383,7 +383,7 @@ FileTest::RWTest()
 	file.Unset();
 	// create a new empty file and write some data into it, then
 	// read the file and check the data
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	char writeBuffer[256];
@@ -406,7 +406,7 @@ FileTest::RWTest()
 	file.Unset();
 	execCommand(string("rm -f ") + testFilename1);
 	// same procedure, just using ReadAt()/WriteAt()
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.WriteAt(80, writeBuffer + 80, 50) == 50 );
@@ -431,7 +431,7 @@ FileTest::RWTest()
 	file.Unset();
 	execCommand(string("rm -f ") + testFilename1);
 	// write past the end of a file
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.Seek(128, SEEK_SET) == 128 );
@@ -440,7 +440,7 @@ FileTest::RWTest()
 	file.Unset();
 	// open the file with B_OPEN_AT_END flag, Write() some data to it, close
 	// and re-open it to check the file
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_WRITE_ONLY | B_OPEN_AT_END);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	for (int32 i = 0; i < 256; i++)
@@ -457,7 +457,7 @@ FileTest::RWTest()
 	file.Unset();
 	// open the file with B_OPEN_AT_END flag, WriteAt() some data to it, close
 	// and re-open it to check the file
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_WRITE_ONLY | B_OPEN_AT_END);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	for (int32 i = 0; i < 256; i++)
@@ -471,7 +471,7 @@ FileTest::RWTest()
 		CPPUNIT_ASSERT( readBuffer[i] == 42 );
 	file.Unset();
 	// open the file with B_OPEN_AT_END flag, ReadAt() some data
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_READ_ONLY | B_OPEN_AT_END);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	for (int32 i = 0; i < 256; i++)
@@ -484,7 +484,7 @@ FileTest::RWTest()
 		CPPUNIT_ASSERT( readBuffer[i] == 42 );
 	file.Unset();
 	// same procedure, just using Seek() and Read()
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_READ_ONLY | B_OPEN_AT_END);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	for (int32 i = 0; i < 256; i++)
@@ -506,14 +506,14 @@ void
 FileTest::PositionTest()
 {
 	// unitialized file
-	nextSubTest();
+	NextSubTest();
 	BFile file;
 	CPPUNIT_ASSERT( file.Position() == B_FILE_ERROR );
 	CPPUNIT_ASSERT( file.Seek(10, SEEK_SET) == B_FILE_ERROR );
 	CPPUNIT_ASSERT( file.Seek(10, SEEK_END) == B_FILE_ERROR );
 	CPPUNIT_ASSERT( file.Seek(10, SEEK_CUR) == B_FILE_ERROR );
 	// open new file, write some bytes to it and seek a bit around
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.Position() == 0 );
@@ -533,7 +533,7 @@ FileTest::PositionTest()
 	// means, that all write()s append their data at the end. The behavior
 	// of Seek() and Position() is a bit unclear for this case.
 /*
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_READ_ONLY | B_OPEN_AT_END);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.Position() == 256 );
@@ -553,13 +553,13 @@ void
 FileTest::SizeTest()
 {
 	// unitialized file
-	nextSubTest();
+	NextSubTest();
 	BFile file;
 	off_t size;
 	CPPUNIT_ASSERT( file.GetSize(&size) != B_OK );
 	CPPUNIT_ASSERT( file.SetSize(100) != B_OK );
 	// read only file
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_READ_ONLY | B_CREATE_FILE);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.GetSize(&size) == B_OK );
@@ -569,7 +569,7 @@ FileTest::SizeTest()
 	CPPUNIT_ASSERT( size == 100 );
 	file.Unset();
 	// shorten existing file
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_WRITE_ONLY);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.GetSize(&size) == B_OK );
@@ -579,7 +579,7 @@ FileTest::SizeTest()
 	CPPUNIT_ASSERT( size == 73 );
 	file.Unset();
 	// enlarge existing file
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_READ_WRITE);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.GetSize(&size) == B_OK );
@@ -589,7 +589,7 @@ FileTest::SizeTest()
 	CPPUNIT_ASSERT( size == 147 );
 	file.Unset();
 	// erase existing file (read only)
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_READ_ONLY | B_ERASE_FILE);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.GetSize(&size) == B_OK );
@@ -599,7 +599,7 @@ FileTest::SizeTest()
 	CPPUNIT_ASSERT( size == 132 );
 	file.Unset();
 	// erase existing file (write only)
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_WRITE_ONLY | B_ERASE_FILE);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.GetSize(&size) == B_OK );
@@ -609,7 +609,7 @@ FileTest::SizeTest()
 	CPPUNIT_ASSERT( size == 93 );
 	file.Unset();
 	// erase existing file using SetSize()
-	nextSubTest();
+	NextSubTest();
 	file.SetTo(testFilename1, B_READ_WRITE);
 	CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( file.GetSize(&size) == B_OK );
@@ -627,7 +627,7 @@ FileTest::AssignmentTest()
 {
 	// copy constructor
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file;
 		CPPUNIT_ASSERT( file.InitCheck() == B_NO_INIT );
@@ -636,7 +636,7 @@ FileTest::AssignmentTest()
 		CPPUNIT_ASSERT( equals(file2.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
 	}
 	// existing file, different open modes
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(existingFilename, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -645,7 +645,7 @@ FileTest::AssignmentTest()
 		CPPUNIT_ASSERT( file2.IsReadable() == true );
 		CPPUNIT_ASSERT( file2.IsWritable() == false );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(existingFilename, B_WRITE_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -654,7 +654,7 @@ FileTest::AssignmentTest()
 		CPPUNIT_ASSERT( file2.IsReadable() == false );
 		CPPUNIT_ASSERT( file2.IsWritable() == true );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(existingFilename, B_READ_WRITE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -665,7 +665,7 @@ FileTest::AssignmentTest()
 	}
 	// assignment operator
 	// uninitialized
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file;
 		BFile file2;
@@ -673,7 +673,7 @@ FileTest::AssignmentTest()
 		// R5 returns B_BAD_VALUE instead of B_NO_INIT
 		CPPUNIT_ASSERT( equals(file2.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file;
 		BFile file2(existingFilename, B_READ_ONLY);
@@ -683,7 +683,7 @@ FileTest::AssignmentTest()
 		CPPUNIT_ASSERT( equals(file2.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
 	}
 	// existing file, different open modes
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(existingFilename, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -693,7 +693,7 @@ FileTest::AssignmentTest()
 		CPPUNIT_ASSERT( file2.IsReadable() == true );
 		CPPUNIT_ASSERT( file2.IsWritable() == false );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(existingFilename, B_WRITE_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -703,7 +703,7 @@ FileTest::AssignmentTest()
 		CPPUNIT_ASSERT( file2.IsReadable() == false );
 		CPPUNIT_ASSERT( file2.IsWritable() == true );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(existingFilename, B_READ_WRITE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -765,4 +765,14 @@ const FileTest::InitTestCase FileTest::initTestCases[] = {
 };
 const int32 FileTest::initTestCasesCount
 	= sizeof(FileTest::initTestCases) / sizeof(FileTest::InitTestCase);
+
+
+
+
+
+
+
+
+
+
 

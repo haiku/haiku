@@ -15,10 +15,12 @@ rule CppUnitLibrary
 
 CppUnitLibrary
 	SemaphoreSyncObject.cpp
+	TestApp.cpp
 	TestCase.cpp
 	TestListener.cpp
 	TestShell.cpp
 	TestSuite.cpp
+	TestUtils.cpp
 	ThreadedTestCase.cpp
 	cppunit/Asserter.cpp
 	cppunit/CompilerOutputter.cpp

@@ -3,6 +3,7 @@
 #include <cppunit/TestCase.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
+#include <TestUtils.h>
 #include <NodeTest.h>
 
 #include <errno.h>
@@ -18,7 +19,6 @@
 #include <String.h>
 #include <TypeConstants.h>
 
-#include "TestUtils.h"
 
 // == for attr_info
 static

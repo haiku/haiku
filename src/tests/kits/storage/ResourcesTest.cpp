@@ -14,8 +14,8 @@
 #include <Resources.h>
 #include <String.h>
 #include <TypeConstants.h>
+#include <TestShell.h>
 
-#include "StorageKitTester.h"
 
 static const char *testDir		= "/tmp/testDir";
 static const char *x86ResFile	= "/tmp/testDir/x86.rsrc";
@@ -196,7 +196,7 @@ void
 ResourcesTest::setUp()
 {
 	BasicTest::setUp();
-	BString unescapedTestDir(shell.TestDir());
+	BString unescapedTestDir(BTestShell::GlobalTestDir());
 	unescapedTestDir.CharacterEscape(" \t\n!\"'`$&()?*+{}[]<>|", '\\');
 	string resourcesTestDir(unescapedTestDir.String());
 	resourcesTestDir += "/resources";
@@ -227,7 +227,7 @@ ResourcesTest::InitTest()
 {
 	// 1. existing files, read only
 	// x86 resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(x86ResFile, B_READ_ONLY);
@@ -235,7 +235,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// ppc resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(ppcResFile, B_READ_ONLY);
@@ -243,7 +243,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// ELF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(elfFile, B_READ_ONLY);
@@ -251,7 +251,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// ELF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(elfNoResFile, B_READ_ONLY);
@@ -259,7 +259,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// PEF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(pefFile, B_READ_ONLY);
@@ -267,7 +267,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// PEF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(pefNoResFile, B_READ_ONLY);
@@ -275,7 +275,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// empty file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(emptyFile, B_READ_ONLY);
@@ -283,7 +283,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// non-resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(noResFile, B_READ_ONLY);
@@ -294,7 +294,7 @@ ResourcesTest::InitTest()
 
 	// 2. existing files, read only, clobber
 	// x86 resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(x86ResFile, B_READ_ONLY);
@@ -302,7 +302,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, true) == B_OK );
 	}
 	// ppc resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(ppcResFile, B_READ_ONLY);
@@ -310,7 +310,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, true) == B_OK );
 	}
 	// ELF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(elfFile, B_READ_ONLY);
@@ -318,7 +318,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, true) == B_OK );
 	}
 	// ELF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(elfNoResFile, B_READ_ONLY);
@@ -326,7 +326,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, true) == B_OK );
 	}
 	// PEF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(pefFile, B_READ_ONLY);
@@ -334,7 +334,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, true) == B_OK );
 	}
 	// PEF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(pefNoResFile, B_READ_ONLY);
@@ -342,7 +342,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, true) == B_OK );
 	}
 	// empty file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(emptyFile, B_READ_ONLY);
@@ -350,7 +350,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, true) == B_OK );
 	}
 	// non-resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(noResFile, B_READ_ONLY);
@@ -360,7 +360,7 @@ ResourcesTest::InitTest()
 
 	// 3. existing files, read/write
 	// x86 resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(x86ResFile, B_READ_WRITE);
@@ -368,7 +368,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// ppc resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(ppcResFile, B_READ_WRITE);
@@ -376,7 +376,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// ELF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(elfFile, B_READ_WRITE);
@@ -384,7 +384,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// ELF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(elfNoResFile, B_READ_WRITE);
@@ -392,7 +392,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// PEF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(pefFile, B_READ_WRITE);
@@ -400,7 +400,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// PEF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(pefNoResFile, B_READ_WRITE);
@@ -408,7 +408,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// empty file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(emptyFile, B_READ_WRITE);
@@ -416,7 +416,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
 	}
 	// non-resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(noResFile, B_READ_WRITE);
@@ -427,7 +427,7 @@ ResourcesTest::InitTest()
 
 	// 4. existing files, read/write, clobber
 	// x86 resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(x86ResFile, B_READ_WRITE);
@@ -436,7 +436,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.Sync() == B_OK );
 	}
 	// ppc resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(ppcResFile, B_READ_WRITE);
@@ -445,7 +445,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.Sync() == B_OK );
 	}
 	// ELF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(elfFile, B_READ_WRITE);
@@ -454,7 +454,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.Sync() == B_OK );
 	}
 	// ELF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(elfNoResFile, B_READ_WRITE);
@@ -463,7 +463,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.Sync() == B_OK );
 	}
 	// PEF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(pefFile, B_READ_WRITE);
@@ -472,7 +472,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.Sync() == B_OK );
 	}
 	// PEF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(pefNoResFile, B_READ_WRITE);
@@ -481,7 +481,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.Sync() == B_OK );
 	}
 	// empty file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(emptyFile, B_READ_WRITE);
@@ -490,7 +490,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.Sync() == B_OK );
 	}
 	// non-resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(noResFile, B_READ_WRITE);
@@ -500,7 +500,7 @@ ResourcesTest::InitTest()
 
 	// 5. bad args
 	// uninitialized file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file;
@@ -508,7 +508,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_NO_INIT );
 	}
 	// badly initialized file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(noSuchFile, B_READ_ONLY);
@@ -516,7 +516,7 @@ ResourcesTest::InitTest()
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_ENTRY_NOT_FOUND );
 	}
 	// NULL file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		// R5: A NULL file is B_OK!
@@ -708,7 +708,7 @@ ResourcesTest::ReadTest()
 
 	// 1. basic tests
 	// x86 resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(x86ResFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -721,7 +721,7 @@ ResourcesTest::ReadTest()
 		ReadResTest(resources, testResource5, false);
 	}
 	// ppc resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(ppcResFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -734,7 +734,7 @@ ResourcesTest::ReadTest()
 		ReadResTest(resources, testResource5, false);
 	}
 	// ELF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(elfFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -747,7 +747,7 @@ ResourcesTest::ReadTest()
 		ReadResTest(resources, testResource5, false);
 	}
 	// ELF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(elfNoResFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -760,7 +760,7 @@ ResourcesTest::ReadTest()
 		ReadResTest(resources, testResource5, false);
 	}
 	// PEF binary containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(pefFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -773,7 +773,7 @@ ResourcesTest::ReadTest()
 		ReadResTest(resources, testResource5, false);
 	}
 	// PEF binary not containing resources
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(pefNoResFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -788,7 +788,7 @@ ResourcesTest::ReadTest()
 
 	// 2. PreloadResource()
 	// Hard to test: just preload all and check, if it still works.
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(x86ResFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -808,7 +808,7 @@ ResourcesTest::ReadTest()
 		ReadResTest(resources, testResource5, false);
 	}
 	// uninitialized BResources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		// int32 type
@@ -819,7 +819,7 @@ ResourcesTest::ReadTest()
 
 	// 3. the index versions of GetResourceInfo()
 	// index only
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(x86ResFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -852,7 +852,7 @@ ResourcesTest::ReadTest()
 												  &name, &length) == false );
 	}
 	// type and index
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(x86ResFile, B_READ_WRITE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -892,7 +892,7 @@ ResourcesTest::ReadTest()
 
 	// 4. error cases
 	// non-resource file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(noResFile, B_READ_ONLY);
@@ -902,7 +902,7 @@ ResourcesTest::ReadTest()
 		ReadBadResTest(resources, testResource1);
 	}
 	// uninitialized file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file;
@@ -911,7 +911,7 @@ ResourcesTest::ReadTest()
 		ReadBadResTest(resources, testResource1);
 	}
 	// badly initialized file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file(noSuchFile, B_READ_ONLY);
@@ -920,7 +920,7 @@ ResourcesTest::ReadTest()
 		ReadBadResTest(resources, testResource1);
 	}
 	// NULL file
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		// R5: A NULL file is B_OK!
@@ -929,7 +929,7 @@ ResourcesTest::ReadTest()
 		ReadBadResTest(resources, testResource1);
 	}
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(x86ResFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1087,7 +1087,7 @@ void
 ResourcesTest::SyncTest()
 {
 	// Sync() is not easy to test. We just check its return value for now.
-	nextSubTest();
+	NextSubTest();
 	execCommand(string("cp ") + x86ResFile + " " + testFile1);
 	{
 		BFile file(testFile1, B_READ_WRITE);
@@ -1108,7 +1108,7 @@ ResourcesTest::SyncTest()
 	}
 	// error cases
 	// read only file
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile1, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1117,13 +1117,13 @@ ResourcesTest::SyncTest()
 		CPPUNIT_ASSERT( resources.Sync() == B_NOT_ALLOWED );
 	}
 	// uninitialized BResources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		CPPUNIT_ASSERT( resources.Sync() == B_NO_INIT );
 	}
 	// badly initialized BResources
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(noSuchFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_ENTRY_NOT_FOUND );
@@ -1138,7 +1138,7 @@ void
 ResourcesTest::MergeTest()
 {
 	// empty file, merge with resources from another file
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1154,7 +1154,7 @@ ResourcesTest::MergeTest()
 	}
 	// empty file, add some resources first and then merge with resources
 	// from another file
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1175,7 +1175,7 @@ ResourcesTest::MergeTest()
 	}
 	// error cases
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1186,13 +1186,13 @@ ResourcesTest::MergeTest()
 		CPPUNIT_ASSERT( resources.MergeFrom(&file2) == B_IO_ERROR );
 		// NULL file
 // R5: crashs
-#if !SK_TEST_R5
+#if !TEST_R5
 		CPPUNIT_ASSERT( resources.MergeFrom(NULL) == B_BAD_VALUE );
 #endif
 	}
 	// uninitialized BResources
 	// R5: returns B_OK!
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		BFile file2(x86ResFile, B_READ_ONLY);
@@ -1200,7 +1200,7 @@ ResourcesTest::MergeTest()
 	}
 	// badly initialized BResources
 	// R5: returns B_OK!
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(noSuchFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_ENTRY_NOT_FOUND );
@@ -1216,7 +1216,7 @@ void
 ResourcesTest::WriteToTest()
 {
 	// take a file with resources and write them to an empty file
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(x86ResFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1229,7 +1229,7 @@ ResourcesTest::WriteToTest()
 	}	
 	// take a file with resources and write them to an non-empty non-resource
 	// file
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(x86ResFile, B_READ_ONLY);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1241,7 +1241,7 @@ ResourcesTest::WriteToTest()
 		CPPUNIT_ASSERT( resources.File() == file2 );
 	}	
 	// take a file with resources and write them to an ELF file
-	nextSubTest();
+	NextSubTest();
 	execCommand(string("cp ") + elfNoResFile + " " + testFile1);
 	{
 		BFile file(x86ResFile, B_READ_ONLY);
@@ -1254,7 +1254,7 @@ ResourcesTest::WriteToTest()
 		CPPUNIT_ASSERT( resources.File() == file2 );
 	}	
 	// empty file, add a resource, write it to another file
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile2, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1274,7 +1274,7 @@ ResourcesTest::WriteToTest()
 		CPPUNIT_ASSERT( fileSize == 0 );
 	}
 	// uninitialized BResources
-	nextSubTest();
+	NextSubTest();
 	execCommand(string("cp ") + elfNoResFile + " " + testFile1);
 	{
 		BResources resources;
@@ -1285,13 +1285,13 @@ ResourcesTest::WriteToTest()
 	}	
 	// bad args: NULL file
 	// R5: crashs
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile2, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
 		BResources resources;
 		CPPUNIT_ASSERT( resources.SetTo(&file, false) == B_OK );
-#if !SK_TEST_R5
+#if !TEST_R5
 		CPPUNIT_ASSERT( resources.WriteTo(NULL) == B_BAD_VALUE);
 #endif
 	}	
@@ -1309,7 +1309,7 @@ ResourcesTest::AddRemoveTest()
 	// Start with an empty file, add all the resources of our x86 resource
 	// file and compare the two bytewise.
 	// This does of course only work on x86 machines.
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1328,7 +1328,7 @@ ResourcesTest::AddRemoveTest()
 	}
 	// Now remove all resources and compare the file with an empty resource
 	// file.
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile1, B_READ_WRITE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1353,7 +1353,7 @@ ResourcesTest::AddRemoveTest()
 		CompareFiles(file1, file2);
 	}
 	// Same file, use the other remove version.
-	nextSubTest();
+	NextSubTest();
 	execCommand(string("cp ") + x86ResFile + " " + testFile1);
 	{
 		BFile file(testFile1, B_READ_WRITE);
@@ -1379,7 +1379,7 @@ ResourcesTest::AddRemoveTest()
 		CompareFiles(file1, file2);
 	}
 	// some arbitrary adding and removing...
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1401,7 +1401,7 @@ ResourcesTest::AddRemoveTest()
 		RemoveResource(resources, resourceSet, testResource4, false);
 	}
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1414,7 +1414,7 @@ ResourcesTest::AddRemoveTest()
 											  "Hey!") == B_BAD_VALUE );
 	}
 	// uninitialized BResources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		const ResourceInfo &info = testResource1;
@@ -1431,7 +1431,7 @@ ResourcesTest::ReadWriteTest()
 	// ReadResource() has already been tested in ReadTest(). Thus we focus on
 	// WriteResource().
 	// Open a file and write a little bit into one of its resources.
-	nextSubTest();
+	NextSubTest();
 	execCommand(string("cp ") + x86ResFile + " " + testFile1);
 	{
 		BFile file(testFile1, B_READ_WRITE);
@@ -1498,7 +1498,7 @@ ResourcesTest::ReadWriteTest()
 	}
 	// error cases
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	{
 		BFile file(testFile1, B_READ_WRITE);
 		CPPUNIT_ASSERT( file.InitCheck() == B_OK );
@@ -1517,7 +1517,7 @@ ResourcesTest::ReadWriteTest()
 						== B_BAD_VALUE );
 	}
 	// uninitialized BResources
-	nextSubTest();
+	NextSubTest();
 	{
 		BResources resources;
 		const ResourceInfo &info = testResource1;
@@ -1528,4 +1528,8 @@ ResourcesTest::ReadWriteTest()
 						== B_BAD_VALUE );
 	}
 }
+
+
+
+
 

@@ -153,9 +153,6 @@ BThreadedTestCaller<TestClass, ExpectedException>::run(CppUnit::TestResult *resu
 				// Try to acquire the semaphore
 				err = acquire_sem_etc(fThreadSem, fThreads.size(), B_RELATIVE_TIMEOUT,	500000);
 				
-				// Get a pointer to the current global shell
-				BTestShell *shell = BTestShell::Shell();
-				
 				// Empty the UpdateList				
 				std::vector<std::string> &list = fObject->AcquireUpdateList();
 				for (std::vector<std::string>::iterator i = list.begin();
@@ -164,7 +161,7 @@ BThreadedTestCaller<TestClass, ExpectedException>::run(CppUnit::TestResult *resu
 				{
 					// Only print to standard out if the current global shell
 					// lets us (or if no global shell is designated).
-					if ((shell && shell->BeVerbose()) || !shell) {					
+					if (BTestShell::GlobalBeVerbose()) {					
 						printf("%s", (*i).c_str());
 						fflush(stdout);
 					}

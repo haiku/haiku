@@ -18,15 +18,14 @@
 #include <Query.h>
 #include <String.h>
 #include <Volume.h>
-#include "StorageKitTester.h"
-#include "TestApp.h"
-#include "TestUtils.h"
+#include <TestApp.h>
+#include <TestUtils.h>
 
 // Query
 
 class Query : public BQuery {
 public:
-#if SK_TEST_R5
+#if TEST_R5
 	status_t PushValue(int32 value)			{ PushInt32(value); return B_OK; }
 	status_t PushValue(uint32 value)		{ PushUInt32(value); return B_OK; }
 	status_t PushValue(int64 value)			{ PushInt64(value); return B_OK; }
@@ -659,7 +658,7 @@ TestOperator(query_op op)
 	TestPredicate(OpNode(op, new AttributeNode("attribute"), NULL), B_OK,
 				  B_NO_INIT);
 // R5: crashs when pushing B_CONTAINS/B_BEGINS/ENDS_WITH on an empty stack
-#if SK_TEST_R5
+#if TEST_R5
 if (op < B_CONTAINS || op > B_ENDS_WITH)
 #endif
 	TestPredicate(OpNode(op, NULL, NULL), B_OK, B_NO_INIT);
@@ -677,7 +676,7 @@ QueryTest::PredicateTest()
 	// * Push*()
 	// * Set/GetPredicate(), PredicateLength()
 	// empty predicate
-	nextSubTest();
+	NextSubTest();
 	char buffer[1024];
 	{
 		Query query;
@@ -690,12 +689,12 @@ QueryTest::PredicateTest()
 						== B_NO_INIT );
 	}
 	// one element predicates
-	nextSubTest();
+	NextSubTest();
 	TestPredicate(Int32Node(42));
 	TestPredicate(UInt32Node(42));
 	TestPredicate(Int64Node(42));
 // R5: buggy PushUInt64() implementation.
-#if !SK_TEST_R5
+#if !TEST_R5
 	TestPredicate(UInt64Node(42));
 #endif
 	TestPredicate(FloatNode(42));
@@ -711,7 +710,7 @@ QueryTest::PredicateTest()
 	TestPredicate(DateNode("invalid date"), B_BAD_VALUE);
 	TestPredicate(AttributeNode("some attribute"));
 	// operators
-	nextSubTest();
+	NextSubTest();
 	TestOperator(B_EQ);
 	TestOperator(B_GT);
 	TestOperator(B_GE);
@@ -733,7 +732,7 @@ QueryTest::PredicateTest()
 		TestPredicate(OpNode(B_NOT, NULL), B_OK, B_NO_INIT);
 	}
 	// well formed, legal predicate
-	nextSubTest();
+	NextSubTest();
 	TestPredicate(OpNode(B_AND,
 		new OpNode(B_CONTAINS,
 			new AttributeNode("attribute"),
@@ -754,7 +753,7 @@ QueryTest::PredicateTest()
 		)
 	));
 	// well formed, illegal predicate
-	nextSubTest();
+	NextSubTest();
 	TestPredicate(OpNode(B_EQ,
 		new StringNode("hello"),
 		new OpNode(B_LE,
@@ -768,7 +767,7 @@ QueryTest::PredicateTest()
 	// ill formed predicates
 	// Some have already been tested in TestOperator, so we only test a few
 	// special ones.
-	nextSubTest();
+	NextSubTest();
 	TestPredicate(ListNode(new Int32Node(42), new StringNode("hello!")),
 				  B_OK, B_NO_INIT);
 	TestPredicate(OpNode(B_EQ,
@@ -776,7 +775,7 @@ QueryTest::PredicateTest()
 		new OpNode(B_NOT, NULL)
 	), B_OK, B_NO_INIT);
 	// precedence Push*() over SetPredicate()
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		OpNode predicate1(B_CONTAINS,
@@ -792,7 +791,7 @@ QueryTest::PredicateTest()
 		CPPUNIT_ASSERT( predicate == predicate1.toString() );
 	}
 	// GetPredicate() clears the stack
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		OpNode predicate1(B_CONTAINS,
@@ -810,7 +809,7 @@ QueryTest::PredicateTest()
 		CPPUNIT_ASSERT( predicate == predicate2.toString() );
 	}
 	// PredicateLength() clears the stack
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		OpNode predicate1(B_CONTAINS,
@@ -828,7 +827,7 @@ QueryTest::PredicateTest()
 		CPPUNIT_ASSERT( predicate == predicate2.toString() );
 	}
 	// SetPredicate(), Push*() fail after Fetch()
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"")
@@ -840,7 +839,7 @@ QueryTest::PredicateTest()
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExistEither\"")
 						== B_NOT_ALLOWED );
 // R5: Push*()ing a new predicate does work, though it doesn't make any sense
-#if SK_TEST_R5
+#if TEST_R5
 		CPPUNIT_ASSERT( query.PushDate("20 May 2002") == B_OK );
 		CPPUNIT_ASSERT( query.PushValue((int32)42) == B_OK );
 		CPPUNIT_ASSERT( query.PushValue((uint32)42) == B_OK );
@@ -866,8 +865,8 @@ QueryTest::PredicateTest()
 	}
 	// SetPredicate(): bad args
 // R5: crashes when passing NULL to Set/GetPredicate()
-#if !SK_TEST_R5
-	nextSubTest();
+#if !TEST_R5
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate(NULL) == B_BAD_VALUE );
@@ -888,15 +887,15 @@ QueryTest::ParameterTest()
 
 	// SetVolume(), TargetDevice()
 	// uninitialized BQuery
-	nextSubTest();
+	NextSubTest();
 	{
 		BQuery query;
 		CPPUNIT_ASSERT( query.TargetDevice() == B_ERROR );
 	}
 	// NULL volume
 // R5: crashs when passing a NULL BVolume
-#if !SK_TEST_R5
-	nextSubTest();
+#if !TEST_R5
+	NextSubTest();
 	{
 		BQuery query;
 		CPPUNIT_ASSERT( query.SetVolume(NULL) == B_BAD_VALUE );
@@ -904,7 +903,7 @@ QueryTest::ParameterTest()
 	}
 #endif
 	// invalid volume
-	nextSubTest();
+	NextSubTest();
 	{
 		BQuery query;
 		BVolume volume(-2);
@@ -913,7 +912,7 @@ QueryTest::ParameterTest()
 		CPPUNIT_ASSERT( query.TargetDevice() == B_ERROR );
 	}
 	// valid volume
-	nextSubTest();
+	NextSubTest();
 	{
 		BQuery query;
 		dev_t device = dev_for_path("/boot");
@@ -925,13 +924,13 @@ QueryTest::ParameterTest()
 
 	// SetTarget(), IsLive()
 	// uninitialized BQuery
-	nextSubTest();
+	NextSubTest();
 	{
 		BQuery query;
 		CPPUNIT_ASSERT( query.IsLive() == false );
 	}
 	// uninitialized BMessenger
-	nextSubTest();
+	NextSubTest();
 	{
 		BQuery query;
 		BMessenger messenger;
@@ -940,7 +939,7 @@ QueryTest::ParameterTest()
 		CPPUNIT_ASSERT( query.IsLive() == false );
 	}
 	// valid BMessenger
-	nextSubTest();
+	NextSubTest();
 	{
 		BQuery query;
 		BMessenger messenger(&fApplication->Handler());
@@ -950,7 +949,7 @@ QueryTest::ParameterTest()
 	}
 
 	// SetVolume/Target() fail after Fetch()
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"")
@@ -966,7 +965,7 @@ QueryTest::ParameterTest()
 	}
 
 	// Fetch() fails without a valid volume set
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"")
@@ -1102,13 +1101,13 @@ QueryTest::FetchTest()
 
 	// Fetch()
 	// uninitialized BQuery
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.Fetch() == B_NO_INIT );
 	}
 	// incompletely initialized BQuery (no predicate)
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		BVolume volume(dev_for_path("/boot"));
@@ -1117,7 +1116,7 @@ QueryTest::FetchTest()
 		CPPUNIT_ASSERT( query.Fetch() == B_NO_INIT );
 	}
 	// incompletely initialized BQuery (no volume)
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"")
@@ -1125,7 +1124,7 @@ QueryTest::FetchTest()
 		CPPUNIT_ASSERT( query.Fetch() == B_NO_INIT );
 	}
 	// incompletely initialized BQuery (invalid predicate)
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"&&")
@@ -1136,7 +1135,7 @@ QueryTest::FetchTest()
 		CPPUNIT_ASSERT( query.Fetch() == B_BAD_VALUE );
 	}
 	// initialized BQuery, Fetch() twice
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"")
@@ -1152,7 +1151,7 @@ QueryTest::FetchTest()
 	fVolumeCreated = true;
 	create_test_entries(allTestEntries, allTestEntryCount);
 	// ... all files
-	nextSubTest();
+	NextSubTest();
 	{
 		QueryTestEntry *entries[] = {
 			&file11, &file12, &file21, &file22, &file31, &file32, &file1,
@@ -1163,7 +1162,7 @@ QueryTest::FetchTest()
 						   entryCount);
 	}
 	// ... all entries containing a "l"
-	nextSubTest();
+	NextSubTest();
 	{
 		QueryTestEntry *entries[] = {
 			&file11, &file12, &link11, &file21, &file22, &link21, &file31,
@@ -1174,7 +1173,7 @@ QueryTest::FetchTest()
 						   entryCount);
 	}
 	// ... all entries ending on "2"
-	nextSubTest();
+	NextSubTest();
 	{
 		QueryTestEntry *entries[] = {
 			&subdir12, &file12, &dir2, &subdir22, &file22, &subdir32, &file32,
@@ -1187,13 +1186,13 @@ QueryTest::FetchTest()
 
 	// Clear()
 	// uninitialized BQuery
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.Clear() == B_OK );
 	}
 	// initialized BQuery, Fetch(), Clear(), Fetch()
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"")
@@ -1206,7 +1205,7 @@ QueryTest::FetchTest()
 		CPPUNIT_ASSERT( query.Fetch() == B_NO_INIT );
 	}
 	// initialized BQuery, Fetch(), Clear(), re-init, Fetch()
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"")
@@ -1225,7 +1224,7 @@ QueryTest::FetchTest()
 
 	// BEntryList interface:
 	// empty queries
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"")
@@ -1244,7 +1243,7 @@ QueryTest::FetchTest()
 		CPPUNIT_ASSERT( query.GetNextDirents(ents, bufSize, 1) == 0 );
 	}
 	// uninitialized queries
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		BEntry entry;
@@ -1258,7 +1257,7 @@ QueryTest::FetchTest()
 						== B_FILE_ERROR );
 	}
 	// bad args
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"ThisShouldNotExist\"")
@@ -1269,7 +1268,7 @@ QueryTest::FetchTest()
 		CPPUNIT_ASSERT( query.Fetch() == B_OK );
 		size_t bufSize = (sizeof(dirent) + B_FILE_NAME_LENGTH) * 10;
 // R5: crashs when passing a NULL BEntry or entry_ref
-#if !SK_TEST_R5
+#if !TEST_R5
 		CPPUNIT_ASSERT( query.GetNextEntry(NULL) == B_BAD_VALUE );
 		CPPUNIT_ASSERT( query.GetNextRef(NULL) == B_BAD_VALUE );
 #endif
@@ -1380,7 +1379,7 @@ QueryTest::LiveTest()
 	BMessenger target(&fApplication->Handler());
 
 	// empty query, add some files, remove some files
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		CPPUNIT_ASSERT( query.SetPredicate("name=\"*Argh\"")
@@ -1414,7 +1413,7 @@ QueryTest::LiveTest()
 		RemoveLiveEntries(entries, entryCount, queryEntries, queryEntryCount);
 	}
 	// non-empty query, add some files, remove some files
-	nextSubTest();
+	NextSubTest();
 	{
 		Query query;
 		TestSet testSet;
@@ -1460,4 +1459,8 @@ QueryTest::LiveTest()
 		RemoveLiveEntries(entries, entryCount, queryEntries, queryEntryCount);
 	}
 }
+
+
+
+
 

@@ -29,9 +29,6 @@ public:
 	//! Restores the current working directory to last directory saved by a	call to SaveCWD().	
 	void RestoreCWD(const char *alternate = NULL);
 protected:
-	//! Returns true if the current shell settings allow us to print to standard output.
-	bool BeVerbose();
-
 	bool fValidCWD;
 	char fCurrentWorkingDir[B_PATH_NAME_LENGTH+1];	
 	int32 fSubTestNum;	
