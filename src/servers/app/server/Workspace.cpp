@@ -23,6 +23,10 @@
 //	Author:			Adi Oanca <adioanca@mymail.ro>
 //	Description:	Tracks workspaces
 //  
+//  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//  Notes:			IMPORTANT WARNING
+//					This object does not use any locking mechanism. It is designed
+//					to be used only by RootLayer class. DO NOT USE from another class!
 //------------------------------------------------------------------------------
 #include <stdio.h>
 #include <Window.h>
@@ -35,8 +39,6 @@
 #include "RGBColor.h"
 #include "Globals.h"
 #include "FMWList.h"
-#include "RootLayer.h"
-#include "Desktop.h"
 
 //#define DEBUG_WORKSPACE
 
@@ -56,14 +58,12 @@
 
 //----------------------------------------------------------------------------------
 
-Workspace::Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor, RootLayer *owner)
+Workspace::Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor)
 {
 	fID			= ID;
 	fSpace		= colorspace;
 	fBGColor	= BGColor;
 
-	fOwner		= owner;
-	
 	fBottomItem	= NULL;
 	fTopItem	= NULL;
 	fCurrentItem= NULL;
@@ -115,7 +115,7 @@ Workspace::~Workspace(void)
 	to give focus to, having as preferred 'layer'.
 	Remember, some windows having B_AVOID_FOCUS can't have the focus state.
 */
-bool Workspace::AddLayerPtr(WinBorder *layer)
+bool Workspace::AddWinBorder(WinBorder *layer)
 {
 	if (layer == NULL)
 		debugger("NULL pointer in Workspace::AddLayerPtr\n");
@@ -128,12 +128,9 @@ bool Workspace::AddLayerPtr(WinBorder *layer)
 	item->upperItem	= NULL;
 	item->lowerItem	= NULL;
 
-	fOpLock.Lock();
-
 	// insert 'item' at the end. It doesn't matter where we add it,
 	// it will be placed correctly by SearchAndSetNewFront(item->layerPtr);
 	InsertItem(item, NULL);
-	fOpLock.Unlock();
 
 	STRACE(("\n*AddLayerPtr(%s) -", layer->GetName()));
 
@@ -154,9 +151,9 @@ bool Workspace::AddLayerPtr(WinBorder *layer)
 	If this window was the front/focus one it calls SearchAndSetNew(Front/Focus)
 	to give the respective state to the window below her.
 */
-bool Workspace::RemoveLayerPtr(WinBorder *layer)
+bool Workspace::RemoveWinBorder(WinBorder *layer)
 {
-	if(!layer)
+	if (layer == NULL)
 		return false;
 
 	STRACE(("\n*Workspace(%ld)::RemoveLayerPtr(%s)\n", ID(), layer->GetName()));
@@ -166,7 +163,6 @@ bool Workspace::RemoveLayerPtr(WinBorder *layer)
 	// search to see if this workspace has WinBorder's pointer in its list
 	ListData	*item = NULL;
 
-	fOpLock.Lock();
 	if((item = HasItem(layer)))
 	{
 		ListData	*nextItem	= NULL;
@@ -201,7 +197,6 @@ bool Workspace::RemoveLayerPtr(WinBorder *layer)
 		RemoveItem(item);
 		delete item;
 		STRACESTREAM();		
-		fOpLock.Unlock();
 
 		// reset some internal variables
 		layer->SetMainWinBorder(NULL);
@@ -215,7 +210,6 @@ bool Workspace::RemoveLayerPtr(WinBorder *layer)
 	else
 	{
 		STRACE(("Layer %s NOT found in Workspace No %ld\n", layer->GetName(), ID()));
-		fOpLock.Unlock();
 		return false;
 	}
 }
@@ -230,7 +224,6 @@ bool Workspace::HideSubsetWindows(WinBorder *layer)
 	// search to see if this workspace has WinBorder's pointer in its list
 	ListData	*item = NULL;
 
-	fOpLock.Lock();
 	if((item = HasItem(layer)))
 	{
 		ListData	*nextItem = NULL;
@@ -259,13 +252,10 @@ bool Workspace::HideSubsetWindows(WinBorder *layer)
 			}
 		}
 		
-		fOpLock.Unlock();
-
 		return true;
 	}
 	else
 	{
-		fOpLock.Unlock();
 		return false;
 	}
 }
@@ -552,7 +542,6 @@ ListData *Workspace::FindPlace(ListData *pref)
 void Workspace::SearchAndSetNewFront(WinBorder *preferred)
 {
 	STRACE(("*WS(%ld)::SASNF(%s)\n", ID(), preferred? preferred->GetName(): "NULL"));
-	fOpLock.Lock();
 	
 	// the new front must not be the same as the previous one.
 	if(fFrontItem && fFrontItem->layerPtr == preferred && !(preferred->IsHidden()))
@@ -562,7 +551,6 @@ void Workspace::SearchAndSetNewFront(WinBorder *preferred)
 		STRACESTREAM();
 		STRACE(("#WS(%ld)::SASNF(%s) ENDED 1\n", ID(), preferred? preferred->GetName(): "NULL"));
 		
-		fOpLock.Unlock();
 		return;
 	}
 
@@ -581,7 +569,6 @@ void Workspace::SearchAndSetNewFront(WinBorder *preferred)
 		STRACESTREAM();
 		STRACE(("#WS(%ld)::SASNF(%s) ENDED 2\n", ID(), preferred? preferred->GetName(): "NULL"));
 
-		fOpLock.Unlock();
 		return;
 	}
 
@@ -1086,7 +1073,6 @@ void Workspace::SearchAndSetNewFront(WinBorder *preferred)
 		fFrontItem = newFrontItem;
 		// TODO: call a method like... WinBorder::MakeFront(true);
 	}
-	fOpLock.Unlock();
 
 	STRACE(("#WS(%ld)::SASNF(%s) ENDED! Workspace data...", ID(), preferred? preferred->GetName(): "NULL"));
 	STRACESTREAM();
@@ -1101,8 +1087,6 @@ void Workspace::SearchAndSetNewFront(WinBorder *preferred)
 void Workspace::SearchAndSetNewFocus(WinBorder *preferred)
 {
 	STRACE(("*WS(%ld)::SASNFocus(%s)\n", ID(), preferred? preferred->GetName(): "NULL"));
-	
-	fOpLock.Lock();
 	
 	if(!preferred)
 		preferred	= fBottomItem? fBottomItem->layerPtr : NULL;
@@ -1175,8 +1159,6 @@ void Workspace::SearchAndSetNewFocus(WinBorder *preferred)
 		// TODO: Rebuild & Redraw.
 		fFocusItem		= item;
 	}
-	
-	fOpLock.Unlock();
 }
 
 //----------------------------------------------------------------------------------
@@ -1194,7 +1176,6 @@ void Workspace::BringToFrontANormalWindow(WinBorder *layer)
 		case B_FLOATING_APP_WINDOW_FEEL:
 		case B_MODAL_APP_WINDOW_FEEL:
 		{
-			fOpLock.Lock();
 			ListData	*item	= fBottomItem;
 			team_id		tid		= layer->Window()->ClientTeamID();
 			while(item)
@@ -1210,7 +1191,6 @@ void Workspace::BringToFrontANormalWindow(WinBorder *layer)
 			if(item)
 				SearchAndSetNewFront(item->layerPtr);
 			
-			fOpLock.Unlock();
 			break;
 		}
 		default:

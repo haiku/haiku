@@ -219,7 +219,7 @@ void RootLayer::AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks)
 	for( int32 i=0; i < 32; i++)
 	{
 		if( wks & (0x00000001 << i) && i < WorkspaceCount())
-			WorkspaceAt(i+1)->AddLayerPtr(winBorder);
+			WorkspaceAt(i+1)->AddWinBorder(winBorder);
 	}
 }
 
@@ -349,7 +349,7 @@ void RootLayer::RemoveWinBorder(WinBorder* winBorder)
 
 		int32 count = WorkspaceCount();
 		for(int32 i=0; i < count; i++)
-			WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
+			WorkspaceAt(i+1)->RemoveWinBorder(winBorder);
 	}
 	else
 	{	// for B_NORMAL_WINDOW_FEEL
@@ -358,7 +358,7 @@ void RootLayer::RemoveWinBorder(WinBorder* winBorder)
 		for( int32 i=0; i < 32 && i < count; i++)
 		{
 			if( workspaces & (0x00000001UL << i))
-				WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
+				WorkspaceAt(i+1)->RemoveWinBorder(winBorder);
 		}
 	}
 	
@@ -399,12 +399,12 @@ void RootLayer::ChangeWorkspacesFor(WinBorder* winBorder, uint32 newWorkspaces)
 		else
 		if(oldWorkspaces & (0x00000001 << i))
 		{
-			WorkspaceAt(i+1)->RemoveLayerPtr(winBorder);
+			WorkspaceAt(i+1)->RemoveWinBorder(winBorder);
 		}
 		else
 		if (newWorkspaces & (0x00000001 << i))
 		{
-			WorkspaceAt(i+1)->AddLayerPtr(winBorder);
+			WorkspaceAt(i+1)->AddWinBorder(winBorder);
 		}
 	}
 }
@@ -560,7 +560,7 @@ void RootLayer::SetWorkspaceCount(const int32 count)
 		else
 		{
 			Workspace	*ws;
-			ws = new Workspace(fColorSpace, i+1, BGColor(), this);
+			ws = new Workspace(fColorSpace, i+1, BGColor());
 			newWSPtrList.AddItem(ws);
 		}
 	}
@@ -653,7 +653,7 @@ void RootLayer::RemoveAppWindow(WinBorder *wb)
 
 	int32 count = WorkspaceCount();
 	for(int32 i=0; i < count; i++)
-		WorkspaceAt(i+1)->RemoveLayerPtr(wb);
+		WorkspaceAt(i+1)->RemoveWinBorder(wb);
 }
 
 void RootLayer::PrintToStream()

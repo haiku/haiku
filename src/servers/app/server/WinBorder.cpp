@@ -515,7 +515,7 @@ void WinBorder::AddToSubsetOf(WinBorder* main)
 			{
 				Workspace	*ws = rl->WorkspaceAt(i+1);
 				if(ws->FrontLayer() == main)
-					ws->AddLayerPtr(this);
+					ws->AddWinBorder(this);
 			}
 
 			rl->fMainLock.Unlock();
@@ -549,7 +549,7 @@ void WinBorder::RemoveFromSubsetOf(WinBorder* main)
 
 				// if its main window is in 'i' workspaces, remove it from
 				// workspace 'i' if it's in there...
-				ws->RemoveLayerPtr(this);
+				ws->RemoveWinBorder(this);
 			}
 		}
 	}

@@ -846,7 +846,7 @@ void Desktop::RemoveSubsetWindow(WinBorder* wb)
 		
 	int32 countWKs = rl->WorkspaceCount();
 	for (int32 i=0; i < countWKs; i++)
-		rl->WorkspaceAt(i+1)->RemoveLayerPtr(wb);
+		rl->WorkspaceAt(i+1)->RemoveWinBorder(wb);
 
 }
 

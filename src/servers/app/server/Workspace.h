@@ -23,6 +23,10 @@
 //	Author:			Adi Oanca <adioanca@myrealbox.com>
 //	Description:	Tracks workspaces
 //  
+//  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//  Notes:			IMPORTANT WARNING
+//					This object does not use any locking mechanism. It is designed
+//					to be used only by RootLayer class. DO NOT USE from another class!
 //------------------------------------------------------------------------------
 #ifndef _WORKSPACE_H_
 #define _WORKSPACE_H_
@@ -34,8 +38,6 @@
 #include "RGBColor.h"
 
 class WinBorder;
-class RBGColor;
-class RootLayer;
 
 struct ListData
 {
@@ -47,12 +49,11 @@ struct ListData
 class Workspace
 {
 public:
-	Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor,
-		RootLayer *owner);
+	Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor);
 	~Workspace(void);
 	
-	bool AddLayerPtr(WinBorder *layer);
-	bool RemoveLayerPtr(WinBorder *layer);
+	bool AddWinBorder(WinBorder *layer);
+	bool RemoveWinBorder(WinBorder *layer);
 	bool HideSubsetWindows(WinBorder *layer);
 	WinBorder *FocusLayer(void) const;
 	WinBorder *FrontLayer(void) const;
@@ -65,7 +66,7 @@ public:
 	WinBorder *GoToTopItem(void);
 	WinBorder *GoToLowerItem(void);
 	bool GoToItem(WinBorder *layer);
-	
+
 	void SetLocalSpace(const uint32 colorspace);
 	uint32 LocalSpace(void) const;
 	
@@ -89,13 +90,12 @@ public:
 	void SearchAndSetNewFocus(WinBorder *preferred);
 	void BringToFrontANormalWindow(WinBorder *layer);
 	
-	ListData *HasItem(WinBorder *layer);
-	
 private:
 	
 	void InsertItem(ListData *item, ListData *before);
 	void RemoveItem(ListData *item);
 	ListData *HasItem(ListData *item);
+	ListData *HasItem(WinBorder *layer);
 	
 	ListData *FindPlace(ListData *pref);
 	
@@ -103,23 +103,19 @@ private:
 	uint32 fSpace;
 	RGBColor fBGColor;
 	
-	BLocker fOpLock;
-	
-	RootLayer *fOwner;
-	
 	// first visible onscreen
 	ListData *fBottomItem;
 	
 	 // the last visible(or covered by other Layers)
 	ListData *fTopItem;
 	
-	 // pointer to the currect element in the list
+	 // pointer to the current element in the list
 	ListData *fCurrentItem;
 	
 	 // the focus WinBorder - for keyboard events
 	ListData *fFocusItem;
 	
-	 // the one the mouse can bring in front as possible(in its set)
+	 // the item that is the target of mouse operations
 	ListData *fFrontItem;
 	
 	// settings for each workspace -- example taken from R5's app_server_settings file
