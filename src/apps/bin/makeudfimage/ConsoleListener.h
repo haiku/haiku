@@ -22,7 +22,7 @@ public:
 	virtual void OnError(const char *message) const;
 	virtual void OnWarning(const char *message) const;
 	virtual void OnUpdate(VerbosityLevel level, const char *message) const;
-	virtual void OnCompletion(bool successful, const char *message) const;
+	virtual void OnCompletion(status_t result, const Statistics &statistics) const;
 	
 	VerbosityLevel Level() const { return fLevel; }
 private:

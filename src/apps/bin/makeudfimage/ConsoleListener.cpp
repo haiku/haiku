@@ -13,6 +13,7 @@
 #include "ConsoleListener.h"
 
 #include <stdio.h>
+#include <string.h>
 
 /*! \brief Creates a new ConsoleListener object with the given verbosity level.
 
@@ -61,8 +62,21 @@ ConsoleListener::OnUpdate(VerbosityLevel level, const char *message) const
 }
 
 void
-ConsoleListener::OnCompletion(bool successful, const char *message) const
+ConsoleListener::OnCompletion(status_t result, const Statistics &statistics) const
 {
-	if (Level() > VERBOSITY_NONE)
-		printf("%s: %s\n", (successful ? "SUCCESS" : "FAILURE"), message);
+	if (Level() > VERBOSITY_NONE) {
+		if (result == B_OK) {
+			printf("Finished\n");
+			printf("- Build time:  %ld seconds\n", statistics.ElapsedTime());
+			printf("- Directories: %Ld directories in %Ld bytes\n",
+			       statistics.Directories(), statistics.DirectoryBytes());
+			printf("- Files:       %Ld files in %Ld bytes\n",
+			       statistics.Files(), statistics.FileBytes());
+		} else {
+			printf("----------------------------------------------------------------------\n");
+			printf("Build failed with error: 0x%lx, `%s'\n", result,
+			       strerror(result));
+			printf("----------------------------------------------------------------------\n");
+		}	
+	}
 }

@@ -14,6 +14,8 @@
 #ifndef _PROGRESS_LISTENER_H
 #define _PROGRESS_LISTENER_H
 
+#include "Statistics.h"
+
 enum VerbosityLevel {
 	VERBOSITY_NONE,
 	VERBOSITY_LOW,
@@ -26,7 +28,7 @@ public:
 	virtual void OnError(const char *message) const = 0;
 	virtual void OnWarning(const char *message) const = 0;
 	virtual void OnUpdate(VerbosityLevel level, const char *message) const = 0;
-	virtual void OnCompletion(bool successful, const char *message) const = 0;		
+	virtual void OnCompletion(status_t result, const Statistics &statistics) const = 0;		
 };
 
 #endif	// _PROGRESS_LISTENER_H
