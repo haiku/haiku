@@ -248,6 +248,6 @@ rw_lock_write_lock(rw_lock *lock)
 status_t
 rw_lock_write_unlock(rw_lock *lock)
 {
-	release_sem_etc(lock->sem, RW_MAX_READERS, 0);
+	return release_sem_etc(lock->sem, RW_MAX_READERS, 0);
 }
 

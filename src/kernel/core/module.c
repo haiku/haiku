@@ -803,6 +803,7 @@ dump_modules(int argc, char **argv)
 			image->path, image->image, image->info, image->ref_count,
 			image->keep_loaded ? "keep loaded" : "can be unloaded");
 	}
+	return 0;
 }
 
 
