@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -24,41 +24,34 @@
 //	Description:	Line storage used by BTextView
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include "LineBuffer.h"
 
-// Project Includes ------------------------------------------------------------
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 _BLineBuffer_::_BLineBuffer_()
 	:	_BTextViewSupportBuffer_<STELine>(20, 2)
 {
 }
-//------------------------------------------------------------------------------
+
+
 _BLineBuffer_::~_BLineBuffer_()
 {
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BLineBuffer_::InsertLine(STELine *inLine, int32 index)
 {
 	InsertItemsAt(1, index, inLine);
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BLineBuffer_::RemoveLines(int32 index, int32 count)
 {
 	RemoveItemsAt(count, index);
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BLineBuffer_::RemoveLineRange(int32 fromOffset, int32 toOffset)
 {
@@ -71,7 +64,8 @@ _BLineBuffer_::RemoveLineRange(int32 fromOffset, int32 toOffset)
 
 	BumpOffset(fromOffset - toOffset, fromLine + 1);
 }
-//------------------------------------------------------------------------------
+
+
 int32
 _BLineBuffer_::OffsetToLine(int32 offset) const
 {
@@ -86,14 +80,14 @@ _BLineBuffer_::OffsetToLine(int32 offset) const
 				break;
 			else
 				minIndex = index + 1;
-		}
-		else
+		} else
 			maxIndex = index;
 	}
 	
 	return index;
 }
-//------------------------------------------------------------------------------
+
+
 int32 _BLineBuffer_::PixelToLine(float pixel) const
 {
 	int32 minIndex = 0;
@@ -107,32 +101,25 @@ int32 _BLineBuffer_::PixelToLine(float pixel) const
 				break;
 			else
 				minIndex = index + 1;
-		}
-		else
+		} else
 			maxIndex = index;
 	}
 	
 	return index;
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BLineBuffer_::BumpOrigin(float delta, long index)
 {	
 	for (long i = index; i < fItemCount; i++)
 		fBuffer[i].origin += delta;
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BLineBuffer_::BumpOffset(int32 delta, int32 index)
 {
 	for (long i = index; i < fItemCount; i++)
 		fBuffer[i].offset += delta;
 }
-//------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */

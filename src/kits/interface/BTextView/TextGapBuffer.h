@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku
+//	Copyright (c) 2001-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -26,18 +26,8 @@
 #ifndef __TEXTGAPBUFFER_H
 #define __TEXTGAPBUFFER_H
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <SupportDefs.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 class BFile;
 // _BTextGapBuffer_ class ------------------------------------------------------
@@ -84,13 +74,15 @@ protected:
 		int32	fScratchSize;		// scratch size
 		bool	fPasswordMode;
 };
-//------------------------------------------------------------------------------
+
+
 inline int32 
 _BTextGapBuffer_::Length() const
 {
 	return fItemCount;
 }
-//------------------------------------------------------------------------------
+
+
 inline char 
 _BTextGapBuffer_::operator[](long index) const
 {
@@ -98,9 +90,3 @@ _BTextGapBuffer_::operator[](long index) const
 }
 
 #endif //__TEXTGAPBUFFER_H
-/*
- * $Log $
- *
- * $Id  $
- *
- */

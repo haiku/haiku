@@ -20,27 +20,19 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		TextGapBuffer.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
+//	Authors:		Marc Flerackers (mflerackers@androme.be)
+//					Stefano Ceccherini (burton666@libero.it)
 //	Description:	Text storage used by BTextView
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
 #include <cstdlib>
 #include <cstring>
 
-// System Includes -------------------------------------------------------------
 #include <File.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
 #include "TextGapBuffer.h"
 
-// Local Defines ---------------------------------------------------------------
 
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 _BTextGapBuffer_::_BTextGapBuffer_()
 	:	fExtraCount(2048),
 		fItemCount(0),
@@ -55,13 +47,15 @@ _BTextGapBuffer_::_BTextGapBuffer_()
 	fBuffer = (char *)malloc(fExtraCount + fItemCount);
 	fScratchBuffer = NULL;
 }
-//------------------------------------------------------------------------------
+
+
 _BTextGapBuffer_::~_BTextGapBuffer_()
 {
 	free(fBuffer);
 	free(fScratchBuffer);
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BTextGapBuffer_::InsertText(const char *inText, int32 inNumItems,
 								  int32 inAtIndex)
@@ -84,7 +78,8 @@ _BTextGapBuffer_::InsertText(const char *inText, int32 inNumItems,
 	fGapIndex += inNumItems;
 	fItemCount += inNumItems;
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BTextGapBuffer_::InsertText(BFile *file, int32 fileOffset, int32 inNumItems, int32 inAtIndex)
 {
@@ -119,7 +114,8 @@ _BTextGapBuffer_::InsertText(BFile *file, int32 fileOffset, int32 inNumItems, in
 		fItemCount += inNumItems;
 	}
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BTextGapBuffer_::RemoveRange(int32 start, int32 end)
 {
@@ -140,7 +136,8 @@ _BTextGapBuffer_::RemoveRange(int32 start, int32 end)
 	if (fGapCount > fExtraCount)
 		SizeGapTo(fExtraCount);	
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BTextGapBuffer_::MoveGapTo(int32 toIndex)
 {
@@ -157,8 +154,7 @@ _BTextGapBuffer_::MoveGapTo(int32 toIndex)
 		dstIndex =  fGapIndex;
 		count = fGapCount + (toIndex - srcIndex);
 		count = (count > trailGapCount) ? trailGapCount : count;
-	}
-	else {
+	} else {
 		srcIndex = toIndex;
 		dstIndex = toIndex + (gapEndIndex - fGapIndex);
 		count = gapEndIndex - dstIndex;
@@ -169,7 +165,8 @@ _BTextGapBuffer_::MoveGapTo(int32 toIndex)
 
 	fGapIndex = toIndex;
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BTextGapBuffer_::SizeGapTo(long inCount)
 {
@@ -184,7 +181,8 @@ _BTextGapBuffer_::SizeGapTo(long inCount)
 	fGapCount = inCount;
 	fBufferCount = fItemCount + fGapCount;
 }
-//------------------------------------------------------------------------------
+
+
 const char *
 _BTextGapBuffer_::GetString(int32 fromOffset, int32 numChars)
 {
@@ -215,7 +213,8 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 numChars)
 	
 	return result;
 }
-//------------------------------------------------------------------------------
+
+
 bool 
 _BTextGapBuffer_::FindChar(char inChar, long fromIndex, long *ioDelta)
 {
@@ -231,7 +230,8 @@ _BTextGapBuffer_::FindChar(char inChar, long fromIndex, long *ioDelta)
 	
 	return false;
 }
-//------------------------------------------------------------------------------
+
+
 const char *
 _BTextGapBuffer_::Text()
 {
@@ -240,12 +240,15 @@ _BTextGapBuffer_::Text()
 	
 	return fBuffer;
 }
-//------------------------------------------------------------------------------
-/*char *_BTextGapBuffer_::RealText()
+
+
+/*char *
+_BTextGapBuffer_::RealText()
 {
 	return fText;
 }*/
-//------------------------------------------------------------------------------
+
+
 void
 _BTextGapBuffer_::GetString(int32 offset, int32 length, char *buffer)
 {
@@ -285,27 +288,24 @@ _BTextGapBuffer_::GetString(int32 offset, int32 length, char *buffer)
 	
 	buffer[length] = '\0';
 }
-//------------------------------------------------------------------------------
+
+
 char 
 _BTextGapBuffer_::RealCharAt(int32 offset) const
 {
 	return (offset < fGapIndex) ? fBuffer[offset] : fBuffer[offset + fGapCount];
 }
-//------------------------------------------------------------------------------
+
+
 bool
 _BTextGapBuffer_::PasswordMode() const
 {
 	return fPasswordMode;
 }
-//------------------------------------------------------------------------------
+
+
 void
 _BTextGapBuffer_::SetPasswordMode(bool state)
 {
 	fPasswordMode = state;
 }
-/*
- * $Log $
- *
- * $Id  $
- *
- */
