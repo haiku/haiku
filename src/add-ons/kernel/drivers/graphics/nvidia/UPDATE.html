@@ -4,10 +4,11 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (cvs 0.32, Rudolf)</h1></p>
+<p><h1>head (cvs 0.33, Rudolf)</h1></p>
 <ul>
 	<li>Execution of acceleration commands is re-setup. Now it should be possible to use more engine commands than there are FIFO channels for them, by doing on-the-fly reconfiguring. This should be especially usefull when 3D acceleration is going to be setup later on;
-	<li>Added recognition for 7 new cards: Some new GeForce 6600 and 6800 types hopefully now work.
+	<li>Added recognition for 7 new cards: Some new GeForce 6600 and 6800 types are now recognized, but do not yet work (contact me for a tweaked, non-accelerated version that does work for NV40 and above for now..);
+	<li>Modified cursor to be hardware synchronized to the screen's vertical retrace. This fixes the high CPU load on moving the mouse especially while being on the bottom of the screen (all cards).
 </ul>
 <p><h1>nv_driver 0.30, (Rudolf)</h1></p>
 <ul>
@@ -153,6 +154,7 @@ The features below are shutdown because they are possibly dangerous without feed
 </ul>
 <p><h1>Still todo:</h1></p>
 <ul>
+	<li>Re-setup acceleration engine for DMA command buffer use;
 	<li>TVout support;
 	<li>Improve/extend various stuff when/if possible.
 </ul>
