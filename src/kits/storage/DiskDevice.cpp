@@ -205,8 +205,19 @@ BDiskDevice::CommitModifications(bool synchronously,
 								 BMessenger progressMessenger,
 								 bool receiveCompleteProgressUpdates)
 {
-	// not implemented
-	return B_ERROR;
+	status_t error = InitCheck();
+	if (error != B_OK)
+		return error;
+	if (!_IsShadow())
+		return B_BAD_VALUE;
+	// TODO: Get port and token from the progressMessenger
+	port_id port = -1;
+	int32 token = -1;
+	error = _kern_commit_disk_device_modifications(ID(), port, token,
+		receiveCompleteProgressUpdates);
+	if (error == B_OK)
+		error = _SetTo(ID(), true, false, 0);
+	return error;
 }
 
 // CancelModifications
