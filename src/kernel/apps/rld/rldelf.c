@@ -1,15 +1,14 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002, Manuel J. Petit. All rights reserved.
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
-/*
-** Copyright 2002, Manuel J. Petit. All rights reserved.
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
 
-// ToDo: this should not really be build with the kernel build rules...
+// ToDo: this should not really be built with the kernel build rules...
 #ifdef _KERNEL_MODE
 #	undef _KERNEL_MODE
 #endif
@@ -60,7 +59,7 @@ enum {
 	RFLAG_RELOCATED			= 0x1000,
 	RFLAG_PROTECTED			= 0x2000,
 	RFLAG_INITIALIZED		= 0x4000,
-	RFLAG_NEEDAGIRLFRIEND	= 0x8000
+	RFLAG_REMAPPED			= 0x8000
 };
 
 
@@ -509,12 +508,44 @@ assert_dynamic_loadable(image_t *image)
 }
 
 
+/**	This function will change the protection of all read-only segments
+ *	to really be read-only.
+ *	The areas have to be read/write first, so that they can be relocated.
+ */
+
+static void
+remap_images(void)
+{
+	image_t *image;
+	uint32 i;
+
+	for (image = gLoadedImages.head; image != NULL; image = image->next) {
+		for (i = 0; i < image->num_regions; i++) {
+			if ((image->regions[i].flags & RFLAG_RW) == 0
+				&& (image->regions[i].flags & RFLAG_REMAPPED) == 0) {
+				// we only need to do this once, so we remember those we've already mapped
+				_kern_set_area_protection(image->regions[i].id, B_READ_AREA | B_EXECUTE_AREA);
+				image->regions[i].flags |= RFLAG_REMAPPED;
+			}
+		}
+	}
+}
+
+
 static bool
 map_image(int fd, char const *path, image_t *image, bool fixed)
 {
+	const char *baseName;
 	uint32 i;
 
 	(void)(fd);
+
+	// cut the file name from the path as base name for the created areas
+	baseName = strrchr(path, '/');
+	if (baseName != NULL)
+		baseName++;
+	else
+		baseName = path;
 
 	for (i = 0; i < image->num_regions; i++) {
 		char regionName[B_OS_NAME_LENGTH];
@@ -528,7 +559,7 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 			fixed = false;
 
 		snprintf(regionName, sizeof(regionName), "%s_seg%lu%s",
-			path, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
+			baseName, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
 		if (image->dynamic_ptr && !fixed) {
 			/*
@@ -1164,6 +1195,8 @@ load_program(char const *path, void **_entry)
 	}
 
 	init_dependencies(gLoadedImages.head, false);
+	remap_images();
+		// ToDo: once setup_system_time() is fixed, move this one line higher!
 
 	*_entry = (void *)(image->entry_point);
 
@@ -1207,6 +1240,7 @@ load_library(char const *path, uint32 flags)
 		FATAL(!relocateSuccess, "troubles relocating\n");
 	}
 
+	remap_images();
 	init_dependencies(image, true);
 
 	rld_unlock();
