@@ -116,8 +116,9 @@ StringAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "BaseCCCCC") == 0);
 	delete str1;
 
-	const int32 OUT_OF_MEM_VAL = 2*1000*1000*1000;
+	
 #ifndef TEST_R5
+	const int32 OUT_OF_MEM_VAL = 2*1000*1000*1000;
 	//Append(char, int32) with excessive length:
 	NextSubTest();
 	str1 = new BString("Base");
