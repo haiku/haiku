@@ -49,6 +49,8 @@ public:
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
 
+	virtual	void				RebuildFullRegion(void);
+
 			void				MouseDown(const BPoint &pt, const int32 &buttons, const int32 &modifiers);
 			void				MouseMoved(const BPoint &pt, const int32 &buttons);
 			void				MouseUp(const BPoint &pt, const int32 &modifiers);
@@ -58,7 +60,7 @@ public:
 			void				UpdateFont(void);
 			void				UpdateScreen(void);
 	
-			ServerWindow*		Window(void) const { return fWindow; }
+			ServerWindow*		Window(void) const { return _serverwin; }
 			Decorator*			GetDecorator(void) const { return fDecorator; }
 			WinBorder*			MainWinBorder() const;
 
@@ -76,7 +78,9 @@ public:
 			void				SetMainWinBorder(WinBorder *newMain);	
 
 protected:
-			ServerWindow		*fWindow;
+	friend class Layer;
+	friend class ServerWindow;
+
 			Decorator			*fDecorator;
 			int32				fFlags;
 			int32				fMouseButtons,
