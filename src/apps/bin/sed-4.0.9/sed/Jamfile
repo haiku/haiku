@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src apps bin sed-4.0.9 sed ;
+
+SubDirCcFlags += -I ../lib -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
+
+BinCommand sed : compile.c execute.c fmt.c regexp.c sed.c : root libsedutils.a ; 

@@ -1,0 +1,102 @@
+* ABOUT BUGS
+
+Before reporting a bug, please check the list of known bugs
+and the list of oft-reported non-bugs (below).
+
+Bugs and comments may be sent to bonzini@gnu.org; please
+include in the Subject: header the first line of the output of
+``sed --version''.
+
+Please do not send a bug report like this:
+
+	[while building frobme-1.3.4] 
+	$ configure 
+	sed: file sedscr line 1: Unknown option to 's'
+
+If sed doesn't configure your favorite package, take a few extra
+minutes to identify the specific problem and make a stand-alone test
+case.
+
+A stand-alone test case includes all the data necessary to perform the
+test, and the specific invocation of sed that causes the problem.  The
+smaller a stand-alone test case is, the better.  A test case should
+not involve something as far removed from sed as ``try to configure
+frobme-1.3.4''.  Yes, that is in principle enough information to look
+for the bug, but that is not a very practical prospect.
+
+
+
+* NON-BUGS
+
+`sed -n' and `s/regex/replace/p'
+
+  Some versions of sed ignore the `p' (print) option of an `s' command
+  unless the `-n' command switch has been specified.  Other versions
+  always honor the `p' option.  GNU sed is the latter sort.  (Both
+  approaches are allowed by POSIX.2.)
+
+
+`N' command on the last line
+
+  Most versions of sed exit without printing anything when the `N'
+  command is issued on the last line of a file.  GNU sed instead
+  prints pattern space before exiting unless of course the `-n'
+  command switch has been specified.  More information on the reason
+  behind this choice can be found in the Info manual.
+
+
+regexp syntax clashes
+
+  sed uses the Posix basic regular expression syntax.  According to
+  the standard, the meaning of some escape sequences is undefined in
+  this syntax;  notable in the case of GNU sed are `\|', `\+', `\?',
+  `\`', `\'', `\<', `\>', `\b', `\B', `\w', and `\W'.
+
+  As in all GNU programs that use Posix basic regular expressions, sed
+  interprets these escape sequences as meta-characters.  So, `x\+'
+  matches one or more occurrences of `x'.   `abc\|def' matches either
+  `abc' or `def'.
+
+  This syntax may cause problems when running scripts written for other
+  seds.  Some sed programs have been written with the assumption that
+  `\|' and `\+' match the literal characters `|' and `+'.  Such scripts
+  must be modified by removing the spurious backslashes if they are to
+  be used with recent versions of sed (not only GNU sed).
+
+  In addition, GNU sed supports several escape characters (some of
+  which are multi-character) to insert non-printable characters
+  in scripts (`\a', `\c', `\d', `\o', `\r', `\t', `\v', `\x').  These
+  can cause similar problems with scripts written for other seds.
+
+
+-i clobbers read-only files
+
+  In short, `sed d -i' will let one delete the contents of
+  a read-only file, and in general the `-i' option will let
+  one clobber protected files.  This is not a bug, but rather a
+  consequence of how the Unix filesystem works.
+
+  The permissions on a file say what can happen to the data
+  in that file, while the permissions on a directory say what can
+  happen to the list of files in that directory.  `sed -i'
+  will not ever open for writing  a file that is already on disk,
+  rather, it will work on a temporary file that is finally renamed
+  to the original name: if you rename or delete files, you're actually
+  modifying the contents of the directory, so the operation depends on
+  the permissions of the directory, not of the file).  For this same
+  reason, sed will not let one use `-i' on a writeable file in a
+  read-only directory (but unbelievably nobody reports that as a
+  bug...).
+
+
+`0a' does not work
+
+  There is no line 0.  0 is a special address that is only used to treat
+  addresses like `0,/RE/' as active when the script starts: if you
+  write `1,/abc/d' and the first line includes the word `abc', then
+  that match would be ignored because address ranges must span at least
+  two lines (barring the end of the file); but what you probably wanted is
+  to delete every line up to the first one including `abc}, and this
+  is obtained with `0,/abc/d'.
+
+

@@ -1,0 +1,8 @@
+sed/compile.c
+sed/execute.c
+sed/regexp.c
+sed/sed.c
+lib/utils.c
+lib/regcomp.c
+lib/regexec.c
+lib/regex_internal.c

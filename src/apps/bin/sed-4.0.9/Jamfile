@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src apps bin sed-4.0.9 ;
+
+SubInclude OBOS_TOP src apps bin sed-4.0.9 lib ;
+SubInclude OBOS_TOP src apps bin sed-4.0.9 sed ; 

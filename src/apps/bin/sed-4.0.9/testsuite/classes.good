@@ -1,0 +1,4 @@
+: ${_cv_='emptyvar'}
+: ${ac_cv_prog/RANLIB='/usr/bin/ranlib'}
+: ${ac_cv_prog/CC='/usr/unsupported/\ \ /lib/_cv_/cc'}
+: ${a/c_cv_prog/CPP='/usr/bin/cpp'}

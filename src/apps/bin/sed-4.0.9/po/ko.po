@@ -1,0 +1,375 @@
+# ko.po -- Korean messages for GNU sed
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Jong-Hoon Ryu <redhat4u@netian.com>, 2001.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GNU sed 3.02.80\n"
+"POT-Creation-Date: 2004-01-10 08:46+0100\n"
+"PO-Revision-Date: 2001-10-12 17:26+0900\n"
+"Last-Translator: Jong-Hoon Ryu <redhat4u@netian.com>\n"
+"Language-Team: Korean <ko@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=EUC-KR\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: \n"
+
+#: sed/compile.c:172
+msgid "Multiple `!'s"
+msgstr "`!' 가 중복되었습니다"
+
+#: sed/compile.c:173
+msgid "Unexpected `,'"
+msgstr "불필요한 `,' 가 사용되고 있습니다"
+
+#: sed/compile.c:174
+msgid "Cannot use +N or ~N as first address"
+msgstr "첫번째 주소로 '+N' 또는 '~N' 을 사용할 수 없습니다"
+
+#: sed/compile.c:175
+msgid "Unmatched `{'"
+msgstr "`{' 가 일치하지 않습니다"
+
+#: sed/compile.c:176
+msgid "Unexpected `}'"
+msgstr "불필요한 `}' 가 사용되고 있습니다"
+
+#: sed/compile.c:177
+msgid "Extra characters after command"
+msgstr "명령뒤에 필요없는 문자들이 있습니다"
+
+#: sed/compile.c:178
+msgid "Expected \\ after `a', `c' or `i'"
+msgstr ""
+
+#: sed/compile.c:179
+msgid "`}' doesn't want any addresses"
+msgstr "`}' 에 어떠한 주소도 필요치 않습니다"
+
+#: sed/compile.c:180
+msgid ": doesn't want any addresses"
+msgstr ": 에 어떠한 주소도 필요치 않습니다"
+
+#: sed/compile.c:181
+msgid "Comments don't accept any addresses"
+msgstr "코멘트에 어떠한 주소도 사용할 수 없습니다"
+
+#: sed/compile.c:182
+msgid "Missing command"
+msgstr "명령이 지정되지 않았습니다"
+
+#: sed/compile.c:183
+msgid "Command only uses one address"
+msgstr "명령에 하나의 주소만 사용할 수 있습니다"
+
+#: sed/compile.c:184
+msgid "Unterminated address regex"
+msgstr "주소 정규표현식 종료되지 않았습니다"
+
+#: sed/compile.c:185
+msgid "Unterminated `s' command"
+msgstr "`s' 명령이 종료되지 않았습니다"
+
+#: sed/compile.c:186
+msgid "Unterminated `y' command"
+msgstr "`y' 명령이 종료되지 않았습니다"
+
+#: sed/compile.c:187
+msgid "Unknown option to `s'"
+msgstr "`s' 에 알 수 없는 옵션이 있습니다"
+
+#: sed/compile.c:188
+msgid "multiple `p' options to `s' command"
+msgstr "`s' 명령에 `p' 옵션이 중복되어 있습니다"
+
+#: sed/compile.c:189
+msgid "multiple `g' options to `s' command"
+msgstr "`s' 명령에 `g' 옵션이 중복되어 있습니다"
+
+#: sed/compile.c:190
+msgid "multiple number options to `s' command"
+msgstr "`s' 명령에 숫자 옵션이 중복되어 있습니다"
+
+#: sed/compile.c:191
+msgid "number option to `s' command may not be zero"
+msgstr "`s' 명령의 숫자 옵션에 '0' 을 지정할 수 없습니다"
+
+#: sed/compile.c:192
+msgid "strings for y command are different lengths"
+msgstr "`y' 명령의 문자열이 길이가 다릅니다"
+
+#: sed/compile.c:193
+msgid "expected newer version of sed"
+msgstr ""
+
+#: sed/compile.c:236
+#, c-format
+msgid "Called savchar() with unexpected pushback (%x)"
+msgstr "예상치 못한 pushback (%x) 과 함께 savchar() 가 호출되었습니다"
+
+#: sed/compile.c:1331
+msgid "Unknown command:"
+msgstr "알 수 없는 명령:"
+
+#: sed/compile.c:1352
+#, c-format
+msgid "%s: file %s line %lu: %s\n"
+msgstr "%s: %s 파일의 %lu 번째 줄: %s\n"
+
+#: sed/compile.c:1355
+#, c-format
+msgid "%s: -e expression #%lu, char %lu: %s\n"
+msgstr "%s: -e expression #%lu, char %lu: %s\n"
+
+#: sed/compile.c:1555
+#, c-format
+msgid "Can't find label for jump to `%s'"
+msgstr "`%s' (으)로 점프할 레이블을 찾을 수 없습니다"
+
+#: sed/execute.c:505
+#, c-format
+msgid "%s: can't read %s: %s\n"
+msgstr "%s: %s (을)를 읽을 수 없음: %s\n"
+
+#: sed/execute.c:530 sed/execute.c:542
+#, fuzzy, c-format
+msgid "Couldn't open temporary file %s: %s"
+msgstr "%s 파일을 열 수 없습니다"
+
+#: sed/execute.c:728
+msgid "INTERNAL ERROR: bad address type"
+msgstr "내부 오류: 잘못된 주소 유형입니다"
+
+#: sed/execute.c:1022 sed/execute.c:1200
+msgid "error in subprocess"
+msgstr ""
+
+#: sed/execute.c:1024
+msgid "option `e' not supported"
+msgstr ""
+
+#: sed/execute.c:1202
+msgid "`e' command not supported"
+msgstr ""
+
+#: sed/execute.c:1438
+#, c-format
+msgid "INTERNAL ERROR: Bad cmd %c"
+msgstr "내부 오류: %c (은)는 잘못된 명령입니다"
+
+#: sed/regexp.c:39 lib/regcomp.c:665
+msgid "No previous regular expression"
+msgstr ""
+
+#: sed/regexp.c:40
+msgid "Cannot specify modifiers on empty regexp"
+msgstr ""
+
+#: sed/regexp.c:134
+#, c-format
+msgid "Invalid reference \\%d on `s' command's RHS"
+msgstr ""
+
+#: sed/sed.c:95
+msgid ""
+"  -R, --regexp-perl\n"
+"                 use Perl 5's regular expressions syntax in the script.\n"
+msgstr ""
+
+#: sed/sed.c:100
+#, fuzzy, c-format
+msgid ""
+"Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 suppress automatic printing of pattern space\n"
+"  -e script, --expression=script\n"
+"                 add the script to the commands to be executed\n"
+"  -f script-file, --file=script-file\n"
+"                 add the contents of script-file to the commands to be "
+"executed\n"
+"  -i[suffix], --in-place[=suffix]\n"
+"                 edit files in place (makes backup if extension supplied)\n"
+"  -l N, --line-length=N\n"
+"                 specify the desired line-wrap length for the `l' command\n"
+"  -r, --regexp-extended\n"
+"                 use extended regular expressions in the script.\n"
+"%s  -s, --separate\n"
+"                 consider files as separate rather than as a single "
+"continuous\n"
+"                 long stream.\n"
+"  -u, --unbuffered\n"
+"                 load minimal amounts of data from the input files and "
+"flush\n"
+"                 the output buffers more often\n"
+"      --help     display this help and exit\n"
+"  -V, --version  output version information and exit\n"
+"\n"
+"If no -e, --expression, -f, or --file option is given, then the first\n"
+"non-option argument is taken as the sed script to interpret.  All\n"
+"remaining arguments are names of input files; if no input files are\n"
+"specified, then the standard input is read.\n"
+"\n"
+msgstr ""
+"사용법: %s [옵션]... {스크립트-스크립트가 없을 경우에는} [입력-파일]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 자동으로 패턴 공간을 출력하지 못하도록 합니다\n"
+"  -e 스크립트, --expression=스크립트\n"
+"                 실행될 명령에 스크립트를 추가합니다\n"
+"  -f 스크립트-파일, --file=스크립트-파일\n"
+"                 실행될 명령에 스크립트-파일의 내용을 추가합니다\n"
+"  -l 숫자, --line-length=숫자\n"
+"                 `l' 명령에 줄바꿈(line-wrap)할 숫자를 지정합니다\n"
+"  -u, --unbuffered\n"
+"\n"
+"      --help     현재 보여지는 도움말을 출력합니다\n"
+"  -V, --version  현재 사용하는 버전 정보를 출력합니다\n"
+"\n"
+"만일 -e, --expression, -f, --file 옵션이 주어지지 않았을 경우에는 옵션-없이\n"
+"첫번째 인수에 해석될 sed 스크립트가 놓여지게 됩니다.  그 다음에 올 수 있는\n"
+"인수로는 입력 파일의 이름입니다; 만일 입력 파일이 지정되지 않았을 경우에는\n"
+"표준 입력의 내용을 읽습니다.\n"
+"\n"
+
+#: sed/sed.c:129
+#, c-format
+msgid ""
+"E-mail bug reports to: %s .\n"
+"Be sure to include the word ``%s'' somewhere in the ``Subject:'' field.\n"
+msgstr ""
+"버그를 보고할 E-mail 주소: %s .\n"
+"``Subject:'' 항목에 반드시 ``%s'' 단어를 포함해 주시기 바랍니다.\n"
+
+#: sed/sed.c:254
+#, c-format
+msgid "super-sed version %s\n"
+msgstr ""
+
+#: sed/sed.c:255
+msgid ""
+"based on GNU sed version 3.02.80\n"
+"\n"
+msgstr ""
+
+#: sed/sed.c:257
+#, c-format
+msgid "GNU sed version %s\n"
+msgstr ""
+
+#: sed/sed.c:259
+#, c-format
+msgid ""
+"%s\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE,\n"
+"to the extent permitted by law.\n"
+msgstr ""
+"%s\n"
+"이 프로그램은 자유 소프트웨어 입니다; 자세한 내용은 저작권 내용의 원문을\n"
+"참고하시기 바랍니다.  이 프로그램은 법에 저촉되지 않는 범위에서 상업적이나\n"
+"특수 목적으로 사용될 경우를 포함한 어떠한 경우에도 보증하지 않습니다.\n"
+
+#: lib/utils.c:126
+#, fuzzy, c-format
+msgid "Couldn't open file %s: %s"
+msgstr "%s 파일을 열 수 없습니다"
+
+#: lib/utils.c:160
+#, fuzzy, c-format
+msgid "couldn't write %d item to %s: %s"
+msgid_plural "couldn't write %d items to %s: %s"
+msgstr[0] "%2$s 에 %1$d 항목(item)을 기록할 수 없습니다: %3$s"
+msgstr[1] "%2$s 에 %1$d 항목(item)을 기록할 수 없습니다: %3$s"
+
+#: lib/utils.c:175
+#, c-format
+msgid "read error on %s: %s"
+msgstr "%s 의 내용 읽기 오류: %s"
+
+#: lib/regcomp.c:149
+msgid "Success"
+msgstr ""
+
+#: lib/regcomp.c:152
+msgid "No match"
+msgstr ""
+
+#: lib/regcomp.c:155
+msgid "Invalid regular expression"
+msgstr ""
+
+#: lib/regcomp.c:158
+msgid "Invalid collation character"
+msgstr ""
+
+#: lib/regcomp.c:161
+msgid "Invalid character class name"
+msgstr ""
+
+#: lib/regcomp.c:164
+msgid "Trailing backslash"
+msgstr ""
+
+#: lib/regcomp.c:167
+msgid "Invalid back reference"
+msgstr ""
+
+#: lib/regcomp.c:170
+#, fuzzy
+msgid "Unmatched [ or [^"
+msgstr "`{' 가 일치하지 않습니다"
+
+#: lib/regcomp.c:173
+#, fuzzy
+msgid "Unmatched ( or \\("
+msgstr "`{' 가 일치하지 않습니다"
+
+#: lib/regcomp.c:176
+#, fuzzy
+msgid "Unmatched \\{"
+msgstr "`{' 가 일치하지 않습니다"
+
+#: lib/regcomp.c:179
+msgid "Invalid content of \\{\\}"
+msgstr ""
+
+#: lib/regcomp.c:182
+msgid "Invalid range end"
+msgstr ""
+
+#: lib/regcomp.c:185
+msgid "Memory exhausted"
+msgstr ""
+
+#: lib/regcomp.c:188
+msgid "Invalid preceding regular expression"
+msgstr ""
+
+#: lib/regcomp.c:191
+msgid "Premature end of regular expression"
+msgstr ""
+
+#: lib/regcomp.c:194
+msgid "Regular expression too big"
+msgstr ""
+
+#: lib/regcomp.c:197
+#, fuzzy
+msgid "Unmatched ) or \\)"
+msgstr "`{' 가 일치하지 않습니다"
+
+#~ msgid "Invalid use of address modifier"
+#~ msgstr "주소 변경자(modifier)의 사용이 올바르지 않습니다"
+
+#~ msgid "Unexpected End-of-file"
+#~ msgstr "파일의 끝(EOF)이 잘못되었습니다"
+
+#~ msgid "bad regexp: %s\n"
+#~ msgstr "잘못된 정규표현식: %s\n"
+
+#~ msgid "input read error: %s"
+#~ msgstr "입력 내용 읽기 오류: %s"
+
+#~ msgid "couldn't write an item to %s: %s"
+#~ msgstr "%s 에 항목(item)을 기록할 수 없습니다: %s"

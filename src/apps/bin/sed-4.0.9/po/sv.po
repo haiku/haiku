@@ -1,0 +1,390 @@
+# Swedish messages for sed.
+# Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+# Christian Rose <menthos@menthos.com>, 1999, 2000, 2001, 2002, 2003.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: sed 4.0.8\n"
+"POT-Creation-Date: 2004-01-10 08:46+0100\n"
+"PO-Revision-Date: 2003-10-24 19:21+0200\n"
+"Last-Translator: Christian Rose <menthos@menthos.com>\n"
+"Language-Team: Swedish <sv@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: sed/compile.c:172
+msgid "Multiple `!'s"
+msgstr "Flera \"!\""
+
+#: sed/compile.c:173
+msgid "Unexpected `,'"
+msgstr "Oväntat \",\""
+
+#: sed/compile.c:174
+msgid "Cannot use +N or ~N as first address"
+msgstr "+N eller ~N kan inte användas som första adress"
+
+#: sed/compile.c:175
+msgid "Unmatched `{'"
+msgstr "Ensamt \"{\""
+
+#: sed/compile.c:176
+msgid "Unexpected `}'"
+msgstr "Oväntat \"}\""
+
+#: sed/compile.c:177
+msgid "Extra characters after command"
+msgstr "Extra tecken efter kommandot"
+
+#: sed/compile.c:178
+msgid "Expected \\ after `a', `c' or `i'"
+msgstr "\\ förväntades efter \"a\", \"c\" eller \"i\""
+
+#: sed/compile.c:179
+msgid "`}' doesn't want any addresses"
+msgstr "\"}\" vill inte ha några adresser"
+
+#: sed/compile.c:180
+msgid ": doesn't want any addresses"
+msgstr ": vill inte ha några adresser"
+
+#: sed/compile.c:181
+msgid "Comments don't accept any addresses"
+msgstr "Kommentarer accepterar inga adresser"
+
+#: sed/compile.c:182
+msgid "Missing command"
+msgstr "Kommando saknas"
+
+#: sed/compile.c:183
+msgid "Command only uses one address"
+msgstr "Kommandot använder endast en adress"
+
+#: sed/compile.c:184
+msgid "Unterminated address regex"
+msgstr "Oavslutat reguljärt uttryck för adress"
+
+#: sed/compile.c:185
+msgid "Unterminated `s' command"
+msgstr "Oavslutat \"s\"-kommando"
+
+#: sed/compile.c:186
+msgid "Unterminated `y' command"
+msgstr "Oavslutat \"y\"-kommando"
+
+#: sed/compile.c:187
+msgid "Unknown option to `s'"
+msgstr "Flaggan okänd för \"s\""
+
+#: sed/compile.c:188
+msgid "multiple `p' options to `s' command"
+msgstr "flera \"p\"-flaggor till \"s\"-kommandot"
+
+#: sed/compile.c:189
+msgid "multiple `g' options to `s' command"
+msgstr "flera \"g\"-flaggor till \"s\"-kommandot"
+
+#: sed/compile.c:190
+msgid "multiple number options to `s' command"
+msgstr "flera sifferflaggor till \"s\"-kommandot"
+
+#: sed/compile.c:191
+msgid "number option to `s' command may not be zero"
+msgstr "sifferflagga till kommandot \"s\" får inte vara noll"
+
+#: sed/compile.c:192
+msgid "strings for y command are different lengths"
+msgstr "strängarna för kommandot \"y\" är olika långa"
+
+#: sed/compile.c:193
+msgid "expected newer version of sed"
+msgstr "nyare version av sed förväntades"
+
+#: sed/compile.c:236
+#, c-format
+msgid "Called savchar() with unexpected pushback (%x)"
+msgstr "Anropade savchar() med oväntat returtecken (%x)"
+
+#: sed/compile.c:1331
+msgid "Unknown command:"
+msgstr "Okänt kommando:"
+
+#: sed/compile.c:1352
+#, c-format
+msgid "%s: file %s line %lu: %s\n"
+msgstr "%s: fil %s rad %lu: %s\n"
+
+#: sed/compile.c:1355
+#, c-format
+msgid "%s: -e expression #%lu, char %lu: %s\n"
+msgstr "%s: -e uttryck #%lu, tecken %lu: %s\n"
+
+#: sed/compile.c:1555
+#, c-format
+msgid "Can't find label for jump to `%s'"
+msgstr "Kan inte hitta etiketten för hopp till \"%s\""
+
+#: sed/execute.c:505
+#, c-format
+msgid "%s: can't read %s: %s\n"
+msgstr "%s: kan inte läsa %s: %s\n"
+
+#: sed/execute.c:530 sed/execute.c:542
+#, c-format
+msgid "Couldn't open temporary file %s: %s"
+msgstr "Kunde inte öppna temporära filen %s: %s"
+
+#: sed/execute.c:728
+msgid "INTERNAL ERROR: bad address type"
+msgstr "INTERNT FEL: felaktig addresstyp"
+
+#: sed/execute.c:1022 sed/execute.c:1200
+msgid "error in subprocess"
+msgstr "fel i underprocess"
+
+#: sed/execute.c:1024
+msgid "option `e' not supported"
+msgstr "flaggan \"e\" stöds inte"
+
+#: sed/execute.c:1202
+msgid "`e' command not supported"
+msgstr "kommandot \"e\" stöds inte"
+
+#: sed/execute.c:1438
+#, c-format
+msgid "INTERNAL ERROR: Bad cmd %c"
+msgstr "INTERNT FEL: Felaktigt kommando %c"
+
+#: sed/regexp.c:39 lib/regcomp.c:665
+msgid "No previous regular expression"
+msgstr "Inget tidigare reguljärt uttryck"
+
+#: sed/regexp.c:40
+msgid "Cannot specify modifiers on empty regexp"
+msgstr "Kan inte ange modifierare på tomt reguljärt uttryck"
+
+#: sed/regexp.c:134
+#, c-format
+msgid "Invalid reference \\%d on `s' command's RHS"
+msgstr "Ogiltig referens \\%d på \"s\"-kommandots RHS"
+
+#: sed/sed.c:95
+msgid ""
+"  -R, --regexp-perl\n"
+"                 use Perl 5's regular expressions syntax in the script.\n"
+msgstr ""
+"  -R, --regexp-perl\n"
+"                 använd Perl 5:s syntax för reguljära uttryck i skriptet.\n"
+
+#: sed/sed.c:100
+#, c-format
+msgid ""
+"Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 suppress automatic printing of pattern space\n"
+"  -e script, --expression=script\n"
+"                 add the script to the commands to be executed\n"
+"  -f script-file, --file=script-file\n"
+"                 add the contents of script-file to the commands to be "
+"executed\n"
+"  -i[suffix], --in-place[=suffix]\n"
+"                 edit files in place (makes backup if extension supplied)\n"
+"  -l N, --line-length=N\n"
+"                 specify the desired line-wrap length for the `l' command\n"
+"  -r, --regexp-extended\n"
+"                 use extended regular expressions in the script.\n"
+"%s  -s, --separate\n"
+"                 consider files as separate rather than as a single "
+"continuous\n"
+"                 long stream.\n"
+"  -u, --unbuffered\n"
+"                 load minimal amounts of data from the input files and "
+"flush\n"
+"                 the output buffers more often\n"
+"      --help     display this help and exit\n"
+"  -V, --version  output version information and exit\n"
+"\n"
+"If no -e, --expression, -f, or --file option is given, then the first\n"
+"non-option argument is taken as the sed script to interpret.  All\n"
+"remaining arguments are names of input files; if no input files are\n"
+"specified, then the standard input is read.\n"
+"\n"
+msgstr ""
+"Användning: %s [FLAGGA]... {skript-endast-om-inga-andra} [indatafil]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 förhindrar automatisk utskrift av mönsterutrymme\n"
+"  -e skript, --expression=skript\n"
+"                 lägg till skript till de kommandon som ska utföras\n"
+"  -f skriptfil, --file=skriptfil\n"
+"                 lägg till innehållet i skriptfil till de kommandon som ska\n"
+"                 utföras\n"
+"  -i[suffix], --in-place[=suffix]\n"
+"                 redigera filer på plats (skapa säkerhetskopia om tillägg\n"
+"                 tillhandahålls)\n"
+"  -l N, --line-length=N\n"
+"                 ange önskad radbrytningslängd för \"l\"-kommandot\n"
+"  -r, --regexp-extended\n"
+"                 använd utökade reguljära uttryck i skriptet.\n"
+"%s  -s, --separate\n"
+"                 betrakta filer som separata istället för en ensam och\n"
+"                 sammanhållen lång ström.\n"
+"  -u, --unbuffered\n"
+"                 läs in minimala mängder data från indatafilerna och töm\n"
+"                 utdatabufferterna oftare\n"
+"      --help     visa denna hjälptext och avsluta\n"
+"  -V, --version  visa versionsinformation och avsluta\n"
+"\n"
+"Om ingen av flaggorna -e, --expression, -f, eller --file ges, blir det\n"
+"första argumentet som inte är en flagga det sed-skript som tolkas. Alla\n"
+"återstående argument är namn på indatafiler; om inga indatafiler är angivna\n"
+"läses standard in.\n"
+"\n"
+
+#: sed/sed.c:129
+#, c-format
+msgid ""
+"E-mail bug reports to: %s .\n"
+"Be sure to include the word ``%s'' somewhere in the ``Subject:'' field.\n"
+msgstr ""
+"Rapportera fel till: %s .\n"
+"Ange ordet \"%s\" på något ställe i \"Ärende:\"-fältet.\n"
+"Skicka anmärkningar på översättningen till <sv@li.org>.\n"
+
+#: sed/sed.c:254
+#, c-format
+msgid "super-sed version %s\n"
+msgstr "super-sed version %s\n"
+
+#: sed/sed.c:255
+msgid ""
+"based on GNU sed version 3.02.80\n"
+"\n"
+msgstr ""
+"baserad på GNU sed version 3.02.80\n"
+"\n"
+
+#: sed/sed.c:257
+#, c-format
+msgid "GNU sed version %s\n"
+msgstr "GNU sed version %s\n"
+
+#: sed/sed.c:259
+#, c-format
+msgid ""
+"%s\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE,\n"
+"to the extent permitted by law.\n"
+msgstr ""
+"%s\n"
+"(Följande text är en informell översättning som enbart tillhandahålls\n"
+" i informativt syfte. För alla juridiska tolkningar gäller den engelska\n"
+" originaltexten.)\n"
+"Det här är fri programvara; se källkoden angående villkor för kopiering.\n"
+"Det finns INGEN garanti; inte ens för SÄLJBARHET eller LÄMPLIGHET FÖR NÅGOT\n"
+"SPECIELLT ÄNDAMÅL, i den omfattning som medges av gällande lag.\n"
+
+#: lib/utils.c:126
+#, c-format
+msgid "Couldn't open file %s: %s"
+msgstr "Kunde inte öppna filen %s: %s"
+
+#: lib/utils.c:160
+#, c-format
+msgid "couldn't write %d item to %s: %s"
+msgid_plural "couldn't write %d items to %s: %s"
+msgstr[0] "kunde inte skriva %d objekt till %s: %s"
+msgstr[1] "kunde inte skriva %d objekt till %s: %s"
+
+#: lib/utils.c:175
+#, c-format
+msgid "read error on %s: %s"
+msgstr "läsfel vid %s: %s"
+
+#: lib/regcomp.c:149
+msgid "Success"
+msgstr "Lyckades"
+
+#: lib/regcomp.c:152
+msgid "No match"
+msgstr "Ingen träff"
+
+#: lib/regcomp.c:155
+msgid "Invalid regular expression"
+msgstr "Ogiltigt reguljärt uttryck"
+
+#: lib/regcomp.c:158
+msgid "Invalid collation character"
+msgstr "Ogiltigt sorteringstecken"
+
+#: lib/regcomp.c:161
+msgid "Invalid character class name"
+msgstr "Ogiltigt teckenklassnamn"
+
+#: lib/regcomp.c:164
+msgid "Trailing backslash"
+msgstr "Eftersläpande omvänt snedstreck"
+
+#: lib/regcomp.c:167
+msgid "Invalid back reference"
+msgstr "Ogiltig bakåtreferens"
+
+#: lib/regcomp.c:170
+msgid "Unmatched [ or [^"
+msgstr "Ensamt [ eller [^"
+
+#: lib/regcomp.c:173
+msgid "Unmatched ( or \\("
+msgstr "Ensamt ( eller \\("
+
+#: lib/regcomp.c:176
+msgid "Unmatched \\{"
+msgstr "Ensamt \\{"
+
+#: lib/regcomp.c:179
+msgid "Invalid content of \\{\\}"
+msgstr "Ogiltigt innehåll i \\{\\}"
+
+#: lib/regcomp.c:182
+msgid "Invalid range end"
+msgstr "Ogiltigt intervallslut"
+
+#: lib/regcomp.c:185
+msgid "Memory exhausted"
+msgstr "Minnet slut"
+
+#: lib/regcomp.c:188
+msgid "Invalid preceding regular expression"
+msgstr "Ogiltigt föregående reguljärt uttryck"
+
+#: lib/regcomp.c:191
+msgid "Premature end of regular expression"
+msgstr "För tidigt slut på reguljärt uttryck"
+
+#: lib/regcomp.c:194
+msgid "Regular expression too big"
+msgstr "Reguljärt uttryck för stort"
+
+#: lib/regcomp.c:197
+msgid "Unmatched ) or \\)"
+msgstr "Ensamt ) eller \\)"
+
+#~ msgid "Invalid use of address modifier"
+#~ msgstr "Felaktig användning av adressmodifierare"
+
+#~ msgid "Unexpected End-of-file"
+#~ msgstr "Oväntat filslut"
+
+#~ msgid "bad regexp: %s\n"
+#~ msgstr "felaktigt reguljärt uttryck: %s\n"
+
+#~ msgid "input read error: %s"
+#~ msgstr "fel vid läsning av indata: %s"
+
+#~ msgid "couldn't write an item to %s: %s"
+#~ msgstr "kunde inte skriva ett objekt till %s: %s"

@@ -1,0 +1,367 @@
+# Estonian translations for GNU sed.
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Toomas Soome <Toomas.Soome@microlink.ee>, 2003.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: sed 4.0.8\n"
+"POT-Creation-Date: 2004-01-10 08:46+0100\n"
+"PO-Revision-Date: 2003-10-24 19:39+0300\n"
+"Last-Translator: Toomas Soome <Toomas.Soome@microlink.ee>\n"
+"Language-Team: Estonian <et@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-15\n"
+"Content-Transfer-Encoding: 8-bit\n"
+"Report-Msgid-Bugs-To: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: sed/compile.c:172
+msgid "Multiple `!'s"
+msgstr "Korduv `!'"
+
+#: sed/compile.c:173
+msgid "Unexpected `,'"
+msgstr "Ootamatu `,'"
+
+#: sed/compile.c:174
+msgid "Cannot use +N or ~N as first address"
+msgstr "+N või ~N ei või kasutada esimese aadressina"
+
+#: sed/compile.c:175
+msgid "Unmatched `{'"
+msgstr "Liigne `{'"
+
+#: sed/compile.c:176
+msgid "Unexpected `}'"
+msgstr "Ootamatu `}'"
+
+#: sed/compile.c:177
+msgid "Extra characters after command"
+msgstr "Lisasümbolid peale käsku"
+
+#: sed/compile.c:178
+msgid "Expected \\ after `a', `c' or `i'"
+msgstr "Peale `a', `c' või `i' peab olema \\"
+
+#: sed/compile.c:179
+msgid "`}' doesn't want any addresses"
+msgstr "`}' ei vaja aadresse"
+
+#: sed/compile.c:180
+msgid ": doesn't want any addresses"
+msgstr ": ei vaja aadresse"
+
+#: sed/compile.c:181
+msgid "Comments don't accept any addresses"
+msgstr "Kommentaarid ei vaja aadresse"
+
+#: sed/compile.c:182
+msgid "Missing command"
+msgstr "Käsk puudub"
+
+#: sed/compile.c:183
+msgid "Command only uses one address"
+msgstr "Käsk kasutab vaid üht aadressi"
+
+#: sed/compile.c:184
+msgid "Unterminated address regex"
+msgstr "Lõpetamata aadressi avaldis"
+
+#: sed/compile.c:185
+msgid "Unterminated `s' command"
+msgstr "Lõpetamata `s' käsk"
+
+#: sed/compile.c:186
+msgid "Unterminated `y' command"
+msgstr "Lõpetamata `y' käsk"
+
+#: sed/compile.c:187
+msgid "Unknown option to `s'"
+msgstr "Tundmatu võti `s' käsule"
+
+#: sed/compile.c:188
+msgid "multiple `p' options to `s' command"
+msgstr "korduv `p' võti `s' käsus"
+
+#: sed/compile.c:189
+msgid "multiple `g' options to `s' command"
+msgstr "korduv `g' võti `s' käsus"
+
+#: sed/compile.c:190
+msgid "multiple number options to `s' command"
+msgstr "korduvad numbrivõtmed `s' käsus"
+
+#: sed/compile.c:191
+msgid "number option to `s' command may not be zero"
+msgstr "numbrivõti `s' käsus ei või olla null"
+
+#: sed/compile.c:192
+msgid "strings for y command are different lengths"
+msgstr "sõned y käsus on erineva pikkusega"
+
+#: sed/compile.c:193
+msgid "expected newer version of sed"
+msgstr "oodati sedi uuemat versiooni"
+
+#: sed/compile.c:236
+#, c-format
+msgid "Called savchar() with unexpected pushback (%x)"
+msgstr "kutsuti savchar() ootamatu pushback (%x)"
+
+#: sed/compile.c:1331
+msgid "Unknown command:"
+msgstr "Tundmatu käsk:"
+
+#: sed/compile.c:1352
+#, c-format
+msgid "%s: file %s line %lu: %s\n"
+msgstr "%s: fail %s rida %lu: %s\n"
+
+#: sed/compile.c:1355
+#, c-format
+msgid "%s: -e expression #%lu, char %lu: %s\n"
+msgstr "%s: -e avaldis #%lu, sümbol %lu: %s\n"
+
+#: sed/compile.c:1555
+#, c-format
+msgid "Can't find label for jump to `%s'"
+msgstr "Ei leia märgendit, et hüpata kohale `%s'"
+
+#: sed/execute.c:505
+#, c-format
+msgid "%s: can't read %s: %s\n"
+msgstr "%s: ei saa lugeda %s: %s\n"
+
+#: sed/execute.c:530 sed/execute.c:542
+#, c-format
+msgid "Couldn't open temporary file %s: %s"
+msgstr "Ajutist faili %s ei saa avada: %s"
+
+#: sed/execute.c:728
+msgid "INTERNAL ERROR: bad address type"
+msgstr "SISEMINE VIGA: vigane aadressi tüüp"
+
+#: sed/execute.c:1022 sed/execute.c:1200
+msgid "error in subprocess"
+msgstr "viga alamprotsessis"
+
+#: sed/execute.c:1024
+msgid "option `e' not supported"
+msgstr "võtit `e' ei toetata"
+
+#: sed/execute.c:1202
+msgid "`e' command not supported"
+msgstr "käsku `e' ei toetata"
+
+#: sed/execute.c:1438
+#, c-format
+msgid "INTERNAL ERROR: Bad cmd %c"
+msgstr "SISEMINE VIGA: Halb käsk %c"
+
+#: sed/regexp.c:39 lib/regcomp.c:665
+msgid "No previous regular expression"
+msgstr "Eelmist regulaaravaldist pole"
+
+#: sed/regexp.c:40
+msgid "Cannot specify modifiers on empty regexp"
+msgstr "Muudatusi tühjale regulaaravaldisele ei saa määrata"
+
+#: sed/regexp.c:134
+#, c-format
+msgid "Invalid reference \\%d on `s' command's RHS"
+msgstr "Vigane viide \\%d käsu `s' paremas pooles"
+
+#: sed/sed.c:95
+msgid ""
+"  -R, --regexp-perl\n"
+"                 use Perl 5's regular expressions syntax in the script.\n"
+msgstr ""
+"  -R, --regexp-perl\n"
+"                 kasuta skriptis Perl 5 regulaaravaldiste süntaksit.\n"
+
+#: sed/sed.c:100
+#, c-format
+msgid ""
+"Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 suppress automatic printing of pattern space\n"
+"  -e script, --expression=script\n"
+"                 add the script to the commands to be executed\n"
+"  -f script-file, --file=script-file\n"
+"                 add the contents of script-file to the commands to be "
+"executed\n"
+"  -i[suffix], --in-place[=suffix]\n"
+"                 edit files in place (makes backup if extension supplied)\n"
+"  -l N, --line-length=N\n"
+"                 specify the desired line-wrap length for the `l' command\n"
+"  -r, --regexp-extended\n"
+"                 use extended regular expressions in the script.\n"
+"%s  -s, --separate\n"
+"                 consider files as separate rather than as a single "
+"continuous\n"
+"                 long stream.\n"
+"  -u, --unbuffered\n"
+"                 load minimal amounts of data from the input files and "
+"flush\n"
+"                 the output buffers more often\n"
+"      --help     display this help and exit\n"
+"  -V, --version  output version information and exit\n"
+"\n"
+"If no -e, --expression, -f, or --file option is given, then the first\n"
+"non-option argument is taken as the sed script to interpret.  All\n"
+"remaining arguments are names of input files; if no input files are\n"
+"specified, then the standard input is read.\n"
+"\n"
+msgstr ""
+"Kasuta: %s [VÕTI]... {skript-siis-kui-teisi-skripte-pole} [sisendfail]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 keela automaatne mustriruumi väljastamine\n"
+"  -e skript, --expression=skript\n"
+"                 lisa skript täidetavate käskude nimekirja\n"
+"  -f skript-fail, --file=skript-fail\n"
+"                 lisa skript-faili sisu täidetavate käskude nimekirja\n"
+"  -i[sufiks], --in-place[=sufiks]\n"
+"                 toimeta faile kohapeal (teeb varukoopia, kui on sufiks)\n"
+"  -l N, --line-length=N\n"
+"                 määra `l' käsule rea pikkus\n"
+"  -r, --regexp-extended\n"
+"                 kasuta skriptis laiendatud regulaaravaldisi\n"
+"%s  -s, --separate\n"
+"                 käsitle faile eraldi, mitte ühe pideva voona.\n"
+"  -u, --unbuffered\n"
+"                 puhverdamata väljund\n"
+"      --help     esita see abiinfo ja lõpeta töö\n"
+"  -V, --version  esita versiooniinfo ja lõpeta töö\n"
+"\n"
+"Kui võtit -e, --expression, -f või --file pole antud, siis kasutatakse\n"
+"esimest mitte-võtmelist argumenti interpreteeritava sed skriptina. Kõik\n"
+"ülejäänud argumendid on sisendfailide nimed; kui sisendfailide nimesid\n"
+"pole, loetakse info standardsisendist.\n"
+"\n"
+
+#: sed/sed.c:129
+#, c-format
+msgid ""
+"E-mail bug reports to: %s .\n"
+"Be sure to include the word ``%s'' somewhere in the ``Subject:'' field.\n"
+msgstr ""
+"Postitage teated vigadest: %s .\n"
+"Lisage kindlasti sõna ``%s'' ``Subject:'' reale.\n"
+
+#: sed/sed.c:254
+#, c-format
+msgid "super-sed version %s\n"
+msgstr "super-sed versioon %s\n"
+
+#: sed/sed.c:255
+msgid ""
+"based on GNU sed version 3.02.80\n"
+"\n"
+msgstr ""
+"põhineb GNU sed versioonil 3.02.80\n"
+"\n"
+
+#: sed/sed.c:257
+#, c-format
+msgid "GNU sed version %s\n"
+msgstr "GNU sed versioon %s\n"
+
+#: sed/sed.c:259
+#, c-format
+msgid ""
+"%s\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE,\n"
+"to the extent permitted by law.\n"
+msgstr ""
+"%s\n"
+"See on vaba tarkvara; kopeerimistingimused leiate lähtetekstidest. Garantii\n"
+"PUUDUB; ka müügiks või mingil eesmärgil kasutamiseks, vastavalt seadustega\n"
+"lubatud piiridele.\n"
+
+#: lib/utils.c:126
+#, c-format
+msgid "Couldn't open file %s: %s"
+msgstr "Faili %s ei saa avada: %s"
+
+#: lib/utils.c:160
+#, c-format
+msgid "couldn't write %d item to %s: %s"
+msgid_plural "couldn't write %d items to %s: %s"
+msgstr[0] "%d elemendi faili %s kirjutamine ebaõnnestus: %s"
+msgstr[1] "%d elemendi faili %s kirjutamine ebaõnnestus: %s"
+
+#: lib/utils.c:175
+#, c-format
+msgid "read error on %s: %s"
+msgstr "lugemisviga %s: %s"
+
+#: lib/regcomp.c:149
+msgid "Success"
+msgstr "Edukas"
+
+#: lib/regcomp.c:152
+msgid "No match"
+msgstr "Ei leia"
+
+#: lib/regcomp.c:155
+msgid "Invalid regular expression"
+msgstr "Vigane regulaaravaldis"
+
+#: lib/regcomp.c:158
+msgid "Invalid collation character"
+msgstr "Vigane sortimise sümbol"
+
+#: lib/regcomp.c:161
+msgid "Invalid character class name"
+msgstr "Vigane sümbolite klassi nimi"
+
+#: lib/regcomp.c:164
+msgid "Trailing backslash"
+msgstr "Lõpetav langkriips"
+
+#: lib/regcomp.c:167
+msgid "Invalid back reference"
+msgstr "Vigane tagasi viide"
+
+#: lib/regcomp.c:170
+msgid "Unmatched [ or [^"
+msgstr "Puudub [ või [^"
+
+#: lib/regcomp.c:173
+msgid "Unmatched ( or \\("
+msgstr "Puudub ( või \\("
+
+#: lib/regcomp.c:176
+msgid "Unmatched \\{"
+msgstr "Puudub \\{"
+
+#: lib/regcomp.c:179
+msgid "Invalid content of \\{\\}"
+msgstr "Vigane \\{\\} sisu"
+
+#: lib/regcomp.c:182
+msgid "Invalid range end"
+msgstr "Vigane vahemiku lõpp"
+
+#: lib/regcomp.c:185
+msgid "Memory exhausted"
+msgstr "Mälu on otsas"
+
+#: lib/regcomp.c:188
+msgid "Invalid preceding regular expression"
+msgstr "Vigane eelnev regulaaravaldis"
+
+#: lib/regcomp.c:191
+msgid "Premature end of regular expression"
+msgstr "Ootamatu regulaaravaldise lõpp"
+
+#: lib/regcomp.c:194
+msgid "Regular expression too big"
+msgstr "Regulaaravaldis on liiga suur"
+
+#: lib/regcomp.c:197
+msgid "Unmatched ) or \\)"
+msgstr "Puudub ) või \\)"

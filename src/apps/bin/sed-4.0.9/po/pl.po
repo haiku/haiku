@@ -1,0 +1,378 @@
+# Polish translations for GNU sed package.
+# Copyright (C) 2003 Free Software Foundation, Inc.
+# Wojciech Polak <polak@gnu.org>, 2003.
+# corrections: Jakub Bogusz <qboosh@pld-linux.org>, 2003.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: sed 4.0.8\n"
+"POT-Creation-Date: 2004-01-10 08:46+0100\n"
+"PO-Revision-Date: 2003-10-25 01:24+0200\n"
+"Last-Translator: Wojciech Polak <polak@gnu.org>\n"
+"Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: \n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: sed/compile.c:172
+msgid "Multiple `!'s"
+msgstr "Wielokrotny znak `!'"
+
+#: sed/compile.c:173
+msgid "Unexpected `,'"
+msgstr "Nieoczekiwany znak `,'"
+
+#: sed/compile.c:174
+msgid "Cannot use +N or ~N as first address"
+msgstr "Nie mo¿na u¿ywaæ +N lub ~N jako pierwszego adresu"
+
+#: sed/compile.c:175
+msgid "Unmatched `{'"
+msgstr "Niedopasowany znak `{'"
+
+#: sed/compile.c:176
+msgid "Unexpected `}'"
+msgstr "Nieoczekiwany znak `}'"
+
+#: sed/compile.c:177
+msgid "Extra characters after command"
+msgstr "Dodatkowe znaki po poleceniu"
+
+#: sed/compile.c:178
+msgid "Expected \\ after `a', `c' or `i'"
+msgstr "Oczekiwano znaku \\ po `a', `c' lub `i'"
+
+#: sed/compile.c:179
+msgid "`}' doesn't want any addresses"
+msgstr "`}' nie chce ¿adnych adresów"
+
+#: sed/compile.c:180
+msgid ": doesn't want any addresses"
+msgstr ": nie chce ¿adnych adresów"
+
+#: sed/compile.c:181
+msgid "Comments don't accept any addresses"
+msgstr "Komentarze nie akceptuj± ¿adnych adresów"
+
+#: sed/compile.c:182
+msgid "Missing command"
+msgstr "Brakuje polecenia"
+
+#: sed/compile.c:183
+msgid "Command only uses one address"
+msgstr "Polecenie u¿ywa tylko jednego adresu"
+
+#: sed/compile.c:184
+msgid "Unterminated address regex"
+msgstr "Niezakoñczony adres wyra¿enia regularnego"
+
+#: sed/compile.c:185
+msgid "Unterminated `s' command"
+msgstr "Niezakoñczone polecenie `s'"
+
+#: sed/compile.c:186
+msgid "Unterminated `y' command"
+msgstr "Niezakoñczone polecenie `y'"
+
+#: sed/compile.c:187
+msgid "Unknown option to `s'"
+msgstr "Nieznana opcja dla polecenia `s'"
+
+#: sed/compile.c:188
+msgid "multiple `p' options to `s' command"
+msgstr "wielokrotne opcje `p' dla polecenia `s'"
+
+#: sed/compile.c:189
+msgid "multiple `g' options to `s' command"
+msgstr "wielokrotne opcje `g' dla polecenia `s'"
+
+#: sed/compile.c:190
+msgid "multiple number options to `s' command"
+msgstr "wielokrotne opcje liczbowe dla polecenia `s'"
+
+#: sed/compile.c:191
+msgid "number option to `s' command may not be zero"
+msgstr "opcja liczbowa dla polecenia `s' nie mo¿e byæ zerem"
+
+#: sed/compile.c:192
+msgid "strings for y command are different lengths"
+msgstr "³añcuchy dla polecenia y s± ró¿nych d³ugo¶ci"
+
+#: sed/compile.c:193
+msgid "expected newer version of sed"
+msgstr "oczekiwano nowszej wersji programu sed"
+
+#: sed/compile.c:236
+#, c-format
+msgid "Called savchar() with unexpected pushback (%x)"
+msgstr "Wywo³ano funkcjê savchar() z nieoczekiwanym zwrotem (%x)"
+
+#: sed/compile.c:1331
+msgid "Unknown command:"
+msgstr "Nieznane polecenie:"
+
+#: sed/compile.c:1352
+#, c-format
+msgid "%s: file %s line %lu: %s\n"
+msgstr "%s: plik %s linia %lu: %s\n"
+
+#: sed/compile.c:1355
+#, c-format
+msgid "%s: -e expression #%lu, char %lu: %s\n"
+msgstr "%s: -e wyra¿enie #%lu, znak %lu: %s\n"
+
+#: sed/compile.c:1555
+#, c-format
+msgid "Can't find label for jump to `%s'"
+msgstr "Nie mo¿na znale¼æ etykiety dla skoku do `%s'"
+
+#: sed/execute.c:505
+#, c-format
+msgid "%s: can't read %s: %s\n"
+msgstr "%s: nie mo¿na odczytaæ %s: %s\n"
+
+#: sed/execute.c:530 sed/execute.c:542
+#, c-format
+msgid "Couldn't open temporary file %s: %s"
+msgstr "Nie mo¿na otworzyæ tymczasowego pliku %s: %s"
+
+#: sed/execute.c:728
+msgid "INTERNAL ERROR: bad address type"
+msgstr "WEWNÊTRZNY B£¡D: nieprawid³owy typ adresu"
+
+#: sed/execute.c:1022 sed/execute.c:1200
+msgid "error in subprocess"
+msgstr "b³±d w podprocesie"
+
+#: sed/execute.c:1024
+msgid "option `e' not supported"
+msgstr "opcja `e' nie jest wspierana"
+
+#: sed/execute.c:1202
+msgid "`e' command not supported"
+msgstr "polecenie `e' nie jest wspierane"
+
+#: sed/execute.c:1438
+#, c-format
+msgid "INTERNAL ERROR: Bad cmd %c"
+msgstr "WEWNÊTRZNY B£¡D: Nieprawid³owe polecenie %c"
+
+#: sed/regexp.c:39 lib/regcomp.c:665
+msgid "No previous regular expression"
+msgstr "Brak poprzedniego wyra¿enia regularnego"
+
+#: sed/regexp.c:40
+msgid "Cannot specify modifiers on empty regexp"
+msgstr "Nie mo¿na wyszczególniæ modyfikatorów w pustym wyra¿eniu regularnym"
+
+#: sed/regexp.c:134
+#, c-format
+msgid "Invalid reference \\%d on `s' command's RHS"
+msgstr "Nieprawid³owe odwo³anie \\%d po prawej stronie polecenia `s'"
+
+#: sed/sed.c:95
+msgid ""
+"  -R, --regexp-perl\n"
+"                 use Perl 5's regular expressions syntax in the script.\n"
+msgstr ""
+"  -R, --regexp-perl\n"
+"                 u¿ywa w skrypcie wyra¿enia regularne zgodne ze sk³adni± "
+"Perl 5.\n"
+
+#: sed/sed.c:100
+#, c-format
+msgid ""
+"Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 suppress automatic printing of pattern space\n"
+"  -e script, --expression=script\n"
+"                 add the script to the commands to be executed\n"
+"  -f script-file, --file=script-file\n"
+"                 add the contents of script-file to the commands to be "
+"executed\n"
+"  -i[suffix], --in-place[=suffix]\n"
+"                 edit files in place (makes backup if extension supplied)\n"
+"  -l N, --line-length=N\n"
+"                 specify the desired line-wrap length for the `l' command\n"
+"  -r, --regexp-extended\n"
+"                 use extended regular expressions in the script.\n"
+"%s  -s, --separate\n"
+"                 consider files as separate rather than as a single "
+"continuous\n"
+"                 long stream.\n"
+"  -u, --unbuffered\n"
+"                 load minimal amounts of data from the input files and "
+"flush\n"
+"                 the output buffers more often\n"
+"      --help     display this help and exit\n"
+"  -V, --version  output version information and exit\n"
+"\n"
+"If no -e, --expression, -f, or --file option is given, then the first\n"
+"non-option argument is taken as the sed script to interpret.  All\n"
+"remaining arguments are names of input files; if no input files are\n"
+"specified, then the standard input is read.\n"
+"\n"
+msgstr ""
+"U¿ycie: %s [OPCJE] {skrypt-tylko-wtedy-gdy-¿aden-inny-skrypt} [plik-"
+"wej¶ciowy]\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 powstrzymuje automatyczne drukowanie przetwarzanych linii.\n"
+"  -e script, --expression=skrypt\n"
+"                 dodaje skrypt do poleceñ, które maj± byæ wykonane.\n"
+"  -f script-file, --file=plik-skryptowy\n"
+"                 dodaje zawarto¶æ pliku skryptowego do poleceñ,\n"
+"                 które maj± byæ wykonane.\n"
+"  -i[rozszerzenie], --in-place[=rozszerzenie]\n"
+"                 edytuje pliki \"w miejscu\" (tworzy kopie zapasowe\n"
+"                 je¿eli zosta³o podane rozszerzenie).\n"
+"  -l N, --line-length=N\n"
+"                 ustala po¿±dan± d³ugo¶æ ³amanych linii dla polecenia `l'.\n"
+"  -r, --regexp-extended\n"
+"                 u¿ywa w skrypcie rozszerzonych wyra¿eñ regularnych.\n"
+"%s  -s, --separate\n"
+"                 traktuje pliki jako oddzielne, a nie jako pojedynczy,\n"
+"                 ci±g³y i d³ugi strumieñ.\n"
+"  -u, --unbuffered\n"
+"                 ³aduje minimaln± ilo¶æ danych z plików wej¶ciowych\n"
+"                 i czê¶ciej oczyszcza bufor wyj¶ciowy.\n"
+"      --help     wy¶wietla tê oto pomoc i koñczy pracê.\n"
+"  -V, --version  wy¶wietla numer wersji i koñczy pracê.\n"
+"\n"
+"Je¿eli nie zostan± podane opcje -e, --expression, -f, lub --file,\n"
+"to wtedy pierwszy argument, który nie jest opcj± linii poleceñ sed,\n"
+"zostanie wziêty jako skrypt sed do przetworzenia. Wszystkie pozosta³e\n"
+"argumenty s± nazwami plików wej¶ciowych; je¿eli nie zostan± podane\n"
+"¿adne pliki wej¶ciowe, to wtedy odczytane zostanie standardowe wej¶cie.\n"
+"\n"
+
+#: sed/sed.c:129
+#, c-format
+msgid ""
+"E-mail bug reports to: %s .\n"
+"Be sure to include the word ``%s'' somewhere in the ``Subject:'' field.\n"
+msgstr ""
+"Ewentualne b³êdy prosimy zg³aszaæ na adres: %s\n"
+"W tym celu proszê dodaæ s³owo ``%s'' do tematu listu.\n"
+
+#: sed/sed.c:254
+#, c-format
+msgid "super-sed version %s\n"
+msgstr "super-sed wersja %s\n"
+
+#: sed/sed.c:255
+msgid ""
+"based on GNU sed version 3.02.80\n"
+"\n"
+msgstr ""
+"na podstawie wersji GNU sed 3.02.80\n"
+"\n"
+
+#: sed/sed.c:257
+#, c-format
+msgid "GNU sed version %s\n"
+msgstr "GNU sed wersja %s\n"
+
+#: sed/sed.c:259
+#, c-format
+msgid ""
+"%s\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE,\n"
+"to the extent permitted by law.\n"
+msgstr ""
+"%s\n"
+"Niniejszy program jest wolnym oprogramowaniem; warunki kopiowania s± "
+"opisane\n"
+"w ¼ród³ach. Autorzy nie daj± ¯ADNYCH gwarancji, w tym równie¿ gwarancji\n"
+"PRZYDATNO¦CI DO SPRZEDA¯Y LUB DO KONKRETNYCH CELÓW.\n"
+
+#: lib/utils.c:126
+#, c-format
+msgid "Couldn't open file %s: %s"
+msgstr "Nie mo¿na otworzyæ pliku %s: %s"
+
+#: lib/utils.c:160
+#, c-format
+msgid "couldn't write %d item to %s: %s"
+msgid_plural "couldn't write %d items to %s: %s"
+msgstr[0] "nie mo¿na zapisaæ %d elementu do %s: %s"
+msgstr[1] "nie mo¿na zapisaæ %d elementów do %s: %s"
+msgstr[2] "nie mo¿na zapisaæ %d elementów do %s: %s"
+
+#: lib/utils.c:175
+#, c-format
+msgid "read error on %s: %s"
+msgstr "b³±d odczytu w %s: %s"
+
+#: lib/regcomp.c:149
+msgid "Success"
+msgstr "Sukces"
+
+#: lib/regcomp.c:152
+msgid "No match"
+msgstr "Brak dopasowania"
+
+#: lib/regcomp.c:155
+msgid "Invalid regular expression"
+msgstr "Nieprawid³owe wyra¿enie regularne"
+
+#: lib/regcomp.c:158
+msgid "Invalid collation character"
+msgstr "Nieprawid³owy znak porównania"
+
+#: lib/regcomp.c:161
+msgid "Invalid character class name"
+msgstr "Nieprawid³owa nazwa klasy znaku"
+
+#: lib/regcomp.c:164
+msgid "Trailing backslash"
+msgstr "Koñcowy znak backslash"
+
+#: lib/regcomp.c:167
+msgid "Invalid back reference"
+msgstr "Nieprawid³owe odwo³anie wsteczne"
+
+#: lib/regcomp.c:170
+msgid "Unmatched [ or [^"
+msgstr "Niedopasowany znak [ lub [^"
+
+#: lib/regcomp.c:173
+msgid "Unmatched ( or \\("
+msgstr "Niedopasowany znak ( lub \\("
+
+#: lib/regcomp.c:176
+msgid "Unmatched \\{"
+msgstr "Niedopasowany znak \\{"
+
+#: lib/regcomp.c:179
+msgid "Invalid content of \\{\\}"
+msgstr "Nieprawid³owa zawarto¶æ \\{\\}"
+
+#: lib/regcomp.c:182
+msgid "Invalid range end"
+msgstr "Nieprawid³owy koniec zakresu"
+
+#: lib/regcomp.c:185
+msgid "Memory exhausted"
+msgstr "Pamiêæ wyczerpana"
+
+#: lib/regcomp.c:188
+msgid "Invalid preceding regular expression"
+msgstr "Nieprawid³owe poprzedzaj±ce wyra¿enie regularne"
+
+#: lib/regcomp.c:191
+msgid "Premature end of regular expression"
+msgstr "Przedwczesny koniec wyra¿enia regularnego"
+
+#: lib/regcomp.c:194
+msgid "Regular expression too big"
+msgstr "Wyra¿enie regularne jest zbyt du¿e"
+
+#: lib/regcomp.c:197
+msgid "Unmatched ) or \\)"
+msgstr "Niedopasowany znak ) lub \\)"

@@ -1,0 +1,1006 @@
+This is sed.info, produced by makeinfo version 4.3 from sed.texi.
+
+INFO-DIR-SECTION Text creation and manipulation
+START-INFO-DIR-ENTRY
+* sed: (sed).                   Stream EDitor.
+
+END-INFO-DIR-ENTRY
+
+
+File: sed.info,  Node: Reverse chars of lines,  Next: tac,  Prev: Print bash environment,  Up: Examples
+
+Reverse Characters of Lines
+===========================
+
+   This script can be used to reverse the position of characters in
+lines.  The technique moves two characters at a time, hence it is
+faster than more intuitive implementations.
+
+   Note the `tx' command before the definition of the label.  This is
+often needed to reset the flag that is tested by the `t' command.
+
+   Imaginative readers will find uses for this script.  An example is
+reversing the output of `banner'.(1)
+
+     #!/usr/bin/sed -f
+     
+     /../! b
+     
+     # Reverse a line.  Begin embedding the line between two newlines
+     s/^.*$/\
+     &\
+     /
+     
+     # Move first character at the end.  The regexp matches until
+     # there are zero or one characters between the markers
+     tx
+     :x
+     s/\(\n.\)\(.*\)\(.\n\)/\3\2\1/
+     tx
+     
+     # Remove the newline markers
+     s/\n//g
+
+   ---------- Footnotes ----------
+
+   (1) This requires another script to pad the output of banner; for
+example
+
+     #! /bin/sh
+     
+     banner -w $1 $2 $3 $4 |
+       sed -e :a -e '/^.\{0,'$1'\}$/ { s/$/ /; ba; }' |
+       ~/sedscripts/reverseline.sed
+
+
+File: sed.info,  Node: tac,  Next: cat -n,  Prev: Reverse chars of lines,  Up: Examples
+
+Reverse Lines of Files
+======================
+
+   This one begins a series of totally useless (yet interesting)
+scripts emulating various Unix commands.  This, in particular, is a
+`tac' workalike.
+
+   Note that on implementations other than GNU `sed' this script might
+easily overflow internal buffers.
+
+     #!/usr/bin/sed -nf
+     
+     # reverse all lines of input, i.e. first line became last, ...
+     
+     # from the second line, the buffer (which contains all previous lines)
+     # is *appended* to current line, so, the order will be reversed
+     1! G
+     
+     # on the last line we're done -- print everything
+     $ p
+     
+     # store everything on the buffer again
+     h
+
+
+File: sed.info,  Node: cat -n,  Next: cat -b,  Prev: tac,  Up: Examples
+
+Numbering Lines
+===============
+
+   This script replaces `cat -n'; in fact it formats its output exactly
+like GNU `cat' does.
+
+   Of course this is completely useless and for two reasons:  first,
+because somebody else did it in C, second, because the following
+Bourne-shell script could be used for the same purpose and would be
+much faster:
+
+     #! /bin/sh
+     sed -e "=" $@ | sed -e '
+       s/^/      /
+       N
+       s/^ *\(......\)\n/\1  /
+     '
+
+   It uses `sed' to print the line number, then groups lines two by two
+using `N'.  Of course, this script does not teach as much as the one
+presented below.
+
+   The algorithm used for incrementing uses both buffers, so the line
+is printed as soon as possible and then discarded.  The number is split
+so that changing digits go in a buffer and unchanged ones go in the
+other; the changed digits are modified in a single step (using a `y'
+command).  The line number for the next line is then composed and
+stored in the hold space, to be used in the next iteration.
+
+     #!/usr/bin/sed -nf
+     
+     # Prime the pump on the first line
+     x
+     /^$/ s/^.*$/1/
+     
+     # Add the correct line number before the pattern
+     G
+     h
+     
+     # Format it and print it
+     s/^/      /
+     s/^ *\(......\)\n/\1  /p
+     
+     # Get the line number from hold space; add a zero
+     # if we're going to add a digit on the next line
+     g
+     s/\n.*$//
+     /^9*$/ s/^/0/
+     
+     # separate changing/unchanged digits with an x
+     s/.9*$/x&/
+     
+     # keep changing digits in hold space
+     h
+     s/^.*x//
+     y/0123456789/1234567890/
+     x
+     
+     # keep unchanged digits in pattern space
+     s/x.*$//
+     
+     # compose the new number, remove the newline implicitly added by G
+     G
+     s/\n//
+     h
+
+
+File: sed.info,  Node: cat -b,  Next: wc -c,  Prev: cat -n,  Up: Examples
+
+Numbering Non-blank Lines
+=========================
+
+   Emulating `cat -b' is almost the same as `cat -n'--we only have to
+select which lines are to be numbered and which are not.
+
+   The part that is common to this script and the previous one is not
+commented to show how important it is to comment `sed' scripts
+properly...
+
+     #!/usr/bin/sed -nf
+     
+     /^$/ {
+       p
+       b
+     }
+     
+     # Same as cat -n from now
+     x
+     /^$/ s/^.*$/1/
+     G
+     h
+     s/^/      /
+     s/^ *\(......\)\n/\1  /p
+     x
+     s/\n.*$//
+     /^9*$/ s/^/0/
+     s/.9*$/x&/
+     h
+     s/^.*x//
+     y/0123456789/1234567890/
+     x
+     s/x.*$//
+     G
+     s/\n//
+     h
+
+
+File: sed.info,  Node: wc -c,  Next: wc -w,  Prev: cat -b,  Up: Examples
+
+Counting Characters
+===================
+
+   This script shows another way to do arithmetic with `sed'.  In this
+case we have to add possibly large numbers, so implementing this by
+successive increments would not be feasible (and possibly even more
+complicated to contrive than this script).
+
+   The approach is to map numbers to letters, kind of an abacus
+implemented with `sed'.  `a's are units, `b's are tenths and so on: we
+simply add the number of characters on the current line as units, and
+then propagate the carry to tenths, hundredths, and so on.
+
+   As usual, running totals are kept in hold space.
+
+   On the last line, we convert the abacus form back to decimal.  For
+the sake of variety, this is done with a loop rather than with some 80
+`s' commands(1): first we convert units, removing `a's from the number;
+then we rotate letters so that tenths become `a's, and so on until no
+more letters remain.
+
+     #!/usr/bin/sed -nf
+     
+     # Add n+1 a's to hold space (+1 is for the newline)
+     s/./a/g
+     H
+     x
+     s/\n/a/
+     
+     # Do the carry.  The t's and b's are not necessary,
+     # but they do speed up the thing
+     t a
+     : a;  s/aaaaaaaaaa/b/g; t b; b done
+     : b;  s/bbbbbbbbbb/c/g; t c; b done
+     : c;  s/cccccccccc/d/g; t d; b done
+     : d;  s/dddddddddd/e/g; t e; b done
+     : e;  s/eeeeeeeeee/f/g; t f; b done
+     : f;  s/ffffffffff/g/g; t g; b done
+     : g;  s/gggggggggg/h/g; t h; b done
+     : h;  s/hhhhhhhhhh//g
+     
+     : done
+     $! {
+       h
+       b
+     }
+     
+     # On the last line, convert back to decimal
+     
+     : loop
+     /a/! s/[b-h]*/&0/
+     s/aaaaaaaaa/9/
+     s/aaaaaaaa/8/
+     s/aaaaaaa/7/
+     s/aaaaaa/6/
+     s/aaaaa/5/
+     s/aaaa/4/
+     s/aaa/3/
+     s/aa/2/
+     s/a/1/
+     
+     : next
+     y/bcdefgh/abcdefg/
+     /[a-h]/ b loop
+     p
+
+   ---------- Footnotes ----------
+
+   (1) Some implementations have a limit of 199 commands per script
+
+
+File: sed.info,  Node: wc -w,  Next: wc -l,  Prev: wc -c,  Up: Examples
+
+Counting Words
+==============
+
+   This script is almost the same as the previous one, once each of the
+words on the line is converted to a single `a' (in the previous script
+each letter was changed to an `a').
+
+   It is interesting that real `wc' programs have optimized loops for
+`wc -c', so they are much slower at counting words rather than
+characters.  This script's bottleneck, instead, is arithmetic, and
+hence the word-counting one is faster (it has to manage smaller
+numbers).
+
+   Again, the common parts are not commented to show the importance of
+commenting `sed' scripts.
+
+     #!/usr/bin/sed -nf
+     
+     # Convert words to a's
+     s/[ tab][ tab]*/ /g
+     s/^/ /
+     s/ [^ ][^ ]*/a /g
+     s/ //g
+     
+     # Append them to hold space
+     H
+     x
+     s/\n//
+     
+     # From here on it is the same as in wc -c.
+     /aaaaaaaaaa/! bx;   s/aaaaaaaaaa/b/g
+     /bbbbbbbbbb/! bx;   s/bbbbbbbbbb/c/g
+     /cccccccccc/! bx;   s/cccccccccc/d/g
+     /dddddddddd/! bx;   s/dddddddddd/e/g
+     /eeeeeeeeee/! bx;   s/eeeeeeeeee/f/g
+     /ffffffffff/! bx;   s/ffffffffff/g/g
+     /gggggggggg/! bx;   s/gggggggggg/h/g
+     s/hhhhhhhhhh//g
+     :x
+     $! { h; b; }
+     :y
+     /a/! s/[b-h]*/&0/
+     s/aaaaaaaaa/9/
+     s/aaaaaaaa/8/
+     s/aaaaaaa/7/
+     s/aaaaaa/6/
+     s/aaaaa/5/
+     s/aaaa/4/
+     s/aaa/3/
+     s/aa/2/
+     s/a/1/
+     y/bcdefgh/abcdefg/
+     /[a-h]/ by
+     p
+
+
+File: sed.info,  Node: wc -l,  Next: head,  Prev: wc -w,  Up: Examples
+
+Counting Lines
+==============
+
+   No strange things are done now, because `sed' gives us `wc -l'
+functionality for free!!! Look:
+
+     #!/usr/bin/sed -nf
+     $=
+
+
+File: sed.info,  Node: head,  Next: tail,  Prev: wc -l,  Up: Examples
+
+Printing the First Lines
+========================
+
+   This script is probably the simplest useful `sed' script.  It
+displays the first 10 lines of input; the number of displayed lines is
+right before the `q' command.
+
+     #!/usr/bin/sed -f
+     10q
+
+
+File: sed.info,  Node: tail,  Next: uniq,  Prev: head,  Up: Examples
+
+Printing the Last Lines
+=======================
+
+   Printing the last N lines rather than the first is more complex but
+indeed possible.  N is encoded in the second line, before the bang
+character.
+
+   This script is similar to the `tac' script in that it keeps the
+final output in the hold space and prints it at the end:
+
+     #!/usr/bin/sed -nf
+     
+     1! {; H; g; }
+     1,10 !s/[^\n]*\n//
+     $p
+     h
+
+   Mainly, the scripts keeps a window of 10 lines and slides it by
+adding a line and deleting the oldest (the substitution command on the
+second line works like a `D' command but does not restart the loop).
+
+   The "sliding window" technique is a very powerful way to write
+efficient and complex `sed' scripts, because commands like `P' would
+require a lot of work if implemented manually.
+
+   To introduce the technique, which is fully demonstrated in the rest
+of this chapter and is based on the `N', `P' and `D' commands, here is
+an implementation of `tail' using a simple "sliding window."
+
+   This looks complicated but in fact the working is the same as the
+last script: after we have kicked in the appropriate number of lines,
+however, we stop using the hold space to keep inter-line state, and
+instead use `N' and `D' to slide pattern space by one line:
+
+     #!/usr/bin/sed -f
+     
+     1h
+     2,10 {; H; g; }
+     $q
+     1,9d
+     N
+     D
+
+
+File: sed.info,  Node: uniq,  Next: uniq -d,  Prev: tail,  Up: Examples
+
+Make Duplicate Lines Unique
+===========================
+
+   This is an example of the art of using the `N', `P' and `D'
+commands, probably the most difficult to master.
+
+     #!/usr/bin/sed -f
+     h
+     
+     :b
+     # On the last line, print and exit
+     $b
+     N
+     /^\(.*\)\n\1$/ {
+         # The two lines are identical.  Undo the effect of
+         # the n command.
+         g
+         bb
+     }
+     
+     # If the `N' command had added the last line, print and exit
+     $b
+     
+     # The lines are different; print the first and go
+     # back working on the second.
+     P
+     D
+
+   As you can see, we mantain a 2-line window using `P' and `D'.  This
+technique is often used in advanced `sed' scripts.
+
+
+File: sed.info,  Node: uniq -d,  Next: uniq -u,  Prev: uniq,  Up: Examples
+
+Print Duplicated Lines of Input
+===============================
+
+   This script prints only duplicated lines, like `uniq -d'.
+
+     #!/usr/bin/sed -nf
+     
+     $b
+     N
+     /^\(.*\)\n\1$/ {
+         # Print the first of the duplicated lines
+         s/.*\n//
+         p
+     
+         # Loop until we get a different line
+         :b
+         $b
+         N
+         /^\(.*\)\n\1$/ {
+             s/.*\n//
+             bb
+         }
+     }
+     
+     # The last line cannot be followed by duplicates
+     $b
+     
+     # Found a different one.  Leave it alone in the pattern space
+     # and go back to the top, hunting its duplicates
+     D
+
+
+File: sed.info,  Node: uniq -u,  Next: cat -s,  Prev: uniq -d,  Up: Examples
+
+Remove All Duplicated Lines
+===========================
+
+   This script prints only unique lines, like `uniq -u'.
+
+     #!/usr/bin/sed -f
+     
+     # Search for a duplicate line --- until that, print what you find.
+     $b
+     N
+     /^\(.*\)\n\1$/ ! {
+         P
+         D
+     }
+     
+     :c
+     # Got two equal lines in pattern space.  At the
+     # end of the file we simply exit
+     $d
+     
+     # Else, we keep reading lines with `N' until we
+     # find a different one
+     s/.*\n//
+     N
+     /^\(.*\)\n\1$/ {
+         bc
+     }
+     
+     # Remove the last instance of the duplicate line
+     # and go back to the top
+     D
+
+
+File: sed.info,  Node: cat -s,  Prev: uniq -u,  Up: Examples
+
+Squeezing Blank Lines
+=====================
+
+   As a final example, here are three scripts, of increasing complexity
+and speed, that implement the same function as `cat -s', that is
+squeezing blank lines.
+
+   The first leaves a blank line at the beginning and end if there are
+some already.
+
+     #!/usr/bin/sed -f
+     
+     # on empty lines, join with next
+     # Note there is a star in the regexp
+     :x
+     /^\n*$/ {
+     N
+     bx
+     }
+     
+     # now, squeeze all '\n', this can be also done by:
+     # s/^\(\n\)*/\1/
+     s/\n*/\
+     /
+
+   This one is a bit more complex and removes all empty lines at the
+beginning.  It does leave a single blank line at end if one was there.
+
+     #!/usr/bin/sed -f
+     
+     # delete all leading empty lines
+     1,/^./{
+     /./!d
+     }
+     
+     # on an empty line we remove it and all the following
+     # empty lines, but one
+     :x
+     /./!{
+     N
+     s/^\n$//
+     tx
+     }
+
+   This removes leading and trailing blank lines.  It is also the
+fastest.  Note that loops are completely done with `n' and `b', without
+exploting the fact that `sed' cycles back to the top of the script
+automatically at the end of a line.
+
+     #!/usr/bin/sed -nf
+     
+     # delete all (leading) blanks
+     /./!d
+     
+     # get here: so there is a non empty
+     :x
+     # print it
+     p
+     # get next
+     n
+     # got chars? print it again, etc...
+     /./bx
+     
+     # no, don't have chars: got an empty line
+     :z
+     # get next, if last line we finish here so no trailing
+     # empty lines are written
+     n
+     # also empty? then ignore it, and get next... this will
+     # remove ALL empty lines
+     /./!bz
+     
+     # all empty lines were deleted/ignored, but we have a non empty.  As
+     # what we want to do is to squeeze, insert a blank line artificially
+     i\
+     
+     bx
+
+
+File: sed.info,  Node: Limitations,  Next: Other Resources,  Prev: Examples,  Up: Top
+
+GNU `sed''s Limitations and Non-limitations
+*******************************************
+
+   For those who want to write portable `sed' scripts, be aware that
+some implementations have been known to limit line lengths (for the
+pattern and hold spaces) to be no more than 4000 bytes.  The POSIX
+standard specifies that conforming `sed' implementations shall support
+at least 8192 byte line lengths.  GNU `sed' has no built-in limit on
+line length; as long as it can `malloc()' more (virtual) memory, you
+can feed or construct lines as long as you like.
+
+   However, recursion is used to handle subpatterns and indefinite
+repetition.  This means that the available stack space may limit the
+size of the buffer that can be processed by certain patterns.
+
+
+File: sed.info,  Node: Other Resources,  Next: Reporting Bugs,  Prev: Limitations,  Up: Top
+
+Other Resources for Learning About `sed'
+****************************************
+
+   In addition to several books that have been written about `sed'
+(either specifically or as chapters in books which discuss shell
+programming), one can find out more about `sed' (including suggestions
+of a few books) from the FAQ for the `sed-users' mailing list,
+available from any of:
+      `http://www.student.northpark.edu/pemente/sed/sedfaq.html'
+      `http://sed.sf.net/grabbag/tutorials/sedfaq.html'
+
+   Also of interest are
+`http://www.student.northpark.edu/pemente/sed/index.htm' and
+`http://sed.sf.net/grabbag', which include `sed' tutorials and other
+`sed'-related goodies.
+
+   The `sed-users' mailing list itself maintained by Sven Guckes.  To
+subscribe, visit `http://groups.yahoo.com' and search for the
+`sed-users' mailing list.
+
+
+File: sed.info,  Node: Reporting Bugs,  Next: Extended regexps,  Prev: Other Resources,  Up: Top
+
+Reporting Bugs
+**************
+
+   Email bug reports to <bonzini@gnu.org>.  Be sure to include the word
+"sed" somewhere in the `Subject:' field.  Also, please include the
+output of `sed --version' in the body of your report if at all possible.
+
+   Please do not send a bug report like this:
+
+     while building frobme-1.3.4
+     $ configure
+     error--> sed: file sedscr line 1: Unknown option to 's'
+
+   If GNU `sed' doesn't configure your favorite package, take a few
+extra minutes to identify the specific problem and make a stand-alone
+test case.  Unlike other programs such as C compilers, making such test
+cases for `sed' is quite simple.
+
+   A stand-alone test case includes all the data necessary to perform
+the test, and the specific invocation of `sed' that causes the problem.
+The smaller a stand-alone test case is, the better.  A test case should
+not involve something as far removed from `sed' as "try to configure
+frobme-1.3.4".  Yes, that is in principle enough information to look
+for the bug, but that is not a very practical prospect.
+
+   Here are a few commonly reported bugs that are not bugs.
+
+`sed -n' and `s/REGEX/`replace'/p'
+     Some versions of `sed' ignore the `p' (print) option of an `s'
+     command unless the `-n' command-line option has been specified.
+     Other versions always honor the `p' option.  Both approaches are
+     allowed by POSIX and GNU `sed' is the better when you write
+     complex scripts and also more intuitive, but portable scripts
+     should be written to work correctly with either behavior.
+
+`N' command on the last line
+     Most versions of `sed' exit without printing anything when the `N'
+     command is issued on the last line of a file.  GNU `sed' prints
+     pattern space before exiting unless of course the `-n' command
+     switch has been specified.  This choice is by design.
+
+     For example, the behavior of
+          sed N foo bar
+
+     would depend on whether foo has an even or an odd number of
+     lines(1).  Or, when writing a script to read the next few lines
+     following a pattern match, traditional implementations of `sed'
+     would force you to write something like
+          /foo/{ $!N; $!N; $!N; $!N; $!N; $!N; $!N; $!N; $!N }
+
+     instead of just
+          /foo/{ N;N;N;N;N;N;N;N;N; }
+
+     In any case, the simplest workaround is to use `$d;N' in scripts
+     that rely on the traditional behavior, or to set the
+     `POSIXLY_CORRECT' variable to a non-empty value.
+
+Regex syntax clashes
+     `sed' uses the POSIX basic regular expression syntax.  According to
+     the standard, the meaning of some escape sequences is undefined in
+     this syntax;  notable in the case of `sed' are `\|', `\+', `\?',
+     `\`', `\'', `\<', `\>', `\b', `\B', `\w', and `\W'.
+
+     As in all GNU programs that use POSIX basic regular expressions,
+     `sed' interprets these escape sequences as special characters.
+     So, `x\+' matches one or more occurrences of `x'.  `abc\|def'
+     matches either `abc' or `def'.
+
+     This syntax may cause problems when running scripts written for
+     other `sed's.  Some `sed' programs have been written with the
+     assumption that `\|' and `\+' match the literal characters `|' and
+     `+'.  Such scripts must be modified by removing the spurious
+     backslashes if they are to be used with modern implementations of
+     `sed', like GNU `sed'.
+
+     In addition, this version of `sed' supports several escape
+     characters (some of which are multi-character) to insert
+     non-printable characters in scripts (`\a', `\c', `\d', `\o', `\r',
+     `\t', `\v', `\x').  These can cause similar problems with scripts
+     written for other `sed's.
+
+`-i' clobbers read-only files
+     In short, `sed -i' will let you delete the contents of a read-only
+     file, and in general the `-i' option (*note Invocation: Invoking
+     sed.) lets you clobber protected files.  This is not a bug, but
+     rather a consequence of how the Unix filesystem works.
+
+     The permissions on a file say what can happen to the data in that
+     file, while the permissions on a directory say what can happen to
+     the list of files in that directory.  `sed -i' will not ever open
+     for writing  a file that is already on disk.  Rather, it will work
+     on a temporary file that is finally renamed to the original name:
+     if you rename or delete files, you're actually modifying the
+     contents of the directory, so the operation depends on the
+     permissions of the directory, not of the file.  For this same
+     reason, `sed' does not let you use `-i' on a writeable file in a
+     read-only directory (but unbelievably nobody reports that as a
+     bug...).
+
+   ---------- Footnotes ----------
+
+   (1) which is the actual "bug" that prompted the change in behavior
+
+
+File: sed.info,  Node: Extended regexps,  Next: Concept Index,  Prev: Reporting Bugs,  Up: Top
+
+Extended regular expressions
+****************************
+
+   The only difference between basic and extended regular expressions
+is in the behavior of a few characters: `?', `+', parentheses, and
+braces (`{}').  While basic regular expressions require these to be
+escaped if you want them to behave as special characters, when using
+extended regular expressions you must escape them if you want them _to
+match a literal character_.
+
+Examples:
+`abc?'
+     becomes `abc\?' when using extended regular expressions.  It
+     matches the literal string `abc?'.
+
+`c\+'
+     becomes `c+' when using extended regular expressions.  It matches
+     one or more `c's.
+
+`a\{3,\}'
+     becomes `a{3,}' when using extended regular expressions.  It
+     matches three or more `a's.
+
+`\(abc\)\{2,3\}'
+     becomes `(abc){2,3}' when using extended regular expressions.  It
+     matches either `abcabc' or `abcabcabc'.
+
+`\(abc*\)\1'
+     becomes `(abc*)\1' when using extended regular expressions.
+     Backreferences must still be escaped when using extended regular
+     expressions.
+
+
+File: sed.info,  Node: Concept Index,  Next: Command and Option Index,  Prev: Extended regexps,  Up: Top
+
+Concept Index
+*************
+
+   This is a general index of all issues discussed in this manual, with
+the exception of the `sed' commands and command-line options.
+
+* Menu:
+
+* Additional reading about sed:          Other Resources.
+* ADDR1,+N:                              Addresses.
+* ADDR1,~N:                              Addresses.
+* Address, as a regular expression:      Addresses.
+* Address, last line:                    Addresses.
+* Address, numeric:                      Addresses.
+* Addresses, in sed scripts:             Addresses.
+* Append hold space to pattern space:    Other Commands.
+* Append next input line to pattern space: Other Commands.
+* Append pattern space to hold space:    Other Commands.
+* Appending text after a line:           Other Commands.
+* Backreferences, in regular expressions: The "s" Command.
+* Branch to a label, if s/// failed:     Extended Commands.
+* Branch to a label, if s/// succeeded:  Programming Commands.
+* Branch to a label, unconditionally:    Programming Commands.
+* Buffer spaces, pattern and hold:       Data Spaces.
+* Bugs, reporting:                       Reporting Bugs.
+* Case-insensitive matching:             The "s" Command.
+* Caveat -- #n on first line:            Common Commands.
+* Command groups:                        Common Commands.
+* Comments, in scripts:                  Common Commands.
+* Conditional branch <1>:                Extended Commands.
+* Conditional branch:                    Programming Commands.
+* Copy hold space into pattern space:    Other Commands.
+* Copy pattern space into hold space:    Other Commands.
+* Delete first line from pattern space:  Other Commands.
+* Disabling autoprint, from command line: Invoking sed.
+* empty regular expression:              Addresses.
+* Evaluate Bourne-shell commands:        Extended Commands.
+* Evaluate Bourne-shell commands, after substitution: The "s" Command.
+* Exchange hold space with pattern space: Other Commands.
+* Excluding lines:                       Addresses.
+* Extended regular expressions, choosing: Invoking sed.
+* Extended regular expressions, syntax:  Extended regexps.
+* Files to be processed as input:        Invoking sed.
+* Flow of control in scripts:            Programming Commands.
+* Global substitution:                   The "s" Command.
+* GNU extensions, /dev/stderr file <1>:  Other Commands.
+* GNU extensions, /dev/stderr file:      The "s" Command.
+* GNU extensions, /dev/stdin file <1>:   Extended Commands.
+* GNU extensions, /dev/stdin file:       Other Commands.
+* GNU extensions, /dev/stdout file <1>:  Other Commands.
+* GNU extensions, /dev/stdout file <2>:  The "s" Command.
+* GNU extensions, /dev/stdout file:      Invoking sed.
+* GNU extensions, 0 address:             Addresses.
+* GNU extensions, 0,ADDR2 addressing:    Addresses.
+* GNU extensions, ADDR1,+N addressing:   Addresses.
+* GNU extensions, ADDR1,~N addressing:   Addresses.
+* GNU extensions, branch if s/// failed: Extended Commands.
+* GNU extensions, case modifiers in s commands: The "s" Command.
+* GNU extensions, checking for their presence: Extended Commands.
+* GNU extensions, evaluating Bourne-shell commands <1>: Extended Commands.
+* GNU extensions, evaluating Bourne-shell commands: The "s" Command.
+* GNU extensions, extended regular expressions: Invoking sed.
+* GNU extensions, g and NUMBER modifier interaction in s command: The "s" Command.
+* GNU extensions, I modifier <1>:        The "s" Command.
+* GNU extensions, I modifier:            Addresses.
+* GNU extensions, in-place editing <1>:  Reporting Bugs.
+* GNU extensions, in-place editing:      Invoking sed.
+* GNU extensions, L command:             Extended Commands.
+* GNU extensions, M modifier:            The "s" Command.
+* GNU extensions, modifiers and the empty regular expression: Addresses.
+* GNU extensions, N~M addresses:         Addresses.
+* GNU extensions, quitting silently:     Extended Commands.
+* GNU extensions, R command:             Extended Commands.
+* GNU extensions, reading a file a line at a time: Extended Commands.
+* GNU extensions, reformatting paragraphs: Extended Commands.
+* GNU extensions, returning an exit code <1>: Extended Commands.
+* GNU extensions, returning an exit code: Common Commands.
+* GNU extensions, setting line length:   Other Commands.
+* GNU extensions, special escapes <1>:   Reporting Bugs.
+* GNU extensions, special escapes:       Escapes.
+* GNU extensions, special two-address forms: Addresses.
+* GNU extensions, subprocesses <1>:      Extended Commands.
+* GNU extensions, subprocesses:          The "s" Command.
+* GNU extensions, to basic regular expressions <1>: Reporting Bugs.
+* GNU extensions, to basic regular expressions: Regular Expressions.
+* GNU extensions, unlimited line length: Limitations.
+* GNU extensions, writing first line to a file: Extended Commands.
+* Goto, in scripts:                      Programming Commands.
+* Greedy regular expression matching:    Regular Expressions.
+* Grouping commands:                     Common Commands.
+* Hold space, appending from pattern space: Other Commands.
+* Hold space, appending to pattern space: Other Commands.
+* Hold space, copy into pattern space:   Other Commands.
+* Hold space, copying pattern space into: Other Commands.
+* Hold space, definition:                Data Spaces.
+* Hold space, exchange with pattern space: Other Commands.
+* In-place editing <1>:                  Reporting Bugs.
+* In-place editing:                      Invoking sed.
+* Inserting text before a line:          Other Commands.
+* Labels, in scripts:                    Programming Commands.
+* Last line, selecting:                  Addresses.
+* Line length, setting <1>:              Other Commands.
+* Line length, setting:                  Invoking sed.
+* Line number, printing:                 Other Commands.
+* Line selection:                        Addresses.
+* Line, selecting by number:             Addresses.
+* Line, selecting by regular expression match: Addresses.
+* Line, selecting last:                  Addresses.
+* List pattern space:                    Other Commands.
+* Mixing g and NUMBER modifiers in the s command: The "s" Command.
+* Next input line, append to pattern space: Other Commands.
+* Next input line, replace pattern space with: Common Commands.
+* Non-bugs, in-place editing:            Reporting Bugs.
+* Non-bugs, N command on the last line:  Reporting Bugs.
+* Non-bugs, p command and -n flag <1>:   Reporting Bugs.
+* Non-bugs, p command and -n flag:       Common Commands.
+* Non-bugs, regex syntax clashes:        Reporting Bugs.
+* Parenthesized substrings:              The "s" Command.
+* Pattern space, definition:             Data Spaces.
+* Perl-style regular expressions, multiline: Addresses.
+* Portability, comments:                 Common Commands.
+* Portability, line length limitations:  Limitations.
+* Portability, N command on the last line: Reporting Bugs.
+* Portability, p command and -n flag <1>: Reporting Bugs.
+* Portability, p command and -n flag:    Common Commands.
+* POSIXLY_CORRECT behavior, bracket expressions: Regular Expressions.
+* POSIXLY_CORRECT behavior, empty regular expression: Addresses.
+* POSIXLY_CORRECT behavior, escapes:     Escapes.
+* POSIXLY_CORRECT behavior, N command:   Reporting Bugs.
+* POSIXLY_CORRECT behavior, two addresses <1>: Extended Commands.
+* POSIXLY_CORRECT behavior, two addresses: Other Commands.
+* Print first line from pattern space:   Other Commands.
+* Printing line number:                  Other Commands.
+* Printing text unambiguously:           Other Commands.
+* Quitting <1>:                          Extended Commands.
+* Quitting:                              Common Commands.
+* Range of lines:                        Addresses.
+* Range with start address of zero:      Addresses.
+* Read next input line:                  Common Commands.
+* Read text from a file <1>:             Extended Commands.
+* Read text from a file:                 Other Commands.
+* Reformat pattern space:                Extended Commands.
+* Reformatting paragraphs:               Extended Commands.
+* Replace hold space with copy of pattern space: Other Commands.
+* Replace pattern space with copy of hold space: Other Commands.
+* Replacing all text matching regexp in a line: The "s" Command.
+* Replacing only Nth match of regexp in a line: The "s" Command.
+* Replacing selected lines with other text: Other Commands.
+* Requiring GNU sed:                     Extended Commands.
+* Script structure:                      sed Programs.
+* Script, from a file:                   Invoking sed.
+* Script, from command line:             Invoking sed.
+* sed program structure:                 sed Programs.
+* Selecting lines to process:            Addresses.
+* Selecting non-matching lines:          Addresses.
+* Several lines, selecting:              Addresses.
+* Slash character, in regular expressions: Addresses.
+* Spaces, pattern and hold:              Data Spaces.
+* Special addressing forms:              Addresses.
+* Standard input, processing as input:   Invoking sed.
+* Stream editor:                         Introduction.
+* Subprocesses <1>:                      Extended Commands.
+* Subprocesses:                          The "s" Command.
+* Substitution of text, options:         The "s" Command.
+* Text, appending:                       Other Commands.
+* Text, deleting:                        Common Commands.
+* Text, insertion:                       Other Commands.
+* Text, printing:                        Common Commands.
+* Text, printing after substitution:     The "s" Command.
+* Text, writing to a file after substitution: The "s" Command.
+* Transliteration:                       Other Commands.
+* Unbuffered I/O, choosing:              Invoking sed.
+* Usage summary, printing:               Invoking sed.
+* Version, printing:                     Invoking sed.
+* Working on separate files:             Invoking sed.
+* Write first line to a file:            Extended Commands.
+* Write to a file:                       Other Commands.
+* Zero, as range start address:          Addresses.
+
+
+File: sed.info,  Node: Command and Option Index,  Prev: Concept Index,  Up: Top
+
+Command and Option Index
+************************
+
+   This is an alphabetical list of all `sed' commands and command-line
+options.
+
+* Menu:
+
+* # (comments):                          Common Commands.
+* --expression:                          Invoking sed.
+* --file:                                Invoking sed.
+* --help:                                Invoking sed.
+* --in-place:                            Invoking sed.
+* --line-length:                         Invoking sed.
+* --quiet:                               Invoking sed.
+* --regexp-extended:                     Invoking sed.
+* --silent:                              Invoking sed.
+* --unbuffered:                          Invoking sed.
+* --version:                             Invoking sed.
+* -e:                                    Invoking sed.
+* -f:                                    Invoking sed.
+* -h:                                    Invoking sed.
+* -i:                                    Invoking sed.
+* -l:                                    Invoking sed.
+* -n:                                    Invoking sed.
+* -n, forcing from within a script:      Common Commands.
+* -r:                                    Invoking sed.
+* -u:                                    Invoking sed.
+* -V:                                    Invoking sed.
+* : (label) command:                     Programming Commands.
+* = (print line number) command:         Other Commands.
+* a (append text lines) command:         Other Commands.
+* b (branch) command:                    Programming Commands.
+* c (change to text lines) command:      Other Commands.
+* D (delete first line) command:         Other Commands.
+* d (delete) command:                    Common Commands.
+* e (evaluate) command:                  Extended Commands.
+* G (appending Get) command:             Other Commands.
+* g (get) command:                       Other Commands.
+* H (append Hold) command:               Other Commands.
+* h (hold) command:                      Other Commands.
+* i (insert text lines) command:         Other Commands.
+* L (fLow paragraphs) command:           Extended Commands.
+* l (list unambiguously) command:        Other Commands.
+* N (append Next line) command:          Other Commands.
+* n (next-line) command:                 Common Commands.
+* P (print first line) command:          Other Commands.
+* p (print) command:                     Common Commands.
+* q (quit) command:                      Common Commands.
+* Q (silent Quit) command:               Extended Commands.
+* r (read file) command:                 Other Commands.
+* R (read line) command:                 Extended Commands.
+* s command, option flags:               The "s" Command.
+* T (test and branch if failed) command: Extended Commands.
+* t (test and branch if successful) command: Programming Commands.
+* v (version) command:                   Extended Commands.
+* w (write file) command:                Other Commands.
+* W (write first line) command:          Extended Commands.
+* x (eXchange) command:                  Other Commands.
+* y (transliterate) command:             Other Commands.
+* {} command grouping:                   Common Commands.
+
+

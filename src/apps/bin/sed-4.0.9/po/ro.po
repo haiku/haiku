@@ -1,0 +1,377 @@
+# Mesajele în limba românã pentru sed.
+# Copyright (C) 2003 Free Software Foundation, Inc.
+# Acest fiºier este distribuit sub aceeaºi licenþã ca ºi pachetul sed.
+# Laurentiu Buzdugan <buzdugan@voyager.net>, 2003.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: sed 4.0.8\n"
+"POT-Creation-Date: 2004-01-10 08:46+0100\n"
+"PO-Revision-Date: 2003-11-22 12:00-0500\n"
+"Last-Translator: Laurentiu Buzdugan <buzdugan@voyager.net>\n"
+"Language-Team: Romanian <translation-team-ro@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: sed/compile.c:172
+msgid "Multiple `!'s"
+msgstr "`!'-uri multiple"
+
+#: sed/compile.c:173
+msgid "Unexpected `,'"
+msgstr "`,' neaºteptat"
+
+#: sed/compile.c:174
+msgid "Cannot use +N or ~N as first address"
+msgstr "Nu se poate folosi +N ºi ~N ca prima adresã"
+
+#: sed/compile.c:175
+msgid "Unmatched `{'"
+msgstr "`{' fãrã pereche"
+
+#: sed/compile.c:176
+msgid "Unexpected `}'"
+msgstr "`}' neaºteptat"
+
+#: sed/compile.c:177
+msgid "Extra characters after command"
+msgstr "Extra caractere dupã comandã"
+
+#: sed/compile.c:178
+msgid "Expected \\ after `a', `c' or `i'"
+msgstr "Este aºteptat \\ dupã `a', `c' sau `i'"
+
+#: sed/compile.c:179
+msgid "`}' doesn't want any addresses"
+msgstr "`}' nu vrea nici o adresã"
+
+#: sed/compile.c:180
+msgid ": doesn't want any addresses"
+msgstr ": nu vrea nici o adresã"
+
+#: sed/compile.c:181
+msgid "Comments don't accept any addresses"
+msgstr "Comentariile nu acceptã nici o adresã"
+
+#: sed/compile.c:182
+msgid "Missing command"
+msgstr "Comandã absentã"
+
+#: sed/compile.c:183
+msgid "Command only uses one address"
+msgstr "Comanda foloseºte numai o adresã"
+
+#: sed/compile.c:184
+msgid "Unterminated address regex"
+msgstr "Adresã regex neterminatã"
+
+#: sed/compile.c:185
+msgid "Unterminated `s' command"
+msgstr "Comandã `s' neterminatã"
+
+#: sed/compile.c:186
+msgid "Unterminated `y' command"
+msgstr "Comandã `y' neterminatã"
+
+#: sed/compile.c:187
+msgid "Unknown option to `s'"
+msgstr "Opþiune necunoscutã pentru `s'"
+
+#: sed/compile.c:188
+msgid "multiple `p' options to `s' command"
+msgstr "multiple opþiuni `p' pentru comanda `s'"
+
+#: sed/compile.c:189
+msgid "multiple `g' options to `s' command"
+msgstr "multiple opþiuni `g' pentru comanda `s'"
+
+#: sed/compile.c:190
+msgid "multiple number options to `s' command"
+msgstr "numãr multiplu de opþiuni pentru comanda `s'"
+
+#: sed/compile.c:191
+msgid "number option to `s' command may not be zero"
+msgstr "numãrul de opþiuni pentru comanda `s' nu poate fi zero"
+
+#: sed/compile.c:192
+msgid "strings for y command are different lengths"
+msgstr "ºirurile pentru comanda y au lungimi diferite"
+
+#: sed/compile.c:193
+msgid "expected newer version of sed"
+msgstr "am aºteptat o versiune mai recentã de sed"
+
+#: sed/compile.c:236
+#, c-format
+msgid "Called savchar() with unexpected pushback (%x)"
+msgstr "savchar() a fost chemat cu pushback (%x) neaºteptat"
+
+#: sed/compile.c:1331
+msgid "Unknown command:"
+msgstr "Comandã necunoscutã:"
+
+#: sed/compile.c:1352
+#, c-format
+msgid "%s: file %s line %lu: %s\n"
+msgstr "%s: fiºierul %s linia %lu: %s\n"
+
+#: sed/compile.c:1355
+#, c-format
+msgid "%s: -e expression #%lu, char %lu: %s\n"
+msgstr "%s: -e expresia #%lu, caracterul %lu: %s\n"
+
+#: sed/compile.c:1555
+#, c-format
+msgid "Can't find label for jump to `%s'"
+msgstr "Nu pot gãsi eticheta pentru saltul la `%s'"
+
+#: sed/execute.c:505
+#, c-format
+msgid "%s: can't read %s: %s\n"
+msgstr "%s: nu pot citi %s: %s\n"
+
+#: sed/execute.c:530 sed/execute.c:542
+#, c-format
+msgid "Couldn't open temporary file %s: %s"
+msgstr "Nu am putut deschide fiºierul temporar %s: %s"
+
+#: sed/execute.c:728
+msgid "INTERNAL ERROR: bad address type"
+msgstr "EROARE INTERNÃ: tip de adresã incorect"
+
+#: sed/execute.c:1022 sed/execute.c:1200
+msgid "error in subprocess"
+msgstr "eroare în subproces"
+
+#: sed/execute.c:1024
+msgid "option `e' not supported"
+msgstr "opþiunea `e' nu e suportatã"
+
+#: sed/execute.c:1202
+msgid "`e' command not supported"
+msgstr "comanda `e' nu e suportatã"
+
+#: sed/execute.c:1438
+#, c-format
+msgid "INTERNAL ERROR: Bad cmd %c"
+msgstr "EROARE INTERNÃ: comandã incorectã %c"
+
+#: sed/regexp.c:39 lib/regcomp.c:665
+msgid "No previous regular expression"
+msgstr "Nici o expresie regularã anterioarã"
+
+#: sed/regexp.c:40
+msgid "Cannot specify modifiers on empty regexp"
+msgstr "Nu se pot specifica modificatori pentru regexp vidã"
+
+#: sed/regexp.c:134
+#, c-format
+msgid "Invalid reference \\%d on `s' command's RHS"
+msgstr "Referinþã invalidã \\%d pentru RHS-ul comanzii `s'"
+
+#: sed/sed.c:95
+msgid ""
+"  -R, --regexp-perl\n"
+"                 use Perl 5's regular expressions syntax in the script.\n"
+msgstr ""
+"  -R, --regexp-perl\n"
+"                foloseºte sintaxa expresiilor regulare din Perl 5 în "
+"script.\n"
+
+#: sed/sed.c:100
+#, c-format
+msgid ""
+"Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 suppress automatic printing of pattern space\n"
+"  -e script, --expression=script\n"
+"                 add the script to the commands to be executed\n"
+"  -f script-file, --file=script-file\n"
+"                 add the contents of script-file to the commands to be "
+"executed\n"
+"  -i[suffix], --in-place[=suffix]\n"
+"                 edit files in place (makes backup if extension supplied)\n"
+"  -l N, --line-length=N\n"
+"                 specify the desired line-wrap length for the `l' command\n"
+"  -r, --regexp-extended\n"
+"                 use extended regular expressions in the script.\n"
+"%s  -s, --separate\n"
+"                 consider files as separate rather than as a single "
+"continuous\n"
+"                 long stream.\n"
+"  -u, --unbuffered\n"
+"                 load minimal amounts of data from the input files and "
+"flush\n"
+"                 the output buffers more often\n"
+"      --help     display this help and exit\n"
+"  -V, --version  output version information and exit\n"
+"\n"
+"If no -e, --expression, -f, or --file option is given, then the first\n"
+"non-option argument is taken as the sed script to interpret.  All\n"
+"remaining arguments are names of input files; if no input files are\n"
+"specified, then the standard input is read.\n"
+"\n"
+msgstr ""
+"Folosire: %s [OPÞIUNE]... {script-doar-dacã-nici-un-alt-script} [fiºier-"
+"intrare]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 eliminã tipãrire automatã a spaþiului de model (pattern)\n"
+"  -e script, --expression=script\n"
+"                 adaugã scriptul la comenzile de executat\n"
+"  -f script-file, --file=script-file\n"
+"                 adaugã conþinutul fiºierului-script la comenzile de "
+"executat\n"
+"  -i[suffix], --in-place[=suffix]\n"
+"                 editeazã fiºierele pe loc (creazã backup dacã extensia e "
+"specificatã)\n"
+"  -l N, --line-length=N\n"
+"                 specificã lungimea liniei pentru wrap pentru comanda `l'\n"
+"  -r, --regexp-extended\n"
+"                 foloseºte expresii regulare extinse în script.\n"
+"%s  -s, --separate\n"
+"                 considerã fiºierele ca separate în loc de un singur stream\n"
+"                 lung, continuu\n"
+"  -u, --unbuffered\n"
+"                 încarcã cantitãþi minime de date din fiºierele de intrare\n"
+"                 ºi descarcã (flush) buferele de ieºire mai des\n"
+"      --help     afiºeazã acest mesaj ºi terminã\n"
+"  -V, --version  afiºeazã informaþia despre versiune ºi terminã\n"
+"\n"
+"Dacã nici una din opþiunile -e, --expression, -f, sau --file e datã, atunci\n"
+"este luat mai întâi argumentul care nu e opþiune drept script sed de\n"
+"interpretat. Toate celelalte argumente sunt nume de fiºiere de intrare; "
+"dacã\n"
+"nici un fiºier de intrare nu a fost specificat, e cititã intrarea standard.\n"
+"\n"
+
+#: sed/sed.c:129
+#, c-format
+msgid ""
+"E-mail bug reports to: %s .\n"
+"Be sure to include the word ``%s'' somewhere in the ``Subject:'' field.\n"
+msgstr ""
+"Raportaþi bug-uri prin e-mail la: %s .\n"
+"Fiþi siguri cã includeþi ``%s'' undeva în câmpul ``Subject:''.\n"
+
+#: sed/sed.c:254
+#, c-format
+msgid "super-sed version %s\n"
+msgstr "versiunea super-sed %s\n"
+
+#: sed/sed.c:255
+msgid ""
+"based on GNU sed version 3.02.80\n"
+"\n"
+msgstr ""
+"bazat pe GNU sed versiunea 3.02.80\n"
+"\n"
+
+#: sed/sed.c:257
+#, c-format
+msgid "GNU sed version %s\n"
+msgstr "GNU sed versiunea %s\n"
+
+#: sed/sed.c:259
+#, c-format
+msgid ""
+"%s\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE,\n"
+"to the extent permitted by law.\n"
+msgstr ""
+"%s\n"
+"Acesta este software liber; vedeþi codul sursã pentru condiþiile de "
+"copiere.\n"
+"Nu existã NICI o garanþie; nici mãcar pentru VANDABILITATE sau POTRIVIRE \n"
+"PENTRU UN ANUME SCOP, conform legilor în vigoare.\n"
+
+#: lib/utils.c:126
+#, c-format
+msgid "Couldn't open file %s: %s"
+msgstr "Nu am putut deschide fiºierul %s: %s"
+
+#: lib/utils.c:160
+#, c-format
+msgid "couldn't write %d item to %s: %s"
+msgid_plural "couldn't write %d items to %s: %s"
+msgstr[0] "Nu am putut scrie %d articol în %s: %s"
+msgstr[1] "Nu am putut scrie %d articole în %s: %s"
+
+#: lib/utils.c:175
+#, c-format
+msgid "read error on %s: %s"
+msgstr "eroare citire pentru %s: %s"
+
+#: lib/regcomp.c:149
+msgid "Success"
+msgstr "Succes"
+
+#: lib/regcomp.c:152
+msgid "No match"
+msgstr "Nici o potrivire"
+
+#: lib/regcomp.c:155
+msgid "Invalid regular expression"
+msgstr "Expresie regularã incorectã"
+
+#: lib/regcomp.c:158
+msgid "Invalid collation character"
+msgstr "Colaþiune de caractere incorectã"
+
+#: lib/regcomp.c:161
+msgid "Invalid character class name"
+msgstr "Nume de clasã de caractere incorect"
+
+#: lib/regcomp.c:164
+msgid "Trailing backslash"
+msgstr "Backslash în coadã"
+
+#: lib/regcomp.c:167
+msgid "Invalid back reference"
+msgstr "Referinþã înapoi incorectã"
+
+#: lib/regcomp.c:170
+msgid "Unmatched [ or [^"
+msgstr "[ sau [^ fãrã pereche"
+
+#: lib/regcomp.c:173
+msgid "Unmatched ( or \\("
+msgstr "( sau \\( fãrã pereche"
+
+#: lib/regcomp.c:176
+msgid "Unmatched \\{"
+msgstr "\\{ fãrã pereche"
+
+#: lib/regcomp.c:179
+msgid "Invalid content of \\{\\}"
+msgstr "Conþinut incorect pentru \\{\\}"
+
+#: lib/regcomp.c:182
+msgid "Invalid range end"
+msgstr "Sfârºit de interval incorect"
+
+#: lib/regcomp.c:185
+msgid "Memory exhausted"
+msgstr "Memorie epuizatã"
+
+#: lib/regcomp.c:188
+msgid "Invalid preceding regular expression"
+msgstr "Expresie regularã precedentã incorectã"
+
+#: lib/regcomp.c:191
+msgid "Premature end of regular expression"
+msgstr "Sfârºit prematur al expresiei regulare"
+
+#: lib/regcomp.c:194
+msgid "Regular expression too big"
+msgstr "Expresie regularã prea mare"
+
+#: lib/regcomp.c:197
+msgid "Unmatched ) or \\)"
+msgstr ") sau \\) fãrã pereche"

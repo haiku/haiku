@@ -1,0 +1,390 @@
+# -*- mode:po; coding:iso-latin-2;-*- Slovenian message catalogue for GNU sed.
+# Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+# Primo¾ Peterlin <primoz.peterlin@biofiz.mf.uni-lj.si>, 2000, 2001, 2002, 2003.
+# $Id: sl.po,v 1.1 2004/03/02 02:47:15 michaelphipps Exp $
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: sed 4.0.6\n"
+"POT-Creation-Date: 2004-01-10 08:46+0100\n"
+"PO-Revision-Date: 2003-04-02 17:20+0200\n"
+"Last-Translator: Primo¾ Peterlin <primoz.peterlin@biofiz.mf.uni-lj.si>\n"
+"Language-Team: Slovenian <translation-team-sl@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8-bit\n"
+"Report-Msgid-Bugs-To: \n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
+"%100==4 ? 3 : 0);\n"
+
+#: sed/compile.c:172
+msgid "Multiple `!'s"
+msgstr "Veèterni klicaji \"!\""
+
+#: sed/compile.c:173
+msgid "Unexpected `,'"
+msgstr "Neprièakovana vejica \",\""
+
+#: sed/compile.c:174
+msgid "Cannot use +N or ~N as first address"
+msgstr "Obliki +N in ~N nista dovoljeni kot zaèetna naslova"
+
+#: sed/compile.c:175
+msgid "Unmatched `{'"
+msgstr "Oklepaj { brez zaklepaja"
+
+#: sed/compile.c:176
+msgid "Unexpected `}'"
+msgstr "Neprièakovan zaklepaj }"
+
+#: sed/compile.c:177
+msgid "Extra characters after command"
+msgstr "Ukazu sledijo dodatni znaki"
+
+#: sed/compile.c:178
+msgid "Expected \\ after `a', `c' or `i'"
+msgstr "Za ,a`, ,c` ali ,i` se prièakuje \\"
+
+#: sed/compile.c:179
+msgid "`}' doesn't want any addresses"
+msgstr "Zaklepaj } ne zahteva naslova"
+
+#: sed/compile.c:180
+msgid ": doesn't want any addresses"
+msgstr ": ne zahteva naslova"
+
+#: sed/compile.c:181
+msgid "Comments don't accept any addresses"
+msgstr "Komentarji ne sprejemajo naslovov"
+
+#: sed/compile.c:182
+msgid "Missing command"
+msgstr "Ukaz manjka"
+
+#: sed/compile.c:183
+msgid "Command only uses one address"
+msgstr "Ukaz uporablja le en naslov"
+
+#: sed/compile.c:184
+msgid "Unterminated address regex"
+msgstr "Regularni izraz z nezakljuèenim naslovom"
+
+#: sed/compile.c:185
+msgid "Unterminated `s' command"
+msgstr "Nezakljuèen ukaz \"s\""
+
+#: sed/compile.c:186
+msgid "Unterminated `y' command"
+msgstr "Nezakljuèen ukaz \"y\""
+
+#: sed/compile.c:187
+msgid "Unknown option to `s'"
+msgstr "Neznane izbire pri ukazu \"s\""
+
+#: sed/compile.c:188
+msgid "multiple `p' options to `s' command"
+msgstr "veèterne izbire \"p\" pri ukazu \"s\""
+
+#: sed/compile.c:189
+msgid "multiple `g' options to `s' command"
+msgstr "veèterne izbire \"g\" pri ukazu \"s\""
+
+#: sed/compile.c:190
+msgid "multiple number options to `s' command"
+msgstr "veèterne ¹tevilène izbire pri ukazu \"s\""
+
+#: sed/compile.c:191
+msgid "number option to `s' command may not be zero"
+msgstr "¹tevilèna izbira pri ukazu \"s\" mora biti nenièelna"
+
+#: sed/compile.c:192
+msgid "strings for y command are different lengths"
+msgstr "niza pri ukazu \"y\" sta razlièno dolga"
+
+#: sed/compile.c:193
+msgid "expected newer version of sed"
+msgstr "prièakovana novej¹a izdaja programa sed"
+
+#: sed/compile.c:236
+#, c-format
+msgid "Called savchar() with unexpected pushback (%x)"
+msgstr "Klic savchar() z neprièakovanim pushback (%x)"
+
+#: sed/compile.c:1331
+msgid "Unknown command:"
+msgstr "Neznan ukaz:"
+
+#: sed/compile.c:1352
+#, c-format
+msgid "%s: file %s line %lu: %s\n"
+msgstr "%s: datoteka %s vrstica %lu: %s\n"
+
+#: sed/compile.c:1355
+#, c-format
+msgid "%s: -e expression #%lu, char %lu: %s\n"
+msgstr "%s: -e izraz #%lu, znak %lu: %s\n"
+
+#: sed/compile.c:1555
+#, c-format
+msgid "Can't find label for jump to `%s'"
+msgstr "Oznake za skok na \"%s\" ni mo¾no najti"
+
+#: sed/execute.c:505
+#, c-format
+msgid "%s: can't read %s: %s\n"
+msgstr "%s: %s ni mo¾no prebrati: %s\n"
+
+#: sed/execute.c:530 sed/execute.c:542
+#, fuzzy, c-format
+msgid "Couldn't open temporary file %s: %s"
+msgstr "Datoteke %s ni mogoèe odpreti: %s"
+
+#: sed/execute.c:728
+msgid "INTERNAL ERROR: bad address type"
+msgstr "INTERNA NAPAKA: pokvarjen tip naslova"
+
+#: sed/execute.c:1022 sed/execute.c:1200
+msgid "error in subprocess"
+msgstr "Napaka v podprocesu"
+
+#: sed/execute.c:1024
+msgid "option `e' not supported"
+msgstr "Izbira ,e` ni podprta"
+
+#: sed/execute.c:1202
+msgid "`e' command not supported"
+msgstr "Ukaz ,e` ni podprt"
+
+#: sed/execute.c:1438
+#, c-format
+msgid "INTERNAL ERROR: Bad cmd %c"
+msgstr "INTERNA NAPAKA: Pokvarjen ukaz %c"
+
+#: sed/regexp.c:39 lib/regcomp.c:665
+msgid "No previous regular expression"
+msgstr "Prej¹nji regularni izraz manjka"
+
+#: sed/regexp.c:40
+msgid "Cannot specify modifiers on empty regexp"
+msgstr "Doloèanje modifikatorjev pri praznem regularnem izrazu ni mogoèe"
+
+#: sed/regexp.c:134
+#, c-format
+msgid "Invalid reference \\%d on `s' command's RHS"
+msgstr "Neveljavni sklic \\%d na desni strani ukaza ,s`"
+
+#: sed/sed.c:95
+msgid ""
+"  -R, --regexp-perl\n"
+"                 use Perl 5's regular expressions syntax in the script.\n"
+msgstr ""
+"  -R, --regexp-perl\n"
+"                 dovoli uporabo regularnih izrazov, ki jih podpira Perl 5\n"
+
+#: sed/sed.c:100
+#, c-format
+msgid ""
+"Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 suppress automatic printing of pattern space\n"
+"  -e script, --expression=script\n"
+"                 add the script to the commands to be executed\n"
+"  -f script-file, --file=script-file\n"
+"                 add the contents of script-file to the commands to be "
+"executed\n"
+"  -i[suffix], --in-place[=suffix]\n"
+"                 edit files in place (makes backup if extension supplied)\n"
+"  -l N, --line-length=N\n"
+"                 specify the desired line-wrap length for the `l' command\n"
+"  -r, --regexp-extended\n"
+"                 use extended regular expressions in the script.\n"
+"%s  -s, --separate\n"
+"                 consider files as separate rather than as a single "
+"continuous\n"
+"                 long stream.\n"
+"  -u, --unbuffered\n"
+"                 load minimal amounts of data from the input files and "
+"flush\n"
+"                 the output buffers more often\n"
+"      --help     display this help and exit\n"
+"  -V, --version  output version information and exit\n"
+"\n"
+"If no -e, --expression, -f, or --file option is given, then the first\n"
+"non-option argument is taken as the sed script to interpret.  All\n"
+"remaining arguments are names of input files; if no input files are\n"
+"specified, then the standard input is read.\n"
+"\n"
+msgstr ""
+"Uporaba: %s [IZBIRA]... [SKRIPT] [DATOTEKA]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 brez avtomatiènega izpisa prostora vzorcev\n"
+"  -e SKRIPT, --expression=SKRIPT\n"
+"                 dodaj SKRIPT med ukaze, ki se izvedejo\n"
+"  -f SKRIPTNA_DATOTEKA, --file=SKRIPTNA_DATOTEKA\n"
+"                 dodaj vsebino SKRIPTNE DATOTEKE med ukaze, ki se izvedejo\n"
+"  -i[PRIPONA], --in-place[=PRIPONA]\n"
+"                 spremembe opravi v sami datoteki (ustvari varnostno kopijo "
+"z\n"
+"                 dano pripono, èe je ta podana)\n"
+"  -l N, --line-length=N\n"
+"                 doloèi ¹irino vrstice za ukaz ,l` na N znakov\n"
+"  -r, --regexp-extended\n"
+"                 dovoli uporabo raz¹irjenih regularnih izrazov\n"
+"%s  -s, --separate\n"
+"                 datoteke obravnavaj kot loèene, ne pa kot neprekinjen tok\n"
+"                 podatkov\n"
+"  -u, --unbuffered\n"
+"\n"
+"      --help     ta navodila\n"
+"  -V, --version  razlièica programa\n"
+"\n"
+"Èe izbire -e, --expression, -f ali --file niso podane, se prvi neizbirni\n"
+"argument tolmaèi kot skript. Vsi preostali argumenti so imena vhodnih "
+"datotek.\n"
+"Èe ni podano nobeno ime datoteke, se bere standardni vhod.\n"
+"\n"
+
+#: sed/sed.c:129
+#, c-format
+msgid ""
+"E-mail bug reports to: %s .\n"
+"Be sure to include the word ``%s'' somewhere in the ``Subject:'' field.\n"
+msgstr ""
+"Sporoèila o napakah po¹ljite na %s .\n"
+"Poskrbite, da bo nekje v polju ,,Subject`` nastopal izraz ,,%s``.\n"
+
+#: sed/sed.c:254
+#, c-format
+msgid "super-sed version %s\n"
+msgstr "super-sed, razlièica %s\n"
+
+#: sed/sed.c:255
+msgid ""
+"based on GNU sed version 3.02.80\n"
+"\n"
+msgstr ""
+"na osnovi GNU sed, razlièica 3.02.80\n"
+"\n"
+
+#: sed/sed.c:257
+#, c-format
+msgid "GNU sed version %s\n"
+msgstr "GNU sed, razlièica %s\n"
+
+#: sed/sed.c:259
+#, c-format
+msgid ""
+"%s\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE,\n"
+"to the extent permitted by law.\n"
+msgstr ""
+"%s\n"
+"To je prost program; pogoji, pod katerimi ga lahko uporabljate, "
+"razmno¾ujete\n"
+"in raz¹irjate so navedeni v izvorni kodi. Za program ni NOBENEGA JAMSTVA,\n"
+"niti jamstev USTREZNOSTI ZA PRODAJO ali PRIMERNOSTI ZA UPORABO.\n"
+
+#: lib/utils.c:126
+#, c-format
+msgid "Couldn't open file %s: %s"
+msgstr "Datoteke %s ni mogoèe odpreti: %s"
+
+#: lib/utils.c:160
+#, c-format
+msgid "couldn't write %d item to %s: %s"
+msgid_plural "couldn't write %d items to %s: %s"
+msgstr[0] "ni mogoèe zapisati %d elementov na %s: %s"
+msgstr[1] "ni mogoèe zapisati %d elementa na %s: %s"
+msgstr[2] "ni mogoèe zapisati %d elementov na %s: %s"
+msgstr[3] "ni mogoèe zapisati %d elementov na %s: %s"
+
+#: lib/utils.c:175
+#, c-format
+msgid "read error on %s: %s"
+msgstr "napaka pri branju z %s: %s"
+
+#: lib/regcomp.c:149
+msgid "Success"
+msgstr "Uspe¹no"
+
+#: lib/regcomp.c:152
+msgid "No match"
+msgstr "Ni ujemanja"
+
+#: lib/regcomp.c:155
+msgid "Invalid regular expression"
+msgstr "Neveljavni regularni izraz"
+
+#: lib/regcomp.c:158
+msgid "Invalid collation character"
+msgstr "Znaka izven abecede"
+
+#: lib/regcomp.c:161
+msgid "Invalid character class name"
+msgstr "Neveljavno ime razreda znakov"
+
+#: lib/regcomp.c:164
+msgid "Trailing backslash"
+msgstr "Zakljuèna obrnjena po¹evnica"
+
+#: lib/regcomp.c:167
+msgid "Invalid back reference"
+msgstr "Neveljavni povratni sklic"
+
+#: lib/regcomp.c:170
+msgid "Unmatched [ or [^"
+msgstr "Oklepaj [ ali [^ brez zaklepaja"
+
+#: lib/regcomp.c:173
+msgid "Unmatched ( or \\("
+msgstr "Oklepaj ( ali \\( brez zaklepaja"
+
+#: lib/regcomp.c:176
+msgid "Unmatched \\{"
+msgstr "Oklepaj \\{ brez zaklepaja"
+
+#: lib/regcomp.c:179
+msgid "Invalid content of \\{\\}"
+msgstr "Neveljavna vsebina \\{\\}"
+
+#: lib/regcomp.c:182
+msgid "Invalid range end"
+msgstr "Neveljavna zgornja meja intervala"
+
+#: lib/regcomp.c:185
+msgid "Memory exhausted"
+msgstr "Zmanjkalo pomnilnika"
+
+#: lib/regcomp.c:188
+msgid "Invalid preceding regular expression"
+msgstr "Neveljaven prej¹nji regularni izraz"
+
+#: lib/regcomp.c:191
+msgid "Premature end of regular expression"
+msgstr "Predèasni zakljuèek regularnega izraza"
+
+#: lib/regcomp.c:194
+msgid "Regular expression too big"
+msgstr "Regularni izraz prevelik"
+
+#: lib/regcomp.c:197
+msgid "Unmatched ) or \\)"
+msgstr "Oklepaj ) ali \\) brez zaklepaja"
+
+#~ msgid "Invalid use of address modifier"
+#~ msgstr "Nepravilna uporaba modifikatorja naslova"
+
+#~ msgid "Unexpected End-of-file"
+#~ msgstr "Neprièakovan konec datoteke"
+
+#~ msgid "bad regexp: %s\n"
+#~ msgstr "pokvarjen regularni izraz: %s\n"
+
+#~ msgid "input read error: %s"
+#~ msgstr "napaka pri branju: %s"
+
+#~ msgid "couldn't write an item to %s: %s"
+#~ msgstr "ni bilo mogoèe zapisati elementa na %s: %s"

@@ -1,0 +1,22 @@
+s%@CFLAGS@%%g
+s%@CPPFLAGS@%-I/%g
+s%@CXXFLAGS@%-x c++%g
+s%@DEFS@%$DEFS%g
+s%@LDFLAGS@%-L/usr/lib%g
+s%@LIBS@%-lgnu -lbfd%g
+s%@exec_prefix@%%g
+s%@prefix@%$prefix%g
+s%@RANLIB@%$RANLIB%g
+s%@CC@%/usr/local/bin/gcc%g
+s%@CPP@%$CPP%g
+s%@XCFLAGS@%$XCFLAGS%g
+s%@XINCLUDES@%$XINCLUDES%g
+s%@XLIBS@%$XLIBS%g
+s%@XPROGS@%$XPROGS%g
+s%@TCLHDIR@%$TCLHDIR%g
+s%@TCLLIB@%$TCLLIB%g
+s%@TKHDIR@%$TKHDIR%g
+s%@TKLIB@%$TKLIB%g
+s%@PTY_TYPE@%$PTY_TYPE%g
+s%@EVENT_TYPE@%$EVENT_TYPE%g
+s%@SETUID@%$SETUID%g

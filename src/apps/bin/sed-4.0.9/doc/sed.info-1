@@ -1,0 +1,1347 @@
+This is sed.info, produced by makeinfo version 4.3 from sed.texi.
+
+INFO-DIR-SECTION Text creation and manipulation
+START-INFO-DIR-ENTRY
+* sed: (sed).                   Stream EDitor.
+
+END-INFO-DIR-ENTRY
+
+This file documents version 4.0.9 of GNU `sed', a stream editor.
+
+   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004 Free Software
+Foundation, Inc.
+
+   This document is released under the terms of the GNU Free
+Documentation License as published by the Free Software Foundation;
+either version 1.1, or (at your option) any later version.
+
+   You should have received a copy of the GNU Free Documentation
+License along with GNU `sed'; see the file `COPYING.DOC'.  If not,
+write to the Free Software Foundation, 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.
+
+   There are no Cover Texts and no Invariant Sections; this text, along
+with its equivalent in the printed manual, constitutes the Title Page.
+
+File: sed.info,  Node: Top,  Next: Introduction,  Up: (dir)
+
+
+
+This file documents version 4.0.9 of GNU `sed', a stream editor.
+
+   Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004 Free Software
+Foundation, Inc.
+
+   This document is released under the terms of the GNU Free
+Documentation License as published by the Free Software Foundation;
+either version 1.1, or (at your option) any later version.
+
+   You should have received a copy of the GNU Free Documentation
+License along with GNU `sed'; see the file `COPYING.DOC'.  If not,
+write to the Free Software Foundation, 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.
+
+   There are no Cover Texts and no Invariant Sections; this text, along
+with its equivalent in the printed manual, constitutes the Title Page.
+* Menu:
+
+* Introduction::               Introduction
+* Invoking sed::               Invocation
+* sed Programs::               `sed' programs
+* Examples::                   Some sample scripts
+* Limitations::                Limitations and (non-)limitations of GNU `sed'
+* Other Resources::            Other resources for learning about `sed'
+* Reporting Bugs::             Reporting bugs
+
+* Extended regexps::           `egrep'-style regular expressions
+
+* Concept Index::              A menu with all the topics in this manual.
+* Command and Option Index::   A menu with all `sed' commands and
+                               command-line options.
+
+--- The detailed node listing ---
+
+sed Programs:
+* Addresses::                       Selecting lines with `sed'
+* Regular Expressions::             Overview of regular expression syntax
+* Data Spaces::                     Where `sed' buffers data
+* Common Commands::                 Often used commands
+* The "s" Command::                 `sed''s Swiss Army Knife
+* Other Commands::                  Less frequently used commands
+* Programming Commands::            Commands for `sed' gurus
+* Extended Commands::               Commands specific of GNU `sed'
+* Escapes::                         Specifying special characters
+
+Examples:
+* Centering lines::
+* Increment a number::
+* Rename files to lower case::
+* Print bash environment::
+* Reverse chars of lines::
+* tac::                             Reverse lines of files
+* cat -n::                          Numbering lines
+* cat -b::                          Numbering non-blank lines
+* wc -c::                           Counting chars
+* wc -w::                           Counting words
+* wc -l::                           Counting lines
+* head::                            Printing the first lines
+* tail::                            Printing the last lines
+* uniq::                            Make duplicate lines unique
+* uniq -d::                         Print duplicated lines of input
+* uniq -u::                         Remove all duplicated lines
+* cat -s::                          Squeezing blank lines
+
+
+File: sed.info,  Node: Introduction,  Next: Invoking sed,  Prev: Top,  Up: Top
+
+Introduction
+************
+
+   `sed' is a stream editor.  A stream editor is used to perform basic
+text transformations on an input stream (a file or input from a
+pipeline).  While in some ways similar to an editor which permits
+scripted edits (such as `ed'), `sed' works by making only one pass over
+the input(s), and is consequently more efficient.  But it is `sed''s
+ability to filter text in a pipeline which particularly distinguishes
+it from other types of editors.
+
+
+File: sed.info,  Node: Invoking sed,  Next: sed Programs,  Prev: Introduction,  Up: Top
+
+Invocation
+**********
+
+   `sed' may be invoked with the following command-line options:
+
+`-V'
+`--version'
+     Print out the version of `sed' that is being run and a copyright
+     notice, then exit.
+
+`-h'
+`--help'
+     Print a usage message briefly summarizing these command-line
+     options and the bug-reporting address, then exit.
+
+`-n'
+`--quiet'
+`--silent'
+     By default, `sed' prints out the pattern space at the end of each
+     cycle through the script.  These options disable this automatic
+     printing, and `sed' only produces output when explicitly told to
+     via the `p' command.
+
+`-i[SUFFIX]'
+`--in-place[=SUFFIX]'
+     This option specifies that files are to be edited in-place.  GNU
+     `sed' does this by creating a temporary file and sending output to
+     this file rather than to the standard output.(1)
+
+     When the end of the file is reached, the temporary file is renamed
+     to the output file's original name.
+
+     The extension, if supplied, is used to modify the name of the old
+     file before renaming the temporary file (thereby making a backup
+     copy(2)) following this rule: if the extension doesn't contain a
+     `*', then it is appended to the end of the current filename as a
+     suffix; if the extension does contain one or more `*' characters,
+     then _each_ asterisk is replaced with the current filename.  This
+     allows you to add a prefix to the backup file, instead of (or in
+     addition to) a suffix, or even to place backup copies of the
+     original files into another directory (provided the directory
+     already exists).
+
+     This option implies `-s'.
+
+`-l N'
+`--line-length=N'
+     Specify the default line-wrap length for the `l' command.  A
+     length of 0 (zero) means to never wrap long lines.  If not
+     specified, it is taken to be 70.
+
+`-r'
+`--regexp-extended'
+     Use extended regular expressions rather than basic regular
+     expressions.  Extended regexps are those that `egrep' accepts;
+     they can be clearer because they usually have less backslashes,
+     but are a GNU extension and hence scripts that use them are not
+     portable.  *Note Extended regular expressions: Extended regexps.
+
+`-s'
+`--separate'
+     By default, `sed' will consider the files specified on the command
+     line as a single continuous long stream.  This GNU `sed' extension
+     allows the user to consider them as separate files: range
+     addresses (such as `/abc/,/def/') are not allowed to span several
+     files, line numbers are relative to the start of each file, `$'
+     refers to the last line of each file, and files invoked from the
+     `R' commands are rewound at the start of each file.
+
+`-u'
+`--unbuffered'
+     Buffer both input and output as minimally as practical.  (This is
+     particularly useful if the input is coming from the likes of `tail
+     -f', and you wish to see the transformed output as soon as
+     possible.)
+
+`-e SCRIPT'
+`--expression=SCRIPT'
+     Add the commands in SCRIPT to the set of commands to be run while
+     processing the input.
+
+`-f SCRIPT-FILE'
+`--file=SCRIPT-FILE'
+     Add the commands contained in the file SCRIPT-FILE to the set of
+     commands to be run while processing the input.
+
+   If no `-e', `-f', `--expression', or `--file' options are given on
+the command-line, then the first non-option argument on the command
+line is taken to be the SCRIPT to be executed.
+
+   If any command-line parameters remain after processing the above,
+these parameters are interpreted as the names of input files to be
+processed.  A file name of `-' refers to the standard input stream.
+The standard input will be processed if no file names are specified.
+
+   ---------- Footnotes ----------
+
+   (1) This applies to commands such as `=', `a', `c', `i', `l', `p'.
+You can still write to the standard output by using the `w' or `W'
+commands together with the `/dev/stdout' special file
+
+   (2) Note that GNU `sed'     creates the backup file whether     or
+not any output is actually changed.
+
+
+File: sed.info,  Node: sed Programs,  Next: Examples,  Prev: Invoking sed,  Up: Top
+
+`sed' Programs
+**************
+
+   A `sed' program consists of one or more `sed' commands, passed in by
+one or more of the `-e', `-f', `--expression', and `--file' options, or
+the first non-option argument if zero of these options are used.  This
+document will refer to "the" `sed' script; this is understood to mean
+the in-order catenation of all of the SCRIPTs and SCRIPT-FILEs passed
+in.
+
+   Each `sed' command consists of an optional address or address range,
+followed by a one-character command name and any additional
+command-specific code.
+
+* Menu:
+
+* Addresses::                Selecting lines with `sed'
+* Regular Expressions::      Overview of regular expression syntax
+* Data Spaces::              Where `sed' buffers data
+* Common Commands::          Often used commands
+* The "s" Command::          `sed''s Swiss Army Knife
+* Other Commands::           Less frequently used commands
+* Programming Commands::     Commands for `sed' gurus
+* Extended Commands::        Commands specific of GNU `sed'
+* Escapes::                  Specifying special characters
+
+
+File: sed.info,  Node: Addresses,  Next: Regular Expressions,  Up: sed Programs
+
+Selecting lines with `sed'
+==========================
+
+   Addresses in a `sed' script can be in any of the following forms:
+`NUMBER'
+     Specifying a line number will match only that line in the input.
+     (Note that `sed' counts lines continuously across all input files
+     unless `-i' or `-s' options are specified.)
+
+`FIRST~STEP'
+     This GNU extension matches every STEPth line starting with line
+     FIRST.  In particular, lines will be selected when there exists a
+     non-negative N such that the current line-number equals FIRST + (N
+     * STEP).  Thus, to select the odd-numbered lines, one would use
+     `1~2'; to pick every third line starting with the second, `2~3'
+     would be used; to pick every fifth line starting with the tenth,
+     use `10~5'; and `50~0' is just an obscure way of saying `50'.
+
+`$'
+     This address matches the last line of the last file of input, or
+     the last line of each file when the `-i' or `-s' options are
+     specified.
+
+`/REGEXP/'
+     This will select any line which matches the regular expression
+     REGEXP.  If REGEXP itself includes any `/' characters, each must
+     be escaped by a backslash (`\').
+
+     Unless `POSIXLY_CORRECT' is set, the empty regular expression `//'
+     repeats the last regular expression match (the same holds if the
+     empty regular expression is passed to the `s' command).  Note that
+     modifiers to regular expressions are evaluated when the regular
+     expression is compiled, thus it is illegal to specify them
+     together with the empty regular expression.  If `POSIXLY_CORRECT'
+     is set, instead, `//' is the null match: this behavior is mandated
+     by POSIX, but it would break too many legacy `sed' scripts to
+     blithely change GNU `sed''s default behavior.
+
+`\%REGEXP%'
+     (The `%' may be replaced by any other single character.)
+
+     This also matches the regular expression REGEXP, but allows one to
+     use a different delimiter than `/'.  This is particularly useful
+     if the REGEXP itself contains a lot of slashes, since it avoids
+     the tedious escaping of every `/'.  If REGEXP itself includes any
+     delimiter characters, each must be escaped by a backslash (`\').
+
+`/REGEXP/I'
+`\%REGEXP%I'
+     The `I' modifier to regular-expression matching is a GNU extension
+     which causes the REGEXP to be matched in a case-insensitive manner.
+
+`/REGEXP/M'
+`\%REGEXP%M'
+     The `M' modifier to regular-expression matching is a GNU `sed'
+     extension which causes `^' and `$' to match respectively (in
+     addition to the normal behavior) the empty string after a newline,
+     and the empty string before a newline.  There are special character
+     sequences (`\`' and `\'') which always match the beginning or the
+     end of the buffer.  `M' stands for `multi-line'.
+
+   If no addresses are given, then all lines are matched; if one
+address is given, then only lines matching that address are matched.
+
+   An address range can be specified by specifying two addresses
+separated by a comma (`,').  An address range matches lines starting
+from where the first address matches, and continues until the second
+address matches (inclusively).  If the second address is a REGEXP, then
+checking for the ending match will start with the line _following_ the
+line which matched the first address.  As a GNU extension, a line
+number of `0' can be used in an address specification like `0,/REGEXP/'
+so that REGEXP will be matched in the first input line too.
+
+   If the second address is a NUMBER less than (or equal to) the line
+matching the first address, then only the one line is matched.
+
+   GNU `sed' also supports some special two-address forms:
+`0,ADDR2'
+     Start out in "matched first address" state, until ADDR2 is found.
+     This is similar to `1,ADDR2', except that if ADDR2 matches the
+     very first line of input the 0,ADDR2 form will be at the end of
+     its range, whereas the 1,ADDR2 form will still be at the beginning
+     of its range.
+
+`ADDR1,+N'
+     Matches ADDR1 and the N lines following ADDR1.
+
+`ADDR1,~N'
+     Matches ADDR1 and the lines following ADDR1 until the next line
+     whose input line number is a multiple of N.
+
+   Appending the `!' character to the end of an address specification
+negates the sense of the match.  That is, if the `!' character follows
+an address range, then only lines which do _not_ match the address range
+will be selected.  This also works for singleton addresses, and,
+perhaps perversely, for the null address.
+
+
+File: sed.info,  Node: Regular Expressions,  Next: Data Spaces,  Prev: Addresses,  Up: sed Programs
+
+Overview of Regular Expression Syntax
+=====================================
+
+   To know how to use `sed', people should understand regular
+expressions ("regexp" for short).  A regular expression is a pattern
+that is matched against a subject string from left to right.  Most
+characters are "ordinary": they stand for themselves in a pattern, and
+match the corresponding characters in the subject.  As a trivial
+example, the pattern
+
+          The quick brown fox
+
+matches a portion of a subject string that is identical to itself.  The
+power of regular expressions comes from the ability to include
+alternatives and repetitions in the pattern.  These are encoded in the
+pattern by the use of "special characters", which do not stand for
+themselves but instead are interpreted in some special way.  Here is a
+brief description of regular expression syntax as used in `sed'.
+
+`CHAR'
+     A single ordinary character matches itself.
+
+`*'
+     Matches a sequence of zero or more instances of matches for the
+     preceding regular expression, which must be an ordinary character,
+     a special character preceded by `\', a `.', a grouped regexp (see
+     below), or a bracket expression.  As a GNU extension, a postfixed
+     regular expression can also be followed by `*'; for example, `a**'
+     is equivalent to `a*'.  POSIX 1003.1-2001 says that `*' stands for
+     itself when it appears at the start of a regular expression or
+     subexpression, but many nonGNU implementations do not support this
+     and portable scripts should instead use `\*' in these contexts.
+
+`\+'
+     As `*', but matches one or more.  It is a GNU extension.
+
+`\?'
+     As `*', but only matches zero or one.  It is a GNU extension.
+
+`\{I\}'
+     As `*', but matches exactly I sequences (I is a decimal integer;
+     for portability, keep it between 0 and 255 inclusive).
+
+`\{I,J\}'
+     Matches between I and J, inclusive, sequences.
+
+`\{I,\}'
+     Matches more than or equal to I sequences.
+
+`\(REGEXP\)'
+     Groups the inner REGEXP as a whole, this is used to:
+
+        * Apply postfix operators, like `\(abcd\)*': this will search
+          for zero or more whole sequences of `abcd', while `abcd*'
+          would search for `abc' followed by zero or more occurrences
+          of `d'.  Note that support for `\(abcd\)*' is required by
+          POSIX 1003.1-2001, but many non-GNU implementations do not
+          support it and hence it is not universally portable.
+
+        * Use back references (see below).
+
+`.'
+     Matches any single character, including newline.
+
+`^'
+     Matches the null string at beginning of line, i.e. what appears
+     after the circumflex must appear at the beginning of line.
+     `^#include' will match only lines where `#include' is the first
+     thing on line--if there are spaces before, for example, the match
+     fails.  `^' acts as a special character only at the beginning of
+     the regular expression or subexpression (that is, after `\(' or
+     `\|').  Portable scripts should avoid `^' at the beginning of a
+     subexpression, though, as POSIX allows implementations that treat
+     `^' as an ordinary character in that context.
+
+`$'
+     It is the same as `^', but refers to end of line.  `$' also acts
+     as a special character only at the end of the regular expression
+     or subexpression (that is, before `\)' or `\|'), and its use at
+     the end of a subexpression is not portable.
+
+`[LIST]'
+`[^LIST]'
+     Matches any single character in LIST: for example, `[aeiou]'
+     matches all vowels.  A list may include sequences like
+     `CHAR1-CHAR2', which matches any character between (inclusive)
+     CHAR1 and CHAR2.
+
+     A leading `^' reverses the meaning of LIST, so that it matches any
+     single character _not_ in LIST.  To include `]' in the list, make
+     it the first character (after the `^' if needed), to include `-'
+     in the list, make it the first or last; to include `^' put it
+     after the first character.
+
+     The characters `$', `*', `.', `[', and `\' are normally not
+     special within LIST.  For example, `[\*]' matches either `\' or
+     `*', because the `\' is not special here.  However, strings like
+     `[.ch.]', `[=a=]', and `[:space:]' are special within LIST and
+     represent collating symbols, equivalence classes, and character
+     classes, respectively, and `[' is therefore special within LIST
+     when it is followed by `.', `=', or `:'.  Special escapes like
+     `\n' and `\t' are recognized within LIST; this will change in a
+     future version in `POSIXLY_CORRECT' mode.  *Note Escapes::.
+
+`REGEXP1\|REGEXP2'
+     Matches either REGEXP1 or REGEXP2.  Use parentheses to use complex
+     alternative regular expressions.  The matching process tries each
+     alternative in turn, from left to right, and the first one that
+     succeeds is used.  It is a GNU extension.
+
+`REGEXP1REGEXP2'
+     Matches the concatenation of REGEXP1 and REGEXP2.  Concatenation
+     binds more tightly than `\|', `^', and `$', but less tightly than
+     the other regular expression operators.
+
+`\DIGIT'
+     Matches the DIGIT-th `\(...\)' parenthesized subexpression in the
+     regular expression.  This is called a "back reference".
+     Subexpressions are implicity numbered by counting occurrences of
+     `\(' left-to-right.
+
+`\n'
+     Matches the newline character.
+
+`\CHAR'
+     Matches CHAR, where CHAR is one of `$', `*', `.', `[', `\', or `^'.
+     Note that the only C-like backslash sequences that you can
+     portably assume to be interpreted are `\n' and `\\'; in particular
+     `\t' is not portable, and matches a `t' under most implementations
+     of `sed', rather than a tab character.
+
+   Note that the regular expression matcher is greedy, i.e., if two or
+more matches are detected, it selects the longest; if there are two or
+more selected with the same size, it selects the first in text.
+
+Examples:
+`abcdef'
+     Matches `abcdef'.
+
+`a*b'
+     Matches zero or more `a's followed by a single `b'.  For example,
+     `b' or `aaaaab'.
+
+`a\?b'
+     Matches `b' or `ab'.
+
+`a\+b\+'
+     Matches one or more `a's followed by one or more `b's: `ab' is the
+     shortest possible match, but other examples are `aaaab' or
+     `abbbbb' or `aaaaaabbbbbbb'.
+
+`.*'
+`.\+'
+     These two both match all the characters in a string; however, the
+     first matches every string (including the empty string), while the
+     second matches only strings containing at least one character.
+
+`^main.*(.*)'
+     This matches a string starting with `main', followed by an opening
+     and closing parenthesis.  The `n', `(' and `)' need not be
+     adjacent.
+
+`^#'
+     This matches a string beginning with `#'.
+
+`\\$'
+     This matches a string ending with a single backslash.  The regexp
+     contains two backslashes for escaping.
+
+`\$'
+     Instead, this matches a string consisting of a single dollar sign,
+     because it is escaped.
+
+`[a-zA-Z0-9]'
+     In the C locale, this matches any ASCII letters or digits.
+
+`[^ tab]\+'
+     (Here `tab' stands for a single tab character.)  This matches a
+     string of one or more characters, none of which is a space or a
+     tab.  Usually this means a word.
+
+`^\(.*\)\n\1$'
+     This matches a string consisting of two equal substrings separated
+     by a newline.
+
+`.\{9\}A$'
+     This matches nine characters followed by an `A'.
+
+`^.\{15\}A'
+     This matches the start of a string that contains 16 characters,
+     the last of which is an `A'.
+
+
+File: sed.info,  Node: Data Spaces,  Next: Common Commands,  Prev: Regular Expressions,  Up: sed Programs
+
+Where `sed' Buffers Data
+========================
+
+   `sed' maintains two data buffers: the active _pattern_ space, and
+the auxiliary _hold_ space.  In "normal" operation, `sed' reads in one
+line from the input stream and places it in the pattern space.  This
+pattern space is where text manipulations occur.  The hold space is
+initially empty, but there are commands for moving data between the
+pattern and hold spaces.
+
+
+File: sed.info,  Node: Common Commands,  Next: The "s" Command,  Prev: Data Spaces,  Up: sed Programs
+
+Often-Used Commands
+===================
+
+   If you use `sed' at all, you will quite likely want to know these
+commands.
+
+`#'
+     [No addresses allowed.]
+
+     The `#' character begins a comment; the comment continues until
+     the next newline.
+
+     If you are concerned about portability, be aware that some
+     implementations of `sed' (which are not POSIX conformant) may only
+     support a single one-line comment, and then only when the very
+     first character of the script is a `#'.
+
+     Warning: if the first two characters of the `sed' script are `#n',
+     then the `-n' (no-autoprint) option is forced.  If you want to put
+     a comment in the first line of your script and that comment begins
+     with the letter `n' and you do not want this behavior, then be
+     sure to either use a capital `N', or place at least one space
+     before the `n'.
+
+`q [EXIT-CODE]'
+     This command only accepts a single address.
+
+     Exit `sed' without processing any more commands or input.  Note
+     that the current pattern space is printed if auto-print is not
+     disabled with the `-n' options.  The ability to return an exit
+     code from the `sed' script is a GNU `sed' extension.
+
+`d'
+     Delete the pattern space; immediately start next cycle.
+
+`p'
+     Print out the pattern space (to the standard output).  This
+     command is usually only used in conjunction with the `-n'
+     command-line option.
+
+     Note: some implementations of `sed', such as this one, will
+     double-print lines when auto-print is not disabled and the `p'
+     command is given.  Other implementations will only print the line
+     once.  Both ways conform with the POSIX standard, and so neither
+     way can be considered to be in error.
+
+     Portable `sed' scripts should thus avoid relying on either
+     behavior; either use the `-n' option and explicitly print what you
+     want, or avoid use of the `p' command (and also the `p' flag to the
+     `s' command).
+
+`n'
+     If auto-print is not disabled, print the pattern space, then,
+     regardless, replace the pattern space with the next line of input.
+     If there is no more input then `sed' exits without processing any
+     more commands.
+
+`{ COMMANDS }'
+     A group of commands may be enclosed between `{' and `}' characters.
+     This is particularly useful when you want a group of commands to
+     be triggered by a single address (or address-range) match.
+
+
+File: sed.info,  Node: The "s" Command,  Next: Other Commands,  Prev: Common Commands,  Up: sed Programs
+
+The `s' Command
+===============
+
+   The syntax of the `s' (as in substitute) command is
+`s/REGEXP/REPLACEMENT/FLAGS'.  The `/' characters may be uniformly
+replaced by any other single character within any given `s' command.
+The `/' character (or whatever other character is used in its stead)
+can appear in the REGEXP or REPLACEMENT only if it is preceded by a `\'
+character.
+
+   The `s' command is probably the most important in `sed' and has a
+lot of different options.  Its basic concept is simple: the `s' command
+attempts to match the pattern space against the supplied REGEXP; if the
+match is successful, then that portion of the pattern space which was
+matched is replaced with REPLACEMENT.
+
+   The REPLACEMENT can contain `\N' (N being a number from 1 to 9,
+inclusive) references, which refer to the portion of the match which is
+contained between the Nth `\(' and its matching `\)'.  Also, the
+REPLACEMENT can contain unescaped `&' characters which reference the
+whole matched portion of the pattern space.  Finally (this is a GNU
+`sed' extension) you can include a special sequence made of a backslash
+and one of the letters `L', `l', `U', `u', or `E'.  The meaning is as
+follows:
+
+`\L'
+     Turn the replacement to lowercase until a `\U' or `\E' is found,
+
+`\l'
+     Turn the next character to lowercase,
+
+`\U'
+     Turn the replacement to uppercase until a `\L' or `\E' is found,
+
+`\u'
+     Turn the next character to uppercase,
+
+`\E'
+     Stop case conversion started by `\L' or `\U'.
+
+   To include a literal `\', `&', or newline in the final replacement,
+be sure to precede the desired `\', `&', or newline in the REPLACEMENT
+with a `\'.
+
+   The `s' command can be followed by zero or more of the following
+FLAGS:
+
+`g'
+     Apply the replacement to _all_ matches to the REGEXP, not just the
+     first.
+
+`NUMBER'
+     Only replace the NUMBERth match of the REGEXP.
+
+     Note: the POSIX standard does not specify what should happen when
+     you mix the `g' and NUMBER modifiers, and currently there is no
+     widely agreed upon meaning across `sed' implementations.  For GNU
+     `sed', the interaction is defined to be: ignore matches before the
+     NUMBERth, and then match and replace all matches from the NUMBERth
+     on.
+
+`p'
+     If the substitution was made, then print the new pattern space.
+
+     Note: when both the `p' and `e' options are specified, the
+     relative ordering of the two produces very different results.  In
+     general, `ep' (evaluate then print) is what you want, but
+     operating the other way round can be useful for debugging.  For
+     this reason, the current version of GNU `sed' interprets specially
+     the presence of `p' options both before and after `e', printing
+     the pattern space before and after evaluation, while in general
+     flags for the `s' command show their effect just once.  This
+     behavior, although documented, might change in future versions.
+
+`w FILE-NAME'
+     If the substitution was made, then write out the result to the
+     named file.  As a GNU `sed' extension, two special values of
+     FILE-NAME are supported: `/dev/stderr', which writes the result to
+     the standard error, and `/dev/stdout', which writes to the standard
+     output.(1)
+
+`e'
+     This command allows one to pipe input from a shell command into
+     pattern space.  If a substitution was made, the command that is
+     found in pattern space is executed and pattern space is replaced
+     with its output.  A trailing newline is suppressed; results are
+     undefined if the command to be executed contains a NUL character.
+     This is a GNU `sed' extension.
+
+`I'
+`i'
+     The `I' modifier to regular-expression matching is a GNU extension
+     which makes `sed' match REGEXP in a case-insensitive manner.
+
+`M'
+`m'
+     The `M' modifier to regular-expression matching is a GNU `sed'
+     extension which causes `^' and `$' to match respectively (in
+     addition to the normal behavior) the empty string after a newline,
+     and the empty string before a newline.  There are special character
+     sequences (`\`' and `\'') which always match the beginning or the
+     end of the buffer.  `M' stands for `multi-line'.
+
+   ---------- Footnotes ----------
+
+   (1) This is equivalent to `p' unless the `-i' option is being used.
+
+
+File: sed.info,  Node: Other Commands,  Next: Programming Commands,  Prev: The "s" Command,  Up: sed Programs
+
+Less Frequently-Used Commands
+=============================
+
+   Though perhaps less frequently used than those in the previous
+section, some very small yet useful `sed' scripts can be built with
+these commands.
+
+`y/SOURCE-CHARS/DEST-CHARS/'
+     (The `/' characters may be uniformly replaced by any other single
+     character within any given `y' command.)
+
+     Transliterate any characters in the pattern space which match any
+     of the SOURCE-CHARS with the corresponding character in DEST-CHARS.
+
+     Instances of the `/' (or whatever other character is used in its
+     stead), `\', or newlines can appear in the SOURCE-CHARS or
+     DEST-CHARS lists, provide that each instance is escaped by a `\'.
+     The SOURCE-CHARS and DEST-CHARS lists _must_ contain the same
+     number of characters (after de-escaping).
+
+`a\'
+`TEXT'
+     In `POSIXLY_CORRECT' mode, this command only accepts a single
+     address.
+
+     Queue the lines of text which follow this command (each but the
+     last ending with a `\', which are removed from the output) to be
+     output at the end of the current cycle, or when the next input
+     line is read.
+
+     As a GNU extension, if between the `a' and the newline there is
+     other than a whitespace-`\' sequence, then the text of this line,
+     starting at the first non-whitespace character after the `a', is
+     taken as the first line of the TEXT block.  (This enables a
+     simplification in scripting a one-line add.)  This extension also
+     works with the `i' and `c' commands.
+
+`i\'
+`TEXT'
+     In `POSIXLY_CORRECT' mode, this command only accepts a single
+     address.
+
+     Immediately output the lines of text which follow this command
+     (each but the last ending with a `\', which are removed from the
+     output).
+
+`c\'
+`TEXT'
+     Delete the lines matching the address or address-range, and output
+     the lines of text which follow this command (each but the last
+     ending with a `\', which are removed from the output) in place of
+     the last line (or in place of each line, if no addresses were
+     specified).  A new cycle is started after this command is done,
+     since the pattern space will have been deleted.
+
+`='
+     In `POSIXLY_CORRECT' mode, this command only accepts a single
+     address.
+
+     Print out the current input line number (with a trailing newline).
+
+`l N'
+     Print the pattern space in an unambiguous form: non-printable
+     characters (and the `\' character) are printed in C-style escaped
+     form; long lines are split, with a trailing `\' character to
+     indicate the split; the end of each line is marked with a `$'.
+
+     N specifies the desired line-wrap length; a length of 0 (zero)
+     means to never wrap long lines.  If omitted, the default as
+     specified on the command line is used.  The N parameter is a GNU
+     `sed' extension.
+
+`r FILENAME'
+     In `POSIXLY_CORRECT' mode, this command only accepts a single
+     address.
+
+     Queue the contents of FILENAME to be read and inserted into the
+     output stream at the end of the current cycle, or when the next
+     input line is read.  Note that if FILENAME cannot be read, it is
+     treated as if it were an empty file, without any error indication.
+
+     As a GNU `sed' extension, the special value `/dev/stdin' is
+     supported for the file name, which reads the contents of the
+     standard input.
+
+`w FILENAME'
+     Write the pattern space to FILENAME.  As a GNU `sed' extension,
+     two special values of FILE-NAME are supported: `/dev/stderr',
+     which writes the result to the standard error, and `/dev/stdout',
+     which writes to the standard output.(1)
+
+     The file will be created (or truncated) before the first input
+     line is read; all `w' commands (including instances of `w' flag on
+     successful `s' commands) which refer to the same FILENAME are
+     output without closing and reopening the file.
+
+`D'
+     Delete text in the pattern space up to the first newline.  If any
+     text is left, restart cycle with the resultant pattern space
+     (without reading a new line of input), otherwise start a normal
+     new cycle.
+
+`N'
+     Add a newline to the pattern space, then append the next line of
+     input to the pattern space.  If there is no more input then `sed'
+     exits without processing any more commands.
+
+`P'
+     Print out the portion of the pattern space up to the first newline.
+
+`h'
+     Replace the contents of the hold space with the contents of the
+     pattern space.
+
+`H'
+     Append a newline to the contents of the hold space, and then
+     append the contents of the pattern space to that of the hold space.
+
+`g'
+     Replace the contents of the pattern space with the contents of the
+     hold space.
+
+`G'
+     Append a newline to the contents of the pattern space, and then
+     append the contents of the hold space to that of the pattern space.
+
+`x'
+     Exchange the contents of the hold and pattern spaces.
+
+   ---------- Footnotes ----------
+
+   (1) This is equivalent to `p' unless the `-i' option is being used.
+
+
+File: sed.info,  Node: Programming Commands,  Next: Extended Commands,  Prev: Other Commands,  Up: sed Programs
+
+Commands for `sed' gurus
+========================
+
+   In most cases, use of these commands indicates that you are probably
+better off programming in something like `awk' or Perl.  But
+occasionally one is committed to sticking with `sed', and these
+commands can enable one to write quite convoluted scripts.
+
+`: LABEL'
+     [No addresses allowed.]
+
+     Specify the location of LABEL for branch commands.  In all other
+     respects, a no-op.
+
+`b LABEL'
+     Unconditionally branch to LABEL.  The LABEL may be omitted, in
+     which case the next cycle is started.
+
+`t LABEL'
+     Branch to LABEL only if there has been a successful `s'ubstitution
+     since the last input line was read or conditional branch was taken.
+     The LABEL may be omitted, in which case the next cycle is started.
+
+
+File: sed.info,  Node: Extended Commands,  Next: Escapes,  Prev: Programming Commands,  Up: sed Programs
+
+Commands Specific to GNU `sed'
+==============================
+
+   These commands are specific to GNU `sed', so you must use them with
+care and only when you are sure that hindering portability is not evil.
+They allow you to check for GNU `sed' extensions or to do tasks that
+are required quite often, yet are unsupported by standard `sed's.
+
+`e [COMMAND]'
+     This command allows one to pipe input from a shell command into
+     pattern space.  Without parameters, the `e' command executes the
+     command that is found in pattern space and replaces the pattern
+     space with the output; a trailing newline is suppressed.
+
+     If a parameter is specified, instead, the `e' command interprets
+     it as a command and sends its output to the output stream (like
+     `r' does).  The command can run across multiple lines, all but the
+     last ending with a back-slash.
+
+     In both cases, the results are undefined if the command to be
+     executed contains a NUL character.
+
+`L N'
+     In `POSIXLY_CORRECT' mode, this command only accepts a single
+     address.
+
+     This GNU `sed' extension fills and joins lines in pattern space to
+     produce output lines of (at most) N characters, like `fmt' does;
+     if N is omitted, the default as specified on the command line is
+     used.
+
+     Blank lines, spaces between words, and indentation are preserved
+     in the output; successive input lines with different indentation
+     are not joined; tabs are expanded to 8 columns.
+
+     If the pattern space contains multiple lines, they are joined, but
+     since the pattern space usually contains a single line, the
+     behavior of a simple `L;d' script is the same as `fmt -s' (i.e.,
+     it does not join short lines to form longer ones).
+
+     N specifies the desired line-wrap length; if omitted, the default
+     as specified on the command line is used.
+
+`Q [EXIT-CODE]'
+     This command only accepts a single address.
+
+     This command is the same as `q', but will not print the contents
+     of pattern space.  Like `q', it provides the ability to return an
+     exit code to the caller.
+
+     This command can be useful because the only alternative ways to
+     accomplish this apparently trivial function are to use the `-n'
+     option (which can unnecessarily complicate your script) or
+     resorting to the following snippet, which wastes time by reading
+     the whole file without any visible effect:
+
+          :eat
+          $d       Quit silently on the last line
+          N        Read another line, silently
+          g        Overwrite pattern space each time to save memory
+          b eat
+
+`R FILENAME'
+     Queue a line of FILENAME to be read and inserted into the output
+     stream at the end of the current cycle, or when the next input
+     line is read.  Note that if FILENAME cannot be read, or if its end
+     is reached, no line is appended, without any error indication.
+
+     As with the `r' command, the special value `/dev/stdin' is
+     supported for the file name, which reads a line from the standard
+     input.
+
+`T LABEL'
+     Branch to LABEL only if there have been no successful
+     `s'ubstitutions since the last input line was read or conditional
+     branch was taken. The LABEL may be omitted, in which case the next
+     cycle is started.
+
+`v VERSION'
+     This command does nothing, but makes `sed' fail if GNU `sed'
+     extensions are not supported, simply because other versions of
+     `sed' do not implement it.  In addition, you can specify the
+     version of `sed' that your script requires, such as `4.0.5'.  The
+     default is `4.0' because that is the first version that
+     implemented this command.
+
+     This commands also enables GNU extensions unconditionally, even if
+     `POSIXLY_CORRECT' is set in the environment.
+
+`W FILENAME'
+     Write to the given filename the portion of the pattern space up to
+     the first newline.  Everything said under the `w' command about
+     file handling holds here too.
+
+
+File: sed.info,  Node: Escapes,  Prev: Extended Commands,  Up: sed Programs
+
+GNU Extensions for Escapes in Regular Expressions
+=================================================
+
+   Until this chapter, we have only encountered escapes of the form
+`\^', which tell `sed' not to interpret the circumflex as a special
+character, but rather to take it literally.  For example, `\*' matches
+a single asterisk rather than zero or more backslashes.
+
+   This chapter introduces another kind of escape(1)--that is, escapes
+that are applied to a character or sequence of characters that
+ordinarily are taken literally, and that `sed' replaces with a special
+character.  This provides a way of encoding non-printable characters in
+patterns in a visible manner.  There is no restriction on the
+appearance of non-printing characters in a `sed' script but when a
+script is being prepared in the shell or by text editing, it is usually
+easier to use one of the following escape sequences than the binary
+character it represents:
+
+   The list of these escapes is:
+
+`\a'
+     Produces or matches a BEL character, that is an "alert" (ASCII 7).
+
+`\f'
+     Produces or matches a form feed (ASCII 12).
+
+`\n'
+     Produces or matches a newline (ASCII 10).
+
+`\r'
+     Produces or matches a carriage return (ASCII 13).
+
+`\t'
+     Produces or matches a horizontal tab (ASCII 9).
+
+`\v'
+     Produces or matches a so called "vertical tab" (ASCII 11).
+
+`\cX'
+     Produces or matches `CONTROL-X', where X is any character.  The
+     precise effect of `\cX' is as follows: if X is a lower case
+     letter, it is converted to upper case.  Then bit 6 of the
+     character (hex 40) is inverted.  Thus `\cz' becomes hex 1A, but
+     `\c{' becomes hex 3B, while `\c;' becomes hex 7B.
+
+`\dXXX'
+     Produces or matches a character whose decimal ASCII value is XXX.
+
+`\oXXX'
+     Produces or matches a character whose octal ASCII value is XXX.
+
+`\xXX'
+     Produces or matches a character whose hexadecimal ASCII value is
+     XX.
+
+   `\b' (backspace) was omitted because of the conflict with the
+existing "word boundary" meaning.
+
+   Other escapes match a particular character class and are valid only
+in regular expressions:
+
+`\w'
+     Matches any "word" character.  A "word" character is any letter or
+     digit or the underscore character.
+
+`\W'
+     Matches any "non-word" character.
+
+`\b'
+     Matches a word boundary; that is it matches if the character to
+     the left is a "word" character and the character to the right is a
+     "non-word" character, or vice-versa.
+
+`\B'
+     Matches everywhere but on a word boundary; that is it matches if
+     the character to the left and the character to the right are
+     either both "word" characters or both "non-word" characters.
+
+`\`'
+     Matches only at the start of pattern space.  This is different
+     from `^' in multi-line mode.
+
+`\''
+     Matches only at the end of pattern space.  This is different from
+     `$' in multi-line mode.
+
+   ---------- Footnotes ----------
+
+   (1) All the escapes introduced here are GNU extensions, with the
+exception of `\n'.
+
+
+File: sed.info,  Node: Examples,  Next: Limitations,  Prev: sed Programs,  Up: Top
+
+Some Sample Scripts
+*******************
+
+   Here are some `sed' scripts to guide you in the art of mastering
+`sed'.
+
+* Menu:
+
+Some exotic examples:
+* Centering lines::
+* Increment a number::
+* Rename files to lower case::
+* Print bash environment::
+* Reverse chars of lines::
+
+Emulating standard utilities:
+* tac::                             Reverse lines of files
+* cat -n::                          Numbering lines
+* cat -b::                          Numbering non-blank lines
+* wc -c::                           Counting chars
+* wc -w::                           Counting words
+* wc -l::                           Counting lines
+* head::                            Printing the first lines
+* tail::                            Printing the last lines
+* uniq::                            Make duplicate lines unique
+* uniq -d::                         Print duplicated lines of input
+* uniq -u::                         Remove all duplicated lines
+* cat -s::                          Squeezing blank lines
+
+
+File: sed.info,  Node: Centering lines,  Next: Increment a number,  Up: Examples
+
+Centering Lines
+===============
+
+   This script centers all lines of a file on a 80 columns width.  To
+change that width, the number in `\{...\}' must be replaced, and the
+number of added spaces also must be changed.
+
+   Note how the buffer commands are used to separate parts in the
+regular expressions to be matched--this is a common technique.
+
+     #!/usr/bin/sed -f
+     
+     # Put 80 spaces in the buffer
+     1 {
+       x
+       s/^$/          /
+       s/^.*$/&&&&&&&&/
+       x
+     }
+     
+     # del leading and trailing spaces
+     y/tab/ /
+     s/^ *//
+     s/ *$//
+     
+     # add a newline and 80 spaces to end of line
+     G
+     
+     # keep first 81 chars (80 + a newline)
+     s/^\(.\{81\}\).*$/\1/
+     
+     # \2 matches half of the spaces, which are moved to the beginning
+     s/^\(.*\)\n\(.*\)\2/\2\1/
+
+
+File: sed.info,  Node: Increment a number,  Next: Rename files to lower case,  Prev: Centering lines,  Up: Examples
+
+Increment a Number
+==================
+
+   This script is one of a few that demonstrate how to do arithmetic in
+`sed'.  This is indeed possible,(1) but must be done manually.
+
+   To increment one number you just add 1 to last digit, replacing it
+by the following digit.  There is one exception: when the digit is a
+nine the previous digits must be also incremented until you don't have
+a nine.
+
+   This solution by Bruno Haible is very clever and smart because it
+uses a single buffer; if you don't have this limitation, the algorithm
+used in *Note Numbering lines: cat -n, is faster.  It works by
+replacing trailing nines with an underscore, then using multiple `s'
+commands to increment the last digit, and then again substituting
+underscores with zeros.
+
+     #!/usr/bin/sed -f
+     
+     /[^0-9]/ d
+     
+     # replace all leading 9s by _ (any other character except digits, could
+     # be used)
+     :d
+     s/9\(_*\)$/_\1/
+     td
+     
+     # incr last digit only.  The first line adds a most-significant
+     # digit of 1 if we have to add a digit.
+     #
+     # The `tn' commands are not necessary, but make the thing
+     # faster
+     
+     s/^\(_*\)$/1\1/; tn
+     s/8\(_*\)$/9\1/; tn
+     s/7\(_*\)$/8\1/; tn
+     s/6\(_*\)$/7\1/; tn
+     s/5\(_*\)$/6\1/; tn
+     s/4\(_*\)$/5\1/; tn
+     s/3\(_*\)$/4\1/; tn
+     s/2\(_*\)$/3\1/; tn
+     s/1\(_*\)$/2\1/; tn
+     s/0\(_*\)$/1\1/; tn
+     
+     :n
+     y/_/0/
+
+   ---------- Footnotes ----------
+
+   (1) `sed' guru Greg Ubben wrote an implementation of the `dc' RPN
+calculator!  It is distributed together with sed.
+
+
+File: sed.info,  Node: Rename files to lower case,  Next: Print bash environment,  Prev: Increment a number,  Up: Examples
+
+Rename Files to Lower Case
+==========================
+
+   This is a pretty strange use of `sed'.  We transform text, and
+transform it to be shell commands, then just feed them to shell.  Don't
+worry, even worse hacks are done when using `sed'; I have seen a script
+converting the output of `date' into a `bc' program!
+
+   The main body of this is the `sed' script, which remaps the name
+from lower to upper (or vice-versa) and even checks out if the remapped
+name is the same as the original name.  Note how the script is
+parameterized using shell variables and proper quoting.
+
+     #! /bin/sh
+     # rename files to lower/upper case...
+     #
+     # usage:
+     #    move-to-lower *
+     #    move-to-upper *
+     # or
+     #    move-to-lower -R .
+     #    move-to-upper -R .
+     #
+     
+     help()
+     {
+     	cat << eof
+     Usage: $0 [-n] [-r] [-h] files...
+     
+     -n      do nothing, only see what would be done
+     -R      recursive (use find)
+     -h      this message
+     files   files to remap to lower case
+     
+     Examples:
+            $0 -n *        (see if everything is ok, then...)
+            $0 *
+     
+            $0 -R .
+     
+     eof
+     }
+     
+     apply_cmd='sh'
+     finder='echo "$|" tr " " "\n"'
+     files_only=
+     
+     while :
+     do
+         case "$1" in
+             -n) apply_cmd='cat' ;;
+             -R) finder='find "$-"type f';;
+             -h) help ; exit 1 ;;
+             *) break ;;
+         esac
+         shift
+     done
+     
+     if [ -z "$1" ]; then
+             echo Usage: $0 [-h] [-n] [-r] files...
+             exit 1
+     fi
+     
+     LOWER='abcdefghijklmnopqrstuvwxyz'
+     UPPER='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+     
+     case `basename $0` in
+             *upper*) TO=$UPPER; FROM=$LOWER ;;
+             *)       FROM=$UPPER; TO=$LOWER ;;
+     esac
+     
+     eval $finder | sed -n '
+     
+     # remove all trailing slashes
+     s/\/*$//
+     
+     # add ./ if there is no path, only a filename
+     /\//! s/^/.\//
+     
+     # save path+filename
+     h
+     
+     # remove path
+     s/.*\///
+     
+     # do conversion only on filename
+     y/'$FROM'/'$TO'/
+     
+     # now line contains original path+file, while
+     # hold space contains the new filename
+     x
+     
+     # add converted file name to line, which now contains
+     # path/file-name\nconverted-file-name
+     G
+     
+     # check if converted file name is equal to original file name,
+     # if it is, do not print nothing
+     /^.*\/\(.*\)\n\1/b
+     
+     # now, transform path/fromfile\n, into
+     # mv path/fromfile path/tofile and print it
+     s/^\(.*\/\)\(.*\)\n\(.*\)$/mv \1\2 \1\3/p
+     
+     ' | $apply_cmd
+
+
+File: sed.info,  Node: Print bash environment,  Next: Reverse chars of lines,  Prev: Rename files to lower case,  Up: Examples
+
+Print `bash' Environment
+========================
+
+   This script strips the definition of the shell functions from the
+output of the `set' Bourne-shell command.
+
+     #!/bin/sh
+     
+     set | sed -n '
+     :x
+     
+     # if no occurrence of "=()" print and load next line
+     /=()/! { p; b; }
+     / () $/! { p; b; }
+     
+     # possible start of functions section
+     # save the line in case this is a var like FOO="() "
+     h
+     
+     # if the next line has a brace, we quit because
+     # nothing comes after functions
+     n
+     /^{/ q
+     
+     # print the old line
+     x; p
+     
+     # work on the new line now
+     x; bx
+     '
+

@@ -1,0 +1,200 @@
+## config:mac-pre.in
+## common Macintosh prefix for all Makefile.in in the Kerberos V5 tree
+
+#
+# MPW-style lines for the MakeFile
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+#
+# This first part is long enough that NFS:Share doesn't notice the non-ASCII
+# characters in the rest of the file, so it claims that the file is type
+# TEXT, which is what we want.  The non-ASCII chars are necessary for MPW 
+# Make
+
+#
+# End of MPW-style lines for MakeFile
+#
+
+WHAT = mac
+
+# Directory syntax Ä 
+R=
+C=
+S=:
+U=:
+
+BUILDTOP = :::
+srcdir = 
+
+# FIXME Ä   This doesn't translate to MPW yet, srcdir must be same as objdir
+# File in object dir can come from either the current dir or srcdir
+# 
+# .  Ä  . "{srcdir}"
+
+# Default rule that puts each file into separate segment
+
+.c.o Ä  .c
+   {CC}  {DepDir}{Default}.c {CFLAGS} -s {Default} -o {TargDir}{Default}.c.o
+
+CPPFLAGS =  -i {SRCTOP}:include -i {BUILDTOP}:include -i {SRCTOP}:include:krb5 -i {BUILDTOP}:include:krb5 -i {CIncludes}
+DEFS =   {CPPFLAGS}
+CC = c
+LD = link
+# The funny quoting in the LDFLAGS is to avoid xxx.c.o being mangled by
+# mac-mf.sed into xxx.c.o
+LDFLAGS=-t MPST -c "MPS " -sym on {Libraries}"Runtime."o {CLibraries}"StdClib."o {Libraries}"ToolLibs."o {Libraries}"Interface."o
+CCOPTS = 
+LIBS = 
+KRB5ROOT= @KRB5ROOT@
+KRB4=@KRB4@
+INSTALL=Duplicate -y
+INSTALL_PROGRAM=Duplicate -y
+INSTALL_DATA=Duplicate -y
+INSTALL_SETUID=Duplicate -y
+
+KRB5MANROOT = {KRB5ROOT}{S}man
+ADMIN_BINDIR = {KRB5ROOT}{S}admin
+SERVER_BINDIR = {KRB5ROOT}{S}sbin
+CLIENT_BINDIR = {KRB5ROOT}{S}bin
+ADMIN_MANDIR = {KRB5MANROOT}{S}man8
+SERVER_MANDIR = {KRB5MANROOT}{S}man8
+CLIENT_MANDIR = {KRB5MANROOT}{S}man1
+FILE_MANDIR = {KRB5MANROOT}{S}man5
+KRB5_LIBDIR = {KRB5ROOT}{S}lib
+KRB5_INCDIR = {KRB5ROOT}{S}include
+KRB5_INCSUBDIRS = ¶
+	{KRB5_INCDIR}{S}krb5 ¶
+	{KRB5_INCDIR}{S}asn.1 ¶
+	{KRB5_INCDIR}{S}kerberosIV
+
+
+RM = Delete -y -i
+CP = Duplicate -y
+MV = mv -f
+CHMOD=chmod
+RANLIB = @RANLIB@
+ARCHIVE = @ARCHIVE@
+ARADD = @ARADD@
+LN = @LN_S@
+AWK = @AWK@
+LEX = @LEX@
+LEXLIB = @LEXLIB@
+YACC = @YACC@
+
+# FIXME Ä   This won't work for srcdir != objdir.  But on the Mac, there
+# is no easy way to build a relative or absolute path, because  Ä  means
+# both the path separator, and the "go up a directory" indicator
+#SRCTOP = {srcdir}{S}{BUILDTOP}
+SRCTOP = {BUILDTOP}
+SUBDIRS = @subdirs@
+
+TOPLIBD = {BUILDTOP}{S}lib
+
+OBJEXT = c.o
+LIBEXT = a
+EXEEXT =
+
+all ÄÄ 
+# Generated automatically from Makefile.in by configure
+CFLAGS = {CCOPTS} {DEFS} -i ::des
+
+##DOSBUILDTOP = ..\..\:
+##DOSLIBNAME=..\crypto.lib
+##DOS!include {BUILDTOP}\config\windows.in
+
+OBJS=	md5.{OBJEXT} md5glue.{OBJEXT} md5crypto.{OBJEXT}
+
+SRCS=	md5.c md5glue.c md5crypto.c
+
+all ÄÄ  {OBJS} 
+
+t_mddriver Ä  t_mddriver.c.o md5.c.o
+	Link    {LDFLAGS} -o t_mddriver t_mddriver.c.o md5.c.o
+
+t_mddriver.exe Ä 
+	{CC} {CFLAGS2} -o t_mddriver.exe t_mddriver.c md5.c
+
+check ÄÄ  t_mddriver{EXEEXT}
+	{C}t_mddriver{EXEEXT} -x
+
+clean ÄÄ 
+	{RM} t_mddriver{EXEEXT} t_mddriver.{OBJEXT}
+# config:post.in
+# put all ÄÄ  first just in case no other rules occur here
+#
+all ÄÄ 
+
+check ÄÄ 
+
+clean ÄÄ  clean-{WHAT}
+	{RM} config.log pre.c.out post.c.out Makefile.c.out
+
+clean-unix ÄÄ 
+	if test -n "{OBJS}" ; then {RM} {OBJS}; else  Ä ; fi
+
+clean-windows ÄÄ 
+	{RM} Å.{OBJEXT}
+	{RM} msvc.pdb Å.err

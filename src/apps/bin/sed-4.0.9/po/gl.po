@@ -1,0 +1,390 @@
+# Galician translation of GNU sed
+# Copyright (C) 1999, 2002 Free Software Foundation, Inc.
+# Jacobo Tarrío Barreiro <jtarrio@trasno.net>, 1999, 2002.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: sed 4.0\n"
+"POT-Creation-Date: 2004-01-10 08:46+0100\n"
+"PO-Revision-Date: 2002-10-25 15:57+0200\n"
+"Last-Translator: Jacobo Tarrío Barreiro <jtarrio@trasno.net>\n"
+"Language-Team: Galician <gpul-traduccion@ceu.fi.udc.es>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: \n"
+"Plural-Forms: nplurals=2; plural=n!=1;\n"
+
+#: sed/compile.c:172
+msgid "Multiple `!'s"
+msgstr "Múltiples `!'s"
+
+#: sed/compile.c:173
+msgid "Unexpected `,'"
+msgstr "`,' inesperada"
+
+#: sed/compile.c:174
+msgid "Cannot use +N or ~N as first address"
+msgstr "Non se pode usar +N ou ~N como primeira dirección"
+
+#: sed/compile.c:175
+msgid "Unmatched `{'"
+msgstr "`{' sen parella"
+
+#: sed/compile.c:176
+msgid "Unexpected `}'"
+msgstr "`}' inesperado"
+
+#: sed/compile.c:177
+msgid "Extra characters after command"
+msgstr "Caracteres extra despois da instrucción"
+
+#: sed/compile.c:178
+msgid "Expected \\ after `a', `c' or `i'"
+msgstr "Esperábase \\ despois de `a', `c' ou `i'"
+
+#: sed/compile.c:179
+msgid "`}' doesn't want any addresses"
+msgstr "`}' non acepta un enderezo"
+
+#: sed/compile.c:180
+msgid ": doesn't want any addresses"
+msgstr ": non acepta un enderezo"
+
+#: sed/compile.c:181
+msgid "Comments don't accept any addresses"
+msgstr "Os comentarios non aceptan enderezos"
+
+#: sed/compile.c:182
+msgid "Missing command"
+msgstr "Falta unha instrucción"
+
+#: sed/compile.c:183
+msgid "Command only uses one address"
+msgstr "A instrucción só usa un enderezo"
+
+#: sed/compile.c:184
+msgid "Unterminated address regex"
+msgstr "Expresión regular de enderezo non rematada"
+
+#: sed/compile.c:185
+msgid "Unterminated `s' command"
+msgstr "Instrucción `s' non rematada"
+
+#: sed/compile.c:186
+msgid "Unterminated `y' command"
+msgstr "Instrucción `y' non rematada"
+
+#: sed/compile.c:187
+msgid "Unknown option to `s'"
+msgstr "Opción de `s' descoñecida"
+
+#: sed/compile.c:188
+msgid "multiple `p' options to `s' command"
+msgstr "múltiples opcións `p' para a instrucción `s'"
+
+#: sed/compile.c:189
+msgid "multiple `g' options to `s' command"
+msgstr "múltiples opcións `g' para a instrucción `s'"
+
+#: sed/compile.c:190
+msgid "multiple number options to `s' command"
+msgstr "múltiples opcións numéricas para a instrucción `s'"
+
+#: sed/compile.c:191
+msgid "number option to `s' command may not be zero"
+msgstr "unha opción numérica para a instrucción `s' non pode ser cero"
+
+#: sed/compile.c:192
+msgid "strings for y command are different lengths"
+msgstr "as cadeas para a instrucción y teñen lonxitudes diferentes"
+
+#: sed/compile.c:193
+msgid "expected newer version of sed"
+msgstr ""
+
+#: sed/compile.c:236
+#, c-format
+msgid "Called savchar() with unexpected pushback (%x)"
+msgstr "Chamouse a savchar() cun pushback inesperado (%x)"
+
+#: sed/compile.c:1331
+msgid "Unknown command:"
+msgstr "Instrucción descoñecida:"
+
+#: sed/compile.c:1352
+#, c-format
+msgid "%s: file %s line %lu: %s\n"
+msgstr "%s: ficheiro %s liña %lu: %s\n"
+
+#: sed/compile.c:1355
+#, c-format
+msgid "%s: -e expression #%lu, char %lu: %s\n"
+msgstr "%s: -e expresión #%lu, carácter %lu: %s\n"
+
+#: sed/compile.c:1555
+#, c-format
+msgid "Can't find label for jump to `%s'"
+msgstr "Non se puido atopa-la etiqueta para saltar a `%s'"
+
+#: sed/execute.c:505
+#, c-format
+msgid "%s: can't read %s: %s\n"
+msgstr "%s: non se puido ler %s: %s\n"
+
+#: sed/execute.c:530 sed/execute.c:542
+#, fuzzy, c-format
+msgid "Couldn't open temporary file %s: %s"
+msgstr "Non se puido abri-lo ficheiro %s: %s"
+
+#: sed/execute.c:728
+msgid "INTERNAL ERROR: bad address type"
+msgstr "ERRO INTERNO: tipo de enderezo incorrecto"
+
+#: sed/execute.c:1022 sed/execute.c:1200
+msgid "error in subprocess"
+msgstr "erro no subproceso"
+
+#: sed/execute.c:1024
+msgid "option `e' not supported"
+msgstr "a opción `e' non está soportada"
+
+#: sed/execute.c:1202
+msgid "`e' command not supported"
+msgstr "o comando `e' non está soportado"
+
+#: sed/execute.c:1438
+#, c-format
+msgid "INTERNAL ERROR: Bad cmd %c"
+msgstr "ERRO INTERNO: instrucción %c incorrecta"
+
+#: sed/regexp.c:39 lib/regcomp.c:665
+msgid "No previous regular expression"
+msgstr "Non hai unha expresión regular anterior"
+
+#: sed/regexp.c:40
+msgid "Cannot specify modifiers on empty regexp"
+msgstr "Non se poden especificar modificadores nunha expresión regular baleira"
+
+#: sed/regexp.c:134
+#, c-format
+msgid "Invalid reference \\%d on `s' command's RHS"
+msgstr "Referencia \\%d non válida no lado dereito do comando `s'"
+
+#: sed/sed.c:95
+msgid ""
+"  -R, --regexp-perl\n"
+"                 use Perl 5's regular expressions syntax in the script.\n"
+msgstr ""
+"  -R, --regexp-perl\n"
+"                 usa-la sintaxe de expresións regulares de Perl 5 no "
+"script.\n"
+
+#: sed/sed.c:100
+#, c-format
+msgid ""
+"Usage: %s [OPTION]... {script-only-if-no-other-script} [input-file]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 suppress automatic printing of pattern space\n"
+"  -e script, --expression=script\n"
+"                 add the script to the commands to be executed\n"
+"  -f script-file, --file=script-file\n"
+"                 add the contents of script-file to the commands to be "
+"executed\n"
+"  -i[suffix], --in-place[=suffix]\n"
+"                 edit files in place (makes backup if extension supplied)\n"
+"  -l N, --line-length=N\n"
+"                 specify the desired line-wrap length for the `l' command\n"
+"  -r, --regexp-extended\n"
+"                 use extended regular expressions in the script.\n"
+"%s  -s, --separate\n"
+"                 consider files as separate rather than as a single "
+"continuous\n"
+"                 long stream.\n"
+"  -u, --unbuffered\n"
+"                 load minimal amounts of data from the input files and "
+"flush\n"
+"                 the output buffers more often\n"
+"      --help     display this help and exit\n"
+"  -V, --version  output version information and exit\n"
+"\n"
+"If no -e, --expression, -f, or --file option is given, then the first\n"
+"non-option argument is taken as the sed script to interpret.  All\n"
+"remaining arguments are names of input files; if no input files are\n"
+"specified, then the standard input is read.\n"
+"\n"
+msgstr ""
+"Uso: %s [OPCIÓN]... {script-só-sen-outro-script} [ficheiro-de-entrada]...\n"
+"\n"
+"  -n, --quiet, --silent\n"
+"                 suprime a visualización automática do espacio de patróns\n"
+"  -e script, --expression=script\n"
+"                 engade o script ás instrucción que serán executadas\n"
+"  -f ficheiro-do-script, --file=ficheiro-do-script\n"
+"                 engade o contido do ficheiro do script ás instruccións que\n"
+"                 se han executar\n"
+"  -i[sufixo], --in-place[=sufixo]\n"
+"                 edita os ficheiros no seu sitio (facendo unha copia de\n"
+"                 seguridade se se dá un sufixo)\n"
+"  -l N, --line-length=N\n"
+"                 especifica a lonxitude de liña desexada para o comando `l'\n"
+"  -r, --regexp-extended\n"
+"                 emprega expresións regulares extendidas no script.\n"
+"%s  -s, --separate\n"
+"                 trata os ficheiros coma separados no canto de coma unha\n"
+"                 longa tira de caracteres continua.\n"
+"  -u, --unbuffered\n"
+"                 carga cantidades mínimas de datos dos ficheiros de entrada\n"
+"                 e baleira os buffers de saída máis decote\n"
+"      --help     amosar esta axuda e saír\n"
+"  -V, --version  amosar información da versión e saír\n"
+"\n"
+"Se non se indican as opcións -e, --expression, -f, ou --file, entón o "
+"primeiro\n"
+"argumento que non sexa unha opción tómase como o script de sed a "
+"interpretar.\n"
+"Tódolos argumentos restantes son nomes de ficheiros de entrada; se non se\n"
+"especifican ficheiros de entrada, entón lese a entrada estándar.\n"
+"\n"
+
+#: sed/sed.c:129
+#, c-format
+msgid ""
+"E-mail bug reports to: %s .\n"
+"Be sure to include the word ``%s'' somewhere in the ``Subject:'' field.\n"
+msgstr ""
+"Informe dos erros no programa a %s .\n"
+"Informe dos erros na traducción a gpul-traduccion@ceu.fi.udc.es .\n"
+"Asegúrese de incluí-la palabra ``%s'' nalgunha parte do campo ``Subject:''.\n"
+
+#: sed/sed.c:254
+#, c-format
+msgid "super-sed version %s\n"
+msgstr "super-sed versión %s\n"
+
+#: sed/sed.c:255
+msgid ""
+"based on GNU sed version 3.02.80\n"
+"\n"
+msgstr "baseado en GNU sed versión 3.02.80\n"
+
+#: sed/sed.c:257
+#, c-format
+msgid "GNU sed version %s\n"
+msgstr "GNU sed versión %s\n"
+
+#: sed/sed.c:259
+#, c-format
+msgid ""
+"%s\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE,\n"
+"to the extent permitted by law.\n"
+msgstr ""
+"%s\n"
+"Isto é software libre; vexa o código fonte polas condicións de copia. NON "
+"hai\n"
+"garantía; nin sequera de COMERCIABILIDADE ou APTITUDE PARA UN FIN "
+"DETERMINADO,\n"
+"ata o que permite a lei.\n"
+
+#: lib/utils.c:126
+#, c-format
+msgid "Couldn't open file %s: %s"
+msgstr "Non se puido abri-lo ficheiro %s: %s"
+
+#: lib/utils.c:160
+#, c-format
+msgid "couldn't write %d item to %s: %s"
+msgid_plural "couldn't write %d items to %s: %s"
+msgstr[0] "non se puido escribir %d elemento en %s: %s"
+msgstr[1] "non se puideron escribir %d elementos en %s: %s"
+
+#: lib/utils.c:175
+#, c-format
+msgid "read error on %s: %s"
+msgstr "erro de lectura en %s: %s"
+
+#: lib/regcomp.c:149
+msgid "Success"
+msgstr "Éxito"
+
+#: lib/regcomp.c:152
+msgid "No match"
+msgstr "Non se atopou"
+
+#: lib/regcomp.c:155
+msgid "Invalid regular expression"
+msgstr "Expresión regular non válida"
+
+#: lib/regcomp.c:158
+msgid "Invalid collation character"
+msgstr "Carácter de ordeamento non válido"
+
+#: lib/regcomp.c:161
+msgid "Invalid character class name"
+msgstr "Nome de clase de caracteres non válido"
+
+#: lib/regcomp.c:164
+msgid "Trailing backslash"
+msgstr "Barra invertida á fin de liña"
+
+#: lib/regcomp.c:167
+msgid "Invalid back reference"
+msgstr "Referencia cara a atrás non válida"
+
+#: lib/regcomp.c:170
+msgid "Unmatched [ or [^"
+msgstr "[ ou [^ sen parella"
+
+#: lib/regcomp.c:173
+msgid "Unmatched ( or \\("
+msgstr "( ou \\( sen parella"
+
+#: lib/regcomp.c:176
+msgid "Unmatched \\{"
+msgstr "\\{ sen parella"
+
+#: lib/regcomp.c:179
+msgid "Invalid content of \\{\\}"
+msgstr "Contido de \\{\\} non válido"
+
+#: lib/regcomp.c:182
+msgid "Invalid range end"
+msgstr "Fin de rango non válida"
+
+#: lib/regcomp.c:185
+msgid "Memory exhausted"
+msgstr "Memoria esgotada"
+
+#: lib/regcomp.c:188
+msgid "Invalid preceding regular expression"
+msgstr "Expresión regular anterior non válida"
+
+#: lib/regcomp.c:191
+msgid "Premature end of regular expression"
+msgstr "Fin prematura da expresión regular"
+
+#: lib/regcomp.c:194
+msgid "Regular expression too big"
+msgstr "Expresión regular grande de máis"
+
+#: lib/regcomp.c:197
+msgid "Unmatched ) or \\)"
+msgstr ") ou \\) sen parella"
+
+#~ msgid "Invalid use of address modifier"
+#~ msgstr "Uso non válido de modificador de dirección"
+
+#~ msgid "Unexpected End-of-file"
+#~ msgstr "Fin-de-ficheiro inesperado"
+
+#~ msgid "bad regexp: %s\n"
+#~ msgstr "expresión regular errónea: %s\n"
+
+#~ msgid "input read error: %s"
+#~ msgstr "erro de lectura da entrada: %s"
+
+#~ msgid "couldn't write an item to %s: %s"
+#~ msgstr "non se puido escribir un elemento en %s: %s"
