@@ -14,6 +14,8 @@
  *	the entry function of the embedded ELF part of the loader.
  */
 
+#define GLOBAL(x) .globl x ; x
+
 .text
 .code16
 
@@ -47,6 +49,13 @@ bfs_start:
 	push	%ds
 	pop		%es
 
+	.code32					// save knowledge from the BFS boot block for later use
+	.byte	0x67
+	movb	%dl, gBootDriveID - 0x10000
+	.byte	0x67
+	movl	%eax, gBootPartitionOffset - 0x10000
+	.code16
+
 	cli						// no interrupts please
 	call	enable_a20		// enable a20 gate
 
@@ -75,9 +84,6 @@ _protected_code_segment:
 
 	mov		$0x10000, %ebp	// setup new stack
 	mov		%ebp, %esp
-
-	movb	%dl, gBootDriveID
-		// save boot device
 
 	call	_start
 
@@ -150,8 +156,10 @@ gdt_descriptor:
 	.word	0x2f			// 6 entries in the GDT (8 bytes each)
 	.long	gdt
 
-.globl gBootDriveID
-gBootDriveID:
+GLOBAL(gBootDriveID):
 	.byte	0
+
+GLOBAL(gBootPartitionOffset):
+	.long	0
 
 .org 1024
