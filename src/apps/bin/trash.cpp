@@ -153,7 +153,6 @@ int main(int argc, char **argv)
 	int dountrash = 0;
 	int i;
 	int err = 0;
-	int fd;
 	if (strstr(argv[0], "untrash") || strstr(argv[0], "restore"))
 		dountrash = 1;
 	if (argc < 2)
