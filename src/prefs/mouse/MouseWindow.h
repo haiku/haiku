@@ -20,17 +20,18 @@
 #include "MouseSettings.h"
 #include "MouseView.h"
 
-class MouseWindow : public BWindow 
-{
-public:
-	MouseWindow(BRect rect);
-	
-	bool QuitRequested();
-	void MessageReceived(BMessage *message);
-		
-	MouseSettings		fSettings;
-private:
-	MouseView	*fView;
+
+class MouseWindow : public BWindow {
+	public:
+		MouseWindow(BRect rect);
+
+		bool QuitRequested();
+		void MessageReceived(BMessage *message);
+
+		MouseSettings	fSettings;
+
+	private:
+		MouseView		*fView;
 };
 
 #endif
