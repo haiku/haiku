@@ -61,3 +61,12 @@ lost5:	lwarx	%r6, 0, %r3
 out5:	mr		%r3, %r6
 		blr
 
+/* int atomic_read(int *value) 
+ *                  r3
+ */
+FUNCTION(atomic_read):
+lost6:	lwarx	%r5, 0, %r3
+		stwcx.	%r5, 0, %r3
+		bne-	lost6
+		mr		%r3, %r5
+		blr
