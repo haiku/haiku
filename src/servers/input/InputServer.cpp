@@ -942,7 +942,14 @@ status_t
 InputServer::EnqueueMethodMessage(BMessage *message)
 {
 	CALLED();
-	
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what>>24, message->what>>16, message->what>>8, message->what));
+#ifdef DEBUG
+	if (message->what == 'IMEV') {
+		int32 code;
+		message->FindInt32("be:opcode", &code);
+		PRINT(("%s be:opcode %li\n", __PRETTY_FUNCTION__, code));
+	}
+#endif
 	LockMethodQueue();
 
 	fMethodQueue.AddItem(message);
@@ -982,12 +989,27 @@ InputServer::LockMethodQueue()
  *   Descr: 
  */
 status_t
-InputServer::SetNextMethod(bool)
+InputServer::SetNextMethod(bool direction)
 {
 	LockMethodQueue();
+
+	int32 index = gInputMethodList.IndexOf(fActiveMethod);
+	if (index < 0) {
+		UnlockMethodQueue();
+		return B_ERROR;
+	}
+
+	index += (direction ? 1 : -1);
 	
+	if (index < 0)
+		index = fMethodQueue.CountItems() - 1;
+	if (index >= fMethodQueue.CountItems())
+		index = 0;
+
+	SetActiveMethod((BInputServerMethod *)gInputMethodList.ItemAt(index));
+
 	UnlockMethodQueue();
-	return 0;
+	return B_OK;
 }
 
 
@@ -1310,6 +1332,8 @@ InputServer::CacheEvents(BList *eventsToCache)
 {
 	CALLED();
 
+	SanitizeEvents(eventsToCache);
+
 	MethodizeEvents(eventsToCache, true);
 	
 	FilterEvents(eventsToCache);
@@ -1411,8 +1435,30 @@ InputServer::FilterEvents(BList *eventsToFilter)
  *   Descr: 
  */
 bool 
-InputServer::SanitizeEvents(BList *)
+InputServer::SanitizeEvents(BList *events)
 {
+	int32 index = 0;
+	BMessage *event;
+	while (NULL != (event = (BMessage*)events->ItemAt(index) ) ) {
+		switch (event->what) {
+			case B_KEY_DOWN:
+				// we scan for Alt+Space key down events which means we change to next input method
+				// Note : Shift+Alt+Space key allows to change to the previous input method
+				if ((fKey_info.modifiers & B_COMMAND_KEY) 
+					&& (fKey_info.key_states[B_SPACE >> 3] & (1 << (7 - (B_SPACE % 8))))) {
+					SetNextMethod(!fKey_info.modifiers & B_SHIFT_KEY);
+
+					// this event isn't sent to the user
+					events->RemoveItem(index);
+					delete event;
+					continue;
+				}
+				break;
+		}
+
+		index++;
+	}	
+
 	return true;
 }
 
