@@ -222,7 +222,7 @@ BFile::SetTo(const char *path, uint32 openMode)
 		// analyze openMode
 		// Well, it's a bit schizophrenic to convert the B_* style openMode
 		// to POSIX style openFlags, but to use O_RWMASK to filter openMode.
-		BPrivate::Storage::OpenFlags openFlags;
+		BPrivate::Storage::OpenFlags openFlags = 0;
 		switch (openMode & O_RWMASK) {
 			case B_READ_ONLY:
  				openFlags = O_RDONLY;

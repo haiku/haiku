@@ -742,8 +742,8 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 	// set some icon size related variables
 	BString attributeString;
 	BRect bounds;
-	uint32 attrType;
-	size_t attrSize;
+	uint32 attrType = 0;
+	size_t attrSize = 0;
 	switch (which) {
 		case B_MINI_ICON:
 			attributeString = kMiniIconAttribute;
@@ -842,9 +842,9 @@ BAppFileInfo::SetIconForType(const char *type, const BBitmap *icon,
 	// set some icon size related variables
 	BString attributeString;
 	BRect bounds;
-	uint32 attrType;
-	size_t attrSize;
-	int32 resourceID;
+	uint32 attrType = 0;
+	size_t attrSize = 0;
+	int32 resourceID = 0;
 	switch (which) {
 		case B_MINI_ICON:
 			attributeString = kMiniIconAttribute;

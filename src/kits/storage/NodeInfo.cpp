@@ -223,8 +223,8 @@ BNodeInfo::GetIcon(BBitmap *icon, icon_size k) const
 	// set some icon size related variables
 	const char *attribute = NULL;
 	BRect bounds;
-	uint32 attrType;
-	size_t attrSize;
+	uint32 attrType = 0;
+	size_t attrSize = 0;
 	switch (k) {
 		case B_MINI_ICON:
 			attribute = kNIMiniIconAttribute;
@@ -319,8 +319,8 @@ BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
 	// set some icon size related variables
 	const char *attribute = NULL;
 	BRect bounds;
-	uint32 attrType;
-	size_t attrSize;
+	uint32 attrType = 0;
+	size_t attrSize = 0;
 	switch (k) {
 		case B_MINI_ICON:
 			attribute = kNIMiniIconAttribute;
@@ -349,7 +349,7 @@ BNodeInfo::SetIcon(const BBitmap *icon, icon_size k)
 	if (error == B_OK) {
 		if (icon) {
 			bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
-			ssize_t written;
+			ssize_t written = 0;
 			if (otherColorSpace) {
 				BBitmap bitmap(bounds, B_CMAP8);
 				error = bitmap.InitCheck();
