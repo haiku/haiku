@@ -6,16 +6,19 @@
 //  by the OpenBeOS license.
 //
 //
-//  File:        MouseMessages.h
-//  Author:      Jérôme Duval, Andrew McCall (mccall@digitalparadise.co.uk)
-//  Description: Media Preferences
-//  Created :   December 10, 2003
-// 
+//  File:			MouseConstants.h
+//  Authors:		Jérôme Duval,
+//					Andrew McCall (mccall@digitalparadise.co.uk)
+//					Axel Dörfler (axeld@pinc-software.de)
+//  Description:	Mouse Preferences
+//  Created:		December 10, 2003
+//
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-#ifndef MOUSE_MESSAGES_H
-#define MOUSE_MESSAGES_H
+#ifndef MOUSE_CONSTANTS_H
+#define MOUSE_CONSTANTS_H
 
+// interface messages
 const uint32 BUTTON_DEFAULTS			= 'BTde';
 const uint32 BUTTON_REVERT				= 'BTre';
 
@@ -31,4 +34,8 @@ const uint32 SLIDER_MOUSE_ACC			= 'SLma';
 
 const uint32 ERROR_DETECTED				= 'ERor';
 
-#endif
+// user interface
+const uint32 kBorderSpace = 10;
+const uint32 kItemSpace = 7;
+
+#endif	/* MOUSE_CONSTANTS_H */
