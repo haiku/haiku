@@ -25,7 +25,7 @@ class ReplaceChange : public DataChange {
 
 		virtual void Apply(off_t offset, uint8 *buffer, size_t size);
 		virtual void Revert(off_t offset, uint8 *buffer, size_t size);
-	
+
 	private:
 		void Normalize(off_t bufferOffset, size_t bufferSize,
 			off_t &offset, size_t &dataOffset, size_t &size);
