@@ -156,20 +156,6 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 			error << ":" << port;
 		error << ": Host not found.";
 		runner->ShowError(error.String());
-	#ifdef USESSL
-		if (use_ssl) {
-			if (ssl)
-				SSL_shutdown(ssl);
-			if (ctx)
-				SSL_CTX_free(ctx);
-		}
-	#endif
-	#ifdef BONE
-		close(net);
-	#else
-		closesocket(net);
-	#endif
-		net = -1;
 		runner->Stop(true);
 		return;
 	}
@@ -187,14 +173,6 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		saAddr.sin_addr.s_addr = hostIP;
 		int result = connect(net, (struct sockaddr *) &saAddr, sizeof(saAddr));
 		if (result < 0) {
-		#ifdef USESSL
-			if (use_ssl) {
-				if (ssl)
-					SSL_shutdown(ssl);
-				if (ctx)
-					SSL_CTX_free(ctx);
-			}
-		#endif
 		#ifdef BONE
 			close(net);
 		#else
@@ -249,6 +227,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 			#else
 				closesocket(net);
 			#endif
+                        net = -1;
 			runner->Stop(true);
 			return;
 		}
