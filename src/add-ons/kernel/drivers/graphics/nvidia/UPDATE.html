@@ -4,11 +4,12 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.14), (Rudolf)</h1></p>
+<p><h1>head (0.15), (Rudolf)</h1></p>
 <ul>
-	<li>Added AGP mode capability on AGP cards along with the option to block it in nv.settings. No GART and AGP aperture support; but if your card and system AGP host bridge support the 'fastwrite' (FW) feature, you'll notice a nice speedup of mostly unaccelerated graphics. I Tested Quake 2 in software rendering mode using timedemo1 with demo1.dm2: framerates jumped up to 140% of the 'original' in 'just' AGP2.0 4X mode!<br>
+	<li>Added AGP mode capability on AGP cards along with the option to block it in nv.settings. No GART and AGP aperture support; but if your card and system AGP host bridge support the 'fastwrite' (FW) feature, you'll notice a nice speedup of mostly unaccelerated graphics. Tested Quake 2 in software rendering mode over here using timedemo1 with demo1.dm2: framerates jumped up to 140% of the 'original' in 'just' AGP2.0 4X mode!<br>
 <strong>Note please :</strong> You need the new AGP kernel driver I setup for this feature, without it you will remain using PCI mode as usual. This AGP driver will be released seperately asap: it's almost ready.
-	<li>Updated CRTC memory granularity settings on TNT2 and later cards to reduce use of card internal bandwidth: this should minimize or prevent distortions on cards that have limited bandwidth available (especially on older cards).
+	<li>Updated CRTC memory granularity settings on TNT2 and later cards to reduce use of card internal bandwidth: this should minimize or prevent distortions on cards that have limited bandwidth available (especially on older cards). Note: doesn't actually fix the problem! (to be continued...)
+	<li>Updated CRTC modeline tuning for panels: this should fix the 'right-shifted' picture on some panels in their native modes.
 </ul>
 <p><h1>nv_driver 0.10, (Rudolf)</h1></p>
 <ul>
