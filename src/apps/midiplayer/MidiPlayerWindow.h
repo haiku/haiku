@@ -43,6 +43,7 @@ enum
 };
 
 class ScopeView;
+class SynthBridge;
 
 class MidiPlayerWindow : public BWindow
 {
@@ -105,6 +106,8 @@ private:
 	float windowX;
 	float windowY;
 	BMidiSynthFile synth;
+	SynthBridge* bridge;
+	bool instrLoaded;
 };
 
 #endif // MIDI_PLAYER_WINDOW_H

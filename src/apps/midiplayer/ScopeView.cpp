@@ -36,6 +36,7 @@ ScopeView::ScopeView()
 	playing = false;
 	enabled = true;
 	haveFile = false;
+	loading = false;
 	
 	sampleCount = (int32) Bounds().Width();
 	leftSamples = new int16[sampleCount];
@@ -117,6 +118,13 @@ void ScopeView::SetEnabled(bool flag)
 void ScopeView::SetHaveFile(bool flag)
 {
 	haveFile = flag;
+}
+
+//------------------------------------------------------------------------------
+
+void ScopeView::SetLoading(bool flag)
+{
+	loading = flag;
 }
 
 //------------------------------------------------------------------------------

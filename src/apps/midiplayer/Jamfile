@@ -8,6 +8,7 @@ App MidiPlayer :
 	MidiPlayerApp.cpp 
 	MidiPlayerWindow.cpp 
 	ScopeView.cpp
+	SynthBridge.cpp
 ;
 
 LinkSharedOSLibs MidiPlayer : 

@@ -20,12 +20,14 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <MidiProducer.h>
 #include <MidiRoster.h>
 #include <StorageKit.h>
 
 #include "MidiPlayerApp.h"
 #include "MidiPlayerWindow.h"
 #include "ScopeView.h"
+#include "SynthBridge.h"
 
 #define _W(a) (a->Frame().Width())
 #define _H(a) (a->Frame().Height())
@@ -43,8 +45,12 @@ MidiPlayerWindow::MidiPlayerWindow()
 	windowX = -1;
 	windowY = -1;
 	inputId = -1;
+	instrLoaded = false;
 
 	be_synth->SetSamplingRate(44100);
+
+	bridge = new SynthBridge;
+	//bridge->Register();
 
 	CreateViews();
 	LoadSettings();
@@ -56,6 +62,9 @@ MidiPlayerWindow::MidiPlayerWindow()
 MidiPlayerWindow::~MidiPlayerWindow()
 {
 	StopSynth();
+	
+	//bridge->Unregister();
+	bridge->Release();
 }
 
 //------------------------------------------------------------------------------
@@ -547,15 +556,36 @@ void MidiPlayerWindow::OnInputChanged(BMessage* msg)
 	int32 newId;
 	if (msg->FindInt32("id", &newId) == B_OK)
 	{
+		if (!instrLoaded)
+		{
+			scopeView->SetLoading(true);
+			scopeView->Invalidate();
+			UpdateIfNeeded();
+		
+			bridge->Init(B_BIG_SYNTH);
+			instrLoaded = true;
+			
+			scopeView->SetLoading(false);
+			scopeView->Invalidate();
+		}
+
+		BMidiProducer* endp;
+		
+		endp = BMidiRoster::FindProducer(inputId);
+		if (endp != NULL)
+		{
+			endp->Disconnect(bridge);
+			endp->Release();
+		}
+
 		inputId = newId;
 
-		// if (!instrLoaded)
-		//   be_synth->LoadInstruments(all)
-	
-		// if id != -1
-		//   connect SynthBridge (from MidiUtil) to producer endpoint
-		// else if SynthBridge still connected
-		//   disconnect SynthBridge	
+		endp = BMidiRoster::FindProducer(inputId);
+		if (endp != NULL)
+		{
+			endp->Connect(bridge);
+			endp->Release();
+		}
 	}
 }
 

@@ -20,48 +20,54 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef SCOPE_VIEW_H
-#define SCOPE_VIEW_H
+#ifndef SYNTH_BRIDGE_H
+#define SYNTH_BRIDGE_H
 
-#include <View.h>
+#include <MidiConsumer.h>
+#include <MidiSynth.h>
 
-class ScopeView : public BView
+class SynthBridge : public BMidiLocalConsumer
 {
 public:
 
-	ScopeView();
-	virtual ~ScopeView();
+	SynthBridge();
 
-	virtual void AttachedToWindow();
-	virtual void DetachedFromWindow();
-	virtual void Draw(BRect updateRect);
+	bool Init(synth_mode mode);
 
-	void SetPlaying(bool flag);
-	void SetEnabled(bool flag);
-	void SetHaveFile(bool flag);
-	void SetLoading(bool flag);
+	BMidiSynth* MidiSynth();
+
+	virtual	void NoteOff(
+		uchar channel, uchar note, uchar velocity, bigtime_t time);
+
+	virtual	void NoteOn(
+		uchar channel, uchar note, uchar velocity, bigtime_t time);
+
+	virtual	void KeyPressure(
+		uchar channel, uchar note, uchar pressure, bigtime_t time);
+
+	virtual	void ControlChange(
+		uchar channel, uchar controlNumber, uchar controlValue, 
+		bigtime_t time);
+
+	virtual	void ProgramChange(
+		uchar channel, uchar programNumber, bigtime_t time);
+
+	virtual	void ChannelPressure(
+		uchar channel, uchar pressure, bigtime_t time);
+
+	virtual	void PitchBend(
+		uchar channel, uchar lsb, uchar msb, bigtime_t time);
+
+	virtual void AllNotesOff(
+		bool justChannel, bigtime_t time);
+
+protected:
+
+	virtual ~SynthBridge() { }
 
 private:
 
-	typedef BView super;
-
-	static int32 _Thread(void* data);
-	int32 Thread();
-	
-	void DrawNoFile();
-	void DrawDisabled();
-	void DrawStopped();
-	void DrawPlaying();
-	
-	bool finished;
-	bool playing;
-	bool enabled;
-	bool haveFile;
-	bool loading;
-	int32 sampleCount;
-	int16* leftSamples;
-	int16* rightSamples;
-	thread_id threadId;
+	BMidiSynth midiSynth;
 };
 
-#endif // SCOPE_VIEW_H
+#endif // SYNTH_BRIDGE_H
