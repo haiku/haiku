@@ -19,7 +19,7 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		BMenuItem.cpp
+//	File Name:		MenuItem.cpp
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //					Bill Hayden (haydentech@users.sourceforge.net)
 //	Description:	Display item for BMenu class
@@ -611,65 +611,3 @@ void BMenuItem::SetSysTrigger(char ch)
 {
 	fSysTrigger = ch;
 }
-//------------------------------------------------------------------------------
-BSeparatorItem::BSeparatorItem()
-	:	BMenuItem(NULL, NULL, 0, 0)
-{
-}
-//------------------------------------------------------------------------------
-BSeparatorItem::BSeparatorItem(BMessage *data)
-	:	BMenuItem(data)
-{
-}
-//------------------------------------------------------------------------------
-BSeparatorItem::~BSeparatorItem()
-{
-}
-//------------------------------------------------------------------------------
-status_t BSeparatorItem::Archive(BMessage *data, bool deep) const
-{
-	return BMenuItem::Archive(data, deep);
-}
-//------------------------------------------------------------------------------
-BArchivable *BSeparatorItem::Instantiate(BMessage *data)
-{
-	if (validate_instantiation(data, "BSeparatorItem"))
-		return new BSeparatorItem(data);
-	else
-		return NULL;
-}
-//------------------------------------------------------------------------------
-void BSeparatorItem::SetEnabled(bool state)
-{
-}
-//------------------------------------------------------------------------------
-void BSeparatorItem::GetContentSize(float *width, float *height)
-{
-	*width = 2.0f;
-	*height = 8.0f;
-}
-//------------------------------------------------------------------------------
-void BSeparatorItem::Draw()
-{
-	BRect bounds = Frame();
-
-	Menu()->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_DARKEN_2_TINT));
-	Menu()->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f),
-		BPoint(bounds.right - 1.0f, bounds.top + 4.0f));
-	Menu()->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_LIGHTEN_2_TINT));
-	Menu()->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f),
-		BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
-
-	Menu()->SetHighColor(0, 0, 0);
-}
-//------------------------------------------------------------------------------
-void BSeparatorItem::_ReservedSeparatorItem1() {}
-void BSeparatorItem::_ReservedSeparatorItem2() {}
-//------------------------------------------------------------------------------
-BSeparatorItem &BSeparatorItem::operator=(const BSeparatorItem &)
-{
-	return *this;
-}
-//------------------------------------------------------------------------------
