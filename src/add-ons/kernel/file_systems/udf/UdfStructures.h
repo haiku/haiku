@@ -216,6 +216,9 @@ extern const entity_id kVirtualPartitionMapId;
 	See also: ECMA 167 2/9.1
 */	
 struct volume_structure_descriptor_header {
+public:
+	volume_structure_descriptor_header(uint8 type, const char *id, uint8 version);
+	
 	uint8 type;
 	char id[5];
 	uint8 version;

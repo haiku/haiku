@@ -106,6 +106,14 @@ const char *Udf::tag_id_to_string(tag_id id)
 // volume_structure_descriptor_header
 //----------------------------------------------------------------------
 
+volume_structure_descriptor_header::volume_structure_descriptor_header(uint8 type, const char *_id, uint8 version)
+	: type(type)
+	, version(version)
+{
+	memcpy(id, _id, 5);
+}
+
+
 /*! \brief Returns true if the given \a id matches the header's id.
 */
 bool
