@@ -75,7 +75,7 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 
 
 status_t
-_CreateDecoder(Decoder **_decoder, media_codec_info *codecInfo, const media_format *format)
+_CreateDecoder(Decoder **_decoder, const media_format *format)
 {
 	printf("_CreateDecoder enter\n");
 
@@ -105,8 +105,6 @@ _CreateDecoder(Decoder **_decoder, media_codec_info *codecInfo, const media_form
 		printf("_CreateDecoder: NewDecoder() failed\n");
 		return B_ERROR;
 	}
-
-	(*_decoder)->GetCodecInfo(*codecInfo);
 
 	printf("_CreateDecoder leave\n");
 

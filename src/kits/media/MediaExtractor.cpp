@@ -189,7 +189,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info 
 		return res;
 	}
 	
-	res = _CreateDecoder(decoder, mci, &fStreamInfo[stream].encodedFormat);
+	res = _CreateDecoder(decoder, &fStreamInfo[stream].encodedFormat);
 	if (res != B_OK) {
 		printf("MediaExtractor::CreateDecoder failed for stream %ld\n", stream);
 		return res;
@@ -202,6 +202,9 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info 
 		printf("MediaExtractor::CreateDecoder Setup failed for stream %ld: %ld (%s)\n",
 			stream, res, strerror(res));
 	}
+	
+	(*decoder)->GetCodecInfo(mci);
+	
 	return res;
 }
 

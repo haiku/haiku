@@ -253,7 +253,7 @@ BMediaDecoder::GetDecoderInfo(media_codec_info *outInfo) const
 		return fInitStatus;
 
 	if (fDecoder != NULL)
-		fDecoder->GetCodecInfo(*outInfo);
+		fDecoder->GetCodecInfo(outInfo);
 	else {
 		strcpy(outInfo->short_name, "unknown");
 		strcpy(outInfo->pretty_name, "unknown");
