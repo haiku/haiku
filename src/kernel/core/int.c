@@ -2,14 +2,14 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved. 
 ** Distributed under the terms of the NewOS License. 
 */ 
-#include <kernel/kernel.h> 
-#include <kernel/int.h> 
-#include <kernel/debug.h> 
-#include <kernel/heap.h> 
-#include <kernel/smp.h> 
-#include <kernel/arch/int.h> 
-#include <newos/errors.h> 
-#include <boot/stage2.h> 
+#include <kernel.h> 
+#include <int.h> 
+#include <debug.h> 
+#include <memheap.h> 
+#include <smp.h> 
+#include <arch/int.h> 
+#include <errno.h> 
+#include <stage2.h> 
 #include <string.h> 
 #include <stdio.h> 
 
@@ -56,7 +56,7 @@ int int_set_io_interrupt_handler(int vector, int (*func)(void*), void* data)
 
         io = (struct io_handler *)kmalloc(sizeof(struct io_handler)); 
         if(io == NULL) 
-                return ERR_NO_MEMORY; 
+                return ENOMEM; 
         io->func = func; 
         io->data = data; 
 
@@ -69,7 +69,7 @@ int int_set_io_interrupt_handler(int vector, int (*func)(void*), void* data)
 
         arch_int_enable_io_interrupt(vector); 
 
-        return NO_ERROR; 
+        return 0; 
 } 
 
 int int_remove_io_interrupt_handler(int vector, int (*func)(void*), void* data) 
@@ -116,7 +116,7 @@ int int_remove_io_interrupt_handler(int vector, int (*func)(void*), void* data)
                 kfree(io); 
         } 
 
-        return (io != NULL) ? NO_ERROR : ERR_INVALID_ARGS; 
+        return (io != NULL) ? 0 : EINVAL; 
 } 
 
 int int_io_interrupt_handler(int vector) 
