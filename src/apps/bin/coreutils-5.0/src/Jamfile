@@ -100,7 +100,7 @@ BinCommand ls :
 BinCommand rm : 
 	rm.c remove.c : libfetish.a : $(coreutils_rsrc) ;
 
-BinCommand chgroup : 
+BinCommand chgrp : 
 	chgrp.c chown-core.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand chown : 
