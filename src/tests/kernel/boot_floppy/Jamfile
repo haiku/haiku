@@ -1,0 +1,39 @@
+SubDir OBOS_TOP src kernel apps ;
+
+KernelObjects
+	exec_test.c
+	false_main.c
+	fibo_main.c
+	fork_test.c
+	init.c
+	monitor_test.c
+	pipe_test.c
+	true_main.c
+	sig_test.c
+	select_test.c
+	tls_test.c
+	on_exit_thread.c
+	;
+
+UsePrivateHeaders kernel ;
+# UsePrivateHeaders [ FDirName kernel arch ] ;
+UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+
+if $(OBOS_ARCH) = x86 {
+	SubInclude OBOS_TOP src kernel apps cpuinfo ;
+}
+
+SubInclude OBOS_TOP src kernel apps echo ;
+SubInclude OBOS_TOP src kernel apps filetest ;
+SubInclude OBOS_TOP src kernel apps fortune ;
+SubInclude OBOS_TOP src kernel apps hostname ;
+SubInclude OBOS_TOP src kernel apps ls ;
+SubInclude OBOS_TOP src kernel apps symlink ;
+SubInclude OBOS_TOP src kernel apps ps ;
+SubInclude OBOS_TOP src kernel apps shell ;
+SubInclude OBOS_TOP src kernel apps envtest ;
+#SubInclude OBOS_TOP src kernel apps sockettest ;
+SubInclude OBOS_TOP src kernel apps testapp ;
+SubInclude OBOS_TOP src kernel apps tests ;
+SubInclude OBOS_TOP src kernel apps uname ;

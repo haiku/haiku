@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src kernel apps shell ;
+
+KernelObjects <$(SOURCE_GRIST)>main.c
+	<$(SOURCE_GRIST)>args.c
+	<$(SOURCE_GRIST)>commands.c
+	<$(SOURCE_GRIST)>file_utils.c
+	<$(SOURCE_GRIST)>parse.c
+	<$(SOURCE_GRIST)>script.c
+	<$(SOURCE_GRIST)>shell_vars.c
+	<$(SOURCE_GRIST)>statements.c
+	<$(SOURCE_GRIST)>shell_history.c
+	 : -fpic ;

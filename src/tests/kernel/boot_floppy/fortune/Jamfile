@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src kernel apps fortune ;
+
+KernelObjects
+	<$(SOURCE_GRIST)>main.c
+	:
+	-fpic
+	;
