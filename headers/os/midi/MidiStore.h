@@ -4,6 +4,7 @@
 
 #include <BeBuild.h>
 #include <Midi.h>
+#include <MidiSynthFile.h>
 
 struct entry_ref;
 
@@ -69,6 +70,8 @@ public:
 
 private:
 
+	friend class BMidiSynthFile;
+	
 	virtual void _ReservedMidiStore1();
 	virtual void _ReservedMidiStore2();
 	virtual void _ReservedMidiStore3();
@@ -117,7 +120,14 @@ private:
 	uint16 format;
 
 	uint16 _reserved1[1];
-	uint32 _reserved2[16];
+
+	synth_file_hook hookFunc;
+	int32 hookArg;
+	bool looping;
+	bool paused;
+	bool finished;
+	
+	uint32 _reserved2[13];
 };
 
 #endif // _MIDI_STORE_H

@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
+ * Copyright (c) 2002-2004 Matthijs Hollemans
+ * Copyright (c) 2003 Jerome Leveque
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"), 
@@ -21,95 +22,107 @@
  */
 
 #include "debug.h"
+#include "MidiStore.h"
 #include "MidiSynthFile.h"
 
 // -----------------------------------------------------------------------------
 
 BMidiSynthFile::BMidiSynthFile()
 {
-	UNIMPLEMENTED
+	store = new BMidiStore();
 }
 
 // -----------------------------------------------------------------------------
 
 BMidiSynthFile::~BMidiSynthFile()
 {
-	UNIMPLEMENTED
+	Stop();
+	delete store;
 }
 
 // -----------------------------------------------------------------------------
 
 status_t BMidiSynthFile::LoadFile(const entry_ref* midi_entry_ref)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	if (midi_entry_ref == NULL)
+	{
+		return B_BAD_VALUE;
+	}
+
+	EnableInput(true, false);
+	store->finished = true;
+
+	// TODO: figure out which instruments are used by the MIDI file,
+	// and load them one-by-one (add a method in BMidiStore for this).
+
+	return store->Import(midi_entry_ref);
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::UnloadFile(void)
 {
-	UNIMPLEMENTED
+	delete store;
+	store = new BMidiStore();
 }
 
 // -----------------------------------------------------------------------------
 
 status_t BMidiSynthFile::Start(void)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	store->Connect(this);
+	store->SetCurrentEvent(0);
+	return store->Start();
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::Stop(void)
 {
-	UNIMPLEMENTED
+	store->Stop();
+	store->Disconnect(this);
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::Fade(void)
 {
-	UNIMPLEMENTED
+	Stop();  // really quick fade :P
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::Pause(void)
 {
-	UNIMPLEMENTED
+	store->paused = true;
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::Resume(void)
 {
-	UNIMPLEMENTED
+	store->paused = false;
 }
 
 // -----------------------------------------------------------------------------
 
 int32 BMidiSynthFile::Duration(void) const
 {
-	UNIMPLEMENTED
-	return 0;
+	return store->DeltaOfEvent(store->CountEvents());
 }
 
 // -----------------------------------------------------------------------------
 
 int32 BMidiSynthFile::Position(int32 ticks) const
 {
-	UNIMPLEMENTED
-	return 0;
+	return store->EventAtDelta(ticks);
 }
 
 // -----------------------------------------------------------------------------
 
 int32 BMidiSynthFile::Seek()
 {
-	UNIMPLEMENTED
-	return 0;
+	return store->CurrentEvent();
 }
 
 // -----------------------------------------------------------------------------
@@ -117,80 +130,82 @@ int32 BMidiSynthFile::Seek()
 status_t BMidiSynthFile::GetPatches(
 	int16* pArray768, int16* pReturnedCount) const
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	// TODO: when loading of instruments in LoadFile() has been
+	// implemented, we can finish this function too.
+
+	*pReturnedCount = 0;
+	return B_OK;
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::SetFileHook(synth_file_hook pSongHook, int32 arg)
 {
-	UNIMPLEMENTED
+	store->hookFunc = pSongHook;
+	store->hookArg = arg;
 }
 
 // -----------------------------------------------------------------------------
 
 bool BMidiSynthFile::IsFinished(void) const
 {
-	UNIMPLEMENTED
-	return false;
+	return store->finished;
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::ScaleTempoBy(double tempoFactor)
 {
-	UNIMPLEMENTED
+	store->SetTempo((int32) (Tempo() * tempoFactor));
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::SetTempo(int32 newTempoBPM)
 {
-	UNIMPLEMENTED
+	store->SetTempo(newTempoBPM);
 }
 
 // -----------------------------------------------------------------------------
 
 int32 BMidiSynthFile::Tempo(void) const
 {
-	UNIMPLEMENTED
-	return 0;
+	return store->Tempo();
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::EnableLooping(bool loop)
 {
-	UNIMPLEMENTED
+	store->looping = loop;
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::MuteTrack(int16 track, bool do_mute)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] MuteTrack is broken; don't use it\n");
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::GetMuteMap(char* pTracks) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] GetMuteMap is broken; don't use it\n");
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::SoloTrack(int16 track, bool do_solo)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] SoloTrack is broken; don't use it\n");
 }
 
 // -----------------------------------------------------------------------------
 
 void BMidiSynthFile::GetSoloMap(char* pTracks) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] GetSoloMap is broken; don't use it\n");
 }
 
 // -----------------------------------------------------------------------------

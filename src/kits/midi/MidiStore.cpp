@@ -80,6 +80,10 @@ BMidiStore::BMidiStore()
 	beatsPerMinute = 60;
 	ticksPerBeat = 240;
 	file = NULL;
+	hookFunc = NULL;
+	looping = false;
+	paused = false;
+	finished = false;
 }
 
 //------------------------------------------------------------------------------
@@ -421,20 +425,58 @@ void BMidiStore::_ReservedMidiStore3() { }
 
 void BMidiStore::Run()
 {
+	// This rather compilicated Run() loop is not only used by BMidiStore
+	// but also by BMidiSynthFile. The "paused", "finished", and "looping"
+	// flags, and the "stop hook" are especially provided for the latter.
+
+	paused = false;
+	finished = false;
+	
 	int32 timeAdjust;
+	uint32 baseTime;
 	bool firstEvent = true;
+	bool resetTime = false;
 
 	while (KeepRunning())
 	{
+		if (paused)
+		{
+			resetTime = true;
+			snooze(100000);
+			continue;
+		}
+		
 		BMidiEvent* event = EventAt(currentEvent);
-		if (event == NULL) { return; }
+		
+		if (event == NULL)  // no more events
+		{
+			if (looping)
+			{
+				resetTime = true;
+				currentEvent = 0;
+			}
+			else
+			{
+				break;
+			}
+		}
 
 		if (firstEvent)
 		{
 			startTime = B_NOW;
-			timeAdjust = startTime - GetEventTime(event);
-			SprayEvent(event, startTime);
+			baseTime = startTime;
+		}
+		else if (resetTime)
+		{
+			baseTime = B_NOW;
+		}
+
+		if (firstEvent || resetTime)
+		{		
+			timeAdjust = baseTime - GetEventTime(event);
+			SprayEvent(event, baseTime);
 			firstEvent = false;
+			resetTime = false;
 		}
 		else
 		{
@@ -442,6 +484,14 @@ void BMidiStore::Run()
 		}
 
 		++currentEvent;
+	}
+
+	finished = true;
+	paused = false;
+
+	if (hookFunc != NULL)
+	{
+		(*hookFunc)(hookArg);
 	}
 }
 
@@ -1033,5 +1083,6 @@ void BMidiStore::WriteMetaEvent(BMidiEvent* event)
 		WriteByte(val);
 	}
 }
+
 
 //------------------------------------------------------------------------------

@@ -21,6 +21,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <string.h>
+
 #include "debug.h"
 #include "Synth.h"
 #include "SoftSynth.h"
@@ -229,8 +231,13 @@ double BSynth::SampleVolume(void) const
 status_t BSynth::GetAudio(
 	int16* pLeft, int16* pRight, int32 max_samples) const
 {
-	fprintf(stderr, "[midi] GetAudio is not supported\n");
-	return B_ERROR;
+	// We don't print a "not supported" message here. That would cause
+	// significant slowdowns because applications ask for this many times.
+	
+	memset(pLeft, 0, max_samples * sizeof(int16));
+	memset(pRight, 0, max_samples * sizeof(int16));
+	
+	return max_samples;
 }
 
 //------------------------------------------------------------------------------

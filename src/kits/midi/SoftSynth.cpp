@@ -298,6 +298,7 @@ void BSoftSynth::Resume(void)
 void BSoftSynth::NoteOff(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
@@ -306,6 +307,7 @@ void BSoftSynth::NoteOff(
 void BSoftSynth::NoteOn(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
@@ -314,6 +316,7 @@ void BSoftSynth::NoteOn(
 void BSoftSynth::KeyPressure(
 	uchar channel, uchar note, uchar pressure, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
@@ -322,6 +325,7 @@ void BSoftSynth::KeyPressure(
 void BSoftSynth::ControlChange(
 	uchar channel, uchar controlNumber, uchar controlValue, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
@@ -330,22 +334,23 @@ void BSoftSynth::ControlChange(
 void BSoftSynth::ProgramChange(
 	uchar channel, uchar programNumber, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
 //------------------------------------------------------------------------------
 
-void BSoftSynth::ChannelPressure(
-	uchar channel, uchar pressure, uint32 time)
+void BSoftSynth::ChannelPressure(uchar channel, uchar pressure, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
 //------------------------------------------------------------------------------
 
-void BSoftSynth::PitchBend(
-	uchar channel, uchar lsb, uchar msb, uint32 time)
+void BSoftSynth::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
@@ -353,6 +358,7 @@ void BSoftSynth::PitchBend(
 
 void BSoftSynth::SystemExclusive(void* data, size_t length, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
@@ -361,6 +367,7 @@ void BSoftSynth::SystemExclusive(void* data, size_t length, uint32 time)
 void BSoftSynth::SystemCommon(
 	uchar status, uchar data1, uchar data2, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
@@ -368,6 +375,7 @@ void BSoftSynth::SystemCommon(
 
 void BSoftSynth::SystemRealTime(uchar status, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
@@ -375,6 +383,7 @@ void BSoftSynth::SystemRealTime(uchar status, uint32 time)
 
 void BSoftSynth::TempoChange(int32 beatsPerMinute, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 
@@ -382,6 +391,7 @@ void BSoftSynth::TempoChange(int32 beatsPerMinute, uint32 time)
 
 void BSoftSynth::AllNotesOff(bool justChannel, uint32 time)
 {
+	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
 	UNIMPLEMENTED
 }
 

@@ -8,6 +8,8 @@
 
 typedef void (*synth_file_hook)(int32 arg);
 
+class BMidiStore;
+
 class BMidiSynthFile : public BMidiSynth
 {
 public:
@@ -55,7 +57,9 @@ private:
 	virtual void _ReservedMidiSynthFile2();
 	virtual void _ReservedMidiSynthFile3();
 
-	uint32 _reserved[4];
+	BMidiStore* store;
+	
+	int32 _reserved[3];
 };
 
 #endif // _MIDI_SYNTH_FILE
