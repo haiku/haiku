@@ -53,6 +53,7 @@
 #include <Volume.h>
 
 using namespace std;
+using namespace BPrivate;
 
 // debugging
 //#define DBG(x) x
@@ -2180,7 +2181,7 @@ BRoster::InitMessengers()
 {
 DBG(OUT("BRoster::InitMessengers()\n"));
 	// find the registrar port
-	port_id rosterPort = find_port(kRosterPortName);
+	port_id rosterPort = find_port(BPrivate::get_roster_port_name());
 	port_info info;
 	if (rosterPort >= 0 && get_port_info(rosterPort, &info) == B_OK) {
 DBG(OUT("  found roster port\n"));

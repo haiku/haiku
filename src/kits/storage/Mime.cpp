@@ -23,6 +23,8 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
+using namespace BPrivate;
+
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };

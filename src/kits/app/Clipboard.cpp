@@ -41,6 +41,8 @@
 // Globals ---------------------------------------------------------------------
 BClipboard *be_clipboard = NULL;
 
+using namespace BPrivate;
+
 
 BClipboard::BClipboard(const char *name, bool transient)
 {

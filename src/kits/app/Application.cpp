@@ -1317,7 +1317,7 @@ const char*
 looper_name_for(const char *signature)
 {
 	if (signature && !strcasecmp(signature, kRegistrarSignature))
-		return kRosterPortName;
+		return BPrivate::get_roster_port_name();
 	return "AppLooperPort";
 }
 

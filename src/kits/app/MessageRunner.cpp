@@ -31,6 +31,8 @@
 #include <Roster.h>
 #include <RosterPrivate.h>
 
+using namespace BPrivate;
+
 // constructor
 /*!	\brief Creates and initializes a new BMessageRunner.
 

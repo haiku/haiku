@@ -20,6 +20,8 @@
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>	// For SendTo()
 
+using namespace BPrivate;
+
 // Private helper functions
 bool isValidMimeChar(const char ch);
 status_t toLower(const char *str, char *result);

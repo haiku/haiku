@@ -18,6 +18,8 @@
 #define DBG(x)
 #define OUT printf
 
+using namespace BPrivate;
+
 /*!
 	\class RegistrarThreadManager
 	\brief RegistrarThreadManager is the master of all threads spawned by the registrar
