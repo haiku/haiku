@@ -58,9 +58,8 @@
 #include <PrivateScreen.h>
 #include <ServerProtocol.h>
 
-// Local Includes --------------------------------------------------------------
 
-// Local Defines ---------------------------------------------------------------
+using namespace BPrivate;
 
 // Globals ---------------------------------------------------------------------
 BApplication *be_app = NULL;
@@ -207,28 +206,10 @@ BApplication::BApplication(const char *signature, status_t *_error)
 
 BApplication::~BApplication()
 {
+	Lock();
+
 	// tell all loopers(usually windows) to quit. Also, wait for them.
-	
-	// TODO: As Axel suggested, this functionality should probably be moved
-	// to quit_all_windows(), and that function should be called from both 
-	// here and QuitRequested().
-
-	BWindow *window = NULL;
-	BList looperList;
-	{
-		using namespace BPrivate;
-		BObjectLocker<BLooperList> ListLock(gLooperList);
-		if (ListLock.IsLocked())
-			gLooperList.GetLooperList(&looperList);
-	}
-
-	for (int32 i = 0; i < looperList.CountItems(); i++) {
-		window	= dynamic_cast<BWindow*>((BLooper*)looperList.ItemAt(i));
-		if (window) {
-			window->Lock();
-			window->Quit();
-		}
-	}
+	quit_all_windows(true);
 
 	// unregister from the roster
 	BRoster::Private().RemoveApp(Team());
@@ -240,11 +221,11 @@ BApplication::~BApplication()
 	link.Flush();
 #endif	// RUN_WITHOUT_APP_SERVER
 
-	// uninitialize be_app and be_app_messenger
+	// ToDo: since we add the port, I guess we should remove it as well? -- axeld.
+	//delete_port(fServerTo);
+
+	// uninitialize be_app, the be_app_messenger is invalidated automatically
 	be_app = NULL;
-	
-	// R5 doesn't uninitialize be_app_messenger.
-	//be_app_messenger = BMessenger();
 }
 
 
@@ -305,6 +286,9 @@ BApplication::InitCheck() const
 thread_id
 BApplication::Run()
 {
+	if (fInitError != B_OK)
+		return fInitError;
+
 	AssertLocked();
 
 	if (fRunCalled)	
@@ -312,15 +296,14 @@ BApplication::Run()
 
 	// Note: We need a local variable too (for the return value), since
 	// fTaskID is cleared by Quit().
+// ToDo: actually, it's not clobbered there?!
 	thread_id thread = fTaskID = find_thread(NULL);
-
-	if (fMsgPort < B_OK)
-		return fMsgPort;
 
 	fRunCalled = true;
 
 	run_task();
 
+	delete fPulseRunner;
 	return thread;
 }
 
@@ -343,6 +326,7 @@ BApplication::Quit()
 	if (!fRunCalled) {
 		delete this;
 	} else if (find_thread(NULL) != fTaskID) {
+// ToDo: why shouldn't we set fTerminating to true directly in this case?
 		// We are not the looper thread.
 		// We push a _QUIT_ into the queue.
 		// TODO: When BLooper::AddMessage() is done, use that instead of
@@ -369,11 +353,7 @@ BApplication::Quit()
 bool
 BApplication::QuitRequested()
 {
-	// No windows -- nothing to do.
-	// TODO: Au contraire, we can have opened windows, and we have
-	// to quit them.
-	
-	return BLooper::QuitRequested();
+	return quit_all_windows(false);
 }
 
 
@@ -558,7 +538,6 @@ BApplication::WindowAt(int32 index) const
 int32
 BApplication::CountLoopers() const
 {
-	using namespace BPrivate;
 	BObjectLocker<BLooperList> ListLock(gLooperList);
 	if (ListLock.IsLocked())
 		return gLooperList.CountLoopers();
@@ -571,7 +550,6 @@ BApplication::CountLoopers() const
 BLooper *
 BApplication::LooperAt(int32 index) const
 {
-	using namespace BPrivate;
 	BLooper *Looper = NULL;
 	BObjectLocker<BLooperList> ListLock(gLooperList);
 	if (ListLock.IsLocked())
@@ -827,7 +805,7 @@ BApplication::run_task()
 
 
 void
-BApplication::InitData(const char *signature, status_t *error)
+BApplication::InitData(const char *signature, status_t *_error)
 {
 	// check whether there exists already an application
 	if (be_app)
@@ -1005,8 +983,8 @@ BApplication::InitData(const char *signature, status_t *error)
 
 	// Return the error or exit, if there was an error and no error variable
 	// has been supplied.
-	if (error)
-		*error = fInitError;
+	if (_error)
+		*_error = fInitError;
 	else if (fInitError != B_OK)
 		exit(0);
 }
@@ -1144,17 +1122,43 @@ BApplication::write_drag(_BSession_ *session, BMessage *message)
 
 
 bool
-BApplication::quit_all_windows(bool force)
+BApplication::window_quit_loop(bool quitFilePanels, bool force)
 {
-	return false;	// TODO: implement?
+	BList looperList;
+	BObjectLocker<BLooperList> listLock(gLooperList);
+	if (listLock.IsLocked())
+		gLooperList.GetLooperList(&looperList);
+
+	for (int32 i = looperList.CountItems(); i-- > 0; ) {
+		BWindow *window = dynamic_cast<BWindow *>((BLooper *)looperList.ItemAt(i));
+
+		// ToDo: windows in this list may already have been closed in the mean time?!
+
+		if (window != NULL && window->Lock()) {
+			if ((window->IsFilePanel() && !quitFilePanels)
+				|| (!force && !window->QuitRequested())) {
+				// the window does not want to quit, so we don't either
+				window->Unlock();
+				return false;
+			}
+
+			window->Quit();
+		}
+	}
+
+	return true;
 }
 
 
 bool
-BApplication::window_quit_loop(bool, bool)
+BApplication::quit_all_windows(bool force)
 {
-	// TODO: Implement and use in BApplication::QuitRequested()
-	return false;
+	AssertLocked();
+
+	if (window_quit_loop(false, force))
+		return true;
+
+	return window_quit_loop(true, force);
 }
 
 
@@ -1239,8 +1243,6 @@ BApplication::window_at(uint32 index, bool includeMenus) const
 status_t
 BApplication::get_window_list(BList *list, bool includeMenus) const
 {
-	using namespace BPrivate;
-
 	ASSERT(list);
 
 	// Windows are BLoopers, so we can just check each BLooper to see if it's
