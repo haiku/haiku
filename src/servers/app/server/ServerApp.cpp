@@ -414,28 +414,28 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			int32		token;
 			port_id		sendPort;
 			port_id		looperPort;
+			port_id		replyport;
 			char		*title;
 			
-			msg->Read<BRect>( &frame );
-			msg->Read<int32>( (int32*)&look );
-			msg->Read<int32>( (int32*)&feel );
-			msg->Read<int32>( (int32*)&flags );
-			msg->Read<int32>( (int32*)&wkspaces );
-			msg->Read<int32>( &token );
-			msg->Read<port_id>( &sendPort );
-			msg->Read<port_id>( &looperPort );
-			msg->ReadString( &title );
+			msg->Read<BRect>(&frame);
+			msg->Read<int32>((int32*)&look);
+			msg->Read<int32>((int32*)&feel);
+			msg->Read<int32>((int32*)&flags);
+			msg->Read<int32>((int32*)&wkspaces);
+			msg->Read<int32>(&token);
+			msg->Read<port_id>(&sendPort);
+			msg->Read<port_id>(&looperPort);
+			msg->ReadString(&title);
+			msg->Read<port_id>(&replyport);
 
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",
 					_signature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port
-			ServerWindow *newwin = new ServerWindow( frame, title,
-				look, feel, flags, this, sendPort, looperPort, wkspaces, token);
+			ServerWindow *newwin = new ServerWindow(frame, title,
+				look, feel, flags, this, sendPort, looperPort, replyport, wkspaces, token);
 			
-			_winlist->AddItem( newwin );
-			//AddWindowToDesktop( newwin, workspace, ActiveScreen() );
-			
+			_winlist->AddItem(newwin);
 
 			STRACE(("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 					_signature.String(),title,frame.left,frame.top,frame.right,frame.bottom));

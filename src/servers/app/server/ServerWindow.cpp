@@ -120,10 +120,10 @@ write_to_buffer(int8 **_buffer, Type value)
 */
 ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	uint32 wfeel, uint32 wflags, ServerApp *winapp,  port_id winport,
-	port_id looperPort, uint32 index, int32 handlerID)
+	port_id looperPort, port_id replyport, uint32 index, int32 handlerID)
 {
 	_title			= new BString;
-	if( string )
+	if(string)
 		_title->SetTo(string);
 	_frame			= rect;
 	_flags			= wflags;
@@ -135,60 +135,68 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	_workspace		= NULL;
 	_token			= win_token_handler.GetToken();
 
-
-		// HAVE messaging working.
-		// _sender is the port to which the app awaits messages from the server
+	
+	// _sender is the port to which the app awaits messages from the server
 	_sender			= winport;
-		// _receiver is the port to which the app sends messages for the server
-	_receiver		= create_port(30,_title->String());
 
-	ses				= new BSession( _receiver, _sender );
-		// Send a reply to our window - it is expecting _receiver port.
-	ses->WriteData( &_receiver, sizeof(port_id) );
-	ses->Sync();
+	// _receiver is the port to which the app sends messages for the server
+	_receiver		= create_port(30,_title->String());
+	
+	
+	
+	// Send a reply to our window - it is expecting _receiver port.
+	
+	// Temporarily use winlink to save time and memory
+	_winlink=new PortLink(replyport);
+
+	_winlink->SetOpCode(AS_CREATE_WINDOW);
+	_winlink->Attach<port_id>(_receiver);
+	_winlink->Flush();
+
+	_winlink->SetPort(winport);
 	
 
-		// WAIT for top_view data and create ServerWindow's top most Layer
-	int32			vMsg;
+	// Wait for top_view data and create ServerWindow's top most Layer
 	int32			vToken;
 	BRect			vFrame;
 	uint32			vResizeMode;
 	uint32			vFlags;
 	char*			vName = NULL;
-
-	ses->ReadInt32( &vMsg );
-	if (vMsg != AS_LAYER_CREATE_ROOT){
+	
+	PortMessage pmsg;
+	pmsg.ReadFromPort(_receiver);
+	if(pmsg.Code() != AS_LAYER_CREATE_ROOT)
 		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received!\n");
-	}
-	ses->ReadInt32( &vToken );
-	ses->ReadRect( &vFrame );
-	ses->ReadUInt32( &vResizeMode );
-	ses->ReadUInt32( &vFlags );
-	vName			= ses->ReadString();
+	
+	pmsg.Read<int32>(&vToken);
+	pmsg.Read<BRect>(&vFrame);
+	pmsg.Read<uint32>(&vResizeMode);
+	pmsg.Read<uint32>(&vFlags);
+	pmsg.ReadString(&vName);
 			
-	top_layer		= new Layer( vFrame, vName, vToken, vResizeMode,
-											vFlags, this );
+	top_layer= new Layer(vFrame, vName, vToken, vResizeMode, vFlags, this);
 	delete vName;
 
-	cl				= top_layer;
+	cl = top_layer;
 			
 
-		// CREATE a WindoBorder object for our ServerWindow.
+	// Create a WindoBorder object for our ServerWindow.
 	_winborder		= new WinBorder(_frame,_title->String(),wlook,wfeel,wflags,this);
 
 
-		// SPAWN our message monitoring _monitorthread
-	_monitorthread	= spawn_thread( MonitorWin, _title->String(), B_NORMAL_PRIORITY, this );
+	// Spawn our message-monitoring _monitorthread
+	_monitorthread	= spawn_thread(MonitorWin, _title->String(), B_NORMAL_PRIORITY, this);
 	if(_monitorthread != B_NO_MORE_THREADS && _monitorthread != B_NO_MEMORY)
-		resume_thread( _monitorthread );
+		resume_thread(_monitorthread);
 
 
-		// ADD window to desktop structure.
+	// Add window to desktop structure.
 	AddWindowToDesktop(this,index,ActiveScreen());
-STRACE(("ServerWindow %s:\n",_title->String() ));
-STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
-STRACE(("\tPort: %ld\n",_receiver));
-STRACE(("\tWorkspace: %ld\n",index));
+
+	STRACE(("ServerWindow %s:\n",_title->String()));
+	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
+	STRACE(("\tPort: %ld\n",_receiver));
+	STRACE(("\tWorkspace: %ld\n",index));
 }
 
 //!Tears down all connections with the user application, kills the monitoring thread.
@@ -205,10 +213,8 @@ STRACE(("ServerWindow %s:~ServerWindow()\n",_title->String()));
 		delete _winborder;
 		
 		cl		= NULL;
-		if ( top_layer )
+		if (top_layer)
 			delete top_layer;
-		delete	ses;
-		ses		= NULL;
 	}
 	kill_thread(_monitorthread);
 }
@@ -227,7 +233,7 @@ STRACE(("ServerWindow %s: Request Draw\n",_title->String()));
 	msg.what		= _UPDATE_;
 	msg.AddRect("_rect", rect);
 	
-	SendMessageToClient( &msg );
+	SendMessageToClient(&msg);
 }
 
 //! Requests an update for the entire window
@@ -251,7 +257,7 @@ STRACE(("ServerWindow %s: Quit\n",_title->String()));
 	
 	msg.what		= B_QUIT_REQUESTED;
 	
-	SendMessageToClient( &msg );
+	SendMessageToClient(&msg);
 }
 
 /*!
@@ -306,25 +312,25 @@ void ServerWindow::Minimize(bool status){
 	bool		sendMessages = false;
 
 	if (status){
-		if ( !IsHidden() ){
+		if (!IsHidden()){
 			Hide();
 			sendMessages	= true;
 		}
 	}
 	else{
-		if ( IsHidden() ){
+		if (IsHidden()){
 			Show();
 			sendMessages	= true;
 		}
 	}
 	
-	if ( sendMessages ){
+	if (sendMessages){
 		BMessage		msg;
 		msg.what		= B_MINIMIZE;
 		msg.AddInt64("when", real_time_clock_usecs());
-		msg.AddBool("minimize", status );
+		msg.AddBool("minimize", status);
 
-		SendMessageToClient( &msg );
+		SendMessageToClient(&msg);
 		
 // TODO: notify tracker! how???
 	}
@@ -373,7 +379,7 @@ STRACE(("ServerWindow %s: WorkspaceActivated(%ld,%s)\n",_title->String(),workspa
 	msg.AddInt32("workspace", workspace);
 	msg.AddBool("active", active);
 	
-	SendMessageToClient( &msg );
+	SendMessageToClient(&msg);
 }
 
 /*!
@@ -390,7 +396,7 @@ STRACE(("ServerWindow %s: WorkspacesChanged(%ld,%ld)\n",_title->String(),oldone,
 	msg.AddInt32("old", oldone);
 	msg.AddInt32("new", newone);
 	
-	SendMessageToClient( &msg );
+	SendMessageToClient(&msg);
 }
 
 /*!
@@ -405,7 +411,7 @@ STRACE(("ServerWindow %s: WindowActivated(%s)\n",_title->String(),(active)?"acti
 	msg.what		= B_WINDOW_ACTIVATED;
 	msg.AddBool("active", active);
 	
-	SendMessageToClient( &msg );
+	SendMessageToClient(&msg);
 }
 
 /*!
@@ -422,7 +428,7 @@ STRACE(("ServerWindow %s: ScreenModeChanged\n",_title->String()));
 	msg.AddRect("frame", frame);
 	msg.AddInt32("mode", (int32)cspace);
 	
-	SendMessageToClient( &msg );
+	SendMessageToClient(&msg);
 }
 
 /*
@@ -471,33 +477,36 @@ bool ServerWindow::IsLocked(void)
 	return _locker.IsLocked();
 }
 
-void ServerWindow::DispatchMessage( int32 code )
+void ServerWindow::DispatchMessage(PortMessage msg)
 {
-	switch( code )
+	switch(msg.Code())
 	{
-	/********** BView Messages ***********/
+		//--------- BView Messages -----------------
 		case AS_SET_CURRENT_LAYER:
 		{
-			int32		token;
+			int32 token;
 			
-			ses->ReadInt32( &token );
+			msg.Read<int32>(&token);
 			
-			Layer		*current = FindLayer( top_layer, token );
+			Layer *current = FindLayer(top_layer, token);
 			if (current)
 				cl		= current;
 			else // hope this NEVER happens! :-)
-				printf("Server PANIC: window %s: cannot find Layer with ID %ld\n", _title->String(), token);
+				debugger("Server PANIC: window cannot find Layer with ID\n");
 
 			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", _title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CREATE:
 		{
+/*
+TODO:	Figure out what Adi did here and convert to PortMessages
+
 			// Received when a view is attached to a window. This will require
 			// us to attach a layer in the tree in the same manner and invalidate
 			// the area in which the new layer resides assuming that it is
 			// visible.
-			STRACE(("SW %s: AS_LAYER_CREATE...\n", _title->String()));
+			STRACE(("ServerWindow %s: AS_LAYER_CREATE...\n", _title->String()));
 			Layer		*oldCL = cl;
 			
 			int32		token;
@@ -508,13 +517,13 @@ void ServerWindow::DispatchMessage( int32 code )
 			int32		childCount;
 			char*		name;
 		
-			ses->ReadInt32( &token );
-			name		= ses->ReadString();
-			ses->ReadRect( &frame );
-			ses->ReadInt32( (int32*)&resizeMask );
-			ses->ReadInt32( (int32*)&flags );
-			ses->ReadBool( &hidden );
-			ses->ReadInt32( &childCount );
+			msg.Read<int32>(&token);
+			msg.ReadString(&name);
+			msg.Read<BRect>(&frame);
+			msg.Read<int32>((int32*)&resizeMask);
+			msg.Read<int32>((int32*)&flags);
+			msg.Read<bool>(&hidden);
+			msg.Read<int32>(&childCount);
 			
 				// view's visible area is invalidated here
 			Layer		*newLayer;
@@ -525,25 +534,26 @@ void ServerWindow::DispatchMessage( int32 code )
 				// we set Layer's attributes (BView's state)
 			cl			= newLayer;
 			
-			int32		msgCode;
-			ses->ReadInt32( &msgCode );		// this is AS_LAYER_SET_FONT_STATE
-			DispatchMessage( msgCode );
+			int32 msgCode;
+			msg.Read<int32>(&msgCode);		// this is AS_LAYER_SET_FONT_STATE
+			DispatchMessage(msgCode);
 
-			ses->ReadInt32( &msgCode );		// this is AS_LAYER_SET_STATE
-			DispatchMessage( msgCode );
+			msg.Read<int32>(&msgCode);		// this is AS_LAYER_SET_STATE
+			DispatchMessage(msgCode);
 
 				// attach the view to the tree structure.
-			oldCL->AddChild( newLayer );
+			oldCL->AddChild(newLayer);
 			
 				// attach its children.
 			for(int i = 0; i < childCount; i++){
-				ses->ReadInt32( &msgCode );		// this is AS_LAYER_CREATE
-				DispatchMessage( msgCode );
+				msg.Read<int32>(&msgCode);		// this is AS_LAYER_CREATE
+				DispatchMessage(msgCode);
 			}
 			
 			cl			= oldCL;
 			
 			STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", _title->String(), cl->_name->String(), name));
+*/
 			break;
 		}
 		case AS_LAYER_DELETE:
@@ -578,45 +588,45 @@ void ServerWindow::DispatchMessage( int32 code )
 			pattern			patt;
 			int32			clippRegRects;
 
-			ses->ReadPoint( &(cl->_layerdata->penlocation) );
-			ses->ReadFloat( &(cl->_layerdata->pensize) );
-			ses->ReadData( &highColor, sizeof(rgb_color) );
-			ses->ReadData( &lowColor, sizeof(rgb_color) );
-			ses->ReadData( &viewColor, sizeof(rgb_color) );
-			ses->ReadData( &patt, sizeof(pattern) );	
-			ses->ReadInt8( (int8*)&(cl->_layerdata->draw_mode) );
-			ses->ReadPoint( &(cl->_layerdata->coordOrigin) );
-			ses->ReadInt8( (int8*)&(cl->_layerdata->lineJoin) );
-			ses->ReadInt8( (int8*)&(cl->_layerdata->lineCap) );
-			ses->ReadFloat( &(cl->_layerdata->miterLimit) );
-			ses->ReadInt8( (int8*)&(cl->_layerdata->alphaSrcMode) );
-			ses->ReadInt8( (int8*)&(cl->_layerdata->alphaFncMode) );
-			ses->ReadFloat( &(cl->_layerdata->scale) );
-			ses->ReadBool( &(cl->_layerdata->fontAliasing) );
-			ses->ReadInt32( &clippRegRects );
+			msg.Read<BPoint>(&(cl->_layerdata->penlocation));
+			msg.Read<float>(&(cl->_layerdata->pensize));
+			msg.Read<rgb_color>(&highColor);
+			msg.Read<rgb_color>(&lowColor);
+			msg.Read<rgb_color>(&viewColor);
+			msg.Read<pattern>(&patt);	
+			msg.Read<int8>((int8*)&(cl->_layerdata->draw_mode));
+			msg.Read<BPoint>(&(cl->_layerdata->coordOrigin));
+			msg.Read<int8>((int8*)&(cl->_layerdata->lineJoin));
+			msg.Read<int8>((int8*)&(cl->_layerdata->lineCap));
+			msg.Read<float>(&(cl->_layerdata->miterLimit));
+			msg.Read<int8>((int8*)&(cl->_layerdata->alphaSrcMode));
+			msg.Read<int8>((int8*)&(cl->_layerdata->alphaFncMode));
+			msg.Read<float>(&(cl->_layerdata->scale));
+			msg.Read<bool>(&(cl->_layerdata->fontAliasing));
+			msg.Read<int32>(&clippRegRects);
 			
-			cl->_layerdata->patt.Set( *((uint64*)&patt) );
-			cl->_layerdata->highcolor.SetColor( highColor );
-			cl->_layerdata->lowcolor.SetColor( lowColor );
-			cl->_layerdata->viewcolor.SetColor( viewColor );
+			cl->_layerdata->patt.Set(*((uint64*)&patt));
+			cl->_layerdata->highcolor.SetColor(highColor);
+			cl->_layerdata->lowcolor.SetColor(lowColor);
+			cl->_layerdata->viewcolor.SetColor(viewColor);
 
-			if( clippRegRects != 0 ){
-				if( cl->_layerdata->clippReg == NULL)
+			if(clippRegRects != 0){
+				if(cl->_layerdata->clippReg == NULL)
 					cl->_layerdata->clippReg = new BRegion();
 				else
 					cl->_layerdata->clippReg->MakeEmpty();
 
 				BRect		rect;
 				
-				for( int32 i = 0; i < clippRegRects; i++){
-					ses->ReadRect( &rect );
-					cl->_layerdata->clippReg->Include( rect );
+				for(int32 i = 0; i < clippRegRects; i++){
+					msg.Read<BRect>(&rect);
+					cl->_layerdata->clippReg->Include(rect);
 				}
 
 				cl->RebuildFullRegion();
 			}
 			else{
-				if ( cl->_layerdata->clippReg ){
+				if (cl->_layerdata->clippReg){
 					delete cl->_layerdata->clippReg;
 					cl->_layerdata->clippReg = NULL;
 
@@ -631,56 +641,56 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			uint16			mask;
 
-			ses->ReadInt16( (int16*)&mask );
+			msg.Read<uint16>(&mask);
 			
-			if ( mask & B_FONT_FAMILY_AND_STYLE ){
+			if (mask & B_FONT_FAMILY_AND_STYLE){
 				uint32		fontID;
-				ses->ReadInt32( (int32*)&fontID );
+				msg.Read<int32>((int32*)&fontID);
 				// TODO: implement later. Currently there is no SetFamAndStyle(uint32)
 				//   in ServerFont class. DW, could you add one?
 				//cl->_layerdata->font->
 			}
 	
-			if ( mask & B_FONT_SIZE ){
+			if (mask & B_FONT_SIZE){
 				float		size;
-				ses->ReadFloat( &size );
-				cl->_layerdata->font.SetSize( size );
+				msg.Read<float>(&size);
+				cl->_layerdata->font.SetSize(size);
 			}
 
-			if ( mask & B_FONT_SHEAR ){
+			if (mask & B_FONT_SHEAR){
 				float		shear;
-				ses->ReadFloat( &shear );
-				cl->_layerdata->font.SetShear( shear );
+				msg.Read<float>(&shear);
+				cl->_layerdata->font.SetShear(shear);
 			}
 
-			if ( mask & B_FONT_ROTATION ){
+			if (mask & B_FONT_ROTATION){
 				float		rotation;
-				ses->ReadFloat( &rotation );
-				cl->_layerdata->font.SetRotation( rotation );
+				msg.Read<float>(&rotation);
+				cl->_layerdata->font.SetRotation(rotation);
 			}
 
-			if ( mask & B_FONT_SPACING ){
+			if (mask & B_FONT_SPACING){
 				uint8		spacing;
-				ses->ReadInt8( (int8*)&spacing );	// uint8
-				cl->_layerdata->font.SetSpacing( spacing );
+				msg.Read<uint8>(&spacing);	// uint8
+				cl->_layerdata->font.SetSpacing(spacing);
 			}
 
-			if ( mask & B_FONT_ENCODING ){
+			if (mask & B_FONT_ENCODING){
 				uint8		encoding;
-				ses->ReadInt8( (int8*)&encoding ); // uint8
-				cl->_layerdata->font.SetEncoding( encoding );
+				msg.Read<int8>((int8*)&encoding); // uint8
+				cl->_layerdata->font.SetEncoding(encoding);
 			}
 
-			if ( mask & B_FONT_FACE ){
+			if (mask & B_FONT_FACE){
 				uint16		face;
-				ses->ReadInt16( (int16*)&face );	// uint16
-				cl->_layerdata->font.SetFace( face );
+				msg.Read<uint16>(&face);	// uint16
+				cl->_layerdata->font.SetFace(face);
 			}
 	
-			if ( mask & B_FONT_FLAGS ){
+			if (mask & B_FONT_FLAGS){
 				uint32		flags;
-				ses->ReadInt32( (int32*)&flags ); // uint32
-				cl->_layerdata->font.SetFlags( flags );
+				msg.Read<uint32>(&flags); // uint32
+				cl->_layerdata->font.SetFlags(flags);
 			}
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
@@ -700,46 +710,46 @@ void ServerWindow::DispatchMessage( int32 code )
 			patt		= ld->patt.GetInt64();
 			
 			// TODO: DW implement such a method in ServerFont class!
-			ses->WriteUInt32( 0UL /*uint32 ld->font.GetFamAndStyle()*/ );
-			ses->WriteFloat( ld->font.Size() );
-			ses->WriteFloat( ld->font.Shear() );
-			ses->WriteFloat( ld->font.Rotation() );
-			ses->WriteUInt8( ld->font.Spacing() );
-			ses->WriteUInt8( ld->font.Encoding() );
-			ses->WriteUInt16( ld->font.Face() );
-			ses->WriteUInt32( ld->font.Flags() );
+			_winlink->Attach<uint32>(0UL /*uint32 ld->font.GetFamAndStyle()*/);
+			_winlink->Attach<float>(ld->font.Size());
+			_winlink->Attach<float>(ld->font.Shear());
+			_winlink->Attach<float>(ld->font.Rotation());
+			_winlink->Attach<uint8>(ld->font.Spacing());
+			_winlink->Attach<uint8>(ld->font.Encoding());
+			_winlink->Attach<uint16>(ld->font.Face());
+			_winlink->Attach<uint32>(ld->font.Flags());
 			
-			ses->WritePoint( ld->penlocation );
-			ses->WriteFloat( ld->pensize );
-			ses->WriteData( &hc, sizeof(rgb_color)/* 4*8 */ );
-			ses->WriteData( &lc, sizeof(rgb_color)/* 4*8 */ );
-			ses->WriteData( &vc, sizeof(rgb_color)/* 4*8 */ );
-			ses->WriteData( &patt, sizeof(pattern)/* 8*8 */ );
-			ses->WritePoint( ld->coordOrigin );
-			ses->WriteUInt8( (uint8)(ld->draw_mode) );
-			ses->WriteUInt8( (uint8)(ld->lineCap) );
-			ses->WriteUInt8( (uint8)(ld->lineJoin) );
-			ses->WriteFloat( ld->miterLimit );
-			ses->WriteUInt8( (uint8)(ld->alphaSrcMode) );
-			ses->WriteUInt8( (uint8)(ld->alphaFncMode) );
-			ses->WriteFloat( ld->scale );
-			ses->WriteBool( ld->fontAliasing );
+			_winlink->Attach<BPoint>(ld->penlocation);
+			_winlink->Attach<float>(ld->pensize);
+			_winlink->Attach<rgb_color>(hc);
+			_winlink->Attach<rgb_color>(lc);
+			_winlink->Attach<rgb_color>(vc);
+			// TODO: fix this to use the templatized version
+			_winlink->Attach(&patt,sizeof(pattern));
+			_winlink->Attach<BPoint>(ld->coordOrigin);
+			_winlink->Attach<uint8>((uint8)(ld->draw_mode));
+			_winlink->Attach<uint8>((uint8)(ld->lineCap));
+			_winlink->Attach<uint8>((uint8)(ld->lineJoin));
+			_winlink->Attach<float>(ld->miterLimit);
+			_winlink->Attach<uint8>((uint8)(ld->alphaSrcMode));
+			_winlink->Attach<uint8>((uint8)(ld->alphaFncMode));
+			_winlink->Attach<float>(ld->scale);
+			_winlink->Attach<bool>(ld->fontAliasing);
 			
 			int32		noOfRects = 0;
-			if ( ld->clippReg )
+			if (ld->clippReg)
 				noOfRects = ld->clippReg->CountRects();
 
-			ses->WriteInt32( noOfRects );
+			_winlink->Attach<int32>(noOfRects);
 			
-			for( int i = 0; i < noOfRects; i++ ){
-				ses->WriteRect( ld->clippReg->RectAt(i) );
+			for(int i = 0; i < noOfRects; i++){
+				_winlink->Attach<BRect>(ld->clippReg->RectAt(i));
 			}
 			
-			ses->WriteFloat( cl->_frame.left );
-			ses->WriteFloat( cl->_frame.top );
-			ses->WriteRect( cl->_frame.OffsetToCopy( cl->_boundsLeftTop ) );
-			
-			ses->Sync();
+			_winlink->Attach<float>(cl->_frame.left);
+			_winlink->Attach<float>(cl->_frame.top);
+			_winlink->Attach<BRect>(cl->_frame.OffsetToCopy(cl->_boundsLeftTop));
+			_winlink->Flush();
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -748,8 +758,8 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			float		x, y;
 			
-			ses->ReadFloat( &x );
-			ses->ReadFloat( &y );
+			msg.Read<float>(&x);
+			msg.Read<float>(&y);
 			
 			cl->MoveBy(x, y);
 
@@ -760,22 +770,22 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			float		newWidth, newHeight;
 			
-			ses->ReadFloat( &newWidth );
-			ses->ReadFloat( &newHeight );
+			msg.Read<float>(&newWidth);
+			msg.Read<float>(&newHeight);
 		/* TODO: check for minimum alowed. WinBorder should provide such
 		 *	a method, based on its decorator.
 		 */
-			cl->ResizeBy( newWidth, newHeight );
+			cl->ResizeBy(newWidth, newHeight);
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_COORD:
 		{
-			ses->WriteFloat( cl->_frame.left );
-			ses->WriteFloat( cl->_frame.top );
-			ses->WriteRect( cl->_frame.OffsetToCopy( cl->_boundsLeftTop ) );
-			ses->Sync();
+			_winlink->Attach<float>(cl->_frame.left);
+			_winlink->Attach<float>(cl->_frame.top);
+			_winlink->Attach<BRect>(cl->_frame.OffsetToCopy(cl->_boundsLeftTop));
+			_winlink->Flush();
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -784,8 +794,8 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			float		x, y;
 			
-			ses->ReadFloat( &x );
-			ses->ReadFloat( &y );
+			msg.Read<float>(&x);
+			msg.Read<float>(&y);
 			
 			cl->_layerdata->coordOrigin.Set(x, y);
 			
@@ -794,15 +804,15 @@ void ServerWindow::DispatchMessage( int32 code )
 		}
 		case AS_LAYER_GET_ORIGIN:
 		{
-			ses->WritePoint( cl->_layerdata->coordOrigin );
-			ses->Sync();
+			_winlink->Attach<BPoint>(cl->_layerdata->coordOrigin);
+			_winlink->Flush();
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
-			ses->ReadUInt32( &(cl->_resize_mode) );
+			msg.Read<uint32>(&(cl->_resize_mode));
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -811,16 +821,16 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			int32		token;
 
-			ses->ReadInt32( &token );
+			msg.Read<int32>(&token);
 			
-			cursormanager->SetCursor( token );
+			cursormanager->SetCursor(token);
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_FLAGS:
 		{
-			ses->ReadUInt32( &(cl->_flags) );
+			msg.Read<uint32>(&(cl->_flags));
 			
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -847,9 +857,9 @@ void ServerWindow::DispatchMessage( int32 code )
  *		it was called. e.g.: different lineCap or lineJoin. Strange result
  *		would appear.
  */
-			ses->ReadInt8( &lineCap );
-			ses->ReadInt8( &lineJoin );
-			ses->ReadFloat( &(cl->_layerdata->miterLimit) );
+			msg.Read<int8>(&lineCap);
+			msg.Read<int8>(&lineJoin);
+			msg.Read<float>(&(cl->_layerdata->miterLimit));
 			
 			cl->_layerdata->lineCap		= (cap_mode)lineCap;
 			cl->_layerdata->lineJoin	= (join_mode)lineJoin;
@@ -859,10 +869,10 @@ void ServerWindow::DispatchMessage( int32 code )
 		}
 		case AS_LAYER_GET_LINE_MODE:
 		{
-			ses->WriteInt8( (int8)(cl->_layerdata->lineCap) );
-			ses->WriteInt8( (int8)(cl->_layerdata->lineJoin) );
-			ses->WriteFloat( cl->_layerdata->miterLimit );
-			ses->Sync();
+			_winlink->Attach<int8>((int8)(cl->_layerdata->lineCap));
+			_winlink->Attach<int8>((int8)(cl->_layerdata->lineJoin));
+			_winlink->Attach<float>(cl->_layerdata->miterLimit);
+			_winlink->Flush();
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -880,7 +890,7 @@ void ServerWindow::DispatchMessage( int32 code )
 		}
 		case AS_LAYER_POP_STATE:
 		{
-			if ( !(cl->_layerdata->prevState) ) {
+			if (!(cl->_layerdata->prevState)) {
 				STRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", _title->String(), cl->_name->String()));
 				break;
 			}
@@ -896,7 +906,7 @@ void ServerWindow::DispatchMessage( int32 code )
 		}
 		case AS_LAYER_SET_SCALE:
 		{
-			ses->ReadFloat( &(cl->_layerdata->scale) );
+			msg.Read<float>(&(cl->_layerdata->scale));
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), cl->_name->String()));		
 			break;
@@ -906,11 +916,11 @@ void ServerWindow::DispatchMessage( int32 code )
 			LayerData		*ld = cl->_layerdata;
 			float			scale = ld->scale;
 
-			while( (ld = ld->prevState) )
+			while((ld = ld->prevState))
 				scale		*= ld->scale;
 			
-			ses->WriteFloat( scale );
-			ses->Sync();
+			_winlink->Attach<float>(scale);
+			_winlink->Flush();
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), cl->_name->String()));		
 			break;
@@ -919,33 +929,33 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			float		x, y;
 			
-			ses->ReadFloat( &x );
-			ses->ReadFloat( &y );
+			msg.Read<float>(&x);
+			msg.Read<float>(&y);
 			
-			cl->_layerdata->penlocation.Set( x, y );
+			cl->_layerdata->penlocation.Set(x, y);
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
-			ses->WritePoint( cl->_layerdata->penlocation );
-			ses->Sync();
+			_winlink->Attach<BPoint>(cl->_layerdata->penlocation);
+			_winlink->Flush();
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
-			ses->ReadFloat( &(cl->_layerdata->pensize) );
+			msg.Read<float>(&(cl->_layerdata->pensize));
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
-			ses->WriteFloat( cl->_layerdata->pensize );
-			ses->Sync();
+			_winlink->Attach<float>(cl->_layerdata->pensize);
+			_winlink->Flush();
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -954,9 +964,9 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			rgb_color		c;
 			
-			ses->ReadData( &c, sizeof(rgb_color) );
+			msg.Read<rgb_color>(&c);
 			
-			cl->_layerdata->highcolor.SetColor( c );
+			cl->_layerdata->highcolor.SetColor(c);
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -965,9 +975,9 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			rgb_color		c;
 			
-			ses->ReadData( &c, sizeof(rgb_color) );
+			msg.Read<rgb_color>(&c);
 			
-			cl->_layerdata->lowcolor.SetColor( c );
+			cl->_layerdata->lowcolor.SetColor(c);
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -976,9 +986,9 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			rgb_color		c;
 			
-			ses->ReadData( &c, sizeof(rgb_color) );
+			msg.Read<rgb_color>(&c);
 			
-			cl->_layerdata->viewcolor.SetColor( c );
+			cl->_layerdata->viewcolor.SetColor(c);
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -991,10 +1001,10 @@ void ServerWindow::DispatchMessage( int32 code )
 			lowColor		= cl->_layerdata->lowcolor.GetColor32();
 			viewColor		= cl->_layerdata->viewcolor.GetColor32();
 			
-			ses->WriteData( &highColor, sizeof(rgb_color) );
-			ses->WriteData( &lowColor, sizeof(rgb_color) );
-			ses->WriteData( &viewColor, sizeof(rgb_color) );
-			ses->Sync();
+			_winlink->Attach<rgb_color>(highColor);
+			_winlink->Attach<rgb_color>(lowColor);
+			_winlink->Attach<rgb_color>(viewColor);
+			_winlink->Flush();
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1003,8 +1013,8 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			int8		srcAlpha, alphaFunc;
 			
-			ses->ReadInt8( &srcAlpha );
-			ses->ReadInt8( &alphaFunc );
+			msg.Read<int8>(&srcAlpha);
+			msg.Read<int8>(&alphaFunc);
 			
 			cl->_layerdata->alphaSrcMode	= (source_alpha)srcAlpha;
 			cl->_layerdata->alphaFncMode	= (alpha_function)alphaFunc;
@@ -1014,9 +1024,9 @@ void ServerWindow::DispatchMessage( int32 code )
 		}
 		case AS_LAYER_GET_BLEND_MODE:
 		{
-			ses->WriteInt8( (int8)(cl->_layerdata->alphaSrcMode) );
-			ses->WriteInt8( (int8)(cl->_layerdata->alphaFncMode) );
-			ses->Sync();
+			_winlink->Attach<int8>((int8)(cl->_layerdata->alphaSrcMode));
+			_winlink->Attach<int8>((int8)(cl->_layerdata->alphaFncMode));
+			_winlink->Flush();
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1025,7 +1035,7 @@ void ServerWindow::DispatchMessage( int32 code )
 		{
 			int8		drawingMode;
 			
-			ses->ReadInt8( &drawingMode );
+			msg.Read<int8>(&drawingMode);
 			
 			cl->_layerdata->draw_mode	= (drawing_mode)drawingMode;
 
@@ -1034,15 +1044,15 @@ void ServerWindow::DispatchMessage( int32 code )
 		}
 		case AS_LAYER_GET_DRAW_MODE:
 		{
-			ses->WriteInt8( (int8)(cl->_layerdata->draw_mode) );
-			ses->Sync();
+			_winlink->Attach<int8>((int8)(cl->_layerdata->draw_mode));
+			_winlink->Flush();
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
-			ses->ReadBool( &(cl->_layerdata->fontAliasing) );
+			msg.Read<bool>(&(cl->_layerdata->fontAliasing));
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1053,8 +1063,8 @@ void ServerWindow::DispatchMessage( int32 code )
 			int32		pictureToken;
 			BPoint		where;
 			
-			ses->ReadInt32( &pictureToken );
-			ses->ReadPoint( &where );
+			msg.Read<int32>(&pictureToken);
+			msg.Read<BPoint>(&where);
 
 		
 			BRegion			reg;
@@ -1062,8 +1072,8 @@ void ServerWindow::DispatchMessage( int32 code )
 
 				// if we had a picture to clip to, include the FULL visible region(if any) in the area to be redrawn
 				// in other words: invalidate what ever is visible for this layer and his children.
-			if ( cl->clipToPicture && cl->_fullVisible.CountRects() > 0 ){
-				reg.Include( &cl->_fullVisible );
+			if (cl->clipToPicture && cl->_fullVisible.CountRects() > 0){
+				reg.Include(&cl->_fullVisible);
 				redraw		= true;
 			}
 
@@ -1075,9 +1085,9 @@ void ServerWindow::DispatchMessage( int32 code )
 				if (!sp)
 					break;
 					
-				if( sp->GetToken() == pictureToken ){
+				if(sp->GetToken() == pictureToken){
 //					cl->clipToPicture	= sp;
-// TODO: increase that picture's reference count.( ~ allocate a picture )
+// TODO: increase that picture's reference count.(~ allocate a picture)
 					break;
 				}
 			}
@@ -1085,7 +1095,7 @@ void ServerWindow::DispatchMessage( int32 code )
 			i = 0;
 
 				// we have a new picture to clip to, so rebuild our full region
-			if( cl->clipToPicture ) {
+			if(cl->clipToPicture) {
 
 				cl->clipToPictureInverse	= false;
 
@@ -1093,7 +1103,7 @@ void ServerWindow::DispatchMessage( int32 code )
 			}
 
 				// we need to rebuild the visible region, we may have a valid one.
-			if (cl->_parent && !(cl->_hidden) ){
+			if (cl->_parent && !(cl->_hidden)){
 				cl->_parent->RebuildChildRegions(cl->_full.Frame(), cl);
 			}
 			else{
@@ -1102,14 +1112,14 @@ void ServerWindow::DispatchMessage( int32 code )
 			}
 
 				// include our full visible region in the region to be redrawn
-			if ( !(cl->_hidden) && (cl->_fullVisible.CountRects() > 0) ){
-				reg.Include( &(cl->_fullVisible) );
+			if (!(cl->_hidden) && (cl->_fullVisible.CountRects() > 0)){
+				reg.Include(&(cl->_fullVisible));
 				redraw		= true;
 			}
 
 				// redraw if: we had OR if we NOW have a picture to clip to.
 			if (redraw){
-				cl->Invalidate( reg );
+				cl->Invalidate(reg);
 			}
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
@@ -1121,8 +1131,8 @@ void ServerWindow::DispatchMessage( int32 code )
 			int32		pictureToken;
 			BPoint		where;
 			
-			ses->ReadInt32( &pictureToken );
-			ses->ReadPoint( &where );
+			msg.Read<int32>(&pictureToken);
+			msg.Read<BPoint>(&where);
 
 			ServerPicture	*sp = NULL;
 			int32			i = 0;
@@ -1132,9 +1142,9 @@ void ServerWindow::DispatchMessage( int32 code )
 				if (!sp)
 					break;
 					
-				if( sp->GetToken() == pictureToken ){
+				if(sp->GetToken() == pictureToken){
 //					cl->clipToPicture	= sp;
-// TODO: increase that picture's reference count.( ~ allocate a picture )
+// TODO: increase that picture's reference count.(~ allocate a picture)
 					break;
 				}
 			}
@@ -1142,13 +1152,13 @@ void ServerWindow::DispatchMessage( int32 code )
 			i = 0;
 			
 				// if a picture has been found...
-			if( cl->clipToPicture ) {
+			if(cl->clipToPicture) {
 
 				cl->clipToPictureInverse	= true;
 
 				cl->RebuildFullRegion();
 
-				cl->RequestDraw( cl->clipToPicture->Frame() );
+				cl->RequestDraw(cl->clipToPicture->Frame());
 			}
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
@@ -1162,23 +1172,23 @@ void ServerWindow::DispatchMessage( int32 code )
 			int32		noOfRects;
 
 			ld			= cl->_layerdata;
-			reg			= cl->ConvertFromParent( &(cl->_visible) );
+			reg			= cl->ConvertFromParent(&(cl->_visible));
 
-			if( ld->clippReg )
-				reg.IntersectWith( ld->clippReg );
+			if(ld->clippReg)
+				reg.IntersectWith(ld->clippReg);
 
-			while( (ld = ld->prevState) )
-				if( ld->clippReg )
-					reg.IntersectWith( ld->clippReg );
+			while((ld = ld->prevState))
+				if(ld->clippReg)
+					reg.IntersectWith(ld->clippReg);
 
 			noOfRects	= reg.CountRects();
-			ses->WriteInt32( noOfRects );
+			_winlink->Attach<int32>(noOfRects);
 
-			for( int i = 0; i < noOfRects; i++){
-				ses->WriteRect( reg.RectAt(i) );
+			for(int i = 0; i < noOfRects; i++){
+				_winlink->Attach<BRect>(reg.RectAt(i));
 			}
 
-			ses->Sync();
+			_winlink->Flush();
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1189,21 +1199,21 @@ void ServerWindow::DispatchMessage( int32 code )
 			int32		noOfRects;
 			BRect		r;
 
-			if( cl->_layerdata->clippReg )
+			if(cl->_layerdata->clippReg)
 				cl->_layerdata->clippReg->MakeEmpty();
 			else
 				cl->_layerdata->clippReg = new BRegion();
 			
-			ses->ReadInt32( &noOfRects );
+			msg.Read<int32>(&noOfRects);
 			
-			for( int i = 0; i < noOfRects; i++ ){
-				ses->ReadRect( &r );
-				cl->_layerdata->clippReg->Include( r );
+			for(int i = 0; i < noOfRects; i++){
+				msg.Read<BRect>(&r);
+				cl->_layerdata->clippReg->Include(r);
 			}
 
 			cl->RebuildFullRegion();
 
-			cl->RequestDraw( cl->clipToPicture->Frame() );
+			cl->RequestDraw(cl->clipToPicture->Frame());
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1214,11 +1224,11 @@ void ServerWindow::DispatchMessage( int32 code )
 // TODO: watch out for the coordinate system
 			BRect		invalRect;
 			
-			ses->ReadRect( &invalRect );
+			msg.Read<BRect>(&invalRect);
 			
-			cl->Invalidate( invalRect );
+			cl->Invalidate(invalRect);
 
-			cl->RequestDraw( invalRect );
+			cl->RequestDraw(invalRect);
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1230,16 +1240,16 @@ void ServerWindow::DispatchMessage( int32 code )
 			int32			noOfRects;
 			BRect			rect;
 			
-			ses->ReadInt32( &noOfRects );
+			msg.Read<int32>(&noOfRects);
 			
-			for( int i = 0; i < noOfRects; i++ ){
-				ses->ReadRect( &rect );
-				invalReg.Include( rect );
+			for(int i = 0; i < noOfRects; i++){
+				msg.Read<BRect>(&rect);
+				invalReg.Include(rect);
 			}
 			
-			cl->Invalidate( invalReg );
+			cl->Invalidate(invalReg);
 
-			cl->RequestDraw( invalReg.Frame() );
+			cl->RequestDraw(invalReg.Frame());
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1392,7 +1402,7 @@ void ServerWindow::DispatchMessage( int32 code )
 		}
 		default:
 		{
-			printf("ServerWindow %s received unexpected code - message offset %lx\n",_title->String(), code - SERVER_TRUE);
+			printf("ServerWindow %s received unexpected code - message offset %lx\n",_title->String(), msg.Code() - SERVER_TRUE);
 			break;
 		}
 	}
@@ -1415,20 +1425,20 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 	Layer *sibling;
 	int32 numRects = 0;
 	
-	if ( !msgsize || !msgbuffer )
+	if (!msgsize || !msgbuffer)
 		return;
-	if ( IsHidden() )
+	if (IsHidden())
 		return;
 
 	WindowClipRegion.Set(_winborder->Frame());
 	sibling = _winborder->GetUpperSibling();
-	while ( sibling )
+	while (sibling)
 	{
 		WindowClipRegion.Exclude(sibling->Frame());
 		sibling = sibling->GetUpperSibling();
 	}
 
-	if ( !WindowClipRegion.Frame().IsValid() )
+	if (!WindowClipRegion.Frame().IsValid())
 		return;
 	
 	// We need to decide whether coordinates are specified in view or root coordinates.
@@ -1439,7 +1449,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		code = read_from_buffer<int32>(&msgbuffer);
 		view_token = read_from_buffer<int32>(&msgbuffer);
 		layer = _workspace->GetRoot()->FindLayer(view_token);
-		if ( layer )
+		if (layer)
 		{
 			layerdata = layer->GetLayerData();
 			LayerClipRegion.Set(layer->Frame());
@@ -1455,14 +1465,14 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		{
 			case AS_SET_HIGH_COLOR:
 			{
-				if ( sizeRemaining >= AS_SET_COLOR_MSG_SIZE )
+				if (sizeRemaining >= AS_SET_COLOR_MSG_SIZE)
 				{
 					uint8 r, g, b, a;
 					r = read_from_buffer<uint8>(&msgbuffer);
 					g = read_from_buffer<uint8>(&msgbuffer);
 					b = read_from_buffer<uint8>(&msgbuffer);
 					a = read_from_buffer<uint8>(&msgbuffer);
-					if ( layerdata )
+					if (layerdata)
 						layerdata->highcolor.SetColor(r,g,b,a);
 					sizeRemaining -= AS_SET_COLOR_MSG_SIZE;
 				}
@@ -1475,14 +1485,14 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_SET_LOW_COLOR:
 			{
-				if ( sizeRemaining >= AS_SET_COLOR_MSG_SIZE )
+				if (sizeRemaining >= AS_SET_COLOR_MSG_SIZE)
 				{
 					uint8 r, g, b, a;
 					r = read_from_buffer<uint8>(&msgbuffer);
 					g = read_from_buffer<uint8>(&msgbuffer);
 					b = read_from_buffer<uint8>(&msgbuffer);
 					a = read_from_buffer<uint8>(&msgbuffer);
-					if ( layerdata )
+					if (layerdata)
 						layerdata->lowcolor.SetColor(r,g,b,a);
 					sizeRemaining -= AS_SET_COLOR_MSG_SIZE;
 				}
@@ -1495,14 +1505,14 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_SET_VIEW_COLOR:
 			{
-				if ( sizeRemaining >= AS_SET_COLOR_MSG_SIZE )
+				if (sizeRemaining >= AS_SET_COLOR_MSG_SIZE)
 				{
 					uint8 r, g, b, a;
 					r = read_from_buffer<uint8>(&msgbuffer);
 					g = read_from_buffer<uint8>(&msgbuffer);
 					b = read_from_buffer<uint8>(&msgbuffer);
 					a = read_from_buffer<uint8>(&msgbuffer);
-					if ( layerdata )
+					if (layerdata)
 						layerdata->viewcolor.SetColor(r,g,b,a);
 					sizeRemaining -= AS_SET_COLOR_MSG_SIZE;
 				}
@@ -1516,7 +1526,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_ARC:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_STROKE_ARC_MSG_SIZE )
+				if (sizeRemaining >= AS_STROKE_ARC_MSG_SIZE)
 				{
 					float left, top, right, bottom, angle, span;
 					int8 *pattern;
@@ -1529,7 +1539,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					span = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->StrokeArc(rect,angle,span,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_ARC_MSG_SIZE;
 				}
@@ -1543,7 +1553,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_BEZIER:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_STROKE_BEZIER_MSG_SIZE )
+				if (sizeRemaining >= AS_STROKE_BEZIER_MSG_SIZE)
 				{
 					BPoint *pts;
 					int8 *pattern;
@@ -1555,7 +1565,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 						pts[i].y = read_from_buffer<float>(&msgbuffer);
 					}
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->StrokeBezier(pts,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_STROKE_BEZIER_MSG_SIZE;
@@ -1570,7 +1580,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_ELLIPSE:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_STROKE_ELLIPSE_MSG_SIZE )
+				if (sizeRemaining >= AS_STROKE_ELLIPSE_MSG_SIZE)
 				{
 					float left, top, right, bottom;
 					int8 *pattern;
@@ -1580,7 +1590,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->StrokeEllipse(rect,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_ELLIPSE_MSG_SIZE;
 				}
@@ -1594,7 +1604,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_LINE:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_STROKE_LINE_MSG_SIZE )
+				if (sizeRemaining >= AS_STROKE_LINE_MSG_SIZE)
 				{
 					float x1, y1, x2, y2;
 					int8 *pattern;
@@ -1605,7 +1615,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BPoint p1(x1,y1);
 					//BPoint p2(x2,y2);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->StrokeLine(p1,p2,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_LINE_MSG_SIZE;
 				}
@@ -1629,7 +1639,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_RECT:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_STROKE_RECT_MSG_SIZE )
+				if (sizeRemaining >= AS_STROKE_RECT_MSG_SIZE)
 				{
 					float left, top, right, bottom;
 					int8 *pattern;
@@ -1639,7 +1649,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->StrokeRect(rect,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_RECT_MSG_SIZE;
 				}
@@ -1653,7 +1663,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_ROUNDRECT:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_STROKE_ROUNDRECT_MSG_SIZE )
+				if (sizeRemaining >= AS_STROKE_ROUNDRECT_MSG_SIZE)
 				{
 					float left, top, right, bottom, xrad, yrad;
 					int8 *pattern;
@@ -1665,7 +1675,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					yrad = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->StrokeRoundRect(rect,xrad,yrad,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_ROUNDRECT_MSG_SIZE;
 				}
@@ -1684,7 +1694,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_TRIANGLE:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_STROKE_TRIANGLE_MSG_SIZE )
+				if (sizeRemaining >= AS_STROKE_TRIANGLE_MSG_SIZE)
 				{
 					BPoint *pts;
 					int8 *pattern;
@@ -1702,7 +1712,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->StrokeTriangle(pts,rect,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_STROKE_TRIANGLE_MSG_SIZE;
@@ -1717,7 +1727,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_ARC:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_FILL_ARC_MSG_SIZE )
+				if (sizeRemaining >= AS_FILL_ARC_MSG_SIZE)
 				{
 					float left, top, right, bottom, angle, span;
 					int8 *pattern;
@@ -1729,7 +1739,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					span = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->FillArc(rect,angle,span,layerdata,pattern);
 					sizeRemaining -= AS_FILL_ARC_MSG_SIZE;
 				}
@@ -1743,7 +1753,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_BEZIER:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_FILL_BEZIER_MSG_SIZE )
+				if (sizeRemaining >= AS_FILL_BEZIER_MSG_SIZE)
 				{
 					BPoint *pts;
 					int8 *pattern;
@@ -1755,7 +1765,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 						pts[i].y = read_from_buffer<float>(&msgbuffer);
 					}
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->FillBezier(pts,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_FILL_BEZIER_MSG_SIZE;
@@ -1770,7 +1780,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_ELLIPSE:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_FILL_ELLIPSE_MSG_SIZE )
+				if (sizeRemaining >= AS_FILL_ELLIPSE_MSG_SIZE)
 				{
 					float left, top, right, bottom;
 					int8 *pattern;
@@ -1780,7 +1790,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->FillEllipse(rect,layerdata,pattern);
 					sizeRemaining -= AS_FILL_ELLIPSE_MSG_SIZE;
 				}
@@ -1798,7 +1808,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_FILL_RECT:
 			{
-				if ( sizeRemaining >= AS_FILL_RECT_MSG_SIZE )
+				if (sizeRemaining >= AS_FILL_RECT_MSG_SIZE)
 				{
 					float left, top, right, bottom;
 					int8 *pattern;
@@ -1809,8 +1819,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					/*
 					BRect rect(left,top,right,bottom);
-					if ( layerdata && numRects )
-						if ( numRects == 1 )
+					if (layerdata && numRects)
+						if (numRects == 1)
 							_app->_driver->FillRect(rect,layerdata,pattern);
 						else
 						{
@@ -1836,7 +1846,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_ROUNDRECT:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_FILL_ROUNDRECT_MSG_SIZE )
+				if (sizeRemaining >= AS_FILL_ROUNDRECT_MSG_SIZE)
 				{
 					float left, top, right, bottom, xrad, yrad;
 					int8 *pattern;
@@ -1848,7 +1858,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					yrad = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->FillRoundRect(rect,xrad,yrad,layerdata,pattern);
 					sizeRemaining -= AS_FILL_ROUNDRECT_MSG_SIZE;
 				}
@@ -1867,7 +1877,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_TRIANGLE:
 			{
 				// TODO:: Add clipping
-				if ( sizeRemaining >= AS_FILL_TRIANGLE_MSG_SIZE )
+				if (sizeRemaining >= AS_FILL_TRIANGLE_MSG_SIZE)
 				{
 					BPoint *pts;
 					int8 *pattern;
@@ -1885,7 +1895,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					//BRect rect(left,top,right,bottom);
-					//if ( layerdata )
+					//if (layerdata)
 						//_app->_driver->FillTriangle(pts,rect,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_FILL_TRIANGLE_MSG_SIZE;
@@ -1947,15 +1957,15 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 int32 ServerWindow::MonitorWin(void *data)
 {
 	ServerWindow 	*win = (ServerWindow *)data;
-	status_t		rv;
-	int32			code;
+	status_t		stat;
+	PortMessage		msg;
 	
 	for(;;)
 	{
-		rv = win->ses->ReadInt32( &code );
+		stat = msg.ReadFromPort(win->_receiver);
 		
-		if ( rv != B_BAD_PORT_ID ){
-			switch( code ){
+		if (stat != B_BAD_PORT_ID){
+			switch(msg.Code()){
 				case B_QUIT_REQUESTED:{
 					STRACE(("ServerWindow %s received Quit request\n",win->Title()));
 					// Our BWindow sent us this message when it quit.
@@ -1966,7 +1976,7 @@ int32 ServerWindow::MonitorWin(void *data)
 					break;
 				}
 				default:{
-					win->DispatchMessage( code );
+					win->DispatchMessage(msg);
 					break;
 				}
 			}
@@ -1976,7 +1986,7 @@ int32 ServerWindow::MonitorWin(void *data)
 			return 1;
 		}
 	
-		if( code == B_QUIT_REQUESTED )
+		if(msg.Code() == B_QUIT_REQUESTED)
 			break;
 	}
 
@@ -2167,39 +2177,39 @@ STRACE(("ServerWindow %s: Set Workspace\n",_title->String()));
 
 Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 {
-	if( !start )
+	if(!start)
 		return NULL;
 	
 		// see if we're looking for 'start'
-	if( start->_view_token == token )
+	if(start->_view_token == token)
 		return const_cast<Layer*>(start);
 
 	Layer		*c = start->_topchild; //c = short for: current
-	if( c != NULL )
-		while( true ){
+	if(c != NULL)
+		while(true){
 			// action block
 			{
-				if( c->_view_token == token )
+				if(c->_view_token == token)
 					return c;
 			}
 
 				// go deep
-			if(	c->_topchild ){
+			if(	c->_topchild){
 				c = c->_topchild;
 			}
 				// go right or up
 			else
 					// go right
-				if( c->_lowersibling ){
+				if(c->_lowersibling){
 					c = c->_lowersibling;
 				}
 					// go up
 				else{
-					while( !c->_parent->_lowersibling && c->_parent != start ){
+					while(!c->_parent->_lowersibling && c->_parent != start){
 						c = c->_parent;
 					}
 						// that enough! We've reached the start layer.
-					if( c->_parent == start )
+					if(c->_parent == start)
 						break;
 						
 					c = c->_parent->_lowersibling;
@@ -2211,17 +2221,17 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 
 //-----------------------------------------------------------------------
 
-void ServerWindow::SendMessageToClient( const BMessage* msg ) const{
+void ServerWindow::SendMessageToClient(const BMessage* msg) const{
 	ssize_t		size;
 	char		*buffer;
 	
 	size		= msg->FlattenedSize();
 	buffer		= new char[size];
-	if ( msg->Flatten( buffer, size ) == B_OK ){
-		write_port( winLooperPort, msg->what, buffer, size );
+	if (msg->Flatten(buffer, size) == B_OK){
+		write_port(winLooperPort, msg->what, buffer, size);
 	}
 	else
-		printf("PANIC: SW: '%s': can't flatten message in 'SendMessageToClient()'\n", _title->String() );
+		printf("PANIC: SW: '%s': can't flatten message in 'SendMessageToClient()'\n", _title->String());
 
 	delete buffer;
 }

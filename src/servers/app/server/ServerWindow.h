@@ -67,7 +67,7 @@ public:
 								ServerWindow(BRect rect, const char *string,
 									uint32 wlook, uint32 wfeel, uint32 wflags,
 									ServerApp *winapp,  port_id winport,
-									port_id looperPort, uint32 index,
+									port_id looperPort, port_id replyport, uint32 index,
 									int32 handlerID);
 								~ServerWindow(void);
 	
@@ -97,7 +97,7 @@ public:
 			void				Unlock(void);
 			bool				IsLocked(void);
 	
-			void				DispatchMessage( int32 code );
+			void				DispatchMessage(PortMessage msg);
 			void				DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
 	static	int32				MonitorWin(void *data);
 	static	void				HandleMouseEvent(PortMessage *msg);
@@ -141,7 +141,6 @@ protected:
 			uint32				_token;
 			int32				_handlertoken;
 	
-			BSession			*ses;
 			port_id				winLooperPort;
 			Layer				*top_layer;
 			Layer				*cl; // short for currentLayer. We'll use it a lot, that's why it's short :-)
