@@ -96,11 +96,16 @@ const char *FontStyle::Name(void)
 	\brief Returns a handle to the style in question, straight from FreeType's cache
 	\return FreeType face handle or NULL if there was an internal error
 */
+
+// TODO: Re-enable when I understand how the FT2 Cache system changed from
+// 2.1.4 to 2.1.8
+/*
 FT_Face FontStyle::GetFace(void)
 {
 	FT_Face f;
 	return (FTC_Manager_Lookup_Face(ftmanager,cachedface,&f)!=0)?f:NULL;
 }
+*/
 
 /*!
 	\brief Returns the path to the style's font file 
@@ -116,6 +121,10 @@ const char *FontStyle::GetPath(void)
 	\param c An ASCII character
 	\return A Unicode value for the character
 */
+
+// TODO: Re-enable when I understand how the FT2 Cache system changed from
+// 2.1.4 to 2.1.8
+/*
 int16 FontStyle::ConvertToUnicode(uint16 c)
 {
 	FT_Face f;
@@ -124,6 +133,7 @@ int16 FontStyle::ConvertToUnicode(uint16 c)
 	
 	return FT_Get_Char_Index(f,c);
 }
+*/
 
 /*!
 	\brief Creates a new ServerFont object for the style, given size, shear, and rotation.
