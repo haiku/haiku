@@ -311,7 +311,7 @@ bfs_write_fs_stat(void *_ns, struct fs_info *info, long mask)
 	FUNCTION_START(("mask = %ld\n",mask));
 	Volume *volume = (Volume *)_ns;
 	disk_super_block &superBlock = volume->SuperBlock();
-	
+
 	Locker locker(volume->Lock());
 
 	status_t status = B_BAD_VALUE;
@@ -990,6 +990,10 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 	Volume *volume = (Volume *)_ns;
 	Inode *oldDirectory = (Inode *)_oldDir;
 	Inode *newDirectory = (Inode *)_newDir;
+
+	// are we already done?
+	if (oldDirectory == newDirectory && !strcmp(oldName, newName))
+		return B_OK;
 
 	// get the directory's tree, and a pointer to the inode which should be changed
 	BPlusTree *tree;
