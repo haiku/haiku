@@ -730,37 +730,6 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
        necessitate to modify mpegvideo.c. The problem comes from the
        fact they decided to store the quantized DC (which would lead
        to problems if Q could vary !) */
-#if defined ARCH_X86
-	/* removed usage of ebx, still this gets optimized by GCC pretty well */
-    asm (
-	"movl  %0, %%eax    \n\t"
-	"addl  %1, %%eax	\n\t"
-	"mull  %2           \n\t"
-	"movl  %%eax, %0    \n\t"
-	: "+g" (a)
-	: "g" (scale >> 1), "g" (inverse[scale])
-	: "%eax", "%edx"
-	);
-    asm (
-	"movl  %0, %%eax    \n\t"
-	"addl  %1, %%eax	\n\t"
-	"mull  %2           \n\t"
-	"movl  %%eax, %0    \n\t"
-	: "+g" (b)
-	: "g" (scale >> 1), "g" (inverse[scale])
-	: "%eax", "%edx"
-	);
-    asm (
-	"movl  %0, %%eax    \n\t"
-	"addl  %1, %%eax	\n\t"
-	"mull  %2           \n\t"
-	"movl  %%eax, %0    \n\t"
-	: "+g" (c)
-	: "g" (scale >> 1), "g" (inverse[scale])
-	: "%eax", "%edx"
-	);
-#else
-    /* #elif defined (ARCH_ALPHA) */
     /* Divisions are extremely costly on Alpha; optimize the most
        common case. But they are costly everywhere...
      */
@@ -773,7 +742,6 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
 	b = FASTDIV((b + (scale >> 1)), scale);
 	c = FASTDIV((c + (scale >> 1)), scale);
     }
-#endif
     /* XXX: WARNING: they did not choose the same test as MPEG4. This
        is very important ! */
     if(s->msmpeg4_version>3){
