@@ -312,9 +312,9 @@ void BMidi::Inflow()
 	{
 		len = read_port(inflowPort, &code, &event, sizeof(event));
 	
-		if (len != sizeof(event)) { continue; }  // ignore errors
-
 		if (code == MSG_CODE_TERMINATE_THREAD) { return; }
+
+		if (len != sizeof(event)) { continue; }  // ignore errors
 
 		switch (event.opcode) 
 		{
