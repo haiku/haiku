@@ -21,6 +21,8 @@
 	uint8 _##name[sizeof(iovecs) + (size)*sizeof(iovec)]; \
 	iovecs *name = (iovecs *)_##name
 
+struct fs_info;
+
 #ifdef __cplusplus
 extern "C" {
 #endif 
@@ -45,54 +47,60 @@ struct fs_calls {
 #endif
 
 struct fs_calls {
-	int (*fs_mount)(fs_cookie *fs, fs_id id, const char *device, void *args, vnode_id *root_vnid);
+	/* general operations */
+	int (*fs_mount)(fs_id id, const char *device, void *args, fs_cookie *_fs, vnode_id *_rootVnodeID);
 	int (*fs_unmount)(fs_cookie fs);
+
+	int (*fs_read_fs_info)(fs_cookie fs, struct fs_info *info);
+	int (*fs_write_fs_info)(fs_cookie fs, struct fs_info *info, int mask);
 	int (*fs_sync)(fs_cookie fs);
 
-	int (*fs_lookup)(fs_cookie fs, fs_vnode dir, const char *name, vnode_id *id);
+	/* vnode operations */
+	int (*fs_lookup)(fs_cookie fs, fs_vnode dir, const char *name, vnode_id *_id);
 	int (*fs_get_vnode_name)(fs_cookie fs, fs_vnode vnode, char *buffer, size_t bufferSize);
 
-	int (*fs_get_vnode)(fs_cookie fs, vnode_id id, fs_vnode *v, bool r);
-	int (*fs_put_vnode)(fs_cookie fs, fs_vnode v, bool r);
-	int (*fs_remove_vnode)(fs_cookie fs, fs_vnode v, bool r);
+	int (*fs_get_vnode)(fs_cookie fs, vnode_id id, fs_vnode *_vnode, bool reenter);
+	int (*fs_put_vnode)(fs_cookie fs, fs_vnode vnode, bool reenter);
+	int (*fs_remove_vnode)(fs_cookie fs, fs_vnode vnode, bool reenter);
 
+	/* VM file access */
 	int (*fs_can_page)(fs_cookie fs, fs_vnode v);
 	ssize_t (*fs_read_page)(fs_cookie fs, fs_vnode v, iovecs *vecs, off_t pos);
 	ssize_t (*fs_write_page)(fs_cookie fs, fs_vnode v, iovecs *vecs, off_t pos);
 
 	/* common operations */
-	int (*fs_ioctl)(fs_cookie fs, fs_vnode v, file_cookie cookie, ulong op, void *buf, size_t len);
+	int (*fs_ioctl)(fs_cookie fs, fs_vnode v, file_cookie cookie, ulong op, void *buffer, size_t length);
 	int (*fs_fsync)(fs_cookie fs, fs_vnode v);
 
 	int (*fs_unlink)(fs_cookie fs, fs_vnode dir, const char *name);
 	int (*fs_rename)(fs_cookie fs, fs_vnode olddir, const char *oldname, fs_vnode newdir, const char *newname);
 
 	int (*fs_read_stat)(fs_cookie fs, fs_vnode v, struct stat *stat);
-	int (*fs_write_stat)(fs_cookie fs, fs_vnode v, struct stat *stat, int stat_mask);
+	int (*fs_write_stat)(fs_cookie fs, fs_vnode v, struct stat *stat, int statMask);
 
 	/* file operations */
-	int (*fs_create)(fs_cookie fs, fs_vnode dir, file_cookie *cookie, vnode_id *new_vnid, const char *name, int omode, int perms);
-	int (*fs_open)(fs_cookie fs, fs_vnode v, file_cookie *cookie, int oflags);
+	int (*fs_create)(fs_cookie fs, fs_vnode dir, const char *name, int omode, int perms, file_cookie *_cookie, vnode_id *_newVnodeID);
+	int (*fs_open)(fs_cookie fs, fs_vnode v, int oflags, file_cookie *_cookie);
 	int (*fs_close)(fs_cookie fs, fs_vnode v, file_cookie cookie);
 	int (*fs_free_cookie)(fs_cookie fs, fs_vnode v, file_cookie cookie);
-	ssize_t (*fs_read)(fs_cookie fs, fs_vnode v, file_cookie cookie, void *buf, off_t pos, size_t *len);
-	ssize_t (*fs_write)(fs_cookie fs, fs_vnode v, file_cookie cookie, const void *buf, off_t pos, size_t *len);
+	ssize_t (*fs_read)(fs_cookie fs, fs_vnode v, file_cookie cookie, void *buffer, off_t pos, size_t *length);
+	ssize_t (*fs_write)(fs_cookie fs, fs_vnode v, file_cookie cookie, const void *buffer, off_t pos, size_t *length);
 	off_t (*fs_seek)(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, int seekType);
 
 	/* directory operations */
-	int (*fs_create_dir)(fs_cookie fs, fs_vnode dir, const char *name, int perms, vnode_id *new_vnid);
-	int (*fs_open_dir)(fs_cookie fs, fs_vnode v, file_cookie *cookie);
+	int (*fs_create_dir)(fs_cookie fs, fs_vnode parent, const char *name, int perms, vnode_id *_newVnodeID);
+	int (*fs_open_dir)(fs_cookie fs, fs_vnode v, file_cookie *_cookie);
 	int (*fs_close_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie);
 	int (*fs_free_dir_cookie)(fs_cookie fs, fs_vnode v, file_cookie cookie);
 	int (*fs_read_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
 	int (*fs_rewind_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie);
 
 	/* attribute directory operations */
-//	int (*fs_open_dir)(fs_cookie fs, fs_vnode v, file_cookie *cookie, int oflags);
-//	int (*fs_close_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie);
-//	int (*fs_free_dir_cookie)(fs_cookie fs, fs_vnode v, file_cookie cookie);
-//	int (*fs_read_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
-//	int (*fs_rewind_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie);
+//	int (*fs_open_attr_dir)(fs_cookie fs, fs_vnode v, file_cookie *cookie, int oflags);
+//	int (*fs_close_attr_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie);
+//	int (*fs_free_attr_dir_cookie)(fs_cookie fs, fs_vnode v, file_cookie cookie);
+//	int (*fs_read_attr_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
+//	int (*fs_rewind_attr_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie);
 //
 //	/* attribute operations */
 //	int (*fs_open_attr)(fs_cookie fs, fs_vnode v, file_cookie *cookie, stream_type st, int oflags);
@@ -101,13 +109,14 @@ struct fs_calls {
 //	ssize_t (*fs_read_attr)(fs_cookie fs, fs_vnode v, file_cookie cookie, void *buf, off_t pos, size_t *len);
 //	ssize_t (*fs_write_attr)(fs_cookie fs, fs_vnode v, file_cookie cookie, const void *buf, off_t pos, size_t *len);
 //	int (*fs_seek_attr)(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, int st);
+//	int (*fs_rename_attr)(fs_cookie fs, fs_vnode file, const char *oldname, const char *newname);
 //
-//	/* index operations */
-//	int (*fs_open_index)(fs_cookie fs, fs_vnode v, file_cookie *cookie, int oflags);
-//	int (*fs_close_index)(fs_cookie fs, fs_vnode v, file_cookie cookie);
-//	int (*fs_free_index_cookie)(fs_cookie fs, fs_vnode v, file_cookie cookie);
-//	int (*fs_read_index)(fs_cookie fs, fs_vnode v, file_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
-//	int (*fs_rewind_index)(fs_cookie fs, fs_vnode v, file_cookie cookie);
+//	/* index directory & index operations */
+//	int (*fs_open_index_dir)(fs_cookie fs, fs_vnode v, file_cookie *cookie, int oflags);
+//	int (*fs_close_index_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie);
+//	int (*fs_free_index_dir_cookie)(fs_cookie fs, fs_vnode v, file_cookie cookie);
+//	int (*fs_read_index_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
+//	int (*fs_rewind_index_dir)(fs_cookie fs, fs_vnode v, file_cookie cookie);
 //
 //	/* query operations */
 //	int (*fs_open_query)(fs_cookie fs, fs_vnode v, file_cookie *cookie, int oflags);
@@ -151,11 +160,16 @@ int vfs_set_cache_ptr(void *vnode, void *cache);
 int sys_mount(const char *path, const char *device, const char *fs_name, void *args);
 int sys_unmount(const char *path);
 int sys_sync(void);
+int sys_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
 int sys_open(const char *path, int omode);
+int sys_open_dir_node_ref(dev_t device, ino_t inode);
+int sys_open_dir_entry_ref(dev_t device, ino_t inode, const char *name);
 int sys_open_dir(const char *path);
 int sys_fsync(int fd);
 off_t sys_seek(int fd, off_t pos, int seekType);
+int sys_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms);
 int sys_create(const char *path, int omode, int perms);
+int sys_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int sys_create_dir(const char *path, int perms);
 int sys_unlink(const char *path);
 int sys_rename(const char *oldpath, const char *newpath);
@@ -167,11 +181,16 @@ int sys_setcwd(const char* path);
 int user_mount(const char *path, const char *device, const char *fs_name, void *args);
 int user_unmount(const char *path);
 int user_sync(void);
+int user_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
 int user_open(const char *path, int omode);
+int user_open_dir_node_ref(dev_t device, ino_t inode);
+int user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname);
 int user_open_dir(const char *path);
 int user_fsync(int fd);
 off_t user_seek(int fd, off_t pos, int seekType);
+int user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms);
 int user_create(const char *path, int omode, int perms);
+int user_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int user_create_dir(const char *path, int perms);
 int user_unlink(const char *path);
 int user_rename(const char *oldpath, const char *newpath);
