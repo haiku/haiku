@@ -67,7 +67,7 @@ MediaWriter::MediaWriter(
 	input.node = media_node::null;               // until registration
 	input.source = media_source::null; 
 	input.destination = media_destination::null; // until registration
-	input.format = *GetFormat();
+	GetFormat(&input.format);
 }
 
 // -------------------------------------------------------- //
@@ -130,7 +130,7 @@ status_t MediaWriter::SetRef(
 		return status;
 	}
 	// reset the format, and set the requirements imposed by this file
-	input.format = *GetFormat();
+	GetFormat(&input.format);
 	AddRequirements(&input.format);
 	// if we are connected we have to re-negotiate the connection
 	if (input.source != media_source::null) {
@@ -285,7 +285,9 @@ status_t MediaWriter::AcceptFormat(
 	fprintf(stderr,"\n");*/
 	// Be's format_is_compatible doesn't work.
 //	if (!format_is_compatible(*format,*myFormat)) {
-	if (!format_is_acceptible(*format,*GetFormat())) {
+	media_format myFormat;
+	GetFormat(&myFormat);
+	if (!format_is_acceptible(*format,myFormat)) {
 		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
@@ -442,7 +444,7 @@ void MediaWriter::Disconnected(
 		return;
 	}
 	input.source = media_source::null;
-	input.format = *GetFormat();
+	GetFormat(&input.format);
 	if (fBufferGroup != 0) {
 		BBufferGroup * group = fBufferGroup;
 		fBufferGroup = 0;
@@ -526,35 +528,42 @@ status_t MediaWriter::HandleDataStatus(
 
 // static:
 
-void MediaWriter::GetFlavor(flavor_info * info, int32 id)
+void MediaWriter::GetFlavor(flavor_info * outInfo, int32 id)
 {
 	fprintf(stderr,"MediaWriter::GetFlavor\n");
-	AbstractFileInterfaceNode::GetFlavor(info,id);
-	info->name = "OpenBeOS Media Writer";
-	info->info = "The OpenBeOS Media Writer consumes a multistream and writes a file.";
-	info->kinds |= B_BUFFER_CONSUMER;
-	info->in_format_count = 1; // 1 input
-	info->in_formats = GetFormat();
+	if (outInfo == 0) {
+		return;
+	}
+	AbstractFileInterfaceNode::GetFlavor(outInfo,id);
+	outInfo->name = "OpenBeOS Media Writer";
+	outInfo->info = "The OpenBeOS Media Writer consumes a multistream and writes a file.";
+	outInfo->kinds |= B_BUFFER_CONSUMER;
+	outInfo->in_format_count = 1; // 1 input
+	media_format * formats = new media_format[outInfo->in_format_count];
+	GetFormat(&formats[0]);
+	outInfo->in_formats = formats;
 	return;
 }
 
-media_format * MediaWriter::GetFormat()
+void MediaWriter::GetFormat(media_format * outFormat)
 {
 	fprintf(stderr,"MediaWriter::GetFormat\n");
-	return AbstractFileInterfaceNode::GetFormat();
+	if (outFormat == 0) {
+		return;
+	}
+	AbstractFileInterfaceNode::GetFormat(outFormat);
+	return;
 }
 
-media_file_format * MediaWriter::GetFileFormat()
+void MediaWriter::GetFileFormat(media_file_format * outFileFormat)
 {
 	fprintf(stderr,"MediaWriter::GetFileFormat\n");
-	static bool initialized = false;
-	static media_file_format * file_format;
-	if (initialized == false) {
-		file_format = AbstractFileInterfaceNode::GetFileFormat();
-		file_format->capabilities |= media_file_format::B_WRITABLE;
-		initialized = true;
+	if (outFileFormat == 0) {
+		return;
 	}
-	return file_format;
+	AbstractFileInterfaceNode::GetFileFormat(outFileFormat);
+	outFileFormat->capabilities |= media_file_format::B_WRITABLE;
+	return;
 }
 
 // protected:

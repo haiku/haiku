@@ -149,7 +149,7 @@ status_t MediaReaderAddOn::GetFileFormatList(
 	if (out_readable_formats != 0) {
 		// don't go off the end
 		if (in_read_items > 0) {
-			out_readable_formats[0] = *MediaReader::GetFileFormat();
+			MediaReader::GetFileFormat(&out_readable_formats[0]);
 		}
 	}
 	return B_OK;

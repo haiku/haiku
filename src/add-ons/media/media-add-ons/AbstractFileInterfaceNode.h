@@ -260,9 +260,9 @@ virtual status_t HandleParameter(
 
 public:
 
-static void GetFlavor(flavor_info * info, int32 id);
-static media_format * GetFormat();
-static media_file_format * GetFileFormat();
+static void GetFlavor(flavor_info * outInfo, int32 id);
+static void GetFormat(media_format * outFormat);
+static void GetFileFormat(media_file_format * outFileFormat);
 
 protected:
 

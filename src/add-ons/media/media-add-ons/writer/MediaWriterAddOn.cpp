@@ -146,10 +146,10 @@ status_t MediaWriterAddOn::GetFileFormatList(
 	if (out_read_items != 0) {
 		*out_read_items = 1;
 	}
-	if (out_readable_formats != 0) {
+	if (out_writable_formats != 0) {
 		// don't go off the end
 		if (in_write_items > 0) {
-			out_writable_formats[0] = *MediaWriter::GetFileFormat();
+			MediaWriter::GetFileFormat(&out_writable_formats[0]);
 		}
 	}
 	return B_OK;

@@ -297,7 +297,7 @@ status_t AbstractFileInterfaceNode::GetNextFileFormat(
 		// so next time they won't get the same format again
 		*cookie = 1;
 	}
-	*out_format = *GetFileFormat();
+	GetFileFormat(out_format);
 	return B_OK;
 }
 
@@ -822,6 +822,9 @@ status_t AbstractFileInterfaceNode::HandleParameter(
 void AbstractFileInterfaceNode::GetFlavor(flavor_info * info, int32 id)
 {
 	fprintf(stderr,"AbstractFileInterfaceNode::GetFlavor\n");
+	if (info == 0) {
+		return;
+	}
 	info->name = "AbstractFileInterfaceNode";
 	info->info = "A AbstractFileInterfaceNode node handles a file.";
 	info->kinds = B_FILE_INTERFACE | B_CONTROLLABLE;
@@ -835,42 +838,41 @@ void AbstractFileInterfaceNode::GetFlavor(flavor_info * info, int32 id)
 	return;
 }
 
-media_format * AbstractFileInterfaceNode::GetFormat()
+void AbstractFileInterfaceNode::GetFormat(media_format * outFormat)
 {
 	fprintf(stderr,"AbstractFileInterfaceNode::GetFormat\n");
-	static bool initialized = false;
-	static media_format format;
-	if (initialized == false) {
-		format.type = B_MEDIA_MULTISTREAM;
-		format.require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-		format.deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;	
-		format.u.multistream = media_multistream_format::wildcard;
-		initialized = true;
+	if (outFormat == 0) {
+		return;
 	}
-	return &format;
+	outFormat->type = B_MEDIA_MULTISTREAM;
+	outFormat->require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
+	outFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;	
+	outFormat->u.multistream = media_multistream_format::wildcard;
 }
 
-media_file_format * AbstractFileInterfaceNode::GetFileFormat()
+void AbstractFileInterfaceNode::GetFileFormat(media_file_format * outFileFormat)
 {
 	fprintf(stderr,"AbstractFileInterfaceNode::GetFileFormat\n");
-	static bool initialized = false;
-	static media_file_format file_format;
-	if (initialized == false) {
-		file_format.capabilities =
-				    media_file_format::B_PERFECTLY_SEEKABLE
-				  | media_file_format::B_IMPERFECTLY_SEEKABLE
-				  | media_file_format::B_KNOWS_ANYTHING;
-		/* I don't know what to initialize this to. (or if I should) */
-		// format.id =
-		file_format.family = B_ANY_FORMAT_FAMILY;
-		file_format.version = 100;
-		strcpy(file_format.mime_type,"");
-		strcpy(file_format.pretty_name,"any media file format");
-		strcpy(file_format.short_name,"any");
-		strcpy(file_format.file_extension,"");
-		initialized = true;
+	if (outFileFormat == 0) {
+		return;
 	}
-	return &file_format;
+	outFileFormat->capabilities =
+			  media_file_format::B_PERFECTLY_SEEKABLE
+			| media_file_format::B_IMPERFECTLY_SEEKABLE
+			| media_file_format::B_KNOWS_ANYTHING;
+	/* I don't know what to initialize this to. (or if I should) */
+	// format.id =
+	outFileFormat->family = B_ANY_FORMAT_FAMILY;
+	outFileFormat->version = 100;
+	// see media_file_format in <MediaDefs.h> for limits
+	strncpy(outFileFormat->mime_type,"",63);
+	outFileFormat->mime_type[63]='\0';
+	strncpy(outFileFormat->pretty_name,"any media file format",63);
+	outFileFormat->pretty_name[63]='\0';
+	strncpy(outFileFormat->short_name,"any",31);
+	outFileFormat->short_name[31]='\0';
+	strncpy(outFileFormat->file_extension,"",7);
+	outFileFormat->file_extension[7]='\0';	
 }
 
 // protected:

@@ -67,7 +67,7 @@ MediaReader::MediaReader(
 	output.node = media_node::null;     // until registration
 	output.source = media_source::null; // until registration
 	output.destination = media_destination::null;
-	output.format = *GetFormat();
+	GetFormat(&output.format);
 }
 
 // -------------------------------------------------------- //
@@ -130,7 +130,7 @@ status_t MediaReader::SetRef(
 		return status;
 	}
 	// reset the format, and set the requirements imposed by this file
-	output.format = *GetFormat();
+	GetFormat(&output.format);
 	AddRequirements(&output.format);
 	// if we are connected we have to re-negotiate the connection
 	if (output.destination != media_destination::null) {
@@ -161,7 +161,7 @@ status_t MediaReader::FormatSuggestionRequested(
 		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	*format = *GetFormat();
+	GetFormat(format);
 	AddRequirements(format);
 	return B_OK;
 }
@@ -308,7 +308,9 @@ status_t MediaReader::FormatProposal(
 	fprintf(stderr,"\n"); */
 	// Be's format_is_compatible doesn't work.
 //	if (!format_is_compatible(*format,*myFormat)) {
-	if (!format_is_acceptible(*format,*GetFormat())) {
+	media_format myFormat;
+	GetFormat(&myFormat);
+	if (!format_is_acceptible(*format,myFormat)) {
 		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
@@ -338,7 +340,7 @@ status_t MediaReader::FormatChangeRequested(
 	status_t status = FormatProposal(source,io_format);
 	if (status != B_OK) {
 		fprintf(stderr,"  error returned by FormatProposal\n");
-		*io_format = *GetFormat();
+		GetFormat(io_format);
 		return status;
 	}
 	return ResolveWildcards(io_format);
@@ -503,13 +505,13 @@ void MediaReader::Connect(
 	if (error != B_OK) {
 		fprintf(stderr,"<- error already\n");
 		output.destination = media_destination::null;
-		output.format = *GetFormat();
+		GetFormat(&output.format);
 		return;
 	}
 	if (output.source != source) {
 		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
 		output.destination = media_destination::null;
-		output.format = *GetFormat();
+		GetFormat(&output.format);
 		return;
 	}	
 	
@@ -534,7 +536,7 @@ void MediaReader::Connect(
 		if (status != B_OK) {
 			fprintf(stderr,"<- SetBufferGroup failed\n");
 			output.destination = media_destination::null;
-			output.format = *GetFormat();
+			GetFormat(&output.format);
 			return;
 		}
 	}
@@ -591,7 +593,7 @@ void MediaReader::Disconnect(
 		return;
 	}
 	output.destination = media_destination::null;
-	output.format = *GetFormat();
+	GetFormat(&output.format);
 	if (fBufferGroup != 0) {
 		BBufferGroup * group = fBufferGroup;
 		fBufferGroup = 0;
@@ -743,35 +745,42 @@ status_t MediaReader::HandleDataStatus(
 
 // static:
 
-void MediaReader::GetFlavor(flavor_info * info, int32 id)
+void MediaReader::GetFlavor(flavor_info * outInfo, int32 id)
 {
 	fprintf(stderr,"MediaReader::GetFlavor\n");
-	AbstractFileInterfaceNode::GetFlavor(info,id);
-	info->name = "OpenBeOS Media Reader";
-	info->info = "The OpenBeOS Media Reader reads a file and produces a multistream.";
-	info->kinds |= B_BUFFER_PRODUCER;
-	info->out_format_count = 1; // 1 output
-	info->out_formats = GetFormat();
+	if (outInfo == 0) {
+		return;
+	}
+	AbstractFileInterfaceNode::GetFlavor(outInfo,id);
+	outInfo->name = "OpenBeOS Media Reader";
+	outInfo->info = "The OpenBeOS Media Reader reads a file and produces a multistream.";
+	outInfo->kinds |= B_BUFFER_PRODUCER;
+	outInfo->out_format_count = 1; // 1 output
+	media_format * formats = new media_format[outInfo->out_format_count];
+	GetFormat(&formats[0]);
+	outInfo->out_formats = formats;
 	return;
 }
 
-media_format * MediaReader::GetFormat()
+void MediaReader::GetFormat(media_format * outFormat)
 {
 	fprintf(stderr,"MediaReader::GetFormat\n");
-	return AbstractFileInterfaceNode::GetFormat();
+	if (outFormat == 0) {
+		return;
+	}
+	AbstractFileInterfaceNode::GetFormat(outFormat);
+	return;
 }
 
-media_file_format * MediaReader::GetFileFormat()
+void MediaReader::GetFileFormat(media_file_format * outFileFormat)
 {
 	fprintf(stderr,"MediaReader::GetFileFormat\n");
-	static bool initialized = false;
-	static media_file_format * file_format;
-	if (initialized == false) {
-		file_format = AbstractFileInterfaceNode::GetFileFormat();
-		file_format->capabilities |= media_file_format::B_READABLE;
-		initialized = true;
+	if (outFileFormat == 0) {
+		return;
 	}
-	return file_format;
+	AbstractFileInterfaceNode::GetFileFormat(outFileFormat);
+	outFileFormat->capabilities |= media_file_format::B_READABLE;
+	return;
 }
 
 // protected:
