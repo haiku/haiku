@@ -876,6 +876,12 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 			AboutRequested();
 			break;
 
+		case B_QUIT_REQUESTED:
+			message->PrintToStream();
+			if (QuitRequested())
+				Quit();
+			break;
+
 		case B_PULSE:
 			Pulse();
 			break;
@@ -884,7 +890,6 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 
 		case _SHOW_DRAG_HANDLES_:
 		case B_APP_ACTIVATED:
-		case B_QUIT_REQUESTED:
 			puts("not yet handled message:");
 			message->PrintToStream();
 			break;
