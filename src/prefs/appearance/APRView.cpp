@@ -180,6 +180,37 @@ void APRView::MessageReceived(BMessage *msg)
 
 	switch(msg->what)
 	{
+		case DELETE_COLORSET:
+		{
+			// Construct the path and delete
+			BString path(COLOR_SET_DIR);
+			path+=*colorset_name;
+			
+			BString printstring("Remove ");
+			printstring+=*colorset_name;
+			printstring+=" from disk permenantly?";
+			BAlert *a=new BAlert("OpenBeOS",printstring.String(),"Yes", "No");
+			if(a->Go()==0)
+			{
+				int stat=remove(path.String());
+				if(stat!=0)
+				{
+#ifdef DEBUG_COLORSET
+printf("MSG: Delete Request - couldn't delete file %s\n",path.String());
+#endif
+				}
+				else
+				{
+					BMenuItem *item=colorset_menu->FindItem(colorset_name->String());
+					if(item!=NULL)
+					{
+						if(colorset_menu->RemoveItem(item))
+							delete item;
+					}
+				}
+			}
+			break;
+		}
 		case LOAD_COLORSET:
 		{
 			BString name;
@@ -473,6 +504,13 @@ printf("SaveColorSet: Error in adding item to menu\n");
 	SetColorSetName(name.String());
 }
 
+void APRView::DeleteColorSet(const BString &name)
+{
+	// Moves the current color set to the trash if it has been saved to disk
+	// Note that it also makes the name <untitled> once more.
+	
+}
+
 color_which APRView::SelectionToAttribute(int32 index)
 {
 	// This simply converts the selected index to the appropriate color_which
@@ -763,4 +801,3 @@ void PrintRGBColor(rgb_color col)
 {
 	printf("RGB Color (%d,%d,%d,%d)\n",col.red,col.green,col.blue,col.alpha);
 }
-
