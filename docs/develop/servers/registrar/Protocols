@@ -372,20 +372,20 @@ message fields:
 
     "which"                     additional message fields       field comments
     -------------------------   ----------------------------    --------------------------
-	REG_MIME_ICON:				"icon data": B_RAW_TYPE,        B_CMAP8 bitmap data only
+	B_REG_MIME_ICON:			"icon data": B_RAW_TYPE,        B_CMAP8 bitmap data only
 								"icon size": B_INT32_TYPE       B_{MINI,LARGE}_ICON
-	REG_MIME_PREFERRED_APP:		"signature": B_STRING_TYPE,
+	B_REG_MIME_PREFERRED_APP:	"signature": B_STRING_TYPE,
 								"app verb": B_INT32_TYPE
-	REG_MIME_ATTR_INFO:			"attr info": B_MESSAGE_TYPE
-	REG_MIME_FILE_EXTENSIONS:	"extensions": B_MESSAGE_TYPE
-	REG_MIME_DESCRIPTION:		"long": B_BOOL_TYPE,
+	B_REG_MIME_ATTR_INFO:		"attr info": B_MESSAGE_TYPE
+	B_REG_MIME_FILE_EXTENSIONS:	"extensions": B_MESSAGE_TYPE
+	B_REG_MIME_DESCRIPTION:		"long": B_BOOL_TYPE,
 								"description": B_STRING_TYPE
-	REG_MIME_SNIFFER_RULE:		"sniffer rule": B_STRING_TYPE
-	REG_MIME_APP_HINT:			"app hint": B_REF_TYPE
-	REG_MIME_ICON_FOR_TYPE		"file type": B_STRING_TYPE,
+	B_REG_MIME_SNIFFER_RULE:	"sniffer rule": B_STRING_TYPE
+	B_REG_MIME_APP_HINT:		"app hint": B_REF_TYPE
+	B_REG_MIME_ICON_FOR_TYPE	"file type": B_STRING_TYPE,
 								"icon data": B_RAW_TYPE,
 								"icon size": B_INT32_TYPE
-	REG_MIME_SUPPORTED_TYPES:	"types": B_STRING_TYPE[]
+	B_REG_MIME_SUPPORTED_TYPES:	"types": B_STRING_TYPE[]
 	
 reply fields:
 - "result":
@@ -410,16 +410,16 @@ message fields:
 
     "which"                     additional message fields       field comments
     -------------------------   ----------------------------    --------------------------
-	REG_MIME_ICON:				"icon size": B_INT32_TYPE       B_{MINI,LARGE}_ICON
-	REG_MIME_PREFERRED_APP:		"app verb": B_INT32_TYPE
-	REG_MIME_ATTR_INFO:			
-	REG_MIME_FILE_EXTENSIONS:	
-	REG_MIME_DESCRIPTION:		"long": B_BOOL_TYPE,
-	REG_MIME_SNIFFER_RULE:		
-	REG_MIME_APP_HINT:			
-	REG_MIME_ICON_FOR_TYPE		"file type": B_STRING_TYPE,
+	B_REG_MIME_ICON:			"icon size": B_INT32_TYPE       B_{MINI,LARGE}_ICON
+	B_REG_MIME_PREFERRED_APP:	"app verb": B_INT32_TYPE
+	B_REG_MIME_ATTR_INFO:			
+	B_REG_MIME_FILE_EXTENSIONS:	
+	B_REG_MIME_DESCRIPTION:		"long": B_BOOL_TYPE,
+	B_REG_MIME_SNIFFER_RULE:		
+	B_REG_MIME_APP_HINT:			
+	B_REG_MIME_ICON_FOR_TYPE	"file type": B_STRING_TYPE,
 								"icon size": B_INT32_TYPE
-	REG_MIME_SUPPORTED_TYPES:	
+	B_REG_MIME_SUPPORTED_TYPES:	
 	
 reply fields:
 - "result":
