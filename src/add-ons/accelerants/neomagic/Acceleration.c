@@ -17,7 +17,7 @@ void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count) {
 	i=0;
 	while (count--)
 	{
-		mn_acc_blit
+		nm_acc_blit
 		(
 			list[i].src_left,
 			list[i].src_top,
@@ -37,7 +37,7 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params 
 	i=0;
 	while (count--)
 	{
-		mn_acc_video_blit
+		nm_acc_video_blit
 		(
 			list[i].src_left,
 			list[i].src_top,
@@ -59,7 +59,7 @@ void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colo
 	i=0;
 	while (count--)
 	{
-		mn_acc_transparent_blit
+		nm_acc_transparent_blit
 		(
 			list[i].src_left,
 			list[i].src_top,
@@ -80,7 +80,7 @@ void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list,
 	i=0;
 	while (count--)
 	{
-		mn_acc_rectangle
+		nm_acc_rectangle
 		(
 			list[i].left,
 			(list[i].right)+1,
@@ -99,7 +99,7 @@ void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count) {
 	i=0;
 	while (count--)
 	{
-		mn_acc_rectangle_invert
+		nm_acc_rectangle_invert
 		(
 			list[i].left,
 			(list[i].right)+1,
@@ -118,7 +118,7 @@ void FILL_SPAN(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count) 
 	i=0;
 	while (count--)
 	{
-		mn_acc_rectangle
+		nm_acc_rectangle
 		(
 			list[i+1],
 			list[i+2]+1,

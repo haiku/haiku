@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 4/2003-8/2003
+   Rudolf Cornelissen 4/2003-1/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -7,8 +7,8 @@
 #include "nm_std.h"
 
 static status_t test_ram(void);
-static status_t nm_general_powerup (void);
-static status_t mn_general_bios_to_powergraphics(void);
+static status_t nmxxxx_general_powerup (void);
+static status_t nm_general_bios_to_powergraphics(void);
 
 static void nm_dump_configuration_space (void)
 {
@@ -43,11 +43,11 @@ static void nm_dump_configuration_space (void)
 #undef DUMP_CFG
 }
 	
-status_t mn_general_powerup()
+status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.05 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-1 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -94,7 +94,7 @@ status_t mn_general_powerup()
 	}
 
 	/* power up the card */
-	status = nm_general_powerup();
+	status = nmxxxx_general_powerup();
 
 	/* override memory detection if requested by user */
 	if (si->settings.memory != 0)
@@ -151,8 +151,7 @@ status_t nm_set_cas_latency()
 	return B_ERROR;
 }
 
-static 
-status_t nm_general_powerup()
+static status_t nmxxxx_general_powerup()
 {
 	uint8 temp;
 //	status_t result;
@@ -185,14 +184,14 @@ status_t nm_general_powerup()
 	ISACRTCW(VGACURCTRL, 0x00);
 
 	/* if the user doesn't want a coldstart OR the BIOS pins info could not be found warmstart */
-	/*if (si->settings.usebios || (result != B_OK)) */return mn_general_bios_to_powergraphics();
+	/*if (si->settings.usebios || (result != B_OK)) */return nm_general_bios_to_powergraphics();
 
 	/*power up the PLLs,LUT,DAC*/
 	LOG(2,("INIT: powerup\n"));
 
 	/* turn off both displays and the hardcursor (also disables transfers) */
-	mn_crtc_dpms(false, false, false);
-	mn_crtc_cursor_hide();
+	nm_crtc_dpms(false, false, false);
+	nm_crtc_cursor_hide();
 
 	/* setup sequencer clocking mode */
 	ISASEQW(CLKMODE, 0x21);
@@ -268,7 +267,7 @@ status_t nm_general_powerup()
 //	VGAW_I(CRTC,0x11,0);
 
 	/* turn on display */
-	mn_crtc_dpms(true, true, true);
+	nm_crtc_dpms(true, true, true);
 
 	return B_OK;
 }
@@ -308,7 +307,7 @@ uint8 nm_general_output_read()
 }
 
 /*busy wait until retrace!*/
-status_t mn_general_wait_retrace()
+status_t nm_general_wait_retrace()
 {
 	while (!(ACCR(STATUS)&0x8));
 	return B_OK;
@@ -316,12 +315,12 @@ status_t mn_general_wait_retrace()
 
 /* basic change of card state from VGA to powergraphics -> should work from BIOS init state*/
 static 
-status_t mn_general_bios_to_powergraphics()
+status_t nm_general_bios_to_powergraphics()
 {
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 
 	/* turn off display */
-	mn_crtc_dpms(false, false, false);
+	nm_crtc_dpms(false, false, false);
 
 	/* set card to 'enhanced' mode: (only VGA standard registers used for NeoMagic cards) */
 	/* (keep) card enabled, set plain normal memory usage, no old VGA 'tricks' ... */
@@ -360,7 +359,7 @@ status_t mn_general_bios_to_powergraphics()
 	ISAGRPHW(FBSTADDE, 0x10);
 
 	/* turn on display */
-	mn_crtc_dpms(true, true, true);
+	nm_crtc_dpms(true, true, true);
 
 	return B_OK;
 }
@@ -373,7 +372,7 @@ status_t mn_general_bios_to_powergraphics()
  * acc constraints are worse than CRTC constraints.
  *
  * Mode slopspace is reflected in fbc->bytes_per_row BTW. */
-status_t mn_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row)
+status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode)
 {
 	/* Note:
 	 * This routine assumes that the CRTC memory pitch granularity is 'smaller than',
@@ -436,28 +435,28 @@ status_t mn_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 
 	/* check if we can setup this mode with acceleration:
 	 * Max sizes need to adhere to both the acceleration engine _and_ the CRTC constraints! */
-	si->acc_mode = true;
+	*acc_mode = true;
 	/* check virtual_width */
 	switch (si->ps.card_type)
 	{
 	case G100:
 		/* acc constraint: */
-		if (target->virtual_width > 2048) si->acc_mode = false;
+		if (target->virtual_width > 2048) *acc_mode = false;
 		break;
 	default:
 		/* G200-G550 */
 		/* acc constraint: */
-		if (target->virtual_width > 4096) si->acc_mode = false;
+		if (target->virtual_width > 4096) *acc_mode = false;
 		/* for 32bit mode a lower CRTC1 restriction applies! */
 //		if ((target->space == B_RGB32_LITTLE) && (target->virtual_width > (4092 & ~acc_mask)))
-//			si->acc_mode = false;
+//			*acc_mode = false;
 		break;
 	}
 	/* virtual_height */
-	if (target->virtual_height > 2048) si->acc_mode = false;
+	if (target->virtual_height > 2048) *acc_mode = false;
 
 //fixme: (temp)
-si->acc_mode = false;
+*acc_mode = false;
 
 	/* now check virtual_size based on CRTC constraints,
 	 * making sure virtual_width stays within the 'mask' constraint: which is only
@@ -497,7 +496,7 @@ si->acc_mode = false;
 	/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
 	 * it was confined above, so we can finally calculate safely if we need slopspace
 	 * for this mode... */
-	if (si->acc_mode)
+	if (*acc_mode)
 		video_pitch = ((target->virtual_width + acc_mask) & ~acc_mask);
 	else
 		video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);

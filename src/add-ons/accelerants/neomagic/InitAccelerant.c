@@ -13,24 +13,21 @@
 #include <unistd.h>
 #include "acc_std.h"
 
-/* defined in ProposeDisplayMode.c */
-extern status_t create_mode_list(void);
-
 static status_t init_common(int the_fd);
 
 /* Initialization code shared between primary and cloned accelerants */
 static status_t init_common(int the_fd) {
 	status_t result;
-	mn_get_private_data gpd;
+	nm_get_private_data gpd;
 	
 	// LOG not available from here to next LOG: NULL si
 
 	/* memorize the file descriptor */
 	fd = the_fd;
 	/* set the magic number so the driver knows we're for real */
-	gpd.magic = MN_PRIVATE_DATA_MAGIC;
+	gpd.magic = NM_PRIVATE_DATA_MAGIC;
 	/* contact driver and get a pointer to the registers and shared data */
-	result = ioctl(fd, MN_GET_PRIVATE_DATA, &gpd, sizeof(gpd));
+	result = ioctl(fd, NM_GET_PRIVATE_DATA, &gpd, sizeof(gpd));
 	if (result != B_OK) goto error0;
 
 	/* clone the shared area for our use */
@@ -133,7 +130,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 	// LOG now available: !NULL si
 	
 	/* call the device specific init code */
-	result = mn_general_powerup();
+	result = nm_general_powerup();
 
 	/* bail out if it failed */
 	if (result != B_OK) goto error1;
@@ -192,7 +189,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 	if (result != B_OK) goto error1;
 
 	/* initialise various cursor stuff*/
-	mn_crtc_cursor_init();
+	nm_crtc_cursor_init();
 
 	/* ensure cursor state */
 	SHOW_CURSOR(false);
@@ -221,7 +218,7 @@ ssize_t ACCELERANT_CLONE_INFO_SIZE(void) {
 	Since we're passing the name of the device as the only required
 	info, return the size of the name buffer
 	*/
-	return B_OS_NAME_LENGTH; // apsed, was MAX_mn_DEVICE_NAME_LENGTH;
+	return B_OS_NAME_LENGTH;
 }
 
 
@@ -230,14 +227,14 @@ Return the info required to clone the device.  void *data points to
 a buffer at least ACCELERANT_CLONE_INFO_SIZE() bytes in length.
 */
 void GET_ACCELERANT_CLONE_INFO(void *data) {
-	mn_device_name dn;
+	nm_device_name dn;
 	status_t result;
 
 	/* call the kernel driver to get the device name */	
-	dn.magic = MN_PRIVATE_DATA_MAGIC;
+	dn.magic = NM_PRIVATE_DATA_MAGIC;
 	/* store the returned info directly into the passed buffer */
 	dn.name = (char *)data;
-	result = ioctl(fd, MN_DEVICE_NAME, &dn, sizeof(dn));
+	result = ioctl(fd, NM_DEVICE_NAME, &dn, sizeof(dn));
 }
 
 /*

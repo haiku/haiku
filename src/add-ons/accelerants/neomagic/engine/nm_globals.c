@@ -18,17 +18,17 @@ display_mode *my_mode_list;
 area_id	my_mode_list_area;
 int accelerantIsClone;
 
-mn_get_set_pci mn_pci_access=
+nm_get_set_pci nm_pci_access=
 	{
-		MN_PRIVATE_DATA_MAGIC,
+		NM_PRIVATE_DATA_MAGIC,
 		0,
 		4,
 		0
 	};
 
-mn_in_out_isa mn_isa_access=
+nm_in_out_isa nm_isa_access=
 	{
-		MN_PRIVATE_DATA_MAGIC,
+		NM_PRIVATE_DATA_MAGIC,
 		0,
 		1,
 		0

@@ -10,7 +10,7 @@
 #include "acc_std.h"
 
 
-static engine_token mn_engine_token = { 1, B_2D_ACCELERATION, NULL };
+static engine_token nm_engine_token = { 1, B_2D_ACCELERATION, NULL };
 
 uint32 ACCELERANT_ENGINE_COUNT(void) {
 	return 1;
@@ -23,7 +23,7 @@ status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, en
 	if (st) SYNC_TO_TOKEN(st);
 
 	/* return an engine token */
-	*et = &mn_engine_token;
+	*et = &nm_engine_token;
 	return B_OK;
 }
 
@@ -42,7 +42,7 @@ void WAIT_ENGINE_IDLE(void) {
 	uint32 count;
 	/*wait for the engine to be totally idle*/
 	count = si->engine.count;
-	mn_acc_wait_idle();
+	nm_acc_wait_idle();
 
 	si->engine.last_idle = count;
 }

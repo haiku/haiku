@@ -10,7 +10,7 @@
 /* Adjust passed parameters to a valid mode line */
 //fixme: the order of the sync edges should also be checked,
 //just like the sync signal's min. pulse length...
-status_t mn_crtc_validate_timing(
+status_t nm_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
 )
@@ -80,7 +80,7 @@ status_t mn_crtc_validate_timing(
 }
 
 /* set a mode line */
-status_t mn_crtc_set_timing(display_mode target, bool crt_only)
+status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 {
 	uint8 temp;
 
@@ -289,7 +289,7 @@ status_t mn_crtc_set_timing(display_mode target, bool crt_only)
 	return B_OK;
 }
 
-status_t mn_crtc_depth(int mode)
+status_t nm_crtc_depth(int mode)
 {
 	uint8 vid_delay = 0;
 
@@ -335,7 +335,7 @@ status_t mn_crtc_depth(int mode)
 	return B_OK;
 }
 
-status_t mn_crtc_dpms(bool display, bool h, bool v)
+status_t nm_crtc_dpms(bool display, bool h, bool v)
 {
 	uint8 temp;
 
@@ -376,7 +376,7 @@ status_t mn_crtc_dpms(bool display, bool h, bool v)
 	return B_OK;
 }
 
-status_t mn_crtc_dpms_fetch(bool * display, bool * h, bool * v)
+status_t nm_crtc_dpms_fetch(bool * display, bool * h, bool * v)
 {
 	*display = !(ISASEQR(CLKMODE) & 0x20);
 
@@ -393,7 +393,7 @@ status_t mn_crtc_dpms_fetch(bool * display, bool * h, bool * v)
 	return B_OK;
 }
 
-status_t mn_crtc_set_display_pitch() 
+status_t nm_crtc_set_display_pitch() 
 {
 	uint32 offset;
 
@@ -414,7 +414,7 @@ status_t mn_crtc_set_display_pitch()
 	return B_OK;
 }
 
-status_t mn_crtc_set_display_start(uint32 startadd,uint8 bpp) 
+status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp) 
 {
 	uint8 val;
 	uint32 timeout = 0;
@@ -458,7 +458,7 @@ status_t mn_crtc_set_display_start(uint32 startadd,uint8 bpp)
 }
 
 /* setup centering mode for current internal or simultaneous flatpanel mode */
-status_t mn_crtc_center(display_mode target)
+status_t nm_crtc_center(display_mode target)
 {
 	uint8 vcent1, vcent2, vcent3, vcent4, vcent5;
 	uint8 hcent1, hcent2, hcent3, hcent4, hcent5;
@@ -565,7 +565,7 @@ status_t mn_crtc_center(display_mode target)
 	return B_OK;
 }
 
-status_t mn_crtc_cursor_init()
+status_t nm_crtc_cursor_init()
 {
 	int i;
 	uint32 * fb;
@@ -607,12 +607,12 @@ status_t mn_crtc_cursor_init()
 	}
 
 	/* activate hardware cursor */
-	mn_crtc_cursor_show();
+	nm_crtc_cursor_show();
 
 	return B_OK;
 }
 
-status_t mn_crtc_cursor_show()
+status_t nm_crtc_cursor_show()
 {
 	if (si->ps.card_type < NM2200)
 	{
@@ -625,7 +625,7 @@ status_t mn_crtc_cursor_show()
 	return B_OK;
 }
 
-status_t mn_crtc_cursor_hide()
+status_t nm_crtc_cursor_hide()
 {
 //linux fixme: using this kills PCI(?) access sometimes, so use ISA access as below...
 /*
@@ -645,7 +645,7 @@ status_t mn_crtc_cursor_hide()
 }
 
 /*set up cursor shape*/
-status_t mn_crtc_cursor_define(uint8* andMask,uint8* xorMask)
+status_t nm_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 {
 	uint8 y;
 	uint8 * cursor;
@@ -683,7 +683,7 @@ status_t mn_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 }
 
 /*position the cursor*/
-status_t mn_crtc_cursor_position(uint16 x ,uint16 y)
+status_t nm_crtc_cursor_position(uint16 x ,uint16 y)
 {
 //NM2160 is ok without this, still verify the rest..:
 	/* make sure we are not in retrace, because the register(s) might get copied

@@ -8,7 +8,7 @@
 #include "nm_std.h"
 
 /*set the mode, brightness is a value from 0->2 (where 1 is equivalent to direct)*/
-status_t mn_dac_mode(int mode,float brightness)
+status_t nm_dac_mode(int mode,float brightness)
 {
 	uint8 *r, *g, *b, t[256];
 	uint16 i;
@@ -69,7 +69,7 @@ status_t mn_dac_mode(int mode,float brightness)
 		break;
 	}
 
-	if (mn_dac_palette(r, g, b, i) != B_OK) return B_ERROR;
+	if (nm_dac_palette(r, g, b, i) != B_OK) return B_ERROR;
 
 	/*set the mode - also sets VCLK dividor*/
 //	DXIW(MULCTRL, mode);
@@ -83,7 +83,7 @@ status_t mn_dac_mode(int mode,float brightness)
 }
 
 /* program the DAC palette using the given r,g,b values */
-status_t mn_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256], uint16 cnt)
+status_t nm_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256], uint16 cnt)
 {
 	int i;
 
@@ -130,7 +130,7 @@ if (1)
 /* important note:
  * PIXPLLC is used - others should be kept as is
  */
-status_t mn_dac_set_pix_pll(display_mode target)
+status_t nm_dac_set_pix_pll(display_mode target)
 {
 	uint8 m=0,n=0,p=0;
 	uint8 temp;
@@ -142,7 +142,7 @@ status_t mn_dac_set_pix_pll(display_mode target)
 	req_pclk = (target.timing.pixel_clock)/1000.0;
 	LOG(4,("DAC: Setting PIX PLL for pixelclock %f\n", req_pclk));
 
-	result = mn_dac_pix_pll_find(target,&pix_setting,&m,&n,&p);
+	result = nm_dac_pix_pll_find(target,&pix_setting,&m,&n,&p);
 	if (result != B_OK)
 	{
 		return result;
@@ -200,7 +200,7 @@ status_t mn_dac_set_pix_pll(display_mode target)
 }
 
 /* find nearest valid pix pll */
-status_t mn_dac_pix_pll_find
+status_t nm_dac_pix_pll_find
 	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result)
 {
 	int m = 0, n = 0, p = 0, n_max;

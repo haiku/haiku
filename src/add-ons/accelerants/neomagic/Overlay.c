@@ -486,7 +486,7 @@ status_t RELEASE_OVERLAY(overlay_token ot)
 	/* call is for real */
 	{
 
-		mn_release_bes();
+		nm_release_bes();
 
 		LOG(4,("succesfull\n"));
 
@@ -553,7 +553,7 @@ status_t CONFIGURE_OVERLAY
 		{
 			LOG(4,("succesfull, switching to buffer %d\n", offset));
 
-			mn_configure_bes(ob, ow, ov, offset);
+			nm_configure_bes(ob, ow, ov, offset);
 
 			return B_OK;
 		}

@@ -79,8 +79,8 @@ static status_t control_hook (void* dev, uint32 msg, void *buf, size_t len);
 static status_t map_device(device_info *di);
 static void unmap_device(device_info *di);
 static void probe_devices(void);
-static int32 mn_interrupt(void *data);
-void drv_program_bes_ISA(mn_bes_data *bes);
+static int32 nm_interrupt(void *data);
+void drv_program_bes_ISA(nm_bes_data *bes);
 
 static DeviceData		*pd;
 static pci_module_info	*pci_bus;
@@ -101,7 +101,7 @@ static device_hooks graphics_device_hooks = {
 
 #define VENDOR_ID			0x10c8	/* Neomagic inc. */
 
-static uint16 mn_device_list[] = {
+static uint16 nm_device_list[] = {
 	0x0001,	/* MagicGraph 128 (NM2070) */
 	0x0002,	/* MagicGraph 128V (NM2090)	0x42 */
 	0x0003,	/* MagicGraph 128ZV (NM2093) 0x43 */
@@ -118,7 +118,7 @@ static struct {
 	uint16	vendor;
 	uint16	*devices;
 } SupportedDevices[] = {
-	{VENDOR_ID, mn_device_list},
+	{VENDOR_ID, nm_device_list},
 	{0x0000, NULL}
 };
 
@@ -586,7 +586,7 @@ static uint32 thread_interrupt_work(int32 *flags, vuint32 *regs, vuint32 *regs2,
 }
 
 static int32
-mn_interrupt(void *data)
+nm_interrupt(void *data)
 {
 	int32 handled = B_UNHANDLED_INTERRUPT;
 	device_info *di = (device_info *)data;
@@ -701,7 +701,7 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	else
 	{
 		/* otherwise install our interrupt handler */
-		result = install_io_interrupt_handler(di->pcii.u.h0.interrupt_line, mn_interrupt, (void *)di, 0);
+		result = install_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nm_interrupt, (void *)di, 0);
 		/* bail if we couldn't install the handler */
 		if (result != B_OK) goto delete_the_sem;
 	}
@@ -788,7 +788,7 @@ free_hook (void* dev) {
 	disable_vbi(regs, regs2);
 	
 	/* remove interrupt handler */
-	remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, mn_interrupt, di);
+	remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nm_interrupt, di);
 
 	/* delete the semaphores, ignoring any errors ('cause the owning team may have died on us) */
 	delete_sem(si->vblank);
@@ -828,39 +828,39 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		} break;
 		
 		/* PRIVATE ioctl from here on */
-		case MN_GET_PRIVATE_DATA: {
-			mn_get_private_data *gpd = (mn_get_private_data *)buf;
-			if (gpd->magic == MN_PRIVATE_DATA_MAGIC) {
+		case NM_GET_PRIVATE_DATA: {
+			nm_get_private_data *gpd = (nm_get_private_data *)buf;
+			if (gpd->magic == NM_PRIVATE_DATA_MAGIC) {
 				gpd->shared_info_area = di->shared_area;
 				result = B_OK;
 			}
 		} break;
-		case MN_GET_PCI: {
-			mn_get_set_pci *gsp = (mn_get_set_pci *)buf;
-			if (gsp->magic == MN_PRIVATE_DATA_MAGIC) {
+		case NM_GET_PCI: {
+			nm_get_set_pci *gsp = (nm_get_set_pci *)buf;
+			if (gsp->magic == NM_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				gsp->value = get_pci(gsp->offset, gsp->size);
 				result = B_OK;
 			}
 		} break;
-		case MN_SET_PCI: {
-			mn_get_set_pci *gsp = (mn_get_set_pci *)buf;
-			if (gsp->magic == MN_PRIVATE_DATA_MAGIC) {
+		case NM_SET_PCI: {
+			nm_get_set_pci *gsp = (nm_get_set_pci *)buf;
+			if (gsp->magic == NM_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				set_pci(gsp->offset, gsp->size, gsp->value);
 				result = B_OK;
 			}
 		} break;
-		case MN_DEVICE_NAME: {
-			mn_device_name *dn = (mn_device_name *)buf;
-			if (dn->magic == MN_PRIVATE_DATA_MAGIC) {
+		case NM_DEVICE_NAME: {
+			nm_device_name *dn = (nm_device_name *)buf;
+			if (dn->magic == NM_PRIVATE_DATA_MAGIC) {
 				strcpy(dn->name, di->name);
 				result = B_OK;
 			}
 		} break;
-		case MN_RUN_INTERRUPTS: {
-			mn_set_bool_state *ri = (mn_set_bool_state *)buf;
-			if (ri->magic == MN_PRIVATE_DATA_MAGIC) {
+		case NM_RUN_INTERRUPTS: {
+			nm_set_bool_state *ri = (nm_set_bool_state *)buf;
+			if (ri->magic == NM_PRIVATE_DATA_MAGIC) {
 				vuint32 *regs = di->regs;
 				vuint32 *regs2 = di->regs2;
 				if (ri->do_it) {
@@ -871,9 +871,9 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				result = B_OK;
 			}
 		} break;
-		case MN_ISA_OUT: {
-			mn_in_out_isa *io_isa = (mn_in_out_isa *)buf;
-			if (io_isa->magic == MN_PRIVATE_DATA_MAGIC) {
+		case NM_ISA_OUT: {
+			nm_in_out_isa *io_isa = (nm_in_out_isa *)buf;
+			if (io_isa->magic == NM_PRIVATE_DATA_MAGIC) {
 				if (io_isa->size == 1)
   					isa_bus->write_io_8(io_isa->adress, (uint8)io_isa->data);
    				else
@@ -881,9 +881,9 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
   				result = B_OK;
    			}
 		} break;
-		case MN_ISA_IN: {
-			mn_in_out_isa *io_isa = (mn_in_out_isa *)buf;
-			if (io_isa->magic == MN_PRIVATE_DATA_MAGIC) {
+		case NM_ISA_IN: {
+			nm_in_out_isa *io_isa = (nm_in_out_isa *)buf;
+			if (io_isa->magic == NM_PRIVATE_DATA_MAGIC) {
 				if (io_isa->size == 1)
 	   				io_isa->data = isa_bus->read_io_8(io_isa->adress);
 	   			else
@@ -891,9 +891,9 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
    				result = B_OK;
    			}
 		} break;
-		case MN_PGM_BES: {
-			mn_bes_data *bes_isa = (mn_bes_data *)buf;
-			if (bes_isa->magic == MN_PRIVATE_DATA_MAGIC) {
+		case NM_PGM_BES: {
+			nm_bes_data *bes_isa = (nm_bes_data *)buf;
+			if (bes_isa->magic == NM_PRIVATE_DATA_MAGIC) {
 				drv_program_bes_ISA(bes_isa);
   				result = B_OK;
    			}
@@ -902,7 +902,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 	return result;
 }
 
-void drv_program_bes_ISA(mn_bes_data *bes)
+void drv_program_bes_ISA(nm_bes_data *bes)
 {
 	uint8 temp;
 

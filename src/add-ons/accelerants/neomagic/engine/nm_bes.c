@@ -8,7 +8,7 @@
 //fixme: implement: (used for virtual screens!)
 //void move_overlay(uint16 hdisp_start, uint16 vdisp_start);
 
-status_t mn_configure_bes
+status_t nm_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow, const overlay_view *ov, int offset)
 {
 	/* yuy2 (4:2:2) colorspace calculations */
@@ -27,7 +27,7 @@ status_t mn_configure_bes
 	 * displayed on screen. This is used for the 'hardware zoom' function. */
  
 	/* bes setup data */
-	mn_bes_data bi;
+	nm_bes_data bi;
 	/* misc used variables */
 	uint16 temp1, temp2;
 	/* BES output coordinate system for virtual workspaces */
@@ -573,8 +573,8 @@ status_t mn_configure_bes
 		bi.colkey_b = (ow->blue.value & ow->blue.mask);
 		bi.ob_width = ob->width;
 		/* ... and call kerneldriver to program the BES */
-		bi.magic = MN_PRIVATE_DATA_MAGIC;
-		ioctl(fd, MN_PGM_BES, &bi, sizeof(bi));
+		bi.magic = NM_PRIVATE_DATA_MAGIC;
+		ioctl(fd, NM_PGM_BES, &bi, sizeof(bi));
 	}
 
 	/* on a 500Mhz P3 CPU just logging a line costs 400uS (18-19 vcounts at 1024x768x60Hz)!
@@ -584,7 +584,7 @@ status_t mn_configure_bes
 	return B_OK;
 }
 
-status_t mn_release_bes()
+status_t nm_release_bes()
 {
 	/* setup BES control: disable scaler */
 	if (si->ps.card_type >= NM2097)

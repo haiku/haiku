@@ -67,6 +67,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	uint8 m,n,p;
 	status_t result;
 	uint32 row_bytes, pointer_reservation;
+	bool acc_mode;
 	double target_refresh = ((double)target->timing.pixel_clock * 1000.0) /
 			(
 				(double)target->timing.h_total * 
@@ -136,7 +137,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	#endif
 
 	/*find a nearby valid timing from that given*/
-	result = mn_crtc_validate_timing
+	result = nm_crtc_validate_timing
 	(
 		&target->timing.h_display, &target->timing.h_sync_start, &target->timing.h_sync_end, &target->timing.h_total,
 		&target->timing.v_display, &target->timing.v_sync_start, &target->timing.v_sync_end, &target->timing.v_total
@@ -154,7 +155,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		target->virtual_height = target->timing.v_display;
 
 	/* nail virtual size and 'subsequently' calculate rowbytes */
-	result = mn_general_validate_pic_size (target, &row_bytes);
+	result = nm_general_validate_pic_size (target, &row_bytes, &acc_mode);
 	if (result == B_ERROR)
 	{
 		LOG(4, ("PROPOSEMODE: could not validate virtual picture size, aborted.\n"));
@@ -222,7 +223,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 
 	/* Now find the nearest valid pixelclock we actually can setup for the target mode,
 	 * this also makes sure we don't generate more pixel bandwidth than the device can handle */
-	result = mn_dac_pix_pll_find(*target,&pix_clock_found,&m,&n,&p);
+	result = nm_dac_pix_pll_find(*target,&pix_clock_found,&m,&n,&p);
 	/* update the target mode */
 	target->timing.pixel_clock = (pix_clock_found * 1000);	
 
@@ -282,6 +283,8 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	 * mode (fixed), and all modes support DPMS (fixed);
 	 * We support scrolling and panning in every mode, so we 'send a signal' to
 	 * BWindowScreen.CanControlFrameBuffer() by setting B_SCROLL.  */
+	/* BTW: B_PARALLEL_ACCESS in combination with a hardcursor enables
+	 * BDirectWindow windowed modes. */
 	target->flags |= (B_PARALLEL_ACCESS | B_8_BIT_DAC | B_DPMS | B_SCROLL);
 
 	/* set HARDWARE_CURSOR mode if suitable */
@@ -322,7 +325,6 @@ status_t GET_MODE_LIST(display_mode *dm)
 	memcpy(dm, my_mode_list, si->mode_count * sizeof(display_mode));
 	return B_OK;
 }
-
 
 /* Create a list of display_modes to pass back to the caller.*/
 status_t create_mode_list(void) {

@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-6/2003
+	Rudolf Cornelissen 4/2003-1/2004
 */
 
 #define MODULE_BIT 0x00200000
@@ -16,13 +16,13 @@
 */
 static void interrupt_enable(bool flag) {
 	status_t result;
-	mn_set_bool_state sbs;
+	nm_set_bool_state sbs;
 
 	/* set the magic number so the driver knows we're for real */
-	sbs.magic = MN_PRIVATE_DATA_MAGIC;
+	sbs.magic = NM_PRIVATE_DATA_MAGIC;
 	sbs.do_it = flag;
 	/* contact driver and get a pointer to the registers and shared data */
-	result = ioctl(fd, MN_RUN_INTERRUPTS, &sbs, sizeof(sbs));
+	result = ioctl(fd, NM_RUN_INTERRUPTS, &sbs, sizeof(sbs));
 }
 
 /* First validate the mode, then call lots of bit banging stuff to set the mode(s)! */
@@ -47,7 +47,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	uint8 colour_depth = 24;
 	uint32 startadd;
-
 	bool display, h, v;
 
 	/* if internal panel is active we don't touch the CRTC timing and the pixelPLL */
@@ -75,11 +74,11 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	interrupt_enable(false);
 
 	/* find current DPMS state, then turn off screen(s) */
-	mn_crtc_dpms_fetch(&display, &h, &v);
-	mn_crtc_dpms(false, false, false);
+	nm_crtc_dpms_fetch(&display, &h, &v);
+	nm_crtc_dpms(false, false, false);
 
 	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
-	startadd = si->fbc.frame_buffer - si->framebuffer;
+	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
 
 	/* Perform the mode switch */
 	{
@@ -98,46 +97,44 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* calculate and set new mode bytes_per_row */
-		mn_general_validate_pic_size (&target, &si->fbc.bytes_per_row);
+		nm_general_validate_pic_size (&target, &si->fbc.bytes_per_row, &si->acc_mode);
 
 		/* set the pixelclock PLL */
 		if (crt_only)
 		{
-			status = mn_dac_set_pix_pll(target);
+			status = nm_dac_set_pix_pll(target);
 			if (status == B_ERROR)
 				LOG(8,("CRTC: error setting pixelclock\n"));
 		}
 
 		/* set the colour depth for CRTC1 and the DAC */
-		mn_dac_mode(colour_mode, 1.0);
-		mn_crtc_depth(colour_mode);
+		nm_dac_mode(colour_mode, 1.0);
+		nm_crtc_depth(colour_mode);
 		
 		/* set the display pitch */
-		mn_crtc_set_display_pitch();
+		nm_crtc_set_display_pitch();
 
 		/* tell the card what memory to display */
-		mn_crtc_set_display_start(startadd,colour_depth);
+		nm_crtc_set_display_start(startadd,colour_depth);
 
 		/* enable primary analog output */
 		//fixme: choose output connector(s)
 		
 		/* set the timing */
-		mn_crtc_set_timing(target, crt_only);
+		nm_crtc_set_timing(target, crt_only);
 
 		/* always setup centering so a KB BIOS switch to flatpanel will go OK... */
-		mn_crtc_center(target);
+		nm_crtc_center(target);
 	}
 
 	/* update driver's mode store */
 	si->dm = target;
 
 	/* turn screen on */
-	mn_crtc_dpms(display,h,v);
+	nm_crtc_dpms(display,h,v);
 
 	/* set up acceleration for this mode */
-	si->dm.virtual_height += 1;//for clipping!
-//	mn_acc_init();
-	si->dm.virtual_height -= 1;
+//	nm_acc_init();
 
 	/* log currently selected output */
 	nm_general_output_select();
@@ -207,11 +204,11 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start)
 	/* actually set the registers */
 	startadd = v_display_start * si->fbc.bytes_per_row;
 	startadd += h_display_start * (colour_depth >> 3);
-	startadd += si->fbc.frame_buffer - si->framebuffer;
+	startadd += (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
 
 	interrupt_enable(false);
 
-	mn_crtc_set_display_start(startadd,colour_depth);
+	nm_crtc_set_display_start(startadd,colour_depth);
 
 	interrupt_enable(true);
 	return B_OK;
@@ -237,20 +234,8 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 		b[i] = *color_data++;
 		i++;	
 	}
-	mn_dac_palette(r,g,b, 256);
+	nm_dac_palette(r,g,b, 256);
 }
-
-
-/* masks for DPMS control bits */
-/*
-enum
-{
-	H_SYNC_OFF = 0x01,
-	V_SYNC_OFF = 0x02,
-	DISPLAY_OFF = 0x04,
-	BITSMASK = (H_SYNC_OFF | V_SYNC_OFF | DISPLAY_OFF)
-};
-*/
 
 /* Put the display into one of the Display Power Management modes. */
 status_t SET_DPMS_MODE(uint32 dpms_flags)
@@ -262,16 +247,16 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 	switch(dpms_flags) 
 	{
 	case B_DPMS_ON:	/* H: on, V: on */
-		mn_crtc_dpms(true, true , true);
+		nm_crtc_dpms(true, true , true);
 		break;
 	case B_DPMS_STAND_BY:
-		mn_crtc_dpms(false, false, true);
+		nm_crtc_dpms(false, false, true);
 		break;
 	case B_DPMS_SUSPEND:
-		mn_crtc_dpms(false, true, false);
+		nm_crtc_dpms(false, true, false);
 		break;
 	case B_DPMS_OFF: /* H: off, V: off, display off */
-		mn_crtc_dpms(false, false, false);
+		nm_crtc_dpms(false, false, false);
 		break;
 	default:
 		LOG(8,("SET_DPMS_MODE: Invalid DPMS settings) $%08x\n", dpms_flags));
@@ -288,14 +273,13 @@ uint32 DPMS_CAPABILITIES(void)
 	return 	(B_DPMS_ON | B_DPMS_STAND_BY | B_DPMS_SUSPEND | B_DPMS_OFF);
 }
 
-
 /* Return the current DPMS mode. */
 uint32 DPMS_MODE(void)
 {
 	bool display, h, v;
 	
 	interrupt_enable(false);
-	mn_crtc_dpms_fetch(&display, &h, &v);
+	nm_crtc_dpms_fetch(&display, &h, &v);
 	interrupt_enable(true);
 
 	if (display && h && v)

@@ -25,7 +25,7 @@ status_t SET_CURSOR_SHAPE(uint16 width, uint16 height, uint16 hot_x, uint16 hot_
 	}
 	else
 	{
-		mn_crtc_cursor_define(andMask,xorMask);
+		nm_crtc_cursor_define(andMask,xorMask);
 
 		/* Update cursor variables appropriately. */
 		si->cursor.width = width;
@@ -108,7 +108,7 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	else y = 0;
 
 	/* position the cursor on the display */
-	mn_crtc_cursor_position(x,y);
+	nm_crtc_cursor_position(x,y);
 }
 
 void SHOW_CURSOR(bool is_visible) 
@@ -117,7 +117,7 @@ void SHOW_CURSOR(bool is_visible)
 	si->cursor.is_visible = is_visible;
 
 	if (is_visible)
-		mn_crtc_cursor_show();
+		nm_crtc_cursor_show();
 	else
-		mn_crtc_cursor_hide();
+		nm_crtc_cursor_hide();
 }

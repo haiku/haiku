@@ -31,7 +31,7 @@ static uint8 depth;
 	} else ACCW(YDSTLEN,((dst)<<16)|(len)); \
 } while (0)
 
-status_t mn_acc_wait_idle()
+status_t nm_acc_wait_idle()
 {
 //	volatile int i;
 //	while (ACCR(STATUS)&(1<<16))
@@ -43,7 +43,7 @@ status_t mn_acc_wait_idle()
 
 /* AFAIK this must be done for every new screenmode.
  * Engine required init. */
-status_t mn_acc_init()
+status_t nm_acc_init()
 {
 	/* used for convenience: MACCESS is a write only register! */
 	uint32 maccess = 0x00000000;
@@ -101,10 +101,10 @@ status_t mn_acc_init()
 
 	if (si->ps.card_type >= G200) {
 		/*DSTORG - location of active screen in framebuffer*/
-		ACCW(DSTORG,(si->fbc.frame_buffer)-(si->framebuffer));
+		ACCW(DSTORG,((uint8*)si->fbc.frame_buffer) - ((uint8*)si->framebuffer));
 
 		/*SRCORG - init source address - same as dest*/
-		ACCW(SRCORG,(si->fbc.frame_buffer)-(si->framebuffer));
+		ACCW(SRCORG,((uint8*)si->fbc.frame_buffer) - ((uint8*)si->framebuffer));
 	}
 
 	/* init YDSTORG - apsed, if not inited, BitBlts may fails on <= G200 */
@@ -150,7 +150,7 @@ status_t mn_acc_init()
 
 /* screen to screen blit - i.e. move windows around.
  * Engine function bitblit, paragraph 4.5.7.2 */
-status_t mn_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
+status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 {
 	uint32 t_start,t_end,offset;
 	uint32 b_start,b_end;
@@ -217,7 +217,7 @@ status_t mn_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 
 /* screen to screen tranparent blit - not sure what uses this.
  * Engine function bitblit, paragraph 4.5.7.2 */
-status_t mn_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h,uint32 colour)
+status_t nm_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h,uint32 colour)
 {
 	uint32 t_start,t_end,offset;
 	uint32 b_start,b_end;
@@ -288,7 +288,7 @@ status_t mn_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 
 /* rectangle fill.
  * Engine function rectangle_fill: paragraph 4.5.5.2 */
 /*colorIndex,fill_rect_params,count*/
-status_t mn_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
+status_t nm_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
 {
 /*
 	FXBNDRY - left and right coordinates    a
@@ -319,7 +319,7 @@ status_t mn_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
 /* rectangle invert.
  * Engine function rectangle_fill: paragraph 4.5.5.2 */
 /*colorIndex,fill_rect_params,count*/
-status_t mn_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
+status_t nm_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
 {
 /*
 	FXBNDRY - left and right coordinates    a
@@ -341,7 +341,7 @@ status_t mn_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 
 
 /* screen to screen scaled filtered blit - i.e. scale video in memory.
  * Engine function texture mapping for video, paragraphs 4.5.5.5 - 4.5.5.9 */
-status_t mn_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
+status_t nm_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 	uint16 xd,uint16 yd,uint16 wd,uint16 hd)
 {
 	//fixme: implement.
