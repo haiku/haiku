@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 6/2004-7/2004
+   Rudolf Cornelissen 6/2004-9/2004
 */
 
 #define MODULE_BIT 0x00000100
@@ -124,8 +124,9 @@ status_t nv_agp_setup(void)
 		ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
 	}
 
-	/* list mode now activated */
-	nv_agp_list_active(nca.cmd);
+	/* list mode now activated,
+	 * make sure we have the correct speed scheme for logging */
+	nv_agp_list_active(nca.cmd | (nv_ai.interface.agp_stat & AGP_rate_rev));
 
 	/* extra check */
 	LOG(4,("AGP: graphics card AGPCMD register readback $%08x\n", CFGR(AGPCMD)));
@@ -177,9 +178,10 @@ static void nv_agp_list_info(agp_info ai)
 		(((ai.interface.agp_stat & AGP_RQ) >> AGP_RQ_shift) + 1)));
 
 	/*
-		list current settings
+		list current settings,
+		make sure we have the correct speed scheme for logging
 	 */
-	nv_agp_list_active(ai.interface.agp_cmd);
+	nv_agp_list_active(ai.interface.agp_cmd | (ai.interface.agp_stat & AGP_rate_rev));
 }
 
 static void nv_agp_list_active(uint32 cmd)

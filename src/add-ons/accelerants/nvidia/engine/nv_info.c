@@ -28,7 +28,7 @@ static void pinsnv10_arch_fake(void);
 static void pinsnv20_arch_fake(void);
 static void pinsnv30_arch_fake(void);
 static void getstrap_arch_nv4(void);
-static void getstrap_arch_nv10_20_30(void);
+static void getstrap_arch_nv10_20_30_40(void);
 static status_t pins2_read(uint8 *rom, uint32 offset);
 static status_t pins3_6_read(uint8 *rom, uint32 offset);
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size, uint16 ram_tab);
@@ -1498,7 +1498,7 @@ void fake_pins(void)
 		getstrap_arch_nv4();
 		break;
 	default:
-		getstrap_arch_nv10_20_30();
+		getstrap_arch_nv10_20_30_40();
 		break;
 	}
 
@@ -2345,7 +2345,7 @@ static void getstrap_arch_nv4(void)
 	si->ps.secondary_head = false;
 }
 
-static void getstrap_arch_nv10_20_30(void)
+static void getstrap_arch_nv10_20_30_40(void)
 {
 	uint32 dev_manID = CFGR(DEVID);
 	uint32 strapinfo = NV_REG32(NV32_NV10STRAPINFO);
@@ -2407,6 +2407,10 @@ static void getstrap_arch_nv10_20_30(void)
 	switch (dev_manID & 0xfff0ffff)
 	{
 	/* Nvidia cards: */
+	case 0x004010de:
+	case 0x00c010de:
+	case 0x00f010de:
+	case 0x014010de:
 	case 0x017010de:
 	case 0x018010de:
 	case 0x01f010de:
@@ -2429,7 +2433,11 @@ static void getstrap_arch_nv10_20_30(void)
 	switch (dev_manID & 0xfff0ffff)
 	{
 	/* Nvidia cards: */
+	case 0x004010de:
+	case 0x00c010de:
+	case 0x00f010de:
 	case 0x011010de:
+	case 0x014010de:
 	case 0x017010de:
 	case 0x018010de:
 	case 0x01f010de:
