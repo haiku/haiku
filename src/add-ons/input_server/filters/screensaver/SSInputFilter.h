@@ -4,9 +4,12 @@
 #include "Messenger.h"
 #include "MessageFilter.h"
 #include "MessageRunner.h"
+#include "ScreenSaverPrefs.h"
 
 const int CORNER_SIZE=10;
 const int timeUp='TMUP';
+
+int32 threadFunc(void *);
 
 class SSISFilter: public BInputServerFilter
 {
@@ -15,20 +18,17 @@ public:
 	virtual ~SSISFilter();
 	virtual filter_result Filter(BMessage *msg, BList *outList);
 	void CheckTime(void);
-	enum cornerPos {MIDDLE='ENDC',TOPL='TOPL',TOPR='TOPR',BOTL='BOTL',BOTR='BOTR'};
+	uint32 getSnoozeTime(void) {return snoozeTime;}
 private:
-	cornerPos blank, keep, current; 
-	uint32 first,blankTime;
+	uint32 lastEventTime,blankTime,snoozeTime,rtc;
+	arrowDirection blank, keep, current; 
 	bool enabled;
-	BMessenger *ssApp;
 	BRect topLeft,topRight,bottomLeft,bottomRight;
-	BMessageRunner *runner;
-	BMessageFilter *filter;
-	BMessenger *messenger;
-	BMessage *timeMsg;
+	ScreenSaverPrefs pref;
+	thread_id watcher;
 
 	void UpdateRectangles(void);
-	void Cornered(cornerPos pos);
+	void Cornered(arrowDirection pos);
 	void Invoke(void);
 	void Banish(void);
 };

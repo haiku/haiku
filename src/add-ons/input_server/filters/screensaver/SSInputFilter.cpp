@@ -1,60 +1,57 @@
-#include "SSInputFilter.h"
 #include "OS.h"
 #include "Roster.h"
+#include "Application.h"
+#include "SSInputFilter.h"
 
 extern "C" _EXPORT BInputServerFilter* instantiate_input_filter();
 
-// TODO:
-// Read SS preferences for timing, corner info
-// If corners get confused (l/r), check size of enums
+SSISFilter *fltr=NULL;
 
-SSISFilter *fltr;
-
-BInputServerFilter* instantiate_input_filter() 
-{ 
+BInputServerFilter* instantiate_input_filter() {  // required C func to build the IS Filter
 	return (fltr=new SSISFilter()); 
 }
 
-filter_result timeUpFunc (BMessage *message,BHandler **target, BMessageFilter *messageFilter) {
-	fltr->CheckTime();
-	return B_SKIP_MESSAGE;
+int32 threadFunc (void *data) {
+	while (1) {
+		snooze(fltr->getSnoozeTime()*1000000); // snoozeTime is in microseconds
+		fltr->CheckTime();
+	}
+	return B_OK; // Should never get here...
 }
 
 SSISFilter::SSISFilter() : enabled(false) {
-	messenger=new BMessenger(NULL,-1); // Get the current teams default handler
-	timeMsg=new BMessage(timeUp);
-	runner=new BMessageRunner(*messenger, timeMsg, 3000000,-1);  // CHANGE ME!!!
-	filter=new BMessageFilter(timeUp,timeUpFunc);	
+	pref.LoadSettings();	
+	blank=pref.GetBlankCorner();
+	keep=pref.GetNeverBlankCorner();
+	blankTime=snoozeTime=pref.BlankTime();
+	watcher=spawn_thread(threadFunc,"ScreenSaverWatcher",0,NULL);	
+	resume_thread(watcher);
 }
 
 void SSISFilter::Invoke(void) {
-	status_t err;
 	if (current==keep)
 		return; // If mouse is in this corner, never invoke.
 	be_roster->Launch("application/x-vnd.OBOS-ScreenSaverApp");
-	ssApp=new BMessenger("application/x-vnd.OBOS-ScreenSaverApp",-1,&err);
 	enabled=true;
 }
 
 void SSISFilter::Banish(void) {
-	ssApp->SendMessage('QUIT');
-	delete ssApp;
-	enabled=true;
+	BMessenger ssApp ("application/x-vnd.OBOS-ScreenSaverApp",-1,NULL); // Don't care if it fails
+	ssApp.SendMessage('MOO1');
+	enabled=false;
 }
 
 void SSISFilter::CheckTime(void) {
-	uint32 rtc;
-	if ((rtc=real_time_clock())>=first+blankTime) 
+	if ((rtc=real_time_clock())>=lastEventTime+blankTime) 
 		Invoke();
-	else
-		runner->SetInterval(first+blankTime-rtc); // Check back at the time when, if nothing is pressed/moved between now and then, we should blank...	
+	snoozeTime=(enabled)?blankTime:lastEventTime+blankTime-rtc;
 }
+
 
 void SSISFilter::UpdateRectangles(void) {
 	BRegion region;
-	BRect frame;
 	GetScreenRegion(&region);
-	frame=region.Frame();
+	BRect frame=region.Frame();
 
 	topLeft.Set(frame.left,frame.top,frame.left+CORNER_SIZE,frame.top+CORNER_SIZE);
 	topRight.Set(frame.right-CORNER_SIZE,frame.top,frame.right,frame.top+CORNER_SIZE);
@@ -62,33 +59,34 @@ void SSISFilter::UpdateRectangles(void) {
 	bottomRight.Set(frame.right-CORNER_SIZE,frame.bottom-CORNER_SIZE,frame.right,frame.bottom);
 }
 
-void SSISFilter::Cornered(cornerPos pos) {
+void SSISFilter::Cornered(arrowDirection pos) {
 	current=pos;
 	if (pos==blank)
 		Invoke();
 }
 
 filter_result SSISFilter::Filter(BMessage *msg,BList *outList) {
+	lastEventTime=real_time_clock();
 	if (msg->what==B_SCREEN_CHANGED)
 		UpdateRectangles();
-	else if (enabled && msg->what==B_MOUSE_MOVED) {
+	else if (enabled)
+			Banish();
+	else if (msg->what==B_MOUSE_MOVED) {
 		BPoint pos;
 		msg->FindPoint("where",&pos);
 		if (topLeft.Contains(pos)) 
-			Cornered(TOPL);
+			Cornered(UPLEFT);
 		else if (topRight.Contains(pos)) 
-			Cornered(TOPR);
+			Cornered(UPRIGHT);
 		else if (bottomLeft.Contains(pos)) 
-			Cornered(BOTL);
+			Cornered(DOWNLEFT);
 		else if (bottomRight.Contains(pos)) 
-			Cornered(BOTR);
+			Cornered(DOWNRIGHT);
 		else
-			Cornered(MIDDLE);
+			Cornered(NONE);
 		}
-	first=real_time_clock();
 }
 
-SSISFilter::~SSISFilter()
-{
+SSISFilter::~SSISFilter() {
 	;
 }
