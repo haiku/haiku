@@ -626,13 +626,15 @@ main()
 		if (error != B_OK)
 			printf("Cancelling modifications failed: %s\n", strerror(error));
 	}
-*/	// cancel modifications
+*/	// commit modifications
 	if (error == B_OK) {
 		error = device.CommitModifications();
 		if (error != B_OK)
 			printf("Committing modifications failed: %s\n", strerror(error));
 	}
-	printf("\nDevice after cancelling the changes:\n");
+	wait_for_jobs();
+//	printf("\nDevice after cancelling the changes:\n");
+	printf("\nDevice after committing the changes:\n");
 	device.VisitEachDescendant(&visitor);
 
 	// for userland testing only
