@@ -8,6 +8,7 @@ INTERFACE_KIT_SOURCE =
 	Control.cpp
 	Deskbar.cpp
 	Font.cpp
+	Globals.cpp
 	Picture.cpp
 	PictureButton.cpp
 	Point.cpp
