@@ -20,7 +20,7 @@ Addon nv.accelerant : accelerants :
 	: false : libnvidia_engine.a
 ;
 
-Package openbeos-nvidia-1.0 :
+Package openbeos-nvidia-cvs :
 	nv.accelerant : 
 	boot home config add-ons accelerants ;
 
