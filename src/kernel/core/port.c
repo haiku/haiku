@@ -62,7 +62,7 @@ static int port_spinlock = 0;
 #define RELEASE_PORT_LOCK(s) release_spinlock(&(s).lock)
 
 
-int
+status_t
 port_init(kernel_args *ka)
 {
 	int i;
@@ -98,7 +98,7 @@ dump_port_list(int argc, char **argv)
 
 	for (i = 0; i < MAX_PORTS; i++) {
 		if (ports[i].id >= 0)
-			dprintf("%p\tid: 0x%x\t\tname: '%s'\n", &ports[i], ports[i].id, ports[i].name);
+			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &ports[i], ports[i].id, ports[i].name);
 	}
 	return 0;
 }
@@ -107,17 +107,17 @@ dump_port_list(int argc, char **argv)
 static void
 _dump_port_info(struct port_entry *port)
 {
-	int cnt;
+	int32 cnt;
 	dprintf("PORT:   %p\n", port);
 	dprintf("name:  '%s'\n", port->name);
-	dprintf("owner: 0x%x\n", port->owner);
-	dprintf("cap:  %d\n", port->capacity);
+	dprintf("owner: 0x%lx\n", port->owner);
+	dprintf("cap:  %ld\n", port->capacity);
 	dprintf("head: %d\n", port->head);
 	dprintf("tail: %d\n", port->tail);
  	get_sem_count(port->read_sem, &cnt);
- 	dprintf("read_sem:  %d\n", cnt);
+ 	dprintf("read_sem:  %ld\n", cnt);
  	get_sem_count(port->read_sem, &cnt);
-	dprintf("write_sem: %d\n", cnt);
+	dprintf("write_sem: %ld\n", cnt);
 }
 
 
@@ -276,7 +276,7 @@ out:
 	return retval;
 }
 
-int			
+status_t			
 close_port(port_id id)
 {
 	int 	state;
@@ -307,7 +307,7 @@ close_port(port_id id)
 	return B_NO_ERROR;
 }
 
-int
+status_t
 delete_port(port_id id)
 {
 	int slot;
@@ -332,7 +332,7 @@ delete_port(port_id id)
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
-		dprintf("delete_port: invalid port_id %d\n", id);
+		dprintf("delete_port: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
@@ -399,7 +399,7 @@ find_port(const char *port_name)
 	return ret_val;
 }
 
-int
+status_t
 _get_port_info(port_id id, port_info *info, size_t size)
 {
 	int slot;
@@ -420,7 +420,7 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
-		dprintf("get_port_info: invalid port_id %d\n", id);
+		dprintf("get_port_info: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
@@ -439,7 +439,7 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	return B_NO_ERROR;
 }
 
-int
+status_t
 _get_next_port_info(team_id team, int32 *cookie, struct port_info *info,
                    size_t size)
 {
@@ -524,7 +524,7 @@ port_buffer_size_etc(port_id id,
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
-		dprintf("get_port_info: invalid port_id %d\n", id);
+		dprintf("get_port_info: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 	RELEASE_PORT_LOCK(ports[slot]);
@@ -555,9 +555,9 @@ port_buffer_size_etc(port_id id,
 	// read data's head length
 	t = ports[slot].head;
 	if (t < 0)
-		panic("port %id: tail < 0", ports[slot].id);
+		panic("port %ld: tail < 0", ports[slot].id);
 	if (t > ports[slot].capacity)
-		panic("port %id: tail > cap %d", ports[slot].id, ports[slot].capacity);
+		panic("port %ld: tail > cap %ld", ports[slot].id, ports[slot].capacity);
 	len = ports[slot].msg_queue[t].data_len;
 	
 	// restore readsem
@@ -574,7 +574,7 @@ port_count(port_id id)
 {
 	int slot;
 	int state;
-	int count;
+	int32 count;
 	
 	if(ports_active == false)
 		return B_BAD_PORT_ID;
@@ -589,7 +589,7 @@ port_count(port_id id)
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
-		dprintf("port_count: invalid port_id %d\n", id);
+		dprintf("port_count: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 	
@@ -605,7 +605,7 @@ port_count(port_id id)
 	return count;
 }
 
-int
+status_t
 read_port(port_id port,
 			int32 *msg_code,
 			void *msg_buffer,
@@ -614,7 +614,7 @@ read_port(port_id port,
 	return read_port_etc(port, msg_code, msg_buffer, buffer_size, 0, 0);
 }
 
-int
+status_t
 read_port_etc(port_id id,
 				int32	*msg_code,
 				void	*msg_buffer,
@@ -653,7 +653,7 @@ read_port_etc(port_id id,
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
-		dprintf("read_port_etc: invalid port_id %d\n", id);
+		dprintf("read_port_etc: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 	// store sem_id in local variable
@@ -693,9 +693,9 @@ read_port_etc(port_id id,
 
 	t = ports[slot].tail;
 	if (t < 0)
-		panic("port %id: tail < 0", ports[slot].id);
+		panic("port %ld: tail < 0", ports[slot].id);
 	if (t > ports[slot].capacity)
-		panic("port %id: tail > cap %d", ports[slot].id, ports[slot].capacity);
+		panic("port %ld: tail > cap %ld", ports[slot].id, ports[slot].capacity);
 
 	ports[slot].tail = (ports[slot].tail + 1) % ports[slot].capacity;
 
@@ -735,7 +735,7 @@ read_port_etc(port_id id,
 	return siz;
 }
 
-int
+status_t
 set_port_owner(port_id id, team_id team)
 {
 	int slot;
@@ -754,7 +754,7 @@ set_port_owner(port_id id, team_id team)
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
-		dprintf("set_port_owner: invalid port_id %d\n", id);
+		dprintf("set_port_owner: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
@@ -768,7 +768,7 @@ set_port_owner(port_id id, team_id team)
 	return B_NO_ERROR;
 }
 
-int
+status_t
 write_port(port_id id,
 	int32 msg_code,
 	const void *msg_buffer,
@@ -777,7 +777,7 @@ write_port(port_id id,
 	return write_port_etc(id, msg_code, msg_buffer, buffer_size, 0, 0);
 }
 
-int
+status_t
 write_port_etc(port_id id,
 	int32 msg_code,
 	const void *msg_buffer,
@@ -791,7 +791,7 @@ write_port_etc(port_id id,
 	sem_id cached_semid;
 	int h;
 	cbuf* msg_store;
-	int c1, c2;
+	int32 c1, c2;
 	int err;
 	
 	if(ports_active == false)
@@ -814,14 +814,14 @@ write_port_etc(port_id id,
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
-		dprintf("write_port_etc: invalid port_id %d\n", id);
+		dprintf("write_port_etc: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
 	if (ports[slot].closed) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
-		dprintf("write_port_etc: port %d closed\n", id);
+		dprintf("write_port_etc: port %ld closed\n", id);
 		return B_BAD_PORT_ID;
 	}
 	
@@ -880,9 +880,9 @@ write_port_etc(port_id id,
 
 	h = ports[slot].head;
 	if (h < 0)
-		panic("port %id: head < 0", ports[slot].id);
+		panic("port %ld: head < 0", ports[slot].id);
 	if (h >= ports[slot].capacity)
-		panic("port %id: head > cap %d", ports[slot].id, ports[slot].capacity);
+		panic("port %ld: head > cap %ld", ports[slot].id, ports[slot].capacity);
 	ports[slot].msg_queue[h].msg_code	= msg_code;
 	ports[slot].msg_queue[h].data_cbuf	= msg_store;
 	ports[slot].msg_queue[h].data_len	= buffer_size;
@@ -963,7 +963,7 @@ void port_test()
 	test_p4 = create_port(1024, "test port #4");
 
 	dprintf("porttest: find_port()\n");
-	dprintf("'test port #1' has id %d (should be %d)\n", find_port("test port #1"), test_p1);
+	dprintf("'test port #1' has id %ld (should be %ld)\n", find_port("test port #1"), test_p1);
 
 	dprintf("porttest: write_port() on 1, 2 and 3\n");
 	write_port(test_p1, 1, &testdata, sizeof(testdata));
@@ -1013,7 +1013,7 @@ void port_test()
 
 int port_test_thread_func(void* arg)
 {
-	int msg_code;
+	int32 msg_code;
 	int n;
 	char buf[6];
 	buf[5] = '\0';
@@ -1021,12 +1021,12 @@ int port_test_thread_func(void* arg)
 	dprintf("porttest: port_test_thread_func()\n");
 	
 	n = read_port(test_p1, &msg_code, &buf, 3);
-	dprintf("read_port #1 code %d len %d buf %s\n", msg_code, n, buf);
+	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
 	n = read_port(test_p1, &msg_code, &buf, 4);
-	dprintf("read_port #1 code %d len %d buf %s\n", msg_code, n, buf);
+	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
 	buf[4] = 'X';
 	n = read_port(test_p1, &msg_code, &buf, 5);
-	dprintf("read_port #1 code %d len %d buf %s\n", msg_code, n, buf);
+	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
 
 	dprintf("porttest: testing delete p1 from other thread\n");
 	delete_port(test_p1);
@@ -1043,7 +1043,7 @@ port_id user_create_port(int32 queue_length, const char *uname)
 {
 	if(uname != NULL) {
 		char name[SYS_MAX_OS_NAME_LEN];
-		int rc;
+		status_t rc;
 
 		if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
 			return ERR_VM_BAD_USER_MEMORY;
@@ -1059,12 +1059,12 @@ port_id user_create_port(int32 queue_length, const char *uname)
 	}
 }
 
-int	user_close_port(port_id id)
+status_t user_close_port(port_id id)
 {
 	return close_port(id);
 }
 
-int	user_delete_port(port_id id)
+status_t user_delete_port(port_id id)
 {
 	return delete_port(id);
 }
@@ -1073,7 +1073,7 @@ port_id	user_find_port(const char *port_name)
 {
 	if(port_name != NULL) {
 		char name[SYS_MAX_OS_NAME_LEN];
-		int rc;
+		status_t rc;
 
 		if((addr)port_name >= KERNEL_BASE && (addr)port_name <= KERNEL_TOP)
 			return ERR_VM_BAD_USER_MEMORY;
@@ -1089,11 +1089,11 @@ port_id	user_find_port(const char *port_name)
 	}
 }
 
-int	user_get_port_info(port_id id, struct port_info *uinfo)
+status_t user_get_port_info(port_id id, struct port_info *uinfo)
 {
-	int 				res;
+	status_t 			res;
 	struct port_info	info;
-	int					rc;
+	status_t 			rc;
 
 	if (uinfo == NULL)
 		return EINVAL;
@@ -1108,14 +1108,14 @@ int	user_get_port_info(port_id id, struct port_info *uinfo)
 	return res;
 }
 
-int	user_get_next_port_info(team_id uteam,
-				uint32 *ucookie,
+status_t user_get_next_port_info(team_id uteam,
+				int32 *ucookie,
 				struct port_info *uinfo)
 {
-	int 				res;
+	status_t 			res;
 	struct port_info	info;
-	uint32				cookie;
-	int					rc;
+	int32				cookie;
+	status_t 			rc;
 
 	if (ucookie == NULL)
 		return EINVAL;
@@ -1127,13 +1127,13 @@ int	user_get_next_port_info(team_id uteam,
 		return ERR_VM_BAD_USER_MEMORY;
 
 	// copy from userspace
-	rc = user_memcpy(&cookie, ucookie, sizeof(uint32));
+	rc = user_memcpy(&cookie, ucookie, sizeof(int32));
 	if(rc < 0)
 		return rc;
 	
 	res = get_next_port_info(uteam, &cookie, &info);
 	// copy to userspace
-	rc = user_memcpy(ucookie, &info, sizeof(uint32));
+	rc = user_memcpy(ucookie, &info, sizeof(int32));
 	if(rc < 0)
 		return rc;
 	rc = user_memcpy(uinfo,   &info, sizeof(struct port_info));
@@ -1147,17 +1147,17 @@ ssize_t	user_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout)
 	return port_buffer_size_etc(port, flags | B_CAN_INTERRUPT, timeout);
 }
 
-int32 user_port_count(port_id port)
+ssize_t user_port_count(port_id port)
 {
 	return port_count(port);
 }
 
-ssize_t	user_read_port_etc(port_id uport, int32 *umsg_code, void *umsg_buffer,
+status_t user_read_port_etc(port_id uport, int32 *umsg_code, void *umsg_buffer,
 							size_t ubuffer_size, uint32 uflags, bigtime_t utimeout)
 {
-	ssize_t	res;
-	int32	msg_code;
-	int		rc;
+	ssize_t		res;
+	int32		msg_code;
+	status_t	rc;
 	
 	if (umsg_code == NULL)
 		return EINVAL;
@@ -1179,12 +1179,12 @@ ssize_t	user_read_port_etc(port_id uport, int32 *umsg_code, void *umsg_buffer,
 	return res;
 }
 
-int	user_set_port_owner(port_id port, team_id team)
+status_t user_set_port_owner(port_id port, team_id team)
 {
 	return set_port_owner(port, team);
 }
 
-int	user_write_port_etc(port_id uport, int32 umsg_code, void *umsg_buffer,
+status_t user_write_port_etc(port_id uport, int32 umsg_code, void *umsg_buffer,
 				size_t ubuffer_size, uint32 uflags, bigtime_t utimeout)
 {
 	if (umsg_buffer == NULL)

@@ -63,7 +63,7 @@ dump_sem_list(int argc, char **argv)
 
 	for (i=0; i<MAX_SEMS; i++) {
 		if (sems[i].id >= 0)
-			dprintf("%p\tid: 0x%x\t\tname: '%s'\n", &sems[i], sems[i].id, sems[i].name);
+			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &sems[i], sems[i].id, sems[i].name);
 	}
 	return 0;
 }
@@ -74,7 +74,7 @@ _dump_sem_info(struct sem_entry *sem)
 {
 	dprintf("SEM:   %p\n", sem);
 	dprintf("name:  '%s'\n", sem->name);
-	dprintf("owner: 0x%x\n", sem->owner);
+	dprintf("owner: 0x%lx\n", sem->owner);
 	dprintf("count: 0x%x\n", sem->count);
 	dprintf("queue: head %p tail %p\n", sem->q.head, sem->q.tail);
 }
@@ -122,7 +122,7 @@ dump_sem_info(int argc, char **argv)
 }
 
 
-int
+status_t
 sem_init(kernel_args *ka)
 {
 	int i;
@@ -151,7 +151,7 @@ sem_init(kernel_args *ka)
 	return 0;
 }
 
-sem_id create_sem_etc(int count, const char *name, team_id owner)
+sem_id create_sem_etc(int32 count, const char *name, team_id owner)
 {
 	int i;
 	int state;
@@ -209,21 +209,21 @@ out:
 	return retval;
 }
 
-sem_id create_sem(int count, const char *name)
+sem_id create_sem(int32 count, const char *name)
 {
 	return create_sem_etc(count, name, team_get_kernel_team_id());
 }
 
-int delete_sem(sem_id id)
+status_t delete_sem(sem_id id)
 {
 	return delete_sem_etc(id, 0);
 }
 
-int delete_sem_etc(sem_id id, int return_code)
+status_t delete_sem_etc(sem_id id, status_t return_code)
 {
 	int slot;
 	int state;
-	int err = B_NO_ERROR;
+	status_t err = B_NO_ERROR;
 	struct thread *t;
 	int released_threads;
 	char *old_name;
@@ -242,7 +242,7 @@ int delete_sem_etc(sem_id id, int return_code)
 	if (sems[slot].id != id) {
 		RELEASE_SEM_LOCK(sems[slot]);
 		restore_interrupts(state);
-		dprintf("delete_sem: invalid sem_id %d\n", id);
+		dprintf("delete_sem: invalid sem_id %ld\n", id);
 		return B_BAD_SEM_ID;
 	}
 
@@ -282,7 +282,7 @@ int delete_sem_etc(sem_id id, int return_code)
 }
 
 // Called from a timer handler. Wakes up a semaphore
-static int sem_timeout(timer *data)
+static int32 sem_timeout(timer *data)
 {
 	struct sem_timeout_args *args = (struct sem_timeout_args *)data->entry.prev;
 	struct thread *t;
@@ -302,7 +302,7 @@ static int sem_timeout(timer *data)
 
 	if (sems[slot].id != args->blocked_sem_id) {
 		// this thread was not waiting on this semaphore
-		panic("sem_timeout: thid %d was trying to wait on sem %d which doesn't exist!\n",
+		panic("sem_timeout: thid %ld was trying to wait on sem %ld which doesn't exist!\n",
 			args->blocked_thread, args->blocked_sem_id);
 	}
 
@@ -324,21 +324,21 @@ static int sem_timeout(timer *data)
 }
 
 
-int acquire_sem(sem_id id)
+status_t acquire_sem(sem_id id)
 {
 	return acquire_sem_etc(id, 1, 0, 0);
 }
 
-int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
+status_t acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
 	int slot = id % MAX_SEMS;
 	int state;
-	int err = 0;
+	status_t err = 0;
 
 	if (sems_active == false)
 		return B_NO_MORE_SEMS;
 	if (id < 0) {
-		dprintf("acquire_sem_etc: invalid sem handle %d\n", id);
+		dprintf("acquire_sem_etc: invalid sem handle %ld\n", id);
 		return B_BAD_SEM_ID;
 	}
 	if (count <= 0)
@@ -348,7 +348,7 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 	GRAB_SEM_LOCK(sems[slot]);
 	
 	if (sems[slot].id != id) {
-		dprintf("acquire_sem_etc: bad sem_id %d\n", id);
+		dprintf("acquire_sem_etc: bad sem_id %ld\n", id);
 		err = B_BAD_SEM_ID;
 		goto err;
 	}
@@ -441,18 +441,18 @@ err:
 	return err;
 }
 
-int release_sem(sem_id id)
+status_t release_sem(sem_id id)
 {
 	return release_sem_etc(id, 1, 0);
 }
 
 
-int release_sem_etc(sem_id id, int count, int flags)
+status_t release_sem_etc(sem_id id, int32 count, uint32 flags)
 {
 	int slot = id % MAX_SEMS;
 	int state;
 	int released_threads = 0;
-	int err = 0;
+	status_t err = 0;
 	struct thread_queue release_queue;
 
 	if (sems_active == false)
@@ -466,7 +466,7 @@ int release_sem_etc(sem_id id, int count, int flags)
 	GRAB_SEM_LOCK(sems[slot]);
 
 	if (sems[slot].id != id) {
-		dprintf("sem_release_etc: invalid sem_id %d\n", id);
+		dprintf("sem_release_etc: invalid sem_id %ld\n", id);
 		err = B_BAD_SEM_ID;
 		goto err;
 	}
@@ -527,7 +527,7 @@ outnolock:
 	return err;
 }
 
-int get_sem_count(sem_id id, int32* thread_count)
+status_t get_sem_count(sem_id id, int32* thread_count)
 {
 	int slot;
 	int state;
@@ -547,7 +547,7 @@ int get_sem_count(sem_id id, int32* thread_count)
 	if (sems[slot].id != id) {
 		RELEASE_SEM_LOCK(sems[slot]);
 		restore_interrupts(state);
-		dprintf("sem_get_count: invalid sem_id %d\n", id);
+		dprintf("sem_get_count: invalid sem_id %ld\n", id);
 		return B_BAD_SEM_ID;
 	}
 
@@ -559,7 +559,7 @@ int get_sem_count(sem_id id, int32* thread_count)
 	return B_NO_ERROR;
 }
 
-int _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
+status_t _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 {
 	int state;
 	int slot;
@@ -579,7 +579,7 @@ int _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 	if (sems[slot].id != id) {
 		RELEASE_SEM_LOCK(sems[slot]);
 		restore_interrupts(state);
-		dprintf("get_sem_info: invalid sem_id %d\n", id);
+		dprintf("get_sem_info: invalid sem_id %ld\n", id);
 		return B_BAD_SEM_ID;
 	}
 
@@ -595,7 +595,7 @@ int _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 	return B_NO_ERROR;
 }
 
-int _get_next_sem_info(team_id team, uint32 *cookie, struct sem_info *info, size_t sz)
+status_t _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz)
 {
 	int state;
 	int slot;
@@ -649,7 +649,7 @@ int _get_next_sem_info(team_id team, uint32 *cookie, struct sem_info *info, size
 	return B_NO_ERROR;
 }
 
-int set_sem_owner(sem_id id, team_id team)
+status_t set_sem_owner(sem_id id, team_id team)
 {
 	int state;
 	int slot;
@@ -673,7 +673,7 @@ int set_sem_owner(sem_id id, team_id team)
 	if (sems[slot].id != id) {
 		RELEASE_SEM_LOCK(sems[slot]);
 		restore_interrupts(state);
-		dprintf("set_sem_owner: invalid sem_id %d\n", id);
+		dprintf("set_sem_owner: invalid sem_id %ld\n", id);
 		return B_BAD_SEM_ID;
 	}
 
@@ -687,7 +687,7 @@ int set_sem_owner(sem_id id, team_id team)
 
 // Wake up a thread that's blocked on a semaphore
 // this function must be entered with interrupts disabled and THREADLOCK held
-int sem_interrupt_thread(struct thread *t)
+status_t sem_interrupt_thread(struct thread *t)
 {
 	int slot;
 	struct thread_queue wakeup_queue;
@@ -704,12 +704,12 @@ int sem_interrupt_thread(struct thread *t)
 	GRAB_SEM_LOCK(sems[slot]);
 
 	if (sems[slot].id != t->sem_blocking) {
-		panic("sem_interrupt_thread: thread 0x%x sez it's blocking on sem 0x%x, but that sem doesn't exist!\n", t->id, t->sem_blocking);
+		panic("sem_interrupt_thread: thread 0x%lx sez it's blocking on sem 0x%lx, but that sem doesn't exist!\n", t->id, t->sem_blocking);
 	}
 
 	wakeup_queue.head = wakeup_queue.tail = NULL;
 	if (remove_thread_from_sem(t, &sems[slot], &wakeup_queue, EINTR) == ERR_NOT_FOUND)
-		panic("sem_interrupt_thread: thread 0x%x not found in sem 0x%x's wait queue\n", t->id, t->sem_blocking);
+		panic("sem_interrupt_thread: thread 0x%lx not found in sem 0x%lx's wait queue\n", t->id, t->sem_blocking);
 
 	RELEASE_SEM_LOCK(sems[slot]);
 
@@ -786,7 +786,7 @@ int sem_delete_owned_sems(team_id owner)
 	return count;
 }
 
-sem_id user_create_sem(int count, const char *uname)
+sem_id user_create_sem(int32 count, const char *uname)
 {
 	if (uname != NULL) {
 		char name[SYS_MAX_OS_NAME_LEN];
@@ -807,42 +807,43 @@ sem_id user_create_sem(int count, const char *uname)
 	}
 }
 
-int user_delete_sem(sem_id id)
+status_t user_delete_sem(sem_id id)
 {
 	return delete_sem(id);
 }
 
-int user_delete_sem_etc(sem_id id, int return_code)
+status_t user_delete_sem_etc(sem_id id, status_t return_code)
 {
 	return delete_sem_etc(id, return_code);
 }
 
-int user_acquire_sem(sem_id id)
+status_t user_acquire_sem(sem_id id)
 {
 	return user_acquire_sem_etc(id, 1, 0, 0);
 }
 
-int user_acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
+status_t user_acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
 	flags = flags | B_CAN_INTERRUPT;
 
 	return acquire_sem_etc(id, count, flags, timeout);
 }
 
-int user_release_sem(sem_id id)
+status_t user_release_sem(sem_id id)
 {
 	return release_sem_etc(id, 1, 0);
 }
 
-int user_release_sem_etc(sem_id id, int count, int flags)
+status_t user_release_sem_etc(sem_id id, int32 count, uint32 flags)
 {
 	return release_sem_etc(id, count, flags);
 }
 
-int user_get_sem_count(sem_id uid, int32* uthread_count)
+status_t user_get_sem_count(sem_id uid, int32* uthread_count)
 {
 	int32 thread_count;
-	int rc, rc2;
+	status_t rc;
+	int rc2;
 	rc  = get_sem_count(uid, &thread_count);
 	rc2 = user_memcpy(uthread_count, &thread_count, sizeof(int32));
 	if (rc2 < 0)
@@ -850,10 +851,11 @@ int user_get_sem_count(sem_id uid, int32* uthread_count)
 	return rc;
 }
 
-int user_get_sem_info(sem_id uid, struct sem_info *uinfo, size_t sz)
+status_t user_get_sem_info(sem_id uid, struct sem_info *uinfo, size_t sz)
 {
 	struct sem_info info;
-	int rc, rc2;
+	status_t rc;
+	int rc2;
 
 	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
@@ -865,29 +867,30 @@ int user_get_sem_info(sem_id uid, struct sem_info *uinfo, size_t sz)
 	return rc;
 }
 
-int user_get_next_sem_info(team_id uteam, uint32 *ucookie, struct sem_info *uinfo, size_t sz)
+status_t user_get_next_sem_info(team_id uteam, int32 *ucookie, struct sem_info *uinfo, size_t sz)
 {
 	struct sem_info info;
-	uint32 cookie;
-	int rc, rc2;
+	int32 cookie;
+	status_t rc;
+	int rc2;
 
 	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
-	rc2 = user_memcpy(&cookie, ucookie, sizeof(uint32));
+	rc2 = user_memcpy(&cookie, ucookie, sizeof(int32));
 	if (rc2 < 0)
 		return rc2;
 	rc = _get_next_sem_info(uteam, &cookie, &info, sz);
 	rc2 = user_memcpy(uinfo, &info, sz);
 	if (rc2 < 0)
 		return rc2;
-	rc2 = user_memcpy(ucookie, &cookie, sizeof(uint32));
+	rc2 = user_memcpy(ucookie, &cookie, sizeof(int32));
 	if (rc2 < 0)
 		return rc2;
 	return rc;
 }
 
-int user_set_sem_owner(sem_id uid, team_id uteam)
+status_t user_set_sem_owner(sem_id uid, team_id uteam)
 {
 	return set_sem_owner(uid, uteam);
 }
