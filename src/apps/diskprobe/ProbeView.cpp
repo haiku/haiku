@@ -1127,7 +1127,11 @@ ProbeView::AttachedToWindow()
 	// Block Size
 
 	subMenu = new BMenu("BlockSize");
-	subMenu->AddItem(new BMenuItem("512", NULL));
+	subMenu->AddItem(item = new BMenuItem("512", NULL));
+	item->SetMarked(true);
+	subMenu->AddItem(new BMenuItem("1024", NULL));
+	subMenu->AddItem(new BMenuItem("2048", NULL));
+	subMenu->SetRadioMode(true);
 	menu->AddItem(new BMenuItem(subMenu));
 	menu->AddSeparatorItem();
 
@@ -1291,6 +1295,8 @@ status_t
 ProbeView::Save()
 {
 	status_t status = fEditor.Save();
+	if (status == B_OK)
+		return B_OK;
 
 	char buffer[1024];
 	snprintf(buffer, sizeof(buffer),
