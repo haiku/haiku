@@ -6,6 +6,7 @@ SubInclude OBOS_TOP src prefs datatranslations ;
 SubInclude OBOS_TOP src prefs devices ;
 SubInclude OBOS_TOP src prefs drivesetup ;
 SubInclude OBOS_TOP src prefs dun ;
+SubInclude OBOS_TOP src prefs filetypes ;
 SubInclude OBOS_TOP src prefs fonts ;
 SubInclude OBOS_TOP src prefs keyboard ;
 SubInclude OBOS_TOP src prefs keymap ;
