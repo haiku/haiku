@@ -549,7 +549,7 @@ main()
 	}
 	// list all disk devices and partitions
 	DumpVisitor visitor;
-	roster.VisitAll(&visitor);
+	roster.VisitEachPartition(&visitor);
 	// list disk systems
 	BDiskSystem diskSystem;
 	while (roster.GetNextDiskSystem(&diskSystem) == B_OK) {
