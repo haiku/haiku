@@ -142,9 +142,6 @@ public:
 							BFont(void);
 							BFont(const BFont &font);
 							BFont(const BFont *font);
-							/* XXX TODO: R5 doesn't have a destructor, so we get linking errors when objects compiled with old headers with the new library
-							~BFont(void);
-							*/
 
 		status_t			SetFamilyAndStyle(const font_family family, 
 											  const font_style style);
@@ -263,8 +260,7 @@ private:
 		uint16				fFace;
 		uint32				fFlags;
 		font_height			fHeight;
-		BFontPrivate		*private_data;
-		uint32				_reserved[2];
+		uint32				_reserved[3];
 
 		void           		SetPacket(void *packet) const;
 		void           		GetTruncatedStrings64(const char *stringArray[], 
