@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <string.h>
 
+static const char * const kDivider =
+	"----------------------------------------------------------------------";
+
 /*! \brief Creates a new ConsoleListener object with the given verbosity level.
 
 	All output from said listener is sent to standard output via printf().
@@ -27,6 +30,19 @@
 ConsoleListener::ConsoleListener(VerbosityLevel level)
 	: fLevel(level)
 {
+}
+
+void
+ConsoleListener::OnStart(const char *sourceDirectory, const char *outputFile,
+	                     const char *udfVolumeName) const
+{
+	if (Level() > VERBOSITY_NONE) {
+		printf("%s\n", kDivider);
+		printf("Source directory: `%s'\n", sourceDirectory);
+		printf("Output file:      `%s'\n", outputFile);
+		printf("UDF Volume Name:  `%s'\n", udfVolumeName);
+		printf("%s\n", kDivider);
+	}
 }
 
 void

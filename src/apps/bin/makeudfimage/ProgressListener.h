@@ -25,6 +25,8 @@ enum VerbosityLevel {
 
 class ProgressListener {
 public:
+	virtual void OnStart(const char *sourceDirectory, const char *outputFile,
+	                     const char *udfVolumeName) const = 0;
 	virtual void OnError(const char *message) const = 0;
 	virtual void OnWarning(const char *message) const = 0;
 	virtual void OnUpdate(VerbosityLevel level, const char *message) const = 0;
