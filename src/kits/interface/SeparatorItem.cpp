@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -22,11 +22,13 @@
 //	File Name:		SeparatorItem.cpp
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //					Bill Hayden (haydentech@users.sourceforge.net)
+//					Stefano Ceccherini (burton666@libero.it)
 //	Description:	Display separator item for BMenu class
 //
 //------------------------------------------------------------------------------
 #include <MenuItem.h>
-#include <Message.h>
+
+#include <stdio.h>
 
 
 BSeparatorItem::BSeparatorItem()
@@ -66,15 +68,16 @@ BSeparatorItem::Instantiate(BMessage *data)
 void
 BSeparatorItem::SetEnabled(bool state)
 {
+	// Don't do anything
 }
 
 
 void
 BSeparatorItem::GetContentSize(float *width, float *height)
 {
-	if (width)
+	if (width != NULL)
 		*width = 2.0f;
-	if (height)
+	if (height != NULL)
 		*height = 8.0f;
 }
 
@@ -82,18 +85,47 @@ BSeparatorItem::GetContentSize(float *width, float *height)
 void
 BSeparatorItem::Draw()
 {
+	BMenu *menu = Menu();
+	if (menu == NULL)
+		return;
+		
 	BRect bounds = Frame();
-
-	Menu()->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_DARKEN_2_TINT));
-	Menu()->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f),
-		BPoint(bounds.right - 1.0f, bounds.top + 4.0f));
-	Menu()->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_LIGHTEN_2_TINT));
-	Menu()->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f),
-		BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
-
-	Menu()->SetHighColor(0, 0, 0);
+	
+	// TODO: Calling this on every Draw() doesn't seem nice.
+	menu_info menuInfo;
+	get_menu_info(&menuInfo);
+	switch (menuInfo.separator) {
+		case 0:
+			// TODO: Check if drawing is pixel perfect
+			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+				B_DARKEN_2_TINT));
+			menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f),
+				BPoint(bounds.right - 1.0f, bounds.top + 4.0f));
+			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+				B_LIGHTEN_2_TINT));
+			menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f),
+				BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
+			menu->SetHighColor(0, 0, 0);
+			break;
+		
+		case 1:
+			// TODO: Check if drawing is pixel perfect
+			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+				B_DARKEN_2_TINT));
+			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 4.0f),
+				BPoint(bounds.right - 9.0f, bounds.top + 4.0f));
+			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+				B_LIGHTEN_2_TINT));
+			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 5.0f),
+				BPoint(bounds.right - 9.0f, bounds.top + 5.0f));
+			menu->SetHighColor(0, 0, 0);
+			break;
+			
+		case 2: // TODO: Implement "type 2" look
+		default:
+			printf("BSeparatorItem::Draw(): Separator item look not supported yet\n");
+			break;
+	}
 }
 
 
