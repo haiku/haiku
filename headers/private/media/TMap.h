@@ -1,3 +1,5 @@
+#ifndef _MEDIA_T_MAP_H
+#define _MEDIA_T_MAP_H
 
 template<class key, class value> class Map
 {
@@ -13,7 +15,7 @@ public:
 		list[count].v = v;
 		count++;
 	}
-	
+
 	bool Get(const key &k, value *v)
 	{
 		for (int i = 0; i < count; i++)
@@ -30,6 +32,25 @@ public:
 		if (index < 0 || index >= count) 
 			return false;
 		*v = list[index].v;
+		return true;
+	}
+	
+	bool GetPointer(const key &k, value **v)
+	{
+		for (int i = 0; i < count; i++)
+			if (list[i].k == k) {
+				*v = &(list[i].v);
+				return true;
+			}
+		return false;
+	}
+	
+	// you can't Remove() while iterating through the map using GetAt()
+	bool GetPointerAt(int32 index, value **v)
+	{
+		if (index < 0 || index >= count) 
+			return false;
+		*v = &(list[index].v);
 		return true;
 	}
 	
@@ -58,3 +79,4 @@ private:
 	int count;
 };
 
+#endif // _MEDIA_T_MAP_H
