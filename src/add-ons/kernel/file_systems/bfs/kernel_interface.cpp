@@ -459,13 +459,16 @@ bfs_remove_vnode(void *_ns, void *_node, char reenter)
 	// If the inode isn't in use anymore, we were called before
 	// bfs_unlink() returns - in this case, we can just use the
 	// transaction which has already deleted the inode.
-	Transaction localTransaction, *transaction = &localTransaction;
-	Journal *journal = volume->GetJournal(volume->ToBlock(inode->Parent()));
+	Transaction localTransaction, *transaction = NULL;
 
-	if (journal != NULL && journal->CurrentThread() == find_thread(NULL))
+	Journal *journal = volume->GetJournal(volume->ToBlock(inode->Parent()));
+	if (journal != NULL)
 		transaction = journal->CurrentTransaction();
-	else
+
+	if (transaction == NULL) {
+		transaction = &localTransaction;
 		localTransaction.Start(volume, inode->BlockNumber());
+	}
 
 	status_t status = inode->Free(transaction);
 	if (status == B_OK) {

@@ -53,8 +53,7 @@ class Journal {
 		status_t WriteLogEntry();
 		status_t LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks);
 
-		thread_id CurrentThread() const { return fOwningThread; }
-		Transaction *CurrentTransaction() const { return fOwner; }
+		Transaction *CurrentTransaction();
 		uint32 TransactionSize() const { return fArray.CountItems() + fArray.BlocksUsed(); }
 
 		status_t FlushLogAndBlocks();
@@ -69,9 +68,8 @@ class Journal {
 		status_t TransactionDone(bool success);
 
 		Volume		*fVolume;
-		Semaphore	fLock;
+		RecursiveLock	fLock;
 		Transaction *fOwner;
-		thread_id	fOwningThread;
 		BlockArray	fArray;
 		uint32		fLogSize, fMaxTransactionSize, fUsed;
 		int32		fTransactionsInEntry;

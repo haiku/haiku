@@ -17,7 +17,6 @@ Journal::Journal(Volume *volume)
 	fVolume(volume),
 	fLock("bfs journal"),
 	fOwner(NULL),
-	fOwningThread(-1),
 	fArray(volume->BlockSize()),
 	fLogSize(volume->Log().length),
 	fMaxTransactionSize(fLogSize / 4 - 5),
@@ -338,10 +337,8 @@ Journal::Lock(Transaction *owner)
 		return B_OK;
 
 	status_t status = fLock.Lock();
-	if (status == B_OK) {
+	if (status == B_OK)
 		fOwner = owner;
-		fOwningThread = find_thread(NULL);
-	}
 
 	// if the last transaction is older than 2 secs, start a new one
 	if (fTransactionsInEntry != 0 && system_time() - fTimestamp > 2000000L)
@@ -361,8 +358,24 @@ Journal::Unlock(Transaction *owner, bool success)
 
 	fTimestamp = system_time();
 	fOwner = NULL;
-	fOwningThread = -1;
 	fLock.Unlock();
+}
+
+
+/** If there is a current transaction that the current thread has
+ *	started, this function will give you access to it.
+ */
+
+Transaction *
+Journal::CurrentTransaction()
+{
+	if (fLock.LockWithTimeout(0) != B_OK)
+		return NULL;
+
+	Transaction *owner = fOwner;
+	fLock.Unlock();
+
+	return owner;
 }
 
 
