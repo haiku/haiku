@@ -39,38 +39,38 @@ operator new(size_t, void *_P)
 
 typedef thread_id hoardThreadType;
 
-extern "C" {
-  ///// Thread-related wrappers.
+namespace BPrivate {
+///// Thread-related wrappers.
 
-  void	hoardCreateThread (hoardThreadType& t,
-			   void *(*function) (void *),
-			   void * arg);
-  void	hoardJoinThread (hoardThreadType& t);
-  void  hoardSetConcurrency (int n);
+void hoardCreateThread(hoardThreadType &t,
+		void *(*function)(void *), void *arg);
+void hoardJoinThread(hoardThreadType &t);
+void hoardSetConcurrency(int n);
 
-  // Return a thread identifier appropriate for hashing:
-  // if the system doesn't produce consecutive thread id's,
-  // some hackery may be necessary.
-  int	hoardGetThreadID (void);
+// Return a thread identifier appropriate for hashing:
+// if the system doesn't produce consecutive thread id's,
+// some hackery may be necessary.
+int	hoardGetThreadID(void);
 
-  ///// Lock-related wrappers.
+///// Lock-related wrappers.
 
-  void	hoardLockInit(hoardLockType& lock, const char *name);
-  void	hoardLock(hoardLockType& lock);
-  void	hoardUnlock(hoardLockType& lock);
+void hoardLockInit(hoardLockType &lock, const char *name);
+void hoardLock(hoardLockType &lock);
+void hoardUnlock(hoardLockType &lock);
 
-  ///// Memory-related wrapper.
+///// Memory-related wrapper.
 
-  int	hoardGetPageSize (void);
-  void *	hoardSbrk (long size);
-  void	hoardUnsbrk (void * ptr, long size);
+int	hoardGetPageSize(void);
+void *hoardSbrk(long size);
+void hoardUnsbrk(void *ptr, long size);
 
-  ///// Other.
+///// Other.
 
-  void  hoardYield (void);
-  int	hoardGetNumProcessors (void);
-  unsigned long hoardInterlockedExchange (unsigned long * oldval,
-					  unsigned long newval);
-}
+void hoardYield(void);
+int	hoardGetNumProcessors(void);
+unsigned long hoardInterlockedExchange(unsigned long *oldval,
+		unsigned long newval);
+
+}	// namespace BPrivate
 
 #endif // _ARCH_SPECIFIC_H_

@@ -17,57 +17,45 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-//#include <assert.h>
-
 #include "arch-specific.h"
 #include "heap.h"
 
-// How many iterations we spin waiting for a lock.
-enum { SPIN_LIMIT = 100 };
-
-// The values of a user-level lock.
-enum { UNLOCKED = 0, LOCKED = 1 };
-
-extern "C" {
-
 #include <OS.h>
+#include <Debug.h>
 #include <unistd.h>
 
 using namespace BPrivate;
 
+
 static area_id heap_region = -1;
 static addr_t brk;
 
-int
-__heap_init()
+
+// ToDo: add real fork() support!
+
+extern "C" status_t
+__init_heap(void)
 {
 	// XXX do something better here
 	if (heap_region < 0) {
 		heap_region = create_area("heap", (void **)&brk,
-			B_ANY_ADDRESS, 4*1024*1024, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+			B_ANY_ADDRESS, 1024 * B_PAGE_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	}
 	return 0;
 }
 
-class heap_init_hack_t {
-public:
-	heap_init_hack_t(void)
-	{
-		__heap_init();
-	}
-} heap_init_hack;
-
+namespace BPrivate {
 
 void
 hoardCreateThread(hoardThreadType &thread,
 	void *(*function)(void *), void *arg)
 {
-	thread = spawn_thread((int32 (*)(void*))function, "some thread",
-			B_NORMAL_PRIORITY, arg);
-	if (thread >= B_OK)
-		resume_thread(thread);
-	else
+	thread = spawn_thread((int32 (*)(void *))function, "hoard thread",
+		B_NORMAL_PRIORITY, arg);
+	if (thread < B_OK)
 		debugger("spawn_thread() failed!");
+
+	resume_thread(thread);
 }
 
 
@@ -139,13 +127,11 @@ hoardSbrk(long size)
 	void *ret = (void *)brk;
 	brk += size + hoardHeap::ALIGNMENT - 1;
 	return ret;
-
-//	return sbrk(size + hoardHeap::ALIGNMENT - 1);
 }
 
 
 void
-hoardUnsbrk(void * ptr, long size)
+hoardUnsbrk(void *ptr, long size)
 {
 	// NOT CURRENTLY IMPLEMENTED!
 }
@@ -168,4 +154,4 @@ hoardInterlockedExchange(unsigned long *oldval,
 	return o;
 }
 
-}
+}	// namespace BPrivate
