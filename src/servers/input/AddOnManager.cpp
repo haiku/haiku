@@ -266,10 +266,8 @@ AddOnManager::RegisterAddOns()
 	node_ref nref;
 	BDirectory directory;
 	BPath path;
-	uint i = 0;
-	if (fSafeMode)	// when safemode, only B_BEOS_ADDONS_DIRECTORY is used
-		i = 2;
-	for (i = 0 ; i < sizeof(directories) / sizeof(directory_which) ; i++)
+	// when safemode, only B_BEOS_ADDONS_DIRECTORY is used
+	for (uint32 i = fSafeMode ? 2 : 0 ; i < sizeof(directories) / sizeof(directory_which) ; i++)
 		for (uint32 j = 0 ; j < sizeof(subDirectories) / sizeof(char[24]) ; j++) {
 			if ((find_directory(directories[i], &path) == B_OK)
 				&& (path.Append(subDirectories[j]) == B_OK)
