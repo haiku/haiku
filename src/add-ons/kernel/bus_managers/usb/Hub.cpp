@@ -19,53 +19,10 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 
-#include <module.h>
-#include <util/kernel_cpp.h>
-
 #include "usb_p.h"
 
-Stack::Stack()
+Hub::Hub(  BusManager *bus , Device *parent , usb_device_descriptor &desc , int8 devicenum )
+   : Device ( bus , parent , desc , devicenum )
 {
-	//Init the master lock
-	m_master = create_sem( 0 , "usb master lock" );
-	set_sem_owner( m_master , B_SYSTEM_TEAM );
-	
-	//Create the data lock
-	m_datalock = create_sem( 0 , "usb data lock" );
-	set_sem_owner( m_datalock , B_SYSTEM_TEAM );
-	
-	//Check for host controller modules
-	void *list = open_module_list( "busses/usb" );
-	char modulename[B_PATH_NAME_LENGTH];
-	size_t buffersize = sizeof(modulename);
-	dprintf( "USB: Looking for host controller modules\n" );
-	while( read_next_module_name( list , modulename , &buffersize ) == B_OK )
-	{
-		dprintf( "USB: Found module %s\n" , modulename );
-		host_controller_info *module = 0;
-		if ( get_module( modulename , (module_info **)&module ) != B_OK )
-			continue;
-		m_busmodules.Insert( new BusManager( module ) , 0 );
-		dprintf( "USB: module %s successfully loaded\n" , modulename );
-	}
-	
-	if( m_busmodules.Count() == 0 )
-		return;
-}
-
-Stack::~Stack()
-{
-	//Release the bus modules
-	for( Vector<BusManager *>::Iterator i = m_busmodules.Begin() ; i != m_busmodules.End() ; i++ )
-		delete (*i);
+	dprintf( "USB Hub::Attach()\n" );
 }	
-	
-
-status_t Stack::InitCheck()
-{
-	if ( m_busmodules.Count() == 0 )
-		return ENODEV;
-	return B_OK;
-}
-
-Stack *data = 0;

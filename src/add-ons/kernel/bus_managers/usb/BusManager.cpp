@@ -1,0 +1,184 @@
+//------------------------------------------------------------------------------
+//	Copyright (c) 2003, Niels S. Reedijk
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+
+#include "usb_p.h"
+
+BusManager::BusManager( host_controller_info *info )
+{
+	hcpointer = info;
+	m_initok = false; 
+	m_roothub = 0;
+	
+	// Set up the semaphore
+	m_lock = create_sem( 1 , "buslock" );
+	if( m_lock < B_OK )
+		return;
+	set_sem_owner( B_SYSTEM_TEAM , m_lock );
+	
+	// Clear the device map
+	memset( &m_devicemap , false , 128 );
+	
+	// Set up the new root hub
+	AllocateNewDevice( 0 );
+	
+	if( m_roothub == 0 )
+		return;
+	
+	m_initok = true;
+}
+
+BusManager::~BusManager()
+{
+	put_module( hcpointer->info.name );
+}
+
+status_t BusManager::InitCheck()
+{
+	if ( m_initok == true )
+		return B_OK;
+	else
+		return B_ERROR;
+}
+
+Device * BusManager::AllocateNewDevice( Device *parent )
+{
+	int8 devicenum;
+	status_t retval;
+	usb_device_descriptor device_descriptor;
+	
+	//1. Check if there is a free entry in the device map (for the device number)
+	devicenum = AllocateAddress();
+	if ( devicenum < 0 )
+	{
+		dprintf( "usb Busmanager [new device]: could not get a new address\n" );
+		return 0;
+	}
+	
+	//2. Set the address of the device USB 1.1 spec p202 (bepdf)
+	retval = SendRequest( 0 ,
+				 USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD , //host->device
+	             USB_REQUEST_SET_ADDRESS , 						//request
+	             devicenum ,									//value
+	             0 ,											//index
+	             0 ,											//length
+	             NULL ,											//data
+	             0 ,											//data_len
+	             0 );											//actual len
+	
+	if ( retval < B_OK )
+	{
+		dprintf( "usb busmanager [new device]: error with commmunicating the right address\n" );
+		return 0; 
+	}
+	
+	//3. Get the device descriptor
+	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
+	// size of any device, plus it is enough, because the device type is in
+	// there too 
+	
+	size_t actual_length;
+	
+	SendRequest( 0 ,
+	             USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD , //Type
+	             USB_REQUEST_GET_DESCRIPTOR ,					//Request
+	             ( USB_DESCRIPTOR_DEVICE << 8 ),				//Value
+	             0 ,											//Index
+	             8 ,											//Length										
+	             (void *)&device_descriptor ,					//Buffer
+	             8 ,											//Bufferlength
+	             &actual_length );								//length
+	
+	if ( actual_length != 8 )
+	{
+		dprintf( "usb busmanager [new device]: error while getting the device descriptor\n" );
+		return 0;
+	}
+
+	//4. Create a new instant based on the type (Hub or Device);
+	if ( device_descriptor.device_class == 0x09 )
+	{
+		dprintf( "usb Busmanager [new device]: New hub\n" );
+		Device *ret = new Hub( this , parent , device_descriptor , devicenum );
+		if ( parent == 0 ) //root hub!!
+			m_roothub = ret;
+		return ret;
+	}
+	
+	dprintf( "usb Busmanager [new device]: New normal device\n" );
+	return new Device( this , parent , device_descriptor , devicenum );
+}
+
+int8 BusManager::AllocateAddress()
+{
+	acquire_sem_etc( m_lock , 1 , B_CAN_INTERRUPT , 0 );
+	int8 devicenum = -1;
+	for( int i = 0 ; i < 128 ; i++ )
+	{
+		if ( m_devicemap[i] == false )
+		{
+			devicenum = i;
+			m_devicemap[i] = true;
+			break;
+		}
+	}
+	release_sem( m_lock );
+	return devicenum;
+}
+
+status_t BusManager::SendRequest( Device * dev , uint8 request_type , uint8 request , uint16 value ,
+	                  uint16 index , uint16 length , void *data ,
+	                  size_t data_len , size_t *actual_len )
+{
+	//todo: het moet speciaal soort geheugen worden
+	usb_request_data *req = (usb_request_data *)malloc( sizeof( usb_request_data) );
+	
+	req->RequestType = request_type;
+	req->Request = request;
+	req->Value = value;
+	req->Index = index;
+	req->Length = length;
+	
+	//Nicen up the second argument: the default pipe
+	//1) set up the pipe stuff a little nicer
+	//2) don't assume it's a low speed device :-(
+	return SendControlMessage( dev , ( 2 << 30 | 1 << 26 ) , req ,
+	                                   data , data_len , actual_len , 3 * 1000 * 1000 ); 
+}
+
+status_t BusManager::SendControlMessage( Device *dev , uint16 pipe , 
+	                             usb_request_data *command , void *data ,
+	                             size_t data_length , size_t *actual_length , 
+	                             bigtime_t timeout )
+{
+	// this method should build an usb packet (new class) with the needed data
+	Packet packet;
+	
+	packet.SetPipe( pipe );
+	packet.SetRequestData( (uint8 *)command );
+	packet.SetBuffer( (uint8 *)data );
+	packet.SetBufferLength( data_length );
+	packet.SetActualLength( actual_length );
+	packet.SetAddress( 0 );
+	
+	status_t retval = hcpointer->SubmitPacket( packet.GetData() );
+	return retval;
+}
+

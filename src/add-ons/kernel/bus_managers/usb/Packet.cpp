@@ -19,53 +19,49 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 
-#include <module.h>
-#include <util/kernel_cpp.h>
-
 #include "usb_p.h"
 
-Stack::Stack()
+Packet::Packet()
 {
-	//Init the master lock
-	m_master = create_sem( 0 , "usb master lock" );
-	set_sem_owner( m_master , B_SYSTEM_TEAM );
-	
-	//Create the data lock
-	m_datalock = create_sem( 0 , "usb data lock" );
-	set_sem_owner( m_datalock , B_SYSTEM_TEAM );
-	
-	//Check for host controller modules
-	void *list = open_module_list( "busses/usb" );
-	char modulename[B_PATH_NAME_LENGTH];
-	size_t buffersize = sizeof(modulename);
-	dprintf( "USB: Looking for host controller modules\n" );
-	while( read_next_module_name( list , modulename , &buffersize ) == B_OK )
-	{
-		dprintf( "USB: Found module %s\n" , modulename );
-		host_controller_info *module = 0;
-		if ( get_module( modulename , (module_info **)&module ) != B_OK )
-			continue;
-		m_busmodules.Insert( new BusManager( module ) , 0 );
-		dprintf( "USB: module %s successfully loaded\n" , modulename );
-	}
-	
-	if( m_busmodules.Count() == 0 )
-		return;
+	d = new usb_packet_t;
 }
 
-Stack::~Stack()
+Packet::~Packet()
 {
-	//Release the bus modules
-	for( Vector<BusManager *>::Iterator i = m_busmodules.Begin() ; i != m_busmodules.End() ; i++ )
-		delete (*i);
-}	
-	
-
-status_t Stack::InitCheck()
-{
-	if ( m_busmodules.Count() == 0 )
-		return ENODEV;
-	return B_OK;
+	delete d;
 }
 
-Stack *data = 0;
+void Packet::SetPipe( uint16 pipe )
+{
+	d->pipe = pipe;
+}
+
+void Packet::SetAddress( uint8 address )
+{
+	d->address = address;
+}
+
+void Packet::SetRequestData( uint8 *data )
+{
+	d->requestdata = data;
+}
+
+void Packet::SetBuffer( uint8 *buffer )
+{
+	d->buffer = buffer;
+}
+
+void Packet::SetBufferLength( int16 length )
+{
+	d->bufferlength = length;
+}
+
+void Packet::SetActualLength( size_t *actual_length )
+{
+	d->actual_length = actual_length;
+};
+
+usb_packet_t * Packet::GetData()
+{
+	return d;
+}
