@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src servers syslog_daemon ;
+
+UsePrivateHeaders syslog_daemon ;
+
+AddResources syslog_daemon : SyslogDaemon.rsrc ;
+
+Server syslog_daemon :
+	SyslogDaemon.cpp
+	syslog_output.cpp
+	listener_output.cpp
+	;
+
+LinkSharedOSLibs syslog_daemon : be ;
