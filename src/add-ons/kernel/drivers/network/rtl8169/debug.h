@@ -27,6 +27,7 @@
 	#define TRACE(a...)
 #endif
 
-#define ERROR(a...) dprintf("rtl8169: " a)
+#define ERROR(a...) dprintf("rtl8169: ERROR " a)
+#define PRINT(a...) dprintf("rtl8169: " a)
 
 #endif

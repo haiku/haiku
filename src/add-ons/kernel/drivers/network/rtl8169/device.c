@@ -33,7 +33,7 @@
 
 static int32 gOpenMask = 0;
 
-void
+static void
 write_phy_reg(rtl8169_device *device, int reg, uint16 value)
 {
 	int i;
@@ -46,7 +46,7 @@ write_phy_reg(rtl8169_device *device, int reg, uint16 value)
 	}
 }
 
-uint16
+static uint16
 read_phy_reg(rtl8169_device *device, int reg)
 {
 	uint32 v;
@@ -73,7 +73,7 @@ write_phy_reg_bit(rtl8169_device *device, int reg, int bitnum, int bitval)
 	write_phy_reg(device, reg, val);
 }
 
-void
+static void
 phy_config(rtl8169_device *device)
 {
 	TRACE("phy_config()\n");
@@ -140,7 +140,7 @@ phy_config(rtl8169_device *device)
 }
 
 
-void
+static void
 dump_phy_stat(rtl8169_device *device)
 {
 	uint32 v = read8(REG_PHY_STAT);
@@ -177,9 +177,33 @@ dump_phy_stat(rtl8169_device *device)
 	if (v & PHY_STAT_FullDup)
 		TRACE("PHY_STAT_FullDup\n");
 }
-			
 
-status_t
+
+static void
+print_link_status(rtl8169_device *device)
+{
+	uint32 phy = read8(REG_PHY_STAT);
+	if (phy & PHY_STAT_EnTBI) {
+		if (read32(REG_TBICSR) & TBICSR_TBILinkOk)
+			PRINT("Link active, 1000 Mbit Full Duplex (TBI mode)\n");
+		else
+			PRINT("Link not active (TBI mode)\n");
+	} else {
+		if (phy & PHY_STAT_LinkSts) {
+			if (phy & PHY_STAT_1000MF)
+				PRINT("Link active, 1000 Mbit Full Duplex (GMII mode)\n");
+			else
+				PRINT("Link active, %s Mbit %s Duplex (MII mode)\n",
+					(phy & PHY_STAT_100M) ? "100" : (phy & PHY_STAT_10M) ? "10" : "unknown",
+					(phy & PHY_STAT_FullDup) ? "Full" : "Half");
+		} else {
+			PRINT("Link not active (MII mode)\n");
+		}
+	}
+}
+
+
+static status_t
 init_buf_desc(rtl8169_device *device)
 {
 	void *rx_buf_desc_virt, *rx_buf_desc_phy;
@@ -278,7 +302,7 @@ rtl8169_rx_int(rtl8169_device *device)
 }
 
 
-int32
+static int32
 rtl8169_int(void *data)
 {
 	rtl8169_device *device = (rtl8169_device *)data;
@@ -299,6 +323,7 @@ rtl8169_int(void *data)
 	if (stat & INT_PUN) {
 		TRACE("INT_PUN\n");
 		dump_phy_stat(device);
+		print_link_status(device);
 	}
 
 	if (stat & (INT_TOK | INT_TER)) {
@@ -435,14 +460,13 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	
 	// configure PHY
 	phy_config(device);
+	
+	dump_phy_stat(device);
+	print_link_status(device);
 
 	// initialize MAC address	
 	for (i = 0; i < 6; i++)
 		device->macaddr[i] = read8(i);
-		
-	dprintf("card %p, mac: ", device);
-	for (i = 0; i < 6; i++)
-		dprintf("%02x:", device->macaddr[i]);
 		
 	TRACE("MAC %02x:%02x:%02x:%02x:%02x:%02x\n",
 		device->macaddr[0], device->macaddr[1], device->macaddr[2],
@@ -504,8 +528,6 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
   	// enable used interrupts
  	write16(REG_INT_MASK, INT_FOVW | INT_PUN | INT_TER | INT_TOK | INT_RER | INT_ROK);
 
-	dump_phy_stat(device);		
-	
 	return B_OK;
 
 err:
@@ -602,7 +624,7 @@ retry:
 	len -= 4; // remove CRC that Realtek always appends
 	if (len < 0)
 		len = 0;
-	if (len > *num_bytes)
+	if (len > (int)*num_bytes)
 		len = *num_bytes;
 
 	memcpy(buf, device->rxBuf[device->rxNextIndex], len);
