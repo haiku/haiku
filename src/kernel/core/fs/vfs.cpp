@@ -2889,7 +2889,7 @@ attr_remove(int fd, const char *name, bool kernel)
 	else
 		status = EROFS;
 
-	put_fd(fd);
+	put_fd(descriptor);
 
 	return status;
 }
@@ -2929,9 +2929,9 @@ attr_rename(int fromfd, const char *fromName, int tofd, const char *toName, bool
 		status = EROFS;
 
 err1:
-	put_fd(tofd);
+	put_fd(toDescriptor);
 err:
-	put_fd(fromfd);
+	put_fd(fromDescriptor);
 
 	return status;
 }
