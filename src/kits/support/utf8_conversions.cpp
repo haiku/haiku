@@ -24,7 +24,6 @@ convert_encoding(const char * from, const char * to,
 	}	
 	if (*state == 0) {
 		iconv(conversion,0,0,0,0);
-		*state = 1;
 	}	
 	input_buffer_t inputBuffer = const_cast<input_buffer_t>(&src);
 	size_t inputLeft = *srcLen;
