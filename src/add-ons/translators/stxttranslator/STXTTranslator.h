@@ -38,7 +38,9 @@
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
 #include <DataIO.h>
+#include <File.h>
 #include <ByteOrder.h>
+#include <fs_attr.h>
 
 #define STXT_TRANSLATOR_VERSION 100
 #define STXT_IN_QUALITY 0.5

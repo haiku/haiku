@@ -544,6 +544,36 @@ output_headers(BPositionIO *outDestination, uint32 text_data_size)
 	return result;
 }
 
+status_t
+output_styles(BPositionIO *outDestination, uint32 text_size,
+	uint8 *pflatRunArray, ssize_t data_size)
+{
+	uint8 buffer[20];
+	
+	// output STYL header
+	TranslatorStyledTextStyleHeader stylheader;
+	stylheader.header.magic = 'STYL';
+	stylheader.header.header_size =
+		sizeof(TranslatorStyledTextStyleHeader);
+	stylheader.header.data_size = data_size;
+	stylheader.apply_offset = 0;
+	stylheader.apply_length = text_size;
+	
+	memcpy(buffer, &stylheader, 20);
+	if (swap_data(B_UINT32_TYPE, buffer, 20,
+		B_SWAP_HOST_TO_BENDIAN) != B_OK)
+		return B_ERROR;
+	if (outDestination->Write(buffer, 20) != 20)
+		return B_ERROR;
+		
+	// output actual style information
+	if (outDestination->Write(pflatRunArray,
+		data_size) != data_size)
+		return B_ERROR;
+	
+	return B_OK;
+}
+
 // convert the plain text from inSource to plain or styled text
 // in outDestination
 status_t
@@ -589,8 +619,44 @@ translate_from_text(BPositionIO *inSource, BPositionIO *outDestination,
 				
 		nread = inSource->Read(buffer, READ_BUFFER_SIZE);
 	}
+	
+	// Read file attributes if outputting styled data 
+	// and inSource is a BFile object
+	status_t result = B_OK;
+	if (!btoplain) {
+		BFile *pfile = NULL;
+		pfile = dynamic_cast<BFile *>(inSource);
+		if (pfile) {
+			const char *kAttrName = "styles";
+			attr_info info;
+			if (pfile->GetAttrInfo(kAttrName, &info) == B_OK) {
+				if (info.type != B_RAW_TYPE)
+					return B_NO_TRANSLATOR;
+				if (info.size < 160)
+					return B_NO_TRANSLATOR;
 		
-	return B_OK;
+				uint8 *pflatRunArray = new uint8[info.size];
+				if (pflatRunArray) {
+					ssize_t amtread = pfile->ReadAttr(kAttrName,
+						B_RAW_TYPE, 0, pflatRunArray, info.size);
+				
+					// write style data
+					if (amtread == info.size) {
+						result = output_styles(outDestination,
+							size, pflatRunArray, info.size);
+					} else
+						result = B_ERROR;
+				
+					delete[] pflatRunArray;
+					pflatRunArray = NULL;
+				
+				} else
+					result = B_NO_MEMORY;
+			}
+		}
+	}
+		
+	return result;
 }
 
 // ---------------------------------------------------------------
