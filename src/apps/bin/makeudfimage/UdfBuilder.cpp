@@ -138,11 +138,16 @@ UdfBuilder::Build()
 	uint16 partitionNumber = 0;
 	Udf::anchor_volume_descriptor anchor256;
 //	Udf::anchor_volume_descriptor anchorN;
+	Udf::extent_address primaryVdsExtent;
+	Udf::extent_address reserveVdsExtent;
 	Udf::primary_volume_descriptor primary;
 	Udf::partition_descriptor partition;
 	Udf::logical_volume_descriptor logical;
-	Udf::long_address fileSetAddress;
+	Udf::long_address filesetAddress;
+	Udf::extent_address filesetExtent;
 	Udf::extent_address integrityExtent;
+	Udf::file_set_descriptor fileset;
+	Udf::long_address rootIcbAddress;
 
 	_OutputFile().Seek(0, SEEK_SET);		
 	_PrintUpdate(VERBOSITY_LOW, "Output file: `%s'", fOutputFilename.c_str());		
@@ -233,14 +238,12 @@ UdfBuilder::Build()
 		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for anchor256 at block 256");
 		error = _Allocator().GetBlock(256);
 		// reserve primary vds (min length = 16 blocks, which is plenty for us)
-		Udf::extent_address primaryExtent;
-		Udf::extent_address reserveExtent;
 		if (!error) {
 			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for primary vds");
-			error = _Allocator().GetNextExtent(16 << _BlockShift(), true, primaryExtent);
+			error = _Allocator().GetNextExtent(16 << _BlockShift(), true, primaryVdsExtent);
 			if (!error) 
 				_PrintUpdate(VERBOSITY_HIGH, "udf: <location: %ld, length: %ld>",
-				             primaryExtent.location(), primaryExtent.length());
+				             primaryVdsExtent.location(), primaryVdsExtent.length());
 		}
 		// reserve reserve vds. try to grab the 16 blocks preceding block 256. if
 		// that fails, just grab any 16. most commercial discs just put the reserve
@@ -248,20 +251,20 @@ UdfBuilder::Build()
 		// now that I think about it... 
 		if (!error) {
 			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for reserve vds");
-			reserveExtent.set_location(256-16);
-			reserveExtent.set_length(16 << _BlockShift());
-			error = _Allocator().GetExtent(reserveExtent);
+			reserveVdsExtent.set_location(256-16);
+			reserveVdsExtent.set_length(16 << _BlockShift());
+			error = _Allocator().GetExtent(reserveVdsExtent);
 			if (error)
-				error = _Allocator().GetNextExtent(16 << _BlockShift(), true, reserveExtent);
+				error = _Allocator().GetNextExtent(16 << _BlockShift(), true, reserveVdsExtent);
 			if (!error) 
 				_PrintUpdate(VERBOSITY_HIGH, "udf: <location: %ld, length: %ld>",
-				             reserveExtent.location(), reserveExtent.length());
+				             reserveVdsExtent.location(), reserveVdsExtent.length());
 		}
 		// write anchor_256
 		if (!error) {
 			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing anchor256");
-			anchor256.main_vds() = primaryExtent;
-			anchor256.reserve_vds() = reserveExtent;
+			anchor256.main_vds() = primaryVdsExtent;
+			anchor256.reserve_vds() = reserveVdsExtent;
 			Udf::descriptor_tag &tag = anchor256.tag();
 			tag.set_id(Udf::TAGID_ANCHOR_VOLUME_DESCRIPTOR_POINTER);
 			tag.set_version(3);
@@ -335,7 +338,7 @@ UdfBuilder::Build()
 				// recalculate the checksums for each sequence.
 			DUMP(primary);
 			// write primary_vd to primary vds
-			primary.tag().set_location(primaryExtent.location()+vdsNumber);
+			primary.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 			primary.tag().set_checksums(primary);
 			ssize_t bytes = _OutputFile().WriteAt(primary.tag().location() << _BlockShift(),
 			                              &primary, sizeof(primary));
@@ -348,7 +351,7 @@ UdfBuilder::Build()
 			}
 			// write primary_vd to reserve vds				                             
 			if (!error) {
-				primary.tag().set_location(reserveExtent.location()+vdsNumber);
+				primary.tag().set_location(reserveVdsExtent.location()+vdsNumber);
 				primary.tag().set_checksums(primary);
 				ssize_t bytes = _OutputFile().WriteAt(primary.tag().location() << _BlockShift(),
 	        			                              &primary, sizeof(primary));
@@ -393,7 +396,7 @@ UdfBuilder::Build()
 				// recalculate the checksums for each sequence.
 			DUMP(partition);
 			// write partition descriptor to primary vds
-			partition.tag().set_location(primaryExtent.location()+vdsNumber);
+			partition.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 			partition.tag().set_checksums(partition);
 			ssize_t bytes = _OutputFile().WriteAt(partition.tag().location() << _BlockShift(),
 			                              &partition, sizeof(partition));
@@ -406,7 +409,7 @@ UdfBuilder::Build()
 			}
 			// write partition descriptor to reserve vds				                             
 			if (!error) {
-				partition.tag().set_location(reserveExtent.location()+vdsNumber);
+				partition.tag().set_location(reserveVdsExtent.location()+vdsNumber);
 				partition.tag().set_checksums(partition);
 				ssize_t bytes = _OutputFile().WriteAt(partition.tag().location() << _BlockShift(),
 	        			                              &partition, sizeof(partition));
@@ -442,12 +445,11 @@ UdfBuilder::Build()
 				memset(logical.logical_volume_contents_use().data, 0,
 				       logical.logical_volume_contents_use().size());			
 				// Allocate a block for the file set descriptor
-				Udf::extent_address temp;
 				error = _PartitionAllocator().GetNextExtent(_BlockSize(), true,
-				                                            fileSetAddress, temp);
+				                                            filesetAddress, filesetExtent);
 			}
 			if (!error) {
-				logical.file_set_address() = fileSetAddress;
+				logical.file_set_address() = filesetAddress;
 				logical.set_map_table_length(sizeof(Udf::physical_partition_map));
 				logical.set_partition_map_count(1);
 				logical.implementation_id() = Udf::kImplementationId;
@@ -475,7 +477,7 @@ UdfBuilder::Build()
 				DUMP(logical);
 				// write partition descriptor to primary vds
 				uint32 logicalSize = Udf::kLogicalVolumeDescriptorBaseSize + sizeof(map);
-				logical.tag().set_location(primaryExtent.location()+vdsNumber);
+				logical.tag().set_location(primaryVdsExtent.location()+vdsNumber);
 				logical.tag().set_checksums(logical, logicalSize);
 				ssize_t bytes = _OutputFile().WriteAt(logical.tag().location() << _BlockShift(),
 				                              &logical, sizeof(logical));
@@ -488,7 +490,7 @@ UdfBuilder::Build()
 				}
 				// write logical descriptor to reserve vds				                             
 				if (!error) {
-					logical.tag().set_location(reserveExtent.location()+vdsNumber);
+					logical.tag().set_location(reserveVdsExtent.location()+vdsNumber);
 					logical.tag().set_checksums(logical, logicalSize);
 					ssize_t bytes = _OutputFile().WriteAt(logical.tag().location() << _BlockShift(),
 		        			                              &logical, sizeof(logical));
@@ -502,21 +504,96 @@ UdfBuilder::Build()
 				}
 			}		
 		}
-		
-		
-		// Build the rest of the image
-		
-		
-		// Set the partition length and rewrite the partition descriptor
+				
+		// Error check
+		if (error) {				 
+			_PrintError("Error writing udf vds: 0x%lx, `%s'",
+			            error, strerror(error));
+		}
+	}
+	
+	// Write the file set descriptor
+	if (!error) {
+		fileset.recording_date_and_time() = _BuildTimeStamp();
+		fileset.set_interchange_level(3);
+		fileset.set_max_interchange_level(3);
+		fileset.set_character_set_list(1);
+		fileset.set_max_character_set_list(1);
+		fileset.set_file_set_number(0);
+		fileset.set_file_set_descriptor_number(0);
+		fileset.logical_volume_id_character_set() = Udf::kCs0CharacterSet;
+		memset(fileset.logical_volume_id().data, 0,
+		       fileset.logical_volume_id().size());			
+		memcpy(fileset.logical_volume_id().data,
+		       _UdfVolumeName().Cs0(), _UdfVolumeName().Cs0Length());
+		memset(fileset.file_set_id().data, 0,
+		       fileset.file_set_id().size());
+		uint32 copyLength = _UdfVolumeName().Cs0Length() > fileset.file_set_id().size()
+		                    ? fileset.file_set_id().size() : _UdfVolumeName().Cs0Length();
+		fileset.file_set_id_character_set() = Udf::kCs0CharacterSet;
+		memcpy(fileset.file_set_id().data,
+		       _UdfVolumeName().Cs0(), copyLength);
+		memset(fileset.copyright_file_id().data, 0,
+		       fileset.copyright_file_id().size());
+		memset(fileset.abstract_file_id().data, 0,
+		       fileset.abstract_file_id().size());
+		// Allocate space for the root icb
+		error = _PartitionAllocator().GetNextExtent(_BlockSize(), true, rootIcbAddress);
 		if (!error) {
-			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Finalizing partition descriptor");
-			partition.set_length(_PartitionAllocator().Length());
-			DUMP(partition);
-			// write partition descriptor to primary vds
-			partition.tag().set_location(primaryExtent.location()+partition.vds_number());
+			fileset.root_directory_icb() = rootIcbAddress;
+			fileset.domain_id() = kDomainId;
+			Udf::long_address nullAddress(0, 0, 0, 0);
+			fileset.next_extent() = nullAddress;
+			fileset.system_stream_directory_icb() = nullAddress;
+			memset(fileset.reserved().data, 0,
+			       fileset.reserved().size());
+			fileset.tag().set_id(Udf::TAGID_FILE_SET_DESCRIPTOR);
+			fileset.tag().set_version(3);
+			fileset.tag().set_serial_number(0);
+			fileset.tag().set_location(filesetAddress.block());
+			fileset.tag().set_checksums(fileset);
+			DUMP(fileset);
+			// write fsd				                             
+			ssize_t bytes = _OutputFile().WriteAt(filesetExtent.location() << _BlockShift(),
+        			                              &fileset, sizeof(fileset));
+			error = check_size_error(bytes, sizeof(fileset));                              
+			if (!error && bytes < ssize_t(_BlockSize())) {
+				ssize_t bytesLeft = _BlockSize() - bytes;
+				bytes = _OutputFile().ZeroAt((filesetExtent.location() << _BlockShift())
+				                             + bytes, bytesLeft);
+				error = check_size_error(bytes, bytesLeft);			                             
+			}
+		}
+	}
+
+	// Build the rest of the image
+
+
+	_PrintUpdate(VERBOSITY_LOW, "Finalizing volume");
+
+	// Set the final partition length and rewrite the partition descriptor
+	if (!error) {
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Finalizing partition descriptor");
+		partition.set_length(_PartitionAllocator().Length());
+		DUMP(partition);
+		// write partition descriptor to primary vds
+		partition.tag().set_location(primaryVdsExtent.location()+partition.vds_number());
+		partition.tag().set_checksums(partition);
+		ssize_t bytes = _OutputFile().WriteAt(partition.tag().location() << _BlockShift(),
+		                              &partition, sizeof(partition));
+		error = check_size_error(bytes, sizeof(partition));                              
+		if (!error && bytes < ssize_t(_BlockSize())) {
+			ssize_t bytesLeft = _BlockSize() - bytes;
+			bytes = _OutputFile().ZeroAt((partition.tag().location() << _BlockShift())
+			                             + bytes, bytesLeft);
+			error = check_size_error(bytes, bytesLeft);			                             
+		}
+		// write partition descriptor to reserve vds				                             
+		if (!error) {
+			partition.tag().set_location(reserveVdsExtent.location()+partition.vds_number());
 			partition.tag().set_checksums(partition);
 			ssize_t bytes = _OutputFile().WriteAt(partition.tag().location() << _BlockShift(),
-			                              &partition, sizeof(partition));
+        			                              &partition, sizeof(partition));
 			error = check_size_error(bytes, sizeof(partition));                              
 			if (!error && bytes < ssize_t(_BlockSize())) {
 				ssize_t bytesLeft = _BlockSize() - bytes;
@@ -524,29 +601,14 @@ UdfBuilder::Build()
 				                             + bytes, bytesLeft);
 				error = check_size_error(bytes, bytesLeft);			                             
 			}
-			// write partition descriptor to reserve vds				                             
-			if (!error) {
-				partition.tag().set_location(reserveExtent.location()+partition.vds_number());
-				partition.tag().set_checksums(partition);
-				ssize_t bytes = _OutputFile().WriteAt(partition.tag().location() << _BlockShift(),
-	        			                              &partition, sizeof(partition));
-				error = check_size_error(bytes, sizeof(partition));                              
-				if (!error && bytes < ssize_t(_BlockSize())) {
-					ssize_t bytesLeft = _BlockSize() - bytes;
-					bytes = _OutputFile().ZeroAt((partition.tag().location() << _BlockShift())
-					                             + bytes, bytesLeft);
-					error = check_size_error(bytes, bytesLeft);			                             
-				}
-			}
 		}
-		
 		// Error check
 		if (error) {				 
 			_PrintError("Error writing udf vds: 0x%lx, `%s'",
 			            error, strerror(error));
 		}
 	}
-
+		
 	if (!error)
 		_PrintUpdate(VERBOSITY_LOW, "Finished");
 	RETURN(error);
