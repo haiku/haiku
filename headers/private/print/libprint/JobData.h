@@ -11,6 +11,7 @@
 #include <Rect.h>
 
 #include "Halftone.h"
+#include "MarginView.h" // for MarginUnit
 
 class BMessage;
 class PrinterCap;
@@ -229,6 +230,8 @@ private:
 	BRect       fScaledPaperRect;
 	BRect       fPrintableRect;
 	BRect       fScaledPrintableRect;
+	BRect       fPhysicalRect;
+	BRect       fScaledPhysicalRect;
 	int32       fNup;
 	int32       fFirstPage;
 	int32       fLastPage;
@@ -246,6 +249,7 @@ private:
 	Color       fColor;
 	Halftone::DitherType fDitherType;
 	PageSelection        fPageSelection;
+	MarginUnit  fMarginUnit;
 
 public:
 	JobData(BMessage *msg, const PrinterCap *cap, Settings settings);
@@ -283,6 +287,12 @@ public:
 
 	const BRect &getScaledPrintableRect() const { return fScaledPrintableRect; }
 	void  setScaledPrintableRect(const BRect &printable_rect) { fScaledPrintableRect = printable_rect; }
+
+	const BRect &getPhysicalRect() const { return fPhysicalRect; }
+	void  setPhysicalRect(const BRect &Physical_rect) { fPhysicalRect = Physical_rect; }
+
+	const BRect &getScaledPhysicalRect() const { return fScaledPhysicalRect; }
+	void  setScaledPhysicalRect(const BRect &Physical_rect) { fScaledPhysicalRect = Physical_rect; }
 
 	int32 getNup() const { return fNup; }
 	void  setNup(int32 nup) { fNup = nup; }
@@ -331,6 +341,9 @@ public:
 	
 	PageSelection getPageSelection() const { return fPageSelection; }
 	void setPageSelection(PageSelection pageSelection) { fPageSelection = pageSelection; }
+	
+	MarginUnit getMarginUnit() const { return fMarginUnit; }
+	void setMarginUnit(MarginUnit marginUnit) { fMarginUnit = marginUnit; }
 };
 
 #endif	/* __JOBDATA_H */

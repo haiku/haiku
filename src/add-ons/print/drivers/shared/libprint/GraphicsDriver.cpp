@@ -53,7 +53,15 @@ GraphicsDriver::~GraphicsDriver()
 {
 }
 
-void GraphicsDriver::setupData(BFile *spool_file, long page_count)
+
+static BRect RotateRect(BRect rect)
+{
+	BRect rotated(rect.top, rect.left, rect.bottom, rect.right);
+	return rotated;
+}
+
+void 
+GraphicsDriver::setupData(BFile *spool_file, long page_count)
 {
 	BMessage *msg = new BMessage();
 	msg->Unflatten(spool_file);
@@ -62,18 +70,16 @@ void GraphicsDriver::setupData(BFile *spool_file, long page_count)
 	delete msg;
 
 	fRealJobData = new JobData(*fOrgJobData);
-	BRect rc;
 
 	switch (fOrgJobData->getNup()) {
 	case 2:
 	case 8:
 	case 32:
 	case 128:
-		rc.left   = fOrgJobData->getPrintableRect().top;
-		rc.top    = fOrgJobData->getPrintableRect().left;
-		rc.right  = fOrgJobData->getPrintableRect().bottom;
-		rc.bottom = fOrgJobData->getPrintableRect().right;
-		fRealJobData->setPrintableRect(rc);
+		fRealJobData->setPrintableRect(RotateRect(fOrgJobData->getPrintableRect()));
+		fRealJobData->setScaledPrintableRect(RotateRect(fOrgJobData->getScaledPrintableRect()));
+		fRealJobData->setPhysicalRect(RotateRect(fOrgJobData->getPhysicalRect()));
+		fRealJobData->setScaledPhysicalRect(RotateRect(fOrgJobData->getScaledPhysicalRect()));
 		if (JobData::kPortrait == fOrgJobData->getOrientation())
 			fRealJobData->setOrientation(JobData::kLandscape);
 		else
@@ -91,7 +97,8 @@ void GraphicsDriver::setupData(BFile *spool_file, long page_count)
 	fSpoolMetaData = new SpoolMetaData(spool_file);
 }
 
-void GraphicsDriver::cleanupData()
+void 
+GraphicsDriver::cleanupData()
 {
 	delete fRealJobData;
 	delete fOrgJobData;
@@ -101,15 +108,19 @@ void GraphicsDriver::cleanupData()
 	fSpoolMetaData = NULL;
 }
 
-void GraphicsDriver::setupBitmap()
+void 
+GraphicsDriver::setupBitmap()
 {
 	fPixelDepth = color_space2pixel_depth(fOrgJobData->getSurfaceType());
 
-	fPageWidth  = (fRealJobData->getPrintableRect().IntegerWidth()  * fOrgJobData->getXres() + 71) / 72;
-	fPageHeight = (fRealJobData->getPrintableRect().IntegerHeight() * fOrgJobData->getYres() + 71) / 72;
+	fPageWidth  = (fRealJobData->getPhysicalRect().IntegerWidth()  * fOrgJobData->getXres() + 71) / 72;
+	fPageHeight = (fRealJobData->getPhysicalRect().IntegerHeight() * fOrgJobData->getYres() + 71) / 72;
 
 	int widthByte = (fPageWidth * fPixelDepth + 7) / 8;
 	int size = widthByte * fPageHeight;
+#ifdef USE_PREVIEW_FOR_DEBUG
+	size = 0;
+#endif
 
 	if (size < kMaxMemorySize) {
 		fBandCount  = 0;
@@ -140,14 +151,16 @@ void GraphicsDriver::setupBitmap()
 	fBitmap->AddChild(fView);
 }
 
-void GraphicsDriver::cleanupBitmap()
+void 
+GraphicsDriver::cleanupBitmap()
 {
 	delete fBitmap;
 	fBitmap = NULL;
 	fView   = NULL;
 }
 
-static BPoint get_scale(JobData *org_job_data)
+static 
+BPoint get_scale(JobData *org_job_data)
 {
 	float width;
 	float height;
@@ -160,8 +173,8 @@ static BPoint get_scale(JobData *org_job_data)
 		scale.x = scale.y = 1.0f;
 		break;
 	case 2:	/* 1x2 or 2x1 */
-		width  = org_job_data->getPrintableRect().Width();
-		height = org_job_data->getPrintableRect().Height();
+		width  = org_job_data->getPhysicalRect().Width();
+		height = org_job_data->getPhysicalRect().Height();
 		if (width < height) {	// portrait
 			scale.x = height / 2.0f / width;
 			scale.y = width / height;
@@ -171,8 +184,8 @@ static BPoint get_scale(JobData *org_job_data)
 		}
 		break;
 	case 8:	/* 2x4 or 4x2 */
-		width  = org_job_data->getPrintableRect().Width();
-		height = org_job_data->getPrintableRect().Height();
+		width  = org_job_data->getPhysicalRect().Width();
+		height = org_job_data->getPhysicalRect().Height();
 		if (width < height) {
 			scale.x = height / 4.0f / width;
 			scale.y = width / height / 2.0f;
@@ -182,8 +195,8 @@ static BPoint get_scale(JobData *org_job_data)
 		}
 		break;
 	case 32:	/* 4x8 or 8x4 */
-		width  = org_job_data->getPrintableRect().Width();
-		height = org_job_data->getPrintableRect().Height();
+		width  = org_job_data->getPhysicalRect().Width();
+		height = org_job_data->getPhysicalRect().Height();
 		if (width < height) {
 			scale.x = height / 8.0f / width;
 			scale.y = width / height / 4.0f;
@@ -231,7 +244,8 @@ static BPoint get_scale(JobData *org_job_data)
 	return scale;
 }
 
-static BPoint get_offset(
+static BPoint 
+get_offset(
 	int index,
 	const BPoint *scale,
 	JobData *org_job_data)
@@ -240,8 +254,8 @@ static BPoint get_offset(
 	offset.x = 0;
 	offset.y = 0;
 
-	float width  = org_job_data->getScaledPrintableRect().Width();
-	float height = org_job_data->getScaledPrintableRect().Height();
+	float width  = org_job_data->getScaledPhysicalRect().Width();
+	float height = org_job_data->getScaledPhysicalRect().Height();
 
 	switch (org_job_data->getNup()) {
 	case 1:
@@ -315,6 +329,12 @@ static BPoint get_offset(
 		break;
 	}
 
+	// adjust margin
+	offset.x += org_job_data->getScaledPrintableRect().left - 
+		org_job_data->getPhysicalRect().left;
+	offset.y += org_job_data->getScaledPrintableRect().top -
+		org_job_data->getPhysicalRect().top;
+
 	float real_scale = min(scale->x, scale->y);
 	if (real_scale != scale->x)
 		offset.x *= scale->x / real_scale;
@@ -325,7 +345,8 @@ static BPoint get_offset(
 }
 
 // print the specified pages on a physical page
-bool GraphicsDriver::printPage(PageDataList *pages)
+bool 
+GraphicsDriver::printPage(PageDataList *pages)
 {
 #ifndef USE_PREVIEW_FOR_DEBUG
 	BPoint offset;
@@ -377,8 +398,6 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 			return false;
 		}
 	} while (offset.x >= 0.0f && offset.y >= 0.0f);
-
-	return true;
 #else	// !USE_PREVIEW_FOR_DEBUG
 	fView->SetScale(1.0);
 	fView->SetHighColor(255, 255, 255);
@@ -393,7 +412,7 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 
 	for (it = pages->begin() ; it != pages->end() ; it++) {
 		BPoint left_top(get_offset(page_index, &scale, fOrgJobData));
-		BRect clip(fOrgJobData->getPrintableRect());
+		BRect clip(fOrgJobData->getScaledPrintableRect());
 		clip.OffsetTo(left_top);
 		BRegion *region = new BRegion();
 		region->Set(clip);
@@ -413,14 +432,17 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 		page_index++;
 	}
 
-	BRect rc(fRealJobData->getPrintableRect());
+	BRect rc(fRealJobData->getPhysicalRect());
 	rc.OffsetTo(30.0, 30.0);
 	PreviewWindow *preview = new PreviewWindow(rc, "Preview", fBitmap);
 	preview->Go();
 #endif	// USE_PREVIEW_FOR_DEBUG
+
+	return true;
 }
 
-bool GraphicsDriver::collectPages(SpoolData *spool_data, PageDataList *pages)
+bool 
+GraphicsDriver::collectPages(SpoolData *spool_data, PageDataList *pages)
 {
 	// collect the pages to be printed on the physical page
 	PageData *page_data;
@@ -436,12 +458,14 @@ bool GraphicsDriver::collectPages(SpoolData *spool_data, PageDataList *pages)
 	return more;
 }
 
-bool GraphicsDriver::skipPages(SpoolData *spool_data)
+bool 
+GraphicsDriver::skipPages(SpoolData *spool_data)
 {
 	return collectPages(spool_data, NULL);
 }
 
-bool GraphicsDriver::printDocument(SpoolData *spool_data)
+bool 
+GraphicsDriver::printDocument(SpoolData *spool_data)
 {
 	bool more;
 	bool success;
@@ -525,7 +549,8 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 	return success;
 }
 
-bool GraphicsDriver::printJob(BFile *spool_file)
+bool 
+GraphicsDriver::printJob(BFile *spool_file)
 {
 	bool success = true;
 	print_file_header pfh;
@@ -579,7 +604,8 @@ bool GraphicsDriver::printJob(BFile *spool_file)
 	return success;
 }
 
-BMessage *GraphicsDriver::takeJob(BFile* spool_file, uint32 flags)
+BMessage *
+GraphicsDriver::takeJob(BFile* spool_file, uint32 flags)
 {
 	fFlags = flags;
 	BMessage *msg;
@@ -591,39 +617,46 @@ BMessage *GraphicsDriver::takeJob(BFile* spool_file, uint32 flags)
 	return msg;
 }
 
-bool GraphicsDriver::startDoc()
+bool 
+GraphicsDriver::startDoc()
 {
 	return true;
 }
 
-bool GraphicsDriver::startPage(int)
+bool 
+GraphicsDriver::startPage(int)
 {
 	return true;
 }
 
-bool GraphicsDriver::nextBand(BBitmap *, BPoint *)
+bool 
+GraphicsDriver::nextBand(BBitmap *, BPoint *)
 {
 	return true;
 }
 
-bool GraphicsDriver::endPage(int)
+bool 
+GraphicsDriver::endPage(int)
 {
 	return true;
 }
 
-bool GraphicsDriver::endDoc(bool)
+bool 
+GraphicsDriver::endDoc(bool)
 {
 	return true;
 }
 
-void GraphicsDriver::writeSpoolData(const void *buffer, size_t size) throw(TransportException)
+void 
+GraphicsDriver::writeSpoolData(const void *buffer, size_t size) throw(TransportException)
 {
 	if (fTransport) {
 		fTransport->write(buffer, size);
 	}
 }
 
-void GraphicsDriver::writeSpoolString(const char *format, ...) throw(TransportException)
+void 
+GraphicsDriver::writeSpoolString(const char *format, ...) throw(TransportException)
 {
 	if (fTransport) {
 		char buffer[256];
@@ -635,7 +668,8 @@ void GraphicsDriver::writeSpoolString(const char *format, ...) throw(TransportEx
 	}
 }
 
-void GraphicsDriver::writeSpoolChar(char c) throw(TransportException)
+void 
+GraphicsDriver::writeSpoolChar(char c) throw(TransportException)
 {
 	if (fTransport) {
 		fTransport->write(&c, 1);
@@ -643,7 +677,8 @@ void GraphicsDriver::writeSpoolChar(char c) throw(TransportException)
 }
 
 
-void GraphicsDriver::rgb32_to_rgb24(void* src, void* dst, int width) {
+void 
+GraphicsDriver::rgb32_to_rgb24(void* src, void* dst, int width) {
 	uint8* d = (uint8*)dst;
 	rgb_color* s = (rgb_color*)src;
 	for (int i = width; i > 0; i --) {
@@ -654,7 +689,8 @@ void GraphicsDriver::rgb32_to_rgb24(void* src, void* dst, int width) {
 	}
 }
 
-void GraphicsDriver::cmap8_to_rgb24(void* src, void* dst, int width) {
+void 
+GraphicsDriver::cmap8_to_rgb24(void* src, void* dst, int width) {
 	uint8* d = (uint8*)dst;
 	uint8* s = (uint8*)src;
 	const color_map* cmap = system_colors();
@@ -667,7 +703,8 @@ void GraphicsDriver::cmap8_to_rgb24(void* src, void* dst, int width) {
 	}
 }
 
-void GraphicsDriver::convert_to_rgb24(void* src, void* dst, int width, color_space cs) {
+void 
+GraphicsDriver::convert_to_rgb24(void* src, void* dst, int width, color_space cs) {
 	if (cs == B_RGB32) rgb32_to_rgb24(src, dst, width);
 	else if (cs == B_CMAP8) cmap8_to_rgb24(src, dst, width);
 	else {
@@ -675,7 +712,8 @@ void GraphicsDriver::convert_to_rgb24(void* src, void* dst, int width, color_spa
 	}
 }
 
-uint8 GraphicsDriver::gray(uint8 r, uint8 g, uint8 b) {
+uint8 
+GraphicsDriver::gray(uint8 r, uint8 g, uint8 b) {
 	if (r == g && g == b) {
 		return r;
 	} else {
@@ -684,7 +722,8 @@ uint8 GraphicsDriver::gray(uint8 r, uint8 g, uint8 b) {
 }
 
 
-void GraphicsDriver::rgb32_to_gray(void* src, void* dst, int width) {
+void 
+GraphicsDriver::rgb32_to_gray(void* src, void* dst, int width) {
 	uint8* d = (uint8*)dst;
 	rgb_color* s = (rgb_color*)src;
 	for (int i = width; i > 0; i --) {
@@ -693,7 +732,8 @@ void GraphicsDriver::rgb32_to_gray(void* src, void* dst, int width) {
 	}
 }
 
-void GraphicsDriver::cmap8_to_gray(void* src, void* dst, int width) {
+void 
+GraphicsDriver::cmap8_to_gray(void* src, void* dst, int width) {
 	uint8* d = (uint8*)dst;
 	uint8* s = (uint8*)src;
 	const color_map* cmap = system_colors();
@@ -704,7 +744,8 @@ void GraphicsDriver::cmap8_to_gray(void* src, void* dst, int width) {
 	}
 }
 
-void GraphicsDriver::convert_to_gray(void* src, void* dst, int width, color_space cs) {
+void 
+GraphicsDriver::convert_to_gray(void* src, void* dst, int width, color_space cs) {
 	if (cs == B_RGB32) rgb32_to_gray(src, dst, width);
 	else if (cs == B_CMAP8) cmap8_to_gray(src, dst, width);
 	else {

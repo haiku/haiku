@@ -29,9 +29,9 @@ struct BaseCap {
 struct PaperCap : public BaseCap {
 	JobData::Paper paper;
 	BRect paper_rect;
-	BRect printable_rect;
+	BRect physical_rect;
 	PaperCap(const string &n, bool d, JobData::Paper p, const BRect &r1, const BRect &r2)
-		: BaseCap(n, d), paper(p), paper_rect(r1), printable_rect(r2) {}
+		: BaseCap(n, d), paper(p), paper_rect(r1), physical_rect(r2) {}
 };
 
 struct PaperSourceCap : public BaseCap {
@@ -91,7 +91,7 @@ public:
 		kColor,
 		// Static boolean settings follow.
 		// For them isSupport() has to be implemented only.
-		kCopyCommand       // supports printer page copy command?
+		kCopyCommand,       // supports printer page copy command?
 	};
 
 	virtual int countCap(CapID) const = 0;

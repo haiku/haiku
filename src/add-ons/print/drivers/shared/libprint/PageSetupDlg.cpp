@@ -14,6 +14,7 @@
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <Font.h>
 #include <Looper.h>
 #include <MessageFilter.h>
 #include <MenuField.h>
@@ -25,15 +26,17 @@
 #include <RadioButton.h>
 #include <Rect.h>
 #include <String.h>
+#include <SupportDefs.h>
 #include <TextControl.h>
 #include <View.h>
 
-#include "PageSetupDlg.h"
+#include "BeUtils.h"
+#include "DbgMsg.h"
 #include "JobData.h"
+#include "MarginView.h"
+#include "PageSetupDlg.h"
 #include "PrinterData.h"
 #include "PrinterCap.h"
-#include "DbgMsg.h"
-#include "BeUtils.h"
 
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
@@ -41,30 +44,37 @@ using namespace std;
 #define std
 #endif
 
-#define	PAGESETUP_WIDTH		350
-#define PAGESETUP_HEIGHT	135
-
 #define	MENU_HEIGHT			16
+#define MENU_WIDTH          200
 #define BUTTON_WIDTH		70
 #define BUTTON_HEIGHT		20
 #define TEXT_HEIGHT         16
 
-#define ORIENT_H			10
-#define ORIENT_V			10
-#define ORIENT_WIDTH		100
-#define ORIENT_HEIGHT		60
-#define PORT_TEXT			"Portrait"
-#define RAND_TEXT			"Landscape"
+#define MARGIN_H            10
+#define MARGIN_V            10
+#define MARGIN_WIDTH        180
+#define MARGIN_HEIGHT       140
 
-#define PAPER_H				ORIENT_H + ORIENT_WIDTH + 15
-#define PAPER_V				20
-#define PAPER_WIDTH			200
+#define	PAGESETUP_WIDTH		MARGIN_H + MARGIN_WIDTH + 15 + MENU_WIDTH + 10
+#define PAGESETUP_HEIGHT	MARGIN_V + MARGIN_HEIGHT + BUTTON_HEIGHT + 20
+
+#define PAPER_H				MARGIN_H + MARGIN_WIDTH + 15
+#define PAPER_V				10
+#define PAPER_WIDTH			MENU_WIDTH
 #define PAPER_HEIGHT		MENU_HEIGHT
 #define PAPER_TEXT			"Paper Size:"
 
+#define ORIENT_H			PAPER_H
+#define ORIENT_V			PAPER_V + 24
+#define ORIENT_WIDTH		MENU_WIDTH
+#define ORIENT_HEIGHT		MENU_HEIGHT
+#define ORIENTATION_TEXT    "Orientation:"
+#define PORTRAIT_TEXT		"Portrait"
+#define LANDSCAPE_TEXT		"Landscape"
+
 #define RES_H				PAPER_H
-#define RES_V				PAPER_V + 24
-#define RES_WIDTH			150
+#define RES_V				ORIENT_V + 24
+#define RES_WIDTH			MENU_WIDTH
 #define RES_HEIGHT			MENU_HEIGHT
 #define RES_TEXT			"Resolution:"
 
@@ -84,14 +94,17 @@ using namespace std;
 
 #define PRINT_LINE_V		(PAGESETUP_HEIGHT - BUTTON_HEIGHT - 23)
 
-const BRect ORIENTAION_RECT(
+const BRect MARGIN_RECT(
+	MARGIN_H,
+	MARGIN_V,
+	MARGIN_H + MARGIN_WIDTH,
+	MARGIN_V + MARGIN_HEIGHT);
+
+const BRect ORIENTATION_RECT(
 	ORIENT_H,
 	ORIENT_V,
 	ORIENT_H + ORIENT_WIDTH,
 	ORIENT_V + ORIENT_HEIGHT);
-
-const BRect PORT_RECT(10, 15, 80, 14);
-const BRect LAND_RECT(10, 35, 80, 14);
 
 const BRect PAPER_RECT(
 	PAPER_H,
@@ -125,7 +138,9 @@ const BRect CANCEL_RECT(
 
 enum MSGS {
 	kMsgCancel = 1,
-	kMsgOK
+	kMsgOK,
+	kMsgOrientationChanged,
+	kMsgPaperChanged,
 };
 
 PageSetupView::PageSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
@@ -138,30 +153,47 @@ PageSetupView::~PageSetupView()
 {
 }
 
-void PageSetupView::AttachedToWindow()
+void
+PageSetupView::AddOrientationItem(const char* name, JobData::Orientation orientation)
+{
+	BMessage *msg = new BMessage(kMsgOrientationChanged);
+	msg->AddInt32("orientation", orientation);
+	BMenuItem *item = new BMenuItem(name, msg);
+	
+	fOrientation->AddItem(item);
+	item->SetTarget(this);
+	if (fJobData->getOrientation() == orientation) {
+		item->SetMarked(true);
+	} else if (fOrientation->CountItems() == 1) {
+		item->SetMarked(true);
+	}
+}
+
+void 
+PageSetupView::AttachedToWindow()
 {
 	BMenuItem  *item = NULL;
-	BMenuField *menufield;
+	BMenuField *menuField;
 	BButton    *button;
 	bool       marked;
 	int        count;
 
-	/* orientaion */
+	/* margin */
+	MarginUnit units = fJobData->getMarginUnit();
+	BRect paper = fJobData->getPaperRect();
+	BRect margin = fJobData->getPrintableRect();
 
-	BBox *box = new BBox(ORIENTAION_RECT);
-	AddChild(box);
-	box->SetLabel("Orientation");
+	// re-calculate the margin from the printable rect in points
+	margin.top -= paper.top;
+	margin.left -= paper.left;
+	margin.right = paper.right - margin.right;
+	margin.bottom = paper.bottom - margin.bottom;
 
-	fPortrait  = new BRadioButton(PORT_RECT, "", PORT_TEXT, NULL);
-	box->AddChild(fPortrait);
-
-	BRadioButton *landscape = new BRadioButton(LAND_RECT, "", RAND_TEXT, NULL);
-	box->AddChild(landscape);
-
-	if (JobData::kPortrait == fJobData->getOrientation())
-		fPortrait->SetValue(B_CONTROL_ON);
-	else
-		landscape->SetValue(B_CONTROL_ON);
+	fMarginView = new MarginView(MARGIN_RECT, 
+		paper.IntegerWidth(), 
+		paper.IntegerHeight(),
+			margin, units);
+	AddChild(fMarginView);
 
 	/* paper selection */
 
@@ -171,7 +203,9 @@ void PageSetupView::AttachedToWindow()
 	count = fPrinterCap->countCap(PrinterCap::kPaper);
 	PaperCap **paper_cap = (PaperCap **)fPrinterCap->enumCap(PrinterCap::kPaper);
 	while (count--) {
-		item = new BMenuItem((*paper_cap)->label.c_str(), NULL);
+		BMessage *msg = new BMessage(kMsgPaperChanged);
+		msg->AddPointer("paperCap", *paper_cap);
+		item = new BMenuItem((*paper_cap)->label.c_str(), msg);
 		fPaper->AddItem(item);
 		item->SetTarget(this);
 		if ((*paper_cap)->paper == fJobData->getPaper()) {
@@ -182,10 +216,32 @@ void PageSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(PAPER_RECT, "", PAPER_TEXT, fPaper);
-	AddChild(menufield);
+	menuField = new BMenuField(PAPER_RECT, "", PAPER_TEXT, fPaper);
+	AddChild(menuField);
 	float width = StringWidth(PAPER_TEXT) + 7;
-	menufield->SetDivider(width);
+	menuField->SetDivider(width);
+
+	/* orientaion */
+	fOrientation = new BPopUpMenu("orientation");
+	fOrientation->SetRadioMode(true);
+	
+	menuField = new BMenuField(ORIENTATION_RECT, "orientation", ORIENTATION_TEXT, fOrientation);
+	menuField->SetDivider(width);
+	
+	count = fPrinterCap->countCap(PrinterCap::kOrientation);
+	if (count == 0) {
+		AddOrientationItem(PORTRAIT_TEXT, JobData::kPortrait);
+		AddOrientationItem(LANDSCAPE_TEXT, JobData::kLandscape);
+	} else {
+		OrientationCap **orientation_cap = (OrientationCap **)fPrinterCap->enumCap(PrinterCap::kOrientation);
+		while (count--) {
+			AddOrientationItem((*orientation_cap)->label.c_str(),
+				(*orientation_cap)->orientation);
+			orientation_cap++;
+		}
+	}
+	
+	AddChild(menuField);
 
 	/* resolution */
 
@@ -206,9 +262,9 @@ void PageSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(RESOLUTION_RECT, "", RES_TEXT, fResolution);
-	AddChild(menufield);
-	menufield->SetDivider(width);
+	menuField = new BMenuField(RESOLUTION_RECT, "", RES_TEXT, fResolution);
+	AddChild(menuField);
+	menuField->SetDivider(width);
 
 	/* scale */
 	BString scale;
@@ -240,38 +296,50 @@ void PageSetupView::AttachedToWindow()
 	button->MakeDefault(true);
 }
 
-inline void swap(float *e1, float *e2)
+inline void 
+swap(float *e1, float *e2)
 {
 	float e = *e1;
 	*e1 = *e2;
 	*e2 = e;
 }
 
-bool PageSetupView::UpdateJobData()
+JobData::Orientation 
+PageSetupView::GetOrientation()
 {
-	if (B_CONTROL_ON == fPortrait->Value()) {
-		fJobData->setOrientation(JobData::kPortrait);
+	BMenuItem *item = fOrientation->FindMarked();
+	int32 orientation;
+	if (item != NULL &&
+		item->Message()->FindInt32("orientation", &orientation) == B_OK) {
+		return (JobData::Orientation)orientation;
 	} else {
-		fJobData->setOrientation(JobData::kLandscape);
+		return JobData::kPortrait;
 	}
+}
 
-	BRect paper_rect;
-	BRect printable_rect;
+PaperCap *
+PageSetupView::GetPaperCap()
+{
+	BMenuItem *item = fPaper->FindMarked();
+	void *pointer;
+	if (item != NULL &&
+		item->Message()->FindPointer("paperCap", &pointer) == B_OK) {
+		return (PaperCap*)pointer;
+	} else {
+		return (PaperCap*)fPrinterCap->getDefaultCap(PrinterCap::kPaper);
+	}
+}
+
+bool 
+PageSetupView::UpdateJobData()
+{
+	fJobData->setOrientation(GetOrientation());
+
+	PaperCap *paperCap = GetPaperCap();	
+	BRect paper_rect = paperCap->paper_rect;
+	BRect physical_rect = paperCap->physical_rect;
 
 	int count;
-
-	count = fPrinterCap->countCap(PrinterCap::kPaper);
-	PaperCap **paper_cap = (PaperCap **)fPrinterCap->enumCap(PrinterCap::kPaper);
-	const char *paper_label = fPaper->FindMarked()->Label();
-	while (count--) {
-		if (!strcmp((*paper_cap)->label.c_str(), paper_label)) {
-			fJobData->setPaper((*paper_cap)->paper);
-			paper_rect = (*paper_cap)->paper_rect;
-			printable_rect = (*paper_cap)->printable_rect;
-			break;
-		}
-		paper_cap++;
-	}
 
 	count = fPrinterCap->countCap(PrinterCap::kResolution);
 	ResolutionCap **resolution_cap = (ResolutionCap **)fPrinterCap->enumCap(PrinterCap::kResolution);
@@ -285,11 +353,26 @@ bool PageSetupView::UpdateJobData()
 		resolution_cap++;
 	}
 
+	// adjust printable rect by margin
+	fJobData->setMarginUnit(fMarginView->GetMarginUnit());
+	BRect margin = fMarginView->GetMargin();
+	BRect printable_rect = margin;
+	printable_rect.right = paper_rect.right - margin.right;
+	printable_rect.bottom = paper_rect.bottom - margin.bottom;
+
+	printable_rect.left = max_c(printable_rect.left, physical_rect.left);
+	printable_rect.top = max_c(printable_rect.top, physical_rect.top);
+	printable_rect.right = min_c(printable_rect.right, physical_rect.right);
+	printable_rect.bottom = min_c(printable_rect.bottom, physical_rect.bottom);
+
+
 	if (JobData::kLandscape == fJobData->getOrientation()) {
 		swap(&paper_rect.left, &paper_rect.top);
 		swap(&paper_rect.right, &paper_rect.bottom);
 		swap(&printable_rect.left, &printable_rect.top);
 		swap(&printable_rect.right, &printable_rect.bottom);
+		swap(&physical_rect.left, &physical_rect.top);
+		swap(&physical_rect.right, &physical_rect.bottom);
 	}
 
 	float scaling = atoi(fScaling->Text());
@@ -307,9 +390,33 @@ bool PageSetupView::UpdateJobData()
 	fJobData->setScaledPaperRect(ScaleRect(paper_rect, scalingR));
 	fJobData->setPrintableRect(printable_rect);
 	fJobData->setScaledPrintableRect(ScaleRect(printable_rect, scalingR));
+	fJobData->setPhysicalRect(physical_rect);
+	fJobData->setScaledPhysicalRect(ScaleRect(physical_rect, scalingR));	
 
 	fJobData->save();
 	return true;
+}
+
+void 
+PageSetupView::MessageReceived(BMessage *msg)
+{
+	switch (msg->what) {
+		case kMsgPaperChanged:
+		case kMsgOrientationChanged:
+			{
+				JobData::Orientation orientation = GetOrientation();
+				PaperCap *paperCap = GetPaperCap();
+				float width = paperCap->paper_rect.Width();
+				float height = paperCap->paper_rect.Height();
+				if (orientation != JobData::kPortrait) {
+					swap(&width, &height);
+				}
+				fMarginView->SetPageSize(width, height);
+				fMarginView->UpdateView(MARGIN_CHANGED);
+				
+			}
+			break;
+	}
 }
 
 //====================================================================
@@ -331,7 +438,8 @@ PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const P
 	SetResult(B_ERROR);
 }
 
-void PageSetupDlg::MessageReceived(BMessage *msg)
+void 
+PageSetupDlg::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 	case kMsgOK:

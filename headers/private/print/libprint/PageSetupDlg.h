@@ -8,12 +8,15 @@
 
 #include <View.h>
 #include "DialogWindow.h"
+#include "JobData.h"
 
 class BRadioButton;
 class BPopUpMenu;
 class JobData;
+class PaperCap;
 class PrinterData;
 class PrinterCap;
+class MarginView;
 
 class PageSetupView : public BView {
 public:
@@ -21,15 +24,21 @@ public:
 	~PageSetupView();
 	virtual void AttachedToWindow();
 	bool UpdateJobData();
+	void MessageReceived(BMessage *msg);
 
 private:
+	void AddOrientationItem(const char *name, JobData::Orientation orientation);
+	JobData::Orientation GetOrientation();
+	PaperCap *GetPaperCap();
+
 	JobData          *fJobData;
 	PrinterData      *fPrinterData;
 	const PrinterCap *fPrinterCap;
-	BRadioButton     *fPortrait;
 	BPopUpMenu       *fPaper;
+	BPopUpMenu       *fOrientation;
 	BPopUpMenu       *fResolution;
 	BTextControl     *fScaling;
+	MarginView       *fMarginView;
 };
 
 class PageSetupDlg : public DialogWindow {

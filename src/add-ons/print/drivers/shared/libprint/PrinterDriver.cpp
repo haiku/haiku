@@ -195,7 +195,17 @@ PrinterDriverInstance::~PrinterDriverInstance()
 
 char *add_printer(char *printerName)
 {
-	PrinterDriverInstance instance;
+	BPath path;
+	BNode folder;
+	BNode* spoolFolder = NULL;
+	// get spool folder
+	if (find_directory(B_USER_PRINTERS_DIRECTORY, &path) == B_OK &&
+		path.Append(printerName) == B_OK &&
+		folder.SetTo(path.Path()) == B_OK) {
+		spoolFolder = &folder;
+	}
+
+	PrinterDriverInstance instance(spoolFolder);
 	return instance.GetPrinterDriver()->AddPrinter(printerName);
 }
 

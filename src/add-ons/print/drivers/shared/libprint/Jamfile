@@ -15,6 +15,7 @@ StaticLibrary print :
 	JSDSlider.cpp
 	JobData.cpp
 	JobSetupDlg.cpp
+	MarginView.cpp
 	PackBits.cpp
 	PageSetupDlg.cpp
 	PagesView.cpp

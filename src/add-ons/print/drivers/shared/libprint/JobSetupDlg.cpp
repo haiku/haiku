@@ -649,6 +649,8 @@ JobSetupView::AttachedToWindow()
 			fDuplex->SetValue(B_CONTROL_ON);
 		}
 		fDuplex->SetTarget(this);
+	} else {
+		fDuplex = NULL;
 	}
 
 	/* copies */
@@ -717,7 +719,8 @@ JobSetupView::UpdateButtonEnabledState()
 	fFromPage->SetEnabled(pageRangeEnabled);
 	fToPage->SetEnabled(pageRangeEnabled);
 	
-	bool pageSelectionEnabled = fDuplex->Value() != B_CONTROL_ON;
+	bool pageSelectionEnabled = fDuplex == NULL || 
+		fDuplex->Value() != B_CONTROL_ON;
 	fAllPages->SetEnabled(pageSelectionEnabled);
 	fOddNumberedPages->SetEnabled(pageSelectionEnabled);
 	fEvenNumberedPages->SetEnabled(pageSelectionEnabled);

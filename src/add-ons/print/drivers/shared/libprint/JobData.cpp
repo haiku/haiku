@@ -34,6 +34,9 @@ static const char *kJDDitherType            = "JJJJ_dither_type";
 static const char *kJDPaperRect             = "JJJJ_paper_rect";
 static const char* kJDPrintableRect         = "JJJJ_printable_rect";
 static const char* kJDPageSelection         = "JJJJ_page_selection";
+static const char* kJDMarginUnit            = "JJJJ_margin_unit";
+static const char* kJDPhysicalRect          = "JJJJ_physical_rect";
+static const char* kJDScaledPhysicalRect    = "JJJJ_scaled_physical_rect";
 
 JobData::JobData(BMessage *msg, const PrinterCap *cap, Settings settings)
 {
@@ -72,6 +75,9 @@ JobData::JobData(const JobData &job_data)
 	fColor                 = job_data.fColor;
 	fDitherType            = job_data.fDitherType;
 	fPageSelection         = job_data.fPageSelection;
+	fMarginUnit            = job_data.fMarginUnit;
+	fPhysicalRect          = job_data.fPhysicalRect;
+	fScaledPhysicalRect    = job_data.fScaledPhysicalRect;
 }
 
 JobData &JobData::operator = (const JobData &job_data)
@@ -102,6 +108,9 @@ JobData &JobData::operator = (const JobData &job_data)
 	fColor                 = job_data.fColor;
 	fDitherType            = job_data.fDitherType;
 	fPageSelection         = job_data.fPageSelection;
+	fMarginUnit            = job_data.fMarginUnit;
+	fPhysicalRect          = job_data.fPhysicalRect;
+	fScaledPhysicalRect    = job_data.fScaledPhysicalRect;
 	return *this;
 }
 
@@ -163,6 +172,14 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 
 	if (msg->HasRect(kJDScaledPrintableRect)) {
 		fScaledPrintableRect = msg->FindRect(kJDScaledPrintableRect);
+	}
+
+	if (msg->HasRect(kJDPhysicalRect)) {
+		fPhysicalRect = msg->FindRect(kJDPhysicalRect);
+	}
+
+	if (msg->HasRect(kJDScaledPhysicalRect)) {
+		fScaledPhysicalRect = msg->FindRect(kJDScaledPhysicalRect);
 	}
 
 	if (msg->HasInt32(kJDFirstPage))
@@ -245,6 +262,11 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		fPageSelection = (PageSelection)msg->FindInt32(kJDPageSelection);
 	else
 		fPageSelection = kAllPages;
+
+	if (msg->HasInt32(kJDMarginUnit))
+		fMarginUnit = (MarginUnit)msg->FindInt32(kJDMarginUnit);
+	else
+		fMarginUnit = kUnitInch;
 }
 
 void JobData::save(BMessage *msg)
@@ -298,6 +320,21 @@ void JobData::save(BMessage *msg)
 		msg->ReplaceRect(kJDScaledPrintableRect, fScaledPrintableRect);
 	else
 		msg->AddRect(kJDScaledPrintableRect, fScaledPrintableRect);
+
+	if (msg->HasRect(kJDPhysicalRect))
+		msg->ReplaceRect(kJDPhysicalRect, fPhysicalRect);
+	else
+		msg->AddRect(kJDPhysicalRect, fPhysicalRect);
+
+	if (msg->HasRect(kJDScaledPhysicalRect))
+		msg->ReplaceRect(kJDScaledPhysicalRect, fScaledPhysicalRect);
+	else
+		msg->AddRect(kJDScaledPhysicalRect, fScaledPhysicalRect);
+
+	if (msg->HasInt32(kJDMarginUnit))
+		msg->ReplaceInt32(kJDMarginUnit, fMarginUnit);
+	else
+		msg->AddInt32(kJDMarginUnit, fMarginUnit);
 
 	// page settings end here; don't store job settings in message
 	if (fSettings == kPageSettings) return;
