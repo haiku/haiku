@@ -7,6 +7,11 @@
 	\brief disk_scanner partition module for "intel" style partitions.
 */
 
+// TODO: The implementation is very strict right now. It rejects a partition
+// completely, if it finds an error in its partition tables. We should see,
+// what error can be handled gracefully, e.g. by ignoring the partition
+// descriptor or the whole partition table sector.
+
 #include <errno.h>
 #include <new.h>
 #include <stdlib.h>
