@@ -843,11 +843,13 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			// here we remove current layer from list.
 			cl->RemoveSelf();
-			
-			// TODO: invalidate the region occupied by this view.
 			cl->PruneTree();
-
+			
+			parent->Invalidate(cl->Frame());
+			
+			#ifdef DEBUG_SERVERWINDOW
 			parent->PrintTree();
+			#endif
 			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fTitle.String(), parent->fName->String(), cl->fName->String()));
 
 			delete cl;
@@ -876,16 +878,18 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			// these 4 are here because of a compiler warning. Maybe he's right... :-)
 			rgb_color	hc, lc, vc; // high, low and view colors
-			uint64		patt;		// current pattern as a uint64
+			uint64		patt;
 			
-			ld			= cl->fLayerData; // now we write fewer characters. :-)
-			hc			= ld->highcolor.GetColor32();
-			lc			= ld->lowcolor.GetColor32();
-			vc			= ld->viewcolor.GetColor32();
-			patt		= ld->patt.GetInt64();
+			ld = cl->fLayerData; // now we write fewer characters. :-)
+			hc = ld->highcolor.GetColor32();
+			lc = ld->lowcolor.GetColor32();
+			vc = ld->viewcolor.GetColor32();
+			patt = ld->patt.GetInt64();
 			
 			// TODO: DW implement such a method in ServerFont class!
 			fSession->StartMessage(SERVER_TRUE);
+			
+			// Attach font state
 			fSession->Attach<uint32>(0UL /*uint32 ld->font.GetFamAndStyle()*/);
 			fSession->Attach<float>(ld->font.Size());
 			fSession->Attach<float>(ld->font.Shear());
@@ -895,14 +899,13 @@ void ServerWindow::DispatchMessage(int32 code)
 			fSession->Attach<uint16>(ld->font.Face());
 			fSession->Attach<uint32>(ld->font.Flags());
 			
+			// Attach view state
 			fSession->Attach<BPoint>(ld->penlocation);
 			fSession->Attach<float>(ld->pensize);
 			fSession->Attach(&hc, sizeof(rgb_color));
 			fSession->Attach(&lc, sizeof(rgb_color));
 			fSession->Attach(&vc, sizeof(rgb_color));
-			
-			// TODO: fix this to use the templatized version
-			fSession->Attach(&patt,sizeof(pattern));
+			fSession->Attach<uint64>(patt);
 			fSession->Attach<BPoint>(ld->coordOrigin);
 			fSession->Attach<uint8>((uint8)(ld->draw_mode));
 			fSession->Attach<uint8>((uint8)(ld->lineCap));
@@ -949,7 +952,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			fSession->Read<float>(&newWidth);
 			fSession->Read<float>(&newHeight);
 			
-			// TODO: check for minimum alowed. WinBorder should provide such
+			// TODO: check for minimum allowed. WinBorder should provide such
 			// a method, based on its decorator.
 			
 			cl->ResizeBy(newWidth, newHeight);
@@ -1636,6 +1639,27 @@ void ServerWindow::DispatchMessage(int32 code)
 
 			break;
 		}
+		case AS_SET_SIZE_LIMITS:
+		{
+			// Attached Data:
+			// 1) float minimum width
+			// 2) float maximum width
+			// 3) float minimum height
+			// 4) float maximum height
+			
+			float wmin,wmax,hmin,hmax;
+			
+			fSession->Read<float>(&wmin);
+			fSession->Read<float>(&wmax);
+			fSession->Read<float>(&hmin);
+			fSession->Read<float>(&hmax);
+			
+			fWinBorder->SetSizeLimits(wmin,wmax,hmin,hmax);
+			
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Flush();
+			break;
+		}
 		case B_MINIMIZE:
 		{
 			// TODO: Implement
@@ -1709,8 +1733,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		
 		if (layer)
 		{
-			// TODO: fix!
-			//layerdata = layer->GetLayerData();
+			layerdata = layer->fLayerData;
 			LayerClipRegion.Set(layer->Frame());
 			LayerClipRegion.IntersectWith(&WindowClipRegion);
 			numRects = LayerClipRegion.CountRects();

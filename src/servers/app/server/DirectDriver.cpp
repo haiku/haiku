@@ -203,7 +203,7 @@ void DirectDriver::InvertRect(const BRect &r)
 			index = start;
 			for(int32 i=0;i<height;i++)
 			{
-				// TODO: Where is the alpha bit
+				// TODO: Where is the alpha bit?
 				for(int32 j=0; j<width; j++)
 					index[j]^=0xFFFF;
 				index = (uint16 *)((uint8 *)index+framebuffer->BytesPerRow());
@@ -354,20 +354,20 @@ bool DirectDriver::DumpToFile(const char *path)
 
 status_t DirectDriver::SetDPMSMode(const uint32 &state)
 {
-	// TODO: Implement software DPMS
-	return B_ERROR;
+	// This is a hack, but should do enough to be ok for our purposes
+	return BScreen().SetDPMS(state);
 }
 
 uint32 DirectDriver::DPMSMode(void) const
 {
-	// TODO: Implement software DPMS
-	return B_DPMS_ON;
+	// This is a hack, but should do enough to be ok for our purposes
+	return BScreen().DPMSState();
 }
 
 uint32 DirectDriver::DPMSCapabilities(void) const
 {
-	// TODO: Implement software DPMS
-	return B_DPMS_ON;
+	// This is a hack, but should do enough to be ok for our purposes
+	return BScreen().DPMSCapabilites();
 }
 
 status_t DirectDriver::GetDeviceInfo(accelerant_device_info *info)

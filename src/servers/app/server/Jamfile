@@ -16,6 +16,7 @@ SharedLibrary appserver :
 	ColorSet.cpp
 	Decorator.cpp
 	DisplayDriver.cpp
+	DisplaySupport.cpp
 	FontFamily.cpp
 	LayerData.cpp
 	PatternHandler.cpp

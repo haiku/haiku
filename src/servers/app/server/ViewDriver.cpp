@@ -426,10 +426,14 @@ bool VDWindow::QuitRequested(void)
 {
 	port_id serverport=find_port(SERVER_PORT_NAME);
 
-	if(serverport!=B_NAME_NOT_FOUND)
+	if(serverport>=0)
 	{
-		write_port(serverport,B_QUIT_REQUESTED,NULL,0);
+		BPortLink link(serverport);
+		link.StartMessage(B_QUIT_REQUESTED);
+		link.Flush();
 	}
+	else
+		printf("ERROR: couldn't find the app_server's main port!");
 	
 	// We actually have to perform the internal equivalent of calling Shutdown
 	// to eliminate a race condition. If a ServerWindow attempts to call a driver
@@ -897,20 +901,24 @@ status_t ViewDriver::SetDPMSMode(const uint32 &state)
 	if(!is_initialized)
 		return B_ERROR;
 		
-	// TODO: Implement software DPMS
-	return B_ERROR;
+	// NOTE: Originally, this was a to-do item to implement software DPMS,
+	// but this driver will not be the official testing driver, so implementing
+	// this stuff the way it was intended -- blanking the server's screen but not
+	// the physical monitor -- is moot, but we will support blanking the
+	// actual monitor if it is supported.
+	return BScreen().SetDPMS(state);
 }
 
 uint32 ViewDriver::DPMSMode(void) const
 {
-	// TODO: Implement software DPMS
-	return B_DPMS_ON;
+	// See note for SetDPMSMode if there are questions
+	return BScreen().DPMSState();
 }
 
 uint32 ViewDriver::DPMSCapabilities(void) const
 {
-	// TODO: Implement software DPMS
-	return B_DPMS_ON;
+	// See note for SetDPMSMode if there are questions
+	return BScreen().DPMSCapabilites();
 }
 
 status_t ViewDriver::GetDeviceInfo(accelerant_device_info *info)
@@ -937,9 +945,11 @@ status_t ViewDriver::GetModeList(display_mode **modes, uint32 *count)
 		return B_ERROR;
 
 	screenwin->Lock();
-		
-	// TODO: Figure out good timing values to be returned in each of the modes
-	// supported.
+	
+	// DEPRECATED:
+	// NOTE: Originally, I was going to figure out good timing values to be 
+	// returned in each of the modes supported, but I won't bother, being this
+	// won't be used much longer anyway. 
 	
 	*modes=new display_mode[13];
 	*count=13;
@@ -1019,11 +1029,9 @@ status_t ViewDriver::ProposeMode(display_mode *candidate, const display_mode *lo
 	if(!is_initialized)
 		return B_ERROR;
 		
-	// TODO: Unhack
-
 	// We should be able to get away with this because we're not dealing with any
 	// specific hardware. This is a Good Thing(TM) because we can support any hardware
-	// we wish within reasbonable expectaions and programmer laziness. :P
+	// we wish within reasonable expectaions and programmer laziness. :P
 	return B_OK;
 }
 

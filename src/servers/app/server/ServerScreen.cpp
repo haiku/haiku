@@ -46,12 +46,25 @@ Screen::~Screen(void)
 
 bool Screen::SupportsResolution(BPoint res, uint32 colorspace)
 {
-// TODO: remove/improve
+	// TODO: remove/improve
 	return true;
 	display_mode	*dm = NULL;
 	uint32			count;
 
-	fDDriver->GetModeList(&dm, &count);
+	status_t err=fDDriver->GetModeList(&dm, &count);
+	
+	if(err==B_UNSUPPORTED)
+	{
+		// We've run into quite a problem here! This is a function which is a requirement
+		// for a graphics module. The best thing that we can hope for is 640x480x8 without
+		// knowing anything else. While even this seems like insanity to assume that we
+		// can support this, the only lower mode supported is 640x400, but we shouldn't even
+		// bother with such a pathetic possibility.
+		if( (uint16)res.x == 640 && (uint16)res.y ==480 && colorspace==B_CMAP8)
+			return true;
+		else
+			return false;
+	}
 
 	for (uint32 i=0; i < count; i++)
 	{
@@ -61,7 +74,7 @@ bool Screen::SupportsResolution(BPoint res, uint32 colorspace)
 			return true;
 	}
 
-	delete dm;
+	delete [] dm;
 	return false;
 }
 

@@ -38,8 +38,6 @@ public:
 	~Screen(void);
 	
 	void				SetID(int32 ID){ fID = ID; }
-
-	// TODO: get/set prototype methods for graphic card features
 	bool				SupportsResolution(BPoint res, uint32 colorspace);
 	bool				SetResolution(BPoint res, uint32 colorspace);
 	BPoint				Resolution() const;
@@ -48,7 +46,6 @@ public:
 	DisplayDriver*		DDriver() const { return fDDriver; }
 
 private:
-	// TODO: members in which we should store data.
 	int32				fID;
 	DisplayDriver		*fDDriver;
 };

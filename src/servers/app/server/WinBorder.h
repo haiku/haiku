@@ -70,6 +70,8 @@ public:
 	void ServerHide();
 	void ServerUnhide();
 
+	void SetSizeLimits(float minwidth, float maxwidth, float minheight, float maxheight);
+
 	void MouseDown(PointerEvent& evt, bool sendMessage);
 	void MouseMoved(PointerEvent& evt);
 	void MouseUp(PointerEvent& evt);
@@ -94,7 +96,7 @@ public:
 	
 	// Server "private" :-) - should not be used
 	void SetMainWinBorder(WinBorder *newMain);	
-
+	
 protected:
 	friend class Layer;
 	friend class ServerWindow;
@@ -114,6 +116,9 @@ protected:
 	bool fIsClosing;
 	bool fIsMinimizing;
 	bool fIsZooming;
+	
+	float fMinWidth, fMaxWidth;
+	float fMinHeight, fMaxHeight;
 };
 
 #endif

@@ -377,19 +377,42 @@ void WinBorder::ResizeBy(float x, float y)
 	Layer::ResizeBy(x,y);
 }
 
-bool WinBorder::IsHidden() const{
+bool WinBorder::IsHidden() const
+{
 	if (fServerHidden)
 		return true;
 
 	return Layer::IsHidden();
 }
 
-void WinBorder::ServerHide(){
+void WinBorder::ServerHide()
+{
 	fServerHidden = true;
 }
 
-void WinBorder::ServerUnhide(){
+void WinBorder::ServerUnhide()
+{
 	fServerHidden = false;
+}
+
+void WinBorder::SetSizeLimits(float minwidth, float maxwidth, float minheight, float maxheight)
+{
+	if(minwidth<0)
+		minwidth=0;
+
+	if(minheight<0)
+		minheight=0;
+	
+	if(maxwidth<=minwidth)
+		maxwidth=minwidth+1;
+	
+	if(maxheight<=minheight)
+		maxheight=minheight+1;
+	
+	fMinWidth=minwidth;
+	fMaxWidth=maxwidth;
+	fMinHeight=minheight;
+	fMaxHeight=maxheight;
 }
 
 bool WinBorder::HasPoint(const BPoint& pt) const
