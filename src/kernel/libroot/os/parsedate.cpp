@@ -13,6 +13,14 @@
 #include <ctype.h>
 
 
+#define TRACE_PARSEDATE 0
+#if TRACE_PARSEDATE
+#	define TRACE(x) printf x ;
+#else
+#	define TRACE(x) ;
+#endif
+
+
 /* The date format is as follows:
  *
  *	a/A		weekday
@@ -102,41 +110,42 @@ static const char * const *sFormatsTable = kFormatsTable;
 
 
 enum field_type {
-	TYPE_DAY_UNIT		= 0x0100,
-	TYPE_SECOND_UNIT	= 0x0200,
-	TYPE_MONTH_UNIT		= 0x0400,
-	TYPE_YEAR_UNIT		= 0x0800,
+	TYPE_UNKNOWN	= 0,
 
-	TYPE_RELATIVE		= 0x1000,
-	TYPE_NOT_MODIFIABLE = 0x2000,
-	TYPE_MODIFIER		= 0x4000,
-	TYPE_UNIT			= 0x8000,
+	TYPE_DAY,
+	TYPE_MONTH,
+	TYPE_YEAR,
+	TYPE_WEEKDAY,
+	TYPE_HOUR,
+	TYPE_MINUTE,
+	TYPE_SECOND,
+	TYPE_TIME_ZONE,
+	TYPE_MERIDIAN,
 
-	TYPE_UNIT_MASK		= 0x0f00,
-	TYPE_MASK			= 0x00ff,
+	TYPE_DASH,
+	TYPE_DOT,
+	TYPE_COMMA,
+	TYPE_COLON,
 
-	TYPE_UNKNOWN		= 0,
-
-	TYPE_DAY			= 1 | TYPE_DAY_UNIT,
-	TYPE_MONTH			= 2 | TYPE_MONTH_UNIT,
-	TYPE_YEAR			= 3 | TYPE_MONTH_UNIT,
-	TYPE_WEEKDAY		= 4 | TYPE_DAY_UNIT,
-	TYPE_NOW			= 5,
-	TYPE_HOUR			= 6 | TYPE_SECOND_UNIT,
-	TYPE_MINUTE			= 7 | TYPE_SECOND_UNIT,
-	TYPE_SECOND			= 8 | TYPE_SECOND_UNIT,
-	TYPE_TIME_ZONE		= 9 | TYPE_SECOND_UNIT,
-	TYPE_MERIDIAN		= 10 | TYPE_SECOND_UNIT,
-
-	TYPE_DASH			= 12,
-	TYPE_DOT			= 13,
-	TYPE_COMMA			= 14,
-	TYPE_COLON			= 15,
-	
-	TYPE_PLUS_MINUS		= 16 | TYPE_MODIFIER | TYPE_RELATIVE,
-	TYPE_NEXT_LAST_THIS	= 17 | TYPE_MODIFIER | TYPE_RELATIVE,
-
+	TYPE_UNIT,
+	TYPE_MODIFIER,
 	TYPE_END,
+};
+
+#define FLAG_NONE				0
+#define FLAG_RELATIVE			1
+#define FLAG_NOT_MODIFIABLE		2
+#define FLAG_NOW				4
+#define FLAG_NEXT_LAST_THIS		8
+#define FLAG_PLUS_MINUS			16
+#define FLAG_HAS_DASH			32
+
+enum units {
+	UNIT_NONE,
+	UNIT_YEAR,
+	UNIT_MONTH,
+	UNIT_DAY,
+	UNIT_SECOND,
 };
 
 enum value_type {
@@ -146,65 +155,68 @@ enum value_type {
 };
 
 enum value_modifier {
-	MODIFY_PLUS,
-	MODIFY_MINUS,
-	MODIFY_NEXT,
-	MODIFY_THIS,
-	MODIFY_LAST,
+	MODIFY_MINUS	= -2,
+	MODIFY_LAST		= -1,
+	MODIFY_NONE		= 0,
+	MODIFY_THIS		= MODIFY_NONE,
+	MODIFY_NEXT		= 1,
+	MODIFY_PLUS		= 2,
 };
 
 struct known_identifier {
 	const char	*string;
 	const char	*alternate_string;
-	int32		type;
+	uint8		type;
+	uint8		flags;
+	uint8		unit;
 	int32		value;
 };
 
 static const known_identifier kIdentifiers[] = {
-	{"today",		NULL,	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_DAY_UNIT, 0},
-	{"tomorrow",	NULL,	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_DAY_UNIT, 1},
-	{"yesterday",	NULL,	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_DAY_UNIT, -1},
-	{"now",			NULL,	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_NOW, 0},
+	{"today",		NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE, UNIT_DAY, 0},
+	{"tomorrow",	NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE, UNIT_DAY, 1},
+	{"yesterday",	NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE, UNIT_DAY, -1},
+	{"now",			NULL,	TYPE_UNIT, FLAG_RELATIVE | FLAG_NOT_MODIFIABLE | FLAG_NOW, 0},
 
-	{"this",		NULL,	TYPE_NEXT_LAST_THIS, 0},
-	{"next",		NULL,	TYPE_NEXT_LAST_THIS, 1},
-	{"last",		NULL,	TYPE_NEXT_LAST_THIS, -1},
+	{"this",		NULL,	TYPE_MODIFIER, FLAG_NEXT_LAST_THIS, UNIT_NONE, MODIFY_THIS},
+	{"next",		NULL,	TYPE_MODIFIER, FLAG_NEXT_LAST_THIS, UNIT_NONE, MODIFY_NEXT},
+	{"last",		NULL,	TYPE_MODIFIER, FLAG_NEXT_LAST_THIS, UNIT_NONE, MODIFY_LAST},
 
-	{"years",		"year",	TYPE_UNIT | TYPE_RELATIVE | TYPE_YEAR_UNIT, 1},
-	{"months",		"month",TYPE_UNIT | TYPE_RELATIVE | TYPE_MONTH_UNIT, 1},
-	{"days",		"day",	TYPE_UNIT | TYPE_RELATIVE | TYPE_DAY_UNIT, 1},
-	{"hour",		NULL,	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1 * 60 * 60},
-	{"hours",		"hrs",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1 * 60 * 60},
-	{"second",		"sec",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1},
-	{"seconds",		"secs",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1},
-	{"minute",		"min",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 60},
-	{"minutes",		"mins",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 60},
+	{"years",		"year",	TYPE_UNIT, FLAG_RELATIVE, UNIT_YEAR, 1},
+	{"months",		"month",TYPE_UNIT, FLAG_RELATIVE, UNIT_MONTH, 1},
+	{"days",		"day",	TYPE_UNIT, FLAG_RELATIVE, UNIT_DAY, 1},
+	{"hour",		NULL,	TYPE_UNIT, FLAG_RELATIVE, UNIT_SECOND, 1 * 60 * 60},
+	{"hours",		"hrs",	TYPE_UNIT, FLAG_RELATIVE, UNIT_SECOND, 1 * 60 * 60},
+	{"second",		"sec",	TYPE_UNIT, FLAG_RELATIVE, UNIT_SECOND, 1},
+	{"seconds",		"secs",	TYPE_UNIT, FLAG_RELATIVE, UNIT_SECOND, 1},
+	{"minute",		"min",	TYPE_UNIT, FLAG_RELATIVE, UNIT_SECOND, 60},
+	{"minutes",		"mins",	TYPE_UNIT, FLAG_RELATIVE, UNIT_SECOND, 60},
 
-	{"am",			NULL,	TYPE_MERIDIAN | TYPE_NOT_MODIFIABLE, 0},
-	{"pm",			NULL,	TYPE_MERIDIAN | TYPE_NOT_MODIFIABLE, 12 * 60 * 60},	// 12 hours
+	{"am",			NULL,	TYPE_MERIDIAN, FLAG_NOT_MODIFIABLE, UNIT_SECOND, 0},
+	{"pm",			NULL,	TYPE_MERIDIAN, FLAG_NOT_MODIFIABLE, UNIT_SECOND, 12 * 60 * 60},
 
-	{"sunday",		"sun",	TYPE_WEEKDAY, 0},
-	{"monday",		"mon",	TYPE_WEEKDAY, 1},
-	{"tuesday",		"tue",	TYPE_WEEKDAY, 2},
-	{"wednesday",	"wed",	TYPE_WEEKDAY, 3},
-	{"thursday",	"thu",	TYPE_WEEKDAY, 4},
-	{"friday",		"fri",	TYPE_WEEKDAY, 5},
-	{"saturday",	"sat",	TYPE_WEEKDAY, 6},
+	{"sunday",		"sun",	TYPE_WEEKDAY, FLAG_NONE, UNIT_DAY, 0},
+	{"monday",		"mon",	TYPE_WEEKDAY, FLAG_NONE, UNIT_DAY, 1},
+	{"tuesday",		"tue",	TYPE_WEEKDAY, FLAG_NONE, UNIT_DAY, 2},
+	{"wednesday",	"wed",	TYPE_WEEKDAY, FLAG_NONE, UNIT_DAY, 3},
+	{"thursday",	"thu",	TYPE_WEEKDAY, FLAG_NONE, UNIT_DAY, 4},
+	{"friday",		"fri",	TYPE_WEEKDAY, FLAG_NONE, UNIT_DAY, 5},
+	{"saturday",	"sat",	TYPE_WEEKDAY, FLAG_NONE, UNIT_DAY, 6},
 
-	{"january",		"jan",	TYPE_MONTH, 1},
-	{"february",	"feb", 	TYPE_MONTH, 2},
-	{"march",		"mar",	TYPE_MONTH, 3},
-	{"april",		"apr",	TYPE_MONTH, 4},
-	{"may",			"may",	TYPE_MONTH, 5},
-	{"june",		"jun",	TYPE_MONTH, 6},
-	{"july",		"jul",	TYPE_MONTH, 7},
-	{"august",		"aug",	TYPE_MONTH, 8},
-	{"september",	"sep",	TYPE_MONTH, 9},
-	{"october",		"oct",	TYPE_MONTH, 10},
-	{"november",	"nov",	TYPE_MONTH, 11},
-	{"december",	"dec",	TYPE_MONTH, 12},
+	{"january",		"jan",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 1},
+	{"february",	"feb", 	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 2},
+	{"march",		"mar",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 3},
+	{"april",		"apr",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 4},
+	{"may",			"may",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 5},
+	{"june",		"jun",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 6},
+	{"july",		"jul",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 7},
+	{"august",		"aug",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 8},
+	{"september",	"sep",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 9},
+	{"october",		"oct",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 10},
+	{"november",	"nov",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 11},
+	{"december",	"dec",	TYPE_MONTH, FLAG_NONE, UNIT_MONTH, 12},
 
-	{"GMT",			NULL,	TYPE_TIME_ZONE,	0},
+	{"GMT",			NULL,	TYPE_TIME_ZONE,	FLAG_NONE, UNIT_SECOND, 0},
 		// ToDo: add more time zones
 
 	{NULL}
@@ -212,66 +224,152 @@ static const known_identifier kIdentifiers[] = {
 
 #define MAX_ELEMENTS	32
 
-struct parsed_element {
-	int32		type;
-	int32		value_type;
-	int32		modifier;
-	bigtime_t	value;
+class DateMask {
+	public:
+		DateMask() : fMask(0UL) {}
+
+		void Set(uint8 type) { fMask |= Flag(type); }
+		bool IsSet(uint8 type) { return fMask & Flag(type); }
+
+		bool HasTime();
+		bool IsComplete();
+
+	private:
+		inline uint32 Flag(uint8 type) { return 1UL << type; }
+
+		uint32	fMask;
 };
 
 
-bool
-isType(int32 typeA, int32 typeB)
+struct parsed_element {
+	uint8		base_type;
+	uint8		type;
+	uint8		flags;
+	uint8		unit;
+	uint8		value_type;
+	int8		modifier;
+	bigtime_t	value;
+	
+	void SetCharType(uint8 fieldType, int8 modify = MODIFY_NONE);
+
+	void Adopt(const known_identifier &identifier);
+	void AdoptUnit(const known_identifier &identifier);
+	bool IsNextLastThis();
+};
+
+
+void 
+parsed_element::SetCharType(uint8 fieldType, int8 modify)
 {
-	return (typeA & TYPE_MASK) == (typeB & TYPE_MASK);
+	base_type = type = fieldType;
+	value_type = VALUE_CHAR;
+	modifier = modify;
 }
+
+
+void 
+parsed_element::Adopt(const known_identifier &identifier)
+{
+	base_type = type = identifier.type;
+	flags = identifier.flags;
+	unit = identifier.unit;
+	
+	if (identifier.type == TYPE_MODIFIER)
+		modifier = identifier.value;
+
+	value_type = VALUE_STRING;
+	value = identifier.value;
+}
+
+
+void 
+parsed_element::AdoptUnit(const known_identifier &identifier)
+{
+	base_type = type = TYPE_UNIT;
+	flags = identifier.flags;
+	unit = identifier.unit;
+	value *= identifier.value;
+}
+
+
+inline bool
+parsed_element::IsNextLastThis()
+{
+	return base_type == TYPE_MODIFIER
+		&& (modifier == MODIFY_NEXT || modifier == MODIFY_LAST || modifier == MODIFY_THIS);
+}
+
+
+//	#pragma mark -
+
+
+bool 
+DateMask::HasTime()
+{
+	// this will cause 
+	return IsSet(TYPE_HOUR);
+}
+
+
+/** This method checks if the date mask is complete in the
+ *	sense that it doesn't need to have a prefilled "struct tm"
+ *	when its time value is computed.
+ */
+
+bool 
+DateMask::IsComplete()
+{
+	// mask must be absolute, at last
+	if (fMask & Flag(TYPE_UNIT))
+		return false;
+
+	// minimal set of flags to have a complete set
+	return !(~fMask & (Flag(TYPE_DAY) | Flag(TYPE_MONTH)));
+}
+
+
+//	#pragma mark -
 
 
 status_t
 preparseDate(const char *dateString, parsed_element *elements)
 {
-	int32 index = 0;
+	int32 index = 0, modify = MODIFY_NONE;
 	char c;
 
 	if (dateString == NULL)
 		return B_ERROR;
 
+	memset(&elements[0], 0, sizeof(parsed_element));
+
 	for (; (c = dateString[0]) != '\0'; dateString++) {
 		// we don't care about spaces
-		if (isspace(c))
+		if (isspace(c)) {
+			modify = MODIFY_NONE;
 			continue;
+		}
 
 		// if we're reached our maximum number of elements, bail out
 		if (index >= MAX_ELEMENTS)
 			return B_ERROR;
 
-		memset(&elements[index], 0, sizeof(parsed_element));
-
 		if (c == ',') {
-			elements[index].type = TYPE_COMMA;
-			elements[index].value_type = VALUE_CHAR;
+			elements[index].SetCharType(TYPE_COMMA);
 		} else if (c == '.') {
-			elements[index].type = TYPE_DOT;
-			elements[index].value_type = VALUE_CHAR;
-		} else if (c == '/' || c == '-') {
-			// ToDo: "-" can also be the minus modifier... - how to distinguish?
-			elements[index].type = TYPE_DASH;
-			elements[index].value_type = VALUE_CHAR;
+			elements[index].SetCharType(TYPE_DOT);
+		} else if (c == '/') {
+			// "-" is handled differently (as a modifier)
+			elements[index].SetCharType(TYPE_DASH);
 		} else if (c == ':') {
-			elements[index].type = TYPE_COLON;
-			elements[index].value_type = VALUE_CHAR;
+			elements[index].SetCharType(TYPE_COLON);
 		} else if (c == '+') {
-			elements[index].type = TYPE_RELATIVE;
-			elements[index].value_type = VALUE_CHAR;
-			elements[index].modifier = MODIFY_PLUS;
+			modify = MODIFY_PLUS;
 
 			// this counts for the next element
 			continue;
 		} else if (c == '-') {
-			// ToDo: this never happens, due to TYPE_DASH
-			elements[index].type = TYPE_MODIFIER;
-			elements[index].value_type = VALUE_CHAR;
-			elements[index].modifier = MODIFY_MINUS;
+			modify = MODIFY_MINUS;
+			elements[index].flags = FLAG_HAS_DASH;
 
 			// this counts for the next element
 			continue;
@@ -281,6 +379,7 @@ preparseDate(const char *dateString, parsed_element *elements)
 			elements[index].type = TYPE_UNKNOWN;
 			elements[index].value_type = VALUE_NUMERICAL;
 			elements[index].value = atoll(dateString);
+			elements[index].modifier = modify;
 
 			// skip number
 			while (isdigit(dateString[1]))
@@ -312,17 +411,17 @@ preparseDate(const char *dateString, parsed_element *elements)
 				return B_ERROR;
 			}
 
-			if (index > 0 && (identifier->type & TYPE_UNIT) != 0) {
+			if (index > 0 && identifier->type == TYPE_UNIT) {
 				// this is just a unit, so it will give the last value a meaning
 
 				if (elements[--index].value_type != VALUE_NUMERICAL
-					&& elements[index].type != TYPE_NEXT_LAST_THIS)
+					&& !elements[index].IsNextLastThis())
 					return B_ERROR;
 
-				elements[index].value *= identifier->value;
-			} else if (index > 0 && elements[index - 1].type == TYPE_NEXT_LAST_THIS) {
-				if (isType(identifier->type, TYPE_MONTH)
-					|| isType(identifier->type, TYPE_WEEKDAY)) {
+				elements[index].AdoptUnit(*identifier);
+			} else if (index > 0 && elements[index - 1].IsNextLastThis()) {
+				if (identifier->type == TYPE_MONTH
+					|| identifier->type == TYPE_WEEKDAY) {
 					index--;
 
 					switch (elements[index].value) {
@@ -336,30 +435,31 @@ preparseDate(const char *dateString, parsed_element *elements)
 							elements[index].modifier = MODIFY_NEXT;
 							break;
 					}
-					elements[index].value = identifier->value;
+					elements[index].Adopt(*identifier);
+					elements[index].type = TYPE_UNIT;
 				} else
 					return B_ERROR;
 			} else {
-				elements[index].value_type = VALUE_STRING;
-				elements[index].value = identifier->value;
+				elements[index].Adopt(*identifier);
 			}
-
-			elements[index].type = identifier->type;
 		}
 
 		// see if we can join any preceding modifiers
 
 		if (index > 0
-			&& (elements[index - 1].type & TYPE_MODIFIER) != 0
-			&& (elements[index].type & TYPE_NOT_MODIFIABLE) == 0) {
+			&& elements[index - 1].type == TYPE_MODIFIER
+			&& (elements[index].flags & FLAG_NOT_MODIFIABLE) == 0) {
 			// copy the current one to the last and go on
 			elements[index].modifier = elements[index - 1].modifier;
 			elements[index].value *= elements[index - 1].value;
+			elements[index].flags |= elements[index - 1].flags;
 			elements[index - 1] = elements[index];
 		} else {
 			// we filled out one parsed_element
 			index++;
 		}
+
+		memset(&elements[index], 0, sizeof(parsed_element));
 	}
 
 	// were there any elements?
@@ -373,68 +473,86 @@ preparseDate(const char *dateString, parsed_element *elements)
 
 
 static void
-computeRelativeUnit(parsed_element &element, struct tm &tm, time_t &now, bool &makeTime, bool isString)
+computeRelativeUnit(parsed_element &element, struct tm &tm, int *_flags)
 {
-	uint32 type = element.type;
-
-	// ToDo: should change flags as well!
-
-	makeTime = true;
-	localtime_r(&now, &tm);
-
 	// set the relative start depending on unit
 
-	if (type & (TYPE_DAY_UNIT | TYPE_MONTH_UNIT | TYPE_YEAR_UNIT)) {
-		tm.tm_hour = 0;
-		tm.tm_min = 0;
-		tm.tm_sec = 0;
+	switch (element.unit) {
+		case UNIT_YEAR:
+			tm.tm_mon = 0;	// supposed to fall through
+		case UNIT_MONTH:
+			tm.tm_mday = 1;	// supposed to fall through
+		case UNIT_DAY:
+			tm.tm_hour = 0;
+			tm.tm_min = 0;
+			tm.tm_sec = 0;
+			break;
 	}
-	if (type & (TYPE_MONTH_UNIT | TYPE_YEAR_UNIT))
-		tm.tm_mday = 1;
-	if (type & TYPE_YEAR_UNIT)
-		tm.tm_mon = 0;
 
 	// adjust value
 
-	if (type & TYPE_RELATIVE) {
-		if (type & TYPE_MONTH_UNIT)
+	if (element.flags & FLAG_RELATIVE) {
+		if (element.unit == UNIT_MONTH)
 			tm.tm_mon += element.value;
-		else if (type & TYPE_DAY_UNIT)
+		else if (element.unit == UNIT_DAY)
 			tm.tm_mday += element.value;
-		else if (type & TYPE_SECOND_UNIT)
-			tm.tm_sec += element.value;
-		else if (!isType(type, TYPE_NOW))
-			;
-			//puts("what's going on here?");
-	} else if (isType(type, TYPE_WEEKDAY)) {
-		tm.tm_mday += abs(element.value) - tm.tm_wday;
+		else if (element.unit == UNIT_SECOND) {
+			if (element.modifier == MODIFY_MINUS)
+				tm.tm_sec -= element.value;
+			else
+				tm.tm_sec += element.value;
+
+			*_flags |= PARSEDATE_MINUTE_RELATIVE_TIME;
+		} else if (element.unit == UNIT_YEAR)
+			tm.tm_year += element.value;
+	} else if (element.base_type == TYPE_WEEKDAY) {
+		tm.tm_mday += element.value - tm.tm_wday;
 
 		if (element.modifier == MODIFY_NEXT)
 			tm.tm_mday += 7;
 		else if (element.modifier == MODIFY_LAST)
 			tm.tm_mday -= 7;
+	} else if (element.base_type == TYPE_MONTH) {
+		tm.tm_mon = element.value - 1;
+
+		if (element.modifier == MODIFY_NEXT)
+			tm.tm_year++;
+		else if (element.modifier == MODIFY_LAST)
+			tm.tm_year--;
 	}
 }
 
 
+/**	Uses the format assignment (through "format", and "optional") for the parsed elements
+ *	and calculates the time value with respect to "now".
+ *	Will also set the day/minute relative flags in "_flags".
+ */
+
 static time_t
-computeDate(const char *format, bool *optional, parsed_element *elements, time_t now, int *_flags)
+computeDate(const char *format, bool *optional, parsed_element *elements, time_t now, DateMask dateMask, int *_flags)
 {
-	//printf("matches: %s\n", format);
+	TRACE(("matches: %s\n", format));
 
 	parsed_element *element = elements;
 	uint32 position = 0;
 	struct tm tm;
-	time_t date;
-	bool relative = false, makeTime = false;
+	bool relative = false;
 
-	// ToDo: only call time() if necessary
 	if (now == -1)
 		now = time(NULL);
 
-	memset(&tm, 0, sizeof(tm));
-//	localtime_r(&now, &tm);
-//	printf("now = %ld, -> %ld\n", now, mktime(&tm));
+	if (dateMask.IsComplete())
+		memset(&tm, 0, sizeof(tm));
+	else {
+		localtime_r(&now, &tm);
+
+		if (dateMask.HasTime()) {
+			tm.tm_min = 0;
+			tm.tm_sec = 0;
+		}
+
+		*_flags = PARSEDATE_RELATIVE_TIME;
+	}
 
 	while (element->type != TYPE_END) {
 		// skip whitespace
@@ -461,36 +579,33 @@ computeDate(const char *format, bool *optional, parsed_element *elements, time_t
 				switch (format[0]) {
 					case 'd':
 						tm.tm_mday = element->value;
-						makeTime = true;
 						break;
 					case 'm':
 						tm.tm_mon = element->value - 1;
-						makeTime = true;
 						break;
 					case 'H':
 					case 'I':
 						tm.tm_hour = element->value;
-						makeTime = true;
 						break;
 					case 'M':
 						tm.tm_min = element->value;
-						makeTime = true;
 						break;
 					case 'S':
 						tm.tm_sec = element->value;
-						makeTime = true;
 						break;
 					case 'y':
 					case 'Y':
 						tm.tm_year = element->value;
 						if (tm.tm_year > 1900)
 							tm.tm_year -= 1900;
-						makeTime = true;
 						break;
 					case 'T':
-						// ToDo:!
-						computeRelativeUnit(*element, tm, now, makeTime, false);
+						computeRelativeUnit(*element, tm, _flags);
 						break;
+					case '-':
+						// there is no TYPE_DASH element for this (just a flag)
+						format++;
+						continue;
 				}
 				break;
 
@@ -498,17 +613,28 @@ computeDate(const char *format, bool *optional, parsed_element *elements, time_t
 				switch (format[0]) {
 					case 'a':	// weekday
 					case 'A':
+						// we'll apply this element later, if still necessary
+						if (!dateMask.IsComplete())
+							computeRelativeUnit(*element, tm, _flags);
 						break;
-					case 'b':
+					case 'b':	// month
 					case 'B':
+						tm.tm_mon = element->value - 1;
 						break;
-					case 'p':
+					case 'p':	// meridian
+						tm.tm_sec += element->value;
 						break;
 					case 'z':	// time zone
 					case 'Z':
+						tm.tm_sec += element->value - timezone;
 						break;
-					case 'T':
-						computeRelativeUnit(*element, tm, now, makeTime, true);
+					case 'T':	// time unit
+						if (element->flags & FLAG_NOW) {
+							*_flags = PARSEDATE_MINUTE_RELATIVE_TIME | PARSEDATE_RELATIVE_TIME;
+							break;
+						}
+
+						computeRelativeUnit(*element, tm, _flags);
 						break;
 				}
 				break;
@@ -516,14 +642,14 @@ computeDate(const char *format, bool *optional, parsed_element *elements, time_t
 
 		// format matched at this point, check next element
 		format++;
+		if (format[0] == ']')
+			format++;
+
 		position++;
 		element++;
 	}
 
-	if (makeTime)
-		return mktime(&tm);
-
-	return now;
+	return mktime(&tm);
 }
 
 
@@ -539,20 +665,16 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 		return B_ERROR;
 	}
 
+#if TRACE_PARSEDATE
 	for (int32 index = 0; elements[index].type != TYPE_END; index++) {
 		parsed_element e = elements[index];
-		char type[32];
-		sprintf(type, "0x%lx", e.type);
-		if (e.type & TYPE_UNIT)
-			strcat(type, " unit");
-		if (e.type & TYPE_RELATIVE)
-			strcat(type, " relative");
 
-		printf("  %ld: type = %ld (%s), value = %Ld (%s)\n",
-			index, e.type & TYPE_MASK, type, e.value,
+		printf("  %ld: type = %ld, base_type = %ld, unit = %ld, flags = %ld, value = %Ld (%s)\n",
+			index, e.type, e.base_type, e.unit, e.flags, e.value,
 			e.value_type == VALUE_NUMERICAL ? "numerical" :
 			(e.value_type == VALUE_STRING ? "string" : "char"));
 	}
+#endif
 
 	bool optional[MAX_ELEMENTS];
 
@@ -561,6 +683,7 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 		
 		const char *format = sFormatsTable[index];
 		uint32 position = 0;
+		DateMask dateMask;
 
 		parsed_element *element = elements;
 		while (element->type != TYPE_END) {
@@ -578,13 +701,13 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 				case VALUE_CHAR:
 					// check the allowed single characters
 
-					switch (element->type & TYPE_MASK) {
+					switch (element->type) {
 						case TYPE_DOT:
 							if (format[0] != '.')
 								goto next_format;
 							break;
 						case TYPE_DASH:
-							if (format[0] != '/' && format[0] != '-')
+							if (format[0] != '-')
 								goto next_format;
 							break;
 						case TYPE_COMMA:
@@ -601,29 +724,50 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 					break;
 
 				case VALUE_NUMERICAL:
+					// make sure that unit types are respected
+					if (element->type == TYPE_UNIT && format[0] != 'T')
+						goto next_format;
+
 					switch (format[0]) {
 						case 'd':
 							if (element->value > 31)
 								goto next_format;
+							
+							dateMask.Set(TYPE_DAY);
 							break;
 						case 'm':
 							if (element->value > 12)
 								goto next_format;
+
+							dateMask.Set(TYPE_MONTH);
 							break;
 						case 'H':
 						case 'I':
 							if (element->value > 24)
 								goto next_format;
+
+							dateMask.Set(TYPE_HOUR);
 							break;
 						case 'M':
+							dateMask.Set(TYPE_MINUTE);
 						case 'S':
 							if (element->value > 59)
 								goto next_format;
+
 							break;
 						case 'y':
 						case 'Y':
-						case 'T':
+							// accept all values
 							break;
+						case 'T':
+							dateMask.Set(TYPE_UNIT);
+							break;
+						case '-':
+							if (element->flags & FLAG_HAS_DASH) {
+								element--;	// consider this element again
+								break;
+							}
+							// supposed to fall through
 						default:
 							goto next_format;
 					}
@@ -633,25 +777,30 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 					switch (format[0]) {
 						case 'a':	// weekday
 						case 'A':
-							if (!isType(element->type, TYPE_WEEKDAY))
+							if (element->type != TYPE_WEEKDAY)
 								goto next_format;
 							break;
 						case 'b':	// month
 						case 'B':
-							if (!isType(element->type, TYPE_MONTH))
+							if (element->type != TYPE_MONTH)
 								goto next_format;
+
+							dateMask.Set(TYPE_MONTH);
 							break;
 						case 'p':	// meridian
-							if (!isType(element->type, TYPE_MERIDIAN))
+							if (element->type != TYPE_MERIDIAN)
 								goto next_format;
 							break;
 						case 'z':	// time zone
 						case 'Z':
-							if (!isType(element->type, TYPE_TIME_ZONE))
+							if (element->type != TYPE_TIME_ZONE)
 								goto next_format;
 							break;
-						case 'T':
-							// last/next/this
+						case 'T':	// time unit
+							if (element->type != TYPE_UNIT)
+								goto next_format;
+
+							dateMask.Set(TYPE_UNIT);
 							break;
 						default:
 							goto next_format;
@@ -693,7 +842,7 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 
 		// made it here? then we seem to have found our guy
 
-		return computeDate(sFormatsTable[index], optional, elements, now, _flags);
+		return computeDate(sFormatsTable[index], optional, elements, now, dateMask, _flags);
 
 	skip_format:
 		// check if the next format has the same beginning as the skipped one,
