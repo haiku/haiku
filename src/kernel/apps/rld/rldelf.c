@@ -872,7 +872,8 @@ load_dependencies(image_t *image)
 		switch (d[i].d_tag) {
 			case DT_NEEDED:
 				needed_offset = d[i].d_un.d_ptr;
-				sprintf(path, "/boot/lib/%s", STRING(image, needed_offset));
+				// ToDo: ever heard of the LIBRARY_PATH env variable?
+				sprintf(path, "/boot/beos/system/lib/%s", STRING(image, needed_offset));
 				image->needed[j] = load_container(path, STRING(image, needed_offset), B_LIBRARY_IMAGE);
 				j += 1;
 
