@@ -1,10 +1,11 @@
 /*****************************************************************************/
-// DecodeTree
+// BitReader
 // Written by Michael Wilber, OBOS Translation Kit Team
 //
-// DecodeTree.h
+// BitReader.cpp
 //
-// This object is used for fast decoding of Huffman encoded data
+// Wrapper class for StreamBuffer to make it convenient to read 1 bit at
+// a time
 //
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -28,50 +29,55 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef DECODE_TREE_H
-#define DECODE_TREE_H
-
-#include <SupportDefs.h>
 #include "BitReader.h"
 
-// structure used to populate
-// the decode trees
-struct HuffmanEncoding {
-	uint16 value;
-	uint8 encoding;
-	uint8 length;
-};
+BitReader::BitReader(StreamBuffer *pstreambuf)
+{
+	finitStatus = B_BAD_VALUE;
+	fnbytesRead = 0;
+	fbitbuf = 0;
+	fcurrentbit = 0;
+	fpstreambuf = pstreambuf;
+	if (fpstreambuf)
+		finitStatus = ReadByte();
+}
 
-// node used by the decode tree
-struct DecodeNode {
-	int16 value;
-	DecodeNode *branches[2];
-};
+BitReader::~BitReader()
+{
+	finitStatus = B_ERROR;
+	fpstreambuf = NULL;
+	fbitbuf = 0;
+	fcurrentbit = 0;
+}
 
-class DecodeTree {
-public:
-	DecodeTree(bool bwhite);
-	~DecodeTree();
+status_t
+BitReader::NextBit()
+{
+	status_t result;
+	result = PeekBit();
+	if (result >= 0)
+		fcurrentbit--;
 	
-	// returns B_OK if the tree was initialized without error,
-	// returns B_ERROR or B_NO_MEMORY if unable to initialize
-	status_t InitCheck() const { return finitStatus; };
-	
-	// Decodes nbits bits from encdata, starting with the 
-	// highest order bit.  If successful, returns the corresponding 
-	// value for the encdata and bitsread contains the 
-	// number of bits from encdata that were decoded.  If not successful,
-	// B_ERROR, B_NO_MEMORY or B_BAD_VALUE is returned
-	status_t GetValue(BitReader &stream) const;
+	return result;
+}
 
-private:
-	status_t LoadBlackEncodings();
-	status_t LoadWhiteEncodings();
-	status_t AddEncodings(const HuffmanEncoding *pencs, uint32 length);
-	status_t AddEncoding(uint16 encoding, uint8 length, uint16 value);
-	
-	status_t finitStatus;
-	DecodeNode *fptop;
-};
+status_t
+BitReader::PeekBit()
+{
+	// if fcurrentbit is zero, read in next byte
+	if (!fcurrentbit && ReadByte() != B_OK)
+		return B_ERROR;
+		
+	return (fbitbuf >> (fcurrentbit - 1)) & 1;
+}
 
-#endif
+status_t
+BitReader::ReadByte()
+{
+	if (fpstreambuf->Read(&fbitbuf, 1) != 1)
+		return B_ERROR;
+	
+	fnbytesRead++;
+	fcurrentbit = 8;
+	return B_OK;
+}

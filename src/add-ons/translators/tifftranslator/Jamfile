@@ -5,6 +5,8 @@ SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators tgatranslator ] 
 
 Translator TIFFTranslator : 
 	StreamBuffer.cpp
+	BitReader.cpp
+	DecodeTree.cpp
 	TiffField.cpp
 	TiffUintField.cpp
 	TiffUnknownField.cpp

@@ -41,6 +41,7 @@
 #include <File.h>
 #include <ByteOrder.h>
 #include <fs_attr.h>
+#include "DecodeTree.h"
 
 #define TIFF_TRANSLATOR_VERSION 100
 
@@ -122,6 +123,18 @@ protected:
 		// the user
 		
 private:
+	status_t LoadHuffmanTrees();
+	
+	ssize_t decode_huffman(StreamBuffer *pstreambuf, TiffDetails &details, 
+		uint8 *pbits);
+	
+	status_t translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
+		uint8 *read, swap_action swp, uint32 outType,
+		BPositionIO *outDestination);
+	
+	DecodeTree *fpblackTree;
+	DecodeTree *fpwhiteTree;
+	
 	char fName[30];
 	char fInfo[100];
 };

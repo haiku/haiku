@@ -35,6 +35,7 @@
 #include "TIFFView.h"
 #include "TiffIfd.h"
 #include "StreamBuffer.h"
+#include "BitReader.h"
 
 // The input formats that this translator supports.
 translation_format gInputFormats[] = {
@@ -124,6 +125,9 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 TIFFTranslator::TIFFTranslator()
 	:	BTranslator()
 {
+	fpblackTree = NULL;
+	fpwhiteTree = NULL;
+	
 	strcpy(fName, "TIFF Images");
 	sprintf(fInfo, "TIFF image translator v%d.%d.%d %s",
 		TIFF_TRANSLATOR_VERSION / 100, (TIFF_TRANSLATOR_VERSION / 10) % 10,
@@ -401,6 +405,7 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 		else
 			dtls.compression = ifd.GetUint(TAG_COMPRESSION);
 		if (dtls.compression != COMPRESSION_NONE &&
+			dtls.compression != COMPRESSION_HUFFMAN &&
 			dtls.compression != COMPRESSION_PACKBITS)
 			return B_NO_TRANSLATOR;
 		
@@ -498,7 +503,8 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 
 status_t
 identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
-	ssize_t amtread, uint8 *read, swap_action swp, TiffDetails *pdetails = NULL)
+	ssize_t amtread, uint8 *read, swap_action swp,
+	TiffDetails *pdetails = NULL)
 {
 	if (amtread != 4)
 		return B_ERROR;
@@ -509,7 +515,8 @@ identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
 		printf("Unable to read first IFD offset\n");
 		return B_NO_TRANSLATOR;
 	}
-	if (swap_data(B_UINT32_TYPE, &firstIFDOffset, sizeof(uint32), swp) != B_OK) {
+	if (swap_data(B_UINT32_TYPE, &firstIFDOffset,
+		sizeof(uint32), swp) != B_OK) {
 		printf("swap_data() error\n");
 		return B_ERROR;
 	}
@@ -765,9 +772,60 @@ unpack(StreamBuffer *pstreambuf, uint8 *tiffbuffer, uint32 tiffbufferlen)
 	return read;
 }
 
+ssize_t
+TIFFTranslator::decode_huffman(StreamBuffer *pstreambuf, TiffDetails &details, 
+	uint8 *pbits)
+{
+	BitReader stream(pstreambuf);
+	if (stream.InitCheck() != B_OK) {
+		debugger("stream init error");
+		return B_ERROR;
+	}
+		
+	const uint8 kblack = 0x00, kwhite = 0xff;
+	uint8 colors[2];
+	if (details.interpretation == PHOTO_WHITEZERO) {
+		colors[0] = kwhite;
+		colors[1] = kblack;
+	} else {
+		colors[0] = kblack;
+		colors[1] = kwhite;
+	}
+
+	uint32 pixelswrit = 0;	
+	DecodeTree *ptrees[2] = {fpwhiteTree, fpblackTree};
+	uint8 currentcolor = 0;
+	uint8 *pcurrentpixel = pbits;
+	while (pixelswrit < details.width) {
+		status_t value = ptrees[currentcolor]->GetValue(stream);
+		if (value < 0) {
+			debugger("value < 0");
+			return B_ERROR;
+		}
+			
+		if (pixelswrit + value > details.width) {
+			debugger("gone past end of line");
+			return B_ERROR;
+		}
+		pixelswrit += value;
+		
+		// covert run length to B_RGB32 pixels
+		uint32 pixelsleft = value;
+		while (pixelsleft--) {
+			memset(pcurrentpixel, colors[currentcolor], 3);
+			pcurrentpixel += 4;
+		}
+		
+		if (value < 64)
+			currentcolor = 1 - currentcolor;
+	}
+	
+	return stream.BytesRead();
+}
+
 status_t
-translate_from_tiff(BPositionIO *inSource, ssize_t amtread, uint8 *read,
-	swap_action swp, uint32 outType, BPositionIO *outDestination)
+TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
+	uint8 *read, swap_action swp, uint32 outType, BPositionIO *outDestination)
 {
 	// Can only output to bits for now
 	if (outType != B_TRANSLATOR_BITMAP)
@@ -780,6 +838,14 @@ translate_from_tiff(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		amtread, read, swp, &details);
 	if (result == B_OK) {
 		// If the TIFF is supported by this translator
+		
+		// If TIFF uses Huffman compression, load
+		// trees for decoding Huffman compression
+		if (details.compression == COMPRESSION_HUFFMAN) {
+			result = LoadHuffmanTrees();
+			if (result != B_OK)
+				return result;
+		}
 		
 		TranslatorBitmap bitsHeader;
 		bitsHeader.magic = B_TRANSLATOR_BITMAP;
@@ -828,18 +894,18 @@ translate_from_tiff(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		// buffer for making reading compressed data
 		// fast and convenient
 		StreamBuffer *pstreambuf = NULL;
-		if (details.compression == COMPRESSION_PACKBITS) {
+		if (details.compression != COMPRESSION_NONE) {
 			pstreambuf = new StreamBuffer(inSource, 2048, false);
 			if (pstreambuf->InitCheck() != B_OK)
-				return B_NO_MEMORY;
+				return B_NO_MEMORY; 
 		}
 			
 		for (uint32 i = 0; i < details.stripsPerImage; i++) {
 			uint32 read = 0;
 			
-			// If Packbits compression, prepare streambuffer
+			// If using compression, prepare streambuffer
 			// for reading
-			if (details.compression == COMPRESSION_PACKBITS &&
+			if (details.compression != COMPRESSION_NONE &&
 				!pstreambuf->Seek(details.pstripOffsets[i]))
 				return B_NO_TRANSLATOR;
 				
@@ -848,25 +914,47 @@ translate_from_tiff(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 			while (read < details.pstripByteCounts[i]) {
 			
 				ssize_t ret = 0;
-				if (details.compression == COMPRESSION_NONE) {
-					ret = inSource->ReadAt(details.pstripOffsets[i] + read,
-						inbuffer, inbufferlen);
-					if (ret != static_cast<ssize_t>(inbufferlen))
+				switch (details.compression) {
+					case COMPRESSION_NONE:
+						ret = inSource->ReadAt(details.pstripOffsets[i] + read,
+							inbuffer, inbufferlen);
+						if (ret != static_cast<ssize_t>(inbufferlen))
+							// break out of while loop
+							ret = -1;
+						break;
+							
+					case COMPRESSION_HUFFMAN:
+						ret = decode_huffman(pstreambuf, details, outbuffer);
+						if (ret < 1)
+							// break out of while loop
+							ret = -1;
 						break;
 						
-				} else if (details.compression == COMPRESSION_PACKBITS) {
-					ret = unpack(pstreambuf, inbuffer, inbufferlen);
-					if (ret < 1)
+					case COMPRESSION_PACKBITS:
+						ret = unpack(pstreambuf, inbuffer, inbufferlen);
+						if (ret < 1)
+							// break out of while loop
+							ret = -1;
 						break;
 				}
+				if (ret < 0)
+					break;
 					
 				read += ret;
-				tiff_to_bits(inbuffer, inbufferlen, outbuffer, details);
+				if (details.compression != COMPRESSION_HUFFMAN)
+					tiff_to_bits(inbuffer, inbufferlen, outbuffer, details);
 				outDestination->Write(outbuffer, outbufferlen);
 			}
 			// If while loop was broken...
-			if (read < details.pstripByteCounts[i])
+			if (read < details.pstripByteCounts[i]) {
+				printf("-- WHILE LOOP BROKEN!!\n");
+				printf("i: %d\n", i);
+				printf("ByteCount: %d\n",
+					details.pstripByteCounts[i]);
+				printf("read: %d\n", read);
+				debugger("while loop broken");
 				break;
+			}
 		}
 		
 		// Clean up
@@ -1034,3 +1122,26 @@ TIFFTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
 
 	return B_OK;
 }
+
+// Initialize the Huffman decoding trees and
+// verify that there were no initialization errors
+status_t
+TIFFTranslator::LoadHuffmanTrees()
+{
+	if (!fpblackTree) {
+		fpblackTree = new DecodeTree(false);
+		if (!fpblackTree)
+			return B_NO_MEMORY;
+	}
+	if (!fpwhiteTree) {
+		fpwhiteTree = new DecodeTree(true);
+		if (!fpwhiteTree)
+			return B_NO_MEMORY;
+	}
+	
+	if (fpblackTree->InitCheck() != B_OK)
+		return fpblackTree->InitCheck();
+	
+	return fpwhiteTree->InitCheck();
+}
+
