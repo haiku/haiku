@@ -31,6 +31,8 @@ typedef struct STELine {
 	long			offset;		// offset of first character of line
 	float			origin;		// pixel position of top of line
 	float			ascent;		// maximum ascent for line
+	float			padding;	// TODO: Don't remove this, as something in
+								// TextView.cpp is broken and will crash
 } STELine, *STELinePtr;
 
 
