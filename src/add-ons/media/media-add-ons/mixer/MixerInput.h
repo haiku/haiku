@@ -70,6 +70,8 @@ private:
 	Resampler		**fResampler; // array
 
 	bool			fUserOverridesChannelDesignations;
+	
+	int32			debugMixBufferFrames;
 };
 
 #endif

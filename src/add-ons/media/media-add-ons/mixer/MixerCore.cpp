@@ -4,6 +4,7 @@
 #include <TimeSource.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
+#include <string.h>
 #include "MixerCore.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
@@ -12,7 +13,7 @@
 #include "Resampler.h"
 #include "Debug.h"
 
-#define DOUBLE_RATE_MIXING 	1
+#define DOUBLE_RATE_MIXING 	0
 
 #define ASSERT_LOCKED()		if (fLocker->IsLocked()) {} else debugger("core not locked, meltdown occurred")
 
@@ -340,13 +341,47 @@ MixerCore::MixThread()
 		// mix all data from all inputs into the mix buffer
 		ASSERT((frame_base + frame_pos) % fMixBufferFrameCount == 0);
 
-		printf("create new buffer event at %Ld, reading input frames at %Ld\n", event_time, frame_base + frame_pos);
-
+//		printf("create new buffer event at %Ld, reading input frames at %Ld\n", event_time, frame_base + frame_pos);
+/*
 		for (int i = 0; i < fMixBufferChannelCount; i++) {
 			for (int j = 0; j < fMixBufferFrameCount; j++) {
 				fMixBuffer[(i * fMixBufferChannelCount)+j] = (i*j) / (float)(fMixBufferChannelCount * fMixBufferFrameCount);
 			}
 		}
+*/
+		// XXX this is a test, copy the the left channel from input 1 or 0
+		Lock();
+		
+		MixerInput *input = Input(1);
+		if (!input)
+			input = Input(0);
+
+		if (input) {
+			const float *buffer;
+			uint32 src_sample_offset;
+			int type;
+			float gain;
+	
+			printf("data reading for %15Ld to %15Ld, ", event_time, event_time + duration_for_frames(fMixBufferFrameRate, fMixBufferFrameCount));
+
+			int64 cur_framepos = frame_base + frame_pos;
+			input->GetMixerChannelInfo(0, cur_framepos, &buffer, &src_sample_offset, &type, &gain);
+			
+			memset(fMixBuffer, 0, fMixBufferChannelCount * fMixBufferFrameCount * sizeof(float));
+
+			uint32 dst_sample_offset;
+			
+			char *src = (char *)buffer;
+			char *dst = (char *)fMixBuffer;
+			dst_sample_offset = fMixBufferChannelCount * sizeof(float);
+			
+			for (int i = 0; i < fMixBufferFrameCount; i++) {
+				*(float *)dst = *(float *)src;
+				dst += dst_sample_offset;
+				src += src_sample_offset;
+			}
+		}
+		Unlock();
 		
 		// request a buffer
 		BBuffer* buf = fBufferGroup->RequestBuffer(fOutput->MediaOutput().format.u.raw_audio.buffer_size, 10000);
@@ -377,7 +412,7 @@ MixerCore::MixThread()
 			}
 		}
 		
-		// shedule next event
+		// schedule next event
 		frame_pos += fMixBufferFrameCount;
 		event_time = time_base + bigtime_t((1000000LL * frame_pos) / fMixBufferFrameRate);
 	}

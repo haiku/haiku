@@ -105,10 +105,12 @@ MixerInput::BufferReceived(BBuffer *buffer)
 
 	int32 offset = frames_for_duration(fMixBufferFrameRate, start - fMixBufferStartTime) % fMixBufferFrameCount;
 
-	printf("MixerInput::BufferReceived:  mix buffer start %14Ld, buffer start %14Ld, offset %6d\n", fMixBufferStartTime, start, offset);
+//	printf("MixerInput::BufferReceived:  mix buffer start %14Ld, buffer start %14Ld, offset %6d\n", fMixBufferStartTime, start, offset);
 
 	int in_frames = frames_per_buffer(fInput.format.u.raw_audio); // XXX use size
 	int out_frames = (int)((in_frames * fMixBufferFrameRate) / fInput.format.u.raw_audio.frame_rate); // XXX losing fractions
+
+	//printf("data arrived for %15Ld to %15Ld, storing at frames %ld to %ld\n", start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames);
 	
 	if (offset + out_frames > fMixBufferFrameCount) {
 
@@ -117,8 +119,10 @@ MixerInput::BufferReceived(BBuffer *buffer)
 		int in_frames1 = (out_frames1 * in_frames) / out_frames;
 		int in_frames2 = in_frames - in_frames1;
 
-		printf("  in_frames %5d, out_frames %5d, in_frames1 %5d, out_frames1 %5d, in_frames2 %5d, out_frames2 %5d\n",
-			   in_frames, out_frames, in_frames1, out_frames1, in_frames2, out_frames2);
+		printf("data arrived for %15Ld to %15Ld, storing at frames %ld to %ld and %ld to %ld\n", start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames1, 0, out_frames2);
+
+//		printf("  in_frames %5d, out_frames %5d, in_frames1 %5d, out_frames1 %5d, in_frames2 %5d, out_frames2 %5d\n",
+//			   in_frames, out_frames, in_frames1, out_frames1, in_frames2, out_frames2);
 		
 		for (int i = 0; i < fInputChannelCount; i++) {
 			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio),
@@ -139,7 +143,8 @@ MixerInput::BufferReceived(BBuffer *buffer)
 		}
 	} else {
 
-		printf("  in_frames %5d, out_frames %5d\n", in_frames, out_frames);
+//		printf("  in_frames %5d, out_frames %5d\n", in_frames, out_frames);
+		printf("data arrived for %15Ld to %15Ld, storing at frames %ld to %ld\n", start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames);
 
 		for (int i = 0; i < fInputChannelCount; i++) {
 			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio),
@@ -369,6 +374,7 @@ MixerInput::GetMixerChannelInfo(int channel, int64 framepos, const float **buffe
 	ASSERT(fMixBuffer);
 	ASSERT(channel >= 0 && channel < fMixerChannelCount);
 	int32 offset = framepos % fMixBufferFrameCount;
+	printf("GetMixerChannelInfo: frames %ld to %ld\n", offset, offset + debugMixBufferFrames);
 	*buffer = reinterpret_cast<float *>(reinterpret_cast<char *>(fMixerChannelInfo[channel].buffer_base) + (offset * sizeof(float) * fInputChannelCount));
 	*sample_offset = sizeof(float) * fInputChannelCount;
 	*type = fMixerChannelInfo[channel].type;
@@ -398,6 +404,7 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames, bigtime_t starttim
 {
 	fMixBufferFrameRate = framerate;
 	fMixBufferStartTime = starttime;
+	debugMixBufferFrames = frames;
 
 	printf("MixerInput::SetMixBufferFormat: framerate %ld, frames %ld, starttime %Ld\n", framerate, frames, starttime);
 
