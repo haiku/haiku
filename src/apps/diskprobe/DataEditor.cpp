@@ -145,7 +145,9 @@ StateWatcher::~StateWatcher()
 	if (fWasModified != fEditor.IsModified())
 		update.AddBool("modified", fEditor.IsModified());
 
-	fEditor.SendNotices(kMsgDataEditorStateChange, &update);
+	// only send an update if we have to report anything
+	if (!update.IsEmpty())
+		fEditor.SendNotices(kMsgDataEditorStateChange, &update);
 }
 
 
