@@ -1,6 +1,5 @@
 #include <View.h>
-
-enum arrowDirection {UPLEFT,UPRIGHT,DOWNLEFT,DOWNRIGHT,NONE};
+#include "ScreenSaverPrefs.h"
 
 class MouseAreaView : public BView
 {
@@ -12,8 +11,8 @@ class MouseAreaView : public BView
 	virtual void Draw(BRect update); 
 	virtual void MouseUp(BPoint point);
 	void DrawArrow(void);
-	inline int getDirection(void) {return ((int)currentDirection);}
-	void setDirection(int direction) {currentDirection=(arrowDirection)direction;Draw(BRect (0,0,100,100));}
+	inline arrowDirection getDirection(void) {return currentDirection;}
+	void setDirection(arrowDirection direction) {currentDirection=direction;Draw(BRect (0,0,100,100));}
 	private:
 	BRect screenArea;
 	arrowDirection currentDirection;

@@ -10,6 +10,7 @@ static const char *times[]={"30 seconds", "1 minute",             "1 minute 30 s
 							"50 minutes", "1 hour",               "1 hour 30 minutes",
 							"2 hours",    "2 hours 30 minutes",   "3 hours",
 							"4 hours",    "5 hours"};
+
 static const int timeInSeconds[]={ 	30,    60,   90,
 									120,   150,  180,
 									240,   300,  360,

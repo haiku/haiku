@@ -5,13 +5,11 @@
 #include <Shape.h>
 #include <stdio.h>
 
-inline BPoint scaleDirect(float x, float y,BRect area)
-{
+inline BPoint scaleDirect(float x, float y,BRect area) {
 	return BPoint(area.Width()*x+area.left,area.Height()*y+area.top);
 }
 
-inline BRect scaleDirect (float x1,float x2,float y1,float y2,BRect area)
-{
+inline BRect scaleDirect (float x1,float x2,float y1,float y2,BRect area) {
 	return BRect(area.Width()*x1+area.left,area.Height()*y1+area.top, area.Width()*x2+area.left,area.Height()*y2+area.top);
 }
 
@@ -21,17 +19,16 @@ float positionalY[]= {0,.1,.7,.8,.9,1.0};
 inline BPoint scale(int x, int y,BRect area) { return scaleDirect(positionalX[x],positionalY[y],area); }
 inline BRect scale(int x1, int x2, int y1, int y2,BRect area) { return scaleDirect(positionalX[x1],positionalX[x2],positionalY[y1],positionalY[y2],area); }
 
-int secondsToSlider(int val)
-{
+int secondsToSlider(int val) {
+	int count=sizeof(timeInSeconds)/sizeof(int);
 	int t;
-	for (t=0;t<sizeof(timeInSeconds)/sizeof(int);t++)
+	for (t=0;t<count;t++)
 		if (timeInSeconds[t]==val)
 				return t;
 	return -1;
 }
 
-void MouseAreaView::Draw(BRect update)
-{
+void MouseAreaView::Draw(BRect update) {
 	SetViewColor(216,216,216);
 	// Top of monitor
 	SetHighColor(grey);
@@ -59,8 +56,9 @@ void MouseAreaView::Draw(BRect update)
 
 float arrowX[]= {0,.25,.5,.66667,.90,.9};
 float arrowY[]= {0,.15,.25,.3333333,.6666667,1.0};
-inline BPoint scale3(int x, int y,BRect area,bool invertX,bool invertY) 
-	{ return scaleDirect(((invertX)?1-arrowX[x]:arrowX[x]),((invertY)?1-arrowY[y]:arrowY[y]),area); }
+
+inline BPoint scale3(int x, int y,BRect area,bool invertX,bool invertY) { 
+	return scaleDirect(((invertX)?1-arrowX[x]:arrowX[x]),((invertY)?1-arrowY[y]:arrowY[y]),area); }
 
 BRect getArrowSize(BRect area,bool isCentered)
 {
@@ -75,10 +73,8 @@ BRect getArrowSize(BRect area,bool isCentered)
 	return (foo);
 }
 
-void MouseAreaView::DrawArrow(void)
-{
-	if (currentDirection!=NONE)
-		{
+void MouseAreaView::DrawArrow(void) {
+	if (currentDirection!=NONE) {
 		BRect area(getArrowSize(screenArea,false));
 		bool invertX=(currentDirection==UPRIGHT||currentDirection==DOWNRIGHT);
 		bool invertY=(currentDirection==UPRIGHT||currentDirection==UPLEFT);
@@ -98,27 +94,23 @@ void MouseAreaView::DrawArrow(void)
 		SetHighColor(black);
 		FillShape(&arrow,B_SOLID_HIGH);
 		}
-	else
-		{
-		PushState();
+	else {
+//		PushState();
 		BRect area(getArrowSize(screenArea,true));
 		SetHighColor(red);
 		SetPenSize(2);
 		StrokeEllipse(area);
 		StrokeLine(BPoint(area.right,area.top),BPoint(area.left,area.bottom));
-		PopState();
+//		PopState();
 		}
 }
 
 
-void MouseAreaView::MouseUp(BPoint point)
-{
-	if (screenArea.Contains(point))
-		{
+void MouseAreaView::MouseUp(BPoint point) {
+	if (screenArea.Contains(point)) {
 		if (getArrowSize(screenArea,true).Contains(point))
 			currentDirection=NONE;
-		else
-			{
+		else {
 			float centerX=screenArea.left+(screenArea.Width()/2);
 			float centerY=screenArea.top+(screenArea.Height()/2);
 			if (point.x<centerX)
