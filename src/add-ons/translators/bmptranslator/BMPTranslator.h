@@ -23,13 +23,14 @@
 #define BBT_CAPABILITY 1.0
 
 struct BMPFileHeader {
+	// for both MS and OS/2 BMP formats
 	uint16 magic;			// = 'BM'
 	uint32 fileSize;		// file size in bytes
 	uint32 reserved;		// equals 0
 	uint32 dataOffset;		// file offset to actual image
 };
 
-struct BMPInfoHeader {
+struct MSInfoHeader {
 	uint32 size;			// size of this struct (40)
 	uint32 width;			// bitmap width
 	uint32 height;			// bitmap height
@@ -43,11 +44,12 @@ struct BMPInfoHeader {
 	uint32 colorsimportant;	// number of important colors, zero = all
 };
 
-struct BMPColorTable {
-	uint8 red;				// red intensity
-	uint8 green;			// green intensity
-	uint8 blue;				// blue intensity
-	uint8 reserved;			// unused (=0)
+struct OS2InfoHeader {
+	uint32 size;			// size of this struct (40)
+	uint16 width;			// bitmap width
+	uint16 height;			// bitmap height
+	uint16 planes;			// number of planes, always 1?
+	uint16 bitsperpixel;	// bits per pixel, (1,4,8,16 or 24)
 };
 
 class BMPTranslator : public BTranslator {
@@ -85,6 +87,11 @@ public:
 		// this function is the whole point of the Translation Kit,
 		// it translates the data in inSource to outDestination
 		// using the format outType
+		
+	virtual status_t MakeConfigurationView(BMessage *ioExtension,
+		BView **outView, BRect *outExtent);
+		// creates and returns the view for displaying information
+		// about this translator
 
 protected:
 	virtual ~BMPTranslator();
