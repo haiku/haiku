@@ -7,6 +7,7 @@
 
 #include "KPPPStateMachine.h"
 #include "KPPPLCP.h"
+#include "KPPPReport.h"
 
 #include "List.h"
 #include "LockerHelper.h"
@@ -26,6 +27,8 @@ class PPPInterface {
 	public:
 		PPPInterface(driver_settings *settings, PPPInterface *parent = NULL);
 		~PPPInterface();
+		
+		void Delete();
 		
 		status_t InitCheck() const;
 		
@@ -102,10 +105,12 @@ class PPPInterface {
 		bool Down();
 		bool IsUp() const;
 		
-/*		void EnableReports(PPP_REPORT type, thread_id thread,
-				int32 flags);
-		void DisableReports(PPP_REPORT type, thread_id thread);
-		bool DoesReport(PPP_REPORT type, thread_id thread); */
+		void EnableReports(PPP_REPORT_TYPE type, port_id port,
+				int32 flags = PPP_NO_REPORT_FLAGS);
+		void DisableReports(PPP_REPORT_TYPE type, port_id port);
+		bool DoesReport(PPP_REPORT_TYPE type, port_id port);
+		bool Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length);
+			// returns false if reply was bad (or an error occured)
 		
 		bool LoadModules(const driver_settings *settings,
 			int32 start, int32 count);
@@ -126,8 +131,6 @@ class PPPInterface {
 		// multilink methods
 		void SetParent(PPPInterface *parent)
 			{ fParent = parent; }
-		
-//		void Report(PPP_REPORT type, int32 code, void *data, int32 length);
 
 	private:
 		driver_parameter *fSettings;
@@ -153,8 +156,11 @@ class PPPInterface {
 		PPPEncapsulator *fFirstEncapsulator;
 		List<PPPProtocol*> fProtocols;
 		List<ppp_module_info*> fModules;
+		List<ppp_report_request> fReportRequests;
 		
-		BLocker& fGeneralLock;
+		port_id fPort;
+		
+		BLocker& fLock;
 };
 
 

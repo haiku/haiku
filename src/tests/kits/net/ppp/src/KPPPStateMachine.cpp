@@ -293,7 +293,7 @@ PPPStateMachine::UpFailedEvent()
 	
 	switch(State()) {
 		case PPP_STARTING_STATE:
-			// we must have called TLS() which sets establishment phase
+			// TLSNotify() sets establishment phase
 			if(Phase() != PPP_ESTABLISHMENT_PHASE) {
 				// there must be a BUG in the device add-on or someone is trying to
 				// fool us (UpEvent() is public) as we did not request the device
@@ -303,9 +303,8 @@ PPPStateMachine::UpFailedEvent()
 				break;
 			}
 			
-			// TODO:
-			// report that up failed
-			// Report(PPP_CONNECTION_REPORT, PPP_UP_FAILED, NULL, 0);
+			Interface()->Report(PPP_CONNECTION_REPORT, PPP_UP_FAILED, NULL, 0);
+			
 			if(Interface()->Parent())
 				Interface()->Parent()->StateMachine().UpFailedEvent(Interface());
 		break;
@@ -373,8 +372,6 @@ PPPStateMachine::DownEvent()
 {
 	LockerHelper locker(fLock);
 	
-	NewPhase(PPP_DOWN_PHASE);
-	
 	switch(State()) {
 		case PPP_CLOSED_STATE:
 		case PPP_CLOSING_STATE:
@@ -385,40 +382,14 @@ PPPStateMachine::DownEvent()
 			// The RFC says we should reconnect, but our implementation
 			// will only do this if auto-redial is enabled (only clients).
 			NewStatus(PPP_STARTING_STATE);
-			
-			// TODO:
-			// report that we lost the connection
-			// if fAuthStatus == FAILED || fPeerAuthStatus == FAILED
-			//  Report(PPP_CONNECTION_REPORT, PPP_AUTH_FAILED, NULL, 0);
-			// else
-			//  Report(PPP_CONNECTION_REPORT, PPP_CONNECTION_LOST, NULL, 0);
 		break;
 		
 		case PPP_STOPPING_STATE:
-			NewStatus(PPP_STARTING_STATE);
-			
-			// TODO:
-			// report that we lost the connection
-			// Report(PPP_CONNECTION_REPORT, PPP_CONNECTION_LOST, NULL, 0);
-		break;
-		
 		case PPP_REQ_SENT_STATE:
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
-			NewStatus(PPP_STARTING_STATE);
-			
-			// TODO:
-			// report that we lost the connection
-			// Report(PPP_CONNECTION_REPORT, PPP_CONNECTION_LOST, NULL, 0);
-		break;
-		
 		case PPP_OPENED_STATE:
-			// tld/1
 			NewStatus(PPP_STARTING_STATE);
-			
-			// TODO:
-			// report that we lost the connection
-			// Report(PPP_CONNECTION_REPORT, PPP_CONNECTION_LOST, NULL, 0);
 		break;
 		
 		default:
@@ -430,19 +401,30 @@ PPPStateMachine::DownEvent()
 	// DownEncapsulators();
 	// ResetOptionHandlers();
 	
+	NewPhase(PPP_DOWN_PHASE);
+	
 	// maybe we need to redial
 	if(State() == PPP_STARTING_STATE) {
+		if(fAuthentiactionStatus == PPP_AUTHENTICATION_FAILED
+				|| fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED)
+			Interface()->Report(PPP_CONNECTION_REPORT, PPP_AUTHENTICATION_FAILED,
+				NULL, 0);
+		else
+			Interface()->Report(PPP_CONNECTION_REPORT, PPP_CONNECTION_LOST,
+				NULL, 0);
+		
+		if(Interface()->Parent())
+			Interface()->Parent()->StateMachine().UpFailedEvent(Interface());
+		
+		NewState(PPP_INITIAL_STATE);
+		
 		if(Interface()->DoesAutoRedial()) {
-			NewState(PPP_INITIAL_STATE);
 			// TODO:
-			// redial using a new thread (maybe interface manager will help us)
-		} else {
-			if(Interface()->Parent())
-				Interface()->Parent()->StateMachine().UpFailedEvent(Interface());
-			// TODO:
-			// we must delete our interface
-		}
-	}
+			// Redial()
+		} else
+			Interface()->Delete();
+	} else
+		Report(PPP_CONNECTION_REPORT, PPP_DOWN_SUCCESSFUL, NULL, 0);
 }
 
 
@@ -674,6 +656,8 @@ PPPStateMachine::RCRBadEvent(mbuf *nak, mbuf *reject)
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
+			NewPhase(PPP_ESTABLISHMENT_PHASE);
+				// tell handlers that we are reconfiguring
 			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
@@ -749,6 +733,8 @@ PPPStateMachine::RCAEvent(mbuf *packet)
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
+			NewPhase(PPP_ESTABLISHMENT_PHASE);
+				// tell handlers that we are reconfiguring
 			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
@@ -808,6 +794,8 @@ PPPStateMachine::RCNEvent(mbuf *packet)
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
+			NewPhase(PPP_ESTABLISHMENT_PHASE);
+				// tell handlers that we are reconfiguring
 			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
@@ -835,12 +823,16 @@ PPPStateMachine::RTREvent(mbuf *packet)
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_REQ_SENT_STATE);
+			NewPhase(PPP_TERMINATION_PHASE);
+				// tell handlers that we are terminating
 			locker.UnlockNow();
 			SendTerminateAck(packet);
 		break;
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_STOPPING_STATE);
+			NewPhase(PPP_TERMINATION_PHASE);
+				// tell handlers that we are terminating
 			ZeroRestartCount();
 			locker.UnlockNow();
 			ThisLayerDown();
@@ -848,6 +840,8 @@ PPPStateMachine::RTREvent(mbuf *packet)
 		break;
 		
 		default:
+			NewPhase(PPP_TERMINATION_PHASE);
+				// tell handlers that we are terminating
 			locker.UnlockNow();
 			SendTerminateAck(packet);
 	}
@@ -1155,7 +1149,15 @@ PPPStateMachine::ThisLayerUp()
 	
 	// We begin with authentication phase and wait until each phase is done.
 	// We stop when we reach established phase.
+	
+	// Do not forget to check if we are going down.
+	if(Phase() != PPP_ESTABLISHMENT_PHASE)
+		return;
+	
 	NewPhase(PPP_AUTHENTICATION_PHASE);
+	
+	locker.UnlockNow();
+	
 	BringHandlersUp();
 }
 
@@ -1166,8 +1168,8 @@ PPPStateMachine::ThisLayerDown()
 	// TODO:
 	// DownProtocols();
 	// DownEncapsulators();
-	// If there are protocols/encapsulators with PPP_DOWN_NEEDED flag
-	// wait until they report a DownEvent() (or until all of them are down).
+	
+	// PPPProtocol/Encapsulator::Down() should block if needed.
 }
 
 
@@ -1182,10 +1184,6 @@ PPPStateMachine::ThisLayerStarted()
 void
 PPPStateMachine::ThisLayerFinished()
 {
-	// TODO:
-	// DownProtocols();
-	// DownEncapsulators();
-	
 	if(Interface()->Device())
 		Interface()->Device()->Down();
 }
@@ -1326,11 +1324,15 @@ PPPStateMachine::SendEchoReply(mbuf *request)
 void
 PPPStateMachine::BringHandlersUp()
 {
-	while(Phase() <= PPP_ESTABLISHED_PHASE) {
+	while(Phase() <= PPP_ESTABLISHED_PHASE && Phase() >= PPP_AUTHENTICATION_PHASE) {
 		if(BringPhaseUp() > 0)
 			break;
 		
-		if(Phase() == PPP_ESTABLISHED_PHASE) {
+		fLock.Lock();
+		
+		if(Phase() < PPP_AUTHENTICATION_PHASE)
+			return;
+		else if(Phase() == PPP_ESTABLISHED_PHASE) {
 			if(Interface()->Parent())
 				Interface()->Parent()->StateMachine().UpEvent(Interface());
 			
@@ -1340,6 +1342,8 @@ PPPStateMachine::BringHandlersUp()
 				Interface()->Ifnet()->if_flags |= IFF_RUNNING;
 		} else
 			NewPhase(Phase() + 1);
+		
+		fLock.Unlock();
 	}
 }
 
@@ -1348,6 +1352,11 @@ PPPStateMachine::BringHandlersUp()
 uint32
 PPPStateMachine::BringPhaseUp()
 {
+	LockerHelper locker(fLock);
+	
+	if(Phase() < PPP_AUTHENTICATION_PHASE)
+		return 0;
+	
 	uint32 count = 0;
 	PPPProtocol *protocol_handler;
 	PPPEncapsulator *encapsulator_handler = Interface()->FirstEncapsulator();

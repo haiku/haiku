@@ -27,10 +27,12 @@ PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NUL
 	: fSettings(dup_driver_settings(settings)),
 	StateMachine(*this), LCP(*this), fIfnet(NULL), fLinkMTU(1500),
 	fAccessing(0), fChildrenCount(0), fDevice(NULL), fFirstEncapsulator(NULL),
-	fGeneralLock(StateMachine().Locker())
+	fLock(StateMachine().Locker())
 {
 	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &fManager) != B_OK)
 		fManager = NULL;
+	
+	fPort = create_port(0, "PPP: reply port");
 	
 	// are we a multilink subinterface?
 	if(parent && parent->IsMultilink()) {
@@ -75,11 +77,14 @@ PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NUL
 
 PPPInterface::~PPPInterface()
 {
+	Report(PPP_DESTRUCTION_REPORT, 0, NULL, 0);
+		// tell all listeners that we are being destroyed
+	
 	// TODO:
 	// remove our iface, so that nobody will access it:
 	//  go down if up
 	//  unregister from ppp_manager
-	//  delete children
+	//  delete children/remove from parent
 	// destroy and remove:
 	// device
 	// protocols
@@ -89,13 +94,21 @@ PPPInterface::~PPPInterface()
 	// put all modules (in fModules)
 	
 	put_module((module_info**) &fManager);
+	delete_port(fPort);
+}
+
+
+void
+PPPInterface::Delete()
+{
+	fManager->delete_interface(this);
 }
 
 
 status_t
 PPPInterface::InitCheck() const
 {
-	if(!fSettings || !fManager)
+	if(!fSettings || !fManager || fPort < 0)
 		return B_ERROR;
 	
 	// sub-interfaces should have a device
@@ -421,7 +434,7 @@ PPPInterface::SetAutoRedial(bool autoredial = true)
 	if(Mode() == PPP_CLIENT_MODE)
 		return false;
 	
-	LockerHelper locker(fGeneralLock);
+	LockerHelper locker(fLock);
 	
 	fAutoRedial = autoredial;
 }
@@ -433,7 +446,7 @@ PPPInterface::SetDialOnDemand(bool dialondemand = true)
 	if(Mode() != PPP_CLIENT_MODE)
 		return false;
 	
-	LockerHelper locker(fGeneralLock);
+	LockerHelper locker(fLock);
 	
 	fDialOnDemand = dialondemand;
 	
@@ -493,33 +506,111 @@ PPPInterface::Down()
 bool
 PPPInterface::IsUp() const
 {
-	LockerHelper locker(fGeneralLock);
+	LockerHelper locker(fLock);
 	
 	return StateMachine().Phase() == PPP_ESTABLISHED_PHASE;
 }
 
 
-/*
-
 void
-PPPInterface::EnableReports(PPP_REPORT type, thread_id thread,
-	bool needsVerification = false)
+PPPInterface::EnableReports(PPP_REPORT_TYPE type, port_id port,
+	int32 flags = PPP_NO_REPORT_FLAGS)
 {
+	LockerHelper locker(fLock);
+	
+	ppp_report_request request;
+	request.type = type;
+	request.port = port;
+	request.flags = flags;
+	
+	fReportRequests.AddItem(request);
 }
 
 
 void
-PPPInterface::DisableReports(PPP_REPORT type, thread_id thread)
+PPPInterface::DisableReports(PPP_REPORT_TYPE type, port_id port)
 {
+	LockerHelper locker(fLock);
+	
+	for(int32 i = 0; i < fReportRequests.CountItems(); i++) {
+		ppp_report_request& request = fReportRequests.ItemAt(i);
+		
+		if(request.port != port)
+			continue;
+		
+		if(report.type == type)
+			fReportRequest.RemoveItem(request);
+	}
 }
 
 
 bool
-PPPInterface::Reports(PPP_REPORT type, thread_id thread)
+PPPInterface::DoesReport(PPP_REPORT_TYPE type, port_id port)
 {
+	LockerHelper locker(fLock);
+	
+	for(int32 i = 0; i < fReportRequests.CountItems(); i++) {
+		ppp_report_request& request = fReportRequests.ItemAt(i);
+		
+		if(request.port == port && request.type == type)
+			return true;
+	}
+	
+	return false;
 }
 
-*/
+
+bool
+PPPInterface::Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
+{
+	if(length > PPP_REPORT_DATA_LIMIT || fPort < 0)
+		return false;
+	
+	if(fReportRequests.CountItems() == 0)
+		return true;
+	
+	if(!data)
+		length = 0;
+	
+	LockerHelper locker(fLock);
+	
+	int32 code, query, result;
+	bool successful = true;
+	
+	report_packet report;
+	report.port = fPort;
+	report.type = type;
+	report.code = code;
+	report.length = length;
+	memcpy(report.data, data, length);
+	
+	for(int32 index = 0; index < fReportRequests.CountItems(); index++) {
+		ppp_report_request& request = fReportRequests.ItemAt(index);
+		
+		result = write_port_etc(request.port, PPP_REPORT_CODE, &report,
+			sizeof(report), B_TIMEOUT, PPP_REPORT_TIMEOUT);
+		
+		if(result == B_BAD_PORT_ID) {
+			fReportRequests.RemoveItem(request);
+			--index;
+			continue;
+		} else if(result == B_OK) {
+			if(request.flags & PPP_WAIT_FOR_REPLY) {
+				result = read_port_etc(fPort, &code, NULL, 0,
+					B_TIMEOUT, PPP_REPORT_TIMEOUT);
+				if(result == 0 && code != B_OK)
+					successful = false;
+			}
+		}
+		
+		if(request.flags & PPP_REMOVE_AFTER_REPORT) {
+			fReportRequests.RemoveItem(request);
+			--index;
+		}
+	}
+	
+	return successful;
+}
 
 
 bool
