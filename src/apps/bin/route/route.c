@@ -287,7 +287,7 @@ void flushroutes(int argc, char *argv[])
 		errno = EACCES;
 		quit("must be root to alter routing table");
 	}
-	shutdown(s, 0); /* Don't want to read back our messages */
+	shutdown(s, SHUTDOWN_RECV); /* Don't want to read back our messages */
 	if (argc > 1) {
 		argv++;
 		if (argc == 2 && **argv == '-')
@@ -616,7 +616,7 @@ int newroute(int argc, char **argv)
 	}
 	cmd = argv[0];
 	if (*cmd != 'g')
-		shutdown(s, 0); /* Don't want to read back our messages */
+		shutdown(s, SHUTDOWN_RECV); /* Don't want to read back our messages */
 	while (--argc > 0) {
 		if (**(++argv)== '-') {
 			switch (key = keyword(1 + *argv)) {
