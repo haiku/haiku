@@ -281,6 +281,15 @@ typedef struct {
 
 /************ DMA command defines ***********/
 
+#define NV_GENERAL_FIFO_CH0					0x0000
+#define NV_GENERAL_FIFO_CH1					0x2000
+#define NV_GENERAL_FIFO_CH2					0x4000
+#define NV_GENERAL_FIFO_CH3					0x6000
+#define NV_GENERAL_FIFO_CH4					0x8000
+#define NV_GENERAL_FIFO_CH5					0xa000
+#define NV_GENERAL_FIFO_CH6					0xc000
+#define NV_GENERAL_FIFO_CH7					0xe000
+#define NV_GENERAL_CMDHANDLE				0x0000
 #define NV_GENERAL_DMAPUT					0x0040
 #define NV_GENERAL_DMAGET					0x0044
 #define NV_ROP5_SOLID_SETROP5				0x0300
