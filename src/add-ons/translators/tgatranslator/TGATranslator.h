@@ -40,7 +40,7 @@
 #define TGA_TRANSLATOR_VERSION 100
 #define TGA_IN_QUALITY 1.0
 	// high in quality becuase this code supports all TGA features
-#define TGA_IN_CAPABILITY 0.8
+#define TGA_IN_CAPABILITY 0.6
 	// high in capability because this code opens basically all TGAs
 #define TGA_OUT_QUALITY 1.0
 	// high out quality because this code outputs fully standard TGAs
@@ -58,11 +58,11 @@
 
 // TGA files are stored in the Intel byte order :)
 struct TGAFileHeader {
-	uint8 idlength;				// Number of bytes in the Image ID field
+	uint8 idlength;
+		// Number of bytes in the Image ID field
 	uint8 colormaptype;
 		// 0	Has NO color-map (palette)
 		// 1	Has color-map (palette)
-		
 	uint8 imagetype;
 		// 0	No Image Data Included
 		// 1	Uncompressed, Color-mapped image
@@ -81,27 +81,25 @@ struct TGAFileHeader {
 #define TGA_NOCOMP_COLORMAP		1
 #define TGA_NOCOMP_TRUECOLOR	2
 #define TGA_NOCOMP_BW			3
-
 #define TGA_RLE_COLORMAP		9
 #define TGA_RLE_TRUECOLOR		10
 #define TGA_RLE_BW				11
 
-// Information about the color map (palette)
-// these bytes are always present, but are zero if no color map
-// is present
+// Information about the color map (palette). These bytes are
+// always present, but are zero if no color map is present
 struct TGAColorMapSpec {
 	uint16 firstentry;		// first useful entry in the color map
 	uint16 length;			// number of color map entries
 	uint8 entrysize;		// number of bits per entry
 };
 
-// Information about the image data
 struct TGAImageSpec {
 	uint16 xorigin;
 	uint16 yorigin;
 	uint16 width;
 	uint16 height;
-	uint8 depth;			// pixel depth includes alpha!
+	uint8 depth;
+		// pixel depth includes alpha bits!
 	uint8 descriptor;
 		// bits 3-0: number of attribute bits per pixel
 		// bits 5&4: order pixels are drawn to the screen
@@ -122,6 +120,9 @@ struct TGAImageSpec {
 #define TGA_ORIGIN_HORZ_BIT	0x10
 #define TGA_ORIGIN_LEFT		0
 #define TGA_ORIGIN_RIGHT	1
+
+#define TGA_DESC_BITS76		0xc0
+#define TGA_DESC_ALPHABITS	0x0f
 
 #define TGA_HEADERS_SIZE 18
 
