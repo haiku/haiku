@@ -98,7 +98,7 @@ AllocationBlock::SetTo(AllocationGroup &group, uint16 block)
 	// 8 blocks per byte
 	fNumBits = fVolume->BlockSize() << 3;
 	// the last group may have less bits in the last block
-	if ((group.fNumBits % fNumBits) != 0)
+	if (block * fNumBits > group.fNumBits)
 		fNumBits = group.fNumBits % fNumBits;
 
 	return CachedBlock::SetTo(group.fStart + block) != NULL ? B_OK : B_ERROR;
@@ -574,7 +574,7 @@ BlockAllocator::Allocate(Transaction *transaction, const Inode *inode, off_t num
 			group = data->direct[last].allocation_group;
 			start = data->direct[last].start + data->direct[last].length;
 		}
-	} else if (inode->IsDirectory()) {
+	} else if (inode->IsContainer()) {
 		// directory data will go in the same allocation group as the inode is in
 		// but after the inode data
 		start = inode->BlockRun().start;
@@ -749,7 +749,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 				continue;
 			}
 
-			if (!inode->IsDirectory()) {
+			if (!inode->IsContainer()) {
 				FATAL(("check: inode at %Ld should have been a directory\n", fVolume->ToBlock(cookie->current)));
 				continue;
 			}
@@ -849,7 +849,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 					Transaction transaction(fVolume, cookie->parent->BlockNumber());
 
 					inode->Node()->flags |= INODE_DONT_FREE_SPACE;
-					status = cookie->parent->Remove(&transaction, name, NULL, inode->IsDirectory());
+					status = cookie->parent->Remove(&transaction, name, NULL, inode->IsContainer());
 					if (status == B_OK)
 						transaction.Done();
 				} else
@@ -865,7 +865,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 				cookie->stack.Push(inode->Attributes());
 
 			// push the directory on the stack so that it will be scanned later
-			if (inode->IsDirectory() && !inode->IsIndex())
+			if (inode->IsContainer() && !inode->IsIndex())
 				cookie->stack.Push(inode->BlockRun());
 			else {
 				// check it now
@@ -922,7 +922,7 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 	uint32 block = run.start / bitsPerBlock;
 	uint32 pos = run.start % bitsPerBlock;
 	int32 length = 0;
-	int64 firstMissing = -1, firstSet = -1;
+	off_t firstMissing = -1, firstSet = -1;
 	off_t firstGroupBlock = (off_t)run.allocation_group << fVolume->AllocationGroupShift();
 
 	AllocationBlock cached(fVolume);
@@ -931,6 +931,11 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 		if (cached.SetTo(fGroups[run.allocation_group], block) < B_OK)
 			RETURN_ERROR(B_IO_ERROR);
 
+		if (pos >= cached.NumBlockBits()) {
+			// something very strange has happened...
+			RETURN_ERROR(B_ERROR);
+		}
+
 		while (length < run.length && pos < cached.NumBlockBits()) {
 			if (!cached.IsUsed(pos)) {
 				if (control == NULL) {
@@ -938,12 +943,12 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 					return B_BAD_DATA;
 				}
 				if (firstMissing == -1) {
-					firstMissing = pos + block * bitsPerBlock;
+					firstMissing = firstGroupBlock + pos + block * bitsPerBlock;
 					control->errors |= BFS_MISSING_BLOCKS;
 				}
 				control->stats.missing++;
 			} else if (firstMissing != -1) {
-				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %ld are not allocated!\n", type, run.allocation_group, run.start, run.length, firstMissing, pos + block * bitsPerBlock - 1));
+				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are not allocated!\n", type, run.allocation_group, run.start, run.length, firstMissing, firstGroupBlock + pos + block * bitsPerBlock - 1));
 				firstMissing = -1;
 			}
 
@@ -953,13 +958,13 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 				uint32 offset = pos + block * bitsPerBlock;
 				if (CheckBitmapIsUsedAt(firstGroupBlock + offset)) {
 					if (firstSet == -1) {
-						firstSet = offset;
+						firstSet = firstGroupBlock + offset;
 						control->errors |= BFS_BLOCKS_ALREADY_SET;
 					}
 					control->stats.already_set++;
 				} else {
 					if (firstSet != -1) {
-						FATAL(("%s: block_run(%ld, %u, %u): blocks %Ld - %ld are already set!\n", type, run.allocation_group, run.start, run.length, firstSet, offset - 1));
+						FATAL(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are already set!\n", type, run.allocation_group, run.start, run.length, firstSet, firstGroupBlock + offset - 1));
 						firstSet = -1;
 					}
 					SetCheckBitmapAt(firstGroupBlock + offset);
@@ -968,12 +973,14 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 			length++;
 			pos++;
 		}
-	}
 
-	if (firstMissing != -1)
-		PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %ld are not allocated!\n", type, run.allocation_group, run.start, run.length, firstMissing, pos + (block - 1) * bitsPerBlock - 1));
-	if (firstSet != -1)
-		FATAL(("%s: block_run(%ld, %u, %u): blocks %Ld - %ld are already set!\n", type, run.allocation_group, run.start, run.length, firstSet, pos + (block - 1) * bitsPerBlock - 1));
+		if (block + 1 >= fBlocksPerGroup || length >= run.length) {
+			if (firstMissing != -1)
+				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are not allocated!\n", type, run.allocation_group, run.start, run.length, firstMissing, firstGroupBlock + pos + block * bitsPerBlock - 1));
+			if (firstSet != -1)
+				FATAL(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are already set!\n", type, run.allocation_group, run.start, run.length, firstSet, firstGroupBlock + pos + block * bitsPerBlock - 1));
+		}
+	}
 
 	return B_OK;
 }
@@ -1044,8 +1051,47 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 		if (status < B_OK)
 			return status;
 
-		// ToDo: add test for double indirect range!
-		FATAL(("*** test for the double indirect range is not yet done ***\n"));
+		int32 runsPerBlock = fVolume->BlockSize() / sizeof(block_run);
+		int32 runsPerArray = runsPerBlock << ARRAY_BLOCKS_SHIFT;
+
+		CachedBlock cachedDirect(fVolume);
+		int32 maxIndirectIndex = (data->double_indirect.length << fVolume->BlockShift()) / sizeof(block_run);
+
+		for (int32 indirectIndex = 0; indirectIndex < maxIndirectIndex; indirectIndex++) {
+			// get the indirect array block
+			block_run *array = (block_run *)cached.SetTo(fVolume->ToBlock(data->double_indirect)
+				+ indirectIndex / runsPerBlock);
+			if (array == NULL)
+				return B_IO_ERROR;
+
+			block_run indirect = array[indirectIndex % runsPerBlock];
+			// are we finished yet?
+			if (indirect.IsZero())
+				return B_OK;
+
+			status = CheckBlockRun(indirect, "double indirect->runs", control);
+			if (status < B_OK)
+				return status;
+
+			int32 maxIndex = (indirect.length << fVolume->BlockShift()) / sizeof(block_run);
+
+			for (int32 index = 0; index < maxIndex; ) {
+				block_run *runs = (block_run *)cachedDirect.SetTo(fVolume->ToBlock(indirect)
+					+ index / runsPerBlock);
+				if (runs == NULL)
+					return B_IO_ERROR;
+
+				do {
+					// are we finished yet?
+					if (runs[index % runsPerBlock].IsZero())
+						return B_OK;
+
+					status = CheckBlockRun(runs[index % runsPerBlock], "double indirect->runs->run", control);
+					if (status < B_OK)
+						return status;
+				} while ((++index % runsPerArray) != 0);
+			}
+		}
 	}
 
 	return B_OK;
