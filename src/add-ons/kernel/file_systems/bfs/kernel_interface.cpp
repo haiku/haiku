@@ -1,6 +1,6 @@
 /* kernel_interface - file system interface to BeOS' vnode layer
 **
-** Initial version by Axel Dörfler, axeld@pinc-software.de
+** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
@@ -26,10 +26,9 @@
 #	define _IMPEXP_KERNEL
 #endif
 
-extern "C" {
-	#include <lock.h>
-	#include <cache.h>
-}
+#include <cache.h>
+#include <lock.h>
+
 #include <fs_attr.h>
 #include <fs_info.h>
 #include <fs_index.h>
@@ -44,97 +43,6 @@ extern "C" {
 
 double
 strtod(const char */*start*/, char **/*end*/)
-{
-	return 0;
-}
-
-
-void
-force_cache_flush(int dev, int prefer_log_blocks)
-{
-}
-
-
-int
-flush_blocks(int dev, off_t bnum, int nblocks)
-{
-	return 0;
-}
-
-
-int
-flush_device(int dev, int warn_locked)
-{
-	return 0;
-}
-
-
-int
-init_cache_for_device(int fd, off_t max_blocks)
-{
-	return 0;
-}
-
-
-int
-remove_cached_device_blocks(int dev, int allow_write)
-{
-	return 0;
-}
-
-
-void *
-get_block(int dev, off_t bnum, int bsize)
-{
-	return NULL;
-}
-
-
-void *
-get_empty_block(int dev, off_t bnum, int bsize)
-{
-	return NULL;
-}
-
-
-int
-release_block(int dev, off_t bnum)
-{
-	return 0;
-}
-
-#if 0
-int
-mark_blocks_dirty(int dev, off_t bnum, int nblocks)
-{
-}
-#endif
-
-int
-cached_read(int dev, off_t bnum, void *data, off_t num_blocks, int bsize)
-{
-	return 0;
-}
-
-
-int
-cached_write(int dev, off_t bnum, const void *data, off_t num_blocks, int bsize)
-{
-	return 0;
-}
-
-
-int
-cached_write_locked(int dev, off_t bnum, const void *data, off_t num_blocks, int bsize)
-{
-	return 0;
-}
-
-
-int
-set_blocks_info(int dev, off_t *blocks, int nblocks,
-	void (*func)(off_t bnum, size_t nblocks, void *arg),
-	void *arg)
 {
 	return 0;
 }
@@ -158,10 +66,6 @@ bfs_mount(mount_id mountID, const char *device, void *args, void **data, vnode_i
 		*rootID = volume->ToVnode(volume->Root());
 		INFORM(("mounted \"%s\" (root node at %Ld, device = %s)\n",
 			volume->Name(), *rootID, device));
-
-#ifdef DEBUG
-		add_debugger_commands();
-#endif
 	}
 	else
 		delete volume;
@@ -179,9 +83,6 @@ bfs_unmount(void *ns)
 	status_t status = volume->Unmount();
 	delete volume;
 
-#ifdef DEBUG
-	remove_debugger_commands();
-#endif
 	RETURN_ERROR(status);
 }
 
@@ -456,7 +357,7 @@ bfs_lookup(void *_ns, void *_directory, const char *file, vnode_id *_vnodeID, in
 static status_t
 bfs_ioctl(void *_ns, void *_node, void *_cookie, ulong cmd, void *buffer, size_t bufferLength)
 {
-	FUNCTION_START(("node = %p, cmd = %d, buf = %p, len = %ld\n", _node, cmd, buffer, bufferLength));
+	FUNCTION_START(("node = %p, cmd = %lu, buf = %p, len = %ld\n", _node, cmd, buffer, bufferLength));
 
 	if (_ns == NULL)
 		return B_BAD_VALUE;
@@ -985,7 +886,7 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 	// If anything fails now, we have to remove the inode from the
 	// new directory in any case to restore the previous state
 	status_t bailStatus = B_OK;
-	
+
 	// update the name only when they differ
 	bool nameUpdated = false;
 	if (strcmp(oldName, newName)) {
@@ -996,12 +897,12 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			nameUpdated = true;
 		}
 	}
-	
+
 	if (status == B_OK) {
 		status = tree->Remove(&transaction, (const uint8 *)oldName, strlen(oldName), id);
 		if (status == B_OK) {
 			inode->Node()->parent = newDirectory->BlockRun();
-			
+
 			// if it's a directory, update the parent directory pointer
 			// in its tree if necessary
 			BPlusTree *movedTree = NULL;
@@ -1020,6 +921,8 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 					return B_OK;
 				}
 			}
+			// If we get here, something has gone wrong already!
+
 			// Those better don't fail, or we switch to a read-only
 			// device for safety reasons (Volume::Panic() does this
 			// for us)
@@ -1030,8 +933,17 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 				movedTree->Replace(&transaction, (const uint8 *)"..", 2, oldDirectory->ID());
 		}
 	}
-	if (bailStatus == B_OK && nameUpdated)
+
+	if (bailStatus == B_OK && nameUpdated) {
 		bailStatus = inode->SetName(&transaction, oldName);
+		if (status == B_OK) {
+			// update inode and index
+			inode->WriteBack(&transaction);
+
+			Index index(volume);
+			index.UpdateName(&transaction, newName, oldName, inode);
+		}
+	}
 
 	if (bailStatus == B_OK)
 		bailStatus = newTree->Remove(&transaction, (const uint8 *)newName, strlen(newName), id);
@@ -2003,7 +1915,14 @@ bfs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+#ifdef DEBUG
+			add_debugger_commands();
+#endif
+			return B_OK;
 		case B_MODULE_UNINIT:
+#ifdef DEBUG
+			remove_debugger_commands();
+#endif
 			return B_OK;
 
 		default:
