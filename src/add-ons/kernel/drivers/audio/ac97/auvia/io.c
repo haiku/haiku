@@ -81,48 +81,6 @@ auvia_reg_write_32(device_config *config, int regno, uint32 value)
 	write_io_32(config->nabmbar + regno, value);
 }
 
-/* Emu10k1 Low level */
-
-/*uint32
-auvia_chan_read(device_config *config, uint16 chano, uint32 reg)
-{
-	uint32       ptr, mask = 0xFFFFFFFF;
-	uint8        size, offset = 0;
-	
-	ptr = ((((uint32) reg) << 16) & 
-		(IS_AUDIGY(config) ? EMU_A_PTR_ADDR_MASK : EMU_PTR_ADDR_MASK)) |
-		(chano & EMU_PTR_CHNO_MASK);
-	if (reg & 0xff000000) {
-		size = (reg >> 24) & 0x3f;
-		offset = (reg >> 16) & 0x1f;
-		mask = ((1 << size) - 1) << offset;
-	}
-	write_io_32(config->nabmbar + EMU_PTR, ptr);
-	ptr = (read_io_32(config->nabmbar + EMU_DATA) & mask) >> offset;
-	return ptr;
-}
-
-void
-auvia_chan_write(device_config *config, uint16 chano,
-	      uint32 reg, uint32 data)
-{
-	uint32       ptr, mask;
-	uint8        size, offset;
-	
-	ptr = ((((uint32) reg) << 16) & 
-		(IS_AUDIGY(config) ? EMU_A_PTR_ADDR_MASK : EMU_PTR_ADDR_MASK)) |
-		(chano & EMU_PTR_CHNO_MASK);
-	if (reg & 0xff000000) {
-		size = (reg >> 24) & 0x3f;
-		offset = (reg >> 16) & 0x1f;
-		mask = ((1 << size) - 1) << offset;
-		data = ((data << offset) & mask) |
-			(auvia_chan_read(config, chano, reg & 0xFFFF) & ~mask);
-	}
-	write_io_32(config->nabmbar + EMU_PTR, ptr);
-	write_io_32(config->nabmbar + EMU_DATA, data);
-}*/
-
 /* codec */
 
 #define AUVIA_TIMEOUT 	200
