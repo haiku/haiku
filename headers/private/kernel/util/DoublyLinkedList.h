@@ -68,7 +68,7 @@ class List {
 
 		IteratorType Iterator()
 		{
-			return IteratorType(*this);
+			return IteratorType(this);
 		}
 
 		bool IsEmpty()
@@ -93,6 +93,7 @@ class List {
 		}
 
 	private:
+		friend class IteratorType;
 		Link fLink;
 };
 
@@ -102,11 +103,11 @@ class Iterator {
 		typedef List<Item, LinkMember> ListType;
 
 		Iterator() : fCurrent(NULL) {}
-		Iterator(ListType &list) : fCurrent(list.Head()) {}
+		Iterator(ListType *list) : fList(list), fCurrent(list->Head()) {}
 
 		Item *Next()
 		{
-			if (fCurrent->next == NULL)
+			if (fCurrent == &fList->fLink)
 				return NULL;
 
 			Link *current = fCurrent;
@@ -116,6 +117,7 @@ class Iterator {
 		}
 
 	private:
+		ListType *fList;
 		Link *fCurrent;
 };
 
