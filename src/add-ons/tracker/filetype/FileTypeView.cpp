@@ -1,6 +1,7 @@
 #include <MenuItem.h>
 #include <Message.h>
 #include <Mime.h>
+#include <Window.h>
 #include <FileTypeView.h>
 
 FileTypeView::FileTypeView(BRect viewFrame)
@@ -12,7 +13,7 @@ FileTypeView::FileTypeView(BRect viewFrame)
 	const char * fileTypeLabel = "File Type";
 	BRect fileTypeRect(10,10,viewFrame.Width()-55,90);
 	fFileTypeBox = new BBox(fileTypeRect,fileTypeLabel,
-	                        B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP);
+	                        B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP, B_WILL_DRAW);
 	fFileTypeBox->SetLabel(fileTypeLabel);
 	AddChild(fFileTypeBox);
 	
@@ -25,7 +26,7 @@ FileTypeView::FileTypeView(BRect viewFrame)
 	const char * preferredAppLabel = "Preferred Application";
 	BRect preferredAppRect(10,95,viewFrame.Width()-55,170);
 	fPreferredAppBox = new BBox(preferredAppRect,preferredAppLabel,
-	                            B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM);
+	                            B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fPreferredAppBox->SetLabel(preferredAppLabel);
 	AddChild(fPreferredAppBox);
 	
@@ -48,11 +49,59 @@ FileTypeView::~FileTypeView()
 {
 }
 
+
+
+class BAppMenuItem : public BMenuItem {
+private:
+	const char * fMimestr;
+	BAppMenuItem(const char * label)
+	 : BMenuItem(label,NULL) {
+		fMimestr = 0;
+	}
+	void SetMime(const char * mimestr) {
+		fMimestr = mimestr;
+	}
+	~BAppMenuItem() {
+		if (fMimestr != Label()) {
+			delete fMimestr;
+		}
+	}
+public:
+	const char * Mime() {
+		return fMimestr;
+	}
+static BAppMenuItem * CreateItemForMime(const char * mimestr) {
+		BMimeType mime(mimestr);
+		entry_ref ref;
+		const char * label = mimestr;
+		if (mime.InitCheck() == B_OK) {
+			if (mime.GetAppHint(&ref) == B_OK) {
+				label = ref.name;
+			}
+		}
+		BAppMenuItem * item = new BAppMenuItem(label);
+		item->SetMime(strdup(mimestr));
+		return item;
+	}
+};
+
 void
 FileTypeView::SetFileType(const char * fileType)
 {
+	bool fast = (fFileType.Compare(fileType) == 0);
 	fFileType.SetTo(fileType);
 	fFileTypeTextControl->SetText(fileType);
+	if (fast)
+		return;
+	BWindow * window = Window();
+	if (window) {
+		window->DisableUpdates();
+	}
+	for (int i = fPreferredAppMenu->CountItems() ; (i > 1) ; i--) {
+		BMenuItem * item = fPreferredAppMenu->ItemAt(i);
+		fPreferredAppMenu->RemoveItem(i);
+		delete item;
+	}
 	BMimeType mime(fileType);
 	if (mime.InitCheck() != B_OK) {
 		return;
@@ -69,48 +118,47 @@ FileTypeView::SetFileType(const char * fileType)
 	if (applications.FindInt32("be:super", &supers) != B_OK) {
 		supers = 0;
 	}
-	for (int i = fPreferredAppMenu->CountItems() ; (i > 2) ; i--) {
-		BMenuItem * item = fPreferredAppMenu->ItemAt(i);
-		fPreferredAppMenu->RemoveItem(i);
-		delete item;
-	}
 	bool separator = false;
 	for (int i = 0 ; (i < subs+supers) ; i++) {
 		const char * str;
 		if (applications.FindString("applications", i, &str) == B_OK) {
-			BMimeType app_mime(str);
-			BMessage * message = NULL;
-			entry_ref ref;
-			if (app_mime.InitCheck() == B_OK) {
-				if (app_mime.GetAppHint(&ref) == B_OK) {
-					message = new BMessage();
-					message->AddString("mimetype",str);
-					str = ref.name;
-				}
-			}
 			if (i < subs) {
 				separator = true;
 			} else if (separator) {
 				fPreferredAppMenu->AddSeparatorItem();
 				separator = false;
 			}
-			fPreferredAppMenu->AddItem(new BMenuItem(str,message));
+			fPreferredAppMenu->AddItem(BAppMenuItem::CreateItemForMime(str));
 		}
+	}
+	if (window) {
+		window->EnableUpdates();
 	}
 }
 
 void
 FileTypeView::SetPreferredApplication(const char * preferredApplication)
 {
-	if (preferredApplication == 0) {
-		fPreferredApp.SetTo(preferredApplication);
+	fPreferredApp.SetTo(preferredApplication);
+	if (preferredApplication == NULL) {
 		fPreferredAppMenuItemNone->SetMarked(true);
 	} else {
-		BMenuItem * item = fPreferredAppMenu->FindItem(preferredApplication);
-		if (item != 0) {
-			fPreferredApp.SetTo(preferredApplication);
-			item->SetMarked(true);
+		for (int i = 0 ; (i < fPreferredAppMenu->CountItems()) ; i++) {
+			BAppMenuItem * item
+			  = dynamic_cast<BAppMenuItem*>(fPreferredAppMenu->ItemAt(i));
+			if (item) {
+				if ((strcmp(item->Label(),preferredApplication) == 0) ||
+					(strcmp(item->Mime(),preferredApplication) == 0)) {
+					if (!item->IsMarked()) {
+						item->SetMarked(true);
+					}
+					return;
+				}
+			}
 		}
+		BAppMenuItem * item = BAppMenuItem::CreateItemForMime(preferredApplication);
+		fPreferredAppMenu->AddItem(item);
+		item->SetMarked(true);
 	}
 }
 
@@ -135,12 +183,13 @@ FileTypeView::GetFileType() const
 const char *
 FileTypeView::GetPreferredApplication() const
 {
-	BMenuItem * item = fPreferredAppMenu->FindMarked();
+	BAppMenuItem * item
+	  = dynamic_cast<BAppMenuItem*>(fPreferredAppMenu->FindMarked());
 	if (item == 0) {
 		return 0;
 	}
 	if (item == fPreferredAppMenuItemNone) {
 		return 0;
 	}
-	return item->Label();
+	return item->Mime();
 }

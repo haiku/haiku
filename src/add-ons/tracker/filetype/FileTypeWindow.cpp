@@ -118,8 +118,8 @@ FileTypeWindow::SaveRequested()
 {
 	status_t result = B_OK;
 	
-	const char * fileType = fView->GetFileType();
-	const char * preferredApplication = fView->GetPreferredApplication();
+	BString fileType(fView->GetFileType());
+	BString preferredApplication(fView->GetPreferredApplication());
 	
 	if (fEntryList != 0) {
 		for (int32 i = 0 ; (i < fEntryList->CountItems()) ; i++) {
@@ -133,17 +133,17 @@ FileTypeWindow::SaveRequested()
 				// save errors are ignored: there's usually no good way for the user to recover
 				continue; // can't proceed with an invalid nodeinfo
 			}
-			if ((result = nodeInfo.SetType(fileType)) != B_OK) {
+			if ((result = nodeInfo.SetType(fileType.String())) != B_OK) {
 				// save errors are ignored: there's usually no good way for the user to recover
 			}
-			if ((result = nodeInfo.SetPreferredApp(preferredApplication)) != B_OK) {
+			if ((result = nodeInfo.SetPreferredApp(preferredApplication.String())) != B_OK) {
 				// save errors are ignored: there's usually no good way for the user to recover
 			}
 		}
 	}
 	
-	fView->SetFileType(fileType);
-	fView->SetPreferredApplication(preferredApplication);	
+	fView->SetFileType(fileType.String());
+	fView->SetPreferredApplication(preferredApplication.String());	
 	return result;
 }
 
