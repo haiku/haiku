@@ -12,7 +12,5 @@ extern int __libc_fcntl (int fd, int cmd, ...);
 libc_hidden_proto (__libc_fcntl)
 extern int __open (__const char *__file, int __oflag, ...);
 libc_hidden_proto (__open)
-extern int __fcntl (int __fd, int __cmd, ...);
-libc_hidden_proto (__fcntl)
 
 #endif
