@@ -42,7 +42,7 @@ int poll(struct pollfd *fds, nfds_t numfds, int timeout)
 
 		tv.tv_sec 	= timeout / 1000;
 		tv.tv_usec	= 1000 * (timeout % 1000);
-		rc = select(n, &read_set, &write_set, &exception_set, &tv);
+		rc = select(n+1, &read_set, &write_set, &exception_set, &tv);
 	};
 
 	if (rc < 0)
