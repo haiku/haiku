@@ -4,7 +4,7 @@
 	
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-9/2003
+	Rudolf Cornelissen 10/2002-10/2003
 */
 
 #define MODULE_BIT 0x08000000
@@ -170,8 +170,8 @@ status_t check_overlay_capability(uint32 feature)
 		break;
 	}
 
-	/* fixme: setup NV4 overlay also... */
-	if (si->ps.card_arch > NV04A)
+	/* all supported cards have a bes... */
+	if (si->ps.card_arch >= NV04A)
 	{
 		/* export video overlay functions */
 		LOG(4, ("Overlay: Exporting hook %s.\n", msg));

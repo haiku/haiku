@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05-2002/09-2003 */
+/* Written by Rudolf Cornelissen 05-2002/10-2003 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -96,21 +96,22 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		switch (cs)
 		{
 			case B_YCbCr422:
-					/* check if slopspace is needed: GeForce need ~0x001f. */
-					/* fixme:
-					 * update needed for GF DVDmax support to adhere to CRTC2 constraints?? */
-					if (width == (width & ~0x001f))
+					if (si->ps.card_arch < NV10A)
 					{
-						si->overlay.myBuffer[offset].width = width;
+						/* check if slopspace is needed: RIVA128 and TNT need ~0x000f. */
+						si->overlay.myBuffer[offset].width = ((width + 0x000f) & ~0x000f);
 					}
 					else
 					{
-						si->overlay.myBuffer[offset].width = (width & ~0x001f) + 0x0020;
+						/* check if slopspace is needed: GeForce need ~0x001f. */
+						/* fixme:
+						 * update needed for GF DVDmax support to adhere to CRTC2 constraints?? */
+						si->overlay.myBuffer[offset].width = ((width + 0x001f) & ~0x001f);
 					}
 					si->overlay.myBuffer[offset].bytes_per_row = 2 * si->overlay.myBuffer[offset].width;
 
 					/* check if the requested horizontal pitch is supported: */
-					//fixme: tune for GF...
+					//fixme: tune for GF and TNT...
 					if (si->overlay.myBuffer[offset].width > 4088)
 					{
 						LOG(4,("Overlay: Sorry, requested buffer pitch not supported, aborted\n"));
@@ -386,9 +387,18 @@ status_t GET_OVERLAY_CONSTRAINTS
 		switch (ob->space)
 		{
 			case B_YCbCr422:
-					/* GeForce need 31. 
-					 * Note: this has to be in sync with the slopspace setup during buffer allocation.. */
-					oc->view.width_alignment = 31;
+					if (si->ps.card_arch < NV10A)
+					{
+						/* RIVA128 and TNT need 15.
+						 * Note: this has to be in sync with the slopspace setup during buffer allocation.. */
+						oc->view.width_alignment = 15;
+					}
+					else
+					{
+						/* GeForce need 31. 
+						 * Note: this has to be in sync with the slopspace setup during buffer allocation.. */
+						oc->view.width_alignment = 31;
+					}
 					break;
 			default:
 					/* we should not be here, but set the worst-case value just to be safe anyway */
@@ -409,6 +419,7 @@ status_t GET_OVERLAY_CONSTRAINTS
 		oc->window.height_alignment = 0;
 		oc->window.width.min = 2;
 		/* GeForce cards can output upto and including 2046 pixels in width */
+		//fixme: how about TNT?
 		if (dm->virtual_width > 2046)
 		{
 			oc->window.width.max = 2046;
@@ -419,6 +430,7 @@ status_t GET_OVERLAY_CONSTRAINTS
 		}
 		oc->window.height.min = 2;
 		/* GeForce cards can output upto and including 2046 pixels in height */
+		//fixme: how about TNT?
 		if (dm->virtual_height > 2046)
 		{
 			oc->window.height.max = 2046;
@@ -431,12 +443,18 @@ status_t GET_OVERLAY_CONSTRAINTS
 		/* GeForce scaling restrictions */
 		switch (si->ps.card_arch)
 		{
+		case NV04A:
+			/* Riva128-TNT2 series have an old BES engine... */
+			oc->h_scale.min = 1.0;
+			oc->v_scale.min = 1.0;
+			break;
 		case NV30A:
 			/* GeForceFX series have a new BES engine... */
 			oc->h_scale.min = 0.5;
 			oc->v_scale.min = 0.5;
 			break;
 		default:
+			/* the rest in between... */
 			oc->h_scale.min = 0.125;
 			oc->v_scale.min = 0.125;
 			break;

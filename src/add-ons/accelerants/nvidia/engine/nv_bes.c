@@ -1,4 +1,4 @@
-/* Nvidia GeForce Back End Scaler functions */
+/* Nvidia TNT and GeForce Back End Scaler functions */
 /* Written by Rudolf Cornelissen 05/2002-10/2003 */
 
 #define MODULE_BIT 0x00000200
@@ -10,18 +10,44 @@
 
 status_t nv_bes_init()
 {
-	/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
-	BESW(NV10_INTE, 0x00000000);
-	/* shut off GeForce4MX MPEG2 decoder */
-	BESW(DEC_GENCTRL, 0x00000000);
-	/* setup BES memory-range mask */
-	BESW(NV10_0MEMMASK, ((si->ps.memory_size << 20) - 1));
-	/* unknown, but needed */
-	BESW(NV10_0WHAT, 0x00000000);
+	if (si->ps.card_arch < NV10A)
+	{
+		/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
+		BESW(NV04_INTE, 0x00000000);
 
-	/* setup brightness, contrast and saturation to be 'neutral' */
-	BESW(NV10_0BRICON, ((0x1000 << 16) | 0x1000));
-	BESW(NV10_0SAT, ((0x0000 << 16) | 0x1000));
+		/* setup saturation to be 'neutral' */
+		BESW(NV04_SAT, 0x00000000);
+		/* setup RGB brightness to be 'neutral' */
+		BESW(NV04_RED_AMP, 0x00000069);
+		BESW(NV04_GRN_AMP, 0x0000003e);
+		BESW(NV04_BLU_AMP, 0x00000089);
+
+		/* setup fifo for fetching data */
+		BESW(NV04_FIFOBURL, 0x00000003);
+		BESW(NV04_FIFOTHRS, 0x00000038);
+
+		/* unknown, but needed (registers only have b0 implemented) */
+		/* (program both buffers to prevent sync distortions) */
+		BESW(NV04_0OFFSET, 0x00000000);
+		BESW(NV04_1OFFSET, 0x00000000);
+	}
+	else
+	{
+		/* >= NV10A */
+
+		/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
+		BESW(NV10_INTE, 0x00000000);
+		/* shut off GeForce4MX MPEG2 decoder */
+		BESW(DEC_GENCTRL, 0x00000000);
+		/* setup BES memory-range mask */
+		BESW(NV10_0MEMMASK, ((si->ps.memory_size << 20) - 1));
+		/* unknown, but needed */
+		BESW(NV10_0OFFSET, 0x00000000);
+
+		/* setup brightness, contrast and saturation to be 'neutral' */
+		BESW(NV10_0BRICON, ((0x1000 << 16) | 0x1000));
+		BESW(NV10_0SAT, ((0x0000 << 16) | 0x1000));
+	}
 
 	return B_OK;
 }
@@ -250,14 +276,25 @@ status_t nv_configure_bes
 	LOG(4,("Overlay: horizontal scaling factor is %f\n", (float)65536 / ifactor));
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	if (((((uint32)my_ov.width) << 16) / 16384) > hiscalv)
+	/* (assuming) all cards have a upscaling limit of 8.0 */
+	if (hiscalv < 0x00002000)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
-		hiscalv = ((((uint32)my_ov.width) << 16) / 16384);
+		hiscalv = 0x00002000;
 		LOG(4,("Overlay: horizontal scaling factor too large, clamping at %f\n", (float)65536 / hiscalv));
 	}
 	switch (si->ps.card_arch)
 	{
+	case NV04A:
+		/* Riva128-TNT2 series have a 'downscaling' limit of 1.000489
+		 * (16bit register with 0.11 format value) */
+		if (hiscalv > 0x0000ffff)
+		{
+			/* (non-inverse) factor too small, set factor to min. valid value */
+			hiscalv = 0x0000ffff;
+			LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)2048 / (hiscalv >> 5)));
+		}
+		break;
 	case NV30A:
 		/* GeForceFX series have a downscaling limit of 0.5 */
 		if (hiscalv > (2 << 16))
@@ -268,6 +305,7 @@ status_t nv_configure_bes
 		}
 		break;
 	default:
+		/* the rest has a downscaling limit of 0.125 */
 		if (hiscalv > (8 << 16))
 		{
 			/* (non-inverse) factor too small, set factor to min. valid value */
@@ -364,14 +402,25 @@ status_t nv_configure_bes
 	viscalv = ifactor;
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	if (((((uint32)my_ov.height) << 16) / 16384) > viscalv)
+	/* (assuming) all cards have a upscaling limit of 8.0 */
+	if (viscalv < 0x00002000)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
-		viscalv = ((((uint32)my_ov.height) << 16) / 16384);
+		viscalv = 0x00002000;
 		LOG(4,("Overlay: vertical scaling factor too large, clamping at %f\n", (float)65536 / viscalv));
 	}
 	switch (si->ps.card_arch)
 	{
+	case NV04A:
+		/* Riva128-TNT2 series have a 'downscaling' limit of 1.000489
+		 * (16bit register with 0.11 format value) */
+		if (viscalv > 0x0000ffff)
+		{
+			/* (non-inverse) factor too small, set factor to min. valid value */
+			viscalv = 0x0000ffff;
+			LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)2048 / (viscalv >> 5)));
+		}
+		break;
 	case NV30A:
 		/* GeForceFX series have a downscaling limit of 0.5 */
 		if (viscalv > (2 << 16))
@@ -382,6 +431,7 @@ status_t nv_configure_bes
 		}
 		break;
 	default:
+		/* the rest has a downscaling limit of 0.125 */
 		if (viscalv > (8 << 16))
 		{
 			/* (non-inverse) factor too small, set factor to min. valid value */
@@ -393,6 +443,10 @@ status_t nv_configure_bes
 	/* AND below is required by hardware */
 	viscalv &= 0x001ffffc;
 
+
+	/* calculate inputbitmap origin adress */
+	a1orgv = (uint32)((vuint32 *)ob->buffer);
+	a1orgv -= (uint32)((vuint32 *)si->framebuffer);
 
 	/* do vertical clipping... */
 	/* Setup vertical source start: first (sub)pixel contributing to output picture. */
@@ -414,23 +468,32 @@ status_t nv_configure_bes
 			/* increase 'number of clipping pixels' with 'fixed value':
 			 * 'total height - 2' of dest. picture in pixels * inverse scaling factor */
 			v1srcstv = (ow->height - 2) * ifactor;
+			/* on pre-NV10 we need to do clipping in the source
+			 * bitmap because no seperate clipping registers exist... */
+			if (si->ps.card_arch < NV10A)
+				a1orgv += ((v1srcstv >> 16) * ob->bytes_per_row);
 		}
 		else
 		{
 			/* increase 'first contributing pixel' with:
 			 * number of destination picture clipping pixels * inverse scaling factor */
 			v1srcstv = (crtc_vstart - ow->v_start) * ifactor;
+			/* on pre-NV10 we need to do clipping in the source
+			 * bitmap because no seperate clipping registers exist... */
+			if (si->ps.card_arch < NV10A)
+				a1orgv += ((v1srcstv >> 16) * ob->bytes_per_row);
 		}
 		LOG(4,("Overlay: clipping at top...\n"));
 	}
 	/* take zoom into account */
 	v1srcstv += (((uint32)my_ov.v_start) << 16);
+	if (si->ps.card_arch < NV10A)
+	{
+		a1orgv += (my_ov.v_start * ob->bytes_per_row);
+		LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n", a1orgv));
+	}
 	LOG(4,("Overlay: first vert. (sub)pixel of input bitmap contributing %f\n", v1srcstv / (float)65536));
 
-
-	/* calculate inputbitmap origin adress */
-	a1orgv = (uint32)((vuint32 *)ob->buffer);
-	a1orgv -= (uint32)((vuint32 *)si->framebuffer);
 	/* AND below is probably required by hardware. */
 	/* Buffer A topleft corner of field 1 (origin)(field 1 contains our full frames) */
 	a1orgv &= 0xfffffff0;
@@ -467,66 +530,150 @@ status_t nv_configure_bes
 	 *** actually program the registers ***
 	 **************************************/
 
-	/* We only use buffer buffer 0: select it. (0x01 = buffer 0, 0x10 = buffer 1) */
-	BESW(NV10_BUFSEL, 0x00000001);  
-	/* setup buffer origin: GeForce uses subpixel precise clipping on left and top! (12.4 values) */
-	BESW(NV10_0SRCREF, ((v1srcstv << 4) & 0xffff0000) | ((hsrcstv >> 12) & 0x0000ffff));
-	/* setup buffersize */
-	BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
-	/* setup source pitch including slopspace (in bytes),
-	 * b16: select YUY2 (0 = YV12), b20: use colorkey, b24: no iturbt_709 */
-	/* Note:
-	 * source pitch granularity = 32 pixels on GeForce cards!! */
-	BESW(NV10_0SRCPTCH, (((ob->width * 2) & 0x0000ffff) | (1 << 16) | (1 << 20) | (0 << 24)));
-	/* setup output window position */
-	BESW(NV10_0DSTREF, ((vcoordv & 0xffff0000) | ((hcoordv & 0xffff0000) >> 16)));
-	/* setup output window size */
-	BESW(NV10_0DSTSIZE, (
-		(((vcoordv & 0x0000ffff) - ((vcoordv & 0xffff0000) >> 16) + 1) << 16) |
-		((hcoordv & 0x0000ffff) - ((hcoordv & 0xffff0000) >> 16) + 1)
-		));
-	/* setup horizontal scaling */
-	BESW(NV10_0ISCALH, (hiscalv << 4));
-	/* setup vertical scaling */
-	BESW(NV10_0ISCALV, (viscalv << 4));
-	/* setup (unclipped!) buffer startadress in RAM */
-	BESW(NV10_0BUFADR, a1orgv);
-	/* enable BES (b0 = 0) */
-	BESW(NV10_GENCTRL, 0x00000000);  
-
-	/**************************
-	 *** setup color keying ***
-	 **************************/
-
-	/* setup colorkeying */
-	switch(si->dm.space)
+	if (si->ps.card_arch < NV10A)
 	{
-	case B_RGB15_LITTLE:
-		BESW(NV10_COLKEY, (
-			((ow->blue.value & ow->blue.mask) << 0)   |
-			((ow->green.value & ow->green.mask) << 5) |
-			((ow->red.value & ow->red.mask) << 10)    |
-			((ow->alpha.value & ow->alpha.mask) << 15)
+		/* unknown, but needed (otherwise high-res distortions and only half the frames */
+		BESW(NV04_OE_STATE, 0x00000000);
+		/* select buffer 0 as active (b16) */
+		BESW(NV04_SU_STATE, 0x00000000);
+		/* unknown (no effect?) */
+		BESW(NV04_RM_STATE, 0x00000000);
+		/* setup clipped(!) buffer startadress in RAM */
+		/* RIVA128 - TNT bes doesn't have clipping registers, so no subpixelprecise clipping
+		 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
+		/* (program both buffers to prevent sync distortions) */
+		/* first include 'pixel precise' left clipping... (top clipping was already included) */
+		a1orgv += ((hsrcstv >> 16) * 2);
+		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+		BESW(NV04_0BUFADR, (a1orgv & ~0x03));
+		BESW(NV04_1BUFADR, (a1orgv & ~0x03));
+		/* setup buffer source pitch including slopspace (in bytes).
+		 * Note:
+		 * source pitch granularity = 16 pixels on the RIVA128 - TNT (so pre-NV10) bes */
+		/* (program both buffers to prevent sync distortions) */
+		BESW(NV04_0SRCPTCH, (ob->width * 2));
+		BESW(NV04_1SRCPTCH, (ob->width * 2));
+		/* setup output window position */
+		BESW(NV04_DSTREF, ((vcoordv & 0xffff0000) | ((hcoordv & 0xffff0000) >> 16)));
+		/* setup output window size */
+		BESW(NV04_DSTSIZE, (
+			(((vcoordv & 0x0000ffff) - ((vcoordv & 0xffff0000) >> 16) + 1) << 16) |
+			((hcoordv & 0x0000ffff) - ((hcoordv & 0xffff0000) >> 16) + 1)
 			));
-		break;
-	case B_RGB16_LITTLE:
-		BESW(NV10_COLKEY, (
-			((ow->blue.value & ow->blue.mask) << 0)   |
-			((ow->green.value & ow->green.mask) << 5) |
-			((ow->red.value & ow->red.mask) << 11)
-			/* this space has no alpha bits */
+		/* setup horizontal and vertical scaling */
+		BESW(NV04_ISCALVH, (((viscalv << 16) >> 5) | (hiscalv >> 5)));
+		/* enable vertical filtering (b0) */
+		BESW(NV04_CTRL_V, 0x00000001);
+		/* enable horizontal filtering (no effect?) */
+		BESW(NV04_CTRL_H, 0x00000111);
+
+		/* enable BES (b0), enable colorkeying (b4), format yuy2 (b8: 0 = ccir) */
+		BESW(NV04_GENCTRL, 0x00000111);
+		/* select buffer 1 as active (b16) */
+		BESW(NV04_SU_STATE, 0x00010000);
+
+		/**************************
+		 *** setup color keying ***
+		 **************************/
+
+		/* setup colorkeying */
+		switch(si->dm.space)
+		{
+		case B_RGB15_LITTLE:
+			BESW(NV04_COLKEY, (
+				((ow->blue.value & ow->blue.mask) << 0)   |
+				((ow->green.value & ow->green.mask) << 5) |
+				((ow->red.value & ow->red.mask) << 10)    |
+				((ow->alpha.value & ow->alpha.mask) << 15)
+				));
+			break;
+		case B_RGB16_LITTLE:
+			BESW(NV04_COLKEY, (
+				((ow->blue.value & ow->blue.mask) << 0)   |
+				((ow->green.value & ow->green.mask) << 5) |
+				((ow->red.value & ow->red.mask) << 11)
+				/* this space has no alpha bits */
+				));
+			break;
+		case B_CMAP8:
+		case B_RGB32_LITTLE:
+		default:
+			BESW(NV04_COLKEY, (
+				((ow->blue.value & ow->blue.mask) << 0)   |
+				((ow->green.value & ow->green.mask) << 8) |
+				((ow->red.value & ow->red.mask) << 16)    |
+				((ow->alpha.value & ow->alpha.mask) << 24)
+				));
+			break;
+		}
+	}
+	else
+	{
+		/* >= NV10A */
+	
+		/* setup buffer origin: GeForce uses subpixel precise clipping on left and top! (12.4 values) */
+		BESW(NV10_0SRCREF, ((v1srcstv << 4) & 0xffff0000) | ((hsrcstv >> 12) & 0x0000ffff));
+		/* setup buffersize */
+		//fixme if needed: width must be even officially...
+		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
+		/* setup source pitch including slopspace (in bytes),
+		 * b16: select YUY2 (0 = YV12), b20: use colorkey, b24: no iturbt_709 (do iturbt_601) */
+		/* Note:
+		 * source pitch granularity = 32 pixels on GeForce cards!! */
+		BESW(NV10_0SRCPTCH, (((ob->width * 2) & 0x0000ffff) | (1 << 16) | (1 << 20) | (0 << 24)));
+		/* setup output window position */
+		BESW(NV10_0DSTREF, ((vcoordv & 0xffff0000) | ((hcoordv & 0xffff0000) >> 16)));
+		/* setup output window size */
+		BESW(NV10_0DSTSIZE, (
+			(((vcoordv & 0x0000ffff) - ((vcoordv & 0xffff0000) >> 16) + 1) << 16) |
+			((hcoordv & 0x0000ffff) - ((hcoordv & 0xffff0000) >> 16) + 1)
 			));
-		break;
-	case B_CMAP8:
-	case B_RGB32_LITTLE:
-	default:
-		BESW(NV10_COLKEY, (
-			((ow->blue.value & ow->blue.mask) << 0)   |
-			((ow->green.value & ow->green.mask) << 8) |
-			((ow->red.value & ow->red.mask) << 16)    |
-			((ow->alpha.value & ow->alpha.mask) << 24)
-			));
-		break;
+		/* setup horizontal scaling */
+		BESW(NV10_0ISCALH, (hiscalv << 4));
+		/* setup vertical scaling */
+		BESW(NV10_0ISCALV, (viscalv << 4));
+		/* setup (unclipped!) buffer startadress in RAM */
+		BESW(NV10_0BUFADR, a1orgv);
+		/* enable BES (b0 = 0) */
+		BESW(NV10_GENCTRL, 0x00000000);
+		/* We only use buffer buffer 0: select it. (0x01 = buffer 0, 0x10 = buffer 1) */
+		/* This also triggers activation of programmed values (double buffered registers feature) */
+		BESW(NV10_BUFSEL, 0x00000001);
+
+		/**************************
+		 *** setup color keying ***
+		 **************************/
+
+		/* setup colorkeying */
+		switch(si->dm.space)
+		{
+		case B_RGB15_LITTLE:
+			BESW(NV10_COLKEY, (
+				((ow->blue.value & ow->blue.mask) << 0)   |
+				((ow->green.value & ow->green.mask) << 5) |
+				((ow->red.value & ow->red.mask) << 10)    |
+				((ow->alpha.value & ow->alpha.mask) << 15)
+				));
+			break;
+		case B_RGB16_LITTLE:
+			BESW(NV10_COLKEY, (
+				((ow->blue.value & ow->blue.mask) << 0)   |
+				((ow->green.value & ow->green.mask) << 5) |
+				((ow->red.value & ow->red.mask) << 11)
+				/* this space has no alpha bits */
+				));
+			break;
+		case B_CMAP8:
+		case B_RGB32_LITTLE:
+		default:
+			BESW(NV10_COLKEY, (
+				((ow->blue.value & ow->blue.mask) << 0)   |
+				((ow->green.value & ow->green.mask) << 8) |
+				((ow->red.value & ow->red.mask) << 16)    |
+				((ow->alpha.value & ow->alpha.mask) << 24)
+				));
+			break;
+		}
 	}
 
 	return B_OK;
@@ -534,8 +681,16 @@ status_t nv_configure_bes
 
 status_t nv_release_bes()
 {
-	/* setup BES control: disable scaler (b0 = 1) */
-	BESW(NV10_GENCTRL, 0x00000001);  
+	if (si->ps.card_arch < NV10A)
+	{
+		/* setup BES control: disable scaler (b0 = 0) */
+		BESW(NV04_GENCTRL, 0x00000000);
+	}
+	else
+	{
+		/* setup BES control: disable scaler (b0 = 1) */
+		BESW(NV10_GENCTRL, 0x00000001);  
+	}
 
 	return B_OK;
 }

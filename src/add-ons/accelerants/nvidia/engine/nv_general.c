@@ -81,7 +81,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.06 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.07 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -271,6 +271,7 @@ status_t nv_general_powerup()
 		break;
 	case 0x025010de: /* Nvidia GeForce4 Ti 4600 */
 	case 0x025110de: /* Nvidia GeForce4 Ti 4400 */
+	case 0x025210de: /* Nvidia GeForce4 Ti 4600 */
 	case 0x025310de: /* Nvidia GeForce4 Ti 4200 */
 		si->ps.card_type = NV25;
 		si->ps.card_arch = NV20A;

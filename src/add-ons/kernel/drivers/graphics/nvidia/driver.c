@@ -148,6 +148,7 @@ static uint16 nvidia_device_list[] = {
 	0x0203, /* Nvidia Quadro DCC */
 	0x0250, /* Nvidia GeForce4 Ti 4600 */
 	0x0251, /* Nvidia GeForce4 Ti 4400 */
+	0x0252, /* Nvidia GeForce4 Ti 4600 */
 	0x0253, /* Nvidia GeForce4 Ti 4200 */
 	0x0258, /* Nvidia Quadro4 900 XGL */
 	0x0259, /* Nvidia Quadro4 750 XGL */
