@@ -399,11 +399,12 @@ void CurView::SetDefaults(void)
 	if(port==B_NAME_NOT_FOUND)
 		return;
 		
-	PortLink link(port);
-	PortMessage pmsg;
+	BPortLink link(port);
+	int32 code;
 	
-	link.SetOpCode(AS_SET_SYSCURSOR_DEFAULTS);
-	link.FlushWithReply(&pmsg);
+	link.StartMessage(AS_SET_SYSCURSOR_DEFAULTS);
+	link.Flush();
+	link.GetNextReply(&code);
 
 }
 

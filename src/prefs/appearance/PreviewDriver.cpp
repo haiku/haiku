@@ -156,7 +156,7 @@ void PreviewDriver::SetMode(const display_mode &mode)
 {
 }
 
-void PreviewDriver::FillSolidRect(const BRect &rect, RGBColor &color)
+void PreviewDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(color.GetColor32());
@@ -180,8 +180,11 @@ void PreviewDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
+void PreviewDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color)
 {
+	BPoint start(x1,y1);
+	BPoint end(x2,y2);
+	
 	view->viewbmp->Lock();
 	drawview->SetHighColor(color.GetColor32());
 	drawview->StrokeLine(start,end);
@@ -190,11 +193,14 @@ void PreviewDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBC
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d)
+void PreviewDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
 {
 	if(!d)
 		return;
 	
+	BPoint start(x1,y1);
+	BPoint end(x2,y2);
+
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
@@ -204,7 +210,7 @@ void PreviewDriver::StrokePatternLine(const BPoint &start, const BPoint &end, co
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
+void PreviewDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
 {
 	view->viewbmp->Lock();
 	drawview->SetHighColor(color.GetColor32());
@@ -234,12 +240,12 @@ void PreviewDriver::ReleaseBuffer(void)
 {
 	view->viewbmp->Unlock();
 }
+
 bool PreviewDriver::Lock(bigtime_t timeout=B_INFINITE_TIMEOUT)
 {
-	return view->viewbmp->Lock();
+	return true;
 }
 
 void PreviewDriver::Unlock(void)
 {
-	view->viewbmp->Unlock();
 }

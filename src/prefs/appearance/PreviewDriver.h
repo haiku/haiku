@@ -79,11 +79,11 @@ public:
 	virtual void Unlock(void);
 
 protected:
-	virtual void FillSolidRect(const BRect &rect, RGBColor &color);
+	virtual void FillSolidRect(const BRect &rect, const RGBColor &color);
 	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
-	virtual void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
-	virtual void StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d);
-	virtual void StrokeSolidRect(const BRect &rect, RGBColor &color);
+	virtual void StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color);
+	virtual void StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d);
+	virtual void StrokeSolidRect(const BRect &rect, const RGBColor &color);
 
 	virtual bool AcquireBuffer(FBBitmap *bmp);
 	virtual void ReleaseBuffer(void);

@@ -253,9 +253,9 @@ void DecView::NotifyServer(void)
 		return;
 	
 	
-	PortLink pl(serverport);
-	pl.SetOpCode(AS_SET_DECORATOR);
-	pl.Attach(item->Text(),strlen(item->Text())+1);
+	BPortLink pl(serverport);
+	pl.StartMessage(AS_SET_DECORATOR);
+	pl.AttachString(item->Text());
 	pl.Flush();
 }
 
