@@ -234,7 +234,12 @@ void GetAppInfoTester::GetRunningAppInfoTest2()
 	BRoster roster;
 	// invalid team ID
 	app_info info;
+#ifdef TEST_R5
 	CHK(roster.GetRunningAppInfo(-1, &info) == B_ERROR);
+#else
+	CHK(roster.GetRunningAppInfo(-1, &info) == B_BAD_TEAM_ID);
+#endif
+	CHK(roster.GetRunningAppInfo(-2, &info) == B_BAD_TEAM_ID);
 	// originally valid team ID -- app terminates before call
 	AppRunner runner(true);
 	CHK(runner.Run("AppRunTestApp1") == B_OK);
