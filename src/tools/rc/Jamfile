@@ -2,6 +2,10 @@ SubDir OBOS_TOP src tools rc ;
 
 GENERATE_C++ on [ FGristFiles lexer.l parser.y ] = true ;
 
+{
+	SubDirC++Flags -Wno-sign-compare -Wno-unused ;
+}
+
 SharedLibrary rdef : compile.cpp decompile.cpp lexer.l parser.y rdef.cpp : be ;
 AbsSymLink <boot!home!config!lib>librdef.so : librdef.so
 		   : /boot/home/config/lib : false ;
