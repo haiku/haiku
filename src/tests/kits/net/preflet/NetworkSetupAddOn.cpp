@@ -3,8 +3,8 @@
 #include "NetworkSetupAddOn.h"
 
 
-NetworkSetupAddOn::NetworkSetupAddOn()
-	: is_dirty(false), profile(NULL)
+NetworkSetupAddOn::NetworkSetupAddOn(image_id image)
+	: is_dirty(false), profile(NULL), addon_image(image)
 {
 }
 

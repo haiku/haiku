@@ -430,28 +430,34 @@ void NetworkSetupWindow::BuildShowMenu
 	
 			printf("Addon %s loaded.\n", addon_path.Path());
 		
-			by_instantiate_func by_func;
-			network_setup_addon_instantiate ns_func;
+			by_instantiate_func by_instantiate;
+			network_setup_addon_instantiate get_nth_addon;
 			status_t status;
 			
-			status = get_image_symbol(addon_id, "get_addon", B_SYMBOL_TYPE_TEXT, (void **) &ns_func);
+			status = get_image_symbol(addon_id, "get_nth_addon", B_SYMBOL_TYPE_TEXT, (void **) &get_nth_addon);
 			if (status == B_OK) {
 				NetworkSetupAddOn *addon;
+				int n;
+				
+				n = 0;
+				while ((addon = get_nth_addon(addon_id, n)) != NULL) {
+					BMessage *msg = new BMessage(msg_what);
+					
+					msg->AddInt32("image_id", addon_id);
+					msg->AddString("addon_path", addon_path.Path());
+					msg->AddPointer("addon", addon);
+					menu->AddItem(new BMenuItem(addon->Name(), msg));
+					n++;
+				}
 
-				addon = ns_func();
-				BMessage *msg = new BMessage(msg_what);
-				msg->AddInt32("image_id", addon_id);
-				msg->AddString("addon_path", addon_path.Path());
-				msg->AddPointer("addon", addon);
-				menu->AddItem(new BMenuItem(addon->Name(), msg));
-				continue;
+				continue;	// skip the Boneyard addon test...
 			};
 
-			status = get_image_symbol(addon_id, "instantiate", B_SYMBOL_TYPE_TEXT, (void **) &by_func);
+			status = get_image_symbol(addon_id, "instantiate", B_SYMBOL_TYPE_TEXT, (void **) &by_instantiate);
 			if (status == B_OK) {
 				BYAddon *addon;
 
-				addon = by_func();
+				addon = by_instantiate();
 				BMessage *msg = new BMessage(msg_what);
 				msg->AddInt32("image_id", addon_id);
 				msg->AddString("addon_path", addon_path.Path());
@@ -460,8 +466,8 @@ void NetworkSetupWindow::BuildShowMenu
 				continue;
 			};
 	
-			//  No "modules" symbol found in this addon
-			printf("Symbol \"instantiate\" not found in %s addon: not a module addon!\n", addon_path.Path());
+			//  No "addon instantiate function" symbol found in this addon
+			printf("No symbol \"get_nth_addon\" or \"instantiate\" not found in %s addon: not a network setup addon!\n", addon_path.Path());
 			unload_add_on(addon_id);
 		};
 		
