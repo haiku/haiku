@@ -244,10 +244,21 @@ restartIfBusy:
 
 
 static status_t
-bfs_release_vnode(void *ns, void *_node, bool reenter)
+bfs_release_vnode(void *_ns, void *_node, bool reenter)
 {
 	//FUNCTION_START(("node = %p\n", _node));
+
+	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
+
+	// since a directory's size can be changed without having it opened,
+	// we need to take care about their preallocated blocks here
+	if (inode->NeedsTrimming()) {
+		Transaction transaction(volume, inode->BlockNumber());
+		
+		if (inode->TrimPreallocation(transaction) == B_OK)
+			transaction.Done();
+	}
 
 	delete inode;
 
@@ -1049,10 +1060,6 @@ bfs_open(void *_ns, void *_node, int omode, void **_cookie)
 	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
 
-	// we can't open a file which uses uncached access twice
-	if (inode->Flags() & INODE_NO_CACHE)
-		return B_BUSY;
-
 	// opening a directory read-only is allowed, although you can't read
 	// any data from it.
 	if (inode->IsDirectory() && omode & O_RWMASK) {
@@ -1159,10 +1166,7 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 	if (status == B_OK)
 		transaction.Done();
 
-	if (status == B_OK && (inode->Flags() & INODE_NO_CACHE) == 0) {
-		// uncached files don't cause notifications during access, and
-		// never want to write back any cached blocks
-
+	if (status == B_OK) {
 		// periodically notify if the file size has changed
 		// ToDo: should we better test for a change in the last_modified time only?
 		if (cookie->last_size != inode->Size()
@@ -1205,7 +1209,10 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
 
-	if (cookie->open_mode & O_RWMASK) {
+	bool needsTrimming = inode->NeedsTrimming();
+
+	if (cookie->open_mode & O_RWMASK
+		&& (needsTrimming || inode->OldLastModified() != inode->LastModified())) {
 #ifdef UNSAFE_GET_VNODE
 		RecursiveLocker locker(volume->Lock());
 #endif
@@ -1219,8 +1226,8 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		bool changed = false;
 		Index index(volume);
 
-		if (inode->OldSize() != inode->Size()) {
-			status = inode->Trim(transaction);
+		if (needsTrimming) {
+			status = inode->TrimPreallocation(transaction);
 			if (status < B_OK)
 				FATAL(("Could not trim preallocated blocks!"));
 	

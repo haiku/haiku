@@ -1201,12 +1201,6 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer, size_t 
 	if (pos + length > Size()) {
 		off_t oldSize = Size();
 
-		// uncached files can't be resized (Inode::SetFileSize() also
-		// doesn't allow this, but this way we don't have to start a
-		// transaction to find out).
-		if (Flags() & INODE_NO_CACHE)
-			return B_BAD_VALUE;
-
 		// the transaction doesn't have to be started already
 		// ToDo: what's that INODE_NO_TRANSACTION flag good for again?
 		if ((Flags() & INODE_NO_TRANSACTION) == 0
@@ -1388,8 +1382,13 @@ Inode::GrowStream(Transaction &transaction, off_t size)
 		// blocks we need to allocate may be different from the one we request
 		// from the block allocator
 
-	// should we preallocate some blocks (currently, always 64k)?
-	if (blocksRequested < (65536 >> fVolume->BlockShift()) && fVolume->FreeBlocks() > 128)
+	// Should we preallocate some blocks (currently, always 64k)?
+	// Attributes, attribute directories, and long symlinks usually won't get that big,
+	// and should stay close to the inode - preallocating could be counterproductive.
+	// Also, if free disk space is tight, we probably don't want to do this as well.
+	if (!IsAttribute() && !IsAttributeDirectory() && !IsSymLink()
+		&& blocksRequested < (65536 >> fVolume->BlockShift())
+		&& fVolume->FreeBlocks() > 128)
 		blocksRequested = 65536 >> fVolume->BlockShift();
 
 	while (blocksNeeded > 0) {
@@ -1795,11 +1794,7 @@ Inode::ShrinkStream(Transaction &transaction, off_t size)
 status_t 
 Inode::SetFileSize(Transaction &transaction, off_t size)
 {
-	if (size < 0
-		// uncached files can't be resized (Stream<Cache>::WriteAt() specifically
-		// denies growing uncached files because of efficiency, so it had to be
-		// adapted if this ever changes [which will probably happen in OpenBeOS]).
-		|| Flags() & INODE_NO_CACHE)
+	if (size < 0)
 		return B_BAD_VALUE;
 
 	off_t oldSize = Size();
@@ -1835,8 +1830,29 @@ Inode::Append(Transaction &transaction, off_t bytes)
 }
 
 
+/**	Checks wether or not this inode's data stream needs to be trimmed
+ *	because of an earlier preallocation.
+ *	Returns true if there are any blocks to be trimmed.
+ */
+
+bool 
+Inode::NeedsTrimming()
+{
+	// We never trim preallocated index blocks to make them grow as smooth as possible.
+	// There are only few indices anyway, so this doesn't hurt
+	if (IsIndex())
+		return false;
+
+	off_t roundedSize = (Size() + fVolume->BlockSize() - 1) >> fVolume->BlockShift();
+
+	return Node().data.MaxDirectRange() > roundedSize
+		|| Node().data.MaxIndirectRange() > roundedSize
+		|| Node().data.MaxDoubleIndirectRange() > roundedSize;
+}
+
+
 status_t 
-Inode::Trim(Transaction &transaction)
+Inode::TrimPreallocation(Transaction &transaction)
 {
 	status_t status = ShrinkStream(transaction, Size());
 	if (status < B_OK)
@@ -1993,12 +2009,6 @@ Inode::Remove(Transaction &transaction, const char *name, off_t *_id, bool isDir
 		REPORT_ERROR(status);
 		return B_ENTRY_NOT_FOUND;
 	}
-
-	// You can't unlink a mounted image or the VM file while it is being used - while
-	// this is not really necessary, it copies the behaviour of the original BFS
-	// and let you and me feel a little bit safer
-	if (inode->Flags() & INODE_NO_CACHE)
-		return B_NOT_ALLOWED;
 
 	// Inode::IsContainer() is true also for indices (furthermore, the S_IFDIR
 	// bit is set for indices in BFS, not for attribute directories) - but you

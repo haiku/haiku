@@ -66,8 +66,9 @@ class Inode {
 		bool IsIndex() const { return (Mode() & (S_INDEX_DIR | 0777)) == S_INDEX_DIR; }
 			// that's a stupid check, but AFAIK the only possible method...
 
-		bool IsAttribute() const { return Mode() & S_ATTR; }
-		bool IsFile() const { return Mode() & S_IFREG; }
+		bool IsAttributeDirectory() const { return (Mode() & S_ATTR_DIR) != 0; }
+		bool IsAttribute() const { return (Mode() & S_ATTR) != 0; }
+		bool IsFile() const { return S_ISREG(Mode()); }
 		bool IsRegularNode() const { return (Mode() & (S_ATTR_DIR | S_INDEX_DIR | S_ATTR)) == 0; }
 			// a regular node in the standard namespace (i.e. not an index or attribute)
 		bool IsSymLink() const { return S_ISLNK(Mode()); }
@@ -125,7 +126,8 @@ class Inode {
 
 		status_t SetFileSize(Transaction &transaction, off_t size);
 		status_t Append(Transaction &transaction, off_t bytes);
-		status_t Trim(Transaction &transaction);
+		status_t TrimPreallocation(Transaction &transaction);
+		bool NeedsTrimming();
 
 		status_t Free(Transaction &transaction);
 		status_t Sync();

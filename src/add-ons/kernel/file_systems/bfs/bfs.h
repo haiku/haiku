@@ -217,7 +217,6 @@ enum inode_flags {
 
 	INODE_PERMANENT_FLAGS	= 0x0000ffff,
 
-	INODE_NO_CACHE			= 0x00010000,
 	INODE_WAS_WRITTEN		= 0x00020000,
 	INODE_NO_TRANSACTION	= 0x00040000,
 	INODE_DONT_FREE_SPACE	= 0x00080000,	// only used by the "chkbfs" functionality
