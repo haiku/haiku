@@ -3331,13 +3331,13 @@ BTextView::RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 			// the new line comes before the old line start, add a line
 			STELine newLine;
 			newLine.offset = toOffset;
-			newLine.origin = ceil(curLine->origin + ascent + descent);
+			newLine.origin = ceil(curLine->origin + ascent + descent) + 1;
 			newLine.ascent = 0;
 			fLines->InsertLine(&newLine, lineIndex);
 		} else {
 			// update the exising line
 			nextLine->offset = toOffset;
-			nextLine->origin = ceil(curLine->origin + ascent + descent);
+			nextLine->origin = ceil(curLine->origin + ascent + descent) + 1;
 			
 			// remove any lines that start before the current line
 			while ( lineIndex < fLines->NumLines() &&
@@ -3537,11 +3537,13 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 		strWidth = 0.0;
 		
 		int32 current = fromOffset;
-		for (offset = fromOffset; offset < limit; current = offset, offset = NextInitialByte(offset)) {
+		for (offset = fromOffset; offset <= limit; current = offset, offset = NextInitialByte(offset)) {
 			strWidth += StyledWidth(current, offset - current, &ascent, &descent);
 			
-			if (strWidth >= *ioWidth)
+			if (strWidth >= *ioWidth) {
+				offset = PreviousInitialByte(offset);
 				break;
+			}
 				
 			*outAscent = max_c(ascent, *outAscent);
 			*outDescent = max_c(descent, *outDescent);
