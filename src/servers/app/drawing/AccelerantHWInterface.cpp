@@ -38,7 +38,7 @@
 
 #include "AccelerantHWInterface.h"
 #include "AccelerantBuffer.h"
-#include "BitmapBuffer.h"
+#include "MallocBuffer.h"
 
 
 #ifdef DEBUG_DRIVER_MODULE
@@ -332,22 +332,23 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
 		// being. The color space conversion is handled in CopyBackToFront()
-		BRect bounds(0, 0, fDisplayMode.virtual_width - 1, fDisplayMode.virtual_height - 1);
-		BBitmap *backBitmap = new BBitmap(bounds, 0, B_RGBA32);
 		
 		delete fBackBuffer;
-		fBackBuffer = new BitmapBuffer(backBitmap);
+		fBackBuffer = new MallocBuffer(fDisplayMode.virtual_width - 1,
+									   fDisplayMode.virtual_height - 1);
 		
-		if (fBackBuffer->InitCheck() != B_OK) {
+		status_t ret = fBackBuffer->InitCheck();
+		if (ret < B_OK) {
 			delete fBackBuffer;
 			fBackBuffer = NULL;
-			return B_ERROR;
+			return ret;
 		}
 		
 		// clear out backbuffer, alpha is 255 this way
 		// TODO: maybe this should handle different color spaces in different
 		//		 ways
-		memset(backBitmap->Bits(), 255, backBitmap->BitsLength());
+		memset(fBackBuffer->Bits(), 255,
+			   fBackBuffer->BytesPerRow() * fBackBuffer->Height());
 	}
 	
 	return B_OK;

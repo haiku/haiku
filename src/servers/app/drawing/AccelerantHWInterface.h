@@ -17,7 +17,7 @@
 #include "HWInterface.h"
 #include <image.h>
 
-class BitmapBuffer;
+class MallocBuffer;
 class AccelerantBuffer;
 class UpdateQueue;
 
@@ -96,7 +96,7 @@ private:
 		display_mode			*fModeList;
 
 
-		BitmapBuffer			*fBackBuffer;
+		MallocBuffer			*fBackBuffer;
 		AccelerantBuffer		*fFrontBuffer;
 
 

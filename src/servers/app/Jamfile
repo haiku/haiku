@@ -21,7 +21,14 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 	
-	VIEW_DRIVER_SOURCES = AccelerantDriver.cpp ;
+	VIEW_DRIVER_SOURCES =
+#		AccelerantBuffer.cpp
+		AccelerantDriver.cpp
+#		AccelerantHWInterface.cpp
+#		DisplayDriverPainter.cpp
+#		HWInterface.cpp
+#		UpdateQueue.cpp
+		;
 } else {
 	VIEW_DRIVER_SOURCES =
 		fake_input_server.cpp
@@ -36,6 +43,7 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 		AccelerantBuffer.cpp
 		DisplayDriverPainter.cpp
 		HWInterface.cpp
+		MallocBuffer.cpp
 		UpdateQueue.cpp
 		ViewHWInterface.cpp
 		AccelerantHWInterface.cpp
@@ -111,6 +119,7 @@ if $(TARGET_PLATFORM) = haiku {
 	LinkSharedOSLibs app_server :
 		libroot.so libtranslation.so libz.so libpng.so libbe.so
 		libappserver.so libfreetype.so libtextencoding.so ;
+#		libagg.a libpainter.a ;
 
 } else {
 	# link as test application under R5

@@ -43,6 +43,7 @@
 
 #if DISPLAYDRIVER == HWDRIVER
 	#include "AccelerantDriver.h"
+//	#include "DisplayDriverPainter.h"
 #elif DISPLAYDRIVER == DIRECTDRIVER
 	#include "DirectDriver.h"
 #elif DISPLAYDRIVER == PAINTERDRIVER
@@ -94,6 +95,7 @@ Desktop::Init(void)
 	bool initDrivers = true;
 	while (initDrivers) {
 		driver = new AccelerantDriver();
+//		driver = new DisplayDriverPainter();
 		AddDriver(driver);
 		initDrivers = false;
 	}
