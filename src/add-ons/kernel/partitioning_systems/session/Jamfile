@@ -6,12 +6,18 @@ UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
 {
-	local defines = [ FDefines USER ] ; 
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) ;
+#	local defines = [ FDefines USER ] ; 
+#	SubDirCcFlags $(defines) ;
+#	SubDirC++Flags $(defines) ;
 }
 
-# For now build a userland version only.
+KernelAddon session : kernel partitioning_systems :
+	Debug.cpp
+	Disc.cpp
+	session.cpp
+	;
+
+# also build a userland version
 Addon <partitioning_system>session : userland partitioning_systems :
 	Debug.cpp
 	Disc.cpp
