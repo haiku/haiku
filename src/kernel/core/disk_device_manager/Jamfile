@@ -9,6 +9,10 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
+# As long as we compile for R5 userland, we define the following macros.
+SubDirCcFlags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
+SubDirC++Flags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
+
 SharedLibrary disk_device_manager :
 	ddm_userland_interface.cpp
 	disk_device_manager.cpp
