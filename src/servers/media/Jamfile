@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src servers media ;
 
 UsePrivateHeaders media ;
+UsePrivateHeaders shared ;
 
 AddResources media_server : media_server.rdef ;
 
