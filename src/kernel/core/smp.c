@@ -524,7 +524,7 @@ smp_wait_for_ap_cpus(kernel_args *ka)
 }
 
 
-int
+status_t
 smp_init(kernel_args *ka)
 {
 	struct smp_msg *msg;
@@ -551,6 +551,13 @@ smp_init(kernel_args *ka)
 	TRACE(("smp_init: calling arch_smp_init\n"));
 
 	return arch_smp_init(ka);
+}
+
+
+status_t
+smp_per_cpu_init(kernel_args *args, int32 cpu)
+{
+	return arch_smp_per_cpu_init(args, cpu);
 }
 
 

@@ -26,7 +26,8 @@ enum {
 	SMP_MSG_FLAG_SYNC,
 };
 
-int smp_init(struct kernel_args *ka);
+status_t smp_init(struct kernel_args *args);
+status_t smp_per_cpu_init(struct kernel_args *args, int32 cpu);
 int smp_trap_non_boot_cpus(struct kernel_args *ka, int cpu);
 void smp_wake_up_all_non_boot_cpus(void);
 void smp_wait_for_ap_cpus(struct kernel_args *ka);

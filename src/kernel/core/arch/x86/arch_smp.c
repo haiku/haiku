@@ -3,12 +3,9 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <boot/stage2.h>
-#include <kernel.h>
-#include <console.h>
-#include <debug.h>
+#include <OS.h>
+#include <boot/kernel_args.h>
 #include <vm.h>
-#include <kernel.h>
 #include <int.h>
 #include <smp.h>
 #include <smp_priv.h>
@@ -25,10 +22,18 @@
 #include <stdio.h>
 
 
+//#define TRACE_ARCH_SMP
+#ifdef TRACE_ARCH_SMP
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 static uint32 *apic = NULL;
-static uint32 cpu_apic_id[SMP_MAX_CPUS] = {0, 0};
-static uint32 cpu_os_id[SMP_MAX_CPUS] = {0, 0};
-static uint32 cpu_apic_version[SMP_MAX_CPUS] = {0, 0};
+static uint32 cpu_apic_id[B_MAX_CPU_COUNT] = {0, 0};
+static uint32 cpu_os_id[B_MAX_CPU_COUNT] = {0, 0};
+static uint32 cpu_apic_version[B_MAX_CPU_COUNT] = {0, 0};
 static uint32 *ioapic = NULL;
 static uint32 apic_timer_tics_per_sec = 0;
 
@@ -68,7 +73,7 @@ static int32
 i386_smp_error_interrupt(void *data)
 {
 	// smp error interrupt
-//	dprintf("smp error interrupt on cpu %d\n", arch_smp_get_current_cpu());
+	TRACE(("smp error interrupt on cpu %d\n", arch_smp_get_current_cpu()));
 	arch_smp_ack_interrupt();
 
 	return B_HANDLED_INTERRUPT;
@@ -90,10 +95,10 @@ apic_write(uint32 offset, uint32 data)
 }
 
 
-int
+status_t
 arch_smp_init(kernel_args *ka)
 {
-	dprintf("arch_smp_init: entry\n");
+	TRACE(("arch_smp_init: entry\n"));
 
 	if (ka->num_cpus > 1) {
 		// setup some globals
@@ -110,12 +115,76 @@ arch_smp_init(kernel_args *ka)
 		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "ioapic", (void *)&ioapic,
 			REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 
+		// set up the local apic on the boot cpu
+		arch_smp_per_cpu_init(ka, 0);
+
 		install_interrupt_handler(0xfb, &i386_timer_interrupt, NULL);
 		install_interrupt_handler(0xfd, &i386_ici_interrupt, NULL);
 		install_interrupt_handler(0xfe, &i386_smp_error_interrupt, NULL);
 		install_interrupt_handler(0xff, &i386_spurious_interrupt, NULL);
 	}
+	return B_OK;
+}
+
+
+static int
+smp_setup_apic(kernel_args *ka)
+{
+	uint32 config;
+
+	TRACE(("setting up the apic..."));
+
+	/* set spurious interrupt vector to 0xff */
+	config = apic_read(APIC_SIVR) & 0xfffffc00;
+	config |= APIC_ENABLE | 0xff;
+	apic_write(APIC_SIVR, config);
+#if 0
+	/* setup LINT0 as ExtINT */
+	config = (apic_read(APIC_LINT0) & 0xffff1c00);
+	config |= APIC_LVT_DM_ExtINT | APIC_LVT_IIPP | APIC_LVT_TM;
+	apic_write(APIC_LINT0, config);
+
+	/* setup LINT1 as NMI */
+	config = (apic_read(APIC_LINT1) & 0xffff1c00);
+	config |= APIC_LVT_DM_NMI | APIC_LVT_IIPP;
+	apic_write(APIC_LINT1, config);
+#endif
+
+	/* setup timer */
+	config = apic_read(APIC_LVTT) & ~APIC_LVTT_MASK;
+	config |= 0xfb | APIC_LVTT_M; // vector 0xfb, timer masked
+	apic_write(APIC_LVTT, config);
+
+	apic_write(APIC_ICRT, 0); // zero out the clock
+
+	config = apic_read(APIC_TDCR) & ~0x0000000f;
+	config |= APIC_TDCR_1; // clock division by 1
+	apic_write(APIC_TDCR, config);
+
+	/* setup error vector to 0xfe */
+	config = (apic_read(APIC_LVT3) & 0xffffff00) | 0xfe;
+	apic_write(APIC_LVT3, config);
+
+	/* accept all interrupts */
+	config = apic_read(APIC_TPRI) & 0xffffff00;
+	apic_write(APIC_TPRI, config);
+
+	config = apic_read(APIC_SIVR);
+	apic_write(APIC_EOI, 0);
+
+	TRACE((" done\n"));
 	return 0;
+}
+
+
+status_t
+arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
+{
+	// set up the local apic on the current cpu
+	TRACE(("arch_smp_init_percpu: setting up the apic on cpu %ld\n", cpu));
+	smp_setup_apic(args);
+
+	return B_OK;
 }
 
 
@@ -123,7 +192,7 @@ void
 arch_smp_send_broadcast_ici(void)
 {
 	uint32 config;
-	int state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 
 	config = apic_read(APIC_ICR1) & APIC_ICR1_WRITE_MASK;
 	apic_write(APIC_ICR1, config | 0xfd | APIC_ICR1_DELMODE_FIXED | APIC_ICR1_DESTMODE_PHYS | APIC_ICR1_DEST_ALL_BUT_SELF);
@@ -133,7 +202,7 @@ arch_smp_send_broadcast_ici(void)
 
 
 void
-arch_smp_send_ici(int target_cpu)
+arch_smp_send_ici(int32 target_cpu)
 {
 	uint32 config;
 	int state = disable_interrupts();
@@ -156,21 +225,21 @@ arch_smp_ack_interrupt(void)
 
 #define MIN_TIMEOUT 1000
 
-int
-arch_smp_set_apic_timer(bigtime_t relative_timeout)
+status_t
+arch_smp_set_apic_timer(bigtime_t relativeTimeout)
 {
+	cpu_status state;
 	uint32 config;
 	uint32 ticks;
-	int state;
 
 	if (apic == NULL)
-		return -1;
+		return B_ERROR;
 
-	if (relative_timeout < MIN_TIMEOUT)
-		relative_timeout = MIN_TIMEOUT;
+	if (relativeTimeout < MIN_TIMEOUT)
+		relativeTimeout = MIN_TIMEOUT;
 
 	// calculation should be ok, since it's going to be 64-bit
-	ticks = ((relative_timeout * apic_timer_tics_per_sec) / 1000000);
+	ticks = ((relativeTimeout * apic_timer_tics_per_sec) / 1000000);
 
 	state = disable_interrupts();
 
@@ -182,19 +251,22 @@ arch_smp_set_apic_timer(bigtime_t relative_timeout)
 	config = apic_read(APIC_LVTT) & ~APIC_LVTT_M; // unmask the timer
 	apic_write(APIC_LVTT, config);
 
+	TRACE(("arch_smp_set_apic_timer: config 0x%x, timeout %Ld, tics/sec %d, tics %d\n",
+		config, relative_timeout, apic_timer_tics_per_sec, ticks));
+
 	apic_write(APIC_ICRT, ticks); // start it up
 
 	restore_interrupts(state);
 
-	return 0;
+	return B_OK;
 }
 
 
 int
 arch_smp_clear_apic_timer(void)
 {
+	cpu_status state;
 	uint32 config;
-	int state;
 
 	if (apic == NULL)
 		return -1;

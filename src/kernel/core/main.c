@@ -1,6 +1,9 @@
 /* This is main - initializes processors and starts init */
 
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -34,8 +37,8 @@
 #include <string.h>
 
 
-#define TRACE_BOOT 1
-#if TRACE_BOOT
+#define TRACE_BOOT
+#ifdef TRACE_BOOT
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -91,9 +94,9 @@ _start(kernel_args *oldka, int cpu_num)
 
 		sem_init(&ka);
 
-		dprintf("##################################################################\n");
-		dprintf("semaphores now available\n");
-		dprintf("##################################################################\n");
+		TRACE(("##################################################################\n"));
+		TRACE(("semaphores now available\n"));
+		TRACE(("##################################################################\n"));
 
 		// now we can create and use semaphores
 		vm_init_postsem(&ka);
@@ -118,16 +121,18 @@ _start(kernel_args *oldka, int cpu_num)
 		start_scheduler();
 	} else {
 		// this is run per cpu for each AP processor after they've been set loose
+		smp_per_cpu_init(&ka, cpu_num);
 		thread_init_percpu(cpu_num);
 	}
-	dprintf("##################################################################\n");
-	dprintf("interrupts now enabled\n");
-	dprintf("##################################################################\n");
+	TRACE(("##################################################################\n"));
+	TRACE(("interrupts now enabled\n"));
+	TRACE(("##################################################################\n"));
+
 	kernel_startup = false;
 	enable_interrupts();
 
 	TRACE(("main: done... begin idle loop on cpu %d\n", cpu_num));
-	for(;;)
+	for (;;)
 		arch_cpu_idle();
 
 	return 0;

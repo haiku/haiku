@@ -18,8 +18,9 @@ struct kernel_args;
 extern "C" {
 #endif
 
-int arch_smp_init(struct kernel_args *ka);
-void arch_smp_send_ici(int target_cpu);
+status_t arch_smp_init(struct kernel_args *args);
+status_t arch_smp_per_cpu_init(struct kernel_args *args, int32 cpu);
+void arch_smp_send_ici(int32 target_cpu);
 void arch_smp_send_broadcast_ici(void);
 
 #ifdef __cplusplus

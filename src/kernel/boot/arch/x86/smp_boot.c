@@ -259,56 +259,6 @@ smp_find_mp_config(kernel_args *ka)
 }
 
 
-static int
-smp_setup_apic(kernel_args *ka)
-{
-	uint32 config;
-
-	TRACE(("setting up the apic..."));
-
-	/* set spurious interrupt vector to 0xff */
-	config = apic_read(APIC_SIVR) & 0xfffffc00;
-	config |= APIC_ENABLE | 0xff;
-	apic_write(APIC_SIVR, config);
-#if 1
-	/* setup LINT0 as ExtINT */
-	config = (apic_read(APIC_LINT0) & 0xffff1c00);
-	config |= APIC_LVT_DM_ExtINT | APIC_LVT_IIPP | APIC_LVT_TM;
-	apic_write(APIC_LINT0, config);
-
-	/* setup LINT1 as NMI */
-	config = (apic_read(APIC_LINT1) & 0xffff1c00);
-	config |= APIC_LVT_DM_NMI | APIC_LVT_IIPP;
-	apic_write(APIC_LINT1, config);
-#endif
-
-	/* setup timer */
-	config = apic_read(APIC_LVTT) & ~APIC_LVTT_MASK;
-	config |= 0xfb | APIC_LVTT_M; // vector 0xfb, timer masked
-	apic_write(APIC_LVTT, config);
-
-	apic_write(APIC_ICRT, 0); // zero out the clock
-
-	config = apic_read(APIC_TDCR) & ~0x0000000f;
-	config |= APIC_TDCR_1; // clock division by 1
-	apic_write(APIC_TDCR, config);
-
-	/* setup error vector to 0xfe */
-	config = (apic_read(APIC_LVT3) & 0xffffff00) | 0xfe;
-	apic_write(APIC_LVT3, config);
-
-	/* accept all interrupts */
-	config = apic_read(APIC_TPRI) & 0xffffff00;
-	apic_write(APIC_TPRI, config);
-
-	config = apic_read(APIC_SIVR);
-	apic_write(APIC_EOI, 0);
-
-	TRACE((" done\n"));
-	return 0;
-}
-
-
 /** Target function of the trampoline code.
  *	The trampoline code should have the pgdir and a gdt set up for us,
  *	along with us being on the final stack for this processor. We need
@@ -330,8 +280,6 @@ smp_cpu_ready(void)
 	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 	asm("cld");
 	asm("fninit");
-
-	smp_setup_apic(ka);
 
 	// Set up the final idt
 	idt_descr.a = IDT_LIMIT - 1;
@@ -536,9 +484,6 @@ smp_boot(kernel_args *ka, uint32 kernel_entry)
 
 		TRACE(("apic = %p\n", ka->arch_args.apic));
 		TRACE(("ioapic = %p\n", ka->arch_args.ioapic));
-
-		// set up the apic
-		smp_setup_apic(ka);
 
 		// calculate how fast the apic timer is
 		calculate_apic_timer_conversion_factor(ka);
