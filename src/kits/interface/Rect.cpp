@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -247,11 +247,11 @@ BRect::operator|(BRect rect) const
 bool
 BRect::Intersects(BRect rect) const
 {
-	if (!(rect.left > right || rect.right < left
-			|| rect.top > bottom || rect.bottom < top))
-		return true;
-	
-	return false;
+	if (!IsValid() || !rect.IsValid())
+		return false;
+
+	return !(rect.left > right || rect.right < left
+			|| rect.top > bottom || rect.bottom < top);	
 }
 //------------------------------------------------------------------------------
 bool
