@@ -343,6 +343,8 @@ PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 			png_set_palette_to_rgb(ppng);
 			
 		if (png_get_valid(ppng, pinfo, PNG_INFO_tRNS)) {
+			// if there is transparency data in the
+			// PNG, but not in the form of an alpha channel
 			balpha = true;
 			png_set_tRNS_to_alpha(ppng);
 		}
@@ -357,6 +359,7 @@ PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 			png_set_gray_to_rgb(ppng);
 			
 		if (color_type & PNG_COLOR_MASK_ALPHA)
+			// if image contains an alpha channel
 			balpha = true;
 			
 		if (!balpha)
