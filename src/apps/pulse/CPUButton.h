@@ -39,4 +39,3 @@ class CPUButton : public BControl {
 };
 
 #endif
-		
