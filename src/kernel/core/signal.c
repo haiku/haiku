@@ -40,6 +40,24 @@ const char * const sigstr[NSIG] = {
 };
 
 
+static bool
+notify_debugger(int signal, struct sigaction *handler, bool deadly,
+	cpu_status *state)
+{
+	bool result;
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(*state);
+
+	result = user_debug_handle_signal(signal, handler, deadly);
+
+	*state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	return result;
+}
+
+
 /**
  *	Expects interrupts off and thread lock held.
  *	The function may release the lock and enable interrupts temporarily, so the
@@ -53,33 +71,29 @@ handle_signals(struct thread *thread, cpu_status *state)
 	int i, sig, global_resched = 0;
 	struct sigaction *handler;
 
-	while (signalMask == 0) {
-		// check, if the thread shall stop for debugging
-		// ToDo: This isn't quite right yet. We always need to check
-		// whether the thread has to stop, also, if there is a signal. Since
-		// in case signal debugging is disabled the thread wouldn't stop
-		// below. At the moment it doesn't stop either, if the signal is
-		// ignored.
-		if (thread->debug_info.flags & B_THREAD_DEBUG_STOP) {
-			RELEASE_THREAD_LOCK();
-			restore_interrupts(*state);
+	// Check, if the thread shall stop for debugging. It will never stop, if
+	// a SIGKILL[THR] signal is pending.
+	if (!(signalMask & (1 << (SIGKILL - 1)))
+		&& !(signalMask & (1 << (SIGKILLTHR - 1)))
+		&& thread->debug_info.flags & B_THREAD_DEBUG_STOP) {
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(*state);
 
-			user_debug_stop_thread();
+		user_debug_stop_thread();
 
-			*state = disable_interrupts();
-			GRAB_THREAD_LOCK();
+		*state = disable_interrupts();
+		GRAB_THREAD_LOCK();
 
-			signalMask = thread->sig_pending & (~thread->sig_block_mask);
-			continue;
-		}
-
-		return 0;
+		signalMask = thread->sig_pending & (~thread->sig_block_mask);
 	}
+
+	if (signalMask == 0)
+		return 0;
 
 	for (i = 0; i < NSIG; i++) {
 		if (signalMask & 0x1) {
-			bool debugSignal = atomic_get(&thread->team->debug_info.flags)
-				& B_TEAM_DEBUG_SIGNALS;
+			bool debugSignal = !(~atomic_get(&thread->team->debug_info.flags)
+				& (B_TEAM_DEBUG_SIGNALS | B_TEAM_DEBUG_DEBUGGER_INSTALLED));
 
 			sig = i + 1;
 			handler = &thread->sig_action[i];
@@ -91,7 +105,10 @@ handle_signals(struct thread *thread, cpu_status *state)
 			if (handler->sa_handler == SIG_IGN) {
 				// signal is to be ignored
 				// ToDo: apply zombie cleaning on SIGCHLD
-				// ToDo: Do we need to notify the debugger?
+
+				// notify the debugger
+				if (debugSignal)
+					notify_debugger(sig, handler, false, state);
 				continue;
 			}
 			if (handler->sa_handler == SIG_DFL) {
@@ -103,9 +120,18 @@ handle_signals(struct thread *thread, cpu_status *state)
 					case SIGTTIN:
 					case SIGTTOU:
 					case SIGCONT:
+						// notify the debugger
+						if (debugSignal)
+							notify_debugger(sig, handler, false, state);
 						continue;
 
 					case SIGSTOP:
+						// notify the debugger
+						if (debugSignal) {
+							if (!notify_debugger(sig, handler, false, state))
+								continue;
+						}
+
 						thread->next_state = B_THREAD_SUSPENDED;
 						global_resched = 1;
 						continue;
@@ -123,6 +149,13 @@ handle_signals(struct thread *thread, cpu_status *state)
 						if (thread->exit.reason != THREAD_RETURN_EXIT)
 							thread->exit.reason = THREAD_RETURN_INTERRUPTED;
 
+						// notify the debugger
+						if (debugSignal && sig != SIGKILL
+								&& sig != SIGKILLTHR) {
+							if (!notify_debugger(sig, handler, true, state))
+								continue;
+						}
+
 						RELEASE_THREAD_LOCK();
 						restore_interrupts(*state);
 
@@ -134,31 +167,14 @@ handle_signals(struct thread *thread, cpu_status *state)
 						// We absolutely need interrupts enabled when we enter
 						// thread_exit().
 
-						if (debugSignal && sig != SIGKILL
-								&& sig != SIGKILLTHR) {
-							// notify the debugger
-							if (user_debug_handle_signal(sig, true)
-									== B_THREAD_DEBUG_IGNORE_SIGNAL) {
-								continue;
-							}
-						}
-
 						thread_exit();
 				}
 			}
 
+			// notify the debugger
 			if (debugSignal) {
-				// notify the debugger
-				RELEASE_THREAD_LOCK();
-				restore_interrupts(*state);
-
-				if (user_debug_handle_signal(sig, false)
-						== B_THREAD_DEBUG_IGNORE_SIGNAL) {
+				if (!notify_debugger(sig, handler, false, state))
 					continue;
-				}
-
-				*state = disable_interrupts();
-				GRAB_THREAD_LOCK();
 			}
 
 			// ToDo: it's not safe to call arch_setup_signal_frame with
