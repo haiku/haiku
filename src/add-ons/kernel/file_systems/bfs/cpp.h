@@ -23,14 +23,14 @@
 
 
 inline void *
-operator new(size_t size, const nothrow_t&) throw()
+operator new(size_t size)
 {
 	return malloc(size);
 } 
 
 
 inline void *
-operator new[](size_t size, const nothrow_t&) throw()
+operator new[](size_t size)
 {
 	return malloc(size);
 }
@@ -51,9 +51,6 @@ operator delete[](void *ptr)
 
 // we're using virtuals
 extern "C" void __pure_virtual();
-
-// we are only using the nothrow-version of new
-#define new new (nothrow)
 
 
 #endif	/* CPP_H */
