@@ -1,0 +1,108 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<HTML>
+<HEAD>
+<TITLE>BMallocIO Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BMallocIO Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BMallocIO interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BMallocIO Interface</A></LI>
+<LI><A HREF="#usecases">BMallocIO Use Cases</A></LI>
+<LI><A HREF="#implement">BMallocIO Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BMallocIO Interface:</H2>
+
+<P>The BMallocIO class represent a buffer of dynamically allocated memory. The buffer is
+automatically allocated by multiplies of a blocksize you can specify, so it will always be
+big enough to contain the data. The best source of information for the BMallocIO interface
+can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Support%20Kit/MemoryIO.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BMallocIO Use Cases:</H2>
+
+<P>The following use cases cover the BMallocIO functionality:</P>
+
+<OL>
+
+<LI><P><B>Construction 1:</B> The BMallocIO constructor set the blocksize to 256.</P></LI>
+
+<LI><P><B>Destruction:</B> The BMallocIO destructor frees the allocated memory.</P></LI>
+
+<LI><P><B>Reading 1:</B> When ReadAt() is called, the BMallocIO returns the number of bytes read from the specified
+position. ReadAt() takes three arguments: the position where to begin the read operation, the buffer where to put the read data,
+and the number of bytes to read. This function does not read outside of the buffer.
+If the specified position is invalid (i.e. outside bounds) this function returns 0. If the read operation
+begins at a valid position, but the sum of position and bytes to read is bigger than the size of the buffer, BMallocIO
+returns just the available data.</P></LI>
+
+<LI><P><B>Reading 2.</B> BMallocIO inherits the Read() function from BPositionIO. This function read the specified amount
+of data from the current position, and put it into the specified buffer, then it moves the I/O index forward of the number of read bytes.
+This function behaves like the above. </P></LI>
+
+<LI><P><B>Writing 1:</B> When WriteAt() is called, BMallocIO returns the number of bytes written to the specified position.
+WriteAt() takes three arguments: the position where to begin the write operation, the buffer from which to read the data to write, and the
+number of bytes to write.
+If the write position is beyond the buffer length, BMallocIO enlarges the buffer to accomodate the data. If enlarging fails, the function
+returns B_NO_MEMORY.
+</P></LI>
+
+<LI><P><B>Writing 2.</B> BMallocIO inherits the Write() function from BPositionIO. This function write the specified amount
+of data to the current position of the BMallocIO object, reading from the specified buffer, then it moves the I/O index forward
+of the number of read bytes.
+This function behaves like the above. </P></LI>
+
+<LI><P><B>Size Changes:</B> The SetSize() member function enlarges or shrink the amount of data which can be read/write.
+Shrinking the buffer is always possible, and the function returns B_OK. Zero frees the memory, while negative values are
+not allowed, and the function returns B_ERROR.
+</P></LI>
+
+<LI><P><B>Seeking.</B> Seek() sets the position in the data buffer where the Read() and Write() functions (inherited from 
+BPositionIO) begin reading and writing. How the position argument is understood depends on the mode flag. There are three possible modes: 
+	<UL>
+	<LI><P>
+	SEEK_SET. The position passed is an offset from the beginning of allocated memory; in other 
+	words, the current position is set to position. For this mode, position should be a positive 
+	value, but the BMallocIO object doesn't do any checking, so it is possible to seek to a negative position
+	(but any consequent Read() or Write() calls will fail).
+	 </P></LI>
+	 <LI><P>
+	SEEK_CUR. The position argument is an offset from the current position; the value of the 
+	argument is added to the current position.  </P></LI>
+	<LI><P>
+	SEEK_END. The position argument is an offset from the end of the buffer for a BMallocIO 
+	object. Positive values seek beyond the end of the buffer or data; negative 
+	values seek backwards into the data.  </P></LI>
+	</UL>
+Seek() Always return the new position.
+</P></LI>
+
+<LI><P><B>Position:</B> The Position() call always return the current position.</P></LI>
+
+<LI><P><B>Setting the BlockSize:</B> The SetBlockSize() call let you specify 
+the blocksize which BMallocIO uses to allocate memory.</P></LI>
+
+<LI><P><B>Getting the Buffer:</B> The Buffer() call returns the buffer used internally 
+by BMallocIO.</P></LI>
+
+<LI><P><B>Getting the Buffer Lenght:</B> The BufferLength() call returns the length
+of the buffer.</P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BMallocIO Implementation:</H2>
+
+<P>The implementation of the BMessageFilter is simple.  It consist in implementing memory read/write on a buffer
+with an index.</P>
+
+</BODY>
+</HTML>
