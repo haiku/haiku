@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers agp ;
 
+UsePrivateHeaders graphics ;
+
 R5KernelAddon agp : [ FDirName kernel bus_managers ] :
 	agp.cpp
 	module.cpp
