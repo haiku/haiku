@@ -80,7 +80,6 @@ extern int	open(const char *pathname, int oflags, ...);
 	   is passed in oflags */
 
 extern int	fcntl(int fd, int op, ...);
-extern int	flock(int fd, int op);
 
 #ifdef __cplusplus
 }
