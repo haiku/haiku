@@ -109,7 +109,7 @@ FindTextView::HexReformat(int32 oldCursor, int32 &newCursor)
 
 		char c = text[i];
 		if (c >= 'A' && c <= 'F')
-			c += 'A' - 'a';
+			c += 'a' - 'A';
 		if ((c >= 'a' && c <= 'f') || (c >= '0' && c <= '9'))
 			insert[out++] = c;
 
