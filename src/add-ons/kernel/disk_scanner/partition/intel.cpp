@@ -3,11 +3,12 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 /*!
-	\file intel.c
+	\file intel.cpp
 	disk_scanner partition module for "intel" style partitions
 */
 
 #include <errno.h>
+#include <new.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -22,11 +23,10 @@
 #define INTEL_PARTITION_MODULE_NAME "disk_scanner/partition/intel/v1"
 
 // partition module identifier
-//static const char *const kShortModuleName = "intel";
-#define kShortModuleName "intel"
+static const char *const kShortModuleName = "intel";
 
-// the maximal number of partitions we support (size of some static arrays)
-static const int32 MAX_PARTITION_COUNT = 64;
+// Maximal number of logical partitions per extended partition we allow.
+static const int32 kMaxLogicalPartitionCount = 128;
 
 struct partition_type {
 	uint8	type;
@@ -66,12 +66,27 @@ static const struct partition_type gPartitionTypes[] = {
 	{ 0, NULL }
 };
 
+// is_empty_type
+static inline
+bool
+is_empty_type(uint8 type)
+{
+	return (type == 0x00);
+}
+
+// is_extended_type
+static inline
+bool
+is_extended_type(uint8 type)
+{
+	return (type == 0x05 || type == 0x0f || type == 0x85);
+}
+
 // chs
 struct chs {
 	uint8	cylinder;
 	uint16	head_sector;	// head[15:10], sector[9:0]
 } _PACKED;
-typedef struct chs chs;
 
 // partition_descriptor
 struct partition_descriptor {
@@ -81,8 +96,10 @@ struct partition_descriptor {
 	chs		end;
 	uint32	start;
 	uint32	size;
+
+	bool is_empty() const { return is_empty_type(type); }
+	bool is_extended() const { return is_extended_type(type); }
 } _PACKED;
-typedef struct partition_descriptor partition_descriptor;
 
 // partition_table_sector
 struct partition_table_sector {
@@ -90,19 +107,8 @@ struct partition_table_sector {
 	partition_descriptor	table[4];
 	uint16					signature;
 } _PACKED;
-typedef struct partition_table_sector partition_table_sector;
 
 static const uint16 kPartitionTableSectorSignature = 0xaa55;
-
-// partition_spec
-typedef struct partition_spec {
-	struct partition_spec	*next;
-	struct partition_spec	*primary;
-	off_t					offset;
-	off_t					size;
-	off_t					extended_pts;
-	uint8					type;
-} partition_spec;
 
 // partition_type_string
 static
@@ -118,218 +124,665 @@ partition_type_string(uint8 type)
 	return "unknown";
 }
 
-// new_partition_spec
-static
-partition_spec *
-new_partition_spec(partition_spec *primary, off_t offset, off_t size,
-				   off_t extended_pts, uint8 type)
+
+// Partition
+class Partition {
+public:
+	Partition();
+	Partition(const partition_descriptor *descriptor, off_t ptsOffset,
+			  off_t baseOffset, int32 blockSize);
+
+	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
+			   off_t baseOffset, int32 blockSize);
+	void Unset();
+
+	bool IsEmpty() const { return is_empty_type(fType); }
+	bool IsExtended() const { return is_extended_type(fType); }
+
+	off_t PTSOffset() const	{ return fPTSOffset; }
+	off_t Offset() const	{ return fOffset; }
+	off_t Size() const		{ return fSize; }
+	uint8 Type() const		{ return fType; }
+	const char *TypeString() const { return partition_type_string(fType); }
+
+	bool CheckLocation(off_t sessionSize) const;
+
+private:
+	off_t	fPTSOffset;
+	off_t	fOffset;	// relative to the start of the session
+	off_t	fSize;
+	uint8	fType;
+};
+
+// constructor
+Partition::Partition()
+	: fPTSOffset(0),
+	  fOffset(0),
+	  fSize(0),
+	  fType(0)
 {
-	partition_spec *spec = (partition_spec*)malloc(sizeof(partition_spec));
-	if (spec) {
-		spec->next = NULL;
-		spec->primary = primary;
-		spec->offset = offset;
-		spec->size = size;
-		spec->extended_pts = extended_pts;
-		spec->type = type;
-	}
-	return spec;
 }
 
-// is_empty_partition
-static
-bool
-is_empty_partition(const partition_descriptor *descriptor)
+// constructor
+Partition::Partition(const partition_descriptor *descriptor,off_t ptsOffset,
+					 off_t baseOffset, int32 blockSize)
+	: fPTSOffset(0),
+	  fOffset(0),
+	  fSize(0),
+	  fType(0)
 {
-	return (descriptor->size == 0);
+	SetTo(descriptor, ptsOffset, baseOffset, blockSize);
 }
 
-// is_extended_type
-static
-bool
-is_extended_type(uint8 type)
-{
-	return (type == 0x05 || type == 0x0f || type == 0x85);
-}
-
-// is_extended_partition
-static
-bool
-is_extended_partition(const partition_descriptor *descriptor)
-{
-	return is_extended_type(descriptor->type);
-}
-
-// get_partition_dimension
-static
+// SetTo
 void
-get_partition_dimension(const partition_descriptor *descriptor,
-						int32 blockSize, off_t baseOffset, off_t *offset,
-						off_t *size)
+Partition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
+				 off_t baseOffset, int32 blockSize)
 {
-	if (descriptor) {
-		*offset = baseOffset + (off_t)descriptor->start * blockSize;
-		*size = (off_t)descriptor->size * blockSize;
+	fPTSOffset = ptsOffset;
+	fOffset = baseOffset + (off_t)descriptor->start * blockSize;
+	fSize = (off_t)descriptor->size * blockSize;
+	fType = descriptor->type;
+	if (fSize == 0)
+		Unset();
+}
+
+// Unset
+void
+Partition::Unset()
+{
+	fPTSOffset = 0;
+	fOffset = 0;
+	fSize = 0;
+	fType = 0;
+}
+
+// CheckLocation
+bool
+Partition::CheckLocation(off_t sessionSize) const
+{
+	return (fOffset >= 0 && fOffset + fSize <= sessionSize);
+}
+
+
+class LogicalPartition;
+
+// PrimaryPartition
+
+class PrimaryPartition : public Partition {
+public:
+	PrimaryPartition();
+	PrimaryPartition(const partition_descriptor *descriptor, off_t ptsOffset,
+					 int32 blockSize);
+
+	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
+			   int32 blockSize);
+	void Unset();
+
+	// only if extended
+	int32 CountLogicalPartitions() const { return fLogicalPartitionCount; }
+	LogicalPartition *LogicalPartitionAt(int32 index) const;
+	void AddLogicalPartition(LogicalPartition *partition);
+
+private:
+	LogicalPartition	*fHead;
+	LogicalPartition	*fTail;
+	int32				fLogicalPartitionCount;
+};
+
+
+// LogicalPartition
+class LogicalPartition : public Partition {
+public:
+	LogicalPartition();
+	LogicalPartition(const partition_descriptor *descriptor, off_t ptsOffset,
+					 int32 blockSize, PrimaryPartition *primary);
+
+	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
+			   int32 blockSize, PrimaryPartition *primary);
+	void Unset();
+
+	PrimaryPartition *GetPrimaryPartition() const { return fPrimary; }
+
+	void SetNext(LogicalPartition *next) { fNext = next; }
+	LogicalPartition *Next() const { return fNext; }
+
+private:
+	PrimaryPartition	*fPrimary;
+	LogicalPartition	*fNext;
+};
+
+
+// PrimaryPartition
+
+// constructor
+PrimaryPartition::PrimaryPartition()
+	: Partition(),
+	  fHead(NULL),
+	  fTail(NULL),
+	  fLogicalPartitionCount(0)
+{
+}
+
+// constructor
+PrimaryPartition::PrimaryPartition(const partition_descriptor *descriptor,
+								   off_t ptsOffset, int32 blockSize)
+	: Partition(),
+	  fHead(NULL),
+	  fTail(NULL),
+	  fLogicalPartitionCount(0)
+{
+	SetTo(descriptor, ptsOffset, blockSize);
+}
+
+// SetTo
+void
+PrimaryPartition::SetTo(const partition_descriptor *descriptor,
+						off_t ptsOffset, int32 blockSize)
+{
+	Unset();
+	Partition::SetTo(descriptor, ptsOffset, 0, blockSize);
+}
+
+// Unset
+void
+PrimaryPartition::Unset()
+{
+	while (LogicalPartition *partition = fHead) {
+		fHead = partition->Next();
+		delete partition;
+	}
+	fHead = NULL;
+	fTail = NULL;
+	fLogicalPartitionCount = 0;
+	Partition::Unset();
+}
+
+// LogicalPartitionAt
+LogicalPartition *
+PrimaryPartition::LogicalPartitionAt(int32 index) const
+{
+	LogicalPartition *partition = NULL;
+	if (index >= 0 && index < fLogicalPartitionCount) {
+		for (partition = fHead; index > 0; index--)
+			partition = partition->Next();
+	}
+	return partition;
+}
+
+// AddLogicalPartition
+void
+PrimaryPartition::AddLogicalPartition(LogicalPartition *partition)
+{
+	if (partition) {
+		if (fTail) {
+			fTail->SetNext(partition);
+			fTail = partition;
+		} else
+			fHead = fTail = partition;
+		partition->SetNext(NULL);
+		fLogicalPartitionCount++;
 	}
 }
 
-// check_partition
-static
-status_t
-check_partition(const partition_descriptor *descriptor, off_t primaryStart,
-				off_t sessionSize)
+
+// LogicalPartition
+
+// constructor
+LogicalPartition::LogicalPartition()
+	: Partition(),
+	  fPrimary(NULL),
+	  fNext(NULL)
 {
-	status_t error = B_OK;
-	if (is_extended_partition(descriptor)) {
-	} else {
-	}
-	return error;
 }
 
-// parse_extended_partition_map
-static
-status_t
-parse_extended_partition_map(int deviceFD, off_t sessionOffset,
-							 off_t sessionSize, partition_spec *primary,
-							 off_t sectorStart, uint8 *buffer,
-							 int32 blockSize, partition_spec **partitionList)
+// constructor
+LogicalPartition::LogicalPartition(const partition_descriptor *descriptor,
+								   off_t ptsOffset, int32 blockSize,
+								   PrimaryPartition *primary)
+	: Partition(),
+	  fPrimary(NULL),
+	  fNext(NULL)
 {
-// TODO: Check for cycles, or at least set an upper bound for the number of
-// partitions. Otherwise an ill-formated disk may bring down the whole
-// system.
-	status_t error = B_OK;
-	const partition_table_sector *pts = (const partition_table_sector*)buffer;
-	const partition_descriptor *extended = NULL;
-	const partition_descriptor *nonExtended = NULL;
-	off_t extendedStart = 0;
-	off_t extendedSize = 0;
-	off_t nonExtendedStart = 0;
-	off_t nonExtendedSize = 0;
-	// read partition table sector
-	if (read_pos(deviceFD, sectorStart, buffer, blockSize) != blockSize) {
-		error = errno;
-		if (error == B_OK)
-			error = B_ERROR;
-		TRACE(("intel: parse_extended_partition_map: reading the PTS failed: "
-			   "%s\n", strerror(error)));
-		return B_OK;
+	SetTo(descriptor, ptsOffset, blockSize, primary);
+}
+
+// SetTo
+void
+LogicalPartition::SetTo(const partition_descriptor *descriptor,
+						off_t ptsOffset, int32 blockSize,
+						PrimaryPartition *primary)
+{
+	Unset();
+	if (descriptor && primary) {
+		off_t baseOffset = (descriptor->is_extended() ? primary->Offset()
+													  : ptsOffset);
+		Partition::SetTo(descriptor, ptsOffset, baseOffset, blockSize);
+		fPrimary = primary;
 	}
-	// check the signature
-	if (error == B_OK && pts->signature != kPartitionTableSectorSignature) {
-		TRACE(("intel: parse_extended_partition_map: invalid PTS "
-			   "signature\n"));
-		return B_OK;
-	}
-	if (error == B_OK) {
-		// check the partitions
-		int32 i;
-		for (i = 0; error == B_OK && i < 4; i++) {
-			const partition_descriptor *descriptor = &pts->table[i];
-			if (!is_empty_partition(descriptor)) {
-				error = check_partition(descriptor, primary->offset,
-										sessionSize);
-				if (is_extended_partition(descriptor)) {
-					if (extended) {
-						// only one extended partition allowed
-						error = B_ERROR;
-						TRACE(("intel: parse_extended_partition_map: "
-							   "only one extended partition allowed\n"));
-					} else
-						extended = descriptor;
-				} else {
-					if (nonExtended) {
-						// only one non-ext. partition allowed
-						error = B_ERROR;
-						TRACE(("intel: parse_extended_partition_map: "
-							   "only one non-extended partition allowed\n"));
-					} else
-						nonExtended = descriptor;
-				}
-				// simply ignore this PTS, if something is ill-formated
-				if (error != B_OK)
-					return B_OK;
+}
+
+// Unset
+void
+LogicalPartition::Unset()
+{
+	fPrimary = NULL;
+	fNext = NULL;
+	Partition::Unset();
+}
+
+
+// PartitionMap
+
+class PartitionMap {
+public:
+	PartitionMap();
+	~PartitionMap();
+
+	void Unset();
+
+	PrimaryPartition *PrimaryPartitionAt(int32 index);
+
+	int32 CountPartitions() const;
+	Partition *PartitionAt(int32 index);
+	const Partition *PartitionAt(int32 index) const;
+
+	bool Check() const;
+
+private:
+	PrimaryPartition		fPrimaries[4];
+};
+
+// constructor
+PartitionMap::PartitionMap()
+{
+}
+
+// destructor
+PartitionMap::~PartitionMap()
+{
+}
+
+// Unset
+void
+PartitionMap::Unset()
+{
+	for (int32 i = 0; i < 4; i++)
+		fPrimaries[i].Unset();
+}
+
+// PrimaryPartitionAt
+PrimaryPartition *
+PartitionMap::PrimaryPartitionAt(int32 index)
+{
+	PrimaryPartition *partition = NULL;
+	if (index >= 0 && index < 4)
+		partition = fPrimaries + index;
+	return partition;
+}
+
+// CountPartitions
+int32
+PartitionMap::CountPartitions() const
+{
+	int32 count = 4;
+	for (int32 i = 0; i < 4; i++)
+		count += fPrimaries[i].CountLogicalPartitions();
+	return count;
+}
+
+// PartitionAt
+Partition *
+PartitionMap::PartitionAt(int32 index)
+{
+	Partition *partition = NULL;
+	int32 count = CountPartitions();
+	if (index >= 0 && index < count) {
+		if (index < 4)
+			partition  = fPrimaries + index;
+		else {
+			index -= 4;
+			int32 primary = 0;
+			while (index >= fPrimaries[primary].CountLogicalPartitions()) {
+				index -= fPrimaries[primary].CountLogicalPartitions();
+				primary++;
 			}
-		}
-		// get the partitions' dimensions
-		if (error == B_OK) {
-			get_partition_dimension(extended, blockSize, primary->offset,
-									&extendedStart, &extendedSize);
-			get_partition_dimension(nonExtended, blockSize, sectorStart,
-									&nonExtendedStart, &nonExtendedSize);
-		}
-		// add a partition specification for the non-extended partition
-		if (error == B_OK && nonExtended) {
-			partition_spec *spec = new_partition_spec(primary,
-				nonExtendedStart, nonExtendedSize, extendedStart,
-				nonExtended->type);
-			if (spec) {
-				*partitionList = spec;
-				partitionList = &spec->next;
-			} else
-				error = B_NO_MEMORY;
-		}
-		// parse the extended partition
-		if (error == B_OK && extended) {
-			error = parse_extended_partition_map(deviceFD,
-				sessionOffset, sessionSize, primary, extendedStart,
-				buffer, blockSize, partitionList);
+			partition = fPrimaries[primary].LogicalPartitionAt(index);
 		}
 	}
-	return error;
+	return partition;
 }
 
-// parse_partition_map
-static
-status_t
-parse_partition_map(int deviceFD, off_t sessionOffset, off_t sessionSize,
-					const uint8 *block, int32 blockSize,
-					partition_spec **partitionList)
+// PartitionAt
+const Partition *
+PartitionMap::PartitionAt(int32 index) const
 {
-	status_t error = B_OK;
-	const partition_table_sector *pts = (const partition_table_sector*)block;
-	uint8 *buffer = (uint8*)malloc(blockSize);
-	partition_spec *primarySpecs[4];
-	if (buffer) {
-		// check the primary partitions
-		int32 i;
-		for (i = 0; error == B_OK && i < 4; i++) {
-			const partition_descriptor *descriptor = &pts->table[i];
-			if (!is_empty_partition(descriptor))
-				error = check_partition(descriptor, 0, sessionSize);
-			// add the partition specification
-			if (error == B_OK) {
-				off_t start = 0;
-				off_t size = 0;
-				partition_spec *spec;
-				get_partition_dimension(descriptor, blockSize, 0, &start,
-										&size);
-				spec = new_partition_spec(0, start, size, 0, descriptor->type);
-				if (spec) {
-					*partitionList = spec;
-					partitionList = &spec->next;
-					primarySpecs[i] = spec;
-				} else
-					error = B_NO_MEMORY;
-			}
+	return const_cast<PartitionMap*>(this)->PartitionAt(index);
+}
+
+// cmp_partition_offset
+static
+int
+cmp_partition_offset(const void *p1, const void *p2)
+{
+	const Partition *partition1 = *static_cast<const Partition **>(p1);
+	const Partition *partition2 = *static_cast<const Partition **>(p2);
+	if (partition1->Offset() < partition2->Offset())
+		return -1;
+	else if (partition1->Offset() > partition2->Offset())
+		return 1;
+	return 0;
+}
+
+// cmp_offset
+static
+int
+cmp_offset(const void *o1, const void *o2)
+{
+	off_t offset1 = *static_cast<const off_t*>(o1);
+	off_t offset2 = *static_cast<const off_t*>(o2);
+	if (offset1 < offset2)
+		return -1;
+	else if (offset1 > offset2)
+		return 1;
+	return 0;
+}
+
+// is_inside_partitions
+static
+bool
+is_inside_partitions(off_t location, const Partition **partitions, int32 count)
+{
+	bool result = false;
+	if (count > 0) {
+		// binary search
+		int32 lower = 0;
+		int32 upper = count - 1;
+		while (lower < upper) {
+			int32 mid = (lower + upper) / 2;
+			const Partition *midPartition = partitions[mid];
+			if (location >= midPartition->Offset() + midPartition->Size())
+				lower = mid + 1;
+			else
+				upper = mid;
 		}
-		// parse the extended partitions
-		if (error == B_OK) {
-			for (i = 0; error == B_OK && i < 4; i++) {
-				partition_spec *spec = primarySpecs[i];
-				if (is_extended_type(spec->type)) {
-					error = parse_extended_partition_map(deviceFD,
-						sessionOffset, sessionSize, spec, spec->offset,
-						buffer, blockSize, partitionList);
+		const Partition *partition = partitions[lower];
+		result = (location >= partition->Offset() &&
+				  location < partition->Offset() + partition->Size());
+	}
+	return result;
+}
+
+// Check
+bool
+PartitionMap::Check() const
+{
+	bool result = true;
+	int32 partitionCount = CountPartitions();
+	const Partition **byOffset = new(nothrow) const Partition*[partitionCount];
+	off_t *ptsOffsets = new(nothrow) off_t[partitionCount - 3];
+	if (byOffset && ptsOffsets) {
+		// fill the arrays
+		int32 byOffsetCount = 0;
+		int32 ptsOffsetCount = 1;	// primary PTS
+		ptsOffsets[0] = 0;			//
+		for (int32 i = 0; i < partitionCount; i++) {
+			const Partition *partition = PartitionAt(i);
+			if (!partition->IsExtended())
+				byOffset[byOffsetCount++] = partition;
+			// add only logical partition PTS locations
+			if (i >= 4)
+				ptsOffsets[ptsOffsetCount++] = partition->PTSOffset();
+		}
+		// sort the arrays
+		qsort(byOffset, byOffsetCount, sizeof(const Partition*),
+			  cmp_partition_offset);
+		qsort(ptsOffsets, ptsOffsetCount, sizeof(off_t), cmp_offset);
+		// check for overlappings
+		off_t nextOffset = 0;
+		for (int32 i = 0; i < byOffsetCount; i++) {
+			const Partition *partition = byOffset[i];
+			if (partition->Offset() < nextOffset) {
+				TRACE(("intel: PartitionMap::Check(): overlapping partitions!"
+					   "\n"));
+				result = false;
+				break;
+			}
+			nextOffset = partition->Offset() + partition->Size();
+		}
+		// check uniqueness of PTS offsets and whether they lie outside of the
+		// non-extended partitions
+		if (result) {
+			for (int32 i = 0; i < ptsOffsetCount; i++) {
+				if (i > 0 && ptsOffsets[i] == ptsOffsets[i - 1]) {
+					TRACE(("intel: PartitionMap::Check(): same PTS for "
+						   "different extended partitions!\n"));
+					result = false;
+					break;
+				} else if (is_inside_partitions(ptsOffsets[i], byOffset,
+												byOffsetCount)) {
+					TRACE(("intel: PartitionMap::Check(): a PTS lies "
+						   "inside a non-extended partition!\n"));
+					result = false;
+					break;
 				}
 			}
 		}
 	} else
-		error = B_NO_MEMORY;
+		result = false;		// no memory: assume failure
 	// cleanup
-	if (buffer)
-		free(buffer);
+	if (byOffset)
+		delete[] byOffset;
+	if (ptsOffsets)
+		delete[] ptsOffsets;
+	return result;
+}
+
+
+// PartitionMapParser
+
+class PartitionMapParser {
+public:
+	PartitionMapParser(int deviceFD, off_t sessionOffset, off_t sessionSize,
+					   int32 blockSize);
+	~PartitionMapParser();
+
+	status_t Parse(const uint8 *block, PartitionMap *map);
+
+	int32 CountPartitions() const;
+	const Partition *PartitionAt(int32 index) const;
+
+private:
+	status_t _ParsePrimary(const partition_table_sector *pts);
+	status_t _ParseExtended(PrimaryPartition *primary, off_t offset);
+	status_t _ReadPTS(off_t offset);
+
+private:
+	int						fDeviceFD;
+	off_t					fSessionOffset;
+	off_t					fSessionSize;
+	int32					fBlockSize;
+	partition_table_sector	*fPTS;	// while parsing
+	PartitionMap			*fMap;	//
+};
+
+// constructor
+PartitionMapParser::PartitionMapParser(int deviceFD, off_t sessionOffset,
+									   off_t sessionSize, int32 blockSize)
+	: fDeviceFD(deviceFD),
+	  fSessionOffset(sessionOffset),
+	  fSessionSize(sessionSize),
+	  fBlockSize(blockSize),
+	  fPTS(NULL),
+	  fMap(NULL)
+{
+}
+
+// destructor
+PartitionMapParser::~PartitionMapParser()
+{
+}
+
+// Parse
+status_t
+PartitionMapParser::Parse(const uint8 *block, PartitionMap *map)
+{
+	status_t error = (block && map ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		fMap = map;
+		fMap->Unset();
+		const partition_table_sector *pts
+			= (const partition_table_sector*)block;
+		error = _ParsePrimary(pts);
+		if (error == B_OK && !fMap->Check())
+			error = B_BAD_DATA;
+		fMap = NULL;
+	}
 	return error;
 }
+
+// _ParsePrimary
+status_t
+PartitionMapParser::_ParsePrimary(const partition_table_sector *pts)
+{
+	status_t error = (pts ? B_OK : B_BAD_VALUE);
+	// check the signature
+	if (error == B_OK && pts->signature != kPartitionTableSectorSignature) {
+		TRACE(("intel: _ParsePrimary(): invalid PTS signature\n"));
+		error = B_BAD_DATA;
+	}
+	// examine the table
+	if (error == B_OK) {
+		for (int32 i = 0; i < 4; i++) {
+			const partition_descriptor *descriptor = &pts->table[i];
+			PrimaryPartition *partition = fMap->PrimaryPartitionAt(i);
+			partition->SetTo(descriptor, 0, fBlockSize);
+			// fail, if location is bad
+			if (!partition->CheckLocation(fSessionSize)) {
+				error = B_BAD_DATA;
+				break;
+			}
+		}
+	}
+	// allocate a PTS buffer
+	if (error == B_OK) {
+		fPTS = new(nothrow) partition_table_sector;
+		if (!fPTS)
+			error = B_NO_MEMORY;
+	}
+	// parse extended partitions
+	if (error == B_OK) {
+		for (int32 i = 0; error == B_OK && i < 4; i++) {
+			PrimaryPartition *primary = fMap->PrimaryPartitionAt(i);
+			if (primary->IsExtended())
+				error = _ParseExtended(primary, primary->Offset());
+		}
+	}
+	// cleanup
+	if (fPTS) {
+		delete fPTS;
+		fPTS = NULL;
+	}
+	return error;
+}
+
+// _ParseExtended
+status_t
+PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
+{
+	status_t error = B_OK;
+	int32 partitionCount = 0;
+	while (error == B_OK) {
+		if (++partitionCount > kMaxLogicalPartitionCount) {
+			TRACE(("intel: _ParseExtended(): Maximal number of logical "
+				   "partitions for extended partition reached. Cycle?\n"));
+			error = B_BAD_DATA;
+		}
+		// read the PTS
+		if (error == B_OK)
+			error = _ReadPTS(offset);
+		// check the signature
+		if (error == B_OK && fPTS->signature != kPartitionTableSectorSignature) {
+			TRACE(("intel: _ParseExtended(): invalid PTS signature\n"));
+			error = B_BAD_DATA;
+		}
+		// examine the table
+		LogicalPartition extended;
+		LogicalPartition nonExtended;
+		if (error == B_OK) {
+			for (int32 i = 0; error == B_OK && i < 4; i++) {
+				const partition_descriptor *descriptor = &fPTS->table[i];
+				LogicalPartition *partition = NULL;
+				if (!descriptor->is_empty()) {
+					if (descriptor->is_extended()) {
+						if (extended.IsEmpty()) {
+							extended.SetTo(descriptor, offset, fBlockSize,
+										   primary);
+							partition = &extended;
+						} else {
+							// only one extended partition allowed
+							error = B_BAD_DATA;
+							TRACE(("intel: _ParseExtended(): "
+								   "only one extended partition allowed\n"));
+						}
+					} else {
+						if (nonExtended.IsEmpty()) {
+							nonExtended.SetTo(descriptor, offset, fBlockSize,
+											  primary);
+							partition = &nonExtended;
+						} else {
+							// only one non-extended partition allowed
+							error = B_BAD_DATA;
+							TRACE(("intel: _ParseExtended(): only one "
+								   "non-extended partition allowed\n"));
+						}
+					}
+					// check the partition's location
+					if (partition && !partition->CheckLocation(fSessionSize))
+						error = B_BAD_DATA;
+				}
+			}
+		}
+		// add non-extended partition to list
+		if (error == B_OK && !nonExtended.IsEmpty()) {
+			LogicalPartition *partition
+				= new(nothrow) LogicalPartition(nonExtended);
+			if (partition)
+				primary->AddLogicalPartition(partition);
+			else
+				error = B_NO_MEMORY;
+		}
+		// prepare to parse next extended partition
+		if (error == B_OK && !extended.IsEmpty())
+			offset = extended.Offset();
+		else
+			break;
+	}
+	return error;
+}
+
+// _ReadPTS
+status_t
+PartitionMapParser::_ReadPTS(off_t offset)
+{
+	status_t error = B_OK;
+	int32 toRead = sizeof(partition_table_sector);
+	// check the offset
+	if (offset < 0 || offset + toRead > fSessionSize) {
+		error = B_BAD_VALUE;
+		TRACE(("intel: _ReadPTS(): bad offset: %Ld\n", offset));
+	// read
+	} else if (read_pos(fDeviceFD, fSessionOffset + offset, fPTS, toRead)
+						!= toRead) {
+		error = errno;
+		if (error == B_OK)
+			error = B_IO_ERROR;
+		TRACE(("intel: _ReadPTS(): reading the PTS failed: %s\n",
+			   strerror(error)));
+	}
+	return error;
+}
+
 
 // std_ops
 static
@@ -351,7 +804,6 @@ bool
 intel_identify(int deviceFD, const session_info *sessionInfo,
 			   const uchar *block)
 {
-	const partition_table_sector *pts = (const partition_table_sector*)block;
 	bool result = true;
 	int32 blockSize = sessionInfo->logical_block_size;
 	TRACE(("intel: identify(%d, %lld, %lld, %p, %ld)\n", deviceFD,
@@ -364,12 +816,15 @@ intel_identify(int deviceFD, const session_info *sessionInfo,
 				   blockSize, sizeof(partition_table_sector)));
 		}
 	}
-	// check PTS signature
+	// read the partition structure
 	if (result) {
-		result = (pts->signature == kPartitionTableSectorSignature);
-		if (!result)
-			TRACE(("intel: identify: bad signature: %x\n", pts->signature));
+		PartitionMapParser parser(deviceFD, sessionInfo->offset,
+								  sessionInfo->size, blockSize);
+		PartitionMap map;
+		result = (parser.Parse(block, &map) == B_OK
+				  && map.CountPartitions() > 0);
 	}
+
 	return result;
 }
 
@@ -388,43 +843,39 @@ intel_get_nth_info(int deviceFD, const session_info *sessionInfo,
 		   sessionOffset, sessionSize, block, blockSize, index));
 	if (intel_identify(deviceFD, sessionInfo, block)) {
 		if (index >= 0) {
-			partition_spec *partitionList = NULL;
-			error = parse_partition_map(deviceFD, sessionOffset, sessionSize,
-										block, blockSize, &partitionList);
+			// parse the partition map
+			PartitionMapParser parser(deviceFD, sessionOffset, sessionSize,
+									  blockSize);
+			PartitionMap map;
+			error = parser.Parse(block, &map);
 			if (error == B_OK) {
-				int32 i = 0;
-				partition_spec *spec = partitionList;
-				for (i = 0; spec && i < index; i++, spec = spec->next);
-				if (spec) {
-					if (spec->size == 0) {
+				if (map.CountPartitions() == 0)
+					error = B_BAD_DATA;
+			}
+			if (error == B_OK) {
+				if (Partition *partition = map.PartitionAt(index)) {
+					if (partition->IsEmpty()) {
 						// empty partition
 						partitionInfo->info.offset = sessionOffset;
 						partitionInfo->info.size = 0;
 						partitionInfo->flags
 							= B_HIDDEN_PARTITION | B_EMPTY_PARTITION;
 					} else {
-						partitionInfo->info.offset = spec->offset;
-						partitionInfo->info.size = spec->size;
-						if (is_extended_type(spec->type))
+						// non-empty partition
+						partitionInfo->info.offset
+							= partition->Offset() + sessionOffset;
+						partitionInfo->info.size = partition->Size();
+						if (partition->IsExtended())
 							partitionInfo->flags = B_HIDDEN_PARTITION;
 						else
 							partitionInfo->flags = 0;
 					}
 					partitionInfo->partition_name[0] = '\0';
 					strcpy(partitionInfo->partition_type,
-						   partition_type_string(spec->type));
-					partitionInfo->partition_code = spec->type;
+						   partition->TypeString());
+					partitionInfo->partition_code = partition->Type();
 				} else
 					error = B_ENTRY_NOT_FOUND;
-			}
-			// free partition list
-			if (partitionList) {
-				partition_spec *spec = partitionList;
-				while (spec) {
-					partitionList = spec->next;
-					free(spec);
-					spec = partitionList;
-				}
 			}
 		}
 	}
@@ -470,6 +921,7 @@ static partition_module_info intel_partition_module =
 	intel_partition,
 };
 
+extern "C" partition_module_info *modules[];
 _EXPORT partition_module_info *modules[] =
 {
 	&intel_partition_module,
