@@ -26,11 +26,8 @@ KernelLd boot_loader :
 	<$(SOURCE_GRIST)!libroot!posix!string>strcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/stage2.ld 
-	:
-	-Bstatic
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/boot_loader.ld 
+	: -Bstatic
 	;
 
 KernelLd stage2 :
