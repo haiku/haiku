@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 BinCommand arp :
 	arp.c
-: socket bind ;
+: libsocket.so libbind.so ;
 
 # Installation -- in the test directory for the time being
 OBOSInstall install-networking

@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 BinCommand ping :
 	ping.c
-: socket bind ;
+: libsocket.so libbind.so ;
 
 # Installation -- in the test directory for the time being
 OBOSInstall install-networking
