@@ -782,7 +782,7 @@ static void print_pir_table(struct pir_table *tbl)
 static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 {
 	uint16 command = 0;
-	uint8 mybus = bus + 1;
+	uint8 mybus = pci_max_bus;
 	struct pci_device *pcid;
 	struct pci_bus *pcib;
 	pci_info *pcii;
@@ -794,7 +794,8 @@ static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 	write_pci_config(bus, dev, func, PCI_primary_bus, 1, bus);
 	write_pci_config(bus, dev, func, PCI_secondary_bus, 1, mybus);
 	write_pci_config(bus, dev, func, PCI_subordinate_bus, 1, 0xff);
-	pci_max_bus = bus + 1;
+
+	pci_max_bus += 1;
 
 	dprintf("PCI-PCI bridge at %d:%d:%d configured as bus %d\n", bus, dev, func, mybus);
 	pci_scan_bus(mybus);
