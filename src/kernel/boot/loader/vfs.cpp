@@ -313,7 +313,7 @@ get_boot_file_system(stage2_args *args)
 		return NULL;
 
 	Partition *partition;
-	if (platform_get_boot_partition(args, &gPartitions, &partition) < B_OK)
+	if (platform_get_boot_partition(args, device, &gPartitions, &partition) < B_OK)
 		return NULL;
 
 	Directory *fileSystem;
