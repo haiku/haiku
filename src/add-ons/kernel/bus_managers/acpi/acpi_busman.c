@@ -13,7 +13,7 @@ struct acpi_module_info acpi_module = {
 	{
 		{
 			B_ACPI_MODULE_NAME,
-			0,
+			B_KEEP_LOADED,
 			acpi_std_ops
 		},
 		
