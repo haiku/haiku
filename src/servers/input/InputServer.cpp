@@ -162,7 +162,8 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 InputServer::~InputServer(void)
 {
 	CALLED();
-	delete fAddOnManager;
+	fAddOnManager->Lock();
+	fAddOnManager->Quit();
 	
 #ifdef COMPILE_FOR_R5
 	delete_port(fAsPort);
@@ -183,18 +184,14 @@ void
 InputServer::ArgvReceived(int32 argc, char** argv)
 {
 	CALLED();
-	if (2 == argc) {
-		if (0 == strcmp("-q", argv[1]) ) {
-			// :TODO: Shutdown and restart the InputServer.
-			PRINT(("InputServer::ArgvReceived - Restarting ...\n"));
-			status_t   quit_status;
-			BMessenger msgr = BMessenger(INPUTSERVER_SIGNATURE, -1, &quit_status);
-			if (B_OK == quit_status) {
-				BMessage   msg  = BMessage(B_QUIT_REQUESTED);
-				msgr.SendMessage(&msg);
-			} else {
-				PRINTERR(("Unable to send Quit message to running InputServer."));
-			}
+	if (2 == argc && (0 == strcmp("-q", argv[1]))) {
+		PRINT(("InputServer::ArgvReceived - Restarting ...\n"));
+		status_t quit_status = B_OK;
+		BMessenger msgr = BMessenger(INPUTSERVER_SIGNATURE, -1, &quit_status);
+		if (B_OK == quit_status) {
+			msgr.SendMessage(B_QUIT_REQUESTED);
+		} else {
+			PRINTERR(("Unable to send Quit message to running InputServer.\n"));
 		}
 	}
 }

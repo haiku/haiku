@@ -52,7 +52,7 @@
 #include <Screen.h>
 #include <SupportDefs.h>
 
-#define INPUTSERVER_SIGNATURE "application/x-vnd.OBOS-input_server"
+#define INPUTSERVER_SIGNATURE "application/x-vnd.Be-input_server"
 
 class BPortLink;
 

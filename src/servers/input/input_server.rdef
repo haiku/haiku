@@ -7,7 +7,7 @@
    application:/x-vnd.obos.app-name
    */
 
-resource app_signature "application/x-vnd.OBOS-input_server";
+resource app_signature "application/x-vnd.Be-input_server";
 
 /* BEOS:APP_FLAGS :
    00000000 = 							   SINGLE LAUNCH
