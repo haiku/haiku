@@ -1005,7 +1005,7 @@ status_t get_next_file_format(int32 *cookie, media_file_format *mfi)
 // final & verified
 const char * B_MEDIA_SERVER_SIGNATURE = "application/x-vnd.Be.media-server";
 
-const type_code B_CODEC_TYPE_INFO = 0x12345678; // XXX fixme
+const type_code B_CODEC_TYPE_INFO = 0x040807b2;
 
 /*************************************************************
  * 
