@@ -104,11 +104,11 @@ void TranslatorRosterTest::ConstructorTest() {
 	//shared instance of TranslatorRoster
 	BTranslatorRoster* proster;
 
-	//Create TranslatorRoster using noargs constructor
+	// Create TranslatorRoster using noargs constructor
+	// (GetAllTranslatorsTest also tests this constructor)
 	NextSubTest();
 	proster = new BTranslatorRoster();
 	CPPUNIT_ASSERT(proster != NULL);
-
 	delete proster;
 	proster = NULL;
 	
@@ -117,10 +117,64 @@ void TranslatorRosterTest::ConstructorTest() {
 	BMessage translator_message;
 	translator_message.AddString("be:translator_path", "/boot/home/config/add-ons/Translators");
 	proster = new BTranslatorRoster(&translator_message);
-
 	CPPUNIT_ASSERT(proster != NULL);
-	// TODO: count the number of translators in the path above and compare
-	// TODO: that number to the translator count
+	
+	// Make sure the correct number of translators were loaded
+	NextSubTest();
+	int32 nloaded = -42;
+	translator_id *pids = NULL;
+	CPPUNIT_ASSERT(proster->GetAllTranslators(&pids, &nloaded) == B_NO_ERROR);
+	CPPUNIT_ASSERT(nloaded > 0);
+	CPPUNIT_ASSERT(pids != NULL);
+	
+	// Make sure the correct translators were loaded
+	NextSubTest();
+	const char *kaTranslatorNames[] = {
+		"TGA Images",
+		"MNGTranslator",
+		"BMP Images",
+		"TestBmpTranslator",
+		"BBitmap Images",
+		"GIMPPatternHandler"
+	};
+	int32 naCounts[sizeof(kaTranslatorNames) /
+		sizeof(const char *)] = { 0 };
+	CPPUNIT_ASSERT(nloaded == sizeof(kaTranslatorNames) /
+		sizeof(const char *));
+	
+	for (int32 i = 0; i < nloaded; i++) {
+		const char *kTranslatorName, *kTranslatorInfo;
+		int32 nTranslatorVersion;
+		
+		CPPUNIT_ASSERT(pids[i] > 0);
+		
+		kTranslatorName = kTranslatorInfo = NULL;
+		nTranslatorVersion = -246;
+		
+		proster->GetTranslatorInfo(pids[i], &kTranslatorName,
+			&kTranslatorInfo, &nTranslatorVersion);
+			
+		CPPUNIT_ASSERT(kTranslatorName);
+		CPPUNIT_ASSERT(kTranslatorInfo);
+		CPPUNIT_ASSERT(nTranslatorVersion > 0);
+		
+		// make sure that the translator matches
+		// one from the list
+		int32 npresent = 0;
+		for (int32 k = 0; k < nloaded; k++) {
+			if (!strcmp(kaTranslatorNames[k], kTranslatorName)) {
+				npresent++;
+				naCounts[k]++;
+			}
+		}
+		CPPUNIT_ASSERT(npresent == 1);
+	}
+	
+	// make certain that each translator in kaTranslatorNames
+	// is loaded exactly once
+	for (int32 i = 0; i < nloaded; i++)
+		CPPUNIT_ASSERT(naCounts[i] == 1);
+	
 	delete proster;
 	proster = NULL;
 }
@@ -142,6 +196,7 @@ void TranslatorRosterTest::DefaultTest() {
  * 
  * @return B_OK if everything went ok, B_ERROR if not
  */
+// ArchiveTest() also tests BTranslatorRoster::Instantiate()
 void TranslatorRosterTest::InstantiateTest() {
 	//shared instance of TranslatorRoster
 	BTranslatorRoster* proster = NULL;
@@ -154,6 +209,10 @@ void TranslatorRosterTest::InstantiateTest() {
 	CPPUNIT_ASSERT(proster == NULL);
 	delete proster;
 	proster = NULL;
+	
+	// TODO: add a case with a BMessage containing a single Translator to load
+	// TODO: add a case with a BMessage containing multiple Translators to load
+	// TODO: add a case with a slightly corrupt BMessage
 }
 
 /**
@@ -285,37 +344,86 @@ void TranslatorRosterTest::ArchiveTest() {
  */
 void TranslatorRosterTest::GetAllTranslatorsTest() {
 	
-	int32 num_translators = 42;
-	translator_id* translators = NULL;
+	int32 nloaded = 42;
+	translator_id* pids = NULL;
+	
+	// bad parameters
+	NextSubTest();
+	BTranslatorRoster roster;
+	CPPUNIT_ASSERT(roster.GetAllTranslators(NULL, &nloaded) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(nloaded == 42);
+	CPPUNIT_ASSERT(roster.GetAllTranslators(&pids, NULL) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(pids == NULL);
+	CPPUNIT_ASSERT(roster.GetAllTranslators(NULL, NULL) == B_BAD_VALUE);
 	
 	// no translators
 	NextSubTest();
-	BTranslatorRoster roster;
 	CPPUNIT_ASSERT(
-		roster.GetAllTranslators(&translators, &num_translators) == B_NO_ERROR);
-		
-	NextSubTest();
-	CPPUNIT_ASSERT(translators == NULL);
-	
-	NextSubTest();
-	CPPUNIT_ASSERT(num_translators == 0);
+		roster.GetAllTranslators(&pids, &nloaded) == B_NO_ERROR);
+	CPPUNIT_ASSERT(nloaded == 0);
+	delete[] pids;
+	pids = NULL;
 	
 	// default translators
 	NextSubTest();
-	num_translators = 42;
-	translators = NULL;
+	nloaded = 42;
 	BTranslatorRoster *proster = BTranslatorRoster::Default();	
 	CPPUNIT_ASSERT(
-		proster->GetAllTranslators(&translators, &num_translators) == B_NO_ERROR);
-		
-	NextSubTest();
-	CPPUNIT_ASSERT(num_translators > 0);
+		proster->GetAllTranslators(&pids, &nloaded) == B_NO_ERROR);
+	CPPUNIT_ASSERT(nloaded > 0);
+	CPPUNIT_ASSERT(pids != NULL);
 	
+	// Make sure the correct translators were loaded
 	NextSubTest();
-	for (int32 i = 0; i < num_translators; i++)
-		CPPUNIT_ASSERT(translators[i] > 0);
+	const char *kaTranslatorNames[] = {
+		"Gobe MS-WORD Translator",
+		"Gobe Text Translator",
+		"TIFF Images",
+		"Gobe SYLK Translator",
+		"StyledEdit Files",
+		"Gobe RTF Translator",
+		"PPM Images",
+		"JPEG Images",
+		"Gobe HTML Translator",
+		"Gobe Excel Translator",
+		"TGA Images",
+		"MNGTranslator",
+		"GIMPPatternHandler",
+		"TestBmpTranslator",
+		"BMP Images",
+		"BBitmap Images"
+	};
+	CPPUNIT_ASSERT(nloaded == sizeof(kaTranslatorNames) /
+		sizeof(const char *));
+	
+	for (int32 i = 0; i < nloaded; i++) {
+		const char *kTranslatorName, *kTranslatorInfo;
+		int32 nTranslatorVersion;
+		
+		CPPUNIT_ASSERT(pids[i] > 0);
+		
+		kTranslatorName = kTranslatorInfo = NULL;
+		nTranslatorVersion = -246;
+		
+		proster->GetTranslatorInfo(pids[i], &kTranslatorName,
+			&kTranslatorInfo, &nTranslatorVersion);
+			
+		CPPUNIT_ASSERT(kTranslatorName);
+		CPPUNIT_ASSERT(kTranslatorInfo);
+		CPPUNIT_ASSERT(nTranslatorVersion > 0);
+		
+		// make sure each translator is loaded exactly once
+		// no more, no less
+		int32 npassed = 0;
+		for (int32 k = 0; k < nloaded; k++) {
+			if (!strcmp(kaTranslatorNames[k], kTranslatorName))
+				npassed++;
+		}
+		CPPUNIT_ASSERT(npassed == 1);
+	}
 
-	delete [] translators;
+	delete[] pids;
+	pids = NULL;
 }
 
 /**
@@ -335,7 +443,8 @@ void TranslatorRosterTest::GetConfigurationMessageTest() {
 	translator_id* translators;
 	proster->GetAllTranslators(&translators, &num_translators);
 	translatorid = translators[0];
-	delete [] translators;
+	delete[] translators;
+	translators = NULL;
 	
 	//get conf for invalid translator
 	CPPUNIT_ASSERT(proster->GetConfigurationMessage(-1, &translator_message) == B_NO_TRANSLATOR);
@@ -416,7 +525,8 @@ void TranslatorRosterTest::GetTranslatorInfoTest() {
 		NextSubTest();
 		CPPUNIT_ASSERT(proster->GetTranslatorInfo(translators[i], &outName, &outInfo, &outVersion) == B_OK);
 	}	
-	delete [] translators;	
+	delete[] translators;
+	translators = NULL;
 }
 
 /**
@@ -459,7 +569,8 @@ void TranslatorRosterTest::GetTranslatorsTest() {
 
 	CPPUNIT_ASSERT(outCount > 0);
 
-	delete [] info;
+	delete[] info;
+	info = NULL;
 }
 
 /**
@@ -496,6 +607,7 @@ void TranslatorRosterTest::IdentifyTest() {
 	CPPUNIT_ASSERT(proster->Identify(&image, NULL, info) == B_OK);
 	
 	delete info;
+	info = NULL;
 }
 
 /**
@@ -522,7 +634,8 @@ void TranslatorRosterTest::MakeConfigurationViewTest() {
 	CPPUNIT_ASSERT(extent.IsValid() == true);
 
 	//clean up after ourselves
-	delete [] translators;
+	delete[] translators;
+	translators = NULL;
 }
 
 /**
@@ -547,7 +660,7 @@ void TranslatorRosterTest::TranslateTest() {
 	
 	//output file
 	NextSubTest();
-	BFile output("../src/tests/kits/translation/data/images/image.out.png",
+	BFile output("../src/tests/kits/translation/data/images/image.out.tga",
 		B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	CPPUNIT_ASSERT(output.InitCheck() == B_OK);
 	
@@ -562,7 +675,7 @@ void TranslatorRosterTest::TranslateTest() {
 	
 	//translate to specific
 	NextSubTest();	
-	CPPUNIT_ASSERT(proster->Translate(&temp, NULL, NULL, &output, B_PNG_FORMAT) == B_OK);
+	CPPUNIT_ASSERT(proster->Translate(&temp, NULL, NULL, &output, B_TGA_FORMAT) == B_OK);
 }
 
 int main() {
