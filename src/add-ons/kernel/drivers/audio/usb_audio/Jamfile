@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src add-ons kernel drivers audio usb_audio ;
+
+R5KernelAddon usb_audio : kernel drivers bin :
+	usb_audio.c
+	USB_audio_utils.c
+;
+
+# Link to kernel/drivers/dev/audio/multi
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio old ] ;
+	local instDriver = <kernel!drivers!dev!audio!old>usb_audio ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : usb_audio ;
+}
