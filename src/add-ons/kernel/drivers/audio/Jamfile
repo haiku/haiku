@@ -1,3 +1,5 @@
 SubDir OBOS_TOP src add-ons kernel drivers audio ;
 
 SubInclude OBOS_TOP src add-ons kernel drivers audio ac97 ;
+SubInclude OBOS_TOP src add-ons kernel drivers audio emuxki ;
+SubInclude OBOS_TOP src add-ons kernel drivers audio module_driver ;
