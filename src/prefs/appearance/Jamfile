@@ -1,23 +1,16 @@
 SubDir OBOS_TOP src prefs appearance ;
 
-UsePrivateHeaders app ;
+UsePrivateHeaders app [ FDirName servers app ] ;
 AddResources Appearance : Appearance.rsrc ;
 
 Preference Appearance :
 	APRMain.cpp
 	APRView.cpp
 	APRWindow.cpp
-	Decorator.cpp
 	DecView.cpp
-	DisplayDriver.cpp
 	PreviewDriver.cpp
-	RGBColor.cpp
 	ColorWell.cpp
 	ColorWhichItem.cpp
-	ColorSet.cpp
-	ServerCursor.cpp
-	ServerBitmap.cpp
-	SystemPalette.cpp
  ;
 
-LinkSharedOSLibs Appearance : be tracker libopenbeos.so ;
+LinkSharedOSLibs Appearance : be tracker libappserver.so libopenbeos.so ;
