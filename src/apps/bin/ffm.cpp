@@ -1,0 +1,28 @@
+/*
+ * ffm.cpp
+ * (c) 2002, Carlos Hasan, for OpenBeOS.
+ */
+
+#include <string.h>
+#include <app/Application.h>
+#include <interface/InterfaceDefs.h>
+
+int main(int argc, char *argv[])
+{
+	BApplication app("application/x.vnd.OpenBe-ffm");
+	bool follow;
+
+	if (argc == 2) {
+		if (strcasecmp(argv[1], "yes") == 0 || strcasecmp(argv[1], "on") == 0)
+			follow = true;
+		else
+			follow = false;
+	}
+	else {
+		follow = true;
+	}
+
+	set_focus_follows_mouse(follow);
+	return 0;
+}
+

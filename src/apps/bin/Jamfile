@@ -5,6 +5,7 @@ StdBinCommands
 	beep.cpp
 	clipboard.cpp
 	df.cpp
+	ffm.cpp
 	iroster.cpp
 	isvolume.cpp
 	listattr.cpp
