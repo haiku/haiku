@@ -1,0 +1,172 @@
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "ICOTranslator.h"
+#include "ConfigView.h"
+#include "ICO.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+
+#define READ_BUFFER_SIZE 2048
+#define DATA_BUFFER_SIZE 64
+
+
+// The input formats that this translator supports.
+translation_format sInputFormats[] = {
+	{
+		ICO_IMAGE_FORMAT,
+		B_TRANSLATOR_BITMAP,
+		ICO_IN_QUALITY,
+		ICO_IN_CAPABILITY,
+		"image/x-icon",
+		"Windows Icon image"
+	},
+	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		BITS_IN_QUALITY,
+		BITS_IN_CAPABILITY,
+		"x-be-bitmap",
+		"Be Bitmap image"
+	},
+};
+
+// The output formats that this translator supports.
+translation_format sOutputFormats[] = {
+	{
+		ICO_IMAGE_FORMAT,
+		B_TRANSLATOR_BITMAP,
+		ICO_OUT_QUALITY,
+		ICO_OUT_CAPABILITY,
+		"image/x-icon",
+		"Windows Icon image"
+	},
+	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		BITS_OUT_QUALITY,
+		BITS_OUT_CAPABILITY,
+		"x-be-bitmap",
+		"Be Bitmap image"
+	},
+};
+
+// Default settings for the Translator
+static TranSetting sDefaultSettings[] = {
+	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
+	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false}
+};
+
+const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
+const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
+const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
+
+
+ICOTranslator::ICOTranslator()
+	: BaseTranslator("Windows Icon Images", "Windows Icon Translator",
+		ICO_TRANSLATOR_VERSION,
+		sInputFormats, kNumInputFormats,
+		sOutputFormats, kNumOutputFormats,
+		"ICOTranslator_Settings",
+		sDefaultSettings, kNumDefaultSettings,
+		B_TRANSLATOR_BITMAP, ICO_IMAGE_FORMAT)
+{
+}
+
+
+ICOTranslator::~ICOTranslator()
+{
+}
+
+
+status_t
+ICOTranslator::DerivedIdentify(BPositionIO *stream,
+	const translation_format *format, BMessage *ioExtension,
+	translator_info *info, uint32 outType)
+{
+	if (!outType)
+		outType = B_TRANSLATOR_BITMAP;
+	if (outType != B_TRANSLATOR_BITMAP && outType != ICO_IMAGE_FORMAT)
+		return B_NO_TRANSLATOR;
+
+	int32 bitsPerPixel;
+	if (ICO::identify(*stream, bitsPerPixel) != B_OK)
+		return B_NO_TRANSLATOR;
+
+	info->type = ICO_IMAGE_FORMAT;
+	info->group = B_TRANSLATOR_BITMAP;
+	info->quality = ICO_IN_QUALITY;
+	info->capability = ICO_IN_CAPABILITY;
+	snprintf(info->name, sizeof(info->name), "Windows Icon %ld bit image", bitsPerPixel);
+	strcpy(info->MIME, "image/x-ico");
+
+	return B_OK;
+}
+
+
+status_t
+ICOTranslator::DerivedTranslate(BPositionIO *source,
+	const translator_info *info, BMessage *ioExtension,
+	uint32 outType, BPositionIO *target, int32 baseType)
+{
+	if (!outType)
+		outType = B_TRANSLATOR_BITMAP;
+	if (outType != B_TRANSLATOR_BITMAP && outType != ICO_IMAGE_FORMAT)
+		return B_NO_TRANSLATOR;
+
+	switch (baseType) {
+		case 1:
+		{
+			if (outType != ICO_IMAGE_FORMAT)
+				return B_NO_TRANSLATOR;
+
+			// Source is in bits format - this has to be done here, because
+			// identify_bits_header() is a member of the BaseTranslator class...
+			TranslatorBitmap bitsHeader;
+			status_t status = identify_bits_header(source, NULL, &bitsHeader);
+			if (status != B_OK)
+				return status;
+
+			return ICO::convert_bits_to_ico(*source, bitsHeader, *target);
+		}
+
+		case 0:
+		{
+			// source is NOT in bits format
+			if (outType != B_TRANSLATOR_BITMAP)
+				return B_NO_TRANSLATOR;
+
+			return ICO::convert_ico_to_bits(*source, *target);
+		}
+
+		default:
+			return B_NO_TRANSLATOR;
+	}
+}
+
+
+BView *
+ICOTranslator::NewConfigView(TranslatorSettings *settings)
+{
+	return new ConfigView(BRect(0, 0, 225, 175));
+}
+
+
+//	#pragma mark -
+
+
+BTranslator *
+make_nth_translator(int32 n, image_id you, uint32 flags, ...)
+{
+	if (n != 0)
+		return NULL;
+
+	return new ICOTranslator();
+}
+
