@@ -6,6 +6,7 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
+#include <Application.h>
 #include <Cursor.h>
 #include <Message.h>
 
@@ -29,6 +30,7 @@
  */
 void BCursorTester::BCursor1()
 {
+  BApplication app("application/x-vnd.cursortest");
   BCursor cur((void *)NULL);
 }
 
@@ -39,6 +41,7 @@ void BCursorTester::BCursor1()
  */
 void BCursorTester::BCursor2()
 {
+  BApplication app("application/x-vnd.cursortest");
   char data[68];
   int i;
 
@@ -59,6 +62,7 @@ void BCursorTester::BCursor2()
  */
 void BCursorTester::BCursor3()
 {
+  BApplication app("application/x-vnd.cursortest");
   int x;
   BCursor cur1(&x);
   char data[68];
@@ -80,6 +84,7 @@ void BCursorTester::BCursor3()
  */
 void BCursorTester::BCursor4()
 {
+  BApplication app("application/x-vnd.cursortest");
   BCursor cur((BMessage *)NULL);
 }
 
@@ -90,6 +95,7 @@ void BCursorTester::BCursor4()
  */
 void BCursorTester::BCursor5()
 {
+  BApplication app("application/x-vnd.cursortest");
   /* The message really should contain a valid archive, but Cursor doesn't
      support archiving anyway, so until R2, this is a moot point.
   */
@@ -104,6 +110,7 @@ void BCursorTester::BCursor5()
  */
 void BCursorTester::Instantiate1()
 {
+  BApplication app("application/x-vnd.cursortest");
   CHK(BCursor::Instantiate(NULL) == NULL);
 }
 
@@ -114,6 +121,7 @@ void BCursorTester::Instantiate1()
  */
 void BCursorTester::Instantiate2()
 {
+  BApplication app("application/x-vnd.cursortest");
   /* The message really should contain a valid archive, but Cursor doesn't
      support archiving anyway, so until R2, this is a moot point.
   */
@@ -128,6 +136,7 @@ void BCursorTester::Instantiate2()
  */
 void BCursorTester::Archive1()
 {
+  BApplication app("application/x-vnd.cursortest");
   char data[68];
   int i;
 
@@ -149,6 +158,7 @@ void BCursorTester::Archive1()
  */
 void BCursorTester::Archive2()
 {
+  BApplication app("application/x-vnd.cursortest");
   char data[68];
   int i;
 
@@ -171,6 +181,7 @@ void BCursorTester::Archive2()
  */
 void BCursorTester::Perform1()
 {
+  BApplication app("application/x-vnd.cursortest");
   char data[68];
   int i;
 
@@ -192,6 +203,7 @@ void BCursorTester::Perform1()
  */
 void BCursorTester::Perform2()
 {
+  BApplication app("application/x-vnd.cursortest");
   char data[68];
   int i;
 
