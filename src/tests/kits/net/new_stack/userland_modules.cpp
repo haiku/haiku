@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <signal.h>
 
 #include <drivers/KernelExport.h>
 #include <drivers/module.h>
@@ -399,6 +400,14 @@ _EXPORT thread_id spawn_kernel_thread(thread_entry func, const char *name, long 
 {
 	return spawn_thread(func, name, priority, arg);
 }
+
+
+
+_EXPORT int send_signal_etc(pid_t thid, uint sig, uint32 flags)
+{
+	return send_signal(thid, sig);
+}	
+
 
 }  // extern "C"
 
