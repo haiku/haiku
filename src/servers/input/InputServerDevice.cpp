@@ -41,6 +41,7 @@
  */
 BInputServerDevice::BInputServerDevice()
 {
+	fOwner = new _BDeviceAddOn_(this);
 }
 
 
@@ -73,6 +74,8 @@ BInputServerDevice::~BInputServerDevice()
 	}
 	
 	InputServer::gInputDeviceListLocker.Unlock();
+	
+	delete fOwner;
 }
 
 

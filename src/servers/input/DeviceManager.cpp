@@ -22,6 +22,101 @@
 #include "InputServer.h"
 
 
+IAHandler::IAHandler(DeviceManager * manager) 
+	: BHandler ("DeviceManager") 
+{
+	fManager = manager;
+}
+
+
+void
+IAHandler::MessageReceived(BMessage * msg)
+{
+	if (msg->what == B_NODE_MONITOR) {
+		int32 opcode;
+		if (msg->FindInt32("opcode", &opcode) == B_OK) {
+			switch (opcode) {
+			case B_ENTRY_CREATED:
+				
+				
+				break;
+			case B_ENTRY_REMOVED:
+				
+				break;
+			case B_ENTRY_MOVED:
+			case B_STAT_CHANGED:
+			case B_ATTR_CHANGED:
+			case B_DEVICE_MOUNTED:
+			case B_DEVICE_UNMOUNTED:
+			default:
+				BHandler::MessageReceived(msg);
+				break;
+			}
+		}
+	}
+}
+
+
+status_t
+IAHandler::AddDirectory(const node_ref * nref)
+{
+	BDirectory directory(nref);
+	status_t status = directory.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	status = watch_node(nref, B_WATCH_DIRECTORY, this);
+	if (status != B_OK)
+		return status;
+
+	BEntry entry;
+	while (directory.GetNextEntry(&entry, true) == B_OK) {
+		add_on_entry_info entry_info;
+		if (entry.GetName(entry_info.name) != B_OK) {
+			continue; // discard and proceed
+		}
+		if (entry.GetNodeRef(&entry_info.nref) != B_OK) {
+			continue; // discard and proceed
+		}
+		entry_info.dir_nref = *nref;
+		
+		// TODO : handle refs
+	}
+
+	return B_OK;
+}
+
+
+status_t
+IAHandler::RemoveDirectory(const node_ref * nref)
+{
+	BDirectory directory(nref);
+	status_t status = directory.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	status = watch_node(nref, B_STOP_WATCHING, this);
+	if (status != B_OK)
+		return status;
+
+	BEntry entry;
+	while (directory.GetNextEntry(&entry, true) == B_OK) {
+		add_on_entry_info entry_info;
+		if (entry.GetName(entry_info.name) != B_OK) {
+			continue; // discard and proceed
+		}
+		if (entry.GetNodeRef(&entry_info.nref) != B_OK) {
+			continue; // discard and proceed
+		}
+		entry_info.dir_nref = *nref;
+		
+		// TODO : handle refs
+	}
+
+	return B_OK;
+}
+
+
 DeviceManager::DeviceManager()
 	:
  	fLock("device manager")
@@ -37,37 +132,7 @@ DeviceManager::~DeviceManager()
 void
 DeviceManager::LoadState()
 {
-	class IAHandler : public AddOnMonitorHandler {
-	private:
-		DeviceManager * fManager;
-	public:
-		IAHandler(DeviceManager * manager) {
-			fManager = manager;
-		}
-		virtual void	AddOnCreated(const add_on_entry_info * entry_info) {
-		}
-		virtual void	AddOnEnabled(const add_on_entry_info * entry_info) {
-			CALLED();
-			entry_ref ref;
-			make_entry_ref(entry_info->dir_nref.device, entry_info->dir_nref.node,
-			               entry_info->name, &ref);
-			BEntry entry(&ref, false);
-			//fManager->RegisterAddOn(entry);
-		}
-		virtual void	AddOnDisabled(const add_on_entry_info * entry_info) {
-			CALLED();
-			entry_ref ref;
-			make_entry_ref(entry_info->dir_nref.device, entry_info->dir_nref.node,
-			               entry_info->name, &ref);
-			BEntry entry(&ref, false);
-			//fManager->UnregisterAddOn(entry);
-		}
-		virtual void	AddOnRemoved(const add_on_entry_info * entry_info) {
-		}
-	};
-
 	fHandler = new IAHandler(this);
-	fAddOnMonitor = new AddOnMonitor(fHandler);
 }
 
 
@@ -75,10 +140,6 @@ void
 DeviceManager::SaveState()
 {
 	CALLED();
-	BMessenger messenger(fAddOnMonitor);
-	messenger.SendMessage(B_QUIT_REQUESTED);
-	int32 exit_value;
-	wait_for_thread(fAddOnMonitor->Thread(), &exit_value);
 	delete fHandler;
 }
 
@@ -87,6 +148,9 @@ status_t
 DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon, 
 				const char *device)
 {
+	// test if already monitored
+
+	// monitor if needed
 	status_t err;
 	node_ref nref;
 	BDirectory directory;
@@ -98,6 +162,8 @@ DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon,
 		return B_OK;
 	} else
 		return err;
+		
+	// add in list
 }
 
 
@@ -105,6 +171,10 @@ status_t
 DeviceManager::StopMonitoringDevice(_BDeviceAddOn_ *addon, 
 				const char *device)
 {
+	// test if still monitored
+	// remove from list
+	
+	// stop monitoring if needed
 	status_t err;
 	node_ref nref;
 	BDirectory directory;

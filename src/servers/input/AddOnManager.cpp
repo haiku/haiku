@@ -354,7 +354,7 @@ AddOnManager::RegisterDevice(BInputServerDevice *device, const entry_ref &ref, i
 	info.ref = ref;
 	info.addon_image = addon_image;
 	info.isd = device;
-	info.addon = new _BDeviceAddOn_;
+	//info.addon = new _BDeviceAddOn_;
 	
 	fDeviceList.Insert(info);
 }
@@ -407,7 +407,7 @@ AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, i
 	info.ref = ref;
 	info.addon_image = addon_image;
 	info.ism = method;
-	info.addon = new _BMethodAddOn_;
+	//info.addon = new _BMethodAddOn_;
 
 	fMethodList.Insert(info);
 	

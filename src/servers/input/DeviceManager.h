@@ -10,13 +10,25 @@
 
 // Manager for devices monitoring
 
+#include <Handler.h>
 #include <Locker.h>
 #include <InputServerDevice.h>
 #include <InputServerFilter.h>
 #include <InputServerMethod.h>
-#include "AddOnMonitor.h"
-#include "AddOnMonitorHandler.h"
 #include "TList.h"
+
+class DeviceManager;
+
+class IAHandler : public BHandler {
+	public:
+		IAHandler(DeviceManager * manager);
+		void MessageReceived(BMessage * msg);
+		status_t AddDirectory(const node_ref * nref);
+		status_t RemoveDirectory(const node_ref * nref);
+	private:
+		DeviceManager * fManager;
+		
+};
 
 class DeviceManager {
 	public:
@@ -36,9 +48,7 @@ class DeviceManager {
 	private:
 		
 		BLocker fLock;
-		
-		AddOnMonitorHandler	*fHandler;
-		AddOnMonitor		*fAddOnMonitor;
+		IAHandler	*fHandler;
 };
 
 #endif // _DEVICE_MANAGER_H

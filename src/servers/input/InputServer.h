@@ -72,12 +72,20 @@ class InputDeviceListItem
 
 class _BDeviceAddOn_
 {
+	public:
+		_BDeviceAddOn_(BInputServerDevice *device)
+			: fDevice(device) {};
 	
+		BInputServerDevice *fDevice;
 };
 
 class _BMethodAddOn_
 {
+	public:
+		_BMethodAddOn_(BInputServerMethod *method)
+			: fMethod(method) {};
 
+		BInputServerMethod *fMethod;
 };
 
 /*****************************************************************************/

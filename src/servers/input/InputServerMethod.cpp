@@ -42,6 +42,7 @@
 BInputServerMethod::BInputServerMethod(const char *name,
                                        const uchar *icon)
 {
+	fOwner = new _BMethodAddOn_(this);
 }
 
 
