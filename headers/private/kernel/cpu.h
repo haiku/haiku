@@ -36,7 +36,7 @@ typedef union cpu_ent {
 		/** If set this will force a reschedule when the quantum timer expires */
 		int preempted;
 		/** Quantum timer */
-		struct timer_event quantum_timer;
+		timer quantum_timer;
 	} info;
 	/** Alignment bytes */
 	uint32 align[16];
