@@ -126,7 +126,7 @@ class HeaderView : public BView, public BInvoker {
 
 	private:
 		void FormatValue(char *buffer, size_t bufferSize, off_t value);
-		void UpdatePositionViews();
+		void UpdatePositionViews(bool all = true);
 		void UpdateOffsetViews(bool all = true);
 		void UpdateFileSizeView();
 		void NotifyTarget();
@@ -602,14 +602,16 @@ HeaderView::FormatValue(char *buffer, size_t bufferSize, off_t value)
 
 
 void
-HeaderView::UpdatePositionViews()
+HeaderView::UpdatePositionViews(bool all)
 {
 	char buffer[64];
 	FormatValue(buffer, sizeof(buffer), fPosition / fBlockSize);
 	fPositionControl->SetText(buffer);
 
-	FormatValue(buffer, sizeof(buffer), fPosition + fOffset);
-	fFileOffsetView->SetText(buffer);
+	if (all) {
+		FormatValue(buffer, sizeof(buffer), fPosition + fOffset);
+		fFileOffsetView->SetText(buffer);
+	}
 }
 
 
@@ -740,7 +742,7 @@ HeaderView::MessageReceived(BMessage *message)
 				// round to block size
 
 			// update views
-			UpdatePositionViews();
+			UpdatePositionViews(false);
 			fPositionSlider->SetPosition(fPosition);
 			break;
 		}
