@@ -2,7 +2,6 @@ SubDir OBOS_TOP src kernel core addons bus_managers ;
 
 KernelStaticLibrary libbus : 
 	<$(SOURCE_GRIST)>bus_init.c 
-	<$(SOURCE_GRIST)>bus_man.c 
 	:
 	-fno-pic -D_KERNEL_MODE
 	;
