@@ -131,7 +131,7 @@ DevicesInfo::DevicesInfo(struct device_info *info,
 				(uint8)(id >> 28) & 0xf,
 				(uint8)((id >> 24) & 0xf));
 			for (uint32 i=0; i<ISA_DEVTABLE_LEN; i++)
-				if (stricmp(isapnp_devids[i].id, string)==0) {
+				if (strcasecmp(isapnp_devids[i].id, string)==0) {
 					fCardName = isapnp_devids[i].devname;
 				}
 		}
