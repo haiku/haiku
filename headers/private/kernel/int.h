@@ -37,30 +37,34 @@
 
 typedef int32 (*interrupt_handler) (void *data);
 
-int int_init(kernel_args *ka);
-int int_init2(kernel_args *ka);
-int int_io_interrupt_handler(int vector);
+int  int_init(kernel_args *ka);
+int  int_init2(kernel_args *ka);
+int  int_io_interrupt_handler(int vector);
 long install_interrupt_handler(long, interrupt_handler,	void *);
 long remove_interrupt_handler (long, interrupt_handler,	void *);
 
-#define int_enable_interrupts	  arch_int_enable_interrupts
-#define int_disable_interrupts	  arch_int_disable_interrupts
-#define int_restore_interrupts	  arch_int_restore_interrupts
-#define int_is_interrupts_enabled arch_int_is_interrupts_enabled
+#define enable_interrupts	  arch_int_enable_interrupts
+#define disable_interrupts	  arch_int_disable_interrupts
+#define restore_interrupts	  arch_int_restore_interrupts
+#define are_interrupts_enabled    arch_int_is_interrupts_enabled
 
-/* interrupt handling support for device drivers */
-long 	install_io_interrupt_handler (
-	long 				interrupt_number, 
-	interrupt_handler	handler, 
-	void				*data, 
-	ulong 				flags
-);
+/** @fn long install_io_interrupt_handler(long interrupt, interrupt_handler handler, void *data, ulong flags);
+ *
+ * @note This function is used for devices that can generate an "actual"
+ *       interrupt, i.e. where IRQ < 16
+ */
+long 	install_io_interrupt_handler(long, 
+                                     interrupt_handler, 
+                                     void *, ulong);
 
-long 	remove_io_interrupt_handler (
-	long 				interrupt_number,
-	interrupt_handler	handler,
-	void				*data
-);
+/** @fn long remove_io_interrupt_handler(long interrupt, interrupt_handler handler, void *data);
+ *
+ * @note This function is used for devices that can generate an "actual"
+ *       interrupt, i.e. where IRQ < 16
+ */
+long 	remove_io_interrupt_handler (long,
+                                     interrupt_handler,
+                                     void *);
 
 /** @} */
 
