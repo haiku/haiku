@@ -3,7 +3,6 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-
 #include <KernelExport.h>
 #include <Drivers.h>
 #include <OS.h>
@@ -17,17 +16,16 @@
 
 #define DEVICE_NAME "input/keyboard/at/0"
 
-#define TRACE_KEYBOARD 1
-#if TRACE_KEYBOARD
+#if DEBUG
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
 
-
 #define LED_SCROLL	1
 #define LED_NUM		2
 #define LED_CAPS	4
+
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -35,9 +33,10 @@ static sem_id keyboard_sem;
 //static mutex keyboard_read_mutex;
 static cbuf *keyboard_buf;
 static isa_module_info *sIsa;
-static at_kbd_io sKeyInfo;
 
 static int32 sOpenMask;
+
+static bool sIsExtended = false;
 
 static void
 wait_for_output(void)
@@ -68,31 +67,40 @@ set_leds(led_info *ledInfo)
 static int32 
 handle_keyboard_interrupt(void *data)
 {
-	unsigned char key;
-	
-	key = sIsa->read_io_8(0x60);
-	TRACE(("handle_keyboard_interrupt: key = 0x%x\n", key));
-
-	if (key == 0xE0) {
-		// Extended key. Handle it in some way
-		return B_HANDLED_INTERRUPT;
-	}
-	
-	if (key & 0x80) {
-		sKeyInfo.is_keydown = false;
+	// TODO: Handle braindead "pause" key special case
+	at_kbd_io keyInfo;
+	unsigned char read, scancode;
 		
-	}
+	read = sIsa->read_io_8(0x60);
+	TRACE(("handle_keyboard_interrupt: read = 0x%x\n", read));
 
-	sKeyInfo.timestamp = system_time();
-	sKeyInfo.scancode = key;
+	if (read == 0xE0) {
+		sIsExtended = true;
+		TRACE(("Extended key\n"));
+		return B_HANDLED_INTERRUPT;
+	} 
+		
+	scancode = read;
+	
+	TRACE(("scancode: %x\n", scancode));
+	if (scancode & 0x80) {
+		keyInfo.is_keydown = false;
+		scancode -= 0x80;	
+	} else
+		keyInfo.is_keydown = true;
+
+	if (sIsExtended)
+		scancode |= 0x80;
+	
+	keyInfo.timestamp = system_time();
+	keyInfo.scancode = scancode;
 	
 	// TODO: Check return value
-	cbuf_memcpy_to_chain(keyboard_buf, 0, (void *)&sKeyInfo, sizeof(sKeyInfo));
+	cbuf_memcpy_to_chain(keyboard_buf, 0, (void *)&keyInfo, sizeof(keyInfo));
 	release_sem_etc(keyboard_sem, 1, B_DO_NOT_RESCHEDULE);
 	
-	// Reset this so the next event defaults to keydown
-	sKeyInfo.is_keydown = true;
-	
+	sIsExtended = false;
+		
 	return B_INVOKE_SCHEDULER;
 }
 
@@ -251,8 +259,6 @@ init_driver()
 		panic("could not create keyboard cbuf chain!\n");
 
 	install_io_interrupt_handler(1, &handle_keyboard_interrupt, NULL, 0);
-	
-	sKeyInfo.is_keydown = true;
 	
 	sOpenMask = 0;
 
