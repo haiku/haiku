@@ -232,6 +232,9 @@ hash_hash_str( const char *str )
 	return hash;
 }
 
+
+
+
 #define MAX_INITIAL 15;
 
 /*
@@ -331,28 +334,36 @@ find_entry(new_hash_table *nh, const void *key, ssize_t klen, const void *val)
 	int hash = 0;
 	ssize_t i;
 
-	if (!nh)
-		return NULL;
+	ASSERT(nh != NULL);
 
 	for (p = key, i = klen; i; i--, p++) 
 		hash = hash * 33 + *p;
 
 	for (hep = &nh->array[hash & nh->max], he = *hep; he; hep = &he->next, he = *hep) {
 //		dprintf("khash, find_entry looking at hep %p, he %p\n", hep, he);
-		if (he->hash == hash && he->klen == klen
-			&& memcmp(he->key, key, klen) == 0) {
-				break;
+		if (he->hash == hash && he->klen == klen && memcmp(he->key, key, klen) == 0) {
+			break;
 		}
 	}
 
-	if (he || !val)
-		return hep;
+	if (val == 0) /* val == 0 means we only lookup, and don't insert */
+		return he ? hep : NULL;
 
 	/* add a new linked-list entry */
 	he = (hash_entry *)pool_get(nh->pool);
+	if (he == NULL)
+		return NULL;
+	
+	/* copy the key */
+	he->key  = malloc(klen);
+	if (he->key == NULL) {
+		pool_put(nh->pool, he);
+		return NULL;
+	}
+	memcpy(he->key, key, klen);
+
 	he->next = NULL;
 	he->hash = hash;
-	he->key  = key;
 	he->klen = klen;
 	he->val = val;
 	*hep = he;
@@ -366,6 +377,8 @@ hash_get(new_hash_table *nh, const void *key, ssize_t klen)
 {
 	hash_entry **hepp;
 	hash_entry *hep;
+
+	ASSERT(nh != NULL);
 	
 	hepp = find_entry(nh, key, klen, NULL);
 //	dprintf("khash, find_entry returned %p\n", hepp);
@@ -385,7 +398,11 @@ hash_set(new_hash_table *nh, const void *key, ssize_t klen, const void *val)
 {
 	hash_entry **hep;
 	hash_entry *old;
+	
+	ASSERT(nh != NULL);
+	
 	hep = find_entry(nh, key, klen, val);
+	ASSERT(hep != NULL);
 
 	if (*hep) {
 		if (!val) {
@@ -401,4 +418,5 @@ hash_set(new_hash_table *nh, const void *key, ssize_t klen, const void *val)
 				expand_array(nh);
 		}
 	}
+	else ASSERT(false);
 }
