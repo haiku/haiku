@@ -36,6 +36,7 @@ class AGGTextRenderer : public TextRenderer {
 											 font_renderer_solid_type* solidRenderer,
 											 font_renderer_bin_type* binRenderer,
 											 const Transformable& transform,
+											 BRect clippingFrame,
 											 bool dryRun = false,
 											 BPoint* nextCharPos = NULL);
 

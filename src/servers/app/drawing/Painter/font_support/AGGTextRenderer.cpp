@@ -113,8 +113,8 @@ AGGTextRenderer::Archive(BMessage* into, bool deep) const
 bool
 AGGTextRenderer::SetFont(const ServerFont &font)
 {
-//	if (fFontEngine.load_font(font, agg::glyph_ren_native_gray8)) {			
-	if (fFontEngine.load_font(font, agg::glyph_ren_outline)) {
+	if (fFontEngine.load_font(font, agg::glyph_ren_native_gray8)) {			
+//	if (fFontEngine.load_font(font, agg::glyph_ren_outline)) {
 		return TextRenderer::SetFont(font);
 	} else {
 		fprintf(stderr, "font could not be loaded\n");
@@ -189,10 +189,11 @@ AGGTextRenderer::RenderString(const char* string,
 							  font_renderer_solid_type* solidRenderer,
 							  font_renderer_bin_type* binRenderer,
 							  const Transformable& transform,
+							  BRect clippingFrame,
 							  bool dryRun,
 							  BPoint* nextCharPos)
 {
-	fFontEngine.hinting(fHinted);
+	fFontEngine.hinting(false);
 	fFontEngine.height((int32)(fPtSize));
 	fFontEngine.width((int32)(fPtSize));
 
@@ -237,6 +238,10 @@ AGGTextRenderer::RenderString(const char* string,
 		double advanceX = 0.0;
 		double advanceY = 0.0;
 
+		// for when we bypass the transformation pipeline
+		BPoint transformOffset(0.0, 0.0);
+		transform.Transform(&transformOffset);
+
 		for (int32 i = 0; i < dstLength / 2; i++) {
 
 			// line break
@@ -264,75 +269,68 @@ AGGTextRenderer::RenderString(const char* string,
 					x += (fAdvanceScale - 1.0) * fFontEngine.height();
 				y += advanceY;
 
-				fFontManager.init_embedded_adaptors(glyph, x, y);
+				// calculate bounds
+				const agg::rect& r = glyph->bounds;
+				BRect glyphBounds(r.x1 + x, r.y1 + y, r.x2 + x, r.y2 + y);
 
-				double left = 0.0;
-				double top = 0.0;
-				double right = -1.0;
-				double bottom = -1.0;
-				uint32 pathID[1];
-				pathID[0] = 0;
+				// init the fontmanager and transform glyph bounds
+				if (glyph->data_type != agg::glyph_data_outline) {
+					// we cannot use the transformation pipeline
+					double transformedX = x + transformOffset.x;
+					double transformedY = y + transformOffset.y;
+					fFontManager.init_embedded_adaptors(glyph,
+														transformedX,
+														transformedY);
+					glyphBounds.OffsetBy(transformOffset);
+				} else {
+					fFontManager.init_embedded_adaptors(glyph, x, y);
+					glyphBounds = transform.TransformBounds(glyphBounds);
+				}
 
-				const agg::rect& r = fFontEngine.bounds();
-
-				switch(glyph->data_type) {
-					case agg::glyph_data_mono:
-						left = r.x1 + x;
-						right = r.x2 + x;
-						top = r.y1 + y;
-						bottom = r.y2 + y;
-						if (!dryRun) {
+				// render glyph and update touched area
+				if (!dryRun && clippingFrame.Intersects(glyphBounds)) {
+					switch(glyph->data_type) {
+						case agg::glyph_data_mono:
 							agg::render_scanlines(fFontManager.mono_adaptor(), 
 												  fFontManager.mono_scanline(), 
 												  *binRenderer);
-						}
-						break;
-
-					case agg::glyph_data_gray8:
-						left = r.x1 + x;
-						right = r.x2 + x;
-						top = r.y1 + y;
-						bottom = r.y2 + y;
-						if (!dryRun) {
+							break;
+		
+						case agg::glyph_data_gray8:
 							agg::render_scanlines(fFontManager.gray8_adaptor(), 
 												  fFontManager.gray8_scanline(), 
 												  *solidRenderer);
-						}
-						break;
-
-					case agg::glyph_data_outline:
-						ras.reset();
-						if(fabs(0.0) <= 0.01) {
+							break;
+		
+						case agg::glyph_data_outline:
+							ras.reset();
+		// NOTE: this function can be easily extended to handle
+		// conversion to contours, to that's why there is a lot of
+		// commented out code, I leave here because I think it
+		// will be needed again.
+		
+	//						if(fabs(0.0) <= 0.01) {
 							// For the sake of efficiency skip the
 							// contour converter if the weight is about zero.
 							//-----------------------
-							agg::bounding_rect(ftrans, pathID, 0, 1,
-											   &left, &top, &right, &bottom);
-							if (!dryRun)
 	//							ras.add_path(fCurves);
 								ras.add_path(ftrans);
-						} else {
-							if (!dryRun)
+	/*						} else {
 	//							ras.add_path(fContour);
 								ras.add_path(ftrans);
-							agg::bounding_rect(ftrans, pathID, 0, 1,
-											   &left, &top, &right, &bottom);
-						}
-						if (!dryRun) {
+							}*/
 							if (fAntialias) {
 								agg::render_scanlines(ras, sl, *solidRenderer);
 							} else {
 								agg::render_scanlines(ras, sl, *binRenderer);
 							}
-						}
-						break;
-					default:
-						break;
+							break;
+						default:
+							break;
+					}
 				}
-				// calculate bounds
-				BRect t(left, top, right, bottom);
-				if (t.IsValid())
-					bounds = bounds.IsValid() ? bounds | t : t;
+				if (glyphBounds.IsValid())
+					bounds = bounds.IsValid() ? bounds | glyphBounds : glyphBounds;
 
 				// increment pen position
 				advanceX = fHinted ? floorf(glyph->advance_x + 0.5) : glyph->advance_x;

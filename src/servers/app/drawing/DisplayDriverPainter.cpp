@@ -460,7 +460,6 @@ printf("region: %ld, rect: %ld, offset(%ld, %ld)\n", i, j, xOffset, yOffset);
 		if (void* rectCopy = rectList.ItemAt(i))
 			free(rectCopy);
 	}
-//printf("CopyRegionList(): %lld\n", system_time() - now);
 
 	fGraphicsCard->Invalidate(updateRect);
 
@@ -549,9 +548,9 @@ DisplayDriverPainter::FillRect(const BRect &r, const RGBColor &color)
 	if (Lock()) {
 
 		fPainter->SetHighColor(color);
-		fPainter->FillRect(r);
+		BRect touched = fPainter->FillRect(r);
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -564,9 +563,9 @@ DisplayDriverPainter::FillRect(const BRect &r, const DrawData *d)
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
-		fPainter->FillRect(r);
+		BRect touched = fPainter->FillRect(r);
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -706,10 +705,17 @@ DisplayDriverPainter::StrokeEllipse(const BRect &r, const DrawData *d)
 void
 DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
-	DrawData d;
-	d.highcolor = color;
-	d.draw_mode = B_OP_COPY;
-	StrokeLine(start, end, &d);
+	if (Lock()) {
+		if (!fPainter->StraightLine(start, end, color.GetColor32())) {
+			DrawData d;
+			d.highcolor = color;
+			d.draw_mode = B_OP_COPY;
+			StrokeLine(start, end, &d);
+		} else {
+			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(start, end)));
+		}
+		Unlock();
+	}
 }
 
 // StrokeLine
@@ -719,10 +725,9 @@ DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const D
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
-		fPainter->StrokeLine(start, end);
+		BRect touched = fPainter->StrokeLine(start, end);
 
-		BRect r(start, end);
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -768,7 +773,6 @@ void
 DisplayDriverPainter::StrokeRect(const BRect &r, const RGBColor &color)
 {
 	if (Lock()) {
-
 		fPainter->StrokeRect(r, color.GetColor32());
 
 		fGraphicsCard->Invalidate(BRect(r.left, r.top, r.right, r.top));
@@ -787,9 +791,9 @@ DisplayDriverPainter::StrokeRect(const BRect &r, const DrawData *d)
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
-		fPainter->StrokeRect(r);
+		BRect touched = fPainter->StrokeRect(r);
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -803,13 +807,11 @@ DisplayDriverPainter::StrokeRegion(BRegion& r, const DrawData *d)
 
 		fPainter->SetDrawData(d);
 
-		BRect invalid = r.RectAt(0);
-		fPainter->StrokeRect(invalid);
+		BRect invalid = fPainter->StrokeRect(r.RectAt(0));
 
 		int32 count = r.CountRects();
 		for (int32 i = 1; i < count; i++) {
-			fPainter->StrokeRect(r.RectAt(i));
-			invalid = invalid | r.RectAt(i);
+			invalid = invalid | fPainter->StrokeRect(r.RectAt(i));
 		}
 
 		fGraphicsCard->Invalidate(invalid);
@@ -885,6 +887,7 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 								 const BPoint &pt, DrawData *d)
 {
 	if (Lock()) {
+
 		fPainter->SetDrawData(d);
 
 		BRect boundingBox = fPainter->DrawString(string, length, pt);

@@ -4,9 +4,11 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <GraphicsDefs.h>
 #include <Region.h>
 
 #include <agg_bezier_arc.h>
+#include <agg_bounding_rect.h>
 #include <agg_conv_curve.h>
 #include <agg_conv_stroke.h>
 #include <agg_ellipse.h>
@@ -199,17 +201,21 @@ Painter::SetLowColor(const rgb_color& color)
 void
 Painter::SetScale(float scale)
 {
-	fScale = scale;
-	_RebuildClipping();
-	_UpdateLineWidth();
+	if (fScale != scale) {
+		fScale = scale;
+		_RebuildClipping();
+		_UpdateLineWidth();
+	}
 }
 
 // SetPenSize
 void
 Painter::SetPenSize(float size)
 {
-	fPenSize = size;
-	_UpdateLineWidth();
+	if (fPenSize != size) {
+		fPenSize = size;
+		_UpdateLineWidth();
+	}
 }
 
 // SetOrigin
@@ -245,6 +251,8 @@ void
 Painter::SetBlendingMode(source_alpha alphaSrcMode, alpha_function alphaFncMode)
 {
 	if (fAlphaSrcMode != alphaSrcMode || fAlphaFncMode != alphaFncMode) {
+		fAlphaSrcMode = alphaSrcMode;
+		fAlphaFncMode = alphaFncMode;
 		if (fDrawingMode == B_OP_ALPHA && fPixelFormat) {
 			fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
 																			  fAlphaSrcMode,
@@ -284,11 +292,13 @@ Painter::SetFont(const ServerFont& font)
 // #pragma mark -
 
 // StrokeLine
-void
+BRect
 Painter::StrokeLine(BPoint a, BPoint b, const pattern& p)
 {
 	_Transform(&a);
 	_Transform(&b);
+
+	BRect touched(a, b);
 
 	// first, try an optimized version
 	float penSize = _Transform(fPenSize);
@@ -298,30 +308,31 @@ Painter::StrokeLine(BPoint a, BPoint b, const pattern& p)
 		if (pat == B_SOLID_HIGH &&
 			StraightLine(a, b, fPatternHandler->HighColor().GetColor32())) {
 			SetPenLocation(b);
-			return;
+			return _Clipped(touched);
 		} else if (pat == B_SOLID_LOW &&
 			StraightLine(a, b, fPatternHandler->LowColor().GetColor32())) {
 			SetPenLocation(b);
-			return;
+			return _Clipped(touched);
 		}
 	}
-
 
 	agg::path_storage path;
 	path.move_to(a.x, a.y);
 	path.line_to(b.x, b.y);
 
-	_StrokePath(path, p);
+	touched = _StrokePath(path, p);
 
 	SetPenLocation(b);
+
+	return _Clipped(touched);
 }
 
 // StrokeLine
-void
+BRect
 Painter::StrokeLine(BPoint b, const pattern& p)
 {
 	// TODO: move this function elsewhere
-	StrokeLine(fPenLocation, b);
+	return StrokeLine(fPenLocation, b);
 }
 
 // StraightLine
@@ -486,7 +497,7 @@ Painter::FillShape(/*const */BShape* shape, const pattern& p) const
 }
 
 // StrokeRect
-void
+BRect
 Painter::StrokeRect(const BRect& r, const pattern& p) const
 {
 	BPoint a(r.left, r.top);
@@ -501,13 +512,15 @@ Painter::StrokeRect(const BRect& r, const pattern& p) const
 // TODO: fix me
 //		pattern p = *fPatternHandler->GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
-			StrokeRect(BRect(a, b),
+			BRect rect(a, b);
+			StrokeRect(rect,
 					   fPatternHandler->HighColor().GetColor32());
-			return;
+			return _Clipped(rect);
 		} else if (p == B_SOLID_LOW) {
-			StrokeRect(BRect(a, b),
+			BRect rect(a, b);
+			StrokeRect(rect,
 					   fPatternHandler->LowColor().GetColor32());
-			return;
+			return _Clipped(rect);
 		}
 	}
 
@@ -518,7 +531,7 @@ Painter::StrokeRect(const BRect& r, const pattern& p) const
 	path.line_to(a.x, b.y);
 	path.close_polygon();
 
-	_StrokePath(path, p);
+	return _StrokePath(path, p);
 }
 
 // StrokeRect
@@ -536,7 +549,7 @@ Painter::StrokeRect(const BRect& r, const rgb_color& c) const
 }
 
 // FillRect
-void
+BRect
 Painter::FillRect(const BRect& r, const pattern& p) const
 {
 	BPoint a(r.left, r.top);
@@ -548,11 +561,13 @@ Painter::FillRect(const BRect& r, const pattern& p) const
 	if (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER) {
 		pattern pat = *fPatternHandler->GetR5Pattern();
 		if (pat == B_SOLID_HIGH) {
-			FillRect(BRect(a, b), fPatternHandler->HighColor().GetColor32());
-			return;
+			BRect rect(a, b);
+			FillRect(rect, fPatternHandler->HighColor().GetColor32());
+			return _Clipped(rect);
 		} else if (pat == B_SOLID_LOW) {
-			FillRect(BRect(a, b), fPatternHandler->LowColor().GetColor32());
-			return;
+			BRect rect(a, b);
+			FillRect(rect, fPatternHandler->LowColor().GetColor32());
+			return _Clipped(rect);
 		}
 	}
 
@@ -569,7 +584,7 @@ Painter::FillRect(const BRect& r, const pattern& p) const
 	path.line_to(a.x, b.y);
 	path.close_polygon();
 
-	_FillPath(path, p);
+	return _FillPath(path, p);
 }
 
 // FillRect
@@ -770,12 +785,18 @@ Painter::DrawString(const char* utf8String, uint32 length,
 		transform.TranslateBy(baseLine);
 		transform.ScaleBy(B_ORIGIN, fScale, fScale);
 		transform.TranslateBy(fOrigin);
-	
+
+		BRect clippingFrame;
+		if (fClippingRegion)
+			clippingFrame = _Transform(fClippingRegion->Frame());
+
 		bounds = fTextRenderer->RenderString(utf8String,
 											 length,
 											 fFontRendererSolid,
 											 fFontRendererBin,
-											 transform, false,
+											 transform,
+											 clippingFrame,
+											 false,
 											 &fPenLocation);
 		// pen location is not transformed in quite the same way,
 		// or transformations would add up
@@ -784,9 +805,7 @@ Painter::DrawString(const char* utf8String, uint32 length,
 		transform.TranslateBy(baseLine);
 		transform.Transform(&fPenLocation);
 	}
-	if (bounds.IsValid() && fClippingRegion)
-		bounds = bounds & _Transform(fClippingRegion->Frame());
-	return bounds;
+	return _Clipped(bounds);
 }
 
 // DrawString
@@ -885,11 +904,12 @@ Painter::BoundingBox(const char* utf8String, uint32 length,
 	Transformable transform;
 	transform.TranslateBy(baseLine);
 
+	BRect dummy;
 	return fTextRenderer->RenderString(utf8String,
 									length,
 									fFontRendererSolid,
 									fFontRendererBin,
-									transform, true);
+									transform, dummy, true);
 }
 
 // #pragma mark -
@@ -1007,6 +1027,17 @@ Painter::_Transform(const BRect& rect) const
 	_Transform(&ret);
 	return ret;
 }
+
+// _Clipped
+BRect
+Painter::_Clipped(const BRect& rect) const
+{
+	if (rect.IsValid() && fClippingRegion)
+		return rect & _Transform(fClippingRegion->Frame());
+	return rect;
+}
+
+// #pragma mark -
 
 // _RebuildClipping
 void
@@ -1320,9 +1351,24 @@ Painter::_InvertRect32(BRect r) const
 
 // #pragma mark -
 
+template<class VertexSource>
+BRect
+Painter::_BoundingBox(VertexSource& path) const
+{
+	double left = 0.0;
+	double top = 0.0;
+	double right = -1.0;
+	double bottom = -1.0;
+	uint32 pathID[1];
+	pathID[0] = 0;
+	agg::bounding_rect(path, pathID, 0, 1, &left, &top, &right, &bottom);
+	return BRect(left, top, right, bottom);
+}
+
+
 // _StrokePath
 template<class VertexSource>
-void
+BRect
 Painter::_StrokePath(VertexSource& path, const pattern& p) const
 {
 // We're now used by app_server and SetDrawData() was called prior to
@@ -1345,11 +1391,13 @@ Painter::_StrokePath(VertexSource& path, const pattern& p) const
 #else
 	fOutlineRasterizer->add_path(path);
 #endif
+
+	return _Clipped(_BoundingBox(path));
 }
 
 // _FillPath
 template<class VertexSource>
-void
+BRect
 Painter::_FillPath(VertexSource& path, const pattern& p) const
 {
 // We're now used by app_server and SetDrawData() was called prior to
@@ -1359,24 +1407,25 @@ Painter::_FillPath(VertexSource& path, const pattern& p) const
 
 	fRasterizer->add_path(path);
 	agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
+
+	return _Clipped(_BoundingBox(path));
 }
 
 // _SetPattern
 void
 Painter::_SetPattern(const pattern& p) const
 {
-	if (memcmp(&p, fPatternHandler->GetR5Pattern(), sizeof(pattern)) != 0) {
-//	if ((uint64)p != (uint64)*fPatternHandler->GetR5Pattern()) {
+	if (!(p == *fPatternHandler->GetR5Pattern())) {
 printf("Painter::_SetPattern()\n");
 		fPatternHandler->SetPattern(p);
 		DrawingMode* mode = NULL;
-		if (memcmp(&p, &B_SOLID_HIGH, sizeof(pattern)) == 0) {
+		if (p == B_SOLID_HIGH) {
 			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
 			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
 													  fAlphaSrcMode,
 													  fAlphaFncMode,
 													  true);
-		} else if (memcmp(&p, &B_SOLID_LOW, sizeof(pattern)) == 0) {
+		} else if (p == B_SOLID_LOW) {
 			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
 			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
 													  fAlphaSrcMode,

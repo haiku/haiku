@@ -64,11 +64,11 @@ class Painter {
 								// painting functions
 
 								// lines
-			void				StrokeLine(		BPoint a,
+			BRect				StrokeLine(		BPoint a,
 												BPoint b,
 												const pattern& p = B_SOLID_HIGH);
 
-			void				StrokeLine(		BPoint b,
+			BRect				StrokeLine(		BPoint b,
 												const pattern& p = B_SOLID_HIGH);
 
 			// return true if the line was either vertical or horizontal
@@ -115,14 +115,14 @@ class Painter {
 
 
 								// rects
-			void				StrokeRect(		const BRect& r,
+			BRect				StrokeRect(		const BRect& r,
 												const pattern& p = B_SOLID_HIGH) const;
 
 			// strokes a one pixel wide solid rect, no blending
 			void				StrokeRect(		const BRect& r,
 												const rgb_color& c) const;
 
-			void				FillRect(		const BRect& r,
+			BRect				FillRect(		const BRect& r,
 												const pattern& p = B_SOLID_HIGH) const;
 
 			// fills a solid rect with color c, no blending
@@ -207,6 +207,9 @@ class Painter {
 												uint32 length,
 												const BPoint& baseLine) const;
 
+	inline	BRect				ClipRect(const BRect& rect) const
+									{ return _Clipped(rect); }
+
  private:
 			void				_MakeEmpty();
 
@@ -218,6 +221,7 @@ class Painter {
 			float				_Transform(const float& width) const;
 			void				_Transform(BRect* rect) const;
 			BRect				_Transform(const BRect& rect) const;
+			BRect				_Clipped(const BRect& rect) const;
 
 			void				_RebuildClipping();
 
@@ -258,10 +262,14 @@ class Painter {
 
 
 			template<class VertexSource>
-			void				_StrokePath(VertexSource& path,
+			BRect				_BoundingBox(VertexSource& path) const;
+
+			template<class VertexSource>
+			BRect				_StrokePath(VertexSource& path,
 											const pattern& p) const;
 			template<class VertexSource>
-			void				_FillPath(VertexSource& path,
+			BRect				_FillPath(VertexSource& path,
+
 										  const pattern& p) const;
 
 			void				_SetPattern(const pattern& p) const;
