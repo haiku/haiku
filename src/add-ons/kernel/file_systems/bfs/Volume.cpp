@@ -335,7 +335,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 
 	fRootNode = new Inode(this, ToVnode(Root()));
 	if (fRootNode && fRootNode->InitCheck() == B_OK) {
-		status = new_vnode(fID, ToVnode(Root()), (void *)fRootNode);
+		status = publish_vnode(fID, ToVnode(Root()), (void *)fRootNode);
 		if (status == B_OK) {
 			// try to get indices root dir
 
