@@ -31,6 +31,7 @@ StdBinCommands
 StdBinCommands
 	chop.c
 	echo.c
+	eject.c
 	hd.c
 	listarea.c
 	listimage.c
