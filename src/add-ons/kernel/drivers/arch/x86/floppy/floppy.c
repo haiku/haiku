@@ -409,7 +409,7 @@ flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *numbytes)
 		size_t toread;
 		TRACE("read: begin %Ld, %ld\n", position, bytes_read);
 		err = read_sectors(cookie->flp, position / sectsize, 1);
-		TRACE("PIO READ got %d sect\n", err);
+		TRACE("PIO READ got %ld sect\n", err);
 		if (err <= 0) {
 			*numbytes = 0;
 			return err;
@@ -427,7 +427,7 @@ flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *numbytes)
 
 		// try to read as many sectors as we can
 		err = read_sectors(cookie->flp, position / sectsize, len / sectsize);
-		TRACE("PIO READ got %d sect\n", err);
+		TRACE("PIO READ got %ld sect\n", err);
 		if (err <= 0) {
 			*numbytes = 0;
 			return err;
@@ -442,7 +442,7 @@ flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *numbytes)
 		TRACE("read: end %Ld, %ld %ld\n", position, bytes_read, len);
 
 		err = read_sectors(cookie->flp, position / sectsize, 1);
-		TRACE("PIO READ got %d sect\n", err);
+		TRACE("PIO READ got %ld sect\n", err);
 		if (err <= 0) {
 			*numbytes = 0;
 			return err;
@@ -473,7 +473,7 @@ flo_control(floppy_cookie *cookie, uint32 op, void *data, size_t len)
 	floppy_t *flp = cookie->flp;
 	switch (op) {
 	case B_GET_ICON:
-		TRACE("control(B_GET_ICON, %d)\n", ((device_icon *)data)->icon_size);
+		TRACE("control(B_GET_ICON, %ld)\n", ((device_icon *)data)->icon_size);
 		if (((device_icon *)data)->icon_size == 16) { /* mini icon */
 			memcpy(((device_icon *)data)->icon_data, floppy_mini_icon, (16*16));
 			return B_OK;

@@ -512,7 +512,7 @@ recalibrate_drive(floppy_t *flp)
 			TRACE("recalibration failed\n");
 			return 2;
 		} if (flp->result[1] != 0) {
-			TRACE("drive is at cylinder %d, didn't make it to 0\n", result[1]);
+			TRACE("drive is at cylinder %d, didn't make it to 0\n", flp->result[1]);
 			if (retry > 3)
 				return 1;
 		} else {
