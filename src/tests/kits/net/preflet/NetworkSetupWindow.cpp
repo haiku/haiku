@@ -143,7 +143,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	fHelpButton = button;
 #endif
 
-	r.top += h + SMALL_MARGIN;
+	r.top += h + V_MARGIN;
 	r.left = H_MARGIN;
 
 	fPanel = new BBox(r, "showview_box", B_FOLLOW_ALL,
@@ -228,7 +228,7 @@ void NetworkSetupWindow::MessageReceived
 
 		fPanel->AddChild(fAddonView);
 		fAddonView->ResizeTo(fPanel->Bounds().Width(), fPanel->Bounds().Height());
-		fAddonView->SetViewColor((rand() % 256), (rand() % 256), (rand() % 256));
+		// fAddonView->SetViewColor((rand() % 256), (rand() % 256), (rand() % 256));
 		break;
 	}
 

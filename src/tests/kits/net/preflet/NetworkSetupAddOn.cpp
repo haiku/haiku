@@ -1,15 +1,19 @@
 #include <stdlib.h>
 
+#include <kernel/image.h>
+#include <storage/Resources.h>
+
 #include "NetworkSetupAddOn.h"
 
 
 NetworkSetupAddOn::NetworkSetupAddOn(image_id image)
-	: is_dirty(false), profile(NULL), addon_image(image)
+	: m_is_dirty(false), m_profile(NULL), m_addon_image(image), m_addon_resources(NULL)
 {
 }
 
 NetworkSetupAddOn::~NetworkSetupAddOn()
 {
+	delete m_addon_resources;
 }
 
 BView * NetworkSetupAddOn::CreateView(BRect *bounds)
@@ -34,7 +38,7 @@ status_t NetworkSetupAddOn::Revert()
 
 status_t NetworkSetupAddOn::ProfileChanged(NetworkSetupProfile *new_profile)
 {
-	profile = new_profile;
+	m_profile = new_profile;
 	return B_OK;
 }
 
@@ -42,4 +46,25 @@ const char * NetworkSetupAddOn::Name()
 {
 	return "Dummy NetworkSetupAddon";
 }
+
+BResources * NetworkSetupAddOn::Resources()
+{
+	if (!m_addon_resources) {
+		image_info info;
+		if (get_image_info(m_addon_image, &info) != B_OK)
+			return NULL;
+		
+		BResources *resources = new BResources();
+		BFile addon_file(info.name, O_RDONLY);
+		if (resources->SetTo(&addon_file) == B_OK)
+			m_addon_resources = resources;
+		else
+			delete resources;
+	};
+	return m_addon_resources;
+}
+
+
+
+
 
