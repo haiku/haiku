@@ -255,8 +255,6 @@ char BAlert::Shortcut(int32 index) const
 //------------------------------------------------------------------------------
 int32 BAlert::Go()
 {
-	system_beep(NULL);	// forces the "beep" event
-	
 	fAlertSem = create_sem(0, "AlertSem");
 	if (fAlertSem < B_OK)
 	{
@@ -535,7 +533,11 @@ void BAlert::InitObject(const char* text, const char* button0,
 					break;
 					
 				case B_WIDTH_FROM_LABEL:
-					fButtons[i]->ResizeToPreferred();
+					fButtons[i]->GetPreferredSize(&buttonWidth, &buttonHeight);
+					// GetPreferredSize() does not return the minimum width required to
+					// fit the label. Thus, the width is computed here.
+					buttonWidth = fButtons[i]->StringWidth(fButtons[i]->Label()) + 20.0f;
+					fButtons[i]->ResizeTo(buttonWidth, buttonHeight);
 					break;
 	
 				default:	// B_WIDTH_AS_USUAL
