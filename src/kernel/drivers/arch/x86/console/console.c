@@ -145,15 +145,16 @@ static char console_putch(const char c)
 static void tab(void)
 {
 	x = (x + TAB_SIZE) & ~TAB_MASK;
-	if (x>=COLUMNS) {
+	if (x >= COLUMNS) {
 		x -= COLUMNS;
 		lf();
 	}
-	pos=origin+((y*columns+x)<<1);
+	pos = origin + ((y * columns + x) << 1);
 }
 
 static int console_open(const char *name, uint32 flags, void **cookie)
 {
+//	dprintf("console_open\n");
 	return 0;
 }
 
@@ -217,8 +218,6 @@ static ssize_t console_write(void * cookie, off_t pos, const void *buf, size_t *
 {
 	ssize_t err;
 
-//	dprintf("console_write: entry, len = %d\n", *len);
-
 	mutex_lock(&console_lock);
 
 	err = _console_write(buf, *len);
@@ -274,8 +273,8 @@ device_hooks console_hooks = {
 	&console_write,
 	NULL,
 	NULL,
-//	NULL,
-//	NULL
+	NULL,
+	NULL
 };
 
 int console_dev_init(kernel_args *ka)
@@ -288,6 +287,12 @@ int console_dev_init(kernel_args *ka)
 
 		pos = origin;
 
+		/* XXX - this is a problem for having the console dynamically linked.
+		 *       When dynamically linked the init_hardware and init_driver
+		 *       routines don't take a kernel_args parameter so we don't have
+		 *       access to this information. We probably need to find a
+		 *       better way of doing this.
+		 */
 		gotoxy(0, ka->cons_line);
 		update_cursor(x, y);
 
@@ -296,7 +301,9 @@ int console_dev_init(kernel_args *ka)
 		if (keyboard_fd < 0)
 			panic("console_dev_init: error opening /dev/keyboard\n");
 
-		// create device node
+		/* As this is statically linked into the kernel we need to actually
+		 * publish our dev entry point.
+		 */
 		devfs_publish_device("console", NULL, &console_hooks);
 	}
 
