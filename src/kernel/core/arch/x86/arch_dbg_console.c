@@ -15,8 +15,11 @@
 
 #include <string.h>
 
-//#define BOCHS_E9_HACK 0
-//#define BOCHS_INPUT_HACK 0
+/* define this only if not used as compile parameter
+ * setting it to one will disable serial debug and
+ * redirect it to Bochs
+ */
+// #define BOCHS_DEBUG_HACK 0
 
 // Select between COM1 and COM2 for debug output
 #define USE_COM1 1
@@ -44,8 +47,10 @@ int arch_dbg_con_init(kernel_args *ka)
 
 char arch_dbg_con_read(void)
 {
-#if BOCHS_INPUT_HACK
-	// stolen from nujeffos
+#if BOCHS_DEBUG_HACK
+	/* polling the keyboard, similar to code in keyboard
+	 * driver, but without using an interrupt
+	 */
 	static const char unshifted_keymap[128] = {
 		0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 8, '\t',
 		'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0, 'a', 's',
@@ -99,9 +104,10 @@ char arch_dbg_con_read(void)
 
 static void _arch_dbg_con_putch(const char c)
 {
-#if BOCHS_E9_HACK
+#if BOCHS_DEBUG_HACK
 	out8(c, 0xe9);
-#else
+	return;
+#endif
 
 #if USE_COM1
 	while ((in8(0x3fd) & 0x20) == 0)
@@ -111,8 +117,6 @@ static void _arch_dbg_con_putch(const char c)
 	while ((in8(0x2fd) & 0x20) == 0)
 		;
 	out8(c, 0x2f8);
-#endif
-
 #endif
 }
 
