@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -350,6 +350,6 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 	if (get_number_of_drives(&driveCount) == B_OK)
 		printf("number of drives: %d\n", driveCount);
 
-	return B_ERROR;
+	return B_OK;
 }
 
