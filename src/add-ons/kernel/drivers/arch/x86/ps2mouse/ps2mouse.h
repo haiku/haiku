@@ -67,14 +67,27 @@
 #define PS2_CTRL_READ_CMD		 0x20
 #define PS2_CTRL_WRITE_CMD       0x60
 #define PS2_CTRL_WRITE_AUX       0xD4
+#define PS2_CTRL_MOUSE_DISABLE	 0xA7
+#define PS2_CTRL_MOUSE_ENABLE	 0xA8
+#define PS2_CTRL_MOUSE_TEST		 0xA9
+
+// command bytes
+#define PS2_CMD_DEV_INIT         0x43
+
+// command bits
+#define PS2_BITS_AUX_INTERRUPT	 0x02
+#define PS2_BITS_MOUSE_DISABLED	 0x20
 
 // data words
-#define PS2_CMD_DEV_INIT         0x43
+#define PS2_CMD_TEST_PASSED		 0xAA
+#define PS2_CMD_GET_DEVICE_ID	 0xF2
+#define PS2_CMD_SET_SAMPLE_RATE	 0xF3
 #define PS2_CMD_ENABLE_MOUSE     0xF4
 #define PS2_CMD_DISABLE_MOUSE    0xF5
 #define PS2_CMD_RESET_MOUSE      0xFF
-#define PS2_CMD_TEST_PASSED		 0xAA
 
+// reply codes
+#define PS2_RES_TEST_PASSED		 0x55
 #define PS2_RES_ACK              0xFA
 #define PS2_RES_RESEND           0xFE
 #define PS2_ERROR				 0xFC
@@ -84,6 +97,10 @@
 
 // other stuff
 #define MOUSE_HISTORY_SIZE		 256
+
+// mouse device IDs
+#define PS2_DEV_ID_STANDARD		 0
+#define PS2_DEV_ID_INTELLIMOUSE	 3
 
 // packet sizes
 #define PS2_PACKET_STANDARD		 3
