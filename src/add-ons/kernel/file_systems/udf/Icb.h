@@ -22,7 +22,7 @@ extern "C" {
 #include "UdfDebug.h"
 
 #include "CachedBlock.h"
-#include "DiskStructures.h"
+#include "UdfStructures.h"
 #include "SinglyLinkedList.h"
 
 namespace Udf {

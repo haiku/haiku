@@ -13,7 +13,7 @@
 #include "kernel_cpp.h"
 #include "UdfDebug.h"
 
-#include "DiskStructures.h"
+#include "UdfStructures.h"
 #include "Icb.h"
 #include "Volume.h"
 

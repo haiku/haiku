@@ -28,7 +28,7 @@ extern "C" {
 #include "kernel_cpp.h"
 #include "UdfDebug.h"
 
-#include "DiskStructures.h"
+#include "UdfStructures.h"
 #include "Volume.h"
 
 namespace Udf {

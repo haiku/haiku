@@ -25,7 +25,7 @@ extern "C" {
 #include "UdfDebug.h"
 
 #include "CS0String.h"
-#include "DiskStructures.h"
+#include "UdfStructures.h"
 #include "Partition.h"
 
 namespace Udf {

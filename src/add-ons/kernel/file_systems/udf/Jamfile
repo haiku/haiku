@@ -32,13 +32,13 @@ R5KernelAddon udf : [ FDirName kernel file_systems udf ] :
 
 	CS0String.cpp
 	DirectoryIterator.cpp
-	DiskStructures.cpp
 	Icb.cpp
 	MetadataPartition.cpp
 	PhysicalPartition.cpp
 	Recognition.cpp
 	SparablePartition.cpp
 	UdfDebug.cpp
+	UdfStructures.cpp
 	Utils.cpp
 	VirtualPartition.cpp
 	Volume.cpp

@@ -12,7 +12,7 @@
 
 #include <kernel_cpp.h>
 
-#include "DiskStructures.h"
+#include "UdfStructures.h"
 #include "Partition.h"
 #include "UdfDebug.h"
 

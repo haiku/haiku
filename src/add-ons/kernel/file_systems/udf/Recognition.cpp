@@ -41,33 +41,26 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	               length, blockSize));
 
 	// Check the block size
-	uint32 bitCount = 0;
-	for (int i = 0; i < 32; i++) {
-		// Zero out all bits except bit i
-		uint32 block = blockSize & (uint32(1) << i);
-		if (block) {
-			if (++bitCount > 1) {
-				PRINT(("Block size must be a power of two! (blockSize = %ld)\n", blockSize));
-				RETURN(B_BAD_VALUE);
-			} else {
-				blockShift = i;
-				PRINT(("blockShift: %ld\n", blockShift));
-			}			
-		}
-	}
-	
-	// Check for a valid volume recognition sequence
-	status_t error = walk_volume_recognition_sequence(device, offset, blockSize, blockShift);
-	
-	// Now hunt down a volume descriptor sequence from one of
-	// the anchor volume pointers (if there are any).
+	status_t error = get_block_shift(blockSize, blockShift);
 	if (!error) {
-		error = walk_anchor_volume_descriptor_sequences(device, offset, length,
-		                                              blockSize, blockShift,
-		                                              logicalVolumeDescriptor,
-		                                              partitionDescriptors,
-		                                              partitionDescriptorCount);
+		PRINT(("blockShift: %ld\n", blockShift));
+
+		// Check for a valid volume recognition sequence
+		error = walk_volume_recognition_sequence(device, offset, blockSize, blockShift);
+	
+		// Now hunt down a volume descriptor sequence from one of
+		// the anchor volume pointers (if there are any).
+		if (!error) {
+			error = walk_anchor_volume_descriptor_sequences(device, offset, length,
+			                                                blockSize, blockShift,
+			                                                logicalVolumeDescriptor,
+			                                                partitionDescriptors,
+			                                                partitionDescriptorCount);
+		}
+	} else {
+		PRINT(("Block size must be a positive power of two! (blockSize = %ld)\n", blockSize));
 	}
+	
 	RETURN(error);
 }
 

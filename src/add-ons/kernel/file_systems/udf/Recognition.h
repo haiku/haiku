@@ -10,7 +10,7 @@
 /*! \file Recognition.h
 */
 
-#include "DiskStructures.h"
+#include "UdfStructures.h"
 #include "UdfDebug.h"
 
 namespace Udf {
