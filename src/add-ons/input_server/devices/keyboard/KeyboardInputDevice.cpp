@@ -1,5 +1,5 @@
 /*****************************************************************************/
-// Mouse input server device addon
+// Keyboard input server device addon
 // Written by Jérôme Duval
 //
 // KeyboardInputDevice.cpp
@@ -51,6 +51,7 @@ const static uint32 kSetRepeatingKey = 0x2712;
 const static uint32 kSetNonRepeatingKey = 0x2713;
 const static uint32 kSetKeyRepeatRate = 0x2714;
 const static uint32 kSetKeyRepeatDelay = 0x2716;
+const static uint32 kCancelTimer = 0x2719;
 const static uint32 kGetNextKey = 0x270f;
 
 const static uint32 kKeyboardThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
@@ -185,7 +186,7 @@ const uint32 at_keycode_map[] = {
 	0x6c,   // Muhenkan, key left to spacebar, japanese
 	0x00,   // UNMAPPED
 	0x6a,   // Yen (macron key, japanese)
-	0x00,   // UNMAPPED
+	0x70,   // Keypad . on Brazilian ABNT2
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -608,10 +609,31 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			LOG("kGetNextKey : %Ld, %02x, %02x, %02lx, %02x\n", at_kbd->timestamp, at_kbd->scancode, at_kbd->is_keydown, keycode, at_kbd->scancode & 0x80);
 
 			if (at_kbd->is_keydown)
-				states[(keycode)>>3] |= (1 << (7 - ((keycode) & 0x7)));
+				states[(keycode)>>3] |= (1 << (7 - (keycode & 0x7)));
 			else
-				states[(keycode)>>3] &= (!(1 << (7 - ((keycode) & 0x7))));
-
+				states[(keycode)>>3] &= (!(1 << (7 - (keycode & 0x7))));
+				
+			if (at_kbd->is_keydown
+				&& (keycode == 0x34) // DELETE KEY
+				&& (states[0x5c >> 3] & (1 << (7 - (0x5c & 0x7))))
+				&& (states[0x5d >> 3] & (1 << (7 - (0x5d & 0x7))))) {
+				
+				// show the team monitor
+				// argh we don't have one !
+				
+				// cancel timer	: TODO this should be done by the team monitor
+				if (ioctl(dev->fd, kCancelTimer, NULL)!=B_OK)
+					LOG_ERR("kCancelTimer : NOT OK\n");
+				else
+					LOG("kCancelTimer : OK\n");
+			}
+			
+			if (at_kbd->is_keydown
+				&& (keycode == 0x68)) { // MENU KEY
+				
+				BMessenger("application/x-vnd.Be-TSKB").SendMessage('BeMn');
+			}
+			
 			uint32 modifiers = keymap->Modifier(keycode);
 			if (modifiers 
 				&& ( !(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) 
