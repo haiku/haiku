@@ -1,20 +1,7 @@
 Tests that need to be created, by interface function
 
 createArea
-	- NULL name
-	- Huge name
-	- 0 page count
-	- page count larger than VM
-	- page count larger than physical memory
-	- specified address (EXACT)
-	- base address (BASE)
-	- kernel address (ANY_KERNEL)
-	- clone (CLONE) - should fail
-	- FULL_LOCK
-	- CONTIGUOUS
-	- LAZY_LOCK
-	- NO_LOCK
-	- LOMEM
+	- improve some of the successful tests.
 
 freeArea
 	- on invalid area
