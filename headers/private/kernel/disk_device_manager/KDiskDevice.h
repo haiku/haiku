@@ -5,7 +5,7 @@
 
 #include <OS.h>
 
-#include "KPartition.h"
+#include "KPhysicalPartition.h"
 #include "RWLocker.h"
 
 // disk device flags
@@ -18,7 +18,7 @@ enum {
 namespace BPrivate {
 namespace DiskDevice {
 
-class KDiskDevice : public KPartition {
+class KDiskDevice : public KPhysicalPartition {
 public:
 	KDiskDevice(partition_id id = -1);
 	virtual ~KDiskDevice();
@@ -65,8 +65,6 @@ public:
 	// access to C style device data
 	disk_device_data *DeviceData();
 	const disk_device_data *DeviceData() const;
-
-	virtual KPartition *CreateShadowPartition();
 
 	void SetShadowOwner(team_id team);
 	team_id ShadowOwner() const;

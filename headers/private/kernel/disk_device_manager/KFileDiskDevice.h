@@ -22,8 +22,6 @@ public:
 
 	const char *FilePath() const;
 
-	virtual KPartition *CreateShadowPartition();
-
 //	virtual void Dump(bool deep = true, int32 level = 0);
 
 private:

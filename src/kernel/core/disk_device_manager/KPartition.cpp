@@ -18,12 +18,12 @@
 
 using namespace std;
 
-// constructor
 // debugging
 //#define DBG(x)
 #define DBG(x) x
 #define OUT printf
 
+// constructor
 KPartition::KPartition(partition_id id)
 	: fPartitionData(),
 	  fChildren(),
@@ -446,7 +446,7 @@ KPartition::GetPath(char *path) const
 	int32 len = strlen(path);
 	if (len >= B_PATH_NAME_LENGTH - 10)
 		return B_NAME_TOO_LONG;
-	if (Parent() == Device()) {
+	if (Parent()->IsDevice()) {
 		// Our parent is a device, so we replace `raw' by our index.
 		int32 leafLen = strlen("/raw");
 		if (len <= leafLen || strcmp(path + len - leafLen, "/raw"))
@@ -579,29 +579,6 @@ KPartition::AddChild(KPartition *partition, int32 index)
 	return B_ERROR;
 }
 
-// CreateChild
-status_t
-KPartition::CreateChild(partition_id id, int32 index, KPartition **_child)
-{
-	// check parameters
-	int32 count = fPartitionData.child_count;
-	if (index == -1)
-		index = count;
-	if (index < 0 || index > count)
-		return B_BAD_VALUE;
-	// create and add partition
-	KPartition *child = new(nothrow) KPartition(id);
-	if (!child)
-		return B_NO_MEMORY;
-	status_t error = AddChild(child, index);
-	// cleanup / set result
-	if (error != B_OK)
-		delete child;
-	else if (_child)
-		*_child = child;
-	return error;
-}
-
 // RemoveChild
 bool
 KPartition::RemoveChild(int32 index)
@@ -666,34 +643,18 @@ KPartition::CountChildren() const
 }
 
 // CreateShadowPartition
-KPartition *
+status_t
 KPartition::CreateShadowPartition()
 {
-	// not implemented
-	return NULL;
+	// implemented by derived classes
+	return B_ERROR;
 }
 
 // DeleteShadowPartition
 void
 KPartition::DeleteShadowPartition()
 {
-	// not implemented
-}
-
-// ShadowPartition
-KPartition *
-KPartition::ShadowPartition() const
-{
-	// not implemented
-	return NULL;
-}
-
-// IsShadowPartition
-bool
-KPartition::IsShadowPartition() const
-{
-	// not implemented
-	return false;
+	// implemented by derived classes
 }
 
 // SetDiskSystem

@@ -24,6 +24,8 @@ namespace DiskDevice {
 
 class KDiskDevice;
 class KDiskSystem;
+class KPhysicalPartition;
+class KShadowPartition;
 
 class KPartition {
 public:
@@ -44,7 +46,7 @@ public:
 	virtual bool PrepareForRemoval();
 	virtual bool PrepareForDeletion();
 
-	status_t Open(int flags, int *fd);
+	virtual status_t Open(int flags, int *fd);
 	virtual status_t PublishDevice();
 	virtual status_t UnpublishDevice();
 
@@ -55,7 +57,7 @@ public:
 	bool IsDescendantBusy() const;
 		// == jobs which may affect a descendant of this partition are
 		// scheduled/in progress; IsBusy() => IsDescendantBusy()
-		// In the userland API, both can probably mapped to one flag.
+		// In the userland API, both can probably be mapped to one flag.
 
 	void SetOffset(off_t offset);
 	off_t Offset() const;		// 0 for devices
@@ -108,8 +110,8 @@ public:
 	void SetVolumeID(dev_t volumeID);
 	dev_t VolumeID() const;
 
-	status_t Mount(uint32 mountFlags, const char *parameters);
-	status_t Unmount();
+	virtual status_t Mount(uint32 mountFlags, const char *parameters);
+	virtual status_t Unmount();
 
 	// Parameters
 
@@ -128,8 +130,8 @@ public:
 	KPartition *Parent() const;
 
 	status_t AddChild(KPartition *partition, int32 index = -1);
-	status_t CreateChild(partition_id id, int32 index,
-						 KPartition **child = NULL);
+	virtual status_t CreateChild(partition_id id, int32 index,
+								 KPartition **child = NULL) = 0;
 	bool RemoveChild(int32 index);
 	bool RemoveChild(KPartition *child);
 	bool RemoveAllChildren();
@@ -138,10 +140,11 @@ public:
 
 	// Shadow Partition
 
-	virtual KPartition *CreateShadowPartition();	// creates a complete tree
-	void DeleteShadowPartition();					// deletes ...
-	KPartition *ShadowPartition() const;
-	bool IsShadowPartition() const;
+	virtual status_t CreateShadowPartition();	// creates a complete tree
+	virtual void DeleteShadowPartition();		// deletes ...
+	virtual KShadowPartition *ShadowPartition() = 0;
+	virtual bool IsShadowPartition() const = 0;
+	virtual KPhysicalPartition *PhysicalPartition() = 0;
 
 	// DiskSystem
 

@@ -37,20 +37,18 @@ public:
 	// Disk Device / Partition Management
 
 	// manager must be locked
-	KDiskDevice *FindDevice(const char *path, bool noShadow = true);
-	KDiskDevice *FindDevice(partition_id id, bool noShadow = true);
-	KPartition *FindPartition(const char *path, bool noShadow = true);
-	KPartition *FindPartition(partition_id id, bool noShadow = true);
-	KFileDiskDevice *FindFileDevice(const char *filePath,
-									bool noShadow = true);
+	KDiskDevice *FindDevice(const char *path);
+	KDiskDevice *FindDevice(partition_id id);
+	KPartition *FindPartition(const char *path, bool noShadow = false);
+	KPartition *FindPartition(partition_id id, bool noShadow = false);
+	KFileDiskDevice *FindFileDevice(const char *filePath);
 
-	KDiskDevice *RegisterDevice(const char *path, bool noShadow = true);
-	KDiskDevice *RegisterDevice(partition_id id, bool noShadow = true);
+	KDiskDevice *RegisterDevice(const char *path);
+	KDiskDevice *RegisterDevice(partition_id id);
 	KDiskDevice *RegisterNextDevice(int32 *cookie);
-	KPartition *RegisterPartition(const char *path, bool noShadow = true);
-	KPartition *RegisterPartition(partition_id id, bool noShadow = true);
-	KFileDiskDevice *RegisterFileDevice(const char *filePath,
-										bool noShadow = true);
+	KPartition *RegisterPartition(const char *path, bool noShadow = false);
+	KPartition *RegisterPartition(partition_id id, bool noShadow = false);
+	KFileDiskDevice *RegisterFileDevice(const char *filePath);
 
 	status_t CreateFileDevice(const char *filePath, partition_id *device = 0);
 	status_t DeleteFileDevice(const char *filePath);

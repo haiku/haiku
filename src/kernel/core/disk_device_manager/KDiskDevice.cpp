@@ -17,7 +17,7 @@
 
 // constructor
 KDiskDevice::KDiskDevice(partition_id id)
-	: KPartition(id),
+	: KPhysicalPartition(id),
 	  fDeviceData(),
 	  fLocker("diskdevice"),
 	  fFD(-1),
@@ -143,7 +143,7 @@ KDiskDevice::IsWriteLocked()
 void
 KDiskDevice::SetID(partition_id id)
 {
-	KPartition::SetID(id);
+	KPhysicalPartition::SetID(id);
 	fDeviceData.id = id;
 }
 
@@ -248,14 +248,6 @@ KDiskDevice::DeviceData() const
 	return &fDeviceData;
 }
 
-// CreateShadowPartition
-KPartition *
-KDiskDevice::CreateShadowPartition()
-{
-	// not implemented
-	return NULL;
-}
-
 // SetShadowOwner
 void
 KDiskDevice::SetShadowOwner(team_id team)
@@ -278,7 +270,7 @@ KDiskDevice::Dump(bool deep, int32 level)
 	OUT("  media status:      %s\n", strerror(fMediaStatus));
 	OUT("  device flags:      %lx\n", DeviceFlags());
 	if (fMediaStatus == B_OK)
-		KPartition::Dump(deep, 0);
+		KPhysicalPartition::Dump(deep, 0);
 }
 
 // GetMediaStatus

@@ -118,14 +118,6 @@ KFileDiskDevice::FilePath() const
 	return fFilePath;
 }
 
-// CreateShadowPartition
-KPartition *
-KFileDiskDevice::CreateShadowPartition()
-{
-	// not implemented
-	return NULL;
-}
-
 // _RegisterDevice
 status_t
 KFileDiskDevice::_RegisterDevice(const char *file, const char *device)

@@ -203,9 +203,8 @@ KDiskDeviceManager::Unlock()
 
 // FindDevice
 KDiskDevice *
-KDiskDeviceManager::FindDevice(const char *path, bool noShadow)
+KDiskDeviceManager::FindDevice(const char *path)
 {
-// TODO: Handle shadows correctly!
 	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie); ) {
 		if (device->Path() && !strcmp(path, device->Path()))
 			return device;
@@ -215,9 +214,8 @@ KDiskDeviceManager::FindDevice(const char *path, bool noShadow)
 
 // FindDevice
 KDiskDevice *
-KDiskDeviceManager::FindDevice(partition_id id, bool noShadow)
+KDiskDeviceManager::FindDevice(partition_id id)
 {
-// TODO: Handle shadows correctly!
 	if (KPartition *partition = FindPartition(id))
 		return partition->Device();
 	return NULL;
@@ -227,7 +225,6 @@ KDiskDeviceManager::FindDevice(partition_id id, bool noShadow)
 KPartition *
 KDiskDeviceManager::FindPartition(const char *path, bool noShadow)
 {
-// TODO: Handle shadows correctly!
 // TODO: Optimize!
 	for (PartitionMap::Iterator it = fPartitions->Begin();
 		 it != fPartitions->End();
@@ -236,6 +233,8 @@ KDiskDeviceManager::FindPartition(const char *path, bool noShadow)
 		char partitionPath[B_PATH_NAME_LENGTH];
 		if (partition->GetPath(partitionPath) == B_OK
 			&& !strcmp(path, partitionPath)) {
+			if (noShadow && partition->IsShadowPartition())
+				return partition->PhysicalPartition();
 			return partition;
 		}
 	}
@@ -246,18 +245,19 @@ KDiskDeviceManager::FindPartition(const char *path, bool noShadow)
 KPartition *
 KDiskDeviceManager::FindPartition(partition_id id, bool noShadow)
 {
-// TODO: Handle shadows correctly!
 	PartitionMap::Iterator it = fPartitions->Find(id);
-	if (it != fPartitions->End())
+	if (it != fPartitions->End()) {
+		if (noShadow && it->Value()->IsShadowPartition())
+			return it->Value()->PhysicalPartition();
 		return it->Value();
+	}
 	return NULL;
 }
 
 // FindFileDevice
 KFileDiskDevice *
-KDiskDeviceManager::FindFileDevice(const char *filePath, bool noShadow)
+KDiskDeviceManager::FindFileDevice(const char *filePath)
 {
-// TODO: Handle shadows correctly!
 	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie); ) {
 		KFileDiskDevice *fileDevice = dynamic_cast<KFileDiskDevice*>(device);
 		if (fileDevice && fileDevice->FilePath()
@@ -270,11 +270,10 @@ KDiskDeviceManager::FindFileDevice(const char *filePath, bool noShadow)
 
 // RegisterDevice
 KDiskDevice *
-KDiskDeviceManager::RegisterDevice(const char *path, bool noShadow)
+KDiskDeviceManager::RegisterDevice(const char *path)
 {
-// TODO: Handle shadows correctly!
 	if (ManagerLocker locker = this) {
-		if (KDiskDevice *device = FindDevice(path, noShadow)) {
+		if (KDiskDevice *device = FindDevice(path)) {
 			device->Register();
 			return device;
 		}
@@ -284,11 +283,10 @@ KDiskDeviceManager::RegisterDevice(const char *path, bool noShadow)
 
 // RegisterDevice
 KDiskDevice *
-KDiskDeviceManager::RegisterDevice(partition_id id, bool noShadow)
+KDiskDeviceManager::RegisterDevice(partition_id id)
 {
-// TODO: Handle shadows correctly!
 	if (ManagerLocker locker = this) {
-		if (KDiskDevice *device = FindDevice(id, noShadow)) {
+		if (KDiskDevice *device = FindDevice(id)) {
 			device->Register();
 			return device;
 		}
@@ -339,10 +337,10 @@ KDiskDeviceManager::RegisterPartition(partition_id id, bool noShadow)
 
 // RegisterFileDevice
 KFileDiskDevice *
-KDiskDeviceManager::RegisterFileDevice(const char *filePath, bool noShadow)
+KDiskDeviceManager::RegisterFileDevice(const char *filePath)
 {
 	if (ManagerLocker locker = this) {
-		if (KFileDiskDevice *device = FindFileDevice(filePath, noShadow)) {
+		if (KFileDiskDevice *device = FindFileDevice(filePath)) {
 			device->Register();
 			return device;
 		}
@@ -572,8 +570,6 @@ KDiskDeviceManager::LoadNextDiskSystem(int32 *cookie)
 	if (!cookie)
 		return NULL;
 	if (ManagerLocker locker = this) {
-		// TODO: This loop assumes that the disk system list is ordered.
-		// Make sure that this is really the case.
 		if (KDiskSystem *diskSystem = NextDiskSystem(cookie)) {
 			if (diskSystem->Load() == B_OK) {
 				*cookie = diskSystem->ID() + 1;

@@ -11,6 +11,7 @@ UsePrivateHeaders [ FDirName storage ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src tests kits storage virtualdrive ] ;
 
 SharedLibrary disk_device_manager :
+	disk_device_manager.cpp
 	KDiskDevice.cpp
 	KDiskDeviceJob.cpp
 	KDiskDeviceJobFactory.cpp
@@ -21,7 +22,8 @@ SharedLibrary disk_device_manager :
 	KFileSystem.cpp
 	KPartition.cpp
 	KPartitioningSystem.cpp
-	disk_device_manager.cpp
+	KPhysicalPartition.cpp
+	KShadowPartition.cpp
 
 	# jobs
 	KCreateChildJob.cpp
