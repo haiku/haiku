@@ -33,6 +33,7 @@
 #include <SupportDefs.h>
 
 #include "AppInfoList.h"
+#include "RecentApps.h"
 #include "WatchingService.h"
 
 class BMessage;
@@ -67,6 +68,15 @@ public:
 	void HandleBroadcast(BMessage *request);
 	void HandleStartWatching(BMessage *request);
 	void HandleStopWatching(BMessage *request);
+	void HandleGetRecentDocuments(BMessage *request);
+	void HandleGetRecentFolders(BMessage *request);
+	void HandleGetRecentApps(BMessage *request);
+	void HandleAddToRecentDocuments(BMessage *request);
+	void HandleAddToRecentFolders(BMessage *request);
+	void HandleAddToRecentApps(BMessage *request);
+	void HandleClearRecentDocuments(BMessage *request);
+	void HandleClearRecentFolders(BMessage *request);
+	void HandleClearRecentApps(BMessage *request);
 
 	status_t Init();
 
@@ -97,6 +107,7 @@ private:
 	IAPRRequestMap	fIAPRRequests;
 	RosterAppInfo	*fActiveApp;
 	WatchingService	fWatchingService;
+	RecentApps		fRecentApps;
 	uint32			fLastToken;
 };
 

@@ -195,6 +195,13 @@ PRINT(("added to early pre-regs, token: %lu\n", token));
 	}
 	// reply to the request
 	if (error == B_OK) {
+		// add to recent apps if successful
+		if (signature && signature[0] != '\0')
+			fRecentApps.Add(signature, flags);
+		else			
+			fRecentApps.Add(&ref, flags);
+//		fRecentApps.Print();
+
 		BMessage reply(B_REG_SUCCESS);
 		// The token is valid only when no team ID has been supplied.
 		if (team < 0)
@@ -758,6 +765,139 @@ TRoster::HandleStopWatching(BMessage *request)
 	}
 
 	FUNCTION_END();
+}
+
+// HandleGetRecentDocuments
+/*!	\brief Handles a GetRecentDocuments() request.
+	\param request The request message
+*/
+void TRoster::HandleGetRecentDocuments(BMessage *request)
+{
+	FUNCTION_START();
+	FUNCTION_END();
+}
+
+// HandleGetRecentFolders
+/*!	\brief Handles a GetRecentFolders() request.
+	\param request The request message
+*/
+void TRoster::HandleGetRecentFolders(BMessage *request)
+{
+}
+
+// HandleGetRecentApps
+/*!	\brief Handles a GetRecentApps() request.
+	\param request The request message
+*/
+void TRoster::HandleGetRecentApps(BMessage *request)
+{
+	FUNCTION_START();
+
+	if (!request) {
+		D(PRINT(("WARNING: TRoster::HandleGetRecentApps(NULL) called\n")));
+		return;
+	}
+
+	int32 maxCount;
+	BMessage reply(B_REG_RESULT);
+
+	status_t err = request->FindInt32("max count", &maxCount);
+	if (!err)
+		err = fRecentApps.Get(maxCount, &reply);
+	reply.AddInt32("result", err);
+	request->SendReply(&reply);	
+
+	FUNCTION_END();
+}
+
+// HandleAddToRecentDocuments
+/*!	\brief Handles an AddToRecentDocuments() request.
+	\param request The request message
+*/
+void TRoster::HandleAddToRecentDocuments(BMessage *request)
+{
+	FUNCTION_START();
+
+	if (!request) {
+		D(PRINT(("WARNING: TRoster::HandleAddToRecentDocuments(NULL) called\n")));
+		return;
+	}
+
+	entry_ref ref;
+	const char *appSig;
+	BMessage reply(B_REG_RESULT);
+
+	status_t err = request->FindRef("ref", &ref);
+	if (!err)
+		err = request->FindString("app sig", &appSig);
+//	if (!err)
+//		err = fRecentDocuments.Add(&ref, appSig);
+	err = B_ERROR;
+	reply.AddInt32("result", err);
+	request->SendReply(&reply);	
+
+	FUNCTION_END();
+}
+
+// HandleAddToRecentFolders
+/*!	\brief Handles an AddToRecentFolders() request.
+	\param request The request message
+*/
+void TRoster::HandleAddToRecentFolders(BMessage *request)
+{
+	FUNCTION_START();
+
+	if (!request) {
+		D(PRINT(("WARNING: TRoster::HandleAddToRecentFolders(NULL) called\n")));
+		return;
+	}
+
+	entry_ref ref;
+	const char *appSig;
+	BMessage reply(B_REG_RESULT);
+
+	status_t err = request->FindRef("ref", &ref);
+	if (!err)
+		err = request->FindString("app sig", &appSig);
+//	if (!err)
+//		err = fRecentFolders.Add(&ref, appSig);
+	err = B_ERROR;
+	reply.AddInt32("result", err);
+	request->SendReply(&reply);	
+
+	FUNCTION_END();
+}
+
+// HandleAddToRecentApps
+/*!	\brief Handles an AddToRecentApps() request.
+	\param request The request message
+*/
+void TRoster::HandleAddToRecentApps(BMessage *request)
+{
+}
+
+// HandleClearRecentDocuments
+/*!	\brief Handles a ClearRecentDocuments() request.
+	\param request The request message
+*/
+void TRoster::HandleClearRecentDocuments(BMessage *request)
+{
+}
+
+// HandleClearRecentFolders
+/*!	\brief Handles a ClearRecentFolders() request.
+	\param request The request message
+*/
+void TRoster::HandleClearRecentFolders(BMessage *request)
+{
+}
+
+// HandleClearRecentApps
+/*!	\brief Handles a ClearRecentApps() request.
+	\param request The request message
+*/
+void TRoster::HandleClearRecentApps(BMessage *request)
+{
 }
 
 // Init
