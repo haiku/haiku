@@ -1,18 +1,50 @@
 
+#include <Alert.h>
 #include <Autolock.h>
 #include <Path.h>
 #include <MenuItem.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
-#include <Alert.h>
+#include <Screen.h>
 #include <stdio.h>
-#include "Constants.h"
-#include "StyledEditApp.h"
-#include "StyledEditWindow.h"
+
+#include <Constants.h>
+#include <StyledEditApp.h>
+#include <StyledEditWindow.h>
 
 using namespace BPrivate;
 
-BRect windowRect(7,26,507,426);
+BRect windowRect(7-15,26-15,507,426);
+
+void cascade() {
+	BScreen screen(NULL);
+	BRect screenBorder = screen.Frame();
+	float left = windowRect.left + 15;
+	if (left + windowRect.Width() > screenBorder.right) {
+		left = 7;
+	}
+	float top = windowRect.top + 15;
+	if (top + windowRect.Height() > screenBorder.bottom) {
+		top = 26;
+	}
+	windowRect.OffsetTo(BPoint(left,top));	
+}
+
+void uncascade() {
+	BScreen screen(NULL);
+	BRect screenBorder = screen.Frame();
+	float left = windowRect.left - 15;
+	if (left < 7) {
+		left = screenBorder.right - windowRect.Width() - 7;
+		left = left - ((int)left % 15) + 7;
+	}
+	float top = windowRect.top - 15;
+	if (top < 26) {
+		top = screenBorder.bottom - windowRect.Height() - 26;
+		top = top - ((int)left % 15) + 26;
+	}
+	windowRect.OffsetTo(BPoint(left,top));	
+}
 
 StyledEditApp * styled_edit_app;
 
@@ -106,24 +138,24 @@ StyledEditApp::MessageReceived(BMessage *message)
 void
 StyledEditApp::OpenDocument()
 {
+	cascade();
 	new StyledEditWindow(windowRect,fNext_Untitled_Window++,fOpenAsEncoding);
-	windowRect.OffsetBy(15,15); // TODO: wrap around screen
 	fWindowCount++;
 }
 
 void
 StyledEditApp::OpenDocument(entry_ref * ref)
 {
+	cascade();
 	new StyledEditWindow(windowRect,ref,fOpenAsEncoding);
-	windowRect.OffsetBy(15,15); // TODO: wrap around screen
 	fWindowCount++;
 }
 
 void
 StyledEditApp::CloseDocument()
 {
+	uncascade();
 	fWindowCount--;
-	windowRect.OffsetBy(-15,-15);
 	if (fWindowCount == 0) {
 		BAutolock lock(this);
 		Quit();
