@@ -122,12 +122,13 @@ float
 identify_partition(int fd, partition_data *partition, void **cookie)
 {
 	DEBUG_INIT_ETC(NULL, ("fd: %d, id: %ld, offset: %Ld, "
-	       "size: %Ld, block_size: %ld", fd,
+	       "size: %Ld, block_size: %ld, flags: 0x%lx", fd,
 	       partition->id, partition->offset, partition->size,
-	       partition->block_size));
+	       partition->block_size, partition->flags));
 	device_geometry geometry;
 	float result = -1;
-	if (partition->block_size == 2048
+	if (partition->flags & B_PARTITION_IS_DEVICE
+	    && partition->block_size == 2048
 	    && ioctl(fd, B_GET_GEOMETRY, &geometry) == 0
 	    && geometry.device_type == B_CD)
 	{
@@ -158,12 +159,42 @@ scan_partition(int fd, partition_data *partition, void *cookie)
 		partition->content_size = partition->size;
 		partition->content_cookie = disc;
 		
-		for (int i = 1; disc->GetSessionInfo(i) == B_OK; i++) {	
-		
+		Session *session = NULL;
+		for (int i = 0; (session = disc->GetSession(i)); i++) {	
+			partition_data *child = create_child_partition(partition->id,
+														   i, -1);
+			if (!child) {
+				PRINT(("Unable to create child at index %ld.\n", i));
+				// something went wrong
+				error = B_ERROR;
+				break;
+			}
+			child->offset = partition->offset + session->Offset();
+			child->size = session->Size();
+			child->block_size = session->BlockSize();
+			child->flags |= session->Flags();
+			child->type = strdup(session->Type());
+			if (!child->type) {
+				error = B_NO_MEMORY;
+				break;
+			}
+			child->parameters = NULL;
+			child->cookie = session;
+		}
+	}
+	// cleanup on error
+	if (error) {
+		delete static_cast<Disc*>(cookie);
+		partition->content_cookie = NULL;
+		for (int32 i = 0; i < partition->child_count; i++) {
+			if (partition_data *child = get_child_partition(partition->id, i)) {
+				delete child->cookie;
+				child->cookie = NULL;
+			}
 		}
 	}
 	PRINT(("error: 0x%lx, `%s'\n", error, strerror(error)));
-	RETURN(B_ERROR);
+	RETURN(error);
 }
 
 static
@@ -172,6 +203,7 @@ free_identify_partition_cookie(partition_data */*partition*/, void *cookie)
 {
 	if (cookie) {
 		DEBUG_INIT_ETC(NULL, ("cookie: %p", cookie));
+		delete cookie;
 	}
 }
 
@@ -179,12 +211,20 @@ static
 void
 free_partition_cookie(partition_data *partition)
 {
-	DEBUG_INIT(NULL);
+	if (partition && partition->cookie) {
+		DEBUG_INIT_ETC(NULL, ("partition->cookie: %p", partition->cookie));
+		delete partition->cookie;
+		partition->cookie = NULL;
+	}
 }
 
 static
 void
 free_partition_content_cookie(partition_data *partition)
 {
-	DEBUG_INIT(NULL);
+	if (partition && partition->content_cookie) {
+		DEBUG_INIT_ETC(NULL, ("partition->content_cookie: %p", partition->content_cookie));
+		delete partition->content_cookie;
+		partition->content_cookie = NULL;
+	}
 }
