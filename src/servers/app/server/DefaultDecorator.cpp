@@ -623,7 +623,7 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 				_driver->StrokeLine(BPoint(rightborder.left, rightborder.bottom-13),
 									BPoint(rightborder.right, rightborder.bottom-13),
 									framecolors[2]);
-				_driver->StrokeLine(BPoint(bottomborder.left-18, bottomborder.top),
+				_driver->StrokeLine(BPoint(bottomborder.right-18, bottomborder.top),
 									BPoint(bottomborder.right-18, bottomborder.bottom),
 									framecolors[2]);
 				break;
