@@ -18,6 +18,12 @@ else
 	exit -1
 fi
 
+#Sometimes the OpenSSL installer is dumb and doesn't create the requisite symlinks
+if test ! -e ~/config/lib/libssl.so && test -e ~/config/lib/libssl.so.0.9.7; then
+	ln -s ~/config/lib/libssl.so.0.9.7 ~/config/lib/libssl.so
+	ln -s ~/config/lib/libcrypto.so.0.9.7 ~/config/lib/libcrypto.so
+fi
+
 if [[ `uname -m` == BePC ]] && test ! -e ~/config/lib/libssl.so; then
 
 RETURN=`alert "You don't seem to have OpenSSL installed, which the mail daemon requires." "Get OpenSSL" "I Don't Care"`
@@ -42,6 +48,16 @@ else
         quit "application/x-vnd.Be-POST"
         quit "application/x-vnd.Be-TSKB"
         unzip -od / install.zip
+
+# Reset the relevant parts of the MIME database
+        setmime -remove application/x-vnd.Be-POST; mimeset /system/servers/mail_daemon
+        setmime -remove application/x-vnd.Be-MAIL; mimeset /boot/beos/apps/BeMail
+        mimeset ~/config/bin/AGMSBayesianSpamServer
+        setmime -set text/x-email -preferredApp /boot/beos/apps/BeMail -preferredAppSig application/x-vnd.Be-MAIL
+        setmime -set text/x-vnd.be-maildraft -preferredApp /boot/beos/apps/BeMail -preferredAppSig application/x-vnd.Be-MAIL
+        setmime -set text/x-partial-email -preferredApp /boot/beos/system/servers/mail_daemon -preferredAppSig application/x-vnd.Be-POST
+
+#Restart the deskbar
         /boot/beos/system/Deskbar > /dev/null &
         alert "Finished installing" "Thanks"
     else
@@ -53,4 +69,9 @@ else
         fi
         $terminal -t "installer" /bin/sh "$0"
     fi
+fi
+
+# Launch prefs if this is a new install of MDR
+if test !  -e "/boot/home/config/settings/Mail/chains";	then
+	/boot/beos/preferences/E-mail &
 fi

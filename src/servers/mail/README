@@ -133,7 +133,9 @@ Note that if you have a large number of archived e-mail messages on your system,
 
 HISTORY:
 
-September 29 2004 - v3.0.0
+October 30 2004 - v3.0.0
+- Fixed all known bugs
+- Removed timeout crash in IMAP
 - Added POP3-SSL support
 - Fixed code so IMAP could compile if OpenSSL not used.
 - Integrated into Haiku source tree
