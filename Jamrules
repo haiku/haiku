@@ -763,9 +763,8 @@ rule KernelLd
 	Depends $(1) : $(2) ;
 
 	if $(6) {
-		Depends $(OBOS_KERNEL_CONFIG) : $(1) ;
 		for i in $(6) {
-			SECTIONS on $(OBOS_KERNEL_CONFIG) += ":" $(i) elf32 [ FDirName $(LOCATE_TARGET) $(1) ] ;
+			KernelConfigSection $(i) : elf32 : $(1) ;
 		}
 	}
 	
@@ -836,7 +835,12 @@ rule SystemMain
 rule KernelConfigSection
 {
 	# KernelConfigSection <section> : <type> : <file>  ;
-	SECTIONS on $(OBOS_KERNEL_CONFIG) += ":" $(1) $(2) $(3) ;
+
+	SECTION_NAMES on $(OBOS_KERNEL_CONFIG) += $(1) ;
+	SECTION_TYPES on $(OBOS_KERNEL_CONFIG) += $(2) ;
+	SECTION_FILES on $(OBOS_KERNEL_CONFIG) += $(3) ;
+
+	Depends $(OBOS_KERNEL_CONFIG) : $(3) ;
 }
 
 rule WriteKernelConfig
@@ -845,42 +849,43 @@ rule WriteKernelConfig
 
 	Depends files : $(1) ;
 	
-	LOCATE on $(1) = $(LOCATE_TARGET) ;
-
-	MakeLocate $(1) : $(LOCATE_TARGET) ;
+	MakeLocate $(1) : $(OBOS_OBJECT_TARGET) ;
 	
 	Clean clean : $(1) ;
 }
 
-actions WriteKernelConfig
+actions WriteKernelConfig bind SECTION_FILES
 {
 	target="$(1)"
 	echo "# OpenBeOS Kernel Config File" > "$target"
 	echo "# Automatically generated - do not edit!" >> "$target"
-	issection="0"
-	section=
-	for i in "$(SECTIONS)" ; do
-		if [ $issection == 1  ]; then
-			section="$i"
-			issection=2
-			echo "["$section"]" >> "$target"
-		elif [ $issection == 2 ]; then
-			type=$i
-			issection=3
-			echo "type="$type >> "$target"
-		else
-			if [ "$i" == ":" ]; then
-				issection=1
-				echo "" >> "$target"
-			else
-				file="$i"
-				case "$file" in
-					/*) ;;
-					*) file=`pwd`/"$file";;
-				esac
-				echo "file="$file >> $target
-			fi
-		fi			
+	count=0
+	for section in "$(SECTION_NAMES)" ; do
+		count=`expr $count + 1`
+		eval section$count="$section"
+	done
+	i=1
+	for type in "$(SECTION_TYPES)" ; do
+		eval type$i="$type"
+		i=`expr $i + 1`
+	done
+	i=1
+	for file in "$(SECTION_FILES)" ; do
+		eval file$i="$file"
+		i=`expr $i + 1`
+	done
+	for i in `seq $count` ; do
+		eval section="\$section$i"
+		eval type="\$type$i"
+		eval file="\$file$i"
+		echo "" >> "$target"
+		echo "["$section"]" >> "$target"
+		echo "type="$type >> "$target"
+		case "$file" in
+			/*) ;;
+			*) file=`pwd`/"$file";;
+		esac
+		echo "file="$file >> "$target"
 	done
 }
 
