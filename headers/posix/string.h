@@ -46,8 +46,10 @@ extern const char *strerror(int error);
 // ToDo: remove bzero(), bcopy() from here - we don't need those
 //	implementations anyway, since BeOS defines them as macros
 //	Of course, we could also just keep them (and bcmp() is missing)
-extern void  *bcopy(void const *source, void *dest, size_t length);
-extern void   bzero(void *buffer, size_t length);
+//extern void  *bcopy(void const *source, void *dest, size_t length);
+//extern void   bzero(void *buffer, size_t length);
+#define bcopy(source, dest, length) memcpy(dest, source, length)
+#define bzero(buffer, length) memset(buffer, 0, length)
 
 /* non-standard string functions */
 extern int		strcasecmp(const char *string1, const char *string2);
