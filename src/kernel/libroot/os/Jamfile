@@ -3,32 +3,29 @@ SubDir OBOS_TOP src kernel libroot os ;
 SubDirHdrs [ FCurrentObjectsDir ] ;
 
 KernelMergeObject os_main.o :
-	<$(SOURCE_GRIST)>area.c
-	<$(SOURCE_GRIST)>atomic.c
-	<$(SOURCE_GRIST)>debug.c
-	<$(SOURCE_GRIST)>driver_settings.c
-	<$(SOURCE_GRIST)>fs_attr.c
-	<$(SOURCE_GRIST)>fs_index.c
-	<$(SOURCE_GRIST)>fs_info.c
-	<$(SOURCE_GRIST)>fs_query.cpp
-	<$(SOURCE_GRIST)>image.c
-	<$(SOURCE_GRIST)>parsedate.cpp
-	<$(SOURCE_GRIST)>port.c
-	<$(SOURCE_GRIST)>sem.c
-	<$(SOURCE_GRIST)>system_info.c
-	<$(SOURCE_GRIST)>team.c
-	<$(SOURCE_GRIST)>thread.c
-	<$(SOURCE_GRIST)>time.c
-	<$(SOURCE_GRIST)>syscalls.S
+	area.c
+	atomic.c
+	debug.c
+	driver_settings.c
+	fs_attr.c
+	fs_index.c
+	fs_info.c
+	fs_query.cpp
+	fs_volume.c
+	image.c
+	parsedate.cpp
+	port.c
+	sem.c
+	system_info.c
+	team.c
+	thread.c
+	time.c
+	syscalls.S
 	:
 	-fPIC -DPIC
 	;
 
 # We need to specify the dependency on the generated syscalls file explicitly.
 Depends [ FGristFiles syscalls.o ] : <syscalls>syscalls.S.inc ;
-
-MergeObjectFromObjects kernel_os_main.o :
-	<$(SOURCE_GRIST)>driver_settings.o
-	;
 
 SubInclude OBOS_TOP src kernel libroot os arch ;

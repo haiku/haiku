@@ -7,6 +7,17 @@ KernelObjects
 	: -fPIC -DPIC
 	;
 
+# kernel libroot os files
+
+KernelMergeObject kernel_os_main.o :
+	driver_settings.c
+	: -fno-pic
+	;
+
+SEARCH on [ FGristFiles
+		driver_settings.c
+	] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+
 # kernel libroot posix files
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) posix ] ;
