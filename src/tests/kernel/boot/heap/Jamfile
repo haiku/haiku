@@ -6,7 +6,7 @@ UsePrivateHeaders kernel ;
 SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
 SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM) ;
 
-ObjectDefines heap.cpp : malloc=heap_malloc free=heap_free HEAP_TEST=1 ;
+ObjectDefines heap.cpp : malloc=heap_malloc free=heap_free realloc=heap_realloc HEAP_TEST=1 ;
 
 # This lets the correct stdio.h header be available
 # on the build platform.
