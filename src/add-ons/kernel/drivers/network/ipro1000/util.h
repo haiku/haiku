@@ -21,6 +21,12 @@
 
 #include <OS.h>
 
-area_id map_mem(void **virt, void *phy, size_t size, uint32 protection, const char *name);
+area_id	map_mem(void **virt, void *phy, size_t size, uint32 protection, const char *name);
+
+void *	area_malloc(size_t size);
+void	area_free(void *p);
+
+// generic macro for rounding, can only be used for power of 2 blocksize
+#define ROUNDUP(size, blocksize) 	(((size) + (blocksize) - 1) & ~((blocksize) - 1))
 
 #endif
