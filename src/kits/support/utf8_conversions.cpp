@@ -7,6 +7,8 @@
 
 using namespace BPrivate;
 
+typedef char ** input_buffer_t;
+
 status_t
 convert_to_utf8(uint32 srcEncoding,
                 const char * src, int32 * srcLen, 
@@ -21,7 +23,7 @@ convert_to_utf8(uint32 srcEncoding,
 	if (conversion == (iconv_t)-1) {
 		return B_ERROR;
 	}
-	const char ** inputBuffer = const_cast<const char**>(&src);
+	input_buffer_t inputBuffer = const_cast<input_buffer_t>(&src);
 	size_t charsLeft = *dstLen;
 	size_t inputLength = *srcLen;
 	size_t bytesLeft = iconv(conversion,inputBuffer,&inputLength,&dst,&charsLeft);
@@ -30,6 +32,7 @@ convert_to_utf8(uint32 srcEncoding,
 	if ((bytesLeft != 0) && (errno != E2BIG) && (errno != EINVAL)) {
 		return B_ERROR;
 	}
+	iconv_close(conversion);
 	return B_OK;
 }
 
@@ -47,7 +50,7 @@ convert_from_utf8(uint32 dstEncoding,
 	if (conversion == (iconv_t)-1) {
 		return B_ERROR;
 	}
-	const char ** inputBuffer = const_cast<const char**>(&src);
+	input_buffer_t inputBuffer = const_cast<input_buffer_t>(&src);
 	size_t charsLeft = *dstLen;
 	size_t inputLength = *srcLen;
 	size_t bytesLeft = iconv(conversion,inputBuffer,&inputLength,&dst,&charsLeft);
@@ -56,5 +59,6 @@ convert_from_utf8(uint32 dstEncoding,
 	if ((bytesLeft != 0) && (errno != E2BIG) && (errno != EINVAL)) {
 		return B_ERROR;
 	}
+	iconv_close(conversion);
 	return B_OK;
 }
