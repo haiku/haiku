@@ -40,4 +40,4 @@ SubInclude OBOS_TOP src kernel core addons ;
 SubInclude OBOS_TOP src kernel core arch ;
 SubInclude OBOS_TOP src kernel core fs ;
 SubInclude OBOS_TOP src kernel core vm ;
-SubInclude OBOS_TOP src kernel core net ;
+#SubInclude OBOS_TOP src kernel core net ;

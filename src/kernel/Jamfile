@@ -127,12 +127,6 @@ KernelLd kernel
 	<$(SOURCE_GRIST)!core>thread.o 
 	<$(SOURCE_GRIST)!core>timer.o
 
-	<$(SOURCE_GRIST)!core!net>pools.o
-	<$(SOURCE_GRIST)!core!net>nhash.o
-	<$(SOURCE_GRIST)!core!net>mbuf.o
-	<$(SOURCE_GRIST)!core!net>net.o
-	<$(SOURCE_GRIST)!core!net>socket.o
-
 	linkhack.so
 
 	libbus.a
@@ -175,12 +169,6 @@ KernelLd kernel.so
 	<$(SOURCE_GRIST)!core>sysctl.o
 	<$(SOURCE_GRIST)!core>thread.o 
 	<$(SOURCE_GRIST)!core>timer.o
-
-	<$(SOURCE_GRIST)!core!net>pools.o
-	<$(SOURCE_GRIST)!core!net>nhash.o
-	<$(SOURCE_GRIST)!core!net>mbuf.o
-	<$(SOURCE_GRIST)!core!net>net.o
-	<$(SOURCE_GRIST)!core!net>socket.o
 
 	linkhack.so
 
@@ -710,19 +698,6 @@ KernelLd filetest :
 	bin/filetest
 	;
 
-KernelLd sockettest :
-	libglue2.o
-	<$(SOURCE_GRIST)!apps!sockettest>main.o
-	libc.so
-	libm.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
-	:
-	:
-	bin/sockettest
-	;
-
 KernelLd loop :
 	<$(SOURCE_GRIST)!add-ons!net!loopback>loop.o
 	kernel.so
@@ -836,11 +811,11 @@ KernelLd uname :
         bin/uname
         ;
 
-WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
+#WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
 
-BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
+#BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
 
-KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(SUBDIR)/boot/arch/$(OBOS_ARCH)/bootblock.bin ;
+#KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(SUBDIR)/boot/arch/$(OBOS_ARCH)/bootblock.bin ;
 
 SubInclude OBOS_TOP src kernel boot ;
 SubInclude OBOS_TOP src kernel core ;
