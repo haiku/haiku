@@ -16,15 +16,17 @@
 #include <LayoutBuilder.h>
 
 
-class TDateEdit;
-class TTimeEdit;
 class TAnalogClock;
 
 
 namespace BPrivate {
 	class BCalendarView;
+	class DateEdit;
+	class TimeEdit;
 }
 using BPrivate::BCalendarView;
+using BPrivate::DateEdit;
+using BPrivate::TimeEdit;
 
 
 class DateTimeView : public BGroupView {
@@ -43,8 +45,8 @@ private:
 			void				_Revert();
 			time_t				_PrefletUptime() const;
 
-			TDateEdit*			fDateEdit;
-			TTimeEdit*			fTimeEdit;
+			DateEdit*			fDateEdit;
+			TimeEdit*			fTimeEdit;
 			BCalendarView*		fCalendarView;
 			TAnalogClock*		fClock;
 

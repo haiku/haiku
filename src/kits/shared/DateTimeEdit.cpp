@@ -16,19 +16,24 @@
 
 #include <stdlib.h>
 
+#include <ControlLook.h>
 #include <DateFormat.h>
+#include <LayoutUtils.h>
 #include <List.h>
 #include <Locale.h>
 #include <String.h>
 #include <Window.h>
 
 
-using BPrivate::B_LOCAL_TIME;
+namespace BPrivate {
 
 
-TTimeEdit::TTimeEdit(const char* name, uint32 sections)
+const uint32 kArrowAreaWidth = 16;
+
+
+TimeEdit::TimeEdit(const char* name, uint32 sections, BMessage* message)
 	:
-	TSectionEdit(name, sections),
+	SectionEdit(name, sections, message),
 	fLastKeyDownTime(0),
 	fFields(NULL),
 	fFieldCount(0),
@@ -39,7 +44,7 @@ TTimeEdit::TTimeEdit(const char* name, uint32 sections)
 }
 
 
-TTimeEdit::~TTimeEdit()
+TimeEdit::~TimeEdit()
 {
 	free(fFieldPositions);
 	free(fFields);
@@ -47,18 +52,21 @@ TTimeEdit::~TTimeEdit()
 
 
 void
-TTimeEdit::KeyDown(const char* bytes, int32 numBytes)
+TimeEdit::KeyDown(const char* bytes, int32 numBytes)
 {
-	TSectionEdit::KeyDown(bytes, numBytes);
+	if (IsEnabled() == false)
+		return;
+	SectionEdit::KeyDown(bytes, numBytes);
 
 	// only accept valid input
 	int32 number = atoi(bytes);
-	if (number - 1 < 0)
+	if (number < 0 || bytes[0] < '0')
 		return;
 
 	int32 section = FocusIndex();
 	if (section < 0 || section > 2)
 		return;
+
 	bigtime_t currentTime = system_time();
 	if (currentTime - fLastKeyDownTime < 1000000) {
 		int32 doubleDigit = number + fLastKeyDownInt * 10;
@@ -72,16 +80,16 @@ TTimeEdit::KeyDown(const char* bytes, int32 numBytes)
 
 	// update display value
 	fHoldValue = number;
-
 	_CheckRange();
+	_UpdateFields();
 
 	// send message to change time
-	DispatchMessage();
+	Invoke();
 }
 
 
 void
-TTimeEdit::InitView()
+TimeEdit::InitView()
 {
 	// make sure we call the base class method, as it
 	// will create the arrow bitmaps and the section list
@@ -91,7 +99,7 @@ TTimeEdit::InitView()
 
 
 void
-TTimeEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
+TimeEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 {
 	if (fFieldPositions == NULL || index * 2 + 1 >= (uint32)fFieldPosCount)
 		return;
@@ -116,7 +124,7 @@ TTimeEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 
 
 void
-TTimeEdit::DrawSeparator(uint32 index, BRect bounds)
+TimeEdit::DrawSeparator(uint32 index, BRect bounds)
 {
 	if (fFieldPositions == NULL || index * 2 + 2 >= (uint32)fFieldPosCount)
 		return;
@@ -134,21 +142,21 @@ TTimeEdit::DrawSeparator(uint32 index, BRect bounds)
 
 
 float
-TTimeEdit::SeparatorWidth()
+TimeEdit::SeparatorWidth()
 {
 	return 10.0f;
 }
 
 
 float
-TTimeEdit::MinSectionWidth()
+TimeEdit::MinSectionWidth()
 {
 	return be_plain_font->StringWidth("00");
 }
 
 
 void
-TTimeEdit::SectionFocus(uint32 index)
+TimeEdit::SectionFocus(uint32 index)
 {
 	fLastKeyDownTime = 0;
 	fFocus = index;
@@ -158,7 +166,7 @@ TTimeEdit::SectionFocus(uint32 index)
 
 
 void
-TTimeEdit::SetTime(int32 hour, int32 minute, int32 second)
+TimeEdit::SetTime(int32 hour, int32 minute, int32 second)
 {
 	// make sure to update date upon overflow
 	if (hour == 0 && minute == 0 && second == 0)
@@ -175,8 +183,15 @@ TTimeEdit::SetTime(int32 hour, int32 minute, int32 second)
 }
 
 
+BTime
+TimeEdit::GetTime()
+{
+	return fTime.Time();
+}
+
+
 void
-TTimeEdit::DoUpPress()
+TimeEdit::DoUpPress()
 {
 	if (fFocus == -1)
 		SectionFocus(0);
@@ -185,14 +200,15 @@ TTimeEdit::DoUpPress()
 	fHoldValue += 1;
 
 	_CheckRange();
+	_UpdateFields();
 
 	// send message to change time
-	DispatchMessage();
+	Invoke();
 }
 
 
 void
-TTimeEdit::DoDownPress()
+TimeEdit::DoDownPress()
 {
 	if (fFocus == -1)
 		SectionFocus(0);
@@ -201,49 +217,27 @@ TTimeEdit::DoDownPress()
 	fHoldValue -= 1;
 
 	_CheckRange();
+	_UpdateFields();
 
-	// send message to change time
-	DispatchMessage();
-	
+	Invoke();
 }
 
 
 void
-TTimeEdit::BuildDispatch(BMessage* message)
+TimeEdit::PopulateMessage(BMessage* message)
 {
 	if (fFocus < 0 || fFocus >= fFieldCount)
 		return;
 
 	message->AddBool("time", true);
-
-	for (int32 index = 0; index < (int)fSectionCount; ++index) {
-		uint32 data = _SectionValue(index);
-
-		if (fFocus == index)
-			data = fHoldValue;
-
-		switch (fFields[index]) {
-			case B_DATE_ELEMENT_HOUR:
-				message->AddInt32("hour", data);
-				break;
-
-			case B_DATE_ELEMENT_MINUTE:
-				message->AddInt32("minute", data);
-				break;
-
-			case B_DATE_ELEMENT_SECOND:
-				message->AddInt32("second", data);
-				break;
-
-			default:
-				break;
-		}
-	}
+	message->AddInt32("hour", fTime.Time().Hour());
+	message->AddInt32("minute", fTime.Time().Minute());
+	message->AddInt32("second", fTime.Time().Second());
 }
 
 
 void
-TTimeEdit::_UpdateFields()
+TimeEdit::_UpdateFields()
 {
 	time_t time = fTime.Time_t();
 	
@@ -263,7 +257,7 @@ TTimeEdit::_UpdateFields()
 
 
 void
-TTimeEdit::_CheckRange()
+TimeEdit::_CheckRange()
 {
 	if (fFocus < 0 || fFocus >= fFieldCount)
 		return;
@@ -318,13 +312,14 @@ TTimeEdit::_CheckRange()
 			return;
 	}
 
+
 	fHoldValue = value;
 	Invalidate(Bounds());
 }
 
 
 bool
-TTimeEdit::_IsValidDoubleDigit(int32 value)
+TimeEdit::_IsValidDoubleDigit(int32 value)
 {
 	if (fFocus < 0 || fFocus >= fFieldCount)
 		return false;
@@ -355,7 +350,7 @@ TTimeEdit::_IsValidDoubleDigit(int32 value)
 
 
 int32
-TTimeEdit::_SectionValue(int32 index) const
+TimeEdit::_SectionValue(int32 index) const
 {
 	if (index < 0 || index >= fFieldCount)
 		return 0;
@@ -384,7 +379,7 @@ TTimeEdit::_SectionValue(int32 index) const
 
 
 float
-TTimeEdit::PreferredHeight()
+TimeEdit::PreferredHeight()
 {
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
@@ -392,12 +387,12 @@ TTimeEdit::PreferredHeight()
 }
 
 
-//	#pragma mark -
+// #pragma mark -
 
 
-TDateEdit::TDateEdit(const char* name, uint32 sections)
+DateEdit::DateEdit(const char* name, uint32 sections, BMessage* message)
 	:
-	TSectionEdit(name, sections),
+	SectionEdit(name, sections, message),
 	fFields(NULL),
 	fFieldCount(0),
 	fFieldPositions(NULL),
@@ -407,7 +402,7 @@ TDateEdit::TDateEdit(const char* name, uint32 sections)
 }
 
 
-TDateEdit::~TDateEdit()
+DateEdit::~DateEdit()
 {
 	free(fFieldPositions);
 	free(fFields);
@@ -415,13 +410,15 @@ TDateEdit::~TDateEdit()
 
 
 void
-TDateEdit::KeyDown(const char* bytes, int32 numBytes)
+DateEdit::KeyDown(const char* bytes, int32 numBytes)
 {
-	TSectionEdit::KeyDown(bytes, numBytes);
+	if (IsEnabled() == false)
+		return;
+	SectionEdit::KeyDown(bytes, numBytes);
 
 	// only accept valid input
 	int32 number = atoi(bytes);
-	if (number - 1 < 0)
+	if (number < 0 || bytes[0] < '0')
 		return;
 
 	int32 section = FocusIndex();
@@ -447,19 +444,19 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 			number += 70;
 		number += oldCentury;
 	}
-
-	// update display value
 	fHoldValue = number;
 
+	// update display value
 	_CheckRange();
+	_UpdateFields();
 
 	// send message to change time
-	DispatchMessage();
+	Invoke();
 }
 
 
 void
-TDateEdit::InitView()
+DateEdit::InitView()
 {
 	// make sure we call the base class method, as it
 	// will create the arrow bitmaps and the section list
@@ -469,7 +466,7 @@ TDateEdit::InitView()
 
 
 void
-TDateEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
+DateEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 {
 	if (fFieldPositions == NULL || index * 2 + 1 >= (uint32)fFieldPosCount)
 		return;
@@ -494,7 +491,7 @@ TDateEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 
 
 void
-TDateEdit::DrawSeparator(uint32 index, BRect bounds)
+DateEdit::DrawSeparator(uint32 index, BRect bounds)
 {
 	if (index >= 2)
 		return;
@@ -515,7 +512,7 @@ TDateEdit::DrawSeparator(uint32 index, BRect bounds)
 
 
 void
-TDateEdit::SectionFocus(uint32 index)
+DateEdit::SectionFocus(uint32 index)
 {
 	fLastKeyDownTime = 0;
 	fFocus = index;
@@ -525,21 +522,21 @@ TDateEdit::SectionFocus(uint32 index)
 
 
 float
-TDateEdit::MinSectionWidth()
+DateEdit::MinSectionWidth()
 {
 	return be_plain_font->StringWidth("00");
 }
 
 
 float
-TDateEdit::SeparatorWidth()
+DateEdit::SeparatorWidth()
 {
 	return 10.0f;
 }
 
 
 void
-TDateEdit::SetDate(int32 year, int32 month, int32 day)
+DateEdit::SetDate(int32 year, int32 month, int32 day)
 {
 	fDate.SetDate(year, month, day);
 
@@ -552,8 +549,15 @@ TDateEdit::SetDate(int32 year, int32 month, int32 day)
 }
 
 
+BDate
+DateEdit::GetDate()
+{
+	return fDate;
+}
+
+
 void
-TDateEdit::DoUpPress()
+DateEdit::DoUpPress()
 {
 	if (fFocus == -1)
 		SectionFocus(0);
@@ -562,14 +566,15 @@ TDateEdit::DoUpPress()
 	fHoldValue += 1;
 
 	_CheckRange();
+	_UpdateFields();
 
 	// send message to change Date
-	DispatchMessage();
+	Invoke();
 }
 
 
 void
-TDateEdit::DoDownPress()
+DateEdit::DoDownPress()
 {
 	if (fFocus == -1)
 		SectionFocus(0);
@@ -578,48 +583,28 @@ TDateEdit::DoDownPress()
 	fHoldValue -= 1;
 
 	_CheckRange();
+	_UpdateFields();
 
 	// send message to change Date
-	DispatchMessage();
+	Invoke();
 }
 
 
 void
-TDateEdit::BuildDispatch(BMessage* message)
+DateEdit::PopulateMessage(BMessage* message)
 {
 	if (fFocus < 0 || fFocus >= fFieldCount)
 		return;
 
 	message->AddBool("time", false);
-
-	for (int32 index = 0; index < (int)fSectionCount; ++index) {
-		uint32 data = _SectionValue(index);
-
-		if (fFocus == index)
-			data = fHoldValue;
-
-		switch (fFields[index]) {
-			case B_DATE_ELEMENT_MONTH:
-				message->AddInt32("month", data);
-				break;
-
-			case B_DATE_ELEMENT_DAY:
-				message->AddInt32("day", data);
-				break;
-
-			case B_DATE_ELEMENT_YEAR:
-				message->AddInt32("year", data);
-				break;
-
-			default:
-				break;
-		}
-	}
+	message->AddInt32("year", fDate.Year());
+	message->AddInt32("month", fDate.Month());
+	message->AddInt32("day", fDate.Day());
 }
 
 
 void
-TDateEdit::_UpdateFields()
+DateEdit::_UpdateFields()
 {
 	time_t time = BDateTime(fDate, BTime()).Time_t();
 
@@ -640,7 +625,7 @@ TDateEdit::_UpdateFields()
 
 
 void
-TDateEdit::_CheckRange()
+DateEdit::_CheckRange()
 {
 	if (fFocus < 0 || fFocus >= fFieldCount)
 		return;
@@ -660,13 +645,21 @@ TDateEdit::_CheckRange()
 		}
 
 		case B_DATE_ELEMENT_MONTH:
+		{
 			if (value > 12)
 				value = 1;
 			else if (value < 1)
 				value = 12;
 
-			fDate.SetDate(fDate.Year(), value, fDate.Day());
+			int32 day = fDate.Day();
+			fDate.SetDate(fDate.Year(), value, 1);
+
+			// changing between months with differing amounts of days
+			while (day > fDate.DaysInMonth())
+				day--;
+			fDate.SetDate(fDate.Year(), value, day);
 			break;
+		}
 
 		case B_DATE_ELEMENT_YEAR:
 			fDate.SetDate(value, fDate.Month(), fDate.Day());
@@ -677,12 +670,12 @@ TDateEdit::_CheckRange()
 	}
 
 	fHoldValue = value;
-	Draw(Bounds());
+	Invalidate(Bounds());
 }
 
 
 bool
-TDateEdit::_IsValidDoubleDigit(int32 value)
+DateEdit::_IsValidDoubleDigit(int32 value)
 {
 	if (fFocus < 0 || fFocus >= fFieldCount)
 		return false;
@@ -721,7 +714,7 @@ TDateEdit::_IsValidDoubleDigit(int32 value)
 
 
 int32
-TDateEdit::_SectionValue(int32 index) const
+DateEdit::_SectionValue(int32 index) const
 {
 	if (index < 0 || index >= fFieldCount)
 		return 0;
@@ -749,10 +742,273 @@ TDateEdit::_SectionValue(int32 index) const
 
 
 float
-TDateEdit::PreferredHeight()
+DateEdit::PreferredHeight()
 {
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	return ceilf((fontHeight.ascent + fontHeight.descent) * 1.4);
 }
 
+
+// #pragma mark -
+
+
+SectionEdit::SectionEdit(const char* name, uint32 sections, BMessage* message)
+	:
+	BControl(name, NULL, message, B_WILL_DRAW | B_NAVIGABLE),
+	fFocus(-1),
+	fSectionCount(sections),
+	fHoldValue(0)
+{
+}
+
+
+SectionEdit::~SectionEdit()
+{
+}
+
+
+void
+SectionEdit::AttachedToWindow()
+{
+	AdoptParentColors();
+	BControl::AttachedToWindow();
+}
+
+
+void
+SectionEdit::Draw(BRect updateRect)
+{
+	DrawBorder(updateRect);
+
+	for (uint32 idx = 0; idx < fSectionCount; idx++) {
+		DrawSection(idx, FrameForSection(idx),
+			((uint32)fFocus == idx) && IsFocus());
+		if (idx < fSectionCount - 1)
+			DrawSeparator(idx, FrameForSeparator(idx));
+	}
+}
+
+
+void
+SectionEdit::MouseDown(BPoint where)
+{
+	if (IsEnabled() == false)
+		return;
+
+	MakeFocus(true);
+
+	if (fUpRect.Contains(where))
+		DoUpPress();
+	else if (fDownRect.Contains(where))
+		DoDownPress();
+	else if (fSectionCount > 0) {
+		for (uint32 idx = 0; idx < fSectionCount; idx++) {
+			if (FrameForSection(idx).Contains(where)) {
+				SectionFocus(idx);
+				return;
+			}
+		}
+	}
+}
+
+
+BSize
+SectionEdit::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, PreferredHeight()));
+}
+
+
+BSize
+SectionEdit::MinSize()
+{
+	BSize minSize;
+	minSize.height = PreferredHeight();
+	minSize.width = (SeparatorWidth() + MinSectionWidth())
+		* fSectionCount;
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
+		minSize);
+}
+
+
+BSize
+SectionEdit::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		MinSize());
+}
+
+
+BRect
+SectionEdit::FrameForSection(uint32 index)
+{
+	BRect area = SectionArea();
+	float sepWidth = SeparatorWidth();
+
+	float width = (area.Width() -
+		sepWidth * (fSectionCount - 1))
+		/ fSectionCount;
+	area.left += index * (width + sepWidth);
+	area.right = area.left + width;
+
+	return area;
+}
+
+
+BRect
+SectionEdit::FrameForSeparator(uint32 index)
+{
+	BRect area = SectionArea();
+	float sepWidth = SeparatorWidth();
+
+	float width = (area.Width() -
+		sepWidth * (fSectionCount - 1))
+		/ fSectionCount;
+	area.left += (index + 1) * width + index * sepWidth;
+	area.right = area.left + sepWidth;
+
+	return area;
+}
+
+
+void
+SectionEdit::MakeFocus(bool focused)
+{
+	if (focused == IsFocus())
+		return;
+
+	BControl::MakeFocus(focused);
+
+	if (fFocus == -1)
+		SectionFocus(0);
+	else
+		SectionFocus(fFocus);
+}
+
+
+void
+SectionEdit::KeyDown(const char* bytes, int32 numbytes)
+{
+	if (IsEnabled() == false)
+		return;
+	if (fFocus == -1)
+		SectionFocus(0);
+
+	switch (bytes[0]) {
+		case B_LEFT_ARROW:
+			fFocus -= 1;
+			if (fFocus < 0)
+				fFocus = fSectionCount - 1;
+			SectionFocus(fFocus);
+			break;
+
+		case B_RIGHT_ARROW:
+			fFocus += 1;
+			if ((uint32)fFocus >= fSectionCount)
+				fFocus = 0;
+			SectionFocus(fFocus);
+			break;
+
+		case B_UP_ARROW:
+			DoUpPress();
+			break;
+
+		case B_DOWN_ARROW:
+			DoDownPress();
+			break;
+
+		default:
+			BControl::KeyDown(bytes, numbytes);
+			break;
+	}
+	Draw(Bounds());
+}
+
+
+status_t
+SectionEdit::Invoke(BMessage* message)
+{
+	if (message == NULL)
+		message = Message();
+	if (message == NULL)
+		return BControl::Invoke(NULL);
+
+	BMessage clone(*message);
+	PopulateMessage(&clone);
+	return BControl::Invoke(&clone);
+}
+
+
+uint32
+SectionEdit::CountSections() const
+{
+	return fSectionCount;
+}
+
+
+int32
+SectionEdit::FocusIndex() const
+{
+	return fFocus;
+}
+
+
+BRect
+SectionEdit::SectionArea() const
+{
+	BRect sectionArea = Bounds().InsetByCopy(2, 2);
+	sectionArea.right -= kArrowAreaWidth;
+	return sectionArea;
+}
+
+
+void
+SectionEdit::DrawBorder(const BRect& updateRect)
+{
+	BRect bounds(Bounds());
+	bool showFocus = (IsFocus() && Window() && Window()->IsActive());
+
+	be_control_look->DrawBorder(this, bounds, updateRect, ViewColor(),
+		B_FANCY_BORDER, showFocus ? BControlLook::B_FOCUSED : 0);
+
+	// draw up/down control
+
+	bounds.left = bounds.right - kArrowAreaWidth;
+	bounds.right = Bounds().right - 2;
+	fUpRect.Set(bounds.left + 3, bounds.top + 2, bounds.right,
+		bounds.bottom / 2.0);
+	fDownRect = fUpRect.OffsetByCopy(0, fUpRect.Height() + 2);
+
+	BPoint middle(floorf(fUpRect.left + fUpRect.Width() / 2),
+		fUpRect.top + 1);
+	BPoint left(fUpRect.left + 3, fUpRect.bottom - 1);
+	BPoint right(left.x + 2 * (middle.x - left.x), fUpRect.bottom - 1);
+
+	SetPenSize(2);
+	SetLowColor(ViewColor());
+
+	if (updateRect.Intersects(fUpRect)) {
+		FillRect(fUpRect, B_SOLID_LOW);
+		BeginLineArray(2);
+			AddLine(left, middle, HighColor());
+			AddLine(middle, right, HighColor());
+		EndLineArray();
+	}
+	if (updateRect.Intersects(fDownRect)) {
+		middle.y = fDownRect.bottom - 1;
+		left.y = right.y = fDownRect.top + 1;
+
+		FillRect(fDownRect, B_SOLID_LOW);
+		BeginLineArray(2);
+			AddLine(left, middle, HighColor());
+			AddLine(middle, right, HighColor());
+		EndLineArray();
+	}
+
+	SetPenSize(1);
+}
+
+
+}	// namespace BPrivate

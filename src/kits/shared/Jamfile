@@ -36,6 +36,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			CalendarView.cpp
 			ColorQuantizer.cpp
 			CommandPipe.cpp
+			DateTimeEdit.cpp
 			DragTrackingFilter.cpp
 			DriverSettingsMessageAdapter.cpp
 			HashString.cpp
