@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src apps bin keymap ;
+
+BinCommand keymap :
+	key_map.cpp
+	Keymap.cpp
+	: be ;
