@@ -88,6 +88,10 @@ struct disk_super_block {
 	int32 Flags() const { return BFS_ENDIAN_TO_HOST_INT32(flags); }
 	off_t LogStart() const { return BFS_ENDIAN_TO_HOST_INT64(log_start); }
 	off_t LogEnd() const { return BFS_ENDIAN_TO_HOST_INT64(log_end); }
+
+	// implemented in Volume.cpp:
+	bool IsValid();
+	void Initialize(const char *name, off_t numBlocks, uint32 blockSize);
 } _PACKED;
 
 #define SUPER_BLOCK_FS_LENDIAN		'BIGE'		/* BIGE */

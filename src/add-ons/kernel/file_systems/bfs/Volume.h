@@ -31,6 +31,9 @@ enum volume_flags {
 	VOLUME_READ_ONLY	= 0x0001
 };
 
+enum volume_initialize_flags {
+	VOLUME_NO_INDICES	= 0x0001,
+};
 
 class Volume {
 	public:
@@ -39,6 +42,8 @@ class Volume {
 
 		status_t			Mount(const char *device, uint32 flags);
 		status_t			Unmount();
+		status_t			Initialize(const char *device, const char *name,
+								uint32 blockSize, uint32 flags);
 
 		bool				IsValidSuperBlock();
 		bool				IsReadOnly() const;
