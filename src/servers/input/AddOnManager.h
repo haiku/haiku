@@ -44,6 +44,10 @@ class AddOnManager : public BLooper {
 		status_t HandleControlDevices(BMessage*, BMessage*);
 		status_t HandleSystemShuttingDown(BMessage*, BMessage*);
 		status_t HandleNodeMonitor(BMessage*);
+		
+		int32 GetReplicantAt(BMessenger target, int32 index) const;
+		status_t GetReplicantName(BMessenger target, int32 uid, BMessage *reply) const;
+		status_t GetReplicantView(BMessenger target, int32 uid, BMessage *reply) const;
 	
 	private:
 		struct device_info {

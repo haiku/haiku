@@ -8,10 +8,12 @@
 
 
 #include <Autolock.h>
+#include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Path.h>
+#include <Roster.h>
 #include <String.h>
 
 #include <image.h>
@@ -21,7 +23,7 @@
 #include "AddOnManager.h"
 #include "InputServer.h"
 #include "InputServerTypes.h"
-
+#include "MethodReplicant.h"
 
 AddOnManager::AddOnManager(bool safeMode)
 	: BLooper("addon_manager"),
@@ -218,6 +220,12 @@ AddOnManager::UnregisterAddOn(BEntry &entry)
 				break;
 			}
 		}
+
+		if (fMethodList.CountItems()<=0) {
+			// we remove the method replicant
+			BDeskbar().RemoveItem(REPLICANT_CTL_NAME);
+			((InputServer*)be_app)->SetMethodReplicant(NULL);
+		}
 	} 
 
 	return B_OK;
@@ -408,6 +416,144 @@ AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, i
 	BAutolock lock2(InputServer::gInputMethodListLocker);
 	
 	InputServer::gInputMethodList.AddItem(method);
+	
+	if (((InputServer*)be_app)->MethodReplicant() == NULL) {
+		app_info info;
+        	be_app->GetAppInfo(&info);
+
+        	status_t err = BDeskbar().AddItem(&info.ref);
+        	if (err!=B_OK) {
+                	PRINTERR(("Deskbar refuses to add method replicant\n"));
+        	} 
+		BMessage request(B_GET_PROPERTY);
+		BMessenger to;
+		BMessenger status;
+
+		request.AddSpecifier("Messenger");
+		request.AddSpecifier("Shelf");
+
+		// In the Deskbar the Shelf is in the View "Status" in Window "Deskbar"
+		request.AddSpecifier("View", "Status");
+		request.AddSpecifier("Window", "Deskbar");
+		to = BMessenger("application/x-vnd.Be-TSKB", -1);
+
+		BMessage reply;
+
+		if ((to.SendMessage(&request, &reply) == B_OK) 
+			&& (reply.FindMessenger("result", &status) == B_OK)) {
+
+			// enum replicant in Status view
+			int32 index = 0;
+			int32 uid;
+			while ((uid = GetReplicantAt(status, index++)) >= B_OK) {
+				BMessage rep_info;
+				if (GetReplicantName(status, uid, &rep_info) != B_OK) {
+					continue;
+				}
+				const char *name;
+				if ((rep_info.FindString("result", &name) == B_OK) 
+					&& (strcmp(name, REPLICANT_CTL_NAME)==0)) {
+					BMessage rep_view;
+					if (GetReplicantView(status, uid, &rep_view)==0) {
+						BMessenger result;
+						if (rep_view.FindMessenger("result", &result) == B_OK) {
+							((InputServer*)be_app)->SetMethodReplicant(new BMessenger(result));
+						}
+					} 
+				}
+			}
+		}
+	}
+}
+
+
+
+
+//
+int32 
+AddOnManager::GetReplicantAt(BMessenger target, int32 index) const
+{
+	/*
+	 So here we want to get the Unique ID of the replicant at the given index
+	 in the target Shelf.
+	 */
+ 
+	BMessage request(B_GET_PROPERTY);// We're getting the ID property
+	BMessage reply;
+	status_t err;
+
+	request.AddSpecifier("ID");// want the ID
+	request.AddSpecifier("Replicant", index);// of the index'th replicant
+
+	if ((err = target.SendMessage(&request, &reply)) != B_OK)
+		return err;
+
+	int32 uid;
+	if ((err = reply.FindInt32("result", &uid)) != B_OK) 
+		return err;
+
+	return uid;
+}
+
+
+//
+status_t 
+AddOnManager::GetReplicantName(BMessenger target, int32 uid, BMessage *reply) const
+{
+	/*
+	 We send a message to the target shelf, asking it for the Name of the 
+	 replicant with the given unique id.
+	 */
+ 
+	BMessage request(B_GET_PROPERTY);
+	BMessage uid_specifier(B_ID_SPECIFIER);// specifying via ID
+	status_t err;
+	status_t e;
+
+	request.AddSpecifier("Name");// ask for the Name of the replicant
+
+	// IDs are specified using code like the following 3 lines:
+	uid_specifier.AddInt32("id", uid);
+	uid_specifier.AddString("property", "Replicant");
+	request.AddSpecifier(&uid_specifier);
+
+	if ((err = target.SendMessage(&request, reply)) != B_OK)
+		return err;
+
+	if (((err = reply->FindInt32("error", &e)) != B_OK) || (e != B_OK))
+		return err ? err : e;
+
+	return B_OK;
+}
+
+//
+status_t 
+AddOnManager::GetReplicantView(BMessenger target, int32 uid, BMessage *reply) const
+{
+	/*
+	 We send a message to the target shelf, asking it for the Name of the 
+	 replicant with the given unique id.
+	 */
+ 
+	BMessage request(B_GET_PROPERTY);
+	BMessage uid_specifier(B_ID_SPECIFIER);// specifying via ID
+	status_t err;
+	status_t e;
+
+	request.AddSpecifier("View");// ask for the Name of the replicant
+
+	// IDs are specified using code like the following 3 lines:
+	uid_specifier.AddInt32("id", uid);
+	uid_specifier.AddString("property", "Replicant");
+	request.AddSpecifier(&uid_specifier);
+
+	if ((err = target.SendMessage(&request, reply)) != B_OK)
+		return err;
+
+	if (((err = reply->FindInt32("error", &e)) != B_OK) || (e != B_OK))
+		return err ? err : e;
+
+	return B_OK;
 }
 
 

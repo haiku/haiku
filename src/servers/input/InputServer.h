@@ -80,10 +80,19 @@ class _BDeviceAddOn_
 class _BMethodAddOn_
 {
 	public:
-		_BMethodAddOn_(BInputServerMethod *method)
-			: fMethod(method) {};
+		_BMethodAddOn_(BInputServerMethod *method, const char* name, const uchar *icon);
+		~_BMethodAddOn_();
 
+		status_t SetName(const char *name);
+		status_t SetIcon(const uchar *icon);
+		status_t SetMenu(const BMenu *menu, const BMessenger &messenger);
+		status_t MethodActivated(bool activate);
+	private:	
 		BInputServerMethod *fMethod;
+		char *fName;
+		uchar fIcon[16*16*1];
+		const BMenu *fMenu;
+		BMessenger fMessenger;
 };
 
 /*****************************************************************************/
@@ -130,11 +139,11 @@ public:
 	status_t UnlockMethodQueue(void);
 	status_t LockMethodQueue(void);
 	status_t SetNextMethod(bool);
-	//SetActiveMethod(_BMethodAddOn_*);
+	void SetActiveMethod(_BMethodAddOn_*);
 	const BMessenger* MethodReplicant(void);
-
-	status_t 		EventLoop();
-	static bool     EventLoopRunning(void);
+	void SetMethodReplicant(const BMessenger *);
+	status_t EventLoop();
+	bool     EventLoopRunning(void);
 
 	bool DispatchEvents(BList*);
 	int DispatchEvent(BMessage*);
@@ -200,6 +209,9 @@ private:
 	
 	BScreen			fScreen;
 	BRect			fFrame;
+
+	_BMethodAddOn_		*fActiveMethod;
+	const BMessenger	*fReplicantMessenger;
 
 #ifndef COMPILE_FOR_R5	
 	// added this to communicate via portlink

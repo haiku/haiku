@@ -51,6 +51,9 @@ Server input_server :
 
 	SystemKeymap.cpp
 
+	MethodReplicant.cpp
+	MethodMenuItem.cpp
+
 	# storage
 	AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp

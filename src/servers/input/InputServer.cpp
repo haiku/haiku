@@ -31,6 +31,7 @@
 
 
 #include <stdio.h>
+#include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -38,11 +39,13 @@
 #include <Locker.h>
 #include <Message.h>
 #include <Path.h>
+#include <Roster.h>
 #include <String.h>
 #include <OS.h>
 
 #include "InputServer.h"
 #include "InputServerTypes.h"
+#include "MethodReplicant.h"
 
 // include app_server headers for communication
 #include <PortLink.h>
@@ -63,19 +66,30 @@ extern "C" status_t _kget_safemode_option_(char* name, uint8 *p1, uint32 *p2);
 // Static InputServer member variables.
 //
 BList   InputServer::gInputDeviceList;
-BLocker InputServer::gInputDeviceListLocker;
+BLocker InputServer::gInputDeviceListLocker("is_device_queue_sem");
 
 BList   InputServer::gInputFilterList;
-BLocker InputServer::gInputFilterListLocker;
+BLocker InputServer::gInputFilterListLocker("is_filter_queue_sem");
 
 BList   InputServer::gInputMethodList;
-BLocker InputServer::gInputMethodListLocker;
+BLocker InputServer::gInputMethodListLocker("is_method_queue_sem");
 
 DeviceManager InputServer::gDeviceManager;
 
 #if DEBUG == 2
 FILE *InputServer::sLogFile = NULL;
 #endif
+
+
+extern "C" _EXPORT BView* instantiate_deskbar_item();
+
+BView *
+instantiate_deskbar_item()
+{
+	return new MethodReplicant(INPUTSERVER_SIGNATURE);
+}
+
+
 
 /*
  *
@@ -152,7 +166,12 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	InitKeyboardMouseStates();
 	
 	fAddOnManager = new AddOnManager(SafeMode());
-	fAddOnManager->LoadState();	
+	fAddOnManager->LoadState();
+
+	//BDeskbar().AddItem(new ::MethodReplicant);
+
+	BMessenger messenger(this);
+	BRoster().StartWatching(messenger, B_REQUEST_LAUNCHED);
 }
 
 /*
@@ -457,6 +476,18 @@ InputServer::MessageReceived(BMessage *message)
 		case SYSTEM_SHUTTING_DOWN:
 			fAddOnManager->PostMessage(message);
 			return;
+		case B_SOME_APP_LAUNCHED: {
+			const char *signature;
+			if (message->FindString("be:signature", &signature)==B_OK) {
+				PRINT(("input_server : %s\n", signature));
+				if (strcmp(signature, "application/x-vnd.Be-TSKB")==0) {
+				
+				}
+			}
+			return;
+
+		}
+			break;
 		default:
 		{
 			return;		
@@ -473,8 +504,13 @@ InputServer::MessageReceived(BMessage *message)
  *   Descr: 
  */
 void
-InputServer::HandleSetMethod(BMessage *)
+InputServer::HandleSetMethod(BMessage *message)
 {
+	int32 cookie;
+	if (message->FindInt32("cookie", &cookie) == B_OK) {
+		_BMethodAddOn_ *addon = (_BMethodAddOn_*)cookie;
+		SetActiveMethod(addon);
+	}
 }
 
 
@@ -907,9 +943,10 @@ InputServer::EnqueueMethodMessage(BMessage *message)
  *   Descr: 
  */
 status_t 
-InputServer::UnlockMethodQueue(void)
+InputServer::UnlockMethodQueue()
 {
-	return 0;
+	gInputMethodListLocker.Unlock();
+	return B_OK;
 }
 
 
@@ -918,9 +955,10 @@ InputServer::UnlockMethodQueue(void)
  *   Descr: 
  */
 status_t 
-InputServer::LockMethodQueue(void)
+InputServer::LockMethodQueue()
 {
-	return 0;
+	gInputMethodListLocker.Lock();
+	return B_OK;
 }
 
 
@@ -931,6 +969,9 @@ InputServer::LockMethodQueue(void)
 status_t
 InputServer::SetNextMethod(bool)
 {
+	LockMethodQueue();
+	
+	UnlockMethodQueue();
 	return 0;
 }
 
@@ -939,12 +980,16 @@ InputServer::SetNextMethod(bool)
  *  Method: InputServer::SetActiveMethod()
  *   Descr: 
  */
-/* 
-InputServer::SetActiveMethod(_BMethodAddOn_ *)
+void
+InputServer::SetActiveMethod(_BMethodAddOn_ *addon)
 {
-	return 0;
+	if (fActiveMethod)
+		fActiveMethod->MethodActivated(false);
+	fActiveMethod = addon;
+	
+	if (fActiveMethod)
+                fActiveMethod->MethodActivated(true);
 }
-*/
 
 
 /*
@@ -952,9 +997,16 @@ InputServer::SetActiveMethod(_BMethodAddOn_ *)
  *   Descr: 
  */
 const BMessenger* 
-InputServer::MethodReplicant(void)
+InputServer::MethodReplicant()
 {
-	return NULL;
+	return fReplicantMessenger;
+}
+
+
+void
+InputServer::SetMethodReplicant(const BMessenger *messenger)
+{
+	fReplicantMessenger = messenger;
 }
 
 
@@ -968,7 +1020,7 @@ InputServer::EventLoop()
 	CALLED();
 	fEventLooperPort = create_port(100, "obos_is_event_port");
 	if(fEventLooperPort < 0) {
-		PRINTERR(("OBOS InputServer: create_port error: (0x%x) %s\n", fEventLooperPort, strerror(fEventLooperPort)));
+		PRINTERR(("InputServer: create_port error: (0x%x) %s\n", fEventLooperPort, strerror(fEventLooperPort)));
 	} 
 	fISPortThread = spawn_thread(ISPortWatcher, "_input_server_event_loop_", B_REAL_TIME_DISPLAY_PRIORITY+3, this);
 	resume_thread(fISPortThread);
@@ -984,7 +1036,7 @@ InputServer::EventLoop()
 bool 
 InputServer::EventLoopRunning(void)
 {
-	return true;
+	return fEventLooperPort > -1;
 }
 
 

@@ -29,8 +29,10 @@
 /*****************************************************************************/
 
 #include <InputServerMethod.h>
+#include <Menu.h>
 #include <Messenger.h>
 #include "InputServer.h"
+#include "InputServerTypes.h"
 
 /**
  *  Method: BInputServerMethod::BInputServerMethod()
@@ -39,7 +41,8 @@
 BInputServerMethod::BInputServerMethod(const char *name,
                                        const uchar *icon)
 {
-	fOwner = new _BMethodAddOn_(this);
+	CALLED();
+	fOwner = new _BMethodAddOn_(this, name, icon);
 }
 
 
@@ -49,6 +52,7 @@ BInputServerMethod::BInputServerMethod(const char *name,
  */
 BInputServerMethod::~BInputServerMethod()
 {
+	CALLED();
 	delete fOwner;
 }
 
@@ -82,9 +86,7 @@ BInputServerMethod::EnqueueMessage(BMessage *message)
 status_t
 BInputServerMethod::SetName(const char *name)
 {
-    status_t dummy;
-
-    return dummy;
+    return fOwner->SetName(name);
 }
 
 
@@ -95,9 +97,7 @@ BInputServerMethod::SetName(const char *name)
 status_t
 BInputServerMethod::SetIcon(const uchar *icon)
 {
-    status_t dummy;
-
-    return dummy;
+    return fOwner->SetIcon(icon);
 }
 
 
@@ -109,9 +109,7 @@ status_t
 BInputServerMethod::SetMenu(const BMenu *menu,
                             const BMessenger target)
 {
-    status_t dummy;
-
-    return dummy;
+    return fOwner->SetMenu(menu, target);
 }
 
 
@@ -155,3 +153,72 @@ BInputServerMethod::_ReservedInputServerMethod4()
 }
 
 
+_BMethodAddOn_::_BMethodAddOn_(BInputServerMethod *method, const char *name,
+	const uchar *icon)
+	: fMethod(method),
+	fMenu(NULL)
+{
+	fName = strdup(name);
+	memcpy(fIcon, icon, 16*16*1);
+}
+
+
+_BMethodAddOn_::~_BMethodAddOn_()
+{
+	free(fName);
+	delete fMenu;
+}
+
+
+status_t
+_BMethodAddOn_::SetName(const char* name)
+{
+	if (fName)
+		free(fName);
+	if (name)
+		fName = strdup(name);
+
+	BMessage msg(IS_UPDATE_NAME);
+	msg.AddInt32("cookie", (uint32)this);
+	msg.AddString("name", name);
+	return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+}
+
+
+status_t
+_BMethodAddOn_::SetIcon(const uchar* icon)
+{
+	memcpy(fIcon, icon, 16*16*1);
+
+	BMessage msg(IS_UPDATE_ICON);
+	msg.AddInt32("cookie", (uint32)this);
+	msg.AddData("icon", B_RAW_TYPE, icon, 16*16*1);
+	return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+}
+
+
+status_t
+_BMethodAddOn_::SetMenu(const BMenu *menu, const BMessenger &messenger)
+{
+	if (fMenu)
+		delete fMenu;
+	fMenu = menu;
+	fMessenger = messenger;
+	
+	BMessage msg(IS_UPDATE_MENU);
+	msg.AddInt32("cookie", (uint32)this);
+	BMessage menuMsg;
+	menu->Archive(&menuMsg);
+	msg.AddMessage("menu", &menuMsg);
+	msg.AddMessenger("target", messenger);
+	return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+}
+
+
+status_t
+_BMethodAddOn_::MethodActivated(bool activate)
+{
+	if (fMethod)
+		return fMethod->MethodActivated(activate);
+	return B_ERROR;
+}
