@@ -69,25 +69,11 @@ using BPrivate::gLooperList;
 using BPrivate::BObjectLocker;
 using BPrivate::BLooperList;
 
-typedef bool (*find_loop_pred)(_loop_data_* data, void* data);
-_loop_data_* find_loop_data(_loop_data_* begin, _loop_data_* end,
-							find_loop_pred, void* data);
-bool looper_by_port_pred(_loop_data_* looper, void* data);
-bool looper_by_tid_pred(_loop_data_* looper, void* data);
-bool looper_by_name_pred(_loop_data_* looper, void* data);
-bool looper_pred(_loop_data_* looper, void* data);
-bool empty_slot_pred(_loop_data_* looper, void* data);
-bool copy_list_pred(_loop_data_* looper, void* data);
-
 port_id _get_looper_port_(const BLooper* looper);
 bool _use_preferred_target_(BMessage* msg) { return msg->fPreferred; }
 int32 _get_message_target_(BMessage* msg) { return msg->fTarget; }
 
 uint32			BLooper::sLooperID = B_ERROR;
-uint32			BLooper::sLooperListSize = 0;
-uint32			BLooper::sLooperCount = 0;
-_loop_data_*	BLooper::sLooperList = NULL;
-BLocker			BLooper::sLooperListLock;
 team_id			BLooper::sTeamID = B_ERROR;
 
 static property_info gLooperPropInfo[] =
@@ -154,9 +140,6 @@ BLooper::~BLooper()
 	SetCommonFilterList(NULL);
 
 	BObjectLocker<BLooperList> ListLock(gLooperList);
-#if 0
-	BAutolock ListLock(sLooperListLock);
-#endif
 	RemoveHandler(this);
 	RemoveLooper(this);
 
@@ -599,9 +582,6 @@ bool BLooper::IsLocked() const
 	// We have to lock the list for the call to IsLooperValid().  Has the side
 	// effect of not letting the looper get deleted while we're here.
 	BObjectLocker<BLooperList> ListLock(gLooperList);
-#if 0
-	BAutolock ListLock(sLooperListLock);
-#endif
 
 	if (!ListLock.IsLocked())
 	{
@@ -641,19 +621,6 @@ BLooper* BLooper::LooperForThread(thread_id tid)
 	{
 		return gLooperList.LooperForThread(tid);
 	}
-#if 0
-	BAutolock ListLock(sLooperListLock);
-	if (ListLock.IsLocked())
-	{
-		_loop_data_* result = find_loop_data(sLooperList,
-											 sLooperList + sLooperCount,
-											 looper_by_tid_pred, (void*)tid);
-		if (result)
-		{
-			return result->looper;
-		}
-	}
-#endif
 
 	return NULL;
 }
@@ -872,9 +839,6 @@ status_t BLooper::_PostMessage(BMessage* msg, BHandler* handler,
 							   BHandler* reply_to)
 {
 	BObjectLocker<BLooperList> ListLock(gLooperList);
-#if 0
-	BAutolock ListLock(sLooperListLock);
-#endif
 	if (!ListLock.IsLocked())
 	{
 		return B_BAD_VALUE;
@@ -948,9 +912,6 @@ DBG(OUT("BLooper::_Lock() done 1\n"));
  */
 	{
 		BObjectLocker<BLooperList> ListLock(gLooperList);
-#if 0
-		BAutolock ListLock(sLooperListLock);
-#endif
 		if (!ListLock.IsLocked())
 		{
 			// If we can't lock, the semaphore is probably
@@ -1076,9 +1037,6 @@ void BLooper::InitData(const char* name, int32 priority, int32 port_capacity)
 	fInitPriority = priority;
 
 	BObjectLocker<BLooperList> ListLock(gLooperList);
-#if 0
-	BAutolock ListLock(sLooperListLock);
-#endif
 	AddLooper(this);
 	AddHandler(this);
 }
@@ -1419,64 +1377,6 @@ void BLooper::AddLooper(BLooper* loop)
 	{
 		gLooperList.AddLooper(loop);
 	}
-#if 0
-	if (sLooperListLock.IsLocked())
-	{
-#if defined(CHECK_ADD_LOOPER)
-		// First see if it's already been added
-		if (!IsLooperValid(loop))
-#endif
-		{
-			_loop_data_* result = find_loop_data(sLooperList,
-												 sLooperList + sLooperCount,
-												 empty_slot_pred, NULL);
-
-			uint32& looperCount = sLooperCount;			// hokey debugging aids
-			uint32& looperListSize = sLooperListSize;
-			if (!result)
-			{
-				// No empty slots; time to expand
-				if (looperCount == looperListSize)
-				{
-					// Allocate the expanded list
-					_loop_data_* temp =
-						new _loop_data_[looperListSize + DATA_BLOCK_SIZE];
-					if (!temp)
-					{
-						// Not good
-						debugger("unable to allocate looper list");
-						return;
-					}
-
-					// Transfer the existing data
-					memcpy(temp, sLooperList,
-						   sizeof (_loop_data_*) * looperListSize);
-					delete[] sLooperList;
-					sLooperList = temp;
-					looperListSize += DATA_BLOCK_SIZE;
-				}
-
-				// Whether we expanded or not, the "new" one will be at the end
-DBG(OUT("BLooper::AddLooper(): looper added at %ld\n", looperCount));
-				result = &sLooperList[looperCount];
-			}
-
-			result->looper = loop;
-			result->thread = loop->fTaskID;
-			++looperCount;
-
-			// Moved this here from InitData() because it occured to me that the
-			// looper could potentially get removed from the list between now
-			// and when we locked it in InitData().  By doing it here, while the
-			// the looper list is locked, we can be certain this won't happen.
-			loop->Lock();
-		}
-	}
-	else
-	{
-		debugger("sLooperList is not locked!");
-	}
-#endif
 }
 //------------------------------------------------------------------------------
 bool BLooper::IsLooperValid(const BLooper* l)
@@ -1485,13 +1385,6 @@ bool BLooper::IsLooperValid(const BLooper* l)
 	{
 		return gLooperList.IsLooperValid(l);
 	}
-#if 0
-	if (sLooperListLock.IsLocked())
-	{
-		return find_loop_data(sLooperList, sLooperList + sLooperCount,
-							  looper_pred, (void*)l);
-	}
-#endif
 
 	return false;
 }
@@ -1502,27 +1395,6 @@ void BLooper::RemoveLooper(BLooper* l)
 	{
 		gLooperList.RemoveLooper(l);
 	}
-#if 0
-	if (sLooperListLock.IsLocked())
-	{
-		_loop_data_* result = find_loop_data(sLooperList,
-											 sLooperList + sLooperCount,
-											 looper_pred, l);
-		if (result)
-		{
-			result->looper = NULL;
-			--sLooperCount;
-		}
-
-		// Nothing left?  Clean up; the app is probably exiting anyway
-		if (sLooperCount == 0)
-		{
-			delete[] sLooperList;
-			sLooperList = NULL;
-			sLooperListSize = 0;
-		}
-	}
-#endif
 }
 //------------------------------------------------------------------------------
 void BLooper::GetLooperList(BList* list)
@@ -1532,14 +1404,6 @@ void BLooper::GetLooperList(BList* list)
 	{
 		gLooperList.GetLooperList(list);
 	}
-#if 0
-	BAutolock ListLock(sLooperListLock);
-	if (ListLock.IsLocked())
-	{
-		find_loop_data(sLooperList, sLooperList + sLooperCount,
-					   copy_list_pred, (void*)list);
-	}
-#endif
 }
 //------------------------------------------------------------------------------
 BLooper* BLooper::LooperForName(const char* name)
@@ -1548,18 +1412,6 @@ BLooper* BLooper::LooperForName(const char* name)
 	{
 		return gLooperList.LooperForName(name);
 	}
-#if 0
-	if (sLooperListLock.IsLocked())
-	{
-		_loop_data_* result = find_loop_data(sLooperList,
-											 sLooperList + sLooperCount,
-											 looper_by_name_pred, (void*)name);
-		if (result)
-		{
-			return result->looper;
-		}
-	}
-#endif
 
 	return NULL;
 }
@@ -1570,79 +1422,12 @@ BLooper* BLooper::LooperForPort(port_id port)
 	{
 		return gLooperList.LooperForPort(port);
 	}
-#if 0
-	if (sLooperListLock.IsLocked())
-	{
-		_loop_data_* result = find_loop_data(sLooperList,
-											 sLooperList + sLooperCount,
-											 looper_by_port_pred, (void*)port);
-		if (result)
-		{
-			return result->looper;
-		}
-	}
-#endif
 
 	return NULL;
 }
 //------------------------------------------------------------------------------
 
 
-//------------------------------------------------------------------------------
-_loop_data_* find_loop_data(_loop_data_* begin, _loop_data_* end,
-							find_loop_pred predicate, void* data)
-{
-	while (begin && begin != end)
-	{
-		if (begin->looper)
-		{
-			if (predicate(begin, data))
-			{
-				return begin;
-			}
-		}
-		++begin;
-	}
-
-	return NULL;
-}
-//------------------------------------------------------------------------------
-bool looper_by_port_pred(_loop_data_* looper, void *data)
-{
-	return _get_looper_port_(looper->looper) == (port_id)data;
-}
-//------------------------------------------------------------------------------
-bool looper_by_tid_pred(_loop_data_* looper, void *data)
-{
-	return looper->thread == (thread_id)data;
-}
-//------------------------------------------------------------------------------
-bool looper_by_name_pred(_loop_data_* looper, void *data)
-{
-	return strcmp(looper->looper->Name(), (const char*)data) == 0;
-}
-//------------------------------------------------------------------------------
-bool looper_pred(_loop_data_* looper, void *data)
-{
-	return looper->looper == (BLooper*)data;
-}
-//------------------------------------------------------------------------------
-bool empty_slot_pred(_loop_data_* looper, void*)
-{
-	return looper->looper == NULL;
-}
-//------------------------------------------------------------------------------
-bool copy_list_pred(_loop_data_ *looper, void* data)
-{
-	BList* List = (BList*)data;
-	if (List && looper->looper)
-	{
-		List->AddItem(looper->looper);
-	}
-
-	// Ride this train to the end
-	return false;
-}
 //------------------------------------------------------------------------------
 port_id _get_looper_port_(const BLooper* looper)
 {

@@ -11,6 +11,7 @@
 #include "LooperForThreadTest.h"
 #include "AddCommonFilterTest.h"
 #include "RemoveCommonFilterTest.h"
+#include "LooperSizeTest.h"
 
 Test* LooperTestSuite()
 {
@@ -27,6 +28,7 @@ Test* LooperTestSuite()
 	tests->addTest(TLooperForThreadTest::Suite());
 	tests->addTest(TAddCommonFilterTest::Suite());
 	tests->addTest(TRemoveCommonFilterTest::Suite());
+	tests->addTest(TLooperSizeTest::Suite());
 
 	return tests;
 }

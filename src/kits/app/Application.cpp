@@ -160,6 +160,9 @@ property_info gApplicationPropInfo[] =
 extern const int __libc_argc;
 extern const char * const *__libc_argv;
 
+class BMenuWindow : public BWindow
+{
+};
 //------------------------------------------------------------------------------
 
 // debugging
@@ -829,7 +832,7 @@ BWindow* BApplication::window_at(uint32 index, bool incl_menus) const
 				{
 					if (count == index)
 					{
-						Window = Looper;
+						Window = dynamic_cast<BWindow*>(Looper);
 					}
 					else
 					{

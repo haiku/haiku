@@ -193,12 +193,9 @@ virtual	void			task_looper();
 		void			UnlockFully();
 
 static	uint32			sLooperID;
-static	uint32			sLooperListSize;
-static	uint32			sLooperCount;
-static	_loop_data_*	sLooperList;
-static	BLocker			sLooperListLock;
 static	team_id			sTeamID;
 
+// DEPRECATED
 static	void			AddLooper(BLooper* l);
 static	bool			IsLooperValid(const BLooper* l);
 static	void			RemoveLooper(BLooper* l);

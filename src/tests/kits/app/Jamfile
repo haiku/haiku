@@ -45,6 +45,7 @@ CommonTestLib libapptest.so
 		LooperForThreadTest.cpp
 		AddCommonFilterTest.cpp
 		RemoveCommonFilterTest.cpp
+		LooperSizeTest.cpp
 
 		# BMessageQueue
 		MessageQueueTest.cpp
