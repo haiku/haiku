@@ -252,6 +252,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 		
 	bool foundLogicalVolumeDescriptor = false;
 	bool foundUnallocatedSpaceDescriptor = false;
+	bool foundUdfImplementationUseDescriptor = false;
 	uint8 uniquePartitions = 0;
 	status_t error = B_OK;
 	
@@ -299,9 +300,13 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 
 				case TAGID_IMPLEMENTATION_USE_VOLUME_DESCRIPTOR:
 				{
-					implementation_use_descriptor *imp_use = reinterpret_cast<implementation_use_descriptor*>(tag);
-					PDUMP(imp_use);				
-					(void)imp_use;	// kill the warning		
+					implementation_use_descriptor *impUse = reinterpret_cast<implementation_use_descriptor*>(tag);
+					PDUMP(impUse);
+					if (impUse->tag().init_check(block) == B_OK
+					    && impUse->implementation_id().matches(kLogicalVolumeInfoId))
+					{
+							foundUdfImplementationUseDescriptor = true;
+					}
 					break;
 				}
 
@@ -426,8 +431,12 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 	PRINT(("found %d unique partition%s\n", uniquePartitions,
 	       (uniquePartitions == 1 ? "" : "s")));
 	
+	if (!error && !foundUdfImplementationUseDescriptor) {
+		INFORM(("WARNING: no valid udf implementation use descriptor found\n"));
+	}
 	if (!error) 
-		error = foundLogicalVolumeDescriptor && foundUnallocatedSpaceDescriptor
+		error = foundLogicalVolumeDescriptor
+		        && foundUnallocatedSpaceDescriptor
 		        ? B_OK : B_ERROR;
 	if (!error) 
 		error = uniquePartitions >= 1 ? B_OK : B_ERROR;
