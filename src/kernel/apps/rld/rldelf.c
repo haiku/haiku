@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -195,6 +195,22 @@ rld_lock()
 		rld_sem_owner = self;
 	}
 	rld_sem_count++;
+}
+
+
+char *
+getenv(const char *name)
+{
+	char **environ = gProgramArgs->envp;
+	int32 length = strlen(name);
+	int32 i;
+
+	for (i = 0; environ[i] != NULL; i++) {
+		if (!strncmp(name, environ[i], length) && environ[i][length] == '=')
+			return environ[i] + length + 1;
+	}
+
+	return NULL;
 }
 
 
