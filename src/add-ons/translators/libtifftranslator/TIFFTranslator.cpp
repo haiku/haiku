@@ -449,7 +449,7 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 	
 	// identify the document the user specified or the first document
 	// if the user did not specify which document they wanted to identify
-	if (document_index != 1 && !TIFFSetDirectory(tif, document_index - 1))
+	if (!TIFFSetDirectory(tif, document_index - 1))
 		return B_NO_TRANSLATOR;
 
 	if (outInfo) {
