@@ -165,7 +165,7 @@ status_t register_layer(const char *name, const char *type, int priority,
 	
 	release_sem(g_layers.lock);
 		
-	dprintf("layers_manager: '%s' layer, registering %s/%s type\n", layer->name, 
+	dprintf("layers_manager: '%s' layer, registering '%s/%s' type\n", layer->name, 
 		string_for_token(layer->type), string_for_token(layer->sub_type));
 	
 	if (_layer)

@@ -21,6 +21,7 @@ SimpleTest new_stack_tester :
 	Depends <installed>new_stack_tester : <network_v2-add-ons>add-ons ;
 }
 
+# for convenience: this target builds all userland new_stack modules
 NotFile userland_network_v2_modules ;
 Depends userland_network_v2_modules :
 	# the main stack modules
