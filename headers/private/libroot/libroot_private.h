@@ -1,15 +1,19 @@
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef LIBROOT_PRIVATE_H
 #define LIBROOT_PRIVATE_H
-/*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
 
 
 struct uspace_program_args;
+struct real_time_data;
 
-void __init_image(const struct uspace_program_args *);
-void __init_dlfcn(const struct uspace_program_args *);
+void __init_image(const struct uspace_program_args *args);
+void __init_dlfcn(const struct uspace_program_args *args);
+
+void __init_time(void);
+void __arch_init_time(struct real_time_data *data);
 
 
 extern char _single_threaded;
