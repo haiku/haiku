@@ -82,4 +82,6 @@ virtual	void		_ReservedListItem2();
 
 /*-------------------------------------------------------------*/
 
+#include <StringItem.h> /* to maintain compatibility */
+
 #endif /* _LIST_ITEM_H */
