@@ -46,7 +46,9 @@ public:
 	status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id = NULL, BString * out_input_name = NULL);
 	status_t SetNode(node_type type, const media_node *node, const dormant_node_info *info = NULL, const media_input *input = NULL);
 	status_t GetAllOutputs(const media_node & node, List<media_output> *list);
+	status_t GetAllOutputs(BBufferProducer *node, List<media_output> *list);
 	status_t GetAllInputs(const media_node & node, List<media_input> *list);
+	status_t GetAllInputs(BBufferConsumer *node, List<media_input> *list);
 	status_t PublishOutputs(const media_node & node, List<media_output> *list);
 	status_t PublishInputs(const media_node & node, List<media_input> *list);
 	
