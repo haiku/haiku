@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src tests kernel core util ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src tests kits app ] ;
 
 # Two versions of the test lib are not really needed until
 # we start linking to Be libraries, but it doesn't hurt...
@@ -8,6 +9,7 @@ CommonTestLib libkernelutilstest.so
 	: KernelUtilsTestAddon.cpp
 #	  AVLTreeMapTest.cpp
 	  SinglyLinkedListTest.cpp
+	  VectorTest.cpp
 	: stdc++.r4
 	: stdc++.r4
 	:
