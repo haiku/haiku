@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#include "builtin_fs.h"
 
 // ToDo: handles file names suboptimally - it has all file names
 //	in a singly linked list, no hash lookups or whatever.
@@ -1251,10 +1250,32 @@ pipefs_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
 }
 
 
-//	#pragma mark -
+static status_t
+pipefs_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			return B_OK;
 
+		case B_MODULE_UNINIT:
+			return B_OK;
 
-static struct fs_ops pipefs_ops = {
+		default:
+			return B_ERROR;
+	}
+}
+
+}	// namespace pipefs
+
+using namespace pipefs;
+
+file_system_info gPipeFileSystem = {
+	{
+		"file_systems/pipefs" B_CURRENT_FS_API_VERSION,
+		0,
+		pipefs_std_ops,
+	},
+
 	&pipefs_mount,
 	&pipefs_unmount,
 	NULL,
@@ -1308,12 +1329,3 @@ static struct fs_ops pipefs_ops = {
 	NULL,
 };
 
-}	// namespace pipefs
-
-extern "C" status_t
-bootstrap_pipefs(void)
-{
-	TRACE(("bootstrap_pipefs: entry\n"));
-
-	return vfs_register_file_system("pipefs", &pipefs::pipefs_ops);
-}

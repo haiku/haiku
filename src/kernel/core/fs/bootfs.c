@@ -19,8 +19,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "builtin_fs.h"
-
 
 #define BOOTFS_TRACE 0
 #if BOOTFS_TRACE
@@ -909,17 +907,52 @@ bootfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 
 
 static status_t
-bootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int statMask)
+bootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, uint32 statMask)
 {
 	// cannot change anything
 	return EROFS;
 }
 
 
-//	#pragma mark -
+static status_t
+bootfs_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+		{
+			area_id area;
+			area_info areaInfo;
+
+			// find the bootdir and set it up
+			area = find_area("bootdir");
+			if (area < 0) {
+				dprintf("bootstrap_bootfs: no bootdir area found!\n");
+				return B_ENTRY_NOT_FOUND;
+			}
+
+			get_area_info(area, &areaInfo);
+			bootdir = (char *)areaInfo.address;
+			bootdir_len = areaInfo.size;
+			bootdir_region = areaInfo.area;
+			return B_OK;
+		}
+
+		case B_MODULE_UNINIT:
+			return B_OK;
+
+		default:
+			return B_ERROR;
+	}
+}
 
 
-static struct fs_ops bootfs_ops = {
+file_system_info gBootFileSystem = {
+	{
+		"file_systems/bootfs" B_CURRENT_FS_API_VERSION,
+		0,
+		bootfs_std_ops,
+	},
+
 	&bootfs_mount,
 	&bootfs_unmount,
 	&bootfs_read_fs_info,
@@ -972,28 +1005,3 @@ static struct fs_ops bootfs_ops = {
 	// the other operations are not supported (attributes, indices, queries)
 	NULL,
 };
-
-
-status_t
-bootstrap_bootfs(void)
-{
-	area_id area;
-	area_info areaInfo;
-
-	TRACE(("bootstrap_bootfs: entry\n"));
-
-	// find the bootdir and set it up
-	area = find_area("bootdir");
-	if (area < 0)
-		panic("bootstrap_bootfs: no bootdir area found!\n");
-
-	get_area_info(area, &areaInfo);
-	bootdir = (char *)areaInfo.address;
-	bootdir_len = areaInfo.size;
-	bootdir_region = areaInfo.area;
-
-	TRACE(("bootstrap_bootfs: found bootdir at %p\n", bootdir));
-
-	return vfs_register_file_system("bootfs", &bootfs_ops);
-}
-

@@ -20,8 +20,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "builtin_fs.h"
-
 
 //#define TRACE_ROOTFS
 #ifdef TRACE_ROOTFS
@@ -889,7 +887,7 @@ rootfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 
 
 static status_t
-rootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
+rootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, uint32 statMask)
 {
 #ifdef TRACE_ROOTFS
 	struct rootfs_vnode *v = _v;
@@ -901,10 +899,29 @@ rootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_
 }
 
 
-//	#pragma mark -
+static status_t
+rootfs_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			return B_OK;
+
+		case B_MODULE_UNINIT:
+			return B_OK;
+
+		default:
+			return B_ERROR;
+	}
+}
 
 
-static struct fs_ops rootfs_ops = {
+file_system_info gRootFileSystem = {
+	{
+		"file_systems/rootfs" B_CURRENT_FS_API_VERSION,
+		0,
+		rootfs_std_ops,
+	},
+
 	&rootfs_mount,
 	&rootfs_unmount,
 	NULL,
@@ -958,11 +975,3 @@ static struct fs_ops rootfs_ops = {
 	NULL,
 };
 
-
-status_t
-bootstrap_rootfs(void)
-{
-	TRACE(("bootstrap_rootfs: entry\n"));
-
-	return vfs_register_file_system("rootfs", &rootfs_ops);
-}
