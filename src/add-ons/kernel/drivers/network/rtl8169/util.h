@@ -1,3 +1,6 @@
+/* Realtek RTL8169 Family Driver
+ * Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
+ */
 #ifndef __UTIL_H
 #define __UTIL_H
 
