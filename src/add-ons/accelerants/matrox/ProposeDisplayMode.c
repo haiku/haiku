@@ -4,7 +4,7 @@
 
 	Other authors for MGA driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-12/2003
+	Rudolf Cornelissen 9/2002-1/2004
 */
 
 #define MODULE_BIT 0x00400000
@@ -340,7 +340,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		case DUALHEAD_SWITCH:
 			if ((((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
 					(row_bytes * (target->virtual_height + vblank_fix))) &&
-			 	((row_bytes / bpp) >= (target->timing.h_display * 2)))
+			 	((uint16)(row_bytes / bpp) >= (target->timing.h_display * 2)))
 			{
 				target->flags |= DUALHEAD_CAPABLE;
 			}
@@ -415,7 +415,6 @@ status_t GET_MODE_LIST(display_mode *dm)
 	memcpy(dm, my_mode_list, si->mode_count * sizeof(display_mode));
 	return B_OK;
 }
-
 
 /* Create a list of display_modes to pass back to the caller.*/
 status_t create_mode_list(void) {

@@ -47,6 +47,7 @@ status_t SYNC_TO_TOKEN(sync_token *st);
 
 void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count);
 void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count);
+void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count);
 void FILL_RECTANGLE(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
 void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count);
 
@@ -62,5 +63,7 @@ status_t GET_OVERLAY_CONSTRAINTS(const display_mode *dm, const overlay_buffer *o
 overlay_token ALLOCATE_OVERLAY(void);
 status_t RELEASE_OVERLAY(overlay_token ot);
 status_t CONFIGURE_OVERLAY(overlay_token ot, const overlay_buffer *ob, const overlay_window *ow, const overlay_view *ov);
+
+status_t create_mode_list(void);
 
 #endif

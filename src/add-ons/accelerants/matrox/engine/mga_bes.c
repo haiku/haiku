@@ -1,5 +1,5 @@
 /* G200-G550 Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-04/2003 */
+/* Written by Rudolf Cornelissen 05/2002-1/2004 */
 
 #define MODULE_BIT 0x00000200
 
@@ -631,7 +631,7 @@ status_t gx00_configure_bes
 	 * upto 360Mhz. So snooze about 4uS to prevent bus-congestion... 
 	 * Appr. 200 lines time will provide enough room even on a 100Mhz CPU if it's
 	 * screen is set to the highest refreshrate/resolution possible. */
-	while (CR1R(VCOUNT) > (si->dm.timing.v_total - 200)) snooze(4);
+	while ((uint16)CR1R(VCOUNT) > (si->dm.timing.v_total - 200)) snooze(4);
 
 
 	/**************************************

@@ -2,7 +2,7 @@
 /* some bits are hacks, where PINS is not known */
 /* Authors:
    Mark Watson 2/2000,
-   Rudolf Cornelissen 10/2002-4/2003
+   Rudolf Cornelissen 10/2002-1/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -151,9 +151,9 @@ status_t pins1_read(uint8 *pins, uint8 length)
 	si->ps.max_dac1_clock_32 = pins[22];//ramdac
 	si->ps.max_pixel_vco = (pins[25] << 8) | pins[24];//PCLK
 	si->ps.std_engine_clock = (pins[29] << 8) | pins[28];
-	if (((pins[31] << 8) | pins[30]) < si->ps.std_engine_clock)
+	if ((uint32)((pins[31] << 8) | pins[30]) < si->ps.std_engine_clock)
 		si->ps.std_engine_clock = (pins[31] << 8) | pins[30];
-	if (((pins[33] << 8) | pins[32]) < si->ps.std_engine_clock)
+	if ((uint32)((pins[33] << 8) | pins[32]) < si->ps.std_engine_clock)
 		si->ps.std_engine_clock = (pins[33] << 8) | pins[32];
 
 //temp. test to see some vals..

@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-12/2003.
+	Rudolf Cornelissen 10/2002-1/2004.
 */
 
 #define MODULE_BIT 0x00800000
@@ -12,9 +12,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "acc_std.h"
-
-/* defined in ProposeDisplayMode.c */
-extern status_t create_mode_list(void);
 
 static status_t init_common(int the_fd);
 

@@ -1,7 +1,7 @@
 /* MGA Acceleration functions */
 /* Authors:
    Mark Watson 2/2000,
-   Rudolf Cornelissen 10/2002-11/2003.
+   Rudolf Cornelissen 10/2002-1/2004.
 */
 
 #define MODULE_BIT 0x00080000
@@ -154,10 +154,10 @@ status_t gx00_acc_init()
 
 	if (si->ps.card_type >= G200) {
 		/*DSTORG - location of active screen in framebuffer*/
-		ACCW(DSTORG,(si->fbc.frame_buffer)-(si->framebuffer));
+		ACCW(DSTORG,((uint8*)si->fbc.frame_buffer) - ((uint8*)si->framebuffer));
 
 		/*SRCORG - init source address - same as dest*/
-		ACCW(SRCORG,(si->fbc.frame_buffer)-(si->framebuffer));
+		ACCW(SRCORG,((uint8*)si->fbc.frame_buffer) - ((uint8*)si->framebuffer));
 	}
 
 	/* init YDSTORG - apsed, if not inited, BitBlts may fails on <= G200 */
