@@ -25,7 +25,6 @@
 #include <elf_priv.h>
 #include <boot/elf.h>
 
-#include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -1074,6 +1073,9 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 		char *regionAddress;
 		region_id id;
 
+		if (pheaders[i].p_type != PT_LOAD)
+			continue;
+
 		regionAddress = (char *)ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
 		if (pheaders[i].p_flags & PF_WRITE) {
 			/*
@@ -1094,7 +1096,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
 				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
 			if (id < 0) {
-				dprintf("error allocating region!\n");
+				dprintf("error allocating region: %s!\n", strerror(id));
 				err = B_NOT_AN_EXECUTABLE;
 				goto error;
 			}
