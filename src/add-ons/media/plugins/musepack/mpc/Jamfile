@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src add-ons media plugins musepack mpc ;
+
+StaticLibrary musepack :
+	bitstream.cpp
+	huffsv46.cpp
+	huffsv7.cpp
+	idtag.cpp
+	in_mpc.cpp
+	mpc_dec.cpp
+	requant.cpp
+	synth_filter.cpp
+	;
+
+LinkSharedOSLibs musepack : be libmedia.so ;
