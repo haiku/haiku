@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src add-ons kernel busses ide ;
+
+SubInclude OBOS_TOP src add-ons kernel busses ide generic_ide_pci ;
+SubInclude OBOS_TOP src add-ons kernel busses ide ide_isa ;
+SubInclude OBOS_TOP src add-ons kernel busses ide promise_tx2 ;

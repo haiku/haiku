@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src add-ons kernel busses ide ide_isa ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon ide_isa : kernel busses ide :
+	ide_isa.c
+	;

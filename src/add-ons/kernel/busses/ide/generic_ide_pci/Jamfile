@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src add-ons kernel busses ide generic_ide_pci ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon generic_ide_pci : kernel busses ide :
+	generic_ide_pci.c
+	;

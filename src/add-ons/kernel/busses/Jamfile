@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src add-ons kernel busses ; 
 
+SubInclude OBOS_TOP src add-ons kernel busses ide ;
 SubInclude OBOS_TOP src add-ons kernel busses usb ;
