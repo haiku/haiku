@@ -32,7 +32,6 @@ StdBinCommands
 	rmattr.cpp
 	safemode.c
 	sleep.cpp
-	strace.cpp
 	sysinfo.c
 	unchop.c
 	unmount.c
@@ -126,6 +125,7 @@ SubInclude OBOS_TOP src apps bin pc ;
 #SubInclude OBOS_TOP src apps bin sed ;
 SubInclude OBOS_TOP src apps bin sed-4.0.9 ;
 SubInclude OBOS_TOP src apps bin sharutils-4.2.1 ;
+SubInclude OBOS_TOP src apps bin strace ;
 SubInclude OBOS_TOP src apps bin vim ;
 SubInclude OBOS_TOP src apps bin zic ;
 
