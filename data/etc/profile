@@ -5,6 +5,9 @@
 
 echo -e "\nWelcome to the Haiku shell.\n"
 
+# switch to $HOME
+cd
+
 export PS1="\w>"
 export HISTFILESIZE=50
 
