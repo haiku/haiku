@@ -9,4 +9,5 @@ SUPPORT_KIT_SOURCE =
 	StopWatch.cpp
 	String.cpp
 	string_helper.cpp
+#	StreamIO.cpp
 ;

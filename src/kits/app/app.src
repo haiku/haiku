@@ -3,6 +3,7 @@ APP_KIT_SOURCE =
 	AppMisc.cpp
 	AppServerLink.cpp
 	Cursor.cpp
+	DataBuffer.cpp
 	Clipboard.cpp
 	Handler.cpp
 	InitTerminateLibBe.cpp
@@ -10,10 +11,13 @@ APP_KIT_SOURCE =
 	Looper.cpp
 	LooperList.cpp
 	Message.cpp
+	MessageBody.cpp
+	MessageField.cpp
 	MessageFilter.cpp
 	MessageQueue.cpp
 	MessageRunner.cpp
 	Messenger.cpp
+	MessageUtils.cpp
 	PropertyInfo.cpp
 	PortLink.cpp
 	RegistrarDefs.cpp

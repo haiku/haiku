@@ -1,0 +1,76 @@
+//------------------------------------------------------------------------------
+//	DataBuffer.h
+//
+//------------------------------------------------------------------------------
+
+#ifndef DATABUFFER_H
+#define DATABUFFER_H
+
+// Standard Includes -----------------------------------------------------------
+
+// System Includes -------------------------------------------------------------
+#include <SupportDefs.h>
+
+// Project Includes ------------------------------------------------------------
+
+// Local Includes --------------------------------------------------------------
+
+// Local Defines ---------------------------------------------------------------
+
+// Globals ---------------------------------------------------------------------
+
+namespace BPrivate {
+
+class BDataBuffer
+{
+	public:
+		BDataBuffer(size_t len);
+		BDataBuffer(void* data, size_t len);
+		BDataBuffer(const BDataBuffer& rhs);
+		~BDataBuffer();
+
+		BDataBuffer& operator=(const BDataBuffer& rhs);
+
+		size_t		BufferSize() const;
+		const void*	Buffer();
+
+	private:
+		class BDataReference
+		{
+			public:
+				void	Acquire(BDataReference*& ref);
+				void	Release(BDataReference*& ref);
+
+				char*	Data()			{ return data; }
+				size_t	Size() const	{ return size; }
+				int32	Count()			{ return count; }
+
+				static void	Create(void* data, size_t len, BDataReference*& ref);
+				static void Create(size_t len, BDataReference*& ref);
+
+			private:
+				BDataReference(void* data, size_t len);
+				BDataReference(size_t len);
+				~BDataReference();
+
+				char*	data;
+				size_t	size;
+				int32	count;
+		};
+
+		BDataBuffer();	// No default construction allowed!
+
+		BDataReference*	fDataRef;
+};
+
+}	// namespace BPrivate
+
+#endif	// DATABUFFER_H
+
+/*
+ * $Log $
+ *
+ * $Id  $
+ *
+ */
+
