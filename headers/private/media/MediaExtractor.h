@@ -3,6 +3,7 @@
 
 #include "ReaderPlugin.h"
 #include "DecoderPlugin.h"
+#include "ChunkCache.h"
 
 namespace BPrivate {
 namespace media {
@@ -14,6 +15,7 @@ struct stream_info
 	bool			hasCookie;
 	void *			infoBuffer;
 	int32			infoBufferSize;
+	ChunkCache *	chunkCache;
 	media_format	encodedFormat;
 };
 
@@ -42,10 +44,17 @@ public:
 
 	status_t		CreateDecoder(int32 stream, Decoder **decoder, media_codec_info *mci);
 
+private:
+	static int32	extractor_thread(void *arg);
+	void			ExtractorThread();
 
 private:
 	status_t		fErr;
-
+	
+	sem_id			fExtractorWaitSem;
+	thread_id		fExtractorThread;
+	volatile bool	fTerminateExtractor;
+	
 	BDataIO			*fSource;
 	Reader			*fReader;
 	
