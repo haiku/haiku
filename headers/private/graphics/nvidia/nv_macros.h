@@ -437,7 +437,7 @@
 #define NVACC_PR_CTX1_E		0x00711504
 #define NVACC_PR_CTX2_E		0x00711508
 #define NVACC_PR_CTX3_E		0x0071150c
-/* used RAMHT registers (hash-table(?)) */
+/* used RAMHT registers (hash-table) */
 #define NVACC_HT_HANDL_00	0x00710000
 #define NVACC_HT_VALUE_00	0x00710004
 #define NVACC_HT_HANDL_01	0x00710008
@@ -557,6 +557,7 @@
 /* Nvidia PCI direct DAC registers (32bit) */
 /* primary head */
 #define NVDAC_CURPOS		0x00680300
+#define NVDAC_NV10_CURSYNC	0x00680404
 #define NVDAC_PIXPLLC		0x00680508
 #define NVDAC_PLLSEL		0x0068050c
 #define NVDAC_OUTPUT		0x0068052c
