@@ -293,6 +293,7 @@ extern status_t		receive_data(thread_id *sender, void *buffer, size_t buffer_siz
 extern bool			has_data(thread_id thread);
 
 extern status_t		snooze(bigtime_t amount);
+extern status_t		snooze_etc(bigtime_t amount, int timeBase, uint32 flags);
 extern status_t		snooze_until(bigtime_t time, int timeBase);
 
 /* system private, use macros instead */
