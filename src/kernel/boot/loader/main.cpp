@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -92,6 +92,10 @@ main(stage2_args *args)
 			register_boot_file_system(volume);
 			load_modules(args, volume);
 
+			// set up kernel args version info
+			gKernelArgs.kernel_args_size = sizeof(kernel_args);
+			gKernelArgs.version = CURRENT_KERNEL_ARGS_VERSION;
+
 			// ToDo: cleanup, heap_release() etc.
 			platform_start_kernel();
 		}
@@ -101,18 +105,3 @@ out:
 	heap_release(args);
 	return 0;
 }
-
-#if 0
-
-void
-load_kernel(void *deviceHandle)
-{
-	void *handle = open(deviceHandle, "system/kernel");
-	if (handle == NULL)
-		panic("Could not open kernel from boot device!\n");
-
-	/* load kernel into memory and relocate it */
-}
-
-#endif
-
