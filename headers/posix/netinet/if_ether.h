@@ -36,8 +36,6 @@
 #ifndef NETINET_IF_ETHER_H
 #define NETINET_IF_ETHER_H
 
-#include <kernel/OS.h>
-
 #include "net/if_arp.h"
 
 /*
