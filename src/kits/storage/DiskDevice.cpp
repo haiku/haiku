@@ -117,6 +117,13 @@ BDiskDevice::Eject(bool update)
 	return B_ERROR;
 }
 
+// SetTo
+status_t
+BDiskDevice::SetTo(partition_id id)
+{
+	return _SetTo(id, true, false, 0);
+}
+
 // Update
 /*!	\brief Updates the object to reflect the latest changes to the device.
 
@@ -184,8 +191,16 @@ BDiskDevice::Update(bool *updated)
 void
 BDiskDevice::Unset()
 {
+	BPartition::_Unset();
 	free(fDeviceData);
 	fDeviceData = NULL;
+}
+
+// InitCheck
+status_t
+BDiskDevice::InitCheck() const
+{
+	return (fDeviceData ? B_OK : B_NO_INIT);
 }
 
 // GetPath
@@ -201,16 +216,27 @@ BDiskDevice::GetPath(BPath *path) const
 bool
 BDiskDevice::IsModified() const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK && _IsShadow()
+			&& _kern_is_disk_device_modified(ID()));
 }
 
 // PrepareModifications
 status_t
 BDiskDevice::PrepareModifications()
 {
-	// not implemented
-	return B_ERROR;
+	// check initialization
+	status_t error = InitCheck();
+	if (error != B_OK)
+		return error;
+	if (_IsShadow())
+		return B_ERROR;
+	// ask kernel to prepare for modifications
+	error = _kern_prepare_disk_device_modifications(ID());
+	if (error != B_OK)
+		return error;
+	// update
+	// TODO: Add an _Update(bool shadow)?
+	return _SetTo(ID(), true, true, 0);
 }
 
 // CommitModifications
@@ -227,13 +253,21 @@ BDiskDevice::CommitModifications(bool synchronously,
 status_t
 BDiskDevice::CancelModifications()
 {
-	// not implemented
-	return B_ERROR;
+	status_t error = InitCheck();
+	if (error != B_OK)
+		return error;
+	if (!_IsShadow())
+		return B_BAD_VALUE;
+	error = _kern_cancel_disk_device_modifications(ID());
+	if (error == B_OK)
+		error = _SetTo(ID(), true, false, 0);
+	return error;
 }
 
 // _SetTo
 status_t
-BDiskDevice::_SetTo(partition_id id, size_t neededSize)
+BDiskDevice::_SetTo(partition_id id, bool deviceOnly, bool shadow,
+					size_t neededSize)
 {
 	Unset();
 	// get the device data
@@ -248,7 +282,7 @@ BDiskDevice::_SetTo(partition_id id, size_t neededSize)
 	}
 	status_t error = B_OK;
 	do {
-		error = _kern_get_disk_device_data(id, false,
+		error = _kern_get_disk_device_data(id, deviceOnly, shadow,
 										   (user_disk_device_data*)buffer,
 										   bufferSize, &neededSize);
 		if (error == B_BUFFER_OVERFLOW) {
@@ -282,11 +316,10 @@ BDiskDevice::_SetTo(user_disk_device_data *data)
 	status_t error = BPartition::_SetTo(this, NULL,
 										&fDeviceData->device_partition_data);
 	if (error != B_OK) {
-		// Don't call Unset() here. If _SetTo() fails, the caller retains
-		// ownership of the supplied data.
-		// TODO: Maybe introduce a _Unset() to avoid potential future
-		// problems.
+		// If _SetTo() fails, the caller retains ownership of the supplied
+		// data. So, unset fDeviceData before calling Unset().
 		fDeviceData = NULL;
+		Unset();
 	}
 	return error;
 }

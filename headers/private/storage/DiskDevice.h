@@ -22,8 +22,10 @@ public:
 
 	status_t Eject(bool update = false);
 
+	status_t SetTo(partition_id id);
 	status_t Update(bool *updated = NULL);
 	void Unset();
+	status_t InitCheck() const;
 
 	virtual status_t GetPath(BPath *path) const;
 
@@ -38,7 +40,8 @@ private:
 	friend class BDiskDeviceList;
 	friend class BDiskDeviceRoster;
 
-	status_t _SetTo(partition_id id, size_t neededSize = 0);
+	status_t _SetTo(partition_id id, bool deviceOnly, bool shadow,
+					size_t neededSize);
 	status_t _SetTo(user_disk_device_data *data);
 
 	virtual bool _AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level);
