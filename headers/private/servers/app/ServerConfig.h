@@ -4,7 +4,9 @@
 // This is defined to place the server in test mode, which modifies certain things like
 // system keyboard shortcuts. Note that it is possible, though senseless, to place it in
 // regular mode and still use a display driver which depends on the R5 app_server
-#define TEST_MODE
+#ifndef TEST_MODE
+	#define TEST_MODE 1
+#endif
 
 // The ViewDriver is a BView/BWindow combination. Plenty of functionality,
 // but dog-slow.

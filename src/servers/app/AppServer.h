@@ -26,10 +26,10 @@ class BitmapManager;
 	application start and quit messages. It also starts the housekeeping threads
 	and initializes most of the server's globals.
 */
-#ifndef TEST_MODE
-class AppServer
-#else
+#if TEST_MODE
 class AppServer : public BApplication
+#else
+class AppServer
 #endif
 {
 public:

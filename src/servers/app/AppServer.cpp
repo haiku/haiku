@@ -85,7 +85,7 @@ ColorSet gui_colorset;
 	This loads the default fonts, allocates all the major global variables, spawns the main housekeeping
 	threads, loads user preferences for the UI and decorator, and allocates various locks.
 */
-#ifdef TEST_MODE
+#if TEST_MODE
 AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE)
 #else
 AppServer::AppServer(void)
