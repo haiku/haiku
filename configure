@@ -90,5 +90,6 @@ cat << EOF > BuildConfig
 FLOPPY_PATH		?= "$floppy" ;
 GCC_PATH		?= ${GCC_PATH} ;
 BOCHS_E9_HACK	?= $bochs_debug ;
+BOCHS_INPUT_HACK	?= $bochs_debug ;
 EOF
 

@@ -90,6 +90,7 @@ if $(DEBUG) {
 KERNEL_CCFLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc" ;
 KERNEL_CCFLAGS += "-fno-builtin -D$(OBOS_TARGET_DEFINE) " ;
 KERNEL_CCFLAGS += "-DBOCHS_E9_HACK=$(BOCHS_E9_HACK) " ;
+KERNEL_CCFLAGS += "-DBOCHS_INPUT_HACK=$(BOCHS_INPUT_HACK) " ;
 
 # Instructs the Library rule to not make its object files temporary.
 # This is need as some objects are used in a static library and for an
