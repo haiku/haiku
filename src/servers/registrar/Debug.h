@@ -40,6 +40,7 @@
 	#define RETURN_ERROR(err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); return _status;}
 	#define SET_ERROR(var, err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); var = _status; }
 	#define FATAL(x) { __out(DEBUG_APP ": "); __out x; }
+	#define ERROR(x) { __out(DEBUG_APP ": "); __out x; }
 	#define INFORM(x) { __out(DEBUG_APP ": "); __out x; }
 	#define FUNCTION(x) { __out(DEBUG_APP ": %s() ",__FUNCTION__); __out x; }
 	#define FUNCTION_START() { __out(DEBUG_APP ": %s()\n",__FUNCTION__); }
@@ -51,6 +52,7 @@
 	#define RETURN_ERROR(status) return status;
 	#define SET_ERROR(var, err) var = err;
 	#define FATAL(x) { __out(DEBUG_APP ": "); __out x; }
+	#define ERROR(x) { __out(DEBUG_APP ": "); __out x; }
 	#define INFORM(x) { __out(DEBUG_APP ": "); __out x; }
 	#define FUNCTION(x) ;
 	#define FUNCTION_START() ;
