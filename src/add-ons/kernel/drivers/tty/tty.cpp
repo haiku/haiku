@@ -458,7 +458,9 @@ tty_ioctl(struct tty *tty, uint32 op, void *buffer, size_t length)
 		case TCSETA:
 		case TCSETAW:
 		case TCSETAF:
-			TRACE(("tty: set attributes\n"));
+			TRACE(("tty: set attributes (iflag = %lx, oflag = %lx, cflag = %lx, lflag = %lx)\n",
+				tty->termios.c_iflag, tty->termios.c_oflag, tty->termios.c_cflag, tty->termios.c_lflag));
+
 			return user_memcpy(&tty->termios, buffer, sizeof(struct termios));
 
 		/* get and set process group ID */
@@ -544,7 +546,11 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 	size_t length = *_length;
 	size_t bytesWritten = 0;
 	bool dontBlock = (mode & O_NONBLOCK) != 0;
-	bool echo = (source->termios.c_lflag & ECHO) != 0;
+
+	bool echo = (target->termios.c_lflag & ECHO) != 0;
+		// Confusingly enough, we need to echo when the target's ECHO flag is
+		// set. That's because our target is supposed to echo back at us, not
+		// to itself.
 
 	// ToDo: "buffer" is not yet copied or accessed in a safe way!
 
@@ -601,16 +607,18 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 }
 
 
-status_t 
+status_t
 tty_select(struct tty *tty, uint8 event, uint32 ref, selectsync *sync)
 {
+	TRACE(("tty_select(event = %u, ref = %lu, sync = %p\n", event, ref, sync));
 	return B_OK;
 }
 
 
-status_t 
+status_t
 tty_deselect(struct tty *tty, uint8 event, selectsync *sync)
 {
+	TRACE(("tty_deselect(event = %u, sync = %p\n", event, sync));
 	return B_OK;
 }
 
