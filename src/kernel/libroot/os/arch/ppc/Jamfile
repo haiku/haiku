@@ -2,15 +2,14 @@ SubDir OBOS_TOP src kernel libroot os arch ppc ;
 
 KernelMergeObject os_arch_$(OBOS_ARCH).o :
 	<$(SOURCE_GRIST)>atomic.S
-#	<$(SOURCE_GRIST)>cpuid.S
 #	<$(SOURCE_GRIST)>systeminfo.c
-#	<$(SOURCE_GRIST)>thread.c
-#	<$(SOURCE_GRIST)>tls.c
+	<$(SOURCE_GRIST)>system_time.S
+	<$(SOURCE_GRIST)>tls.c
 	:
 	-fPIC -DPIC
 	;
 
 MergeObjectFromObjects kernel_os_arch_$(OBOS_ARCH).o :
 	<$(SOURCE_GRIST)>atomic.o
-	#<$(SOURCE_GRIST)>cpuid.o
+	<$(SOURCE_GRIST)>system_time.S
 	;
