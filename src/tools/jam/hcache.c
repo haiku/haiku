@@ -348,10 +348,16 @@ hcache (TARGET *t, LIST *hdrscan)
 {
     HCACHEDATA  cachedata, *c = &cachedata;
     LIST 	*l = 0;
+    char _normalizedPath[PATH_MAX];
+    char *normalizedPath = normalize_path(t->boundname, _normalizedPath,
+    	sizeof(_normalizedPath));
 
     ++queries;
 
-    c->boundname = t->boundname;
+    if (normalizedPath)
+	c->boundname = normalizedPath;
+    else
+	c->boundname = t->boundname;
 
     if (hashcheck (hcachehash, (HASHDATA **) &c))
     {

@@ -338,7 +338,7 @@ find_jcache_entry(jamfile_cache* cache, char* filename)
 {
 	jcache_entry _entry;
 	jcache_entry* entry = &_entry;
-entry->filename = filename;
+	entry->filename = filename;
 	if (!hashcheck(cache->entries, (HASHDATA**)&entry))
 		entry = 0;
 	return entry;
@@ -624,12 +624,18 @@ jcache_done(void)
 			contents of the specified file, or 0, if an error occured.
 */
 char**
-jcache(char *filename)
+jcache(char *_filename)
 {
 	char** strings = 0;
 	jamfile_cache* cache = get_jcache();
-	// get file time
 	time_t time;
+	// normalize the filename
+    char _normalizedPath[PATH_MAX];
+    char *filename = normalize_path(_filename, _normalizedPath,
+    	sizeof(_normalizedPath));
+    if (!filename)
+    	filename = _filename;
+	// get file time
 	if (!cache)
 		return 0;
 	if (file_time(filename, &time) == 0) {
