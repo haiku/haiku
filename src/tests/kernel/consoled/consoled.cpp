@@ -270,6 +270,7 @@ start_process(int argc, const char **argv, struct console *con)
 	pid = load_image(argc, argv, (const char **)environ);
 	resume_thread(pid);
 	setpgid(pid, 0);
+	tcsetpgrp(con->tty_slave_fd, pid);
 
 	dup2(saved_stdin, 0);
 	dup2(saved_stdout, 1);
