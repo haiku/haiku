@@ -18,6 +18,11 @@ class _EXPORT BTextMailComponent;
 #include <MailContainer.h>
 #include <mail_util.h>
 
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
+
+using namespace BPrivate ;
+
 struct CharsetConversionEntry
 {
 	const char *charset;
@@ -256,7 +261,7 @@ BMailComponent::SetToRFC822(BPositionIO *data, size_t /*length*/, bool /*parse_n
 
 status_t
 BMailComponent::RenderToRFC822(BPositionIO *render_to) {
-	int32 charset = B_ISO1_CONVERSION;
+	int32 charset = B_ISO15_CONVERSION;
 	int8 encoding = quoted_printable;
 	const char *key, *value;
 	char *allocd;
@@ -371,7 +376,7 @@ void BMailComponent::_ReservedComponent5() {}
 BTextMailComponent::BTextMailComponent(const char *text, uint32 defaultCharSet)
 	: BMailComponent(defaultCharSet),
 	encoding(quoted_printable),
-	charset(B_ISO1_CONVERSION),
+	charset(B_ISO15_CONVERSION),
 	raw_data(NULL)
 {
 	if (text != NULL)
@@ -494,10 +499,15 @@ BTextMailComponent::ParseRaw()
 
 	charset = _charSetForTextDecoding;
 	if (charset == B_MAIL_NULL_CONVERSION && content_type.HasString("charset")) {
-		for (int32 i = 0; mail_charsets[i].charset != NULL; i++) {
-			if (strcasecmp(content_type.FindString("charset"), mail_charsets[i].charset) == 0) {
-				charset = mail_charsets[i].flavor;
-				break;
+		const char * charset_string = content_type.FindString("charset");
+		if (strcasecmp(charset_string, "us-ascii") == 0) {
+			charset = B_MAIL_US_ASCII_CONVERSION;
+		} else if (strcasecmp(charset_string, "utf-8") == 0) {
+			charset = B_MAIL_UTF8_CONVERSION;
+		} else {
+			const BCharacterSet * cs = BCharacterSetRoster::FindCharacterSetByName(charset_string);
+			if (cs != NULL) {
+				charset = cs->GetConversionID();
 			}
 		}
 	}
@@ -536,8 +546,8 @@ BTextMailComponent::ParseRaw()
 	if (charset == B_MAIL_NULL_CONVERSION) {
 		if (decoded.FindFirst ("\e$B") >= 0 || decoded.FindFirst ("\e$@") >= 0)
 			charset = B_JIS_CONVERSION;
-		else // Just assume the usual Latin-1 character set.
-			charset = B_ISO1_CONVERSION;
+		else // Just assume the usual Latin-9 character set.
+			charset = B_ISO15_CONVERSION;
 	}
 
 	int32 state = 0;
