@@ -52,7 +52,7 @@
 /* The default value of the PATH variable. */
 #ifndef DEFAULT_PATH_VALUE
 #define DEFAULT_PATH_VALUE \
-  "/usr/gnu/bin:/usr/local/bin:/usr/ucb:/bin:/usr/bin:."
+  ".:/boot/home/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:/boot/develop/bin"
 #endif
 
 /* The value for PATH when invoking `command -p'.  This is only used when
