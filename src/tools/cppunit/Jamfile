@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src tools cppunit ;
 
+UseHeaders [ FDirName $(OBOS_TOP) headers tools elfsymbolpatcher ] ;
+
 rule CppUnitLibrary
 {
 	# CppUnitLibrary <sources> ;
@@ -49,4 +51,5 @@ CppUnitLibrary
 LinkSharedOSLibs libcppunit.so :
 	stdc++.r4
 	/boot/develop/lib/x86/libbe.so
+	libelfsymbolpatcher.a
 ;

@@ -1,19 +1,27 @@
-#include <TestShell.h>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
 
-#include <cppunit/Exception.h>
-#include <cppunit/Test.h>
-#include <cppunit/TestFailure.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestSuite.h>
+#include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <image.h>
+#include <Locker.h>
 #include <Path.h>
+#include <TLS.h>
+
+#include <cppunit/Exception.h>
+#include <cppunit/Test.h>
+#include <cppunit/TestAssert.h>
+#include <cppunit/TestFailure.h>
+#include <cppunit/TestResult.h>
+#include <cppunit/TestSuite.h>
+
+#include <TestShell.h>
 #include <TestListener.h>
-#include <set>
-#include <map>
-#include <string>
-#include <vector>
+
+#include <ElfSymbolPatcher.h>
 
 BTestShell *BTestShell::fGlobalShell = NULL;
 const char BTestShell::indent[] = "  ";
@@ -24,11 +32,18 @@ BTestShell::BTestShell(const std::string &description, SyncObject *syncObject)
 	, fDescription(description)
 	, fListTestsAndExit(false)
 	, fTestDir(NULL)
+	, fPatchGroupLocker(new(nothrow) BLocker)
+	, fPatchGroup(NULL)
+	, fOldDebuggerHook(NULL)
+	, fOldLoadAddOnHook(NULL)
+	, fOldUnloadAddOnHook(NULL)
 {
-};
+	fTLSDebuggerCall = tls_allocate();
+}
 
 BTestShell::~BTestShell() {
 	delete fTestDir;
+	delete fPatchGroupLocker;
 }
 
 
@@ -183,7 +198,9 @@ BTestShell::Run(int argc, char *argv[]) {
 	
 	// Run all the tests
 	InitOutput();
+	InstallPatches();
 	suite.run(&fTestResults);
+	UninstallPatches();
 	PrintResults();
 
 	return 0;
@@ -197,6 +214,36 @@ BTestShell::Verbosity() const {
 const char*
 BTestShell::TestDir() const {
 	return (fTestDir ? fTestDir->Path() : NULL);
+}
+
+// ExpectDebuggerCall
+/*!	\brief Marks the current thread as ready for a debugger() call.
+
+	A subsequent call of debugger() will be intercepted and a respective
+	flag will be set. WasDebuggerCalled() will then return \c true.
+*/
+void
+BTestShell::ExpectDebuggerCall()
+{
+	void *var = tls_get(fTLSDebuggerCall);
+	::CppUnit::Asserter::failIf(var, "ExpectDebuggerCall(): Already expecting "
+		"a debugger() call.");
+	tls_set(fTLSDebuggerCall, (void*)1);
+}
+
+// WasDebuggerCalled
+/*!	\brief Returns whether the current thread has invoked debugger() since
+		   the last ExpectDebuggerCall() invocation and resets the mode so
+		   that subsequent debugger() calls will hit the debugger.
+	\return \c true, if debugger() has been called by the current thread since
+			the last invocation of ExpectDebuggerCall(), \c false otherwise.
+*/
+bool
+BTestShell::WasDebuggerCalled()
+{
+	void *var = tls_get(fTLSDebuggerCall);
+	tls_set(fTLSDebuggerCall, NULL);
+	return ((int)var > 1);
 }
 
 void
@@ -410,5 +457,143 @@ BTestShell::UpdateTestDir(char *argv[]) {
 			cout << "Couldn't get test dir." << endl;
 	} else
 		cout << "Couldn't find the path to the test app." << endl;
+}
+
+// InstallPatches
+/*!	\brief Patches the debugger() function.
+
+	load_add_on() and unload_add_on() are patches as well, to keep the
+	patch group up to date, when images are loaded/unloaded.
+*/
+void
+BTestShell::InstallPatches()
+{
+	if (fPatchGroup) {
+		cerr << "BTestShell::InstallPatches(): Patch group already exist!"
+			<< endl;
+		return;
+	}
+	BAutolock locker(fPatchGroupLocker);
+	if (!locker.IsLocked()) {
+		cerr << "BTestShell::InstallPatches(): Failed to acquire patch "
+			"group lock!" << endl;
+		return;
+	}
+	fPatchGroup = new(nothrow) ElfSymbolPatchGroup;
+	// init the symbol patch group
+	if (!fPatchGroup) {
+		cerr << "BTestShell::InstallPatches(): Failed to allocate patch "
+			"group!" << endl;
+		return;
+	}
+	if (// debugger()
+		fPatchGroup->AddPatch("debugger", (void*)&_DebuggerHook,
+							  (void**)&fOldDebuggerHook) == B_OK
+		// load_add_on()
+		&& fPatchGroup->AddPatch("load_add_on", (void*)&_LoadAddOnHook,
+								 (void**)&fOldLoadAddOnHook) == B_OK
+		// unload_add_on()
+		&& fPatchGroup->AddPatch("unload_add_on", (void*)&_UnloadAddOnHook,
+								 (void**)&fOldUnloadAddOnHook) == B_OK
+		) {
+		// everything went fine
+		fPatchGroup->Patch();
+	} else {
+		cerr << "BTestShell::InstallPatches(): Failed to patch all symbols!"
+			<< endl;
+		UninstallPatches();
+	}
+}
+
+// UninstallPatches
+/*!	\brief Undoes the patches applied by InstallPatches().
+*/
+void
+BTestShell::UninstallPatches()
+{
+	BAutolock locker(fPatchGroupLocker);
+	if (!locker.IsLocked()) {
+		cerr << "BTestShell::UninstallPatches(): "
+			"Failed to acquire patch group lock!" << endl;
+		return;
+	}
+	if (fPatchGroup) {
+		fPatchGroup->Restore();
+		delete fPatchGroup;
+		fPatchGroup = NULL;
+	}
+}
+
+// _Debugger
+void
+BTestShell::_Debugger(const char *message)
+{
+	if (!this || !fPatchGroup) {
+		debugger(message);
+		return;
+	}
+	BAutolock locker(fPatchGroupLocker);
+	if (!locker.IsLocked() || !fPatchGroup) {
+		debugger(message);
+		return;
+	}
+cout << "debugger() called: " << message << endl;
+	void *var = tls_get(fTLSDebuggerCall);
+	if (var)
+		tls_set(fTLSDebuggerCall, (void*)((int)var + 1));
+	else
+		(*fOldDebuggerHook)(message);
+}
+
+// _LoadAddOn
+image_id
+BTestShell::_LoadAddOn(const char *path)
+{
+	if (!this || !fPatchGroup)
+		return load_add_on(path);
+	BAutolock locker(fPatchGroupLocker);
+	if (!locker.IsLocked() || !fPatchGroup)
+		return load_add_on(path);
+	image_id result = (*fOldLoadAddOnHook)(path);
+	fPatchGroup->Update();
+	return result;
+}
+
+// _UnloadAddOn
+status_t
+BTestShell::_UnloadAddOn(image_id image)
+{
+	if (!this || !fPatchGroup)
+		return unload_add_on(image);
+	BAutolock locker(fPatchGroupLocker);
+	if (!locker.IsLocked() || !fPatchGroup)
+		return unload_add_on(image);
+
+	if (!this || !fPatchGroup)
+		return unload_add_on(image);
+	status_t result = (*fOldUnloadAddOnHook)(image);
+	fPatchGroup->Update();
+	return result;
+}
+
+// _DebuggerHook
+void
+BTestShell::_DebuggerHook(const char *message)
+{
+	fGlobalShell->_Debugger(message);
+}
+
+// _LoadAddOnHook
+image_id
+BTestShell::_LoadAddOnHook(const char *path)
+{
+	return fGlobalShell->_LoadAddOn(path);
+}
+
+// _UnloadAddOnHook
+status_t
+BTestShell::_UnloadAddOnHook(image_id image)
+{
+	return fGlobalShell->_UnloadAddOn(image);
 }
 

@@ -7,13 +7,17 @@
 #include <cppunit/TestListener.h>
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
+#include <image.h>
 #include <TestSuite.h>
 #include <map>
 #include <set>
 #include <string>
 
 class BDirectory;
+class BLocker;
 class BPath;
+
+class ElfSymbolPatchGroup;
 
 // Defines SuiteFunction to be a pointer to a function that
 // takes no arguments and returns a pointer to a CppUnit::Test
@@ -21,6 +25,19 @@ typedef CppUnit::Test* (*SuiteFunction)(void);
 
 // This is just absurd to have to type...
 typedef CppUnit::SynchronizedObject::SynchronizationObject SyncObject;
+
+/*!	\brief Executes a statement that is supposed to call debugger().
+	An exception is thrown if the debugger is not invoked by the
+	statement.
+*/
+#define CPPUNIT_ASSERT_DEBUGGER(statement)					\
+	BTestShell::GlobalShell()->ExpectDebuggerCall();		\
+	statement;												\
+	::CppUnit::Asserter::failIf(							\
+		!BTestShell::GlobalShell()->WasDebuggerCalled(),	\
+		(#statement),										\
+		CPPUNIT_SOURCELINE() );
+
 
 //! BeOS savvy command line interface for the CppUnit testing framework.
 /*! This class provides a fully functional command-line testing interface
@@ -83,6 +100,8 @@ public:
 	const char* TestDir() const;
 	static const char* GlobalTestDir() { return (fGlobalShell ? fGlobalShell->TestDir() : NULL); };
 
+	void ExpectDebuggerCall();
+	bool WasDebuggerCalled();
 
 protected:
 	typedef std::map<std::string, CppUnit::Test*> TestMap;
@@ -101,6 +120,13 @@ protected:
 	static const char indent[];
 	bool fListTestsAndExit;
 	BPath *fTestDir;
+	BLocker *fPatchGroupLocker;
+	int32 fTLSDebuggerCall;
+	ElfSymbolPatchGroup *fPatchGroup;
+	void (*fOldDebuggerHook)(const char*);
+	image_id (*fOldLoadAddOnHook)(const char*);
+	status_t (*fOldUnloadAddOnHook)(image_id);
+
 
 	//! Prints a brief description of the program.
 	virtual void PrintDescription(int argc, char *argv[]);
@@ -140,15 +166,25 @@ protected:
 	
 	//! Sets the current test directory.
 	void UpdateTestDir(char *argv[]);
-	
-	
-private:
-  //! Prevents the use of the copy constructor.
-  BTestShell( const BTestShell &copy );
-  
-  //! Prevents the use of the copy operator.
-  void operator =( const BTestShell &copy );
 
+	void InstallPatches();
+	void UninstallPatches();
+
+private:
+	//! Prevents the use of the copy constructor.
+	BTestShell( const BTestShell &copy );
+
+	//! Prevents the use of the copy operator.
+	void operator =( const BTestShell &copy );
+
+	void _Debugger(const char* message);
+	image_id _LoadAddOn(const char* path);
+	status_t _UnloadAddOn(image_id image);
+
+	static void _DebuggerHook(const char* message);
+	static image_id _LoadAddOnHook(const char* path);
+	static status_t _UnloadAddOnHook(image_id image);
+	
 };	// class BTestShell
 
 #endif // _beos_test_shell_h_
