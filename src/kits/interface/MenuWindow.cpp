@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -34,14 +34,14 @@
 // this should go to some private header.
 const window_feel kMenuWindowFeel = (window_feel)1025;
 
-BMenuWindow::BMenuWindow(BRect frame, BMenu *menu)
+BMenuWindow::BMenuWindow(BMenu *menu)
 	:
-	BWindow(frame, "Menu", B_NO_BORDER_WINDOW_LOOK, kMenuWindowFeel,
+	// The window will be resized by BMenu, so just pass a dummy rect
+	BWindow(BRect(0, 0, 0, 0), "Menu", B_NO_BORDER_WINDOW_LOOK, kMenuWindowFeel,
 			B_NOT_ZOOMABLE)
 {
 	fMenu = menu;
 	AddChild(fMenu);	
-	ResizeTo(fMenu->Bounds().Width() + 1, fMenu->Bounds().Height() + 1);
 	fMenu->MakeFocus(true);
 }
 

@@ -683,7 +683,7 @@ void
 BMenu::Draw(BRect updateRect)
 {
 	DrawBackground(updateRect);
-	DrawItems(Bounds());
+	DrawItems(updateRect);
 }
 
 
@@ -949,7 +949,7 @@ BMenu::Track(bool openAnyway, BRect *clickToOpenRect)
 bool
 BMenu::AddDynamicItem(add_state s)
 {
-	// Not implemented
+	// Implemented in subclasses
 	return false;
 }
 
@@ -957,20 +957,11 @@ BMenu::AddDynamicItem(add_state s)
 void
 BMenu::DrawBackground(BRect update)
 {
-	BRect bounds(Bounds());
-	
+	BRect rect = Bounds() & update;
 	rgb_color oldColor = HighColor();
 	
-	SetHighColor(tint_color(sMenuInfo.background_color, B_DARKEN_4_TINT));
-	StrokeRect(bounds);
-	SetHighColor(tint_color(sMenuInfo.background_color, B_DARKEN_2_TINT));
-	StrokeLine(BPoint(bounds.left + 2, bounds.bottom - 1),
-		BPoint(bounds.right - 1, bounds.bottom - 1));
-	StrokeLine(BPoint(bounds.right - 1, bounds.top + 1));
-	SetHighColor(tint_color(sMenuInfo.background_color, B_LIGHTEN_2_TINT));
-	StrokeLine(BPoint(bounds.right - 2, bounds.top + 1),
-		BPoint(bounds.left + 1, bounds.top + 1));
-	StrokeLine(BPoint(bounds.left + 1, bounds.bottom - 2));
+	SetHighColor(sMenuInfo.background_color);
+	FillRect(rect, B_SOLID_HIGH);
 	
 	SetHighColor(oldColor);
 }
@@ -1026,11 +1017,10 @@ BMenu::InitData(BMessage *data)
 bool
 BMenu::_show(bool selectFirstItem)
 {
-	BPoint point = ScreenLocation();
+	BWindow *window = new BMenuWindow(this);
 
-	BWindow *window = new BMenuWindow(BRect(point.x, point.y,
-		point.x + 20, point.y + 200), this);
-
+	window->ResizeTo(Bounds().Width() + 1, Bounds().Height() + 1);
+	window->MoveTo(ScreenLocation());
 	window->Show();
 	
 	return true;
@@ -1067,17 +1057,24 @@ BMenu::_track(int *action, long start)
 				break;		
 			}
 			
+			// TODO: Sometimes the menu flickers a bit.
+			// try to be smarter and suggest an update area, 
+			// instead of invalidating the whole view.
 			if (item != fSelected) {
 				SelectItem(item);
 				Invalidate();
 			}
-												
+															
 			UnlockLooper();
 		}
 		
 		snooze(50000);
 	} while (buttons != 0);
 	
+	// TODO: A deeper investigation of actions
+	// would be nice. Consider building an enum
+	// with the possible actions, and putting it in a
+	// private, shared header (BMenuBar needs to know about them too).
 	if (action != NULL) {
 		if (buttons != 0)
 			*action = 0;
@@ -1162,30 +1159,30 @@ void
 BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 						  float* width, float* height)
 {
-	BRect frame;
+	BRect frame(0, 0, 0, 0);
 	float iWidth, iHeight;
-	BMenuItem *item;
+	BMenuItem *item = NULL;
 	
 	switch (fLayout) {
 		case B_ITEMS_IN_COLUMN:
 		{
-			frame = BRect(0.0f, 0.0f, 0.0f, 2.0f);
-
 			for (int32 i = 0; i < fItems.CountItems(); i++) {
-				item = static_cast<BMenuItem *>(fItems.ItemAt(i));			
-				item->GetContentSize(&iWidth, &iHeight);
-
-				if (item->fModifiers && item->fShortcutChar)
-					iWidth += 25.0f;
+				item = ItemAt(i);			
+				if (item != NULL) {
+					item->GetContentSize(&iWidth, &iHeight);
 	
-				item->fBounds.left = 2.0f;
-				item->fBounds.top = frame.bottom;
-				item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
+					if (item->fModifiers && item->fShortcutChar)
+						iWidth += 25.0f;
+		
+					item->fBounds.left = 2.0f;
+					item->fBounds.top = frame.bottom;
+					item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
 
-				frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);
-				frame.bottom = item->fBounds.bottom + 1.0f;
+					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);
+					frame.bottom = item->fBounds.bottom + 1.0f;
+				}
 			}
-
+			
 			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.right = frame.right;
 
@@ -1202,17 +1199,19 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				(float)ceil(fh.ascent) + (float)ceil(fh.descent) + fPad.top + fPad.bottom);
 
 			for (int32 i = 0; i < fItems.CountItems(); i++) {
-				item = static_cast<BMenuItem *>(fItems.ItemAt(i));
-				item->GetContentSize(&iWidth, &iHeight);
+				item = ItemAt(i);
+				if (item != NULL) {
+					item->GetContentSize(&iWidth, &iHeight);
 
-				item->fBounds.left = frame.right;
-				item->fBounds.top = 0.0f;
-				item->fBounds.right = item->fBounds.left + iWidth + fPad.left + fPad.right;
+					item->fBounds.left = frame.right;
+					item->fBounds.top = 0.0f;
+					item->fBounds.right = item->fBounds.left + iWidth + fPad.left + fPad.right;
 
-				frame.right = item->fBounds.right + 1.0f;
-				frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
+					frame.right = item->fBounds.right + 1.0f;
+					frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
+				}
 			}
-
+			
 			for (int i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.bottom = frame.bottom;
 
@@ -1222,10 +1221,8 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		
 		case B_ITEMS_IN_MATRIX:
 		{
-			frame.Set(0, 0, 0, 0);
-
 			for (int32 i = 0; i < CountItems(); i++) {
-				BMenuItem *item = ItemAt(i);
+				item = ItemAt(i);
 				if (item != NULL) {
 					frame.left = min_c(frame.left, item->Frame().left);
 					frame.right = max_c(frame.right, item->Frame().right);
@@ -1295,7 +1292,6 @@ BMenu::DrawItems(BRect updateRect)
 		if (ItemAt(i)->Frame().Intersects(updateRect))
 			ItemAt(i)->Draw();			
 	}
-	Sync();
 }
 
 
