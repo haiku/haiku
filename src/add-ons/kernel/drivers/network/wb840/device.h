@@ -1,3 +1,8 @@
+/* Copyright (c) 2003-2004 
+ * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
+ * This file is released under the MIT license
+ */
+ 
 #ifndef __WB_DRIVER_H
 #define __WB_DRIVER_H
 

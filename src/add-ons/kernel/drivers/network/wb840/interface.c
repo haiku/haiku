@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2003-2004 Stefano Ceccherini (burton666@libero.it)
  * Copyright (c) 1997, 1998
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -31,9 +32,6 @@
  *
  */
 
-/* Adapted for BeOS by Stefano Ceccherini <burton666@libero.it> */
-
-
 #include "wb840.h"
 #include "device.h"
 #include "interface.h"
@@ -51,6 +49,7 @@
 
 #define MII_DELAY(x)	read32(x->reg_base + WB_SIO)
 			
+
 static void
 mii_sync(struct wb_device *device)
 {
@@ -90,7 +89,7 @@ mii_send(wb_device *device, uint32 bits, int count)
 /*
  * Read an PHY register through the MII.
  */
-int
+static int
 wb_mii_readreg(wb_device *device, wb_mii_frame *frame)	
 {
 	int	i, ack;
@@ -180,7 +179,7 @@ fail:
 /*
  * Write to a PHY register through the MII.
  */
-int
+static int
 wb_mii_writereg(wb_device *device, wb_mii_frame	*frame)
 {
 	/*
@@ -252,16 +251,10 @@ wb_miibus_writereg(wb_device *device, int phy, int reg, int data)
 }
 
 
-void
-wb_miibus_statchg(wb_device *device)
-{
-	//wb_setcfg(device, device->sc_mii.mii_media_active);
-}
-
-
 #define EEPROM_DELAY(x)	read32(x->reg_base + WB_SIO)
 
-void
+#if 0
+static void
 wb_eeprom_putbyte(wb_device *device, int addr)
 {
 	int	d, i;
@@ -295,6 +288,7 @@ wb_eeprom_putbyte(wb_device *device, int addr)
 
 	return;
 }
+#endif
 
 		
 static void
@@ -353,14 +347,14 @@ wb_eeprom_getword(wb_device *device, int addr, uint16 *dest)
 
 void
 wb_read_eeprom(wb_device *device, void* dest,
-	int offset, int count, int swap)
+	int offset, int count, bool swap)
 {
 	int i;
 	uint16 word = 0, *ptr;
 	
 	for (i = 0; i < count; i++) {
 		wb_eeprom_getword(device, offset + i, &word);
-		ptr = (uint16*)(dest + (i * 2));
+		ptr = (uint16 *)((uint8 *)dest + (i * 2));
 		if (swap)
 			*ptr = ntohs(word);
 		else

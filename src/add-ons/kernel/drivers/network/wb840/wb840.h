@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2003-2004 Stefano Ceccherini (burton666@libero.it)
  * Copyright (c) 1997, 1998
  *	Bill Paul <wpaul@ctr.columbia.edu>.  All rights reserved.
  *
@@ -29,7 +30,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * This file has been adapted for BeOS by Stefano Ceccherini
  */
  
 #ifndef __WB840_H

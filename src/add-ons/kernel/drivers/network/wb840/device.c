@@ -1,3 +1,7 @@
+/* Copyright (c) 2003-2004 
+ * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
+ * This file is released under the MIT license
+ */
 #include <KernelExport.h>
 #include <Errors.h>
 #include <stdlib.h>
@@ -65,7 +69,7 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 	data->wb_cachesize = gPci->read_pci_config(data->pciInfo->bus, data->pciInfo->device,
 			data->pciInfo->function, PCI_line_size, sizeof (PCI_line_size)) & 0xff;
 		
-	wb_read_eeprom(data, &data->MAC_Address, 0, 3, 0);
+	wb_read_eeprom(data, &data->MAC_Address, 0, 3, false);
 	
 	status = wb_create_semaphores(data);
 	if (status < B_OK) {

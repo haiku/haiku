@@ -1,7 +1,7 @@
 /* Copyright (c) 2003-2004 
  * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
+ * This file is released under the MIT license
  */
-
 #include "device.h"
 #include "driver.h"
 #include "debug.h"
@@ -42,10 +42,10 @@ gMIIChips[] = {
 static int
 mii_readstatus(wb_device *device)
 {
-	// status bit has to be retrieved 2 times
 	int i = 0;
 	int status;
 	
+	// status bit has to be retrieved 2 times
 	while (i++ < 2)
 		status = wb_miibus_readreg(device, device->phy, MII_STATUS);
 	
@@ -89,7 +89,7 @@ wb_disable_interrupts(struct wb_device *device)
 }
 
 
-void
+static void
 wb_selectPHY(wb_device *device)
 {
 	uint16 status;
@@ -245,7 +245,7 @@ wb_stop(wb_device *device)
 }
 
 
-void
+static void
 wb_updateLink(struct wb_device *device)
 {
 	if (!device->autoNegotiationComplete) {
