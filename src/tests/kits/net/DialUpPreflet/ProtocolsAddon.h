@@ -80,8 +80,8 @@ class ProtocolsView : public BView {
 		bool HasProtocol(const BString& moduleName) const;
 
 	private:
-		void RegisterProtocol(const DialUpAddon *protocol);
-		void RegisterProtocol(int32 index);
+		int32 RegisterProtocol(const DialUpAddon *protocol);
+		int32 RegisterProtocol(int32 index);
 			// moves the protocol from the pop-up menu to the list view
 		void UnregisterProtocol(int32 index);
 			// moves the protocol from the list view to the pop-up menu

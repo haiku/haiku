@@ -82,15 +82,9 @@ ProtocolsAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 bool
 ProtocolsAddon::LoadProtocolSettings(const BMessage& parameter)
 {
-	// TODO: Maybe we should only load the first add-on because we cannot know
-	// whether the settings are acceptable for all listed protocols.
-	// In addition to this, maybe the protocol itself chose this format because
-	// it consists of two modules.
-	
-	// get protocols and ask them to load their settings
+	// get protocol and ask it to load its settings
 	BString name;
-	for(int32 index = 0; parameter.FindString(MDSU_VALUES, index, &name) == B_OK;
-			index++) {
+	if(parameter.FindString(MDSU_VALUES, &name) == B_OK) {
 		DialUpAddon *protocol;
 		if(!GetProtocol(name, &protocol))
 			return false;
@@ -326,20 +320,20 @@ ProtocolsView::MessageReceived(BMessage *message)
 	switch(message->what) {
 		case MSG_ADD_PROTOCOL: {
 			BMenuItem *selected = fProtocolsMenu->Go(fAddButton->ConvertToScreen(
-				fAddButton->Bounds().RightTop()));
+				fAddButton->Bounds().RightTop()), false, true);
 			
-			RegisterProtocol(fProtocolsMenu->IndexOf(selected));
-			
+			int32 index = RegisterProtocol(fProtocolsMenu->IndexOf(selected));
 			UpdateButtons();
+			
+			if(index > 0)
+				fListView->Select(index);
 		} break;
 		
 		case MSG_REMOVE_PROTOCOL: {
-			AddonItem *selected = dynamic_cast<AddonItem*>(
-				fListView->RemoveItem(fListView->CurrentSelection()));
-			
-			UnregisterProtocol(fListView->IndexOf(selected));
-			
+			UnregisterProtocol(fListView->CurrentSelection());
 			UpdateButtons();
+			
+			fListView->Select(0);
 		} break;
 		
 		case MSG_SHOW_PREFERENCES: {
@@ -388,33 +382,33 @@ ProtocolsView::HasProtocol(const BString& moduleName) const
 }
 
 
-void
+int32
 ProtocolsView::RegisterProtocol(const DialUpAddon *protocol)
 {
 	if(!protocol)
-		return;
+		return -1;
 	
 	DialUpAddon *addon;
 	BMenuItem *item;
 	for(int32 index = 0; index < fProtocolsMenu->CountItems(); index++) {
 		item = fProtocolsMenu->ItemAt(index);
 		if(item && item->Message()->FindPointer("Addon",
-				reinterpret_cast<void**>(addon)) == B_OK && addon == protocol) {
-			RegisterProtocol(index);
-			return;
-		}
+				reinterpret_cast<void**>(&addon)) == B_OK && addon == protocol)
+			return RegisterProtocol(index);
 	}
+	
+	return -1;
 }
 
 
-void
+int32
 ProtocolsView::RegisterProtocol(int32 index)
 {
 	DialUpAddon *addon;
 	BMenuItem *remove = fProtocolsMenu->ItemAt(index);
 	if(!remove || remove->Message()->FindPointer("Addon",
-			reinterpret_cast<void**>(addon)) != B_OK)
-		return;
+			reinterpret_cast<void**>(&addon)) != B_OK)
+		return -1;
 	
 	const char *label = remove->Label();
 	AddonItem *item = new AddonItem(label, addon);
@@ -423,13 +417,16 @@ ProtocolsView::RegisterProtocol(int32 index)
 	fListView->AddItem(item, index);
 	fProtocolsMenu->RemoveItem(remove);
 	delete remove;
+	
+	addon->LoadSettings(Addon()->Settings(), Addon()->Profile(), true);
+	return index;
 }
 
 
 void
 ProtocolsView::UnregisterProtocol(int32 index)
 {
-	AddonItem *remove = dynamic_cast<AddonItem*>(fListView->ItemAt(index));
+	AddonItem *remove = dynamic_cast<AddonItem*>(fListView->RemoveItem(index));
 	if(!remove)
 		return;
 	
@@ -448,18 +445,19 @@ ProtocolsView::UnregisterProtocol(int32 index)
 void
 ProtocolsView::UpdateButtons()
 {
+	AddonItem *item = dynamic_cast<AddonItem*>(fListView->ItemAt(
+		fListView->CurrentSelection()));
+	
 	if(fProtocolsMenu->CountItems() == 0)
 		fAddButton->SetEnabled(false);
 	else
 		fAddButton->SetEnabled(true);
 	
-	if(CountProtocols() == 0)
+	if(!item)
 		fRemoveButton->SetEnabled(false);
 	else
 		fRemoveButton->SetEnabled(true);
 	
-	AddonItem *item = dynamic_cast<AddonItem*>(fListView->ItemAt(
-		fListView->CurrentSelection()));
 	float width, height;
 	if(!item || !item->Addon()->GetPreferredSize(&width, &height))
 		fPreferencesButton->SetEnabled(false);

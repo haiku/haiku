@@ -6,6 +6,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 
 # additonal headers for built-in add-ons:
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pppoe ] ; # PPPoE
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp ipcp ] ; # IPCP
 
 SimpleTest DialUpPreflet :
 	DialUpApplication.cpp
@@ -17,6 +18,7 @@ SimpleTest DialUpPreflet :
 	
 	# built-in add-ons
 	GeneralAddon.cpp
+	IPCPAddon.cpp
 	PPPoEAddon.cpp
 	ProtocolsAddon.cpp
 ;

@@ -13,6 +13,7 @@
 
 // built-in add-ons
 #include "GeneralAddon.h"
+#include "IPCPAddon.h"
 #include "PPPoEAddon.h"
 #include "ProtocolsAddon.h"
 
@@ -602,6 +603,10 @@ DialUpView::LoadAddons()
 	GeneralAddon *generalAddon = new GeneralAddon(&fAddons);
 	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, generalAddon);
 	fAddons.AddPointer(DUN_DELETE_ON_QUIT, generalAddon);
+	// "IPCP" protocol
+	IPCPAddon *ipcpAddon = new IPCPAddon(&fAddons);
+	fAddons.AddPointer(DUN_PROTOCOL_ADDON_TYPE, ipcpAddon);
+	fAddons.AddPointer(DUN_DELETE_ON_QUIT, ipcpAddon);
 	// "PPPoE" device
 	PPPoEAddon *pppoeAddon = new PPPoEAddon(&fAddons);
 	fAddons.AddPointer(DUN_DEVICE_ADDON_TYPE, pppoeAddon);

@@ -143,7 +143,7 @@ PPPoEAddon::IsModified(bool& settings, bool& profile) const
 		return;
 	}
 	
-	settings = profile = false;
+	profile = false;
 	settings = (fInterfaceName != fPPPoEView->InterfaceName()
 		|| fACName != fPPPoEView->ACName()
 		|| fServiceName != fPPPoEView->ServiceName());
