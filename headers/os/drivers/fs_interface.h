@@ -142,6 +142,11 @@ extern fs_ops	fs_entry;
 extern int32	api_version;
 
 /* file system add-ons only prototypes */
+extern status_t new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode);
+extern status_t get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_privateNode);
+extern status_t put_vnode(mount_id mountID, vnode_id vnodeID);
+extern status_t remove_vnode(mount_id mountID, vnode_id vnodeID);
+
 extern status_t notify_listener(int op, mount_id device, vnode_id parentNode,
 					vnode_id toParentNode, vnode_id node, const char *name);
 extern status_t send_notification(port_id port, long token, ulong what, long op,
