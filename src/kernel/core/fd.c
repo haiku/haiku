@@ -60,7 +60,6 @@ alloc_fd(void)
 		f->vnode = NULL;
 		f->cookie = NULL;
 		f->ref_count = 1;
-		f->dummy = 0xdeadbeef;
 	}
 	return f;
 }

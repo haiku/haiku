@@ -45,7 +45,6 @@ struct file_descriptor {
 	struct fd_ops *ops;
 	struct vnode *vnode;
 	void	*cookie;
-	int32	dummy;
 };
 
 
