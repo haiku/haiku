@@ -1,4 +1,111 @@
 SubDir OBOS_TOP src tools gensyscalls ;
 
-BuildPlatformMain gensyscalls : gensyscalls.cpp ;
+# build gensyscallinfos
+
+BuildPlatformMain gensyscallinfos : gensyscallinfos.cpp ;
+LinkSharedOSLibs gensyscallinfos : stdc++.r4 ;
+
+
+# generate the syscall infos source file
+
+SetupObjectsDir ;
+
+local syscallsHeader = [ FGristFiles syscalls.h ] ;
+SEARCH on $(syscallsHeader) = [ FDirName $(OBOS_TOP) headers private kernel ] ;
+
+local syscallsHeaderPP = [ FGristFiles syscalls.h.pp ] ;
+LOCATE on $(syscallsHeaderPP) = $(LOCATE_SOURCE) ;
+
+local syscallInfos = [ FGristFiles gensyscalls_infos.c ] ;
+LOCATE on $(syscallInfos) = $(LOCATE_SOURCE) ;
+
+rule GenSyscallInfos {
+	Depends $(1) : gensyscallinfos $(2) ;
+	GenSyscallInfos1 $(1) : gensyscallinfos $(2) ;
+}
+
+actions GenSyscallInfos1 {
+	$(2[1]) $(2[2]) $(1)
+}
+
+GenSyscallInfos $(syscallInfos) : $(syscallsHeaderPP) ;
+
+
+# build gensyscalls
+
+BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos:S=$(SUFOBJ)) ;
 LinkSharedOSLibs gensyscalls : stdc++.r4 ;
+
+
+# generate the output files
+
+# place them where there are needed
+local syscallFiles = <syscalls>syscalls.S.inc <syscalls>syscall_dispatcher.h ;
+MakeLocate <syscalls>syscalls.S.inc : [ FObjectsDir src kernel libroot os ] ;
+MakeLocate <syscalls>syscall_dispatcher.h : [ FObjectsDir src kernel core ] ;
+#Depends <syscalls>generatedFiles : $(syscallFiles) ;
+#NotFile <syscalls>generatedFiles ;
+
+Depends <dir>objects/x86.R1/kernel/core : <dir>objects/x86.R1/kernel ;
+
+rule GenSyscallsFile {
+	Depends $(1) : gensyscalls ;
+	GenSyscallsFile1 $(1) : gensyscalls ;
+}
+
+actions GenSyscallsFile1 {
+	$(2[1]) -c $(1)
+}
+
+rule GenSyscallsDispatcher {
+	Depends $(1) : gensyscalls ;
+	GenSyscallsDispatcher1 $(1) : gensyscalls ;
+}
+
+actions GenSyscallsDispatcher1 {
+	$(2[1]) -d $(1)
+}
+
+#GenSyscalls $(syscallFiles) ;
+GenSyscallsFile <syscalls>syscalls.S.inc ;
+GenSyscallsDispatcher <syscalls>syscall_dispatcher.h ;
+
+
+# preprocess the syscalls header
+
+SetupIncludes ;
+UsePrivateHeaders kernel ;
+UseArchHeaders $(OBOS_ARCH) ;
+
+rule Preprocess
+{
+	Depends $(<) : $(>) ;
+
+	HDRS on $(<) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+	HDRRULE on $(>) = HdrRule ;
+	HDRSCAN on $(>) = $(HDRPATTERN) ;
+	HDRSEARCH on $(>) = 
+		$(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
+
+	HDRGRIST on $(>) = $(HDRGRIST) ;
+
+	DEFINES on $(<) += $(DEFINES) ;
+
+	CCFLAGS on $(<) += $(CCFLAGS) $(SUBDIRCCFLAGS) $(OPTIM)
+					   [ FDefines GEN_SYSCALL_INFOS_PROCESSING ] ;
+
+	CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
+	CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
+}
+
+actions Preprocess 
+{
+	$(CC) -E "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+}
+
+Preprocess $(syscallsHeaderPP) : $(syscallsHeader) ;
+
+
+# compile the syscall infos source file
+
+Object $(syscallInfos:S=$(SUFOBJ)) : $(syscallInfos) ;
