@@ -347,21 +347,40 @@ void
 BMenuItem::DrawContent()
 {
 	fSuper->MovePenBy(0, fSuper->fAscent);
+	BPoint lineStart = fSuper->PenLocation();
+	
 	fSuper->DrawString(fLabel);
 	
 	// ToDo: label truncation is missing
-	// ToDo: draw trigger is missing!
+	
+	if (fSuper->AreTriggersEnabled() && fTriggerIndex != -1) {
+		float escapements[128]; // TODO: this doesn't look nice
+		BFont font;
+		fSuper->GetFont(&font);
+		font.GetEscapements(fLabel, fTriggerIndex + 1, escapements);
+		for (int32 i = 0; i < fTriggerIndex; i++)
+			lineStart.x += escapements[i] * font.Size();
+		
+		lineStart.x--;
+		lineStart.y++;
+		
+		BPoint lineEnd(lineStart);
+		lineEnd.x += escapements[fTriggerIndex] * font.Size();
+						
+		fSuper->StrokeLine(lineStart, lineEnd);
+	}
 }
 
 
 void
 BMenuItem::Draw()
 {
+	// TODO: Cleanup
 	bool enabled = IsEnabled();
 
 	fSuper->CacheFontInfo();
 
-	if (IsSelected() && (enabled || Submenu())/* && fSuper->fRedrawAfterSticky*/) {
+	if (IsSelected() && (enabled || Submenu()) /*&& fSuper->fRedrawAfterSticky*/) {
 		fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 			B_DARKEN_2_TINT));
 		fSuper->SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
@@ -379,8 +398,11 @@ BMenuItem::Draw()
 			B_DISABLED_LABEL_TINT));
 
 	fSuper->MovePenTo(ContentLocation());
+	
 	DrawContent();
 
+	fSuper->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	
 	if (fSuper->Layout() == B_ITEMS_IN_COLUMN) {
 		if (IsMarked())
 			DrawMarkSymbol();
@@ -459,10 +481,9 @@ BMenuItem::InitMenuData(BMenu *menu)
 	fSubmenu = menu;
 	fSubmenu->fSuperitem = this;
 
-	BMenuItem *item;
+	BMenuItem *item = menu->FindMarked();
 
-	if (menu->IsRadioMode() && menu->IsLabelFromMarked() &&
-		(item = menu->FindMarked()) != NULL)
+	if (menu->IsRadioMode() && menu->IsLabelFromMarked() && item != NULL)
 		SetLabel(item->Label());
 	else
 		SetLabel(menu->Name());
