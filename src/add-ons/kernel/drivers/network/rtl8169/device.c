@@ -47,7 +47,7 @@ read_phy_reg(rtl8169_device *device, int reg)
 	return 0xffff;
 }
 
-void
+static inline void
 write_phy_reg_bit(rtl8169_device *device, int reg, int bitnum, int bitval)
 {
 	uint16 val = read_phy_reg(device, reg);
@@ -66,11 +66,62 @@ phy_config(rtl8169_device *device)
 	if (device->phy_version == 0 || device->phy_version == 1) {
 		uint16 val;
 		TRACE("performing phy init\n");
+		// XXX this should probably not be done if the phy wasn't
+		// identified, but BSD does it too for mac_version == 0 (=> phy_version also 0)
+		// doing the same as the BSD and Linux driver here
+		// see IEE 802.3-2002 (is also uses decimal numbers when refering
+		// to the registers, as do we). Added a little documentation
+		write_phy_reg(device, 31, 0x0001); // vendor specific (enter programming mode?)
+		write_phy_reg(device, 21, 0x1000); // vendor specific	
+		write_phy_reg(device, 24, 0x65c7); // vendor specific	
+		write_phy_reg_bit(device, 4, 11, 0); // reset T (T=toggle) bit in reg 4 (ability)
+		val = read_phy_reg(device, 4) & 0x0fff;	// get only the message code fields
+		write_phy_reg(device, 4, val); // and write them back. this clears the page and makes it unformatted (see 37.2.4.3.1)
+		write_phy_reg(device, 3, 0x00a1); // assign 32 bit phy identifier high word
+		write_phy_reg(device, 2, 0x0008); // assign 32 bit phy identifier low word
+		write_phy_reg(device, 1, 0x1020); // set status: 10 MBit full duplex and auto negotiation completed
+		write_phy_reg(device, 0, 0x1000); // reset the phy!
+		write_phy_reg_bit(device, 4, 11, 1); // set toggle bit high
+		write_phy_reg_bit(device, 4, 11, 0); // set toggle bit low => this is a toggle
+		val = (read_phy_reg(device, 4) & 0x0fff) | 0x7000; // set ack1, ack2, indicate formatted page
+		write_phy_reg(device, 4, val); // write the value from above
+		write_phy_reg(device, 3, 0xff41); // assign another
+		write_phy_reg(device, 2, 0xde60); // 32 bit phy identifier
+		write_phy_reg(device, 1, 0x0140); // phy will accept management frames with preamble suppressed, extended capability in reg 15
+		write_phy_reg(device, 0, 0x0077); //
+		write_phy_reg_bit(device, 4, 11, 1);	// set toggle bit high
+		write_phy_reg_bit(device, 4, 11, 0);	// set toggle bit low => this is a toggle
+		val = ( read_phy_reg(device, 4) & 0x0fff) | 0xa000;
+		write_phy_reg(device, 4, val);	//
+		write_phy_reg(device, 3, 0xdf01); // assign another
+		write_phy_reg(device, 2, 0xdf20); // 32 bit phy identifier
+		write_phy_reg(device, 1, 0xff95); // phy will do 100Mbit and 10Mbit in full and half duplex, something reserved and
+										  // remote fault detected, link is up and extended capability in reg 15
+		write_phy_reg(device, 0, 0xfa00); // select 10 MBit, disable auto neg., half duplex normal operation
+		write_phy_reg_bit(device, 4, 11, 1);	// set toggle bit high
+		write_phy_reg_bit(device, 4, 11, 0);	// set toggle bit low => this is a toggle
+		val = ( read_phy_reg(device, 4) & 0x0fff) | 0xb000;
+		write_phy_reg(device, 4, val); // write capabilites
+		write_phy_reg(device, 3, 0xff41); // assign another
+		write_phy_reg(device, 2, 0xde20); // 32 bit phy identifier
+		write_phy_reg(device, 1, 0x0140); // phy will accept management frames with preamble suppressed, extended capability in reg 15
+		write_phy_reg(device, 0, 0x00bb); // write status
+		write_phy_reg_bit(device, 4, 11, 1); // set toggle bit high
+		write_phy_reg_bit(device, 4, 11, 0); // set toggle bit low => this is a toggle
+		val = ( read_phy_reg(device, 4) & 0x0fff) | 0xf000;
+		write_phy_reg(device, 4, val);	//w 4 15 12 f
+		write_phy_reg(device, 3, 0xdf01); // assign another
+		write_phy_reg(device, 2, 0xdf20); // 32 bit phy identifier
+		write_phy_reg(device, 1, 0xff95); // write capabilites
+		write_phy_reg(device, 0, 0xbf00); // write status
+		write_phy_reg_bit(device, 4, 11, 1); // set toggle bit high
+		write_phy_reg_bit(device, 4, 11, 0); // set toggle bit low => this is a toggle
+		write_phy_reg(device, 31, 0x0000); // vendor specific (leave programming mode?)
 	}	
 
-	write_phy_reg(device, 0x04, 0x01e1); // 10/100 capability
-	write_phy_reg(device, 0x09, 0x0200); // 1000 capability
-	write_phy_reg(device, 0x00, 0x1200); // enable and rstart NWAY
+	write_phy_reg(device, 4, 0x01e1); // 10/100 capability
+	write_phy_reg(device, 9, 0x0200); // 1000 capability
+	write_phy_reg(device, 0, 0x1200); // enable auto negotiation and restart it
 }
 
 
@@ -160,7 +211,7 @@ init_buf_desc(rtl8169_device *device)
 	return B_OK;
 }
 
-inline void
+static inline void
 rtl8169_tx_int(rtl8169_device *device)
 {
 	int32 limit;
@@ -186,7 +237,7 @@ rtl8169_tx_int(rtl8169_device *device)
 }
 
 
-inline void
+static inline void
 rtl8169_rx_int(rtl8169_device *device)
 {
 	int32 limit;
@@ -287,7 +338,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	device->pciInfo = gDevList[dev_id];
 	device->nonblocking = (flags & O_NONBLOCK) ? true : false;
 	device->closed = false;
-
+	
 	device->rxSpinlock = 0;
 	device->rxReadySem = create_sem(0, "rtl8169 rx ready");
 	device->rxNextIndex = 0;
@@ -317,7 +368,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	}
 
 	TRACE("IRQ %d\n", device->irq);
-
+	
 	// map registers into memory
 	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, 0x14, 4);
 	val &= PCI_address_memory_32_mask;
@@ -330,10 +381,10 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 		
 	TRACE("mapped registers to %p\n", device->regAddr);
 
-	// disable receiver & transmitter
+	// disable receiver & transmitter XXX might be removed
 	write8(REG_CR, read8(REG_CR) & ~(CR_RE | CR_TE));
 
-	// do a soft reset, does also initialize chip with buffer descriptors
+	// do a soft reset
 	write8(REG_CR, read8(REG_CR) | CR_RST);
 	for (i = 0; (read8(REG_CR) & CR_RST) && i < 1000; i++)
 		snooze(10);
@@ -349,18 +400,20 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	TRACE("8169 Mac Version %d\n", device->mac_version);
 	if (device->mac_version > 0) { // this is a RTL8169s single chip
 		// get PHY hardware version
-		device->phy_version = read_phy_reg(device, 0x03) & 0x0f;
+		device->phy_version = read_phy_reg(device, 0x03) & 0x000f;
 		TRACE("8169 Phy Version %d\n", device->phy_version);
 	} else {
+		// we should probably detect what kind of phy is used
 		device->phy_version = 0;
 		TRACE("8169 Phy Version unknown\n");
 	}
 	
 	if (device->mac_version == 1) {
+		// as it's done by the BSD driver...
 		TRACE("Setting MAC Reg C+CR 0x82h = 0x01h\n");
-		write8(0x82, 0x01);
+		write8(0x82, 0x01); // don't know what this does
 		TRACE("Setting PHY Reg 0x0bh = 0x00h\n");
-		write_phy_reg(device, 0x0b, 0x0000);
+		write_phy_reg(device, 0x0b, 0x0000); // 0xb is a reserved (vendor specific register), don't know what this does
 	}
 	
 	// configure PHY
@@ -369,6 +422,10 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	// initialize MAC address	
 	for (i = 0; i < 6; i++)
 		device->macaddr[i] = read8(i);
+		
+	dprintf("card %p, mac: ", device);
+	for (i = 0; i < 6; i++)
+		dprintf("%02x:", device->macaddr[i]);
 		
 	TRACE("MAC %02x:%02x:%02x:%02x:%02x:%02x\n",
 		device->macaddr[0], device->macaddr[1], device->macaddr[2],
@@ -386,6 +443,8 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 
 	if (device->mac_version == 1) {
 		TRACE("Setting Reg C+CR bit 3 and bit 14 to 1\n");
+		// bit 3 is PCI multiple read/write enable (max Tx/Rx DMA burst size setting is no longer valid then)
+		// bit 14 ??? (need more docs)
 		write16(0xe0, read16(0xe0) | 0x4008);
 	}
 
@@ -605,7 +664,7 @@ retry:
 	restore_interrupts(cpu);
 
 	device->txNextIndex = (device->txNextIndex + 1) % TX_DESC_COUNT;
-
+	
 	write8(REG_TPPOLL, read8(REG_TPPOLL) | TPPOLL_NPQ); // set queue polling bit
 
 	TRACE("rtl8169_write() leave\n");

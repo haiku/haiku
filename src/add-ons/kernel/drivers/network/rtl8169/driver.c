@@ -13,10 +13,6 @@
 #include "device.h"
 #include "driver.h"
 
-#define INFO1 "rtl8169: Realtek RTL8169 Family Driver. Version 1.0"
-#define INFO2 "rtl8169: Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>"
-#define INFO3 "rtl8169: All rights reserved. Build " __DATE__ " "__TIME__
-
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 pci_module_info *gPci;
@@ -43,6 +39,7 @@ init_hardware(void)
 		}
 	}
 	put_module(B_PCI_MODULE_NAME);
+
 	return res;
 }
 

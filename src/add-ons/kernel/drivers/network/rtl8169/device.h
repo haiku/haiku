@@ -24,7 +24,7 @@ status_t rtl8169_free(void* cookie);
 typedef struct {
 	int 				devId;
 	pci_info *			pciInfo;
-
+	
 	volatile bool		nonblocking;
 	volatile bool		closed;
 	
