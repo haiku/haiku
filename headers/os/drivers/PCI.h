@@ -596,4 +596,4 @@ struct pci_module_info {
 }
 #endif
 
-#endif
+#endif	/* _PCI_H */

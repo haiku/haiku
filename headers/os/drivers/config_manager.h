@@ -35,8 +35,12 @@ typedef struct {
 	uint32	cookie;
 } resource_range_descriptor;
 
-typedef enum { B_IRQ_RESOURCE, B_DMA_RESOURCE,
-		B_IO_PORT_RESOURCE, B_MEMORY_RESOURCE } resource_type;
+typedef enum {
+	B_IRQ_RESOURCE,
+	B_DMA_RESOURCE,
+	B_IO_PORT_RESOURCE,
+	B_MEMORY_RESOURCE
+} resource_type;
 
 typedef struct {
 	resource_type type;
@@ -108,4 +112,4 @@ typedef struct config_manager_for_driver_module_info {
 }
 #endif
 
-#endif
+#endif	/* _CONFIG_MANAGER_H */

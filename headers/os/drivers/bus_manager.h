@@ -28,4 +28,4 @@ struct bus_manager_info {
 }
 #endif
 
-#endif
+#endif	/* _BUS_MANAGER_H */

@@ -9,7 +9,7 @@
 *******************************************************************************/
 
 #ifndef _ISA_H
-#define _ISA_H 1
+#define _ISA_H
 
 //#include <SupportDefs.h>
 #include <bus_manager.h>
@@ -81,4 +81,4 @@ struct isa_module_info {
 }
 #endif
 
-#endif
+#endif	/* _ISA_H */
