@@ -23,6 +23,7 @@ struct hash_table *hash_init(uint32 table_size, int next_ptr_offset,
 int hash_uninit(struct hash_table *table);
 status_t hash_insert(struct hash_table *table, void *_element);
 status_t hash_remove(struct hash_table *table, void *_element);
+void *hash_remove_first(struct hash_table *table, uint32 *_cookie);
 void *hash_find(struct hash_table *table, void *e);
 void *hash_lookup(struct hash_table *table, const void *key);
 struct hash_iterator *hash_open(struct hash_table *table, struct hash_iterator *i);
