@@ -397,10 +397,12 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			{
 				fGeneralLock.Lock();
 				rl->fMainLock.Lock();
-// TODO: it's not that good to use fMouseTarget.
-// (you have problems with B_MOUSE_UP, you know... :-)))
-// Yes, I know. But it's too late tonight. :-)))
-				if (target != fMouseTarget)
+#if 0
+printf("Target: %s\n", target->GetName());
+printf("Front: %s\n", ws->FrontLayer()->GetName());
+printf("Focus: %s\n", ws->FocusLayer()->GetName());
+#endif
+				if (target != ws->FrontLayer())
 				{
 					WinBorder		*previousFocus;
 					WinBorder		*activeFocus;
@@ -415,6 +417,8 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 
 					if (target == activeFocus && target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
 						target->MouseDown(msg, true);
+					else
+						target->MouseDown(msg, false);
 
 					// may be or may be empty.
 // TODO: what if modal of floating windows are in front of us?
@@ -432,11 +436,16 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 						}
 					}
 
-					fMouseTarget = activeFocus;
+					fMouseTarget = target;
+#if 0
+printf("2Target: %s\n", target->GetName());
+printf("2Front: %s\n", ws->FrontLayer()->GetName());
+printf("2Focus: %s\n", ws->FocusLayer()->GetName());
+#endif
 
 					activeFocus->Window()->Unlock();
 				}
-				else // target == fMouseTarget
+				else // target == ws->FrontLayer()
 				{
 					// only if target has the focus!
 					if (target == ws->FocusLayer())
