@@ -3089,7 +3089,7 @@ BTextView::HandlePageKey(uint32 inPageKey)
 				line = (*fLines)[CurrentLine() + 1];
 				fClickOffset = PreviousInitialByte(line->offset);
 			} else
-				fClickOffset = fText->Length();
+				fClickOffset = fText->Length() - 1;
 
 			ScrollToOffset(fClickOffset);
 			if (shiftDown) {
