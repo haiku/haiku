@@ -171,9 +171,9 @@ virtual void		DrawBackground(BRect update);
 						
 /*----- Private or reserved -----------------------------------------*/
 private:
-friend BWindow;
-friend BMenuBar;
-friend BMenuItem;
+friend class BWindow;
+friend class BMenuBar;
+friend class BMenuItem;
 friend status_t _init_interface_kit_();
 friend status_t	set_menu_info(menu_info *);
 friend status_t	get_menu_info(menu_info *);

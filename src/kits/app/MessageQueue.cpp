@@ -1,14 +1,14 @@
 //
-//  $Id: MessageQueue.cpp,v 1.2 2002/09/28 09:49:34 shatty Exp $
+//  $Id: MessageQueue.cpp,v 1.3 2003/05/14 17:21:46 haydentech Exp $
 //
 //  This file contains the implementation of the BMessageQueue class
 //  for the OpenBeOS project.
 //
 
 
-#include "MessageQueue.h"
-#include "Autolock.h"
-#include "Message.h"
+#include <MessageQueue.h>
+#include <Autolock.h>
+#include <Message.h>
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {

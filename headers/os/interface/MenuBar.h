@@ -80,10 +80,10 @@ virtual void			AllDetached();
 virtual status_t		Perform(perform_code d, void *arg);
 
 private:
-friend BWindow;
-friend BMenuItem;
-friend BMenuField;
-friend BMenu;
+friend class BWindow;
+friend class BMenuItem;
+friend class BMenuField;
+friend class BMenu;
 
 virtual	void			_ReservedMenuBar1();
 virtual	void			_ReservedMenuBar2();

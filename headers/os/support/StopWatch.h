@@ -2,7 +2,7 @@
 #define _BLUE_STOP_WATCH_H
 
 #include <BeBuild.h>
-#include "support/SupportDefs.h"
+#include <SupportDefs.h>
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {

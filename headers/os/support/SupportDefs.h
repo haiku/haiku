@@ -40,7 +40,7 @@ typedef unsigned short			ushort;
 // System Includes -------------------------------------------------------------
 #include <BeBuild.h>
 #include <sys/types.h>
-#include <support/Errors.h>
+#include <Errors.h>
 
 // Project Includes ------------------------------------------------------------
 

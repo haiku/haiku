@@ -28,9 +28,9 @@
 #include <stdio.h>
 
 // System Includes -------------------------------------------------------------
-#include "ColorControl.h"
-#include "TextControl.h"
-#include <Support/Errors.h>
+#include <ColorControl.h>
+#include <TextControl.h>
+#include <Errors.h>
 
 // Project Includes ------------------------------------------------------------
 

@@ -24,11 +24,11 @@
 //	Description:	BShape encapsulates a Postscript-style "path"
 //------------------------------------------------------------------------------
 
-#include "Shape.h"
-#include "Point.h"
-#include "Rect.h"
-#include <Support/Errors.h>
-#include <App/Message.h>
+#include <Shape.h>
+#include <Point.h>
+#include <Rect.h>
+#include <Errors.h>
+#include <Message.h>
 
 #define OP_LINETO		0x10000000
 #define OP_BEZIERTO		0x20000000

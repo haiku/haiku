@@ -65,9 +65,9 @@ virtual	void			Highlight(bool on);
 
 /*----- Private or reserved -----------------------------------------*/
 private:
-friend	BMenu;
-friend	BPopUpMenu;
-friend	BMenuBar;
+friend class BMenu;
+friend class BPopUpMenu;
+friend class BMenuBar;
 
 virtual	void		_ReservedMenuItem1();
 virtual	void		_ReservedMenuItem2();

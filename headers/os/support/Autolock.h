@@ -1,5 +1,5 @@
 //
-//	$Id: Autolock.h,v 1.1 2002/07/09 12:24:33 ejakowatz Exp $
+//	$Id: Autolock.h,v 1.2 2003/05/14 17:21:46 haydentech Exp $
 //
 //	This is the BAutolock interface for OpenBeOS.  It has been created to
 //	be source and binary compatible with the BeOS version of BAutolock.
@@ -11,7 +11,7 @@
 #define	_OPENBEOS_AUTOLOCK_H
 
 
-#include "Locker.h"
+#include <Locker.h>
 #include <Looper.h>
 
 

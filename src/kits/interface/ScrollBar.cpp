@@ -172,7 +172,7 @@ BArchivable *BScrollBar::Instantiate(BMessage *data)
 	return NULL;
 }
 
-status_t BScrollBar::Archive(BMessage *data, bool deep = true) const
+status_t BScrollBar::Archive(BMessage *data, bool deep) const
 {
 	return B_ERROR;
 }
@@ -481,6 +481,10 @@ void BScrollBar::ResizeToPreferred()
 
 void BScrollBar::GetPreferredSize(float *width, float *height)
 {
+	if (fOrientation == B_VERTICAL)
+		*width = B_V_SCROLL_BAR_WIDTH;
+	else if (fOrientation == B_HORIZONTAL)
+		*height = B_H_SCROLL_BAR_HEIGHT;
 }
 
 void BScrollBar::MakeFocus(bool state)

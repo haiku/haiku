@@ -15,7 +15,7 @@
 #include <SupportDefs.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <OS.h>
 
 /*------------------------------*/

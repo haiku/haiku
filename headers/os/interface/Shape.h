@@ -74,9 +74,9 @@ virtual	void			_ReservedShape2();
 virtual	void			_ReservedShape3();
 virtual	void			_ReservedShape4();
 
-		friend			BShapeIterator;
+		friend class	BShapeIterator;
 		friend class	TPicture;
-		friend			BView;
+		friend class	BView;
 		friend class	BFont;
 		void			GetData(int32 *opCount, int32 *ptCount, uint32 **opList, BPoint **ptList);
 		void			SetData(int32 opCount, int32 ptCount, uint32 *opList, BPoint *ptList);

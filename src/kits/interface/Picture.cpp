@@ -27,7 +27,7 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 // System Includes -------------------------------------------------------------
 #include <Picture.h>

@@ -26,7 +26,7 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 // System Includes -------------------------------------------------------------
 #include <Control.h>
