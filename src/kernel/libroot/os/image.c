@@ -4,16 +4,15 @@
 */
 
 
+#include <libroot_private.h>
+#include <user_runtime.h>
+#include <syscalls.h>
+
 #include <OS.h>
 #include <image.h>
 
-#include "syscalls.h"
-#include "user_runtime.h"
 
-
-void __init__image(struct uspace_program_args const *);
-
-static struct rld_export const *gRuntimeLinker;
+static struct rld_export const *sRuntimeLinker;
 
 
 thread_id
@@ -27,21 +26,21 @@ load_image(int32 argc, const char **argv, const char **environ)
 image_id
 load_add_on(char const *name)
 {
-	return gRuntimeLinker->load_add_on(name, 0);
+	return sRuntimeLinker->load_add_on(name, 0);
 }
 
 
 status_t
 unload_add_on(image_id id)
 {
-	return gRuntimeLinker->unload_add_on(id);
+	return sRuntimeLinker->unload_add_on(id);
 }
 
 
 status_t
 get_image_symbol(image_id id, char const *symbolName, int32 symbolType, void **_location)
 {
-	return gRuntimeLinker->get_image_symbol(id, symbolName, symbolType, _location);
+	return sRuntimeLinker->get_image_symbol(id, symbolName, symbolType, _location);
 }
 
 
@@ -49,7 +48,7 @@ status_t
 get_nth_image_symbol(image_id id, int32 num, char *nameBuffer, int32 *_nameLength,
 	int32 *_symbolType, void **_location)
 {
-	return gRuntimeLinker->get_nth_image_symbol(id, num, nameBuffer, _nameLength, _symbolType, _location);
+	return sRuntimeLinker->get_nth_image_symbol(id, num, nameBuffer, _nameLength, _symbolType, _location);
 }
 
 
@@ -68,9 +67,9 @@ _get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t infoS
 
 
 void
-__init__image(struct uspace_program_args const *args)
+__init_image(const struct uspace_program_args *args)
 {
-	gRuntimeLinker = args->rld_export;
+	sRuntimeLinker = args->rld_export;
 }
 
 
