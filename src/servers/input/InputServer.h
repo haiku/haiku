@@ -97,9 +97,9 @@ class InputServer : public BApplication
 	typedef BApplication Inherited;
 public:
 	InputServer(void);
-	~InputServer(void);
+	virtual ~InputServer(void);
 
-	void ArgvReceived(long, char**);
+	virtual void ArgvReceived(long, char**);
 
 	void InitKeyboardMouseStates(void);
 	
@@ -107,10 +107,10 @@ public:
 	void InitFilters(void);
 	void InitMethods(void);
 
-	bool QuitRequested(void);
-	void ReadyToRun(void);
+	virtual bool QuitRequested(void);
+	virtual void ReadyToRun(void);
 	//thread_id Run(void);
-	void MessageReceived(BMessage*); 
+	virtual void MessageReceived(BMessage*); 
 
 	void HandleSetMethod(BMessage*);
 	void HandleGetMouseType(BMessage*, BMessage*);
