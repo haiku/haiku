@@ -1,0 +1,965 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <KernelExport.h>
+#include <OS.h>
+
+#include "memory_pool.h"
+#include "net_stack.h"
+#include "buffer.h"
+
+
+typedef struct net_buffer_chunk
+{
+	struct net_buffer_chunk	*next;
+	struct net_buffer_chunk *next_data;
+	uint32					ref_count;		// this data is referenced by 'ref_count' net_buffer_chunk(s)
+	const void 				*data;			// address of data
+	uint32					len;			// in bytes (could be 0, with *guest* add_buffer_free_element() node
+	buffer_chunk_free_func	free_func;		// if NULL, don't free it!
+	void *					free_cookie;	// if != NULL, free_func(cookie, data) is called... otherwise, free_func(data)
+} net_buffer_chunk;
+
+struct net_buffer {
+	struct net_buffer 		*next;		// for chained buffers, like fifo'ed ones...
+	struct net_buffer_chunk *all_chunks;	// unordored but ref counted net_buffer_chunk(s) linked list, to free on delete_data()
+	struct net_buffer_chunk *data_chunks;	// ordered net_buffer_chunk(s) linked list
+	size_t					len;		// total bytes in this net_buffer
+	uint32					flags;
+		#define BUFFER_TO_FREE (1)
+		#define BUFFER_IS_URGENT (2)
+// TODO: handle buffer attributs storage and lookup
+//  struct attribut 		*attributs;  // buffer attributs
+};
+
+struct net_buffer_queue
+{
+  benaphore  		lock;
+  sem_id        	sync;
+  volatile int32  	waiting;
+  volatile int32  	interrupt;
+  
+  size_t       		max_bytes;
+  size_t        	current_bytes;
+  
+  net_buffer 		*head;
+  net_buffer		*tail;
+};
+
+
+#define DPRINTF printf
+
+#define BUFFERS_PER_POOL		(64)
+#define BUFFER_CHUNKS_PER_POOL	(256)
+
+static memory_pool *	g_buffers_pool 			= NULL;
+static memory_pool *	g_buffer_chunks_pool	= NULL;
+
+static thread_id		g_buffers_purgatory_thread = -1;
+static volatile sem_id	g_buffers_purgatory_sync = -1;		// use to notify buffers purgatory thread that some net_buffers need to be deleted (interrupt safely...)
+
+#define BUFFER_QUEUES_PER_POOL	16
+
+static memory_pool *	g_buffer_queues_pool = NULL;
+
+extern struct memory_pool_module_info *g_memory_pool;
+
+// Privates prototypes
+// -------------------
+
+static net_buffer_chunk * 	new_buffer_chunk(const void *data, uint32 len);
+static net_buffer_chunk * 	find_buffer_chunk(net_buffer *buffer, uint32 offset, uint32 *offset_in_chunk, net_buffer_chunk **previous_chunk);
+
+static status_t	prepend_buffer(net_buffer *buffer, const void *data, uint32 bytes, buffer_chunk_free_func freethis);
+static status_t append_buffer(net_buffer *buffer, const void *data, uint32 bytes, buffer_chunk_free_func freethis);
+
+static int32				buffers_purgatory_thread(void * data);
+
+static status_t		 		buffer_killer(memory_pool * pool, void * node, void * cookie);
+static status_t	 			buffer_queue_killer(memory_pool * pool, void * node, void * cookie);
+
+
+// LET'S GO FOR IMPLEMENTATION
+// ------------------------------------
+
+
+//	#pragma mark [Start/Stop Service functions]
+
+
+// --------------------------------------------------
+status_t start_buffers_service()
+{
+	g_buffers_purgatory_sync = create_sem(0, "net buffers purgatory");
+#ifdef _KERNEL_MODE
+	set_sem_owner(g_buffers_purgatory_sync, B_SYSTEM_TEAM);
+#endif
+
+	// fire buffers_purgatory_thread
+	g_buffers_purgatory_thread = spawn_kernel_thread(buffers_purgatory_thread, "net buffers serial killer", B_LOW_PRIORITY, 0);
+	if (g_buffers_purgatory_thread < B_OK)
+		return g_buffers_purgatory_thread;
+
+	puts("net buffers service started.");
+		
+	return resume_thread(g_buffers_purgatory_thread);
+}
+
+
+// --------------------------------------------------
+status_t stop_buffers_service()
+{
+	status_t	status;
+
+	// Free all buffers queues inner stuff (sem, locker, etc)
+	g_memory_pool->for_each_pool_node(g_buffer_queues_pool, buffer_queue_killer, NULL);
+	g_memory_pool->delete_pool(g_buffer_queues_pool);
+	g_buffer_queues_pool	= NULL;
+
+	// this would stop buffers_purgatory_thread
+	delete_sem(g_buffers_purgatory_sync);
+	g_buffers_purgatory_sync = -1;
+	wait_for_thread(g_buffers_purgatory_thread, &status);
+	
+	// As the purgatory thread stop, some net_buffer(s) still could be flagged
+	// BUFFER_TO_FREE, but not deleted... yet.
+	g_memory_pool->for_each_pool_node(g_buffers_pool, buffer_killer, NULL);
+
+	// free buffers-related pools
+	g_memory_pool->delete_pool(g_buffers_pool);
+	g_memory_pool->delete_pool(g_buffer_chunks_pool);
+	
+	g_buffers_pool 		= NULL;
+	g_buffer_chunks_pool	= NULL;
+	
+	puts("net buffers service stopped.");
+	
+	return B_OK;
+}
+
+
+// #pragma mark [Public functions]
+
+	
+// --------------------------------------------------
+net_buffer * new_buffer(void)
+{
+	net_buffer *buffer;
+	
+	if (! g_buffers_pool)
+		g_buffers_pool = g_memory_pool->new_pool(sizeof(*buffer), BUFFERS_PER_POOL);
+			
+	if (! g_buffers_pool)
+		return NULL;
+	
+	buffer = (net_buffer *) g_memory_pool->new_pool_node(g_buffers_pool);
+	if (! buffer)
+		return NULL;
+	
+	buffer->next 		= NULL;
+	buffer->data_chunks = NULL;
+	buffer->all_chunks	= NULL;
+	buffer->len			= 0;
+	buffer->flags		= 0;
+	
+	return buffer;
+}
+
+
+
+// --------------------------------------------------
+status_t delete_buffer(net_buffer *buffer, bool interrupt_safe)
+{
+	net_buffer_chunk *chunk;
+	net_buffer_chunk *next_chunk;
+	
+	if (! buffer)
+		return B_BAD_VALUE;
+
+	if (! g_buffers_pool)
+		// Uh? From where come this net_data!?!
+		return B_ERROR;
+		
+	if (interrupt_safe) {
+	  // We're called from a interrupt handler. Don't use any blocking calls (delete_pool_node() is!)
+	  // We flag this net_buffer as to be free by the buffers purgatory thread
+	  // Notify him that he have a new buffer purgatory candidate
+      // (notice the B_DO_NOT_RESCHEDULE usage, the only release_sem_etc() interrupt-safe mode)
+	  buffer->flags |= BUFFER_TO_FREE;
+      return release_sem_etc(g_buffers_purgatory_sync, 1, B_DO_NOT_RESCHEDULE); 
+	};
+
+	// Okay, we can free each buffer chunk(s) right now!
+	chunk = buffer->all_chunks;
+	while (chunk) {
+		// okay, one net_buffer_chunk less referencing this data
+		chunk->ref_count--;
+		next_chunk = chunk->next;
+		
+		if (chunk->ref_count == 0) {
+			// it was the last net_buffer_chunk to reference this data, 
+			// so free it now!
+
+			// do we have to call the free_func() on this data?
+			if (chunk->free_func) {
+				// yes, please!!!
+				// call the right free_func kind on this data
+				if (chunk->free_cookie)
+					chunk->free_func(chunk->free_cookie, (void *) chunk->data);
+				else
+					chunk->free_func((void *) chunk->data);
+			};
+		};
+		// delete this net_buffer_chunk
+		g_memory_pool->delete_pool_node(g_buffer_chunks_pool, chunk);
+			
+		chunk = next_chunk;
+	};
+	
+	// Last, delete the net_buffer itself
+	return g_memory_pool->delete_pool_node(g_buffers_pool, buffer);
+}
+
+
+// --------------------------------------------------
+net_buffer * duplicate_buffer(net_buffer *buffer)
+{
+	return NULL; // B_UNSUPPORTED;
+}
+
+
+// --------------------------------------------------
+net_buffer * clone_buffer(net_buffer *buffer)
+{
+	return NULL; // B_UNSUPPORTED;
+}
+
+
+// --------------------------------------------------
+net_buffer * split_buffer(net_buffer *buffer, uint32 offset)
+{
+	return NULL; // B_UNSUPPORTED;
+}
+
+
+// --------------------------------------------------
+status_t attach_buffer_free_element(net_buffer *buffer, void *arg1, void *arg2, buffer_chunk_free_func freethis)
+{
+	net_buffer_chunk *chunk;
+
+	if (! buffer)
+		return B_BAD_VALUE;
+	
+	chunk = new_buffer_chunk(arg1, 0); // unknown data length
+	if (! chunk)
+		return B_ERROR;
+	
+	chunk->next_data		= NULL;	// not a data_chunks member, just a *guest star* all_chunks member
+	chunk->free_func		= freethis;
+	chunk->free_cookie	= arg2;	
+
+	// add to all_chunks (chunks order don't matter in this list :-)
+	chunk->next 		= buffer->all_chunks;
+	buffer->all_chunks 	= chunk;
+	
+	return B_OK;
+}
+
+
+// --------------------------------------------------
+status_t add_to_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes, buffer_chunk_free_func freethis)
+{
+	net_buffer_chunk 	*previous_chunk;
+	net_buffer_chunk 	*next_chunk;
+	net_buffer_chunk 	*split_chunk;
+	net_buffer_chunk 	*new_chunk;
+	uint32 offset_in_chunk;
+	
+	if (offset == 0)
+		return prepend_buffer(buffer, data, bytes, freethis);
+
+	if (offset >= buffer->len)
+		return append_buffer(buffer, data, bytes, freethis);
+
+	if (! buffer)
+		return B_BAD_VALUE;
+	
+	if (bytes < 1)
+		return B_BAD_VALUE;
+
+
+	next_chunk = find_buffer_chunk(buffer, offset, &offset_in_chunk, &previous_chunk);
+	if (! next_chunk)
+		return B_BAD_VALUE;
+	
+	split_chunk	= NULL;
+	new_chunk	= NULL;
+	
+	if (offset_in_chunk) {
+		// we must split next_chunk data in two parts :-(
+		uint8 *split;
+
+		split = (uint8 *) next_chunk->data;
+		split += offset_in_chunk;
+		split_chunk = new_buffer_chunk(split, next_chunk->len - offset_in_chunk);
+		if (! split_chunk)
+			goto error1;
+
+		next_chunk->len = offset_in_chunk; // cut the data len of original chunk
+
+		// as split_chunk data comes from 'next_chunk', we don't 
+		// ask to free this chunk data, as it would be by previous_chunk
+		split_chunk->free_func = NULL;	
+	
+		// add the split_chunk to buffer's all_chunks list
+		split_chunk->next 	= buffer->all_chunks;
+		buffer->all_chunks	= split_chunk;
+		
+		// insert the split_chunk between the two part of the *splitted* next_chunk
+		split_chunk->next_data = next_chunk->next_data;
+		next_chunk->next_data = split_chunk;
+		
+		previous_chunk = next_chunk;
+		next_chunk     = split_chunk;
+	};
+
+	// create a new chunk to host inserted data
+	new_chunk = new_buffer_chunk(data, bytes);
+	if (! new_chunk)
+		goto error2;
+	
+	new_chunk->free_func	= freethis; // can be NULL = don't free this chunk
+	new_chunk->free_cookie	= NULL;	
+	
+	// add the new_chunk to buffer's all_chunks list
+	new_chunk->next 	= buffer->all_chunks;
+	buffer->all_chunks 	= new_chunk;
+
+	// Insert this new_chunk between previous and next chunk
+	previous_chunk->next_data 	= new_chunk;
+	new_chunk->next_data		= next_chunk;
+
+	buffer->len += bytes;
+	
+	return B_OK;
+
+error2:
+	g_memory_pool->delete_pool_node(g_buffer_chunks_pool, new_chunk);
+error1:
+	g_memory_pool->delete_pool_node(g_buffer_chunks_pool, split_chunk);
+	return B_ERROR;
+}
+
+
+// --------------------------------------------------
+status_t remove_from_buffer(net_buffer *buffer, uint32 offset, uint32 bytes)
+{
+#if 0
+	// TODO!!!
+
+	net_buffer_chunk *	ndn;
+	net_buffer_chunk *	start_node;
+	net_buffer_chunk *	end_node;
+	uint32			start_node_offset;
+	uint32			end_node_offset;
+	net_buffer_chunk *	start_split_node;
+	net_buffer_chunk *	end_split_node;
+	uint8 *			data;
+	
+	if (bytes < 1)
+		return B_BAD_VALUE;
+
+	/*
+	Possibles cases:
+	[XXXXXXX|++++++]....	Triming at start of node (start and/or end nodes)
+    [+++|XXXXXX|+++]....    Triming in the middle of *one* node
+	[+++++|XXXXXXXX]....    Triming at the end of start node
+	...[XXXXXXXXXXXXXX].... Triming one or more full node
+	*/
+
+	start_node = find_buffer_chunk(nd, offset, &start_node_offset, NULL);
+	if (! start_node)
+		return B_BAD_VALUE;
+
+	end_node = find_buffer_chunk(nd, offset + bytes, &end_node_offset, NULL);
+	if (! end_node)
+		return B_BAD_VALUE;
+
+	if ( (start_node == end_node) && 
+		 (start_node_offset > 0) && (end_node_offset != end_node->len) )
+		 // need to split one node into two parts, left & right, to be able to 
+		 // trim data in the middle:
+		 // [++++|XXXXXX|+++++++]
+		 return B_OK;
+	};
+
+	// if the trimmed part is in one node, we know now that it's:
+	// |++++++|XXXXXXXXXXXX|, or:
+	// |XXXXXXXXX|+++++++++|
+
+	if (start_node_offset)
+		start_node->len = start_node_offset;
+
+	if (end_node_offset) {
+		data = (uint8 *) end_node->data;
+		data += end_node_offset;
+		end_node->data = data;
+		end_node->len -= end_node_offset;
+	};
+
+		// start node must be split
+		split = (uint8 *) start_node->data;
+		split += start_node_offset;
+		start_split_node = new_buffer_chunk(split, start_node->len - start_node_offset);
+		if (! start_split_node)
+			goto error1;
+	};
+
+	if (end_node_offset) {
+		// end node must be split
+		split = (uint8 *) end_node->data;
+		split += end_node_offset;
+		end_split_node = new_buffer_chunk(split, end_node->len - end_node_offset);
+		if (! end_split_node)
+			goto error2;
+	};
+
+	if (start_split_node) {
+	};
+
+	ndn = start_node->next_data;
+	while (ndn->next_data != end_node) {
+		if (ndn->next_data == end_node)
+			break;
+
+		ndn = ndn->next_data;
+	};
+	!= end_node
+
+	if (end_split_node) {
+	};
+
+
+		// split start_node data chunk in two parts
+		start_node->len = start_node_offset;
+		
+		start_split_node->free_func = NULL;
+
+	};
+	
+
+
+	ndn->len = offset_in_node;
+	
+	split_node->free_func = NULL;	// as split_node data comes from 'ndn', we don't 
+									// free this node data but only 'ndn' one...
+
+	// create a new node to host inserted data
+	new_node = new_buffer_chunk(data, bytes);
+	if (! new_node)
+		goto error2;
+	
+	new_node->free_func		= freethis; // can be NULL = don't free this chunk
+	new_node->free_cookie	= NULL;	
+	
+	// add these nodes to node_list (nodes order don't matter in this list, so we do it the easy way :-)
+	split_node->next 	= nd->node_list;
+	new_node->next 	= split_node;
+	nd->node_list 		= new_node;
+
+	// Insert this new_node this node to the end of data_list
+	split_node->next_data = ndn->next_data;
+	ndn->next_data = new_node;
+	new_node->next_data = split_node;
+
+	nd->len -= bytes;
+	
+	return B_OK;
+
+error2:
+	g_memory_pool->delete_pool_node(g_buffer_chunks_pool, end_split_node);
+error1:
+	if (start_split_node)
+		g_memory_pool->delete_pool_node(g_buffer_chunks_pool, start_split_node);
+#endif
+	return B_ERROR;
+}
+
+
+// --------------------------------------------------
+uint32 read_buffer(net_buffer *buffer, uint32 offset, void *data, uint32 bytes)
+{
+	net_buffer_chunk 	*chunk;
+	uint32				offset_in_chunk;
+	uint32				len;
+	uint32				chunk_len;
+	uint8 				*from;
+	uint8 				*to;
+	
+	to = (uint8 *) data;
+	len = 0;
+
+	chunk = find_buffer_chunk(buffer, offset, &offset_in_chunk, NULL);
+	while (chunk) {
+		from  = (uint8 *) chunk->data;
+		from += offset_in_chunk;
+		chunk_len = min((chunk->len - offset_in_chunk), (bytes - len));
+		
+		memcpy(to, from, chunk_len);
+
+		len += chunk_len;
+		if (len >= bytes)
+			break;
+
+		to += chunk_len;
+		offset_in_chunk = 0; // only the first chunk
+		
+		chunk = chunk->next_data;	// next chunk
+	};
+		
+	return len;	
+}
+
+
+// --------------------------------------------------
+uint32 write_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes)
+{
+	net_buffer_chunk 	*chunk;
+	uint32			offset_in_chunk;
+	uint32			len;
+	uint32			chunk_len;
+	uint8 			*from;
+	uint8 			*to;
+	
+	from = (uint8 *) data;
+	len = 0;
+
+	chunk = find_buffer_chunk(buffer, offset, &offset_in_chunk, NULL);
+	if (! chunk)
+		return B_ERROR;
+		
+	while (chunk) {
+		to  = (uint8 *) chunk->data;
+		to += offset_in_chunk;
+		chunk_len = min((chunk->len - offset_in_chunk), (bytes - len));
+		
+		memcpy(to, from, chunk_len);
+
+		len += chunk_len;
+		if (len >= bytes)
+			break;
+
+		from += chunk_len;
+		offset_in_chunk = 0; // only the first chunk
+		
+		chunk = chunk->next_data;	// next chunk
+	};
+		
+	return len;	
+}
+
+//	#pragma mark [data(s) queues functions]
+
+// --------------------------------------------------
+net_buffer_queue * new_buffer_queue(size_t max_bytes)
+{
+	net_buffer_queue *queue;
+	
+	if (! g_buffer_queues_pool)
+		g_buffer_queues_pool = g_memory_pool->new_pool(sizeof(net_buffer_queue), BUFFER_QUEUES_PER_POOL);
+			
+	if (! g_buffer_queues_pool)
+		return NULL;
+	
+	queue = (net_buffer_queue *) g_memory_pool->new_pool_node(g_buffer_queues_pool);
+	if (! queue)
+		return NULL;
+	
+	create_benaphore(&queue->lock, "net_buffer_queue lock");
+	queue->sync = create_sem(0, "net_buffer_queue sem");
+	
+	queue->max_bytes 		= max_bytes;
+	queue->current_bytes 	= 0;
+	
+	queue->head = queue->tail = NULL;
+	
+	return queue;
+}
+
+
+// --------------------------------------------------
+status_t	delete_buffer_queue(net_buffer_queue *queue)
+{
+	status_t status;
+	
+	if (! queue)
+		return B_BAD_VALUE;
+		
+	if (! g_buffer_queues_pool)
+		// Uh? From where come this queue then!?!
+		return B_ERROR;
+
+	// free the net_buffer's (still) in this queue
+	status = empty_buffer_queue(queue);
+	if (status != B_OK)
+		return status;
+	
+	delete_sem(queue->sync);
+	delete_benaphore(&queue->lock);
+
+	return g_memory_pool->delete_pool_node(g_buffer_queues_pool, queue);
+}
+
+
+// --------------------------------------------------
+status_t	empty_buffer_queue(net_buffer_queue *queue)
+{
+	net_buffer *buffer;
+	net_buffer *next_buffer;
+		
+	if (! queue)
+		return B_BAD_VALUE;
+	
+	lock_benaphore(&queue->lock);
+	
+	buffer = queue->head;
+	while (buffer) {
+		next_buffer = buffer->next;
+		delete_buffer(buffer, true);
+		buffer = next_buffer;
+	};
+	
+	queue->head = NULL;
+	queue->tail = NULL;
+
+	delete_sem(queue->sync);
+	queue->sync = create_sem(0, "net_buffer_queue sem");
+	
+	unlock_benaphore(&queue->lock);
+	return B_OK;
+}
+
+
+// --------------------------------------------------
+status_t enqueue_buffer(net_buffer_queue *queue, net_buffer *buffer)
+{
+	if (! queue)
+		return B_BAD_VALUE;
+	
+	if (! buffer)
+		return B_BAD_VALUE;
+	
+	buffer->next = NULL;
+	
+/*
+	if (queue->current_bytes + buffer->len > queue->max_bytes)
+		// what to do? dump some enqueued buffer(s) to free space? drop the new net_buffer?
+		// TODO: dequeue enought net_buffer(s) to free space to queue this one...
+		NULL;
+*/
+	lock_benaphore(&queue->lock);
+		
+	if (! queue->head)
+		queue->head = buffer;
+	if (queue->tail)
+		queue->tail->next = buffer;
+	queue->tail =  buffer;
+	
+	queue->current_bytes += buffer->len;
+
+	unlock_benaphore(&queue->lock);
+	
+	return release_sem_etc(queue->sync, 1, B_DO_NOT_RESCHEDULE);
+}
+
+
+// --------------------------------------------------
+size_t  dequeue_buffer(net_buffer_queue *queue, net_buffer **buffer, bigtime_t timeout, bool peek)
+{
+	status_t	status;
+	net_buffer	*head_buffer;
+	
+	if (! queue)
+		return B_BAD_VALUE;
+
+	status = acquire_sem_etc(queue->sync, 1, B_RELATIVE_TIMEOUT, timeout);
+	if (status != B_OK)
+		return status;
+	
+	lock_benaphore(&queue->lock);
+	
+	head_buffer = queue->head;
+	
+	if (! peek) {
+		// detach the head net_buffer from this fifo
+		queue->head = head_buffer->next;
+		if (queue->tail == head_buffer)
+			queue->tail = queue->head;
+
+		queue->current_bytes -= head_buffer->len;
+
+		head_buffer->next = NULL;	// we never know :-)
+	};
+	
+	unlock_benaphore(&queue->lock);
+	
+	*buffer = head_buffer;
+	
+	return head_buffer->len;
+}	
+
+
+//	#pragma mark [Helper functions]
+
+// --------------------------------------------------
+static net_buffer_chunk * new_buffer_chunk(const void *data, uint32 len)
+{
+	net_buffer_chunk *chunk;
+	
+	if (! g_buffer_chunks_pool)
+		g_buffer_chunks_pool = g_memory_pool->new_pool(sizeof(net_buffer_chunk), BUFFER_CHUNKS_PER_POOL);
+			
+	if (! g_buffer_chunks_pool)
+		return NULL;
+	
+	chunk = (net_buffer_chunk *) g_memory_pool->new_pool_node(g_buffer_chunks_pool);
+	
+	chunk->data = data;
+	chunk->len  = len;
+
+	chunk->ref_count = 1;
+
+	chunk->free_cookie	= NULL;
+	chunk->free_func	= NULL;
+
+	chunk->next			= NULL;
+	chunk->next_data	= NULL;
+
+	return chunk;
+}
+
+
+// --------------------------------------------------
+static net_buffer_chunk * find_buffer_chunk(net_buffer *buffer, uint32 offset, uint32 *offset_in_chunk, net_buffer_chunk **previous_chunk)
+{
+	net_buffer_chunk *previous;
+	net_buffer_chunk *chunk;
+	uint32			len;
+	
+	if (! buffer)
+		return NULL;
+	
+	if (buffer->len <= offset)
+		// this net_buffer don't hold enough data to reach this offset!
+		return NULL;
+	
+	len = 0;
+	chunk = buffer->data_chunks;
+	previous = NULL;
+	while (chunk)	{
+		len += chunk->len;
+
+		if(offset < len)
+			break;
+		
+		previous = chunk;
+		chunk = chunk->next_data;
+	};
+
+	if (offset_in_chunk)
+		*offset_in_chunk = chunk->len - (len - offset);	
+	if (previous_chunk)
+		*previous_chunk = previous;
+
+	return chunk;
+}
+
+// --------------------------------------------------
+static status_t prepend_buffer(net_buffer *buffer, const void *data, uint32 bytes, buffer_chunk_free_func freethis)
+{
+	net_buffer_chunk *chunk;
+
+	if (! buffer)
+		return B_BAD_VALUE;
+
+	if (bytes < 1)
+		return B_BAD_VALUE;
+	
+	// create a new chunk to host the prepending data
+	chunk = new_buffer_chunk(data, bytes);
+	if (! chunk)
+		return B_ERROR;
+	
+	chunk->free_func	= freethis; // can be NULL = don't free this chunk
+	chunk->free_cookie	= NULL;	
+	
+	// add this chunk to all_chunks (chunks order don't matter in this list, so we do it the easy way :-)
+	chunk->next	 		= buffer->all_chunks;
+	buffer->all_chunks 	= chunk;
+	
+	// prepend this chunk to the data_chunks list:
+	chunk->next_data	= buffer->data_chunks;
+	buffer->data_chunks	= chunk;
+	
+	buffer->len += bytes;
+	
+	return B_OK;
+}
+
+
+// --------------------------------------------------
+static status_t append_buffer(net_buffer *buffer, const void *data, uint32 bytes, buffer_chunk_free_func freethis)
+{
+	net_buffer_chunk *chunk;
+
+	if (! buffer)
+		return B_BAD_VALUE;
+	
+	if (bytes < 1)
+		return B_BAD_VALUE;
+	
+	// create a new chunk to host the appending data
+	chunk = new_buffer_chunk(data, bytes);
+	if (! chunk)
+		return B_ERROR;
+	
+	chunk->free_func	= freethis; // can be NULL = don't free this chunk
+	chunk->free_cookie	= NULL;	
+	
+	// add this chunk to all_chunks (chunks order don't matter in this list, so we do it the easy way :-)
+	chunk->next	 		= buffer->all_chunks;
+	buffer->all_chunks 	= chunk;
+
+	// Add this chunk to the end of data_chunks list
+	chunk->next_data		= NULL;
+	if (buffer->data_chunks) {
+		net_buffer_chunk *tmp;
+		
+		tmp = buffer->data_chunks;
+		while(tmp->next_data) // search the last net_buffer_chunk in list
+			tmp = tmp->next_data;
+		tmp->next_data = chunk;
+	} else
+		buffer->data_chunks = chunk;
+
+	buffer->len += bytes;
+	
+	return B_OK;
+}
+
+
+// --------------------------------------------------
+void dump_memory
+	(
+	const char *	prefix,
+	const void *	data,
+	uint32			len
+	)
+{
+	uint32	i,j;
+  	char	text[96];	// only 3*16 + 16 max by line needed
+	uint8 *	byte;
+	char *	ptr;
+
+	byte = (uint8 *) data;
+
+	for ( i = 0; i < len; i += 16 )
+		{
+		ptr = text;
+
+      	for ( j = i; j < i+16 ; j++ )
+			{
+			if ( j < len )
+				sprintf(ptr, "%02x ",byte[j]);
+			else
+				sprintf(ptr, "   ");
+			ptr += 3;
+			};
+			
+		for (j = i; j < len && j < i+16;j++)
+			{
+			if ( byte[j] >= ' ' && byte[j] <= 0x7e )
+				*ptr = byte[j];
+			else
+				*ptr = '.';
+				
+			ptr++;
+			};
+		*ptr = '\n';
+		ptr++;
+		*ptr = '\0';
+		
+		if (prefix)
+			DPRINTF(prefix);
+		DPRINTF(text);
+
+		// next line
+		};
+}
+
+
+// --------------------------------------------------
+void dump_buffer(net_buffer *buffer)
+{
+	net_buffer_chunk *chunk;
+
+	if (! buffer)
+		return;
+
+	DPRINTF("---- net_buffer %p: total len %ld\n", buffer, buffer->len);
+	
+	DPRINTF("data_chunks:\n");
+	chunk = buffer->data_chunks;
+	while (chunk) {
+		DPRINTF("  * chunk %p: data %p, len %ld\n", chunk, chunk->data, chunk->len);
+		dump_memory("      ", chunk->data, chunk->len);
+		DPRINTF("    next: %p\n", chunk->next_data);
+
+		chunk = chunk->next_data;
+	};
+
+	DPRINTF("all_chunks:\n");
+	chunk = buffer->all_chunks;
+	while (chunk) {
+		DPRINTF("  * chunk %p: data %p, len %ld, ref_count %ld\n", chunk, chunk->data, chunk->len, chunk->ref_count);
+		if (chunk->free_func)
+			DPRINTF("    free_func: %p, free_cookie %p\n", chunk->free_func, chunk->free_cookie);
+		DPRINTF("    next: %p\n", chunk->next);
+
+		chunk = chunk->next;
+	};
+
+}
+
+// #pragma mark [Buffers Purgatory functions]
+
+// --------------------------------------------------
+static int32 buffers_purgatory_thread(void *data)
+{
+	while (true) {
+		if (acquire_sem(g_buffers_purgatory_sync) != B_OK)
+			break;
+		
+		// okay, time to cleanup some net_buffer(s)
+		g_memory_pool->for_each_pool_node(g_buffers_pool, buffer_killer, NULL);
+	};
+	return 0;
+}
+
+
+// --------------------------------------------------
+static status_t buffer_killer(memory_pool * pool, void * node, void * cookie)
+{
+	net_buffer *buffer = node;
+	if (buffer->flags & BUFFER_TO_FREE)
+		delete_buffer(buffer, false);
+		
+	return 0; // B_OK;
+}
+
+
+// --------------------------------------------------
+static status_t buffer_queue_killer(memory_pool * pool, void * node, void * cookie)
+{
+	return delete_buffer_queue((net_buffer_queue *) node);
+}
+
