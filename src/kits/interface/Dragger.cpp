@@ -23,7 +23,6 @@
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //	Description:	BDragger represents a replicant "handle".
 //------------------------------------------------------------------------------
-
 #include <Alert.h>
 #include <Beep.h>
 #include <Bitmap.h>
@@ -37,22 +36,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Globals ---------------------------------------------------------------------
+
 bool BDragger::sVisible;
 bool BDragger::sInited;
 BLocker BDragger::sLock;
 BList BDragger::sList;
 
-static rgb_color kZombieColor = {220, 220, 220, 255};
+const static rgb_color kZombieColor = {220, 220, 220, 255};
 
-const unsigned char kHandBitmap[] = {	255, 255,   0,   0,   0, 255, 255, 255,
-										255, 255,   0, 131, 131,   0, 255, 255,
-										  0,   0,   0,   0, 131, 131,   0,   0,
-										  0, 131,   0,   0, 131, 131,   0,   0,
-										  0, 131, 131, 131, 131, 131,   0,   0,
-										255,   0, 131, 131, 131, 131,   0,   0,
-										255, 255,   0,   0,   0,   0,   0,   0,
-										255, 255, 255, 255, 255, 255,   0,   0};
+const unsigned char
+kHandBitmap[] = {
+	255, 255,   0,   0,   0, 255, 255, 255,
+	255, 255,   0, 131, 131,   0, 255, 255,
+	  0,   0,   0,   0, 131, 131,   0,   0,
+	  0, 131,   0,   0, 131, 131,   0,   0,
+	  0, 131, 131, 131, 131, 131,   0,   0,
+	255,   0, 131, 131, 131, 131,   0,   0,
+	255, 255,   0,   0,   0,   0,   0,   0,
+	255, 255, 255, 255, 255, 255,   0,   0
+};
 
 
 BDragger::BDragger(BRect bounds, BView *target, uint32 rmask, uint32 flags)
@@ -80,7 +82,7 @@ BDragger::BDragger(BMessage *data)
 		fErrCount(0),
 		fPopUp(NULL)
 {
-	data->FindInt32("_rel", (int32*)&fRelation);
+	data->FindInt32("_rel", (int32 *)&fRelation);
 
 	fBitmap = new BBitmap(BRect(0.0f, 0.0f, 7.0f, 7.0f), B_CMAP8, false, false);
 	fBitmap->SetBits(kHandBitmap, fBitmap->BitsLength(), 0, B_CMAP8);
@@ -91,7 +93,7 @@ BDragger::BDragger(BMessage *data)
 		BArchivable *archivable = instantiate_object(&popupMsg);
 
 		if (archivable)
-			fPopUp = dynamic_cast<BPopUpMenu*>(archivable);
+			fPopUp = dynamic_cast<BPopUpMenu *>(archivable);
 	}
 }
 
@@ -207,15 +209,15 @@ BDragger::MouseDown(BPoint where)
 		bool drag = false;
 
 		while (true) {
-			BPoint where2;
+			BPoint mousePoint;
 			uint32 buttons;
 
-			GetMouse(&where2, &buttons);
+			GetMouse(&mousePoint, &buttons);
 			
 			if (!buttons)
 				break;
 			
-			if (where2 != where) {
+			if (mousePoint != where) {
 				drag = true;
 				break;
 			}
@@ -240,7 +242,6 @@ BDragger::MouseDown(BPoint where)
 			}
 
 			archive.AddInt32("be:actions", B_TRASH_TARGET);
-
 			
 			BPoint offset;
 			drawing_mode mode;		
@@ -258,16 +259,16 @@ BDragger::MouseDown(BPoint where)
 
 
 void
-BDragger::MouseUp(BPoint pt)
+BDragger::MouseUp(BPoint point)
 {
-	BView::MouseUp(pt);
+	BView::MouseUp(point);
 }
 
 
 void
-BDragger::MouseMoved(BPoint pt, uint32 code, const BMessage *msg)
+BDragger::MouseMoved(BPoint point, uint32 code, const BMessage *msg)
 {
-	BView::MouseMoved(pt, code, msg);
+	BView::MouseMoved(point, code, msg);
 }
 
 
@@ -276,7 +277,7 @@ BDragger::MessageReceived(BMessage *msg)
 {
 	if (msg->what == B_TRASH_TARGET) {
 		if (fShelf)
-			Window()->PostMessage('JAHA', fTarget, NULL);
+			Window()->PostMessage('JAHA', fTarget, NULL); // TODO: 'JAHA' ? What's that ?
 		else
 			(new BAlert("??",
 				"Can't delete this replicant from its original application. Life goes on.",
@@ -301,16 +302,16 @@ BDragger::MessageReceived(BMessage *msg)
 
 
 void
-BDragger::FrameMoved(BPoint new_position)
+BDragger::FrameMoved(BPoint newPosition)
 {
-	BView::FrameMoved(new_position);
+	BView::FrameMoved(newPosition);
 }
 
 
 void
-BDragger::FrameResized(float new_width, float new_height)
+BDragger::FrameResized(float newWidth, float newHeight)
 {
-	BView::FrameResized(new_width, new_height);
+	BView::FrameResized(newWidth, newHeight);
 }
 
 
@@ -349,14 +350,14 @@ BHandler *BDragger::ResolveSpecifier(BMessage *msg, int32 index,
 status_t
 BDragger::GetSupportedSuites(BMessage *data)
 {
-	return GetSupportedSuites(data);
+	return BView::GetSupportedSuites(data);
 }
 
 
 status_t
 BDragger::Perform(perform_code d, void *arg)
 {
-	return Perform(d, arg);
+	return BView::Perform(d, arg);
 }
 
 
@@ -410,7 +411,7 @@ BPopUpMenu *
 BDragger::PopUp() const
 {
 	if (!fPopUp && fTarget)
-		const_cast<BDragger*>(this)->BuildDefaultPopUp();
+		const_cast<BDragger *>(this)->BuildDefaultPopUp();
 	
 	return fPopUp;
 }
@@ -552,21 +553,16 @@ BDragger::BuildDefaultPopUp()
 	if (name)
 		msg->AddString("target", name);
 
-	// TODO: Fix this
-	char *about = (char*)malloc(6 + (name ? strlen(name) : 0) + 1);
-	sprintf(about, "About %s", name);
+	char about[B_OS_NAME_LENGTH];
+	snprintf(about, B_OS_NAME_LENGTH, "About %s", name);
 
 	fPopUp->AddItem(new BMenuItem(about, msg));
 
-	free(about);
-
-	// Seperator
+	// Separator
 	fPopUp->AddItem(new BSeparatorItem());
 
 	// Delete
-	msg = new BMessage('JAHA');
-
-	fPopUp->AddItem(new BMenuItem("Delete", msg));
+	fPopUp->AddItem(new BMenuItem("Delete", new BMessage('JAHA')));
 }
 
 
