@@ -179,8 +179,8 @@ worker_thread(void *data)
 }
 
 
-ModemDevice::ModemDevice(PPPInterface& interface, driver_parameter *settings)
-	: PPPDevice("PPPoE", 0, interface, settings),
+ModemDevice::ModemDevice(KPPPInterface& interface, driver_parameter *settings)
+	: KPPPDevice("Modem", 0, interface, settings),
 	fInterfaceName(NULL),
 	fHandle(-1),
 	fWorkerThread(-1),
@@ -229,7 +229,7 @@ ModemDevice::InitCheck() const
 	if(fState != INITIAL && Handle() == -1)
 		return B_ERROR;
 	
-	return InterfaceName() && PPPDevice::InitCheck() == B_OK ? B_OK : B_ERROR;
+	return InterfaceName() && KPPPDevice::InitCheck() == B_OK ? B_OK : B_ERROR;
 }
 
 
@@ -486,7 +486,7 @@ ModemDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 status_t
 ModemDevice::DataReceived(uint8 *buffer, uint32 length)
 {
-	// TODO: report corrupted packets to PPPInterface
+	// TODO: report corrupted packets to KPPPInterface
 	
 	if(length < 3)
 		return B_ERROR;

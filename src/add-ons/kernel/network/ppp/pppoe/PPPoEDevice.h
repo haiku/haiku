@@ -23,9 +23,9 @@ enum pppoe_state {
 };
 
 
-class PPPoEDevice : public PPPDevice {
+class PPPoEDevice : public KPPPDevice {
 	public:
-		PPPoEDevice(PPPInterface& interface, driver_parameter *settings);
+		PPPoEDevice(KPPPInterface& interface, driver_parameter *settings);
 		virtual ~PPPoEDevice();
 		
 		ifnet *EthernetIfnet() const

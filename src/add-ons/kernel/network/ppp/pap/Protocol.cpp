@@ -32,15 +32,15 @@ typedef struct authentication_item {
 } authentication_item;
 
 
-PAPHandler::PAPHandler(PAP& owner, PPPInterface& interface)
-	: PPPOptionHandler("PAP", AUTHENTICATION_TYPE, interface, NULL),
+PAPHandler::PAPHandler(PAP& owner, KPPPInterface& interface)
+	: KPPPOptionHandler("PAP", AUTHENTICATION_TYPE, interface, NULL),
 	fOwner(owner)
 {
 }
 
 
 status_t
-PAPHandler::AddToRequest(PPPConfigurePacket& request)
+PAPHandler::AddToRequest(KPPPConfigurePacket& request)
 {
 	// only local authenticators send requests to peer
 	if(Owner().Side() != PPP_PEER_SIDE)
@@ -58,29 +58,29 @@ PAPHandler::AddToRequest(PPPConfigurePacket& request)
 
 
 status_t
-PAPHandler::ParseNak(const PPPConfigurePacket& nak)
+PAPHandler::ParseNak(const KPPPConfigurePacket& nak)
 {
 	return B_OK;
 }
 
 
 status_t
-PAPHandler::ParseReject(const PPPConfigurePacket& reject)
+PAPHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
 	return B_OK;
 }
 
 
 status_t
-PAPHandler::ParseAck(const PPPConfigurePacket& ack)
+PAPHandler::ParseAck(const KPPPConfigurePacket& ack)
 {
 	return B_OK;
 }
 
 
 status_t
-PAPHandler::ParseRequest(const PPPConfigurePacket& request,
-	int32 index, PPPConfigurePacket& nak, PPPConfigurePacket& reject)
+PAPHandler::ParseRequest(const KPPPConfigurePacket& request,
+	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
 {
 	// only local authenticators handle requests from peer
 	if(Owner().Side() != PPP_LOCAL_SIDE)
@@ -97,7 +97,7 @@ PAPHandler::ParseRequest(const PPPConfigurePacket& request,
 
 
 status_t
-PAPHandler::SendingAck(const PPPConfigurePacket& ack)
+PAPHandler::SendingAck(const KPPPConfigurePacket& ack)
 {
 	return B_OK;
 }
@@ -110,8 +110,8 @@ PAPHandler::Reset()
 
 
 // PAP
-PAP::PAP(PPPInterface& interface, driver_parameter *settings)
-	: PPPProtocol("PAP", PPP_AUTHENTICATION_PHASE, PAP_PROTOCOL, PPP_PROTOCOL_LEVEL,
+PAP::PAP(KPPPInterface& interface, driver_parameter *settings)
+	: KPPPProtocol("PAP", PPP_AUTHENTICATION_PHASE, PAP_PROTOCOL, PPP_PROTOCOL_LEVEL,
 		AF_INET, 0, interface, settings, PPP_ALWAYS_ALLOWED,
 		AUTHENTICATOR_TYPE_STRING, new PAPHandler(*this, interface)),
 	fState(INITIAL),
@@ -122,7 +122,7 @@ PAP::PAP(PPPInterface& interface, driver_parameter *settings)
 {
 	fUser[0] = fPassword[0] = 0;
 	
-	ParseSettings(settings);
+	ParseSettings(Interface().Profile().SettingsFor("authenticator", "pap"));
 }
 
 
@@ -137,7 +137,7 @@ PAP::InitCheck() const
 	if(Side() != PPP_LOCAL_SIDE && Side() != PPP_PEER_SIDE)
 		return B_ERROR;
 	
-	return PPPProtocol::InitCheck();
+	return KPPPProtocol::InitCheck();
 }
 
 
@@ -298,10 +298,13 @@ PAP::Pulse()
 
 
 bool
-PAP::ParseSettings(driver_parameter *requests)
+PAP::ParseSettings(const driver_parameter *requests)
 {
 	memset(fUser, 0, sizeof(fUser));
 	memset(fPassword, 0, sizeof(fPassword));
+	
+	if(!requests)
+		return false;
 	
 	// The following values are allowed:
 	//  "User"

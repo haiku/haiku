@@ -25,9 +25,9 @@ enum modem_state {
 
 class ACFCHandler;
 
-class ModemDevice : public PPPDevice {
+class ModemDevice : public KPPPDevice {
 	public:
-		ModemDevice(PPPInterface& interface, driver_parameter *settings);
+		ModemDevice(KPPPInterface& interface, driver_parameter *settings);
 		virtual ~ModemDevice();
 		
 		const char *InterfaceName() const

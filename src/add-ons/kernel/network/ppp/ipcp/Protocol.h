@@ -58,9 +58,9 @@ extern struct protosw *gProto[];
 	// defined in ipcp.cpp
 
 
-class IPCP : public PPPProtocol {
+class IPCP : public KPPPProtocol {
 	public:
-		IPCP(PPPInterface& interface, driver_parameter *settings);
+		IPCP(KPPPInterface& interface, driver_parameter *settings);
 		virtual ~IPCP();
 		
 		ppp_state State() const
@@ -78,7 +78,7 @@ class IPCP : public PPPProtocol {
 		virtual void Pulse();
 
 	private:
-		bool ParseSideRequests(driver_parameter *requests, ppp_side side);
+		bool ParseSideRequests(const driver_parameter *requests, ppp_side side);
 		void UpdateAddresses();
 		void RemoveRoutes();
 		

@@ -29,9 +29,9 @@ enum acfc_state {
 };
 
 
-class ACFCHandler : public PPPOptionHandler {
+class ACFCHandler : public KPPPOptionHandler {
 	public:
-		ACFCHandler(uint32 options, PPPInterface& interface);
+		ACFCHandler(uint32 options, KPPPInterface& interface);
 		
 		uint32 Options() const
 			{ return fOptions; }
@@ -40,14 +40,14 @@ class ACFCHandler : public PPPOptionHandler {
 		acfc_state PeerState() const
 			{ return fPeerState; }
 		
-		virtual status_t AddToRequest(PPPConfigurePacket& request);
-		virtual status_t ParseNak(const PPPConfigurePacket& nak);
-		virtual status_t ParseReject(const PPPConfigurePacket& reject);
-		virtual status_t ParseAck(const PPPConfigurePacket& ack);
+		virtual status_t AddToRequest(KPPPConfigurePacket& request);
+		virtual status_t ParseNak(const KPPPConfigurePacket& nak);
+		virtual status_t ParseReject(const KPPPConfigurePacket& reject);
+		virtual status_t ParseAck(const KPPPConfigurePacket& ack);
 		
-		virtual status_t ParseRequest(const PPPConfigurePacket& request,
-			int32 index, PPPConfigurePacket& nak, PPPConfigurePacket& reject);
-		virtual status_t SendingAck(const PPPConfigurePacket& ack);
+		virtual status_t ParseRequest(const KPPPConfigurePacket& request,
+			int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject);
+		virtual status_t SendingAck(const KPPPConfigurePacket& ack);
 		
 		virtual void Reset();
 

@@ -44,8 +44,8 @@ dump_packet(struct mbuf *packet)
 #endif
 
 
-PPPoEDevice::PPPoEDevice(PPPInterface& interface, driver_parameter *settings)
-	: PPPDevice("PPPoE", PPPoE_HEADER_SIZE + ETHER_HDR_LEN, interface, settings),
+PPPoEDevice::PPPoEDevice(KPPPInterface& interface, driver_parameter *settings)
+	: KPPPDevice("PPPoE", PPPoE_HEADER_SIZE + ETHER_HDR_LEN, interface, settings),
 	fEthernetIfnet(NULL),
 	fSessionID(0),
 	fHostUniq(NewHostUniq()),
@@ -114,7 +114,7 @@ status_t
 PPPoEDevice::InitCheck() const
 {
 	return EthernetIfnet() && EthernetIfnet()->output
-		&& PPPDevice::InitCheck() == B_OK ? B_OK : B_ERROR;
+		&& KPPPDevice::InitCheck() == B_OK ? B_OK : B_ERROR;
 }
 
 

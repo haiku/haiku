@@ -8,6 +8,7 @@
 #include "Protocol.h"
 #include <KPPPConfigurePacket.h>
 #include <KPPPInterface.h>
+#include <settings_tools.h>
 
 #include <LockerHelper.h>
 
@@ -21,8 +22,8 @@
 	// 3 seconds
 
 
-IPCP::IPCP(PPPInterface& interface, driver_parameter *settings)
-	: PPPProtocol("IPCP", PPP_NCP_PHASE, IPCP_PROTOCOL, PPP_PROTOCOL_LEVEL,
+IPCP::IPCP(KPPPInterface& interface, driver_parameter *settings)
+	: KPPPProtocol("IPCP", PPP_NCP_PHASE, IPCP_PROTOCOL, PPP_PROTOCOL_LEVEL,
 		AF_INET, 0, interface, settings, PPP_INCLUDES_NCP),
 	fDefaultRoute(NULL),
 	fRequestPrimaryDNS(false),
@@ -46,12 +47,10 @@ IPCP::IPCP(PPPInterface& interface, driver_parameter *settings)
 	
 	// Parse settings:
 	// "Local" and "Peer" describe each side's settings
-	for(int32 index = 0; index < settings->parameter_count; index++) {
-		if(!strcasecmp(settings->parameters[index].name, "Local"))
-			ParseSideRequests(&settings->parameters[index], PPP_LOCAL_SIDE);
-		else if(!strcasecmp(settings->parameters[index].name, "Peer"))
-			ParseSideRequests(&settings->parameters[index], PPP_PEER_SIDE);
-	}
+	const driver_parameter *profile
+		= Interface().Profile().SettingsFor("protocol", "ipcp");
+	ParseSideRequests(get_parameter_with_name("Local", profile), PPP_LOCAL_SIDE);
+	ParseSideRequests(get_parameter_with_name("Peer", profile), PPP_PEER_SIDE);
 }
 
 
@@ -86,7 +85,7 @@ IPCP::StackControl(uint32 op, void *data)
 		
 		default:
 			dprintf("IPCP: Unknown ioctl: %ld\n", op);
-			return PPPProtocol::StackControl(op, data);
+			return KPPPProtocol::StackControl(op, data);
 	}
 	
 	return B_OK;
@@ -306,8 +305,11 @@ IPCP::Pulse()
 
 
 bool
-IPCP::ParseSideRequests(driver_parameter *requests, ppp_side side)
+IPCP::ParseSideRequests(const driver_parameter *requests, ppp_side side)
 {
+	if(!requests)
+		return false;
+	
 	ipcp_requests *selectedRequests;
 	
 	if(side == PPP_LOCAL_SIDE) {
@@ -419,12 +421,14 @@ IPCP::UpdateAddresses()
 		dprintf("IPCP: UpdateAddress(): SIOCSIFNETMASK returned error!\n");
 	
 	// add default/subnet route
-	if(rtrequest(RTM_ADD, (struct sockaddr*) &inreq.ifra_mask,
-			(struct sockaddr*) &fGateway, (struct sockaddr*) &inreq.ifra_mask,
-			RTF_UP | RTF_GATEWAY, &fDefaultRoute) != B_OK)
-		dprintf("IPCP: UpdateAddress(): could not add default/subnet route!\n");
-	
-	--fDefaultRoute->rt_refcnt;
+	if(Side() == PPP_LOCAL_SIDE) {
+		if(rtrequest(RTM_ADD, (struct sockaddr*) &inreq.ifra_mask,
+				(struct sockaddr*) &fGateway, (struct sockaddr*) &inreq.ifra_mask,
+				RTF_UP | RTF_GATEWAY, &fDefaultRoute) != B_OK)
+			dprintf("IPCP: UpdateAddress(): could not add default/subnet route!\n");
+		
+		--fDefaultRoute->rt_refcnt;
+	}
 }
 
 
@@ -546,9 +550,9 @@ IPCP::RCREvent(struct mbuf *packet)
 	dprintf("IPCP: RCREvent() state=%d\n", State());
 #endif
 	
-	PPPConfigurePacket request(packet);
-	PPPConfigurePacket nak(PPP_CONFIGURE_NAK);
-	PPPConfigurePacket reject(PPP_CONFIGURE_REJECT);
+	KPPPConfigurePacket request(packet);
+	KPPPConfigurePacket nak(PPP_CONFIGURE_NAK);
+	KPPPConfigurePacket reject(PPP_CONFIGURE_REJECT);
 	
 	// we should not use the same id as the peer
 	if(fID == mtod(packet, ppp_lcp_packet*)->id)
@@ -753,7 +757,7 @@ IPCP::RCAEvent(struct mbuf *packet)
 	}
 	
 	// parse this ack
-	PPPConfigurePacket ack(packet);
+	KPPPConfigurePacket ack(packet);
 	ppp_configure_item *item;
 	in_addr_t *requestedAddress, *wishedAddress = NULL, *configuredAddress = NULL;
 	for(int32 index = 0; index < ack.CountItems(); index++) {
@@ -863,7 +867,7 @@ IPCP::RCNEvent(struct mbuf *packet)
 	}
 	
 	// parse this nak/reject
-	PPPConfigurePacket nak_reject(packet);
+	KPPPConfigurePacket nak_reject(packet);
 	ppp_configure_item *item;
 	in_addr_t *requestedAddress;
 	if(nak_reject.Code() == PPP_CONFIGURE_NAK)
@@ -1182,7 +1186,7 @@ IPCP::SendConfigureRequest()
 	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
 	locker.UnlockNow();
 	
-	PPPConfigurePacket request(PPP_CONFIGURE_REQUEST);
+	KPPPConfigurePacket request(PPP_CONFIGURE_REQUEST);
 	request.SetID(NextID());
 	fRequestID = request.ID();
 	ip_item ipItem;
@@ -1236,7 +1240,7 @@ IPCP::SendConfigureAck(struct mbuf *packet)
 		return false;
 	
 	mtod(packet, ppp_lcp_packet*)->code = PPP_CONFIGURE_ACK;
-	PPPConfigurePacket ack(packet);
+	KPPPConfigurePacket ack(packet);
 	
 	// verify items
 	ppp_configure_item *item;

@@ -13,8 +13,8 @@
 #define ACFC_TYPE				0x8
 
 
-ACFCHandler::ACFCHandler(uint32 options, PPPInterface& interface)
-	: PPPOptionHandler("ACFC Handler", ACFC_TYPE, interface, NULL),
+ACFCHandler::ACFCHandler(uint32 options, KPPPInterface& interface)
+	: KPPPOptionHandler("ACFC Handler", ACFC_TYPE, interface, NULL),
 	fOptions(options),
 	fLocalState(ACFC_DISABLED),
 	fPeerState(ACFC_DISABLED)
@@ -23,7 +23,7 @@ ACFCHandler::ACFCHandler(uint32 options, PPPInterface& interface)
 
 
 status_t
-ACFCHandler::AddToRequest(PPPConfigurePacket& request)
+ACFCHandler::AddToRequest(KPPPConfigurePacket& request)
 {
 	// is ACFC not requested or was it rejected?
 	if(fLocalState == ACFC_REJECTED
@@ -39,7 +39,7 @@ ACFCHandler::AddToRequest(PPPConfigurePacket& request)
 
 
 status_t
-ACFCHandler::ParseNak(const PPPConfigurePacket& nak)
+ACFCHandler::ParseNak(const KPPPConfigurePacket& nak)
 {
 	// naks do not contain ACFC items
 	if(nak.ItemWithType(ACFC_TYPE))
@@ -50,7 +50,7 @@ ACFCHandler::ParseNak(const PPPConfigurePacket& nak)
 
 
 status_t
-ACFCHandler::ParseReject(const PPPConfigurePacket& reject)
+ACFCHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
 	if(reject.ItemWithType(ACFC_TYPE)) {
 		fLocalState = ACFC_REJECTED;
@@ -64,7 +64,7 @@ ACFCHandler::ParseReject(const PPPConfigurePacket& reject)
 
 
 status_t
-ACFCHandler::ParseAck(const PPPConfigurePacket& ack)
+ACFCHandler::ParseAck(const KPPPConfigurePacket& ack)
 {
 	if(ack.ItemWithType(ACFC_TYPE))
 		fLocalState = ACFC_ACCEPTED;
@@ -80,8 +80,8 @@ ACFCHandler::ParseAck(const PPPConfigurePacket& ack)
 
 
 status_t
-ACFCHandler::ParseRequest(const PPPConfigurePacket& request,
-	int32 index, PPPConfigurePacket& nak, PPPConfigurePacket& reject)
+ACFCHandler::ParseRequest(const KPPPConfigurePacket& request,
+	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
 {
 	if(!request.ItemWithType(ACFC_TYPE))
 		return B_OK;
@@ -98,7 +98,7 @@ ACFCHandler::ParseRequest(const PPPConfigurePacket& request,
 
 
 status_t
-ACFCHandler::SendingAck(const PPPConfigurePacket& ack)
+ACFCHandler::SendingAck(const KPPPConfigurePacket& ack)
 {
 	ppp_configure_item *item = ack.ItemWithType(ACFC_TYPE);
 	

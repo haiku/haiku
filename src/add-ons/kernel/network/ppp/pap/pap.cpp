@@ -25,7 +25,7 @@ status_t std_ops(int32 op, ...);
 
 static
 bool
-add_to(PPPInterface& mainInterface, PPPInterface *subInterface,
+add_to(KPPPInterface& mainInterface, KPPPInterface *subInterface,
 	driver_parameter *settings, ppp_module_key_type type)
 {
 	if(type != PPP_AUTHENTICATOR_KEY_TYPE)

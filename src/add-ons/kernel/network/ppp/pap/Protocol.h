@@ -29,21 +29,22 @@ enum pap_state {
 
 
 class PAP;
-class PAPHandler : public PPPOptionHandler {
+
+class PAPHandler : public KPPPOptionHandler {
 	public:
-		PAPHandler(PAP& owner, PPPInterface& interface);
+		PAPHandler(PAP& owner, KPPPInterface& interface);
 		
 		PAP& Owner() const
 			{ return fOwner; }
 		
-		virtual status_t AddToRequest(PPPConfigurePacket& request);
-		virtual status_t ParseNak(const PPPConfigurePacket& nak);
-		virtual status_t ParseReject(const PPPConfigurePacket& reject);
-		virtual status_t ParseAck(const PPPConfigurePacket& ack);
+		virtual status_t AddToRequest(KPPPConfigurePacket& request);
+		virtual status_t ParseNak(const KPPPConfigurePacket& nak);
+		virtual status_t ParseReject(const KPPPConfigurePacket& reject);
+		virtual status_t ParseAck(const KPPPConfigurePacket& ack);
 		
-		virtual status_t ParseRequest(const PPPConfigurePacket& request,
-			int32 index, PPPConfigurePacket& nak, PPPConfigurePacket& reject);
-		virtual status_t SendingAck(const PPPConfigurePacket& ack);
+		virtual status_t ParseRequest(const KPPPConfigurePacket& request,
+			int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject);
+		virtual status_t SendingAck(const KPPPConfigurePacket& ack);
 		
 		virtual void Reset();
 
@@ -52,9 +53,9 @@ class PAPHandler : public PPPOptionHandler {
 };
 
 
-class PAP : public PPPProtocol {
+class PAP : public KPPPProtocol {
 	public:
-		PAP(PPPInterface& interface, driver_parameter *settings);
+		PAP(KPPPInterface& interface, driver_parameter *settings);
 		virtual ~PAP();
 		
 		virtual status_t InitCheck() const;
@@ -70,7 +71,7 @@ class PAP : public PPPProtocol {
 		virtual void Pulse();
 
 	private:
-		bool ParseSettings(driver_parameter *settings);
+		bool ParseSettings(const driver_parameter *settings);
 		
 		// for state machine
 		void NewState(pap_state next);
