@@ -119,8 +119,8 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 		}
 
 		/* modify sync polarities (needed to maintain correct panel centering):
-		 * both polarities must be same (confirmed NM2160) */
-		target.timing.flags |= (B_POSITIVE_HSYNC | B_POSITIVE_VSYNC);
+		 * both polarities must be negative (confirmed NM2160) */
+		target.timing.flags &= ~(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC);
 	}
 
 	/* Modify parameters as required by standard VGA */
