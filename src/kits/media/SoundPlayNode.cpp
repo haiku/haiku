@@ -7,6 +7,7 @@
  ***********************************************************************/
 
 #include <TimeSource.h>
+#include <MediaRoster.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -25,7 +26,7 @@
 
 #define SEND_NEW_BUFFER_EVENT (BTimedEventQueue::B_USER_EVENT + 1)
 
-_SoundPlayNode::_SoundPlayNode(const char *name, const media_multi_audio_format *format, BSoundPlayer *player) : 
+_SoundPlayNode::_SoundPlayNode(const char *name, BSoundPlayer *player) : 
 	BMediaNode(name),
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
 	BMediaEventLooper(),
@@ -37,28 +38,8 @@ _SoundPlayNode::_SoundPlayNode(const char *name, const media_multi_audio_format 
 	mTooEarlyCount(0)
 {
 	CALLED();
-	mFormat.type = B_MEDIA_RAW_AUDIO;
-	mFormat.u.raw_audio = *format;
-	
-	DPRINTF("Format Info:\n");
-	DPRINTF("  frame_rate:     %.1f (%ld)\n", mFormat.u.raw_audio.frame_rate, (int32)mFormat.u.raw_audio.frame_rate);
-	DPRINTF("  channel_count:  %ld\n",mFormat.u.raw_audio.channel_count);
-	DPRINTF("  byte_order:     %ld (",mFormat.u.raw_audio.byte_order);
-	switch (mFormat.u.raw_audio.byte_order) {
-		case B_MEDIA_BIG_ENDIAN: DPRINTF("B_MEDIA_BIG_ENDIAN)\n"); break;
-		case B_MEDIA_LITTLE_ENDIAN: DPRINTF("B_MEDIA_LITTLE_ENDIAN)\n"); break;
-		default: DPRINTF("unknown)\n"); break;
-	}
-	DPRINTF("  buffer_size:    %ld\n",mFormat.u.raw_audio.buffer_size);
-	DPRINTF("  format:         %ld (",mFormat.u.raw_audio.format);
-	switch (mFormat.u.raw_audio.format) {
-		case media_raw_audio_format::B_AUDIO_FLOAT: DPRINTF("B_AUDIO_FLOAT)\n"); break;
-		case media_raw_audio_format::B_AUDIO_SHORT: DPRINTF("B_AUDIO_SHORT)\n"); break;
-		case media_raw_audio_format::B_AUDIO_INT: DPRINTF("B_AUDIO_INT)\n"); break;
-		case media_raw_audio_format::B_AUDIO_CHAR: DPRINTF("B_AUDIO_CHAR)\n"); break;
-		case media_raw_audio_format::B_AUDIO_UCHAR: DPRINTF("B_AUDIO_UCHAR)\n"); break;
-		default: DPRINTF("unknown)\n"); break;
-	}
+	mOutput.format.type = B_MEDIA_RAW_AUDIO;
+	mOutput.format.u.raw_audio = media_multi_audio_format::wildcard;
 }
 
 
@@ -75,16 +56,16 @@ _SoundPlayNode::IsPlaying()
 }
 
 bigtime_t
-_SoundPlayNode::Latency()
+_SoundPlayNode::CurrentTime()
 {
-	return EventLatency();
+	int frame_rate = (int)mOutput.format.u.raw_audio.frame_rate;
+	return frame_rate == 0 ? 0 : bigtime_t((1000000LL * mFramesSent) / frame_rate);
 }
-
 
 media_multi_audio_format 
 _SoundPlayNode::Format() const
 {
-	return mFormat.u.raw_audio;
+	return mOutput.format.u.raw_audio;
 }
 
 // -------------------------------------------------------- //
@@ -122,7 +103,8 @@ void _SoundPlayNode::NodeRegistered(void)
 	
 	SetPriority(B_URGENT_PRIORITY);
 	
-	mOutput.format = mFormat;
+	mOutput.format.type = B_MEDIA_RAW_AUDIO;
+	mOutput.format.u.raw_audio = media_multi_audio_format::wildcard;
 	mOutput.destination = media_destination::null;
 	mOutput.source.port = ControlPort();
 	mOutput.source.id = 0;
@@ -168,7 +150,8 @@ _SoundPlayNode::FormatSuggestionRequested(media_type type, int32 /*quality*/, me
 		return B_MEDIA_BAD_FORMAT;
 
 	// this is the format we'll be returning (our preferred format)
-	*format = mFormat;
+	format->type = B_MEDIA_RAW_AUDIO;
+	format->u.raw_audio = media_multi_audio_format::wildcard;
 
 	return B_OK;
 }
@@ -186,16 +169,21 @@ _SoundPlayNode::FormatProposal(const media_source& output, media_format* format)
 		return B_MEDIA_BAD_SOURCE;
 	}
 
-	// we only support floating-point raw audio, so we always return that, but we
-	// supply an error code depending on whether we found the proposal acceptable.
-	media_type requestedType = format->type;
-	*format = mFormat;
-	if ((requestedType != B_MEDIA_UNKNOWN_TYPE) && (requestedType != B_MEDIA_RAW_AUDIO)) {
+	// if wildcard, change it to raw audio
+	if (format->type == B_MEDIA_UNKNOWN_TYPE)
+		format->type = B_MEDIA_RAW_AUDIO;
+
+	// if not raw audio, we can't support it
+	if (format->type != B_MEDIA_RAW_AUDIO) {
 		TRACE("_SoundPlayNode::FormatProposal returning B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	else
-		return B_OK;		// raw audio or wildcard type, either is okay by us
+	
+	char buf[100];
+	string_for_format(*format, buf, sizeof(buf));
+	printf("_SoundPlayNode::FormatProposal: format %s\n", buf);
+
+	return B_OK;
 }
 
 status_t 
@@ -284,15 +272,14 @@ status_t
 _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destination& where, media_format* format, media_source* out_source, char* out_name)
 {
 	// PrepareToConnect() is the second stage of format negotiations that happens
-	// inside BMediaRoster::Connect().  At this point, the consumer's AcceptFormat()
+	// inside BMediaRoster::Connect(). At this point, the consumer's AcceptFormat()
 	// method has been called, and that node has potentially changed the proposed
-	// format.  It may also have left wildcards in the format.  PrepareToConnect()
+	// format. It may also have left wildcards in the format. PrepareToConnect()
 	// *must* fully specialize the format before returning!
 	CALLED();
 
 	// is this our output?
-	if (what != mOutput.source)
-	{
+	if (what != mOutput.source)	{
 		TRACE("_SoundPlayNode::PrepareToConnect returning B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
@@ -302,26 +289,55 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 		return B_MEDIA_ALREADY_CONNECTED;
 
 	// the format may not yet be fully specialized (the consumer might have
-	// passed back some wildcards).  Finish specializing it now, and return an
+	// passed back some wildcards). Finish specializing it now, and return an
 	// error if we don't support the requested format.
-	if (format->type != B_MEDIA_RAW_AUDIO)
-	{
-		TRACE("\tnon-raw-audio format?!\n");
+
+	char buf[100];
+	string_for_format(*format, buf, sizeof(buf));
+	printf("_SoundPlayNode::PrepareToConnect: input format %s\n", buf);
+
+	// if not raw audio, we can't support it
+	if (format->type != B_MEDIA_UNKNOWN_TYPE && format->type != B_MEDIA_RAW_AUDIO) {
+		TRACE("_SoundPlayNode::PrepareToConnect: non raw format, returning B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	// !!! validate all other fields except for buffer_size here, because the consumer might have
-	// supplied different values from AcceptFormat()?
 
-	// check the buffer size, which may still be wildcarded
-	if (format->u.raw_audio.buffer_size == media_raw_audio_format::wildcard.buffer_size)
-	{
-		format->u.raw_audio.buffer_size = 2048;		// pick something comfortable to suggest
-		TRACE("\tno buffer size provided, suggesting %lu\n", format->u.raw_audio.buffer_size);
+	// the haiku mixer might have a hint
+	// for us, so check for it
+	#define FORMAT_USER_DATA_TYPE 		0x7294a8f3
+	#define FORMAT_USER_DATA_MAGIC_1	0xc84173bd
+	#define FORMAT_USER_DATA_MAGIC_2	0x4af62b7d
+	uint32 channel_count = 0;
+	float frame_rate = 0;
+	if (format->user_data_type == FORMAT_USER_DATA_TYPE
+			&& *(uint32 *)&format->user_data[0] == FORMAT_USER_DATA_MAGIC_1
+			&& *(uint32 *)&format->user_data[44] == FORMAT_USER_DATA_MAGIC_2) {
+		channel_count = *(uint32 *)&format->user_data[4];
+		frame_rate = *(float *)&format->user_data[20];
+		printf("_SoundPlayNode::PrepareToConnect: found mixer info: channel_count %ld, frame_rate %.1f\n", channel_count, frame_rate);
 	}
-	else
-	{
-		TRACE("\tconsumer suggested buffer_size %lu\n", format->u.raw_audio.buffer_size);
-	}
+	if (channel_count <= 0)
+		channel_count = 2;
+	if (frame_rate <= 0)
+		frame_rate = 44100;
+
+	media_format default_format;
+	default_format.type = B_MEDIA_RAW_AUDIO;
+	default_format.u.raw_audio.frame_rate = frame_rate > 0 ? frame_rate : 44100;
+	default_format.u.raw_audio.channel_count = channel_count > 0 ? channel_count : 2;
+	default_format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
+	default_format.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
+	default_format.u.raw_audio.buffer_size = 0;
+	format->SpecializeTo(&default_format);
+	
+	if (format->u.raw_audio.buffer_size == 0)
+		format->u.raw_audio.buffer_size = BMediaRoster::Roster()->AudioBufferSizeFor(
+			format->u.raw_audio.channel_count,
+			format->u.raw_audio.format,
+			format->u.raw_audio.frame_rate);
+	
+	string_for_format(*format, buf, sizeof(buf));
+	printf("_SoundPlayNode::PrepareToConnect: output format %s\n", buf);
 
 	// Now reserve the connection, and return information about it
 	mOutput.destination = where;
@@ -337,8 +353,7 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 	CALLED();
 	
 	// is this our output?
-	if (source != mOutput.source)
-	{
+	if (source != mOutput.source) {
 		TRACE("_SoundPlayNode::Connect returning\n");
 		return;
 	}
@@ -346,10 +361,10 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 	// If something earlier failed, Connect() might still be called, but with a non-zero
 	// error code.  When that happens we simply unreserve the connection and do
 	// nothing else.
-	if (error)
-	{
+	if (error) {
 		mOutput.destination = media_destination::null;
-		mOutput.format = mFormat;
+		mOutput.format.type = B_MEDIA_RAW_AUDIO;
+		mOutput.format.u.raw_audio = media_multi_audio_format::wildcard;
 		return;
 	}
 
@@ -400,7 +415,8 @@ _SoundPlayNode::Disconnect(const media_source& what, const media_destination& wh
 	if ((where == mOutput.destination) && (what == mOutput.source))
 	{
 		mOutput.destination = media_destination::null;
-		mOutput.format = mFormat;
+		mOutput.format.type = B_MEDIA_RAW_AUDIO;
+		mOutput.format.u.raw_audio = media_multi_audio_format::wildcard;
 		delete mBufferGroup;
 		mBufferGroup = NULL;
 	}

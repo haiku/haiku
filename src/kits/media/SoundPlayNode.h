@@ -19,11 +19,11 @@ class _SoundPlayNode
 	: public BBufferProducer, public BMediaEventLooper
 {
 public:
-	_SoundPlayNode(const char *name, const media_multi_audio_format *format, BSoundPlayer *player);
+	_SoundPlayNode(const char *name, BSoundPlayer *player);
 	~_SoundPlayNode();
 	
 	bool IsPlaying();
-	bigtime_t Latency();
+	bigtime_t CurrentTime();
 	
 /*************************/
 /* begin from BMediaNode */

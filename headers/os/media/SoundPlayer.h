@@ -152,22 +152,17 @@ virtual	status_t _Reserved_SoundPlayer_7(void *, ...);
 		void (*fPlayBufferFunc)(void * cookie, void * buffer, size_t size, const media_raw_audio_format & format);
 		void (*fNotifierFunc)(void * cookie, sound_player_notification what, ...);
 		BLocker fLocker;
-		float fVolume;
-		media_input fMediaInput;
-		media_output fMediaOutput;
-		float * _m_mix_buffer;
-		size_t _m_mix_buffer_size;
+		float fVolumeDB;
+		media_input fMediaInput;	// the system mixer
+		media_output fMediaOutput;	// the player node
 		void * fCookie;
-		void * _m_buf;
-		size_t _m_bufsize;
 		int32 fFlags;
 
 		status_t fInitStatus;		//	new in R4.1
-		bigtime_t _m_perfTime;
 		BContinuousParameter * fVolumeSlider;
 		bigtime_t fLastVolumeUpdate;
 		BParameterWeb *fParameterWeb;
-		uint32 _m_reserved[9];
+		uint32 _m_reserved[15];
 
 		void NotifySoundDone(
 				play_id sound,
