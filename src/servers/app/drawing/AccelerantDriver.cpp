@@ -193,7 +193,8 @@ AccelerantDriver::Initialize()
 	accSetCursorShape = (set_cursor_shape)accelerant_hook(B_SET_CURSOR_SHAPE,NULL);
 	accMoveCursor = (move_cursor)accelerant_hook(B_MOVE_CURSOR,NULL);
 	accShowCursor = (show_cursor)accelerant_hook(B_SHOW_CURSOR,NULL);
-
+	accScreenBlit = (screen_to_screen_blit)accelerant_hook(B_SCREEN_TO_SCREEN_BLIT, NULL);
+	
 #ifdef DRAW_TEST
 	// Commented out to remove a couple warnings
 //	RGBColor red(255,0,0,0);
@@ -1229,6 +1230,27 @@ AccelerantDriver::GetDepthFromColorspace(int space)
 void
 AccelerantDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
 {
+#ifndef DISABLE_HARDWARE_ACCELERATION
+	if (accScreenBlit && AcquireEngine) {
+		if (AcquireEngine(0, 0, NULL, &mEngineToken) == B_OK) {
+			blit_params blitParams;
+			blitParams.src_left = (uint16)src.left;
+			blitParams.src_top = (uint16)src.top;
+			blitParams.dest_left = (uint16)dest.left;
+			blitParams.dest_top = (uint16)dest.top;
+			blitParams.width = (int16)src.Width() - 1;
+			blitParams.height = (int16)src.Height() - 1;
+			
+			accScreenBlit(mEngineToken, &blitParams, 1);
+			
+			if (ReleaseEngine)
+				ReleaseEngine(mEngineToken, NULL);
+			
+			Unlock();
+			return;
+		}
+	}
+#endif
 }
 
 void
