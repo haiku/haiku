@@ -4,6 +4,10 @@
 #ifndef _SYS_TYPES_H
 #define _SYS_TYPES_H
 
+
+#include <BeBuild.h>
+
+
 /* BSD compatibility */
 typedef unsigned long 		u_long;
 typedef unsigned int 		u_int;
