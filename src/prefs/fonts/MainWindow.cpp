@@ -48,9 +48,9 @@ MainWindow::MainWindow(BRect frame)
 	
 	topLevelView = new BBox(Bounds(), "TopLevelView", B_FOLLOW_ALL, B_WILL_DRAW, B_NO_BORDER);
 	
-	AddChild(buttonView);
-	AddChild(tabView);
 	AddChild(topLevelView);
+	topLevelView->AddChild(buttonView);
+	topLevelView->AddChild(tabView);
 	
 }
 

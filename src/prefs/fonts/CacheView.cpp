@@ -19,8 +19,6 @@ CacheView::CacheView(BRect rect, int minVal, int maxVal, int32 printCurrVal, int
 	   	   : BView(rect, "CacheView", B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	
-	float x;
-	float y;
 	BRect viewSize = Bounds();
 	char sliderMinLabel[10];
 	char sliderMaxLabel[10];
@@ -37,7 +35,7 @@ CacheView::CacheView(BRect rect, int minVal, int maxVal, int32 printCurrVal, int
 	
 	viewSize.InsetBy(15, 10);
 	
-	sprintf(msg, "Screen font cache size : %d kB", screenCurrVal);
+	sprintf(msg, "Screen font cache size : %d kB", static_cast<int>(screenCurrVal));
 	
 	screenFCS = new BSlider(*(new BRect(viewSize.left, viewSize.top, viewSize.right, viewSize.top + 25.0)),
 							"screenFontCache",
@@ -57,7 +55,7 @@ CacheView::CacheView(BRect rect, int minVal, int maxVal, int32 printCurrVal, int
 	
 	viewSize.top = viewSize.top + 65.0;
 	
-	sprintf(msg, "Printing font cache size : %d kB", printCurrVal);
+	sprintf(msg, "Printing font cache size : %d kB", static_cast<int>(printCurrVal));
 	
 	printFCS = new BSlider(*(new BRect(viewSize.left, viewSize.top, viewSize.right, viewSize.top + 25.0)),
 							"printFontCache",
