@@ -256,6 +256,9 @@ add_vnode_to_mount_list(struct vnode *v, struct fs_mount *mount)
 
 	v->mount_next = mount->vnodes_head;
 	v->mount_prev = NULL;
+	if (v->mount_next)
+		v->mount_next->mount_prev = v;
+
 	mount->vnodes_head = v;
 	if (!mount->vnodes_tail)
 		mount->vnodes_tail = v;

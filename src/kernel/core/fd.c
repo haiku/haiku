@@ -210,8 +210,8 @@ fd_dup2(int oldfd, int newfd, bool kernel)
 	if (oldfd != newfd) {
 		// Now do the work
 		evicted = context->fds[newfd];
-		context->fds[newfd] = context->fds[oldfd];
 		atomic_add(&context->fds[oldfd]->ref_count, 1);
+		context->fds[newfd] = context->fds[oldfd];
 	}
 
 	mutex_unlock(&context->io_mutex);
