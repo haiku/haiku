@@ -33,6 +33,7 @@ static int    _Exit_SP = 0;
 void
 abort()
 {
+	raise(SIGABRT);
 	exit(EXIT_FAILURE);
 }
 
