@@ -37,24 +37,24 @@ static const boot_entry *bootdir = (boot_entry*)BOOTDIR_ADDR;
 static kernel_args *ka = (kernel_args *)0x20000;
 
 // needed for message
-static unsigned short *kScreenBase = (unsigned short*) 0xb8000;
-static unsigned screenOffset = 0;
+static uint16 *kScreenBase = (unsigned short*) 0xb8000;
+static uint32 screenOffset = 0;
 
 unsigned int cv_factor = 0;
 
 // size of bootdir in pages
-static unsigned int bootdir_pages = 0;
+static uint32 bootdir_pages = 0;
 
 // working pagedir and pagetable
-static unsigned int *pgdir = 0;
-static unsigned int *pgtable = 0;
+static uint32 *pgdir = 0;
+static uint32 *pgtable = 0;
 
 // function decls for this module
 static void calculate_cpu_conversion_factor(void);
-static void load_elf_image(void *data, unsigned int *next_paddr,
-	addr_range *ar0, addr_range *ar1, unsigned int *start_addr, addr_range *dynamic_section);
-static int mmu_init(kernel_args *ka, unsigned int *next_paddr);
-static void mmu_map_page(unsigned int vaddr, unsigned int paddr);
+static void load_elf_image(void *data, uint32 *next_paddr, addr_range *ar0,
+	addr_range *ar1, uint32 *start_addr, addr_range *dynamic_section);
+static int mmu_init(kernel_args *ka, uint32 *next_paddr);
+static void mmu_map_page(uint32 vaddr, uint32 paddr);
 static int check_cpu(void);
 
 
@@ -67,14 +67,14 @@ static int check_cpu(void);
  */
 
 void
-_start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
+_start(uint32 mem, int in_vesa, uint32 vesa_ptr)
 {
-	unsigned int *idt;
+	uint32 *idt;
 	segment_descriptor *gdt;
-	unsigned int next_vaddr;
-	unsigned int next_paddr;
-	unsigned int i;
-	unsigned int kernel_entry;
+	uint32 next_vaddr;
+	uint32 next_paddr;
+	uint32 i;
+	uint32 kernel_entry;
 
 	asm("cld");			// Ain't nothing but a GCC thang.
 	asm("fninit");		// initialize floating point unit
@@ -111,7 +111,7 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		MESSAGE(("bootdir is ", bootdir_pages, " pages long\n"));
 	}
 
-	ka->bootdir_addr.start = (unsigned long)bootdir;
+	ka->bootdir_addr.start = (uint32)bootdir;
 	ka->bootdir_addr.size = bootdir_pages * PAGE_SIZE;
 
 	next_paddr = BOOTDIR_ADDR + bootdir_pages * PAGE_SIZE;
@@ -156,11 +156,11 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		struct gdt_idt_descr idt_descr;
 
 		// find a new idt
-		idt = (unsigned int *)next_paddr;
-		ka->arch_args.phys_idt = (unsigned int)idt;
+		idt = (uint32 *)next_paddr;
+		ka->arch_args.phys_idt = (uint32)idt;
 		next_paddr += PAGE_SIZE;
 
-		MESSAGE(("idt at ", (unsigned int)idt, "\n"));
+		MESSAGE(("idt at ", (uint32)idt, "\n"));
 
 		// clear it out
 		for (i = 0; i < IDT_LIMIT / 4; i++) {
@@ -168,13 +168,13 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		}
 
 		// map the idt into virtual space
-		mmu_map_page(next_vaddr, (unsigned int)idt);
-		ka->arch_args.vir_idt = (unsigned int)next_vaddr;
+		mmu_map_page(next_vaddr, (uint32)idt);
+		ka->arch_args.vir_idt = (uint32)next_vaddr;
 		next_vaddr += PAGE_SIZE;
 
 		// load the idt
 		idt_descr.a = IDT_LIMIT - 1;
-		idt_descr.b = (unsigned int *)ka->arch_args.vir_idt;
+		idt_descr.b = (uint32 *)ka->arch_args.vir_idt;
 
 		asm("lidt	%0;"
 			: : "m" (idt_descr));
@@ -188,10 +188,10 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 
 		// find a new gdt
 		gdt = (segment_descriptor *)next_paddr;
-		ka->arch_args.phys_gdt = (unsigned int)gdt;
+		ka->arch_args.phys_gdt = (uint32)gdt;
 		next_paddr += PAGE_SIZE;
 
-		MESSAGE(("gdt at ", (unsigned int)gdt, "\n"));
+		MESSAGE(("gdt at ", (uint32)gdt, "\n"));
 
 		// put standard segment descriptors in it
 		clear_segment_descriptor(&gdt[0]);
@@ -209,13 +209,13 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		// to contain the TSS descriptors, and for TLS (one for every CPU)
 
 		// map the gdt into virtual space
-		mmu_map_page(next_vaddr, (unsigned int)gdt);
-		ka->arch_args.vir_gdt = (unsigned int)next_vaddr;
+		mmu_map_page(next_vaddr, (uint32)gdt);
+		ka->arch_args.vir_gdt = (uint32)next_vaddr;
 		next_vaddr += PAGE_SIZE;
 
 		// load the GDT
 		gdt_descr.a = GDT_LIMIT - 1;
-		gdt_descr.b = (unsigned int *)ka->arch_args.vir_gdt;
+		gdt_descr.b = (uint32 *)ka->arch_args.vir_gdt;
 
 		asm("lgdt	%0;"
 			: : "m" (gdt_descr));
@@ -227,10 +227,10 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 	// this enables a mmu trick where the 4 MB region that this pgdir entry
 	// represents now maps the 4MB of potential pagetables that the pgdir
 	// points to. Thrown away later in VM bringup, but useful for now.
-	pgdir[1023] = (unsigned int)pgdir | DEFAULT_PAGE_FLAGS;
+	pgdir[1023] = (uint32)pgdir | DEFAULT_PAGE_FLAGS;
 
 	// also map it on the next vpage
-	mmu_map_page(next_vaddr, (unsigned int)pgdir);
+	mmu_map_page(next_vaddr, (uint32)pgdir);
 	ka->arch_args.vir_pgdir = next_vaddr;
 	next_vaddr += PAGE_SIZE;
 
@@ -286,7 +286,8 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 
 
 static void
-load_elf_image(void *data, unsigned int *next_paddr, addr_range *ar0, addr_range *ar1, unsigned int *start_addr, addr_range *dynamic_section)
+load_elf_image(void *data, uint32 *next_paddr, addr_range *ar0, addr_range *ar1,
+	uint32 *start_addr, addr_range *dynamic_section)
 {
 	struct Elf32_Ehdr *imageHeader = (struct Elf32_Ehdr*) data;
 	struct Elf32_Phdr *segments = (struct Elf32_Phdr*)(imageHeader->e_phoff + (unsigned) imageHeader);
@@ -299,7 +300,7 @@ load_elf_image(void *data, unsigned int *next_paddr, addr_range *ar0, addr_range
 
 	for (segmentIndex = 0; segmentIndex < imageHeader->e_phnum; segmentIndex++) {
 		struct Elf32_Phdr *segment = &segments[segmentIndex];
-		unsigned segmentOffset;
+		uint32 segmentOffset;
 
 		switch (segment->p_type) {
 			case PT_LOAD:
@@ -365,40 +366,40 @@ load_elf_image(void *data, unsigned int *next_paddr, addr_range *ar0, addr_range
  */
 
 static int
-mmu_init(kernel_args *ka, unsigned int *next_paddr)
+mmu_init(kernel_args *ka, uint32 *next_paddr)
 {
 	int i;
 
 	// allocate a new pgdir
-	pgdir = (unsigned int *)*next_paddr;
+	pgdir = (uint32 *)*next_paddr;
 	(*next_paddr) += PAGE_SIZE;
-	ka->arch_args.phys_pgdir = (unsigned int)pgdir;
+	ka->arch_args.phys_pgdir = (uint32)pgdir;
 
 	// clear out the pgdir
 	for (i = 0; i < 1024; i++)
 		pgdir[i] = 0;
 
 	// make a pagetable at this random spot
-	pgtable = (unsigned int *)0x11000;
+	pgtable = (uint32 *)0x11000;
 
 	for (i = 0; i < 1024; i++) {
 		pgtable[i] = (i * 0x1000) | DEFAULT_PAGE_FLAGS;
 	}
 
-	pgdir[0] = (unsigned int)pgtable | DEFAULT_PAGE_FLAGS;
+	pgdir[0] = (uint32)pgtable | DEFAULT_PAGE_FLAGS;
 
 	// make another pagetable at this random spot
-	pgtable = (unsigned int *)0x12000;
+	pgtable = (uint32 *)0x12000;
 
 	for (i = 0; i < 1024; i++) {
 		pgtable[i] = (i * 0x1000 + 0x400000) | DEFAULT_PAGE_FLAGS;
 	}
 
-	pgdir[1] = (unsigned int)pgtable | DEFAULT_PAGE_FLAGS;
+	pgdir[1] = (uint32)pgtable | DEFAULT_PAGE_FLAGS;
 
 	// Get new page table and clear it out
-	pgtable = (unsigned int *)*next_paddr;
-	ka->arch_args.pgtables[0] = (unsigned int)pgtable;
+	pgtable = (uint32 *)*next_paddr;
+	ka->arch_args.pgtables[0] = (uint32)pgtable;
 	ka->arch_args.num_pgtables = 1;
 
 	(*next_paddr) += PAGE_SIZE;
@@ -407,7 +408,7 @@ mmu_init(kernel_args *ka, unsigned int *next_paddr)
 
 	// put the new page table into the page directory
 	// this maps the kernel at KERNEL_BASE
-	pgdir[KERNEL_BASE/(4*1024*1024)] = (unsigned int)pgtable | DEFAULT_PAGE_FLAGS;
+	pgdir[KERNEL_BASE/(4*1024*1024)] = (uint32)pgtable | DEFAULT_PAGE_FLAGS;
 
 	// switch to the new pgdir
 	asm("movl %0, %%eax;"
@@ -425,7 +426,7 @@ mmu_init(kernel_args *ka, unsigned int *next_paddr)
  */
 
 static void
-mmu_map_page(unsigned int vaddr, unsigned int paddr)
+mmu_map_page(uint32 vaddr, uint32 paddr)
 {
 	PRINT(("mmu_map_page: vaddr 0x%x, paddr 0x%x\n", vaddr, paddr));
 
@@ -443,7 +444,7 @@ mmu_map_page(unsigned int vaddr, unsigned int paddr)
 static int
 check_cpu(void)
 {
-	unsigned int data[4];
+	uint32 data[4];
 	char str[17];
 
 	// check the eflags register to see if the cpuid instruction exists
@@ -462,9 +463,9 @@ check_cpu(void)
 
 	// build the vendor string
 	memset(str, 0, sizeof(str));
-	*(unsigned int *)&str[0] = data[1];
-	*(unsigned int *)&str[4] = data[3];
-	*(unsigned int *)&str[8] = data[2];
+	*(uint32 *)&str[0] = data[1];
+	*(uint32 *)&str[4] = data[3];
+	*(uint32 *)&str[8] = data[2];
 
 	// get the family, model, stepping
 	cpuid(1, data);
