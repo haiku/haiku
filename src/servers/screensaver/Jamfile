@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src servers screensaver ;
+
+Server OBOSscreensaver :
+	ScreenSaverApp.cpp
+	SSAwindow.cpp
+	SSthread.cpp
+# Was in the makefile sources list, but it didn't make because of that.
+#	pwWindow.cpp
+;
+LinkSharedOSLibs OBOSscreensaver : be game ;
