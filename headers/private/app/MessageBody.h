@@ -125,17 +125,20 @@ status_t BMessageBody::AddData(const char *name, const T1 &data, type_code type)
 	status_t err = B_OK;
 	BMessageField* BMF = FindData(name, type, err);
 
-	if (err == B_NAME_NOT_FOUND)
+	if (err)
 	{
-		// Reset err; we'll create the field
-		err = B_OK;
-	}
-	else
-	{
-		// Looking for B_BAD_TYPE here in particular, which would indicate
-		// that we tried to add data of type X when we already had data of
-		// type Y with the same name
-		return err;
+		if (err == B_NAME_NOT_FOUND)
+		{
+			// Reset err; we'll create the field
+			err = B_OK;
+		}
+		else
+		{
+			// Looking for B_BAD_TYPE here in particular, which would indicate
+			// that we tried to add data of type X when we already had data of
+			// type Y with the same name
+			return err;
+		}
 	}
 
 	if (!BMF)

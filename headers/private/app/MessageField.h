@@ -375,14 +375,16 @@ const void*
 BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy, GetDataPolicy>::
 DataAt(int32 index, ssize_t* size) const
 {
-	if (index > CountItems())
-		return NULL;
+	if (index < CountItems())
+	{
+		*size = SizePolicy::Size(fData[index]);
+		const T1& ref = fData[index];
+		const T1* data = &ref;
 
-	*size = SizePolicy::Size(fData[index]);
-	const T1& ref = fData[index];
-	const T1* data = &ref;
+		return GetDataPolicy::GetData(data);//(const void*)data;
+	}
 
-	return GetDataPolicy::GetData(data);//(const void*)data;
+	return NULL;
 }
 //------------------------------------------------------------------------------
 template

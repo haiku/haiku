@@ -55,6 +55,7 @@ BMessageBody::BMessageBody(const BMessageBody &rhs)
 //------------------------------------------------------------------------------
 BMessageBody::~BMessageBody()
 {
+	MakeEmpty();
 }
 //------------------------------------------------------------------------------
 BMessageBody& BMessageBody::operator=(const BMessageBody &rhs)
@@ -294,11 +295,27 @@ status_t BMessageBody::RemoveData(const char* name, int32 index)
 //------------------------------------------------------------------------------
 status_t BMessageBody::RemoveName(const char* name)
 {
-	return fData.erase(name) ? B_OK : B_NAME_NOT_FOUND;
+	TMsgDataMap::iterator i = fData.find(name);
+	if (i == fData.end())
+	{
+		return B_NAME_NOT_FOUND;
+	}
+
+	delete i->second;
+	fData.erase(i);
+
+	return B_OK;
 }
 //------------------------------------------------------------------------------
 status_t BMessageBody::MakeEmpty()
 {
+	for (TMsgDataMap::iterator i = fData.begin();
+		 i != fData.end();
+		 ++i)
+	{
+		delete i->second;
+	}
+
 	fData.clear();
 	return B_OK;
 }
