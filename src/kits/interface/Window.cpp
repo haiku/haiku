@@ -686,8 +686,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 	switch ( msg->what ) { 
 	case B_ZOOM:{
 		Zoom();
-		break;}
-
+		break;
+	}
 	case B_MINIMIZE:{
 		bool			minimize;
 
@@ -695,8 +695,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 
 		fMinimized		= minimize;
 		Minimize( minimize );
-		break;}
-
+		break;
+	}
 	case B_WINDOW_RESIZED:{
 		BPoint			offset;
 		int32			width, height;
@@ -708,8 +708,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 
 		fFrame.SetRightBottom( fFrame.LeftTop() + offset );
 		FrameResized( offset.x, offset.y );
-		break;}
-
+		break;
+	}
 	case B_WINDOW_MOVED:{
 		BPoint			origin;
 
@@ -717,8 +717,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 
 		fFrame.OffsetTo( origin );
 		FrameMoved( origin );
-		break;}
-
+		break;
+	}
 		// this is NOT an app_server message and we have to be cautious
 	case B_WINDOW_MOVE_BY:{
 		BPoint			offset;
@@ -727,8 +727,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			MoveBy( offset.x, offset.y );
 		else
 			msg->SendReply( B_MESSAGE_NOT_UNDERSTOOD );
-		break;}
-
+		break;
+	}
 		// this is NOT an app_server message and we have to be cautious
 	case B_WINDOW_MOVE_TO:{
 		BPoint			origin;
@@ -737,8 +737,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			MoveTo( origin );
 		else
 			msg->SendReply( B_MESSAGE_NOT_UNDERSTOOD );
-		break;}
-
+		break;
+	}
 	case B_WINDOW_ACTIVATED:{
 		bool			active;
 
@@ -746,8 +746,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 
 		fActive			= active; 
 		handleActivation( active );
-		break;}
-
+		break;
+	}
 	case B_SCREEN_CHANGED:{
 		BRect			frame;
 		uint32			mode;
@@ -755,8 +755,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		msg->FindRect("frame", &frame);
 		msg->FindInt32("mode", (int32*)&mode);
 		ScreenChanged( frame, (color_space)mode );
-		break;}
-
+		break;
+	}
 	case B_WORKSPACE_ACTIVATED:{
 		uint32			workspace;
 		bool			active;
@@ -764,8 +764,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		msg->FindInt32( "workspace", (int32*)&workspace );
 		msg->FindBool( "active", &active );
 		WorkspaceActivated( workspace, active );
-		break;}
-
+		break;
+	}
 	case B_WORKSPACES_CHANGED:{
 		uint32			oldWorkspace;
 		uint32			newWorkspace;
@@ -773,8 +773,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		msg->FindInt32( "old", (int32*)&oldWorkspace );
 		msg->FindInt32( "new", (int32*)&newWorkspace );
 		WorkspacesChanged( oldWorkspace, newWorkspace );
-		break;}
-
+		break;
+	}
 	case B_KEY_DOWN:{
 		uint32			modifiers;
 		int32			raw_char;
@@ -786,35 +786,35 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 // TODO: it is NOT "bytes" field you should pass to KeyDown(), it is "byte" field.
 		if ( !handleKeyDown( raw_char, (uint32)modifiers) )
 			fFocus->KeyDown( string, strlen(string)-1 );
-		break;}
-
+		break;
+	}
 	case B_KEY_UP:{
 		const char		*string;
 
 		msg->FindString( "bytes", &string );
 		fFocus->KeyUp( string, strlen(string)-1 );
-		break;}
-
+		break;
+	}
 	case B_UNMAPPED_KEY_DOWN:{
 		if (fFocus)
 			fFocus->MessageReceived( msg );
-		break;}
-
+		break;
+	}
 	case B_UNMAPPED_KEY_UP:{
 		if (fFocus)
 			fFocus->MessageReceived( msg );
-		break;}
-
+		break;
+	}
 	case B_MODIFIERS_CHANGED:{
 		if (fFocus)
 			fFocus->MessageReceived( msg );
-		break;}
-
+		break;
+	}
 	case B_MOUSE_WHEEL_CHANGED:{
 		if (fFocus)
 			fFocus->MessageReceived( msg );
-		break;}
-
+		break;
+	}
 	case B_MOUSE_DOWN:{
 		BPoint			where;
 		uint32			modifiers;
@@ -827,8 +827,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		msg->FindInt32( "clicks", &clicks );
 
 		sendMessageUsingEventMask( B_MOUSE_DOWN, where );
-		break;}
-
+		break;
+	}
 	case B_MOUSE_UP:{
 		BPoint			where;
 		uint32			modifiers;
@@ -837,8 +837,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		msg->FindInt32( "modifiers", (int32*)&modifiers );
 		
 		sendMessageUsingEventMask( B_MOUSE_UP, where );
-		break;}
-
+		break;
+	}
 	case B_MOUSE_MOVED:{
 		BPoint			where;
 		uint32			buttons;
@@ -847,72 +847,72 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		msg->FindInt32( "buttons", (int32*)&buttons );
 		
 		sendMessageUsingEventMask( B_MOUSE_MOVED, where );
-		break;}
-
+		break;
+	}
 	case B_PULSE:{
 		if (fPulseEnabled)
 			sendPulse( top_view );
-		break;}
-
+		break;
+	}
 	case B_QUIT_REQUESTED:{
 		if (QuitRequested())
 			Quit();
-		break;}
-
+		break;
+	}
 	case _UPDATE_:{
 		BRect			updateRect;
 		msg->FindRect("_rect", &updateRect);
 
-// TODO: ADD this method:
-		//DrawViews( updateRect );
-		break;}
-
+		DoUpdate(top_view, updateRect);
+		break;
+	}
 	case B_VIEW_MOVED:{
-			BPoint			where;
-			int32			token = B_NULL_TOKEN;
-			BView			*view;
+		BPoint			where;
+		int32			token = B_NULL_TOKEN;
+		BView			*view;
 
-			msg->FindPoint("where", &where);
-			msg->FindInt32("_token", &token);
-			msg->RemoveName("_token");
+		msg->FindPoint("where", &where);
+		msg->FindInt32("_token", &token);
+		msg->RemoveName("_token");
 			
-			view			= findView(top_view, token);
-			if (view){
-				STRACE(("Calling BView(%s)::FrameMoved( %f, %f )\n", view->Name(), where.x, where.y));
-				view->FrameMoved( where );
-			}
-			else
-				printf("***PANIC: BW: Can't find view with ID: %ld !***\n", token);
+		view			= findView(top_view, token);
+		if (view){
+			STRACE(("Calling BView(%s)::FrameMoved( %f, %f )\n", view->Name(), where.x, where.y));
+			view->FrameMoved( where );
+		}
+		else
+			printf("***PANIC: BW: Can't find view with ID: %ld !***\n", token);
 
-		break;}
-	
+		break;
+	}	
 	case B_VIEW_RESIZED:{
-			float			newWidth,
-							newHeight;
-			BPoint			where;
-			int32			token = B_NULL_TOKEN;
-			BView			*view;
+		float			newWidth,
+						newHeight;
+		BPoint			where;
+		int32			token = B_NULL_TOKEN;
+		BView			*view;
 
-			msg->FindFloat("width", &newWidth);
-			msg->FindFloat("height", &newHeight);
-			msg->FindPoint("where", &where);
-			msg->FindInt32("_token", &token);
-			msg->RemoveName("_token");
+		msg->FindFloat("width", &newWidth);
+		msg->FindFloat("height", &newHeight);
+		msg->FindPoint("where", &where);
+		msg->FindInt32("_token", &token);
+		msg->RemoveName("_token");
 			
-			view			= findView(top_view, token);
-			if (view){
-				STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", view->Name(), newWidth, newHeight));
-				view->FrameResized( newWidth, newHeight );
-			}
-			else
-				printf("***PANIC: BW: Can't find view with ID: %ld !***\n", token);
+		view			= findView(top_view, token);
+		if (view){
+			STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", view->Name(), newWidth, newHeight));
+			view->FrameResized( newWidth, newHeight );
+		}
+		else
+			printf("***PANIC: BW: Can't find view with ID: %ld !***\n", token);
 
-		break;}
-		
+		break;
+	}		
 	default:{
 		BLooper::DispatchMessage(msg, target); 
-		break;}
-   }
+		break;
+	}
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -2823,23 +2823,23 @@ void BWindow::drawAllViews(BView* aView){
 
 //------------------------------------------------------------------------------
 
-void BWindow::drawView(BView* aView, BRect area){
-
-/* TODO: Drawing during an Update
-			These settings are temporary. When the update is over, all graphics
-			  parameters are reset to their initial values
-*/
+void BWindow::DoUpdate(BView* aView, BRect& area){
+	aView->do_owner_check();
+printf("------------\n");
+area.PrintToStream();
+printf("------------\n");
+	session->WriteInt32( AS_BEGIN_UPDATE );
 	aView->Draw( area );
+	session->WriteInt32( AS_END_UPDATE );
 
 	BView			*child;
 	if ( (child = aView->first_child) ){
 		while ( child ) {
 			if ( area.Intersects( child->Frame() ) ){
-				BRect			newArea;
-
-				newArea			= area & child->Frame();
+				BRect		newArea;
+				newArea		= area & child->Frame();
 				child->ConvertFromParent( &newArea );
-				child->Invalidate( newArea );
+				DoUpdate( child, newArea );
 			}
 			child 		= child->next_sibling; 
 		}
