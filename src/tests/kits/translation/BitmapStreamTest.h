@@ -36,34 +36,32 @@
 #include <BitmapStream.h>
 #include <File.h>
 
-class BitmapStreamTest {
+/** CppUnit support */
+#include <TestCase.h>
+
+class BitmapStreamTest : public BTestCase {
 public:
-    BitmapStreamTest();
+    BitmapStreamTest(std::string name = "");
     ~BitmapStreamTest();
     
-    status_t Initialize();
-    status_t Perform();
-    inline void setVerbose(bool verbose) { this->verbose = verbose; };
+	/* cppunit suite function prototype */    
+    static CppUnit::Test* Suite();    
     
     //actual tests
-	status_t ConstructorTest();
-	status_t DetachBitmap();
-	status_t Position();
-	status_t ReadAt();
-	status_t Seek();
-	status_t SetSize();
-	status_t WriteAt();
-	status_t Size();
+    void InitializeTest();
+	void ConstructorTest();
+	void DetachBitmapTest();
+	void PositionTest();
+	void ReadAtTest();
+	void SeekTest();
+	void SetSizeTest();
+	void WriteAtTest();
+	void SizeTest();
 private:
-	void Debug(char* string);
-	
 	/** default roster used when performing tests */
     BTranslatorRoster* roster;
     
     /** File to read from */
     BFile* file;
-
-    /** Whether or not to output test info */
-    bool verbose;
 };
 #endif
