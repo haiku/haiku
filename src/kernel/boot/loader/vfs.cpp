@@ -4,11 +4,12 @@
 */
 
 
-#include "Partition.h"
 #include "RootFileSystem.h"
 
+#include <StorageDefs.h>
 #include <boot/vfs.h>
 #include <boot/platform.h>
+#include <boot/partitions.h>
 #include <boot/stdio.h>
 #include <util/kernel_cpp.h>
 
