@@ -800,10 +800,16 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 		}
 		buffer = const_cast<uint8 *>(key);
 	} else if (!strcmp(fAttribute, "name")) {
+		// we need to lock before accessing Inode::Name()
+		inode->SmallDataLock().Lock();
+		locked = true;
+
 		// if not, check for "fake" attributes, "name", "size", "last_modified",
 		buffer = (uint8 *)inode->Name();
-		if (buffer == NULL)
+		if (buffer == NULL) {
+			inode->SmallDataLock().Unlock();
 			return B_ERROR;
+		}
 
 		type = B_STRING_TYPE;
 		size = strlen((const char *)buffer);
@@ -1059,7 +1065,9 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 			dirent->d_ino = offset;
 			dirent->d_pdev = volume->ID();
 			dirent->d_pino = volume->ToVnode(inode->Parent());
-			strcpy(dirent->d_name,inode->Name());
+			
+			if (inode->GetName(dirent->d_name) < B_OK)
+				FATAL(("inode %Ld in query has no name!\n", inode->BlockNumber()));
 
 #ifdef KEEP_WRONG_DIRENT_RECLEN
 			// ToDo: The available file systems in BeOS apparently don't set the
