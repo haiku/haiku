@@ -2,6 +2,17 @@ SubDir OBOS_TOP src add-ons kernel bus_managers agp ;
 
 UsePrivateHeaders graphics ;
 
+Package haiku-agp :
+	README.html ;
+
+Package haiku-agp :
+	agp :
+	boot home config add-ons kernel bus_managers ;
+
+Package haiku-agp :
+	agp.settings :
+	boot home config settings kernel drivers ;
+
 R5KernelAddon agp : [ FDirName kernel bus_managers ] :
 	agp.cpp
 	module.cpp
