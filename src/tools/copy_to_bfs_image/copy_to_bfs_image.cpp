@@ -1,4 +1,6 @@
 /*
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
 */
 
 #include <stdio.h>
@@ -122,7 +124,7 @@ copy_dir(const char *fromPath, const char *toPath)
 		if (st.st_mode & S_IFDIR) {
 			char path[1024];
 
-			if ((err = sys_mkdir(1, -1, path, MY_S_IRWXU)) == B_OK)
+			if ((err = sys_mkdir(1, -1, path, S_IRWXU)) == B_OK)
 				copy_dir(fromName, path);
 			else
 				printf("Could not create directory %s: (%s)\n", path, strerror(err));
@@ -154,11 +156,8 @@ copy(const char *from, const char *to)
 
 	struct stat toStat;
 	status_t status = sys_rstat(1, -1, toPath, &toStat, 1);
-	if (status != B_OK) {
-		fprintf(stderr, "Could not stat \"%s\": %s\n", to, strerror(status));
-		return status;
-	}
-	
+		// will be evaluated later
+
 	if (S_ISDIR(fromStat.st_mode)) {
 		if (S_ISREG(toStat.st_mode)) {
 			fprintf(stderr, "Target \"%s\" is not a directory\n.", to);
@@ -166,14 +165,14 @@ copy(const char *from, const char *to)
 		}
 
 		return copy_dir(from, toPath);
-	} else {
+	} else if (status == B_OK) {
 		if (S_ISREG(toStat.st_mode)) {
 			// overwrite target file
 			return copy_file(from, fromStat, toPath);
 		} else {
 			// copy into target directory
 			strlcat(toPath, "/", B_PATH_NAME_LENGTH);
-			
+
 			const char *fileName = strrchr(from, '/');
 			if (fileName == NULL)
 				fileName = from;
@@ -184,6 +183,58 @@ copy(const char *from, const char *to)
 
 			return copy_file(from, fromStat, toPath);
 		}
+	} else {
+		// stat(target) failed, so it doesn't exist yet - if
+		// the target doesn't end in "/", that's should not
+		// be a problem, just copy the file under the new name
+
+		if (toPath[strlen(toPath) - 1] == '/') {
+			fprintf(stderr, "Could not stat \"%s\": %s\n", to, strerror(status));
+			return status;
+		}
+
+		return copy_file(from, fromStat, toPath);
+	}
+}
+
+
+void
+create_target_path(const char *to, bool lastOneIsDirectory)
+{
+	char path[B_PATH_NAME_LENGTH];
+	snprintf(path, B_PATH_NAME_LENGTH, "/myfs/%s", to);
+
+	to = path + 6;
+		// locate "to" to the start of the file system
+
+	while (true) {
+		char *next = strchr(to, '/');
+		if (next == NULL && !lastOneIsDirectory || next == NULL && to[0] == '\0')
+			break;
+
+		if (next == to) {
+			// filter "//" like path parts
+			to++;
+			continue;
+		}
+
+		if (next)
+			next[0] = '\0';
+
+		// create path
+
+		printf("create path for: %s\n", path);
+		status_t status = sys_mkdir(1, -1, path, S_IRWXU);
+		if (status != B_OK && status != B_FILE_EXISTS) {
+			printf("failed: %s!\n", strerror(status));
+			break;
+		}
+
+		if (next != NULL) {
+			next[0] = '/';
+			to = next + 1;
+		} else
+			break;
 	}
 }
 
@@ -191,7 +242,8 @@ copy(const char *from, const char *to)
 void
 usage(const char *programName)
 {
-	printf("usage: %s <bfs-image> <source-files ...> <target>\n", programName);
+	printf("usage: %s [-p] <bfs-image> <source-files ...> <target>\n"
+		"  -p  Creates the target path if necessary\n", programName);
 	exit(-1);
 }
 
@@ -199,12 +251,20 @@ usage(const char *programName)
 int
 main(int argc, char **argv)
 {
+	bool createTargetPath = false;
+
 	const char *programName = strrchr(argv[0], '/');
 	if (programName == NULL)
 		programName = argv[0];
 	else
 		programName++;
 
+	if (argc > 2 && !strcmp(argv[1], "-p")) {
+		// read options in an ugly and simple way
+		createTargetPath = true;
+		argv++;
+		argc--;
+	}
 	if (argc < 4)
 		usage(programName);
 
@@ -212,6 +272,11 @@ main(int argc, char **argv)
 	const char *target = argv[argc - 1];
 
 	init_fs(image);
+
+	if (createTargetPath) {
+		// make sure the target path exists
+		create_target_path(target, argc > 3 || target[strlen(target) - 1] == '/');
+	}
 
 	for (int32 i = 2; i < argc - 1; i++) {
 		printf("copy \"%s\" to \"%s\"\n", argv[i], target);
