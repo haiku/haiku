@@ -32,6 +32,7 @@
 
 
 #include <stdlib.h>
+#include <udb/USB_hid.h>
 #include "hidparse.h"
 
 /*

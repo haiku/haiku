@@ -169,51 +169,6 @@ int parse_report_descriptor
 	size_t *total_report_size,
 	int *first_report_id);
 
-/*
-	Usage Pages/IDs
-*/
-
-enum
-{
-	USAGE_PAGE_GENERIC_DESKTOP = 1,
-	USAGE_PAGE_SIMULATION = 2,
-	USAGE_PAGE_GAME = 5,
-	USAGE_PAGE_KEYBOARD = 7,
-	USAGE_PAGE_LED,
-	USAGE_PAGE_BUTTONS,
-};
-
-/* Page 1: Generic Desktop */
-
-enum
-{
-	USAGE_ID_POINTER = 1,
-	USAGE_ID_MOUSE = 2,
-	USAGE_ID_JOYSTICK = 4,
-	USAGE_ID_GAMEPAD,
-	USAGE_ID_KEYBOARD,
-	USAGE_ID_KEYPAD,
-
-	USAGE_ID_X = 0x30,
-	USAGE_ID_Y,
-	USAGE_ID_Z,
-	USAGE_ID_RX,
-	USAGE_ID_RY,
-	USAGE_ID_RZ,
-	USAGE_ID_SLIDER,
-	USAGE_ID_DIAL,
-	USAGE_ID_WHEEL,
-	USAGE_ID_HAT_SWITCH,
-};
-
-/* Page 2: Simulation */
-
-enum
-{
-	USAGE_ID_RUDDER = 0xBA,
-	USAGE_ID_THROTTLE = 0xBB,
-};
-
 int count_controls
 	(report_insn *insns,
 	size_t num_insns,
