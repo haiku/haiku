@@ -13,6 +13,7 @@
 #include "Index.h"
 
 #include <string.h>
+#include <stdio.h>
 
 
 class InodeAllocator {
@@ -81,6 +82,9 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run, Inode **_
 	node->flags = INODE_IN_USE | INODE_NOT_READY;
 		// INODE_NOT_READY prevents the inode from being opened - it is
 		// cleared in InodeAllocator::Keep()
+	node->etc = (uint32)fInode;
+		// this is temporarily set along INODE_NOT_READY and lets bfs_read_vnode()
+		// find the associated Inode object
 
 	node->create_time = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
 	node->last_modified_time = node->create_time | (volume->GetUniqueID() & INODE_TIME_MASK);
@@ -134,16 +138,55 @@ InodeAllocator::Keep()
 //	#pragma mark -
 
 
+status_t 
+bfs_inode::InitCheck(Volume *volume)
+{
+	if (flags & INODE_NOT_READY) {
+		// the other fields may not yet contain valid values
+		return B_BUSY;
+	}
+
+	if (magic1 != INODE_MAGIC1
+		|| !(flags & INODE_IN_USE)
+		|| inode_num.length != 1
+		// matches inode size?
+		|| (uint32)inode_size != volume->InodeSize()
+		// parent resides on disk?
+		|| parent.allocation_group > int32(volume->AllocationGroups())
+		|| parent.allocation_group < 0
+		|| parent.start > (1L << volume->AllocationGroupShift())
+		|| parent.length != 1
+		// attributes, too?
+		|| attributes.allocation_group > int32(volume->AllocationGroups())
+		|| attributes.allocation_group < 0
+		|| attributes.start > (1L << volume->AllocationGroupShift()))
+		RETURN_ERROR(B_BAD_DATA);
+
+	// ToDo: Add some tests to check the integrity of the other stuff here,
+	// especially for the data_stream!
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
 Inode::Inode(Volume *volume, vnode_id id, bool empty, uint8 reenter)
 	: CachedBlock(volume, volume->VnodeToBlock(id), empty),
 	fTree(NULL),
-	fLock("bfs inode")
+	fLock()
 {
-	Node()->flags &= INODE_PERMANENT_FLAGS;
+	Initialize();
+}
 
-	// these two will help to maintain the indices
-	fOldSize = Size();
-	fOldLastModified = LastModified();
+
+Inode::Inode(CachedBlock *cached)
+	: CachedBlock(cached),
+	fTree(NULL),
+	fLock()
+{
+	Initialize();
 }
 
 
@@ -153,36 +196,38 @@ Inode::~Inode()
 }
 
 
+void
+Inode::Initialize()
+{
+	char lockName[32];
+	sprintf(lockName, "bfs inode %ld.%d", BlockRun().allocation_group, BlockRun().start);
+	fLock.Initialize(lockName);
+
+	Node()->flags &= INODE_PERMANENT_FLAGS;
+
+	// these two will help to maintain the indices
+	fOldSize = Size();
+	fOldLastModified = LastModified();
+}
+
+
 status_t 
-Inode::InitCheck()
+Inode::InitCheck(bool checkNode)
 {
 	if (!Node())
 		RETURN_ERROR(B_IO_ERROR);
 
 	// test inode magic and flags
-	if (Node()->magic1 != INODE_MAGIC1
-		|| !(Node()->flags & INODE_IN_USE)
-		|| Node()->inode_num.length != 1
-		// matches inode size?
-		|| (uint32)Node()->inode_size != fVolume->InodeSize()
-		// parent resides on disk?
-		|| Node()->parent.allocation_group > int32(fVolume->AllocationGroups())
-		|| Node()->parent.allocation_group < 0
-		|| Node()->parent.start > (1L << fVolume->AllocationGroupShift())
-		|| Node()->parent.length != 1
-		// attributes, too?
-		|| Node()->attributes.allocation_group > int32(fVolume->AllocationGroups())
-		|| Node()->attributes.allocation_group < 0
-		|| Node()->attributes.start > (1L << fVolume->AllocationGroupShift())) {
-		FATAL(("inode at block %Ld corrupt!\n", fBlockNumber));
-		RETURN_ERROR(B_BAD_DATA);
+	if (checkNode) {
+		status_t status = Node()->InitCheck(fVolume);
+		if (status == B_BUSY)
+			return B_BUSY;
+	
+		if (status < B_OK) {
+			FATAL(("inode at block %Ld corrupt!\n", fBlockNumber));
+			RETURN_ERROR(B_BAD_DATA);
+		}
 	}
-
-	if (Flags() & INODE_NOT_READY)
-		return B_BUSY;
-
-	// ToDo: Add some tests to check the integrity of the other stuff here,
-	// especially for the data_stream!
 
 	// it's more important to know that the inode is corrupt
 	// so we check for the lock not until here

@@ -55,60 +55,17 @@ enum inode_type {
 
 class CachedBlock {
 	public:
-		CachedBlock(Volume *volume)
-			:
-			fVolume(volume),
-			fBlock(NULL)
-		{
-		}
+		CachedBlock(Volume *volume);
+		CachedBlock(Volume *volume, off_t block, bool empty = false);
+		CachedBlock(Volume *volume, block_run run, bool empty = false);
+		CachedBlock(CachedBlock *cached);
+		~CachedBlock();
 
-		CachedBlock(Volume *volume, off_t block, bool empty = false)
-			:
-			fVolume(volume),
-			fBlock(NULL)
-		{
-			SetTo(block, empty);
-		}
-
-		CachedBlock(Volume *volume, block_run run, bool empty = false)
-			:
-			fVolume(volume),
-			fBlock(NULL)
-		{
-			SetTo(volume->ToBlock(run), empty);
-		}
-
-		~CachedBlock()
-		{
-			Unset();
-		}
-
-		void Unset()
-		{
-			if (fBlock != NULL)
-				release_block(fVolume->Device(), fBlockNumber);
-		}
-
-		uint8 *SetTo(off_t block, bool empty = false)
-		{
-			Unset();
-			fBlockNumber = block;
-			return fBlock = empty ? (uint8 *)get_empty_block(fVolume->Device(), block, BlockSize())
-								  : (uint8 *)get_block(fVolume->Device(), block, BlockSize());
-		}
-
-		uint8 *SetTo(block_run run, bool empty = false)
-		{
-			return SetTo(fVolume->ToBlock(run), empty);
-		}
-
-		status_t WriteBack(Transaction *transaction)
-		{
-			if (transaction == NULL || fBlock == NULL)
-				RETURN_ERROR(B_BAD_VALUE);
-
-			return transaction->WriteBlocks(fBlockNumber, fBlock);
-		}
+		inline void Keep();
+		inline void Unset();
+		inline uint8 *SetTo(off_t block, bool empty = false);
+		inline uint8 *SetTo(block_run run, bool empty = false);
+		inline status_t WriteBack(Transaction *transaction);
 
 		uint8 *Block() const { return fBlock; }
 		off_t BlockNumber() const { return fBlockNumber; }
@@ -126,10 +83,12 @@ class CachedBlock {
 		uint8	*fBlock;
 };
 
+//--------------------------------------
 
 class Inode : public CachedBlock {
 	public:
-		Inode(Volume *volume,vnode_id id,bool empty = false,uint8 reenter = 0);
+		Inode(Volume *volume, vnode_id id, bool empty = false, uint8 reenter = 0);
+		Inode(CachedBlock *cached);
 		~Inode();
 
 		bfs_inode *Node() const { return (bfs_inode *)fBlock; }
@@ -162,7 +121,7 @@ class Inode : public CachedBlock {
 		block_run &Attributes() const { return Node()->attributes; }
 		Volume *GetVolume() const { return fVolume; }
 
-		status_t InitCheck();
+		status_t InitCheck(bool checkNode = true);
 
 		status_t CheckPermissions(int accessMode) const;
 
@@ -224,6 +183,8 @@ class Inode : public CachedBlock {
 
 		friend AttributeIterator;
 		friend InodeAllocator;
+
+		void Initialize();
 
 		status_t RemoveSmallData(small_data *item, int32 index);
 
@@ -319,6 +280,99 @@ class AttributeIterator {
 		void Update(uint16 index, int8 change);
 		AttributeIterator *fNext;
 };
+
+
+//--------------------------------------
+// inlines
+
+
+inline
+CachedBlock::CachedBlock(Volume *volume)
+	:
+	fVolume(volume),
+	fBlock(NULL)
+{
+}
+
+
+inline
+CachedBlock::CachedBlock(Volume *volume, off_t block, bool empty = false)
+	:
+	fVolume(volume),
+	fBlock(NULL)
+{
+	SetTo(block, empty);
+}
+
+
+inline
+CachedBlock::CachedBlock(Volume *volume, block_run run, bool empty = false)
+	:
+	fVolume(volume),
+	fBlock(NULL)
+{
+	SetTo(volume->ToBlock(run), empty);
+}
+
+
+inline 
+CachedBlock::CachedBlock(CachedBlock *cached)
+	:
+	fVolume(cached->fVolume),
+	fBlock(cached->fBlock),
+	fBlockNumber(cached->BlockNumber())
+{
+	cached->Keep();
+}
+
+
+inline
+CachedBlock::~CachedBlock()
+{
+	Unset();
+}
+
+
+inline void
+CachedBlock::Keep()
+{
+	fBlock = NULL;
+}
+
+
+inline void
+CachedBlock::Unset()
+{
+	if (fBlock != NULL)
+		release_block(fVolume->Device(), fBlockNumber);
+}
+
+
+inline uint8 *
+CachedBlock::SetTo(off_t block, bool empty = false)
+{
+	Unset();
+	fBlockNumber = block;
+	return fBlock = empty ? (uint8 *)get_empty_block(fVolume->Device(), block, BlockSize())
+						  : (uint8 *)get_block(fVolume->Device(), block, BlockSize());
+}
+
+
+inline uint8 *
+CachedBlock::SetTo(block_run run, bool empty = false)
+{
+	return SetTo(fVolume->ToBlock(run), empty);
+}
+
+
+inline status_t
+CachedBlock::WriteBack(Transaction *transaction)
+{
+	if (transaction == NULL || fBlock == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	return transaction->WriteBlocks(fBlockNumber, fBlock);
+}
 
 
 /**	Converts the "omode", the open flags given to bfs_open(), into

@@ -17,8 +17,7 @@
 #endif
 
 
-struct block_run
-{
+struct block_run {
 	int32		allocation_group;
 	uint16		start;
 	uint16		length;
@@ -45,8 +44,7 @@ typedef block_run inode_addr;
 
 #define BFS_DISK_NAME_LENGTH	32
 
-struct disk_super_block
-{
+struct disk_super_block {
 	char		name[BFS_DISK_NAME_LENGTH];
 	int32		magic1;
 	int32		fs_byte_order;
@@ -82,8 +80,7 @@ struct disk_super_block
 
 #define NUM_DIRECT_BLOCKS			12
 
-struct data_stream
-{
+struct data_stream {
 	block_run	direct[NUM_DIRECT_BLOCKS];
 	off_t		max_direct_range;
 	block_run	indirect;
@@ -104,8 +101,7 @@ struct data_stream
 
 struct bfs_inode;
 
-struct small_data
-{
+struct small_data {
 	uint32		type;
 	uint16		name_size;
 	uint16		data_size;
@@ -123,12 +119,14 @@ struct small_data
 #define FILE_NAME_NAME			0x13 
 #define FILE_NAME_NAME_LENGTH	1 
 
+
 //**************************************
+
+class Volume;
 
 #define SHORT_SYMLINK_NAME_LENGTH	144 // length incl. terminating '\0'
 
-struct bfs_inode
-{
+struct bfs_inode {
 	int32		magic1;
 	inode_addr	inode_num;
 	int32		uid;
@@ -142,7 +140,7 @@ struct bfs_inode
 	uint32		type;				// attribute type
 	
 	int32		inode_size;
-	uint32		etc;				// for in-memory structures (unused in OpenBeOS' fs)
+	uint32		etc;				// a pointer to the Inode object during construction
 
 	union {
 		data_stream		data;
@@ -150,6 +148,9 @@ struct bfs_inode
 	};
 	int32		pad[4];
 	small_data	small_data_start[0];
+
+	status_t InitCheck(Volume *volume);
+		// defined in Inode.cpp
 };	
 
 #define INODE_MAGIC1			0x3bbe0ad9
@@ -157,8 +158,7 @@ struct bfs_inode
 #define INODE_TIME_MASK			0xffff
 #define INODE_FILE_NAME_LENGTH	256
 
-enum inode_flags
-{
+enum inode_flags {
 	INODE_IN_USE			= 0x00000001,	// always set
 	INODE_ATTR_INODE		= 0x00000004,
 	INODE_LOGGED			= 0x00000008,	// log changes to the data stream
@@ -323,5 +323,6 @@ small_data::IsLast(bfs_inode *inode)
 	// results)
 	return (uint32)this > (uint32)inode + inode->inode_size - sizeof(small_data) || name_size == 0;
 }
+
 
 #endif	/* BFS_H */

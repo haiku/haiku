@@ -343,10 +343,11 @@ bfs_sync(void *_ns)
 //	#pragma mark -
 
 
-/**	Using vnode id, read in vnode information into fs-specific struct,
- *	and return it in node. the reenter flag tells you if this function
- *	is being called via some other fs routine, so that things like 
- *	double-locking can be avoided.
+/**	Reads in the node from disk and creates an inode object from it.
+ *	Has to be cautious if the node in question is currently under
+ *	construction, in which case it waits for that action to be completed,
+ *	and uses the inode object from the construction instead of creating
+ *	a new one.
  */
 
 static int
@@ -360,35 +361,55 @@ bfs_read_vnode(void *_ns, vnode_id id, char reenter, void **_node)
 		return B_ERROR;
 	}
 
-	Inode *inode = new Inode(volume, id, false, reenter);
-	if (inode == NULL)
-		return B_NO_MEMORY;
+	CachedBlock cached(volume, id);
 
-	status_t status;
+	bfs_inode *node = (bfs_inode *)cached.Block();
+	Inode *inode = NULL;
 	int32 tries = 0;
 
-	while (true) {
-		if ((status = inode->InitCheck()) == B_OK) {
-			// the inode is okay and ready to be used
-			*_node = (void *)inode;
-			return B_OK;
-		}
+restartIfBusy:
+	status_t status = node->InitCheck(volume);
 
-		// if "status" is B_BUSY, we wait a bit and try again
+	if (status == B_BUSY) {
+		inode = (Inode *)node->etc;
+			// We have to use the "etc" field to get the inode object
+			// (the inode is currently being constructed)
+			// We would need to call something like get_vnode() again here
+			// to get rid of the "etc" field - which would be nice, especially
+			// for other file systems which don't have this messy field.
 
-		if (status == B_BUSY) {
+		// let us wait a bit and try again later
+		if (tries++ < 200) {
 			// wait for one second at maximum
-			if (tries++ < 200) {
-				snooze(5000);
-				continue;
-			}
-			FATAL(("inode is not becoming unbusy (id = %Ld)\n", id));
+			snooze(5000);
+			goto restartIfBusy;
 		}
-		break;
+		FATAL(("inode is not becoming unbusy (id = %Ld)\n", id));
+		return status;
+	} else if (status < B_OK) {
+		FATAL(("inode at %Ld is corrupt!\n", id));
+		return status;
 	}
 
-	delete inode;
-	RETURN_ERROR(status);
+	// If the inode is currently being constructed, we already have an inode
+	// pointer (taken from the node's etc field).
+	// If not, we create a new one here
+
+	if (inode == NULL) {
+		inode = new Inode(&cached);
+		if (inode == NULL)
+			return B_NO_MEMORY;
+
+		status = inode->InitCheck(false);
+		if (status < B_OK)
+			delete inode;
+	} else
+		status = inode->InitCheck(false);
+
+	if (status == B_OK)
+		*_node = inode;
+
+	return status;
 }
 
 
