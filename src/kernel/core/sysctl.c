@@ -6,7 +6,7 @@
 #include <debug.h>
 #include <memheap.h>
 #include <sysctl.h>
-
+#include <KernelExport.h>
 #include <Errors.h>
 
 /* Not sure where to put this definition yet (sys/param.h?), 

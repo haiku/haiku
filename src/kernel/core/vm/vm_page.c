@@ -38,7 +38,7 @@ static vm_page *all_pages;
 static addr physical_page_offset;
 static unsigned int num_pages;
 
-static spinlock_t page_lock;
+static spinlock page_lock;
 
 static sem_id modified_pages_available;
 

@@ -142,7 +142,7 @@ err:
 }
 
 
-static int parse_expression(scan_info *info,shell_value **out)
+static int parse_expr(scan_info *info,shell_value **out)
 {
 	(*out) = NULL;
 	return parse_oper(info,out,MAX_LEVEL);
@@ -288,7 +288,7 @@ static int handle_exit(scan_info *info)
 
 		if(scan(info)) return SHE_SCAN_ERROR;
 
-		err = parse_expression(info,&expr);
+		err = parse_expr(info,&expr);
 		if(err != SHE_NO_ERROR) return err;
 
 		if(!(expr->isnumber)){
@@ -322,7 +322,7 @@ static int parse_rvl_expr(scan_info *info,shell_value **out)
 
 	if(expect(info,SVO_PARENL)) return SVO_PARENL;
 
-	err = parse_expression(info,out);
+	err = parse_expr(info,out);
 
 	if(err != SHE_NO_ERROR) return err;
 
@@ -423,7 +423,7 @@ static int handle_load(scan_info *info)
 
 	if(expect(info,SVO_LOAD)) return SVO_LOAD;
 
-	err = parse_expression(info,&value);
+	err = parse_expr(info,&value);
 	if(err != SHE_NO_ERROR) return err;
 
 	set_shell_var_with_value(var_name,value);
@@ -446,7 +446,7 @@ static int handle_echo(scan_info *info)
 
 	while(info->sym_code != SVO_END){
 
-		err = parse_expression(info,&value);
+		err = parse_expr(info,&value);
 
 		if(err != SHE_NO_ERROR) return err;
 

@@ -7,6 +7,8 @@
 #include <debug.h>
 #include <bus.h>
 #include <config_manager.h>
+#include <KernelExport.h>
+
 
 int bus_init(kernel_args *ka)
 {

@@ -25,10 +25,24 @@ struct io_handler {
 
 struct io_vector {
 	struct io_handler handler_list;
-	spinlock_t        vector_lock;
+	spinlock          vector_lock;
 };
 
 static struct io_vector *io_vectors = NULL;
+
+
+cpu_status
+disable_interrupts()
+{
+	return arch_int_disable_interrupts();
+}
+
+
+void
+restore_interrupts(cpu_status status)
+{
+	arch_int_restore_interrupts(status);
+}
 
 
 int

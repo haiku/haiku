@@ -42,7 +42,7 @@ struct thread_key {
 };
 
 // global
-spinlock_t thread_spinlock = 0;
+spinlock thread_spinlock = 0;
 
 // thread list
 static struct thread *idle_threads[MAX_BOOT_CPUS];
@@ -1085,15 +1085,9 @@ void
 sys_exit_thread(status_t return_value)
 {
 	struct thread *t = thread_get_current_thread();
-	int state;
 	
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
 	t->return_code = return_value;
 	t->return_flags = THREAD_RETURN_EXIT;
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-	
 	send_signal_etc(t->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
 }
 

@@ -21,7 +21,7 @@
 #include <arch/smp.h>
 
 static timer * volatile events[SMP_MAX_CPUS] = { NULL, };
-static spinlock_t timer_spinlock[SMP_MAX_CPUS] = { 0, };
+static spinlock timer_spinlock[SMP_MAX_CPUS] = { 0, };
 
 int timer_init(kernel_args *ka)
 {
@@ -56,7 +56,7 @@ int timer_interrupt()
 {
 	bigtime_t sched_time;
 	timer *event;
-	spinlock_t *spinlock;
+	spinlock *spinlock;
 	int curr_cpu = smp_get_current_cpu();
 	int rc = B_HANDLED_INTERRUPT;
 

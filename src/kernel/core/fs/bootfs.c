@@ -14,6 +14,7 @@
 #include <kerrors.h>
 #include <arch/cpu.h>
 #include <sys/stat.h>
+#include <KernelExport.h>
 
 #include <bootdir.h>
 

@@ -9,7 +9,7 @@
 #include <cdefs.h>
 
 int con_init(kernel_args *ka);
-int kprintf(const char *fmt, ...) __PRINTFLIKE(1,2);
-int kprintf_xy(int x, int y, const char *fmt, ...) __PRINTFLIKE(3,4);
+void kprintf(const char *fmt, ...) __PRINTFLIKE(1,2);
+void kprintf_xy(int x, int y, const char *fmt, ...) __PRINTFLIKE(3,4);
 
 #endif

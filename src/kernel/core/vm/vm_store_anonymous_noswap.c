@@ -9,6 +9,7 @@
 #include <vm_store_anonymous_noswap.h>
 #include <Errors.h>
 #include <kerrors.h>
+#include <KernelExport.h>
 
 static void anonymous_destroy(struct vm_store *store)
 {

@@ -6,6 +6,7 @@
 #define _KERNEL_SMP_H
 
 #include <stage2.h>
+#include <KernelExport.h>
 
 // intercpu messages
 enum {
@@ -34,11 +35,6 @@ int smp_disable_ici(void);
 int smp_get_num_cpus(void);
 void smp_set_num_cpus(int num_cpus);
 int smp_get_current_cpu(void);
-
-// spinlock functions
-typedef volatile int spinlock_t;
-void acquire_spinlock(spinlock_t *lock);
-void release_spinlock(spinlock_t *lock);
 
 #endif
 

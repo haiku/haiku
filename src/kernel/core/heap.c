@@ -3,6 +3,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+#include <KernelExport.h>
 #include <kernel.h>
 #include <vm.h>
 #include <lock.h>

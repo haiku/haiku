@@ -38,7 +38,7 @@ extern _IMPEXP_KERNEL thread_id spawn_kernel_thread (
 
 typedef ulong		cpu_status;
 
-extern _IMPEXP_KERNEL cpu_status	disable_interrupts();
+extern _IMPEXP_KERNEL cpu_status	disable_interrupts(void);
 extern _IMPEXP_KERNEL void			restore_interrupts(cpu_status status);
 
 
@@ -85,10 +85,19 @@ typedef struct timer timer;
 typedef struct qent	qent;
 typedef	int32 (*timer_hook)(timer *);
 
+/**
+ * The BeOS qent structure is probably part of a general double linked list
+ * interface used all over the kernel; a struct is required to have a qent
+ * entry struct as first element, so it can be linked to other elements
+ * easily. The key field is probably just an id, eventually used to order
+ * the list.
+ * Since we don't use this kind of interface, but we have to provide it
+ * to keep compatibility, we can use the qent struct for other purposes...
+ */
 struct qent {
-	int64		key;
-	qent		*next;
-	qent		*prev;
+	int64		key;			/* We use this as the sched time */
+	qent		*next;			/* This is used as a pointer to next timer */
+	qent		*prev;			/* This can be used for callback args */
 };
 
 struct timer {
@@ -111,6 +120,7 @@ bool		cancel_timer(timer *t);
 --- */
 
 extern _IMPEXP_KERNEL int	send_signal_etc(pid_t thid, uint sig, uint32 flags);
+extern _IMPEXP_KERNEL int	has_signals_pending(void *thr);
 
 
 /* ---

@@ -12,6 +12,7 @@
 #include <debug.h>
 #include <string.h>
 #include <memheap.h>
+#include <KernelExport.h>
 
 static pci_module_info *pcim = NULL;
 

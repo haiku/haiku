@@ -13,6 +13,7 @@
 #include <Errors.h>
 #include <kerrors.h>
 #include <sys/stat.h>
+#include <KernelExport.h>
 
 #include <string.h>
 #include <stdio.h>

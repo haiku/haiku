@@ -29,7 +29,7 @@ struct port_entry {
 	port_id 			id;
 	team_id 			owner;
 	int32 				capacity;
-	int     			lock;
+	spinlock			lock;
 	char				*name;
 	sem_id				read_sem;
 	sem_id				write_sem;
@@ -57,7 +57,7 @@ static bool ports_active = false;
 
 static port_id next_port = 0;
 
-static int port_spinlock = 0;
+static spinlock port_spinlock = 0;
 #define GRAB_PORT_LIST_LOCK() acquire_spinlock(&port_spinlock)
 #define RELEASE_PORT_LIST_LOCK() release_spinlock(&port_spinlock)
 #define GRAB_PORT_LOCK(s) acquire_spinlock(&(s).lock)

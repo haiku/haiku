@@ -44,7 +44,7 @@ static void *team_hash = NULL;
 static team_id next_team_id = 1;
 static struct team *kernel_team = NULL;
 
-spinlock_t team_spinlock = 0;
+spinlock team_spinlock = 0;
 
 static struct team *create_team_struct(const char *name, bool kernel);
 static void delete_team_struct(struct team *p);

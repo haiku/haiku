@@ -32,7 +32,7 @@ void i386_selector_init( void *gdt )
 //		0 on error
 selector_id i386_selector_add( selector_type type )
 {
-	static int spinlock;
+	static spinlock spinlock;
 	int state;
 	uint32 mask;
 	selector_id id = 0;

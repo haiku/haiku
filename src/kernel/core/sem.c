@@ -33,12 +33,12 @@
 
 
 struct sem_entry {
-	sem_id	id;
-	int		count;
+	sem_id		id;
+	int			count;
 	struct thread_queue q;
-	char	*name;
-	int		lock;
-	team_id	owner;		 // if set to -1, means owned by a port
+	char		*name;
+	spinlock	lock;
+	team_id		owner;		 // if set to -1, means owned by a port
 };
 
 #define MAX_SEMS 4096
@@ -48,7 +48,7 @@ static region_id         gSemRegion = 0;
 static bool              gSemsActive = false;
 static sem_id            gNextSemID = 0;
 
-static int sem_spinlock = 0;
+static spinlock sem_spinlock = 0;
 #define GRAB_SEM_LIST_LOCK()     acquire_spinlock(&sem_spinlock)
 #define RELEASE_SEM_LIST_LOCK()  release_spinlock(&sem_spinlock)
 #define GRAB_SEM_LOCK(s)         acquire_spinlock(&(s).lock)

@@ -29,7 +29,7 @@ int dbg_register_file[2][14]; /* XXXmpetit -- must be made generic */
 
 
 static bool serial_debug_on = false;
-static spinlock_t dbg_spinlock = 0;
+static spinlock dbg_spinlock = 0;
 static int debugger_on_cpu = -1;
 
 struct debugger_command
@@ -250,7 +250,7 @@ kernel_debugger(const char * message)
 }
 
 
-int
+void
 panic(const char *fmt, ...)
 {
 	int ret = 0;
@@ -279,25 +279,22 @@ panic(const char *fmt, ...)
 	kernel_debugger(NULL);
 
 	restore_interrupts(state);
-	return ret;
 }
 
 
-int
+void
 dprintf(const char *fmt, ...)
 {
 	va_list args;
 	char temp[512];
-	int ret = 0;
 
 	if (serial_debug_on) {
 		va_start(args, fmt);
-		ret = vsprintf(temp, fmt, args);
+		vsprintf(temp, fmt, args);
 		va_end(args);
 
 		dbg_puts(temp);
 	}
-	return ret;
 }
 
 
@@ -335,7 +332,7 @@ dbg_puts(const char *s)
 
 
 int
-add_debugger_command(const char *name, int (*func)(int, char **), const char *desc)
+add_debugger_command(char *name, int (*func)(int, char **), char *desc)
 {
 	int flags;
 	struct debugger_command *cmd;
@@ -362,7 +359,7 @@ add_debugger_command(const char *name, int (*func)(int, char **), const char *de
 
 
 int
-remove_debugger_command(const char * name, int (*func)(int, char **))
+remove_debugger_command(char * name, int (*func)(int, char **))
 {
 	int flags;
 	struct debugger_command *cmd;

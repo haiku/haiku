@@ -8,6 +8,7 @@
 #include <ISA.h>
 #include <arch/cpu.h>
 #include <debug.h>
+#include <KernelExport.h>
 
 static status_t isa_rescan(void)
 {

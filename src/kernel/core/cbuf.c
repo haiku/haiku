@@ -24,9 +24,9 @@
 static cbuf *cbuf_free_list;
 static sem_id free_list_sem;
 static cbuf *cbuf_free_noblock_list;
-static spinlock_t noblock_spin;
+static spinlock noblock_spin;
 
-static spinlock_t cbuf_lowlevel_spinlock;
+static spinlock cbuf_lowlevel_spinlock;
 static region_id cbuf_region_id;
 static cbuf *cbuf_region;
 static region_id cbuf_bitmap_region_id;

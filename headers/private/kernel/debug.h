@@ -17,16 +17,10 @@ char dbg_putch(char c);
 void dbg_puts(const char *s);
 bool dbg_set_serial_debug(bool new_val);
 bool dbg_get_serial_debug(void);
-int  dprintf(const char *fmt, ...) __PRINTFLIKE(1,2);
-int  panic(const char *fmt, ...) __PRINTFLIKE(1,2);
-void kernel_debugger(const char *);
 
 /* special return codes for kernel debugger command function*/
 #define  B_KDEBUG_CONT   2
 #define  B_KDEBUG_QUIT   3
-
-int  add_debugger_command(const char * name, int (*func)(int, char **), const char *desc);
-int  remove_debugger_command(const char * name, int (*func)(int, char **));
 
 extern void dbg_save_registers(int *);	/* arch provided */
 

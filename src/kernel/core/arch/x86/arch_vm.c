@@ -10,6 +10,7 @@
 #include <debug.h>
 #include <Errors.h>
 #include <kerrors.h>
+#include <KernelExport.h>
 
 #include <arch/vm.h>
 #include <arch/int.h>

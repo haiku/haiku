@@ -7,6 +7,8 @@
 #include <debug.h>
 #include <arch/cpu.h>
 
+#include <KernelExport.h>
+
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>

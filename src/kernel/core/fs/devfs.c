@@ -14,6 +14,7 @@
 #include <kerrors.h>
 #include <Drivers.h>
 #include <sys/stat.h>
+#include <KernelExport.h>
 
 #include <arch/cpu.h>
 #include <devfs.h>

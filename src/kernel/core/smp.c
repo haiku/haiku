@@ -42,17 +42,17 @@ struct smp_msg {
 #define MAILBOX_LOCAL 1
 #define MAILBOX_BCAST 2
 
-static spinlock_t boot_cpu_spin[SMP_MAX_CPUS] = { 0, };
+static spinlock boot_cpu_spin[SMP_MAX_CPUS] = { 0, };
 
 static struct smp_msg *free_msgs = NULL;
 static volatile int free_msg_count = 0;
-static spinlock_t free_msg_spinlock = 0;
+static spinlock free_msg_spinlock = 0;
 
 static struct smp_msg *smp_msgs[SMP_MAX_CPUS] = { NULL, };
-static spinlock_t cpu_msg_spinlock[SMP_MAX_CPUS] = { 0, };
+static spinlock cpu_msg_spinlock[SMP_MAX_CPUS] = { 0, };
 
 static struct smp_msg *smp_broadcast_msgs = NULL;
-static spinlock_t broadcast_msg_spinlock = 0;
+static spinlock broadcast_msg_spinlock = 0;
 
 static bool ici_enabled = false;
 
@@ -61,7 +61,7 @@ static int smp_num_cpus = 1;
 static int smp_process_pending_ici(int curr_cpu);
 
 void
-acquire_spinlock(spinlock_t *lock)
+acquire_spinlock(spinlock *lock)
 {
 	if (smp_num_cpus > 1) {
 		int curr_cpu = smp_get_current_cpu();
@@ -78,7 +78,7 @@ acquire_spinlock(spinlock_t *lock)
 
 
 static void
-acquire_spinlock_nocheck(spinlock_t *lock)
+acquire_spinlock_nocheck(spinlock *lock)
 {
 	if (smp_num_cpus > 1) {
 		while (1) {
@@ -92,7 +92,7 @@ acquire_spinlock_nocheck(spinlock_t *lock)
 
 
 void
-release_spinlock(spinlock_t *lock)
+release_spinlock(spinlock *lock)
 {
 	*lock = 0;
 }
@@ -188,7 +188,7 @@ smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mail
 		// we were the last one to decrement the ref_count
 		// it's our job to remove it from the list & possibly clean it up
 		struct smp_msg **mbox = NULL;
-		spinlock_t *spinlock = NULL;
+		spinlock *spinlock = NULL;
 
 		// clean up the message from one of the mailboxes
 		switch(source_mailbox) {

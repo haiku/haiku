@@ -3,6 +3,7 @@
 /* XXX - add documentation to this file! */
 #include <kernel.h>
 #include <OS.h>
+#include <KernelExport.h>
 #include <pools.h>
 #include <vm.h>
 #include <memheap.h>

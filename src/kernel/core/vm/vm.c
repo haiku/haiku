@@ -51,7 +51,7 @@ static void *aspace_table;
 static sem_id aspace_hash_sem;
 
 static int max_commit;
-static spinlock_t max_commit_lock;
+static spinlock max_commit_lock;
 
 // function declarations
 static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock);

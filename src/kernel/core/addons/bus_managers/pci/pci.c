@@ -53,7 +53,7 @@ enum {
 static struct pci_device *pci_devices = NULL;
 static struct pci_bus    *pci_busses  = NULL;
 
-static spinlock_t pci_config_lock = 0;  /* lock for config space access */
+static spinlock   pci_config_lock = 0;  /* lock for config space access */
 static int        pci_mode = 1;         /* The pci config mechanism we're using.
                                          * NB defaults to 1 as this is more common, but
                                          * checked at runtime

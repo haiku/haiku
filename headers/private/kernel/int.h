@@ -7,6 +7,7 @@
 
 #include <stage2.h>
 #include <arch/int.h>
+#include <KernelExport.h>
 
 /**
  * @defgroup kernelint Interrupts
@@ -35,17 +36,13 @@
  */
 #define B_NO_ENABLE_COUNTER         1
 
-typedef int32 (*interrupt_handler) (void *data);
-
 int  int_init(kernel_args *ka);
 int  int_init2(kernel_args *ka);
 int  int_io_interrupt_handler(int vector);
 long install_interrupt_handler(long, interrupt_handler,	void *);
 long remove_interrupt_handler (long, interrupt_handler,	void *);
 
-#define enable_interrupts	  arch_int_enable_interrupts
-#define disable_interrupts	  arch_int_disable_interrupts
-#define restore_interrupts	  arch_int_restore_interrupts
+#define enable_interrupts		  arch_int_enable_interrupts
 #define are_interrupts_enabled    arch_int_is_interrupts_enabled
 
 /** @fn long install_io_interrupt_handler(long interrupt, interrupt_handler handler, void *data, ulong flags);

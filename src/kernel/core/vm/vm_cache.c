@@ -21,7 +21,7 @@
 /* hash table of pages keyed by cache they're in and offset */
 #define PAGE_TABLE_SIZE 1024 /* make this dynamic */
 static void *page_cache_table;
-static spinlock_t page_cache_table_lock;
+static spinlock page_cache_table_lock;
 
 struct page_lookup_key {
 	off_t offset;

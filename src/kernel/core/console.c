@@ -31,7 +31,7 @@ struct console_op_xy_struct {
 static int console_fd = -1;
 
 
-int
+void
 kprintf(const char *fmt, ...)
 {
 	int ret = 0;
@@ -45,11 +45,10 @@ kprintf(const char *fmt, ...)
 	
 		sys_write(console_fd, 0, temp, ret);
 	}
-	return ret;
 }
 
 
-int
+void
 kprintf_xy(int x, int y, const char *fmt, ...)
 {
 	int ret = 0;
@@ -65,7 +64,6 @@ kprintf_xy(int x, int y, const char *fmt, ...)
 		buf.y = y;
 		sys_ioctl(console_fd, CONSOLE_OP_WRITEXY, &buf, ret + sizeof(buf.x) + sizeof(buf.y));
 	}
-	return ret;
 }
 
 

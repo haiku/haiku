@@ -5,6 +5,7 @@
 */
 
 #include <OS.h>
+#include <KernelExport.h>
 #include <kernel.h>
 #include <debug.h>
 #include <thread.h>
@@ -177,8 +178,9 @@ send_signal_etc(pid_t tid, uint sig, uint32 flags)
 
 
 int
-has_signals_pending(struct thread *t)
+has_signals_pending(void *thr)
 {
+	struct thread *t = (struct thread *)thr;
 	if (!t)
 		t = thread_get_current_thread();
 	return (t->sig_pending & ~t->sig_block_mask);
