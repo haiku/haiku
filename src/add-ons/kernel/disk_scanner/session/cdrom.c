@@ -156,6 +156,13 @@ typedef struct {
 	uint8 pframes;
 } cdrom_full_table_of_contents_entry;
 
+/*! Bitflags for control entries
+*/
+enum {
+	kControlDataTrack = 0x4,
+	kControlCopyPermitted = 0x2,
+};
+
 // std_ops
 static
 status_t
@@ -257,7 +264,9 @@ dump_full_table_of_contents(uchar *data, uint16 data_length)
 		TRACE(("entry #%d:\n", i));
 		TRACE(("  session  = %d\n", entries[i].session));
 		TRACE(("  adr      = %d\n", entries[i].adr));
-		TRACE(("  control  = %d\n", entries[i].control));
+		TRACE(("  control  = %d (%s track, copy %s)\n", entries[i].control,
+		       (entries[i].control & kControlDataTrack ? "data" : "audio"),
+		       (entries[i].control & kControlCopyPermitted ? "permitted" : "prohibited")));
 		TRACE(("  tno      = %d\n", entries[i].tno));
 		TRACE(("  point    = %d (0x%.2x)\n", entries[i].point, entries[i].point));
 		TRACE(("  minutes  = %d\n", entries[i].minutes));
@@ -352,6 +361,7 @@ cdrom_session_identify(int deviceFD, off_t deviceSize, int32 blockSize)
 
 // cdrom_session_get_nth_info
 /*! \todo Check that read_toc buffer was large enough on success
+	\todo Politley ignore states not in { 0xa0,0xa1,0xa2,1-99 }
 */
 static
 status_t
@@ -416,11 +426,14 @@ cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
 			
 			for (i = 0; i < count && state != cdromError && state != cdromFinished; i++) {
 				// We're only interested in positional info for data tracks
-				if ((entries[i].control == 0x04 || entries[i].control == 0x06)
+				if (entries[i].control != 0x04 && entries[i].control != 0x06) {
 				    	// 0x04 == data track, digital copy prohibited
 						// 0x06 == data track, digital copy allowed
-				    && entries[i].adr == 0x01)
-						// 0x01 == positional information
+					TRACE(("%s: WARNING: session %d, point %d not a data track point\n",
+					       kModuleDebugName, entries[i].session, entries[i].point));
+				}
+				if (entries[i].adr == 0x01)
+					// 0x01 == positional information
 				{
 					switch (entries[i].point) {
 						// first track number (in pmin)
