@@ -2,7 +2,7 @@ SubDir OBOS_TOP src servers app server ;
 
 AddResources app_server : app_server.rsrc ;
 
-UsePrivateHeaders app ;
+UsePrivateHeaders app interface ;
 UseFreeTypeHeaders ;
 
 Server app_server :

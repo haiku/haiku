@@ -27,7 +27,7 @@
 //------------------------------------------------------------------------------
 
 #include "PicturePlayer.h"
-#include "PictureProtocol.h"
+#include <PictureProtocol.h>
 #include "DisplayDriver.h"
 
 PicturePlayer::PicturePlayer(DisplayDriver *d,void *data, int32 size)
