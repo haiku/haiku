@@ -171,11 +171,10 @@ check_wall_daemon(void *arg, int iteration)
 	struct list_link *link = NULL;
 	uint32 *wall;
 
-dprintf("checking walls...\n");
 	acquire_sem(sWallCheckLock);
 
 	while ((link = list_get_next_item(&sWalls, link)) != NULL) {
-		wall = (uint32 *)((addr_t)link + WALL_SIZE + 8);
+		wall = (uint32 *)((addr_t)link + sizeof(struct list_link) + WALL_SIZE + 8);
 		check_wall(wall);
 	}
 
@@ -236,6 +235,10 @@ heap_init(addr_t heapBase)
 	heap_lock.sem = -1;
 	heap_lock.holder = -1;
 
+#if USE_CHECKING_WALL
+	list_init(&sWalls);
+#endif
+
 	// set up some debug commands
 	add_debugger_command("heap_bindump", &dump_bin_list, "dump stats about bin usage");
 
@@ -244,16 +247,22 @@ heap_init(addr_t heapBase)
 
 
 status_t
-heap_init_postsem(kernel_args *ka)
+heap_init_post_sem(kernel_args *ka)
 {
 	if (mutex_init(&heap_lock, "heap_mutex") < 0)
 		panic("error creating heap mutex\n");
 
 #if USE_CHECKING_WALL
 	sWallCheckLock = create_sem(1, "check wall");
-if (sWallCheckLock == 0)
-	panic("AAAaaaaargl.\n");
-	list_init(&sWalls);
+#endif
+	return B_OK;
+}
+
+
+status_t
+heap_init_post_thread(kernel_args *ka)
+{
+#if USE_CHECKING_WALL
 	register_kernel_daemon(check_wall_daemon, NULL, WALL_CHECK_FREQUENCY);
 #endif
 	return B_OK;
@@ -393,13 +402,13 @@ out:
 #if USE_WALL
 	{
 		uint32 *wall = (uint32 *)((addr_t)address + alignment - WALL_SIZE - 8);
-#if USE_CECKING_WALL
-		struct list_link *link = (struct list_link)wall - 1;
-		
-		acquire_sem(sCheckWallLock);
+#if USE_CHECKING_WALL
+		struct list_link *link = (struct list_link *)wall - 1;
+
+		acquire_sem(sWallCheckLock);
 		list_add_link_to_tail(&sWalls, link);
-		list_remove_link(link);
-		release_sem(sCheckWallLock);
+		release_sem(sWallCheckLock);
+
 		size -= sizeof(struct list_link);
 #endif
 		size -= 8 + 2*WALL_SIZE + 2*alignment;
@@ -449,12 +458,12 @@ free(void *address)
 		uint32 *wall = (uint32 *)((uint8 *)address - WALL_SIZE - 8);
 		uint32 alignOffset = wall[0];
 
-#if USE_CECKING_WALL
-		struct list_link *link = (struct list_link)wall - 1;
+#if USE_CHECKING_WALL
+		struct list_link *link = (struct list_link *)wall - 1;
 
-		acquire_sem(sCheckWallLock);
+		acquire_sem(sWallCheckLock);
 		list_remove_link(link);
-		release_sem(sCheckWallLock);
+		release_sem(sWallCheckLock);
 #endif
 		check_wall(address);
 		address = (uint8 *)address - alignOffset;
