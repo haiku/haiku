@@ -15,19 +15,19 @@ bool testCount (int expected, testType type)
 	int found;
 	switch (type) {
 		case clean:
-			if (found=pm.getCleanCount()!=expected) {
+			if ((found=pm.getCleanCount())!=expected) {
 				error ("%s, invalid cleanCount of %d, expected: %d\n",testName,found,expected);
 				return false;
 				}
 			break;
 		case unused:
-			if (found=pm.getUnusedCount()!=expected) {
+			if ((found=pm.getUnusedCount())!=expected) {
 				error ("%s, invalid unusedCount of %d, expected: %d\n",testName,found,expected);
 				return false;
 				}
 			break;
 		case inuse:
-			if (found=pm.getInUseCount()!=expected) {
+			if ((found=pm.getInUseCount())!=expected) {
 				error ("%s, invalid InUseCount of %d, expected: %d\n",testName,found,expected);
 				return false;
 				}
