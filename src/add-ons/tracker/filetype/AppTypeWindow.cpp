@@ -115,12 +115,19 @@ AppTypeWindow::QuitRequested()
 	}
 }
 
+static const char * application_file_types = "BEOS:FILE_TYPES";
+static const char * application_flags_name = "BEOS:APP_FLAGS";
+static const char * application_large_standard_icon_name = "BEOS:L:STD_ICON";
+static const char * application_median_standard_icon_name = "BEOS:M:STD_ICON";
+static const char * application_signature_name = "BEOS:APP_SIG";
+static const char * application_version_name = "BEOS:APP_VERSION";
+
 status_t
 AppTypeWindow::SaveRequested()
 {
 	status_t result = B_OK;
 	
-	// TODO : save new settings
+	// TODO : save new settings to all attributes and resources matching the name
 	
 	return result;
 }
@@ -137,4 +144,6 @@ AppTypeWindow::SetEntry(const BEntry * entry)
 	SetTitle(strdup(title.String()));
 	
 	// TODO : set old settings
+
+
 }

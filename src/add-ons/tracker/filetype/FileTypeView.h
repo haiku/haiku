@@ -8,7 +8,7 @@
 #include <TextControl.h>
 #include <View.h>
 
-class FileTypeView : public BView {
+class FileTypeView : public BBox {
 public:
 	FileTypeView(BRect viewFrame);
 	~FileTypeView();

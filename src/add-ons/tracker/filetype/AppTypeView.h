@@ -1,14 +1,14 @@
 #ifndef APP_TYPE_VIEW_H
 #define APP_TYPE_VIEW_H
 
+#include <Box.h>
 #include <TextControl.h>
-#include <View.h>
 
 class AppTypeAppFlagsView;
 class AppTypeSupportedTypesView;
 class AppTypeVersionInfoView;
 
-class AppTypeView : public BView {
+class AppTypeView : public BBox {
 public:
 	AppTypeView(BRect viewFrame);
 	~AppTypeView();

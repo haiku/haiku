@@ -4,8 +4,8 @@
 #include <AppTypeVersionInfoView.h>
 
 AppTypeView::AppTypeView(BRect viewFrame)
-	: BView(viewFrame, "AppTypeView", B_FOLLOW_ALL,
-	        B_FRAME_EVENTS|B_WILL_DRAW)
+	: BBox(viewFrame, "AppTypeView", B_FOLLOW_ALL,
+	        B_FRAME_EVENTS|B_WILL_DRAW, B_PLAIN_BORDER)
 {
 	SetViewColor( ui_color(B_PANEL_BACKGROUND_COLOR) );
 	

@@ -44,10 +44,10 @@ FileTypeWindow::FileTypeWindow(const BList * entryList)
 FileTypeWindow::~FileTypeWindow()
 {
 	if (fEntryList != 0) {
-		void * item; 
-		for (int32 i = 0 ; item = fEntryList->ItemAt(i) ; i++) {
-			delete item;
+		for (int32 i = 0 ; (i < fEntryList->CountItems()) ; i++) {
+			delete fEntryList->ItemAt(i);
 		}
+		fEntryList->MakeEmpty();
 		delete fEntryList;
 	}
 }

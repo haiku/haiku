@@ -1,10 +1,11 @@
 #include <MenuItem.h>
-
+#include <Message.h>
+#include <Mime.h>
 #include <FileTypeView.h>
 
 FileTypeView::FileTypeView(BRect viewFrame)
-	: BView(viewFrame, "FileTypeView", B_FOLLOW_ALL,
-	        B_FRAME_EVENTS|B_WILL_DRAW)
+	: BBox(viewFrame, "FileTypeView", B_FOLLOW_ALL,
+	        B_FRAME_EVENTS|B_WILL_DRAW, B_PLAIN_BORDER)
 {
 	SetViewColor( ui_color(B_PANEL_BACKGROUND_COLOR) );
 	
@@ -52,6 +53,50 @@ FileTypeView::SetFileType(const char * fileType)
 {
 	fFileType.SetTo(fileType);
 	fFileTypeTextControl->SetText(fileType);
+	BMimeType mime(fileType);
+	if (mime.InitCheck() != B_OK) {
+		return;
+	}
+	BMessage applications;
+	if (mime.GetSupportingApps(&applications) != B_OK) {
+		return;
+	}
+	int32 subs = 0;
+	if (applications.FindInt32("be:sub", &subs) != B_OK) {
+		subs = 0;
+	}
+	int32 supers = 0;
+	if (applications.FindInt32("be:super", &supers) != B_OK) {
+		supers = 0;
+	}
+	for (int i = fPreferredAppMenu->CountItems() ; (i > 2) ; i--) {
+		BMenuItem * item = fPreferredAppMenu->ItemAt(i);
+		fPreferredAppMenu->RemoveItem(i);
+		delete item;
+	}
+	bool separator = false;
+	for (int i = 0 ; (i < subs+supers) ; i++) {
+		const char * str;
+		if (applications.FindString("applications", i, &str) == B_OK) {
+			BMimeType app_mime(str);
+			BMessage * message = NULL;
+			entry_ref ref;
+			if (app_mime.InitCheck() == B_OK) {
+				if (app_mime.GetAppHint(&ref) == B_OK) {
+					message = new BMessage();
+					message->AddString("mimetype",str);
+					str = ref.name;
+				}
+			}
+			if (i < subs) {
+				separator = true;
+			} else if (separator) {
+				fPreferredAppMenu->AddSeparatorItem();
+				separator = false;
+			}
+			fPreferredAppMenu->AddItem(new BMenuItem(str,message));
+		}
+	}
 }
 
 void
