@@ -8,8 +8,11 @@ AddResources midi_server :
 
 Server midi_server :
 	MidiServerApp.cpp 
+	DeviceWatcher.cpp
+	PortDrivers.cpp
 ;
 
 LinkSharedOSLibs midi_server : 
 	be 
+	midi2
 ;

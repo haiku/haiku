@@ -24,6 +24,7 @@
 
 #include "debug.h"
 #include "MidiServerApp.h"
+#include "PortDrivers.h"
 #include "ServerDefs.h"
 #include "protocol.h"
 
@@ -35,6 +36,7 @@ MidiServerApp::MidiServerApp()
 	TRACE(("Running OpenBeOS MIDI server"))
 
 	nextId = 1;
+	devWatcher.Start();
 }
 
 //------------------------------------------------------------------------------

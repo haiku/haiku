@@ -21,36 +21,27 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _PORT_DRIVERS_H
-#define _PORT_DRIVERS_H
+#ifndef DEVICE_WATCHER_H
+#define DEVICE_WATCHER_H
 
-#include <MidiProducer.h>
-#include <MidiConsumer.h>
+class BBitmap;
+class BMidiEndpoint;
 
-class MidiPortConsumer : public BMidiLocalConsumer
+class DeviceWatcher
 {
 public:
-	MidiPortConsumer(int fd, const char* name);
+	DeviceWatcher();
+	~DeviceWatcher();
 
-	virtual void Data(uchar* data, size_t length, bool atomic, bigtime_t time);
-
-private:
-	int fd;
-};
-
-class MidiPortProducer : public BMidiLocalProducer
-{
-public:
-	MidiPortProducer(int fd, const char* name);
-	~MidiPortProducer(void);
-
-	int32 GetData(void);
+	void Start();
 
 private:
 	static int32 SpawnThread(void* data);
+	void ScanDevices(const char* path);
+	void SetIcons(BMidiEndpoint* endp);
 
-	int fd;
-	bool keepRunning;
+	BBitmap* largeIcon;
+	BBitmap* miniIcon;
 };
 
-#endif // _PORT_DRIVERS_H
+#endif // DEVICE_WATCHER_H

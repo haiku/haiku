@@ -26,6 +26,8 @@
 #include <Application.h>
 #include <List.h>
 
+#include "DeviceWatcher.h"
+
 struct app_t;
 struct endpoint_t;
 
@@ -136,6 +138,9 @@ private:
 	
 	// The ID we will assign to the next new endpoint.
 	int32 nextId;
+
+	// Creates endpoints for /dev/midi drivers.
+	DeviceWatcher devWatcher;
 
 	#ifdef DEBUG
 	void DumpApps();
