@@ -18,6 +18,7 @@ INTERFACE_KIT_SOURCE =
 	StringView.cpp
 	TextControl.cpp
 	TextInput.cpp
+	View.cpp
 	Window.cpp
 
 	# BTextView
