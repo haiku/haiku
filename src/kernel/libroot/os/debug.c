@@ -4,6 +4,7 @@
 */
 
 
+#include <debugger.h>
 #include <OS.h>
 #include "syscalls.h"
 
@@ -14,19 +15,42 @@
 void
 debugger(const char *message)
 {
-	// ToDo: implement debugger() properly
-	puts("*** debugger call - not yet implemented ***");
-	printf("%s\n", message);
-
-	abort();
+	_kern_debugger(message);
 }
 
 
 const int
 disable_debugger(int state)
 {
-	// ToDo: implement disable_debugger()
-	return 0;
+	return _kern_disable_debugger(state);
+}
+
+
+status_t
+install_default_debugger(port_id debuggerPort)
+{
+	return _kern_install_default_debugger(debuggerPort);
+}
+
+
+port_id
+install_team_debugger(team_id team, port_id debuggerPort)
+{
+	return _kern_install_team_debugger(team, debuggerPort);
+}
+
+
+status_t
+remove_team_debugger(team_id team)
+{
+	return _kern_remove_team_debugger(team);
+}
+
+
+status_t
+debug_thread(thread_id thread)
+{
+	return _kern_debug_thread(thread);
 }
 
 
