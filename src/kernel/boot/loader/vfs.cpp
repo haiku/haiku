@@ -354,7 +354,57 @@ mount_boot_file_systems()
 		}
 		gRoot->Close(cookie);
 	}
+
 	return B_OK;
+}
+
+
+static status_t
+get_node_for_path(Directory *directory, const char *pathName, Node **_node)
+{
+	char pathBuffer[B_PATH_NAME_LENGTH];
+	char *path = pathBuffer;
+
+	if (pathName == NULL)
+		return B_BAD_VALUE;
+
+	strlcpy(path, pathName, sizeof(pathBuffer));
+
+	while (true) {
+		Node *nextNode;
+		char *nextPath;
+
+		// walk to find the next path component ("path" will point to a single
+		// path component), and filter out multiple slashes
+		for (nextPath = path + 1; nextPath[0] != '\0' && nextPath[0] != '/'; nextPath++);
+
+		if (*nextPath == '/') {
+			*nextPath = '\0';
+			do
+				nextPath++;
+			while (*nextPath == '/');
+		}
+
+		nextNode = directory->Lookup(path, true);
+		directory->Release();
+
+		if (nextNode == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		path = nextPath;
+		if (S_ISDIR(nextNode->Type()))
+			directory = (Directory *)nextNode;
+		else if (path[0])
+			return B_NOT_ALLOWED;
+
+		// are we done?
+		if (path[0] == '\0') {
+			*_node = nextNode;
+			return B_OK;
+		}
+	}
+
+	return NULL;
 }
 
 
@@ -494,9 +544,37 @@ write(int fd, const void *buffer, size_t bufferSize)
 
 
 int
-open(const char *name, int mode)
+open(const char *name, int mode, ...)
 {
-	return B_ERROR;
+	// we always start at the top
+	if (name[0] == '/')
+		name++;
+
+	Node *node;
+	if (get_node_for_path(gRoot, name, &node) < B_OK)
+		return B_ENTRY_NOT_FOUND;
+
+	int fd = open_node(node, mode);
+
+	node->Release();
+	return fd;
+}
+
+
+int
+open_from(Directory *directory, const char *name, int mode)
+{
+	if (name[0] == '/')
+		return B_BAD_VALUE;
+
+	Node *node;
+	if (get_node_for_path(directory, name, &node) < B_OK)
+		return B_ENTRY_NOT_FOUND;
+
+	int fd = open_node(node, mode);
+
+	node->Release();
+	return fd;
 }
 
 
