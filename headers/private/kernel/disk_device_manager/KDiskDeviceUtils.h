@@ -151,6 +151,7 @@ private:
 // instantiations
 class KDiskDevice;
 class KDiskDeviceManager;
+class KDiskSystem;
 class KPartition;
 
 typedef AutoLocker<KDiskDevice, AutoLockerReadLocking<KDiskDevice> >
@@ -178,6 +179,24 @@ public:
 typedef AutoLocker<KPartition, AutoLockerPartitionRegistration<> >
 	PartitionRegistrar;
 
+// AutoLockerDiskSystemLoading
+template<const int dummy = 0>
+class AutoLockerDiskSystemLoading {
+public:
+	inline bool Lock(KDiskSystem *diskSystem)
+	{
+		return (diskSystem->Load() == B_OK);
+	}
+
+	inline void Unlock(KDiskSystem *diskSystem)
+	{
+		diskSystem->Unload();
+	}
+};
+
+typedef AutoLocker<KDiskSystem, AutoLockerDiskSystemLoading<> >
+	DiskSystemLoader;
+
 } // namespace DiskDevice
 } // namespace BPrivate
 
@@ -187,5 +206,6 @@ using BPrivate::DiskDevice::DeviceReadLocker;
 using BPrivate::DiskDevice::DeviceWriteLocker;
 using BPrivate::DiskDevice::ManagerLocker;
 using BPrivate::DiskDevice::PartitionRegistrar;
+using BPrivate::DiskDevice::DiskSystemLoader;
 
 #endif	// _K_DISK_DEVICE_H
