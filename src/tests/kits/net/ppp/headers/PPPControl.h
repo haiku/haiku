@@ -12,6 +12,10 @@
 #include <PPPDefs.h>
 
 
+// various constants
+#define PPP_HANDLER_NAME_LENGTH_LIMIT		63
+	// if the name is longer than this value it will be truncated to fit the structure
+
 // starting values and other values for control ops
 #define PPP_RESERVE_OPS_COUNT				0xFFFF
 #define PPP_OPS_START						B_DEVICE_OP_CODES_END + 1
@@ -132,6 +136,7 @@ typedef struct ppp_handler_info {
 	
 	ppp_phase phase;
 	int32 addressFamily, flags;
+	ppp_side side;
 	uint16 protocol;
 	
 	bool isEnabled;
@@ -146,7 +151,7 @@ typedef struct ppp_handler_info {
 		// PPP_TERMINATION_PHASE	-		IsGoingDown() == true
 	
 	// only protocol
-	ppp_authenticator_type authenticatorType;
+	char type[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	
 	// only encapsulator
 	ppp_encapsulation_level level;

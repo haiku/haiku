@@ -42,6 +42,7 @@ ForEachItem(_LIST& list, _FUNCTION function)
 		function(list.ItemAt(index));
 }
 
+
 // These are very simple send/receive_data functions with a timeout
 // and there is a race condition beween has_data() and send/receive_data().
 // Timeouts in ms.

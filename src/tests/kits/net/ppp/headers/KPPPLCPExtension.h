@@ -52,7 +52,7 @@ class PPPLCPExtension {
 		status_t fInitStatus;
 
 	private:
-		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+		char *fName;
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
 		uint8 fCode;

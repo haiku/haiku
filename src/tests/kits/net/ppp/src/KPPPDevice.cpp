@@ -20,11 +20,10 @@ PPPDevice::PPPDevice(const char *name, PPPInterface& interface,
 	fInterface(interface),
 	fSettings(settings)
 {
-	if(name) {
-		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
-		fName[PPP_HANDLER_NAME_LENGTH_LIMIT] = 0;
-	} else
-		strcpy(fName, "???");
+	if(name)
+		fName = strdup(name);
+	else
+		fName = strdup("Unknown");
 	
 	fInitStatus = interface.SetDevice(this) ? B_OK : B_ERROR;
 }
@@ -32,6 +31,8 @@ PPPDevice::PPPDevice(const char *name, PPPInterface& interface,
 
 PPPDevice::~PPPDevice()
 {
+	free(fName);
+	
 	Interface().SetDevice(NULL);
 }
 
@@ -53,7 +54,7 @@ PPPDevice::Control(uint32 op, void *data, size_t length)
 			
 			ppp_device_info *info = (ppp_device_info*) data;
 			memset(info, 0, sizeof(ppp_device_info_t));
-			strcpy(info->name, Name());
+			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->settings = Settings();
 			info->MTU = MTU();
 			info->inputTransferRate = InputTransferRate();

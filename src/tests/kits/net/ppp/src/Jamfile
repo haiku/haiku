@@ -26,5 +26,6 @@ R5KernelStaticLibrary kernelppp :
 	
 	# integrated modules
 	_KPPPMRUHandler.cpp
+	_KPPPAuthenticationHandler.cpp
 	_KPPPPFCHandler.cpp
 ;

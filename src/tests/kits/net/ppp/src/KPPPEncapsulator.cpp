@@ -7,6 +7,7 @@
 
 #include <KPPPEncapsulator.h>
 #include <KPPPUtils.h>
+#include "settings_tools.h"
 
 #include <PPPControl.h>
 
@@ -28,11 +29,20 @@ PPPEncapsulator::PPPEncapsulator(const char *name, ppp_phase phase,
 	fUpRequested(true),
 	fConnectionStatus(PPP_DOWN_PHASE)
 {
-	if(name) {
-		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
-		fName[PPP_HANDLER_NAME_LENGTH_LIMIT] = 0;
-	} else
-		strcpy(fName, "???");
+	if(name)
+		fName = strdup(name);
+	else
+		fName = strdup("Unknown");
+	
+	const char *sideString = get_parameter_value("side", settings);
+	if(sideString)
+		fSide = get_side_string_value(sideString, PPP_LOCAL_SIDE);
+	else {
+		if(interface.Mode() == PPP_CLIENT_MODE)
+			fSide = PPP_LOCAL_SIDE;
+		else
+			fSide = PPP_PEER_SIDE;
+	}
 	
 	fInitStatus = interface.AddEncapsulator(this) ? B_OK : B_ERROR;
 }
@@ -40,6 +50,8 @@ PPPEncapsulator::PPPEncapsulator(const char *name, ppp_phase phase,
 
 PPPEncapsulator::~PPPEncapsulator()
 {
+	free(fName);
+	
 	Interface().RemoveEncapsulator(this);
 }
 
@@ -74,11 +86,12 @@ PPPEncapsulator::Control(uint32 op, void *data, size_t length)
 			
 			ppp_handler_info *info = (ppp_handler_info*) data;
 			memset(info, 0, sizeof(ppp_handler_info_t));
-			strcpy(info->name, Name());
+			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->settings = Settings();
 			info->phase = Phase();
 			info->addressFamily = AddressFamily();
 			info->flags = Flags();
+			info->side = Side();
 			info->protocol = Protocol();
 			info->isEnabled = IsEnabled();
 			info->isUpRequested = IsUpRequested();
@@ -118,11 +131,9 @@ status_t
 PPPEncapsulator::SendToNext(struct mbuf *packet, uint16 protocol) const
 {
 	// Find the next possible handler for this packet.
-	// This handler should be:
-	// - enabled
-	// - allowed to send
+	// This handler should be enabled, up, and allowed to send
 	if(Next()) {
-		if(Next()->IsEnabled()
+		if(Next()->IsEnabled() && Next()->IsUp()
 				&& is_handler_allowed(*Next(), Interface().State(), Interface().Phase()))
 			return Next()->Send(packet, protocol);
 		else

@@ -8,11 +8,10 @@
 #ifndef _K_PPP_PROTOCOL__H
 #define _K_PPP_PROTOCOL__H
 
-#include <driver_settings.h>
-
 #include <KPPPDefs.h>
 
 class PPPInterface;
+class PPPOptionHandler;
 
 
 class PPPProtocol {
@@ -20,7 +19,7 @@ class PPPProtocol {
 		PPPProtocol(const char *name, ppp_phase phase, uint16 protocol,
 			int32 addressFamily, PPPInterface& interface,
 			driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
-			ppp_authenticator_type authenticatorType = PPP_NO_AUTHENTICATOR);
+			const char *type = NULL, PPPOptionHandler *optionHandler = NULL);
 		virtual ~PPPProtocol();
 		
 		virtual status_t InitCheck() const;
@@ -43,9 +42,15 @@ class PPPProtocol {
 				// negative values and values > 0xFF are ignored
 		int32 Flags() const
 			{ return fFlags; }
+		ppp_side Side() const
+			{ return fSide; }
+				// which side this protocol works for
 		
-		ppp_authenticator_type AuthenticatorType() const
-			{ return fAuthenticatorType; }
+		// extensions
+		const char *Type() const
+			{ return fType; }
+		PPPOptionHandler *OptionHandler() const
+			{ return fOptionHandler; }
 		
 		void SetEnabled(bool enabled = true);
 		bool IsEnabled() const
@@ -88,17 +93,19 @@ class PPPProtocol {
 			// report up/down events
 
 	protected:
+		ppp_side fSide;
 		status_t fInitStatus;
 
 	private:
-		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+		char *fName;
 		ppp_phase fPhase;
 		uint16 fProtocol;
 		int32 fAddressFamily;
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
 		int32 fFlags;
-		ppp_authenticator_type fAuthenticatorType;
+		char *fType;
+		PPPOptionHandler *fOptionHandler;
 		
 		bool fEnabled;
 		bool fUpRequested;

@@ -11,10 +11,6 @@
 #include <SupportDefs.h>
 
 
-// various constants
-#define PPP_HANDLER_NAME_LENGTH_LIMIT		63
-	// if the name is longer than this value it will be truncated
-
 // settings keys
 #define PPP_DISONNECT_AFTER_IDLE_SINCE_KEY	"DisonnectAfterIdleSince"
 #define PPP_MODE_KEY						"Mode"
@@ -24,7 +20,6 @@
 #define PPP_PROTOCOL_KEY					"Protocol"
 #define PPP_DEVICE_KEY						"Device"
 #define PPP_AUTHENTICATOR_KEY				"Authenticator"
-#define PPP_PEER_AUTHENTICATOR_KEY			"Peer-Authenticator"
 #define PPP_MULTILINK_KEY					"Multilink-Protocol"
 
 // settings values
@@ -130,11 +125,12 @@ enum ppp_mode {
 	PPP_SERVER_MODE
 };
 
-// PPPProtocol serves as authenticator
-enum ppp_authenticator_type {
-	PPP_NO_AUTHENTICATOR = 0,
-	PPP_LOCAL_AUTHENTICATOR,
-	PPP_PEER_AUTHENTICATOR
+// which side the protocol/encapsulator works for
+enum ppp_side {
+	PPP_NO_SIDE,
+	PPP_LOCAL_SIDE,
+	PPP_PEER_SIDE,
+	PPP_BOTH_SIDES
 };
 
 // authentication status

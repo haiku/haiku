@@ -80,11 +80,10 @@ class PPPDevice {
 		uint32 fMTU;
 			// always hold this value up-to-date!
 		bool fIsUp;
-		
 		status_t fInitStatus;
 
 	private:
-		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+		char *fName;
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
 };

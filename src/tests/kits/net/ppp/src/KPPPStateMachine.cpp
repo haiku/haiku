@@ -1337,14 +1337,18 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 		handler = LCP().OptionHandlerFor(request.ItemAt(index)->type);
 		
 		if(!handler || !handler->IsEnabled()) {
-			// unhandled items should be added to reject
+			// unhandled items should be added to the reject
 			reject.AddItem(request.ItemAt(index));
 			continue;
 		}
 		
 		result = handler->ParseRequest(request, index, nak, reject);
 		
-		if(result != B_OK) {
+		if(result == PPP_UNHANDLED) {
+			// unhandled items should be added to the reject
+			reject.AddItem(request.ItemAt(index));
+			continue;
+		} else if(result != B_OK) {
 			// the request contains a value that has been sent more than
 			// once or the value is corrupted
 			m_freem(packet);

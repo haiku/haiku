@@ -69,7 +69,7 @@ class PPPOptionHandler {
 		status_t fInitStatus;
 
 	private:
-		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+		char *fName;
 		uint8 fType;
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;

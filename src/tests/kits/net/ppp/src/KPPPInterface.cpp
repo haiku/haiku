@@ -33,6 +33,7 @@
 
 // internal modules
 #include "_KPPPMRUHandler.h"
+#include "_KPPPAuthenticationHandler.h"
 #include "_KPPPPFCHandler.h"
 
 
@@ -87,6 +88,11 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 		new _PPPMRUHandler(*this);
 	if(mruHandler->InitCheck() != B_OK)
 		delete mruHandler;
+	// authentication
+	_PPPAuthenticationHandler *authenticationHandler =
+		new _PPPAuthenticationHandler(*this);
+	if(authenticationHandler->InitCheck() != B_OK)
+		delete authenticationHandler;
 	// PFC
 	_PPPPFCHandler *pfcHandler =
 		new _PPPPFCHandler(fLocalPFCState, fPeerPFCState, *this);
@@ -478,9 +484,7 @@ PPPInterface::AddProtocol(PPPProtocol *protocol)
 	
 	LockerHelper locker(fLock);
 	
-	if(Phase() != PPP_DOWN_PHASE
-			|| (protocol->AuthenticatorType() != PPP_NO_AUTHENTICATOR
-				&& ProtocolFor(protocol->Protocol())))
+	if(Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change and there may only be
 			// one authenticator protocol for each protocol number
@@ -1050,7 +1054,7 @@ PPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 		if(!strcasecmp(settings->parameters[index].name, PPP_MULTILINK_KEY)
 				&& settings->parameters[index].value_count > 0) {
 			if(!LoadModule(settings->parameters[index].values[0],
-					settings->parameters[index].parameters, PPP_MULTILINK_TYPE))
+					settings->parameters[index].parameters, PPP_MULTILINK_KEY_TYPE))
 				return false;
 			break;
 		}
@@ -1072,15 +1076,13 @@ PPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 		name = settings->parameters[index].name;
 		
 		if(!strcasecmp(name, PPP_LOAD_MODULE_KEY))
-			type = PPP_LOAD_MODULE_TYPE;
+			type = PPP_LOAD_MODULE_KEY_TYPE;
 		else if(!strcasecmp(name, PPP_DEVICE_KEY))
-			type = PPP_DEVICE_TYPE;
+			type = PPP_DEVICE_KEY_TYPE;
 		else if(!strcasecmp(name, PPP_PROTOCOL_KEY))
-			type = PPP_PROTOCOL_TYPE;
+			type = PPP_PROTOCOL_KEY_TYPE;
 		else if(!strcasecmp(name, PPP_AUTHENTICATOR_KEY))
-			type = PPP_AUTHENTICATOR_TYPE;
-		else if(!strcasecmp(name, PPP_PEER_AUTHENTICATOR_KEY))
-			type = PPP_PEER_AUTHENTICATOR_TYPE;
+			type = PPP_AUTHENTICATOR_KEY_TYPE;
 		
 		if(type >= 0)
 			for(int32 value_id = 0; value_id < settings->parameters[index].value_count;

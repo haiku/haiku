@@ -20,12 +20,11 @@ typedef uint32 interface_id;
 // module key types (used when loading a module)
 enum ppp_module_key_type {
 	PPP_UNDEFINED_KEY_TYPE = -1,
-	PPP_LOAD_MODULE_TYPE = 0,
-	PPP_DEVICE_TYPE,
-	PPP_PROTOCOL_TYPE,
-	PPP_AUTHENTICATOR_TYPE,
-	PPP_PEER_AUTHENTICATOR_TYPE,
-	PPP_MULTILINK_TYPE
+	PPP_LOAD_MODULE_KEY_TYPE = 0,
+	PPP_DEVICE_KEY_TYPE,
+	PPP_PROTOCOL_KEY_TYPE,
+	PPP_AUTHENTICATOR_KEY_TYPE,
+	PPP_MULTILINK_KEY_TYPE
 };
 
 // PPP events as defined in RFC 1661 (with one exception: PPP_UP_FAILED_EVENT)

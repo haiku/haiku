@@ -6,8 +6,10 @@
 //---------------------------------------------------------------------
 
 #include <KPPPInterface.h>
+#include <KPPPOptionHandler.h>
 
 #include <PPPControl.h>
+#include "settings_tools.h"
 
 #include <cstring>
 
@@ -15,27 +17,37 @@
 PPPProtocol::PPPProtocol(const char *name, ppp_phase phase, uint16 protocol,
 		int32 addressFamily, PPPInterface& interface,
 		driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
-		ppp_authenticator_type authenticatorType = PPP_NO_AUTHENTICATOR)
+		const char *type = NULL, PPPOptionHandler *optionHandler = NULL)
 	: fPhase(phase),
 	fProtocol(protocol),
 	fAddressFamily(addressFamily),
 	fInterface(interface),
 	fSettings(settings),
 	fFlags(flags),
-	fAuthenticatorType(authenticatorType),
+	fOptionHandler(optionHandler),
 	fEnabled(true),
 	fUpRequested(true),
 	fConnectionStatus(PPP_DOWN_PHASE)
 {
-	if(name) {
-		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
-		fName[PPP_HANDLER_NAME_LENGTH_LIMIT] = 0;
-	} else
-		strcpy(fName, "???");
+	if(name)
+		fName = strdup(name);
+	else
+		fName = strdup("Unknown");
 	
-	if(authenticatorType != PPP_NO_AUTHENTICATOR)
-		SetEnabled(false);
-			// only the active authenticator should be enabled
+	if(type)
+		fType = strdup(type);
+	else
+		fType = strdup("Unknown");
+	
+	const char *sideString = get_parameter_value("side", settings);
+	if(sideString)
+		fSide = get_side_string_value(sideString, PPP_LOCAL_SIDE);
+	else {
+		if(interface.Mode() == PPP_CLIENT_MODE)
+			fSide = PPP_LOCAL_SIDE;
+		else
+			fSide = PPP_PEER_SIDE;
+	}
 	
 	fInitStatus = interface.AddProtocol(this) ? B_OK : B_ERROR;
 }
@@ -43,6 +55,9 @@ PPPProtocol::PPPProtocol(const char *name, ppp_phase phase, uint16 protocol,
 
 PPPProtocol::~PPPProtocol()
 {
+	free(fName);
+	free(fType);
+	
 	Interface().RemoveProtocol(this);
 }
 
@@ -77,16 +92,17 @@ PPPProtocol::Control(uint32 op, void *data, size_t length)
 			
 			ppp_handler_info *info = (ppp_handler_info*) data;
 			memset(info, 0, sizeof(ppp_handler_info_t));
-			strcpy(info->name, Name());
+			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->settings = Settings();
 			info->phase = Phase();
 			info->addressFamily = AddressFamily();
 			info->flags = Flags();
+			info->side = Side();
 			info->protocol = Protocol();
 			info->isEnabled = IsEnabled();
 			info->isUpRequested = IsUpRequested();
 			info->connectionStatus = fConnectionStatus;
-			info->authenticatorType = AuthenticatorType();
+			strncpy(info->type, Type(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 		} break;
 		
 		case PPPC_SET_ENABLED:

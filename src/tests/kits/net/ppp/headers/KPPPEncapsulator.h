@@ -49,6 +49,9 @@ class PPPEncapsulator {
 				// negative values and values > 0xFF are ignored
 		int32 Flags() const
 			{ return fFlags; }
+		ppp_side Side() const
+			{ return fSide; }
+				// which side this encapsulator works for
 		
 		void SetEnabled(bool enabled = true);
 		bool IsEnabled() const
@@ -101,11 +104,11 @@ class PPPEncapsulator {
 
 	protected:
 		uint32 fOverhead;
-		
+		ppp_side fSide;
 		status_t fInitStatus;
 
 	private:
-		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+		char *fName;
 		ppp_phase fPhase;
 		ppp_encapsulation_level fLevel;
 		uint16 fProtocol;
