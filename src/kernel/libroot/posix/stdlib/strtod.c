@@ -1612,6 +1612,24 @@ __strtod_internal(const char *number, char **_end, int group)
 	return strtod(number, _end);
 }
 
+// XXX this is not correct
+
+long double __strtold_internal(const char *number, char **_end, int group);
+
+long double
+__strtold_internal(const char *number, char **_end, int group)
+{
+	return __strtod_internal(number, _end, group);
+}
+
+float __strtof_internal(const char *number, char **_end, int group);
+
+float
+__strtof_internal(const char *number, char **_end, int group)
+{
+	return __strtod_internal(number, _end, group);
+}
+
 
 /* removed from the build, is only used by __dtoa() */
 #if 0
