@@ -9,8 +9,8 @@
 
 
 status_t
-fs_mount_volume(const char *fileSystem, const char *where,
-	const char *device, uint32 flags, const char *parameters)
+fs_mount_volume(const char *where, const char *device,
+	const char *fileSystem, uint32 flags, const char *parameters)
 {
 	return _kern_mount(where, device, fileSystem, flags, (void *)parameters);
 }
@@ -20,13 +20,5 @@ status_t
 fs_unmount_volume(const char *path, uint32 flags)
 {
 	return _kern_unmount(path/*, flags*/);
-}
-
-
-status_t
-fs_initialize_volume(const char *fileSystem, const char *volumeName,
-	const char *device, uint32 flags, const char *parameters)
-{
-	return B_ERROR;
 }
 
