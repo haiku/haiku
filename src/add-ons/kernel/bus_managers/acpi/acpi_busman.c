@@ -17,6 +17,10 @@ void reset_fixed_event (uint32 event);
 status_t install_fixed_event_handler	(uint32 event, interrupt_handler *handler, void *data); 
 status_t remove_fixed_event_handler	(uint32 event, interrupt_handler *handler); 
 
+status_t get_next_entry (uint32 object_type, const char *base, char *result, size_t len, void **counter);
+status_t get_device_hid (const char *path, char *hid);
+uint32 get_object_type (const char *path);
+
 struct acpi_module_info acpi_module = {
 	{
 		{
@@ -33,7 +37,10 @@ struct acpi_module_info acpi_module = {
 	fixed_event_status,
 	reset_fixed_event,
 	install_fixed_event_handler,
-	remove_fixed_event_handler
+	remove_fixed_event_handler,
+	get_next_entry,
+	get_device_hid,
+	get_object_type
 };
 
 _EXPORT module_info *modules[] = {
@@ -114,4 +121,59 @@ status_t install_fixed_event_handler (uint32 event, interrupt_handler *handler, 
 
 status_t remove_fixed_event_handler	(uint32 event, interrupt_handler *handler) {
 	return ((AcpiRemoveFixedEventHandler(event,handler) == AE_OK) ? B_OK : B_ERROR);
+}
+
+status_t get_next_entry (uint32 object_type, const char *base, char *result, size_t len, void **counter) {
+	ACPI_STATUS result_status;
+	ACPI_HANDLE parent,child,new_child;
+	ACPI_BUFFER buffer;
+	
+	if ((base == NULL) || (strcmp(base,"\\") == 0)) {
+		parent = ACPI_ROOT_OBJECT;
+	} else {
+		result_status = AcpiGetHandle(NULL,base,&parent);
+		if (result_status != AE_OK)
+			return B_ENTRY_NOT_FOUND;
+	}
+	
+	child = *counter;
+	
+	result_status = AcpiGetNextObject(object_type,parent,child,&new_child);
+	if (result_status != AE_OK)
+		return B_ENTRY_NOT_FOUND;
+		
+	*counter = new_child;
+	buffer.Length = len;
+	buffer.Pointer = result;
+	
+	result_status = AcpiGetName(new_child,ACPI_FULL_PATHNAME,&buffer);
+	if (result_status != AE_OK)
+		return B_NO_MEMORY; /* Corresponds to AE_BUFFER_OVERFLOW */
+	
+	return B_OK;
+}
+
+status_t get_device_hid (const char *path, char *hid) {
+	ACPI_HANDLE handle;
+	ACPI_DEVICE_INFO info;
+	
+	if (AcpiGetHandle(NULL,path,&handle) != AE_OK)
+		return B_ENTRY_NOT_FOUND;
+	
+	if (AcpiGetObjectInfo(handle,&info) != AE_OK)
+		return B_BAD_TYPE;
+		
+	strcpy(hid,info.HardwareId.Value);
+	return B_OK;
+}
+
+uint32 get_object_type (const char *path) {
+	ACPI_HANDLE handle;
+	ACPI_OBJECT_TYPE type;
+	
+	if (AcpiGetHandle(NULL,path,&handle) != AE_OK)
+		return B_ENTRY_NOT_FOUND;
+		
+	AcpiGetType(handle,&type);
+	return type;
 }
