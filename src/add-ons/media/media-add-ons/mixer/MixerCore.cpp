@@ -278,6 +278,13 @@ MixerCore::EnableOutput(bool enabled)
 		StartMixThread();
 }
 
+uint32
+MixerCore::OutputChannelCount()
+{
+	return (fOutput) ? fOutput->GetOutputChannelCount() : 0;
+}
+
+
 bool
 MixerCore::Start()
 {

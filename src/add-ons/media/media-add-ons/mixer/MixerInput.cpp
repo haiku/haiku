@@ -287,13 +287,39 @@ MixerInput::UpdateChannelDesignations()
 
 	printf("UpdateChannelDesignations: enter\n");
 
-	if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
-		// a left or right channel get's output as stereo on both
-		fInputChannelInfo[0].designations = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
-	} else {
-		// everything else get's mapped 1:1
-		for (int i = 0; i < fInputChannelCount; i++)
-			fInputChannelInfo[i].designations = GetChannelMask(i, fInputChannelMask);
+	// first apply a 1:1 mapping
+	for (int i = 0; i < fInputChannelCount; i++)
+		fInputChannelInfo[i].designations = GetChannelMask(i, fInputChannelMask);
+	
+	// specialize this, depending on the available physical output channels
+	switch (fCore->OutputChannelCount()) {
+		case 0:
+		case 1:
+			break;
+			
+		case 2:
+			if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
+				fInputChannelInfo[0].designations = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
+			}
+			break;
+			
+		default:
+			if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
+				fInputChannelInfo[0].designations = B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT;
+			}
+			if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_LEFT)) {
+				fInputChannelInfo[0].designations = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
+			}
+			if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_RIGHT)) {
+				fInputChannelInfo[0].designations = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
+			}
+			if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_LEFT)) {
+				fInputChannelInfo[1].designations = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
+			}
+			if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_RIGHT)) {
+				fInputChannelInfo[1].designations = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
+			}
+			break;
 	}
 
 	for (int i = 0; i < fInputChannelCount; i++)
