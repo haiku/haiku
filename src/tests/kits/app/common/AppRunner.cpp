@@ -23,6 +23,7 @@ AppRunner::AppRunner(bool requestQuitOnDestruction)
 		   fOutput(),
 		   fReader(-1),
 		   fTeam(-1),
+		   fRef(),
 		   fMessenger(),
 		   fRequestQuitOnDestruction(requestQuitOnDestruction)
 {
@@ -50,6 +51,7 @@ AppRunner::Run(const char *command, const char *args, bool findCommand)
 		find_test_app(command, &appPath);
 		command = appPath.String();
 	}
+	get_ref_for_path(command, &fRef);
 	// add args, i.e. compose the command line
 	BString cmdLine(command);
 	if (args) {
@@ -126,6 +128,34 @@ team_id
 AppRunner::Team()
 {
 	return fTeam;
+}
+
+// AppLooperPort
+port_id
+AppRunner::AppLooperPort()
+{
+	struct messenger_hack {
+		port_id	fPort;
+		int32	fHandlerToken;
+		team_id	fTeam;
+		int32	extra0;
+		int32	extra1;
+		bool	fPreferredTarget;
+		bool	extra2;
+		bool	extra3;
+		bool	extra4;
+	};
+	return ((messenger_hack*)&fMessenger)->fPort;
+}
+
+// GetRef
+status_t
+AppRunner::GetRef(entry_ref *ref)
+{
+	status_t error = (ref ? B_OK : B_ERROR);
+	if (error == B_OK)
+		*ref = fRef;
+	return error;
 }
 
 // RequestQuit

@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include <DataIO.h>
+#include <Entry.h>
 #include <Locker.h>
 
 class AppRunner {
@@ -18,6 +19,8 @@ public:
 	bool HasQuitted();
 	void WaitFor(bool requestQuit = false);
 	team_id Team();
+	port_id AppLooperPort();
+	status_t GetRef(entry_ref *ref);
 	status_t RequestQuit();
 
 	status_t GetOutput(BString *buffer);
@@ -38,6 +41,7 @@ private:
 	BMallocIO	fOutput;
 	thread_id	fReader;
 	team_id		fTeam;
+	entry_ref	fRef;
 	BMessenger	fMessenger;
 	bool		fRequestQuitOnDestruction;
 
