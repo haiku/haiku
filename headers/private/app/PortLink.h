@@ -14,13 +14,14 @@ class PortLinkData;
 
 class PortLink
 {
-	typedef struct
+	class ReplyData
 	{
+		public:
+			ReplyData(void) { code=0; buffersize=0; buffer=NULL; }
 		int32 code;
 		ssize_t buffersize;
 		int8 *buffer;
-		
-	} ReplyData;
+	};
 public:
 	PortLink(port_id port);
 	PortLink(const PortLink &link);
