@@ -6,615 +6,496 @@
 //
 //	Description:	BVolume class
 // ----------------------------------------------------------------------
+/*!
+	\file Volume.h
+	BVolume implementation.
+*/
 
-#include <Volume.h>
-
-#include <Directory.h>
-#include <Bitmap.h>
-#include <Node.h>
 #include <errno.h>
+
+#include <Bitmap.h>
+#include <Directory.h>
 #include <fs_info.h>
 #include <kernel_interface.h>
+#include <Node.h>
+#include <Volume.h>
 
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
 #endif
 
-// ----------------------------------------------------------------------
-//	BVolume (public)
-// ----------------------------------------------------------------------
-//	Default constructor: does nothing and sets InitCheck() to B_NO_INIT.
+/*!
+	\class BVolume
+	\brief Represents a disk volume
+	
+	Provides an interface for querying information about a volume.
 
-BVolume::BVolume(void)
-{
-	Unset();
-}
+	The class is a simple wrapper for a \c dev_t and the function
+	fs_stat_dev. The only exception is the method is SetName(), which
+	sets the name of the volume.
 
+	\author Vincent Dominguez
+	\author <a href='mailto:bonefish@users.sf.net'>Ingo Weinhold</a>
+	
+	\version 0.0.0
+*/
 
-// ----------------------------------------------------------------------
-//	BVolume (public)
-// ----------------------------------------------------------------------
-//	Device constructor: sets the BVolume to point to the volume
-//	represented by the argument. See the SetTo() function for
-//	status codes.
+/*!	\var dev_t BVolume::fDevice
+	\brief The volume's device ID.
+*/
 
-BVolume::BVolume(
-	dev_t			dev)
-{
-#if !_PR3_COMPATIBLE_
-	// Initialize reserved class variables to "safe" values:
-	_reserved[0] = 0L;
-	_reserved[1] = 0L;
-	_reserved[2] = 0L;
-	_reserved[3] = 0L;
-	_reserved[4] = 0L;
-	_reserved[5] = 0L;
-	_reserved[6] = 0L;
-	_reserved[7] = 0L;
-		// Place this in a separate initialization method at
-		//	a later time.
-#endif
+/*!	\var dev_t BVolume::fCStatus
+	\brief The object's initialization status.
+*/
 
-	SetTo(dev);
-}
+// constructor
+/*!	\brief Creates an uninitialized BVolume.
 
-
-// ----------------------------------------------------------------------
-//	BVolume (public)
-// ----------------------------------------------------------------------
-//	Copy constructor: sets the object to point to the same device as
-//	does the argument.
-
-BVolume::BVolume(
-	const BVolume&	vol)
-{
-#if !_PR3_COMPATIBLE_
-	// Initialize reserved class variables to "safe" values:
-	_reserved[0] = 0L;
-	_reserved[1] = 0L;
-	_reserved[2] = 0L;
-	_reserved[3] = 0L;
-	_reserved[4] = 0L;
-	_reserved[5] = 0L;
-	_reserved[6] = 0L;
-	_reserved[7] = 0L;
-		// Place this in a separate initialization method at
-		//	a later time.
-#endif
-
-	fDev = vol.Device();
-	fCStatus = vol.InitCheck();
-}
-
-
-// ----------------------------------------------------------------------
-//	~BVolume (public, virtual)
-// ----------------------------------------------------------------------
-//	Destructor: Destroys the BVolume object.
-
-BVolume::~BVolume(void)
+	InitCheck() will return \c B_NO_INIT.
+*/
+BVolume::BVolume()
+	: fDevice(-1),
+	  fCStatus(B_NO_INIT)
 {
 }
 
+// constructor
+/*!	\brief Creates a BVolume and initializes it to the volume specified
+		   by the supplied device ID.
 
-// ----------------------------------------------------------------------
-//	InitCheck (public)
-// ----------------------------------------------------------------------
-//	Returns the status of the last initialization (from either the
-//	constructor or SetTo()). 
+	InitCheck() should be called to check whether the initialization was
+	successful.
 
+	\param device The device ID of the volume.
+*/
+BVolume::BVolume(dev_t device)
+	: fDevice(-1),
+	  fCStatus(B_NO_INIT)
+{
+	SetTo(device);
+}
+
+// copy constructor
+/*!	\brief Creates a BVolume and makes it a clone of the supplied one.
+
+	Afterwards the object refers to the same device the supplied object
+	does. If the latter is not properly initialized, this object isn't
+	either.
+
+	\param volume The volume object to be cloned.
+*/
+BVolume::BVolume(const BVolume &volume)
+	: fDevice(volume.fDevice),
+	  fCStatus(volume.fCStatus)
+{
+}
+
+// destructor
+/*!	\brief Frees all resources associated with the object.
+
+	Does nothing.
+*/
+BVolume::~BVolume()
+{
+}
+
+// InitCheck
+/*!	\brief Returns the result of the last initialization.
+	\return
+	- \c B_OK: The object is properly initialized.
+	- an error code otherwise
+*/
 status_t
-BVolume::InitCheck(void) const 
+BVolume::InitCheck(void) const
 {	
 	return fCStatus;
 }
 
-
-// ----------------------------------------------------------------------
-//	SetTo (public)
-// ----------------------------------------------------------------------
-//	Initializes the BVolume object to represent the volume (device)
-//	identified by the argument. 
-
+// SetTo
+/*!	\brief Re-initializes the object to refer to the volume specified by
+		   the supplied device ID.
+	\param device The device ID of the volume.
+	\param
+	- \c B_OK: Everything went fine.
+	- an error code otherwise
+*/
 status_t
-BVolume::SetTo(
-	dev_t			dev) 
+BVolume::SetTo(dev_t device)
 {
-	fDev = dev;
-	
-	// Call the kernel function that gets device information
-	//	in order to determine the device status:
-	fs_info			fsInfo;
-	int				err = BPrivate::Storage::stat_dev(dev, &fsInfo);
-	
-	if (err != 0) {
-		fCStatus = errno;
+	// uninitialize
+	Unset();
+	// check the parameter
+	status_t error = (device >= 0 ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		fs_info info;
+		if (fs_stat_dev(device, &info) != 0)
+			error = errno;
 	}
-	else {
-		fCStatus = B_OK;
-	}
-	
+	// set the new value
+	if (error == B_OK)	
+		fDevice = device;
+	// set the init status variable
+	fCStatus = error;
 	return fCStatus;
 }
 
-
-// ----------------------------------------------------------------------
-//	Unset (public)
-// ----------------------------------------------------------------------
-//	Uninitializes the BVolume. 
-
+// Unset
+/*!	\brief Uninitialized the BVolume.
+*/
 void
-BVolume::Unset(void) 
+BVolume::Unset()
 {
-	fDev = 0L;
+	fDevice = -1;
 	fCStatus = B_NO_INIT;
 }
 
-
-// ----------------------------------------------------------------------
-//	Device (public)
-// ----------------------------------------------------------------------
-//	Returns the object's dev_t number. 
-
+// Device
+/*!	\brief Returns the device ID of the volume the object refers to.
+	\return Returns the device ID of the volume the object refers to
+			or -1, if the object is not properly initialized.
+*/
 dev_t
-BVolume::Device(void) const 
+BVolume::Device() const 
 {
-	return fDev;
+	return fDevice;
 }
 
-
-// ----------------------------------------------------------------------
-//	GetRootDirectory (public)
-// ----------------------------------------------------------------------
-//	Initializes dir (which must be allocated) to refer to the volume's
-//	"root directory." The root directory stands at the "root" of the
-//	volume's file hierarchy.
-//
-//	NOTE: This isn't necessarily the root of the entire file
-//	hierarchy, but only the root of the volume hierarchy.
-//
-//	This function does not change fDev nor fCStatus.
-
+// GetRootDirectory
+/*!	\brief Returns the root directory of the volume referred to by the object.
+	\param directory A pointer to a pre-allocated BDirectory to be initialized
+		   to the volume's root directory.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a directory or the object is not properly
+	  initialized.
+	- another error code
+*/
 status_t
-BVolume::GetRootDirectory(
-	BDirectory*		dir) const
+BVolume::GetRootDirectory(BDirectory *directory) const
 {
-	status_t		currentStatus = fCStatus;
-	
-	if ((dir != NULL) && (currentStatus == B_OK)){
-
-		// Obtain the device information for the current device
-		//	and initialize the passed-in BDirectory object with
-		//	the device and root node values.
-		
-		fs_info			fsInfo;
-		int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-		
-		if (err != 0) {
-			currentStatus = errno;
-		}
-		else {
-			node_ref		nodeRef;
-			
-			nodeRef.device = fsInfo.dev;
-				// NOTE: This should be the same as fDev.
-			nodeRef.node = fsInfo.root;
-			
-			currentStatus = dir->SetTo(&nodeRef);
-		}
-
+	// check parameter and initialization
+	status_t error = (directory && InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	// init the directory
+	if (error == B_OK) {
+		node_ref ref;
+		ref.device = info.dev;
+		ref.node = info.root;
+		error = directory->SetTo(&ref);
 	}
-	
-	return currentStatus;
+	return error;
 }
 
-
-// ----------------------------------------------------------------------
-//	Capacity (public)
-// ----------------------------------------------------------------------
-//	Returns the volume's total storage capacity (in bytes).
-
+// Capacity
+/*!	\brief Returns the volume's total storage capacity.
+	\return
+	- The volume's total storage capacity (in bytes), when the object is
+	  properly initialized.
+	- \c B_BAD_VALUE otherwise.
+*/
 off_t
-BVolume::Capacity(void) const 
+BVolume::Capacity() const
 {
-	off_t		totalBytes = 0;
-	
-	if (fCStatus == B_OK){
-
-		// Obtain the device information for the current device
-		//	and calculate the total storage capacity.
-		
-		fs_info			fsInfo;
-		int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-		
-		if (err == 0) {
-			totalBytes = fsInfo.block_size * fsInfo.total_blocks;
-		}
-
-	}
-
-	return totalBytes;
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	return (error == B_OK ? info.total_blocks * info.block_size : error);
 }
 
-
-// ----------------------------------------------------------------------
-//	FreeBytes (public)
-// ----------------------------------------------------------------------
-//	Returns the amount of storage that's currently unused on the
-//	volume (in bytes).
-
+// FreeBytes
+/*!	\brief Returns the amount of storage that's currently unused on the
+		   volume (in bytes).
+	\return
+	- The amount of storage that's currently unused on the volume (in bytes),
+	  when the object is properly initialized.
+	- \c B_BAD_VALUE otherwise.
+*/
 off_t
-BVolume::FreeBytes(void) const 
+BVolume::FreeBytes() const
 {
-	off_t		remainingBytes = 0L;
-	
-	if (fCStatus == B_OK){
-
-		// Obtain the device information for the current device
-		//	and calculate the free storage available.
-		
-		fs_info			fsInfo;
-		int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-		
-		if (err == 0) {
-			remainingBytes = fsInfo.block_size * fsInfo.free_blocks;
-		}
-
-	}
-
-	return remainingBytes;
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	return (error == B_OK ? info.free_blocks * info.block_size : error);
 }
 
+// GetName
+/*!	\brief Returns the name of the volume.
 
-// ----------------------------------------------------------------------
-//	GetName (public)
-// ----------------------------------------------------------------------
-//	Copies the name of the volume into the supplied buffer.
-//
-//	The string pointed to by \a name must be long enough to
-//  hold the entire volume name. A length of B_PATH_NAME_LENGTH
-//  is safe and reccommended.
+	The name of the volume is copied into the provided buffer.
 
+	\param name A pointer to a pre-allocated character buffer of size
+		   \c B_FILE_NAME_LENGTH or larger into which the name of the
+		   volume shall be written.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a name or the object is not properly
+	  initialized.
+	- another error code
+*/
 status_t
-BVolume::GetName(
-	char*			name) const 
+BVolume::GetName(char *name) const
 {
-	status_t		currentStatus = fCStatus;
-	
-	if ((name != NULL) && (currentStatus == B_OK)) {
-
-		// Obtain the device information for the current device
-		//	and copies the device name into the buffer.
-		
-		fs_info			fsInfo;
-		int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-		
-		if (err != 0) {
-			currentStatus = errno;
-		}
-		else {
-			strcpy(name, fsInfo.volume_name);
-			currentStatus = B_OK;
-		}
-
-	}
-	
-	return currentStatus;
+	// check parameter and initialization
+	status_t error = (name && InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	// copy the name
+	if (error == B_OK)
+		strncpy(name, info.volume_name, B_FILE_NAME_LENGTH);
+	return error;
 }
 
-
-// ----------------------------------------------------------------------
-//	SetName (public)
-// ----------------------------------------------------------------------
-//	Sets the name of the volume to the supplied string.
-//	Setting the name is typically (and most politely) the user's
-//	responsibility (a task that's performed, most easily, through the
-//	Tracker). If you really want to set the name of the volume
-//	programmatically, you do so by renaming the volume's root directory.
-
+// SetName
+/*!	\brief Sets the name of the volume referred to by this object.
+	\param name The volume's new name. Must not be longer than
+		   \c B_FILE_NAME_LENGTH (including the terminating null).
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a name or the object is not properly
+	  initialized.
+	- another error code
+*/
 status_t
-BVolume::SetName(
-	const char*		name) 
+BVolume::SetName(const char *name)
 {
-	status_t		currentStatus = B_ERROR;
-	
-	// *** Call a kernel or, more indirectly, a POSIX function
-	//	that sets a volume name ***
-	
-	return currentStatus;
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	if (error == B_OK)
+		error = BPrivate::Storage::set_volume_name(fDevice, name);
+	return error;
 }
 
-
-// ----------------------------------------------------------------------
-//	GetIcon (public)
-// ----------------------------------------------------------------------
-//	Returns the volume's icon in icon. which specifies the icon to
-//	retrieve, either B_MINI_ICON (16x16) or B_LARGE_ICON (32x32).
-
+// GetIcon
+/*!	\brief Returns the icon of the volume.
+	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
+		   to store the requested icon (16x16 for the mini and 32x32 for the
+		   large icon).
+	\param which Specifies the size of the icon to be retrieved:
+		   \c B_MINI_ICON for the mini and \c B_LARGE_ICON for the large icon.
+*/
 status_t
-BVolume::GetIcon(
-	BBitmap*		icon,
-	icon_size		which) const
+BVolume::GetIcon(BBitmap *icon, icon_size which) const
 {
-	status_t		currentStatus = fCStatus;
-	
-	if ((icon != NULL) && (currentStatus == B_OK)
-		&& ((which == B_MINI_ICON) || (which == B_LARGE_ICON))) {
-		char		deviceName[B_DEV_NAME_LENGTH];
-		
-		currentStatus = GetName(deviceName);
-		
-		if (currentStatus == B_OK)
-		{
-			currentStatus = get_device_icon(deviceName, icon, which);
-		}
+	// check parameter and initialization
+	status_t error = (icon && InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	BRect rect;
+	if (error == B_OK) {
+		if (which == B_MINI_ICON)
+			rect.Set(0, 0, 15, 15);
+		else if (which == B_LARGE_ICON)
+			rect.Set(0, 0, 31, 31);
+		else
+			error = B_BAD_VALUE;
 	}
-	
-	return (currentStatus);
+	// check whether icon size and bitmap dimensions do match
+	if (error == B_OK
+		&& (icon->Bounds() != rect || icon->ColorSpace() != B_CMAP8)) {
+		error = B_BAD_VALUE;
+	}
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	// get the icon
+	if (error == B_OK)
+		error = get_device_icon(info.device_name, icon->Bits(), which);
+	return error;
 }
 
-
-// ----------------------------------------------------------------------
-//	IsRemovable (public)
-// ----------------------------------------------------------------------
-//	Tests the volume and returns whether or not it is removable.
-
+// IsRemovable
+/*!	\brief Returns whether the volume is removable.
+	\return \c true, when the object is properly initialized and the
+	referred to volume is removable, \c false otherwise.
+*/
 bool
-BVolume::IsRemovable(void) const
+BVolume::IsRemovable() const
 {
-	bool			volumeIsRemovable = false;
-
-	// Obtain the device information for the current device
-	//	and determines whether or not the device is removable.
-	
-	fs_info			fsInfo;
-	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-	
-	if (err == 0) {
-		volumeIsRemovable = (fsInfo.flags & B_FS_IS_REMOVABLE);
-	}
-	
-	return (volumeIsRemovable);
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	return (error == B_OK && (info.flags & B_FS_IS_REMOVABLE));
 }
 
-
-// ----------------------------------------------------------------------
-//	IsReadOnly (public)
-// ----------------------------------------------------------------------
-//	Tests the volume and returns whether or not it is read-only.
-
+// IsReadOnly
+/*!	\brief Returns whether the volume is read only.
+	\return \c true, when the object is properly initialized and the
+	referred to volume is read only, \c false otherwise.
+*/
 bool
 BVolume::IsReadOnly(void) const
 {
-	bool		volumeIsReadOnly = false;
-	
-	// Obtain the device information for the current device
-	//	and determines whether or not the device is read-only.
-	
-	fs_info			fsInfo;
-	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-	
-	if (err == 0) {
-		volumeIsReadOnly = (fsInfo.flags & B_FS_IS_READONLY);
-	}
-	
-	return (volumeIsReadOnly);
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	return (error == B_OK && (info.flags & B_FS_IS_READONLY));
 }
 
-
-// ----------------------------------------------------------------------
-//	IsPersistent (public)
-// ----------------------------------------------------------------------
-//	Tests the volume and returns whether or not it is persistent.
-
+// IsPersistent
+/*!	\brief Returns whether the volume is persistent.
+	\return \c true, when the object is properly initialized and the
+	referred to volume is persistent, \c false otherwise.
+*/
 bool
 BVolume::IsPersistent(void) const
 {
-	bool		volumeIsPersistent = false;
-	
-	// Obtain the device information for the current device
-	//	and determines whether or not the storage medium
-	//	is persistent.
-	
-	fs_info			fsInfo;
-	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-	
-	if (err == 0) {
-		volumeIsPersistent = (fsInfo.flags & B_FS_IS_PERSISTENT);
-	}
-	
-	return (volumeIsPersistent);
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	return (error == B_OK && (info.flags & B_FS_IS_PERSISTENT));
 }
 
-
-// ----------------------------------------------------------------------
-//	IsShared (public)
-// ----------------------------------------------------------------------
-//	Tests the volume and returns whether or not it is shared.
-
+// IsShared
+/*!	\brief Returns whether the volume is shared.
+	\return \c true, when the object is properly initialized and the
+	referred to volume is shared, \c false otherwise.
+*/
 bool
 BVolume::IsShared(void) const
 {
-	bool		volumeIsShared = false;
-	
-	// Obtain the device information for the current device
-	//	and determines whether or not the volume is shared
-	//	over a network.
-	
-	fs_info			fsInfo;
-	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-	
-	if (err == 0) {
-		volumeIsShared = (fsInfo.flags & B_FS_IS_SHARED);
-	}
-	
-	return (volumeIsShared);
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	return (error == B_OK && (info.flags & B_FS_IS_SHARED));
 }
 
-
-// ----------------------------------------------------------------------
-//	KnowsMime (public)
-// ----------------------------------------------------------------------
-//	Tests the volume and returns whether or not it uses MIME types.
-
+// KnowsMime
+/*!	\brief Returns whether the volume supports MIME types.
+	\return \c true, when the object is properly initialized and the
+	referred to volume supports MIME types, \c false otherwise.
+*/
 bool
 BVolume::KnowsMime(void) const
 {
-	bool		volumeKnowsMime = false;
-	
-	// Obtain the device information for the current device
-	//	and determines whether or not the volume supports
-	//	MIME types.
-	
-	fs_info			fsInfo;
-	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-	
-	if (err == 0) {
-		volumeKnowsMime = (fsInfo.flags & B_FS_HAS_MIME);
-	}
-	
-	return (volumeKnowsMime);
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	return (error == B_OK && (info.flags & B_FS_HAS_MIME));
 }
 
-
-// ----------------------------------------------------------------------
-//	KnowsAttr (public)
-// ----------------------------------------------------------------------
-//	Tests the volume and returns whether or not its files
-//	accept attributes.
-
+// KnowsAttr
+/*!	\brief Returns whether the volume supports attributes.
+	\return \c true, when the object is properly initialized and the
+	referred to volume supports attributes, \c false otherwise.
+*/
 bool
 BVolume::KnowsAttr(void) const
 {
-	bool		volumeKnowsAttr = false;
-	
-	// Obtain the device information for the current device
-	//	and determines whether or not the files on the
-	//	volume accept attributes.
-	
-	fs_info			fsInfo;
-	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-	
-	if (err == 0) {
-		volumeKnowsAttr = (fsInfo.flags & B_FS_HAS_ATTR);
-	}
-	
-	return (volumeKnowsAttr);
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	return (error == B_OK && (info.flags & B_FS_HAS_ATTR));
 }
 
-
-// ----------------------------------------------------------------------
-//	KnowsQuery (public)
-// ----------------------------------------------------------------------
-//	Tests the volume and returns whether or not it can respond
-//	to queries.
-
+// KnowsQuery
+/*!	\brief Returns whether the volume supports queries.
+	\return \c true, when the object is properly initialized and the
+	referred to volume supports queries, \c false otherwise.
+*/
 bool
 BVolume::KnowsQuery(void) const
 {
-	bool		volumeKnowsQuery = false;
-	
-	// Obtain the device information for the current device
-	//	and determines whether or not the volume can
-	//	respond to queries.
-	
-	fs_info			fsInfo;
-	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
-	
-	if (err == 0) {
-		volumeKnowsQuery = (fsInfo.flags & B_FS_HAS_QUERY);
-	}
-	
-	return (volumeKnowsQuery);
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
+	// get FS stat
+	fs_info info;
+	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
+		error = errno;
+	return (error == B_OK && (info.flags & B_FS_HAS_QUERY));
 }
 
+// ==
+/*!	\brief Returns whether two BVolume objects are equal.
 
-// ----------------------------------------------------------------------
-//	operator == (public)
-// ----------------------------------------------------------------------
-//	Two BVolume objects are said to be equal if they refer to the
-//	same volume, or if they're both uninitialized.
-//	Returns whether or not the volumes are equal.
+	Two volume objects are said to be equal, if they either are both
+	uninitialized, or both are initialized and refer to the same volume.
 
+	\param volume The object to be compared with.
+	\result \c true, if this object and the supplied one are equal, \c false
+			otherwise.
+*/
 bool
-BVolume::operator==(
-	const BVolume&		vol) const
+BVolume::operator==(const BVolume &volume) const
 {
-	// First determine whether both objects are uninitialized,
-	//	since comparing the fDev members of uninitialized BVolume
-	//	instances will return an invalid result.
-	
-	bool		areEqual = ((this->fCStatus == B_NO_INIT)
-								&& (vol.InitCheck() == B_NO_INIT));
-
-	if (!areEqual) {
-		// The BVolume instance are initialized, test the
-		//	fDev member values:
-		areEqual = (this->fDev == vol.Device());
-	}
-	
-	return (areEqual);
+	return (InitCheck() != B_OK && volume.InitCheck() != B_OK
+			|| fDevice == volume.fDevice);
 }
 
+// !=
+/*!	\brief Returns whether two BVolume objects are unequal.
 
-// ----------------------------------------------------------------------
-//	operator != (public)
-// ----------------------------------------------------------------------
-//	Two BVolume objects are said to be equal if they refer to the
-//	same volume, or if they're both uninitialized.
-//	Returns whether or not the volumes are not equal.
+	Two volume objects are said to be equal, if they either are both
+	uninitialized, or both are initialized and refer to the same volume.
 
+	\param volume The object to be compared with.
+	\result \c true, if this object and the supplied one are unequal, \c false
+			otherwise.
+*/
 bool
-BVolume::operator!=(
-	const BVolume&		vol) const
+BVolume::operator!=(const BVolume &volume) const
 {
-	bool		areNotEqual = !(*this == vol);
-	
-	return (areNotEqual);
+	return !(*this == volume);
 }
 
+// =
+/*!	\brief Assigns another BVolume object to this one.
 
-// ----------------------------------------------------------------------
-//	operator = (public)
-// ----------------------------------------------------------------------
-//	In the expression:
-//
-//		BVolume a = b;
-//
-//	BVolume a is initialized to refer to the same volume as b.
-//	To gauge the success of the assignment, you should call InitCheck()
-//	immediately afterwards.
-//
-//	Assigning a BVolume to itself is safe. 
-//	Assigning from an uninitialized BVolume is "successful":
-//	The assigned-to BVolume will also be uninitialized (B_NO_INIT).
+	This object is made an exact clone of the supplied one.
 
+	\param volume The volume from which shall be assigned.
+	\return A reference to this object.
+*/
 BVolume&
-BVolume::operator=(
-	const BVolume&		vol)
+BVolume::operator=(const BVolume &volume)
 {
-	this->fDev = vol.Device();
-	this->fCStatus = vol.InitCheck();
-
-	return (*this);
+	if (&volume != this) {
+		this->fDevice = volume.fDevice;
+		this->fCStatus = volume.fCStatus;
+	}
+	return *this;
 }
 
 
 // FBC 
-void BVolume::_TurnUpTheVolume1() {} 
-void BVolume::_TurnUpTheVolume2() {} 
-void BVolume::_TurnUpTheVolume3() {} 
-void BVolume::_TurnUpTheVolume4() {} 
-void BVolume::_TurnUpTheVolume5() {} 
-void BVolume::_TurnUpTheVolume6() {} 
-void BVolume::_TurnUpTheVolume7() {} 
-void BVolume::_TurnUpTheVolume8() {}
-
+void BVolume::_ReservedVolume1() {} 
+void BVolume::_ReservedVolume2() {} 
+void BVolume::_ReservedVolume3() {} 
+void BVolume::_ReservedVolume4() {} 
+void BVolume::_ReservedVolume5() {} 
+void BVolume::_ReservedVolume6() {} 
+void BVolume::_ReservedVolume7() {} 
+void BVolume::_ReservedVolume8() {}
 
 #ifdef USE_OPENBEOS_NAMESPACE
 }
 #endif
-
-
-

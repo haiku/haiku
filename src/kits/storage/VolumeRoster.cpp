@@ -6,180 +6,216 @@
 //
 //	Description:	BVolumeRoster class
 // ----------------------------------------------------------------------
+/*!
+	\file VolumeRoster.cpp
+	BVolumeRoster implementation.
+*/
 
-#include <VolumeRoster.h>
-
-#include <Directory.h>
-#include <Bitmap.h>
-#include <Node.h>
 #include <errno.h>
+#include <new.h>
+
+#include <Bitmap.h>
+#include <Directory.h>
 #include <fs_info.h>
 #include <kernel_interface.h>
+#include <Node.h>
+#include <NodeMonitor.h>
+#include <VolumeRoster.h>
 
+static const char kBootVolumePath[] = "/boot";
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
 #endif
 
-// ----------------------------------------------------------------------
-//	BVolumeRoster (public)
-// ----------------------------------------------------------------------
-//	Default constructor: creates a new BVolumeRoster object.
-//	You don't have to "initialize" the object before using it (as you do
-//	with most other Storage Kit classes). You can call GetNextVolume()
-//	(or another method) immediately after constructing.
-
-BVolumeRoster::BVolumeRoster(void)
-{
-#if !_PR3_COMPATIBLE_
-	// Initialize reserved class variables to "safe" values:
-	_reserved[0] = 0L;
-	_reserved[1] = 0L;
-	_reserved[2] = 0L;
-		// Place this in a separate initialization method at
-		//	a later time.
-#endif
+/*!
+	\class BVolumeRoster
+	\brief A roster of all volumes available in the system
 	
-	fPos = 0;
-	fTarget = NULL;
-}
+	Provides an interface for iterating through the volumes available in
+	the system and watching volume mounting/unmounting.
 
+	The class wraps the next_dev() function for iterating through the
+	volume list and the watch_node()/stop_watching() for the watching
+	features.
 
-// ----------------------------------------------------------------------
-//	~BVolumeRoster (public, virtual)
-// ----------------------------------------------------------------------
-//	Destructor: Destroys the BVolumeRoster object.
-//	If this BVolumeRoster object was watching volumes,
-//	the watch is called off.
+	\author Vincent Dominguez
+	\author <a href='mailto:bonefish@users.sf.net'>Ingo Weinhold</a>
+	
+	\version 0.0.0
+*/
 
-BVolumeRoster::~BVolumeRoster(void)
+/*!	\var dev_t BVolumeRoster::fCookie
+	\brief The iteration cookie for next_dev(). Initialized with 0.
+*/
+
+/*!	\var dev_t BVolumeRoster::fTarget
+	\brief BMessenger referring to the target to which the watching
+		   notification messages are sent.
+
+	The object is allocated and owned by the roster. \c NULL, if not watching.
+*/
+
+// constructor
+/*!	\brief Creates a new BVolumeRoster.
+
+	The object is ready to be used.
+*/
+BVolumeRoster::BVolumeRoster()
+	: fCookie(0),
+	  fTarget(NULL)
 {
 }
 
+// destructor
+/*!	\brief Frees all resources associated with this object.
 
-// ----------------------------------------------------------------------
-//	GetNextVolume (public)
-// ----------------------------------------------------------------------
-//	Retrieves the "next" volume from the volume list and uses it to
-//	initialize the argument (which must be allocated). When the function 
-//	returns B_BAD_VALUE, you've reached the end of the list. 
+	If a watching was activated on (StartWatching()), it is deactived.
+*/
+BVolumeRoster::~BVolumeRoster()
+{
+	StopWatching();
+}
 
+// GetNextVolume
+/*!	\brief Returns the next volume in the list of available volumes.
+	\param volume A pointer to a pre-allocated BVolume to be initialized to
+		   refer to the next volume in the list of available volumes.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: The last volume in the list has already been returned.
+*/
 status_t
-BVolumeRoster::GetNextVolume(BVolume* vol) 
+BVolumeRoster::GetNextVolume(BVolume *volume)
 {
-	status_t		currentStatus = B_BAD_VALUE;
-	dev_t			deviceID = next_dev(&fPos);
-	
-	if ((deviceID >= 0) && (vol != NULL))
-	{
-		currentStatus = vol->SetTo(deviceID);
+	// check parameter
+	status_t error = (volume ? B_OK : B_BAD_VALUE);
+	// get next device
+	dev_t device;
+	if (error == B_OK) {
+		device = next_dev(&fCookie);
+		if (device < 0)
+			error = device;
 	}
-	
-	return currentStatus;
+	// init volume
+	if (error == B_OK)
+		error = volume->SetTo(device);
+	return error;
 }
 
-
-// ----------------------------------------------------------------------
-//	Rewind (public)
-// ----------------------------------------------------------------------
-//	Rewinds the volume list such that the next call to GetNextVolume()
-//	will return the first element in the list.
-
+// Rewind
+/*! \brief Rewinds the list of available volumes such that the next call to
+		   GetNextVolume() will return the first element in the list.
+*/
 void
-BVolumeRoster::Rewind(void) 
+BVolumeRoster::Rewind()
 {
-	fPos = 0;
+	fCookie = 0;
 }
 
+// GetBootVolume
+/*!	\brief Returns the boot volume.
 
-// ----------------------------------------------------------------------
-//	GetBootVolume (public)
-// ----------------------------------------------------------------------
-//	Initializes boot_vol to refer to the "boot volume." This is the
-//	volume that was used to boot the computer. boot_vol must be
-//	allocated before you pass it in. If the boot volume can't be found,
-//	the argument is uninitialized.
-//
-//	Currently, this function looks for the volume that is mounted at /boot.
-//	The only way to fool the system into thinking that there is not a boot
-//	volume is to rename /boot -- but, please refrain from doing so...(:o(
+	Currently, this function looks for the volume that is mounted at "/boot".
+	The only way to fool the system into thinking that there is not a boot
+	volume is to rename "/boot" -- but, please refrain from doing so...(:o(
 
+	\param volume A pointer to a pre-allocated BVolume to be initialized to
+		   refer to the boot volume.
+	\return
+	- \c B_OK: Everything went fine.
+	- an error code otherwise
+*/
 status_t
-BVolumeRoster::GetBootVolume(BVolume* boot_vol) 
+BVolumeRoster::GetBootVolume(BVolume *volume)
 {
-	int32		pos = 0; 
-	dev_t		deviceID = 0;
-	status_t	currentStatus = B_BAD_VALUE;
-	
-	do {
-		deviceID = next_dev(&pos);
-		
-		if(deviceID >= 0) {
-			fs_info			fsInfo;
-			int				err = BPrivate::Storage::stat_dev(deviceID, &fsInfo);
-			
-			if (err == 0) {
-				if(std::strcmp(fsInfo.device_name, kBootVolumeName) == 0) {
-					fPos = pos;
-					currentStatus = boot_vol->SetTo(deviceID);
-					break;
-				}
-			}
-		}
-	} while(deviceID >= 0);
-	
-	return currentStatus;
+	// check parameter
+	status_t error = (volume ? B_OK : B_BAD_VALUE);
+	// get device
+	dev_t device;
+	if (error == B_OK) {
+		device = dev_for_path(kBootVolumePath);
+		if (device < 0)
+			error = device;
+	}
+	// init volume
+	if (error == B_OK)
+		error = volume->SetTo(device);
+	return error;
 }
 
+// StartWatching
+/*!	\brief Starts watching the list of volumes available in the system.
 
-// ----------------------------------------------------------------------
-//	StartWatching (public)
-// ----------------------------------------------------------------------
-//	Registers a request for notifications of volume mounts and unmounts.
-//	The notifications are sent (as BMessages) to the BHandler/BLooper
-//	pair specified by the argument. There are separate messages for
-//	mounting and unmounting; their formats are described below.
-//
-//	The caller retains possession of the BHandler/BLooper that the
-//	BMessenger represents. The volume watching continues until this 
-//	BVolumeRoster object is destroyed, or until you call StopWatching(). 
+	Notifications are sent to the specified target whenever a volume is
+	mounted or unmounted. The format of the notification messages is
+	described under watch_node(). Actually BVolumeRoster just provides a
+	more convenient interface for it.
 
+	If StartWatching() has been called before with another target and no
+	StopWatching() since, StopWatching() is called first, so that the former
+	target won't receive any notifications anymore.
+
+	When the object is destroyed all watching has an end as well.
+
+	\param messenger The target to which the notification messages shall be
+		   sent.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: The supplied BMessenger is invalid.
+	- \c B_NO_MEMORY: Insufficient memory to carry out this operation.
+*/
 status_t
-BVolumeRoster::StartWatching(BMessenger msngr) 
+BVolumeRoster::StartWatching(BMessenger messenger)
 {
-	return B_BAD_VALUE;
+	StopWatching();
+	status_t error = (messenger.IsValid() ? B_OK : B_ERROR);
+	// clone messenger
+	if (error == B_OK) {
+		fTarget = new(nothrow) BMessenger(messenger);
+		if (!fTarget)
+			error = B_NO_MEMORY;
+	}
+	// start watching
+	if (error == B_OK)
+		error = watch_node(NULL, B_WATCH_MOUNT, messenger);
+	// cleanup on failure
+	if (error != B_OK && fTarget) {
+		delete fTarget;
+		fTarget = NULL;
+	}
+	return error;
 }
 
-
-// ----------------------------------------------------------------------
-//	StopWatching (public)
-// ----------------------------------------------------------------------
-//	Tells the volume-watcher to stop watching. Notifications of volume
-//	mounts and unmounts are no longer sent to the BVolumeRoster's target. 
-
+// StopWatching
+/*!	\brief Stops volume watching initiated with StartWatching() before.
+*/
 void
-BVolumeRoster::StopWatching(void) 
+BVolumeRoster::StopWatching()
 {
+	if (fTarget) {
+		stop_watching(*fTarget);
+		delete fTarget;
+		fTarget = NULL;
+	}
 }
 
-
-// ----------------------------------------------------------------------
-//	Messenger (public)
-// ----------------------------------------------------------------------
-//	Returns a copy of the BMessenger object that was set in the
-//	previous StartWatching() call. 
-
+// Messenger
+/*!	\brief Returns a messenger to the target currently watching the volume
+		   list.
+	\return A messenger to the target currently watching the volume list, or
+			an invalid messenger, if noone is currently watching.
+*/
 BMessenger
-BVolumeRoster::Messenger(void) const
+BVolumeRoster::Messenger() const
 {
-	return *fTarget;
+	return (fTarget ? *fTarget : BMessenger());
 }
 
+// FBC
+void BVolumeRoster::_ReservedVolumeRoster1() {}
+void BVolumeRoster::_ReservedVolumeRoster2() {}
 
 #ifdef USE_OPENBEOS_NAMESPACE
 }
 #endif
-
-
-
-
