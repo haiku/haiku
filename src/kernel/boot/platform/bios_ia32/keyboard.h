@@ -26,6 +26,7 @@ union key {
 extern "C" {
 #endif
 
+extern void clear_key_buffer(void);
 extern union key wait_for_key(void);
 extern uint32 check_for_boot_keys(void);
 

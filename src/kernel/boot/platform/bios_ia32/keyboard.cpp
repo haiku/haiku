@@ -33,6 +33,14 @@ check_for_key(void)
 }
 
 
+extern "C" void
+clear_key_buffer(void)
+{
+	while (check_for_key() != 0)
+		;
+}
+
+
 extern "C" union key
 wait_for_key(void)
 {
