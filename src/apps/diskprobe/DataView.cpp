@@ -1053,6 +1053,8 @@ DataView::SetFontSize(float point)
 	font.SetSize(point);
 
 	SetFont(&font);
+	UpdateScroller();
+	Invalidate();
 }
 
 

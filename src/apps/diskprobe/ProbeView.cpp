@@ -44,6 +44,7 @@
 static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgPositionUpdate = 'poup';
 static const uint32 kMsgLastPosition = 'lpos';
+static const uint32 kMsgFontSize = 'fnts';
 
 
 class IconView : public BView {
@@ -1115,15 +1116,17 @@ ProbeView::AttachedToWindow()
 	for (uint32 i = 0; i < sizeof(fontSizes) / sizeof(fontSizes[0]); i++) {
 		char buffer[16];
 		snprintf(buffer, sizeof(buffer), "%ld", fontSizes[i]);
-		subMenu->AddItem(item = new BMenuItem(buffer, NULL));
+		subMenu->AddItem(item = new BMenuItem(buffer, message = new BMessage(kMsgFontSize)));
+		message->AddFloat("font_size", fontSizes[i]);
 		if (fontSizes[i] == fontSize)
 			item->SetMarked(true);
 	}
 	subMenu->AddSeparatorItem();
-	subMenu->AddItem(item = new BMenuItem("Fit", NULL));
+	subMenu->AddItem(item = new BMenuItem("Fit", new BMessage(kMsgFontSize)));
 	if (fontSize == 0)
 		item->SetMarked(true);
 
+	subMenu->SetTargetForItems(this);
 	subMenu->SetRadioMode(true);
 	menu->AddItem(new BMenuItem(subMenu));
 
@@ -1251,6 +1254,21 @@ ProbeView::MessageReceived(BMessage *message)
 			int32 start, end;
 			fDataView->GetSelection(start, end);
 			UpdateSelectionMenuItems(start, end);
+
+			// update the applications settings
+			BMessage update(*message);
+			update.what = kMsgSettingsChanged;
+			be_app_messenger.SendMessage(&update);
+			break;
+		}
+
+		case kMsgFontSize:
+		{
+			float size = 0.0f;
+			message->FindFloat("font_size", &size);
+
+			fDataView->SetFontSize(size);
+			UpdateSizeLimits();
 
 			// update the applications settings
 			BMessage update(*message);
