@@ -55,6 +55,15 @@
 
 #include "keywords.h"
 
+#ifndef __P
+#define	__P(s) s
+#endif
+
+#ifndef __CONCAT
+#define	__CONCAT(x,y)	x ## y
+#endif
+
+
 // phoudoin, 20031026: FIXME: sysctl.h is a kernel private header!
 extern int sysctl(int *, uint, void *, size_t *, void *, size_t);
 

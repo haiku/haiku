@@ -52,6 +52,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifndef __P
+#define	__P(s) s
+#endif
+
 // phoudoin, 20031026: FIXME: sysctl.h is a kernel private header!
 extern int sysctl(int *, uint, void *, size_t *, void *, size_t);
 
