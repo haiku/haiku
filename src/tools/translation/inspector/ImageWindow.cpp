@@ -74,7 +74,7 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	
 	// Setup file open panel
 	fpopenPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this),
-		NULL, 0, false, new BMessage(M_OPEN_FILE_PANEL), NULL, false, true);
+		(const entry_ref*)NULL, 0L, false, new BMessage(M_OPEN_FILE_PANEL), NULL, false, true);
 		
 	SetSizeLimits(200, 10000, 150, 10000);
 }
