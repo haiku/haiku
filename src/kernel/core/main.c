@@ -194,7 +194,7 @@ main2(void *unused)
 	//	but instead, the hardware and drivers are rescanned then.
 
 	TRACE(("Mount boot file system\n"));
-	vfs_mount_boot_file_system();
+	vfs_mount_boot_file_system(&ka);
 
 	TRACE(("Init busses\n"));
 	bus_init(&ka);
