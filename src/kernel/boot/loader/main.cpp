@@ -88,12 +88,11 @@ main(stage2_args *args)
 			}
 		}
 
-		// if everything is okay, continue booting
+		// if everything is okay, continue booting; the kernel
+		// is already loaded at this point and we definitely
+		// know our boot volume, too
 		if (status == B_OK) {
 			register_boot_file_system(volume);
-
-			if (load_kernel(args, volume) < B_OK)
-				panic("could not load kernel");
 			load_modules(args, volume);
 
 			// ToDo: cleanup, heap_release() etc.
