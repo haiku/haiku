@@ -5,13 +5,18 @@
 
 #include <string.h>
 
+#include <Directory.h>
+#include <Entry.h>
 #include <Locker.h>
 #include <Message.h>
 #include <NodeMonitor.h>
+#include <Path.h>
 #include <Volume.h>
 
 #include "RVolumeList.h"
 #include "Debug.h"
+
+namespace RVolumeListPredicates {
 
 // CompareIDPredicate
 struct CompareIDPredicate : public UnaryPredicate<RVolume> {
@@ -45,13 +50,18 @@ private:
 	const char	*fPath;
 };
 
+}	// namespace RVolumeListPredicates
+
+using namespace RVolumeListPredicates;
+
 
 // RVolume
 
 // constructor
 RVolume::RVolume()
 	: fID(-1),
-	  fRootNode(-1)
+	  fRootNode(-1),
+	  fRootEntry()
 {
 }
 
@@ -60,13 +70,31 @@ status_t
 RVolume::SetTo(dev_t id)
 {
 	status_t error = B_OK;
+	// get general info
 	fs_info info;
 	error = fs_stat_dev(id, &info);
 	if (error == B_OK) {
 		fID = id;
 		fRootNode = info.root;
-		strcpy(fDevicePath, info.device_name);
-	} else
+		if (info.device_name[0] != '\0')
+			strcpy(fDevicePath, info.device_name);
+		else	// generate a pseudo name -- needed for the list
+			sprintf(fDevicePath, "%ld", id);
+	}
+	// get root dir entry_ref
+	if (error == B_OK) {
+		node_ref ref;
+		GetRootDirNode(&ref);
+		BDirectory dir;
+		error = dir.SetTo(&ref);
+		BEntry entry;
+		if (error == B_OK)
+			error = dir.GetEntry(&entry);
+		if (error == B_OK)
+			error = entry.GetRef(&fRootEntry);
+	}
+	// cleanup on error
+	if (error != B_OK)
 		Unset();
 	return error;
 }
@@ -126,7 +154,9 @@ RVolumeListListener::VolumeUnmounted(const RVolume *volume)
 
 // MountPointMoved
 void
-RVolumeListListener::MountPointMoved(const RVolume *volume)
+RVolumeListListener::MountPointMoved(const RVolume *volume,
+									 const entry_ref *oldRoot,
+									 const entry_ref *newRoot)
 {
 }
 
@@ -194,12 +224,15 @@ RVolumeList::HandleMessage(BMessage *message)
 status_t
 RVolumeList::Rescan()
 {
-	fVolumes.MakeEmpty();
+PRINT(("RVolumeList::Rescan()\n"));
+	for (int32 i = fVolumes.CountItems() - 1; i >= 0; i--)
+		_RemoveVolumeAt(i);
 	fRoster.Rewind();
 	BVolume bVolume;
 	while (fRoster.GetNextVolume(&bVolume) == B_OK)
 		_AddVolume(bVolume.Device());
-	return B_ERROR;
+PRINT(("RVolumeList::Rescan() done\n"));
+	return B_OK;
 }
 
 // VolumeForDevicePath
@@ -272,6 +305,18 @@ RVolumeList::_AddVolume(dev_t id)
 	return volume;
 }
 
+// _RemoveVolumeAt
+bool
+RVolumeList::_RemoveVolumeAt(int32 index)
+{
+	bool result = false;
+	if (RVolume *volume = fVolumes.RemoveItemAt(index)) {
+		volume->StopWatching(fTarget);
+		delete volume;
+	}
+	return result;
+}
+
 // _DeviceMounted
 void
 RVolumeList::_DeviceMounted(BMessage *message)
@@ -307,12 +352,33 @@ RVolumeList::_DeviceUnmounted(BMessage *message)
 void
 RVolumeList::_MountPointMoved(BMessage *message)
 {
+	// Note: The "device" field of the message refers to the device of the
+	// parent directory. Therefore we need to get an entry_ref, turn it into
+	// a path and get the device for that path.
+	// get the message fields
 	dev_t device;
-	if (message->FindInt32("device", &device) == B_OK) {
-		PRINT(("RVolumeList::_MountPointMoved(%ld)\n", device));
-		if (RVolume *volume = fVolumes.FindIf(CompareIDPredicate(device))) {
-			if (fListener)
-				fListener->MountPointMoved(volume);
+	ino_t directory;
+	const char *name;
+	if (message->FindInt32("device", &device) == B_OK
+		&& message->FindInt64("to directory", &directory) == B_OK
+		&& message->FindString("name", &name) == B_OK) {
+		// init an entry_ref
+		entry_ref ref;
+		ref.device = device;
+		ref.directory = directory;
+		ref.set_name(name);
+		// get the path and the device for that path
+		BPath path;
+		if (path.SetTo(&ref) == B_OK
+			&& (device = dev_for_path(path.Path())) >= 0) {
+			PRINT(("RVolumeList::_MountPointMoved(%ld)\n", device));
+			if (RVolume *volume = fVolumes.FindIf(CompareIDPredicate(device))) {
+				entry_ref oldRoot;
+				volume->GetRootDirEntry(&oldRoot);
+				volume->SetRootDirEntry(&ref);
+				if (fListener)
+					fListener->MountPointMoved(volume, &oldRoot, &ref);
+			}
 		}
 	}
 }

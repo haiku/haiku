@@ -7,30 +7,33 @@
 #include <RegistrarDefs.h>
 
 #include "DiskDeviceManager.h"
+#include "Debug.h"
+#include "EventMaskWatcher.h"
 #include "RDiskDevice.h"
 #include "RDiskDeviceList.h"
 #include "RPartition.h"
 #include "RSession.h"
-#include "Debug.h"
 
 enum {
-	REQUEST_PRIORITY		= 0,
-	NODE_MONITOR_PRIORITY	= 10,
+	REQUEST_PRIORITY			= 0,
+	NODE_MONITOR_PRIORITY		= 10,
+	WATCHING_REQUEST_PRIORITY	= 20,
 };
 
 // constructor
 DiskDeviceManager::DiskDeviceManager()
 	: BLooper("disk device manager"),
 	  fDeviceListLock(),
+	  fWatchingService(),
 	  fVolumeList(BMessenger(this), fDeviceListLock),
-	  fDeviceList(BMessenger(this), fDeviceListLock, fVolumeList),
+	  fDeviceList(BMessenger(this), fDeviceListLock, fVolumeList,
+	  			  &fWatchingService),
 	  fMessageQueue(),
 	  fWorker(-1),
 	  fMessageCounter(-1),
 	  fTerminating(false)
 {
 	// set up the device list
-	fVolumeList.Rescan();
 	fVolumeList.Dump();
 	fDeviceList.Rescan();
 	fDeviceList.Dump();
@@ -61,10 +64,14 @@ DiskDeviceManager::MessageReceived(BMessage *message)
 		case B_REG_NEXT_DISK_DEVICE:
 		case B_REG_GET_DISK_DEVICE:
 		case B_REG_UPDATE_DISK_DEVICE:
+			DetachCurrentMessage();
+			if (!_PushMessage(message, REQUEST_PRIORITY))
+				delete message;
+			break;
 		case B_REG_DEVICE_START_WATCHING:
 		case B_REG_DEVICE_STOP_WATCHING:
 			DetachCurrentMessage();
-			if (!_PushMessage(message, REQUEST_PRIORITY))
+			if (!_PushMessage(message, WATCHING_REQUEST_PRIORITY))
 				delete message;
 			break;
 		case B_NODE_MONITOR:
@@ -80,13 +87,14 @@ DiskDeviceManager::MessageReceived(BMessage *message)
 
 // _NextDiskDeviceRequest
 void
-DiskDeviceManager::_NextDiskDeviceRequest(BMessage *message)
+DiskDeviceManager::_NextDiskDeviceRequest(BMessage *request)
 {
 	FUNCTION_START();
+	Lock();
 	status_t error = B_OK;
 	int32 cookie = 0;
 	BMessage reply(B_REG_RESULT);
-	if (message->FindInt32("cookie", &cookie) == B_OK) {
+	if (request->FindInt32("cookie", &cookie) == B_OK) {
 		// get next device
 		if (RDiskDevice *device = fDeviceList.DeviceWithID(cookie, false)) {
 			// archive device
@@ -103,23 +111,25 @@ DiskDeviceManager::_NextDiskDeviceRequest(BMessage *message)
 		SET_ERROR(error, B_BAD_VALUE);
 	// add result and send reply
 	reply.AddInt32("result", error);
-	message->SendReply(&reply);
+	request->SendReply(&reply);
+	Unlock();
 }
 
 // _GetDiskDeviceRequest
 void
-DiskDeviceManager::_GetDiskDeviceRequest(BMessage *message)
+DiskDeviceManager::_GetDiskDeviceRequest(BMessage *request)
 {
+	Lock();
 	status_t error = B_ENTRY_NOT_FOUND;
 	// get the device
 	RDiskDevice *device = NULL;
 	int32 id = 0;
-	if (message->FindInt32("device_id", &id) == B_OK)
+	if (request->FindInt32("device_id", &id) == B_OK)
 		device = fDeviceList.DeviceWithID(id);
-	else if (message->FindInt32("session_id", &id) == B_OK) {
+	else if (request->FindInt32("session_id", &id) == B_OK) {
 		if (RSession *session = fDeviceList.SessionWithID(id))
 			device = session->Device();
-	} else if (message->FindInt32("partition_id", &id) == B_OK) {
+	} else if (request->FindInt32("partition_id", &id) == B_OK) {
 		if (RPartition *partition = fDeviceList.PartitionWithID(id))
 			device = partition->Device();
 	} else
@@ -134,13 +144,15 @@ DiskDeviceManager::_GetDiskDeviceRequest(BMessage *message)
 	}
 	// add result and send reply
 	reply.AddInt32("result", error);
-	message->SendReply(&reply);
+	request->SendReply(&reply);
+	Unlock();
 }
 
 // _UpdateDiskDeviceRequest
 void
-DiskDeviceManager::_UpdateDiskDeviceRequest(BMessage *message)
+DiskDeviceManager::_UpdateDiskDeviceRequest(BMessage *request)
 {
+	Lock();
 	status_t error = B_ENTRY_NOT_FOUND;
 	// get the device and check the object is up to date
 	bool upToDate = false;
@@ -148,20 +160,20 @@ DiskDeviceManager::_UpdateDiskDeviceRequest(BMessage *message)
 	int32 id = 0;
 	int32 changeCounter = 0;
 	uint32 policy = 0;
-	if (message->FindInt32("change_counter", &changeCounter) != B_OK
-		|| message->FindInt32("update_policy", (int32*)&policy) != B_OK) {
-		// bad request message
+	if (request->FindInt32("change_counter", &changeCounter) != B_OK
+		|| request->FindInt32("update_policy", (int32*)&policy) != B_OK) {
+		// bad request request
 		SET_ERROR(error, B_BAD_VALUE);
-	} else if (message->FindInt32("device_id", &id) == B_OK) {
+	} else if (request->FindInt32("device_id", &id) == B_OK) {
 		device = fDeviceList.DeviceWithID(id);
 		if (device)
 			upToDate = (device->ChangeCounter() == changeCounter);
-	} else if (message->FindInt32("session_id", &id) == B_OK) {
+	} else if (request->FindInt32("session_id", &id) == B_OK) {
 		if (RSession *session = fDeviceList.SessionWithID(id)) {
 			device = session->Device();
 			upToDate = (session->ChangeCounter() == changeCounter);
 		}
-	} else if (message->FindInt32("partition_id", &id) == B_OK) {
+	} else if (request->FindInt32("partition_id", &id) == B_OK) {
 		if (RPartition *partition = fDeviceList.PartitionWithID(id)) {
 			device = partition->Device();
 			upToDate = (partition->ChangeCounter() == changeCounter);
@@ -184,8 +196,65 @@ DiskDeviceManager::_UpdateDiskDeviceRequest(BMessage *message)
 	if (error == B_OK)
 		error = reply.AddBool("up_to_date", upToDate);
 	reply.AddInt32("result", error);
-	message->SendReply(&reply);
+	request->SendReply(&reply);
+	Unlock();
 }
+
+// _StartWatchingRequest
+void
+DiskDeviceManager::_StartWatchingRequest(BMessage *request)
+{
+	FUNCTION_START();
+	Lock();
+	status_t error = B_OK;
+	// get the parameters
+	BMessenger target;
+	uint32 events;
+	if (error == B_OK
+		&& (request->FindMessenger("target", &target) != B_OK
+			|| request->FindInt32("events", (int32*)&events) != B_OK)) {
+		SET_ERROR(error, B_BAD_VALUE);
+	}
+	// add the new watcher
+	if (error == B_OK) {
+		Watcher *watcher = new(nothrow) EventMaskWatcher(target, events);
+		if (watcher) {
+			if (!fWatchingService.AddWatcher(watcher)) {
+				SET_ERROR(error, B_NO_MEMORY);
+				delete watcher;
+			}
+		} else
+			SET_ERROR(error, B_NO_MEMORY);
+	}
+	// add result and send reply
+	BMessage reply(B_REG_RESULT);
+	reply.AddInt32("result", error);
+	request->SendReply(&reply);
+	Unlock();
+};
+
+// _StopWatchingRequest
+void
+DiskDeviceManager::_StopWatchingRequest(BMessage *request)
+{
+	FUNCTION_START();
+	Lock();
+	status_t error = B_OK;
+	// get the parameters
+	BMessenger target;
+	if (error == B_OK && request->FindMessenger("target", &target) != B_OK)
+		error = B_BAD_VALUE;
+	// remove the watcher
+	if (error == B_OK) {
+		if (!fWatchingService.RemoveWatcher(target))
+			error = B_BAD_VALUE;
+	}
+	// add result and send reply
+	BMessage reply(B_REG_RESULT);
+	reply.AddInt32("result", error);
+	request->SendReply(&reply);
+	Unlock();
+};
 
 // _PushMessage
 bool
@@ -233,7 +302,10 @@ DiskDeviceManager::_Worker()
 					_UpdateDiskDeviceRequest(message);
 					break;
 				case B_REG_DEVICE_START_WATCHING:
+					_StartWatchingRequest(message);
+					break;
 				case B_REG_DEVICE_STOP_WATCHING:
+					_StopWatchingRequest(message);
 					break;
 				case B_NODE_MONITOR:
 				{

@@ -6,6 +6,7 @@
 #ifndef VOLUME_LIST_H
 #define VOLUME_LIST_H
 
+#include <Entry.h>
 #include <Messenger.h>
 #include <Node.h>
 #include <ObjectList.h>
@@ -26,17 +27,21 @@ public:
 
 	dev_t ID() const { return fID; }
 	ino_t RootNode() const { return fRootNode; }
-	void GetRootNodeRef(node_ref *ref) const
+	void GetRootDirNode(node_ref *ref) const
 		{ ref->device = fID; ref->node = fRootNode; }
+	void GetRootDirEntry(entry_ref *ref) const { *ref = fRootEntry; }
 	const char *DevicePath() const { return fDevicePath; }
+
+	void SetRootDirEntry(const entry_ref *ref) { fRootEntry = *ref; }
 
 	status_t StartWatching(BMessenger target) const;
 	status_t StopWatching(BMessenger target) const;
 
 private:
-	dev_t	fID;
-	ino_t	fRootNode;
-	char	fDevicePath[B_FILE_NAME_LENGTH];
+	dev_t		fID;
+	ino_t		fRootNode;
+	entry_ref	fRootEntry;
+	char		fDevicePath[B_FILE_NAME_LENGTH];
 };
 
 // RVolumeListListener
@@ -47,7 +52,9 @@ public:
 
 	virtual void VolumeMounted(const RVolume *volume);
 	virtual void VolumeUnmounted(const RVolume *volume);
-	virtual void MountPointMoved(const RVolume *volume);
+	virtual void MountPointMoved(const RVolume *volume,
+								 const entry_ref *oldRoot,
+								 const entry_ref *newRoot);
 };
 
 // RVolumeList
@@ -71,6 +78,7 @@ public:
 
 private:
 	RVolume *_AddVolume(dev_t id);
+	bool _RemoveVolumeAt(int32 index);
 	void _DeviceMounted(BMessage *message);
 	void _DeviceUnmounted(BMessage *message);
 	void _MountPointMoved(BMessage *message);

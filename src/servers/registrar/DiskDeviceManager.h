@@ -13,6 +13,7 @@
 #include "PriorityMessageQueue.h"
 #include "RDiskDeviceList.h"
 #include "RVolumeList.h"
+#include "WatchingService.h"
 
 class DiskDeviceManager : public BLooper {
 public:
@@ -23,9 +24,11 @@ public:
 
 private:
 	// requests
-	void _NextDiskDeviceRequest(BMessage *message);
-	void _GetDiskDeviceRequest(BMessage *message);
-	void _UpdateDiskDeviceRequest(BMessage *message);
+	void _NextDiskDeviceRequest(BMessage *request);
+	void _GetDiskDeviceRequest(BMessage *request);
+	void _UpdateDiskDeviceRequest(BMessage *request);
+	void _StartWatchingRequest(BMessage *request);
+	void _StopWatchingRequest(BMessage *request);
 
 	bool _PushMessage(BMessage *message, int32 priority);
 	BMessage *_PopMessage();
@@ -35,6 +38,7 @@ private:
 
 private:
 	BLocker					fDeviceListLock;
+	WatchingService			fWatchingService;
 	RVolumeList				fVolumeList;
 	RDiskDeviceList			fDeviceList;
 	PriorityMessageQueue	fMessageQueue;

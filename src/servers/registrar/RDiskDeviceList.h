@@ -19,6 +19,7 @@ class BLocker;
 class RDiskDevice;
 class RPartition;
 class RSession;
+class WatchingService;
 
 // device list modification causes
 // TODO: to be moved to <DiskDeviceRoster.h>
@@ -36,14 +37,17 @@ enum {
 
 class RDiskDeviceList : public MessageHandler, public RVolumeListListener {
 public:
-	RDiskDeviceList(BMessenger target, BLocker &lock, RVolumeList &volumeList);
+	RDiskDeviceList(BMessenger target, BLocker &lock, RVolumeList &volumeList,
+					WatchingService *watchingService);
 	~RDiskDeviceList();
 
 	virtual void HandleMessage(BMessage *message);
 
 	virtual void VolumeMounted(const RVolume *volume);
 	virtual void VolumeUnmounted(const RVolume *volume);
-	virtual void MountPointMoved(const RVolume *volume);
+	virtual void MountPointMoved(const RVolume *volume,
+								 const entry_ref *oldRoot,
+								 const entry_ref *newRoot);
 
 	bool AddDevice(RDiskDevice *device);
 	bool RemoveDevice(int32 index);
@@ -63,6 +67,7 @@ public:
 	RPartition *PartitionWithID(int32 id) const;
 
 	RDiskDevice *DeviceWithPath(const char *path) const;
+	RPartition *PartitionWithPath(const char *path) const;
 
 	status_t Rescan();
 
@@ -88,10 +93,21 @@ private:
 	status_t _Scan(BDirectory &dir);
 	status_t _ScanDevice(const char *path);
 
+	status_t _InitNotificationMessage(BMessage *message, uint32 event,
+									  uint32 cause);
+	status_t _InitNotificationMessage(BMessage *message, uint32 event,
+									  uint32 cause, const RDiskDevice *device);
+	status_t _InitNotificationMessage(BMessage *message, uint32 event,
+									  uint32 cause, const RSession *session);
+	status_t _InitNotificationMessage(BMessage *message, uint32 event,
+									  uint32 cause,
+									  const RPartition *partition);
+
 private:
 	mutable BLocker				&fLock;
 	BMessenger					fTarget;
 	RVolumeList					&fVolumeList;
+	WatchingService				*fWatchingService;
 	BObjectList<RDiskDevice>	fDevices;		// sorted by ID
 	BObjectList<RSession>		fSessions;		//
 	BObjectList<RPartition>		fPartitions;	//

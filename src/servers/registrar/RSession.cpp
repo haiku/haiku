@@ -109,10 +109,10 @@ RSession::RemovePartition(int32 index)
 {
 	RPartition *partition = PartitionAt(index);
 	if (partition) {
-		partition->SetSession(NULL);
-		fPartitions.RemoveItemAt(index);
 		if (RDiskDeviceList *deviceList = DeviceList())
 			deviceList->PartitionRemoved(partition);
+		partition->SetSession(NULL);
+		fPartitions.RemoveItemAt(index);
 		delete partition;
 	}
 	return (partition != NULL);

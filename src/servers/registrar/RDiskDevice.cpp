@@ -141,10 +141,10 @@ RDiskDevice::RemoveSession(int32 index)
 {
 	RSession *session = SessionAt(index);
 	if (session) {
-		session->SetDevice(NULL);
-		fSessions.RemoveItemAt(index);
 		if (RDiskDeviceList *deviceList = DeviceList())
 			deviceList->SessionRemoved(session);
+		session->SetDevice(NULL);
+		fSessions.RemoveItemAt(index);
 		delete session;
 	}
 	return (session != NULL);
