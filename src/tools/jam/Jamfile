@@ -97,6 +97,11 @@ if $(VMS)
 	CCFLAGS += /define=VMS ;
 }
 
+# Need to link against -lnet
+if $(OS) = BEOS {
+	LINKLIBS += -lnet ;
+}
+
 #
 # The guts of the Jamfile: how to build Jam
 #

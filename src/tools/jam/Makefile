@@ -50,6 +50,9 @@ TARGET = -o $(EXENAME)
 # QNX rtp (neutrino)
 #CC = gcc
 
+# BeOS
+LINKLIBS = -lnet
+
 SOURCES = \
 	builtins.c \
 	command.c compile.c execunix.c execvms.c expand.c \
