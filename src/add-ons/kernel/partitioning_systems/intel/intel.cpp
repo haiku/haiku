@@ -308,51 +308,51 @@ static partition_module_info intel_partition_map_module = {
 	pm_free_partition_content_cookie,	// free_partition_content_cookie
 
 	// querying
-	NULL,								// supports_reparing_partition
-	NULL,								// supports_resizing_partition
-	NULL,								// supports_resizing_child_partition
-	NULL,								// supports_moving_partition
-	NULL,								// supports_moving_child_partition
+	NULL,								// supports_repairing
+	NULL,								// supports_resizing
+	NULL,								// supports_resizing_child
+	NULL,								// supports_moving
+	NULL,								// supports_moving_child
 	NULL,								// supports_setting_name
 	NULL,								// supports_setting_content_name
 	NULL,								// supports_setting_type
 	NULL,								// supports_setting_parameters
 	NULL,								// supports_setting_content_parameters
-	NULL,								// supports_initializing_partition
-	NULL,							// supports_initializing_child_partition
-	NULL,								// supports_creating_child_partition
-	NULL,								// supports_deleting_child_partition
+	NULL,								// supports_initializing
+	NULL,								// supports_initializing_child
+	NULL,								// supports_creating_child
+	NULL,								// supports_deleting_child
 	NULL,								// is_sub_system_for
 
-	NULL,								// validate_resize_partition
-	NULL,								// validate_resize_child_partition
-	NULL,								// validate_move_partition
-	NULL,								// validate_move_child_partition
+	NULL,								// validate_resize
+	NULL,								// validate_resize_child
+	NULL,								// validate_move
+	NULL,								// validate_move_child
 	NULL,								// validate_set_name
 	NULL,								// validate_set_content_name
 	NULL,								// validate_set_type
-	NULL,								// validate_set_partition_parameters
-	NULL,						// validate_set_partition_content_parameters
-	NULL,								// validate_initialize_partition
-	NULL,								// validate_create_child_partition
+	NULL,								// validate_set_parameters
+	NULL,								// validate_set_content_parameters
+	NULL,								// validate_initialize
+	NULL,								// validate_create_child
 	NULL,								// get_partitionable_spaces
 	NULL,								// get_next_supported_type
 	NULL,								// get_type_for_content_type
 
 	// writing
-	NULL,								// repair_partition
-	NULL,								// resize_partition
-	NULL,								// resize_child_partition
-	NULL,								// move_partition
-	NULL,								// move_child_partition
+	NULL,								// repair
+	NULL,								// resize
+	NULL,								// resize_child
+	NULL,								// move
+	NULL,								// move_child
 	NULL,								// set_name
 	NULL,								// set_content_name
 	NULL,								// set_type
-	NULL,								// set_parameters_partition
-	NULL,								// set_partition_content_parameters
-	NULL,								// initialize_partition
-	NULL,								// create_child_partition
-	NULL,								// delete_child_partition
+	NULL,								// set_parameters
+	NULL,								// set_content_parameters
+	NULL,								// initialize
+	NULL,								// create_child
+	NULL,								// delete_child
 };
 
 
@@ -388,51 +388,51 @@ static partition_module_info intel_extended_partition_module = {
 	ep_free_partition_content_cookie,	// free_partition_content_cookie
 
 	// querying
-	NULL,								// supports_reparing_partition
-	NULL,								// supports_resizing_partition
-	NULL,								// supports_resizing_child_partition
-	NULL,								// supports_moving_partition
-	NULL,								// supports_moving_child_partition
+	NULL,								// supports_repairing
+	NULL,								// supports_resizing
+	NULL,								// supports_resizing_child
+	NULL,								// supports_moving
+	NULL,								// supports_moving_child
 	NULL,								// supports_setting_name
 	NULL,								// supports_setting_content_name
 	NULL,								// supports_setting_type
 	NULL,								// supports_setting_parameters
 	NULL,								// supports_setting_content_parameters
-	NULL,								// supports_initializing_partition
-	NULL,							// supports_initializing_child_partition
-	NULL,								// supports_creating_child_partition
-	NULL,								// supports_deleting_child_partition
+	NULL,								// supports_initializing
+	NULL,								// supports_initializing_child
+	NULL,								// supports_creating_child
+	NULL,								// supports_deleting_child
 	NULL,								// is_sub_system_for
 
-	NULL,								// validate_resize_partition
-	NULL,								// validate_resize_child_partition
-	NULL,								// validate_move_partition
-	NULL,								// validate_move_child_partition
+	NULL,								// validate_resize
+	NULL,								// validate_resize_child
+	NULL,								// validate_move
+	NULL,								// validate_move_child
 	NULL,								// validate_set_name
 	NULL,								// validate_set_content_name
 	NULL,								// validate_set_type
-	NULL,								// validate_set_partition_parameters
-	NULL,						// validate_set_partition_content_parameters
-	NULL,								// validate_initialize_partition
-	NULL,								// validate_create_child_partition
+	NULL,								// validate_set_parameters
+	NULL,								// validate_set_content_parameters
+	NULL,								// validate_initialize
+	NULL,								// validate_create_child
 	NULL,								// get_partitionable_spaces
 	NULL,								// get_next_supported_type
 	NULL,								// get_type_for_content_type
 
 	// writing
-	NULL,								// repair_partition
-	NULL,								// resize_partition
-	NULL,								// resize_child_partition
-	NULL,								// move_partition
-	NULL,								// move_child_partition
+	NULL,								// repair
+	NULL,								// resize
+	NULL,								// resize_child
+	NULL,								// move
+	NULL,								// move_child
 	NULL,								// set_name
 	NULL,								// set_content_name
 	NULL,								// set_type
-	NULL,								// set_parameters_partition
-	NULL,								// set_partition_content_parameters
-	NULL,								// initialize_partition
-	NULL,								// create_child_partition
-	NULL,								// delete_child_partition
+	NULL,								// set_parameters
+	NULL,								// set_content_parameters
+	NULL,								// initialize
+	NULL,								// create_child
+	NULL,								// delete_child
 };
 
 

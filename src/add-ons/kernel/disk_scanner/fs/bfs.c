@@ -272,29 +272,28 @@ static fs_module_info bfs_module = {
 	bfs_free_partition_content_cookie,	// free_partition_content_cookie
 
 	// querying
-	NULL,								// supports_defragmenting_partition
-	NULL,								// supports_reparing_partition
-	NULL,								// supports_resizing_partition
-	NULL,								// supports_moving_partition
+	NULL,								// supports_defragmenting
+	NULL,								// supports_repairing
+	NULL,								// supports_resizing
+	NULL,								// supports_moving
 	NULL,								// supports_setting_content_name
 	NULL,								// supports_setting_content_parameters
-	NULL,								// supports_initializing_partition
-	NULL,								// is_sub_system_for
+	NULL,								// supports_initializing
 
-	NULL,								// validate_resize_partition
-	NULL,								// validate_move_partition
+	NULL,								// validate_resize
+	NULL,								// validate_move
 	NULL,								// validate_set_content_name
-	NULL,						// validate_set_partition_content_parameters
-	NULL,								// validate_initialize_partition
+	NULL,								// validate_set_content_parameters
+	NULL,								// validate_initialize
 
 	// writing
-	NULL,								// defragment_partition
-	NULL,								// repair_partition
-	NULL,								// resize_partition
-	NULL,								// move_partition
+	NULL,								// defragment
+	NULL,								// repair
+	NULL,								// resize
+	NULL,								// move
 	NULL,								// set_content_name
-	NULL,								// set_partition_content_parameters
-	NULL,								// initialize_partition
+	NULL,								// set_content_parameters
+	NULL,								// initialize
 };
 
 
