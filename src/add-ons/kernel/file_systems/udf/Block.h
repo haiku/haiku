@@ -14,18 +14,19 @@
 
 namespace UDF {
 
+template<class DataType>
 class Block {
 public:
-	Block(uint32 size)
-		: fSize(size)
-		, fData(malloc(size))
+	Block(uint32 blockSize)
+		: fSize(blockSize)
+		, fData(malloc(blockSize))
 	{
 	}
 		
-	~Block() { free(fData); }	
+	~Block() { free(Data()); }	
 	uint32 Size() { return fSize; }	
-	void* Data() { return fData; }
-	status_t InitCheck() { return fData ? B_OK : B_NO_MEMORY; }
+	DataType* Data() { return (DataType*)fData; }
+	status_t InitCheck() { return Data() ? B_OK : B_NO_MEMORY; }
 	
 private:
 	Block();
