@@ -1206,7 +1206,7 @@ int maventv_init(display_mode target)
 //	}
 
 	/* setup CRTC2 timing */
-	nv_crtc2_set_timing(tv_target);
+	head2_set_timing(tv_target);
 
 	/* start whole thing if needed */
 //	if (si->ps.card_type <= G400MAX) MAVW(RESYNC, 0x20);

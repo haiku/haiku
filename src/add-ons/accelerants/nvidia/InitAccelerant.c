@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-1/2004.
+	Rudolf Cornelissen 10/2002-4/2004.
 */
 
 #define MODULE_BIT 0x00800000
@@ -38,8 +38,8 @@ static status_t init_common(int the_fd) {
 			goto error0;
 	}
 	// LOG is now available, si !NULL
-	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d, greensync %d\n",
-		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.greensync));
+	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d, switchhead %d\n",
+		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.switchhead));
 
  	/*Check for R4.5.0 and if it is running, use work around*/
  	{
@@ -175,8 +175,8 @@ status_t INIT_ACCELERANT(int the_fd) {
 	if (result != B_OK) goto error1;
 
 	/* initialise various cursor stuff*/
-	nv_crtc_cursor_init();
-	if (si->ps.secondary_head) nv_crtc2_cursor_init();
+	head1_cursor_init();
+	if (si->ps.secondary_head) head2_cursor_init();
 
 	/* ensure cursor state */
 	SHOW_CURSOR(false);
@@ -259,6 +259,9 @@ status_t CLONE_ACCELERANT(void *data) {
 
 	/* call the shared initialization code */
 	result = init_common(fd);
+
+	/* setup CRTC functions access */
+	setup_virtualized_crtcs(si->crtc_switch_mode);
 
 	/* bail out if the common initialization failed */
 	if (result != B_OK) goto error1;

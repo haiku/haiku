@@ -157,7 +157,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	#endif
 
 	/*find a nearby valid timing from that given*/
-	result = nv_crtc_validate_timing
+	result = head1_validate_timing
 	(
 		&target->timing.h_display, &target->timing.h_sync_start, &target->timing.h_sync_end, &target->timing.h_total,
 		&target->timing.v_display, &target->timing.v_sync_start, &target->timing.v_sync_end, &target->timing.v_total
@@ -387,11 +387,8 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	LOG(1, ("PROPOSEMODE: validated status modeflags: $%08x\n", target->flags));
 
 	/* overrule timing command flags to be (fixed) blank_pedestal = 0.0IRE,
-	 * progressive scan (fixed), and setup sync_on_green flag according to
-	 * nv.settings options file */
+	 * progressive scan (fixed), and sync_on_green not avaible. */
 	target->timing.flags &= ~(B_BLANK_PEDESTAL | B_TIMING_INTERLACED | B_SYNC_ON_GREEN);
-	if (si->settings.greensync)
-		target->timing.flags |= B_SYNC_ON_GREEN;
 	/* The HSYNC and VSYNC command flags are actually executed by the driver. */
 
 	if (status == B_OK)	LOG(4, ("PROPOSEMODE: completed successfully.\n"));

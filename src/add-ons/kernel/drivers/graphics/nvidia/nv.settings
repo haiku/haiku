@@ -17,6 +17,6 @@ hardcursor true			# if true use on-chip cursor capabilities
 #logmask   0x08000604	# log overlay use in full
 #logmask 	0xffffffff		# log everything
 dumprom    false        		# dump bios rom in ~/nv.rom: probably not functional yet
-greensync	false			# not functional, will be removed
+switchhead false			# switch head assignment (dualhead cards only)
 
 #--------- that's all.

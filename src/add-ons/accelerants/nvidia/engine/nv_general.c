@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-12 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-13 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -690,6 +690,66 @@ status_t nv_set_cas_latency()
 	return result;
 }
 
+void setup_virtualized_crtcs(bool cross)
+{
+	if (cross)
+	{
+		head1_validate_timing	= (crtc_validate_timing)	nv_crtc2_validate_timing;
+		head1_set_timing		= (crtc_set_timing)			nv_crtc2_set_timing;
+		head1_depth				= (crtc_depth)				nv_crtc2_depth;
+		head1_dpms				= (crtc_dpms)				nv_crtc2_dpms;
+		head1_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc2_dpms_fetch;
+		head1_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc2_set_display_pitch;
+		head1_set_display_start	= (crtc_set_display_start)	nv_crtc2_set_display_start;
+		head1_cursor_init		= (crtc_cursor_init)		nv_crtc2_cursor_init;
+		head1_cursor_show		= (crtc_cursor_show)		nv_crtc2_cursor_show;
+		head1_cursor_hide		= (crtc_cursor_hide)		nv_crtc2_cursor_hide;
+		head1_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
+		head1_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
+
+		head2_validate_timing	= (crtc_validate_timing)	nv_crtc_validate_timing;
+		head2_set_timing		= (crtc_set_timing)			nv_crtc_set_timing;
+		head2_depth				= (crtc_depth)				nv_crtc_depth;
+		head2_dpms				= (crtc_dpms)				nv_crtc_dpms;
+		head2_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc_dpms_fetch;
+		head2_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc_set_display_pitch;
+		head2_set_display_start	= (crtc_set_display_start)	nv_crtc_set_display_start;
+		head2_cursor_init		= (crtc_cursor_init)		nv_crtc_cursor_init;
+		head2_cursor_show		= (crtc_cursor_show)		nv_crtc_cursor_show;
+		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc_cursor_hide;
+		head2_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
+		head2_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
+	}
+	else
+	{
+		head1_validate_timing	= (crtc_validate_timing)	nv_crtc_validate_timing;
+		head1_set_timing		= (crtc_set_timing)			nv_crtc_set_timing;
+		head1_depth				= (crtc_depth)				nv_crtc_depth;
+		head1_dpms				= (crtc_dpms)				nv_crtc_dpms;
+		head1_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc_dpms_fetch;
+		head1_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc_set_display_pitch;
+		head1_set_display_start	= (crtc_set_display_start)	nv_crtc_set_display_start;
+		head1_cursor_init		= (crtc_cursor_init)		nv_crtc_cursor_init;
+		head1_cursor_show		= (crtc_cursor_show)		nv_crtc_cursor_show;
+		head1_cursor_hide		= (crtc_cursor_hide)		nv_crtc_cursor_hide;
+		head1_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
+		head1_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
+
+		head2_validate_timing	= (crtc_validate_timing)	nv_crtc2_validate_timing;
+		head2_set_timing		= (crtc_set_timing)			nv_crtc2_set_timing;
+		head2_depth				= (crtc_depth)				nv_crtc2_depth;
+		head2_dpms				= (crtc_dpms)				nv_crtc2_dpms;
+		head2_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc2_dpms_fetch;
+		head2_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc2_set_display_pitch;
+		head2_set_display_start	= (crtc_set_display_start)	nv_crtc2_set_display_start;
+		head2_cursor_init		= (crtc_cursor_init)		nv_crtc2_cursor_init;
+		head2_cursor_show		= (crtc_cursor_show)		nv_crtc2_cursor_show;
+		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc2_cursor_hide;
+		head2_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
+		head2_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
+	}
+}
+
 static status_t nvxx_general_powerup()
 {
 	status_t result;
@@ -704,6 +764,9 @@ static status_t nvxx_general_powerup()
 	/* log the PINS struct settings */
 	dump_pins();
 
+	/* setup CRTC functions access: determined in parse_pins/fake_pins */
+	setup_virtualized_crtcs(si->ps.crtc2_prim);
+
 	/* if the user doesn't want a coldstart OR the BIOS pins info could not be found warmstart */
 //temp:
 return nv_general_bios_to_powergraphics();
@@ -712,8 +775,8 @@ return nv_general_bios_to_powergraphics();
 	/*power up the PLLs,LUT,DAC*/
 	LOG(2,("INIT: PLL/LUT/DAC powerup\n"));
 	/* turn off both displays and the hardcursor (also disables transfers) */
-	nv_crtc_dpms(false, false, false);
-	nv_crtc_cursor_hide();
+	head1_dpms(false, false, false);
+	head1_cursor_hide();
 	/* G200 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
 	 * (this would create electrical shortcuts,
 	 * resulting in extra chip heat and distortions visible on screen */
@@ -786,7 +849,7 @@ return nv_general_bios_to_powergraphics();
 //	VGAW_I(CRTC,0x11,0);
 
 	/* turn on display one */
-	nv_crtc_dpms(true , true, true);
+	head1_dpms(true , true, true);
 
 	return B_OK;
 }
@@ -796,8 +859,9 @@ status_t nv_general_output_select(bool cross)
 	/* make sure this call is warranted */
 	if (si->ps.secondary_head)
 	{
-		/* NV11 cards can't switch heads */
-		if (si->ps.card_type != NV11)
+		/* NV11 cards can't switch heads; we lack info to switch heads via outputs
+		 * if flatpanels are used */
+		if ((si->ps.card_type != NV11) && !si->ps.tmds1_active && !si->ps.tmds2_active)
 		{
 			if (cross)
 			{
@@ -823,7 +887,34 @@ status_t nv_general_output_select(bool cross)
 		}
 		else
 		{
-			LOG(4,("INIT: NV11 outputs are hardwired to be straight-through\n"));
+			/* make sure we have outputs wired straight through first */
+			if (si->ps.card_type == NV11)
+			{
+				LOG(4,("INIT: NV11 outputs are hardwired to be straight-through\n"));
+			}
+			else
+			{
+				LOG(4,("INIT: switching outputs to be straight-through\n"));
+
+				/* enable head 1 on connector 1 */
+				DACW(OUTPUT, 0x00000001);
+				/* enable head 2 on connector 2 */
+				DAC2W(OUTPUT, 0x00000101);
+			}
+
+			/* now invert CRTC use to do switching */
+			if (cross)
+			{
+				LOG(4,("INIT: switching CRTC use to be cross-connected\n"));
+				si->crtc_switch_mode = !si->ps.crtc2_prim;
+			}
+			else
+			{
+				LOG(4,("INIT: switching CRTC use to be straight-through\n"));
+				si->crtc_switch_mode = si->ps.crtc2_prim;
+			}
+			/* update CRTC functions access */
+			setup_virtualized_crtcs(si->crtc_switch_mode);
 		}
 		return B_OK;
 	}
@@ -871,12 +962,12 @@ status_t nv_general_bios_to_powergraphics()
 	}
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
-	nv_crtc_dpms(false, false, false);
-	nv_crtc_cursor_hide();
+	head1_dpms(false, false, false);
+	head1_cursor_hide();
 	if (si->ps.secondary_head)
 	{
-		nv_crtc2_dpms(false, false, false);
-		nv_crtc2_cursor_hide();
+		head2_dpms(false, false, false);
+		head2_cursor_hide();
 	}
 
 	if (si->ps.secondary_head)
@@ -970,7 +1061,7 @@ status_t nv_general_bios_to_powergraphics()
 	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
 
 	/* turn screen one on */
-	nv_crtc_dpms(true, true, true);
+	head1_dpms(true, true, true);
 
 	return B_OK;
 }

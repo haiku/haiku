@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.10-12), (Rudolf)</h1></p>
+<p><h1>head (0.10-13), (Rudolf)</h1></p>
 <ul>
 	<li>Implemented laptop internal flatpanel presence and native resolution detection;
 	<li>Implemented external DVI flatpanel(s) presence and native resolution detection;
@@ -19,10 +19,11 @@
 	<li>Updated panel detection code once more: pre NV18 DVI panels should be working again now;
 	<li>Added flatpanel DPMS support for both heads via powerup/powerdown of LVDS and TMDS transmitters;
 	<li>Added panel(s) native mode(s) to the modelist exported by the driver. You can now set it (them) by just selecting it from the Screenprefs app, <strong>except</strong> if you use the native R5 one. Use Dualhead setup instead (for example): the extra mode(s) will be at the bottom of the list;
-	<li>Removed a bug in the panel detection code and added a bit more logging.
+	<li>Removed a bug in the panel detection code and added a bit more logging;
+	<li>Implemented virtualized CRTC1 and CRTC2 access: when one flatpanel is found on a card that panel is primary output now; dualhead switch mode is operational with flatpanels now; and the user has the option to select the primary output via nv.settings now (via the new 'switchhead' option).
 </ul>
-NOTE:<br>
-dualhead switch mode is not yet operational for flatpanels...
+WARNING:<br>
+Driver 0.10-13 has yet to be actually tested and updated to correct bugs!!
 <p><h1>nv_driver 0.09, (Rudolf)</h1></p>
 <ul>
 	<li>Fixed NV11 trouble with repeating screen(s) on the right side of the monitor;

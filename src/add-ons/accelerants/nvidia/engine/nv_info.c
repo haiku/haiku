@@ -245,6 +245,13 @@ void fake_pins(void)
 
 	/* find out the BIOS preprogrammed panel use status... */
 	detect_panels();
+
+	/* select other CRTC for primary head use if specified by user in settings file */
+	if (si->ps.secondary_head && si->settings.switchhead)
+	{
+		LOG(2,("INFO: switching CRTC's (specified in settings file)\n"));
+		si->ps.crtc2_prim = !si->ps.crtc2_prim;
+	}
 }
 
 static void detect_panels()
@@ -252,11 +259,8 @@ static void detect_panels()
 	/* detect if the BIOS enabled LCD's (internal panels or DVI) or TVout */
 
 	/* both external TMDS transmitters (used for LCD/DVI) and external TVencoders
-	 * can use the CRTC's in slaved mode. */
+	 * (can) use the CRTC's in slaved mode. */
 	/* Note:
-	 * Apparantly a panel on CRTC1 uses the CRTC in slaved mode, while a panel
-	 * on CRTC2 uses the CRTC in master mode. */
-	/* Note also:
 	 * DFP's are programmed with standard VESA modelines by the card's BIOS! */
 	bool slaved_for_dev1 = false, slaved_for_dev2 = false;
 	bool tvout1 = false, tvout2 = false;
@@ -319,6 +323,7 @@ static void detect_panels()
 	si->ps.master_tmds2 = false;
 	si->ps.tmds1_active = false;
 	si->ps.tmds2_active = false;
+	si->ps.crtc2_prim = false;
 	/* determine the situation we are in... (regarding flatpanels) */
 	/* fixme: add VESA DDC EDID stuff one day... */
 	/* fixme: find out how to program those transmitters one day instead of
@@ -337,6 +342,10 @@ static void detect_panels()
 	 *    BIOSes;
 	 * -> the programmed set of registers tells you where a TMDS (DVI) panel is
 	 *    connected. */
+	/* note also:
+	 * external TMDS encoders are only used for logic-level translation: it's 
+	 * modeline registers are not used. Instead the GPU's internal modeline registers
+	 * are used. The external encoder is not connected to a I2C bus (confirmed NV34). */
 	if (slaved_for_dev1 && !tvout1)
 	{
 		uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
@@ -424,6 +433,14 @@ static void detect_panels()
 		si->ps.panel1_aspect = (si->ps.panel1_width / ((float)si->ps.panel1_height));
 	if (si->ps.tmds2_active)
 		si->ps.panel2_aspect = (si->ps.panel2_width / ((float)si->ps.panel2_height));
+
+	/* if one panel is detected, and it's on the secondary head on dualhead cards,
+	 * we use that head as primary head */
+	if (si->ps.secondary_head && si->ps.tmds2_active && !si->ps.tmds1_active)
+	{
+		LOG(2,("INFO: CRTC2 has a panel only: defaulting to CRTC2 use\n"));
+		si->ps.crtc2_prim = true;
+	}
 
 	/* dump some panel configuration registers... */
 	LOG(2,("INFO: Dumping flatpanel registers:\n"));

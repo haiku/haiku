@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 4/2003-1/2004
+	Rudolf Cornelissen 4/2003-4/2004
 */
 
 #define MODULE_BIT 0x20000000
@@ -26,9 +26,9 @@ status_t SET_CURSOR_SHAPE(uint16 width, uint16 height, uint16 hot_x, uint16 hot_
 	}
 	else
 	{
-		nv_crtc_cursor_define(andMask,xorMask);
+		head1_cursor_define(andMask,xorMask);
 		if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_OFF)
-			nv_crtc2_cursor_define(andMask,xorMask);
+			head2_cursor_define(andMask,xorMask);
 
 		/* Update cursor variables appropriately. */
 		si->cursor.width = width;
@@ -110,8 +110,8 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	switch (si->dm.flags & DUALHEAD_BITS)
 	{
 	case DUALHEAD_CLONE:
-		nv_crtc_cursor_position(x,y);
-		nv_crtc2_cursor_position(x,y);
+		head1_cursor_position(x,y);
+		head2_cursor_position(x,y);
 		break;
 	case DUALHEAD_ON:
 	case DUALHEAD_SWITCH:
@@ -120,26 +120,26 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 			if (si->cursor.dh_right)
 			{
 				LOG(4,("MOVE_CURSOR: now on left side\n"));
-				nv_crtc2_cursor_hide();
-				nv_crtc_cursor_show();
+				head2_cursor_hide();
+				head1_cursor_show();
 				si->cursor.dh_right = false;
 			}
-			nv_crtc_cursor_position(x, y);
+			head1_cursor_position(x, y);
 		}
 		else
 		{
 			if (!si->cursor.dh_right)
 			{
 				LOG(4,("MOVE_CURSOR: now on right side\n"));
-				nv_crtc_cursor_hide();
-				nv_crtc2_cursor_show();
+				head1_cursor_hide();
+				head2_cursor_show();
 				si->cursor.dh_right = true;
 			}
-			nv_crtc2_cursor_position((x - si->dm.timing.h_display), y);
+			head2_cursor_position((x - si->dm.timing.h_display), y);
 		}
 		break;
 	default: /* singlehead mode */
-		nv_crtc_cursor_position(x,y);
+		head1_cursor_position(x,y);
 		break;
 	}
 }
@@ -154,13 +154,13 @@ void SHOW_CURSOR(bool is_visible)
 	case DUALHEAD_CLONE:
 		if (is_visible)
 		{
-			nv_crtc_cursor_show();
-			nv_crtc2_cursor_show();
+			head1_cursor_show();
+			head2_cursor_show();
 		}
 		else
 		{
-			nv_crtc_cursor_hide();
-			nv_crtc2_cursor_hide();
+			head1_cursor_hide();
+			head2_cursor_hide();
 		}
 		break;
 	case DUALHEAD_ON:
@@ -169,27 +169,27 @@ void SHOW_CURSOR(bool is_visible)
 		{
 			if (!si->cursor.dh_right)
 			{
-				nv_crtc_cursor_show();
+				head1_cursor_show();
 			}
 			else
 			{
-				nv_crtc2_cursor_show();
+				head2_cursor_show();
 			}
 		}
 		else
 		{
-			nv_crtc_cursor_hide();
-			nv_crtc2_cursor_hide();
+			head1_cursor_hide();
+			head2_cursor_hide();
 		}
 		break;
 	default: /* singlehead mode */
 		if (is_visible)
 		{
-			nv_crtc_cursor_show();
+			head1_cursor_show();
 		}
 		else
 		{
-			nv_crtc_cursor_hide();
+			head1_cursor_hide();
 		}
 		break;
 	}

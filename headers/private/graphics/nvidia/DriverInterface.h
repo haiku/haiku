@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-3/2004.
+	Rudolf Cornelissen 10/2002-4/2004.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -86,7 +86,7 @@ typedef struct settings {  // apsed, see comments in nv.settings
 	uint32 memory;
 	bool   usebios;
 	bool   hardcursor;
-	bool   greensync;
+	bool   switchhead;
 } settings;
 
 /*shared info*/
@@ -147,6 +147,7 @@ typedef struct {
 	display_mode dm2;		/* current display mode configuration: head2 */
 	bool acc_mode;			/* signals (non)accelerated mode */
 	bool interlaced_tv_mode;/* signals interlaced CRTC TV output mode */
+	bool crtc_switch_mode;	/* signals dualhead switch mode if panels are used */
 
   /*frame buffer config - for BDirectScreen*/
 	frame_buffer_config fbc;	/* bytes_per_row and start of frame buffer: head1 */
@@ -232,6 +233,7 @@ typedef struct {
 		uint16 panel2_width;		/* native horizontal resolution for digital panels */
 		uint16 panel2_height;		/* navive vertical resolution for digital panels */
 		float panel2_aspect;		/* panel's aspect ratio */
+		bool crtc2_prim;			/* using CRTC2 as primary CRTC */
 		uint32 tvout_chip_type;     /* see tvchip_type enum above */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
 
