@@ -128,7 +128,7 @@ else
 	sPrefix=:
 	cd="$fsShellCommand cd"
 	scd="$fsShellCommand cd"
-	cp="$fsShellCommand xcp"
+	cp="$fsShellCommand cp"
 	ln="$fsShellCommand ln"
 	mkdir="$fsShellCommand mkdir"
 	rm="$fsShellCommand rm"
