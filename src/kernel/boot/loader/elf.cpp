@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define TRACE_ELF 0
+#define TRACE_ELF 1
 #if TRACE_ELF
 #	define TRACE(x) dprintf x
 #else
@@ -105,6 +105,9 @@ elf_load_image(int fd, preloaded_image *image)
 		region->start = ROUNDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
 		region->size = ROUNDUP(programHeaders[i].p_memsz + (programHeaders[i].p_vaddr % B_PAGE_SIZE), PAGE_SIZE);
 		region->delta = -region->start;
+
+		TRACE(("segment %d: start = %p, size = %lu, delta = %ld\n", i,
+			region->start, region->size, region->delta));
 	}
 
 	// if image->text_region.start == NULL (image is relocatable), 
@@ -136,6 +139,8 @@ elf_load_image(int fd, preloaded_image *image)
 			region = &image->text_region;
 		else
 			continue;
+
+		TRACE(("load segment %d...\n", i));
 
 		length = read_pos(fd, programHeaders[i].p_offset,
 			(void *)(region->start + (programHeaders[i].p_vaddr % B_PAGE_SIZE)),
