@@ -27,14 +27,9 @@
 //
 //------------------------------------------------------------------------------
 
-#include "Locker.h"
 #include <OS.h>
+#include <Locker.h>
 #include <SupportDefs.h>
-
-
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
 
 
 //
@@ -240,12 +235,11 @@ BLocker::InitLocker(const char *name,
 
 
 bool
-BLocker::AcquireLock(bigtime_t timeout,
-               status_t *error)
+BLocker::AcquireLock(bigtime_t timeout, status_t *error)
 {
 	// By default, return no error.
-    *error = B_NO_ERROR;
-
+	status_t status = B_OK;
+		
 	// Only try to acquire the lock if the thread doesn't already own it.
     if (!IsLocked()) {
 	
@@ -255,10 +249,11 @@ BLocker::AcquireLock(bigtime_t timeout,
    		// the semaphore in this case.
    		int32 oldBenaphoreCount = atomic_add(&fBenaphoreCount, 1);
   		if (oldBenaphoreCount > 0) {
-
-   			*error = acquire_sem_etc(fSemaphoreID, 1, B_RELATIVE_TIMEOUT,
+			do {
+   				status = acquire_sem_etc(fSemaphoreID, 1, B_RELATIVE_TIMEOUT,
    									 timeout);
-   			// Note, if the lock here does time out, the benaphore count
+			} while (status == B_INTERRUPTED);
+			// Note, if the lock here does time out, the benaphore count
    			// is not decremented.  By doing this, the benaphore count will
    			// never go back to zero.  This means that the locking essentially
    			// changes to semaphore style if this was a benaphore.
@@ -300,7 +295,7 @@ BLocker::AcquireLock(bigtime_t timeout,
     }
     
     // If the lock has successfully been acquired.	
-   	if (*error == B_NO_ERROR) {
+   	if (status == B_OK) {
    		
    		// Set the lock owner to this thread and increment the recursive count
    		// by one.  The recursive count is incremented because one more Unlock()
@@ -309,11 +304,9 @@ BLocker::AcquireLock(bigtime_t timeout,
     	fRecursiveCount++;
     }
    	
+	if (error != NULL)
+		*error = status;
+
    	// Return true if the lock has been acquired.
-    return (*error == B_NO_ERROR);
+    return (status == B_OK);
 }
-
-
-#ifdef USE_OPENBEOS_NAMESPACE
-}
-#endif
