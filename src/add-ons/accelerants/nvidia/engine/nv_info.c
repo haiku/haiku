@@ -18,8 +18,8 @@ static void pinsnv20_arch_fake(void);
 static void pinsnv30_arch_fake(void);
 static void getstrap_arch_nv4(void);
 static void getstrap_arch_nv10_20_30(void);
-static status_t pins2_read(uint8 *rom, uint32 offset);
-static status_t pins5_read(uint8 *rom, uint32 offset);
+static status_t pins2_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
+static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -28,6 +28,7 @@ status_t parse_pins ()
 	uint8 chksum = 0;
 	int i;
 	uint32 offset;
+	uint8 ram_cfg;
 	status_t result = B_ERROR;
 
 	/* preset PINS read status to failed */
@@ -79,25 +80,18 @@ status_t parse_pins ()
 		rom[offset + 5], rom[offset + 6]));
 
 	/* fill out the si->ps struct if possible */
+	ram_cfg = ((NV_REG32(NV32_NVSTRAPINFO2) >> 2) & 0x0000000f);
+
 	switch (rom[offset + 5])
 	{
 	case 2:
-		pins2_read(rom, offset);
+		pins2_read(rom, offset, ram_cfg);
 		break;
 	case 3:
-		//fixme:
-		pins5_read(rom, offset);
-		break;
 	case 4:
-		//fixme:
-		pins5_read(rom, offset);
-		break;
 	case 5:
-		pins5_read(rom, offset);
-		break;
 	case 6:
-		//fixme:
-		pins5_read(rom, offset);
+		pins3_6_read(rom, offset, ram_cfg);
 		break;
 	default:
 		LOG(8,("INFO: unknown PINS version\n"));
@@ -117,16 +111,18 @@ status_t parse_pins ()
 	return B_OK;
 }
 
-static status_t pins2_read(uint8 *rom, uint32 offset)
+static status_t pins2_read(uint8 *rom, uint32 offset, uint8 ram_cfg)
 {
 	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
 	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
 	uint16 init_size = rom[offset + 22] + (rom[offset + 23] * 256) + 1;
+	char* signon_msg   = &(rom[(rom[offset + 24] + (rom[offset + 25] * 256))]);
 	char* vendor_name  = &(rom[(rom[offset + 40] + (rom[offset + 41] * 256))]);
 	char* product_name = &(rom[(rom[offset + 42] + (rom[offset + 43] * 256))]);
 	char* product_rev  = &(rom[(rom[offset + 44] + (rom[offset + 45] * 256))]);
 
 	LOG(8,("INFO: init_1 $%04x, init_2 $%04x, size $%04x\n", init1, init2, init_size));
+	LOG(8,("INFO: signon msg:\n%s\n", signon_msg));
 	LOG(8,("INFO: vendor name: %s\n", vendor_name));
 	LOG(8,("INFO: product name: %s\n", product_name));
 	LOG(8,("INFO: product rev: %s\n", product_rev));
@@ -134,19 +130,38 @@ static status_t pins2_read(uint8 *rom, uint32 offset)
 	return B_ERROR;
 }
 
-static status_t pins5_read(uint8 *rom, uint32 offset)
+static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg)
 {
 	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
 	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
 	uint16 init_size = rom[offset + 22] + (rom[offset + 23] * 256) + 1;
+	char* signon_msg   = &(rom[(rom[offset + 30] + (rom[offset + 31] * 256))]);
 	char* vendor_name  = &(rom[(rom[offset + 46] + (rom[offset + 47] * 256))]);
 	char* product_name = &(rom[(rom[offset + 48] + (rom[offset + 49] * 256))]);
 	char* product_rev  = &(rom[(rom[offset + 50] + (rom[offset + 51] * 256))]);
 
 	LOG(8,("INFO: init_1 $%04x, init_2 $%04x, size $%04x\n", init1, init2, init_size));
+	LOG(8,("INFO: signon msg:\n%s\n", signon_msg));
 	LOG(8,("INFO: vendor name: %s\n", vendor_name));
 	LOG(8,("INFO: product name: %s\n", product_name));
 	LOG(8,("INFO: product rev: %s\n", product_rev));
+
+	/* pins 5.16 and higher only contain PLL VCO range info */
+	if (((rom[offset + 5]) >= 5) && ((rom[offset + 6]) >= 0x10))
+	{
+		uint32 fvco_max = *((uint32*)(&(rom[offset + 67])));
+		uint32 fvco_min = *((uint32*)(&(rom[offset + 71])));
+
+		LOG(8,("INFO: PLL VCO range is %dkHz - %dkHz\n", fvco_min, fvco_max));
+
+		/* only pins 5 contains this info */
+		//fixme: not finished..
+/*		if ((rom[offset + 5]) == 5)
+		{
+			uint16 IOFlagConditionTablePointer =
+				rom[offset + 85] + (rom[offset + 86] * 256);
+		}
+*/	}
 
 	return B_ERROR;
 }
