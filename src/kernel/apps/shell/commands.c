@@ -173,7 +173,7 @@ int cmd_stat(int argc, char *argv[])
 		return 0;
 	}
 
-	rc = sys_rstat(argv[1], &stat);
+	rc = sys_read_stat(argv[1], &stat);
 	if(rc >= 0) {
 		printf("stat of file '%s': \n", argv[1]);
 		printf("vnid 0x%x\n", (unsigned int)stat.st_ino);
