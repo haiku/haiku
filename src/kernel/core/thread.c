@@ -1698,6 +1698,9 @@ _user_find_thread(const char *userName)
 {
 	char name[B_OS_NAME_LENGTH];
 	
+	if (userName == NULL)
+		return find_thread(NULL);
+
 	if (!IS_USER_ADDRESS(userName)
 		|| user_strlcpy(name, userName, sizeof(name)) < B_OK)
 		return B_BAD_ADDRESS;
