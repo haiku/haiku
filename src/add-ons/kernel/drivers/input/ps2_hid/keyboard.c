@@ -13,7 +13,11 @@
 // although the kb_mouse replacement driver never locks.
 
 #include "common.h"
+#ifdef COMPILE_FOR_R5
 #include "cbuf_adapter.h"
+#else
+#include "cbuf.h"
+#endif
 
 #include <string.h>
 //#include <lock.h>
