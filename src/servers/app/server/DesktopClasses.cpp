@@ -27,6 +27,8 @@
 //------------------------------------------------------------------------------
 #include "DesktopClasses.h"
 #include "TokenHandler.h"
+#include "ServerWindow.h"
+#include "WinBorder.h"
 
 // Defined and initialized in AppServer.cpp
 extern RGBColor workspace_default_color;
@@ -330,23 +332,27 @@ status_t Screen::SetSpace(int32 index, int32 res,bool stick)
 */
 void Screen::AddWindow(ServerWindow *win, int32 workspace)
 {
-	//TODO: Implement
-	if(!win)
+	if(!win || !win->_winborder)
 		return;
+	
+	Layer *rl=GetRootLayer(workspace);
+	if(rl)
+		rl->AddChild(win->_winborder);
 }
 
 /*!
 	\brief Removes a Window from the desktop
 	\param win The window to remove
 	
-	If the window does not belong to this screen or has not been added to the desktop, 
-	this function will fail.
+	The window will remove itself from whatever screen it has been added to, or if it has not been 
+	added to the desktop, it will do nothing.
 */
 void Screen::RemoveWindow(ServerWindow *win)
 {
-	//TODO: Implement
-	if(!win)
+	if(!win || !win->_winborder)
 		return;
+	
+	win->_winborder->RemoveSelf();
 }
 
 /*!

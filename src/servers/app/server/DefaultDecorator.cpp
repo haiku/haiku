@@ -31,17 +31,22 @@
 #include "DefaultDecorator.h"
 #include "RGBColor.h"
 
+//#define DEBUG_DECORATOR
+
+#ifdef DEBUG_DECORATOR
+#include <stdio.h>
+#endif
+
 DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
  : Decorator(rect,wlook,wfeel,wflags)
 {
 	taboffset=0;
 
-	// These hard-coded assignments will go bye-bye when the system _colors 
-	// API is implemented
-
 	// commented these out because they are taken care of by the SetFocus() call
 	SetFocus(false);
 
+	// These hard-coded assignments will go bye-bye when the system _colors 
+	// API is implemented
 	frame_highercol.SetColor(216,216,216);
 	frame_lowercol.SetColor(110,110,110);
 
@@ -60,14 +65,68 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 
 	tab_highcol=_colors->window_tab;
 	tab_lowcol=_colors->window_tab;
+
+#ifdef DEBUG_DECORATOR
+printf("DefaultDecorator:\n");
+printf("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom);
+#endif
 }
 
 DefaultDecorator::~DefaultDecorator(void)
 {
+#ifdef DEBUG_DECORATOR
+printf("DefaultDecorator: ~DefaultDecorator()\n");
+#endif
 }
 
 click_type DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
+#ifdef DEBUG_DECORATOR
+printf("DefaultDecorator: Clicked\n");
+printf("\tPoint: (%.1f,%.1f)\n",pt.x,pt.y);
+printf("\tButtons:\n");
+if(buttons==0)
+	printf("\t\tNone\n");
+else
+{
+	if(buttons & B_PRIMARY_MOUSE_BUTTON)
+		printf("\t\tPrimary\n");
+	if(buttons & B_SECONDARY_MOUSE_BUTTON)
+		printf("\t\tSecondary\n");
+	if(buttons & B_TERTIARY_MOUSE_BUTTON)
+		printf("\t\tTertiary\n");
+}
+printf("\tNodifiers:\n");
+if(modifiers==0)
+	printf("\t\tNone\n");
+else
+{
+	if(modifiers & B_CAPS_LOCK)
+		printf("\t\tCaps Lock\n");
+	if(modifiers & B_NUM_LOCK)
+		printf("\t\tNum Lock\n");
+	if(modifiers & B_SCROLL_LOCK)
+		printf("\t\tScroll Lock\n");
+	if(modifiers & B_LEFT_COMMAND_KEY)
+		printf("\t\t Left Command\n");
+	if(modifiers & B_RIGHT_COMMAND_KEY)
+		printf("\t\t Right Command\n");
+	if(modifiers & B_LEFT_CONTROL_KEY)
+		printf("\t\tLeft Control\n");
+	if(modifiers & B_RIGHT_CONTROL_KEY)
+		printf("\t\tRight Control\n");
+	if(modifiers & B_LEFT_OPTION_KEY)
+		printf("\t\tLeft Option\n");
+	if(modifiers & B_RIGHT_OPTION_KEY)
+		printf("\t\tRight Option\n");
+	if(modifiers & B_LEFT_SHIFT_KEY)
+		printf("\t\tLeft Shift\n");
+	if(modifiers & B_RIGHT_SHIFT_KEY)
+		printf("\t\tRight Shift\n");
+	if(modifiers & B_MENU_KEY)
+		printf("\t\tMenu\n");
+}
+#endif
 	if(_closerect.Contains(pt))
 		return CLICK_CLOSE;
 
@@ -106,6 +165,9 @@ click_type DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 
 void DefaultDecorator::_DoLayout(void)
 {
+#ifdef DEBUG_DECORATOR
+printf("DefaultDecorator: Do Layout\n");
+#endif
 	// Here we determine the size of every rectangle that we use
 	// internally when we are given the size of the client rectangle.
 	
@@ -159,6 +221,9 @@ void DefaultDecorator::MoveBy(float x, float y)
 
 void DefaultDecorator::MoveBy(BPoint pt)
 {
+#ifdef DEBUG_DECORATOR
+printf("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
+#endif
 	// Move all internal rectangles the appropriate amount
 	_frame.OffsetBy(pt);
 	_closerect.OffsetBy(pt);
@@ -170,6 +235,9 @@ void DefaultDecorator::MoveBy(BPoint pt)
 
 BRegion * DefaultDecorator::GetFootprint(void)
 {
+#ifdef DEBUG_DECORATOR
+printf("DefaultDecorator: Get Footprint\n");
+#endif
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
@@ -219,6 +287,9 @@ void DefaultDecorator::_SetFocus(void)
 
 void DefaultDecorator::Draw(BRect update)
 {
+#ifdef DEBUG_DECORATOR
+printf("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom);
+#endif
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
 

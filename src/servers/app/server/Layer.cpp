@@ -34,6 +34,8 @@
 #include "PortLink.h"
 #include "TokenHandler.h"
 
+//#define DEBUG_LAYER
+
 //! TokenHandler object used to provide IDs for all Layers and, thus, BViews
 TokenHandler view_token_handler;
 
@@ -64,7 +66,7 @@ Layer::Layer(BRect frame, const char *name, int32 resize, int32 flags,ServerWind
 
 	_visible=new BRegion(Bounds());
 	_full=new BRegion(Bounds());
-	_invalid=NULL;
+	_invalid=new BRegion(Bounds());
 
 	_serverwin=win;
 	
@@ -79,11 +81,19 @@ Layer::Layer(BRect frame, const char *name, int32 resize, int32 flags,ServerWind
 
 	_level=0;
 	_layerdata=new LayerData;
+#ifdef DEBUG_LAYER
+printf("Layer: %s\n",name);
+printf("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",frame.left,frame.top,frame.right,frame.bottom);
+printf("\tWindow: %s\n",win?win->Title():"NULL");
+#endif
 }
 
 //! Destructor frees all allocated heap space
 Layer::~Layer(void)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: ~Layer()\n",_name->String());
+#endif
 	if(_visible)
 	{
 		delete _visible;
@@ -119,6 +129,10 @@ Layer::~Layer(void)
 */
 void Layer::AddChild(Layer *layer, Layer *before=NULL, bool rebuild)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Add Child (%s, %s, %s) - Incomplete\n",_name->String(),layer?layer->_name->String():"NULL",
+	before?before->_name->String():"NULL",rebuild?"rebuild":"no rebuild");
+#endif
 	// TODO: Add before support
 
 	if(layer->_parent!=NULL)
@@ -181,6 +195,10 @@ void Layer::AddChild(Layer *layer, Layer *before=NULL, bool rebuild)
 */
 void Layer::RemoveChild(Layer *layer, bool rebuild)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Remove Child (%s,%s)\n",_name->String(),layer?layer->_name->String():"NULL",
+	rebuild?"rebuild":"no rebuild");
+#endif
 	if(layer->_parent==NULL)
 	{
 		printf("ERROR: RemoveChild(): Layer doesn't have a _parent\n");
@@ -224,6 +242,9 @@ void Layer::RemoveChild(Layer *layer, bool rebuild)
 */
 void Layer::RemoveSelf(bool rebuild)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: RemoveSelf(%s)\n",_name->String(),rebuild?"rebuild":"no rebuild");
+#endif
 	// A Layer removes itself from the tree (duh)
 	if(_parent==NULL)
 	{
@@ -251,6 +272,9 @@ void Layer::RemoveSelf(bool rebuild)
 */
 Layer *Layer::GetChildAt(BPoint pt, bool recursive=false)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Get Child At (%.1f,%.1f)\n",_name->String(),pt.x,pt.y);
+#endif
 	Layer *child;
 	if(recursive)
 	{
@@ -304,6 +328,9 @@ BRect Layer::Frame(void)
 */
 void Layer::PruneTree(void)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Prune Tree\n",_name->String());
+#endif
 	Layer *lay,*nextlay;
 
 	lay=_topchild;
@@ -329,6 +356,9 @@ void Layer::PruneTree(void)
 */
 Layer *Layer::FindLayer(int32 token)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Find Layer (%ld)\n",_name->String(),token);
+#endif
 	// recursive search for a layer based on its view token
 	Layer *lay, *trylay;
 
@@ -360,6 +390,10 @@ Layer *Layer::FindLayer(int32 token)
 */
 void Layer::Invalidate(BRegion region)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Invalidate(BRegion)\n",_name->String());
+region.PrintToStream();
+#endif
 	int32 i;
 	BRect r;
 
@@ -406,6 +440,10 @@ void Layer::Invalidate(BRegion region)
 */
 void Layer::Invalidate(BRect rect)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Invalidate(%.1f,%.1f,%.1f,%.1f)\n",_name->String(),rect.left,rect.top,rect.right,
+	rect.bottom);
+#endif
 	// Make our own section dirty and pass it on to any children, if necessary....
 	// YES, WE ARE SHARING DIRT! Mudpies anyone? :D
 	if(TestRectIntersection(Frame(),rect))
@@ -441,6 +479,10 @@ void Layer::Invalidate(BRect rect)
 */
 void Layer::RequestDraw(const BRect &r)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: RequestDraw(%.1f,%.1f,%.1f,%.1f) - unimplemented\n",
+	_name->String(),r.left,r.top,r.right,r.bottom);
+#endif
 	// TODO: Implement and fix
 /*	if(_visible==NULL || _hidecount>0)
 		return;
@@ -480,6 +522,9 @@ bool Layer::IsDirty(void) const
 //! Show the layer. Operates just like the BView call with the same name
 void Layer::Show(void)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Show\n",_name->String());
+#endif
 	if(_hidecount==0)
 		return;
 
@@ -500,6 +545,9 @@ void Layer::Show(void)
 //! Hide the layer. Operates just like the BView call with the same name
 void Layer::Hide(void)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Hide\n",_name->String());
+#endif
 	if(_hidecount==0)
 	{
 		BRegion *reg=new BRegion(ConvertToParent(_visible));
@@ -547,6 +595,9 @@ uint32 Layer::CountChildren(void)
 */
 void Layer::MoveBy(float x, float y)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Move By (%.1f,%.1f)\n",_name->String(),x,y);
+#endif
 	BRect oldframe(_frame);
 	_frame.OffsetBy(x,y);
 
@@ -573,6 +624,9 @@ void Layer::MoveBy(float x, float y)
 */
 void Layer::ResizeBy(float x, float y)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Rezize By (%.1f,%.1f) - Incomplete\n",_name->String(),x,y);
+#endif
 	// TODO: Implement and test child resizing based on flags
 	
 	BRect oldframe=_frame;
@@ -596,6 +650,10 @@ void Layer::ResizeBy(float x, float y)
 */
 void Layer::RebuildRegions(bool include_children=true)
 {
+#ifdef DEBUG_LAYER
+printf("Layer: %s: Rebuild Regions (%s)\n",_name->String(),include_children?"include children":
+"no child inclusion");
+#endif
 	BRegion *reg,*reg2;
 	if(_full)
 		_full->Include(Bounds());

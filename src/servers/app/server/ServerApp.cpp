@@ -258,8 +258,18 @@ printf("ServerApp %s:Server shutdown notification received\n",app->_signature.St
 						// because the server was asked to quit. Thus, we
 						// ask all apps to quit. This is NOT the same as system
 						// shutdown and will happen only in testing
-//						BMessage *shutdown=new BMessage(B_QUIT_REQUESTED);
+						
+						// For now, it seems that we can't seem to try to play nice and tell
+						// an application to quit, so we'll just have to go postal. XD
+
+//						BMessage *shutdown=new BMessage(_QUIT_);
 //						SendMessage(app->_sender,shutdown);
+
+						// DIE! DIE! DIE! :P
+						port_info pi;
+						get_port_info(app->_sender,&pi);
+						kill_team(pi.team);
+						app->PostMessage(B_QUIT_REQUESTED);
 #ifdef DEBUG_SERVERAPP
 printf("ServerApp %s:Sent server shutdown message to BApp\n",app->_signature.String());
 #endif
@@ -321,6 +331,9 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 	{
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Client font list update confirmed\n",_signature.String());
+#endif
 			// received when the client-side global font list has been
 			// refreshed
 			fontserver->Lock();
@@ -358,6 +371,11 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 				winlook, winfeel, winflags,this,win_port,workspace,htoken);
 			_winlist->AddItem(newwin);
 
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
+	_signature.String(),(const char *)index,rect.left,rect.top,rect.right,rect.bottom);
+#endif
+
 			// Window looper is waiting for our reply. Send back the
 			// ServerWindow's message port
 			PortLink *replylink=new PortLink(reply_port);
@@ -383,6 +401,9 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 				w=(ServerWindow*)_winlist->ItemAt(i);
 				if(w->_token==winid)
 				{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Deleting window %s\n",_signature.String(),w->Title());
+#endif
 					_winlist->RemoveItem(w);
 					delete w;
 					break;
@@ -419,6 +440,10 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			s.id=*((int32*)index);
 			
 			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
+		_signature.String(),r.left,r.top,r.right,r.bottom);
+#endif
 			if(sbmp)
 			{
 				// list for doing faster lookups for a bitmap than what the BitmapManager
@@ -453,6 +478,9 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			ServerBitmap *sbmp=_FindBitmap(*((int32*)index));
 			if(sbmp)
 			{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Deleting Bitmap %ld\n",_signature.String(),*((int32*)index));
+#endif
 				_bmplist->RemoveItem(sbmp);
 				bitmapmanager->DeleteBitmap(sbmp);
 				write_port(replyport,SERVER_TRUE,NULL,0);
@@ -464,18 +492,34 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		}
 		case AS_CREATE_PICTURE:
 		{
+			// TODO: Implement
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Create Picture unimplemented\n",_signature.String());
+#endif
 			break;
 		}
 		case AS_DELETE_PICTURE:
 		{
+			// TODO: Implement
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Delete Picture unimplemented\n",_signature.String());
+#endif
 			break;
 		}
 		case AS_CLONE_PICTURE:
 		{
+			// TODO: Implement
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Clone Picture unimplemented\n",_signature.String());
+#endif
 			break;
 		}
 		case AS_DOWNLOAD_PICTURE:
 		{
+			// TODO; Implement
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Download Picture unimplemented\n",_signature.String());
+#endif
 			break;
 		}
 		case AS_SET_SCREEN_MODE:
@@ -487,6 +531,9 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			int32 workspace=*((int32*)index); index+=sizeof(int32);
 			uint32 mode=*((uint32*)index); index+=sizeof(uint32);
 
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: SetScreenMode: workspace %ld, mode %lu\n",_signature.String(), workspace, mode);
+#endif
 			SetSpace(workspace,mode,*((bool*)index));
 
 			break;
@@ -505,23 +552,35 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		// call the CursorManager's version to allow for future expansion
 		case AS_SHOW_CURSOR:
 		{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Show Cursor\n",_signature.String());
+#endif
 			cursormanager->ShowCursor();
 			_cursorhidden=false;
 			break;
 		}
 		case AS_HIDE_CURSOR:
 		{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Hide Cursor\n",_signature.String());
+#endif
 			cursormanager->HideCursor();
 			_cursorhidden=true;
 			break;
 		}
 		case AS_OBSCURE_CURSOR:
 		{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Obscure Cursor\n",_signature.String());
+#endif
 			cursormanager->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: Query Cursor Hidden\n",_signature.String());
+#endif
 			// Attached data
 			// 1) int32 port to reply to
 			write_port(*((port_id*)index),(_cursorhidden)?SERVER_TRUE:SERVER_FALSE,NULL,0);
@@ -529,6 +588,9 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		}
 		case AS_SET_CURSOR_DATA:
 		{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: SetCursor(cursor data *)\n",_signature.String());
+#endif
 			// Attached data: 68 bytes of _appcursor data
 			
 			int8 cdata[68];
@@ -549,6 +611,9 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		}
 		case AS_SET_CURSOR_BCURSOR:
 		{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s: SetCursor(BCursor)\n",_signature.String());
+#endif
 			// Attached data:
 			// 1) port_id reply port
 			// 2) 68 bytes of _appcursor data
@@ -573,8 +638,9 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		}
 		default:
 		{
-			printf("ServerApp %s received unhandled message code %lx\n",
-				_signature.String(),code);
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s received unhandled message code %lx\n",_signature.String(),code);
+#endif
 			break;
 		}
 	}

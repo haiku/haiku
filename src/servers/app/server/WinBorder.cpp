@@ -37,6 +37,17 @@
 #include "WinBorder.h"
 #include "AppServer.h"	// for new_decorator()
 
+//#define DEBUG_WINBORDER
+//#define DEBUG_WINBORDER_MOUSE
+
+#ifdef DEBUG_WINBORDER
+#include <stdio.h>
+#endif
+
+#ifdef DEBUG_WINBORDER_MOUSE
+#include <stdio.h>
+#endif
+
 namespace winborder_private
 {
 	bool is_moving_window=false;
@@ -55,7 +66,7 @@ WinBorder * get_active_winborder(void) { return winborder_private::active_winbor
 void set_active_winborder(WinBorder *win) { winborder_private::active_winborder=win; }
 
 WinBorder::WinBorder(BRect r, const char *name, int32 look, int32 feel, int32 flags, ServerWindow *win)
- : Layer(r,name,0,flags,win)
+ : Layer(r,name,B_FOLLOW_NONE,flags,win)
 {
 	_mbuttons=0;
 	_win=win;
@@ -70,15 +81,26 @@ WinBorder::WinBorder(BRect r, const char *name, int32 look, int32 feel, int32 fl
 	_vresizewin=false;
 
 	_decorator=new_decorator(r,name,look,feel,flags,GetGfxDriver());
+#ifdef DEBUG_WINBORDER
+printf("WinBorder %s:\n",_title->String());
+printf("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom);
+printf("\tWindow %s\n",win?win->Title():"NULL");
+#endif
 }
 
 WinBorder::~WinBorder(void)
 {
+#ifdef DEBUG_WINBORDER
+printf("WinBorder %s:~WinBorder()\n",_title->String());
+#endif
 	delete _title;
 }
 
 void WinBorder::MouseDown(int8 *buffer)
 {
+#ifdef DEBUG_WINBORDER_MOUSE
+printf("WinBorder %s: MouseDown unimplemented\n",_title->String());
+#endif
 /*	_mbuttons=buttons;
 	kmodifiers=modifiers;
 	click_type click=_decorator->Clicked(pt, _mbuttons, kmodifiers);
@@ -150,6 +172,9 @@ void WinBorder::MouseDown(int8 *buffer)
 
 void WinBorder::MouseMoved(int8 *buffer)
 {
+#ifdef DEBUG_WINBORDER_MOUSE
+printf("WinBorder %s: MouseMoved unimplemented\n",_title->String());
+#endif
 /*	_mbuttons=buttons;
 	kmodifiers=modifiers;
 	click_type click=_decorator->Clicked(pt, _mbuttons, kmodifiers);
@@ -238,6 +263,9 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 void WinBorder::MouseUp(int8 *buffer)
 {
+#ifdef DEBUG_WINBORDER_MOUSE
+printf("WinBorder %s: MouseUp unimplmented\n",_title->String());
+#endif
 /*
 	_mbuttons=buttons;
 	kmodifiers=modifiers;
@@ -285,6 +313,9 @@ void WinBorder::MouseUp(int8 *buffer)
 
 void WinBorder::Draw(BRect update_rect)
 {
+#ifdef DEBUG_WINBORDER
+printf("WinBorder %s: Draw\n",_title->String());
+#endif
 	if(_update && _visible!=NULL)
 		_is_updating=true;
 
@@ -296,6 +327,9 @@ void WinBorder::Draw(BRect update_rect)
 
 void WinBorder::RequestDraw(const BRect &r)
 {
+#ifdef DEBUG_WINBORDER
+printf("WinBorder %s: RequestDraw\n",_title->String());
+#endif
 	_decorator->Draw(r);
 }
 
@@ -333,16 +367,28 @@ void WinBorder::ResizeBy(float x, float y)
 
 void WinBorder::UpdateColors(void)
 {
+#ifdef DEBUG_WINBORDER
+printf("WinBorder %s: UpdateColors\n",_title->String());
+#endif
 }
 
 void WinBorder::UpdateDecorator(void)
 {
+#ifdef DEBUG_WINBORDER
+printf("WinBorder %s: UpdateDecorator\n",_title->String());
+#endif
 }
 
 void WinBorder::UpdateFont(void)
 {
+#ifdef DEBUG_WINBORDER
+printf("WinBorder %s: UpdateFont\n",_title->String());
+#endif
 }
 
 void WinBorder::UpdateScreen(void)
 {
+#ifdef DEBUG_WINBORDER
+printf("WinBorder %s: UpdateScreen\n",_title->String());
+#endif
 }

@@ -395,6 +395,7 @@ void AddWindowToDesktop(ServerWindow *win, int32 workspace=B_CURRENT_WORKSPACE, 
 
 	Workspace *w=desktop_private::activescreen->GetActiveWorkspace();
 	win->SetWorkspace(w);
+	desktop_private::activescreen->AddWindow(win,workspace);
 	
 	desktop_private::layerlock.Unlock();
 	desktop_private::workspacelock.Unlock();
@@ -410,6 +411,7 @@ void RemoveWindowFromDesktop(ServerWindow *win)
 	lock_layers();
 	
 	win->SetWorkspace(NULL);
+	desktop_private::activescreen->RemoveWindow(win);
 	
 	unlock_layers();
 	unlock_workspaces();

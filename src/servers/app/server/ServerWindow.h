@@ -95,9 +95,12 @@ public:
 	Workspace *GetWorkspace(void);
 	void SetWorkspace(Workspace *wkspc);
 
+	//! Returns the window's title
+	const char *Title(void) { return _title->String(); }
 protected:	
 	friend ServerApp;
 	friend WinBorder;
+	friend class Screen;
 	
 	BString *_title;
 	int32 _look, _feel, _flags;

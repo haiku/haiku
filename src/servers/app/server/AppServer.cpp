@@ -52,9 +52,10 @@ RGBColor workspace_default_color(51,102,160);
 	This loads the default fonts, allocates all the major global variables, spawns the main housekeeping
 	threads, loads user preferences for the UI and decorator, and allocates various locks.
 */
-AppServer::AppServer(void)
 #if DISPLAYDRIVER != HWDRIVER
- : BApplication (SERVER_SIGNATURE)
+AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE)
+#else
+AppServer::AppServer(void)
 #endif
 {
 	_mouseport=create_port(100,SERVER_INPUT_PORT);
