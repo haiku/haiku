@@ -605,10 +605,10 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	status_t status = 0;
 	int type = 0;
 
-	FUNCTION(("vnode_path_to_vnode(path = %s)\n", path));
+	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
 
 	if (!path)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	while (true) {
 		struct vnode *nextVnode;
@@ -632,12 +632,11 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 			while (*nextPath == '/');
 		}
 
-		// See if the .. is at the root of a mount and move to the covered
-		// vnode so we pass the '..' parse to the underlying filesystem
+		// See if the '..' is at the root of a mount and move to the covered
+		// vnode so we pass the '..' path to the underlying filesystem
 		if (!strcmp("..", path)
 			&& vnode->mount->root_vnode == vnode
 			&& vnode->mount->covers_vnode) {
-
 			nextVnode = vnode->mount->covers_vnode;
 			inc_vnode_ref_count(nextVnode);
 			put_vnode(vnode);
@@ -718,6 +717,9 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				vnode = sRoot;
 				inc_vnode_ref_count(vnode);
 			}
+			inc_vnode_ref_count(vnode);
+				// balance the next recursion - we will decrement the ref_count
+				// of the vnode, no matter if we succeeded or not
 
 			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, count + 1, &nextVnode, _type);
 
@@ -760,7 +762,7 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 	FUNCTION(("path_to_vnode(path = \"%s\")\n", path));
 
 	if (!path)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	// figure out if we need to start at root or at cwd
 	if (*path == '/') {
