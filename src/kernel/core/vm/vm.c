@@ -2592,6 +2592,15 @@ resize_area(area_id areaID, size_t newSize)
 		}
 
 		current->size = newSize;
+
+		// we also need to unmap all pages beyond the new size, if the area has shrinked
+		if (newSize < oldSize) {
+			vm_translation_map *map = &current->aspace->translation_map;
+
+			map->ops->lock(map);
+			map->ops->unmap(map, current->base + newSize, current->base + oldSize - 1);
+			map->ops->unlock(map);
+		}
 	}
 
 	if (failed) {
@@ -2601,7 +2610,7 @@ resize_area(area_id areaID, size_t newSize)
 
 		goto err;
 	}
-
+		
 	vm_cache_resize(cache, newSize);
 	mutex_unlock(&cache->lock);
 
