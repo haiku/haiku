@@ -14,6 +14,7 @@ KernelLd boot_loader :
 	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>kvsprintf.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memmove.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strdup.o
@@ -21,6 +22,7 @@ KernelLd boot_loader :
 	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strcmp.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strncmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcat.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
