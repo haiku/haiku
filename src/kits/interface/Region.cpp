@@ -118,7 +118,7 @@ sort_rects(clipping_rect *rects, long count)
 					again = true;
 				}
 			}
-		} while (again != true); 
+		} while (again); 
 	}
 }
 
@@ -325,12 +325,68 @@ append_region(BRegion *first, BRegion *second, BRegion *dest)
 }
 
 
-/*
 void
-r_or(long, long, BRegion *first, BRegion *second, BRegion *dest, long *L1, long *L2)
-{	      
+r_or(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, long *index1, long *index2)
+{
+	PRINT(("%s\n", __PRETTY_FUNCTION__));
+	long i1 = *index1;
+	long i2 = *index2;
+	
+	if (first->count <= i1) {
+		if (second->count > i2) {
+			clipping_rect secondRect = second->data[i2];
+		
+			secondRect.top = max_c(secondRect.top, top);
+			secondRect.bottom = min_c(secondRect.bottom, bottom);
+			
+			if (valid_rect(secondRect))
+				dest->_AddRect(secondRect);
+			if (second->data[i2].bottom <= bottom)
+				i2++;
+	 	}
+	 	
+	 } else if (second->count <= i2) {
+	 
+	 	clipping_rect firstRect = first->data[i1];
+	 	
+	 	firstRect.top = max_c(firstRect.top, top);
+	 	firstRect.bottom = min_c(firstRect.bottom, bottom);
+	 	
+	 	if (valid_rect(firstRect));
+	 		dest->_AddRect(firstRect);
+	 	if (first->data[i1].bottom <= bottom)
+	 		i1++;
+	 		
+	 } else {
+	 	clipping_rect firstRect = first->data[i1];
+	 	clipping_rect secondRect = second->data[i2];
+	 	
+	 	firstRect.top = max_c(firstRect.top, top);
+	 	firstRect.bottom = min_c(firstRect.bottom, bottom);
+	 	
+	 	secondRect.top = max_c(secondRect.top, top);
+		secondRect.bottom = min_c(secondRect.bottom, bottom);
+	 	
+	 	if (valid_rect(sect_rect(firstRect, secondRect)))
+	 		dest->_AddRect(union_rect(firstRect, secondRect));
+	 	
+	 	else {
+	 		if (valid_rect(firstRect))
+	 			dest->_AddRect(firstRect);
+	 		if (valid_rect(secondRect))
+	 			dest->_AddRect(secondRect);
+	 	}
+	 		
+	 	if (first->data[i1].bottom <= bottom)
+	 		i1++;
+	 	if (second->data[i2].bottom <= bottom)
+			i2++;
+	}
+		
+	*index1 = i1;
+	*index2 = i2;    
 }
-*/
+
 
 /*! \brief Divides the plane into horizontal bands, then passes those bands to r_or
 	which does the real work.
@@ -359,7 +415,7 @@ or_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 		}	
 		
 		for (int x = b; x < second->count; x++) {
-			int32 n = second->data[x].top;
+			int32 n = second->data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
 			if (second->data[x].bottom >= top && second->data[x].bottom < bottom)
@@ -524,7 +580,7 @@ sub_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 		}	
 		
 		for (int x = b; x < second->count; x++) {
-			int32 n = second->data[x].top;
+			int32 n = second->data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
 			if (second->data[x].bottom >= top && second->data[x].bottom < bottom)
