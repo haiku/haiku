@@ -16,6 +16,7 @@ KernelObjects
 	<$(SOURCE_GRIST)>rand.c 
 	<$(SOURCE_GRIST)>random.c
 	<$(SOURCE_GRIST)>realpath.c
+	<$(SOURCE_GRIST)>strtod.c
 	<$(SOURCE_GRIST)>strtol.c
 	<$(SOURCE_GRIST)>strtoll.c
 	<$(SOURCE_GRIST)>strtoul.c
