@@ -36,6 +36,7 @@
 #include <Rect.h>
 #include <Locker.h>
 #include "RGBColor.h"
+#include <Region.h>
 
 class ServerCursor;
 class ServerBitmap;
@@ -106,6 +107,7 @@ public:
 	virtual void FillEllipse(BRect r, LayerData *d, int8 *pat);
 	virtual void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat);
 	virtual void FillRect(BRect r, LayerData *d, int8 *pat);
+	virtual void FillRegion(BRegion *r, LayerData *d, int8 *pat);
 	virtual void FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat);
 //	virtual void FillShape(SShape *sh, LayerData *d, int8 *pat);
 	virtual void FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat);
@@ -124,6 +126,7 @@ public:
 	virtual void StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat);
 	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true);
 	virtual void StrokeRect(BRect r, LayerData *d, int8 *pat);
+	virtual void StrokeRegion(BRegion *r, LayerData *d, int8 *pat);
 	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat);
 //	virtual void StrokeShape(SShape *sh, LayerData *d, int8 *pat);
 	virtual void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat);

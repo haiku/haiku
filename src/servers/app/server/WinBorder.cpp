@@ -296,11 +296,6 @@ printf("ClickMove: Drag\n");
 			_win->Unlock();
 			
 			lock_layers();
-//			_parent->Invalidate(oldmoveframe);
-//			MoveBy(dx,dy);
-//			_decorator->MoveBy(BPoint(dx, dy));
-//			_parent->RequestDraw();
-//			_decorator->Draw();
 			BRegion *reg=_decorator->GetFootprint();
 			_driver->CopyRegion(reg,_win->_frame.LeftTop());
 			

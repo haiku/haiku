@@ -205,6 +205,26 @@ void DisplayDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 }
 
 /*!
+	\brief Convenience function for server use
+	\param r BRegion to be filled
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+*/
+void DisplayDriver::FillRegion(BRegion *r, LayerData *d, int8 *pat)
+{
+	if(!r || !d || !pat)
+		return;
+		
+	_locker->Lock();
+
+	for(int32 i=0; i<r->CountRects();i++)
+		FillRect(r->RectAt(i),d,pat);
+
+	_locker->Unlock();
+}
+
+/*!
 	\brief Called for all BView::FillRoundRect calls
 	\param r The rectangle itself
 	\param xrad X radius of the corner arcs
@@ -417,6 +437,26 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, Laye
 */
 void DisplayDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 {
+}
+
+/*!
+	\brief Convenience function for server use
+	\param r BRegion to be stroked
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+*/
+void DisplayDriver::StrokeRegion(BRegion *r, LayerData *d, int8 *pat)
+{
+	if(!r || !d || !pat)
+		return;
+		
+	_locker->Lock();
+
+	for(int32 i=0; i<r->CountRects();i++)
+		StrokeRect(r->RectAt(i),d,pat);
+
+	_locker->Unlock();
 }
 
 /*!

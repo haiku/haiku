@@ -36,6 +36,12 @@
 #include "RectUtils.h"
 
 //#define DEBUG_LAYER
+#define DEBUG_REGIONS
+
+#ifdef DEBUG_REGIONS
+#include "Desktop.h"
+#include "DisplayDriver.h"
+#endif
 
 //! TokenHandler object used to provide IDs for all Layers and, thus, BViews
 TokenHandler view_token_handler;
@@ -685,12 +691,20 @@ printf("Layer: %s: Move By (%.1f,%.1f)\n",_name->String(),x,y);
 
 	if(_parent)
 	{
-		if(_parent->_invalid==NULL)
-			_parent->_invalid=new BRegion(oldframe);
-		else
-			_parent->_invalid->Include(oldframe);
-	}
+		BRegion *i=new BRegion(oldframe);
+		if(TestRectIntersection(oldframe,_frame))
+			i->Exclude(_frame);
 
+		if(_parent->_invalid==NULL)
+			_parent->_invalid=i;
+		else
+		{
+			_parent->_invalid->Include(i);
+			delete i;
+		}
+		_parent->_is_dirty=true;
+	}
+	_is_dirty=true;
 //	for(Layer *lay=_topchild; lay!=NULL; lay=lay->_lowersibling)
 //		lay->MoveBy(x,y);
 //	Invalidate(Frame());
@@ -752,18 +766,16 @@ printf("Layer: %s: Rebuild Regions (%s)\n",_name->String(),include_children?"inc
 	{
 		if(childlay->_visible && childlay->_hidecount==0)
 		{
-			// reg is what is _visible in the layer's _parent's coordinate system
-//			reg=new BRegion(ConvertToParent(_visible));
-			// reg2 is the layer's _visible region in the sibling's coordinate system
-//			reg2=new BRegion(childlay->ConvertFromParent(reg));
-//			delete reg;
-
-			// lowersiblings occupy screen space _above_ a layer, so the layer itself
-			// must remove from its _visible region 
-//			_visible->Exclude(reg2);
-//			delete reg2;
-			reg=new BRegion(ConvertToParent(_visible));
+#ifdef DEBUG_REGIONS
+printf("old visible:");_visible->PrintToStream();
+#endif
+			reg=new BRegion(childlay->ConvertToParent(childlay->_visible));
 			_visible->Exclude(reg);
+#ifdef DEBUG_REGIONS
+printf("child visible:");childlay->_visible->PrintToStream();
+printf("converted child visible:");reg->PrintToStream();
+printf("new visible:");_visible->PrintToStream();
+#endif
 			delete reg;
 		}
 	}
