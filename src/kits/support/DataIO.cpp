@@ -193,7 +193,7 @@ BMemoryIO::~BMemoryIO()
 ssize_t
 BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
 {
-	if (buffer == NULL)
+	if (buffer == NULL || pos < 0)
 		return B_BAD_VALUE;
 		
 	ssize_t sizeRead = 0;
@@ -212,7 +212,7 @@ BMemoryIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	if (fReadOnly)
 		return B_NOT_ALLOWED;
 	
-	if (buffer == NULL)
+	if (buffer == NULL || pos < 0)
 		return B_BAD_VALUE;
 		
 	ssize_t sizeWritten = 0;	
