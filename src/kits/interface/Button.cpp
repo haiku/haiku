@@ -86,7 +86,7 @@ status_t BButton::Archive(BMessage* archive, bool deep) const
 	return err;
 }
 //------------------------------------------------------------------------------
-void BButton::Draw(BRect updateRect)
+void HButton::Draw(BRect updateRect)
 {
 	font_height fh;
 	GetFontHeight(&fh);
@@ -120,163 +120,115 @@ void BButton::Draw(BRect updateRect)
 		lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
 		lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
 		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
-		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
-		darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
 	BRect rect(bounds);
+	bool bEnabled = IsEnabled();
 	
 	if (IsDefault())
-		rect = DrawDefault(rect, IsEnabled());
+		rect = DrawDefault(rect, bEnabled);
 	else
 		rect.InsetBy(1,1);
 	
-	if (IsEnabled())
+	// This can be set outside draw
+	if (bEnabled)
+		SetHighColor(tint_color(no_tint, B_DARKEN_4_TINT));
+	else
+		SetHighColor(tint_color(no_tint, B_DARKEN_2_TINT));
+
+	// Dark border
+	StrokeRect(rect);
+
+	BeginLineArray(8);
+	
+	// Corners
+	rgb_color cornerColor = no_tint;
+	if (IsDefault())
+		cornerColor = lighten1;
+	AddLine(rect.LeftBottom(), rect.LeftBottom(), cornerColor);
+	AddLine(rect.LeftTop(), rect.LeftTop(), cornerColor);
+	AddLine(rect.RightTop(), rect.RightTop(), cornerColor);
+	AddLine(rect.RightBottom(), rect.RightBottom(), cornerColor);
+
+	rect.InsetBy(1, 1);
+
+	// First bevel
+	rgb_color firstBevelColor;
+	if (bEnabled)
+		firstBevelColor = tint_color(no_tint, B_DARKEN_2_TINT);
+	else
+		firstBevelColor = no_tint;
+	AddLine(BPoint(rect.left + 1.0f, rect.bottom),
+		BPoint(rect.right, rect.bottom), firstBevelColor);
+	AddLine(BPoint(rect.right, rect.bottom - 1.0f),
+		BPoint(rect.right, rect.top + 1.0f), firstBevelColor);
+
+	AddLine(BPoint(rect.left, rect.top),
+		BPoint(rect.left, rect.bottom), lighten1);
+	AddLine(BPoint(rect.left + 1.0f, rect.top),
+		BPoint(rect.right, rect.top), lighten1);
+
+	EndLineArray();
+
+	rect.InsetBy(1, 1);
+
+	// Second bevel
+	SetHighColor(lightenmax);
+	FillRect(rect);
+
+	SetHighColor(no_tint);
+	StrokeLine(BPoint(rect.right, rect.top + 1.0f),
+		BPoint(rect.right, rect.bottom));
+	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom));
+	
+	rect.InsetBy(1, 1);
+
+	// Filling
+	rect.left += 1.0f;
+	rect.top += 1.0f;
+	SetHighColor(lighten1);
+	FillRect(rect);
+
+	if (bEnabled && Value())
 	{
-		// This can be set outside draw
-		SetHighColor(darken4);
+		// Invert
+		rect.left -= 3;
+		rect.top -= 3;
+		rect.right += 2;
+		rect.bottom += 2;
+		InvertRect(rect);
+	}
 
-		// Dark border
-		StrokeRect(rect);
+	// Label
+	float x = (bounds.right - StringWidth(Label())) / 2.0f;
+	float y = bounds.top + ((bounds.Height() - fh.ascent - fh.descent) / 2.0f) + fh.ascent + 1;	
 
-		BeginLineArray(8);
-
-		// Corners
-		AddLine(rect.LeftBottom(), rect.LeftBottom(), no_tint);
-		AddLine(rect.LeftTop(), rect.LeftTop(), no_tint);
-		AddLine(rect.RightTop(), rect.RightTop(), no_tint);
-		AddLine(rect.RightBottom(), rect.RightBottom(), no_tint);
-
-		rect.InsetBy(1, 1);
-
-		// First bevel
-		AddLine(BPoint(rect.left + 1.0f, rect.bottom),
-			BPoint(rect.right, rect.bottom), darken2);
-		AddLine(BPoint(rect.right, rect.bottom - 1.0f),
-			BPoint(rect.right, rect.top + 1.0f), darken2);
-
-		AddLine(BPoint(rect.left, rect.top),
-			BPoint(rect.left, rect.bottom), lighten1);
-		AddLine(BPoint(rect.left + 1.0f, rect.top),
-			BPoint(rect.right, rect.top), lighten1);
-
-		EndLineArray();
-
-		rect.InsetBy(1, 1);
-
-		// Second bevel
+	if (bEnabled && Value())
+	{
 		SetHighColor(lightenmax);
-		FillRect(rect);
-
-		SetHighColor(no_tint);
-		StrokeLine(BPoint(rect.right, rect.top + 1.0f),
-			BPoint(rect.right, rect.bottom));
-		StrokeLine(BPoint(rect.left + 1.0f, rect.bottom));
-		
-		rect.InsetBy(1, 1);
-
-		// Filling
-		rect.left += 1.0f;
-		rect.top += 1.0f;
-		SetHighColor(lighten1);
-		FillRect(rect);
-
-		if (Value())
-		{
-			// Invert
-			rect.left -= 3;
-			rect.top -= 3;
-			rect.right += 2;
-			rect.bottom += 2;
-			InvertRect(rect);
-		}
-
-		// Label
-		float x = (bounds.right - StringWidth(Label())) / 2.0f;
-		float y = bounds.top + ((bounds.Height() - fh.ascent - fh.descent) / 2.0f) + fh.ascent + 1;
-		
-
-		if (Value())
-		{
-			SetHighColor(lightenmax);
-			SetLowColor(darkenmax);
-		}
-		else
-		{
-			SetHighColor(darkenmax);
-			SetLowColor(lighten2);
-		}
-
-		DrawString(Label(), BPoint(x, y));
-		
-		if (IsFocus() && Window()->IsActive())
-		{
-			// Draw focus line
-			y += fh.descent;
-			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-			StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
-			SetHighColor(255, 255, 255);
-			StrokeLine(BPoint(x, y + 1), BPoint(x + StringWidth(Label()), y + 1));
-			
-		}
+		SetLowColor(darkenmax);
 	}
 	else
 	{
-		// This can be set outside draw
-		SetHighColor(darken2);
-
-		// Dark border
-		StrokeRect(rect);
-
-		BeginLineArray(8);
-
-		// Corners
-		AddLine(rect.LeftBottom(), rect.LeftBottom(), no_tint);
-		AddLine(rect.LeftTop(), rect.LeftTop(), no_tint);
-		AddLine(rect.RightTop(), rect.RightTop(), no_tint);
-		AddLine(rect.RightBottom(), rect.RightBottom(), no_tint);
-
-		rect.InsetBy(1, 1);
-
-		// First bevel
-		AddLine(BPoint(rect.left + 1.0f, rect.bottom),
-			BPoint(rect.right, rect.bottom), no_tint);
-		AddLine(BPoint(rect.right, rect.bottom - 1.0f),
-			BPoint(rect.right, rect.top + 1.0f), no_tint);
-
-		AddLine(BPoint(rect.left, rect.top),
-			BPoint(rect.left, rect.bottom), lighten1);
-		AddLine(BPoint(rect.left + 1.0f, rect.top),
-			BPoint(rect.right, rect.top), lighten1);
-
-		EndLineArray();
-
-		rect.InsetBy(1, 1);
-
-		// Second bevel
-		SetHighColor(lightenmax);
-		FillRect(rect);
-
-		SetHighColor(no_tint);
-		StrokeLine(BPoint(rect.right, rect.top + 1.0f),
-			BPoint(rect.right, rect.bottom));
-		StrokeLine(BPoint(rect.left + 1.0f, rect.bottom));
-		
-		rect.InsetBy(1, 1);
-
-		// Filling
-		rect.left += 1.0f;
-		rect.top += 1.0f;
-		SetHighColor(lighten1);
-		FillRect(rect);
-
-		// Label
-		float x = (bounds.right - StringWidth(Label())) / 2.0f;
-		float y = bounds.bottom - fh.descent - 5.0f;
-
-		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
+		if (bEnabled)
+			SetHighColor(darkenmax);
+		else
+			SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
 		SetLowColor(lighten2);
-		DrawString(Label(), BPoint(x, y));
+	}
+
+	// Draw the label
+	DrawString(Label(), BPoint(x, y));
+	
+	if (bEnabled && IsFocus() && Window()->IsActive())
+	{
+		// Draw focus line
+		y += fh.descent;
+		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+		StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
+		SetHighColor(255, 255, 255);
+		StrokeLine(BPoint(x, y + 1), BPoint(x + StringWidth(Label()), y + 1));
+		
 	}
 }
 
@@ -513,63 +465,48 @@ BButton &BButton::operator=(const BButton &)
 	return *this;
 }
 //------------------------------------------------------------------------------
-BRect BButton::DrawDefault(BRect bounds, bool enabled)
+BRect HButton::DrawDefault(BRect bounds, bool enabled)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
-	darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
-	darken4 = tint_color(no_tint, B_DARKEN_4_TINT);
+	darken1 = tint_color(no_tint, B_DARKEN_1_TINT);
+	
+	rgb_color borderColor;
+	if (enabled)
+		borderColor = tint_color(no_tint, B_DARKEN_4_TINT);
+	else
+		borderColor = darken1;
+
+	// Dark border
+	BeginLineArray(4);
+	AddLine(BPoint(bounds.left, bounds.bottom - 1.0f),
+		BPoint(bounds.left, bounds.top + 1.0f), borderColor);
+	AddLine(BPoint(bounds.left + 1.0f, bounds.top),
+		BPoint(bounds.right - 1.0f, bounds.top), borderColor);
+	AddLine(BPoint(bounds.right, bounds.top + 1.0f),
+		BPoint(bounds.right, bounds.bottom - 1.0f), borderColor);
+	AddLine(BPoint(bounds.left + 1.0f, bounds.bottom),
+		BPoint(bounds.right - 1.0f, bounds.bottom), borderColor);
+	EndLineArray();
 
 	if (enabled)
 	{
-		// Dark border
-		BeginLineArray(4);
-		AddLine(BPoint(bounds.left, bounds.bottom - 1.0f),
-			BPoint(bounds.left, bounds.top + 1.0f), darken4);
-		AddLine(BPoint(bounds.left + 1.0f, bounds.top),
-			BPoint(bounds.right - 1.0f, bounds.top), darken4);
-		AddLine(BPoint(bounds.right, bounds.top + 1.0f),
-			BPoint(bounds.right, bounds.bottom - 1.0f), darken4);
-		AddLine(BPoint(bounds.left + 1.0f, bounds.bottom),
-			BPoint(bounds.right - 1.0f, bounds.bottom), darken4);
-		EndLineArray();
-
-		bounds.InsetBy(1.0f, 1.0f);
-
 		// Bevel
+		bounds.InsetBy(1.0f, 1.0f);
 		SetHighColor(darken1);
 		StrokeRect(bounds);
+	}
 
-		bounds.InsetBy(1.0f, 1.0f);
+	bounds.InsetBy(1.0f, 1.0f);
 
-		// Filling
-		SetHighColor(lighten1);
-		FillRect(bounds);
+	// Filling
+	SetHighColor(lighten1);
+	FillRect(bounds);
 
+	if (enabled)
 		bounds.InsetBy(2.0f, 2.0f);
-	}
 	else
-	{
-		// Dark border
-		BeginLineArray(4);
-		AddLine(BPoint(bounds.left, bounds.bottom - 1.0f),
-			BPoint(bounds.left, bounds.top + 1.0f), darken1);
-		AddLine(BPoint(bounds.left + 1.0f, bounds.top),
-			BPoint(bounds.right - 1.0f, bounds.top), darken1);
-		AddLine(BPoint(bounds.right, bounds.top + 1.0f),
-			BPoint(bounds.right, bounds.bottom - 1.0f), darken1);
-		AddLine(BPoint(bounds.left + 1.0f, bounds.bottom),
-			BPoint(bounds.right - 1.0f, bounds.bottom), darken1);
-		EndLineArray();
-
-		bounds.InsetBy(1.0f, 1.0f);
-
-		// Filling
-		SetHighColor(lighten1);
-		FillRect(bounds);
-
 		bounds.InsetBy(3.0f, 3.0f);
-	}
 
 	return bounds;
 }
