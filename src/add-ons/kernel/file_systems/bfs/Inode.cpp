@@ -1193,21 +1193,25 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 		bytes = size - data->size;
 
 	// do we have enough free blocks on the disk?
-	off_t blocks = (bytes + fVolume->BlockSize() - 1) / fVolume->BlockSize();
-	if (blocks > fVolume->FreeBlocks())
+	off_t blocksRequested = (bytes + fVolume->BlockSize() - 1) >> fVolume->BlockShift();
+	if (blocksRequested > fVolume->FreeBlocks())
 		return B_DEVICE_FULL;
 
+	off_t blocksNeeded = blocksRequested;
+		// because of preallocations and partial allocations, the number of
+		// blocks we need to allocate may be different from the one we request
+		// from the block allocator
+
 	// should we preallocate some blocks (currently, always 64k)?
-	off_t blocksNeeded = blocks;
-	if (blocks < (65536 >> fVolume->BlockShift()) && fVolume->FreeBlocks() > 128)
-		blocks = 65536 >> fVolume->BlockShift();
+	if (blocksRequested < (65536 >> fVolume->BlockShift()) && fVolume->FreeBlocks() > 128)
+		blocksRequested = 65536 >> fVolume->BlockShift();
 
 	while (blocksNeeded > 0) {
 		// the requested blocks do not need to be returned with a
 		// single allocation, so we need to iterate until we have
 		// enough blocks allocated
 		block_run run;
-		status_t status = fVolume->Allocate(transaction, this, blocks, run, minimum);
+		status_t status = fVolume->Allocate(transaction, this, blocksRequested, run, minimum);
 		if (status < B_OK)
 			return status;
 
@@ -1219,10 +1223,10 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 
 		blocksNeeded -= run.length;
 		// don't preallocate if the first allocation was already too small
-		blocks = blocksNeeded;
+		blocksRequested = blocksNeeded;
 		if (minimum > 1) {
 			// make sure that "blocks" is a multiple of minimum
-			blocks = (blocks + minimum - 1) & ~(minimum - 1);
+			blocksRequested = (blocksRequested + minimum - 1) & ~(minimum - 1);
 		}
 
 		// Direct block range
@@ -1321,7 +1325,7 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 					return status;
 
 				blocksNeeded += rest;
-				blocks = (blocksNeeded + NUM_ARRAY_BLOCKS - 1) & ~(NUM_ARRAY_BLOCKS - 1);
+				blocksRequested = (blocksNeeded + NUM_ARRAY_BLOCKS - 1) & ~(NUM_ARRAY_BLOCKS - 1);
 				minimum = NUM_ARRAY_BLOCKS;
 					// we make sure here that we have at minimum NUM_ARRAY_BLOCKS allocated,
 					// so if the allocation succeeds, we don't run into an endless loop
