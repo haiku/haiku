@@ -1117,7 +1117,7 @@ rule assemble
 
 actions assemble
 {
-	$(CC) -c "$(2)" -O2 $(ASFLAGS) $(KERNEL_CCFLAGS) $(ASHDRS) -o "$(1)" ;
+	$(CC) -c "$(2)" -O2 $(ASFLAGS) -D_ASSEMBLER $(KERNEL_CCFLAGS) $(ASHDRS) -o "$(1)" ;
 }
 
 # Overridden to allow spaces in file names.
