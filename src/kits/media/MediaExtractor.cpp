@@ -1,9 +1,7 @@
 #include "MediaExtractor.h"
+#include "PluginManager.h"
 #include <stdio.h>
 #include <string.h>
-
-status_t _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BDataIO *source);
-status_t _CreateDecoder(Decoder **decoder, media_codec_info *mci, const media_format *format);
 
 MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
 {
@@ -61,6 +59,9 @@ MediaExtractor::~MediaExtractor()
 		if (fStreamInfo[i].cookie)
 			fReader->FreeCookie(fStreamInfo[i].cookie);
 	}
+
+	if (fReader)
+		_DestroyReader(fReader);
 
 	delete fStreamInfo;
 	delete fSource;
@@ -168,18 +169,6 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info 
 
 	(*decoder)->Setup(this, stream);	
 	
-	return B_OK;
-}
-
-status_t
-_CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BDataIO *source)
-{
-	return B_OK;
-}
-
-status_t
-_CreateDecoder(Decoder **decoder, media_codec_info *mci, const media_format *format)
-{
 	return B_OK;
 }
 

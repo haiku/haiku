@@ -5,6 +5,7 @@
  ***********************************************************************/
 #include <MediaTrack.h>
 #include "MediaExtractor.h"
+#include "PluginManager.h"
 #include "ReaderPlugin.h"
 #include "debug.h"
 
@@ -15,7 +16,8 @@
 BMediaTrack::~BMediaTrack()
 {
 	CALLED();
-	delete fDecoder;
+	if (fDecoder)
+		_DestroyDecoder(fDecoder);
 }
 
 /*************************************************************
