@@ -1,6 +1,6 @@
-#if !defined __ASSEMBLER__ && !defined _ISOMAC && !defined __OPTIMIZE__
-# error "glibc cannot be compiled without optimization"
-#endif
+//#if !defined __ASSEMBLER__ && !defined _ISOMAC && !defined __OPTIMIZE__
+//# error "glibc cannot be compiled without optimization"
+//#endif
 
 /* Another evil option when it comes to compiling the C library is
    --ffast-math since it alters the ABI.  */
