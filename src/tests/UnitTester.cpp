@@ -2,6 +2,8 @@
 #include <iostream>
 #include <unistd.h>
 
+#include <Path.h>
+
 /* Since some of our obos libraries (such as libtranslation.so) have
    identically named R5 equivalents, it was necessary to have two
    separate unit testing programs, each with their own lib/ subdir,
@@ -36,8 +38,17 @@ int main(int argc, char *argv[]) {
 			}
 			cmd += " " + arg;
 		}
-	}	
+	}
+	// get test dir path
+	BPath path(argv[0]);
+	if (path.InitCheck() == B_OK) {
+		if (path.GetParent(&path) != B_OK)
+			cout << "Couldn't get test dir." << endl;
+	} else
+		cout << "Couldn't find the path to the test app." << endl;
+	// construct the command path
 	cmd = (doR5Tests ? "unittester_r5/UnitTesterHelper_r5" : "unittester/UnitTesterHelper") + cmd;
+	cmd = string(path.Path()) + "/" + cmd;
 	if (beVerbose)
 		cout << "Executing: '" << cmd << "'" << endl;	
 	system(cmd.c_str());
