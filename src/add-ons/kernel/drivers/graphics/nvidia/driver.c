@@ -298,7 +298,7 @@ static struct {
 	{0x0000, NULL}
 };
 
-static settings current_settings = { // see comments in nv.settings 
+static nv_settings current_settings = { // see comments in nv.settings 
 	// for driver
 	DRIVER_PREFIX ".accelerant",
 	false,      // dumprom
