@@ -618,7 +618,7 @@ makeIndices()
 		fs_create_index(device,B_MAIL_ATTR_WHEN,B_INT32_TYPE,0);
 		fs_create_index(device,B_MAIL_ATTR_FLAGS,B_INT32_TYPE,0);
 		fs_create_index(device,"MAIL:chain",B_INT32_TYPE,0);
-		//fs_create_index(device,"MAIL:fullsize",B_UINT32_TYPE,0);
+		fs_create_index(device,"MAIL:pending_chain",B_INT32_TYPE,0);
 	}
 }
 

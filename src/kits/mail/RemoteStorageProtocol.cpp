@@ -12,6 +12,7 @@ class _EXPORT BRemoteMailStorageProtocol;
 
 #include <RemoteStorageProtocol.h>
 #include <ChainRunner.h>
+#include <E-mail.h>
 
 namespace {
 
@@ -325,8 +326,21 @@ void BRemoteMailStorageProtocol::SyncMailbox(const char *mailbox) {
 		
 		if (snoodle.ReadAttr("MAIL:chain",B_INT32_TYPE,0,&chain,sizeof(chain)) < B_OK)
 			append = true;
-		if (chain != runner->Chain()->ID())
-			append = true;
+		if (chain != runner->Chain()->ID()) {
+			int32 pending_chain(-1), flags(0);
+			snoodle.ReadAttr("MAIL:pending_chain",B_INT32_TYPE,0,&chain,sizeof(chain));
+			snoodle.ReadAttr("MAIL:flags",B_INT32_TYPE,0,&flags,sizeof(flags));
+		
+			if ((pending_chain == runner->Chain()->ID()) && (BMailChain(chain).ChainDirection() == outbound) && (flags & B_MAIL_PENDING))
+				continue; //--- Ignore this message, recode the chain attribute at the next SyncMailbox()
+				
+			if (pending_chain == runner->Chain()->ID()) {
+				chain = runner->Chain()->ID();
+				snoodle.WriteAttr("MAIL:chain",B_INT32_TYPE,0,&chain,sizeof(chain));
+				append = false;
+			} else
+				append = true;
+		}
 		if (snoodle.ReadAttrString("MAIL:unique_id",&string) < B_OK)
 			append = true;
 
@@ -351,7 +365,14 @@ void BRemoteMailStorageProtocol::SyncMailbox(const char *mailbox) {
 		/*snoodle.RemoveAttr("MAIL:unique_id");
 		snoodle.RemoveAttr("MAIL:chain");*/
 		chain = runner->Chain()->ID();
-		snoodle.WriteAttr("MAIL:chain",B_INT32_TYPE,0,&chain,sizeof(chain));
+	
+		int32 flags = 0;
+		snoodle.ReadAttr("MAIL:flags",B_INT32_TYPE,0,&flags,sizeof(flags));
+		
+		if (flags & B_MAIL_PENDING)
+			snoodle.WriteAttr("MAIL:pending_chain",B_INT32_TYPE,0,&chain,sizeof(chain));
+		else
+			snoodle.WriteAttr("MAIL:chain",B_INT32_TYPE,0,&chain,sizeof(chain));
 		snoodle.WriteAttrString("MAIL:unique_id",&string);
 		(*manifest) += string.String();
 		(*unique_ids) += string.String();

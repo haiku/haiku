@@ -193,6 +193,10 @@ BMailProtocol::BMailProtocol(BMessage *settings, BMailChainRunner *run)
 		fido.PushAttr("MAIL:chain");
 		fido.PushInt32(settings->FindInt32("chain"));
 		fido.PushOp(B_EQ);
+		fido.PushAttr("MAIL:pending_chain");
+		fido.PushInt32(settings->FindInt32("chain"));
+		fido.PushOp(B_EQ);
+		fido.PushOp(B_OR);
 		if (!settings->FindBool("delete_remote_when_local")) {
 			fido.PushAttr("BEOS:type");
 			fido.PushString("text/x-partial-email");
@@ -307,6 +311,10 @@ void BMailProtocol::CheckForDeletedMessages() {
 				fido.PushAttr("MAIL:chain");
 				fido.PushInt32(settings->FindInt32("chain"));
 				fido.PushOp(B_EQ);
+				fido.PushAttr("MAIL:pending_chain");
+				fido.PushInt32(settings->FindInt32("chain"));
+				fido.PushOp(B_EQ);
+				fido.PushOp(B_OR);
 				fido.Fetch();
 		
 				BString uid;
