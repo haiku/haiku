@@ -5,6 +5,10 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+#if DEBUG
+#include <cstdio>
+#endif
+
 #include "Protocol.h"
 #include "IPCP.h"
 #include <KPPPConfigurePacket.h>
@@ -17,6 +21,40 @@
 #include <netinet/in_var.h>
 #include <core_funcs.h>
 #include <sys/sockio.h>
+
+
+#if DEBUG
+#include <unistd.h>
+
+static int sFD;
+	// the file descriptor for debug output
+static char sDigits[] = "0123456789ABCDEF";
+void
+dump_packet(struct mbuf *packet, const char *direction)
+{
+	if(!packet)
+		return;
+	
+	uint8 *data = mtod(packet, uint8*);
+	uint8 buffer[128];
+	uint8 bufferIndex = 0;
+	
+	sprintf((char*) buffer, "Dumping %s packet;len=%ld;pkthdr.len=%d\n", direction,
+		packet->m_len, packet->m_flags & M_PKTHDR ? packet->m_pkthdr.len : -1);
+	write(sFD, buffer, strlen((char*) buffer));
+	
+	for(uint32 index = 0; index < packet->m_len; index++) {
+		buffer[bufferIndex++] = sDigits[data[index] >> 4];
+		buffer[bufferIndex++] = sDigits[data[index] & 0x0F];
+		if(bufferIndex == 32 || index == packet->m_len - 1) {
+			buffer[bufferIndex++] = '\n';
+			buffer[bufferIndex] = 0;
+			write(sFD, buffer, strlen((char*) buffer));
+			bufferIndex = 0;
+		}
+	}
+}
+#endif
 
 
 static const bigtime_t kIPCPStateMachineTimeout = 3000000;
@@ -39,11 +77,18 @@ IPCP::IPCP(KPPPInterface& interface, driver_parameter *settings)
 	fNextTimeout(0)
 {
 	ProfileChanged();
+	
+#if DEBUG
+	sFD = open("/boot/home/ipcpdebug", O_WRONLY | O_CREAT | O_TRUNC);
+#endif
 }
 
 
 IPCP::~IPCP()
 {
+#if DEBUG
+	close(sFD);
+#endif
 }
 
 
@@ -193,8 +238,13 @@ IPCP::Send(struct mbuf *packet, uint16 protocolNumber = IPCP_PROTOCOL)
 #endif
 	
 	if((protocolNumber == IP_PROTOCOL && State() == PPP_OPENED_STATE)
-			|| protocolNumber == IPCP_PROTOCOL)
+			|| protocolNumber == IPCP_PROTOCOL) {
+#if DEBUG
+		dump_packet(packet, "outgoing");
+#endif
+		Interface().UpdateIdleSince();
 		return SendToNext(packet, protocolNumber);
+	}
 	
 	dprintf("IPCP: Send() failed because of wrong state or protocol number!\n");
 	
@@ -278,6 +328,10 @@ IPCP::ReceiveIPPacket(struct mbuf *packet, uint16 protocolNumber)
 	// TODO: add VJC support (the packet would be decoded here)
 	
 	if (gProto[IPPROTO_IP] && gProto[IPPROTO_IP]->pr_input) {
+#if DEBUG
+		dump_packet(packet, "incoming");
+#endif
+		Interface().UpdateIdleSince();
 		gProto[IPPROTO_IP]->pr_input(packet, 0);
 		return B_OK;
 	} else {
