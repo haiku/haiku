@@ -2056,6 +2056,7 @@ AppFileInfoTest::IconTest()
 		BBitmap icon(BRect(0, 0, 15, 15), B_RGB32);
 		CHK(appFileInfo.GetIcon(&icon, B_MINI_ICON) == B_OK);
 		BBitmap icon2(BRect(0, 0, 15, 15), B_RGB32);
+		// SetBits() can be used, since there's no row padding for 16x16.
 		icon2.SetBits(fIconM2->Bits(), fIconM2->BitsLength(), 0, B_CMAP8);
 		CHK(icon_equal(&icon, &icon2));
 		// large
@@ -2064,6 +2065,7 @@ AppFileInfoTest::IconTest()
 		BBitmap icon3(BRect(0, 0, 31, 31), B_RGB32);
 		CHK(appFileInfo.GetIcon(&icon3, B_LARGE_ICON) == B_OK);
 		BBitmap icon4(BRect(0, 0, 31, 31), B_RGB32);
+		// SetBits() can be used, since there's no row padding for 32x32.
 		icon4.SetBits(fIconL2->Bits(), fIconL2->BitsLength(), 0, B_CMAP8);
 		CHK(icon_equal(&icon3, &icon4));
 #endif
@@ -2418,6 +2420,7 @@ AppFileInfoTest::IconForTypeTest()
 		BBitmap icon(BRect(0, 0, 15, 15), B_RGB32);
 		CHK(appFileInfo.GetIconForType(testType1, &icon, B_MINI_ICON) == B_OK);
 		BBitmap icon2(BRect(0, 0, 15, 15), B_RGB32);
+		// SetBits() can be used, since there's no row padding for 16x16.
 		icon2.SetBits(fIconM2->Bits(), fIconM2->BitsLength(), 0, B_CMAP8);
 		CHK(icon_equal(&icon, &icon2));
 		// large
@@ -2427,6 +2430,7 @@ AppFileInfoTest::IconForTypeTest()
 		CHK(appFileInfo.GetIconForType(testType1, &icon3, B_LARGE_ICON)
 			== B_OK);
 		BBitmap icon4(BRect(0, 0, 31, 31), B_RGB32);
+		// SetBits() can be used, since there's no row padding for 32x32.
 		icon4.SetBits(fIconL2->Bits(), fIconL2->BitsLength(), 0, B_CMAP8);
 		CHK(icon_equal(&icon3, &icon4));
 #endif
