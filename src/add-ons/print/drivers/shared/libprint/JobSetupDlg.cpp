@@ -11,6 +11,7 @@
 #include <fcntl.h>  
 #include <unistd.h>
 #include <sys/stat.h>
+#include <math.h>
 
 #include <Alert.h>
 #include <Bitmap.h>
@@ -27,9 +28,11 @@
 #include <PrintJob.h>
 #include <RadioButton.h>
 #include <Rect.h>
+#include <Slider.h>
 #include <TextControl.h>
 #include <View.h>
 
+#include "HalftoneView.h"
 #include "JobSetupDlg.h"
 #include "JobData.h"
 #include "PrinterData.h"
@@ -44,23 +47,36 @@ using namespace std;
 
 //#define	PRINT_COPIES		100
 
-#define	PRINT_WIDTH			355
-#define PRINT_HEIGHT		210
-
 #define QUALITY_H			10
 #define QUALITY_V			10
 #define QUALITY_WIDTH		180
-#define QUALITY_HEIGHT		70
 
 	#define BPP_H			10
 	#define BPP_V			15
-	#define BPP_WIDTH		140
+	#define BPP_WIDTH		120
 	#define BPP_HEIGHT		16
 
+	#define DITHER_H        BPP_H
+	#define DITHER_V        BPP_V + BPP_HEIGHT + 10
+	#define DITHER_WIDTH    BPP_WIDTH
+	#define DITHER_HEIGHT   BPP_HEIGHT
+
 	#define GAMMA_H			BPP_H
-	#define GAMMA_V			BPP_V + BPP_HEIGHT + 10
-	#define GAMMA_WIDTH		120
-	#define GAMMA_HEIGHT	BPP_HEIGHT
+	#define GAMMA_V			DITHER_V + DITHER_HEIGHT + 10
+	#define GAMMA_WIDTH		QUALITY_WIDTH - 20
+	#define GAMMA_HEIGHT	55 // BPP_HEIGHT
+	
+	#define INK_DENSITY_H           BPP_H
+	#define INK_DENSITY_V           GAMMA_V + GAMMA_HEIGHT + 5
+	#define INK_DENSITY_WIDTH       GAMMA_WIDTH
+	#define INK_DENSITY_HEIGHT      55 // BPP_HEIGHT
+	
+	#define HALFTONE_H      INK_DENSITY_H
+	#define HALFTONE_V      INK_DENSITY_V + INK_DENSITY_HEIGHT + 5
+	#define HALFTONE_WIDTH  160
+	#define HALFTONE_HEIGHT 4*11 
+	
+#define QUALITY_HEIGHT		HALFTONE_V + HALFTONE_HEIGHT + 5
 
 #define PAGERABGE_H			QUALITY_H
 #define PAGERABGE_V			QUALITY_V + QUALITY_HEIGHT + 5
@@ -86,6 +102,9 @@ using namespace std;
 	#define TO_V				FROM_V
 	#define TO_WIDTH			59
 	#define TO_HEIGHT			FROM_HEIGHT
+
+#define	PRINT_WIDTH			355
+#define PRINT_HEIGHT		QUALITY_HEIGHT + PAGERABGE_HEIGHT + 20 // 210
 
 #define PAPERFEED_H			QUALITY_H + QUALITY_WIDTH + 10
 #define PAPERFEED_V			QUALITY_V + 5
@@ -140,6 +159,24 @@ const BRect bpp_rect(
 	BPP_V,
 	BPP_H + BPP_WIDTH,
 	BPP_V + BPP_HEIGHT);
+
+const BRect dither_rect(
+	DITHER_H,
+	DITHER_V,
+	DITHER_H + DITHER_WIDTH,
+	DITHER_V + DITHER_HEIGHT);
+
+const BRect ink_density_rect(
+	INK_DENSITY_H,
+	INK_DENSITY_V,
+	INK_DENSITY_H + INK_DENSITY_WIDTH,
+	INK_DENSITY_V + INK_DENSITY_HEIGHT);
+
+const BRect halftone_rect(
+	HALFTONE_H,
+	HALFTONE_V,
+	HALFTONE_H + HALFTONE_WIDTH,
+	HALFTONE_V + HALFTONE_HEIGHT);
 
 const BRect gamma_rect(
 	GAMMA_H,
@@ -235,6 +272,11 @@ struct NupCap : public BaseCap {
 	NupCap(const string &s, bool d, int n) : BaseCap(s, d), nup(n) {}
 };
 
+struct DitherCap : public BaseCap {
+	Halftone::DitherType dither_type;
+	DitherCap(const string &s, bool d, Halftone::DitherType type) : BaseCap(s, d), dither_type(type) {}
+};
+
 static const SurfaceCap gRGB32("RGB32", false, B_RGB32);
 static const SurfaceCap gCMAP8("CMAP8", true,  B_CMAP8);
 static const SurfaceCap gGray8("GRAY8", false, B_GRAY8);
@@ -249,6 +291,11 @@ static const NupCap gNup16("16-up", false, 16);
 static const NupCap gNup25("25-up", false, 25);
 static const NupCap gNup32("32-up", false, 32);
 static const NupCap gNup36("36-up", false, 36);
+
+static const DitherCap gDitherType1("Type 1", false, Halftone::kType1);
+static const DitherCap gDitherType2("Type 2", false, Halftone::kType2);
+static const DitherCap gDitherType3("Type 3", false, Halftone::kType3);
+static const DitherCap gDitherFloydSteinberg("Floyd Steinberg", false, Halftone::kTypeFloydSteinberg);
 
 const SurfaceCap *gSurfaces[] = {
 	&gRGB32,
@@ -269,11 +316,19 @@ const NupCap *gNups[] = {
 	&gNup36
 };
 
+const DitherCap *gDitherTypes[] = {
+	&gDitherType1,
+	&gDitherType2,
+	&gDitherType3,
+	&gDitherFloydSteinberg
+};
+
 enum {
 	kMsgRangeAll = 'JSdl',
 	kMsgRangeSelection,
 	kMsgCancel,
-	kMsgOK
+	kMsgOK,
+	kMsgQuality,
 };
 
 JobSetupView::JobSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
@@ -331,7 +386,7 @@ void JobSetupView::AttachedToWindow()
 	count = fPrinterCap->countCap(PrinterCap::kColor);
 	const ColorCap **color_cap = (const ColorCap **)fPrinterCap->enumCap(PrinterCap::kColor);
 	while (count--) {
-		item = new BMenuItem((*color_cap)->label.c_str(), NULL);
+		item = new BMenuItem((*color_cap)->label.c_str(), new BMessage(kMsgQuality));
 		fColorType->AddItem(item);
 		if ((*color_cap)->color == fJobData->getColor()) {
 			item->SetMarked(true);
@@ -346,13 +401,62 @@ void JobSetupView::AttachedToWindow()
 	box->AddChild(menufield);
 	width = StringWidth("Color") + 10;
 	menufield->SetDivider(width);
+	fColorType->SetTargetForItems(this);
 	
-	fGamma = new BTextControl(gamma_rect, "", "Gamma", "", NULL);
+	/* dither type */
+	marked = false;
+	fDitherType = new BPopUpMenu("");
+	fDitherType->SetRadioMode(true);
+
+	count = sizeof(gDitherTypes) / sizeof(gDitherTypes[0]);
+	const DitherCap **dither_cap = gDitherTypes;
+	while (count--) {
+		item = new BMenuItem((*dither_cap)->label.c_str(), new BMessage(kMsgQuality));
+		fDitherType->AddItem(item);
+		if ((*dither_cap)->dither_type == fJobData->getDitherType()) {
+			item->SetMarked(true);
+			marked = true;
+		}
+		dither_cap++;
+	}
+	if (!marked && item)
+		item->SetMarked(true);
+	menufield = new BMenuField(dither_rect, "", "Dithering", fDitherType);
+
+	box->AddChild(menufield);
+	width = StringWidth("Dithering") + 10;
+	menufield->SetDivider(width);
+	fDitherType->SetTargetForItems(this);
+	
+	/* halftone preview view */
+	BRect rect(halftone_rect);
+	BBox* halftoneBorder = new BBox(rect.InsetByCopy(-1, -1));
+	box->AddChild(halftoneBorder);
+	halftoneBorder->SetBorder(B_PLAIN_BORDER);
+	
+	fHalftone = new HalftoneView(rect.OffsetToCopy(1, 1), "halftone", B_FOLLOW_ALL, B_WILL_DRAW); 
+	halftoneBorder->AddChild(fHalftone);
+	fHalftone->preview(fJobData->getGamma(), fJobData->getInkDensity(), fJobData->getDitherType(), fJobData->getColor() == JobData::kColor);
+	
+	/* gamma */
+	fGamma = new BSlider(gamma_rect, "", "Gamma", new BMessage(kMsgQuality), -300, 300);
+	fGamma->SetLimitLabels("Brighter", "Darker");
+	fGamma->SetValue(100 * log(fJobData->getGamma()) / log(2.0));
+	fGamma->SetHashMarks(B_HASH_MARKS_BOTH);
+	fGamma->SetHashMarkCount(7);
 	box->AddChild(fGamma);
-	fGamma->SetDivider(width);
-	ostringstream oss3;
-	oss3 << fJobData->getGamma();
-	fGamma->SetText(oss3.str().c_str());
+	fGamma->SetModificationMessage(new BMessage(kMsgQuality));
+	fGamma->SetTarget(this);
+
+	/* ink density */
+	fInkDensity = new BSlider(ink_density_rect, "", "Ink Density", new BMessage(kMsgQuality), 0, 127);
+	fInkDensity->SetLimitLabels("Max", "Min");
+	fInkDensity->SetValue((int32)fJobData->getInkDensity());
+	fInkDensity->SetHashMarks(B_HASH_MARKS_TOP);
+	fInkDensity->SetHashMarkCount(10);
+	box->AddChild(fInkDensity);
+	fInkDensity->SetModificationMessage(new BMessage(kMsgQuality));
+	fInkDensity->SetTarget(this);
 
 	/* page range */
 
@@ -511,7 +615,52 @@ void JobSetupView::MessageReceived(BMessage *msg)
 		to_page->SetEnabled(true);
 		Window()->Unlock();
 		break;
+
+	case kMsgQuality:
+		fHalftone->preview(getGamma(), getInkDensity(), getDitherType(), getColor() == JobData::kColor); 
+		break;
+
 	}
+}
+
+JobData::Color JobSetupView::getColor()
+{
+	int count = fPrinterCap->countCap(PrinterCap::kColor);
+	const ColorCap **color_cap = (const ColorCap**)fPrinterCap->enumCap(PrinterCap::kColor);
+	const char *color_label = fColorType->FindMarked()->Label();
+	while (count--) {
+		if (!strcmp((*color_cap)->label.c_str(), color_label)) {
+			return (*color_cap)->color;
+		}
+		color_cap++;
+	}
+	return JobData::kMonochrome;
+}
+
+Halftone::DitherType JobSetupView::getDitherType()
+{
+	int count = sizeof(gDitherTypes) / sizeof(gDitherTypes[0]);
+	const DitherCap **dither_cap = gDitherTypes;
+	const char *dithering_label = fDitherType->FindMarked()->Label();
+	while (count --) {
+		if (strcmp((*dither_cap)->label.c_str(), dithering_label) == 0) {
+			return (*dither_cap)->dither_type;
+		}
+		dither_cap ++;
+	}
+	return Halftone::kTypeFloydSteinberg;
+}
+
+float JobSetupView::getGamma()
+{
+	const float value = (float)fGamma->Value();
+	return pow(2.0, value / 100.0);
+}
+
+float JobSetupView::getInkDensity()
+{
+	const float value = (float)fInkDensity->Value();
+	return value;
 }
 
 bool JobSetupView::UpdateJobData()
@@ -530,18 +679,10 @@ bool JobSetupView::UpdateJobData()
 		surface_cap++;
 	}
 */
-	count = fPrinterCap->countCap(PrinterCap::kColor);
-	const ColorCap **color_cap = (const ColorCap**)fPrinterCap->enumCap(PrinterCap::kColor);
-	const char *color_label = fColorType->FindMarked()->Label();
-	while (count--) {
-		if (!strcmp((*color_cap)->label.c_str(), color_label)) {
-			fJobData->setColor((*color_cap)->color);
-			break;
-		}
-		color_cap++;
-	}	
-	
-	fJobData->setGamma(atof(fGamma->Text()));
+	fJobData->setColor(getColor());	
+	fJobData->setGamma(getGamma());
+	fJobData->setInkDensity(getInkDensity());
+	fJobData->setDitherType(getDitherType());
 
 	int first_page;
 	int last_page;
@@ -632,7 +773,7 @@ filter_result PrintKeyFilter(BMessage *msg, BHandler **target, BMessageFilter *f
 JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
 	: BWindow(BRect(100, 100, 100 + PRINT_WIDTH, 100 + PRINT_HEIGHT),
 		"PrintJob Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
+		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	fResult = 0;
 /*
@@ -680,7 +821,7 @@ void JobSetupDlg::MessageReceived(BMessage *msg)
 		fResult = B_ERROR;
 		release_sem(fSemaphore);
 		break;
-
+	
 	default:
 		BWindow::MessageReceived(msg);
 		break;

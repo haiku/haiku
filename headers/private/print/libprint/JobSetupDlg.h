@@ -9,13 +9,18 @@
 #include <View.h>
 #include <Window.h>
 
+#include "JobData.h"
+#include "Halftone.h"
+
 class BTextControl;
 class BRadioButton;
 class BCheckBox;
 class BPopUpMenu;
+class BSlider;
 class JobData;
 class PrinterData;
 class PrinterCap;
+class HalftoneView;
 
 class JobSetupView : public BView {
 public:
@@ -30,14 +35,22 @@ public:
 	BTextControl *to_page;
 
 private:
+	JobData::Color getColor();
+	Halftone::DitherType getDitherType();
+	float getGamma();
+	float getInkDensity();
+
 	JobData          *fJobData;
 	PrinterData      *fPrinterData;
 	const PrinterCap *fPrinterCap;
-	BTextControl     *fGamma;
+	BPopUpMenu       *fColorType;
+	BPopUpMenu       *fDitherType;
+	BSlider          *fGamma;
+	BSlider          *fInkDensity;
+	HalftoneView     *fHalftone;
 	BRadioButton     *fAll;
 	BCheckBox        *fCollate;
 	BCheckBox        *fReverse;
-	BPopUpMenu       *fColorType;
 	BPopUpMenu       *fPaperFeed;
 	BCheckBox        *fDuplex;
 	BPopUpMenu       *fNup;
