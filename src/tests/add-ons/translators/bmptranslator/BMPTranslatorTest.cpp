@@ -9,11 +9,15 @@
 #include <image.h>
 #include <Translator.h>
 #include <TranslatorFormats.h>
+#include <TranslatorRoster.h>
 #include <Message.h>
 #include <View.h>
 #include <Rect.h>
 #include <File.h>
 #include <DataIO.h>
+#include <Errors.h>
+#include <OS.h>
+#include "TranslatorTestAddOn.h"
 #include "../../../../add-ons/translators/bmptranslator/BMPTranslator.h"
 
 // Suite
@@ -22,23 +26,19 @@ BMPTranslatorTest::Suite()
 {
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
 	typedef CppUnit::TestCaller<BMPTranslatorTest> TC;
-		
+			
 	suite->addTest(
-		new TC("BMPTranslator DummyTest",
-			&BMPTranslatorTest::DummyTest));
+		new TC("BMPTranslator IdentifyTest",
+			&BMPTranslatorTest::IdentifyTest));
+
+	suite->addTest(
+		new TC("BMPTranslator TranslateTest",
+			&BMPTranslatorTest::TranslateTest));	
+
 #if !TEST_R5
 	suite->addTest(
-		new TC("BMPTranslator BTranslatorBasicTest",
-			&BMPTranslatorTest::BTranslatorBasicTest));
-	suite->addTest(
-		new TC("BMPTranslator BTranslatorIdentifyErrorTest",
-			&BMPTranslatorTest::BTranslatorIdentifyErrorTest));
-	suite->addTest(
-		new TC("BMPTranslator BTranslatorIdentifyTest",
-			&BMPTranslatorTest::BTranslatorIdentifyTest));
-	suite->addTest(
-		new TC("BMPTranslator BTranslatorTranslateTest",
-			&BMPTranslatorTest::BTranslatorTranslateTest));
+		new TC("BMPTranslator LoadAddOnTest",
+			&BMPTranslatorTest::LoadAddOnTest));
 #endif
 		
 	return suite;
@@ -58,200 +58,112 @@ BMPTranslatorTest::tearDown()
 	BTestCase::tearDown();
 }
 
-// BTranslatorTest
-#if !TEST_R5
 void
-BMPTranslatorTest::BTranslatorBasicTest()
+CheckBits_Bmp(translator_info *pti)
 {
-	// . Make sure the add_on loads
-	NextSubTest();
-	const char *path = "/boot/home/config/add-ons/Translators/BMPTranslator";
-	image_id image = load_add_on(path);
-	CPPUNIT_ASSERT(image >= 0);
-	
-	// . Load in function to make the object
-	NextSubTest();
-	BTranslator *(*pMakeNthTranslator)(int32 n,image_id you,uint32 flags,...);
-	status_t err = get_image_symbol(image, "make_nth_translator",
-		B_SYMBOL_TYPE_TEXT, (void **)&pMakeNthTranslator);
-	CPPUNIT_ASSERT(!err);
-
-	// . Make sure the function returns a pointer to a BTranslator
-	NextSubTest();
-	BTranslator *ptran = pMakeNthTranslator(0, image, 0);
-	CPPUNIT_ASSERT(ptran);
-	
-	// . Make sure the function only returns one BTranslator
-	NextSubTest();
-	CPPUNIT_ASSERT(!pMakeNthTranslator(1, image, 0));
-	
-	// . The translator should only have one reference
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 1);
-	
-	// . Make sure Acquire returns a BTranslator even though its
-	// already been Acquired once
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->Acquire() == ptran);
-	
-	// . Acquired twice, refcount should be 2
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 2);
-	
-	// . Release should return ptran because it is still acquired
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->Release() == ptran);
-	
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 1);
-	
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->Acquire() == ptran);
-	
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 2);
-	
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->Release() == ptran);
-	
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 1);
-	
-	// . A name would be nice
-	NextSubTest();
-	const char *tranname = ptran->TranslatorName();
-	CPPUNIT_ASSERT(tranname);
-	printf(" {%s} ", tranname);
-	
-	// . More info would be nice
-	NextSubTest();
-	const char *traninfo = ptran->TranslatorInfo();
-	CPPUNIT_ASSERT(traninfo);
-	printf(" {%s} ", traninfo);
-	
-	// . What version are you?
-	// (when ver == 100, that means that version is 1.00)
-	NextSubTest();
-	int32 ver = ptran->TranslatorVersion();
-	CPPUNIT_ASSERT((ver / 100) > 0);
-	printf(" {%d} ", (int) ver);
-	
-	// . Input formats?
-	NextSubTest();
-	{
-		int32 incount = 0;
-		const translation_format *pins = ptran->InputFormats(&incount);
-		CPPUNIT_ASSERT(incount == 2);
-		CPPUNIT_ASSERT(pins);
-		// . must support BMP and bits formats
-		for (int32 i = 0; i < incount; i++) {
-			CPPUNIT_ASSERT(pins[i].group == B_TRANSLATOR_BITMAP);
-			CPPUNIT_ASSERT(pins[i].quality > 0 && pins[i].quality <= 1);
-			CPPUNIT_ASSERT(pins[i].capability > 0 && pins[i].capability <= 1);
-			CPPUNIT_ASSERT(pins[i].MIME);
-			CPPUNIT_ASSERT(pins[i].name);
-
-			if (pins[i].type == B_TRANSLATOR_BITMAP) {
-				CPPUNIT_ASSERT(strcmp(pins[i].MIME, BITS_MIME_STRING) == 0);
-				CPPUNIT_ASSERT(strcmp(pins[i].name,
-					"Be Bitmap Format (BMPTranslator)") == 0);
-			} else if (pins[i].type == B_BMP_FORMAT) {
-				CPPUNIT_ASSERT(strcmp(pins[i].MIME, BMP_MIME_STRING) == 0);
-				CPPUNIT_ASSERT(strcmp(pins[i].name, "BMP image") == 0);
-			} else
-				CPPUNIT_ASSERT(false);
-		}
-	}
-	
-	// . Output formats?
-	NextSubTest();
-	{
-		int32 outcount = 0;
-		const translation_format *pouts = ptran->OutputFormats(&outcount);
-		CPPUNIT_ASSERT(outcount == 2);
-		CPPUNIT_ASSERT(pouts);
-		// . must support BMP and bits formats
-		for (int32 i = 0; i < outcount; i++) {
-			CPPUNIT_ASSERT(pouts[i].group == B_TRANSLATOR_BITMAP);
-			CPPUNIT_ASSERT(pouts[i].quality > 0 && pouts[i].quality <= 1);
-			CPPUNIT_ASSERT(pouts[i].capability > 0 && pouts[i].capability <= 1);
-			CPPUNIT_ASSERT(pouts[i].MIME);
-			CPPUNIT_ASSERT(pouts[i].name);
-	
-			if (pouts[i].type == B_TRANSLATOR_BITMAP) {
-				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, BITS_MIME_STRING) == 0);
-				CPPUNIT_ASSERT(strcmp(pouts[i].name,
-					"Be Bitmap Format (BMPTranslator)") == 0);
-			} else if (pouts[i].type == B_BMP_FORMAT) {
-				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, BMP_MIME_STRING) == 0);
-				CPPUNIT_ASSERT(strcmp(pouts[i].name, "BMP image (MS format)") == 0);
-			} else
-				CPPUNIT_ASSERT(false);
-		}
-	}
-	
-	// . MakeConfigurationView
-	// Needs a BApplication object to work
-	/*
-	NextSubTest();
-	{
-		BMessage *pmsg = NULL;
-		BView *pview = NULL;
-		BRect dummy;
-		status_t result = ptran->MakeConfigurationView(pmsg, &pview, &dummy);
-		CPPUNIT_ASSERT(result == B_OK);
-		printf(" monkey ");
-		CPPUNIT_ASSERT(pview);
-		printf(" bear ");
-	}
-	*/
-	
-	// . Release should return NULL because Release has been called
-	// as many times as it has been acquired
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->Release() == NULL);
-	
-	// . Unload Add-on
-	NextSubTest();
-	CPPUNIT_ASSERT(unload_add_on(image) == B_OK); 
+	CheckTranslatorInfo(pti, B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP,
+		0.6f, 0.8f, "Be Bitmap Format (BMPTranslator)",
+		"image/x-be-bitmap");
 }
 
 void
-BMPTranslatorTest::BTranslatorIdentifyErrorTest()
+CheckBmp(translator_info *pti, const char *imageType)
 {
-	// . Make sure the add_on loads
-	NextSubTest();
-	const char *path = "/boot/home/config/add-ons/Translators/BMPTranslator";
-	image_id image = load_add_on(path);
-	CPPUNIT_ASSERT(image >= 0);
-	
-	// . Load in function to make the object
-	NextSubTest();
-	BTranslator *(*pMakeNthTranslator)(int32 n,image_id you,uint32 flags,...);
-	status_t err = get_image_symbol(image, "make_nth_translator",
-		B_SYMBOL_TYPE_TEXT, (void **)&pMakeNthTranslator);
-	CPPUNIT_ASSERT(!err);
+	CheckTranslatorInfo(pti, B_BMP_FORMAT, B_TRANSLATOR_BITMAP,
+		1.0f, 0.8f, imageType, "image/x-bmp");
+}
 
-	// . Make sure the function returns a pointer to a BTranslator
-	NextSubTest();
-	BTranslator *ptran = pMakeNthTranslator(0, image, 0);
-	CPPUNIT_ASSERT(ptran);
+// coveniently group path of image with
+// the expected Identify() string for that image
+struct IdentifyInfo {
+	const char *imagePath;
+	const char *identifyString;
+};
+
+void
+IdentifyTests(BMPTranslatorTest *ptest, BTranslatorRoster *proster,
+	const IdentifyInfo *pinfo, int32 len, bool bbits)
+{
+	translator_info ti;
+	printf(" [%d] ", (int) bbits);
 	
-	// . Make sure the function only returns one BTranslator
+	for (int32 i = 0; i < len; i++) {
+		ptest->NextSubTest();
+		BFile file;
+		printf(" [%s] ", pinfo[i].imagePath);
+		CPPUNIT_ASSERT(file.SetTo(pinfo[i].imagePath, B_READ_ONLY) == B_OK);
+
+		// Identify (output: B_TRANSLATOR_ANY_TYPE)
+		ptest->NextSubTest();
+		memset(&ti, 0, sizeof(translator_info));
+		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti) == B_OK);
+		if (bbits)
+			CheckBits_Bmp(&ti);
+		else
+			CheckBmp(&ti, pinfo[i].identifyString);
+	
+		// Identify (output: B_TRANSLATOR_BITMAP)
+		ptest->NextSubTest();
+		memset(&ti, 0, sizeof(translator_info));
+		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti, 0, NULL,
+			B_TRANSLATOR_BITMAP) == B_OK);
+		if (bbits)
+			CheckBits_Bmp(&ti);
+		else
+			CheckBmp(&ti, pinfo[i].identifyString);
+	
+		// Identify (output: B_BMP_FORMAT)
+		ptest->NextSubTest();
+		memset(&ti, 0, sizeof(translator_info));
+		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti, 0, NULL,
+			B_BMP_FORMAT) == B_OK);
+		if (bbits)
+			CheckBits_Bmp(&ti);
+		else
+			CheckBmp(&ti, pinfo[i].identifyString);
+	}
+}
+
+void
+BMPTranslatorTest::IdentifyTest()
+{
+	// Init
 	NextSubTest();
-	CPPUNIT_ASSERT(!pMakeNthTranslator(1, image, 0));
+	status_t result = B_ERROR;
+	BTranslatorRoster *proster = new BTranslatorRoster();
+	CPPUNIT_ASSERT(proster);
+	CPPUNIT_ASSERT(proster->AddTranslators(
+		"/boot/home/config/add-ons/Translators/BMPTranslator") == B_OK);
+	BFile wronginput("../src/tests/kits/translation/data/images/image.jpg",
+		B_READ_ONLY);
+	CPPUNIT_ASSERT(wronginput.InitCheck() == B_OK);
+		
+	// Identify (bad input, output types)
+	NextSubTest();
+	translator_info ti;
+	memset(&ti, 0, sizeof(translator_info));
+	result = proster->Identify(&wronginput, NULL, &ti, 0,
+		NULL, B_TRANSLATOR_TEXT);
+	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
+	
+	// Identify (wrong type of input data)
+	NextSubTest();
+	memset(&ti, 0, sizeof(translator_info));
+	result = proster->Identify(&wronginput, NULL, &ti);
+	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
 	
 	// empty
 	NextSubTest();
-	translator_info outinfo;
 	BMallocIO mallempty;
-	CPPUNIT_ASSERT(ptran->Identify(&mallempty, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallempty, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	// weird, non-image data
 	NextSubTest();
 	const char *strmonkey = "monkey monkey monkey";
 	BMemoryIO memmonkey(strmonkey, strlen(strmonkey));
-	CPPUNIT_ASSERT(ptran->Identify(&memmonkey, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&memmonkey, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	// abreviated BMPFileHeader
 	NextSubTest();
@@ -261,7 +173,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	BMallocIO mallabrev;
 	CPPUNIT_ASSERT(mallabrev.Write(&fheader.magic, 2) == 2);
 	CPPUNIT_ASSERT(mallabrev.Write(&fheader.fileSize, 4) == 4);
-	CPPUNIT_ASSERT(ptran->Identify(&mallabrev, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallabrev, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	// Write out the MS and OS/2 headers with various fields being corrupt, only one 
 	// corrupt field at a time, also do abrev test for MS header and OS/2 header
@@ -288,7 +200,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallbadfs.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallbadfs.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallbadfs.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(ptran->Identify(&mallbadfs, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallbadfs, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -312,7 +224,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallbadr.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallbadr.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallbadr.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(ptran->Identify(&mallbadr, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallbadr, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -336,7 +248,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallbaddo1.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallbaddo1.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallbaddo1.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(ptran->Identify(&mallbaddo1, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallbaddo1, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -355,7 +267,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallbaddo2.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallbaddo2.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallbaddo2.Write(&os2header, 12) == 12);
-	CPPUNIT_ASSERT(ptran->Identify(&mallbaddo2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallbaddo2, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -373,7 +285,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallbaddo3.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallbaddo3.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallbaddo3.Write(&os2header, 12) == 12);
-	CPPUNIT_ASSERT(ptran->Identify(&mallbaddo3, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallbaddo3, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -391,7 +303,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallos2abrev.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallos2abrev.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallos2abrev.Write(&os2header, 1) == 1); // only 1 byte of the os2 header included
-	CPPUNIT_ASSERT(ptran->Identify(&mallos2abrev, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallos2abrev, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -409,7 +321,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallos2abrev2.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallos2abrev2.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallos2abrev2.Write(&os2header, 5) == 5); // most of the os2 header missing
-	CPPUNIT_ASSERT(ptran->Identify(&mallos2abrev2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallos2abrev2, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -433,7 +345,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallmsabrev1.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallmsabrev1.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallmsabrev1.Write(&msheader, 1) == 1); // only 1 byte of ms header written
-	CPPUNIT_ASSERT(ptran->Identify(&mallmsabrev1, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallmsabrev1, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -457,7 +369,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallmsabrev2.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallmsabrev2.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallmsabrev2.Write(&msheader, 15) == 15); // less than half of ms header written
-	CPPUNIT_ASSERT(ptran->Identify(&mallmsabrev2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallmsabrev2, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -481,7 +393,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallmssize.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallmssize.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallmssize.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(ptran->Identify(&mallmssize, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallmssize, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -505,7 +417,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallmssize2.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallmssize2.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallmssize2.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(ptran->Identify(&mallmssize2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallmssize2, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -523,7 +435,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallos2size.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallos2size.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallos2size.Write(&os2header, 12) == 12);
-	CPPUNIT_ASSERT(ptran->Identify(&mallos2size, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallos2size, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -541,7 +453,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallos2size2.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallos2size2.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallos2size2.Write(&os2header, 12) == 12);
-	CPPUNIT_ASSERT(ptran->Identify(&mallos2size2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallos2size2, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -565,7 +477,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallmswidth.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallmswidth.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallmswidth.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(ptran->Identify(&mallmswidth, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallmswidth, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -583,7 +495,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallos2width.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallos2width.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallos2width.Write(&os2header, 12) == 12);
-	CPPUNIT_ASSERT(ptran->Identify(&mallos2width, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallos2width, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -607,7 +519,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallmsheight.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallmsheight.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallmsheight.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(ptran->Identify(&mallmsheight, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallmsheight, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -625,7 +537,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallos2height.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallos2height.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallos2height.Write(&os2header, 12) == 12);
-	CPPUNIT_ASSERT(ptran->Identify(&mallos2height, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallos2height, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -649,7 +561,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallmsplanes.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallmsplanes.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallmsplanes.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(ptran->Identify(&mallmsplanes, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallmsplanes, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -673,7 +585,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallmsplanes2.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallmsplanes2.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallmsplanes2.Write(&msheader, 40) == 40);
-	CPPUNIT_ASSERT(ptran->Identify(&mallmsplanes2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallmsplanes2, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -691,7 +603,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallos2planes.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallos2planes.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallos2planes.Write(&os2header, 12) == 12);
-	CPPUNIT_ASSERT(ptran->Identify(&mallos2planes, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallos2planes, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	NextSubTest();
 	fheader.magic = 'MB';
@@ -709,7 +621,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	CPPUNIT_ASSERT(mallos2planes2.Write(&fheader.reserved, 4) == 4);
 	CPPUNIT_ASSERT(mallos2planes2.Write(&fheader.dataOffset, 4) == 4);
 	CPPUNIT_ASSERT(mallos2planes2.Write(&os2header, 12) == 12);
-	CPPUNIT_ASSERT(ptran->Identify(&mallos2planes2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(proster->Identify(&mallos2planes2, NULL, &ti) == B_NO_TRANSLATOR);
 	
 	// makes sure invalid bit depths aren't recognized
 	const uint16 bitdepths[] = { 0, 2, 3, 5, 6, 7, 9, 23, 25, 31, 33 };
@@ -738,7 +650,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 		CPPUNIT_ASSERT(mallmsbitdepth.Write(&fheader.reserved, 4) == 4);
 		CPPUNIT_ASSERT(mallmsbitdepth.Write(&fheader.dataOffset, 4) == 4);
 		CPPUNIT_ASSERT(mallmsbitdepth.Write(&msheader, 40) == 40);
-		CPPUNIT_ASSERT(ptran->Identify(&mallmsbitdepth, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+		CPPUNIT_ASSERT(proster->Identify(&mallmsbitdepth, NULL, &ti) == B_NO_TRANSLATOR);
 		
 		NextSubTest();
 		fheader.magic = 'MB';
@@ -757,7 +669,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 		CPPUNIT_ASSERT(mallos2bitdepth.Write(&fheader.reserved, 4) == 4);
 		CPPUNIT_ASSERT(mallos2bitdepth.Write(&fheader.dataOffset, 4) == 4);
 		CPPUNIT_ASSERT(mallos2bitdepth.Write(&os2header, 12) == 12);
-		CPPUNIT_ASSERT(ptran->Identify(&mallos2bitdepth, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+		CPPUNIT_ASSERT(proster->Identify(&mallos2bitdepth, NULL, &ti) == B_NO_TRANSLATOR);
 	}
 	
 	// makes sure invalid compression values aren't recognized
@@ -792,7 +704,7 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 				CPPUNIT_ASSERT(mallmscomp.Write(&fheader.reserved, 4) == 4);
 				CPPUNIT_ASSERT(mallmscomp.Write(&fheader.dataOffset, 4) == 4);
 				CPPUNIT_ASSERT(mallmscomp.Write(&msheader, 40) == 40);
-				CPPUNIT_ASSERT(ptran->Identify(&mallmscomp, NULL, NULL, &outinfo, 0)
+				CPPUNIT_ASSERT(proster->Identify(&mallmscomp, NULL, &ti)
 					== B_NO_TRANSLATOR);
 			}
 		}
@@ -824,422 +736,338 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 		CPPUNIT_ASSERT(mallmscolors.Write(&fheader.reserved, 4) == 4);
 		CPPUNIT_ASSERT(mallmscolors.Write(&fheader.dataOffset, 4) == 4);
 		CPPUNIT_ASSERT(mallmscolors.Write(&msheader, 40) == 40);
-		CPPUNIT_ASSERT(ptran->Identify(&mallmscolors, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+		CPPUNIT_ASSERT(proster->Identify(&mallmscolors, NULL, &ti) == B_NO_TRANSLATOR);
 	}
 	
-	// . Release should return NULL because Release has been called
-	// as many times as it has been acquired
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->Release() == NULL);
+	// Identify (successfully identify the following files)
+	const IdentifyInfo aBitsPaths[] = {
+		{ "/boot/home/resources/bmp/b_cmap8.bits", "" },
+		{ "/boot/home/resources/bmp/b_gray1-2.bits", "" },
+		{ "/boot/home/resources/bmp/b_gray1.bits", "" },
+		{ "/boot/home/resources/bmp/b_rgb15.bits", "" },
+		{ "/boot/home/resources/bmp/b_rgb16.bits", "" },
+		{ "/boot/home/resources/bmp/b_rgb32.bits", "" },
+		{ "/boot/home/resources/bmp/blocks.bits", "" },
+		{ "/boot/home/resources/bmp/gnome_beer.bits", "" },
+		{ "/boot/home/resources/bmp/vsmall.bits", "" }
+	};
+	const IdentifyInfo aBmpPaths[] = {
+		{ "/boot/home/resources/bmp/blocks_24bit.bmp",
+			"BMP image (MS format, 24 bits)" },
+		{ "/boot/home/resources/bmp/blocks_4bit_rle.bmp",
+			"BMP image (MS format, 4 bits, RLE)" },
+		{ "/boot/home/resources/bmp/blocks_8bit_rle.bmp",
+			"BMP image (MS format, 8 bits, RLE)" },
+		{ "/boot/home/resources/bmp/color_scribbles_1bit.bmp",
+			"BMP image (MS format, 1 bits)" },
+		{ "/boot/home/resources/bmp/color_scribbles_1bit_os2.bmp",
+			"BMP image (OS/2 format, 1 bits)" },
+		{ "/boot/home/resources/bmp/color_scribbles_24bit.bmp",
+			"BMP image (MS format, 24 bits)" },
+		{ "/boot/home/resources/bmp/color_scribbles_24bit_os2.bmp",
+			"BMP image (OS/2 format, 24 bits)" },
+		{ "/boot/home/resources/bmp/color_scribbles_4bit.bmp",
+			"BMP image (MS format, 4 bits)" },
+		{ "/boot/home/resources/bmp/color_scribbles_4bit_os2.bmp",
+			"BMP image (OS/2 format, 4 bits)" },
+		{ "/boot/home/resources/bmp/color_scribbles_4bit_rle.bmp",
+			"BMP image (MS format, 4 bits, RLE)" },
+		{ "/boot/home/resources/bmp/color_scribbles_8bit.bmp",
+			"BMP image (MS format, 8 bits)" },
+		{ "/boot/home/resources/bmp/color_scribbles_8bit_os2.bmp",
+			"BMP image (OS/2 format, 8 bits)" },
+		{ "/boot/home/resources/bmp/color_scribbles_8bit_rle.bmp",
+			"BMP image (MS format, 8 bits, RLE)" },
+		{ "/boot/home/resources/bmp/gnome_beer_24bit.bmp",
+			"BMP image (MS format, 24 bits)" },
+		{ "/boot/home/resources/bmp/vsmall_1bit.bmp",
+			"BMP image (MS format, 1 bits)" },
+		{ "/boot/home/resources/bmp/vsmall_1bit_os2.bmp",
+			"BMP image (OS/2 format, 1 bits)" },
+		{ "/boot/home/resources/bmp/vsmall_24bit.bmp",
+			"BMP image (MS format, 24 bits)" },
+		{ "/boot/home/resources/bmp/vsmall_24bit_os2.bmp",
+			"BMP image (OS/2 format, 24 bits)" },
+		{ "/boot/home/resources/bmp/vsmall_4bit.bmp",
+			"BMP image (MS format, 4 bits)" },
+		{ "/boot/home/resources/bmp/vsmall_4bit_os2.bmp",
+			"BMP image (OS/2 format, 4 bits)" },
+		{ "/boot/home/resources/bmp/vsmall_4bit_rle.bmp",
+			"BMP image (MS format, 4 bits, RLE)" },
+		{ "/boot/home/resources/bmp/vsmall_8bit.bmp",
+			"BMP image (MS format, 8 bits)" },
+		{ "/boot/home/resources/bmp/vsmall_8bit_os2.bmp",
+			"BMP image (OS/2 format, 8 bits)" },
+		{ "/boot/home/resources/bmp/vsmall_8bit_rle.bmp",
+			"BMP image (MS format, 8 bits, RLE)" },
+		{ "/boot/home/resources/bmp/b_rgb32(32).bmp",
+			"BMP image (MS format, 32 bits)" }
+	};
+
+	IdentifyTests(this, proster, aBmpPaths,
+		sizeof(aBmpPaths) / sizeof(IdentifyInfo), false);
+	IdentifyTests(this, proster, aBitsPaths,
+		sizeof(aBitsPaths) / sizeof(IdentifyInfo), true);
 	
-	// . Unload Add-on
-	NextSubTest();
-	CPPUNIT_ASSERT(unload_add_on(image) == B_OK); 
+	delete proster;
+	proster = NULL;
 }
 
-bool
-AreIdentical(BPositionIO *pA, BPositionIO *pB)
-{
-	if (!pA || !pB)
-		return false;
-	
-	pA->Seek(0, SEEK_SET);
-	pB->Seek(0, SEEK_SET);
-	
-	const int32 kbufsize = 512;
-	uint8 bufA[kbufsize], bufB[kbufsize];
-	
-	ssize_t amtA = pA->Read(bufA, kbufsize);
-	ssize_t amtB = pB->Read(bufB, kbufsize);
-	while (amtA == amtB && amtA > 0) {
-		if (memcmp(bufA, bufB, amtA))
-			return false;	
-		amtA = pA->Read(bufA, kbufsize);
-		amtB = pB->Read(bufB, kbufsize);
-	}
-	
-	if (amtA == amtB)
-		return true;
-	else {
-		printf(" {amtA: %d amtB: %d} ", (int) amtA, (int) amtB);
-		return false;
-	}
-}
+// coveniently group path of bmp image with
+// path of bits image that it should translate to
+struct TranslatePaths {
+	const char *bmpPath;
+	const char *bitsPath;
+};
 
 void
-BMPTranslatorTest::BTranslatorTranslateTest()
+TranslateTests(BMPTranslatorTest *ptest, BTranslatorRoster *proster,
+	const TranslatePaths *paths, int32 len, bool bbmpinput)
 {
-	// . Make sure the add_on loads
-	NextSubTest();
-	const char *path = "/boot/home/config/add-ons/Translators/BMPTranslator";
-	image_id image = load_add_on(path);
-	CPPUNIT_ASSERT(image >= 0);
-	
-	// . Load in function to make the object
-	NextSubTest();
-	BTranslator *(*pMakeNthTranslator)(int32 n,image_id you,uint32 flags,...);
-	status_t err = get_image_symbol(image, "make_nth_translator",
-		B_SYMBOL_TYPE_TEXT, (void **)&pMakeNthTranslator);
-	CPPUNIT_ASSERT(!err);
-
-	// . Make sure the function returns a pointer to a BTranslator
-	NextSubTest();
-	BTranslator *ptran = pMakeNthTranslator(0, image, 0);
-	CPPUNIT_ASSERT(ptran);
-	
-	// . Make sure the function only returns one BTranslator
-	NextSubTest();
-	CPPUNIT_ASSERT(!pMakeNthTranslator(1, image, 0));
-	
-	const char *resourcepath = "/boot/home/Desktop/resources/";
-	const char *bmpinimages[] = {
-		"blocks_24bit.bmp", "blocks_4bit_rle.bmp", "blocks_8bit_rle.bmp",
-		"color_scribbles_24bit.bmp", "color_scribbles_24bit_os2.bmp",
-		"color_scribbles_8bit.bmp", "color_scribbles_8bit_os2.bmp", "color_scribbles_8bit_rle.bmp",  
-		"color_scribbles_4bit.bmp", "color_scribbles_4bit_os2.bmp", "color_scribbles_4bit_rle.bmp", 
-		"color_scribbles_1bit_os2.bmp", "color_scribbles_1bit.bmp",
-		"vsmall_24bit.bmp", "vsmall_24bit_os2.bmp",
-		"vsmall_8bit.bmp", "vsmall_8bit_os2.bmp", "vsmall_8bit_rle.bmp",
-		"vsmall_4bit.bmp", "vsmall_4bit_os2.bmp", "vsmall_4bit_rle.bmp",
-		"vsmall_1bit.bmp", "vsmall_1bit_os2.bmp",    
-		"gnome_beer_24bit.bmp"
-	};
-	const int32 knbmpinimages = sizeof(bmpinimages) / sizeof(const char *);
-	struct BitsCompare {
-		uint32 nbmps;
-		const char *bitsimage;
-	};
-	BitsCompare bitscomps[] = {
-		{3, "blocks.bits"},
-		{7, "color_scribbles_24bit.bits"},
-		{1, "color_scribbles_4bit_rle.bits"},
-		{2, "color_scribbles_1bit.bits"},
-		{10, "vsmall.bits"},
-		{1, "gnome_beer.bits"}
-	};
-	const int32 knbitscomps = sizeof(bitscomps) / sizeof(BitsCompare);
-	// NOTE: this loop is destructive, it destroys the resuability
-	// of the bitscomps variable
-	int32 iin = 0;
-	for (int32 i = 0; i < knbitscomps; i++) {
-		char bmppath[512], bitspath[512];
-		strcpy(bitspath, resourcepath);
-		strcat(bitspath, bitscomps[i].bitsimage);
-		printf(" |bits: %s| ", bitspath);
-		BFile bitsfile;
-		CPPUNIT_ASSERT(bitsfile.SetTo(bitspath, B_READ_ONLY) == B_OK);
-		while (bitscomps[i].nbmps > 0 && iin < knbmpinimages) {
-			NextSubTest();
-			bitscomps[i].nbmps--;
-			strcpy(bmppath, resourcepath);
-			strcat(bmppath, bmpinimages[iin]);
-			printf(" |bmp: %s| ", bmppath);
-			BFile bmpfile;
-			CPPUNIT_ASSERT(bmpfile.SetTo(bmppath, B_READ_ONLY) == B_OK);
-			BMallocIO mallio;
-			mallio.Seek(0, SEEK_SET);
-			CPPUNIT_ASSERT(ptran->Translate(&bmpfile, NULL, NULL, B_TRANSLATOR_BITMAP, &mallio) == B_OK);
-			bool bresult = AreIdentical(&bitsfile, &mallio);
-			if (!bresult) {
-				BFile dbgout("/boot/home/trantest.bits", B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-				dbgout.Write(mallio.Buffer(), mallio.BufferLength());				
+	// Perform translations on every file in the array
+	for (int32 i = 0; i < len; i++) {
+		// Setup input files	
+		ptest->NextSubTest();
+		BFile bmpfile, bitsfile, *pinput;
+		CPPUNIT_ASSERT(bmpfile.SetTo(paths[i].bmpPath, B_READ_ONLY) == B_OK);
+		CPPUNIT_ASSERT(bitsfile.SetTo(paths[i].bitsPath, B_READ_ONLY) == B_OK);
+		if (bbmpinput) {
+			printf(" [%s] ", paths[i].bmpPath);
+			pinput = &bmpfile;
+		} else {
+			printf(" [%s] ", paths[i].bitsPath);
+			pinput = &bitsfile;
+		}
+		
+		BMallocIO mallio, dmallio;
+		
+		// Convert to B_TRANSLATOR_ANY_TYPE (should be B_TRANSLATOR_BITMAP)
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(pinput, NULL, NULL, &mallio,
+			B_TRANSLATOR_ANY_TYPE) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(mallio, bitsfile) == true);
+		
+		// Convert to B_TRANSLATOR_BITMAP
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(pinput, NULL, NULL, &mallio,
+			B_TRANSLATOR_BITMAP) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(mallio, bitsfile) == true);
+		
+		// Convert bits mallio to B_TRANSLATOR_BITMAP dmallio
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
+			B_TRANSLATOR_BITMAP) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(dmallio, bitsfile) == true);
+		
+		// Only perform the following tests if the BMP is not
+		// an OS/2 format BMP image.
+		// (Need to write special testing for OS/2 images)
+		if (!strstr(paths[i].bmpPath, "os2")) {
+			// Convert to B_BMP_FORMAT
+			ptest->NextSubTest();
+			CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
+			CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
+			CPPUNIT_ASSERT(proster->Translate(pinput, NULL, NULL, &mallio,
+				B_BMP_FORMAT) == B_OK);
+			CPPUNIT_ASSERT(CompareStreams(mallio, bmpfile) == true);
+		
+			// Convert BMP mallio to B_TRANSLATOR_BITMAP dmallio
+			if (bbmpinput) {
+				ptest->NextSubTest();
+				CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
+				CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
+				CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
+					B_TRANSLATOR_BITMAP) == B_OK);
+				CPPUNIT_ASSERT(CompareStreams(dmallio, bitsfile) == true);
 			}
-			CPPUNIT_ASSERT(bresult);
-			iin++;
+		
+			// Convert BMP mallio to B_BMP_FORMAT dmallio
+			ptest->NextSubTest();
+			CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
+			CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
+			CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
+				B_BMP_FORMAT) == B_OK);
+			CPPUNIT_ASSERT(CompareStreams(dmallio, bmpfile) == true);
 		}
 	}
-	
-	// . Release should return NULL because Release has been called
-	// as many times as it has been acquired
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->Release() == NULL);
-	
-	// . Unload Add-on
-	NextSubTest();
-	CPPUNIT_ASSERT(unload_add_on(image) == B_OK); 
 }
 
 void
-test_outinfo(translator_info &info, bool isbmp)
+BMPTranslatorTest::TranslateTest()
 {
-	if (isbmp) {
-		CPPUNIT_ASSERT(info.type == B_BMP_FORMAT);
-		CPPUNIT_ASSERT(strcmp(info.MIME, BMP_MIME_STRING) == 0);
-	} else {
-		CPPUNIT_ASSERT(info.type == B_TRANSLATOR_BITMAP);
-		CPPUNIT_ASSERT(strcmp(info.MIME, BITS_MIME_STRING) == 0);
-	}
-	CPPUNIT_ASSERT(info.name);
-	CPPUNIT_ASSERT(info.group == B_TRANSLATOR_BITMAP);
-	CPPUNIT_ASSERT(info.quality > 0 && info.quality <= 1);
-	CPPUNIT_ASSERT(info.capability > 0 && info.capability <= 1);
-}
-
-void
-BMPTranslatorTest::BTranslatorIdentifyTest()
-{
-	// . Make sure the add_on loads
+	// Init
 	NextSubTest();
-	const char *path = "/boot/home/config/add-ons/Translators/BMPTranslator";
-	image_id image = load_add_on(path);
-	CPPUNIT_ASSERT(image >= 0);
+	status_t result = B_ERROR;
+	off_t filesize = -1;
+	BTranslatorRoster *proster = new BTranslatorRoster();
+	CPPUNIT_ASSERT(proster);
+	CPPUNIT_ASSERT(proster->AddTranslators(
+		"/boot/home/config/add-ons/Translators/BMPTranslator") == B_OK);
+	BFile wronginput("../src/tests/kits/translation/data/images/image.jpg",
+		B_READ_ONLY);
+	CPPUNIT_ASSERT(wronginput.InitCheck() == B_OK);
+	BFile output("/tmp/bmp_test.out", B_WRITE_ONLY | 
+		B_CREATE_FILE | B_ERASE_FILE);
+	CPPUNIT_ASSERT(output.InitCheck() == B_OK);
 	
-	// . Load in function to make the object
+	// Translate (bad input, output types)
 	NextSubTest();
-	BTranslator *(*pMakeNthTranslator)(int32 n,image_id you,uint32 flags,...);
-	status_t err = get_image_symbol(image, "make_nth_translator",
-		B_SYMBOL_TYPE_TEXT, (void **)&pMakeNthTranslator);
-	CPPUNIT_ASSERT(!err);
-
-	// . Make sure the function returns a pointer to a BTranslator
-	NextSubTest();
-	BTranslator *ptran = pMakeNthTranslator(0, image, 0);
-	CPPUNIT_ASSERT(ptran);
+	result = proster->Translate(&wronginput, NULL, NULL, &output,
+		B_TRANSLATOR_TEXT);
+	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
+	CPPUNIT_ASSERT(filesize == 0);
 	
-	// . Make sure the function only returns one BTranslator
+	// Translate (wrong type of input data)
 	NextSubTest();
-	CPPUNIT_ASSERT(!pMakeNthTranslator(1, image, 0));
+	result = proster->Translate(&wronginput, NULL, NULL, &output,
+		B_BMP_FORMAT);
+	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
+	CPPUNIT_ASSERT(filesize == 0);
 	
-	// . call identify on a BMP with various different options
-	const char *resourcepath = "/boot/home/Desktop/resources/";
-	const char *testimages[] = {
-		"blocks.bits", "color_scribbles_8bit_os2.bmp",
-		"blocks_24bit.bmp", "color_scribbles_8bit_rle.bmp",
-		"blocks_4bit_rle.bmp", "gnome_beer.bits",
-		"blocks_8bit_rle.bmp", "gnome_beer_24bit.bmp",
-		"color_scribbles_1bit.bits", "vsmall.bits",
-		"color_scribbles_1bit.bmp", "vsmall_1bit.bmp",
-		"color_scribbles_1bit_os2.bmp", "vsmall_1bit_os2.bmp",
-		"color_scribbles_24bit.bits", "vsmall_24bit.bmp",
-		"color_scribbles_24bit.bmp", "vsmall_24bit_os2.bmp",
-		"color_scribbles_24bit_os2.bmp", "vsmall_4bit.bmp",
-		"color_scribbles_4bit.bmp", "vsmall_4bit_os2.bmp",
-		"color_scribbles_4bit_os2.bmp", "vsmall_4bit_rle.bmp",
-		"color_scribbles_4bit_rle.bits", "vsmall_8bit.bmp",
-		"color_scribbles_4bit_rle.bmp", "vsmall_8bit_os2.bmp",
-		"color_scribbles_8bit.bmp", "vsmall_8bit_rle.bmp"
+	// Translate (wrong type of input, B_TRANSLATOR_ANY_TYPE output)
+	NextSubTest();
+	result = proster->Translate(&wronginput, NULL, NULL, &output,
+		B_TRANSLATOR_ANY_TYPE);
+	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
+	CPPUNIT_ASSERT(filesize == 0);
+	
+	// For translating BMP images to bits
+	const TranslatePaths aBmpInput[] = {
+		{ "/boot/home/resources/bmp/blocks_24bit.bmp",
+			"/boot/home/resources/bmp/blocks.bits" },
+		{ "/boot/home/resources/bmp/blocks_4bit_rle.bmp",
+			"/boot/home/resources/bmp/blocks.bits" },
+		{ "/boot/home/resources/bmp/blocks_8bit_rle.bmp",
+			"/boot/home/resources/bmp/blocks.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_1bit.bmp",
+			"/boot/home/resources/bmp/color_scribbles_1bit.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_1bit_os2.bmp",
+			"/boot/home/resources/bmp/color_scribbles_1bit.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_24bit.bmp",
+			"/boot/home/resources/bmp/color_scribbles_24bit.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_24bit_os2.bmp",
+			"/boot/home/resources/bmp/color_scribbles_24bit.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_4bit.bmp",
+			"/boot/home/resources/bmp/color_scribbles_24bit.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_4bit_os2.bmp",
+			"/boot/home/resources/bmp/color_scribbles_24bit.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_4bit_rle.bmp",
+			"/boot/home/resources/bmp/color_scribbles_4bit_rle.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_8bit.bmp",
+			"/boot/home/resources/bmp/color_scribbles_24bit.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_8bit_os2.bmp",
+			"/boot/home/resources/bmp/color_scribbles_24bit.bits" },
+		{ "/boot/home/resources/bmp/color_scribbles_8bit_rle.bmp",
+			"/boot/home/resources/bmp/color_scribbles_24bit.bits" },
+		{ "/boot/home/resources/bmp/gnome_beer_24bit.bmp",
+			"/boot/home/resources/bmp/gnome_beer.bits" },
+		{ "/boot/home/resources/bmp/vsmall_1bit.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/vsmall_1bit_os2.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/vsmall_24bit.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/vsmall_24bit_os2.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/vsmall_4bit.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/vsmall_4bit_os2.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/vsmall_4bit_rle.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/vsmall_8bit.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/vsmall_8bit_os2.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/vsmall_8bit_rle.bmp",
+			"/boot/home/resources/bmp/vsmall.bits" },
+		{ "/boot/home/resources/bmp/b_rgb32(32).bmp",
+			"/boot/home/resources/bmp/b_rgb32.bits" }
 	};
-	char imagepath[512] = { 0 };
-	const int32 knimages = 30;
-	BMessage emptymsg;
-	translation_format hintformat;
-	translator_info outinfo;
 	
-	// NOTE: This code assumes that BMP files end with ".bmp" and
-	// Be Bitmap Images end with ".bits", if this is not true, the
-	// test will not work properly
-	for (int32 i = 0; i < knimages; i++) {
-		NextSubTest();
-		strcpy(imagepath, resourcepath);
-		strcat(imagepath, testimages[i]);
-		int32 pathlen = strlen(imagepath);
-		bool isbmp;
-		if (imagepath[pathlen - 1] == 'p')
-			isbmp = true;
-		else
-			isbmp = false;
-		printf(" [%s] ", testimages[i]);
-		BFile imagefile;
-		CPPUNIT_ASSERT(imagefile.SetTo(imagepath, B_READ_ONLY) == B_OK);
-		
-		////////// No hints or io extension
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, NULL, &outinfo, 0) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, NULL, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, NULL, &outinfo, B_BMP_FORMAT) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		///////////// empty io extension
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &emptymsg, &outinfo, 0) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &emptymsg, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &emptymsg, &outinfo, B_BMP_FORMAT) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		///////////// with "correct" hint
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		if (isbmp) {
-			hintformat.type = B_BMP_FORMAT;
-			strcpy(hintformat.MIME, BMP_MIME_STRING);
-			strcpy(hintformat.name, "BMP Image");
-		} else {
-			hintformat.type = B_TRANSLATOR_BITMAP;
-			strcpy(hintformat.MIME, BITS_MIME_STRING);
-			strcpy(hintformat.name, "Be Bitmap Image");
-		}
-		hintformat.group = B_TRANSLATOR_BITMAP;
-		hintformat.quality = 0.5;
-		hintformat.capability = 0.5;
-		
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, 0) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		if (isbmp) {
-			hintformat.type = B_BMP_FORMAT;
-			strcpy(hintformat.MIME, BMP_MIME_STRING);
-			strcpy(hintformat.name, "BMP Image");
-		} else {
-			hintformat.type = B_TRANSLATOR_BITMAP;
-			strcpy(hintformat.MIME, BITS_MIME_STRING);
-			strcpy(hintformat.name, "Be Bitmap Image");
-		}
-		hintformat.group = B_TRANSLATOR_BITMAP;
-		hintformat.quality = 0.5;
-		hintformat.capability = 0.5;
-		
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		if (isbmp) {
-			hintformat.type = B_BMP_FORMAT;
-			strcpy(hintformat.MIME, BMP_MIME_STRING);
-			strcpy(hintformat.name, "BMP Image");
-		} else {
-			hintformat.type = B_TRANSLATOR_BITMAP;
-			strcpy(hintformat.MIME, BITS_MIME_STRING);
-			strcpy(hintformat.name, "Be Bitmap Image");
-		}
-		hintformat.group = B_TRANSLATOR_BITMAP;
-		hintformat.quality = 0.5;
-		hintformat.capability = 0.5;
-		
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, B_BMP_FORMAT) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		///////////// with misleading hint (the hint is probably ignored anyway)
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		hintformat.type = B_WAV_FORMAT;
-		strcpy(hintformat.MIME, "audio/wav");
-		strcpy(hintformat.name, "WAV Audio");
-		hintformat.group = B_TRANSLATOR_SOUND;
-		hintformat.quality = 0.5;
-		hintformat.capability = 0.5;
-		
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, 0) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		hintformat.type = B_WAV_FORMAT;
-		strcpy(hintformat.MIME, "audio/wav");
-		strcpy(hintformat.name, "WAV Audio");
-		hintformat.group = B_TRANSLATOR_SOUND;
-		hintformat.quality = 0.5;
-		hintformat.capability = 0.5;
-		
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		hintformat.type = B_WAV_FORMAT;
-		strcpy(hintformat.MIME, "audio/wav");
-		strcpy(hintformat.name, "WAV Audio");
-		hintformat.group = B_TRANSLATOR_SOUND;
-		hintformat.quality = 0.5;
-		hintformat.capability = 0.5;
-		
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, B_BMP_FORMAT) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		// ioExtension Tests
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		BMessage msgheaderonly;
-		msgheaderonly.AddBool(B_TRANSLATOR_EXT_HEADER_ONLY, true);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgheaderonly, &outinfo, 0) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgheaderonly, &outinfo, B_BMP_FORMAT) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgheaderonly, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		BMessage msgdataonly;
-		msgdataonly.AddBool(B_TRANSLATOR_EXT_DATA_ONLY, true);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgdataonly, &outinfo, 0) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgdataonly, &outinfo, B_BMP_FORMAT) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgdataonly, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
-		test_outinfo(outinfo, isbmp);
-		
-		NextSubTest();
-		memset(&outinfo, 0, sizeof(outinfo));
-		imagefile.Seek(0, SEEK_SET);
-		BMessage msgbothonly;
-		msgbothonly.AddBool(B_TRANSLATOR_EXT_HEADER_ONLY, true);
-		msgbothonly.AddBool(B_TRANSLATOR_EXT_DATA_ONLY, true);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgbothonly, &outinfo, 0) == B_BAD_VALUE);
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgbothonly, &outinfo, B_BMP_FORMAT) == B_BAD_VALUE);
-		imagefile.Seek(0, SEEK_SET);
-		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgbothonly, &outinfo, B_TRANSLATOR_BITMAP) == B_BAD_VALUE);
-	}	
+	// For translating bits images to BMP
+	const TranslatePaths aBitsInput[] = {
+		{ "/boot/home/resources/bmp/b_gray1-2.bmp",
+			"/boot/home/resources/bmp/b_gray1-2.bits" },
+		{ "/boot/home/resources/bmp/b_gray1.bmp",
+			"/boot/home/resources/bmp/b_gray1.bits" },
+		{ "/boot/home/resources/bmp/b_rgb15.bmp",
+			"/boot/home/resources/bmp/b_rgb15.bits" },
+		{ "/boot/home/resources/bmp/b_rgb16.bmp",
+			"/boot/home/resources/bmp/b_rgb16.bits" },
+		{ "/boot/home/resources/bmp/b_rgb32(24).bmp",
+			"/boot/home/resources/bmp/b_rgb32.bits" },
+		{ "/boot/home/resources/bmp/b_cmap8.bmp",
+			"/boot/home/resources/bmp/b_cmap8.bits" }
+	};
 	
-	// . Release should return NULL because Release has been called
-	// as many times as it has been acquired
-	NextSubTest();
-	CPPUNIT_ASSERT(ptran->Release() == NULL);
+	TranslateTests(this, proster, aBmpInput,
+		sizeof(aBmpInput) / sizeof(TranslatePaths), true);
+	TranslateTests(this, proster, aBitsInput,
+		sizeof(aBitsInput) / sizeof(TranslatePaths), false);
 	
-	// . Unload Add-on
-	NextSubTest();
-	CPPUNIT_ASSERT(unload_add_on(image) == B_OK); 
+	delete proster;
+	proster = NULL;
+}
+
+#if !TEST_R5
+
+// The input formats that this translator is supposed to support
+translation_format gBMPInputFormats[] = {
+	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		0.6f, // quality
+		0.8f, // capability
+		"image/x-be-bitmap",
+		"Be Bitmap Format (BMPTranslator)"
+	},
+	{
+		B_BMP_FORMAT,
+		B_TRANSLATOR_BITMAP,
+		1.0f,
+		0.8f,
+		"image/x-bmp",
+		"BMP image"
+	}
+};
+
+// The output formats that this translator is supposed to support
+translation_format gBMPOutputFormats[] = {
+	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		0.6f, // quality
+		0.8f, // capability
+		"image/x-be-bitmap",
+		"Be Bitmap Format (BMPTranslator)"
+	},
+	{
+		B_BMP_FORMAT,
+		B_TRANSLATOR_BITMAP,
+		1.0f,
+		0.5f,
+		"image/x-bmp",
+		"BMP image (MS format)"
+	}
+};
+
+void
+BMPTranslatorTest::LoadAddOnTest()
+{
+	TranslatorLoadAddOnTest("/boot/home/config/add-ons/Translators/BMPTranslator",
+		this,
+		gBMPInputFormats, sizeof(gBMPInputFormats) / sizeof(translation_format),
+		gBMPOutputFormats, sizeof(gBMPOutputFormats) / sizeof(translation_format));
 }
 
 #endif // #if !TEST_R5
-
-// DummyTest
-void
-BMPTranslatorTest::DummyTest()
-{
-	// 0. Tautology
-	NextSubTest();
-	{
-		printf("Hello from mars.");
-		CPPUNIT_ASSERT( true == true );
-	}
-}

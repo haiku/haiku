@@ -6,8 +6,8 @@
 #include <TestCase.h>
 #include <TestShell.h>
 
+#define BBT_MIME_STRING  "image/x-be-bitmap"
 #define BMP_MIME_STRING "image/x-bmp"
-#define BITS_MIME_STRING "image/x-be-bitmap"
 
 class CppUnit::Test;
 
@@ -25,13 +25,10 @@ public:
 	// Test functions
 	//------------------------------------------------------------
 #if !TEST_R5
-	void BTranslatorBasicTest();
-	void BTranslatorIdentifyErrorTest();
-	void BTranslatorIdentifyTest();
-	void BTranslatorTranslateTest();
+	void LoadAddOnTest();
 #endif
-
-	void DummyTest();
+	void IdentifyTest();
+	void TranslateTest();
 };
 
 #endif	// BMP_TRANSLATOR_TEST_H
