@@ -376,8 +376,7 @@ _BTypingUndoBuffer_::ForwardErase()
 	fTextView->GetSelection(&start, &end);
 	
 	int32 charLen = UTF8NextCharLen(fTextView->Text() + start);	
-	printf("Char Len: %d\n", charLen);
-
+	
 	if (start != fTypedEnd || end != fTypedEnd || fUndone > 0) {
 		Reset();
 		// if we've got a selection, we're already done
