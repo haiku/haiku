@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 // This file could be moved into a generic tty module.
 // The whole hardware signaling stuff is missing, though - it's currently
@@ -294,6 +294,7 @@ reset_tty(struct tty *tty, int32 index)
 status_t
 tty_output_getc(struct tty *tty, int *_c)
 {
+	return B_ERROR;
 }
 
 
@@ -386,6 +387,8 @@ tty_input_putc(struct tty *tty, int c)
 	// to write if there is still space left in the buffer
 	if (line_buffer_writable(tty->input_buffer))
 		release_sem_etc(tty->write_sem, 1, B_DO_NOT_RESCHEDULE);
+
+	return B_OK;
 }
 
 
@@ -439,13 +442,14 @@ err2:
 	mutex_destroy(&tty->lock);
 err1:
 	uninit_line_buffer(tty->input_buffer);
+	return status;
 }
 
 
 status_t
 tty_ioctl(struct tty *tty, uint32 op, void *buffer, size_t length)
 {
-	TRACE(("tty_ioctl: tty %p, op %lu, buffer %p, length %lu\n", &tty, op, buffer, length));
+	TRACE(("tty_ioctl: tty %p, op %lu, buffer %p, length %lu\n", tty, op, buffer, length));
 	MutexLocker locker(&tty->lock);
 
 	switch (op) {
@@ -589,6 +593,14 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 
 			if (c == '\n' && (source->termios.c_oflag & (OPOST | ONLCR)) == OPOST | ONLCR) {
 				// post-process output and transfrom '\n' to '\r\n'
+#if 1
+	// ToDo: this doesn't fix the bug that is responsible for the doubled shell prompt
+	//		and it's all wrong, too - but it cures the symptoms, and that's good enough
+	//		for now :)
+	//		Apparently, the shell reads only single bytes and handles both, '\r' and '\n'
+	//		as a newline.
+				if (!sourceIsMaster)
+#endif
 				tty_input_putc_locked(target, '\r');
 			 	if (echo)
 					tty_input_putc_locked(source, '\r');
