@@ -14,7 +14,7 @@
 #define NVCFG_BASE7		0x28 //unknown if used
 #define NVCFG_SUBSYSID1	0x2c
 #define NVCFG_ROMBASE	0x30
-#define NVCFG_CFG_0		0x34
+#define NVCFG_CAPPTR	0x34
 #define NVCFG_CFG_1		0x38 //unknown if used
 #define NVCFG_INTERRUPT	0x3c
 #define NVCFG_SUBSYSID2	0x40
@@ -32,9 +32,9 @@
 #define NVCFG_CFG_15	0x70 //unknown if used
 #define NVCFG_CFG_16	0x74 //unknown if used
 #define NVCFG_CFG_17	0x78 //unknown if used
-#define NVCFG_GF2IGPU	0x7c //wrong...
+#define NVCFG_CFG_18	0x7c //unknown if used
 #define NVCFG_CFG_19	0x80 //unknown if used
-#define NVCFG_GF4MXIGPU	0x84 //wrong...
+#define NVCFG_CFG_20	0x84 //unknown if used
 #define NVCFG_CFG_21	0x88 //unknown if used
 #define NVCFG_CFG_22	0x8c //unknown if used
 #define NVCFG_CFG_23	0x90 //unknown if used
