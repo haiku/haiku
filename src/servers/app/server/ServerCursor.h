@@ -31,6 +31,7 @@
 #include "ServerBitmap.h"
 
 class ServerApp;
+class CursorManager;
 
 /*!
 	\class ServerCursor ServerCursor.h
@@ -55,8 +56,11 @@ public:
 	const char *GetAppSignature(void) { return _app_signature; }
 private:
 	friend ServerApp;
+	friend CursorManager;
+	
 	BPoint _hotspot;
 	char *_app_signature;
+	int32 token;
 };
 
 #endif
