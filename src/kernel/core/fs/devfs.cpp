@@ -11,9 +11,9 @@
 #include <SupportDefs.h>
 #include <KernelExport.h>
 #include <Drivers.h>
-#include <device_manager.h>
 #include <pnp_devfs.h>
 
+#include <kdevice_manager.h>
 #include <vfs.h>
 #include <debug.h>
 #include <khash.h>
@@ -61,7 +61,8 @@ struct devfs_stream {
 			struct devfs_cookie *jar_head;
 		} dir;
 		struct stream_dev {
-			void *ident;
+			pnp_node_info *node;
+			pnp_devfs_driver_info *info;
 			device_hooks *ops;
 			struct devfs_part_map *part_map;
 			IOScheduler *scheduler;
@@ -106,8 +107,6 @@ struct devfs_cookie {
 
 /* the one and only allowed devfs instance */
 static struct devfs *sDeviceFileSystem = NULL;
-
-static status_t pnp_devfs_open(void *_device, uint32 flags, void **_deviceCookie);
 
 
 #define BOOTFS_HASH_SIZE 16
@@ -174,9 +173,15 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode, bool force_delet
 	// remove it from the global hash table
 	hash_remove(fs->vnode_list_hash, vnode);
 
-	// TK: for partitions, we have to release the raw device
-	if (vnode->stream.type == STREAM_TYPE_DEVICE && vnode->stream.u.dev.part_map)
-		put_vnode(fs->id, vnode->stream.u.dev.part_map->raw_vnode->id);
+	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
+		// for partitions, we have to release the raw device
+		if (vnode->stream.u.dev.part_map)
+			put_vnode(fs->id, vnode->stream.u.dev.part_map->raw_vnode->id);
+
+		// remove API conversion from old to new drivers
+		if (vnode->stream.u.dev.node == NULL)
+			free(vnode->stream.u.dev.info);
+	}
 
 	free(vnode->name);
 	free(vnode);
@@ -378,7 +383,8 @@ devfs_set_partition(struct devfs *fs, struct devfs_vnode *vnode,
 	}
 
 	part_node->stream.type = STREAM_TYPE_DEVICE;
-	part_node->stream.u.dev.ident = vnode->stream.u.dev.ident;
+	part_node->stream.u.dev.node = vnode->stream.u.dev.node;
+	part_node->stream.u.dev.info = vnode->stream.u.dev.info;
 	part_node->stream.u.dev.ops = vnode->stream.u.dev.ops;
 	part_node->stream.u.dev.part_map = part_map;
 	part_node->stream.u.dev.scheduler = vnode->stream.u.dev.scheduler;
@@ -420,6 +426,152 @@ translate_partition_access(devfs_part_map *map, off_t &offset, size_t &size)
 
 	size = min_c(size, map->size - offset);
 	offset += map->offset;
+}
+
+
+static pnp_devfs_driver_info *
+create_new_driver_info(device_hooks *ops)
+{
+	pnp_devfs_driver_info *info = (pnp_devfs_driver_info *)malloc(sizeof(pnp_devfs_driver_info));
+	if (info == NULL)
+		return NULL;
+
+	memset(info, 0, sizeof(pnp_driver_info));
+
+	info->open = NULL;
+		// ops->open is used directly for old devices
+	info->close = ops->close;
+	info->free = ops->free;
+	info->control = ops->control;
+	info->select = ops->select;
+	info->deselect = ops->deselect;
+	info->read = ops->read;
+	info->write = ops->write;
+
+	info->read_pages = NULL;
+	info->write_pages = NULL;
+		// old devices can't know to do physical page access
+
+	return info;
+}
+
+
+static status_t
+devfs_publish_device(const char *path, pnp_node_info *node, pnp_devfs_driver_info *info, device_hooks *ops)
+{
+	status_t status = B_OK;
+	char temp[B_PATH_NAME_LENGTH + 1];
+
+	TRACE(("devfs_publish_device: entry path '%s', ident %p, hooks %p\n", path, ident, ops));
+
+	if (sDeviceFileSystem == NULL) {
+		panic("devfs_publish_device called before devfs mounted\n");
+		return B_ERROR;
+	}
+
+	if ((ops == NULL && (node == NULL || info == NULL))
+		|| path == NULL || path[0] == '/')
+		return B_BAD_VALUE;
+
+	// are the provided device hooks okay?
+	if ((ops != NULL && (ops->open == NULL || ops->close == NULL
+		|| ops->read == NULL || ops->write == NULL))
+		|| info != NULL && (info->open == NULL || info->close == NULL
+		|| info->read == NULL || info->write == NULL))
+		return B_BAD_VALUE;
+
+	// copy the path over to a temp buffer so we can munge it
+	strlcpy(temp, path, B_PATH_NAME_LENGTH);
+
+	mutex_lock(&sDeviceFileSystem->lock);
+
+	// create the path leading to the device
+	// parse the path passed in, stripping out '/'
+	struct devfs_vnode *dir = sDeviceFileSystem->root_vnode;
+	struct devfs_vnode *vnode = NULL;
+	int32 i = 0, last = 0;
+	bool atLeaf = false;
+	bool isDisk = false;
+
+	for (;;) {
+		if (temp[i] == 0) {
+			atLeaf = true; // we'll be done after this one
+		} else if (temp[i] == '/') {
+			temp[i] = 0;
+			i++;
+		} else {
+			i++;
+			continue;
+		}
+
+		TRACE(("\tpath component '%s'\n", &temp[last]));
+
+		// we have a path component
+		vnode = devfs_find_in_dir(dir, &temp[last]);
+		if (vnode) {
+			if (!atLeaf) {
+				// we are not at the leaf of the path, so as long as
+				// this is a dir we're okay
+				if (vnode->stream.type == STREAM_TYPE_DIR) {
+					last = i;
+					dir = vnode;
+					continue;
+				}
+			}
+			// we are at the leaf and hit another node
+			// or we aren't but hit a non-dir node.
+			// we're screwed
+			status = B_FILE_EXISTS;
+			goto out;
+		} else {
+			vnode = devfs_create_vnode(sDeviceFileSystem, &temp[last]);
+			if (!vnode) {
+				status = B_NO_MEMORY;
+				goto out;
+			}
+		}
+
+		// set up the new vnode
+		if (atLeaf) {
+			// this is the last component
+			vnode->stream.type = STREAM_TYPE_DEVICE;
+
+			if (node != NULL)
+				vnode->stream.u.dev.info = info;
+			else
+				vnode->stream.u.dev.info = create_new_driver_info(ops);
+
+			vnode->stream.u.dev.node = node;
+			vnode->stream.u.dev.ops = ops;
+
+			// every raw disk gets an I/O scheduler object attached
+			// ToDo: the driver should ask for a scheduler (ie. using its devfs node attributes)
+			if (isDisk && !strcmp(&temp[last], "raw")) 
+				vnode->stream.u.dev.scheduler = new IOScheduler(path, info);
+		} else {
+			// this is a dir
+			vnode->stream.type = STREAM_TYPE_DIR;
+			vnode->stream.u.dir.dir_head = NULL;
+			vnode->stream.u.dir.jar_head = NULL;
+
+			// mark disk devices - they might get an I/O scheduler
+			if (last == 0 && !strcmp(temp, "disk"))
+				isDisk = true;
+		}
+
+		hash_insert(sDeviceFileSystem->vnode_list_hash, vnode);
+
+		devfs_insert_in_dir(dir, vnode);
+
+		if (atLeaf)
+			break;
+		last = i;
+		dir = vnode;
+	}
+
+out:
+	mutex_unlock(&sDeviceFileSystem->lock);
+	return status;
 }
 
 
@@ -570,9 +722,9 @@ devfs_get_vnode_name(fs_volume _fs, fs_vnode _vnode, char *buffer, size_t buffer
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 
-	TRACE(("devfs_get_vnode_name: vnode = %p\n",vnode));
+	TRACE(("devfs_get_vnode_name: vnode = %p\n", vnode));
 	
-	strlcpy(buffer,vnode->name,bufferSize);
+	strlcpy(buffer, vnode->name, bufferSize);
 	return B_OK;
 }
 
@@ -647,7 +799,7 @@ devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int omode, int perm
 
 
 static status_t
-devfs_open(fs_volume _fs, fs_vnode _vnode, int oflags, fs_cookie *_cookie)
+devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie;
@@ -662,11 +814,11 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int oflags, fs_cookie *_cookie)
 	if (vnode->stream.type != STREAM_TYPE_DEVICE)
 		return B_BAD_VALUE;
 
-	// ToDo: gross hack!
-	if (vnode->stream.u.dev.ident != NULL)
-		status = pnp_devfs_open(vnode->stream.u.dev.ident, oflags, &cookie->u.dev.dcookie);
-	else
-		status = vnode->stream.u.dev.ops->open(vnode->name, oflags, &cookie->u.dev.dcookie);
+	if (vnode->stream.u.dev.node != NULL) {
+		status = vnode->stream.u.dev.info->open(vnode->stream.u.dev.node->parent->cookie,
+					openMode, &cookie->u.dev.dcookie);
+	} else
+		status = vnode->stream.u.dev.ops->open(vnode->name, openMode, &cookie->u.dev.dcookie);
 
 	*_cookie = cookie;
 
@@ -684,7 +836,7 @@ devfs_close(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 
 	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
 		// pass the call through to the underlying device
-		return vnode->stream.u.dev.ops->close(cookie->u.dev.dcookie);
+		return vnode->stream.u.dev.info->close(cookie->u.dev.dcookie);
 	}
 
 	return B_OK;
@@ -701,12 +853,10 @@ devfs_free_cookie(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 
 	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
 		// pass the call through to the underlying device
-		vnode->stream.u.dev.ops->free(cookie->u.dev.dcookie);
+		vnode->stream.u.dev.info->free(cookie->u.dev.dcookie);
 	}
 
-	if (cookie)
-		free(cookie);
-
+	free(cookie);
 	return 0;
 }
 
@@ -732,6 +882,8 @@ devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	// that at some point -- axeld.
 	//if (cookie->stream->type != STREAM_TYPE_DEVICE)
 	//	return EINVAL;
+	//if (vnode->stream.type != STREAM_TYPE_DEVICE)
+	//	return B_BAD_VALUE;
 
 	if (vnode->stream.u.dev.part_map)
 		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_length);
@@ -751,7 +903,7 @@ devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	}
 
 	// pass the call through to the device
-	return vnode->stream.u.dev.ops->read(cookie->u.dev.dcookie, pos, buffer, _length);
+	return vnode->stream.u.dev.info->read(cookie->u.dev.dcookie, pos, buffer, _length);
 }
 
 
@@ -783,7 +935,7 @@ devfs_write(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 		return status;
 	}
 
-	return vnode->stream.u.dev.ops->write(cookie->u.dev.dcookie, pos, buffer, _length);
+	return vnode->stream.u.dev.info->write(cookie->u.dev.dcookie, pos, buffer, _length);
 }
 
 
@@ -901,89 +1053,62 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op, void *b
 				return devfs_set_partition(fs, vnode, cookie, *(partition_info *)buffer, length);
 		}
 
-		return vnode->stream.u.dev.ops->control(cookie->u.dev.dcookie, op, buffer, length);
+		return vnode->stream.u.dev.info->control(cookie->u.dev.dcookie, op, buffer, length);
 	}
 
 	return B_BAD_VALUE;
 }
 
 
-#if 0
-static int devfs_canpage(fs_volume _fs, fs_vnode _v)
+static bool
+devfs_can_page(fs_volume _fs, fs_vnode _vnode)
 {
-	struct devfs_vnode *v = _v;
+	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
 
-	TRACE(("devfs_canpage: vnode 0x%x\n", v));
+	TRACE(("devfs_canpage: vnode 0x%x\n", vnode));
 
-	if(v->stream.type == STREAM_TYPE_DEVICE) {
-		if(!v->stream.u.dev.ops->dev_canpage)
-			return 0;
-		return v->stream.u.dev.ops->dev_canpage(v->stream.u.dev.ident);
-	} else {
-		return 0;
-	}
+	if (vnode->stream.type != STREAM_TYPE_DEVICE
+		|| vnode->stream.u.dev.node == NULL)
+		return false;
+
+	return vnode->stream.u.dev.info->read_pages != NULL;
 }
 
-static ssize_t devfs_readpage(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+
+static status_t
+devfs_read_pages(fs_volume _fs, fs_vnode _vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
-	struct devfs_vnode *v = _v;
+	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
 
-	TRACE(("devfs_readpage: vnode 0x%x, vecs 0x%x, pos 0x%x 0x%x\n", v, vecs, pos));
+	TRACE(("devfs_read_page: vnode 0x%x, vecs 0x%x, pos 0x%x 0x%x\n", vnode, vecs, pos));
 
-	if(v->stream.type == STREAM_TYPE_DEVICE) {
-		struct devfs_part_map *part_map = v->stream.u.dev.part_map;
-			
-		if(!v->stream.u.dev.ops->dev_readpage)
-			return ERR_NOT_ALLOWED;
-			
-		if( part_map ) {
-			if( pos < 0 )
-				return ERR_INVALID_ARGS;
-				
-			if( pos > part_map->size )
-				return 0;
+	if (vnode->stream.type != STREAM_TYPE_DEVICE
+		|| vnode->stream.u.dev.info->read_pages == NULL)
+		return B_NOT_ALLOWED;
 
-			// XXX we modify a passed-in structure
-			vecs->total_len = min( vecs->total_len, part_map->size - pos );
-			pos += part_map->offset;
-		}
+	if (vnode->stream.u.dev.part_map)
+		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_numBytes);
 
-		return v->stream.u.dev.ops->dev_readpage(v->stream.u.dev.ident, vecs, pos);
-	} else {
-		return ERR_NOT_ALLOWED;
-	}
+	return vnode->stream.u.dev.info->read_pages(vnode->stream.u.dev.node->cookie, pos, vecs, count, _numBytes);
 }
 
-static ssize_t devfs_writepage(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+
+static status_t
+devfs_write_pages(fs_volume _fs, fs_vnode _vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
-	struct devfs_vnode *v = _v;
+	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
 
-	TRACE(("devfs_writepage: vnode 0x%x, vecs 0x%x, pos 0x%x 0x%x\n", v, vecs, pos));
+	TRACE(("devfs_write_page: vnode 0x%x, vecs 0x%x, pos 0x%x 0x%x\n", vnode, vecs, pos));
 
-	if(v->stream.type == STREAM_TYPE_DEVICE) {
-		struct devfs_part_map *part_map = v->stream.u.dev.part_map;
+	if (vnode->stream.type != STREAM_TYPE_DEVICE
+		|| vnode->stream.u.dev.info->write_pages == NULL)
+		return B_NOT_ALLOWED;
 
-		if(!v->stream.u.dev.ops->dev_writepage)
-			return ERR_NOT_ALLOWED;
+	if (vnode->stream.u.dev.part_map)
+		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_numBytes);
 
-		if( part_map ) {
-			if( pos < 0 )
-				return ERR_INVALID_ARGS;
-				
-			if( pos > part_map->size )
-				return 0;
-
-			// XXX we modify a passed-in structure
-			vecs->total_len = min( vecs->total_len, part_map->size - pos );
-			pos += part_map->offset;
-		}
-
-		return v->stream.u.dev.ops->dev_writepage(v->stream.u.dev.ident, vecs, pos);
-	} else {
-		return ERR_NOT_ALLOWED;
-	}
+	return vnode->stream.u.dev.info->write_pages(vnode->stream.u.dev.node->cookie, pos, vecs, count, _numBytes);
 }
-#endif
 
 
 static status_t
@@ -1093,9 +1218,11 @@ file_system_info gDeviceFileSystem = {
 	&devfs_put_vnode,
 	&devfs_remove_vnode,
 
-	NULL,	// can page (currently commented out for whatever reason...)
-	NULL,	// read pages
-	NULL,	// write pages
+	&devfs_can_page,
+	&devfs_read_pages,
+	&devfs_write_pages,
+
+	NULL,	// get_file_map
 
 	/* common */
 	&devfs_ioctl,
@@ -1138,41 +1265,7 @@ file_system_info gDeviceFileSystem = {
 //	temporary hack to get it to work with the current device manager
 
 
-// info about one device
-typedef struct device_info {
-	struct device_info	*next, *prev;
-	
-	char 				*name;				// device name
-	pnp_devfs_driver_info *interface;		// interface of pnp driver
-	device_hooks		devfs_hooks;		// hooks passed to devfs
-	void				*cookie;			// pnp driver cookie for device
-	uint32				ref_count;			// number of open file handles + 1 if device
-											// is not a zombie
-	uint32				load_count;			// number of (virtual) load_driver calls
-	pnp_node_handle		parent;				// underlying node of driver
-	benaphore			load_lock;			// lock for load/unload calls
-} device_info;
-
-
 static device_manager_info *pnp;
-
-
-static status_t
-pnp_devfs_open(void *_device, uint32 flags, void **_deviceCookie)
-{
-	device_info *device = (device_info *)_device;
-	void *cookie;
-	status_t res;
-
-	TRACE(("pnp_devfs_open()\n"));
-
-	res = device->interface->open(device->cookie, flags, &cookie);
-	if (res != B_OK)
-		return res;
-
-	*_deviceCookie = cookie;
-	return B_OK;
-}
 
 
 static const pnp_node_attr pnp_devfs_attrs[] =
@@ -1191,70 +1284,48 @@ static status_t
 pnp_devfs_probe(pnp_node_handle parent)
 {
 	char *str = NULL, *filename = NULL;
-	device_info *device;
 	pnp_node_handle node;
-	status_t res;
+	status_t status;
 
 	TRACE(("pnp_devfs_probe()\n"));
 
 	// make sure we can handle this parent
 	if (pnp->get_attr_string(parent, PNP_DRIVER_TYPE, &str, false) != B_OK
 		|| strcmp(str, PNP_DEVFS_TYPE_NAME) != 0) {
-		res = B_ERROR;
-		goto err0;
+		status = B_ERROR;
+		goto err1;
 	}
 
 	if (pnp->get_attr_string(parent, PNP_DEVFS_FILENAME, &filename, true) != B_OK) {
-		dprintf("Item containing file name is missing\n");
-		res = B_ERROR;
-		goto err0;
+		dprintf("devfs: Item containing file name is missing\n");
+		status = B_ERROR;
+		goto err1;
 	}
 
 	TRACE(("Adding %s\n", filename));
 
-	device = (device_info *)malloc(sizeof(struct device_info));
-	if (device == NULL)
-		return B_NO_MEMORY;
+	pnp_devfs_driver_info *info;
+	status = pnp->load_driver(parent, NULL, (pnp_driver_info **)&info, NULL);
+	if (status != B_OK)
+		goto err1;
 
-	memset(device, 0, sizeof(struct device_info));
-
-	device->name = strdup(filename);
-	if (device->name == NULL) {
-		res = B_NO_MEMORY;
-		goto err;
-	}
-
-	device->parent = parent;
-	device->ref_count = 1;
-	device->load_count = 0;
-
-	res = pnp->load_driver(parent, NULL, 
-			(pnp_driver_info **)&device->interface, 
-			&device->cookie);
-	if (res != B_OK)
+	status = pnp->register_device(parent, pnp_devfs_attrs, NULL, &node);
+	if (status != B_OK || node == NULL)
 		goto err2;
 
-	res = pnp->register_device(parent, pnp_devfs_attrs, NULL, &node);
-	if (res != B_OK || node == NULL)
-		goto err3;
-
 	//add_device(device);
-	devfs_publish_device(device->name, device, (device_hooks *)(((struct pnp_driver_info *)(device->interface)) + 1));
+	devfs_publish_device(filename, node, info, NULL);
 	//nudge();
 
 	return B_OK;
 
-err3:
-	pnp->unload_driver(parent);
 err2:
-	free(device->name);
-err:
-	free(device);
-err0:
+	pnp->unload_driver(parent);
+err1:
 	free(str);
 	free(filename);
 
-	return res;
+	return status;
 }
 
 
@@ -1371,109 +1442,8 @@ devfs_publish_partition(const char *path, const partition_info *info)
 
 
 extern "C" status_t
-devfs_publish_device(const char *path, void *ident, device_hooks *ops)
+devfs_publish_device(const char *path, void *obsolete, device_hooks *ops)
 {
-	status_t status = B_OK;
-	char temp[B_PATH_NAME_LENGTH + 1];
-	struct devfs_vnode *dir;
-	struct devfs_vnode *v;
-
-	TRACE(("devfs_publish_device: entry path '%s', ident %p, hooks %p\n", path, ident, ops));
-
-	if (sDeviceFileSystem == NULL) {
-		panic("devfs_publish_device called before devfs mounted\n");
-		return B_ERROR;
-	}
-
-	if (ops == NULL || path == NULL || path[0] == '/'
-		|| ops->open == NULL || ops->close == NULL
-		|| ops->read == NULL || ops->write == NULL)
-		return B_BAD_VALUE;
-
-	// copy the path over to a temp buffer so we can munge it
-	strlcpy(temp, path, B_PATH_NAME_LENGTH);
-
-	mutex_lock(&sDeviceFileSystem->lock);
-
-	// create the path leading to the device
-	// parse the path passed in, stripping out '/'
-	dir = sDeviceFileSystem->root_vnode;
-	v = NULL;
-	int32 i = 0, last = 0;
-	bool atLeaf = false;
-	bool isDisk = false;
-
-	for (;;) {
-		if (temp[i] == 0) {
-			atLeaf = true; // we'll be done after this one
-		} else if (temp[i] == '/') {
-			temp[i] = 0;
-			i++;
-		} else {
-			i++;
-			continue;
-		}
-
-		TRACE(("\tpath component '%s'\n", &temp[last]));
-
-		// we have a path component
-		v = devfs_find_in_dir(dir, &temp[last]);
-		if (v) {
-			if (!atLeaf) {
-				// we are not at the leaf of the path, so as long as
-				// this is a dir we're okay
-				if (v->stream.type == STREAM_TYPE_DIR) {
-					last = i;
-					dir = v;
-					continue;
-				}
-			}
-			// we are at the leaf and hit another node
-			// or we aren't but hit a non-dir node.
-			// we're screwed
-			status = B_FILE_EXISTS;
-			goto out;
-		} else {
-			v = devfs_create_vnode(sDeviceFileSystem, &temp[last]);
-			if (!v) {
-				status = B_NO_MEMORY;
-				goto out;
-			}
-		}
-
-		// set up the new vnode
-		if (atLeaf) {
-			// this is the last component
-			v->stream.type = STREAM_TYPE_DEVICE;
-			v->stream.u.dev.ident = ident;
-			v->stream.u.dev.ops = ops;
-
-			// every raw disk gets an I/O scheduler object attached
-			if (isDisk && !strcmp(&temp[last], "raw")) 
-				v->stream.u.dev.scheduler = new IOScheduler(path, ops);
-		} else {
-			// this is a dir
-			v->stream.type = STREAM_TYPE_DIR;
-			v->stream.u.dir.dir_head = NULL;
-			v->stream.u.dir.jar_head = NULL;
-
-			// mark disk devices - they might get an I/O scheduler
-			if (last == 0 && !strcmp(temp, "disk"))
-				isDisk = true;
-		}
-
-		hash_insert(sDeviceFileSystem->vnode_list_hash, v);
-
-		devfs_insert_in_dir(dir, v);
-
-		if (atLeaf)
-			break;
-		last = i;
-		dir = v;
-	}
-
-out:
-	mutex_unlock(&sDeviceFileSystem->lock);
-	return status;
+	return devfs_publish_device(path, NULL, NULL, ops);
 }
 
