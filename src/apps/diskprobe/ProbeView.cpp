@@ -969,12 +969,25 @@ ProbeView::UpdateAttributesMenu(BMenu *menu)
 
 
 void 
-ProbeView::AddFileMenuItems(BMenu *menu, int32 index)
+ProbeView::AddSaveMenuItems(BMenu *menu, int32 index)
+{
+	BMenuItem *item;
+	menu->AddItem(item = new BMenuItem("Save", new BMessage(B_SAVE_REQUESTED)), index++);
+	item->SetTarget(this);
+	item->SetEnabled(false);
+	//menu->AddItem(new BMenuItem("Save As" B_UTF8_ELLIPSIS, NULL));
+}
+
+
+void 
+ProbeView::AddPrintMenuItems(BMenu *menu, int32 index)
 {
 	BMenuItem *item;
 	menu->AddItem(item = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, NULL), index++);
+	item->SetTarget(this);
 	item->SetEnabled(false);
 	menu->AddItem(item = new BMenuItem("Print" B_UTF8_ELLIPSIS, NULL, 'P', B_COMMAND_KEY), index++);
+	item->SetTarget(this);
 	item->SetEnabled(false);
 }
 
@@ -1002,7 +1015,9 @@ ProbeView::AttachedToWindow()
 		ResizeBy(0, -bar->Bounds().Height());
 
 		BMenu *menu = new BMenu(fEditor.IsAttribute() ? "Attribute" : fEditor.IsDevice() ? "Device" : "File");
-		AddFileMenuItems(menu, 0);
+		AddSaveMenuItems(menu, 0);
+		menu->AddSeparatorItem();
+		AddPrintMenuItems(menu, menu->CountItems());
 		menu->AddSeparatorItem();
 
 		menu->AddItem(new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W', B_COMMAND_KEY));
@@ -1056,9 +1071,6 @@ ProbeView::AttachedToWindow()
 	fSwappedMenuItem->SetTarget(fHeaderView);
 	menu->AddItem(new BMenuItem(subMenu));
 	UpdateSelectionMenuItems(0, 0);
-	menu->AddSeparatorItem();
-
-	menu->AddItem(new BMenuItem("Write", NULL, 'S', B_COMMAND_KEY));
 	menu->AddSeparatorItem();
 
 	subMenu = new BMenu("Bookmarks");

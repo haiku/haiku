@@ -33,7 +33,8 @@ class ProbeView : public BView {
 		virtual void WindowActivated(bool active);
 		virtual void MessageReceived(BMessage *message);
 
-		void AddFileMenuItems(BMenu *menu, int32 index);
+		void AddSaveMenuItems(BMenu *menu, int32 index);
+		void AddPrintMenuItems(BMenu *menu, int32 index);
 
 		void UpdateSizeLimits();
 

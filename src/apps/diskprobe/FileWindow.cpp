@@ -45,7 +45,12 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 					new BMessage(kMsgOpenFilePanel), 'O', B_COMMAND_KEY));
 	menu->AddSeparatorItem();
 
-	// the ProbeView file menu items will be inserted here
+	// the ProbeView save menu items will be inserted here
+	BMenuItem *item = new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W', B_COMMAND_KEY);
+	menu->AddItem(item);
+	menu->AddSeparatorItem();
+
+	// the ProbeView print menu items will be inserted here
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem("About DiskProbe" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));
@@ -53,6 +58,7 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q', B_COMMAND_KEY));
 	menu->SetTargetForItems(be_app);
+	item->SetTarget(this);
 	menuBar->AddItem(menu);
 
 	// add our interface widgets
@@ -60,7 +66,8 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 	BRect rect = Bounds();
 	rect.top = menuBar->Bounds().Height() + 1;
 	ProbeView *probeView = new ProbeView(rect, ref, NULL, settings);
-	probeView->AddFileMenuItems(menu, menu->CountItems() - 4);
+	probeView->AddSaveMenuItems(menu, 4);
+	probeView->AddPrintMenuItems(menu, menu->CountItems() - 4);
 	AddChild(probeView);
 
 	probeView->UpdateSizeLimits();

@@ -173,11 +173,11 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 
 	BMenu *menu = new BMenu("Attribute");
 
-	menu->AddItem(new BMenuItem("Save", NULL, 'S', B_COMMAND_KEY));
+	// the ProbeView save menu items will be inserted here
 	menu->AddItem(new BMenuItem("Remove from File", new BMessage(kMsgRemoveAttribute)));
 	menu->AddSeparatorItem();
 
-	// the ProbeView file menu items will be inserted here
+	// the ProbeView print menu items will be inserted here
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W', B_COMMAND_KEY));
@@ -201,7 +201,8 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 	rect = tabView->ContainerView()->Bounds();
 	rect.top += 3;
 	fProbeView = new ProbeView(rect, ref, attribute, settings);
-	fProbeView->AddFileMenuItems(menu, menu->CountItems() - 2);
+	fProbeView->AddSaveMenuItems(menu, 0);
+	fProbeView->AddPrintMenuItems(menu, menu->CountItems() - 2);
 	tabView->AddRawEditorTab(fProbeView);
 
 	view->AddChild(tabView);
