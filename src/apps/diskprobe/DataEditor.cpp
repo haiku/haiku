@@ -90,7 +90,7 @@ ReplaceChange::Normalize(off_t bufferOffset, size_t bufferSize, off_t &offset,
 	}
 
 	if (offset + size > bufferOffset + bufferSize)
-		size = offset - bufferOffset + offset;
+		size = bufferOffset + bufferSize - offset;
 }
 
 
@@ -98,7 +98,7 @@ void
 ReplaceChange::Apply(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 {
 	// is it in our range?
-	if (fOffset - bufferOffset > bufferSize || fOffset + fSize < bufferOffset)
+	if (fOffset > bufferOffset + bufferSize || fOffset + fSize < bufferOffset)
 		return;
 
 	// don't change anything outside the supplied buffer
@@ -318,8 +318,12 @@ DataEditor::AddChange(DataChange *change)
 status_t 
 DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 {
-	if (!IsLocked())
-		debugger("DataEditor: view not locked");
+	BAutolock locker(this);
+
+	if (offset >= fSize)
+		return B_BAD_VALUE;
+	if (offset + length > fSize)
+		length = fSize - offset;
 
 	if (fNeedsUpdate) {
 		status_t status = Update();
@@ -337,8 +341,7 @@ DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 status_t 
 DataEditor::Remove(off_t offset, off_t length)
 {
-	if (!IsLocked())
-		debugger("DataEditor: view not locked");
+	BAutolock locker(this);
 
 	// not yet implemented
 
@@ -349,8 +352,7 @@ DataEditor::Remove(off_t offset, off_t length)
 status_t 
 DataEditor::Insert(off_t offset, const uint8 *text, size_t length)
 {
-	if (!IsLocked())
-		debugger("DataEditor: view not locked");
+	BAutolock locker(this);
 
 	// not yet implemented
 
@@ -490,6 +492,9 @@ DataEditor::SetViewOffset(off_t offset)
 		if (status < B_OK)
 			return status;
 	}
+
+	if (offset < 0 || offset > fSize)
+		return B_BAD_VALUE;
 
 	fRealViewOffset = (offset / fBlockSize) * fBlockSize;
 	fViewOffset = offset;
