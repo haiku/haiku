@@ -219,9 +219,6 @@ ShowImageWindow::BuildViewMenu(BMenu *pmenu)
 	// Note: ShowImage loades images in window thread so it becomes unresponsive if
 	// slide show delay is too short! (Especially if loading the image takes as long as
 	// or longer than the slide show delay). Should load in background thread!
-	// AddDelayItem(pDelay, "Half a Second", 0.5, false);
-	// AddDelayItem(pDelay, "One Second", 1, false);
-	// AddDelayItem(pDelay, "Two Second", 2, false);
 	AddDelayItem(pDelay, "Three Seconds", 3);
 	AddDelayItem(pDelay, "Four Second", 4);
 	AddDelayItem(pDelay, "Five Seconds", 5);
@@ -844,9 +841,11 @@ ShowImageWindow::ClosePrompt()
 		if (pAlert->Go() == 0)
 			// Cancel
 			return false;
-		else
+		else {
 			// Close
+			fModified = false;
 			return true;
+		}
 	}
 }
 
