@@ -1090,7 +1090,7 @@ b44_LM_ServiceInterrupts(PLM_DEVICE_BLOCK pDevice)
 
 		/* if not for us */
 		if (intstatus == 0)
-			return LM_STATUS_SUCCESS;
+			return 12;
 
 		/* clear the interrupt */
 		REG_WR(pDevice, intstatus, intstatus);
