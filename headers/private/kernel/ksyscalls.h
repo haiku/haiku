@@ -85,6 +85,8 @@ enum {
 	SYSCALL_FSTAT,
 	SYSCALL_READ_DIR,
 	SYSCALL_REWIND_DIR,
+	SYSCALL_OPEN_DIR,
+	SYSCALL_CREATE_DIR
 };
 
 int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret);

@@ -29,6 +29,7 @@ struct fd_ops {
 	char *fs_name;
 	ssize_t		(*fd_read) (struct file_descriptor *, void *buffer, off_t pos, size_t *length);
 	ssize_t		(*fd_write)(struct file_descriptor *, const void *buffer, off_t pos, size_t *length);
+	int			(*fd_seek)(struct file_descriptor *, off_t pos, int seek_type);
 	int			(*fd_ioctl)(struct file_descriptor *, ulong op, void *buffer, size_t length);
 //	int			(*fd_poll)(struct file_descriptor *, int);
 	status_t	(*fd_read_dir)(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
@@ -46,13 +47,10 @@ struct file_descriptor {
 	void	*cookie;
 };
 
-//#define DTYPE_VNODE        1
-//#define DTYPE_SOCKET       2
 
 /* Types of file descriptors we can create */
 
 enum fd_types {
-	FDTYPE_VNODE = 1,	// ToDo: to be removed shortly
 	FDTYPE_FILE	= 1,
 	FDTYPE_ATTR,
 	FDTYPE_DIR,
