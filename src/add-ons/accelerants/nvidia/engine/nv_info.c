@@ -936,6 +936,65 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			}
 			adress += size32;
 			break;
+		case 0x34: /* new */
+			*size -= (12 + ((*((uint8*)(&(rom[(adress + 7)])))) << 1));
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			index = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			and_out = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			shift = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			offset32 = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			size32 = ((*((uint8*)(&(rom[adress])))) << 1);
+			adress += 1;
+			reg2 = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			safe = ISARB(reg);
+			ISAWB(reg, index);
+			byte = ISARB(reg + 1);
+			ISAWB(reg, safe);
+			byte &= (uint8)and_out;
+			data = (byte >> shift);
+			data <<= 1;
+			data2 = *((uint16*)(&(rom[(adress + data)])));
+			if (offset32 < 0x80)
+			{
+//				exec_cmd_39(adress, offset32, exec);
+				data2 <<= 1;
+			}
+//add real logline here..
+			LOG(8,("blabla...\n"));
+			if (exec && reg2)
+			{
+				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
+				display_mode target;
+				float calced_clk;
+				uint8 m, n, p;
+				target.space = B_CMAP8;
+				target.timing.pixel_clock = (data2 * 10);
+				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
+				NV_REG32(reg2) = ((p << 16) | (n << 8) | m);
+//fixme?
+				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
+//				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
+//					DACW(PIXPLLC2, 0x80000401);
+			}
+			log_pll(reg);
+			adress += size32;
+			break;
 		case 0x37: /* new */
 			*size -= 11;
 			if (*size < 0)
