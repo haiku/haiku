@@ -12,6 +12,8 @@
 
 #include "PhysicalPartitionAllocator.h"
 
+Udf::extent_address PhysicalPartitionAllocator::dummyExtent;
+
 PhysicalPartitionAllocator::PhysicalPartitionAllocator(uint16 number,
                                                        uint32 offset,
                                                        Allocator &allocator)
