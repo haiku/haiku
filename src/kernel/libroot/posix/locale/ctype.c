@@ -41,14 +41,14 @@ _U,_U,_U,_U,_U,_U,_U,_P,_U,_U,_U,_U,_U,_U,_U,_L,       /* 208-223 */
 _L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,       /* 224-239 */
 _L,_L,_L,_L,_L,_L,_L,_P,_L,_L,_L,_L,_L,_L,_L,_L};      /* 240-255 */
 
-unsigned char tolower(unsigned char c)
+int tolower(int c)
 {
 	if(isupper(c))
 		c -= 'A'-'a';
 	return c;
 }
 
-unsigned char toupper(unsigned char c)
+int toupper(int c)
 {
 	if(islower(c))
 		c -= 'a'-'A';
@@ -120,3 +120,7 @@ int toascii(int c)
 	return ((unsigned char)c & 0x7f);
 }
 
+int isblank(int c)
+{
+	return (((unsigned char)c == ' ') || ((unsigned char)c == '\t'));
+}
