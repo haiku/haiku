@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-2/2004
+   Rudolf Cornelissen 12/2003-3/2004
 */
 
 #define MODULE_BIT 0x00010000
@@ -143,6 +143,20 @@ status_t nv_dac_set_pix_pll(display_mode target)
 
 	float pix_setting, req_pclk;
 	status_t result;
+
+	/* fix a DVI or laptop flatpanel to 60Hz refresh! */
+	/* Note:
+	 * The pixelclock drives the flatpanel modeline, not the CRTC modeline. */
+	if (si->ps.tmds1_active)
+	{
+		LOG(4,("DAC: Fixing DFP refresh to 60Hz!\n"));
+
+		/* readout the panel's modeline to determine the needed pixelclock */
+		target.timing.pixel_clock = (
+			((DACR(FP_HTOTAL) & 0x0000ffff) + 1) *
+			((DACR(FP_VTOTAL) & 0x0000ffff) + 1) *
+			60) / 1000;
+	}
 
 	req_pclk = (target.timing.pixel_clock)/1000.0;
 	LOG(4,("DAC: Setting PIX PLL for pixelclock %f\n", req_pclk));

@@ -252,10 +252,12 @@ static void detect_panels()
 	/* detect if the BIOS enabled LCD's (internal panels or DVI) or TVout */
 	{
 		/* both external TMDS transmitters (used for LCD/DVI) and external TVencoders
-		 * use the CRTC's in slaved mode. */
+		 * can use the CRTC's in slaved mode. */
 		/* Note:
-		 * It looks like GeForceFX cards have on die TMDS encoders that nolonger
-		 * require the CRTC to be slaved. */
+		 * Apparantly a panel on CRTC1 uses the CRTC in slaved mode, while a panel
+		 * on CRTC2 uses the CRTC in master mode. */
+		/* Note also:
+		 * DFP's are programmed with standard VESA modelines by the card's BIOS! */
 		bool slaved_for_dev1 = false, slaved_for_dev2 = false;
 		bool tvout1 = false, tvout2 = false;
 

@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-1/2004
+   Rudolf Cornelissen 11/2002-3/2004
 */
 
 #define MODULE_BIT 0x00020000
@@ -112,10 +112,12 @@ status_t nv_crtc2_set_timing(display_mode target)
 	/* enable access to CRTC2 */
 	CRTC2W(OWNER, 0x03);
 
-//fixme: flatpanel 'don't touch' update needed for 'Go' cards!?!
-	if (true)
+	/* Note for laptop and DVI flatpanels:
+	 * CRTC timing has a seperate set of registers from flatpanel timing.
+	 * The flatpanel timing registers have scaling registers that are used to match
+	 * these two modelines. */
 	{
-		LOG(4,("CRTC2: CRT only mode, setting full timing...\n"));
+		LOG(4,("CRTC2: Setting full timing...\n"));
 
 		/* log the mode that will be set */
 		LOG(2,("CRTC2:\n\tHTOT:%x\n\tHDISPEND:%x\n\tHBLNKS:%x\n\tHBLNKE:%x\n\tHSYNCS:%x\n\tHSYNCE:%x\n\t",htotal,hdisp_e,hblnk_s,hblnk_e,hsync_s,hsync_e));
@@ -220,6 +222,24 @@ status_t nv_crtc2_set_timing(display_mode target)
 	/* always disable interlaced operation */
 	/* (interlace is supported on upto and including NV10, NV15, and NV30 and up) */
 	CRTC2W(INTERLACE, 0xff);
+
+	/* setup flatpanel scaling if needed */
+	//fixme: unlock registers and/or setup chksum?!? doesn't work yet :-/
+	if (si->ps.tmds2_active)
+	{
+		uint32 iscale_x, iscale_y;
+
+		//fixme: checkout upscaling and aspect!!!
+		iscale_x = ((4096 * target.timing.h_display) / si->ps.panel1_width);
+		iscale_y = ((4096 * target.timing.v_display) / si->ps.panel1_height);
+		DAC2W(FP_DEBUG3, (iscale_x & 0x00001fff) | ((iscale_y & 0x00001fff) << 16));
+
+		/* limit last fetched line if vertical scaling is done */
+		if (iscale_y != 4096)
+			DAC2W(FP_DEBUG2, ((1 << 28) | ((target.timing.v_display - 1) << 16)));
+		else
+			DAC2W(FP_DEBUG2, 0x00000000);
+	}
 
 	return B_OK;
 }
