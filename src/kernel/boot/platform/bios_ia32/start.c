@@ -8,6 +8,7 @@
 #include "cpu.h"
 #include "mmu.h"
 #include "keyboard.h"
+#include "bios.h"
 
 #include <KernelExport.h>
 #include <boot/platform.h>
@@ -68,6 +69,7 @@ platform_start_kernel(void)
 		// something goes wrong when we pass &gKernelArgs directly
 		// to the assembler inline below - might be a bug in GCC
 		// or I don't see something important...
+	addr_t stackTop = gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
 	mmu_init_for_kernel();
 	cpu_boot_other_cpus();
@@ -76,7 +78,7 @@ platform_start_kernel(void)
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
-		: : "m" (gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
+		: : "m" (stackTop));
 	asm("pushl  $0x0; "					// we're the BSP cpu (0)
 		"pushl 	%0;	"					// kernel args
 		"pushl 	$0x0;"					// dummy retval for call to main
@@ -85,6 +87,16 @@ platform_start_kernel(void)
 		: : "g" (args), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
 
 	panic("kernel returned!\n");
+}
+
+
+void
+platform_exit(void)
+{
+	struct bios_regs regs;
+	regs.eax = 0x0;
+	call_bios(0x19, &regs);
+		// this should reboot the system (but doesn't seem to work...)
 }
 
 
