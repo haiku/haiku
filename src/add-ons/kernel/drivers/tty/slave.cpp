@@ -96,7 +96,20 @@ slave_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 	slave_cookie *cookie = (slave_cookie *)_cookie;
 
 	TRACE(("slave_ioctl: cookie %p, op %lu, buffer %p, length %lu\n", _cookie, op, buffer, length));
-	return tty_ioctl(cookie->tty, op, buffer, length);
+
+	switch (op) {
+		case B_SET_BLOCKING_IO:
+			cookie->open_mode &= ~O_NONBLOCK;
+			break;
+		case B_SET_NONBLOCKING_IO:
+			cookie->open_mode |= O_NONBLOCK;
+			break;
+
+		default:
+			return tty_ioctl(cookie->tty, op, buffer, length);		
+	}
+
+	return B_OK;
 }
 
 
