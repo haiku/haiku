@@ -28,6 +28,9 @@
 static const char *testDir			= "/tmp/testDir";
 static const char *testFile1		= "/tmp/testDir/file1";
 static const char *testFile2		= "/tmp/testDir/file2";
+static const char *testFile3		= "/tmp/testDir/file3";
+static const char *testFile4		= "/tmp/testDir/file4";
+static const char *abstractTestEntry = "/tmp/testDir/abstract-entry";
 static const char *testType1		= "application/x-vnd.obos.node-info-test1";
 static const char *testType2		= "application/x-vnd.obos.node-info-test2";
 static const char *invalidTestType	= "invalid-mime-type";
@@ -48,7 +51,7 @@ static const char *kTypeAttribute			= "BEOS:TYPE";
 static const char *kMiniIconAttribute		= "BEOS:M:STD_ICON";
 static const char *kLargeIconAttribute		= "BEOS:L:STD_ICON";
 static const char *kPreferredAppAttribute	= "BEOS:PREF_APP";
-//static const char *kAppHintAttribute		= "BEOS:PPATH";
+static const char *kAppHintAttribute		= "BEOS:PPATH";
 
 enum {
 	MINI_ICON_TYPE	= 'MICN',
@@ -93,16 +96,16 @@ NodeInfoTest::Suite() {
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
 	typedef CppUnit::TestCaller<NodeInfoTest> TC;
 		
-//	suite->addTest( new TC("BNodeInfo::Init Test1", &NodeInfoTest::InitTest1) );
-//	suite->addTest( new TC("BNodeInfo::Init Test2", &NodeInfoTest::InitTest2) );
-//	suite->addTest( new TC("BNodeInfo::Type Test", &NodeInfoTest::TypeTest) );
-//	suite->addTest( new TC("BNodeInfo::Icon Test", &NodeInfoTest::IconTest) );
+	suite->addTest( new TC("BNodeInfo::Init Test1", &NodeInfoTest::InitTest1) );
+	suite->addTest( new TC("BNodeInfo::Init Test2", &NodeInfoTest::InitTest2) );
+	suite->addTest( new TC("BNodeInfo::Type Test", &NodeInfoTest::TypeTest) );
+	suite->addTest( new TC("BNodeInfo::Icon Test", &NodeInfoTest::IconTest) );
 	suite->addTest( new TC("BNodeInfo::Preferred App Test",
 						   &NodeInfoTest::PreferredAppTest) );
-//	suite->addTest( new TC("BNodeInfo::App Hint Test",
-//						   &NodeInfoTest::AppHintTest) );
-//	suite->addTest( new TC("BNodeInfo::Tracker Icon Test",
-//						   &NodeInfoTest::TrackerIconTest) );
+	suite->addTest( new TC("BNodeInfo::App Hint Test",
+						   &NodeInfoTest::AppHintTest) );
+	suite->addTest( new TC("BNodeInfo::Tracker Icon Test",
+						   &NodeInfoTest::TrackerIconTest) );
 
 	return suite;
 }		
@@ -116,15 +119,21 @@ NodeInfoTest::setUp()
 	execCommand(
 		string("mkdir ") + testDir
 		+ "; touch " + testFile1
-		+ "; touch " + testFile2
+			   + " " + testFile2
+			   + " " + testFile3
+			   + " " + testFile4
 	);
 	// create app
 	fApplication = new BApplication("application/x-vnd.obos.node-info-test");
 	// create icons
 	fIconM1 = create_test_icon(B_MINI_ICON, 1);
 	fIconM2 = create_test_icon(B_MINI_ICON, 2);
+	fIconM3 = create_test_icon(B_MINI_ICON, 3);
+	fIconM4 = create_test_icon(B_MINI_ICON, 4);
 	fIconL1 = create_test_icon(B_LARGE_ICON, 1);
 	fIconL2 = create_test_icon(B_LARGE_ICON, 2);
+	fIconL3 = create_test_icon(B_LARGE_ICON, 3);
+	fIconL4 = create_test_icon(B_LARGE_ICON, 4);
 }
 	
 // tearDown
@@ -134,15 +143,19 @@ NodeInfoTest::tearDown()
 	// delete the icons
 	delete fIconM1;
 	delete fIconM2;
+	delete fIconM3;
+	delete fIconM4;
 	delete fIconL1;
 	delete fIconL2;
+	delete fIconL3;
+	delete fIconL4;
 	fIconM1 = fIconM2 = fIconL1 = fIconL2 = NULL;
 	// delete the application
 	delete fApplication;
 	fApplication = NULL;
 	// remove the types we've added
 	const char * const testTypes[] = {
-		testType1, testType2
+		testType1, testType2, testAppSignature1, testAppSignature2
 	};
 	for (uint32 i = 0; i < sizeof(testTypes) / sizeof(const char*); i++) {
 		BMimeType type(testTypes[i]);
@@ -302,12 +315,25 @@ CheckPreferredAppAttr(BNode &node, const char *data)
 			  strlen(data) + 1);
 }
 
+// CheckAppHintAttr
+static
+void
+CheckAppHintAttr(BNode &node, const entry_ref *ref)
+{
+	BPath path;
+	CHK(path.SetTo(ref) == B_OK);
+	const char *data = path.Path();
+// R5: Attribute is of type B_MIME_STRING_TYPE though it contains a path name!
+	CheckAttr(node, kAppHintAttribute, B_MIME_STRING_TYPE, data,
+			  strlen(data) + 1);
+}
+
 // TypeTest
 void
 NodeInfoTest::TypeTest()
 {
 	// status_t GetType(char *type) const
-	// * NULL type => B_BAD_VALUE
+	// * NULL type => B_BAD_ADDRESS
 	NextSubTest();
 	{
 		BNode node(testFile1);
@@ -557,7 +583,7 @@ void
 NodeInfoTest::PreferredAppTest()
 {
 	// status_t GetPreferredApp(char *signature, app_verb verb = B_OPEN) const
-	// * NULL signature => B_BAD_VALUE
+	// * NULL signature => B_BAD_ADDRESS
 	NextSubTest();
 	{
 		BNode node(testFile1);
@@ -655,39 +681,308 @@ NodeInfoTest::PreferredAppTest()
 void
 NodeInfoTest::AppHintTest()
 {
+	// init test refs
+	entry_ref testRef1, testRef2, abstractRef;
+	CHK(get_ref_for_path(testFile3, &testRef1) == B_OK);
+	CHK(get_ref_for_path(testFile4, &testRef2) == B_OK);
+	CHK(get_ref_for_path(abstractTestEntry, &abstractRef) == B_OK);
+
 	// status_t GetAppHint(entry_ref *ref) const
 	// * NULL ref => B_BAD_VALUE
+	NextSubTest();
+	{
+		BNode node(testFile1);
+		BNodeInfo nodeInfo;
+		CHK(nodeInfo.SetTo(&node) == B_OK);
+		CHK(nodeInfo.GetAppHint(NULL) == B_BAD_VALUE);
+	}
 	// * uninitialized => B_NO_INIT
-	// * invalid/abstract ref => != B_OK
+	NextSubTest();
+	{
+		BNodeInfo nodeInfo;
+		entry_ref ref;
+		CHK(nodeInfo.GetAppHint(&ref) == B_NO_INIT);
+	}
 	// * has no app hint => B_ENTRY_NOT_FOUND
+	NextSubTest();
+	{
+		BNode node(testFile1);
+		BNodeInfo nodeInfo;
+		CHK(nodeInfo.SetTo(&node) == B_OK);
+		entry_ref ref;
+		CHK(nodeInfo.GetAppHint(&ref) == B_ENTRY_NOT_FOUND);
+	}
 	// * set, get, reset, get
+	NextSubTest();
+	{
+		BNode node(testFile1);
+		BNodeInfo nodeInfo;
+		CHK(nodeInfo.SetTo(&node) == B_OK);
+		// set
+		CHK(nodeInfo.SetAppHint(&testRef1) == B_OK);
+		// get
+		entry_ref ref;
+		CHK(nodeInfo.GetAppHint(&ref) == B_OK);
+		CHK(ref == testRef1);
+		CheckAppHintAttr(node, &testRef1);
+		// reset
+		CHK(nodeInfo.SetAppHint(&testRef2) == B_OK);
+		// get
+		CHK(nodeInfo.GetAppHint(&ref) == B_OK);
+		CHK(ref == testRef2);
+		CheckAppHintAttr(node, &testRef2);
+	}
+
 	// status_t SetAppHint(const entry_ref *ref)
-	// * NULL ref => B_BAD_VALUE
+	// * NULL ref => B_OK
+	NextSubTest();
+	{
+		BNode node(testFile1);
+		BNodeInfo nodeInfo;
+		CHK(nodeInfo.SetTo(&node) == B_OK);
+		CHK(nodeInfo.SetAppHint(NULL) == B_OK);
+		// get
+		entry_ref ref;
+		CHK(nodeInfo.GetAppHint(&ref) == B_ENTRY_NOT_FOUND);
+		CheckNoAttr(node, kAppHintAttribute);
+	}
 	// * uninitialized => B_NO_INIT
+	NextSubTest();
+	{
+		BNodeInfo nodeInfo;
+		CHK(nodeInfo.SetAppHint(&testRef1) == B_NO_INIT);
+	}
 	// * invalid/abstract ref => != B_OK
+	NextSubTest();
+	{
+		BNode node(testFile1);
+		BNodeInfo nodeInfo;
+		CHK(nodeInfo.SetTo(&node) == B_OK);
+		// invalid ref
+		entry_ref invalidRef;
+		CHK(nodeInfo.SetAppHint(&invalidRef) != B_OK);
+		// abstract ref
+		CHK(nodeInfo.SetAppHint(&abstractRef) == B_OK);
+		// get
+		entry_ref ref;
+		CHK(nodeInfo.GetAppHint(&ref) == B_OK);
+		CHK(ref == abstractRef);
+		CheckAppHintAttr(node, &abstractRef);
+	}
+}
+
+// TestTrackerIcon
+static
+void
+TestTrackerIcon(BNodeInfo &nodeInfo, entry_ref *ref, icon_size size,
+				BBitmap *expectedIcon)
+{
+	// mini
+	if (size == B_MINI_ICON) {
+		// non-static
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CHK(nodeInfo.GetTrackerIcon(&icon, B_MINI_ICON) == B_OK);
+		CHK(icon_equal(expectedIcon, &icon));
+		// static
+		BBitmap icon1(BRect(0, 0, 15, 15), B_CMAP8);
+		CHK(BNodeInfo::GetTrackerIcon(ref, &icon1, B_MINI_ICON) == B_OK);
+		CHK(icon_equal(expectedIcon, &icon1));
+	} else {
+		// large
+		// non-static
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CHK(nodeInfo.GetTrackerIcon(&icon2, B_LARGE_ICON) == B_OK);
+		CHK(icon_equal(expectedIcon, &icon2));
+		// static
+		BBitmap icon3(BRect(0, 0, 31, 31), B_CMAP8);
+		CHK(BNodeInfo::GetTrackerIcon(ref, &icon3, B_LARGE_ICON) == B_OK);
+		CHK(icon_equal(expectedIcon, &icon3));
+	}
 }
 
 // TrackerIconTest
 void
 NodeInfoTest::TrackerIconTest()
 {
-	// status_t GetTrackerIcon(BBitmap *icon, icon_size k = B_LARGE_ICON) const
-	// * NULL icon => B_BAD_VALUE
-	// * uninitialized => B_NO_INIT
-	// * unknown icon size => B_BAD_VALUE
-	// * icon dimensions != icon size => B_BAD_VALUE
-	// * has no icon, but preferred app with icon for type => B_OK
-	// * no icon, no preferred app/preferred app without icon for type,
-	//   but icon for type in MIME data base => B_OK
-	// * no icon, no preferred app/preferred app without icon for type,
-	//   no icon for type in MIME data base, preferred app for type in MIME
-	//   database and app has icon for type => B_OK
-	// * no icon, no preferred app/preferred app without icon for type,
-	//   no icon for type in MIME data base, no preferred app for type in MIME
-	//   database/app without icon for type => != B_OK
+	entry_ref testRef1;
+	CHK(get_ref_for_path(testFile1, &testRef1) == B_OK);
+	BBitmap octetMIcon(BRect(0, 0, 15, 15), B_CMAP8);
+	BBitmap octetLIcon(BRect(0, 0, 31, 31), B_CMAP8);
+	BMimeType octetType("application/octet-stream");
+	CHK(octetType.GetIcon(&octetMIcon, B_MINI_ICON) == B_OK);
+	CHK(octetType.GetIcon(&octetLIcon, B_LARGE_ICON) == B_OK);
+
 	// static status_t GetTrackerIcon(const entry_ref *ref, BBitmap *icon,
 	//								  icon_size k = B_LARGE_ICON)
 	// * NULL ref => B_BAD_VALUE
-	// otherwise same tests
+	NextSubTest();
+	{
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CHK(BNodeInfo::GetTrackerIcon(NULL, &icon, B_MINI_ICON)
+			== B_BAD_VALUE);
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CHK(BNodeInfo::GetTrackerIcon(NULL, &icon2, B_LARGE_ICON)
+			== B_BAD_VALUE);
+	}
+
+	// status_t GetTrackerIcon(BBitmap *icon, icon_size k = B_LARGE_ICON) const
+	// * uninitialized => B_NO_INIT
+	NextSubTest();
+	{
+		BNodeInfo nodeInfo;
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CHK(nodeInfo.GetTrackerIcon(&icon, B_MINI_ICON) == B_NO_INIT);
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CHK(nodeInfo.GetTrackerIcon(&icon2, B_LARGE_ICON) == B_NO_INIT);
+	}
+
+	// status_t GetTrackerIcon(BBitmap *icon, icon_size k = B_LARGE_ICON) const
+	// static status_t GetTrackerIcon(const entry_ref *ref, BBitmap *icon,
+	//								  icon_size k = B_LARGE_ICON)
+	// * NULL icon => B_BAD_VALUE
+	NextSubTest();
+	{
+		// non-static
+		BNode node(testFile1);
+		BNodeInfo nodeInfo;
+		CHK(nodeInfo.SetTo(&node) == B_OK);
+		CHK(nodeInfo.GetTrackerIcon(NULL, B_MINI_ICON) == B_BAD_VALUE);
+		CHK(nodeInfo.GetTrackerIcon(NULL, B_LARGE_ICON) == B_BAD_VALUE);
+		// static
+		CHK(BNodeInfo::GetTrackerIcon(&testRef1, NULL, B_MINI_ICON)
+			== B_BAD_VALUE);
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CHK(BNodeInfo::GetTrackerIcon(&testRef1, NULL, B_LARGE_ICON)
+			== B_BAD_VALUE);
+	}
+	// * icon dimensions != icon size => B_BAD_VALUE
+	NextSubTest();
+	{
+		// non-static
+		BNode node(testFile1);
+		BNodeInfo nodeInfo;
+		CHK(nodeInfo.SetTo(&node) == B_OK);
+		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
+		CHK(nodeInfo.GetTrackerIcon(&icon, B_MINI_ICON) == B_BAD_VALUE);
+		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
+		CHK(nodeInfo.GetTrackerIcon(&icon2, B_LARGE_ICON) == B_BAD_VALUE);
+		// static
+		CHK(BNodeInfo::GetTrackerIcon(&testRef1, &icon, B_MINI_ICON)
+			== B_BAD_VALUE);
+		CHK(BNodeInfo::GetTrackerIcon(&testRef1, &icon2, B_LARGE_ICON)
+			== B_BAD_VALUE);
+	}
+
+	// initialization for further tests
+	BNode node(testFile1);
+	BNodeInfo nodeInfo;
+	CHK(nodeInfo.SetTo(&node) == B_OK);
+	// install file type
+	BMimeType type(testType1);
+	CHK(type.Install() == B_OK);
+	// set icons for file
+	CHK(nodeInfo.SetIcon(fIconM1, B_MINI_ICON) == B_OK);
+	CHK(nodeInfo.SetIcon(fIconL1, B_LARGE_ICON) == B_OK);
+	// install application type with icons for type, and make it the file's
+	// preferred application
+	BMimeType appType(testAppSignature1);
+	CHK(appType.Install() == B_OK);
+	CHK(appType.SetIconForType(testType1, fIconM2, B_MINI_ICON) == B_OK);
+	CHK(appType.SetIconForType(testType1, fIconL2, B_LARGE_ICON) == B_OK);
+	CHK(nodeInfo.SetPreferredApp(testAppSignature1) == B_OK);
+	// set icons for type in MIME database
+	CHK(type.SetIcon(fIconM3, B_MINI_ICON) == B_OK);
+	CHK(type.SetIcon(fIconL3, B_LARGE_ICON) == B_OK);
+	// install application type with icons for type, and make it the type's
+	// preferred application
+	BMimeType appType2(testAppSignature2);
+	CHK(appType2.Install() == B_OK);
+	CHK(appType2.SetIconForType(testType1, fIconM4, B_MINI_ICON) == B_OK);
+	CHK(appType2.SetIconForType(testType1, fIconL4, B_LARGE_ICON) == B_OK);
+	CHK(type.SetPreferredApp(testAppSignature2) == B_OK);
+
+	// * has icon, but not type => B_OK,
+	//   returns the "application/octet-stream" icon
+	NextSubTest();
+	{
+		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, &octetMIcon);
+		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, &octetLIcon);
+	}
+	// set invalid file type
+	CHK(nodeInfo.SetType(invalidTestType) == B_OK);
+	// * has icon, but invalid type => B_OK, returns file icon
+	NextSubTest();
+	{
+		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, fIconM1);
+		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, fIconL1);
+	}
+	// set file type
+	CHK(nodeInfo.SetType(testType1) == B_OK);
+	// * has icon => B_OK
+	NextSubTest();
+	{
+		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, fIconM1);
+		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, fIconL1);
+	}
+	// unset icons
+	CHK(nodeInfo.SetIcon(NULL, B_MINI_ICON) == B_OK);
+	CHK(nodeInfo.SetIcon(NULL, B_LARGE_ICON) == B_OK);
+	// * has no icon, but preferred app with icon for type => B_OK
+	NextSubTest();
+	{
+		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, fIconM2);
+		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, fIconL2);
+	}
+	// unset icons for type for preferred app
+	CHK(appType.SetIconForType(testType1, NULL, B_MINI_ICON) == B_OK);
+	CHK(appType.SetIconForType(testType1, NULL, B_LARGE_ICON) == B_OK);
+	// * no icon, preferred app without icon for type,
+	//   but icon for type in MIME data base => B_OK
+	NextSubTest();
+	{
+		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, fIconM3);
+		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, fIconL3);
+	}
+	// unset preferred app
+	CHK(nodeInfo.SetPreferredApp(NULL) == B_OK);
+	// * no icon, no preferred app,
+	//   but icon for type in MIME data base => B_OK
+	NextSubTest();
+	{
+		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, fIconM3);
+		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, fIconL3);
+	}
+	// unset icons for type
+	CHK(type.SetIcon(NULL, B_MINI_ICON) == B_OK);
+	CHK(type.SetIcon(NULL, B_LARGE_ICON) == B_OK);
+	// * no icon, no preferred app, no icon for type in MIME data base, but
+	//   preferred app for type in MIME database and app has icon for type
+	//   => B_OK
+	NextSubTest();
+	{
+		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, fIconM4);
+		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, fIconL4);
+	}
+	// unset icons for type for preferred app
+	CHK(appType2.SetIconForType(testType1, NULL, B_MINI_ICON) == B_OK);
+	CHK(appType2.SetIconForType(testType1, NULL, B_LARGE_ICON) == B_OK);
+	// * no icon, no preferred app, no icon for type in MIME data base,
+	//   preferred app for type in MIME database and app has no icon for type
+	//   => B_OK, returns the "application/octet-stream" icon
+	NextSubTest();
+	{
+		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, &octetMIcon);
+		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, &octetLIcon);
+	}
+	// unset preferred application
+	CHK(type.SetPreferredApp(NULL) == B_OK);
+	// * no icon, no preferred app, no icon for type in MIME data base,
+	//   no preferred app for type in MIME database => B_OK,
+	//   returns the "application/octet-stream" icon
+	NextSubTest();
+	{
+		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, &octetMIcon);
+		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, &octetLIcon);
+	}
 }
 

@@ -37,8 +37,12 @@ private:
 	BApplication	*fApplication;
 	BBitmap			*fIconM1;
 	BBitmap			*fIconM2;
+	BBitmap			*fIconM3;
+	BBitmap			*fIconM4;
 	BBitmap			*fIconL1;
 	BBitmap			*fIconL2;
+	BBitmap			*fIconL3;
+	BBitmap			*fIconL4;
 };
 
 #endif	// NODE_INFO_TEST_H
