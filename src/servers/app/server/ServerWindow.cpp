@@ -75,11 +75,7 @@
 #	define STRACE_MOUSE(x) ;
 #endif
 
-//! TokenHandler object used to provide IDs for all windows in the system
-TokenHandler win_token_handler;
-
-//! Active winborder - used for tracking windows during moves, resizes, and tab slides
-WinBorder *active_winborder=NULL;
+//------------------------------------------------------------------------------
 
 template<class Type> Type
 read_from_buffer(int8 **_buffer)
@@ -92,7 +88,7 @@ read_from_buffer(int8 **_buffer)
 
 	return value;
 }
-
+//------------------------------------------------------------------------------
 static int8 *read_pattern_from_buffer(int8 **_buffer)
 {
 	int8 *pattern = *_buffer;
@@ -101,7 +97,7 @@ static int8 *read_pattern_from_buffer(int8 **_buffer)
 
 	return pattern;
 }
-
+//------------------------------------------------------------------------------
 template<class Type> void
 write_to_buffer(int8 **_buffer, Type value)
 {
@@ -112,7 +108,7 @@ write_to_buffer(int8 **_buffer, Type value)
 
 	*_buffer = (int8 *)(typedBuffer);
 }
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Contructor
 	
@@ -139,7 +135,6 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	fClientTeamID = winapp->ClientTeamID();
 	fWorkspaces = index;
 	
-	fWorkspace = NULL;
 	fWinBorder = NULL;
 	fTopLayer = NULL;
 	
@@ -179,7 +174,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	STRACE(("\tPort: %ld\n",fMessagePort));
 	STRACE(("\tWorkspace: %ld\n",index));
 }
-
+//------------------------------------------------------------------------------
 void ServerWindow::Init(void)
 {
 	fWinBorder = new WinBorder( fFrame, fTitle.String(), fLook, fFeel, 0UL,
@@ -198,7 +193,7 @@ void ServerWindow::Init(void)
 	if(fMonitorThreadID != B_NO_MORE_THREADS && fMonitorThreadID != B_NO_MEMORY)
 		resume_thread(fMonitorThreadID);
 }
-
+//------------------------------------------------------------------------------
 //!Tears down all connections with the user application, kills the monitoring thread.
 ServerWindow::~ServerWindow(void)
 {
@@ -229,40 +224,28 @@ ServerWindow::~ServerWindow(void)
 	desktop->fGeneralLock.Unlock();
 	STRACE(("#ServerWindow(%s) will exit NOW!!!\n", fTitle.String()));
 }
-
-/*!
-	\brief Requests an update of the specified rectangle
-	\param rect The area to update, in the parent's coordinates
-	
-	This could be considered equivalent to BView::Invalidate()
-*/
-void ServerWindow::RequestDraw(BRect rect)
-{
-	STRACE(("ServerWindow %s: Request Draw\n",fTitle.String()));
-	BMessage msg;
-	
-	msg.what = _UPDATE_;
-	msg.AddRect("_rect", rect);
-	
-	SendMessageToClient(&msg);
-}
-
-//! Requests an update for the entire window
-void ServerWindow::RequestDraw(void)
-{
-	RequestDraw(fFrame);
-}
-
+//5700 - fara servo , fara cas
+//6300 - 1,4
+//6700 - 1,6
+//7100 - 1,4
+//7500 - 1,6
+//------------------------------------------------------------------------------
 //! Forces the window border to update its decorator
 void ServerWindow::ReplaceDecorator(void)
 {
+	if (!IsLocked())
+		debugger("you must lock a ServerWindow object before calling ::ReplaceDecorator()\n");
+
 	STRACE(("ServerWindow %s: Replace Decorator\n",fTitle.String()));
 	fWinBorder->UpdateDecorator();
 }
-
+//------------------------------------------------------------------------------
 //! Requests that the ServerWindow's BWindow quit
 void ServerWindow::Quit(void)
 {
+	if (!IsLocked())
+		debugger("you must lock a ServerWindow object before calling ::Quit()\n");
+
 	STRACE(("ServerWindow %s: Quit\n",fTitle.String()));
 	BMessage msg;
 	
@@ -270,10 +253,13 @@ void ServerWindow::Quit(void)
 	
 	SendMessageToClient(&msg);
 }
-
+//------------------------------------------------------------------------------
 //! Shows the window's WinBorder
 void ServerWindow::Show(void)
 {
+	if (!IsLocked())
+		debugger("you must lock a ServerWindow object before calling ::Show()\n");
+
 	if(!fWinBorder->IsHidden())
 		return;
 
@@ -345,10 +331,13 @@ void ServerWindow::Show(void)
 		debugger("WARNING: NULL fWinBorder\n");
 	}
 }
-
+//------------------------------------------------------------------------------
 //! Hides the window's WinBorder
 void ServerWindow::Hide(void)
 {
+	if (!IsLocked())
+		debugger("you must lock a ServerWindow object before calling ::Hide()\n");
+
 	if(fWinBorder->IsHidden())
 		return;
 
@@ -391,19 +380,19 @@ void ServerWindow::Hide(void)
 		STRACE(("ServerWindow(%s)::Hide() - General lock released\n", fWinBorder->GetName()));
 	}
 }
-
+//------------------------------------------------------------------------------
 /*
 	\brief Determines whether the window is hidden or not
 	\return true if hidden, false if not
 */
-bool ServerWindow::IsHidden(void)
+bool ServerWindow::IsHidden(void) const
 {
 	if(fWinBorder)
 		return fWinBorder->IsHidden();
 	
 	return true;
 }
-
+//------------------------------------------------------------------------------
 void ServerWindow::Minimize(bool status)
 {
 	// This function doesn't need much -- check to make sure that we should and
@@ -439,7 +428,7 @@ void ServerWindow::Minimize(bool status)
 		SendMessageToClient(&msg);
 	}
 }
-
+//------------------------------------------------------------------------------
 // Sends a message to the client to perform a Zoom
 void ServerWindow::Zoom(void)
 {
@@ -447,34 +436,7 @@ void ServerWindow::Zoom(void)
 	msg.what=B_ZOOM;
 	SendMessageToClient(&msg);
 }
-
-/*!
-	\brief Handles focus and redrawing when changing focus states
-	
-	The ServerWindow is set to (in)active and its decorator is redrawn based on its active status
-*/
-void ServerWindow::SetFocus(bool value)
-{
-	STRACE(("ServerWindow %s: Set Focus to %s - UNIMPLEMENTED\n",fTitle.String(),value?"true":"false"));
-/*
-	if(fIsActive!=value)
-	{
-		fIsActive=value;
-		fWinBorder->SetFocus(value);
-//		fWinBorder->RequestDraw();
-	}
-*/
-}
-
-/*!
-	\brief Determines whether or not the window is active
-	\return true if active, false if not
-*/
-bool ServerWindow::HasFocus(void)
-{
-	return fIsActive;
-}
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Notifies window of workspace (de)activation
 	\param workspace Index of the workspace changed
@@ -492,7 +454,7 @@ void ServerWindow::WorkspaceActivated(int32 workspace, bool active)
 	
 	SendMessageToClient(&msg);
 }
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Notifies window of a workspace switch
 	\param oldone index of the previous workspace
@@ -509,7 +471,7 @@ void ServerWindow::WorkspacesChanged(int32 oldone,int32 newone)
 	
 	SendMessageToClient(&msg);
 }
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Notifies window of a change in focus
 	\param active New active status of the window
@@ -524,7 +486,7 @@ void ServerWindow::WindowActivated(bool active)
 	
 	SendMessageToClient(&msg);
 }
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Notifies window of a change in screen resolution
 	\param frame Size of the new resolution
@@ -541,27 +503,7 @@ void ServerWindow::ScreenModeChanged(const BRect frame, const color_space cspace
 	
 	SendMessageToClient(&msg);
 }
-
-/*
-	\brief Sets the frame size of the window
-	\rect New window size
-*/
-void ServerWindow::SetFrame(const BRect &rect)
-{
-	STRACE(("ServerWindow %s: Set Frame to (%.1f,%.1f,%.1f,%.1f)\n",fTitle.String(),
-			rect.left,rect.top,rect.right,rect.bottom));
-	fFrame=rect;
-}
-
-/*!
-	\brief Returns the frame of the window in screen coordinates
-	\return The frame of the window in screen coordinates
-*/
-BRect ServerWindow::Frame(void)
-{
-	return fFrame;
-}
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Locks the window
 	\return B_OK if everything is ok, B_ERROR if something went wrong
@@ -572,7 +514,7 @@ status_t ServerWindow::Lock(void)
 	
 	return (fLocker.Lock())?B_OK:B_ERROR;
 }
-
+//------------------------------------------------------------------------------
 //! Unlocks the window
 void ServerWindow::Unlock(void)
 {
@@ -580,22 +522,23 @@ void ServerWindow::Unlock(void)
 	
 	fLocker.Unlock();
 }
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Determines whether or not the window is locked
 	\return True if locked, false if not.
 */
-bool ServerWindow::IsLocked(void)
+bool ServerWindow::IsLocked(void) const
 {
 	return fLocker.IsLocked();
 }
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Sets the font state for a layer
 	\param layer The layer to set the font
 */
 void ServerWindow::SetLayerFontState(Layer *layer)
 {
+	// NOTE: no need to check for a lock. This is a private method.
 	uint16 mask;
 
 	fSession->ReadUInt16(&mask);
@@ -661,9 +604,10 @@ void ServerWindow::SetLayerFontState(Layer *layer)
 	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",
 			fTitle.String(), layer->fName->String()));
 }
-
+//------------------------------------------------------------------------------
 void ServerWindow::SetLayerState(Layer *layer)
 {
+	// NOTE: no need to check for a lock. This is a private method.
 	rgb_color highColor, lowColor, viewColor;
 	pattern	patt;
 	int32 clipRegRects;
@@ -716,9 +660,10 @@ void ServerWindow::SetLayerState(Layer *layer)
 	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",fTitle.String(),
 			 layer->fName->String()));
 }
-
+//------------------------------------------------------------------------------
 Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
 {
+	// NOTE: no need to check for a lock. This is a private method.
 	STRACE(("ServerWindow(%s)::CreateLayerTree()\n", fTitle.String()));
 
 	int32 token;
@@ -779,7 +724,7 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
 	
 	return newLayer;
 }
-
+//------------------------------------------------------------------------------
 void ServerWindow::DispatchMessage(int32 code)
 {
 	switch(code)
@@ -904,7 +849,7 @@ void ServerWindow::DispatchMessage(int32 code)
 
 			if (!(newLayer->IsHidden())){
 				// cl is the parent of newLayer, so this call is OK.
-				cl->FullInvalidate(newLayer->fFull.Frame());
+				cl->FullInvalidate(BRegion(newLayer->fFull));
 			}
 
 			break;
@@ -1715,7 +1660,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 	}
 }
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Iterator for graphics update messages
 	\param msgsize Size of the buffer containing the graphics messages
@@ -2260,7 +2205,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		}
 	}
 }
-
+//------------------------------------------------------------------------------
 /*!
 	\brief Message-dispatching loop for the ServerWindow
 
@@ -2277,19 +2222,20 @@ int32 ServerWindow::MonitorWin(void *data)
 	
 	while(!quitting)
 	{
+		code = AS_CLIENT_DEAD;
 		ses->ReadInt32(&code);
+
+		win->Lock();
 
 		switch(code)
 		{
-			case 0:
+			case AS_CLIENT_DEAD:
 			{
 				// this means the client has been killed
-
-				// TODO: A message code should *never* be 0. The source sending this message
-				// needs to be changed to something like AS_CLIENT_DEAD or something.
-				
-				STRACE(("ServerWindow %s received '0' message code\n",win->Title()));
+				STRACE(("ServerWindow %s received 'AS_CLIENT_DEAD' message code\n",win->Title()));
 				quitting = true;
+				// TODO: this is not that simple. Desktop Class should delete a window.
+				// something like: Desktop::DeleteWindow(thisWindow). 
 				delete win;
 				break;
 			}
@@ -2317,47 +2263,17 @@ int32 ServerWindow::MonitorWin(void *data)
 				break;
 			}
 		}
+
+		win->Unlock();
 	}
 	return 0;
 }
-
-/*!
-	\brief Send a message to the ServerWindow
-	\param code ID code of the message to post
-	\param size size of the data buffer
-	\param buffer Any attached data
-*/
-void ServerWindow::PostMessage(int32 code, size_t size, int8 *buffer)
-{
-	write_port(fMessagePort,code, buffer, size);
-}
-
-/*!
-	\brief Returns the Workspace object to which the window belongs
-	
-	If the window belongs to all workspaces, it returns the current workspace
-*/
-Workspace *ServerWindow::GetWorkspace(void)
-{
-	//TODO: resolve
-	if(fWorkspaces==B_ALL_WORKSPACES)
-		return NULL;//fWorkspaces->GetScreen()->GetActiveWorkspace();
-
-	return NULL;
-}
-
-/*!
-	\brief Assign the window to a particular workspace object
-	\param The ServerWindow's new workspace
-*/
-void ServerWindow::SetWorkspace(Workspace *wkspc)
-{
-STRACE(("ServerWindow %s: Set Workspace\n",fTitle.String()));
-	fWorkspace=wkspc;
-}
-
+//------------------------------------------------------------------------------
 Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 {
+	if (!IsLocked())
+		debugger("you must lock a ServerWindow object before calling ::FindLayer()\n");
+
 	if(!start)
 		return NULL;
 	
@@ -2404,9 +2320,12 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 
 	return NULL;
 }
-
+//------------------------------------------------------------------------------
 void ServerWindow::SendMessageToClient(const BMessage* msg) const
 {
+	if (!IsLocked())
+		debugger("you must lock a ServerWindow object before calling ::SendMessageToClient()\n");
+
 	ssize_t		size;
 	char		*buffer;
 	
@@ -2420,26 +2339,5 @@ void ServerWindow::SendMessageToClient(const BMessage* msg) const
 
 	delete buffer;
 }
+//------------------------------------------------------------------------------
 
-/*!
-	\brief Handles window activation stuff. Called by Desktop functions
-*/
-void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin)
-{
-STRACE(("ActivateWindow: old=%s, new=%s\n",oldwin?oldwin->Title():"NULL",newwin?newwin->Title():"NULL"));
-	if(oldwin==newwin)
-		return;
-
-	if(oldwin)
-		oldwin->SetFocus(false);
-
-	if(newwin)
-		newwin->SetFocus(true);
-}
-
-/*
- @log
- 	*added handlers for AS_LAYER_(MOVE/RESIZE)TO messages
- 	*added AS_LAYER_GET_COORD handler
- 	*changed some methods to use BMessage class for sending messages to BWindow
-*/

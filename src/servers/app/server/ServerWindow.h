@@ -71,66 +71,66 @@ public:
 	virtual ~ServerWindow(void);
 	
 	void Init();
-	
+
+	// ServerWindow must be locked for these ones.	
 	void ReplaceDecorator(void);
 	void Quit(void);
 	void Show(void);
 	void Hide(void);
-	bool IsHidden(void);
+
+	// methods for sending various messages to client.
+	bool IsHidden(void) const;
 	void Minimize(bool status);
 	void Zoom(void);
-	void SetFocus(bool value);
-	bool HasFocus(void);
-	void RequestDraw(BRect rect);
-	void RequestDraw(void);
-	
 	void WorkspaceActivated(int32 workspace, bool active);
 	void WorkspacesChanged(int32 oldone,int32 newone);
 	void WindowActivated(bool active);
 	void ScreenModeChanged(const BRect frame, const color_space cspace);
 	
-	void SetFrame(const BRect &rect);
-	BRect Frame(void);
-	
 	status_t Lock(void);
 	void Unlock(void);
-	bool IsLocked(void);
-	thread_id ThreadID(void) const { return fMonitorThreadID;}
-	
-	void DispatchMessage(int32 code);
-	void DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
-	static int32 MonitorWin(void *data);
-	void PostMessage(int32 code, size_t size=0, int8 *buffer=NULL);
+	bool IsLocked(void) const;
 	
 	//! Returns the index of the workspaces to which it belongs
 	int32 GetWorkspaceIndex(void) { return fWorkspaces; }
-	Workspace *GetWorkspace(void);
-	void SetWorkspace(Workspace *wkspc);
-	
-	//! Returns the window's title
-	const char *Title(void) { return fTitle.String(); }
-	
-	Layer *CreateLayerTree(Layer *localRoot);
-	void SetLayerState(Layer *layer);
-	void SetLayerFontState(Layer *layer);
-	
+
+	// util methods.	
 	Layer *FindLayer(const Layer *start, int32 token) const;
 	void SendMessageToClient( const BMessage *msg ) const;
-	
+
+	// a few, not that important methods returning some internal settings.	
 	int32 Look(void) const { return fLook; }
 	int32 Feel(void) const { return fFeel; }
 	uint32 Flags(void) const { return fFlags; }
-	team_id ClientTeamID(void) const { return fClientTeamID; }
-	ServerApp *App(void) const { return fServerApp; }
 	uint32 Workspaces(void) const { return fWorkspaces; }
+
+	// to who we belong. who do we own. our title.
+	ServerApp *App(void) const { return fServerApp; }
 	WinBorder *GetWinBorder(void) const { return fWinBorder; }
-	
-	// server "private" - try not to use
+	const char *Title(void) const { return fTitle.String(); }
+
+	// related thread/team_id(s).
+	team_id ClientTeamID(void) const { return fClientTeamID; }
+	thread_id ThreadID(void) const { return fMonitorThreadID;}
+
+	// server "private" - try not to use.
 	void QuietlySetWorkspaces(uint32 wks) { fWorkspaces = wks; }
 	void QuietlySetFeel(int32 feel) { fFeel = feel; }
 	int32 ClientToken(void) const { return fHandlerToken; }
 	
 	FMWList fWinFMWList;
+
+private:
+	// methods for retrieving and creating a tree strcture of Layers.
+	Layer *CreateLayerTree(Layer *localRoot);
+	void SetLayerState(Layer *layer);
+	void SetLayerFontState(Layer *layer);
+
+	// message handle methods.
+	void DispatchMessage(int32 code);
+	void DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
+	static int32 MonitorWin(void *data);
+
 
 protected:	
 	friend class ServerApp;
@@ -143,8 +143,6 @@ protected:
 	int32 fFeel;
 	int32 fFlags;
 	uint32 fWorkspaces;
-	Workspace *fWorkspace;
-	bool fIsActive;
 	
 	ServerApp *fServerApp;
 	WinBorder *fWinBorder;
