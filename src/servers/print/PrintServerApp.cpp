@@ -6,12 +6,9 @@
 // The print_server manages the communication between applications and the
 // printer and transport drivers.
 //
-//
-//
-// TODO:
-//	 Handle spooled jobs at startup
-//	 Handle printer status (asked to print a spooled job but printer busy)
-//   
+// Authors
+//   Ithamar R. Adema
+//   Michael Pfeiffer
 //
 // This application and all source files used in its construction, except 
 // where noted, are licensed under the MIT License, and have been written 
@@ -45,22 +42,25 @@
 #include "pr_server.h"
 
 	// BeOS API
-#include <FindDirectory.h>
-#include <NodeMonitor.h>
-#include <Directory.h>
-#include <PrintJob.h>
-#include <NodeInfo.h>
-#include <String.h>
-#include <Roster.h>
-#include <image.h>
 #include <Alert.h>
-#include <Path.h>
+#include <Autolock.h>
+#include <Directory.h>
 #include <File.h>
+#include <image.h>
+#include <FindDirectory.h>
 #include <Mime.h>
+#include <NodeInfo.h>
+#include <NodeMonitor.h>
+#include <Path.h>
+#include <Roster.h>
+#include <PrintJob.h>
+#include <String.h>
 
 	// ANSI C
 #include <stdio.h>	//for printf
 #include <unistd.h> //for unlink
+
+BLocker *gLock = NULL;
 
 // ---------------------------------------------------------------
 typedef struct _printer_data {
@@ -83,16 +83,17 @@ typedef char* (*add_printer_func_t)(const char* printer_name);
 int
 main()
 {
+	gLock = new BLocker();
 		// Create our application object
 	status_t rc = B_OK;
-	new PrintServerApp(&rc);
+	PrintServerApp print_server(&rc);
 	
 		// If all went fine, let's start it
 	if (rc == B_OK) {
-		be_app->Run();
+		print_server.Run();
 	}
 	
-	delete be_app;
+	delete gLock;
 	
 	return rc;
 }
@@ -111,10 +112,14 @@ main()
 PrintServerApp::PrintServerApp(status_t* err)
 	: Inherited(PSRV_SIGNATURE_TYPE, err),
 	fSelectedIconMini(BRect(0,0,B_MINI_ICON-1,B_MINI_ICON-1), B_CMAP8),
-	fSelectedIconLarge(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8)
+	fSelectedIconLarge(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8),
+	fNumberOfPrinters(0),
+	fNoPrinterAvailable(0)
 {
 		// If our superclass initialized ok
 	if (*err == B_OK) {
+		fNoPrinterAvailable = create_sem(1, "");
+		
 			// let us try as well
 		SetupPrinterList();
 		RetrieveDefaultPrinter();
@@ -123,6 +128,9 @@ PrintServerApp::PrintServerApp(status_t* err)
 		BMimeType type(PRNT_SIGNATURE_TYPE);
 		type.GetIcon(&fSelectedIconMini, B_MINI_ICON);
 		type.GetIcon(&fSelectedIconLarge, B_LARGE_ICON);
+		
+			// Start handling of spooled files
+		PostMessage(PSRV_PRINT_SPOOLED_JOB);
 	}
 }
 
@@ -141,10 +149,68 @@ bool PrintServerApp::QuitRequested()
 				::watch_node(&nref, B_STOP_WATCHING, be_app_messenger);
 			}
 		}
+
+			// Release all printers
+		Printer* printer;
+		while ((printer = Printer::At(0)) != NULL) {
+			Printer::Remove(printer);
+			printer->AbortPrintThread();
+			printer->Release();
+		}
+
+			// Wait for printers
+		if (fNoPrinterAvailable > 0) {
+			acquire_sem(fNoPrinterAvailable);
+			delete_sem(fNoPrinterAvailable);
+			fNoPrinterAvailable = 0;
+		}
 	}
 	
 	return rc;
 }
+
+
+void PrintServerApp::RegisterPrinter(BDirectory* printer) {
+	BString transport, address, connection;
+	
+	printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &transport);
+	printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &address);
+	printer->ReadAttrString(PSRV_PRINTER_ATTR_CNX, &connection);
+	
+ 	BAutolock lock(gLock);
+	if (lock.IsLocked()) {
+		Resource* r = fResourceManager.Allocate(transport.String(), address.String(), connection.String());
+	 	new Printer(printer, r);
+		if (fNumberOfPrinters == 0) acquire_sem(fNoPrinterAvailable);
+		fNumberOfPrinters ++;
+	}
+}
+
+
+void PrintServerApp::NotifyPrinterDeletion(Resource* res) {
+	BAutolock lock(gLock);
+	if (lock.IsLocked()) {
+		fNumberOfPrinters --;
+		fResourceManager.Free(res);
+		if (fNumberOfPrinters == 0) release_sem(fNoPrinterAvailable);
+	}
+}
+
+void PrintServerApp::HandleRemovedPrinter(BMessage* msg) {
+	int32 opcode;
+	dev_t device;
+	ino_t node;
+	Printer* printer;
+	if (msg->FindInt32("opcode", &opcode) == B_OK && opcode == B_ENTRY_REMOVED &&
+		msg->FindInt32("device", &device) == B_OK &&
+		msg->FindInt64("node", &node) == B_OK &&
+		(printer = Printer::Find(device, node)) != NULL) {
+		if (printer == fDefaultPrinter) fDefaultPrinter = NULL;
+		Printer::Remove(printer);
+		printer->Release();
+	}
+}
+
 
 // ---------------------------------------------------------------
 // SetupPrinterList
@@ -176,14 +242,14 @@ status_t PrintServerApp::SetupPrinterList()
 					// If the entry is a directory
 				if (entry.IsDirectory()) {
 						// Check it's Mime type for a spool director
-					BNode node(&entry);
+					BDirectory node(&entry);
 					BNodeInfo info(&node);
 					char buffer[256];
 					
 					if (info.GetType(buffer) == B_OK &&
 						strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
 							// Yes, it is a printer definition node
-						new Printer(&node);
+						RegisterPrinter(&node);
 					}
 				}
 			}
@@ -234,10 +300,12 @@ PrintServerApp::MessageReceived(BMessage* msg)
 		case B_EXECUTE_PROPERTY:
 			HandleScriptingCommand(msg);
 			break;
+
+		case B_NODE_MONITOR:
+			HandleRemovedPrinter(msg);
+			break;
 		
 		default:
-			printf("PrintServerApp::MessageReceived(): ");
-			msg->PrintToStream();			
 			Inherited::MessageReceived(msg);
 	}	
 }
@@ -298,10 +366,12 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 							// call the function and check its result
 						if ((*func)(printerName) == NULL) {
 							BEntry entry;
-							if (printer.GetEntry(&entry) == B_OK &&	entry.GetPath(&path) == B_OK) {
+							if (printer.GetEntry(&entry) == B_OK) {
 									// Delete the printer if function failed
-								::rmdir(path.Path());
+								entry.Remove();
 							}
+						} else {
+							RegisterPrinter(&printer);
 						}
 					}
 					
@@ -360,55 +430,19 @@ PrintServerApp::SelectPrinter(const char* printerName)
 }
 
 // ---------------------------------------------------------------
-// HandleSpooledJob(const char* jobname, const char* filepath)
+// HandleSpooledJobs()
 //
-// Handles calling the printer driver for printing a spooled job.
+// Handles calling the printer drivers for printing a spooled job.
 //
-// Parameters:
-//      msg - A copy of the message received, will be accessible
-//            to the printer driver for reading job config 
-//            details.
-// Returns:
-//      BMessage containing new job data, or NULL pointer if not
-//		successfull.
 // ---------------------------------------------------------------
-status_t
-PrintServerApp::HandleSpooledJob(const char* jobname, const char* filepath)
+void
+PrintServerApp::HandleSpooledJobs()
 {
-	BFile spoolFile(filepath, B_READ_ONLY);
-	print_file_header header;
-	BString driverName;
-	BMessage settings;
-	Printer* printer;
-	status_t rc;
-	BPath path;
-	
-		// Open the spool file
-	if ((rc=spoolFile.InitCheck()) == B_OK) {
-			// Read header from filestream
-		spoolFile.Seek(0, SEEK_SET);
-		spoolFile.Read(&header, sizeof(header));
-
-			// Get the printer settings
-		settings.Unflatten(&spoolFile);
-
-			// Get name of printer from settings
-		const char* printerName;
-		if ((rc=settings.FindString("current_printer", &printerName)) == B_OK) {
-				// Find printer definition for this printer
-			if ((printer=Printer::Find(printerName)) != NULL) {
-					// and tell the printer to print the spooled job
-				printer->PrintSpooledJob(&spoolFile, settings);
-			}
-		}
-
-			// Remove spool file if printing was successfull.
-		if (rc == B_OK) {
-			::unlink(filepath);
-		}
+	const int n = Printer::CountPrinters();
+	for (int i = 0; i < n; i ++) {
+		Printer* printer = Printer::At(i);
+		printer->HandleSpooledJob();
 	}
-
-	return rc;
 }
 
 // ---------------------------------------------------------------

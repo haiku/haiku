@@ -6,6 +6,9 @@
 // The print_server manages the communication between applications and the
 // printer and transport drivers.
 //
+// Authors
+//   Ithamar R. Adema
+//   Michael Pfeiffer
 //
 // This application and all source files used in its construction, except 
 // where noted, are licensed under the MIT License, and have been written 
@@ -35,11 +38,17 @@
 #ifndef PRINTSERVERAPP_H
 #define PRINTSERVERAPP_H
 
+#include "ResourceManager.h"
+
 class PrintServerApp;
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <OS.h>
 #include <String.h>
+
+// global BLocker for synchronisation
+extern BLocker* gLock;
 
 /*****************************************************************************/
 // PrintServerApp
@@ -52,8 +61,10 @@ class PrintServerApp : public BApplication
 	typedef BApplication Inherited;
 public:
 	PrintServerApp(status_t* err);
+	
 	bool QuitRequested();
 	void MessageReceived(BMessage* msg);
+	void NotifyPrinterDeletion(Resource* res);
 	
 		// Scripting support, see PrintServerApp.Scripting.cpp
 	status_t GetSupportedSuites(BMessage* msg);
@@ -64,12 +75,15 @@ public:
 private:
 	status_t SetupPrinterList();
 
-	status_t  HandleSpooledJob(const char* jobname, const char* filepath);
+	void     HandleSpooledJobs();
 	
 	status_t SelectPrinter(const char* printerName);
 	status_t CreatePrinter(	const char* printerName, const char* driverName,
 							const char* connection, const char* transportName,
 							const char* transportPath);
+
+	void     RegisterPrinter(BDirectory* node);
+	void     HandleRemovedPrinter(BMessage* msg);
 	
 	status_t StoreDefaultPrinter();
 	status_t RetrieveDefaultPrinter();
@@ -77,14 +91,18 @@ private:
 	status_t FindPrinterNode(const char* name, BNode& node);
 	status_t FindPrinterDriver(const char* name, BPath& outPath);
 	
+	ResourceManager fResourceManager;
 	Printer* fDefaultPrinter;
 	BBitmap fSelectedIconMini;
 	BBitmap fSelectedIconLarge;
+	int     fNumberOfPrinters;
+	sem_id  fNoPrinterAvailable;
 
 		// "Classic" BeOS R5 support, see PrintServerApp.R5.cpp
 	static status_t async_thread(void* data);
 	void AsyncHandleMessage(BMessage* msg);
 	void Handle_BeOSR5_Message(BMessage* msg);
+
 };
 
 #endif

@@ -6,6 +6,8 @@
 // The print_server manages the communication between applications and the
 // printer and transport drivers.
 //   
+// Author
+//   Ithamar R. Adema
 //
 // This application and all source files used in its construction, except 
 // where noted, are licensed under the MIT License, and have been written 
@@ -105,7 +107,7 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 			case B_DELETE_PROPERTY: {
 					Printer* printer = GetPrinterFromSpecifier(&spec);
 					status_t rc = B_BAD_VALUE;
-					
+
 					if (printer != NULL && (rc=printer->Remove()) == B_OK) {
 						printer->Release();
 					}

@@ -17,6 +17,8 @@ Server
 	PrintServerApp.Scripting.cpp
 	Printer.Scripting.cpp
 	Printer.cpp
+	ResourceManager.cpp
+	Jobs.cpp
 	BeUtils.cpp
 	;
 

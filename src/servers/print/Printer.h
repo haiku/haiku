@@ -5,13 +5,10 @@
 //
 // The print_server manages the communication between applications and the
 // printer and transport drivers.
-//
-//
-//
-// TODO:
-//	 Handle spooled jobs at startup
-//	 Handle printer status (asked to print a spooled job but printer busy)
 //   
+// Authors
+//   Ithamar R. Adema
+//   Michael Pfeiffer
 //
 // This application and all source files used in its construction, except 
 // where noted, are licensed under the MIT License, and have been written 
@@ -43,11 +40,17 @@
 
 class Printer;
 
+#include "BeUtils.h"
+#include "ResourceManager.h"
+#include "Jobs.h"
+
 	// BeOS API
+#include <Directory.h>
 #include <Handler.h>
-#include <String.h>
 #include <image.h>
-#include <Node.h>
+#include <Locker.h>
+#include <PrintJob.h>
+#include <String.h>
 
 	// OpenTracker shared sources
 #include "ObjectList.h"
@@ -58,27 +61,27 @@ class Printer;
 // This class represents one printer definition. It is manages all actions &
 // data related to that printer.
 /*****************************************************************************/
-class Printer : public BHandler
+class Printer : public BHandler, public Object
 {
 	typedef BHandler Inherited;
 
 public:
-	Printer(const BNode* node);
+	Printer(const BDirectory* node, Resource* res);
 	~Printer();
 
-	void Acquire();
-	void Release();
-		
 		// Static helper functions
 	static Printer* Find(const BString& name);
+	static Printer* Find(dev_t device, ino_t node);
 	static Printer* At(int32 idx);
+	static void Remove(Printer* printer);
 	static int32 CountPrinters();
 	
 	status_t Remove();
 	status_t ConfigurePrinter();
 	status_t ConfigureJob(BMessage& ioSettings);
 	status_t ConfigurePage(BMessage& ioSettings);
-	status_t PrintSpooledJob(BFile* spoolFile, const BMessage& settings);
+	void HandleSpooledJob();
+	void AbortPrintThread();
 
 	void MessageReceived(BMessage* msg);
 
@@ -90,10 +93,22 @@ public:
 private:
 	status_t LoadPrinterAddon(image_id& id);
 
-	BNode fNode;
-	int32 fRefCount;
+	Folder fFolder;
+	Resource* fResource;
+	BDirectory fNode;
+	bool fSinglePrintThread;
+	Job* fJob;
+	volatile vint32 fProcessing;
+	bool fAbort;	
 	
 	static BObjectList<Printer> sPrinters;
+
+	bool FindSpooledJob();
+	void CloseJob();
+	status_t PrintSpooledJob(BFile* spoolFile, const BMessage& settings);
+	void PrintThread(Job* job);
+	static status_t print_thread(void* data);
+	status_t StartPrintThread();
 };
 
 #endif

@@ -1,20 +1,14 @@
 /*****************************************************************************/
-// BeUtils.cpp
-//
-// Version: 1.0.0d1
-//
-// Several utilities for writing applications for the BeOS. It are small
-// very specific functions, but generally useful (could be here because of a
-// lack in the APIs, or just sheer lazyness :))
+// ResourceManager
 //
 // Author
-//   Ithamar R. Adema
+//   Michael Pfeiffer
 //
 // This application and all source files used in its construction, except 
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2001 OpenBeOS Project
+// Copyright (c) 2002 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -34,28 +28,51 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
+
+
+#ifndef RESOURCE_MANAGER_H
+#define RESOURCE_MANAGER_H
+
+#include "ObjectList.h"
+
+#include <Locker.h>
+#include <String.h>
+
 #include "BeUtils.h"
 
-// ---------------------------------------------------------------
-// TestForAddonExistence
-//
-// [Method Description]
-//
-// Parameters:
-//
-// Returns:
-// ---------------------------------------------------------------
-status_t TestForAddonExistence(const char* name, directory_which which, const char* section, BPath& outPath)
-{
-	status_t err = B_OK;
-	
-	if ((err=find_directory(which, &outPath)) == B_OK &&
-		(err=outPath.Append(section)) == B_OK &&
-		(err=outPath.Append(name)) == B_OK)
-	{
-		struct stat buf;
-		err = stat(outPath.Path(), &buf);
-	}
-	
-	return err;
-}
+class Resource : public Object {
+private:
+	BString	 fTransport;
+	BString  fTransportAddress;
+	BString  fConnection;
+	sem_id   fResourceAvailable;
+
+	bool NeedsLocking();
+
+
+public:
+	Resource(const char* transport, const char* address, const char* connection);
+	~Resource();
+
+	bool Equals(const char* transport, const char* address, const char* connection);
+
+	const BString& Transport() const { return fTransport; }
+
+	bool Lock();
+	void Unlock();
+};
+
+class ResourceManager {
+private:
+	BObjectList<Resource> fResources;	
+		
+	Resource* Find(const char* transport, const char* address, const char* connection);
+
+public:
+	~ResourceManager();
+
+	Resource* Allocate(const char* transport, const char* address, const char* connection);
+	void Free(Resource* r);
+};
+
+#endif

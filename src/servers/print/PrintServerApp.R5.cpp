@@ -6,12 +6,9 @@
 // The print_server manages the communication between applications and the
 // printer and transport drivers.
 //
-//
-//
-// TODO:
-//	 Handle spooled jobs at startup
-//	 Handle printer status (asked to print a spooled job but printer busy)
-//   
+// Authors
+//   Ithamar R. Adema
+//   Michael Pfeiffer
 //
 // This application and all source files used in its construction, except 
 // where noted, are licensed under the MIT License, and have been written 
@@ -53,12 +50,16 @@
 
 struct AsyncThreadParams {
 	Printer* printer;
-	BMessage message;
+	BMessage* message;
 
 	AsyncThreadParams(Printer* p, BMessage* m)
 		: printer(p)
-		, message(*m)
+		, message(m)
 	{ }
+
+	~AsyncThreadParams() {
+		delete message;
+	}
 };
 
 status_t PrintServerApp::async_thread(void* data)
@@ -66,7 +67,7 @@ status_t PrintServerApp::async_thread(void* data)
 	AsyncThreadParams* p = (AsyncThreadParams*)data;
 	
 	Printer* printer = p->printer;
-	BMessage* msg = &p->message;
+	BMessage* msg = p->message;
 	
 	switch (msg->what) {
 			// Handle showing the page config dialog
@@ -131,10 +132,6 @@ void PrintServerApp::AsyncHandleMessage(BMessage* msg)
 
 void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 {
-	printf("PrintServerApp::Handle_BeOSR5_Message\n");
-	msg->PrintToStream();			
-	fflush(stdout);
-
 	switch(msg->what) {
 			// Get currently selected printer
 		case PSRV_GET_ACTIVE_PRINTER: {
@@ -186,18 +183,12 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 
 		case PSRV_SHOW_PAGE_SETUP: 
 		case PSRV_SHOW_PRINT_SETUP: 
-			AsyncHandleMessage(msg);
+			AsyncHandleMessage(DetachCurrentMessage());
 			break;
 
 			// Tell printer addon to print a spooled job
-		case PSRV_PRINT_SPOOLED_JOB: {
-				BString name, jobpath;
-				if (msg->FindString("Spool File",&jobpath) == B_OK &&
-					msg->FindString("JobName", &name) == B_OK) {
-						// Handle the spooled job
-					HandleSpooledJob(name.String(), jobpath.String());
-				}
-			}
+		case PSRV_PRINT_SPOOLED_JOB:
+			HandleSpooledJobs();
 			break;
 	}
 }
