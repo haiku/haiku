@@ -100,36 +100,41 @@ public:
 	status_t Broadcast(BMessage *message, BMessenger replyTo) const;
 
 	// watching
-	status_t StartWatching(BMessenger target, uint32 eventMask) const;
+	status_t StartWatching(BMessenger target,
+						   uint32 eventMask = B_REQUEST_LAUNCHED
+											  | B_REQUEST_QUIT) const;
 	status_t StopWatching(BMessenger target) const;
 
 	status_t ActivateApp(team_id team) const;
 
 	// launch app
-	status_t Launch(const char *mimeType, BMessage *initialMessage,
-					team_id *appTeam) const;
+	status_t Launch(const char *mimeType, BMessage *initialMessage = 0,
+					team_id *appTeam = 0) const;
 	status_t Launch(const char *mimeType, BList *messageList,
-					team_id *appTeam) const;
+					team_id *appTeam = 0) const;
 	status_t Launch(const char *mimeType, int argc, char **args,
-					team_id *appTeam) const;
+					team_id *appTeam = 0) const;
 	status_t Launch(const entry_ref *ref, const BMessage *initialMessage = 0,
 					team_id *appTeam = 0) const;
 	status_t Launch(const entry_ref *ref, const BList *messageList,
-					team_id *appTeam) const;
+					team_id *appTeam = 0) const;
 	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
-					team_id *appTeam) const;
+					team_id *appTeam = 0) const;
 
 	// recent documents, folders, apps
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
-							const char *fileType, const char *appSig) const;
+							const char *fileType,
+							const char *appSig = 0) const;
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
 							const char *fileTypes[], int32 fileTypesCount,
-							const char *appSig) const;
+							const char *appSig = 0) const;
 	void GetRecentFolders(BMessage *refList, int32 maxCount,
-						  const char *appSig) const;
+						  const char *appSig = 0) const;
 	void GetRecentApps(BMessage *refList, int32 maxCount) const;
-	void AddToRecentDocuments(const entry_ref *doc, const char *appSig) const;
-	void AddToRecentFolders(const entry_ref *folder, const char *appSig) const;
+	void AddToRecentDocuments(const entry_ref *doc,
+							  const char *appSig = 0) const;
+	void AddToRecentFolders(const entry_ref *folder,
+							const char *appSig = 0) const;
 
 private:
 	class ArgVector;
