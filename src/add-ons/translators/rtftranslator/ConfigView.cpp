@@ -31,9 +31,9 @@ ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	rect.OffsetBy(0, height + 10);
 	char version[256];
 	sprintf(version, "Version %d.%d.%d, %s",
-		int(B_TRANSLATION_MAJOR_VER(RTF_TRANSLATOR_VERSION)),
-		int(B_TRANSLATION_MINOR_VER(RTF_TRANSLATOR_VERSION)),
-		int(B_TRANSLATION_REVSN_VER(RTF_TRANSLATOR_VERSION)),
+		int(B_TRANSLATION_MAJOR_VERSION(RTF_TRANSLATOR_VERSION)),
+		int(B_TRANSLATION_MINOR_VERSION(RTF_TRANSLATOR_VERSION)),
+		int(B_TRANSLATION_REVISION_VERSION(RTF_TRANSLATOR_VERSION)),
 		__DATE__);
 	stringView = new BStringView(rect, "version", version);
 	stringView->ResizeToPreferred();

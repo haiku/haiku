@@ -329,9 +329,9 @@ BTranslatorRoster::Version(int32 *outCurVersion, int32 *outMinVersion,
 	static char vDate[] = __DATE__;
 	if (!vString[0]) {
 		sprintf(vString, "Translation Kit v%d.%d.%d %s\n",
-			static_cast<int>(B_TRANSLATION_MAJOR_VER(B_TRANSLATION_CURRENT_VERSION)),
-			static_cast<int>(B_TRANSLATION_MINOR_VER(B_TRANSLATION_CURRENT_VERSION)),
-			static_cast<int>(B_TRANSLATION_REVSN_VER(B_TRANSLATION_CURRENT_VERSION)),
+			static_cast<int>(B_TRANSLATION_MAJOR_VERSION(B_TRANSLATION_CURRENT_VERSION)),
+			static_cast<int>(B_TRANSLATION_MINOR_VERSION(B_TRANSLATION_CURRENT_VERSION)),
+			static_cast<int>(B_TRANSLATION_REVISION_VERSION(B_TRANSLATION_CURRENT_VERSION)),
 			vDate);
 	}
 	*outCurVersion = B_TRANSLATION_CURRENT_VERSION;

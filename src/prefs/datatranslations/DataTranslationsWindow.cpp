@@ -264,9 +264,9 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 			else {
 				// Convert the version number into a readable format
 				strInfoMsg <<
-					static_cast<int>(B_TRANSLATION_MAJOR_VER(tranVersion)) << '.' <<
-					static_cast<int>(B_TRANSLATION_MINOR_VER(tranVersion)) << '.' <<
-					static_cast<int>(B_TRANSLATION_REVSN_VER(tranVersion));
+					static_cast<int>(B_TRANSLATION_MAJOR_VERSION(tranVersion)) << '.' <<
+					static_cast<int>(B_TRANSLATION_MINOR_VERSION(tranVersion)) << '.' <<
+					static_cast<int>(B_TRANSLATION_REVISION_VERSION(tranVersion));
 			}				
 			strInfoMsg << "\nInfo: " << tranInfo <<
 				"\nPath: " << tranPath.Path() << "\n"; 

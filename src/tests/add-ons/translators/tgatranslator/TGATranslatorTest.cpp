@@ -612,7 +612,7 @@ TGATranslatorTest::LoadAddOnTest()
 		this,
 		gTGAInputFormats, sizeof(gTGAInputFormats) / sizeof(translation_format),
 		gTGAOutputFormats, sizeof(gTGAOutputFormats) / sizeof(translation_format),
-		B_TRANSLATION_MAKE_VER(1,0,0));
+		B_TRANSLATION_MAKE_VERSION(1,0,0));
 }
 
 #endif // #if !TEST_R5

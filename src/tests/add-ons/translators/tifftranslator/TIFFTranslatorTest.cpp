@@ -468,7 +468,7 @@ TIFFTranslatorTest::LoadAddOnTest()
 		this,
 		gTIFFInputFormats, sizeof(gTIFFInputFormats) / sizeof(translation_format),
 		gTIFFOutputFormats, sizeof(gTIFFOutputFormats) / sizeof(translation_format),
-		B_TRANSLATION_MAKE_VER(1,0,0));
+		B_TRANSLATION_MAKE_VERSION(1,0,0));
 }
 
 #endif // #if !TEST_R5

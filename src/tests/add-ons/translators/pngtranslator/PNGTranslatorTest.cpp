@@ -26,7 +26,7 @@
 // PNG Translator Settings
 #define PNG_SETTING_INTERLACE "png /interlace"
 
-#define PNG_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VER(1,0,0)
+#define PNG_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1,0,0)
 
 #define PNG_IN_QUALITY 0.8
 #define PNG_IN_CAPABILITY 0.8
@@ -458,7 +458,7 @@ PNGTranslatorTest::LoadAddOnTest()
 		this,
 		gPNGInputFormats, sizeof(gPNGInputFormats) / sizeof(translation_format),
 		gPNGOutputFormats, sizeof(gPNGOutputFormats) / sizeof(translation_format),
-		B_TRANSLATION_MAKE_VER(1,0,0));
+		PNG_TRANSLATOR_VERSION);
 }
 
 #endif // #if !TEST_R5

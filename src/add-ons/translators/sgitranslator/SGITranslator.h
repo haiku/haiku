@@ -45,7 +45,7 @@
 #include <fs_attr.h>
 #include "BaseTranslator.h"
 
-#define SGI_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VER(1,0,0)
+#define SGI_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1,0,0)
 
 #define SGI_IN_QUALITY 0.5
 #define SGI_IN_CAPABILITY 0.6

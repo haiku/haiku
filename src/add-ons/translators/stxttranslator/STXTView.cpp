@@ -107,9 +107,9 @@ STXTView::Draw(BRect area)
 	
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
-		static_cast<int>(B_TRANSLATION_MAJOR_VER(STXT_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_MINOR_VER(STXT_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_REVSN_VER(STXT_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(STXT_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VERSION(STXT_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(STXT_TRANSLATOR_VERSION)),
 		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 /*	char copyright[] = "© 2002 OpenBeOS Project";

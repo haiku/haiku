@@ -64,9 +64,9 @@ BaseTranslator::BaseTranslator(const char *name, const char *info,
 	strcpy(fName, name);
 	fInfo = new char[strlen(info) + 41];
 	sprintf(fInfo, "%s v%d.%d.%d %s", info,
-		static_cast<int>(B_TRANSLATION_MAJOR_VER(fVersion)),
-		static_cast<int>(B_TRANSLATION_MINOR_VER(fVersion)),
-		static_cast<int>(B_TRANSLATION_REVSN_VER(fVersion)),
+		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(fVersion)),
+		static_cast<int>(B_TRANSLATION_MINOR_VERSION(fVersion)),
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(fVersion)),
 		__DATE__);
 
 	fInputFormats = inFormats;

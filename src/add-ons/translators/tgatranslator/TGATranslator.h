@@ -40,7 +40,7 @@
 #include <ByteOrder.h>
 #include "BaseTranslator.h"
 
-#define TGA_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VER(1,0,0)
+#define TGA_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1,0,0)
 #define TGA_IN_QUALITY 0.7
 #define TGA_IN_CAPABILITY 0.8
 #define TGA_OUT_QUALITY 0.7

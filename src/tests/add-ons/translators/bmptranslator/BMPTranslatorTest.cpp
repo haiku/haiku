@@ -1159,7 +1159,7 @@ BMPTranslatorTest::LoadAddOnTest()
 		this,
 		gBMPInputFormats, sizeof(gBMPInputFormats) / sizeof(translation_format),
 		gBMPOutputFormats, sizeof(gBMPOutputFormats) / sizeof(translation_format),
-		B_TRANSLATION_MAKE_VER(1,0,0));
+		B_TRANSLATION_MAKE_VERSION(1,0,0));
 }
 
 #endif // #if !TEST_R5
