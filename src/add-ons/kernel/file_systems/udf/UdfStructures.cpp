@@ -629,9 +629,9 @@ logical_volume_info::dump() const
 	DUMP(character_set());
 	string = logical_volume_id();
 	PRINT(("logical_volume_id: `%s'\n", string.Utf8()));
-	for (int i = 0; i < _logical_volume_info.length(); i++) {
+	for (uint32 i = 0; i < _logical_volume_info.length(); i++) {
 		string = _logical_volume_info[i];
-		PRINT(("logical_volume_info #%d: %s\n", i, string.Utf8()));
+		PRINT(("logical_volume_info #%ld: %s\n", i, string.Utf8()));
 	}
 	PRINT(("implementation_id:\n"));
 	DUMP(implementation_id());
