@@ -43,7 +43,7 @@ BBlockCache::BBlockCache(uint32 blockCount,
  :	fFreeList(0),
  	fBlockSize(blockSize),
  	fExcessBlocks(0),
-	fLocker(),
+	fLocker("some BBlockCache lock"),
 	fAlloc(0),
 	fFree(0) 
 {
@@ -53,11 +53,10 @@ BBlockCache::BBlockCache(uint32 blockCount,
 			fFree = &operator delete[];
 			break;
 		case B_MALLOC_CACHE:
+		default:
 			fAlloc = &malloc;
 			fFree = &free;
 			break;
-		default:
-			debugger("Error, you can't create a BBlockCache with undefined allocationType\n");
 	}
 
 	// To properly maintain a list of free buffers, a buffer must be
