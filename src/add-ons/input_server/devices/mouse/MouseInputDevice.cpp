@@ -29,9 +29,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-//#define DEBUG 1
+#define DEBUG 1
 #if DEBUG
-	#define LOG(text) fputs(text, sLogFile)
+	#define LOG(text) fputs(text, sLogFile); fflush(sLogFile)
 #else
 	#define LOG(text)
 #endif
@@ -76,8 +76,7 @@ instantiate_input_device()
 
 
 MouseInputDevice::MouseInputDevice()
-	: 	fThread(-1),
-		sQuit(false)
+	: 	fThread(-1)
 {
 	// TODO: Open "/dev/input/mouse/serial/0" as well, and what about USB mouses ?
 	fFd = open("dev/input/mouse/ps2/0", O_RDWR);
@@ -87,7 +86,7 @@ MouseInputDevice::MouseInputDevice()
 
 #if DEBUG
 	if (sLogFile == NULL)
-		sLogFile = fopen("/var/log/mouse_device_log.log", "w");
+		sLogFile = fopen("/var/log/mouse_device_log.log", "a");
 #endif
 }
 
