@@ -41,8 +41,10 @@ Volume::Volume(boot::Partition *partition)
 
 		case DT_AMIGA_OFS:
 			printf("The Amiga OFS is not yet supported.\n");
+			return;
 		default:
 			// unsupported file system
+			printf("amiga_ffs: unsupported: %08lx\n", fType);
 			return;
 	}
 
