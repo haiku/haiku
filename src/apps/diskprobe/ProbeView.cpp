@@ -1,15 +1,12 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "ProbeView.h"
 #include "DataView.h"
 #include "DiskProbe.h"
-
-#define BEOS_R5_COMPATIBLE
-	// for SetLimits()
 
 #include <Application.h>
 #include <Window.h>
@@ -32,6 +29,7 @@
 #include <NodeInfo.h>
 #include <Node.h>
 #include <NodeMonitor.h>
+#include <Directory.h>
 #include <Volume.h>
 #include <fs_attr.h>
 #include <PrintJob.h>
@@ -1143,7 +1141,7 @@ ProbeView::UpdateAttributesMenu(BMenu *menu)
 
 	// add new items (sorted)
 
-	BNode node(&fEditor.Ref());
+	BNode node(&fEditor.AttributeRef());
 	if (node.InitCheck() == B_OK) {
 		char attribute[B_ATTR_NAME_LENGTH];
 		node.RewindAttrs();
@@ -1166,7 +1164,7 @@ ProbeView::UpdateAttributesMenu(BMenu *menu)
 			}
 
 			BMessage *message = new BMessage(B_REFS_RECEIVED);
-			message->AddRef("refs", &fEditor.Ref());
+			message->AddRef("refs", &fEditor.AttributeRef());
 			message->AddString("attributes", attribute);
 
 			menu->AddItem(new TypeMenuItem(attribute, type, message), i);
@@ -1306,10 +1304,15 @@ ProbeView::AttachedToWindow()
 	// "Attributes" menu (it's only visible if the underlying
 	// file system actually supports attributes)
 
+	BDirectory directory;
 	BVolume volume;
+	if (directory.SetTo(&fEditor.AttributeRef()) == B_OK && directory.IsRootDirectory())
+		directory.GetVolume(&volume);
+	else
+		fEditor.File().GetVolume(&volume);
+
 	if (!fEditor.IsAttribute()
-		&& fEditor.File().GetVolume(&volume) == B_OK
-		&& (volume.KnowsMime() || volume.KnowsAttr())) {
+		&& volume.InitCheck() == B_OK && (volume.KnowsMime() || volume.KnowsAttr())) {
 		bar->AddItem(menu = new BMenu("Attributes"));
 		UpdateAttributesMenu(menu);
 	}
