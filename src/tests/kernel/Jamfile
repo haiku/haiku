@@ -3,3 +3,4 @@ SubDir OBOS_TOP src tests kernel ;
 SubInclude OBOS_TOP src tests kernel boot ;
 SubInclude OBOS_TOP src tests kernel core ;
 SubInclude OBOS_TOP src tests kernel libroot ;
+SubInclude OBOS_TOP src tests kernel benchmarks ;
