@@ -11,7 +11,7 @@
 
 template<class t> const t & max(const t &t1, const t &t2) { return (t1 > t2) ?  t1 : t2; }
 
-MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixSampleRate, int32 mixFramesCount, bigtime_t mixStartTime)
+MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrameRate, int32 mixFrameCount, bigtime_t mixStartTime)
  :	fCore(core),
  	fInput(input),
 	fInputByteSwap(0),
@@ -60,7 +60,7 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixSampl
 	
 	// fMixerChannelInfo and fMixerChannelCount will be initialized by UpdateMixerChannels()
 
-	SetMixBufferFormat(mixSampleRate, mixFramesCount, mixStartTime);
+	SetMixBufferFormat(mixFrameRate, mixFrameCount, mixStartTime);
 	UpdateChannelDesignations();
 	UpdateMixerChannels();
 	

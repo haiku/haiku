@@ -8,7 +8,7 @@ class Resampler;
 class MixerInput
 {
 public:
-	MixerInput(MixerCore *core, const media_input &input, float mixSampleRate, int32 mixFramesCount, bigtime_t mixStartTime);
+	MixerInput(MixerCore *core, const media_input &input, float mixFrameRate, int32 mixFrameCount, bigtime_t mixStartTime);
 	~MixerInput();
 	
 	int32 ID();

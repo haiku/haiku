@@ -59,6 +59,8 @@ class AudioMixer :
 		void				NodeRegistered();
 		void 				Stop(bigtime_t performance_time, bool immediate);
 		void 				SetTimeSource(BTimeSource * time_source);
+		
+		using BBufferProducer::SendBuffer;
 	
 	protected:
 	

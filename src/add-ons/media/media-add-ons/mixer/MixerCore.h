@@ -3,13 +3,14 @@
 
 #include <Locker.h>
 
+class AudioMixer;
 class MixerInput;
 class MixerOutput;
 
 class MixerCore
 {
 public:
-	MixerCore();
+	MixerCore(AudioMixer *node);
 	~MixerCore();
 	
 	bool AddInput(const media_input &input);
@@ -60,8 +61,9 @@ private:
 	int32		fMixBufferChannelCount;
 	int32		*fMixBufferChannelTypes; //array
 	bool		fDoubleRateMixing;
-	bigtime_t	fLastMixStartTime;
+	bigtime_t	fMixStartTime;
 	
+	AudioMixer *fNode;
 	BBufferGroup *fBufferGroup;
 	BTimeSource	*fTimeSource;
 	thread_id	fMixThread;

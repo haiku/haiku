@@ -31,7 +31,7 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 			BControllable(),
 			BMediaEventLooper(),
 			fAddOn(addOn),
-			fCore(new MixerCore),
+			fCore(new MixerCore(this)),
 			fWeb(0),
 			fBufferGroup(0),
 			fDownstreamLatency(1),
@@ -57,6 +57,14 @@ AudioMixer::~AudioMixer()
 	BMediaEventLooper::Quit();
 	SetParameterWeb(NULL); 
 
+	// stop the mixer
+	fCore->Lock();
+	fCore->Stop();
+	fCore->Unlock();
+
+	// disconnect all nodes from the mixer
+	// XXX todo
+	
 	delete fCore;
 	delete fBufferGroup;
 	
@@ -715,7 +723,7 @@ AudioMixer::SetTimeSource(BTimeSource * time_source)
 }
 
 void 
-AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness, bool realTimeEvent)
+AudioMixer::HandleEvent(const media_timed_event *event, bigtime_t lateness, bool realTimeEvent)
 {
 	switch (event->type)
 	{
@@ -729,6 +737,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness, boo
 
 		case BTimedEventQueue::B_START:
 		{
+			printf("AudioMixer::HandleEvent: B_START\n");
 			if (RunState() != B_STARTED) {
 				fCore->Lock();
 				fCore->Start(event->event_time);
@@ -739,6 +748,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness, boo
 			
 		case BTimedEventQueue::B_STOP:
 		{
+			printf("AudioMixer::HandleEvent: B_STOP\n");
 			// stopped - don't process any more buffers, flush all buffers from eventqueue
 			EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER);
 			fCore->Lock();

@@ -1,5 +1,6 @@
 #include <RealtimeAlloc.h>
 #include <MediaNode.h>
+#include <BufferProducer.h>
 #include <TimeSource.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
@@ -7,6 +8,7 @@
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerUtils.h"
+#include "AudioMixer.h"
 #include "Debug.h"
 
 #define DOUBLE_RATE_MIXING 	1
@@ -26,7 +28,7 @@
  */
 
 
-MixerCore::MixerCore()
+MixerCore::MixerCore(AudioMixer *node)
  :	fLocker(new BLocker),
 	fInputs(new BList),
 	fOutput(0),
@@ -38,7 +40,8 @@ MixerCore::MixerCore()
 	fMixBufferChannelTypes(0),
 	fMixBufferChannelCount(0),
  	fDoubleRateMixing(DOUBLE_RATE_MIXING),
- 	fLastMixStartTime(0),
+ 	fMixStartTime(0),
+ 	fNode(node),
 	fBufferGroup(0),
 	fTimeSource(0),
 	fMixThread(-1),
@@ -67,7 +70,7 @@ bool
 MixerCore::AddInput(const media_input &input)
 {
 	ASSERT_LOCKED();
-	fInputs->AddItem(new MixerInput(this, input, fMixBufferFrameRate, fMixBufferFrameCount, fLastMixStartTime));
+	fInputs->AddItem(new MixerInput(this, input, fMixBufferFrameRate, fMixBufferFrameCount, fMixStartTime));
 	return true;
 }
 
@@ -184,7 +187,7 @@ MixerCore::OutputFormatChanged(const media_multi_audio_format &format)
 
 	MixerInput *input;
 	for (int i = 0; (input = Input(i)); i++)
-		input->SetMixBufferFormat(fMixBufferFrameRate, fMixBufferFrameCount, fLastMixStartTime);
+		input->SetMixBufferFormat(fMixBufferFrameRate, fMixBufferFrameCount, fMixStartTime);
 }
 
 void
@@ -204,11 +207,13 @@ MixerCore::SetTimeSource(BTimeSource *ts)
 		fTimeSource->Release();
 		
 	fTimeSource = dynamic_cast<BTimeSource *>(ts->Acquire());
-	fLastMixStartTime = fTimeSource->Now();
+//	fMixStartTime = fTimeSource->Now();
 
-	MixerInput *input;
-	for (int i = 0; (input = Input(i)); i++)
-		input->SetMixBufferFormat(fMixBufferFrameRate, fMixBufferFrameCount, fLastMixStartTime);
+	printf("MixerCore::SetTimeSource, now = %Ld\n", fTimeSource->Now());
+
+//	MixerInput *input;
+//	for (int i = 0; (input = Input(i)); i++)
+//		input->SetMixBufferFormat(fMixBufferFrameRate, fMixBufferFrameCount, fMixStartTime);
 }
 
 void
@@ -222,6 +227,7 @@ void
 MixerCore::Start(bigtime_t time)
 {
 	ASSERT_LOCKED();
+	printf("MixerCore::Start\n");
 	if (fRunning)
 		return;
 		
@@ -235,6 +241,7 @@ void
 MixerCore::Stop()
 {
 	ASSERT_LOCKED();
+	printf("MixerCore::Stop\n");
 	if (!fRunning)
 		return;
 
@@ -277,39 +284,66 @@ void
 MixerCore::MixThread()
 {
 	bigtime_t 	event_time;
-	bigtime_t 	base;
+	bigtime_t 	time_base;
 	bigtime_t 	latency;
-	int64		pos;
+	int64		frame_base;
+	int64		frame_pos;
 	
-	pos = 0;
 	latency = 30000;
-	base = event_time = fTimeSource->Now();
+	
+	while (fTimeSource->Now() <= 0) {
+		printf("delay MixThread start, now %Ld\n", (int64)fTimeSource->Now());
+		snooze(1000);
+	}
+	
+	printf("starting MixThread, now %Ld\n", (int64)fTimeSource->Now());
+
+	/* We must read from the input buffer at a position (pos) that is always a multiple of fMixBufferFrameCount.
+	 */
+	int64 temp = frames_for_duration(fMixBufferFrameRate, fTimeSource->Now() - fMixStartTime);
+	frame_base = ((temp / fMixBufferFrameCount) + 1) * fMixBufferFrameCount;
+	time_base = duration_for_frames(fMixBufferFrameRate, frame_base) + fMixStartTime;
+	
+	printf("starting MixThread, now %Ld, time_base %Ld, fMixStartTime %Ld, frame_base %Ld\n", fTimeSource->Now(), time_base, fMixStartTime, frame_base);
+	
+	event_time = time_base;
+	frame_pos = 0;
 	for (;;) {
 		status_t rv;
 		rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, fTimeSource->RealTimeFor(event_time, latency));
 		if (rv == B_INTERRUPTED)
 			continue;
-		if (rv < B_OK)
+		if (rv != B_TIMED_OUT && rv < B_OK)
 			return;
 			
 		// mix all data from all inputs into the mix buffer
+		ASSERT((frame_base + frame_pos) % fMixBufferFrameCount == 0);
+
+		printf("create new buffer event at %Ld, reading input frames at %Ld\n", event_time, frame_base + frame_pos);
+
 		
 		// request a buffer
 		BBuffer* buf = fBufferGroup->RequestBuffer(fOutput->MediaOutput().format.u.raw_audio.buffer_size, 10000);
+		if (buf) {
 		
-		// copy data from mix buffer into output buffer
+			// copy data from mix buffer into output buffer
 
-		// fill in the buffer header
-		media_header* hdr = buf->Header();
-		hdr->type = B_MEDIA_RAW_AUDIO;
-		hdr->size_used = fOutput->MediaOutput().format.u.raw_audio.buffer_size;
-		hdr->time_source = fTimeSource->ID();
-		hdr->start_time = event_time;
+			// fill in the buffer header
+			media_header* hdr = buf->Header();
+			hdr->type = B_MEDIA_RAW_AUDIO;
+			hdr->size_used = fOutput->MediaOutput().format.u.raw_audio.buffer_size;
+			hdr->time_source = fTimeSource->ID();
+			hdr->start_time = event_time;
 		
-		// send the buffer
+			// send the buffer
+			if (B_OK != fNode->SendBuffer(buf, fOutput->MediaOutput().destination)) {
+				printf("SendBuffer failed\n");
+				buf->Recycle();
+			}
+		}
 		
 		// shedule next event
-		pos += fMixBufferFrameCount;
-		event_time = base + bigtime_t((1000000LL * pos) / fMixBufferFrameRate);
+		frame_pos += fMixBufferFrameCount;
+		event_time = time_base + bigtime_t((1000000LL * frame_pos) / fMixBufferFrameRate);
 	}
 }
