@@ -191,11 +191,19 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 }
 
 
+/**	This function reads \a size bytes directly from the file into the cache.
+ *	If \a bufferSize does not equal zero, the data read in is also copied to
+ *	the provided buffer.
+ *	This function always allocates all pages; it is the responsibility of the
+ *	calling function to only ask for yet uncached ranges.
+ */
+
 static status_t
-read_from_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
+read_into_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
 {
 	TRACE(("read_from_cache: ref = %p, offset = %Ld, size = %lu, buffer = %p, bufferSize = %lu\n", ref, offset, size, (void *)buffer, bufferSize));
 
+	vm_cache_ref *cache = ref->cache;
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
 
@@ -225,11 +233,14 @@ read_from_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, s
 		// ToDo: check if the array is large enough!
 	}
 
+	mutex_unlock(&cache->lock);
+
 	// read file into reserved pages
 	status_t status = pages_io(ref, offset, vecs, vecCount, &size, false);
 	if (status < B_OK) {
 		// ToDo: remove allocated pages...
 		panic("file_cache: remove allocated pages! read pages failed: %s\n", strerror(status));
+		mutex_lock(&cache->lock);
 		return status;
 	}
 
@@ -251,6 +262,8 @@ read_from_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, s
 		for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE, base += B_PAGE_SIZE)
 			vm_put_physical_page(base);
 	}
+
+	mutex_lock(&cache->lock);
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;)
@@ -378,6 +391,8 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 	addr_t buffer = bufferBase;
 	off_t lastOffset = offset;
 
+	mutex_lock(&cache->lock);
+
 	for (; bytesLeft > 0; offset += B_PAGE_SIZE) {
 		// check if this page is already in memory
 		addr_t virtualAddress;
@@ -398,8 +413,9 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 			if (bufferBase != buffer) {
 				size_t requestSize = buffer - bufferBase;
 				if ((doWrite && write_to_cache(ref, lastOffset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)
-					|| (!doWrite && read_from_cache(ref, lastOffset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)) {
+					|| (!doWrite && read_into_cache(ref, lastOffset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)) {
 					vm_put_physical_page(virtualAddress);
+					mutex_unlock(&cache->lock);
 					return B_IO_ERROR;
 				}
 				bufferBase += requestSize;
@@ -418,6 +434,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 
 			if (bytesLeft <= B_PAGE_SIZE) {
 				// we've read the last page, so we're done!
+				mutex_unlock(&cache->lock);
 				return B_OK;
 			}
 
@@ -434,13 +451,17 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 	}
 
 	// fill the last remainding bytes of the request (either write or read)
-	
+
 	lastOffset += pageOffset;
 
+	status_t status;
 	if (doWrite)
-		return write_to_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
+		status = write_to_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
+	else
+		status = read_into_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
 
-	return read_from_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
+	mutex_unlock(&cache->lock);
+	return status;
 }
 
 
@@ -451,16 +472,81 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 extern "C" void
 cache_prefetch(mount_id mountID, vnode_id vnodeID)
 {
+	vm_cache_ref *cache;
+	void *vnode;
+
 	// ToDo: schedule prefetch
 	// ToDo: maybe get 1) access type (random/sequential), 2) file vecs which blocks to prefetch
-	dprintf("prefetch vnode %ld:%Ld\n", mountID, vnodeID);
+	//	for now, we just prefetch the first 64 kB
+
+	TRACE(("cache_prefetch(vnode %ld:%Ld)\n", mountID, vnodeID));
+
+	// get the vnode for the object, this also grabs a ref to it
+	if (vfs_get_vnode(mountID, vnodeID, &vnode) != B_OK)
+		return;
+
+	if (vfs_get_vnode_cache(vnode, &cache) != B_OK) {
+		vfs_vnode_release_ref(vnode);
+		return;
+	}
+
+	file_cache_ref *ref = (struct file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
+	off_t fileSize = cache->cache->virtual_size;
+
+	size_t size = 65536;
+	if (size > fileSize)
+		size = fileSize;
+
+	size_t bytesLeft = size, lastLeft = size;
+	off_t lastOffset = 0;
+	size_t lastSize = 0;
+
+	mutex_lock(&cache->lock);
+
+	for (off_t offset = 0; bytesLeft > 0; offset += B_PAGE_SIZE) {
+		// check if this page is already in memory
+		addr_t virtualAddress;
+	restart:
+		vm_page *page = vm_cache_lookup_page(cache, offset);
+		if (page != NULL) {
+			// it is, so let's satisfy in the first part of the request
+			if (lastOffset < offset) {
+				size_t requestSize = offset - lastOffset;
+				read_into_cache(ref, lastOffset, requestSize, NULL, 0);
+			}
+
+			if (bytesLeft <= B_PAGE_SIZE) {
+				// we've read the last page, so we're done!
+				goto out;
+			}
+
+			// prepare a potential gap request
+			lastOffset = offset + B_PAGE_SIZE;
+			lastLeft = bytesLeft - B_PAGE_SIZE;
+		}
+
+		if (bytesLeft <= B_PAGE_SIZE)
+			break;
+
+		bytesLeft -= B_PAGE_SIZE;
+	}
+
+	// read in the last part
+	read_into_cache(ref, lastOffset, lastLeft, NULL, 0);
+
+out:
+	mutex_unlock(&cache->lock);
+	vfs_vnode_release_ref(vnode);
 }
 
 
 extern "C" void
-cache_node_opened(void *_ref, mount_id mountID, vnode_id vnodeID)
+cache_node_opened(vm_cache_ref *cache, mount_id mountID, vnode_id vnodeID)
 {
-	file_cache_ref *ref = (file_cache_ref *)_ref;
+	if (cache == NULL)
+		return;
+
+	file_cache_ref *ref = (file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
 
 	if (ref != NULL && sCacheModule != NULL)
 		sCacheModule->node_opened(ref->cache->cache->virtual_size, mountID, vnodeID);
@@ -468,8 +554,13 @@ cache_node_opened(void *_ref, mount_id mountID, vnode_id vnodeID)
 
 
 extern "C" void
-cache_node_closed(void *ref, mount_id mountID, vnode_id vnodeID)
+cache_node_closed(vm_cache_ref *cache, mount_id mountID, vnode_id vnodeID)
 {
+	if (cache == NULL)
+		return;
+
+	file_cache_ref *ref = (file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
+
 	if (ref != NULL && sCacheModule != NULL)
 		sCacheModule->node_closed(mountID, vnodeID);
 }
@@ -504,14 +595,15 @@ file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 	if (vfs_get_cookie_from_fd(fd, &ref->cookie) != B_OK)
 		goto err2;
 
-	// get the vnode for the object
-	if (vfs_get_vnode(mountID, vnodeID, &ref->vnode) != B_OK)
+	// get the vnode for the object (note, this does not grab a reference to the node)
+	if (vfs_lookup_vnode(mountID, vnodeID, &ref->vnode) != B_OK)
 		goto err2;
 
-	if (vfs_get_vnode_cache(ref->vnode, (void **)&ref->cache) != B_OK)
+	if (vfs_get_vnode_cache(ref->vnode, &ref->cache) != B_OK)
 		goto err3;
 
 	ref->cache->cache->virtual_size = size;
+	((vnode_store *)ref->cache->cache->store)->file_cache_ref = ref;
 	return ref;
 
 err3:
