@@ -1,0 +1,25 @@
+SubDir OBOS_TOP src add-ons kernel drivers audio ac97 ichaudio ;
+
+# UsePrivateHeaders media ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons media media-add-ons lala ] ;
+
+KernelMergeObject ichaudio_driver.o : 
+	ichaudio.c
+	:
+	-fno-pic -Wno-unused -D_KERNEL_MODE
+	;
+
+KernelLd ichaudio :
+	ichaudio_driver.o
+	lala.o
+	:
+	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
+	:
+	-Bdynamic -shared
+	:
+	:
+	add-ons/kernel/drivers/bin
+	;
+
+SubInclude OBOS_TOP src add-ons kernel drivers audio ac97 ichaudio lala ;
