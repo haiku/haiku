@@ -45,4 +45,7 @@ private:
 	static BLocker	fTeamPortLock;
 };
 
+status_t find_test_app(const char *testApp, BString *path);
+status_t find_test_app(const char *testApp, entry_ref *ref);
+
 #endif	// APP_RUNNER_H

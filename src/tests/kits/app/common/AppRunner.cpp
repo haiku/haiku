@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include <Autolock.h>
+#include <Entry.h>
 #include <Messenger.h>
 #include <String.h>
 
@@ -46,13 +47,7 @@ AppRunner::Run(const char *command, const char *args, bool findCommand)
 	// get the app path
 	BString appPath;
 	if (findCommand) {
-		appPath = BTestShell::GlobalTestDir();
-		appPath.CharacterEscape(" \t\n!\"'`$&()?*+{}[]<>|", '\\');
-		appPath += "/kits/app/";
-		appPath += command;
-		#ifdef TEST_R5
-			appPath += "_r5";
-		#endif
+		find_test_app(command, &appPath);
 		command = appPath.String();
 	}
 	// add args, i.e. compose the command line
@@ -252,4 +247,35 @@ port_id	AppRunner::fTeamPort = -1;
 
 // fTeamPortLock
 BLocker	AppRunner::fTeamPortLock;
+
+
+// find_test_app
+status_t
+find_test_app(const char *testApp, BString *path)
+{
+	status_t error = (testApp && path ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		*path = BTestShell::GlobalTestDir();
+		path->CharacterEscape(" \t\n!\"'`$&()?*+{}[]<>|", '\\');
+		*path += "/kits/app/";
+		*path += testApp;
+		#ifdef TEST_R5
+			*path += "_r5";
+		#endif
+	}
+	return error;
+}
+
+// find_test_app
+status_t
+find_test_app(const char *testApp, entry_ref *ref)
+{
+	status_t error = (testApp && ref ? B_OK : B_BAD_VALUE);
+	BString path;
+	if (error == B_OK)
+		error = find_test_app(testApp, &path);
+	if (error == B_OK)
+		error = get_ref_for_path(path.String(), ref);
+	return error;
+}
 
