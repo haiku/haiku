@@ -508,6 +508,8 @@ enum tag_id {
 
 const char *tag_id_to_string(tag_id id);
 
+extern const uint16 kCrcTable[256];
+
 /*! \brief Primary volume descriptor
 */
 struct primary_volume_descriptor {
