@@ -4,6 +4,7 @@ KernelMergeObject posix_string.o :
 	bcmp.c
 	bcopy.c
 	bzero.c
+	ffs.cpp
 	memchr.c
 	memcmp.c
 	memcpy.c
