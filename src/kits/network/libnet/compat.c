@@ -142,3 +142,23 @@ _EXPORT int getpassword(char * pwd, size_t length)
 }
 
 
+struct utsname {
+	char sysname[32];
+	char nodename[32];
+	char release[32];
+	char version[32];
+	char machine[32];
+};
+int uname(struct utsname *name);
+_EXPORT int uname(struct utsname *name)
+{
+	if(!name)
+		return B_ERROR;
+	
+	strcpy(name->sysname, "BeOS");
+	strcpy(name->nodename, "trantor");
+	strcpy(name->release, "5.0");
+	strcpy(name->version, "1000009");
+	strcpy(name->machine, "BePC");
+	return B_OK;
+}

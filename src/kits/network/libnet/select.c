@@ -146,16 +146,17 @@ _EXPORT int select(int nbits, struct fd_set * rbits,
 	case B_WOULD_BLOCK:
 	case B_TIMED_OUT:	// logicly, 'n' should stay to 0 in this case...
 		n = 0;
+		// IMPORTANT: memcpy uses the old R5 fd_bits size (sizeof(unsigned) * 8)!
 		if (rbits) {
-			memcpy(rbits, &rss->rbits, sizeof(*rbits));
+			memcpy(rbits, &rss->rbits, sizeof(unsigned) * 8);
 			n += fd_set_count(rbits, nbits);
 		};
 		if (wbits) {
-			memcpy(wbits, &rss->wbits, sizeof(*wbits));
+			memcpy(wbits, &rss->wbits, sizeof(unsigned) * 8);
 			n += fd_set_count(wbits, nbits);
 		};
 		if (ebits) {
-			memcpy(ebits, &rss->ebits, sizeof(*ebits));
+			memcpy(ebits, &rss->ebits, sizeof(unsigned) * 8);
 			n += fd_set_count(ebits, nbits);
 		};
 		break;
