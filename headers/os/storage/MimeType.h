@@ -200,7 +200,7 @@ private:
 //	status_t OpenFile(bool create_file = false, dev_t dev = -1) const;
 //	status_t CloseFile() const;
 	status_t GetSupportedTypes(BMessage *types);
-	status_t SetSupportedTypes(const BMessage *types);
+	status_t SetSupportedTypes(const BMessage *types, bool fullSync = true);
 //	void MimeChanged(int32 w, const char *type = NULL,
 //					 bool large = true) const;
 
