@@ -11,6 +11,7 @@
 #include <sniffer/Pattern.h>
 #include <DataIO.h>
 #include <stdio.h>	// for SEEK_* defines
+#include <new>
 
 using namespace BPrivate::Storage::Sniffer;
 
