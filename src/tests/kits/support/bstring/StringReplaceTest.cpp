@@ -246,6 +246,12 @@ StringReplaceTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "xxc xxc xxc") == 0);
 	delete str1;
 	
+	NextSubTest();
+	str1 = new BString("abcabcabcbababc");
+	str1->ReplaceSet("abc", 'c');
+	CPPUNIT_ASSERT(strcmp(str1->String(), "ccccccccccccccc") == 0);
+	delete str1;
+	
 	//ReplaceSet(const char*, const char*)
 	NextSubTest();
 	str1 = new BString("abcd abcd abcd");
