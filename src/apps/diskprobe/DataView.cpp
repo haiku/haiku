@@ -15,9 +15,6 @@
 #include <Beep.h>
 
 
-typedef uint32 addr_t;
-	// this one is not yet defined in a public place
-
 static const uint32 kBlockSize = 16;
 static const uint32 kHorizontalSpace = 8;
 static const uint32 kVerticalSpace = 4;
@@ -58,6 +55,7 @@ DataView::DataView(BRect rect, DataEditor &editor)
 	fFocus(kHexFocus),
 	fBase(kHexBase),
 	fIsActive(true),
+	fBitPosition(0),
 	fFitFontSize(false)
 {
 	fPositionLength = 4;
