@@ -3,6 +3,7 @@ SubDir OBOS_TOP src apps ;
 SubInclude OBOS_TOP src apps bin ;
 SubInclude OBOS_TOP src apps clock ;
 SubInclude OBOS_TOP src apps magnify ;
+SubInclude OBOS_TOP src apps people ;
 SubInclude OBOS_TOP src apps pulse ;
 SubInclude OBOS_TOP src apps showimage ;
 SubInclude OBOS_TOP src apps stylededit ;
