@@ -60,34 +60,16 @@ vesa_get_mode_info(uint16 mode, struct vbe_mode_info *modeInfo)
 }
 
 
-static addr_t
-fix_vbe_pointer(addr_t address, vbe_info_block *target)
-{
-	uint16 segment = address >> 16;
-	uint16 offset = address & 0xffff;
-
-	address = (segment << 4) + offset;
-
-	// if the address is a pointer in the info block itself, it has
-	// to be relocated to the new info block address
-	if (address >= kExtraSegmentScratch && address <= kExtraSegmentScratch + sizeof(vbe_info_block))
-		address += (addr_t)target - kExtraSegmentScratch;
-
-	return address;
-}
-
-
 static status_t
-vesa_init(vbe_info_block *vbeInfo, uint16 *_standardMode)
+vesa_get_vbe_info_block(vbe_info_block *info)
 {
-	struct vbe_info_block *info = (vbe_info_block *)kExtraSegmentScratch;
 	memset(info, 0, sizeof(vbe_info_block));
 	info->signature = VBE2_SIGNATURE;
 
 	struct bios_regs regs;
 	regs.eax = 0x4f00;
-	regs.es = 0;
-	regs.edi = (addr_t)info;
+	regs.es = ADDRESS_SEGMENT(info);
+	regs.edi = ADDRESS_OFFSET(info);
 	call_bios(0x10, &regs);
 
 	if ((regs.eax & 0xffff) != 0x4f)
@@ -103,16 +85,24 @@ vesa_init(vbe_info_block *vbeInfo, uint16 *_standardMode)
 		return B_ERROR;
 	}
 
-	info->oem_string = fix_vbe_pointer(info->oem_string, vbeInfo);
-	info->mode_list = fix_vbe_pointer(info->mode_list, vbeInfo);
+	info->oem_string = SEGMENTED_TO_LINEAR(info->oem_string);
+	info->mode_list = SEGMENTED_TO_LINEAR(info->mode_list);
 	dprintf("oem string: %s\n", (const char *)info->oem_string);
 
-	memcpy(vbeInfo, info, sizeof(vbe_info_block));
+	return B_OK;
+}
+
+
+static status_t
+vesa_init(vbe_info_block *info, uint16 *_standardMode)
+{
+	if (vesa_get_vbe_info_block(info) != B_OK)
+		return B_ERROR;
 
 	dprintf("mode list:\n");
 	int32 i = 0;
 	while (true) {
-		uint16 mode = ((uint16 *)vbeInfo->mode_list)[i++];
+		uint16 mode = ((uint16 *)info->mode_list)[i++];
 		if (mode == 0xffff)
 			break;
 
@@ -261,7 +251,7 @@ platform_switch_to_logo(void)
 #endif
 
 	// ToDo: this is a temporary hack!
-	addr_t start = gKernelArgs.fb.mapping.start + gKernelArgs.fb.x_size * (gKernelArgs.fb.y_size - 200) * (gKernelArgs.fb.bit_depth/8) + gKernelArgs.fb.x_size - 400;
+	addr_t start = gKernelArgs.fb.mapping.start + gKernelArgs.fb.x_size * (gKernelArgs.fb.y_size - kHeight - 60) * (gKernelArgs.fb.bit_depth/8) + gKernelArgs.fb.x_size - kWidth - 40;
 	for (int32 i = 0; i < kHeight; i++) {
 		memcpy((void *)(start + gKernelArgs.fb.x_size * i), &kImageData[i * kWidth], kWidth);
 	}
