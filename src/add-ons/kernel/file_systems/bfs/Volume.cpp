@@ -13,6 +13,7 @@
 
 #include <util/kernel_cpp.h>
 #include <KernelExport.h>
+#include <Drivers.h>
 #include <fs_volume.h>
 
 #include <stdlib.h>
@@ -218,7 +219,7 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 //	#pragma mark -
 
 
-Volume::Volume(nspace_id id)
+Volume::Volume(mount_id id)
 	:
 	fID(id),
 	fBlockAllocator(this),

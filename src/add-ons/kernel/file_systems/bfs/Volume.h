@@ -8,12 +8,12 @@
 
 
 #include <KernelExport.h>
+#include <fs_interface.h>
 
 extern "C" {
 	#ifndef _IMPEXP_KERNEL
 	#	define _IMPEXP_KERNEL
 	#endif
-	#include "fsproto.h"
 	#include "lock.h"
 	#include "cache.h"
 }
@@ -37,7 +37,7 @@ enum volume_initialize_flags {
 
 class Volume {
 	public:
-		Volume(nspace_id id);
+		Volume(mount_id id);
 		~Volume();
 
 		status_t			Mount(const char *device, uint32 flags);
@@ -59,7 +59,7 @@ class Volume {
 		vint32				&LogEnd() { return fLogEnd; }
 		int					Device() const { return fDevice; }
 
-		nspace_id			ID() const { return fID; }
+		mount_id			ID() const { return fID; }
 		const char			*Name() const { return fSuperBlock.name; }
 
 		off_t				NumBlocks() const { return fSuperBlock.NumBlocks(); }
@@ -116,7 +116,7 @@ class Volume {
 		uint32				GetUniqueID();
 
 	protected:
-		nspace_id			fID;
+		mount_id			fID;
 		int					fDevice;
 		disk_super_block	fSuperBlock;
 
