@@ -496,7 +496,6 @@ static void detect_panels()
 	LOG(2,("INFO: End flatpanel registers dump.\n"));
 }
 
-//fixme: in progress!!
 static void setup_output_matrix()
 {
 	/* setup defaults: */
@@ -619,7 +618,48 @@ static void setup_output_matrix()
 			//fixme? add TVout (only, so no CRT(s) connected) support...
 			switch (si->ps.monitors)
 			{
-				//fixme: add/setup NV11 matrix use!!!
+			case 0x00: /* no monitor found at all */
+				LOG(2,("INFO: head 1 has nothing connected;\n"));
+				LOG(2,("INFO: head 2 has nothing connected:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x01: /* digital panel on head 1, nothing on head 2 */
+				LOG(2,("INFO: head 1 has a digital panel;\n"));
+				LOG(2,("INFO: head 2 has nothing connected:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x02: /* analog panel or CRT on head 1, nothing on head 2 */
+				LOG(2,("INFO: head 1 has an analog panel or CRT;\n"));
+				LOG(2,("INFO: head 2 has nothing connected:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x03: /* both types on head 1, nothing on head 2 */
+				LOG(2,("INFO: head 1 has a digital panel AND an analog panel or CRT;\n"));
+				LOG(2,("INFO: head 2 has nothing connected:\n"));
+				LOG(2,("INFO: correction not possible...\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x10: /* nothing on head 1, digital panel on head 2 */
+				LOG(2,("INFO: head 1 has nothing connected;\n"));
+				LOG(2,("INFO: head 2 has a digital panel:\n"));
+				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+				si->ps.crtc2_prim = true;
+				break;
+			case 0x11: /* digital panels on both heads */
+				LOG(2,("INFO: head 1 has a digital panel;\n"));
+				LOG(2,("INFO: head 2 has a digital panel:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x12: /* analog panel or CRT on head 1, digital panel on head 2 */
+				LOG(2,("INFO: head 1 has an analog panel or CRT;\n"));
+				LOG(2,("INFO: head 2 has a digital panel:\n"));
+				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+				si->ps.crtc2_prim = true;
+				break;
+			default: /* more than two monitors connected to just two outputs: illegal! */
+				LOG(2,("INFO: illegal monitor setup ($%02x):\n", si->ps.monitors));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
 			}
 		}
 	}
