@@ -4,6 +4,7 @@
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <Path.h>
+#include <File.h>
 #include <image.h>
 #include <DataIO.h>
 #include <Message.h>
@@ -14,7 +15,7 @@ int main (int argc, char *argv[])
 	char *transport;
 	
 	if (argc < 2) {
-		printf("Usage: %s <transport add-on name>\n", argv[0]);
+		printf("Usage: %s <transport add-on name> [<file to print>]\n", argv[0]);
 		return B_ERROR;
 	}
 
@@ -71,6 +72,7 @@ int main (int argc, char *argv[])
 	// now, initialize the transport add-on
 	// request BDataIO object from transport add-on
 	BMessage msg('TRIN');
+	// TODO: create on the fly a temporary printer folder for testing purpose only
 	msg.AddString("printer_file", "/boot/home/config/settings/printers/test");
 	BDataIO *io = (*init_proc)(&msg);
 	
@@ -79,6 +81,26 @@ int main (int argc, char *argv[])
 		msg.PrintToStream();
 	} else
 		printf("failed!\n");
+
+
+	if (argc > 2) {
+		BFile data(argv[2], B_READ_ONLY);
+		if (data.InitCheck() == B_OK) {
+			uint8 buffer[B_PAGE_SIZE];
+			ssize_t total = 0;
+			ssize_t sz;
+			
+			printf("Sending data read from %s file...\n", argv[2]);
+			while((sz = data.Read(buffer, sizeof(buffer))) > 0) {
+				if (io->Write(buffer, sz) < 0) {
+					printf("Error writting on the print transport stream!\n");
+					break;
+				}
+				total += sz;
+			}	// while
+			printf("%ld data bytes sent.\n", total);
+		}	// data valid file
+	}	// optional data file
 	
 	if (exit_proc) {
 		printf("Exiting %s...\n", transport);
