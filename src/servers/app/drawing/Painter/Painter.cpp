@@ -787,6 +787,8 @@ Painter::DrawString(const char* utf8String, uint32 length,
 		transform.TranslateBy(baseLine);
 		transform.Transform(&fPenLocation);
 	}
+	if (bounds.IsValid() && fClippingRegion)
+		bounds = bounds & _Transform(fClippingRegion->Frame());
 	return bounds;
 }
 
@@ -998,6 +1000,15 @@ Painter::_Transform(BRect* rect) const
 	rect->bottom *= fScale;
 	rect->right--;
 	rect->bottom--;
+}
+
+// _Transform
+BRect
+Painter::_Transform(const BRect& rect) const
+{
+	BRect ret = rect;
+	_Transform(&ret);
+	return ret;
 }
 
 // _RebuildClipping

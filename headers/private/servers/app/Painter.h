@@ -165,24 +165,24 @@ class Painter {
 												const pattern& p = B_SOLID_HIGH) const;
 
 								// strings
-			void				DrawChar(		char aChar);
+			BRect				DrawChar(		char aChar);
 
-			void				DrawChar(		char aChar,
+			BRect				DrawChar(		char aChar,
 												BPoint baseLine);
 
-			void				DrawString(		const char* utf8String,
+			BRect				DrawString(		const char* utf8String,
 												uint32 length,
 												const escapement_delta* delta = NULL);
 
-			void				DrawString(		const char* utf8String,
+			BRect				DrawString(		const char* utf8String,
 												uint32 length,
 												BPoint baseLine,
 												const escapement_delta* delta = NULL);
 
-			void				DrawString(		const char* utf8String,
+			BRect				DrawString(		const char* utf8String,
 												const escapement_delta* delta = NULL);
 
-			void				DrawString(		const char* utf8String,
+			BRect				DrawString(		const char* utf8String,
 												BPoint baseLine,
 												const escapement_delta* delta = NULL);
 
@@ -224,6 +224,7 @@ class Painter {
 			void				_Transform(float* width) const;
 			float				_Transform(const float& width) const;
 			void				_Transform(BRect* rect) const;
+			BRect				_Transform(const BRect& rect) const;
 
 			void				_RebuildClipping();
 
