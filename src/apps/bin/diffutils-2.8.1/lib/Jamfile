@@ -4,7 +4,7 @@ SubDirCcFlags -DHAVE_CONFIG_H ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 StaticLibrary diffutils : 
-	alloca.c
+#	alloca.c
 	basename.c
 	c-stack.c
 	cmpbuf.c
@@ -40,5 +40,4 @@ StaticLibrary diffutils :
 	xmalloc.c
 	xstrtol.c
 	xstrtoumax.c
-	: STATIC_LIBRARY_DIR
 ;
