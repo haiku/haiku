@@ -38,7 +38,7 @@ driver_info_t driver_info = {
 
 
 status_t
-ichaudio_attach(drv_t *drv, void *cookie)
+ichaudio_attach(drv_t *drv, void *_cookie)
 {
 	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
 	
