@@ -134,8 +134,10 @@ mp3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	ioDecodedFormat->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 	
 	int frame_size = (ioDecodedFormat->u.raw_audio.format & 0xf) * ioDecodedFormat->u.raw_audio.channel_count;
-	if (ioDecodedFormat->u.raw_audio.buffer_size == 0 || (ioDecodedFormat->u.raw_audio.buffer_size % frame_size) != 0)
+	if (ioDecodedFormat->u.raw_audio.buffer_size == 0)
 		ioDecodedFormat->u.raw_audio.buffer_size = AudioBufferSize(ioDecodedFormat->u.raw_audio);
+	else
+		ioDecodedFormat->u.raw_audio.buffer_size = (ioDecodedFormat->u.raw_audio.buffer_size / frame_size) * frame_size;
 	if (ioDecodedFormat->u.raw_audio.channel_mask == 0)
 		ioDecodedFormat->u.raw_audio.channel_mask = (fChannelCount == 1) ? B_CHANNEL_LEFT : B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 
