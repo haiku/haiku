@@ -99,7 +99,7 @@ TranslationUtilsTest::GetBitmapTest()
 		"application/x-vnd.OpenBeOS-translationkit_translationutilstest");
 	BBitmap *pbits = NULL;
 	pbits = BTranslationUtils::GetBitmap(
-		"../src/tests/kits/translation/data/images/image.png");
+		"../../src/tests/kits/translation/data/images/image.png");
 	CheckBitmap(pbits);
 	delete pbits;
 	pbits = NULL;
@@ -111,7 +111,7 @@ TranslationUtilsTest::GetBitmapTest()
 	// File (GetBitmapFile)
 	NextSubTest();
 	pbits = BTranslationUtils::GetBitmapFile(
-		"../src/tests/kits/translation/data/images/image.png");
+		"../../src/tests/kits/translation/data/images/image.png");
 	CheckBitmap(pbits);
 	delete pbits;
 	pbits = NULL;
