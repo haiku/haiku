@@ -38,11 +38,11 @@ struct team_key {
 };
 
 struct team_arg {
-	char *path;
-	char **args;
-	char **envp;
-	unsigned int argc;
-	unsigned int envc;
+	char	*path;
+	uint32	arg_count;
+	char	**args;
+	uint32	env_count;
+	char	**env;
 };
 
 // team list
@@ -56,8 +56,8 @@ static struct team *create_team_struct(const char *name, bool kernel);
 static void delete_team_struct(struct team *p);
 static int team_struct_compare(void *_p, const void *_key);
 static uint32 team_struct_hash(void *_p, const void *_key, uint32 range);
-static void kfree_strings_array(char **strings, int strc);
-static int user_copy_strings_array(char **strings, int strc, char ***kstrings);
+static void free_strings_array(char **strings, int32 count);
+static status_t user_copy_strings_array(char * const *strings, int32 count, char ***_strings);
 static void _dump_team_info(struct team *p);
 static int dump_team_info(int argc, char **argv);
 
@@ -149,84 +149,77 @@ team_init(kernel_args *ka)
 }
 
 
-/**	Frees an array of strings in kernel space
- *	Parameters
- *		strings		strings array
- *		strc		number of strings in array
+/**	Frees an array of strings in kernel space.
+ *
+ *	\param strings strings array
+ *	\param count number of strings in array
  */
 
 static void
-kfree_strings_array(char **strings, int strc)
+free_strings_array(char **strings, int32 count)
 {
-	int cnt = strc;
+	int32 i;
 
+	if (strings == NULL)
+		return;
 
-	if (strings != NULL) {
-		for (cnt = 0; cnt < strc; cnt++){
-			free(strings[cnt]);
-		}
-	    free(strings);
-	}
+	for (i = 0; i < count; i++)
+		free(strings[i]);
+
+    free(strings);
 }
 
 
 /**	Copy an array of strings from user space to kernel space
- *	Parameters
- *		strings		userspace strings array
- *		strc		number of strings in array
- *		kstrings	pointer to the kernel copy
- *	Returns < 0 on error and **kstrings = NULL
+ *
+ *	\param strings userspace strings array
+ *	\param count number of strings in array
+ *	\param kstrings	pointer to the kernel copy
+ *	\return \c B_OK on success, or an appropriate error code on
+ *		failure.
  */
 
-static int
-user_copy_strings_array(char **userStrings, int strc, char ***kstrings)
+static status_t
+user_copy_strings_array(char * const *userStrings, int32 count, char ***_strings)
 {
-	char **lstrings;
-	int err;
-	int cnt;
-	char *source;
 	char buffer[SYS_THREAD_STRING_LENGTH_MAX];
-
-	*kstrings = NULL;
+	char **strings;
+	status_t err;
+	int32 i = 0;
 
 	if (!IS_USER_ADDRESS(userStrings))
 		return B_BAD_ADDRESS;
 
-	lstrings = (char **)malloc((strc + 1) * sizeof(char *));
-	if (lstrings == NULL)
+	strings = (char **)malloc((count + 1) * sizeof(char *));
+	if (strings == NULL)
 		return B_NO_MEMORY;
+
+	if ((err = user_memcpy(strings, userStrings, count * sizeof(char *))) < B_OK)
+		goto error;
 
 	// scan all strings and copy to kernel space
 
-	for (cnt = 0; cnt < strc; cnt++) {
-		err = user_memcpy(&source, &(userStrings[cnt]), sizeof(char *));
-		if (err < 0)
+	for (; i < count; i++) {
+		err = user_strlcpy(buffer, strings[i], SYS_THREAD_STRING_LENGTH_MAX);
+		if (err < B_OK)
 			goto error;
 
-		if (!IS_USER_ADDRESS(source)) {
-			err = B_BAD_ADDRESS;
-			goto error;
-		}
-
-		err = user_strlcpy(buffer, source, SYS_THREAD_STRING_LENGTH_MAX);
-		if (err < 0)
-			goto error;
-
-		lstrings[cnt] = strdup(buffer);
-		if (lstrings[cnt] == NULL){
-			err = ENOMEM;
+		strings[i] = strdup(buffer);
+		if (strings[i] == NULL) {
+			err = B_NO_MEMORY;
 			goto error;
 		}
 	}
 
-	lstrings[strc] = NULL;
+	strings[count] = NULL;
+	*_strings = strings;
 
-	*kstrings = lstrings;
-	return B_NO_ERROR;
+	return B_OK;
 
 error:
-	kfree_strings_array(lstrings, cnt);
-	dprintf("user_copy_strings_array failed %d \n", err);
+	free_strings_array(strings, i);
+
+	TRACE(("user_copy_strings_array failed %d \n", err));
 	return err;
 }
 
@@ -485,6 +478,36 @@ get_arguments_data_size(char **args, int argc)
 }
 
 
+static void
+free_team_arg(struct team_arg *teamArg)
+{
+	free(teamArg->path);
+	free(teamArg);
+}
+
+
+static struct team_arg *
+create_team_arg(const char *path, int32 argc, char **args, int32 envCount, char **env)
+{
+	struct team_arg *teamArg = (struct team_arg *)malloc(sizeof(struct team_arg));
+	if (teamArg == NULL)
+		return NULL;
+
+	teamArg->path = strdup(path);
+	if (teamArg->path == NULL) {
+		free(teamArg);
+		return NULL;
+	}
+
+	teamArg->arg_count = argc;
+	teamArg->args = args;
+	teamArg->env_count = envCount;
+	teamArg->env = env;
+
+	return teamArg;
+}
+
+
 static int32
 team_create_team2(void *args)
 {
@@ -495,13 +518,12 @@ team_create_team2(void *args)
 	char *path;
 	addr entry;
 	char ustack_name[128];
-	uint32 totalSize;
+	uint32 sizeLeft;
 	char **uargs;
 	char **uenv;
 	char *udest;
 	struct uspace_program_args *uspa;
-	unsigned int arg_cnt;
-	unsigned int env_cnt;
+	uint32 argCount, envCount, i;
 
 	t = thread_get_current_thread();
 	team = t->team;
@@ -513,15 +535,15 @@ team_create_team2(void *args)
 	// ToDo: make ENV_SIZE variable and put it on the heap?
 	// ToDo: we could reserve the whole USER_STACK_REGION upfront...
 
-	totalSize = PAGE_ALIGN(MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
-		get_arguments_data_size(teamArgs->args, teamArgs->argc));
-	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - totalSize;
+	sizeLeft = PAGE_ALIGN(MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
+		get_arguments_data_size(teamArgs->args, teamArgs->arg_count));
+	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - sizeLeft;
 	t->user_stack_size = MAIN_THREAD_STACK_SIZE;
 		// the exact location at the end of the user stack region
 
 	sprintf(ustack_name, "%s_main_stack", team->name);
 	t->user_stack_region_id = create_area_etc(team, ustack_name, (void **)&t->user_stack_base,
-		B_EXACT_ADDRESS, totalSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (t->user_stack_region_id < 0) {
 		dprintf("team_create_team2: could not create default user stack region\n");
 		return t->user_stack_region_id;
@@ -530,42 +552,49 @@ team_create_team2(void *args)
 	// now that the TLS area is allocated, initialize TLS
 	arch_thread_init_tls(t);
 
+	argCount = teamArgs->arg_count;
+	envCount = teamArgs->env_count;
+
 	uspa = (struct uspace_program_args *)(t->user_stack_base + STACK_SIZE + TLS_SIZE + ENV_SIZE);
 	uargs = (char **)(uspa + 1);
-	udest = (char  *)(uargs + teamArgs->argc + 1);
+	udest = (char  *)(uargs + argCount + 1);
 
-	TRACE(("addr: stack base = 0x%lx, uargs = %p, udest = %p, totalSize = %lu\n",
-		t->user_stack_base, uargs, udest, totalSize));
+	TRACE(("addr: stack base = 0x%lx, uargs = %p, udest = %p, sizeLeft = %lu\n",
+		t->user_stack_base, uargs, udest, sizeLeft));
 
-	for (arg_cnt = 0; arg_cnt < teamArgs->argc; arg_cnt++) {
-		uargs[arg_cnt] = udest;
-		udest += user_strlcpy(udest, teamArgs->args[arg_cnt], totalSize) + 1;
+	for (i = 0; i < argCount; i++) {
+		ssize_t length = user_strlcpy(udest, teamArgs->args[i], sizeLeft) + 1;
+
+		uargs[i] = udest;
+		udest += length;
+		sizeLeft -= length;
 	}
-	uargs[arg_cnt] = NULL;
+	uargs[argCount] = NULL;
 
 	team->user_env_base = t->user_stack_base + t->user_stack_size + TLS_SIZE;
 	uenv = (char **)team->user_env_base;
 	udest = (char *)team->user_env_base + ENV_SIZE - 1;
 
-	TRACE(("team_create_team2: envc: %d, envp: 0x%p\n", teamArgs->envc, (void *)teamArgs->envp));
+	TRACE(("team_create_team2: envc: %d, envp: 0x%p\n", teamArgs->env_count, (void *)teamArgs->env));
 
-	for (env_cnt = 0; env_cnt < teamArgs->envc; env_cnt++) {
-		size_t length = strlen(teamArgs->envp[env_cnt]) + 1;
-		udest -= length;
-		uenv[env_cnt] = udest;
-		user_memcpy(udest, teamArgs->envp[env_cnt], length);
+	for (i = 0; i < envCount; i++) {
+		ssize_t length = user_strlcpy(udest, teamArgs->env[i], sizeLeft) + 1;
+
+		uenv[i] = udest;
+		udest += length;
+		sizeLeft -= length;
 	}
-	uenv[env_cnt] = NULL;
+	uenv[envCount] = NULL;
 
 	user_memcpy(uspa->program_name, team->name, sizeof(uspa->program_name));
 	user_memcpy(uspa->program_path, teamArgs->path, sizeof(uspa->program_path));
-	uspa->argc = arg_cnt;
+	uspa->argc = argCount;
 	uspa->argv = uargs;
-	uspa->envc = env_cnt;
+	uspa->envc = envCount;
 	uspa->envp = uenv;
 
-	kfree_strings_array(teamArgs->args, teamArgs->argc);
-	kfree_strings_array(teamArgs->envp, teamArgs->envc);
+	free_strings_array(teamArgs->args, teamArgs->arg_count);
+	free_strings_array(teamArgs->env, teamArgs->env_count);
 
 	path = teamArgs->path;
 	TRACE(("team_create_team2: loading elf binary '%s'\n", path));
@@ -574,8 +603,7 @@ team_create_team2(void *args)
 	err = elf_load_user_image("/boot/beos/system/lib/rld.so", team, 0, &entry);
 
 	// free the args
-	free(teamArgs->path);
-	free(teamArgs);
+	free_team_arg(teamArgs);
 
 	if (err < 0) {
 		// Luckily, we don't have to clean up the mess we created - that's
@@ -596,7 +624,7 @@ team_create_team2(void *args)
 
 
 team_id
-team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
+team_create_team(const char *path, const char *name, char **args, int argc, char **env, int envCount, int priority)
 {
 	struct team *team, *parent;
 	const char *threadName;
@@ -626,33 +654,24 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	restore_interrupts(state);
 
 	// copy the args over
-	teamArgs = (struct team_arg *)malloc(sizeof(struct team_arg));
-	if (teamArgs == NULL){
+	teamArgs = create_team_arg(path, argc, args, envCount, env);
+	if (teamArgs == NULL) {
 		err = B_NO_MEMORY;
 		goto err1;
 	}
-	teamArgs->path = strdup(path);
-	if (teamArgs->path == NULL){
-		err = B_NO_MEMORY;
-		goto err2;
-	}
-	teamArgs->argc = argc;
-	teamArgs->args = args;
-	teamArgs->envp = envp;
-	teamArgs->envc = envc;
 
 	// create a new io_context for this team
 	team->io_context = vfs_new_io_context(thread_get_current_thread()->team->io_context);
 	if (!team->io_context) {
 		err = B_NO_MEMORY;
-		goto err3;
+		goto err2;
 	}
 
 	// create an address space for this team
 	team->_aspace_id = vm_create_aspace(team->name, USER_BASE, USER_SIZE, false);
 	if (team->_aspace_id < 0) {
 		err = team->_aspace_id;
-		goto err4;
+		goto err3;
 	}
 	team->aspace = vm_get_aspace_by_id(team->_aspace_id);
 
@@ -667,22 +686,20 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	tid = spawn_kernel_thread_etc(team_create_team2, threadName, B_NORMAL_PRIORITY, teamArgs, team->id);
 	if (tid < 0) {
 		err = tid;
-		goto err5;
+		goto err4;
 	}
 
 	resume_thread(tid);
 
 	return pid;
 
-err5:
+err4:
 	vm_put_aspace(team->aspace);
 	vm_delete_aspace(team->_aspace_id);
-err4:
-	vfs_free_io_context(team->io_context);
 err3:
-	free(teamArgs->path);
+	vfs_free_io_context(team->io_context);
 err2:
-	free(teamArgs);
+	free_team_arg(teamArgs);
 err1:
 	// remove the team structure from the team hash table and delete the team structure
 	state = disable_interrupts();
@@ -694,8 +711,51 @@ err1:
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 	delete_team_struct(team);
-//err:
+
 	return err;
+}
+
+
+static status_t
+exec_team(const char *path, int32 argCount, char **args, int32 envCount, char **env)
+{
+	struct team *team = thread_get_current_thread()->team;
+	struct team_arg *teamArgs;
+	status_t status;
+
+	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld\n", path, argCount, envCount));
+
+	// switching the kernel at run time is probably not a good idea :)
+	if (team == team_get_kernel_team())
+		return B_NOT_ALLOWED;
+
+	// we currently need to be single threaded here
+	// ToDo: maybe we should just kill all other threads and
+	//	make the current thread the team's main thread?
+	if (team->main_thread != thread_get_current_thread()
+		|| team->main_thread != team->thread_list
+		|| team->main_thread->team_next != NULL)
+		return B_NOT_ALLOWED;
+
+	// ToDo: maybe we should make sure upfront that the target path is an app?
+
+	teamArgs = create_team_arg(path, argCount, args, envCount, env);
+	if (teamArgs == NULL)
+		return B_NO_MEMORY;
+
+	// ToDo: remove team resources if there are any left
+
+	vm_delete_areas(team->aspace);
+	delete_owned_ports(team->id);
+	sem_delete_owned_sems(team->id);
+	remove_images(team);
+	vfs_exec_io_context(team->io_context);
+
+	status = team_create_team2(teamArgs);
+		// this one usually doesn't return...
+
+	// sorry, we have to kill us, there is no way out anymore (without any areas left and all that)
+	exit_thread(status);
 }
 
 
@@ -999,23 +1059,35 @@ sys_getenv(const char *name, char **value)
 
 
 status_t
-_user_exec(const char *path, int32 argc, char * const *userArgv, int32 envCount, char * const *userEnvironment)
+_user_exec(const char *userPath, int32 argCount, char * const *userArgs,
+	int32 envCount, char * const *userEnvironment)
 {
-	int32 i;
-	dprintf("exec(path = \"%s\", argc = %ld, envc = %ld) is not yet implemented\n", path, argc, envCount);
-	for (i = 0; i < argc; i++) {
-		char argv[B_FILE_NAME_LENGTH];
-		user_strlcpy(argv, userArgv[i], sizeof(argv));
+	char path[B_PATH_NAME_LENGTH];
+	status_t status;
+	char **args;
+	char **env;
 
-		dprintf("  [%ld] %s\n", i, argv);
-	}
-	for (i = 0; i < envCount; i++) {
-		char env[B_FILE_NAME_LENGTH];
-		user_strlcpy(env, userEnvironment[i], sizeof(env));
+	if (!IS_USER_ADDRESS(userPath) || !IS_USER_ADDRESS(userArgs) || !IS_USER_ADDRESS(userEnvironment)
+		|| user_strlcpy(path, userPath, sizeof(path)) < B_OK)
+		return B_BAD_ADDRESS;
 
-		dprintf("  (%ld) %s\n", i, env);
+	status = user_copy_strings_array(userArgs, argCount, &args);
+	if (status < B_OK)
+		return status;
+
+	status = user_copy_strings_array(userEnvironment, envCount, &env);
+	if (status < B_OK) {
+		free_strings_array(args, argCount);
+		return status;
 	}
-	return B_ERROR;
+
+	status = exec_team(path, argCount, args, envCount, env);
+		// this one only returns in case of error
+
+	free_strings_array(args, argCount);
+	free_strings_array(env, envCount);
+
+	return status;
 }
 
 
@@ -1106,8 +1178,8 @@ _user_create_team(const char *userPath, const char *userName, char **userArgs,
 	return team_create_team(path, name, args, argCount, env, envCount, priority);
 
 error:
-	kfree_strings_array(args, argCount);
-	kfree_strings_array(env, envCount);
+	free_strings_array(args, argCount);
+	free_strings_array(env, envCount);
 	return rc;
 }
 
