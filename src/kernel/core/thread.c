@@ -409,19 +409,29 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 
 static const char *
-state_to_text(int state)
+state_to_text(struct thread *thread, int32 state)
 {
 	switch (state) {
 		case B_THREAD_READY:
-			return "READY";
+			return "ready";
+
 		case B_THREAD_RUNNING:
-			return "RUNNING";
+			return "running";
+
 		case B_THREAD_WAITING:
-			return "WAITING";
+			if (thread->sem.blocking == sSnoozeSem)
+				return "zzz";
+			if (thread->sem.blocking == thread->msg.read_sem)
+				return "receive";
+
+			return "waiting";
+
 		case B_THREAD_SUSPENDED:
-			return "SUSPEND";
+			return "suspended";
+
 		case THREAD_STATE_FREE_ON_RESCHED:
-			return "DEATH";
+			return "death";
+
 		default:
 			return "UNKNOWN";
 	}
@@ -439,8 +449,8 @@ _dump_thread_info(struct thread *t)
 	dprintf("all_next:    %p\nteam_next:  %p\nq_next:     %p\n",
 		t->all_next, t->team_next, t->queue_next);
 	dprintf("priority:    0x%lx\n", t->priority);
-	dprintf("state:       %s\n", state_to_text(t->state));
-	dprintf("next_state:  %s\n", state_to_text(t->next_state));
+	dprintf("state:       %s\n", state_to_text(t, t->state));
+	dprintf("next_state:  %s\n", state_to_text(t, t->next_state));
 	dprintf("cpu:         %p ", t->cpu);
 	if (t->cpu)
 		dprintf("(%d)\n", t->cpu->info.cpu_num);
@@ -517,20 +527,25 @@ dump_thread_list(int argc, char **argv)
 	struct thread *t;
 	struct hash_iterator i;
 
+	dprintf("thread         id  state       sem cpu  stack       name\n");
+
 	hash_open(sThreadHash, &i);
 	while ((t = hash_next(sThreadHash, &i)) != NULL) {
-		dprintf("%p", t);
-		if (t->name != NULL)
-			dprintf("\t%32s", t->name);
+		dprintf("%p %6lx  %-9s", t, t->id, state_to_text(t, t->state));
+
+		// does it block on a semaphore?
+		if (t->state == B_THREAD_WAITING)
+			dprintf("%6lx  ", t->sem.blocking);
 		else
-			dprintf("\t%32s", "<NULL>");
-		dprintf("\t0x%lx", t->id);
-		dprintf("\t%16s", state_to_text(t->state));
+			dprintf("     -  ");
+
+		// on which CPU does it run?
 		if (t->cpu)
-			dprintf("\t%d", t->cpu->info.cpu_num);
+			dprintf("%2d", t->cpu->info.cpu_num);
 		else
-			dprintf("\tNOCPU");
-		dprintf("\t0x%lx\n", t->kernel_stack_base);
+			dprintf(" -");
+
+		dprintf("  %p  %s\n", (void *)t->kernel_stack_base, t->name != NULL ? t->name : "<NULL>");
 	}
 	hash_close(sThreadHash, &i, false);
 	return 0;
