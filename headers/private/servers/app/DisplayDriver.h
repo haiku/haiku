@@ -200,7 +200,8 @@ public:
 	void StrokeEllipse(const BRect &r, const DrawData *d);
 	void StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color);
 	void StrokeLine(const BPoint &start, const BPoint &end, const DrawData *d);
-	void StrokePoint(BPoint &pt, const RGBColor &color);
+	void StrokePoint(const BPoint &pt, const RGBColor &color);
+	void StrokePoint(const BPoint &pt, const DrawData *d);
 	void StrokePolygon(BPoint *ptlist, int32 numpts, const RGBColor &color, bool is_closed=true);
 	void StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *d, bool is_closed=true);
 	void StrokeRect(const BRect &r, const RGBColor &color);
@@ -295,7 +296,7 @@ friend class WinBorder;
 	virtual void Blit(const BRect &src, const BRect &dest, const DrawData *d);
 	virtual void FillSolidRect(const BRect &rect, const RGBColor &color);
 	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
-	virtual void StrokeSolidLine(const BPoint &start, const BPoint &end, const RGBColor &color);
+	virtual void StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color);
 	virtual void StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d);
 	virtual void StrokeSolidRect(const BRect &rect, const RGBColor &color);
 	virtual void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);

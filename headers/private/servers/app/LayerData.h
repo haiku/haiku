@@ -72,7 +72,7 @@ public:
 			bool				fontAliasing;
 			ServerFont			font;
 	
-			BRegion*			clippReg;
+			BRegion*			clipReg;
 	
 			escapement_delta	edelta;
 };
