@@ -79,6 +79,7 @@ status_t BSoftSynth::SetDefaultInstrumentsFile()
 	if (B_OK == find_directory(
 			B_SYNTH_DIRECTORY, NULL, false, buf, B_PATH_NAME_LENGTH))
 	{
+		strcat(buf, "/");
 		strcat(buf, B_BIG_SYNTH_FILE);
 		return SetInstrumentsFile(buf);
 	}
