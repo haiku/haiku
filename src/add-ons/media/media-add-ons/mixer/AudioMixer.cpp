@@ -1242,7 +1242,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness, boo
 			// if this is the first buffer, mark with the start time
 			// we need this to calculate the other buffer times
 			if (fStartTime == 0) {
-				fStartTime = TimeSource()->RealTimeFor(event->event_time, 0);
+				fStartTime = event->event_time;
 			}
 			
 			// count frames that have been played
@@ -1252,7 +1252,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness, boo
 			fFramesSent += framesperbuffer;
 			
 			// calculate the start time for the next event and add the event
-			bigtime_t nextevent = TimeSource()->PerformanceTimeFor(bigtime_t(fStartTime + double(fFramesSent / fOutput.format.u.raw_audio.frame_rate) * 1000000.0));
+			bigtime_t nextevent = bigtime_t(fStartTime + double(fFramesSent / fOutput.format.u.raw_audio.frame_rate) * 1000000.0);
 			media_timed_event nextBufferEvent(nextevent, SEND_NEW_BUFFER_EVENT);
 			EventQueue()->AddEvent(nextBufferEvent);
 			break;

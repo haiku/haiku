@@ -608,7 +608,7 @@ _SoundPlayNode::SendNewBuffer(const media_timed_event *event, bigtime_t lateness
 
 	// The buffer is on its way; now schedule the next one to go
 	// nextEvent is the time at which the buffer should arrive at it's destination
-	bigtime_t nextEvent = TimeSource()->PerformanceTimeFor(mStartTime + bigtime_t((1000000LL * mFramesSent) / mOutput.format.u.raw_audio.frame_rate));
+	bigtime_t nextEvent = mStartTime + bigtime_t((1000000LL * mFramesSent) / mOutput.format.u.raw_audio.frame_rate);
 	media_timed_event nextBufferEvent(nextEvent, SEND_NEW_BUFFER_EVENT);
 	EventQueue()->AddEvent(nextBufferEvent);
 	
@@ -650,7 +650,7 @@ _SoundPlayNode::HandleStart(
 		// and fire off the first "produce a buffer" event.
 	
 		mFramesSent = 0;	
-		mStartTime = TimeSource()->RealTimeFor(event->event_time, 0);
+		mStartTime = event->event_time;
 		media_timed_event firstBufferEvent(event->event_time, SEND_NEW_BUFFER_EVENT);
 
 		// Alternatively, we could call HandleEvent() directly with this event, to avoid a trip through
