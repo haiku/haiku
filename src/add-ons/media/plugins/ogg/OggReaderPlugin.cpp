@@ -48,9 +48,13 @@ oggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 	while (result == 0) {
 		char * buffer = ogg_sync_buffer(&fSync,read_size);
 		ssize_t bytes = Source()->Read(buffer,read_size);
+		if (bytes == 0) {
+			TRACE("oggReader::GetPage: Read: no data\n");
+			return B_LAST_BUFFER_ERROR;
+		}
 		if (bytes < 0) {
 			TRACE("oggReader::GetPage: Read: error\n");
-			return B_ERROR;
+			return bytes;
 		}
 		if (ogg_sync_wrote(&fSync,bytes) != 0) {
 			TRACE("oggReader::GetPage: ogg_sync_wrote failed?: error\n");
@@ -251,8 +255,9 @@ oggReader::GetNextChunk(void *cookie,
 	while (ogg_stream_packetpeek(stream,NULL) != 1) {
 		ogg_page page;
 		do {
-			if (GetPage(&page) != B_OK) {
-				return B_ERROR;
+			status_t status = GetPage(&page);
+			if (status != B_OK) {
+				return status;
 			}
 		} while (ogg_page_serialno(&page) != stream->serialno);
 	}
