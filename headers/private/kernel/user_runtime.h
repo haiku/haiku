@@ -17,7 +17,7 @@ struct rld_export
 	status_t (*unload_add_on)(image_id imageID);
 	status_t (*get_image_symbol)(image_id imageID, char const *symbolName,
 		int32 symbolType, void **_location);
-	status_t (*get_nth_image_symbol)(image_id imageID, int32 num, char const *symbolName,
+	status_t (*get_nth_image_symbol)(image_id imageID, int32 num, char *symbolName,
 		int32 *nameLength, int32 *symbolType, void **_location);
 };
 
