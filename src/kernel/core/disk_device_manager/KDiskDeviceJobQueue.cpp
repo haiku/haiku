@@ -97,6 +97,13 @@ KDiskDeviceJobQueue::Device() const
 	return fDevice;
 }
 
+// ActiveJobIndex
+int32
+KDiskDeviceJobQueue::ActiveJobIndex() const
+{
+	return fActiveJob;
+}
+
 // ActiveJob
 KDiskDeviceJob *
 KDiskDeviceJobQueue::ActiveJob() const

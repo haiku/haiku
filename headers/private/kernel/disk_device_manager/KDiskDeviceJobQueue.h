@@ -23,6 +23,7 @@ public:
 	void SetDevice(KDiskDevice *device);
 	KDiskDevice *Device() const;
 
+	int32 ActiveJobIndex() const;
 	KDiskDeviceJob *ActiveJob() const;
 
 	// list of scheduled jobs
