@@ -7,7 +7,9 @@
 #include "net_module.h"
 
 #include <KernelExport.h>
-#define NET_RAW_MODULE_NAME	"network/protocols/raw"
+
+
+#define NET_RAW_MODULE_NAME	  NETWORK_MODULES_ROOT "protocols/raw"
 
 struct raw_module_info {
 	struct kernel_net_module_info info;

@@ -8,7 +8,8 @@
 #include "net_module.h"
 
 #include <KernelExport.h>
-#define NET_IPV4_MODULE_NAME	"network/protocols/ipv4"
+
+#define NET_IPV4_MODULE_NAME	NETWORK_MODULES_ROOT "protocols/ipv4"
 
 struct ipv4_module_info {
 	struct kernel_net_module_info info;

@@ -8,7 +8,8 @@
 #include "net_module.h"
 
 #include <KernelExport.h>
-#define NET_ETHERNET_MODULE_NAME	"network/interfaces/ethernet"
+
+#define NET_ETHERNET_MODULE_NAME	NETWORK_MODULES_ROOT "interfaces/ethernet"
 
 typedef void (*ethernet_receiver_func)(struct mbuf *buf);
 

@@ -17,6 +17,8 @@
 
 #include <module.h>
 
+#define NETWORK_MODULES_ROOT	"obos_network/"
+
 struct kernel_net_module_info {
 	module_info info;
 	int (*start)(void *);

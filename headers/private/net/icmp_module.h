@@ -7,7 +7,8 @@
 #include "net_module.h"
 
 #include <KernelExport.h>
-#define NET_ICMP_MODULE_NAME	"network/protocols/icmp"
+
+#define NET_ICMP_MODULE_NAME	NETWORK_MODULES_ROOT "protocols/icmp"
 
 struct icmp_module_info {
 	struct kernel_net_module_info info;

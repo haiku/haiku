@@ -161,6 +161,6 @@ struct core_module_info {
 	int (*socket_shutdown)		(struct socket *so, int how);
 };
 
-#define NET_CORE_MODULE_NAME	"network/core/v1"
+#define NET_CORE_MODULE_NAME	NETWORK_MODULES_ROOT "core/v1"
 
 #endif /* OBOS_CORE_MODULE_H */
