@@ -60,8 +60,24 @@
 #include <ServerProtocol.h>
 
 // Local Includes --------------------------------------------------------------
+#include <stdio.h>
 
 // Local Defines ---------------------------------------------------------------
+
+#define DEBUG_BVIEW
+#ifdef DEBUG_BVIEW
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
+#endif
+
+#ifdef DEBUG_BVIEW
+#	define BVTRACE PrintToStream()
+#else
+#	define BVTRACE ;
+#endif
+
 inline rgb_color _get_rgb_color( uint32 color );
 inline uint32 _get_uint32_color( rgb_color c );
 inline rgb_color _set_static_rgb_color( uint8 r, uint8 g, uint8 b, uint8 a=255 );
@@ -331,6 +347,7 @@ NOTE: we do not use this flag any more
 //---------------------------------------------------------------------------
 
 BView::~BView(){
+STRACE(("BView(%s)::~BView()\n", this->Name()));
 	if (owner)
 		debugger("Trying to delete a view that belongs to a window. Call RemoveSelf first.");
 
@@ -2908,11 +2925,14 @@ void BView::InvertRect(BRect r){
 // View Hierarchy Functions
 //---------------------------------------------------------------------------
 void BView::AddChild(BView* child, BView* before){
+STRACE(("BView(%s)::AddChild(child='%s' before='%s')\n", this->Name(),
+		child? child->Name(): "NULL",
+		before? before->Name(): "NULL"));
 	if ( !child )
 		return;
 
 	if (child->parent != NULL)
-		debugger("AddChild failed - the view already belonged to someone else.");
+		debugger("AddChild failed - the view already belongs to someone else.");
 	
 	if (owner)
 		owner->Lock();
@@ -2923,21 +2943,31 @@ void BView::AddChild(BView* child, BView* before){
 	if (owner){
 		check_lock();
 
+		STRACE(("BView(%s)::AddChild(child='%s' before='%s')... contacting app_server\n", this->Name(),
+				child? child->Name(): "NULL",
+				before? before->Name(): "NULL"));
+	
 		child->setOwner( this->owner);
 		attachView( child );
 		
 		owner->Unlock();
-	}	
+	}
+//	BVTRACE;
+	PrintTree();
+//	PrintToStream();
 }
 
 //---------------------------------------------------------------------------
 
 bool BView::RemoveChild(BView* child){
-
+STRACE(("BView(%s)::RemoveChild(%s)\n", this->Name(), child->Name() ));
 	if (!child)
 		return false;
-	
-	return child->removeSelf();
+
+	bool	rv = child->removeSelf();
+//	BVTRACE;
+	PrintTree();	
+	return rv;
 }
 
 //---------------------------------------------------------------------------
@@ -3251,13 +3281,18 @@ void BView::MessageReceived( BMessage *msg )
 
 //---------------------------------------------------------------------------
 
+status_t BView::Perform(perform_code d, void* arg){
+	return B_BAD_VALUE;
+}
+
 // Private Functions
 //---------------------------------------------------------------------------
 
 void BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flags){
 
 		// Info: The name of the view is set by BHandler constructor
-		
+
+	// initialize members		
 	fFlags				= (resizingMode & _RESIZE_MASK_) | (flags & ~_RESIZE_MASK_);
 
 	originX				= frame.left;
@@ -3273,6 +3308,7 @@ void BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 
 	top_level_view		= false;
 
 	cpicture			= NULL;
+	comm				= NULL;
 
 	fVerScroller		= NULL;
 	fHorScroller		= NULL;
@@ -3280,13 +3316,17 @@ void BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 
 	f_is_printing		= false;
 
 	fPermanentState		= NULL;
-	fState				= NULL;	// ALLMOST allways use this member!!!
+	fState				= new _view_attr_;
 
 	fBounds				= frame.OffsetToCopy(0.0, 0.0);
 	fShelf				= NULL;
+	pr_state			= NULL;
 
 	fEventMask			= 0;
 	fEventOptions		= 0;
+	
+	// call initialization methods.
+	initCachedState();
 }
 
 //---------------------------------------------------------------------------
@@ -3341,6 +3381,7 @@ void BView::setOwner(BWindow *theOwner)
 //---------------------------------------------------------------------------
 
 bool BView::removeSelf(){
+STRACE(("BView(%s)::removeSelf()...\n", this->Name() ));
 /* 		# check for dirty flags 						- by updateCachedState()
  * 		# check for dirty flags on 'child' children		- by updateCachedState()
  *		# handle if in middle of Begin/EndLineArray()	- by setOwner(NULL)
@@ -3354,13 +3395,17 @@ bool BView::removeSelf(){
  */
  	bool		returnValue = true;
 
+	if (!parent){
+		STRACE(("BView(%s)::removeSelf()... NO parent\n", this->Name()));
+		return false;
+	}
+
 	check_lock();
 	
-	if (!parent)
-		return false;
-	
 	if (owner){
-
+	
+		updateCachedState();
+		
 		if (owner->fDefaultButton == this){
 			owner->SetDefaultButton( NULL );
 		}
@@ -3374,7 +3419,6 @@ bool BView::removeSelf(){
 		}
 	
 		callDetachHooks( this );
-		updateCachedState();
 
 		BWindow			*ownerZ = owner;
 
@@ -3388,7 +3432,8 @@ bool BView::removeSelf(){
 	parent			= NULL;
 	next_sibling	= NULL;
 	prev_sibling	= NULL;
-	
+
+STRACE(("DONE: BView(%s)::removeSelf()\n", this->Name()));
 	return returnValue;
 }
 
@@ -3439,24 +3484,42 @@ bool BView::addToList(BView *aView, BView *before){
 	if ( !aView )
 		return false;
 
-	BView		*current = first_child;
+	BView		*current 	= first_child;
+	BView		*last		= current;
 	
-	while( current && current->next_sibling != before )
-		current	= current->next_sibling;
-
-	if ( !current && before )
+	while( current && current != before){
+		last		= current;
+		current		= current->next_sibling;
+	}
+	
+	if( !current && before )
 		return false;
 	
-	if ( current ){
-		aView->next_sibling			= current->next_sibling;
-		current->next_sibling		= aView;
-		aView->prev_sibling			= current;
-		
-		if( aView->next_sibling )
-			aView->next_sibling->prev_sibling		= aView;
+		// we're at begining of the list, OR between two elements
+	if( current ){
+		if ( current == first_child ){
+			aView->next_sibling		= current;
+			current->prev_sibling	= aView;
+			first_child				= aView;
+		}
+		else{
+			aView->next_sibling		= current;
+			aView->prev_sibling		= current->prev_sibling;
+			current->prev_sibling->next_sibling		= aView;
+			current->prev_sibling	= aView;
+		}
 	}
+		// we have reached the end of the list
 	else{
-		first_child		= aView;
+			// if last!=NULL then we add to the end.
+		if ( last ){
+			last->next_sibling		= aView;
+			aView->prev_sibling		= last;
+		}
+			// if last==NULL, then aView is the first child in the list
+		else{
+			first_child		= aView;
+		}
 	}
 	
 	aView->parent		= this;
@@ -3490,6 +3553,7 @@ bool BView::attachView(BView *aView){
 	owner->session->WriteRect( aView->Frame() );
 	owner->session->WriteUInt32( aView->ResizingMode() );
 	owner->session->WriteUInt32( aView->Flags() );
+	owner->session->WriteBool( aView->IsHidden() );
 	owner->session->WriteInt32( aView->CountChildren() );
 	
 	setCachedState();
@@ -3536,7 +3600,7 @@ BView* BView::findView(const BView* aView, const char* viewName) const{
 	if ( (child = aView->first_child) ){
 		while ( child ) {
 			BView*		view = NULL;
-			if ( view == findView( child, viewName ) )
+			if ( (view = findView( child, viewName )) )
 				return view;
 			child 		= child->next_sibling; 
 		}
@@ -3587,14 +3651,14 @@ void BView::setCachedState(){
 void BView::setFontState(const BFont* font, uint16 mask){
 
 	owner->session->WriteInt32( AS_LAYER_SET_FONT_STATE );
-	owner->session->WriteInt32( mask );
+	owner->session->WriteUInt16( mask );
 
 		// always present.
 	if ( mask & B_FONT_FAMILY_AND_STYLE ){
 		uint32		fontID;
 		fontID		= font->FamilyAndStyle( );
 		
-		owner->session->WriteInt32( fontID );
+		owner->session->WriteUInt32( fontID );
 	}
 	
 	if ( mask & B_FONT_SIZE ){
@@ -3610,26 +3674,26 @@ void BView::setFontState(const BFont* font, uint16 mask){
 	}
 
 	if ( mask & B_FONT_SPACING ){
-		owner->session->WriteInt8( font->Spacing() );	// uint8
+		owner->session->WriteUInt8( font->Spacing() );	// uint8
 	}
 
 	if ( mask & B_FONT_ENCODING ){
-		owner->session->WriteInt8( font->Encoding() ); // uint8
+		owner->session->WriteUInt8( font->Encoding() ); // uint8
 	}
 
 	if ( mask & B_FONT_FACE ){
-		owner->session->WriteInt16( font->Face() );	// uint16
+		owner->session->WriteUInt16( font->Face() );	// uint16
 	}
 	
 	if ( mask & B_FONT_FLAGS ){
-		owner->session->WriteInt32( font->Flags() ); // uint32
+		owner->session->WriteUInt32( font->Flags() ); // uint32
 	}
 }
 
 //---------------------------------------------------------------------------
 
 void BView::initCachedState(){
-	fState->font			= be_plain_font;
+	fState->font			= *be_plain_font;
 
 	fState->penPosition.Set( 0.0, 0.0 );
 	fState->penSize			= 1.0;
@@ -3666,7 +3730,7 @@ void BView::initCachedState(){
 
 	fState->scale			= 1.0;
 
-	fState->fontAliasing	= true;
+	fState->fontAliasing	= false;
 
 		/* INFO: We include(invalidate) only B_VIEW_CLIP_REGION_BIT flag,
 		 * because we should get the clipping region from app_server.
@@ -3683,10 +3747,11 @@ void BView::initCachedState(){
 
 void BView::updateCachedState(){
 		// fail if we do not have an owner
+STRACE(("BView(%s)::updateCachedState()\n", Name() ));
  	do_owner_check();
  	
  	owner->session->WriteInt32( AS_LAYER_GET_STATE );
- 	owner->Sync();
+ 	owner->session->Sync();
 
 	uint32		fontID;
 	float		size;
@@ -3699,49 +3764,27 @@ void BView::updateCachedState(){
 	int32		noOfRects;
 	BRect		rect;	
 	
-	owner->session->ReadInt16( (int16*)&(fState->fontFlags) );
+		// read and set the font state
+	owner->session->ReadInt32( (int32*)&fontID );
+	owner->session->ReadFloat( &size );
+	owner->session->ReadFloat( &shear );
+	owner->session->ReadFloat( &rotation );
+	owner->session->ReadInt8( (int8*)&spacing );
+	owner->session->ReadInt8( (int8*)&encoding );
+	owner->session->ReadInt16( (int16*)&face );
+	owner->session->ReadInt32( (int32*)&flags );
 
-		// always present.
-	if ( fState->fontFlags & B_FONT_FAMILY_AND_STYLE ){
-		owner->session->ReadInt32( (int32*)&fontID );
-		fState->font.SetFamilyAndStyle( fontID );
-	}
-	
-	if ( fState->fontFlags & B_FONT_SIZE ){
-		owner->session->ReadFloat( &size );
-		fState->font.SetSize( size );
-	}
+	fState->fontFlags		= B_FONT_ALL;
+	fState->font.SetFamilyAndStyle( fontID );
+	fState->font.SetSize( size );
+	fState->font.SetShear( shear );
+	fState->font.SetRotation( rotation );
+	fState->font.SetSpacing( spacing );
+	fState->font.SetEncoding( encoding );
+	fState->font.SetFace( face );
+	fState->font.SetFlags( flags );
 
-	if ( fState->fontFlags & B_FONT_SHEAR ){
-		owner->session->ReadFloat( &shear );
-		fState->font.SetShear( shear );
-	}
-
-	if ( fState->fontFlags & B_FONT_ROTATION ){
-		owner->session->ReadFloat( &rotation );
-		fState->font.SetRotation( rotation );
-	}
-
-	if ( fState->fontFlags & B_FONT_SPACING ){
-		owner->session->ReadInt8( (int8*)&spacing );
-		fState->font.SetSpacing( spacing );
-	}
-
-	if ( fState->fontFlags & B_FONT_ENCODING ){
-		owner->session->ReadInt8( (int8*)&encoding );
-		fState->font.SetEncoding( encoding );
-	}
-
-	if ( fState->fontFlags & B_FONT_FACE ){
-		owner->session->ReadInt16( (int16*)&face );
-		fState->font.SetFace( face );
-	}
-	
-	if ( fState->fontFlags & B_FONT_FLAGS ){
-		owner->session->ReadInt32( (int32*)&flags );
-		fState->font.SetFlags( flags );
-	}
- 	
+		// read and set view's state						 	
 	owner->session->ReadPoint( &(fState->penPosition) );
 	owner->session->ReadFloat( &(fState->penSize) );	
 	owner->session->ReadData( &(fState->highColor), sizeof(rgb_color) );
@@ -3772,6 +3815,7 @@ void BView::updateCachedState(){
 	owner->session->ReadRect( &fBounds );
 
 	fState->flags			= B_VIEW_CLIP_REGION_BIT;
+STRACE(("BView(%s)::updateCachedState() - DONE\n", Name() ));	
 }
 
 //---------------------------------------------------------------------------
@@ -3813,16 +3857,21 @@ void BView::SetPattern(pattern pat){
 //---------------------------------------------------------------------------
 
 bool BView::do_owner_check() const{
+STRACE(("BView(%s)::do_owner_check()...", Name()));
 	int32			serverToken = _get_object_token_(this);
 
 	if (owner){
 		owner->AssertLocked();
 
 		if (owner->fLastViewToken != serverToken){
+			STRACE(("contacting app_server... sending token: %ld\n", serverToken));
 			owner->session->WriteInt32( AS_SET_CURRENT_LAYER );
 			owner->session->WriteInt32( serverToken );
 
 			owner->fLastViewToken = serverToken;
+		}
+		else{
+			STRACE(("this is the lastViewToken\n"));
 		}
 		return true;
 	}
@@ -3835,17 +3884,25 @@ bool BView::do_owner_check() const{
 //---------------------------------------------------------------------------
 
 void BView::check_lock() const{
+STRACE(("BView(%s)::check_lock()...", Name()));
 	int32			serverToken = _get_object_token_(this);
 
 	if (owner){
 		owner->AssertLocked();
 
 		if (owner->fLastViewToken != serverToken){
+			STRACE(("contacting app_server... sending token: %ld\n", serverToken));
 			owner->session->WriteInt32( AS_SET_CURRENT_LAYER );
 			owner->session->WriteInt32( serverToken );
 
 			owner->fLastViewToken = serverToken;
 		}
+		else{
+			STRACE(("quiet2\n"));
+		}
+	}
+	else{
+		STRACE(("quiet1\n"));
 	}
 }
 
@@ -3871,6 +3928,38 @@ bool BView::do_owner_check_no_pick() const{
 
 //---------------------------------------------------------------------------
 
+void BView::_ReservedView2(){
+}
+void BView::_ReservedView3(){
+}
+void BView::_ReservedView4(){
+}
+void BView::_ReservedView5(){
+}
+void BView::_ReservedView6(){
+}
+void BView::_ReservedView7(){
+}
+void BView::_ReservedView8(){
+}
+#if !_PR3_COMPATIBLE_
+void BView::_ReservedView9(){
+}
+void BView::_ReservedView10(){
+}
+void BView::_ReservedView11(){
+}
+void BView::_ReservedView12(){
+}
+void BView::_ReservedView13(){
+}
+void BView::_ReservedView14(){
+}
+void BView::_ReservedView15(){
+}
+void BView::_ReservedView16(){
+}
+#endif
 
 
 //---------------------------------------------------------------------------
@@ -3933,8 +4022,149 @@ inline bool _is_new_pattern( const pattern& p1, const pattern& p2 ){
 	else
 		return true;
 }
+
+//---------------------------------------------------------------------------
+
+void BView::PrintToStream(){
+	printf("BView::PrintToStream()\n");
+	printf("\tName: %s
+\tParent: %s
+\tFirstChild: %s
+\tNextSibling: %s
+\tPrevSibling: %s
+\tOwner(Window): %s
+\tToken: %ld
+\tFlags: %ld
+\tView origin: (%f,%f)
+\tView Bounds rectangle: (%f,%f,%f,%f)
+\tShow level: %d
+\tTopView?: %s
+\tBPicture: %s
+\tVertical Scrollbar %s
+\tHorizontal Scrollbar %s
+\tIs Printing?: %s
+\tShelf?: %s
+\tEventMask: %ld
+\tEventOptions: %ld\n",
+	Name(),
+	parent? parent->Name() : "NULL",
+	first_child? first_child->Name() : "NULL",
+	next_sibling? next_sibling->Name() : "NULL",
+	prev_sibling? prev_sibling->Name() : "NULL",
+	owner? owner->Name() : "NULL",
+	_get_object_token_(this),
+	fFlags,
+	originX, originY,
+	fBounds.left, fBounds.top, fBounds.right, fBounds.bottom,
+	fShowLevel,
+	top_level_view? "YES" : "NO",
+	cpicture? "YES" : "NULL",
+	fVerScroller? "YES" : "NULL",
+	fHorScroller? "YES" : "NULL",
+	f_is_printing? "YES" : "NO",
+	fShelf? "YES" : "NO",
+	fEventMask,
+	fEventOptions);
+	
+	printf("\tState status:
+\t\tLocalCoordianteSystem: (%f,%f)
+\t\tPenLocation: (%f,%f)
+\t\tPenSize: %f
+\t\tHighColor: [%d,%d,%d,%d]
+\t\tLowColor: [%d,%d,%d,%d]
+\t\tViewColor: [%d,%d,%d,%d]
+\t\tPattern: %llx
+\t\tDrawingMode: %d
+\t\tLineJoinMode: %d
+\t\tLineCapMode: %d
+\t\tMiterLimit: %f
+\t\tAlphaSource: %d
+\t\tAlphaFuntion: %d
+\t\tScale: %f
+\t\t(Print)FontAliasing: %s
+\t\tFont Info:\n",
+	fState->coordSysOrigin.x, fState->coordSysOrigin.y,
+	fState->penPosition.x, fState->penPosition.y,
+	fState->penSize,
+	fState->highColor.red, fState->highColor.blue, fState->highColor.green, fState->highColor.alpha,
+	fState->lowColor.red, fState->lowColor.blue, fState->lowColor.green, fState->lowColor.alpha,
+	fState->viewColor.red, fState->viewColor.blue, fState->viewColor.green, fState->viewColor.alpha,
+	*((uint64*)&(fState->patt)),
+	fState->drawingMode,
+	fState->lineJoin,
+	fState->lineCap,
+	fState->miterLimit,
+	fState->alphaSrcMode,
+	fState->alphaFncMode,
+	fState->scale,
+	fState->fontAliasing? "YES" : "NO");
+
+	fState->font.PrintToStream();
+// TODO: also print the line array.
+}
+
+//---------------------------------------------------------------------------
+
+void BView::PrintTree(){
+
+	int32		spaces = 2;
+	BView		*c = first_child; //c = short for: current
+	printf( "'%s'\n", Name() );
+	if( c != NULL )
+		while( true ){
+			// action block
+			{
+				for( int i = 0; i < spaces; i++)
+					printf(" ");
+				
+				printf( "'%s'\n", c->Name() );
+			}
+
+				// go deep
+			if(	c->first_child ){
+				c = c->first_child;
+				spaces += 2;
+			}
+				// go right or up
+			else
+					// go right
+				if( c->next_sibling ){
+					c = c->next_sibling;
+				}
+					// go up
+				else{
+					while( !c->parent->next_sibling && c->parent != this ){
+						c = c->parent;
+						spaces -= 2;
+					}
+						// that enough! We've reached this view.
+					if( c->parent == this )
+						break;
+						
+					c = c->parent->next_sibling;
+					spaces -= 2;
+				}
+		}
+}
+
+//---------------------------------------------------------------------------
+
 /* TODOs
  * 		-implement SetDiskMode() what's with this method? what does it do? test!
  * 			does it has something to do with DrawPictureAsync( filename* .. )?
  *		-implement DrawAfterChildren()
  */
+/*
+ @log:
+	
+	* Modified a few lines from BSession::WriteInt32( uint32 ) into WriteUInt32( uint32 )
+	* in updateCachedState(), now all font attributes are received at once; I realized app_server doesn't need the flag based system. :-)
+	* added a new method: PrintToStream() - used for debugging.
+	* now the view state is allocated and initialized in BView::InitData(...)
+	* modified a few things in addToList(...) 'cause I don't know what was in my head when I wrote it?!
+	* added _ReservedView2-18() methods because of linker errors.
+	* a new method used for debugging: PrintTree()
+	* added debugging messages for a few methods
+	* TESTED view hierarchy methods like AddChild() and RemoveChild() RemoveSelf() - They WORK! :-)))
+	* minor but significant :-) ( = instead of == ) change in findView(...)
+*/
