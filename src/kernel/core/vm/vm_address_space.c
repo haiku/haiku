@@ -86,7 +86,6 @@ _dump_aspace(vm_address_space *aspace)
 static int
 dump_aspace(int argc, char **argv)
 {
-//	int i;
 	vm_address_space *aspace;
 
 	if (argc < 2) {
@@ -94,9 +93,9 @@ dump_aspace(int argc, char **argv)
 		return 0;
 	}
 
-	// if the argument looks like a hex number, treat it as such
-	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		unsigned long num = atoul(argv[1]);
+	// if the argument looks like a number, treat it as such
+	if (isdigit(argv[1][0])) {
+		unsigned long num = strtoul(argv[1], NULL, 0);
 		aspace_id id = num;
 
 		aspace = hash_lookup(aspace_table, &id);
@@ -313,7 +312,7 @@ vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel, vm_add
 	aspace->last_working_set_adjust = system_time();
 
 	// initialize the corresponding translation map
-	err = vm_translation_map_create(&aspace->translation_map, kernel);
+	err = arch_vm_translation_map_init_map(&aspace->translation_map, kernel);
 	if (err < B_OK) {
 		free(aspace->name);
 		free(aspace);
@@ -392,6 +391,17 @@ vm_aspace_init(void)
 status_t
 vm_aspace_init_post_sem(void)
 {
-	kernel_aspace->virtual_map.sem = create_sem(WRITE_COUNT, "kernel_aspacelock");
-	aspace_hash_sem = create_sem(WRITE_COUNT, "aspace_hash_sem");
+	status_t status = arch_vm_translation_map_init_kernel_map_post_sem(&kernel_aspace->translation_map);
+	if (status < B_OK)
+		return status;
+
+	status = kernel_aspace->virtual_map.sem = create_sem(WRITE_COUNT, "kernel_aspacelock");
+	if (status < B_OK)
+		return status;
+
+	status = aspace_hash_sem = create_sem(WRITE_COUNT, "aspace_hash_sem");
+	if (status < B_OK)
+		return status;
+
+	return B_OK;
 }
