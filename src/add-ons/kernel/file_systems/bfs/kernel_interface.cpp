@@ -2124,8 +2124,10 @@ static file_system_info sBeFileSystem = {
 	NULL,
 };
 
+extern module_info gDiskDeviceInfo;
 
 module_info *modules[] = {
 	(module_info *)&sBeFileSystem,
+	&gDiskDeviceInfo,
 	NULL,
 };

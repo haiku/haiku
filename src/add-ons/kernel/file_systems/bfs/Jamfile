@@ -36,6 +36,8 @@ oldOPTIM = $(OPTIM) ;
 }
 
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName storage ] ;
 
 KernelStaticLibrary libbfs :
 	BlockAllocator.cpp
@@ -53,6 +55,7 @@ KernelStaticLibrary libbfs :
 
 KernelAddon bfs : kernel file_systems :
 	kernel_interface.cpp
+	disk_device_interface.cpp
 	: libbfs.a
 	;
 

@@ -115,6 +115,8 @@ class Volume {
 
 		uint32				GetUniqueID();
 
+		static status_t		Identify(int fd, disk_super_block *superBlock);
+
 	protected:
 		mount_id			fID;
 		int					fDevice;

@@ -304,26 +304,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 #endif
 
 	// read the super block
-	char buffer[1024];
-	if (read_pos(fDevice, 0, buffer, sizeof(buffer)) != sizeof(buffer))
-		return B_IO_ERROR;
-
-	status_t status = B_OK;
-
-	// Note: that does work only for x86, for PowerPC, the super block
-	// is located at offset 0!
-	memcpy(&fSuperBlock, buffer + 512, sizeof(disk_super_block));
-	if (!IsValidSuperBlock()) {
-#ifndef BFS_LITTLE_ENDIAN_ONLY
-		memcpy(&fSuperBlock, buffer, sizeof(disk_super_block));
-		if (!IsValidSuperBlock())
-			return B_BAD_VALUE;
-#else
-		return B_BAD_VALUE;
-#endif
-	}
-
-	if (!IsValidSuperBlock()) {
+	if (Identify(fDevice, &fSuperBlock) != B_OK) {
 		FATAL(("invalid super block!\n"));
 		return B_BAD_VALUE;
 	}
@@ -355,6 +336,8 @@ Volume::Mount(const char *deviceName, uint32 flags)
 		FATAL(("could not initialize journal/block bitmap allocator!\n"));
 		return B_NO_MEMORY;
 	}
+
+	status_t status = B_OK;
 
 	fRootNode = new Inode(this, ToVnode(Root()));
 	if (fRootNode && fRootNode->InitCheck() == B_OK) {
@@ -534,7 +517,31 @@ Volume::RemoveQuery(Query *query)
 
 
 //	#pragma mark -
-//	Disk initialization
+//	Disk scanning and initialization
+
+
+status_t
+Volume::Identify(int fd, disk_super_block *superBlock)
+{
+	char buffer[1024];
+	if (read_pos(fd, 0, buffer, sizeof(buffer)) != sizeof(buffer))
+		return B_IO_ERROR;
+
+	// Note: that does work only for x86, for PowerPC, the super block
+	// may be located at offset 0!
+	memcpy(superBlock, buffer + 512, sizeof(disk_super_block));
+	if (!superBlock->IsValid()) {
+#ifndef BFS_LITTLE_ENDIAN_ONLY
+		memcpy(superBlock, buffer, sizeof(disk_super_block));
+		if (!superBlock->IsValid())
+			return B_BAD_VALUE;
+#else
+		return B_BAD_VALUE;
+#endif
+	}
+
+	return B_OK;
+}
 
 
 #ifdef USER
