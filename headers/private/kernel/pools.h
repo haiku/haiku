@@ -1,4 +1,4 @@
-	/* pools.h
+/* pools.h
  * simple fixed size block allocator
  */
 
@@ -47,7 +47,7 @@ struct pool_ctl {
 };
 
 int32 pool_init(pool_ctl **p, size_t sz);
-char *pool_get(pool_ctl *p);
+void *pool_get(pool_ctl *p);
 void  pool_put(pool_ctl *p, void *ptr);
 void  pool_destroy(pool_ctl *p);
 void  pool_debug(struct pool_ctl *p, char *name);

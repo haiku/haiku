@@ -338,7 +338,7 @@ find_entry(new_hash_table *nh, const void *key, ssize_t klen, const void *val)
 		hash = hash * 33 + *p;
 
 	for (hep = &nh->array[hash & nh->max], he = *hep; he; hep = &he->next, he = *hep) {
-		dprintf("khash, find_entry looking at hep %p, he %p\n", hep, he);
+//		dprintf("khash, find_entry looking at hep %p, he %p\n", hep, he);
 		if (he->hash == hash && he->klen == klen
 			&& memcmp(he->key, key, klen) == 0) {
 				break;
@@ -368,7 +368,7 @@ hash_get(new_hash_table *nh, const void *key, ssize_t klen)
 	hash_entry *hep;
 	
 	hepp = find_entry(nh, key, klen, NULL);
-	dprintf("khash, find_entry returned %p\n", hepp);
+//	dprintf("khash, find_entry returned %p\n", hepp);
 	if (hepp == NULL)
 		return NULL;
 

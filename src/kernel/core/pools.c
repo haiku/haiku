@@ -15,7 +15,6 @@
 #include <debug.h>
 #include <pools.h>
 
-static sem_id init_sem = -1;
 #define POOL_ALLOC_SZ 4 * 1024
 #define ROUND_TO_PAGE_SIZE(x) (((x) + (POOL_ALLOC_SZ) - 1) & ~((POOL_ALLOC_SZ) - 1))
 
@@ -76,7 +75,7 @@ static struct pool_mem *get_mem_block(struct pool_ctl *pool)
 	memset(block, 0, sizeof(*block));
 
 	block->aid = vm_create_anonymous_region(vm_get_kernel_aspace_id(),
-	                    "net_stack_pools_block",
+	                    "some pool block",
 						(void**)&block->base_addr,
 						REGION_ADDR_ANY_ADDRESS, pool->block_size,
 						REGION_WIRING_WIRED_CONTIG, 
@@ -129,15 +128,10 @@ int32 pool_init(struct pool_ctl **_newPool, size_t size)
 	/* if the init failes, the new pool will be set to NULL */
 	*_newPool = NULL;
 
-	if (init_sem == -1)
-		create_sem(1, "pool_init_sem");
-
 	/* minimum block size is sizeof the free_blk structure */
 	if (size < sizeof(struct free_blk)) 
-		return EINVAL;
+		size = sizeof(struct free_blk);
 
-//	acquire_sem_etc(init_sem, 1, B_CAN_INTERRUPT, 0);
-	
 	pool = (struct pool_ctl *)malloc(sizeof(struct pool_ctl));
 	if (pool == NULL)
 		return ENOMEM;
@@ -177,13 +171,11 @@ int32 pool_init(struct pool_ctl **_newPool, size_t size)
 	}
 
 	*_newPool = pool;
-
-//	release_sem_etc(init_sem, 1, B_CAN_INTERRUPT);	
 	return 0;
 }
 
 
-char *pool_get(struct pool_ctl *p)
+void *pool_get(struct pool_ctl *p)
 {
 	/* ok, so now we look for a suitable block... */
 	struct pool_mem *mp = p->list;
