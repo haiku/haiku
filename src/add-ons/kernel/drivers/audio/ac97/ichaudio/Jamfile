@@ -13,6 +13,7 @@ KernelMergeObject ichaudio_driver.o :
 KernelLd ichaudio :
 	ichaudio_driver.o
 	lala.o
+	/boot/beos/system/kernel_intel
 	:
 	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
 	:
