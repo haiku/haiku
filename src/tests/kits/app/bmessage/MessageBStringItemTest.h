@@ -130,7 +130,7 @@ struct TBStringAssertPolicy
 };
 bool TBStringAssertPolicy::Size(size_t size, BString& data)
 {
-	return size == data.Length() + 1;
+	return size == (size_t)data.Length() + 1;
 }
 //------------------------------------------------------------------------------
 typedef TMessageItemTest

@@ -335,12 +335,12 @@ MessageItemTest5()
 	TypePtr pout;
 	ssize_t size;
 	
-	for (int32 i = 0; i < InitPolicy::Size(in); ++i)
+	for (uint32 i = 0; i < InitPolicy::Size(in); ++i)
 	{
 		CPPUNIT_ASSERT(FuncPolicy::Add(msg, "item", in[i]) == B_OK);
 	}
 
-	for (int32 i = 0; i < InitPolicy::Size(in); ++i)
+	for (uint32 i = 0; i < InitPolicy::Size(in); ++i)
 	{
 		CPPUNIT_ASSERT(FuncPolicy::Has(msg, "item", i));
 		CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, "item", i),
@@ -373,7 +373,7 @@ MessageItemTest6()
 	Type out = InitPolicy::Zero();
 	const int rIndex = 2;
 
-	for (int32 i = 0; i < InitPolicy::Size(in); ++i)
+	for (uint32 i = 0; i < InitPolicy::Size(in); ++i)
 	{
 		CPPUNIT_ASSERT(FuncPolicy::Add(msg, "item", in[i]) == B_OK);
 	}
@@ -445,14 +445,14 @@ MessageItemTest8()
 	Type out = InitPolicy::Zero();
 	TypePtr pout;
 	ssize_t size;
-	for (int32 i = 0; i < InitPolicy::Size(in); ++i)
+	for (uint32 i = 0; i < InitPolicy::Size(in); ++i)
 	{
 		CPPUNIT_ASSERT(FuncPolicy::AddData(msg, "item", TypeCode,
 					   AddressOf(in[i]), InitPolicy::SizeOf(in[i]),
 					   TypePolicy<Type>::FixedSize) == B_OK);
 	}
 
-	for (int32 i = 0; i < InitPolicy::Size(in); ++i)
+	for (uint32 i = 0; i < InitPolicy::Size(in); ++i)
 	{
 		CPPUNIT_ASSERT(FuncPolicy::Has(msg, "item", i));
 		CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, "item", i),

@@ -167,7 +167,7 @@ struct TFlattenableAssertPolicy
 bool TFlattenableAssertPolicy::Size(size_t size, MyFlattenableType& flat)
 {
 	ssize_t flatSize = flat.FlattenedSize();
-	return size == flatSize;
+	return size == (size_t)flatSize;
 }
 //------------------------------------------------------------------------------
 template<>

@@ -200,7 +200,7 @@ struct TMessageAssertPolicy
 bool TMessageAssertPolicy::Size(size_t size, BMessage& msg)
 {
 	ssize_t msgSize = msg.FlattenedSize();
-	return size == msgSize;
+	return size == (size_t)msgSize;
 }
 //------------------------------------------------------------------------------
 template<>
