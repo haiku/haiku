@@ -53,16 +53,8 @@ sPropertyInfo[] = {
 	{ "Orientation",
 	{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
 	{ B_DIRECT_SPECIFIER, 0 }, "" },
-	
-	{ "ChannelCount",
-	{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "" },
-	
-	{ "CurrentChannel",
-	{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
-	{ B_DIRECT_SPECIFIER, 0 }, "" },
-	
-	{0}
+		
+	{ 0 }
 };
 	
 

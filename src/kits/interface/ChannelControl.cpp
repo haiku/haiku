@@ -8,9 +8,25 @@
 #include <PropertyInfo.h>
 
 
-static property_info // TODO: Finish this
+static property_info
 sPropertyInfo[] = {
-	{0}
+	{ "ChannelCount",
+	{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+	{ B_DIRECT_SPECIFIER, 0 }, "", 0 },
+	
+	{ "CurrentChannel",
+	{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+	{ B_DIRECT_SPECIFIER, 0	}, "", 0 },
+	
+	{ "MaxLimitLabel", 
+	{ B_GET_PROPERTY, B_SET_PROPERTY, 0	},
+	{ B_DIRECT_SPECIFIER, 0	}, "", 0 },
+	
+	{ "MinLimitLabel",
+	{ B_GET_PROPERTY, B_SET_PROPERTY, 0	},
+	{ B_DIRECT_SPECIFIER, 0	}, "", 0 },
+	
+	{ 0 }
 };
 
 
@@ -430,6 +446,28 @@ BChannelControl::GetLimitsFor(int32 fromChannel, int32 channelCount,
 status_t
 BChannelControl::SetLimits(int32 minimum, int32 maximum)
 {
+	if (minimum > maximum)
+		return B_BAD_VALUE;
+	
+	int32 numChannels = CountChannels();
+	int32 *newMinLimits = new int32[numChannels];
+	int32 *newMaxLimits = new int32[numChannels];
+
+	for (int32 c = 0; c < numChannels; c++) {
+		newMinLimits[c] = minimum;
+		newMaxLimits[c] = maximum;
+		if (fChannelValues[c] < newMinLimits[c])
+			fChannelValues[c] = newMinLimits[c];
+		else if (fChannelValues[c] > newMaxLimits[c])
+			fChannelValues[c] = newMaxLimits[c];
+	}
+
+	delete[] fChannelMin;
+	delete[] fChannelMax;
+
+	fChannelMin = newMinLimits;
+	fChannelMax = newMaxLimits;
+
 	return B_ERROR;
 }
 
@@ -437,7 +475,19 @@ BChannelControl::SetLimits(int32 minimum, int32 maximum)
 status_t
 BChannelControl::GetLimits(int32 *outMinimum, int32 *outMaximum) const
 {
-	return B_ERROR;
+	if (outMinimum == NULL || outMaximum == NULL)
+		return B_BAD_VALUE;
+
+	if (fChannelMin == NULL || fChannelMax == NULL)
+		return B_ERROR;
+
+	int32 numChannels = CountChannels();
+	for (int32 c = 0; c < numChannels; c++) {
+		outMinimum[c] = fChannelMin[c];
+		outMaximum[c] = fChannelMax[c];
+	}
+
+	return B_OK;
 }
 
 
