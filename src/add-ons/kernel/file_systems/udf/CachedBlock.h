@@ -15,12 +15,13 @@
 	Axel Dörfler, axeld@pinc-software.de
 */
 
+#include <fsproto.h>
+
 extern "C" {
 	#ifndef _IMPEXP_KERNEL
 	#	define _IMPEXP_KERNEL
 	#endif
 	
-	#include <fsproto.h>
 	#include "lock.h"
 	#include "cache.h"
 }

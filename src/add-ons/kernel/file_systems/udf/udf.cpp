@@ -27,9 +27,7 @@
 #	define _IMPEXP_KERNEL
 #endif
 
-extern "C" {
-	#include <fsproto.h>
-}	// end extern "C"
+#include <fsproto.h>
 
 #if !_KERNEL_MODE
 #	define dprintf printf
