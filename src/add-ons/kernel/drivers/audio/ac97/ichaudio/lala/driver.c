@@ -129,12 +129,12 @@ ich_open(const char *name, uint32 flags, void** cookie)
 	}
 	*cookie = (void *) index;
 	
-	if (drv_data[drv_count]->open_count == 0) {
+	if (drv_data[index]->open_count == 0) {
 		res = driver_info.attach(drv_data[index], &drv_data[index]->cookie);
-		drv_data[drv_count]->open_count = (res == B_OK) ? 1 : 0;
+		drv_data[index]->open_count = (res == B_OK) ? 1 : 0;
 	} else {
 		res = B_OK;
-		drv_data[drv_count]->open_count++;
+		drv_data[index]->open_count++;
 	}
 
 	release_sem(drv_sem);
@@ -161,9 +161,9 @@ ich_free(void* cookie)
 
 	acquire_sem(drv_sem);
 
-	drv_data[drv_count]->open_count--;
+	drv_data[index]->open_count--;
 
-	if (drv_data[drv_count]->open_count == 0)
+	if (drv_data[index]->open_count == 0)
 		res = driver_info.detach(drv_data[index], drv_data[index]->cookie);
 	else
 		res = B_OK;

@@ -20,7 +20,6 @@ KernelLd ichaudio :
 	-Bdynamic -shared
 	:
 	:
-	add-ons/kernel/drivers/bin
 	;
 
 SubInclude OBOS_TOP src add-ons kernel drivers audio ac97 ichaudio lala ;
