@@ -31,6 +31,7 @@ struct dirent;
 // NOTE:
 // * Nothing but those prototypes may live here.
 // * The arguments of the functions must be named to be processed properly.
+
 #ifdef GEN_SYSCALL_INFOS_PROCESSING
 #pragma syscalls begin
 #endif
@@ -84,14 +85,15 @@ extern status_t		_kern_kill_thread(thread_id thread);
 extern void			_kern_exit_thread(status_t returnValue);
 extern status_t		_kern_wait_for_thread(thread_id thread, status_t *_returnCode);
 extern bool			_kern_has_data(thread_id thread);
-extern status_t		_kern_send_data(thread_id thread, int32 code, const void *buffer, size_t buffer_size);
-extern status_t		_kern_receive_data(thread_id *_sender, void *buffer, size_t buffer_size);
+extern status_t		_kern_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize);
+extern status_t		_kern_receive_data(thread_id *_sender, void *buffer, size_t bufferSize);
 extern int64		_kern_restore_signal_frame();
 
 extern status_t		_kern_get_thread_info(thread_id id, thread_info *info);
 extern status_t		_kern_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
 extern status_t		_kern_get_team_info(team_id id, team_info *info);
 extern status_t		_kern_get_next_team_info(int32 *cookie, team_info *info);
+extern status_t		_kern_get_team_usage_info(team_id team, int32 who, team_usage_info *info, size_t size);
 
 // signal functions
 extern int			_kern_send_signal(pid_t tid, uint sig);
