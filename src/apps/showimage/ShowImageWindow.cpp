@@ -109,10 +109,9 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	// create menu bar	
 	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
 	LoadMenus(fBar);
-	AddChild(fBar);
 
 	BRect viewFrame = Bounds();
-	viewFrame.top		= fBar->Bounds().bottom + 1;
+	viewFrame.top		= fBar->Bounds().bottom;
 	viewFrame.right		-= B_V_SCROLL_BAR_WIDTH;
 	viewFrame.bottom	-= B_H_SCROLL_BAR_HEIGHT;
 	
@@ -123,13 +122,15 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	BScrollView *pscrollView = new BScrollView("image_scroller", fImageView,
 		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
 	AddChild(pscrollView);
+	AddChild(fBar);
 	
 	const int32 kstatusWidth = 190;
 	BRect rect;
 	rect = Bounds();
 	rect.top	= viewFrame.bottom + 1;
 	rect.left 	= viewFrame.left + kstatusWidth;
-	rect.right	= viewFrame.right;	
+	rect.right	= viewFrame.right + 1;	
+	rect.bottom += 1;
 	BScrollBar *phscroll;
 	phscroll = new BScrollBar(rect, "hscroll", fImageView, 0, 150,
 		B_HORIZONTAL);
@@ -143,9 +144,10 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	AddChild(fStatusView);
 	
 	rect = Bounds();
-	rect.top    = viewFrame.top;
+	rect.top    = viewFrame.top - 1;
 	rect.left 	= viewFrame.right + 1;
-	rect.bottom	= viewFrame.bottom;
+	rect.bottom	= viewFrame.bottom + 1;
+	rect.right	+= 1;
 	BScrollBar *pvscroll;
 	pvscroll = new BScrollBar(rect, "vscroll", fImageView, 0, 150, B_VERTICAL);
 	AddChild(pvscroll);
