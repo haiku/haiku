@@ -198,6 +198,7 @@ typedef struct {
 // B_DEBUG_MESSAGE_GET_WHY_STOPPED
 
 typedef struct {
+	port_id		reply_port;		// port to send the reply to
 	thread_id	thread;			// the thread
 } debug_nub_get_why_stopped;
 
@@ -205,7 +206,6 @@ typedef struct {
 
 typedef struct {
 	thread_id			thread;				// the thread
-	int32				align_to_double;	// alignment
 	debug_cpu_state		cpu_state;			// the new CPU state
 } debug_nub_set_cpu_state;
 
