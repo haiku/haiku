@@ -83,6 +83,18 @@ SEARCH on [ FGristFiles
 		util.c
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo ] ;
 
+Package openbeos-echogals-cvs
+	:
+	echogals
+	:
+	boot home config add-ons kernel drivers bin ;
+
+Package openbeos-echogals-cvs
+	:
+	<kernel!drivers!dev!audio!multi>echogals
+	:
+	boot home config add-ons kernel drivers dev audio multi ;
+
 # Link to kernel/drivers/dev/audio/multi
 {
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
