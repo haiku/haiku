@@ -263,6 +263,16 @@ AlertTest::Suite()
 	////// UW_ES_EA - One Button //////
 	AT_ADDTEST(OK_X_UW_ES_EA);
 	AT_ADDTEST(fortyX_60X_UW_ES_EA);
+	
+	////// UW_OS_IA - One Button //////
+	AT_ADDTEST(OK_X_UW_OS_IA);
+	AT_ADDTEST(fortyX_60X_UW_OS_IA);
+	
+	////// LW_OS_IA - One Button //////
+	AT_ADDTEST(OK_X_LW_OS_IA);
+	
+	////// UW_OS_EA - One Button //////
+	AT_ADDTEST(OK_X_UW_OS_EA);
 
 	////// UW_ES_IA - Two Button //////
 	AT_ADDTEST(OK_Cancel_60X_UW_ES_IA);
@@ -282,6 +292,15 @@ AlertTest::Suite()
 	////// UW_ES_EA - Two Button //////
 	AT_ADDTEST(OK_Cancel_60X_UW_ES_EA);
 	AT_ADDTEST(twentyX_20X_60X_UW_ES_EA);
+	
+	////// UW_OS_IA - Two Button //////
+	AT_ADDTEST(OK_Cancel_60X_UW_OS_IA);
+	
+	////// LW_OS_IA - Two Button //////
+	AT_ADDTEST(OK_Cancel_60X_LW_OS_IA);
+	
+	////// LW_OS_EA - Two Button //////
+	AT_ADDTEST(twentyX_OK_60X_LW_OS_EA);
 			
 	////// UW_ES_IA - Three Button //////
 	AT_ADDTEST(twentyX_20X_20X_60X_UW_ES_IA);
@@ -300,6 +319,18 @@ AlertTest::Suite()
 	
 	////// UW_ES_EA - Three Button //////
 	AT_ADDTEST(twentyX_20X_20X_60X_UW_ES_EA);
+	
+	////// UW_OS_IA - Three Button //////
+	AT_ADDTEST(Yes_No_Cancel_60X_UW_OS_IA);
+	
+	////// LW_OS_IA - Three Button //////
+	AT_ADDTEST(Yes_No_Cancel_60X_LW_OS_IA);
+	
+	////// WW_OS_IA - Three Button //////
+	AT_ADDTEST(Monkey_Dog_Cat_60X_WW_OS_IA);
+	
+	////// UW_OS_EA - Three Button //////
+	AT_ADDTEST(twentyX_OK_Cancel_60X_UW_OS_EA);
 		
 	return suite;
 }		
@@ -729,6 +760,127 @@ AlertTest::fortyX_60X_UW_ES_EA()
 	ati.GuiInfoTest();
 }
 
+////// UW_OS_IA - One Button //////
+
+void
+AlertTest::OK_X_UW_OS_IA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert1";
+	wi.width = 310.0f;
+	wi.height = 64.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = "X";
+	ti.width = 245.0f;
+	ti.height = 13.0f;
+	ti.topleft.Set(55.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = "OK";
+	bi.width = 75.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(229.0f, 28.0f);
+	ati.SetButtonInfo(0, bi);
+		
+	ati.SetButtonWidthMode(B_WIDTH_AS_USUAL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_INFO_ALERT);
+	
+	ati.GuiInfoTest();
+}
+
+void
+AlertTest::fortyX_60X_UW_OS_IA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.width = 365.0f;
+	wi.height = 77.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = k60X;
+	ti.width = 300.0f;
+	ti.height = 26.0f;
+	ti.topleft.Set(55.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = k40X;
+	bi.width = 300.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(59.0f, 41.0f);
+	ati.SetButtonInfo(0, bi);
+		
+	ati.SetButtonWidthMode(B_WIDTH_AS_USUAL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_INFO_ALERT);
+	
+	ati.GuiInfoTest();
+}
+	
+////// LW_OS_IA - One Button //////
+
+void
+AlertTest::OK_X_LW_OS_IA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert1";
+	wi.width = 310.0f;
+	wi.height = 64.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = "X";
+	ti.width = 245.0f;
+	ti.height = 13.0f;
+	ti.topleft.Set(55.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = "OK";
+	bi.width = 35.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(269.0f, 28.0f);
+	ati.SetButtonInfo(0, bi);
+		
+	ati.SetButtonWidthMode(B_WIDTH_FROM_LABEL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_INFO_ALERT);
+	
+	ati.GuiInfoTest();
+}
+	
+////// UW_OS_EA - One Button //////
+
+void
+AlertTest::OK_X_UW_OS_EA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert1";
+	wi.width = 310.0f;
+	wi.height = 64.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = "X";
+	ti.width = 290.0f;
+	ti.height = 13.0f;
+	ti.topleft.Set(10.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = "OK";
+	bi.width = 75.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(229.0f, 28.0f);
+	ati.SetButtonInfo(0, bi);
+		
+	ati.SetButtonWidthMode(B_WIDTH_AS_USUAL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_EMPTY_ALERT);
+	
+	ati.GuiInfoTest();
+}
+
 ////// UW_ES_IA - Two Button //////
 
 void
@@ -1107,7 +1259,114 @@ AlertTest::twentyX_20X_60X_UW_ES_EA()
 	ati.GuiInfoTest();
 }
 
+////// UW_OS_IA - Two Button //////
 
+void
+AlertTest::OK_Cancel_60X_UW_OS_IA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert";
+	wi.width = 310.0f;
+	wi.height = 77.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = k60X;
+	ti.width = 245.0f;
+	ti.height = 26.0f;
+	ti.topleft.Set(55.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = "OK";
+	bi.width = 75.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(55.0f, 44.0f);
+	ati.SetButtonInfo(0, bi);
+	bi.label = "Cancel";
+	bi.width = 75.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(229.0f, 41.0f);
+	ati.SetButtonInfo(1, bi);
+	
+	ati.SetButtonWidthMode(B_WIDTH_AS_USUAL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_INFO_ALERT);
+	
+	ati.GuiInfoTest();
+}
+	
+////// LW_OS_IA - Two Button //////
+
+void
+AlertTest::OK_Cancel_60X_LW_OS_IA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert";
+	wi.width = 310.0f;
+	wi.height = 77.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = k60X;
+	ti.width = 245.0f;
+	ti.height = 26.0f;
+	ti.topleft.Set(55.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = "OK";
+	bi.width = 35.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(55.0f, 44.0f);
+	ati.SetButtonInfo(0, bi);
+	bi.label = "Cancel";
+	bi.width = 52.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(252.0f, 41.0f);
+	ati.SetButtonInfo(1, bi);
+	
+	ati.SetButtonWidthMode(B_WIDTH_FROM_LABEL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_INFO_ALERT);
+	
+	ati.GuiInfoTest();
+}
+	
+////// LW_OS_EA - Two Button //////
+
+void
+AlertTest::twentyX_OK_60X_LW_OS_EA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert";
+	wi.width = 310.0f;
+	wi.height = 77.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = k60X;
+	ti.width = 290.0f;
+	ti.height = 26.0f;
+	ti.topleft.Set(10.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = k20X;
+	bi.width = 160.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(10.0f, 44.0f);
+	ati.SetButtonInfo(0, bi);
+	bi.label = "OK";
+	bi.width = 35.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(269.0f, 41.0f);
+	ati.SetButtonInfo(1, bi);
+
+	ati.SetButtonWidthMode(B_WIDTH_FROM_LABEL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_EMPTY_ALERT);
+	
+	ati.GuiInfoTest();
+}
+	
 ////// UW_ES_IA - Three Button //////
 
 void
@@ -1497,6 +1756,170 @@ AlertTest::twentyX_20X_20X_60X_UW_ES_EA()
 	
 	ati.SetButtonWidthMode(B_WIDTH_AS_USUAL);
 	ati.SetButtonSpacingMode(B_EVEN_SPACING);
+	ati.SetAlertType(B_EMPTY_ALERT);
+	
+	ati.GuiInfoTest();
+}
+
+////// UW_OS_IA - Three Button //////
+
+void
+AlertTest::Yes_No_Cancel_60X_UW_OS_IA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert1";
+	wi.width = 335.0f;
+	wi.height = 77.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = k60X;
+	ti.width = 270.0f;
+	ti.height = 26.0f;
+	ti.topleft.Set(55.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = "Yes";
+	bi.width = 75.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(66.0f, 44.0f);
+	ati.SetButtonInfo(0, bi);
+	bi.label = "No";
+	bi.width = 75.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(173.0f, 44.0f);
+	ati.SetButtonInfo(1, bi);
+	bi.label = "Cancel";
+	bi.width = 75.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(254.0f, 41.0f);
+	ati.SetButtonInfo(2, bi); 
+
+	ati.SetButtonWidthMode(B_WIDTH_AS_USUAL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_INFO_ALERT);
+	
+	ati.GuiInfoTest();
+}
+	
+////// LW_OS_IA - Three Button //////
+
+void
+AlertTest::Yes_No_Cancel_60X_LW_OS_IA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert1";
+	wi.width = 335.0f;
+	wi.height = 77.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = k60X;
+	ti.width = 270.0f;
+	ti.height = 26.0f;
+	ti.topleft.Set(55.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = "Yes";
+	bi.width = 37.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(169.0f, 44.0f);
+	ati.SetButtonInfo(0, bi);
+	bi.label = "No";
+	bi.width = 33.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(238.0f, 44.0f);
+	ati.SetButtonInfo(1, bi);
+	bi.label = "Cancel";
+	bi.width = 52.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(277.0f, 41.0f);
+	ati.SetButtonInfo(2, bi); 
+
+	ati.SetButtonWidthMode(B_WIDTH_FROM_LABEL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_INFO_ALERT);
+	
+	ati.GuiInfoTest();
+}
+	
+////// WW_OS_IA - Three Button //////
+
+void
+AlertTest::Monkey_Dog_Cat_60X_WW_OS_IA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert1";
+	wi.width = 335.0f;
+	wi.height = 77.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = k60X;
+	ti.width = 270.0f;
+	ti.height = 26.0f;
+	ti.topleft.Set(55.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = "Monkey";
+	bi.width = 56.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(123.0f, 44.0f);
+	ati.SetButtonInfo(0, bi);
+	bi.label = "Dog";
+	bi.width = 56.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(211.0f, 44.0f);
+	ati.SetButtonInfo(1, bi);
+	bi.label = "Cat";
+	bi.width = 56.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(273.0f, 41.0f);
+	ati.SetButtonInfo(2, bi); 
+
+	ati.SetButtonWidthMode(B_WIDTH_FROM_WIDEST);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
+	ati.SetAlertType(B_INFO_ALERT);
+	
+	ati.GuiInfoTest();
+}
+	
+////// UW_OS_EA - Three Button //////
+
+void
+AlertTest::twentyX_OK_Cancel_60X_UW_OS_EA()
+{
+	AlertTestInfo ati(this);
+	GuiInfo wi, ti, bi;
+	wi.label = "alert1";
+	wi.width = 366.0f;
+	wi.height = 77.0f;
+	ati.SetWinInfo(wi);
+	
+	ti.label = k60X;
+	ti.width = 346.0f;
+	ti.height = 26.0f;
+	ti.topleft.Set(10.0f, 6.0f);
+	ati.SetTextViewInfo(ti);
+	
+	bi.label = k20X;
+	bi.width = 160.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(12.0f, 44.0f);
+	ati.SetButtonInfo(0, bi);
+	bi.label = "OK";
+	bi.width = 75.0f;
+	bi.height = 24.0f;
+	bi.topleft.Set(204.0f, 44.0f);
+	ati.SetButtonInfo(1, bi);
+	bi.label = "Cancel";
+	bi.width = 75.0f;
+	bi.height = 30.0f;
+	bi.topleft.Set(285.0f, 41.0f);
+	ati.SetButtonInfo(2, bi); 
+
+	ati.SetButtonWidthMode(B_WIDTH_AS_USUAL);
+	ati.SetButtonSpacingMode(B_OFFSET_SPACING);
 	ati.SetAlertType(B_EMPTY_ALERT);
 	
 	ati.GuiInfoTest();

@@ -67,6 +67,16 @@ public:
 	void OK_X_UW_ES_EA();
 	void fortyX_60X_UW_ES_EA();
 	
+	////// UW_OS_IA - One Button //////
+	void OK_X_UW_OS_IA();
+	void fortyX_60X_UW_OS_IA();
+	
+	////// LW_OS_IA - One Button //////
+	void OK_X_LW_OS_IA();
+	
+	////// UW_OS_EA - One Button //////
+	void OK_X_UW_OS_EA();
+	
 	////// UW_ES_IA - Two Button //////
 	void OK_Cancel_60X_UW_ES_IA();
 	void twentyX_Cancel_60X_UW_ES_IA();
@@ -86,6 +96,15 @@ public:
 	void OK_Cancel_60X_UW_ES_EA();
 	void twentyX_20X_60X_UW_ES_EA();
 	
+	////// UW_OS_IA - Two Button //////
+	void OK_Cancel_60X_UW_OS_IA();
+	
+	////// LW_OS_IA - Two Button //////
+	void OK_Cancel_60X_LW_OS_IA();
+	
+	////// LW_OS_EA - Two Button //////
+	void twentyX_OK_60X_LW_OS_EA();
+	
 	////// UW_ES_IA - Three Button //////
 	void twentyX_20X_20X_60X_UW_ES_IA();
 	
@@ -103,6 +122,18 @@ public:
 	
 	////// UW_ES_EA - Three Button //////
 	void twentyX_20X_20X_60X_UW_ES_EA();
+	
+	////// UW_OS_IA - Three Button //////
+	void Yes_No_Cancel_60X_UW_OS_IA();
+	
+	////// LW_OS_IA - Three Button //////
+	void Yes_No_Cancel_60X_LW_OS_IA();
+	
+	////// WW_OS_IA - Three Button //////
+	void Monkey_Dog_Cat_60X_WW_OS_IA();
+	
+	////// UW_OS_EA - Three Button //////
+	void twentyX_OK_Cancel_60X_UW_OS_EA();
 };
 
 #endif	// ALERT_TEST_H
