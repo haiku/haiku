@@ -5,8 +5,6 @@
 #ifndef _LIBSYS_SYSCALLS_H
 #define _LIBSYS_SYSCALLS_H
 
-/* this file shouldn't be in the public folder! */
-
 #include <ktypes.h>
 #include <defines.h>
 #include <resource.h>
@@ -115,5 +113,4 @@ int sys_getdtablesize(void);
 }
 #endif
 
-#endif
-
+#endif	/* _LIBSYS_SYSCALLS_H */

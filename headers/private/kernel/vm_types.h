@@ -1,7 +1,5 @@
-#ifndef _PUBLIC_KERNEL_VM_TYPES_H
-#define _PUBLIC_KERNEL_VM_TYPES_H
-
-// ToDo: this file shouldn't be in the public folder
+#ifndef _KERNEL_VM_TYPES_H
+#define _KERNEL_VM_TYPES_H
 
 #include <kernel.h>
 #include <stage2.h>
@@ -181,5 +179,4 @@ enum {
 #define LOCK_KERNEL    0x2
 #define LOCK_MASK      0x3
 
-#endif /* _PUBLIC_KERNEL_VM_TYPES_H */
-
+#endif	/* _KERNEL_VM_TYPES_H */
