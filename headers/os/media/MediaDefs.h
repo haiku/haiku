@@ -599,9 +599,7 @@ typedef enum {
 	B_WAV_FORMAT_FAMILY = 6,
 	B_AIFF_FORMAT_FAMILY = 7,
 	B_AVR_FORMAT_FAMILY = 8,
-	B_OGG_FORMAT_FAMILY = 9,
 	B_MISC_FORMAT_FAMILY = 99999,
-	B_META_FORMAT_FAMILY = 100000
 } media_format_family;
 
 struct media_file_format {

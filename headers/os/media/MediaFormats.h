@@ -123,10 +123,6 @@ typedef struct {
 	uint32 codec;
 } media_misc_description;
 
-typedef struct {
-	char description[48];
-} media_meta_description;
-
 typedef struct _media_format_description {
 #if defined(__cplusplus)
 	_media_format_description();
@@ -146,7 +142,6 @@ typedef struct _media_format_description {
 		media_aiff_description aiff;
 		media_misc_description misc;
 		media_avr_description avr;
-		media_meta_description meta;
 		uint32 _reserved_[12];
 	} u;
 } media_format_description;
