@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src prefs backgrounds ;
+
+AddResources Backgrounds : Backgrounds.rsrc ;
+
+Preference Backgrounds : BackgroundImage.cpp BGMain.cpp BGView.cpp BGWindow.cpp ;
+
+LinkSharedOSLibs Backgrounds : be tracker translation ;
