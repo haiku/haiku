@@ -19,7 +19,7 @@
 #include <PortLink.h>
 #include "defs.h"
 #include "ColorWell.h"
-#include "ColorUtils.h"
+#include <ColorUtils.h>
 
 //#define DEBUG_COLORSET
 

@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src prefs appearance ;
 
+UsePrivateHeaders app ;
 AddResources Appearance : Appearance.rsrc ;
 
 Preference Appearance :
