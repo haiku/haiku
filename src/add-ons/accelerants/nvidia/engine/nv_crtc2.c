@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-7/2004
+   Rudolf Cornelissen 11/2002-9/2004
 */
 
 #define MODULE_BIT 0x00020000
@@ -122,16 +122,16 @@ status_t nv_crtc2_set_timing(display_mode target)
 			(((uint16)((si->ps.p2_timing.h_total / ((float)si->ps.p2_timing.h_display)) *
 			target.timing.h_display)) & 0xfff8) - 8;
 
-		//fixme: can be removed if community confirms no problems with modified setup!
-		//(confirmed this 'problem' on NV34 and NV11 now.)
-		/* NV11 timing has tighter constraints than later cards */
-//		if ((si->ps.card_type == NV11) &&
-//			(target.timing.h_display == si->ps.p2_timing.h_display))
-
-		/* in native mode the CRTC needs some extra time to keep synced correctly */
+		/* in native mode the CRTC needs some extra time to keep synced correctly;
+		 * OTOH the overlay unit distorts if we reserve too much time! */
 		if (target.timing.h_display == si->ps.p2_timing.h_display)
 		{
-			target.timing.h_total -= 56;
+			/* NV11 timing has different constraints than later cards */
+			if (si->ps.card_type == NV11)
+				target.timing.h_total -= 56;
+			else
+				/* confirmed NV34 with 1680x1050 panel */
+				target.timing.h_total -= 32;
 		}
 
 		if (target.timing.h_sync_start == target.timing.h_display)
