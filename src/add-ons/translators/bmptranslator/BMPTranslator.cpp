@@ -314,6 +314,11 @@ status_t translate_from_bits32_to_bmp(BPositionIO *inSource, BPositionIO *outDes
 			bitsBytesPerPixel = 2;
 			break;
 			
+		case B_CMAP8:
+		case B_GRAY8:
+			bitsBytesPerPixel = 1;
+			break;
+			
 		default:
 			return B_ERROR;
 	}
@@ -336,6 +341,7 @@ status_t translate_from_bits32_to_bmp(BPositionIO *inSource, BPositionIO *outDes
 	}
 	memset(bmpRowData, 0, bmpRowBytes);
 	ssize_t rd = inSource->Read(bitsRowData, bitsRowBytes);
+	const color_map *pmap = system_colors();
 	while (rd == bitsRowBytes) {
 	
 		for (uint32 i = 0; i < infoHeader.width; i++) {
@@ -392,6 +398,23 @@ status_t translate_from_bits32_to_bmp(BPositionIO *inSource, BPositionIO *outDes
 					bmppixel = bmpRowData + (i * 3);
 					bmppixel[0] = bitspixel[2];
 					bmppixel[1] = bitspixel[1];
+					bmppixel[2] = bitspixel[0];
+					break;
+				
+				case B_CMAP8:
+					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
+					bmppixel = bmpRowData + (i * 3);
+					rgb_color c = pmap->color_list[bitspixel[0]];
+					bmppixel[0] = c.blue;
+					bmppixel[1] = c.green;
+					bmppixel[2] = c.red;
+					break;
+					
+				case B_GRAY8:
+					bitspixel = bitsRowData + (i * bitsBytesPerPixel);
+					bmppixel = bmpRowData + (i * 3);
+					bmppixel[0] = bitspixel[0];
+					bmppixel[1] = bitspixel[0];
 					bmppixel[2] = bitspixel[0];
 					break;
 					
@@ -541,6 +564,8 @@ status_t translate_from_bits(BPositionIO *inSource, ssize_t amtread,
 			case B_RGB15_BIG:
 			case B_RGBA15:
 			case B_RGBA15_BIG:
+			case B_CMAP8:
+			case B_GRAY8:
 			case B_CMYK32:
 			case B_CMY32:
 			case B_CMYA32:
@@ -595,6 +620,8 @@ status_t translate_from_bits(BPositionIO *inSource, ssize_t amtread,
 			case B_RGB15_BIG:
 			case B_RGBA15:
 			case B_RGBA15_BIG:
+			case B_CMAP8:
+			case B_GRAY8:
 			case B_CMYK32:
 			case B_CMY32:
 			case B_CMYA32:
