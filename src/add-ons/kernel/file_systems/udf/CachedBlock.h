@@ -15,7 +15,13 @@
 	Axel Dörfler, axeld@pinc-software.de
 */
 
-#include <fsproto.h>
+#ifdef COMPILE_FOR_R5
+extern "C" {
+#endif
+	#include <fsproto.h>
+#ifdef COMPILE_FOR_R5
+}
+#endif
 
 extern "C" {
 	#ifndef _IMPEXP_KERNEL

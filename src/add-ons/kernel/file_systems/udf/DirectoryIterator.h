@@ -13,7 +13,13 @@
 #ifndef _IMPEXP_KERNEL
 #	define _IMPEXP_KERNEL
 #endif
-#include <fsproto.h>
+#ifdef COMPILE_FOR_R5
+extern "C" {
+#endif
+	#include <fsproto.h>
+#ifdef COMPILE_FOR_R5
+}
+#endif
 
 #include "kernel_cpp.h"
 #include "UdfDebug.h"

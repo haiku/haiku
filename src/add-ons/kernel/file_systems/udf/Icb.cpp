@@ -47,6 +47,7 @@ Icb::Icb(Volume *volume, long_address address)
 		}
 	}		
 	fInitStatus = error;
+	PRINT(("result: 0x%lx, `%s'\n", error, strerror(error)));
 }
 	
 status_t

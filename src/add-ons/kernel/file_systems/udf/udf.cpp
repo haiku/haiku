@@ -27,7 +27,13 @@
 #	define _IMPEXP_KERNEL
 #endif
 
-#include <fsproto.h>
+#ifdef COMPILE_FOR_R5
+extern "C" {
+#endif
+	#include <fsproto.h>
+#ifdef COMPILE_FOR_R5
+}
+#endif
 
 #if !_KERNEL_MODE
 #	define dprintf printf
