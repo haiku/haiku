@@ -261,6 +261,7 @@ Journal::WriteLogEntry()
 
 	uint8 *arrayBlock = (uint8 *)array;
 
+	// ToDo: the single writes should be combined!
 	for (int32 size = fArray.BlocksUsed(); size-- > 0;) {
 		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
 			arrayBlock, fVolume->BlockSize());
@@ -271,13 +272,18 @@ Journal::WriteLogEntry()
 
 	// Write logged blocks into the log
 
-	cookie = 0;
-	const uint8 *block;
-	while (cache_next_block_in_transaction(fVolume->BlockCache(), fTransactionID, &cookie,
-			NULL, (void **)&block, NULL) == B_OK) {
-		// ToDo: combine blocks if possible (using iovecs)!
+	for (int32 i = 0; i < array->count; i++) {
+		const uint8 *block = (const uint8 *)block_cache_get(fVolume->BlockCache(), array->values[i]);
+		if (block == NULL) {
+			FATAL(("Could not get block %Ld\n", array->values[i]));
+			continue;
+		}
+
+		// ToDo: combine blocks whenever possible (using iovecs)!
 		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
 			block, fVolume->BlockSize());
+
+		block_cache_put(fVolume->BlockCache(), array->values[i]);
 		logPosition = (logPosition + 1) % fLogSize;
 	}
 
