@@ -22,7 +22,10 @@ typedef struct selectsync selectsync;
 #define B_SELECT_READ		1
 #define B_SELECT_WRITE		2
 #define B_SELECT_EXCEPTION	3
-extern void notify_select_event(selectsync * sync, uint32 ref);
+// that's Be's prototype...
+//extern void notify_select_event(selectsync * sync, uint32 ref);
+// moved from current/headers/private/kernel/vfs.h
+extern status_t notify_select_event(struct selectsync *sync, uint32 ref, uint8 event);
 #endif
 
 typedef status_t (*device_open_hook) (const char *name, uint32 flags, void **cookie);
