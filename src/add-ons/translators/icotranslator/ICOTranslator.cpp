@@ -99,14 +99,16 @@ ICOTranslator::DerivedIdentify(BPositionIO *stream,
 		return B_NO_TRANSLATOR;
 
 	int32 bitsPerPixel;
-	if (ICO::identify(ioExtension, *stream, bitsPerPixel) != B_OK)
+	uint8 type;
+	if (ICO::identify(ioExtension, *stream, type, bitsPerPixel) != B_OK)
 		return B_NO_TRANSLATOR;
 
 	info->type = ICO_IMAGE_FORMAT;
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = ICO_IN_QUALITY;
 	info->capability = ICO_IN_CAPABILITY;
-	snprintf(info->name, sizeof(info->name), "Windows Icon %ld bit image", bitsPerPixel);
+	snprintf(info->name, sizeof(info->name), "Windows %s %ld bit image",
+		type == ICO::kTypeIcon ? "Icon" : "Cursor", bitsPerPixel);
 	strcpy(info->MIME, kICOMimeType);
 
 	return B_OK;

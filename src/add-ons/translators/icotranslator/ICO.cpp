@@ -41,6 +41,15 @@ class TempAllocator {
 };
 
 
+bool 
+ico_header::IsValid() const
+{
+	return reserved == 0
+		&& (type == kTypeIcon || type == kTypeCursor)
+		&& entry_count < 32;
+}
+
+
 void
 ico_header::SwapToHost()
 {
@@ -305,8 +314,11 @@ convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
 
 	if (bitsPerPixel != 32) {
 		bytesRead = source.Read(andData, andDataSize);
-		if (bytesRead != andDataSize)
-			return B_BAD_DATA;
+		if (bytesRead != andDataSize) {
+			// reading the alpha channel failed, so we're ignoring it
+			// (but we're still able to show the image data)
+			andData = NULL;
+		}
 	}
 
 	for (uint32 row = 0; row < entry.height; row++) {
@@ -355,7 +367,8 @@ convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
 
 			if (bitsPerPixel != 32) {
 				// set alpha channel
-				if (get_1_bit_per_pixel(get_data_row(andData, andDataSize, andRowBytes, row), x))
+				if (andData != NULL
+					&& get_1_bit_per_pixel(get_data_row(andData, andDataSize, andRowBytes, row), x))
 					outRowData[x] = kMagicTransparentColor;
 				else
 					outRowData[x].alpha = 255;
@@ -483,7 +496,7 @@ convert_bits_to_data(TranslatorBitmap &bitsHeader, uint8 *bitsData, ico_dir_entr
 
 
 status_t
-ICO::identify(BMessage *settings, BPositionIO &stream, int32 &bitsPerPixel)
+ICO::identify(BMessage *settings, BPositionIO &stream, uint8 &type, int32 &bitsPerPixel)
 {
 	// read in the header
 
@@ -499,6 +512,7 @@ ICO::identify(BMessage *settings, BPositionIO &stream, int32 &bitsPerPixel)
 		return B_BAD_VALUE;
 
 	int32 iconIndex = 0;
+	type = header.type;
 
 	if (settings) {
 		// Add page count to ioExtension
@@ -514,6 +528,8 @@ ICO::identify(BMessage *settings, BPositionIO &stream, int32 &bitsPerPixel)
 		if (iconIndex < 0 || iconIndex >= header.entry_count)
 			return B_NO_TRANSLATOR;
 	}
+
+	TRACE(("iconIndex = %ld, count = %ld\n", iconIndex, header.entry_count));
 
 	// read in directory entries
 

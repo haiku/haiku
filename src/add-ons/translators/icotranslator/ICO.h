@@ -17,12 +17,17 @@ namespace ICO {
 
 // All ICO structures are written in little endian format
 
+enum ico_type {
+	kTypeIcon	= 1,
+	kTypeCursor	= 2,
+};
+
 struct ico_header {
 	uint16	reserved;
 	uint16	type;
 	uint16	entry_count;
 
-	bool IsValid() const { return reserved == 0 && type == 1 && entry_count < 32; }
+	bool IsValid() const;
 	void SwapToHost();
 	void SwapFromHost();
 } _PACKED;
@@ -79,7 +84,7 @@ struct rgba32_color {
 };
 
 
-extern status_t identify(BMessage *settings, BPositionIO &stream, int32 &bitsPerPixel);
+extern status_t identify(BMessage *settings, BPositionIO &stream, uint8 &type, int32 &bitsPerPixel);
 extern status_t convert_ico_to_bits(BMessage *settings, BPositionIO &source, BPositionIO &target);
 extern status_t convert_bits_to_ico(BMessage *settings, BPositionIO &source,
 					TranslatorBitmap &bitsHeader, BPositionIO &target);
