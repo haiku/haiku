@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2002, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -30,28 +30,18 @@
 #include <List.h>
 #include <Window.h>
 
-class FMWList
+class FMWList : public BList
 {
 public:
 	FMWList(void);
 	virtual ~FMWList(void);
-	void AddItem(void *item);
-	bool HasItem(void *item) const;
-	bool RemoveItem(void* item);
-	void *ItemAt(int32 i) const;
-	int32 CountItems(void) const;
-	void *LastItem(void) const;
-	void *FirstItem(void) const;
-	int32 IndexOf(void *item);
+	void AddWinBorder(void *item);
 
 	// special
 	void AddFMWList(FMWList *list);
 	
 	// debugging methods
 	void PrintToStream() const;
-
-private:
-	BList fList;
 };
 
 #endif

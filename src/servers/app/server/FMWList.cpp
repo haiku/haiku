@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2002, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		FMWList.cpp
-//	Author:			Adi Oanca <adioanca@myrealbox.com>
+//	Author:			Adi Oanca <adioanca@haikumail.com>
 //	Description:	List class for tracking floating and modal windows
 //  
 //------------------------------------------------------------------------------
@@ -32,26 +32,27 @@
 #include "ServerWindow.h"
 
 FMWList::FMWList(void)
+	: BList()
 {
 }
 
 FMWList::~FMWList(void)
 {
-//	printf("~FMWList()\n");
-//	if (fList.CountItems() > 0)
-//		printf("SERVER: WARNING: FMWList NOT empty in destructor!\n");
 }
 	
-void FMWList::AddItem(void *item)
+void FMWList::AddWinBorder(void *item)
 {
+	if(HasItem(item))
+		return;
+
 	int32 feelItem = ((WinBorder*)item)->Window()->Feel();;
 	int32 feelTemp = 0;
 	int32 location = 0;
 
-	for(int32 i=0; i<fList.CountItems(); i++)
+	for(int32 i=0; i<CountItems(); i++)
 	{
 		location	= i + 1;
-		feelTemp	= ((WinBorder*)fList.ItemAt(i))->Window()->Feel();
+		feelTemp	= ((WinBorder*)ItemAt(i))->Window()->Feel();
 		
 		// in short: if 'item' is a floating window
 		if(	(feelItem == B_FLOATING_SUBSET_WINDOW_FEEL ||
@@ -68,50 +69,15 @@ void FMWList::AddItem(void *item)
 			break; 
 		}
 	}
-	fList.AddItem(item, location);
-}
-
-bool FMWList::HasItem(void *item) const
-{
-	return fList.HasItem(item);
-}
-
-bool FMWList::RemoveItem(void *item)
-{
-	return fList.RemoveItem(item);
-}
-
-void *FMWList::ItemAt(int32 i) const
-{
-	return fList.ItemAt(i);
-}
-
-int32 FMWList::CountItems() const
-{
-	return fList.CountItems();
-}
-
-void *FMWList::LastItem() const
-{
-	return fList.LastItem();
-}
-
-void *FMWList::FirstItem() const
-{
-	return fList.FirstItem();
-}
-
-int32 FMWList::IndexOf(void *item)
-{
-	return fList.IndexOf(item);
+	AddItem(item, location);
 }
 
 void FMWList::AddFMWList(FMWList *list)
 {
 	int32 i=0;
-	for(i=0; i<fList.CountItems(); i++)
+	for(i=0; i<CountItems(); i++)
 	{
-		int32 feel = ((WinBorder*)fList.ItemAt(i))->Window()->Feel();
+		int32 feel = ((WinBorder*)ItemAt(i))->Window()->Feel();
 		if(feel == B_MODAL_SUBSET_WINDOW_FEEL ||
 			feel == B_MODAL_APP_WINDOW_FEEL ||
 			feel == B_MODAL_ALL_WINDOW_FEEL)
@@ -129,11 +95,11 @@ void FMWList::AddFMWList(FMWList *list)
 			feel == B_MODAL_APP_WINDOW_FEEL ||
 			feel == B_MODAL_ALL_WINDOW_FEEL)
 		{
-			fList.AddItem(item, fList.CountItems());
+			AddItem(item, CountItems());
 		}
 		else
 		{
-			fList.AddItem(item, i);
+			AddItem(item, i);
 			i++;
 		}
 	}
@@ -143,9 +109,9 @@ void FMWList::PrintToStream() const
 {
 	printf("Floating and modal windows list:\n");
 	WinBorder	*wb = NULL;
-	for (int32 i=0; i<fList.CountItems(); i++)
+	for (int32 i=0; i<CountItems(); i++)
 	{
-		wb=(WinBorder*)fList.ItemAt(i);
+		wb=(WinBorder*)ItemAt(i);
 		
 		printf("\t%s", wb->GetName());
 		
