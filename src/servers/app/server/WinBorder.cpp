@@ -39,6 +39,9 @@
 #include "WinBorder.h"
 #include "AppServer.h"	// for new_decorator()
 #include "TokenHandler.h"
+#include "Globals.h"
+#include "RootLayer.h"
+#include "Workspace.h"
 
 // TODO: Document this file completely
 
@@ -88,6 +91,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	_hresizewin		= false;
 	_vresizewin		= false;
 	fLastMousePosition.Set(-1,-1);
+	SetLevel();
 
 	_decorator		= NULL;
 
@@ -113,14 +117,14 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 		// get a token
 	_view_token		= border_token_handler.GetToken();
 
-STRACE(("WinBorder %s:\n",_title->String()));
+STRACE(("WinBorder %s:\n",GetName()));
 STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
 STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
 }
 
 WinBorder::~WinBorder(void)
 {
-STRACE(("WinBorder %s:~WinBorder()\n",_title->String()));
+STRACE(("WinBorder %s:~WinBorder()\n",GetName()));
 	if (_decorator)	{
 		delete _decorator;
 		_decorator		= NULL;
@@ -189,7 +193,7 @@ void WinBorder::MouseDown(int8 *buffer)
 			BRect			helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
 			msg.what		= B_MOUSE_DOWN;
 			msg.AddInt64("when", real_time_clock_usecs());
-			msg.AddPoint("where", (_win->top_layer->GetLayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
+			msg.AddPoint("where", (_win->top_layer->LayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
 			msg.AddInt32("modifiers", modifiers);
 			msg.AddInt32("buttons", buttons);
 			msg.AddInt32("clicks", 1);
@@ -254,7 +258,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 void WinBorder::MouseUp(int8 *buffer)
 {
-STRACE_MOUSE(("WinBorder %s: MouseUp() \n",_title->String()));
+STRACE_MOUSE(("WinBorder %s: MouseUp() \n",GetName()));
 	// buffer data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
@@ -307,12 +311,26 @@ STRACE_MOUSE(("WinBorder %s: MouseUp() \n",_title->String()));
 			BRect			helpRect(pt.x, pt.y, pt.x+1, pt.y+1);
 			msg.what		= B_MOUSE_UP;
 			msg.AddInt64("when", real_time_clock_usecs());
-			msg.AddPoint("where", (_win->top_layer->GetLayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
+			msg.AddPoint("where", (_win->top_layer->LayerAt(pt)->ConvertFromTop(helpRect)).LeftTop() );
 			msg.AddInt32("modifiers", modifiers);
 			
 			_win->SendMessageToClient( &msg );
 		}
 	}
+}
+
+void WinBorder::Show(){
+	if( !_hidden )
+		return;
+	
+	_hidden		= false;
+}
+
+void WinBorder::Hide(){
+	if ( _hidden )
+		return;
+
+	_hidden		= true;
 }
 
 /*!
@@ -434,6 +452,13 @@ void WinBorder::RebuildRegions( const BRect& r ){
 
 void WinBorder::Draw(const BRect &r)
 {
+//TODO: REMOVE this! For Test purposes only!
+printf("*WinBorder(%s)::Draw()\n", GetName());
+		_decorator->Draw();
+printf("#WinBorder(%s)::Draw() ENDED\n", GetName());
+	return;
+//----------------
+
 		// draw the decorator
 	BRegion			reg(r);
 	if (_decorator){
@@ -597,6 +622,10 @@ void WinBorder::ResizeBy(float x, float y)
 	}
 }
 
+bool WinBorder::HasPoint(BPoint pt) const{
+	return _full.Contains(pt);
+}
+
 void WinBorder::MoveToBack(){
 // TODO: take care of focus.
 	if (this == _parent->_topchild)
@@ -664,23 +693,146 @@ void WinBorder::MoveToFront(){
 	tempFullVisible.Exclude(&cachedFullVisible);
 	Invalidate( tempFullVisible );
 }
+//---------------------------------------------------------------------------
+void WinBorder::SetMainWinBorder(WinBorder *newMain){
+	fMainWinBorder = newMain;
+}
+//---------------------------------------------------------------------------
+WinBorder* WinBorder::MainWinBorder() const{
+	return fMainWinBorder;
+}
+//---------------------------------------------------------------------------
+void WinBorder::SetLevel(){
+	switch(_win->Feel()){
+		case B_NORMAL_WINDOW_FEEL:
+			_level	= B_NORMAL_FEEL;
+			break;
+		case B_FLOATING_SUBSET_WINDOW_FEEL:
+			_level	= B_FLOATING_SUBSET_FEEL;
+			break;
+		case B_FLOATING_APP_WINDOW_FEEL:
+			_level	= B_FLOATING_APP_FEEL;
+			break;
+		case B_FLOATING_ALL_WINDOW_FEEL:
+			_level	= B_FLOATING_ALL_FEEL;
+			break;
+		case B_MODAL_SUBSET_WINDOW_FEEL:
+			_level	= B_MODAL_SUBSET_FEEL;
+			break;
+		case B_MODAL_APP_WINDOW_FEEL:
+			_level	= B_MODAL_APP_FEEL;
+			break;
+		case B_MODAL_ALL_WINDOW_FEEL:
+			_level	= B_MODAL_ALL_FEEL;
+			break;
+		case B_SYSTEM_LAST:
+		case B_SYSTEM_FIRST:
+// TODO: uncomment later when this code makes its way into the real server!
+//			if(_win->ServerTeamID() != _win->ClientTeamID())
+//				_win->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
+//			else
+				_level	= _win->Feel();
+			break;
+		default:
+			_win->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
+			_level	= B_NORMAL_FEEL;
+			break;
+	}
+}
+//---------------------------------------------------------------------------
+void WinBorder::AddToSubsetOf(WinBorder* main){
+	if (!main || (main && !(main->GetRootLayer())))
+		return;
 
+	if (main->Window()->fWinFMWList.HasItem(this) || !(desktop->HasWinBorder(this)))
+		return;
+
+	if (main->Window()->Feel() == B_NORMAL_WINDOW_FEEL
+			&& ( Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL
+				|| Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
+		)
+	{
+			// if the main window is hidden also hide this one.
+		if(main->IsHidden())
+			_hidden = true;
+			// add to main window's subset
+		main->Window()->fWinFMWList.AddItem(this);
+			// set this member accordingly
+		fMainWinBorder = main;
+			// because this window is in a subset it should appear in the
+			// workspaces its main window appears in.
+		Window()->QuietlySetWorkspaces(main->Window()->Workspaces());
+			// this is a *modal* window, so add it to workspaces.
+		if ( !(main->IsHidden()) && Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL){
+			main->GetRootLayer()->AddWinBorderToWorkspaces(this, main->Window()->Workspaces());
+		}
+			// this a *floating* window so if the main window is 'front',
+			// 	add it to the current workspace.
+		if ( !(main->IsHidden()) && Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL){
+			int32	count = main->GetRootLayer()->WorkspaceCount();
+			for(int32 i=0; i < count; i++){
+				Workspace	*ws = main->GetRootLayer()->WorkspaceAt(i+1);
+				if(ws->FrontLayer() == main)
+					ws->AddLayerPtr(this);
+			}
+		}
+	}
+}
+//---------------------------------------------------------------------------
+void WinBorder::RemoveFromSubsetOf(WinBorder* main){
+		// remove from main window's subset list.
+	if(main->Window()->fWinFMWList.RemoveItem(this)){
+		int32	count = main->GetRootLayer()->WorkspaceCount();
+		for(int32 i=0; i < count; i++){
+			if(main->Window()->Workspaces() & (0x00000001 << i)){
+				Workspace	*ws = main->GetRootLayer()->WorkspaceAt(i+1);
+					// if its main window is in 'i' workspaces, remove it from
+					// workspace 'i' if it's in there...
+				ws->RemoveLayerPtr(this);
+			}
+		}
+	}
+	
+	fMainWinBorder	= NULL;
+}
+//---------------------------------------------------------------------------
+void WinBorder::PrintToStream(){
+	printf("\t%s", GetName());
+		if (Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
+			printf("\t%s", "B_FLOATING_SUBSET_WINDOW_FEEL");
+		if (Window()->Feel() == B_FLOATING_APP_WINDOW_FEEL)
+			printf("\t%s", "B_FLOATING_APP_WINDOW_FEEL");
+		if (Window()->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
+			printf("\t%s", "B_FLOATING_ALL_WINDOW_FEEL");
+		if (Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
+			printf("\t%s", "B_MODAL_SUBSET_WINDOW_FEEL");
+		if (Window()->Feel() == B_MODAL_APP_WINDOW_FEEL)
+			printf("\t%s", "B_MODAL_APP_WINDOW_FEEL");
+		if (Window()->Feel() == B_MODAL_ALL_WINDOW_FEEL)
+			printf("\t%s", "B_MODAL_ALL_WINDOW_FEEL");
+		if (Window()->Feel() == B_NORMAL_WINDOW_FEEL)
+			printf("\t%s", "B_NORMAL_WINDOW_FEEL");
+
+	printf("\t%s\n", _hidden?"hidden" : "not hidden");
+	_full.PrintToStream();
+}
+//---------------------------------------------------------------------------
 void WinBorder::UpdateColors(void)
 {
-STRACE(("WinBorder %s: UpdateColors unimplemented\n",_title->String()));
+STRACE(("WinBorder %s: UpdateColors unimplemented\n",GetName()));
 }
 
 void WinBorder::UpdateDecorator(void)
 {
-STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",_title->String()));
+STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",GetName()));
 }
 
 void WinBorder::UpdateFont(void)
 {
-STRACE(("WinBorder %s: UpdateFont unimplemented\n",_title->String()));
+STRACE(("WinBorder %s: UpdateFont unimplemented\n",GetName()));
 }
 
 void WinBorder::UpdateScreen(void)
 {
-STRACE(("WinBorder %s: UpdateScreen unimplemented\n",_title->String()));
+STRACE(("WinBorder %s: UpdateScreen unimplemented\n",GetName()));
 }

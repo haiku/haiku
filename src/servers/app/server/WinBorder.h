@@ -38,63 +38,70 @@ class DisplayDriver;
 class WinBorder : public Layer
 {
 public:
-	WinBorder(const BRect &r, const char *name, const int32 look, 
-					const int32 feel, const int32 flags, ServerWindow *win);
-	virtual ~WinBorder(void);
+							WinBorder(const BRect &r, const char *name, const int32 look, 
+								const int32 feel, const int32 flags, ServerWindow *win);
+	virtual					~WinBorder(void);
 	
-	virtual	void RebuildRegions( const BRect& r );
-	virtual	void Draw(const BRect &r);
-	
-	virtual	void MoveBy(float x, float y);
-	virtual	void ResizeBy(float x, float y);
-	
-	void SetServerFeel(int32 feel);
-	int32 GetServerFeel(void) const { return _serverfeel; }
-	
-	void MoveToBack();
-	void MoveToFront();
-	
-	void MouseDown(int8 *buffer);
-	void MouseMoved(int8 *buffer);
-	void MouseUp(int8 *buffer);
-	
-	void UpdateColors(void);
-	void UpdateDecorator(void);
-	void UpdateFont(void);
-	void UpdateScreen(void);
-	
-	void SetFocus(const bool &active);
-	ServerWindow* Window(void) const { return _win; }
-	Decorator* GetDecorator(void) const { return _decorator; }
-	
-	WinBorder *MainWinBorder(void) const { return fMainWinBorder; }
+	virtual	void				RebuildRegions( const BRect& r );
+	virtual	void				Draw(const BRect &r);
 
-	// Server "private" :-) - should not be used
-	void SetMainWinBorder(WinBorder *newMain) { fMainWinBorder=newMain; }
-	
+	virtual	void				MoveBy(float x, float y);
+	virtual	void				ResizeBy(float x, float y);
+			bool				HasPoint(BPoint pt) const;
+
+			void				MoveToBack();
+			void				MoveToFront();
+
+			void				MouseDown(int8 *buffer);
+			void				MouseMoved(int8 *buffer);
+			void				MouseUp(int8 *buffer);
+			
+	virtual	void				Hide();
+	virtual	void				Show();
+
+			void				UpdateColors(void);
+			void				UpdateDecorator(void);
+			void				UpdateFont(void);
+			void				UpdateScreen(void);
+
+			void				SetFocus(const bool &active);
+			ServerWindow*		Window(void) const { return _win; }
+			Decorator*			GetDecorator(void) const { return _decorator; }
+
+			WinBorder*			MainWinBorder() const;
+			void				SetLevel();
+
+			void				AddToSubsetOf(WinBorder* main);
+			void				RemoveFromSubsetOf(WinBorder* main);
+			
+			void				PrintToStream();
+
+// Server "private" :-) - should not be used
+			void				SetMainWinBorder(WinBorder *newMain);	
+
 protected:
-	ServerWindow *_win;
-	Decorator *_decorator;
-	int32 _flags;
-	BRect _clientframe;
-	int32 _mbuttons,
-		_kmodifiers;
-	int32 _serverfeel;
-	BPoint fLastMousePosition;
-	bool _update;
-	bool _hresizewin,_vresizewin;
-	WinBorder *fMainWinBorder;
-	
-	BRegion *fDecFull,
-		*fDecFullVisible,
-		*fDecVisible;
-				
-	//BString *_title;
-/*	bool fIsMoving;
-	bool fIsResizing;
-	bool fIsClosing;
-	bool fIsMinimizing;
-	bool fIsZooming
+
+			ServerWindow		*_win;
+			//BString				*_title;
+			Decorator			*_decorator;
+			int32				_flags;
+			BRect				_clientframe;
+			int32				_mbuttons,
+								_kmodifiers;
+			BPoint				fLastMousePosition;
+			bool				_update;
+			bool				_hresizewin,_vresizewin;
+
+			BRegion				*fDecFull,
+								*fDecFullVisible,
+								*fDecVisible;
+
+			WinBorder*			fMainWinBorder;
+/*			bool				fIsMoving;
+			bool				fIsResizing;
+			bool				fIsClosing;
+			bool				fIsMinimizing;
+			bool				fIsZooming
 */
 };
 
