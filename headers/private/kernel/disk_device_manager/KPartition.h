@@ -69,6 +69,7 @@ public:
 
 	void SetStatus(uint32 status);
 	uint32 Status() const;
+	bool IsUninitialized() const;
 	
 	void SetFlags(uint32 flags);	// comprises the ones below
 	void AddFlags(uint32 flags);

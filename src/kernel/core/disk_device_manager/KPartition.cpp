@@ -314,6 +314,13 @@ KPartition::Status() const
 	return fPartitionData.status;
 }
 
+// IsUninitialized
+bool
+KPartition::IsUninitialized() const
+{
+	return (Status() == B_PARTITION_UNINITIALIZED);
+}
+
 // SetFlags
 void
 KPartition::SetFlags(uint32 flags)
