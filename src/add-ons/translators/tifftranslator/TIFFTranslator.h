@@ -43,6 +43,10 @@
 #include <fs_attr.h>
 #include "DecodeTree.h"
 
+// IO Extension Names:
+#define DOCUMENT_COUNT "/documentCount"
+#define DOCUMENT_INDEX "/documentIndex"
+
 #define TIFF_TRANSLATOR_VERSION 100
 
 #define TIFF_IN_QUALITY 0.1
@@ -142,8 +146,8 @@ private:
 	ssize_t decode_t4(BitReader &stream, TiffDetails &details, 
 		uint8 *pbits, bool bfirstLine);
 	
-	status_t translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
-		uint8 *read, swap_action swp, uint32 outType,
+	status_t translate_from_tiff(BPositionIO *inSource, BMessage *ioExtension, 
+		ssize_t amtread, uint8 *read, swap_action swp, uint32 outType,
 		BPositionIO *outDestination);
 	
 	DecodeTree *fpblackTree;

@@ -11,6 +11,7 @@ Translator TIFFTranslator :
 	TiffUintField.cpp
 	TiffUnknownField.cpp
 	TiffIfd.cpp
+	TiffIfdList.cpp
 	TIFFMain.cpp
 	TIFFTranslator.cpp
 	TIFFView.cpp

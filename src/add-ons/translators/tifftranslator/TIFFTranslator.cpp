@@ -34,6 +34,7 @@
 #include "TIFFTranslator.h"
 #include "TIFFView.h"
 #include "TiffIfd.h"
+#include "TiffIfdList.h"
 #include "StreamBuffer.h"
 #include "BitReader.h"
 
@@ -432,7 +433,7 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 					ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 1)
 					return B_NO_TRANSLATOR;
 				
-				// Only 1D and fill byte boundery t4options are
+				// Only 1D and fill byte boundary t4options are
 				// supported
 				if (ifd.HasField(TAG_T4_OPTIONS))
 					t4options = ifd.GetUint(TAG_T4_OPTIONS);
@@ -660,8 +661,8 @@ copy_tiff_name(char *strname, TiffDetails *pdetails, swap_action swp)
 }
 
 status_t
-identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
-	ssize_t amtread, uint8 *read, swap_action swp,
+identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
+	translator_info *outInfo, ssize_t amtread, uint8 *read, swap_action swp,
 	TiffDetails *pdetails = NULL)
 {
 	if (amtread != 4)
@@ -678,16 +679,33 @@ identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
 		// swap_data() error
 		return B_ERROR;
 	}
-	TiffIfd ifd(firstIFDOffset, *inSource, swp);
+	TiffIfdList ifdlist(firstIFDOffset, *inSource, swp);
 	
 	status_t initcheck;
-	initcheck = ifd.InitCheck();
+	initcheck = ifdlist.InitCheck();
 		
 	// Read in some fields in order to determine whether or not
 	// this particular TIFF image is supported by this translator
 	
 	// Check the required fields
 	if (initcheck == B_OK) {
+	
+		int32 document_count, document_index = 1;
+		document_count = ifdlist.GetCount();
+		
+		if (ioExtension) {
+			// Add page count to ioExtension
+			ioExtension->RemoveName(DOCUMENT_COUNT);
+			ioExtension->AddInt32(DOCUMENT_COUNT, document_count);
+			
+			// Check if a document index has been specified	
+			ioExtension->FindInt32(DOCUMENT_INDEX, &document_index);
+			if (document_index < 1 || document_index > document_count)
+				return B_NO_TRANSLATOR;
+		}
+			
+		// Identify the page the user asked for
+		TiffIfd *pifd = ifdlist.GetIfd(document_index - 1);
 			
 		bool bAllocArrays = true;
 		TiffDetails localdetails;
@@ -696,7 +714,7 @@ identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
 			pdetails = &localdetails;
 		}
 		status_t result;
-		result = check_tiff_fields(ifd, pdetails, bAllocArrays);
+		result = check_tiff_fields(*pifd, pdetails, bAllocArrays);
 		
 		if (result == B_OK && outInfo) {
 			outInfo->type = B_TIFF_FORMAT;
@@ -823,7 +841,7 @@ TIFFTranslator::Identify(BPositionIO *inSource,
 			return B_NO_TRANSLATOR;
 		}
 		
-		return identify_tiff_header(inSource, outInfo, 4, ch, swp);
+		return identify_tiff_header(inSource, ioExtension, outInfo, 4, ch, swp);
 	}
 }
 
@@ -1144,8 +1162,9 @@ TIFFTranslator::decode_huffman(StreamBuffer *pstreambuf, TiffDetails &details,
 }
 
 status_t
-TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
-	uint8 *read, swap_action swp, uint32 outType, BPositionIO *outDestination)
+TIFFTranslator::translate_from_tiff(BPositionIO *inSource,
+	BMessage *ioExtension, ssize_t amtread, uint8 *read, swap_action swp,
+	uint32 outType,	BPositionIO *outDestination)
 {
 	// Can only output to bits for now
 	if (outType != B_TRANSLATOR_BITMAP)
@@ -1154,7 +1173,7 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 	status_t result;
 	
 	TiffDetails details;
-	result = identify_tiff_header(inSource, NULL,
+	result = identify_tiff_header(inSource, ioExtension, NULL,
 		amtread, read, swp, &details);
 	if (result == B_OK) {
 		// If the TIFF is supported by this translator
@@ -1415,7 +1434,7 @@ TIFFTranslator::Translate(BPositionIO *inSource,
 			return B_NO_TRANSLATOR;
 		}
 		
-		return translate_from_tiff(inSource, 4, ch, swp, outType,
+		return translate_from_tiff(inSource, ioExtension, 4, ch, swp, outType,
 			outDestination);
 	}
 }
