@@ -32,17 +32,35 @@ static void nv_start_dma(void);
 static status_t nv_acc_fifofree_dma(uint16 cmd_size);
 static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size);
 
+/* used to track engine DMA stalls */
+static uint8 err;
+
+/* wait until engine completely idle */
 status_t nv_acc_wait_idle_dma()
 {
-	/* wait until engine completely idle */
+	/* we'd better check for timeouts on the DMA engine as it's theoretically
+	 * breakable by malfunctioning software */
+	uint16 cnt = 0;
 
-	/* wait until all upcoming commands are in execution at least */
-	while (NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
+	/* wait until all upcoming commands are in execution at least. Do this until
+	 * we hit a timeout; abort if we failed at least three times before:
+	 * if DMA stalls, we have to forget about it alltogether at some point, or
+	 * the system will almost come to a complete halt.. */
+	while ((NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
 			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])
-			!= (si->engine.dma.put << 2))
+			!= (si->engine.dma.put << 2)) &&
+			(cnt < 10000) && (err < 3))
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (100);
+		cnt++;
+	}
+
+	/* log timeout if we had one */
+	if (cnt == 10000)
+	{
+		err++;
+		LOG(4,("ACC_DMA: wait_idle DMA timeout #%d, engine trouble!\n", err));
 	}
 
 	/* wait until execution completed */
@@ -61,6 +79,8 @@ status_t nv_acc_init_dma()
 {
 	uint16 cnt;
 	uint32 surf_depth, patt_depth;
+	/* reset the engine DMA stalls counter */
+	err = 0;
 
 	/* a hanging engine only recovers from a complete power-down/power-up cycle */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
@@ -755,7 +775,7 @@ status_t nv_acc_init_dma()
 		patt_depth = 0x00000003;
 		break;
 	default:
-		LOG(8,("ACC: init, invalid bit depth\n"));
+		LOG(8,("ACC_DMA: init, invalid bit depth\n"));
 		return B_ERROR;
 	}
 
