@@ -84,6 +84,7 @@ class DataEditor : public BLocker {
 		entry_ref	fRef;
 		BFile		fFile;
 		const char	*fAttribute;
+		type_code	fType;
 		bool		fIsDevice, fIsReadOnly;
 		off_t		fRealSize, fSize;
 

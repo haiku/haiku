@@ -9,6 +9,7 @@
 #include <Autolock.h>
 #include <NodeMonitor.h>
 #include <Drivers.h>
+#include <fs_attr.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -203,9 +204,22 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 	fFile.GetStat(&stat);
 	fIsDevice = (stat.st_mode & (S_IFBLK | S_IFCHR)) != 0;
 
+	if (attribute != NULL)
+		fAttribute = strdup(attribute);
+	else
+		fAttribute = NULL;
+
 	fBlockSize = 512;
 
-	if (fIsDevice) {
+	if (IsAttribute()) {
+		attr_info info;
+		status = fFile.GetAttrInfo(fAttribute, &info);
+		if (status != B_OK)
+			return status;
+
+		fSize = info.size;
+		fType = info.type;
+	} else if (fIsDevice) {
 		// ToDo: is there any other possibility to issue a ioctl() from a BFile?
 		device_geometry geometry;
 		int device = fFile.Dup();
@@ -220,9 +234,6 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		fSize = 1LL * geometry.head_count * geometry.cylinder_count
 			* geometry.sectors_per_track * geometry.bytes_per_sector;
 		fBlockSize = geometry.bytes_per_sector;
-	} else if (IsAttribute()) {
-		// ToDo: add support for attributes!
-		fSize = 0;
 	} else {
 		status = fFile.GetSize(&fSize);
 		if (status < B_OK) {
@@ -230,11 +241,6 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 			return status;
 		}
 	}
-
-	if (attribute != NULL)
-		fAttribute = strdup(attribute);
-	else
-		fAttribute = NULL;
 
 	fView = NULL;
 	fRealViewOffset = 0;
@@ -476,7 +482,12 @@ DataEditor::SetBlockSize(size_t size)
 status_t 
 DataEditor::Update()
 {
-	ssize_t bytesRead = fFile.ReadAt(fRealViewOffset, fView, fRealViewSize);
+	ssize_t bytesRead;
+	if (IsAttribute())
+		bytesRead = fFile.ReadAttr(fAttribute, fType, fRealViewOffset, fView, fRealViewSize);
+	else
+		bytesRead = fFile.ReadAt(fRealViewOffset, fView, fRealViewSize);
+
 	if (bytesRead < B_OK)
 		return bytesRead;
 
