@@ -1,14 +1,12 @@
-#ifndef STACK_H
-#define STACK_H
-/* Stack - a template stack class
+#ifndef _TSTACK_H
+#define _TSTACK_H
+/* Stack - a template stack class, does not call any constructors/destructors
 **
 ** Copyright 2001 pinc Software. All Rights Reserved.
 ** This file may be used under the terms of the OpenBeOS License.
+**
+** 2002-03-10 Modified by Marcus Overhagen
 */
-
-
-#include <SupportDefs.h>
-
 
 template<class T> class Stack {
 	public:
@@ -26,20 +24,28 @@ template<class T> class Stack {
 				free(fArray);
 		}
 		
-		status_t Push(T value)
+		bool Push(const T & value)
 		{
 			if (fUsed >= fMax) {
 				fMax += 16;
-				T *newArray = (T *)realloc(fArray,fMax * sizeof(T));
+				T *newArray = (T *)realloc(fArray, fMax * sizeof(T));
 				if (newArray == NULL)
-					return B_NO_MEMORY;
+					return false;
 
 				fArray = newArray;
 			}
 			fArray[fUsed++] = value;
-			return B_OK;
+			return true;
 		}
 		
+		bool GetPointerAt(int32 index, T **value)
+		{
+			if (index < 0 || index >= fUsed) 
+				return false;
+			*value = &(fArray[index]);
+			return true;
+		}
+
 		bool Pop(T *value)
 		{
 			if (fUsed == 0)
@@ -49,10 +55,15 @@ template<class T> class Stack {
 			return true;
 		}
 		
+		int32 CountItems() const
+		{
+			return fUsed;
+		}
+		
 	private:
 		T		*fArray;
 		int32	fUsed;
 		int32	fMax;
 };
 
-#endif	/* STACK_H */
+#endif	/* TSTACK_H */
