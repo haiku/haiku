@@ -8,6 +8,7 @@ Server obos_registrar :
 	AppInfoList.cpp
 	ClipboardHandler.cpp
 	ClipboardTree.cpp
+	DiskDeviceManager.cpp
 	Event.cpp
 	EventMaskWatcher.cpp
 	EventQueue.cpp

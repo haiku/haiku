@@ -8,6 +8,7 @@
 #include <RegistrarDefs.h>
 
 #include "ClipboardHandler.h"
+#include "DiskDeviceManager.h"
 #include "EventQueue.h"
 #include "MessageEvent.h"
 #include "MessageRunnerManager.h"
@@ -36,6 +37,7 @@ Registrar::Registrar()
 		   fRoster(NULL),
 		   fClipboardHandler(NULL),
 		   fMIMEManager(NULL),
+		   fDiskDeviceManager(NULL),
 		   fEventQueue(NULL),
 		   fMessageRunnerManager(NULL),
 		   fSanityEvent(NULL)
@@ -57,6 +59,8 @@ Registrar::~Registrar()
 	delete fMessageRunnerManager;
 	delete fEventQueue;
 	delete fSanityEvent;
+	fDiskDeviceManager->Lock();
+	fDiskDeviceManager->Quit();
 	fMIMEManager->Lock();
 	fMIMEManager->Quit();
 	RemoveHandler(fClipboardHandler);
@@ -92,6 +96,15 @@ Registrar::MessageReceived(BMessage *message)
 		{
 			PRINT(("B_REG_GET_CLIPBOARD_MESSENGER\n"));
 			BMessenger messenger(fClipboardHandler);
+			BMessage reply(B_REG_SUCCESS);
+			reply.AddMessenger("messenger", messenger);
+			message->SendReply(&reply);
+			break;
+		}
+		case B_REG_GET_DISK_DEVICE_MESSENGER:
+		{
+			PRINT(("B_REG_GET_DISK_DEVICE_MESSENGER\n"));
+			BMessenger messenger(NULL, fDiskDeviceManager);
 			BMessage reply(B_REG_SUCCESS);
 			reply.AddMessenger("messenger", messenger);
 			message->SendReply(&reply);
@@ -213,6 +226,9 @@ Registrar::ReadyToRun()
 	// create MIME manager
 	fMIMEManager = new MIMEManager;
 	fMIMEManager->Run();
+	// create disk device manager
+	fDiskDeviceManager = new DiskDeviceManager;
+	fDiskDeviceManager->Run();
 	// create message runner manager
 	fEventQueue = new EventQueue(kEventQueueName);
 	fMessageRunnerManager = new MessageRunnerManager(fEventQueue);

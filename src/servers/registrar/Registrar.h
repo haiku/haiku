@@ -29,6 +29,7 @@
 #include <Application.h>
 
 class ClipboardHandler;
+class DiskDeviceManager;
 class EventQueue;
 class MessageEvent;
 class MessageRunnerManager;
@@ -55,6 +56,7 @@ private:
 	BPrivate::TRoster		*fRoster;
 	ClipboardHandler		*fClipboardHandler;
 	MIMEManager				*fMIMEManager;
+	DiskDeviceManager		*fDiskDeviceManager;
 	EventQueue				*fEventQueue;
 	MessageRunnerManager	*fMessageRunnerManager;
 	MessageEvent			*fSanityEvent;
