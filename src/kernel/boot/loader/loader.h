@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 #ifndef LOADER_H
@@ -12,6 +12,5 @@
 extern bool is_bootable(Directory *volume);
 extern status_t load_kernel(stage2_args *args, Directory *volume);
 extern status_t load_modules(stage2_args *args, Directory *volume);
-extern void start_kernel();
 
 #endif	/* LOADER_H */

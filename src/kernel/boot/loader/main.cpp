@@ -25,6 +25,7 @@
 
 
 kernel_args gKernelArgs;
+addr_t gKernelEntry;
 
 
 extern "C" int
@@ -96,7 +97,7 @@ main(stage2_args *args)
 			load_modules(args, volume);
 
 			// ToDo: cleanup, heap_release() etc.
-			start_kernel();
+			platform_start_kernel();
 		}
 	}
 

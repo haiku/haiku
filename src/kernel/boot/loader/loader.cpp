@@ -65,6 +65,8 @@ load_kernel(stage2_args *args, Directory *volume)
 
 	puts("kernel loaded successfully");
 
+	gKernelEntry = image.elf_header.e_entry;
+
 /*	void *cookie;
 	if (volume->Open(&cookie, O_RDONLY) == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
@@ -82,7 +84,7 @@ load_modules(stage2_args *args, Directory *volume)
 {
 	// we don't have readdir() & co. yet...
 
-	int fd = open_from(volume, "beos/system/add-ons/boot", O_RDONLY);
+	int fd = open_from(volume, "beos/system/add-ons/kernel/boot", O_RDONLY);
 	if (fd < B_OK)
 		return fd;
 
@@ -100,13 +102,5 @@ load_modules(stage2_args *args, Directory *volume)
 	}
 
 	return B_OK;
-}
-
-
-void
-start_kernel()
-{
-	// shouldn't return...
-	panic("starting the kernel is not yet implemented :)");
 }
 
