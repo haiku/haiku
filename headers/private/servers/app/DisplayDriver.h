@@ -29,7 +29,7 @@
 #ifndef _DISPLAY_DRIVER_H_
 #define _DISPLAY_DRIVER_H_
 
-#include <GraphicsCard.h>
+#include <Accelerant.h>
 #include <OS.h>
 
 #include <View.h>
