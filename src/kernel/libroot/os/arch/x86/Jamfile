@@ -1,9 +1,15 @@
 SubDir OBOS_TOP src kernel libroot os arch x86 ;
 
-KernelObjects
+KernelMergeObject os_arch_$(OBOS_ARCH).o :
 	<$(SOURCE_GRIST)>atomic.S
 	<$(SOURCE_GRIST)>cpuid.S
 	:
 	-fPIC -DPIC
+	;
+
+MergeObjectFromObjects kernel_os_arch_$(OBOS_ARCH).o :
+	# ToDo: remove atomic_xxx() functions from the kernel's libx86.a
+	#<$(SOURCE_GRIST)>atomic.o
+	<$(SOURCE_GRIST)>cpuid.o
 	;
 

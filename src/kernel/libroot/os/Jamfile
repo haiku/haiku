@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src kernel libroot os ;
 
-KernelObjects
+KernelMergeObject os_main.o :
 	<$(SOURCE_GRIST)>area.c
 	<$(SOURCE_GRIST)>debug.c
 	<$(SOURCE_GRIST)>fs_attr.c

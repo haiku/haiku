@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src kernel libroot posix math ;
 
-KernelObjects 
+KernelMergeObject posix_math.o :
 	<$(SOURCE_GRIST)>acosh.c
 	<$(SOURCE_GRIST)>asincos.c
 	<$(SOURCE_GRIST)>asinh.c

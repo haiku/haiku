@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src kernel libroot posix stdio ;
 
-KernelObjects 
+KernelMergeObject posix_stdio.o :
 	<$(SOURCE_GRIST)>fclose.c
 	<$(SOURCE_GRIST)>feof.c
  	<$(SOURCE_GRIST)>fflush.c
@@ -23,7 +23,6 @@ KernelObjects
 	<$(SOURCE_GRIST)>getchar.c
 	<$(SOURCE_GRIST)>gets.c
 	<$(SOURCE_GRIST)>getw.c
-	<$(SOURCE_GRIST)>kvsprintf.c
  	<$(SOURCE_GRIST)>makebuf.c
 	<$(SOURCE_GRIST)>printf.c
 	<$(SOURCE_GRIST)>putc.c
@@ -46,3 +45,10 @@ KernelObjects
 	:
 	-fPIC -DPIC
 	;
+
+KernelMergeObject kernel_posix_stdio.o :
+	<$(SOURCE_GRIST)>kvsprintf.c
+	:
+	-fPIC -DPIC
+	;
+
