@@ -15,6 +15,6 @@ heap_init(struct stage2_args *args)
 
 
 extern "C" void
-heap_release(void)
+heap_release(struct stage2_args *args)
 {
 }

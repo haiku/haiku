@@ -35,7 +35,7 @@ get_device(const char *path, Node **_device)
 
 
 static status_t
-add_device(const char *path, struct list *list)
+add_device(const char *path, NodeList *list)
 {
 	Node *device;
 	status_t status = get_device(path, &device);
@@ -43,14 +43,14 @@ add_device(const char *path, struct list *list)
 		return status;
 
 	printf("add \"%s\" to list of boot devices\n", path);
-	list_add_item(list, device);
+	list->Add(device);
 
 	return B_OK;
 }
 
 
 static status_t
-recursive_add_device(const char *path, struct list *list)
+recursive_add_device(const char *path, NodeList *list)
 {
 	DIR *dir = opendir(path);
 	if (dir == NULL)
@@ -91,11 +91,12 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 
 
 status_t
-platform_get_boot_partition(struct stage2_args *args, struct list *list,
+platform_get_boot_partition(struct stage2_args *args, NodeList *list,
 	boot::Partition **_partition)
 {
+	NodeIterator iterator = list->Iterator();
 	boot::Partition *partition = NULL;
-	while ((partition = (boot::Partition *)list_get_next_item(list, partition)) != NULL) {
+	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
 		// just take the first partition
 		*_partition = partition;
 		return B_OK;
@@ -106,7 +107,7 @@ platform_get_boot_partition(struct stage2_args *args, struct list *list,
 
 
 status_t
-platform_add_block_devices(struct stage2_args *args, struct list *list)
+platform_add_block_devices(struct stage2_args *args, NodeList *list)
 {
 	recursive_add_device("/dev/disk/ide", list);
 	recursive_add_device("/dev/disk/scsi", list);
