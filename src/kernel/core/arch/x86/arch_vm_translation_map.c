@@ -6,6 +6,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
@@ -51,7 +52,7 @@ static sem_id iospace_full_sem;
 #define PAGE_INVALIDATE_CACHE_SIZE 64
 
 // vm_translation object stuff
-typedef struct vm_translation_map_arch_info_struct {
+typedef struct vm_translation_map_arch_info {
 	pdentry *pgdir_virt;
 	pdentry *pgdir_phys;
 	int num_invalidate_pages;
@@ -80,11 +81,18 @@ static spinlock tmap_list_lock;
 #define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
 
-static status_t vm_translation_map_quick_query(addr_t va, addr_t *out_physical);
+static status_t early_query(addr_t va, addr_t *out_physical);
 static status_t get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags);
 static status_t put_physical_page_tmap(addr_t va);
 
 static void flush_tmap(vm_translation_map *map);
+
+
+void *
+i386_translation_map_get_pgdir(vm_translation_map *map)
+{
+	return map->arch_data->pgdir_phys;
+}
 
 
 static void
@@ -114,6 +122,30 @@ _update_all_pgdirs(int index, pdentry e)
 
 	release_spinlock(&tmap_list_lock);
 	restore_interrupts(state);
+}
+
+
+// XXX currently assumes this translation map is active
+
+static status_t
+early_query(addr_t va, addr_t *out_physical)
+{
+	ptentry *pentry;
+
+	if (page_hole_pgdir[VADDR_TO_PDENT(va)].present == 0) {
+		// no pagetable here
+		return ERR_VM_PAGE_NOT_PRESENT;
+	}
+
+	pentry = page_hole + va / PAGE_SIZE;
+	if (pentry->present == 0) {
+		// page mapping not valid
+		return ERR_VM_PAGE_NOT_PRESENT;
+	}
+
+	*out_physical = pentry->addr << 12;
+
+	return 0;
 }
 
 
@@ -630,50 +662,59 @@ static vm_translation_map_ops tmap_ops = {
 };
 
 
-int
-vm_translation_map_create(vm_translation_map *new_map, bool kernel)
+//	#pragma mark -
+//	VM API
+
+
+status_t
+arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 {
-	if (new_map == NULL)
-		return EINVAL;
+	if (map == NULL)
+		return B_BAD_VALUE;
 
 	TRACE(("vm_translation_map_create\n"));
 
 	// initialize the new object
-	new_map->ops = &tmap_ops;
-	new_map->map_count = 0;
+	map->ops = &tmap_ops;
+	map->map_count = 0;
 
-	// ToDo: lock creation fails at this point during the boot process!
-	// (it will boot anyway, for now, the return code was wrong previously...)
-	if (recursive_lock_init(&new_map->lock, "vm tm rlock") < 0)
-		dprintf("vm_translation_map_create(): creating lock failed - continuing...");
+	if (!kernel) {
+		// During the boot process, there are no semaphores available at this
+		// point, so we only try to create the translation map lock if we're
+		// initialize a user translation map.
+		// vm_translation_map_init_kernel_map_post_sem() is used to complete
+		// the kernel translation map.
+		if (recursive_lock_init(&map->lock, "translation map") < B_OK)
+			return map->lock.sem;
+	}
 
-	new_map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
-	if (new_map == NULL) {
-		recursive_lock_destroy(&new_map->lock);
+	map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
+	if (map == NULL) {
+		recursive_lock_destroy(&map->lock);
 		return B_NO_MEMORY;
 	}
 
-	new_map->arch_data->num_invalidate_pages = 0;
+	map->arch_data->num_invalidate_pages = 0;
 
 	if (!kernel) {
 		// user
 		// allocate a pgdir
-		new_map->arch_data->pgdir_virt = memalign(B_PAGE_SIZE, B_PAGE_SIZE);
-		if (new_map->arch_data->pgdir_virt == NULL) {
-			free(new_map->arch_data);
-			recursive_lock_destroy(&new_map->lock);
+		map->arch_data->pgdir_virt = memalign(B_PAGE_SIZE, B_PAGE_SIZE);
+		if (map->arch_data->pgdir_virt == NULL) {
+			free(map->arch_data);
+			recursive_lock_destroy(&map->lock);
 			return B_NO_MEMORY;
 		}
-		vm_get_page_mapping(vm_get_kernel_aspace_id(), (addr_t)new_map->arch_data->pgdir_virt, (addr_t *)&new_map->arch_data->pgdir_phys);
+		vm_get_page_mapping(vm_get_kernel_aspace_id(), (addr_t)map->arch_data->pgdir_virt, (addr_t *)&map->arch_data->pgdir_phys);
 	} else {
 		// kernel
 		// we already know the kernel pgdir mapping
-		(addr_t)new_map->arch_data->pgdir_virt = kernel_pgdir_virt;
-		(addr_t)new_map->arch_data->pgdir_phys = kernel_pgdir_phys;
+		(addr_t)map->arch_data->pgdir_virt = kernel_pgdir_virt;
+		(addr_t)map->arch_data->pgdir_phys = kernel_pgdir_phys;
 	}
 
 	// zero out the bottom portion of the new pgdir
-	memset(new_map->arch_data->pgdir_virt + FIRST_USER_PGDIR_ENT, 0, NUM_USER_PGDIR_ENTS * sizeof(pdentry));
+	memset(map->arch_data->pgdir_virt + FIRST_USER_PGDIR_ENT, 0, NUM_USER_PGDIR_ENTS * sizeof(pdentry));
 
 	// insert this new map into the map list
 	{
@@ -681,45 +722,55 @@ vm_translation_map_create(vm_translation_map *new_map, bool kernel)
 		acquire_spinlock(&tmap_list_lock);
 
 		// copy the top portion of the pgdir from the current one
-		memcpy(new_map->arch_data->pgdir_virt + FIRST_KERNEL_PGDIR_ENT, kernel_pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
+		memcpy(map->arch_data->pgdir_virt + FIRST_KERNEL_PGDIR_ENT, kernel_pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
 			NUM_KERNEL_PGDIR_ENTS * sizeof(pdentry));
 
-		new_map->next = tmap_list;
-		tmap_list = new_map;
+		map->next = tmap_list;
+		tmap_list = map;
 
 		release_spinlock(&tmap_list_lock);
 		restore_interrupts(state);
 	}
 
-	return 0;
+	return B_OK;
 }
 
 
-int
-vm_translation_map_module_init(kernel_args *ka)
+status_t
+arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
 {
-	TRACE(("vm_translation_map_module_init: entry\n"));
+	if (recursive_lock_init(&map->lock, "translation map") < B_OK)
+		return map->lock.sem;
+
+	return B_OK;
+}
+
+
+status_t
+arch_vm_translation_map_init(kernel_args *args)
+{
+	TRACE(("vm_translation_map_init: entry\n"));
 
 	// page hole set up in stage2
-	page_hole = (ptentry *)ka->arch_args.page_hole;
+	page_hole = (ptentry *)args->arch_args.page_hole;
 	// calculate where the pgdir would be
-	page_hole_pgdir = (pdentry *)(((unsigned int)ka->arch_args.page_hole) + (PAGE_SIZE * 1024 - PAGE_SIZE));
+	page_hole_pgdir = (pdentry *)(((unsigned int)args->arch_args.page_hole) + (PAGE_SIZE * 1024 - PAGE_SIZE));
 	// clear out the bottom 2 GB, unmap everything
 	memset(page_hole_pgdir + FIRST_USER_PGDIR_ENT, 0, sizeof(pdentry) * NUM_USER_PGDIR_ENTS);
 
-	kernel_pgdir_phys = (pdentry *)ka->arch_args.phys_pgdir;
-	kernel_pgdir_virt = (pdentry *)ka->arch_args.vir_pgdir;
+	kernel_pgdir_phys = (pdentry *)args->arch_args.phys_pgdir;
+	kernel_pgdir_virt = (pdentry *)args->arch_args.vir_pgdir;
 
 	tmap_list_lock = 0;
 	tmap_list = NULL;
 
 	// allocate some space to hold physical page mapping info
-	paddr_desc = (paddr_chunk_desc *)vm_alloc_from_ka_struct(ka,
+	paddr_desc = (paddr_chunk_desc *)vm_alloc_from_kernel_args(args,
 		sizeof(paddr_chunk_desc) * 1024, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	num_virtual_chunks = IOSPACE_SIZE / IOSPACE_CHUNK_SIZE;
-	virtual_pmappings = (paddr_chunk_desc **)vm_alloc_from_ka_struct(ka,
+	virtual_pmappings = (paddr_chunk_desc **)vm_alloc_from_kernel_args(args,
 		sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	iospace_pgtables = (ptentry *)vm_alloc_from_ka_struct(ka,
+	iospace_pgtables = (ptentry *)vm_alloc_from_kernel_args(args,
 		PAGE_SIZE * (IOSPACE_SIZE / (PAGE_SIZE * 1024)), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("paddr_desc %p, virtual_pmappings %p, iospace_pgtables %p\n",
@@ -747,34 +798,34 @@ vm_translation_map_module_init(kernel_args *ka)
 
 		virt_pgtable = (addr_t)iospace_pgtables;
 		for (i = 0; i < (IOSPACE_SIZE / (PAGE_SIZE * 1024)); i++, virt_pgtable += PAGE_SIZE) {
-			vm_translation_map_quick_query(virt_pgtable, &phys_pgtable);
+			early_query(virt_pgtable, &phys_pgtable);
 			e = &page_hole_pgdir[(IOSPACE_BASE / (PAGE_SIZE * 1024)) + i];
 			put_pgtable_in_pgdir(e, phys_pgtable, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		}
 	}
 
-	TRACE(("vm_translation_map_module_init: done\n"));
+	TRACE(("vm_translation_map_init: done\n"));
 
 	return 0;
 }
 
 
-void
-vm_translation_map_module_init_post_sem(kernel_args *ka)
+status_t
+arch_vm_translation_map_init_post_sem(kernel_args *args)
 {
 	mutex_init(&iospace_mutex, "iospace_mutex");
 	iospace_full_sem = create_sem(1, "iospace_full_sem");
 }
 
 
-int
-vm_translation_map_module_init2(kernel_args *ka)
+status_t
+arch_vm_translation_map_init_post_area(kernel_args *args)
 {
 	// now that the vm is initialized, create a region that represents
 	// the page hole
 	void *temp;
 
-	TRACE(("vm_translation_map_module_init2: entry\n"));
+	TRACE(("vm_translation_map_init_post_area: entry\n"));
 
 	// unmap the page hole hack we were using before
 	kernel_pgdir_virt[1023].present = 0;
@@ -800,14 +851,14 @@ vm_translation_map_module_init2(kernel_args *ka)
 		B_EXACT_ADDRESS, B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)),
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	TRACE(("vm_translation_map_module_init2: creating iospace\n"));
+	TRACE(("vm_translation_map_init_post_area: creating iospace\n"));
 	temp = (void *)IOSPACE_BASE;
 	vm_create_null_region(vm_get_kernel_aspace_id(), "iospace", &temp,
 		B_EXACT_ADDRESS, IOSPACE_SIZE);
 
-	TRACE(("vm_translation_map_module_init2: done\n"));
+	TRACE(("vm_translation_map_init_post_area: done\n"));
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -818,12 +869,12 @@ vm_translation_map_module_init2(kernel_args *ka)
 // into a 4 MB region. It's only used here, and is later unmapped.
 
 status_t
-vm_translation_map_quick_map(kernel_args *ka, addr_t va, addr_t pa,
+arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
 {
 	int index;
 
-	TRACE(("quick_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
+	TRACE(("early_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
 
 	// check to see if a page table exists for this range
 	index = VADDR_TO_PDENT(va);
@@ -831,11 +882,11 @@ vm_translation_map_quick_map(kernel_args *ka, addr_t va, addr_t pa,
 		addr_t pgtable;
 		pdentry *e;
 		// we need to allocate a pgtable
-		pgtable = get_free_page(ka);
+		pgtable = get_free_page(args);
 		// pgtable is in pages, convert to physical address
 		pgtable *= PAGE_SIZE;
 
-		TRACE(("quick_map: asked for free page for pgtable. 0x%lx\n", pgtable));
+		TRACE(("early_map: asked for free page for pgtable. 0x%lx\n", pgtable));
 
 		// put it in the pgdir
 		e = &page_hole_pgdir[index];
@@ -849,37 +900,6 @@ vm_translation_map_quick_map(kernel_args *ka, addr_t va, addr_t pa,
 
 	arch_cpu_invalidate_TLB_range(va, va);
 
-	return 0;
-}
-
-
-// XXX currently assumes this translation map is active
-
-static status_t
-vm_translation_map_quick_query(addr_t va, addr_t *out_physical)
-{
-	ptentry *pentry;
-
-	if (page_hole_pgdir[VADDR_TO_PDENT(va)].present == 0) {
-		// no pagetable here
-		return ERR_VM_PAGE_NOT_PRESENT;
-	}
-
-	pentry = page_hole + va / PAGE_SIZE;
-	if (pentry->present == 0) {
-		// page mapping not valid
-		return ERR_VM_PAGE_NOT_PRESENT;
-	}
-
-	*out_physical = pentry->addr << 12;
-
-	return 0;
-}
-
-
-void *
-i386_translation_map_get_pgdir(vm_translation_map *map)
-{
-	return map->arch_data->pgdir_phys;
+	return B_OK;
 }
 
