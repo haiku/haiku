@@ -375,8 +375,19 @@ DisplayDriverPainter::FillRegion(BRegion& r, const DrawData *d)
 
 // FillRoundRect
 void
-DisplayDriverPainter::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const DrawData *d)
+DisplayDriverPainter::FillRoundRect(const BRect &r,
+									const float &xrad, const float &yrad,
+									const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+		fPainter->FillRoundRect(r, xrad, yrad);
+
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // FillShape
@@ -386,6 +397,12 @@ DisplayDriverPainter::FillShape(const BRect &bounds,
 								const int32 &ptcount, const BPoint *ptlist,
 								const DrawData *d)
 {
+	if (Lock()) {
+
+printf("DisplayDriverPainter::FillShape() - what is this stuff that gets passed here?\n");
+
+		Unlock();
+	}
 }
 
 // FillTriangle
@@ -393,6 +410,15 @@ void
 DisplayDriverPainter::FillTriangle(BPoint *pts, const BRect &bounds,
 								   const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+		fPainter->FillTriangle(pts[0], pts[1], pts[2]);
+
+		fGraphicsCard->Invalidate(bounds);
+
+		Unlock();
+	}
 }
 
 // StrokeArc
@@ -400,18 +426,58 @@ void
 DisplayDriverPainter::StrokeArc(const BRect &r, const float &angle,
 								const float &span, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+
+		float xRadius = r.Width() / 2.0;
+		float yRadius = r.Width() / 2.0;
+		BPoint center(r.left + xRadius,
+					  r.top + yRadius);
+
+		fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
+
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // StrokeBezier
 void
 DisplayDriverPainter::StrokeBezier(BPoint *pts, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+
+		fPainter->StrokeBezier(pts);
+
+		// TODO: Invalidate
+
+		Unlock();
+	}
 }
 
 // StrokeEllipse
 void
 DisplayDriverPainter::StrokeEllipse(const BRect &r, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+
+		float xRadius = r.Width() / 2.0;
+		float yRadius = r.Width() / 2.0;
+		BPoint center(r.left + xRadius,
+					  r.top + yRadius);
+
+		fPainter->StrokeEllipse(center, xRadius, yRadius);
+
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // StrokeLine
@@ -466,8 +532,17 @@ DisplayDriverPainter::StrokePoint(const BPoint& pt, const DrawData *d)
 void
 DisplayDriverPainter::StrokePolygon(BPoint *ptlist, int32 numpts,
 									const BRect &bounds, const DrawData *d,
-									bool is_closed)
+									bool closed)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+		fPainter->StrokePolygon(ptlist, numpts, closed);
+
+		fGraphicsCard->Invalidate(bounds);
+
+		Unlock();
+	}
 }
 
 // StrokeRect
@@ -528,6 +603,15 @@ void
 DisplayDriverPainter::StrokeRoundRect(const BRect &r, const float &xrad,
 									  const float &yrad, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+		fPainter->StrokeRoundRect(r, xrad, yrad);
+
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // StrokeShape
@@ -536,6 +620,12 @@ DisplayDriverPainter::StrokeShape(const BRect &bounds, const int32 &opcount,
 								  const int32 *oplist, const int32 &ptcount,
 								  const BPoint *ptlist, const DrawData *d)
 {
+	if (Lock()) {
+
+printf("DisplayDriverPainter::StrokeShape() - what is this stuff that gets passed here?\n");
+
+		Unlock();
+	}
 }
 
 // StrokeTriangle
@@ -543,6 +633,15 @@ void
 DisplayDriverPainter::StrokeTriangle(BPoint *pts, const BRect &bounds,
 									 const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+		fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
+
+		fGraphicsCard->Invalidate(bounds);
+
+		Unlock();
+	}
 }
 
 // DrawString
@@ -660,19 +759,26 @@ DisplayDriverPainter::GetTruncatedStrings(const char **instrings,
 bool
 DisplayDriverPainter::Lock(bigtime_t timeout)
 {
+	bool success = false;
 	// NOTE: I'm hoping I don't change the semantics and implications of
 	// the original implementation, but I need the locker to be somewhere
 	// else in order to serialize only the access to the back buffer
-	if (timeout == B_INFINITE_TIMEOUT)
-		return fGraphicsCard->Lock();
+	if (timeout == B_INFINITE_TIMEOUT) {
+		success = fGraphicsCard->Lock();
+//printf("DisplayDriverPainter::Lock()\n");
+	} else {
+		success = (fGraphicsCard->LockWithTimeout(timeout) >= B_OK) ? true : false;
+//printf("DisplayDriverPainter::LockWithTimeout(): %d\n", success);
+	}
 	
-	return (fGraphicsCard->LockWithTimeout(timeout) >= B_OK) ? true : false;
+	return success;
 }
 
 // Unlock
 void
 DisplayDriverPainter::Unlock()
 {
+//printf("DisplayDriverPainter::Unlock()\n");
 	fGraphicsCard->Unlock();
 }
 
@@ -684,6 +790,8 @@ DisplayDriverPainter::SetMode(const display_mode &mode)
 		fPainter->AttachToBuffer(fGraphicsCard->BackBuffer());
 		DisplayDriver::SetMode(mode);
 		Unlock();
+	} else {
+		fprintf(stderr, "DisplayDriverPainter::SetMode() - unsupported mode!\n");
 	}
 }
 
@@ -816,11 +924,12 @@ void DisplayDriverPainter::CopyToBitmap(ServerBitmap *target,
 // Invalidate
 void DisplayDriverPainter::Invalidate(const BRect &r)
 {
-	if (Lock()) {
+// the CursorHandler uses this, but we don't need right now, and it clutters debug output
+//	if (Lock()) {
 // ?!? Does this implementation need this?
-		fGraphicsCard->Invalidate(r);
-		Unlock();
-	}
+//		fGraphicsCard->Invalidate(r);
+//		Unlock();
+//	}
 }
 
 // ConstrainClippingRegion
