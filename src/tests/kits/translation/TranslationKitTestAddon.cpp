@@ -36,7 +36,7 @@
 #include "BitmapStreamTest.h"
 
 BTestSuite* getTestSuite() {
-	BTestSuite *suite = new BTestSuite("TranslatorRosterTest suite");
+	BTestSuite *suite = new BTestSuite("Translation");
 	suite->addTest("TranslatorRosterTest", TranslatorRosterTest::Suite());
 	suite->addTest("BitmapStreamTest", BitmapStreamTest::Suite());
 	return suite;
