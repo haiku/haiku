@@ -34,6 +34,7 @@ addr_t vm_page_num_free_pages(void);
 status_t vm_page_write_modified(vm_cache *cache);
 
 vm_page *vm_page_allocate_page(int state);
+status_t vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages);
 vm_page *vm_page_allocate_page_run(int state, addr_t length);
 vm_page *vm_page_allocate_specific_page(addr_t page_num, int state);
 vm_page *vm_lookup_page(addr_t page_num);
