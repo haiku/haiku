@@ -178,17 +178,17 @@ readSettings(struct sis_info *info)
 		return;
 
 	parameter = get_driver_parameter(handle, "duplex", "auto", "auto");
-	if (!stricmp(parameter, "full"))
+	if (!strcasecmp(parameter, "full"))
 		info->fixedMode = LINK_FULL_DUPLEX;
-	else if (!stricmp(parameter, "half"))
+	else if (!strcasecmp(parameter, "half"))
 		info->fixedMode = LINK_HALF_DUPLEX;
 
 	parameter = get_driver_parameter(handle, "speed", "auto", "auto");
-	if (!stricmp(parameter, "100"))
+	if (!strcasecmp(parameter, "100"))
 		info->fixedMode |= LINK_SPEED_100_MBIT;
-	else if (!stricmp(parameter, "10"))
+	else if (!strcasecmp(parameter, "10"))
 		info->fixedMode |= LINK_SPEED_10_MBIT;
-	else if (!stricmp(parameter, "1"))
+	else if (!strcasecmp(parameter, "1"))
 		info->fixedMode |= LINK_SPEED_HOME;
 
 	// it's either all or nothing
