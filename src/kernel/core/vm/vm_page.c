@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <arch/cpu.h>
 #include <vm.h>
@@ -49,71 +50,28 @@ static int vm_page_set_state_nolock(vm_page *page, int page_state);
 static void clear_page(addr pa);
 static int page_scrubber(void *);
 
-static bool gCheck = false;
-
-
-static void
-check_page_queue(const char *prefix, page_queue *queue)
-{
-	vm_page *page;
-	
-	if (!gCheck)
-		return;
-
-	for (page = queue->head; page; page = page->queue_next) {
-		if (page->queue_next == NULL && queue->tail != page)
-			panic("check_page: \"%s\", q = %p, page = %p\n", prefix, queue, page);
-	}
-}
-
 
 static vm_page *dequeue_page(page_queue *q)
 {
 	vm_page *page;
 
-	check_page_queue("dq1", q);
-//	dprintf("dequeue_page: q = %p, q->head = %p, q->tail = %p\n", q, q->head, q->tail);
-	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail)
-		panic("dequeue_page1: list at %p is corrupt (count = %d)\n", q, q->count);
-
 	page = q->tail;
 	if (page != NULL) {
-		if (page->queue_prev == NULL && q->head != page)
-			panic("dp: q = %p, page = %p, page->queue_prev == NULL, but q->head != page\n", q, page);
-		if (page->queue_next == NULL && q->tail != page)
-			panic("dp: q = %p, page = %p, page->queue_next == NULL, but q->tail != page\n", q, page);
-
-		if (q->head == page) {
-			dprintf("dequeue: q = %p, set head to NULL\n", q);
+		if (q->head == page)
 			q->head = NULL;
-		}
-		if (page->queue_prev != NULL) {
+		if (page->queue_prev != NULL)
 			page->queue_prev->queue_next = NULL;
-		}
+
 		q->tail = page->queue_prev;
 		q->count--;
-	} else if (q->head != NULL)
-		panic("dequeue_page: list %p is corrupt\n", q);
-
-	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail) {
-		dprintf("page = %p, page->prev = %p, page->next = %p\n", page, page->queue_prev, page->queue_next);
-		dprintf("q = %p, q->head = %p, q->tail = %p, q->count = %d\n", q, q->head, q->tail, q->count);
-		panic("dequeue_page2: list at %p is corrupt (count = %d)\n", q, q->count);
 	}
-
-	check_page_queue("dq2", q);
 
 	return page;
 }
 
+
 static void enqueue_page(page_queue *q, vm_page *page)
 {
-	check_page_queue("eq1", q);
-
-//	dprintf("enqueue_page: q = %p, q->head = %p, q->tail = %p\n", q, q->head, q->tail);
-	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail)
-		panic("enqueue_page: list at %p is corrupt (count = %d)\n", q, q->count);
-
 	if (q->head != NULL)
 		q->head->queue_prev = page;
 	page->queue_next = q->head;
@@ -122,44 +80,29 @@ static void enqueue_page(page_queue *q, vm_page *page)
 	if (q->tail == NULL)
 		q->tail = page;
 	q->count++;
+
 	if (q == &page_modified_queue) {
 		if (q->count == 1)
 			release_sem_etc(modified_pages_available, 1, B_DO_NOT_RESCHEDULE);
 	}
-
-	if (page->queue_prev == NULL && q->head != page)
-		panic("ep: q = %p, page = %p, page->queue_prev == NULL, but q->head != page\n", q, page);
-	if (page->queue_next == NULL && q->tail != page)
-		panic("ep: q = %p, page = %p, page->queue_next == NULL, but q->tail != page\n", q, page);
-
-	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail)
-		panic("enqueue_page: list at %p is corrupt (count = %d)\n", q, q->count);
-
-	check_page_queue("eq2", q);
 }
+
 
 static void remove_page_from_queue(page_queue *q, vm_page *page)
 {
-//	dprintf("remove_page: q = %p, q->head = %p, q->tail = %p\n", q, q->head, q->tail);
-	check_page_queue("rpq1", q);
-
-	if (page->queue_prev != NULL) {
+	if (page->queue_prev != NULL)
 		page->queue_prev->queue_next = page->queue_next;
-	} else {
+	else
 		q->head = page->queue_next;
-	}
-	if (page->queue_next != NULL) {
+
+	if (page->queue_next != NULL)
 		page->queue_next->queue_prev = page->queue_prev;
-	} else {
+	else
 		q->tail = page->queue_prev;
-	}
+
 	q->count--;
-
-	if ((q->head == NULL || q->tail == NULL) && q->head != q->tail)
-		panic("remove_page_from_queue: list at %p is corrupt (count = %d)\n", q, q->count);
-
-	check_page_queue("rpq2", q);
 }
+
 
 static void move_page_to_queue(page_queue *from_q, page_queue *to_q, vm_page *page)
 {
@@ -167,11 +110,8 @@ static void move_page_to_queue(page_queue *from_q, page_queue *to_q, vm_page *pa
 		remove_page_from_queue(from_q, page);
 		enqueue_page(to_q, page);
 	}
-	if ((from_q->head == NULL || from_q->tail == NULL) && from_q->head != from_q->tail)
-		panic("move_page_to_queue: from list at %p is corrupt (count = %d)\n", from_q, from_q->count);
-	if ((to_q->head == NULL || to_q->tail == NULL) && to_q->head != to_q->tail)
-		panic("move_page_to_queue: to list at %p is corrupt (count = %d)\n", to_q, to_q->count);
 }
+
 
 static int pageout_daemon()
 {
@@ -183,7 +123,7 @@ static int pageout_daemon()
 
 	dprintf("pageout daemon starting\n");
 
-	for(;;) {
+	for (;;) {
 		acquire_sem(modified_pages_available);
 
 		dprintf("here\n");
@@ -276,7 +216,7 @@ int vm_page_init(kernel_args *ka)
 		unsigned int last_phys_page = 0;
 
 		physical_page_offset = ka->phys_mem_range[0].start / PAGE_SIZE;
-		for(i=0; i<ka->num_phys_mem_ranges; i++) {
+		for (i = 0; i<ka->num_phys_mem_ranges; i++) {
 			last_phys_page = (ka->phys_mem_range[i].start + ka->phys_mem_range[i].size) / PAGE_SIZE - 1;
 		}
 		dprintf("first phys page = 0x%lx, last 0x%x\n", physical_page_offset, last_phys_page);
@@ -305,7 +245,6 @@ int vm_page_init(kernel_args *ka)
 		vm_mark_page_range_inuse(ka->phys_alloc_range[i].start / PAGE_SIZE,
 			ka->phys_alloc_range[i].size / PAGE_SIZE);
 	}
-	gCheck = true;
 
 	// set the global max_commit variable
 	vm_increase_max_commit(num_pages*PAGE_SIZE);
