@@ -190,46 +190,9 @@ const char *const module_paths[] = {
 
 #define num_module_paths (sizeof( module_paths ) / sizeof( module_paths[0] ))
 
-#define MODULES_HASH_SIZE 16
-
 /* the hash tables we use */
-void *module_files;
-void *modules_list;
-
-static int module_compare(void *a, const void *key)
-{
-	module *mod = a;
-	
-	return strcmp(mod->name, (const char*)key);
-}
-
-static unsigned int module_hash(void *a, const void *key, unsigned int range)
-{
-	module *module = a;
-
-	if (module != NULL )
-		return hash_hash_str(module->name) % range;
-	else
-		return hash_hash_str(key) % range;
-}
-
-static int mod_files_compare(void *a, const void *key)
-{
-	loaded_module *module = a;
-	const char *name = key;
-
-	return strcmp(module->path, name);
-}
-
-static unsigned int mod_files_hash(void *a, const void *key, unsigned int range)
-{
-	loaded_module *module = a;
-
-	if (module != NULL )
-		return hash_hash_str(module->path) % range;
-	else
-		return hash_hash_str(key) % range;
-}
+new_hash_table *module_files = NULL;
+new_hash_table *modules_list = NULL;
 
 /* load_module_file
  * Try to load the module file we've found into memory.
@@ -275,11 +238,8 @@ static module_info **load_module_file(const char *path)
 
 	recursive_lock_lock(&modules_lock);
 
-	/* NB NB NB The call to insque MUST be done before insertion into
-	 * the hash list 
-	 */
 	insque(lm, &loaded_modules);
-	hash_insert(module_files, lm);
+	hash_set(module_files, path, strlen(path), lm);
 
 	recursive_lock_unlock(&modules_lock);
 
@@ -289,10 +249,11 @@ static module_info **load_module_file(const char *path)
 static inline void unload_module_file(const char *path)
 {
 	loaded_module *themod; 
-	themod = (loaded_module*)hash_lookup(module_files, path);
-	if (!themod) {
+dprintf("unload_mdoule_file: %s\n", path);
+
+//	themod = (loaded_module*)hash_get(module_files, path, strlen(path));
+	if ((themod = (loaded_module*)hash_get(module_files, path, strlen(path))) == NULL)
 		return;
-	}
 
 	if (themod->ref_cnt != 0) {
 		dprintf("Can't unload %s due to ref_cnt = %d\n", themod->path, themod->ref_cnt);
@@ -300,13 +261,13 @@ static inline void unload_module_file(const char *path)
 	}
 
 	recursive_lock_lock(&modules_lock);
+
 	remque(themod);
-	hash_remove(module_files, themod);
+	hash_set(module_files, path, strlen(path), NULL);
 
 	recursive_lock_unlock(&modules_lock);
 
 	elf_unload_kspace(themod->path);
-	kfree(themod->path);
 	kfree(themod);
 }
 
@@ -322,21 +283,21 @@ static int simple_module_info(module_info *mod, const char *file, int offset)
 {
 	module *m;
 	
-	m = (module*)hash_lookup(modules_list, mod->name);
+	if (!mod->name)
+		return -1;
+
+	m = (module*)hash_get(modules_list, mod->name, strlen(mod->name));
 	if (m) {
 		dprintf("Duplicate module name (%s) detected...ignoring\n", mod->name);
 		return -1;
 	}
-		
-	if ((m = (module*)kmalloc(sizeof(module))) == NULL) {
+
+	if ((m = (module*)kmalloc(sizeof(module))) == NULL)
 		return -1;
-	}
-	if (!mod->name) {
-		return -1;
-	}
 	
 	SHOW_FLOW(3, "simple_module_info(%s, %s)\n", mod->name, file);
 	
+	dprintf("simple_module_info: '%s'\n", mod->name);
 	m->module = NULL; /* back pointer */
 	m->name = (char*)kmalloc(strlen(mod->name) + 1);
 	if (!m->name) {
@@ -357,11 +318,8 @@ static int simple_module_info(module_info *mod, const char *file, int offset)
 	recursive_lock_lock(&modules_lock);
 
 	/* Insert into linked list */
-	/* NB NB NB The call to insque MUST be done before insertion into
-	 * the hash list 
-	 */
 	insque(m, &known_modules);
-	hash_insert(modules_list, m);
+	hash_set(modules_list, mod->name, strlen(mod->name), m);
 
 	recursive_lock_unlock(&modules_lock);
 
@@ -393,7 +351,7 @@ static int recurse_check_file(const char *filepath, const char *module_wanted)
 		 * is this new module the one we're looking for?
 		 * module_wanted may be a NULL, which is why we check for it.
 		 */
-		if (simple_module_info(*chk, filepath, i++) == 0) {
+		if (simple_module_info((*chk), filepath, i++) == 0) {
 			if (module_wanted && strcmp((*chk)->name, module_wanted) == 0)
 				match = 1;
 		}
@@ -403,8 +361,10 @@ static int recurse_check_file(const char *filepath, const char *module_wanted)
 	 * the one we're looking for. Unload the module as we're not about to need
 	 * anything from it.
 	 */	
-	if (match != 1)
+	if (match != 1) {
+//		dprintf("unloading module file %s\n", filepath);
 		unload_module_file(filepath);
+	}
 
 	return match;
 }
@@ -471,7 +431,7 @@ static int recurse_directory(const char *path, const char *match)
 			 * not, it's a new file so we need to read in the
 			 * file details via recurse_file_check() function.
 			 */
-			if (hash_lookup(module_files, newpath) != NULL)
+			if (hash_get(module_files, newpath, strlen(newpath)) != NULL)
 				res = 0;
 			else
 				res = recurse_check_file(newpath, match);
@@ -505,7 +465,7 @@ static module *search_module(const char *name)
 		return NULL;
 	}
 	
-	return (module*)hash_lookup(modules_list, name);
+	return (module*)hash_get(modules_list, name, strlen(name));
 }
 
 
@@ -598,7 +558,7 @@ static inline int uninit_module(module *module)
 
 static int process_module_info(module_iterator *iter, char *buf, size_t *bufsize)
 {
-	module *m;
+	module *m = NULL;
 	module_info **mod;
 	int res = B_NO_ERROR;
 		
@@ -608,7 +568,7 @@ static int process_module_info(module_iterator *iter, char *buf, size_t *bufsize
 	} else {
 		res = simple_module_info(*mod, iter->cur_path, iter->module_pos++);
 		
-		m = (module*)hash_lookup(modules_list, (*mod)->name);
+		m = (module*)hash_get(modules_list, (*mod)->name, strlen((*mod)->name));
 		if (m) {
 			strlcpy(buf, m->name, *bufsize);
 			*bufsize = strlen(m->name);
@@ -951,11 +911,8 @@ int module_init( kernel_args *ka, module_info **sys_module_headers )
 	SHOW_FLOW0( 0, "\n" );
 	recursive_lock_create( &modules_lock );
 	
-	modules_list = hash_init(MODULES_HASH_SIZE, offsetof(module, next),
-                             module_compare, module_hash);
-		
-	module_files = hash_init(MODULES_HASH_SIZE, offsetof(loaded_module, next),
-	                         mod_files_compare, mod_files_hash);
+	modules_list = hash_make();
+	module_files = hash_make();
 	                         
 	if (modules_list == NULL || module_files == NULL)
 		return ENOMEM;
@@ -977,7 +934,7 @@ int module_init( kernel_args *ka, module_info **sys_module_headers )
 /* BeOS Compatibility... */
 int	get_module(const char *path, module_info **vec)
 {
-	module *m = (module *)hash_lookup(modules_list, path);
+	module *m = (module *)hash_get(modules_list, path, strlen(path));
 	loaded_module *lm;
 	int res = B_NO_ERROR;
 	*vec = NULL;
@@ -1006,12 +963,12 @@ int	get_module(const char *path, module_info **vec)
 	 * be in memory if we have just run search_modules, but may not be
 	 * if we are used cached information.
 	 */
-	lm = (loaded_module*)hash_lookup(module_files, m->file);
+	lm = (loaded_module*)hash_get(module_files, m->file, strlen(m->file));
 	if (!lm) {
 		if (load_module_file(m->file) == NULL)
 			return ENOENT;
 		
-		lm = (loaded_module*)hash_lookup(module_files, m->file);
+		lm = (loaded_module*)hash_get(module_files, m->file, strlen(m->file));
 		if (!lm)
 			return ENOENT;
 	}
@@ -1041,7 +998,7 @@ int	get_module(const char *path, module_info **vec)
 
 int put_module(const char *path)
 {
-	module *m = (module *)hash_lookup(modules_list, path);
+	module *m = (module *)hash_get(modules_list, path, strlen(path));
 	
 	if (!m) {
 		dprintf("We don't seem to have a reference to module %s\n", path);
