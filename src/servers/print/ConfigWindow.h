@@ -56,13 +56,17 @@ public:
 	
 	void MessageReceived(BMessage* m);
 
+	void FrameMoved(BPoint p);
+
+	static BRect GetWindowFrame();
+	static void SetWindowFrame(BRect frame);
+
 private:
 	void PrinterForMimeType();
 	void SetupPrintersMenu(BMenu* menu);
 	void UpdateAppSettings(const char* mime, const char* printer);
 	void UpdateSettings(bool read);
-	void PageSetup(BMessage* m);
-	void JobSetup(BMessage* m);
+	void Setup(config_setup_kind);
 
 	config_setup_kind fKind;
 	Printer*    fDefaultPrinter;

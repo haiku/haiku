@@ -37,10 +37,10 @@
 
 #include <String.h>
 
-class AppSettings : public Object {
+class AppSettings {
 private:
-	BString fMimeType;
-	BString fPrinter;
+	BString fMimeType; // application signature
+	BString fPrinter;  // printer used by application (default == empty string)
 
 public:
 	AppSettings(const char* mimeType, const char* printer = NULL);
@@ -53,11 +53,11 @@ public:
 };
 
 
-class PrinterSettings : public Object {
+class PrinterSettings {
 private:
 	BString  fPrinter;
-	BMessage fPageSettings;
-	BMessage fJobSettings;
+	BMessage fPageSettings; // default page settings
+	BMessage fJobSettings;  // default job settings
 
 public:
 	PrinterSettings(const char* printer, BMessage* pageSettings = NULL, BMessage* jobSettings = NULL);
@@ -65,6 +65,7 @@ public:
 	const char* GetPrinter() const       { return fPrinter.String(); }
 	BMessage* GetPageSettings()          { return &fPageSettings; }
 	BMessage* GetJobSettings()           { return &fJobSettings; }
+
 	void SetPrinter(const char* p)       { fPrinter = p; }
 	void SetPageSettings(BMessage* s)    { fPageSettings = *s; }
 	void SetJobSettings(BMessage* s)     { fJobSettings = *s; }
@@ -74,9 +75,11 @@ class Settings {
 private:
 	BObjectList<AppSettings>     fApps;
 	BObjectList<PrinterSettings> fPrinters;
+	bool                         fUseConfigWindow;
+	BRect                        fConfigWindowFrame;
 	
 	static Settings* fSingleton;
-	Settings() { }
+	Settings();
 	
 public:
 	static Settings* GetSettings();
@@ -93,6 +96,11 @@ public:
 	void AddPrinterSettings(PrinterSettings* s) { fPrinters.AddItem(s); }
 	void RemovePrinterSettings(int i);
 	PrinterSettings* FindPrinterSettings(const char* printer);
+	
+	bool UseConfigWindow() const       { return fUseConfigWindow; }
+	void SetUseConfigWindow(bool b)    { fUseConfigWindow = b; }
+	BRect ConfigWindowFrame() const    { return fConfigWindowFrame; }
+	void SetConfigWindowFrame(BRect r) { fConfigWindowFrame = r; }	
 		
 	void Save(BFile* settings_file);
 	void Load(BFile* settings_file);

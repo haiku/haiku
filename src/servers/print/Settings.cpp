@@ -57,17 +57,18 @@ PrinterSettings::PrinterSettings(const char* printer, BMessage* pageSettings, BM
 
 Settings* Settings::fSingleton = NULL;
 
+static const BRect kConfigWindowFrame(30, 30, 220, 120);
+
+Settings::Settings()
+	: fApps(true)     // owns AppSettings
+	, fPrinters(true) // owns PrinterSettings
+	, fUseConfigWindow(true)
+	, fConfigWindowFrame(kConfigWindowFrame)
+{
+}
+
 Settings::~Settings() {
 	fSingleton = NULL;
-	
-	for (int i = 0; i < AppSettingsCount(); i++) {
-		AppSettings* app = AppSettingsAt(i);
-		app->Release();	
-	}
-	for (int i = 0; i < PrinterSettingsCount(); i++) {
-		PrinterSettings* p = PrinterSettingsAt(i);
-		p->Release();
-	}
 }
 
 Settings* Settings::GetSettings() {
@@ -114,6 +115,9 @@ void Settings::Save(BFile* file) {
 		m.AddMessage("S", p->GetPageSettings());
 		m.AddMessage("J", p->GetJobSettings());
 	}
+	
+	m.AddBool("UseConfigWindow", fUseConfigWindow);
+	m.AddRect("ConfigWindowFrame", fConfigWindowFrame);
 	m.Flatten(file);
 }
 
@@ -133,5 +137,11 @@ void Settings::Load(BFile* file) {
 			m.FindMessage("J", i, &job) == B_OK; i ++) {
 			AddPrinterSettings(new PrinterSettings(printer.String(), &page, &job));
 		}
+		
+		if (m.FindBool("UseConfigWindow", &fUseConfigWindow) != B_OK)
+			fUseConfigWindow = true;
+		
+		if (m.FindRect("ConfigWindowFrame", &fConfigWindowFrame) != B_OK)
+			fConfigWindowFrame = BRect(kConfigWindowFrame);
 	}
 }

@@ -605,10 +605,16 @@ bool PrintServerApp::OpenSettings(BFile& file, bool forReading) {
 
 void PrintServerApp::LoadSettings() {
 	BFile file;
-	if (OpenSettings(file, true)) fSettings->Load(&file);
+	if (OpenSettings(file, true)) {
+		fSettings->Load(&file);
+		fUseConfigWindow = fSettings->UseConfigWindow();
+	}
 }
 
 void PrintServerApp::SaveSettings() {
 	BFile file;
-	if (OpenSettings(file, false)) fSettings->Save(&file);
+	if (OpenSettings(file, false)) {
+		fSettings->SetUseConfigWindow(fUseConfigWindow);
+		fSettings->Save(&file);
+	}
 }

@@ -44,7 +44,7 @@
 #include <Window.h>
 
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMessage* settings, AutoReply* sender)
-	: BWindow(BRect(30, 30, 200, 125), "Printer Setup", 
+	: BWindow(ConfigWindow::GetWindowFrame(), "Printer Setup", 
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 	, fKind(kind)
 	, fDefaultPrinter(defaultPrinter)
@@ -112,9 +112,9 @@ void ConfigWindow::Go() {
 
 void ConfigWindow::MessageReceived(BMessage* m) {
 	switch (m->what) {
-		case MSG_PAGE_SETUP: PageSetup(m);
+		case MSG_PAGE_SETUP: Setup(kPageSetup);
 			break;
-		case MSG_JOB_SETUP: JobSetup(m);
+		case MSG_JOB_SETUP: Setup(kJobSetup);
 			break;
 		case MSG_PRINTER_SELECTED: {
 				BString printer;
@@ -127,6 +127,27 @@ void ConfigWindow::MessageReceived(BMessage* m) {
 			break;
 		default:
 			inherited::MessageReceived(m);
+	}
+}
+
+void ConfigWindow::FrameMoved(BPoint p) {
+	BRect frame = GetWindowFrame();
+	frame.OffsetTo(p);
+	SetWindowFrame(frame);
+}
+
+BRect ConfigWindow::GetWindowFrame() {
+	BAutolock lock(gLock);
+	if (lock.IsLocked()) {
+		return Settings::GetSettings()->ConfigWindowFrame();
+	}
+	return BRect(30, 30, 300, 300);
+}
+
+void ConfigWindow::SetWindowFrame(BRect r) {
+	BAutolock lock(gLock);
+	if (lock.IsLocked()) {
+		Settings::GetSettings()->SetConfigWindowFrame(r);
 	}
 }
 
@@ -204,29 +225,19 @@ void ConfigWindow::UpdateSettings(bool read) {
 	}
 }
 
-void ConfigWindow::PageSetup(BMessage* m) {
+void ConfigWindow::Setup(config_setup_kind kind) {
 	if (fCurrentPrinter) {
 		Hide();
 		UpdateSettings(true);
-		bool ok = fCurrentPrinter->ConfigurePage(fPageSettings) == B_OK;
-		if (ok) UpdateSettings(false);
-		if (ok && fKind == kPageSetup) {
-			fSender->SetReply(&fJobSettings);
-			Quit();
+		bool ok;
+		if (kind == kPageSetup) {
+			ok = fCurrentPrinter->ConfigurePage(fPageSettings) == B_OK;
 		} else {
-			Show();
+			ok = fCurrentPrinter->ConfigureJob(fJobSettings) == B_OK;
 		}
-	}
-}
-
-void ConfigWindow::JobSetup(BMessage* m) {
-	if (fCurrentPrinter) {
-		Hide();
-		UpdateSettings(true);
-		bool ok = fCurrentPrinter->ConfigureJob(fJobSettings) == B_OK;
 		if (ok) UpdateSettings(false);
-		if (ok && fKind == kJobSetup) {
-			fSender->SetReply(&fJobSettings);
+		if (ok && fKind == kind) {
+			fSender->SetReply(kind == kPageSetup ? &fPageSettings : &fJobSettings);
 			Quit();
 		} else {
 			Show();
