@@ -23,7 +23,11 @@
 port_id _get_looper_port_(const BLooper* looper);
 
 //------------------------------------------------------------------------------
-//case 1: looper is unlocked and queue is empty
+/**
+	IsMessageWaiting()
+	@case		looper is unlocked and queue is empty
+	@results	IsMessageWaiting() returns false
+ */
 void TIsMessageWaitingTest::IsMessageWaiting1()
 {
 	DEBUGGER_ESCAPE;
@@ -33,7 +37,11 @@ void TIsMessageWaitingTest::IsMessageWaiting1()
 	CPPUNIT_ASSERT(!Looper.IsMessageWaiting());
 }
 //------------------------------------------------------------------------------
-//case 2: looper is unlocked and queue is filled
+/**
+	IsMessageWaiting()
+	@case		looper is unlocked and queue is filled
+	@results	IsMessageWaiting() returns false
+ */
 void TIsMessageWaitingTest::IsMessageWaiting2()
 {
 	DEBUGGER_ESCAPE;
@@ -44,7 +52,15 @@ void TIsMessageWaitingTest::IsMessageWaiting2()
 	CPPUNIT_ASSERT(!Looper.IsMessageWaiting());
 }
 //------------------------------------------------------------------------------
-//case 3: looper is locked and queue is empty
+/**
+	IsMessageWaiting()
+	@case		looper is locked and queue is empty
+	@results	IsMessageWaiting() returns false
+	@note		R5 will return true in this test.  The extra testing below
+				indicates that the R5 version probably returns != 0 from
+				port_buffer_size_etc(), resulting in an incorrect true in cases
+				where the operation would block.
+ */
 void TIsMessageWaitingTest::IsMessageWaiting3()
 {
 	BLooper Looper;
@@ -73,7 +89,11 @@ void TIsMessageWaitingTest::IsMessageWaiting3()
 #endif
 }
 //------------------------------------------------------------------------------
-//case 4: looper is locked and queue is filled
+/**
+	IsMessageWaiting()
+	@case		looper is locked and queue is filled
+	@results	IsMessageWaiting() returns true.
+ */
 void TIsMessageWaitingTest::IsMessageWaiting4()
 {
 	BLooper Looper;
@@ -82,7 +102,29 @@ void TIsMessageWaitingTest::IsMessageWaiting4()
 	CPPUNIT_ASSERT(Looper.IsMessageWaiting());
 }
 //------------------------------------------------------------------------------
-//case 5: looper is locked, message is posted, queue is empty
+/**
+	IsMessageWaiting()
+	@case		looper is locked, message is posted, queue is empty
+	@results	IsMessageWaiting() returns true.
+	@note		The first assert always worked under R5 but only sometimes for
+				OBOS.  Answer: the OBOS implementation of BLooper was attempting
+				to lock itself prior to fetching the message from the queue.  I
+				moved the lock attempt after the fetch and it worked the same.
+				I realized that if the system was loaded heavily enough, the
+				assert might still fail simply because the looper would not have
+				had enough time to get to the fetch (thereby emptying the queue),
+				so the assert is no longer used.  If we do manage to call
+				IsMessageWaiting() before the fetch happens (which does happen
+				every once in a while), we still get a true result because the
+				port buffer is checked.  Later: it's finally dawned on me that
+				if the system is loaded *lightly* enough, the message will not
+				only get fetched, but popped off the queue as well.  Since R5
+				returns the bogus true, the second assert works even when the
+				message has been de-queued.  OBOS, of course, will (correctly)
+				fail the assert in that situation.  Unfortunately, that renders
+				this test completely unreliable.  It is pulled until a fully
+				reliable test can be devised.
+ */
 void TIsMessageWaitingTest::IsMessageWaiting5()
 {
 	BLooper* Looper = new BLooper(__PRETTY_FUNCTION__);
@@ -94,13 +136,6 @@ void TIsMessageWaitingTest::IsMessageWaiting5()
 //	CPPUNIT_ASSERT(Looper->MessageQueue()->IsEmpty());
 	CPPUNIT_ASSERT(Looper->IsMessageWaiting());
 
-// Tests to help figure out why the first assert above always worked under R5
-// but only sometimes for OBOS.  Answer: the OBOS implementation of BLooper
-// was attempting to lock itself prior to fetching the message from the queue.
-// I moved the lock attempt after the fetch and it worked the same.  I realized
-// that if the system was loaded heavily enough, the assert might still fail
-// simply because the looper would not had enough time to get to the fetch
-// (thereby emptying the queue), so the assert is no longer used.
 #if 0
 	ssize_t count;
 	do
@@ -139,7 +174,9 @@ Test* TIsMessageWaitingTest::Suite()
 	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting2);
 	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting3);
 	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting4);
-	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting5);
+
+	// See note for test
+//	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting5);
 
 	return suite;
 }

@@ -11,17 +11,15 @@
 #include <be/app/Messenger.h>
 #include <be/app/MessageFilter.h>
 
-#if !defined(SYSTEM_TEST)
-#include <be/app/Looper.h>
-#else
-#include "../../../../source/lib/application/headers/Looper.h"
-#endif
+#include <Looper.h>
 
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
 #include "IsMessageWaitingTest.h"
 #include "RemoveHandlerTest.h"
+#include "IndexOfTest.h"
+#include "CountHandlersTest.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -43,6 +41,8 @@ Test* addonTestFunc(void)
 
 	tests->addTest(TIsMessageWaitingTest::Suite());
 	tests->addTest(TRemoveHandlerTest::Suite());
+	tests->addTest(TIndexOfTest::Suite());
+	tests->addTest(TCountHandlersTest::Suite());
 
 	return tests;
 }

@@ -271,7 +271,6 @@ bool BLooper::IsMessageWaiting() const
 {
 	if (!IsLocked())
 	{
-		// TODO: test
 		debugger("The Looper must be locked before calling IsMsgWaiting");
 		return false;
 	}
@@ -337,8 +336,6 @@ bool BLooper::RemoveHandler(BHandler* handler)
 		debugger("Looper must be locked before calling RemoveHandler.");
 	}
 
-	// TODO: test
-	// Need to ensure this algo reflects what actually happens
 	if (handler->Looper() == this && fHandlers.RemoveItem(handler))
 	{
 		if (handler == fPreferred)
@@ -370,7 +367,10 @@ BHandler* BLooper::HandlerAt(int32 index) const
 //------------------------------------------------------------------------------
 int32 BLooper::IndexOf(BHandler* handler) const
 {
-	AssertLocked();
+	if (!IsLocked())
+	{
+		debugger("Looper must be locked before calling IndexOf.");
+	}
 
 	// TODO: test
 	// ensure the B_ERROR gets returned if the handler isn't in the list

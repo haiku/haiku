@@ -1,4 +1,25 @@
-MessageQueue()
+BLooper(const char* name = NULL,
+		int32 priority = B_NORMAL_PRIORITY,
+		int32 port_capacity = B_LOOPER_PORT_DEFAULT_CAPACITY);
+~BLooper();
+BLooper(BMessage* data);
+Instantiate(BMessage* data);
+Archive(BMessage* data, bool deep = true) const;
+PostMessage(uint32 command);
+PostMessage(BMessage* message);
+PostMessage(uint32 command,
+			BHandler* handler,
+			BHandler* reply_to = NULL);
+PostMessage(BMessage* message,
+			BHandler* handler,
+			BHandler* reply_to = NULL);
+DispatchMessage(BMessage* message, BHandler* handler);
+MessageReceived(BMessage* msg);
+CurrentMessage() const;
+DetachCurrentMessage();
+MessageQueue() const;
+
+IsMessageWaiting()
 --------------
 case 1: looper is unlocked and queue is empty
 case 2: looper is unlocked and queue is filled
@@ -6,10 +27,59 @@ case 3: looper is locked and queue is empty
 case 4: looper is locked and queue is filled
 case 5: looper is locked, message is posted, queue is emptied
 
+AddHandler(BHandler* handler);
+
 RemoveHandler(BHandler* handler)
 --------------
-case : handler is NULL
-case : handler doesn't belong to this looper
-case : handler is valid, looper is unlocked
-case : handler doesn't belong to this looper, looper is unlocked
-case : handler has filters; FilterList() should be NULL on remove
+case 1: handler is NULL
+case 2: handler doesn't belong to this looper
+case 3: handler is valid, looper is unlocked
+case 4: handler doesn't belong to this looper, looper is unlocked
+case 5: handler has filters; FilterList() should be NULL on remove
+
+CountHandlers() const;
+--------------
+case : No handlers added
+case : Several handlers added, then removed
+
+HandlerAt(int32 index) const;
+--------------
+case : No handlers added, check for looper itself
+case : Index out of range (CountHandlers() + 1)
+case : Several handlers added, checked against expected indices
+
+IndexOf(BHandler* handler) const;
+--------------
+case 1: handler is NULL
+case 2: handler is valid, doesn't belong to this looper
+case 3: handler is valid, belongs to looper
+case 4: handler is valid, one of many added and removed
+case 5: handler is valid, looper is unlocked
+
+PreferredHandler() const;
+SetPreferredHandler(BHandler* handler);
+Run();
+Quit();
+QuitRequested();
+Lock();
+Unlock();
+IsLocked() const;
+LockWithTimeout(bigtime_t timeout);
+Thread() const;
+Team() const;
+LooperForThread(thread_id tid);
+LockingThread() const;
+CountLocks() const;
+CountLockRequests() const;
+Sem() const;
+ResolveSpecifier(BMessage* msg,
+				 int32 index,
+				 BMessage* specifier,
+				 int32 form,
+				 const char* property);
+GetSupportedSuites(BMessage* data);
+AddCommonFilter(BMessageFilter* filter);
+RemoveCommonFilter(BMessageFilter* filter);
+SetCommonFilterList(BList* filters);
+CommonFilterList() const;
+Perform(perform_code d, void* arg);

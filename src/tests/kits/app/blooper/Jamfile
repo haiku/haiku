@@ -4,6 +4,8 @@ CommonUnitTest BLooperTester
 	: main.cpp
 	  IsMessageWaitingTest.cpp
 	  RemoveHandlerTest.cpp
+	  IndexOfTest.cpp
+	  CountHandlersTest.cpp
 	: kits app
 	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
 	: be stdc++.r4
