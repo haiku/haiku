@@ -270,7 +270,6 @@ rule TestLib
 	OPTIM = ;
 
 #	SetupIncludes ;
-	UseCppUnitHeaders ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(sources) ;
 	Main $(target) : $(sources) ;
@@ -278,6 +277,7 @@ rule TestLib
 	Depends $(target) : libcppunit.so ;
 	Depends obostests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
+	UseCppUnitObjectHeaders $(sources) ;
 	UsePublicObjectHeaders $(sources) : $(headerDirs) ;
 	ObjectDefines $(sources) : TEST_OBOS ;
 	LINKFLAGS on $(target) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(target)\" ;
@@ -310,7 +310,6 @@ rule R5TestLib
 	local optim = $(OPTIM) ;
 	OPTIM = ;
 
-	UseCppUnitHeaders ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(objects) ;
 
@@ -328,6 +327,7 @@ rule R5TestLib
 	Depends $(target) : libcppunit.so ;
 	Depends r5tests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
+	UseCppUnitObjectHeaders $(objects) ;
 	ObjectDefines $(objects) : TEST_R5 ;
 	LINKFLAGS on $(target) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(target)\" ;
 
@@ -380,7 +380,6 @@ rule UnitTest
 	OPTIM = ;
 
 #	SetupIncludes ;
-	UseCppUnitHeaders ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(sources) ;
 	Main $(target) : $(sources) ;
@@ -388,6 +387,7 @@ rule UnitTest
 	Depends $(target) : libcppunit.so ;
 	Depends obostests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
+	UseCppUnitObjectHeaders $(sources) ;
 	UsePublicObjectHeaders $(sources) : $(headerDirs) ;
 	ObjectDefines $(sources) : TEST_OBOS ;
 
@@ -419,7 +419,6 @@ rule R5UnitTest
 	local optim = $(OPTIM) ;
 	OPTIM = ;
 
-	UseCppUnitHeaders ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(objects) ;
 
@@ -437,6 +436,7 @@ rule R5UnitTest
 	Depends $(target) : libcppunit.so ;
 	Depends r5tests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
+	UseCppUnitObjectHeaders $(objects) ;
 	ObjectDefines $(objects) : TEST_R5 ;
 
 	# Turn debugging on. That is usually desired for test code.
@@ -723,6 +723,11 @@ rule UseHeaders
 rule UseCppUnitHeaders
 {
 	SubDirHdrs [ FDirName $(OBOS_TOP) headers tools cppunit ] ;
+}
+
+rule UseCppUnitObjectHeaders
+{
+	ObjectHdrs $(1) : [ FDirName $(OBOS_TOP) headers tools cppunit ] ;
 }
 
 rule UseArchHeaders
