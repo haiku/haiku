@@ -32,6 +32,9 @@ extern char		*strchr(const char *string, int character);
 extern char		*strrchr(const char *string, int character);
 extern char		*strstr(const char *string, const char *searchString);
 
+extern char		*strchrnul(const char *string, int character);
+	// this is a GNU extension
+
 extern char		*strpbrk(const char *string, const char *set);
 extern char		*strtok(char *string, const char *set);
 extern char		*strtok_r(char *string, const char *set, char **savePointer);
