@@ -4,6 +4,7 @@ KernelObjects
 	<$(SOURCE_GRIST)>chmod.c
 	<$(SOURCE_GRIST)>stat.c
 	<$(SOURCE_GRIST)>mkdir.c
+ 	<$(SOURCE_GRIST)>select.c
  	<$(SOURCE_GRIST)>sysctl.c
 	:
 	-fPIC -DPIC
