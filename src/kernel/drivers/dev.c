@@ -23,7 +23,9 @@
 
 #include <stdio.h>
 
-/* These are mainly here to allow testing and this needs to be revisited */
+/* TODO: move this into devfs.c, to add full dynamicly loaded device drivers support
+ These are mainly here to allow testing and this needs to be revisited
+*/
 const char *device_paths[] = {
 	"/boot/addons/drivers/dev",
 	"/boot/addons/drivers/dev/audio",	
@@ -68,52 +70,75 @@ int dev_init(kernel_args *ka)
 image_id dev_load_dev_module(const char *name, const char *dirpath)
 {
 	image_id id;
-	status_t (*init_hardware)(void);
-	const char **(*publish_devices)(void) = NULL;
-	device_hooks *(*find_device)(const char *);
-	void (*bootstrap)();
 	char path[SYS_MAX_PATH_LEN];
+	// uint32 * api_version;
+	status_t (*init_hardware)(void);
+	status_t (*init_driver)(void);
+	status_t (*uninit_driver)(void);
+	device_hooks *(*find_device)(const char *);
+	const char **(*publish_devices)(void);
 	const char **devfs_paths;
-	device_hooks *hooks;
+	bool keep_loaded;
 		
 	sprintf(path, "%s/%s", dirpath, name);
 
 	id = elf_load_kspace(path, "");
 	if(id < 0)
 		return id;
-	
-	init_hardware = (void*)elf_lookup_symbol(id, "init_hardware");
-	if (init_hardware) {
-		dprintf("DEV: found init_hardware in %s\n", name);
-		if (init_hardware() != 0) {
-			dprintf("DEV: %s: init_hardware failed :(\n", name);
-			elf_unload_kspace(path);
-			return ENXIO;
+
+	// get device driver API symbols
+	// api_version = (uint32 *) elf_lookup_symbol(id, "api_version");
+	init_hardware = (void *) elf_lookup_symbol(id, "init_hardware");
+	init_driver = (void *) elf_lookup_symbol(id, "init_driver");
+	uninit_driver = (void *) elf_lookup_symbol(id, "uninit_driver");
+	publish_devices = (void *) elf_lookup_symbol(id, "publish_devices");
+	find_device = (void *) elf_lookup_symbol(id, "find_device");
+
+	if (publish_devices == NULL || find_device == NULL) {
+		dprintf("DEV: %s: mandatory driver symbol(s) missing! :(\n", name);
+		id = EINVAL;
+		goto error;
+	} 
+
+	if (init_hardware && init_hardware() != 0) {
+		dprintf("DEV: %s: init_hardware failed :(\n", name);
+		id = ENXIO;
+		goto error;
+	}
+
+	if (init_driver && init_driver() != 0) {
+		dprintf("DEV: %s: init_driver failed :(\n", name);
+		id = ENXIO;
+		goto error;
 		}
-//		dprintf("DEV: Well alright - %s init'd OK!\n", name);
-		publish_devices = (void*)elf_lookup_symbol(id, "publish_devices");
-//		dprintf("DEV: %s: found publish_devices\n", name);	
-		devfs_paths = publish_devices();
-//		dprintf("DEV: %s: publish_devices = %p\n", name, (char*)devfs_paths);
-//		for (; *devfs_paths; devfs_paths++) {
-//			dprintf("DEV: %s: wants to be known as %s\n", name, *devfs_paths);
-//		}
-		find_device = (void*)elf_lookup_symbol(id, "find_device");
-		if (!find_device) {
-			elf_unload_kspace(path);
-			dprintf("failed to find the find_device symbol!\n");
-			return EINVAL; /* should be EFTYPE */
-		}
-		/* Should really cycle through these... */
-		devfs_paths = publish_devices();
-		for (; *devfs_paths; devfs_paths++) {
-			hooks = find_device(*devfs_paths);
-			dprintf("publishing %s\n", *devfs_paths);
-			if (hooks)
-				devfs_publish_device(*devfs_paths, NULL, hooks);
-		}
-	} else
-		return EINVAL; /* should be FTYPE */
 		
+//	dprintf("DEV: Well alright - %s init'd OK!\n", name);
+
+	/* Should really cycle through these... */
+	devfs_paths = publish_devices();
+	keep_loaded = false;
+	for (; *devfs_paths; devfs_paths++) {
+		device_hooks * hooks;
+
+		hooks = find_device(*devfs_paths);
+		dprintf("DEV: %s: publishing %s\n", name, *devfs_paths);
+		if (hooks) {
+			if (devfs_publish_device(*devfs_paths, NULL, hooks) == 0)
+				keep_loaded = true;
+		}
+	}
+	
+	if (keep_loaded)
+		// okay, keep this driver image in memory, as he publish *something*
+		return id;
+	
+	// no need to keep this driver image loaded... 
+	if (uninit_driver)
+		uninit_driver();
+	id = 0;
+
+error:
+	elf_unload_kspace(path);
 	return id;
 }
+
