@@ -7,6 +7,12 @@
 namespace BPrivate {
 	class Decoder;
 }
+namespace BPrivate {
+	namespace media {
+		class Decoder;
+		class DecoderPlugin;
+	}
+}
 
 class BMediaDecoder {
 	public:
@@ -42,14 +48,16 @@ class BMediaDecoder {
 		static status_t next_chunk(void *classptr, void **chunkData, size_t *chunkLen, media_header *mh);
 		void	ReleaseDecoder();
 
-		BPrivate::Decoder	*fDecoder;
+		BPrivate::media::Decoder	*fDecoder;
 		int32				fDecoderID;
+		BPrivate::media::DecoderPlugin	*fDecoderPlugin;
+		int32				fDecoderPluginID;
 		status_t			fInitStatus;
 
 
 		/* fbc data and virtuals */
 
-		uint32 _reserved_BMediaDecoder_[32];
+		uint32 _reserved_BMediaDecoder_[30];
 
 		virtual	status_t _Reserved_BMediaDecoder_0(int32 arg, ...);
 		virtual	status_t _Reserved_BMediaDecoder_1(int32 arg, ...);

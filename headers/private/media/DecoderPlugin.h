@@ -4,11 +4,16 @@
 #include <MediaTrack.h>
 #include <MediaFormats.h>
 #include "MediaPlugin.h"
-#include "MediaExtractor.h"
 
 class AddOnManager;
 
 namespace BPrivate { namespace media {
+
+class ChunkProvider {
+public:
+	virtual status_t	GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+						             media_header *mediaHeader) = 0;
+};
 
 class Decoder
 {
@@ -31,12 +36,9 @@ public:
 	status_t			GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 									 media_header *mediaHeader);
 
+	void				Setup(ChunkProvider *provider);
 private:
-	friend class MediaExtractor;
-	
-	void				Setup(MediaExtractor *extractor, int32 stream);
-	MediaExtractor *	fExtractor;
-	int32				fStream;
+	ChunkProvider *		fChunkProvider;
 };
 
 
