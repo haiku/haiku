@@ -113,7 +113,7 @@ _EXPORT int select(int nbits, struct fd_set * rbits,
 	if (tv) {
 		bigtime_t timeout;
 
-		timeout = tv->tv_sec * 1000000 + tv->tv_usec;
+		timeout = tv->tv_sec * 1000000LL + tv->tv_usec;
  		status = acquire_sem_etc(rss->wakeup, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 	} else
 		status = acquire_sem(rss->wakeup);  
