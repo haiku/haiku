@@ -60,13 +60,13 @@ Server input_server :
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp
 
-	: be
+	: stdc++.r4
 ;
 
 if $(COMPILE_FOR_R5) {
-	LinkSharedOSLibs input_server : stdc++.r4 ;
+	LinkSharedOSLibs input_server : be ;
 } else {
-	LinkSharedOSLibs input_server : <boot!home!config!lib>libopenbeos.so stdc++.r4 ;
+	LinkSharedOSLibs input_server : libroot.so libbe.so ;
 }
 
 SEARCH on [ FGristFiles AddOnMonitor.cpp

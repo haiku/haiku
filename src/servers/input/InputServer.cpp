@@ -8,7 +8,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2002-2004 Haiku Project
+// Copyright (c) 2002-2005 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -30,18 +30,20 @@
 /*****************************************************************************/
 
 
-#include <stdio.h>
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
-#include <Locker.h>
-#include <Message.h>
 #include <Path.h>
 #include <Roster.h>
+#include <Locker.h>
+#include <Message.h>
 #include <String.h>
 #include <OS.h>
+#include <driver_settings.h>
+
+#include <stdio.h>
 
 #include "InputServer.h"
 #include "InputServerTypes.h"
@@ -60,8 +62,11 @@ extern "C" void RegisterDevices(input_device_ref** devices)
 	CALLED();
 };
 
-// i don't know the exact signature but this one works
-extern "C" status_t _kget_safemode_option_(char* name, uint8 *p1, uint32 *p2);
+#ifdef COMPILE_FOR_R5
+extern "C" status_t _kget_safemode_option_(const char *parameter, char *buffer, size_t *_bufferSize);
+#else
+extern "C" status_t _kern_get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize);
+#endif
 
 
 // Static InputServer member variables.
@@ -93,7 +98,6 @@ instantiate_deskbar_item()
 }
 
 
-
 /*
  *
  */
@@ -121,32 +125,40 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 #endif
 
 	CALLED();
-	
-	EventLoop();
-	
-	uint8 p1;
-	uint32 p2 = 1;
-		
-	if (_kget_safemode_option_("safemode", &p1, &p2) == B_OK)
-		sSafeMode = true;
-	
-	gDeviceManager.LoadState();
-	
-#ifdef COMPILE_FOR_R5
 
+	EventLoop();
+
+	char parameter[32];
+	size_t parameterLength = sizeof(parameter);
+
+#ifdef COMPILE_FOR_R5
+	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK) {
+#else
+	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK) {
+#endif
+		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
+			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
+			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
+			sSafeMode = true;
+	}
+
+	gDeviceManager.LoadState();
+
+#ifdef COMPILE_FOR_R5
 	if (has_data(find_thread(NULL))) {
 		PRINT(("HasData == YES\n")); 
 		int32 buffer[2];
 		thread_id appThreadId;
 		memset(buffer, 0, sizeof(buffer));
 		int32 code = receive_data(&appThreadId, buffer, sizeof(buffer));
+		(void)code;	// suppresses warning in non-debug build
 		PRINT(("tid : %ld, code :%ld\n", appThreadId, code));
-		for (int32 i=0; i<2; i++) {
+		for (int32 i = 0; i < 2; i++) {
 			PRINT(("data : %lx\n", buffer[i]));
 		}
 		fCursorSem = buffer[0];
 		area_id appArea = buffer[1];
-		
+
 		fCloneArea = clone_area("isClone", (void**)&fAppBuffer, B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, appArea);
 		if (fCloneArea < B_OK) {
 			PRINTERR(("clone_area error : %s\n", strerror(fCloneArea)));
@@ -155,19 +167,18 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 		fAsPort = create_port(100, "is_as");
 
 		PRINT(("is_as port :%ld\n", fAsPort));
-		
+
 		buffer[1] = fEventLooperPort;
 		buffer[0] = fAsPort;
-	
+
 		status_t err;
 		if ((err = send_data(appThreadId, 0, buffer, sizeof(buffer)))!=B_OK)
 			PRINTERR(("error when send_data %s\n", strerror(err)));
 	}
-
 #endif
 
 	InitKeyboardMouseStates();
-	
+
 	fAddOnManager = new AddOnManager(SafeMode());
 	fAddOnManager->LoadState();
 
@@ -1641,7 +1652,6 @@ InputServer::ControlDevices(const char* name, input_device_type type, uint32 cod
 		return B_ERROR;
 	else
 		return B_OK;
-	
 }
 
 
@@ -1655,6 +1665,9 @@ InputServer::DoMouseAcceleration(int32 *x,
 {
 	CALLED();
 	int32 speed = fMouseSettings.MouseSpeed() >> 15;
+
+	// ToDo: implement mouse acceleration
+	(void)speed;
 	//*y = *x * speed;
 	PRINT(("DoMouse : %ld %ld %ld %ld\n", *x, *y, speed, fMouseSettings.MouseSpeed()));
 	return true;
