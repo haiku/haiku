@@ -1,9 +1,9 @@
 #include "lala/lala.h"
 #include "ichaudio.h"
 
-status_t ichaudio_attach(drv_t *dev, void **cookie, int id_table_index);
-status_t ichaudio_powerctl(void *cookie);
-status_t ichaudio_detach(void *cookie);
+status_t ichaudio_attach(drv_t *drv, void **cookie);
+status_t ichaudio_powerctl(drv_t *drv, void *cookie);
+status_t ichaudio_detach(drv_t *drv, void *cookie);
 
 id_table_t ichaudio_id_table[] = {
 	{ 0x8086, 0x7195, -1, -1, -1, -1, -1, "Intel 82443MX AC97 audio" },
@@ -19,7 +19,7 @@ id_table_t ichaudio_id_table[] = {
 	{ 0x10DE, 0x00DA, -1, -1, -1, -1, -1, "NVIDIA nForce 3 (MCP3)  AC97 audio" },
 	{ 0x1022, 0x764D, -1, -1, -1, -1, -1, "AMD AMD8111 AC97 audio" },
 	{ 0x1022, 0x7445, -1, -1, -1, -1, -1, "AMD AMD768 AC97 audio" },
-	{ 0x1003, 0x0004, -1, -1, -1, -1, -1, "Highpoint HPT372 RAID" },
+	{ 0x1103, 0x0004, -1, -1, -1, -1, -1, "Highpoint HPT372 RAID" },
 	{ 0x1095, 0x3112, -1, -1, -1, -1, -1, "Silicon Image SATA Si3112" },
 	{ 0x8086, 0x244b, -1, -1, -1, -1, -1, "Intel IDE Controller" },
 	{ 0x8979, 0x6456, -1, -1, -1, -1, -1, "does not exist" },
@@ -37,7 +37,7 @@ driver_info_t driver_info = {
 
 
 status_t
-ichaudio_attach(drv_t *dev, void **_cookie, int id_table_index)
+ichaudio_attach(drv_t *drv, void **_cookie)
 {
 	ichaudio_cookie *cookie = (ichaudio_cookie *) malloc(sizeof(ichaudio_cookie));
 	if (!cookie) return B_ERROR;
@@ -56,7 +56,7 @@ err:
 
 
 status_t
-ichaudio_detach(void *_cookie)
+ichaudio_detach(drv_t *drv, void *_cookie)
 {
 	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
 
@@ -66,7 +66,7 @@ ichaudio_detach(void *_cookie)
 
 
 status_t
-ichaudio_powerctl(void *_cookie)
+ichaudio_powerctl(drv_t *drv, void *_cookie)
 {
 	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
 

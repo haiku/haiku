@@ -4,7 +4,19 @@
 #include <OS.h>
 #include <malloc.h>
 
-typedef void drv_t;
+typedef struct
+{
+	pci_module_info *	pci;
+
+	uint8				bus;
+	uint8				device;
+	uint8				function;
+
+	const char *		name;
+	uint32				flags;
+
+} drv_t;
+ 
 typedef void stream_id;
 typedef void control_id;
 
@@ -20,9 +32,9 @@ typedef struct {
 	uint32	flags;
 } id_table_t;
 
-typedef status_t (*drv_attach)		(drv_t *dev, void **cookie, int id_table_index);
-typedef status_t (*drv_powerctl)	(void *cookie);
-typedef status_t (*drv_detach)		(void *cookie);
+typedef status_t (*drv_attach)		(drv_t *drv, void **cookie);
+typedef status_t (*drv_powerctl)	(drv_t *drv, void *cookie);
+typedef status_t (*drv_detach)		(drv_t *drv, void *cookie);
 
 typedef struct 
 {
