@@ -1,18 +1,31 @@
 #ifndef _SIGNAL_H_
 #define _SIGNAL_H_
-
 /* 
 ** Distributed under the terms of the OpenBeOS License.
 */
 
+
 #include <sys/types.h>
 
 
-typedef int	 sig_atomic_t;
+typedef int	sig_atomic_t;
 typedef long sigset_t;
 
 typedef void (*sig_func_t)(int);
 typedef void (*__signal_func_ptr)(int);  /* deprecated, for compatibility with BeOS only */
+
+
+// ToDo: actually make use of this structure!
+typedef struct {
+	int		si_signo;	/* signal number */
+	int		si_code;	/* signal code */
+	int		si_errno;	/* if non zero, an error number associated with this signal */
+	pid_t	si_pid;		/* sending process ID */
+	uid_t	si_uid;		/* real user ID of sending process */
+	void	*si_addr;	/* address of faulting instruction */
+	int		si_status;	/* exit value or signal */
+	long	si_band;	/* band event for SIGPOLL */
+} siginfo_t;
 
 
 /*
@@ -31,10 +44,10 @@ typedef void (*__signal_func_ptr)(int);  /* deprecated, for compatibility with B
  * 
  */
 struct sigaction {
-	sig_func_t sa_handler;
-	sigset_t   sa_mask;
-	int        sa_flags;
-	void      *sa_userdata;  /* will be passed to the signal handler */
+	sig_func_t	sa_handler;
+	sigset_t	sa_mask;
+	int			sa_flags;
+	void		*sa_userdata;  /* will be passed to the signal handler */
 };
 
 
@@ -49,14 +62,13 @@ struct sigaction {
 #define SA_STACK      0x10
 
 
-
 /*
  * for signals using an alternate stack
  */
 typedef struct stack_t {
-	void   *ss_sp;
-	size_t  ss_size;
-	int     ss_flags;
+	void	*ss_sp;
+	size_t	ss_size;
+	int		ss_flags;
 } stack_t;
 
 
@@ -66,7 +78,6 @@ typedef struct stack_t {
 #define SIG_BLOCK    1
 #define SIG_UNBLOCK  2
 #define SIG_SETMASK  3
-
 
 
 /*
@@ -112,10 +123,8 @@ typedef struct stack_t {
 #define NSIG (__signal_max+1)  /* the number of defined signals */
 
 
-
 /* the global table of text strings containing descriptions for each signal */
 extern const char * const sys_siglist[NSIG];
-
 
 
 #ifdef __cplusplus
@@ -167,7 +176,6 @@ sigdelset(sigset_t *set, int sig)
 #ifdef __cplusplus
 }
 #endif
-
 
 /*
  * ==================================================
@@ -233,9 +241,6 @@ sigdelset(sigset_t *set, int sig)
  *    processors come out. Nonetheless, the ability to change the registers does
  *    open some interesting programming possibilities.
  */
-
-
-
 
 /*
  * the vregs struct:
@@ -399,6 +404,5 @@ struct vregs {
 };
  
 #endif /* __INTEL__ */
-
 
 #endif /* _SIGNAL_H_ */
