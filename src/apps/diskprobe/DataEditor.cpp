@@ -224,8 +224,10 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 	if (IsAttribute()) {
 		attr_info info;
 		status = fFile.GetAttrInfo(fAttribute, &info);
-		if (status != B_OK)
+		if (status != B_OK) {
+			fFile.Unset();
 			return status;
+		}
 
 		fSize = info.size;
 		fType = info.type;
@@ -264,26 +266,8 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 
 
 status_t 
-DataEditor::SetToAttribute(const char *attribute)
-{
-	status_t status = InitCheck();
-	if (status < B_OK)
-		return status;
-
-	fAttribute = attribute;
-
-	// ToDo: attributes are not yet supported
-	return B_ERROR;
-}
-
-
-status_t 
 DataEditor::InitCheck()
 {
-	if (fAttribute != NULL)
-		// ToDo: for now!
-		return B_ERROR;
-
 	return fFile.InitCheck();
 }
 

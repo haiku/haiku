@@ -25,7 +25,6 @@ class DataEditor : public BLocker {
 		status_t SetTo(const char *path, const char *attribute = NULL);
 		status_t SetTo(entry_ref &ref, const char *attribute = NULL);
 		status_t SetTo(BEntry &entry, const char *attribute = NULL);
-		status_t SetToAttribute(const char *attribute);
 
 		bool IsReadOnly() const { return fIsReadOnly; }
 		bool IsDevice() const { return fIsDevice; }
