@@ -24,29 +24,25 @@
 	// don't include that file
 
 #ifndef __BEOS__
-
-#define _ERRORS_H
-	// don't include <Errors.h>, we use the platform <errno.h>
-
-#define dprintf build_platform_dprintf
-#include <stdio.h>
-#undef dprintf
+#	define dprintf build_platform_dprintf
+#	include <stdio.h>
+#	undef dprintf
 
 typedef struct dirent dirent_t;
 typedef struct iovec iovec;
 
-#else
-#	define _BE_ERRNO_H_
-		// in this case, we want to use our Errors.h, not both :)
-		// (this is defined by Dano/Zeta's be_errors.h header)
+#endif	// __BEOS__
+
+#include <errno.h>
+#ifndef _ERRORS_H
+#	define _ERRORS_H
+	// don't include <Errors.h>, we use the platform <errno.h>
 #endif
 
 #include <dirent.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <time.h>
 

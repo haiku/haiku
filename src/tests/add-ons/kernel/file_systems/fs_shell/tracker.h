@@ -1,6 +1,8 @@
 #ifndef TRACKER_H
 #define TRACKER_H
 
+#include "compat.h"
+
 #include <SupportDefs.h>
 #include <OS.h>
 #include <AppDefs.h>
