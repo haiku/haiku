@@ -10,6 +10,7 @@
 
 #include "Icb.h"
 #include "MemoryChunk.h"
+#include "Recognition.h"
 
 using namespace Udf;
 
@@ -23,6 +24,7 @@ Volume::Volume(nspace_id id)
 	: fId(id)
 	, fDevice(0)
 	, fReadOnly(false)
+	, fMounted(false)
 	, fOffset(0)
 	, fBlockSize(0)
 	, fBlockShift(0)
@@ -31,6 +33,8 @@ Volume::Volume(nspace_id id)
 	, fRootIcb(NULL)
 #endif
 {
+	for (int i = 0; i < UDF_MAX_PARTITION_MAPS; i++)
+		fPartitions[i] = NULL;
 }
 
 status_t
@@ -59,6 +63,151 @@ Volume::Identify(int device, off_t offset, off_t length, uint32 blockSize, char 
 //	fclose(file);		
 	RETURN(err);	
 }
+
+/*! \brief Attempts to mount the given device.
+
+	\param volumeStart The block on the given device whereat the volume begins.
+	\param volumeLength The block length of the volume on the given device.
+*/
+status_t
+Volume::Mount2(const char *deviceName, off_t offset, off_t length,
+              uint32 blockSize, uint32 flags)
+{
+	DEBUG_INIT_ETC(CF_PUBLIC | CF_VOLUME_OPS, "Volume",
+	               ("deviceName: `%s', offset: %Ld, length: %Ld, blockSize: %ld, "
+                   "flags: %ld", deviceName, offset, length, blockSize, flags));
+	if (!deviceName)
+		RETURN(B_BAD_VALUE);
+	if (Mounted()) {
+		// Already mounted, thank you for asking
+		RETURN(B_BUSY);
+	}
+
+	// Open the device read only
+	int device = open(deviceName, O_RDONLY);
+	if (device < B_OK)
+		RETURN(device);
+	
+	status_t error = B_OK;
+	
+	// If the device is actually a normal file, try to disable the cache
+	// for the file in the parent filesystem
+	struct stat stat;
+	error = fstat(device, &stat) < 0 ? B_ERROR : B_OK;
+	if (!error) {
+		if (stat.st_mode & S_IFREG && ioctl(device, IOCTL_FILE_UNCACHED_IO, NULL) < 0) {
+			DIE(("Unable to disable cache of underlying file system.\n"));
+		}
+	}
+
+	udf_logical_descriptor logicalVolumeDescriptor;
+	udf_partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
+	uint8 partitionDescriptorCount;
+	uint32 blockShift;
+
+	error = udf_recognize(device, offset, length, blockSize, blockShift,
+	                               logicalVolumeDescriptor, partitionDescriptors,
+	                               partitionDescriptorCount);
+
+	// Set up the block cache
+	if (!error)
+		error = init_cache_for_device(device, length);
+		
+	// Set up the partitions
+	if (!error) {
+		// Set up physical and sparable partitions first
+		int offset = 0;
+		for (uint8 i = 0; i < logicalVolumeDescriptor.partition_map_count(); i++) {
+			uint8 *maps = logicalVolumeDescriptor.partition_maps();
+			udf_generic_partition_map *header =
+				reinterpret_cast<udf_generic_partition_map*>(maps+offset);
+//				logicalVolumeDescriptor.partition_maps() + offset);
+			PRINT(("partition map %d (type %d):\n", i, header->type()));
+			if (header->type() == 1) {
+//				udf_physical_partition_map* map =
+//					reinterpret_cast<udf_physical_partition_map*>(header);
+//				PDUMP(map);
+				PDUMP(reinterpret_cast<udf_physical_partition_map*>(header));
+			} else {
+				udf_sparable_partition_map* map =
+					reinterpret_cast<udf_sparable_partition_map*>(header);
+					DUMP(map->partition_type_id());
+			}
+			    
+			offset += header->length();
+		}
+	}
+	
+	RETURN(B_ERROR);
+
+	// At this point we've found a valid set of volume descriptors, and we
+	// have our partitions set up. We
+	// now need to investigate the file set descriptor pointed to by
+	// the logical volume descriptor
+	if (!error) {
+		MemoryChunk chunk(fLogicalVolumeDescriptor.file_set_address().length());
+	
+		status_t error = chunk.InitCheck();
+
+		if (!error) {
+			error = Read(fLogicalVolumeDescriptor.file_set_address(),
+			           fLogicalVolumeDescriptor.file_set_address().length(),
+			           chunk.Data());
+			if (!error) {
+				udf_file_set_descriptor *fileSet =
+				 	reinterpret_cast<udf_file_set_descriptor*>(chunk.Data());
+				fileSet->tag().init_check(0);
+				PDUMP(fileSet);
+				fRootIcb = new Icb(this, fileSet->root_directory_icb());
+				error = fRootIcb ? fRootIcb->InitCheck() : B_NO_MEMORY;
+			}
+		}	
+	}
+	
+	if (!error) {
+		// Success, create a vnode for the root
+		error = new_vnode(Id(), RootIcb()->Id(), (void*)RootIcb());
+		if (error) {
+			PRINT(("Error create vnode for root icb! error = 0x%lx, `%s'\n",
+			       error, strerror(error)));
+		}
+	}
+	
+	fInitStatus = error < B_OK ? B_UNINITIALIZED : B_LOGICAL_VOLUME_INITIALIZED;
+
+	// set name and other member variables
+	if (!error) {
+	
+	}
+
+	fDevice = device;	
+	fReadOnly = true;
+	fOffset = offset;
+	fLength = length;	
+	fBlockSize = blockSize;
+
+	RETURN(error);
+
+/*	if (!error && volumeName) {
+		CS0String name(logicalVolumeDescriptor.logical_volume_identifier());
+		strcpy(volumeName, name.String());
+	}
+*/	
+/*	
+	status_t error = _Init(device, volumeStart, volumeLength, blockSize);
+	if (!error) 
+		error = _Identify();
+	if (!error)
+		error = _Mount();
+
+	if (error)
+		fInitStatus = B_UNINITIALIZED;
+	
+	RETURN(error);
+
+*/
+}
+
 
 /*! \brief Attempts to mount the given device.
 
@@ -269,7 +418,7 @@ Volume::_Identify()
 //		FILE *file = fopen("/boot/home/Desktop/vdoutput.txt", "w+");
 //		fprint
 
-		fName.SetTo(fLogicalVD.logical_volume_identifier()); 
+		fName.SetTo(fLogicalVolumeDescriptor.logical_volume_identifier()); 
 	}
 		
 	fInitStatus = err < B_OK ? B_UNINITIALIZED : B_IDENTIFIED;
@@ -521,10 +670,10 @@ Volume::_WalkVolumeDescriptorSequence(udf_extent_address extent)
 					PDUMP(logical);
 					if (foundLogicalVD) {
 						// Keep the vd with the highest vds_number
-						if (logical->vds_number() > fLogicalVD.vds_number())
-							fLogicalVD = *(logical);
+						if (logical->vds_number() > fLogicalVolumeDescriptor.vds_number())
+							fLogicalVolumeDescriptor = *(logical);
 					} else {
-						fLogicalVD = *(logical);
+						fLogicalVolumeDescriptor = *(logical);
 						foundLogicalVD = true;
 					}
 					break;
@@ -567,14 +716,14 @@ status_t
 Volume::_InitFileSetDescriptor()
 {
 	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS, "Volume");
-	MemoryChunk chunk(fLogicalVD.file_set_address().length());
+	MemoryChunk chunk(fLogicalVolumeDescriptor.file_set_address().length());
 	
 	status_t err = chunk.InitCheck();
 
 #if (!DRIVE_SETUP_ADDON)
 	if (!err) {
-//		err = Read(ad, fLogicalVD.file_set_address().length(), chunk.Data());
-		err = Read(fLogicalVD.file_set_address(), fLogicalVD.file_set_address().length(), chunk.Data());
+//		err = Read(ad, fLogicalVolumeDescriptor.file_set_address().length(), chunk.Data());
+		err = Read(fLogicalVolumeDescriptor.file_set_address(), fLogicalVolumeDescriptor.file_set_address().length(), chunk.Data());
 		if (!err) {
 			udf_file_set_descriptor *fileSet = reinterpret_cast<udf_file_set_descriptor*>(chunk.Data());
 			fileSet->tag().init_check(0);

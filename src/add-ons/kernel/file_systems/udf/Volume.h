@@ -27,6 +27,7 @@ extern "C" {
 #include "CS0String.h"
 #include "DiskStructures.h"
 #include "PartitionMap.h"
+#include "Partition.h"
 
 namespace Udf {
 
@@ -40,6 +41,8 @@ public:
 		
 	status_t Mount(const char *deviceName, off_t volumeStart, off_t volumeLength, uint32 flags, 
 	               uint32 blockSize = 2048);
+	status_t Mount2(const char *deviceName, off_t offset, off_t length,
+              uint32 blockSize, uint32 flags);
 	status_t Unmount();
 	
 	const char *Name() const;
@@ -56,6 +59,7 @@ public:
 	off_t RelativeAddress(off_t address) { return Offset() * BlockSize() + address; }
 		
 	bool IsReadOnly() const { return fReadOnly; }
+	bool Mounted() const { return fMounted; }
 	
 	vnode_id ToVnodeId(off_t block) const { return (vnode_id)block; }	
 
@@ -70,6 +74,8 @@ public:
 	off_t MapAddress(udf_extent_address address);
 	status_t MapBlock(udf_long_address address, off_t *mappedBlock);
 	off_t MapAddress(udf_short_address address);
+	status_t MapExtent(udf_long_address logicalExtent, udf_extent_address &physicalExtent);
+	
 private:
 	Volume();						// unimplemented
 	Volume(const Volume &ref);		// unimplemented
@@ -100,15 +106,17 @@ private:
 	nspace_id fId;
 	int fDevice;
 	bool fReadOnly;
+	bool fMounted;
 
-	off_t fOffset;	//!< Starting block of the volume on the given device
-	off_t fLength;	//!< Block length of volume on the given device
+	off_t fOffset;
+	off_t fLength;
 	uint32 fBlockSize;
 	uint32 fBlockShift;
 
 	status_t fInitStatus;
-	
-	udf_logical_descriptor fLogicalVD;
+		
+	udf_logical_descriptor fLogicalVolumeDescriptor;
+	Partition *fPartitions[UDF_MAX_PARTITION_MAPS];
 	PartitionMap fPartitionMap;
 #if (!DRIVE_SETUP_ADDON)
 	Icb *fRootIcb;	// Destroyed by vfs via callback to udf_release_node()
