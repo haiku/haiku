@@ -152,6 +152,10 @@ status_t _kern_validate_set_partition_content_name(disk_system_id diskSystemID,
 status_t _kern_validate_set_partition_type(disk_system_id diskSystemID,
 										   partition_id partitionID,
 										   const char *type);
+status_t _kern_validate_initialize_partition(disk_system_id diskSystemID,
+											 partition_id partitionID,
+											 char *name,
+											 const char *parameters);
 status_t _kern_validate_create_child_partition(disk_system_id diskSystemID,
 											   partition_id partitionID,
 											   off_t *offset, off_t *size,

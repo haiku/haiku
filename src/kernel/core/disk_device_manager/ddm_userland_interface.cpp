@@ -749,6 +749,31 @@ _kern_validate_set_partition_type(disk_system_id diskSystemID,
 	return B_ERROR;
 }
 
+// _kern_validate_initialize_partition
+status_t
+_kern_validate_initialize_partition(disk_system_id diskSystemID,
+									partition_id partitionID, char *name,
+									const char *parameters)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return B_BAD_VALUE;
+	// get the disk system
+	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemID);
+	if (!diskSystem)
+		return B_ENTRY_NOT_FOUND;
+	DiskSystemLoader loader(diskSystem, true);
+	// get the info
+	return diskSystem->ValidateInitialize(partition, name, parameters);
+}
+
 // _kern_validate_create_child_partition
 status_t
 _kern_validate_create_child_partition(disk_system_id diskSystemID,
