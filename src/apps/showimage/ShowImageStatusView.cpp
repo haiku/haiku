@@ -7,16 +7,15 @@
 ShowImageStatusView::ShowImageStatusView(BRect r, const char* name, uint32 resizingMode, uint32 flags)
 	: BView(r, name, resizingMode, flags)
 {
-	m_caption = "";
 }
 
 void ShowImageStatusView::Draw(BRect updateRect)
 {
-	DrawString( m_caption, BPoint( 3, 11) );
+	DrawString( fstrText.String(), BPoint( 3, 11) );
 }
 
-void ShowImageStatusView::SetCaption( char * Caption )
+void ShowImageStatusView::SetText(BString &strText)
 {
-	m_caption = Caption;
+	fstrText = strText;
 	Invalidate();
 }

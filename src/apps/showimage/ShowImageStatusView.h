@@ -6,6 +6,7 @@
 #define _ShowImageStatusView_h
 
 #include <View.h>
+#include <String.h>
 
 class ShowImageStatusView : public BView
 {
@@ -14,10 +15,10 @@ public:
 	
 	virtual void Draw(BRect updateRect);
 	
-	void SetCaption( char * Caption );
+	void SetText(BString &strText);
 	
 private:
-    char * m_caption;
+    BString fstrText;
 };
 
 #endif /* _ShowImageStatusView_h */
