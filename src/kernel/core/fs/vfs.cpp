@@ -1657,16 +1657,6 @@ vfs_mount_boot_file_system()
 		status_t status = _kern_mount("/boot", "/dev/disk/scsi/0/0/0/raw", "bfs", NULL);
 		if (status < B_OK)
 			panic("could not get boot device: %s!\n", strerror(status));
-
-		DIR *dir = opendir("/boot/beos/system/add-ons/kernel/bus_managers");
-		if (dir != NULL) {
-			dprintf("Boot Directory Contents:\n");
-			struct dirent *dirent;
-			while ((dirent = readdir(dir)) != NULL) {
-				dprintf(":: %s\n", dirent->d_name);
-			}
-			closedir(dir);
-		}
 	} else
 		put_file_system(bootfs);
 
