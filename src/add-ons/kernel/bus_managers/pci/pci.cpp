@@ -214,8 +214,8 @@ PCI::ReadPciBasicInfo(PCIDev *dev)
 	dev->info.class_base = pci_read_config(dev->bus, dev->dev, dev->func, PCI_class_base, 1);
 	dev->info.line_size = pci_read_config(dev->bus, dev->dev, dev->func, PCI_line_size, 1);
 	dev->info.latency = pci_read_config(dev->bus, dev->dev, dev->func, PCI_latency, 1);
+	// BeOS does not mask off the multifunction bit, developer must use (header_type & PCI_header_type_mask)
 	dev->info.header_type = pci_read_config(dev->bus, dev->dev, dev->func, PCI_header_type, 1);
-	dev->info.header_type &= PCI_header_type_mask; // this masks off the multifunction bit
 	dev->info.bist = pci_read_config(dev->bus, dev->dev, dev->func, PCI_bist, 1);
 	dev->info.reserved = 0;
 }
@@ -224,33 +224,62 @@ PCI::ReadPciBasicInfo(PCIDev *dev)
 void
 PCI::ReadPciHeaderInfo(PCIDev *dev)
 {
-	switch (dev->info.header_type) {
+	switch (dev->info.header_type & PCI_header_type_mask) {
 		case 0:
-			dev->info.u.h0.cardbus_cis = pci_read_config(dev->bus, dev->dev, dev->func, PCI_cardbus_cis, 4);
-			dev->info.u.h0.subsystem_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subsystem_id, 2);
-			dev->info.u.h0.subsystem_vendor_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subsystem_vendor_id, 2);
+		{
+			// disable PCI device address decoding (io and memory) while BARs are modified
+			uint16 pcicmd = pci_read_config(dev->bus, dev->dev, dev->func, PCI_command, 2);
+			pci_write_config(dev->bus, dev->dev, dev->func, PCI_command, 2, pcicmd & ~(PCI_command_io | PCI_command_memory));
+
+			// get BAR size infos			
 			GetRomBarInfo(dev, PCI_rom_base, &dev->info.u.h0.rom_base_pci, &dev->info.u.h0.rom_size);
-			dev->info.u.h0.rom_base = (ulong)pci_ram_address((void *)dev->info.u.h0.rom_base_pci);
 			for (int i = 0; i < 6; i++) {
 				GetBarInfo(dev, PCI_base_registers + 4*i,
 					&dev->info.u.h0.base_registers_pci[i],
 					&dev->info.u.h0.base_register_sizes[i],
 					&dev->info.u.h0.base_register_flags[i]);
+			}
+			
+			// restore PCI device address decoding
+			pci_write_config(dev->bus, dev->dev, dev->func, PCI_command, 2, pcicmd);
+
+			dev->info.u.h0.rom_base = (ulong)pci_ram_address((void *)dev->info.u.h0.rom_base_pci);
+			for (int i = 0; i < 6; i++) {
 				dev->info.u.h0.base_registers[i] = (ulong)pci_ram_address((void *)dev->info.u.h0.base_registers_pci[i]);
 			}
+			
+			dev->info.u.h0.cardbus_cis = pci_read_config(dev->bus, dev->dev, dev->func, PCI_cardbus_cis, 4);
+			dev->info.u.h0.subsystem_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subsystem_id, 2);
+			dev->info.u.h0.subsystem_vendor_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subsystem_vendor_id, 2);
 			dev->info.u.h0.interrupt_line = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_line, 1);
 			dev->info.u.h0.interrupt_pin = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_pin, 1);
 			dev->info.u.h0.min_grant = pci_read_config(dev->bus, dev->dev, dev->func, PCI_min_grant, 1);
 			dev->info.u.h0.max_latency = pci_read_config(dev->bus, dev->dev, dev->func, PCI_max_latency, 1);
 			break;
+		}
+
 		case 1:
+		{
+			// disable PCI device address decoding (io and memory) while BARs are modified
+			uint16 pcicmd = pci_read_config(dev->bus, dev->dev, dev->func, PCI_command, 2);
+			pci_write_config(dev->bus, dev->dev, dev->func, PCI_command, 2, pcicmd & ~(PCI_command_io | PCI_command_memory));
+
+			GetRomBarInfo(dev, PCI_bridge_rom_base, &dev->info.u.h1.rom_base_pci);
 			for (int i = 0; i < 2; i++) {
 				GetBarInfo(dev, PCI_base_registers + 4*i,
 					&dev->info.u.h1.base_registers_pci[i],
 					&dev->info.u.h1.base_register_sizes[i],
 					&dev->info.u.h1.base_register_flags[i]);
+			}
+
+			// restore PCI device address decoding
+			pci_write_config(dev->bus, dev->dev, dev->func, PCI_command, 2, pcicmd);
+
+			dev->info.u.h1.rom_base = (ulong)pci_ram_address((void *)dev->info.u.h1.rom_base_pci);
+			for (int i = 0; i < 2; i++) {
 				dev->info.u.h1.base_registers[i] = (ulong)pci_ram_address((void *)dev->info.u.h1.base_registers_pci[i]);
 			}
+
 			dev->info.u.h1.primary_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_primary_bus, 1);
 			dev->info.u.h1.secondary_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_secondary_bus, 1);
 			dev->info.u.h1.subordinate_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subordinate_bus, 1);
@@ -266,12 +295,12 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 			dev->info.u.h1.prefetchable_memory_limit_upper32 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_limit_upper32, 4);
 			dev->info.u.h1.io_base_upper16 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_base_upper16, 2);
 			dev->info.u.h1.io_limit_upper16 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_limit_upper16, 2);
-			GetRomBarInfo(dev, PCI_bridge_rom_base, &dev->info.u.h1.rom_base_pci);
-			dev->info.u.h1.rom_base = (ulong)pci_ram_address((void *)dev->info.u.h1.rom_base_pci);
 			dev->info.u.h1.interrupt_line = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_line, 1);
 			dev->info.u.h1.interrupt_pin = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_pin, 1);
 			dev->info.u.h1.bridge_control = pci_read_config(dev->bus, dev->dev, dev->func, PCI_bridge_control, 2);		
 			break;
+		}
+
 		default:
 			dprintf("PCI: Header type unknown (%d)\n", dev->info.header_type);
 			break;
