@@ -347,7 +347,7 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 {
 	net_stack_cookie *nsc = cookie;
 	struct stack_driver_args *args = data;
-	int err;
+	int err = B_OK;
 
 #if SHOW_INSANE_DEBUGGING
 	dprintf(LOGID "net_stack_control(%p, 0x%lX, %p, %ld)\n", cookie, op, data, len);
@@ -376,6 +376,12 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 				
 				*((void **) data) = cookie;
 				return B_OK;
+			}
+			case NET_STACK_CONTROL_NET_MODULE: {
+				struct control_net_module_args *control_args =
+					(struct control_net_module_args*) data;
+				return core->control_net_module(control_args->name, control_args->op,
+					control_args->data, control_args->length);
 			}
 		};
 	} else {
@@ -472,6 +478,8 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 				return B_BAD_VALUE;
 		};
 	};
+	
+	return err;
 }
 
 
