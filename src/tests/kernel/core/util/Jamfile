@@ -9,6 +9,7 @@ CommonTestLib libkernelutilstest.so
 	: KernelUtilsTestAddon.cpp
 #	  AVLTreeMapTest.cpp
 	  SinglyLinkedListTest.cpp
+	  DoublyLinkedListTest.cpp
 	  VectorMapTest.cpp
 	  VectorSetTest.cpp
 	  VectorTest.cpp
