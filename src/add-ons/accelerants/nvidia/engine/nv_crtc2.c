@@ -115,6 +115,13 @@ status_t nv_crtc2_set_timing(display_mode target)
 			(((uint16)((si->ps.p2_timing.h_total / ((float)si->ps.p2_timing.h_display)) *
 			target.timing.h_display)) & 0xfff8) - 8;
 
+		/* apparantly NV11 timing is a bit more critical */
+		if ((si->ps.card_type == NV11) &&
+			(target.timing.h_display == si->ps.p2_timing.h_display))
+		{
+			target.timing.h_total -= 32;
+		}
+
 		if (target.timing.h_sync_start == target.timing.h_display)
 			target.timing.h_sync_start += 8;
 		if (target.timing.h_sync_end == target.timing.h_total)

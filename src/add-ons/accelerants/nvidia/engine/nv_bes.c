@@ -1,9 +1,23 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-5/2004 */
+/* Written by Rudolf Cornelissen 05/2002-6/2004 */
 
 #define MODULE_BIT 0x00000200
 
 #include "nv_std.h"
+
+typedef struct move_overlay_info move_overlay_info;
+
+struct move_overlay_info
+{
+	uint32 hcoordv;		/* left and right edges of video output window */
+	uint32 vcoordv;		/* top and bottom edges of video output window */
+	uint32 hsrcstv;		/* horizontal source start in source buffer (clipping) */
+	uint32 v1srcstv;	/* vertical source start in source buffer (clipping) */
+	uint32 a1orgv;		/* alternate source clipping via startadress of source buffer */
+};
+
+static void nv_bes_calc_move_overlay(move_overlay_info *moi);
+static void nv_bes_program_move_overlay(move_overlay_info moi);
 
 /* move the overlay output window in virtualscreens */
 /* Note:
@@ -11,15 +25,21 @@
  * output window is located! */
 void nv_bes_move_overlay()
 {
-	/* calculated BES register values */
-	uint32 	hcoordv, vcoordv, hsrcstv, a1orgv, v1srcstv;
+	move_overlay_info moi;
+
+	/* abort if overlay is not active */
+	if (!si->overlay.active) return;
+
+	nv_bes_calc_move_overlay(&moi);
+	nv_bes_program_move_overlay(moi);
+}
+
+static void nv_bes_calc_move_overlay(move_overlay_info *moi)
+{
 	/* misc used variables */
 	uint16 temp1, temp2;
 	/* visible screen window in virtual workspaces */
 	uint16 crtc_hstart, crtc_vstart, crtc_hend, crtc_vend;
-
-	/* abort if overlay is not active */
-	if (!si->overlay.active) return;
 
 	/* do 'overlay follow head' in dualhead modes on dualhead cards */
 	if (si->ps.secondary_head)
@@ -61,7 +81,7 @@ void nv_bes_move_overlay()
 	 ****************************************/
 
 	/* setup left and right edges of output window */
-	hcoordv = 0;
+	moi->hcoordv = 0;
 	/* left edge coordinate of output window, must be inside desktop */
 	/* clipping on the left side */
 	if (si->overlay.ow.h_start < crtc_hstart)
@@ -82,7 +102,7 @@ void nv_bes_move_overlay()
 			temp1 = (si->overlay.ow.h_start - crtc_hstart) & 0x7ff;
 		}
 	} 
-	hcoordv |= temp1 << 16;
+	moi->hcoordv |= temp1 << 16;
 	/* right edge coordinate of output window, must be inside desktop */
 	/* width < 2 is not allowed */
 	if (si->overlay.ow.width < 2) 
@@ -111,11 +131,11 @@ void nv_bes_move_overlay()
 			}
 		}
 	}
-	hcoordv |= temp2 << 0;
+	moi->hcoordv |= temp2 << 0;
 	LOG(4,("Overlay: CRTC left-edge output %d, right-edge output %d\n",temp1, temp2));
 
 	/* setup top and bottom edges of output window */
-	vcoordv = 0;
+	moi->vcoordv = 0;
 	/* top edge coordinate of output window, must be inside desktop */
 	/* clipping on the top side */
 	if (si->overlay.ow.v_start < crtc_vstart)
@@ -136,7 +156,7 @@ void nv_bes_move_overlay()
 			temp1 = (si->overlay.ow.v_start - crtc_vstart) & 0x7ff;
 		}
 	} 
-	vcoordv |= temp1 << 16;
+	moi->vcoordv |= temp1 << 16;
 	/* bottom edge coordinate of output window, must be inside desktop */
 	/* height < 2 is not allowed */
 	if (si->overlay.ow.height < 2) 
@@ -165,7 +185,7 @@ void nv_bes_move_overlay()
 			}
 		}
 	}
-	vcoordv |= temp2 << 0;
+	moi->vcoordv |= temp2 << 0;
 	LOG(4,("Overlay: CRTC top-edge output %d, bottom-edge output %d\n",temp1, temp2));
 
 
@@ -181,7 +201,7 @@ void nv_bes_move_overlay()
 	 * Note: The input bitmaps slopspace is automatically excluded from the calculations this way! */
 	/* Note also:
 	 * Even if the scaling factor is clamping we instruct the BES to use the correct source start pos.! */
-	hsrcstv = 0;
+	moi->hsrcstv = 0;
 	/* check for destination horizontal clipping at left side */
 	if (si->overlay.ow.h_start < crtc_hstart)
 	{
@@ -190,24 +210,24 @@ void nv_bes_move_overlay()
 		if ((si->overlay.ow.h_start + si->overlay.ow.width - 1) < (crtc_hstart + 1))
 		{
 			/* increase 'first contributing pixel' with 'fixed value': (total dest. width - 2) */
-			hsrcstv += (si->overlay.ow.width - 2);
+			moi->hsrcstv += (si->overlay.ow.width - 2);
 		}
 		else
 		{
 			/* increase 'first contributing pixel' with actual number of dest. clipping pixels */
-			hsrcstv += (crtc_hstart - si->overlay.ow.h_start);
+			moi->hsrcstv += (crtc_hstart - si->overlay.ow.h_start);
 		}
 		LOG(4,("Overlay: clipping left...\n"));
 
 		/* The calculated value is based on scaling = 1x. So we now compensate for scaling.
 		 * Note that this also already takes care of aligning the value to the BES register! */
-		hsrcstv *= si->overlay.h_ifactor;
+		moi->hsrcstv *= si->overlay.h_ifactor;
 	}
 	/* take zoom into account */
-	hsrcstv += ((uint32)si->overlay.my_ov.h_start) << 16;
+	moi->hsrcstv += ((uint32)si->overlay.my_ov.h_start) << 16;
 	/* AND below required by hardware */
-	hsrcstv &= 0x03fffffc;
-	LOG(4,("Overlay: first hor. (sub)pixel of input bitmap contributing %f\n", hsrcstv / (float)65536));
+	moi->hsrcstv &= 0x03fffffc;
+	LOG(4,("Overlay: first hor. (sub)pixel of input bitmap contributing %f\n", moi->hsrcstv / (float)65536));
 
 
 	/*******************************
@@ -215,8 +235,8 @@ void nv_bes_move_overlay()
 	 *******************************/
 
 	/* calculate inputbitmap origin adress */
-	a1orgv = (uint32)((vuint32 *)si->overlay.ob.buffer);
-	a1orgv -= (uint32)((vuint32 *)si->framebuffer);
+	moi->a1orgv = (uint32)((vuint32 *)si->overlay.ob.buffer);
+	moi->a1orgv -= (uint32)((vuint32 *)si->framebuffer);
 
 	/* Setup vertical source start: first (sub)pixel contributing to output picture. */
 	/* Note:
@@ -226,7 +246,7 @@ void nv_bes_move_overlay()
 	/* Note also:
 	 * Even if the scaling factor is clamping we instruct the BES to use the correct source start pos.! */
 
-	v1srcstv = 0;
+	moi->v1srcstv = 0;
 	/* check for destination vertical clipping at top side */
 	if (si->overlay.ow.v_start < crtc_vstart)
 	{
@@ -236,39 +256,41 @@ void nv_bes_move_overlay()
 		{
 			/* increase 'number of clipping pixels' with 'fixed value':
 			 * 'total height - 2' of dest. picture in pixels * inverse scaling factor */
-			v1srcstv = (si->overlay.ow.height - 2) * si->overlay.v_ifactor;
+			moi->v1srcstv = (si->overlay.ow.height - 2) * si->overlay.v_ifactor;
 			/* on pre-NV10 we need to do clipping in the source
 			 * bitmap because no seperate clipping registers exist... */
 			if (si->ps.card_arch < NV10A)
-				a1orgv += ((v1srcstv >> 16) * si->overlay.ob.bytes_per_row);
+				moi->a1orgv += ((moi->v1srcstv >> 16) * si->overlay.ob.bytes_per_row);
 		}
 		else
 		{
 			/* increase 'first contributing pixel' with:
 			 * number of destination picture clipping pixels * inverse scaling factor */
-			v1srcstv = (crtc_vstart - si->overlay.ow.v_start) * si->overlay.v_ifactor;
+			moi->v1srcstv = (crtc_vstart - si->overlay.ow.v_start) * si->overlay.v_ifactor;
 			/* on pre-NV10 we need to do clipping in the source
 			 * bitmap because no seperate clipping registers exist... */
 			if (si->ps.card_arch < NV10A)
-				a1orgv += ((v1srcstv >> 16) * si->overlay.ob.bytes_per_row);
+				moi->a1orgv += ((moi->v1srcstv >> 16) * si->overlay.ob.bytes_per_row);
 		}
 		LOG(4,("Overlay: clipping at top...\n"));
 	}
 	/* take zoom into account */
-	v1srcstv += (((uint32)si->overlay.my_ov.v_start) << 16);
+	moi->v1srcstv += (((uint32)si->overlay.my_ov.v_start) << 16);
 	if (si->ps.card_arch < NV10A)
 	{
-		a1orgv += (si->overlay.my_ov.v_start * si->overlay.ob.bytes_per_row);
-		LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n", a1orgv));
+		moi->a1orgv += (si->overlay.my_ov.v_start * si->overlay.ob.bytes_per_row);
+		LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n", moi->a1orgv));
 	}
-	LOG(4,("Overlay: first vert. (sub)pixel of input bitmap contributing %f\n", v1srcstv / (float)65536));
+	LOG(4,("Overlay: first vert. (sub)pixel of input bitmap contributing %f\n", moi->v1srcstv / (float)65536));
 
 	/* AND below is probably required by hardware. */
 	/* Buffer A topleft corner of field 1 (origin)(field 1 contains our full frames) */
-	a1orgv &= 0xfffffff0;
-	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n",a1orgv));
+	moi->a1orgv &= 0xfffffff0;
+	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n", moi->a1orgv));
+}
 
-
+static void nv_bes_program_move_overlay(move_overlay_info moi)
+{
 	/*************************************
 	 *** sync to BES (Back End Scaler) ***
 	 *************************************/
@@ -294,10 +316,10 @@ void nv_bes_move_overlay()
 		 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
 		/* (program both buffers to prevent sync distortions) */
 		/* first include 'pixel precise' left clipping... (top clipping was already included) */
-		a1orgv += ((hsrcstv >> 16) * 2);
+		moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
 		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
-		BESW(NV04_0BUFADR, (a1orgv & ~0x03));
-		BESW(NV04_1BUFADR, (a1orgv & ~0x03));
+		BESW(NV04_0BUFADR, (moi.a1orgv & ~0x03));
+		BESW(NV04_1BUFADR, (moi.a1orgv & ~0x03));
 
 		/* setup buffer source pitch including slopspace (in bytes).
 		 * Note:
@@ -306,11 +328,11 @@ void nv_bes_move_overlay()
 //		BESW(NV04_0SRCPTCH, (ob->width * 2));
 //		BESW(NV04_1SRCPTCH, (ob->width * 2));
 		/* setup output window position */
-		BESW(NV04_DSTREF, ((vcoordv & 0xffff0000) | ((hcoordv & 0xffff0000) >> 16)));
+		BESW(NV04_DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
 		/* setup output window size */
 		BESW(NV04_DSTSIZE, (
-			(((vcoordv & 0x0000ffff) - ((vcoordv & 0xffff0000) >> 16) + 1) << 16) |
-			((hcoordv & 0x0000ffff) - ((hcoordv & 0xffff0000) >> 16) + 1)
+			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
+			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
 			));
 
 		/* enable BES (b0), enable colorkeying (b4), format yuy2 (b8: 0 = ccir) */
@@ -323,7 +345,7 @@ void nv_bes_move_overlay()
 		/* >= NV10A */
 	
 		/* setup buffer origin: GeForce uses subpixel precise clipping on left and top! (12.4 values) */
-		BESW(NV10_0SRCREF, ((v1srcstv << 4) & 0xffff0000) | ((hsrcstv >> 12) & 0x0000ffff));
+		BESW(NV10_0SRCREF, ((moi.v1srcstv << 4) & 0xffff0000) | ((moi.hsrcstv >> 12) & 0x0000ffff));
 		/* setup buffersize */
 		//fixme if needed: width must be even officially...
 //		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
@@ -333,11 +355,11 @@ void nv_bes_move_overlay()
 		 * source pitch granularity = 32 pixels on GeForce cards!! */
 //		BESW(NV10_0SRCPTCH, (((ob->width * 2) & 0x0000ffff) | (1 << 16) | (1 << 20) | (0 << 24)));
 		/* setup output window position */
-		BESW(NV10_0DSTREF, ((vcoordv & 0xffff0000) | ((hcoordv & 0xffff0000) >> 16)));
+		BESW(NV10_0DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
 		/* setup output window size */
 		BESW(NV10_0DSTSIZE, (
-			(((vcoordv & 0x0000ffff) - ((vcoordv & 0xffff0000) >> 16) + 1) << 16) |
-			((hcoordv & 0x0000ffff) - ((hcoordv & 0xffff0000) >> 16) + 1)
+			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
+			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
 			));
 		/* setup (unclipped!) buffer startadress in RAM */
 //		BESW(NV10_0BUFADR, a1orgv);
@@ -438,12 +460,12 @@ status_t nv_configure_bes
 	/* 'ov' is the view in the source bitmap, so which part of the bitmap is actually
 	 * displayed on screen. This is used for the 'hardware zoom' function. */
  
+	/* output window position and clipping info for source buffer */
+	move_overlay_info moi;
 	/* calculated BES register values */
-	uint32 	hcoordv, vcoordv, hiscalv, hsrcstv,	viscalv, a1orgv, v1srcstv;
-	/* misc used variables */
-	uint16 temp1, temp2;
+	uint32 	hiscalv, viscalv;
 	/* interval representation, used for scaling calculations */
-	uint16 intrep, crtc_hstart, crtc_vstart, crtc_hend, crtc_vend;
+	uint16 intrep;
 	/* inverse scaling factor, used for source positioning */
 	uint32 ifactor;
 	/* copy of overlay view which has checked valid values */
@@ -469,149 +491,19 @@ status_t nv_configure_bes
 	LOG(6,("Overlay: inputbuffer view (zoom) left %d, top %d, width %d, height %d\n",
 		my_ov.h_start, my_ov.v_start, my_ov.width, my_ov.height));
 
-	/* save for nv_bes_move_overlay() */
+	/* save for nv_bes_calc_move_overlay() */
 	si->overlay.ow = *ow;
 	si->overlay.ob = *ob;
 	si->overlay.my_ov = my_ov;
 
-	/* the BES does not respect virtual_workspaces, but adheres to CRTC
-	 * constraints only */
-	crtc_hstart = si->dm.h_display_start;
-	/* make dualhead stretch and switch mode work while we're at it.. */
-	if (si->overlay.crtc)
-	{
-		crtc_hstart += si->dm.timing.h_display;
-	}
 
-	/* horizontal end is the first position beyond the displayed range on the CRTC */
-	crtc_hend = crtc_hstart + si->dm.timing.h_display;
-	crtc_vstart = si->dm.v_display_start;
-	/* vertical end is the first position beyond the displayed range on the CRTC */
-	crtc_vend = crtc_vstart + si->dm.timing.v_display;
-
-
-	/****************************************
-	 *** setup all edges of output window ***
-	 ****************************************/
-
-	/* setup left and right edges of output window */
-	hcoordv = 0;
-	/* left edge coordinate of output window, must be inside desktop */
-	/* clipping on the left side */
-	if (ow->h_start < crtc_hstart)
-	{
-		temp1 = 0;
-	}
-	else
-	{
-		/* clipping on the right side */
-		if (ow->h_start >= (crtc_hend - 1))
-		{
-			/* width < 2 is not allowed */
-			temp1 = (crtc_hend - crtc_hstart - 2) & 0x7ff;
-		} 
-		else
-		/* no clipping here */
-		{
-			temp1 = (ow->h_start - crtc_hstart) & 0x7ff;
-		}
-	} 
-	hcoordv |= temp1 << 16;
-	/* right edge coordinate of output window, must be inside desktop */
-	/* width < 2 is not allowed */
-	if (ow->width < 2) 
-	{
-		temp2 = (temp1 + 1) & 0x7ff;
-	}
-	else 
-	{
-		/* clipping on the right side */
-		if ((ow->h_start + ow->width - 1) > (crtc_hend - 1))
-		{
-			temp2 = (crtc_hend - crtc_hstart - 1) & 0x7ff;
-		}
-		else
-		{
-			/* clipping on the left side */
-			if ((ow->h_start + ow->width - 1) < (crtc_hstart + 1))
-			{
-				/* width < 2 is not allowed */
-				temp2 = 1;
-			}
-			else
-			/* no clipping here */
-			{
-				temp2 = ((uint16)(ow->h_start + ow->width - crtc_hstart - 1)) & 0x7ff;
-			}
-		}
-	}
-	hcoordv |= temp2 << 0;
-	LOG(4,("Overlay: CRTC left-edge output %d, right-edge output %d\n",temp1, temp2));
-
-	/* setup top and bottom edges of output window */
-	vcoordv = 0;
-	/* top edge coordinate of output window, must be inside desktop */
-	/* clipping on the top side */
-	if (ow->v_start < crtc_vstart)
-	{
-		temp1 = 0;
-	}
-	else
-	{
-		/* clipping on the bottom side */
-		if (ow->v_start >= (crtc_vend - 1))
-		{
-			/* height < 2 is not allowed */
-			temp1 = (crtc_vend - crtc_vstart - 2) & 0x7ff;
-		} 
-		else
-		/* no clipping here */
-		{
-			temp1 = (ow->v_start - crtc_vstart) & 0x7ff;
-		}
-	} 
-	vcoordv |= temp1 << 16;
-	/* bottom edge coordinate of output window, must be inside desktop */
-	/* height < 2 is not allowed */
-	if (ow->height < 2) 
-	{
-		temp2 = (temp1 + 1) & 0x7ff;
-	}
-	else 
-	{
-		/* clipping on the bottom side */
-		if ((ow->v_start + ow->height - 1) > (crtc_vend - 1))
-		{
-			temp2 = (crtc_vend - crtc_vstart - 1) & 0x7ff;
-		}
-		else
-		{
-			/* clipping on the top side */
-			if ((ow->v_start + ow->height - 1) < (crtc_vstart + 1))
-			{
-				/* height < 2 is not allowed */
-				temp2 = 1;
-			}
-			else
-			/* no clipping here */
-			{
-				temp2 = ((uint16)(ow->v_start + ow->height - crtc_vstart - 1)) & 0x7ff;
-			}
-		}
-	}
-	vcoordv |= temp2 << 0;
-	LOG(4,("Overlay: CRTC top-edge output %d, bottom-edge output %d\n",temp1, temp2));
-
-
-	/*********************************************
-	 *** setup horizontal scaling and clipping ***
-	 *********************************************/
-
+	/********************************
+	 *** setup horizontal scaling ***
+	 ********************************/
 	LOG(6,("Overlay: total input picture width = %d, height = %d\n",
 			(ob->width - si->overlay.myBufInfo[offset].slopspace), ob->height));
 	LOG(6,("Overlay: output picture width = %d, height = %d\n", ow->width, ow->height));
 
-	/* do horizontal scaling... */
 	/* determine interval representation value, taking zoom into account */
 	if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
 	{
@@ -648,7 +540,7 @@ status_t nv_configure_bes
 	/* correct factor to prevent most-right visible 'line' from distorting */
 	ifactor -= (1 << 2);
 	hiscalv = ifactor;
-	/* save for nv_bes_move_overlay() */
+	/* save for nv_bes_calc_move_overlay() */
 	si->overlay.h_ifactor = ifactor;
 	LOG(4,("Overlay: horizontal scaling factor is %f\n", (float)65536 / ifactor));
 
@@ -697,49 +589,10 @@ status_t nv_configure_bes
 	hiscalv &= 0x001ffffc;
 
 
-	/* do horizontal clipping... */
-	/* Setup horizontal source start: first (sub)pixel contributing to output picture */
-	/* Note:
-	 * The method is to calculate, based on 1:1 scaling, based on the output window.
-	 * After this is done, include the scaling factor so you get a value based on the input bitmap.
-	 * Then add the left starting position of the bitmap's view (zoom function) to get the final value needed.
-	 * Note: The input bitmaps slopspace is automatically excluded from the calculations this way! */
-	/* Note also:
-	 * Even if the scaling factor is clamping we instruct the BES to use the correct source start pos.! */
-	hsrcstv = 0;
-	/* check for destination horizontal clipping at left side */
-	if (ow->h_start < crtc_hstart)
-	{
-		/* check if entire destination picture is clipping left:
-		 * (2 pixels will be clamped onscreen at least) */
-		if ((ow->h_start + ow->width - 1) < (crtc_hstart + 1))
-		{
-			/* increase 'first contributing pixel' with 'fixed value': (total dest. width - 2) */
-			hsrcstv += (ow->width - 2);
-		}
-		else
-		{
-			/* increase 'first contributing pixel' with actual number of dest. clipping pixels */
-			hsrcstv += (crtc_hstart - ow->h_start);
-		}
-		LOG(4,("Overlay: clipping left...\n"));
+	/******************************
+	 *** setup vertical scaling ***
+	 ******************************/
 
-		/* The calculated value is based on scaling = 1x. So we now compensate for scaling.
-		 * Note that this also already takes care of aligning the value to the BES register! */
-		hsrcstv *= ifactor;
-	}
-	/* take zoom into account */
-	hsrcstv += ((uint32)my_ov.h_start) << 16;
-	/* AND below required by hardware */
-	hsrcstv &= 0x03fffffc;
-	LOG(4,("Overlay: first hor. (sub)pixel of input bitmap contributing %f\n", hsrcstv / (float)65536));
-
-
-	/*******************************************
-	 *** setup vertical scaling and clipping ***
-	 *******************************************/
-
-	/* do vertical scaling... */
 	/* determine interval representation value, taking zoom into account */
 	if (ow->flags & B_OVERLAY_VERTICAL_FILTERING)
 	{
@@ -779,7 +632,7 @@ status_t nv_configure_bes
 
 	/* preserve ifactor for source positioning calculations later on */
 	viscalv = ifactor;
-	/* save for nv_bes_move_overlay() */
+	/* save for nv_bes_calc_move_overlay() */
 	si->overlay.v_ifactor = ifactor;
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
@@ -827,60 +680,10 @@ status_t nv_configure_bes
 	viscalv &= 0x001ffffc;
 
 
-	/* calculate inputbitmap origin adress */
-	a1orgv = (uint32)((vuint32 *)ob->buffer);
-	a1orgv -= (uint32)((vuint32 *)si->framebuffer);
-
-	/* do vertical clipping... */
-	/* Setup vertical source start: first (sub)pixel contributing to output picture. */
-	/* Note:
-	 * The method is to calculate, based on 1:1 scaling, based on the output window.
-	 * 'After' this is done, include the scaling factor so you get a value based on the input bitmap. 
-	 * Then add the top starting position of the bitmap's view (zoom function) to get the final value needed. */
-	/* Note also:
-	 * Even if the scaling factor is clamping we instruct the BES to use the correct source start pos.! */
-
-	v1srcstv = 0;
-	/* check for destination vertical clipping at top side */
-	if (ow->v_start < crtc_vstart)
-	{
-		/* check if entire destination picture is clipping at top:
-		 * (2 pixels will be clamped onscreen at least) */
-		if ((ow->v_start + ow->height - 1) < (crtc_vstart + 1))
-		{
-			/* increase 'number of clipping pixels' with 'fixed value':
-			 * 'total height - 2' of dest. picture in pixels * inverse scaling factor */
-			v1srcstv = (ow->height - 2) * ifactor;
-			/* on pre-NV10 we need to do clipping in the source
-			 * bitmap because no seperate clipping registers exist... */
-			if (si->ps.card_arch < NV10A)
-				a1orgv += ((v1srcstv >> 16) * ob->bytes_per_row);
-		}
-		else
-		{
-			/* increase 'first contributing pixel' with:
-			 * number of destination picture clipping pixels * inverse scaling factor */
-			v1srcstv = (crtc_vstart - ow->v_start) * ifactor;
-			/* on pre-NV10 we need to do clipping in the source
-			 * bitmap because no seperate clipping registers exist... */
-			if (si->ps.card_arch < NV10A)
-				a1orgv += ((v1srcstv >> 16) * ob->bytes_per_row);
-		}
-		LOG(4,("Overlay: clipping at top...\n"));
-	}
-	/* take zoom into account */
-	v1srcstv += (((uint32)my_ov.v_start) << 16);
-	if (si->ps.card_arch < NV10A)
-	{
-		a1orgv += (my_ov.v_start * ob->bytes_per_row);
-		LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n", a1orgv));
-	}
-	LOG(4,("Overlay: first vert. (sub)pixel of input bitmap contributing %f\n", v1srcstv / (float)65536));
-
-	/* AND below is probably required by hardware. */
-	/* Buffer A topleft corner of field 1 (origin)(field 1 contains our full frames) */
-	a1orgv &= 0xfffffff0;
-	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n",a1orgv));
+	/********************************************************************************
+	 *** setup all edges of output window, setup horizontal and vertical clipping ***
+	 ********************************************************************************/
+	nv_bes_calc_move_overlay(&moi);
 
 
 	/*****************************
@@ -926,10 +729,10 @@ status_t nv_configure_bes
 		 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
 		/* (program both buffers to prevent sync distortions) */
 		/* first include 'pixel precise' left clipping... (top clipping was already included) */
-		a1orgv += ((hsrcstv >> 16) * 2);
+		moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
 		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
-		BESW(NV04_0BUFADR, (a1orgv & ~0x03));
-		BESW(NV04_1BUFADR, (a1orgv & ~0x03));
+		BESW(NV04_0BUFADR, (moi.a1orgv & ~0x03));
+		BESW(NV04_1BUFADR, (moi.a1orgv & ~0x03));
 		/* setup buffer source pitch including slopspace (in bytes).
 		 * Note:
 		 * source pitch granularity = 16 pixels on the RIVA128 - TNT (so pre-NV10) bes */
@@ -937,11 +740,11 @@ status_t nv_configure_bes
 		BESW(NV04_0SRCPTCH, (ob->width * 2));
 		BESW(NV04_1SRCPTCH, (ob->width * 2));
 		/* setup output window position */
-		BESW(NV04_DSTREF, ((vcoordv & 0xffff0000) | ((hcoordv & 0xffff0000) >> 16)));
+		BESW(NV04_DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
 		/* setup output window size */
 		BESW(NV04_DSTSIZE, (
-			(((vcoordv & 0x0000ffff) - ((vcoordv & 0xffff0000) >> 16) + 1) << 16) |
-			((hcoordv & 0x0000ffff) - ((hcoordv & 0xffff0000) >> 16) + 1)
+			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
+			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
 			));
 		/* setup horizontal and vertical scaling */
 		BESW(NV04_ISCALVH, (((viscalv << 16) >> 5) | (hiscalv >> 5)));
@@ -995,7 +798,7 @@ status_t nv_configure_bes
 		/* >= NV10A */
 	
 		/* setup buffer origin: GeForce uses subpixel precise clipping on left and top! (12.4 values) */
-		BESW(NV10_0SRCREF, ((v1srcstv << 4) & 0xffff0000) | ((hsrcstv >> 12) & 0x0000ffff));
+		BESW(NV10_0SRCREF, ((moi.v1srcstv << 4) & 0xffff0000) | ((moi.hsrcstv >> 12) & 0x0000ffff));
 		/* setup buffersize */
 		//fixme if needed: width must be even officially...
 		BESW(NV10_0SRCSIZE, ((ob->height << 16) | ob->width));
@@ -1005,18 +808,18 @@ status_t nv_configure_bes
 		 * source pitch granularity = 32 pixels on GeForce cards!! */
 		BESW(NV10_0SRCPTCH, (((ob->width * 2) & 0x0000ffff) | (1 << 16) | (1 << 20) | (0 << 24)));
 		/* setup output window position */
-		BESW(NV10_0DSTREF, ((vcoordv & 0xffff0000) | ((hcoordv & 0xffff0000) >> 16)));
+		BESW(NV10_0DSTREF, ((moi.vcoordv & 0xffff0000) | ((moi.hcoordv & 0xffff0000) >> 16)));
 		/* setup output window size */
 		BESW(NV10_0DSTSIZE, (
-			(((vcoordv & 0x0000ffff) - ((vcoordv & 0xffff0000) >> 16) + 1) << 16) |
-			((hcoordv & 0x0000ffff) - ((hcoordv & 0xffff0000) >> 16) + 1)
+			(((moi.vcoordv & 0x0000ffff) - ((moi.vcoordv & 0xffff0000) >> 16) + 1) << 16) |
+			((moi.hcoordv & 0x0000ffff) - ((moi.hcoordv & 0xffff0000) >> 16) + 1)
 			));
 		/* setup horizontal scaling */
 		BESW(NV10_0ISCALH, (hiscalv << 4));
 		/* setup vertical scaling */
 		BESW(NV10_0ISCALV, (viscalv << 4));
 		/* setup (unclipped!) buffer startadress in RAM */
-		BESW(NV10_0BUFADR, a1orgv);
+		BESW(NV10_0BUFADR, moi.a1orgv);
 		/* enable BES (b0 = 0) */
 		BESW(NV10_GENCTRL, 0x00000000);
 		/* We only use buffer buffer 0: select it. (0x01 = buffer 0, 0x10 = buffer 1) */

@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/2002-4/2004 */
+/* Written by Rudolf Cornelissen 05/2002-6/2004 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -595,26 +595,7 @@ status_t CONFIGURE_OVERLAY
 		{
 			LOG(4,("succesfull, switching to buffer %d\n", offset));
 
-			/* do 'overlay follow head' in dualhead modes on dualhead cards */
-			if (si->ps.secondary_head)
-			{
-				switch (si->dm.flags & DUALHEAD_BITS)
-				{
-				case DUALHEAD_ON:
-				case DUALHEAD_SWITCH:
-					if ((ow->h_start + (ow->width / 2)) <
-							(si->dm.h_display_start + si->dm.timing.h_display))
-						nv_bes_to_crtc(si->crtc_switch_mode);
-					else
-						nv_bes_to_crtc(!si->crtc_switch_mode);
-					break;
-				default:
-						nv_bes_to_crtc(si->crtc_switch_mode);
-					break;
-				}
-			}
-
-			/* _now_ program overlay hardware */
+			/* program overlay hardware */
 			nv_configure_bes(ob, ow, ov, offset);
 
 			return B_OK;

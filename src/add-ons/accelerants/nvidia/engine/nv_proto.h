@@ -1,4 +1,4 @@
-/*general card functions*/
+/* general card functions */
 status_t nv_general_powerup(void);
 status_t nv_set_cas_latency(void);
 void setup_virtualized_heads(bool);
@@ -18,17 +18,17 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	if (mod && lev) nv_log args; \
 } while (0)
 
-/*support functions*/
+/* support functions */
 void delay(bigtime_t i);
 void nv_log(char *format, ...);
 
-/*i2c maven functions*/
+/* i2c functions */
 int i2c_maven_read(unsigned char address);
 void i2c_maven_write(unsigned char address, unsigned char data);
 status_t i2c_init(void);
 status_t i2c_maven_probe(void);
 
-/*card info functions*/
+/* card info functions */
 status_t parse_pins(void);
 void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2);
 void fake_pins(void);
@@ -89,13 +89,13 @@ status_t nv_crtc2_dpms(bool, bool, bool);
 status_t nv_crtc2_dpms_fetch(bool*, bool*, bool*);
 status_t nv_crtc2_mem_priority(uint8);
 
-status_t nv_crtc2_cursor_init(void); /*Yes, cursor follows CRTC1 - not the DAC!*/
+status_t nv_crtc2_cursor_init(void);
 status_t nv_crtc2_cursor_define(uint8*,uint8*);
 status_t nv_crtc2_cursor_position(uint16 x ,uint16 y);
 status_t nv_crtc2_cursor_show(void);
 status_t nv_crtc2_cursor_hide(void);
 
-/*acceleration functions*/
+/* acceleration functions */
 status_t check_acc_capability(uint32 feature);
 status_t nv_acc_init(void);
 status_t nv_acc_setup_blit(void);
@@ -109,7 +109,7 @@ status_t nv_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 	uint16 xd,uint16 yd,uint16 wd,uint16 hd);
 status_t nv_acc_wait_idle(void);
 
-/*backend scaler functions*/
+/* backend scaler functions */
 status_t check_overlay_capability(uint32 feature);
 void nv_bes_move_overlay(void);
 status_t nv_bes_to_crtc(bool crtc);
@@ -121,6 +121,6 @@ status_t nv_release_bes(void);
 /* I2C functions */
 status_t i2c_sec_tv_adapter(void);
 
-/*driver structures and enums*/
-enum{BPP8=0,BPP15=1,BPP16=2,BPP24=3,BPP32=4};
+/* driver structures and enums */
+enum{BPP8 = 0, BPP15 = 1, BPP16 = 2, BPP24 = 3, BPP32 = 4};
 enum{DS_CRTC1DAC_CRTC2MAVEN, DS_CRTC1MAVEN_CRTC2DAC, DS_CRTC1CON1_CRTC2CON2, DS_CRTC1CON2_CRTC2CON1};
