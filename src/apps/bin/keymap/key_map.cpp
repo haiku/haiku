@@ -55,7 +55,6 @@ int main(int argc, char **argv)
 			} else if (operation == 'l') {
 				Keymap keymap;
 				keymap.LoadSource(stdin);
-				
 				keymap.SaveAsCurrent();
 				return 0;
 			}

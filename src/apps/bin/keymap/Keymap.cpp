@@ -285,7 +285,7 @@ Keymap::ComputeChars(const char *buffer, struct re_registers &regs, int i, int &
 	} else if (sscanf(buffer + regs.start[i], "0x%s", hexChars) > 0) {
 		length = strlen(hexChars) / 2;
 		for (uint32 j=0; j<length; j++)
-			sscanf(hexChars + 2*j, "%02x", (unsigned short *)current + j);
+			sscanf(hexChars + 2*j, "%02x", (uint8*)current + j);
 	}
 	fChars[offset] = length;
 	offset += length + 1;
