@@ -263,8 +263,8 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	// Multiply togheter
 	FT_Matrix_Multiply(&rmatrix, &smatrix);
 	
-	FT_Vector pen;
-	FT_Set_Transform(face, &smatrix, &pen);
+	//FT_Vector pen;
+	//FT_Set_Transform(face, &smatrix, &pen);
 	
 	BShape **shapes = (BShape **)malloc(sizeof(BShape *) * numChars);
 	for (int i = 0; i < numChars; i++) {
@@ -277,6 +277,53 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	}
 	
 	return shapes;
+}
+
+BPoint *
+ServerFont::GetEscapements(const char charArray[], int32 numChars,
+							BPoint offsetArray[]) const
+{
+	if (!charArray || numChars <= 0 || !offsetArray)
+		return NULL;
+	
+	FT_Face face = fStyle->GetFTFace();
+	if (!face)
+		return NULL;
+	
+	FT_Set_Char_Size(face, 0, int32(fSize) * 64, 72, 72);
+	
+	Angle rotation(frotation);
+	Angle shear(fshear);
+	
+	// First, rotate
+	FT_Matrix rmatrix;
+	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000);
+	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000);
+	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000);
+	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000);
+	
+	// Next, shear
+	FT_Matrix smatrix;
+	smatrix.xx = (FT_Fixed)(0x10000); 
+	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000);
+	smatrix.yx = (FT_Fixed)(0);
+	smatrix.yy = (FT_Fixed)(0x10000);
+	
+	// Multiply togheter
+	FT_Matrix_Multiply(&rmatrix, &smatrix);
+	
+	//FT_Vector pen;
+	//FT_Set_Transform(face, &smatrix, &pen);
+	
+	BPoint *escapements = (BPoint *)malloc(sizeof(BPoint) * numChars);
+	for (int i = 0; i < numChars; i++) {
+		FT_Load_Char(face, charArray[i], FT_LOAD_NO_BITMAP);
+		escapements[i].x = float(face->glyph->metrics.width / 64) / fSize;
+		escapements[i].y = 0;
+		escapements[i] += offsetArray[i];
+	}
+	
+	return escapements;
 }
 
 /*!

@@ -72,6 +72,8 @@ public:
 	uint16 GlyphCount(void) const { return fStyle->GlyphCount(); }
 	uint16 CharMapCount(void) const { return fStyle->CharMapCount(); }
 	BShape **GetGlyphShapes(const char charArray[], int32 numChars) const;
+	BPoint *GetEscapements(const char charArray[], int32 numChars,
+							BPoint offsetArray[]) const;
 	
 	FT_Face GetFTFace() const { return fStyle->GetFTFace(); };
 	

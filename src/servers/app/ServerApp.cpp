@@ -1699,7 +1699,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 9) port_id - reply port
 			
 			// Returns:
-			// 1) BShape with glyph shape
+			// 1) BShape - glyph shape
 			// numChars times
 			
 			uint16 famid, styid;
@@ -1734,10 +1734,82 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				BShape **shapes = font.GetGlyphShapes(charArray, numChars);
 				if (shapes) {
 					replylink.StartMessage(SERVER_TRUE);
-					for (int32 i = 0; i < numChars; i++)
+					for (int32 i = 0; i < numChars; i++) {
 						replylink.AttachShape(*shapes[i]);
+						delete shapes[i];
+					}
 					
 					replylink.Flush();
+					delete shapes;
+				} else {
+					replylink.StartMessage(SERVER_FALSE);
+					replylink.Flush();
+				}
+			} else {
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			break;
+		}
+		case AS_GET_ESCAPEMENTS:
+		{
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) float - point size
+			// 4) float - rotation
+			// 5) uint32 - flags
+			// 6) int32 - numChars
+			
+			// 7) char - char     -\       both
+			// 8) BPoint - offset -/ (numChars times)
+			
+			// 9) port_id - reply port
+			
+			// Returns:
+			// 1) BPoint - escapement
+			// numChars times
+			
+			uint16 famid, styid;
+			uint32 flags;
+			float ptsize, rotation;
+			
+			msg.Read<uint16>(&famid);
+			msg.Read<uint16>(&styid);
+			msg.Read<float>(&ptsize);
+			msg.Read<float>(&rotation);
+			msg.Read<uint32>(&flags);
+			
+			int32 numChars;
+			msg.Read<int32>(&numChars);
+			
+			char charArray[numChars];			
+			BPoint offsetArray[numChars];
+			for (int32 i = 0; i < numChars; i++) {
+				msg.Read<char>(&charArray[i]);
+				msg.Read<BPoint>(&offsetArray[i]);
+			}
+			
+			port_id replyport;
+			msg.Read<port_id>(&replyport);
+			replylink.SetSendPort(replyport);
+			
+			ServerFont font;
+			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
+				font.SetSize(ptsize);
+				font.SetRotation(rotation);
+				font.SetFlags(flags);
+				
+				BPoint *esc = font.GetEscapements(charArray, numChars, offsetArray);
+				if (esc) {
+					replylink.StartMessage(SERVER_TRUE);
+					for (int32 i = 0; i < numChars; i++) {
+						replylink.Attach<BPoint>(esc[i]);
+					}
+					
+					replylink.Flush();
+					delete esc;
 				} else {
 					replylink.StartMessage(SERVER_FALSE);
 					replylink.Flush();

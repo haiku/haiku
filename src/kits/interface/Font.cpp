@@ -966,6 +966,12 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	
 	link.StartMessage(AS_GET_ESCAPEMENTS);
 	
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Attach<float>(fSize);
+	link.Attach<float>(fRotation);
+	link.Attach<uint32>(fFlags);
+	
 	link.Attach<int32>(numChars);
 	
 	if(offsetArray)
