@@ -451,7 +451,7 @@ DBG(OUT("BLooper::Quit()\n"));
 			name = "no-name";
 		}
 		printf("ERROR - you must Lock a looper before calling Quit(), "
-			   "team=%d, looper=%s", Team(), name);
+			   "team=%ld, looper=%s", Team(), name);
 	}
 DBG(OUT("  is locked\n"));
 
@@ -540,7 +540,7 @@ DBG(OUT("  fOwnerCount now: %ld\n", fOwnerCount));
 		fOwner = -1;
 
 		//	Decrement requested lock count (using fAtomicCount for this)
-		int32 atomicCount = atomic_add(&fAtomicCount, -1);
+/*		int32 atomicCount =*/ atomic_add(&fAtomicCount, -1);
 DBG(OUT("  fAtomicCount now: %ld\n", fAtomicCount));
 
 		//	Check if anyone is waiting for a lock
