@@ -717,7 +717,9 @@ void BApplication::InitData(const char* signature, status_t* error)
 		be_app = this;
 		be_app_messenger = BMessenger(NULL, this);
 	}
-	// TODO: SetName()
+	// set the BHandler's name
+	if (fInitError == B_OK)
+		SetName(ref.name);
 	// TODO: create_app_meta_mime()
 	// Return the error or exit, if there was an error and no error variable
 	// has been supplied.
