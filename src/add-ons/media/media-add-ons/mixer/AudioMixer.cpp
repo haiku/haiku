@@ -22,7 +22,7 @@
 #include "MixerUtils.h"
 #include "debug.h"
 
-#define VERSION_STRING	"0.2"
+#define VERSION_STRING	"0.4"
 #define BUILD_STRING	__DATE__ " " __TIME__
 
 // the range of the gain sliders (in dB)
