@@ -200,8 +200,8 @@ class BPlusTree {
 		status_t	SeekDown(Stack<node_and_key> &stack, const uint8 *key, uint16 keyLength);
 
 	private:
-		friend CachedNode;
-		friend TreeIterator;
+		friend class CachedNode;
+		friend class TreeIterator;
 
 		Stream		*fStream;
 		bplustree_header *fHeader;
