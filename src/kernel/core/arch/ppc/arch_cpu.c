@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -198,6 +198,13 @@ arch_cpu_user_memset(void *s, char c, size_t count, addr_t *fault_handler)
 error:
 	*fault_handler = 0;
 	return B_BAD_ADDRESS;
+}
+
+
+status_t
+arch_cpu_shutdown(bool reboot)
+{
+	return EOPNOTSUPP;
 }
 
 
