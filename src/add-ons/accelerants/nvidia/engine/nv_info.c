@@ -39,10 +39,10 @@ status_t parse_pins ()
 	/* check BIOS signature - this is defined in the PCI standard */
 	if (rom[0]!=0x55 || rom[1]!=0xaa)
 	{
-		LOG(8,("INFO: BIOS signiture not found\n"));
+		LOG(8,("INFO: BIOS signature not found\n"));
 		return B_ERROR;
 	}
-	LOG(2,("INFO: BIOS signiture $AA55 found OK\n"));
+	LOG(2,("INFO: BIOS signature $AA55 found OK\n"));
 	/* check for a valid PINS struct adress */
 	pins = rom + (rom[0x7FFC]|(rom[0x7FFD]<<8));
 	if ((pins - rom) > 0x7F80)
