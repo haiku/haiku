@@ -11,9 +11,9 @@ StaticLibrary
 	;
 
 StaticLibrary
-	transportaddon
+	printtransportaddon
 	:
-	TransportAddOn.cpp
+	PrintTransportAddOn.cpp
 	;
 
 

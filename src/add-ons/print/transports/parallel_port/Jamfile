@@ -9,6 +9,6 @@ Addon Parallel\ Port
 	: print_transport.cpp
 ;
 
-LinkSharedOSLibs Parallel\ Port : be libtransportaddon.a
+LinkSharedOSLibs Parallel\ Port : be libprinttransportaddon.a
  ;
 

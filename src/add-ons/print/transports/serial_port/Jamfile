@@ -9,6 +9,6 @@ Addon Serial\ Port
 	: print_transport.cpp
 ;
 
-LinkSharedOSLibs Serial\ Port : be libtransportaddon.a
+LinkSharedOSLibs Serial\ Port : be libprinttransportaddon.a
  ;
 
