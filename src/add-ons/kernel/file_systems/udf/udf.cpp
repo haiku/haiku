@@ -8,7 +8,7 @@
 //  code :-P).
 //---------------------------------------------------------------------
 
-/*! \file vfs_interface.cpp
+/*! \file udf.cpp
 */
 
 #include "UdfDebug.h"
@@ -254,9 +254,15 @@ udf_mount(nspace_id nsid, const char *deviceName, ulong flags, void *parms,
 			deviceSize = (off_t)geometry.sectors_per_track
 				* geometry.cylinder_count * geometry.head_count;
 		} else {
-			err = errno;
+			struct stat stat;
+			err = fstat(device, &stat) < 0 ? B_ERROR : B_OK;
+			if (!err) {
+				deviceSize = stat.st_size / 2048;
+			}
 		}
 	}
+
+
 	
 	// Create and mount the volume
 	if (!err) {
