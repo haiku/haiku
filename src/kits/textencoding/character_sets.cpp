@@ -14,31 +14,31 @@ static const BCharacterSet unicode(0,106,"Unicode","UTF-8","UTF-8",NULL);
 
 static const char * isoLatin1aliases[] =
  { "iso-ir-100","ISO_8859-1","ISO-8859-1","latin1","11","IBM819","CP819","csISOLatin1",NULL };
-static const BCharacterSet isoLatin1(1,4,"ISO Latin 1","ISO_8859-1:1987","ISO_8859-1",isoLatin1aliases);
+static const BCharacterSet isoLatin1(1,4,"ISO Latin 1","ISO_8859-1:1987","ISO-8859-1",isoLatin1aliases);
 
 static const char * isoLatin2aliases[] =
  { "iso-ir-101","ISO_8859-2","ISO-8859-2","latin2","12","csISOLatin2",NULL };
-static const BCharacterSet isoLatin2(2,5,"ISO Latin 2","ISO_8859-2:1987","ISO_8859-2",isoLatin2aliases);
+static const BCharacterSet isoLatin2(2,5,"ISO Latin 2","ISO_8859-2:1987","ISO-8859-2",isoLatin2aliases);
 
 static const char * isoLatin3aliases[] =
  { "iso-ir-109","ISO_8859-3","ISO-8859-3","latin3","13","csISOLatin3",NULL };
-static const BCharacterSet isoLatin3(3,6,"ISO Latin 3","ISO_8859-3:1988","ISO_8859-3",isoLatin3aliases);
+static const BCharacterSet isoLatin3(3,6,"ISO Latin 3","ISO_8859-3:1988","ISO-8859-3",isoLatin3aliases);
 
 static const char * isoLatin4aliases[] =
  { "iso-ir-110","ISO_8859-4","ISO-8859-4","latin4","14","csISOLatin4",NULL };
-static const BCharacterSet isoLatin4(4,7,"ISO Latin 4","ISO_8859-4:1988","ISO_8859-4",isoLatin4aliases);
+static const BCharacterSet isoLatin4(4,7,"ISO Latin 4","ISO_8859-4:1988","ISO-8859-4",isoLatin4aliases);
 
 static const char * isoLatin5aliases[] =
  { "iso-ir-144","ISO_8859-5","ISO-8859-5","cyrillic","csISOLatinCyrillic",NULL };
-static const BCharacterSet isoLatin5(5,8,"ISO Cyrillic","ISO_8859-5:1988","ISO_8859-5",isoLatin5aliases);
+static const BCharacterSet isoLatin5(5,8,"ISO Cyrillic","ISO_8859-5:1988","ISO-8859-5",isoLatin5aliases);
 
 static const char * isoLatin6aliases[] =
  { "iso-ir-127","ISO_8859-6","ISO-8859-6","ECMA-114","ASMO-708","arabic","csISOLatinArabic",NULL };
-static const BCharacterSet isoLatin6(6,9,"ISO Arabic","ISO_8859-6:1987","ISO_8859-6",isoLatin6aliases);
+static const BCharacterSet isoLatin6(6,9,"ISO Arabic","ISO_8859-6:1987","ISO-8859-6",isoLatin6aliases);
 
 static const char * isoLatin7aliases[] =
  { "iso-ir-126","ISO_8859-7","ISO-8859-7","ELOT_928","ECMA-118","greek","greek8","csISOLatinGreek",NULL };
-static const BCharacterSet isoLatin7(7,10,"ISO Greek","ISO_8859-7:1987","ISO_8859-7",isoLatin7aliases);
+static const BCharacterSet isoLatin7(7,10,"ISO Greek","ISO_8859-7:1987","ISO-8859-7",isoLatin7aliases);
 
 static const char * isoLatin8aliases[] =
  { "iso-ir-138","ISO_8859-8","ISO-8859-8","hebrew","csISOLatinHebrew",NULL };
@@ -58,17 +58,17 @@ static const BCharacterSet macintosh(11,2027,"Macintosh Roman","macintosh",NULL,
 
 static const char * shiftJISaliases[] =
  { "MS_Kanji","csShiftJIS",NULL };
-static const BCharacterSet shiftJIS(12,17,"Shift JIS","Shift_JIS","Shift_JIS",shiftJISaliases);
+static const BCharacterSet shiftJIS(12,17,"Japanese Shift JIS","Shift_JIS","Shift_JIS",shiftJISaliases);
 
 static const char * EUCPackedJapaneseAliases[] =
  { "EUC-JP","csEUCPkdFmtJapanese",NULL };
-static const BCharacterSet packedJapanese(13,18,"EUC Packed Format Japanese",
+static const BCharacterSet packedJapanese(13,18,"Japanese EUC",
                                    "Extended_UNIX_Code_Packed_Format_for_Japanese","EUC-JP",
                                    EUCPackedJapaneseAliases);
 
-static const char * JIS0208aliases[] =
- { "iso-ir-87","x0208","JIS_X0208-1983","csISO87JISX0208",NULL };
-static const BCharacterSet JIS0208(14,63,"JIS 0208","JIS_C6226-1983",NULL,JIS0208aliases);
+static const char * iso2022jpAliases[] =
+ { "csISO2022JP",NULL };
+static const BCharacterSet iso2022jp(14,39,"Japanese JIS","ISO-2022-JP","ISO-2022-JP",iso2022jpAliases);
 
 static const BCharacterSet windows1252(15,2252,"MS-Windows Codepage 1252","windows-1252",NULL,NULL);
 
@@ -126,7 +126,7 @@ const BCharacterSet * character_sets_by_id[] = {
 	&isoLatin6,	&isoLatin7, &isoLatin8, &isoLatin9, &isoLatin10,
 	&macintosh,
 	// R5 BFont encodings end here
-	&shiftJIS, &packedJapanese, &JIS0208,
+	&shiftJIS, &packedJapanese, &iso2022jp,
 	&windows1252, &unicode2, &KOI8R, &windows1251,
 	&IBM866, &IBM437, &eucKR, &iso13, &iso14, &iso15,
 	// R5 convert_to/from_utf8 encodings end here
