@@ -39,8 +39,8 @@
 // Includes to be able to talk to the app_server
 #include <Application.h>
 #include <ServerProtocol.h>
-#include <PortLink.h>
 #include <PortMessage.h>
+#include <AppServerLink.h>
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -2159,7 +2159,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	status_t error = B_OK;
 
 	PortMessage pmsg;
-	PortLink *link=new PortLink(be_app->fServerTo);
+	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
 
 	// clean up
 	if (fBasePtr) {
