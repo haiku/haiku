@@ -786,6 +786,7 @@ DialUpView::LoadAddons()
 	GeneralAddon *fGeneralAddon = new GeneralAddon(&fAddons);
 	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, fGeneralAddon);
 	fAddons.AddPointer(DUN_DELETE_ON_QUIT, fGeneralAddon);
+
 	// "IPCP" protocol
 	IPCPAddon *ipcpAddon = new IPCPAddon(&fAddons);
 	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, ipcpAddon);
@@ -794,7 +795,7 @@ DialUpView::LoadAddons()
 	PPPoEAddon *pppoeAddon = new PPPoEAddon(&fAddons);
 	fAddons.AddPointer(DUN_DEVICE_ADDON_TYPE, pppoeAddon);
 	fAddons.AddPointer(DUN_DELETE_ON_QUIT, pppoeAddon);
-	
+
 	// "PAP" authenticator
 	BMessage addon;
 #ifdef LANG_GERMAN
@@ -813,7 +814,7 @@ DialUpView::LoadAddons()
 
 
 void
-DialUpView::AddInterface(const char *name, bool isNew = false)
+DialUpView::AddInterface(const char *name, bool isNew)
 {
 	if(fInterfaceMenu->FindItem(name)) {
 		(new BAlert(kErrorTitle, kErrorInterfaceExists, kLabelOK,
@@ -835,7 +836,7 @@ DialUpView::AddInterface(const char *name, bool isNew = false)
 
 
 void
-DialUpView::SelectInterface(int32 index, bool isNew = false)
+DialUpView::SelectInterface(int32 index, bool isNew)
 {
 	BMenuItem *item = fInterfaceMenu->FindMarked();
 	if(fCurrentItem && item == fCurrentItem)

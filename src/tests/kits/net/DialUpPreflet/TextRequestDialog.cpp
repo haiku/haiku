@@ -44,7 +44,7 @@ static const char *kLabelCancel = "Cancel";
 
 
 TextRequestDialog::TextRequestDialog(const char *title, const char *information,
-		const char *request, const char *text = NULL)
+		const char *request, const char *text)
 	: BWindow(kWindowRect, title, B_MODAL_WINDOW, B_NOT_RESIZABLE | B_NOT_CLOSABLE, 0),
 	fInvoker(NULL)
 {

@@ -28,12 +28,12 @@
 #include <MenuItem.h>
 #include <Screen.h>
 #include <String.h>
-#include <StringItem.h>
+#include <ListItem.h>	// Contains StringItem class declaration
 #include <Window.h>
 
 
 BPoint
-center_on_screen(BRect rect, BWindow *window = NULL)
+center_on_screen(BRect rect, BWindow *window)
 {
 	BRect screenFrame = (BScreen(window).Frame());
 	BPoint point((screenFrame.Width() - rect.Width()) / 2.0,
@@ -46,7 +46,7 @@ center_on_screen(BRect rect, BWindow *window = NULL)
 
 
 int32
-FindNextMenuInsertionIndex(BMenu *menu, const char *name, int32 index = 0)
+FindNextMenuInsertionIndex(BMenu *menu, const char *name, int32 index)
 {
 	BMenuItem *item;
 	for(; index < menu->CountItems(); index++) {

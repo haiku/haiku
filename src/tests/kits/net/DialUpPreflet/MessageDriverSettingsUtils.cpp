@@ -36,7 +36,7 @@ static bool AddParameters(const BMessage& message, driver_settings *to);
 
 bool
 FindMessageParameter(const char *name, const BMessage& message, BMessage *save,
-	int32 *startIndex = NULL)
+	int32 *startIndex)
 {
 	// XXX: this should be removed when we can replace BMessage with something better
 	BString string;
