@@ -143,11 +143,6 @@ typedef struct vm_store_ops {
 } vm_store_ops;
 
 // args for the create_area funcs
-enum {
-	// ToDo: these are here only temporarily - it's a private
-	//	addition to the BeOS create_area() flags
-	B_EXACT_KERNEL_ADDRESS = B_EXACT_ADDRESS
-};
 
 enum {
 	REGION_NO_PRIVATE_MAP = 0,
