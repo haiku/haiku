@@ -9,6 +9,7 @@
 #include <ChannelSlider.h>
 #include <Debug.h>
 #include <PropertyInfo.h>
+#include <Screen.h>
 #include <Window.h>
 
 const static unsigned char
@@ -96,6 +97,11 @@ BChannelSlider::BChannelSlider(BMessage *archive)
 
 BChannelSlider::~BChannelSlider()
 {
+	delete fLeftKnob;
+	delete fMidKnob;
+	delete fRightKnob;
+	delete fBacking;
+	delete fBackingView;
 	delete fInitialValues;
 }
 
@@ -204,6 +210,7 @@ BChannelSlider::Draw(BRect updateRect)
 	MovePenTo((bounds.Width() - labelWidth) / 2, 10);
 	DrawString(Label());
 	
+	Sync();
 	// TODO: Respect label limits !!!	
 }
 
@@ -389,9 +396,15 @@ BChannelSlider::GetSupportedSuites(BMessage *data)
 void
 BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed)
 {
-	// TODO: Implement
+	BPoint where;
+	where.x = area.Width() / 2;
+	where.y = area.top + ThumbDeltaFor(channel);
+	
+	BPoint leftTop(where.x, area.top);
+	BPoint bottomRight(where.x, area.top + ThumbRangeFor(channel));
+	DrawGroove(into, channel, leftTop, bottomRight);
+	DrawThumb(into, channel, where, pressed);
 }
-
 
 
 void
@@ -531,9 +544,6 @@ BChannelSlider::InitData()
 	fFocusChannel = -1;
 	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	// TODO: Set initial values ?
-	// actually, looks like initial values are set on MouseDown()/MouseMoved()
 }
 
 
@@ -573,7 +583,50 @@ BChannelSlider::UpdateFontDimens()
 void
 BChannelSlider::DrawThumbs()
 {
+	BRect first = ThumbFrameFor(0);
+	BRect last = ThumbFrameFor(CountChannels());
+		
+	if (fBacking == NULL) {
+		BRect bitmapFrame;
+		if (Vertical()) {
+			bitmapFrame.top = first.top - ThumbRangeFor(0);
+			bitmapFrame.bottom = last.bottom;
+			bitmapFrame.left = first.left;
+			bitmapFrame.right = last.right;
+		} else {
+			bitmapFrame.top = first.top;
+			bitmapFrame.bottom = last.bottom;
+			bitmapFrame.left = first.left;
+			bitmapFrame.right = last.right + ThumbRangeFor(0);
+		}
+		
+		bitmapFrame.OffsetTo(B_ORIGIN);
+		fBacking = new BBitmap(bitmapFrame, BScreen(Window()).ColorSpace(), true, false);
+		if (fBacking->Lock()) {
+			fBackingView = new BView(bitmapFrame, "backing view", B_FOLLOW_NONE, B_WILL_DRAW);
+			fBacking->AddChild(fBackingView);
+			fBackingView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+			fBackingView->SetLowColor(fBackingView->ViewColor());
+			fBacking->Unlock();
+		}			
+	}
 	
+	if (fBacking->Lock()) {
+		for (int32 i = 0; i < CountChannels(); i++) {
+			fBackingView->FillRect(fBackingView->Bounds(), B_SOLID_LOW);
+			DrawChannel(fBackingView, i, ThumbFrameFor(i), fMinpoint != 0); 
+		}
+		
+		fBackingView->Sync();
+		fBacking->Unlock();
+	}
+	
+	BPoint drawHere;
+	drawHere.x = (Bounds().Width() - fBacking->Bounds().Width()) / 2;
+	drawHere.y = (Bounds().Height() - fBacking->Bounds().Height()) / 2;
+	
+	fClickDelta = drawHere;
+	DrawBitmapAsync(fBacking, drawHere);
 }
 
 
