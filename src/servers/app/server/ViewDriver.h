@@ -113,15 +113,6 @@ public:
 //	virtual void DrawPicture(SPicture *pic, BPoint pt);
 	void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
 
-	void FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	void FillBezier(BPoint *pts, LayerData *d, const Pattern &pat);
-	void FillEllipse(BRect r, LayerData *d, const Pattern &pat);
-	void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat);
-	void FillRect(BRect r, LayerData *d, const Pattern &pat);
-	void FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
-//	void FillShape(SShape *sh, LayerData *d, const Pattern &pat);
-	void FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
-
 	void HideCursor(void);
 	void InvertRect(BRect r);
 	bool IsCursorHidden(void);
@@ -135,16 +126,41 @@ public:
 //	void SetDrawingMode(drawing_mode mode);
 	void ShowCursor(void);
 
-	void StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	void StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat);
-	void StrokeEllipse(BRect r, LayerData *d, const Pattern &pat);
-	void StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat);
-	void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
-	void StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed=true);
-	void StrokeRect(BRect r, LayerData *d, const Pattern &pat);
-	void StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
-//	void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
-	void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
+virtual void FillArc(const BRect r, float angle, float span, RGBColor& color);
+	virtual void FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillBezier(BPoint *pts, RGBColor& color);
+	virtual void FillBezier(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillEllipse(BRect r, RGBColor& color);
+	virtual void FillEllipse(BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color);
+	virtual void FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillRect(const BRect r, RGBColor& color);
+	virtual void FillRect(const BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color);
+	virtual void FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+//	virtual void FillShape(SShape *sh, LayerData *d, const Pattern &pat);
+	virtual void FillTriangle(BPoint *pts, RGBColor& color);
+	virtual void FillTriangle(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	
+	virtual void StrokeArc(BRect r, float angle, float span, float pensize, RGBColor& color);
+	virtual void StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeBezier(BPoint *pts, float pensize, RGBColor& color);
+	virtual void StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeEllipse(BRect r, float pensize, RGBColor& color);
+	virtual void StrokeEllipse(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& color);
+	virtual void StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokePoint(BPoint& pt, RGBColor& color);
+	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBColor& color, bool is_closed=true);
+	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color, bool is_closed=true);
+	virtual void StrokeRect(BRect r, float pensize, RGBColor& color);
+	virtual void StrokeRect(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor& color);
+	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+//	virtual void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
+
+	virtual void StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors);
+
 	void SetMode(int32 mode);
 	float StringWidth(const char *string, int32 length, LayerData *d);
 	float StringHeight(const char *string, int32 length, LayerData *d);

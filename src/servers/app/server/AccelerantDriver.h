@@ -49,8 +49,42 @@ public:
 	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
 	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL);
 
-	virtual void FillRect(BRect r, LayerData *d, const Pattern &pat);
+
+	virtual void FillArc(const BRect r, float angle, float span, RGBColor& color);
+	virtual void FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillBezier(BPoint *pts, RGBColor& color);
+	virtual void FillBezier(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillEllipse(BRect r, RGBColor& color);
+	virtual void FillEllipse(BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color);
+	virtual void FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillRect(const BRect r, RGBColor& color);
+	virtual void FillRect(const BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color);
+	virtual void FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
 //	virtual void FillShape(SShape *sh, LayerData *d, const Pattern &pat);
+	virtual void FillTriangle(BPoint *pts, RGBColor& color);
+	virtual void FillTriangle(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	
+	virtual void StrokeArc(BRect r, float angle, float span, float pensize, RGBColor& color);
+	virtual void StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeBezier(BPoint *pts, float pensize, RGBColor& color);
+	virtual void StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeEllipse(BRect r, float pensize, RGBColor& color);
+	virtual void StrokeEllipse(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& color);
+	virtual void StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokePoint(BPoint& pt, RGBColor& color);
+	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBColor& color, bool is_closed=true);
+	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color, bool is_closed=true);
+	virtual void StrokeRect(BRect r, float pensize, RGBColor& color);
+	virtual void StrokeRect(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor& color);
+	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+//	virtual void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
+
+	virtual void StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors);
+
 
 	virtual void HideCursor(void);
 	virtual void MoveCursorTo(float x, float y);
@@ -59,8 +93,6 @@ public:
 	virtual void ObscureCursor(void);
 	virtual void SetCursor(ServerCursor *csr);
 
-//	virtual void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
-	virtual void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
 	virtual void SetMode(int32 mode);
 	virtual bool DumpToFile(const char *path);
 	float StringWidth(const char *string, int32 length, LayerData *d);
@@ -79,12 +111,17 @@ public:
 protected:
 	void BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY);
 	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
-	void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
-	void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
-	void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
+	//void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
+	//void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
+	//void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
+	void HLinePatternThick(int32 x1, int32 x2, int32 y);
+	void VLinePatternThick(int32 x, int32 y1, int32 y2);
+	void FillSolidRect(int32 left, int32 top, int32 right, int32 bottom);
+	void FillPatternRect(int32 left, int32 top, int32 right, int32 bottom);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
-	void SetPixel(int x, int y, RGBColor col);
-	void SetThickPixel(int x, int y, int thick, PatternHandler *pat);
+	//void SetPixel(int x, int y, RGBColor col);
+	//void SetThickPixel(int x, int y, int thick, PatternHandler *pat);
+	void SetThickPatternPixel(int x, int y);
 	int OpenGraphicsDevice(int deviceNumber);
 	int GetModeFromResolution(int width, int height, int space);
 	int GetWidthFromMode(int mode);

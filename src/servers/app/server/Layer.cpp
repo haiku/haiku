@@ -485,13 +485,10 @@ void Layer::RequestClientUpdate(const BRect &rect){
 		// only the visible area is cleared, because DisplayDriver does the clipping to it.
 		// draw background, *only IF* our view color is different to B_TRANSPARENT_COLOR!
 	if ( !(_layerdata->viewcolor == RGBColor(B_TRANSPARENT_COLOR)) ) {
-			// a quick hack for drawing in other color than the low one.
-		RGBColor		tempColor	= _layerdata->lowcolor;
-		_layerdata->lowcolor.SetColor( B_TRANSPARENT_COLOR );
+		RGBColor tempColor(B_TRANSPARENT_COLOR);
+		//_layerdata->lowcolor.SetColor( B_TRANSPARENT_COLOR );
 
-		fDriver->StrokeRect(rect, _layerdata, pat_solidlow);
-			// .. hack continued
-		_layerdata->lowcolor		= tempColor;
+		fDriver->StrokeRect(rect, _layerdata->pensize, tempColor);
 	}
 
 	BMessage		msg;
@@ -513,13 +510,10 @@ void Layer::RequestDraw(const BRect &r)
 {
 
 	if (_visible.CountRects() > 0){
-			// a quick hack for drawing in other color than the low one.
-		RGBColor		tempColor	= _layerdata->lowcolor;
-		_layerdata->lowcolor.SetColor( B_TRANSPARENT_COLOR );
+		RGBColor tempColor(B_TRANSPARENT_COLOR);
+		//_layerdata->lowcolor.SetColor( B_TRANSPARENT_COLOR );
 
-		fDriver->StrokeRect(r, _layerdata, pat_solidlow);
-			// .. hack continued
-		_layerdata->lowcolor		= tempColor;
+		fDriver->StrokeRect(r, _layerdata->pensize, tempColor);
 
 			// draw itself.
 		Draw(r);

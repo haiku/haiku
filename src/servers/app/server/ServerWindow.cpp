@@ -1528,9 +1528,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					angle = read_from_buffer<float>(&msgbuffer);
 					span = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->StrokeArc(rect,angle,span,layerdata,pattern);
+					//BRect rect(left,top,right,bottom);
+					//if ( layerdata )
+						//_app->_driver->StrokeArc(rect,angle,span,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_ARC_MSG_SIZE;
 				}
 				else
@@ -1555,8 +1555,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 						pts[i].y = read_from_buffer<float>(&msgbuffer);
 					}
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					if ( layerdata )
-						_app->_driver->StrokeBezier(pts,layerdata,pattern);
+					//if ( layerdata )
+						//_app->_driver->StrokeBezier(pts,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_STROKE_BEZIER_MSG_SIZE;
 				}
@@ -1579,9 +1579,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					right = read_from_buffer<float>(&msgbuffer);
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->StrokeEllipse(rect,layerdata,pattern);
+					//BRect rect(left,top,right,bottom);
+					//if ( layerdata )
+						//_app->_driver->StrokeEllipse(rect,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_ELLIPSE_MSG_SIZE;
 				}
 				else
@@ -1603,10 +1603,10 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					x2 = read_from_buffer<float>(&msgbuffer);
 					y2 = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BPoint p1(x1,y1);
-					BPoint p2(x2,y2);
-					if ( layerdata )
-						_app->_driver->StrokeLine(p1,p2,layerdata,pattern);
+					//BPoint p1(x1,y1);
+					//BPoint p2(x2,y2);
+					//if ( layerdata )
+						//_app->_driver->StrokeLine(p1,p2,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_LINE_MSG_SIZE;
 				}
 				else
@@ -1638,9 +1638,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					right = read_from_buffer<float>(&msgbuffer);
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->StrokeRect(rect,layerdata,pattern);
+					//BRect rect(left,top,right,bottom);
+					//if ( layerdata )
+						//_app->_driver->StrokeRect(rect,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_RECT_MSG_SIZE;
 				}
 				else
@@ -1664,9 +1664,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					xrad = read_from_buffer<float>(&msgbuffer);
 					yrad = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->StrokeRoundRect(rect,xrad,yrad,layerdata,pattern);
+					//BRect rect(left,top,right,bottom);
+					//if ( layerdata )
+						//_app->_driver->StrokeRoundRect(rect,xrad,yrad,layerdata,pattern);
 					sizeRemaining -= AS_STROKE_ROUNDRECT_MSG_SIZE;
 				}
 				else
@@ -1701,9 +1701,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					right = read_from_buffer<float>(&msgbuffer);
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->StrokeTriangle(pts,rect,layerdata,pattern);
+					//BRect rect(left,top,right,bottom);
+					//if ( layerdata )
+						//_app->_driver->StrokeTriangle(pts,rect,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_STROKE_TRIANGLE_MSG_SIZE;
 				}
@@ -1728,9 +1728,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					angle = read_from_buffer<float>(&msgbuffer);
 					span = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->FillArc(rect,angle,span,layerdata,pattern);
+					//BRect rect(left,top,right,bottom);
+					//if ( layerdata )
+						//_app->_driver->FillArc(rect,angle,span,layerdata,pattern);
 					sizeRemaining -= AS_FILL_ARC_MSG_SIZE;
 				}
 				else
@@ -1755,8 +1755,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 						pts[i].y = read_from_buffer<float>(&msgbuffer);
 					}
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					if ( layerdata )
-						_app->_driver->FillBezier(pts,layerdata,pattern);
+					//if ( layerdata )
+						//_app->_driver->FillBezier(pts,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_FILL_BEZIER_MSG_SIZE;
 				}
@@ -1779,9 +1779,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					right = read_from_buffer<float>(&msgbuffer);
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->FillEllipse(rect,layerdata,pattern);
+					//BRect rect(left,top,right,bottom);
+					//if ( layerdata )
+						//_app->_driver->FillEllipse(rect,layerdata,pattern);
 					sizeRemaining -= AS_FILL_ELLIPSE_MSG_SIZE;
 				}
 				else
@@ -1807,6 +1807,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					right = read_from_buffer<float>(&msgbuffer);
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
+					/*
 					BRect rect(left,top,right,bottom);
 					if ( layerdata && numRects )
 						if ( numRects == 1 )
@@ -1817,6 +1818,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 							for (i=0; i<numRects; i++)
 								_app->_driver->FillRect(LayerClipRegion.RectAt(i),layerdata,pattern);
 						}
+						*/
 					sizeRemaining -= AS_FILL_RECT_MSG_SIZE;
 				}
 				else
@@ -1845,9 +1847,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					xrad = read_from_buffer<float>(&msgbuffer);
 					yrad = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->FillRoundRect(rect,xrad,yrad,layerdata,pattern);
+					//BRect rect(left,top,right,bottom);
+					//if ( layerdata )
+						//_app->_driver->FillRoundRect(rect,xrad,yrad,layerdata,pattern);
 					sizeRemaining -= AS_FILL_ROUNDRECT_MSG_SIZE;
 				}
 				else
@@ -1882,9 +1884,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					right = read_from_buffer<float>(&msgbuffer);
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->FillTriangle(pts,rect,layerdata,pattern);
+					//BRect rect(left,top,right,bottom);
+					//if ( layerdata )
+						//_app->_driver->FillTriangle(pts,rect,layerdata,pattern);
 					delete[] pts;
 					sizeRemaining -= AS_FILL_TRIANGLE_MSG_SIZE;
 				}

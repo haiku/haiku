@@ -102,10 +102,7 @@ STRACE(("Desktop: InitWorkspace\n"));
 
 	if(tdriver->Initialize())
 	{
-		// TODO: figure out how to load the workspace data and do it here.
-		// For now, we'll just use 3 workspaces.
-		
-		s=new Screen(tdriver,3);
+		s=new Screen(tdriver);
 		desktop_private::screenlist->AddItem(s);
 	}
 	else
@@ -127,10 +124,7 @@ STRACE(("\t NULL display driver. OK. We crash now. :P\n"));
 
 	if(tdriver->Initialize())
 	{
-		// TODO: figure out how to load the workspace data and do it here.
-		// For now, we'll just use 3 workspaces.
-		
-		s=new Screen(tdriver,3);
+		s=new Screen(tdriver);
 		desktop_private::screenlist->AddItem(s);
 	}
 	else
@@ -149,6 +143,13 @@ STRACE(("\t NULL display driver. OK. We crash now. :P\n"));
 	{
 		s->Activate();
 		desktop_private::activescreen=s;
+
+		// TODO: figure out how to load the workspace data and do it here.
+		// For now, we'll just use 3 workspaces.
+		// Initializing the workspaces has been seperated from the constructor
+		// since currently RootLayer can only be constructed when there is an
+		// active screen.
+		s->SetWorkspaceCount(3);
 #ifdef TEST_MODE
 		s->SetSpace(0,B_32_BIT_640x480,true);
 #endif

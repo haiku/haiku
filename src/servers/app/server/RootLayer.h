@@ -47,7 +47,6 @@ public:
 										DisplayDriver *gfxdriver);
 	virtual							~RootLayer();
 
-	virtual	void					Draw(const BRect &r);
 	virtual	void					MoveBy(float x, float y);
 	virtual	void					ResizeBy(float x, float y);
 

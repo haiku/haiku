@@ -21,6 +21,7 @@
 //
 //	File Name:		DisplayDriver.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//				Gabe Yoder <gyoder@stny.rr.com>
 //	Description:	Mostly abstract class which handles all graphics output
 //					for the server
 //  
@@ -30,20 +31,17 @@
 #include "LayerData.h"
 #include "ServerCursor.h"
 
-#define CLIP_X(a) ( (a < 0) ? 0 : ((a > _buffer_width-1) ? \
-			_buffer_width-1 : a) )
-#define CLIP_Y(a) ( (a < 0) ? 0 : ((a > _buffer_height-1) ? \
-			_buffer_height-1 : a) )
-#define CHECK_X(a) ( (a >= 0) || (a <= _buffer_width-1) )
-#define CHECK_Y(a) ( (a >= 0) || (a <= _buffer_height-1) )
+// TODO: Major cleanup is left.  Public functions should be repsonsible for locking.
+// Clean the locking code from the protected functions.  Remove bounds checking stuff
+// since clipper must handle all needed boundary checks (otherwise we could have windows
+// bleeding into other windows).
+// TODO: Add pixel, line, and rect functions for handling all of the options from LayerData
 
-/* TODO: Add handling of draw modes */
-
-AccLineCalc::AccLineCalc()
+LineCalc::LineCalc()
 {
 }
 
-AccLineCalc::AccLineCalc(const BPoint &pta, const BPoint &ptb)
+LineCalc::LineCalc(const BPoint &pta, const BPoint &ptb)
 {
 	start=pta;
 	end=ptb;
@@ -55,7 +53,7 @@ AccLineCalc::AccLineCalc(const BPoint &pta, const BPoint &ptb)
 	maxy = MAX(start.y,end.y);
 }
 
-void AccLineCalc::SetPoints(const BPoint &pta, const BPoint &ptb)
+void LineCalc::SetPoints(const BPoint &pta, const BPoint &ptb)
 {
 	start=pta;
 	end=ptb;
@@ -67,7 +65,149 @@ void AccLineCalc::SetPoints(const BPoint &pta, const BPoint &ptb)
 	maxy = MAX(start.y,end.y);
 }
 
-void AccLineCalc::Swap(AccLineCalc &from)
+bool LineCalc::ClipToRect(const BRect& rect)
+{
+	if ( (maxx < rect.left) || (minx > rect.right) || (miny < rect.top) || (maxy > rect.bottom) )
+		return false;
+	BPoint newStart(-1,-1);
+	BPoint newEnd(-1,-1);
+	if ( maxx == minx )
+	{
+		newStart.x = newEnd.x = minx;
+		if ( miny < rect.top )
+			newStart.y = rect.top;
+		else
+			newStart.y = miny;
+		if ( maxy > rect.bottom )
+			newEnd.y = rect.bottom;
+		else
+			newEnd.y = maxy;
+	}
+	else if ( maxy == miny )
+	{
+		newStart.y = newEnd.y = miny;
+		if ( minx < rect.left )
+			newStart.x = rect.left;
+		else
+			newStart.x = minx;
+		if ( maxx > rect.right )
+			newEnd.x = rect.right;
+		else
+			newEnd.x = maxx;
+	}
+	else
+	{
+		float leftInt, rightInt, topInt, bottomInt;
+		BPoint tempPoint;
+		leftInt = GetY(rect.left);
+		rightInt = GetY(rect.right);
+		topInt = GetX(rect.top);
+		bottomInt = GetX(rect.bottom);
+		if ( end.x < start.x )
+		{
+			tempPoint = start;
+			start = end;
+			end = tempPoint;
+		}
+		if ( start.x < rect.left )
+		{
+			if ( (leftInt >= rect.top) && (leftInt <= rect.bottom) )
+			{
+				newStart.x = rect.left;
+				newStart.y = leftInt;
+			}
+			if ( start.y < end.y )
+			{
+				if ( (topInt >= rect.left) && (topInt <= rect.right) )
+				{
+					newStart.x = topInt;
+					newStart.y = rect.top;
+				}
+			}
+			else
+			{
+				if ( (bottomInt >= rect.left) && (bottomInt <= rect.right) )
+				{
+					newStart.x = bottomInt;
+					newStart.y = rect.bottom;
+				}
+			}
+		}
+		else
+		{
+			if ( start.y < rect.top )
+			{
+				if ( (topInt >= rect.left) && (topInt <= rect.right) )
+				{
+					newStart.x = topInt;
+					newStart.y = rect.top;
+				}
+			}
+			else if ( start.y > rect.bottom )
+			{
+				if ( (bottomInt >= rect.left) && (bottomInt <= rect.right) )
+				{
+					newStart.x = bottomInt;
+					newStart.y = rect.bottom;
+				}
+			}
+			else
+				newStart = start;
+		}
+		if ( end.x > rect.right )
+		{
+			if ( (rightInt >= rect.top) && (rightInt <= rect.bottom) )
+			{
+				newEnd.x = rect.right;
+				newEnd.y = rightInt;
+			}
+			if ( start.y < end.y )
+			{
+				if ( (bottomInt >= rect.left) && (bottomInt <= rect.right) )
+				{
+					newEnd.x = bottomInt;
+					newEnd.y = rect.bottom;
+				}
+			}
+			else
+			{
+				if ( (topInt >= rect.left) && (topInt <= rect.right) )
+				{
+					newEnd.x = topInt;
+					newEnd.y = rect.top;
+				}
+			}
+		}
+		else
+		{
+			if ( end.y < rect.top )
+			{
+				if ( (topInt >= rect.left) && (topInt <= rect.right) )
+				{
+					newEnd.x = topInt;
+					newEnd.y = rect.top;
+				}
+			}
+			else if ( end.y > rect.bottom )
+			{
+				if ( (bottomInt >= rect.left) && (bottomInt <= rect.right) )
+				{
+					newEnd.x = bottomInt;
+					newEnd.y = rect.bottom;
+				}
+			}
+			else
+				newEnd = end;
+		}
+	}
+	if ( (newStart.x == -1) || (newStart.y == -1) || (newEnd.x == -1) || (newEnd.y == -1) )
+		return false;
+	SetPoints(newStart,newEnd);
+
+	return true;
+}
+
+void LineCalc::Swap(LineCalc &from)
 {
 	BPoint pta, ptb;
 	pta = start;
@@ -76,38 +216,18 @@ void AccLineCalc::Swap(AccLineCalc &from)
 	from.SetPoints(pta,ptb);
 }
 
-float AccLineCalc::GetX(float y)
+float LineCalc::GetX(float y)
 {
 	if (start.x == end.x)
 		return start.x;
 	return ( (y-offset)/slope );
 }
 
-float AccLineCalc::MinX()
-{
-	return minx;
-}
-
-float AccLineCalc::MaxX()
-{
-	return maxx;
-}
-
-float AccLineCalc::GetY(float x)
+float LineCalc::GetY(float x)
 {
 	if ( start.x == end.x )
 		return start.y;
 	return ( (slope * x) + offset );
-}
-
-float AccLineCalc::MinY()
-{
-	return miny;
-}
-
-float AccLineCalc::MaxY()
-{
-	return maxy;
 }
 
 /*!
@@ -170,8 +290,7 @@ void DisplayDriver::Shutdown(void)
 	\param src Source rectangle.
 	\param dest Destination rectangle.
 	
-	Bounds checking must be done in this call. If the destination is not the same size 
-	as the source, the source should be scaled to fit.
+	If the destination is not the same size as the source, the source should be scaled to fit.
 */
 void DisplayDriver::CopyBits(BRect src, BRect dest)
 {
@@ -181,9 +300,6 @@ void DisplayDriver::CopyBits(BRect src, BRect dest)
 	\brief A screen-to-screen blit (of sorts) which copies a BRegion
 	\param src Source region
 	\param lefttop Offset to which the region will be copied
-	
-	Bounds checking must be done in this call. This function needs to be literally as
-	fast as possible - all window moves will be done with it.
 */
 void DisplayDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 {
@@ -196,8 +312,6 @@ void DisplayDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 	\param src Source rectangle
 	\param dest Destination rectangle. Source will be scaled to fit if not the same size.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	
-	Bounds checking must be done in this call.
 */
 void DisplayDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d)
 {
@@ -218,18 +332,23 @@ void DisplayDriver::DrawString(const char *string, int32 length, BPoint pt, Laye
 {
 }
 
+void DisplayDriver::FillArc(const BRect r, float angle, float span, RGBColor& color)
+{
+}
+
+void DisplayDriver::FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+}
+
 /*!
 	\brief Called for all BView::FillArc calls
 	\param r Rectangle enclosing the entire arc
 	\param angle Starting angle for the arc in degrees
 	\param span Span of the arc in degrees. Ending angle = angle+span.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	Bounds checking must be done in this call because only part of the arc may end up
-	being clipped.
+	\param setLIne The horizontal line drawing function which handles needed things like pattern,
+	               color, and line thickness
 */
-void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
+void DisplayDriver::FillArc(const BRect r, float angle, float span, DisplayDriver* driver, SetHorizontalLineFuncType setLine)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -250,21 +369,16 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, cons
 	int startQuad, endQuad;
 	bool useQuad1, useQuad2, useQuad3, useQuad4;
 	bool shortspan = false;
-	float oldpensize;
-	BPoint center(xc,yc);
+	//BPoint center(xc,yc);
 
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
-	  FillEllipse(r,d,pat);
+	  FillEllipse(r,driver,setLine);
 	  return;
 	}
 
 	Lock();
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
-	oldpensize = d->pensize;
-	d->pensize = 1;
 
 	if ( span > 0 )
 	{
@@ -310,14 +424,15 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, cons
 		}
 	}
 
-	if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-	if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
-	if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
-	if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+	if ( useQuad1 )
+		(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+	if ( useQuad2 )
+		(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc-y));
+	if ( useQuad3 )
+		(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc+y));
+	if ( useQuad4 )
+		(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
+	/*
 	if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
 		StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
@@ -330,6 +445,7 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, cons
 	if ( (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
 		StrokeLine(BPoint(xc+x,yc+y),center,d,pat);
+		*/
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -345,131 +461,87 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, cons
 			p += Ry2 + px - py;
 		}
 
-		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
-		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
-		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+		if ( useQuad1 )
+			(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+		if ( useQuad2 )
+			(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc-y));
+		if ( useQuad3 )
+			(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc+y));
+		if ( useQuad4 )
+			(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
 		if ( !shortspan )
 		{
 			if ( startQuad == 1 )
 			{
-				if ( CHECK_Y(yc-y) )
+				if ( x <= startx )
+					(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+				else
 				{
-					if ( x <= startx )
-					{
-						if ( CHECK_X(xc) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-					}
-					else
-					{
-						xclip = ROUND(y*startx/(double)starty);
-						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
-							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc-y),&pattern);
-					}
+					xclip = ROUND(y*startx/(double)starty);
+					(driver->*setLine)(ROUND(xc),ROUND(xc+xclip),ROUND(yc-y));
 				}
 			}
 			else if ( startQuad == 2 )
 			{
-				if ( CHECK_Y(yc-y) )
+				if ( x >= startx )
 				{
-					if ( x >= startx )
-					{
-						xclip = ROUND(y*startx/(double)starty);
-						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc-y),&pattern);
-					}
+					xclip = ROUND(y*startx/(double)starty);
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc-xclip),ROUND(yc-y));
 				}
 			}
 			else if ( startQuad == 3 )
 			{
-				if ( CHECK_Y(yc+y) )
+				if ( x <= startx )
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc),ROUND(yc+y));
+				else
 				{
-					if ( x <= startx )
-					{
-						if ( CHECK_X(xc-x) || CHECK_X(xc) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
-					}
-					else
-					{
-						xclip = ROUND(y*startx/(double)starty);
-						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
-							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
-					}
+					xclip = ROUND(y*startx/(double)starty);
+					(driver->*setLine)(ROUND(xc-xclip),ROUND(xc),ROUND(yc+y));
 				}
 			}
 			else if ( startQuad == 4 )
 			{
-				if ( CHECK_Y(yc+y) )
+				if ( x >= startx )
 				{
-					if ( x >= startx )
-					{
-						xclip = ROUND(y*startx/(double)starty);
-						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
-					}
+					xclip = ROUND(y*startx/(double)starty);
+					(driver->*setLine)(ROUND(xc+xclip),ROUND(xc+x),ROUND(yc+y));
 				}
 			}
 
 			if ( endQuad == 1 )
 			{
-				if ( CHECK_Y(yc-y) )
+				if ( x >= endx )
 				{
-					if ( x >= endx )
-					{
-						xclip = ROUND(y*endx/(double)endy);
-						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-					}
+					xclip = ROUND(y*endx/(double)endy);
+					(driver->*setLine)(ROUND(xc+xclip),ROUND(xc+x),ROUND(yc-y));
 				}
 			}
 			else if ( endQuad == 2 )
 			{
-				if ( CHECK_Y(yc-y) )
+				if ( x <= endx )
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc),ROUND(yc-y));
+				else
 				{
-					if ( x <= endx )
-					{
-						if ( CHECK_X(xc-x) || CHECK_X(xc) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
-					}
-					else
-					{
-						xclip = ROUND(y*endx/(double)endy);
-						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
-							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
-					}
+					xclip = ROUND(y*endx/(double)endy);
+					(driver->*setLine)(ROUND(xc-xclip),ROUND(xc),ROUND(yc-y));
 				}
 			}
 			else if ( endQuad == 3 )
 			{
-				if ( CHECK_Y(yc+y) )
+				if ( x >= endx )
 				{
-					if ( x >= endx )
-					{
-						xclip = ROUND(y*endx/(double)endy);
-						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc+y),&pattern);
-					}
+					xclip = ROUND(y*endx/(double)endy);
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc-xclip),ROUND(yc+y));
 				}
 			}
 			else if ( endQuad == 4 )
 			{
-				if ( CHECK_Y(yc+y) )
+				if ( x <= endx )
+					(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
+				else
 				{
-					if ( x <= endx )
-					{
-						if ( CHECK_X(xc) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
-					}
-					else
-					{
-						xclip = ROUND(y*endx/(double)endy);
-						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
-							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc+y),&pattern);
-					}
+					xclip = ROUND(y*endx/(double)endy);
+					(driver->*setLine)(ROUND(xc),ROUND(xc+xclip),ROUND(yc+y));
 				}
 			}
 		}
@@ -479,67 +551,31 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, cons
 			endclip = ROUND(y*endx/(double)endy);
 			if ( startQuad == 1 )
 			{
-				if ( CHECK_Y(yc-y) )
-				{
-					if ( (x <= startx) && (x >= endx) )
-					{
-						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-					}
-					else
-					{
-						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
-							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+startclip)),ROUND(yc-y),&pattern);
-					}
-				}
+				if ( (x <= startx) && (x >= endx) )
+					(driver->*setLine)(ROUND(xc+endclip),ROUND(xc+x),ROUND(yc-y));
+				else
+					(driver->*setLine)(ROUND(xc+endclip),ROUND(xc+startclip),ROUND(yc-y));
 			}
 			else if ( startQuad == 2 )
 			{
-				if ( CHECK_Y(yc-y) )
-				{
-					if ( (x <= startx) && (x >= endx) )
-					{
-						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
-					}
-					else
-					{
-						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
-							HLine(ROUND(CLIP_X(xc-endclip)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
-					}
-				}
+				if ( (x <= startx) && (x >= endx) )
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc-startclip),ROUND(yc-y));
+				else
+					(driver->*setLine)(ROUND(xc-endclip),ROUND(xc-startclip),ROUND(yc-y));
 			}
 			else if ( startQuad == 3 )
 			{
-				if ( CHECK_Y(yc+y) )
-				{
-					if ( (x <= startx) && (x >= endx) )
-					{
-						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
-					}
-					else
-					{
-						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
-							HLine(ROUND(CLIP_X(xc-startclip)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
-					}
-				}
+				if ( (x <= startx) && (x >= endx) )
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc-endclip),ROUND(yc+y));
+				else
+					(driver->*setLine)(ROUND(xc-startclip),ROUND(xc-endclip),ROUND(yc+y));
 			}
 			else if ( startQuad == 4 )
 			{
-				if ( CHECK_Y(yc+y) )
-				{
-					if ( (x <= startx) && (x >= endx) )
-					{
-						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
-					}
-					else
-					{
-						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
-							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+endclip)),ROUND(yc+y),&pattern);
-					}
-				}
+				if ( (x <= startx) && (x >= endx) )
+					(driver->*setLine)(ROUND(xc+startclip),ROUND(xc+x),ROUND(yc+y));
+				else
+					(driver->*setLine)(ROUND(xc+startclip),ROUND(xc+endclip),ROUND(yc+y));
 			}
 		}
 	}
@@ -558,131 +594,87 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, cons
 			p += Rx2 - py +px;
 		}
 
-		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
-		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
-		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+		if ( useQuad1 )
+			(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+		if ( useQuad2 )
+			(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc-y));
+		if ( useQuad3 )
+			(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc+y));
+		if ( useQuad4 )
+			(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
 		if ( !shortspan )
 		{
 			if ( startQuad == 1 )
 			{
-				if ( CHECK_Y(yc-y) )
+				if ( x <= startx )
+					(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+				else
 				{
-					if ( x <= startx )
-					{
-						if ( CHECK_X(xc) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-					}
-					else
-					{
-						xclip = ROUND(y*startx/(double)starty);
-						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
-							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc-y),&pattern);
-					}
+					xclip = ROUND(y*startx/(double)starty);
+					(driver->*setLine)(ROUND(xc),ROUND(xc+xclip),ROUND(yc-y));
 				}
 			}
 			else if ( startQuad == 2 )
 			{
-				if ( CHECK_Y(yc-y) )
+				if ( x >= startx )
 				{
-					if ( x >= startx )
-					{
-						xclip = ROUND(y*startx/(double)starty);
-						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc-y),&pattern);
-					}
+					xclip = ROUND(y*startx/(double)starty);
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc-xclip),ROUND(yc-y));
 				}
 			}
 			else if ( startQuad == 3 )
 			{
-				if ( CHECK_Y(yc+y) )
+				if ( x <= startx )
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc),ROUND(yc+y));
+				else
 				{
-					if ( x <= startx )
-					{
-						if ( CHECK_X(xc-x) || CHECK_X(xc) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
-					}
-					else
-					{
-						xclip = ROUND(y*startx/(double)starty);
-						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
-							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
-					}
+					xclip = ROUND(y*startx/(double)starty);
+					(driver->*setLine)(ROUND(xc-xclip),ROUND(xc),ROUND(yc+y));
 				}
 			}
 			else if ( startQuad == 4 )
 			{
-				if ( CHECK_Y(yc+y) )
+				if ( x >= startx )
 				{
-					if ( x >= startx )
-					{
-						xclip = ROUND(y*startx/(double)starty);
-						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
-					}
+					xclip = ROUND(y*startx/(double)starty);
+					(driver->*setLine)(ROUND(xc+xclip),ROUND(xc+x),ROUND(yc+y));
 				}
 			}
 
 			if ( endQuad == 1 )
 			{
-				if ( CHECK_Y(yc-y) )
+				if ( x >= endx )
 				{
-					if ( x >= endx )
-					{
-						xclip = ROUND(y*endx/(double)endy);
-						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-					}
+					xclip = ROUND(y*endx/(double)endy);
+					(driver->*setLine)(ROUND(xc+xclip),ROUND(xc+x),ROUND(yc-y));
 				}
 			}
 			else if ( endQuad == 2 )
 			{
-				if ( CHECK_Y(yc-y) )
+				if ( x <= endx )
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc),ROUND(yc-y));
+				else
 				{
-					if ( x <= endx )
-					{
-						if ( CHECK_X(xc-x) || CHECK_X(xc) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
-					}
-					else
-					{
-						xclip = ROUND(y*endx/(double)endy);
-						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
-							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
-					}
+					xclip = ROUND(y*endx/(double)endy);
+					(driver->*setLine)(ROUND(xc-xclip),ROUND(xc),ROUND(yc-y));
 				}
 			}
 			else if ( endQuad == 3 )
 			{
-				if ( CHECK_Y(yc+y) )
+				if ( x >= endx )
 				{
-					if ( x >= endx )
-					{
-						xclip = ROUND(y*endx/(double)endy);
-						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc+y),&pattern);
-					}
+					xclip = ROUND(y*endx/(double)endy);
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc-xclip),ROUND(yc+y));
 				}
 			}
 			else if ( endQuad == 4 )
 			{
-				if ( CHECK_Y(yc+y) )
+				if ( x <= endx )
+					(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
+				else
 				{
-					if ( x <= endx )
-					{
-						if ( CHECK_X(xc) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
-					}
-					else
-					{
-						xclip = ROUND(y*endx/(double)endy);
-						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
-							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc+y),&pattern);
-					}
+					xclip = ROUND(y*endx/(double)endy);
+					(driver->*setLine)(ROUND(xc),ROUND(xc+xclip),ROUND(yc+y));
 				}
 			}
 		}
@@ -692,86 +684,56 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, cons
 			endclip = ROUND(y*endx/(double)endy);
 			if ( startQuad == 1 )
 			{
-				if ( CHECK_Y(yc-y) )
-				{
-					if ( (x <= startx) && (x >= endx) )
-					{
-						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-					}
-					else
-					{
-						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
-							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+startclip)),ROUND(yc-y),&pattern);
-					}
-				}
+				if ( (x <= startx) && (x >= endx) )
+					(driver->*setLine)(ROUND(xc+endclip),ROUND(xc+x),ROUND(yc-y));
+				else
+					(driver->*setLine)(ROUND(xc+endclip),ROUND(xc+startclip),ROUND(yc-y));
 			}
 			else if ( startQuad == 2 )
 			{
-				if ( CHECK_Y(yc-y) )
-				{
-					if ( (x <= startx) && (x >= endx) )
-					{
-						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
-					}
-					else
-					{
-						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
-							HLine(ROUND(CLIP_X(xc-endclip)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
-					}
-				}
+				if ( (x <= startx) && (x >= endx) )
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc-startclip),ROUND(yc-y));
+				else
+					(driver->*setLine)(ROUND(xc-endclip),ROUND(xc-startclip),ROUND(yc-y));
 			}
 			else if ( startQuad == 3 )
 			{
-				if ( CHECK_Y(yc+y) )
-				{
-					if ( (x <= startx) && (x >= endx) )
-					{
-						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
-							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
-					}
-					else
-					{
-						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
-							HLine(ROUND(CLIP_X(xc-startclip)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
-					}
-				}
+				if ( (x <= startx) && (x >= endx) )
+					(driver->*setLine)(ROUND(xc-x),ROUND(xc-endclip),ROUND(yc+y));
+				else
+					(driver->*setLine)(ROUND(xc-startclip),ROUND(xc-endclip),ROUND(yc+y));
 			}
 			else if ( startQuad == 4 )
 			{
-				if ( CHECK_Y(yc+y) )
-				{
-					if ( (x <= startx) && (x >= endx) )
-					{
-						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
-							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
-					}
-					else
-					{
-						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
-							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+endclip)),ROUND(yc+y),&pattern);
-					}
-				}
+				if ( (x <= startx) && (x >= endx) )
+					(driver->*setLine)(ROUND(xc+startclip),ROUND(xc+x),ROUND(yc+y));
+				else
+					(driver->*setLine)(ROUND(xc+startclip),ROUND(xc+endclip),ROUND(yc+y));
 			}
 		}
 	}
-	d->pensize = oldpensize;
 	Unlock();
+}
+
+void DisplayDriver::FillBezier(BPoint *pts, RGBColor& color)
+{
+}
+
+void DisplayDriver::FillBezier(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
 }
 
 /*!
 	\brief Called for all BView::FillBezier calls.
 	\param pts 4-element array of BPoints in the order of start, end, and then the two control
 	points. 
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
+	\param setLine Horizontal ine drawing routine which handles things like color and pattern.
 
-	Bounds checking must be done in this call.
 	Does not work quite right, need to redo this.
 */
-void DisplayDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
+void DisplayDriver::FillBezier(BPoint *pts, DisplayDriver* driver, SetHorizontalLineFuncType setLine)
 {
+  /*
 	double Ax, Bx, Cx, Dx;
 	double Ay, By, Cy, Dy;
 	int x, y;
@@ -787,7 +749,7 @@ void DisplayDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 	if ( fabs(pts[3].y-pts[0].y) > fabs(pts[3].x-pts[0].x) )
 		steep = true;
 	
-	AccLineCalc line(pts[0], pts[3]);
+	LineCalc line(pts[0], pts[3]);
 	oldpensize = d->pensize;
 	d->pensize = 1;
 
@@ -838,18 +800,23 @@ void DisplayDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 	}
 	d->pensize = oldpensize;
 	Unlock();
+	*/
+}
+
+void DisplayDriver::FillEllipse(BRect r, RGBColor& color)
+{
+}
+
+void DisplayDriver::FillEllipse(BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
 }
 
 /*!
 	\brief Called for all BView::FillEllipse calls
 	\param r BRect enclosing the ellipse to be drawn.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	Bounds checking must be done in this call because only part of the ellipse may end up
-	being clipped.
+	\param setLine Horizontal line drawing routine which handles things like color and pattern.
 */
-void DisplayDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
+void DisplayDriver::FillEllipse(BRect r, DisplayDriver* driver, SetHorizontalLineFuncType setLine)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -866,16 +833,11 @@ void DisplayDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 	int py = twoRx2 * y;
 
 	Lock();
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
 
-	if ( CHECK_X(xc) )
-	{
-		if ( CHECK_Y(yc-y) )
-			SetPixel(ROUND(xc),ROUND(yc-y),pattern.GetColor(xc,yc-y));
-		if ( CHECK_Y(yc+y) )
-			SetPixel(ROUND(xc),ROUND(yc+y),pattern.GetColor(xc,yc+y));
-	}
+	//SetPixel(ROUND(xc),ROUND(yc-y),pattern.GetColor(xc,yc-y));
+	(driver->*setLine)(ROUND(xc),ROUND(xc),ROUND(yc-y));
+	//SetPixel(ROUND(xc),ROUND(yc+y),pattern.GetColor(xc,yc+y));
+	(driver->*setLine)(ROUND(xc),ROUND(xc),ROUND(yc+y));
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -891,13 +853,8 @@ void DisplayDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 			p += Ry2 + px - py;
 		}
 
-		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
-		{
-			if ( CHECK_Y(yc-y) )
-	                	HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-			if ( CHECK_Y(yc+y) )
-		                HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
-		}
+               	(driver->*setLine)(ROUND(xc-x),ROUND(xc+x),ROUND(yc-y));
+                (driver->*setLine)(ROUND(xc-x),ROUND(xc+x),ROUND(yc+y));
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -914,29 +871,30 @@ void DisplayDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 			p += Rx2 - py +px;
 		}
 
-		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
-		{
-			if ( CHECK_Y(yc-y) )
-	                	HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
-			if ( CHECK_Y(yc+y) )
-		                HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
-		}
+               	(driver->*setLine)(ROUND(xc-x),ROUND(xc+x),ROUND(yc-y));
+                (driver->*setLine)(ROUND(xc-x),ROUND(xc+x),ROUND(yc+y));
 	}
 	Unlock();
+}
+
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color)
+{
+}
+
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
 }
 
 /*!
 	\brief Called for all BView::FillPolygon calls
 	\param ptlist Array of BPoints defining the polygon.
 	\param numpts Number of points in the BPoint array.
-	\param rect Rectangle which contains the polygon
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
+	\param setLine Horizontal line drawing routine which handles things like color and pattern.
 
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
 */
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat)
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, DisplayDriver* driver, SetHorizontalLineFuncType setLine)
 {
 	/* Here's the plan.  Record all line segments in polygon.  If a line segments crosses
 	   the y-value of a point not in the segment, split the segment into 2 segments.
@@ -952,14 +910,12 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerD
 		Unlock();
 		return;
 	}
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
 
 	BPoint *currentPoint, *nextPoint;
 	BPoint tempNextPoint;
 	BPoint tempCurrentPoint;
 	int currentIndex, bestIndex, i, j, y;
-	AccLineCalc *segmentArray = new AccLineCalc[2*numpts];
+	LineCalc *segmentArray = new LineCalc[2*numpts];
 	int numSegments = 0;
 
 	/* Generate the segment list */
@@ -1023,38 +979,33 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerD
 	}
 
 	/* Draw the lines */
-	for (y=ROUND(rect.top); y<=ROUND(rect.bottom); y++)
+	for (y=(int)segmentArray[0].MinY(); y<=segmentArray[numSegments-1].MaxY(); y++)
 	{
-		if ( CHECK_Y(y) )
+		i = 0;
+		while (i<numSegments)
 		{
-			i = 0;
-			while (i<numSegments)
+			if (segmentArray[i].MinY() > y)
+				break;
+			if (segmentArray[i].MaxY() < y)
 			{
-				if (segmentArray[i].MinY() > y)
-					break;
-				if (segmentArray[i].MaxY() < y)
-				{
-					i++;
-					continue;
-				}
-				if (segmentArray[i].MinY() == segmentArray[i].MaxY())
-				{
-					if ( (segmentArray[i].MinX() < _buffer_width) &&
-						(segmentArray[i].MaxX() >= 0) )
-						HLine(CLIP_X(ROUND(segmentArray[i].MinX())),
-						      CLIP_X(ROUND(segmentArray[i].MaxX())),
-						      y, &pattern);
-					i++;
-				}
-				else
-				{
-					if ( (segmentArray[i].GetX(y) < _buffer_width) &&
-						(segmentArray[i+1].GetX(y) >= 0) )
-						HLine(CLIP_X(ROUND(segmentArray[i].GetX(y))),
-						      CLIP_X(ROUND(segmentArray[i+1].GetX(y))),
-						      y, &pattern);
-					i+=2;
-				}
+				i++;
+				continue;
+			}
+			if (segmentArray[i].MinY() == segmentArray[i].MaxY())
+			{
+				if ( (segmentArray[i].MinX() < _buffer_width) &&
+					(segmentArray[i].MaxX() >= 0) )
+					(driver->*setLine)(ROUND(segmentArray[i].MinX()),
+					      ROUND(segmentArray[i].MaxX()), y);
+				i++;
+			}
+			else
+			{
+				if ( (segmentArray[i].GetX(y) < _buffer_width) &&
+					(segmentArray[i+1].GetX(y) >= 0) )
+					(driver->*setLine)(ROUND(segmentArray[i].GetX(y)),
+					      ROUND(segmentArray[i+1].GetX(y)), y);
+				i+=2;
 			}
 		}
 	}
@@ -1065,32 +1016,61 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerD
 /*!
 	\brief Called for all BView::FillRect calls
 	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
+	\param color The color used to fill the rectangle
 */
-void DisplayDriver::FillRect(BRect r, LayerData *d, const Pattern &pat)
+void DisplayDriver::FillRect(const BRect r, RGBColor& color)
+{
+}
+
+/*!
+	\brief Called for all BView::FillRect calls
+	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param pattern The pattern used to fill the rectangle
+	\param high_color The high color of the pattern
+	\param low_color The low color of the pattern
+*/
+void DisplayDriver::FillRect(const BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
 {
 }
 
 /*!
 	\brief Convenience function for server use
 	\param r BRegion to be filled
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
+	\param color The color used to fill the region
 */
-void DisplayDriver::FillRegion(BRegion *r, LayerData *d, const Pattern &pat)
+void DisplayDriver::FillRegion(BRegion& r, RGBColor& color)
 {
-	if(!r || !d)
-		return;
-		
 	Lock();
 
-	for(int32 i=0; i<r->CountRects();i++)
-		FillRect(r->RectAt(i),d,pat);
+	for(int32 i=0; i<r.CountRects();i++)
+		FillRect(r.RectAt(i),color);
 
 	Unlock();
+}
+
+/*!
+	\brief Convenience function for server use
+	\param r BRegion to be filled
+	\param pattern The pattern used to fill the region
+	\param high_color The high color of the pattern
+	\param low_color The low color of the pattern
+*/
+void DisplayDriver::FillRegion(BRegion& r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+
+	for(int32 i=0; i<r.CountRects();i++)
+		FillRect(r.RectAt(i),pattern, high_color, low_color);
+
+	Unlock();
+}
+
+void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color)
+{
+}
+
+void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
 }
 
 /*!
@@ -1098,62 +1078,49 @@ void DisplayDriver::FillRegion(BRegion *r, LayerData *d, const Pattern &pat)
 	\param r The rectangle itself
 	\param xrad X radius of the corner arcs
 	\param yrad Y radius of the corner arcs
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	Bounds checking must be done in this call because only part of the roundrect may end 
-	up being clipped.
+	\param setRect Rectangle filling routine which handles things like color and pattern
+	\param setLine Horizontal line drawing function which handles things like color and pattern
 */
-void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
+void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, DisplayDriver* driver, SetRectangleFuncType setRect, SetHorizontalLineFuncType setLine)
 {
 	float arc_x;
 	float yrad2 = yrad*yrad;
 	int i;
 
-	Lock();
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
-	
 	for (i=0; i<=(int)yrad; i++)
 	{
 		arc_x = xrad*sqrt(1-i*i/yrad2);
-		if ( CHECK_Y(r.top+yrad-i) )
-			HLine(ROUND(CLIP_X(r.left+xrad-arc_x)), ROUND(CLIP_X(r.right-xrad+arc_x)),
-				ROUND(r.top+yrad-i), &pattern);
-		if ( CHECK_Y(r.bottom-yrad+i) )
-			HLine(ROUND(CLIP_X(r.left+xrad-arc_x)), ROUND(CLIP_X(r.right-xrad+arc_x)),
-				ROUND(r.bottom-yrad+i), &pattern);
+		(driver->*setLine)(ROUND(r.left+xrad-arc_x), ROUND(r.right-xrad+arc_x),
+			ROUND(r.top+yrad-i));
+		(driver->*setLine)(ROUND(r.left+xrad-arc_x), ROUND(r.right-xrad+arc_x),
+			ROUND(r.bottom-yrad+i));
 	}
-	FillRect(BRect(CLIP_X(r.left),CLIP_Y(r.top+yrad),
-			CLIP_X(r.right),CLIP_Y(r.bottom-yrad)), d, pat);
-
-	Unlock();
+	(driver->*setRect)((int)(r.left),(int)(r.top+yrad),(int)(r.right),(int)(r.bottom-yrad));
 }
 
 //void DisplayDriver::FillShape(SShape *sh, LayerData *d, const Pattern &pat)
 //{
 //}
 
+void DisplayDriver::FillTriangle(BPoint *pts, RGBColor& color)
+{
+}
+
+void DisplayDriver::FillTriangle(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+}
+
 /*!
 	\brief Called for all BView::FillTriangle calls
 	\param pts Array of 3 BPoints. Always non-NULL.
-	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
-	it may not be within the frame buffer's bounds.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	Bounds checking must be done in this call because only part of the triangle may end 
-	up being clipped.
+	\param setLine Horizontal line drawing routine which handles things like color and pattern.
 */
-void DisplayDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
+void DisplayDriver::FillTriangle(BPoint *pts, DisplayDriver* driver, SetHorizontalLineFuncType setLine)
 {
-	if(!pts || !d)
+	if ( !pts )
 		return;
 
-	Lock();
 	BPoint first, second, third;
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
 
 	// Sort points according to their y values and x values (y is primary)
 	if ( (pts[0].y < pts[1].y) ||
@@ -1197,9 +1164,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Patte
 		end.y=first.y;
 		start.x=MIN(first.x,MIN(second.x,third.x));
 		end.x=MAX(first.x,MAX(second.x,third.x));
-		if ( CHECK_Y(start.y) && (CHECK_X(start.x) || CHECK_X(end.x)) )
-			HLine(ROUND(CLIP_X(start.x)), ROUND(CLIP_X(end.x)), ROUND(start.y), &pattern);
-		Unlock();
+		(driver->*setLine)(ROUND(start.x), ROUND(end.x), ROUND(start.y));
 		return;
 	}
 
@@ -1208,47 +1173,37 @@ void DisplayDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Patte
 	// Special case #1: first and second in the same row
 	if(first.y==second.y)
 	{
-		AccLineCalc lineA(first, third);
-		AccLineCalc lineB(second, third);
+		LineCalc lineA(first, third);
+		LineCalc lineB(second, third);
 		
-		if ( CHECK_Y(first.y) && (CHECK_X(first.x) || CHECK_X(second.x)) )
-			HLine(ROUND(CLIP_X(first.x)), ROUND(CLIP_X(second.x)), ROUND(first.y), &pattern);
+		(driver->*setLine)(ROUND(first.x), ROUND(second.x), ROUND(first.y));
 		for(i=(int32)first.y+1; i<=third.y; i++)
-			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-				HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
-		Unlock();
+			(driver->*setLine)(ROUND(lineA.GetX(i)), ROUND(lineB.GetX(i)), i);
 		return;
 	}
 	
 	// Special case #2: second and third in the same row
 	if(second.y==third.y)
 	{
-		AccLineCalc lineA(first, second);
-		AccLineCalc lineB(first, third);
+		LineCalc lineA(first, second);
+		LineCalc lineB(first, third);
 		
-		if ( CHECK_Y(second.y) && (CHECK_X(second.x) || CHECK_X(third.x)) )
-			HLine(ROUND(CLIP_X(second.x)), ROUND(CLIP_X(third.x)), ROUND(second.y), &pattern);
+		(driver->*setLine)(ROUND(second.x), ROUND(third.x), ROUND(second.y));
 		for(i=(int32)first.y; i<third.y; i++)
-			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-				HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
-		Unlock();
+			(driver->*setLine)(ROUND(lineA.GetX(i)), ROUND(lineB.GetX(i)), i);
 		return;
 	}
 	
 	// Normal case.	
-	AccLineCalc lineA(first, second);
-	AccLineCalc lineB(first, third);
-	AccLineCalc lineC(second, third);
+	LineCalc lineA(first, second);
+	LineCalc lineB(first, third);
+	LineCalc lineC(second, third);
 	
 	for(i=(int32)first.y; i<(int32)second.y; i++)
-		if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-			HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
+		(driver->*setLine)(ROUND(lineA.GetX(i)), ROUND(lineB.GetX(i)), i);
 
 	for(i=(int32)second.y; i<=third.y; i++)
-		if ( CHECK_Y(i) && (CHECK_X(lineC.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-			HLine(ROUND(CLIP_X(lineC.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
-		
-	Unlock();
+		(driver->*setLine)(ROUND(lineC.GetX(i)), ROUND(lineB.GetX(i)), i);
 }
 
 /*!
@@ -1351,18 +1306,22 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 	Unlock();
 }
 
+void DisplayDriver::StrokeArc(BRect r, float angle, float span, float pensize, RGBColor& color)
+{
+}
+
+void DisplayDriver::StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+}
+
 /*!
 	\brief Called for all BView::StrokeArc calls
 	\param r Rectangle enclosing the entire arc
 	\param angle Starting angle for the arc in degrees
 	\param span Span of the arc in degrees. Ending angle = angle+span.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	Bounds checking must be done in this call because only part of the arc may end up
-	being clipped.
+	\param setPixel Pixel drawing function which handles things like size and pattern.
 */
-void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
+void DisplayDriver::StrokeArc(BRect r, float angle, float span, DisplayDriver* driver, SetPixelFuncType setPixel)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -1381,20 +1340,14 @@ void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, co
 	int startQuad, endQuad;
 	bool useQuad1, useQuad2, useQuad3, useQuad4;
 	bool shortspan = false;
-	int thick;
 
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
-	  StrokeEllipse(r,d,pat);
+	  StrokeEllipse(r,driver,setPixel);
 	  return;
 	}
 
-	Lock();
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
-
-	thick = (int)d->pensize;
 	if ( span > 0 )
 	{
 		startQuad = (int)(angle/90)%4+1;
@@ -1436,23 +1389,22 @@ void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, co
 		}
 	}
 
-        /* SetThickPixel does bounds checking, so we don't have to worry about it here */
 	if ( useQuad1 || 
 	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+		(driver->*setPixel)(ROUND(xc+x),ROUND(yc-y));
 	if ( useQuad2 || 
 	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+		(driver->*setPixel)(ROUND(xc-x),ROUND(yc-y));
 	if ( useQuad3 || 
 	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+		(driver->*setPixel)(ROUND(xc-x),ROUND(yc+y));
 	if ( useQuad4 || 
 	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+		(driver->*setPixel)(ROUND(xc+x),ROUND(yc+y));
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -1471,19 +1423,19 @@ void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, co
 		if ( useQuad1 || 
 		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+			(driver->*setPixel)(ROUND(xc+x),ROUND(yc-y));
 		if ( useQuad2 || 
 		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+			(driver->*setPixel)(ROUND(xc-x),ROUND(yc-y));
 		if ( useQuad3 || 
 		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+			(driver->*setPixel)(ROUND(xc-x),ROUND(yc+y));
 		if ( useQuad4 || 
 		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+			(driver->*setPixel)(ROUND(xc+x),ROUND(yc+y));
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -1503,33 +1455,38 @@ void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, co
 		if ( useQuad1 || 
 		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+			(driver->*setPixel)(ROUND(xc+x),ROUND(yc-y));
 		if ( useQuad2 || 
 		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+			(driver->*setPixel)(ROUND(xc-x),ROUND(yc-y));
 		if ( useQuad3 || 
 		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+			(driver->*setPixel)(ROUND(xc-x),ROUND(yc+y));
 		if ( useQuad4 || 
 		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+			(driver->*setPixel)(ROUND(xc+x),ROUND(yc+y));
 	}
-	Unlock();
+}
+
+
+void DisplayDriver::StrokeBezier(BPoint *pts, float pensize, RGBColor& color)
+{
+}
+
+void DisplayDriver::StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
 }
 
 /*!
 	\brief Called for all BView::StrokeBezier calls.
 	\param pts 4-element array of BPoints in the order of start, end, and then the two control
 	points. 
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	Bounds checking must be done in this call.
+	\param setPixel Pixel drawing function which handles things like size and pattern.
 */
-void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
+void DisplayDriver::StrokeBezier(BPoint *pts, DisplayDriver* driver, SetPixelFuncType setPixel)
 {
 	double Ax, Bx, Cx, Dx;
 	double Ay, By, Cy, Dy;
@@ -1539,10 +1496,6 @@ void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 	double dt = .0005;
 	double dt2, dt3;
 	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
-
-	Lock();
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
 
 	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
 	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
@@ -1572,9 +1525,8 @@ void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 	{
 		x = ROUND(X);
 		y = ROUND(Y);
-                /* SetThickPixel does bounds checking, so we don't have to worry about it */
 		if ( (x!=lastx) || (y!=lasty) )
-			SetThickPixel(x,y,ROUND(d->pensize),&pattern);
+			(driver->*setPixel)(x,y);
 		lastx = x;
 		lasty = y;
 
@@ -1585,19 +1537,22 @@ void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 		dy += ddy;
 		ddy += dddy;
 	}
-	Unlock();
+}
+
+void DisplayDriver::StrokeEllipse(BRect r, float pensize, RGBColor& color)
+{
+}
+
+void DisplayDriver::StrokeEllipse(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
 }
 
 /*!
 	\brief Called for all BView::StrokeEllipse calls
 	\param r BRect enclosing the ellipse to be drawn.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	Bounds checking must be done in this call because only part of the ellipse may end up
-	being clipped.
+	\param setPixel Pixel drawing function which handles things like size and pattern.
 */
-void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
+void DisplayDriver::StrokeEllipse(BRect r, DisplayDriver* driver, SetPixelFuncType setPixel)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -1612,19 +1567,11 @@ void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 	int y = (int)ry;
 	int px = 0;
 	int py = twoRx2 * y;
-	int thick;
 
-	Lock();
-	thick = (int)d->pensize;
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
-
-        /* SetThickPixel does bounds checking, so we don't have to worry about it */
-
-	SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
-	SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
-	SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
-	SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+	(driver->*setPixel)(ROUND(xc+x),ROUND(yc-y));
+	(driver->*setPixel)(ROUND(xc-x),ROUND(yc-y));
+	(driver->*setPixel)(ROUND(xc-x),ROUND(yc+y));
+	(driver->*setPixel)(ROUND(xc+x),ROUND(yc+y));
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -1640,10 +1587,10 @@ void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 			p += Ry2 + px - py;
 		}
 
-		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
-		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
-		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
-		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+		(driver->*setPixel)(ROUND(xc+x),ROUND(yc-y));
+		(driver->*setPixel)(ROUND(xc-x),ROUND(yc-y));
+		(driver->*setPixel)(ROUND(xc-x),ROUND(yc+y));
+		(driver->*setPixel)(ROUND(xc+x),ROUND(yc+y));
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -1660,25 +1607,28 @@ void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 			p += Rx2 - py +px;
 		}
 
-		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
-		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
-		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
-		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+		(driver->*setPixel)(ROUND(xc+x),ROUND(yc-y));
+		(driver->*setPixel)(ROUND(xc-x),ROUND(yc-y));
+		(driver->*setPixel)(ROUND(xc-x),ROUND(yc+y));
+		(driver->*setPixel)(ROUND(xc+x),ROUND(yc+y));
 	}
-	Unlock();
+}
+
+void DisplayDriver::StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& color)
+{
+}
+
+void DisplayDriver::StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
 }
 
 /*!
 	\brief Draws a line. Really.
 	\param start Starting point
 	\param end Ending point
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-	
-	The endpoints themselves are guaranteed to be in bounds, but clipping for lines with
-	a thickness greater than 1 will need to be done.
+	\param setPixel Pixel drawing function which handles things like size and pattern.
 */
-void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
+void DisplayDriver::StrokeLine(BPoint start, BPoint end, DisplayDriver* driver, SetPixelFuncType setPixel)
 {
 	int x1 = ROUND(start.x);
 	int y1 = ROUND(start.y);
@@ -1690,12 +1640,6 @@ void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pat
 	double xInc, yInc;
 	double x = x1;
 	double y = y1;
-	int thick;
-
-	Lock();
-	thick = (int)d->pensize;
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
 
 	if ( abs(dx) > abs(dy) )
 		steps = abs(dx);
@@ -1704,58 +1648,61 @@ void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pat
 	xInc = dx / (double) steps;
 	yInc = dy / (double) steps;
 
-        /* SetThickPixel does bounds checking, so we don't have to worry about it */
-	SetThickPixel(ROUND(x),ROUND(y),thick,&pattern);
+	(driver->*setPixel)(ROUND(x),ROUND(y));
 	for (k=0; k<steps; k++)
 	{
 		x += xInc;
 		y += yInc;
-		SetThickPixel(ROUND(x),ROUND(y),thick,&pattern);
+		(driver->*setPixel)(ROUND(x),ROUND(y));
 	}
-	Unlock();
+}
+
+void DisplayDriver::StrokePoint(BPoint& pt, RGBColor& color)
+{
+}
+
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBColor& color, bool is_closed)
+{
+}
+
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color, bool is_closed)
+{
 }
 
 /*!
 	\brief Called for all BView::StrokePolygon calls
 	\param ptlist Array of BPoints defining the polygon.
 	\param numpts Number of points in the BPoint array.
-	\param rect Rectangle which contains the polygon
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	The points in the array are not guaranteed to be within the framebuffer's 
-	coordinate range.
+	\param setPixel Pixel drawing function which handles things like size and pattern.
 */
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed)
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, DisplayDriver* driver, SetPixelFuncType setPixel, bool is_closed)
 {
-	/* Bounds checking is handled by StrokeLine and the functions it uses */
-	Lock();
 	for(int32 i=0; i<(numpts-1); i++)
-		StrokeLine(ptlist[i],ptlist[i+1],d,pat);
+		StrokeLine(ptlist[i],ptlist[i+1],driver,setPixel);
 	if(is_closed)
-		StrokeLine(ptlist[numpts-1],ptlist[0],d,pat);
-	Unlock();
+		StrokeLine(ptlist[numpts-1],ptlist[0],driver,setPixel);
 }
 
 /*!
 	\brief Called for all BView::StrokeRect calls
-	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
+	\param r BRect to be drawn
+	\param pensize Thickness of the lines
+	\param color The color of the rectangle
 */
-void DisplayDriver::StrokeRect(BRect r, LayerData *d, const Pattern &pat)
+void DisplayDriver::StrokeRect(BRect r, float pensize, RGBColor& color)
 {
-	Lock();
-	int thick = (int)d->pensize;
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
+}
 
-	HLineThick(ROUND(r.left), ROUND(r.right), ROUND(r.top), thick, &pattern);
-	StrokeLine(r.RightTop(), r.RightBottom(), d, pat);
-	HLineThick(ROUND(r.right), ROUND(r.left), ROUND(r.bottom), thick, &pattern);
-	StrokeLine(r.LeftTop(), r.LeftBottom(), d, pat);
-	Unlock();
+void DisplayDriver::StrokeRect(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+}
+
+void DisplayDriver::StrokeRect(BRect r, DisplayDriver* driver, SetHorizontalLineFuncType setHLine, SetVerticalLineFuncType setVLine)
+{
+	(driver->*setHLine)((int)ROUND(r.left), (int)ROUND(r.right), (int)ROUND(r.top));
+	(driver->*setVLine)((int)ROUND(r.right), (int)ROUND(r.top), (int)ROUND(r.bottom));
+	(driver->*setHLine)((int)ROUND(r.left), (int)ROUND(r.right), (int)ROUND(r.bottom));
+	(driver->*setVLine)((int)ROUND(r.left), (int)ROUND(r.top), (int)ROUND(r.bottom));
 }
 
 /*!
@@ -1765,17 +1712,32 @@ void DisplayDriver::StrokeRect(BRect r, LayerData *d, const Pattern &pat)
 	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 */
-void DisplayDriver::StrokeRegion(BRegion *r, LayerData *d, const Pattern &pat)
+void DisplayDriver::StrokeRegion(BRegion& r, float pensize, RGBColor& color)
 {
-	if(!r || !d)
-		return;
-		
 	Lock();
 
-	for(int32 i=0; i<r->CountRects();i++)
-		StrokeRect(r->RectAt(i),d,pat);
+	for(int32 i=0; i<r.CountRects();i++)
+		StrokeRect(r.RectAt(i),pensize,color);
 
 	Unlock();
+}
+
+void DisplayDriver::StrokeRegion(BRegion& r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+
+	for(int32 i=0; i<r.CountRects();i++)
+		StrokeRect(r.RectAt(i),pensize,pattern,high_color,low_color);
+
+	Unlock();
+}
+
+void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor& color)
+{
+}
+
+void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
 }
 
 /*!
@@ -1783,42 +1745,35 @@ void DisplayDriver::StrokeRegion(BRegion *r, LayerData *d, const Pattern &pat)
 	\param r The rect itself
 	\param xrad X radius of the corner arcs
 	\param yrad Y radius of the corner arcs
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	Bounds checking must be done in this call because only part of the roundrect may end 
-	up being clipped.
+	\param setHLine Horizontal line drawing function
+	\param setVLine Vertical line drawing function
+	\param setPixel Pixel drawing function
 */
-void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
+void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, DisplayDriver* driver, SetHorizontalLineFuncType setHLine, SetVerticalLineFuncType setVLine, SetPixelFuncType setPixel)
 {
-	float hLeft, hRight;
-	float vTop, vBottom;
+	int hLeft, hRight;
+	int vTop, vBottom;
 	float bLeft, bRight, bTop, bBottom;
-	Lock();
-	int thick = (int)d->pensize;
-	PatternHandler pattern(pat);
-	pattern.SetColors(d->highcolor, d->lowcolor);
 
-	hLeft = r.left + xrad;
-	hRight = r.right - xrad;
-	vTop = r.top + yrad;
-	vBottom = r.bottom - yrad;
+	hLeft = (int)ROUND(r.left + xrad);
+	hRight = (int)ROUND(r.right - xrad);
+	vTop = (int)ROUND(r.top + yrad);
+	vBottom = (int)ROUND(r.bottom - yrad);
 	bLeft = hLeft + xrad;
 	bRight = hRight -xrad;
 	bTop = vTop + yrad;
 	bBottom = vBottom - yrad;
-	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, d, pat);
-	HLineThick(ROUND(hRight), ROUND(hLeft), ROUND(r.top), thick, &pattern);
+	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, driver, setPixel);
+	(driver->*setHLine)(hRight, hLeft, (int)ROUND(r.top));
 	
-	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, d, pat);
-	StrokeLine(BPoint(r.left,vTop),BPoint(r.left,vBottom),d,pat);
+	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, driver, setPixel);
+	(driver->*setVLine)((int)ROUND(r.left),vTop,vBottom);
 
-	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, d, pat);
-	HLineThick(ROUND(hLeft), ROUND(hRight), ROUND(r.bottom), thick, &pattern);
+	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, driver, setPixel);
+	(driver->*setHLine)(hLeft, hRight, ROUND(r.bottom));
 
-	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d, pat);
-	StrokeLine(BPoint(r.right,vBottom),BPoint(r.right,vTop),d,pat);
-	Unlock();
+	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, driver, setPixel);
+	(driver->*setVLine)((int)ROUND(r.right),vBottom,vTop);
 }
 
 //void DisplayDriver::StrokeShape(SShape *sh, LayerData *d, const Pattern &pat)
@@ -1828,21 +1783,24 @@ void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *
 /*!
 	\brief Called for all BView::StrokeTriangle calls
 	\param pts Array of 3 BPoints. Always non-NULL.
-	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
-	it may not be within the frame buffer's bounds.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
-
-	Bounds checking must be done in this call because only part of the triangle may end 
-	up being clipped.
+	\param pensize The line thickness
+	\param color The color of the lines
 */
-void DisplayDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
+void DisplayDriver::StrokeTriangle(BPoint *pts, float pensize, RGBColor& color)
 {
-	/* Bounds checking is handled by StrokeLine and the functions it calls */
 	Lock();
-	StrokeLine(pts[0],pts[1],d,pat);
-	StrokeLine(pts[1],pts[2],d,pat);
-	StrokeLine(pts[2],pts[0],d,pat);
+	StrokeLine(pts[0],pts[1],pensize,color);
+	StrokeLine(pts[1],pts[2],pensize,color);
+	StrokeLine(pts[2],pts[0],pensize,color);
+	Unlock();
+}
+
+void DisplayDriver::StrokeTriangle(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	StrokeLine(pts[0],pts[1],pensize,pattern,high_color,low_color);
+	StrokeLine(pts[1],pts[2],pensize,pattern,high_color,low_color);
+	StrokeLine(pts[2],pts[0],pensize,pattern,high_color,low_color);
 	Unlock();
 }
 
@@ -1850,14 +1808,10 @@ void DisplayDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pat
 	\brief Draws a series of lines - optimized for speed
 	\param pts Array of BPoints pairs
 	\param numlines Number of lines to be drawn
+	\param pensize The thickness of the lines
 	\param colors Array of colors for each respective line
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	
-	Data for this call is passed directly from userland - this call is responsible for all
-	checking. All lines are to be processed in the call using the same LayerData settings
-	for each line.
 */
-void DisplayDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
+void DisplayDriver::StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors)
 {
 }
 
@@ -2336,9 +2290,11 @@ ServerCursor *DisplayDriver::_GetCursor(void)
 	\param col The color to draw
 	Must be implemented in subclasses
 */
+/*
 void DisplayDriver::SetPixel(int x, int y, RGBColor col)
 {
 }
+*/
 
 /*!
 	\brief Draws a point of a specified thickness
@@ -2348,7 +2304,12 @@ void DisplayDriver::SetPixel(int x, int y, RGBColor col)
 	\param pat The PatternHandler which detemines pixel colors
 	Must be implemented in subclasses
 */
+/*
 void DisplayDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pat)
+{
+}
+*/
+void DisplayDriver::SetThickPatternPixel(int x, int y)
 {
 }
 
@@ -2360,9 +2321,11 @@ void DisplayDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pat)
 	\param pat The PatternHandler which detemines pixel colors
 	Must be implemented in subclasses
 */
+/*
 void DisplayDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
 {
 }
+*/
 
 /*!
 	\brief Draws a horizontal line
@@ -2373,8 +2336,24 @@ void DisplayDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
 	\param pat The PatternHandler which detemines pixel colors
 	Must be implemented in subclasses
 */
+/*
 void DisplayDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat)
 {
 }
+*/
 
+void DisplayDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
+{
+}
 
+void DisplayDriver::VLinePatternThick(int32 x1, int32 x2, int32 y)
+{
+}
+
+void DisplayDriver::FillSolidRect(int32 left, int32 top, int32 right, int32 bottom)
+{
+}
+
+void DisplayDriver::FillPatternRect(int32 left, int32 top, int32 right, int32 bottom)
+{
+}

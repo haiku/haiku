@@ -176,7 +176,7 @@ STRACE_WS(("Workspace::SetSpace(%ld) unimplemented\n",res));
 	\param gfxmodule Pointer to the uninitialized display driver to use
 	\param workspaces The number of workspaces on this screen
 */
-Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
+Screen::Screen(DisplayDriver *gfxmodule)
 {
 STRACE_SCREEN(("Screen::Screen(%s,%u)\n",gfxmodule?"driver":"NULL",workspaces));
 	_workspacelist=NULL;
@@ -210,22 +210,9 @@ STRACE_SCREEN(("Screen::Screen(%s,%u)\n",gfxmodule?"driver":"NULL",workspaces));
 		
 		// right now, we won't do anything with the gcinfo structure. ** LAZY PROGRAMMER ALERT ** :P
 
-		_workspacelist = new BList(workspaces);
-		_workspacecount = workspaces;
-		for (int i=0; i<workspaces; i++)
-		{
-			_workspacelist->AddItem(new Workspace(_gcinfo,_fbinfo,this));
-		}
+		_workspacelist = new BList();
+		_workspacecount = 0;
 		_resolution=_driver->GetMode();
-		
-		if(workspaces>0)
-		{
-			_currentworkspace=0;
-			_activeworkspace=(Workspace*)_workspacelist->ItemAt(0);
-			_workspacecount=workspaces;
-			_activeworkspace->GetRoot()->Show();
-//			_activeworkspace->GetRoot()->RequestDraw();
-		}
 	}
 }
 
@@ -311,7 +298,16 @@ void Screen::SetWorkspaceCount(int32 count)
 	if ( _workspacecount == count )
 		return;
 	for (i=_workspacecount; i<count; i++)
+	{
 		AddWorkspace();
+		if ( !i )
+		{
+			_currentworkspace=0;
+			_activeworkspace=(Workspace*)_workspacelist->ItemAt(0);
+			_activeworkspace->GetRoot()->Show();
+//			_activeworkspace->GetRoot()->RequestDraw();
+		}
+	}
 	for (i=_workspacecount; i>count; i--)
 		DeleteWorkspace(i-1);
 	_workspacecount = count;

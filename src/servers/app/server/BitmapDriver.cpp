@@ -21,7 +21,7 @@
 //
 //	File Name:		BitmapDriver.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					
+//				Gabe Yoder <gyoder@stny.rr.com>
 //	Description:	Driver to draw on ServerBitmaps
 //  
 //------------------------------------------------------------------------------
@@ -44,54 +44,7 @@
 #include <String.h>
 #include <math.h>
 
-#ifndef CLIP_X
-
-#define CLIP_X(a) ( (a < 0) ? 0 : ((a > _target->Width()-1) ? \
-			_target->Width()-1 : a) )
-#define CLIP_Y(a) ( (a < 0) ? 0 : ((a > _target->Height()-1) ? \
-			_target->Height()-1 : a) )
-#define CHECK_X(a) ( (a >= 0) || (a <= _target->Width()-1) )
-#define CHECK_Y(a) ( (a >= 0) || (a <= _target->Height()-1) )
-
-#endif
-
 extern RGBColor workspace_default_color;	// defined in AppServer.cpp
-
-void HLine_32Bit(graphics_card_info i, uint16 x, uint16 y, uint16 length, rgb_color col);
-void HLine_16Bit(graphics_card_info i, uint16 x, uint16 y, uint16 length, uint16 col);
-void HLine_16Bit(graphics_card_info i, uint16 x, uint16 y, uint16 length, uint8 col);
-
-class BitmapLineCalc
-{
-public:
-	BitmapLineCalc(const BPoint &pta, const BPoint &ptb);
-	float GetX(float y);
-	float GetY(float x);
-	float Slope(void) { return slope; }
-	float Offset(void) { return offset; }
-private:
-	float slope;
-	float offset;
-	BPoint start, end;
-};
-
-BitmapLineCalc::BitmapLineCalc(const BPoint &pta, const BPoint &ptb)
-{
-	start=pta;
-	end=ptb;
-	slope=(start.y-end.y)/(start.x-end.x);
-	offset=start.y-(slope * start.x);
-}
-
-float BitmapLineCalc::GetX(float y)
-{
-	return ( (y-offset)/slope );
-}
-
-float BitmapLineCalc::GetY(float x)
-{
-	return ( (slope * x) + offset );
-}
 
 /*!
 	\brief Sets up internal variables needed by all DisplayDriver subclasses
@@ -190,250 +143,360 @@ void BitmapDriver::DrawBitmap(ServerBitmap *bitmap, BRect source, BRect dest, La
 	Unlock();
 }
 
+
+void BitmapDriver::FillArc(const BRect r, float angle, float span, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillArc(r,angle,span,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillArc(r,angle,span,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillBezier(BPoint *pts, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillBezier(pts,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillBezier(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillBezier(pts,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillEllipse(BRect r, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillEllipse(r,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillEllipse(BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillEllipse(r,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillPolygon(ptlist,numpts,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillPolygon(ptlist,numpts,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
 /*!
 	\brief Called for all BView::FillRect calls
 	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
-
+	\param color The color used when filling the rectangle
 */
-void BitmapDriver::FillRect(BRect r, LayerData *d, const Pattern &pat)
+void BitmapDriver::FillRect(const BRect r, RGBColor& color)
 {
 	Lock();
-	if(_target)
+	fDrawColor = color;
+	FillSolidRect((int32)r.left,(int32)r.top,(int32)r.right,(int32)r.bottom);
+	Unlock();
+}
+
+/*!
+	\brief Called for all BView::FillRect calls
+	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param pattern The pattern to be used when filling the rectangle
+	\param high_color The high color of the pattern to fill
+	\param low_color  The low color of the pattern to fill
+*/
+void BitmapDriver::FillRect(const BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	FillPatternRect((int32)r.left,(int32)r.top,(int32)r.right,(int32)r.bottom);
+	Unlock();
+}
+
+void BitmapDriver::FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	fDrawColor = color;
+	DisplayDriver::FillRoundRect(r,xrad,yrad,this,(SetRectangleFuncType)&BitmapDriver::FillSolidRect,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillRoundRect(r,xrad,yrad,this,(SetRectangleFuncType)&BitmapDriver::FillPatternRect,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillTriangle(BPoint *pts, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillTriangle(pts,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::FillTriangle(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillTriangle(pts,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::StrokeArc(BRect r, float angle, float span, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeArc(r,angle,span,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeArc(r,angle,span,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokeBezier(BPoint *pts, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeBezier(pts,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeBezier(pts,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokeEllipse(BRect r, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeEllipse(r,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokeEllipse(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeEllipse(r,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeLine(start,end,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeLine(start,end,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokePoint(BPoint& pt, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	SetThickPatternPixel((int)pt.x,(int)pt.y);
+	Unlock();
+}
+
+void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBColor& color, bool is_closed)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokePolygon(ptlist,numpts,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel,is_closed);
+	Unlock();
+}
+
+void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color, bool is_closed)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokePolygon(ptlist,numpts,this,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokeRect(BRect r, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeRect(r,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick,(SetVerticalLineFuncType)&BitmapDriver::VLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::StrokeRect(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeRect(r,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick,(SetVerticalLineFuncType)&BitmapDriver::VLinePatternThick);
+	Unlock();
+}
+
+void BitmapDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeRoundRect(r,xrad,yrad,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick,(SetVerticalLineFuncType)&BitmapDriver::VLinePatternThick,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void BitmapDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeRoundRect(r,xrad,yrad,this,(SetHorizontalLineFuncType)&BitmapDriver::HLinePatternThick,(SetVerticalLineFuncType)&BitmapDriver::VLinePatternThick,(SetPixelFuncType)&BitmapDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+/*!
+	\brief Draws a series of lines - optimized for speed
+	\param pts Array of BPoints pairs
+	\param numlines Number of lines to be drawn
+	\param pensize The thickness of the lines
+	\param colors Array of colors for each respective line
+*/
+void BitmapDriver::StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors)
+{
+	int x1, y1, x2, y2, dx, dy;
+	int steps, k;
+	double xInc, yInc;
+	double x,y;
+	int i;
+
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	for (i=0; i<numlines; i++)
 	{
-	//	int32 width=rect.IntegerWidth();
-		for(int32 i=(int32)r.top;i<=r.bottom;i++)
-	//		HLine(fbuffer->gcinfo,(int32)rect.left,i,width,col);
-			Line(BPoint(r.left,i),BPoint(r.right,i),d,pat);
+		//fDrawColor = colors[i];
+		fDrawPattern.SetColors(colors[i],colors[i]);
+		x1 = ROUND(pts[i*2].x);
+		y1 = ROUND(pts[i*2].y);
+		x2 = ROUND(pts[i*2+1].x);
+		y2 = ROUND(pts[i*2+1].y);
+		dx = x2-x1;
+		dy = y2-y1;
+		x = x1;
+		y = y1;
+		if ( abs(dx) > abs(dy) )
+			steps = abs(dx);
+		else
+			steps = abs(dy);
+		xInc = dx / (double) steps;
+		yInc = dy / (double) steps;
+
+		SetThickPatternPixel(ROUND(x),ROUND(y));
+		for (k=0; k<steps; k++)
+		{
+			x += xInc;
+			y += yInc;
+			SetThickPatternPixel(ROUND(x),ROUND(y));
+		}
 	}
 	Unlock();
 }
 
-void BitmapDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
-{
-	switch(_target->BitsPerPixel())
-	{
-		case 32:
-		case 24:
-			SetThickPixel32(x,y,thick,col.GetColor32());
-			break;
-		case 16:
-		case 15:
-			SetThickPixel16(x,y,thick,col.GetColor16());
-			break;
-		case 8:
-			SetThickPixel8(x,y,thick,col.GetColor8());
-			break;
-		default:
-			printf("Unknown pixel depth %d in SetThickPixel\n",_target->BitsPerPixel());
-			break;
-	}
-}
-
-void BitmapDriver::SetThickPixel32(int x, int y, int thick, rgb_color col)
-{
-	// Code courtesy of YNOP's SecondDriver
-	union
-	{
-		uint8 bytes[4];
-		uint32 word;
-	}c1;
-	
-	c1.bytes[0]=col.blue; 
-	c1.bytes[1]=col.green; 
-	c1.bytes[2]=col.red; 
-	c1.bytes[3]=col.alpha; 
-
-	/*
-	uint32 *bits=(uint32*)_target->Bits();
-	*(bits + x + (y*_target->Width()))=c1.word;
-	*/
-	uint32 *bits=(uint32*)_target->Bits()+(x-thick/2)+(y-thick/2)*_target->BytesPerRow();
-	int i,j;
-	for (i=0; i<thick; i++)
-	{
-		for (j=0; j<thick; j++)
-		{
-			*(bits+j)=c1.word;
-		}
-		bits += _target->BytesPerRow();
-	}
-}
-
-void BitmapDriver::SetThickPixel16(int x, int y, int thick, uint16 col)
-{
-// TODO: Implement
-printf("SetThickPixel16 unimplemented\n");
-
-}
-
-void BitmapDriver::SetThickPixel8(int x, int y, int thick, uint8 col)
-{
-	// When the DisplayDriver API changes, we'll use the uint8 highcolor. Until then,
-	// we'll use *pattern
-  /*
-	uint8 *bits=(uint8*)_target->Bits();
-	*(bits + x + (y*_target->BytesPerRow()))=col;
-	*/
-
-	uint8 *bits=(uint8*)_target->Bits()+(x-thick/2)+(y-thick/2)*_target->BytesPerRow();
-	int i,j;
-	for (i=0; i<thick; i++)
-	{
-		for (j=0; j<thick; j++)
-		{
-			*(bits+j)=col;
-		}
-		bits += _target->BytesPerRow();
-	}
-}
-
-void BitmapDriver::SetPixel(int x, int y, RGBColor col)
-{
-	switch(_target->BitsPerPixel())
-	{
-		case 32:
-		case 24:
-			SetPixel32(x,y,col.GetColor32());
-			break;
-		case 16:
-		case 15:
-			SetPixel16(x,y,col.GetColor16());
-			break;
-		case 8:
-			SetPixel8(x,y,col.GetColor8());
-			break;
-		default:
-			break;
-	}
-}
-
-void BitmapDriver::SetPixel32(int x, int y, rgb_color col)
-{
-	// Code courtesy of YNOP's SecondDriver
-	union
-	{
-		uint8 bytes[4];
-		uint32 word;
-	}c1;
-	
-	c1.bytes[0]=col.blue; 
-	c1.bytes[1]=col.green; 
-	c1.bytes[2]=col.red; 
-	c1.bytes[3]=col.alpha; 
-
-	uint32 *bits=(uint32*)_target->Bits();
-	*(bits + x + (y*_target->BytesPerRow()))=c1.word;
-}
-
-void BitmapDriver::SetPixel16(int x, int y, uint16 col)
-{
-// TODO: Implement
-printf("SetPixel16 unimplemented\n");
-
-}
-
-void BitmapDriver::SetPixel8(int x, int y, uint8 col)
-{
-	// When the DisplayDriver API changes, we'll use the uint8 highcolor. Until then,
-	// we'll use *pattern
-	uint8 *bits=(uint8*)_target->Bits();
-	*(bits + x + (y*_target->BytesPerRow()))=col;
-
-}
 
 //! Empty
 void BitmapDriver::SetMode(int32 space)
 {
 	// No need to reset a bitmap's color space
-}
-
-void BitmapDriver::SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex)
-{
-	// This function is designed to add pattern support to this thing. Should be
-	// inlined later to add speed lost in the multiple function calls.
-	if(patternindex>32)
-		return;
-
-	if(_target)
-	{
-//		uint64 *p64=(uint64*)pattern;
-
-		// check for transparency in mask. If transparent, we can quit here
-		
-//		bool transparent_bit=
-//			( *p64 & ~((uint64)2 << (32-patternindex)))?true:false;
-
-//		bool highcolor_bit=
-//			( *p64 & ~((uint64)2 << (64-patternindex)))?true:false;
-			
-		switch(_target->BitsPerPixel())
-		{	
-			case 32:
-			case 24:
-			{
-				
-				break;
-			}
-			case 16:
-			case 15:
-			{
-				break;
-			}
-			case 8:
-			{
-				break;
-			}
-			default:
-			{
-				break;
-			}
-		}
-	}
-}
-
-void BitmapDriver::Line(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
-{
-	// Internal function which is called from within other functions
-	
-	// Courtesy YNOP's SecondDriver with minor changes by DW
-	int oct=0;
-	int xoff=(int32)end.x;
-	int yoff=(int32)end.y; 
-	int32 x2=(int32)start.x-xoff;
-	int32 y2=(int32)start.y-yoff; 
-	int32 x1=0;
-	int32 y1=0;
-	if(y2<0){ y2=-y2; oct+=4; }//bit2=1
-	if(x2<0){ x2=-x2; oct+=2;}//bit1=1
-	if(x2<y2){ int t=x2; x2=y2; y2=t; oct+=1;}//bit0=1
-	int x=x1,
-		y=y1,
-		sum=x2-x1,
-		Dx=2*(x2-x1),
-		Dy=2*(y2-y1);
-	for(int i=0; i <= x2-x1; i++)
-	{
-		switch(oct)
-		{
-			case 0:SetPixel(( x)+xoff,( y)+yoff,d->highcolor);break;
-			case 1:SetPixel(( y)+xoff,( x)+yoff,d->highcolor);break;
- 			case 3:SetPixel((-y)+xoff,( x)+yoff,d->highcolor);break;
-			case 2:SetPixel((-x)+xoff,( y)+yoff,d->highcolor);break;
-			case 6:SetPixel((-x)+xoff,(-y)+yoff,d->highcolor);break;
-			case 7:SetPixel((-y)+xoff,(-x)+yoff,d->highcolor);break;
-			case 5:SetPixel(( y)+xoff,(-x)+yoff,d->highcolor);break;
-			case 4:SetPixel(( x)+xoff,(-y)+yoff,d->highcolor);break;
-		}
-		x++;
-		sum-=Dy;
-		if(sum < 0)
-		{
-			y++;
-			sum += Dx;
-		}
-	}
 }
 
 //! Empty
@@ -1317,50 +1380,67 @@ rgb_color BitmapDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d
 }
 
 /*!
-	\brief Draws a horizontal line
-	\param x1 The first x coordinate (guaranteed to be in bounds)
-	\param x2 The second x coordinate (guaranteed to be in bounds)
-	\param y The y coordinate (guaranteed to be in bounds)
-	\param pat The PatternHandler which detemines pixel colors
+	\brief Draws a point using the display driver's specified thickness and pattern
+	\param x The x coordinate (not guaranteed to be in bounds)
+	\param y The y coordinate (not guaranteed to be in bounds)
 */
-void BitmapDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
+void BitmapDriver::SetThickPatternPixel(int x, int y)
 {
-	int x;
-	if ( x1 > x2 )
-	{
-		x = x2;
-		x2 = x1;
-		x1 = x;
-	}
+	int left, right, top, bottom;
+	int bytes_per_row = _target->BytesPerRow();
+	left = x - fLineThickness/2;
+	right = x + fLineThickness/2;
+	top = y - fLineThickness/2;
+	bottom = y + fLineThickness/2;
 	switch(_target->BitsPerPixel())
 	{
 		case 8:
 			{
-				uint8 *fb = (uint8 *)_target->Bits() + y*_target->BytesPerRow();
-				for (x=x1; x<=x2; x++)
-					fb[x] = pat->GetColor(x,y).GetColor8();
+				int x,y;
+				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();;
+					fb += bytes_per_row;
+				}
 			} break;
 		case 15:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y*_target->BytesPerRow());
-				for (x=x1; x<=x2; x++)
-					fb[x] = pat->GetColor(x,y).GetColor15();
+				int x,y;
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
 			} break;
 		case 16:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y*_target->BytesPerRow());
-				for (x=x1; x<=x2; x++)
-					fb[x] = pat->GetColor(x,y).GetColor16();
+				int x,y;
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
 			} break;
 		case 24:
 		case 32:
 			{
-				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + y*_target->BytesPerRow());
+				int x,y;
+				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
 				rgb_color color;
-				for (x=x1; x<=x2; x++)
+				for (y=top; y<=bottom; y++)
 				{
-					color = pat->GetColor(x,y).GetColor32();
-					fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+					for (x=left; x<=right; x++)
+					{
+						color = fDrawPattern.GetColor(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+					}
+					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
 		default:
@@ -1369,17 +1449,15 @@ void BitmapDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
 }
 
 /*!
-	\brief Draws a horizontal line
+	\brief Draws a horizontal line using the display driver's line thickness and pattern
 	\param x1 The first x coordinate (not guaranteed to be in bounds)
 	\param x2 The second x coordinate (not guaranteed to be in bounds)
 	\param y The y coordinate (not guaranteed to be in bounds)
-	\param thick The thickness of the line
-	\param pat The PatternHandler which detemines pixel colors
 */
-void BitmapDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat)
+void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 {
 	int x, y1, y2;
-	int bytesPerRow = _target->BytesPerRow();
+	int bytes_per_row = _target->BytesPerRow();
 
 	if ( x1 > x2 )
 	{
@@ -1387,59 +1465,243 @@ void BitmapDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternH
 		x2 = x1;
 		x1 = x;
 	}
-	y1 = y-thick/2;
-	y2 = y+thick/2;
-	if ( (x2 < 0) || (x1 >= _target->Width()) || (!CHECK_Y(y1) && !CHECK_Y(y2)) )
-		return;
-	x1 = CLIP_X(x1);
-	x2 = CLIP_X(x2);
-	y1 = CLIP_Y(y1);
-	y2 = CLIP_Y(y2);
+	y1 = y - fLineThickness/2;
+	y2 = y + fLineThickness/2;
 	switch(_target->BitsPerPixel())
 	{
 		case 8:
 			{
-				uint8 *fb = (uint8 *)_target->Bits() + y*bytesPerRow;
+				uint8 *fb = (uint8 *)_target->Bits() + y1*bytes_per_row;
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = pat->GetColor(x,y).GetColor8();
-					fb += bytesPerRow;
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+					fb += bytes_per_row;
 				}
 			} break;
 		case 15:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y*bytesPerRow);
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = pat->GetColor(x,y).GetColor15();
-					fb = (uint16 *)((uint8 *)fb + bytesPerRow);
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
 		case 16:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y*bytesPerRow);
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = pat->GetColor(x,y).GetColor16();
-					fb = (uint16 *)((uint8 *)fb + bytesPerRow);
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
 		case 24:
 		case 32:
 			{
-				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + y*bytesPerRow);
+				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
 				rgb_color color;
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
 					{
-						color = pat->GetColor(x,y).GetColor32();
+						color = fDrawPattern.GetColor(x,y).GetColor32();
 						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
-					fb = (uint32 *)((uint8 *)fb + bytesPerRow);
+					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
+
+/*!
+	\brief Draws a vertical line using the display driver's line thickness and pattern
+	\param x The x coordinate
+	\param y1 The first y coordinate
+	\param y2 The second y coordinate
+*/
+void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
+{
+	int y, x1, x2;
+	int bytes_per_row = _target->BytesPerRow();
+
+	if ( y1 > y2 )
+	{
+		y = y2;
+		y2 = y1;
+		y1 = y;
+	}
+	x1 = x - fLineThickness/2;
+	x2 = x + fLineThickness/2;
+	switch(_target->BitsPerPixel())
+	{
+		case 8:
+			{
+				uint8 *fb = (uint8 *)_target->Bits() + y1*bytes_per_row;
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+					fb += bytes_per_row;
+				}
+			} break;
+		case 15:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 16:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 24:
+		case 32:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
+				rgb_color color;
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+					{
+						color = fDrawPattern.GetColor(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+					}
+					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
+
+void BitmapDriver::FillSolidRect(int32 left, int32 top, int32 right, int32 bottom)
+{
+	int bytes_per_row = _target->BytesPerRow();
+	switch(_target->BitsPerPixel())
+	{
+		case 8:
+			{
+				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
+				uint8 color8 = fDrawColor.GetColor8();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color8;
+					fb += bytes_per_row;
+				}
+			} break;
+		case 15:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 color15 = fDrawColor.GetColor15();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color15;
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 16:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 color16 = fDrawColor.GetColor16();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color16;
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 24:
+		case 32:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				rgb_color fill_color = fDrawColor.GetColor32();
+				uint32 color32 = (fill_color.alpha << 24) | (fill_color.red << 16) | (fill_color.green << 8) | (fill_color.blue);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color32;
+					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
+
+void BitmapDriver::FillPatternRect(int32 left, int32 top, int32 right, int32 bottom)
+{
+	int bytes_per_row = _target->BytesPerRow();
+	switch(_target->BitsPerPixel())
+	{
+		case 8:
+			{
+				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+					fb += bytes_per_row;
+				}
+			} break;
+		case 15:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 16:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
+				}
+			} break;
+		case 24:
+		case 32:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				int x,y;
+				rgb_color color;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+					{
+						color = fDrawPattern.GetColor(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+					}
+					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
 		default:

@@ -39,13 +39,7 @@
 #include <unistd.h>
 
 #define RUN_UNDER_R5
-
-#define CLIP_X(a) ( (a < 0) ? 0 : ((a > mDisplayMode.virtual_width-1) ? \
-			mDisplayMode.virtual_width-1 : a) )
-#define CLIP_Y(a) ( (a < 0) ? 0 : ((a > mDisplayMode.virtual_height-1) ? \
-			mDisplayMode.virtual_height-1 : a) )
-#define CHECK_X(a) ( (a >= 0) || (a <= mDisplayMode.virtual_width-1) )
-#define CHECK_Y(a) ( (a >= 0) || (a <= mDisplayMode.virtual_height-1) )
+#define DRAW_TEST
 
 /* TODO: Add handling of draw modes */
 
@@ -185,6 +179,12 @@ bool AccelerantDriver::Initialize(void)
 	accMoveCursor = (move_cursor)accelerant_hook(B_MOVE_CURSOR,NULL);
 	accShowCursor = (show_cursor)accelerant_hook(B_SHOW_CURSOR,NULL);
 
+#ifdef DRAW_TEST
+	RGBColor red(255,0,0,0);
+	RGBColor green(0,255,0,0);
+	RGBColor blue(0,0,255,0);
+	FillRect(BRect(0,0,1024,768),blue);
+#endif
 	return true;
 }
 
@@ -399,161 +399,351 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 	Unlock();
 }
 
-/*!
-	\brief Called for all BView::FillRect calls
-	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
-*/
-void AccelerantDriver::FillRect(BRect r, LayerData *d, const Pattern &pattern)
+void AccelerantDriver::FillArc(const BRect r, float angle, float span, RGBColor& color)
 {
 	Lock();
-	const int8 *pat=pattern.GetInt8();
-#ifndef DISABLE_HARDWARE_ACCELERATION
-	if ( accFillRect && AcquireEngine && (((uint8)*pat == 0xFF) || (*pat == 0)) )
-	{
-		bool solidColor = true;
-		int i;
-		for (i=1; i<8; i++)
-			if ( pat[i] != pat[i-1] )
-				solidColor = false;
-		if ( solidColor && (AcquireEngine(0,0,NULL,&mEngineToken) == B_OK) )
-		{
-			fill_rect_params fillParams;
-			uint32 color=0;
-			fillParams.right = (uint16)r.right;
-			fillParams.left = (uint16)r.left;
-			fillParams.top = (uint16)r.top;
-			fillParams.bottom = (uint16)r.bottom;
-			if ( (uint8)*pat == 0xFF )
-			{
-				switch (mDisplayMode.space)
-				{
-					case B_CMAP8:
-					case B_GRAY8:
-						color = d->highcolor.GetColor8();
-						break;
-					case B_RGB16_BIG:
-					case B_RGB16_LITTLE:
-					case B_RGB15_BIG:
-					case B_RGBA15_BIG:
-					case B_RGB15_LITTLE:
-					case B_RGBA15_LITTLE:
-						color = d->highcolor.GetColor16();
-						break;
-					case B_RGB32_BIG:
-					case B_RGBA32_BIG:
-					case B_RGB32_LITTLE:
-					case B_RGBA32_LITTLE:
-					{
-						rgb_color rgbcolor = d->highcolor.GetColor32();
-						color = (rgbcolor.alpha << 24) | (rgbcolor.red << 16) | (rgbcolor.green << 8) | (rgbcolor.blue);
-					}
-						break;
-				}
-			}
-			else
-			{
-				switch (mDisplayMode.space)
-				{
-					case B_CMAP8:
-					case B_GRAY8:
-						color = d->lowcolor.GetColor8();
-						break;
-					case B_RGB16_BIG:
-					case B_RGB16_LITTLE:
-					case B_RGB15_BIG:
-					case B_RGBA15_BIG:
-					case B_RGB15_LITTLE:
-					case B_RGBA15_LITTLE:
-						color = d->lowcolor.GetColor16();
-						break;
-					case B_RGB32_BIG:
-					case B_RGBA32_BIG:
-					case B_RGB32_LITTLE:
-					case B_RGBA32_LITTLE:
-					{
-						rgb_color rgbcolor = d->lowcolor.GetColor32();
-						color = (rgbcolor.alpha << 24) | (rgbcolor.red << 16) | (rgbcolor.green << 8) | (rgbcolor.blue);
-					}
-						break;
-				}
-			}
-			accFillRect(mEngineToken, color, &fillParams, 1);
-			if ( ReleaseEngine )
-				ReleaseEngine(mEngineToken,NULL);
-			Unlock();
-			return;
-		}
-	}
-#endif
-
-	PatternHandler pathandler(pattern);
-	pathandler.SetColors(d->highcolor, d->lowcolor);
-
-	switch (mDisplayMode.space)
-	{
-		case B_CMAP8:
-		case B_GRAY8:
-			{
-				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + (int)r.top*mFrameBufferConfig.bytes_per_row;
-				int x,y;
-				for (y=(int)r.top; y<=(int)r.bottom; y++)
-				{
-					for (x=(int)r.left; x<=r.right; x++)
-					{
-						fb[x] = pathandler.GetColor(x,y).GetColor8();
-					}
-					fb += mFrameBufferConfig.bytes_per_row;
-				}
-			} break;
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-		case B_RGB15_LITTLE:
-		case B_RGBA15_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + (int)r.top*mFrameBufferConfig.bytes_per_row);
-				int x,y;
-				for (y=(int)r.top; y<=(int)r.bottom; y++)
-				{
-					for (x=(int)r.left; x<=r.right; x++)
-					{
-						fb[x] = pathandler.GetColor(x,y).GetColor16();
-					}
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE:
-			{
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + (int)r.top*mFrameBufferConfig.bytes_per_row);
-				int x,y;
-				rgb_color color;
-				for (y=(int)r.top; y<=(int)r.bottom; y++)
-				{
-					for (x=(int)r.left; x<=r.right; x++)
-					{
-						color = pathandler.GetColor(x,y).GetColor32();
-						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-					}
-					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillArc(r,angle,span,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
 	Unlock();
 }
 
-//void AccelerantDriver::FillShape(SShape *sh, LayerData *d, const Pattern &pat)
-//{
-//}
+void AccelerantDriver::FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillArc(r,angle,span,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillBezier(BPoint *pts, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillBezier(pts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillBezier(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillBezier(pts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillEllipse(BRect r, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillEllipse(r,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillEllipse(BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillEllipse(r,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillPolygon(ptlist,numpts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillPolygon(ptlist,numpts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillRect(const BRect r, RGBColor& color)
+{
+	Lock();
+	fDrawColor = color;
+	FillSolidRect((int32)r.left,(int32)r.top,(int32)r.right,(int32)r.bottom);
+	Unlock();
+}
+
+/*!
+	\brief Called for all BView::FillRect calls
+	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param pattern The pattern to be used when filling the rectangle
+	\param high_color The high color of the pattern to fill
+	\param low_color  The low color of the pattern to fill
+*/
+void AccelerantDriver::FillRect(const BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	FillPatternRect((int32)r.left,(int32)r.top,(int32)r.right,(int32)r.bottom);
+	Unlock();
+}
+
+void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	fDrawColor = color;
+	DisplayDriver::FillRoundRect(r,xrad,yrad,this,(SetRectangleFuncType)&AccelerantDriver::FillSolidRect,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillRoundRect(r,xrad,yrad,this,(SetRectangleFuncType)&AccelerantDriver::FillPatternRect,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillTriangle(BPoint *pts, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::FillTriangle(pts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::FillTriangle(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::FillTriangle(pts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeArc(BRect r, float angle, float span, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeArc(r,angle,span,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeArc(r,angle,span,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeBezier(BPoint *pts, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeBezier(pts,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeBezier(pts,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeEllipse(BRect r, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeEllipse(r,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeEllipse(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeEllipse(r,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeLine(start,end,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeLine(start,end,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokePoint(BPoint& pt, RGBColor& color)
+{
+	Lock();
+	fLineThickness = 1;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	SetThickPatternPixel((int)pt.x,(int)pt.y);
+	Unlock();
+}
+
+void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBColor& color, bool is_closed)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokePolygon(ptlist,numpts,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel,is_closed);
+	Unlock();
+}
+
+void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color, bool is_closed)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokePolygon(ptlist,numpts,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeRect(BRect r, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeRect(r,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick,(SetVerticalLineFuncType)&AccelerantDriver::VLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeRect(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeRect(r,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick,(SetVerticalLineFuncType)&AccelerantDriver::VLinePatternThick);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor& color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	fDrawPattern.SetColors(color,color);
+	DisplayDriver::StrokeRoundRect(r,xrad,yrad,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick,(SetVerticalLineFuncType)&AccelerantDriver::VLinePatternThick,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
+{
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget(pattern);
+	fDrawPattern.SetColors(high_color,low_color);
+	DisplayDriver::StrokeRoundRect(r,xrad,yrad,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick,(SetVerticalLineFuncType)&AccelerantDriver::VLinePatternThick,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
+	Unlock();
+}
+
+/*!
+	\brief Draws a series of lines - optimized for speed
+	\param pts Array of BPoints pairs
+	\param numlines Number of lines to be drawn
+	\param pensize The thickness of the lines
+	\param colors Array of colors for each respective line
+*/
+void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors)
+{
+	int x1, y1, x2, y2, dx, dy;
+	int steps, k;
+	double xInc, yInc;
+	double x,y;
+	int i;
+
+	Lock();
+	fLineThickness = (int)pensize;
+	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
+	for (i=0; i<numlines; i++)
+	{
+		//fDrawColor = colors[i];
+		fDrawPattern.SetColors(colors[i],colors[i]);
+		x1 = ROUND(pts[i*2].x);
+		y1 = ROUND(pts[i*2].y);
+		x2 = ROUND(pts[i*2+1].x);
+		y2 = ROUND(pts[i*2+1].y);
+		dx = x2-x1;
+		dy = y2-y1;
+		x = x1;
+		y = y1;
+		if ( abs(dx) > abs(dy) )
+			steps = abs(dx);
+		else
+			steps = abs(dy);
+		xInc = dx / (double) steps;
+		yInc = dy / (double) steps;
+
+		SetThickPatternPixel(ROUND(x),ROUND(y));
+		for (k=0; k<steps; k++)
+		{
+			x += xInc;
+			y += yInc;
+			SetThickPatternPixel(ROUND(x),ROUND(y));
+		}
+	}
+	Unlock();
+}
+
+
 
 /*!
 	\brief Hides the cursor.
@@ -818,28 +1008,6 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 		if(!IsCursorHidden())
 			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
 	}
-	Unlock();
-}
-
-//void AccelerantDriver::StrokeShape(SShape *sh, LayerData *d, const Pattern &pat)
-//{
-//}
-
-/*!
-	\brief Draws a series of lines - optimized for speed
-	\param pts Array of BPoints pairs
-	\param numlines Number of lines to be drawn
-	\param colors Array of colors for each respective line
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	
-	Data for this call is passed directly from userland - this call is responsible for all
-	checking. All lines are to be processed in the call using the same LayerData settings
-	for each line.
-*/
-void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
-{
-	Lock();
-	
 	Unlock();
 }
 
@@ -1135,6 +1303,7 @@ void AccelerantDriver::GetTruncatedStrings( const char **instrings, int32 string
 	\param y The y coordinate (guaranteed to be in bounds)
 	\param col The color to draw
 */
+/*
 void AccelerantDriver::SetPixel(int x, int y, RGBColor col)
 {
 	switch (mDisplayMode.space)
@@ -1168,24 +1337,20 @@ void AccelerantDriver::SetPixel(int x, int y, RGBColor col)
 			printf("Error: Unknown color space\n");
 	}
 }
+*/
 
 /*!
-	\brief Draws a point of a specified thickness
+	\brief Draws a point using the display driver's specified thickness and pattern
 	\param x The x coordinate (not guaranteed to be in bounds)
 	\param y The y coordinate (not guaranteed to be in bounds)
-	\param thick The thickness of the point
-	\param pat The PatternHandler which detemines pixel colors
 */
-void AccelerantDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pat)
+void AccelerantDriver::SetThickPatternPixel(int x, int y)
 {
-	if ( (!CHECK_X(x-thick/2) && !CHECK_X(x+thick/2)) ||
-		(!CHECK_Y(y-thick/2) && !CHECK_Y(y+thick/2)) )
-		return;
 	int left, right, top, bottom;
-	left = CLIP_X(x-thick/2);
-	right = CLIP_X(x+thick/2);
-	top = CLIP_Y(y-thick/2);
-	bottom = CLIP_Y(y+thick/2);
+	left = x - fLineThickness/2;
+	right = x + fLineThickness/2;
+	top = y - fLineThickness/2;
+	bottom = y + fLineThickness/2;
 	switch (mDisplayMode.space)
 	{
 		case B_CMAP8:
@@ -1196,14 +1361,10 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pa
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
-					{
-						fb[x] = pat->GetColor(x,y).GetColor8();;
-					}
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();;
 					fb += mFrameBufferConfig.bytes_per_row;
 				}
 			} break;
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
 		case B_RGB15_LITTLE:
@@ -1214,9 +1375,19 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pa
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
-					{
-						fb[x] = pat->GetColor(x,y).GetColor16();
-					}
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			{
+				int x,y;
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
 					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
 				}
 			} break;
@@ -1232,7 +1403,7 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pa
 				{
 					for (x=left; x<=right; x++)
 					{
-						color = pat->GetColor(x,y).GetColor32();
+						color = fDrawPattern.GetColor(x,y).GetColor32();
 						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
 					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
@@ -1250,9 +1421,9 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pa
 	\param y The y coordinate (guaranteed to be in bounds)
 	\param pat The PatternHandler which detemines pixel colors
 */
+/*
 void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
 {
-	/* TODO: Add hardware acceleration */
 	int x;
 	if ( x1 > x2 )
 	{
@@ -1302,18 +1473,16 @@ void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
 			printf("Error: Unknown color space\n");
 	}
 }
+*/
 
 /*!
-	\brief Draws a horizontal line
+	\brief Draws a horizontal line using the display driver's line thickness and pattern
 	\param x1 The first x coordinate (not guaranteed to be in bounds)
 	\param x2 The second x coordinate (not guaranteed to be in bounds)
 	\param y The y coordinate (not guaranteed to be in bounds)
-	\param thick The thickness of the line
-	\param pat The PatternHandler which detemines pixel colors
 */
-void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat)
+void AccelerantDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 {
-	/* TODO: Add hardware acceleration */
 	int x, y1, y2;
 
 	if ( x1 > x2 )
@@ -1322,14 +1491,8 @@ void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, Patt
 		x2 = x1;
 		x1 = x;
 	}
-	y1 = y-thick/2;
-	y2 = y+thick/2;
-	if ( (x2 < 0) || (x1 >= mDisplayMode.virtual_width) || (!CHECK_Y(y1) && !CHECK_Y(y2)) )
-		return;
-	x1 = CLIP_X(x1);
-	x2 = CLIP_X(x2);
-	y1 = CLIP_Y(y1);
-	y2 = CLIP_Y(y2);
+	y1 = y - fLineThickness/2;
+	y2 = y + fLineThickness/2;
 	switch (mDisplayMode.space)
 	{
 		case B_CMAP8:
@@ -1339,7 +1502,7 @@ void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, Patt
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = pat->GetColor(x,y).GetColor8();
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
 					fb += mFrameBufferConfig.bytes_per_row;
 				}
 			} break;
@@ -1348,22 +1511,22 @@ void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, Patt
 		case B_RGB15_LITTLE:
 		case B_RGBA15_LITTLE:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = pat->GetColor(x,y).GetColor15();
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
 					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
 				}
 			} break;
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = pat->GetColor(x,y).GetColor16();
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
 					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
 				}
 			} break;
@@ -1372,13 +1535,267 @@ void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, Patt
 		case B_RGB32_LITTLE:
 		case B_RGBA32_LITTLE:
 			{
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
 				rgb_color color;
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
 					{
-						color = pat->GetColor(x,y).GetColor32();
+						color = fDrawPattern.GetColor(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+					}
+					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
+
+/*!
+	\brief Draws a vertical line using the display driver's line thickness and pattern
+	\param x The x coordinate
+	\param y1 The first y coordinate
+	\param y2 The second y coordinate
+*/
+void AccelerantDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
+{
+	int y, x1, x2;
+
+	if ( y1 > y2 )
+	{
+		y = y2;
+		y2 = y1;
+		y1 = y;
+	}
+	x1 = x - fLineThickness/2;
+	x2 = x + fLineThickness/2;
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+		case B_GRAY8:
+			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row;
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+					fb += mFrameBufferConfig.bytes_per_row;
+				}
+			} break;
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
+				rgb_color color;
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+					{
+						color = fDrawPattern.GetColor(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+					}
+					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
+
+void AccelerantDriver::FillSolidRect(int32 left, int32 top, int32 right, int32 bottom)
+{
+#ifndef DISABLE_HARDWARE_ACCELERATION
+	if ( accFillRect && AcquireEngine )
+	{
+		if ( AcquireEngine(0,0,NULL,&mEngineToken) == B_OK )
+		{
+			fill_rect_params fillParams;
+			uint32 fill_color=0;
+			fillParams.right = (uint16)right;
+			fillParams.left = (uint16)left;
+			fillParams.top = (uint16)top;
+			fillParams.bottom = (uint16)bottom;
+			switch (mDisplayMode.space)
+			{
+				case B_CMAP8:
+				case B_GRAY8:
+					fill_color = fDrawColor.GetColor8();
+					break;
+				case B_RGB15_BIG:
+				case B_RGBA15_BIG:
+				case B_RGB15_LITTLE:
+				case B_RGBA15_LITTLE:
+					fill_color = fDrawColor.GetColor15();
+					break;
+				case B_RGB16_BIG:
+				case B_RGB16_LITTLE:
+					fill_color = fDrawColor.GetColor16();
+					break;
+				case B_RGB32_BIG:
+				case B_RGBA32_BIG:
+				case B_RGB32_LITTLE:
+				case B_RGBA32_LITTLE:
+				{
+					rgb_color rgbcolor = fDrawColor.GetColor32();
+					fill_color = (rgbcolor.alpha << 24) | (rgbcolor.red << 16) | (rgbcolor.green << 8) | (rgbcolor.blue);
+				}
+					break;
+			}
+			accFillRect(mEngineToken, fill_color, &fillParams, 1);
+			if ( ReleaseEngine )
+				ReleaseEngine(mEngineToken,NULL);
+			Unlock();
+			return;
+		}
+	}
+#endif
+
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+		case B_GRAY8:
+			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row;
+				uint8 color8 = fDrawColor.GetColor8();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color8;
+					fb += mFrameBufferConfig.bytes_per_row;
+				}
+			} break;
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				uint16 color15 = fDrawColor.GetColor15();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color15;
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				uint16 color16 = fDrawColor.GetColor16();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color16;
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				rgb_color fill_color = fDrawColor.GetColor32();
+				uint32 color32 = (fill_color.alpha << 24) | (fill_color.red << 16) | (fill_color.green << 8) | (fill_color.blue);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color32;
+					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
+
+void AccelerantDriver::FillPatternRect(int32 left, int32 top, int32 right, int32 bottom)
+{
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+		case B_GRAY8:
+			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row;
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+					fb += mFrameBufferConfig.bytes_per_row;
+				}
+			} break;
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				int x,y;
+				rgb_color color;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+					{
+						color = fDrawPattern.GetColor(x,y).GetColor32();
 						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
 					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
@@ -1938,12 +2355,14 @@ int AccelerantDriver::GetDepthFromColorspace(int space)
 		case B_GRAY8:
 			depth = 8;
 			break;
-		case B_RGB16:
 		case B_RGB15:
 		case B_RGBA15:
-		case B_RGB16_BIG:
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
+			depth = 15;
+			break;
+		case B_RGB16:
+		case B_RGB16_BIG:
 			depth = 16;
 			break;
 		case B_RGB32:

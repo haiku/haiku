@@ -91,7 +91,7 @@ protected:
 class Screen
 {
 public:
-	Screen(DisplayDriver *gfxmodule, uint8 workspaces);
+	Screen(DisplayDriver *gfxmodule);
 	~Screen(void);
 	void AddWorkspace(int32 index=-1);
 	void AddWorkspace(Workspace *workspace,int32 index=-1);
