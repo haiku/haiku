@@ -38,7 +38,7 @@ echo "Building $imageSize MB image at $imagePath..."
 RUN_WITHOUT_APP_SERVER=1
 
 BEOS_BIN="touch sync ln listattr listsem listport du rm \
-	true false ls df mount unmount cp mv ps sh"
+	true false ls df mount unmount cp mv ps sh mkdir sleep"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so"
 
@@ -166,3 +166,5 @@ done
 cd $previousDir
 sync
 unmount /haiku
+rmdir /haiku
+
