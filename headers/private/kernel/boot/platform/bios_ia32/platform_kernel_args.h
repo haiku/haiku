@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 #ifndef KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H
@@ -17,6 +17,8 @@
 
 
 typedef struct {
+	int32	_dummy;
+		// structure sizes differ if this would be empty (kernel vs. boot loader)
 } platform_kernel_args;
 
 #endif	/* KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H */
