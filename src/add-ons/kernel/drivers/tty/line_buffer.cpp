@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "line_buffer.h"
@@ -15,6 +15,7 @@ clear_line_buffer(struct line_buffer &buffer)
 {
 	buffer.in = 0;
 	buffer.first = 0;
+	return B_OK;
 }
 
 
@@ -98,6 +99,7 @@ line_buffer_putc(struct line_buffer &buffer, char c)
 		return B_NO_MEMORY;
 
 	buffer.buffer[(buffer.first + buffer.in++) % buffer.size] = c;
+	return B_OK;
 }
 
 
