@@ -109,11 +109,7 @@ PrinterDriver::PrintJob
 	int32 				page;
 	uint32				copy;
 	uint32				copies;
-#if PATTERN_SUPPORT
 	const int32         passes = 2;
-#else
-	const int32         passes = 1;
-#endif
 
 	fJobFile		= jobFile;
 	fPrinterNode	= printerNode;
