@@ -532,7 +532,7 @@ BParameterWeb::Flatten(void *buffer,
 	if(size < ActualFSize)
 		return B_NO_MEMORY;
 	
-	byte *CurrentPos = static_cast<byte *>(buffer);
+	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
 	
 	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
 	//being written in the correct byte order.
@@ -664,7 +664,7 @@ BParameterWeb::Unflatten(type_code c,
 	//In this case, the fields REQUIRED after the group list are:
 	//(none)
 	//TOTAL: 0 bytes
-	MaxByteLength = size - (((CurrentPos + sizeof(media_node)) - static_cast<byte *>(buf)) + 0);
+	MaxByteLength = size - (((CurrentPos + sizeof(media_node)) - static_cast<const byte *>(buf)) + 0);
 	
 	ssize_t MinFlattenedItemSize = 8;
 	
@@ -691,7 +691,7 @@ BParameterWeb::Unflatten(type_code c,
 		//In this case, the fields REQUIRED after the group list are:
 		//NumGroups*(4 bytes)
 		//TOTAL: NumGroups*(4 bytes) bytes
-		MaxByteLength = size - ((CurrentPos - static_cast<byte *>(buf)) + (NumItems*4));
+		MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + (NumItems*4));
 		
 		//make sure that the SubGroupSize cannot overflow the buffer we are reading out of
 		SubGroupSize = min_c(SubGroupSize,MaxByteLength);
@@ -1075,7 +1075,7 @@ BParameterGroup::Flatten(void *buffer,
 	if(size < ActualFSize)
 		return B_NO_MEMORY;
 	
-	byte *CurrentPos = static_cast<byte *>(buffer);
+	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
 	
 	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
 	//being written in the correct byte order.
@@ -1271,7 +1271,7 @@ BParameterGroup::Unflatten(type_code c,
 	//Param Count (4 bytes)
 	//Subgroup Count (4 bytes)
 	//TOTAL: 8 bytes
-	MaxByteLength = size - ((CurrentPos - static_cast<byte *>(buf)) + 8);
+	MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 8);
 	
 	NameStringLength = min_c(NameStringLength,MaxByteLength);
 	
@@ -1334,7 +1334,7 @@ BParameterGroup::Unflatten(type_code c,
 	//In this case, the fields REQUIRED after the name string are:
 	//Subgroup Count (4 bytes)
 	//TOTAL: 4 bytes
-	MaxByteLength = size - ((CurrentPos - static_cast<byte *>(buf)) + 4);
+	MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 4);
 	
 	ssize_t MinFlattenedItemSize(12);
 	
@@ -1361,7 +1361,7 @@ BParameterGroup::Unflatten(type_code c,
 		//In this case, the fields REQUIRED after the name string are:
 		//Subgroup Count (4 bytes)
 		//TOTAL: 4 bytes
-		MaxByteLength = size - ((CurrentPos - static_cast<byte *>(buf)) + 4);
+		MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 4);
 		
 		//make sure that the ParamSize cannot overflow the buffer we are reading out of
 		ParamSize = min_c(ParamSize,MaxByteLength);
@@ -1406,7 +1406,7 @@ BParameterGroup::Unflatten(type_code c,
 	//In this case, the fields REQUIRED after the name string are:
 	//(none)
 	//TOTAL: 0 bytes
-	MaxByteLength = size - ((CurrentPos - static_cast<byte *>(buf)) + 0);
+	MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 0);
 	
 	MinFlattenedItemSize = 12;
 	
@@ -1433,7 +1433,7 @@ BParameterGroup::Unflatten(type_code c,
 		//In this case, the fields REQUIRED after the name string are:
 		//(none)
 		//TOTAL: 0 bytes
-		MaxByteLength = size - ((CurrentPos - static_cast<byte *>(buf)) + 0);
+		MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + 0);
 		
 		//make sure that the SubGroupSize cannot overflow the buffer we are reading out of
 		SubGroupSize = min_c(SubGroupSize,MaxByteLength);
@@ -1796,7 +1796,7 @@ BParameter::Flatten(void *buffer,
 	if(size < ActualFSize)
 		return B_NO_MEMORY;
 	
-	byte *CurrentPos = static_cast<byte *>(buffer);
+	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
 	
 	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
 	//being written in the correct byte order.
@@ -1978,7 +1978,7 @@ BParameter::Unflatten(type_code c,
 	//Channel Count (4 bytes)
 	//Flags (4 bytes)
 	//TOTAL: 22 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<byte *>(buf)) + 22);
+	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 22);
 	
 	NameStringLength = min_c(NameStringLength,MaxByteLength);
 	
@@ -2005,7 +2005,7 @@ BParameter::Unflatten(type_code c,
 	//Channel Count (4 bytes)
 	//Flags (4 bytes)
 	//TOTAL: 21 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<byte *>(buf)) + 21);
+	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 21);
 	
 	KindStringLength = min_c(KindStringLength,MaxByteLength);
 	
@@ -2031,7 +2031,7 @@ BParameter::Unflatten(type_code c,
 	//Channel Count (4 bytes)
 	//Flags (4 bytes)
 	//TOTAL: 20 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<byte *>(buf)) + 20);
+	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 20);
 	
 	UnitStringLength = min_c(UnitStringLength,MaxByteLength);
 	
@@ -2063,7 +2063,7 @@ BParameter::Unflatten(type_code c,
 	//Channel Count (4 bytes)
 	//Flags (4 bytes)
 	//TOTAL: 16 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<byte *>(buf)) + 16);
+	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 16);
 	
 	NumInputs = min_c(NumInputs,static_cast<ssize_t>(MaxByteLength/sizeof(BParameter *)));
 	
@@ -2127,7 +2127,7 @@ BParameter::Unflatten(type_code c,
 	//Channel Count (4 bytes)
 	//Flags (4 bytes)
 	//TOTAL: 12 bytes
-	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<byte *>(buf)) + 12);
+	MaxByteLength = ParamStructSize - ((CurrentPos - static_cast<const byte *>(buf)) + 12);
 	
 	NumOutputs = min_c(NumOutputs,static_cast<ssize_t>(MaxByteLength/sizeof(BParameter *)));
 	
@@ -2521,7 +2521,7 @@ BContinuousParameter::Flatten(void *buffer,
 		return RetVal;
 	}
 	
-	byte *CurrentPos = static_cast<byte *>(buffer);
+	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
 	CurrentPos += TotalBParameterFlatSize;
 	
 	//write out the mMinimum property
@@ -2888,7 +2888,7 @@ BDiscreteParameter::Flatten(void *buffer,
 		return RetVal;
 	}
 	
-	byte *CurrentPos = static_cast<byte *>(buffer);
+	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
 	CurrentPos += TotalBParameterFlatSize;
 	
 	//write out the number of value/name pairs
@@ -3004,7 +3004,7 @@ BDiscreteParameter::Unflatten(type_code c,
 	ssize_t NumItems = *(reinterpret_cast<const ssize_t *>(CurrentPos));
 	CurrentPos += sizeof(ssize_t);
 	
-	ssize_t MaxByteLength = size - (CurrentPos - static_cast<byte *>(buf));
+	ssize_t MaxByteLength = size - (CurrentPos - static_cast<const byte *>(buf));
 	
 	const ssize_t MinFlattenedItemSize(5);
 	
@@ -3024,7 +3024,7 @@ BDiscreteParameter::Unflatten(type_code c,
 		
 		//ensure that we don't read so much that we don't have enough buffer left for the minimum remainder
 		//of this item (4 byte int32 value), or for the minimum size of the remaining items (5bytes*(num remaining items))
-		MaxByteLength = size - ((CurrentPos - static_cast<byte *>(buf)) + (NumItems - (i+1))*MinFlattenedItemSize + sizeof(int32));
+		MaxByteLength = size - ((CurrentPos - static_cast<const byte *>(buf)) + (NumItems - (i+1))*MinFlattenedItemSize + sizeof(int32));
 		
 		NameStringLength = min_c(NameStringLength,MaxByteLength);
 		
