@@ -13,17 +13,15 @@ KernelLd
 	-Bdynamic -shared
 	:
 	:
-	addons/kernel/bus_managers/config_manager
+	addons/kernel/config_manager
 	;
 
 KernelStaticLibrary libbus : 
 	<$(SOURCE_GRIST)>bus_init.c 
 	<$(SOURCE_GRIST)>bus_man.c 
-
-	<$(SOURCE_GRIST)>pci/pci.c
-	<$(SOURCE_GRIST)>pci/pci_bus.c
 	:
-	-fno-pic
+	-fno-pic -D_KERNEL_MODE
 	;
 
 SubInclude OBOS_TOP src kernel core addons bus_managers isa ;
+SubInclude OBOS_TOP src kernel core addons bus_managers pci ;

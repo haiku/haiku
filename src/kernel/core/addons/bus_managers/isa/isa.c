@@ -17,32 +17,32 @@ static status_t isa_rescan(void)
 
 static uint8 isa_read_io_8(int mapped_io_addr)
 {
-	return in8( mapped_io_addr );
+	return in8(mapped_io_addr);
 }
 
 static void isa_write_io_8(int mapped_io_addr, uint8 value)
 {
-	out8( value, mapped_io_addr );
+	out8(value, mapped_io_addr);
 }
 
 static uint16 isa_read_io_16( int mapped_io_addr )
 {
-	return in16( mapped_io_addr );
+	return in16(mapped_io_addr);
 }
 
 static void isa_write_io_16( int mapped_io_addr, uint16 value )
 {
-	out16( value, mapped_io_addr );
+	out16(value, mapped_io_addr);
 }
 
 static uint32 isa_read_io_32( int mapped_io_addr )
 {
-	return in32( mapped_io_addr );
+	return in32(mapped_io_addr);
 }
 
 static void isa_write_io_32( int mapped_io_addr, uint32 value )
 {
-	out32( value, mapped_io_addr );
+	out32(value, mapped_io_addr);
 }
 
 static void *ram_address(const void *physical_address_in_system_memory)

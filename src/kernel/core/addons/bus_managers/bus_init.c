@@ -6,19 +6,19 @@
 #include <memheap.h>
 #include <debug.h>
 #include <bus.h>
-
-#ifdef ARCH_x86
-#include <pci_bus.h>
-#endif
+#include <config_manager.h>
 
 int bus_init(kernel_args *ka)
 {
+	struct config_manager_for_driver_module_info *cfm;
+	
 	bus_man_init(ka);
 
-#ifdef ARCH_x86
-	pci_bus_init(ka);
-#endif
-
+	if (get_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME, 
+	               (module_info**)&cfm) == 0) {
+		dprintf("bus_init: loaded the config_manager\n");
+	}
+	
 #if 0
 	{
 		id_list *vendor_ids;
