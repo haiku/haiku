@@ -13,31 +13,6 @@
 #include <fcntl.h>
 
 
-#if 0
-struct vfs_ops {
-	int (*open)(void **_cookie);
-	int (*close)(void *cookie);
-	int (*read)(void *cookie, off_t pos, void *buffer, size_t bytes);
-	int (*write)(void *cookie, off_t pos, const void *buffer, size_t bytes);
-};
-
-struct vfs_node {
-	struct vfs_node	*next;
-	off_t			offset;
-	off_t			size;
-	int32			ref_count;
-	struct vfs_ops	*ops;
-};
-
-struct vfs_descriptor {
-	struct vfs_node	*node;
-	struct vfs_ops	*ops;
-	void			*cookie;
-	off_t			offset;
-	int32			ref_count;
-};
-#endif
-
 #define MAX_VFS_DESCRIPTORS 32
 
 list gBootDevices;
