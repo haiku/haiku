@@ -73,7 +73,7 @@ OggTobiasStream::OggTobiasStream(long serialno)
 
 OggTobiasStream::~OggTobiasStream()
 {
-
+	TRACE("OggTobiasStream::~OggTobiasStream\n");
 }
 
 status_t
@@ -85,14 +85,14 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	ogg_packet packet;
 
 	// get header packet
-	if (fHeaderPackets.size() < 1) {
+	if (GetHeaderPackets().size() < 1) {
 		result = GetPacket(&packet);
 		if (result != B_OK) {
 			return result;
 		}
 		SaveHeaderPacket(packet);
 	}
-	packet = fHeaderPackets[0];
+	packet = GetHeaderPackets()[0];
 	if (!packet.b_o_s) {
 		return B_ERROR; // first packet was not beginning of stream
 	}
@@ -128,7 +128,7 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	// TODO: wring more info out of the headers
 
 	// get comment packet
-	if (fHeaderPackets.size() < 2) {
+	if (GetHeaderPackets().size() < 2) {
 		result = GetPacket(&packet);
 		if (result != B_OK) {
 			return result;
@@ -136,7 +136,7 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 		SaveHeaderPacket(packet);
 	}
 
-	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
+	format->SetMetaData((void*)&GetHeaderPackets(),sizeof(GetHeaderPackets()));
 	*duration = 80000000;
 	*frameCount = 60000;
 	return B_OK;
@@ -144,10 +144,14 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 
 status_t
 OggTobiasStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
-                              media_header *mediaHeader)
+                             media_header *mediaHeader)
 {
-	OggStream::GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
-	*chunkSize = ((ogg_packet*)chunkBuffer)->bytes;
-	*chunkBuffer = ((ogg_packet*)chunkBuffer)->packet;
+	status_t result = GetPacket(&fChunkPacket);
+	if (result != B_OK) {
+		TRACE("OggTobiasStream::GetNextChunk failed: GetPacket = %s\n", strerror(result));
+		return result;
+	}
+	*chunkBuffer = fChunkPacket.packet;
+	*chunkSize = fChunkPacket.bytes;
 	return B_OK;
 }

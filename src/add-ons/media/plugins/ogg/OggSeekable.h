@@ -1,5 +1,5 @@
-#ifndef _OGG_STREAM_H
-#define _OGG_STREAM_H
+#ifndef _OGG_SEEKABLE_H
+#define _OGG_SEEKABLE_H
 
 #include "OggTrack.h"
 #include "OggReaderPlugin.h"
@@ -7,10 +7,10 @@
 
 namespace BPrivate { namespace media {
 
-class OggStream : public OggTrack {
+class OggSeekable : public OggTrack {
 public:
-	static OggStream *	makeOggStream(OggReader::StreamInterface * interface,
-						              long serialno, const ogg_packet & packet);
+	static OggSeekable * makeOggSeekable(OggReader::SeekableInterface * interface,
+						                 long serialno, const ogg_packet & packet);
 
 	// interface for OggReader
 	virtual status_t	GetStreamInfo(int64 *frameCount, bigtime_t *duration,
@@ -19,9 +19,9 @@ public:
 						             media_header *mediaHeader);
 
 protected:
-				OggStream(long serialno);
+				OggSeekable(long serialno);
 public:
-	virtual		~OggStream();
+	virtual		~OggSeekable();
 
 	// reader push input function
 	status_t	AddPage(off_t position, const ogg_page & page);
@@ -29,21 +29,17 @@ public:
 protected:
 	// subclass pull input function
 	status_t	GetPacket(ogg_packet * packet);
-	ogg_packet			fChunkPacket;
-
-protected:
-	int64				fCurrentFrame;
-	bigtime_t			fCurrentTime;
 
 private:
 	ogg_sync_state		fSync;
 	BLocker				fSyncLock;
 	ogg_stream_state	fStreamState;
-	OggReader::StreamInterface * fReaderInterface;
+	OggReader::SeekableInterface * fReaderInterface;
+	ogg_packet			fChunkPacket;
 };
 
 } } // namespace BPrivate::media
 
 using namespace BPrivate::media;
 
-#endif // _OGG_STREAM_H
+#endif // _OGG_SEEKABLE_H

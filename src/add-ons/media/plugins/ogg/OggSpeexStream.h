@@ -14,6 +14,9 @@ public:
 
 	virtual	status_t	GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 						              media_format *format);
+	virtual status_t	GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+						             media_header *mediaHeader);
+
 };
 
 } } // namespace BPrivate::media

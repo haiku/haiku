@@ -16,8 +16,6 @@ public:
 						              media_format *format);
 	virtual status_t	GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 						              media_header *mediaHeader);
-private:
-	ogg_packet	fChunkPacket;
 
 };
 

@@ -1,8 +1,5 @@
-#include "OggStream.h"
-#include "OggSpeexStream.h"
-#include "OggTheoraStream.h"
-#include "OggTobiasStream.h"
-#include "OggVorbisStream.h"
+#include "OggSeekable.h"
+#include "OggVorbisSeekable.h"
 #include <Autolock.h>
 #include <stdio.h>
 
@@ -14,25 +11,25 @@
 #endif
 
 /*
- * OggStream codec identification and instantiation
+ * OggSeekable codec identification and instantiation
  */
 
-/* static */ OggStream *
-OggStream::makeOggStream(OggReader::StreamInterface * interface,
+/* static */ OggSeekable *
+OggSeekable::makeOggSeekable(OggReader::SeekableInterface * interface,
                          long serialno, const ogg_packet & packet)
 {
-	TRACE("OggStream::makeOggStream\n");
-	OggStream * stream;
-	if (OggVorbisStream::IsValidHeader(packet)) {
-		stream = new OggVorbisStream(serialno);
-	} else if (OggTobiasStream::IsValidHeader(packet)) {
-		stream = new OggTobiasStream(serialno);
-	} else if (OggSpeexStream::IsValidHeader(packet)) {
-		stream = new OggSpeexStream(serialno);
-	} else if (OggTheoraStream::IsValidHeader(packet)) {
-		stream = new OggTheoraStream(serialno);
+	TRACE("OggSeekable::makeOggSeekable\n");
+	OggSeekable * stream;
+	if (OggVorbisSeekable::IsValidHeader(packet)) {
+		stream = new OggVorbisSeekable(serialno);
+//	} else if (OggTobiasSeekable::IsValidHeader(packet)) {
+//		stream = new OggTobiasSeekable(serialno);
+//	} else if (OggSpeexSeekable::IsValidHeader(packet)) {
+//		stream = new OggSpeexSeekable(serialno);
+//	} else if (OggTheoraSeekable::IsValidHeader(packet)) {
+//		stream = new OggTheoraSeekable(serialno);
 	} else {
-		stream = new OggStream(serialno);
+		stream = new OggSeekable(serialno);
 	}
 	stream->fReaderInterface = interface;
 	return stream;
@@ -40,21 +37,19 @@ OggStream::makeOggStream(OggReader::StreamInterface * interface,
 
 
 /*
- * OggStream generic functions
+ * OggSeekable generic functions
  */
 
-OggStream::OggStream(long serialno)
+OggSeekable::OggSeekable(long serialno)
 	: OggTrack(serialno)
 {
-	TRACE("OggStream::OggStream\n");
-	fCurrentFrame = 0;
-	fCurrentTime = 0;
+	TRACE("OggSeekable::OggSeekable\n");
 	ogg_sync_init(&fSync);
 	ogg_stream_init(&fStreamState,serialno);
 }
 
 
-OggStream::~OggStream()
+OggSeekable::~OggSeekable()
 {
 	// free internal stream state storage
 	ogg_sync_clear(&fSync);
@@ -63,9 +58,9 @@ OggStream::~OggStream()
 
 
 status_t
-OggStream::AddPage(off_t position, const ogg_page & page)
+OggSeekable::AddPage(off_t position, const ogg_page & page)
 {
-	TRACE("OggStream::AddPage\n");
+	TRACE("OggSeekable::AddPage\n");
 	BAutolock autolock(fSyncLock);
 	char * buffer;
 	// copy the header to our local sync
@@ -81,23 +76,23 @@ OggStream::AddPage(off_t position, const ogg_page & page)
 
 
 status_t
-OggStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
+OggSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
                          media_format *format)
 {
-	TRACE("OggStream::GetStreamInfo\n");
+	TRACE("OggSeekable::GetStreamInfo\n");
 	status_t result = B_OK;
 	ogg_packet packet;
 	if (GetHeaderPackets().size() < 1) {
 		result = GetPacket(&packet);
 		if (result != B_OK) {
-			TRACE("OggStream::GetStreamInfo failed to get header packet\n");
+			TRACE("OggSeekable::GetStreamInfo failed to get header packet\n");
 			return result;
 		}
 		SaveHeaderPacket(packet);
 	}
 	packet = GetHeaderPackets()[0];
 	if (!packet.b_o_s) {
-		TRACE("OggStream::GetStreamInfo failed : not beginning of stream\n");
+		TRACE("OggSeekable::GetStreamInfo failed : not beginning of stream\n");
 		return B_ERROR; // first packet was not beginning of stream
 	}
 
@@ -131,12 +126,12 @@ OggStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 
 // the default chunk is an ogg packet
 status_t
-OggStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+OggSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
              media_header *mediaHeader)
 {
 	status_t result = GetPacket(&fChunkPacket);
 	if (result != B_OK) {
-		TRACE("OggStream::GetNextChunk failed: GetPacket = %s\n", strerror(result));
+		TRACE("OggSeekable::GetNextChunk failed: GetPacket = %s\n", strerror(result));
 		return result;
 	}
 	*chunkBuffer = &fChunkPacket;
@@ -147,7 +142,7 @@ OggStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 
 // subclass pull input function
 status_t
-OggStream::GetPacket(ogg_packet * packet)
+OggSeekable::GetPacket(ogg_packet * packet)
 {
 	// at the end, pull the packet
 	while (ogg_stream_packetpeek(&fStreamState, NULL) != 1) {
@@ -155,23 +150,23 @@ OggStream::GetPacket(ogg_packet * packet)
 		int result;
 		ogg_page page;
 		while ((result = ogg_sync_pageout(&fSync,&page)) == 0) {
-			result = fReaderInterface->ReadPage();
-			if (result < 0) {
-				TRACE("OggStream::GetPacket: GetNextPage = %s\n", strerror(result));
+			status_t result = B_ERROR; // fReaderInterface->ReadPage();
+			if (result != B_OK) {
+				TRACE("OggSeekable::GetPacket: GetNextPage = %s\n", strerror(result));
 				return result;
 			}
 		}
 		if (result == -1) {
-			TRACE("OggStream::GetPacket: ogg_sync_pageout: not synced??\n");
+			TRACE("OggSeekable::GetPacket: ogg_sync_pageout: not synced??\n");
 			return B_ERROR;
 		}
 		if (ogg_stream_pagein(&fStreamState,&page) != 0) {
-			TRACE("OggStream::GetPacket: ogg_stream_pagein: failed??\n");
+			TRACE("OggSeekable::GetPacket: ogg_stream_pagein: failed??\n");
 			return B_ERROR;
 		}
 	}
 	if (ogg_stream_packetout(&fStreamState, packet) != 1) {
-		TRACE("OggStream::GetPacket: ogg_stream_packetout failed\n");
+		TRACE("OggSeekable::GetPacket: ogg_stream_packetout failed\n");
 		return B_ERROR;
 	}
 	return B_OK;

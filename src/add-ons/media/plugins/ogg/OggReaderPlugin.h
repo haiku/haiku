@@ -8,9 +8,9 @@
 
 namespace BPrivate { namespace media {
 
-class OggStream;
+class OggTrack;
 
-typedef std::map<long,OggStream*> serialno_OggStream_map;
+typedef std::map<long,OggTrack*> serialno_OggTrack_map;
 typedef std::vector<long> serialno_vector;
 
 class OggReader : public Reader
@@ -28,36 +28,35 @@ public:
 	status_t	AllocateCookie(int32 streamNumber, void **cookie);
 	status_t	FreeCookie(void *cookie);
 
-	// delegated to OggStream	
+	// delegated to OggTrack	
 	status_t	GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 							  media_format *format, void **infoBuffer, int32 *infoSize);
-	status_t	Seek(void *cookie,
-					 uint32 seekTo,
-					 int64 *frame, bigtime_t *time);
-	status_t	GetNextChunk(void *cookie,
-							 void **chunkBuffer, int32 *chunkSize,
+	status_t	Seek(void *cookie, uint32 seekTo, int64 *frame, bigtime_t *time);
+	status_t	GetNextChunk(void *cookie, void **chunkBuffer, int32 *chunkSize,
 							 media_header *mediaHeader);
 									 
-protected:
-	// called by OggStream through GetPageInterface
-	status_t	GetPage(ogg_page * page, int read_size = 4*B_PAGE_SIZE,
-				        bool short_page = false);
-	status_t	GetPageAt(off_t position, ogg_stream_state * stream,
-				          int read_size = 4*B_PAGE_SIZE);
-
-	ogg_sync_state			fSync;
-	serialno_OggStream_map	fStreams;
-	serialno_vector			fCookies;
-	BPositionIO *			fSeekable;
-
 private:
-	off_t		fNextPosition;
+	ogg_sync_state			fSync;
+	BLocker					fSyncLock;
+	serialno_OggTrack_map	fTracks;
+	serialno_vector			fCookies;
 
-	class GetPageInterface {
+	BPositionIO *			fSeekable;
+	BFile *					fFile;
+
+	off_t					fPosition;
+
+	// interfaces for OggTracks
+	ssize_t		ReadPage(bool first_page = false);
+	ssize_t		ReadPageAt(off_t position, int read_size = 4*B_PAGE_SIZE);
+
+	class StreamInterface {
 	public:
-		virtual status_t	GetNextPage() = 0;
-		virtual status_t	GetPageAt(off_t position, ogg_stream_state * stream,
-							          int read_size = 4*B_PAGE_SIZE) = 0;
+		virtual ssize_t		ReadPage() = 0;
+	};
+	class SeekableInterface {
+	public:
+		virtual ssize_t		ReadPageAt(off_t position, int read_size = 4*B_PAGE_SIZE) = 0;
 	};
 };
 

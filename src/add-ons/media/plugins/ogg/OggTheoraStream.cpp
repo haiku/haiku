@@ -152,14 +152,14 @@ OggTheoraStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	ogg_packet packet;
 
 	// get header packet
-	if (fHeaderPackets.size() < 1) {
+	if (GetHeaderPackets().size() < 1) {
 		result = GetPacket(&packet);
 		if (result != B_OK) {
 			return result;
 		}
 		SaveHeaderPacket(packet);
 	}
-	packet = fHeaderPackets[0];
+	packet = GetHeaderPackets()[0];
 	if (!packet.b_o_s) {
 		return B_ERROR; // first packet was not beginning of stream
 	}
@@ -199,7 +199,7 @@ OggTheoraStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	format->u.encoded_video.output.display.line_count = info.frame_height;
 	// TODO: wring more info out of the headers
 
-	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
+	format->SetMetaData((void*)&GetHeaderPackets(),sizeof(GetHeaderPackets()));
 	*duration = 80000000;
 	*frameCount = 60000;
 	return B_OK;

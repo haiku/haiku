@@ -1,5 +1,5 @@
 #include "OggVorbisFormats.h"
-#include "OggVorbisStream.h"
+#include "OggVorbisSeekable.h"
 #include <stdio.h>
 
 #define TRACE_THIS 1
@@ -80,31 +80,31 @@ static int _vorbis_unpack_info(vorbis_info *vi,oggpack_buffer *opb){
 }
 
 /*
- * OggVorbisStream implementations
+ * OggVorbisSeekable implementations
  */
 
 /* static */ bool
-OggVorbisStream::IsValidHeader(const ogg_packet & packet)
+OggVorbisSeekable::IsValidHeader(const ogg_packet & packet)
 {
 	return findIdentifier(packet,"vorbis",1);
 }
 
-OggVorbisStream::OggVorbisStream(long serialno)
-	: OggStream(serialno)
+OggVorbisSeekable::OggVorbisSeekable(long serialno)
+	: OggSeekable(serialno)
 {
-	TRACE("OggVorbisStream::OggVorbisStream\n");
+	TRACE("OggVorbisSeekable::OggVorbisSeekable\n");
 }
 
-OggVorbisStream::~OggVorbisStream()
+OggVorbisSeekable::~OggVorbisSeekable()
 {
-	TRACE("OggVorbisStream::~OggVorbisStream\n");
+	TRACE("OggVorbisSeekable::~OggVorbisSeekable\n");
 }
 
 status_t
-OggVorbisStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
+OggVorbisSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
                                media_format *format)
 {
-	TRACE("OggVorbisStream::GetStreamInfo\n");
+	TRACE("OggVorbisSeekable::GetStreamInfo\n");
 	status_t result = B_OK;
 	ogg_packet packet;
 

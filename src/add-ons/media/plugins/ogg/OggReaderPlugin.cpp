@@ -2,12 +2,15 @@
 #include <string.h>
 #include <malloc.h>
 #include <stdint.h>
-#include <DataIO.h>
+#include <Autolock.h>
 #include <ByteOrder.h>
+#include <DataIO.h>
+#include <File.h>
 #include <InterfaceDefs.h>
 #include <MediaFormats.h>
 #include "OggReaderPlugin.h"
 #include "OggStream.h"
+#include "OggSeekable.h"
 
 #define TRACE_THIS 1
 #if TRACE_THIS
@@ -20,20 +23,22 @@ OggReader::OggReader()
 {
 	TRACE("OggReader::OggReader\n");
 	ogg_sync_init(&fSync);
+	fSeekable = NULL;
+	fFile = NULL;
+	fPosition = -1;
 }
 
 
 OggReader::~OggReader()
 {
 	TRACE("OggReader::~OggReader\n");
-	serialno_OggStream_map::iterator i = fStreams.begin();
-	while (i != fStreams.end()) {
-		serialno_OggStream_map::iterator j = i;
+	serialno_OggTrack_map::iterator i = fTracks.begin();
+	while (i != fTracks.end()) {
+		serialno_OggTrack_map::iterator j = i;
 		i++;
 		delete j->second;
 	}
 	ogg_sync_clear(&fSync);
-	fNextPosition = -1;
 }
 
       
@@ -44,16 +49,19 @@ OggReader::Copyright()
 }
 
 
-status_t
-OggReader::GetPage(ogg_page * page, int read_size, bool short_page)
+// the main page reading hook (stream friendly)
+ssize_t
+OggReader::ReadPage(bool first_page)
 {
-//	TRACE("OggReader::GetPage\n");
+//	TRACE("OggReader::ReadPage\n");
+	int read_size = (first_page ? 4096 : 4*B_PAGE_SIZE);
+	BAutolock autolock(fSyncLock);
+	ogg_page page;
 retry:
-	off_t position = fNextPosition;
-	int result = ogg_sync_pageout(&fSync,page); // first read leftovers
+	int result = ogg_sync_pageout(&fSync, &page); // first read leftovers
 	while (result == 0) {
-		char * buffer = ogg_sync_buffer(&fSync,read_size);
-		ssize_t bytes = Source()->Read(buffer,read_size);
+		char * buffer = ogg_sync_buffer(&fSync, read_size);
+		ssize_t bytes = Source()->Read(buffer, read_size);
 		if (bytes == 0) {
 			TRACE("OggReader::GetPage: Read: no data\n");
 			return B_LAST_BUFFER_ERROR;
@@ -62,46 +70,50 @@ retry:
 			TRACE("OggReader::GetPage: Read: error\n");
 			return bytes;
 		}
-		if (ogg_sync_wrote(&fSync,bytes) != 0) {
+		if (ogg_sync_wrote(&fSync, bytes) != 0) {
 			TRACE("OggReader::GetPage: ogg_sync_wrote failed?: error\n");
 			return B_ERROR;
 		}
-		result = ogg_sync_pageout(&fSync,page);
-		if (short_page && (result != 1)) {
-			TRACE("OggReader::GetPage: short page not found: error\n");
+		result = ogg_sync_pageout(&fSync, &page);
+		if (first_page && (result != 1)) {
+			TRACE("OggReader::GetPage: short first page not found: error\n");
 			return B_ERROR;
 		}
+		fPosition += bytes;
 	}
 	if (result == -1) {
 		TRACE("OggReader::GetPage: ogg_sync_pageout: not synced: error\n");
 		return B_ERROR;
 	}
-#ifdef STRICT_OGG
-	if (ogg_page_version(page) != 0) {
+	if (ogg_page_version(&page) != 0) {
 		TRACE("OggReader::GetPage: ogg_page_version: error in page encoding: error\n");
 		return B_ERROR;
 	}
-#endif
-	fNextPosition += (fSeekable ? page->header_len + page->body_len : 0);
-	long serialno = ogg_page_serialno(page);
-	if (fStreams.find(serialno) == fStreams.end()) {
+	long serialno = ogg_page_serialno(&page);
+	if (fTracks.find(serialno) == fTracks.end()) {
 		// this is an unknown serialno
-		if (ogg_page_bos(page) == 0) {
+		if (ogg_page_bos(&page) == 0) {
 			TRACE("OggReader::GetPage: non-bos page with unknown serialno\n");
 #ifdef STRICT_OGG
 			return B_ERROR;
 #else
-			// silently discard packets with unknown serialno
+			// silently discard non-bos packets with unknown serialno
 			goto retry;
 #endif
 		}
+#ifdef STRICT_OGG
+		if (ogg_page_continued(&page) != 0) {
+			TRACE("oggReader::GetPage: ogg_page_continued: continued page: not ogg\n");
+			return B_ERROR;
+		}
+#endif STRICT_OGG
 		// this is a beginning of stream page
 		ogg_stream_state stream;
 		if (ogg_stream_init(&stream, serialno) != 0) {
 			TRACE("oggReader::GetPage: ogg_stream_init failed?: error\n");
 			return B_ERROR;
 		}
-		if (ogg_stream_pagein(&stream, page) != 0) {
+		if (ogg_stream_pagein(&stream, &page) != 0) {
 			TRACE("oggReader::GetPage: ogg_stream_pagein: failed: error\n");
 			return B_ERROR;
 		}
@@ -111,51 +123,59 @@ retry:
 			return B_ERROR;
 #endif STRICT_OGG
 		}
-		class Interface : public GetPageInterface {
-		private:
-			OggReader * reader;
-			long serialno;
-		public:
-			Interface(OggReader * reader, long serialno) {
-				this->reader = reader;
-				this->serialno = serialno;
-			}
-			virtual status_t GetNextPage() {
-				ogg_page next_page;
-				do {
-					status_t result = reader->GetPage(&next_page);
-					if (result != B_OK) {
-						return result;
-					}
-				} while (ogg_page_serialno(&next_page) != serialno);
-				return B_OK;
-			}
-			virtual status_t GetPageAt(off_t position, ogg_stream_state * stream,
-                                       int read_size = 4*B_PAGE_SIZE) {
-				return reader->GetPageAt(position,stream,read_size);
-			}
-		};
-		fStreams[serialno] = OggStream::makeOggStream(new Interface(this, serialno), serialno, packet);
+		if (fSeekable) {
+			class Interface : public SeekableInterface {
+			private:
+				OggReader * reader;
+			public:
+				Interface(OggReader * reader) {
+					this->reader = reader;
+				}
+				virtual ssize_t ReadPageAt(off_t position, int read_size = 4*B_PAGE_SIZE) {
+					return reader->ReadPageAt(position, read_size);
+				}
+			};
+			fTracks[serialno] = OggSeekable::makeOggSeekable(new Interface(this), serialno, packet);
+		} else {
+			class Interface : public StreamInterface {
+			private:
+				OggReader * reader;
+			public:
+				Interface(OggReader * reader) {
+					this->reader = reader;
+				}
+				virtual ssize_t ReadPage() {
+					return reader->ReadPage();
+				}
+			};
+			fTracks[serialno] = OggStream::makeOggStream(new Interface(this), serialno, packet);
+		}
 		fCookies.push_back(serialno);
 	}
-	return fStreams[serialno]->AddPage(position,page);
+	off_t pageStart = fPosition - page.header_len - page.body_len;
+	status_t status = fTracks[serialno]->AddPage(pageStart, page);
+	if (status != B_OK) {
+		return status;
+	}
+	return page.header_len + page.body_len;
 }
 
 
-status_t
-OggReader::GetPageAt(off_t position, ogg_stream_state * stream, int read_size)
+ssize_t
+OggReader::ReadPageAt(off_t position, int read_size)
 {
 	TRACE("OggReader::GetPageAt %llu\n", position);
 	if (!fSeekable) {
 		return B_ERROR;
 	}
+/*
 	ogg_sync_state sync;
 	ogg_sync_init(&sync);
 	ogg_page page;
 	int result;
-	while ((result = ogg_sync_pageout(&sync,&page)) == 0) {
-		char * buffer = ogg_sync_buffer(&sync,read_size);
-		ssize_t bytes = fSeekable->ReadAt(position,buffer,read_size);
+	while ((result = ogg_sync_pageout(&sync, &page)) == 0) {
+		char * buffer = ogg_sync_buffer(&sync, read_size);
+		ssize_t bytes = fSeekable->ReadAt(position, buffer, read_size);
 		if (bytes == 0) {
 			TRACE("OggReader::GetPage: Read: no data\n");
 			return B_LAST_BUFFER_ERROR;
@@ -165,7 +185,7 @@ OggReader::GetPageAt(off_t position, ogg_stream_state * stream, int read_size)
 			return bytes;
 		}
 		position += bytes;
-		if (ogg_sync_wrote(&sync,bytes) != 0) {
+		if (ogg_sync_wrote(&sync, bytes) != 0) {
 			TRACE("OggReader::GetPage: ogg_sync_wrote failed?: error\n");
 			return B_ERROR;
 		}
@@ -185,6 +205,7 @@ OggReader::GetPageAt(off_t position, ogg_stream_state * stream, int read_size)
 		return B_ERROR;
 	}
 	ogg_sync_clear(&sync);
+*/
 	return B_OK;
 }
 
@@ -198,7 +219,7 @@ get_seekable(BDataIO * data)
 		return 0;
 	}
 	// first try to get our current location
-	off_t current = seekable->Seek(0,SEEK_CUR);
+	off_t current = seekable->Seek(0, SEEK_CUR);
 	if (current < 0) {
 		return 0;
 	}
@@ -207,19 +228,34 @@ get_seekable(BDataIO * data)
 		return 0;
 	}
 	// next try to seek to our current location (absolutely)
-	if (seekable->Seek(current,SEEK_SET) < 0) {
+	if (seekable->Seek(current, SEEK_SET) < 0) {
 		return 0;
 	}
 	// next try to seek to the start of the stream (absolutely)
-	if (seekable->Seek(0,SEEK_SET) < 0) {
+	if (seekable->Seek(0, SEEK_SET) < 0) {
 		return 0;
 	}
 	// then seek back to where we started
-	if (seekable->Seek(current,SEEK_SET) < 0) {
+	if (seekable->Seek(current, SEEK_SET) < 0) {
 		// really screwed
 		return 0;
 	}
 	return seekable;
+}
+
+static BFile *
+get_file(BDataIO * data)
+{
+	// try to cast to BFile then perform a series of
+	// sanity checks to ensure that the file is okay
+	BFile * file = dynamic_cast<BFile *>(data);
+	if (file == 0) {
+		return 0;
+	}
+	if (file->InitCheck() != B_OK) {
+		return 0;
+	}
+	return file;
 }
 
 status_t
@@ -227,38 +263,22 @@ OggReader::Sniff(int32 *streamCount)
 {
 	TRACE("OggReader::Sniff\n");
 #ifdef STRICT_OGG
-	bool short_page = true;
+	bool first_page = true;
 #else
-	bool short_page = false;
+	bool first_page = false;
 #endif
-	fSeekable = get_seekable(Source());
+//	fSeekable = get_seekable(Source());
+	fFile = get_file(Source());
 
-	fNextPosition = (fSeekable ? fSeekable->Position() : -1);
-	
-	ogg_page page;
-	if (GetPage(&page,4096,short_page) != B_OK) {
-		return B_ERROR;
+	ssize_t bytes = ReadPage(first_page);
+	if (bytes < 0) {
+		return bytes;
 	}
-
-	// page sanity checks
-	if (ogg_page_version(&page) != 0) {
-		TRACE("OggReader::Sniff: ogg_page_version: error in page encoding: not ogg\n");
-		return B_ERROR;
-	}
-#ifdef STRICT_OGG
-	if (ogg_page_bos(&page) == 0) {
-		TRACE("OggReader::Sniff: ogg_page_bos: not beginning of a bitstream: not ogg\n");
-		return B_ERROR;
-	}
-	if (ogg_page_continued(&page) != 0) {
-		TRACE("OggReader::Sniff: ogg_page_continued: continued page: not ogg\n");
-		return B_ERROR;
-	}
-#endif STRICT_OGG
-
-	while (ogg_page_bos(&page) > 0) {
-		if (GetPage(&page) != B_OK) {
-			return B_ERROR;
+	uint count = 1;
+	while (count++ == fCookies.size()) {
+		ssize_t bytes = ReadPage();
+		if (bytes < 0) {
+			return bytes;
 		}
 	}
 	*streamCount = fCookies.size();
@@ -292,9 +312,9 @@ OggReader::AllocateCookie(int32 streamNumber, void **cookie)
 		TRACE("OggReader::AllocateCookie: invalid streamNumber: bail\n");
 		return B_ERROR;
 	}
-	OggStream * stream = fStreams[fCookies[streamNumber]];
+	OggTrack * track = fTracks[fCookies[streamNumber]];
 	// store the cookie
-	*cookie = stream;
+	*cookie = track;
 	return B_OK;
 }
 
@@ -314,8 +334,8 @@ OggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 	TRACE("OggReader::GetStreamInfo\n");
 	*infoBuffer = 0;
 	*infoSize = 0;
-	OggStream * stream = static_cast<OggStream*>(cookie);
-	return stream->GetStreamInfo(frameCount,duration,format);
+	OggTrack * track = static_cast<OggTrack*>(cookie);
+	return track->GetStreamInfo(frameCount, duration, format);
 }
 
 
@@ -324,9 +344,9 @@ OggReader::Seek(void *cookie,
 				uint32 seekTo,
 				int64 *frame, bigtime_t *time)
 {
-	TRACE("OggReader::Seek to %lld : %lld\n",*frame,*time);
-	OggStream * stream = static_cast<OggStream*>(cookie);
-	return stream->Seek(seekTo,frame,time);
+	TRACE("OggReader::Seek to %lld : %lld\n", *frame, *time);
+	OggTrack * track = static_cast<OggTrack*>(cookie);
+	return track->Seek(seekTo, frame, time);
 }
 
 
@@ -336,8 +356,8 @@ OggReader::GetNextChunk(void *cookie,
 						media_header *mediaHeader)
 {
 //	TRACE("OggReader::GetNextChunk\n");
-	OggStream * stream = static_cast<OggStream*>(cookie);
-	return stream->GetNextChunk(chunkBuffer,chunkSize,mediaHeader);
+	OggTrack * track = static_cast<OggTrack*>(cookie);
+	return track->GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
 }
 
 
