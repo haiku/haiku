@@ -1249,12 +1249,14 @@ void BSlider::SetFont(const BFont *font, uint32 properties)
 	}
 }
 //------------------------------------------------------------------------------
+#ifdef __HAIKU__
 void BSlider::SetLimits(int32 minimum, int32 maximum)
 {
 	// TODO: Redraw
 	fMinValue = minimum;
 	fMaxValue = maximum;
 }
+#endif
 //------------------------------------------------------------------------------
 void BSlider::_DrawBlockThumb()
 {
@@ -1424,7 +1426,9 @@ float BSlider::_MaxPosition() const
 extern "C"
 void _ReservedSlider4__7BSlider(BSlider *slider, int32 minimum, int32 maximum)
 {
+#ifdef __HAIKU__
 	slider->SetLimits(minimum, maximum);
+#endif
 }
 //------------------------------------------------------------------------------
 void BSlider::_ReservedSlider5() {}
