@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,14 +10,26 @@
 #include <kernel.h>
 #include <syscalls.h>
 
+#include <string.h>
+
 
 extern "C" status_t
 get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize)
 {
-	// ToDo: implement me for real!
-	//	We could also think about making this available in the kernel (by making it non-static)
+	void *handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+	if (handle == NULL)
+		return B_ENTRY_NOT_FOUND;
 
-	return B_ENTRY_NOT_FOUND;
+	status_t status = B_ENTRY_NOT_FOUND;
+
+	const char *value = get_driver_parameter(handle, parameter, NULL, NULL);
+	if (value != NULL) {
+		*_bufferSize = strlcpy(buffer, value, *_bufferSize);
+		status = B_OK;
+	}
+
+	unload_driver_settings(handle);
+	return status;
 }
 
 
