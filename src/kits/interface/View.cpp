@@ -3198,6 +3198,7 @@ BView::AddChild(BView *child, BView *before)
 
 		child->setOwner(this->owner);
 		attachView(child);
+		callAttachHooks(child);
 
 		if (lockedByAddChild)
 			owner->Unlock();
@@ -3733,15 +3734,10 @@ BView::removeSelf()
 }
 
 
-bool
+void
 BView::callDetachHooks(BView *aView)
 {
-	//	check_clock();
-
-	// call the hook function:
 	aView->DetachedFromWindow();
-
-	// we attach all its children
 
 	BView *child = aView->first_child;	
 	while (child != NULL) {
@@ -3749,10 +3745,7 @@ BView::callDetachHooks(BView *aView)
 		child = child->next_sibling;
 	}
 
-	// call the hook function:
 	aView->AllDetached();
-
-	return true;
 }
 
 
@@ -3819,6 +3812,19 @@ BView::addToList(BView *aView, BView *before)
 	return true;
 }
 
+void
+BView::callAttachHooks(BView *aView)
+{
+	aView->AttachedToWindow();
+
+	BView *child= aView->first_child;
+	while (child != NULL) {
+		aView->callAttachHooks(child);
+		child = child->next_sibling;
+	}
+
+	aView->AllAttached();
+}
 
 bool
 BView::attachView(BView *aView)
@@ -3851,9 +3857,6 @@ BView::attachView(BView *aView)
 	
 	aView->setCachedState();
 
-	// call the hook function:
-	aView->AttachedToWindow();
-
 	// we attach all its children
 
 	BView *child= aView->first_child;
@@ -3862,8 +3865,6 @@ BView::attachView(BView *aView)
 		child = child->next_sibling;
 	}
 
-	// call the hook function:
-	aView->AllAttached();
 	owner->fLink->Flush();
 
 	return true;
