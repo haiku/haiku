@@ -29,17 +29,20 @@ fi
 
 fi
 
-quit "application/x-vnd.Be-POST"
-quit "application/x-vnd.Be-TSKB"
-
 if [ -n "$TTY" ]
 then
+    quit "application/x-vnd.Be-POST"
+    quit "application/x-vnd.Be-TSKB"
     unzip -d / install.zip
+    /boot/beos/system/Deskbar > /dev/null &
 else
     response=`alert "Would you like to automatically overwrite existing files, or receive a prompt?" "Overwrite" "Prompt"`
     if [ $response == "Overwrite" ]
     then
+        quit "application/x-vnd.Be-POST"
+        quit "application/x-vnd.Be-TSKB"
         unzip -od / install.zip
+        /boot/beos/system/Deskbar > /dev/null &
         alert "Finished installing" "Thanks"
     else
         if [ -e /boot/beos/apps/Terminal ]
