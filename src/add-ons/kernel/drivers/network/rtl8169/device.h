@@ -55,20 +55,20 @@ typedef struct {
 	volatile int32		rxIntIndex;		// current descriptor that needs be checked
 	volatile int32		rxFree;
 
-
 	volatile buf_desc *	txDesc;
 	volatile buf_desc *	rxDesc;
 	
 	area_id				txDescArea;
 	area_id				rxDescArea;
-	area_id				txBufArea;
-	area_id				rxBufArea;
 
 	void *				txBuf[TX_DESC_COUNT];
 	void *				rxBuf[RX_DESC_COUNT];
+
+	area_id				txBufArea;
+	area_id				rxBufArea;
 	
 	void *				regAddr;
-	area_id				refArea;
+	area_id				regArea;
 
 	uint8				irq;
 	uint8				macaddr[6];

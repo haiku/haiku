@@ -23,8 +23,6 @@
 #include <fcntl.h>
 #include <string.h>
 
-//#define DEBUG
-
 #include "debug.h"
 #include "device.h"
 #include "driver.h"
@@ -32,6 +30,7 @@
 #include "util.h"
 
 static int32 gOpenMask = 0;
+
 
 static void
 write_phy_reg(rtl8169_device *device, int reg, uint16 value)
@@ -45,6 +44,7 @@ write_phy_reg(rtl8169_device *device, int reg, uint16 value)
 		snooze(100);
 	}
 }
+
 
 static uint16
 read_phy_reg(rtl8169_device *device, int reg)
@@ -62,6 +62,7 @@ read_phy_reg(rtl8169_device *device, int reg)
 	return 0xffff;
 }
 
+
 static inline void
 write_phy_reg_bit(rtl8169_device *device, int reg, int bitnum, int bitval)
 {
@@ -72,6 +73,7 @@ write_phy_reg_bit(rtl8169_device *device, int reg, int bitnum, int bitval)
 		val &= ~(1 << bitnum);
 	write_phy_reg(device, reg, val);
 }
+
 
 static void
 phy_config(rtl8169_device *device)
@@ -250,6 +252,7 @@ init_buf_desc(rtl8169_device *device)
 	return B_OK;
 }
 
+
 static inline void
 rtl8169_tx_int(rtl8169_device *device)
 {
@@ -415,8 +418,8 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, 0x14, 4);
 	val &= PCI_address_memory_32_mask;
 	TRACE("hardware register address %p\n", (void *) val);
-	device->refArea = map_mem(&device->regAddr, (void *)val, 256, 0, "rtl8169 register");
-	if (device->refArea < B_OK) {
+	device->regArea = map_mem(&device->regAddr, (void *)val, 256, 0, "rtl8169 register");
+	if (device->regArea < B_OK) {
 		ERROR("can't map hardware registers\n");
 		goto err;
 	}
@@ -533,7 +536,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 err:
 	delete_sem(device->rxReadySem);
 	delete_sem(device->txFreeSem);
-	delete_area(device->refArea);
+	delete_area(device->regArea);
 	delete_area(device->txBufArea);
 	delete_area(device->rxBufArea);
 	delete_area(device->txDescArea);
@@ -575,7 +578,7 @@ rtl8169_free(void* cookie)
 
 	delete_sem(device->rxReadySem);
 	delete_sem(device->txFreeSem);
-	delete_area(device->refArea);
+	delete_area(device->regArea);
 	delete_area(device->txBufArea);
 	delete_area(device->rxBufArea);
 	delete_area(device->txDescArea);
