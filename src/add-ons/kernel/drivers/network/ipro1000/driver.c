@@ -123,8 +123,10 @@ init_driver(void)
 	if (!item)
 		return B_NO_MEMORY;
 	
-	if (get_module(B_PCI_MODULE_NAME, (module_info **)&gPci) < B_OK)
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&gPci) < B_OK) {
+		free(item);
 		return B_ERROR;
+	}
 	
 	for (cards = 0, index = 0; gPci->get_nth_pci_info(index++, item) == B_OK; ) {
 		const char *info = identify_device(item);
@@ -138,7 +140,7 @@ init_driver(void)
 			cards++;
 			item = (pci_info *)malloc(sizeof(pci_info));
 			if (!item)
-				return B_OK; // already found 1 card, but out of memory
+				goto err_outofmem;
 			if (cards == MAX_CARDS)
 				break;
 		}
@@ -167,6 +169,11 @@ err_mempool:
 	terminate_timer();
 err_timer:
 err_cards:
+err_outofmem:
+	for (index = 0; index < cards; index++) {
+		free(gDevList[index]);
+		free(gDevNameList[index]);
+	}
 	put_module(B_PCI_MODULE_NAME);
 	return B_ERROR;
 }
