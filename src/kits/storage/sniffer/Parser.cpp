@@ -1192,6 +1192,7 @@ Parser::ParseRPattern() {
 		}
 	} else
 		ThrowOutOfMemError(stream.Pos());
+	return NULL;
 }
 
 Pattern*
@@ -1239,6 +1240,7 @@ Parser::ParsePattern() {
 		} else
 			ThrowOutOfMemError(stream.Pos());
 	}
+	return NULL;
 }
 
 void
