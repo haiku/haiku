@@ -210,6 +210,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 	status_t result = B_OK;
 	bool end = false;
 	bool exec = true;
+	uint8 index, byte, safe;
 	uint32 reg, data, and_out, or_in;
 
 	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
@@ -317,8 +318,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			}
 			break;
 		case 0x78:
-			LOG(8,("xxx cmd, skipping...\n"));
-
 			*size -= 6;
 			if (*size < 0)
 			{
@@ -328,7 +327,28 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				break;
 			}
 
-			adress += 6;
+			/* execute */
+			adress += 1;
+			reg = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			index = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			and_out = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			or_in = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			LOG(8,("cmd 'RD 8b idx REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+				index, reg, and_out, or_in));
+			if (exec)
+			{
+				safe = NV_REG8(0x00601000 + reg);
+				NV_REG8(0x00601000 + reg) = index;
+				byte = NV_REG8(0x00601000 + reg + 1);
+				byte &= (uint8)and_out;
+				byte |= (uint8)or_in;
+				NV_REG8(0x00601000 + reg + 1) = byte;
+				NV_REG8(0x00601000 + reg) = safe;
+			}
 			break;
 		case 0x79:
 			LOG(8,("xxx cmd, skipping...\n"));
