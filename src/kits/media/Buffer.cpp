@@ -281,6 +281,8 @@ BBuffer::SetHeader(const media_header *header)
 {
 	CALLED();
 	fMediaHeader = *header;
+	
+//  XXX why can't we do this without crash? what's wrong?
 //	fMediaHeader.buffer = fBufferID;
 }
 
