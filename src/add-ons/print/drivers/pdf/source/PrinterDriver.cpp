@@ -58,12 +58,7 @@ THE SOFTWARE.
 PrinterDriver::PrinterDriver()
 	:	fJobFile(NULL),
 		fPrinterNode(NULL),
-		fJobMsg(NULL),
-
-		fTransport(NULL),
-		fTransportAddOn(-1),
-		fTransportInitProc(NULL),
-		fTransportExitProc(NULL)		
+		fJobMsg(NULL)
 {
 }
 
@@ -87,10 +82,6 @@ struct print_file_header {
        int32   _reserved_5_;
 };
 #endif
-
-//void PrinterDriver::SimonStopPrinting() {
-//	printingProgress = false;
-//}
 
 // Public methods
 // --------------
@@ -118,11 +109,10 @@ PrinterDriver::PrintJob
 	if (!fJobFile || !fPrinterNode) 
 		return B_ERROR;
 
-	// open transport
-	if (OpenTransport() != B_OK) {
+	if (fPrintTransport.Open(fPrinterNode) != B_OK) {
 		return B_ERROR;
 	}
-	if (PrintToFileCanceled()) {
+	if (fPrintTransport.IsPrintToFileCanceled()) {
 		return B_OK;
 	}
 
@@ -135,11 +125,7 @@ PrinterDriver::PrintJob
 	msg->Unflatten(fJobFile);
 	// We have to load the settings here for Dano/Zeta because they don't store 
 	// all fields from the message returned by config_job in the job file!
-	printf("JobMsg\n");
-	msg->PrintToStream();
 	PrinterSettings::Update(printerNode, msg);
-	printf("\n\nAfter Update:\n");
-	msg->PrintToStream();
 	
 	if (msg->HasInt32("copies")) {
 		copies = msg->FindInt32("copies");
@@ -172,8 +158,6 @@ PrinterDriver::PrintJob
 	
 	status_t s = EndJob();
 	if (status == B_OK) status = s;
-		
-	CloseTransport();
 
 	delete fJobMsg;
 	
@@ -249,21 +233,6 @@ PrinterDriver::PrinterSetup(char *printerName)
 status_t 
 PrinterDriver::PageSetup(BMessage *setupMsg, const char *printerName)
 {
-	// check to see if the messag is built correctly...
-	if (setupMsg->HasFloat("scaling") != B_OK) {
-		PrinterSettings *ps = new PrinterSettings(printerName);
-
-		if (ps->InitCheck() == B_OK) {
-			// first read the settings from the spool dir
-			if (ps->ReadSettings(setupMsg) != B_OK) {
-				// if there were none, then create a default set...
-				ps->GetDefaults(setupMsg);
-				// ...and save them
-				ps->WriteSettings(setupMsg);
-			}
-		}			
-	}
-
 	PageSetupWindow *psw;
 	
 	psw = new PageSetupWindow(setupMsg, printerName);
@@ -289,113 +258,6 @@ PrinterDriver::JobSetup(BMessage *jobMsg, const char *printerName)
 
 	jsw = new JobSetupWindow(jobMsg, printerName);
 	return jsw->Go();
-}
-
-
-// --------------------------------------------------
-status_t 
-PrinterDriver::OpenTransport()
-{
-	char	buffer[512];
-	BPath	*path;
-	
-
-	if (!fPrinterNode)
-		return B_ERROR;
-
-	// first, find & load transport add-on
-	path = new BPath();
-	
-	// find name of this printer transport add-on 
-	fPrinterNode->ReadAttr("transport", B_STRING_TYPE, 0, buffer, sizeof(buffer));
-	
-	// try first on user add-ons directory
-	find_directory(B_USER_ADDONS_DIRECTORY, path);
-	path->Append("Print/transport");
-	path->Append(buffer);
-	fTransportAddOn = load_add_on(path->Path());
-	
-	if (fTransportAddOn < 0) {
-		// add-on not in user add-ons directory. try system one
-		find_directory(B_BEOS_ADDONS_DIRECTORY, path);
-		path->Append("Print/transport");
-		path->Append(buffer);
-		fTransportAddOn = load_add_on(path->Path());
-	}
-	
-	if (fTransportAddOn < 0) {
-		BAlert * alert = new BAlert("Uh oh!", "Couldn't find transport add-on.", "OK");
-		alert->Go();
-		return B_ERROR;
-	}
-	
-	// get init & exit proc
-	get_image_symbol(fTransportAddOn, "init_transport", B_SYMBOL_TYPE_TEXT, (void **) &fTransportInitProc);
-	get_image_symbol(fTransportAddOn, "exit_transport", B_SYMBOL_TYPE_TEXT, (void **) &fTransportExitProc);
-	
-	if (!fTransportInitProc || !fTransportExitProc) {
-		BAlert * alert = new BAlert("Uh oh!", "Couldn't resolve transport symbols.", "OK");
-		alert->Go();
-		return B_ERROR;
-	}
-	
-	delete path;
-	
-	// now, init transport add-on
-	node_ref 	ref;
-	BDirectory 	dir;
-
-	fPrinterNode->GetNodeRef(&ref);
-	dir.SetTo(&ref);
-	
-	path = new BPath(&dir, NULL);
-	strcpy(buffer, path->Path());
-	
-	// create BMessage for init_transport()
-	BMessage *msg = new BMessage('TRIN');
-	msg->AddString("printer_file", buffer);
-	
-	fTransport = (*fTransportInitProc)(msg);
-	
-	delete msg;
-	delete path;
-	
-	if (fTransport == 0) {
-		BAlert *alert = new BAlert("Uh oh!", "Couldn't open transport.", "OK");
-		alert->Go();
-		return B_ERROR;
-	}
-	
-	return B_OK;
-}
-
-
-// --------------------------------------------------
-bool
-PrinterDriver::PrintToFileCanceled()
-{ 
-	// The BeOS "Print To File" transport returns a non-NULL BDataIO *
-	// even after user filepanel cancellation! 
-	BFile* file = dynamic_cast<BFile*>(fTransport);
-	return file && file->InitCheck() != B_OK;
-}
-
-
-// --------------------------------------------------
-status_t 
-PrinterDriver::CloseTransport()
-{
-	if (!fTransportAddOn)
-		return B_ERROR;
-
-	if (fTransportExitProc)
-		(*fTransportExitProc)();
-
-	unload_add_on(fTransportAddOn);
-	fTransportAddOn = 0;
-	fTransport = NULL;
-	
-	return B_OK;
 }
 
 #ifdef CODEWARRIOR

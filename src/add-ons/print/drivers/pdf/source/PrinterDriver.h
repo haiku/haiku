@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include <AppKit.h>
 #include <InterfaceKit.h>
 
+#include "PrintTransport.h"
+
 #ifndef ROUND_UP
 	#define ROUND_UP(x, y) (((x) + (y) - 1) & ~((y) - 1))
 #endif
@@ -83,16 +85,11 @@ public:
 	virtual status_t 		PageSetup(BMessage *msg, const char *printerName = NULL);
 	virtual status_t 		JobSetup(BMessage *msg, const char *printerName = NULL);
 	
-	// transport-related methods
-	status_t				OpenTransport();
-	status_t				CloseTransport();
-	bool                    PrintToFileCanceled();
-
 	// accessors
 	inline BFile			*JobFile()		{ return fJobFile; }
 	inline BNode			*PrinterNode()	{ return fPrinterNode; }
 	inline BMessage			*JobMsg()		{ return fJobMsg; }
-	inline BDataIO			*Transport()	{ return fTransport; }
+	inline BDataIO			*Transport()	{ return fPrintTransport.GetDataIO(); }
 	inline StatusWindow		*Status()       { return fStatusWindow; }
 	inline int32            Pass() const    { return fPass; }
 	
@@ -115,11 +112,7 @@ private:
 	int32                   fPass;
 	
 	// transport-related 
-	BDataIO					*fTransport;
-	image_id				fTransportAddOn;
-	init_transport_proc		fTransportInitProc;
-	exit_transport_proc		fTransportExitProc;
+	PrintTransport          fPrintTransport;
 };
 
 #endif // #ifndef PRINTERDRIVER_H
-
