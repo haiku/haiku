@@ -124,6 +124,7 @@ BOptionPopUp::GetOptionAt(int32 index, const char **outName, int32 *outValue)
 			result = true;
 		}
 	}
+	
 	return result;
 }
 
@@ -167,29 +168,30 @@ status_t
 BOptionPopUp::AddOptionAt(const char *name, int32 value, int32 index)
 {
 	BMenu *menu = _mField->Menu();
-	if (menu != NULL) {
-		int32 numItems = menu->CountItems();
-		if (index < 0 || index > numItems)
-			return B_BAD_VALUE;
-		
-		BMessage *message = MakeValueMessage(value);
-		if (message == NULL)
-			return B_ERROR;	// TODO: Should return B_NO_MEMORY instead ?
-		
-		BMenuItem *newItem = new BMenuItem(name, message);
-		if (newItem == NULL) {
-			delete message;
-			return B_ERROR; // TODO: same as above
-		}
-		menu->AddItem(newItem, index);
-		
-		// We didnt' have any items before, so select the newly added one
-		if (numItems == 0)
-			SetValue(value);
-		return B_OK;
+	if (menu == NULL)
+		return B_ERROR;
+	
+	int32 numItems = menu->CountItems();
+	if (index < 0 || index > numItems)
+		return B_BAD_VALUE;
+	
+	BMessage *message = MakeValueMessage(value);
+	if (message == NULL)
+		return B_ERROR;	// TODO: Should return B_NO_MEMORY instead ?
+	
+	BMenuItem *newItem = new BMenuItem(name, message);
+	if (newItem == NULL) {
+		delete message;
+		return B_ERROR; // TODO: same as above
 	}
-
-	return B_ERROR;
+	
+	menu->AddItem(newItem, index);
+	
+	// We didnt' have any items before, so select the newly added one
+	if (numItems == 0)
+		SetValue(value);
+	
+	return B_OK;
 }
 
 
@@ -238,14 +240,16 @@ BOptionPopUp::SetValue(int32 value)
 {
 	BControl::SetValue(value);
 	BMenu *menu = _mField->Menu();
+	if (menu == NULL)
+		return;
 
 	int32 numItems = menu->CountItems();
 	for (int32 i = 0; i < numItems; i++) {
 		BMenuItem *item = menu->ItemAt(i);
 		if (item && item->Message()) {
-			int32 val;
-			item->Message()->FindInt32("be:value", &val);
-			if (val == value) {
+			int32 itemValue;
+			item->Message()->FindInt32("be:value", &itemValue);
+			if (itemValue == value) {
 				item->SetMarked(true);
 
 #if BEHAVE_LIKE_R5
@@ -293,6 +297,7 @@ BOptionPopUp::GetPreferredSize(float *width, float *height)
 	
 	// Iterate over all the entries in the control,
 	// and take the maximum width.
+	// TODO: Should we call BMenuField::GetPreferredSize() instead ?
 	int32 numItems = menu->CountItems();	
 	for (int32 i = 0; i < numItems; i++) {
 		BMenuItem *item = menu->ItemAt(i);
