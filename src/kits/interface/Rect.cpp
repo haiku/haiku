@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2003, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -38,19 +38,19 @@
 
 // Globals ---------------------------------------------------------------------
 
-bool TestLineIntersect(const BRect& r, float x1, float y1, float x2, float y2,
-					   bool vertical = true);
 
 //------------------------------------------------------------------------------
-void BRect::InsetBy(BPoint p)
+void
+BRect::InsetBy(BPoint point)
 {
-	 left += p.x;
-	 right -= p.x;
-	 top += p.y;
-	 bottom -= p.y;
+	 left += point.x;
+	 right -= point.x;
+	 top += point.y;
+	 bottom -= point.y;
 }
 //------------------------------------------------------------------------------
-void BRect::InsetBy(float dx, float dy)
+void
+BRect::InsetBy(float dx, float dy)
 {
 	 left += dx;
 	 right -= dx;
@@ -58,41 +58,47 @@ void BRect::InsetBy(float dx, float dy)
 	 bottom -= dy;
 }
 //------------------------------------------------------------------------------
-BRect& BRect::InsetBySelf(BPoint p)
+BRect&
+BRect::InsetBySelf(BPoint point)
 {
-	this->InsetBy(p);
+	InsetBy(point);
 	return *this;
 }
 //------------------------------------------------------------------------------
-BRect& BRect::InsetBySelf(float dx, float dy)
+BRect&
+BRect::InsetBySelf(float dx, float dy)
 {
-	this->InsetBy(dx, dy);
+	InsetBy(dx, dy);
 	return *this;
 }
 //------------------------------------------------------------------------------
-BRect BRect::InsetByCopy(BPoint p)
+BRect
+BRect::InsetByCopy(BPoint point)
 {
 	BRect copy(*this);
-	copy.InsetBy(p);
+	copy.InsetBy(point);
 	return copy;
 }
 //------------------------------------------------------------------------------
-BRect BRect::InsetByCopy(float dx, float dy)
+BRect
+BRect::InsetByCopy(float dx, float dy)
 {
 	BRect copy(*this);
 	copy.InsetBy(dx, dy);
 	return copy;
 }
 //------------------------------------------------------------------------------
-void BRect::OffsetBy(BPoint p)
+void
+BRect::OffsetBy(BPoint point)
 {
-	 left += p.x;
-	 right += p.x;
-	 top += p.y;
-	 bottom += p.y;
+	 left += point.x;
+	 right += point.x;
+	 top += point.y;
+	 bottom += point.y;
 }
 //------------------------------------------------------------------------------
-void BRect::OffsetBy(float dx, float dy)
+void
+BRect::OffsetBy(float dx, float dy)
 {
 	 left += dx;
 	 right += dx;
@@ -100,41 +106,47 @@ void BRect::OffsetBy(float dx, float dy)
 	 bottom += dy;
 }
 //------------------------------------------------------------------------------
-BRect& BRect::OffsetBySelf(BPoint p)
+BRect&
+BRect::OffsetBySelf(BPoint point)
 {
-	this->OffsetBy(p);
+	OffsetBy(point);
 	return *this;
 }
 //------------------------------------------------------------------------------
-BRect& BRect::OffsetBySelf(float dx, float dy)
+BRect&
+BRect::OffsetBySelf(float dx, float dy)
 {
-	this->OffsetBy(dx, dy);
+	OffsetBy(dx, dy);
 	return *this;
 }
 //------------------------------------------------------------------------------
-BRect BRect::OffsetByCopy(BPoint p)
+BRect
+BRect::OffsetByCopy(BPoint point)
 {
 	BRect copy(*this);
-	copy.OffsetBy(p);
+	copy.OffsetBy(point);
 	return copy;
 }
 //------------------------------------------------------------------------------
-BRect BRect::OffsetByCopy(float dx, float dy)
+BRect
+BRect::OffsetByCopy(float dx, float dy)
 {
 	BRect copy(*this);
 	copy.OffsetBy(dx, dy);
 	return copy;
 }
 //------------------------------------------------------------------------------
-void BRect::OffsetTo(BPoint p)
+void
+BRect::OffsetTo(BPoint point)
 {
-	 right = (right - left) + p.x;
-	 left = p.x;
-	 bottom = (bottom - top) + p.y;
-	 top = p.y;
+	 right = (right - left) + point.x;
+	 left = point.x;
+	 bottom = (bottom - top) + point.y;
+	 top = point.y;
 }
 //------------------------------------------------------------------------------
-void BRect::OffsetTo(float x, float y)
+void
+BRect::OffsetTo(float x, float y)
 {
 	 right = (right - left) + x;
 	 left = x;
@@ -142,99 +154,94 @@ void BRect::OffsetTo(float x, float y)
 	 top=y;
 }
 //------------------------------------------------------------------------------
-BRect& BRect::OffsetToSelf(BPoint p)
+BRect&
+BRect::OffsetToSelf(BPoint point)
 {
-	this->OffsetTo(p);
+	OffsetTo(point);
 	return *this;
 }
 //------------------------------------------------------------------------------
-BRect& BRect::OffsetToSelf(float dx, float dy)
+BRect&
+BRect::OffsetToSelf(float dx, float dy)
 {
-	this->OffsetTo(dx, dy);
+	OffsetTo(dx, dy);
 	return *this;
 }
 //------------------------------------------------------------------------------
-BRect BRect::OffsetToCopy(BPoint p)
+BRect
+BRect::OffsetToCopy(BPoint point)
 {
 	BRect copy(*this);
-	copy.OffsetTo(p);
+	copy.OffsetTo(point);
 	return copy;
 }
 //------------------------------------------------------------------------------
-BRect BRect::OffsetToCopy(float dx, float dy)
+BRect
+BRect::OffsetToCopy(float dx, float dy)
 {
 	BRect copy(*this);
 	copy.OffsetTo(dx, dy);
 	return copy;
 }
 //------------------------------------------------------------------------------
-void BRect::PrintToStream() const
+void
+BRect::PrintToStream() const
 {
-	printf("(l:%.1f t:%.1f r:%.1f b:%.1f)\n", left, top, right, bottom);
+	printf("BRect(%.1f, %.1f, %.1f, %.1f)\n", left, top, right, bottom);
 }
 //------------------------------------------------------------------------------
-bool BRect::operator==(BRect r) const
+bool
+BRect::operator==(BRect rect) const
 {
-	 return left == r.left && right == r.right &&
-	 		top == r.top && bottom == r.bottom;
+	 return left == rect.left && right == rect.right &&
+	 		top == rect.top && bottom == rect.bottom;
 }
 //------------------------------------------------------------------------------
-bool BRect::operator!=(BRect r) const
+bool
+BRect::operator!=(BRect rect) const
 {
-	 return !(*this == r);
+	 return !(*this == rect);
 }
 //------------------------------------------------------------------------------
-BRect BRect::operator&(BRect r) const
+BRect
+BRect::operator&(BRect rect) const
 {
-	 return BRect(max_c(left, r.left), max_c(top, r.top),
-	 			  min_c(right, r.right), min_c(bottom, r.bottom));
+	 return BRect(max_c(left, rect.left), max_c(top, rect.top),
+	 			  min_c(right, rect.right), min_c(bottom, rect.bottom));
 }
 //------------------------------------------------------------------------------
-BRect BRect::operator|(BRect r) const
+BRect
+BRect::operator|(BRect rect) const
 {
-	 return BRect(min_c(left, r.left), min_c(top, r.top),
-	 			  max_c(right, r.right), max_c(bottom, r.bottom));
+	 return BRect(min_c(left, rect.left), min_c(top, rect.top),
+	 			  max_c(right, rect.right), max_c(bottom, rect.bottom));
 }
 //------------------------------------------------------------------------------
-bool BRect::Intersects(BRect r) const
+bool
+BRect::Intersects(BRect rect) const
 {
-	return	TestLineIntersect(*this, r.left, r.top, r.left, r.bottom)		||
-			TestLineIntersect(*this, r.left, r.top, r.right, r.top, false)	||
-			TestLineIntersect(*this, r.right, r.top, r.right, r.bottom)		||
-			TestLineIntersect(*this, r.left, r.bottom, r.right, r.bottom, false);
+	if (!(rect.left > right || rect.right < left
+			|| rect.top > bottom || rect.bottom < top))
+		return true;
+	
+	return false;
 }
 //------------------------------------------------------------------------------
-bool BRect::Contains(BPoint p) const
+bool
+BRect::Contains(BPoint point) const
 {
-	return p.x >= left && p.x <= right && p.y >= top && p.y <= bottom;
+	return point.x >= left && point.x <= right
+			&& point.y >= top && point.y <= bottom;
 }
 //------------------------------------------------------------------------------
-bool BRect::Contains(BRect r) const
+bool
+BRect::Contains(BRect rect) const
 {
-	return r.left >= left && r.right <= right &&
-		   r.top >= top && r.bottom <= bottom;
+	return rect.left >= left && rect.right <= right
+			&& rect.top >= top && rect.bottom <= bottom;
 }
 //------------------------------------------------------------------------------
 
-
-//------------------------------------------------------------------------------
-bool TestLineIntersect(const BRect& r, float x1, float y1, float x2, float y2,
-					   bool vertical)
-{
-	if (vertical)
-	{
-		return	(x1 >= r.left && x1 <= r.right) &&
-				((y1 >= r.top && y1 <= r.bottom) ||
-				 (y2 >= r.top && y2 <= r.bottom));
-	}
-	else
-	{
-		return	(y1 >= r.top && y1 <= r.bottom) &&
-				((x1 >= r.left && x1 <= r.right) ||
-				 (x2 >= r.left && x2 <= r.right));
-	}
-}
-//------------------------------------------------------------------------------
 
 /*
  * $Log $
