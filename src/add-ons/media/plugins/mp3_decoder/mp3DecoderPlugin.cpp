@@ -14,6 +14,12 @@
 
 #define DECODE_BUFFER_SIZE	(32 * 1024)
 
+inline size_t
+AudioBufferSize(int32 channel_count, uint32 sample_format, float frame_rate, bigtime_t buffer_duration = 50000 /* 50 ms */)
+{
+	return (sample_format & 0xf) * channel_count * (size_t)((frame_rate * buffer_duration) / 1000000.0);
+}
+
 // bit_rate_table[mpeg_version_index][layer_index][bitrate_index]
 static const int bit_rate_table[4][4][16] =
 {
@@ -117,7 +123,7 @@ mp3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	ioDecodedFormat->u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT; // XXX should support other formats, too
 	ioDecodedFormat->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN; // XXX should support other endain, too
 	if (ioDecodedFormat->u.raw_audio.buffer_size < 512 || ioDecodedFormat->u.raw_audio.buffer_size > 65536)
-		ioDecodedFormat->u.raw_audio.buffer_size = BMediaRoster::Roster()->AudioBufferSizeFor(
+		ioDecodedFormat->u.raw_audio.buffer_size = AudioBufferSize(
 														fChannelCount,
 														ioDecodedFormat->u.raw_audio.format,
 														fFrameRate);

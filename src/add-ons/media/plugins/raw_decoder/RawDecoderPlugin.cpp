@@ -14,6 +14,11 @@
   #define TRACE(a...)
 #endif
 
+inline size_t
+AudioBufferSize(int32 channel_count, uint32 sample_format, float frame_rate, bigtime_t buffer_duration = 50000 /* 50 ms */)
+{
+	return (sample_format & 0xf) * channel_count * (size_t)((frame_rate * buffer_duration) / 1000000.0);
+}
 
 status_t
 RawDecoder::Setup(media_format *ioEncodedFormat,
@@ -62,7 +67,14 @@ RawDecoder::Setup(media_format *ioEncodedFormat,
 			TRACE("RawDecoder::Setup: unknown input format\n");
 			return B_ERROR;
 	}
-
+	
+	// since we can translate to a different buffer size,
+	// suggest something nicer than delivered by the
+	// file reader (perhaps we should even report wildcard?)
+	ioEncodedFormat->u.raw_audio.buffer_size = AudioBufferSize(
+														ioEncodedFormat->u.raw_audio.channel_count,
+														ioEncodedFormat->u.raw_audio.format,
+														ioEncodedFormat->u.raw_audio.frame_rate);
 	return B_OK;
 }
 
@@ -148,7 +160,7 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 	ioDecodedFormat->u.raw_audio.matrix_mask = 0;
 	
 	if (ioDecodedFormat->u.raw_audio.buffer_size < 128 || ioDecodedFormat->u.raw_audio.buffer_size > 65536) {
-		ioDecodedFormat->u.raw_audio.buffer_size = BMediaRoster::Roster()->AudioBufferSizeFor(
+		ioDecodedFormat->u.raw_audio.buffer_size = AudioBufferSize(
 														ioDecodedFormat->u.raw_audio.channel_count,
 														ioDecodedFormat->u.raw_audio.format,
 														ioDecodedFormat->u.raw_audio.frame_rate);

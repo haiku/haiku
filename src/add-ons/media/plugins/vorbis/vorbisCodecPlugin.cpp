@@ -15,6 +15,12 @@
 
 #define DECODE_BUFFER_SIZE	(32 * 1024)
 
+inline size_t
+AudioBufferSize(int32 channel_count, uint32 sample_format, float frame_rate, bigtime_t buffer_duration = 50000 /* 50 ms */)
+{
+	return (sample_format & 0xf) * channel_count * (size_t)((frame_rate * buffer_duration) / 1000000.0);
+}
+
 vorbisDecoder::vorbisDecoder()
 {
 	TRACE("vorbisDecoder::vorbisDecoder\n");
@@ -103,9 +109,7 @@ void vorbisDecoder::CopyInfoToDecodedFormat(media_raw_audio_format * raf) {
 	raf->byte_order = B_MEDIA_HOST_ENDIAN; // XXX should support other endain, too
 
 	if (raf->buffer_size < 512 || raf->buffer_size > 65536) {
-		BMediaRoster * roster = BMediaRoster::Roster();
-		raf->buffer_size
-		 = roster->AudioBufferSizeFor(raf->channel_count,raf->format,raf->frame_rate);
+		raf->buffer_size = AudioBufferSize(raf->channel_count,raf->format,raf->frame_rate);
     }
 }
 
