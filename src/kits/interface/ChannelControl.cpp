@@ -39,6 +39,7 @@ BChannelControl::BChannelControl(BRect frame, const char *name, const char *labe
 BChannelControl::BChannelControl(BMessage *archive)
 	: BControl(archive)
 {
+	
 }
 
 
@@ -51,9 +52,34 @@ BChannelControl::~BChannelControl()
 
 
 status_t
-BChannelControl::Archive(BMessage *into, bool deep) const
+BChannelControl::Archive(BMessage *message, bool deep) const
 {
-	return B_ERROR;
+	status_t status = BControl::Archive(message, deep);
+	
+	status = message->AddInt32("be:_m_channel_count", fChannelCount);
+	if (status == B_OK)
+		message->AddInt32("be:_m_value_channel", fCurrentChannel);
+	if (status == B_OK)
+		message->AddString("be:_m_min_label", fMinLabel.String());
+	if (status == B_OK)
+		message->AddString("be:_m_max_label", fMaxLabel.String());
+	 
+	if (status == B_OK && fChannelValues != NULL
+		&& fChannelMax != NULL && fChannelMin != NULL) {
+		for (int32 i = 0; i < fChannelCount; i++) {
+			status = message->AddInt32("be:_m_channel_min", fChannelMin[i]);
+			if (status < B_OK)
+				break;
+			status = message->AddInt32("be:_m_channel_max", fChannelMax[i]);
+			if (status < B_OK)
+				break;
+			status = message->AddInt32("be:_m_channel_val", fChannelValues[i]);
+			if (status < B_OK)
+				break;
+		}
+	}
+
+	return status;
 }
 
 
@@ -105,7 +131,12 @@ BHandler *
 BChannelControl::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 	int32 form, const char *property)
 {
-	return NULL;
+	BHandler *target = this;
+	BPropertyInfo propertyInfo(sPropertyInfo);
+	if (propertyInfo.FindMatch(msg, index, specifier, form, property) < B_OK)
+		target = BControl::ResolveSpecifier(msg, index, specifier, form, property); 
+	
+	return target;
 }
 
 
@@ -160,7 +191,27 @@ status_t
 BChannelControl::InvokeChannel(BMessage *msg, int32 fromChannel,
 	int32 channelCount, const bool *inMask)
 {
-	return B_ERROR;
+	bool notify = false;
+	BMessage invokeMessage(InvokeKind(&notify));
+
+	if (msg != NULL)
+		invokeMessage = *msg;
+	else if (Message() != NULL)
+		invokeMessage = *Message();
+	
+	invokeMessage.AddInt32("be:current_channel", fCurrentChannel);
+	
+	if (channelCount == -1)
+		channelCount = fChannelCount - fromChannel;
+		
+	for (int32 i = fromChannel; i < fromChannel + channelCount; i++) {
+		invokeMessage.AddInt32("be:channel_value", fChannelValues[i]);
+		// TODO: Fix this: just send "be:channel_changed" = true
+		// for channels which have changed their values.
+		invokeMessage.AddBool("be:channel_changed", true);
+	}
+	
+	return BControl::Invoke(&invokeMessage);
 }
 
 
