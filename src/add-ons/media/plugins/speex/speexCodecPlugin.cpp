@@ -250,7 +250,7 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
 //	TRACE("SpeexDecoder::Decode\n");
-	uint8 * out_buffer = static_cast<uint8 *>(buffer);
+	float * out_buffer = static_cast<float *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
 	
 	mediaHeader->start_time = fStartTime;
@@ -277,7 +277,7 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 		ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
 		speex_bits_read_from(&fBits, (char*)packet->packet, packet->bytes);
 		for (int frame = 0 ; frame < fHeader->frames_per_packet ; frame++) {
-			int ret = speex_decode(fDecoderState, &fBits, (float*)out_buffer);
+			int ret = speex_decode(fDecoderState, &fBits, out_buffer);
 			if (ret == -1) {
 				break;
 			}
@@ -290,19 +290,18 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 				break;
 			}
 			if (fHeader->nb_channels == 2) {
-				speex_decode_stereo((float*)out_buffer, fHeader->frame_size, fStereoState);
+				speex_decode_stereo(out_buffer, fHeader->frame_size, fStereoState);
 			}
-			for (int i = 0 ; i < fSpeexOutputLength/fFrameSize ; i++) {
-				*((float*)out_buffer) /= 32000;
-				out_buffer += fFrameSize;
+			for (int i = 0 ; i < fHeader->frame_size ; i++) {
+				out_buffer[i] /= 32000.0;
 			}
-			out_buffer += fSpeexOutputLength;
-			out_bytes_needed -= fSpeexOutputLength;
+			out_buffer += fHeader->frame_size;
+			out_bytes_needed -= fHeader->frame_size*fFrameSize;
 		}
 	}
 
 done:	
-	uint samples = (out_buffer - (uint8*)buffer) / fFrameSize;
+	uint samples = ((uint8*)out_buffer - (uint8*)buffer) / fFrameSize;
 	fStartTime += (1000000LL * samples) / fHeader->rate;
 	//TRACE("SpeexDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
