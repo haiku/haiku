@@ -56,7 +56,7 @@ public:
 
 	thread_id Thread() const;
 
-	bool HandleMessage(debug_thread_stopped &message);
+	bool HandleMessage(DebugMessage *message);
 
 	virtual void MessageReceived(BMessage *message);
 
@@ -149,12 +149,23 @@ ThreadDebugHandler::Thread() const
 
 // HandleMessage
 bool
-ThreadDebugHandler::HandleMessage(debug_thread_stopped &message)
+ThreadDebugHandler::HandleMessage(DebugMessage *message)
 {
 	if (!fInvoker)
 		fInvoker = new BInvoker(new BMessage(ALERT_MESSAGE), this);
+
+	// get some user-readable message
 	char buffer[512];
-	get_why_stopped_string(message.why, buffer, sizeof(buffer));
+	if (message->Code() == B_DEBUGGER_MESSAGE_THREAD_STOPPED) {
+		get_debug_why_stopped_string(message->Data().thread_stopped.why, buffer,
+			sizeof(buffer));
+	} else if (message->Code() == B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED) {
+		get_debug_exception_string(message->Data().exception_occurred.exception,
+			buffer, sizeof(buffer));
+	} else {
+		// We shouldn't be here.
+		sprintf(buffer, "Debug messages %ld", (int32)message->Code());
+	}
 
 	// TODO: This would be the point to pop up an asynchronous alert.
 	// We just print the error and send a message to ourselves.
@@ -222,6 +233,7 @@ TeamDebugHandler::HandleMessage(DebugMessage *message)
 
 	switch (message->Code()) {
 		case B_DEBUGGER_MESSAGE_THREAD_STOPPED:
+		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 		{
 			fNubPort = message->Data().origin.nub_port;
 
@@ -232,7 +244,7 @@ TeamDebugHandler::HandleMessage(DebugMessage *message)
 			fDebugServer->AddHandler(handler);
 
 			// let the handler deal with the message
-			if (handler->HandleMessage(message->Data().thread_stopped))
+			if (handler->HandleMessage(message))
 				_DeleteThreadHandler(handler);
 
 			break;
