@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 4/2003-1/2004
+   Rudolf Cornelissen 4/2003-3/2004
 */
 
 #define MODULE_BIT 0x00008000

@@ -8,6 +8,8 @@
 
 #include "nm_std.h"
 
+static status_t nm_acc_wait_fifo(uint32 n);
+
 /*acceleration notes*/
 
 /*functions Be's app_server uses:
@@ -21,19 +23,23 @@ blit
 status_t nm_acc_wait_idle()
 {
 	/* wait until engine completely idle */
-	switch (si->ps.card_type)
+	while (ACCR(STATUS) & 0x00000001)
 	{
-	case NM2097:
-	case NM2160:
-		while (ACCR(STATUS) & 0x00000001)
-		{
-			/* snooze a bit so I do not hammer the bus */
-			snooze (100); 
-		}
-		break;
+		/* snooze a bit so I do not hammer the bus */
+		snooze (100); 
 	}
 
 	return B_OK;
+}
+
+/* wait for enough room in fifo */
+static status_t nm_acc_wait_fifo(uint32 n)
+{
+	while (((ACCR(STATUS) & 0x0000ff00) >> 8) < n)
+	{
+		/* snooze a bit so I do not hammer the bus */
+		snooze (10);
+	}
 }
 
 /* AFAIK this must be done for every new screenmode.
@@ -91,6 +97,13 @@ status_t nm_acc_init()
 		return B_ERROR;
 	}
 
+	/* enable engine FIFO */
+//fixme: does not work yet..
+	si->engine.control |= (1 << 27);
+
+	/* setup buffer startadress */
+//fixme! setup..
+
 	/* fixme?: setup clipping */
 
 	return B_OK;
@@ -101,22 +114,28 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 {
 	/* make sure the previous command (if any) is completed */
 	nm_acc_wait_idle();
+//does not work yet:
+//	nm_acc_wait_fifo(4);
 
     if ((yd < ys) || ((yd == ys) && (xd < xs)))
     {
 		/* start with upper left corner */
-		ACCW(BLTCNTL, si->engine.control);
+		/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
+		ACCW(BLTCNTL, si->engine.control | 0x830c0000);
+		/* send command and exexute */
 		ACCW(SRCSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
 		ACCW(DSTSTARTOFF, ((yd << 16) | (xd & 0x0000ffff)));
-		ACCW(XYEXT, ((h << 16) | (w & 0x0000ffff)));
+		ACCW(XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
 	}
     else
     {
 		/* start with lower right corner */
-		ACCW(BLTCNTL, (si->engine.control | 0x00000013));
-		ACCW(SRCSTARTOFF, (((ys + (h - 1)) << 16) | ((xs + (w - 1)) & 0x0000ffff)));
-		ACCW(DSTSTARTOFF, (((yd + (h - 1)) << 16) | ((xd + (w - 1)) & 0x0000ffff)));
-		ACCW(XYEXT, ((h << 16) | (w & 0x0000ffff)));
+		/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
+		ACCW(BLTCNTL, (si->engine.control | 0x830c0013));
+		/* send command and exexute */
+		ACCW(SRCSTARTOFF, (((ys + h) << 16) | ((xs + w) & 0x0000ffff)));
+		ACCW(DSTSTARTOFF, (((yd + h) << 16) | ((xd + w) & 0x0000ffff)));
+		ACCW(XYEXT, (((h + 1) << 16) | ((w + 1) & 0x0000ffff)));
 	}
 
 	return B_OK;
