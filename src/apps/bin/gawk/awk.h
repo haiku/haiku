@@ -172,7 +172,7 @@ extern int errno;
 #include <unixlib.h>
 #endif	/* atarist || VMS */
 
-#if ! defined(MSDOS) && ! defined(OS2) && ! defined(WIN32) && ! defined(__EMX__) && ! defined(__CYGWIN__) && ! defined(O_BINARY) /*duh*/
+#if ! defined(MSDOS) && ! defined(OS2) && ! defined(WIN32) && ! defined(__EMX__) && ! defined(__CYGWIN__) && ! defined(__BEOS__) && ! defined(O_BINARY) /*duh*/
 #define O_BINARY	0
 #endif
 
