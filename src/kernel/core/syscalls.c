@@ -60,6 +60,9 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SYNC:
 			*call_ret = user_sync();
 			break;
+		case SYSCALL_OPEN_ENTRY_REF:
+			*call_ret = user_open_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1, arg2), (const char *)arg3, (int)arg4);
+			break;
 		case SYSCALL_OPEN:
 			*call_ret = user_open((const char *)arg0, (int)arg1);
 			break;
@@ -78,6 +81,12 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SEEK:
 			*call_ret = user_seek((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (int)arg3);
 			break;
+		case SYSCALL_OPEN_DIR_ENTRY_REF:
+			*call_ret = user_open_dir_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3);
+			break;
+		case SYSCALL_OPEN_DIR_NODE_REF:
+			*call_ret = user_open_dir_node_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2));
+			break;
 		case SYSCALL_OPEN_DIR:
 			*call_ret = user_open_dir((const char *)arg0);
 			break;
@@ -90,8 +99,14 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_IOCTL:
 			*call_ret = user_ioctl((int)arg0, (ulong)arg1, (void *)arg2, (size_t)arg3);
 			break;
+		case SYSCALL_CREATE_ENTRY_REF:
+			*call_ret = user_create_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3, (int)arg4, (int)arg5);
+			break;
 		case SYSCALL_CREATE:
 			*call_ret = user_create((const char *)arg0, (int)arg1, (int)arg2);
+			break;
+		case SYSCALL_CREATE_DIR_ENTRY_REF:
+			*call_ret = user_create_dir_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3, (int)arg4);
 			break;
 		case SYSCALL_CREATE_DIR:
 			*call_ret = user_create_dir((const char *)arg0, (int)arg1);
