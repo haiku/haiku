@@ -938,9 +938,9 @@ vm_create_null_area(aspace_id aid, const char *name, void **address, uint32 addr
 
 
 status_t
-vm_create_vnode_cache(void *vnode, void **_cache)
+vm_create_vnode_cache(void *vnode, struct vm_cache_ref **_cacheRef)
 {
-	vm_cache_ref *cache_ref;
+	vm_cache_ref *cacheRef;
 	vm_cache *cache;
 	vm_store *store;
 
@@ -957,17 +957,17 @@ vm_create_vnode_cache(void *vnode, void **_cache)
 		return B_NO_MEMORY;
 	}
 
-	cache_ref = vm_cache_ref_create(cache);
-	if (cache_ref == NULL) {
+	cacheRef = vm_cache_ref_create(cache);
+	if (cacheRef == NULL) {
 		dprintf("vm_create_vnode_cache: vm_cache_ref_create returned NULL\n");
 		return B_NO_MEMORY;
 	}
 
 	// acquire the cache ref once to represent the ref that the vnode will have
 	// this is one of the only places where we dont want to ref to ripple down to the store
-	vm_cache_acquire_ref(cache_ref, false);
+	vm_cache_acquire_ref(cacheRef, false);
 
-	*_cache = cache_ref;
+	*_cacheRef = cacheRef;
 	return B_OK;
 }
 
@@ -981,7 +981,7 @@ static area_id
 _vm_map_file(aspace_id aid, const char *name, void **_address, uint32 addressSpec,
 	size_t size, uint32 protection, uint32 mapping, const char *path, off_t offset, bool kernel)
 {
-	vm_cache_ref *cache_ref;
+	vm_cache_ref *cacheRef;
 	vm_area *area;
 	void *vnode;
 	status_t status;
@@ -1000,20 +1000,20 @@ _vm_map_file(aspace_id aid, const char *name, void **_address, uint32 addressSpe
 	if (status < B_OK)
 		goto err1;
 
-	status = vfs_get_vnode_cache(vnode, (void **)&cache_ref);
+	status = vfs_get_vnode_cache(vnode, &cacheRef);
 	if (status < B_OK)
 		goto err2;
 
 	// acquire a ref to the cache before we do work on it. Dont ripple the ref acquision to the vnode
 	// below because we'll have to release it later anyway, since we grabbed a ref to the vnode at
 	// vfs_get_vnode_from_path(). This puts the ref counts in sync.
-	vm_cache_acquire_ref(cache_ref, false);
-	status = map_backing_store(aspace, cache_ref->cache->store, _address, offset, size,
+	vm_cache_acquire_ref(cacheRef, false);
+	status = map_backing_store(aspace, cacheRef->cache->store, _address, offset, size,
 					addressSpec, 0, protection, mapping, &area, name);
-	vm_cache_release_ref(cache_ref);
+	vm_cache_release_ref(cacheRef);
 	vm_put_aspace(aspace);
 
-	if (status < 0)
+	if (status < B_OK)
 		return status;
 
 	return area->id;
