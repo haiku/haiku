@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src apps diskprobe ;
+
+UsePrivateHeaders shared ;
+
+# AddResources DiskProbe : DiskProbe.rsrc ;
+
+App DiskProbe :
+	DiskProbe.cpp
+	DataEditor.cpp
+	;
+
+LinkSharedOSLibs DiskProbe : be ;
