@@ -80,7 +80,7 @@ BMediaTheme::ViewFor(BParameterWeb *web, const BRect *hintRect, BMediaTheme *usi
 		if (_mDefaultTheme == NULL)
 			_mDefaultTheme = new BPrivate::DefaultMediaTheme();
 
-		//usingTheme = _mDefaultTheme;
+		usingTheme = _mDefaultTheme;
 	}
 
 	if (usingTheme == NULL)
