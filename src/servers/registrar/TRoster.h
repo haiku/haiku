@@ -33,8 +33,10 @@
 #include <SupportDefs.h>
 
 #include "AppInfoList.h"
+#include "WatchingService.h"
 
 class BMessage;
+class WatchingService;
 
 struct IAPRRequest {
 	entry_ref	ref;
@@ -63,6 +65,8 @@ public:
 	void HandleGetAppList(BMessage *request);
 	void HandleActivateApp(BMessage *request);
 	void HandleBroadcast(BMessage *request);
+	void HandleStartWatching(BMessage *request);
+	void HandleStopWatching(BMessage *request);
 
 	status_t Init();
 
@@ -82,6 +86,8 @@ private:
 	// helper functions
 	static status_t _AddMessageAppInfo(BMessage *message,
 									   const app_info *info);
+	static status_t _AddMessageWatchingInfo(BMessage *message,
+											const app_info *info);
 	uint32 _NextToken();
 	void _ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info);
 
@@ -90,6 +96,7 @@ private:
 	AppInfoList		fEarlyPreRegisteredApps;
 	IAPRRequestMap	fIAPRRequests;
 	RosterAppInfo	*fActiveApp;
+	WatchingService	fWatchingService;
 	uint32			fLastToken;
 };
 

@@ -131,6 +131,12 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_BROADCAST:
 			fRoster->HandleBroadcast(message);
 			break;
+		case B_REG_START_WATCHING:
+			fRoster->HandleStartWatching(message);
+			break;
+		case B_REG_STOP_WATCHING:
+			fRoster->HandleStopWatching(message);
+			break;
 		// message runner requests
 		case B_REG_REGISTER_MESSAGE_RUNNER:
 			fMessageRunnerManager->HandleRegisterRunner(message);

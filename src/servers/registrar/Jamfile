@@ -8,6 +8,7 @@ Server obos_registrar :
 	AppInfoList.cpp
 	ClipboardHandler.cpp
 	Event.cpp
+	EventMaskWatcher.cpp
 	EventQueue.cpp
 	MessageEvent.cpp
 	MessageRunnerManager.cpp
@@ -15,6 +16,8 @@ Server obos_registrar :
 	Registrar.cpp
 	RosterAppInfo.cpp
 	TRoster.cpp
+	Watcher.cpp
+	WatchingService.cpp
 ;
 LinkSharedOSLibs obos_registrar :
 	<boot!home!config!lib>libopenbeos.so

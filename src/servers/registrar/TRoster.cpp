@@ -34,6 +34,7 @@
 #include "RegistrarDefs.h"
 #include "RosterAppInfo.h"
 #include "TRoster.h"
+#include "EventMaskWatcher.h"
 
 /*!
 	\class TRoster
@@ -74,6 +75,7 @@ TRoster::TRoster()
 		 fEarlyPreRegisteredApps(),
 		 fIAPRRequests(),
 		 fActiveApp(NULL),
+		 fWatchingService(),
 		 fLastToken(0)
 {
 }
@@ -685,6 +687,79 @@ TRoster::HandleBroadcast(BMessage *request)
 	FUNCTION_END();
 }
 
+// HandleStartWatching
+/*!	\brief Handles a StartWatching() request.
+	\param request The request message
+*/
+void
+TRoster::HandleStartWatching(BMessage *request)
+{
+	FUNCTION_START();
+
+	status_t error = B_OK;
+	// get the parameters
+	BMessenger target;
+	uint32 events;
+	if (error == B_OK && request->FindMessenger("target", &target) != B_OK)
+		error = B_BAD_VALUE;
+	if (request->FindInt32("events", (int32*)&events) != B_OK)
+		error = B_BAD_VALUE;
+	// add the new watcher
+	if (error == B_OK) {
+		Watcher *watcher = new(nothrow) EventMaskWatcher(target, events);
+		if (watcher) {
+			if (!fWatchingService.AddWatcher(watcher)) {
+				error = B_NO_MEMORY;
+				delete watcher;
+			}
+		} else
+			error = B_NO_MEMORY;
+	}
+	// reply to the request
+	if (error == B_OK) {
+		BMessage reply(B_REG_SUCCESS);
+		request->SendReply(&reply);
+	} else {
+		BMessage reply(B_REG_ERROR);
+		reply.AddInt32("error", error);
+		request->SendReply(&reply);
+	}
+
+	FUNCTION_END();
+}
+
+// HandleStopWatching
+/*!	\brief Handles a StopWatching() request.
+	\param request The request message
+*/
+void
+TRoster::HandleStopWatching(BMessage *request)
+{
+	FUNCTION_START();
+
+	status_t error = B_OK;
+	// get the parameters
+	BMessenger target;
+	if (error == B_OK && request->FindMessenger("target", &target) != B_OK)
+		error = B_BAD_VALUE;
+	// remove the watcher
+	if (error == B_OK) {
+		if (!fWatchingService.RemoveWatcher(target))
+			error = B_BAD_VALUE;
+	}
+	// reply to the request
+	if (error == B_OK) {
+		BMessage reply(B_REG_SUCCESS);
+		request->SendReply(&reply);
+	} else {
+		BMessage reply(B_REG_ERROR);
+		reply.AddInt32("error", error);
+		request->SendReply(&reply);
+	}
+
+	FUNCTION_END();
+}
+
 // Init
 /*!	\brief Initializes the roster.
 
@@ -827,6 +902,11 @@ TRoster::CheckSanity()
 void
 TRoster::_AppAdded(RosterAppInfo *info)
 {
+	// notify the watchers
+	BMessage message(B_SOME_APP_LAUNCHED);
+	_AddMessageWatchingInfo(&message, info);
+	EventMaskWatcherFilter filter(B_REQUEST_LAUNCHED);
+	fWatchingService.NotifyWatchers(&message, &filter);
 }
 
 // _AppRemoved
@@ -840,6 +920,11 @@ TRoster::_AppRemoved(RosterAppInfo *info)
 		// deactivate the app, if it was the active one
 		if (info == fActiveApp)
 			ActivateApp(NULL);
+		// notify the watchers
+		BMessage message(B_SOME_APP_QUIT);
+		_AddMessageWatchingInfo(&message, info);
+		EventMaskWatcherFilter filter(B_REQUEST_QUIT);
+		fWatchingService.NotifyWatchers(&message, &filter);
 	}
 }
 
@@ -858,6 +943,11 @@ TRoster::_AppActivated(RosterAppInfo *info)
 			BMessage message(B_APP_ACTIVATED);
 			message.AddBool("active", true);
 			messenger.SendMessage(&message);
+			// notify the watchers
+			BMessage watcherMessage(B_SOME_APP_ACTIVATED);
+			_AddMessageWatchingInfo(&watcherMessage, info);
+			EventMaskWatcherFilter filter(B_REQUEST_ACTIVATED);
+			fWatchingService.NotifyWatchers(&watcherMessage, &filter);
 		}
 	}
 }
@@ -906,6 +996,29 @@ TRoster::_AddMessageAppInfo(BMessage *message, const app_info *info)
 	// add the flat info
 	return message->AddData("app_info", B_REG_APP_INFO_TYPE, &flatInfo,
 							sizeof(flat_app_info));
+}
+
+// _AddMessageWatchingInfo
+/*!	\brief Adds application monitoring related fields to a message.
+	\param message The message.
+	\param info The app_info of the concerned application.
+	\return \c B_OK if everything went fine, an error code otherwise.
+*/
+status_t
+TRoster::_AddMessageWatchingInfo(BMessage *message, const app_info *info)
+{
+	status_t error = B_OK;
+	if (error == B_OK)
+		error = message->AddString("be:signature", info->signature);
+	if (error == B_OK)
+		error = message->AddInt32("be:team", info->team);
+	if (error == B_OK)
+		error = message->AddInt32("be:thread", info->thread);
+	if (error == B_OK)
+		error = message->AddInt32("be:flags", (int32)info->flags);
+	if (error == B_OK)
+		error = message->AddRef("be:ref", &info->ref);
+	return error;
 }
 
 // _NextToken
