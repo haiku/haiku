@@ -10,19 +10,20 @@
 
 #else
 
-#include <OS.h>
-#include <Drivers.h>
-#include <KernelExport.h>
-#include <string.h>
-#include <driver_settings.h>
+// Public/system includes
+#include <drivers/Drivers.h>
+#include <drivers/KernelExport.h>
+#include <drivers/driver_settings.h>
 #include <drivers/module.h>		// For get_module()/put_module()
 
-#include "netinet/in_var.h"
-#include "sys/select.h"
+#include <net_stack_driver.h>
+#include <netinet/in_var.h>
 
-#include "protosw.h"
-#include "core_module.h"
-#include "net_stack_driver.h"
+#include <string.h>
+
+// Private includes
+#include <protosw.h>
+#include <core_module.h>
 
 /* these are missing from KernelExport.h ... */
 #define  B_SELECT_READ       1 

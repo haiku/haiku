@@ -1,18 +1,35 @@
 SubDir OBOS_TOP src add-ons kernel drivers net stack ;
 
 UsePrivateHeaders net ;
-UsePublicHeaders posix ;
+UsePublicHeaders ;
+UsePosixHeaders ;
+
+# a) Userland stack version:
 
 R5KernelAddon stack : kernel drivers bin :
-	net_stack_driver.c
+	net_userstack_driver.c
 ;
 
 # For OpenBeOS we should be building the driver objects this way.
+#KernelObjects
+#	net_userstack_driver.c
+#	:
+#	-fno-pic -D_KERNEL_MODE
+#	;
+
+# b) Kernelland stack version:
+#
+#R5KernelAddon stack : kernel drivers bin :
+#	net_stack_driver.c
+# ;
+#
+# For OpenBeOS we should be building the kernel stack driver objects this way.
 #KernelObjects
 #	net_stack_driver.c
 #	:
 #	-fno-pic -D_KERNEL_MODE
 #	;
+
 
 # Link to kernel/drivers/dev/net
 {

@@ -8,21 +8,25 @@
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
+#ifndef _KERNEL_MODE
 
+#error "This module MUST be built as a kernel driver!"
+
+#else
+
+// Public includes
 //#include <OS.h>
-#include <KernelExport.h>
-#include <Drivers.h>
+#include <drivers/Drivers.h>
+#include <drivers/KernelExport.h>
 
-#include <string.h>
+// Posix includes
 #include <malloc.h>
+#include <string.h>
+#include <netinet/in_var.h>
 
-#include "net_stack_driver.h"
-#include "userland_ipc.h"
-#include "lock.h"
-#include "sys/sockio.h"
-#include "sys/socket.h"
-#include "net/if.h"
-#include "sys/select.h"
+// Private includes
+#include <net_stack_driver.h>
+#include <userland_ipc.h>
 
 /* these are missing from KernelExport.h ... */
 #define  B_SELECT_READ       1 
