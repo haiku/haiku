@@ -41,7 +41,7 @@ prepare_output()
 	bool needNew = true;
 	bool tooLarge = false;
 
-	if (sLog > 0) {
+	if (sLog >= 0) {
 		// check file size
 		struct stat stat;
 		if (fstat(sLog, &stat) == 0) {
@@ -53,6 +53,10 @@ prepare_output()
 	}
 
 	if (needNew) {
+		// close old file; it'll be (re)moved soon
+		if (sLog >= 0)
+			close(sLog);
+
 		// get path
 		BPath base;
 		find_directory(/*B_COMMON_LOG_DIRECTORY*/B_COMMON_TEMP_DIRECTORY, &base);
@@ -63,14 +67,23 @@ prepare_output()
 
 		// move old file if it already exists
 		if (tooLarge) {
-			base.Append("syslog.old");
-			rename(syslog.Path(), base.Path());
+			BPath oldlog(base);
+			oldlog.Append("syslog.old");
 
-			// ToDo: remove old file if space on device is tight?
+			remove(oldlog.Path());
+			rename(syslog.Path(), oldlog.Path());
+
+			// ToDo: just remove old file if space on device is tight?
 		}
+
+		bool haveSyslog = sLog >= 0;
 
 		// open file
 		sLog = open(syslog.Path(), O_APPEND | O_CREAT | O_WRONLY, 644);
+		if (!haveSyslog && sLog >=0) {
+			// first time open, check file size again 
+			prepare_output();
+		}
 	}
 
 	return sLog >= 0 ? B_OK : B_ERROR;
