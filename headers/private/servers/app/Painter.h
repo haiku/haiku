@@ -227,7 +227,7 @@ class Painter {
 
 			void				_RebuildClipping();
 
-			void				_UpdateFont();
+			void				_UpdateFont(const char* pathToFontFile = NULL);
 			void				_UpdateLineWidth();
 
 								// drawing functions stroke/fill

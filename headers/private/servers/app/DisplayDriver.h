@@ -307,9 +307,10 @@ class DisplayDriver {
 	virtual void				Unlock() = 0;
 
 	// display mode access
-	virtual void				SetMode(const display_mode &mode) = 0;
-	virtual	void				GetMode(display_mode *mode) = 0;
-	virtual	const display_mode*	DisplayMode() = 0;
+	virtual void				SetMode(const display_mode &mode);
+	virtual	void				GetMode(display_mode *mode);
+			const display_mode*	DisplayMode()
+									{ return &fDisplayMode; }
 	
 	virtual bool				DumpToFile(const char *path) = 0;
 	virtual ServerBitmap*		DumpToBitmap() = 0;
@@ -356,6 +357,8 @@ class DisplayDriver {
 	// needed by Layer
 	virtual	void				ConstrainClippingRegion(BRegion *reg) = 0;
 
+ protected:
+			display_mode		fDisplayMode;
 };
 
 #endif

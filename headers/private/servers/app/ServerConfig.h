@@ -38,8 +38,8 @@
 
 // Display driver to be used by the server.
 #ifndef DISPLAYDRIVER
-//#	define DISPLAYDRIVER PAINTERDRIVER
-#	define DISPLAYDRIVER VIEWDRIVER
+#	define DISPLAYDRIVER PAINTERDRIVER
+//#	define DISPLAYDRIVER VIEWDRIVER
 #endif
 
 // Uncomment this if the DisplayDriver should only rely on drawing functions implemented
