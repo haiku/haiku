@@ -21,6 +21,11 @@ Preference KeymapTest :
 	Input.cpp
 	: be tracker ;
 
+if $(COMPILE_FOR_R5) {
+} else {
+	LinkSharedOSLibs KeymapTest : <boot!home!config!lib>libopenbeos.so ;
+}
+
 SEARCH on [ FGristFiles
 	KeymapApplication.cpp
 	KeymapWindow.cpp
@@ -41,6 +46,11 @@ Preference KeyboardTest :
 	InterfaceDefs.cpp
 	Input.cpp
 	: translation be ;
+
+if $(COMPILE_FOR_R5) {
+} else {
+	LinkSharedOSLibs KeyboardTest : <boot!home!config!lib>libopenbeos.so ;
+}
 
 SEARCH on [ FGristFiles
 	Keyboard.cpp 
@@ -63,6 +73,11 @@ Preference MouseTest :
 	Input.cpp
 	: translation be
 	;
+
+if $(COMPILE_FOR_R5) {
+} else {
+	LinkSharedOSLibs MouseTest : <boot!home!config!lib>libopenbeos.so ;
+}
 
 SEARCH on [ FGristFiles
 	Mouse.cpp 
