@@ -105,7 +105,6 @@ BNetBuffer::BNetBuffer( const BNetBuffer& refparam )
 BNetBuffer::BNetBuffer( BMessage* archive )
            : CTOR_INIT_LIST
 {
-    status_t res;
     const unsigned char* msgDataPtr;
     ssize_t msgNBytes;
 
@@ -113,17 +112,17 @@ BNetBuffer::BNetBuffer( BMessage* archive )
     int32  stackSize;
     int32  capacity;
 
-    if ( archive->FindInt32( "bnbuff_datasize", dataSize ) != B_OK )
+    if ( archive->FindInt32( "bnbuff_datasize", &dataSize ) != B_OK )
     {
         return;
     }
 
-    if ( archive->FindInt32( "bnbuff_stacksize", stackSize ) != B_OK )
+    if ( archive->FindInt32( "bnbuff_stacksize", &stackSize ) != B_OK )
     {
         return;
     }
 
-    if ( archive->FindInt32( "bnbuff_capacity", capacity ) != B_OK )
+    if ( archive->FindInt32( "bnbuff_capacity", &capacity ) != B_OK )
     {
         return;
     }
@@ -653,7 +652,7 @@ status_t BNetBuffer::dpop( int32 Type, int32 Length, void* Data )
 
     // Validate the start marker.
     tmp = *( int32 * )stackPtr;
-    if ( tmp != DATA_START_MARKER )
+    if ( tmp != (int32) DATA_START_MARKER )
     {
         return B_ERROR;
     }
@@ -681,7 +680,7 @@ status_t BNetBuffer::dpop( int32 Type, int32 Length, void* Data )
     // Validate the end marker.
     stackPtr += Length;
     tmp = *( int32 * )stackPtr;
-    if ( tmp != DATA_END_MARKER )
+    if ( tmp != (int32) DATA_END_MARKER )
     {
         return B_ERROR;
     }
