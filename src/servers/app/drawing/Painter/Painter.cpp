@@ -156,9 +156,9 @@ Painter::SetDrawData(const DrawData* data)
 	SetBlendingMode(data->alphaSrcMode, data->alphaFncMode);
 	SetPenLocation(data->penlocation);
 	SetFont(data->font);
-	if (data->clipReg) {
-		ConstrainClipping(*data->clipReg);
-	}
+//	if (data->clipReg) {
+//		ConstrainClipping(*data->clipReg);
+//	}
 	fPatternHandler->SetPattern(data->patt);
 }
 
