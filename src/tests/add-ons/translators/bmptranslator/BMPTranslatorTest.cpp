@@ -12,6 +12,7 @@
 #include <Message.h>
 #include <View.h>
 #include <Rect.h>
+#include <File.h>
 
 // Suite
 CppUnit::Test *
@@ -25,8 +26,11 @@ BMPTranslatorTest::Suite()
 			&BMPTranslatorTest::DummyTest));
 #if !TEST_R5
 	suite->addTest(
-		new TC("BMPTranslator BTranslatorTest",
-			&BMPTranslatorTest::BTranslatorTest));
+		new TC("BMPTranslator BTranslatorBasicTest",
+			&BMPTranslatorTest::BTranslatorBasicTest));
+	suite->addTest(
+		new TC("BMPTranslator BTranslatorIdentifyTest",
+			&BMPTranslatorTest::BTranslatorIdentifyTest));
 #endif
 		
 	return suite;
@@ -49,7 +53,7 @@ BMPTranslatorTest::tearDown()
 // BTranslatorTest
 #if !TEST_R5
 void
-BMPTranslatorTest::BTranslatorTest()
+BMPTranslatorTest::BTranslatorBasicTest()
 {
 	// . Make sure the add_on loads
 	NextSubTest();
@@ -90,6 +94,21 @@ BMPTranslatorTest::BTranslatorTest()
 	NextSubTest();
 	CPPUNIT_ASSERT(ptran->Release() == ptran);
 	
+	NextSubTest();
+	CPPUNIT_ASSERT(ptran->ReferenceCount() == 1);
+	
+	NextSubTest();
+	CPPUNIT_ASSERT(ptran->Acquire() == ptran);
+	
+	NextSubTest();
+	CPPUNIT_ASSERT(ptran->ReferenceCount() == 2);
+	
+	NextSubTest();
+	CPPUNIT_ASSERT(ptran->Release() == ptran);
+	
+	NextSubTest();
+	CPPUNIT_ASSERT(ptran->ReferenceCount() == 1);
+	
 	// . A name would be nice
 	NextSubTest();
 	const char *tranname = ptran->TranslatorName();
@@ -125,11 +144,11 @@ BMPTranslatorTest::BTranslatorTest()
 			CPPUNIT_ASSERT(pins[i].name);
 
 			if (pins[i].type == B_TRANSLATOR_BITMAP) {
-				CPPUNIT_ASSERT(strcmp(pins[i].MIME, "image/x-be-bitmap") == 0);
+				CPPUNIT_ASSERT(strcmp(pins[i].MIME, BITS_MIME_STRING) == 0);
 				CPPUNIT_ASSERT(strcmp(pins[i].name,
 					"Be Bitmap Format (BMPTranslator)") == 0);
 			} else if (pins[i].type == B_BMP_FORMAT) {
-				CPPUNIT_ASSERT(strcmp(pins[i].MIME, "image/x-bmp") == 0);
+				CPPUNIT_ASSERT(strcmp(pins[i].MIME, BMP_MIME_STRING) == 0);
 				CPPUNIT_ASSERT(strcmp(pins[i].name, "BMP image") == 0);
 			} else
 				CPPUNIT_ASSERT(false);
@@ -152,11 +171,11 @@ BMPTranslatorTest::BTranslatorTest()
 			CPPUNIT_ASSERT(pouts[i].name);
 	
 			if (pouts[i].type == B_TRANSLATOR_BITMAP) {
-				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, "image/x-be-bitmap") == 0);
+				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, BITS_MIME_STRING) == 0);
 				CPPUNIT_ASSERT(strcmp(pouts[i].name,
 					"Be Bitmap Format (BMPTranslator)") == 0);
 			} else if (pouts[i].type == B_BMP_FORMAT) {
-				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, "image/x-bmp") == 0);
+				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, BMP_MIME_STRING) == 0);
 				CPPUNIT_ASSERT(strcmp(pouts[i].name, "BMP image (MS format)") == 0);
 			} else
 				CPPUNIT_ASSERT(false);
@@ -188,7 +207,190 @@ BMPTranslatorTest::BTranslatorTest()
 	NextSubTest();
 	CPPUNIT_ASSERT(unload_add_on(image) == B_OK); 
 }
-#endif
+
+void
+test_outinfo(translator_info &info, bool isbmp)
+{
+	if (isbmp) {
+		CPPUNIT_ASSERT(outinfo.type == B_BMP_FORMAT);
+		CPPUNIT_ASSERT(strcmp(outinfo.MIME, BMP_MIME_STRING) == 0);
+	} else {
+		CPPUNIT_ASSERT(outinfo.type == B_TRANSLATOR_BITMAP);
+		CPPUNIT_ASSERT(strcmp(outinfo.MIME, BITS_MIME_STRING) == 0);
+	}
+	CPPUNIT_ASSERT(outinfo.name);
+	CPPUNIT_ASSERT(outinfo.group == B_TRANSLATOR_BITMAP);
+	CPPUNIT_ASSERT(outinfo.quality > 0 && outinfo.quality <= 1);
+	CPPUNIT_ASSERT(outinfo.capability > 0 && outinfo.capability <= 1);
+}
+
+void
+BMPTranslatorTest::BTranslatorIdentifyTest()
+{
+// . Make sure the add_on loads
+	NextSubTest();
+	const char *path = "/boot/home/config/add-ons/Translators/BMPTranslator";
+	image_id image = load_add_on(path);
+	CPPUNIT_ASSERT(image >= 0);
+	
+	// . Load in function to make the object
+	NextSubTest();
+	BTranslator *(*pMakeNthTranslator)(int32 n,image_id you,uint32 flags,...);
+	status_t err = get_image_symbol(image, "make_nth_translator",
+		B_SYMBOL_TYPE_TEXT, (void **)&pMakeNthTranslator);
+	CPPUNIT_ASSERT(!err);
+
+	// . Make sure the function returns a pointer to a BTranslator
+	NextSubTest();
+	BTranslator *ptran = pMakeNthTranslator(0, image, 0);
+	CPPUNIT_ASSERT(ptran);
+	
+	// . Make sure the function only returns one BTranslator
+	NextSubTest();
+	CPPUNIT_ASSERT(!pMakeNthTranslator(1, image, 0));
+	
+	// . call identify on a BMP with various different options
+	const char *resourcepath =
+		"../src/tests/add-ons/translators/bmptranslator/resources/";
+	const char *testimages[] = {
+		"blocks.bits", "color_scribbles_8bit_os2.bmp",
+		"blocks_24bit.bmp", "color_scribbles_8bit_rle.bmp",
+		"blocks_4bit_rle.bmp", "gnome_beer.bits",
+		"blocks_8bit_rle.bmp", "gnome_beer_24bit.bmp",
+		"color_scribbles_1bit.bits", "vsmall.bits",
+		"color_scribbles_1bit.bmp", "vsmall_1bit.bmp",
+		"color_scribbles_1bit_os2.bmp", "vsmall_1bit_os2.bmp",
+		"color_scribbles_24bit.bits", "vsmall_24bit.bmp",
+		"color_scribbles_24bit.bmp", "vsmall_24bit_os2.bmp",
+		"color_scribbles_24bit_os2.bmp", "vsmall_4bit.bmp",
+		"color_scribbles_4bit.bmp", "vsmall_4bit_os2.bmp",
+		"color_scribbles_4bit_os2.bmp", "vsmall_4bit_rle.bmp",
+		"color_scribbles_4bit_rle.bits", "vsmall_8bit.bmp",
+		"color_scribbles_4bit_rle.bmp", "vsmall_8bit_os2.bmp",
+		"color_scribbles_8bit.bmp", "vsmall_8bit_rle.bmp"
+	};
+	char imagepath[512] = { 0 };
+	const int32 knimages = 30;
+	BMessage emptymsg;
+	translation_format hintformat;
+	translator_info outinfo;
+	
+	// NOTE: This code assumes that BMP files end with ".bmp" and
+	// Be Bitmap Images end with ".bits", if this is not true, the
+	// test will not work properly
+	for (int32 i = 0; i < knimages; i++) {
+		NextSubTest();
+		strcpy(imagepath, resourcepath);
+		strcat(imagepath, testimages[i]);
+		int32 pathlen = strlen(imagepath);
+		bool isbmp;
+		if (imagefile[pathlen - 1] == 'p')
+			isbmp = true;
+		else
+			isbmp = false;
+		printf(" [%s] ", testimages[i]);
+		BFile imagefile;
+		CPPUNIT_ASSERT(imagefile.SetTo(imagepath, B_READ_ONLY) == B_OK);
+		
+		////////// No hints or io extension
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, NULL, &outinfo, 0) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, NULL, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, NULL, &outinfo, B_BMP_FORMAT) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		///////////// empty io extension
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &emptymsg, &outinfo, 0) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &emptymsg, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &emptymsg, &outinfo, B_BMP_FORMAT) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		///////////// with "correct" hint
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		if (isbmp) {
+			hintformat.type = B_BMP_FORMAT;
+			strcpy(hintformat.MIME, BMP_MIME_STRING);
+			strcpy(hintformat.name, "BMP Image");
+		} else {
+			hintformat.type = B_TRANSLATOR_BITMAP;
+			strcpy(hintformat.MIME, BITS_MIME_STRING);
+			strcpy(hintformat.name, "Be Bitmap Image");
+		}
+		hintformat.group = B_TRANSLATOR_BITMAP;
+		hintformat.quality = 0.5;
+		hintformat.capability = 0.5;
+		
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, 0) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		if (isbmp) {
+			hintformat.type = B_BMP_FORMAT;
+			strcpy(hintformat.MIME, BMP_MIME_STRING);
+			strcpy(hintformat.name, "BMP Image");
+		} else {
+			hintformat.type = B_TRANSLATOR_BITMAP;
+			strcpy(hintformat.MIME, BITS_MIME_STRING);
+			strcpy(hintformat.name, "Be Bitmap Image");
+		}
+		hintformat.group = B_TRANSLATOR_BITMAP;
+		hintformat.quality = 0.5;
+		hintformat.capability = 0.5;
+		
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		if (isbmp) {
+			hintformat.type = B_BMP_FORMAT;
+			strcpy(hintformat.MIME, BMP_MIME_STRING);
+			strcpy(hintformat.name, "BMP Image");
+		} else {
+			hintformat.type = B_TRANSLATOR_BITMAP;
+			strcpy(hintformat.MIME, BITS_MIME_STRING);
+			strcpy(hintformat.name, "Be Bitmap Image");
+		}
+		hintformat.group = B_TRANSLATOR_BITMAP;
+		hintformat.quality = 0.5;
+		hintformat.capability = 0.5;
+		
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, B_BMP_FORMAT) == B_OK);
+		test_outinfo(outinfo, isbmp);
+	}	
+	
+	// . Release should return NULL because Release has been called
+	// as many times as it has been acquired
+	NextSubTest();
+	CPPUNIT_ASSERT(ptran->Release() == NULL);
+	
+	// . Unload Add-on
+	NextSubTest();
+	CPPUNIT_ASSERT(unload_add_on(image) == B_OK); 
+}
+
+#endif // #if !TEST_R5
 
 // DummyTest
 void
