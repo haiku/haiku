@@ -27,18 +27,26 @@ BScrollView::BScrollView(const char *name, BView *target, uint32 resizeMask,
 
 	if (border == B_FANCY_BORDER)
 		fTarget->MoveBy(kFancyBorderSize, kFancyBorderSize);
+	else if (border == B_PLAIN_BORDER)
+		fTarget->MoveBy(kPlainBorderSize, kPlainBorderSize);
 
 	AddChild(fTarget);
 
-	BRect frame = fTarget->Bounds();
+	BRect frame = fTarget->Frame();
 	// ToDo: find out the original scroll bar names
 	if (horizontal) {
-		fHorizontalScrollBar = new BScrollBar(frame, "horizontal", fTarget, 0, 100, B_HORIZONTAL);
+		BRect rect = frame;
+		rect.top = rect.bottom + 1;
+		rect.bottom += B_H_SCROLL_BAR_HEIGHT + 1;
+		fHorizontalScrollBar = new BScrollBar(rect, "horizontal", fTarget, 0, 100, B_HORIZONTAL);
 		AddChild(fHorizontalScrollBar);
 	}
 
 	if (vertical) {
-		fVerticalScrollBar = new BScrollBar(frame, "vertical", fTarget, 0, 100, B_VERTICAL);
+		BRect rect = frame;
+		rect.left = rect.right + 1;
+		rect.right += B_V_SCROLL_BAR_WIDTH + 1;
+		fVerticalScrollBar = new BScrollBar(rect, "vertical", fTarget, 0, 100, B_VERTICAL);
 		AddChild(fVerticalScrollBar);
 	}
 
@@ -63,6 +71,7 @@ BArchivable *
 BScrollView::Instantiate(BMessage *data)
 {
 	// ToDo
+	return NULL;
 }
 
 
@@ -70,6 +79,7 @@ status_t
 BScrollView::Archive(BMessage *data, bool deep) const
 {
 	// ToDo
+	return B_ERROR;
 }
 
 
@@ -104,7 +114,27 @@ BScrollView::AllDetached()
 void
 BScrollView::Draw(BRect updateRect)
 {
-	// ToDo: draw border
+	if (fBorder == B_PLAIN_BORDER) {
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+		StrokeRect(Bounds());
+		return;
+	} else if (fBorder != B_FANCY_BORDER)
+		return;
+
+	BRect bounds = Bounds();
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	StrokeRect(bounds.InsetByCopy(1, 1));
+
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	StrokeLine(bounds.LeftBottom(), bounds.LeftTop());
+	bounds.left++;
+	StrokeLine(bounds.LeftTop(), bounds.RightTop());
+
+	SetHighColor(ui_color(B_SHINE_COLOR));
+	StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
+	bounds.top++;
+	bounds.bottom--;
+	StrokeLine(bounds.RightBottom(), bounds.RightTop());
 }
 
 
@@ -293,8 +323,6 @@ BScrollView::CalcFrame(BView *target, bool horizontal, bool vertical, border_sty
 	if (horizontal)
 		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
 
-	// ToDo: find out the real values
-
 	float borderSize = 0;
 	if (border == B_PLAIN_BORDER)
 		borderSize = kPlainBorderSize;
@@ -302,6 +330,13 @@ BScrollView::CalcFrame(BView *target, bool horizontal, bool vertical, border_sty
 		borderSize = kFancyBorderSize;
 
 	frame.InsetBy(-borderSize, -borderSize);
+
+	if (borderSize == 0) {
+		if (vertical)
+			frame.right++;
+		if (horizontal)
+			frame.bottom++;
+	}
 
 	return frame;
 }
@@ -311,6 +346,7 @@ int32
 BScrollView::ModFlags(int32, border_style)
 {
 	// ToDo: I have no idea what this is for
+	return 0;
 }
 
 
