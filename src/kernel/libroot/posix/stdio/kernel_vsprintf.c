@@ -79,81 +79,6 @@ do_div(uint64 *_number, uint32 base)
 }
 
 
-static char *
-number(char *str, long long num, unsigned base, int size, int precision, int type)
-{
-	const char *digits="0123456789abcdefghijklmnopqrstuvwxyz";
-	char c, sign, tmp[66];
-	int i;
-
-	if (type & LARGE)
-		digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	if (type & LEFT)
-		type &= ~ZEROPAD;
-	if (base < 2 || base > 36)
-		return 0;
-
-	c = (type & ZEROPAD) ? '0' : ' ';
-	sign = 0;
-	if (type & SIGN) {
-		if (num < 0) {
-			sign = '-';
-			num = -num;
-			size--;
-		} else if (type & PLUS) {
-			sign = '+';
-			size--;
-		} else if (type & SPACE) {
-			sign = ' ';
-			size--;
-		}
-	}
-	if (type & SPECIAL) {
-		if (base == 16)
-			size -= 2;
-		else if (base == 8)
-			size--;
-	}
-	i = 0;
-	if (num == 0)
-		tmp[i++] = '0';
-	else while (num != 0)
-		tmp[i++] = digits[do_div(&num, base)];
-
-	if (i > precision)
-		precision = i;
-	size -= precision;
-
-	if (!(type&(ZEROPAD + LEFT))) {
-		while (size-- > 0)
-			*str++ = ' ';
-	}
-	if (sign)
-		*str++ = sign;
-
-	if (type & SPECIAL) {
-		if (base == 8)
-			*str++ = '0';
-		else if (base == 16) {
-			*str++ = '0';
-			*str++ = digits[33];
-		}
-	}
-
-	if (!(type & LEFT))
-		while (size-- > 0)
-			*str++ = c;
-	while (i < precision--)
-		*str++ = '0';
-	while (i-- > 0)
-		*str++ = tmp[i];
-	while (size-- > 0)
-		*str++ = ' ';
-
-	return str;
-}
-
-
 static bool
 put_padding(char **_buffer, size_t *_bytesLeft, int32 count)
 {
@@ -236,14 +161,89 @@ put_character(char **_buffer, size_t *_bytesLeft, char c)
 }
 
 
+static char *
+number(char *str, long long num, unsigned base, int size, int precision, int type)
+{
+	const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";
+	char c, sign, tmp[66];
+	int i;
+
+	if (type & LARGE)
+		digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	if (type & LEFT)
+		type &= ~ZEROPAD;
+	if (base < 2 || base > 36)
+		return 0;
+
+	c = (type & ZEROPAD) ? '0' : ' ';
+	sign = 0;
+	if (type & SIGN) {
+		if (num < 0) {
+			sign = '-';
+			num = -num;
+			size--;
+		} else if (type & PLUS) {
+			sign = '+';
+			size--;
+		} else if (type & SPACE) {
+			sign = ' ';
+			size--;
+		}
+	}
+	if (type & SPECIAL) {
+		if (base == 16)
+			size -= 2;
+		else if (base == 8)
+			size--;
+	}
+	i = 0;
+	if (num == 0)
+		tmp[i++] = '0';
+	else while (num != 0)
+		tmp[i++] = digits[do_div(&num, base)];
+
+	if (i > precision)
+		precision = i;
+	size -= precision;
+
+	if (!(type&(ZEROPAD + LEFT))) {
+		while (size-- > 0)
+			*str++ = ' ';
+	}
+	if (sign)
+		*str++ = sign;
+
+	if (type & SPECIAL) {
+		if (base == 8)
+			*str++ = '0';
+		else if (base == 16) {
+			*str++ = '0';
+			*str++ = digits[33];
+		}
+	}
+
+	if (!(type & LEFT))
+		while (size-- > 0)
+			*str++ = c;
+	while (i < precision--)
+		*str++ = '0';
+	while (i-- > 0)
+		*str++ = tmp[i];
+	while (size-- > 0)
+		*str++ = ' ';
+
+	return str;
+}
+
+
 int
-vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
+vsnprintf(char *buffer, size_t bytesLeft, const char *format, va_list args)
 {
 	uint64 num;
 	int base;
-	char *str;
+	char *string;
 	int flags;			/* flags to number() */
-	int field_width;	/* width of output field */
+	int fieldWidth;	/* width of output field */
 	int precision;		
 		/* min. # of digits for integers; max number of chars for from string */
 	int qualifier;		/* 'h', 'l', or 'L' for integer fields */
@@ -251,9 +251,9 @@ vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
 	bytesLeft--;
 		// make space for the terminating '\0' byte
 
-	for (str = buffer; fmt[0] && bytesLeft > 0; fmt++) {
-		if (fmt[0] != '%') {
-			if (!put_character(&str, &bytesLeft, fmt[0]))
+	for (string = buffer; format[0] && bytesLeft > 0; format++) {
+		if (format[0] != '%') {
+			if (!put_character(&string, &bytesLeft, format[0]))
 				break;
 
 			continue;
@@ -264,8 +264,8 @@ vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
 		flags = 0;
 
 	repeat:
-		++fmt;		/* this also skips first '%' */
-		switch (fmt[0]) {
+		++format;		/* this also skips first '%' */
+		switch (format[0]) {
 			case '-': flags |= LEFT; goto repeat;
 			case '+': flags |= PLUS; goto repeat;
 			case ' ': flags |= SPACE; goto repeat;
@@ -275,15 +275,15 @@ vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
 
 		/* get field width */
 
-		field_width = -1;
-		if (isdigit(*fmt))
-			field_width = skip_atoi(&fmt);
-		else if (fmt[0] == '*') {
-			++fmt;
+		fieldWidth = -1;
+		if (isdigit(*format))
+			fieldWidth = skip_atoi(&format);
+		else if (format[0] == '*') {
+			++format;
 			/* it's the next argument */
-			field_width = va_arg(args, int);
-			if (field_width < 0) {
-				field_width = -field_width;
+			fieldWidth = va_arg(args, int);
+			if (fieldWidth < 0) {
+				fieldWidth = -fieldWidth;
 				flags |= LEFT;
 			}
 		}
@@ -291,12 +291,12 @@ vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
 		/* get the precision */
 
 		precision = -1;
-		if (fmt[0] == '.') {
-			++fmt;	
-			if (isdigit(*fmt))
-				precision = skip_atoi(&fmt);
-			else if (fmt[0] == '*') {
-				++fmt;
+		if (format[0] == '.') {
+			++format;	
+			if (isdigit(*format))
+				precision = skip_atoi(&format);
+			else if (format[0] == '*') {
+				++format;
 				/* it's the next argument */
 				precision = va_arg(args, int);
 			}
@@ -307,22 +307,20 @@ vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
 		/* get the conversion qualifier */
 
 		qualifier = -1;
-		if (fmt[0] == 'h' || fmt[0] == 'l' || fmt[0] == 'L') {
-			qualifier = fmt[0];
-			++fmt;
-		}
+		if (format[0] == 'h' || format[0] == 'l' || format[0] == 'L')
+			qualifier = *format++;
 
 		/* default base */
 		base = 10;
 
-		switch (fmt[0]) {
+		switch (format[0]) {
 			case 'c':
-				if (!(flags & LEFT) && !put_padding(&str, &bytesLeft, field_width))
+				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft, fieldWidth))
 					goto out;
 
-				put_character(&str, &bytesLeft, (char)va_arg(args, int));
+				put_character(&string, &bytesLeft, (char)va_arg(args, int));
 
-				if ((flags & LEFT) != 0 && !put_padding(&str, &bytesLeft, field_width))
+				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft, fieldWidth))
 					goto out;
 				continue;
 
@@ -336,37 +334,37 @@ vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
 
 				length = strnlen(argument, precision);
 
-				if (!(flags & LEFT) && !put_padding(&str, &bytesLeft, field_width))
+				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft, fieldWidth))
 					goto out;
 
-				if (!put_string(&str, &bytesLeft, argument, length))
+				if (!put_string(&string, &bytesLeft, argument, length))
 					goto out;
 
-				if ((flags & LEFT) != 0 && !put_padding(&str, &bytesLeft, field_width))
+				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft, fieldWidth))
 					goto out;
 				continue;
 			}
 
 			case 'p':
-				if (field_width == -1) {
-					field_width = 2*sizeof(void *);
+				if (fieldWidth == -1) {
+					fieldWidth = 2*sizeof(void *);
 					flags |= ZEROPAD;
 				}
 
 				// ToDo: fix me!
-				str[0] = '0';
-				str[1] = 'x';
-				str = number(str + 2, (uint32)va_arg(args, void *), 16,
-						field_width, precision, flags);
+				string[0] = '0';
+				string[1] = 'x';
+				string = number(string + 2, (uint32)va_arg(args, void *), 16,
+						fieldWidth, precision, flags);
 				continue;
 
 			case 'n':
 				if (qualifier == 'l') {
 					long *ip = va_arg(args, long *);
-					*ip = (str - buffer);
+					*ip = (string - buffer);
 				} else {
 					int *ip = va_arg(args, int *);
-					*ip = (str - buffer);
+					*ip = (string - buffer);
 				}
 				continue;
 
@@ -388,13 +386,13 @@ vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
 				break;
 
 			default:
-				if (fmt[0] != '%')
-					put_character(&str, &bytesLeft, '%');
+				if (format[0] != '%')
+					put_character(&string, &bytesLeft, '%');
 
-				if (!fmt[0])
+				if (!format[0])
 					goto out;
 
-				put_character(&str, &bytesLeft, fmt[0]);
+				put_character(&string, &bytesLeft, format[0]);
 				continue;
 		}
 
@@ -403,23 +401,23 @@ vsnprintf(char *buffer, size_t bytesLeft, const char *fmt, va_list args)
 		else if (qualifier == 'l') {
 			num = va_arg(args, unsigned long);
 			if (flags & SIGN)
-				num = (long) num;
+				num = (long)num;
 		} else if (qualifier == 'h') {
-			num = (unsigned short) va_arg(args, int);
+			num = (unsigned short)va_arg(args, int);
 			if (flags & SIGN)
-				num = (short) num;
+				num = (short)num;
 		} else if (flags & SIGN)
 			num = va_arg(args, int);
 		else
 			num = va_arg(args, unsigned int);
 
 		// ToDo: fix me!
-		str = number(str, num, base, field_width, precision, flags);
+		string = number(string, num, base, fieldWidth, precision, flags);
 	}
 
 out:
-	*str = '\0';
-	return str - buffer;
+	*string = '\0';
+	return string - buffer;
 }
 
 
