@@ -398,11 +398,11 @@ bfs_scan_partition(int fd, partition_data *partition, void *cookie)
 	partition->flags |= B_PARTITION_FILE_SYSTEM;
 	partition->block_size = superBlock->block_size;
 	partition->content_name = strdup(superBlock->name);
-	partition->content_type = strdup(kPartitionTypeBFS);
+	// (content_type is set by the system)
 	// (no content_parameters, content_cookie ?)
 	// free the super block
 	free(superBlock);
-	if (!partition->content_name || !partition->content_type)
+	if (!partition->content_name)
 		return B_NO_MEMORY;
 	return B_OK;
 }
