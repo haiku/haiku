@@ -223,7 +223,7 @@ void i386_handle_trap(struct int_frame frame)
 				}
 			} else {
 				// want to pass too many args into the system
-				retcode = ERR_INVALID_ARGS;
+				retcode = EINVAL;
 			}
 			frame.eax = retcode & 0xffffffff;
 			frame.edx = retcode >> 32;

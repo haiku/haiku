@@ -505,7 +505,7 @@ restart:
 		if(flags == PHYSICAL_PAGE_NO_WAIT) {
 			// punt back to the caller and let them handle this
 			mutex_unlock(&iospace_mutex);
-			return ERR_NO_MEMORY;
+			return ENOMEM;
 		} else {
 			mutex_unlock(&iospace_mutex);
 			acquire_sem(iospace_full_sem);
@@ -574,18 +574,18 @@ static vm_translation_map_ops tmap_ops = {
 int vm_translation_map_create(vm_translation_map *new_map, bool kernel)
 {
 	if(new_map == NULL)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 dprintf("vm_translation_map_create\n");
 	// initialize the new object
 	new_map->ops = &tmap_ops;
 	new_map->map_count = 0;
 	if(recursive_lock_create(&new_map->lock) < 0)
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 
 	new_map->arch_data = (vm_translation_map_arch_info *)kmalloc(sizeof(vm_translation_map_arch_info));
 	if(new_map == NULL)
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 
 	new_map->arch_data->num_invalidate_pages = 0;
 
@@ -595,7 +595,7 @@ dprintf("vm_translation_map_create\n");
 		new_map->arch_data->pgdir_virt = kmalloc(PAGE_SIZE);
 		if(new_map->arch_data->pgdir_virt == NULL) {
 			kfree(new_map->arch_data);
-			return ERR_NO_MEMORY;
+			return ENOMEM;
 		}
 		if(((addr)new_map->arch_data->pgdir_virt % PAGE_SIZE) != 0)
 			panic("vm_translation_map_create: malloced pgdir and found it wasn't aligned!\n");

@@ -48,7 +48,7 @@ int arch_vm_init_endvm(kernel_args *ka)
 		REGION_ADDR_ANY_ADDRESS, 0xa0000, LOCK_RW|LOCK_KERNEL, 0x0);
 	if(id < 0) {
 		panic("arch_vm_init_endvm: unable to map dma region\n");
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 	}
 	return 0;
 }

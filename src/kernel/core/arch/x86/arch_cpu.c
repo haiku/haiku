@@ -48,13 +48,13 @@ int arch_cpu_init2(kernel_args *ka)
 	tss = kmalloc(sizeof(struct tss *) * ka->num_cpus);
 	if(tss == NULL) {
 		panic("arch_cpu_init2: could not allocate buffer for tss pointers\n");
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 	}
 
 	tss_loaded = kmalloc(sizeof(int) * ka->num_cpus);
 	if(tss == NULL) {
 		panic("arch_cpu_init2: could not allocate buffer for tss booleans\n");
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 	}
 	memset(tss_loaded, 0, sizeof(int) * ka->num_cpus);
 
@@ -66,7 +66,7 @@ int arch_cpu_init2(kernel_args *ka)
 			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
 		if(rid < 0) {
 			panic("arch_cpu_init2: unable to create region for tss\n");
-			return ERR_NO_MEMORY;
+			return ENOMEM;
 		}
 
 		memset(tss[i], 0, sizeof(struct tss));
