@@ -179,7 +179,7 @@ private:
 							uint32 flags, team_id team, thread_id thread,
 							port_id port, bool fullReg, uint32 *token,
 							team_id *otherTeam) const;
-	void SetSignature(team_id team, const char *mimeSig) const;
+	status_t SetSignature(team_id team, const char *mimeSig) const;
 	void SetThread(team_id team, thread_id thread) const;
 	status_t SetThreadAndTeam(uint32 entryToken, thread_id thread,
 							  team_id team) const;
@@ -197,10 +197,10 @@ private:
 	bool UpdateActiveApp(team_id team) const;
 	void SetAppFlags(team_id team, uint32 flags) const;
 	void DumpRoster() const;
-	status_t resolve_app(const char *inType, const entry_ref *ref,
+	status_t resolve_app(const char *inType, entry_ref *ref,
 						 entry_ref *appRef, char *appSig, uint32 *appFlags,
 						 bool *wasDocument) const;
-	status_t translate_ref(const entry_ref *ref, BMimeType *appMeta,
+	status_t translate_ref(entry_ref *ref, BMimeType *appMeta,
 						   entry_ref *appRef, BFile *appFile,
 						   bool *wasDocument) const;
 	status_t translate_type(const char *mimeType, BMimeType *appMeta,
