@@ -4,7 +4,6 @@ StdBinCommands
 		alert.cpp
 		clipboard.cpp
 		shutdown.cpp
-		beep.cpp
 		clipboard.cpp
 		df.cpp
 		isvolume.cpp
@@ -17,6 +16,7 @@ StdBinCommands
 
 StdBinCommands
 		roster.cpp
+		beep.cpp
 		catattr.cpp
 	: be stdc++.r4 ;
 
