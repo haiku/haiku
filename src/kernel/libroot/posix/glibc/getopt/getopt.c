@@ -76,6 +76,9 @@
 # endif
 #endif
 
+/* ToDo: for now! */
+#undef _LIBC
+
 #ifndef _
 /* This is for other GNU distributions with internationalized messages.  */
 # if (HAVE_LIBINTL_H && ENABLE_NLS) || defined _LIBC
