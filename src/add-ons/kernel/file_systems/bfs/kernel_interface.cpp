@@ -375,13 +375,16 @@ bfs_read_vnode(void *_ns, vnode_id id, char reenter, void **_node)
 	if (inode == NULL)
 		return B_NO_MEMORY;
 
-	if (inode->InitCheck() == B_OK) {
+	status_t status = inode->InitCheck();
+	if (status == B_OK) {
 		*_node = (void *)inode;
 		return B_OK;
 	}
 
+	// ToDo: if "status" is B_BUSY, we could wait a bit and try again
+
 	delete inode;
-	RETURN_ERROR(B_ERROR);
+	RETURN_ERROR(status);
 }
 
 
@@ -412,13 +415,15 @@ bfs_remove_vnode(void *_ns, void *_node, char reenter)
 	// up by the inode from being freed - this flag is set only in situations
 	// where this is a good idea... (the block bitmap will get fixed anyway
 	// in this case).
-	if (inode->Flags() & INODE_DONT_FREE_SPACE)
+	if (inode->Flags() & INODE_DONT_FREE_SPACE) {
+		delete inode;
 		return B_OK;
+	}
 
 	// If the inode isn't in use anymore, we were called before
 	// bfs_unlink() returns - in this case, we can just use the
 	// transaction which has already deleted the inode.
-	Transaction localTransaction,*transaction = &localTransaction;
+	Transaction localTransaction, *transaction = &localTransaction;
 	Journal *journal = volume->GetJournal(volume->ToBlock(inode->Parent()));
 
 	if (journal != NULL && journal->CurrentThread() == find_thread(NULL))
@@ -426,35 +431,15 @@ bfs_remove_vnode(void *_ns, void *_node, char reenter)
 	else
 		localTransaction.Start(volume, inode->BlockNumber());
 
-	// Perhaps there should be an implementation of Inode::ShrinkStream() that
-	// just frees the data_stream, but doesn't change the inode (since it is
-	// freed anyway) - that would make an undelete command possible
-	status_t status = inode->SetFileSize(transaction, 0);
-	if (status < B_OK)
-		return status;
-
-	// Free all attributes, and remove their indices
-	{
-		// We have to limit the scope of AttributeIterator, so that its
-		// destructor is not called after the inode is deleted
-		AttributeIterator iterator(inode);
-
-		char name[B_FILE_NAME_LENGTH];
-		uint32 type;
-		size_t length;
-		vnode_id id;
-		while ((status = iterator.GetNext(name, &length, &type, &id)) == B_OK)
-			inode->RemoveAttribute(transaction, name);
-	}
-
-	if ((status = volume->Free(transaction, inode->BlockRun())) == B_OK) {
+	status_t status = inode->Free(transaction);
+	if (status == B_OK) {
 		if (transaction == &localTransaction)
 			localTransaction.Done();
 
 		delete inode;
 	}
 
-	return B_OK;
+	return status;
 }
 
 
@@ -891,6 +876,8 @@ bfs_symlink(void *_ns, void *_directory, const char *name, const char *path)
 		// we don't have to do that here...
 		status = link->WriteAt(&transaction, 0, (const uint8 *)path, &length);
 	}
+	// ToDo: would be nice if Inode::Create() would let the INODE_NOT_READY
+	//	flag set until here, so that it can be accessed directly
 
 	// Inode::Create() left the inode locked
 	put_vnode(volume->ID(), id);
