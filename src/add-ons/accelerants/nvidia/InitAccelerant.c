@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-7/2003.
+	Rudolf Cornelissen 10/2002-12/2003.
 */
 
 #define MODULE_BIT 0x00800000
@@ -234,7 +234,8 @@ status_t CLONE_ACCELERANT(void *data) {
 	char path[MAXPATHLEN];
 
 	/* the data is the device name */
-	strcpy(path, "/dev");
+	/* Note: the R4 graphics driver kit is in error here (missing trailing '/') */
+	strcpy(path, "/dev/");
 	strcat(path, (const char *)data);
 	/* open the device, the permissions aren't important */
 	fd = open(path, B_READ_WRITE);
