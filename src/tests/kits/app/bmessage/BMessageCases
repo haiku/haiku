@@ -11,6 +11,10 @@ BMessage(const BMessage &a_message);
 case 1: copy of default constructed
 
 ~BMessage();
+--------------
+case 1: Sent message not replied to, so B_NO_REPLY sent
+case 2: Sent message replied to, so B_NO_REPLY not sent
+
 BMessage& operator=(const BMessage &msg);
 --------------
 case 1: assignment of default constructed

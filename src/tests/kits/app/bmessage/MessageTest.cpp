@@ -2,6 +2,7 @@
 //#include "MessageTest.h"
 #include "../common.h"
 #include "MessageConstructTest.h"
+#include "MessageDestructTest.h"
 #include "MessageOpAssignTest.h"
 #include "MessageEasyFindTest.h"
 #include "MessageBoolItemTest.h"
@@ -26,6 +27,7 @@ Test* MessageTestSuite()
 	TestSuite* tests = new TestSuite();
 
 	tests->addTest(TMessageConstructTest::Suite());
+	tests->addTest(TMessageDestructTest::Suite());
 	tests->addTest(TMessageOpAssignTest::Suite());
 	tests->addTest(TMessageEasyFindTest::Suite());
 	tests->addTest(TMessageBoolItemTest::Suite());
