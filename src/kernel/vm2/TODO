@@ -1,0 +1,7 @@
+*1) There is no arch-level integration. This is to be tested (to death) in user land first.  
+2) Tests are not done. Barely started.  
+
+5) I use new and delete. I know that doesn't work in kernel land. Not too tough to change, though.  
+6) Need to make the paging daemon load the pages in, using semaphores.
+
+* == can not be done in user land.

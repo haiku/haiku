@@ -1,0 +1,121 @@
+#include "vpage.h"
+
+	swapFileManager  *vpage::swapMan;
+	pageManager *vpage::pageMan;  
+
+void vpage::flush(void)
+	{
+	if (protection==writable && dirty)
+		swapMan->write_block(backingNode,physPage, PAGE_SIZE);
+	}
+
+void vpage::refresh(void)
+	{
+		swapMan->read_block(backingNode,physPage, PAGE_SIZE);
+	}
+
+vpage *vpage::clone(unsigned long address) // The calling method will have to create this...
+	{
+	vnode node;
+	node.fd=0;
+	node.offset=0;
+	return  new vpage(address,node,physPage,(protection==readable)?protection:copyOnWrite,LAZY); // Not sure if LAZY is right or not
+	}
+
+// backing and/or physMem can be NULL/0.
+vpage::vpage(unsigned long start,vnode backing, page *physMem,protectType prot,pageState state) 
+	{ 
+	start_address=start;
+	end_address=start+PAGE_SIZE-1;
+	protection=prot;
+	swappable=(state==NO_LOCK);
+	if (backing.fd=0)
+		backingNode=swapMan->findNode();
+	else
+		backingNode=backing; 
+	if (!physPage && (state!=LAZY) && (state!=NO_LOCK))
+		physPage=pageMan->getPage();
+	else
+		physPage=physMem;
+	}
+
+void vpage::setProtection(protectType prot)
+	{
+	protection=prot;
+	// Change the hardware
+	}
+
+bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = panic.
+	{ // This is dispatched by the real interrupt handler, who locates us
+	if (writeError)
+		{
+		dirty=true;
+		if (physPage)
+			{
+			if (protection==copyOnWrite) // Else, this was just a "let me know when I am dirty"...
+				{
+				page *newPhysPage=pageMan->getPage();
+				memcpy(newPhysPage,physPage,PAGE_SIZE);
+				physPage=newPhysPage;
+				protection=writable;
+				backingNode=swapMan->findNode(); // Need new backing store for this node, since it was copied, the original is no good...
+				// Update the architecture specific stuff here...
+				}
+			return true; 
+			}
+		}
+	physPage=pageMan->getPage();
+	// Update the architecture specific stuff here...
+	refresh(); // I wonder if these vnode calls are safe during an interrupt...
+	}
+
+char vpage::getByte(unsigned long address)
+	{
+	if (!physPage)
+		fault((void *)(address),false);
+	return *((char *)(address-start_address+physPage->getAddress()));
+	}
+
+void vpage::setByte(unsigned long address,char value)
+	{
+	if (!physPage)
+		fault((void *)(address),false);
+	*((char *)(address-start_address+physPage->getAddress()))=value;
+	}
+
+int  vpage::getInt(unsigned long address)
+	{
+	if (!physPage)
+		fault((void *)(address),false);
+	return *((int *)(address-start_address+physPage->getAddress()));
+	}
+
+void  vpage::setInt(unsigned long address,int value)
+	{
+	if (!physPage)
+		fault((void *)(address),false);
+	*((int *)(address-start_address+physPage->getAddress()))=value;
+	}
+
+void vpage::pager(int desperation)
+	{
+	if (!swappable)
+			return;
+	switch (desperation)
+		{
+		case 1: return; break;
+		case 2: if (!physPage || protection!=readable)  return;break;
+		case 3: if (!physPage || dirty)  return;break;
+		case 4: if (!physPage)  return;break;
+		case 5: if (!physPage)  return;break;
+		default: return;break;
+		}
+	flush();
+	pageMan->freePage(physPage);
+	physPage=NULL;
+	}
+
+void vpage::saver(void)
+	{
+	flush();
+	}
