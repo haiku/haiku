@@ -259,7 +259,9 @@ public:
         inline void _iprint(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
                 fputs(buf, InputServer::sLogFile); fflush(InputServer::sLogFile); }
 	#define PRINT(x)	_iprint x
-	
+#else
+	#undef PRINT
+	#define PRINT(x)	SERIAL_PRINT(x)	
 #endif
 		#define PRINTERR(x)		PRINT(x)
         #define EXIT()          PRINT(("EXIT %s\n", __PRETTY_FUNCTION__))
