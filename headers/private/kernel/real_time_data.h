@@ -13,12 +13,8 @@
 //	to this, it should be properly separated and moved into the arch tree.
 
 struct real_time_data {
-	uint64	boot_time;
+	bigtime_t	system_time_offset;
 	uint32	system_time_conversion_factor;
-	bigtime_t	timezone_offset;
-	bool	dst_observed;
-	char 	tzfilename[B_PATH_NAME_LENGTH];
-	bool	isGMT;
 };
 
 #endif	/* _KERNEL_REAL_TIME_DATA_H */
