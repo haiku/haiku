@@ -4,41 +4,72 @@ UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
 
 ObjectsDefines 
-	heap.cpp 
+	# boot loader
 	main.cpp
 	vfs.cpp
 	partitions.cpp
 	stdio.cpp
 	RootFileSystem.cpp
-	: 
-	malloc=boot_malloc free=boot_free read_pos=boot_read_pos close=boot_close
+
+	# partitions
+	amiga_rdb.cpp
+	apple.cpp
+	intel.cpp
+	PartitionMap.cpp
+
+	# file systems
+	bfs.cpp
+	Directory.cpp
+	:
+	read_pos=boot_read_pos fstat=boot_fstat open=boot_open close=boot_close
 	;
 
-# This lets the correct stdio.h header be available
-# on the build platform.
-# This will be fixed with the move to GNU's stdio header
-if $(OS) = "LINUX" {
-#	SubDirC++Flags -include /usr/include/stdio.h ;
-} else {
-#	SubDirC++Flags -include /boot/develop/headers/posix/stdio.h ;
-	SubDirC++Flags -DHAVE_READ_POS=1 ;
+{
+	local defines =
+		_BOOT_MODE
+		BOOT_SUPPORT_PARTITION_AMIGA
+		BOOT_SUPPORT_PARTITION_APPLE
+		BOOT_SUPPORT_PARTITION_INTEL
+
+		BOOT_SUPPORT_FILE_SYSTEM_BFS
+		;
+
+	defines = [ FDefines $(defines) ] ;
+
+	if $(OS) = "LINUX" {
+	#	SubDirC++Flags -include /usr/include/stdio.h ;
+	} else {
+	#	SubDirC++Flags -include /boot/develop/headers/posix/stdio.h ;
+		SubDirC++Flags $(defines) -DHAVE_READ_POS=1 -fno-builtins -fcheck-memory-usage -D_NO_INLINE_ASM ;
+	}
 }
 
 SimpleTest BootLoaderTest :
+	# userland bindings
 	platform_start.cpp
-	#platform_console.cpp
 	platform_debug.cpp
 	platform_devices.cpp
 	platform_heap.cpp
 	Handle.cpp
 
+	# boot loader
 	main.cpp
 	vfs.cpp
 	partitions.cpp
-	heap.cpp
 	RootFileSystem.cpp
+
+	# partitioning systems
+	amiga_rdb.cpp
+	apple.cpp
+	intel.cpp
+	PartitionMap.cpp
+
+	# file systems
+	bfs.cpp
+	Directory.cpp
 
 	list.c
 	:
@@ -54,3 +85,14 @@ SEARCH on [ FGristFiles
 		heap.cpp RootFileSystem.cpp
 	] = [ FDirName $(OBOS_TOP) src kernel boot loader ] ;
 
+SEARCH on [ FGristFiles amiga_rdb.cpp ]
+    = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems amiga ] ;
+
+SEARCH on [ FGristFiles apple.cpp ]
+    = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems apple ] ;
+
+SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp ]
+    = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems intel ] ;
+
+SEARCH on [ FGristFiles bfs.cpp Directory.cpp ]
+    = [ FDirName $(OBOS_TOP) src kernel boot loader file_systems bfs ] ;
