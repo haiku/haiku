@@ -2909,10 +2909,35 @@ void
 BTextView::HandlePageKey(uint32 inPageKey)
 {
 	CALLED();
+	
+	int32 modifiers = 0;
+	BMessage *currentMessage = Window()->CurrentMessage();
+	currentMessage->FindInt32("modifiers", &modifiers);
+
+	bool shiftDown = modifiers & B_SHIFT_KEY;
+
+	int32 oldOffset;;
+	int32 newOffset;
+	
 	switch (inPageKey) {
 		case B_HOME:
+			oldOffset = fSelStart;
+			newOffset = 0;
+			ScrollToOffset(newOffset);
+			if (shiftDown)
+				Select(newOffset, oldOffset);
+			else
+				Select(newOffset, newOffset);
+			break;
+
 		case B_END:
-			ScrollToOffset((inPageKey == B_HOME) ? 0 : fText->Length());
+			oldOffset = fSelEnd;
+			newOffset = fText->Length();
+			ScrollToOffset(newOffset);
+			if (shiftDown)
+				Select(oldOffset, newOffset);
+			else
+				Select(newOffset, newOffset);
 			break;
 			
 		case B_PAGE_UP: 
