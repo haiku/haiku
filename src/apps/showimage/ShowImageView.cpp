@@ -1923,11 +1923,71 @@ ShowImageView::SetTrackerSelectionToCurrent()
 }
 
 bool
+ShowImageView::FindNextImageByDir(entry_ref *in_current, entry_ref *out_image, bool next, bool rewind)
+{
+	ASSERT(next || !rewind);
+	BEntry curImage(in_current);
+	entry_ref entry, *ref;
+	BDirectory parent;
+	BList entries;
+	bool found = false;
+	int32 cur;
+	
+	if (curImage.GetParent(&parent) != B_OK)
+		return false;
+
+	while (parent.GetNextRef(&entry) == B_OK) {
+		if (entry != *in_current) {
+			entries.AddItem(new entry_ref(entry));
+		} else {
+			// insert current ref, so we can find it easily after sorting
+			entries.AddItem(in_current);
+		}
+	}
+	
+	entries.SortItems(CompareEntries);
+	
+	cur = entries.IndexOf(in_current);
+	ASSERT(cur >= 0);
+
+	// remove it so FreeEntries() does not delete it
+	entries.RemoveItem(in_current);
+	
+	if (next) {
+		// find the next image in the list
+		if (rewind) cur = 0; // start with first
+		for (; (ref = (entry_ref*)entries.ItemAt(cur)) != NULL; cur ++) {
+			if (IsImage(ref)) {
+				found = true;
+				*out_image = (const entry_ref)*ref;
+				break;
+			}
+		}
+	} else {
+		// find the previous image in the list
+		cur --;
+		for (; cur >= 0; cur --) {
+			ref = (entry_ref*)entries.ItemAt(cur);
+			if (IsImage(ref)) {
+				found = true;
+				*out_image = (const entry_ref)*ref;
+				break;
+			}
+		}
+	}
+
+	FreeEntries(&entries);
+	return found;
+}
+
+bool
 ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, bool rewind)
 {
 	// Based on similar function from BeMail!
 	if (!fTrackerMessenger.IsValid())
-		return false;
+		// If tracker scripting is not available,
+		// fall back on directory searching code
+		return FindNextImageByDir(in_current, ref, next, rewind);
 
 	//
 	//	Ask the Tracker what the next/prev file in the window is.
