@@ -1,0 +1,186 @@
+SubDir OBOS_TOP src kits network libbind ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(SUBDIR) headers ] ;
+
+# our libroot contains functions that are missing in BeOS (e.g.: strlcat)
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot posix pthread ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
+
+# private sources for this port
+SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
+
+# BIND sources
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dst ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) inet ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) irs ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) isc ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) nameser ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) resolv ] ;
+
+{
+	# we want to have the xxx_r functions, too
+	local defines = _REENTRANT=1 NO_SOCKADDR_UN=1 ;
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+SharedLibrary "bind" :
+	# dst
+	dst_api.c
+	hmac_link.c
+	md5_dgst.c
+	support.c
+	
+	# inet
+	inet_addr.c
+	inet_cidr_ntop.c
+	inet_cidr_pton.c
+	inet_data.c
+	inet_lnaof.c
+	inet_makeaddr.c
+	inet_net_ntop.c
+	inet_net_pton.c
+	inet_neta.c
+	inet_netof.c
+	inet_network.c
+	inet_ntoa.c
+	inet_ntop.c
+	inet_pton.c
+	nsap_addr.c
+	
+	# irs
+	dns.c
+	dns_gr.c
+	dns_ho.c
+	dns_nw.c
+	dns_pr.c
+	dns_pw.c
+	dns_sv.c
+	gai_strerror.c
+	gen.c
+	gen_gr.c
+	gen_ho.c
+	gen_ng.c
+	gen_nw.c
+	gen_pr.c
+	gen_pw.c
+	gen_sv.c
+	getaddrinfo.c
+	getgrent.c
+	getgrent_r.c
+	gethostent.c
+	gethostent_r.c
+	getnameinfo.c
+	getnetent.c
+	getnetent_r.c
+	getnetgrent.c
+	getnetgrent_r.c
+	getprotoent.c
+	getprotoent_r.c
+	getpwent.c
+	getpwent_r.c
+	getservent.c
+	getservent_r.c
+	hesiod.c
+	irp.c
+	irp_gr.c
+	irp_ho.c
+	irp_ng.c
+	irp_nw.c
+	irp_pr.c
+	irp_pw.c
+	irp_sv.c
+	irpmarshall.c
+	irs_data.c
+	lcl.c
+	lcl_gr.c
+	lcl_ho.c
+	lcl_ng.c
+	lcl_nw.c
+	lcl_pr.c
+	lcl_pw.c
+	lcl_sv.c
+	nis.c
+	nis_gr.c
+	nis_ho.c
+	nis_ng.c
+	nis_nw.c
+	nis_pr.c
+	nis_pw.c
+	nis_sv.c
+	nul_ng.c
+	util.c
+	
+	# isc (not used)
+	assertions.c
+	base64.c
+	bitncmp.c
+	ctl_clnt.c
+	ctl_p.c
+	ctl_srvr.c
+	ev_connects.c
+	ev_files.c
+	ev_streams.c
+	ev_timers.c
+	ev_waits.c
+	eventlib.c
+	heap.c
+	hex.c
+	logging.c
+	memcluster.c
+	movefile.c
+	tree.c
+	
+	# nameser
+	ns_date.c
+	ns_name.c
+	ns_netint.c
+	ns_parse.c
+	ns_print.c
+	ns_samedomain.c
+	ns_sign.c
+	ns_ttl.c
+	ns_verify.c
+	
+	# resolv
+	herror.c
+	res_comp.c
+	res_data.c
+	res_debug.c
+	res_findzonecut.c
+	res_init.c
+	res_mkquery.c
+	res_mkupdate.c
+	res_query.c
+	res_send.c
+	res_sendsigned.c
+	res_update.c
+	
+	# functions from our libroot
+	pthread_mutex.c
+	pthread_mutexattr.c
+	strlcat.c
+	
+	# private functions
+	arc4random.c
+	ethers.c
+	pthread_emu.c
+	strsep.c
+;
+
+LinkSharedOSLibs libbind.so :
+	be # BeOS defines syslog in libbe.so
+	socket ;
+
+# Installation -- in the test directory for the time being
+OBOSInstallRelSymLink install-networking
+	: [ FDirName $(OBOS_TEST_DIR) kits net lib ]
+	: libbind.so
+	: installed-networking-test ;
+
+Package openbeos-networkingkit-cvs :
+	libbind.so :
+#	boot home config lib ;
+	boot home Desktop openbeos-networkingkit lib ;

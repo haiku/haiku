@@ -1,0 +1,27 @@
+BIND 9.2.3 ported to OpenBeOS
+
+This file contains important information for developers who want to port BIND to OpenBeOS.
+I created config.h, port_before.h, and port_after.h with the BIND configure script and fixed some mistakes that the script made.
+
+Our private folder are:
+	headers (some headers are not defined in OpenBeOS)
+	src (functions that are not part of OpenBeOS, e.g.: strsep)
+
+Porting issues:
+	BIND wants to include sys/un.h and utmp.h. We do not have these, so I put empty headers into the private headers folder.
+	
+	strsep() is not defined although we #define NEED_STRSEP in port_after.h. I put it in our private src folder.
+	
+	OpenBeOS defines pselect(), but we turned NEEDS_PSELECT in port_after.h on because it is not present in BeOS.
+	As long as we do not have a working kernel this should be #define'd. When we can do a real OpenBeOS port we should #undef it again.
+
+Added sources for compatibility:
+	arc4random.c
+	ethers.c
+	pthread_emu.c
+
+Changes made to the sources and headers:
+	netdb.h and resolv.h: simplified by removing unneeded checks for other platforms
+	
+	irs/gai_strerror and irs/irs_data.c: Changed the initialization of the mutex lock and rewrote TLS to use BeOS functions
+		because we do not have full pthread support.
