@@ -88,6 +88,7 @@ image_compare(void *_image, const void *_key)
 static void
 unregister_elf_image(struct elf_image_info *image)
 {
+	unregister_image(team_get_kernel_team(), image->id);
 	hash_remove(sImagesHash, image);
 }
 
