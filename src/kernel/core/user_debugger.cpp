@@ -694,6 +694,61 @@ nub_thread_cleanup(struct thread *nubThread)
 }
 
 
+/**	\brief Reads data from user memory.
+ *
+ *	Tries to read \a size bytes of data from user memory address \a address
+ *	into the supplied buffer \a buffer. If only a part could be read the
+ *	function won't fail. The number of bytes actually read is return through
+ *	\a bytesRead.
+ *
+ *	\param address The user memory address from which to read.
+ *	\param buffer The buffer into which to write.
+ *	\param size The number of bytes to read.
+ *	\param bytesRead Will be set to the number of bytes actually read.
+ *	\return \c B_OK, if reading went fine. Then \a bytesRead will be set to
+ *			the amount of data actually read. An error indicates that nothing
+ *			has been read.
+ */
+static status_t
+read_user_memory(const void *_address, void *_buffer, int32 size,
+	int32 &bytesRead)
+{
+	const char *address = (const char*)_address;
+	char *buffer = (char*)_buffer;
+
+	// check the parameters
+	if (!IS_USER_ADDRESS(address))
+		return B_BAD_ADDRESS;
+	if (size <= 0)
+		return B_BAD_VALUE;
+
+	// If the region to be read crosses page boundaries, we split it up into
+	// smaller chunks.
+	bytesRead = 0;
+	while (size > 0) {
+		int32 toRead = size;
+		if ((uint32)address % B_PAGE_SIZE + toRead > B_PAGE_SIZE)
+			toRead = B_PAGE_SIZE - (uint32)address % B_PAGE_SIZE;
+
+		status_t error = user_memcpy(buffer, address, toRead);
+
+		// If reading fails, we only fail, if we haven't read anything yet.
+		if (error != B_OK) {
+			if (bytesRead > 0)
+				return B_OK;
+			return error;
+		}
+
+		bytesRead += toRead;
+		address += toRead;
+		buffer += toRead;
+		size -= toRead;
+	}
+
+	return B_OK;
+}
+
+
 static status_t
 debug_nub_thread(void *)
 {
@@ -761,8 +816,11 @@ debug_nub_thread(void *)
 					result = B_BAD_VALUE;
 
 				// read the memory
-				if (result == B_OK)
-					result = user_memcpy(reply.read_memory.data, address, size);
+				int32 bytesRead = 0;
+				if (result == B_OK) {
+					result = read_user_memory(address, reply.read_memory.data,
+						size, bytesRead);
+				}
 				reply.read_memory.error = result;
 
 				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_READ_MEMORY: "
@@ -770,7 +828,7 @@ debug_nub_thread(void *)
 					nubThread->id, replyPort, address, size, result));
 
 				// send only as much data as necessary
-				int32 bytesRead = (result == B_OK ? size : 0);
+				reply.read_memory.size = bytesRead;
 				replySize = reply.read_memory.data + bytesRead - (char*)&reply;
 				sendReply = true;
 				break;
