@@ -401,7 +401,8 @@ MixerCore::MixThread()
 
 	if (!LockFromMixThread())
 		return;
-	latency = bigtime_t(0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio));
+	latency = min(3600LL, bigtime_t(0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio)));
+	// XXX we might need to add scheduling latency
 	
 	TRACE("MixerCore: starting MixThread at %Ld with latency %Ld and downstream latency %Ld\n", start, latency, fDownstreamLatency);
 

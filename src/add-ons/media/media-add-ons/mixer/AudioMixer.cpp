@@ -444,7 +444,7 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	TRACE("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
-	fInternalLatency = bigtime_t(1.6 * BufferDuration());
+	fInternalLatency = BufferDuration() + min(4500LL, bigtime_t(0.5 * BufferDuration()));
 	TRACE("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
@@ -637,11 +637,10 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 
 	// SetDuration of one buffer
 	SetBufferDuration(buffer_duration(format.u.raw_audio));
-
 	TRACE("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
-	fInternalLatency = bigtime_t(1.6 * BufferDuration());
+	fInternalLatency = BufferDuration() + min(4500LL, bigtime_t(0.5 * BufferDuration()));
 	TRACE("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
