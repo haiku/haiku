@@ -143,7 +143,7 @@ MediaExtractor::Seek(int32 stream, uint32 seekTo,
 	if (result != B_OK)
 		return result;
 	
-	// clear buffered chunks
+	// XXX clear buffered chunks
 	return B_OK;
 }
 
@@ -164,18 +164,22 @@ MediaExtractor::GetNextChunk(int32 stream,
 	return fReader->GetNextChunk(fStreamInfo[stream].cookie, chunkBuffer, chunkSize, mediaHeader);
 }
 
-class MediaExtractorChunkProvider : public ChunkProvider {
+class MediaExtractorChunkProvider : public ChunkProvider
+{
 private:
 	MediaExtractor * fExtractor;
 	int32 fStream;
 public:
-	MediaExtractorChunkProvider(MediaExtractor * extractor, int32 stream) {
+	MediaExtractorChunkProvider(MediaExtractor * extractor, int32 stream)
+	{
 		fExtractor = extractor;
 		fStream = stream;
 	}
+	
 	virtual status_t GetNextChunk(void **chunkBuffer, int32 *chunkSize,
-	                              media_header *mediaHeader) {
-		return fExtractor->GetNextChunk(fStream,chunkBuffer,chunkSize,mediaHeader);
+	                              media_header *mediaHeader)
+	{
+		return fExtractor->GetNextChunk(fStream, chunkBuffer, chunkSize, mediaHeader);
 	}
 };
 
