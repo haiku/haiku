@@ -116,39 +116,39 @@ static char *decode_class(uint8 base, uint8 sub_class)
 		case 0x01:
 			switch (sub_class) {
 				case PCI_scsi:
-					return "mass storage controller: scsi";
+					return "mass storage: scsi";
 				case PCI_ide:
-					return "mass storage controller: ide";
+					return "mass storage: ide";
 				case PCI_floppy:
-					return "mass storage controller: floppy";
+					return "mass storage: floppy";
 				case PCI_ipi:
-					return "mass storage controller: ipi";
+					return "mass storage: ipi";
 				case PCI_raid:
-					return "mass storage controller: raid";
+					return "mass storage: raid";
 				case PCI_mass_storage_other:
-					return "mass storage controller: other";
+					return "mass storage: other";
 			}
 		case 0x02:
 			switch (sub_class) {
 				case PCI_ethernet:
-					return "network controller: ethernet";
+					return "network: ethernet";
 				case PCI_token_ring:
-					return "network controller: token ring";
+					return "network: token ring";
 				case PCI_fddi:
-					return "network controller: fddi";
+					return "network: fddi";
 				case PCI_atm:
-					return "network controller: atm";
+					return "network: atm";
 				case PCI_network_other:
-					return "network controller: other";
+					return "network: other";
 			}
 		case 0x03:
 			switch (sub_class) {
 				case PCI_vga:
-					return "display controller: vga";
+					return "display: vga";
 				case PCI_xga:
-					return "display controller: xga";
+					return "display: xga";
 				case PCI_display_other:
-					return "display controller: other";
+					return "display: other";
 			}					
 		case 0x04:
 			switch (sub_class) {
@@ -159,27 +159,27 @@ static char *decode_class(uint8 base, uint8 sub_class)
 				case PCI_multimedia_other:
 					return "multimedia device: other";
 			}
-		case 0x05: return "memory controller";
+		case 0x05: return "memory";
 		case 0x06:
 			switch (sub_class) {
 				case PCI_host:
-					return "bridge controller: host bridge";
+					return "bridge: host bridge";
 				case PCI_isa:
-					return "bridge controller: isa";
+					return "bridge: isa";
 				case PCI_eisa:
-					return "bridge controller: eisa";
+					return "bridge: eisa";
 				case PCI_microchannel:
-					return "bridge controller: microchannel";
+					return "bridge: microchannel";
 				case PCI_pci:
-					return "bridge controller: PCI";
+					return "bridge: PCI";
 				case PCI_pcmcia:
-					return "bridge controller: PC Card";
+					return "bridge: PC Card";
 				case PCI_nubus:
-					return "bridge controller: nubus";
+					return "bridge: nubus";
 				case PCI_cardbus:
-					return "bridge controller: CardBus";
+					return "bridge: CardBus";
 				case PCI_bridge_other:
-					return "bridge controller: other";
+					return "bridge: other";
 			}
 		case 0x07: return "simple comms controller";
 		case 0x08: return "base system peripheral";
@@ -189,15 +189,15 @@ static char *decode_class(uint8 base, uint8 sub_class)
 		case 0x0c:
 			switch (sub_class) {
 				case PCI_firewire:
-					return "bus controller: IEEE1394 FireWire";
+					return "bus: IEEE1394 FireWire";
 				case PCI_access:
-					return "bus controller: ACCESS.bus";
+					return "bus: ACCESS.bus";
 				case PCI_ssa:
-					return "bus controller: SSA";
+					return "bus: SSA";
 				case PCI_usb:
-					return "bus controller: USB";
+					return "bus: USB";
 				case PCI_fibre_channel:
-					return "bus controller: fibre channel";
+					return "bus: fibre channel";
 			}
 		case 0x0d: return "wireless";
 		case 0x0e: return "intelligent i/o ??";
@@ -775,6 +775,10 @@ static void print_pir_table(struct pir_table *tbl)
  * and scan the bus it defines.
  * The bus is initially taken off-line, scanned and then put back on-line
  *
+ * NB We increment the pci_max_bus value before we use mybus in the following
+ *    code and pci_max_bus is incremented before we recurse to preserve the
+ *    correct relationships with nubering.
+ *
  * We initally set the subordinate_bus to 0xff and then adjust it to the max
  * once we've scanned the bus on the other side of the bridge. See the URL
  * above for information on why this is done.
@@ -782,7 +786,7 @@ static void print_pir_table(struct pir_table *tbl)
 static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 {
 	uint16 command = 0;
-	uint8 mybus = pci_max_bus + 1;
+	uint8 mybus;
 	struct pci_device *pcid;
 	struct pci_bus *pcib;
 	pci_info *pcii;
@@ -791,11 +795,13 @@ static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 	command &= ~ 0x03;
 	write_pci_config(bus, dev, func, PCI_command, 2, command);
 
+	/* Keep Marcus happy */
+	pci_max_bus += 1;
+	mybus = pci_max_bus;
+	
 	write_pci_config(bus, dev, func, PCI_primary_bus, 1, bus);
 	write_pci_config(bus, dev, func, PCI_secondary_bus, 1, mybus);
 	write_pci_config(bus, dev, func, PCI_subordinate_bus, 1, 0xff);
-
-	pci_max_bus += 1;
 
 	dprintf("PCI-PCI bridge at %d:%d:%d configured as bus %d\n", bus, dev, func, mybus);
 	pci_scan_bus(mybus);
@@ -874,23 +880,30 @@ static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 
 static void debug_show_device(pci_info *pcii)
 {
-	dprintf("device at %d:%d:%d => %s\n", pcii->bus, pcii->device, 
+	uint16 status = read_pci_config(pcii->bus, pcii->device, pcii->function, PCI_status, 2);
+	
+	dprintf("device @ %d:%d:%d > %s [%04x:%04x]\n", pcii->bus, pcii->device, 
 	        pcii->function, 
-	        decode_class(pcii->class_base, pcii->class_sub));
-	dprintf("Capabilities: ");
-	if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_agp, NULL))
-		dprintf("AGP ");
-	if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_pm, NULL))
-		dprintf("Pwr Mgmt ");
-	if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_vpd, NULL))
-		dprintf("VPD ");
-	if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_slotid, NULL))
-		dprintf("slotID ");
-	if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_msi, NULL))
-		dprintf("MSI ");
-	if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_hotplug, NULL))
-		dprintf("hotplug ");
-	dprintf("\n");
+	        decode_class(pcii->class_base, pcii->class_sub),
+	        pcii->vendor_id, pcii->device_id);
+
+	if ((status & PCI_status_capabilities)) {
+		dprintf("Capabilities: ");
+		if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_agp, NULL))
+			dprintf("AGP ");
+		if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_pm, NULL))
+			dprintf("Pwr Mgmt ");
+		if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_vpd, NULL))
+			dprintf("VPD ");
+		if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_slotid, NULL))
+			dprintf("slotID ");
+		if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_msi, NULL))
+			dprintf("MSI ");
+		if (pci_get_capability(pcii->bus, pcii->device, pcii->function, PCI_cap_id_hotplug, NULL))
+			dprintf("hotplug ");
+		dprintf("\n");
+	} else 
+		dprintf("\t(No capabilities exist for this device)\n");
 }
 	
 static void pci_device_probe(uint8 bus, uint8 dev, uint8 func) 
