@@ -11,7 +11,8 @@
 //  Description: VolumeControl and link items in Deskbar
 //  Created :    October 20, 2003
 //	Modified by: Jérome Duval
-//      Modified by: François Revol, 10/31/2003
+//  Modified by: François Revol, 10/31/2003
+//  Modified by: Marcus Overhagen, 15/08/2004
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -77,6 +78,8 @@ public:
 
 	virtual void MessageReceived(BMessage *);
 private:
+	status_t LaunchByPath(const char *path);
+	status_t LaunchBySig(const char *sig);
 	void LoadSettings();
 	void SaveSettings();
 	BBitmap *		segments;
@@ -168,15 +171,33 @@ MediaReplicant::MessageReceived(BMessage *message)
 		break;
 	case OPEN_MEDIA_PLAYER:
 		// launch the media player app
-		be_roster->Launch("application/x-vnd.Be.MediaPlayer");
+		if (B_OK == LaunchBySig("application/x-vnd.Haiku.MediaPlayer"))
 			break;
+		if (B_OK == LaunchBySig("application/x-vnd.Be.MediaPlayer"))
+			break;
+		if (B_OK == LaunchByPath("/boot/beos/apps/MediaPlayer"))
+			break;
+		(new BAlert("desklink", "Couldn't launch MediaPlayer", "OK"))->Go();
+		break;
 	case MEDIA_SETTINGS:
 		// launch the media prefs app
-		be_roster->Launch("application/x-vnd.Be.MediaPrefs");
+		if (B_OK == LaunchBySig("application/x-vnd.Haiku.MediaPrefs"))
+			break;
+		if (B_OK == LaunchBySig("application/x-vnd.Be.MediaPrefs"))
+			break;
+		if (B_OK == LaunchByPath("/boot/home/config/be/Preferences/Media"))
+			break;
+		(new BAlert("desklink", "Couldn't launch Media Preferences", "OK"))->Go();
 		break;
 	case SOUND_SETTINGS:
 		// launch the sounds prefs app
-		be_roster->Launch("application/x-vnd.Be.SoundsPrefs");
+		if (B_OK == LaunchBySig("application/x-vnd.Haiku.SoundsPrefs"))
+			break;
+		if (B_OK == LaunchBySig("application/x-vnd.Be.SoundsPrefs"))
+			break;
+		if (B_OK == LaunchByPath("/boot/home/config/be/Preferences/Sounds"))
+			break;
+		(new BAlert("desklink", "Couldn't launch Sounds Preferences", "OK"))->Go();
 		break;
 	case TOGGLE_DONT_BEEP:
 		confDontBeep = !confDontBeep;
@@ -188,6 +209,46 @@ MediaReplicant::MessageReceived(BMessage *message)
 		BView::MessageReceived(message);
 		break;		
 	}
+}
+
+
+status_t
+MediaReplicant::LaunchByPath(const char *path)
+{
+	BEntry ent;
+	entry_ref ref;
+	app_info appInfo;
+	status_t err;
+
+	err = ent.SetTo(path);
+	if (err)
+		return err;
+	err = ent.GetRef(&ref);
+	if (err)
+		return err;
+	err = be_roster->Launch(&ref);
+	if (err != B_ALREADY_RUNNING)
+		return err; // should be B_OK or fatal error
+	err = be_roster->GetAppInfo(&ref, &appInfo);
+	if (err)
+		return err;
+	return be_roster->ActivateApp(appInfo.team);
+}
+
+
+status_t
+MediaReplicant::LaunchBySig(const char *sig)
+{
+	app_info appInfo;
+	status_t err;
+
+	err = be_roster->Launch(sig);
+	if (err != B_ALREADY_RUNNING)
+		return err; // should be B_OK or fatal error
+	err = be_roster->GetAppInfo(sig, &appInfo);
+	if (err)
+		return err;
+	return be_roster->ActivateApp(appInfo.team);
 }
 
 
