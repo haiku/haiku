@@ -355,7 +355,7 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 
 	if(sems[slot].count - count < 0 && (flags & B_TIMEOUT) != 0 && timeout <= 0) {
 		// immediate timeout
-		err = ERR_SEM_TIMED_OUT;
+		err = B_TIMED_OUT;
 		goto err;
 	}
 
@@ -423,7 +423,7 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 		RELEASE_THREAD_LOCK();
 
 		if((flags & B_TIMEOUT) != 0) {
-			if(t->sem_errcode != ERR_SEM_TIMED_OUT) {
+			if(t->sem_errcode != B_TIMED_OUT) {
 				// cancel the timer event, the sem may have been deleted or interrupted
 				// with the timer still active
 				timer_cancel_event(&timer);
@@ -603,9 +603,10 @@ int _get_next_sem_info(proc_id proc, uint32 *cookie, struct sem_info *info, size
 		return B_NO_MORE_SEMS;
 
 	if (cookie == NULL)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
+	/* prevents sems[].owner == -1 >= means owned by a port */
 	if (proc < 0)
-		return ERR_INVALID_ARGS;	// prevents sems[].owner == -1 >= means owned by a port
+		return EINVAL; 
 
 	if (*cookie == NULL) {
 		// return first found
@@ -642,7 +643,7 @@ int _get_next_sem_info(proc_id proc, uint32 *cookie, struct sem_info *info, size
 	int_restore_interrupts(state);
 
 	if (slot == MAX_SEMS)
-		return ERR_SEM_NOT_FOUND;
+		return B_BAD_SEM_ID;
 	*cookie = slot;
 	return B_NO_ERROR;
 }
@@ -657,7 +658,7 @@ int set_sem_owner(sem_id id, proc_id proc)
 	if(id < 0)
 		return B_BAD_SEM_ID;
 	if (proc < NULL)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	// XXX: todo check if proc exists
 //	if (proc_get_proc_struct(proc) == NULL)
@@ -687,17 +688,13 @@ int set_sem_owner(sem_id id, proc_id proc)
 // this function must be entered with interrupts disabled and THREADLOCK held
 int sem_interrupt_thread(struct thread *t)
 {
-//	struct thread *t1;
 	int slot;
-//	int state;
 	struct thread_queue wakeup_queue;
 
 //	dprintf("sem_interrupt_thread: called on thread %p (%d), blocked on sem 0x%x\n", t, t->id, t->sem_blocking);
 
-	if(t->state != THREAD_STATE_WAITING)
-		return ERR_INVALID_ARGS;
-	if(t->sem_blocking < 0)
-		return ERR_INVALID_ARGS;
+	if(t->state != THREAD_STATE_WAITING || t->sem_blocking < 0)
+		return EINVAL;
 	if((t->sem_flags & B_CAN_INTERRUPT) == 0)
 		return ERR_SEM_NOT_INTERRUPTABLE;
 

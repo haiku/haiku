@@ -348,7 +348,7 @@ delete_port(port_id id)
 	kfree(old_name);
 
 	// release the threads that were blocking on this port by deleting the sem
-	// read_port() will see the ERR_SEM_DELETED acq_sem() return value, and act accordingly
+	// read_port() will see the B_BAD_SEM_ID acq_sem() return value, and act accordingly
 	delete_sem(r_sem);
 	delete_sem(w_sem);
 
@@ -529,12 +529,12 @@ port_buffer_size_etc(port_id id,
 	res = acquire_sem_etc(ports[slot].read_sem, 1, flags & (B_TIMEOUT | B_CAN_INTERRUPT), timeout);
 
 	GRAB_PORT_LOCK(ports[slot]);
-	if (res == ERR_SEM_DELETED) {
+	if (res == B_BAD_SEM_ID) {
 		// somebody deleted the port
 		RELEASE_PORT_LOCK(ports[slot]);
 		return B_BAD_PORT_ID;
 	}
-	if (res == ERR_SEM_TIMED_OUT) {
+	if (res == B_TIMED_OUT) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		return B_TIMED_OUT;
 	}
@@ -663,12 +663,12 @@ read_port_etc(port_id id,
 	//      both threads will read in 2 different slots allocated above, simultaneously
 	// 		slot is a thread-local variable
 
-	if (res == ERR_SEM_DELETED || res == EINTR) {
+	if (res == B_BAD_SEM_ID || res == EINTR) {
 		/* somebody deleted the port or the sem went away */
 		return B_BAD_PORT_ID;
 	}
 
-	if (res == ERR_SEM_TIMED_OUT) {
+	if (res == B_TIMED_OUT) {
 		// timed out, or, if timeout=0, 'would block'
 		return B_BAD_PORT_ID;
 	}
@@ -833,12 +833,12 @@ write_port_etc(port_id id,
 	//      both threads will write in 2 different slots allocated above, simultaneously
 	// 		slot is a thread-local variable
 
-	if (res == ERR_SEM_DELETED || res == EINTR) {
+	if (res == B_BAD_PORT_ID || res == EINTR) {
 		/* somebody deleted the port or the sem while we were waiting */
 		return B_BAD_PORT_ID;
 	}
 
-	if (res == ERR_SEM_TIMED_OUT) {
+	if (res == B_TIMED_OUT) {
 		// timed out, or, if timeout=0, 'would block'
 		return B_TIMED_OUT;
 	}

@@ -251,7 +251,7 @@ static int user_copy_arg_list(char **args, int argc, char ***kargs)
 
 	largs = (char **)kmalloc((argc + 1) * sizeof(char *));
 	if(largs == NULL){
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 	}
 
 	// scan all parameters and copy to kernel space
@@ -273,7 +273,7 @@ static int user_copy_arg_list(char **args, int argc, char ***kargs)
 
 		largs[cnt] = (char *)kstrdup(buf);
 		if(largs[cnt] == NULL){
-			err = ERR_NO_MEMORY;
+			err = ENOMEM;
 			goto error;
 		}
 	}
@@ -407,7 +407,7 @@ static thread_id _create_thread(const char *name, proc_id pid, addr entry, void 
 
 	t = create_thread_struct(name);
 	if(t == NULL)
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 
 	t->priority = priority == -1 ? THREAD_MEDIUM_PRIORITY : priority;
 	t->state = THREAD_STATE_BIRTH;
@@ -536,7 +536,7 @@ int thread_suspend_thread(thread_id id)
 	if (t != NULL) {
 		if (t->proc == kernel_proc) {
 			// no way
-			retval = ERR_NOT_ALLOWED;
+			retval = EPERM;
 		} else if (t->in_kernel == true) {
 			t->pending_signals |= SIG_SUSPEND;
 			retval = B_NO_ERROR;
@@ -962,7 +962,7 @@ int thread_init(kernel_args *ka)
 		t = create_thread_struct(temp);
 		if(t == NULL) {
 			panic("error creating idle thread struct\n");
-			return ERR_NO_MEMORY;
+			return ENOMEM;
 		}
 		t->proc = proc_get_kernel_proc();
 		t->priority = THREAD_IDLE_PRIORITY;
@@ -996,7 +996,7 @@ int thread_init(kernel_args *ka)
 	death_stacks = (struct death_stack *)kmalloc(num_death_stacks * sizeof(struct death_stack));
 	if(death_stacks == NULL) {
 		panic("error creating death stacks\n");
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 	}
 	{
 		char temp[64];
@@ -1253,7 +1253,7 @@ static int _thread_kill_thread(thread_id id, bool wait_on)
 	if(t != NULL) {
 		if(t->proc == kernel_proc) {
 			// can't touch this
-			rc = ERR_NOT_ALLOWED;
+			rc = EPERM;
 		} else {
 			deliver_signal(t, SIG_KILL);
 			rc = B_NO_ERROR;
@@ -1330,7 +1330,7 @@ int thread_wait_on_thread(thread_id id, int *retcode)
 	rc = acquire_sem(sem);
 
 	/* This thread died the way it should, dont ripple a non-error up */
-	if (rc == ERR_SEM_DELETED)
+	if (rc == B_BAD_SEM_ID)
 		rc = B_NO_ERROR;
 
 	return rc;
@@ -1732,7 +1732,7 @@ proc_id proc_create_proc(const char *path, const char *name, char **args, int ar
 
 	p = create_proc_struct(name, false);
 	if(p == NULL)
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 
 	pid = p->id;
 
@@ -1745,12 +1745,12 @@ proc_id proc_create_proc(const char *path, const char *name, char **args, int ar
 	// copy the args over
 	pargs = (struct proc_arg *)kmalloc(sizeof(struct proc_arg));
 	if(pargs == NULL){
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto err1;
 	}
 	pargs->path = (char *)kstrdup(path);
 	if(pargs->path == NULL){
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto err2;
 	}
 	pargs->argc = argc;
@@ -1759,7 +1759,7 @@ proc_id proc_create_proc(const char *path, const char *name, char **args, int ar
 	// create a new ioctx for this process
 	p->ioctx = vfs_new_io_context(thread_get_current_thread()->proc->ioctx);
 	if(!p->ioctx) {
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto err3;
 	}
 
@@ -1876,7 +1876,7 @@ int user_proc_get_table(struct proc_info *pbuf, size_t len)
 	if (count < max)
 		return count;
 	else
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 }
 
 
@@ -2019,7 +2019,7 @@ int user_getrlimit(int resource, struct rlimit * urlp)
 	struct rlimit	rl;
 
 	if (urlp == NULL) {
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 	if((addr)urlp >= KERNEL_BASE && (addr)urlp <= KERNEL_TOP) {
 		return ERR_VM_BAD_USER_MEMORY;
@@ -2061,7 +2061,7 @@ int user_setrlimit(int resource, const struct rlimit * urlp)
 	struct rlimit	rl;
 
 	if (urlp == NULL) {
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 	if((addr)urlp >= KERNEL_BASE && (addr)urlp <= KERNEL_TOP) {
 		return ERR_VM_BAD_USER_MEMORY;
