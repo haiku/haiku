@@ -150,47 +150,120 @@ struct option options[] =
 void
 TerminalApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 {
-	if (argc <= 1) {
-		OpenTerminal();
-	} else if (argv[1][0] != '-') {
-		argc--;
-		printf("execvp(%ld,%s ...)\n",argc,argv[1]);
-		OpenTerminal();
-	} else {
-		const char * execname = (argc >= 1 ? argv[0] : "");
-		const char * title = 0;
-		int indexptr = 0;
-		int ch;
-		char * const * optargv = (char * const *)argv;
-		while ((ch = getopt_long_only(argc, optargv, "g:hmp:t:", options, &indexptr)) != -1) {
-			switch (ch) {
-			case 'h':
-				PrintUsage(execname);
-				return;
-			break;
-			case 't':
-				title = optarg;
-				printf("title is %s\n", title);
-			break;
-			case ':':
-				switch (optopt) {
+	BMessage * terminal = new BMessage(OPEN_TERMINAL);
+	if (argc > 1) {
+		if (argv[1][0] == '-') {
+			const char * execname = (argc >= 1 ? argv[0] : "");
+			const char * title = 0;
+			int indexptr = 0;
+			int ch;
+			char * const * optargv = (char * const *)argv;
+			while ((ch = getopt_long_only(argc, optargv, "hg:mp:t:", options, &indexptr)) != -1) {
+				switch (ch) {
+				case 'h':
+					PrintUsage(execname);
+					delete terminal;
+					return;
+				break;
+				case 'g':
+					printf("geometry is %s = ",optarg);
+					int m, n;
+					if ((sscanf(optarg,"%ldx%ld%s",&m,&n) != 2) || (m < 0) || (n < 0)) {
+						printf("??\n");
+						printf("geometry must be of the format MxN where M and N are positive integers\n");
+						delete terminal;
+						return;
+					}
+					printf("%ld,%ld\n",m,n);
+					terminal->AddInt32("columns",m);
+					terminal->AddInt32("rows",n);					
+				break;
+				case 'm':
+					printf("pass meta through to shell\n");
+					terminal->AddBool("meta",true);
+				break;
 				case 't':
-					printf("-t without title\n");
+					printf("title is %s\n",optarg);
+					terminal->AddString("title",optarg);
+				break;
+				case 'p': {
+					printf("prefs file is %s\n",optarg);
+					BPath pref;
+					if (optarg[0] == '/') {
+						pref.SetTo(optarg);
+					} else {
+						pref.SetTo(cwd,optarg);
+					}
+					entry_ref ref;
+					switch (get_ref_for_path(pref.Path(),&ref)) {
+						case B_OK:
+						break;
+						case B_ENTRY_NOT_FOUND:
+							printf("could not find entry for prefs file '%s'\n",optarg);
+							delete terminal;
+							return;
+						break;
+						case B_NO_MEMORY:
+							printf("not enough memory in get_ref_for_path\n");
+							delete terminal;
+							return;
+						break;
+						default:
+							printf("unknown error in get_ref_for_path\n");
+							delete terminal;
+							return;
+					}
+					terminal->AddRef("pref",&ref);
+				}
+				break;					
+				case ':':
+					switch (optopt) {
+					case 't':
+						printf("-t option must be specified with a title\n");
+						delete terminal;
+						return;
+					break;
+					default:
+						printf("-%c missing argument\n", optopt);
+						delete terminal;
+						return;
+					}
+				break;
+				case '?':
+					delete terminal;
+					return;
 				break;
 				default:
-					printf("-%c missing argument\n", optopt);
+					switch (options[indexptr].val) {
+					case 1: // curbg
+						printf("curbg = %s\n",optarg);
+					break;
+					case 2: // curfg
+						printf("curfg = %s\n",optarg);
+					break;
+					case 3: // bg
+						printf("bg = %s\n",optarg);
+					break;
+					case 4: // fg
+						printf("fg = %s\n",optarg);
+					break;
+					case 5: // selbg
+						printf("selbg = %s\n",optarg);
+					break;
+					case 6: // selfg
+						printf("selfg = %s\n",optarg);
+					break;
+					default:
+						printf("invalid indexptr %ld\n",indexptr);
+						delete terminal;
+						return;
+					}		
 				}
-			break;
-			case '?':
-				printf("unknown arg %c\n", optopt);
-			break;
-			default:
-				printf("%s\n",argv[optind]);
-				return;
 			}
 		}
-		OpenTerminal();
+		printf("execvp(%ld,%s ...)\n",argc-optind,argv[optind]);
 	}
+	PostMessage(terminal);
 	return;
 }
 

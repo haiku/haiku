@@ -9,6 +9,10 @@
 
 const float TEXT_INSET = 3.0;
 
+// Application messages
+
+const uint32 OPEN_TERMINAL              ='OTRM';
+
 // Messages for menu commands
 
 // Terminal
