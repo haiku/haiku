@@ -55,8 +55,9 @@ _user_get_safemode_option(const char *userParameter, char *userBuffer, size_t *_
 	originalBufferSize = bufferSize;
 	status_t status = get_safemode_option(parameter, buffer, &bufferSize);
 
-	if (user_strlcpy(userBuffer, buffer, originalBufferSize) < B_OK
-		|| user_memcpy(_userBufferSize, &bufferSize, sizeof(size_t)) < B_OK)
+	if (status == B_OK
+		&& (user_strlcpy(userBuffer, buffer, originalBufferSize) < B_OK
+			|| user_memcpy(_userBufferSize, &bufferSize, sizeof(size_t)) < B_OK))
 		return B_BAD_ADDRESS;
 
 	return status;
