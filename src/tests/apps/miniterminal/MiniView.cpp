@@ -52,15 +52,16 @@ Setenv(const char *var, const char *value)
 	while (environ [envindex] != NULL) {
 		if (strncmp (environ [envindex], var, len) == 0) {
 			/* found it */
-			environ[envindex] = (char *)malloc ((unsigned)len + val_len + 1);
-			sprintf (environ [envindex], "%s%s", var, value);
+			// TODO: shouldn't we free the old variable first?
+			environ[envindex] = (char *)malloc ((unsigned)len + val_len + 2);
+			sprintf (environ [envindex], "%s=%s", var, value);
 			return;
 		}
 		envindex ++;
 	}
 	
-	environ [envindex] = (char *) malloc ((unsigned)len + val_len + 1);
-	sprintf (environ [envindex], "%s%s", var, value);
+	environ [envindex] = (char *) malloc ((unsigned)len + val_len + 2);
+	sprintf (environ [envindex], "%s=%s", var, value);
 	environ [++envindex] = NULL;
 }
 
