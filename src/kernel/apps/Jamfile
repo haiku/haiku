@@ -20,10 +20,6 @@ UsePrivateHeaders kernel ;
 UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
 UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 
-StdBinCommands
-	cache_control.cpp
-	: libroot.so ;
-
 if $(OBOS_ARCH) = x86 {
 	SubInclude OBOS_TOP src kernel apps cpuinfo ;
 }

@@ -4,12 +4,17 @@ SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core cache ] ;
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core ] ;
 
 UsePrivateHeaders kernel ;
+UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src kernel core cache ] ;
+
+StdBinCommands
+	cache_control.cpp
+	: libroot.so ;
 
 SimpleTest BlockMapTest :
 	BlockMapTest.cpp
 	BlockMap.cpp
 	khash.c
-	: libkernelland_emu.so
-	;
+	: libkernelland_emu.so ;
 
