@@ -36,7 +36,7 @@
 #include "ServerCursor.h"
 #include "CursorData.h"
 
-// TODO: Remove remnants of old API.  Inplement all functions.  Bounds checking needs to be
+// TODO: Implement all functions.  Bounds checking needs to be
 // handled by the public drawing functions.
 // Add clipping and make sure public functions have Lock & Unlock.
 
@@ -53,10 +53,6 @@ DisplayDriver::DisplayDriver(void) :
 {
 	_locker=new BLocker();
 	fCursorHandler.SetCursor(new ServerCursor(default_cursor_data));
-//	_is_cursor_hidden=false;
-//	_is_cursor_obscured=false;
-//	_cursor=NULL;
-//	_cursorsave=NULL;
 	fDPMSCaps=B_DPMS_ON;
 	fDPMSState=B_DPMS_ON;
 }
@@ -284,35 +280,6 @@ DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap,
 	Invalidate(destrect);
 }
 
-/*!
-	\brief Called for all BView::DrawBitmap calls
-	\param bmp Bitmap to be drawn. It will always be non-NULL and valid. The color 
-	space is not guaranteed to match.
-	\param src Source rectangle
-	\param dest Destination rectangle. Source will be scaled to fit if not the same size.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-*/
-
-//void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d)
-//{
-/*	Lock();
-
-	FBBitmap		frameBuffer;
-	//FBBitmap		*fbmp = &frameBuffer;
-	
-	if(!AcquireBuffer(&frameBuffer))
-	{
-		debugger("ERROR: Couldn't acquire framebuffer in DrawBitmap()\n");
-		return;
-	}
-	
-	ReleaseBuffer();
-	Unlock();
-	
-	Invalidate(dest);
-*/
-//}
-
 void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BRegion* clipReg)
 {
 	Lock();
@@ -446,372 +413,6 @@ void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BReg
 	Invalidate(inval);
 //	ConstrainClippingRegion(NULL);
 }
-
-
-/*!
-	\brief Called for all BView::FillArc calls
-	\param r Rectangle enclosing the entire arc
-	\param angle Starting angle for the arc in degrees
-	\param span Span of the arc in degrees. Ending angle = angle+span.
-	\param color The color of the arc
-*/
-/*void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, const RGBColor &color)
-{
-	if(fCursorHandler.IntersectsCursor(r))
-		fCursorHandler.DriverHide();
-	
-	float xc = (r.left+r.right)/2;
-	float yc = (r.top+r.bottom)/2;
-	float rx = r.Width()/2;
-	float ry = r.Height()/2;
-	int Rx2 = ROUND(rx*rx);
-	int Ry2 = ROUND(ry*ry);
-	int twoRx2 = 2*Rx2;
-	int twoRy2 = 2*Ry2;
-	int p;
-	int x=0;
-	int y = (int)ry;
-	int px = 0;
-	int py = twoRx2 * y;
-	int startx, endx;
-	int starty, endy;
-	int xclip, startclip, endclip;
-	int startQuad, endQuad;
-	bool useQuad1, useQuad2, useQuad3, useQuad4;
-	bool shortspan = false;
-
-	// Watch out for bozos giving us whacko spans
-	if ( (span >= 360) || (span <= -360) )
-	{
-		FillEllipse(r,color);
-		fCursorHandler.DriverShow();
-		return;
-	}
-
-	Lock();
-
-	if ( span > 0 )
-	{
-		startQuad = (int)(angle/90)%4+1;
-		endQuad = (int)((angle+span)/90)%4+1;
-		startx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
-		endx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
-	}
-	else
-	{
-		endQuad = (int)(angle/90)%4+1;
-		startQuad = (int)((angle+span)/90)%4+1;
-		endx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
-		startx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
-	}
-
-	starty = ROUND(ry*sqrt(1-(double)startx*startx/(rx*rx)));
-	endy = ROUND(ry*sqrt(1-(double)endx*endx/(rx*rx)));
-
-	if ( startQuad != endQuad )
-	{
-		useQuad1 = (endQuad > 1) && (startQuad > endQuad);
-		useQuad2 = ((startQuad == 1) && (endQuad > 2)) || ((startQuad > endQuad) && (endQuad > 2));
-		useQuad3 = ((startQuad < 3) && (endQuad == 4)) || ((startQuad < 3) && (endQuad < startQuad));
-		useQuad4 = (startQuad < 4) && (startQuad > endQuad);
-	}
-	else
-	{
-		if ( (span < 90) && (span > -90) )
-		{
-			useQuad1 = false;
-			useQuad2 = false;
-			useQuad3 = false;
-			useQuad4 = false;
-			shortspan = true;
-		}
-		else
-		{
-			useQuad1 = (startQuad != 1);
-			useQuad2 = (startQuad != 2);
-			useQuad3 = (startQuad != 3);
-			useQuad4 = (startQuad != 4);
-		}
-	}
-
-	if ( useQuad1 )
-		StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-	if ( useQuad2 )
-		StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc-x),ROUND(yc-y),color);
-	if ( useQuad3 )
-		StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc-x),ROUND(yc+y),color);
-	if ( useQuad4 )
-		StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-
-	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
-	while (px < py)
-	{
-		x++;
-		px += twoRy2;
-		if ( p < 0 )
-			p += Ry2 + px;
-		else
-		{
-			y--;
-			py -= twoRx2;
-			p += Ry2 + px - py;
-		}
-
-		if ( useQuad1 )
-			StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-		if ( useQuad2 )
-			StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc-x),ROUND(yc-y),color);
-		if ( useQuad3 )
-			StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc-x),ROUND(yc+y),color);
-		if ( useQuad4 )
-			StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-		if ( !shortspan )
-		{
-			if ( startQuad == 1 )
-			{
-				if ( x <= startx )
-					StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-				else
-				{
-					xclip = ROUND(y*startx/(double)starty);
-					StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc+xclip),ROUND(yc-y),color);
-				}
-			}
-			else if ( startQuad == 2 )
-			{
-				if ( x >= startx )
-				{
-					xclip = ROUND(y*startx/(double)starty);
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc-xclip),ROUND(yc-y),color);
-				}
-			}
-			else if ( startQuad == 3 )
-			{
-				if ( x <= startx )
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc),ROUND(yc+y),color);
-				else
-				{
-					xclip = ROUND(y*startx/(double)starty);
-					StrokeSolidLine(ROUND(xc-xclip),ROUND(yc+y),ROUND(xc),ROUND(yc+y),color);
-				}
-			}
-			else if ( startQuad == 4 )
-			{
-				if ( x >= startx )
-				{
-					xclip = ROUND(y*startx/(double)starty);
-					StrokeSolidLine(ROUND(xc+xclip),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-				}
-			}
-
-			if ( endQuad == 1 )
-			{
-				if ( x >= endx )
-				{
-					xclip = ROUND(y*endx/(double)endy);
-					StrokeSolidLine(ROUND(xc+xclip),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-				}
-			}
-			else if ( endQuad == 2 )
-			{
-				if ( x <= endx )
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc),ROUND(yc-y),color);
-				else
-				{
-					xclip = ROUND(y*endx/(double)endy);
-					StrokeSolidLine(ROUND(xc-xclip),ROUND(yc-y),ROUND(xc),ROUND(yc-y),color);
-				}
-			}
-			else if ( endQuad == 3 )
-			{
-				if ( x >= endx )
-				{
-					xclip = ROUND(y*endx/(double)endy);
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc-xclip),ROUND(yc+y),color);
-				}
-			}
-			else if ( endQuad == 4 )
-			{
-				if ( x <= endx )
-					StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-				else
-				{
-					xclip = ROUND(y*endx/(double)endy);
-					StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc+xclip),ROUND(yc+y),color);
-				}
-			}
-		}
-		else
-		{
-			startclip = ROUND(y*startx/(double)starty);
-			endclip = ROUND(y*endx/(double)endy);
-			if ( startQuad == 1 )
-			{
-				if ( (x <= startx) && (x >= endx) )
-					StrokeSolidLine(ROUND(xc+endclip),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-				else
-					StrokeSolidLine(ROUND(xc+endclip),ROUND(yc-y),ROUND(xc+startclip),ROUND(yc-y),color);
-			}
-			else if ( startQuad == 2 )
-			{
-				if ( (x <= startx) && (x >= endx) )
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc-startclip),ROUND(yc-y),color);
-				else
-					StrokeSolidLine(ROUND(xc-endclip),ROUND(yc-y),ROUND(xc-startclip),ROUND(yc-y),color);
-			}
-			else if ( startQuad == 3 )
-			{
-				if ( (x <= startx) && (x >= endx) )
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc-endclip),ROUND(yc+y),color);
-				else
-					StrokeSolidLine(ROUND(xc-startclip),ROUND(yc+y),ROUND(xc-endclip),ROUND(yc+y),color);
-			}
-			else if ( startQuad == 4 )
-			{
-				if ( (x <= startx) && (x >= endx) )
-					StrokeSolidLine(ROUND(xc+startclip),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-				else
-					StrokeSolidLine(ROUND(xc+startclip),ROUND(yc+y),ROUND(xc+endclip),ROUND(yc+y),color);
-			}
-		}
-	}
-
-	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
-	while (y>0)
-	{
-		y--;
-		py -= twoRx2;
-		if (p>0)
-			p += Rx2 - py;
-		else
-		{
-			x++;
-			px += twoRy2;
-			p += Rx2 - py +px;
-		}
-
-		if ( useQuad1 )
-			StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-		if ( useQuad2 )
-			StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc-x),ROUND(yc-y),color);
-		if ( useQuad3 )
-			StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc-x),ROUND(yc+y),color);
-		if ( useQuad4 )
-			StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-		if ( !shortspan )
-		{
-			if ( startQuad == 1 )
-			{
-				if ( x <= startx )
-					StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-				else
-				{
-					xclip = ROUND(y*startx/(double)starty);
-					StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc+xclip),ROUND(yc-y),color);
-				}
-			}
-			else if ( startQuad == 2 )
-			{
-				if ( x >= startx )
-				{
-					xclip = ROUND(y*startx/(double)starty);
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc-xclip),ROUND(yc-y),color);
-				}
-			}
-			else if ( startQuad == 3 )
-			{
-				if ( x <= startx )
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc),ROUND(yc+y),color);
-				else
-				{
-					xclip = ROUND(y*startx/(double)starty);
-					StrokeSolidLine(ROUND(xc-xclip),ROUND(yc+y),ROUND(xc),ROUND(yc+y),color);
-				}
-			}
-			else if ( startQuad == 4 )
-			{
-				if ( x >= startx )
-				{
-					xclip = ROUND(y*startx/(double)starty);
-					StrokeSolidLine(ROUND(xc+xclip),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-				}
-			}
-
-			if ( endQuad == 1 )
-			{
-				if ( x >= endx )
-				{
-					xclip = ROUND(y*endx/(double)endy);
-					StrokeSolidLine(ROUND(xc+xclip),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-				}
-			}
-			else if ( endQuad == 2 )
-			{
-				if ( x <= endx )
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc),ROUND(yc-y),color);
-				else
-				{
-					xclip = ROUND(y*endx/(double)endy);
-					StrokeSolidLine(ROUND(xc-xclip),ROUND(yc-y),ROUND(xc),ROUND(yc-y),color);
-				}
-			}
-			else if ( endQuad == 3 )
-			{
-				if ( x >= endx )
-				{
-					xclip = ROUND(y*endx/(double)endy);
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc-xclip),ROUND(yc+y),color);
-				}
-			}
-			else if ( endQuad == 4 )
-			{
-				if ( x <= endx )
-					StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-				else
-				{
-					xclip = ROUND(y*endx/(double)endy);
-					StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc+xclip),ROUND(yc+y),color);
-				}
-			}
-		}
-		else
-		{
-			startclip = ROUND(y*startx/(double)starty);
-			endclip = ROUND(y*endx/(double)endy);
-			if ( startQuad == 1 )
-			{
-				if ( (x <= startx) && (x >= endx) )
-					StrokeSolidLine(ROUND(xc+endclip),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-				else
-					StrokeSolidLine(ROUND(xc+endclip),ROUND(yc-y),ROUND(xc+startclip),ROUND(yc-y),color);
-			}
-			else if ( startQuad == 2 )
-			{
-				if ( (x <= startx) && (x >= endx) )
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc-startclip),ROUND(yc-y),color);
-				else
-					StrokeSolidLine(ROUND(xc-endclip),ROUND(yc-y),ROUND(xc-startclip),ROUND(yc-y),color);
-			}
-			else if ( startQuad == 3 )
-			{
-				if ( (x <= startx) && (x >= endx) )
-					StrokeSolidLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc-endclip),ROUND(yc+y),color);
-				else
-					StrokeSolidLine(ROUND(xc-startclip),ROUND(yc+y),ROUND(xc-endclip),ROUND(yc+y),color);
-			}
-			else if ( startQuad == 4 )
-			{
-				if ( (x <= startx) && (x >= endx) )
-					StrokeSolidLine(ROUND(xc+startclip),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-				else
-					StrokeSolidLine(ROUND(xc+startclip),ROUND(yc+y),ROUND(xc+endclip),ROUND(yc+y),color);
-			}
-		}
-	}
-	fCursorHandler.DriverShow();
-	Invalidate(r);
-	Unlock();
-}*/
 
 /*!
 	\brief Called for all BView::FillArc calls
@@ -1181,22 +782,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 	Invalidate(r);
 	Unlock();
 }
-/*
-void DisplayDriver::FillBezier(BPoint *pts, const RGBColor &color)
-{
-	Lock();
 
-	BezierCurve curve(pts);
-	
-	if(fCursorHandler.IntersectsCursor(curve.Frame()))
-		fCursorHandler.DriverHide();
-	
-	FillPolygon(curve.GetPointArray(), curve.points.CountItems(), curve.Frame(), color);
-	
-	fCursorHandler.DriverShow();
-	Unlock();
-}
-*/
 /*!
 	\brief Called for all BView::FillBezier calls.
 	\param pts 4-element array of BPoints in the order of start, end, and then the two control
@@ -1217,76 +803,7 @@ void DisplayDriver::FillBezier(BPoint *pts, const DrawData *d)
 	fCursorHandler.DriverShow();
 	Unlock();
 }
-/*!
-	\brief Called for all BView::FillEllipse calls
-	\param r BRect enclosing the ellipse to be drawn.
-	\param color The color of the ellipse
-*/
-/*
-void DisplayDriver::FillEllipse(const BRect &r, const RGBColor &color)
-{
-	float xc = (r.left+r.right)/2;
-	float yc = (r.top+r.bottom)/2;
-	float rx = r.Width()/2;
-	float ry = r.Height()/2;
-	int Rx2 = ROUND(rx*rx);
-	int Ry2 = ROUND(ry*ry);
-	int twoRx2 = 2*Rx2;
-	int twoRy2 = 2*Ry2;
-	int p;
-	int x=0;
-	int y = (int)ry;
-	int px = 0;
-	int py = twoRx2 * y;
 
-	Lock();
-
-	if(fCursorHandler.IntersectsCursor(r))
-		fCursorHandler.DriverHide();
-	
-	StrokeSolidLine(ROUND(xc),ROUND(yc-y),ROUND(xc),ROUND(yc-y),color);
-	StrokeSolidLine(ROUND(xc),ROUND(yc+y),ROUND(xc),ROUND(yc+y),color);
-
-	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
-	while (px < py)
-	{
-		x++;
-		px += twoRy2;
-		if ( p < 0 )
-			p += Ry2 + px;
-		else
-		{
-			y--;
-			py -= twoRx2;
-			p += Ry2 + px - py;
-		}
-
-               	StrokeSolidLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-                StrokeSolidLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-	}
-
-	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
-	while (y>0)
-	{
-		y--;
-		py -= twoRx2;
-		if (p>0)
-			p += Rx2 - py;
-		else
-		{
-			x++;
-			px += twoRy2;
-			p += Rx2 - py +px;
-		}
-
-               	StrokeSolidLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),color);
-                StrokeSolidLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),color);
-	}
-	fCursorHandler.DriverShow();
-	Invalidate(r);
-	Unlock();
-}
-*/
 /*!
 	\brief Called for all BView::FillEllipse calls
 	\param r BRect enclosing the ellipse to be drawn.
@@ -1359,153 +876,6 @@ void DisplayDriver::FillEllipse(const BRect &r, const DrawData *d)
 	Invalidate(r);
 	Unlock();
 }
-
-/*!
-	\brief Called for all BView::FillPolygon calls
-	\param ptlist Array of BPoints defining the polygon.
-	\param numpts Number of points in the BPoint array.
-	\param color  The color of the polygon
-*/
-/*
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const RGBColor &color)
-{
-	// Here's the plan.  Record all line segments in polygon.  If a line segments crosses
-	// the y-value of a point not in the segment, split the segment into 2 segments.
-	// Once we have gone through all of the segments, sort them primarily on y-value
-	// and secondarily on x-value.  Step through each y-value in the bounding rectangle
-	// and look for intersections with line segments.  First intersection is start of
-	// horizontal line, second intersection is end of horizontal line.  Continue for
-	// all pairs of intersections.  Watch out for horizontal line segments.
-	
-	if ( !ptlist || (numpts < 3) )
-		return;
-
-	Lock();
-
-	if(fCursorHandler.IntersectsCursor(bounds))
-		fCursorHandler.DriverHide();
-	
-	BPoint *currentPoint, *nextPoint;
-	BPoint tempNextPoint;
-	BPoint tempCurrentPoint;
-	int currentIndex, bestIndex, i, j, y;
-	LineCalc *segmentArray = new LineCalc[2*numpts];
-	int numSegments = 0;
-	int minX, minY, maxX, maxY;
-
-	minX = ROUND(ptlist[0].x);
-	maxX = ROUND(ptlist[0].x);
-	minY = ROUND(ptlist[0].y);
-	maxY = ROUND(ptlist[0].y);
-	
-	// Generate the segment list
-	currentPoint = ptlist;
-	currentIndex = 0;
-	nextPoint = &ptlist[1];
-	while (currentPoint)
-	{
-		if ( numSegments >= 2*numpts )
-		{
-			printf("ERROR: Insufficient memory allocated to segment array\n");
-			delete[] segmentArray;
-			Unlock();
-			return;
-		}
-
-		if ( ROUND(currentPoint->x) < minX )
-			minX = ROUND(currentPoint->x);
-		if ( ROUND(currentPoint->x) > maxX )
-			maxX = ROUND(currentPoint->x);
-		if ( ROUND(currentPoint->y) < minY )
-			minY = ROUND(currentPoint->y);
-		if ( ROUND(currentPoint->y) > maxY )
-			maxY = ROUND(currentPoint->y);
-
-		for (i=0; i<numpts; i++)
-		{
-			if ( ((ptlist[i].y > currentPoint->y) && (ptlist[i].y < nextPoint->y)) ||
-				((ptlist[i].y < currentPoint->y) && (ptlist[i].y > nextPoint->y)) )
-			{
-				segmentArray[numSegments].SetPoints(*currentPoint,*nextPoint);
-				tempNextPoint.x = segmentArray[numSegments].GetX(ptlist[i].y);
-				tempNextPoint.y = ptlist[i].y;
-				nextPoint = &tempNextPoint;
-			}
-		}
-
-		segmentArray[numSegments].SetPoints(*currentPoint,*nextPoint);
-		numSegments++;
-		if ( nextPoint == &tempNextPoint )
-		{
-			tempCurrentPoint = tempNextPoint;
-			currentPoint = &tempCurrentPoint;
-			nextPoint = &ptlist[(currentIndex+1)%numpts];
-		}
-		else if ( nextPoint == ptlist )
-		{
-			currentPoint = NULL;
-		}
-		else
-		{
-			currentPoint = nextPoint;
-			currentIndex++;
-			nextPoint = &ptlist[(currentIndex+1)%numpts];
-		}
-	}
-
-	// Selection sort the segments.  Probably should replace this later.
-	for (i=0; i<numSegments; i++)
-	{
-		bestIndex = i;
-		for (j=i+1; j<numSegments; j++)
-		{
-			if ( (segmentArray[j].MinY() < segmentArray[bestIndex].MinY()) ||
-				((segmentArray[j].MinY() == segmentArray[bestIndex].MinY()) &&
-				 (segmentArray[j].MinX() < segmentArray[bestIndex].MinX())) )
-				bestIndex = j;
-		}
-		if (bestIndex != i)
-			segmentArray[i].Swap(segmentArray[bestIndex]);
-	}
-
-	// Draw the lines
-	for (y=minY; y<=maxY; y++)
-	{
-		i = 0;
-		while (i<numSegments)
-		{
-			if (segmentArray[i].MinY() > y)
-				break;
-			if (segmentArray[i].MaxY() < y)
-			{
-				i++;
-				continue;
-			}
-			if (segmentArray[i].MinY() == segmentArray[i].MaxY())
-			{
-				if ( (segmentArray[i].MinX() < fDisplayMode.virtual_width) &&
-					(segmentArray[i].MaxX() >= 0) )
-					StrokeSolidLine(ROUND(segmentArray[i].MinX()), y,
-							  ROUND(segmentArray[i].MaxX()), y, color);
-				i++;
-			}
-			else
-			{
-				if ( (segmentArray[i+1].GetX(y) < fDisplayMode.virtual_width) &&
-					(segmentArray[i].GetX(y) >= 0) )
-					StrokeSolidLine(ROUND(segmentArray[i].GetX(y)), y,
-							  ROUND(segmentArray[i+1].GetX(y)), y, color);
-				i+=2;
-			}
-		}
-	}
-
-	delete[] segmentArray;
-	fCursorHandler.DriverShow();
-	Invalidate(bounds);
-	Unlock();
-
-}*/
 
 /*!
 	\brief Called for all BView::FillPolygon calls
@@ -1776,29 +1146,6 @@ void DisplayDriver::FillRect(const BRect &r, const DrawData *d)
 /*!
 	\brief Convenience function for server use
 	\param r BRegion to be filled
-	\param color The color used to fill the region
-*/
-/*void DisplayDriver::FillRegion(BRegion& r, const RGBColor &color)
-{
-	Lock();
-
-	if(fCursorHandler.IntersectsCursor(r.Frame()))
-		fCursorHandler.DriverHide();
-	
-	int numRects;
-
-	numRects = r.CountRects();
-	for(int32 i=0; i<numRects;i++)
-		FillSolidRect(r.RectAt(i),color);
-	
-	fCursorHandler.DriverShow();
-	Invalidate(r.Frame());
-	Unlock();
-}*/
-
-/*!
-	\brief Convenience function for server use
-	\param r BRegion to be filled
 	\param pattern The pattern used to fill the region
 	\param high_color The high color of the pattern
 	\param low_color The low color of the pattern
@@ -1836,28 +1183,6 @@ void DisplayDriver::FillRegion(BRegion& r, const DrawData *d)
 	Invalidate(r.Frame());
 	Unlock();
 }
-
-/*void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const RGBColor &color)
-{
-	float arc_x;
-	float yrad2 = yrad*yrad;
-	int i;
-	
-	Lock();
-	
-	if(fCursorHandler.IntersectsCursor(r))
-		fCursorHandler.DriverHide();
-	for (i=0; i<=(int)yrad; i++)
-	{
-		arc_x = xrad*sqrt(1-i*i/yrad2);
-		StrokeSolidLine(ROUND(r.left+xrad-arc_x), ROUND(r.top+yrad-i), ROUND(r.right-xrad+arc_x), ROUND(r.top+yrad-i),color);
-		StrokeSolidLine(ROUND(r.left+xrad-arc_x), ROUND(r.bottom-yrad+i), ROUND(r.right-xrad+arc_x), ROUND(r.bottom-yrad+i),color);
-	}
-	FillSolidRect(BRect(r.left,r.top+yrad,r.right,r.bottom-yrad),color);
-	fCursorHandler.DriverShow();
-	Invalidate(r);
-	Unlock();
-}*/
 
 /*!
 	\brief Called for all BView::FillRoundRect calls
@@ -1929,112 +1254,6 @@ void DisplayDriver::FillShape(const BRect &bounds, const int32 &opcount, const i
 	// TODO: Implement DisplayDriver::FillShape. How, though? AGG backend?
 	printf("DisplayDriver::FillShape unimplemented\n");
 }
-
-/*void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColor &color)
-{
-	if ( !pts )
-		return;
-
-	Lock();
-	if(fCursorHandler.IntersectsCursor(bounds))
-		fCursorHandler.DriverHide();
-	
-	BPoint first, second, third;
-
-	// Sort points according to their y values and x values (y is primary)
-	if ( (pts[0].y < pts[1].y) ||
-		((pts[0].y == pts[1].y) && (pts[0].x <= pts[1].x)) )
-	{
-		first=pts[0];
-		second=pts[1];
-	}
-	else
-	{
-		first=pts[1];
-		second=pts[0];
-	}
-	
-	if ( (second.y<pts[2].y) ||
-		((second.y == pts[2].y) && (second.x <= pts[2].x)) )
-	{
-		third=pts[2];
-	}
-	else
-	{
-		// second is lower than "third", so we must ensure that this third point
-		// isn't higher than our first point
-		third=second;
-		if ( (first.y<pts[2].y) ||
-			((first.y == pts[2].y) && (first.x <= pts[2].x)) )
-			second=pts[2];
-		else
-		{
-			second=first;
-			first=pts[2];
-		}
-	}
-	
-	// Now that the points are sorted, check to see if they all have the same
-	// y value
-	if(first.y==second.y && second.y==third.y)
-	{
-		BPoint start,end;
-		start.y=first.y;
-		end.y=first.y;
-		start.x=MIN(first.x,MIN(second.x,third.x));
-		end.x=MAX(first.x,MAX(second.x,third.x));
-		StrokeSolidLine(ROUND(start.x), ROUND(start.y), ROUND(end.x), ROUND(start.y), color);
-		fCursorHandler.DriverShow();
-		Unlock();
-		return;
-	}
-
-	int32 i;
-
-	// Special case #1: first and second in the same row
-	if(first.y==second.y)
-	{
-		LineCalc lineA(first, third);
-		LineCalc lineB(second, third);
-		
-		StrokeSolidLine(ROUND(first.x), ROUND(first.y), ROUND(second.x), ROUND(first.y), color);
-		for(i=(int32)first.y+1; i<=third.y; i++)
-			StrokeSolidLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
-		fCursorHandler.DriverShow();
-		Unlock();
-		return;
-	}
-	
-	// Special case #2: second and third in the same row
-	if(second.y==third.y)
-	{
-		LineCalc lineA(first, second);
-		LineCalc lineB(first, third);
-		
-		StrokeSolidLine(ROUND(second.x), ROUND(second.y), ROUND(third.x), ROUND(second.y), color);
-		for(i=(int32)first.y; i<third.y; i++)
-			StrokeSolidLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
-		fCursorHandler.DriverShow();
-		Unlock();
-		return;
-	}
-	
-	// Normal case.	
-	LineCalc lineA(first, second);
-	LineCalc lineB(first, third);
-	LineCalc lineC(second, third);
-
-	for(i=(int32)first.y; i<(int32)second.y; i++)
-		StrokeSolidLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
-
-	for(i=(int32)second.y; i<=third.y; i++)
-		StrokeSolidLine(ROUND(lineC.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
-	
-	fCursorHandler.DriverShow();
-	Invalidate(bounds);
-	
-	Unlock();
-}*/
 
 /*!
 	\brief Called for all BView::FillTriangle calls
@@ -2158,175 +1377,6 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 	Unlock();
 }
 
-
-/*!
-	\brief Called for all BView::StrokeArc calls
-	\param r Rectangle enclosing the entire arc
-	\param angle Starting angle for the arc in degrees
-	\param span Span of the arc in degrees. Ending angle = angle+span.
-	\param color The color of the arc
-
-	This is inefficient and should probably be reworked
-*/
-/*void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &span, const RGBColor &color)
-{
-	float xc = (r.left+r.right)/2;
-	float yc = (r.top+r.bottom)/2;
-	float rx = r.Width()/2;
-	float ry = r.Height()/2;
-	int Rx2 = ROUND(rx*rx);
-	int Ry2 = ROUND(ry*ry);
-	int twoRx2 = 2*Rx2;
-	int twoRy2 = 2*Ry2;
-	int p;
-	int x=0;
-	int y = (int)ry;
-	int px = 0;
-	int py = twoRx2 * y;
-	int startx, endx;
-	int startQuad, endQuad;
-	bool useQuad1, useQuad2, useQuad3, useQuad4;
-	bool shortspan = false;
-
-	Lock();
-
-	if(fCursorHandler.IntersectsCursor(r))
-		fCursorHandler.DriverHide();
-	
-	// Watch out for bozos giving us whacko spans
-	if ( (span >= 360) || (span <= -360) )
-	{
-		StrokeEllipse(r,color);
-		fCursorHandler.DriverShow();
-		Unlock();
-		return;
-	}
-
-	if ( span > 0 )
-	{
-		startQuad = (int)(angle/90)%4+1;
-		endQuad = (int)((angle+span)/90)%4+1;
-		startx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
-		endx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
-	}
-	else
-	{
-		endQuad = (int)(angle/90)%4+1;
-		startQuad = (int)((angle+span)/90)%4+1;
-		endx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
-		startx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
-	}
-
-	if ( startQuad != endQuad )
-	{
-		useQuad1 = (endQuad > 1) && (startQuad > endQuad);
-		useQuad2 = ((startQuad == 1) && (endQuad > 2)) || ((startQuad > endQuad) && (endQuad > 2));
-		useQuad3 = ((startQuad < 3) && (endQuad == 4)) || ((startQuad < 3) && (endQuad < startQuad));
-		useQuad4 = (startQuad < 4) && (startQuad > endQuad);
-	}
-	else
-	{
-		if ( (span < 90) && (span > -90) )
-		{
-			useQuad1 = false;
-			useQuad2 = false;
-			useQuad3 = false;
-			useQuad4 = false;
-			shortspan = true;
-		}
-		else
-		{
-			useQuad1 = (startQuad != 1);
-			useQuad2 = (startQuad != 2);
-			useQuad3 = (startQuad != 3);
-			useQuad4 = (startQuad != 4);
-		}
-	}
-
-	if ( useQuad1 || 
-	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
-	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-		StrokePoint(BPoint(xc+x,yc-y),color);
-	if ( useQuad2 || 
-	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
-	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-		StrokePoint(BPoint(xc-x,yc-y),color);
-	if ( useQuad3 || 
-	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
-	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-		StrokePoint(BPoint(xc-x,yc+y),color);
-	if ( useQuad4 || 
-	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
-	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-		StrokePoint(BPoint(xc+x,yc+y),color);
-
-	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
-	while (px < py)
-	{
-		x++;
-		px += twoRy2;
-		if ( p < 0 )
-			p += Ry2 + px;
-		else
-		{
-			y--;
-			py -= twoRx2;
-			p += Ry2 + px - py;
-		}
-
-		if ( useQuad1 || 
-		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
-		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			StrokePoint(BPoint(xc+x,yc-y),color);
-		if ( useQuad2 || 
-		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
-		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			StrokePoint(BPoint(xc-x,yc-y),color);
-		if ( useQuad3 || 
-		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
-		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			StrokePoint(BPoint(xc-x,yc+y),color);
-		if ( useQuad4 || 
-		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
-		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			StrokePoint(BPoint(xc+x,yc+y),color);
-	}
-
-	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
-	while (y>0)
-	{
-		y--;
-		py -= twoRx2;
-		if (p>0)
-			p += Rx2 - py;
-		else
-		{
-			x++;
-			px += twoRy2;
-			p += Rx2 - py +px;
-		}
-
-		if ( useQuad1 || 
-		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
-		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			StrokePoint(BPoint(xc+x,yc-y),color);
-		if ( useQuad2 || 
-		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
-		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			StrokePoint(BPoint(xc-x,yc-y),color);
-		if ( useQuad3 || 
-		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
-		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			StrokePoint(BPoint(xc-x,yc+y),color);
-		if ( useQuad4 || 
-		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
-		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			StrokePoint(BPoint(xc+x,yc+y),color);
-	}
-	fCursorHandler.DriverShow();
-	Invalidate(r);
-	Unlock();
-}*/
 
 /*!
 	\brief Called for all BView::StrokeArc calls
@@ -2500,30 +1550,6 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 /*!
 	\brief Called for all BView::StrokeBezier calls.
 	\param pts 4-element array of BPoints in the order of start, end, and then the two control points. 
-	\param color draw color
-*/
-/*void DisplayDriver::StrokeBezier(BPoint *pts, const RGBColor &color)
-{
-	int i, numLines;
-
-	Lock();
-	BezierCurve curve(pts);
-
-	if(fCursorHandler.IntersectsCursor(curve.Frame()))
-		fCursorHandler.DriverHide();
-	
-	numLines = curve.points.CountItems()-1;
-	for (i=0; i<numLines; i++)
-		StrokeLine(*((BPoint*)curve.points.ItemAt(i)),*((BPoint*)curve.points.ItemAt(i+1)),color);
-	
-	fCursorHandler.DriverShow();
-	Invalidate(curve.Frame());
-	Unlock();
-}*/
-
-/*!
-	\brief Called for all BView::StrokeBezier calls.
-	\param pts 4-element array of BPoints in the order of start, end, and then the two control points. 
 	\param d draw data
 */
 void DisplayDriver::StrokeBezier(BPoint *pts, const DrawData *d)
@@ -2544,82 +1570,6 @@ void DisplayDriver::StrokeBezier(BPoint *pts, const DrawData *d)
 	Invalidate(curve.Frame());
 	Unlock();
 }
-
-/*!
-	\brief Called for all BView::StrokeEllipse calls
-	\param r BRect enclosing the ellipse to be drawn.
-	\param color The color of the ellipse
-*/
-/*void DisplayDriver::StrokeEllipse(const BRect &r, const RGBColor &color)
-{
-	float xc = (r.left+r.right)/2;
-	float yc = (r.top+r.bottom)/2;
-	float rx = r.Width()/2;
-	float ry = r.Height()/2;
-	int Rx2 = ROUND(rx*rx);
-	int Ry2 = ROUND(ry*ry);
-	int twoRx2 = 2*Rx2;
-	int twoRy2 = 2*Ry2;
-	int p;
-	int x=0;
-	int y = (int)ry;
-	int px = 0;
-	int py = twoRx2 * y;
-	int lastx, lasty;
-
-	Lock();
-
-	if(fCursorHandler.IntersectsCursor(r))
-		fCursorHandler.DriverHide();
-	
-	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
-	while (px < py)
-	{
-		lastx = x;
-		lasty = y;
-		x++;
-		px += twoRy2;
-		if ( p < 0 )
-			p += Ry2 + px;
-		else
-		{
-			y--;
-			py -= twoRx2;
-			p += Ry2 + px - py;
-		}
-
-		StrokeLine(BPoint(xc+lastx,yc-lasty),BPoint(xc+x,yc-y),color);
-		StrokeLine(BPoint(xc-lastx,yc-lasty),BPoint(xc-x,yc-y),color);
-		StrokeLine(BPoint(xc-lastx,yc+lasty),BPoint(xc-x,yc+y),color);
-		StrokeLine(BPoint(xc+lastx,yc+lasty),BPoint(xc+x,yc+y),color);
-	}
-
-	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
-	while (y>0)
-	{
-		lastx = x;
-		lasty = y;
-		y--;
-		py -= twoRx2;
-		if (p>0)
-			p += Rx2 - py;
-		else
-		{
-			x++;
-			px += twoRy2;
-			p += Rx2 - py +px;
-		}
-
-		StrokeLine(BPoint(xc+lastx,yc-lasty),BPoint(xc+x,yc-y),color);
-		StrokeLine(BPoint(xc-lastx,yc-lasty),BPoint(xc-x,yc-y),color);
-		StrokeLine(BPoint(xc-lastx,yc+lasty),BPoint(xc-x,yc+y),color);
-		StrokeLine(BPoint(xc+lastx,yc+lasty),BPoint(xc+x,yc+y),color);
-	}
-	
-	fCursorHandler.DriverShow();
-	Invalidate(r);
-	Unlock();
-}*/
 
 /*!
 	\brief Called for all BView::StrokeEllipse calls
@@ -2827,44 +1777,6 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const Dra
 	Unlock();
 }
 
-/*!
-	\brief Draws a line. Really.
-	\param start Starting point
-	\param end Ending point
-	\param setPixel Pixel drawing function which handles things like size and pattern.
-*/
-/*void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, DisplayDriver* driver, SetPixelFuncType setPixel)
-{
-	// TODO: What's this particular StrokeLine call for?
-	
-	int x1 = ROUND(start.x);
-	int y1 = ROUND(start.y);
-	int x2 = ROUND(end.x);
-	int y2 = ROUND(end.y);
-	int dx = x2 - x1;
-	int dy = y2 - y1;
-	int steps, k;
-	double xInc, yInc;
-	double x = x1;
-	double y = y1;
-
-	if ( abs(dx) > abs(dy) )
-		steps = abs(dx);
-	else
-		steps = abs(dy);
-	xInc = dx / (double) steps;
-	yInc = dy / (double) steps;
-
-	(driver->*setPixel)(ROUND(x),ROUND(y));
-	for (k=0; k<steps; k++)
-	{
-		x += xInc;
-		y += yInc;
-		(driver->*setPixel)(ROUND(x),ROUND(y));
-	}
-	Invalidate(BRect(start,end));
-}*/
-
 void DisplayDriver::StrokePoint(const BPoint& pt, const RGBColor &color)
 {
 	StrokeLine(pt, pt, color);
@@ -2876,25 +1788,6 @@ void DisplayDriver::StrokePoint(const BPoint& pt, const DrawData *d)
 	StrokeLine(pt, pt, d);
 	Invalidate(BRect(pt,pt));
 }
-
-/*void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const RGBColor &color, bool is_closed)
-{
-	if(!ptlist)
-		return;
-
-	Lock();
-	if(fCursorHandler.IntersectsCursor(bounds))
-		fCursorHandler.DriverHide();
-	
-	for(int32 i=0; i<(numpts-1); i++)
-		StrokeLine(ptlist[i],ptlist[i+1],color);
-	if(is_closed)
-		StrokeLine(ptlist[numpts-1],ptlist[0],color);
-	
-	fCursorHandler.DriverShow();
-	Invalidate(bounds);
-	Unlock();
-}*/
 
 /*!
 	\brief Called for all BView::StrokePolygon calls
@@ -2922,10 +1815,9 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const BRect &bou
 }
 
 /*!
-	\brief Called for all BView::StrokeRect calls
+	\brief Called by Decorator
 	\param r BRect to be drawn
-	\param pensize Thickness of the lines
-	\param color The color of the rectangle
+	\param color Color in which to draw
 */
 void DisplayDriver::StrokeRect(const BRect &r, const RGBColor &color)
 {
@@ -2940,6 +1832,11 @@ void DisplayDriver::StrokeRect(const BRect &r, const RGBColor &color)
 	Unlock();
 }
 
+/*!
+	\brief Called for all BView::StrokeRect calls
+	\param r BRect to be drawn
+	\param d      DrawData containing all of the other options
+*/
 void DisplayDriver::StrokeRect(const BRect &r, const DrawData *d)
 {
 	Lock();
@@ -2959,24 +1856,8 @@ void DisplayDriver::StrokeRect(const BRect &r, const DrawData *d)
 	\brief Convenience function for server use
 	\param r BRegion to be stroked
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 */
-/*void DisplayDriver::StrokeRegion(BRegion& r, const RGBColor &color)
-{
-	Lock();
-
-	if(fCursorHandler.IntersectsCursor(r.Frame()))
-		fCursorHandler.DriverHide();
-	
-	for(int32 i=0; i<r.CountRects();i++)
-		StrokeRect(r.RectAt(i),color);
-	
-	fCursorHandler.DriverShow();
-	Invalidate(r.Frame());
-	Unlock();
-}*/
-
 void DisplayDriver::StrokeRegion(BRegion& r, const DrawData *d)
 {
 	Lock();
@@ -2991,42 +1872,6 @@ void DisplayDriver::StrokeRegion(BRegion& r, const DrawData *d)
 	Invalidate(r.Frame());
 	Unlock();
 }
-
-/*void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, const RGBColor &color)
-{
-	int hLeft, hRight;
-	int vTop, vBottom;
-	float bLeft, bRight, bTop, bBottom;
-
-	hLeft = (int)ROUND(r.left + xrad);
-	hRight = (int)ROUND(r.right - xrad);
-	vTop = (int)ROUND(r.top + yrad);
-	vBottom = (int)ROUND(r.bottom - yrad);
-	bLeft = hLeft + xrad;
-	bRight = hRight -xrad;
-	bTop = vTop + yrad;
-	bBottom = vBottom - yrad;
-
-	Lock();
-	if(fCursorHandler.IntersectsCursor(r))
-		fCursorHandler.DriverHide();
-	
-	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, color);
-	StrokeLine(BPoint(hRight, r.top), BPoint(hLeft, r.top), color);
-	
-	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, color);
-	StrokeLine(BPoint(r.left, vTop), BPoint(r.left, vBottom), color);
-
-	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, color);
-	StrokeLine(BPoint(hLeft, r.bottom), BPoint(hRight, r.bottom), color);
-
-	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, color);
-	StrokeLine(BPoint(r.right, vBottom), BPoint(r.right, vTop), color);
-	
-	fCursorHandler.DriverShow();
-	Invalidate(r);
-	Unlock();
-}*/
 
 /*!
 	\brief Called for all BView::StrokeRoundRect calls
@@ -3081,24 +1926,7 @@ void DisplayDriver::StrokeShape(const BRect &bounds, const int32 &opcount, const
 
 /*!
 	\brief Called for all BView::StrokeTriangle calls
-	\param pts Array of 3 BPoints. Always non-NULL.
-	\param color The color of the lines
 */
-/*void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const RGBColor &color)
-{
-	Lock();
-	if(fCursorHandler.IntersectsCursor(bounds))
-		fCursorHandler.DriverHide();
-	
-	StrokeLine(pts[0],pts[1],color);
-	StrokeLine(pts[1],pts[2],color);
-	StrokeLine(pts[2],pts[0],color);
-	
-	fCursorHandler.DriverShow();
-	Invalidate(bounds);
-	Unlock();
-}*/
-
 void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const DrawData *d)
 {
 	Lock();
@@ -3297,8 +2125,6 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	Unlock();
 
 }
-
-
 
 /*!
 	\brief Gets the width of a string in pixels
@@ -3936,11 +2762,6 @@ void DisplayDriver::VLinePatternThick(int32 x1, int32 x2, int32 y)
 	\param thick The thickness of the point
 	\param pat The PatternHandler which detemines pixel colors
 	Must be implemented in subclasses
-*/
-/*
-void DisplayDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pat)
-{
-}
 */
 void DisplayDriver::SetThickPatternPixel(int x, int y)
 {
