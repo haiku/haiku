@@ -111,8 +111,8 @@ static int handle_mouse_interrupt(void* data)
 		break;
 	} // switch
 
-   next_input = (next_input + 1) % 3;
-	return INT_NO_RESCHEDULE;
+	next_input = (next_input + 1) % 3;
+	return B_HANDLED_INTERRUPT;
 } // handle_mouse_interrupt
 
 /////////////////////////////////////////////////////////////////////////
@@ -298,35 +298,35 @@ static unsigned char read_data_byte()
  */
 status_t init_hardware()
 {
-   dprintf("Initializing PS/2 mouse\n");
+	dprintf("Initializing PS/2 mouse\n");
 
-   // init device driver
+	// init device driver
 	memset(&md_int, 0, sizeof(mouse_data));
 
 	// register interrupt handler
-	int_set_io_interrupt_handler(INT_BASE + INT_PS2_MOUSE,
-	   &handle_mouse_interrupt, NULL);
+	install_io_interrupt_handler(INT_BASE + INT_PS2_MOUSE,
+	                             &handle_mouse_interrupt, NULL, 0);
 
 	// must enable the cascade interrupt
 	arch_int_enable_io_interrupt(INT_BASE + INT_CASCADE);
 
 	// enable auxilary device, IRQs and PS/2 mouse
-   write_command_byte(PS2_CMD_DEV_INIT);
+	write_command_byte(PS2_CMD_DEV_INIT);
 	write_aux_byte(PS2_CMD_ENABLE_MOUSE);
 
 	// controller should send ACK if mouse was detected
 	if(read_data_byte() != PS2_RES_ACK) {
-	   dprintf("No PS/2 mouse found\n");
+		dprintf("No PS/2 mouse found\n");
 		return -1;
-	} // if
-
+	} 
+	
 	dprintf("A PS/2 mouse has been successfully detected\n");
 
 	// create the mouse semaphore, used for synchronization between
 	// the interrupt handler and the read() operation
 	mouse_sem = create_sem(0, "ps2_mouse_sem");
 	if(mouse_sem < 0)
-	   panic("failed to create PS/2 mouse semaphore!\n");
+		panic("failed to create PS/2 mouse semaphore!\n");
 
 	return 0;
 } // mouse_dev_init

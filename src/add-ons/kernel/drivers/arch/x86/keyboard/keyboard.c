@@ -158,7 +158,7 @@ static void insert_in_buf(char c)
 static int handle_keyboard_interrupt(void* data)
 {
 	unsigned char key;
-	int retval = INT_NO_RESCHEDULE;
+	int retval = B_UNHANDLED_INTERRUPT;
 
 	key = in8(0x60);
 //	dprintf("handle_keyboard_interrupt: key = 0x%x\n", key);
@@ -220,7 +220,7 @@ static int handle_keyboard_interrupt(void* data)
 //					dprintf("ascii = 0x%x, '%c'\n", ascii, ascii);
 				if(ascii != 0) {
 					insert_in_buf(ascii);
-					retval = INT_RESCHEDULE;
+					retval = B_INVOKE_SCHEDULER;
 				} else {
 //					dprintf("keyboard: unknown scan-code 0x%x\n",key);
 				}
@@ -306,7 +306,7 @@ static int setup_keyboard(void)
 status_t init_hardware()
 {
 	setup_keyboard();
-	int_set_io_interrupt_handler(0x21,&handle_keyboard_interrupt, NULL);
+	install_io_interrupt_handler(0x21, &handle_keyboard_interrupt, NULL, 0);
 
 	return 0;
 }
