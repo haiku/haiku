@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src kernel boot ;
- 
+
+SetupIncludes ; 
 oldccflags = $(CCFLAGS) ;
 {
   CCFLAGS = ;
