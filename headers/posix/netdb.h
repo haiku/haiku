@@ -1,4 +1,8 @@
 /*
+	Modified for [Open]BeOS
+*/
+
+/*
  * ++Copyright++ 1980, 1983, 1988, 1993
  * -
  * Copyright (c) 1980, 1983, 1988, 1993
@@ -86,12 +90,21 @@
 
 /*
  *      @(#)netdb.h	8.1 (Berkeley) 6/2/93
- *	$Id: netdb.h,v 1.7 2004/04/15 15:54:33 wkornew Exp $
+ *	$Id: netdb.h,v 1.8 2004/05/13 00:48:55 phoudoin Exp $
  */
+ 
+/* Modified for OpenBeOS
+*/
 
 #ifndef _NETDB_H_
 #define _NETDB_H_
 
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <stdio.h>
+
+
+/*
 #include <sys/param.h>
 #include <sys/types.h>
 #if (!defined(BSD)) || (BSD < 199306)
@@ -101,6 +114,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>
+*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #ifndef _PATH_HEQUIV
 #define _PATH_HEQUIV	"/etc/hosts.equiv"
@@ -118,9 +137,7 @@
 #define	_PATH_SERVICES	"/etc/services"
 #endif
 
-__BEGIN_DECLS
-extern int * __h_errno __P((void));
-__END_DECLS
+extern int * __h_errno (void);
 #define	h_errno (*__h_errno())
 
 /*
@@ -332,7 +349,8 @@ struct	servent_data {
 };
 #endif
 
-__BEGIN_DECLS
+#define __P(a) a
+
 void		endhostent __P((void));
 void		endnetent __P((void));
 void		endprotoent __P((void));
@@ -402,20 +420,15 @@ struct servent	*getservbyport_r __P((int port, const char *,
 struct servent	*getservent_r __P((struct servent *, char *, int));
 void		setservent_r __P((int));
 void		endservent_r __P((void));
-__END_DECLS
 
-/* This is nec'y to make this include file properly replace the sun version. */
-#ifdef sun
-#ifdef __GNU_LIBRARY__
-#include <rpc/netdb.h>
-#else
-struct rpcent {
-	char	*r_name;	/* name of server for this rpc program */
-	char	**r_aliases;	/* alias list */
-	int	r_number;	/* rpc program number */
-};
-struct rpcent	*getrpcbyname(), *getrpcbynumber(), *getrpcent();
-#endif /* __GNU_LIBRARY__ */
-#endif /* sun */
+
+/* BeOS specific, because of lack of UNIX passwd functions */
+int getusername(char *username, unsigned userlen);
+int getpassword(char *password, unsigned passlen);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* !_NETDB_H_ */
