@@ -30,6 +30,7 @@
 #include "KPartition.h"
 #include "KPartitioningSystem.h"
 #include "KPartitionVisitor.h"
+#include "KPath.h"
 #include "KShadowPartition.h"
 
 // debugging
@@ -154,17 +155,23 @@ KDiskDeviceManager::KDiskDeviceManager()
 	size_t partitioningPrefixLength = strlen(kPartitioningSystemPrefix);
 
 	while (true) {
-		char name[B_PATH_NAME_LENGTH];
-		size_t nameLength = sizeof(name);
-		if (get_next_loaded_module_name(&cookie, name, &nameLength) != B_OK)
+		KPath name;
+		if (name.InitCheck() != B_OK)
 			break;
+		size_t nameLength = name.BufferSize();
+		if (get_next_loaded_module_name(&cookie, name.LockBuffer(),
+			&nameLength) != B_OK) {
+			break;
+		}
+		name.UnlockBuffer();
 
-		if (!strncmp(name, kPartitioningSystemPrefix, partitioningPrefixLength)) {
-			DBG(OUT("partitioning system: %s\n", name));
-			_AddPartitioningSystem(name);
-		} else if (is_fs_disk_device(name)) {
-			DBG(OUT("file system: %s\n", name));
-			_AddFileSystem(name);
+		if (!strncmp(name.Path(), kPartitioningSystemPrefix,
+				partitioningPrefixLength)) {
+			DBG(OUT("partitioning system: %s\n", name.Path()));
+			_AddPartitioningSystem(name.Path());
+		} else if (is_fs_disk_device(name.Path())) {
+			DBG(OUT("file system: %s\n", name.Path()));
+			_AddFileSystem(name.Path());
 		}
 	}
 
@@ -306,18 +313,22 @@ KDiskDeviceManager::FindDevice(partition_id id, bool deviceOnly)
 	return NULL;
 }
 
+//#include "AutoDeleter.h"
+
 // FindPartition
 KPartition *
 KDiskDeviceManager::FindPartition(const char *path, bool noShadow)
 {
 // TODO: Optimize!
+	KPath partitionPath;
+	if (partitionPath.InitCheck() != B_OK)
+		return NULL;
 	for (PartitionMap::Iterator it = fPartitions->Begin();
 		 it != fPartitions->End();
 		 ++it) {
 		KPartition *partition = it->Value();
-		char partitionPath[B_PATH_NAME_LENGTH];
-		if (partition->GetPath(partitionPath) == B_OK
-			&& !strcmp(path, partitionPath)) {
+		if (partition->GetPath(&partitionPath) == B_OK
+			&& partitionPath == path) {
 			if (noShadow && partition->IsShadowPartition())
 				return partition->PhysicalPartition();
 			return partition;
@@ -690,6 +701,9 @@ KDiskDeviceManager::NextJob(int32 *cookie)
 }
 
 // AddJobQueue
+/*!
+	The device must be write locked, the manager must be locked.
+*/
 status_t
 KDiskDeviceManager::AddJobQueue(KDiskDeviceJobQueue *jobQueue)
 {
@@ -1008,6 +1022,9 @@ KDiskDeviceManager::_RemoveJobQueue(KDiskDeviceJobQueue *jobQueue)
 }
 
 // _UpdateBusyPartitions
+/*!
+	The device must be write locked, the manager must be locked.
+*/
 status_t
 KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
 {
@@ -1096,10 +1113,12 @@ KDiskDeviceManager::_UpdateJobStatus(KDiskDeviceJob *job, uint32 status,
 status_t
 KDiskDeviceManager::_Scan(const char *path)
 {
+DBG(OUT("KDiskDeviceManager::_Scan(%s)\n", path));
 	status_t error = B_OK;
 	struct stat st;
-	if (lstat(path, &st) < 0)
+	if (lstat(path, &st) < 0) {
 		return errno;
+	}
 	if (S_ISDIR(st.st_mode)) {
 		// a directory: iterate through its contents
 		DIR *dir = opendir(path);
@@ -1109,11 +1128,12 @@ KDiskDeviceManager::_Scan(const char *path)
 			// skip "." and ".."
 			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
 				continue;
-			if (strlen(path) + strlen(entry->d_name) + 1 >= B_PATH_NAME_LENGTH)
+			KPath entryPath;
+			if (entryPath.SetPath(path) != B_OK
+				|| entryPath.Append(entry->d_name) != B_OK) {
 				continue;
-			char entryPath[B_PATH_NAME_LENGTH];
-			sprintf(entryPath, "%s/%s", path, entry->d_name);
-			_Scan(entryPath);
+			}
+			_Scan(entryPath.Path());
 		}
 		closedir(dir);
 	} else {
@@ -1141,6 +1161,9 @@ DBG(OUT("  found device: %s\n", path));
 }
 
 // _ScanPartition
+/*!
+	The device must be write locked, the manager must be locked.
+*/
 status_t
 KDiskDeviceManager::_ScanPartition(KPartition *partition)
 {
