@@ -343,10 +343,10 @@ int32 ServerApp::MonitorApp(void *data)
 				port_id replyport = -1;
 			
 				msgqueue.Read<BRect>(&frame);
-				msgqueue.Read<int32>((int32*)&look);
-				msgqueue.Read<int32>((int32*)&feel);
-				msgqueue.Read<int32>((int32*)&flags);
-				msgqueue.Read<int32>((int32*)&wkspaces);
+				msgqueue.Read<uint32>(&look);
+				msgqueue.Read<uint32>(&feel);
+				msgqueue.Read<uint32>(&flags);
+				msgqueue.Read<uint32>(&wkspaces);
 				msgqueue.Read<int32>(&token);
 				msgqueue.Read<port_id>(&sendPort);
 				msgqueue.Read<port_id>(&looperPort);
