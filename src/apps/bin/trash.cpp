@@ -35,6 +35,7 @@ status_t untrash(const char *f)
 {
 	status_t err;
 	char original_path[B_PATH_NAME_LENGTH];
+	BPath path(f);
 	BNode node(f);
 	err = node.InitCheck();
 	if (err)
@@ -42,7 +43,7 @@ status_t untrash(const char *f)
 	err = node.ReadAttr(kAttrOriginalPath, B_STRING_TYPE, 0LL, original_path, B_PATH_NAME_LENGTH);
 	if (err < 0)
 		return err;
-	err = rename(f, original_path);
+	err = rename(path.Path(), original_path);
 	if (err < 0)
 		return err;
 	node.RemoveAttr(kAttrOriginalPath);
@@ -92,7 +93,7 @@ status_t trash(const char *f)
 		if (!trashDir.Contains(trashed_file))
 			break;
 	}
-	err = rename(f, trashed_file);
+	err = rename(original_path, trashed_file);
 	if (err < 0)
 		return err;
 	
