@@ -262,7 +262,7 @@ MessagingService::Init()
 
 	// install the default send message command handler
 	MessagingCommandHandler *handler = new(nothrow) DefaultSendCommandHandler;
-	if (handler)
+	if (!handler)
 		return B_NO_MEMORY;
 	SetCommandHandler(MESSAGING_COMMAND_SEND_MESSAGE, handler);
 
@@ -369,6 +369,8 @@ MessagingService::_CommandProcessor()
 					"commands.", area, area->ID(), area->CountCommands()));
 				break;
 			}
+PRINT(("MessagingService::_CommandProcessor(): got command %lu\n",
+command->command));
 
 			// dispatch the command
 			MessagingCommandHandler *handler
