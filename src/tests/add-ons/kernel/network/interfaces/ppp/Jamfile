@@ -11,6 +11,4 @@ Addon <userland>ppp : userland network interfaces :
 	PPPManager.cpp
 ;
 
-SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
-
 LinkSharedOSLibs <userland>ppp : <userland>libkernelppp.a <installed>net_stack_tester be ;

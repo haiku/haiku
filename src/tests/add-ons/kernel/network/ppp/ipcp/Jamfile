@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src tests add-ons kernel network ppp ipcp ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp ipcp ] ;
+
+
+Addon <userland>ipcp : userland network ppp : 
+	ipcp.cpp
+	Protocol.cpp
+;
+
+LinkSharedOSLibs <userland>ipcp : <userland>libkernelppp.a <installed>net_stack_tester be net ;

@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src tests add-ons kernel network ppp pap ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pap ] ;
+
+
+Addon <userland>pap : userland network ppp : 
+	pap.cpp
+	Protocol.cpp
+;
+
+LinkSharedOSLibs <userland>pap : <userland>libkernelppp.a <installed>net_stack_tester be ;
