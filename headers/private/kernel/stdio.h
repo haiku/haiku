@@ -1,8 +1,8 @@
 /* stdio.h
  */
 
-#ifndef _STDIO_H
-#define _STDIO_H
+#ifndef _STDIO_H_
+#define _STDIO_H_
 
 #include <ktypes.h>
 #include <stdarg.h>
@@ -205,4 +205,4 @@ static __inline int __sputc(int _c, FILE *_p) {
 }
 #endif
 
-#endif /* _STDIO_H */
+#endif /* _STDIO_H_ */
