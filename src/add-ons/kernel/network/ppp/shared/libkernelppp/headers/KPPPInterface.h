@@ -43,7 +43,7 @@ class PPPInterface : public PPPLayer {
 		PPPInterface& operator= (const PPPInterface& copy);
 		
 		// only PPPManager may construct us!
-		PPPInterface(interface_id ID, driver_settings *settings,
+		PPPInterface(interface_id ID, const driver_settings *settings,
 			PPPInterface *parent = NULL);
 		~PPPInterface();
 
@@ -152,7 +152,7 @@ class PPPInterface : public PPPLayer {
 		PPPReportManager& ReportManager()
 			{ return fReportManager; }
 		bool Report(ppp_report_type type, int32 code, void *data, int32 length)
-			{ return fReportManager.Report(type, code, data, length); }
+			{ return ReportManager().Report(type, code, data, length); }
 			// returns false if reply was bad (or an error occured)
 		
 		bool LoadModules(driver_settings *settings,
@@ -168,9 +168,7 @@ class PPPInterface : public PPPLayer {
 		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber);
 		
 		status_t ReceiveFromDevice(struct mbuf *packet);
-			// This is called by the receive-thread.
-			// Only call this if it does not block Send() or
-			// SendToDevice()!
+			// This must not block PPPDevice::Send()!
 		
 		void Pulse();
 			// this manages all timeouts, etc.
@@ -199,9 +197,6 @@ class PPPInterface : public PPPLayer {
 		interface_id fID;
 			// the manager assigns an ID to every interface
 		driver_settings *fSettings;
-		PPPStateMachine fStateMachine;
-		PPPLCP fLCP;
-		PPPReportManager fReportManager;
 		struct ifnet *fIfnet;
 		
 		thread_id fUpThread;
@@ -229,6 +224,9 @@ class PPPInterface : public PPPLayer {
 		PPPProtocol *fFirstProtocol;
 		List<char*> fModules;
 		
+		PPPStateMachine fStateMachine;
+		PPPLCP fLCP;
+		PPPReportManager fReportManager;
 		BLocker& fLock;
 		int32 fDeleteCounter;
 };

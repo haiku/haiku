@@ -21,8 +21,6 @@ PPPOptionHandler::PPPOptionHandler(const char *name, uint8 type,
 		fName = strdup(name);
 	else
 		fName = strdup("Unknown");
-	
-	fInitStatus = interface.LCP().AddOptionHandler(this) ? B_OK : B_ERROR;
 }
 
 

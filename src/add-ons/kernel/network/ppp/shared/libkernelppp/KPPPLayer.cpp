@@ -11,11 +11,14 @@
 #include <cstring>
 #include <core_funcs.h>
 
-#include <kernel_cpp.h>
+#ifdef _KERNEL_MODE
+	#include <kernel_cpp.h>
+#endif
 
 
 PPPLayer::PPPLayer(const char *name, ppp_level level)
 	: fInitStatus(B_OK),
+	fLevel(level),
 	fNext(NULL)
 {
 	if(name)

@@ -75,8 +75,6 @@ PPPStateMachine::NewState(ppp_state next)
 void
 PPPStateMachine::NewPhase(ppp_phase next)
 {
-	// the ifnet's running flag is set here and in PPPInterface::SetDialOnDemand()
-	
 	// there is nothing after established phase and nothing before down phase
 	if(next > PPP_ESTABLISHED_PHASE)
 		next = PPP_ESTABLISHED_PHASE;
@@ -86,9 +84,15 @@ PPPStateMachine::NewPhase(ppp_phase next)
 	// Report a down event to parent if we are not usable anymore.
 	// The report threads get their notification later.
 	if(Phase() == PPP_ESTABLISHED_PHASE && next != Phase()) {
-		// there is no need to unset the running flag because we unregister, anyway
 		if(!Interface().DoesDialOnDemand())
 			Interface().UnregisterInterface();
+		
+		if(Interface().Ifnet()) {
+			Interface().Ifnet()->if_flags &= ~IFF_RUNNING;
+			
+			if(!Interface().DoesDialOnDemand())
+				Interface().Ifnet()->if_flags &= ~IFF_UP;
+		}
 		
 		if(Interface().Parent())
 			Interface().Parent()->StateMachine().DownEvent(Interface());
@@ -97,8 +101,8 @@ PPPStateMachine::NewPhase(ppp_phase next)
 	fPhase = next;
 	
 	if(Phase() == PPP_ESTABLISHED_PHASE) {
-		if(Interface().Ifnet() && !Interface().DoesDialOnDemand())
-			Interface().Ifnet()->if_flags |= IFF_RUNNING;
+		if(Interface().Ifnet())
+			Interface().Ifnet()->if_flags |= IFF_UP | IFF_RUNNING;
 		
 		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_SUCCESSFUL, NULL, 0);
 	}
@@ -419,6 +423,11 @@ PPPStateMachine::UpFailedEvent()
 			
 			if(Interface().Parent())
 				Interface().Parent()->StateMachine().UpFailedEvent(Interface());
+			
+			NewPhase(PPP_DOWN_PHASE);
+				// tell DownEvent() that we do not need to redial
+			
+			DownEvent();
 		break;
 		
 		default:
@@ -525,6 +534,7 @@ PPPStateMachine::DownEvent()
 			IllegalEvent(PPP_DOWN_EVENT);
 	}
 	
+	ppp_phase oldPhase = Phase();
 	NewPhase(PPP_DOWN_PHASE);
 	
 	DownProtocols();
@@ -536,6 +546,7 @@ PPPStateMachine::DownEvent()
 	if(State() == PPP_STARTING_STATE) {
 		bool needsRedial = false;
 		
+		// we do not try to redial if authentication failed
 		if(fLocalAuthenticationStatus == PPP_AUTHENTICATION_FAILED
 				|| fLocalAuthenticationStatus == PPP_AUTHENTICATING)
 			Interface().Report(PPP_CONNECTION_REPORT,
@@ -550,8 +561,10 @@ PPPStateMachine::DownEvent()
 			if(Interface().fUpThread == -1)
 				needsRedial = true;
 			
-			Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_CONNECTION_LOST,
-				NULL, 0);
+			// test if UpFailedEvent() was not called
+			if(oldPhase != PPP_DOWN_PHASE)
+				Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_CONNECTION_LOST,
+					NULL, 0);
 		}
 		
 		if(Interface().Parent())
@@ -587,8 +600,10 @@ PPPStateMachine::OpenEvent()
 			if(Interface().Mode() == PPP_SERVER_MODE) {
 				NewPhase(PPP_ESTABLISHMENT_PHASE);
 				
-				if(Interface().Device())
-					Interface().Device()->Listen();
+				if(Interface().Device() && !Interface().Device()->Up()) {
+					Interface().Device()->UpFailedEvent();
+					return;
+				}
 			} else
 				NewState(PPP_STARTING_STATE);
 			
@@ -1452,8 +1467,8 @@ PPPStateMachine::ThisLayerDown()
 void
 PPPStateMachine::ThisLayerStarted()
 {
-	if(Interface().Device())
-		Interface().Device()->Up();
+	if(Interface().Device() && !Interface().Device()->Up())
+		Interface().Device()->UpFailedEvent();
 }
 
 

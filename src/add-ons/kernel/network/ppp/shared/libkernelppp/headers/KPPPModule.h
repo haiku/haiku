@@ -16,7 +16,7 @@ class PPPInterface;
 typedef struct ppp_module_info {
 	module_info minfo;
 	status_t (*control)(uint32 op, void *data, size_t length);
-	status_t (*add_to)(PPPInterface& mainInterface, PPPInterface *subInterface,
+	bool (*add_to)(PPPInterface& mainInterface, PPPInterface *subInterface,
 		driver_parameter *settings, ppp_module_key_type type);
 			// multilink: handlers that must run on a real device
 			// should be added to subInterface (may be NULL)

@@ -11,6 +11,9 @@
 #include <SupportDefs.h>
 
 
+typedef uint32 interface_id;
+
+
 // settings keys
 #define PPP_DISONNECT_AFTER_IDLE_SINCE_KEY	"DisonnectAfterIdleSince"
 #define PPP_MODE_KEY						"Mode"
@@ -34,6 +37,14 @@
 
 
 #define PPP_ERROR_BASE						B_ERRORS_END + 1
+
+
+// this is used when talking to the interface manager
+enum ppp_interface_filter {
+	PPP_ALL_INTERFACES,
+	PPP_REGISTERED_INTERFACES,
+	PPP_UNREGISTERED_INTERFACES
+};
 
 // return values for Send()/Receive() methods in addition to B_ERROR and B_OK
 // PPP_UNHANDLED is also used by PPPOptionHandler

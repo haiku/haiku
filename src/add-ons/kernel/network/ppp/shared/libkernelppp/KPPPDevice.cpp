@@ -19,15 +19,15 @@ PPPDevice::PPPDevice(const char *name, PPPInterface& interface,
 	fMTU(1500),
 	fInterface(interface),
 	fSettings(settings),
-	fIsUp(false)
+	fConnectionPhase(PPP_DOWN_PHASE)
 {
-	fInitStatus = interface.SetDevice(this) && fInitStatus == B_OK ? B_OK : B_ERROR;
 }
 
 
 PPPDevice::~PPPDevice()
 {
-	Interface().SetDevice(NULL);
+	if(Interface().Device() == this)
+		Interface().SetDevice(NULL);
 }
 
 
@@ -85,15 +85,19 @@ PPPDevice::Pulse()
 
 
 bool
-PPPDevice::UpStarted() const
+PPPDevice::UpStarted()
 {
+	fConnectionPhase = PPP_ESTABLISHMENT_PHASE;
+	
 	return Interface().StateMachine().TLSNotify();
 }
 
 
 bool
-PPPDevice::DownStarted() const
+PPPDevice::DownStarted()
 {
+	fConnectionPhase = PPP_TERMINATION_PHASE;
+	
 	return Interface().StateMachine().TLFNotify();
 }
 
@@ -101,7 +105,7 @@ PPPDevice::DownStarted() const
 void
 PPPDevice::UpFailedEvent()
 {
-	fIsUp = false;
+	fConnectionPhase = PPP_DOWN_PHASE;
 	
 	Interface().StateMachine().UpFailedEvent();
 }
@@ -110,7 +114,7 @@ PPPDevice::UpFailedEvent()
 void
 PPPDevice::UpEvent()
 {
-	fIsUp = true;
+	fConnectionPhase = PPP_ESTABLISHED_PHASE;
 	
 	Interface().StateMachine().UpEvent();
 }
@@ -119,7 +123,7 @@ PPPDevice::UpEvent()
 void
 PPPDevice::DownEvent()
 {
-	fIsUp = false;
+	fConnectionPhase = PPP_DOWN_PHASE;
 	
 	Interface().StateMachine().DownEvent();
 }

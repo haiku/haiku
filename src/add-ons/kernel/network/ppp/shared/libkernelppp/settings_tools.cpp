@@ -27,10 +27,15 @@ dup_driver_settings(const driver_settings *dup)
 	driver_settings *ret = (driver_settings*) malloc(sizeof(driver_settings));
 	
 	ret->parameter_count = dup->parameter_count;
-	ret->parameters = (driver_parameter*) malloc(ret->parameter_count * sizeof(driver_parameter));
 	
-	for(int32 i=0; i < ret->parameter_count; i++)
-		copy_parameter(&dup->parameters[i], &ret->parameters[i]);
+	if(ret->parameter_count > 0)
+		ret->parameters =
+			(driver_parameter*) malloc(ret->parameter_count * sizeof(driver_parameter));
+	else
+		ret->parameters = NULL;
+	
+	for(int32 index = 0; index < ret->parameter_count; index++)
+		copy_parameter(&dup->parameters[index], &ret->parameters[index]);
 	
 	return ret;
 }
@@ -43,45 +48,108 @@ copy_parameter(const driver_parameter *from, driver_parameter *to)
 	to->name = strdup(from->name);
 	to->value_count = from->value_count;
 	
-	to->values = (char**) malloc(to->value_count * sizeof(char*));
+	if(to->value_count > 0)
+		to->values = (char**) malloc(to->value_count * sizeof(char*));
+	else
+		to->values = NULL;
 	
-	for(int32 i=0; i < to->value_count; i++)
-		to->values[i] = strdup(from->values[i]);
+	for(int32 index = 0; index < to->value_count; index++)
+		to->values[index] = strdup(from->values[index]);
 	
 	to->parameter_count = from->parameter_count;
 	
-	to->parameters = (driver_parameter*) malloc(to->parameter_count * sizeof(driver_parameter));
+	if(to->parameter_count > 0)
+		to->parameters =
+			(driver_parameter*) malloc(to->parameter_count * sizeof(driver_parameter));
+	else
+		to->parameters = NULL;
 	
-	for(int32 i=0; i < to->parameter_count; i++)
-		copy_parameter(&from->parameters[i], &to->parameters[i]);
+	for(int32 index = 0; index < to->parameter_count; index++)
+		copy_parameter(&from->parameters[index], &to->parameters[index]);
 }
 
 
 void
 free_driver_settings(driver_settings *settings)
 {
-	for(int32 i=0; i < settings->parameter_count; i++)
-		free_driver_parameter(&settings->parameters[i]);
+	if(!settings)
+		return;
+	
+	for(int32 index = 0; index < settings->parameter_count; index++)
+		free_driver_parameter(&settings->parameters[index]);
 	
 	free(settings->parameters);
 	free(settings);
 }
 
 
+static
 void
 free_driver_parameter(driver_parameter *p)
 {
 	free(p->name);
 	
-	for(int32 i=0; i < p->value_count; i++)
-		free(p->values[i]);
+	for(int32 index = 0; index < p->value_count; index++)
+		free(p->values[index]);
 	
 	free(p->values);
 	
-	for(int32 i=0; i < p->parameter_count; i++)
-		free_driver_parameter(&p->parameters[i]);
+	for(int32 index = 0; index < p->parameter_count; index++)
+		free_driver_parameter(&p->parameters[index]);
 	
 	free(p->parameters);
+}
+
+
+bool
+equal_driver_settings(const driver_settings *lhs, const driver_settings *rhs)
+{
+	if(!lhs && !rhs)
+		return true;
+	else if(!lhs || !rhs)
+		return false;
+	
+	if(lhs->parameter_count != rhs->parameter_count)
+		return false;
+	
+	for(int32 index = 0; index < lhs->parameter_count; index++) {
+		if(!equal_driver_parameters(&lhs->parameters[index], &rhs->parameters[index]))
+			return false;
+	}
+	
+	return true;
+}
+
+
+bool
+equal_driver_parameters(const driver_parameter *lhs, const driver_parameter *rhs)
+{
+	if(!lhs && !rhs)
+		return true;
+	else if(!lhs || !rhs)
+		return false;
+	
+	if(lhs->name && rhs->name) {
+		if(strcmp(lhs->name, rhs->name))
+			return false;
+	} else if(lhs->name != rhs->name)
+		return false;
+	
+	if(lhs->value_count != rhs->value_count
+			|| lhs->parameter_count != rhs->parameter_count)
+		return false;
+	
+	for(int32 index = 0; index < lhs->value_count; index++) {
+		if(strcmp(lhs->values[index], rhs->values[index]))
+			return false;
+	}
+	
+	for(int32 index = 0; index < lhs->parameter_count; index++) {
+		if(!equal_driver_parameters(&lhs->parameters[index], &rhs->parameters[index]))
+			return false;
+	}
+	
+	return true;
 }
 
 
@@ -139,10 +207,11 @@ get_settings_value(const char *name, const driver_settings *settings)
 	if(!name || !settings)
 		return NULL;
 	
-	for(int32 i=0; i < settings->parameter_count; i++)
-		if(!strcasecmp(settings->parameters[i].name, name)
-			&& settings->parameters[i].value_count > 0)
-			return settings->parameters[i].values[0];
+	for(int32 index = 0; index < settings->parameter_count; index++)
+		if(!strcasecmp(settings->parameters[index].name, name)
+				&& settings->parameters[index].value_count > 0
+				&& settings->parameters[index].values)
+			return settings->parameters[index].values[0];
 	
 	return NULL;
 }

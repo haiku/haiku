@@ -17,6 +17,8 @@
 
 
 class PPPDevice : public PPPLayer {
+		friend class PPPStateMachine;
+
 	protected:
 		// PPPDevice must be subclassed
 		PPPDevice(const char *name, PPPInterface& interface,
@@ -35,12 +37,18 @@ class PPPDevice : public PPPLayer {
 		uint32 MTU() const
 			{ return fMTU; }
 		
-		// these calls must not block
 		virtual bool Up() = 0;
+			// In server mode you should listen for incoming connections.
+			// On error: either call UpFailedEvent() or return false.
 		virtual bool Down() = 0;
-		virtual bool Listen() = 0;
 		bool IsUp() const
-			{ return fIsUp; }
+			{ return fConnectionPhase == PPP_ESTABLISHED_PHASE; }
+		bool IsDown() const
+			{ return fConnectionPhase == PPP_DOWN_PHASE; }
+		bool IsGoingUp() const
+			{ return fConnectionPhase == PPP_ESTABLISHMENT_PHASE; }
+		bool IsGoingDown() const
+			{ return fConnectionPhase == PPP_TERMINATION_PHASE; }
 		
 		// The biggest of the two tranfer rates will be set in ifnet.
 		// These methods should return default values when disconnected.
@@ -68,8 +76,8 @@ class PPPDevice : public PPPLayer {
 		// Report that we are going up/down
 		// (from now on, the Up() process can be aborted).
 		// Abort if false is returned!
-		bool UpStarted() const;
-		bool DownStarted() const;
+		bool UpStarted();
+		bool DownStarted();
 		
 		// report up/down events
 		void UpFailedEvent();
@@ -85,7 +93,7 @@ class PPPDevice : public PPPLayer {
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
 		
-		bool fIsUp;
+		ppp_phase fConnectionPhase;
 };
 
 

@@ -108,7 +108,6 @@ class PPPProtocol : public PPPLayer {
 
 	private:
 		ppp_phase fActivationPhase;
-		ppp_level fLevel;
 		uint16 fProtocolNumber;
 		int32 fAddressFamily;
 		PPPInterface& fInterface;

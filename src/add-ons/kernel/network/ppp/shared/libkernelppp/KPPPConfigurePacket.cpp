@@ -20,20 +20,20 @@ PPPConfigurePacket::PPPConfigurePacket(uint8 code)
 PPPConfigurePacket::PPPConfigurePacket(struct mbuf *packet)
 {
 	// decode packet
-	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
+	ppp_lcp_packet *header = mtod(packet, ppp_lcp_packet*);
 	
-	if(!SetCode(data->code))
+	if(!SetCode(header->code))
 		return;
 	
-	if(data->length < 4)
+	if(header->length < 4)
 		return;
 			// there are no items (or one corrupted item)
 	
 	int32 position = 0;
 	ppp_configure_item *item;
 	
-	while(position <= data->length - 4) {
-		item = (ppp_configure_item*) (data->data + position);
+	while(position <= header->length - 4) {
+		item = (ppp_configure_item*) (header->data + position);
 		position += item->length;
 		
 		AddItem(item);
@@ -130,9 +130,9 @@ PPPConfigurePacket::ToMbuf(uint32 reserve = 0)
 	struct mbuf *packet = m_gethdr(MT_DATA);
 	packet->m_data += reserve;
 	
-	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
+	ppp_lcp_packet *header = mtod(packet, ppp_lcp_packet*);
 	
-	data->code = Code();
+	header->code = Code();
 	
 	uint8 length = 0;
 	ppp_configure_item *item;
@@ -140,17 +140,18 @@ PPPConfigurePacket::ToMbuf(uint32 reserve = 0)
 	for(int32 index = 0; index < CountItems(); index++) {
 		item = ItemAt(index);
 		
+		// make sure we have enough space left
 		if(0xFF - length < item->length) {
 			m_freem(packet);
 			return NULL;
 		}
 		
-		memcpy(data->data + length, item, item->length);
+		memcpy(header->data + length, item, item->length);
 		length += item->length;
 	}
 	
-	data->length = length + 2;
-	packet->m_len = data->length;
+	header->length = length + 2;
+	packet->m_len = header->length;
 	
 	return packet;
 }

@@ -21,8 +21,6 @@ PPPLCPExtension::PPPLCPExtension(const char *name, uint8 code, PPPInterface& int
 		fName = strdup(name);
 	else
 		fName = strdup("Unknown");
-	
-	fInitStatus = interface.LCP().AddLCPExtension(this) ? B_OK : B_ERROR;
 }
 
 

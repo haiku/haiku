@@ -11,8 +11,6 @@
 #include <PPPDefs.h>
 
 
-typedef uint32 interface_id;
-
 // various constants
 #define PPP_PULSE_RATE						500000
 

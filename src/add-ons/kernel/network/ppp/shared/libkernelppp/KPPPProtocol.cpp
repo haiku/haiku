@@ -45,8 +45,6 @@ PPPProtocol::PPPProtocol(const char *name, ppp_phase activationPhase,
 		else
 			fSide = PPP_PEER_SIDE;
 	}
-	
-	fInitStatus = interface.AddProtocol(this) && fInitStatus == B_OK ? B_OK : B_ERROR;
 }
 
 

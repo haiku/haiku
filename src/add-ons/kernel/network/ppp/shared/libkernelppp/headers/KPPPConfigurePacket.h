@@ -16,7 +16,7 @@ struct mbuf;
 typedef struct ppp_configure_item {
 	uint8 type;
 	uint8 length;
-	int8 data[0];
+	uint8 data[0];
 		// the data follows this structure
 } ppp_configure_item;
 

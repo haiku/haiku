@@ -32,16 +32,18 @@ PPPLCP::~PPPLCP()
 {
 	while(CountOptionHandlers())
 		delete OptionHandlerAt(0);
+	while(CountLCPExtensions())
+		delete LCPExtensionAt(0);
 }
 
 
 bool
 PPPLCP::AddOptionHandler(PPPOptionHandler *optionHandler)
 {
-	if(!optionHandler)
+	if(!optionHandler || &optionHandler->Interface() != &Interface())
 		return false;
 	
-	LockerHelper locker(StateMachine().Locker());
+	LockerHelper locker(StateMachine().fLock);
 	
 	if(Interface().Phase() != PPP_DOWN_PHASE || OptionHandlerFor(optionHandler->Type()))
 		return false;
@@ -55,7 +57,7 @@ PPPLCP::AddOptionHandler(PPPOptionHandler *optionHandler)
 bool
 PPPLCP::RemoveOptionHandler(PPPOptionHandler *optionHandler)
 {
-	LockerHelper locker(StateMachine().Locker());
+	LockerHelper locker(StateMachine().fLock);
 	
 	if(Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
@@ -106,10 +108,10 @@ PPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
 bool
 PPPLCP::AddLCPExtension(PPPLCPExtension *lcpExtension)
 {
-	if(!lcpExtension)
+	if(!lcpExtension || &lcpExtension->Interface() != &Interface())
 		return false;
 	
-	LockerHelper locker(StateMachine().Locker());
+	LockerHelper locker(StateMachine().fLock);
 	
 	if(Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
@@ -122,7 +124,7 @@ PPPLCP::AddLCPExtension(PPPLCPExtension *lcpExtension)
 bool
 PPPLCP::RemoveLCPExtension(PPPLCPExtension *lcpExtension)
 {
-	LockerHelper locker(StateMachine().Locker());
+	LockerHelper locker(StateMachine().fLock);
 	
 	if(Interface().Phase() != PPP_DOWN_PHASE)
 		return false;

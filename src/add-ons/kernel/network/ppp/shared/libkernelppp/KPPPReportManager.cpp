@@ -118,11 +118,17 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 			continue;
 		} else if(result == B_OK) {
 			if(request->flags & PPP_WAIT_FOR_REPLY) {
+				thread_info info;
+				
 				if(request->flags & PPP_NO_REPLY_TIMEOUT) {
 					sender = -1;
-					while(sender != request->thread)
-						code = receive_data(&sender, NULL, 0);
-					result = B_OK;
+					result = B_ERROR;
+					// always check if the thread still exists
+					while(sender != request->thread
+							&& get_thread_info(request->thread, &info)
+								!= B_BAD_THREAD_ID)
+						result = receive_data_with_timeout(&sender, &code, NULL, 0,
+							PPP_REPORT_TIMEOUT);
 				} else {
 					sender = -1;
 					result = B_OK;

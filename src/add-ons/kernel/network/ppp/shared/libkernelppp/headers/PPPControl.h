@@ -9,6 +9,7 @@
 #define _PPP_CONTROL__H
 
 #include <Drivers.h>
+#include <driver_settings.h>
 #include <PPPDefs.h>
 
 
@@ -30,16 +31,22 @@
 
 enum ppp_control_ops {
 	// -----------------------------------------------------
+	// PPPManager
+	PPPC_CREATE_INTERFACE = PPP_OPS_START,
+	PPPC_DELETE_INTERFACE,
+	PPPC_BRING_INTERFACE_UP,
+	PPPC_BRING_INTERFACE_DOWN,
+	PPPC_CONTROL_INTERFACE,
+	PPPC_GET_INTERFACES,
+	PPPC_COUNT_INTERFACES,
+	// -----------------------------------------------------
+	
+	// -----------------------------------------------------
 	// PPPInterface
 	PPPC_GET_INTERFACE_INFO = PPP_INTERFACE_OPS_START,
 	PPPC_SET_MRU,
 	PPPC_SET_DIAL_ON_DEMAND,
 	PPPC_SET_AUTO_REDIAL,
-	
-	// these control ops use the ppp_report_request structure
-	PPPC_ENABLE_INTERFACE_REPORTS,
-	PPPC_DISABLE_INTERFACE_REPORTS,
-		// flags are not used for this control op
 	
 	// handler access
 	PPPC_CONTROL_DEVICE,
@@ -64,15 +71,35 @@ enum ppp_control_ops {
 	PPPC_ENABLE,
 	PPPC_GET_SIMPLE_HANDLER_INFO,
 		// PPPOptionHandler and PPPLCPExtension
+	
+	// these two control ops use the ppp_report_request structure
+	PPPC_ENABLE_REPORTS,
+	PPPC_DISABLE_REPORTS,
+		// flags are not used for this control op
 	// -----------------------------------------------------
 	
 	PPP_CONTROL_OPS_END = B_DEVICE_OP_CODES_END + 0xFFFF
 };
 
 
+typedef struct ppp_interface_settings_info {
+	const driver_settings *settings;
+	interface_id interface;
+		// only when creating: this is the id of the created interface
+} ppp_interface_settings_info;
+
+
+typedef struct ppp_get_interfaces_info {
+	interface_id *interfaces;
+	int32 count;
+	ppp_interface_filter filter;
+	int32 resultCount;
+} ppp_get_interfaces_info;
+
+
 typedef struct ppp_control_info {
 	uint32 index;
-		// index of interface/protocol/etc.
+		// index/id of interface/protocol/etc.
 	uint32 op;
 		// the Control()/ioctl() opcode
 	void *data;
@@ -90,6 +117,9 @@ typedef struct ppp_control_info {
 
 typedef struct ppp_interface_info {
 	const driver_settings *settings;
+	
+	int32 if_unit;
+		// negative if not registered
 	
 	ppp_mode mode;
 	ppp_state state;

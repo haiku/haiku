@@ -8,15 +8,16 @@
 #ifndef _SETTINGS_TOOLS__H
 #define _SETTINGS_TOOLS__H
 
-// remove this as soon as we get the extended driver_settings API
+#include <driver_settings.h>
 
-struct driver_settings;
-struct driver_parameter;
 
+// TODO: remove this as soon as we get the extended driver_settings API
 
 driver_settings *dup_driver_settings(const driver_settings *settings);
 void free_driver_settings(driver_settings *settings);
 
+bool equal_driver_settings(const driver_settings *lhs, const driver_settings *rhs);
+bool equal_driver_parameters(const driver_parameter *lhs, const driver_parameter *rhs);
 
 ppp_side get_side_string_value(const char *sideString, ppp_side unknownValue);
 bool get_boolean_value(const char *string, bool unknownValue);
@@ -27,7 +28,8 @@ inline
 const char*
 get_parameter_value(const char *name, const driver_parameter *parameters)
 {
-	return get_settings_value(name, (driver_settings*) &parameters->parameter_count);
+	return get_settings_value(name,
+		parameters ? (driver_settings*) &parameters->parameter_count : NULL);
 }
 
 

@@ -28,7 +28,10 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include <kernel_cpp.h>
+#ifdef _KERNEL_MODE
+	#include <kernel_cpp.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 

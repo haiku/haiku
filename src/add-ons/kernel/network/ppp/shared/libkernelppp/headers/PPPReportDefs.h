@@ -8,6 +8,8 @@
 #ifndef _PPP_REPORT_DEFS__H
 #define _PPP_REPORT_DEFS__H
 
+#include <OS.h>
+
 
 #define PPP_REPORT_TIMEOUT			10
 
@@ -28,13 +30,21 @@ enum ppp_report_flags {
 enum ppp_report_type {
 	PPP_ALL_REPORTS = -1,
 		// used only when disabling reports
+	PPP_MANAGER_REPORT = 1,
 	PPP_DESTRUCTION_REPORT = 16,
 		// the interface is being destroyed (no code is needed)
 		// this report is sent even if it was not requested
 	PPP_CONNECTION_REPORT = 17
 };
 
+
 // report codes (type-specific)
+enum ppp_manager_report_codes {
+	// the interface id is added to the following reports
+	PPP_REPORT_INTERFACE_CREATED = 0
+};
+
+
 enum ppp_connection_report_codes {
 	PPP_REPORT_GOING_UP = 0,
 	PPP_REPORT_UP_SUCCESSFUL = 1,

@@ -91,9 +91,6 @@ class PPPStateMachine {
 		void DownEvent();
 
 	private:
-		BLocker& Locker()
-			{ return fLock; }
-		
 		// private StateMachine methods
 		void NewState(ppp_state next);
 		void NewPhase(ppp_phase next);
