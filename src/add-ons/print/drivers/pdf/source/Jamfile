@@ -1,6 +1,9 @@
 SubDir OBOS_TOP src add-ons print drivers pdf source ;
 
-AddResources PDF\ Writer : PDFWriter.rsrc ;
+AddResources PDF\ Writer : 
+	# PDFWriter.rsrc 
+	PDFWriter.rdef
+;
 
 Addon 
 	PDF\ Writer
