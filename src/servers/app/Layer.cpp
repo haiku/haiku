@@ -557,7 +557,13 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 
 				if (fUpdateReg.CountRects() > 0)
 				{
-					SendUpdateMsg();
+					if (!fOwner->fInUpdate)
+					{
+						fOwner->prevInvalid = fUpdateReg;
+						SendUpdateMsg();
+					}
+					else
+						fOwner->zUpdateReg.Include(&fUpdateReg);
 				}
 				
 				// we're not that different than other. We too have an
@@ -657,9 +663,9 @@ void Layer::UpdateStart()
 	fInUpdate = true;
 	if (fClassID == AS_WINBORDER_CLASS)
 	{
+		// NOTE: don't worry, RooLayer is locked here.
 		WinBorder	*wb = (WinBorder*)this;
-		wb->yUpdateReg = wb->zUpdateReg;
-		wb->zUpdateReg.MakeEmpty();
+		wb->yUpdateReg = wb->prevInvalid;
 	}
 	fClipReg = &fUpdateReg;
 }
@@ -672,6 +678,15 @@ void Layer::UpdateEnd()
 	{
 		WinBorder	*wb = (WinBorder*)this;
 		wb->yUpdateReg.MakeEmpty();
+		wb->zUpdateReg.Exclude(&wb->prevInvalid);
+		if (wb->zUpdateReg.CountRects() > 0)
+		{
+			wb->prevInvalid = wb->zUpdateReg;
+			fUpdateReg = wb->zUpdateReg;
+			SendUpdateMsg();
+		}
+		else
+			wb->prevInvalid.MakeEmpty();
 	}
 
 	fInUpdate = false;

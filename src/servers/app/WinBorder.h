@@ -114,6 +114,7 @@ protected:
 
 	BRegion	 zUpdateReg;
 	BRegion	 yUpdateReg;
+	BRegion  prevInvalid;
 
 	int32 fMouseButtons;
 	int32 fKeyModifiers;

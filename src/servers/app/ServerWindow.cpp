@@ -1416,7 +1416,9 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_END_UPDATE:
 		{
 			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n",fTitle.String()));
+			fWinBorder->GetRootLayer()->Lock();
 			cl->UpdateEnd();
+			fWinBorder->GetRootLayer()->Unlock();
 			break;
 		}
 
@@ -1649,7 +1651,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 {
 	fWinBorder->GetRootLayer()->Lock();
 	BRegion		rreg(cl->fVisible);
-	rreg.Include(&fWinBorder->zUpdateReg);
+	rreg.Include(&fWinBorder->yUpdateReg);
 
 	desktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
 
