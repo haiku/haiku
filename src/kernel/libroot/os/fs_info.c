@@ -27,7 +27,7 @@ dev_t
 dev_for_path(const char *path)
 {
 	struct stat stat;
-	int status = _kern_read_stat(-1, path, false, &stat, sizeof(struct stat));
+	int status = _kern_read_stat(-1, path, true, &stat, sizeof(struct stat));
 	if (status == B_OK)
 		return stat.st_dev;
 
