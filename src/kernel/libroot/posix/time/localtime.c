@@ -949,17 +949,18 @@ tzsetwall P((void))
 
 
 #include <StorageDefs.h>
-void _get_tzfilename(char* filename, size_t length);
+#include <syscalls.h>
 
 void
 tzset P((void))
 {
 	register const char *	name;
 	char tzfilename[B_PATH_NAME_LENGTH];
+	bool is_gmt;
 
 	name = getenv("TZ");
 	if (name == NULL) {
-		_get_tzfilename(tzfilename, B_PATH_NAME_LENGTH);
+		_kern_get_tzfilename(tzfilename, B_PATH_NAME_LENGTH, &is_gmt);
 		if (tzfilename[0] == '\0') {
 			tzsetwall();
 			return;
