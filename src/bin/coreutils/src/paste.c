@@ -1,5 +1,6 @@
 /* paste - merge lines of files
-   Copyright (C) 1984, 1997-2002 by David M. Ihnat
+   Copyright (C) 1997-2004 Free Software Foundation, Inc.
+   Copyright (C) 1984 David M. Ihnat
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -41,40 +42,31 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include "system.h"
-#include "closeout.h"
 #include "error.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "paste"
 
-#define AUTHORS N_ ("David M. Ihnat and David MacKenzie")
+#define AUTHORS "David M. Ihnat", "David MacKenzie"
 
 /* Indicates that no delimiter should be added in the current position. */
 #define EMPTY_DELIM '\0'
-
-static FILE dummy_closed;
-/* Element marking a file that has reached EOF and been closed. */
-#define CLOSED (&dummy_closed)
-
-static FILE dummy_endlist;
-/* Element marking end of list of open files. */
-#define ENDLIST (&dummy_endlist)
 
 /* Name this program was run with. */
 char *program_name;
 
 /* If nonzero, we have read standard input at some point. */
-static int have_read_stdin;
+static bool have_read_stdin;
 
 /* If nonzero, merge subsequent lines of each file rather than
    corresponding lines from each file in parallel. */
-static int serial_merge;
+static bool serial_merge;
 
 /* The delimeters between lines of input files (used cyclically). */
 static char *delims;
 
 /* A pointer to the character after the end of `delims'. */
-static char *delim_end;
+static char const *delim_end;
 
 static struct option const longopts[] =
 {
@@ -85,19 +77,16 @@ static struct option const longopts[] =
   {0, 0, 0, 0}
 };
 
-/* Replace backslash representations of special characters in
-   STRPTR with their actual values.
-   The set of possible backslash characters has been expanded beyond
-   that recognized by the Unix version.
+/* Set globals delims and delim_end.  Copy STRPTR to DELIMS, converting
+   backslash representations of special characters in STRPTR to their actual
+   values. The set of possible backslash characters has been expanded beyond
+   that recognized by the Unix version.  */
 
-   Return a pointer to the character after the new end of STRPTR. */
-
-static char *
-collapse_escapes (char *strptr)
+static void
+collapse_escapes (char const *strptr)
 {
-  register char *strout;
-
-  strout = strptr;		/* Start at the same place, anyway. */
+  char *strout = xstrdup (strptr);
+  delims = strout;
 
   while (*strptr)
     {
@@ -142,37 +131,51 @@ collapse_escapes (char *strptr)
 	  strptr++;
 	}
     }
-  return strout;
+  delim_end = strout;
+}
+
+/* Report a write error and exit.  */
+
+static void write_error (void) ATTRIBUTE_NORETURN;
+static void
+write_error (void)
+{
+  error (EXIT_FAILURE, errno, _("write error"));
+  abort ();
+}
+
+/* Output a single byte, reporting any write errors.  */
+
+static inline void
+xputchar (char c)
+{
+  if (putchar (c) < 0)
+    write_error ();
 }
 
 /* Perform column paste on the NFILES files named in FNAMPTR.
-   Return 0 if no errors, 1 if one or more files could not be
+   Return true if successful, false if one or more files could not be
    opened or read. */
 
-static int
-paste_parallel (int nfiles, char **fnamptr)
+static bool
+paste_parallel (size_t nfiles, char **fnamptr)
 {
-  int errors = 0;		/* 1 if open or read errors occur. */
-  /* Number of files for which space is allocated in `delbuf' and `fileptr'.
-     Enlarged as necessary. */
-  int file_list_size = 12;
-  int chr IF_LINT (= 0);	/* Input character. */
-  int line_length;		/* Number of chars in line. */
-  int somedone;			/* 0 if all files empty for this line. */
+  bool ok = true;
   /* If all files are just ready to be closed, or will be on this
      round, the string of delimiters must be preserved.
-     delbuf[0] through delbuf[file_list_size]
+     delbuf[0] through delbuf[nfiles]
      store the delimiters for closed files. */
-  char *delbuf;
-  size_t delims_saved;		/* Number of delims saved in `delbuf'. */
-  register char *delimptr;	/* Cycling pointer into `delims'. */
-  FILE **fileptr;		/* Streams open to the files to process. */
-  int files_open;		/* Number of files still open to process. */
-  int i;			/* Loop index. */
-  int opened_stdin = 0;		/* Nonzero if any fopen got fd 0. */
+  char *delbuf = xmalloc (nfiles + 2);
 
-  delbuf = (char *) xmalloc (file_list_size + 2);
-  fileptr = (FILE **) xmalloc ((file_list_size + 1) * sizeof (FILE *));
+  /* Streams open to the files to process; NULL if the corresponding
+     stream is closed.  */
+  FILE **fileptr = xnmalloc (nfiles + 1, sizeof *fileptr);
+
+  /* Number of files still open to process.  */
+  size_t files_open;
+
+  /* True if any fopen got fd == STDIN_FILENO.  */
+  bool opened_stdin = false;
 
   /* Attempt to open all files.  This could be expanded to an infinite
      number of files, but at the (considerable) expense of remembering
@@ -180,16 +183,9 @@ paste_parallel (int nfiles, char **fnamptr)
 
   for (files_open = 0; files_open < nfiles; ++files_open)
     {
-      if (files_open == file_list_size - 2)
-	{
-	  file_list_size += 12;
-	  delbuf = (char *) xrealloc (delbuf, file_list_size + 2);
-	  fileptr = (FILE **) xrealloc ((char *) fileptr, (file_list_size + 1)
-					* sizeof (FILE *));
-	}
       if (STREQ (fnamptr[files_open], "-"))
 	{
-	  have_read_stdin = 1;
+	  have_read_stdin = true;
 	  fileptr[files_open] = stdin;
 	}
       else
@@ -197,12 +193,10 @@ paste_parallel (int nfiles, char **fnamptr)
 	  fileptr[files_open] = fopen (fnamptr[files_open], "r");
 	  if (fileptr[files_open] == NULL)
 	    error (EXIT_FAILURE, errno, "%s", fnamptr[files_open]);
-	  else if (fileno (fileptr[files_open]) == 0)
-	    opened_stdin = 1;
+	  else if (fileno (fileptr[files_open]) == STDIN_FILENO)
+	    opened_stdin = true;
 	}
     }
-
-  fileptr[files_open] = ENDLIST;
 
   if (opened_stdin && have_read_stdin)
     error (EXIT_FAILURE, 0, _("standard input is closed"));
@@ -214,19 +208,25 @@ paste_parallel (int nfiles, char **fnamptr)
   while (files_open)
     {
       /* Set up for the next line. */
-      somedone = 0;
-      delimptr = delims;
-      delims_saved = 0;
+      bool somedone = false;
+      char const *delimptr = delims;
+      size_t delims_saved = 0;	/* Number of delims saved in `delbuf'. */
+      size_t i;
 
-      for (i = 0; fileptr[i] != ENDLIST && files_open; i++)
+      for (i = 0; i < nfiles && files_open; i++)
 	{
-	  line_length = 0;	/* Clear so we can easily detect EOF. */
-	  if (fileptr[i] != CLOSED)
+	  int chr IF_LINT (= 0);	/* Input character. */
+	  int err IF_LINT (= 0);	/* Input errno value.  */
+	  size_t line_length = 0;	/* Number of chars in line. */
+
+	  if (fileptr[i])
 	    {
 	      chr = getc (fileptr[i]);
+	      err = errno;
 	      if (chr != EOF && delims_saved)
 		{
-		  fwrite (delbuf, sizeof (char), delims_saved, stdout);
+		  if (fwrite (delbuf, 1, delims_saved, stdout) != delims_saved)
+		    write_error ();
 		  delims_saved = 0;
 		}
 
@@ -235,35 +235,36 @@ paste_parallel (int nfiles, char **fnamptr)
 		  line_length++;
 		  if (chr == '\n')
 		    break;
-		  putc (chr, stdout);
+		  xputchar (chr);
 		  chr = getc (fileptr[i]);
+		  err = errno;
 		}
 	    }
 
 	  if (line_length == 0)
 	    {
 	      /* EOF, read error, or closed file.
-		 If an EOF or error, close the file and mark it in the list. */
-	      if (fileptr[i] != CLOSED)
+		 If an EOF or error, close the file.  */
+	      if (fileptr[i])
 		{
 		  if (ferror (fileptr[i]))
 		    {
-		      error (0, errno, "%s", fnamptr[i]);
-		      errors = 1;
+		      error (0, err, "%s", fnamptr[i]);
+		      ok = false;
 		    }
 		  if (fileptr[i] == stdin)
 		    clearerr (fileptr[i]); /* Also clear EOF. */
 		  else if (fclose (fileptr[i]) == EOF)
 		    {
 		      error (0, errno, "%s", fnamptr[i]);
-		      errors = 1;
+		      ok = false;
 		    }
 
-		  fileptr[i] = CLOSED;
+		  fileptr[i] = NULL;
 		  files_open--;
 		}
 
-	      if (fileptr[i + 1] == ENDLIST)
+	      if (i + 1 == nfiles)
 		{
 		  /* End of this output line.
 		     Is this the end of the whole thing? */
@@ -272,10 +273,12 @@ paste_parallel (int nfiles, char **fnamptr)
 		      /* No.  Some files were not closed for this line. */
 		      if (delims_saved)
 			{
-			  fwrite (delbuf, sizeof (char), delims_saved, stdout);
+			  if (fwrite (delbuf, 1, delims_saved, stdout)
+			      != delims_saved)
+			    write_error ();
 			  delims_saved = 0;
 			}
-		      putc ('\n', stdout);
+		      xputchar ('\n');
 		    }
 		  continue;	/* Next read of files, or exit. */
 		}
@@ -291,43 +294,51 @@ paste_parallel (int nfiles, char **fnamptr)
 	  else
 	    {
 	      /* Some data read. */
-	      somedone++;
+	      somedone = true;
 
 	      /* Except for last file, replace last newline with delim. */
-	      if (fileptr[i + 1] != ENDLIST)
+	      if (i + 1 != nfiles)
 		{
-		  if (chr != '\n')
-		    putc (chr, stdout);
+		  if (chr != '\n' && chr != EOF)
+		    xputchar (chr);
 		  if (*delimptr != EMPTY_DELIM)
-		    putc (*delimptr, stdout);
+		    xputchar (*delimptr);
 		  if (++delimptr == delim_end)
 		    delimptr = delims;
 		}
 	      else
-		putc (chr, stdout);
+		{
+		  /* If the last line of the last file lacks a newline,
+		     print one anyhow.  POSIX requires this.  */
+		  char c = (chr == EOF ? '\n' : chr);
+		  xputchar (c);
+		}
 	    }
 	}
     }
-  return errors;
+  free (fileptr);
+  free (delbuf);
+  return ok;
 }
 
 /* Perform serial paste on the NFILES files named in FNAMPTR.
-   Return 0 if no errors, 1 if one or more files could not be
+   Return true if no errors, false if one or more files could not be
    opened or read. */
 
-static int
-paste_serial (int nfiles, char **fnamptr)
+static bool
+paste_serial (size_t nfiles, char **fnamptr)
 {
-  int errors = 0;		/* 1 if open or read errors occur. */
-  register int charnew, charold; /* Current and previous char read. */
-  register char *delimptr;	/* Current delimiter char. */
-  register FILE *fileptr;	/* Open for reading current file. */
+  bool ok = true;	/* false if open or read errors occur. */
+  int charnew, charold; /* Current and previous char read. */
+  char const *delimptr;	/* Current delimiter char. */
+  FILE *fileptr;	/* Open for reading current file. */
 
   for (; nfiles; nfiles--, fnamptr++)
     {
+      int saved_errno;
       if (STREQ (*fnamptr, "-"))
 	{
-	  have_read_stdin = 1;
+	  have_read_stdin = true;
 	  fileptr = stdin;
 	}
       else
@@ -336,7 +347,7 @@ paste_serial (int nfiles, char **fnamptr)
 	  if (fileptr == NULL)
 	    {
 	      error (0, errno, "%s", *fnamptr);
-	      errors = 1;
+	      ok = false;
 	      continue;
 	    }
 	}
@@ -344,6 +355,7 @@ paste_serial (int nfiles, char **fnamptr)
       delimptr = delims;	/* Set up for delimiter string. */
 
       charold = getc (fileptr);
+      saved_errno = errno;
       if (charold != EOF)
 	{
 	  /* `charold' is set up.  Hit it!
@@ -358,44 +370,45 @@ paste_serial (int nfiles, char **fnamptr)
 	      if (charold == '\n')
 		{
 		  if (*delimptr != EMPTY_DELIM)
-		    putc (*delimptr, stdout);
+		    xputchar (*delimptr);
 
 		  if (++delimptr == delim_end)
 		    delimptr = delims;
 		}
 	      else
-		putc (charold, stdout);
+		xputchar (charold);
 
 	      charold = charnew;
 	    }
+	  saved_errno = errno;
 
 	  /* Hit EOF.  Process that last character. */
-	  putc (charold, stdout);
+	  xputchar (charold);
 	}
 
       if (charold != '\n')
-	putc ('\n', stdout);
+	xputchar ('\n');
 
       if (ferror (fileptr))
 	{
-	  error (0, errno, "%s", *fnamptr);
-	  errors = 1;
+	  error (0, saved_errno, "%s", *fnamptr);
+	  ok = false;
 	}
       if (fileptr == stdin)
 	clearerr (fileptr);	/* Also clear EOF. */
       else if (fclose (fileptr) == EOF)
 	{
 	  error (0, errno, "%s", *fnamptr);
-	  errors = 1;
+	  ok = false;
 	}
     }
-  return errors;
+  return ok;
 }
 
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -422,15 +435,17 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       /* FIXME: add a couple of examples.  */
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
-  exit (status == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (status);
 }
 
 int
 main (int argc, char **argv)
 {
-  int optc, exit_status;
-  char default_delims[2], zero_delims[3];
+  int optc;
+  bool ok;
+  char const *delim_arg = "\t";
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -438,28 +453,22 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
-  have_read_stdin = 0;
-  serial_merge = 0;
-  delims = default_delims;
-  strcpy (delims, "\t");
-  strcpy (zero_delims, "\\0");
+  have_read_stdin = false;
+  serial_merge = false;
 
   while ((optc = getopt_long (argc, argv, "d:s", longopts, NULL)) != -1)
     {
       switch (optc)
 	{
-	case 0:
-	  break;
-
 	case 'd':
 	  /* Delimiter character(s). */
 	  if (optarg[0] == '\0')
-	    optarg = zero_delims;
-	  delims = optarg;
+	    optarg = "\\0";
+	  delim_arg = optarg;
 	  break;
 
 	case 's':
-	  serial_merge++;
+	  serial_merge = true;
 	  break;
 
 	case_GETOPT_HELP_CHAR;
@@ -474,13 +483,16 @@ main (int argc, char **argv)
   if (optind == argc)
     argv[argc++] = "-";
 
-  delim_end = collapse_escapes (delims);
+  collapse_escapes (delim_arg);
 
   if (!serial_merge)
-    exit_status = paste_parallel (argc - optind, &argv[optind]);
+    ok = paste_parallel (argc - optind, &argv[optind]);
   else
-    exit_status = paste_serial (argc - optind, &argv[optind]);
+    ok = paste_serial (argc - optind, &argv[optind]);
+
+  free (delims);
+
   if (have_read_stdin && fclose (stdin) == EOF)
     error (EXIT_FAILURE, errno, "-");
-  exit (exit_status == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

@@ -21,15 +21,10 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
-
-#if STDC_HEADERS || HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
 
 #if HAVE_UNISTD_H
 # include <unistd.h>
@@ -77,7 +72,7 @@ getuser (uid_t uid)
       return tail->name;
 
   pwent = getpwuid (uid);
-  tail = (struct userid *) xmalloc (sizeof (struct userid));
+  tail = xmalloc (sizeof (struct userid));
   tail->id.u = uid;
   tail->name = pwent ? xstrdup (pwent->pw_name) : NULL;
 
@@ -119,7 +114,7 @@ getuidbyname (const char *user)
     }
 #endif
 
-  tail = (struct userid *) xmalloc (sizeof (struct userid));
+  tail = xmalloc (sizeof (struct userid));
   tail->name = xstrdup (user);
 
   /* Add to the head of the list, so most recently used is first.  */
@@ -153,7 +148,7 @@ getgroup (gid_t gid)
       return tail->name;
 
   grent = getgrgid (gid);
-  tail = (struct userid *) xmalloc (sizeof (struct userid));
+  tail = xmalloc (sizeof (struct userid));
   tail->id.g = gid;
   tail->name = grent ? xstrdup (grent->gr_name) : NULL;
 
@@ -195,7 +190,7 @@ getgidbyname (const char *group)
     }
 #endif
 
-  tail = (struct userid *) xmalloc (sizeof (struct userid));
+  tail = xmalloc (sizeof (struct userid));
   tail->name = xstrdup (group);
 
   /* Add to the head of the list, so most recently used is first.  */

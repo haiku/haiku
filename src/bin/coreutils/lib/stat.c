@@ -1,7 +1,10 @@
 /* Work around the bug in some systems whereby stat/lstat succeeds when
-   given the zero-length file name argument.  The stat/lstat from SunOS4.1.4
-   has this bug.
-   Copyright (C) 1997-2003 Free Software Foundation, Inc.
+   given the zero-length file name argument.  The stat/lstat from SunOS 4.1.4
+   has this bug.  Also work around a deficiency in Solaris systems (up to at
+   least Solaris 9) regarding the semantics of `lstat ("symlink/", sbuf).'
+
+   Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,35 +27,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
-#ifdef LSTAT
+#if defined LSTAT && ! LSTAT_FOLLOWS_SLASHED_SYMLINK
+# include <stdlib.h>
 # include <string.h>
 
-# if HAVE_STDLIB_H
-#  include <stdlib.h>
-# endif
-
-# ifdef STAT_MACROS_BROKEN
-#  undef S_ISLNK
-# endif
-
-# ifndef S_ISLNK
-#  ifdef S_IFLNK
-#   define S_ISLNK(m) (((m) & S_IFMT) == S_IFLNK)
-#  else
-#   define S_ISLNK(m) 0
-#  endif
-# endif
-
-# ifndef HAVE_DECL_FREE
-"this configure-time declaration test was not run"
-# endif
-# if !HAVE_DECL_FREE
-void free ();
-# endif
-
+# include "stat-macros.h"
 # include "xalloc.h"
 
 /* lstat works differently on Linux and Solaris systems.  POSIX (see
@@ -94,14 +73,14 @@ slash_aware_lstat (const char *file, struct stat *sbuf)
 
   return lstat_result;
 }
-#endif /* LSTAT */
+#endif /* LSTAT && ! LSTAT_FOLLOWS_SLASHED_SYMLINK */
 
 /* This is a wrapper for stat/lstat.
    If FILE is the empty string, fail with errno == ENOENT.
    Otherwise, return the result of calling the real stat/lstat.
 
    This works around the bug in some systems whereby stat/lstat succeeds when
-   given the zero-length file name argument.  The stat/lstat from SunOS4.1.4
+   given the zero-length file name argument.  The stat/lstat from SunOS 4.1.4
    has this bug.  */
 
 /* This function also provides a version of lstat with consistent semantics
@@ -109,7 +88,11 @@ slash_aware_lstat (const char *file, struct stat *sbuf)
 
 #ifdef LSTAT
 # define rpl_xstat rpl_lstat
-# define xstat_return_val(F, S) slash_aware_lstat (F, S)
+# if ! LSTAT_FOLLOWS_SLASHED_SYMLINK
+#  define xstat_return_val(F, S) slash_aware_lstat (F, S)
+# else
+#  define xstat_return_val(F, S) lstat (F, S)
+# endif
 #else
 # define rpl_xstat rpl_stat
 # define xstat_return_val(F, S) stat (F, S)

@@ -1,5 +1,5 @@
 /* mkfifo -- make fifo's (named pipes)
-   Copyright (C) 90, 91, 1995-2002 Free Software Foundation, Inc.
+   Copyright (C) 90, 91, 1995-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ static struct option const longopts[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -77,9 +77,10 @@ main (int argc, char **argv)
   mode_t newmode;
   struct mode_change *change;
   const char *specified_mode;
-  int errors = 0;
+  int exit_status = EXIT_SUCCESS;
   int optc;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -90,14 +91,12 @@ main (int argc, char **argv)
   specified_mode = NULL;
 
 #ifndef S_ISFIFO
-  error (4, 0, _("fifo files not supported"));
+  error (EXIT_FAILURE, 0, _("fifo files not supported"));
 #else
   while ((optc = getopt_long (argc, argv, "m:", longopts, NULL)) != -1)
     {
       switch (optc)
 	{
-	case 0:
-	  break;
 	case 'm':
 	  specified_mode = optarg;
 	  break;
@@ -110,7 +109,7 @@ main (int argc, char **argv)
 
   if (optind == argc)
     {
-      error (0, 0, _("too few arguments"));
+      error (0, 0, _("missing operand"));
       usage (EXIT_FAILURE);
     }
 
@@ -136,17 +135,17 @@ main (int argc, char **argv)
 	 ensures the file mode permission bits are still set as desired.  */
 
       if (fail == 0 && specified_mode)
- 	{
- 	  fail = chmod (argv[optind], newmode);
+	{
+	  fail = chmod (argv[optind], newmode);
 	  if (fail)
 	    error (0, errno, _("cannot set permissions of fifo %s"),
 		   quote (argv[optind]));
- 	}
+	}
 
       if (fail)
- 	errors = 1;
+	exit_status = EXIT_FAILURE;
     }
 
-  exit (errors);
+  exit (exit_status);
 #endif
 }

@@ -1,6 +1,7 @@
 /* makepath.c -- Ensure that a directory path exists.
-   Copyright (C) 1990, 1997, 1998, 1999, 2000, 2002, 2003 Free Software
-   Foundation, Inc.
+
+   Copyright (C) 1990, 1997, 1998, 1999, 2000, 2002, 2003, 2004 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,19 +23,9 @@
 # include <config.h>
 #endif
 
-#if __GNUC__
-# define alloca __builtin_alloca
-#else
-# if HAVE_ALLOCA_H
-#  include <alloca.h>
-# else
-#  ifdef _AIX
- #  pragma alloca
-#  else
-char *alloca ();
-#  endif
-# endif
-#endif
+#include "makepath.h"
+
+#include <alloca.h>
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -43,64 +34,9 @@ char *alloca ();
 # include <unistd.h>
 #endif
 
-#if STAT_MACROS_BROKEN
-# undef S_ISDIR
-#endif
-
-#if !defined S_ISDIR && defined S_IFDIR
-# define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
-#endif
-
-#ifndef S_IRWXUGO
-# define S_IRWXUGO (S_IRWXU | S_IRWXG | S_IRWXO)
-#endif
-
-#if STDC_HEADERS
-# include <stdlib.h>
-#endif
-
+#include <stdlib.h>
 #include <errno.h>
-
-#ifndef errno
-extern int errno;
-#endif
-
-#if HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-# ifndef strchr
-#  define strchr index
-# endif
-#endif
-
-#ifndef S_ISUID
-# define S_ISUID 04000
-#endif
-#ifndef S_ISGID
-# define S_ISGID 02000
-#endif
-#ifndef S_ISVTX
-# define S_ISVTX 01000
-#endif
-#ifndef S_IRUSR
-# define S_IRUSR 0200
-#endif
-#ifndef S_IWUSR
-# define S_IWUSR 0200
-#endif
-#ifndef S_IXUSR
-# define S_IXUSR 0100
-#endif
-
-#ifndef S_IRWXU
-# define S_IRWXU (S_IRUSR | S_IWUSR | S_IXUSR)
-#endif
-
-#define WX_USR (S_IWUSR | S_IXUSR)
-
-/* Include this before libintl.h so we get our definition of PARAMS. */
-#include "makepath.h"
+#include <string.h>
 
 #include "gettext.h"
 #define _(msgid) gettext (msgid)
@@ -109,6 +45,9 @@ extern int errno;
 #include "dirname.h"
 #include "error.h"
 #include "quote.h"
+#include "stat-macros.h"
+
+#define WX_USR (S_IWUSR | S_IXUSR)
 
 #define CLEANUP_CWD					\
   do							\
@@ -140,18 +79,19 @@ extern int errno;
   while (0)
 
 /* Attempt to create directory DIR (aka DIRPATH) with the specified MODE.
-   If CREATED_DIR_P is non-NULL, set *CREATED_DIR_P to non-zero if this
-   function creates DIR and to zero otherwise.  Give a diagnostic and
-   return non-zero if DIR cannot be created or cannot be determined to
+   If CREATED_DIR_P is non-NULL, set *CREATED_DIR_P if this
+   function creates DIR and clear it otherwise.  Give a diagnostic and
+   return false if DIR cannot be created or cannot be determined to
    exist already.  Use DIRPATH in any diagnostic, not DIR.
-   Note that if DIR already exists, this function returns zero
-   (indicating success) and sets *CREATED_DIR_P to zero.  */
+   Note that if DIR already exists, this function returns true
+   (indicating success) and clears *CREATED_DIR_P.  */
 
-int
-make_dir (const char *dir, const char *dirpath, mode_t mode, int *created_dir_p)
+bool
+make_dir (const char *dir, const char *dirpath, mode_t mode,
+	  bool *created_dir_p)
 {
-  int fail = 0;
-  int created_dir;
+  bool ok = true;
+  bool created_dir;
 
   created_dir = (mkdir (dir, mode) == 0);
 
@@ -172,12 +112,12 @@ make_dir (const char *dir, const char *dirpath, mode_t mode, int *created_dir_p)
 	{
 	  error (0, saved_errno, _("cannot create directory %s"),
 		 quote (dirpath));
-	  fail = 1;
+	  ok = false;
 	}
       else if (!S_ISDIR (stats.st_mode))
 	{
 	  error (0, 0, _("%s exists but is not a directory"), quote (dirpath));
-	  fail = 1;
+	  ok = false;
 	}
       else
 	{
@@ -188,7 +128,7 @@ make_dir (const char *dir, const char *dirpath, mode_t mode, int *created_dir_p)
   if (created_dir_p)
     *created_dir_p = created_dir;
 
-  return fail;
+  return ok;
 }
 
 /* Ensure that the directory ARGPATH exists.
@@ -202,36 +142,36 @@ make_dir (const char *dir, const char *dirpath, mode_t mode, int *created_dir_p)
    If VERBOSE_FMT_STRING is nonzero, use it as a printf format
    string for printing a message after successfully making a directory,
    with the name of the directory that was just made as an argument.
-   If PRESERVE_EXISTING is non-zero and ARGPATH is an existing directory,
+   If PRESERVE_EXISTING is true and ARGPATH is an existing directory,
    then do not attempt to set its permissions and ownership.
 
-   Return 0 if ARGPATH exists as a directory with the proper
-   ownership and permissions when done, otherwise 1.  */
+   Return true iff ARGPATH exists as a directory with the proper
+   ownership and permissions when done.  */
 
-int
+bool
 make_path (const char *argpath,
-	   int mode,
-	   int parent_mode,
+	   mode_t mode,
+	   mode_t parent_mode,
 	   uid_t owner,
 	   gid_t group,
-	   int preserve_existing,
+	   bool preserve_existing,
 	   const char *verbose_fmt_string)
 {
   struct stat stats;
-  int retval = 0;
+  bool retval = true;
 
   if (stat (argpath, &stats))
     {
       char *slash;
-      int tmp_mode;		/* Initial perms for leading dirs.  */
-      int re_protect;		/* Should leading dirs be unwritable? */
+      mode_t tmp_mode;		/* Initial perms for leading dirs.  */
+      bool re_protect;		/* Should leading dirs be unwritable? */
       struct ptr_list
       {
 	char *dirname_end;
 	struct ptr_list *next;
       };
       struct ptr_list *p, *leading_dirs = NULL;
-      int do_chdir;		/* Whether to chdir before each mkdir.  */
+      bool do_chdir;		/* Whether to chdir before each mkdir.  */
       struct saved_cwd cwd;
       char *basename_dir;
       char *dirpath;
@@ -252,23 +192,23 @@ make_path (const char *argpath,
 	      && (parent_mode & (S_ISUID | S_ISGID | S_ISVTX)) != 0))
 	{
 	  tmp_mode = S_IRWXU;
-	  re_protect = 1;
+	  re_protect = true;
 	}
       else
 	{
 	  tmp_mode = parent_mode;
-	  re_protect = 0;
+	  re_protect = false;
 	}
 
       /* If we can record the current working directory, we may be able
 	 to do the chdir optimization.  */
-      do_chdir = !save_cwd (&cwd);
+      do_chdir = (save_cwd (&cwd) == 0);
 
       /* If we've saved the cwd and DIRPATH is an absolute pathname,
 	 we must chdir to `/' in order to enable the chdir optimization.
          So if chdir ("/") fails, turn off the optimization.  */
       if (do_chdir && *dirpath == '/' && chdir ("/") < 0)
-	do_chdir = 0;
+	do_chdir = false;
 
       slash = dirpath;
 
@@ -278,8 +218,7 @@ make_path (const char *argpath,
 
       while (1)
 	{
-	  int newly_created_dir;
-	  int fail;
+	  bool newly_created_dir;
 
 	  /* slash points to the leftmost unprocessed component of dirpath.  */
 	  basename_dir = slash;
@@ -294,11 +233,10 @@ make_path (const char *argpath,
 	    basename_dir = dirpath;
 
 	  *slash = '\0';
-	  fail = make_dir (basename_dir, dirpath, tmp_mode, &newly_created_dir);
-	  if (fail)
+	  if (! make_dir (basename_dir, dirpath, tmp_mode, &newly_created_dir))
 	    {
 	      CLEANUP;
-	      return 1;
+	      return false;
 	    }
 
 	  if (newly_created_dir)
@@ -316,7 +254,7 @@ make_path (const char *argpath,
 		  error (0, errno, _("cannot change owner and/or group of %s"),
 			 quote (dirpath));
 		  CLEANUP;
-		  return 1;
+		  return false;
 		}
 
 	      if (re_protect)
@@ -338,7 +276,7 @@ make_path (const char *argpath,
 	      error (0, errno, _("cannot chdir to directory %s"),
 		     quote (dirpath));
 	      CLEANUP;
-	      return 1;
+	      return false;
 	    }
 
 	  *slash++ = '/';
@@ -358,10 +296,10 @@ make_path (const char *argpath,
       /* We're done making leading directories.
 	 Create the final component of the path.  */
 
-      if (make_dir (basename_dir, dirpath, mode, NULL))
+      if (! make_dir (basename_dir, dirpath, mode, NULL))
 	{
 	  CLEANUP;
-	  return 1;
+	  return false;
 	}
 
       if (verbose_fmt_string != NULL)
@@ -377,7 +315,7 @@ make_path (const char *argpath,
 	    {
 	      error (0, errno, _("cannot change owner and/or group of %s"),
 		     quote (dirpath));
-	      retval = 1;
+	      retval = false;
 	    }
 	}
 
@@ -391,7 +329,7 @@ make_path (const char *argpath,
 	{
 	  error (0, errno, _("cannot change permissions of %s"),
 		 quote (dirpath));
-	  retval = 1;
+	  retval = false;
 	}
 
       CLEANUP_CWD;
@@ -404,9 +342,9 @@ make_path (const char *argpath,
 	  *(p->dirname_end) = '\0';
 	  if (chmod (dirpath, parent_mode))
 	    {
-	      error (0, errno, "cannot change permissions of %s",
+	      error (0, errno, _("cannot change permissions of %s"),
 		     quote (dirpath));
-	      retval = 1;
+	      retval = false;
 	    }
 	}
     }
@@ -419,7 +357,7 @@ make_path (const char *argpath,
       if (!S_ISDIR (stats.st_mode))
 	{
 	  error (0, 0, _("%s exists but is not a directory"), quote (dirpath));
-	  return 1;
+	  return false;
 	}
 
       if (!preserve_existing)
@@ -439,13 +377,13 @@ make_path (const char *argpath,
 	    {
 	      error (0, errno, _("cannot change owner and/or group of %s"),
 		     quote (dirpath));
-	      retval = 1;
+	      retval = false;
 	    }
 	  if (chmod (dirpath, mode))
 	    {
 	      error (0, errno, _("cannot change permissions of %s"),
 				 quote (dirpath));
-	      retval = 1;
+	      retval = false;
 	    }
 	}
     }

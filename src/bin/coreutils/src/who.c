@@ -1,5 +1,5 @@
 /* GNU's who.
-   Copyright (C) 1992-2003 Free Software Foundation, Inc.
+   Copyright (C) 1992-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,12 +33,15 @@
 
 #include "readutmp.h"
 #include "error.h"
-#include "closeout.h"
+#include "hard-locale.h"
+#include "inttostr.h"
+#include "quote.h"
+#include "vasprintf.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "who"
 
-#define AUTHORS N_ ("Joseph Arceneaux, David MacKenzie, and Michael Stone")
+#define AUTHORS "Joseph Arceneaux", "David MacKenzie", "Michael Stone"
 
 #ifndef MAXHOSTNAMELEN
 # define MAXHOSTNAMELEN 64
@@ -48,32 +51,34 @@
 # define S_IWGRP 020
 #endif
 
-#ifndef USER_PROCESS
-# define USER_PROCESS INT_MAX
+#ifdef RUN_LVL
+# define UT_TYPE_RUN_LVL(U) UT_TYPE_EQ (U, RUN_LVL)
+#else
+# define UT_TYPE_RUN_LVL(U) false
 #endif
 
-#ifndef RUN_LVL
-# define RUN_LVL INT_MAX
+#ifdef INIT_PROCESS
+# define UT_TYPE_INIT_PROCESS(U) UT_TYPE_EQ (U, INIT_PROCESS)
+#else
+# define UT_TYPE_INIT_PROCESS(U) false
 #endif
 
-#ifndef INIT_PROCESS
-# define INIT_PROCESS INT_MAX
+#ifdef LOGIN_PROCESS
+# define UT_TYPE_LOGIN_PROCESS(U) UT_TYPE_EQ (U, LOGIN_PROCESS)
+#else
+# define UT_TYPE_LOGIN_PROCESS(U) false
 #endif
 
-#ifndef LOGIN_PROCESS
-# define LOGIN_PROCESS INT_MAX
+#ifdef DEAD_PROCESS
+# define UT_TYPE_DEAD_PROCESS(U) UT_TYPE_EQ (U, DEAD_PROCESS)
+#else
+# define UT_TYPE_DEAD_PROCESS(U) false
 #endif
 
-#ifndef DEAD_PROCESS
-# define DEAD_PROCESS INT_MAX
-#endif
-
-#ifndef BOOT_TIME
-# define BOOT_TIME 0
-#endif
-
-#ifndef NEW_TIME
-# define NEW_TIME 0
+#ifdef NEW_TIME
+# define UT_TYPE_NEW_TIME(U) UT_TYPE_EQ (U, NEW_TIME)
+#else
+# define UT_TYPE_NEW_TIME(U) false
 #endif
 
 #define IDLESTR_LEN 6
@@ -82,7 +87,7 @@
 # define UT_PID(U) ((U)->ut_pid)
 # define PIDSTR_DECL_AND_INIT(Var, Utmp_ent) \
   char Var[INT_STRLEN_BOUND (Utmp_ent->ut_pid) + 1]; \
-  sprintf (Var, "%d", (int) (Utmp_ent->ut_pid))
+  sprintf (Var, "%ld", (long int) (Utmp_ent->ut_pid))
 #else
 # define UT_PID(U) 0
 # define PIDSTR_DECL_AND_INIT(Var, Utmp_ent) \
@@ -92,87 +97,74 @@
 #if HAVE_STRUCT_XTMP_UT_ID
 # define UT_ID(U) ((U)->ut_id)
 #else
-  /* Of course, sizeof "whatever" is the size of a pointer (often 4),
-     but that's ok, since the actual string has a length of only 2.  */
 # define UT_ID(U) "??"
 #endif
 
-#define UT_TYPE_UNDEF 255
-
-#if HAVE_STRUCT_XTMP_UT_TYPE
-# define UT_TYPE(U) ((U)->ut_type)
-#else
-# define UT_TYPE(U) UT_TYPE_UNDEF
-#endif
-
-#define IS_USER_PROCESS(U)			\
-  (UT_USER (utmp_buf)[0]			\
-   && (UT_TYPE (utmp_buf) == USER_PROCESS	\
-       || (UT_TYPE (utmp_buf) == UT_TYPE_UNDEF	\
-	   && UT_TIME_MEMBER (utmp_buf) != 0)))
-
-int gethostname ();
 char *ttyname ();
 char *canon_host ();
 
 /* The name this program was run with. */
 char *program_name;
 
-/* If nonzero, attempt to canonicalize hostnames via a DNS lookup. */
-static int do_lookup;
+/* If true, attempt to canonicalize hostnames via a DNS lookup. */
+static bool do_lookup;
 
-/* If nonzero, display only a list of usernames and count of
+/* If true, display only a list of usernames and count of
    the users logged on.
-   Ignored for `who am i'. */
-static int short_list;
+   Ignored for `who am i'.  */
+static bool short_list;
 
-/* If nonzero, display only name, line, and time fields */
-static int short_output;
+/* If true, display only name, line, and time fields.  */
+static bool short_output;
 
-/* If nonzero, display the hours:minutes since each user has touched
+/* If true, display the hours:minutes since each user has touched
    the keyboard, or "." if within the last minute, or "old" if
-   not within the last day. */
-static int include_idle;
+   not within the last day.  */
+static bool include_idle;
 
-/* If nonzero, display a line at the top describing each field. */
-static int include_heading;
+/* If true, display a line at the top describing each field.  */
+static bool include_heading;
 
-/* If nonzero, display a `+' for each user if mesg y, a `-' if mesg n,
+/* If true, display a `+' for each user if mesg y, a `-' if mesg n,
    or a `?' if their tty cannot be statted. */
-static int include_mesg;
+static bool include_mesg;
 
-/* If nonzero, display process termination & exit status */
-static int include_exit;
+/* If true, display process termination & exit status.  */
+static bool include_exit;
 
-/* If nonzero, display the last boot time */
-static int need_boottime;
+/* If true, display the last boot time.  */
+static bool need_boottime;
 
-/* If nonzero, display dead processes */
-static int need_deadprocs;
+/* If true, display dead processes.  */
+static bool need_deadprocs;
 
-/* If nonzero, display processes waiting for user login */
-static int need_login;
+/* If true, display processes waiting for user login.  */
+static bool need_login;
 
-/* If nonzero, display processes started by init */
-static int need_initspawn;
+/* If true, display processes started by init.  */
+static bool need_initspawn;
 
-/* If nonzero, display the last clock change */
-static int need_clockchange;
+/* If true, display the last clock change.  */
+static bool need_clockchange;
 
-/* If nonzero, display the current runlevel */
-static int need_runlevel;
+/* If true, display the current runlevel.  */
+static bool need_runlevel;
 
-/* If nonzero, display user processes */
-static int need_users;
+/* If true, display user processes.  */
+static bool need_users;
 
-/* If nonzero, display info only for the controlling tty */
-static int my_line_only;
+/* If true, display info only for the controlling tty.  */
+static bool my_line_only;
+
+/* The strftime format to use for login times, and its expected
+   output width.  */
+static char const *time_format;
+static int time_format_width;
 
 /* for long options with no corresponding short option, use enum */
 enum
 {
-  LOOKUP_OPTION = CHAR_MAX + 1,
-  LOGIN_OPTION
+  LOOKUP_OPTION = CHAR_MAX + 1
 };
 
 static struct option const longopts[] = {
@@ -182,7 +174,7 @@ static struct option const longopts[] = {
   {"dead", no_argument, NULL, 'd'},
   {"heading", no_argument, NULL, 'H'},
   {"idle", no_argument, NULL, 'i'},
-  {"login", no_argument, NULL, LOGIN_OPTION},
+  {"login", no_argument, NULL, 'l'},
   {"lookup", no_argument, NULL, LOOKUP_OPTION},
   {"message", no_argument, NULL, 'T'},
   {"mesg", no_argument, NULL, 'T'},
@@ -197,84 +189,142 @@ static struct option const longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
-/* Return a string representing the time between WHEN and the time
-   that this function is first run.
+/* Return a string representing the time between WHEN and now.
+   BOOTTIME is the time of last reboot.
    FIXME: locale? */
 static const char *
-idle_string (time_t when)
+idle_string (time_t when, time_t boottime)
 {
-  static time_t now = 0;
-  static char idle_hhmm[IDLESTR_LEN];
-  time_t seconds_idle;
+  static time_t now = TYPE_MINIMUM (time_t);
 
-  if (now == 0)
+  if (now == TYPE_MINIMUM (time_t))
     time (&now);
 
-  seconds_idle = now - when;
-  if (seconds_idle < 60)	/* One minute. */
-    return "  .  ";
-  if (seconds_idle < (24 * 60 * 60))	/* One day. */
+  if (boottime < when && now - 24 * 60 * 60 < when && when <= now)
     {
-      sprintf (idle_hhmm, "%02d:%02d",
-	       (int) (seconds_idle / (60 * 60)),
-	       (int) ((seconds_idle % (60 * 60)) / 60));
-      return (const char *) idle_hhmm;
+      int seconds_idle = now - when;
+      if (seconds_idle < 60)
+	return "  .  ";
+      else
+	{
+	  static char idle_hhmm[IDLESTR_LEN];
+	  sprintf (idle_hhmm, "%02d:%02d",
+		   seconds_idle / (60 * 60),
+		   (seconds_idle % (60 * 60)) / 60);
+	  return idle_hhmm;
+	}
     }
+
   return _(" old ");
 }
 
-/* Return a standard time string, "mon dd hh:mm"
-   FIXME: handle localization */
+/* Return a time string.  */
 static const char *
 time_string (const STRUCT_UTMP *utmp_ent)
 {
+  static char buf[INT_STRLEN_BOUND (intmax_t) + sizeof "-%m-%d %H:%M"];
+
   /* Don't take the address of UT_TIME_MEMBER directly.
      Ulrich Drepper wrote:
      ``... GNU libc (and perhaps other libcs as well) have extended
      utmp file formats which do not use a simple time_t ut_time field.
      In glibc, ut_time is a macro which selects for backward compatibility
      the tv_sec member of a struct timeval value.''  */
-  time_t tm = UT_TIME_MEMBER (utmp_ent);
+  time_t t = UT_TIME_MEMBER (utmp_ent);
+  struct tm *tmp = localtime (&t);
 
-  char *ptr = ctime (&tm) + 4;
-  ptr[12] = '\0';
-  return ptr;
+  if (tmp)
+    {
+      strftime (buf, sizeof buf, time_format, tmp);
+      return buf;
+    }
+  else
+    return TYPE_SIGNED (time_t) ? imaxtostr (t, buf) : umaxtostr (t, buf);
 }
 
 /* Print formatted output line. Uses mostly arbitrary field sizes, probably
    will need tweaking if any of the localization stuff is done, or for 64 bit
    pids, etc. */
 static void
-print_line (const char *user, const char state, const char *line,
+print_line (int userlen, const char *user, const char state,
+	    int linelen, const char *line,
 	    const char *time_str, const char *idle, const char *pid,
 	    const char *comment, const char *exitstr)
 {
-  printf ("%-8.8s", user ? user : "   .");
-  if (include_mesg)
-    printf (" %c", state);
-  printf (" %-12s", line);
-  printf (" %-12s", time_str);
-  if (include_idle && !short_output)
-    printf (" %-6s", idle);
-  if (!short_output)
-    printf (" %10s", pid);
-  /* FIXME: it's not really clear whether the following should be in short_output.
-     a strict reading of SUSv2 would suggest not, but I haven't seen any
-     implementations that actually work that way... */
-  printf (" %-8s", comment);
-  if (include_exit && exitstr && *exitstr)
-    printf (" %-12s", exitstr);
-  putchar ('\n');
+  static char mesg[3] = { ' ', 'x', '\0' };
+  char *buf;
+  char x_idle[1 + IDLESTR_LEN + 1];
+  char x_pid[1 + INT_STRLEN_BOUND (pid_t) + 1];
+  char *x_exitstr;
+  int err;
+
+  mesg[1] = state;
+
+  if (include_idle && !short_output && strlen (idle) < sizeof x_idle - 1)
+    sprintf (x_idle, " %-6s", idle);
+  else
+    *x_idle = '\0';
+
+  if (!short_output && strlen (pid) < sizeof x_pid - 1)
+    sprintf (x_pid, " %10s", pid);
+  else
+    *x_pid = '\0';
+
+  x_exitstr = xmalloc (include_exit ? 1 + MAX (12, strlen (exitstr)) + 1 : 1);
+  if (include_exit)
+    sprintf (x_exitstr, " %-12s", exitstr);
+  else
+    *x_exitstr = '\0';
+
+  err = asprintf (&buf,
+		  "%-8.*s"
+		  "%s"
+		  " %-12.*s"
+		  " %-*s"
+		  "%s"
+		  "%s"
+		  " %-8s"
+		  "%s"
+		  ,
+		  userlen, user ? user : "   .",
+		  include_mesg ? mesg : "",
+		  linelen, line,
+		  time_format_width,
+		  time_str,
+		  x_idle,
+		  x_pid,
+		  /* FIXME: it's not really clear whether the following
+		     field should be in the short_output.  A strict reading
+		     of SUSv2 would suggest not, but I haven't seen any
+		     implementations that actually work that way... */
+		  comment,
+		  x_exitstr
+		  );
+  if (err == -1)
+    xalloc_die ();
+
+  {
+    /* Remove any trailing spaces.  */
+    char *p = buf + strlen (buf);
+    while (*--p == ' ')
+      /* empty */;
+    *(p + 1) = '\0';
+  }
+
+  puts (buf);
+  free (buf);
+  free (x_exitstr);
 }
 
-/* Send properly parsed USER_PROCESS info to print_line */
+/* Send properly parsed USER_PROCESS info to print_line.  The most
+   recent boot time is BOOTTIME. */
 static void
-print_user (const STRUCT_UTMP *utmp_ent)
+print_user (const STRUCT_UTMP *utmp_ent, time_t boottime)
 {
   struct stat stats;
   time_t last_change;
   char mesg;
-  char idlestr[IDLESTR_LEN];
+  char idlestr[IDLESTR_LEN + 1];
   static char *hoststr;
   static size_t hostlen;
 
@@ -312,7 +362,7 @@ print_user (const STRUCT_UTMP *utmp_ent)
     }
 
   if (last_change)
-    sprintf (idlestr, "%.6s", idle_string (last_change));
+    sprintf (idlestr, "%.*s", IDLESTR_LEN, idle_string (last_change, boottime));
   else
     sprintf (idlestr, "  ?");
 
@@ -323,11 +373,11 @@ print_user (const STRUCT_UTMP *utmp_ent)
       char *host = 0, *display = 0;
 
       /* Copy the host name into UT_HOST, and ensure it's nul terminated. */
-      strncpy (ut_host, utmp_ent->ut_host, (int) sizeof (utmp_ent->ut_host));
+      strncpy (ut_host, utmp_ent->ut_host, sizeof (utmp_ent->ut_host));
       ut_host[sizeof (utmp_ent->ut_host)] = '\0';
 
       /* Look for an X display.  */
-      display = strrchr (ut_host, ':');
+      display = strchr (ut_host, ':');
       if (display)
 	*display++ = '\0';
 
@@ -345,7 +395,7 @@ print_user (const STRUCT_UTMP *utmp_ent)
 	  if (hostlen < strlen (host) + strlen (display) + 4)
 	    {
 	      hostlen = strlen (host) + strlen (display) + 4;
-	      hoststr = (char *) realloc (hoststr, hostlen);
+	      hoststr = xrealloc (hoststr, hostlen);
 	    }
 	  sprintf (hoststr, "(%s:%s)", host, display);
 	}
@@ -354,23 +404,27 @@ print_user (const STRUCT_UTMP *utmp_ent)
 	  if (hostlen < strlen (host) + 3)
 	    {
 	      hostlen = strlen (host) + 3;
-	      hoststr = (char *) realloc (hoststr, hostlen);
+	      hoststr = xrealloc (hoststr, hostlen);
 	    }
 	  sprintf (hoststr, "(%s)", host);
 	}
+
+      if (host != ut_host)
+	free (host);
     }
   else
     {
       if (hostlen < 1)
 	{
 	  hostlen = 1;
-	  hoststr = (char *) realloc (hoststr, hostlen);
+	  hoststr = xrealloc (hoststr, hostlen);
 	}
       stpcpy (hoststr, "");
     }
 #endif
 
-  print_line (UT_USER (utmp_ent), mesg, utmp_ent->ut_line,
+  print_line (sizeof UT_USER (utmp_ent), UT_USER (utmp_ent), mesg,
+	      sizeof utmp_ent->ut_line, utmp_ent->ut_line,
 	      time_string (utmp_ent), idlestr, pidstr,
 	      hoststr ? hoststr : "", "");
 }
@@ -378,7 +432,8 @@ print_user (const STRUCT_UTMP *utmp_ent)
 static void
 print_boottime (const STRUCT_UTMP *utmp_ent)
 {
-  print_line ("", ' ', "system boot", time_string (utmp_ent), "", "", "", "");
+  print_line (-1, "", ' ', -1, "system boot",
+	      time_string (utmp_ent), "", "", "", "");
 }
 
 static char *
@@ -386,9 +441,8 @@ make_id_equals_comment (STRUCT_UTMP const *utmp_ent)
 {
   char *comment = xmalloc (strlen (_("id=")) + sizeof UT_ID (utmp_ent) + 1);
 
-  /* Cast field width argument to `int' to avoid warning from gcc.  */
-  sprintf (comment, "%s%.*s", _("id="), (int) sizeof UT_ID (utmp_ent),
-	   UT_ID (utmp_ent));
+  strcpy (comment, _("id="));
+  strncat (comment, UT_ID (utmp_ent), sizeof UT_ID (utmp_ent));
   return comment;
 }
 
@@ -410,7 +464,7 @@ print_deadprocs (const STRUCT_UTMP *utmp_ent)
 
   /* FIXME: add idle time? */
 
-  print_line ("", ' ', utmp_ent->ut_line,
+  print_line (-1, "", ' ', sizeof utmp_ent->ut_line, utmp_ent->ut_line,
 	      time_string (utmp_ent), "", pidstr, comment, exitstr);
   free (comment);
 }
@@ -423,7 +477,7 @@ print_login (const STRUCT_UTMP *utmp_ent)
 
   /* FIXME: add idle time? */
 
-  print_line ("LOGIN", ' ', utmp_ent->ut_line,
+  print_line (-1, "LOGIN", ' ', sizeof utmp_ent->ut_line, utmp_ent->ut_line,
 	      time_string (utmp_ent), "", pidstr, comment, "");
   free (comment);
 }
@@ -434,7 +488,7 @@ print_initspawn (const STRUCT_UTMP *utmp_ent)
   char *comment = make_id_equals_comment (utmp_ent);
   PIDSTR_DECL_AND_INIT (pidstr, utmp_ent);
 
-  print_line ("", ' ', utmp_ent->ut_line,
+  print_line (-1, "", ' ', sizeof utmp_ent->ut_line, utmp_ent->ut_line,
 	      time_string (utmp_ent), "", pidstr, comment, "");
   free (comment);
 }
@@ -443,7 +497,7 @@ static void
 print_clockchange (const STRUCT_UTMP *utmp_ent)
 {
   /* FIXME: handle NEW_TIME & OLD_TIME both */
-  print_line ("", ' ', _("clock change"),
+  print_line (-1, "", ' ', -1, _("clock change"),
 	      time_string (utmp_ent), "", "", "", "");
 }
 
@@ -451,8 +505,8 @@ static void
 print_runlevel (const STRUCT_UTMP *utmp_ent)
 {
   static char *runlevline, *comment;
-  int last = UT_PID (utmp_ent) / 256;
-  int curr = UT_PID (utmp_ent) % 256;
+  unsigned char last = UT_PID (utmp_ent) / 256;
+  unsigned char curr = UT_PID (utmp_ent) % 256;
 
   if (!runlevline)
     runlevline = xmalloc (strlen (_("run-level")) + 3);
@@ -462,7 +516,7 @@ print_runlevel (const STRUCT_UTMP *utmp_ent)
     comment = xmalloc (strlen (_("last=")) + 2);
   sprintf (comment, "%s%c", _("last="), (last == 'N') ? 'S' : last);
 
-  print_line ("", ' ', runlevline, time_string (utmp_ent),
+  print_line (-1, "", ' ', -1, runlevline, time_string (utmp_ent),
 	      "", "", comment, "");
 
   return;
@@ -471,46 +525,49 @@ print_runlevel (const STRUCT_UTMP *utmp_ent)
 /* Print the username of each valid entry and the number of valid entries
    in UTMP_BUF, which should have N elements. */
 static void
-list_entries_who (int n, const STRUCT_UTMP *utmp_buf)
+list_entries_who (size_t n, const STRUCT_UTMP *utmp_buf)
 {
-  int entries = 0;
+  unsigned long int entries = 0;
+  char const *separator = "";
 
   while (n--)
     {
-      if (UT_USER (utmp_buf)[0] && UT_TYPE (utmp_buf) == USER_PROCESS)
+      if (IS_USER_PROCESS (utmp_buf))
 	{
 	  char *trimmed_name;
 
 	  trimmed_name = extract_trimmed_name (utmp_buf);
 
-	  printf ("%s ", trimmed_name);
+	  printf ("%s%s", separator, trimmed_name);
 	  free (trimmed_name);
+	  separator = " ";
 	  entries++;
 	}
       utmp_buf++;
     }
-  printf (_("\n# users=%u\n"), entries);
+  printf (_("\n# users=%lu\n"), entries);
 }
 
 static void
 print_heading (void)
 {
-  print_line (_("NAME"), ' ', _("LINE"), _("TIME"), _("IDLE"), _("PID"),
-	      _("COMMENT"), _("EXIT"));
+  print_line (-1, _("NAME"), ' ', -1, _("LINE"), _("TIME"), _("IDLE"),
+	      _("PID"), _("COMMENT"), _("EXIT"));
 }
 
 /* Display UTMP_BUF, which should have N entries. */
 static void
-scan_entries (int n, const STRUCT_UTMP *utmp_buf)
+scan_entries (size_t n, const STRUCT_UTMP *utmp_buf)
 {
   char *ttyname_b IF_LINT ( = NULL);
+  time_t boottime = TYPE_MINIMUM (time_t);
 
   if (include_heading)
     print_heading ();
 
   if (my_line_only)
     {
-      ttyname_b = ttyname (0);
+      ttyname_b = ttyname (STDIN_FILENO);
       if (!ttyname_b)
 	return;
       if (strncmp (ttyname_b, DEV_DIR_WITH_TRAILING_SLASH, DEV_DIR_LEN) == 0)
@@ -524,23 +581,26 @@ scan_entries (int n, const STRUCT_UTMP *utmp_buf)
 		   sizeof (utmp_buf->ut_line)) == 0)
 	{
 	  if (need_users && IS_USER_PROCESS (utmp_buf))
-	    print_user (utmp_buf);
-	  else if (need_runlevel && UT_TYPE (utmp_buf) == RUN_LVL)
+	    print_user (utmp_buf, boottime);
+	  else if (need_runlevel && UT_TYPE_RUN_LVL (utmp_buf))
 	    print_runlevel (utmp_buf);
-	  else if (need_boottime && UT_TYPE (utmp_buf) == BOOT_TIME)
+	  else if (need_boottime && UT_TYPE_BOOT_TIME (utmp_buf))
 	    print_boottime (utmp_buf);
 	  /* I've never seen one of these, so I don't know what it should
 	     look like :^)
 	     FIXME: handle OLD_TIME also, perhaps show the delta? */
-	  else if (need_clockchange && UT_TYPE (utmp_buf) == NEW_TIME)
+	  else if (need_clockchange && UT_TYPE_NEW_TIME (utmp_buf))
 	    print_clockchange (utmp_buf);
-	  else if (need_initspawn && UT_TYPE (utmp_buf) == INIT_PROCESS)
+	  else if (need_initspawn && UT_TYPE_INIT_PROCESS (utmp_buf))
 	    print_initspawn (utmp_buf);
-	  else if (need_login && UT_TYPE (utmp_buf) == LOGIN_PROCESS)
+	  else if (need_login && UT_TYPE_LOGIN_PROCESS (utmp_buf))
 	    print_login (utmp_buf);
-	  else if (need_deadprocs && UT_TYPE (utmp_buf) == DEAD_PROCESS)
+	  else if (need_deadprocs && UT_TYPE_DEAD_PROCESS (utmp_buf))
 	    print_deadprocs (utmp_buf);
 	}
+
+      if (UT_TYPE_BOOT_TIME (utmp_buf))
+	boottime = UT_TIME_MEMBER (utmp_buf);
 
       utmp_buf++;
     }
@@ -550,23 +610,24 @@ scan_entries (int n, const STRUCT_UTMP *utmp_buf)
 static void
 who (const char *filename)
 {
-  int n_users;
+  size_t n_users;
   STRUCT_UTMP *utmp_buf;
-  int fail = read_utmp (filename, &n_users, &utmp_buf);
 
-  if (fail)
+  if (read_utmp (filename, &n_users, &utmp_buf) != 0)
     error (EXIT_FAILURE, errno, "%s", filename);
 
   if (short_list)
     list_entries_who (n_users, utmp_buf);
   else
     scan_entries (n_users, utmp_buf);
+
+  free (utmp_buf);
 }
 
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -582,12 +643,10 @@ usage (int status)
       fputs (_("\
   -i, --idle        add idle time as HOURS:MINUTES, . or old\n\
                     (deprecated, use -u)\n\
-      --login       print system login processes\n\
-                    (equivalent to SUS -l)\n\
+  -l, --login       print system login processes\n\
 "), stdout);
       fputs (_("\
-  -l, --lookup      attempt to canonicalize hostnames via DNS\n\
-                    (-l is deprecated, use --lookup)\n\
+      --lookup      attempt to canonicalize hostnames via DNS\n\
   -m                only hostname and user associated with stdin\n\
   -p, --process     print active processes spawned by init\n\
 "), stdout);
@@ -618,9 +677,10 @@ If ARG1 ARG2 given, -m presumed: `am i' or `mom likes' are usual.\n\
 int
 main (int argc, char **argv)
 {
-  int optc, longind;
-  int assumptions = 1;
+  int optc;
+  bool assumptions = true;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -628,82 +688,78 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
-  while ((optc = getopt_long (argc, argv, "abdilmpqrstuwHT", longopts,
-			      &longind)) != -1)
+  while ((optc = getopt_long (argc, argv, "abdilmpqrstuwHT", longopts, NULL))
+	 != -1)
     {
       switch (optc)
 	{
-	case 0:
-	  break;
-
 	case 'a':
-	  need_boottime = 1;
-	  need_deadprocs = 1;
-	  need_login = 1;
-	  need_initspawn = 1;
-	  need_runlevel = 1;
-	  need_clockchange = 1;
-	  need_users = 1;
-	  include_mesg = 1;
-	  include_idle = 1;
-	  include_exit = 1;
-	  assumptions = 0;
+	  need_boottime = true;
+	  need_deadprocs = true;
+	  need_login = true;
+	  need_initspawn = true;
+	  need_runlevel = true;
+	  need_clockchange = true;
+	  need_users = true;
+	  include_mesg = true;
+	  include_idle = true;
+	  include_exit = true;
+	  assumptions = false;
 	  break;
 
 	case 'b':
-	  need_boottime = 1;
-	  assumptions = 0;
+	  need_boottime = true;
+	  assumptions = false;
 	  break;
 
 	case 'd':
-	  need_deadprocs = 1;
-	  include_idle = 1;
-	  include_exit = 1;
-	  assumptions = 0;
+	  need_deadprocs = true;
+	  include_idle = true;
+	  include_exit = true;
+	  assumptions = false;
 	  break;
 
 	case 'H':
-	  include_heading = 1;
+	  include_heading = true;
 	  break;
 
-	  /* FIXME: This should be -l in a future version */
-	case LOGIN_OPTION:
-	  need_login = 1;
-	  include_idle = 1;
-	  assumptions = 0;
+	case 'l':
+	  need_login = true;
+	  include_idle = true;
+	  assumptions = false;
 	  break;
 
 	case 'm':
-	  my_line_only = 1;
+	  my_line_only = true;
 	  break;
 
 	case 'p':
-	  need_initspawn = 1;
-	  assumptions = 0;
+	  need_initspawn = true;
+	  assumptions = false;
 	  break;
 
 	case 'q':
-	  short_list = 1;
+	  short_list = true;
 	  break;
 
 	case 'r':
-	  need_runlevel = 1;
-	  include_idle = 1;
-	  assumptions = 0;
+	  need_runlevel = true;
+	  include_idle = true;
+	  assumptions = false;
 	  break;
 
 	case 's':
-	  short_output = 1;
+	  short_output = true;
 	  break;
 
 	case 't':
-	  need_clockchange = 1;
-	  assumptions = 0;
+	  need_clockchange = true;
+	  assumptions = false;
 	  break;
 
 	case 'T':
 	case 'w':
-	  include_mesg = 1;
+	  include_mesg = true;
 	  break;
 
 	case 'i':
@@ -712,17 +768,13 @@ main (int argc, char **argv)
   use -u instead"));
 	  /* Fall through.  */
 	case 'u':
-	  need_users = 1;
-	  include_idle = 1;
-	  assumptions = 0;
+	  need_users = true;
+	  include_idle = true;
+	  assumptions = false;
 	  break;
 
-	case 'l':
-	  error (0, 0,
-		 _("Warning: the meaning of '-l' will change in a future\
- release to conform to POSIX"));
 	case LOOKUP_OPTION:
-	  do_lookup = 1;
+	  do_lookup = true;
 	  break;
 
 	  case_GETOPT_HELP_CHAR;
@@ -736,17 +788,29 @@ main (int argc, char **argv)
 
   if (assumptions)
     {
-      need_users = 1;
-      short_output = 1;
+      need_users = true;
+      short_output = true;
     }
 
   if (include_exit)
     {
-      short_output = 0;
+      short_output = false;
+    }
+
+  if (hard_locale (LC_TIME))
+    {
+      time_format = "%Y-%m-%d %H:%M";
+      time_format_width = 4 + 1 + 2 + 1 + 2 + 1 + 2 + 1 + 2;
+    }
+  else
+    {
+      time_format = "%b %e %H:%M";
+      time_format_width = 3 + 1 + 2 + 1 + 2 + 1 + 2;
     }
 
   switch (argc - optind)
     {
+    case -1:
     case 0:			/* who */
       who (UTMP_FILE);
       break;
@@ -756,12 +820,12 @@ main (int argc, char **argv)
       break;
 
     case 2:			/* who <blurf> <glop> */
-      my_line_only = 1;
+      my_line_only = true;
       who (UTMP_FILE);
       break;
 
     default:			/* lose */
-      error (0, 0, _("too many arguments"));
+      error (0, 0, _("extra operand %s"), quote (argv[optind + 2]));
       usage (EXIT_FAILURE);
     }
 

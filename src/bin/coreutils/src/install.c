@@ -1,5 +1,5 @@
 /* install - copy files and set attributes
-   Copyright (C) 89, 90, 91, 1995-2002 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,14 +17,11 @@
 
 /* Written by David MacKenzie <djm@gnu.ai.mit.edu> */
 
-#ifdef _AIX
- #pragma alloca
-#endif
-
 #include <config.h>
 #include <stdio.h>
 #include <getopt.h>
 #include <sys/types.h>
+#include <signal.h>
 #include <pwd.h>
 #include <grp.h>
 
@@ -38,6 +35,7 @@
 #include "modechange.h"
 #include "path-concat.h"
 #include "quote.h"
+#include "utimens.h"
 #include "xstrtol.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -74,20 +72,16 @@ gid_t getgid ();
 /* Number of bytes of a file to copy at a time. */
 #define READ_SIZE (32 * 1024)
 
-int isdir ();
-
-int stat ();
-
-static int change_timestamps (const char *from, const char *to);
-static int change_attributes (const char *path);
-static int copy_file (const char *from, const char *to,
-		      const struct cp_options *x);
-static int install_file_to_path (const char *from, const char *to,
+static bool change_timestamps (const char *from, const char *to);
+static bool change_attributes (const char *path);
+static bool copy_file (const char *from, const char *to,
+		       const struct cp_options *x);
+static bool install_file_to_path (const char *from, const char *to,
+				  const struct cp_options *x);
+static bool install_file_in_dir (const char *from, const char *to_dir,
 				 const struct cp_options *x);
-static int install_file_in_dir (const char *from, const char *to_dir,
-				const struct cp_options *x);
-static int install_file_in_file (const char *from, const char *to,
-				 const struct cp_options *x);
+static bool install_file_in_file (const char *from, const char *to,
+				  const struct cp_options *x);
 static void get_ids (void);
 static void strip (const char *path);
 void usage (int status);
@@ -113,11 +107,11 @@ static gid_t group_id;
    no effect. */
 static mode_t mode = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 
-/* If nonzero, strip executable files after copying them. */
-static int strip_files;
+/* If true, strip executable files after copying them. */
+static bool strip_files;
 
-/* If nonzero, install a directory instead of a regular file. */
-static int dir_arg;
+/* If true, install a directory instead of a regular file. */
+static bool dir_arg;
 
 static struct option const long_options[] =
 {
@@ -125,10 +119,12 @@ static struct option const long_options[] =
   {"directory", no_argument, NULL, 'd'},
   {"group", required_argument, NULL, 'g'},
   {"mode", required_argument, NULL, 'm'},
+  {"no-target-directory", no_argument, NULL, 'T'},
   {"owner", required_argument, NULL, 'o'},
   {"preserve-timestamps", no_argument, NULL, 'p'},
   {"strip", no_argument, NULL, 's'},
   {"suffix", required_argument, NULL, 'S'},
+  {"target-directory", required_argument, NULL, 't'},
   {"version-control", required_argument, NULL, 'V'}, /* Deprecated. FIXME. */
   {"verbose", no_argument, NULL, 'v'},
   {GETOPT_HELP_OPTION_DECL},
@@ -139,54 +135,77 @@ static struct option const long_options[] =
 static void
 cp_option_init (struct cp_options *x)
 {
-  x->copy_as_regular = 1;
+  x->copy_as_regular = true;
   x->dereference = DEREF_ALWAYS;
-  x->unlink_dest_before_opening = 1;
-  x->unlink_dest_after_failed_open = 0;
-  x->hard_link = 0;
+  x->unlink_dest_before_opening = true;
+  x->unlink_dest_after_failed_open = false;
+  x->hard_link = false;
   x->interactive = I_UNSPECIFIED;
-  x->move_mode = 0;
+  x->move_mode = false;
   x->myeuid = geteuid ();
-  x->one_file_system = 0;
-  x->preserve_ownership = 0;
-  x->preserve_links = 0;
-  x->preserve_mode = 0;
-  x->preserve_timestamps = 0;
-  x->require_preserve = 0;
-  x->recursive = 0;
+  x->one_file_system = false;
+  x->preserve_ownership = false;
+  x->preserve_links = false;
+  x->preserve_mode = false;
+  x->preserve_timestamps = false;
+  x->require_preserve = false;
+  x->recursive = false;
   x->sparse_mode = SPARSE_AUTO;
-  x->symbolic_link = 0;
-  x->backup_type = none;
+  x->symbolic_link = false;
+  x->backup_type = no_backups;
 
   /* Create destination files initially writable so we can run strip on them.
      Although GNU strip works fine on read-only files, some others
      would fail.  */
-  x->set_mode = 1;
+  x->set_mode = true;
   x->mode = S_IRUSR | S_IWUSR;
-  x->stdin_tty = 0;
+  x->stdin_tty = false;
 
   x->umask_kill = 0;
-  x->update = 0;
-  x->verbose = 0;
-  x->xstat = stat;
+  x->update = false;
+  x->verbose = false;
   x->dest_info = NULL;
   x->src_info = NULL;
+}
+
+/* FILE is the last operand of this command.  Return true if FILE is a
+   directory.  But report an error there is a problem accessing FILE,
+   or if FILE does not exist but would have to refer to an existing
+   directory if it referred to anything at all.  */
+
+static bool
+target_directory_operand (char const *file)
+{
+  char const *b = base_name (file);
+  size_t blen = strlen (b);
+  bool looks_like_a_dir = (blen == 0 || ISSLASH (b[blen - 1]));
+  struct stat st;
+  int err = (stat (file, &st) == 0 ? 0 : errno);
+  bool is_a_dir = !err && S_ISDIR (st.st_mode);
+  if (err && err != ENOENT)
+    error (EXIT_FAILURE, err, _("accessing %s"), quote (file));
+  if (is_a_dir < looks_like_a_dir)
+    error (EXIT_FAILURE, err, _("target %s is not a directory"), quote (file));
+  return is_a_dir;
 }
 
 int
 main (int argc, char **argv)
 {
   int optc;
-  int errors = 0;
+  bool ok = true;
   const char *specified_mode = NULL;
-  int make_backups = 0;
+  bool make_backups = false;
   char *backup_suffix_string;
   char *version_control_string = NULL;
-  int mkdir_and_install = 0;
+  bool mkdir_and_install = false;
   struct cp_options x;
+  char const *target_directory = NULL;
+  bool no_target_directory = false;
   int n_files;
   char **file;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -198,22 +217,19 @@ main (int argc, char **argv)
 
   owner_name = NULL;
   group_name = NULL;
-  strip_files = 0;
-  dir_arg = 0;
+  strip_files = false;
+  dir_arg = false;
   umask (0);
 
   /* FIXME: consider not calling getenv for SIMPLE_BACKUP_SUFFIX unless
      we'll actually use backup_suffix_string.  */
   backup_suffix_string = getenv ("SIMPLE_BACKUP_SUFFIX");
 
-  while ((optc = getopt_long (argc, argv, "bcsDdg:m:o:pvV:S:", long_options,
+  while ((optc = getopt_long (argc, argv, "bcsDdg:m:o:pt:TvV:S:", long_options,
 			      NULL)) != -1)
     {
       switch (optc)
 	{
-	case 0:
-	  break;
-
 	case 'V':  /* FIXME: this is deprecated.  Remove it in 2001.  */
 	  error (0, 0,
 		 _("warning: --version-control (-V) is obsolete;  support for\
@@ -222,23 +238,27 @@ main (int argc, char **argv)
 	  /* Fall through.  */
 
 	case 'b':
-	  make_backups = 1;
+	  make_backups = true;
 	  if (optarg)
 	    version_control_string = optarg;
 	  break;
 	case 'c':
 	  break;
 	case 's':
-	  strip_files = 1;
+	  strip_files = true;
+#ifdef SIGCHLD
+	  /* System V fork+wait does not work if SIGCHLD is ignored.  */
+	  signal (SIGCHLD, SIG_DFL);
+#endif
 	  break;
 	case 'd':
-	  dir_arg = 1;
+	  dir_arg = true;
 	  break;
 	case 'D':
-	  mkdir_and_install = 1;
+	  mkdir_and_install = true;
 	  break;
 	case 'v':
-	  x.verbose = 1;
+	  x.verbose = true;
 	  break;
 	case 'g':
 	  group_name = optarg;
@@ -250,11 +270,29 @@ main (int argc, char **argv)
 	  owner_name = optarg;
 	  break;
 	case 'p':
-	  x.preserve_timestamps = 1;
+	  x.preserve_timestamps = true;
 	  break;
 	case 'S':
-	  make_backups = 1;
+	  make_backups = true;
 	  backup_suffix_string = optarg;
+	  break;
+	case 't':
+	  if (target_directory)
+	    error (EXIT_FAILURE, 0,
+		   _("multiple target directories specified"));
+	  else
+	    {
+	      struct stat st;
+	      if (stat (optarg, &st) != 0)
+		error (EXIT_FAILURE, errno, _("accessing %s"), quote (optarg));
+	      if (! S_ISDIR (st.st_mode))
+		error (EXIT_FAILURE, 0, _("target %s is not a directory"),
+		       quote (optarg));
+	    }
+	  target_directory = optarg;
+	  break;
+	case 'T':
+	  no_target_directory = true;
 	  break;
 	case_GETOPT_HELP_CHAR;
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -264,9 +302,12 @@ main (int argc, char **argv)
     }
 
   /* Check for invalid combinations of arguments. */
-  if (dir_arg && strip_files)
+  if (dir_arg & strip_files)
     error (EXIT_FAILURE, 0,
 	   _("the strip option may not be used when installing a directory"));
+  if (dir_arg && target_directory)
+    error (EXIT_FAILURE, 0,
+	   _("target directory not allowed when installing a directory"));
 
   if (backup_suffix_string)
     simple_backup_suffix = xstrdup (backup_suffix_string);
@@ -274,15 +315,40 @@ main (int argc, char **argv)
   x.backup_type = (make_backups
 		   ? xget_version (_("backup type"),
 				   version_control_string)
-		   : none);
+		   : no_backups);
 
   n_files = argc - optind;
   file = argv + optind;
 
-  if (n_files == 0 || (n_files == 1 && !dir_arg))
+  if (n_files <= ! (dir_arg || target_directory))
     {
-      error (0, 0, _("too few arguments"));
+      if (n_files <= 0)
+	error (0, 0, _("missing file operand"));
+      else
+	error (0, 0, _("missing destination file operand after %s"),
+	       quote (file[0]));
       usage (EXIT_FAILURE);
+    }
+
+  if (no_target_directory)
+    {
+      if (target_directory)
+	error (EXIT_FAILURE, 0,
+	       _("Cannot combine --target-directory (-t) "
+		 "and --no-target-directory (-T)"));
+      if (2 < n_files)
+	{
+	  error (0, 0, _("extra operand %s"), quote (file[2]));
+	  usage (EXIT_FAILURE);
+	}
+    }
+  else if (! (dir_arg || target_directory))
+    {
+      if (2 <= n_files && target_directory_operand (file[n_files - 1]))
+	target_directory = file[--n_files];
+      else if (2 < n_files)
+	error (EXIT_FAILURE, 0, _("target %s is not a directory"),
+	       quote (file[n_files - 1]));
     }
 
   if (specified_mode)
@@ -302,8 +368,8 @@ main (int argc, char **argv)
       int i;
       for (i = 0; i < n_files; i++)
 	{
-	  errors |=
-	    make_path (file[i], mode, mode, owner_id, group_id, 0,
+	  ok &=
+	    make_path (file[i], mode, mode, owner_id, group_id, false,
 		       (x.verbose ? _("creating directory %s") : NULL));
 	}
     }
@@ -313,141 +379,115 @@ main (int argc, char **argv)
 	 required by copy.c::copy. */
       hash_init ();
 
-      if (n_files == 2)
+      if (!target_directory)
         {
           if (mkdir_and_install)
-	    errors = install_file_to_path (file[0], file[1], &x);
-	  else if (!isdir (file[1]))
-	    errors = install_file_in_file (file[0], file[1], &x);
+	    ok = install_file_to_path (file[0], file[1], &x);
 	  else
-	    errors = install_file_in_dir (file[0], file[1], &x);
+	    ok = install_file_in_file (file[0], file[1], &x);
 	}
       else
 	{
 	  int i;
-	  const char *dest = file[n_files - 1];
-	  if (!isdir (dest))
-	    {
-	      error (0, 0,
-		     _("installing multiple files, but last argument, %s \
-is not a directory"),
-		     quote (dest));
-	      usage (EXIT_FAILURE);
-	    }
-
 	  dest_info_init (&x);
-	  for (i = 0; i < n_files - 1; i++)
+	  for (i = 0; i < n_files; i++)
 	    {
-	      errors |= install_file_in_dir (file[i], dest, &x);
+	      ok &= install_file_in_dir (file[i], target_directory, &x);
 	    }
 	}
     }
 
-  exit (errors);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 /* Copy file FROM onto file TO, creating any missing parent directories of TO.
-   Return 0 if successful, 1 if an error occurs */
+   Return true if successful.  */
 
-static int
+static bool
 install_file_to_path (const char *from, const char *to,
 		      const struct cp_options *x)
 {
-  char *dest_dir;
-  int fail = 0;
+  char *dest_dir = dir_name (to);
+  bool ok = true;
 
-  dest_dir = dir_name (to);
-
-  /* check to make sure this is a path (not install a b ) */
-  if (!STREQ (dest_dir, ".")
-      && !isdir (dest_dir))
+  /* Make sure that the parent of the destination is a directory.  */
+  if (! STREQ (dest_dir, "."))
     {
       /* Someone will probably ask for a new option or three to specify
 	 owner, group, and permissions for parent directories.  Remember
 	 that this option is intended mainly to help installers when the
 	 distribution doesn't provide proper install rules.  */
 #define DIR_MODE (S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)
-      fail = make_path (dest_dir, DIR_MODE, DIR_MODE, owner_id, group_id, 0,
-			(x->verbose ? _("creating directory %s") : NULL));
+      ok = make_path (dest_dir, DIR_MODE, DIR_MODE, owner_id, group_id, true,
+		      (x->verbose ? _("creating directory %s") : NULL));
     }
-
-  if (fail == 0)
-    fail = install_file_in_file (from, to, x);
 
   free (dest_dir);
 
-  return fail;
+  if (ok)
+    ok = install_file_in_file (from, to, x);
+
+  return ok;
 }
 
 /* Copy file FROM onto file TO and give TO the appropriate
    attributes.
-   Return 0 if successful, 1 if an error occurs. */
+   Return true if successful.  */
 
-static int
+static bool
 install_file_in_file (const char *from, const char *to,
 		      const struct cp_options *x)
 {
-  if (copy_file (from, to, x))
-    return 1;
+  if (! copy_file (from, to, x))
+    return false;
   if (strip_files)
     strip (to);
-  if (change_attributes (to))
-    return 1;
+  if (! change_attributes (to))
+    return false;
   if (x->preserve_timestamps)
     return change_timestamps (from, to);
-  return 0;
+  return true;
 }
 
 /* Copy file FROM into directory TO_DIR, keeping its same name,
    and give the copy the appropriate attributes.
-   Return 0 if successful, 1 if not. */
+   Return true if successful.  */
 
-static int
+static bool
 install_file_in_dir (const char *from, const char *to_dir,
 		     const struct cp_options *x)
 {
-  const char *from_base;
-  char *to;
-  int ret;
-
-  from_base = base_name (from);
-  to = path_concat (to_dir, from_base, NULL);
-  ret = install_file_in_file (from, to, x);
+  const char *from_base = base_name (from);
+  char *to = path_concat (to_dir, from_base, NULL);
+  bool ret = install_file_in_file (from, to, x);
   free (to);
   return ret;
 }
 
 /* Copy file FROM onto file TO, creating TO if necessary.
-   Return 0 if the copy is successful, 1 if not.  */
+   Return true if successful.  */
 
-static int
+static bool
 copy_file (const char *from, const char *to, const struct cp_options *x)
 {
-  int fail;
-  int nonexistent_dst = 0;
-  int copy_into_self;
+  bool copy_into_self;
 
   /* Allow installing from non-regular files like /dev/null.
      Charles Karney reported that some Sun version of install allows that
-     and that sendmail's installation process relies on the behavior.  */
-  if (isdir (from))
-    {
-      error (0, 0, _("%s is a directory"), quote (from));
-      return 1;
-    }
+     and that sendmail's installation process relies on the behavior.
+     However, since !x->recursive, the call to "copy" will fail if FROM
+     is a directory.  */
 
-  fail = copy (from, to, nonexistent_dst, x, &copy_into_self, NULL);
-
-  return fail;
+  return copy (from, to, false, x, &copy_into_self, NULL);
 }
 
 /* Set the attributes of file or directory PATH.
-   Return 0 if successful, 1 if not. */
+   Return true if successful.  */
 
-static int
+static bool
 change_attributes (const char *path)
 {
-  int err = 0;
+  bool ok = true;
 
   /* chown must precede chmod because on some systems,
      chown clears the set[ug]id bits for non-superusers,
@@ -468,46 +508,44 @@ change_attributes (const char *path)
 #endif
       )
     {
-      error (0, errno, "cannot change ownership of %s", quote (path));
-      err = 1;
+      error (0, errno, _("cannot change ownership of %s"), quote (path));
+      ok = false;
     }
 
-  if (!err && chmod (path, mode))
+  if (ok && chmod (path, mode))
     {
-      error (0, errno, "cannot change permissions of %s", quote (path));
-      err = 1;
+      error (0, errno, _("cannot change permissions of %s"), quote (path));
+      ok = false;
     }
 
-  return err;
+  return ok;
 }
 
 /* Set the timestamps of file TO to match those of file FROM.
-   Return 0 if successful, 1 if not. */
+   Return true if successful.  */
 
-static int
+static bool
 change_timestamps (const char *from, const char *to)
 {
   struct stat stb;
-  struct utimbuf utb;
+  struct timespec timespec[2];
 
   if (stat (from, &stb))
     {
       error (0, errno, _("cannot obtain time stamps for %s"), quote (from));
-      return 1;
+      return false;
     }
 
-  /* There's currently no interface to set file timestamps with
-     better than 1-second resolution, so discard any fractional
-     part of the source timestamp.  */
-
-  utb.actime = stb.st_atime;
-  utb.modtime = stb.st_mtime;
-  if (utime (to, &utb))
+  timespec[0].tv_sec = stb.st_atime;
+  timespec[0].tv_nsec = TIMESPEC_NS (stb.st_atim);
+  timespec[1].tv_sec = stb.st_mtime;
+  timespec[1].tv_nsec = TIMESPEC_NS (stb.st_mtim);
+  if (utimens (to, timespec))
     {
       error (0, errno, _("cannot set time stamps for %s"), quote (to));
-      return 1;
+      return false;
     }
-  return 0;
+  return true;
 }
 
 /* Strip the symbol table from the file PATH.
@@ -589,21 +627,22 @@ get_ids (void)
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
     {
       printf (_("\
-Usage: %s [OPTION]... SOURCE DEST           (1st format)\n\
-  or:  %s [OPTION]... SOURCE... DIRECTORY   (2nd format)\n\
-  or:  %s -d [OPTION]... DIRECTORY...       (3rd format)\n\
+Usage: %s [OPTION]... [-T] SOURCE DEST\n\
+  or:  %s [OPTION]... SOURCE... DIRECTORY\n\
+  or:  %s [OPTION]... -t DIRECTORY SOURCE...\n\
+  or:  %s [OPTION]... -d DIRECTORY...\n\
 "),
-	      program_name, program_name, program_name);
+	      program_name, program_name, program_name, program_name);
       fputs (_("\
-In the first two formats, copy SOURCE to DEST or multiple SOURCE(s) to\n\
+In the first three forms, copy SOURCE to DEST or multiple SOURCE(s) to\n\
 the existing DIRECTORY, while setting permission modes and owner/group.\n\
-In the third format, create all components of the given DIRECTORY(ies).\n\
+In the 4th form, create all components of the given DIRECTORY(ies).\n\
 \n\
 "), stdout);
       fputs (_("\
@@ -618,7 +657,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
   -D                  create all leading components of DEST except the last,\n\
-                        then copy SOURCE to DEST;  useful in the 1st format\n\
+                        then copy SOURCE to DEST\n\
   -g, --group=GROUP   set group ownership, instead of process' current group\n\
   -m, --mode=MODE     set permission mode (as in chmod), instead of rwxr-xr-x\n\
   -o, --owner=OWNER   set ownership (super-user only)\n\
@@ -626,8 +665,10 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (_("\
   -p, --preserve-timestamps   apply access/modification times of SOURCE files\n\
                         to corresponding destination files\n\
-  -s, --strip         strip symbol tables, only for 1st and 2nd formats\n\
+  -s, --strip         strip symbol tables\n\
   -S, --suffix=SUFFIX override the usual backup suffix\n\
+  -t, --target-directory=DIRECTORY  copy all SOURCE arguments into DIRECTORY\n\
+  -T, --no-target-directory  treat DEST as a normal file\n\
   -v, --verbose       print the name of each directory as it is created\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);

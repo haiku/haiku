@@ -1,6 +1,6 @@
 /* Return a string describing the type of a file.
 
-   Copyright (C) 1993, 1994, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1993, 1994, 2001, 2002, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "file-type.h"
+#include "stat-macros.h"
 
 #include <gettext.h>
 #define _(text) gettext (text)
@@ -67,6 +68,9 @@ file_type (struct stat const *st)
 
   if (S_TYPEISSHM (st))
     return _("shared memory object");
+
+  if (S_TYPEISTMO (st))
+    return _("typed memory object");
 
   return _("weird file");
 }

@@ -1,9 +1,12 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 
-SUBDIRS = lib src doc man m4 po tests
+SUBDIRS = lib src doc man po tests
 EXTRA_DIST = Makefile.cfg Makefile.maint GNUmakefile \
   .kludge-stamp .prev-version THANKS-to-translators THANKStt.in \
+  .x-sc_space_tab .x-sc_sun_os_names \
+  .x-sc_file_system \
   announce-gen \
+  m4/ChangeLog \
   old/fileutils/ChangeLog \
   old/fileutils/ChangeLog-1997 \
   old/sh-utils/ChangeLog \
@@ -21,6 +24,9 @@ ACLOCAL_AMFLAGS = -I m4
 # Some tests always need root privileges, others need them only sometimes.
 check-root:
 	cd tests && $(MAKE) $@
+
+dist-hook:
+	test -x $(srcdir)/config/install-sh
 
 distcheck-hook:
 	$(MAKE) my-distcheck

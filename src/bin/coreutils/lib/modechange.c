@@ -1,5 +1,7 @@
 /* modechange.c -- file mode manipulation
-   Copyright (C) 1989, 1990, 1997, 1998, 1999, 2001 Free Software Foundation, Inc.
+
+   Copyright (C) 1989, 1990, 1997, 1998, 1999, 2001, 2003, 2004 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,16 +33,9 @@
 #include "modechange.h"
 #include <sys/stat.h>
 #include "xstrtol.h"
-
-#if STDC_HEADERS
-# include <stdlib.h>
-#else
-char *malloc ();
-#endif
-
-#ifndef NULL
-# define NULL 0
-#endif
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 #if STAT_MACROS_BROKEN
 # undef S_ISDIR
@@ -216,24 +211,21 @@ mode_compile (const char *mode_string, unsigned int masked_ops)
 
   umask_value = umask (0);
   umask (umask_value);		/* Restore the old value. */
-  --mode_string;
 
   /* One loop iteration for each "ugoa...=+-rwxXstugo...[=+-rwxXstugo...]". */
-  do
+  for (;; mode_string++)
     {
       /* Which bits in the mode are operated on. */
       mode_t affected_bits = 0;
       /* `affected_bits' modified by umask. */
       mode_t affected_masked;
       /* Operators to actually use umask on. */
-      unsigned ops_to_mask = 0;
+      unsigned int ops_to_mask = 0;
 
-      int who_specified_p;
+      bool who_specified_p;
 
-      affected_bits = 0;
-      ops_to_mask = 0;
       /* Turn on all the bits in `affected_bits' for each group given. */
-      for (++mode_string;; ++mode_string)
+      for (;; mode_string++)
 	switch (*mode_string)
 	  {
 	  case 'u':
@@ -256,10 +248,10 @@ mode_compile (const char *mode_string, unsigned int masked_ops)
       /* If none specified, affect all bits, except perhaps those
 	 set in the umask. */
       if (affected_bits)
-	who_specified_p = 1;
+	who_specified_p = true;
       else
 	{
-	  who_specified_p = 0;
+	  who_specified_p = false;
 	  affected_bits = CHMOD_MODE_BITS;
 	  ops_to_mask = masked_ops;
 	}
@@ -356,7 +348,11 @@ mode_compile (const char *mode_string, unsigned int masked_ops)
 	      }
 	no_more_values:;
 	}
-  } while (*mode_string == ',');
+
+      if (*mode_string != ',')
+	break;
+    }
+
   if (*mode_string == 0)
     return head;
 invalid:

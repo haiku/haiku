@@ -1,5 +1,5 @@
 /* Duplicate an open file descriptor to a specified file descriptor.
-   Copyright 1999 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,9 +22,6 @@
 #endif
 
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
 
 #if HAVE_FCNTL_H
 # include <fcntl.h>

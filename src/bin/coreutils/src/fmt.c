@@ -1,5 +1,5 @@
 /* GNU fmt -- simple text formatter.
-   Copyright (C) 1994-2003 Free Software Foundation, Inc.
+   Copyright (C) 1994-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 #define word unused_word_type
 
 #include "system.h"
-#include "closeout.h"
 #include "error.h"
+#include "quote.h"
 #include "xstrtol.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -56,7 +56,12 @@
    or too long.  The definition of SHORT_COST(n) should not be changed.
    However, EQUIV(n) may need tuning.  */
 
-typedef long COST;
+/* FIXME: "fmt" misbehaves given large inputs or options.  One
+   possible workaround for part of the problem is to change COST to be
+   a floating-point type.  There are other problems besides COST,
+   though; see MAXWORDS below.  */
+
+typedef long int COST;
 
 #define MAXCOST	TYPE_MAXIMUM (COST)
 
@@ -100,8 +105,12 @@ typedef long COST;
 #define LINE_CREDIT	EQUIV(3)
 
 /* Size of paragraph buffer, in words and characters.  Longer paragraphs
-   are handled neatly (cf. flush_paragraph()), so there's little to gain
-   by making these larger.  */
+   are handled neatly (cf. flush_paragraph()), so long as these values
+   are considerably greater than required by the width.  These values
+   cannot be extended indefinitely: doing so would run into size limits
+   and/or cause more overflows in cost calculations.  FIXME: Remove these
+   arbitrary limits.  */
+
 #define MAXWORDS	1000
 #define MAXCHARS	5000
 
@@ -114,13 +123,6 @@ typedef long COST;
 /* Size of a tab stop, for expansion on input and re-introduction on
    output.  */
 #define TABWIDTH	8
-
-/* Miscellaneous definitions.  */
-
-#undef TRUE
-#define TRUE true
-#undef FALSE
-#define FALSE false
 
 /* Word descriptor structure.  */
 
@@ -171,16 +173,16 @@ const char *program_name;
 
 /* Option values.  */
 
-/* If TRUE, first 2 lines may have different indent (default FALSE).  */
+/* If true, first 2 lines may have different indent (default false).  */
 static bool crown;
 
-/* If TRUE, first 2 lines _must_ have different indent (default FALSE).  */
+/* If true, first 2 lines _must_ have different indent (default false).  */
 static bool tagged;
 
-/* If TRUE, each line is a paragraph on its own (default FALSE).  */
+/* If true, each line is a paragraph on its own (default false).  */
 static bool split;
 
-/* If TRUE, don't preserve inter-word spacing (default FALSE).  */
+/* If true, don't preserve inter-word spacing (default false).  */
 static bool uniform;
 
 /* Prefix minus leading and trailing spaces (default "").  */
@@ -228,7 +230,7 @@ static WORD word[MAXWORDS];
    word.  */
 static WORD *word_limit;
 
-/* If TRUE, current input file contains tab characters, and so tabs can be
+/* If true, current input file contains tab characters, and so tabs can be
    used for white space on output.  */
 static bool tabs;
 
@@ -263,7 +265,7 @@ static int last_line_length;
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -279,24 +281,25 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
   -c, --crown-margin        preserve indentation of first two lines\n\
-  -p, --prefix=STRING       combine only lines having STRING as prefix\n\
+  -p, --prefix=STRING       reformat only lines beginning with STRING,\n\
+                              reattaching the prefix to reformatted lines\n\
   -s, --split-only          split long lines, but do not refill\n\
 "),
 	     stdout);
       fputs (_("\
   -t, --tagged-paragraph    indentation of first line different from second\n\
   -u, --uniform-spacing     one space between words, two after sentences\n\
-  -w, --width=NUMBER        maximum line width (default of 75 columns)\n\
+  -w, --width=WIDTH         maximum line width (default of 75 columns)\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\
 \n\
-In -wNUMBER, the letter `w' may be omitted.\n"),
+With no FILE, or when FILE is -, read standard input.\n"),
 	     stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
-  exit (status == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (status);
 }
 
 /* Decode options and launch execution.  */
@@ -318,7 +321,10 @@ int
 main (register int argc, register char **argv)
 {
   int optchar;
+  bool ok = true;
+  char const *max_width_option = NULL;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -326,25 +332,17 @@ main (register int argc, register char **argv)
 
   atexit (close_stdout);
 
-  crown = tagged = split = uniform = FALSE;
+  crown = tagged = split = uniform = false;
   max_width = WIDTH;
   prefix = "";
   prefix_length = prefix_lead_space = prefix_full_length = 0;
 
   if (argc > 1 && argv[1][0] == '-' && ISDIGIT (argv[1][1]))
     {
-      const char *s = argv[1] + 1;
-      max_width = 0;
-      /* Old option syntax; a dash followed by one or more digits.
-         Move past the number. */
-      for (; ISDIGIT (*s); ++s)
-	{
-	  int old_max = max_width;
-	  max_width = max_width * 10 + *s - '0';
-	  if (INT_MAX / 10 < old_max || max_width < old_max)
-	    error (EXIT_FAILURE, 0, _("invalid width option: `%s'"), argv[1]);
-	}
-      /* Make the options we just parsed invisible to getopt. */
+      /* Old option syntax; a dash followed by one or more digits.  */
+      max_width_option = argv[1] + 1;
+
+      /* Make the option we just parsed invisible to getopt.  */
       argv[1] = argv[0];
       argv++;
       argc--;
@@ -356,36 +354,30 @@ main (register int argc, register char **argv)
     switch (optchar)
       {
       default:
+	if (ISDIGIT (optchar))
+	  error (0, 0, _("invalid option -- %c; -WIDTH is recognized\
+ only when it is the first\noption; use -w N instead"),
+		 optchar);
 	usage (EXIT_FAILURE);
 
-      case 0:
-	break;
-
       case 'c':
-	crown = TRUE;
+	crown = true;
 	break;
 
       case 's':
-	split = TRUE;
+	split = true;
 	break;
 
       case 't':
-	tagged = TRUE;
+	tagged = true;
 	break;
 
       case 'u':
-	uniform = TRUE;
+	uniform = true;
 	break;
 
       case 'w':
-	{
-	  long int tmp_long;
-	  if (xstrtol (optarg, NULL, 10, &tmp_long, "") != LONGINT_OK
-	      || tmp_long <= 0 || tmp_long > INT_MAX)
-	    error (EXIT_FAILURE, 0, _("invalid width: `%s'"),
-		   optarg);
-	  max_width = (int) tmp_long;
-	}
+	max_width_option = optarg;
 	break;
 
       case 'p':
@@ -397,6 +389,18 @@ main (register int argc, register char **argv)
       case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 
       }
+
+  if (max_width_option)
+    {
+      /* Limit max_width to MAXCHARS / 2; otherwise, the resulting
+	 output can be quite ugly.  */
+      unsigned long int tmp;
+      if (! (xstrtoul (max_width_option, NULL, 10, &tmp, "") == LONGINT_OK
+	     && tmp <= MAXCHARS / 2))
+	error (EXIT_FAILURE, 0, _("invalid width: %s"),
+	       quote (max_width_option));
+      max_width = tmp;
+    }
 
   best_width = max_width * (2 * (100 - LEEWAY) + 1) / 200;
 
@@ -417,15 +421,22 @@ main (register int argc, register char **argv)
 		{
 		  fmt (in_stream);
 		  if (fclose (in_stream) == EOF)
-		    error (EXIT_FAILURE, errno, "%s", file);
+		    {
+		      error (0, errno, "%s", file);
+		      ok = false;
+		    }
 		}
 	      else
-		error (0, errno, "%s", file);
+		{
+		  error (0, errno, _("cannot open %s for reading"),
+			 quote (file));
+		  ok = false;
+		}
 	    }
 	}
     }
 
-  exit (EXIT_SUCCESS);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 /* Trim space from the front and back of the string P, yielding the prefix,
@@ -456,7 +467,7 @@ set_prefix (register char *p)
 static void
 fmt (FILE *f)
 {
-  tabs = FALSE;
+  tabs = false;
   other_indent = 0;
   next_char = get_prefix (f);
   while (get_paragraph (f))
@@ -511,8 +522,8 @@ set_other_indent (bool same_paragraph)
    If a prefix is in effect, it must be present at the same indent for
    each line in the paragraph.
 
-   Return FALSE if end-of-file was encountered before the start of a
-   paragraph, else TRUE.  */
+   Return false if end-of-file was encountered before the start of a
+   paragraph, else true.  */
 
 static bool
 get_paragraph (FILE *f)
@@ -532,7 +543,7 @@ get_paragraph (FILE *f)
       if (c == EOF)
 	{
 	  next_char = EOF;
-	  return FALSE;
+	  return false;
 	}
       putchar ('\n');
       c = get_prefix (f);
@@ -580,9 +591,9 @@ get_paragraph (FILE *f)
       while (same_para (c) && in_column == other_indent)
 	c = get_line (f, c);
     }
-  (word_limit - 1)->period = (word_limit - 1)->final = TRUE;
+  (word_limit - 1)->period = (word_limit - 1)->final = true;
   next_char = c;
-  return TRUE;
+  return true;
 }
 
 /* Copy to the output a line that failed to match the prefix, or that
@@ -600,7 +611,7 @@ copy_rest (FILE *f, register int c)
     {
       put_space (next_prefix_indent);
       for (s = prefix; out_column != in_column && *s; out_column++)
-	putchar (*(unsigned char *)s++);
+	putchar (*s++);
       put_space (in_column - out_column);
     }
   while (c != '\n' && c != EOF)
@@ -611,9 +622,9 @@ copy_rest (FILE *f, register int c)
   return c;
 }
 
-/* Return TRUE if a line whose first non-blank character after the
+/* Return true if a line whose first non-blank character after the
    prefix (if any) is C could belong to the current paragraph,
-   otherwise FALSE.  */
+   otherwise false.  */
 
 static bool
 same_para (register int c)
@@ -703,7 +714,8 @@ get_prefix (FILE *f)
       next_prefix_indent = in_column;
       for (p = prefix; *p != '\0'; p++)
 	{
-	  if (c != *(unsigned char *)p)
+	  unsigned char pc = *p;
+	  if (c != pc)
 	    return c;
 	  in_column++;
 	  c = getc (f);
@@ -725,7 +737,7 @@ get_space (FILE *f, register int c)
 	in_column++;
       else if (c == '\t')
 	{
-	  tabs = TRUE;
+	  tabs = true;
 	  in_column = (in_column / TABWIDTH + 1) * TABWIDTH;
 	}
       else
@@ -739,13 +751,13 @@ get_space (FILE *f, register int c)
 static void
 check_punctuation (register WORD *w)
 {
-  const unsigned char *start, *finish;
+  char const *start = w->text;
+  char const *finish = start + (w->length - 1);
+  unsigned char fin = *finish;
 
-  start = (unsigned char *) w->text;
-  finish = start + (w->length - 1);
   w->paren = isopen (*start);
-  w->punct = ISPUNCT (*finish);
-  while (isclose (*finish) && finish > start)
+  w->punct = ISPUNCT (fin);
+  while (start < finish && isclose (*finish))
     finish--;
   w->period = isperiod (*finish);
 }
@@ -765,7 +777,7 @@ flush_paragraph (void)
 
   if (word_limit == word)
     {
-      printf ("%*s", wptr - parabuf, parabuf);
+      fwrite (parabuf, sizeof *parabuf, wptr - parabuf, stdout);
       wptr = parabuf;
       return;
     }
@@ -797,7 +809,7 @@ flush_paragraph (void)
   /* Copy text of words down to start of parabuf -- we use memmove because
      the source and target may overlap.  */
 
-  memmove (parabuf, split_point->text, (size_t) (wptr - split_point->text));
+  memmove (parabuf, split_point->text, wptr - split_point->text);
   shift = split_point->text - parabuf;
   wptr -= shift;
 
@@ -809,8 +821,7 @@ flush_paragraph (void)
   /* Copy words from split_point down to word -- we use memmove because
      the source and target may overlap.  */
 
-  memmove ((char *) word, (char *) split_point,
-	 (word_limit - split_point + 1) * sizeof (WORD));
+  memmove (word, split_point, (word_limit - split_point + 1) * sizeof *word);
   word_limit -= split_point - word;
 }
 

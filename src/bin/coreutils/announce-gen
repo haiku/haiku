@@ -6,7 +6,7 @@ use Getopt::Long;
 use Digest::MD5;
 use Digest::SHA1;
 
-(my $VERSION = '$Revision: 1.1 $ ') =~ tr/[0-9].//cd;
+(my $VERSION = '$Revision: 1.22 $ ') =~ tr/[0-9].//cd;
 (my $ME = $0) =~ s|.*/||;
 
 my %valid_release_types = map {$_ => 1} qw (alpha beta major);
@@ -70,6 +70,138 @@ OPTIONS:
 EOF
     }
   exit $exit_code;
+}
+
+
+=item C<%size> = C<sizes (@file)>
+
+Compute the sizes of the C<@file> and return them as a hash.  Return
+C<undef> if one of the computation failed.
+
+=cut
+
+sub sizes (@)
+{
+  my (@file) = @_;
+
+  my $fail = 0;
+  my %res;
+  foreach my $f (@file)
+    {
+      my $cmd = "du --human $f";
+      my $t = `$cmd`;
+      # FIXME-someday: give a better diagnostic, a la $PROCESS_STATUS
+      $@
+	and (warn "$ME: command failed: `$cmd'\n"), $fail = 1;
+      chomp $t;
+      $t =~ s/^([\d.]+[MkK]).*/${1}B/;
+      $res{$f} = $t;
+    }
+  return $fail ? undef : %res;
+}
+
+=item C<print_locations ($title, \@url, \%size, @file)
+
+Print a section C<$title> dedicated to the list of <@file>, which
+sizes are stored in C<%size>, and which are available from the C<@url>.
+
+=cut
+
+sub print_locations ($\@\%@)
+{
+  my ($title, $url, $size, @file) = @_;
+  print "Here are the $title:\n";
+  foreach my $url (@{$url})
+    {
+      for my $file (@file)
+	{
+	  print "  $url/$file";
+	  print "   (", $$size{$file}, ")"
+	    if exists $$size{$file};
+	  print "\n";
+	}
+    }
+  print "\n";
+}
+
+=item C<print_signatures (@file)
+
+Print the MD5 and SHA1 signature section for each C<@file>.
+
+=cut
+
+sub print_signatures (@)
+{
+  my (@file) = @_;
+
+  print "Here are the MD5 and SHA1 signatures:\n";
+  print "\n";
+
+  foreach my $meth (qw (md5 sha1))
+    {
+      foreach my $f (@file)
+	{
+	  open IN, '<', $f
+	    or die "$ME: $f: cannot open for reading: $!\n";
+	  binmode IN;
+	  my $dig =
+	    ($meth eq 'md5'
+	     ? Digest::MD5->new->addfile(*IN)->hexdigest
+	     : Digest::SHA1->new->addfile(*IN)->hexdigest);
+	  close IN;
+	  print "$dig  $f\n";
+	}
+    }
+
+
+}
+
+=item C<print_news_deltas ($news_file, $prev_version, $curr_version)
+
+Print the section of the NEWS file C<$news_file> addressing changes
+between versions C<$prev_version> and C<$curr_version>.
+
+=cut
+
+sub print_news_deltas ($$$)
+{
+  my ($news_file, $prev_version, $curr_version) = @_;
+
+  print "\n$news_file\n\n";
+
+  # Print all lines from $news_file, starting with the first one
+  # that mentions $curr_version up to but not including
+  # the first occurrence of $prev_version.
+  my $in_items;
+
+  open NEWS, '<', $news_file
+    or die "$ME: $news_file: cannot open for reading: $!\n";
+  while (defined (my $line = <NEWS>))
+    {
+      if ( ! $in_items)
+	{
+	  # Match lines like this one:
+	  # * Major changes in release 5.0.1:
+	  # but not any other line that starts with a space, *, or -.
+	  $line =~ /^(\* Major changes.*|[^ *-].*)\Q$curr_version\E/o
+	    or next;
+	  $in_items = 1;
+	  print $line;
+	}
+      else
+	{
+	  # Be careful that this regexp cannot match version numbers
+	  # in NEWS items -- they might well say `introduced in 4.5.5',
+	  # and we don't want that to match.
+	  $line =~ /^(\* Major changes.*|[^ *-].*)\Q$prev_version\E/o
+	    and last;
+	  print $line;
+	}
+    }
+  close NEWS;
+
+  $in_items
+    or die "$ME: $news_file: no matching lines for `$curr_version'\n";
 }
 
 sub print_changelog_deltas ($$)
@@ -159,23 +291,27 @@ sub print_changelog_deltas ($$)
 }
 
 {
+  # Neutralize the locale, so that, for instance, "du" does not
+  # issue "1,2" instead of "1.2", what confuses our regexps.
+  $ENV{LC_ALL} = "C";
+
   my $release_type;
   my $package_name;
   my $prev_version;
   my $curr_version;
   my $release_archive_dir;
   my @url_dir_list;
-  my $news_file;
+  my @news_file;
 
   GetOptions
     (
-     'release-type=s' => \$release_type,
-     'package-name=s' => \$package_name,
+     'release-type=s'     => \$release_type,
+     'package-name=s'     => \$package_name,
      'previous-version=s' => \$prev_version,
-     'current-version=s' => \$curr_version,
+     'current-version=s'  => \$curr_version,
      'release-archive-directory=s' => \$release_archive_dir,
-     'url-directory=s@' => \@url_dir_list,
-     'news=s@' => \$news_file,
+     'url-directory=s'    => \@url_dir_list,
+     'news=s'             => \@news_file,
 
      help => sub { usage 0 },
      version => sub { print "$ME version $VERSION\n"; exit },
@@ -209,123 +345,55 @@ sub print_changelog_deltas ($$)
   my $tbz = "$my_distdir.tar.bz2";
   my $xd = "$package_name-$prev_version-$curr_version.xdelta";
 
-  my %size;
+  my %size = sizes ($tgz, $tbz, $xd);
+  %size
+    or exit 1;
 
-  foreach my $f (($tgz, $tbz, $xd))
-    {
-      my $cmd = "du --human $f";
-      my $t = `$cmd`;
-      # FIXME-someday: give a better diagnostic, a la $PROCESS_STATUS
-      $@
-	and (warn "$ME: command failed: `$cmd'\n"), $fail = 1;
-      chomp $t;
-      $t =~ s/^([\d.]+[MkK]).*/${1}B/;
-      $size{$f} = $t;
-    }
-
-  $fail
-    and exit 1;
-
+  # The markup is escaped as <\# so that when this script is sent by
+  # mail (or part of a diff), Gnus is not triggered.
   print <<EOF;
 
 Subject: $my_distdir released
 
-<#secure method=pgpmime mode=sign>
+<\#secure method=pgpmime mode=sign>
 
 FIXME: put comments here
 
 EOF
 
-  print "Here are the compressed sources:\n";
-  foreach my $url (@url_dir_list)
-    {
-      print "  $url/$tgz   ($size{$tgz})\n";
-      print "  $url/$tbz  ($size{$tbz})\n";
-    }
+  print_locations ("compressed sources", @url_dir_list, %size,
+		   $tgz, $tbz);
+  print_locations ("xdelta-style diffs", @url_dir_list, %size,
+		   $xd);
+  print_locations ("GPG detached signatures", @url_dir_list, %size,
+		   "$tgz.sig", "$tbz.sig");
 
-  print "\nAnd here are xdelta-style diffs:\n";
-  foreach my $url (@url_dir_list)
-    {
-      print "  $url/$xd   ($size{$xd})\n";
-    }
+  print_signatures ($tgz, $tbz, $xd);
 
-  print "\nHere are GPG detached signatures:\n";
-  foreach my $url (@url_dir_list)
-    {
-      print "  $url/$tgz.sig\n";
-      print "  $url/$tbz.sig\n";
-    }
-
-  # FIXME: clean up upon interrupt or die
-  my $tmpdir = $ENV{TMPDIR} || '/tmp';
-  my $tmp = "$tmpdir/$ME-$$";
-  unlink $tmp;  # ignore failure
-
-  print "\nHere are the MD5 and SHA1 signatures:\n";
-  print "\n";
-  print "<#part type=text/plain filename=\"$tmp\" disposition=inline>\n"
-    . "<#/part>\n";
-
-  open OUT, '>', $tmp
-    or die "$ME: $tmp: cannot open for writing: $!\n";
-
-  foreach my $meth (qw (md5 sha1))
-    {
-      foreach my $f (($tgz, $tbz, $xd))
-	{
-	  open IN, '<', $f
-	    or die "$ME: $f: cannot open for reading: $!\n";
-	  binmode IN;
-	  my $dig =
-	    ($meth eq 'md5'
-	     ? Digest::MD5->new->addfile(*IN)->hexdigest
-	     : Digest::SHA1->new->addfile(*IN)->hexdigest);
-	  close IN;
-	  print OUT "$dig  $f\n";
-	}
-    }
-
-  close OUT
-    or die "$ME: $tmp: while writing: $!\n";
-  chmod 0400, $tmp;  # ignore failure
-
-  if ($news_file)
-    {
-      print "\nNEWS\n\n";
-
-      # Print all lines from $news_file, starting with the first one
-      # that mentions $curr_version up to but not including
-      # the first occurrence of $prev_version.
-      my $in_items;
-      open NEWS, '<', $news_file
-	or die "$ME: $news_file: cannot open for reading: $!\n";
-      while (defined (my $line = <NEWS>))
-	{
-	  if ( ! $in_items)
-	    {
-	      $line =~ /^[^ *].*\Q$curr_version\E/o
-		or next;
-	      $in_items = 1;
-	      print $line;
-	    }
-	  else
-	    {
-	      # Be careful that this regexp cannot match version numbers
-	      # in NEWS items -- they might well say `introduced in 4.5.5',
-	      # and we don't want that to match.
-	      $line =~ /^[^ *].*\Q$prev_version\E/o
-		and last;
-	      print $line;
-	    }
-	}
-      close NEWS;
-
-      $in_items
-	or die "$ME: $news_file: no matching lines\n";
-    }
+  print_news_deltas ($_, $prev_version, $curr_version)
+    foreach @news_file;
 
   $release_type eq 'major'
     or print_changelog_deltas ($package_name, $prev_version);
 
   exit 0;
 }
+
+
+
+### Setup "GNU" style for perl-mode and cperl-mode.
+## Local Variables:
+## perl-indent-level: 2
+## perl-continued-statement-offset: 2
+## perl-continued-brace-offset: 0
+## perl-brace-offset: 0
+## perl-brace-imaginary-offset: 0
+## perl-label-offset: -2
+## cperl-indent-level: 2
+## cperl-brace-offset: 0
+## cperl-continued-brace-offset: 0
+## cperl-label-offset: -2
+## cperl-extra-newline-before-brace: t
+## cperl-merge-trailing-else: nil
+## cperl-continued-statement-offset: 2
+## End:

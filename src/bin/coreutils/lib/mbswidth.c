@@ -1,5 +1,5 @@
 /* Determine the number of screen columns needed for a string.
-   Copyright (C) 2000-2002 Free Software Foundation, Inc.
+   Copyright (C) 2000-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,12 @@
 
 /* Get mbstate_t, mbrtowc(), mbsinit(), wcwidth().  */
 #if HAVE_WCHAR_H
+/* Tru64 with Desktop Toolkit C has a bug: <stdio.h> must be included before
+   <wchar.h>.
+   BSD/OS 4.1 has a bug: <stdio.h> and <time.h> must be included before
+   <wchar.h>.  */
+# include <stdio.h>
+# include <time.h>
 # include <wchar.h>
 #endif
 
@@ -75,7 +81,7 @@ int wcwidth ();
 #else
 # define IN_CTYPE_DOMAIN(c) isascii(c)
 #endif
-/* Undefine to protect against the definition in wctype.h of solaris2.6.   */
+/* Undefine to protect against the definition in wctype.h of Solaris 2.6.   */
 #undef ISPRINT
 #define ISPRINT(c) (IN_CTYPE_DOMAIN (c) && isprint (c))
 #undef ISCNTRL
@@ -85,7 +91,7 @@ int wcwidth ();
    character string pointed to by STRING.  If a non-printable character
    occurs, and MBSW_REJECT_UNPRINTABLE is specified, -1 is returned.
    With flags = MBSW_REJECT_INVALID | MBSW_REJECT_UNPRINTABLE, this is
-   the multibyte analogon of the wcswidth function.  */
+   the multibyte analogue of the wcswidth function.  */
 int
 mbswidth (const char *string, int flags)
 {

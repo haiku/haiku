@@ -1,5 +1,5 @@
 /* GNU's read utmp module.
-   Copyright (C) 1992-2001, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1992-2001, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,25 +19,21 @@
 
 #include <config.h>
 
+#include "readutmp.h"
+
+#include <errno.h>
 #include <stdio.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#if defined(STDC_HEADERS) || defined(HAVE_STRING_H)
-# include <string.h>
-#else
-# include <strings.h>
-#endif /* STDC_HEADERS || HAVE_STRING_H */
+#include <string.h>
+#include <stdlib.h>
 
-#if STDC_HEADERS
-# include <stdlib.h>
-#else
-void *realloc ();
-#endif
-
-#include "readutmp.h"
-#include "unlocked-io.h"
 #include "xalloc.h"
+
+#if USE_UNLOCKED_IO
+# include "unlocked-io.h"
+#endif
 
 /* Copy UT->ut_name into storage obtained from malloc.  Then remove any
    trailing spaces from the copy, NUL terminate it, and return the copy.  */
@@ -49,28 +45,31 @@ extract_trimmed_name (const STRUCT_UTMP *ut)
 
   trimmed_name = xmalloc (sizeof (UT_USER (ut)) + 1);
   strncpy (trimmed_name, UT_USER (ut), sizeof (UT_USER (ut)));
-  /* Append a trailing space character.  Some systems pad names shorter than
-     the maximum with spaces, others pad with NULs.  Remove any spaces.  */
-  trimmed_name[sizeof (UT_USER (ut))] = ' ';
-  p = strchr (trimmed_name, ' ');
-  if (p != NULL)
-    *p = '\0';
+  /* Append a trailing NUL.  Some systems pad names shorter than the
+     maximum with spaces, others pad with NULs.  Remove any trailing
+     spaces.  */
+  trimmed_name[sizeof (UT_USER (ut))] = '\0';
+  for (p = trimmed_name + strlen (trimmed_name);
+       trimmed_name < p && p[-1] == ' ';
+       *--p = '\0')
+    continue;
   return trimmed_name;
 }
 
 /* Read the utmp entries corresponding to file FILENAME into freshly-
    malloc'd storage, set *UTMP_BUF to that pointer, set *N_ENTRIES to
    the number of entries, and return zero.  If there is any error,
-   return non-zero and don't modify the parameters.  */
+   return -1, setting errno, and don't modify the parameters.  */
 
 #ifdef UTMP_NAME_FUNCTION
 
 int
-read_utmp (const char *filename, int *n_entries, STRUCT_UTMP **utmp_buf)
+read_utmp (const char *filename, size_t *n_entries, STRUCT_UTMP **utmp_buf)
 {
-  int n_read;
+  size_t n_read;
+  size_t n_alloc = 4;
+  STRUCT_UTMP *utmp = xmalloc (n_alloc * sizeof *utmp);
   STRUCT_UTMP *u;
-  STRUCT_UTMP *utmp = NULL;
 
   /* Ignore the return value for now.
      Solaris' utmpname returns 1 upon success -- which is contrary
@@ -83,10 +82,12 @@ read_utmp (const char *filename, int *n_entries, STRUCT_UTMP **utmp_buf)
   n_read = 0;
   while ((u = GET_UTMP_ENT ()) != NULL)
     {
+      if (n_read == n_alloc)
+	{
+	  utmp = xnrealloc (utmp, n_alloc, 2 * sizeof *utmp);
+	  n_alloc *= 2;
+	}
       ++n_read;
-      utmp = (STRUCT_UTMP *) realloc (utmp, n_read * sizeof (STRUCT_UTMP));
-      if (utmp == NULL)
-	return 1;
       utmp[n_read - 1] = *u;
     }
 
@@ -101,7 +102,7 @@ read_utmp (const char *filename, int *n_entries, STRUCT_UTMP **utmp_buf)
 #else
 
 int
-read_utmp (const char *filename, int *n_entries, STRUCT_UTMP **utmp_buf)
+read_utmp (const char *filename, size_t *n_entries, STRUCT_UTMP **utmp_buf)
 {
   FILE *utmp;
   struct stat file_stats;
@@ -111,25 +112,35 @@ read_utmp (const char *filename, int *n_entries, STRUCT_UTMP **utmp_buf)
 
   utmp = fopen (filename, "r");
   if (utmp == NULL)
-    return 1;
+    return -1;
 
-  fstat (fileno (utmp), &file_stats);
-  size = file_stats.st_size;
-  if (size > 0)
-    buf = (STRUCT_UTMP *) xmalloc (size);
-  else
+  if (fstat (fileno (utmp), &file_stats) != 0)
     {
+      int e = errno;
       fclose (utmp);
-      return 1;
+      errno = e;
+      return -1;
+    }
+  size = file_stats.st_size;
+  buf = xmalloc (size);
+  n_read = fread (buf, sizeof *buf, size / sizeof *buf, utmp);
+  if (ferror (utmp))
+    {
+      int e = errno;
+      free (buf);
+      fclose (utmp);
+      errno = e;
+      return -1;
+    }
+  if (fclose (utmp) != 0)
+    {
+      int e = errno;
+      free (buf);
+      errno = e;
+      return -1;
     }
 
-  /* Use < instead of != in case the utmp just grew.  */
-  n_read = fread (buf, 1, size, utmp);
-  if (ferror (utmp) || fclose (utmp) == EOF
-      || n_read < size)
-    return 1;
-
-  *n_entries = size / sizeof (STRUCT_UTMP);
+  *n_entries = n_read;
   *utmp_buf = buf;
 
   return 0;

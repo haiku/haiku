@@ -3,7 +3,8 @@ dist_man_MANS = \
   basename.1 cat.1 chgrp.1 chmod.1 chown.1 chroot.1 cksum.1 comm.1 \
   cp.1 csplit.1 cut.1 date.1 dd.1 df.1 dir.1 dircolors.1 dirname.1 du.1 \
   echo.1 env.1 expand.1 expr.1 factor.1 false.1 fmt.1 fold.1 groups.1 \
-  head.1 hostid.1 hostname.1 id.1 install.1 join.1 link.1 ln.1 logname.1 \
+  head.1 hostid.1 hostname.1 id.1 install.1 join.1 kill.1 \
+  link.1 ln.1 logname.1 \
   ls.1 md5sum.1 mkdir.1 mkfifo.1 mknod.1 mv.1 nice.1 nl.1 nohup.1 od.1 \
   paste.1 pathchk.1 pinky.1 pr.1 printenv.1 printf.1 ptx.1 pwd.1 readlink.1 \
   rm.1 rmdir.1 seq.1 sha1sum.1 shred.1 sleep.1 sort.1 split.1 stat.1 stty.1 \
@@ -13,7 +14,7 @@ dist_man_MANS = \
 
 man_aux = $(dist_man_MANS:.1=.x)
 
-EXTRA_DIST = $(man_aux)
+EXTRA_DIST = $(man_aux) help2man
 MAINTAINERCLEANFILES = $(man_MANS)
 
 # Depend on configure.ac to get version number changes.
@@ -55,6 +56,7 @@ hostname.1:	$(common_dep)	$(srcdir)/hostname.x	../src/hostname.c
 id.1:		$(common_dep)	$(srcdir)/id.x		../src/id.c
 install.1:	$(common_dep)	$(srcdir)/install.x	../src/install.c
 join.1:		$(common_dep)	$(srcdir)/join.x	../src/join.c
+kill.1:		$(common_dep)	$(srcdir)/kill.x	../src/kill.c
 link.1:		$(common_dep)	$(srcdir)/link.x	../src/link.c
 ln.1:		$(common_dep)	$(srcdir)/ln.x		../src/ln.c
 logname.1:	$(common_dep)	$(srcdir)/logname.x	../src/logname.c
@@ -66,7 +68,7 @@ mknod.1:	$(common_dep)	$(srcdir)/mknod.x	../src/mknod.c
 mv.1:		$(common_dep)	$(srcdir)/mv.x		../src/mv.c
 nice.1:		$(common_dep)	$(srcdir)/nice.x	../src/nice.c
 nl.1:		$(common_dep)	$(srcdir)/nl.x		../src/nl.c
-nohup.1:	$(common_dep)	$(srcdir)/nohup.x	../src/nohup.sh
+nohup.1:	$(common_dep)	$(srcdir)/nohup.x	../src/nohup.c
 od.1:		$(common_dep)	$(srcdir)/od.x		../src/od.c
 paste.1:	$(common_dep)	$(srcdir)/paste.x	../src/paste.c
 pathchk.1:	$(common_dep)	$(srcdir)/pathchk.x	../src/pathchk.c
@@ -115,30 +117,53 @@ SUFFIXES = .x .1
 
 # Ensure that help2man runs the ../src/ginstall binary as
 # `install' when creating install.1.
+# Similarly, ensure that it uses the ../src/[ binary to create test.1.
 t = $*.td
-mapped_name = `echo $*|sed 's/install/ginstall/'`
+mapped_name = `echo $*|sed 's/install/ginstall/; s/test/[/'`
 
 # Note the use of $t/$*, rather than just `$*' as in other packages.
 # That is necessary to avoid failures for programs that are also shell built-in
 # functions like echo, false, printf, pwd.
 .x.1:
+	@rm -f $@
 	@echo "Updating man page $@";		\
 	mkdir $t;				\
 	(cd $t && $(LN_S) ../../src/$(mapped_name)$(EXEEXT) $*$(EXEEXT)); \
-	$(HELP2MAN)				\
+	$(PERL) -- $(srcdir)/help2man		\
 	    --include=$(srcdir)/$*.x		\
-	    --output=$@ $t/$*$(EXEEXT);		\
-	rm -rf $t
+	    --output=$@ $t/$*$(EXEEXT)
+	@chmod a-w $@
+	@rm -rf $t
 
-check-local: check-x-vs-1
+check-local: check-x-vs-1 check-programs-vs-x
+
+# Sort in traditional ASCII order, regardless of the current locale;
+# otherwise we may get into trouble with distinct strings that the
+# current locale considers to be equal.
+ASSORT = LC_ALL=C sort
 
 # Ensure that for each .x file in this directory, there is a
 # corresponding .1 file in the definition of $(dist_man_MANS) above.
 .PHONY: check-x-vs-1
 check-x-vs-1:
-	PATH=../src@PATH_SEPARATOR@$$PATH; export PATH;			\
+	PATH=../src$(PATH_SEPARATOR)$$PATH; export PATH;		\
 	t=ls-files.$$$$;						\
-	(cd $(srcdir) && ls -1 *.x) | sed 's/\.x$$//' | sort > $$t;	\
-	echo $(dist_man_MANS) | fmt -w1 | sed 's/\.1$$//' | sort -u	\
-	  | diff - $$t || { rm $$t; exit 1; };				\
+	(cd $(srcdir) && ls -1 *.x) | sed 's/\.x$$//' | $(ASSORT) > $$t;\
+	echo $(dist_man_MANS) | tr -s ' ' '\n' | sed 's/\.1$$//'	\
+	  | $(ASSORT) | diff - $$t || { rm $$t; exit 1; };		\
 	rm $$t
+
+all_programs =								\
+      (cd ../src && MAKEFLAGS= $(MAKE) -s all_programs.list)		\
+    | grep -v '\['
+
+.PHONY: check-programs-vs-x
+check-programs-vs-x:
+	status=0;					\
+	for p in dummy `$(all_programs)`; do		\
+	  test $$p = dummy && continue;			\
+	  test $$p = ginstall && p=install || : ;	\
+	  test -f $(srcdir)/$$p.x			\
+	    || { echo missing $$p.x 1>&2; status=1; };	\
+	done;						\
+	exit $$status

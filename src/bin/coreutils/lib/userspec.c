@@ -1,5 +1,6 @@
 /* userspec.c -- Parse a user and group string.
-   Copyright (C) 1989-1992, 1997, 1998, 2000, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1989-1992, 1997-1998, 2000, 2002-2004 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,20 +22,10 @@
 # include <config.h>
 #endif
 
-#ifdef __GNUC__
-# define alloca __builtin_alloca
-#else
-# if HAVE_ALLOCA_H
-#  include <alloca.h>
-# else
-#  ifdef _AIX
- #  pragma alloca
-#  else
-char *alloca ();
-#  endif
-# endif
-#endif
+/* Specification.  */
+#include "userspec.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -44,27 +35,16 @@ char *alloca ();
 # include <sys/param.h>
 #endif
 
-#if HAVE_LIMITS_H
-# include <limits.h>
-#endif
-
-#if HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-# ifndef strchr
-#  define strchr index
-# endif
-#endif
-
-#if STDC_HEADERS
-# include <stdlib.h>
-#endif
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
 
 #if HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 
+#include "inttostr.h"
+#include "strdup.h"
 #include "xalloc.h"
 #include "xstrtol.h"
 
@@ -84,10 +64,6 @@ struct group *getgrgid ();
 
 #ifndef HAVE_ENDPWENT
 # define endpwent() ((void) 0)
-#endif
-
-#ifndef CHAR_BIT
-# define CHAR_BIT 8
 #endif
 
 /* The extra casts work around common compiler bugs.  */
@@ -114,18 +90,6 @@ struct group *getgrgid ();
 # define MAXGID GID_T_MAX
 #endif
 
-/* Perform the equivalent of the statement `dest = strdup (src);',
-   but obtaining storage via alloca instead of from the heap.  */
-
-#define V_STRDUP(dest, src)						\
-  do									\
-    {									\
-      int _len = strlen ((src));					\
-      (dest) = (char *) alloca (_len + 1);				\
-      strcpy (dest, src);						\
-    }									\
-  while (0)
-
 /* ISDIGIT differs from isdigit, as follows:
    - Its arg may be any int or unsigned int; it need not be an unsigned char.
    - It's guaranteed to evaluate its argument exactly once.
@@ -133,99 +97,71 @@ struct group *getgrgid ();
    POSIX says that only '0' through '9' are digits.  Prefer ISDIGIT to
    ISDIGIT_LOCALE unless it's important to use the locale's definition
    of `digit' even when the host does not conform to POSIX.  */
-#define ISDIGIT(c) ((unsigned) (c) - '0' <= 9)
+#define ISDIGIT(c) ((unsigned int) (c) - '0' <= 9)
 
-#ifndef strdup
-char *strdup ();
-#endif
+#ifdef __DJGPP__
 
-/* Return nonzero if STR represents an unsigned decimal integer,
-   otherwise return 0. */
+/* Return true if STR represents an unsigned decimal integer.  */
 
-static int
+static bool
 is_number (const char *str)
 {
-  for (; *str; str++)
-    if (!ISDIGIT (*str))
-      return 0;
-  return 1;
+  do
+    {
+      if (!ISDIGIT (*str))
+	return false;
+    }
+  while (*++str);
+
+  return true;
 }
+#endif
 
-/* Extract from NAME, which has the form "[user][:.][group]",
-   a USERNAME, UID U, GROUPNAME, and GID G.
-   Either user or group, or both, must be present.
-   If the group is omitted but the ":" separator is given,
-   use the given user's login group.
-   If SPEC_ARG contains a `:', then use that as the separator, ignoring
-   any `.'s.  If there is no `:', but there is a `.', then first look
-   up the entire SPEC_ARG as a login name.  If that look-up fails, then
-   try again interpreting the `.'  as a separator.
-
-   USERNAME and GROUPNAME will be in newly malloc'd memory.
-   Either one might be NULL instead, indicating that it was not
-   given and the corresponding numeric ID was left unchanged.
-
-   Return NULL if successful, a static error message string if not.  */
-
-const char *
-parse_user_spec (const char *spec_arg, uid_t *uid, gid_t *gid,
-		 char **username_arg, char **groupname_arg)
+static char const *
+parse_with_separator (char const *spec, char const *separator,
+		      uid_t *uid, gid_t *gid,
+		      char **username, char **groupname)
 {
   static const char *E_invalid_user = N_("invalid user");
   static const char *E_invalid_group = N_("invalid group");
   static const char *E_bad_spec =
     N_("cannot get the login group of a numeric UID");
-  static const char *E_cannot_omit_both =
-    N_("cannot omit both user and group");
 
   const char *error_msg;
-  char *spec;			/* A copy we can write on.  */
   struct passwd *pwd;
   struct group *grp;
-  char *g, *u, *separator;
-  char *groupname;
-  int maybe_retry = 0;
-  char *dot = NULL;
+  char *u;
+  char const *g;
+  char *gname = NULL;
+  uid_t unum = *uid;
+  gid_t gnum = *gid;
 
   error_msg = NULL;
-  *username_arg = *groupname_arg = NULL;
-  groupname = NULL;
+  *username = *groupname = NULL;
 
-  V_STRDUP (spec, spec_arg);
+  /* Set U and G to nonzero length strings corresponding to user and
+     group specifiers or to NULL.  If U is not NULL, it is a newly
+     allocated string.  */
 
-  /* Find the POSIX `:' separator if there is one.  */
-  separator = strchr (spec, ':');
-
-  /* If there is no colon, then see if there's a `.'.  */
+  u = NULL;
   if (separator == NULL)
     {
-      dot = strchr (spec, '.');
-      /* If there's no colon but there is a `.', then first look up the
-	 whole spec, in case it's an OWNER name that includes a dot.
-	 If that fails, then we'll try again, but interpreting the `.'
-	 as a separator.  */
-      /* FIXME: accepting `.' as the separator is contrary to POSIX.
-	 someday we should drop support for this.  */
-      if (dot)
-	maybe_retry = 1;
+      if (*spec)
+	u = xstrdup (spec);
     }
-
- retry:
-
-  /* Replace separator with a NUL.  */
-  if (separator != NULL)
-    *separator = '\0';
-
-  /* Set U and G to non-zero length strings corresponding to user and
-     group specifiers or to NULL.  */
-  u = (*spec == '\0' ? NULL : spec);
+  else
+    {
+      size_t ulen = separator - spec;
+      if (ulen != 0)
+	{
+	  u = xmemdup (spec, ulen + 1);
+	  u[ulen] = '\0';
+	}
+    }
 
   g = (separator == NULL || *(separator + 1) == '\0'
        ? NULL
        : separator + 1);
-
-  if (u == NULL && g == NULL)
-    return _(E_cannot_omit_both);
 
 #ifdef __DJGPP__
   /* Pretend that we are the user U whose group is G.  This makes
@@ -241,47 +177,30 @@ parse_user_spec (const char *spec_arg, uid_t *uid, gid_t *gid,
       pwd = getpwnam (u);
       if (pwd == NULL)
 	{
-
-	  if (!is_number (u))
-	    error_msg = E_invalid_user;
+	  bool use_login_group = (separator != NULL && g == NULL);
+	  if (use_login_group)
+	    error_msg = E_bad_spec;
 	  else
 	    {
-	      int use_login_group;
-	      use_login_group = (separator != NULL && g == NULL);
-	      if (use_login_group)
-		error_msg = E_bad_spec;
+	      unsigned long int tmp;
+	      if (xstrtoul (u, NULL, 10, &tmp, "") == LONGINT_OK
+		  && tmp <= MAXUID)
+		unum = tmp;
 	      else
-		{
-		  unsigned long int tmp_long;
-		  if (xstrtoul (u, NULL, 0, &tmp_long, NULL) != LONGINT_OK
-		      || tmp_long > MAXUID)
-		    return _(E_invalid_user);
-		  *uid = tmp_long;
-		}
+		error_msg = E_invalid_user;
 	    }
 	}
       else
 	{
-	  *uid = pwd->pw_uid;
+	  unum = pwd->pw_uid;
 	  if (g == NULL && separator != NULL)
 	    {
 	      /* A separator was given, but a group was not specified,
 	         so get the login group.  */
-	      *gid = pwd->pw_gid;
-	      grp = getgrgid (pwd->pw_gid);
-	      if (grp == NULL)
-		{
-		  /* This is enough room to hold the unsigned decimal
-		     representation of any 32-bit quantity and the trailing
-		     zero byte.  */
-		  char uint_buf[21];
-		  sprintf (uint_buf, "%u", (unsigned) (pwd->pw_gid));
-		  V_STRDUP (groupname, uint_buf);
-		}
-	      else
-		{
-		  V_STRDUP (groupname, grp->gr_name);
-		}
+	      char buf[INT_BUFSIZE_BOUND (uintmax_t)];
+	      gnum = pwd->pw_gid;
+	      grp = getgrgid (gnum);
+	      gname = xstrdup (grp ? grp->gr_name : umaxtostr (gnum, buf));
 	      endgrent ();
 	    }
 	}
@@ -294,58 +213,72 @@ parse_user_spec (const char *spec_arg, uid_t *uid, gid_t *gid,
       grp = getgrnam (g);
       if (grp == NULL)
 	{
-	  if (!is_number (g))
-	    error_msg = E_invalid_group;
+	  unsigned long int tmp;
+	  if (xstrtoul (g, NULL, 10, &tmp, "") == LONGINT_OK && tmp <= MAXGID)
+	    gnum = tmp;
 	  else
-	    {
-	      unsigned long int tmp_long;
-	      if (xstrtoul (g, NULL, 0, &tmp_long, NULL) != LONGINT_OK
-		  || tmp_long > MAXGID)
-		return _(E_invalid_group);
-	      *gid = tmp_long;
-	    }
+	    error_msg = E_invalid_group;
 	}
       else
-	*gid = grp->gr_gid;
+	gnum = grp->gr_gid;
       endgrent ();		/* Save a file descriptor.  */
-
-      if (error_msg == NULL)
-	V_STRDUP (groupname, g);
+      gname = xstrdup (g);
     }
 
   if (error_msg == NULL)
     {
-      if (u != NULL)
-	{
-	  *username_arg = strdup (u);
-	  if (*username_arg == NULL)
-	    error_msg = xalloc_msg_memory_exhausted;
-	}
-
-      if (groupname != NULL && error_msg == NULL)
-	{
-	  *groupname_arg = strdup (groupname);
-	  if (*groupname_arg == NULL)
-	    {
-	      if (*username_arg != NULL)
-		{
-		  free (*username_arg);
-		  *username_arg = NULL;
-		}
-	      error_msg = xalloc_msg_memory_exhausted;
-	    }
-	}
+      *uid = unum;
+      *gid = gnum;
+      *username = u;
+      *groupname = gname;
+      u = NULL;
     }
+  else
+    free (gname);
 
-  if (error_msg && maybe_retry)
-    {
-      maybe_retry = 0;
-      separator = dot;
-      error_msg = NULL;
-      goto retry;
-    }
-
+  free (u);
   return _(error_msg);
+}
+
+/* Extract from SPEC, which has the form "[user][:.][group]",
+   a USERNAME, UID U, GROUPNAME, and GID G.
+   Either user or group, or both, must be present.
+   If the group is omitted but the separator is given,
+   use the given user's login group.
+   If SPEC contains a `:', then use that as the separator, ignoring
+   any `.'s.  If there is no `:', but there is a `.', then first look
+   up the entire SPEC as a login name.  If that look-up fails, then
+   try again interpreting the `.'  as a separator.
+
+   USERNAME and GROUPNAME will be in newly malloc'd memory.
+   Either one might be NULL instead, indicating that it was not
+   given and the corresponding numeric ID was left unchanged.
+
+   Return NULL if successful, a static error message string if not.  */
+
+char const *
+parse_user_spec (char const *spec, uid_t *uid, gid_t *gid,
+		 char **username, char **groupname)
+{
+  char const *colon = strchr (spec, ':');
+  char const *error_msg =
+    parse_with_separator (spec, colon, uid, gid, username, groupname);
+
+  if (!colon && error_msg)
+    {
+      /* If there's no colon but there is a dot, and if looking up the
+	 whole spec failed (i.e., the spec is not a owner name that
+	 includes a dot), then try again, but interpret the dot as a
+	 separator.  This is a compatible extension to POSIX, since
+	 the POSIX-required behavior is always tried first.  */
+
+      char const *dot = strchr (spec, '.');
+      if (dot
+	  && ! parse_with_separator (spec, dot, uid, gid, username, groupname))
+	error_msg = NULL;
+    }
+
+  return error_msg;
 }
 
 #ifdef TEST
@@ -368,10 +301,10 @@ main (int argc, char **argv)
       tmp = strdup (argv[i]);
       e = parse_user_spec (tmp, &uid, &gid, &username, &groupname);
       free (tmp);
-      printf ("%s: %u %u %s %s %s\n",
+      printf ("%s: %lu %lu %s %s %s\n",
 	      argv[i],
-	      (unsigned int) uid,
-	      (unsigned int) gid,
+	      (unsigned long int) uid,
+	      (unsigned long int) gid,
 	      NULL_CHECK (username),
 	      NULL_CHECK (groupname),
 	      NULL_CHECK (e));

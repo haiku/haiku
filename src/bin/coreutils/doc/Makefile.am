@@ -13,29 +13,39 @@ EXTRA_DIST = perm.texi getdate.texi constants.texi doclicense.texi
 # old systems.
 MAKEINFO = makeinfo --no-split
 
-# Remove `DISABLED_' when fileutils, textutils, and sh-utils have
-# all been merged into one package.
-DISABLED_constants.texi: $(top_srcdir)/src/tail.c
+constants.texi: $(top_srcdir)/src/tail.c
 	LC_ALL=C \
 	sed -n -e 's/^#define \(DEFAULT_MAX[_A-Z]*\) \(.*\)/@set \1 \2/p' \
 	  $(top_srcdir)/src/tail.c > t-$@
 	mv t-$@ $@
 
-# Uncomment this when fileutils, textutils, and sh-utils have
-# all been merged into one package.
-# MAINTAINERCLEANFILES = constants.texi
+MAINTAINERCLEANFILES = constants.texi
 
 $(DVIS): $(EXTRA_DIST)
 $(INFO_DEPS): $(EXTRA_DIST)
 
+# Extended regular expressions to match word starts and ends.
+_W = (^|[^A-Za-z0-9_])
+W_ = ([^A-Za-z0-9_]|$$)
+
 # List words/regexps here that should not appear in the texinfo documentation.
+# E.g., use @sc{nul}, not `NUL'
+# and use `time zone', not `timezone'.
 check-texinfo:
 	fail=0; \
 	grep timezone $(srcdir)/*.texi && fail=1; \
+	$(EGREP) '$(_W)IO$(W_)' $(srcdir)/*.texi && fail=1; \
+	grep non-zero $(srcdir)/*.texi && fail=1; \
+	grep '@url{' $(srcdir)/*.texi && fail=1; \
+	$(EGREP) '$(_W)NUL$(W_)' $(srcdir)/*.texi && fail=1; \
 	grep '\$$@"' $(srcdir)/*.texi && fail=1; \
+	grep -n '[^[:punct:]]@footnote' $(srcdir)/*.texi && fail=1; \
+	grep -n filename $(srcdir)/*.texi|grep -vE 'setfilename|{filename}' \
+	  && fail=1; \
 	$(PERL) -e 1 2> /dev/null && { $(PERL) -ne \
 	  '/\bPOSIX\b/ && !/\@acronym{POSIX}/ && !/^\* / || /{posix}/ and print,exit 1' \
 	  $(srcdir)/*.texi 2> /dev/null || fail=1; }; \
+	grep -iwE 'builtins?' $(srcdir)/*.texi && fail=1; \
 	exit $$fail
 
 check: check-texinfo

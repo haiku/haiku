@@ -1,7 +1,7 @@
 /* exclude.c -- exclude file names
 
-   Copyright (C) 1992, 1993, 1994, 1997, 1999, 2000, 2001, 2002, 2003 Free
-   Software Foundation, Inc.
+   Copyright (C) 1992, 1993, 1994, 1997, 1999, 2000, 2001, 2002, 2003,
+   2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,45 +24,34 @@
 # include <config.h>
 #endif
 
-#if HAVE_STDBOOL_H
-# include <stdbool.h>
-#else
-typedef enum {false = 0, true = 1} bool;
-#endif
+#include <stdbool.h>
 
+#include <ctype.h>
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
+#include <stddef.h>
 #include <stdio.h>
-#if HAVE_SYS_TYPES_H
-# include <sys/types.h>
-#endif
-#if HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
-#if HAVE_STRING_H
-# include <string.h>
-#endif
-#if HAVE_STRINGS_H
-# include <strings.h>
-#endif
-#if HAVE_INTTYPES_H
-# include <inttypes.h>
-#else
-# if HAVE_STDINT_H
-#  include <stdint.h>
-# endif
-#endif
+#include <stdlib.h>
+#include <string.h>
 
 #include "exclude.h"
 #include "fnmatch.h"
-#include "unlocked-io.h"
 #include "xalloc.h"
 
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t) -1)
+#if USE_UNLOCKED_IO
+# include "unlocked-io.h"
 #endif
+
+#if STDC_HEADERS || (! defined isascii && ! HAVE_ISASCII)
+# define IN_CTYPE_DOMAIN(c) true
+#else
+# define IN_CTYPE_DOMAIN(c) isascii (c)
+#endif
+
+static inline bool
+is_space (unsigned char c)
+{
+  return IN_CTYPE_DOMAIN (c) && isspace (c);
+}
 
 /* Verify a requirement at compile-time (unlike assert, which is runtime).  */
 #define verify(name, assertion) struct name { char a[(assertion) ? 1 : -1]; }
@@ -104,12 +93,7 @@ struct exclude
 struct exclude *
 new_exclude (void)
 {
-  struct exclude *ex = (struct exclude *) xmalloc (sizeof *ex);
-  ex->exclude_count = 0;
-  ex->exclude_alloc = (1 << 6); /* This must be a power of 2.  */
-  ex->exclude = (struct patopts *) xmalloc (ex->exclude_alloc
-					    * sizeof ex->exclude[0]);
-  return ex;
+  return xzalloc (sizeof *new_exclude ());
 }
 
 /* Free the storage associated with an exclude list.  */
@@ -200,15 +184,9 @@ add_exclude (struct exclude *ex, char const *pattern, int options)
 {
   struct patopts *patopts;
 
-  if (ex->exclude_alloc <= ex->exclude_count)
-    {
-      size_t s = 2 * ex->exclude_alloc;
-      if (! (0 < s && s <= SIZE_MAX / sizeof ex->exclude[0]))
-	xalloc_die ();
-      ex->exclude_alloc = s;
-      ex->exclude = (struct patopts *) xrealloc (ex->exclude,
-						 s * sizeof ex->exclude[0]);
-    }
+  if (ex->exclude_count == ex->exclude_alloc)
+    ex->exclude = x2nrealloc (ex->exclude, &ex->exclude_alloc,
+			      sizeof *ex->exclude);
 
   patopts = &ex->exclude[ex->exclude_count++];
   patopts->pattern = pattern;
@@ -216,8 +194,9 @@ add_exclude (struct exclude *ex, char const *pattern, int options)
 }
 
 /* Use ADD_FUNC to append to EX the patterns in FILENAME, each with
-   OPTIONS.  LINE_END terminates each pattern in the file.  Return -1
-   on failure, 0 on success.  */
+   OPTIONS.  LINE_END terminates each pattern in the file.  If
+   LINE_END is a space character, ignore trailing spaces and empty
+   lines in FILE.  Return -1 on failure, 0 on success.  */
 
 int
 add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
@@ -226,11 +205,11 @@ add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
 {
   bool use_stdin = filename[0] == '-' && !filename[1];
   FILE *in;
-  char *buf;
+  char *buf = NULL;
   char *p;
   char const *pattern;
   char const *lim;
-  size_t buf_alloc = (1 << 10);  /* This must be a power of two.  */
+  size_t buf_alloc = 0;
   size_t buf_count = 0;
   int c;
   int e = 0;
@@ -240,18 +219,11 @@ add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
   else if (! (in = fopen (filename, "r")))
     return -1;
 
-  buf = xmalloc (buf_alloc);
-
   while ((c = getc (in)) != EOF)
     {
-      buf[buf_count++] = c;
       if (buf_count == buf_alloc)
-	{
-	  buf_alloc *= 2;
-	  if (! buf_alloc)
-	    xalloc_die ();
-	  buf = xrealloc (buf, buf_alloc);
-	}
+	buf = x2realloc (buf, &buf_alloc);
+      buf[buf_count++] = c;
     }
 
   if (ferror (in))
@@ -261,12 +233,28 @@ add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
     e = errno;
 
   buf = xrealloc (buf, buf_count + 1);
+  buf[buf_count] = line_end;
+  lim = buf + buf_count + ! (buf_count == 0 || buf[buf_count - 1] == line_end);
+  pattern = buf;
 
-  for (pattern = p = buf, lim = buf + buf_count;  p <= lim;  p++)
-    if (p < lim ? *p == line_end : buf < p && p[-1])
+  for (p = buf; p < lim; p++)
+    if (*p == line_end)
       {
-	*p = '\0';
+	char *pattern_end = p;
+
+	if (is_space (line_end))
+	  {
+	    for (; ; pattern_end--)
+	      if (pattern_end == pattern)
+		goto next_pattern;
+	      else if (! is_space (pattern_end[-1]))
+		break;
+	  }
+
+	*pattern_end = '\0';
 	(*add_func) (ex, pattern, options);
+
+      next_pattern:
 	pattern = p + 1;
       }
 

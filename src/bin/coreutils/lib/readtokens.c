@@ -1,5 +1,5 @@
 /* readtokens.c  -- Functions for reading tokens from an input stream.
-   Copyright (C) 1990-1991, 1999, 2001, 2003 Jim Meyering.
+   Copyright (C) 1990-1991, 1999-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,38 +19,24 @@
 
 /* This almost supercedes xreadline stuff -- using delim="\n"
    gives the same functionality, except that these functions
-   would never return empty lines.
-
-   To Do:
-     - To allow '\0' as a delimiter, I will have to change
-       interfaces to permit specification of delimiter-string
-       length.
-   */
+   would never return empty lines. */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
-#include <stdio.h>
-
-#ifdef STDC_HEADERS
-# include <stdlib.h>
-#endif
-
-#if defined (STDC_HEADERS) || defined(HAVE_STRING_H)
-# include <string.h>
-/* An ANSI string.h and pre-ANSI memory.h might conflict.  */
-# if !defined (STDC_HEADERS) && defined (HAVE_MEMORY_H)
-#  include <memory.h>
-# endif /* not STDC_HEADERS and HAVE_MEMORY_H */
-#else /* not STDC_HEADERS and not HAVE_STRING_H */
-# include <strings.h>
-/* memory.h and strings.h conflict on some systems.  */
-#endif /* not STDC_HEADERS and not HAVE_STRING_H */
-
 #include "readtokens.h"
-#include "unlocked-io.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
 #include "xalloc.h"
+
+#if USE_UNLOCKED_IO
+# include "unlocked-io.h"
+#endif
 
 #define STREQ(a,b) ((a) == (b) || ((a) && (b) && *(a) == *(b) \
 				   && strcmp(a, b) == 0))
@@ -58,48 +44,50 @@
 /* Initialize a tokenbuffer. */
 
 void
-init_tokenbuffer (tokenbuffer)
-     token_buffer *tokenbuffer;
+init_tokenbuffer (token_buffer *tokenbuffer)
 {
-  tokenbuffer->size = INITIAL_TOKEN_LENGTH;
-  tokenbuffer->buffer = ((char *) xmalloc (INITIAL_TOKEN_LENGTH));
+  tokenbuffer->size = 0;
+  tokenbuffer->buffer = NULL;
 }
 
-/* Read a token from `stream' into `tokenbuffer'.
+/* Read a token from STREAM into TOKENBUFFER.
+   A token is delimited by any of the N_DELIM bytes in DELIM.
    Upon return, the token is in tokenbuffer->buffer and
-   has a trailing '\0' instead of the original delimiter.
+   has a trailing '\0' instead of any original delimiter.
    The function value is the length of the token not including
-   the final '\0'.  When EOF is reached (i.e. on the call
-   after the last token is read), -1 is returned and tokenbuffer
-   isn't modified.
+   the final '\0'.  Upon EOF (i.e. on the call after the last
+   token is read) or error, return -1 without modifying tokenbuffer.
+   The EOF and error conditions may be distinguished in the caller
+   by testing ferror (STREAM).
 
-   This function will work properly on lines containing NUL bytes
-   and on files that aren't newline-terminated.  */
+   This function works properly on lines containing NUL bytes
+   and on files do not end with a delimiter.  */
 
-long
+size_t
 readtoken (FILE *stream,
 	   const char *delim,
-	   int n_delim,
+	   size_t n_delim,
 	   token_buffer *tokenbuffer)
 {
   char *p;
-  int c, i, n;
+  int c;
+  size_t i, n;
   static const char *saved_delim = NULL;
   static char isdelim[256];
-  int same_delimiters;
+  bool same_delimiters;
 
   if (delim == NULL && saved_delim == NULL)
     abort ();
 
-  same_delimiters = 0;
+  same_delimiters = false;
   if (delim != saved_delim && saved_delim != NULL)
     {
-      same_delimiters = 1;
+      same_delimiters = true;
       for (i = 0; i < n_delim; i++)
 	{
 	  if (delim[i] != saved_delim[i])
 	    {
-	      same_delimiters = 0;
+	      same_delimiters = false;
 	      break;
 	    }
 	}
@@ -107,37 +95,36 @@ readtoken (FILE *stream,
 
   if (!same_delimiters)
     {
-      const char *t;
-      unsigned int j;
+      size_t j;
       saved_delim = delim;
-      for (j = 0; j < sizeof (isdelim); j++)
-	isdelim[j] = 0;
-      for (t = delim; *t; t++)
-	isdelim[(unsigned char) *t] = 1;
+      memset (isdelim, 0, sizeof isdelim);
+      for (j = 0; j < n_delim; j++)
+	{
+	  unsigned char ch = delim[j];
+	  isdelim[ch] = 1;
+	}
     }
 
-  p = tokenbuffer->buffer;
-  n = tokenbuffer->size;
-  i = 0;
-
-  /* FIXME: don't fool with this caching BS.  Use strchr instead.  */
+  /* FIXME: don't fool with this caching.  Use strchr instead.  */
   /* skip over any leading delimiters */
   for (c = getc (stream); c >= 0 && isdelim[c]; c = getc (stream))
     {
       /* empty */
     }
 
+  p = tokenbuffer->buffer;
+  n = tokenbuffer->size;
+  i = 0;
   for (;;)
     {
-      if (i >= n)
-	{
-	  n = 3 * (n / 2 + 1);
-	  p = xrealloc (p, (unsigned int) n);
-	}
+      if (c < 0 && i == 0)
+	return -1;
+
+      if (i == n)
+	p = x2nrealloc (p, &n, sizeof *p);
+
       if (c < 0)
 	{
-	  if (i == 0)
-	    return (-1);
 	  p[i] = 0;
 	  break;
 	}
@@ -152,64 +139,61 @@ readtoken (FILE *stream,
 
   tokenbuffer->buffer = p;
   tokenbuffer->size = n;
-  return (i);
+  return i;
 }
 
-/* Return a NULL-terminated array of pointers to tokens
-   read from `stream.'  The number of tokens is returned
-   as the value of the function.
-   All storage is obtained through calls to malloc();
+/* Build a NULL-terminated array of pointers to tokens
+   read from STREAM.  Return the number of tokens read.
+   All storage is obtained through calls to xmalloc-like functions.
 
    %%% Question: is it worth it to do a single
    %%% realloc() of `tokens' just before returning? */
 
-int
+size_t
 readtokens (FILE *stream,
-	    int projected_n_tokens,
+	    size_t projected_n_tokens,
 	    const char *delim,
-	    int n_delim,
+	    size_t n_delim,
 	    char ***tokens_out,
-	    long **token_lengths)
+	    size_t **token_lengths)
 {
   token_buffer tb, *token = &tb;
-  int token_length;
   char **tokens;
-  long *lengths;
-  int sz;
-  int n_tokens;
+  size_t *lengths;
+  size_t sz;
+  size_t n_tokens;
+
+  if (projected_n_tokens == 0)
+    projected_n_tokens = 64;
+  else
+    projected_n_tokens++;	/* add one for trailing NULL pointer */
+
+  sz = projected_n_tokens;
+  tokens = xnmalloc (sz, sizeof *tokens);
+  lengths = xnmalloc (sz, sizeof *lengths);
 
   n_tokens = 0;
-  if (projected_n_tokens > 0)
-    projected_n_tokens++;	/* add one for trailing NULL pointer */
-  else
-    projected_n_tokens = 64;
-  sz = projected_n_tokens;
-  tokens = (char **) xmalloc (sz * sizeof (char *));
-  lengths = (long *) xmalloc (sz * sizeof (long));
-
   init_tokenbuffer (token);
   for (;;)
     {
       char *tmp;
-      token_length = readtoken (stream, delim, n_delim, token);
+      size_t token_length = readtoken (stream, delim, n_delim, token);
       if (n_tokens >= sz)
 	{
-	  sz *= 2;
-	  tokens = (char **) xrealloc (tokens, sz * sizeof (char *));
-	  lengths = (long *) xrealloc (lengths, sz * sizeof (long));
+	  tokens = x2nrealloc (tokens, &sz, sizeof *tokens);
+	  lengths = xnrealloc (lengths, sz, sizeof *lengths);
 	}
 
-      if (token_length < 0)
+      if (token_length == (size_t) -1)
 	{
 	  /* don't increment n_tokens for NULL entry */
 	  tokens[n_tokens] = NULL;
-	  lengths[n_tokens] = -1;
+	  lengths[n_tokens] = 0;
 	  break;
 	}
-      tmp = (char *) xmalloc ((token_length + 1) * sizeof (char));
+      tmp = xnmalloc (token_length + 1, sizeof *tmp);
       lengths[n_tokens] = token_length;
-      tokens[n_tokens] = strncpy (tmp, token->buffer,
-				  (unsigned) (token_length + 1));
+      tokens[n_tokens] = memcpy (tmp, token->buffer, token_length + 1);
       n_tokens++;
     }
 

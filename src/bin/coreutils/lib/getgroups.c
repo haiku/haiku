@@ -1,5 +1,5 @@
 /* provide consistent interface to getgroups for systems that don't allow N==0
-   Copyright (C) 1996, 1999 Free Software Foundation, Inc.
+   Copyright (C) 1996, 1999, 2003 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 #include <config.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <errno.h>
+#include <stdlib.h>
 
 #include "xalloc.h"
 
@@ -29,10 +31,11 @@
    provided function handle all others. */
 
 int
-getgroups (size_t n, GETGROUPS_T *group)
+getgroups (int n, GETGROUPS_T *group)
 {
   int n_groups;
   GETGROUPS_T *gbuf;
+  int saved_errno;
 
 #undef getgroups
 
@@ -40,17 +43,22 @@ getgroups (size_t n, GETGROUPS_T *group)
     return getgroups (n, group);
 
   n = 20;
-  gbuf = NULL;
   while (1)
     {
-      gbuf = (GETGROUPS_T *) xrealloc (gbuf, n * sizeof (GETGROUPS_T));
+      /* No need to worry about address arithmetic overflow here,
+	 since the ancient systems that we're running on have low
+	 limits on the number of secondary groups.  */
+      gbuf = xmalloc (n * sizeof *gbuf);
       n_groups = getgroups (n, gbuf);
       if (n_groups < n)
 	break;
+      free (gbuf);
       n += 10;
     }
 
+  saved_errno = errno;
   free (gbuf);
+  errno = saved_errno;
 
   return n_groups;
 }

@@ -1,5 +1,5 @@
 /* cp-hash.c  -- file copying (hash search routines)
-   Copyright (C) 89, 90, 91, 1995-2002 Free Software Foundation.
+   Copyright (C) 89, 90, 91, 1995-2004 Free Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ struct Src_to_dest
   /* Destination path name (of non-directory or pre-existing directory)
      corresponding to the dev/ino of a copied file, or the destination path
      name corresponding to a dev/ino pair for a newly-created directory. */
-  char const* name;
+  char *name;
 };
 
 /* This table maps source dev/ino to destination file name.
@@ -52,8 +52,8 @@ static Hash_table *src_to_dest;
 /* Initial size of the above hash table.  */
 #define INITIAL_TABLE_SIZE 103
 
-static unsigned int
-src_to_dest_hash (void const *x, unsigned int table_size)
+static size_t
+src_to_dest_hash (void const *x, size_t table_size)
 {
   struct Src_to_dest const *p = x;
 
@@ -77,13 +77,13 @@ static void
 src_to_dest_free (void *x)
 {
   struct Src_to_dest *a = x;
-  free ((char *) (a->name));
+  free (a->name);
   free (x);
 }
 
 /* Remove the entry matching INO/DEV from the table
    that maps source ino/dev to destination file name.  */
-void
+extern void
 forget_created (ino_t ino, dev_t dev)
 {
   struct Src_to_dest probe;
@@ -99,9 +99,9 @@ forget_created (ino_t ino, dev_t dev)
 }
 
 /* Add PATH to the list of files that we have created.
-   Return 1 if we can't stat PATH, otherwise 0.  */
+   Return true if successful.  */
 
-int
+extern bool
 remember_created (const char *path)
 {
   struct stat sb;
@@ -109,24 +109,38 @@ remember_created (const char *path)
   if (stat (path, &sb) < 0)
     {
       error (0, errno, "%s", quote (path));
-      return 1;
+      return false;
     }
 
   remember_copied (path, sb.st_ino, sb.st_dev);
-  return 0;
+  return true;
+}
+
+/* If INO/DEV correspond to an already-copied source file, return the
+   name of the corresponding destination file.  Otherwise, return NULL.  */
+
+extern char *
+src_to_dest_lookup (ino_t ino, dev_t dev)
+{
+  struct Src_to_dest ent;
+  struct Src_to_dest const *e;
+  ent.st_ino = ino;
+  ent.st_dev = dev;
+  e = hash_lookup (src_to_dest, &ent);
+  return e ? e->name : NULL;
 }
 
 /* Add path NAME, copied from inode number INO and device number DEV,
    to the list of files we have copied.
    Return NULL if inserted, otherwise non-NULL. */
 
-char *
+extern char *
 remember_copied (const char *name, ino_t ino, dev_t dev)
 {
   struct Src_to_dest *ent;
   struct Src_to_dest *ent_from_table;
 
-  ent = (struct Src_to_dest *) xmalloc (sizeof *ent);
+  ent = xmalloc (sizeof *ent);
   ent->name = xstrdup (name);
   ent->st_ino = ino;
   ent->st_dev = dev;
@@ -152,7 +166,7 @@ remember_copied (const char *name, ino_t ino, dev_t dev)
 }
 
 /* Initialize the hash table.  */
-void
+extern void
 hash_init (void)
 {
   src_to_dest = hash_initialize (INITIAL_TABLE_SIZE, NULL,
@@ -166,7 +180,7 @@ hash_init (void)
 /* Reset the hash structure in the global variable `htab' to
    contain no entries.  */
 
-void
+extern void
 forget_all (void)
 {
   hash_free (src_to_dest);

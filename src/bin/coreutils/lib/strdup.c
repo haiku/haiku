@@ -1,4 +1,6 @@
-/* Copyright (C) 1991, 1996, 1997, 1998, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 1996, 1997, 1998, 2002, 2003, 2004 Free Software
+   Foundation, Inc.
+
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -19,13 +21,13 @@
 # include <config.h>
 #endif
 
-#if defined _LIBC || defined  STDC_HEADERS
-# include <stdlib.h>
-# include <string.h>
-#else
-char *malloc ();
-char *memcpy ();
+#ifndef _LIBC
+/* Get specification.  */
+# include "strdup.h"
 #endif
+
+#include <stdlib.h>
+#include <string.h>
 
 #undef __strdup
 #undef strdup

@@ -1,6 +1,6 @@
 /* xreadlink.c -- readlink wrapper to return the link name in malloc'd storage
 
-   Copyright 2001 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,21 +23,13 @@
 # include <config.h>
 #endif
 
+#include "xreadlink.h"
+
 #include <stdio.h>
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
-
-#if HAVE_LIMITS_H
-# include <limits.h>
-#endif
-#if HAVE_SYS_TYPES_H
-# include <sys/types.h>
-#endif
-#if HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
+#include <limits.h>
+#include <sys/types.h>
+#include <stdlib.h>
 #if HAVE_UNISTD_H
 # include <unistd.h>
 #endif
@@ -49,28 +41,34 @@ extern int errno;
 # define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
 #endif
 
+#define MAXSIZE (SIZE_MAX < SSIZE_MAX ? SIZE_MAX : SSIZE_MAX)
+
 #include "xalloc.h"
-#include "xreadlink.h"
 
 /* Call readlink to get the symbolic link value of FILENAME.
+   SIZE is a hint as to how long the link is expected to be;
+   typically it is taken from st_size.  It need not be correct.
    Return a pointer to that NUL-terminated string in malloc'd storage.
    If readlink fails, return NULL (caller may use errno to diagnose).
-   If realloc fails, or if the link value is longer than SIZE_MAX :-),
+   If malloc fails, or if the link value is longer than SSIZE_MAX :-),
    give a diagnostic and exit.  */
 
 char *
-xreadlink (char const *filename)
+xreadlink (char const *filename, size_t size)
 {
   /* The initial buffer size for the link value.  A power of 2
      detects arithmetic overflow earlier, but is not required.  */
-  size_t buf_size = 128;
+  size_t buf_size = size < MAXSIZE ? size + 1 : MAXSIZE;
 
   while (1)
     {
       char *buffer = xmalloc (buf_size);
-      ssize_t link_length = readlink (filename, buffer, buf_size);
+      ssize_t r = readlink (filename, buffer, buf_size);
+      size_t link_length = r;
 
-      if (link_length < 0)
+      /* On AIX 5L v5.3 and HP-UX 11i v2 04/09, readlink returns -1
+	 with errno == ERANGE if the buffer is too small.  */
+      if (r < 0 && errno != ERANGE)
 	{
 	  int saved_errno = errno;
 	  free (buffer);
@@ -78,15 +76,18 @@ xreadlink (char const *filename)
 	  return NULL;
 	}
 
-      if ((size_t) link_length < buf_size)
+      if (link_length < buf_size)
 	{
 	  buffer[link_length] = 0;
 	  return buffer;
 	}
 
       free (buffer);
-      buf_size *= 2;
-      if (SSIZE_MAX < buf_size || (SIZE_MAX / 2 < SSIZE_MAX && buf_size == 0))
+      if (buf_size <= MAXSIZE / 2)
+	buf_size *= 2;
+      else if (buf_size < MAXSIZE)
+	buf_size = MAXSIZE;
+      else
 	xalloc_die ();
     }
 }

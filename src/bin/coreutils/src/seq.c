@@ -1,5 +1,5 @@
 /* seq - print sequence of numbers to standard output.
-   Copyright (C) 1994-2003 Free Software Foundation, Inc.
+   Copyright (C) 1994-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,8 +24,9 @@
 #include <sys/types.h>
 
 #include "system.h"
-#include "closeout.h"
+#include "c-strtod.h"
 #include "error.h"
+#include "quote.h"
 #include "xstrtol.h"
 #include "xstrtod.h"
 
@@ -34,8 +35,8 @@
 
 #define AUTHORS "Ulrich Drepper"
 
-/* If nonzero print all number with equal width.  */
-static int equal_width;
+/* If true print all number with equal width.  */
+static bool equal_width;
 
 /* The name that this program was run with.  */
 char *program_name;
@@ -48,15 +49,14 @@ static char *separator;
 /* FIXME: make this an option.  */
 static char *terminator = "\n";
 
-/* The representation of the decimal point in the current locale.
-   Always "." if the localeconv function is not supported.  */
-static char *decimal_point = ".";
+/* The representation of the decimal point in the current locale.  */
+static char decimal_point;
 
 /* The starting number.  */
 static double first;
 
 /* The increment.  */
-static double step;
+static double step = 1.0;
 
 /* The last number.  */
 static double last;
@@ -74,7 +74,7 @@ static struct option const long_options[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -95,10 +95,12 @@ Print numbers from FIRST to LAST, in steps of INCREMENT.\n\
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       fputs (_("\
 \n\
-If FIRST or INCREMENT is omitted, it defaults to 1.\n\
+If FIRST or INCREMENT is omitted, it defaults to 1.  That is, an\n\
+omitted INCREMENT defaults to 1 even when LAST is smaller than FIRST.\n\
 FIRST, INCREMENT, and LAST are interpreted as floating point values.\n\
-INCREMENT should be positive if FIRST is smaller than LAST, and negative\n\
-otherwise.  When given, the FORMAT argument must contain exactly one of\n\
+INCREMENT is usually positive if FIRST is smaller than LAST, and\n\
+INCREMENT is usually negative if FIRST is greater than LAST.\n\
+When given, the FORMAT argument must contain exactly one of\n\
 the printf-style, floating point output formats %e, %f, %g\n\
 "), stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
@@ -114,7 +116,7 @@ scan_double_arg (const char *arg)
 {
   double ret_val;
 
-  if (xstrtod (arg, NULL, &ret_val))
+  if (! xstrtod (arg, NULL, &ret_val, c_strtod))
     {
       error (0, 0, _("invalid floating point argument: %s"), arg);
       usage (EXIT_FAILURE);
@@ -123,10 +125,10 @@ scan_double_arg (const char *arg)
   return ret_val;
 }
 
-/* Check whether the format string is valid for a single `double'
-   argument.  Return 0 if not, 1 if correct. */
+/* Return true if the format string is valid for a single `double'
+   argument.  */
 
-static int
+static bool
 valid_format (const char *fmt)
 {
   while (*fmt != '\0')
@@ -141,7 +143,7 @@ valid_format (const char *fmt)
       fmt++;
     }
   if (*fmt == '\0')
-    return 0;
+    return false;
 
   fmt += strspn (fmt, "-+#0 '");
   if (ISDIGIT (*fmt) || *fmt == '.')
@@ -156,7 +158,7 @@ valid_format (const char *fmt)
     }
 
   if (!(*fmt == 'e' || *fmt == 'f' || *fmt == 'g'))
-    return 0;
+    return false;
 
   fmt++;
   while (*fmt != '\0')
@@ -165,71 +167,34 @@ valid_format (const char *fmt)
 	{
 	  fmt++;
 	  if (*fmt != '%')
-	    return 0;
+	    return false;
 	}
 
       fmt++;
     }
 
-  return 1;
+  return true;
 }
 
 /* Actually print the sequence of numbers in the specified range, with the
    given or default stepping and format.  */
-static int
+static void
 print_numbers (const char *fmt)
 {
-  if (first > last)
+  double i;
+
+  for (i = 0; /* empty */; i++)
     {
-      int i;
-
-      if (step >= 0)
-	{
-	  error (0, 0,
-		 _("when the starting value is larger than the limit,\n\
-the increment must be negative"));
-	  usage (EXIT_FAILURE);
-	}
-
-      printf (fmt, first);
-      for (i = 1; /* empty */; i++)
-	{
-	  double x = first + i * step;
-
-	  if (x < last)
-	    break;
-
-	  fputs (separator, stdout);
-	  printf (fmt, x);
-	}
+      double x = first + i * step;
+      if (step < 0 ? x < last : last < x)
+	break;
+      if (i)
+	fputs (separator, stdout);
+      printf (fmt, x);
     }
-  else
-    {
-      int i;
 
-      if (step <= 0)
-	{
-	  error (0, 0,
-		 _("when the starting value is smaller than the limit,\n\
-the increment must be positive"));
-	  usage (EXIT_FAILURE);
-	}
-
-      printf (fmt, first);
-      for (i = 1; /* empty */; i++)
-	{
-	  double x = first + i * step;
-
-	  if (x > last)
-	    break;
-
-	  fputs (separator, stdout);
-	  printf (fmt, x);
-	}
-    }
-  fputs (terminator, stdout);
-
-  return 0;
+  if (i)
+    fputs (terminator, stdout);
 }
 
 #if HAVE_RINT && HAVE_MODF && HAVE_FLOOR
@@ -260,7 +225,7 @@ get_width_format ()
     }
 
   sprintf (buffer, "%g", rint (max_val));
-  if (buffer[strspn (buffer, "0123456789")] != '\0')
+  if (buffer[strspn (buffer, "-0123456789")] != '\0')
     return "%g";
   width1 = strlen (buffer);
 
@@ -285,9 +250,7 @@ get_width_format ()
   else
     {
       if (buffer[0] != '1'
-	  /* FIXME: assumes that decimal_point is a single character
-	     string.  */
-	  || buffer[1] != decimal_point[0]
+	  || buffer[1] != decimal_point
 	  || buffer[2 + strspn (&buffer[2], "0123456789")] != '\0')
 	return "%g";
       width1 -= 2;
@@ -300,9 +263,7 @@ get_width_format ()
   else
     {
       if (buffer[0] != '1'
-	  /* FIXME: assumes that decimal_point is a single character
-	     string.  */
-	  || buffer[1] != decimal_point[0]
+	  || buffer[1] != decimal_point
 	  || buffer[2 + strspn (&buffer[2], "0123456789")] != '\0')
 	return "%g";
       width2 -= 2;
@@ -332,13 +293,12 @@ get_width_format (void)
 int
 main (int argc, char **argv)
 {
-  int errs;
   int optc;
-  int step_is_set;
 
   /* The printf(3) format used for output.  */
   char *format_str = NULL;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -346,22 +306,21 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
-  equal_width = 0;
+  equal_width = false;
   separator = "\n";
   first = 1.0;
-  step_is_set = 0;
 
-  /* Figure out the locale's idea of a decimal point.  */
-#if HAVE_LOCALECONV
+  /* Get locale's representation of the decimal point.  */
   {
-    struct lconv *locale;
+    struct lconv const *locale = localeconv ();
 
-    locale = localeconv ();
-    /* Paranoia.  */
-    if (locale && locale->decimal_point && locale->decimal_point[0] != '\0')
-      decimal_point = locale->decimal_point;
+    /* If the locale doesn't define a decimal point, or if the decimal
+       point is multibyte, use the C locale's decimal point.  FIXME:
+       add support for multibyte decimal points.  */
+    decimal_point = locale->decimal_point[0];
+    if (! decimal_point || locale->decimal_point[1])
+      decimal_point = '.';
   }
-#endif
 
   /* We have to handle negative numbers in the command line but this
      conflicts with the command line arguments.  So explicitly check first
@@ -369,7 +328,7 @@ main (int argc, char **argv)
   while (optind < argc)
     {
       if (argv[optind][0] == '-'
-	  && ((optc = argv[optind][1]) == decimal_point[0]
+	  && ((optc = argv[optind][1]) == decimal_point
 	      || ISDIGIT (optc)))
 	{
 	  /* means negative number */
@@ -382,9 +341,6 @@ main (int argc, char **argv)
 
       switch (optc)
 	{
-	case 0:
-	  break;
-
 	case 'f':
 	  format_str = optarg;
 	  break;
@@ -394,7 +350,7 @@ main (int argc, char **argv)
 	  break;
 
 	case 'w':
-	  equal_width = 1;
+	  equal_width = true;
 	  break;
 
 	case_GETOPT_HELP_CHAR;
@@ -408,13 +364,13 @@ main (int argc, char **argv)
 
   if (argc - optind < 1)
     {
-      error (0, 0, _("too few arguments"));
+      error (0, 0, _("missing operand"));
       usage (EXIT_FAILURE);
     }
 
   if (3 < argc - optind)
     {
-      error (0, 0, _("too many arguments"));
+      error (0, 0, _("extra operand %s"), quote (argv[optind + 3]));
       usage (EXIT_FAILURE);
     }
 
@@ -434,9 +390,7 @@ main (int argc, char **argv)
       if (optind < argc)
 	{
 	  step = last;
-	  step_is_set = 1;
 	  last = scan_double_arg (argv[optind++]);
-
 	}
     }
 
@@ -447,11 +401,6 @@ format string may not be specified when printing equal width strings"));
       usage (EXIT_FAILURE);
     }
 
-  if (!step_is_set)
-    {
-      step = first <= last ? 1.0 : -1.0;
-    }
-
   if (format_str == NULL)
     {
       if (equal_width)
@@ -460,7 +409,7 @@ format string may not be specified when printing equal width strings"));
 	format_str = "%g";
     }
 
-  errs = print_numbers (format_str);
+  print_numbers (format_str);
 
-  exit (errs);
+  exit (EXIT_SUCCESS);
 }

@@ -1,5 +1,5 @@
 /* xnanosleep.c -- a more convenient interface to nanosleep
-   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,25 +22,15 @@
 # include <config.h>
 #endif
 
+#include "xnanosleep.h"
+
+#include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <assert.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <time.h>
-
-#if HAVE_CLOCK_GETTIME && defined CLOCK_REALTIME
-# define USE_CLOCK_GETTIME 1
-#else
-# define USE_CLOCK_GETTIME 0
-#endif
-
-#if ! USE_CLOCK_GETTIME
-# include <sys/time.h>
-#endif
-
-#ifndef CHAR_BIT
-# define CHAR_BIT 8
-#endif
 
 /* The extra casts work around common compiler bugs.  */
 #define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
@@ -56,62 +46,41 @@
 
 #include "timespec.h"
 #include "xalloc.h"
-#include "xnanosleep.h"
-#include "xstrtod.h"
 
-/* Subtract the `struct timespec' values X and Y,
-   storing the difference in DIFF.
-   Return 1 if the difference is positive, otherwise 0.
-   Derived from code in the GNU libc manual.  */
+/* Subtract the `struct timespec' values X and Y by computing X - Y.
+   If the difference is negative or zero, return false.
+   Otherwise, return true and store the difference in DIFF.
+   X and Y must have valid ts_nsec values, in the range 0 to 999999999.
+   If the difference would overflow, store the maximum possible difference.  */
 
-static int
+static bool
 timespec_subtract (struct timespec *diff,
-		   const struct timespec *x, struct timespec *y)
+		   struct timespec const *x, struct timespec const *y)
 {
-  /* Perform the carry for the later subtraction by updating Y. */
-  if (x->tv_nsec < y->tv_nsec)
+  time_t sec = x->tv_sec - y->tv_sec;
+  long int nsec = x->tv_nsec - y->tv_nsec;
+
+  if (x->tv_sec < y->tv_sec)
+    return false;
+
+  if (sec < 0)
     {
-      int nsec = (y->tv_nsec - x->tv_nsec) / 1000000000 + 1;
-      y->tv_nsec -= 1000000000 * nsec;
-      y->tv_sec += nsec;
+      /* The difference has overflowed.  */
+      sec = TIME_T_MAX;
+      nsec = 999999999;
+    }
+  else if (sec == 0 && nsec <= 0)
+    return false;
+
+  if (nsec < 0)
+    {
+      sec--;
+      nsec += 1000000000;
     }
 
-  if (1000000000 < x->tv_nsec - y->tv_nsec)
-    {
-      int nsec = (y->tv_nsec - x->tv_nsec) / 1000000000;
-      y->tv_nsec += 1000000000 * nsec;
-      y->tv_sec -= nsec;
-    }
-
-  /* Compute the time remaining to wait.
-     `tv_nsec' is certainly positive. */
-  diff->tv_sec = x->tv_sec - y->tv_sec;
-  diff->tv_nsec = x->tv_nsec - y->tv_nsec;
-
-  /* Return 1 if result is positive. */
-  return y->tv_sec < x->tv_sec;
-}
-
-struct timespec *
-clock_get_realtime (struct timespec *ts)
-{
-  int fail;
-#if USE_CLOCK_GETTIME
-  fail = clock_gettime (CLOCK_REALTIME, ts);
-#else
-  struct timeval tv;
-  fail = gettimeofday (&tv, NULL);
-  if (!fail)
-    {
-      ts->tv_sec = tv.tv_sec;
-      ts->tv_nsec = 1000 * tv.tv_usec;
-    }
-#endif
-
-  if (fail)
-    return NULL;
-
-  return ts;
+  diff->tv_sec = sec;
+  diff->tv_nsec = nsec;
+  return true;
 }
 
 /* Sleep until the time (call it WAKE_UP_TIME) specified as
@@ -124,7 +93,7 @@ clock_get_realtime (struct timespec *ts)
 int
 xnanosleep (double seconds)
 {
-  int overflow;
+  bool overflow;
   double ns;
   struct timespec ts_start;
   struct timespec ts_sleep;
@@ -132,7 +101,7 @@ xnanosleep (double seconds)
 
   assert (0 <= seconds);
 
-  if (clock_get_realtime (&ts_start) == NULL)
+  if (gettime (&ts_start) != 0)
     return -1;
 
   /* Separate whole seconds from nanoseconds.
@@ -184,7 +153,7 @@ xnanosleep (double seconds)
 
   while (nanosleep (&ts_sleep, NULL) != 0)
     {
-      if (errno != EINTR)
+      if (errno != EINTR || gettime (&ts_start) != 0)
 	return -1;
 
       /* POSIX.1-2001 requires that when a process is suspended, then
@@ -195,8 +164,7 @@ xnanosleep (double seconds)
 	 this bug by computing the remaining time here, rather than by
 	 relying on nanosleep's computation.  */
 
-      if (! timespec_subtract (&ts_sleep, &ts_stop,
-			       clock_get_realtime (&ts_start)))
+      if (! timespec_subtract (&ts_sleep, &ts_stop, &ts_start))
 	break;
     }
 

@@ -1,5 +1,5 @@
 /* kill -- send a signal to a process
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@
 #endif
 
 #include "system.h"
-#include "closeout.h"
 #include "error.h"
 #include "sig2str.h"
 
@@ -51,6 +50,8 @@ intmax_t strtoimax ();
 # if ! (HAVE_DECL_SYS_SIGLIST || defined sys_siglist)
 #  if HAVE_DECL__SYS_SIGLIST || defined _sys_siglist
 #   define sys_siglist _sys_siglist
+#  elif HAVE_DECL___SYS_SIGLIST || defined __sys_siglist
+#   define sys_siglist __sys_siglist
 #  endif
 # endif
 # if HAVE_DECL_SYS_SIGLIST || defined sys_siglist
@@ -85,7 +86,7 @@ static struct option const long_options[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -257,12 +258,6 @@ send_signals (int signum, char *const *argv)
   int status = EXIT_SUCCESS;
   char const *arg = *argv;
 
-  if (! arg)
-    {
-      error (0, 0, _("missing operand after `%s'"), argv[-1]);
-      usage (EXIT_FAILURE);
-    }
-
   do
     {
       char *endp;
@@ -294,6 +289,7 @@ main (int argc, char **argv)
   int signum = -1;
   char signame[SIG2STR_MAX];
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -368,7 +364,13 @@ main (int argc, char **argv)
       usage (EXIT_FAILURE);
     }
 
+  if ( ! list && argc <= optind)
+    {
+      error (0, 0, _("no process ID specified"));
+      usage (EXIT_FAILURE);
+    }
+
   return (list
-	  ? list_signals (table, optind == argc ? NULL : argv + optind)
+	  ? list_signals (table, optind < argc ? argv + optind : NULL)
 	  : send_signals (signum, argv + optind));
 }

@@ -25,23 +25,20 @@
 # include <config.h>
 #endif
 
-#if HAVE_STRING_H
-# include <string.h>
-#endif
-#if HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
+#include <alloca.h>
+
+#include <string.h>
+#include <stdlib.h>
 
 #ifdef emacs
 # include "lisp.h"
 # include "blockinput.h"
-# define xalloc_die() memory_full ()
 # ifdef EMACS_FREE
 #  undef free
 #  define free EMACS_FREE
 # endif
 #else
-# include <xalloc.h>
+# define memory_full() abort ()
 #endif
 
 /* If compiling with GCC 2, this file's not needed.  */
@@ -77,19 +74,6 @@ long i00afunc ();
 #   define ADDRESS_FUNCTION(arg) &(arg)
 #  endif
 
-#  ifndef POINTER_TYPE
-#   ifdef __STDC__
-#    define POINTER_TYPE void
-#   else
-#    define POINTER_TYPE char
-#   endif
-#  endif
-typedef POINTER_TYPE *pointer;
-
-#  ifndef NULL
-#   define NULL 0
-#  endif
-
 /* Define STACK_DIRECTION if you know the direction of stack
    growth for your system; otherwise it will be automatically
    deduced at run-time.
@@ -112,7 +96,7 @@ static int stack_dir;		/* 1 or -1 once known.  */
 #   define STACK_DIR	stack_dir
 
 static void
-find_stack_direction ()
+find_stack_direction (void)
 {
   static char *addr = NULL;	/* Address of first `dummy', once known.  */
   auto char dummy;		/* To get stack address.  */
@@ -165,9 +149,8 @@ static header *last_alloca_header = NULL;	/* -> last alloca header.  */
    caller, but that method cannot be made to work for some
    implementations of C, for example under Gould's UTX/32.  */
 
-pointer
-alloca (size)
-     size_t size;
+void *
+alloca (size_t size)
 {
   auto char probe;		/* Probes stack depth: */
   register char *depth = ADDRESS_FUNCTION (probe);
@@ -193,7 +176,7 @@ alloca (size)
 	{
 	  register header *np = hp->h.next;
 
-	  free ((pointer) hp);	/* Collect garbage.  */
+	  free (hp);		/* Collect garbage.  */
 
 	  hp = np;		/* -> next header.  */
 	}
@@ -214,25 +197,25 @@ alloca (size)
 
   {
     /* Address of header.  */
-    register pointer new;
+    register header *new;
 
     size_t combined_size = sizeof (header) + size;
     if (combined_size < sizeof (header))
-      xalloc_die ();
+      memory_full ();
 
-    new = xmalloc (combined_size);
+    new = malloc (combined_size);
 
-    if (new == 0)
-      abort();
+    if (! new)
+      memory_full ();
 
-    ((header *) new)->h.next = last_alloca_header;
-    ((header *) new)->h.deep = depth;
+    new->h.next = last_alloca_header;
+    new->h.deep = depth;
 
-    last_alloca_header = (header *) new;
+    last_alloca_header = new;
 
     /* User storage begins just after header.  */
 
-    return (pointer) ((char *) new + sizeof (header));
+    return (void *) (new + 1);
   }
 }
 

@@ -1,5 +1,5 @@
 /* group-member.c -- determine whether group id is in calling user's group list
-   Copyright (C) 1994, 1997, 1998 Free Software Foundation, Inc.
+   Copyright (C) 1994, 1997, 1998, 2003 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,18 +19,17 @@
 # include <config.h>
 #endif
 
+#include "group-member.h"
+
+#include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
-
-#ifdef STDC_HEADERS
-# include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 #if HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 
-#include "group-member.h"
 #include "xalloc.h"
 
 struct group_info
@@ -42,48 +41,38 @@ struct group_info
 #if HAVE_GETGROUPS
 
 static void
-free_group_info (struct group_info *g)
+free_group_info (struct group_info const *g)
 {
   free (g->group);
-  free (g);
 }
 
-static struct group_info *
-get_group_info (void)
+static bool
+get_group_info (struct group_info *gi)
 {
   int n_groups;
-  int n_group_slots;
-  struct group_info *gi;
+  int n_group_slots = getgroups (0, NULL);
   GETGROUPS_T *group;
 
-  /* getgroups () returns the number of elements that it was able to
-     place into the array.  We simply continue to call getgroups ()
-     until the number of elements placed into the array is smaller than
-     the physical size of the array. */
+  if (n_group_slots < 0)
+    return false;
 
-  group = NULL;
-  n_groups = 0;
-  n_group_slots = 0;
-  while (n_groups == n_group_slots)
-    {
-      n_group_slots += 64;
-      group = (GETGROUPS_T *) xrealloc (group,
-					n_group_slots * sizeof (GETGROUPS_T));
-      n_groups = getgroups (n_group_slots, group);
-    }
+  /* Avoid xnmalloc, as it goes awry when SIZE_MAX < n_group_slots.  */
+  if (xalloc_oversized (n_group_slots, sizeof *group))
+    xalloc_die ();
+  group = xmalloc (n_group_slots * sizeof *group);
+  n_groups = getgroups (n_group_slots, group);
 
   /* In case of error, the user loses. */
   if (n_groups < 0)
     {
       free (group);
-      return NULL;
+      return false;
     }
 
-  gi = (struct group_info *) xmalloc (sizeof (*gi));
   gi->n_groups = n_groups;
   gi->group = group;
 
-  return gi;
+  return true;
 }
 
 #endif /* not HAVE_GETGROUPS */
@@ -100,24 +89,23 @@ group_member (gid_t gid)
 #else
   int i;
   int found;
-  struct group_info *gi;
+  struct group_info gi;
 
-  gi = get_group_info ();
-  if (gi == NULL)
+  if (! get_group_info (&gi))
     return 0;
 
   /* Search through the list looking for GID. */
   found = 0;
-  for (i = 0; i < gi->n_groups; i++)
+  for (i = 0; i < gi.n_groups; i++)
     {
-      if (gid == gi->group[i])
+      if (gid == gi.group[i])
 	{
 	  found = 1;
 	  break;
 	}
     }
 
-  free_group_info (gi);
+  free_group_info (&gi);
 
   return found;
 #endif /* HAVE_GETGROUPS */
@@ -128,7 +116,7 @@ group_member (gid_t gid)
 char *program_name;
 
 int
-main (int argc, char** argv)
+main (int argc, char **argv)
 {
   int i;
 

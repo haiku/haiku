@@ -20,11 +20,13 @@ TERM con80x43
 TERM con80x50
 TERM con80x60
 TERM dtterm
+TERM putty
 TERM xterm
 TERM xterm-color
 TERM xterm-debian
 TERM rxvt
 TERM screen
+TERM screen-bce
 TERM screen-w
 TERM vt100
 TERM Eterm
@@ -38,15 +40,15 @@ TERM Eterm
 # Background color codes:
 # 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
 NORMAL 00	# global default, although everything should be something.
-FILE 00 	# normal file
-DIR 01;34 	# directory
-LINK 01;36 	# symbolic link.  (If you set this to 'target' instead of a
-           	# numerical value, the color is as for the file pointed to.)
+FILE 00		# normal file
+DIR 01;34	# directory
+LINK 01;36	# symbolic link.  (If you set this to 'target' instead of a
+		# numerical value, the color is as for the file pointed to.)
 FIFO 40;33	# pipe
 SOCK 01;35	# socket
 DOOR 01;35	# door
 BLK 40;33;01	# block device driver
-CHR 40;33;01 	# character device driver
+CHR 40;33;01	# character device driver
 ORPHAN 40;31;01 # symlink to nonexistent file
 
 # This is for files with execute permission:
@@ -91,6 +93,7 @@ EXEC 01;32
 .tif 01;35
 .tiff 01;35
 .png 01;35
+.mov 01;35
 .mpg 01;35
 .mpeg 01;35
 .avi 01;35
@@ -101,6 +104,8 @@ EXEC 01;32
 .xwd 01;35
 
 # audio formats
-.ogg 01;35
+.flac 01;35
 .mp3 01;35
+.mpc 01;35
+.ogg 01;35
 .wav 01;35

@@ -7,15 +7,19 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 StaticLibrary fetish : 
 	__fpending.c
 	acl.c
-	addext.c
 #	alloca.c
 	argmatch.c
 #	atexit.c
 	backupfile.c
 	basename.c
+	calloc.c
 	canon-host.c
 	canonicalize.c
+	c-strtod.c
+	c-strtold.c
+	chdir-long.c
 	chown.c
+	cloexec.c
 	closeout.c
 	cycle-check.c
 	diacrit.c
@@ -36,7 +40,7 @@ StaticLibrary fetish :
 	fopen-safer.c
 #	fsusage.c
 #	ftruncate.c
-	ftw.c
+	fts.c
 	full-read.c
 	full-write.c
 	getcwd.c
@@ -45,10 +49,10 @@ StaticLibrary fetish :
 #	gethostname.c
 #	getline.c
 #	getloadavg.c
+	getndelim2.c
 	getopt.c
 	getopt1.c
 	getpass.c
-	getstr.c
 	gettime.c
 #	gettimeofday.c
 	getugroups.c
@@ -60,7 +64,6 @@ StaticLibrary fetish :
 	human.c
 	idcache.c
 	imaxtostr.c
-	isdir.c
 	lchown.c
 	linebuffer.c
 	localcharset.c
@@ -77,6 +80,7 @@ StaticLibrary fetish :
 	memcoll.c
 #	memcpy.c
 #	memmove.c
+	mempcpy.c
 	memrchr.c
 #	memset.c
 	mkdir.c
@@ -87,6 +91,8 @@ StaticLibrary fetish :
 	nanosleep.c
 #	obstack.c
 	offtostr.c
+	openat.c
+	open-safer.c
 	path-concat.c
 	physmem.c
 	posixtm.c
@@ -97,9 +103,11 @@ StaticLibrary fetish :
 #	raise.c
 #	readlink-stub.c
 	readtokens.c
+	readtokens0.c
 #	realloc.c
 #	regex.c
 	rename.c
+	root-dev-ino.c
 #	rmdir.c
 	rpmatch.c
 	safe-read.c
@@ -107,8 +115,9 @@ StaticLibrary fetish :
 	same.c
 	save-cwd.c
 	savedir.c
+	setenv.c
 	settime.c
-	sha.c
+	sha1.c
 	sig2str.c
 #	stat.c
 #	stpcpy.c
@@ -131,19 +140,24 @@ StaticLibrary fetish :
 #	strtoumax.c
 	strverscmp.c
 #	tempname.c
-	tsearch.c
+	time_r.c
 	umaxtostr.c
 	unicodeio.c
+	unsetenv.c
 	userspec.c
 #	utime.c
+	utimecmp.c
+	utimens.c
 	version-etc.c
+	xalloc-die.c
+	xfts.c
 	xgetcwd.c
 	xgethostname.c
 	xmalloc.c
 	xmemcoll.c
 	xnanosleep.c
 	xreadlink.c
-	xstrdup.c
+	xstrndup.c
 	xstrtod.c
 	xstrtoimax.c
 	xstrtol.c
@@ -152,6 +166,3 @@ StaticLibrary fetish :
 	yesno.c
 ;
 
-# Removed: readutmp.c
-#          inttostr.c
-#          fnmatch_loop.c

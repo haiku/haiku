@@ -1,5 +1,5 @@
 /* tty -- print the path of the terminal connected to standard input
-   Copyright (C) 1990-2002 Free Software Foundation, Inc.
+   Copyright (C) 1990-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,8 +28,15 @@
 #include <sys/types.h>
 
 #include "system.h"
-#include "closeout.h"
 #include "error.h"
+#include "quote.h"
+
+/* Exit statuses.  */
+enum
+  {
+    TTY_FAILURE = 2,
+    TTY_WRITE_ERROR = 3
+  };
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "tty"
@@ -39,8 +46,8 @@
 /* The name under which this program was run. */
 char *program_name;
 
-/* If nonzero, return an exit status but produce no output. */
-static int silent;
+/* If true, return an exit status but produce no output. */
+static bool silent;
 
 static struct option const longopts[] =
 {
@@ -54,7 +61,7 @@ static struct option const longopts[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -78,25 +85,23 @@ main (int argc, char **argv)
   char *tty;
   int optc;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
-  close_stdout_set_status (3);
+  initialize_exit_failure (TTY_WRITE_ERROR);
   atexit (close_stdout);
 
-  silent = 0;
+  silent = false;
 
   while ((optc = getopt_long (argc, argv, "s", longopts, NULL)) != -1)
     {
       switch (optc)
 	{
-	case 0:
-	  break;
-
 	case 's':
-	  silent = 1;
+	  silent = true;
 	  break;
 
 	case_GETOPT_HELP_CHAR;
@@ -104,14 +109,14 @@ main (int argc, char **argv)
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 
 	default:
-	  usage (2);
+	  usage (TTY_FAILURE);
 	}
     }
 
-  if (optind != argc)
-    error (0, 0, _("ignoring all arguments"));
+  if (optind < argc)
+    error (0, 0, _("extra operand %s"), quote (argv[optind]));
 
-  tty = ttyname (0);
+  tty = ttyname (STDIN_FILENO);
   if (!silent)
     {
       if (tty)
@@ -120,5 +125,5 @@ main (int argc, char **argv)
 	puts (_("not a tty"));
     }
 
-  exit (isatty (0) ? 0 : 1);
+  exit (isatty (STDIN_FILENO) ? EXIT_SUCCESS : EXIT_FAIL);
 }

@@ -1,5 +1,5 @@
 /* comm -- compare two sorted files line by line.
-   Copyright (C) 86, 90, 91, 1995-2002 Free Software Foundation, Inc.
+   Copyright (C) 86, 90, 91, 1995-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,16 +23,16 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include "system.h"
-#include "closeout.h"
 #include "linebuffer.h"
 #include "error.h"
 #include "hard-locale.h"
+#include "quote.h"
 #include "xmemcoll.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "comm"
 
-#define AUTHORS N_ ("Richard Stallman and David MacKenzie")
+#define AUTHORS "Richard Stallman", "David MacKenzie"
 
 /* Undefine, to avoid warning about redefinition on some systems.  */
 #undef min
@@ -41,17 +41,17 @@
 /* The name this program was run with. */
 char *program_name;
 
-/* Nonzero if the LC_COLLATE locale is hard.  */
-static int hard_LC_COLLATE;
+/* True if the LC_COLLATE locale is hard.  */
+static bool hard_LC_COLLATE;
 
-/* If nonzero, print lines that are found only in file 1. */
-static int only_file_1;
+/* If true, print lines that are found only in file 1. */
+static bool only_file_1;
 
-/* If nonzero, print lines that are found only in file 2. */
-static int only_file_2;
+/* If true, print lines that are found only in file 2. */
+static bool only_file_2;
 
-/* If nonzero, print lines that are found in both files. */
-static int both;
+/* If true, print lines that are found in both files. */
+static bool both;
 
 static struct option const long_options[] =
 {
@@ -65,27 +65,35 @@ static struct option const long_options[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
     {
       printf (_("\
-Usage: %s [OPTION]... LEFT_FILE RIGHT_FILE\n\
+Usage: %s [OPTION]... FILE1 FILE2\n\
 "),
 	      program_name);
       fputs (_("\
-Compare sorted files LEFT_FILE and RIGHT_FILE line by line.\n\
+Compare sorted files FILE1 and FILE2 line by line.\n\
+"), stdout);
+      fputs (_("\
 \n\
-  -1              suppress lines unique to left file\n\
-  -2              suppress lines unique to right file\n\
+With no options, produce three-column output.  Column one contains\n\
+lines unique to FILE1, column two contains lines unique to FILE2,\n\
+and column three contains lines common to both files.\n\
+"), stdout);
+      fputs (_("\
+\n\
+  -1              suppress lines unique to FILE1\n\
+  -2              suppress lines unique to FILE2\n\
   -3              suppress lines that appear in both files\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
-  exit (status == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (status);
 }
 
 /* Output the line in linebuffer LINE to stream STREAM
@@ -130,9 +138,9 @@ writeline (const struct linebuffer *line, FILE *stream, int class)
    If either is "-", use the standard input for that file.
    Assume that each input file is sorted;
    merge them and output the result.
-   Return 0 if successful, 1 if any errors occur. */
+   Return true if successful.  */
 
-static int
+static bool
 compare_files (char **infiles)
 {
   /* For each file, we have one linebuffer in lb1.  */
@@ -145,7 +153,11 @@ compare_files (char **infiles)
   /* streams[i] holds the input stream for file i.  */
   FILE *streams[2];
 
-  int i, ret = 0;
+  /* errno values for each stream.  */
+  int saved_errno[2];
+
+  int i;
+  bool ret = true;
 
   /* Initialize the storage. */
   for (i = 0; i < 2; i++)
@@ -156,10 +168,11 @@ compare_files (char **infiles)
       if (!streams[i])
 	{
 	  error (0, errno, "%s", infiles[i]);
-	  return 1;
+	  return false;
 	}
 
-      thisline[i] = readline (thisline[i], streams[i]);
+      thisline[i] = readlinebuffer (thisline[i], streams[i]);
+      saved_errno[i] = errno;
     }
 
   while (thisline[0] || thisline[1])
@@ -174,7 +187,7 @@ compare_files (char **infiles)
 	order = -1;
       else
 	{
-	  if (HAVE_SETLOCALE && hard_LC_COLLATE)
+	  if (hard_LC_COLLATE)
 	    order = xmemcoll (thisline[0]->buffer, thisline[0]->length - 1,
 			      thisline[1]->buffer, thisline[1]->length - 1);
 	  else
@@ -199,19 +212,30 @@ compare_files (char **infiles)
       /* Step the file the line came from.
 	 If the files match, step both files.  */
       if (order >= 0)
-	thisline[1] = readline (thisline[1], streams[1]);
+	{
+	  thisline[1] = readlinebuffer (thisline[1], streams[1]);
+	  saved_errno[1] = errno;
+	}
       if (order <= 0)
-	thisline[0] = readline (thisline[0], streams[0]);
+	{
+	  thisline[0] = readlinebuffer (thisline[0], streams[0]);
+	  saved_errno[0] = errno;
+	}
     }
 
   /* Free all storage and close all input streams. */
   for (i = 0; i < 2; i++)
     {
       free (lb1[i].buffer);
-      if (ferror (streams[i]) || fclose (streams[i]) == EOF)
+      if (ferror (streams[i]))
+	{
+	  error (0, saved_errno[i], "%s", infiles[i]);
+	  ret = false;
+	}
+      if (fclose (streams[i]) != 0)
 	{
 	  error (0, errno, "%s", infiles[i]);
-	  ret = 1;
+	  ret = false;
 	}
     }
   return ret;
@@ -222,6 +246,7 @@ main (int argc, char **argv)
 {
   int c;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -230,26 +255,23 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
-  only_file_1 = 1;
-  only_file_2 = 1;
-  both = 1;
+  only_file_1 = true;
+  only_file_2 = true;
+  both = true;
 
   while ((c = getopt_long (argc, argv, "123", long_options, NULL)) != -1)
     switch (c)
       {
-      case 0:
-	break;
-
       case '1':
-	only_file_1 = 0;
+	only_file_1 = false;
 	break;
 
       case '2':
-	only_file_2 = 0;
+	only_file_2 = false;
 	break;
 
       case '3':
-	both = 0;
+	both = false;
 	break;
 
       case_GETOPT_HELP_CHAR;
@@ -260,9 +282,21 @@ main (int argc, char **argv)
 	usage (EXIT_FAILURE);
       }
 
-  if (optind + 2 != argc)
-    usage (EXIT_FAILURE);
+  if (argc - optind < 2)
+    {
+      if (argc <= optind)
+	error (0, 0, _("missing operand"));
+      else
+	error (0, 0, _("missing operand after %s"), quote (argv[argc - 1]));
+      usage (EXIT_FAILURE);
+    }
 
-  exit (compare_files (argv + optind) == 0
+  if (2 < argc - optind)
+    {
+      error (0, 0, _("extra operand %s"), quote (argv[optind + 2]));
+      usage (EXIT_FAILURE);
+    }
+
+  exit (compare_files (argv + optind)
 	? EXIT_SUCCESS : EXIT_FAILURE);
 }

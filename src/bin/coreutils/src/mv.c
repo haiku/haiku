@@ -1,5 +1,5 @@
 /* mv -- move or rename files
-   Copyright (C) 86, 89, 90, 91, 1995-2002 Free Software Foundation, Inc.
+   Copyright (C) 86, 89, 90, 91, 1995-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,10 +16,6 @@
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* Written by Mike Parker, David MacKenzie, and Jim Meyering */
-
-#ifdef _AIX
- #pragma alloca
-#endif
 
 #include <config.h>
 #include <stdio.h>
@@ -41,7 +37,7 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "mv"
 
-#define AUTHORS N_ ("Mike Parker, David MacKenzie, and Jim Meyering")
+#define AUTHORS "Mike Parker", "David MacKenzie", "Jim Meyering"
 
 /* Initial number of entries in each hash table entry's table of inodes.  */
 #define INITIAL_HASH_MODULE 100
@@ -53,19 +49,15 @@
    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
 enum
 {
-  TARGET_DIRECTORY_OPTION = CHAR_MAX + 1,
-  STRIP_TRAILING_SLASHES_OPTION,
-  REPLY_OPTION
+  REPLY_OPTION = CHAR_MAX + 1,
+  STRIP_TRAILING_SLASHES_OPTION
 };
-
-int isdir ();
-int lstat ();
 
 /* The name this program was run with. */
 char *program_name;
 
 /* Remove any trailing slashes from each SOURCE argument.  */
-static int remove_trailing_slashes;
+static bool remove_trailing_slashes;
 
 /* Valid arguments to the `--reply' option. */
 static char const* const reply_args[] =
@@ -84,10 +76,11 @@ static struct option const long_options[] =
   {"backup", optional_argument, NULL, 'b'},
   {"force", no_argument, NULL, 'f'},
   {"interactive", no_argument, NULL, 'i'},
+  {"no-target-directory", no_argument, NULL, 'T'},
   {"reply", required_argument, NULL, REPLY_OPTION},
   {"strip-trailing-slashes", no_argument, NULL, STRIP_TRAILING_SLASHES_OPTION},
   {"suffix", required_argument, NULL, 'S'},
-  {"target-directory", required_argument, NULL, TARGET_DIRECTORY_OPTION},
+  {"target-directory", required_argument, NULL, 't'},
   {"update", no_argument, NULL, 'u'},
   {"verbose", no_argument, NULL, 'v'},
   {"version-control", required_argument, NULL, 'V'},
@@ -99,42 +92,47 @@ static struct option const long_options[] =
 static void
 rm_option_init (struct rm_options *x)
 {
-  x->unlink_dirs = 0;
-
-  x->ignore_missing_files = 0;
-
-  x->recursive = 1;
+  x->unlink_dirs = false;
+  x->ignore_missing_files = false;
+  x->root_dev_ino = NULL;
+  x->recursive = true;
 
   /* Should we prompt for removal, too?  No.  Prompting for the `move'
      part is enough.  It implies removal.  */
   x->interactive = 0;
-  x->stdin_tty = 0;
+  x->stdin_tty = false;
 
-  x->verbose = 0;
+  x->verbose = false;
+
+  /* Since this program may well have to process additional command
+     line arguments after any call to `rm', that function must preserve
+     the initial working directory, in case one of those is a
+     `.'-relative name.  */
+  x->require_restore_cwd = true;
 }
 
 static void
 cp_option_init (struct cp_options *x)
 {
-  x->copy_as_regular = 0;  /* FIXME: maybe make this an option */
+  x->copy_as_regular = false;  /* FIXME: maybe make this an option */
   x->dereference = DEREF_NEVER;
-  x->unlink_dest_before_opening = 0;
-  x->unlink_dest_after_failed_open = 0;
-  x->hard_link = 0;
+  x->unlink_dest_before_opening = false;
+  x->unlink_dest_after_failed_open = false;
+  x->hard_link = false;
   x->interactive = I_UNSPECIFIED;
-  x->move_mode = 1;
+  x->move_mode = true;
   x->myeuid = geteuid ();
-  x->one_file_system = 0;
-  x->preserve_ownership = 1;
-  x->preserve_links = 1;
-  x->preserve_mode = 1;
-  x->preserve_timestamps = 1;
-  x->require_preserve = 0;  /* FIXME: maybe make this an option */
-  x->ignore_attributes = 0;
-  x->recursive = 1;
+  x->one_file_system = false;
+  x->preserve_ownership = true;
+  x->preserve_links = true;
+  x->preserve_mode = true;
+  x->preserve_timestamps = true;
+  x->require_preserve = false;  /* FIXME: maybe make this an option */
+  x->ignore_attributes = false;
+  x->recursive = true;
   x->sparse_mode = SPARSE_AUTO;  /* FIXME: maybe make this an option */
-  x->symbolic_link = 0;
-  x->set_mode = 0;
+  x->symbolic_link = false;
+  x->set_mode = false;
   x->mode = 0;
   x->stdin_tty = isatty (STDIN_FILENO);
 
@@ -144,46 +142,45 @@ cp_option_init (struct cp_options *x)
      have been allowed with the mask this process was started with.  */
   x->umask_kill = ~ umask (0);
 
-  x->update = 0;
-  x->verbose = 0;
-  x->xstat = lstat;
+  x->update = false;
+  x->verbose = false;
   x->dest_info = NULL;
   x->src_info = NULL;
 }
 
-/* If PATH is an existing directory, return nonzero, else 0.  */
+/* FILE is the last operand of this command.  Return true if FILE is a
+   directory.  But report an error there is a problem accessing FILE,
+   or if FILE does not exist but would have to refer to an existing
+   directory if it referred to anything at all.  */
 
-static int
-is_real_dir (const char *path)
+static bool
+target_directory_operand (char const *file)
 {
-  struct stat stats;
-
-  return lstat (path, &stats) == 0 && S_ISDIR (stats.st_mode);
+  char const *b = base_name (file);
+  size_t blen = strlen (b);
+  bool looks_like_a_dir = (blen == 0 || ISSLASH (b[blen - 1]));
+  struct stat st;
+  int err = (stat (file, &st) == 0 ? 0 : errno);
+  bool is_a_dir = !err && S_ISDIR (st.st_mode);
+  if (err && err != ENOENT)
+    error (EXIT_FAILURE, err, _("accessing %s"), quote (file));
+  if (is_a_dir < looks_like_a_dir)
+    error (EXIT_FAILURE, err, _("target %s is not a directory"), quote (file));
+  return is_a_dir;
 }
 
-/* Move SOURCE onto DEST.  Handles cross-filesystem moves.
+/* Move SOURCE onto DEST.  Handles cross-file-system moves.
    If SOURCE is a directory, DEST must not exist.
-   Return 0 if successful, non-zero if an error occurred.  */
+   Return true if successful.  */
 
-static int
+static bool
 do_move (const char *source, const char *dest, const struct cp_options *x)
 {
-  static int first = 1;
-  int copy_into_self;
-  int rename_succeeded;
-  int fail;
+  bool copy_into_self;
+  bool rename_succeeded;
+  bool ok = copy (source, dest, false, x, &copy_into_self, &rename_succeeded);
 
-  if (first)
-    {
-      first = 0;
-
-      /* Allocate space for remembering copied and created files.  */
-      hash_init ();
-    }
-
-  fail = copy (source, dest, 0, x, &copy_into_self, &rename_succeeded);
-
-  if (!fail)
+  if (ok)
     {
       char const *dir_to_remove;
       if (copy_into_self)
@@ -200,7 +197,7 @@ do_move (const char *source, const char *dest, const struct cp_options *x)
 	     and failing.  */
 
 	  dir_to_remove = NULL;
-	  fail = 1;
+	  ok = false;
 	}
       else if (rename_succeeded)
 	{
@@ -246,24 +243,22 @@ do_move (const char *source, const char *dest, const struct cp_options *x)
 	  status = rm (1, &dir_to_remove, &rm_options);
 	  assert (VALID_STATUS (status));
 	  if (status == RM_ERROR)
-	    fail = 1;
+	    ok = false;
 	}
     }
 
-  return fail;
+  return ok;
 }
 
 /* Move file SOURCE onto DEST.  Handles the case when DEST is a directory.
-   DEST_IS_DIR must be nonzero when DEST is a directory or a symlink to a
-   directory and zero otherwise.
-   Return 0 if successful, non-zero if an error occurred.  */
+   Treat DEST as a directory if DEST_IS_DIR.
+   Return true if successful.  */
 
-static int
-movefile (char *source, char *dest, int dest_is_dir,
+static bool
+movefile (char *source, char *dest, bool dest_is_dir,
 	  const struct cp_options *x)
 {
-  int dest_had_trailing_slash = strip_trailing_slashes (dest);
-  int fail;
+  bool ok;
 
   /* This code was introduced to handle the ambiguity in the semantics
      of mv that is induced by the varying semantics of the rename function.
@@ -272,47 +267,39 @@ movefile (char *source, char *dest, int dest_is_dir,
      function that ignores a trailing slash.  I believe the Linux
      rename semantics are POSIX and susv2 compliant.  */
 
+  strip_trailing_slashes (dest);
   if (remove_trailing_slashes)
     strip_trailing_slashes (source);
 
-  /* In addition to when DEST is a directory, if DEST has a trailing
-     slash and neither SOURCE nor DEST is a directory, presume the target
-     is DEST/`basename source`.  This converts `mv x y/' to `mv x y/x'.
-     This change means that the command `mv any file/' will now fail
-     rather than performing the move.  The case when SOURCE is a
-     directory and DEST is not is properly diagnosed by do_move.  */
-
-  if (dest_is_dir || (dest_had_trailing_slash && !is_real_dir (source)))
+  if (dest_is_dir)
     {
-      /* DEST is a directory; build full target filename. */
+      /* Treat DEST as a directory; build the full filename.  */
       char const *src_basename = base_name (source);
       char *new_dest = path_concat (dest, src_basename, NULL);
-      if (new_dest == NULL)
-	xalloc_die ();
       strip_trailing_slashes (new_dest);
-      fail = do_move (source, new_dest, x);
+      ok = do_move (source, new_dest, x);
       free (new_dest);
     }
   else
     {
-      fail = do_move (source, dest, x);
+      ok = do_move (source, dest, x);
     }
 
-  return fail;
+  return ok;
 }
 
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
     {
       printf (_("\
-Usage: %s [OPTION]... SOURCE DEST\n\
+Usage: %s [OPTION]... [-T] SOURCE DEST\n\
   or:  %s [OPTION]... SOURCE... DIRECTORY\n\
-  or:  %s [OPTION]... --target-directory=DIRECTORY SOURCE...\n\
+  or:  %s [OPTION]... -t DIRECTORY SOURCE...\n\
 "),
 	      program_name, program_name, program_name);
       fputs (_("\
@@ -326,9 +313,9 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       --backup[=CONTROL]       make a backup of each existing destination file\n\
   -b                           like --backup but does not accept an argument\n\
   -f, --force                  do not prompt before overwriting\n\
-                                 equivalent to --reply=yes\n\
+                                 (equivalent to --reply=yes)\n\
   -i, --interactive            prompt before overwrite\n\
-                                 equivalent to --reply=query\n\
+                                 (equivalent to --reply=query)\n\
 "), stdout);
       fputs (_("\
       --reply={yes,no,query}   specify how to handle the prompt about an\n\
@@ -338,7 +325,8 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -S, --suffix=SUFFIX          override the usual backup suffix\n\
 "), stdout);
       fputs (_("\
-      --target-directory=DIRECTORY  move all SOURCE arguments into DIRECTORY\n\
+  -t, --target-directory=DIRECTORY  move all SOURCE arguments into DIRECTORY\n\
+  -T, --no-target-directory    treat DEST as a normal file\n\
   -u, --update                 move only when the SOURCE file is newer\n\
                                  than the destination file or when the\n\
                                  destination file is missing\n\
@@ -368,17 +356,17 @@ int
 main (int argc, char **argv)
 {
   int c;
-  int errors;
-  int make_backups = 0;
-  int dest_is_dir;
+  bool ok;
+  bool make_backups = false;
   char *backup_suffix_string;
   char *version_control_string = NULL;
   struct cp_options x;
   char *target_directory = NULL;
-  int target_directory_specified;
-  unsigned int n_files;
+  bool no_target_directory = false;
+  int n_files;
   char **file;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -392,15 +380,11 @@ main (int argc, char **argv)
      we'll actually use backup_suffix_string.  */
   backup_suffix_string = getenv ("SIMPLE_BACKUP_SUFFIX");
 
-  errors = 0;
-
-  while ((c = getopt_long (argc, argv, "bfiuvS:V:", long_options, NULL)) != -1)
+  while ((c = getopt_long (argc, argv, "bfit:uvS:TV:", long_options, NULL))
+	 != -1)
     {
       switch (c)
 	{
-	case 0:
-	  break;
-
 	case 'V':  /* FIXME: this is deprecated.  Remove it in 2001.  */
 	  error (0, 0,
 		 _("warning: --version-control (-V) is obsolete;  support for\
@@ -409,7 +393,7 @@ main (int argc, char **argv)
 	  /* Fall through.  */
 
 	case 'b':
-	  make_backups = 1;
+	  make_backups = true;
 	  if (optarg)
 	    version_control_string = optarg;
 	  break;
@@ -424,19 +408,33 @@ main (int argc, char **argv)
 				     reply_args, reply_vals);
 	  break;
 	case STRIP_TRAILING_SLASHES_OPTION:
-	  remove_trailing_slashes = 1;
+	  remove_trailing_slashes = true;
 	  break;
-	case TARGET_DIRECTORY_OPTION:
+	case 't':
+	  if (target_directory)
+	    error (EXIT_FAILURE, 0, _("multiple target directories specified"));
+	  else
+	    {
+	      struct stat st;
+	      if (stat (optarg, &st) != 0)
+		error (EXIT_FAILURE, errno, _("accessing %s"), quote (optarg));
+	      if (! S_ISDIR (st.st_mode))
+		error (EXIT_FAILURE, 0, _("target %s is not a directory"),
+		       quote (optarg));
+	    }
 	  target_directory = optarg;
 	  break;
+	case 'T':
+	  no_target_directory = true;
+	  break;
 	case 'u':
-	  x.update = 1;
+	  x.update = true;
 	  break;
 	case 'v':
-	  x.verbose = 1;
+	  x.verbose = true;
 	  break;
 	case 'S':
-	  make_backups = 1;
+	  make_backups = true;
 	  backup_suffix_string = optarg;
 	  break;
 	case_GETOPT_HELP_CHAR;
@@ -449,32 +447,35 @@ main (int argc, char **argv)
   n_files = argc - optind;
   file = argv + optind;
 
-  target_directory_specified = (target_directory != NULL);
-  if (target_directory == NULL && n_files != 0)
-    target_directory = file[n_files - 1];
-
-  dest_is_dir = (n_files > 0 && isdir (target_directory));
-
-  if (n_files == 0 || (n_files == 1 && !target_directory_specified))
+  if (n_files <= !target_directory)
     {
-      error (0, 0, _("missing file argument"));
+      if (n_files <= 0)
+	error (0, 0, _("missing file operand"));
+      else
+	error (0, 0, _("missing destination file operand after %s"),
+	       quote (file[0]));
       usage (EXIT_FAILURE);
     }
 
-  if (target_directory_specified)
+  if (no_target_directory)
     {
-      if (!dest_is_dir)
+      if (target_directory)
+	error (EXIT_FAILURE, 0,
+	       _("Cannot combine --target-directory (-t) "
+		 "and --no-target-directory (-T)"));
+      if (2 < n_files)
 	{
-	  error (0, 0, _("specified target, %s is not a directory"),
-		 quote (target_directory));
+	  error (0, 0, _("extra operand %s"), quote (file[2]));
 	  usage (EXIT_FAILURE);
 	}
     }
-  else if (n_files > 2 && !dest_is_dir)
+  else if (!target_directory)
     {
-      error (0, 0,
-	    _("when moving multiple files, last argument must be a directory"));
-      usage (EXIT_FAILURE);
+      if (2 <= n_files && target_directory_operand (file[n_files - 1]))
+	target_directory = file[--n_files];
+      else if (2 < n_files)
+	error (EXIT_FAILURE, 0, _("target %s is not a directory"),
+	       quote (file[n_files - 1]));
     }
 
   if (backup_suffix_string)
@@ -483,24 +484,26 @@ main (int argc, char **argv)
   x.backup_type = (make_backups
 		   ? xget_version (_("backup type"),
 				   version_control_string)
-		   : none);
+		   : no_backups);
 
-  /* Move each arg but the last into the target_directory.  */
-  {
-    unsigned int last_file_idx = (target_directory_specified
-				  ? n_files - 1
-				  : n_files - 2);
-    unsigned int i;
+  hash_init ();
 
-    /* Initialize the hash table only if we'll need it.
-       The problem it is used to detect can arise only if there are
-       two or more files to move.  */
-    if (last_file_idx)
-      dest_info_init (&x);
+  if (target_directory)
+    {
+      int i;
 
-    for (i = 0; i <= last_file_idx; ++i)
-      errors |= movefile (file[i], target_directory, dest_is_dir, &x);
-  }
+      /* Initialize the hash table only if we'll need it.
+	 The problem it is used to detect can arise only if there are
+	 two or more files to move.  */
+      if (2 <= n_files)
+	dest_info_init (&x);
 
-  exit (errors);
+      ok = true;
+      for (i = 0; i < n_files; ++i)
+	ok &= movefile (file[i], target_directory, true, &x);
+    }
+  else
+    ok = movefile (file[0], file[1], false, &x);
+
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

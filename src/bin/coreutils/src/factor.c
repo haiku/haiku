@@ -1,5 +1,5 @@
 /* factor -- print prime factors of n.
-   Copyright (C) 86, 1995-2002 Free Software Foundation, Inc.
+   Copyright (C) 86, 1995-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
    Adapted for GNU, fixed to factor UINT_MAX by Jim Meyering.  */
 
 #include <config.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <sys/types.h>
 
@@ -26,7 +27,6 @@
 #define NDEBUG 1
 
 #include "system.h"
-#include "closeout.h"
 #include "error.h"
 #include "inttostr.h"
 #include "long-options.h"
@@ -52,7 +52,7 @@
    http://www.utm.edu/research/primes/glossary/WheelFactorization.html  */
 
 #include "wheel-size.h"  /* For the definition of WHEEL_SIZE.  */
-static const unsigned int wheel_tab[] =
+static const unsigned char wheel_tab[] =
   {
 #include "wheel.h"
   };
@@ -66,7 +66,7 @@ char *program_name;
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -94,14 +94,14 @@ Print the prime factors of each NUMBER.\n\
 
 /* FIXME: comment */
 
-static int
-factor (uintmax_t n0, int max_n_factors, uintmax_t *factors)
+static size_t
+factor (uintmax_t n0, size_t max_n_factors, uintmax_t *factors)
 {
   register uintmax_t n = n0, d, q;
-  int n_factors = 0;
-  unsigned int const *w = wheel_tab;
+  size_t n_factors = 0;
+  unsigned char const *w = wheel_tab;
 
-  if (n < 1)
+  if (n <= 1)
     return n_factors;
 
   /* The exit condition in the following loop is correct because
@@ -140,56 +140,59 @@ factor (uintmax_t n0, int max_n_factors, uintmax_t *factors)
 
 /* FIXME: comment */
 
-static int
+static bool
 print_factors (const char *s)
 {
   uintmax_t factors[MAX_N_FACTORS];
   uintmax_t n;
-  int n_factors;
-  int i;
+  size_t n_factors;
+  size_t i;
   char buf[INT_BUFSIZE_BOUND (uintmax_t)];
+  strtol_error err;
 
-  if (xstrtoumax (s, NULL, 10, &n, "") != LONGINT_OK)
+  if ((err = xstrtoumax (s, NULL, 10, &n, "")) != LONGINT_OK)
     {
-      error (0, 0, _("`%s' is not a valid positive integer"), s);
-      return 1;
+      if (err == LONGINT_OVERFLOW)
+	error (0, 0, _("`%s' is too large"), s);
+      else
+	error (0, 0, _("`%s' is not a valid positive integer"), s);
+      return false;
     }
   n_factors = factor (n, MAX_N_FACTORS, factors);
   printf ("%s:", umaxtostr (n, buf));
   for (i = 0; i < n_factors; i++)
     printf (" %s", umaxtostr (factors[i], buf));
   putchar ('\n');
-  return 0;
+  return true;
 }
 
-static int
+static bool
 do_stdin (void)
 {
-  int fail = 0;
+  bool ok = true;
   token_buffer tokenbuffer;
 
   init_tokenbuffer (&tokenbuffer);
 
   for (;;)
     {
-      long int token_length;
-
-      token_length = readtoken (stdin, DELIM, sizeof (DELIM) - 1,
-				&tokenbuffer);
-      if (token_length < 0)
+      size_t token_length = readtoken (stdin, DELIM, sizeof (DELIM) - 1,
+				       &tokenbuffer);
+      if (token_length == (size_t) -1)
 	break;
-      fail |= print_factors (tokenbuffer.buffer);
+      ok &= print_factors (tokenbuffer.buffer);
     }
   free (tokenbuffer.buffer);
 
-  return fail;
+  return ok;
 }
 
 int
 main (int argc, char **argv)
 {
-  int fail;
+  bool ok;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -198,26 +201,20 @@ main (int argc, char **argv)
   atexit (close_stdout);
 
   parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
-		      AUTHORS, usage);
-  /* The above handles --help and --version.
-     Since there is no other invocation of getopt, handle `--' here.  */
-  if (argc > 1 && STREQ (argv[1], "--"))
-    {
-      --argc;
-      ++argv;
-    }
+		      usage, AUTHORS, (char const *) NULL);
+  if (getopt_long (argc, argv, "", NULL, NULL) != -1)
+    usage (EXIT_FAILURE);
 
-  fail = 0;
-  if (argc == 1)
-    fail = do_stdin ();
+  if (argc <= optind)
+    ok = do_stdin ();
   else
     {
       int i;
-      for (i = 1; i < argc; i++)
-	fail |= print_factors (argv[i]);
+      for (i = optind; i < argc; i++)
+	if (! print_factors (argv[i]))
+	  usage (EXIT_FAILURE);
+      ok = true;
     }
-  if (fail)
-    usage (EXIT_FAILURE);
 
-  exit (fail);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

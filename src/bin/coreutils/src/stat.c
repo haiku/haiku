@@ -1,5 +1,5 @@
-/* stat.c -- display file or filesystem status
-   Copyright (C) 2001, 2002, 2003 Free Software Foundation.
+/* stat.c -- display file or file system status
+   Copyright (C) 2001, 2002, 2003, 2004 Free Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,31 +23,33 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
-#include <unistd.h>
-#include <time.h>
-#if HAVE_SYS_STATVFS_H
+#if HAVE_SYS_STATVFS_H && HAVE_STRUCT_STATVFS_F_BASETYPE
 # include <sys/statvfs.h>
-#endif
-#if HAVE_SYS_VFS_H
+#elif HAVE_SYS_VFS_H
 # include <sys/vfs.h>
-#endif
-
+#elif HAVE_SYS_MOUNT_H && HAVE_SYS_PARAM_H
+/* NOTE: freebsd5.0 needs sys/param.h and sys/mount.h for statfs.
+   It does have statvfs.h, but shouldn't use it, since it doesn't
+   HAVE_STRUCT_STATVFS_F_BASETYPE.  So find a clean way to fix it.  */
 /* NetBSD 1.5.2 needs these, for the declaration of struct statfs. */
-#if !HAVE_SYS_STATVFS_H && !HAVE_SYS_VFS_H
-# if HAVE_SYS_MOUNT_H && HAVE_SYS_PARAM_H
-#  include <sys/param.h>
-#  include <sys/mount.h>
+# include <sys/param.h>
+# include <sys/mount.h>
+# if HAVE_NETINET_IN_H && HAVE_NFS_NFS_CLNT_H && HAVE_NFS_VFS_H
+/* Ultrix 4.4 needs these for the declaration of struct statfs.  */
+#  include <netinet/in.h>
+#  include <nfs/nfs_clnt.h>
+#  include <nfs/vfs.h>
 # endif
 #endif
 
 #include "system.h"
 
-#include "closeout.h"
 #include "error.h"
 #include "filemode.h"
 #include "file-type.h"
 #include "fs.h"
 #include "getopt.h"
+#include "inttostr.h"
 #include "quote.h"
 #include "quotearg.h"
 #include "strftime.h"
@@ -57,16 +59,23 @@
 
 #if HAVE_STRUCT_STATVFS_F_BASETYPE
 # define STRUCT_STATVFS struct statvfs
-# define HAVE_STRUCT_STATXFS_F_TYPE HAVE_STRUCT_STATVFS
+# define HAVE_STRUCT_STATXFS_F_TYPE HAVE_STRUCT_STATVFS_F_TYPE
 # if HAVE_STRUCT_STATVFS_F_NAMEMAX
 #  define SB_F_NAMEMAX(S) ((uintmax_t) ((S)->f_namemax))
 # endif
+# if STAT_STATVFS
+#  define STATFS statvfs
+# endif
 #else
 # define STRUCT_STATVFS struct statfs
-# define HAVE_STRUCT_STATXFS_F_TYPE HAVE_STRUCT_STATFS
+# define HAVE_STRUCT_STATXFS_F_TYPE HAVE_STRUCT_STATFS_F_TYPE
 # if HAVE_STRUCT_STATFS_F_NAMELEN
 #  define SB_F_NAMEMAX(S) ((uintmax_t) ((S)->f_namelen))
 # endif
+#endif
+
+#ifndef STATFS
+# define STATFS statfs
 #endif
 
 #ifndef SB_F_NAMEMAX
@@ -91,16 +100,14 @@
 static struct option const long_options[] = {
   {"link", no_argument, 0, 'l'}, /* deprecated.  FIXME: remove in 2003 */
   {"dereference", no_argument, 0, 'L'},
+  {"file-system", no_argument, 0, 'f'},
+  {"filesystem", no_argument, 0, 'f'}, /* obsolete and undocumented alias */
   {"format", required_argument, 0, 'c'},
-  {"filesystem", no_argument, 0, 'f'},
   {"terse", no_argument, 0, 't'},
   {GETOPT_HELP_OPTION_DECL},
   {GETOPT_VERSION_OPTION_DECL},
   {NULL, 0, NULL, 0}
 };
-
-/* Nonzero means we should exit with EXIT_FAILURE upon completion.  */
-static int G_fail;
 
 char *program_name;
 
@@ -108,201 +115,152 @@ char *program_name;
    Some systems have statfvs.f_basetype[FSTYPSZ]. (AIX, HP-UX, and Solaris)
    Others have statfs.f_fstypename[MFSNAMELEN]. (NetBSD 1.5.2)
    Still others have neither and have to get by with f_type (Linux).  */
-static char *
+static char const *
 human_fstype (STRUCT_STATVFS const *statfsbuf)
 {
 #ifdef STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME
-  /* Cast away the `const' attribute.  */
-  return (char *) statfsbuf->STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME;
+  return statfsbuf->STATXFS_FILE_SYSTEM_TYPE_MEMBER_NAME;
 #else
-  char const *type;
   switch (statfsbuf->f_type)
     {
 # if defined __linux__
-    case S_MAGIC_AFFS:
-      type = "affs";
-      break;
-    case S_MAGIC_EXT:
-      type = "ext";
-      break;
-    case S_MAGIC_EXT2_OLD:
-      type = "ext2";
-      break;
-    case S_MAGIC_EXT2:
-      type = "ext2/ext3";
-      break;
-    case S_MAGIC_HPFS:
-      type = "hpfs";
-      break;
-    case S_MAGIC_ISOFS:
-      type = "isofs";
-      break;
-    case S_MAGIC_ISOFS_WIN:
-      type = "isofs";
-      break;
-    case S_MAGIC_ISOFS_R_WIN:
-      type = "isofs";
-      break;
-    case S_MAGIC_MINIX:
-      type = "minix";
-      break;
-    case S_MAGIC_MINIX_30:
-      type = "minix (30 char.)";
-      break;
-    case S_MAGIC_MINIX_V2:
-      type = "minix v2";
-      break;
-    case S_MAGIC_MINIX_V2_30:
-      type = "minix v2 (30 char.)";
-      break;
-    case S_MAGIC_MSDOS:
-      type = "msdos";
-      break;
-    case S_MAGIC_FAT:
-      type = "fat";
-      break;
-    case S_MAGIC_NCP:
-      type = "novell";
-      break;
-    case S_MAGIC_NFS:
-      type = "nfs";
-      break;
-    case S_MAGIC_PROC:
-      type = "proc";
-      break;
-    case S_MAGIC_SMB:
-      type = "smb";
-      break;
-    case S_MAGIC_XENIX:
-      type = "xenix";
-      break;
-    case S_MAGIC_SYSV4:
-      type = "sysv4";
-      break;
-    case S_MAGIC_SYSV2:
-      type = "sysv2";
-      break;
-    case S_MAGIC_COH:
-      type = "coh";
-      break;
-    case S_MAGIC_UFS:
-      type = "ufs";
-      break;
-    case S_MAGIC_XIAFS:
-      type = "xia";
-      break;
-    case S_MAGIC_NTFS:
-      type = "ntfs";
-      break;
-    case S_MAGIC_TMPFS:
-      type = "tmpfs";
-      break;
-    case S_MAGIC_REISERFS:
-      type = "reiserfs";
-      break;
-    case S_MAGIC_CRAMFS:
-      type = "cramfs";
-      break;
-    case S_MAGIC_ROMFS:
-      type = "romfs";
-      break;
+
+      /* IMPORTANT NOTE: Each of the following `case S_MAGIC_...:'
+	 statements must be followed by a hexadecimal constant in
+	 a comment.  The S_MAGIC_... name and constant are automatically
+	 combined to produce the #define directives in fs.h.  */
+
+    case S_MAGIC_AFFS: /* 0xADFF */
+      return "affs";
+    case S_MAGIC_DEVPTS: /* 0x1CD1 */
+      return "devpts";
+    case S_MAGIC_EXT: /* 0x137D */
+      return "ext";
+    case S_MAGIC_EXT2_OLD: /* 0xEF51 */
+      return "ext2";
+    case S_MAGIC_EXT2: /* 0xEF53 */
+      return "ext2/ext3";
+    case S_MAGIC_HPFS: /* 0xF995E849 */
+      return "hpfs";
+    case S_MAGIC_ISOFS: /* 0x9660 */
+      return "isofs";
+    case S_MAGIC_ISOFS_WIN: /* 0x4000 */
+      return "isofs";
+    case S_MAGIC_ISOFS_R_WIN: /* 0x4004 */
+      return "isofs";
+    case S_MAGIC_MINIX: /* 0x137F */
+      return "minix";
+    case S_MAGIC_MINIX_30: /* 0x138F */
+      return "minix (30 char.)";
+    case S_MAGIC_MINIX_V2: /* 0x2468 */
+      return "minix v2";
+    case S_MAGIC_MINIX_V2_30: /* 0x2478 */
+      return "minix v2 (30 char.)";
+    case S_MAGIC_MSDOS: /* 0x4d44 */
+      return "msdos";
+    case S_MAGIC_FAT: /* 0x4006 */
+      return "fat";
+    case S_MAGIC_NCP: /* 0x564c */
+      return "novell";
+    case S_MAGIC_NFS: /* 0x6969 */
+      return "nfs";
+    case S_MAGIC_PROC: /* 0x9fa0 */
+      return "proc";
+    case S_MAGIC_SMB: /* 0x517B */
+      return "smb";
+    case S_MAGIC_XENIX: /* 0x012FF7B4 */
+      return "xenix";
+    case S_MAGIC_SYSV4: /* 0x012FF7B5 */
+      return "sysv4";
+    case S_MAGIC_SYSV2: /* 0x012FF7B6 */
+      return "sysv2";
+    case S_MAGIC_COH: /* 0x012FF7B7 */
+      return "coh";
+    case S_MAGIC_UFS: /* 0x00011954 */
+      return "ufs";
+    case S_MAGIC_XIAFS: /* 0x012FD16D */
+      return "xia";
+    case S_MAGIC_NTFS: /* 0x5346544e */
+      return "ntfs";
+    case S_MAGIC_TMPFS: /* 0x1021994 */
+      return "tmpfs";
+    case S_MAGIC_REISERFS: /* 0x52654973 */
+      return "reiserfs";
+    case S_MAGIC_CRAMFS: /* 0x28cd3d45 */
+      return "cramfs";
+    case S_MAGIC_ROMFS: /* 0x7275 */
+      return "romfs";
+    case S_MAGIC_RAMFS: /* 0x858458f6 */
+      return "ramfs";
+    case S_MAGIC_SQUASHFS: /* 0x73717368 */
+      return "squashfs";
+    case S_MAGIC_SYSFS: /* 0x62656572 */
+      return "sysfs";
 # elif __GNU__
     case FSTYPE_UFS:
-      type = "ufs";
-      break;
+      return "ufs";
     case FSTYPE_NFS:
-      type = "nfs";
-      break;
+      return "nfs";
     case FSTYPE_GFS:
-      type = "gfs";
-      break;
+      return "gfs";
     case FSTYPE_LFS:
-      type = "lfs";
-      break;
+      return "lfs";
     case FSTYPE_SYSV:
-      type = "sysv";
-      break;
+      return "sysv";
     case FSTYPE_FTP:
-      type = "ftp";
-      break;
+      return "ftp";
     case FSTYPE_TAR:
-      type = "tar";
-      break;
+      return "tar";
     case FSTYPE_AR:
-      type = "ar";
-      break;
+      return "ar";
     case FSTYPE_CPIO:
-      type = "cpio";
-      break;
+      return "cpio";
     case FSTYPE_MSLOSS:
-      type = "msloss";
-      break;
+      return "msloss";
     case FSTYPE_CPM:
-      type = "cpm";
-      break;
+      return "cpm";
     case FSTYPE_HFS:
-      type = "hfs";
-      break;
+      return "hfs";
     case FSTYPE_DTFS:
-      type = "dtfs";
-      break;
+      return "dtfs";
     case FSTYPE_GRFS:
-      type = "grfs";
-      break;
+      return "grfs";
     case FSTYPE_TERM:
-      type = "term";
-      break;
+      return "term";
     case FSTYPE_DEV:
-      type = "dev";
-      break;
+      return "dev";
     case FSTYPE_PROC:
-      type = "proc";
-      break;
+      return "proc";
     case FSTYPE_IFSOCK:
-      type = "ifsock";
-      break;
+      return "ifsock";
     case FSTYPE_AFS:
-      type = "afs";
-      break;
+      return "afs";
     case FSTYPE_DFS:
-      type = "dfs";
-      break;
+      return "dfs";
     case FSTYPE_PROC9:
-      type = "proc9";
-      break;
+      return "proc9";
     case FSTYPE_SOCKET:
-      type = "socket";
-      break;
+      return "socket";
     case FSTYPE_MISC:
-      type = "misc";
-      break;
+      return "misc";
     case FSTYPE_EXT2FS:
-      type = "ext2/ext3";
-      break;
+      return "ext2/ext3";
     case FSTYPE_HTTP:
-      type = "http";
-      break;
+      return "http";
     case FSTYPE_MEMFS:
-      type = "memfs";
-      break;
+      return "memfs";
     case FSTYPE_ISO9660:
-      type = "iso9660";
-      break;
+      return "iso9660";
 # endif
     default:
-      type = NULL;
-      break;
+      {
+	unsigned long int type = statfsbuf->f_type;
+	static char buf[sizeof "UNKNOWN (0x%lx)" - 3
+			+ (sizeof type * CHAR_BIT + 3) / 4];
+	sprintf (buf, "UNKNOWN (0x%lx)", type);
+	return buf;
+      }
     }
-
-  if (type)
-    return (char *) type;
-
-  {
-    static char buf[sizeof "UNKNOWN (0x%x)" - 2
-		    + 2 * sizeof (statfsbuf->f_type)];
-    sprintf (buf, "UNKNOWN (0x%x)", statfsbuf->f_type);
-    return buf;
-  }
 #endif
 }
 
@@ -316,16 +274,18 @@ human_access (struct stat const *statbuf)
 }
 
 static char *
-human_time (time_t const *t)
+human_time (time_t t, int t_ns)
 {
-  static char str[80];
-  struct tm *tm = localtime (t);
+  static char str[MAX (INT_BUFSIZE_BOUND (intmax_t),
+		       (INT_STRLEN_BOUND (int) /* YYYY */
+			+ 1 /* because YYYY might equal INT_MAX + 1900 */
+			+ sizeof "-MM-DD HH:MM:SS.NNNNNNNNN +ZZZZ"))];
+  struct tm const *tm = localtime (&t);
   if (tm == NULL)
-    {
-      G_fail = 1;
-      return (char *) _("*** invalid date/time ***");
-    }
-  nstrftime (str, sizeof str, "%Y-%m-%d %H:%M:%S.%N %z", tm, 0, 0);
+    return (TYPE_SIGNED (time_t)
+	    ? imaxtostr (t, str)
+	    : umaxtostr (t, str));
+  nstrftime (str, sizeof str, "%Y-%m-%d %H:%M:%S.%N %z", tm, 0, t_ns);
   return str;
 }
 
@@ -361,7 +321,8 @@ print_statfs (char *pformat, char m, char const *filename,
     case 't':
 #if HAVE_STRUCT_STATXFS_F_TYPE
       strcat (pformat, "lx");
-      printf (pformat, (long int) (statfsbuf->f_type));  /* no equiv. */
+      printf (pformat,
+	      (unsigned long int) (statfsbuf->f_type));  /* no equiv. */
 #else
       fputc ('*', stdout);
 #endif
@@ -383,8 +344,8 @@ print_statfs (char *pformat, char m, char const *filename,
       printf (pformat, (intmax_t) (statfsbuf->f_bavail));
       break;
     case 's':
-      strcat (pformat, "ld");
-      printf (pformat, (long int) (statfsbuf->f_bsize));
+      strcat (pformat, "lu");
+      printf (pformat, (unsigned long int) (statfsbuf->f_bsize));
       break;
     case 'c':
       strcat (pformat, PRIdMAX);
@@ -420,7 +381,7 @@ print_stat (char *pformat, char m, char const *filename, void const *data)
       strcat (pformat, "s");
       if (S_ISLNK (statbuf->st_mode))
 	{
-	  char *linkname = xreadlink (filename);
+	  char *linkname = xreadlink (filename, statbuf->st_size);
 	  if (linkname == NULL)
 	    {
 	      error (0, errno, _("cannot read symbolic link %s"),
@@ -438,40 +399,41 @@ print_stat (char *pformat, char m, char const *filename, void const *data)
 	}
       break;
     case 'd':
-      strcat (pformat, "d");
-      printf (pformat, (int) statbuf->st_dev);
+      strcat (pformat, PRIuMAX);
+      printf (pformat, (uintmax_t) statbuf->st_dev);
       break;
     case 'D':
-      strcat (pformat, "x");
-      printf (pformat, (int) statbuf->st_dev);
+      strcat (pformat, PRIxMAX);
+      printf (pformat, (uintmax_t) statbuf->st_dev);
       break;
     case 'i':
-      strcat (pformat, "d");
-      printf (pformat, (int) statbuf->st_ino);
+      strcat (pformat, PRIuMAX);
+      printf (pformat, (uintmax_t) statbuf->st_ino);
       break;
     case 'a':
-      strcat (pformat, "o");
-      printf (pformat, statbuf->st_mode & 07777);
+      strcat (pformat, "lo");
+      printf (pformat,
+	      (unsigned long int) (statbuf->st_mode & CHMOD_MODE_BITS));
       break;
     case 'A':
       strcat (pformat, "s");
       printf (pformat, human_access (statbuf));
       break;
     case 'f':
-      strcat (pformat, "x");
-      printf (pformat, statbuf->st_mode);
+      strcat (pformat, "lx");
+      printf (pformat, (unsigned long int) statbuf->st_mode);
       break;
     case 'F':
       strcat (pformat, "s");
       printf (pformat, file_type (statbuf));
       break;
     case 'h':
-      strcat (pformat, "d");
-      printf (pformat, (int) statbuf->st_nlink);
+      strcat (pformat, "lu");
+      printf (pformat, (unsigned long int) statbuf->st_nlink);
       break;
     case 'u':
-      strcat (pformat, "d");
-      printf (pformat, statbuf->st_uid);
+      strcat (pformat, "lu");
+      printf (pformat, (unsigned long int) statbuf->st_uid);
       break;
     case 'U':
       strcat (pformat, "s");
@@ -480,8 +442,8 @@ print_stat (char *pformat, char m, char const *filename, void const *data)
       printf (pformat, (pw_ent != 0L) ? pw_ent->pw_name : "UNKNOWN");
       break;
     case 'g':
-      strcat (pformat, "d");
-      printf (pformat, statbuf->st_gid);
+      strcat (pformat, "lu");
+      printf (pformat, (unsigned long int) statbuf->st_gid);
       break;
     case 'G':
       strcat (pformat, "s");
@@ -490,52 +452,55 @@ print_stat (char *pformat, char m, char const *filename, void const *data)
       printf (pformat, (gw_ent != 0L) ? gw_ent->gr_name : "UNKNOWN");
       break;
     case 't':
-      strcat (pformat, "x");
-      printf (pformat, major (statbuf->st_rdev));
+      strcat (pformat, "lx");
+      printf (pformat, (unsigned long int) major (statbuf->st_rdev));
       break;
     case 'T':
-      strcat (pformat, "x");
-      printf (pformat, minor (statbuf->st_rdev));
+      strcat (pformat, "lx");
+      printf (pformat, (unsigned long int) minor (statbuf->st_rdev));
       break;
     case 's':
       strcat (pformat, PRIuMAX);
       printf (pformat, (uintmax_t) (statbuf->st_size));
       break;
     case 'B':
-      strcat (pformat, "u");
-      printf (pformat, (unsigned int) ST_NBLOCKSIZE);
+      strcat (pformat, "lu");
+      printf (pformat, (unsigned long int) ST_NBLOCKSIZE);
       break;
     case 'b':
-      strcat (pformat, "u");
-      printf (pformat, (unsigned int) ST_NBLOCKS (*statbuf));
+      strcat (pformat, PRIuMAX);
+      printf (pformat, (uintmax_t) ST_NBLOCKS (*statbuf));
       break;
     case 'o':
-      strcat (pformat, "d");
-      printf (pformat, (int) statbuf->st_blksize);
+      strcat (pformat, "lu");
+      printf (pformat, (unsigned long int) statbuf->st_blksize);
       break;
     case 'x':
       strcat (pformat, "s");
-      printf (pformat, human_time (&(statbuf->st_atime)));
+      printf (pformat, human_time (statbuf->st_atime,
+				   TIMESPEC_NS (statbuf->st_atim)));
       break;
     case 'X':
-      strcat (pformat, "d");
-      printf (pformat, (int) statbuf->st_atime);
+      strcat (pformat, TYPE_SIGNED (time_t) ? "ld" : "lu");
+      printf (pformat, (unsigned long int) statbuf->st_atime);
       break;
     case 'y':
       strcat (pformat, "s");
-      printf (pformat, human_time (&(statbuf->st_mtime)));
+      printf (pformat, human_time (statbuf->st_mtime,
+				   TIMESPEC_NS (statbuf->st_mtim)));
       break;
     case 'Y':
-      strcat (pformat, "d");
-      printf (pformat, (int) statbuf->st_mtime);
+      strcat (pformat, TYPE_SIGNED (time_t) ? "ld" : "lu");
+      printf (pformat, (unsigned long int) statbuf->st_mtime);
       break;
     case 'z':
       strcat (pformat, "s");
-      printf (pformat, human_time (&(statbuf->st_ctime)));
+      printf (pformat, human_time (statbuf->st_ctime,
+				   TIMESPEC_NS (statbuf->st_ctim)));
       break;
     case 'Z':
-      strcat (pformat, "d");
-      printf (pformat, (int) statbuf->st_ctime);
+      strcat (pformat, TYPE_SIGNED (time_t) ? "ld" : "lu");
+      printf (pformat, (unsigned long int) statbuf->st_ctime);
       break;
     default:
       strcat (pformat, "c");
@@ -556,7 +521,6 @@ print_it (char const *masterformat, char const *filename,
 
   char *dest = xmalloc (strlen (format) + 1);
 
-
   b = format;
   while (b)
     {
@@ -573,9 +537,12 @@ print_it (char const *masterformat, char const *filename,
 	  dest[1 + len] = 0;
 	  p += len;
 
+	  b = p + 1;
 	  switch (*p)
 	    {
 	    case '\0':
+	      b = NULL;
+	      /* fall through */
 	    case '%':
 	      putchar ('%');
 	      break;
@@ -583,7 +550,6 @@ print_it (char const *masterformat, char const *filename,
 	      print_func (dest, *p, filename, data);
 	      break;
 	    }
-	  b = p + 1;
 	}
       else
 	{
@@ -593,63 +559,59 @@ print_it (char const *masterformat, char const *filename,
     }
   free (format);
   free (dest);
-  fputc ('\n', stdout);
 }
 
-/* stat the filesystem and print what we find */
-static void
-do_statfs (char const *filename, int terse, char const *format)
+/* Stat the file system and print what we find.  */
+static bool
+do_statfs (char const *filename, bool terse, char const *format)
 {
   STRUCT_STATVFS statfsbuf;
-  int i = statfs (filename, &statfsbuf);
 
-  if (i == -1)
+  if (STATFS (filename, &statfsbuf) != 0)
     {
       error (0, errno, _("cannot read file system information for %s"),
 	     quote (filename));
-      return;
+      return false;
     }
 
   if (format == NULL)
     {
       format = (terse
-		? "%n %i %l %t %b %f %a %s %c %d"
+		? "%n %i %l %t %b %f %a %s %c %d\n"
 		: "  File: \"%n\"\n"
 		"    ID: %-8i Namelen: %-7l Type: %T\n"
 		"Blocks: Total: %-10b Free: %-10f Available: %-10a Size: %s\n"
-		"Inodes: Total: %-10c Free: %-10d");
+		"Inodes: Total: %-10c Free: %-10d\n");
     }
 
   print_it (format, filename, print_statfs, &statfsbuf);
+  return true;
 }
 
 /* stat the file and print what we find */
-static void
-do_stat (char const *filename, int follow_links, int terse,
+static bool
+do_stat (char const *filename, bool follow_links, bool terse,
 	 char const *format)
 {
   struct stat statbuf;
-  int i = ((follow_links == 1)
-	   ? stat (filename, &statbuf)
-	   : lstat (filename, &statbuf));
 
-  if (i == -1)
+  if ((follow_links ? stat : lstat) (filename, &statbuf) != 0)
     {
       error (0, errno, _("cannot stat %s"), quote (filename));
-      return;
+      return false;
     }
 
   if (format == NULL)
     {
-      if (terse != 0)
+      if (terse)
 	{
-	  format = "%n %s %b %f %u %g %D %i %h %t %T %X %Y %Z %o";
+	  format = "%n %s %b %f %u %g %D %i %h %t %T %X %Y %Z %o\n";
 	}
       else
 	{
-	  /* tmp hack to match orignal output until conditional implemented */
-	  i = statbuf.st_mode & S_IFMT;
-	  if (i == S_IFCHR || i == S_IFBLK)
+	  /* Temporary hack to match original output until conditional
+	     implemented.  */
+	  if (S_ISBLK (statbuf.st_mode) || S_ISCHR (statbuf.st_mode))
 	    {
 	      format =
 		"  File: %N\n"
@@ -664,28 +626,29 @@ do_stat (char const *filename, int follow_links, int terse,
 	      format =
 		"  File: %N\n"
 		"  Size: %-10s\tBlocks: %-10b IO Block: %-6o %F\n"
-		"Device: %Dh/%dd\tInode: %-10i  Links: %-5h\n"
+		"Device: %Dh/%dd\tInode: %-10i  Links: %h\n"
 		"Access: (%04a/%10.10A)  Uid: (%5u/%8U)   Gid: (%5g/%8G)\n"
 		"Access: %x\n" "Modify: %y\n" "Change: %z\n";
 	    }
 	}
     }
   print_it (format, filename, print_stat, &statbuf);
+  return true;
 }
 
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
     {
       printf (_("Usage: %s [OPTION] FILE...\n"), program_name);
       fputs (_("\
-Display file or filesystem status.\n\
+Display file or file system status.\n\
 \n\
-  -f, --filesystem      display filesystem status instead of file status\n\
+  -f, --file-system     display file system status instead of file status\n\
   -c  --format=FORMAT   use the specified FORMAT instead of the default\n\
   -L, --dereference     follow links\n\
   -t, --terse           print the information in terse form\n\
@@ -694,7 +657,7 @@ Display file or filesystem status.\n\
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
 
       fputs (_("\n\
-The valid format sequences for files (without --filesystem):\n\
+The valid format sequences for files (without --file-system):\n\
 \n\
   %A   Access rights in human readable form\n\
   %a   Access rights in octal\n\
@@ -758,11 +721,13 @@ main (int argc, char *argv[])
 {
   int c;
   int i;
-  int follow_links = 0;
-  int fs = 0;
-  int terse = 0;
+  bool follow_links = false;
+  bool fs = false;
+  bool terse = false;
   char *format = NULL;
+  bool ok = true;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -777,15 +742,20 @@ main (int argc, char *argv[])
 	case 'c':
 	  format = optarg;
 	  break;
+
 	case 'l': /* deprecated */
+	  error (0, 0, _("Warning: `-l' is deprecated; use `-L' instead"));
+	  /* fall through */
 	case 'L':
-	  follow_links = 1;
+	  follow_links = true;
 	  break;
+
 	case 'f':
-	  fs = 1;
+	  fs = true;
 	  break;
+
 	case 't':
-	  terse = 1;
+	  terse = true;
 	  break;
 
 	case_GETOPT_HELP_CHAR;
@@ -799,17 +769,14 @@ main (int argc, char *argv[])
 
   if (argc == optind)
     {
-      error (0, 0, _("too few arguments"));
+      error (0, 0, _("missing operand"));
       usage (EXIT_FAILURE);
     }
 
   for (i = optind; i < argc; i++)
-    {
-      if (fs == 0)
-	do_stat (argv[i], follow_links, terse, format);
-      else
-	do_statfs (argv[i], terse, format);
-    }
+    ok &= (fs
+	   ? do_statfs (argv[i], terse, format)
+	   : do_stat (argv[i], follow_links, terse, format));
 
-  exit (G_fail ? EXIT_FAILURE : EXIT_SUCCESS);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

@@ -1,5 +1,7 @@
 /* linebuffer.c -- read arbitrarily long lines
-   Copyright (C) 1986, 1991, 1998, 1999, 2001 Free Software Foundation, Inc.
+
+   Copyright (C) 1986, 1991, 1998, 1999, 2001, 2003, 2004 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,21 +24,22 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include "linebuffer.h"
-#include "unlocked-io.h"
 #include "xalloc.h"
 
-void free ();
+#if USE_UNLOCKED_IO
+# include "unlocked-io.h"
+#endif
 
 /* Initialize linebuffer LINEBUFFER for use. */
 
 void
 initbuffer (struct linebuffer *linebuffer)
 {
-  linebuffer->length = 0;
-  linebuffer->size = 200;
-  linebuffer->buffer = xmalloc (linebuffer->size);
+  memset (linebuffer, 0, sizeof *linebuffer);
 }
 
 /* Read an arbitrarily long line of text from STREAM into LINEBUFFER.
@@ -44,17 +47,19 @@ initbuffer (struct linebuffer *linebuffer)
    that ends in a non-newline character.  Do not null terminate.
    Therefore the stream can contain NUL bytes, and the length
    (including the newline) is returned in linebuffer->length.
-   Return NULL upon error, or when STREAM is empty.
+   Return NULL when stream is empty.  Return NULL and set errno upon
+   error; callers can distinguish this case from the empty case by
+   invoking ferror (stream).
    Otherwise, return LINEBUFFER.  */
 struct linebuffer *
-readline (struct linebuffer *linebuffer, FILE *stream)
+readlinebuffer (struct linebuffer *linebuffer, FILE *stream)
 {
   int c;
   char *buffer = linebuffer->buffer;
   char *p = linebuffer->buffer;
   char *end = buffer + linebuffer->size; /* Sentinel. */
 
-  if (feof (stream) || ferror (stream))
+  if (feof (stream))
     return NULL;
 
   do
@@ -62,7 +67,7 @@ readline (struct linebuffer *linebuffer, FILE *stream)
       c = getc (stream);
       if (c == EOF)
 	{
-	  if (p == buffer)
+	  if (p == buffer || ferror (stream))
 	    return NULL;
 	  if (p[-1] == '\n')
 	    break;
@@ -70,9 +75,9 @@ readline (struct linebuffer *linebuffer, FILE *stream)
 	}
       if (p == end)
 	{
-	  linebuffer->size *= 2;
-	  buffer = xrealloc (buffer, linebuffer->size);
-	  p = p - linebuffer->buffer + buffer;
+	  size_t oldsize = linebuffer->size;
+	  buffer = x2realloc (buffer, &linebuffer->size);
+	  p = buffer + oldsize;
 	  linebuffer->buffer = buffer;
 	  end = buffer + linebuffer->size;
 	}
@@ -84,11 +89,10 @@ readline (struct linebuffer *linebuffer, FILE *stream)
   return linebuffer;
 }
 
-/* Free linebuffer LINEBUFFER and its data, all allocated with malloc. */
+/* Free the buffer that was allocated for linebuffer LINEBUFFER.  */
 
 void
 freebuffer (struct linebuffer *linebuffer)
 {
   free (linebuffer->buffer);
-  free (linebuffer);
 }

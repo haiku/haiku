@@ -1,6 +1,7 @@
 /* backupfile.c -- make Emacs style backup file names
-   Copyright (C) 1990,91,92,93,94,95,96,97,98,99,2000, 2001, 2002 Free Software
-   Foundation, Inc.
+
+   Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+   1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,19 +18,28 @@
    If not, write to the Free Software Foundation,
    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-/* Written by David MacKenzie <djm@gnu.ai.mit.edu>.
-   Some algorithms adapted from GNU Emacs. */
+/* Written by Paul Eggert and David MacKenzie.
+   Some algorithms adapted from GNU Emacs.  */
 
 #if HAVE_CONFIG_H
 # include <config.h>
 #endif
 
-#include <stdio.h>
-#include <sys/types.h>
-#if HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
+#include "backupfile.h"
+
+#include "argmatch.h"
+#include "dirname.h"
+#include "xalloc.h"
+
+#include <errno.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <limits.h>
+
+#if HAVE_UNISTD_H
+# include <unistd.h>
 #endif
 
 #if HAVE_DIRENT_H
@@ -49,47 +59,41 @@
 # endif
 #endif
 
-#if CLOSEDIR_VOID
-/* Fake a return value. */
-# define CLOSEDIR(d) (closedir (d), 0)
-#else
-# define CLOSEDIR(d) closedir (d)
-#endif
-
-#if HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
-
-#ifndef HAVE_DECL_GETENV
-"this configure-time declaration test was not run"
-#endif
-#if !HAVE_DECL_GETENV
-char *getenv ();
-#endif
-
-#ifndef HAVE_DECL_MALLOC
-"this configure-time declaration test was not run"
-#endif
-#if !HAVE_DECL_MALLOC
-char *malloc ();
-#endif
-
 #if HAVE_DIRENT_H || HAVE_NDIR_H || HAVE_SYS_DIR_H || HAVE_SYS_NDIR_H
 # define HAVE_DIR 1
 #else
 # define HAVE_DIR 0
 #endif
 
-#if HAVE_LIMITS_H
-# include <limits.h>
+#if D_INO_IN_DIRENT
+# define REAL_DIR_ENTRY(dp) ((dp)->d_ino != 0)
+#else
+# define REAL_DIR_ENTRY(dp) 1
 #endif
-#ifndef CHAR_BIT
-# define CHAR_BIT 8
+
+#if ! (HAVE_PATHCONF && defined _PC_NAME_MAX)
+# define pathconf(file, option) (errno = -1)
 #endif
-/* Upper bound on the string length of an integer converted to string.
-   302 / 1000 is ceil (log10 (2.0)).  Subtract 1 for the sign bit;
-   add 1 for integer division truncation; add 1 more for a minus sign.  */
-#define INT_STRLEN_BOUND(t) ((sizeof (t) * CHAR_BIT - 1) * 302 / 1000 + 2)
+
+#ifndef _POSIX_NAME_MAX
+# define _POSIX_NAME_MAX 14
+#endif
+#ifndef SIZE_MAX
+# define SIZE_MAX ((size_t) -1)
+#endif
+
+#if defined _XOPEN_NAME_MAX
+# define NAME_MAX_MINIMUM _XOPEN_NAME_MAX
+#else
+# define NAME_MAX_MINIMUM _POSIX_NAME_MAX
+#endif
+
+#ifndef HAVE_DOS_FILE_NAMES
+# define HAVE_DOS_FILE_NAMES 0
+#endif
+#ifndef HAVE_LONG_FILE_NAMES
+# define HAVE_LONG_FILE_NAMES 0
+#endif
 
 /* ISDIGIT differs from isdigit, as follows:
    - Its arg may be any int or unsigned int; it need not be an unsigned char.
@@ -98,136 +102,237 @@ char *malloc ();
    POSIX says that only '0' through '9' are digits.  Prefer ISDIGIT to
    ISDIGIT_LOCALE unless it's important to use the locale's definition
    of `digit' even when the host does not conform to POSIX.  */
-#define ISDIGIT(c) ((unsigned) (c) - '0' <= 9)
-
-#if D_INO_IN_DIRENT
-# define REAL_DIR_ENTRY(dp) ((dp)->d_ino != 0)
-#else
-# define REAL_DIR_ENTRY(dp) 1
-#endif
-
-#include "argmatch.h"
-#include "backupfile.h"
-#include "dirname.h"
+#define ISDIGIT(c) ((unsigned int) (c) - '0' <= 9)
 
 /* The extension added to file names to produce a simple (as opposed
    to numbered) backup file name. */
-const char *simple_backup_suffix = "~";
+char const *simple_backup_suffix = "~";
 
-static int max_backup_version PARAMS ((const char *, const char *));
-static int version_number PARAMS ((const char *, const char *, size_t));
 
-/* Return the name of the new backup file for file FILE,
-   allocated with malloc.  Return 0 if out of memory.
-   FILE must not end with a '/' unless it is the root directory.
-   Do not call this function if backup_type == none. */
+/* If FILE (which was of length FILELEN before an extension was
+   appended to it) is too long, replace the extension with the single
+   char E.  If the result is still too long, remove the char just
+   before E.  */
 
-char *
-find_backup_file_name (const char *file, enum backup_type backup_type)
+static void
+check_extension (char *file, size_t filelen, char e)
 {
-  size_t backup_suffix_size_max;
-  size_t file_len = strlen (file);
-  size_t numbered_suffix_size_max = INT_STRLEN_BOUND (int) + 4;
-  char *s;
-  const char *suffix = simple_backup_suffix;
+  char *base = base_name (file);
+  size_t baselen = base_len (base);
+  size_t baselen_max = HAVE_LONG_FILE_NAMES ? 255 : NAME_MAX_MINIMUM;
 
-  /* Allow room for simple or `.~N~' backups.  */
-  backup_suffix_size_max = strlen (simple_backup_suffix) + 1;
-  if (HAVE_DIR && backup_suffix_size_max < numbered_suffix_size_max)
-    backup_suffix_size_max = numbered_suffix_size_max;
-
-  s = malloc (file_len + 1
-	      + backup_suffix_size_max + numbered_suffix_size_max);
-  if (s)
+  if (HAVE_DOS_FILE_NAMES || NAME_MAX_MINIMUM < baselen)
     {
-#if HAVE_DIR
-      if (backup_type != simple)
-	{
-	  int highest_backup;
-	  size_t dirlen = dir_len (file);
+      /* The new base name is long enough to require a pathconf check.  */
+      long name_max;
 
-	  memcpy (s, file, dirlen);
-	  if (dirlen == FILESYSTEM_PREFIX_LEN (file))
-	    s[dirlen++] = '.';
-	  s[dirlen] = '\0';
-	  highest_backup = max_backup_version (base_name (file), s);
-	  if (! (backup_type == numbered_existing && highest_backup == 0))
-	    {
-	      char *numbered_suffix = s + (file_len + backup_suffix_size_max);
-	      sprintf (numbered_suffix, ".~%d~", highest_backup + 1);
-	      suffix = numbered_suffix;
-	    }
+      /* Temporarily modify the buffer into its parent directory name,
+	 invoke pathconf on the directory, and then restore the buffer.  */
+      char tmp[sizeof "."];
+      memcpy (tmp, base, sizeof ".");
+      strcpy (base, ".");
+      errno = 0;
+      name_max = pathconf (file, _PC_NAME_MAX);
+      if (0 <= name_max || errno == 0)
+	{
+	  long size = baselen_max = name_max;
+	  if (name_max != size)
+	    baselen_max = SIZE_MAX;
 	}
+      memcpy (base, tmp, sizeof ".");
+    }
+
+  if (HAVE_DOS_FILE_NAMES && baselen_max <= 12)
+    {
+      /* Live within DOS's 8.3 limit.  */
+      char *dot = strchr (base, '.');
+      if (!dot)
+	baselen_max = 8;
+      else
+	{
+	  char const *second_dot = strchr (dot + 1, '.');
+	  baselen_max = (second_dot
+			 ? second_dot - base
+			 : dot + 1 - base + 3);
+	}
+    }
+
+  if (baselen_max < baselen)
+    {
+      baselen = file + filelen - base;
+      if (baselen_max <= baselen)
+	baselen = baselen_max - 1;
+      base[baselen] = e;
+      base[baselen + 1] = '\0';
+    }
+}
+
+#if HAVE_DIR
+
+/* Returned values for NUMBERED_BACKUP.  */
+
+enum numbered_backup_result
+  {
+    /* The new backup name is the same length as an existing backup
+       name, so it's valid for that directory.  */
+    BACKUP_IS_SAME_LENGTH,
+
+    /* Some backup names already exist, but the returned name is longer
+       than any of them, and its length should be checked.  */
+    BACKUP_IS_LONGER,
+
+    /* There are no existing backup names.  The new name's length
+       should be checked.  */
+    BACKUP_IS_NEW
+  };
+
+/* *BUFFER contains a file name.  Store into *BUFFER the next backup
+   name for the named file, with a version number greater than all the
+   existing numbered backups.  Reallocate *BUFFER as necessary; its
+   initial allocated size is BUFFER_SIZE, which must be at least 4
+   bytes longer than the file name to make room for the initially
+   appended ".~1".  FILELEN is the length of the original file name.
+   The returned value indicates what kind of backup was found.  If an
+   I/O or other read error occurs, use the highest backup number that
+   was found.  */
+
+static enum numbered_backup_result
+numbered_backup (char **buffer, size_t buffer_size, size_t filelen)
+{
+  enum numbered_backup_result result = BACKUP_IS_NEW;
+  DIR *dirp;
+  struct dirent *dp;
+  char *buf = *buffer;
+  size_t versionlenmax = 1;
+  char *base = base_name (buf);
+  size_t base_offset = base - buf;
+  size_t baselen = base_len (base);
+
+  /* Temporarily modify the buffer into its parent directory name,
+     open the directory, and then restore the buffer.  */
+  char tmp[sizeof "."];
+  memcpy (tmp, base, sizeof ".");
+  strcpy (base, ".");
+  dirp = opendir (buf);
+  memcpy (base, tmp, sizeof ".");
+  strcpy (base + baselen, ".~1~");
+
+  if (!dirp)
+    return result;
+
+  while ((dp = readdir (dirp)) != NULL)
+    {
+      char const *p;
+      char *q;
+      bool all_9s;
+      size_t versionlen;
+      size_t new_buflen;
+
+      if (! REAL_DIR_ENTRY (dp) || NLENGTH (dp) < baselen + 4)
+	continue;
+
+      if (memcmp (buf + base_offset, dp->d_name, baselen + 2) != 0)
+	continue;
+
+      p = dp->d_name + baselen + 2;
+
+      /* Check whether this file has a version number and if so,
+	 whether it is larger.  Use string operations rather than
+	 integer arithmetic, to avoid problems with integer overflow.  */
+
+      if (! ('1' <= *p && *p <= '9'))
+	continue;
+      all_9s = (*p == '9');
+      for (versionlen = 1; ISDIGIT (p[versionlen]); versionlen++)
+	all_9s &= (p[versionlen] == '9');
+
+      if (! (p[versionlen] == '~' && !p[versionlen + 1]
+	     && (versionlenmax < versionlen
+		 || (versionlenmax == versionlen
+		     && memcmp (buf + filelen + 2, p, versionlen) <= 0))))
+	continue;
+
+      /* This directory has the largest version number seen so far.
+	 Append this highest numbered extension to the file name,
+	 prepending '0' to the number if it is all 9s.  */
+
+      versionlenmax = all_9s + versionlen;
+      result = (all_9s ? BACKUP_IS_LONGER : BACKUP_IS_SAME_LENGTH);
+      new_buflen = filelen + 2 + versionlenmax + 1;
+      if (buffer_size <= new_buflen)
+	{
+	  buf = xnrealloc (buf, 2, new_buflen);
+	  buffer_size = new_buflen * 2;
+	}
+      q = buf + filelen;
+      *q++ = '.';
+      *q++ = '~';
+      *q = '0';
+      q += all_9s;
+      memcpy (q, p, versionlen + 2);
+
+      /* Add 1 to the version number.  */
+
+      q += versionlen;
+      while (*--q == '9')
+	*q = '0';
+      ++*q;
+    }
+
+  closedir (dirp);
+  *buffer = buf;
+  return result;
+}
 #endif /* HAVE_DIR */
 
-      strcpy (s, file);
-      addext (s, suffix, '~');
-    }
+/* Return the name of the new backup file for the existing file FILE,
+   allocated with malloc.  Report an error and fail if out of memory.
+   Do not call this function if backup_type == no_backups.  */
+
+char *
+find_backup_file_name (char const *file, enum backup_type backup_type)
+{
+  size_t filelen = strlen (file);
+  char *s;
+  size_t ssize;
+  bool simple = true;
+
+  /* Allow room for simple or ".~N~" backups.  The guess must be at
+     least sizeof ".~1~", but otherwise will be adjusted as needed.  */
+  size_t simple_backup_suffix_size = strlen (simple_backup_suffix) + 1;
+  size_t backup_suffix_size_guess = simple_backup_suffix_size;
+  enum { GUESS = sizeof ".~12345~" };
+  if (HAVE_DIR && backup_suffix_size_guess < GUESS)
+    backup_suffix_size_guess = GUESS;
+
+  ssize = filelen + backup_suffix_size_guess + 1;
+  s = xmalloc (ssize);
+  memcpy (s, file, filelen + 1);
+
+#if HAVE_DIR
+  if (backup_type != simple_backups)
+    switch (numbered_backup (&s, ssize, filelen))
+      {
+      case BACKUP_IS_SAME_LENGTH:
+	return s;
+
+      case BACKUP_IS_LONGER:
+	simple = false;
+	break;
+
+      case BACKUP_IS_NEW:
+	simple = (backup_type == numbered_existing_backups);
+	break;
+      }
+#endif
+
+  if (simple)
+    memcpy (s + filelen, simple_backup_suffix, simple_backup_suffix_size);
+  check_extension (s, filelen, '~');
   return s;
 }
 
-#if HAVE_DIR
-
-/* Return the number of the highest-numbered backup file for file
-   FILE in directory DIR.  If there are no numbered backups
-   of FILE in DIR, or an error occurs reading DIR, return 0.
-   */
-
-static int
-max_backup_version (const char *file, const char *dir)
-{
-  DIR *dirp;
-  struct dirent *dp;
-  int highest_version;
-  int this_version;
-  size_t file_name_length;
-
-  dirp = opendir (dir);
-  if (!dirp)
-    return 0;
-
-  highest_version = 0;
-  file_name_length = base_len (file);
-
-  while ((dp = readdir (dirp)) != 0)
-    {
-      if (!REAL_DIR_ENTRY (dp) || NLENGTH (dp) < file_name_length + 4)
-	continue;
-
-      this_version = version_number (file, dp->d_name, file_name_length);
-      if (this_version > highest_version)
-	highest_version = this_version;
-    }
-  if (CLOSEDIR (dirp))
-    return 0;
-  return highest_version;
-}
-
-/* If BACKUP is a numbered backup of BASE, return its version number;
-   otherwise return 0.  BASE_LENGTH is the length of BASE.
-   */
-
-static int
-version_number (const char *base, const char *backup, size_t base_length)
-{
-  int version;
-  const char *p;
-
-  version = 0;
-  if (strncmp (base, backup, base_length) == 0
-      && backup[base_length] == '.'
-      && backup[base_length + 1] == '~')
-    {
-      for (p = &backup[base_length + 2]; ISDIGIT (*p); ++p)
-	version = version * 10 + *p - '0';
-      if (p[0] != '~' || p[1])
-	version = 0;
-    }
-  return version;
-}
-#endif /* HAVE_DIR */
-
-static const char * const backup_args[] =
+static char const * const backup_args[] =
 {
   /* In a series of synonyms, present the most meaning full first, so
      that argmatch_valid be more readable. */
@@ -240,22 +345,22 @@ static const char * const backup_args[] =
 
 static const enum backup_type backup_types[] =
 {
-  none, none,
-  simple, simple,
-  numbered_existing, numbered_existing,
-  numbered, numbered
+  no_backups, no_backups,
+  simple_backups, simple_backups,
+  numbered_existing_backups, numbered_existing_backups,
+  numbered_backups, numbered_backups
 };
 
 /* Return the type of backup specified by VERSION.
-   If VERSION is NULL or the empty string, return numbered_existing.
+   If VERSION is NULL or the empty string, return numbered_existing_backups.
    If VERSION is invalid or ambiguous, fail with a diagnostic appropriate
    for the specified CONTEXT.  Unambiguous abbreviations are accepted.  */
 
 enum backup_type
-get_version (const char *context, const char *version)
+get_version (char const *context, char const *version)
 {
   if (version == 0 || *version == 0)
-    return numbered_existing;
+    return numbered_existing_backups;
   else
     return XARGMATCH (context, version, backup_args, backup_types);
 }
@@ -268,7 +373,7 @@ get_version (const char *context, const char *version)
    Unambiguous abbreviations are accepted.  */
 
 enum backup_type
-xget_version (const char *context, const char *version)
+xget_version (char const *context, char const *version)
 {
   if (version && *version)
     return get_version (context, version);

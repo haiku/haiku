@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 2001-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1998, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -26,9 +26,14 @@
 #ifdef HAVE_UTIME_H
 # include <utime.h>
 #endif
+
+#if !HAVE_UTIMES_NULL
 # include <sys/stat.h>
-# include <unistd.h>
 # include <fcntl.h>
+#endif
+
+#include <unistd.h>
+#include <errno.h>
 
 #include "full-write.h"
 #include "safe-read.h"
@@ -56,21 +61,36 @@ utime_null (const char *file)
   int fd;
   char c;
   int status = 0;
-  struct stat sb;
+  struct stat st;
+  int saved_errno = 0;
 
   fd = open (file, O_RDWR);
   if (fd < 0
-      || fstat (fd, &sb) < 0
+      || fstat (fd, &st) < 0
       || safe_read (fd, &c, sizeof c) == SAFE_READ_ERROR
       || lseek (fd, (off_t) 0, SEEK_SET) < 0
       || full_write (fd, &c, sizeof c) != sizeof c
-      /* Maybe do this -- it's necessary on SunOS4.1.3 with some combination
+      /* Maybe do this -- it's necessary on SunOS 4.1.3 with some combination
 	 of patches, but that system doesn't use this code: it has utimes.
 	 || fsync (fd) < 0
       */
-      || (sb.st_size == 0 && ftruncate (fd, sb.st_size) < 0)
-      || close (fd) < 0)
-    status = -1;
+      || (st.st_size == 0 && ftruncate (fd, st.st_size) < 0))
+    {
+      saved_errno = errno;
+      status = -1;
+    }
+
+  if (0 <= fd)
+    {
+      if (close (fd) < 0)
+	status = -1;
+
+      /* If there was a prior failure, use the saved errno value.
+	 But if the only failure was in the close, don't change errno.  */
+      if (saved_errno)
+	errno = saved_errno;
+    }
+
   return status;
 #endif
 }

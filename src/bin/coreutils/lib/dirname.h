@@ -1,4 +1,6 @@
-/*  Copyright (C) 1998, 2001 Free Software Foundation, Inc.
+/*  Take file names apart into directory and base names.
+
+    Copyright (C) 1998, 2001, 2003, 2004 Free Software Foundation, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,13 +19,8 @@
 #ifndef DIRNAME_H_
 # define DIRNAME_H_ 1
 
-# ifndef PARAMS
-#  if defined PROTOTYPES || (defined __STDC__ && __STDC__)
-#   define PARAMS(Args) Args
-#  else
-#   define PARAMS(Args) ()
-#  endif
-# endif
+# include <stdbool.h>
+# include <stddef.h>
 
 # ifndef DIRECTORY_SEPARATOR
 #  define DIRECTORY_SEPARATOR '/'
@@ -33,15 +30,18 @@
 #  define ISSLASH(C) ((C) == DIRECTORY_SEPARATOR)
 # endif
 
-# ifndef FILESYSTEM_PREFIX_LEN
-#  define FILESYSTEM_PREFIX_LEN(Filename) 0
+# ifndef FILE_SYSTEM_PREFIX_LEN
+#  define FILE_SYSTEM_PREFIX_LEN(Filename) 0
 # endif
 
-char *base_name PARAMS ((char const *path));
-char *dir_name PARAMS ((char const *path));
-size_t base_len PARAMS ((char const *path));
-size_t dir_len PARAMS ((char const *path));
+# define IS_ABSOLUTE_FILE_NAME(F) ISSLASH ((F)[FILE_SYSTEM_PREFIX_LEN (F)])
+# define IS_RELATIVE_FILE_NAME(F) (! IS_ABSOLUTE_FILE_NAME (F))
 
-int strip_trailing_slashes PARAMS ((char *path));
+char *base_name (char const *path);
+char *dir_name (char const *path);
+size_t base_len (char const *path);
+size_t dir_len (char const *path);
+
+bool strip_trailing_slashes (char *path);
 
 #endif /* not DIRNAME_H_ */

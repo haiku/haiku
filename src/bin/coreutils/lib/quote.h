@@ -1,5 +1,7 @@
 /* quote.h - prototypes for quote.c
-   Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+
+   Copyright (C) 1998, 1999, 2000, 2001, 2003 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,13 +18,5 @@
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 
-#ifndef PARAMS
-# if defined PROTOTYPES || (defined __STDC__ && __STDC__)
-#  define PARAMS(Args) Args
-# else
-#  define PARAMS(Args) ()
-# endif
-#endif
-
-char const *quote_n PARAMS ((int n, char const *name));
-char const *quote PARAMS ((char const *name));
+char const *quote_n (int n, char const *name);
+char const *quote (char const *name);

@@ -1,5 +1,7 @@
 /* whoami -- print effective userid
-   Copyright (C) 89,90, 1991-1997, 1999-2002 Free Software Foundation, Inc.
+
+   Copyright (C) 89,90, 1991-1997, 1999-2002, 2004 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,8 +27,9 @@
 #include <getopt.h>
 
 #include "system.h"
+#include "error.h"
 #include "long-options.h"
-#include "closeout.h"
+#include "quote.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "whoami"
@@ -36,15 +39,10 @@
 /* The name this program was run with. */
 char *program_name;
 
-static struct option const long_options[] =
-{
-  {0, 0, 0, 0}
-};
-
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -67,8 +65,8 @@ main (int argc, char **argv)
 {
   register struct passwd *pw;
   register uid_t uid;
-  int c;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -77,22 +75,15 @@ main (int argc, char **argv)
   atexit (close_stdout);
 
   parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
-		      AUTHORS, usage);
-
-  while ((c = getopt_long (argc, argv, "", long_options, NULL)) != -1)
-    {
-      switch (c)
-	{
-	case 0:
-	  break;
-
-	default:
-	  usage (EXIT_FAILURE);
-	}
-    }
+		      usage, AUTHORS, (char const *) NULL);
+  if (getopt_long (argc, argv, "", NULL, NULL) != -1)
+    usage (EXIT_FAILURE);
 
   if (optind != argc)
-    usage (EXIT_FAILURE);
+    {
+      error (0, 0, _("extra operand %s"), quote (argv[optind]));
+      usage (EXIT_FAILURE);
+    }
 
   uid = geteuid ();
   pw = getpwuid (uid);
@@ -101,7 +92,7 @@ main (int argc, char **argv)
       puts (pw->pw_name);
       exit (EXIT_SUCCESS);
     }
-  fprintf (stderr, _("%s: cannot find username for UID %u\n"),
-	   program_name, (unsigned) uid);
+  fprintf (stderr, _("%s: cannot find username for UID %lu\n"),
+	   program_name, (unsigned long int) uid);
   exit (EXIT_FAILURE);
 }

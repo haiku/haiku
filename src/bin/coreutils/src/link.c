@@ -1,5 +1,5 @@
 /* link utility for GNU.
-   Copyright (C) 2001-2002 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2002, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ char *program_name;
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -64,6 +64,7 @@ Usage: %s FILE1 FILE2\n\
 int
 main (int argc, char **argv)
 {
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -72,31 +73,28 @@ main (int argc, char **argv)
   atexit (close_stdout);
 
   parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
-		      AUTHORS, usage);
+		      usage, AUTHORS, (char const *) NULL);
+  if (getopt_long (argc, argv, "", NULL, NULL) != -1)
+    usage (EXIT_FAILURE);
 
-  /* The above handles --help and --version.
-     Since there is no other invocation of getopt, handle `--' here.  */
-  if (1 < argc && STREQ (argv[1], "--"))
+  if (argc < optind + 2)
     {
-      --argc;
-      ++argv;
-    }
-
-  if (argc < 3)
-    {
-      error (0, 0, _("too few arguments"));
+      if (argc < optind + 1)
+	error (0, 0, _("missing operand"));
+      else
+	error (0, 0, _("missing operand after %s"), quote (argv[optind]));
       usage (EXIT_FAILURE);
     }
 
-  if (3 < argc)
+  if (optind + 2 < argc)
     {
-      error (0, 0, _("too many arguments"));
+      error (0, 0, _("extra operand %s"), quote (argv[optind + 2]));
       usage (EXIT_FAILURE);
     }
 
-  if (link (argv[1], argv[2]) != 0)
+  if (link (argv[optind], argv[optind + 1]) != 0)
     error (EXIT_FAILURE, errno, _("cannot create link %s to %s"),
-	   quote_n (0, argv[2]), quote_n (1, argv[1]));
+	   quote_n (0, argv[optind + 1]), quote_n (1, argv[optind]));
 
   exit (EXIT_SUCCESS);
 }

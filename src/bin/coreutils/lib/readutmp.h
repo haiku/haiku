@@ -1,5 +1,7 @@
 /* Declarations for GNU's read utmp module.
-   Copyright (C) 1992-2002 Free Software Foundation, Inc.
+
+   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+   2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,19 +22,12 @@
 #ifndef __READUTMP_H__
 # define __READUTMP_H__
 
-# ifndef PARAMS
-#  if defined PROTOTYPES || (defined __STDC__ && __STDC__)
-#   define PARAMS(Args) Args
-#  else
-#   define PARAMS(Args) ()
-#  endif
-# endif
-
 # include <sys/types.h>
 
 /* AIX 4.3.3 has both utmp.h and utmpx.h, but only struct utmp
    has the ut_exit member.  */
-# if HAVE_UTMPX_H && HAVE_UTMP_H && HAVE_STRUCT_UTMP_UT_EXIT && ! HAVE_STRUCT_UTMPX_UT_EXIT
+# if (HAVE_UTMPX_H && HAVE_UTMP_H && HAVE_STRUCT_UTMP_UT_EXIT \
+      && ! HAVE_STRUCT_UTMPX_UT_EXIT)
 #  undef HAVE_UTMPX_H
 # endif
 
@@ -40,7 +35,7 @@
 #  ifdef HAVE_UTMP_H
     /* HPUX 10.20 needs utmp.h, for the definition of e.g., UTMP_FILE.  */
 #   include <utmp.h>
-#  endif // HAVE_UTMP_H
+#  endif
 #  include <utmpx.h>
 #  define UTMP_STRUCT_NAME utmpx
 #  define UT_TIME_MEMBER(UT_PTR) ((UT_PTR)->ut_tv.tv_sec)
@@ -49,7 +44,7 @@
 #  define END_UTMP_ENT endutxent
 #  ifdef HAVE_UTMPXNAME
 #   define UTMP_NAME_FUNCTION utmpxname
-#  endif // HAVE_UTMPXNAME
+#  endif
 
 #  if HAVE_STRUCT_UTMPX_UT_EXIT_E_TERMINATION
 #   define UT_EXIT_E_TERMINATION(U) ((U)->ut_exit.e_termination)
@@ -58,8 +53,8 @@
 #    define UT_EXIT_E_TERMINATION(U) ((U)->ut_exit.ut_termination)
 #   else
 #    define UT_EXIT_E_TERMINATION(U) 0
-#   endif // HAVE_STRUCT_UTMPX_UT_EXIT_UT_TERMINATION
-#  endif // HAVE_STRUCT_UTMPX_UT_EXIT_E_TERMINATION
+#   endif
+#  endif
 
 #  if HAVE_STRUCT_UTMPX_UT_EXIT_E_EXIT
 #   define UT_EXIT_E_EXIT(U) ((U)->ut_exit.e_exit)
@@ -72,9 +67,7 @@
 #  endif
 
 # else
-#  ifdef HAVE_UTMP_H
 #  include <utmp.h>
-#  endif // HAVE_UTMP_H
 #  if !HAVE_DECL_GETUTENT
     struct utmp *getutent();
 #  endif
@@ -123,11 +116,11 @@
 # else
 
 #  if HAVE_STRUCT_UTMP_UT_USER
-#   define UT_USER(Utmp) Utmp->ut_user
+#   define UT_USER(Utmp) ((Utmp)->ut_user)
 #  endif
 #  if HAVE_STRUCT_UTMP_UT_NAME
 #   undef UT_USER
-#   define UT_USER(Utmp) Utmp->ut_name
+#   define UT_USER(Utmp) ((Utmp)->ut_name)
 #  endif
 
 # endif
@@ -144,21 +137,9 @@
     (HAVE_STRUCT_UTMP_UT_PID \
      || HAVE_STRUCT_UTMPX_UT_PID)
 
-# define HAVE_STRUCT_XTMP_UT_TYPE \
-    (HAVE_STRUCT_UTMP_UT_TYPE \
-     || HAVE_STRUCT_UTMPX_UT_TYPE)
-
 typedef struct UTMP_STRUCT_NAME STRUCT_UTMP;
 
-# include <time.h>
-# ifdef HAVE_SYS_PARAM_H
-#  include <sys/param.h>
-# endif
-
-# include <errno.h>
-# ifndef errno
-extern int errno;
-# endif
+enum { UT_USER_SIZE = sizeof UT_USER ((STRUCT_UTMP *) 0) };
 
 # if !defined (UTMP_FILE) && defined (_PATH_UTMP)
 #  define UTMP_FILE _PATH_UTMP
@@ -186,15 +167,32 @@ extern int errno;
 #  define WTMP_FILE "/etc/wtmp"
 # endif
 
-# undef PARAMS
-# if defined (__STDC__) && __STDC__
-#  define PARAMS(Args) Args
+# if HAVE_STRUCT_UTMP_UT_TYPE || HAVE_STRUCT_UTMPX_UT_TYPE
+#  define UT_TYPE_EQ(U, V) ((U)->ut_type == (V))
+#  define UT_TYPE_NOT_DEFINED 0
 # else
-#  define PARAMS(Args) ()
+#  define UT_TYPE_EQ(U, V) 0
+#  define UT_TYPE_NOT_DEFINED 1
 # endif
 
-extern char *extract_trimmed_name PARAMS ((const STRUCT_UTMP *ut));
-extern int read_utmp PARAMS ((const char *filename,
-			      int *n_entries, STRUCT_UTMP **utmp_buf));
+# ifdef BOOT_TIME
+#  define UT_TYPE_BOOT_TIME(U) UT_TYPE_EQ (U, BOOT_TIME)
+# else
+#  define UT_TYPE_BOOT_TIME(U) 0
+# endif
+
+# ifdef USER_PROCESS
+#  define UT_TYPE_USER_PROCESS(U) UT_TYPE_EQ (U, USER_PROCESS)
+# else
+#  define UT_TYPE_USER_PROCESS(U) 0
+# endif
+
+# define IS_USER_PROCESS(U)					\
+   (UT_USER (U)[0]						\
+    && (UT_TYPE_USER_PROCESS (U)				\
+        || (UT_TYPE_NOT_DEFINED && UT_TIME_MEMBER (U) != 0)))
+
+char *extract_trimmed_name (const STRUCT_UTMP *ut);
+int read_utmp (const char *filename, size_t *n_entries, STRUCT_UTMP **utmp_buf);
 
 #endif /* __READUTMP_H__ */

@@ -1,6 +1,7 @@
 /* An interface to read and write that retries (if necessary) until complete.
 
-   Copyright (C) 1993, 1994, 1997-2003 Free Software Foundation, Inc.
+   Copyright (C) 1993, 1994, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+   2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,20 +21,22 @@
 # include <config.h>
 #endif
 
-#include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
-
+/* Specification.  */
 #ifdef FULL_READ
 # include "full-read.h"
+#else
+# include "full-write.h"
+#endif
+
+#include <errno.h>
+
+#ifdef FULL_READ
 # include "safe-read.h"
 # define safe_rw safe_read
 # define full_rw full_read
 # undef const
 # define const /* empty */
 #else
-# include "full-write.h"
 # include "safe-write.h"
 # define safe_rw safe_write
 # define full_rw full_write

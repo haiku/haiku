@@ -1,5 +1,5 @@
 /* tee - read from standard input and write to standard output and files.
-   Copyright (C) 85,1990-2002 Free Software Foundation, Inc.
+   Copyright (C) 85,1990-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,21 +24,20 @@
 #include <getopt.h>
 
 #include "system.h"
-#include "closeout.h"
 #include "error.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "tee"
 
-#define AUTHORS N_ ("Mike Parker, Richard M. Stallman, and David MacKenzie")
+#define AUTHORS "Mike Parker", "Richard M. Stallman", "David MacKenzie"
 
-static int tee (int nfiles, const char **files);
+static bool tee (int nfiles, const char **files);
 
-/* If nonzero, append to output files rather than truncating them. */
-static int append;
+/* If true, append to output files rather than truncating them. */
+static bool append;
 
-/* If nonzero, ignore interrupts. */
-static int ignore_interrupts;
+/* If true, ignore interrupts. */
+static bool ignore_interrupts;
 
 /* The name that this program was run with. */
 char *program_name;
@@ -55,7 +54,7 @@ static struct option const long_options[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -69,6 +68,10 @@ Copy standard input to each FILE, and also to standard output.\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+      fputs (_("\
+\n\
+If a FILE is -, copy again to standard output.\n\
+"), stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
   exit (status);
@@ -77,9 +80,10 @@ Copy standard input to each FILE, and also to standard output.\n\
 int
 main (int argc, char **argv)
 {
-  int errs;
+  bool ok;
   int optc;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -87,22 +91,19 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
-  append = 0;
-  ignore_interrupts = 0;
+  append = false;
+  ignore_interrupts = false;
 
   while ((optc = getopt_long (argc, argv, "ai", long_options, NULL)) != -1)
     {
       switch (optc)
 	{
-	case 0:
-	  break;
-
 	case 'a':
-	  append = 1;
+	  append = true;
 	  break;
 
 	case 'i':
-	  ignore_interrupts = 1;
+	  ignore_interrupts = true;
 	  break;
 
 	case_GETOPT_HELP_CHAR;
@@ -115,58 +116,33 @@ main (int argc, char **argv)
     }
 
   if (ignore_interrupts)
-    {
-#ifdef _POSIX_SOURCE
-      struct sigaction sigact;
-
-      sigact.sa_handler = SIG_IGN;
-      sigemptyset (&sigact.sa_mask);
-      sigact.sa_flags = 0;
-      sigaction (SIGINT, &sigact, NULL);
-#else				/* !_POSIX_SOURCE */
-      signal (SIGINT, SIG_IGN);
-#endif				/* _POSIX_SOURCE */
-    }
-
-  /* Don't let us be killed if one of the output files is a pipe that
-     doesn't consume all its input.  */
-#ifdef _POSIX_SOURCE
-  {
-    struct sigaction sigact;
-
-    sigact.sa_handler = SIG_IGN;
-    sigemptyset (&sigact.sa_mask);
-    sigact.sa_flags = 0;
-    sigaction (SIGPIPE, &sigact, NULL);
-  }
-#else
-  signal (SIGPIPE, SIG_IGN);
-#endif
+    signal (SIGINT, SIG_IGN);
 
   /* Do *not* warn if tee is given no file arguments.
      POSIX requires that it work when given no arguments.  */
 
-  errs = tee (argc - optind, (const char **) &argv[optind]);
+  ok = tee (argc - optind, (const char **) &argv[optind]);
   if (close (STDIN_FILENO) != 0)
     error (EXIT_FAILURE, errno, _("standard input"));
 
-  exit (errs);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 /* Copy the standard input into each of the NFILES files in FILES
    and into the standard output.
-   Return 0 if successful, 1 if any errors occur. */
+   Return true if successful.  */
 
-static int
+static bool
 tee (int nfiles, const char **files)
 {
   FILE **descriptors;
   char buffer[BUFSIZ];
-  int bytes_read, i;
-  int ret = 0;
+  ssize_t bytes_read;
+  int i;
+  bool ok = true;
   const char *mode_string = (append ? "a" : "w");
 
-  descriptors = (FILE **) xmalloc ((nfiles + 1) * sizeof (descriptors[0]));
+  descriptors = xnmalloc (nfiles + 1, sizeof *descriptors);
 
   /* Move all the names `up' one in the argv array to make room for
      the entry for standard output.  This writes into argv[argc].  */
@@ -183,11 +159,13 @@ tee (int nfiles, const char **files)
 
   for (i = 1; i <= nfiles; i++)
     {
-      descriptors[i] = fopen (files[i], mode_string);
+      descriptors[i] = (STREQ (files[i], "-")
+			? stdout
+			: fopen (files[i], mode_string));
       if (descriptors[i] == NULL)
 	{
 	  error (0, errno, "%s", files[i]);
-	  ret = 1;
+	  ok = false;
 	}
       else
 	{
@@ -209,28 +187,30 @@ tee (int nfiles, const char **files)
       /* Write to all NFILES + 1 descriptors.
 	 Standard output is the first one.  */
       for (i = 0; i <= nfiles; i++)
-	{
-	  if (descriptors[i] != NULL)
-	    fwrite (buffer, bytes_read, 1, descriptors[i]);
-	}
+	if (descriptors[i]
+	    && fwrite (buffer, 1, bytes_read, descriptors[i]) != bytes_read)
+	  {
+	    error (0, errno, "%s", files[i]);
+	    descriptors[i] = NULL;
+	    ok = false;
+	  }
     }
 
   if (bytes_read == -1)
     {
       error (0, errno, _("read error"));
-      ret = 1;
+      ok = false;
     }
 
   /* Close the files, but not standard output.  */
   for (i = 1; i <= nfiles; i++)
-    if (descriptors[i] != NULL
-	&& (ferror (descriptors[i]) || fclose (descriptors[i]) == EOF))
+    if (descriptors[i] && fclose (descriptors[i]) != 0)
       {
 	error (0, errno, "%s", files[i]);
-	ret = 1;
+	ok = false;
       }
 
   free (descriptors);
 
-  return ret;
+  return ok;
 }

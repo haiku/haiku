@@ -1,5 +1,6 @@
 /* BSD compatible remove directory function for System V
-   Copyright (C) 1988, 1990 Free Software Foundation, Inc.
+
+   Copyright (C) 1988, 1990, 1999, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,19 +22,9 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
 
-#if STAT_MACROS_BROKEN
-# undef S_ISDIR
-#endif
-
-#if !defined(S_ISDIR) && defined(S_IFDIR)
-# define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
-#endif
+#include "stat-macros.h"
 
 /* rmdir adapted from GNU tar.  */
 
@@ -41,8 +32,7 @@ extern int errno;
    Return 0 if successful, -1 if not.  */
 
 int
-rmdir (dpath)
-     char *dpath;
+rmdir (char const *dpath)
 {
   pid_t cpid;
   int status;

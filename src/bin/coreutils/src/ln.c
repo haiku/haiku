@@ -1,5 +1,5 @@
 /* `ln' program to create links between files.
-   Copyright (C) 86, 89, 90, 91, 1995-2002 Free Software Foundation, Inc.
+   Copyright (C) 86, 89, 90, 91, 1995-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,10 +17,6 @@
 
 /* Written by Mike Parker and David MacKenzie. */
 
-#ifdef _AIX
- #pragma alloca
-#endif
-
 #include <config.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -32,23 +28,15 @@
 #include "dirname.h"
 #include "error.h"
 #include "quote.h"
+#include "yesno.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "ln"
 
-#define AUTHORS N_ ("Mike Parker and David MacKenzie")
+#define AUTHORS "Mike Parker", "David MacKenzie"
 
-/* For long options that have no equivalent short option, use a
-   non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
-enum
-{
-  TARGET_DIRECTORY_OPTION = CHAR_MAX + 1
-};
-
-int link ();			/* Some systems don't declare this anywhere. */
-
-#ifdef S_ISLNK
-int symlink ();
+#ifndef ENABLE_HARD_LINK_TO_SYMLINK_WARNING
+# define ENABLE_HARD_LINK_TO_SYMLINK_WARNING 0
 #endif
 
 /* In being careful not even to try to make hard links to directories,
@@ -73,61 +61,63 @@ int symlink ();
       {									\
 	const char *source_base;					\
 	char *tmp_source;						\
+	size_t buf_len = strlen (source) + 1;				\
 									\
-	tmp_source = (char *) alloca (strlen ((source)) + 1);		\
-	strcpy (tmp_source, (source));					\
+	tmp_source = alloca (buf_len);					\
+	memcpy (tmp_source, (source), buf_len);				\
 	strip_trailing_slashes (tmp_source);				\
 	source_base = base_name (tmp_source);				\
 									\
-	(new_dest) = (char *) alloca (strlen ((dest)) + 1		\
+	(new_dest) = alloca (strlen ((dest)) + 1			\
 				      + strlen (source_base) + 1);	\
 	stpcpy (stpcpy (stpcpy ((new_dest), (dest)), "/"), source_base);\
       }									\
     while (0)
 
-int isdir ();
-int yesno ();
-
 /* The name by which the program was run, for error messages.  */
 char *program_name;
 
 /* FIXME: document */
-enum backup_type backup_type;
+static enum backup_type backup_type;
 
 /* A pointer to the function used to make links.  This will point to either
    `link' or `symlink'. */
 static int (*linkfunc) ();
 
-/* If nonzero, make symbolic links; otherwise, make hard links.  */
-static int symbolic_link;
+/* If true, make symbolic links; otherwise, make hard links.  */
+static bool symbolic_link;
 
-/* If nonzero, ask the user before removing existing files.  */
-static int interactive;
+/* If true, ask the user before removing existing files.  */
+static bool interactive;
 
-/* If nonzero, remove existing files unconditionally.  */
-static int remove_existing_files;
+/* If true, remove existing files unconditionally.  */
+static bool remove_existing_files;
 
-/* If nonzero, list each file as it is moved. */
-static int verbose;
+/* If true, list each file as it is moved. */
+static bool verbose;
 
-/* If nonzero, allow the superuser to make hard links to directories. */
-static int hard_dir_link;
+/* If true, allow the superuser to *attempt* to make hard links
+   to directories.  However, it appears that this option is not useful
+   in practice, since even the superuser is prohibited from hard-linking
+   directories on most (all?) existing systems.  */
+static bool hard_dir_link;
 
 /* If nonzero, and the specified destination is a symbolic link to a
    directory, treat it just as if it were a directory.  Otherwise, the
    command `ln --force --no-dereference file symlink-to-dir' deletes
    symlink-to-dir before creating the new link.  */
-static int dereference_dest_dir_symlinks = 1;
+static bool dereference_dest_dir_symlinks = true;
 
 static struct option const long_options[] =
 {
   {"backup", optional_argument, NULL, 'b'},
   {"directory", no_argument, NULL, 'F'},
   {"no-dereference", no_argument, NULL, 'n'},
+  {"no-target-directory", no_argument, NULL, 'T'},
   {"force", no_argument, NULL, 'f'},
   {"interactive", no_argument, NULL, 'i'},
   {"suffix", required_argument, NULL, 'S'},
-  {"target-directory", required_argument, NULL, TARGET_DIRECTORY_OPTION},
+  {"target-directory", required_argument, NULL, 't'},
   {"symbolic", no_argument, NULL, 's'},
   {"verbose", no_argument, NULL, 'v'},
   {"version-control", required_argument, NULL, 'V'}, /* Deprecated. FIXME. */
@@ -136,19 +126,40 @@ static struct option const long_options[] =
   {NULL, 0, NULL, 0}
 };
 
+/* FILE is the last operand of this command.  Return true if FILE is a
+   directory.  But report an error there is a problem accessing FILE,
+   or if FILE does not exist but would have to refer to an existing
+   directory if it referred to anything at all.  */
+
+static bool
+target_directory_operand (char const *file)
+{
+  char const *b = base_name (file);
+  size_t blen = strlen (b);
+  bool looks_like_a_dir = (blen == 0 || ISSLASH (b[blen - 1]));
+  struct stat st;
+  int err = ((dereference_dest_dir_symlinks ? stat : lstat) (file, &st) == 0
+	     ? 0 : errno);
+  bool is_a_dir = !err && S_ISDIR (st.st_mode);
+  if (err && err != ENOENT)
+    error (EXIT_FAILURE, err, _("accessing %s"), quote (file));
+  if (is_a_dir < looks_like_a_dir)
+    error (EXIT_FAILURE, err, _("target %s is not a directory"), quote (file));
+  return is_a_dir;
+}
+
 /* Make a link DEST to the (usually) existing file SOURCE.
    Symbolic links to nonexistent files are allowed.
-   If DEST is a directory, put the link to SOURCE in that directory.
-   Return 1 if there is an error, otherwise 0.  */
+   If DEST_IS_DIR, put the link to SOURCE in the DEST directory.
+   Return true if successful.  */
 
-static int
-do_link (const char *source, const char *dest)
+static bool
+do_link (const char *source, const char *dest, bool dest_is_dir)
 {
   struct stat source_stats;
   struct stat dest_stats;
   char *dest_backup = NULL;
-  int lstat_status;
-  int backup_succeeded = 0;
+  bool lstat_ok = false;
 
   /* Use stat here instead of lstat.
      On SVR4, link does not follow symlinks, so this check disallows
@@ -159,10 +170,11 @@ do_link (const char *source, const char *dest)
       if (STAT_LIKE_LINK (source, &source_stats) != 0)
 	{
 	  error (0, errno, _("accessing %s"), quote (source));
-	  return 1;
+	  return false;
 	}
 
-      if (S_ISLNK (source_stats.st_mode))
+      if (ENABLE_HARD_LINK_TO_SYMLINK_WARNING
+	  && S_ISLNK (source_stats.st_mode))
 	{
 	  error (0, 0, _("%s: warning: making a hard link to a symbolic link\
  is not portable"),
@@ -173,42 +185,25 @@ do_link (const char *source, const char *dest)
 	{
 	  error (0, 0, _("%s: hard link not allowed for directory"),
 		 quote (source));
-	  return 1;
+	  return false;
 	}
     }
 
-  lstat_status = lstat (dest, &dest_stats);
-  if (lstat_status != 0 && errno != ENOENT)
+  if (dest_is_dir)
     {
-      error (0, errno, _("accessing %s"), quote (dest));
-      return 1;
-    }
-
-  /* If the destination is a directory or (it is a symlink to a directory
-     and the user has not specified --no-dereference), then form the
-     actual destination name by appending base_name (source) to the
-     specified destination directory.  */
-  if ((lstat_status == 0
-       && S_ISDIR (dest_stats.st_mode))
-#ifdef S_ISLNK
-      || (dereference_dest_dir_symlinks
-	  && (lstat_status == 0
-	      && S_ISLNK (dest_stats.st_mode)
-	      && isdir (dest)))
-#endif
-     )
-    {
-      /* Target is a directory; build the full filename. */
+      /* Treat DEST as a directory; build the full filename.  */
       char *new_dest;
       PATH_BASENAME_CONCAT (new_dest, dest, source);
       dest = new_dest;
+    }
 
-      /* Get stats for new DEST.  */
-      lstat_status = lstat (dest, &dest_stats);
-      if (lstat_status != 0 && errno != ENOENT)
+  if (remove_existing_files || interactive || backup_type != no_backups)
+    {
+      lstat_ok = (lstat (dest, &dest_stats) == 0);
+      if (!lstat_ok && errno != ENOENT)
 	{
 	  error (0, errno, _("accessing %s"), quote (dest));
-	  return 1;
+	  return false;
 	}
     }
 
@@ -218,84 +213,58 @@ do_link (const char *source, const char *dest)
      But if the source and destination are the same, don't remove
      anything and fail right here.  */
   if (remove_existing_files
-      && lstat_status == 0
+      && lstat_ok
       /* Allow `ln -sf --backup k k' to succeed in creating the
 	 self-referential symlink, but don't allow the hard-linking
 	 equivalent: `ln -f k k' (with or without --backup) to get
 	 beyond this point, because the error message you'd get is
 	 misleading.  */
-      && (backup_type == none || !symbolic_link)
+      && (backup_type == no_backups || !symbolic_link)
       && (!symbolic_link || stat (source, &source_stats) == 0)
-      && source_stats.st_dev == dest_stats.st_dev
-      && source_stats.st_ino == dest_stats.st_ino
+      && SAME_INODE (source_stats, dest_stats)
       /* The following detects whether removing DEST will also remove
- 	 SOURCE.  If the file has only one link then both are surely
- 	 the same link.  Otherwise check whether they point to the same
+	 SOURCE.  If the file has only one link then both are surely
+	 the same link.  Otherwise check whether they point to the same
 	 name in the same directory.  */
       && (source_stats.st_nlink == 1 || same_name (source, dest)))
     {
       error (0, 0, _("%s and %s are the same file"),
 	     quote_n (0, source), quote_n (1, dest));
-      return 1;
+      return false;
     }
 
-  if (lstat_status == 0 || lstat (dest, &dest_stats) == 0)
+  if (lstat_ok)
     {
       if (S_ISDIR (dest_stats.st_mode))
 	{
 	  error (0, 0, _("%s: cannot overwrite directory"), quote (dest));
-	  return 1;
+	  return false;
 	}
       if (interactive)
 	{
 	  fprintf (stderr, _("%s: replace %s? "), program_name, quote (dest));
 	  if (!yesno ())
-	    return 0;
-	}
-      else if (!remove_existing_files && backup_type == none)
-	{
-	  error (0, 0, _("%s: File exists"), quote (dest));
-	  return 1;
+	    return true;
 	}
 
-      if (backup_type != none)
+      if (backup_type != no_backups)
 	{
 	  char *tmp_backup = find_backup_file_name (dest, backup_type);
-	  if (tmp_backup == NULL)
-	    xalloc_die ();
-	  dest_backup = (char *) alloca (strlen (tmp_backup) + 1);
-	  strcpy (dest_backup, tmp_backup);
+	  size_t buf_len = strlen (tmp_backup) + 1;
+	  dest_backup = alloca (buf_len);
+	  memcpy (dest_backup, tmp_backup, buf_len);
 	  free (tmp_backup);
 	  if (rename (dest, dest_backup))
 	    {
 	      if (errno != ENOENT)
 		{
 		  error (0, errno, _("cannot backup %s"), quote (dest));
-		  return 1;
+		  return false;
 		}
 	      else
 		dest_backup = NULL;
 	    }
-	  else
-	    {
-	      backup_succeeded = 1;
-	    }
 	}
-
-      /* Try to unlink DEST even if we may have renamed it.  In some unusual
-	 cases (when DEST and DEST_BACKUP are hard-links that refer to the
-	 same file), rename succeeds and DEST remains.  If we didn't remove
-	 DEST in that case, the subsequent LINKFUNC call would fail.  */
-      if (unlink (dest) && errno != ENOENT)
-	{
-	  error (0, errno, _("cannot remove %s"), quote (dest));
-	  return 1;
-	}
-    }
-  else if (errno != ENOENT)
-    {
-      error (0, errno, _("accessing %s"), quote (dest));
-      return 1;
     }
 
   if (verbose)
@@ -304,14 +273,42 @@ do_link (const char *source, const char *dest)
 	       ? _("create symbolic link %s to %s")
 	       : _("create hard link %s to %s")),
 	      quote_n (0, dest), quote_n (1, source));
-      if (backup_succeeded)
+      if (dest_backup)
 	printf (_(" (backup: %s)"), quote (dest_backup));
       putchar ('\n');
     }
 
   if ((*linkfunc) (source, dest) == 0)
+    return true;
+
+  /* If the attempt to create a link failed and we are removing or
+     backing up destinations, unlink the destination and try again.
+
+     POSIX 1003.1-2004 requires that ln -f A B must unlink B even on
+     failure (e.g., when A does not exist).  This is counterintuitive,
+     and we submitted a defect report
+     <http://www.opengroup.org/sophocles/show_mail.tpl?source=L&listname=austin-review-l&id=1795>
+     (2004-06-24).  If the committee does not fix the standard we'll
+     have to change the behavior of ln -f, at least if POSIXLY_CORRECT
+     is set.  In the meantime ln -f A B will not unlink B unless the
+     attempt to link A to B failed because B already existed.
+
+     Try to unlink DEST even if we may have backed it up successfully.
+     In some unusual cases (when DEST and DEST_BACKUP are hard-links
+     that refer to the same file), rename succeeds and DEST remains.
+     If we didn't remove DEST in that case, the subsequent LINKFUNC
+     call would fail.  */
+
+  if (errno == EEXIST && (remove_existing_files || dest_backup))
     {
-      return 0;
+      if (unlink (dest) != 0)
+	{
+	  error (0, errno, _("cannot remove %s"), quote (dest));
+	  return false;
+	}
+
+      if (linkfunc (source, dest) == 0)
+	return true;
     }
 
   error (0, errno,
@@ -325,30 +322,30 @@ do_link (const char *source, const char *dest)
       if (rename (dest_backup, dest))
 	error (0, errno, _("cannot un-backup %s"), quote (dest));
     }
-  return 1;
+  return false;
 }
 
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
     {
       printf (_("\
-Usage: %s [OPTION]... TARGET [LINK_NAME]\n\
-  or:  %s [OPTION]... TARGET... DIRECTORY\n\
-  or:  %s [OPTION]... --target-directory=DIRECTORY TARGET...\n\
+Usage: %s [OPTION]... [-T] TARGET LINK_NAME   (1st form)\n\
+  or:  %s [OPTION]... TARGET                  (2nd form)\n\
+  or:  %s [OPTION]... TARGET... DIRECTORY     (3rd form)\n\
+  or:  %s [OPTION]... -t DIRECTORY TARGET...  (4th form)\n\
 "),
-	      program_name, program_name, program_name);
+	      program_name, program_name, program_name, program_name);
       fputs (_("\
-Create a link to the specified TARGET with optional LINK_NAME.\n\
-If LINK_NAME is omitted, a link with the same basename as the TARGET is\n\
-created in the current directory.  When using the second form with more\n\
-than one TARGET, the last argument must be a directory;  create links\n\
-in DIRECTORY to each TARGET.  Create hard links by default, symbolic\n\
-links with --symbolic.  When creating hard links, each TARGET must exist.\n\
+In the 1st form, create a link to TARGET with the name LINK_NAME.\n\
+In the 2nd form, create a link to TARGET in the current directory.\n\
+In the 3rd and 4th forms, create links to each TARGET in DIRECTORY.\n\
+Create hard links by default, symbolic links with --symbolic.\n\
+When creating hard links, each TARGET must exist.\n\
 \n\
 "), stdout);
       fputs (_("\
@@ -357,7 +354,9 @@ Mandatory arguments to long options are mandatory for short options too.\n\
       fputs (_("\
       --backup[=CONTROL]      make a backup of each existing destination file\n\
   -b                          like --backup but does not accept an argument\n\
-  -d, -F, --directory         hard link directories (super-user only)\n\
+  -d, -F, --directory         allow the superuser to attempt to hard link\n\
+                                directories (note: will probably fail due to\n\
+                                system restrictions, even for the superuser)\n\
   -f, --force                 remove existing destination files\n\
 "), stdout);
       fputs (_("\
@@ -368,8 +367,9 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
   -S, --suffix=SUFFIX         override the usual backup suffix\n\
-      --target-directory=DIRECTORY  specify the DIRECTORY in which to create\n\
+  -t, --target-directory=DIRECTORY  specify the DIRECTORY in which to create\n\
                                 the links\n\
+  -T, --no-target-directory   treat LINK_NAME as a normal file\n\
   -v, --verbose               print name of each file before linking\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
@@ -396,16 +396,16 @@ int
 main (int argc, char **argv)
 {
   int c;
-  int errors;
-  int make_backups = 0;
+  bool ok;
+  bool make_backups = false;
   char *backup_suffix_string;
   char *version_control_string = NULL;
   char *target_directory = NULL;
-  int target_directory_specified;
-  unsigned int n_files;
+  bool no_target_directory = false;
+  int n_files;
   char **file;
-  int dest_is_dir;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -418,17 +418,13 @@ main (int argc, char **argv)
   backup_suffix_string = getenv ("SIMPLE_BACKUP_SUFFIX");
 
   symbolic_link = remove_existing_files = interactive = verbose
-    = hard_dir_link = 0;
-  errors = 0;
+    = hard_dir_link = false;
 
-  while ((c = getopt_long (argc, argv, "bdfinsvFS:V:", long_options, NULL))
+  while ((c = getopt_long (argc, argv, "bdfinst:vFS:TV:", long_options, NULL))
 	 != -1)
     {
       switch (c)
 	{
-	case 0:			/* Long-named option. */
- 	  break;
-
 	case 'V':  /* FIXME: this is deprecated.  Remove it in 2001.  */
 	  error (0, 0,
 		 _("warning: --version-control (-V) is obsolete;  support for\
@@ -437,41 +433,55 @@ main (int argc, char **argv)
 	  /* Fall through.  */
 
 	case 'b':
-	  make_backups = 1;
+	  make_backups = true;
 	  if (optarg)
 	    version_control_string = optarg;
 	  break;
 	case 'd':
 	case 'F':
-	  hard_dir_link = 1;
+	  hard_dir_link = true;
 	  break;
 	case 'f':
-	  remove_existing_files = 1;
-	  interactive = 0;
+	  remove_existing_files = true;
+	  interactive = false;
 	  break;
 	case 'i':
-	  remove_existing_files = 0;
-	  interactive = 1;
+	  remove_existing_files = false;
+	  interactive = true;
 	  break;
 	case 'n':
-	  dereference_dest_dir_symlinks = 0;
+	  dereference_dest_dir_symlinks = false;
 	  break;
 	case 's':
 #ifdef S_ISLNK
-	  symbolic_link = 1;
+	  symbolic_link = true;
 #else
 	  error (EXIT_FAILURE, 0,
 		 _("symbolic links are not supported on this system"));
 #endif
 	  break;
-	case TARGET_DIRECTORY_OPTION:
+	case 't':
+	  if (target_directory)
+	    error (EXIT_FAILURE, 0, _("multiple target directories specified"));
+	  else
+	    {
+	      struct stat st;
+	      if (stat (optarg, &st) != 0)
+		error (EXIT_FAILURE, errno, _("accessing %s"), quote (optarg));
+	      if (! S_ISDIR (st.st_mode))
+		error (EXIT_FAILURE, 0, _("target %s is not a directory"),
+		       quote (optarg));
+	    }
 	  target_directory = optarg;
 	  break;
+	case 'T':
+	  no_target_directory = true;
+	  break;
 	case 'v':
-	  verbose = 1;
+	  verbose = true;
 	  break;
 	case 'S':
-	  make_backups = 1;
+	  make_backups = true;
 	  backup_suffix_string = optarg;
 	  break;
 	case_GETOPT_HELP_CHAR;
@@ -485,30 +495,38 @@ main (int argc, char **argv)
   n_files = argc - optind;
   file = argv + optind;
 
-  if (n_files == 0)
+  if (n_files <= 0)
     {
-      error (0, 0, _("missing file argument"));
+      error (0, 0, _("missing file operand"));
       usage (EXIT_FAILURE);
     }
 
-  target_directory_specified = (target_directory != NULL);
-  if (!target_directory)
-    target_directory = file[n_files - 1];
-
-  /* If target directory is not specified, and there's only one
-     file argument, then pretend `.' was given as the second argument.  */
-  if (!target_directory_specified && n_files == 1)
+  if (no_target_directory)
     {
-      static char *dummy[2];
-      dummy[0] = file[0];
-      dummy[1] = ".";
-      file = dummy;
-      n_files = 2;
-      dest_is_dir = 1;
+      if (target_directory)
+	error (EXIT_FAILURE, 0,
+	       _("Cannot combine --target-directory "
+		 "and --no-target-directory"));
+      if (n_files != 2)
+	{
+	  if (n_files < 2)
+	    error (0, 0,
+		   _("missing destination file operand after %s"),
+		   quote (file[0]));
+	  else
+	    error (0, 0, _("extra operand %s"), quote (file[2]));
+	  usage (EXIT_FAILURE);
+	}
     }
-  else
+  else if (!target_directory)
     {
-      dest_is_dir = isdir (target_directory);
+      if (n_files < 2)
+	target_directory = ".";
+      else if (2 <= n_files && target_directory_operand (file[n_files - 1]))
+	target_directory = file[--n_files];
+      else if (2 < n_files)
+	error (EXIT_FAILURE, 0, _("target %s is not a directory"),
+	       quote (file[n_files - 1]));
     }
 
   if (symbolic_link)
@@ -516,60 +534,22 @@ main (int argc, char **argv)
   else
     linkfunc = link;
 
-  if (target_directory_specified && !dest_is_dir)
-    {
-      error (0, 0, _("%s: specified target directory is not a directory"),
-	     quote (target_directory));
-      usage (EXIT_FAILURE);
-    }
-
   if (backup_suffix_string)
     simple_backup_suffix = xstrdup (backup_suffix_string);
 
   backup_type = (make_backups
 		 ? xget_version (_("backup type"), version_control_string)
-		 : none);
+		 : no_backups);
 
-  if (target_directory_specified || n_files > 2)
+  if (target_directory)
     {
-      unsigned int i;
-      unsigned int last_file_idx = (target_directory_specified
-				    ? n_files - 1
-				    : n_files - 2);
-
-      if (!target_directory_specified && !dest_is_dir)
-	error (EXIT_FAILURE, 0,
-	   _("when making multiple links, last argument must be a directory"));
-      for (i = 0; i <= last_file_idx; ++i)
-	errors += do_link (file[i], target_directory);
+      int i;
+      ok = true;
+      for (i = 0; i < n_files; ++i)
+	ok &= do_link (file[i], target_directory, true);
     }
   else
-    {
-      struct stat source_stats;
-      const char *source;
-      char *dest;
-      char *new_dest;
+    ok = do_link (file[0], file[1], false);
 
-      source = file[0];
-      dest = file[1];
-
-      /* When the destination is specified with a trailing slash and the
-	 source exists but is not a directory, convert the user's command
-	 `ln source dest/' to `ln source dest/basename(source)'.  */
-
-      if (dest[strlen (dest) - 1] == '/'
-	  && lstat (source, &source_stats) == 0
-	  && !S_ISDIR (source_stats.st_mode))
-	{
-	  PATH_BASENAME_CONCAT (new_dest, dest, source);
-	}
-      else
-	{
-	  new_dest = dest;
-	}
-
-      errors = do_link (source, new_dest);
-    }
-
-  exit (errors != 0);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

@@ -1,5 +1,5 @@
 /* Provide a stub lchown function for systems that lack it.
-   Copyright (C) 1998, 1999, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2002, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,40 +22,31 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
+
 #include "lchown.h"
-
-#ifdef STAT_MACROS_BROKEN
-# undef S_ISLNK
-#endif
-
-#ifndef S_ISLNK
-# ifdef S_IFLNK
-#  define S_ISLNK(m) (((m) & S_IFMT) == S_IFLNK)
-# else
-#  define S_ISLNK(m) 0
-# endif
-#endif
+#include "stat-macros.h"
 
 /* Declare chown to avoid a warning.  Don't include unistd.h,
    because it may have a conflicting prototype for lchown.  */
 int chown ();
 
 /* Work just like chown, except when FILE is a symbolic link.
-   In that case, set errno to ENOSYS and return -1.  */
+   In that case, set errno to EOPNOTSUPP and return -1.
+   But if autoconf tests determined that chown modifies
+   symlinks, then just call chown.  */
 
 int
 lchown (const char *file, uid_t uid, gid_t gid)
 {
+#if ! CHOWN_MODIFIES_SYMLINK
   struct stat stats;
 
   if (lstat (file, &stats) == 0 && S_ISLNK (stats.st_mode))
     {
-      errno = ENOSYS;
+      errno = EOPNOTSUPP;
       return -1;
     }
+#endif
 
   return chown (file, uid, gid);
 }

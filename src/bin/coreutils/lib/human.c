@@ -1,7 +1,7 @@
 /* human.c -- print human readable file size
 
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
-   Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+   Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,69 +17,32 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-/* Originally contributed by lm@sgi.com;
-   --si, output block size selection, large file support,
-   and grouping added by eggert@twinsun.com.  */
+/* Written by Paul Eggert and Larry McVoy.  */
 
 #if HAVE_CONFIG_H
 # include <config.h>
 #endif
 
-#if HAVE_STDBOOL_H
-# include <stdbool.h>
-#else
-typedef enum {false = 0, true = 1} bool;
-#endif
+#include "human.h"
 
-#if HAVE_INTTYPES_H
-# include <inttypes.h>
-#else
-# if HAVE_STDINT_H
-#  include <stdint.h>
-# endif
-#endif
+#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "gettext.h"
+#define _(msgid) gettext (msgid)
+
+#include <argmatch.h>
+#include <error.h>
+#include <xstrtol.h>
+
 #ifndef SIZE_MAX
 # define SIZE_MAX ((size_t) -1)
 #endif
 #ifndef UINTMAX_MAX
 # define UINTMAX_MAX ((uintmax_t) -1)
 #endif
-
-#include <limits.h>
-
-#if HAVE_LOCALE_H && HAVE_LOCALECONV
-# include <locale.h>
-#endif
-
-#if HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
-#ifndef HAVE_DECL_GETENV
-"this configure-time declaration test was not run"
-#endif
-#if !HAVE_DECL_GETENV
-char *getenv ();
-#endif
-
-#if HAVE_STRING_H
-# include <string.h>
-#endif
-
-#if HAVE_STRINGS_H
-# include <strings.h>
-#endif
-
-#include <stdio.h>
-#include <sys/types.h>
-
-#include <gettext.h>
-#define _(text) gettext (text)
-
-#include <argmatch.h>
-#include <error.h>
-#include <xstrtol.h>
-
-#include "human.h"
 
 /* The maximum length of a suffix like "KiB".  */
 #define HUMAN_READABLE_SUFFIX_LENGTH_MAX 3
@@ -192,6 +155,9 @@ group_number (char *number, size_t numberlen,
    so on.  Numbers smaller than the power aren't modified.
    human_autoscale is normally used together with human_SI.
 
+   If (OPTS & human_space_before_unit), use a space to separate the
+   number from any suffix that is appended as described below.
+
    If (OPTS & human_SI), append an SI prefix indicating which power is
    being used.  If in addition (OPTS & human_B), append "B" (if base
    1000) or "iB" (if base 1024) to the SI prefix.  When ((OPTS &
@@ -224,7 +190,6 @@ human_readable (uintmax_t n, char *buf, int opts,
   size_t decimal_pointlen = 1;
   char const *grouping = "";
   char const *thousands_sep = "";
-#if HAVE_LOCALE_H && HAVE_LOCALECONV
   struct lconv const *l = localeconv ();
   size_t pointlen = strlen (l->decimal_point);
   if (0 < pointlen && pointlen <= MB_LEN_MAX)
@@ -235,7 +200,6 @@ human_readable (uintmax_t n, char *buf, int opts,
   grouping = l->grouping;
   if (strlen (l->thousands_sep) <= MB_LEN_MAX)
     thousands_sep = l->thousands_sep;
-#endif
 
   psuffix = buf + LONGEST_HUMAN_READABLE - HUMAN_READABLE_SUFFIX_LENGTH_MAX;
   p = psuffix;
@@ -334,8 +298,8 @@ human_readable (uintmax_t n, char *buf, int opts,
 	  {
 	    do
 	      {
-		unsigned r10 = (amt % base) * 10 + tenths;
-		unsigned r2 = (r10 % base) * 2 + (rounding >> 1);
+		unsigned int r10 = (amt % base) * 10 + tenths;
+		unsigned int r2 = (r10 % base) * 2 + (rounding >> 1);
 		amt /= base;
 		tenths = r10 / base;
 		rounding = (r2 < base
@@ -373,11 +337,9 @@ human_readable (uintmax_t n, char *buf, int opts,
 	  }
       }
 
-    if (inexact_style == human_ceiling
-	? 0 < tenths + rounding
-	: inexact_style == human_round_to_nearest
-	? 5 < tenths + (2 < rounding + (amt & 1))
-	: /* inexact_style == human_floor */ 0)
+    if (inexact_style == human_round_to_nearest
+	? 5 < tenths + (0 < rounding + (amt & 1))
+	: inexact_style == human_ceiling && 0 < tenths + rounding)
       {
 	amt++;
 
@@ -419,6 +381,9 @@ human_readable (uintmax_t n, char *buf, int opts,
 	    if (++exponent == exponent_max)
 	      break;
 	}
+
+      if ((exponent | (opts & human_B)) && (opts & human_space_before_unit))
+	*psuffix++ = ' ';
 
       if (exponent)
 	*psuffix++ = (! (opts & human_base_1024) && exponent == 1
@@ -464,7 +429,9 @@ humblock (char const *spec, uintmax_t *block_size, int *options)
   int i;
   int opts = 0;
 
-  if (! spec && ! (spec = getenv ("BLOCK_SIZE")))
+  if (! spec
+      && ! (spec = getenv ("BLOCK_SIZE"))
+      && ! (spec = getenv ("BLOCKSIZE")))
     *block_size = default_block_size ();
   else
     {
@@ -486,8 +453,6 @@ humblock (char const *spec, uintmax_t *block_size, int *options)
 				       "eEgGkKmMpPtTyYzZ0");
 	  if (e != LONGINT_OK)
 	    return e;
-	  if (*ptr)
-	    return LONGINT_INVALID_SUFFIX_CHAR;
 	  for (; ! ('0' <= *spec && *spec <= '9'); spec++)
 	    if (spec == ptr)
 	      {

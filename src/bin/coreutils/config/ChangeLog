@@ -1,3 +1,59 @@
+2004-12-17  Jim Meyering  <jim@meyering.net>
+
+	* install-sh: Sync from gnulib.
+
+2004-12-16  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* mdate-sh: Sync from gnulib.
+
+2004-11-23  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* config.sub, texinfo.tex: Sync from gnulib.
+
+2004-11-17  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* config.guess, config.sub: Sync from gnulib.
+
+2004-11-10  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* texinfo.tex: Sync from gnulib.
+
+2004-11-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* texinfo.tex: Sync from gnulib.
+
+2004-10-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* config.guess, install-sh, texinfo.tex: Sync from gnulib.
+
+2004-10-03  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* config.guess, config.sub, install-sh, missing, texinfo.tex:
+	Sync from gnulib.
+
+2004-09-24  Jim Meyering  <jim@meyering.net>
+
+	* cvsu: Remove file.  The version of cvsu from the cvsutils package
+	does the same job with --find --type=... options.
+	* cvsu: New file, used by rules in coreutils' Makefile.maint.
+
+2004-08-05  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* config.guess, config.sub, install-sh, texinfo.tex: Sync from gnulib.
+
+2004-03-30  Paul Eggert  <eggert@twinsun.com>
+
+	* config.guess, config.sub, install-sh, texinfo.tex: Sync from gnulib.
+
+2003-08-16  Paul Eggert  <eggert@twinsun.com>
+
+	* config.rpath, texinfo.tex: Sync with gnulib.
+
+2003-04-21  Jim Meyering  <jim@meyering.net>
+
+	* depcomp: New version, now that this file is on the list
+	in ../Makefile.cfg.
+
 2003-01-12  Jim Meyering  <jim@meyering.net>
 
 	Lots of syntactic clean-up, mostly from Karl Berry.
@@ -35,4 +91,4 @@
 2002-02-17  Jim Meyering  <jim@meyering.net>
 
 	* config.guess (main): Don't use `head -1'; it's no longer portable.
-        Use `sed 1q' instead.
+	Use `sed 1q' instead.

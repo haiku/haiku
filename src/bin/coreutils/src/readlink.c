@@ -1,5 +1,5 @@
 /* readlink -- display value of a symbolic link.
-   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,16 +19,13 @@
 
 #include <config.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <limits.h>
 #include <getopt.h>
+#include <sys/types.h>
 
 #include "system.h"
 #include "canonicalize.h"
 #include "error.h"
 #include "xreadlink.h"
-#include "long-options.h"
 #include "quote.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -39,16 +36,17 @@
 /* Name this program was run with.  */
 char *program_name;
 
-  /* If nonzero, canonicalize file name. */
-static int canonicalize;
-  /* If nonzero, do not output the trailing newline. */
-static int no_newline;
-  /* If nonzero, report error messages. */
-static int verbose;
+/* If true, do not output the trailing newline.  */
+static bool no_newline;
+
+/* If true, report error messages.  */
+static bool verbose;
 
 static struct option const longopts[] =
 {
   {"canonicalize", no_argument, 0, 'f'},
+  {"canonicalize-existing", no_argument, 0, 'e'},
+  {"canonicalize-missing", no_argument, 0, 'm'},
   {"no-newline", no_argument, 0, 'n'},
   {"quiet", no_argument, 0, 'q'},
   {"silent", no_argument, 0, 's'},
@@ -70,12 +68,19 @@ usage (int status)
       fputs (_("Display value of a symbolic link on standard output.\n\n"),
 	     stdout);
       fputs (_("\
-  -f, --canonicalize      canonicalize by following every symlink in every\n\
-                          component of the given path recursively\n\
-  -n, --no-newline        do not output the trailing newline\n\
+  -f, --canonicalize            canonicalize by following every symlink in\n\
+                                every component of the given path recursively;\n\
+                                all but the last path component must exist\n\
+  -e, --canonicalize-existing   canonicalize by following every symlink in\n\
+                                every component of the given path recursively,\n\
+                                all path components must exist\n\
+  -m, --canonicalize-missing    canonicalize by following every symlink in\n\
+                                every component of the given path recursively,\n\
+                                without requirements on components existence\n\
+  -n, --no-newline              do not output the trailing newline\n\
   -q, --quiet,\n\
-  -s, --silent            suppress most error messages\n\
-  -v, --verbose           report error messages\n\
+  -s, --silent                  suppress most error messages\n\
+  -v, --verbose                 report error messages\n\
 "), stdout);
       fputs (HELP_OPTION_DESCRIPTION, stdout);
       fputs (VERSION_OPTION_DESCRIPTION, stdout);
@@ -85,41 +90,49 @@ usage (int status)
 }
 
 int
-main (int argc, char *const argv[])
+main (int argc, char **argv)
 {
+  /* If not -1, use this method to canonicalize.  */
+  int can_mode = -1;
+
+  /* File name to canonicalize.  */
   const char *fname;
+
+  /* Result of canonicalize.  */
   char *value;
+
   int optc;
 
+  initialize_main (&argc, &argv);
+  program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
   atexit (close_stdout);
 
-  if (argc < 1)
-    error (EXIT_FAILURE, 0, _("too few arguments"));
-
-  program_name = argv[0];
-
-  while ((optc = getopt_long (argc, argv, "fnqsv", longopts, NULL)) != -1)
+  while ((optc = getopt_long (argc, argv, "efmnqsv", longopts, NULL)) != -1)
     {
       switch (optc)
 	{
-	case 0:
+	case 'e':
+	  can_mode = CAN_EXISTING;
 	  break;
 	case 'f':
-	  canonicalize = 1;
+	  can_mode = CAN_ALL_BUT_LAST;
+	  break;
+	case 'm':
+	  can_mode = CAN_MISSING;
 	  break;
 	case 'n':
-	  no_newline = 1;
+	  no_newline = true;
 	  break;
 	case 'q':
 	case 's':
-	  verbose = 0;
+	  verbose = false;
 	  break;
 	case 'v':
-	  verbose = 1;
+	  verbose = true;
 	  break;
 	case_GETOPT_HELP_CHAR;
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -130,7 +143,7 @@ main (int argc, char *const argv[])
 
   if (optind >= argc)
     {
-      error (EXIT_SUCCESS, 0, _("too few arguments"));
+      error (0, 0, _("missing operand"));
       usage (EXIT_FAILURE);
     }
 
@@ -138,11 +151,13 @@ main (int argc, char *const argv[])
 
   if (optind < argc)
     {
-      error (EXIT_SUCCESS, 0, _("too many arguments"));
+      error (0, 0, _("extra operand %s"), quote (argv[optind]));
       usage (EXIT_FAILURE);
     }
 
-  value = (canonicalize ? canonicalize_file_name : xreadlink) (fname);
+  value = (can_mode != -1
+	   ? canonicalize_filename_mode (fname, can_mode)
+	   : xreadlink (fname, 1024));
   if (value)
     {
       printf ("%s%s", value, (no_newline ? "" : "\n"));
@@ -151,7 +166,7 @@ main (int argc, char *const argv[])
     }
 
   if (verbose)
-    error (EXIT_SUCCESS, errno, "%s", fname);
+    error (EXIT_FAILURE, errno, "%s", fname);
 
   return EXIT_FAILURE;
 }

@@ -1,5 +1,7 @@
 /* backupfile.h -- declarations for making Emacs style backup file names
-   Copyright (C) 1990-1992, 1997-1999 Free Software Foundation, Inc.
+
+   Copyright (C) 1990, 1991, 1992, 1997, 1998, 1999, 2003, 2004 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,42 +21,41 @@
 #ifndef BACKUPFILE_H_
 # define BACKUPFILE_H_
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+
 /* When to make backup files. */
 enum backup_type
 {
   /* Never make backups. */
-  none,
+  no_backups,
 
   /* Make simple backups of every file. */
-  simple,
+  simple_backups,
 
   /* Make numbered backups of files that already have numbered backups,
      and simple backups of the others. */
-  numbered_existing,
+  numbered_existing_backups,
 
   /* Make numbered backups of every file. */
-  numbered
+  numbered_backups
 };
 
 # define VALID_BACKUP_TYPE(Type)	\
-  ((Type) == none			\
-   || (Type) == simple			\
-   || (Type) == numbered_existing	\
-   || (Type) == numbered)
+  ((unsigned int) (Type) <= numbered_backups)
 
 extern char const *simple_backup_suffix;
 
-# ifndef PARAMS
-#  if defined PROTOTYPES || (defined __STDC__ && __STDC__)
-#   define PARAMS(Args) Args
-#  else
-#   define PARAMS(Args) ()
-#  endif
-# endif
+char *find_backup_file_name (char const *, enum backup_type);
+enum backup_type get_version (char const *context, char const *arg);
+enum backup_type xget_version (char const *context, char const *arg);
+void addext (char *, char const *, int);
 
-char *find_backup_file_name PARAMS ((char const *, enum backup_type));
-enum backup_type get_version PARAMS ((char const *context, char const *arg));
-enum backup_type xget_version PARAMS ((char const *context, char const *arg));
-void addext PARAMS ((char *, char const *, int));
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif /* ! BACKUPFILE_H_ */

@@ -1,5 +1,5 @@
 /* save-cwd.c -- Save and restore current working directory.
-   Copyright (C) 1995, 1997, 1998, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1995, 1997, 1998, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,11 +21,11 @@
 # include "config.h"
 #endif
 
-#include <stdio.h>
+#include "save-cwd.h"
 
-#ifdef STDC_HEADERS
-# include <stdlib.h>
-#endif
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #if HAVE_UNISTD_H
 # include <unistd.h>
@@ -38,16 +38,8 @@
 #endif
 
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
 
-#ifndef O_DIRECTORY
-# define O_DIRECTORY 0
-#endif
-
-#include "save-cwd.h"
-#include "error.h"
+#include "chdir-long.h"
 #include "xgetcwd.h"
 
 /* Record the location of the current working directory in CWD so that
@@ -63,77 +55,78 @@ extern int errno;
    support for fchdir, and getcwd is not robust or as efficient.
    So, we prefer to use the open/fchdir approach, but fall back on
    getcwd if necessary.  Some systems lack fchdir altogether: OS/2,
-   Cygwin (as of March 2003), SCO Xenix.  At least SunOS4 and Irix 5.3
+   Cygwin (as of March 2003), SCO Xenix.  At least SunOS 4 and Irix 5.3
    provide the function, yet it doesn't work for partitions on which
    auditing is enabled.  */
 
 int
 save_cwd (struct saved_cwd *cwd)
 {
-  static int have_working_fchdir = 1;
+#if !HAVE_FCHDIR
+# undef fchdir
+# define fchdir(x) (abort (), 0)
+  bool have_working_fchdir = false;
+  bool fchdir_needs_testing = false;
+#elif (__sgi || __sun)
+  static bool have_working_fchdir = true;
+  bool fchdir_needs_testing = true;
+#else
+  bool have_working_fchdir = true;
+  bool fchdir_needs_testing = false;
+#endif
 
   cwd->desc = -1;
   cwd->name = NULL;
 
   if (have_working_fchdir)
     {
-#if HAVE_FCHDIR
-      cwd->desc = open (".", O_RDONLY | O_DIRECTORY);
+      cwd->desc = open (".", O_RDONLY);
       if (cwd->desc < 0)
 	{
-	  error (0, errno, "cannot open current directory");
-	  return 1;
+	  cwd->desc = open (".", O_WRONLY);
+	  if (cwd->desc < 0)
+	    {
+	      cwd->name = xgetcwd ();
+	      return cwd->name ? 0 : -1;
+	    }
 	}
 
-# if __sun__ || sun
       /* On SunOS 4 and IRIX 5.3, fchdir returns EINVAL when auditing
 	 is enabled, so we have to fall back to chdir.  */
-      if (fchdir (cwd->desc))
+      if (fchdir_needs_testing && fchdir (cwd->desc) != 0)
 	{
-	  if (errno == EINVAL)
+	  int saved_errno = errno;
+	  close (cwd->desc);
+	  cwd->desc = -1;
+	  if (saved_errno != EINVAL)
 	    {
-	      close (cwd->desc);
-	      cwd->desc = -1;
-	      have_working_fchdir = 0;
+	      errno = saved_errno;
+	      return -1;
 	    }
-	  else
-	    {
-	      error (0, errno, "current directory");
-	      close (cwd->desc);
-	      cwd->desc = -1;
-	      return 1;
-	    }
+	  have_working_fchdir = false;
 	}
-# endif /* __sun__ || sun */
-#else
-# define fchdir(x) (abort (), 0)
-      have_working_fchdir = 0;
-#endif
     }
 
   if (!have_working_fchdir)
     {
       cwd->name = xgetcwd ();
       if (cwd->name == NULL)
-	{
-	  error (0, errno, "cannot get current directory");
-	  return 1;
-	}
+	return -1;
     }
   return 0;
 }
 
 /* Change to recorded location, CWD, in directory hierarchy.
-   Upon failure, return nonzero (errno is set by chdir or fchdir).
+   Upon failure, return -1 (errno is set by chdir or fchdir).
    Upon success, return zero.  */
 
 int
 restore_cwd (const struct saved_cwd *cwd)
 {
   if (0 <= cwd->desc)
-    return fchdir (cwd->desc) < 0;
+    return fchdir (cwd->desc);
   else
-    return chdir (cwd->name) < 0;
+    return chdir_long (cwd->name);
 }
 
 void

@@ -1,5 +1,5 @@
 /* sum -- checksum and count the blocks in a file
-   Copyright (C) 86, 89, 91, 1995-2002 Free Software Foundation, Inc.
+   Copyright (C) 86, 89, 91, 1995-2002, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include <sys/types.h>
 #include <getopt.h>
 #include "system.h"
-#include "closeout.h"
 #include "error.h"
 #include "human.h"
 #include "safe-read.h"
@@ -33,13 +32,13 @@
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "sum"
 
-#define AUTHORS N_ ("Kayvan Aghaiepour and David MacKenzie")
+#define AUTHORS "Kayvan Aghaiepour", "David MacKenzie"
 
 /* The name this program was run with. */
 char *program_name;
 
-/* Nonzero if any of the files read were the standard input. */
-static int have_read_stdin;
+/* True if any of the files read were the standard input. */
+static bool have_read_stdin;
 
 static struct option const longopts[] =
 {
@@ -52,7 +51,7 @@ static struct option const longopts[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -75,16 +74,16 @@ With no FILE, or when FILE is -, read standard input.\n\
 "), stdout);
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
-  exit (status == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (status);
 }
 
 /* Calculate and print the rotated checksum and the size in 1K blocks
    of file FILE, or of the standard input if FILE is "-".
    If PRINT_NAME is >1, print FILE next to the checksum and size.
-   The checksum varies depending on sizeof(int).
-   Return 0 if successful, -1 if an error occurs. */
+   The checksum varies depending on sizeof (int).
+   Return true if successful.  */
 
-static int
+static bool
 bsd_sum_file (const char *file, int print_name)
 {
   register FILE *fp;
@@ -96,7 +95,7 @@ bsd_sum_file (const char *file, int print_name)
   if (STREQ (file, "-"))
     {
       fp = stdin;
-      have_read_stdin = 1;
+      have_read_stdin = true;
     }
   else
     {
@@ -104,7 +103,7 @@ bsd_sum_file (const char *file, int print_name)
       if (fp == NULL)
 	{
 	  error (0, errno, "%s", file);
-	  return -1;
+	  return false;
 	}
     }
   /* Need binary I/O, or else byte counts and checksums are incorrect.  */
@@ -123,13 +122,13 @@ bsd_sum_file (const char *file, int print_name)
       error (0, errno, "%s", file);
       if (!STREQ (file, "-"))
 	fclose (fp);
-      return -1;
+      return false;
     }
 
   if (!STREQ (file, "-") && fclose (fp) == EOF)
     {
       error (0, errno, "%s", file);
-      return -1;
+      return false;
     }
 
   printf ("%05d %5s", checksum,
@@ -138,15 +137,15 @@ bsd_sum_file (const char *file, int print_name)
     printf (" %s", file);
   putchar ('\n');
 
-  return 0;
+  return true;
 }
 
 /* Calculate and print the checksum and the size in 512-byte blocks
    of file FILE, or of the standard input if FILE is "-".
    If PRINT_NAME is >0, print FILE next to the checksum and size.
-   Return 0 if successful, -1 if an error occurs. */
+   Return true if successful.  */
 
-static int
+static bool
 sysv_sum_file (const char *file, int print_name)
 {
   int fd;
@@ -162,7 +161,7 @@ sysv_sum_file (const char *file, int print_name)
   if (STREQ (file, "-"))
     {
       fd = 0;
-      have_read_stdin = 1;
+      have_read_stdin = true;
     }
   else
     {
@@ -170,7 +169,7 @@ sysv_sum_file (const char *file, int print_name)
       if (fd == -1)
 	{
 	  error (0, errno, "%s", file);
-	  return -1;
+	  return false;
 	}
     }
   /* Need binary I/O, or else byte counts and checksums are incorrect.  */
@@ -189,7 +188,7 @@ sysv_sum_file (const char *file, int print_name)
 	  error (0, errno, "%s", file);
 	  if (!STREQ (file, "-"))
 	    close (fd);
-	  return -1;
+	  return false;
 	}
 
       for (i = 0; i < bytes_read; i++)
@@ -200,7 +199,7 @@ sysv_sum_file (const char *file, int print_name)
   if (!STREQ (file, "-") && close (fd) == -1)
     {
       error (0, errno, "%s", file);
-      return -1;
+      return false;
     }
 
   r = (s & 0xffff) + ((s & 0xffffffff) >> 16);
@@ -212,17 +211,18 @@ sysv_sum_file (const char *file, int print_name)
     printf (" %s", file);
   putchar ('\n');
 
-  return 0;
+  return true;
 }
 
 int
 main (int argc, char **argv)
 {
-  int errors = 0;
+  bool ok;
   int optc;
   int files_given;
-  int (*sum_func) (const char *, int) = bsd_sum_file;
+  bool (*sum_func) (const char *, int) = bsd_sum_file;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -230,15 +230,12 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
-  have_read_stdin = 0;
+  have_read_stdin = false;
 
   while ((optc = getopt_long (argc, argv, "rs", longopts, NULL)) != -1)
     {
       switch (optc)
 	{
-	case 0:
-	  break;
-
 	case 'r':		/* For SysV compatibility. */
 	  sum_func = bsd_sum_file;
 	  break;
@@ -257,17 +254,13 @@ main (int argc, char **argv)
     }
 
   files_given = argc - optind;
-  if (files_given == 0)
-    {
-      if ((*sum_func) ("-", files_given) < 0)
-	errors = 1;
-    }
+  if (files_given <= 0)
+    ok = sum_func ("-", files_given);
   else
-    for (; optind < argc; optind++)
-      if ((*sum_func) (argv[optind], files_given) < 0)
-	errors = 1;
+    for (ok = true; optind < argc; optind++)
+      ok &= sum_func (argv[optind], files_given);
 
   if (have_read_stdin && fclose (stdin) == EOF)
     error (EXIT_FAILURE, errno, "-");
-  exit (errors == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

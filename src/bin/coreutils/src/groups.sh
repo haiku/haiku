@@ -1,6 +1,6 @@
 #!/bin/sh
 # groups -- print the groups a user is in
-# Copyright (C) 1991, 1997, 2000, 2002 Free Software Foundation, Inc.
+# Copyright (C) 1991, 1997, 2000, 2002, 2004 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software Foundation,
-# Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+# Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 # Written by David MacKenzie <djm@gnu.ai.mit.edu>.
 
@@ -31,6 +31,14 @@ Same as id -Gn.  If no USERNAME, use current process.
 
 Report bugs to <@PACKAGE_BUGREPORT@>."
 
+version='groups (@GNU_PACKAGE@) @VERSION@
+Written by David MacKenzie.
+
+Copyright (C) 2004 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.'
+
+
 fail=0
 case $# in
   1 )
@@ -38,7 +46,7 @@ case $# in
       z--help )
 	 echo "$usage" || fail=1; exit $fail;;
       z--version )
-	 echo "groups (@GNU_PACKAGE@) @VERSION@" || fail=1; exit $fail;;
+	 echo "$version" || fail=1; exit $fail;;
       * ) ;;
     esac
     ;;

@@ -1,5 +1,7 @@
 /* print the hexadecimal identifier for the current host
-   Copyright (C) 1997, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+
+   Copyright (C) 1997, 1999, 2000, 2001, 2002, 2003, 2004 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,16 +20,14 @@
 /* Written by Jim Meyering.  */
 
 #include <config.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <sys/types.h>
-#if HAVE_UNISTD_H
-# include <unistd.h>
-#endif
 
 #include "system.h"
-#include "closeout.h"
 #include "long-options.h"
 #include "error.h"
+#include "quote.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "hostid"
@@ -40,7 +40,7 @@ char *program_name;
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -64,6 +64,7 @@ main (int argc, char **argv)
 {
   long int id;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -72,11 +73,13 @@ main (int argc, char **argv)
   atexit (close_stdout);
 
   parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
-		      AUTHORS, usage);
+		      usage, AUTHORS, (char const *) NULL);
+  if (getopt_long (argc, argv, "", NULL, NULL) != -1)
+    usage (EXIT_FAILURE);
 
-  if (argc > 1)
+  if (optind < argc)
     {
-      error (0, 0, _("too many arguments"));
+      error (0, 0, _("extra operand %s"), quote (argv[optind]));
       usage (EXIT_FAILURE);
     }
 

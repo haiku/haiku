@@ -40,6 +40,7 @@ StdBinCommands
 	mkfifo.c
 	mknod.c
 	nl.c
+	nohup.c
 	od.c
 	paste.c
 	pathchk.c
@@ -52,8 +53,6 @@ StdBinCommands
 	rmdir.c
 	seq.c
 	shred.c
-	sleep.c
-	sort.c
 	split.c
 	stty.c
 	su.c
@@ -82,6 +81,13 @@ StdBinCommands
 	tail.c
 	uname.c
 	: libfetish.a $(SELECT_UNAME_ETC_LIB) : $(coreutils_rsrc) ;
+
+#commands requiring something in libroot.so (getrlimit...)
+
+StdBinCommands
+	sleep.c
+	sort.c
+        : libfetish.a libroot.so : $(coreutils_rsrc) ;
 
 # stat.c
 # chroot.c

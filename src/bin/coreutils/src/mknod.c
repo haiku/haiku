@@ -1,5 +1,5 @@
 /* mknod -- make special files
-   Copyright (C) 90, 91, 1995-2002 Free Software Foundation, Inc.
+   Copyright (C) 90, 91, 1995-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ static struct option const longopts[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -91,8 +91,10 @@ main (int argc, char **argv)
   struct mode_change *change;
   const char *specified_mode;
   int optc;
+  int expected_operands;
   mode_t node_type;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -106,8 +108,6 @@ main (int argc, char **argv)
     {
       switch (optc)
 	{
-	case 0:
-	  break;
 	case 'm':
 	  specified_mode = optarg;
 	  break;
@@ -130,16 +130,32 @@ main (int argc, char **argv)
       newmode = mode_adjust (newmode, change);
     }
 
-  if (argc - optind != 2 && argc - optind != 4)
+  /* If the number of arguments is 0 or 1,
+     or (if it's 2 or more and the second one starts with `p'), then there
+     must be exactly two operands.  Otherwise, there must be four.  */
+  expected_operands = (argc <= optind
+		       || (optind + 1 < argc && argv[optind + 1][0] == 'p')
+		       ? 2 : 4);
+
+  if (argc - optind < expected_operands)
     {
-      const char *msg;
-      if (argc - optind < 2)
-	msg = _("too few arguments");
-      else if (argc - optind > 4)
-	msg = _("too many arguments");
+      if (argc <= optind)
+	error (0, 0, _("missing operand"));
       else
-	msg = _("wrong number of arguments");
-      error (0, 0, "%s", msg);
+	error (0, 0, _("missing operand after %s"), quote (argv[argc - 1]));
+      if (expected_operands == 4 && argc - optind == 2)
+	fprintf (stderr, "%s\n",
+		 _("Special files require major and minor device numbers."));
+      usage (EXIT_FAILURE);
+    }
+
+  if (expected_operands < argc - optind)
+    {
+      error (0, 0, _("extra operand %s"),
+	     quote (argv[optind + expected_operands]));
+      if (expected_operands == 2 && argc - optind == 4)
+	fprintf (stderr, "%s\n",
+		 _("Fifos do not have major and minor device numbers."));
       usage (EXIT_FAILURE);
     }
 
@@ -150,7 +166,7 @@ main (int argc, char **argv)
     {
     case 'b':			/* `block' or `buffered' */
 #ifndef S_IFBLK
-      error (4, 0, _("block special files not supported"));
+      error (EXIT_FAILURE, 0, _("block special files not supported"));
 #else
       node_type = S_IFBLK;
 #endif
@@ -159,21 +175,13 @@ main (int argc, char **argv)
     case 'c':			/* `character' */
     case 'u':			/* `unbuffered' */
 #ifndef S_IFCHR
-      error (4, 0, _("character special files not supported"));
+      error (EXIT_FAILURE, 0, _("character special files not supported"));
 #else
       node_type = S_IFCHR;
 #endif
       goto block_or_character;
 
     block_or_character:
-      if (argc - optind != 4)
-	{
-	  error (0, 0, _("\
-when creating special files, major and minor device\n\
-numbers must be specified"));
-	  usage (EXIT_FAILURE);
-	}
-
       {
 	char const *s_major = argv[optind + 2];
 	char const *s_minor = argv[optind + 3];
@@ -203,21 +211,15 @@ numbers must be specified"));
 
     case 'p':			/* `pipe' */
 #ifndef S_ISFIFO
-      error (4, 0, _("fifo files not supported"));
+      error (EXIT_FAILURE, 0, _("fifo files not supported"));
 #else
-      if (argc - optind != 2)
-	{
-	  error (0, 0, _("\
-major and minor device numbers may not be specified for fifo files"));
-	  usage (EXIT_FAILURE);
-	}
       if (mkfifo (argv[optind], newmode))
 	error (EXIT_FAILURE, errno, "%s", quote (argv[optind]));
 #endif
       break;
 
     default:
-      error (0, 0, "invalid device type %s", quote (argv[optind + 1]));
+      error (0, 0, _("invalid device type %s"), quote (argv[optind + 1]));
       usage (EXIT_FAILURE);
     }
 

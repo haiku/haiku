@@ -1,5 +1,5 @@
 /* env - run a program in a modified environment
-   Copyright (C) 1986, 1991-2003 Free Software Foundation, Inc.
+   Copyright (C) 1986, 1991-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -85,12 +85,11 @@
 
 #include "system.h"
 #include "error.h"
-#include "closeout.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "env"
 
-#define AUTHORS N_ ("Richard Mlynarik and David MacKenzie")
+#define AUTHORS "Richard Mlynarik", "David MacKenzie"
 
 int putenv ();
 
@@ -111,7 +110,7 @@ static struct option const longopts[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -137,60 +136,58 @@ A mere - implies -i.  If no COMMAND, print the resulting environment.\n\
 }
 
 int
-main (register int argc, register char **argv, char **envp)
+main (register int argc, register char **argv)
 {
-  char *dummy_environ[1];
   int optc;
-  int ignore_environment = 0;
+  bool ignore_environment = false;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
+  initialize_exit_failure (EXIT_FAIL);
   atexit (close_stdout);
 
   while ((optc = getopt_long (argc, argv, "+iu:", longopts, NULL)) != -1)
     {
       switch (optc)
 	{
-	case 0:
-	  break;
 	case 'i':
-	  ignore_environment = 1;
+	  ignore_environment = true;
 	  break;
 	case 'u':
 	  break;
 	case_GETOPT_HELP_CHAR;
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 	default:
-	  usage (2);
+	  usage (EXIT_FAIL);
 	}
     }
 
-  if (optind != argc && !strcmp (argv[optind], "-"))
-    ignore_environment = 1;
+  if (optind < argc && STREQ (argv[optind], "-"))
+    ignore_environment = true;
 
-  environ = dummy_environ;
-  environ[0] = NULL;
-
-  if (!ignore_environment)
-    for (; *envp; envp++)
-      putenv (*envp);
+  if (ignore_environment)
+    {
+      static char *dummy_environ[] = { NULL };
+      environ = dummy_environ;
+    }
 
   optind = 0;			/* Force GNU getopt to re-initialize. */
   while ((optc = getopt_long (argc, argv, "+iu:", longopts, NULL)) != -1)
     if (optc == 'u')
       putenv (optarg);		/* Requires GNU putenv. */
 
-  if (optind != argc && !strcmp (argv[optind], "-"))
+  if (optind < argc && STREQ (argv[optind], "-"))
     ++optind;
 
   while (optind < argc && strchr (argv[optind], '='))
     putenv (argv[optind++]);
 
   /* If no program is specified, print the environment and exit. */
-  if (optind == argc)
+  if (argc <= optind)
     {
       while (*environ)
 	puts (*environ++);
@@ -200,7 +197,7 @@ main (register int argc, register char **argv, char **envp)
   execvp (argv[optind], &argv[optind]);
 
   {
-    int exit_status = (errno == ENOENT ? 127 : 126);
+    int exit_status = (errno == ENOENT ? EXIT_ENOENT : EXIT_CANNOT_INVOKE);
     error (0, errno, "%s", argv[optind]);
     exit (exit_status);
   }

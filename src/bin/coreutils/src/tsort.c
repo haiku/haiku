@@ -1,5 +1,5 @@
 /* tsort - topological sort.
-   Copyright (C) 1998-2002 Free Software Foundation, Inc.
+   Copyright (C) 1998-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,9 +29,9 @@
 #include <sys/types.h>
 
 #include "system.h"
-#include "closeout.h"
 #include "long-options.h"
 #include "error.h"
+#include "quote.h"
 #include "readtokens.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -54,8 +54,8 @@ struct item
 {
   const char *str;
   struct item *left, *right;
-  int balance;
-  int count;
+  int balance; /* -1, 0, or +1 */
+  size_t count;
   struct item *qlink;
   struct successor *top;
 };
@@ -63,11 +63,8 @@ struct item
 /* The name this program was run with. */
 char *program_name;
 
-/* Nonzero if any of the input files are the standard input. */
-static int have_read_stdin;
-
-/* The error code to return to the system. */
-static int exit_status;
+/* True if any of the input files are the standard input. */
+static bool have_read_stdin;
 
 /* The head of the sorted list.  */
 static struct item *head = NULL;
@@ -79,17 +76,12 @@ static struct item *zeros = NULL;
 static struct item *loop = NULL;
 
 /* The number of strings to sort.  */
-static int n_strings = 0;
-
-static struct option const long_options[] =
-{
-  { NULL, 0, NULL, 0}
-};
+static size_t n_strings = 0;
 
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -105,14 +97,14 @@ With no FILE, or when FILE is -, read standard input.\n\
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
 
-  exit (status == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (status);
 }
 
 /* Create a new item/node for STR.  */
 static struct item *
 new_item (const char *str)
 {
-  struct item *k = xmalloc (sizeof (struct item));
+  struct item *k = xmalloc (sizeof *k);
 
   k->str = (str ? xstrdup (str): NULL);
   k->left = k->right = NULL;
@@ -287,21 +279,21 @@ record_relation (struct item *j, struct item *k)
   if (!STREQ (j->str, k->str))
     {
       k->count++;
-      p = xmalloc (sizeof (struct successor));
+      p = xmalloc (sizeof *p);
       p->suc = k;
       p->next = j->top;
       j->top = p;
     }
 }
 
-static int
+static bool
 count_items (struct item *unused ATTRIBUTE_UNUSED)
 {
   n_strings++;
-  return 0;
+  return false;
 }
 
-static int
+static bool
 scan_zeros (struct item *k)
 {
   /* Ignore strings that have already been printed.  */
@@ -315,12 +307,12 @@ scan_zeros (struct item *k)
       zeros = k;
     }
 
-  return 0;
+  return false;
 }
 
 /* Try to detect the loop.  If we have detected that K is part of a
    loop, print the loop on standard error, remove a relation to break
-   the loop, and return non-zero.
+   the loop, and return true.
 
    The loop detection strategy is as follows: Realise that what we're
    dealing with is essentially a directed graph.  If we find an item
@@ -336,7 +328,7 @@ scan_zeros (struct item *k)
    loop has completely been constructed.  If the loop was found, the
    global variable LOOP will be NULL.  */
 
-static int
+static bool
 detect_loop (struct item *k)
 {
   if (k->count > 0)
@@ -390,7 +382,7 @@ detect_loop (struct item *k)
 
 		      /* Since we have found the loop, stop walking
                          the tree.  */
-		      return 1;
+		      return true;
 		    }
 		  else
 		    {
@@ -405,14 +397,14 @@ detect_loop (struct item *k)
 	}
     }
 
-  return 0;
+  return false;
 }
 
 /* Recurse (sub)tree rooted at ROOT, calling ACTION for each node.
-   Stop when ACTION returns non-zero.  */
+   Stop when ACTION returns true.  */
 
-static int
-recurse_tree (struct item *root, int (*action) (struct item *))
+static bool
+recurse_tree (struct item *root, bool (*action) (struct item *))
 {
   if (root->left == NULL && root->right == NULL)
     return (*action) (root);
@@ -420,32 +412,33 @@ recurse_tree (struct item *root, int (*action) (struct item *))
     {
       if (root->left != NULL)
 	if (recurse_tree (root->left, action))
-	  return 1;
+	  return true;
       if ((*action) (root))
-	return 1;
+	return true;
       if (root->right != NULL)
 	if (recurse_tree (root->right, action))
-	  return 1;
+	  return true;
     }
 
-  return 0;
+  return false;
 }
 
 /* Walk the tree specified by the head ROOT, calling ACTION for
    each node.  */
 
 static void
-walk_tree (struct item *root, int (*action) (struct item *))
+walk_tree (struct item *root, bool (*action) (struct item *))
 {
   if (root->right)
     recurse_tree (root->right, action);
 }
 
-/* Do a topological sort on FILE.   */
+/* Do a topological sort on FILE.   Return true if successful.  */
 
-static void
+static bool
 tsort (const char *file)
 {
+  bool ok = true;
   struct item *root;
   struct item *j = NULL;
   struct item *k = NULL;
@@ -458,7 +451,7 @@ tsort (const char *file)
   if (STREQ (file, "-"))
     {
       fp = stdin;
-      have_read_stdin = 1;
+      have_read_stdin = true;
     }
   else
     {
@@ -471,11 +464,9 @@ tsort (const char *file)
 
   while (1)
     {
-      long int len;
-
       /* T2. Next Relation.  */
-      len = readtoken (fp, DELIM, sizeof (DELIM) - 1, &tokenbuffer);
-      if (len < 0)
+      size_t len = readtoken (fp, DELIM, sizeof (DELIM) - 1, &tokenbuffer);
+      if (len == (size_t) -1)
 	break;
 
       assert (len != 0);
@@ -490,6 +481,10 @@ tsort (const char *file)
 
       j = k;
     }
+
+  if (k != NULL)
+    error (EXIT_FAILURE, 0, _("%s: input contains an odd number of tokens"),
+	   file);
 
   /* T1. Initialize (N <- n).  */
   walk_tree (root, count_items);
@@ -526,13 +521,11 @@ tsort (const char *file)
 	}
 
       /* T8.  End of process.  */
-      assert (n_strings >= 0);
       if (n_strings > 0)
 	{
 	  /* The input contains a loop.  */
-	  error (0, 0, _("%s: input contains a loop:"),
-		 (have_read_stdin ? "-" : file));
-	  exit_status = 1;
+	  error (0, 0, _("%s: input contains a loop:"), file);
+	  ok = false;
 
 	  /* Print the loop and remove a relation to break it.  */
 	  do
@@ -540,13 +533,16 @@ tsort (const char *file)
 	  while (loop);
 	}
     }
+
+  return ok;
 }
 
 int
 main (int argc, char **argv)
 {
-  int opt;
+  bool ok;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -554,35 +550,23 @@ main (int argc, char **argv)
 
   atexit (close_stdout);
 
-  exit_status = 0;
-
   parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE, VERSION,
-		      AUTHORS, usage);
+		      usage, AUTHORS, (char const *) NULL);
+  if (getopt_long (argc, argv, "", NULL, NULL) != -1)
+    usage (EXIT_FAILURE);
 
-  while ((opt = getopt_long (argc, argv, "", long_options, NULL)) != -1)
-    switch (opt)
-      {
-      case 0:			/* long option */
-	break;
-      default:
-	usage (EXIT_FAILURE);
-      }
+  have_read_stdin = false;
 
-  have_read_stdin = 0;
-
-  if (optind + 1 < argc)
+  if (1 < argc - optind)
     {
-      error (0, 0, _("only one argument may be specified"));
+      error (0, 0, _("extra operand %s"), quote (argv[optind + 1]));
       usage (EXIT_FAILURE);
     }
 
-  if (optind < argc)
-    tsort (argv[optind]);
-  else
-    tsort ("-");
+  ok = tsort (optind == argc ? "-" : argv[optind]);
 
   if (have_read_stdin && fclose (stdin) == EOF)
     error (EXIT_FAILURE, errno, _("standard input"));
 
-  exit (exit_status == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

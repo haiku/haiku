@@ -1,4 +1,4 @@
-/* Work around bug on some systems where malloc (0) fails.
+/* malloc() function that is glibc compatible.
    Copyright (C) 1997, 1998 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -22,14 +22,12 @@
 #endif
 #undef malloc
 
-#include <sys/types.h>
-
-char *malloc ();
+#include <stdlib.h>
 
 /* Allocate an N-byte block of memory from the heap.
    If N is zero, allocate a 1-byte block.  */
 
-char *
+void *
 rpl_malloc (size_t n)
 {
   if (n == 0)

@@ -1,5 +1,5 @@
 /* chroot -- run command or shell with special root directory
-   Copyright (C) 95, 96, 1997, 1999-2002 Free Software Foundation, Inc.
+   Copyright (C) 95, 96, 1997, 1999-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,13 +18,14 @@
 /* Written by Roland McGrath.  */
 
 #include <config.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <sys/types.h>
 
 #include "system.h"
-#include "long-options.h"
 #include "error.h"
-#include "closeout.h"
+#include "long-options.h"
+#include "quote.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "chroot"
@@ -37,7 +38,7 @@ char *program_name;
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -64,29 +65,33 @@ If no command is given, run ``${SHELL} -i'' (default: /bin/sh).\n\
 int
 main (int argc, char **argv)
 {
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
 
+  initialize_exit_failure (EXIT_FAIL);
   atexit (close_stdout);
 
   parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
-		      AUTHORS, usage);
-  if (argc == 1)
+		      usage, AUTHORS, (char const *) NULL);
+  if (getopt_long (argc, argv, "+", NULL, NULL) != -1)
+    usage (EXIT_FAIL);
+
+  if (argc <= optind)
     {
-      error (0, 0, _("too few arguments"));
-      usage (EXIT_FAILURE);
+      error (0, 0, _("missing operand"));
+      usage (EXIT_FAIL);
     }
 
-  if (chroot (argv[1]))
-    error (EXIT_FAILURE, errno,
-	   _("cannot change root directory to %s"), argv[1]);
+  if (chroot (argv[optind]) != 0)
+    error (EXIT_FAIL, errno, _("cannot change root directory to %s"), argv[1]);
 
   if (chdir ("/"))
-    error (EXIT_FAILURE, errno, _("cannot chdir to root directory"));
+    error (EXIT_FAIL, errno, _("cannot chdir to root directory"));
 
-  if (argc == 2)
+  if (argc == optind + 1)
     {
       /* No command.  Run an interactive shell.  */
       char *shell = getenv ("SHELL");
@@ -94,19 +99,20 @@ main (int argc, char **argv)
 	shell = "/bin/sh";
       argv[0] = shell;
       argv[1] = "-i";
+      argv[2] = NULL;
     }
   else
     {
       /* The following arguments give the command.  */
-      argv += 2;
+      argv += optind + 1;
     }
 
   /* Execute the given command.  */
   execvp (argv[0], argv);
 
   {
-    int exit_status = (errno == ENOENT ? 127 : 126);
-    error (0, errno, "%s", argv[0]);
+    int exit_status = (errno == ENOENT ? EXIT_ENOENT : EXIT_CANNOT_INVOKE);
+    error (0, errno, _("cannot run command %s"), quote (argv[0]));
     exit (exit_status);
   }
 }

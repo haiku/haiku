@@ -1,5 +1,5 @@
 /* hostname - set or print the name of current host system
-   Copyright (C) 1994-1997, 1999-2002 Free Software Foundation, Inc.
+   Copyright (C) 1994-1997, 1999-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,43 +15,41 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
-/* Jim Meyering <meyering@comco.com> */
+/* Written by Jim Meyering.  */
 
 #include <config.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <sys/types.h>
 
 #include "system.h"
-#include "closeout.h"
 #include "long-options.h"
 #include "error.h"
+#include "quote.h"
+#include "xgethostname.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "hostname"
 
 #define AUTHORS "Jim Meyering"
 
+#if HAVE_SETHOSTNAME && !defined sethostname
+int sethostname ();
+#endif
+
 #if !defined(HAVE_SETHOSTNAME) && defined(HAVE_SYSINFO) && \
      defined (HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_LIMITS_H)
 # include <sys/systeminfo.h>
 
 int
-sethostname (name, namelen)
-     char *name;
-     int namelen;
+sethostname (char *name, size_t namelen)
 {
   /* Using sysinfo() is the SVR4 mechanism to set a hostname. */
-  int result;
-
-  result = sysinfo (SI_SET_HOSTNAME, name, namelen);
-
-  return (result == -1 ? result : 0);
+  return (sysinfo (SI_SET_HOSTNAME, name, namelen) < 0 ? -1 : 0);
 }
 
 # define HAVE_SETHOSTNAME 1  /* Now we have it... */
 #endif
-
-char *xgethostname ();
 
 /* The name this program was run with. */
 char *program_name;
@@ -59,7 +57,7 @@ char *program_name;
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -83,6 +81,7 @@ main (int argc, char **argv)
 {
   char *hostname;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -91,35 +90,34 @@ main (int argc, char **argv)
   atexit (close_stdout);
 
   parse_long_options (argc, argv, PROGRAM_NAME, GNU_PACKAGE, VERSION,
-		      AUTHORS, usage);
+		      usage, AUTHORS, (char const *) NULL);
+  if (getopt_long (argc, argv, "", NULL, NULL) != -1)
+    usage (EXIT_FAILURE);
 
-#ifdef HAVE_SETHOSTNAME
-  if (argc == 2)
+  if (argc == optind + 1)
     {
-      int err;
-
-      /* Set hostname to argv[1].  */
-      err = sethostname (argv[1], strlen (argv[1]));
-      if (err != 0)
-	error (EXIT_FAILURE, errno, _("cannot set hostname to `%s'"), argv[1]);
-      exit (EXIT_SUCCESS);
-    }
+#ifdef HAVE_SETHOSTNAME
+      /* Set hostname to operand.  */
+      char const *name = argv[optind];
+      if (sethostname (name, strlen (name)) != 0)
+	error (EXIT_FAILURE, errno, _("cannot set name to `%s'"), name);
 #else
-  if (argc == 2)
-    error (EXIT_FAILURE, 0,
-	   _("cannot set hostname; this system lacks the functionality"));
+      error (EXIT_FAILURE, 0,
+	     _("cannot set hostname; this system lacks the functionality"));
 #endif
+    }
 
-  if (argc == 1)
+  if (argc <= optind)
     {
       hostname = xgethostname ();
       if (hostname == NULL)
 	error (EXIT_FAILURE, errno, _("cannot determine hostname"));
       printf ("%s\n", hostname);
     }
-  else
+
+  if (optind + 1 < argc)
     {
-      error (2, 0, _("too many arguments"));
+      error (0, 0, _("extra operand %s"), quote (argv[optind + 1]));
       usage (EXIT_FAILURE);
     }
 

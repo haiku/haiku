@@ -1,7 +1,7 @@
 /* uname -- print system information
 
-   Copyright 1989, 1992, 1993, 1996, 1997, 1999, 2000, 2001, 2002 Free
-   Software Foundation, Inc.
+   Copyright 1989, 1992, 1993, 1996, 1997, 1999, 2000, 2001, 2002,
+   2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,8 +29,10 @@
 # include <sys/systeminfo.h>
 #endif
 
-#if HAVE_SYSCTL && HAVE_SYS_SYSCTL_H
-# include <sys/param.h> /* needed for OpenBSD 3.0 */
+#if HAVE_SYS_SYSCTL_H
+# if HAVE_SYS_PARAM_H
+#  include <sys/param.h> /* needed for OpenBSD 3.0 */
+# endif
 # include <sys/sysctl.h>
 # ifdef HW_MODEL
 #  ifdef HW_MACHINE_ARCH
@@ -44,9 +46,14 @@
 # endif
 #endif
 
+#ifdef __APPLE__
+#include <mach/machine.h>
+#include <mach-o/arch.h>
+#endif
+
 #include "system.h"
 #include "error.h"
-#include "closeout.h"
+#include "quote.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "uname"
@@ -102,7 +109,7 @@ static struct option const long_options[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -136,9 +143,10 @@ Print certain system information.  With no OPTION, same as -s.\n\
 static void
 print_element (char const *element)
 {
-  static int printed;
-  if (printed++)
+  static bool printed;
+  if (printed)
     putchar (' ');
+  printed = true;
   fputs (element, stdout);
 }
 
@@ -149,8 +157,9 @@ main (int argc, char **argv)
   static char const unknown[] = "unknown";
 
   /* Mask indicating which elements to print. */
-  unsigned toprint = 0;
+  unsigned int toprint = 0;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -162,9 +171,6 @@ main (int argc, char **argv)
     {
       switch (c)
 	{
-	case 0:
-	  break;
-
 	case 'a':
 	  toprint = -1;
 	  break;
@@ -210,8 +216,11 @@ main (int argc, char **argv)
 	}
     }
 
-  if (optind != argc)
-    usage (EXIT_FAILURE);
+  if (argc != optind)
+    {
+      error (0, 0, _("extra operand %s"), quote (argv[optind]));
+      usage (EXIT_FAILURE);
+    }
 
   if (toprint == 0)
     toprint = PRINT_KERNEL_NAME;
@@ -255,6 +264,26 @@ main (int argc, char **argv)
 	  static int mib[] = { CTL_HW, UNAME_PROCESSOR };
 	  if (sysctl (mib, 2, processor, &s, 0, 0) >= 0)
 	    element = processor;
+
+# ifdef __APPLE__
+	  /* This kludge works around a bug in Mac OS X.  */
+	  if (element == unknown)
+	    {
+	      cpu_type_t cputype;
+	      size_t s = sizeof cputype;
+	      NXArchInfo const *ai;
+	      if (sysctlbyname ("hw.cputype", &cputype, &s, NULL, 0) == 0
+		  && (ai = NXGetArchInfoFromCpuType (cputype,
+						     CPU_SUBTYPE_MULTIPLE))
+		  != NULL)
+		element = ai->name;
+
+	      /* Hack "safely" around the ppc vs. powerpc return value. */
+	      if (cputype == CPU_TYPE_POWERPC
+		  && strncmp (element, "ppc", 3) == 0)
+		element = "powerpc";
+	    }
+# endif
 	}
 #endif
       print_element (element);

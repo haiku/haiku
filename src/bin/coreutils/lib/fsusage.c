@@ -1,6 +1,7 @@
-/* fsusage.c -- return space usage of mounted filesystems
-   Copyright (C) 1991, 1992, 1996, 1998, 1999, 2002, 2003 Free Software
-   Foundation, Inc.
+/* fsusage.c -- return space usage of mounted file systems
+
+   Copyright (C) 1991, 1992, 1996, 1998, 1999, 2002, 2003, 2004 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,10 +23,12 @@
 
 #if HAVE_INTTYPES_H
 # include <inttypes.h>
-#else
-# if HAVE_STDINT_H
-#  include <stdint.h>
-# endif
+#endif
+#if HAVE_STDINT_H
+# include <stdint.h>
+#endif
+#if HAVE_UNISTD_H
+# include <unistd.h>
 #endif
 #ifndef UINTMAX_MAX
 # define UINTMAX_MAX ((uintmax_t) -1)
@@ -35,12 +38,7 @@
 #include <sys/stat.h>
 #include "fsusage.h"
 
-#if HAVE_LIMITS_H
-# include <limits.h>
-#endif
-#ifndef CHAR_BIT
-# define CHAR_BIT 8
-#endif
+#include <limits.h>
 
 #if HAVE_SYS_PARAM_H
 # include <sys/param.h>
@@ -76,7 +74,6 @@
 
 #if HAVE_SYS_STATVFS_H		/* SVR4 */
 # include <sys/statvfs.h>
-int statvfs ();
 #endif
 
 #include "full-read.h"
@@ -106,7 +103,7 @@ int statvfs ();
 #define PROPAGATE_TOP_BIT(x) ((x) | ~ (EXTRACT_TOP_BIT (x) - 1))
 
 /* Fill in the fields of FSP with information about space usage for
-   the filesystem on which PATH resides.
+   the file system on which PATH resides.
    DISK is the device on which PATH is mounted, for space-getting
    methods that need to know it.
    Return 0 if successful, -1 if not.  When returning -1, ensure that

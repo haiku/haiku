@@ -1,5 +1,5 @@
 /* Compute MD5 or SHA1 checksum of files or strings
-   Copyright (C) 1995-2002 Free Software Foundation, Inc.
+   Copyright (C) 1995-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,27 +26,27 @@
 #include "system.h"
 
 #include "md5.h"
-#include "sha.h"
+#include "sha1.h"
 #include "checksum.h"
 #include "getline.h"
-#include "closeout.h"
 #include "error.h"
+#include "quote.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
-#define PROGRAM_NAME (algorithm == ALG_MD5 ? "md5sum" : "shasum")
+#define PROGRAM_NAME (algorithm == ALG_MD5 ? "md5sum" : "sha1sum")
 
-#define AUTHORS N_ ("Ulrich Drepper and Scott Miller")
+#define AUTHORS "Ulrich Drepper", "Scott Miller"
 
 /* Most systems do not distinguish between external and internal
    text representations.  */
 /* FIXME: This begs for an autoconf test.  */
 #if O_BINARY
-# define OPENOPTS(BINARY) ((BINARY) != 0 ? TEXT1TO1 : TEXTCNVT)
+# define OPENOPTS(BINARY) ((BINARY) ? TEXT1TO1 : TEXTCNVT)
 # define TEXT1TO1 "rb"
 # define TEXTCNVT "r"
 #else
 # if defined VMS
-#  define OPENOPTS(BINARY) ((BINARY) != 0 ? TEXT1TO1 : TEXTCNVT)
+#  define OPENOPTS(BINARY) ((BINARY) ? TEXT1TO1 : TEXTCNVT)
 #  define TEXT1TO1 "rb", "ctx=stm"
 #  define TEXTCNVT "r", "ctx=stm"
 # else
@@ -62,7 +62,7 @@
 
 
 #define DIGEST_TYPE_STRING(Alg) ((Alg) == ALG_MD5 ? "MD5" : "SHA1")
-#define DIGEST_STREAM(Alg) ((Alg) == ALG_MD5 ? md5_stream : sha_stream)
+#define DIGEST_STREAM(Alg) ((Alg) == ALG_MD5 ? md5_stream : sha1_stream)
 
 #define DIGEST_BITS(Alg) ((Alg) == ALG_MD5 ? 128 : 160)
 #define DIGEST_HEX_BYTES(Alg) (DIGEST_BITS (Alg) / 4)
@@ -78,8 +78,8 @@
    + 2 /* blank and binary indicator */ \
    + 1 /* minimum filename length */ )
 
-/* Nonzero if any of the files read were the standard input. */
-static int have_read_stdin;
+/* True if any of the files read were the standard input. */
+static bool have_read_stdin;
 
 /* The minimum length of a valid checksum line for the selected algorithm.  */
 static size_t min_digest_line_length;
@@ -89,11 +89,11 @@ static size_t digest_hex_bytes;
 
 /* With --check, don't generate any output.
    The exit code indicates success or failure.  */
-static int status_only = 0;
+static bool status_only = false;
 
 /* With --check, print a message to standard error warning about each
    improperly formatted checksum line.  */
-static int warn = 0;
+static bool warn = false;
 
 /* Declared and set via one of the wrapper .c files.  */
 /* int algorithm = ALG_UNSPECIFIED; */
@@ -101,12 +101,18 @@ static int warn = 0;
 /* The name this program was run with.  */
 char *program_name;
 
+/* For long options that have no equivalent short option, use a
+   non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
+enum
+{
+  STATUS_OPTION = CHAR_MAX + 1
+};
+
 static const struct option long_options[] =
 {
   { "binary", no_argument, 0, 'b' },
   { "check", no_argument, 0, 'c' },
-  { "status", no_argument, 0, 2 },
-  { "string", required_argument, 0, 1 },
+  { "status", no_argument, 0, STATUS_OPTION },
   { "text", no_argument, 0, 't' },
   { "warn", no_argument, 0, 'w' },
   { GETOPT_HELP_OPTION_DECL },
@@ -117,7 +123,7 @@ static const struct option long_options[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -157,37 +163,88 @@ text), and name for each FILE.\n"),
       printf (_("\nReport bugs to <%s>.\n"), PACKAGE_BUGREPORT);
     }
 
-  exit (status == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (status);
+}
+
+#define ISWHITE(c) ((c) == ' ' || (c) == '\t')
+
+/* Split the checksum string S (of length S_LEN) from a BSD 'md5' or
+   'sha1' command into two parts: a hexadecimal digest, and the file
+   name.  S is modified.  Return true if successful.  */
+
+static bool
+bsd_split_3 (char *s, size_t s_len, unsigned char **hex_digest, char **file_name)
+{
+  size_t i;
+
+  *file_name = s;
+
+  /* Find end of filename. The BSD 'md5' and 'sha1' commands do not escape
+     filenames, so search backwards for the last ')'. */
+  i = s_len - 1;
+  while (i && s[i] != ')')
+    i--;
+
+  if (s[i] != ')')
+    return false;
+
+  s[i++] = '\0';
+
+  while (ISWHITE (s[i]))
+    i++;
+
+  if (s[i] != '=')
+    return false;
+
+  i++;
+
+  while (ISWHITE (s[i]))
+    i++;
+
+  *hex_digest = (unsigned char *) &s[i];
+  return true;
 }
 
 /* Split the string S (of length S_LEN) into three parts:
    a hexadecimal digest, binary flag, and the file name.
-   S is modified.  */
+   S is modified.  Return true if successful.  */
 
-static int
+static bool
 split_3 (char *s, size_t s_len,
-	 unsigned char **hex_digest, int *binary, char **file_name)
+	 unsigned char **hex_digest, bool *binary, char **file_name)
 {
   size_t i;
-  int escaped_filename = 0;
-
-#define ISWHITE(c) ((c) == ' ' || (c) == '\t')
+  bool escaped_filename = false;
+  size_t algo_name_len;
 
   i = 0;
   while (ISWHITE (s[i]))
     ++i;
+
+  /* Check for BSD-style checksum line. */
+  algo_name_len = strlen (DIGEST_TYPE_STRING (algorithm));
+  if (strncmp (s + i, DIGEST_TYPE_STRING (algorithm), algo_name_len) == 0)
+    {
+      if (strncmp (s + i + algo_name_len, " (", 2) == 0)
+	{
+	  *binary = false;
+	  return bsd_split_3 (s +      i + algo_name_len + 2,
+			      s_len - (i + algo_name_len + 2),
+			      hex_digest, file_name);
+	}
+    }
 
   /* Ignore this line if it is too short.
      Each line must have at least `min_digest_line_length - 1' (or one more, if
      the first is a backslash) more characters to contain correct message digest
      information.  */
   if (s_len - i < min_digest_line_length + (s[i] == '\\'))
-    return 1;
+    return false;
 
   if (s[i] == '\\')
     {
       ++i;
-      escaped_filename = 1;
+      escaped_filename = true;
     }
   *hex_digest = (unsigned char *) &s[i];
 
@@ -196,12 +253,12 @@ split_3 (char *s, size_t s_len,
      immediately by a white space it's an error.  */
   i += digest_hex_bytes;
   if (!ISWHITE (s[i]))
-    return 1;
+    return false;
 
   s[i++] = '\0';
 
   if (s[i] != ' ' && s[i] != '*')
-    return 1;
+    return false;
   *binary = (s[i++] == '*');
 
   /* All characters between the type indicator and end of line are
@@ -223,7 +280,7 @@ split_3 (char *s, size_t s_len,
 	      if (i == s_len - 1)
 		{
 		  /* A valid line does not end with a backslash.  */
-		  return 1;
+		  return false;
 		}
 	      ++i;
 	      switch (s[i++])
@@ -236,13 +293,13 @@ split_3 (char *s, size_t s_len,
 		  break;
 		default:
 		  /* Only `\' or `n' may follow a backslash.  */
-		  return 1;
+		  return false;
 		}
 	      break;
 
 	    case '\0':
 	      /* The file name may not contain a NUL.  */
-	      return 1;
+	      return false;
 	      break;
 
 	    default:
@@ -252,36 +309,36 @@ split_3 (char *s, size_t s_len,
 	}
       *dst = '\0';
     }
-  return 0;
+  return true;
 }
 
-static int
+static bool
 hex_digits (unsigned char const *s)
 {
   while (*s)
     {
       if (!ISXDIGIT (*s))
-        return 0;
+        return false;
       ++s;
     }
-  return 1;
+  return true;
 }
 
 /* An interface to the function, DIGEST_STREAM,
-   (either md5_stream or sha_stream).
+   (either md5_stream or sha1_stream).
    Operate on FILENAME (it may be "-") and put the result in *BIN_RESULT.
-   Return non-zero upon failure, zero to indicate success.  */
+   Return true if successful.  */
 
-static int
-digest_file (const char *filename, int binary, unsigned char *bin_result,
-	   int (*digest_stream)(FILE *, void *))
+static bool
+digest_file (const char *filename, bool binary, unsigned char *bin_result,
+	     int (*digest_stream) (FILE *, void *))
 {
   FILE *fp;
   int err;
 
   if (STREQ (filename, "-"))
     {
-      have_read_stdin = 1;
+      have_read_stdin = true;
       fp = stdin;
 #if O_BINARY
       /* If we need binary reads from a pipe or redirected stdin, we need
@@ -300,7 +357,7 @@ digest_file (const char *filename, int binary, unsigned char *bin_result,
       if (fp == NULL)
 	{
 	  error (0, errno, "%s", filename);
-	  return 1;
+	  return false;
 	}
     }
 
@@ -310,33 +367,33 @@ digest_file (const char *filename, int binary, unsigned char *bin_result,
       error (0, errno, "%s", filename);
       if (fp != stdin)
 	fclose (fp);
-      return 1;
+      return false;
     }
 
   if (fp != stdin && fclose (fp) == EOF)
     {
       error (0, errno, "%s", filename);
-      return 1;
+      return false;
     }
 
-  return 0;
+  return true;
 }
 
-static int
-digest_check (const char *checkfile_name, int (*digest_stream)(FILE *, void *))
+static bool
+digest_check (const char *checkfile_name, int (*digest_stream) (FILE *, void *))
 {
   FILE *checkfile_stream;
-  int n_properly_formated_lines = 0;
-  int n_mismatched_checksums = 0;
-  int n_open_or_read_failures = 0;
+  uintmax_t n_properly_formatted_lines = 0;
+  uintmax_t n_mismatched_checksums = 0;
+  uintmax_t n_open_or_read_failures = 0;
   unsigned char bin_buffer[MAX_DIGEST_BIN_BYTES];
-  size_t line_number;
+  uintmax_t line_number;
   char *line;
   size_t line_chars_allocated;
 
   if (STREQ (checkfile_name, "-"))
     {
-      have_read_stdin = 1;
+      have_read_stdin = true;
       checkfile_name = _("standard input");
       checkfile_stream = stdin;
     }
@@ -346,7 +403,7 @@ digest_check (const char *checkfile_name, int (*digest_stream)(FILE *, void *))
       if (checkfile_stream == NULL)
 	{
 	  error (0, errno, "%s", checkfile_name);
-	  return 1;
+	  return false;
 	}
     }
 
@@ -357,12 +414,14 @@ digest_check (const char *checkfile_name, int (*digest_stream)(FILE *, void *))
   do
     {
       char *filename;
-      int binary;
+      bool binary;
       unsigned char *hex_digest;
-      int err;
-      int line_length;
+      ssize_t line_length;
 
       ++line_number;
+      if (line_number == 0)
+	error (EXIT_FAILURE, 0, _("%s: too many checksum lines"),
+	       checkfile_name);
 
       line_length = getline (&line, &line_chars_allocated, checkfile_stream);
       if (line_length <= 0)
@@ -376,14 +435,15 @@ digest_check (const char *checkfile_name, int (*digest_stream)(FILE *, void *))
       if (line[line_length - 1] == '\n')
 	line[--line_length] = '\0';
 
-      err = split_3 (line, line_length, &hex_digest, &binary, &filename);
-      if (err || !hex_digits (hex_digest))
+      if (! (split_3 (line, line_length, &hex_digest, &binary, &filename)
+	     && hex_digits (hex_digest)))
 	{
 	  if (warn)
 	    {
 	      error (0, 0,
-		     _("%s: %lu: improperly formatted %s checksum line"),
-		     checkfile_name, (unsigned long) line_number,
+		     _("%s: %" PRIuMAX
+		       ": improperly formatted %s checksum line"),
+		     checkfile_name, line_number,
 		     DIGEST_TYPE_STRING (algorithm));
 	    }
 	}
@@ -393,13 +453,13 @@ digest_check (const char *checkfile_name, int (*digest_stream)(FILE *, void *))
 					  '4', '5', '6', '7',
 					  '8', '9', 'a', 'b',
 					  'c', 'd', 'e', 'f' };
-	  int fail;
+	  bool ok;
 
-	  ++n_properly_formated_lines;
+	  ++n_properly_formatted_lines;
 
-	  fail = digest_file (filename, binary, bin_buffer, digest_stream);
+	  ok = digest_file (filename, binary, bin_buffer, digest_stream);
 
-	  if (fail)
+	  if (!ok)
 	    {
 	      ++n_open_or_read_failures;
 	      if (!status_only)
@@ -442,16 +502,16 @@ digest_check (const char *checkfile_name, int (*digest_stream)(FILE *, void *))
   if (ferror (checkfile_stream))
     {
       error (0, 0, _("%s: read error"), checkfile_name);
-      return 1;
+      return false;
     }
 
   if (checkfile_stream != stdin && fclose (checkfile_stream) == EOF)
     {
       error (0, errno, "%s", checkfile_name);
-      return 1;
+      return false;
     }
 
-  if (n_properly_formated_lines == 0)
+  if (n_properly_formatted_lines == 0)
     {
       /* Warn if no tests are found.  */
       error (0, 0, _("%s: no properly formatted %s checksum lines found"),
@@ -461,54 +521,55 @@ digest_check (const char *checkfile_name, int (*digest_stream)(FILE *, void *))
     {
       if (!status_only)
 	{
-	  int n_computed_checkums = (n_properly_formated_lines
-				     - n_open_or_read_failures);
+	  if (n_open_or_read_failures != 0)
+	    error (0, 0,
+		   ngettext ("WARNING: %" PRIuMAX " of %" PRIuMAX
+			     " listed file could not be read",
+			     "WARNING: %" PRIuMAX " of %" PRIuMAX
+			     " listed files could not be read",
+			     n_properly_formatted_lines),
+		   n_open_or_read_failures, n_properly_formatted_lines);
 
-	  if (n_open_or_read_failures > 0)
+	  if (n_mismatched_checksums != 0)
 	    {
+	      uintmax_t n_computed_checksums =
+		(n_properly_formatted_lines - n_open_or_read_failures);
 	      error (0, 0,
-		     _("WARNING: %d of %d listed %s could not be read"),
-		     n_open_or_read_failures, n_properly_formated_lines,
-		     (n_properly_formated_lines == 1
-		      ? _("file") : _("files")));
-	    }
-
-	  if (n_mismatched_checksums > 0)
-	    {
-	      error (0, 0,
-		   _("WARNING: %d of %d computed %s did NOT match"),
-		     n_mismatched_checksums, n_computed_checkums,
-		     (n_computed_checkums == 1
-		      ? _("checksum") : _("checksums")));
+		     ngettext ("WARNING: %" PRIuMAX " of %" PRIuMAX
+			       " computed checksum did NOT match",
+			       "WARNING: %" PRIuMAX " of %" PRIuMAX
+			       " computed checksums did NOT match",
+			       n_computed_checksums),
+		     n_mismatched_checksums, n_computed_checksums);
 	    }
 	}
     }
 
-  return ((n_properly_formated_lines > 0 && n_mismatched_checksums == 0
-	   && n_open_or_read_failures == 0) ? 0 : 1);
+  return (n_properly_formatted_lines != 0
+	  && n_mismatched_checksums == 0
+	  && n_open_or_read_failures == 0);
 }
 
 int
 main (int argc, char **argv)
 {
   unsigned char bin_buffer[MAX_DIGEST_BIN_BYTES];
-  int do_check = 0;
+  bool do_check = false;
   int opt;
-  char **string = NULL;
-  size_t n_strings = 0;
-  size_t err = 0;
-  int file_type_specified = 0;
+  bool ok = true;
+  bool file_type_specified = false;
 
 #if O_BINARY
   /* Binary is default on MSDOS, so the actual file contents
      are used in computation.  */
-  int binary = 1;
+  bool binary = true;
 #else
   /* Text is default of the Plumb/Lankester format.  */
-  int binary = 0;
+  bool binary = false;
 #endif
 
   /* Setting values of global variables.  */
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -519,36 +580,24 @@ main (int argc, char **argv)
   while ((opt = getopt_long (argc, argv, "bctw", long_options, NULL)) != -1)
     switch (opt)
       {
-      case 0:			/* long option */
-	break;
-      case 1: /* --string */
-	{
-	  if (string == NULL)
-	    string = (char **) xmalloc ((argc - 1) * sizeof (char *));
-
-	  if (optarg == NULL)
-	    optarg = "";
-	  string[n_strings++] = optarg;
-	}
-	break;
       case 'b':
-	file_type_specified = 1;
-	binary = 1;
+	file_type_specified = true;
+	binary = true;
 	break;
       case 'c':
-	do_check = 1;
+	do_check = true;
 	break;
-      case 2:
-	status_only = 1;
-	warn = 0;
+      case STATUS_OPTION:
+	status_only = true;
+	warn = false;
 	break;
       case 't':
-	file_type_specified = 1;
-	binary = 0;
+	file_type_specified = true;
+	binary = false;
 	break;
       case 'w':
-	status_only = 0;
-	warn = 1;
+	status_only = false;
+	warn = true;
 	break;
       case_GETOPT_HELP_CHAR;
       case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
@@ -559,68 +608,39 @@ main (int argc, char **argv)
   min_digest_line_length = MIN_DIGEST_LINE_LENGTH (algorithm);
   digest_hex_bytes = DIGEST_HEX_BYTES (algorithm);
 
-  if (file_type_specified && do_check)
+  if (file_type_specified & do_check)
     {
-      error (0, 0, _("the --binary and --text options are meaningless when \
-verifying checksums"));
+      error (0, 0, _("the --binary and --text options are meaningless when "
+		     "verifying checksums"));
       usage (EXIT_FAILURE);
     }
 
-  if (n_strings > 0 && do_check)
-    {
-      error (0, 0,
-	     _("the --string and --check options are mutually exclusive"));
-      usage (EXIT_FAILURE);
-    }
-
-  if (status_only && !do_check)
+  if (status_only & !do_check)
     {
       error (0, 0,
        _("the --status option is meaningful only when verifying checksums"));
       usage (EXIT_FAILURE);
     }
 
-  if (warn && !do_check)
+  if (warn & !do_check)
     {
       error (0, 0,
        _("the --warn option is meaningful only when verifying checksums"));
       usage (EXIT_FAILURE);
     }
 
-  if (n_strings > 0)
-    {
-      size_t i;
-
-      if (optind < argc)
-	{
-	  error (0, 0, _("no files may be specified when using --string"));
-	  usage (EXIT_FAILURE);
-	}
-      for (i = 0; i < n_strings; ++i)
-	{
-	  size_t cnt;
-	  if (algorithm == ALG_MD5)
-	    md5_buffer (string[i], strlen (string[i]), bin_buffer);
-	  else
-	    sha_buffer (string[i], strlen (string[i]), bin_buffer);
-
-	  for (cnt = 0; cnt < (digest_hex_bytes / 2); ++cnt)
-	    printf ("%02x", bin_buffer[cnt]);
-
-	  printf ("  \"%s\"\n", string[i]);
-	}
-    }
-  else if (do_check)
+  if (do_check)
     {
       if (optind + 1 < argc)
 	{
-	  error (0, 0,
-		 _("only one argument may be specified when using --check"));
+	  error (0, 0, _("extra operand %s"), quote (argv[optind + 1]));
+	  fprintf (stderr, "%s\n",
+		   _("Only one operand may be specified when using --check."));
 	  usage (EXIT_FAILURE);
 	}
 
-      err = digest_check ((optind == argc) ? "-" : argv[optind],
-			  DIGEST_STREAM (algorithm));
+      ok = digest_check (optind == argc ? "-" : argv[optind],
+			 DIGEST_STREAM (algorithm));
     }
   else
     {
@@ -629,13 +649,12 @@ verifying checksums"));
 
       for (; optind < argc; ++optind)
 	{
-	  int fail;
 	  char *file = argv[optind];
 
-	  fail = digest_file (file, binary, bin_buffer,
-			      DIGEST_STREAM (algorithm));
-	  err |= fail;
-	  if (!fail)
+	  if (! digest_file (file, binary, bin_buffer,
+			     DIGEST_STREAM (algorithm)))
+	    ok = false;
+	  else
 	    {
 	      size_t i;
 
@@ -680,5 +699,5 @@ verifying checksums"));
   if (have_read_stdin && fclose (stdin) == EOF)
     error (EXIT_FAILURE, errno, _("standard input"));
 
-  exit (err == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
+  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
 }

@@ -1,5 +1,5 @@
 /* `rm' file deletion utility for GNU.
-   Copyright (C) 88, 90, 91, 1994-2003 Free Software Foundation, Inc.
+   Copyright (C) 88, 90, 91, 1994-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -49,15 +49,17 @@
 #include <assert.h>
 
 #include "system.h"
+#include "dirname.h"
 #include "error.h"
+#include "quote.h"
 #include "remove.h"
-#include "save-cwd.h"
+#include "root-dev-ino.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
 #define PROGRAM_NAME "rm"
 
 #define AUTHORS \
-  N_ ("Paul Rubin, David MacKenzie, Richard Stallman, and Jim Meyering")
+  "Paul Rubin", "David MacKenzie, Richard Stallman", "Jim Meyering"
 
 /* Name this program was run with.  */
 char *program_name;
@@ -66,7 +68,9 @@ char *program_name;
    non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
 enum
 {
-  PRESUME_INPUT_TTY_OPTION = CHAR_MAX + 1
+  NO_PRESERVE_ROOT = CHAR_MAX + 1,
+  PRESERVE_ROOT,
+  PRESUME_INPUT_TTY_OPTION
 };
 
 static struct option const long_opts[] =
@@ -74,6 +78,9 @@ static struct option const long_opts[] =
   {"directory", no_argument, NULL, 'd'},
   {"force", no_argument, NULL, 'f'},
   {"interactive", no_argument, NULL, 'i'},
+
+  {"no-preserve-root", no_argument, NULL, NO_PRESERVE_ROOT},
+  {"preserve-root", no_argument, NULL, PRESERVE_ROOT},
 
   /* This is solely for testing.  Do not document.  */
   /* It is relatively difficult to ensure that there is a tty on stdin.
@@ -91,19 +98,25 @@ static struct option const long_opts[] =
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
     {
+      char *base = base_name (program_name);
       printf (_("Usage: %s [OPTION]... FILE...\n"), program_name);
       fputs (_("\
 Remove (unlink) the FILE(s).\n\
 \n\
   -d, --directory       unlink FILE, even if it is a non-empty directory\n\
-                          (super-user only)\n\
+                          (super-user only; this works only if your system\n\
+                           supports `unlink' for nonempty directories)\n\
   -f, --force           ignore nonexistent files, never prompt\n\
   -i, --interactive     prompt before any removal\n\
+"), stdout);
+      fputs (_("\
+      --no-preserve-root do not treat `/' specially (the default)\n\
+      --preserve-root   fail to operate recursively on `/'\n\
   -r, -R, --recursive   remove the contents of directories recursively\n\
   -v, --verbose         explain what is being done\n\
 "), stdout);
@@ -117,7 +130,7 @@ use one of these commands:\n\
 \n\
   %s ./-foo\n\
 "),
-	      program_name, program_name);
+	      base, base);
       fputs (_("\
 \n\
 Note that if you use rm to remove a file, it is usually possible to recover\n\
@@ -132,21 +145,27 @@ truly unrecoverable, consider using shred.\n\
 static void
 rm_option_init (struct rm_options *x)
 {
-  x->unlink_dirs = 0;
-  x->ignore_missing_files = 0;
-  x->interactive = 0;
-  x->recursive = 0;
+  x->unlink_dirs = false;
+  x->ignore_missing_files = false;
+  x->interactive = false;
+  x->recursive = false;
+  x->root_dev_ino = NULL;
   x->stdin_tty = isatty (STDIN_FILENO);
-  x->verbose = 0;
+  x->verbose = false;
+
+  /* Since this program exits immediately after calling `rm', rm need not
+     expend unnecessary effort to preserve the initial working directory.  */
+  x->require_restore_cwd = false;
 }
 
 int
 main (int argc, char **argv)
 {
+  bool preserve_root = false;
   struct rm_options x;
-  int fail = 0;
   int c;
 
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -160,29 +179,41 @@ main (int argc, char **argv)
     {
       switch (c)
 	{
-	case 0:		/* Long option.  */
-	  break;
 	case 'd':
-	  x.unlink_dirs = 1;
+	  x.unlink_dirs = true;
 	  break;
+
 	case 'f':
-	  x.interactive = 0;
-	  x.ignore_missing_files = 1;
+	  x.interactive = false;
+	  x.ignore_missing_files = true;
 	  break;
+
 	case 'i':
-	  x.interactive = 1;
-	  x.ignore_missing_files = 0;
+	  x.interactive = true;
+	  x.ignore_missing_files = false;
 	  break;
+
 	case 'r':
 	case 'R':
-	  x.recursive = 1;
+	  x.recursive = true;
 	  break;
+
+	case NO_PRESERVE_ROOT:
+	  preserve_root = false;
+	  break;
+
+	case PRESERVE_ROOT:
+	  preserve_root = true;
+	  break;
+
 	case PRESUME_INPUT_TTY_OPTION:
-	  x.stdin_tty = 1;
+	  x.stdin_tty = true;
 	  break;
+
 	case 'v':
-	  x.verbose = 1;
+	  x.verbose = true;
 	  break;
+
 	case_GETOPT_HELP_CHAR;
 	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
 	default:
@@ -190,15 +221,24 @@ main (int argc, char **argv)
 	}
     }
 
-  if (optind == argc)
+  if (argc <= optind)
     {
       if (x.ignore_missing_files)
 	exit (EXIT_SUCCESS);
       else
 	{
-	  error (0, 0, _("too few arguments"));
+	  error (0, 0, _("missing operand"));
 	  usage (EXIT_FAILURE);
 	}
+    }
+
+  if (x.recursive & preserve_root)
+    {
+      static struct dev_ino dev_ino_buf;
+      x.root_dev_ino = get_root_dev_ino (&dev_ino_buf);
+      if (x.root_dev_ino == NULL)
+	error (EXIT_FAILURE, errno, _("failed to get attributes of %s"),
+	       quote ("/"));
     }
 
   {
@@ -207,9 +247,6 @@ main (int argc, char **argv)
 
     enum RM_status status = rm (n_files, file, &x);
     assert (VALID_STATUS (status));
-    if (status == RM_ERROR)
-      fail = 1;
+    exit (status == RM_ERROR ? EXIT_FAILURE : EXIT_SUCCESS);
   }
-
-  exit (fail);
 }

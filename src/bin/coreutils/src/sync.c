@@ -1,5 +1,5 @@
 /* sync - update the super block
-   Copyright (C) 1994-2002 Free Software Foundation, Inc.
+   Copyright (C) 1994-2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 /* Written by Jim Meyering */
 
 #include <config.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <sys/types.h>
 
@@ -36,7 +37,7 @@ char *program_name;
 void
 usage (int status)
 {
-  if (status != 0)
+  if (status != EXIT_SUCCESS)
     fprintf (stderr, _("Try `%s --help' for more information.\n"),
 	     program_name);
   else
@@ -56,6 +57,7 @@ Force changed blocks to disk, update the super block.\n\
 int
 main (int argc, char **argv)
 {
+  initialize_main (&argc, &argv);
   program_name = argv[0];
   setlocale (LC_ALL, "");
   bindtextdomain (PACKAGE, LOCALEDIR);
@@ -64,9 +66,11 @@ main (int argc, char **argv)
   atexit (close_stdout);
 
   parse_long_options (argc, argv, PROGRAM_NAME, PACKAGE, VERSION,
-		      AUTHORS, usage);
+		      usage, AUTHORS, (char const *) NULL);
+  if (getopt_long (argc, argv, "", NULL, NULL) != -1)
+    usage (EXIT_FAILURE);
 
-  if (argc != 1)
+  if (optind < argc)
     error (0, 0, _("ignoring all arguments"));
 
   sync ();

@@ -1,5 +1,7 @@
 /* getusershell.c -- Return names of valid user shells.
-   Copyright (C) 1991, 1997, 2000, 2001 Free Software Foundation, Inc.
+
+   Copyright (C) 1991, 1997, 2000, 2001, 2003, 2004 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,12 +34,14 @@
 #endif
 
 #include <stdio.h>
-#if HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
+#include <stdlib.h>
 #include <ctype.h>
-#include "unlocked-io.h"
+
 #include "xalloc.h"
+
+#if USE_UNLOCKED_IO
+# include "unlocked-io.h"
+#endif
 
 #if defined (STDC_HEADERS) || (!defined (isascii) && !defined (HAVE_ISASCII))
 # define IN_CTYPE_DOMAIN(c) 1
@@ -47,7 +51,7 @@
 
 #define ISSPACE(c) (IN_CTYPE_DOMAIN (c) && isspace (c))
 
-static int readname ();
+static size_t readname (char **, size_t *, FILE *);
 
 #if ! defined ADDITIONAL_DEFAULT_SHELLS && defined __MSDOS__
 # define ADDITIONAL_DEFAULT_SHELLS \
@@ -65,7 +69,7 @@ static char const* const default_shells[] =
 
 /* Index of the next shell in `default_shells' to return.
    0 means we are not using `default_shells'. */
-static int default_index = 0;
+static size_t default_index = 0;
 
 /* Input stream from the shells file. */
 static FILE *shellstream = NULL;
@@ -74,7 +78,7 @@ static FILE *shellstream = NULL;
 static char *line = NULL;
 
 /* Number of bytes allocated for `line'. */
-static int line_size = 0;
+static size_t line_size = 0;
 
 /* Return an entry from the shells file, ignoring comment lines.
    If the file doesn't exist, use the list in DEFAULT_SHELLS (above).
@@ -82,7 +86,7 @@ static int line_size = 0;
    Return NULL if there are no more entries.  */
 
 char *
-getusershell ()
+getusershell (void)
 {
   if (default_index > 0)
     {
@@ -114,7 +118,7 @@ getusershell ()
 /* Rewind the shells file. */
 
 void
-setusershell ()
+setusershell (void)
 {
   default_index = 0;
   if (shellstream)
@@ -124,7 +128,7 @@ setusershell ()
 /* Close the shells file. */
 
 void
-endusershell ()
+endusershell (void)
 {
   if (shellstream)
     {
@@ -138,36 +142,26 @@ endusershell ()
    and/or realloc'd as necessary and can start out NULL,
    and whose size is passed and returned in *SIZE.
 
-   Return the number of characters placed in *NAME
+   Return the number of bytes placed in *NAME
    if some nonempty sequence was found, otherwise 0.  */
 
-static int
-readname (name, size, stream)
-     char **name;
-     int *size;
-     FILE *stream;
+static size_t
+readname (char **name, size_t *size, FILE *stream)
 {
   int c;
-  int name_index = 0;
-
-  if (*name == NULL)
-    {
-      *size = 10;
-      *name = (char *) xmalloc (*size);
-    }
+  size_t name_index = 0;
 
   /* Skip blank space.  */
   while ((c = getc (stream)) != EOF && ISSPACE (c))
     /* Do nothing. */ ;
 
-  while (c != EOF && !ISSPACE (c))
+  for (;;)
     {
+      if (*size <= name_index)
+	*name = x2nrealloc (*name, size, sizeof **name);
+      if (c == EOF || ISSPACE (c))
+	break;
       (*name)[name_index++] = c;
-      while (name_index >= *size)
-	{
-	  *size *= 2;
-	  *name = (char *) xrealloc (*name, *size);
-	}
       c = getc (stream);
     }
   (*name)[name_index] = '\0';
@@ -175,7 +169,8 @@ readname (name, size, stream)
 }
 
 #ifdef TEST
-main ()
+int
+main (void)
 {
   char *s;
 
