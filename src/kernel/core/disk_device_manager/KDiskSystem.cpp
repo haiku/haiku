@@ -64,19 +64,25 @@ KDiskSystem::PrettyName()
 	return fPrettyName;
 }
 
+// Flags
+uint32
+KDiskSystem::Flags() const
+{
+	return fFlags;
+}
+
 // IsFileSystem
 bool
 KDiskSystem::IsFileSystem() const
 {
-	// to be implemented by derived classes
-	return false;
+	return (fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM);
 }
 
 // IsPartitioningSystem
 bool
 KDiskSystem::IsPartitioningSystem() const
 {
-	return !IsFileSystem();
+	return !(fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM);
 }
 
 // GetInfo
@@ -88,7 +94,7 @@ KDiskSystem::GetInfo(user_disk_system_info *info)
 	info->id = ID();
 	strcpy(info->name, Name());
 	strcpy(info->pretty_name, PrettyName());
-	info->file_system = IsFileSystem();
+	info->flags = Flags();
 }
 
 // Load
@@ -547,6 +553,13 @@ status_t
 KDiskSystem::SetPrettyName(const char *name)
 {
 	return set_string(fPrettyName, name);
+}
+
+// SetFlags
+void
+KDiskSystem::SetFlags(uint32 flags)
+{
+	fFlags = flags;
 }
 
 // _NextID

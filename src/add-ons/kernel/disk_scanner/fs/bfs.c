@@ -263,6 +263,7 @@ static fs_module_info bfs_module = {
 // B_PLAIN_C_ERROR:
 //	kPartitionTypeBFS,					// pretty_name
 	"BFS Filesystem",					// pretty_name
+	B_DISK_SYSTEM_IS_FILE_SYSTEM,		// flags
 
 	// scanning
 	bfs_identify_partition,				// identify_partition

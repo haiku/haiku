@@ -17,8 +17,6 @@ public:
 
 	virtual status_t Init();
 
-	virtual bool IsFileSystem() const;
-
 	// Scanning
 
 	virtual float Identify(KPartition *partition, void **cookie);

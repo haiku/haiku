@@ -117,6 +117,7 @@ typedef status_t (*partition_set_partition_content_parameters)(int fd,
 typedef struct partition_module_info {
 	module_info									module;
 	const char									*pretty_name;
+	uint32										flags;
 
 	// scanning
 	partition_identify_partition				identify_partition;
@@ -243,6 +244,7 @@ typedef status_t (*fs_set_partition_content_parameters)(int fd,
 typedef struct fs_module_info {
 	module_info									module;
 	const char									*pretty_name;
+	uint32										flags;
 
 	// scanning
 	fs_identify_partition						identify_partition;

@@ -298,6 +298,7 @@ static partition_module_info intel_partition_map_module = {
 		pm_std_ops
 	},
 	kPartitionTypeIntel,				// pretty_name
+	0,									// flags
 
 	// scanning
 	pm_identify_partition,				// identify_partition
@@ -375,6 +376,7 @@ static partition_module_info intel_extended_partition_module = {
 		ep_std_ops
 	},
 	kPartitionTypeIntelExtended,		// pretty_name
+	0,									// flags
 
 	// scanning
 	ep_identify_partition,				// identify_partition

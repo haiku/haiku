@@ -32,15 +32,9 @@ KFileSystem::Init()
 	if (error != B_OK)
 		return error;
 	error = SetPrettyName(fModule->pretty_name);
+	SetFlags(fModule->flags | B_DISK_SYSTEM_IS_FILE_SYSTEM);
 	Unload();
 	return error;
-}
-
-// IsFileSystem
-bool
-KFileSystem::IsFileSystem() const
-{
-	return true;
 }
 
 // Identify

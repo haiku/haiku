@@ -23,9 +23,10 @@ public:
 //	void SetID(disk_system_id id);
 	disk_system_id ID() const;
 	const char *Name() const;
-	virtual const char *PrettyName();
+	const char *PrettyName();
+	uint32 Flags() const;
 
-	virtual bool IsFileSystem() const;
+	bool IsFileSystem() const;
 	bool IsPartitioningSystem() const;
 
 	void GetInfo(user_disk_system_info *info);
@@ -137,6 +138,7 @@ protected:
 	virtual void UnloadModule();
 
 	status_t SetPrettyName(const char *name);
+	void SetFlags(uint32 flags);
 
 	static int32 _NextID();
 
@@ -144,6 +146,7 @@ private:
 	disk_system_id	fID;
 	char			*fName;
 	char			*fPrettyName;
+	uint32			fFlags;
 	int32			fLoadCounter;
 
 	static int32	fNextID;

@@ -32,15 +32,9 @@ KPartitioningSystem::Init()
 	if (error != B_OK)
 		return error;
 	error = SetPrettyName(fModule->pretty_name);
+	SetFlags(fModule->flags & ~(uint32)B_DISK_SYSTEM_IS_FILE_SYSTEM);
 	Unload();
 	return error;
-}
-
-// IsFileSystem
-bool
-KPartitioningSystem::IsFileSystem() const
-{
-	return false;
 }
 
 // Identify

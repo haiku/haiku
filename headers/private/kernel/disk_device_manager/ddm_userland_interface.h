@@ -52,7 +52,7 @@ struct user_disk_system_info {
 	disk_system_id	id;
 	char			name[B_FILE_NAME_LENGTH];	// better B_PATH_NAME_LENGTH?
 	char			pretty_name[B_OS_NAME_LENGTH];
-	bool			file_system;
+	uint32			flags;
 };
 
 // userland disk device job representation
