@@ -39,7 +39,10 @@ enum {
 	B_MS_WINDOWS_1251_CONVERSION,	/* MS-Windows Codepage 1251 */
 	B_MS_DOS_866_CONVERSION,		/* MS-DOS Codepage 866 */
 	B_MS_DOS_CONVERSION,			/* MS-DOS Codepage 437 */
-	B_EUC_KR_CONVERSION				/* EUC Korean */
+	B_EUC_KR_CONVERSION,				/* EUC Korean */
+	B_ISO13_CONVERSION,				/* ISO 8859-13 */
+	B_ISO14_CONVERSION,				/* ISO 8859-14 */
+	B_ISO15_CONVERSION,				/* ISO 8859-15 */
 };
 
 /*-------------------------------------------------------------*/
