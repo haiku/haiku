@@ -28,7 +28,7 @@
 #include "DialUpView.h"
 
 
-static const char *kSignature = "application/x-obos.dial-up-preflet";
+static const char *kSignature = "application/x-haiku.dial-up-preflet";
 
 
 class DialUpApplication : public BApplication {
