@@ -316,7 +316,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 	mouse_device *dev = (mouse_device *)arg;
 	
 	mouse_movement movements;
-	uint32 buttons_state;
+	uint32 buttons_state = 0;
 	BMessage *message;
 	while (dev->active) {
 		memset(&movements, 0, sizeof(movements));
