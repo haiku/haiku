@@ -137,7 +137,6 @@ KernelLd libroot.so :
 	posix_stdlib.o
 	posix_string.o
 	posix_sys.o
-	posix_termios.o
 	posix_time.o
 	posix_unistd.o
 
