@@ -83,9 +83,14 @@ partitionInfo->info.device[0] = '\0';
 	}
 	// get the FS info
 	if (error == B_OK) {
-		error = disk_scanner->get_partition_fs_info(deviceFD, partitionInfo);
-		// in case the FS is unknown, we fill in the respective fields
-		if (error == B_ENTRY_NOT_FOUND) {
+		bool hidden = (partitionInfo->flags & B_HIDDEN_PARTITION);
+		if (!hidden) {
+			error = disk_scanner->get_partition_fs_info(deviceFD,
+														partitionInfo);
+		}
+		// in case the partition is no data partition or the FS is unknown,
+		// we fill in the respective fields
+		if (hidden || error == B_ENTRY_NOT_FOUND) {
 			error = B_OK;
 			partitionInfo->file_system_short_name[0] = '\0';
 			partitionInfo->file_system_long_name[0] = '\0';
