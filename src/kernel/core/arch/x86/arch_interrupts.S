@@ -94,12 +94,12 @@ int_bottom:
 	movl	%eax,%es
 	movl	%ss,%ebx
 	movl	%esp,%esi
-	cmpl	%eax,%ebx  // check if we changed the stack
+	cmpl	%eax,%ebx 	// check if we changed the stack
 	jne		custom_stack
   kernel_stack:
 	call	i386_handle_trap
 	pop		%gs
-	pop		%fs
+	pop		%fs			// kernel stacks don't care about TLS (which uses %fs)
 	pop		%es
 	pop		%ds
 	popa
@@ -124,7 +124,7 @@ int_bottom:
 	call	i386_handle_trap
 	lss		84(%esp),%esp	// reload custom stack address
 	pop		%gs
-	pop		%fs
+	addl	$4, %esp		// we skip %fs, as this contains the CPU dependent TLS segment
 	pop		%es
 	pop		%ds
 	popa
@@ -193,7 +193,7 @@ FUNCTION(i386_restore_frame_from_syscall):
 	add		$4, %esp	// make the iframe our current stack position (we don't need the
 						// return address anymore, as we will use the one of the frame)
 	pop		%gs			// recreate the frame environment
-	pop		%fs
+	addl	$4, %esp	// we skip %fs, as this contains the CPU dependent TLS segment
 	pop		%es
 	pop		%ds
 	popa
