@@ -5,7 +5,7 @@
 #include <string.h>
 
 #ifdef _KERNEL_
-#include <KernelExport.h>
+#	include <KernelExport.h>
 #endif
 
 #include "netinet/in.h"
@@ -27,19 +27,32 @@ struct ifaddr **ifnet_addrs;
 static int if_index;
 static int if_indexlim;
 
-struct ifnet *get_interfaces(void)
+
+static inline bool
+equal(struct sockaddr *addr1, struct sockaddr *addr2)
+{
+	return !memcmp(addr1, addr2, addr1->sa_len);
+}
+
+
+struct ifnet *
+get_interfaces(void)
 {
 	return devices;
 }
 
-void if_init(void)
+
+void
+if_init(void)
 {
 	ifnet_addrs = NULL;
 	if_index = 0;
 	if_indexlim = 8; /* initial value */
 }
 
-int ifioctl(struct socket *so, int cmd, caddr_t data)
+
+int
+ifioctl(struct socket *so, int cmd, caddr_t data)
 {
 	struct ifnet *ifp;
 	struct ifreq *ifr;
@@ -84,8 +97,10 @@ int ifioctl(struct socket *so, int cmd, caddr_t data)
 	
 	return 0;
 }
+
 	
-struct ifnet *ifunit(char *name)
+struct ifnet *
+ifunit(char *name)
 {
 	ifnet *d = devices;
 
@@ -95,7 +110,9 @@ struct ifnet *ifunit(char *name)
 	return NULL;
 }
 
-void dump_sockaddr(void *ptr)
+
+void
+dump_sockaddr(void *ptr)
 {
 	struct sockaddr *sa = (struct sockaddr *)ptr;
 	uint8 *d = NULL;
@@ -140,7 +157,9 @@ void dump_sockaddr(void *ptr)
 	}
 }
 
-void *protocol_address(struct ifnet *ifa, int family)
+
+void *
+protocol_address(struct ifnet *ifa, int family)
 {
 	struct ifaddr *a = ifa->if_addrlist;
 
@@ -156,15 +175,13 @@ void *protocol_address(struct ifnet *ifa, int family)
 	return NULL;
 }
 
-#define equal(a1, a2) \
-  (memcmp((caddr_t)(a1), (caddr_t)(a2), ((struct sockaddr *)(a1))->sa_len) == 0)
 
 /*
  * Find an interface address specific to an interface best matching
  * a given address.
  */
-struct ifaddr *ifaof_ifpforaddr(struct sockaddr *addr, 
-				struct ifnet *ifp)
+struct ifaddr *
+ifaof_ifpforaddr(struct sockaddr *addr, struct ifnet *ifp)
 {
 	struct ifaddr *ifa;
 	char *cp, *cp2, *cp3;
@@ -198,7 +215,9 @@ struct ifaddr *ifaof_ifpforaddr(struct sockaddr *addr,
         return (ifa_maybe);
 }
 
-struct ifaddr *ifa_ifwithdstaddr(struct sockaddr *addr)
+
+struct ifaddr *
+ifa_ifwithdstaddr(struct sockaddr *addr)
 {
 	struct ifnet *ifp;
 	struct ifaddr *ifa;
@@ -215,7 +234,9 @@ struct ifaddr *ifa_ifwithdstaddr(struct sockaddr *addr)
         return (NULL);
 }
 
-struct ifaddr *ifa_ifwithaddr(struct sockaddr *addr)
+
+struct ifaddr *
+ifa_ifwithaddr(struct sockaddr *addr)
 {
 	struct ifnet *ifp;
 	struct ifaddr *ifa;
@@ -236,11 +257,14 @@ struct ifaddr *ifa_ifwithaddr(struct sockaddr *addr)
         return (NULL);
 }
 
+
 /*
  * Find an interface on a specific network.  If many, choice
  * is most specific found.
  */
-struct ifaddr *ifa_ifwithnet(struct sockaddr *addr)
+
+struct ifaddr *
+ifa_ifwithnet(struct sockaddr *addr)
 {
 	struct ifnet *ifp;
 	struct ifaddr *ifa;
