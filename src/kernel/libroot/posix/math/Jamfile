@@ -1,5 +1,12 @@
 SubDir OBOS_TOP src kernel libroot posix math ;
 
+SubDirHdrs [ FDirName $(OBOS_TOP) headers posix ] ;
+	# even if this looks redundant, it's needed so that posix/math.h is
+	# still the first choice (there are files with the same name in
+	# glibc's includes.
+	# ToDo: The best solution would probably be to restrict the additional
+	# header includes to ceilf.c and floorf.c, as they are the only users
+
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc include arch $(OBOS_ARCH) ] ;
