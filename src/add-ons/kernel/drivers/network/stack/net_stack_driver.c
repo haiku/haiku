@@ -162,7 +162,7 @@ _EXPORT int32 api_version = B_CUR_DRIVER_API_VERSION;
 _EXPORT status_t init_hardware(void)
 {
 	bool safemode = false;
-	void * sfmptr;
+	void *sfmptr;
 
 #if SERIAL_DEBUGGING	
 	// XXX - switch on/off at top of file...
@@ -266,11 +266,9 @@ _EXPORT device_hooks * find_device(const char* device_name)
  */
 
 // the network stack functions - mainly just pass throughs...
-static status_t net_stack_open(const char * name,
-                                uint32 flags,
-                                void ** cookie)
+static status_t net_stack_open(const char *name, uint32 flags, void **cookie)
 {
-	net_stack_cookie *	nsc;
+	net_stack_cookie *nsc;
 
 	nsc = (net_stack_cookie *) malloc(sizeof(*nsc));
 	if (!nsc)
@@ -300,7 +298,7 @@ static status_t net_stack_open(const char * name,
 
 static status_t net_stack_close(void *cookie)
 {
-	net_stack_cookie * nsc = (net_stack_cookie *) cookie;
+	net_stack_cookie *nsc = cookie;
 	int rv;
 	
 #if SHOW_INSANE_DEBUGGING
@@ -320,8 +318,8 @@ static status_t net_stack_close(void *cookie)
 
 static status_t net_stack_free_cookie(void *cookie)
 {
-	net_stack_cookie * nsc = (net_stack_cookie *) cookie;
-	selecter * s;
+	net_stack_cookie *nsc = cookie;
+	selecter *s;
 
 #if SHOW_INSANE_DEBUGGING
 	dprintf(LOGID "net_stack_free_cookie(%p)\n", cookie);
@@ -331,7 +329,7 @@ static status_t net_stack_free_cookie(void *cookie)
 	delete_sem(nsc->selecters_lock);
 	s = nsc->selecters;
 	while (s) {
-		selecter * tmp = s;
+		selecter *tmp = s;
 		s = s->next;
 		free(tmp);
 	};
@@ -343,9 +341,11 @@ static status_t net_stack_free_cookie(void *cookie)
 
 
 
-static status_t net_stack_control(void *cookie, uint32 op, void * data, size_t len)
+static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t len)
 {
-	net_stack_cookie *	nsc = (net_stack_cookie *) cookie;
+	net_stack_cookie *nsc = cookie;
+	struct stack_driver_args *args = data;
+	int err;
 
 #if SHOW_INSANE_DEBUGGING
 	dprintf(LOGID "net_stack_control(%p, 0x%lX, %p, %ld)\n", cookie, op, data, len);
@@ -355,136 +355,130 @@ static status_t net_stack_control(void *cookie, uint32 op, void * data, size_t l
 	keep_driver_loaded();
 #endif
 
-	switch (op) {
-		case NET_STACK_SOCKET: {
-			struct socket_args * args = (struct socket_args *) data;
-			int rv;
+	if (! nsc->socket) {
+		switch (op) {
+			case NET_STACK_SOCKET: {
 
-			// okay, now try to open a real socket behind this fd/net_stack_cookie pair
-			rv = core->socket_init(&nsc->socket);
-			if (rv == 0)
-				rv = core->socket_create(nsc->socket, args->family, args->type, args->proto);
-			// TODO: This is where the open flags need to be addressed
-			return rv;
-		}
-		case NET_STACK_CONNECT: {
-			struct sockaddr_args * args = (struct sockaddr_args *) data;
-			// args->addr == sockaddr to connect to
-			return core->socket_connect(nsc->socket, (caddr_t) args->addr, args->addrlen);
-		}
-		case NET_STACK_BIND: {
-			struct sockaddr_args * args = (struct sockaddr_args *) data;
-			// args->addr == sockaddr to try and bind to
-			return core->socket_bind(nsc->socket, (caddr_t) args->addr, args->addrlen);
-		}
-		case NET_STACK_LISTEN: {
-			struct int_args * args = (struct int_args *) data;
-			// args->value == backlog to set
-			return core->socket_listen(nsc->socket, args->value);
-		}
-		case NET_STACK_GET_COOKIE: {
-			/* this is needed by accept() call, to be able to pass back
-			 * in NET_STACK_ACCEPT opcode the cookie (aka the net_stack_cookie!)
-			 * of the filedescriptor to use for the new accepted socket
-			 */
-			*((void **) data) = cookie;
-			return B_OK;
-		}
-		case NET_STACK_ACCEPT: {
-			struct accept_args * args = (struct accept_args *) data;
-			net_stack_cookie * ansc = (net_stack_cookie *) args->cookie;
-			/* args->cookie == net_stack_cookie * of the already opened fd to use to the 
-			 * newly accepted socket
-			 */
-			return core->socket_accept(nsc->socket, &ansc->socket, (void *)args->addr, &args->addrlen);
-		}
-		case NET_STACK_SEND: {
-			struct data_xfer_args * args = (struct data_xfer_args *) data;
-			// TODO: flags gets ignored here...
-			return net_stack_write(cookie, 0, args->data, &args->datalen);
-		}
-		case NET_STACK_RECV: {
-			struct data_xfer_args * args = (struct data_xfer_args *) data;
-			// TODO: flags gets ignored here...
-			return net_stack_read(cookie, 0, args->data, &args->datalen);
-		}
-		case NET_STACK_RECVFROM: {
-			struct msghdr * mh = (struct msghdr *) data;
-			int retsize, error;
+				// okay, now try to open a real socket behind this fd/net_stack_cookie pair
+				err = core->socket_init(&nsc->socket);
+				if (err == 0)
+					err = core->socket_create(nsc->socket, args->u.socket.family, args->u.socket.type, args->u.socket.proto);
+				// TODO: This is where the open flags need to be addressed
+				return err;
+			}
+			case NET_STACK_ASSOCIATE_SOCKET:
+				nsc->socket = args->u.associate.socket;
+				return B_OK;
+		};
+	} else {
+		switch (op) {
+			case NET_STACK_CONNECT:
+				return core->socket_connect(nsc->socket, (caddr_t) args->u.sockaddr.addr, args->u.sockaddr.addrlen);
 
-			error = core->socket_recv(nsc->socket, mh, (caddr_t)&mh->msg_namelen, 
+			case NET_STACK_BIND:
+				return core->socket_bind(nsc->socket, (caddr_t) args->u.sockaddr.addr, args->u.sockaddr.addrlen);
+	
+			case NET_STACK_LISTEN:
+				// backlog to set
+				return core->socket_listen(nsc->socket, args->u.integer.value);
+
+			case NET_STACK_ACCEPT: {
+				int fd;
+				struct socket *s;
+				struct associate_socket_args associate;
+				
+				err = core->socket_accept(nsc->socket, &s, (void *) args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
+				if (err < 0)
+					return err;
+				
+				// Okay, we have a new socket, but it should be a file descriptor too: 	
+				fd = open(NET_STACK_DRIVER_PATH, O_RDWR);
+				if (fd < 0) {
+					core->socket_close(s);
+					return fd;
+				};
+				
+				associate.socket = s;
+				err = ioctl(fd, NET_STACK_ASSOCIATE_SOCKET, &associate, sizeof(associate));
+				if (err < 0) {
+					core->socket_close(s);
+					close(fd);
+					return err;
+				};
+				
+				return fd;
+			}
+			case NET_STACK_SEND:
+				// TODO: flags gets ignored here...
+				return net_stack_write(cookie, 0, args->u.xfer.data, &args->u.xfer.datalen);
+
+			case NET_STACK_RECV:
+				// TODO: flags gets ignored here...
+				return net_stack_read(cookie, 0, args->u.xfer.data, &args->u.xfer.datalen);
+
+			case NET_STACK_RECVFROM: {
+				struct msghdr * mh = (struct msghdr *) data;
+				int retsize;
+
+				err = core->socket_recv(nsc->socket, mh, (caddr_t)&mh->msg_namelen, 
 			                     &retsize);
-			if (error == 0)
-				return retsize;
-			return error;
-		}
-		case NET_STACK_SENDTO: {
-			struct msghdr * mh = (struct msghdr *) data;
-			int retsize, error;
+				if (err == 0)
+					return retsize;
+				return err;
+			}
+			case NET_STACK_SENDTO: {
+				struct msghdr * mh = (struct msghdr *) data;
+				int retsize;
 
-			error = core->socket_send(nsc->socket, mh, mh->msg_flags, 
+				err = core->socket_send(nsc->socket, mh, mh->msg_flags, 
 			                     &retsize);
-			if (error == 0)
-				return retsize;
-			return error;
-		}
-		case NET_STACK_SYSCTL: {
-			struct sysctl_args * args = (struct sysctl_args *) data;
-			return core->net_sysctl(args->name, args->namelen,
-			                          args->oldp, args->oldlenp,
-			                          args->newp, args->newlen);
-		}
-		case NET_STACK_GETSOCKOPT: {
-			struct sockopt_args * args = (struct sockopt_args *) data;
-			return core->socket_getsockopt(nsc->socket, args->level, args->option,
-			                      args->optval, (size_t *) &args->optlen);
-		}
-		case NET_STACK_SETSOCKOPT: {
-			struct sockopt_args * args = (struct sockopt_args *)data;
-			
-			return core->socket_setsockopt(nsc->socket, args->level, args->option,
-			                        (const void *) args->optval, args->optlen);
-		}		
-		case NET_STACK_GETSOCKNAME: {
-			struct sockaddr_args * args = (struct sockaddr_args *) data;
-			// args->addr == sockaddr to accept the sockname
-			return core->socket_getsockname(nsc->socket, args->addr, &args->addrlen);
-		}
-		case NET_STACK_GETPEERNAME: {
-			struct sockaddr_args * args = (struct sockaddr_args *) data;
-			// args->addr == sockaddr to accept the peername
-			return core->socket_getpeername(nsc->socket, args->addr, &args->addrlen);
-		}
-		case NET_STACK_STOP: {
-			core->stop();
-			return B_OK;
-		}
-		case B_SET_BLOCKING_IO: {
-			nsc->open_flags &= ~O_NONBLOCK;
-			return B_OK;
-		}
-		case B_SET_NONBLOCKING_IO: {
-			nsc->open_flags |= O_NONBLOCK;
-			return B_OK;
-		}
-		case NET_STACK_SELECT: {
-			struct select_args *args = (struct select_args *) data;
-			
-			/* if we get this opcode, we are using the r5 kernel select() call,
-			 * so we can't use his notify_select_event(), but our own implementation! */
-			g_nse = r5_notify_select_event;
-			return net_stack_select(cookie, (args->ref & 0x0F), args->ref, args->sync);
-		}
-		case NET_STACK_DESELECT: {
-			struct select_args * args = (struct select_args *) data;
-			return net_stack_deselect(cookie, (args->ref & 0x0F), args->sync);
-		}
-		default:
-			if (nsc->socket)
-				// pass any unhandled opcode to the stack
-				return core->socket_ioctl(nsc->socket, op, data);
-			return B_BAD_VALUE;
-	}
+				if (err == 0)
+					return retsize;
+				return err;
+			}
+			case NET_STACK_SYSCTL:
+				return core->net_sysctl(args->u.sysctl.name, args->u.sysctl.namelen,
+			                          args->u.sysctl.oldp, args->u.sysctl.oldlenp,
+			                          args->u.sysctl.newp, args->u.sysctl.newlen);
+		
+			case NET_STACK_GETSOCKOPT:
+				return core->socket_getsockopt(nsc->socket, args->u.sockopt.level, args->u.sockopt.option,
+			                      args->u.sockopt.optval, (size_t *) &args->u.sockopt.optlen);
+
+			case NET_STACK_SETSOCKOPT:
+				return core->socket_setsockopt(nsc->socket, args->u.sockopt.level, args->u.sockopt.option,
+			                        (const void *) args->u.sockopt.optval, args->u.sockopt.optlen);
+
+			case NET_STACK_GETSOCKNAME:
+				return core->socket_getsockname(nsc->socket, args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
+	
+			case NET_STACK_GETPEERNAME:
+				return core->socket_getpeername(nsc->socket, args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
+
+			case B_SET_BLOCKING_IO:
+				nsc->open_flags &= ~O_NONBLOCK;
+				return B_OK;
+	
+			case B_SET_NONBLOCKING_IO:
+				nsc->open_flags |= O_NONBLOCK;
+				return B_OK;
+	
+			case NET_STACK_SELECT:
+				/* if we get this opcode, we are using the r5 kernel select() call,
+				 * so we can't use his notify_select_event(), but our own implementation! */
+				g_nse = r5_notify_select_event;
+				return net_stack_select(cookie, (args->u.select.ref & 0x0F),
+										args->u.select.ref, args->u.select.sync);
+			case NET_STACK_DESELECT: 
+				return net_stack_deselect(cookie, (args->u.select.ref & 0x0F), args->u.select.sync);
+
+			default:
+				if (nsc->socket)
+					// pass any unhandled opcode to the stack
+					return core->socket_ioctl(nsc->socket, op, data);
+				return B_BAD_VALUE;
+		};
+	};
 }
 
 

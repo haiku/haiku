@@ -148,35 +148,15 @@ _EXPORT int listen(int sock, int backlog)
 _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 {
 	struct sockaddr temp;
-	struct accept_args args;
-	int	rv;
-	int	new_sock;
-	void *cookie;
-
-	new_sock = open(get_stack_driver_path(), O_RDWR);
-	if (new_sock < 0)
-		return new_sock;
-	
-	// The network stack driver will need to know to which net_stack_cookie to
-	// *bind* with the new accepted socket. He can't know himself find out 
-	// the net_stack_cookie of our new_sock file descriptor, the just open() one...
-	// So, here, we ask him the net_stack_cookie value for our fd... :-)
-	rv = ioctl(new_sock, NET_STACK_GET_COOKIE, &cookie);
-	if (rv < 0) {
-		close(new_sock);
-		return rv;
-	}; 
-
-	args.cookie	= cookie; // this way driver can use the right fd/cookie for the new_sock!
+	struct sockaddr_args args;
+	int new_sock;
 
 	args.addr		= g_beos_r5_compatibility ? &temp : addr;
 	args.addrlen	= g_beos_r5_compatibility ? sizeof(temp) : *addrlen;
-	
-	rv = ioctl(sock, NET_STACK_ACCEPT, &args, sizeof(args));
-	if (rv < 0) {
-		close(new_sock);
-		return rv;
-	};
+       	
+	new_sock = ioctl(sock, NET_STACK_ACCEPT, &args, sizeof(args));
+	if (new_sock < 0)
+		return new_sock;
 
 	if (g_beos_r5_compatibility) {
 		convert_to_beos_r5_sockaddr(addr, &temp);
@@ -257,7 +237,7 @@ _EXPORT ssize_t sendto(int sock, const void *buffer, size_t buflen, int flags,
  */
 _EXPORT ssize_t recv(int sock, void *data, size_t datalen, int flags)
 {
-	struct data_xfer_args args;
+	struct xfer_args args;
 	int	rv;
 	
 	args.data = data;
@@ -276,7 +256,7 @@ _EXPORT ssize_t recv(int sock, void *data, size_t datalen, int flags)
 
 _EXPORT ssize_t send(int sock, const void *data, size_t datalen, int flags)
 {
-	struct data_xfer_args args;
+	struct xfer_args args;
 	int	rv;
 	
 	args.data = (void *) data;
