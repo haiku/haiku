@@ -29,5 +29,6 @@ Depends userland_disk_system_modules :
 	<partitioning_system>intel
 	<partitioning_system>amiga_rdb
 	<partitioning_system>apple
+	<partitioning_system>session
 ;
 
