@@ -1243,28 +1243,6 @@ register struct tm * const		tmp;
 #endif /* defined TM_GMTOFF */
 }
 
-char *
-ctime(timep)
-const time_t * const	timep;
-{
-/*
-** Section 4.12.3.2 of X3.159-1989 requires that
-**	The ctime function converts the calendar time pointed to by timer
-**	to local time in the form of a string.  It is equivalent to
-**		asctime(localtime(timer))
-*/
-	return asctime(localtime(timep));
-}
-
-char *
-ctime_r(timep, buf)
-const time_t * const	timep;
-char *			buf;
-{
-	struct tm	tm;
-
-	return asctime_r(localtime_r(timep, &tm), buf);
-}
 
 /*
 ** Adapted from code provided by Robert Elz, who writes:
@@ -1617,7 +1595,9 @@ struct tm * const	tmp;
 	return time1(tmp, localsub, 0L);
 }
 
-#ifdef STD_INSPIRED
+#ifndef STD_INSPIRED
+#pragma weak timelocal=mktime
+#else
 
 time_t
 timelocal(tmp)
