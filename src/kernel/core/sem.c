@@ -667,7 +667,7 @@ _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz
 	if (team < 0)
 		return B_BAD_TEAM_ID; 
 
-	if (*cookie == NULL) {
+	if (*cookie == 0) {
 		// return first found
 		slot = 0;
 	}

@@ -458,7 +458,7 @@ _get_next_port_info(team_id team, int32 *cookie, struct port_info *info, size_t 
 	if (cookie == NULL)
 		return B_BAD_VALUE;
 
-	if (*cookie == NULL) {
+	if (*cookie == 0) {
 		// return first found
 		slot = 0;
 	} else {
