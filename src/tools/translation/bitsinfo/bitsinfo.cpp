@@ -41,6 +41,12 @@
 #include <File.h>
 #include <TranslatorFormats.h>
 
+struct ColorSpaceName { 
+	color_space id;
+	const char *name;
+};
+#define COLORSPACENAME(id) {id, #id}
+
 void
 PrintBitsInfo(const char *filepath)
 {
@@ -73,57 +79,53 @@ PrintBitsInfo(const char *filepath)
 		printf("rowBytes: %u\n",
 			static_cast<unsigned int>(header.rowBytes));
 	
-		// print out colorspace if it matches an item in the list	
-		struct ColorSpaceName { 
-			color_space id;
-			const char *name;
-		};
+		// print out colorspace if it matches an item in the list
 		ColorSpaceName colorspaces[] = {
-			{ B_NO_COLOR_SPACE, "B_NO_COLOR_SPACE" },
-			{ B_RGB32,		"B_RGB32" },
-			{ B_RGBA32,		"B_RGBA32" },
-			{ B_RGB24,		"B_RGB24" },
-			{ B_RGB16,		"B_RGB16" },
-			{ B_RGB15,		"B_RGB15" },
-			{ B_RGBA15,		"B_RGBA15" },
-			{ B_CMAP8,		"B_CMAP8" },
-			{ B_GRAY8,		"B_GRAY8" },
-			{ B_GRAY1,		"B_GRAY1" },
-			{ B_RGB32_BIG,	"B_RGB32_BIG" },
-			{ B_RGBA32_BIG,	"B_RGBA32_BIG" },
-			{ B_RGB24_BIG,	"B_RGB24_BIG" },
-			{ B_RGB16_BIG,	"B_RGB16_BIG" },
-			{ B_RGB15_BIG,	"B_RGB15_BIG" },
-			{ B_RGBA15_BIG,	"B_RGBA15_BIG" },
-			{ B_YCbCr422,	"B_YCbCr422" },
-			{ B_YCbCr411,	"B_YCbCr411" },
-			{ B_YCbCr444,	"B_YCbCr444" },
-			{ B_YCbCr420,	"B_YCbCr420" },
-			{ B_YUV422,		"B_YUV422" },
-			{ B_YUV411,		"B_YUV411" },
-			{ B_YUV444,		"B_YUV444" },
-			{ B_YUV420,		"B_YUV420" },
-			{ B_YUV9,		"B_YUV9" },
-			{ B_YUV12,		"B_YUV12" },
-			{ B_UVL24,		"B_UVL24" },
-			{ B_UVL32,		"B_UVL32" },
-			{ B_UVLA32,		"B_UVLA32" },
-			{ B_LAB24,		"B_LAB24" },
-			{ B_LAB32,		"B_LAB32" },
-			{ B_LABA32,		"B_LABA32" },
-			{ B_HSI24,		"B_LABA32" },
-			{ B_HSI32,		"B_HSI32" },
-			{ B_HSIA32,		"B_HSIA32" },
-			{ B_HSV24,		"B_HSV24" },
-			{ B_HSV32,		"B_HSV32" },
-			{ B_HSVA32,		"B_HSVA32" },
-			{ B_HLS24,		"B_HLS24" },
-			{ B_HLS32,		"B_HLS32" },
-			{ B_HLSA32,		"B_HLSA32" },
-			{ B_CMY24,		"B_CMY24" },
-			{ B_CMY32,		"B_CMY32" },
-			{ B_CMYA32,		"B_CMYA32" },
-			{ B_CMYK32,		"B_CMYK32" }
+			COLORSPACENAME(B_NO_COLOR_SPACE),
+			COLORSPACENAME(B_RGB32),
+			COLORSPACENAME(B_RGBA32),
+			COLORSPACENAME(B_RGB24),
+			COLORSPACENAME(B_RGB16),
+			COLORSPACENAME(B_RGB15),
+			COLORSPACENAME(B_RGBA15),
+			COLORSPACENAME(B_CMAP8),
+			COLORSPACENAME(B_GRAY8),
+			COLORSPACENAME(B_GRAY1),
+			COLORSPACENAME(B_RGB32_BIG),
+			COLORSPACENAME(B_RGBA32_BIG),
+			COLORSPACENAME(B_RGB24_BIG),
+			COLORSPACENAME(B_RGB16_BIG),
+			COLORSPACENAME(B_RGB15_BIG),
+			COLORSPACENAME(B_RGBA15_BIG),
+			COLORSPACENAME(B_YCbCr422),
+			COLORSPACENAME(B_YCbCr411),
+			COLORSPACENAME(B_YCbCr444),
+			COLORSPACENAME(B_YCbCr420),
+			COLORSPACENAME(B_YUV422),
+			COLORSPACENAME(B_YUV411),
+			COLORSPACENAME(B_YUV444),
+			COLORSPACENAME(B_YUV420),
+			COLORSPACENAME(B_YUV9),
+			COLORSPACENAME(B_YUV12),
+			COLORSPACENAME(B_UVL24),
+			COLORSPACENAME(B_UVL32),
+			COLORSPACENAME(B_UVLA32),
+			COLORSPACENAME(B_LAB24),
+			COLORSPACENAME(B_LAB32),
+			COLORSPACENAME(B_LABA32),
+			COLORSPACENAME(B_HSI24),
+			COLORSPACENAME(B_HSI32),
+			COLORSPACENAME(B_HSIA32),
+			COLORSPACENAME(B_HSV24),
+			COLORSPACENAME(B_HSV32),
+			COLORSPACENAME(B_HSVA32),
+			COLORSPACENAME(B_HLS24),
+			COLORSPACENAME(B_HLS32),
+			COLORSPACENAME(B_HLSA32),
+			COLORSPACENAME(B_CMY24),
+			COLORSPACENAME(B_CMY32),
+			COLORSPACENAME(B_CMYA32),
+			COLORSPACENAME(B_CMYK32)
 		};
 		const int32 kncolorspaces =  sizeof(colorspaces) /
 			sizeof(ColorSpaceName);
