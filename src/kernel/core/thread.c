@@ -1138,8 +1138,8 @@ spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority, 
 //	public kernel exported functions
 
 
-status_t
-send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
+static status_t
+send_data_etc(thread_id tid, int32 code, const void *buffer, size_t buffer_size, int32 flags)
 {
 	struct thread *target;
 	sem_id cached_sem;
@@ -1162,7 +1162,7 @@ send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 	if (buffer_size > THREAD_MAX_MESSAGE_SIZE)
 		return B_NO_MEMORY;
 
-	rv = acquire_sem_etc(cached_sem, 1, B_CAN_INTERRUPT, 0);
+	rv = acquire_sem_etc(cached_sem, 1, flags, 0);
 	if (rv == B_INTERRUPTED)
 		// We got interrupted by a signal
 		return rv;
@@ -1211,32 +1211,46 @@ send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 
 
 status_t
-receive_data(thread_id *sender, void *buffer, size_t bufferSize)
+send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 {
-	struct thread *t = thread_get_current_thread();
+	return send_data_etc(thread, code, buffer, bufferSize, 0);
+}
+
+
+static status_t
+receive_data_etc(thread_id *sender, void *buffer, size_t bufferSize, int32 flags)
+{
+	struct thread *thread = thread_get_current_thread();
 	status_t status;
 	size_t size;
 	int32 code;
 
-	status = acquire_sem_etc(t->msg.read_sem, 1, B_CAN_INTERRUPT, 0);
+	status = acquire_sem_etc(thread->msg.read_sem, 1, flags, 0);
 	if (status < B_OK)
 		return status;
 
-	size = min(bufferSize, t->msg.size);
-	status = cbuf_user_memcpy_from_chain(buffer, t->msg.buffer, 0, size);
+	size = min(bufferSize, thread->msg.size);
+	status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer, 0, size);
 	if (status < B_OK) {
-		cbuf_free_chain(t->msg.buffer);
-		release_sem(t->msg.write_sem);
+		cbuf_free_chain(thread->msg.buffer);
+		release_sem(thread->msg.write_sem);
 		return status;
 	}
 
-	*sender = t->msg.sender;
-	code = t->msg.code;
+	*sender = thread->msg.sender;
+	code = thread->msg.code;
 
-	cbuf_free_chain(t->msg.buffer);
-	release_sem(t->msg.write_sem);
+	cbuf_free_chain(thread->msg.buffer);
+	release_sem(thread->msg.write_sem);
 
 	return code;
+}
+
+
+status_t
+receive_data(thread_id *sender, void *buffer, size_t bufferSize)
+{
+	return receive_data_etc(sender, buffer, bufferSize, 0);
 }
 
 
@@ -1668,25 +1682,25 @@ user_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSi
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
-	return send_data(thread, code, buffer, bufferSize);
+	return send_data_etc(thread, code, buffer, bufferSize, B_CAN_INTERRUPT);
 		// supports userland buffers
 }
 
 
 status_t
-user_receive_data(thread_id *userSender, void *buffer, size_t bufferSize)
+user_receive_data(thread_id *_userSender, void *buffer, size_t bufferSize)
 {
 	thread_id sender;
 	status_t code;
 
-	if (!IS_USER_ADDRESS(userSender)
+	if (!IS_USER_ADDRESS(_userSender)
 		|| !IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
-	code = receive_data(&sender, buffer, bufferSize);
+	code = receive_data_etc(&sender, buffer, bufferSize, B_CAN_INTERRUPT);
 		// supports userland buffers
 
-	if (user_memcpy(userSender, &sender, sizeof(thread_id)) < B_OK)
+	if (user_memcpy(_userSender, &sender, sizeof(thread_id)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return code;
