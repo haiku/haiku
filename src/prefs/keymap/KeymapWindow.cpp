@@ -1,15 +1,14 @@
-#include <app/Application.h>
-#include <interface/View.h>
-#include <interface/GraphicsDefs.h>
-#include <interface/MenuItem.h>
-#include <interface/ListView.h>
-#include <interface/ScrollView.h>
-#include <interface/Button.h>
-#include <interface/Alert.h>
-#include <interface/Box.h>
-#ifdef DEBUG
-	#include <stdio.h>
-#endif //DEBUG
+#include <Alert.h>
+#include <Application.h>
+#include <Box.h>
+#include <Button.h>
+#include <Debug.h>
+#include <GraphicsDefs.h>
+#include <ListView.h>
+#include <MenuItem.h>
+#include <ScrollView.h>
+#include <StringView.h>
+#include <View.h>
 #include "KeymapWindow.h"
 #include "KeymapListItem.h"
 #include "KeymapApplication.h"
@@ -54,7 +53,9 @@ KeymapWindow::KeymapWindow( BRect frame )
 
 }
 
-BMenuBar * KeymapWindow::AddMenuBar()
+
+BMenuBar *
+KeymapWindow::AddMenuBar()
 {
 	BRect		bounds;
 	BMenu		*menu;
@@ -103,86 +104,44 @@ BMenuBar * KeymapWindow::AddMenuBar()
 	
 	// Create the Font menu
 	menu = new BMenu( "Font" );
+	int32 numFamilies = count_font_families(); 
+	font_family family, current_family;
+	font_style current_style; 
+	uint32 flags;
 	
+	be_plain_font->GetFamilyAndStyle(&current_family, &current_style);
+		
+	for ( int32 i = 0; i < numFamilies; i++ )
+		if ( get_font_family(i, &family, &flags) == B_OK ) {
+			BMenuItem *item = 
+				new BMenuItem(family, new BMessage( MENU_FONT_CHANGED));
+			menu->AddItem(item);
+			if(strcmp(family, current_family) == 0)
+				item->SetMarked(true);
+		}
 	menubar->AddItem( menu );
 	
 	return menubar;
 }
 
-void KeymapWindow::AddMaps()
+
+void 
+KeymapWindow::AddMaps()
 {
-	BBox		*mapsBox;
-	BRect		bounds;
-	BList		*entryList;
-	BList		*listItems;
-	KeymapListItem	*currentKeymapItem;
-
 	// The Maps box
-	bounds = BRect( 9,11, 140, 227 );
-	mapsBox = new BBox( bounds );
-	mapsBox->SetLabel( "Maps" );
+	BRect bounds = BRect(9,11,140,226);
+	BBox *mapsBox = new BBox(bounds);
+	mapsBox->SetLabel("Maps");
 	fPlaceholderView->AddChild( mapsBox );
-/*
-	// Set drawing mode to B_OP_COPY
-	mapsBox->SetDrawingMode( B_OP_COPY );
-	
-	// Set mapsBox->LowColor to background color
-	rgb_color	tempColor;
-	tempColor = ui_color( B_MENU_BACKGROUND_COLOR );
-	mapsBox->SetLowColor( tempColor );
-	
-	// Set mapsBox->HighColor to black
-	tempColor.red   = 0;
-	tempColor.green = 0;
-	tempColor.blue  = 0;
-	tempColor.alpha = 0;
-	mapsBox->SetHighColor( tempColor );
-	
-	// Set font to something nice
-	BFont	*font = new BFont();
-	font->SetFace( B_REGULAR_FACE );
-//	font->SetFamilyAndStyle();
-	font->SetRotation( 0.0 );
-	font->SetShear( 90.0 );
-	font->SetSize( 12.0 );
-	font->SetSpacing( B_BITMAP_SPACING );
-	mapsBox->SetFont( font );
-*/
+
 	// The System list
-	bounds = BRect( 209,20, 370,135 );
-/*
-	BView	*textSystem = new BView( bounds, NULL, B_NOT_RESIZABLE, 0 );
-	rgb_color	tempColor;
-	tempColor = ui_color( B_MENU_BACKGROUND_COLOR );
-*/
-/*
-	tempColor.red   = 0;
-	tempColor.green = 0;
-	tempColor.blue  = 0;
-	tempColor.alpha = 0;
-*/
-//	textSystem->SetViewColor( tempColor );
-//	textSystem->SetLowColor( tempColor );
-/*
-	tempColor.red   = 0;
-	tempColor.green = 0;
-	tempColor.blue  = 0;
-	tempColor.alpha = 0;
-	textSystem->SetHighColor( tempColor );
-
- 	tempColor.red   = 0;
-	tempColor.green = 0;
-	tempColor.blue  = 0;
-	tempColor.alpha = 0;
-	textSystem->SetLowColor( tempColor );
-
-	textSystem->DrawString( "System", BPoint( 0, 14 ) );
-	fPlaceholderView->AddChild( textSystem );
-*/
-	bounds = BRect( 13,36, 103,106 );
-	entryList = fApplication->SystemMaps();
+	BStringView *systemLabel = new BStringView(BRect(13,13,113,33), "system", "System");
+	mapsBox->AddChild(systemLabel);
+	
+	bounds = BRect( 13,35, 103,105 );
+	BList *entryList = fApplication->SystemMaps();
 	fSystemListView = new BListView( bounds, "systemList" );
-	listItems = ListItemsFromEntryList( entryList );
+	BList *listItems = ListItemsFromEntryList( entryList );
 	fSystemListView->AddList( listItems );
 	mapsBox->AddChild( new BScrollView( "systemScrollList", fSystemListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true ));
@@ -191,12 +150,14 @@ void KeymapWindow::AddMaps()
 	delete entryList;
 
 	// The User list
-	mapsBox->DrawString( "User", BPoint( 13, 113 ));
-	bounds = BRect( 13,129, 103,199 );
+	BStringView *userLabel = new BStringView(BRect(13,110,113,128), "user", "User");
+	mapsBox->AddChild(userLabel);
+
+	bounds = BRect(13,130,103,200);
 	entryList = fApplication->UserMaps();
 	fUserListView = new BListView( bounds, "userList" );
 	// '(Current)'
-	currentKeymapItem = ItemFromEntry( fApplication->CurrentMap() );
+	KeymapListItem *currentKeymapItem = ItemFromEntry( fApplication->CurrentMap() );
 	if( currentKeymapItem != NULL )
 		fUserListView->AddItem( currentKeymapItem );
 	// Saved keymaps
@@ -209,7 +170,9 @@ void KeymapWindow::AddMaps()
 	delete entryList;
 }
 
-BList* KeymapWindow::ListItemsFromEntryList( BList * entryList)
+
+BList* 
+KeymapWindow::ListItemsFromEntryList( BList * entryList)
 {
 	BEntry			*currentEntry;
 	BList			*listItems;
@@ -233,7 +196,9 @@ BList* KeymapWindow::ListItemsFromEntryList( BList * entryList)
 	return listItems;
 }
 
-KeymapListItem* KeymapWindow::ItemFromEntry( BEntry *entry )
+
+KeymapListItem* 
+KeymapWindow::ItemFromEntry( BEntry *entry )
 {
 	KeymapListItem	*item;
 
@@ -247,13 +212,17 @@ KeymapListItem* KeymapWindow::ItemFromEntry( BEntry *entry )
 	return item;
 }
 
-bool KeymapWindow::QuitRequested()
+
+bool 
+KeymapWindow::QuitRequested()
 {
 	be_app->PostMessage( B_QUIT_REQUESTED );
 	return true;
 }
 
-void KeymapWindow::MessageReceived( BMessage* message )
+
+void 
+KeymapWindow::MessageReceived( BMessage* message )
 {
 	switch( message->what ) {
 		case MENU_FILE_OPEN:
@@ -292,23 +261,23 @@ void KeymapWindow::MessageReceived( BMessage* message )
 	}
 }
 
-void KeymapWindow::HandleSystemMapSelected( BMessage *selectionMessage )
+
+void 
+KeymapWindow::HandleSystemMapSelected( BMessage *selectionMessage )
 {
-	#if DEBUG
-		printf("System map selected\n");
-	#endif //DEBUG
 	HandleMapSelected( selectionMessage, fSystemListView, fUserListView );
 }
 
-void KeymapWindow::HandleUserMapSelected( BMessage *selectionMessage )
+
+void 
+KeymapWindow::HandleUserMapSelected( BMessage *selectionMessage )
 {
-	#if DEBUG
-		printf("User map selected\n");
-	#endif //DEBUG
 	HandleMapSelected( selectionMessage, fUserListView, fSystemListView );
 }
 
-void KeymapWindow::HandleMapSelected( BMessage *selectionMessage,
+
+void 
+KeymapWindow::HandleMapSelected( BMessage *selectionMessage,
 	BListView * selectedView, BListView * otherView )
 {
 	int32	index;
@@ -339,7 +308,9 @@ void KeymapWindow::HandleMapSelected( BMessage *selectionMessage,
 	otherView->DeselectAll();
 }
 
-void KeymapWindow::UseKeymap()
+
+void 
+KeymapWindow::UseKeymap()
 {
 	if( fSelectedMap != NULL )
 		fApplication->UseKeymap( fSelectedMap );

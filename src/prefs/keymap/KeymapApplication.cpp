@@ -180,3 +180,12 @@ int KeymapApplication::NotifyInputServer()
 	system("kill -KILL input_server");
 	return B_NO_ERROR;
 }
+
+
+int main ()
+{
+	new KeymapApplication;
+	be_app->Run();
+	delete be_app;
+	return 0;
+}

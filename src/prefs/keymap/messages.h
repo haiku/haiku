@@ -10,6 +10,7 @@
 #define MENU_EDIT_PASTE		'mMEV'
 #define MENU_EDIT_CLEAR		'mMEL'
 #define MENU_EDIT_SELECT_ALL 'mMEA'
+#define MENU_FONT_CHANGED	'mMFC'
 #define SYSTEM_MAP_SELECTED	'SmST'
 #define USER_MAP_SELECTED	'UmST'
 #define	USE_KEYMAP			'UkyM'
