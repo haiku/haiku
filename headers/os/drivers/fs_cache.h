@@ -17,11 +17,14 @@ extern "C" {
 #endif 
 
 /* transactions */
-extern int32 cache_transaction_start(void *_cache, transaction_notification_hook hook, void *data);
-extern status_t cache_transaction_sync(void *_cache, int32 id);
-extern status_t cache_transaction_end(void *_cache, int32 id);
-extern status_t cache_transaction_abort(void *_cache, int32 id);
-extern status_t cache_transaction_next_block(void *_cache, int32 id, uint32 *_cookie,
+extern int32 cache_start_transaction(void *_cache);
+extern status_t cache_sync_transaction(void *_cache, int32 id);
+extern status_t cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook, void *data);
+extern status_t cache_abort_transaction(void *_cache, int32 id);
+extern int32 cache_detach_sub_transaction(void *_cache, int32 id);
+extern status_t cache_abort_sub_transaction(void *_cache, int32 id);
+extern status_t cache_start_sub_transaction(void *_cache, int32 id);
+extern status_t cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie,
 					off_t *_blockNumber, void **_data, void **_unchangedData);
 
 /* block cache */
@@ -43,6 +46,7 @@ extern void block_cache_put(void *_cache, off_t blockNumber);
 extern void *file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd);
 extern void file_cache_delete(void *_cacheRef);
 extern status_t file_cache_set_size(void *_cacheRef, off_t size);
+extern status_t file_cache_sync(void *_cache);
 
 extern status_t file_cache_read_pages(void *_cacheRef, off_t offset,
 					const iovec *vecs, size_t count, size_t *_numBytes);
