@@ -48,6 +48,9 @@ int             em_display_debug_stats = 1;
 int  em_attach(device_t);
 int  em_detach(device_t);
 static int32 em_intr(void *);
+static int32 event_handler(void *);
+static int  start_event_thread(struct adapter *);
+static void stop_event_thread(struct adapter *);
 static void em_start(struct ifnet *);
 static int  em_ioctl(struct ifnet *, u_long, caddr_t);
 static void em_watchdog(struct ifnet *);
@@ -196,6 +199,12 @@ em_attach(device_t dev)
 
 	callout_handle_init(&adapter->timer_handle);
 	callout_handle_init(&adapter->tx_fifo_timer_handle);
+
+	/* create event processing thread */
+	if (start_event_thread(adapter) < 0) {
+		error = EIO;
+		goto err_event;
+	}
 
 	/* Determine hardware revision */
 	em_identify_hardware(adapter);
@@ -369,6 +378,7 @@ err_rx_desc:
 err_tx_desc:
 err_pci:
 	em_free_pci_resources(adapter);
+err_event:
 	sysctl_ctx_free(&adapter->sysctl_ctx);
 err_sysctl:
         splx(s);
@@ -400,6 +410,9 @@ em_detach(device_t dev)
 
 	em_stop(adapter);
 	em_phy_hw_reset(&adapter->hw);
+
+	stop_event_thread(adapter);
+
 #if __FreeBSD_version < 500000
         ether_ifdetach(&adapter->interface_data.ac_if, ETHER_BPF_SUPPORTED);
 #else
@@ -436,6 +449,45 @@ em_detach(device_t dev)
 	return(0);
 }
 
+static int
+start_event_thread(struct adapter *adapter)
+{
+	TRACE("start_event_thread enter\n");
+
+	adapter->event_thread = spawn_kernel_thread(event_handler, "ipro1000 event", 80, adapter);
+	adapter->event_sem = create_sem(0, "ipro1000 event");
+	adapter->event_flags = 0;
+	
+	if (adapter->event_thread >= 0 && adapter->event_sem >= 0) {
+		resume_thread(adapter->event_thread);
+		TRACE("start_event_thread leave\n");
+		return 0;
+	}
+
+	TRACE("start_event_thread failed\n");
+
+	delete_sem(adapter->event_sem);
+	kill_thread(adapter->event_thread);
+
+	TRACE("start_event_thread leave\n");
+	return -1;
+}
+
+static void
+stop_event_thread(struct adapter *adapter)
+{
+	status_t thread_return_value;
+	
+	TRACE("stop_event_thread enter\n");
+	
+	delete_sem(adapter->event_sem);
+	wait_for_thread(adapter->event_thread, &thread_return_value);	
+	adapter->event_thread = -1;
+	adapter->event_sem = -1;
+
+	TRACE("stop_event_thread leave\n");
+}
+
 
 /*********************************************************************
  *  Transmit entry point
@@ -447,6 +499,7 @@ em_detach(device_t dev)
  *  the packet is requeued.
  **********************************************************************/
 
+// can be called from within interrupt
 static void
 em_start(struct ifnet *ifp)
 {
@@ -756,6 +809,7 @@ em_intr(void *arg)
         u_int32_t       reg_icr;
         struct ifnet    *ifp;
         struct adapter  *adapter = arg;
+        bool			release_event_sem = false;
 
         ifp = &adapter->interface_data.ac_if;  
 
@@ -778,14 +832,10 @@ em_intr(void *arg)
 
 	/* Link status change */
 	if (reg_icr & (E1000_ICR_RXSEQ | E1000_ICR_LSC)) {
-		untimeout(em_local_timer, adapter,
-			  adapter->timer_handle);
-		adapter->hw.get_link_status = 1;
-		em_check_for_link(&adapter->hw);
-		em_print_link_status(adapter);
-		adapter->timer_handle =
-		timeout(em_local_timer, adapter, 2*hz);
+		atomic_or(&adapter->event_flags, EVENT_LINK_CHANGED);
+		release_event_sem = true;
 	}
+
 
         while (loop_cnt > 0) {
                 if (ifp->if_flags & IFF_RUNNING) {
@@ -795,10 +845,46 @@ em_intr(void *arg)
                 loop_cnt--;
         }
 
-        if (ifp->if_flags & IFF_RUNNING && ifp->if_snd.ifq_head != NULL)
-                em_start(ifp);
+	if (ifp->if_flags & IFF_RUNNING && ifp->if_snd.ifq_head != NULL) {
+		atomic_or(&adapter->event_flags, EVENT_RESTART_TX);
+		release_event_sem = true;
+	}
+	
+	if (release_event_sem)
+		release_sem_etc(adapter->event_sem, 1, B_DO_NOT_RESCHEDULE);
 
-        return B_HANDLED_INTERRUPT;
+	return B_INVOKE_SCHEDULER;
+}
+
+static int32
+event_handler(void *cookie)
+{
+	struct adapter * adapter = cookie;
+	int32 events;
+	
+	for (;;) {
+		if (acquire_sem_etc(adapter->event_sem, 1, B_CAN_INTERRUPT, 0) != B_OK)
+			return 0;
+
+		events = atomic_read(&adapter->event_flags); // read
+		atomic_and(&adapter->event_flags, ~events);	 // and clear
+
+		if (events & EVENT_LINK_CHANGED) {
+			TRACE("EVENT_LINK_CHANGED\n");
+			untimeout(em_local_timer, adapter, adapter->timer_handle);
+			adapter->hw.get_link_status = 1;
+			em_check_for_link(&adapter->hw);
+			em_print_link_status(adapter);
+			adapter->timer_handle =	timeout(em_local_timer, adapter, 2*hz);
+		}
+
+		if (events & EVENT_RESTART_TX) {
+			TRACE("EVENT_RESTART_TX\n");
+// XXX not multithread save?
+//        	if (ifp->if_flags & IFF_RUNNING && ifp->if_snd.ifq_head != NULL)
+//                em_start(ifp);
+		}
+	}
 }
 
 
@@ -2504,6 +2590,7 @@ em_enable_vlans(struct adapter *adapter)
 	return;
 }
 
+// can be called from within interrupt
 static void
 em_enable_intr(struct adapter * adapter)
 {
@@ -2511,6 +2598,7 @@ em_enable_intr(struct adapter * adapter)
 	return;
 }
 
+// can be called from within interrupt
 static void
 em_disable_intr(struct adapter *adapter)
 {
