@@ -1,0 +1,43 @@
+Data		Bytes	Meaning
+
+1BOF(ascii)	4		version					
+??			4		??
+0x76		4		flattened size
+DPUQ		4		what(B_QUERY_UPDATE)
+??			5		??
+
+0F			1		fixed chunk size?
+GNOL		4		type
+04			1		chunk size
+06			1		name length
+opcode		6		name
+1			4		data(B_ENTRY_CREATED)
+
+0F			1		fixed chunk size?
+GNOL		4		type
+04			1		chunk size
+06			1		name length
+device		6		name
+4			4		data
+
+0F			1		fixed chunk size?
+GNLL		4		type
+08			1		chunk size
+09			1		name length
+directory	9		name
+524992		8		data
+
+0F			1		fixed chunk size?
+GNLL		4		type
+08			1		chunk size
+04			1		name length
+node		4		name
+524295		8		data
+
+0B			1		variable chunk size?
+RTSC		4		type
+08			1		chunk size
+04			1		name length
+name		4		name
+08			1		chunk size?
+			8		padded string?
