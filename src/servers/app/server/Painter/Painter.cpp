@@ -22,6 +22,8 @@
 #include "PatternHandler.h"
 #include "RenderingBuffer.h"
 #include "ShapeConverter.h"
+#include "ServerBitmap.h"
+#include "ServerFont.h"
 
 #include "Painter.h"
 
@@ -581,97 +583,70 @@ void
 Painter::DrawBitmap(const BBitmap* bitmap,
 					BRect bitmapRect, BRect viewRect) const
 {
-typedef agg::span_allocator<agg::rgba8> span_alloc_type;
-typedef agg::span_interpolator_linear<> interpolator_type;
-typedef agg::span_image_filter_rgba32_nn<agg::order_bgra32,
-										 interpolator_type> span_gen_type;
-typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_type;
+	if (bitmap && bitmap->IsValid()) {
+		// the native bitmap coordinate system
+		// (can have left top corner offset)
+		BRect actualBitmapRect(bitmap->Bounds());
 
-	if (bitmap && bitmap->IsValid()
-		&& bitmapRect.IsValid() && bitmapRect.Intersects(bitmap->Bounds())
-		&& viewRect.IsValid()) {
-
-		BRect actualBitmapRect = bitmap->Bounds();
-		// compensate for the lefttop offset the actualBitmapRect might have
-// NOTE: I have no clue why this next call gives a wrong result!
-// According to the BeBook, bitmapRect is supposed to be in native
-// bitmap space!
-//		bitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
-		actualBitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
-
-		// calculate the scaling
-		double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
-		double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
-
-		// constrain rect to passed bitmap bounds
-		// and transfer the changes to the viewRect
-		if (bitmapRect.left < actualBitmapRect.left) {
-			float diff = actualBitmapRect.left - bitmapRect.left;
-			viewRect.left += diff * xScale;
-			bitmapRect.left = actualBitmapRect.left;
-		}
-		if (bitmapRect.top < actualBitmapRect.top) {
-			float diff = actualBitmapRect.top - bitmapRect.top;
-			viewRect.top += diff;
-			bitmapRect.top = actualBitmapRect.top;
-		}
-		if (bitmapRect.right > actualBitmapRect.right) {
-			float diff = bitmapRect.right - actualBitmapRect.right;
-			viewRect.right -= diff;
-			bitmapRect.right = actualBitmapRect.right;
-		}
-		if (bitmapRect.bottom > actualBitmapRect.bottom) {
-			float diff = bitmapRect.right - actualBitmapRect.bottom;
-			viewRect.bottom -= diff;
-			bitmapRect.bottom = actualBitmapRect.bottom;
-		}
-
-		float xOffset = viewRect.left - (bitmapRect.left * xScale);
-		float yOffset = viewRect.top - (bitmapRect.top * yScale);
-
-		// source rendering buffer
 		agg::rendering_buffer srcBuffer;
 		srcBuffer.attach((uint8*)bitmap->Bits(),
-						 actualBitmapRect.IntegerWidth() + 1,
-						 actualBitmapRect.IntegerHeight() + 1,
+						 (uint32)actualBitmapRect.IntegerWidth() + 1,
+						 (uint32)actualBitmapRect.IntegerHeight() + 1,
 						 bitmap->BytesPerRow());
 
-		agg::trans_affine srcMatrix;
-//		srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left, -actualBitmapRect.top);
-		srcMatrix *= agg::trans_affine_scaling(fScale, fScale);
-		srcMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
-
-		agg::trans_affine imgMatrix;
-		imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
-		imgMatrix *= agg::trans_affine_translation(xOffset, yOffset);
-		imgMatrix *= agg::trans_affine_scaling(fScale, fScale);
-		imgMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
-		imgMatrix.invert();
-		
-		span_alloc_type sa;
-		interpolator_type interpolator(imgMatrix);
-
-		span_gen_type sg(sa, srcBuffer, agg::rgba(0, 0, 0, 0), interpolator);
-
-		image_renderer_type ri(*fBaseRenderer, sg);
-
-		agg::rasterizer_scanline_aa<> pf;
-		agg::scanline_u8 sl;
-
-		// path encloses image
-		agg::path_storage path;
-		path.move_to(viewRect.left, viewRect.top);
-		path.line_to(viewRect.right + 1, viewRect.top);
-		path.line_to(viewRect.right + 1, viewRect.bottom + 1);
-		path.line_to(viewRect.left, viewRect.bottom + 1);
-		path.close_polygon();
-
-		agg::conv_transform<agg::path_storage> tr(path, srcMatrix);
-
-		pf.add_path(tr);
-		agg::render_scanlines(pf, sl, ri);
+		_DrawBitmap(srcBuffer, bitmap->ColorSpace(), actualBitmapRect, bitmapRect, viewRect);
 	}
 }
+
+// DrawBitmap
+void
+Painter::DrawBitmap(const ServerBitmap* bitmap,
+					BRect bitmapRect, BRect viewRect) const
+{
+	if (bitmap && bitmap->InitCheck()) {
+		// the native bitmap coordinate system
+		BRect actualBitmapRect(bitmap->Bounds());
+
+		agg::rendering_buffer srcBuffer;
+		srcBuffer.attach(bitmap->Bits(),
+						 bitmap->Width(),
+						 bitmap->Height(),
+						 bitmap->BytesPerRow());
+
+		_DrawBitmap(srcBuffer, bitmap->ColorSpace(), actualBitmapRect, bitmapRect, viewRect);
+	}
+}
+
+// #pragma mark -
+
+// FillRegion
+void
+Painter::FillRegion(const BRegion* region, const pattern& p = B_SOLID_HIGH) const
+{
+	BRegion copy(*region);
+	int32 count = copy.CountRects();
+	for (int32 i = 0; i < count; i++) {
+		FillRect(copy.RectAt(i), p);
+	}
+}
+
+// InvertRect
+void
+Painter::InvertRect(const BRect& r) const
+{
+	BRegion region(r);
+	if (fClippingRegion) {
+		region.IntersectWith(fClippingRegion);
+	}
+	// implementation only for B_RGB32 at the moment
+	int32 count = region.CountRects();
+	for (int32 i = 0; i < count; i++) {
+		BRect r = region.RectAt(i);
+		_Transform(&r);
+		_InvertRect32(r);
+	}
+}
+
 
 // #pragma mark -
 
@@ -761,6 +736,25 @@ Painter::_Transform(const float& width) const
 	return w;
 }
 
+// _Transform
+void
+Painter::_Transform(BRect* rect) const
+{
+	// TODO integrate this function more
+	rect->right++;
+	rect->bottom++;
+	rect->left += fOrigin.x;
+	rect->top += fOrigin.y;
+	rect->right += fOrigin.x;
+	rect->bottom += fOrigin.y;
+	rect->left *= fScale;
+	rect->top *= fScale;
+	rect->right *= fScale;
+	rect->bottom *= fScale;
+	rect->right--;
+	rect->bottom--;
+}
+
 // _RebuildClipping
 void
 Painter::_RebuildClipping()
@@ -776,16 +770,17 @@ Painter::_RebuildClipping()
 				// though I was unable to figure out the difference
 				BPoint lt(r.LeftTop());
 				BPoint rb(r.RightBottom());
-rb += BPoint(1.0, 1.0);
-//				_Transform(&lt, false);
-//				_Transform(&rb, false);
-lt += fOrigin;
-lt.x *= fScale;
-lt.y *= fScale;
-rb += fOrigin;
-rb.x *= fScale;
-rb.y *= fScale;
-rb -= BPoint(1.0, 1.0);
+				// offset to bottom right corner of pixel before transformation
+				rb += BPoint(1.0, 1.0);
+				// apply transformation
+				lt += fOrigin;
+				lt.x *= fScale;
+				lt.y *= fScale;
+				rb += fOrigin;
+				rb.x *= fScale;
+				rb.y *= fScale;
+				// undo offset to bottom right corner after transformation
+				rb -= BPoint(1.0, 1.0);
 //				fBaseRenderer->add_clip_box(floorf(lt.x),
 //											floorf(lt.y),
 //											ceilf(rb.x),
@@ -927,7 +922,128 @@ Painter::_DrawPolygon(const BPoint* ptArray, int32 numPts,
 	}
 }
 
+// _DrawBitmap
+void
+Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
+					 BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
+{
+	switch (format) {
+		case B_RGB32:
+		case B_RGBA32:
+			_DrawBitmap32(srcBuffer, actualBitmapRect, bitmapRect, viewRect);
+			break;
+		default:
+fprintf(stderr, "Painter::DrawBitmap() - unsupported colorspace: %d\n", format);
+			break;
+	}
+}
 
+// _DrawBitmap32
+void
+Painter::_DrawBitmap32(const agg::rendering_buffer& srcBuffer,
+					   BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
+{
+typedef agg::span_allocator<agg::rgba8> span_alloc_type;
+typedef agg::span_interpolator_linear<> interpolator_type;
+typedef agg::span_image_filter_rgba32_nn<agg::order_bgra32,
+										 interpolator_type> span_gen_type;
+typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_type;
+
+	if (bitmapRect.IsValid() && bitmapRect.Intersects(actualBitmapRect)
+		&& viewRect.IsValid()) {
+
+		// compensate for the lefttop offset the actualBitmapRect might have
+// NOTE: I have no clue why enabling the next call gives a wrong result!
+// According to the BeBook, bitmapRect is supposed to be in native
+// bitmap space!
+//		bitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
+		actualBitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
+
+		// calculate the scaling
+		double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
+		double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
+
+		// constrain rect to passed bitmap bounds
+		// and transfer the changes to the viewRect
+		if (bitmapRect.left < actualBitmapRect.left) {
+			float diff = actualBitmapRect.left - bitmapRect.left;
+			viewRect.left += diff * xScale;
+			bitmapRect.left = actualBitmapRect.left;
+		}
+		if (bitmapRect.top < actualBitmapRect.top) {
+			float diff = actualBitmapRect.top - bitmapRect.top;
+			viewRect.top += diff;
+			bitmapRect.top = actualBitmapRect.top;
+		}
+		if (bitmapRect.right > actualBitmapRect.right) {
+			float diff = bitmapRect.right - actualBitmapRect.right;
+			viewRect.right -= diff;
+			bitmapRect.right = actualBitmapRect.right;
+		}
+		if (bitmapRect.bottom > actualBitmapRect.bottom) {
+			float diff = bitmapRect.right - actualBitmapRect.bottom;
+			viewRect.bottom -= diff;
+			bitmapRect.bottom = actualBitmapRect.bottom;
+		}
+
+		float xOffset = viewRect.left - (bitmapRect.left * xScale);
+		float yOffset = viewRect.top - (bitmapRect.top * yScale);
+
+		agg::trans_affine srcMatrix;
+//		srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left, -actualBitmapRect.top);
+		srcMatrix *= agg::trans_affine_scaling(fScale, fScale);
+		srcMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
+
+		agg::trans_affine imgMatrix;
+		imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
+		imgMatrix *= agg::trans_affine_translation(xOffset, yOffset);
+		imgMatrix *= agg::trans_affine_scaling(fScale, fScale);
+		imgMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
+		imgMatrix.invert();
+		
+		span_alloc_type sa;
+		interpolator_type interpolator(imgMatrix);
+
+		span_gen_type sg(sa, srcBuffer, agg::rgba(0, 0, 0, 0), interpolator);
+
+		image_renderer_type ri(*fBaseRenderer, sg);
+
+		agg::rasterizer_scanline_aa<> pf;
+		agg::scanline_u8 sl;
+
+		// path encloses image
+		agg::path_storage path;
+		path.move_to(viewRect.left, viewRect.top);
+		path.line_to(viewRect.right + 1, viewRect.top);
+		path.line_to(viewRect.right + 1, viewRect.bottom + 1);
+		path.line_to(viewRect.left, viewRect.bottom + 1);
+		path.close_polygon();
+
+		agg::conv_transform<agg::path_storage> tr(path, srcMatrix);
+
+		pf.add_path(tr);
+		agg::render_scanlines(pf, sl, ri);
+	}
+}
+
+// _InvertRect32
+void
+Painter::_InvertRect32(BRect r) const
+{
+	if (fBuffer) {
+		int32 width = r.IntegerWidth() + 1;
+		for (int32 y = (int32)r.top; y <= (int32)r.bottom; y++) {
+			uint8* dst = fBuffer->row(y);
+			dst += (int32)r.left * 4;
+			for (int32 i = 0; i < width; i++) {
+				dst[0] = 255 - dst[0];
+				dst[1] = 255 - dst[1];
+				dst[2] = 255 - dst[2];
+				dst += 4;
+			}
+		}
+	}
+}
 
 // #pragma mark -
 

@@ -10,3 +10,14 @@ B_OP_ALPHA (with B_ALPHA_OVERLAY) seems to *assign* the source alpha to the dest
 The BView pen location appears to be integer coords, which spoils the pen location version of BView::DrawString() for rotated text.
 
 Dest alpha is actually only interesting when drawing into a BBitmap. When drawing into the frame buffer, dest alpha is logically 255, it wouldn't even need to be assigned. Maybe we could save a few CPU cycles if we adjust the DrawingMode classes accordingly. For now, the modes work as expected when drawing into a BBitmap.
+
+
+Current comparision timings:
+
+drawing_mode:		B_OP_COPY
+pen size:			 1.0
+ellipse test:		 5.15
+ellipse test AA:	13.90
+pen size:			 2.0
+ellipse test:		15.2
+ellipse test AA:	11.0
