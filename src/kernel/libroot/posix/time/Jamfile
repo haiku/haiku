@@ -6,6 +6,7 @@ KernelMergeObject posix_time.o :
 	difftime.c
 	localtime.c
 	mktime.c
+	stime.c
 	strftime.cpp
 	time.c
 	tzset.c
