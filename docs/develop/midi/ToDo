@@ -1,19 +1,6 @@
 
-General:
-	- Fill out headers.
-	- Add copyright information to files.
+All of the Midi Kit documentation currently resides 
+on the MIDI team website: 
 
-BMidi:
-	- Put semaphores in the right places if necessary.
+    <http://home.concepts.nl/~hollies/midi>
 
-BMidiStore:
-	- Implement formats 1 and 2
-	- Implement frame based timing
-	- Implement export functionality.
-	- Cleanup
-
-BMidiText:
-	- Nothing?
-
-midi_server:
-	- Get started.
