@@ -5,7 +5,6 @@
 
 
 #include "MusePackReader.h"
-#include "mpc/mpc_dec.h"
 
 #include <InterfaceDefs.h>
 #include <stdio.h>
@@ -55,6 +54,16 @@ MusePackReader::Sniff(int32 *_streamCount)
 void 
 MusePackReader::GetFileFormatInfo(media_file_format *mff)
 {
+
+	mff->capabilities =   media_file_format::B_READABLE
+						| media_file_format::B_KNOWS_ENCODED_AUDIO
+						| media_file_format::B_IMPERFECTLY_SEEKABLE;
+	mff->family = B_MISC_FORMAT_FAMILY;
+	mff->version = 100;
+	strcpy(mff->mime_type, "audio/x-mpc");
+	strcpy(mff->file_extension, "mpc");
+	strcpy(mff->short_name, "MusePack");
+	strcpy(mff->pretty_name, "MusePack");
 }
 
 
@@ -63,6 +72,36 @@ MusePackReader::AllocateCookie(int32 streamNumber, void **_cookie)
 {
 	// we don't need a cookie - we only know one single stream
 	*_cookie = NULL;
+	
+	media_format_description description;
+	description.family = B_MISC_FORMAT_FAMILY;
+	description.u.misc.file_format = 'mpc ';
+	description.u.misc.codec = 'MPC7';
+		// 7 is the most recent stream version
+
+	status_t status = BMediaFormats().GetFormatFor(description, &fFormat);
+	if (status < B_OK)
+		return status;
+		
+	// allocate and initialize internal decoder
+	fDecoder = new MPC_decoder(static_cast<BPositionIO *>(Source()));
+	fDecoder->RESET_Globals();
+	fDecoder->RESET_Synthesis();
+	fDecoder->SetStreamInfo(&fInfo);
+	if (!fDecoder->FileInit()) {
+		delete fDecoder;
+		fDecoder = 0;
+		return B_ERROR;
+	}
+
+#if 0 // not required to report
+	fFormat.u.encoded_audio.output.frame_rate = fInfo.simple.SampleFreq;
+	fFormat.u.encoded_audio.output.channel_count = fInfo.simple.Channels;
+	fFormat.u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_FLOAT;
+	fFormat.u.encoded_audio.output.byte_order = B_MEDIA_HOST_ENDIAN;
+	fFormat.u.encoded_audio.output.buffer_size = sizeof(MPC_SAMPLE_FORMAT) * FRAMELEN * 2;
+#endif
+
 	return B_OK;
 }
 
@@ -86,28 +125,10 @@ MusePackReader::GetStreamInfo(void *cookie, int64 *_frameCount, bigtime_t *_dura
 	*_duration = bigtime_t(1000.0 * (fInfo.simple.Frames - 0.5) * FRAMELEN
 		/ (fInfo.simple.SampleFreq / 1000) + 0.5);
 
-	media_format_description description;
-	description.family = B_MISC_FORMAT_FAMILY;
-	description.u.misc.file_format = 'mpc ';
-	description.u.misc.codec = 'MPC7';
-		// 7 is the most recent stream version
-
-	status_t status = BMediaFormats().GetFormatFor(description, format);
-	if (status < B_OK)
-		return status;
-
-	// allocate and initialize internal decoder
-	MPC_decoder *decoder = new MPC_decoder(static_cast<BPositionIO *>(Source()));
-	decoder->RESET_Globals();
-	decoder->RESET_Synthesis();
-	decoder->SetStreamInfo(&fInfo);
-	if (!decoder->FileInit()) {
-		delete decoder;
-		return B_ERROR;
-	}
+	*format = fFormat;
 
 	// we provide the stream info in this place
-	*_infoBuffer = (void *)decoder;
+	*_infoBuffer = (void *)fDecoder;
 	*_infoSize = sizeof(MPC_decoder);
 
 	return B_OK;

@@ -10,6 +10,7 @@
 #include <MediaFormats.h>
 
 #include "mpc/in_mpc.h"
+#include "mpc/mpc_dec.h"
 
 
 class MusePackReader : public Reader {
@@ -37,6 +38,8 @@ class MusePackReader : public Reader {
 
 	private:
 		StreamInfo	fInfo;
+		media_format fFormat;
+		MPC_decoder *fDecoder;
 };
 
 #endif	/* MUSEPACK_READER_H */
