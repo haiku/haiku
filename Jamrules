@@ -658,6 +658,7 @@ rule SetupKernel
 	UsePublicHeaders kernel ;
 	UsePublicHeaders [ FDirName os kernel ] ;
 	UsePrivateHeaders kernel ;
+	UsePosixHeaders ;
 	UseArchHeaders $(OBOS_ARCH) ;
 
 	SetupObjectsDir ;
