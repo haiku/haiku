@@ -1,5 +1,6 @@
 #include "MediaExtractor.h"
 #include "PluginManager.h"
+#include "ChunkCache.h"
 #include "debug.h"
 
 #include <Autolock.h>

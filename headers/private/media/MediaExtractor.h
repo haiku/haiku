@@ -3,10 +3,11 @@
 
 #include "ReaderPlugin.h"
 #include "DecoderPlugin.h"
-#include "ChunkCache.h"
 
 namespace BPrivate {
 namespace media {
+
+class ChunkCache;
 
 struct stream_info
 {
