@@ -93,6 +93,8 @@ RGBColor::RGBColor(const RGBColor &col)
 	color32=col.color32;
 	color16=col.color16;
 	color8=col.color8;
+	update8=col.update8;
+	update16=col.update16;
 }
 
 /*!
@@ -101,14 +103,21 @@ RGBColor::RGBColor(const RGBColor &col)
 RGBColor::RGBColor(void)
 {
 	SetColor(0,0,0,0);
+	update8=update16=false;
 }
 
 /*!
 	\brief Returns the color as the closest 8-bit color in the palette
 	\return The palette index for the current color
 */
-uint8 RGBColor::GetColor8(void) const
+uint8 RGBColor::GetColor8(void)
 {
+	if(update8)
+	{
+		color8=FindClosestColor(system_palette, color32);
+		update8=false;
+	}
+
 	return color8;
 }
 
@@ -116,8 +125,14 @@ uint8 RGBColor::GetColor8(void) const
 	\brief Returns the color as the closest 16-bit color
 	\return 16-bit value of the current color, including alpha
 */
-uint16 RGBColor::GetColor16(void) const
+uint16 RGBColor::GetColor16(void)
 {
+	if(update16)
+	{
+		color16=FindClosestColor16(color32);
+		update16=false;
+	}
+	
 	return color16;
 }
 
@@ -143,6 +158,8 @@ void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a)
 	color32.green=g;
 	color32.blue=b;
 	color32.alpha=a;
+	
+	update8=update16=true;
 }
 
 /*!
@@ -158,6 +175,8 @@ void RGBColor::SetColor(int r, int g, int b, int a)
 	color32.green=(uint8)g;
 	color32.blue=(uint8)b;
 	color32.alpha=(uint8)a;
+
+	update8=update16=true;
 }
 
 /*!
@@ -168,7 +187,9 @@ void RGBColor::SetColor(uint16 col16)
 {
 	color16=col16;
 	SetRGBColor(&color32,col16);
-	color8=FindClosestColor(system_palette,color32);
+
+	update8=true;
+	update16=false;
 }
 
 /*!
@@ -179,7 +200,9 @@ void RGBColor::SetColor(uint8 col8)
 {
 	color8=col8;
 	color32=system_palette[col8];
-	color16=FindClosestColor16(color32);
+	
+	update8=false;
+	update16=true;
 }
 
 /*!
@@ -189,8 +212,7 @@ void RGBColor::SetColor(uint8 col8)
 void RGBColor::SetColor(const rgb_color &color)
 {
 	color32=color;
-	color16=FindClosestColor16(color32);
-	color8=FindClosestColor(system_palette,color32);
+	update8=update16=true;
 }
 
 /*!
@@ -202,6 +224,8 @@ void RGBColor::SetColor(const RGBColor &col)
 	color32=col.color32;
 	color16=col.color16;
 	color8=col.color8;
+	update8=col.update8;
+	update16=col.update16;
 }
 
 /*!
@@ -213,6 +237,8 @@ RGBColor & RGBColor::operator=(const RGBColor &col)
 	color32=col.color32;
 	color16=col.color16;
 	color8=col.color8;
+	update8=col.update8;
+	update16=col.update16;
 	return *this;
 }
 
@@ -223,8 +249,7 @@ RGBColor & RGBColor::operator=(const RGBColor &col)
 RGBColor & RGBColor::operator=(const rgb_color &col)
 {
 	color32=col;
-	color16=FindClosestColor16(color32);
-	color8=FindClosestColor(system_palette,color32);
+	update8=update16=true;
 
 	return *this;
 }
@@ -259,7 +284,7 @@ RGBColor RGBColor::MakeBlendColor(const RGBColor &color, const float &position)
 	if(mod<0 )
 		newcol.red=0;
 
-	delta=int16(col2.green)-int16(col.green);
+delta=int16(col2.green)-int16(col.green);
 	mod=col.green + (position * delta);
 	newcol.green=uint8(mod);
 	if(mod>255 )
