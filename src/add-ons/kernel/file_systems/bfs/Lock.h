@@ -131,7 +131,7 @@ class RecursiveLock {
 #endif
 		}
 
-		status_t Lock()
+		status_t LockWithTimeout(bigtime_t timeout)
 		{
 			thread_id thread = find_thread(NULL);
 			if (thread == fOwner) {
@@ -145,7 +145,7 @@ class RecursiveLock {
 				status = B_OK;
 			else
 #endif
-				status = acquire_sem(fSemaphore);
+				status = acquire_sem_etc(fSemaphore, 1, B_RELATIVE_TIMEOUT, timeout);
 
 			if (status == B_OK) {
 				fOwner = thread;
@@ -153,6 +153,11 @@ class RecursiveLock {
 			}
 
 			return status;
+		}
+
+		status_t Lock()
+		{
+			return LockWithTimeout(B_INFINITE_TIMEOUT);
 		}
 
 		status_t Unlock()
