@@ -47,6 +47,7 @@ public:
 	void SetShowCaption(bool show);
 	void ResizeToViewBounds(bool resize);
 	BBitmap *GetBitmap();
+	void GetName(BString *name);
 	void GetPath(BString *name);
 	void FlushToLeftTop();
 	
@@ -78,6 +79,9 @@ public:
 	void SetSlideShowDelay(float seconds);
 	void StartSlideShow();
 	void StopSlideShow();
+	void SetZoom(float zoom);
+	void ZoomIn();
+	void ZoomOut();
 	
 	// Image manipulation
 	void Rotate(int degree); // 90 and 270 only
@@ -107,8 +111,9 @@ private:
 	BPoint ViewToImage(BPoint p) const;
 	BRect ImageToView(BRect r) const;
 	bool IsImage(const entry_ref* pref);
+	static int CompareEntries(const void* a, const void* b);
 	void FreeEntries(BList* entries);
-	bool FindNextImage(BEntry* entry, bool next, bool rewind);
+	bool FindNextImage(entry_ref* ref, bool next, bool rewind);
 	bool ShowNextImage(bool next, bool rewind);
 	bool FirstFile();
 	void ConstrainToImage(BPoint &point);
@@ -128,6 +133,7 @@ private:
 	int32 fDocumentIndex;
 	int32 fDocumentCount;
 	BBitmap *fpBitmap;
+	float fZoom;
 	bool fResizeToViewBounds;
 	float fLeft;         // the origin of the image in the view
 	float fTop;

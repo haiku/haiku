@@ -60,6 +60,12 @@ const uint32 MSG_SLIDE_SHOW_DELAY   = 'mSSD';
 const uint32 MSG_FULL_SCREEN        = 'mFSC';
 const uint32 MSG_UPDATE_RECENT_DOCUMENTS = 'mURD';
 const uint32 MSG_SHOW_CAPTION       = 'mSCP';
+const uint32 MSG_PAGE_SETUP         = 'mPSU';
+const uint32 MSG_PREPARE_PRINT      = 'mPPT';
+const uint32 MSG_PRINT              = 'mPRT';
+const uint32 MSG_ZOOM_IN            = 'mZIN';
+const uint32 MSG_ZOOM_OUT           = 'mZOU';
+const uint32 MSG_ORIGINAL_SIZE      = 'mOSZ';
 
 extern const char *APP_SIG;
 

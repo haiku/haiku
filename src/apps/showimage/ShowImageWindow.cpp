@@ -44,6 +44,7 @@
 #include <SupportDefs.h>
 #include <Screen.h>
 #include <Roster.h>
+#include <PrintJob.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageWindow.h"
@@ -56,6 +57,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	fpSavePanel = NULL;
 	fFullScreen = false;
 	fShowCaption = true; // XXX what is best for default?
+	fPrintSettings = NULL;
 		
 	// create menu bar	
 	fpBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
@@ -104,13 +106,13 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	SetSizeLimits(250, 100000, 100, 100000);
 	
 	// finish creating window
-	UpdateTitle();
-
 	fpImageView->SetImage(pref);
 
-	SetPulseRate(100000); // every 1/10 second; ShowImageView needs it for marching ants
-
 	if (InitCheck() == B_OK) {
+		UpdateTitle();
+
+		SetPulseRate(100000); // every 1/10 second; ShowImageView needs it for marching ants
+
 		fpImageView->FlushToLeftTop();
 		WindowRedimension(fpImageView->GetBitmap());
 		Show();
@@ -182,14 +184,17 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	fpOpenMenu->Superitem()->SetTarget(be_app);
 	fpOpenMenu->Superitem()->SetShortcut('O', 0);
 	pmenu->AddSeparatorItem();
-	BMenu *pmenuSaveAs = new BMenu("Save As...", B_ITEMS_IN_COLUMN);
+	BMenu *pmenuSaveAs = new BMenu("Save As" B_UTF8_ELLIPSIS, B_ITEMS_IN_COLUMN);
 	BTranslationUtils::AddTranslationItems(pmenuSaveAs, B_TRANSLATOR_BITMAP);
 		// Fill Save As submenu with all types that can be converted
 		// to from the Be bitmap image format
 	pmenu->AddItem(pmenuSaveAs);
 	AddItemMenu(pmenu, "Close", MSG_CLOSE, 'W', 0, 'W', true);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "About ShowImage...", B_ABOUT_REQUESTED, 0, 0, 'A', true);
+	AddItemMenu(pmenu, "Page Setup" B_UTF8_ELLIPSIS, MSG_PAGE_SETUP, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Print" B_UTF8_ELLIPSIS, MSG_PREPARE_PRINT, 0, 0, 'W', true);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "About ShowImage" B_UTF8_ELLIPSIS, B_ABOUT_REQUESTED, 0, 0, 'A', true);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Quit", B_QUIT_REQUESTED, 'Q', 0, 'A', true);
 	pbar->AddItem(pmenu);
@@ -249,6 +254,10 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddDelayItem(pDelay, "Ten Seconds", 10, false);
 	AddDelayItem(pDelay, "Twenty Seconds", 20, false);
 	pmenu->AddItem(pDelay);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Original Size", MSG_ORIGINAL_SIZE, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Zoom In", MSG_ZOOM_IN, '+', 0, 'W', true);
+	AddItemMenu(pmenu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, 'W', true);	
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, 'W', true);
@@ -406,15 +415,21 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 					// Remove all page numbers
 					delete fpGoToPageMenu->RemoveItem(0L);
 			
-				for (int32 i = 1; i > 0 && i <= pages; i++) {
+				for (int32 i = 1; i <= pages; i++) {
 					// Fill Go To page submenu with an entry for each page
 					BMessage *pgomsg;
+					char shortcut = 0;
 					pgomsg = new BMessage(MSG_GOTO_PAGE);
 					pgomsg->AddInt32("page", i);
 					BString strCaption;
 					strCaption << i;
 					BMenuItem *pitem;
-					pitem = new BMenuItem(strCaption.String(), pgomsg, 0);
+					if (i < 10) {
+						shortcut = '0' + i;
+					} else if (i == 10) {
+						shortcut = '0';
+					}
+					pitem = new BMenuItem(strCaption.String(), pgomsg, shortcut);
 					if (curPage == i)
 						pitem->SetMarked(true);
 					fpGoToPageMenu->AddItem(pitem);
@@ -503,6 +518,9 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 				bool resize;
 				resize = ToggleMenuItem(pmsg->what);
 				fpImageView->ResizeToViewBounds(resize);
+				EnableMenuItem(MSG_ORIGINAL_SIZE, !resize);
+				EnableMenuItem(MSG_ZOOM_IN, !resize);
+				EnableMenuItem(MSG_ZOOM_OUT, !resize);
 			}
 			break;
 
@@ -556,6 +574,26 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		
 		case MSG_UPDATE_RECENT_DOCUMENTS:
 			UpdateRecentDocumentsMenu();
+			break;
+		
+		case MSG_PAGE_SETUP:
+			PageSetup();
+			break;
+		case MSG_PREPARE_PRINT:
+			PrepareForPrint();
+			break;
+		case MSG_PRINT:
+			Print(pmsg);
+			break;
+		
+		case MSG_ZOOM_IN:
+			fpImageView->ZoomIn();
+			break;
+		case MSG_ZOOM_OUT:
+			fpImageView->ZoomOut();
+			break;
+		case MSG_ORIGINAL_SIZE:
+			fpImageView->SetZoom(1.0);
 			break;
 					
 		default:
@@ -668,6 +706,106 @@ ShowImageWindow::ToggleFullScreen()
 	fpImageView->SetShowCaption(fFullScreen && fShowCaption);
 	MoveTo(frame.left, frame.top);
 	ResizeTo(frame.Width(), frame.Height());
+}
+
+bool
+ShowImageWindow::PageSetup()
+{
+	status_t st;
+	BString name;
+	fpImageView->GetName(&name);
+	BPrintJob printJob(name.String());
+	if (fPrintSettings != NULL) {
+		printJob.SetSettings(new BMessage(*fPrintSettings));
+	}
+	st = printJob.ConfigPage();
+	if (st == B_OK) {
+		delete fPrintSettings;
+		fPrintSettings = printJob.Settings();
+	}
+	return st == B_OK;
+}
+
+void
+ShowImageWindow::PrepareForPrint()
+{
+	if (fPrintSettings == NULL && !PageSetup()) {
+		return;
+	}
+
+	fPrintOptions.SetBounds(fpImageView->GetBitmap()->Bounds());
+	fPrintOptions.SetWidth(fpImageView->GetBitmap()->Bounds().Width()+1);
+
+	new PrintOptionsWindow(BPoint(Frame().left+30, Frame().top+50), &fPrintOptions, this);
+}
+
+void
+ShowImageWindow::Print(BMessage *msg)
+{
+	status_t st;
+	if (msg->FindInt32("status", &st) != B_OK || st != B_OK) {
+		return;
+	}
+	
+	BString name;
+	fPrintOptions.SetBounds(fpImageView->GetBitmap()->Bounds());
+	fpImageView->GetName(&name);
+	BPrintJob printJob(name.String());
+	printJob.SetSettings(new BMessage(*fPrintSettings));
+	if (printJob.ConfigJob() == B_OK) {
+		int32  firstPage;
+		int32  lastPage;
+		BRect  printableRect = printJob.PrintableRect();
+		float width, imageWidth, imageHeight, w1, w2;
+		BBitmap* bitmap;
+
+		// first/lastPage is unused for now
+		firstPage = printJob.FirstPage();
+		lastPage = printJob.LastPage();
+		if (firstPage < 1) {
+			firstPage = 1;
+		}
+		if (lastPage < firstPage) {
+			lastPage = firstPage;
+		}
+		
+		bitmap = fpImageView->GetBitmap();
+		imageWidth = bitmap->Bounds().Width() + 1.0;
+		imageHeight = bitmap->Bounds().Height() + 1.0;
+		
+		switch (fPrintOptions.Option()) {
+			case PrintOptions::kFitToPage:
+				w1 = printableRect.Width()+1;
+				w2 = imageWidth * (printableRect.Height() + 1) / imageHeight;
+				if (w2 < w1) {
+					width = w2;
+				} else {
+					width = w1;
+				}
+				break;
+			case PrintOptions::kZoomFactor:
+				width = imageWidth * fPrintOptions.ZoomFactor();
+				break;				
+			case PrintOptions::kDPI:
+				width = imageWidth * 72.0 / fPrintOptions.DPI();
+				break;				
+			case PrintOptions::kWidth:
+			case PrintOptions::kHeight:
+				width = fPrintOptions.Width();
+				break;
+			default:
+				// keep compiler silent; should not reach here
+				width = imageWidth;				
+		}
+
+		// XXX: eventually print large images on several pages
+		printJob.BeginJob();
+		fpImageView->SetScale(width / imageWidth);
+		printJob.DrawView(fpImageView, bitmap->Bounds(), BPoint(printableRect.left, printableRect.top));
+		fpImageView->SetScale(1.0);
+		printJob.SpoolPage();
+		printJob.CommitJob();
+	}
 }
 
 bool

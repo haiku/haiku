@@ -34,6 +34,8 @@
 #include <TranslationDefs.h>
 #include <String.h>
 
+#include "PrintOptionsWindow.h"
+
 class ShowImageView;
 class ShowImageStatusView;
 
@@ -77,6 +79,9 @@ private:
 	bool CanQuit();
 		// returns true if the window can be closed safely, false if not
 	void ToggleFullScreen();
+	bool PageSetup();
+	void PrepareForPrint();
+	void Print(BMessage *msg);
 
 	BFilePanel *fpSavePanel;
 	BMenuBar *fpBar;
@@ -88,6 +93,8 @@ private:
 	bool fFullScreen;
 	BRect fWindowFrame;
 	bool fShowCaption;
+	BMessage *fPrintSettings;
+	PrintOptions fPrintOptions;
 };
 
 #endif /* _ShowImageWindow_h */

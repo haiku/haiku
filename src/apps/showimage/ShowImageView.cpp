@@ -160,6 +160,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	SetSlideShowDelay(3); // 3 seconds
 	fBeginDrag = false;
 	fShowCaption = false;
+	fZoom = 1.0;
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kborderColor);
@@ -301,6 +302,19 @@ ShowImageView::GetBitmap()
 }
 
 void
+ShowImageView::GetName(BString *name)
+{
+	*name = "";
+	BEntry entry(&fCurrentRef);
+	if (entry.InitCheck() == B_OK) {
+		char n[B_FILE_NAME_LENGTH];
+		if (entry.GetName(n) == B_OK) {
+			name->SetTo(n);
+		}
+	}		
+}
+
+void
 ShowImageView::GetPath(BString *name)
 {
 	*name = "";
@@ -353,6 +367,7 @@ ShowImageView::AlignBitmap() const
 			}
 		}
 	} else {
+		rect.right *= fZoom; rect.bottom *= fZoom;
 		rect.OffsetBy(BORDER_WIDTH, BORDER_WIDTH);
 	}
 	rect.OffsetBy(PEN_SIZE, PEN_SIZE);
@@ -421,7 +436,7 @@ ShowImageView::DrawCaption()
 	width = font.StringWidth(fCaption.String())+1; // 1 for text shadow
 	font.GetHeight(&fontHeight);
 	height = fontHeight.ascent + fontHeight.descent;
-	// center text vertically
+	// center text horizontally
 	pos.x = (bounds.left + bounds.right - width)/2;
 	// flush bottom
 	pos.y = bounds.bottom - fontHeight.descent - 5;
@@ -456,26 +471,30 @@ void
 ShowImageView::Draw(BRect updateRect)
 {
 	if (fpBitmap) {
-		BRect rect = AlignBitmap();
-		Setup(rect);
-		
-		BRect border(rect);
-		border.InsetBy(-PEN_SIZE, -PEN_SIZE);
-
-		DrawBorder(border);
-
-		// Draw black rectangle around image
-		StrokeRect(border);
-		
-		// Draw image	
-		DrawBitmap(fpBitmap, fpBitmap->Bounds(), rect);
-					
-		if (fShowCaption) {
-			DrawCaption();
-		}
-		
-		if (fbHasSelection) {
-			DrawSelectionBox(fSelectionRect);
+		if (!IsPrinting()) {
+			BRect rect = AlignBitmap();
+			Setup(rect);
+			
+			BRect border(rect);
+			border.InsetBy(-PEN_SIZE, -PEN_SIZE);
+	
+			DrawBorder(border);
+	
+			// Draw black rectangle around image
+			StrokeRect(border);
+			
+			// Draw image	
+			DrawBitmap(fpBitmap, fpBitmap->Bounds(), rect);
+						
+			if (fShowCaption) {
+				DrawCaption();
+			}
+			
+			if (fbHasSelection) {
+				DrawSelectionBox(fSelectionRect);
+			}
+		} else {
+			DrawBitmap(fpBitmap);
 		}
 	}
 }
@@ -783,6 +802,7 @@ void
 ShowImageView::FixupScrollBars()
 {
 	BScrollBar *psb;	
+
 	if (fResizeToViewBounds) {
 		psb = ScrollBar(B_HORIZONTAL);
 		if (psb) psb->SetRange(0, 0);
@@ -792,8 +812,10 @@ ShowImageView::FixupScrollBars()
 	}
 
 	BRect rctview = Bounds(), rctbitmap(0, 0, 0, 0);
-	if (fpBitmap)
-		rctbitmap = fpBitmap->Bounds();
+	if (fpBitmap) {
+		BRect rect(AlignBitmap());
+		rctbitmap.Set(0, 0, rect.Width(), rect.Height());
+	}
 	
 	float prop, range;
 	psb = ScrollBar(B_HORIZONTAL);
@@ -914,6 +936,15 @@ ShowImageView::PrevPage()
 	}
 }
 
+int 
+ShowImageView::CompareEntries(const void* a, const void* b)
+{
+	entry_ref *r1, *r2;
+	r1 = *(entry_ref**)a;
+	r2 = *(entry_ref**)b;
+	return strcasecmp(r1->name, r2->name);
+}
+
 void
 ShowImageView::GoToPage(int32 page)
 {
@@ -928,73 +959,77 @@ ShowImageView::FreeEntries(BList* entries)
 {
 	const int32 n = entries->CountItems();
 	for (int32 i = 0; i < n; i ++) {
-		BEntry* entry = (BEntry*)entries->ItemAt(i);
-		delete entry;		
+		entry_ref* ref = (entry_ref*)entries->ItemAt(i);
+		delete ref;		
 	}
 	entries->MakeEmpty();
 }
 
-// Notes: BDirectory::GetNextEntry() must not necessary
-// return entries sorted by name, thou BFS does. 
 bool
-ShowImageView::FindNextImage(BEntry* image, bool next, bool rewind)
+ShowImageView::FindNextImage(entry_ref* image, bool next, bool rewind)
 {
 	ASSERT(next || !rewind);
 	BEntry curImage(&fCurrentRef);
-	BEntry entry;
+	entry_ref entry, *ref;
 	BDirectory parent;
 	BList entries;
-
+	bool found = false;
+	int32 cur;
+	
 	if (curImage.GetParent(&parent) != B_OK)
 		return false;
 
-	while (parent.GetNextEntry(&entry) == B_OK) {
-		if (rewind || entry == curImage) {
-			// start with first entry or found current image
-			if (next) {
-				// start with next entry
-				if (!rewind && parent.GetNextEntry(&entry) != B_OK) {
-					break;
-				}
-				// find next image in directory
-				do {
-					entry_ref ref;
-					if (entry.GetRef(&ref) == B_OK && IsImage(&ref)) {
-						*image = entry;
-						return true;
-					}
-				} while (parent.GetNextEntry(&entry) == B_OK);
-			} else {
-				// find previous image in directory
-				for (int32 i = entries.CountItems() - 1; i >= 0; i --) {
-					BEntry* entry = (BEntry*)entries.ItemAt(i);
-					entry_ref ref;
-					if (entry->GetRef(&ref) == B_OK && IsImage(&ref)) {
-						*image = *entry;
-						FreeEntries(&entries);
-						return true;
-					}
-				}
-			}
-			break;
-		}
-		if (!next) {			
-			// record entries if we search for previous file
-			entries.AddItem(new BEntry(entry));
+	while (parent.GetNextRef(&entry) == B_OK) {
+		if (entry != fCurrentRef) {
+			entries.AddItem(new entry_ref(entry));
+		} else {
+			// insert current ref, so we can find it easily after sorting
+			entries.AddItem(&fCurrentRef);
 		}
 	}
+	
+	entries.SortItems(CompareEntries);
+	
+	cur = entries.IndexOf(&fCurrentRef);
+	ASSERT(cur >= 0);
+
+	// remove it so FreeEntries() does not delete it
+	entries.RemoveItem(&fCurrentRef);
+	
+	if (next) {
+		// find the next image in the list
+		if (rewind) cur = 0; // start with first
+		for (; (ref = (entry_ref*)entries.ItemAt(cur)) != NULL; cur ++) {
+			if (IsImage(ref)) {
+				found = true;
+				*image = (const entry_ref)*ref;
+				break;
+			}
+		}
+	} else {
+		// find the previous image in the list
+		cur --;
+		for (; cur >= 0; cur --) {
+			ref = (entry_ref*)entries.ItemAt(cur);
+			if (IsImage(ref)) {
+				found = true;
+				*image = (const entry_ref)*ref;
+				break;
+			}
+		}
+	}
+
 	FreeEntries(&entries);
-	return false;
+	return found;
 }
 
 bool
 ShowImageView::ShowNextImage(bool next, bool rewind)
 {
-	BEntry image;
 	entry_ref ref;
 	
-	if (FindNextImage(&image, next, rewind) && image.GetRef(&ref) == B_OK) {
-		SetImage(&ref); 
+	if (FindNextImage(&ref, next, rewind)) {
+		SetImage(&ref);
 		return true;
 	}
 	return false;
@@ -1016,6 +1051,28 @@ bool
 ShowImageView::FirstFile()
 {
 	return ShowNextImage(true, true);
+}
+
+void
+ShowImageView::SetZoom(float zoom)
+{
+	fZoom = zoom;
+	FixupScrollBars();
+	Invalidate();
+}
+
+void
+ShowImageView::ZoomIn()
+{
+	SetZoom(fZoom + 0.25);
+}
+
+void
+ShowImageView::ZoomOut()
+{
+	if (fZoom > 0.25) {
+		SetZoom(fZoom - 0.25);
+	}
 }
 
 void
