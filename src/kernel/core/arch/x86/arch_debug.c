@@ -16,12 +16,38 @@
 #include <arch/x86/arch_cpu.h>
 
 
+#define NUM_PREVIOUS_LOCATIONS 16
+
+
+static bool
+already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 ebp)
+{
+	int32 last = *_last;
+	int32 num = *_num;
+	int32 i;
+
+	for (i = 0; i < num; i++) {
+		if (visited[(NUM_PREVIOUS_LOCATIONS + last - i) % NUM_PREVIOUS_LOCATIONS] == ebp)
+			return true;
+	}
+
+	*_last = last = (last + 1) % NUM_PREVIOUS_LOCATIONS;
+	visited[last] = ebp;
+
+	if (num < NUM_PREVIOUS_LOCATIONS)
+		*_num = num + 1;
+
+	return false;
+}
+
+
 static int
 dbg_stack_trace(int argc, char **argv)
 {
+	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
 	struct thread *t;
 	uint32 ebp;
-	int i;
+	int32 i, num = 0, last = 0;
 
 	if (argc < 2)
 		t = thread_get_current_thread();
@@ -87,6 +113,10 @@ dbg_stack_trace(int argc, char **argv)
 			ebp = *(uint32 *)ebp;
 		}
 
+		if (already_visited(previousLocations, &last, &num, ebp)) {
+			dprintf("circular stack frame: %p!\n", (void *)ebp);
+			break;
+		}
 		if (ebp == 0)
 			break;
 	}
