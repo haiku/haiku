@@ -5,6 +5,7 @@
 
 typedef struct gensyscall_parameter_info {
 	const char	*type;
+	const char	*name;
 	int			offset;
 	int			size;
 	int			actual_size;

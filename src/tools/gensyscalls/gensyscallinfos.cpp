@@ -43,6 +43,16 @@ struct Type {
 	string type;
 };
 
+// NamedType
+struct NamedType : Type {
+	NamedType(const char *type, const char *name) 
+		: Type(type), name(name) {}
+	NamedType(const string &type, const string &name)
+		: Type(type), name(name) {}
+
+	string name;
+};
+
 // Function
 class Function {
 public:
@@ -58,7 +68,7 @@ public:
 		return fName;
 	}
 
-	void AddParameter(const Type &type)
+	void AddParameter(const NamedType &type)
 	{
 		fParameters.push_back(type);
 	}
@@ -68,7 +78,7 @@ public:
 		return fParameters.size();
 	}
 
-	const Type &ParameterAt(int index) const
+	const NamedType &ParameterAt(int index) const
 	{
 		return fParameters[index];
 	}
@@ -84,9 +94,9 @@ public:
 	}
 
 protected:
-	string			fName;
-	vector<Type>	fParameters;
-	Type			fReturnType;
+	string				fName;
+	vector<NamedType>	fParameters;
+	Type				fReturnType;
 };
 
 // Syscall
@@ -344,9 +354,10 @@ private:
 			file << "static gensyscall_parameter_info " << paramInfoName
 				<< "[] = {" << endl;
 			for (int k = 0; k < paramCount; k++) {
-				file << "\t{ \"" << syscall.ParameterAt(k).type << "\", 0, "
-				<< "sizeof(" << syscall.ParameterAt(k).type << "), 0 },"
-				<< endl;
+				const NamedType &param = syscall.ParameterAt(k);
+				file << "\t{ \"" << param.type << "\", \"" << param.name
+				<< "\", 0, " << "sizeof(" << syscall.ParameterAt(k).type
+				<< "), 0 }," << endl;
 			}
 			file << "};" << endl;
 			file << endl;
@@ -465,16 +476,19 @@ private:
 				// that's OK
 				return;
 			}
-			throw ParseException("Error while parsing function "
-				"parameter.");
+			throw ParseException("Error while parsing function parameter.");
 		}
-		type.pop_back(); // last component is the parameter name
+
+		// last component is the parameter name
+		string typeName = type.back();
+		type.pop_back();
+
 		string typeString(type[0]);
 		for (int i = 1; i < (int)type.size(); i++) {
 			typeString += " ";
 			typeString += type[i];
 		}
-		syscall.AddParameter(typeString);
+		syscall.AddParameter(NamedType(typeString, typeName));
 	}
 
 	void _ParseFunctionPointerParameter(Tokenizer &tokenizer, Syscall &syscall,
@@ -491,9 +505,13 @@ private:
 		while (tokenizer.CheckNextToken("*"))
 			type.push_back("*");
 		// now comes the parameter name, if specified -- skip it
+		string typeName;
 		if (!tokenizer.CheckNextToken(")")) {
-			tokenizer.GetNextToken();
+			typeName = tokenizer.GetNextToken();
 			tokenizer.ExpectNextToken(")");
+		} else {
+			throw ParseException("Error while parsing function parameter. "
+				"No parameter name.");
 		}
 		type.push_back(")");
 		// the function parameters
@@ -508,7 +526,7 @@ private:
 			typeString += " ";
 			typeString += type[i];
 		}
-		syscall.AddParameter(typeString);
+		syscall.AddParameter(NamedType(typeString, typeName));
 	}
 
 private:
