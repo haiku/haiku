@@ -1926,6 +1926,7 @@ void BWindow::ResizeBy(float dx, float dy)
 	fLink->Flush();
 	
 	top_view->ResizeBy(dxNew, dyNew);
+	Unlock();
 }
 
 //------------------------------------------------------------------------------
@@ -3048,7 +3049,6 @@ void BWindow::drawAllViews(BView* aView)
 {
 	if(Lock())
 	{
-		Lock();
 		top_view->Invalidate();
 		Unlock();
 	}
