@@ -8,6 +8,7 @@
 
 #include <types.h>
 #include <defines.h>
+#include <sys/uio.h>
 
 /* ---
 	these hooks are how the kernel accesses the device
@@ -29,12 +30,12 @@ typedef status_t (*device_select_hook) (void *cookie, uint8 event, uint32 ref,
                                         selectsync *sync);
 typedef status_t (*device_deselect_hook) (void *cookie, uint8 event,
                                           selectsync *sync);
-/* XXX - no iovec support yet
 typedef status_t (*device_readv_hook) (void *cookie, off_t position, const iovec *vec,
 					size_t count, size_t *numBytes);
 typedef status_t (*device_writev_hook) (void *cookie, off_t position, const iovec *vec,
 					size_t count, size_t *numBytes);
-*/
+
+#define	B_CUR_DRIVER_API_VERSION	2
 
 /* ---
 	the device_hooks structure is a descriptor for the device, giving its
@@ -50,9 +51,8 @@ typedef struct {
 	device_write_hook		write;		/* writes to the device */
 	device_select_hook		select;		/* start select */
 	device_deselect_hook	deselect;	/* stop select */
-/* XXX - no iovec support yet */
-//	device_readv_hook		readv;		/* scatter-gather read from the device */
-//	device_writev_hook		writev;		/* scatter-gather write to the device */
+	device_readv_hook		readv;		/* scatter-gather read from the device */
+	device_writev_hook		writev;		/* scatter-gather write to the device */
 } device_hooks;
 
 status_t		init_hardware(void);
