@@ -40,12 +40,12 @@ StringRemoveTest::PerformTest(void)
 #ifndef TEST_R5	
 	//new length is < 0
 	//it crashes r5 implementation, but ours works fine here,
-	//in this case, we ignore the truncation
+	//in this case, we just truncate to 0
 	NextSubTest();
 	string1 = new BString("This is a long string");
 	string1->Truncate(-3);
-	CPPUNIT_ASSERT(strcmp(string1->String(), "This is a long string") == 0);
-	CPPUNIT_ASSERT(string1->Length() == 21);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "") == 0);
+	CPPUNIT_ASSERT(string1->Length() == 0);
 	delete string1;	
 #endif
 	
