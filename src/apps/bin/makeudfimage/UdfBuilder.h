@@ -33,6 +33,7 @@ private:
 
 	OutputFile& _OutputFile() { return fOutputFile; }
 	uint32 _BlockSize() const { return fBlockSize; }	
+	uint32 _BlockShift() const { return fBlockShift; }	
 	bool _DoUdf() const { return fDoUdf; }
 	bool _DoIso() const { return fDoIso; }
 	Allocator& _Allocator() { return fAllocator; }

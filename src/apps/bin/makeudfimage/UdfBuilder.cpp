@@ -17,6 +17,7 @@
 #include "UdfDebug.h"
 #include "Utils.h"
 
+using Udf::bool_to_string;
 using Udf::check_size_error;
 
 /*! \brief Creates a new UdfBuilder object.
@@ -90,6 +91,9 @@ UdfBuilder::Build()
 	_OutputFile().Seek(0, SEEK_SET);		
 	_PrintUpdate(VERBOSITY_LOW, "Output file: `%s'", fOutputFilename.c_str());		
 
+
+	_PrintUpdate(VERBOSITY_LOW, "Initializing volume");
+
 	// Reserve the first 32KB and zero them out.
 	if (!error) {
 		const int reservedAreaSize = 32 * 1024;
@@ -110,7 +114,7 @@ UdfBuilder::Build()
 	
 	// Write the iso portion of the vrs
 	if (!error && _DoIso()) {
-		_PrintUpdate(VERBOSITY_LOW, "Writing iso portion of volume recognition sequence...");
+		_PrintUpdate(VERBOSITY_MEDIUM, "iso: Writing primary volume descriptor");
 		
 		// Error check
 		if (error) {				 
@@ -121,9 +125,9 @@ UdfBuilder::Build()
 			
 	// Write the udf portion of the vrs
 	if (!error && _DoUdf()) {
-		_PrintUpdate(VERBOSITY_LOW, "Writing udf portion of volume recognition sequence...");
 		Udf::extent_address extent;
 		// Bea
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing beginning extended area descriptor");
 		Udf::volume_structure_descriptor_header bea(0, Udf::kVSDID_BEA, 1);
 		error = _Allocator().GetNextExtent(vrsBlockSize, true, extent);
 		if (!error) {
@@ -135,6 +139,7 @@ UdfBuilder::Build()
 			}
 		}				
 		// Nsr
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing nsr descriptor");
 		Udf::volume_structure_descriptor_header nsr(0, Udf::kVSDID_ECMA167_3, 1);
 		if (!error)
 			error = _Allocator().GetNextExtent(vrsBlockSize, true, extent);
@@ -147,6 +152,7 @@ UdfBuilder::Build()
 			}
 		}				
 		// Tea
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing terminating extended area descriptor");
 		Udf::volume_structure_descriptor_header tea(0, Udf::kVSDID_TEA, 1);
 		if (!error)
 			error = _Allocator().GetNextExtent(vrsBlockSize, true, extent);
@@ -161,6 +167,60 @@ UdfBuilder::Build()
 		// Error check
 		if (error) {				 
 			_PrintError("Error writing udf vrs: 0x%lx, `%s'",
+			            error, strerror(error));
+		}
+	}
+	
+	// Write the udf anchor_256 and volume descriptor sequences
+	if (!error && _DoUdf()) {
+		// reserve anchor_256
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for anchor_256 at block 256");
+		error = _Allocator().GetBlock(256);
+		// reserve primary vds (min length = 16 blocks, which is plenty for us)
+		Udf::extent_address primaryExtent;
+		Udf::extent_address reserveExtent;
+		if (!error) {
+			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for primary vds");
+			error = _Allocator().GetNextExtent(16 << _BlockShift(), true, primaryExtent);
+			if (!error) 
+				_PrintUpdate(VERBOSITY_HIGH, "udf: <location: %ld, length: %ld>",
+				             primaryExtent.location(), primaryExtent.length());
+		}
+		// reserve reserve vds
+		if (!error) {
+			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for reserve vds");
+			error = _Allocator().GetNextExtent(16 << _BlockShift(), true, reserveExtent);
+			if (!error) 
+				_PrintUpdate(VERBOSITY_HIGH, "udf: <location: %ld, length: %ld>",
+				             reserveExtent.location(), reserveExtent.length());
+		}
+		// write anchor_256
+		if (!error) {
+			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing anchor_256");
+			Udf::anchor_volume_descriptor anchor;
+			anchor.main_vds() = primaryExtent;
+			anchor.reserve_vds() = reserveExtent;
+			Udf::descriptor_tag &tag = anchor.tag();
+			tag.set_id(Udf::TAGID_ANCHOR_VOLUME_DESCRIPTOR_POINTER);
+			tag.set_version(3);
+			tag.set_serial_number(0);
+			tag.set_location(256);
+			tag.set_checksums(anchor);
+			_OutputFile().Seek(256 << _BlockShift(), SEEK_SET);
+			ssize_t bytes = _OutputFile().Write(&anchor, sizeof(anchor));
+			error = check_size_error(bytes, sizeof(anchor));
+			if (!error && bytes < ssize_t(_BlockSize())) {
+				bytes = _OutputFile().Zero(_BlockSize()-sizeof(anchor));
+				error = check_size_error(bytes, _BlockSize()-sizeof(anchor));
+			}
+		}
+		// write primary vds
+
+		// write reserve vds
+		
+		// Error check
+		if (error) {				 
+			_PrintError("Error writing udf vds: 0x%lx, `%s'",
 			            error, strerror(error));
 		}
 	}
