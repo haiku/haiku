@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <KernelExport.h>
 #include <Drivers.h>
 
 #include <KDiskDeviceUtils.h>
@@ -15,7 +16,7 @@
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 static const char *kFileDevicesDir = "/dev/disk/virtual/files";
 

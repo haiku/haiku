@@ -1,5 +1,6 @@
 // disk_device_manager.cpp
 
+#include <KernelExport.h>
 #include <stdio.h>
 
 #include "disk_device_manager.h"
@@ -14,7 +15,7 @@
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // write_lock_disk_device
 disk_device_data *

@@ -7,14 +7,11 @@ SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
 UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
-# As long as we compile for R5 userland, we define the following macros.
-SubDirCcFlags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
-SubDirC++Flags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
-
-SharedLibrary disk_device_manager :
+KernelStaticLibrary libdisk_device_manager :
 	ddm_operation_validation.cpp
 	ddm_userland_interface.cpp
 	disk_device_manager.cpp
@@ -24,7 +21,7 @@ SharedLibrary disk_device_manager :
 	KDiskDeviceJobGenerator.cpp
 	KDiskDeviceJobQueue.cpp
 	KDiskDeviceManager.cpp
-	KFileDiskDevice.cpp
+#	KFileDiskDevice.cpp
 	KDiskSystem.cpp
 	KFileSystem.cpp
 	KPartition.cpp
@@ -54,14 +51,6 @@ SharedLibrary disk_device_manager :
 	# disk device types
 	DiskDeviceTypes.cpp
 ;
-
-LinkSharedOSLibs libdisk_device_manager.so
-	: <boot!home!config!lib>libkernelland_emu.so ;
-
-# Hack to enable ddm_userland_interface.cpp to include vm.h but not make
-# kernel/stdio.h shadow the real stdio.h
-ObjectHdrs [ FGristFiles ddm_userland_interface$(SUFOBJ) ]
-	: [ PrivateHeaders kernel [ FDirName kernel arch $(OBOS_ARCH) ] ] ;
 
 # KFileDiskDevice.cpp needs the virtualdrive.h Header. Add it here to not
 # contaminate the include paths for the other files.

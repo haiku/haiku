@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <KernelExport.h>
 #include <Drivers.h>
 
 #include "ddm_userland_interface.h"
@@ -16,7 +17,7 @@
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // constructor
 KDiskDevice::KDiskDevice(partition_id id)

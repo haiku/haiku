@@ -1,6 +1,6 @@
 // RWLocker.cpp
 
-#include <new>
+#include <util/kernel_cpp.h>
 
 #include "RWLocker.h"
 

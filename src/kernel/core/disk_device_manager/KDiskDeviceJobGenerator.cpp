@@ -453,7 +453,9 @@ KDiskDeviceJobGenerator::_GenerateRemainingJobs(KShadowPartition *parent,
 	}
 	// recurse
 	for (int32 i = 0; KPartition *_child = partition->ChildAt(i); i++) {
-		KShadowPartition *child = dynamic_cast<KShadowPartition *>(_child);
+// ToDo: was:
+//		KShadowPartition *child = dynamic_cast<KShadowPartition *>(_child);
+		KShadowPartition *child = static_cast<KShadowPartition *>(_child);
 		if (!child)
 			return B_BAD_VALUE;
 		status_t error = _GenerateRemainingJobs(partition, child);

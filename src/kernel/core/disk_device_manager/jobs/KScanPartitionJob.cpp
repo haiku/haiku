@@ -13,7 +13,7 @@
 // debugging
 #define DBG(x)
 //#define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // constructor
 KScanPartitionJob::KScanPartitionJob(partition_id partitionID)

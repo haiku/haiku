@@ -1,7 +1,6 @@
 // UserDataWriter.cpp
 
-#include <new>
-
+#include <util/kernel_cpp.h>
 #include <ddm_userland_interface.h>
 #include <Vector.h>
 

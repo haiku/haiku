@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <util/kernel_cpp.h>
+
 #include "ddm_userland_interface.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
@@ -11,7 +13,7 @@
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // constructor
 KDiskSystem::KDiskSystem(const char *name)

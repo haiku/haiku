@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include <KernelExport.h>
 #include <DiskDeviceDefs.h>
 #include <KDiskDevice.h>
 #include <KDiskDeviceManager.h>
@@ -16,7 +17,7 @@
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // constructor
 KResizeJob::KResizeJob(partition_id parentID, partition_id partitionID,

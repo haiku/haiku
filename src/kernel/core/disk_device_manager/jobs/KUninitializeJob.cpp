@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include <KernelExport.h>
 #include <DiskDeviceDefs.h>
 #include <KDiskDevice.h>
 #include <KDiskDeviceManager.h>
@@ -14,7 +15,7 @@
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // constructor
 KUninitializeJob::KUninitializeJob(partition_id partitionID)

@@ -2,13 +2,14 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <KernelExport.h>
 #include <Drivers.h>
 #include <Errors.h>
+#include <util/kernel_cpp.h>
 
 #include <ddm_userland_interface.h>
 #include <KDiskDevice.h>
@@ -27,7 +28,7 @@ using namespace std;
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // ListenerSet
 struct KPartition::ListenerSet : VectorSet<KPartitionListener*> {};
@@ -163,6 +164,8 @@ status_t
 KPartition::PublishDevice()
 {
 	// prepare a partition_info
+	// ToDo!
+#if 0
 	partition_info info;
 	info.offset = Offset();
 	info.size = Size();
@@ -187,12 +190,16 @@ KPartition::PublishDevice()
 		error = errno;
 	close(fd);
 	return error;
+#endif
+	return B_ERROR;
 }
 
 // UnpublishDevice
 status_t
 KPartition::UnpublishDevice()
 {
+	return B_OK;
+#if 0
 	// get the entry path
 	char path[B_PATH_NAME_LENGTH];
 	status_t error = GetPath(path);
@@ -202,6 +209,7 @@ KPartition::UnpublishDevice()
 	if (remove(path) < 0)
 		return errno;
 	return B_OK;
+#endif
 }
 
 // SetBusy

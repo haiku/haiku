@@ -4,13 +4,14 @@
 
 #include "ddm_userland_interface.h"
 
+#include <util/kernel_cpp.h>
 #include <KDiskDeviceJob.h>
 #include <KDiskDeviceUtils.h>
 
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // constructor
 KDiskDeviceJob::KDiskDeviceJob(uint32 type, partition_id partitionID,

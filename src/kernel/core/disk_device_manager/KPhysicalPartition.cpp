@@ -2,13 +2,13 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #include <Drivers.h>
 #include <Errors.h>
+#include <util/kernel_cpp.h>
 
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
@@ -21,7 +21,7 @@ using namespace std;
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // constructor
 KPhysicalPartition::KPhysicalPartition(partition_id id)
@@ -70,6 +70,9 @@ KPhysicalPartition::Open(int flags, int *fd)
 status_t
 KPhysicalPartition::PublishDevice()
 {
+// ToDo!
+	return B_ERROR;
+#if 0
 	// prepare a partition_info
 	partition_info info;
 	info.offset = Offset();
@@ -95,12 +98,14 @@ KPhysicalPartition::PublishDevice()
 		error = errno;
 	close(fd);
 	return error;
+#endif
 }
 
 // UnpublishDevice
 status_t
 KPhysicalPartition::UnpublishDevice()
 {
+#if 0
 	// get the entry path
 	char path[B_PATH_NAME_LENGTH];
 	status_t error = GetPath(path);
@@ -109,6 +114,7 @@ KPhysicalPartition::UnpublishDevice()
 	// remove the entry
 	if (remove(path) < 0)
 		return errno;
+#endif
 	return B_OK;
 }
 

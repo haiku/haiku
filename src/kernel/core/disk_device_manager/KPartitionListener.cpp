@@ -1,6 +1,8 @@
 // KPartitionListener.cpp
 
 #include <KPartitionListener.h>
+#include <util/kernel_cpp.h>
+
 
 // constructor
 KPartitionListener::KPartitionListener()

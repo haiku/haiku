@@ -2,13 +2,13 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #include <Drivers.h>
 #include <Errors.h>
+#include <util/kernel_cpp.h>
 
 #include "ddm_userland_interface.h"
 #include "KDiskDevice.h"
@@ -21,7 +21,7 @@ using namespace std;
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // constructor
 KShadowPartition::KShadowPartition(KPhysicalPartition *partition)

@@ -1,6 +1,7 @@
 // KPartitionVisitor.cpp
 
 #include "KPartitionVisitor.h"
+#include <util/kernel_cpp.h>
 
 // constructor
 KPartitionVisitor::KPartitionVisitor()

@@ -1,5 +1,8 @@
 // KDiskDeviceManager.cpp
 
+#include <KernelExport.h>
+#include <util/kernel_cpp.h>
+
 #include <dirent.h>
 #include <errno.h>
 #include <module.h>
@@ -28,7 +31,7 @@
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 // directories for partitioning and file system modules
 static const char *kPartitioningSystemPrefix	= "partitioning_systems";
@@ -305,6 +308,8 @@ KDiskDeviceManager::FindPartition(partition_id id, bool noShadow)
 KFileDiskDevice *
 KDiskDeviceManager::FindFileDevice(const char *filePath)
 {
+	// ToDo: this solution makes use of dynamic_cast!
+#if 0
 	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie); ) {
 		KFileDiskDevice *fileDevice = dynamic_cast<KFileDiskDevice*>(device);
 		if (fileDevice && fileDevice->FilePath()
@@ -312,6 +317,7 @@ KDiskDeviceManager::FindFileDevice(const char *filePath)
 			return fileDevice;
 		}
 	}
+#endif
 	return NULL;
 }
 
@@ -487,6 +493,9 @@ KDiskDeviceManager::WriteLockPartition(partition_id id)
 partition_id
 KDiskDeviceManager::CreateFileDevice(const char *filePath)
 {
+// ToDo!
+	return B_ERROR;
+#if 0
 	if (!filePath)
 		return B_BAD_VALUE;
 	status_t error = B_ERROR;
@@ -517,12 +526,14 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath)
 		delete device;
 	}
 	return error;
+#endif
 }
 
 // DeleteFileDevice
 status_t
 KDiskDeviceManager::DeleteFileDevice(const char *filePath)
 {
+#if 0
 	if (KFileDiskDevice *device = RegisterFileDevice(filePath)) {
 		PartitionRegistrar _(device, true);
 		if (DeviceWriteLocker locker = device) {
@@ -530,6 +541,7 @@ KDiskDeviceManager::DeleteFileDevice(const char *filePath)
 				return B_OK;
 		}
 	}
+#endif
 	return B_ERROR;
 }
 
@@ -537,6 +549,8 @@ KDiskDeviceManager::DeleteFileDevice(const char *filePath)
 status_t
 KDiskDeviceManager::DeleteFileDevice(partition_id id)
 {
+	// ToDo: there is no dynamic_cast in the kernel!
+#if 0
 	if (KDiskDevice *device = RegisterDevice(id)) {
 		PartitionRegistrar _(device, true);
 		if (!dynamic_cast<KFileDiskDevice*>(device) || id != device->ID())
@@ -546,6 +560,7 @@ KDiskDeviceManager::DeleteFileDevice(partition_id id)
 				return B_OK;
 		}
 	}
+#endif
 	return B_ERROR;
 }
 

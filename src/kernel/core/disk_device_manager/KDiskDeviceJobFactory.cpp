@@ -1,6 +1,6 @@
 // KDiskDeviceJobFactory.cpp
 
-#include <new>
+#include <util/kernel_cpp.h>
 
 #include "KDiskDeviceJob.h"
 #include "KDiskDeviceJobFactory.h"

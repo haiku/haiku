@@ -1,12 +1,12 @@
 // KDiskDeviceJobQueue.cpp
 
-#include <new>
 #include <stdio.h>
 #include <string.h>
 
 #include <Vector.h>
 
 #include <KernelExport.h>
+#include <util/kernel_cpp.h>
 
 #include "KDiskDevice.h"
 #include "KDiskDeviceJob.h"
@@ -17,7 +17,7 @@
 // debugging
 //#define DBG(x)
 #define DBG(x) x
-#define OUT printf
+#define OUT dprintf
 
 using namespace std;
 
