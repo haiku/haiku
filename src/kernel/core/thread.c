@@ -27,7 +27,7 @@
 #include <elf.h>
 #include <malloc.h>
 #include <user_runtime.h>
-#include <boot/stage2.h>
+#include <boot/kernel_args.h>
 #include <string.h>
 #include <kimage.h>
 #include <stdio.h>

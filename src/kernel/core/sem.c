@@ -18,7 +18,7 @@
 #include <Errors.h>
 #include <kerrors.h>
 
-#include <boot/stage2.h>
+#include <boot/kernel_args.h>
 
 #include <string.h>
 #include <stdlib.h>

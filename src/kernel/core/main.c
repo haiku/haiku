@@ -5,7 +5,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <boot/stage2.h>
+#include <boot/kernel_args.h>
 #include <Errors.h>
 #include <kernel.h>
 #include <console.h>

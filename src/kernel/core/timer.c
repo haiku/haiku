@@ -15,7 +15,7 @@
 #include <vm.h>
 #include <int.h>
 #include <timer.h>
-#include <boot/stage2.h>
+#include <boot/kernel_args.h>
 
 #include <arch/cpu.h>
 #include <arch/timer.h>

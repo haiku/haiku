@@ -14,7 +14,7 @@
 #include <cpu.h>
 #include <vm.h>
 #include <arch/cpu.h>
-#include <boot/stage2.h>
+#include <boot/kernel_args.h>
 
 #include <string.h>
 
