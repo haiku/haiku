@@ -473,7 +473,7 @@ typedef union {
 		uint32	reserved_2;
 	} eax_1;
 
-struct {
+	struct {
 		uint8	call_num;
 		uint8	cache_descriptors[15];
 	} eax_2;
