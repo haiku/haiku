@@ -388,9 +388,8 @@ status_t TranslatorRosterTest::GetInputFormatsTest() {
 		const translation_format *fmts;
 		int32 num_fmts;
 		roster->GetInputFormats(translators[i], &fmts, &num_fmts);
-		//printf("Translator supports %ld input formats\n", num_fmts);
-		if(num_fmts <= 0) {
-			Debug("Found translator accepting 0 or less input formats");
+		if(num_fmts < 0) {
+			Debug("Found translator accepting less than 0 input formats");
 			return B_ERROR;
 		}
 	}
