@@ -14,7 +14,10 @@
 #include <Message.h>
 #include <Node.h>
 #include <Roster.h>
+
+#ifdef TEST_OBOS
 #include <RosterPrivate.h>
+#endif
 
 // Project Includes ------------------------------------------------------------
 #include <TestShell.h>
