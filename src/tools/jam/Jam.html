@@ -1,14 +1,14 @@
 <HTML>
 
-<TITLE> Jam/MR - Make(1) Redux </TITLE>
+<TITLE> Jam - Make(1) Redux </TITLE>
 
 <BODY>
 
 <CENTER>
 
-<H1> Jam/MR - Make(1) Redux </H1>
+<H1> Jam - Make(1) Redux </H1>
 
-<P> The <a href=http://www.perforce.com/jam/jam.html>Jam/MR</a> Executable
+<P> The <a href=http://www.perforce.com/jam/jam.html>Jam</a> Executable
 
 </CENTER>
 
@@ -17,7 +17,7 @@
 <DT> <P> <H2> USAGE </H2> <DD>
 
 <PRE>
-jam [ -a ] [ -n ] [ -v ] [ -q ]
+jam [ -a ] [ -g ] [ -n ] [ -q ] [ -v ]
     [ -d <I>debug</I> ] 
     [ -f <I>jambase</I> ] 
     [ -j <I>jobs</I> ] 
@@ -60,21 +60,33 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 	<B>Jam</b> may be invoked with the following options:
 
-	<P> <TABLE WIDTH=75% ALIGN=CENTER>
+	<P> <TABLE WIDTH=85% ALIGN=CENTER BORDER=1 CELLPADDING=2>
 
-	    <TR><TD VALIGN=TOP><CODE> -a </CODE>
+	    <TR><TD VALIGN=TOP WIDTH=20%><CODE> -a </CODE>
 	    <TD> Build all targets anyway, even if they are up-to-date.
+
+	    <TR><TD VALIGN=TOP><CODE> -d <I>c</I>  </CODE>
+	    <TD> Turn on display option <I>c</I> and off the default 
+	    display (summary info and actions):
+
+	    <DL COMPACT>
+	    <DT> a <DD> Show summary info, actions, quiet actions, and the
+	    use of temporary targets
+	    <DT> c <DD> Show the names of files that cause rebuilds, i.e.
+	    new sources, missing targets, etc.
+	    <DT> d <DD> Display a dependency graph (in <B>jam</B> syntax).
+	    <DT> m <DD> Display the dependency analysis, and target/source
+	    	    timestamps and paths
+	    <DT> x <DD> Show shell arguments
+	    </DL>
 
 	    <TR><TD VALIGN=TOP><CODE> -d <I>n</I>  </CODE>
 	    <TD> Enable cummulative debugging levels from 1 to <I>n</I>.  
 	    Interesting values are:
 
 	    <DL COMPACT>
-	    <DT> 1 <DD> Show actions (the default) 
-	    <DT> 2 <DD> Show "quiet" actions and display all action text 
-	    <DT> 3 <DD> Show dependency analysis, and target/source 
-		    timestamps/paths  
-	    <DT> 4 <DD> Show shell arguments 
+	    <DT> 1 <DD> Show actions and summary info (the default) 
+	    <DT> 3 <DD> Old name for -dm (described above)
 	    <DT> 5 <DD> Show rule invocations and variable expansions 
 	    <DT> 6 <DD> Show directory/header file/archive scans 
 	    <DT> 7 <DD> Show variable settings 
@@ -86,12 +98,15 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	    <TD> Enable debugging level <I>n</I>.
 
 	    <TR><TD VALIGN=TOP><CODE> -d 0 </CODE>
-	    <TD> Turn off all debugging levels.  Only errors are not suppressed.
+	    <TD> Turn off all debugging levels.  Only errors are emitted.
 
 	    <TR><TD VALIGN=TOP><CODE> -f <I>jambase</I></CODE>
 	    <TD>Read <I>jambase</I> instead of using the built-in Jambase.
-	    Only one -f flag is permitted, but the <i>jambase</i> may 
-	    explicitly include other files.
+	    Multiple -f flags are permitted.
+
+	    <TR><TD VALIGN=TOP><CODE> -g </CODE>
+	    <TD> Build targets with the newest sources first, rather than
+	    in the order of appearance in the Jambase/Jamfiles.
 
 	    <TR><TD VALIGN=TOP><CODE> -j <I>n</I></CODE>
 	    <TD> Run up to <I>n</I> shell commands concurrently (UNIX 
@@ -99,7 +114,7 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 	    <TR><TD VALIGN=TOP><CODE> -n</CODE>
 	    <TD> Don't actually execute the updating actions, but do
-	    everything else.  This changes the debug level default to -d2.
+	    everything else.  This changes the debug level to -dax.
 
 	    <TR><TD VALIGN=TOP><CODE> -o <I>file</I></CODE>
 	    <TD> Write the updating actions to the specified file instead
@@ -107,7 +122,7 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 	    <TR><TD VALIGN=TOP><CODE> -q </CODE>
 	    <TD> Quit quickly (as if an interrupt was received)
-	    as soon as any target fails.
+	    as soon as any target build fails.
 
 	    <TR><TD VALIGN=TOP><CODE> -s <I>var</I>=<I>value</I></CODE>
 	    <TD> Set the variable <I>var</I> to <I>value</I>, overriding
@@ -151,7 +166,7 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 	<P>
 
-	In the parsing phase, <b>jam</b> reads and parses the Jambase
+	In the parsing phase, <b>jam</b> reads and executes the Jambase
 	file, by default the built-in one.  It is written in the <b>jam</b>
 	language.  See <a href="#language"> Language</a> below.  The
 	last action of the Jambase is to read (via the "include" rule)
@@ -172,25 +187,45 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 <DT> <P> <H3> Binding </H3> <DD>
 </A>
 
-	<P>
-
 	<P> <H5> Binding </H5>
 
 	After parsing, <B>jam</B> recursively descends the dependency
 	graph and binds every file target with a location in the
-	filesystem.  If <B>jam</B> detects a circular dependency in the
-	graph, it issues a warning.
+	filesystem.  
+
+	<P> <H5> Targets </H5> <DD>
+
+	Any string value in <b>jam</b> can represent a target, and it
+	does so if the DEPENDS or INCLUDES rules make it part of the
+	dependency graph.  Build targets are files to be updated.  Source
+	targets are the files used in updating build targets.  Build
+	targets and source targets are collectively referred to as file
+	targets, and frequently build targets are source targets for
+	other build targets.  Pseudotargets are symbols which represent
+	dependencies on other targets, but which are not themselves
+	associated with any real file.
 
 	<P>
 
-	File target names are given as absolute or relative path names
-	in the filesystem.  If the path name is absolute, it is bound
-	as is.  If the path name is relative, it is normally bound as
-	is, and thus relative to the current directory.  This can be
-	modified by the settings of the $(SEARCH) and $(LOCATE) variables,
-	which enable <b>jam</b> to find and build targets spread across
-	a directory tree.  See <A HREF="#search">SEARCH and LOCATE
-	Variables</a> below.
+	A file target's identifier is generally the file's name, which can
+	be absolutely rooted, relative to the directory of <b>jam</b>'s
+	invocation, or simply local (no directory).  Most often it is the
+	last case, and the actual file path is bound using the $(SEARCH)
+	and $(LOCATE) special variables.  See <A HREF="#search"> SEARCH
+	and LOCATE Variables</A> below.  A local filename is optionally
+	qualified with "grist," a string value used to assure uniqueness.
+	A file target with an identifier of the form <I>file(member)</I>
+	is a library member (usually an ar(1) archive on UNIX).
+
+	<P>
+
+	The use of $(SEARCH) and $(LOCATE) allows <b>jam</b> to separate
+	the the location of files from their names, so that Jamfiles can
+	refer to files locally (i.e. relative to the Jamfile's directory),
+	yet still be usable when <b>jam</b> is invoked from a distant
+	directory.  The use of grist allows files with the same name
+	to be identified uniquely, so that <b>jam</b> can read a whole
+	directory tree of Jamfiles and not mix up same-named targets.
 
 	<P> <H5> Update Determination </H5>
 
@@ -199,13 +234,10 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	phase.  A target is normally so marked if it is missing, it is
 	older than any of its sources, or any of its sources are marked
 	for updating.  This behavior can be modified by the application
-	of special built-in rules, ALWAYS, LEAVES, NOCARE, NOTFILE,
-	NOUPDATE, and TEMPORARY.  See <A HREF="#bindingmods">Modifying
+	of special built-in rules.  See <A HREF="#bindingmods">Modifying
 	Binding</A> below.
 
 	<P> <H5> Header File Scanning </H5>
-
-	<P>
 
 	During the binding phase, <b>jam</b> also performs header file
 	scanning, where it looks inside source files for the implicit
@@ -231,7 +263,9 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 	The -j flag instructs <B>jam</B> to build more than one target
 	at a time.  If there are multiple actions on a single target,
-	they are run sequentially.  
+	they are run sequentially.   The -g flag reorders builds so that
+	targets with newest sources are built first.  Normally, they are
+	built in the order of appearance in the Jamfiles.
 
 <A NAME="language">
 <DT> <P> <H2> LANGUAGE </H2> <DD>
@@ -239,237 +273,573 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 <DT> <P> <H3> Overview </H3> <DD>
 
-	<B>Jam</b> has an interpreted, procedural language.  Statements
-	in <b>jam</b> are rule (procedure) definitions, rule invocations,
-	flow-of-control structures, variable assignments, and sundry
-	language support.
+	<B>Jam</b> has a interpreted, procedural language with a few
+	select features to effect program construction.  Statements in
+	<b>jam</b> are rule (procedure) definitions, rule invocations,
+	updating action definitions, flow-of-control structures, variable
+	assignments, and sundry language support.
 
 <DT> <P> <H3> Lexical Features </H3> <DD>
 
 	<P>
 
 	<B>Jam</b> treats its input files as whitespace-separated tokens,
-	with two exceptions: double quotes (") can enclose whitespace
-	to embed it into a token, and everything between the matching
-	curly braces ({}) in the definition of a  rule action is treated
+	with two exceptions: double quotes (") can enclose whitespace to
+	embed it into a token, and everything between the matching curly
+	braces ({}) in the definition of a updating actions is treated
 	as a single string.  A backslash (\) can escape a double quote,
 	or any single whitespace character.
 
 	<P>
 
 	<B>Jam</b> requires whitespace (blanks, tabs, or newlines) to
-	surround all tokens, <i>including the colon (:) and semicolon
-	(;) tokens</i>.
+	surround all tokens, <b>including the colon (:) and semicolon
+	(;) tokens</b>.
 
 	<P>
 
-	<B>Jam</b> keywords (an mentioned in this document) are reserved
+	<B>Jam</b> keywords (as mentioned in this document) are reserved
 	and generally must be quoted with double quotes (") to be used
 	as arbitrary tokens, such as variable or target names.
 
-<DT> <P> <H3> Targets </H3> <DD>
+<DT> <P> <H3> Datatype </H3> <DD>
 
 	<P>
 
-	The essential <b>jam</b> data entity is a target.  Built targets
-	are files to be updated.  Source targets are the files used in
-	updating built targets.  Built targets and source targets are
-	collectively referred to as file targets, and frequently built
-	targets are source targets for other built targets.  Pseudotargets
-	are symbols which represent dependencies on other targets, but
-	which are not themselves associated with any real file.
-
-	<P>
-
-	A file target's identifier is generally the file's name, which
-	can be absolutely rooted, relative to the directory of <b>jam</b>'s
-	invocation, or simply local (no directory).  Most often it is
-	the last case, and the actual file path is bound using the
-	$(SEARCH) and $(LOCATE) special variables.  See <A HREF="#search">
-	SEARCH and LOCATE Variables</A> below.  A local filename is
-	optionally qualified with grist, a string value used to assure
-	uniqueness.  A file target with an identifier of the form
-	<I>file(member)</I> is a library member (usually an ar(1) archive
-	on UNIX).
+	<B>Jam</B>'s only data type is a one-dimensional list of arbitrary
+	strings.  They arise as literal (whitespace-separated) tokens in
+	the Jambase or included files, as the result of variable expansion
+	of those tokens, or as the return value from a rule invocation.
 
 <DT> <P> <H3> Rules </H3> <DD>
 
 	<P>
 
-	The basic <B>jam</b> language entity is called a rule.  A rule
-	is defined in two parts: the procedure and the actions.  The
-	procedure is a body of <b>jam</b> statements to be run when the
-	rule is invoked; the actions are the OS shell commands to execute
-	when updating the built targets of the rule.
+	The basic <B>jam</b> language entity is called a rule.	A rule
+	is simply a procedure definition, with a body of <b>jam</b>
+	statements to be run when the rule is invoked.  The syntax of
+	rule invocation make it possible to write Jamfiles that look
+	a bit like Makefiles.
 
 	<P>
 
-	Rules can return values, which can be expanded into a list with
-        "[ <i>rule</i> <i>args</i> ... ]". A rule's value is the value
-	of its last statement, though only the following statements
-	have values: 'if' (value of the leg chosen), 'switch' (value of the case
-	chosen), set (value of the resulting variable), and 'return' (value
-        of its arguments). Note that 'return' doesn't actually cause a
-        return, i.e., is a no-op unless it is the last statement
-        of the last block executed within rule body.
+	Rules take up to 9 arguments ($(1) through $(9), each a list)
+	and can have a return value (a single list).  A rule's return
+	value can be expanded in a list by enclosing the rule invocation
+	with <tt>[</tt> and <tt>]</tt>.
+
+<DT> <P> <H3> Updating Actions </H3> <DD>
 
 	<P>
 
-	The <b>jam</b> statements for defining and invoking rules are
-	as follows:
+	A rule may have updating actions associated with it, in which
+	case arguments $(1) and $(2) are treated as built targets and
+	sources, respectively.	Updating actions are the OS shell commands
+	to execute when updating the built targets of the rule.
+
+	<P>
+
+	When an rule with updating actions is invoked, those actions are
+	added to those associated with its built targets ($(1)) before
+	the rule's procedure is run.  Later, to build the targets in the
+	updating phase, the actions are passed to the OS command shell,
+	with $(1) and $(2) replaced by bound versions of the target names.
+	See <A HREF="#binding"> Binding</A> above.
+
+
+<DT> <P> <H3> Statements </H3> <DD>
+
+	<P>
+
+	<b>Jam</b>'s langauge has the following statements:
 
 	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
 
 	    <P> <DT> <CODE>
-	    rule <I>rulename</I> { <I>statements</I> }
+	    
+		<I>rulename field1</I> : <I>field2</I> : <I>...</I> 
+	    	: <I>fieldN</I> ;
+
 	    </CODE>
 
-	    <DD> Define a rule's procedure, replacing any previous
-	    definition.
+	    <P><DD> Invoke a rule.  A rule is invoked with values in
+	    <I>field1</I> through <I>fieldN</I> (9 max).  They may be
+	    referenced in the procedure's <I>statements</I> as $(1)
+	    through $(<9>N</I>).  $(&lt;) and $(&gt;) are synonymous
+	    with $(1) and $(2).
+
+	    <P>
+	    <i>rulename</i> undergoes <A HREF="#varexp"> variable
+	    expansion</A>.  If the resulting list is more than one value,
+	    each rule is invoked with the same arguments, and the result
+	    of the invocation is the concatenation of all the results.
 
 	    <P> <DT> <CODE>
-	    actions [ <I>modifiers</I> ] <I>rulename</I> { <I>commands</I> }
+
+		actions [ <I>modifiers</I> ] <I>rulename</I> { <I>commands</I> }
+
 	    </CODE>
 
-	    <DD> Define a rule's updating actions, replacing any
-	    previous definition.
+	    <P><DD> Define a rule's updating actions, replacing any previous
+	    definition.  The first two arguments may be referenced in
+	    the action's <I>commands</I> as $(1) and $(2) or $(&lt;)
+	    and $(&gt;).
+
+	    <P>
+
+	    The following action <i>modifiers</i> are understood:
+
+	    <P><TABLE BORDER=1>
+
+		<TR><TD WIDTH=30%><CODE> actions bind <I>vars</I> </CODE></TD>
+		<TD> $(vars) will be replaced with bound values.</TD>
+		</TR>
+
+		<TR><TD><CODE> actions existing </CODE></TD>
+		<TD> $(>) includes only source targets currently existing.</TD>
+		</TR>
+
+		<TR><TD><CODE> actions ignore </CODE></TD>
+		<TD> The return status of the <I>commands</I> is ignored.</TD>
+		</TR>
+
+		<TR><TD><CODE> actions piecemeal </CODE></TD>
+		<TD> <I>commands</I>  are repeatedly invoked with a subset
+		of $(>) small enough to fit in the command buffer on this
+		OS.</TD>
+		</TR>
+
+		<TR><TD><CODE> actions quietly </CODE></TD>
+		<TD> The action is not echoed to the standard output.</TD>
+		</TR>
+
+		<TR><TD><CODE> actions together </CODE></TD>
+		<TD> The $(>) from multiple invocations of the same action
+		on the same built target are glommed together.</TD>
+		</TR>
+
+		<TR><TD><CODE> actions updated </CODE></TD>
+		<TD> $(>) includes only source targets themselves marked
+		for updating.</TD>
+		</TR>
+
+	    </TABLE>
+
+	    <P><DT><CODE> 
+
+		break 
+
+	    </CODE>
+
+	    <P><DD> Breaks out of the closest enclosing <I>for</I>
+	    or <I>while</I> loop.
+
+	    <P><DT><CODE> 
+
+		continue 
+
+	    </CODE>
+
+	    <P><DD> Jumps to the end of the closest enclosing <I>for</I>
+	    or <I>while</I> loop.
+
+	    <P><DT><CODE> 
+
+		for <I>var</I> in <I>list</I> { <I>statements</I> }
+
+	    </CODE>
+
+	    <P><DD> Executes <i>statements</i> for each element in
+	    <i>list</i>, setting the variable <i>var</i> to the element
+	    value.
+
+	    <A name=if>
+	    <P><DT><CODE>
+	    </A>
+
+		if <I>cond</I> { <I>statements</I> } [ else <I>statement</I> ]
+
+	    </CODE>
+
+	    <P><DD> Does the obvious;  the else clause is optional.
+	    <i>cond</i> is built of:
+
+	    <TABLE BORDER=1> 
+
+		<TR><TD WIDTH=25%> <CODE><I>a</I></CODE></TD>
+		<TD> true if any <I>a</I> element is a non-zero-length 
+		string</TD>
+		<TR><TD> <CODE><I>a</I> = <I>b</I></CODE> </TD>
+		<TD> list <I>a</I> matches list <I>b</I> 
+		string-for-string</TD>
+		<TR><TD> <CODE><I>a</I> != <I>b</I> </CODE></TD>
+		<TD> list <I>a</I> does not match list <I>b</I></TD>
+		<TR><TD> <CODE><I>a</I> &lt; <I>b</I> </CODE></TD>
+		<TD> <I>a[i]</I> string is less than <I>b[i]</I>
+		string, where <i>i</i> is first mismatched element
+		in lists <I>a</I> and <I>b</I></TD>
+		<TR><TD> <CODE><I>a</I> &lt;= <I>b</I> </CODE></TD>
+		<TD> every <I>a</I> string is less than or equal to
+		its <I>b</I> counterpart</TD>
+		<TR><TD> <CODE><I>a</I> &gt; <I>b</I> </CODE></TD>
+		<TD> <I>a[i]</I> string is greater than <I>b[i]</I>
+		string, where <i>i</i> is first mismatched element</TD>
+		<TR><TD> <CODE><I>a</I> &gt;= <I>b</I> </CODE></TD>
+		<TD> every <I>a</I> string is greater than or equal to
+		its <I>b</I> counterpart</TD>
+		<TR><TD> <CODE><I>a</I> in <I>b</I> </CODE></TD>
+		<TD> true if all elements of <I>a</I> can be found
+		in <I>b</I>, or if <I>a</I> has no elements</TD>
+		<TR><TD> <CODE>! <I>cond</I> </CODE></TD>
+		<TD> condition not true</TD>
+		<TR><TD> <CODE><I>cond</I> && <I>cond</I> </CODE></TD>
+		<TD> conjunction</TD>
+		<TR><TD> <CODE><I>cond</I> || <I>cond</I> </CODE></TD>
+		<TD> disjunction</TD>
+		<TR><TD> <CODE>( <I>cond</I> ) </CODE></TD>
+		<TD> precedence grouping</TD>
+
+	    </TABLE>
+
+	    <P><DT> <CODE>
+
+		include <I>file</I> ;
+
+	    </CODE>
+
+	    <P><DD> Causes <b>jam</b> to read the named <i>file</i>.
+	    The file is bound like a regular target (see <A
+	    HREF="#binding"> Binding</A> above) but unlike a regular
+	    target the include file cannot be built.  Marking an include
+	    file target with the <b>NOCARE</b> rule makes it optional:
+	    if it is missing, it causes no error.
+
+	    <P>
+
+	    The include file is inserted into the input stream during
+	    the parsing phase. The primary input file and all the included
+	    file(s) are treated as a single file; that is, <b>jam</b>
+	    infers no scope boundaries from included files.
+
+	    <P><DT> <CODE>
+
+		local <i>vars</I> [ = <i>values</i> ] ;
+
+	    </CODE>
+
+	    <P><DD> Creates new <i>vars</i> inside to the enclosing {}
+	    block, obscuring any previous values they might have.  The
+	    previous values for <i>vars</i> are restored when the current
+	    block ends.  Any rule called or file included will see the
+	    local and not the previous value (this is sometimes called
+	    Dynamic Scoping).  The local statement may appear anywhere,
+	    even outside of a block (in which case the previous value
+	    is restored when the input ends).  The <i>vars</i> are
+	    initialized to <i>values</i> if present, or left uninitialized
+	    otherwise.
 
 	    <P> <DT> <CODE>
-	    <I>rulename field1</I> : <I>field2</I> : <I>...</I> 
-	    : <I>fieldN</I> ;
+	    
+		on <I>target</I> <I>statement</I> ;
+
 	    </CODE>
 
-	    <DD> Invoke a rule.
+	    <P><DD> Run <I>statement</I> under the influence of
+	    <I>target</I>'s target-specific variables.  These variables
+	    become local copies during <I>statement</I>'s run, but they
+	    may be updated as target-specific variables using the usual
+	    "<I>variable</I> on <I>targets</I> =" syntax.
+
+
+	    <P><DT> <CODE>
+
+		return <I>values</I> ; 
+
+	    </CODE>
+
+	    <P><DD> Within a rule body, the return statement sets the return
+	    value for an invocation of the rule and terminates the rule's
+	    execution.
 
 	    <P> <DT> <CODE>
-	    on <I>target</I> <I>rulename field1</I> : <I>field2</I> : <I>...</I> 
-	    : <I>fieldN</I> ;
-	    </CODE>
-
-	    <DD> Invoke a rule under the influence of <I>target</I>'s specific
-            variables..
-
-	    <P> <DT> <CODE>
-	    [ <I>rulename field1</I> : <I>field2</I> : <I>...</I>
-            : <I>fieldN</I> ] <br>
-	    [  on <I>target</I> <I>rulename field1</I> : <I>field2</I> : <I>...</I>
-            : <I>fieldN</I> ] <br>
+	    
+		rule <I>rulename</I> [ : <I>vars</I> ] { <I>statements</I> }
 
 	    </CODE>
 
-	    <DD> Used as an argument, expands to the return value of the rule invoked.
+	    <P><DD> Define a rule's procedure, replacing any previous
+	    definition.  If <I>vars</I> are provided, they are assigned
+	    the values of the parameters ($(1) to $(9)) when <I>statements</I>
+	    are executed, as with the <B>local</B> statement.
+
+	    <P><DT> <CODE>
+
+		<A NAME="switch">
+		switch <I>value</I>
+		</A>
+		<BR> { 
+		<BR> case <I>pattern1</I> : <I>statements</I> ; 
+		<BR> case <I>pattern2</I> : <I>statements</I> ; 
+		<BR> ... 
+		<BR> }
+
+	    </CODE>
+
+	    <P><DD> The switch statement executes zero or one of the
+	    enclosed <i>statements</i>, depending on which, if any, is
+	    the first case whose <i>pattern</I> matches <i>value</i>.
+	    The <i>pattern</I> values are not variable-expanded.  The
+	    <i>pattern</I>  values may include the following wildcards:
+
+	    <TABLE>
+
+		<TR><TD><CODE> ? </CODE></TD>
+		<TD> match any single character </TD>
+		<TR><TD><CODE> * </CODE></TD>
+		<TD> match zero or more characters </TD>
+		<TR><TD><CODE> [<i>chars</i>] </CODE></TD>
+		<TD> match any single character in <i>chars</i> </TD>
+		<TR><TD><CODE> [^<i>chars</i>] </CODE></TD>
+		<TD> match any single character not in <i>chars</i> </TD>
+		<TR><TD><CODE> \<i>x</i> </CODE></TD>
+		<TD> match <i>x</i> (escapes the other wildcards)</i> </TD>
+
+	    </TABLE>
+
+	    <P><DT> <CODE>
+
+		while <I>cond</I> { <I>statements</I> }
+
+	    </CODE>
+
+	    <P><DD> Repeatedly execute <I>statements</I> while <I>cond</I>
+	    remains true upon entry. (See the description of <I>cond</I>
+	    expression syntax under <a href="#if">if</a>, above).
+	</DL></TABLE>
+
+
+<DT> <P> <H3> Variables </H3> <DD>
+
+	<P>
+
+	<B>Jam</b> variables are lists of zero or more elements, with
+	each element being a string value.  An undefined variable is
+	indistinguishable from a variable with an empty list, however,
+	a defined variable may have one more elements which are null
+	strings.  All variables are referenced as $(<I>variable</I>).
+
+	<P>
+
+	Variables are either global or target-specific.  In the latter
+	case, the variable takes on the given value only during the
+	target's binding, header file scanning, and updating; and during
+	the "on <I>target</I> <I>statement</I>" statement.
+
+	<P>
+
+	A variable is defined with:
+
+	<P> <TABLE WIDTH=75% ALIGN=CENTER> <TR><TD> <DL>
+
+	    <DT><CODE> 
+	    <I>variable</I> = <I>elements</I> ; </CODE>
+	    <DT><CODE> 
+	    <I>variable</I> += <I>elements</I> ; </CODE>
+	    <DT><CODE> 
+	    <I>variable</I> ?= <I>elements</I> ; </CODE>
+	    <DT><CODE> 
+	    <I>variable</I> on <I>targets</I> = <I>elements</I> ; </CODE>
+	    <DT><CODE> 
+	    <I>variable</I> on <I>targets</I> += <I>elements</I> ; </CODE>
+	    <DT><CODE> 
+	    <I>variable</I> on <I>targets</I> ?= <I>elements</I> ; </CODE>
 
 	</DL></TABLE>
 
 	<P>
 
-	A rule is invoked with values in <I>field1</I> through
-	<I>fieldN</I>.  They may be referenced in the procedure's
-	<I>statements</I> as $(1) through $(<I>N</I>) (9 max), and the
-	first two only may be referenced in the action's <I>commands</I>
-	as $(1) and $(2).  $(&lt;) and $(&gt;) are synonymous with $(1)
-	and $(2).
+	The first three forms set <I>variable</I> globally.  The last
+	three forms set a target-specific variable.  The = operator
+	replaces any previous elements of <I>variable</I> with
+	<I>elements</I>; the += operation adds <I>elements</I> to
+	<I>variable</I>'s list of elements; the ?= operator sets
+	<I>variable</I> only if it was previously unset.  The last form
+	"<I>variable</I> on <I>targets</I> ?= <I>elements</I>" checks
+	to see if the target-specific, not the global, variable is set.
+	(The ?= operator also has an old form "default =".)  
 
 	<P>
 
-	Rules fall into two categories: updating rules (with actions),
-	and pure procedure rules (without actions).  Updating rules
-	treat arguments $(1) and $(2) as built targets and sources,
-	respectively, while pure procedure rules can take arbitrary
-	arguments.
+	Variables referenced in updating commands will be replaced with
+	their values; target-specific values take precedence over global
+	values.  Variables passed as arguments ($(1) and $(2)) to actions
+	are replaced with their bound values; the "bind" modifier can
+	be used on actions to cause other variables to be replaced with
+	bound values.  See <A HREF="#actionmods">Action Modifiers</A>
+	above.
 
 	<P>
 
-	When an updating rule is invoked, its updating actions are added
-	to those associated with its built targets ($(1)) before the
-	rule's procedure is run.  Later, to build the targets in the
-	updating phase, <I>commands</I> are passed to the OS command
-	shell, with $(1) and $(2) replaced by bound versions of the
-	target names.  See <A HREF="#binding"> Binding</A> above.
+	<B>Jam</b> variables are not re-exported to the environment of
+	the shell that executes the updating actions, but the updating
+	actions can reference <b>jam</b> variables with $(<I>variable</I>).
 
-	<P>
-	
-	Rule invokation may be indirected through a variable:
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
-	    <P> <DT> <CODE>
-	    $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I> 
-	    : <I>fieldN</I> ;
-	    </CODE>
-
-	    <P> <DT> <CODE>
-	    on <I>target</I> $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I> 
-	    : <I>fieldN</I> ;
-	    </CODE>
-
-	    <P> <DT> <CODE>
-	    [ $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I>
-	
-            : <I>fieldN</I> ] <br>
-	    [  on <I>target</I> $(<I>var</I>) <I>field1</I> : <I>field2</I> : <I>...</I>
-            : <I>fieldN</I> ] <br>
-
-	    </CODE>
-
-	</DL></TABLE>
-
- 	The variable's value names the rule (or rules) to be invoked.
-	A rule is invoked for each element in the list of
-	<TT>$(<I>var</I>)</TT>'s values. The fields
-	<I>field1</I> : <I>field2</I> : <I>...</I> are passed as
-	arguments for each invokation. For the <TT> [ ... ] </TT> forms,
-	the return value is the concatenation of the return values for
-	all of the invokations.
-
-	<A NAME="actionmods">
-	<P> <H4> Action Modifiers </H4>
-	</A>
+<A NAME="varexp">
+<DT> <P> <H3> Variable Expansion </H3> <DD>
+</A>
 
 	<P>
 
-	The following action <i>modifiers</i> are understood:
+	During parsing, <b>jam</b> performs variable expansion on each
+	token that is not a keyword or rule name.  Such tokens with
+	embedded variable references are replaced with zero or more
+	tokens.  Variable references are of the form $(<I>v</I>) or
+	$(<I>vm</I>), where <i>v</i> is the variable name,  and  <I>m</I>
+	are optional modifiers.
 
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+	<P>
 
-	    <P><DT><CODE> actions bind <I>vars</I> </CODE>
-	    <DD> $(vars) will be replaced with bound values.
+	Variable expansion in a rule's actions is similar to variable
+	expansion in statements,  except that the action string is
+	tokenized at whitespace regardless of quoting.
 
-	    <P><DT><CODE> actions existing </CODE>
-	    <DD> $(>) includes only source targets currently existing.
+	<P>
 
-	    <P><DT><CODE> actions ignore </CODE>
-	    <DD> The return status of the <I>commands</I> is ignored.
+	The result of a token after variable expansion is the
+	<i>product</i> of the components of the token, where each
+	component is a literal substring or a list substituting a variable
+	reference.  For example:
 
-	    <P><DT><CODE> actions piecemeal </CODE>
-	    <DD> <I>commands</I>  are repeatedly invoked with a subset
-	    of $(>) small enough to fit in the command buffer on this
-	    OS.
+	<P> <TABLE WIDTH=75% ALIGN=CENTER><TR><TD><CODE>
 
-	    <P><DT><CODE> actions quietly </CODE>
-	    <DD> The action is not echoed to the standard output.
+	    <BR>$(X)      -> a b c
+	    <BR>t$(X)     -> ta tb tc
+	    <BR>$(X)z     -> az bz cz
+	    <BR>$(X)-$(X) -> a-a a-b a-c b-a b-b b-c c-a c-b c-c
 
-	    <P><DT><CODE> actions together </CODE>
-	    <DD> The $(>) from multiple invocations of the same action
-	    on the same built target are glommed together.
+	</CODE></TABLE>
 
-	    <P><DT><CODE> actions updated </CODE>
-	    <DD> $(>) includes only source targets themselves marked
-	    for updating.
+	<P>
 
-	</DL></TABLE>
+	The variable name and modifiers can themselves contain
+	a variable reference,  and this partakes of the product
+	as well:
+
+	<P> <TABLE WIDTH=75% ALIGN=CENTER><TR><TD><CODE>
+
+	    <BR>$(X)      -> a b c
+	    <BR>$(Y)      -> 1 2
+	    <BR>$(Z)      -> X Y
+	    <BR>$($(Z))   -> a b c 1 2
+
+	</CODE></TABLE>
+
+	<P>
+
+	Because of this product expansion, if any variable reference in
+	a token is undefined, the result of the expansion is an empty
+	list.  If any variable element is a null string, the result
+	propagates the non-null elements:
+
+	<P> <TABLE WIDTH=75% ALIGN=CENTER><TR><TD><CODE>
+
+	    <BR>$(X)        -> a ""
+	    <BR>$(Y)        -> "" 1
+	    <BR>$(Z)	  -> 
+	    <BR>*$(X)$(Y)*  -> *a* *a1* ** *1*
+	    <BR>*$(X)$(Z)*  ->
+
+	</CODE></TABLE>
+
+	<P>
+
+	A variable element's string value can be parsed into grist and
+	filename-related components.  Modifiers to a variable are used
+	to select elements, select components, and replace components.
+	The modifiers are:
+
+	<P> <TABLE WIDTH=75% BORDER=1 ALIGN=CENTER>
+
+	    <TR><TD><CODE> [<I>n</I>] </CODE>
+	    <TD>Select element number <I>n</I> (starting at 1).  If
+	    the variable contains fewer than <I>n</I> elements,
+	    the result is a zero-element list.
+
+	    <TR><TD><CODE> [<I>n</I>-<I>m</I>] </CODE>
+	    <TD>Select elements number <I>n</I> through <I>m</I>.
+
+	    <TR><TD><CODE> [<I>n</I>-] </CODE>
+	    <TD>Select elements number <I>n</I> through the last.
+
+	    <TR><TD><CODE> :B </CODE>
+	    <TD>Select filename base.
+
+	    <TR><TD><CODE> :S </CODE>
+	    <TD>Select (last) filename suffix.
+
+	    <TR><TD><CODE> :M </CODE>
+	    <TD>Select archive member name.
+
+	    <TR><TD><CODE> :D </CODE>
+	    <TD>Select directory path.
+
+	    <TR><TD><CODE> :P </CODE>
+	    <TD>Select parent directory.
+
+	    <TR><TD><CODE> :G </CODE>
+	    <TD>Select grist.
+
+	    <TR><TD><CODE> :U </CODE>
+	    <TD>Replace lowercase characters with uppercase.
+
+	    <TR><TD><CODE> :L </CODE>
+	    <TD>Replace uppercase characters with lowercase.
+
+	    <TR><TD><CODE> :<i>chars</I> </CODE>
+	    <TD>Select the components listed in <i>chars</i>.
+
+	    <TR><TD><CODE> :G=<I>grist</I> </CODE>
+	    <TD>Replace grist with <I>grist</I>.
+
+	    <TR><TD><CODE> :D=<I>path</I> </CODE>
+	    <TD>Replace directory with <I>path</I>.
+
+	    <TR><TD><CODE> :B=<I>base</I> </CODE>
+	    <TD>Replace the base part of file name with <I>base</I>.
+
+	    <TR><TD><CODE> :S=<I>suf</I> </CODE>
+	    <TD>Replace the suffix of file name with <I>suf</I>.
+
+	    <TR><TD><CODE> :M=<I>mem</I> </CODE>
+	    <TD>Replace the archive member name with <I>mem</I>.
+
+	    <TR><TD><CODE> :R=<I>root</I> </CODE>
+	    <TD>Prepend <I>root</I> to the whole file name,  if not
+	    already rooted.
+
+	    <TR><TD><CODE> :E=<I>value</I> </CODE>
+	    <TD>Use <I>value</I> instead if the variable is unset.
+
+	    <TR><TD><CODE> :J=<I>joinval</I> </CODE>
+	    <TD>Concatentate list elements into single
+            element, separated by <I>joinval</I>.
+
+	</TABLE>
+
+	<P>
+
+	On VMS, $(var:P) is the parent directory of $(var:D); on Unix
+	and NT, $(var:P) and $(var:D) are the same.
 
 
 <DT> <P> <H3> Built-in Rules </H3> <DD>
 
 	<P>
-	<B>Jam</b> has eleven built-in rules, all of which are pure
+	<B>Jam</b> has twelve built-in rules, all of which are pure
 	procedure rules without updating actions.  They are in
 	three groups:  the first builds the dependency graph;
 	the second modifies it; and the third are just utility
 	rules.
-
-	<P>
 
 	<P> <H5> Dependency Building </H5> 
 
@@ -597,440 +967,49 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 	<P> <H5> Utility Rules </H5> 
 
-	<P>
-
-	The two rules ECHO and EXIT are utility rules, used only in
-	<b>jam</b>'s parsing phase.
+	The remaining rules are utility rules.
 
 	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
 
 	<P><DT><CODE>
-	ECHO <i>args</I> ;
+	ECHO <i>args</I> ; <br>
+	Echo <i>args</I> ; <br>
+	echo <i>args</I> ;
 	</CODE>
 
 	<DD> Blurts out the message <i>args</I> to stdout.
 
 	<P><DT><CODE>
-	EXIT <i>args</I> ;
+	EXIT <i>args</I> ; <br>
+	Exit <i>args</I> ; <br>
+	exit <i>args</I> ;
 	</CODE>
 
 	<DD> Blurts out the message <i>args</I> to stdout and then exits
 	with a failure status.
 
-	<P>
-
-	"Echo", "echo", "Exit", and "exit" are accepted as aliases for ECHO
-	and EXIT, since it is hard to tell that these are built-in
-	rules and not part of the language, like "include".
-
-	</DL></TABLE>
-
-	<P>
-
-	The GLOB rule does filename globbing.
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
 	<P><DT><CODE>
-	GLOB <i>directories</I> : <I>patterns</I>
+	GLOB <i>directories</I> : <I>patterns</I> ;
 	</CODE>
 
-	<DD>  Using the same wildcards as for the patterns in the <A
-	HREF="#switch">switch</A> statement).  It is invoked by being
-	used as an argument to a rule invocation inside of `[ ]`. For
-	example: "<TT>FILES = [ GLOB dir1 dir2 : *.c *.h ]</TT>" sets
-	A to the list of C source and header files in dir1 or dir2.
-	The resulting filenames are the full pathnames, including the
-	directory, but the pattern is applied only to the file name
-	without the directory.
-
-	</DL></TABLE>
-
-	<P>
-
-	The MATCH rule does pattern matching.
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
+	<DD> Scans <i>directories</i> for files matching <i>patterns</i>,
+	returning the list of matching files (with directory prepended).
+	<i>patterns</i> uses the same syntax as in the <b>switch</b>
+	statement.  Only useful within the <tt>[ ]</tt> construct, to
+	change the result into a list.
 
 	<P><DT><CODE>
-	MATCH <i>regexps</I> : <I>list</I>
+	MATCH <i>regexps</I> : <I>list</I> ;
 	</CODE>
 
 	<DD> Matches the <b>egrep</b>(1) style regular expressions
 	<I>regexps</I> against the strings in <I>list</I>.  The result
 	is the concatenation of matching <tt>()</tt> subexpressions for
-	each string in <I>list</I>, and for each regular expression in    
+	each string in <I>list</I>, and for each regular expression in
 	<I>regexps</I>.  Only useful within the <tt>[ ]</tt> construct,
 	to change the result into a list.
 
 	</DL></TABLE>
-
-<DT> <P> <H3> Flow-of-Control </H3> <DD>
-
-	<P>
-
-	Jam has several simple flow-of-control statements:
-
-	<P><TABLE WIDTH=75% ALIGN=CENTER><TR><TD><DL>
-
-	    <P><DT><CODE> 
-
-		for <I>var</I> in <I>list</I> { <I>statements</I> }
-
-	    </CODE>
-
-	    <P><DD> Executes <i>statements</i> for each element in
-	    <i>list</i>, setting the variable <i>var</i> to the element
-	    value.
-
-	    <A name=if>
-	    <P><DT><CODE>
-	    </A>
-
-		if <I>cond</I> { <I>statements</I> } 
-		<BR> [ else <I>statements</I> ]
-
-	    </CODE>
-
-	    <P><DD> Does the obvious;  the else clause is optional.
-	    <i>cond</i> is built of:
-
-	    <TABLE> 
-
-		<TR><TD> <CODE><I>a</I></CODE></TD>
-		<TD> true if any <I>a</I> element is a non-zero-length 
-		string</TD>
-		<TR><TD> <CODE><I>a</I> = <I>b</I></CODE> </TD>
-		<TD> list <I>a</I> matches list <I>b</I> 
-		string-for-string</TD>
-		<TR><TD> <CODE><I>a</I> != <I>b</I> </CODE></TD>
-		<TD> list <I>a</I> does not match list <I>b</I></TD>
-		<TR><TD> <CODE><I>a</I> &lt; <I>b</I> </CODE></TD>
-		<TD> <I>a[i]</I> string is less than <I>b[i]</I>
-		string, where <i>i</i> is first mismatched element
-		in lists <I>a</I> and <I>b</I></TD>
-		<TR><TD> <CODE><I>a</I> &lt;= <I>b</I> </CODE></TD>
-		<TD> every <I>a</I> string is less than or equal to
-		its <I>b</I> counterpart</TD>
-		<TR><TD> <CODE><I>a</I> &gt; <I>b</I> </CODE></TD>
-		<TD> <I>a[i]</I> string is greater than <I>b[i]</I>
-		string, where <i>i</i> is first mismatched element</TD>
-		<TR><TD> <CODE><I>a</I> &gt;= <I>b</I> </CODE></TD>
-		<TD> every <I>a</I> string is greater than or equal to
-		its <I>b</I> counterpart</TD>
-		<TR><TD> <CODE><I>a</I> in <I>b</I> </CODE></TD>
-		<TD> true if all elements of <I>a</I> can be found
-		in <I>b</I>, or if <I>a</I> has no elements</TD>
-		<TR><TD> <CODE>! <I>cond</I> </CODE></TD>
-		<TD> condition not true</TD>
-		<TR><TD> <CODE><I>cond</I> && <I>cond</I> </CODE></TD>
-		<TD> conjunction</TD>
-		<TR><TD> <CODE><I>cond</I> || <I>cond</I> </CODE></TD>
-		<TD> disjunction</TD>
-		<TR><TD> <CODE>( <I>cond</I> ) </CODE></TD>
-		<TD> precedence grouping</TD>
-
-	    </TABLE>
-
-	    <P><DT> <CODE>
-
-		include <I>file</I> ;
-
-	    </CODE>
-
-	    <P><DD> Causes <b>jam</b> to read the named <i>file</i>.
-	    The file is bound like a regular target (see <A
-	    HREF="#binding"> Binding</A> above) but unlike a regular
-	    target the include file cannot be built.
-
-	    <P>
-
-	    The include file is inserted into the input stream during
-	    the parsing phase. The primary input file and all the included
-	    file(s) are treated as a single file; that is, <b>jam</b>
-	    infers no scope boundaries from included files.
-
-	    <P><DT> <CODE>
-
-		local <i>vars</I> [ = <i>values</i> ] ;
-
-	    </CODE>
-
-	    <P><DD> Creates new <i>vars</i> inside to the enclosing {}
-	    block, obscuring any previous values they might have.  The
-	    previous values for <i>vars</i> are restored when the current
-	    block ends.  Any rule called or file included will see the
-	    local and not the previous value (this is sometimes called
-	    Dynamic Scoping).  The local statement may appear anywhere,
-	    even outside of a block (in which case the previous value
-	    is restored when the input ends).  The <i>vars</i> are
-	    initialized to <i>values</i> if present, or left uninitialized
-	    otherwise.
-
-	    <P><DT> <CODE>
-
-		return <I>values</I> ; 
-
-	    </CODE>
-
-	    <P><DD> Within a rule body, the return statement sets the return
-            value for an invocation of the rule. It does <i>not</i> cause the
-            rule to return; a rule's value is actually the value of the
-            last statement executed, so a return should be the
-	    last statement executed before the rule "naturally" returns.
-
-	    <P><DT> <CODE>
-
-		<A NAME="switch">
-		switch <I>value</I>
-		</A>
-		<BR> { 
-		<BR> case <I>pattern1</I> : <I>statements</I> ; 
-		<BR> case <I>pattern2</I> : <I>statements</I> ; 
-		<BR> ... 
-		<BR> }
-
-	    </CODE>
-
-	    <P><DD> The switch statement executes zero or one of the
-	    enclosed <i>statements</i>, depending on which, if any, is
-	    the first case whose <i>pattern</I> matches <i>value</i>.
-	    The <i>pattern</I> values are not variable-expanded.  The
-	    <i>pattern</I>  values may include the following wildcards:
-
-	    <TABLE>
-
-		<TR><TD><CODE> ? </CODE></TD>
-		<TD> match any single character </TD>
-		<TR><TD><CODE> * </CODE></TD>
-		<TD> match zero or more characters </TD>
-		<TR><TD><CODE> [<i>chars</i>] </CODE></TD>
-		<TD> match any single character in <i>chars</i> </TD>
-		<TR><TD><CODE> [^<i>chars</i>] </CODE></TD>
-		<TD> match any single character not in <i>chars</i> </TD>
-		<TR><TD><CODE> \<i>x</i> </CODE></TD>
-		<TD> match <i>x</i> (escapes the other wildcards)</i> </TD>
-
-	    </TABLE>
-
-	    <P><DT> <CODE>
-
-		while <I>cond</I> { <I>statements</I> }
-
-	    </CODE>
-
-	    <P><DD> Repeatedly execute <I>statements</I> while <I>cond</I>
-	    remains true upon entry. (See the description of <I>cond</I>
-	    expression syntax under <a href="#if">if</a>, above).
-	</DL></TABLE>
-
-<DT> <P> <H3> Variables </H3> <DD>
-
-	<P>
-
-	<B>Jam</b> variables are lists of zero or more elements, with
-	each element being a string value.  An undefined variable is
-	indistinguishable from a variable with an empty list, however,
-	a defined variable may have one more elements which are null
-	strings.  All variables are referenced as $(<I>variable</I>).
-
-	<P>
-
-	Variables are either global or target-specific.  In the latter
-	case, the variable takes on the given value only during the
-	updating of the specific target.
-
-	<P>
-
-	A variable is defined with:
-
-	<P> <TABLE WIDTH=75% ALIGN=CENTER> <TR><TD> <DL>
-
-	    <DT><CODE> 
-	    <I>variable</I> = <I>elements</I> ; </CODE>
-	    <DT><CODE> 
-	    <I>variable</I> += <I>elements</I> ; </CODE>
-	    <DT><CODE> 
-	    <I>variable</I> on <I>targets</I> = <I>elements</I> ; </CODE>
-	    <DT><CODE> 
-	    <I>variable</I> on <I>targets</I> += <I>elements</I> ; </CODE>
-	    <DT><CODE> 
-	    <I>variable</I> default = <I>elements</I> ; </CODE>
-	    <DT><CODE> 
-	    <I>variable</I> ?= <I>elements</I> ; </CODE>
-
-	</DL></TABLE>
-
-	<P>
-
-	The first two forms set <I>variable</I> globally.  The third
-	and forth forms set a target-specific variable.  The = operator
-	replaces any previous elements of <I>variable</I> with
-	<I>elements</I>; the += operation adds <I>elements</I> to
-	<I>variable</I>'s list of elements.  The final two forms are
-	synonymous: they set <I>variable</I> globally, but only if it
-	was previously unset.
-
-	<P>
-
-	Variables referenced in updating commands will be replaced with
-	their values; target-specific values take precedence over global
-	values.  Variables passed as arguments ($(1) and $(2)) to actions
-	are replaced with their bound values; the "bind" modifier can
-	be used on actions to cause other variables to be replaced with
-	bound values.  See <A HREF="#actionmods">Action Modifiers</A>
-	above.
-
-	<P>
-
-	<B>Jam</b> variables are not re-exported to the environment of
-	the shell that executes the updating actions, but the updating
-	actions can reference <b>jam</b> variables with $(<I>variable</I>).
-
-	<P> <H4> Variable Expansion </H4>
-
-	<P>
-
-	During parsing, <b>jam</b> performs variable expansion on each
-	token that is not a keyword or rule name.  Such tokens with
-	embedded variable references are replaced with zero or more
-	tokens.  Variable references are of the form $(<I>v</I>) or
-	$(<I>vm</I>), where <i>v</i> is the variable name,  and  <I>m</I>
-	are optional modifiers.
-
-	<P>
-
-	Variable expansion in a rule's actions is similar to variable
-	expansion in statements,  except that the action string is
-	tokenized at whitespace regardless of quoting.
-
-	<P>
-
-	The result of a token after variable expansion is the
-	<i>product</i> of the components of the token, where each
-	component is a literal substring or a list substituting a variable
-	reference.  For example:
-
-	<P> <TABLE WIDTH=75% ALIGN=CENTER><TR><TD><CODE>
-
-	    <BR>$(X)      -> a b c
-	    <BR>t$(X)     -> ta tb tc
-	    <BR>$(X)z     -> az bz cz
-	    <BR>$(X)-$(X) -> a-a a-b a-c b-a b-b b-c c-a c-b c-c
-
-	</CODE></TABLE>
-
-	<P>
-
-	The variable name and modifiers can themselves contain
-	a variable reference,  and this partakes of the product
-	as well:
-
-	<P> <TABLE WIDTH=75% ALIGN=CENTER><TR><TD><CODE>
-
-	    <BR>$(X)      -> a b c
-	    <BR>$(Y)      -> 1 2
-	    <BR>$(Z)      -> X Y
-	    <BR>$($(Z))   -> a b c 1 2
-
-	</CODE></TABLE>
-
-	<P>
-
-	Because of this product expansion, if any variable reference in
-	a token is undefined, the result of the expansion is an empty
-	list.  If any variable element is a null string, the result
-	propagates the non-null elements:
-
-	<P> <TABLE WIDTH=75% ALIGN=CENTER><TR><TD><CODE>
-
-	    <BR>$(X)        -> a ""
-	    <BR>$(Y)        -> "" 1
-	    <BR>$(Z)	  -> 
-	    <BR>*$(X)$(Y)*  -> *a* *a1* ** *1*
-	    <BR>*$(X)$(Z)*  ->
-
-	</CODE></TABLE>
-
-	<P>
-
-	A variable element's string value can be parsed into grist and
-	filename-related components.  Modifiers to a variable are used
-	to select elements, select components, and replace components.
-	The modifiers are:
-
-	<P> <TABLE WIDTH=75% ALIGN=CENTER>
-
-	    <TR><TD><CODE> [<I>n</I>] </CODE>
-	    <TD>Select element number <I>n</I> (starting at 1).  If
-	    the variable contains fewer than <I>n</I> elements,
-	    the result is a zero-element list.
-
-	    <TR><TD><CODE> [<I>n</I>-<I>m</I>] </CODE>
-	    <TD>Select elements number <I>n</I> through <I>m</I>.
-
-	    <TR><TD><CODE> [<I>n</I>-] </CODE>
-	    <TD>Select elements number <I>n</I> through the last.
-
-	    <TR><TD><CODE> :B </CODE>
-	    <TD>Select filename base.
-
-	    <TR><TD><CODE> :S </CODE>
-	    <TD>Select (last) filename suffix.
-
-	    <TR><TD><CODE> :M </CODE>
-	    <TD>Select archive member name.
-
-	    <TR><TD><CODE> :D </CODE>
-	    <TD>Select directory path.
-
-	    <TR><TD><CODE> :P </CODE>
-	    <TD>Select parent directory.
-
-	    <TR><TD><CODE> :G </CODE>
-	    <TD>Select grist.
-
-	    <TR><TD><CODE> :U </CODE>
-	    <TD>Replace lowercase characters with uppercase.
-
-	    <TR><TD><CODE> :L </CODE>
-	    <TD>Replace uppercase characters with lowercase.
-
-	    <TR><TD><CODE> :<i>chars</I> </CODE>
-	    <TD>Select the components listed in <i>chars</i>.
-
-	    <TR><TD><CODE> :G=<I>grist</I> </CODE>
-	    <TD>Replace grist with <I>grist</I>.
-
-	    <TR><TD><CODE> :D=<I>path</I> </CODE>
-	    <TD>Replace directory with <I>path</I>.
-
-	    <TR><TD><CODE> :B=<I>base</I> </CODE>
-	    <TD>Replace the base part of file name with <I>base</I>.
-
-	    <TR><TD><CODE> :S=<I>suf</I> </CODE>
-	    <TD>Replace the suffix of file name with <I>suf</I>.
-
-	    <TR><TD><CODE> :M=<I>mem</I> </CODE>
-	    <TD>Replace the archive member name with <I>mem</I>.
-
-	    <TR><TD><CODE> :R=<I>root</I> </CODE>
-	    <TD>Prepend <I>root</I> to the whole file name,  if not
-	    already rooted.
-
-	    <TR><TD><CODE> :E=<I>value</I> </CODE>
-	    <TD>Assign <I>value</I> to the variable if it is unset.
-
-	    <TR><TD><CODE> :J=<I>joinval</I> </CODE>
-	    <TD>Concatentate list elements into single
-            element, separated by <I>joinval</I>.
-
-	</TABLE>
-
-	<P>
-
-	On VMS, $(var:P) is the parent directory of $(var:D); on Unix
-	and NT, $(var:P) and $(var:D) are the same.
 
 <DT> <P> <H3> Built-in Variables </H3> <DD>
 
@@ -1096,8 +1075,8 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 	uses $(HDRPATTERN) as the pattern for $(HDRSCAN).  $(HDRRULE)
 	is the name of a rule to invoke with the results of the scan:
 	the scanned file is the target, the found files are the sources.
-	This is the only place where <b>jam</b> invokes a rule through
-	a variable setting.
+	$(HDRRULE) is run under the influence of the scanned file's
+	target-specific variables.
 
 	<P>
 
@@ -1156,7 +1135,7 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
 
 	    <TR><TD>JAMDATE<TD>Time and date at <b>jam</b> start-up.
 	    <TR><TD>JAMUNAME<TD>Ouput of <b>uname</b>(1) command (Unix only)
-	    <TR><TD>JAMVERSION<TD><b>jam</b> version, currently "2.3"
+	    <TR><TD>JAMVERSION<TD><b>jam</b> version, as reported by jam -v.
 
 	</TABLE>
 
@@ -1341,9 +1320,9 @@ jam [ -a ] [ -n ] [ -v ] [ -q ]
         <BR>
         Comments to <A HREF="mailto:info@perforce.com">info@perforce.com</A>
         <BR>
-        Last updated: April 1, 2002
+        Last updated: May, 2002
 	<BR>
-	$Id: //public/jam/src/Jam.html#11 $
+	$Id: //public/jam/src/Jam.html#19 $
 
 </BODY> 
 </HTML>

@@ -26,7 +26,7 @@
  *
  *	make1cmds() - turn ACTIONS into CMDs, grouping, splitting, etc
  *	make1list() - turn a list of targets into a LIST, for $(<) and $(>)
- * 	make1settings() - for vars that get bound values, build up replacement lists
+ * 	make1settings() - for vars that get bound, build up replacement lists
  * 	make1bind() - bind targets that weren't bound in dependency analysis
  *
  * 04/16/94 (seiwald) - Split from make.c.
@@ -38,6 +38,15 @@
  * 01/22/94 (seiwald) - pass per-target JAMSHELL down to execcmd().
  * 02/28/95 (seiwald) - Handle empty "existing" actions.
  * 03/10/95 (seiwald) - Fancy counts.
+ * 02/07/01 (seiwald) - Fix jam -d0 return status.
+ * 01/21/02 (seiwald) - new -q to quit quickly on build failure
+ * 02/28/02 (seiwald) - don't delete 'actions updated' targets on failure
+ * 02/28/02 (seiwald) - merge EXEC_xxx flags in with RULE_xxx 
+ * 07/17/02 (seiwald) - TEMPORARY sources for headers now get built
+ * 09/23/02 (seiwald) - "...using temp..." only displayed on -da now.
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
  */
 
 # include "jam.h"
@@ -116,7 +125,6 @@ make1a(
 	TARGET	*parent )
 {
 	TARGETS	*c;
-	int i;
 
 	/* If the parent is the first to try to build this target */
 	/* or this target is in the make1c() quagmire, arrange for the */
@@ -148,9 +156,8 @@ make1a(
 
 	t->progress = T_MAKE_ONSTACK;
 
-	for( i = T_DEPS_DEPENDS; i <= T_DEPS_INCLUDES; i++ )
-	    for( c = t->deps[i]; c && !intr; c = c->next )
-		make1a( c->target, t );
+	for( c = t->depends; c && !intr; c = c->next )
+	    make1a( c->target, t );
 
 	t->progress = T_MAKE_ACTIVE;
 
@@ -168,8 +175,7 @@ static void
 make1b( TARGET *t )
 {
 	TARGETS	*c;
-	int 	i;
-	char 	*failed = "dependents";
+	const char *failed = "dependents";
 
 	/* If any dependents are still outstanding, wait until they */
 	/* call make1b() to signal their completion. */
@@ -181,9 +187,8 @@ make1b( TARGET *t )
 
 	/* Collect status from dependents */
 
-	for( i = T_DEPS_DEPENDS; i <= T_DEPS_INCLUDES; i++ )
-	    for( c = t->deps[i]; c; c = c->next )
-		if( c->target->status > t->status )
+	for( c = t->depends; c; c = c->next )
+	    if( c->target->status > t->status )
 	{
 	    failed = c->target->name;
 	    t->status = c->target->status;
@@ -215,12 +220,13 @@ make1b( TARGET *t )
 	    break;
 
 	case T_FATE_ISTMP:
-	    if( DEBUG_MAKE )
+	    if( DEBUG_MAKEQ )
 		printf( "...using %s...\n", t->name );
 	    break;
 
 	case T_FATE_TOUCHED:
 	case T_FATE_MISSING:
+	case T_FATE_NEEDTMP:
 	case T_FATE_OUTDATED:
 	case T_FATE_UPDATE:
 	    /* Set "on target" vars, build actions, unset vars */
@@ -421,7 +427,7 @@ make1cmds( ACTIONS *a0 )
 	    LIST    *nt, *ns;
 	    ACTIONS *a1;
 	    CMD	    *cmd;
-	    int	    start, chunk, length;
+	    int	    start, chunk, length, maxline;
 
 	    /* Only do rules with commands to execute. */
 	    /* If this action has already been executed, use saved status */
@@ -475,10 +481,15 @@ make1cmds( ACTIONS *a0 )
 	     * is likely to be much more compute intensive!
 	     *
 	     * Note we loop through at least once, for sourceless actions.
+	     *
+	     * Max line length is the action specific maxline or, if not 
+	     * given or bigger than MAXLINE, MAXLINE.
 	     */
 
 	    start = 0;
 	    chunk = length = list_length( ns );
+	    maxline = rule->flags / RULE_MAXLINE;
+	    maxline = maxline && maxline < MAXLINE ? maxline : MAXLINE;
 
 	    do
 	    {
@@ -487,7 +498,8 @@ make1cmds( ACTIONS *a0 )
 		CMD *cmd = cmd_new( rule, 
 			list_copy( L0, nt ), 
 			list_sublist( ns, start, chunk ),
-			list_copy( L0, shell ) );
+			list_copy( L0, shell ),
+			maxline );
 
 		if( cmd )
 		{
@@ -509,7 +521,7 @@ make1cmds( ACTIONS *a0 )
 		    /* Too long and not splittable. */
 
 		    printf( "%s actions too long (max %d)!\n", 
-			rule->name, MAXLINE );
+			rule->name, maxline );
 		    exit( EXITBAD );
 		}
 	    }
@@ -574,7 +586,7 @@ make1list(
 
 	/* Build new list */
 
-	l = list_new( l, copystr( t->boundname ) );
+	l = list_new( l, t->boundname, 1 );
     }
 
     return l;
@@ -606,7 +618,7 @@ make1settings( LIST *vars )
 
 		/* Build new list */
 
-		nl = list_new( nl, copystr( t->boundname ) );
+		nl = list_new( nl, t->boundname, 1 );
 	    }
 
 	    /* Add to settings chain */

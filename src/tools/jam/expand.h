@@ -6,6 +6,13 @@
 
 /*
  * expand.h - expand a buffer, given variable values
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-LIST *var_expand( LIST	*l, char *in, char *end, LOL *lol, int cancopyin );
+LIST *var_expand( 
+	LIST		*l,
+	const char	*in,
+	const char	*end,
+	LOL 		*lol,
+	int 		cancopyin );

@@ -21,6 +21,8 @@
  * handle action strings (look only for the closing }) and a mode to 
  * ignore most keywords when looking for a punctuation keyword.  This 
  * allows non-punctuation keywords to be used in lists without quoting.
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 /*
@@ -31,7 +33,7 @@
 
 typedef struct _YYSTYPE {
 	int		type;
-	char		*string;
+	const char	*string;
 	PARSE		*parse;
 	LIST		*list;
 	int		number;
@@ -40,9 +42,9 @@ typedef struct _YYSTYPE {
 extern YYSTYPE yylval;
 
 void yymode( int n );
-void yyerror( char *s );
+void yyerror( const char *s );
 int yyanyerrors();
-void yyfparse( char *s );
+void yyfparse( const char *s );
 int yyline();
 int yylex();
 int yyparse();

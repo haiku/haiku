@@ -4,9 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "option.h"
-
 /*
  * option.c - command line option processing
  *
@@ -15,13 +12,18 @@
  *		  Return the number of argv[] elements used up by options,
  *		  or -1 if an invalid option flag was given or an argument
  *		  was supplied for an option that does not require one."
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "option.h"
 
 int
 getoptions(
     int argc,
     char **argv,
-    char *opts,
+    const char *opts,
     option *optv )
 {
     int i;
@@ -44,7 +46,7 @@ getoptions(
 
 	for( arg = &argv[i][1]; *arg; arg++ )
 	{
-	    char *f;
+	    const char *f;
 
 	    for( f = opts; *f; f++ )
 		if( *f == *arg )
@@ -87,7 +89,7 @@ getoptions(
  * Name: getoptval() - find an option given its character
  */
 
-char *
+const char *
 getoptval( 
 	option *optv,
 	char opt,

@@ -6,11 +6,13 @@
 
 /*
  * filesys.h - OS specific file routines 
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-typedef void (*scanback)( void *closure, char *file, int found, time_t t );
+typedef void (*scanback)( void *closure, const char *file, int found, time_t t );
 
-void file_dirscan( char *dir, scanback func, void *closure );
-void file_archscan( char *arch, scanback func, void *closure );
+void file_dirscan( const char *dir, scanback func, void *closure );
+void file_archscan( const char *arch, scanback func, void *closure );
 
-int file_time( char *filename, time_t *time );
+int file_time( const char *filename, time_t *time );

@@ -6,6 +6,8 @@
 
 /*
  * builtins.h - compile parsed jam statements
+ *
+ * 01/10/01 (seiwald) - split from compile.h
  */
 
 void load_builtins();

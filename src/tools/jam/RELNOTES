@@ -1,9 +1,259 @@
-Release notes for Jam/MR 2.4
+===============================================================================
+===============================================================================
+
+
+Release notes for Jam 2.5
+(aka Jam - make(1) redux)
+
+0. Changes between 2.5rc1 and 2.5rc2:
+
+	Several uninitialized memory accesses have been corrected in
+	var_expand() and file_archscan(), thanks to Matt Armstrong.
+
+	Fix 'actions updated' broken by change 2487.  (See the
+	description to change 2612 for details).
+
+	Fix "includes of includes not being considered", broken by 2499.
+	(See the description to change 2614 for details).
+
+	Remove NT FQuote rule, as, \" is required to pass quotes on
+	the command line.
+
+	Porting change: allow jam to build with BorlandC 5.5
+
+	Porting change: for WinXP IA64; set MSVCNT to the root of the
+	SDK and MSVCVer to Win64; change handle type to long long (too
+	much to include windows.h?); bury IA64 in the library path in
+	Jambase.
+
+	Porting change: Mac classic MPW Codewarrior 7 upgrades: minor
+	compiling issues, new paths in Jambase for libraries and
+	includes, and separate out GenFile1 that sets PATH for UNIX
+	only, as it does't work under MPW (or anything other than with
+	sh).
+        
+	Porting change: Minor Cray porting: make hashitem()'s key
+	value unsigned so we're guaranteed no integer overflows.
+
+	SubDir's support for an externally set TOP variable was broken
+	in 2.5rc1.  It now works as it did in 2.4.  Further, using SubDir
+	to include a subpart of an SubDir tree now works.  Previously,
+	you could only include the root of another SubDir tree.  For example,
+
+		SubDir ALL src builds ;
+		SubInclude ALL src server support ;
+
+	Essentially includes the ../server/support/Jamfile, without getting
+	confused as to the current directory.
+
+0.1. Changes between 2.5rc2 and 2.5rc3:
+
+	More SubDir work after rc2: if a Jamrules invoked SubDir to 
+	establish other roots, and that Jamrules isn't in the current
+	directory, the roots it established were wrong.
+
+	Fix mysterious rebuild problem:  in an attempt to make 'jam -dc'
+	output report headers updates more accurately, internal (header
+	collection) targets were being bound as T_BIND_PARENTS so that
+	they could carry the timestamp of the actual source file.  But
+	that caused the fate of the internal node to be marked as
+	T_FATE_NEEDTMP if anything they included was newer, and that
+	easily happens among header files (something is always newer
+	than something else).  Now internal targets carry their parents
+	time, but with T_BIND_UNBOUND, like other NOTFILE targets.
+
+	Remove temp .bat files created on NT.  They used to all have
+	the same name and get reused, but with 2.5 the names were salted
+	with the PID and they would litter $TEMP.  Now they get removed
+	after being used.
+
+	Undocumented support for SUBDIRRULES, user-provided rules
+	to invoke at the end of the SubDir rule, and SUBDIRRESET,
+	SUBDIR variables to reset (like SUBDIRC++FLAGS, SUBDIRHDRS, etc)
+	for each new SubDir.
+
+1.  Release info:
+
+	Jam 2.5
+	January 20, 2002
+	VERSION 2.5
+
+2.  Compatibility
+
+	Jam 2.5 is upward compatible with Jam 2.4
+
+	The Jam 2.5 language is a superset of the 2.4 language;
+	Jamfiles, Jambase, and other rulesets used in 2.4 can be used
+	with the 2.5 language support.
+
+3.  Changes since 2.4.
+
+3.1.  Changes to Jam Language
+
+	The 'return' statement now actually returns, and there are now
+	break & continue statements for for & while loops.
+
+3.2.  Jambase Changes
+
+	MkDir now grists directories with 'dir', so that directory
+	targets can be distinguished from other targets.
+
+	SubDir now allows multiple overlapping roots (top level
+	directories): the first SubDir of a new root uses the CWD of
+	jam to set that root; subsquent SubDirs use the current SUBDIR
+	to set the new root.  New FSubDirPath to compute a path (given
+	SubDir arguments) and SubRules to include another root's
+	Jamrules.  Jamrules only included if present; no error issued
+	if no Jamrules file.
+
+	$(RMDIR) has been defined for NT and defaulted to $(RM) 
+	everwhere else.  Not much tested.  For Michael Champigny.
+
+	GenFile actions (on UNIX) now put . in the PATH for the execution
+	of the command, so that (at least) when jam builds itself . does 
+	not need to be in the global path.  It is the rare case where a
+	target bound in the current directory can't be used directly,
+	so we fudge it by setting PATH.
+
+3.3   'jam' Changes (See Jam.html)
+
+	The whole /MR of Jam's name has been dropped.  It was intended
+	to avoid trademark infringement of JYACC's JAM, but as far as
+	we can tell (a) it wasn't enough to avoid infringement and (b)
+	the trademark has lapsed anyhow.
+
+	If header dependencies cause an object to be recompiled and
+	the source file is a temporary, the temporary is now
+	reconstructed.  Previously, headers weren't considered when
+	deciding when to reconstruct a temporary.
+
+	-d has been reworked to make it easier to display more useful
+	tracing information separate from the debugging gunk:
+
+		-da - show all actions (formerly -d2)
+		-dc - show 'causes' for rebuilding (new output)
+		-dd - show dependencies (new output)
+		-dm - show make graph (aka -d3)
+		-dx - show executable text (formerly -d2)
+
+	-dd is new, and more display options are anticipated.
+
+	-n now implies -dax.
+
+	The message "...using xxx..." now only shows up with -da.
+
+	Jam.html was extensively updated, in an attempt at lucidity.
+
+3.4.  Jam internal code changes
+
+	Removed spurious search() in 'on' statement handling, thanks
+	(again) to Ingo Weinhold.
+
+	Fix 'includes' support so that included files aren't treated
+	as direct dependencies during the command execution phase.  If
+	an included file failed to build, make1() would bypass the
+	including file.  Now make0() appends each child's 'includes'
+	onto its own 'depends' list, eliminating 'includes'-specific
+	code in make0() and make1().
+
+	Rewrite of the past: updated all jam's source with comments to
+	reflect changes since about 2.3, very early 2001.
+
+
+4.  Fixed bugs
+
+	Fixed the description of the :E modifier in Jam.html.
+
+	Setting target-specific variables while under the influence of
+	the target's target-specific variables caused the _global_ values
+	to be modified.  This happened both during header file scanning
+	(HdrRule is called when target-specific variables are in effect)
+	and with the "on target statement" syntax.  Now setting
+	target-specific variables works again.  Thanks to Matt Armstrong.
+
+	Setting "var on target ?= value" now works as expected: if the
+	variable is already set on the target, it is left unchanged.
+	Previously, ?= was ignored and the variable was set anyway.
+	Thanks to Chris Antos.
+
+	Variable expansion in actions has always put an extra blank
+	space after the last list element, but the expansion is described
+	in the code as "space separated".  Now the last blank is suppressed
+	to match.  From Miklos Fazekas.
+
+	The temp file name used by jam for .bat files on NT now contains
+	jam's pid, so that multiple jams can run on the same system (with
+	the same $TEMP).  Thanks to Steve Anichini.
+
+	Several uninitialized memory accesses have been corrected in
+	var_expand() and file_archscan(), thanks to Matt Armstrong.
+
+5.  Porting
+
+	The Makefile now uses $(EXENAME) (./jam0 on UNIX, .\jam0.exe
+	on NT) instead of just "jam0", so that . doesn't need to be in
+	your PATH to bootstrap.
+
+	MACOSX updates: use 'ar' instead of libtool, as libtool can't
+	update a library and we archive too many things to do it in
+	one go; add piles of code to file_archscan() to handle new
+	BSD4.4 style "#1/nnnn" archive entry names, where the real
+	entry name follows the header and nnnn is the length of the
+	name.
+
+	The jam code underwent a const-ing, to work with compilers
+	that don't like "" being passed as a non-const char *.
+
+	Compiling on solaris w/ sparc now sets OSPLAT to "sparc".
+	Previously, it suppressed this, assuming (wrongly) that sparc
+	was the only solaris platform.  Thanks to Michael Champigny
+	<michael.champigny@intel.com>.
+
+	Jambase no longer announces the compiler it is using on
+	Windows.  It doesn't announce anything else, so why?
+
+	Jambase no longer refers to advapi32.lib on NT, as it isn't
+	needed for linking jam itself and it seems to move from
+	release to release (of MS Visual Studio).
+
+	Makefile/Jambase: BEOS updates from "Ingo Weinhold"
+	<bonefish@cs.tu-berlin.de>.
+
+	The NoCare rule can be used to suppress error messages when
+	an 'include' file can't be found.
+
+	AIX "big" archives are now supported, thanks to suggestions
+	from Randy Roesler.
+
+	MSVCDIR now works as well as MSVCNT for the Microsoft Visual C
+	compiler directory.  It changed names in VC 6.0.  Thanks to
+	Matt Armstrong.
+
+	Allow jam to build with BorlandC 5.5
+
+	For WinXP IA64; set MSVCNT to the root of the SDK and MSVCVer
+	to Win64; change handle type to long long (too much to include
+	windows.h?); bury IA64 in the library path in Jambase.
+
+	Mac classic MPW Codewarrior 7 upgrades: minor compiling
+	issues, new paths in Jambase for libraries and includes, and
+	separate out GenFile1 that sets PATH for UNIX only, as it
+	does't work under MPW (or anything other than with sh).
+
+	Minor Cray porting: make hashitem()'s key value unsigned so
+	we're guaranteed no integer overflows.
+
+
+===============================================================================
+===============================================================================
+
+
+Release notes for Jam 2.4
 (aka Jam - make(1) redux)
 
 1.  Release info:
 
-	Jam/MR 2.4
+	Jam 2.4
 	March, 21, 2002
 	VERSION 2.4
 
@@ -196,7 +446,7 @@ Release notes for Jam/MR 2.4
 ===============================================================================
 
 
-Release notes for Jam/MR 2.3
+Release notes for Jam 2.3
 (aka Jam - make(1) redux)
 
 0.  Bugs fixed since 2.3.1
@@ -211,7 +461,7 @@ Release notes for Jam/MR 2.3
 
 1.  Release info:
 
-	Jam/MR 2.3
+	Jam 2.3
 	November 16, 2000
 	VERSION 2.3
 	PATCHLEVEL 1
@@ -258,7 +508,7 @@ Release notes for Jam/MR 2.3
 
 	The old mock functions like makeDirName, which assigned their
 	results to the variable named as their first argument, have
-	been replaced with real functions using the new [] synxtax.
+	been replaced with real functions using the new [] syntax.
 	E.g. "makeDirName foo : bar ola" is now "foo = [ fDirName bar ]"
 
 	Install now always does a cp/chmod/etc, rather than using

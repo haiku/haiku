@@ -4,11 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "pathsys.h"
-
-# ifdef USE_PATHUNIX
-
 /*
  * pathunix.c - manipulate file names on UNIX, NT, OS2, AmigaOS
  *
@@ -34,8 +29,14 @@
  * 05/03/96 (seiwald) - split from filent.c, fileunix.c
  * 12/20/96 (seiwald) - when looking for the rightmost . in a file name,
  *		      don't include the archive member name.
- * 01/13/01 (seiwald) - turn on \ handling on UNIX, on by accident
+ * 01/13/01 (seiwald) - turn off \ handling on UNIX, on by accident
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "pathsys.h"
+
+# ifdef USE_PATHUNIX
 
 /*
  * path_parse() - split a file name into dir/base/suffix/member
@@ -43,11 +44,11 @@
 
 void
 path_parse( 
-	char	*file,
+	const char *file,
 	PATHNAME *f )
 {
-	char *p, *q;
-	char *end;
+	const char *p, *q;
+	const char *end;
 	
 	memset( (char *)f, 0, sizeof( *f ) );
 

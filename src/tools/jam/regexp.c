@@ -36,6 +36,8 @@
  *** happily defined in string.h).
  *** THIS IS AN ALTERED VERSION.  It was altered by Christopher Seiwald
  *** seiwald@perforce.com, on 20 January 2000, to use function prototypes.
+ *** THIS IS AN ALTERED VERSION.  It was altered by Christopher Seiwald
+ *** seiwald@perforce.com, on 05 November 2002, to const string literals.
  *
  * Beware that some of this code is subtly aware of the way operator
  * precedence is structured in regular expressions.  Serious changes in
@@ -210,7 +212,7 @@ STATIC int strcspn();
  * of the structure of the compiled regexp.
  */
 regexp *
-regcomp( char *exp )
+regcomp( const char *exp )
 {
 	register regexp *r;
 	register char *scan;
@@ -767,15 +769,15 @@ regoptail(
 /*
  * Global work variables for regexec().
  */
-static char *reginput;		/* String-input pointer. */
+static const char *reginput;	/* String-input pointer. */
 static char *regbol;		/* Beginning of input, for ^ check. */
-static char **regstartp;	/* Pointer to startp array. */
-static char **regendp;		/* Ditto for endp. */
+static const char **regstartp;	/* Pointer to startp array. */
+static const char **regendp;	/* Ditto for endp. */
 
 /*
  * Forwards.
  */
-STATIC int regtry( regexp *prog, char *string );
+STATIC int regtry( regexp *prog, const char *string );
 STATIC int regmatch( char *prog );
 STATIC int regrepeat( char *p );
 
@@ -791,7 +793,7 @@ STATIC char *regprop();
 int
 regexec(
 	register regexp *prog,
-	register char *string )
+	register const char *string )
 {
 	register char *s;
 
@@ -852,11 +854,11 @@ regexec(
 static int			/* 0 failure, 1 success */
 regtry(
 	regexp *prog,
-	char *string )
+	const char *string )
 {
 	register int i;
-	register char **sp;
-	register char **ep;
+	register const char **sp;
+	register const char **ep;
 
 	reginput = string;
 	regstartp = prog->startp;
@@ -971,7 +973,7 @@ regmatch( char *prog )
 		case OPEN+8:
 		case OPEN+9: {
 				register int no;
-				register char *save;
+				register const char *save;
 
 				no = OP(scan) - OPEN;
 				save = reginput;
@@ -999,7 +1001,7 @@ regmatch( char *prog )
 		case CLOSE+8:
 		case CLOSE+9: {
 				register int no;
-				register char *save;
+				register const char *save;
 
 				no = OP(scan) - CLOSE;
 				save = reginput;
@@ -1018,7 +1020,7 @@ regmatch( char *prog )
 			}
 			break;
 		case BRANCH: {
-				register char *save;
+				register const char *save;
 
 				if (OP(next) != BRANCH)		/* No choice. */
 					next = OPERAND(scan);	/* Avoid recursion. */
@@ -1039,7 +1041,7 @@ regmatch( char *prog )
 		case PLUS: {
 				register char nextch;
 				register int no;
-				register char *save;
+				register const char *save;
 				register int min;
 
 				/*
@@ -1091,7 +1093,7 @@ static int
 regrepeat( char *p )
 {
 	register int count = 0;
-	register char *scan;
+	register const char *scan;
 	register char *opnd;
 
 	scan = reginput;
@@ -1315,3 +1317,9 @@ strcspn(
 	return(count);
 }
 #endif
+
+void
+regerror( const char *s )
+{
+	printf( "re error %s\n", s );
+}

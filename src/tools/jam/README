@@ -1,10 +1,10 @@
-Jam/MR (aka "jam - make(1) redux") 
+Jam - make(1) redux
 
     /+\
     +\	Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.
     \+/
 
-    This is Release 2.4 of Jam/MR, a make-like program.
+    This is Release 2.5 of Jam, a make-like program.
 
     License is hereby granted to use this software and distribute it
     freely, as long as this copyright notice is retained and modifications 
@@ -110,10 +110,12 @@ INSTALLING
 	depends on which compiler you are using:
 
 	    BCCROOT:	The Borland C compiler
+	    MSVCDIR:	The Microsoft Compiler 6.0 (for NT)
 	    MSVCNT:	The Microsoft Compiler 5.0 (for NT)
 	    MSVC:	The Microsoft Compiler 1.5 (for Windows)
 
-	Only MSVCNT has really been tested and is known to work.
+	Only MSVCNT and MSVCDIR have really been tested and are known
+	to work.
 
     Macintosh
 
@@ -142,6 +144,7 @@ February, 1996 - release 2.1
 November, 1997 - release 2.2
 December, 2000 - release 2.3
 March, 2002 - release 2.4
+December, 2002 - release 2.5
 
 
 Christopher Seiwald

@@ -6,6 +6,8 @@
 
 /*
  * search.h - find a target along $(SEARCH) or $(LOCATE) 
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-char *search( char *target, time_t *time );
+const char *search( const char *target, time_t *time );

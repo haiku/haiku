@@ -5,7 +5,7 @@ Jambase Reference
 <BODY>
 <CENTER>
 <a href=http://www.perforce.com/jam/jam.html>
-Jam/MR
+Jam
 </a>
 <H1>
 <A NAME="TOP">
@@ -14,9 +14,9 @@ Jambase Reference
 </H1>
 </CENTER>
 <P>
-       Jambase is a base set of Jam/MR rules which
+       Jambase is a base set of Jam rules which
        provide roughly make(1)-like functionality for 
-       <a href="Jam.html"><b>jam</b></A>, the Jam/MR executable program.
+       <a href="Jam.html"><b>jam</b></A>, the Jam executable program.
        This document, which started out as the Jambase(5) man page, 
        is a reference guide to the 
        <A href="#RULES">rules</A>,
@@ -29,10 +29,10 @@ Jambase Reference
 <LI>
 	<a href="Jamfile.html">Using Jamfiles and Jambase</A>
 <LI>
-	<a href="Jam.html">The Jam/MR Executable Program</A>
+	<a href="Jam.html">The Jam Executable Program</A>
 </UL>
 <P>
-Jam/MR documentation and source are available from the
+Jam documentation and source are available from the
 <A HREF=http://public.perforce.com/public/index.html>Perforce Public Depot</a>.
 For detailed information about any of the rules summarized below,
 see the 
@@ -267,19 +267,19 @@ Jambase Rules
               Makes <I>target</I> a symbolic link to <I>source,</I> if it isn't one
               already. (Unix only.)
 </BLOCKQUOTE>
-	<B>SubDir</B> <I>VAR d1 ... dn</I> ;
+	<B>SubDir</B> <I>TOP d1 ... dn</I> ;
 <BLOCKQUOTE>
 		Sets up housekeeping for the source files located
-		in <I><CODE>$(VAR)/d1/.../dn</CODE></I>:
+		in <I><CODE>$(TOP)/d1/.../dn</CODE></I>:
 		<UL>
-		<LI>Reads in rules file associated with <I>VAR</I>,
+		<LI>Reads in rules file associated with <I>TOP</I>,
 		    if it hasn't already been read.
 		<LI>Initializes variables for search paths, 
 		    output directories, compiler
 		    flags, and grist, using <I>d1 ... dn</I> tokens.
 		</UL>
 		<P>
-		<I>VAR</I> is the name of a variable; 
+		<I>TOP</I> is the name of a variable; 
 		<I>d1</I> thru <I>dn</I> are elements
 		of a directory path.
 </BLOCKQUOTE>
@@ -724,8 +724,16 @@ Jambase Variables
 
 	MSVCNT
 <BLOCKQUOTE>
-		Selects Microsoft Visual C NT compile & link
-		actions on NT.
+		Selects Microsoft Visual C NT 5.0 and earlier compile
+		& link actions on NT.
+</BLOCKQUOTE>
+
+	MSVCDIR
+<BLOCKQUOTE>
+		Selects Microsoft Visual C NT 6.0 and later compile
+		& link actions on NT.  These are identical to versions
+		5.0 and earlier -- it just seems Microsoft changed the
+		name of the variable.
 </BLOCKQUOTE>
 
 
@@ -926,6 +934,6 @@ Jambase Variables
 	<BR>
 	Last updated: Dec 31, 2000
 	<BR>
-	$Id: //public/jam/src/Jambase.html#7 $
+	$Id: //public/jam/src/Jambase.html#10 $
 </BODY>
 </HTML>

@@ -6,9 +6,11 @@
 
 /*
  * newstr.h - string manipulation routines
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-char *newstr( char *string );
-char *copystr( char *s );
-void freestr( char *s );
+const char *newstr( const char *string );
+const char *copystr( const char *s );
+void freestr( const char *s );
 void donestr();

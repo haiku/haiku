@@ -4,30 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "execcmd.h"
-# include <errno.h>
-
-# ifdef USE_EXECUNIX
-
-# ifdef NO_VFORK
-# define vfork() fork()
-# endif
-
-# if defined( OS_NT ) || defined( OS_OS2 )
-
-# define USE_EXECNT
-
-# include <process.h>
-
-# if !defined( __BORLANDC__ ) && !defined( OS_OS2 )
-# define wait my_wait
-static int my_wait( int *status );
-# endif
-
-# endif
-
 /*
  * execunix.c - execute a shell script on UNIX/WinNT/OS2/AmigaOS
  *
@@ -57,7 +33,34 @@ static int my_wait( int *status );
  * 05/04/94 (seiwald) - async multiprocess interface
  * 01/22/95 (seiwald) - $(JAMSHELL) support
  * 06/02/97 (gsar)    - full async multiprocess support for Win32
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/27/02 (seiwald) - grist .bat file with pid for system uniqueness
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "execcmd.h"
+# include <errno.h>
+
+# ifdef USE_EXECUNIX
+
+# ifdef OS_OS2
+# define USE_EXECNT
+# include <process.h>
+# endif
+
+# ifdef OS_NT 
+# define USE_EXECNT
+# include <process.h>
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>		/* do the ugly deed */
+# define USE_MYWAIT
+# if !defined( __BORLANDC__ ) 
+# define wait my_wait
+static int my_wait( int *status );
+# endif
+# endif
 
 static int intr = 0;
 static int cmdsrunning = 0;
@@ -99,7 +102,7 @@ execcmd(
 {
 	int pid;
 	int slot;
-	char *argv[ MAXARGC + 1 ];	/* +1 for NULL */
+	const char *argv[ MAXARGC + 1 ];	/* +1 for NULL */
 
 # ifdef USE_EXECNT
 	char *p;
@@ -126,10 +129,12 @@ execcmd(
 		!( tempdir = getenv( "TMP" ) ) )
 		    tempdir = "\\temp";
 
-	    cmdtab[ slot ].tempfile = malloc( strlen( tempdir ) + 14 );
+	    /* +32 is room for \jamXXXXXtSS.bat (at least) */
 
-	    sprintf( cmdtab[ slot ].tempfile, "%s\\jamtmp%02d.bat", 
-				tempdir, slot );
+	    cmdtab[ slot ].tempfile = malloc( strlen( tempdir ) + 32 );
+
+	    sprintf( cmdtab[ slot ].tempfile, "%s\\jam%dt%d.bat", 
+				tempdir, GetCurrentProcessId(), slot );
 	}
 
 	/* Trim leading, ending white space */
@@ -217,11 +222,19 @@ execcmd(
 	    exit( EXITBAD );
 	}
 # else
+# ifdef NO_VFORK
+	if ((pid = fork()) == 0) 
+   	{
+	    execvp( argv[0], argv );
+	    _exit(127);
+	}
+# else
 	if ((pid = vfork()) == 0) 
    	{
-		execvp( argv[0], argv );
-		_exit(127);
+	    execvp( argv[0], argv );
+	    _exit(127);
 	}
+# endif
 
 	if( pid == -1 )
 	{
@@ -283,6 +296,12 @@ execwait()
 	    exit( EXITBAD );
 	}
 
+# ifdef USE_EXECNT
+	/* Clear the temp file */
+
+	unlink( cmdtab[ i ].tempfile );
+# endif
+
 	/* Drive the completion */
 
 	if( !--cmdsrunning )
@@ -302,11 +321,7 @@ execwait()
 	return 1;
 }
 
-# if defined( OS_NT ) && !defined( __BORLANDC__ )
-
-# define WIN32_LEAN_AND_MEAN
-
-# include <windows.h>		/* do the ugly deed */
+# ifdef USE_MYWAIT
 
 static int
 my_wait( int *status )
@@ -365,6 +380,6 @@ FAILED:
     
 }
 
-# endif /* NT && !__BORLANDC__ */
+# endif /* USE_MYWAIT */
 
 # endif /* USE_EXECUNIX */

@@ -4,14 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "expand.h"
-# include "hash.h"
-# include "newstr.h"
-
 /*
  * variable.c - handle jam multi-element variables
  *
@@ -34,7 +26,17 @@
  * 01/22/95 (seiwald) - split environment variables at blanks or :'s
  * 05/10/95 (seiwald) - split path variables at SPLITPATH (not :)
  * 09/11/00 (seiwald) - defunct var_list() removed
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "variable.h"
+# include "expand.h"
+# include "hash.h"
+# include "newstr.h"
 
 static struct hash *varhash = 0;
 
@@ -45,12 +47,12 @@ static struct hash *varhash = 0;
 typedef struct _variable VARIABLE ;
 
 struct _variable {
-	char	*symbol;
-	LIST	*value;
+	const char	*symbol;
+	LIST		*value;
 } ;
 
-static VARIABLE *var_enter( char *symbol );
-static void var_dump( char *symbol, LIST *value, char *what );
+static VARIABLE *var_enter( const char *symbol );
+static void var_dump( const char *symbol, LIST *value, const char *what );
 
 
 
@@ -62,11 +64,11 @@ static void var_dump( char *symbol, LIST *value, char *what );
  */
 
 void
-var_defines( char **e )
+var_defines( const char **e )
 {
 	for( ; *e; e++ )
 	{
-	    char *val;
+	    const char *val;
 
 	    /* Just say "no": windows defines this in the env, */
 	    /* but we don't want it to override our notion of OS. */
@@ -84,7 +86,7 @@ var_defines( char **e )
 # endif
 	    {
 		LIST *l = L0;
-		char *pp, *p;
+		const char *pp, *p;
 # ifdef OS_MAC
 		char split = ',';
 # else
@@ -108,10 +110,10 @@ var_defines( char **e )
 		{
 		    strncpy( buf, pp, p - pp );
 		    buf[ p - pp ] = '\0';
-		    l = list_new( l, newstr( buf ) );
+		    l = list_new( l, buf, 0 );
 		}
 
-		l = list_new( l, newstr( pp ) );
+		l = list_new( l, pp, 0 );
 
 		/* Get name */
 
@@ -131,7 +133,7 @@ var_defines( char **e )
 
 int
 var_string(
-	char	*in,
+	const char *in,
 	char	*out,
 	int	outsize,
 	LOL	*lol )
@@ -174,13 +176,11 @@ var_string(
 
 	    if( dollar )
 	    {
-		LIST	*l;
-
-		l = var_expand( L0, lastword, out, lol, 0 );
+		LIST *l = var_expand( L0, lastword, out, lol, 0 );
 
 		out = lastword;
 
-		for( ; l; l = list_next( l ) )
+		while( l )
 		{
 		    int so = strlen( l->string );
 
@@ -189,7 +189,11 @@ var_string(
 
 		    strcpy( out, l->string );
 		    out += so;
-		    *out++ = ' ';
+
+		    /* Separate with space */
+
+		    if( l = list_next( l ) )
+			*out++ = ' ';
 		}
 
 		list_free( l );
@@ -211,7 +215,7 @@ var_string(
  */
 
 LIST *
-var_get( char *symbol )
+var_get( const char *symbol )
 {
 	VARIABLE var, *v = &var;
 
@@ -240,7 +244,7 @@ var_get( char *symbol )
 
 void
 var_set(
-	char	*symbol,
+	const char *symbol,
 	LIST	*value,
 	int	flag )
 {
@@ -278,7 +282,7 @@ var_set(
 
 LIST *
 var_swap(
-	char	*symbol,
+	const char *symbol,
 	LIST	*value )
 {
 	VARIABLE *v = var_enter( symbol );
@@ -299,7 +303,7 @@ var_swap(
  */
 
 static VARIABLE *
-var_enter( char	*symbol )
+var_enter( const char *symbol )
 {
 	VARIABLE var, *v = &var;
 
@@ -321,9 +325,9 @@ var_enter( char	*symbol )
 
 static void
 var_dump(
-	char	*symbol,
-	LIST	*value,
-	char	*what )
+	const char	*symbol,
+	LIST		*value,
+	const char	*what )
 {
 	printf( "%s %s = ", what, symbol );
 	list_print( value );

@@ -4,14 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "variable.h"
-# include "rules.h"
-# include "newstr.h"
-# include "hash.h"
-
 /*
  * rules.c - access to RULEs, TARGETs, and ACTIONs
  *
@@ -19,12 +11,14 @@
  *
  *    bindrule() - return pointer to RULE, creating it if necessary
  *    bindtarget() - return pointer to TARGET, creating it if necessary
+ *    copytarget() - make a new target with the old target's name
  *    touchtarget() - mark a target to simulate being new
  *    targetlist() - turn list of target names into a TARGET chain
  *    targetentry() - add a TARGET to a chain of TARGETS
+ *    targetchain() - append two TARGET chains
  *    actionlist() - append to an ACTION chain
  *    addsettings() - add a deferred "set" command to a target
- *    usesettings() - set all target specific variables
+ *    copysettings() - copy a settings list for temp use
  *    pushsettings() - set all target specific variables
  *    popsettings() - reset target specific variables to their pre-push values
  *    freesettings() - delete a settings list
@@ -32,7 +26,20 @@
  *
  * 04/12/94 (seiwald) - actionlist() now just appends a single action.
  * 08/23/94 (seiwald) - Support for '+=' (append to variable)
+ * 06/21/02 (seiwald) - support for named parameters
+ * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
+ * 12/17/02 (seiwald) - new copysettings() to protect target-specific vars
+ * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "variable.h"
+# include "rules.h"
+# include "newstr.h"
+# include "hash.h"
 
 static struct hash *rulehash = 0;
 static struct hash *targethash = 0;
@@ -43,7 +50,7 @@ static struct hash *targethash = 0;
  */
 
 RULE *
-bindrule( char *rulename )
+bindrule( const char *rulename )
 {
 	RULE rule, *r = &rule;
 
@@ -58,6 +65,7 @@ bindrule( char *rulename )
 	    r->procedure = (PARSE *)0;
 	    r->actions = (char *)0;
 	    r->bindlist = L0;
+	    r->params = L0;
 	    r->flags = 0;
 	}
 
@@ -69,7 +77,7 @@ bindrule( char *rulename )
  */
 
 TARGET *
-bindtarget( char *targetname )
+bindtarget( const char *targetname )
 {
 	TARGET target, *t = &target;
 
@@ -89,11 +97,32 @@ bindtarget( char *targetname )
 }
 
 /*
+ * copytarget() - make a new target with the old target's name
+ *
+ * Not entered into hash table -- for internal nodes.
+ */
+
+TARGET *
+copytarget( const TARGET *ot )
+{
+	TARGET *t;
+
+	t = (TARGET *)malloc( sizeof( *t ) );
+	memset( (char *)t, '\0', sizeof( *t ) );
+	t->name = copystr( ot->name );
+	t->boundname = t->name;
+
+	t->flags |= T_FLAG_NOTFILE | T_FLAG_INTERNAL;
+
+	return t;
+}
+
+/*
  * touchtarget() - mark a target to simulate being new
  */
 
 void
-touchtarget( char *t )
+touchtarget( const char *t )
 {
 	bindtarget( t )->flags |= T_FLAG_TOUCHED;
 }
@@ -144,6 +173,32 @@ targetentry(
 }
 
 /*
+ * targetchain() - append two TARGET chains
+ *
+ * Inputs:
+ *	chain	exisitng TARGETS to append to
+ *	target	new target to append
+ */
+
+TARGETS *
+targetchain( 
+	TARGETS	*chain,
+	TARGETS	*targets )
+{
+	TARGETS *c;
+
+	if( !targets )
+	    return chain;
+	else if( !chain )
+	    return targets;
+
+	chain->tail->next = targets;
+	chain->tail = targets->tail;
+
+	return chain;
+}
+
+/*
  * actionlist() - append to an ACTION chain
  */
 
@@ -176,8 +231,8 @@ actionlist(
 SETTINGS *
 addsettings(
 	SETTINGS *head,
-	int	append,
-	char	*symbol,
+	int	setflag,
+	const char *symbol,
 	LIST	*value )
 {
 	SETTINGS *v;
@@ -200,17 +255,58 @@ addsettings(
 	    v->next = head;
 	    head = v;
 	}
-	else if( append )
+	else switch( setflag )
 	{
-	    v->value = list_append( v->value, value );
-	}
-	else
-	{
+	case VAR_SET:
+	    /* Toss old, set new */
 	    list_free( v->value );
 	    v->value = value;
-	} 
+	    break;
+
+	case VAR_APPEND:
+	    /* Append new to old */
+	    v->value = list_append( v->value, value );
+	    break;
+
+	case VAR_DEFAULT:
+	    /* Toss new, old already set */
+	    list_free( value );
+	    break;
+	}
 
 	/* Return (new) head of list. */
+
+	return head;
+}
+
+/*
+ * copysettings() - copy a settings list for temp use
+ *
+ * When target-specific variables are pushed into place with pushsettings(),
+ * any global variables with the same name are swapped onto the target's
+ * SETTINGS chain.  If that chain gets modified (by using the "on target"
+ * syntax), popsettings() would wrongly swap those modified values back 
+ * as the new global values.  
+ *
+ * copysettings() protects the target's SETTINGS chain by providing a
+ * copy of the chain to pass to pushsettings() and popsettings(), so that
+ * the target's original SETTINGS chain can be modified using the usual
+ * "on target" syntax.
+ */
+
+SETTINGS *
+copysettings( SETTINGS *from )
+{
+	SETTINGS *head = 0, *v;
+
+	for( ; from; from = from->next )
+	{
+	    SETTINGS *v = (SETTINGS *)malloc( sizeof( *v ) );
+	    v->symbol = copystr( from->symbol );
+	    v->value = list_copy( 0, from->value );
+	    v->next = head;
+	    head = v;
+	}
 
 	return head;
 }

@@ -4,13 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "execcmd.h"
-# include <errno.h>
-
-# ifdef OS_MAC
-
 /*
  * execunix.c - execute a shell script on UNIX
  *
@@ -38,7 +31,15 @@
  * 04/08/94 (seiwald) - Coherent/386 support added.
  * 05/04/94 (seiwald) - async multiprocess interface
  * 01/22/95 (seiwald) - $(JAMSHELL) support
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "execcmd.h"
+# include <errno.h>
+
+# ifdef OS_MAC
 
 /*
  * execcmd() - launch an async command execution

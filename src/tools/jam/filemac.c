@@ -3,17 +3,6 @@
  *
  * This file is part of Jam - see jam.c for Copyright information.
  */
- 
-# include "jam.h"
-# include "filesys.h"
-# include "pathsys.h"
-
-# ifdef OS_MAC
-
-#include <Files.h>
-#include <Folders.h>
-
-# include <:sys:stat.h>
 
 /*
  * filemac.c - manipulate file names and scan directories on macintosh
@@ -35,7 +24,21 @@
  * 02/14/95 (seiwald) - parse and build /xxx properly
  * 05/03/96 (seiwald) - split into pathunix.c
  * 11/21/96 (peterk) - BEOS does not have Unix-style archives
+ * 01/21/00 (malyn) - divorced from GUSI
+ * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+ 
+# include "jam.h"
+# include "filesys.h"
+# include "pathsys.h"
+
+# ifdef OS_MAC
+
+#include <Files.h>
+#include <Folders.h>
+
+# include <:sys:stat.h>
 
 void CopyC2PStr(const char * cstr, StringPtr pstr)
 {
@@ -53,7 +56,7 @@ void CopyC2PStr(const char * cstr, StringPtr pstr)
 
 void
 file_dirscan( 
-	char	*dir,
+	const char *dir,
 	scanback func,
 	void	*closure )
 {
@@ -135,7 +138,7 @@ file_dirscan(
 
 int
 file_time( 
-	char	*filename,
+	const char *filename,
 	time_t	*time )
 {
 	struct stat statbuf;
@@ -154,7 +157,7 @@ file_time(
 
 void
 file_archscan(
-	char 	*archive,
+	const char *archive,
 	scanback func,
 	void	*closure )
 {

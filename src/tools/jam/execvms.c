@@ -4,21 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "execcmd.h"
-
-# ifdef OS_VMS
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <iodef.h>
-#include <ssdef.h>
-#include <descrip.h>
-#include <dvidef.h>
-#include <clidef.h>
-
 /*
  * execvms.c - execute a shell script, ala VMS
  *
@@ -36,7 +21,23 @@
  * 05/04/94 (seiwald) - async multiprocess interface; noop on VMS
  * 12/20/96 (seiwald) - rewritten to handle multi-line commands well
  * 01/14/96 (seiwald) - don't put -'s between "'s
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "execcmd.h"
+
+# ifdef OS_VMS
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <iodef.h>
+#include <ssdef.h>
+#include <descrip.h>
+#include <dvidef.h>
+#include <clidef.h>
 
 #define WRTLEN 240
 

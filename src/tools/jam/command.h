@@ -51,7 +51,8 @@ CMD *cmd_new(
 	RULE	*rule,		/* rule (referenced) */
 	LIST	*targets,	/* $(<) (freed) */
 	LIST	*sources,	/* $(>) (freed) */
-	LIST	*shell );	/* $(SHELL) (freed) */
+	LIST	*shell,		/* $(SHELL) (freed) */
+	int	maxline );	/* max line length */
 
 void cmd_free( CMD *cmd );
 

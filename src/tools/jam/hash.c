@@ -4,9 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "hash.h"
-
 /* 
  * hash.c - simple in-memory hashing routines 
  *
@@ -21,15 +18,18 @@
  *     hashrehash() - resize and rebuild hp->tab, the hash table
  *
  * 4/29/93 - ensure ITEM's are aligned
+ * 11/04/02 (seiwald) - const-ing for string literals
+ * 01/31/02 (seiwald) - keyval now unsigned (cray-ziness)
  */
 
-char 	*hashsccssid="@(#)hash.c	1.14  ()  6/20/88";
+# include "jam.h"
+# include "hash.h"
 
 /* Header attached to all data items entered into a hash table. */
 
 struct hashhdr {
 	struct item *next;
-	int keyval;			/* for quick comparisons */
+	unsigned int keyval;		/* for quick comparisons */
 } ;
 
 /* This structure overlays the one handed to hashenter(). */
@@ -78,7 +78,7 @@ struct hash
 		} lists[ MAX_LISTS ];
 	} items;
 
-	char *name;	/* just for hashstats() */
+	const char *name;	/* just for hashstats() */
 } ;
 
 static void hashrehash( struct hash *hp );
@@ -96,8 +96,8 @@ hashitem(
 {
 	ITEM **base;
 	register ITEM *i;
-	char *b = (*data)->key;
-	int keyval;
+	unsigned char *b = (unsigned char *)(*data)->key;
+	unsigned int keyval;
 
 	if( enter && !hp->items.more )
 	    hashrehash( hp );
@@ -109,8 +109,6 @@ hashitem(
 
 	while( *b )
 		keyval = keyval * 2147059363 + *b++;
-
-	keyval &= 0x7FFFFFFF;
 
 	base = hp->tab.base + ( keyval % hp->tab.nel );
 
@@ -187,7 +185,7 @@ static void hashrehash( register struct hash *hp )
 struct hash *
 hashinit( 
 	int datalen,
-	char *name )
+	const char *name )
 {
 	struct hash *hp = (struct hash *)malloc( sizeof( *hp ) );
 

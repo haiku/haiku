@@ -4,17 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-
-# include "lists.h"
-# include "parse.h"
-# include "builtins.h"
-# include "rules.h"
-# include "filesys.h"
-# include "newstr.h"
-# include "regexp.h"
-# include "pathsys.h"
-
 /*
  * builtins.c - builtin jam rules
  *
@@ -32,7 +21,26 @@
  *	builtin_match() - MATCH rule
  *
  * 01/10/01 (seiwald) - split from compile.c
+ * 01/08/01 (seiwald) - new 'Glob' (file expansion) builtin
+ * 03/02/02 (seiwald) - new 'Match' (regexp match) builtin
+ * 04/03/02 (seiwald) - Glob matches only filename, not directory
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 10/22/02 (seiwald) - working return/break/continue statements
+ * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/03/02 (seiwald) - fix odd includes support by grafting them onto depends
+ * 01/14/03 (seiwald) - fix includes fix with new internal includes TARGET
  */
+
+# include "jam.h"
+
+# include "lists.h"
+# include "parse.h"
+# include "builtins.h"
+# include "rules.h"
+# include "filesys.h"
+# include "newstr.h"
+# include "regexp.h"
+# include "pathsys.h"
 
 /*
  * compile_builtin() - define builtin rules
@@ -41,14 +49,14 @@
 # define P0 (PARSE *)0
 # define C0 (char *)0
 
-LIST *builtin_depends( PARSE *parse, LOL *args );
-LIST *builtin_echo( PARSE *parse, LOL *args );
-LIST *builtin_exit( PARSE *parse, LOL *args );
-LIST *builtin_flags( PARSE *parse, LOL *args );
-LIST *builtin_glob( PARSE *parse, LOL *args );
-LIST *builtin_match( PARSE *parse, LOL *args );
+LIST *builtin_depends( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_echo( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_exit( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_flags( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_glob( PARSE *parse, LOL *args, int *jmp );
+LIST *builtin_match( PARSE *parse, LOL *args, int *jmp );
 
-int glob( char *s, char *c );
+int glob( const char *s, const char *c );
 
 void
 load_builtins()
@@ -59,7 +67,7 @@ load_builtins()
 
     bindrule( "Depends" )->procedure = 
     bindrule( "DEPENDS" )->procedure = 
-	parse_make( builtin_depends, P0, P0, P0, C0, C0, T_DEPS_DEPENDS );
+	parse_make( builtin_depends, P0, P0, P0, C0, C0, 0 );
 
     bindrule( "echo" )->procedure = 
     bindrule( "Echo" )->procedure = 
@@ -77,7 +85,7 @@ load_builtins()
 
     bindrule( "Includes" )->procedure = 
     bindrule( "INCLUDES" )->procedure = 
-	parse_make( builtin_depends, P0, P0, P0, C0, C0, T_DEPS_INCLUDES );
+	parse_make( builtin_depends, P0, P0, P0, C0, C0, 1 );
 
     bindrule( "Leaves" )->procedure = 
     bindrule( "LEAVES" )->procedure = 
@@ -116,17 +124,29 @@ load_builtins()
 LIST *
 builtin_depends(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	LIST *targets = lol_get( args, 0 );
 	LIST *sources = lol_get( args, 1 );
-	int which = parse->num;
 	LIST *l;
 
 	for( l = targets; l; l = list_next( l ) )
 	{
 	    TARGET *t = bindtarget( l->string );
-	    t->deps[ which ] = targetlist( t->deps[ which ], sources );
+
+	    /* If doing INCLUDES, switch to the TARGET's include */
+	    /* TARGET, creating it if needed.  The internal include */
+	    /* TARGET shares the name of its parent. */
+
+	    if( parse->num )
+	    {
+		if( !t->includes )
+		    t->includes = copytarget( t );
+		t = t->includes;
+	    }
+
+	    t->depends = targetlist( t->depends, sources );
 	}
 
 	return L0;
@@ -142,7 +162,8 @@ builtin_depends(
 LIST *
 builtin_echo(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	list_print( lol_get( args, 0 ) );
 	printf( "\n" );
@@ -159,7 +180,8 @@ builtin_echo(
 LIST *
 builtin_exit(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	list_print( lol_get( args, 0 ) );
 	printf( "\n" );
@@ -177,7 +199,8 @@ builtin_exit(
 LIST *
 builtin_flags(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	LIST *l = lol_get( args, 0 );
 
@@ -199,7 +222,7 @@ struct globbing {
 static void
 builtin_glob_back(
 	void	*closure,
-	char	*file,
+	const char *file,
 	int	status,
 	time_t	time )
 {
@@ -218,7 +241,7 @@ builtin_glob_back(
 	for( l = globbing->patterns; l; l = l->next )
 	    if( !glob( l->string, buf ) )
 	{
-	    globbing->results = list_new( globbing->results, newstr( file ) );
+	    globbing->results = list_new( globbing->results, file, 0 );
 	    break;
 	}
 }
@@ -226,7 +249,8 @@ builtin_glob_back(
 LIST *
 builtin_glob(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	LIST *l = lol_get( args, 0 );
 	LIST *r = lol_get( args, 1 );
@@ -249,7 +273,8 @@ builtin_glob(
 LIST *
 builtin_match(
 	PARSE	*parse,
-	LOL	*args )
+	LOL	*args,
+	int	*jmp )
 {
 	LIST *l, *r;
 	LIST *result = 0;
@@ -282,7 +307,7 @@ builtin_match(
 		    int l = re->endp[i] - re->startp[i];
 		    memcpy( buf, re->startp[i], l );
 		    buf[ l ] = 0;
-		    result = list_new( result, newstr( buf ) );
+		    result = list_new( result, buf, 0 );
 		}
 	    }
 

@@ -4,10 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "newstr.h"
-# include "lists.h"
-
 /*
  * lists.c - maintain lists of strings
  *
@@ -23,7 +19,14 @@
  *
  * 08/23/94 (seiwald) - new list_append()
  * 09/07/00 (seiwald) - documented lol_*() functions
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/09/02 (seiwald) - new list_printq() for writing lists to Jambase
  */
+
+# include "jam.h"
+# include "newstr.h"
+# include "lists.h"
 
 static LIST *freelist = 0;	/* junkpile for list_free() */
 
@@ -61,12 +64,17 @@ list_append(
 LIST *
 list_new( 
 	LIST	*head,
-	char	*string )
+	const char *string,
+	int	copy )
 {
 	LIST *l;
 
 	if( DEBUG_LISTS )
 	    printf( "list > %s <\n", string );
+
+	/* Copy/newstr as needed */
+
+	string = copy ? copystr( string ) : newstr( string );
 
 	/* Get list struct from freelist, if one available.  */
 	/* Otherwise allocate. */
@@ -107,7 +115,7 @@ list_copy(
 	LIST 	*nl )
 {
 	for( ; nl; nl = list_next( nl ) )
-	    l = list_new( l, copystr( nl->string ) );
+	    l = list_new( l, nl->string, 1 );
 
 	return l;
 }
@@ -128,7 +136,7 @@ list_sublist(
 	    ;
 
 	for( ; l && count--; l = list_next( l ) )
-	    nl = list_new( nl, copystr( l->string ) );
+	    nl = list_new( nl, l->string, 1 );
 
 	return nl;
 }
@@ -158,6 +166,44 @@ list_print( LIST *l )
 {
 	for( ; l; l = list_next( l ) )
 	    printf( "%s ", l->string );
+}
+
+/*
+ * list_printq() - print a list of safely quoted strings to a file
+ */
+
+void
+list_printq( FILE *out, LIST *l )
+{
+	/* Dump each word, enclosed in "s */
+	/* Suitable for Jambase use. */
+
+	for( ; l; l = list_next( l ) )
+	{
+	    const char *p = l->string;
+	    const char *ep = p + strlen( p );
+	    const char *op = p;
+
+	    fputc( '\n', out );
+	    fputc( '\t', out );
+	    fputc( '"', out );
+
+	    /* Any embedded "'s?  Escape them */
+
+	    while( p = (char *)memchr( op, '"',  ep - op ) )
+	    {
+		fwrite( op, p - op, 1, out );
+		fputc( '\\', out );
+		fputc( '"', out );
+		op = p + 1;
+	    }
+
+	    /* Write remainder */
+
+	    fwrite( op, ep - op, 1, out );
+	    fputc( '"', out );
+	    fputc( ' ', out );
+	}
 }
 
 /*

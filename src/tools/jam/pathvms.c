@@ -4,13 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "pathsys.h"
-
-# ifdef OS_VMS
-
-# define DEBUG
-
 /*
  * pathvms.c - manipulate file names on VMS
  *
@@ -29,7 +22,15 @@
  *
  * 02/09/95 (seiwald) - bungled R=[xxx] - was using directory length!
  * 05/03/96 (seiwald) - split from filevms.c
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "pathsys.h"
+
+# ifdef OS_VMS
+
+# define DEBUG
 
 /*
  * path_parse() - split a file name into dir/base/suffix/member
@@ -37,11 +38,11 @@
 
 void
 path_parse( 
-	char	*file,
+	const char *file,
 	PATHNAME *f )
 {
-	char *p, *q;
-	char *end;
+	const char *p, *q;
+	const char *end;
 	
 	memset( (char *)f, 0, sizeof( *f ) );
 
@@ -179,11 +180,11 @@ strnchr(
 
 static void
 dir_flags( 
-	char	*buf,
+	const char *buf,
 	int	len,
 	struct dirinf *i )
 {
-	char *p;
+	const char *p;
 
 	if( !buf || !len )
 	{
@@ -193,19 +194,19 @@ dir_flags(
 	    i->dev.len =
 	    i->dir.len = 0;
 	}
-	else if( p = strnchr( buf, ':', len ) )
+	else if( p = strnchr( (char *)buf, ':', len ) )
 	{
-	    i->dev.ptr = buf;
+	    i->dev.ptr = (char *)buf;
 	    i->dev.len = p + 1 - buf;
-	    i->dir.ptr = buf + i->dev.len;
+	    i->dir.ptr = (char *)buf + i->dev.len;
 	    i->dir.len = len - i->dev.len;
 	    i->flags = i->dir.len && *i->dir.ptr == '[' ? DIR_DEVDIR : DIR_DEV;
 	}
 	else
 	{
-	    i->dev.ptr = buf;
+	    i->dev.ptr = (char *)buf;
 	    i->dev.len = 0;
-	    i->dir.ptr = buf;
+	    i->dir.ptr = (char *)buf;
 	    i->dir.len = len;
 
 	    if( *buf == '[' && buf[1] == ']' )

@@ -6,11 +6,13 @@
 
 /*
  * hash.h - simple in-memory hashing routines 
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 typedef struct hashdata HASHDATA;
 
-struct hash *	hashinit( int datalen, char *name );
+struct hash *	hashinit( int datalen, const char *name );
 int 		hashitem( struct hash *hp, HASHDATA **data, int enter );
 void 		hashdone( struct hash *hp );
 

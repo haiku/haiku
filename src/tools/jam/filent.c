@@ -4,6 +4,30 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
+/*
+ * filent.c - scan directories and archives on NT
+ *
+ * External routines:
+ *
+ *	file_dirscan() - scan a directory for files
+ *	file_time() - get timestamp of file, if not done by file_dirscan()
+ *	file_archscan() - scan an archive for files
+ *
+ * File_dirscan() and file_archscan() call back a caller provided function
+ * for each file found.  A flag to this callback function lets file_dirscan()
+ * and file_archscan() indicate that a timestamp is being provided with the
+ * file.   If file_dirscan() or file_archscan() do not provide the file's
+ * timestamp, interested parties may later call file_time().
+ *
+ * 07/10/95 (taylor)  Findfirst() returns the first file on NT.
+ * 05/03/96 (seiwald) split apart into pathnt.c
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
+ * 10/03/00 (anton) - Porting for Borland C++ 5.5
+ * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
+ * 11/04/02 (seiwald) - const-ing for string literals
+ * 01/23/03 (seiwald) - long long handles for NT IA64
+ */
+
 # include "jam.h"
 # include "filesys.h"
 # include "pathsys.h"
@@ -23,38 +47,25 @@
 # include <sys/stat.h>
 
 /*
- * filent.c - scan directories and archives on NT
- *
- * External routines:
- *
- *	file_dirscan() - scan a directory for files
- *	file_time() - get timestamp of file, if not done by file_dirscan()
- *	file_archscan() - scan an archive for files
- *
- * File_dirscan() and file_archscan() call back a caller provided function
- * for each file found.  A flag to this callback function lets file_dirscan()
- * and file_archscan() indicate that a timestamp is being provided with the
- * file.   If file_dirscan() or file_archscan() do not provide the file's
- * timestamp, interested parties may later call file_time().
- *
- * 07/10/95 (taylor)  Findfirst() returns the first file on NT.
- * 05/03/96 (seiwald) split apart into pathnt.c
- */
-
-/*
  * file_dirscan() - scan a directory for files
  */
 
+# ifdef _M_IA64
+# define FINDTYPE long long
+# else
+# define FINDTYPE long
+# endif
+
 void
 file_dirscan( 
-	char *dir,
+	const char *dir,
 	scanback func,
 	void	*closure )
 {
 	PATHNAME f;
 	char filespec[ MAXJPATH ];
 	char filename[ MAXJPATH ];
-	long handle;
+	FINDTYPE handle;
 	int ret;
 	struct _finddata_t finfo[1];
 
@@ -102,7 +113,7 @@ file_dirscan(
 # else
 	handle = _findfirst( filespec, finfo );
 
-	if( ret = ( handle < 0L ) )
+	if( ret = ( handle == (FINDTYPE)(-1) ) )
 	    return;
 
 	while( !ret )
@@ -128,7 +139,7 @@ file_dirscan(
 
 int
 file_time(
-	char	*filename,
+	const char *filename,
 	time_t	*time )
 {
 	/* On NT this is called only for C:/ */
@@ -169,7 +180,7 @@ struct ar_hdr {
 
 void
 file_archscan(
-	char *archive,
+	const char *archive,
 	scanback func,
 	void	*closure )
 {

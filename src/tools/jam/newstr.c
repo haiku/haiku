@@ -4,10 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "newstr.h"
-# include "hash.h"
-
 /*
  * newstr.c - string manipulation routines
  *
@@ -26,9 +22,15 @@
  * This implementation builds a hash table of all strings, so that multiple 
  * calls of newstr() on the same string allocate memory for the string once.
  * Strings are never actually freed.
+ *
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
-typedef char *STRING;
+# include "jam.h"
+# include "newstr.h"
+# include "hash.h"
+
+typedef const char *STRING;
 
 static struct hash *strhash = 0;
 static int strtotal = 0;
@@ -37,8 +39,8 @@ static int strtotal = 0;
  * newstr() - return a malloc'ed copy of a string
  */
 
-char *
-newstr( char *string )
+const char *
+newstr( const char *string )
 {
 	STRING str, *s = &str;
 
@@ -67,8 +69,8 @@ newstr( char *string )
  * copystr() - return a copy of a string previously returned by newstr()
  */
 
-char *
-copystr( char *s )
+const char *
+copystr( const char *s )
 {
 	return s;
 }
@@ -78,7 +80,7 @@ copystr( char *s )
  */
 
 void
-freestr( char *s )
+freestr( const char *s )
 {
 }
 

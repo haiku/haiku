@@ -4,12 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "filesys.h"
-# include "pathsys.h"
-
-# ifdef OS_VMS
-
 /*
  * filevms.c - scan directories and libaries on VMS
  *
@@ -27,7 +21,16 @@
  *
  * 02/09/95 (seiwald) - bungled R=[xxx] - was using directory length!
  * 05/03/96 (seiwald) - split into pathvms.c
+ * 01/08/01 (seiwald) - closure param for file_dirscan/file_archscan
+ * 03/23/01 (seiwald) - VMS C++ changes.
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "filesys.h"
+# include "pathsys.h"
+
+# ifdef OS_VMS
 
 # include <rms.h>
 # include <iodef.h>
@@ -99,7 +102,7 @@ file_cvttime(
 
 void
 file_dirscan( 
-	char *dir,
+	const char *dir,
 	scanback func,
 	void	*closure )
 {
@@ -135,7 +138,7 @@ file_dirscan(
     xfab.fab$l_dna = DEFAULT_FILE_SPECIFICATION;
     xfab.fab$b_dns = sizeof( DEFAULT_FILE_SPECIFICATION ) - 1;
     xfab.fab$l_fop = FAB$M_NAM;
-    xfab.fab$l_fna = dir;			/* address of file name	    */
+    xfab.fab$l_fna = (char *)dir;		/* address of file name	    */
     xfab.fab$b_fns = strlen( dir );		/* length of file name	    */
     xfab.fab$l_nam = &xnam;			/* address of NAB block	    */
     xfab.fab$l_xab = (char *)&xab;       /* address of XAB block     */
@@ -224,7 +227,7 @@ file_dirscan(
 
 int
 file_time(
-	char	*filename,
+	const char *filename,
 	time_t	*time )
 {
 	/* This should never be called, as all files are */
@@ -281,7 +284,7 @@ file_archmember(
 
 void
 file_archscan(
-	char *archive,
+	const char *archive,
 	scanback func,
 	void	*closure )
 {
@@ -294,7 +297,7 @@ file_archscan(
 
     register int status;
 
-    VMS_archive = archive;
+    VMS_archive = (char *)archive;
     VMS_func = func;
     VMS_closure = closure;
 
@@ -302,7 +305,7 @@ file_archscan(
     if ( !( status & 1 ) )
 	return;
 
-    library.dsc$a_pointer = archive;
+    library.dsc$a_pointer = (char *)archive;
     library.dsc$w_length = strlen( archive );
 
     status = lbr$open( &context, &library, NULL, NULL, NULL, NULL, NULL );

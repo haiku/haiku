@@ -4,13 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "variable.h"
-# include "expand.h"
-# include "pathsys.h"
-# include "newstr.h"
-
 /*
  * expand.c - expand a buffer, given variable values
  *
@@ -26,8 +19,22 @@
  *
  * 01/25/94 (seiwald) - $(X)$(UNDEF) was expanding like plain $(X)
  * 04/13/94 (seiwald) - added shorthand L0 for null list pointer
+ * 01/20/00 (seiwald) - Upgraded from K&R to ANSI C
  * 01/11/01 (seiwald) - added support for :E=emptyvalue, :J=joinval
+ * 01/13/01 (seiwald) - :UDJE work on non-filename strings
+ * 02/19/01 (seiwald) - make $($(var):J=x) join multiple values of var
+ * 01/25/02 (seiwald) - fixed broken $(v[1-]), by ian godin
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/30/02 (armstrong) - fix out-of-bounds access in var_expand()
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "variable.h"
+# include "expand.h"
+# include "pathsys.h"
+# include "newstr.h"
 
 typedef struct {
 	PATHNAME	f;		/* :GDBSMR -- pieces */
@@ -39,8 +46,8 @@ typedef struct {
 	PATHPART	join;		/* :J -- join list with char */
 } VAR_EDITS ;
 
-static void var_edit_parse( char *mods, VAR_EDITS *edits );
-static void var_edit_file( char *in, char *out, VAR_EDITS *edits );
+static void var_edit_parse( const char *mods, VAR_EDITS *edits );
+static void var_edit_file( const char *in, char *out, VAR_EDITS *edits );
 static void var_edit_shift( char *out, VAR_EDITS *edits );
 
 # define MAGIC_COLON	'\001'
@@ -61,15 +68,15 @@ static void var_edit_shift( char *out, VAR_EDITS *edits );
 
 LIST *
 var_expand( 
-	LIST	*l,
-	char	*in,
-	char	*end,
-	LOL	*lol,
-	int	cancopyin )
+	LIST		*l,
+	const char 	*in,
+	const char 	*end,
+	LOL		*lol,
+	int		cancopyin )
 {
 	char out_buf[ MAXSYM ];
 	char *out = out_buf;
-	char *inp = in;
+	const char *inp = in;
 	char *ov;		/* for temp copy of variable in outbuf */
 	int depth;
 
@@ -78,7 +85,7 @@ var_expand(
 
 	/* This gets alot of cases: $(<) and $(>) */
 
-	if( in[0] == '$' && in[1] == '(' && in[3] == ')' && !in[4] )
+	if( end - in == 4 && in[0] == '$' && in[1] == '(' && in[3] == ')' )
 	{
 	    switch( in[2] )
 	    {
@@ -107,9 +114,9 @@ var_expand(
 	*out = '\0';
 
 	if( cancopyin )
-	    return list_new( l, copystr( inp ) );
+	    return list_new( l, inp, 1 );
 	else
-	    return list_new( l, newstr( out_buf ) );
+	    return list_new( l, out_buf, 0 );
 
     expand:
 	/*
@@ -258,7 +265,7 @@ var_expand(
 		/* Empty w/ :E=default? */
 
 		if( !value && colon && edits.empty.ptr )
-		    evalue = value = list_new( L0, newstr( edits.empty.ptr ) );
+		    evalue = value = list_new( L0, edits.empty.ptr, 0 );
 
 		/* For each variable value */
 
@@ -300,7 +307,7 @@ var_expand(
 
 		    if( in == end )
 		    {
-			l = list_new( l, newstr( out_buf ) );
+			l = list_new( l, out_buf, 0 );
 			continue;
 		    }
 
@@ -314,7 +321,7 @@ var_expand(
 		    for( rem = remainder; rem; rem = list_next( rem ) )
 		    {
 			strcpy( out1, rem->string );
-			l = list_new( l, newstr( out_buf ) );
+			l = list_new( l, out_buf, 0 );
 		    }
 		}
 
@@ -380,7 +387,7 @@ var_expand(
 
 static void
 var_edit_parse(
-	char		*mods,
+	const char	*mods,
 	VAR_EDITS	*edits )
 {
 	int havezeroed = 0;
@@ -463,7 +470,7 @@ var_edit_parse(
 	
 static void
 var_edit_file( 
-	char	*in,
+	const char *in,
 	char	*out,
 	VAR_EDITS *edits )
 {
