@@ -373,6 +373,9 @@ void BStatusBar::Update(float delta, const char *text, const char *trailingText)
 {
 	fCurrent += delta;
 
+	if (fCurrent > fMax)
+		fCurrent = fMax;
+
 	if (fText)
 		free(fText);
 

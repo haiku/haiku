@@ -569,7 +569,10 @@ BRect BTabView::DrawTabs()
 			(i == fSelection) ? B_TAB_FRONT : (i == 0) ? B_TAB_FIRST : B_TAB_ANY,
 			(i + 1 != fSelection));
 
-	return TabFrame(fSelection);
+	if (fSelection > -1)
+		return TabFrame(fSelection);
+	else
+		return BRect();
 }
 //------------------------------------------------------------------------------
 void BTabView::DrawBox(BRect selTabRect)

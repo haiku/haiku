@@ -62,7 +62,7 @@ BButton::BButton(BMessage *archive)
 //------------------------------------------------------------------------------
 BArchivable *BButton::Instantiate ( BMessage *archive )
 {
-	if ( validate_instantiation(archive, "BButton"))
+	if (validate_instantiation(archive, "BButton"))
 		return new BButton(archive);
 	else
 		return NULL;
@@ -274,7 +274,7 @@ void BButton::AttachedToWindow()
 	BControl::AttachedToWindow();
 
 	if (IsDefault())
-		Window()->SetDefaultButton((BButton*)this);
+		Window()->SetDefaultButton(this);
 }
 //------------------------------------------------------------------------------
 void BButton::KeyDown ( const char *bytes, int32 numBytes )
@@ -306,23 +306,22 @@ void BButton::MakeDefault(bool flag)
 	
 	fDrawAsDefault = flag;
 	BWindow *window = Window();
-	
-	if (window)
-	{
-		BButton *button = (BButton*)(window->DefaultButton());
 		
-		if (flag)
-		{
-			ResizeBy(6.0f, 6.0f);
-			MoveBy(-3.0f, -3.0f);
+	if (flag)
+	{
+		ResizeBy(6.0f, 6.0f);
+		MoveBy(-3.0f, -3.0f);
+
+		if (window)
 			window->SetDefaultButton((BButton*)this);
-		}
-		else
-		{
-			ResizeBy(-6.0f, -6.0f);
-			MoveBy(3.0f, 3.0f);
+	}
+	else
+	{
+		ResizeBy(-6.0f, -6.0f);
+		MoveBy(3.0f, 3.0f);
+		
+		if (window)
 			window->SetDefaultButton(NULL);
-		}
 	}
 }
 //------------------------------------------------------------------------------
@@ -397,6 +396,12 @@ void BButton::GetPreferredSize (float *width, float *height)
 	
 	if (*width < 75.0f)
 		*width = 75.0f;
+
+	if (fDrawAsDefault)
+	{
+		*width += 6.0f;
+		*height += 6.0f;
+	}
 }
 //------------------------------------------------------------------------------
 void BButton::ResizeToPreferred()

@@ -301,25 +301,6 @@ void BControl::KeyDown(const char *bytes, int32 numBytes)
 	{
 		switch (bytes[0])
 		{
-			case B_UP_ARROW:
-				message->ReplaceInt64("when", (int64)system_time());
-				message->ReplaceInt32("key", 38);
-				message->ReplaceInt32("raw_char", B_TAB);
-				message->ReplaceInt32("modifiers", B_SCROLL_LOCK | B_SHIFT_KEY);
-				message->ReplaceInt8("byte", B_TAB);
-				message->ReplaceString("bytes", "");
-				Looper()->PostMessage(message);
-				break;
-
-			case B_DOWN_ARROW:
-				message->ReplaceInt64("when", (int64)system_time());
-				message->ReplaceInt32("key", 38);
-				message->ReplaceInt32("raw_char", B_TAB);
-				message->ReplaceInt8("byte", B_TAB);
-				message->ReplaceString("bytes", "");
-				Looper()->PostMessage(message);
-				break;
-
 			case B_ENTER:
 			case B_SPACE:
 				if (Value())
