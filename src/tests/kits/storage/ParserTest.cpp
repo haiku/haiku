@@ -5,7 +5,7 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCaller.h>
 #include <sniffer/Parser.h>
-#include <MimeType.h>
+#include <Mime.h>
 #include <String.h>		// BString
 #include <TestUtils.h>
 
