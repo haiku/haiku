@@ -11,6 +11,7 @@
 //  Description: VolumeControl and link items in Deskbar
 //  Created :    October 20, 2003
 //	Modified by: Jérome Duval
+//      Modified by: François Revol, 10/31/2003
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -28,6 +29,9 @@
 #include <strings.h>
 #include <List.h>
 #include <String.h>
+#include <Debug.h>
+#include <FindDirectory.h>
+#include <Path.h>
 #include "VolumeSlider.h"
 #include "DeskButton.h"
 #include "iconfile.h"
@@ -35,6 +39,10 @@
 #define MEDIA_SETTINGS 'mese'
 #define SOUND_SETTINGS 'sose'
 #define OPEN_MEDIA_PLAYER 'omep'
+#define TOGGLE_DONT_BEEP 'tdbp'
+#define SET_VOLUME_WHICH 'svwh'
+
+#define SETTINGS_FILE "x-vnd.OBOS.DeskbarVolumeControlSettings"
 
 const char *app_signature = "application/x-vnd.be.desklink";
 // the application signature used by the replicant to find the supporting
@@ -66,8 +74,12 @@ public:
 
 	virtual void MessageReceived(BMessage *);
 private:
+	void LoadSettings();
+	void SaveSettings();
 	BBitmap *		segments;
 	VolumeSlider	*volumeSlider;
+	bool confDontBeep; /* don't beep on volume change */
+	int32 confVolumeWhich; /* which volume parameter to act on (Mixer/Phys.Output) */
 };
 
 //
@@ -100,6 +112,7 @@ VCButton::VCButton(BRect frame, const char *name,
 	BDragger *dragger = new BDragger(rect, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(dragger);
 	dragger->SetViewColor(B_TRANSPARENT_32_BIT);
+	LoadSettings();
 }
 
 
@@ -110,12 +123,14 @@ VCButton::VCButton(BMessage *message)
 	// Background Bitmap
 	segments = new BBitmap(BRect(0, 0, 16 - 1, 16 - 1), B_COLOR_8_BIT);
 	segments->SetBits(kSpeakerBits, 16*16, 0, B_COLOR_8_BIT);
+	LoadSettings();
 }
 
 
 VCButton::~VCButton()
 {
 	delete segments;
+	SaveSettings();
 }
 
 
@@ -143,26 +158,32 @@ void
 VCButton::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case B_ABOUT_REQUESTED:
-			(new BAlert("About Volume Control", "Volume Control (Replicant)\n"
-				"  Brought to you by Jérôme DUVAL.\n\n"
-				"OpenBeOS, 2003","OK"))->Go();
+	case B_ABOUT_REQUESTED:
+		(new BAlert("About Volume Control", "Volume Control (Replicant)\n"
+			    "  Brought to you by Jérôme DUVAL.\n\n"
+			    "OpenBeOS, 2003","OK"))->Go();
+		break;
+	case OPEN_MEDIA_PLAYER:
+		// launch the media player app
+		be_roster->Launch("application/x-vnd.Be.MediaPlayer");
 			break;
-		case OPEN_MEDIA_PLAYER:
-			// launch the media player app
-			be_roster->Launch("application/x-vnd.Be.MediaPlayer");
-			break;
-		case MEDIA_SETTINGS:
-			// launch the media prefs app
-			be_roster->Launch("application/x-vnd.Be.MediaPrefs");
-			break;
-		case SOUND_SETTINGS:
-			// launch the sounds prefs app
-			be_roster->Launch("application/x-vnd.Be.SoundsPrefs");
-			break;
-		default:
-			BView::MessageReceived(message);
-			break;		
+	case MEDIA_SETTINGS:
+		// launch the media prefs app
+		be_roster->Launch("application/x-vnd.Be.MediaPrefs");
+		break;
+	case SOUND_SETTINGS:
+		// launch the sounds prefs app
+		be_roster->Launch("application/x-vnd.Be.SoundsPrefs");
+		break;
+	case TOGGLE_DONT_BEEP:
+		confDontBeep = !confDontBeep;
+		break;
+	case SET_VOLUME_WHICH:
+		message->FindInt32("volwhich", &confVolumeWhich);
+		break;
+	default:
+		BView::MessageReceived(message);
+		break;		
 	}
 }
 
@@ -193,13 +214,32 @@ VCButton::MouseDown(BPoint point)
 		menu->AddItem(new BMenuItem("Sound Settings...", new BMessage(SOUND_SETTINGS)));
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem("Open MediaPlayer", new BMessage(OPEN_MEDIA_PLAYER)));
+		menu->AddSeparatorItem();
+		BMenuItem *tmpItem = new BMenuItem("Dont beep", new BMessage(TOGGLE_DONT_BEEP));
+		menu->AddItem(tmpItem);
+		tmpItem->SetMarked(confDontBeep);
+		BMenu *volMenu = new BMenu("Act On");
+		volMenu->SetFont(be_plain_font);
+		BMessage *msg;
+		msg = new BMessage(SET_VOLUME_WHICH);
+		msg->AddInt32("volwhich", VOLUME_USE_MIXER);
+		tmpItem = new BMenuItem("System Mixer", msg);
+		tmpItem->SetMarked(confVolumeWhich == VOLUME_USE_MIXER);
+		volMenu->AddItem(tmpItem);
+		msg = new BMessage(SET_VOLUME_WHICH);
+		msg->AddInt32("volwhich", VOLUME_USE_PHYS_OUTPUT);
+		tmpItem = new BMenuItem("Physical Output", msg);
+		volMenu->AddItem(tmpItem);
+		tmpItem->SetMarked(confVolumeWhich == VOLUME_USE_PHYS_OUTPUT);
+		menu->AddItem(volMenu);
 		
 		menu->SetTargetForItems(this);
+		volMenu->SetTargetForItems(this);
 		menu->Go(where, true, true, BRect(where - BPoint(4, 4), 
 			where + BPoint(4, 4)));
 	} else if (mouseButtons & B_PRIMARY_MOUSE_BUTTON) {
 		// Show VolumeSlider
-		volumeSlider = new VolumeSlider(BRect(where.x,where.y,where.x+207,where.y+19));
+		volumeSlider = new VolumeSlider(BRect(where.x,where.y,where.x+207,where.y+19), confDontBeep, confVolumeWhich);
 		volumeSlider->Show();
 	}
 }
@@ -211,7 +251,40 @@ VCButton::MouseUp(BPoint point)
 	/* don't Quit() ! thanks for FFM users */
 }
 
+void VCButton::LoadSettings()
+{
+	confDontBeep = false;
+	confVolumeWhich = VOLUME_USE_MIXER;
+	BPath p;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &p, false) < B_OK)
+		return;
+	p.SetTo(p.Path(), SETTINGS_FILE);
+	BFile settings(p.Path(), B_READ_ONLY);
+	if (settings.InitCheck() < B_OK)
+		return;
+	BMessage msg;
+	if (msg.Unflatten(&settings) < B_OK)
+		return;
+	msg.FindInt32("volwhich", &confVolumeWhich);
+	msg.FindBool("dontbeep", &confDontBeep);
+}
 
+void VCButton::SaveSettings()
+{
+	BPath p;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &p, false) < B_OK)
+		return;
+	p.SetTo(p.Path(), SETTINGS_FILE);
+	BFile settings(p.Path(), B_WRITE_ONLY|B_CREATE_FILE|B_ERASE_FILE);
+	if (settings.InitCheck() < B_OK)
+		return;
+	BMessage msg('CNFG');
+	msg.AddInt32("volwhich", confVolumeWhich);
+	msg.AddBool("dontbeep", confDontBeep);
+	ssize_t len=0;
+	if (msg.Flatten(&settings, &len) < B_OK)
+		return;
+}
 
 
 int

@@ -11,6 +11,7 @@
 //  Description: VolumeControl and link items in Deskbar
 //  Created :    October 20, 2003
 //	Modified by: Jérome Duval
+//      Modified by: François Revol, 10/31/2003
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -29,7 +30,7 @@
 #define VOLUME_CHANGED 'vlcg'
 #define VOLUME_UPDATED 'vlud'
 
-VolumeSlider::VolumeSlider(BRect frame)
+VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
 	: BWindow(frame, "VolumeSlider", B_BORDERED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_WILL_ACCEPT_FIRST_CLICK, 0),
 	aOutNode(NULL),
 	paramWeb(NULL),
@@ -50,6 +51,7 @@ VolumeSlider::VolumeSlider(BRect frame)
 
 	float value = 0.0;
 	bool retrying = false;
+	this->dontBeep = dontBeep;
 	
 	aOutNode = new media_node();
 
@@ -75,16 +77,51 @@ VolumeSlider::VolumeSlider(BRect frame)
 	}
 	
 	if (roster && (err==B_OK)) {
-		//if((err = roster->GetAudioOutput(aOutNode)) == B_OK) {
-		if((err = roster->GetAudioMixer(aOutNode)) == B_OK) {
+		switch (volumeWhich) {
+		case VOLUME_USE_MIXER:
+			err = roster->GetAudioMixer(aOutNode);
+			break;
+		case VOLUME_USE_PHYS_OUTPUT:
+			err = roster->GetAudioOutput(aOutNode);
+			break;
+		}
+		if(err == B_OK) {
 			if((err = roster->GetParameterWebFor(*aOutNode, &paramWeb)) == B_OK) {
 			
 				//Finding the Mixer slider in the audio output ParameterWeb 
 				int32 numParams = paramWeb->CountParameters();
 				BParameter* p = NULL;
+				bool foundMixerLabel = false;
 				for (int i = 0; i < numParams; i++) {
 					p = paramWeb->ParameterAt(i);
 					PRINT(("BParameter[%i]: %s\n", i, p->Name()));
+					if (volumeWhich == VOLUME_USE_MIXER) {
+						if (!strcmp(p->Kind(), B_MASTER_GAIN))
+							break;
+					} else if (volumeWhich == VOLUME_USE_PHYS_OUTPUT) {
+						/* not all cards use the same name, and
+						 * they don't seem to use Kind() == B_MASTER_GAIN
+						 */
+						if (!strcmp(p->Kind(), B_MASTER_GAIN))
+							break;
+						PRINT(("not MASTER_GAIN \n"));
+						
+						/* some audio card
+						 */
+						if (!strcmp(p->Name(), "Master"))
+							break;
+						PRINT(("not 'Master' \n"));
+						
+						/* some Ensonic card have all controls names 'Volume', so
+						 * need to fint the one that has the 'Mixer' text label
+						 */
+						if (foundMixerLabel && !strcmp(p->Name(), "Volume"))
+							break;
+						if (!strcmp(p->Name(), "Mixer"))
+							foundMixerLabel = true;
+						PRINT(("not 'Mixer' \n"));
+					}
+#if 0
 					//if (!strcmp(p->Name(), "Master")) {
 					if (!strcmp(p->Kind(), B_MASTER_GAIN)) {
 						for (; i < numParams; i++) {
@@ -94,6 +131,8 @@ VolumeSlider::VolumeSlider(BRect frame)
 						}
 						break;
 					} else p = NULL;
+#endif
+					p = NULL;
 				}
 				if (p==NULL) {
 					errString = "Could not find the mixer";
@@ -112,7 +151,7 @@ VolumeSlider::VolumeSlider(BRect frame)
 					
 					mixerParam->GetValue( &chanData, &size, &lastChange );
 					
-					value = (chanData[0]-min)*100/(max-min);
+					value = (chanData[0]-min)*100/((max-min)?(max-min):1);
 				}
 			} else {
 				errString = "No parameter web";
@@ -143,6 +182,8 @@ VolumeSlider::VolumeSlider(BRect frame)
 	AddChild(box);
 
 	hasChanged = false; /* make sure we don't beep if we don't change anything */
+	if (mixerParam == NULL)
+		value = -1;
 	slider = new SliderView(box->Bounds().InsetByCopy(1, 1), new BMessage(VOLUME_CHANGED), 
 		(errString==NULL) ? "Volume" : errString, B_FOLLOW_LEFT | B_FOLLOW_TOP, value);
 	box->AddChild(slider);
@@ -181,7 +222,8 @@ VolumeSlider::MessageReceived(BMessage *msg)
 		if (hasChanged) {
 			PRINT(("VOLUME_CHANGED\n"));
 			UpdateVolume(mixerParam);
-			beep();
+			if (!dontBeep)
+				beep();
 		}
 		Quit();
 		break;
@@ -267,7 +309,7 @@ SliderView::Draw(BRect updateRect)
 	DrawBitmapAsync(&leftBitmap, BPoint(5,1));
 	DrawBitmapAsync(&rightBitmap, BPoint(193,1));
 
-	float position = 11 + (192-11) * Value() / 100;
+	float position = 11 + (192-11) * ((Value()==-1)?0:Value()) / 100;
 	float right = (position < REDZONESTART) ? position : REDZONESTART;
 	SetHighColor(99,151,99);
 	FillRect(BRect(11,3,right,4));
@@ -312,7 +354,7 @@ SliderView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 		SetTracking(false);
 	}
 		
-	if (!Bounds().InsetBySelf(2,2).Contains(point))
+	if ((Value() == -1) || !Bounds().InsetBySelf(2,2).Contains(point))
 		return;
 
 	float v = MIN(MAX(point.x, 11), 192);
@@ -331,7 +373,7 @@ SliderView::MouseUp(BPoint point)
 {
 	if (!IsTracking())
 		return;
-	if (Bounds().InsetBySelf(2,2).Contains(point)) {
+	if ((Value() != -1) && Bounds().InsetBySelf(2,2).Contains(point)) {
 		float v = MIN(MAX(point.x, 11), 192);
 		v = (v - 11) / (192-11) * 100;
 		v = MAX(MIN(v,100), 0);

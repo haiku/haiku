@@ -11,6 +11,7 @@
 //  Description: VolumeControl and link items in Deskbar
 //  Created :    October 20, 2003
 //	Modified by: Jérome Duval
+//      Modified by: François Revol, 10/31/2003
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 #ifndef VOLUMESLIDER_H
@@ -20,6 +21,9 @@
 #include <Control.h>
 #include <Bitmap.h>
 #include <ParameterWeb.h>
+
+#define VOLUME_USE_MIXER 0 /* default */
+#define VOLUME_USE_PHYS_OUTPUT 1
 
 class SliderView : public BControl
 {
@@ -38,7 +42,7 @@ private:
 class VolumeSlider : public BWindow
 {
 public:
-	VolumeSlider(BRect frame);
+	VolumeSlider(BRect frame, bool dontBeep=false, int32 volumeWhich=0);
 	~VolumeSlider();
 
 	void MessageReceived(BMessage*);
@@ -50,6 +54,7 @@ private:
 	BContinuousParameter* mixerParam;
 	float min, max, step;
 	bool hasChanged;
+	bool dontBeep;
 	SliderView *slider;
 };
 
