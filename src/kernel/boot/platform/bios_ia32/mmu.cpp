@@ -38,7 +38,7 @@
 
 //#define TRACE_MMU
 #ifdef TRACE_MMU
-#	define TRACE(x) printf x
+#	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif

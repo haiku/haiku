@@ -8,19 +8,20 @@ UsePrivateHeaders [ FDirName storage ] ;
 SubDirC++Flags -fno-rtti ;
 
 KernelMergeObject boot_platform_bios_ia32.o :
-	<$(SOURCE_GRIST)>shell.S
-	<$(SOURCE_GRIST)>start.c
-	<$(SOURCE_GRIST)>debug.c
-	<$(SOURCE_GRIST)>bios.S
-	<$(SOURCE_GRIST)>console.cpp
-	<$(SOURCE_GRIST)>devices.cpp
-	<$(SOURCE_GRIST)>keyboard.cpp
-	<$(SOURCE_GRIST)>menu.cpp
-	<$(SOURCE_GRIST)>mmu.cpp
-	<$(SOURCE_GRIST)>cpu.cpp
-	<$(SOURCE_GRIST)>smp_boot.c
-	<$(SOURCE_GRIST)>smp_trampoline.S
-	<$(SOURCE_GRIST)>support.S
-	<$(SOURCE_GRIST)>video.cpp
+	shell.S
+	start.c
+	debug.c
+	bios.S
+	console.cpp
+	serial.cpp
+	devices.cpp
+	keyboard.cpp
+	menu.cpp
+	mmu.cpp
+	cpu.cpp
+	smp_boot.c
+	smp_trampoline.S
+	support.S
+	video.cpp
 	: -fno-pic
 	;

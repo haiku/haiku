@@ -468,12 +468,9 @@ void
 platform_run_menu(Menu *menu)
 {
 	platform_switch_to_text_mode();
-	serial_disable();
-		// no serial output while we're playing on the console
 
 	run_menu(menu);
 
-	serial_enable();
 	platform_switch_to_logo();
 }
 

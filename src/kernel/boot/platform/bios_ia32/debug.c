@@ -1,8 +1,10 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
+
+#include "serial.h"
 
 #include <boot/platform.h>
 #include <boot/stdio.h>
@@ -34,10 +36,17 @@ panic(const char *format, ...)
 void
 dprintf(const char *format, ...)
 {
+	char buffer[512];
 	va_list list;
+	int length;
 
 	va_start(list, format);
-	vprintf(format, list);
+	length = vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
+
+	serial_puts(buffer, length);
+
+	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
+		fprintf(stderr, "%s", buffer);
 }
 

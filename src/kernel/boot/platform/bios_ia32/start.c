@@ -4,6 +4,7 @@
 */
 
 
+#include "serial.h"
 #include "console.h"
 #include "cpu.h"
 #include "mmu.h"
@@ -113,6 +114,7 @@ _start(void)
 
 	args.heap_size = HEAP_SIZE;
 
+	serial_init();
 	console_init();
 	cpu_init();
 	mmu_init();
