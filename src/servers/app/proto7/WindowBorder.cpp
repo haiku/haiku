@@ -175,12 +175,11 @@ void WindowBorder::MouseMoved(BPoint pt, int32 buttons, int32 modifiers)
 			// SlideTab returns how much things were moved, and currently
 			// supports just the x direction, so get the value so
 			// we can invalidate the proper area.
-			decor->SlideTab(dx,0);
-			BRegion r(frame),*footprint=decor->GetFootprint();
-			parent->Invalidate(footprint->Frame());
+			layerlock->Lock();
+			parent->Invalidate(decor->SlideTab(dx,0));
 			parent->RequestDraw();
 			decor->DrawTab();
-			delete footprint;
+			layerlock->Unlock();
 		}
 	}
 	if(is_moving_window)
