@@ -35,8 +35,9 @@
 #define PAINTERDRIVER 5
 
 // Display driver to be used by the server.
-#define DISPLAYDRIVER PAINTERDRIVER
-//#define DISPLAYDRIVER VIEWDRIVER
+#ifndef DISPLAYDRIVER
+#	define DISPLAYDRIVER PAINTERDRIVER
+#endif
 
 // Uncomment this if the DisplayDriver should only rely on drawing functions implemented
 // in software even though hardware-accelerated functions are available
