@@ -33,6 +33,7 @@ typedef long long           ino_t;
 typedef int                 cnt_t;
 typedef long                dev_t;
 typedef long		        pid_t;
+typedef long				id_t;
 
 typedef unsigned int 		uid_t;
 typedef unsigned int 		gid_t;
