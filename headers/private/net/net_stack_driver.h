@@ -22,11 +22,11 @@ enum {
 	NET_STACK_SOCKET = NET_STACK_IOCTL_BASE,	// socket_args *
 	NET_STACK_BIND,								// sockaddr_args *
 	NET_STACK_RECVFROM,							// struct msghdr *
-	NET_STACK_RECV,								// data_xfer_args *
+	NET_STACK_RECV,								// transfer_args *
 	NET_STACK_SENDTO,							// struct msghdr *
-	NET_STACK_SEND,								// data_xfer_args *
+	NET_STACK_SEND,								// transfer_args *
 	NET_STACK_LISTEN,							// int_args * (value = backlog)
-	NET_STACK_ACCEPT,							// accept_args *
+	NET_STACK_ACCEPT,							// sockaddr_args *
 	NET_STACK_CONNECT,							// sockaddr_args *
 	NET_STACK_SHUTDOWN,							// int_args * (value = how)
 	NET_STACK_GETSOCKOPT,						// sockopt_args *
@@ -37,7 +37,7 @@ enum {
 	NET_STACK_SYSCTL,							// sysctl_args *
 	NET_STACK_SELECT,							// select_args *
 	NET_STACK_DESELECT,							// select_args *
-	NET_STACK_GET_COOKIE,						// void **
+	NET_STACK_ASSOCIATE_SOCKET,					// associate_args *
 	
 	NET_STACK_STOP,
 	
@@ -50,7 +50,7 @@ struct int_args {	// used by NET_STACK_LISTEN/_SHUTDOWN
 	int value;
 };
 
-struct sockaddr_args {	// used by NET_STACK_CONNECT/_BIND/_GETSOCKNAME/_GETPEERNAME
+struct sockaddr_args {	// used by NET_STACK_CONNECT/_BIND/_ACCEPT/_GETSOCKNAME/_GETPEERNAME
 	struct sockaddr *addr;
 	int addrlen;
 };
@@ -62,7 +62,7 @@ struct sockopt_args {	// used by NET_STACK_SETSOCKOPT/_GETSOCKOPT
 	int   	optlen;
 };
 
-struct data_xfer_args {	// used by NET_STACK_SEND/_RECV
+struct xfer_args {	// used by NET_STACK_SEND/_RECV
 	void *data;
 	size_t datalen;
 	int flags;
@@ -76,14 +76,8 @@ struct socket_args {	// used by NET_STACK_SOCKET
 	int proto;
 };
 
-struct getcookie_args {	// used by NET_STACK_GET_COOKIE
-	void **cookie;
-};
-
-struct accept_args {	// used by NET_STACK_ACCEPT
-	void *cookie;
-	struct sockaddr *addr;
-	int addrlen;
+struct associate_socket_args {	// used by NET_STACK_ASSOCIATE_SOCKET
+	void *socket;
 };
 
 struct sysctl_args {	// used by NET_STACK_SYSCTL
@@ -136,6 +130,20 @@ struct r5_selectsync {
 	struct fd_set rbits;	// read event bits field
 	struct fd_set wbits;	// write event bits field
 	struct fd_set ebits;	// exception event bits field
+};
+
+
+struct stack_driver_args {
+	union {
+		struct int_args 				integer;
+		struct socket_args				socket;
+		struct sockaddr_args 			sockaddr;
+		struct sockopt_args				sockopt;
+		struct associate_socket_args	associate;
+		struct xfer_args				xfer;
+		struct sysctl_args				sysctl;
+		struct select_args				select;
+	} u;
 };
 
 #endif /* NET_STACK_DRIVER_H */
