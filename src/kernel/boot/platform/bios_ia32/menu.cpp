@@ -386,6 +386,7 @@ run_menu(Menu *menu)
 
 				// restore current menu
 				sMenuOffset = offset;
+				menu->FindSelected(&selected);
 				menu->Show();
 				draw_menu(menu);
 			} else if (item->Type() == MENU_ITEM_MARKABLE) {
