@@ -285,24 +285,41 @@ thread_id BApplication::Run()
 //------------------------------------------------------------------------------
 void BApplication::Quit()
 {
+	bool unlock = false;
 	if (!IsLocked()) {
 		const char* name = Name();
 		if (!name)
 			name = "no-name";
-		printf("ERROR - you must Lock a looper before calling Quit(), "
-			   "team=%ld, looper=%s", Team(), name);
+		printf("ERROR - you must Lock the application object before calling "
+			   "Quit(), team=%ld, looper=%s\n", Team(), name);
+		unlock = true;
+		if (!Lock())
+			return;
 	}
-	// Set the termination flag. That's sufficient in some cases.
-	fTerminating = true;
 	// Delete the object, if not running only.
-	if (!fRunCalled)
+	if (!fRunCalled) {
 		delete this;
-	// In case another thread called Quit(), things are a bit more complicated.
-	// BLooper::Quit() handles that gracefully.
-	else if (find_thread(NULL) != fTaskID)
-		BLooper::Quit();
-	// prevent the BLooper destructor from killing the main thread
-	fTaskID = -1;
+	} else if (find_thread(NULL) != fTaskID) {
+		// We are not the looper thread.
+		// We push a _QUIT_ into the queue.
+		// TODO: When BLooper::AddMessage() is done, use that instead of
+		// PostMessage()??? This would overtake messages that are still at
+		// the port.
+		// NOTE: We must not unlock here -- otherwise we had to re-lock, which
+		// may not work. This is bad, since, if the port is full, it
+		// won't get emptier, as the looper thread needs to lock the object
+		// before dispatching messages.
+		while (PostMessage(_QUIT_, this) == B_WOULD_BLOCK)
+			snooze(10000);
+	} else {
+		// We are the looper thread.
+		// Just set fTerminating to true which makes us fall through the
+		// message dispatching loop and return from Run().
+		fTerminating = true;
+	}
+	// If we had to lock the object, unlock now.
+	if (unlock)
+		Unlock();
 }
 //------------------------------------------------------------------------------
 bool BApplication::QuitRequested()
