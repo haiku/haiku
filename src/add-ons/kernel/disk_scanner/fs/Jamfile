@@ -1,1 +1,8 @@
 SubDir OBOS_TOP src add-ons kernel disk_scanner fs ;
+
+UsePrivateHeaders $(DOT) ;
+
+R5KernelAddon bfs : kernel disk_scanner fs :
+	bfs.c
+;
+
