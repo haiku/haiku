@@ -217,11 +217,186 @@ SwapDoubleTest::test(void)
 {
 	const double kNumber = 1.125;
 	const double kNaN = NAN;
-	const double kInfinity = HUGE_VALF;
+	const double kInfinity = HUGE_VAL;
 
 	CHK(kNumber == __swap_double(__swap_double(kNumber)));
 	CHK(kNaN == __swap_double(__swap_double(kNaN)));
 	CHK(kInfinity == __swap_double(__swap_double(kInfinity)));
+}
+
+
+//	#pragma mark -
+
+
+class SwapDataTest : public BTestCase {
+	public:
+		SwapDataTest(std::string name = "");
+
+		static Test *suite(void);
+		void test(void);
+};
+
+
+SwapDataTest::SwapDataTest(std::string name)
+	: BTestCase(name)
+{
+}
+
+
+Test *
+SwapDataTest::suite(void)
+{
+	return new CppUnit::TestCaller<SwapDataTest>("ByteOrderTest::SwapDataTest", &SwapDataTest::test);
+}
+
+
+void 
+SwapDataTest::test(void)
+{
+	// error checking
+	char string[4];
+	CHK(swap_data(B_STRING_TYPE, string, 4, B_SWAP_ALWAYS) == B_BAD_VALUE);
+	int32 num32 = 0;
+	CHK(swap_data(B_INT32_TYPE, &num32, 0, B_SWAP_ALWAYS) == B_BAD_VALUE);
+	CHK(swap_data(B_INT32_TYPE, NULL, 4, B_SWAP_ALWAYS) == B_BAD_VALUE);
+#if B_HOST_IS_LENDIAN
+	CHK(swap_data(B_INT32_TYPE, NULL, 4, B_SWAP_HOST_TO_LENDIAN) == B_BAD_VALUE);
+#else
+	CHK(swap_data(B_INT32_TYPE, NULL, 4, B_SWAP_HOST_TO_BENDIAN) == B_BAD_VALUE);
+#endif
+
+	// algorithm checking
+#define TEST(type, source, target) \
+	memcpy(target, source, sizeof(source)); \
+	for (int32 i = 0; i < 4; i++) { \
+		if (B_HOST_IS_LENDIAN) { \
+			swap_data(type, target, sizeof(target), B_SWAP_HOST_TO_LENDIAN); \
+			CHK(!memcmp(target, source, sizeof(source))); \
+			swap_data(type, target, sizeof(target), B_SWAP_LENDIAN_TO_HOST); \
+			CHK(!memcmp(target, source, sizeof(source))); \
+			\
+			swap_data(type, target, sizeof(target), B_SWAP_HOST_TO_BENDIAN); \
+			CHK(memcmp(target, source, sizeof(source))); \
+			swap_data(type, target, sizeof(target), B_SWAP_BENDIAN_TO_HOST); \
+			CHK(!memcmp(target, source, sizeof(source))); \
+		} else if (B_HOST_IS_BENDIAN) { \
+			swap_data(type, target, sizeof(target), B_SWAP_HOST_TO_BENDIAN); \
+			CHK(!memcmp(target, source, sizeof(source))); \
+			swap_data(type, target, sizeof(target), B_SWAP_BENDIAN_TO_HOST); \
+			CHK(!memcmp(target, source, sizeof(source))); \
+			\
+			swap_data(type, target, sizeof(target), B_SWAP_HOST_TO_LENDIAN); \
+			CHK(memcmp(target, source, sizeof(source))); \
+			swap_data(type, target, sizeof(target), B_SWAP_LENDIAN_TO_HOST); \
+			CHK(!memcmp(target, source, sizeof(source))); \
+		} \
+		\
+		swap_data(type, target, sizeof(target), B_SWAP_ALWAYS); \
+		CHK(memcmp(target, source, sizeof(source))); \
+		swap_data(type, target, sizeof(target), B_SWAP_ALWAYS); \
+		CHK(!memcmp(target, source, sizeof(source))); \
+	}
+
+	const uint64 kArray64[] = {0x0123456789abcdefULL, 0x1234, 0x5678000000000000ULL, 0x0};
+	uint64 array64[4];
+	TEST(B_UINT64_TYPE, kArray64, array64);
+
+	const uint32 kArray32[] = {0x12345678, 0x1234, 0x56780000, 0x0};
+	uint32 array32[4];
+	TEST(B_UINT32_TYPE, kArray32, array32);
+
+	const uint16 kArray16[] = {0x1234, 0x12, 0x3400, 0x0};
+	uint16 array16[4];
+	TEST(B_UINT16_TYPE, kArray16, array16);
+
+	const float kArrayFloat[] = {3.4f, 0.0f, NAN, HUGE_VALF};
+	float arrayFloat[4];
+	TEST(B_FLOAT_TYPE, kArrayFloat, arrayFloat);
+
+	const float kArrayDouble[] = {3.42, 0.0, NAN, HUGE_VAL};
+	double arrayDouble[4];
+	TEST(B_DOUBLE_TYPE, kArrayDouble, arrayDouble);
+
+#undef TEST
+}
+
+
+//	#pragma mark -
+
+
+class IsTypeSwappedTest : public BTestCase {
+	public:
+		IsTypeSwappedTest(std::string name = "");
+
+		static Test *suite(void);
+		void test(void);
+};
+
+
+IsTypeSwappedTest::IsTypeSwappedTest(std::string name)
+	: BTestCase(name)
+{
+}
+
+
+Test *
+IsTypeSwappedTest::suite(void)
+{
+	return new CppUnit::TestCaller<IsTypeSwappedTest>("ByteOrderTest::IsTypeSwappedTest", &IsTypeSwappedTest::test);
+}
+
+
+void 
+IsTypeSwappedTest::test(void)
+{
+#define IS_SWAPPED(x) CHK(is_type_swapped(x))
+#define NOT_SWAPPED(x) CHK(!is_type_swapped(x))
+
+	IS_SWAPPED(B_ANY_TYPE);
+	IS_SWAPPED(B_BOOL_TYPE);
+	IS_SWAPPED(B_CHAR_TYPE);
+	IS_SWAPPED(B_COLOR_8_BIT_TYPE);
+	IS_SWAPPED(B_DOUBLE_TYPE);
+	IS_SWAPPED(B_FLOAT_TYPE);
+	IS_SWAPPED(B_GRAYSCALE_8_BIT_TYPE);
+	IS_SWAPPED(B_INT64_TYPE);
+	IS_SWAPPED(B_INT32_TYPE);
+	IS_SWAPPED(B_INT16_TYPE);
+	IS_SWAPPED(B_INT8_TYPE);
+	IS_SWAPPED(B_MESSAGE_TYPE);
+	IS_SWAPPED(B_MESSENGER_TYPE);
+	IS_SWAPPED(B_MIME_TYPE);
+	IS_SWAPPED(B_MONOCHROME_1_BIT_TYPE);
+	IS_SWAPPED(B_OBJECT_TYPE);
+	IS_SWAPPED(B_OFF_T_TYPE);
+	IS_SWAPPED(B_PATTERN_TYPE);
+	IS_SWAPPED(B_POINTER_TYPE);
+	IS_SWAPPED(B_POINT_TYPE);
+	IS_SWAPPED(B_RAW_TYPE);
+	IS_SWAPPED(B_RECT_TYPE);
+	IS_SWAPPED(B_REF_TYPE);
+	IS_SWAPPED(B_RGB_32_BIT_TYPE);
+	IS_SWAPPED(B_RGB_COLOR_TYPE);
+	IS_SWAPPED(B_SIZE_T_TYPE);
+	IS_SWAPPED(B_SSIZE_T_TYPE);
+	IS_SWAPPED(B_STRING_TYPE);
+	IS_SWAPPED(B_TIME_TYPE);
+	IS_SWAPPED(B_UINT64_TYPE);
+	IS_SWAPPED(B_UINT32_TYPE);
+	IS_SWAPPED(B_UINT16_TYPE);
+	IS_SWAPPED(B_UINT8_TYPE);
+	IS_SWAPPED(B_MEDIA_PARAMETER_TYPE);
+	IS_SWAPPED(B_MEDIA_PARAMETER_WEB_TYPE);
+	IS_SWAPPED(B_MEDIA_PARAMETER_GROUP_TYPE);
+	IS_SWAPPED(B_ASCII_TYPE);
+
+	NOT_SWAPPED('    ');
+	NOT_SWAPPED('0000');
+	NOT_SWAPPED('1111');
+	NOT_SWAPPED('aaaa');
+
+#undef IS_SWAPPED
+#undef NOT_SWAPPED
 }
 
 
@@ -238,8 +413,8 @@ ByteOrderTestSuite()
 	testSuite->addTest(new Swap64Test("__swap_int64()"));
 	testSuite->addTest(new SwapFloatTest("__swap_float()"));
 	testSuite->addTest(new SwapDoubleTest("__swap_double()"));
-//	testSuite->addTest(new SwapDataTest("swap_data()"));
-//	testSuite->addTest(new IsTypeSwappedTest("is_type_swapped()"));
+	testSuite->addTest(new SwapDataTest("swap_data()"));
+	testSuite->addTest(new IsTypeSwappedTest("is_type_swapped()"));
 
 	return testSuite;
 }
