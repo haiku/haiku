@@ -217,8 +217,8 @@ CompareStreams(BPositionIO &a, BPositionIO &b)
 	bool bresult = false;		
 	abuf = new uint8[alen];
 	bbuf = new uint8[blen];
-	if (a.ReadAt(0, abuf, alen) == B_OK) {
-		if (b.ReadAt(0, bbuf, blen) == B_OK) {
+	if (a.ReadAt(0, abuf, alen) == alen) {
+		if (b.ReadAt(0, bbuf, blen) == blen) {
 			if (memcmp(abuf, bbuf, alen) == 0)
 				bresult = true;
 			else
@@ -262,15 +262,19 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 		BFile styled_file, plain_file, *pinput_file;
 		CPPUNIT_ASSERT(styled_file.SetTo(styled_path, B_READ_ONLY) == B_OK);
 		CPPUNIT_ASSERT(plain_file.SetTo(plain_path, B_READ_ONLY) == B_OK);
-		if (bplain)
+		if (bplain) {
+			printf(" [%s] ", plain_path);
 			pinput_file = &plain_file;
-		else
+		} else {
+			printf(" [%s] ", styled_path);
 			pinput_file = &styled_file;
+		}
 		
 		BMallocIO mallio;
 		
 		// Convert to B_TRANSLATOR_ANY_TYPE (should be B_TRANSLATOR_TEXT)
 		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
 		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
 		CPPUNIT_ASSERT(proster->Translate(pinput_file, NULL, NULL, &mallio,
 			B_TRANSLATOR_ANY_TYPE) == B_OK);
@@ -278,6 +282,7 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 		
 		// Convert to B_TRANSLATOR_TEXT
 		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
 		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
 		CPPUNIT_ASSERT(proster->Translate(pinput_file, NULL, NULL, &mallio,
 			B_TRANSLATOR_TEXT) == B_OK);
@@ -285,6 +290,7 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 		
 		// Convert to B_STYLED_TEXT_FORMAT
 		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
 		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
 		CPPUNIT_ASSERT(proster->Translate(pinput_file, NULL, NULL, &mallio,
 			B_STYLED_TEXT_FORMAT) == B_OK);
@@ -358,7 +364,15 @@ STXTTranslatorTest::TranslateTest()
 	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
 	
 	// Translate various data
-	const char *aTextFiles[] = {
+	const char *aPlainTextFiles[] = {
+		"../src/tests/kits/translation/data/text/ascii",
+		"../src/tests/kits/translation/data/text/japanese",
+		"../src/tests/kits/translation/data/text/multi_byte",
+		"../src/tests/kits/translation/data/text/one_length",
+		"../src/tests/kits/translation/data/text/symbols",
+		"../src/tests/kits/translation/data/text/zero_length"
+	};
+	const char *aStyledTextFiles[] = {
 		"../src/tests/kits/translation/data/text/ascii",
 		"../src/tests/kits/translation/data/text/japanese",
 		"../src/tests/kits/translation/data/text/multi_byte",
@@ -367,10 +381,10 @@ STXTTranslatorTest::TranslateTest()
 		"../src/tests/kits/translation/data/text/symbols",
 		"../src/tests/kits/translation/data/text/zero_length"
 	};
-	TranslateTests(this, proster, aTextFiles,
-		sizeof(aTextFiles) / sizeof(const char *), true);
-	TranslateTests(this, proster, aTextFiles,
-		sizeof(aTextFiles) / sizeof(const char *), false);
+	TranslateTests(this, proster, aPlainTextFiles,
+		sizeof(aPlainTextFiles) / sizeof(const char *), true);
+	TranslateTests(this, proster, aStyledTextFiles,
+		sizeof(aStyledTextFiles) / sizeof(const char *), false);
 }
 
 void
