@@ -748,6 +748,12 @@
 #define NVBES_NV10_1SRCPTCH	0x0000895c
 /* Nvidia MPEG2 hardware decoder (GeForce4MX only) */
 #define NVBES_DEC_GENCTRL	0x00001588
+//new:
+#define NV32_NV45_WHAT10	0x00001700
+#define NV32_NV45_WHAT11	0x00001704
+#define NV32_NV45_WHAT12	0x00001708
+#define NV32_NV45_WHAT13	0x0000170c
+//end new
 
 //old:
 /*MAVEN registers (<= G400) */
