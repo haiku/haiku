@@ -11,7 +11,7 @@
 #include "DataExchange.h"
 #include "ServerInterface.h" // NEW_MEDIA_SERVER_SIGNATURE
 
-#define TIMEOUT 2000000
+#define TIMEOUT 5000000 // 5 seconds timeout!
 
 namespace BPrivate {
 namespace media {
@@ -118,10 +118,10 @@ status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size
 	rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
 	if (rv != B_OK) {
 		FATAL("SendToPort: write_port failed, port %ld, error %#lx (%s)\n", sendport, rv, strerror(rv));
-		if (sendport == MediaServerPort) {
+		if (rv == B_BAD_PORT_ID && sendport == MediaServerPort) {
 			find_media_server_port();
 			sendport = MediaServerPort;
-		} else if (sendport == MediaAddonServerPort) {
+		} else if (rv == B_BAD_PORT_ID && sendport == MediaAddonServerPort) {
 			find_media_addon_server_port();
 			sendport = MediaAddonServerPort;
 		} else {
@@ -148,10 +148,10 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 	
 	if (rv != B_OK) {
 		FATAL("QueryPort: write_port failed, port %ld, error %#lx (%s)\n", requestport, rv, strerror(rv));
-		if (requestport == MediaServerPort) {
+		if (rv == B_BAD_PORT_ID && requestport == MediaServerPort) {
 			find_media_server_port();
 			requestport = MediaServerPort;
-		} else if (requestport == MediaAddonServerPort) {
+		} else if (rv == B_BAD_PORT_ID && requestport == MediaAddonServerPort) {
 			find_media_addon_server_port();
 			requestport = MediaAddonServerPort;
 		} else {
