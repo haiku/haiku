@@ -1,4 +1,5 @@
 #include <MediaNode.h>
+#include <Buffer.h>
 #include "MixerCore.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
@@ -50,7 +51,7 @@ MixerCore::RemoveInput(int32 inputID)
 {
 	ASSERT_LOCKED();
 	MixerInput *input;
-	for (int i = 0; (input = (MixerInput *)fInputs->ItemAt(i)) != 0; i++) {
+	for (int i = 0; (input = Input(i)) != 0; i++) {
 		if (input->ID() == inputID) {
 			fInputs->RemoveItem(i);
 			delete input;
@@ -96,6 +97,15 @@ void
 MixerCore::BufferReceived(BBuffer *buffer, bigtime_t lateness)
 {
 	ASSERT_LOCKED();
+	MixerInput *input;
+	int32 id = buffer->Header()->destination;
+	for (int i = 0; (input = Input(i)) != 0; i++) {
+		if (input->ID() == id) {
+			input->BufferReceived(buffer);
+			return;
+		}
+	}
+	printf("MixerCore::BufferReceived: received buffer for unknown id %ld\n", id);
 }
 	
 void
@@ -109,7 +119,7 @@ MixerCore::OutputFormatChanged(const media_format *format)
 {
 	ASSERT_LOCKED();
 	
-		void ChangeMixBufferFormat(float samplerate, int32 frames, int32 channelcount, uint32 channel_mask);
+//		void ChangeMixBufferFormat(float samplerate, int32 frames, int32 channelcount, uint32 channel_mask);
 
 }
 

@@ -6,7 +6,6 @@
 class MixerInput;
 class MixerOutput;
 
-
 class MixerCore
 {
 public:
