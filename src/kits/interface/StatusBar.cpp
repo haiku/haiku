@@ -240,18 +240,44 @@ void BStatusBar::MessageReceived(BMessage *message)
 void BStatusBar::Draw(BRect updateRect)
 {
 	float width = Frame().Width();
+	font_height fh;
+	GetFontHeight(&fh);
+	
+	SetHighColor(0, 0, 0);
+	MovePenTo(2.0f, (float)ceil(fh.ascent) + 1.0f);
 
 	if (fLabel)
-	{
-		font_height fh;
-
-		GetFontHeight(&fh);
+		DrawString(fLabel);
+	if (fText)
+		DrawString(fText);
 		
-		SetHighColor(0, 0, 0);
-		DrawString(fLabel, BPoint(0.0f, (float)ceil(fh.ascent + fh.leading)));
+	if (fTrailingText)
+	{
+		if (fTrailingLabel)
+		{
+			MovePenTo(width - StringWidth(fTrailingText) -
+			StringWidth(fTrailingLabel) - 2.0f,
+			(float)ceil(fh.ascent) + 1.0f);
+			DrawString(fTrailingText);
+			DrawString(fTrailingLabel);
+		}
+		else
+		{
+			MovePenTo(width - StringWidth(fTrailingText) - 2.0f,
+			(float)ceil(fh.ascent) + 1.0f);
+			DrawString(fTrailingText);
+		}
+		
+	}
+	else if (fTrailingLabel)
+	{
+		MovePenTo(width - StringWidth(fTrailingLabel) - 2.0f,
+			(float)ceil(fh.ascent) + 1.0f);
+		DrawString(fTrailingLabel);
 	}
 
-	BRect rect(0.0f, 16.0f, width, 16.0f + fBarHeight);
+	BRect rect(0.0f, (float)ceil(fh.ascent) + 4.0f, width,
+		(float)ceil(fh.ascent) + 4.0f + fBarHeight);
 
 	// First bevel
 	SetHighColor(tint_color(ui_color ( B_PANEL_BACKGROUND_COLOR ), B_DARKEN_1_TINT));
