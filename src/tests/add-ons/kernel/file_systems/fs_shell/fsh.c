@@ -117,8 +117,7 @@ do_close(int argc, char **argv)
 static void
 do_open(int argc, char **argv)
 {
-    int  err;
-    char name[64], buff[64];
+    char name[64];
 
     if (cur_fd >= 0)
         do_close(0, NULL);
@@ -138,8 +137,7 @@ do_open(int argc, char **argv)
 static void
 do_make(int argc, char **argv)
 {
-    int err;
-    char name[64], buff[64];
+    char name[64];
 
     if (cur_fd >= 0)
         do_close(0, NULL);
@@ -167,7 +165,7 @@ static void
 do_mkdir(int argc, char **argv)
 {
     int err;
-    char name[64], buff[64];
+    char name[64];
 
     if (argc < 2) 
         make_random_name(name, sizeof(name));
@@ -198,11 +196,11 @@ do_read_test(int argc, char **argv)
 
     buff = malloc(len);
     if (buff == NULL) {
-        printf("no memory for write buffer of %d bytes\n", len);
+        printf("no memory for write buffer of %lu bytes\n", len);
         return;
     }
 
-    for(i=0; i < len; i++)
+    for (i = 0; (size_t)i < len; i++)
         buff[i] = (char)0xff;
 
     err = sys_read(1, cur_fd, buff, len);
@@ -213,7 +211,7 @@ do_read_test(int argc, char **argv)
         hexdump(buff, 512);
 
     free(buff);
-    printf("read read %d bytes and returned %d\n", len, err);
+    printf("read read %lu bytes and returned %d\n", len, err);
 }
 
 
@@ -234,17 +232,17 @@ do_write_test(int argc, char **argv)
 
     buff = malloc(len);
     if (buff == NULL) {
-        printf("no memory for write buffer of %d bytes\n", len);
+        printf("no memory for write buffer of %lu bytes\n", len);
         return;
     }
 
-    for(i=0; i < len; i++)
+    for (i = 0; (size_t)i < len; i++)
         buff[i] = i;
 
     err = sys_write(1, cur_fd, buff, len);
     free(buff);
     
-    printf("write wrote %d bytes and returned %d\n", len, err);
+    printf("write wrote %lu bytes and returned %d\n", len, err);
 }
 
 
@@ -264,10 +262,10 @@ do_write_stream(int argc, char **argv)
     if (argv[1] && isdigit(argv[1][0]))
         amount = strtoul(&argv[1][0], NULL, 0);
 
-    for(i = 0;i < sizeof(buffer);i++)
+    for(i = 0; (size_t)i < sizeof(buffer); i++)
         buffer[i] = i;
 
-	for (i = 0;i < amount;i++) {
+	for (i = 0; (size_t)i < amount; i++) {
 		err = sys_write(1, cur_fd, buffer, length);
 		if (err < B_OK)
 			break;
@@ -304,11 +302,11 @@ do_read_attr(int argc, char **argv)
 
     buffer = malloc(len);
     if (buffer == NULL) {
-        printf("no memory for write buffer of %d bytes\n", len);
+        printf("no memory for write buffer of %lu bytes\n", len);
         return;
     }
 
-	for (i = 0;i < len;i++)
+	for (i = 0; (size_t)i < len; i++)
 		buffer[i] = (char)0xff;
 
     err = sys_read_attr(1, cur_fd, attribute, 'CSTR', buffer, len, 0);
@@ -317,7 +315,7 @@ do_read_attr(int argc, char **argv)
         hexdump(buffer, err < 512 ? err : 512);
 
     free(buffer);
-    printf("read read %d bytes and returned %d (%s)\n", len, err, strerror(err));
+    printf("read read %lu bytes and returned %d (%s)\n", len, err, strerror(err));
 }
 
 
@@ -348,17 +346,17 @@ do_write_attr(int argc, char **argv)
 
     buffer = malloc(len);
     if (buffer == NULL) {
-        printf("no memory for write buffer of %d bytes\n", len);
+        printf("no memory for write buffer of %lu bytes\n", len);
         return;
     }
 
-    for (i = 0;i < len;i++)
+    for (i = 0; (size_t)i < len; i++)
         buffer[i] = i;
 
     err = sys_write_attr(1, cur_fd, attribute, 'CSTR', buffer, len, 0);
     free(buffer);
 
-    printf("write wrote %d bytes and returned %d\n", len, err);
+    printf("write wrote %lu bytes and returned %d\n", len, err);
 }
 
 
@@ -413,7 +411,7 @@ mode_bits_to_str(int mode, char *str)
 static void
 do_dir(int argc, char **argv)
 {
-    int               dirfd, err, fd, max_err = 10;
+    int               dirfd, err, max_err = 10;
     char              dirname[128], buff[512], time_buf[64] = { '\0', };
     size_t            len,count = 0;
     struct my_dirent *dent;
@@ -452,7 +450,7 @@ do_dir(int argc, char **argv)
 
         err = sys_rstat(1, dirfd, dent->d_name, &st, 1);
         if (err != 0) {
-            printf("stat failed for: %s (%ld)\n", dent->d_name, dent->d_ino);
+            printf("stat failed for: %s (%Ld)\n", dent->d_name, dent->d_ino);
             if (max_err-- <= 0)
                 break;
             
@@ -523,12 +521,10 @@ do_fcntl(int argc, char **argv)
 static void
 do_rmall(int argc, char **argv)
 {
-    int               dirfd, err, fd, max_err = 10;
+    int               dirfd, err, max_err = 10;
     char              dirname[128], fname[512], buff[512];
     size_t            len,count = 0;
     struct my_dirent *dent;
-    struct my_stat    st;
-    struct tm        *tm;
     
     dent = (struct my_dirent *)buff;
 
@@ -561,7 +557,7 @@ do_rmall(int argc, char **argv)
         sprintf(fname, "%s/%s", dirname, dent->d_name);
         err = sys_unlink(1, -1, fname);
         if (err != 0) {
-            printf("unlink failed for: %s (%ld)\n", fname, dent->d_ino);
+            printf("unlink failed for: %s (%Ld)\n", fname, dent->d_ino);
         } else
 	        count++;
     }
@@ -618,7 +614,7 @@ do_seek(int argc, char **argv)
 
     err = sys_lseek(1, cur_fd, pos, SEEK_SET);
     if (err != pos) {
-        printf("seek to %ld failed (%ld)\n", pos, err);
+        printf("seek to %Ld failed (%Ld)\n", pos, err);
     }
 }
 
@@ -627,7 +623,7 @@ static void
 do_rm(int argc, char **argv)
 {
     int err;
-    char name[256], buff[256];
+    char name[256];
 
     if (cur_fd >= 0)
         do_close(0, NULL);
@@ -651,7 +647,7 @@ static void
 do_rmdir(int argc, char **argv)
 {
     int err;
-    char name[256], buff[256];
+    char name[256];
 
     if (cur_fd >= 0)
         do_close(0, NULL);
@@ -706,7 +702,7 @@ do_copy_to_myfs(char *host_file, char *bfile)
     }
 
     if (err < 0) {
-        printf("err == %d, amt == %d\n", err, amt);
+        printf("err == %d, amt == %ld\n", err, amt);
         perror("write error");
     }
 
@@ -760,8 +756,6 @@ do_copy_from_myfs(char *bfile, char *host_file)
 static void
 do_copy(int argc, char **argv)
 {
-    char name1[128], name2[128];
-
     if (cur_fd >= 0)
         do_close(0, NULL);
 
@@ -800,13 +794,13 @@ copydir(char *fromPath,char *toPath)
 	from = opendir(fromPath);
 	if (from == NULL) {
 		printf("could not open %s\n", fromPath);
-		return;
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	myfs_name = malloc(1024);  from_name = malloc(1024);  buff = malloc(bufferSize);
 	if (myfs_name == NULL || from_name == NULL || buff == NULL) {
 		printf("out of memory\n");
-		return;
+		return B_NO_MEMORY;
 	}
 
 	while ((dirent = readdir(from)) != NULL) {
@@ -839,7 +833,7 @@ copydir(char *fromPath,char *toPath)
 			fd = open(from_name, O_RDONLY);
 			if (fd < 0) {
 				printf("can't open host file: %s\n", from_name);
-				return;
+				return fd;
 			}
 
 			sprintf(myfs_name, "%s/%s", toPath, dirent->d_name);
@@ -847,7 +841,7 @@ copydir(char *fromPath,char *toPath)
 								MY_S_IFREG|MY_S_IRWXU, 0)) < 0) {
 		        close(fd);
 		        printf("error opening: %s\n", myfs_name);
-		        return;
+		        return bfd;
 		    }
 
 			// copy attributes first!
@@ -893,7 +887,7 @@ copydir(char *fromPath,char *toPath)
 			}
 
 			if (err < 0) {
-				printf("write error: err == %d, amt == %d\n", err, amt);
+				printf("write error: err == %d, amt == %ld\n", err, amt);
 			}
 
 			sys_close(1, bfd);
@@ -903,6 +897,7 @@ copydir(char *fromPath,char *toPath)
 	closedir(from);
 
 	free(myfs_name);  free(from_name);  free(buff);
+	return B_OK;
 }
 
 
@@ -1019,7 +1014,7 @@ do_attrtest(int argc, char **argv)
     	iterations = atol(argv[1]);
     if (argc > 2 && isdigit(*argv[2]))
     	maxSize = atol(argv[2]);
-    if (argc > 1 && !isdigit(*argv[1]) || argc > 2 && !isdigit(*argv[2])) {
+    if ((argc > 1 && !isdigit(*argv[1])) || (argc > 2 && !isdigit(*argv[2]))) {
     	printf("usage: attrs [number of iterations] [max attr size]\n");
     	return;
     }
@@ -1108,7 +1103,7 @@ do_listqueries(int argc, char **argv)
 		if (gQueryCookie[min] == NULL)
 			continue;
 
-		printf("%ld. (%p) %s\n", min, gQueryCookie[min], gQueryString[min]);
+		printf("%d. (%p) %s\n", min, gQueryCookie[min], gQueryString[min]);
 	}
 }
 
@@ -1176,7 +1171,7 @@ do_startquery(int argc, char **argv)
 		return;
 	}
 
-	printf("query number %ld started - use the 'stopquery' command to stop it.\n", freeSlot);
+	printf("query number %d started - use the 'stopquery' command to stop it.\n", freeSlot);
 	gQueryString[freeSlot] = strdup(query);
 }
 
@@ -1234,7 +1229,7 @@ do_query(int argc, char **argv)
 static void
 do_cio(int argc, char **argv)
 {
-    int            i, j, fd, err;
+    int            i, j, fd;
     char           fname[64];
     fs_off_t       pos;
     size_t         len;
@@ -1255,26 +1250,26 @@ do_cio(int argc, char **argv)
 
     gettimeofday(&start, NULL);
 
-    for(i=0; i < MAX_ITER; i++) {
-        for(j=0; j < NUM_READS; j++) {
-            len = sizeof(buff);
-            if (sys_read(1, fd, buff, len) != len) {
-                perror("cio read");
-                break;
-            }
-        }
+	for (i = 0; i < MAX_ITER; i++) {
+		for (j = 0; j < NUM_READS; j++) {
+			len = sizeof(buff);
+			if (sys_read(1, fd, buff, len) != (ssize_t)len) {
+				perror("cio read");
+				break;
+			}
+		}
 
-        pos = 0;
-        if (sys_lseek(1, fd, pos, SEEK_SET) != pos) {
-            perror("cio lseek");
-            break;
-        }
-    }
+		pos = 0;
+		if (sys_lseek(1, fd, pos, SEEK_SET) != pos) {
+			perror("cio lseek");
+			break;
+		}
+	}
 
     gettimeofday(&end, NULL);
     SubTime(&end, &start, &result);
         
-    printf("read %d bytes in %2ld.%.6ld seconds\n",
+    printf("read %ld bytes in %2ld.%.6ld seconds\n",
            (MAX_ITER * NUM_READS * sizeof(buff)) / 1024,
            result.tv_sec, result.tv_usec);
 
@@ -1326,7 +1321,7 @@ do_lat_fs(int argc, char **argv)
     if (argc > 1) 
         iter = strtoul(&argv[1][0], NULL, 0);
 
-    for (i = 0; i < sizeof(sizes)/sizeof(int); ++i) {
+    for (i = 0; (size_t)i < sizeof(sizes)/sizeof(int); i++) {
         printf("CREATING: %d files of %5d bytes each\n", iter, sizes[i]);
         for (j = 0; j < iter; ++j) {
             sprintf(name, "/myfs/%.5d", j);
@@ -1346,7 +1341,7 @@ do_lat_fs(int argc, char **argv)
 static void
 do_create(int argc, char **argv)
 {
-    int  i, j, iter = 100, err;
+    int  j, iter = 100, err;
     int  size = 0;
     char name[64];
 
@@ -1373,7 +1368,7 @@ do_create(int argc, char **argv)
 static void
 do_delete(int argc, char **argv)
 {
-    int  i, j, iter = 100;
+    int  j, iter = 100;
     char name[64];
 
     if (argc > 1)
