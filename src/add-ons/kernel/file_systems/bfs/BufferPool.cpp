@@ -6,6 +6,7 @@
 
 
 #include "BufferPool.h"
+#include "Debug.h"
 #include "cpp.h"
 
 #include <stdlib.h>
@@ -70,7 +71,7 @@ BufferPool::RequestBuffers(uint32 blockSize)
 			// free already allocated buffers
 			for (;i-- > 0; i++)
 				free(buffers[i]);
-			return B_NO_MEMORY;
+			RETURN_ERROR(B_NO_MEMORY);
 		}
 		if (i > 0)
 			*(buffers[i]) = buffers[i - 1];
@@ -89,7 +90,7 @@ BufferPool::RequestBuffers(uint32 blockSize)
 			free(buffers[i]);
 	}
 
-	return status;
+	RETURN_ERROR(status);
 }
 
 
