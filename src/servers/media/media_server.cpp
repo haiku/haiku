@@ -119,7 +119,6 @@ ServerApp::ServerApp()
  	: BApplication(NEW_MEDIA_SERVER_SIGNATURE),
 	fLocker(new BLocker("media server locker"))
 {
-
  	gNotificationManager = new NotificationManager;
  	gBufferManager = new BufferManager;
 	gAppManager = new AppManager;
@@ -682,24 +681,6 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
-		
-		case SERVER_GET_FORMAT_FOR_DESCRIPTION:
-		{
-			const server_get_format_for_description_request *request = reinterpret_cast<const server_get_format_for_description_request *>(data);
-			server_get_format_for_description_reply reply;
-			rv = gFormatManager->GetFormatForDescription(&reply.format, request->description);
-			request->SendReply(rv, &reply, sizeof(reply));
-			break;
-		}
-		
-		case SERVER_GET_DESCRIPTION_FOR_FORMAT:
-		{
-			const server_get_description_for_format_request *request = reinterpret_cast<const server_get_description_for_format_request *>(data);
-			server_get_description_for_format_reply reply;
-			rv = gFormatManager->GetDescriptionForFormat(&reply.description, request->format, request->family);						 
-			request->SendReply(rv, &reply, sizeof(reply));
-			break;
-		}
 
 		case SERVER_GET_READERS:
 		{
@@ -745,18 +726,31 @@ ServerApp::MessageReceived(BMessage *msg)
 {
 	TRACE("ServerApp::MessageReceived %lx enter\n", msg->what);
 	switch (msg->what) {
-		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
-		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
-		case MEDIA_SERVER_SEND_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
-		case MMEDIAFILESMANAGER_SAVE_TIMER:	gMMediaFilesManager->TimerMessage(); break;		
-		default: inherited::MessageReceived(msg); break;
+		case MEDIA_SERVER_REQUEST_NOTIFICATIONS:
+		case MEDIA_SERVER_CANCEL_NOTIFICATIONS:
+		case MEDIA_SERVER_SEND_NOTIFICATIONS:
+			gNotificationManager->EnqueueMessage(msg);
+			break;
+
+		case MMEDIAFILESMANAGER_SAVE_TIMER:
+			gMMediaFilesManager->TimerMessage();
+			break;
+		
+		case MEDIA_SERVER_GET_FORMATS:
+			gFormatManager->GetFormats(*msg);
+			break;
+
+		default:
+			inherited::MessageReceived(msg);
 			//printf("\nnew media server: unknown message received\n");
 			//msg->PrintToStream();
+			break;
 	}
 	TRACE("ServerApp::MessageReceived %lx leave\n", msg->what);
 }
 
-int main()
+int
+main()
 {
 	new ServerApp;
 	be_app->Run();
