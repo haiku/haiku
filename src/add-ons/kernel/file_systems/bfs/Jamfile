@@ -32,7 +32,7 @@ oldOPTIM = $(OPTIM) ;
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
 }
 
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
