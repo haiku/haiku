@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include <string.h>
 #include <Autolock.h>
 
+#define LOGGING 0
+
 Report* Report::fInstance = NULL;
 
 

@@ -48,10 +48,6 @@ protected:
 	void ClosePath(void);
 
 public:
-	cap_mode  LineCapMode() const    { return fWriter->fState->capMode; }
-	join_mode LineJoinMode() const   { return fWriter->fState->joinMode; }
-	float     LineMiterLimit() const { return fWriter->fState->miterLimit; }
-
 	PDFLinePathBuilder(SubPath *subPath, PDFWriter *writer);
 };
 

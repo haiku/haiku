@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
+#include "InterfaceUtils.h"
 #include "Utils.h"
 #include "Fonts.h"
 

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "PDFLinePathBuilder.h"
 #include "Log.h"
 #include "Report.h"
+#include "PDFWriter.h"
 
 #ifdef CODEWARRIOR
 	#pragma mark [BShape drawing support routines]
@@ -147,9 +148,9 @@ DrawShape::Draw()
 		fDrawn = true;
 		if (IsDrawing()) {
 			if (fStroke) 
-				PDF_stroke(Pdf()); 
+				fWriter->StrokeOrClip(); // strokes always
 			else {
-				PDF_fill(Pdf());
+				fWriter->FillOrClip(); // fills always
 			}
 		} else if (TransformPath()) {
 			EndSubPath();

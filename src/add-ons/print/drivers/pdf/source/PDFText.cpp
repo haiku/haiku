@@ -490,6 +490,7 @@ PDFWriter::DrawString(char *string, float escapement_nospace, float escapement_s
 
 	BPoint start(fState->penX, fState->penY);
 
+	BeginTransparency();
 	// If !MakesPDF() all the effort below just for the bounding box!
 	// draw each character
 	const char *c = utf8.String();
@@ -520,6 +521,7 @@ PDFWriter::DrawString(char *string, float escapement_nospace, float escapement_s
 		// next character
 		c += s; u += 2;
 	}
+	EndTransparency();
 
 	// text line processing (for non rotated text only!)
 	BPoint        end(fState->penX, fState->penY);
@@ -539,6 +541,9 @@ PDFWriter::DrawString(char *string, float escapement_nospace, float escapement_s
 		&bounds, &font, pdfSystem());
 		
 	fTextLine.Add(segment);
+	
+	if (IsDrawing()) {
+	}
 }
 
 

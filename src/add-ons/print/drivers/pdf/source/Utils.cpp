@@ -30,10 +30,6 @@ THE SOFTWARE.
 */
 
 #include "Utils.h"
-#include <Window.h>
-#include <Alert.h>
-#include <TextView.h>
-#include <string.h>
 
 // --------------------------------------------------
 EscapeMessageFilter::EscapeMessageFilter(BWindow *window, int32 what) 
@@ -57,82 +53,52 @@ EscapeMessageFilter::Filter(BMessage *msg, BHandler **target)
 	return B_DISPATCH_MESSAGE;
 }
 
+// --------------------------------------------------
+// copied from BeUtils.cpp
+static bool InList(const char* list[], const char* name) {
+	for (int i = 0; list[i] != NULL; i ++) {
+		if (strcmp(list[i], name) == 0) return true;
+	}
+	return false;
+} 
+
+#include <stdio.h>
 
 // --------------------------------------------------
-HWindow::HWindow(BRect frame, const char *title, window_type type, uint32 flags, uint32 workspace, uint32 escape_msg)
-	: BWindow(frame, title, type, flags, workspace)
-{
-	Init(escape_msg);
-}
-
-
-// --------------------------------------------------
-HWindow::HWindow(BRect frame, const char *title, window_look look, window_feel feel, uint32 flags, uint32 workspace, uint32 escape_msg)
-	: BWindow(frame, title, look, feel, flags, workspace)
-{
-	Init(escape_msg);
-}
-
-
-// --------------------------------------------------
-void
-HWindow::Init(uint32 escape_msg)
-{
-	AddShortcut('i', 0, new BMessage(B_ABOUT_REQUESTED));
-	AddCommonFilter(new EscapeMessageFilter(this, escape_msg));	
-}
-
-
-// --------------------------------------------------
-void
-HWindow::MessageReceived(BMessage* msg)
-{
-	if (msg->what == B_ABOUT_REQUESTED) {
-		AboutRequested();
-	} else {
-		inherited::MessageReceived(msg);
+// copied from BeUtils.cpp
+void AddFields(BMessage* to, const BMessage* from, const char* excludeList[], const char* includeList[]) {
+	if (to == from) return;
+	char* name;
+	type_code type;
+	int32 count;
+	for (int32 i = 0; from->GetInfo(B_ANY_TYPE, i, &name, &type, &count) == B_OK; i ++) {
+		if (excludeList && InList(excludeList, name)) continue;
+		if (includeList && !InList(includeList, name)) continue;
+		// replace existing data
+		to->RemoveName(name);
+		
+		const void* data;
+		ssize_t size;
+		for (int32 j = 0; j < count; j ++) {
+			if (from->FindData(name, type, j, &data, &size) == B_OK) {
+				// WTF why works AddData not for B_STRING_TYPE in R5.0.3?
+				if (type == B_STRING_TYPE) to->AddString(name, (const char*)data);
+				else if (type == B_MESSAGE_TYPE) {
+					BMessage m;
+					from->FindMessage(name, j, &m);
+					to->AddMessage(name, &m);
+				} else to->AddData(name, type, data, size);
+			}
+		}
 	}
 }
 
-// --------------------------------------------------
-static const char* 
-kAbout =
-"PDF Writer for BeOS\n"
-"© 2001, 2002 OpenBeOS\n"
-"\n"
-"\tPhilippe Houdoin - Project Leader\n"
-"\tSimon Gauvin - GUI Design\n"
-"\tMichael Pfeiffer - PDF Generation, Configuration, Interactive Features\n"
-"\tCelerick Stephens - Documentation\n"
-;
-
-void
-HWindow::AboutRequested()
-{
-	BAlert *about = new BAlert("About PDF Writer", kAbout, "Cool");
-	BTextView *v = about->TextView();
-	if (v) {
-		rgb_color red = {255, 0, 51, 255};
-		rgb_color blue = {0, 102, 255, 255};
-
-		v->SetStylable(true);
-		char *text = (char*)v->Text();
-		char *s = text;
-		// set all Be in blue and red
-		while ((s = strstr(s, "Be")) != NULL) {
-			int32 i = s - text;
-			v->SetFontAndColor(i, i+1, NULL, 0, &blue);
-			v->SetFontAndColor(i+1, i+2, NULL, 0, &red);
-			s += 2;
-		}
-		// first text line 
-		s = strchr(text, '\n');
-		BFont font;
-		v->GetFontAndColor(0, &font);
-		font.SetSize(12); // font.SetFace(B_OUTLINED_FACE);
-		v->SetFontAndColor(0, s-text+1, &font, B_FONT_SIZE);
-	};
-	about->Go();
+void AddString(BMessage* m, const char* name, const char* value) {
+	if (m->HasString(name, 0)) {
+		m->ReplaceString(name, value);
+	} else {
+		m->AddString(name, value);
+	}
 }
 
 

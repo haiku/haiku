@@ -31,33 +31,9 @@ THE SOFTWARE.
 
 #include <InterfaceKit.h>
 #include <SupportKit.h>
+#include "InterfaceUtils.h"
 #include "FontsWindow.h"
 #include "Fonts.h"
-
-
-class DragListView : public BListView
-{
-public:
-	DragListView(BRect frame, const char *name,
-		list_view_type type = B_SINGLE_SELECTION_LIST,
-		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP, 
-		uint32 flags = B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS);
-	bool InitiateDrag(BPoint point, int32 index, bool wasSelected);
-};
-
-DragListView::DragListView(BRect frame, const char *name,
-		list_view_type type,
-		uint32 resizingMode, uint32 flags)
-	: BListView(frame, name, type, resizingMode, flags)
-{
-}
-
-bool DragListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
-{
-	BMessage m;
-	DragMessage(&m, ItemFrame(index), this);
-	return true;
-}
 
 
 class CJKFontItem : public BStringItem

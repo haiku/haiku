@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
+#include "InterfaceUtils.h"
 #include "Utils.h"
 #include "PrinterDriver.h"
 
@@ -73,6 +74,7 @@ private:
 
 	BMessage*               fSettings;
 
+	BTextControl*			fLicenseKey;
 	bool                    fCreateLinks;
 	float                   fLinkBorderWidth;
 	bool                    fCreateBookmarks;

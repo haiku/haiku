@@ -37,6 +37,10 @@ THE SOFTWARE.
 #include "JobSetupWindow.h"
 #include "DocInfoWindow.h"
 
+static const char* includeKeys[] = {
+	"doc_info", "master_password", "user_password", "permissions", NULL
+};
+
 // --------------------------------------------------
 JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	:	HWindow(BRect(0, 0, 320, 160), "Job Setup", B_TITLED_WINDOW_LOOK,
@@ -69,14 +73,18 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	char            buffer[80];
 	
 	// PrinterDriver ensures that property exists
-	msg->FindInt32("copies",     &copies);
-	msg->FindInt32("first_page", &firstPage);
-	msg->FindInt32("last_page",  &lastPage);
-	if (B_OK != msg->FindMessage("doc_info", &fDocInfo)) {
-		fDocInfo.AddString("Author", "");
-		fDocInfo.AddString("Subject", "");
-		fDocInfo.AddString("Keywords", "");
+	fSetupMsg->FindInt32("copies",     &copies);
+	fSetupMsg->FindInt32("first_page", &firstPage);
+	fSetupMsg->FindInt32("last_page",  &lastPage);
+	BMessage doc_info;
+	if (B_OK != fSetupMsg->FindMessage("doc_info", &doc_info)) {
+		// default fields
+		doc_info.AddString("Author", "");
+		doc_info.AddString("Subject", "");
+		doc_info.AddString("Keywords", "");
+		msg->AddMessage("doc_info", &doc_info);
 	}
+	AddFields(&fDocInfo, fSetupMsg, NULL, includeKeys);
 	
 	allPages = firstPage == 1 && lastPage == MAX_INT32;
 
@@ -247,11 +255,7 @@ JobSetupWindow::UpdateJobMessage()
 	fSetupMsg->ReplaceInt32("copies", copies);
 	fSetupMsg->ReplaceInt32("first_page", from);
 	fSetupMsg->ReplaceInt32("last_page", to);
-	if (fSetupMsg->HasMessage("doc_info")) {
-		fSetupMsg->ReplaceMessage("doc_info", &fDocInfo);
-	} else {
-		fSetupMsg->AddMessage("doc_info", &fDocInfo);
-	}
+	AddFields(fSetupMsg, &fDocInfo);
 }
 
 
@@ -292,6 +296,7 @@ JobSetupWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case DOC_INFO_MSG:
+			fDocInfo.PrintToStream(); fflush(stdout);
 			(new DocInfoWindow(&fDocInfo))->Show();
 			break;
 
@@ -309,9 +314,7 @@ JobSetupWindow::Go()
 	MoveTo(300,300);
 	Show();
 	acquire_sem(fExitSem);
-	Lock();
-	Quit();
-
+	if (Lock()) Quit();
 	return fResult;
 }
 

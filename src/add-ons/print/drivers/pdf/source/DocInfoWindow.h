@@ -39,7 +39,51 @@ THE SOFTWARE.
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
+#include "InterfaceUtils.h"
 #include "Utils.h"
+
+class PermissionLabels {
+private:
+	const char* fName;
+	const char* fPDFName;
+	
+public:
+	PermissionLabels(const char* name, const char* pdfName) : fName(name), fPDFName(pdfName) { }
+	// accessors
+	const char* GetName() const { return fName; }
+	const char* GetPDFName() const { return fName; }
+};
+
+class Permission {
+private:
+	const PermissionLabels* fLabels;
+	bool fAllowed;
+	
+public:
+	Permission() : fLabels(NULL), fAllowed(true) { }
+	// accessors	
+	const char* GetName() const { return fLabels->GetName(); }
+	const char* GetPDFName() const { return fLabels->GetPDFName(); }
+	bool IsAllowed() const { return fAllowed; }
+	// setter
+	void SetLabels(const PermissionLabels* labels) { fLabels = labels; }
+	void SetAllowed(bool allowed) { fAllowed = allowed; }
+};
+
+class Permissions {
+private:
+	Permission* fPermissions;
+	int fNofPermissions;
+	
+public:
+	Permissions();
+	// accessors
+	Permission* At(int i) { return &fPermissions[i]; }
+	int Length() const { return fNofPermissions; }
+	// decode/encode pdflib permission string
+	void Decode(const char* s);
+	void Encode(BString* s);
+};
 
 class DocInfoWindow : public HWindow 
 {
@@ -66,13 +110,26 @@ public:
 	virtual void            Quit();
 
 private:
-	BMessage               *fDocInfo;
+	BMessage               *fDocInfo; // owned by parent window
 	BView                  *fTable;
 	BScrollView            *fTableScrollView;
 	BMenu                  *fKeyList;
+	BTextControl           *fMasterPassword;
+	BTextControl           *fUserPassword;
+	Permissions             fPermissions;
+	
+	BMessage*               DocInfo() {  return fDocInfo; }
 
+	BBox*                   CreateTabPanel(BTabView* tabView, const char* label);
+	void                    SetupButtons(BBox* panel);
+	void                    SetupDocInfoView(BBox* panel);
+	BTextControl*           AddPasswordControl(BRect r, BView* panel, const char* name, const char* label);
+	void                    SetupPasswordView(BBox* panel);
+	void                    SetupPermissionsView(BBox* panel);
 	void                    BuildTable(BMessage *fromDocInfo);
-	void                    ReadFieldsFromTable(BMessage *toDocInfo);
+	void                    ReadFieldsFromTable(BMessage* doc_info);
+	void                    ReadPasswords();
+	void                    ReadPermissions();
 	void                    EmptyKeyList();
 	bool                    IsValidKey(const char *key);
 	void                    AddKey(BMessage* msg, bool textControl);

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #define PRINTERSETUPWINDOW_H
 
 #include <InterfaceKit.h>
+#include "InterfaceUtils.h"
 #include "Utils.h"
 
 class PrinterSetupWindow : public HWindow 

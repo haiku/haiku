@@ -157,12 +157,13 @@ status_t
 PrinterSettings::GetDefaults(BMessage *msg)
 {
 	// check to see if there is a pdf_printer_settings file
-	PrinterPrefs *prefs = new PrinterPrefs();
-	BMessage *settings = new BMessage();
-	settings->what = 'okok';
-	if (prefs->LoadSettings(settings) == B_OK) {
+	PrinterPrefs prefs;
+	BMessage settings;
+	settings.what = 'okok';
+	
+	if (prefs.LoadSettings(&settings) == B_OK && Validate(&settings) == B_OK) {
 		// yes, copy the settings into message
-		*msg = *settings;
+		*msg = settings;
 	} else {
 		// set default value if property not set
 		msg->AddInt64("xres", XRES);
@@ -181,13 +182,14 @@ PrinterSettings::GetDefaults(BMessage *msg)
 		msg->AddBool("create_xrefs", CREATE_XREFS);
 		msg->AddString("xrefs_file", XREFS_FILE);
 		msg->AddInt32("close_option", CLOSE_OPTION);
+		msg->AddString("pdflib_license_key", PDFLIB_LICENSE_KEY);
+		msg->AddString("master_password", MASTER_PASSWORD);
+		msg->AddString("user_password", USER_PASSWORD);
+		msg->AddString("permissions", PERMISSIONS);
 		
 		// create pdf_printer_settings file
-		prefs->SaveSettings(msg);
+		prefs.SaveSettings(msg);
 	}
-
-	delete prefs;
-	delete settings;
 
 	return B_OK;
 }
@@ -257,6 +259,18 @@ PrinterSettings::Validate(const BMessage *msg)
 		return B_ERROR;
 	}
 	if (msg->FindInt32("close_option", &i32) != B_OK) {
+		return B_ERROR;
+	}
+	if (msg->FindString("pdflib_license_key", &s) != B_OK) {
+		return B_ERROR;
+	}
+	if (msg->FindString("user_password", &s) != B_OK) {
+		return B_ERROR;
+	}
+	if (msg->FindString("master_password", &s) != B_OK) {
+		return B_ERROR;
+	}
+	if (msg->FindString("permissions", &s) != B_OK) {
 		return B_ERROR;
 	}
 	// message ok

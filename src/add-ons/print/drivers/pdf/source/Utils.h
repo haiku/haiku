@@ -37,6 +37,10 @@ THE SOFTWARE.
 #include <MessageFilter.h>
 
 
+// adds fields to message or replaces existing fields (copy BeUtils.h)
+void AddFields(BMessage* to, const BMessage* from, const char* excludeList[] = NULL, const char* includeList[] = NULL);
+void AddString(BMessage* m, const char* name, const char* value);
+
 class EscapeMessageFilter : public BMessageFilter 
 {
 private:
@@ -48,21 +52,6 @@ public:
 	filter_result Filter(BMessage *msg, BHandler **target);
 };
 
-
-class HWindow : public BWindow
-{
-protected:
-	void Init(uint32 escape_msg);
-	
-public:
-	typedef BWindow 		inherited;
-
-	HWindow(BRect frame, const char *title, window_type type, uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE, uint32 escape_msg = B_QUIT_REQUESTED);
-	HWindow(BRect frame, const char *title, window_look look, window_feel feel, uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE, uint32 escape_msg = B_QUIT_REQUESTED);
-	
-	virtual void MessageReceived(BMessage* m);
-	virtual void AboutRequested();
-};
 
 #define BEGINS_CHAR(byte) ((byte & 0xc0) != 0x80)
 
@@ -79,6 +68,7 @@ public:
 	int32    CountItems() const;
 	T*       ItemAt(int32 index) const;
 	void     AddItem(T* p);
+	T*       RemoveItem(int i);
 	T*       Items();
 	void     SortItems(int (*comp)(const T**, const T**));
 };
@@ -115,6 +105,11 @@ T* TList<T>::ItemAt(int32 index) const {
 template<class T>
 void TList<T>::AddItem(T* p) {
 	fList.AddItem(p);
+}
+
+template<class T>
+T* TList<T>::RemoveItem(int i) {
+	return (T*)fList.RemoveItem(i);
 }
 
 

@@ -67,6 +67,18 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 
 	x = 5; y = 5; w = r.Width(); h = r.Height();
 
+	// PDFlib license key
+#if 0	
+	BString licenseKey;
+	if (settings->FindString("pdflib_license_key", &licenseKey) != B_OK) licenseKey = "";
+	fLicenseKey = new BTextControl(BRect(x, y, x+2-10, y+14), "pdflib_license_key", "PDFlib License Key", "", NULL);
+	fLicenseKey->TextView()->HideTyping(true);
+	fLicenseKey->TextView()->SetText(licenseKey.String());
+	panel->AddChild(fLicenseKey);
+	fLicenseKey->ResizeToPreferred();
+	y += fLicenseKey->Bounds().Height()+5;
+#endif
+
 	// web links
 	if (settings->FindBool("create_web_links", &fCreateLinks) != B_OK) fCreateLinks = false;
 
@@ -208,6 +220,14 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 void
 AdvancedSettingsWindow::UpdateSettings()
 {
+#if 0
+	if (fSettings->HasString("pdflib_license_key")) {
+		fSettings->ReplaceString("pdflib_license_key", fLicenseKey->Text());
+	} else {
+		fSettings->AddString("pdflib_license_key", fLicenseKey->Text());
+	}
+#endif
+
 	if (fSettings->HasBool("create_web_links")) {
 		fSettings->ReplaceBool("create_web_links", fCreateLinks);
 	} else {

@@ -57,6 +57,10 @@ const char BOOKMARK_DEFINITION_FILE[] = "";
 const bool CREATE_XREFS = false;
 const char XREFS_FILE[] = "";
 const int32 CLOSE_OPTION = 0;
+const char PDFLIB_LICENSE_KEY[] = "";
+const char USER_PASSWORD[] = ""; // none if empty
+const char MASTER_PASSWORD[] = ""; // none if empty
+const char PERMISSIONS[] = ""; // all is allowed
 
 /**
  * Class

@@ -93,7 +93,8 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		// Image support
 		int32       BytesPerPixel(int32 pixelFormat);
 
-		bool        NeedsAlphaCheck(int32 pixelFormat);
+		bool        HasAlphaChannel(int32 pixelFormat);
+		bool        NeedsBPC1Mask(int32 pixelFormat);
 
 		inline bool IsTransparentRGB32(uint8* in);
 		inline bool IsTransparentRGBA32(uint8* in);
@@ -110,6 +111,9 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		inline bool IsTransparentCMAP8(uint8* in);
 		//inline bool IsTransparentGRAY8(uint8* in);
 		//inline bool IsTransparentGRAY1(uint8* in);
+
+		inline uint8 AlphaFromRGBA32(uint8* in);
+		inline uint8 AlphaFromRGBA32_BIG(uint8* in);
 
 		inline void ConvertFromRGB32(uint8* in, uint8* out);
 		inline void ConvertFromRGB32_BIG(uint8* in, uint8* out);
@@ -128,6 +132,7 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		inline void ConvertFromGRAY1(uint8* in, uint8* out, int8 bit);
 
 		void		*CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data);
+		void		*CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data);
 		BBitmap		*ConvertBitmap(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data);
 		bool		GetImages(BRect src, int32 width, int32 height, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data, int* mask, int* image);
 
@@ -193,6 +198,12 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		static inline bool IsSame(const rgb_color &c1, const rgb_color &c2);
 		
 	private:
+	
+		enum PDFVersion {
+			kPDF13,
+			kPDF14,
+			kPDF15
+		};
 	
 		class State 
 		{
@@ -271,7 +282,25 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 				return IsSame(pat, p) && IsSame(lowColor, low) && IsSame(highColor, high);
 			};
 		};
+
+		class Transparency
+		{
+			uint8	alpha;
+			int		handle;
+		public:			
+			Transparency(uint8 alpha, int handle)
+				: alpha(alpha)
+				, handle(handle)
+			{};
+			
+			inline bool Matches(uint8 alpha) const {
+				return this->alpha == alpha;
+			};
+			
+			inline int Handle() const { return handle; }
+		};
 	
+		PDFVersion      fPDFVersion;
 		FILE			*fLog;
 		PDF				*fPdf;
 		int32           fPage;
@@ -279,6 +308,8 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		int32           fStateDepth;
 		TList<Font>     fFontCache;
 		TList<Pattern>  fPatterns;
+		TList<Transparency> fTransparencyCache;
+		TList<Transparency> fTransparencyStack;
 		int64           fEmbedMaxFontSize;
 		BScreen         *fScreen;
 		Fonts           *fFonts;
@@ -315,15 +346,24 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		inline bool IsDrawing() const  { return fMode == kDrawingMode; }
 		inline bool IsClipping() const { return fMode == kClippingMode; }
 
+		// PDF features depending on PDF version:
+		inline bool SupportsSoftMask() const { return fPDFVersion >= kPDF14; }
+		inline bool SupportsOpacity() const { return fPDFVersion >= kPDF14; }
+
 		inline float     PenSize() const        { return fState->penSize; }
 		inline cap_mode  LineCapMode() const    { return fState->capMode; }
 		inline join_mode LineJoinMode() const   { return fState->joinMode; }
 		inline float     LineMiterLimit() const { return fState->miterLimit; }
-
+		
 		bool StoreTranslatorBitmap(BBitmap *bitmap, const char *filename, uint32 type);
 
 		void GetFontName(BFont *font, char *fontname, bool &embed, font_encoding encoding);
 		int FindFont(char *fontname, bool embed, font_encoding encoding);
+
+		// alpha transparency
+		Transparency* FindTransparency(uint8 alpha);
+		void BeginTransparency();
+		void EndTransparency();
 
 		void PushInternalState();
 		bool PopInternalState();

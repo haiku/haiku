@@ -30,209 +30,52 @@ THE SOFTWARE.
 #include <InterfaceKit.h>
 #include <SupportKit.h>
 #include "DocInfoWindow.h"
+#include "InterfaceUtils.h"
 #include <ctype.h>
 
-
-// --------------------------------------------------
-class TextView : public BTextView
-{
-public:
-	typedef BTextView inherited;
-	
-	TextView(BRect frame,
-				const char *name,
-				BRect textRect,
-				uint32 rmask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-				uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
-
-	TextView(BRect frame,
-				const char *name,
-				BRect textRect,
-				const BFont *font, const rgb_color *color,
-				uint32 rmask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-				uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
-
-	void KeyDown(const char *bytes, int32 numBytes);
-	void MakeFocus(bool focus = true);
-	void Draw(BRect r);
+// pdflib 5.x supports password protection and permissions in the commercial license only!
+static const PermissionLabels gPermissionLabels[] = {
+	PermissionLabels("Prevent printing the file.", "noprint"),
+	PermissionLabels("Prevent making any changes.", "nomodify"),
+	PermissionLabels("Prevent copying or extracting text or graphics.", "nocopy"),
+	PermissionLabels("Prevent adding or changing comments or form fields.", "noannots"),
+	PermissionLabels("Prevent form field filling.", "noforms"),
+	PermissionLabels("Prevent extracting text of graphics.", "noaccessible"),
+	PermissionLabels("Prevent inserting, deleting, or rotating pages and creating bookmarks and thumbnails, even if nomodify hasn't been specified", "noassemble"),
+	PermissionLabels("Prevent high-resolution printing.", "nohiresprint")
 };
 
+// Implementation of Permissions
 
-// --------------------------------------------------
-class TextControl : public BView
-{
-	BStringView *fLabel;
-	TextView   *fText;
-public:
-	TextControl(BRect frame,
-				const char *name,
-				const char *label, 
-				const char *initial_text, 
-				BMessage *message,
-				uint32 rmask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-				uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
-	const char *Label() { return fLabel->Text(); }
-	const char *Text()  { return fText->Text(); }
-	void MakeFocus(bool focus = true) { fText->MakeFocus(focus); }	
-	void ConvertToParent(BView* parent, BView* child, BRect &rect);
-	void FocusSetTo(BView* child);
-};
-
-
-// --------------------------------------------------
-class Table : public BView
-{
-public:
-	typedef BView inherited;
-	
-	Table(BRect frame, const char *name, uint32 rmode, uint32 flags);
-	void ScrollTo(BPoint p);
-};
-
-
-// --------------------------------------------------
-TextView::TextView(BRect frame,
-				const char *name,
-				BRect textRect,
-				uint32 rmask,
-				uint32 flags)
-	: BTextView(frame, name, textRect, rmask, flags)
-{
+Permissions::Permissions() {
+	fNofPermissions = sizeof(gPermissionLabels)/sizeof(PermissionLabels);
+	fPermissions = new Permission[fNofPermissions];
+	for (int i = 0; i < fNofPermissions; i ++) {
+		fPermissions[i].SetLabels(&gPermissionLabels[i]);
+	}	
 }
 
-
-// --------------------------------------------------
-TextView::TextView(BRect frame,
-				const char *name,
-				BRect textRect,
-				const BFont *font, const rgb_color *color,
-				uint32 rmask,
-				uint32 flags)
-	: BTextView(frame, name, textRect, font, color, rmask, flags)
-{
-}
-
-
-// --------------------------------------------------
-void 
-TextView::KeyDown(const char *bytes, int32 numBytes)
-{
-	if (numBytes == 1 && *bytes == B_TAB) {
-		BView::KeyDown(bytes, numBytes);
-		return;
-	}
-	inherited::KeyDown(bytes, numBytes);
-}
-
-
-// --------------------------------------------------
-void 
-TextView::Draw(BRect update)
-{
-	inherited::Draw(update);
-	if (IsFocus()) {
-		// stroke focus rectangle
-		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		StrokeRect(Bounds());
+void Permissions::Decode(const char* s) {
+	for (int i = 0; i < fNofPermissions; i ++) {
+		bool allowed = strstr(s, At(i)->GetPDFName()) == NULL;
+		At(i)->SetAllowed(allowed);
 	}
 }
 
-
-// --------------------------------------------------
-void 
-TextView::MakeFocus(bool focus)
-{
-	Invalidate();
-	inherited::MakeFocus(focus);
-	// notify TextControl
-	BView* parent = Parent(); // BBox
-	if (focus && parent) {
-		parent = parent->Parent(); // TextControl
-		TextControl* control = dynamic_cast<TextControl*>(parent);
-		if (control) control->FocusSetTo(this);
-	}
-}
-
-
-// --------------------------------------------------
-TextControl::TextControl(BRect frame,
-				const char *name,
-				const char *label, 
-				const char *initial_text, 
-				BMessage *message,
-				uint32 rmask,
-				uint32 flags)
-	: BView(frame, name, rmask, flags)
-{
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	BRect r(0, 0, frame.Width() / 2 -1, frame.Height());
-	fLabel = new BStringView(r, "", label);
-	BRect f(r);
-	f.OffsetTo(frame.Width() / 2 + 1, 0);
-	// box around TextView
-	BBox *box = new BBox(f, "", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-	f.OffsetTo(0, 0);
-	f.InsetBy(1,1);
-	r.InsetBy(2,2);
-	fText  = new TextView(f, "", r, rmask, flags | B_NAVIGABLE);
-	fText->SetWordWrap(false);
-	fText->DisallowChar('\n');
-	fText->Insert(initial_text);
-	AddChild(fLabel); 
-	AddChild(box);
-	box->AddChild(fText);
-}
-
-
-// --------------------------------------------------
-void 
-TextControl::ConvertToParent(BView* parent, BView* child, BRect &rect) 
-{
-	do {
-		child->ConvertToParent(&rect);
-		child = child->Parent();
-	} while (child != NULL && child != parent);
-}
-
-
-// --------------------------------------------------
-void
-TextControl::FocusSetTo(BView *child)
-{
-	BRect r;
-	BView* parent = Parent(); // Table
-	if (parent) {
-		ConvertToParent(parent, child, r);
-		parent->ScrollTo(0, r.top);
-	}
-}
-
-
-// --------------------------------------------------
-Table::Table(BRect frame, const char *name, uint32 rmode, uint32 flags)
-	: BView(frame, name, rmode, flags)
-{
-}
-
-
-// --------------------------------------------------
-void
-Table::ScrollTo(BPoint p)
-{
-	float h = Frame().Height()+1;
-	if (Parent()) {
-		BScrollView* scrollView = dynamic_cast<BScrollView*>(Parent());
-		if (scrollView) {
-			BScrollBar *sb = scrollView->ScrollBar(B_VERTICAL);
-			float min, max;
-			sb->GetRange(&min, &max);
-			if (p.y < (h/2)) p.y = 0;
-			else if (p.y > max) p.y = max;
+void Permissions::Encode(BString* s) {
+	bool first = true;
+	s->Truncate(0);
+	for (int i = 0; i < fNofPermissions; i ++) {
+		if (!At(i)->IsAllowed()) {
+			if (first) {
+				first = false;
+			} else {
+				s->Append(" ");
+			}
+			s->Append(At(i)->GetPDFName());
 		}
 	}
-	inherited::ScrollTo(p);
 }
-
 
 // --------------------------------------------------
 DocInfoWindow::DocInfoWindow(BMessage *doc_info)
@@ -243,18 +86,80 @@ DocInfoWindow::DocInfoWindow(BMessage *doc_info)
 	// ---- Ok, build a default page setup user interface
 	BRect		r;
 	BBox		*panel;
-	BButton		*button;
-	float		x, y, w, h;
-	BString 	setting_value;
-
+	BTabView    *tabView;
+	BString     permissions;
 	fDocInfo = doc_info;
 	
-	// add a *dialog* background
+	if (DocInfo()->FindString("permissions", &permissions) == B_OK) {
+		fPermissions.Decode(permissions.String());
+	}
+	
 	r = Bounds();
-	panel = new BBox(r, "top_panel", B_FOLLOW_ALL, 
-					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-					B_PLAIN_BORDER);
+	tabView = new BTabView(r, "tab_view");
 
+	SetupDocInfoView(CreateTabPanel(tabView, "Information"));
+	//SetupPasswordView(CreateTabPanel(tabView, "Password"));
+	//SetupPermissionsView(CreateTabPanel(tabView, "Permissions"));
+	
+	AddChild(tabView);
+	MoveTo(320, 320);
+	
+	if (fTable->ChildAt(0)) fTable->ChildAt(0)->MakeFocus();
+}
+
+BBox*
+DocInfoWindow::CreateTabPanel(BTabView* tabView, const char* label) {
+	BRect r(tabView->Bounds());
+	r.bottom -= tabView->TabHeight();
+	// create tab panel
+	BBox* panel = new BBox(r, "top_panel", B_FOLLOW_ALL, 
+					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
+					B_PLAIN_BORDER);;
+	// add panel to tab
+	BTab* tab = new BTab();
+	tabView->AddTab(panel, tab);
+	tab->SetLabel(label);
+	return panel;
+}
+
+
+void
+DocInfoWindow::SetupButtons(BBox* panel) {
+	BButton		*button;
+	float		x, y, w, h;
+	BRect       r(panel->Bounds());
+	
+	// add a "OK" button, and make it default
+	button 	= new BButton(r, NULL, "OK", new BMessage(OK_MSG), 
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	button->ResizeToPreferred();
+	button->GetPreferredSize(&w, &h);
+	x = r.right - w - 8;
+	y = r.bottom - h - 8;
+	button->MoveTo(x, y);
+	panel->AddChild(button);
+
+	// add a "Cancel button	
+	button 	= new BButton(r, NULL, "Cancel", new BMessage(CANCEL_MSG), 
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	button->GetPreferredSize(&w, &h);
+	button->ResizeToPreferred();
+	button->MoveTo(x - w - 8, y);
+	panel->AddChild(button);
+
+	// add a separator line...
+	BBox * line = new BBox(BRect(r.left, y - 9, r.right, y - 8), NULL,
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM );
+	panel->AddChild(line);
+}
+
+void
+DocInfoWindow::SetupDocInfoView(BBox* panel) {
+	BButton		*button;
+	float		x, y, w, h;
+
+	BRect r(panel->Bounds());
+	
 	// add list of keys
 	fKeyList = new BMenu("Delete Key");
 	BMenuField *menu = new BMenuField(BRect(0, 0, 90, 10), "delete", "", fKeyList);
@@ -295,39 +200,48 @@ DocInfoWindow::DocInfoWindow(BMessage *doc_info)
 	add->MoveTo(keys->Frame().right + 5, keys->Frame().top);
 
 	// fill table
-	BuildTable(fDocInfo);
-
-	// add a "OK" button, and make it default
-	button 	= new BButton(r, NULL, "OK", new BMessage(OK_MSG), 
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->GetPreferredSize(&w, &h);
-	x = r.right - w - 8;
-	y = r.bottom - h - 8;
-	button->MoveTo(x, y);
-	panel->AddChild(button);
-
-	// add a "Cancel button	
-	button 	= new BButton(r, NULL, "Cancel", new BMessage(CANCEL_MSG), 
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	button->MoveTo(x - w - 8, y);
-	panel->AddChild(button);
-
-	// add a separator line...
-	BBox * line = new BBox(BRect(r.left, y - 9, r.right, y - 8), NULL,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM );
-	panel->AddChild(line);
-
-	// Finally, add our panel to window
-	AddChild(panel);
-	
-	MoveTo(320, 320);
-	
-	if (fTable->ChildAt(0)) fTable->ChildAt(0)->MakeFocus();
+	BMessage doc_info;
+	fDocInfo->FindMessage("doc_info", &doc_info);
+	BuildTable(&doc_info);
+	SetupButtons(panel);
 }
 
+
+BTextControl*
+DocInfoWindow::AddPasswordControl(BRect r, BView* panel, const char* name, const char* label) {
+	BString s;
+	BTextControl* text;
+	if (DocInfo()->FindString(name, &s) != B_OK) s = "";
+	text = new BTextControl(r, name, label, "", NULL);
+	text->TextView()->HideTyping(true);
+	text->TextView()->SetText(s.String());
+	panel->AddChild(text);
+	return text;
+}
+
+// --------------------------------------------------
+void
+DocInfoWindow::SetupPasswordView(BBox* panel) {
+	BRect r(panel->Bounds());
+	BRect r1(5, 5, r.Width()-10, 25);
+	BString label;
+	
+	fMasterPassword = AddPasswordControl(r1, panel, "master_password", "Master Password:");
+	r1.OffsetBy(0, fMasterPassword->Bounds().Height());
+	fUserPassword = AddPasswordControl(r1, panel, "user_password", "User Password:");
+	
+	float w = max_c(panel->StringWidth(fMasterPassword->Label()), panel->StringWidth(fUserPassword->Label()));
+	fMasterPassword->SetDivider(w);
+	fUserPassword->SetDivider(w);
+	
+	SetupButtons(panel);
+}
+
+void
+DocInfoWindow::SetupPermissionsView(BBox* panel) {
+
+	SetupButtons(panel);
+}
 
 // --------------------------------------------------
 bool 
@@ -351,7 +265,14 @@ void
 DocInfoWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what){
-		case OK_MSG: ReadFieldsFromTable(fDocInfo); Quit();
+		case OK_MSG: {
+				BMessage doc_info;
+				ReadFieldsFromTable(&doc_info);
+				DocInfo()->ReplaceMessage("doc_info", &doc_info);
+				ReadPasswords();
+				ReadPermissions();
+				Quit();
+			}
 			break;
 		
 		case CANCEL_MSG: Quit();
@@ -433,7 +354,26 @@ DocInfoWindow::BuildTable(BMessage *docInfo)
 
 // --------------------------------------------------
 void 
-DocInfoWindow::ReadFieldsFromTable(BMessage *toDocInfo) 
+DocInfoWindow::ReadPasswords() 
+{
+	//AddString(DocInfo(), "master_password", fMasterPassword->TextView()->Text());
+	//AddString(DocInfo(), "user_password", fUserPassword->TextView()->Text());
+}
+
+// --------------------------------------------------
+void 
+DocInfoWindow::ReadPermissions() 
+{
+	BString permissions;
+	fPermissions.Encode(&permissions);
+//	AddString(DocInfo(), "permissions", permissions.String());
+}
+
+
+
+// --------------------------------------------------
+void 
+DocInfoWindow::ReadFieldsFromTable(BMessage* doc_info) 
 {
 	BView* child;
 	BMessage m;
@@ -443,7 +383,7 @@ DocInfoWindow::ReadFieldsFromTable(BMessage *toDocInfo)
 			m.AddString(t->Label(), t->Text());
 		}
 	}
-	*toDocInfo = m;
+	*doc_info = m;
 }
 
 

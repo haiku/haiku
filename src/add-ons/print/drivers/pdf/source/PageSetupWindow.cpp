@@ -77,7 +77,8 @@ static struct
 	{NULL, 0}
 };
 
-static const char *pdf_compatibility[] = {"1.2", "1.3", "1.4", NULL};
+// PDFLib 5.x does not support PDF 1.2 anymore!
+static const char *pdf_compatibility[] = {"1.3", "1.4", NULL};
 
 /**
  * Constuctor
@@ -437,6 +438,15 @@ PageSetupWindow::UpdateSetupMessage()
 	BString s;
 	int32   i;
 	
+	
+	if (fAdvancedSettings.FindString("pdflib_license_key", &s) == B_OK) {
+		if (fSetupMsg->HasString("pdflib_license_key")) {
+			fSetupMsg->ReplaceString("pdflib_license_key", s.String());
+		} else {
+			fSetupMsg->AddString("pdflib_license_key", s.String());
+		}
+	}
+
 	if (fAdvancedSettings.FindBool("create_web_links", &b) == B_OK) {
 		if (fSetupMsg->HasBool("create_web_links")) {
 			fSetupMsg->ReplaceBool("create_web_links", b);
@@ -493,7 +503,7 @@ PageSetupWindow::UpdateSetupMessage()
 		}
 	}
 
-	// save the settings to be new defaults
+	// save the settings to the new defaults
 	PrinterSettings *ps = new PrinterSettings(fPrinterDirName.String());
 	if (ps->InitCheck() == B_OK) {
 		ps->WriteSettings(fSetupMsg);
