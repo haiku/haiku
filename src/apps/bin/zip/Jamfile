@@ -13,33 +13,28 @@ StaticLibrary zip :
 	zipfile.c
 	trees.c
 	crctab.c
+	: : zip.rdef
 ;
 
 BinCommand zip :
 	zip.c
-	: libzip.a
+	: libzip.a be : zip.rdef
 ;
-
-LinkSharedOSLibs zip : be ;
 
 BinCommand zipcloak :
 	zipcloak.c
 	bedefs.c
-	: libzip.a 
+	: libzip.a : zip.rdef
 ;
 
 BinCommand zipnote :
 	zipnote.c
 	bedefs.c
-	: libzip.a 
+	: libzip.a be : zip.rdef
 ;
-
-LinkSharedOSLibs zipnote : be ;
 
 BinCommand zipsplit :
 	zipsplit.c
 	bedefs.c
-	: libzip.a 
+	: libzip.a be : zip.rdef
 ;
-
-LinkSharedOSLibs zipsplit : be ;
