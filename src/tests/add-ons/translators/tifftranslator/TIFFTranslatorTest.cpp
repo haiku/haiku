@@ -214,7 +214,9 @@ TIFFTranslatorTest::IdentifyTest()
 		{ "/boot/home/resources/tiff/vsmall_cmap4_nocomp.tif",
 			"TIFF Image (Little, Palette, None)" },
 		{ "/boot/home/resources/tiff/vsmall_rgb_nocomp.tif",
-			"TIFF Image (Little, RGB, None)" }
+			"TIFF Image (Little, RGB, None)" },
+		{ "/boot/home/resources/tiff/backup_help.tif",
+			"TIFF Image (Big, Mono, Group 3)" }
 	};
 
 	IdentifyTests(this, proster, aTiffPaths,
@@ -405,7 +407,9 @@ TIFFTranslatorTest::TranslateTest()
 		{ "/boot/home/resources/tiff/vsmall_cmap4_nocomp.tif",
 			"/boot/home/resources/tiff/vsmall.bits" },
 		{ "/boot/home/resources/tiff/vsmall_rgb_nocomp.tif",
-			"/boot/home/resources/tiff/vsmall.bits" }
+			"/boot/home/resources/tiff/vsmall.bits" },
+		{ "/boot/home/resources/tiff/backup_help.tif",
+			"/boot/home/resources/tiff/backup_help.bits" }
 	};
 	
 	TranslateTests(this, proster, aPaths,
