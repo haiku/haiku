@@ -22,6 +22,6 @@ Addon <userland>core : userland network :
 	socket.c
 ;
 
-LinkSharedOSLibs <userland>core : root <installed>net_stack_tester ;
+LinkSharedOSLibs <userland>core : <installed>net_stack_tester ;
 
 

@@ -8,4 +8,4 @@ Addon <userland>icmp : userland network protocols :
 	icmp.c
 ;
 
-LinkSharedOSLibs <userland>icmp : root <installed>net_stack_tester ;
+LinkSharedOSLibs <userland>icmp : <installed>net_stack_tester ;

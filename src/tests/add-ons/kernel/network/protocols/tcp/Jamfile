@@ -13,4 +13,4 @@ Addon <userland>tcp : userland network protocols :
 	arc4random.c
 ;
 
-LinkSharedOSLibs <userland>tcp : root <installed>net_stack_tester ;
+LinkSharedOSLibs <userland>tcp : <installed>net_stack_tester ;

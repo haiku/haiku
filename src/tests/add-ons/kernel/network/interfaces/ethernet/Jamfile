@@ -8,5 +8,5 @@ Addon <userland>ethernet : userland network interfaces :
 	ethernet.c
 ;
 
-LinkSharedOSLibs <userland>ethernet : root <installed>net_stack_tester ;
+LinkSharedOSLibs <userland>ethernet : <installed>net_stack_tester ;
 

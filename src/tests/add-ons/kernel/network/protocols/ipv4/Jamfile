@@ -8,4 +8,4 @@ Addon <userland>ipv4 : userland network protocols :
 	ipv4.c
 ;
 
-LinkSharedOSLibs <userland>ipv4 : root <installed>net_stack_tester ;
+LinkSharedOSLibs <userland>ipv4 : <installed>net_stack_tester ;

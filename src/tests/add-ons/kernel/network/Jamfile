@@ -5,12 +5,14 @@ UsePrivateHeaders net ;
 # the network stack tester app
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+
 SimpleTest net_stack_tester : 
 	net_stack_tester.cpp 
 	userland_ipc.c
 	userland_modules.cpp
-	: be 
+	: be
 ;
+
 LOCATE on <installed>net_stack_tester = [ on net_stack_tester return $(LOCATE) ] ;
 Depends <installed>net_stack_tester : net_stack_tester ;
 
