@@ -30,6 +30,9 @@ public:
 	void SetOutputChannelSourceGain(int channel, uint32 source_designation, float source_gain);
 	float GetOutputChannelSourceGain(int channel, uint32 source_designation);
 	void GetOutputChannelSourceAt(int channel, int index, uint32 *source_designation, float *source_gain);
+	
+	void SetMuted(bool yesno);
+	bool IsMuted();
 
 	// only for use by MixerCore
 	void GetMixerChannelInfo(int channel, int index, int *type, float *gain);
@@ -55,6 +58,8 @@ private:
 	uint32				fOutputChannelCount;
 	output_chan_info 	*fOutputChannelInfo; //array
 	ByteSwap			*fOutputByteSwap;
+	
+	bool				fMuted;
 };
 
 inline uint32 MixerOutput::GetOutputChannelCount()
@@ -88,6 +93,11 @@ inline void MixerOutput::AdjustByteOrder(BBuffer *buffer)
 {
 	if (fOutputByteSwap)
 		fOutputByteSwap->Swap(buffer->Data(), buffer->SizeUsed());
+}
+
+inline bool MixerOutput::IsMuted()
+{
+	return fMuted;
 }
 
 #endif

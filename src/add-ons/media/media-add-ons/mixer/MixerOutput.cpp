@@ -9,7 +9,8 @@ MixerOutput::MixerOutput(MixerCore *core, const media_output &output)
 	fOutput(output),
 	fOutputChannelCount(0),
 	fOutputChannelInfo(0),
-	fOutputByteSwap(0)
+	fOutputByteSwap(0),
+	fMuted(false)
 {
 	fix_multiaudio_format(&fOutput.format.u.raw_audio);
 	PRINT_OUTPUT("MixerOutput::MixerOutput", fOutput);
@@ -312,4 +313,10 @@ MixerOutput::GetOutputChannelSourceAt(int channel, int index, uint32 *source_des
 	}
 	*source_gain = fOutputChannelInfo[channel].source_gain[index];
 	*source_designation = ChannelTypeToChannelMask(fOutputChannelInfo[channel].source_type[index]);
+}
+
+void
+MixerOutput::SetMuted(bool yesno)
+{
+	fMuted = yesno;
 }

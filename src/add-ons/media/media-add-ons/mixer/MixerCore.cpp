@@ -436,8 +436,8 @@ MixerCore::MixThread()
 		if (!LockWithTimeout(10000))
 			continue;
 		
-		// no inputs, skip further processing and just send an empty buffer
-		if (fInputs->IsEmpty()) {
+		// no inputs or output muted, skip further processing and just send an empty buffer
+		if (fInputs->IsEmpty() || fOutput->IsMuted()) {
 			int size = fOutput->MediaOutput().format.u.raw_audio.buffer_size;
 			BBuffer* buf = fBufferGroup->RequestBuffer(size, 5000);
 			if (buf) {

@@ -868,11 +868,10 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// output mute control
-			printf("get output mute control size %d\n", *ioSize);
 			if (*ioSize < sizeof(int32))
 				goto err;
 			*ioSize = sizeof(int32);
-			static_cast<int32 *>(value)[0] = 0;
+			static_cast<int32 *>(value)[0] = output->IsMuted();
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// output gain control
@@ -926,9 +925,9 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// output mute control
-			printf("set output mute control size %d\n", size);
 			if (size != sizeof(int32))
 				goto err;
+			output->SetMuted(static_cast<const int32 *>(value)[0]);
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// output gain control
@@ -984,10 +983,10 @@ AudioMixer::UpdateParameterWeb()
 	group = output->MakeGroup("");
 	out = fCore->Output();
 	if (!out) {
-		group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Gain", B_WEB_BUFFER_INPUT); 
+		group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Output", B_WEB_BUFFER_INPUT); 
 		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
 	} else {
-		group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Gain", B_WEB_BUFFER_INPUT); 
+		group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Output", B_WEB_BUFFER_INPUT); 
 		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, StringForFormat(out), B_GENERIC);
 		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
 		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", -60.0, 18.0, 0.5) 
