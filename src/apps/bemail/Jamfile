@@ -2,7 +2,7 @@ SubDir OBOS_TOP src apps bemail ;
 
 UsePrivateHeaders mail ;
 
-AddResources BeMail : BeMail.rsrc ;
+AddResources BeMail : versioning.rdef pictures.rdef  ;
 App BeMail : 
 	BmapButton.cpp
 	ButtonBar.cpp
