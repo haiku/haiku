@@ -2,3 +2,8 @@ SubDir OBOS_TOP ;
 
 SubInclude OBOS_TOP src ;
 
+WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
+
+BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
+
+KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(OBOS_TOP)/src/kernel/boot/arch/$(OBOS_ARCH)/bootblock.bin ;
