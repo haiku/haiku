@@ -54,33 +54,13 @@ struct translator_info {		/* Info about a specific translation*/
 	char			MIME[251];
 };
 
-// BEGIN: Added by Michael Wilber
-struct translator_data {
-	const char *translatorName;
-	const char *translatorInfo;
-	int32 translatorVersion;
-	const translation_format *inputFormats;
-	const translation_format *outputFormats;
-
-	status_t (*Identify)(BPositionIO *inSource,
-		const translation_format *inFormat, BMessage *ioExtension,
-		translator_info *outInfo, uint32 outType);
-		
-	status_t (*Translate)(BPositionIO *inSource,
-		const translator_info *inInfo, BMessage *ioExtension,
-		uint32 outType, BPositionIO *outDestination);
-		
-	status_t (*MakeConfig)(BMessage *ioExtension,
-		BView **outView, BRect *outExtent);
-		
-	status_t (*GetConfigMessage)(BMessage *ioExtension);
-};
+// BEGIN: Haiku R1 Extensions
 
 #define B_TRANSLATION_MAKE_VERSION(major,minor,revision) ((major << 8) | ((minor << 4) & 0xf0) | (revision & 0x0f))
 #define B_TRANSLATION_MAJOR_VERSION(v) (v >> 8)
 #define B_TRANSLATION_MINOR_VERSION(v) ((v >> 4) & 0xf)
 #define B_TRANSLATION_REVISION_VERSION(v) (v & 0xf)
 
-// END: Added by Michael Wilber
+// END: Haiku R1 Extensions
 
 #endif /* _TRANSLATION_DEFS_H */
