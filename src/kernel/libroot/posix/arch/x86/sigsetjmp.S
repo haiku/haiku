@@ -25,6 +25,7 @@ FUNCTION(sigsetjmp):
 	mov		%ebx, JMP_REGS_EBX(%eax)
 	mov		%esi, JMP_REGS_ESI(%eax)
 	mov		%edi, JMP_REGS_EDI(%eax)
+	mov		%ebp, JMP_REGS_EBP(%eax)
 
 	// save stack and return address (because that's where we intend to jump to)
 	lea		4(%esp,1), %ecx
