@@ -24,6 +24,8 @@
 
 static const char *kSignature = "application/x-vnd.OpenBeOS-DiskProbe";
 
+static const uint32 kCascadeOffset = 20;
+
 
 class DiskProbe : public BApplication {
 	public:
@@ -243,7 +245,7 @@ DiskProbe::Probe(entry_ref &ref)
 
 	// cascade window
 	BRect rect = fWindowPosition;
-	rect.OffsetBy(probeWindows * 15, probeWindows * 15);
+	rect.OffsetBy(probeWindows * kCascadeOffset, probeWindows * kCascadeOffset);
 
 	BWindow *window = new ProbeWindow(rect, &ref);
 	window->Show();
