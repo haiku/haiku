@@ -8,4 +8,6 @@ KernelAddon <driver>tty : kernel drivers dev :
 	line_buffer.cpp
 	master.cpp
 	slave.cpp
+	SemaphorePool.cpp
 	;
+
