@@ -44,22 +44,14 @@
 
 #define STXT_TRANSLATOR_VERSION 0x100
 #define STXT_IN_QUALITY 0.5
-	// high in quality becuase this code supports all STXT features
 #define STXT_IN_CAPABILITY 0.5
-	// high in capability because this code opens basically all STXTs
 #define STXT_OUT_QUALITY 0.5
-	// high out quality because this code outputs fully standard STXTs
 #define STXT_OUT_CAPABILITY 0.5
-	// medium out capability because RLE compression is not an option
 
 #define TEXT_IN_QUALITY 0.4
-	// medium in quality because only most common features are supported
 #define TEXT_IN_CAPABILITY 0.6
-	// high in capability because most variations are supported
 #define TEXT_OUT_QUALITY 0.4
-	// medium out quality because only most common features are supported
 #define TEXT_OUT_CAPABILITY 0.6
-	// high out capability because most variations are supported
 
 class STXTTranslator : public BTranslator {
 public:

@@ -47,15 +47,15 @@
 
 #define PNG_TRANSLATOR_VERSION 0x100
 
-#define PNG_IN_QUALITY 0.6
-#define PNG_IN_CAPABILITY 0.2
-#define PNG_OUT_QUALITY 0.6
-#define PNG_OUT_CAPABILITY 0.2
+#define PNG_IN_QUALITY 0.8
+#define PNG_IN_CAPABILITY 0.8
+#define PNG_OUT_QUALITY 0.8
+#define PNG_OUT_CAPABILITY 0.5
 
-#define BBT_IN_QUALITY 0.5
-#define BBT_IN_CAPABILITY 0.2
+#define BBT_IN_QUALITY 0.8
+#define BBT_IN_CAPABILITY 0.6
 #define BBT_OUT_QUALITY 0.5
-#define BBT_OUT_CAPABILITY 0.2
+#define BBT_OUT_CAPABILITY 0.4
 
 
 class PNGTranslator : public BTranslator {

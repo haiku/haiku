@@ -41,23 +41,15 @@
 #include "TGATranslatorSettings.h"
 
 #define TGA_TRANSLATOR_VERSION 0x100
-#define TGA_IN_QUALITY 1.0
-	// high in quality becuase this code supports all TGA features
-#define TGA_IN_CAPABILITY 0.6
-	// high in capability because this code opens most TGAs
-#define TGA_OUT_QUALITY 1.0
-	// high out quality because this code outputs fully standard TGAs
-#define TGA_OUT_CAPABILITY 0.7
-	// high out capability because many TGA features are supported
+#define TGA_IN_QUALITY 0.7
+#define TGA_IN_CAPABILITY 0.8
+#define TGA_OUT_QUALITY 0.7
+#define TGA_OUT_CAPABILITY 0.6
 
-#define BBT_IN_QUALITY 0.6
-	// medium in quality because only most common features are supported
-#define BBT_IN_CAPABILITY 0.8
-	// high in capability because most variations are supported
+#define BBT_IN_QUALITY 0.7
+#define BBT_IN_CAPABILITY 0.6
 #define BBT_OUT_QUALITY 0.6
-	// medium out quality because only most common features are supported
 #define BBT_OUT_CAPABILITY 0.8
-	// high out capability because most variations are supported
 
 // TGA files are stored in the Intel byte order :)
 struct TGAFileHeader {

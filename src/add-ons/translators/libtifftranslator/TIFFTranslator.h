@@ -48,16 +48,14 @@
 
 #define TIFF_TRANSLATOR_VERSION 0x100
 
-#define TIFF_IN_QUALITY 0.5
+#define TIFF_IN_QUALITY 0.7
 #define TIFF_IN_CAPABILITY 0.6
-#define TIFF_OUT_QUALITY 0.8
-	// high out quality because this code outputs fully standard TIFFs
-#define TIFF_OUT_CAPABILITY 0.4
-	// medium out capability because not many TIFF features are supported
+#define TIFF_OUT_QUALITY 0.7
+#define TIFF_OUT_CAPABILITY 0.6
 
-#define BBT_IN_QUALITY 0.4
+#define BBT_IN_QUALITY 0.7
 #define BBT_IN_CAPABILITY 0.6
-#define BBT_OUT_QUALITY 0.4
+#define BBT_OUT_QUALITY 0.7
 #define BBT_OUT_CAPABILITY 0.6
 
 class TIFFTranslatorSettings;
