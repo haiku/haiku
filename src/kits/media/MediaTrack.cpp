@@ -14,7 +14,7 @@
 #include "ReaderPlugin.h"
 #include "debug.h"
 
-#define CONVERT_TO_INT32 1 // XXX test! this triggers a few bugs!
+#define CONVERT_TO_INT32 0 // XXX test! this triggers a few bugs!
 
 // flags used for workarounds
 enum {
@@ -274,7 +274,7 @@ BMediaTrack::ReadFrames(void *out_buffer,
 	if (mh)
 		*mh = header;
 
-	printf("BMediaTrack::ReadFrames: %Ld frames, start-time %Ld\n", *out_frameCount, header.start_time);
+//	printf("BMediaTrack::ReadFrames: %Ld frames, start-time %Ld\n", *out_frameCount, header.start_time);
 
 	return result;
 }
@@ -769,7 +769,7 @@ status_t BMediaTrack::_Reserved_BMediaTrack_47(int32 arg, ...) { return B_ERROR;
 
 RawDecoderChunkProvider::RawDecoderChunkProvider(Decoder *decoder, int buffer_size, int frame_size)
 {
-	printf("RawDecoderChunkProvider: buffer_size %d, frame_size %d\n", buffer_size, frame_size);
+//	printf("RawDecoderChunkProvider: buffer_size %d, frame_size %d\n", buffer_size, frame_size);
 	fDecoder = decoder;
 	fFrameSize = frame_size;
 	fBufferSize = buffer_size;
@@ -791,7 +791,7 @@ RawDecoderChunkProvider::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 	if (res == B_OK) {
 		*chunkBuffer = fBuffer;
 		*chunkSize = frames * fFrameSize;
-		printf("RawDecoderChunkProvider::GetNextChunk, %Ld frames, %ld bytes, start-time %Ld\n", frames, *chunkSize, mediaHeader->start_time);
+//		printf("RawDecoderChunkProvider::GetNextChunk, %Ld frames, %ld bytes, start-time %Ld\n", frames, *chunkSize, mediaHeader->start_time);
 	} else {
 		printf("RawDecoderChunkProvider::GetNextChunk failed\n");
 	}
