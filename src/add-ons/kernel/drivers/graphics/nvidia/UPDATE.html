@@ -4,9 +4,14 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.10-2), (Rudolf)</h1></p>
+<p><h1>head (0.10-4), (Rudolf)</h1></p>
 <ul>
-	<li>Trying to detect internal (laptops) and external (DVI) digital flatpanels connected... (preliminary stuff)
+	<li>Implemented laptop internal flatpanel presence and native resolution detection;
+	<li>Implemented external DVI flatpanel(s) presence and native resolution detection;
+	<li>Added flatpanel(s) refreshrate protection: it(they) is(are) always kept at 60Hz refresh;
+	<li>Added flatpanel specific CRTC modeline and DFP modeline tuning: DVI connected panels work now on both heads (if applicable).<br>
+	NOTE:<br>
+	dualhead switch mode is not yet operational for flatpanels...
 </ul>
 <p><h1>nv_driver 0.09, (Rudolf)</h1></p>
 <ul>
