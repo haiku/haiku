@@ -189,3 +189,20 @@ list_remove_tail_item(struct list *list)
 	return GET_ITEM(list, link);
 }
 
+
+/**	Moves the contents of the source list to the target list.
+ *	The target list will be emptied before the items are moved;
+ *	this is a very fast operation.
+ */
+
+void *
+list_move_to_list(struct list *sourceList, struct list *targetList)
+{
+	*targetList = *sourceList;
+	targetList->link.next->prev = &targetList->link;
+	targetList->link.prev->next = &targetList->link;
+
+	sourceList->link.next = sourceList->link.prev = &sourceList->link;
+}
+
+
