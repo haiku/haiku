@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include <InterfaceKit.h>
 #include "PrintJobReader.h"
-#include "PrinterDriver.h"
 #include "InterfaceUtils.h"
 
 class PreviewPage {
@@ -109,11 +108,6 @@ public:
 	PreviewWindow(BFile* jobFile);
 	status_t InitCheck() const { return fPreview->InitCheck(); }
 	void MessageReceived(BMessage* m);
+	status_t Go();
 };
 
-class PreviewDriver : public PrinterDriver {
-public:
-	PreviewDriver(BNode* spoolDir) : PrinterDriver(spoolDir) {};
-	~PreviewDriver() {};
-	virtual status_t 		PrintJob(BFile *jobFile, BMessage *jobMsg);	
-};

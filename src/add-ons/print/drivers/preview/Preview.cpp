@@ -369,32 +369,12 @@ void PreviewWindow::MessageReceived(BMessage* m) {
 	UpdateControls();
 }
 
-status_t PreviewDriver::PrintJob(BFile *jobFile, BMessage *jobMsg) {
-	PreviewWindow* w;
-	status_t st;
-	w = new PreviewWindow(jobFile);
-	st = w->InitCheck();
+status_t PreviewWindow::Go() {
+	status_t st = InitCheck();
 	if (st == B_OK) {
-		w->Go();
+		return inherited::Go();
 	} else {
-		w->Quit();
+		Quit();
 	}
 	return st;
 }
-
-PrinterDriver* instanciate_driver(BNode *spoolDir)
-{
-	return new PreviewDriver(spoolDir);
-}
-
-// About dialog text:
-const char* 
-kAbout =
-"Preview for BeOS\n"
-"© 2003 OpenBeOS\n"
-"by Michael Pfeiffer\n"
-"\n"
-"Based on PDF Writer by\nPhilippe Houdoin, Simon Gauvin, Michael Pfeiffer\n"
-;
-
-

@@ -14,7 +14,8 @@ Addon Preview : print :
 	Driver.cpp
 	PrinterDriver.cpp
 	Preview.cpp
+	PreviewDriver.cpp
 ;
 
-LinkSharedOSLibs Preview : be root libprint.a ;
+LinkSharedOSLibs Preview : be root libprint.a  ;
 

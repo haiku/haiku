@@ -64,7 +64,7 @@ public:
 	// Quit() is called by child class with result code
 	void Quit(status_t result);
 	// Show window and wait for it to quit, returns result code
-	status_t Go();
+	virtual status_t Go();
 	// Or quit window e.g. something went wrong in constructor
 	void Quit();
 	

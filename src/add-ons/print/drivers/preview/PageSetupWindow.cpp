@@ -108,7 +108,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	float       width, height;
 	int32       orient;
 	BRect		page;
-	BRect		margin(0,0,0,0);
+	BRect		margin(0, 0, 0, 0);
 	int32 		units = MarginView::UNIT_INCH;
 	BString 	setting_value;
 
@@ -117,10 +117,15 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 //	(new BAlert("", "orientation not in msg", "Shit"))->Go(); 
 
 	// load page rect
-	fSetupMsg->FindRect("paper_rect", &r);
-	width = r.Width();
-	height = r.Height();
-	page = r;
+	if (fSetupMsg->FindRect("paper_rect", &r) == B_OK) {
+		width = r.Width();
+		height = r.Height();
+		page = r;
+	} else {
+		width = letter_width;
+		height = letter_height;
+		page.Set(0, 0, width, height);
+	}
 	
 	// Load units
 	fSetupMsg->FindInt32("units", &units);
@@ -135,12 +140,14 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	
 	// re-calculate the margin from the printable rect in points
 	margin = page;
-	fSetupMsg->FindRect("printable_rect", &margin);
-	
-	margin.top -= page.top;
-	margin.left -= page.left;
-	margin.right = page.right - margin.right;
-	margin.bottom = page.bottom - margin.bottom;
+	if (fSetupMsg->FindRect("printable_rect", &margin) == B_OK) {
+		margin.top -= page.top;
+		margin.left -= page.left;
+		margin.right = page.right - margin.right;
+		margin.bottom = page.bottom - margin.bottom;
+	} else {
+		margin.Set(0, 0, 0, 0);
+	}
 
 	fMarginView = new MarginView(BRect(20,20,200,160), width, height,
 			margin, units);
