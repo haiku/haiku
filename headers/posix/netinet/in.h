@@ -77,7 +77,7 @@ struct sockaddr_in {
 	uint8		sin_family;
 	uint16		sin_port;
 	struct in_addr 	sin_addr;
-	int8		sin_zero[8];
+	int8		sin_zero[24];
 };
 /* the address is therefore at sin_addr.s_addr */
 

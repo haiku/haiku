@@ -20,7 +20,7 @@ struct sockaddr_dl {
 	uint8	sdl_nlen;     /* interface name length, no trailing 0 reqd. */
 	uint8	sdl_alen;     /* link level address length */
 	uint8	sdl_slen;     /* link layer selector length */
-	char	sdl_data[12]; /* minimum work area, can be larger;
+	char	sdl_data[24]; /* minimum work area, can be larger;
                                    contains both if name and ll address */
 };
 
