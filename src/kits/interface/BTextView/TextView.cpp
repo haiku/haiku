@@ -3232,20 +3232,20 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 						bool scroll)
 {
 	// TODO: Cleanup
-	ASSERT(Window() != NULL);
-	if (!Window())
-		return;
-	
 	float saveHeight = fTextRect.Height();
 	int32 fromLine = LineAt(fromOffset);
 	int32 toLine = LineAt(toOffset);
 	int32 saveFromLine = fromLine;
 	int32 saveToLine = toLine;
 	float saveLineHeight = LineHeight(fromLine);
-	BRect bounds = Bounds();
 	
 	RecalculateLineBreaks(&fromLine, &toLine);
 
+	// TODO: Maybe there is still something we can do without a window...
+	if (!Window())
+		return;
+	
+	BRect bounds = Bounds();
 	float newHeight = fTextRect.Height();
 	
 	// if the line breaks have changed, force an erase
