@@ -129,7 +129,7 @@ TGATranslator::TGATranslator()
 		// load settings from the TGA Translator settings file
 
 	strcpy(fName, "TGA Images");
-	sprintf(fInfo, "TGA image translator v%d.%d.%d %s\n",
+	sprintf(fInfo, "TGA image translator v%d.%d.%d %s",
 		TGA_TRANSLATOR_VERSION / 100, (TGA_TRANSLATOR_VERSION / 10) % 10,
 		TGA_TRANSLATOR_VERSION % 10, __DATE__);
 }
