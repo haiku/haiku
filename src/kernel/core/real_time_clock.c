@@ -77,9 +77,10 @@ rtc_debug(int argc, char **argv)
 
 
 status_t
-rtc_init(kernel_args *ka)
+rtc_init(kernel_args *args)
 {
 	void *clonedRealTimeData;
+
 	area_id area = create_area("real time data", (void **)&sRealTimeData, B_ANY_KERNEL_ADDRESS,
 		PAGE_ALIGN(sizeof(struct real_time_data)), B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -88,11 +89,21 @@ rtc_init(kernel_args *ka)
 		return area;
 	}
 
-	if (clone_area("real time data userland", &clonedRealTimeData, B_CLONE_ADDRESS, 
+	// On some systems like x86, a page cannot be read-only in userland and writable
+	// in the kernel. Therefore, we clone the real time data area here for user
+	// access; it doesn't hurt on other platforms, too.
+	// The area is used to share time critical information, such as the system
+	// time conversion factor which can change at any time.
+
+	if (clone_area("real time data userland", &clonedRealTimeData, B_ANY_KERNEL_ADDRESS, 
 		B_READ_AREA, area) < B_OK) {
 		dprintf("rtc_init: error creating real time data userland area\n");
 		// we don't panic because it's not kernel critical
 	}
+
+	// ToDo: initialization of the system time conversion factor is an x86 thing
+	//	and should be moved there
+	sRealTimeData->system_time_conversion_factor = args->arch_args.system_time_cv_factor;
 
 	rtc_hw_to_system();
 
