@@ -38,13 +38,13 @@ void vm_put_region(vm_region *region);
 
 // private kernel only extension (should be moved somewhere else):
 struct team;
-area_id create_area_etc(struct team *team, char *name, void **address, uint32 addressSpec,
+area_id create_area_etc(struct team *team, const char *name, void **address, uint32 addressSpec,
 	uint32 size, uint32 lock, uint32 protection);
 status_t delete_area_etc(struct team *team, area_id area);
 
 region_id vm_create_anonymous_region(aspace_id aid, const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);
-region_id vm_map_physical_memory(aspace_id aid, char *name, void **address, int addr_type,
+region_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, int addr_type,
 	addr size, int lock, addr phys_addr);
 region_id vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
 	addr size, int lock, int mapping, const char *path, off_t offset);
