@@ -2007,8 +2007,9 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 	// (live queries might want to access us after this)
 
 	Index index(volume);
-	if (inode->IsRegularNode()) {
+	if (inode->IsRegularNode() && name != NULL) {
 		// the name index only contains regular files
+		// (but not the root node where name == NULL)
 		status = index.InsertName(transaction, name, inode);
 		if (status < B_OK && status != B_BAD_INDEX) {
 			// We have to remove the node from the parent at this point,
@@ -2016,7 +2017,7 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 			// case (and if it fails, we can't do anything about it...)
 			if (tree)
 				tree->Remove(transaction, name, inode->ID());
-			else
+			else if (parent != NULL && (mode & S_ATTR_DIR) != 0)
 				parent->Node()->attributes.SetTo(0, 0, 0);
 
 			return status;
