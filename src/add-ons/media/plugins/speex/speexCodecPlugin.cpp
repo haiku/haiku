@@ -20,11 +20,15 @@
 #define DECODE_BUFFER_SIZE	(32 * 1024)
 
 
-inline size_t
-AudioBufferSize(media_raw_audio_format * raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
+inline void
+AdjustBufferSize(media_raw_audio_format * raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
 {
-	return (raf->format & 0xf) * (raf->channel_count)
-         * (size_t)((raf->frame_rate * buffer_duration) / 1000000.0);
+	size_t frame_size = (raf->format & 0xf) * raf->channel_count;
+	if (raf->buffer_size <= frame_size) {
+		raf->buffer_size = frame_size * (size_t)((raf->frame_rate * buffer_duration) / 1000000.0);
+	} else {
+		raf->buffer_size = (raf->buffer_size / frame_size) * frame_size;
+	}
 }
 
 
@@ -209,21 +213,16 @@ SpeexDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	format.u.raw_audio.frame_rate = (float)fHeader->rate;
 	format.u.raw_audio.channel_count = fHeader->nb_channels;
 	format.u.raw_audio.channel_mask = B_CHANNEL_LEFT | (fHeader->nb_channels != 1 ? B_CHANNEL_RIGHT : 0);
-	int buffer_size = ioDecodedFormat->u.raw_audio.buffer_size;
-	if (buffer_size < 512) {
-		buffer_size = AudioBufferSize(&format.u.raw_audio);
-	}
-	int output_length = fHeader->frame_size * fHeader->nb_channels
-	                 * (format.u.raw_audio.format & 0xf);
-	buffer_size = ((buffer_size - 1) / output_length + 1) * output_length;
-	format.u.raw_audio.buffer_size = buffer_size;
 	if (!format_is_compatible(format,*ioDecodedFormat)) {
 		*ioDecodedFormat = format;
 	}
 	ioDecodedFormat->SpecializeTo(&format);
+	AdjustBufferSize(&ioDecodedFormat->u.raw_audio);
+	int output_length = fHeader->frame_size * format.AudioFrameSize();
+	ioDecodedFormat->u.raw_audio.buffer_size
+	  = ((ioDecodedFormat->u.raw_audio.buffer_size - 1) / output_length + 1) * output_length;
 	// setup output variables
-	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * 
-	             (ioDecodedFormat->u.raw_audio.channel_count);
+	fFrameSize = ioDecodedFormat->AudioFrameSize();
 	fOutputBufferSize = ioDecodedFormat->u.raw_audio.buffer_size;
 	fSpeexOutputLength = output_length;
 	return B_OK;

@@ -21,8 +21,8 @@
 inline void
 AdjustBufferSize(media_raw_audio_format * raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
 {
-	int frame_size = (raf->format & 0xf) * raf->channel_count;
-	if (raf->buffer_size == 0) {
+	size_t frame_size = (raf->format & 0xf) * raf->channel_count;
+	if (raf->buffer_size <= frame_size) {
 		raf->buffer_size = frame_size * (size_t)((raf->frame_rate * buffer_duration) / 1000000.0);
 	} else {
 		raf->buffer_size = (raf->buffer_size / frame_size) * frame_size;
@@ -97,12 +97,12 @@ VorbisDecoder::Setup(media_format *inputFormat,
 	}
 	// parse comment packet
 	if (vorbis_synthesis_headerin(&fInfo,&fComment,&(*packets)[1]) != 0) {
-		TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis comment\n");
+		TRACE("VorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis comment\n");
 		return B_ERROR;
 	}
 	// parse codebook packet
 	if (vorbis_synthesis_headerin(&fInfo,&fComment,&(*packets)[2]) != 0) {
-		TRACE("vorbiseDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis codebook\n");
+		TRACE("VorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis codebook\n");
 		return B_ERROR;
 	}
 	// initialize decoder
