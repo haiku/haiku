@@ -933,7 +933,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				invalidate		= ActiveWorkspace()->MoveToBack(target);
 			else
 				invalidate		= ActiveWorkspace()->MoveToFront(target);
-				
+
 			if (invalidate)
 			{
 				get_workspace_windows();
@@ -953,11 +953,11 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			{
 				fResizingWindow = true;
 			}
-			else if (action != DEC_NONE)
+			else if (action != DEC_NONE && action != DEC_MOVETOBACK)
 			{
 				target->MouseDown(action);
 			}
-			else
+			else if (action != DEC_MOVETOBACK)
 			{
 				// we are inside WinBorder
 

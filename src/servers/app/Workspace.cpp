@@ -321,9 +321,10 @@ STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL")
 	if (!newLastItem)
 		return false;
 
-	bool	returnValue	= false;
-	bool	changeFront	= false;
-	int32	level		= newLast->Level();
+	ListData	*previous = newLastItem->upperItem;
+	bool		returnValue	= false;
+	bool		changeFront	= false;
+	int32		level		= newLast->Level();
 	if (level > B_SYSTEM_FIRST)
 		level = B_SYSTEM_FIRST;
 
@@ -355,7 +356,7 @@ STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL")
 		case B_FLOATING_APP:
 		case B_FLOATING_ALL:
 		{
-			placeToBack(newLastItem);
+			returnValue = placeToBack(newLastItem);
 		}
 		break;
 		case B_MODAL_APP:
@@ -452,6 +453,9 @@ STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL")
 		}
 	}
 
+	if (previous == newLastItem->upperItem)
+		returnValue = false;
+
 	// The following applies ONLY to B_NORMAL and B_MODAL_APP windows.
 
 	if (changeFront)
@@ -459,7 +463,7 @@ STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL")
 		ListData	*newFront;
 		newFront	= findNextFront();
 		if (newFront)
-			MoveToFront(newFront->layerPtr);
+			returnValue |= MoveToFront(newFront->layerPtr);
 		else
 			debugger("MoveToBack: can't find new front! We should find one!\n");
 	}
