@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include "DriverInterface.h"
-#include "global.h"
+#include "mga_globals.h"
 //apsed #include "mga_extern.h"
 #include "mga_proto.h"
 #include "be_driver_proto.h"

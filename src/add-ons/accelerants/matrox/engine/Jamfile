@@ -2,7 +2,6 @@ SubDir OBOS_TOP src add-ons accelerants matrox engine ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics matrox ] ;
-UseHeaders [ FDirName $(SUBDIR) .. ] ;
 
 StaticLibrary matrox_engine :
 	mga_acc.c
@@ -11,6 +10,7 @@ StaticLibrary matrox_engine :
 	mga_crtc2.c
 	mga_dac.c
 	mga_general.c
+	mga_globals.c
 	mga_i2c.c
 	mga_info.c
 	mga_maven.c

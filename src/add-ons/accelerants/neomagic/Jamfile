@@ -20,6 +20,10 @@ Addon nm.accelerant : accelerants :
 	: false : libneomagic_engine.a
 ;
 
+Package openbeos-neomagic-1.0 :
+	nm.accelerant :
+	boot home config add-ons accelerants ;
+
 Depends nm.accelerant : nm.driver ;
 
 SubInclude OBOS_TOP src add-ons accelerants neomagic engine ;

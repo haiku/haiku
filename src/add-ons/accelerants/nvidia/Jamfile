@@ -20,6 +20,10 @@ Addon nv.accelerant : accelerants :
 	: false : libnvidia_engine.a
 ;
 
+Package openbeos-nvidia-1.0 :
+	nv.accelerant : 
+	boot home config add-ons accelerants ;
+
 Depends nv.accelerant : nv.driver ;
 
 SubInclude OBOS_TOP src add-ons accelerants nvidia engine ;
