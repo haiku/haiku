@@ -737,25 +737,35 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 			while (*nextPath == '/');
 		}
 
-		// see if the .. is at the root of a mount
-		if (strcmp("..", path) == 0 && vnode->mount->root_vnode == vnode) {
-			// move to the covered vnode so we pass the '..' parse to the underlying filesystem
-			if (vnode->mount->covers_vnode) {
-				nextVnode = vnode->mount->covers_vnode;
-				inc_vnode_ref_count(nextVnode);
-				dec_vnode_ref_count(vnode, false);
-				vnode = nextVnode;
-			}
+		// See if the .. is at the root of a mount and move to the covered
+		// vnode so we pass the '..' parse to the underlying filesystem
+		if (!strcmp("..", path)
+			&& vnode->mount->root_vnode == vnode
+			&& vnode->mount->covers_vnode) {
+
+			nextVnode = vnode->mount->covers_vnode;
+			inc_vnode_ref_count(nextVnode);
+			put_vnode(vnode);
+			vnode = nextVnode;
 		}
 
-		// tell the filesystem to get the vnode of this path component
-		status = FS_CALL(vnode, lookup)(vnode->mount->cookie, vnode->private_node, path, &vnodeID, &type);
-		if (status < 0) {
+		// Check if we have the right to search the current directory vnode.
+		// If a file system doesn't have the access() function, we assume that
+		// searching a directory is always allowed
+		if (FS_CALL(vnode, access))
+			status = FS_CALL(vnode, access)(vnode->mount->cookie, vnode->private_node, X_OK);
+
+		// Tell the filesystem to get the vnode of this path component (if we got the
+		// permission from the call above)
+		if (status >= B_OK)
+			status = FS_CALL(vnode, lookup)(vnode->mount->cookie, vnode->private_node, path, &vnodeID, &type);
+
+		if (status < B_OK) {
 			put_vnode(vnode);
 			return status;
 		}
 
-		// lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
+		// Lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
 		// from inside the filesystem, thus the vnode would have to be in the list and it's
 		// ref count incremented at this point
 		mutex_lock(&gVnodeMutex);
@@ -789,7 +799,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 			if (status < B_OK) {
 				free(buffer);
 
-resolve_link_error:
+		resolve_link_error:
 				put_vnode(vnode);
 				put_vnode(nextVnode);
 
@@ -1544,6 +1554,27 @@ vfs_setrlimit(int resource, const struct rlimit * rlp)
 		default:
 			return -1;
 	}
+}
+
+
+static int
+notify_listener(int op, mount_id mountID, vnode_id parentVnodeID, vnode_id toParentVnodeID,
+	vnode_id vnodeID, const char *name)
+{
+	// not yet exported or implemented, may change completely
+	// this is currently the BeOS compatible notify_listener() function
+	return 0;
+}
+
+
+static int
+send_notification(port_id port, long token, ulong what, long op, mount_id mountID,
+	mount_id toMountID, vnode_id parentVnodeID, vnode_id toParentVnodeID,
+	vnode_id vnodeID, const char *name)
+{
+	// not yet exported or implemented, may change completely
+	// this is currently the BeOS compatible send_notification() function
+	return 0;
 }
 
 
