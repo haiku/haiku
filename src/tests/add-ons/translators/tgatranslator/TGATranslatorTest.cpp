@@ -94,7 +94,7 @@ void
 CheckBits_Tga(translator_info *pti)
 {
 	CheckTranslatorInfo(pti, B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP,
-		0.6f, 0.8f, "Be Bitmap Format (TGATranslator)",
+		0.7f, 0.6f, "Be Bitmap Format (TGATranslator)",
 		"image/x-be-bitmap");
 }
 
@@ -102,7 +102,7 @@ void
 CheckTga(translator_info *pti, const char *imageType)
 {
 	CheckTranslatorInfo(pti, B_TGA_FORMAT, B_TRANSLATOR_BITMAP,
-		1.0f, 0.6f, imageType, "image/x-targa");
+		0.7f, 0.8f, imageType, "image/x-targa");
 }
 
 // coveniently group path of image with
@@ -307,7 +307,6 @@ TranslateTests(TGATranslatorTest *ptest, BTranslatorRoster *proster,
 			B_ERASE_FILE);
 		CPPUNIT_ASSERT(tmpfile.InitCheck() == B_OK);
 		CPPUNIT_ASSERT(dtmpfile.InitCheck() == B_OK);
-		
 		// Convert to B_TRANSLATOR_ANY_TYPE (should be B_TRANSLATOR_BITMAP)
 		ptest->NextSubTest();
 		CPPUNIT_ASSERT(tmpfile.Seek(0, SEEK_SET) == 0);
@@ -515,7 +514,6 @@ TGATranslatorTest::ConfigMessageTest()
 {
 	// Init
 	NextSubTest();
-	status_t result = B_ERROR;
 	BTranslatorRoster *proster = new BTranslatorRoster();
 	CPPUNIT_ASSERT(proster);
 	CPPUNIT_ASSERT(proster->AddTranslators(
@@ -566,16 +564,16 @@ translation_format gTGAInputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
-		0.6f, // quality
-		0.8f, // capability
+		0.7f, // quality
+		0.6f, // capability
 		"image/x-be-bitmap",
 		"Be Bitmap Format (TGATranslator)"
 	},
 	{
 		B_TGA_FORMAT,
 		B_TRANSLATOR_BITMAP,
-		1.0f,
-		0.6f,
+		0.7f,
+		0.8f,
 		"image/x-targa",
 		"Targa image"
 	}
@@ -594,8 +592,8 @@ translation_format gTGAOutputFormats[] = {
 	{
 		B_TGA_FORMAT,
 		B_TRANSLATOR_BITMAP,
-		1.0f,
 		0.7f,
+		0.6f,
 		"image/x-targa",
 		"Targa image"
 	}
@@ -607,7 +605,8 @@ TGATranslatorTest::LoadAddOnTest()
 	TranslatorLoadAddOnTest("/boot/home/config/add-ons/Translators/TGATranslator",
 		this,
 		gTGAInputFormats, sizeof(gTGAInputFormats) / sizeof(translation_format),
-		gTGAOutputFormats, sizeof(gTGAOutputFormats) / sizeof(translation_format));
+		gTGAOutputFormats, sizeof(gTGAOutputFormats) / sizeof(translation_format),
+		B_TRANSLATION_MAKE_VER(1,0,0));
 }
 
 #endif // #if !TEST_R5
