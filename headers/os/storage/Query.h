@@ -7,8 +7,8 @@
 	BQuery interface declaration.
 */
 
-#ifndef _sk_query_h_
-#define _sk_query_h_
+#ifndef _QUERY_H
+#define _QUERY_H
 
 #include <EntryList.h>
 #include <Messenger.h>
@@ -120,4 +120,4 @@ private:
 	StorageKit::FileDescriptor fQueryFd;
 };
 
-#endif	// _sk_query_h_
+#endif	// _QUERY_H

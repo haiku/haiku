@@ -7,8 +7,8 @@
 	ResourceFile interface declaration.
 */
 
-#ifndef _sk_resource_file_h_
-#define _sk_resource_file_h_
+#ifndef _RESOURCE_FILE_H
+#define _RESOURCE_FILE_H
 
 #include <ByteOrder.h>
 
@@ -125,4 +125,4 @@ ResourceFile::_GetUInt32(uint32 value)
 
 };	// namespace StorageKit
 
-#endif	// _sk_resource_file_h_
+#endif	// _RESOURCE_FILE_H

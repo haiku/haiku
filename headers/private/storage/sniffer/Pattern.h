@@ -6,8 +6,8 @@
 	\file sniffer/Pattern.h
 	Mime Sniffer Pattern declarations
 */
-#ifndef _sk_sniffer_pattern_h_
-#define _sk_sniffer_pattern_h_
+#ifndef _SNIFFER_PATTERN_H
+#define _SNIFFER_PATTERN_H
 
 #include <SupportDefs.h>
 #include <string>
@@ -48,4 +48,4 @@ private:
 
 }
 
-#endif	// _sk_sniffer_pattern_h_
+#endif	// _SNIFFER_PATTERN_H

@@ -7,8 +7,8 @@
 //	Description:	BVolume class
 // ----------------------------------------------------------------------
 
-#ifndef __sk_volume_h__
-#define __sk_volume_h__
+#ifndef _VOLUME_H
+#define _VOLUME_H
 
 #ifndef _BE_BUILD_H
 #include <BeBuild.h>
@@ -104,4 +104,4 @@ class BVolume {
 }
 #endif
 
-#endif	// __sk_volume_h__
+#endif	// _VOLUME_H

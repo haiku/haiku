@@ -7,8 +7,8 @@
 	ResourceItem interface declaration.
 */
 
-#ifndef _sk_resource_item_h_
-#define _sk_resource_item_h_
+#ifndef _RESOURCE_ITEM_H
+#define _RESOURCE_ITEM_H
 
 #include <DataIO.h>
 #include <String.h>
@@ -84,4 +84,4 @@ private:
 
 };	// namespace StorageKit
 
-#endif	// _sk_resource_item_h_
+#endif	// _RESOURCE_ITEM_H

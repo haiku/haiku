@@ -7,8 +7,8 @@
 	Miscellaneous Storage Kit definitions and includes.
 */
 
-#ifndef __sk_def_storage_h__
-#define __sk_def_storage_h__
+#ifndef _DEF_STORAGE_H
+#define _DEF_STORAGE_H
 
 #include <fcntl.h>
 #include <sys/param.h>
@@ -53,4 +53,4 @@ enum node_flavor {
 #endif	// USE_OPENBEOS_NAMESPACE
 
 
-#endif __sk_def_storage_h__
+#endif // _DEF_STORAGE_H

@@ -6,8 +6,8 @@
 	\file sniffer/Err.h
 	Mime Sniffer Error class declarations
 */
-#ifndef _sk_sniffer_err_h_
-#define _sk_sniffer_err_h_
+#ifndef _SNIFFER_ERR_H
+#define _SNIFFER_ERR_H
 
 #include <SupportDefs.h>
 #include <string>
@@ -49,4 +49,4 @@ private:
 
 }
 
-#endif	// _sk_sniffer_err_h_
+#endif	// _SNIFFER_ERR_H

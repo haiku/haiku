@@ -7,8 +7,8 @@
 	BEntryList interface declaration.
 */
 
-#ifndef __sk_entry_list_h__
-#define __sk_entry_list_h__
+#ifndef _ENTRY_LIST_H
+#define _ENTRY_LIST_H
 
 #include <dirent.h>
 #include <SupportDefs.h>
@@ -57,4 +57,4 @@ private:
 };		// namespace OpenBeOS
 #endif
 
-#endif	// __sk_entry_list_h__
+#endif	// _ENTRY_LIST_H

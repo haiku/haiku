@@ -6,8 +6,8 @@
 	\file sniffer/RPatternList.h
 	MIME sniffer rpattern list declarations
 */
-#ifndef _sk_sniffer_r_pattern_list_h_
-#define _sk_sniffer_r_pattern_list_h_
+#ifndef _SNIFFER_R_PATTERN_LIST_H
+#define _SNIFFER_R_PATTERN_LIST_H
 
 #include <sniffer/DisjList.h>
 #include <vector>
@@ -36,4 +36,4 @@ private:
 
 }
 
-#endif	// _sk_sniffer_r_pattern_list_h_
+#endif	// _SNIFFER_R_PATTERN_LIST_H

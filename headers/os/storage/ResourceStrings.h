@@ -7,8 +7,8 @@
 	BResourceStrings interface declaration.
 */
 
-#ifndef _sk_resource_strings_h_
-#define _sk_resource_strings_h_
+#ifndef _RESOURCE_STRINGS_H
+#define _RESOURCE_STRINGS_H
 
 #include <Entry.h>
 #include <Locker.h>
@@ -87,4 +87,4 @@ private:
 	virtual	void _ReservedResourceStrings5();
 };
 
-#endif	// _sk_resource_strings_h_
+#endif	// _RESOURCE_STRINGS_H

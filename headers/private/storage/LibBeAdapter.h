@@ -1,7 +1,7 @@
 // LibBeAdapter.h
 
-#ifndef _sk_lib_be_adapter_h_
-#define _sk_lib_be_adapter_h_
+#ifndef _LIB_BE_ADAPTER_H
+#define _LIB_BE_ADAPTER_H
 
 #include <SupportDefs.h>
 
@@ -16,4 +16,4 @@ extern status_t swap_data_adapter(type_code type, void *data, size_t length,
 
 extern bool is_type_swapped_adapter(type_code type);
 
-#endif	// _sk_lib_be_adapter_h_
+#endif	// _LIB_BE_ADAPTER_H

@@ -6,8 +6,8 @@
 	\file sniffer/PatternList.h
 	MIME sniffer pattern list declarations
 */
-#ifndef _sk_sniffer_pattern_list_h_
-#define _sk_sniffer_pattern_list_h_
+#ifndef _SNIFFER_PATTERN_LIST_H
+#define _SNIFFER_PATTERN_LIST_H
 
 #include <sniffer/DisjList.h>
 #include <sniffer/Range.h>
@@ -40,4 +40,4 @@ private:
 
 }
 
-#endif	// _sk_sniffer_pattern_list_h_
+#endif	// _SNIFFER_PATTERN_LIST_H

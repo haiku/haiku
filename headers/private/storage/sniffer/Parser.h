@@ -6,8 +6,8 @@
 	\file sniffer/Parser.h
 	MIME sniffer rule parser declarations
 */
-#ifndef _sk_sniffer_parser_h_
-#define _sk_sniffer_parser_h_
+#ifndef _SNIFFER_PARSER_H
+#define _SNIFFER_PARSER_H
 
 #include <SupportDefs.h>
 #include <sniffer/Err.h>
@@ -326,5 +326,5 @@ private:
 }	// namespace Sniffer
 
 
-#endif	// _sk_sniffer_parser_h_
+#endif	// _SNIFFER_PARSER_H
 

@@ -6,8 +6,8 @@
 	\file QueryPredicate.h
 	BQuery predicate helper classes interface declaration.
 */
-#ifndef _sk_query_predicate_h_
-#define _sk_query_predicate_h_
+#ifndef _QUERY_PREDICATE_H
+#define _QUERY_PREDICATE_H
 
 #include <stdio.h>
 
@@ -203,4 +203,4 @@ private:
 
 };	// namespace StorageKit
 
-#endif	// _sk_query_predicate_h_
+#endif	// _QUERY_PREDICATE_H

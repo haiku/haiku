@@ -6,8 +6,8 @@
 	\file Entry.h
 	BEntry and entry_ref interface declarations.
 */
-#ifndef __sk_entry_h__
-#define __sk_entry_h__
+#ifndef _ENTRY_H
+#define _ENTRY_H
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -117,4 +117,4 @@ bool operator<(const entry_ref &a, const entry_ref &b);
 };		// namespace OpenBeOS
 #endif
 
-#endif	// __sk_entry_h__
+#endif	// _ENTRY_H

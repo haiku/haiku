@@ -7,8 +7,8 @@
 	BResources interface declaration.
 */
 
-#ifndef _sk_resources_h_
-#define _sk_resources_h_
+#ifndef _RESOURCES_H
+#define _RESOURCES_H
 
 #include <File.h>
 
@@ -111,4 +111,4 @@ private:
 };		// namespace OpenBeOS
 #endif
 
-#endif	// _sk_resources_h_
+#endif	// _RESOURCES_H

@@ -7,8 +7,8 @@
 	Declarations of find_directory() functions and associated types.	
 */
 
-#ifndef __sk_find_directory_h__
-#define __sk_find_directory_h__
+#ifndef _FIND_DIRECTORY_H
+#define _FIND_DIRECTORY_H
 
 #include <SupportDefs.h>
 
@@ -132,4 +132,4 @@ status_t find_directory(directory_which which, BPath *path,
 };		// namespace OpenBeOS
 #endif
 
-#endif	// __sk_find_directory_h__
+#endif	// _FIND_DIRECTORY_H

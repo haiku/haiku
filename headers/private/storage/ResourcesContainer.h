@@ -7,8 +7,8 @@
 	ResourcesContainer interface declaration.
 */
 
-#ifndef _sk_resources_container_h_
-#define _sk_resources_container_h_
+#ifndef _RESOURCES_CONTAINER_H
+#define _RESOURCES_CONTAINER_H
 
 #include <List.h>
 
@@ -72,4 +72,4 @@ private:
 
 };	// namespace StorageKit
 
-#endif	// _sk_resources_container_h_
+#endif	// _RESOURCES_CONTAINER_H

@@ -6,8 +6,8 @@
 	\file File.h
 	BFile interface declaration.
 */
-#ifndef __sk_file_h__
-#define __sk_file_h__
+#ifndef _FILE_H
+#define _FILE_H
 
 #include <DataIO.h>
 #include <Node.h>
@@ -82,4 +82,4 @@ private:
 };		// namespace OpenBeOS
 #endif
 
-#endif	// __sk_file_h__
+#endif	// _FILE_H

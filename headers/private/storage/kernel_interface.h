@@ -8,8 +8,8 @@
 	to communicate with the kernel
 */
 
-#ifndef _sk_kernel_interface_h_
-#define _sk_kernel_interface_h_
+#ifndef _STORAGE_KIT_KERNEL_INTERFACE_H
+#define _STORAGE_KIT_KERNEL_INTERFACE_H
 
 #include <SupportKit.h>
 #include <StorageDefs.Private.h>
@@ -331,4 +331,4 @@ status_t remove(const char *path);
 
 } // namespace StorageKit
 
-#endif
+#endif	// _STORAGE_KIT_KERNEL_INTERFACE_H

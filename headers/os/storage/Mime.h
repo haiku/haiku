@@ -6,8 +6,8 @@
 	\file Mime.h
 	Mime type C functions interface declarations.
 */
-#ifndef _sk_mime_h_
-#define _sk_mime_h_
+#ifndef _MIME_H
+#define _MIME_H
 
 #include <SupportDefs.h>
 #include <StorageDefs.h>
@@ -42,4 +42,4 @@ enum icon_size {
 #include <MimeType.h>
 #endif
 
-#endif	// _sk_mime_h_
+#endif	// _MIME_H

@@ -1,7 +1,7 @@
 // Exception
 
-#ifndef _sk_exception_
-#define _sk_exception_
+#ifndef _EXCEPTION_H
+#define _EXCEPTION_H
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -108,4 +108,4 @@ private:
 
 };	// namespace StorageKit
 
-#endif	// _sk_exception_
+#endif	// _EXCEPTION_H

@@ -7,8 +7,8 @@
 	OffsetFile interface declaration.
 */
 
-#ifndef _sk_offset_file_h_
-#define _sk_offset_file_h_
+#ifndef _OFFSET_FILE_H
+#define _OFFSET_FILE_H
 
 #include <DataIO.h>
 #include <File.h>
@@ -60,4 +60,4 @@ private:
 
 };	// namespace StorageKit
 
-#endif	// _sk_offset_file_h_
+#endif	// _OFFSET_FILE_H

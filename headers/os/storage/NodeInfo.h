@@ -7,8 +7,8 @@
 	BNodeInfo interface declaration.
 */
 
-#ifndef __sk_node_info_h__
-#define __sk_node_info_h__
+#ifndef _NODE_INFO_H
+#define _NODE_INFO_H
 
 #ifndef _BE_BUILD_H
 #include <BeBuild.h>
@@ -86,4 +86,4 @@ private:
 }
 #endif // USE_OPENBEOS_NAMESPACE
 
-#endif // __sk_node_info_h__
+#endif // _NODE_INFO_H

@@ -7,8 +7,8 @@
 	BStatable interface declaration.
 */
 
-#ifndef __sk_statable_h__
-#define __sk_statable_h__
+#ifndef _STATABLE_H
+#define _STATABLE_H
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -80,4 +80,4 @@ public:
 }
 #endif // USE_OPENBEOS_NAMESPACE
 
-#endif // __sk_statable_h__
+#endif // _STATABLE_H

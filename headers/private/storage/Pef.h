@@ -1,7 +1,7 @@
 // Pef.h
 
-#ifndef _sk_pef_h_
-#define _sk_pef_h_
+#ifndef _PEF_H
+#define _PEF_H
 
 #include <SupportDefs.h>
 
@@ -43,4 +43,4 @@ struct PEFSectionHeader {
 
 const uint32 kPEFSectionHeaderSize		= 28;
 
-#endif	// _sk_pef_h_
+#endif	// _PEF_H

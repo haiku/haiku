@@ -8,8 +8,8 @@
 	Storage Kit support functions.
 */
 
-#ifndef _sk_storage_support_h_
-#define _sk_storage_support_h_
+#ifndef _STORAGE_SUPPORT_H
+#define _STORAGE_SUPPORT_H
 
 
 namespace StorageKit {
@@ -39,4 +39,4 @@ status_t check_path_name(const char *path);
 
 } // namespace StorageKit
 
-#endif	// _sk_storage_support_h_
+#endif	// _STORAGE_SUPPORT_H

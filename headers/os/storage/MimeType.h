@@ -6,8 +6,8 @@
 	\file MimeType.h
 	BMimeType interface declarations.
 */
-#ifndef _sk_mime_type_h_
-#define _sk_mime_type_h_
+#ifndef _MIME_TYPE_H
+#define _MIME_TYPE_H
 
 #include <SupportDefs.h>
 #include <StorageDefs.h>
@@ -190,4 +190,4 @@ private:
 };
 
 
-#endif	// _sk_mime_type_h_
+#endif	// _MIME_TYPE_H

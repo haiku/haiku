@@ -6,8 +6,8 @@
 	\file sniffer/RPattern.h
 	Mime Sniffer RPattern declarations
 */
-#ifndef _sk_sniffer_r_pattern_h_
-#define _sk_sniffer_r_pattern_h_
+#ifndef _SNIFFER_R_PATTERN_H
+#define _SNIFFER_R_PATTERN_H
 
 #include <sniffer/Range.h>
 
@@ -35,4 +35,4 @@ private:
 
 }
 
-#endif	// _sk_sniffer_r_pattern_h_
+#endif	// _SNIFFER_R_PATTERN_H

@@ -7,8 +7,8 @@
 	BDirectory interface declaration.
 */
 
-#ifndef __sk_directory_h__
-#define __sk_directory_h__
+#ifndef _DIRECTORY_H
+#define _DIRECTORY_H
 
 #include <Node.h>
 #include <EntryList.h>
@@ -106,4 +106,4 @@ status_t create_directory(const char *path, mode_t mode);
 };		// namespace OpenBeOS
 #endif
 
-#endif	// __sk_directory_h__
+#endif	// _DIRECTORY_H

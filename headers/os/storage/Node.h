@@ -7,8 +7,8 @@
 	BNode and node_ref interface declarations.
 */
 
-#ifndef __sk_node_h__
-#define __sk_node_h__
+#ifndef _NODE_H
+#define _NODE_H
 
 #include <Statable.h>
 #include <StorageDefs.Private.h>
@@ -134,4 +134,4 @@ private:
 };		// namespace OpenBeOS
 #endif
 
-#endif	// __sk_node_h__
+#endif	// _NODE_H

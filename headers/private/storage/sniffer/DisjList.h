@@ -6,8 +6,8 @@
 	\file sniffer/DisjList.h
 	Mime Sniffer Disjunction List declarations
 */
-#ifndef _sk_sniffer_disj_list_h_
-#define _sk_sniffer_disj_list_h_
+#ifndef _SNIFFER_DISJ_LIST_H
+#define _SNIFFER_DISJ_LIST_H
 
 class BPositionIO;
 
@@ -28,4 +28,4 @@ protected:
 
 }
 
-#endif	// _sk_sniffer_disj_list_h_
+#endif	// _SNIFFER_DISJ_LIST_H

@@ -6,8 +6,8 @@
 	\file sniffer/Range.h
 	MIME sniffer range declarations
 */
-#ifndef _sk_sniffer_range_h_
-#define _sk_sniffer_range_h_
+#ifndef _SNIFFER_RANGE_H
+#define _SNIFFER_RANGE_H
 
 #include <SupportDefs.h>
 
@@ -35,4 +35,4 @@ private:
 
 }
 
-#endif	// _sk_sniffer_range_h_
+#endif	// _SNIFFER_RANGE_H

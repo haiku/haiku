@@ -1,7 +1,7 @@
 // ResourcesDefs.h
 
-#ifndef _sk_resources_defs_h_
-#define _sk_resources_defs_h_
+#ifndef _DEF_RESOURCES_H
+#define _DEF_RESOURCES_H
 
 #include <SupportDefs.h>
 
@@ -102,4 +102,4 @@ struct resource_info_table_end {
 const uint32	kResourceInfoTableEndSize		= 8;
 
 
-#endif	// _sk_resources_defs_h_
+#endif	// _DEF_RESOURCES_H

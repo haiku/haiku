@@ -7,11 +7,11 @@
 	Private Storage Kit declarations needed in public headers.
 */
 
-#ifndef __sk_def_storage_private_h__
-#define __sk_def_storage_private_h__
+#ifndef _DEF_STORAGE_PRIVATE_H
+#define _DEF_STORAGE_PRIVATE_H
 
 namespace StorageKit {
 	typedef int FileDescriptor;
 };
 
-#endif // __sk_def_storage_private_h__
+#endif // _DEF_STORAGE_PRIVATE_H

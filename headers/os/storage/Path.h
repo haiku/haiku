@@ -7,8 +7,8 @@
 	BPath interface declaration.
 */
 
-#ifndef __sk_path_h__
-#define __sk_path_h__
+#ifndef _PATH_H
+#define _PATH_H
 
 #include <Flattenable.h>
 #include <SupportDefs.h>
@@ -97,4 +97,4 @@ private:
 };		// namespace OpenBeOS
 #endif
 
-#endif	// __sk_path_h__
+#endif	// _PATH_H

@@ -9,8 +9,8 @@
 	BSymLink interface declaration.
 */
 
-#ifndef __sk_sym_link_h__
-#define __sk_sym_link_h__
+#ifndef _SYM_LINK_H
+#define _SYM_LINK_H
 
 #include <Node.h>
 #include <StorageDefs.h>
@@ -83,4 +83,4 @@ private:
 };		// namespace OpenBeOS
 #endif
 
-#endif	// __sk_sym_link_h__
+#endif	// _SYM_LINK_H

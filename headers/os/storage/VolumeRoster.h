@@ -8,8 +8,8 @@
 // ----------------------------------------------------------------------
 
 
-#ifndef __sk_volumeroster_h__
-#define __sk_volumeroster_h__
+#ifndef _VOLUME_ROSTER_H
+#define _VOLUME_ROSTER_H
 
 #ifndef _BE_BUILD_H
 #include <BeBuild.h>
@@ -61,4 +61,4 @@ class BVolumeRoster {
 }
 #endif
 
-#endif	// __sk_volumeroster_h__
+#endif	// _VOLUME_ROSTER_H

@@ -1,7 +1,7 @@
 // Elf.h
 
-#ifndef _sk_elf_h_
-#define _sk_elf_h_
+#ifndef _ELF_H
+#define _ELF_H
 
 // types
 typedef uint32		Elf32_Addr;
@@ -102,4 +102,4 @@ typedef struct {
 #define SHT_LOUSER		0x80000000
 #define SHT_HIUSER		0xffffffff
 
-#endif	// _sk_elf_h_
+#endif	// _ELF_H

@@ -6,8 +6,8 @@
 	\file sniffer/Rule.h
 	Mime sniffer rule declarations
 */
-#ifndef _sk_sniffer_rule_h_
-#define _sk_sniffer_rule_h_
+#ifndef _SNIFFER_RULE_H
+#define _SNIFFER_RULE_H
 
 #include <SupportDefs.h>
 #include <vector>
@@ -42,4 +42,4 @@ private:
 
 }
 
-#endif	// _sk_sniffer_rule_h_
+#endif	// _SNIFFER_RULE_H
