@@ -212,16 +212,13 @@ status_t identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 		return B_NO_TRANSLATOR;
 	if (infoHeader.planes != 1)
 		return B_NO_TRANSLATOR;
-	if (infoHeader.bitsperpixel != 1 &&
-		infoHeader.bitsperpixel != 4 &&
-		infoHeader.bitsperpixel != 8 &&
-		infoHeader.bitsperpixel != 16 &&
-		infoHeader.bitsperpixel != 24 &&
-		infoHeader.bitsperpixel != 32)
-		return B_NO_TRANSLATOR;
-	if (infoHeader.compression != BMP_NO_COMPRESS &&
-		infoHeader.compression != BMP_RLE8_COMPRESS &&
-		infoHeader.compression != BMP_RLE4_COMPRESS)
+	if ((infoHeader.bitsperpixel != 1 || infoHeader.compression != BMP_NO_COMPRESS) &&
+		(infoHeader.bitsperpixel != 4 || infoHeader.compression != BMP_NO_COMPRESS) &&
+		(infoHeader.bitsperpixel != 4 || infoHeader.compression != BMP_RLE4_COMPRESS) &&
+		(infoHeader.bitsperpixel != 8 || infoHeader.compression != BMP_NO_COMPRESS) &&
+		(infoHeader.bitsperpixel != 8 || infoHeader.compression != BMP_RLE8_COMPRESS) &&
+		(infoHeader.bitsperpixel != 24 || infoHeader.compression != BMP_NO_COMPRESS) &&
+		(infoHeader.bitsperpixel != 32 || infoHeader.compression != BMP_NO_COMPRESS))
 		return B_NO_TRANSLATOR;
 	if (infoHeader.colorsimportant > infoHeader.colorsused)
 		return B_NO_TRANSLATOR;
@@ -437,89 +434,48 @@ status_t translate_from_bits(BPositionIO *inSource, ssize_t amtread,
 		return B_NO_TRANSLATOR;
 }
 
-status_t translate_from_bmp24_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
+status_t translate_from_bmpnpal_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 	int32 datasize, BMPInfoHeader &infoHeader)
 {
-	char *bitspixels = new char[datasize];
-	if (!bitspixels)
-		return B_ERROR;
-		
-	char pixel[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
 	int32 bitsRowBytes = infoHeader.width * 4;
-	int32 bmpbytesperpixel = infoHeader.bitsperpixel / 8;
-	int32 padding = (infoHeader.width * bmpbytesperpixel) % 4;
+	int32 bmpBytesPerPixel = infoHeader.bitsperpixel / 8;
+	int32 padding = (infoHeader.width * bmpBytesPerPixel) % 4;
 	if (padding)
 		padding = 4 - padding;
-	uint32 bmppixcol = 0, bmppixrow = 0;
-	ssize_t rd = inSource->Read(pixel, bmpbytesperpixel);
-	while (rd > 0) {
-		int32 bitsoffset = ((infoHeader.height -
-			(bmppixrow + 1)) * bitsRowBytes) +
-				(bmppixcol * 4);
-		memcpy(bitspixels + bitsoffset, pixel, 4);
-		bmppixcol++;
-		
-		if (bmppixcol == infoHeader.width) {
-			bmppixcol = 0;
-			bmppixrow++;
-			// If padding, skip over the padding
-			if (padding)
-				inSource->Seek(padding, SEEK_CUR);
-						
-			// if I've read all of the pixel data, break
-			// out of the loop so I don't try to read 
-			// non-pixel data
-			if (bmppixrow == infoHeader.height)
-				break;
-		}
-		rd = inSource->Read(pixel, bmpbytesperpixel);
-	}
-	outDestination->Write(bitspixels, datasize);
-				
-	delete[] bitspixels;
-	return B_OK;
-}
-
-status_t translate_from_bmp8_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
-	int32 datasize, BMPInfoHeader &infoHeader, const char *palette)
-{
-	uint8 index;
-	char *bitspixels = new char[datasize];
-	if (!bitspixels)
+	int32 bmpRowBytes = (infoHeader.width * bmpBytesPerPixel) + padding;
+	uint32 bmppixrow = 0;
+	off_t bmpoffset = ((infoHeader.height - 1) * bmpRowBytes);
+	inSource->Seek(bmpoffset, SEEK_CUR);
+	char *bmpRowData = new char[bmpRowBytes];
+	if (!bmpRowData)
 		return B_ERROR;
-	memset(bitspixels, 0xffffffff, datasize);
-
-	int32 padding = infoHeader.width % 4;
-	if (padding)
-		padding = 4 - padding;
-	int32 bitsRowBytes = infoHeader.width * 4;
-	uint32 bmppixcol = 0, bmppixrow = 0;
-	ssize_t rd = inSource->Read(&index, 1);
-	while (rd > 0) {
-		int32 bitsoffset = ((infoHeader.height -
-			(bmppixrow + 1)) * bitsRowBytes) +
-				(bmppixcol * 4);
-		memcpy(bitspixels + bitsoffset, palette + (index * 4), 3);
-		bmppixcol++;
-		
-		if (bmppixcol == infoHeader.width) {
-			bmppixcol = 0;
-			bmppixrow++;
-			// If padding, read in the bytes of padding
-			if (padding)
-				inSource->Seek(padding, SEEK_CUR);
-						
-			// if I've read all of the pixel data, break
-			// out of the loop so I don't try to read 
-			// non-pixel data
-			if (bmppixrow == infoHeader.height)
-				break;
-		}
-		rd = inSource->Read(&index, 1);
+	char *bitsRowData = new char[bitsRowBytes];
+	if (!bitsRowData) {
+		delete[] bmpRowData;
+		return B_ERROR;
 	}
-	outDestination->Write(bitspixels, datasize);
+	memset(bitsRowData, 0xffffffff, bitsRowBytes);
+	ssize_t rd = inSource->Read(bmpRowData, bmpRowBytes);
+	while (rd == bmpRowBytes) {
+		for (uint32 i = 0; i < infoHeader.width; i++)
+			memcpy(bitsRowData + (i * 4),
+				bmpRowData + (i * bmpBytesPerPixel), 3);
 				
-	delete[] bitspixels;
+		outDestination->Write(bitsRowData, bitsRowBytes);
+		bmppixrow++;
+		// if I've read all of the pixel data, break
+		// out of the loop so I don't try to read 
+		// non-pixel data
+		if (bmppixrow == infoHeader.height)
+			break;
+
+		inSource->Seek(-(bmpRowBytes * 2), SEEK_CUR);
+		rd = inSource->Read(bmpRowData, bmpRowBytes);
+	}
+	
+	delete[] bmpRowData;
+	delete[] bitsRowData;
+
 	return B_OK;
 }
 
@@ -668,64 +624,6 @@ status_t translate_from_bmp8r_to_bits(BPositionIO *inSource, BPositionIO *outDes
 		}
 		if (rd > 0)
 			rd = inSource->Read(&count, 1);
-	}
-	outDestination->Write(bitspixels, datasize);
-				
-	delete[] bitspixels;
-	return B_OK;
-}
-
-status_t translate_from_bmp4_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
-	int32 datasize, BMPInfoHeader &infoHeader, const char *palette)
-{
-	uint8 indices;
-	char *bitspixels = new char[datasize];
-	if (!bitspixels)
-		return B_ERROR;
-	memset(bitspixels, 0xffffffff, datasize);
-
-	int32 padding;
-	if (!(infoHeader.width % 2))
-		padding = (infoHeader.width / 2) % 4;
-	else
-		padding = ((infoHeader.width + 2 - (infoHeader.width % 2)) / 2) % 4;
-	if (padding)
-		padding = 4 - padding;
-
-	int32 bitsRowBytes = infoHeader.width * 4;
-	uint32 bmppixcol = 0, bmppixrow = 0;
-	ssize_t rd = inSource->Read(&indices, 1);
-	while (rd > 0) {
-		uint32 hbytesUsed = min(2,
-			infoHeader.width - bmppixcol);
-		for (uint32 i = 0; i < hbytesUsed; i++) {
-			uint8 index;
-			if (!i)
-				index = (indices>>4) & 0xf;
-			else
-				index = indices & 0xf;
-				// should be either zero or one
-			int32 bitsoffset = ((infoHeader.height -
-				(bmppixrow + 1)) * bitsRowBytes) +
-					(bmppixcol * 4);
-			memcpy(bitspixels + bitsoffset, palette + (index * 4), 3);
-			bmppixcol++;
-		}
-					
-		if (bmppixcol == infoHeader.width) {
-			bmppixcol = 0;
-			bmppixrow++;
-			// If padding, read in the bytes of padding
-			if (padding)
-				inSource->Seek(padding, SEEK_CUR);
-						
-			// if I've read all of the pixel data, break
-			// out of the loop so I don't try to read 
-			// non-pixel data
-			if (bmppixrow == infoHeader.height)
-				break;
-		}
-		rd = inSource->Read(&indices, 1);
 	}
 	outDestination->Write(bitspixels, datasize);
 				
@@ -899,57 +797,68 @@ status_t translate_from_bmp4r_to_bits(BPositionIO *inSource, BPositionIO *outDes
 	return B_OK;
 }
 
-status_t translate_from_bmp1_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
+status_t translate_from_bmppal_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 	int32 datasize, BMPInfoHeader &infoHeader, const char *palette)
 {
-	uint8 indices;
-	char *bitspixels = new char[datasize];
-	if (!bitspixels)
-		return B_ERROR;
-	memset(bitspixels, 0xffffffff, datasize);
-
+	uint16 pixelsPerByte = 8 / infoHeader.bitsperpixel;
+	uint16 bitsPerPixel = infoHeader.bitsperpixel;
+	
+	uint8 mask = 1;
+	for (uint16 i = 0; i < bitsPerPixel; i++)
+		mask *= 2;
+	mask -= 1;
+	
 	int32 padding;
-	if (!(infoHeader.width % 8))
-		padding = (infoHeader.width / 8) % 4;
+	if (!(infoHeader.width % pixelsPerByte))
+		padding = (infoHeader.width / pixelsPerByte) % 4;
 	else
-		padding = ((infoHeader.width + 8 - (infoHeader.width % 8)) / 8) % 4;
-					
+		padding = ((infoHeader.width + pixelsPerByte - 
+			(infoHeader.width % pixelsPerByte)) / pixelsPerByte) % 4;
 	if (padding)
 		padding = 4 - padding;
+
+	int32 bmpRowBytes = (infoHeader.width / pixelsPerByte) + 
+		((infoHeader.width % pixelsPerByte) ? 1 : 0) + padding;
+	uint32 bmppixrow = 0;
+
+	off_t bmpoffset = ((infoHeader.height - 1) * bmpRowBytes);
+	inSource->Seek(bmpoffset, SEEK_CUR);
+	char *bmpRowData = new char[bmpRowBytes];
+	if (!bmpRowData)
+		return B_ERROR;
 	int32 bitsRowBytes = infoHeader.width * 4;
-	uint32 bmppixcol = 0, bmppixrow = 0;
-	ssize_t rd = inSource->Read(&indices, 1);
-	while (rd > 0) {
-		uint32 bitsUsed = min(8,
-			infoHeader.width - bmppixcol);
-		for (uint32 i = 0; i < bitsUsed; i++) {
-			uint8 index = (indices>>(7 - i)) & 1;
-				// should be either zero or one
-			int32 bitsoffset = ((infoHeader.height -
-				(bmppixrow + 1)) * bitsRowBytes) +
-					(bmppixcol * 4);
-			memcpy(bitspixels + bitsoffset, palette + (index * 4), 3);
-			bmppixcol++;
-		}
-					
-		if (bmppixcol == infoHeader.width) {
-			bmppixcol = 0;
-			bmppixrow++;
-			// If padding, read in the bytes of padding
-			if (padding )
-				inSource->Seek(padding, SEEK_CUR);
-						
-			// if I've read all of the pixel data, break
-			// out of the loop so I don't try to read 
-			// non-pixel data
-			if (bmppixrow == infoHeader.height)
-				break;
-		}
-		rd = inSource->Read(&indices, 1);
+	char *bitsRowData = new char[bitsRowBytes];
+	if (!bitsRowData) {
+		delete[] bmpRowData;
+		return B_ERROR;
 	}
-	outDestination->Write(bitspixels, datasize);
+	memset(bitsRowData, 0xffffffff, bitsRowBytes);
+	ssize_t rd = inSource->Read(bmpRowData, bmpRowBytes);
+	while (rd == bmpRowBytes) {
+		for (uint32 i = 0; i < infoHeader.width; i++) {
+			uint8 indices = (bmpRowData + (i / pixelsPerByte))[0];
+			uint8 index;
+			index = (indices >>
+				(bitsPerPixel * ((pixelsPerByte - 1) - (i % pixelsPerByte)))) & mask;
+			memcpy(bitsRowData + (i * 4),
+				palette + (4 * index), 3);
+		}
 				
-	delete[] bitspixels;
+		outDestination->Write(bitsRowData, bitsRowBytes);
+		bmppixrow++;
+		// if I've read all of the pixel data, break
+		// out of the loop so I don't try to read 
+		// non-pixel data
+		if (bmppixrow == infoHeader.height)
+			break;
+
+		inSource->Seek(-(bmpRowBytes * 2), SEEK_CUR);
+		rd = inSource->Read(bmpRowData, bmpRowBytes);
+	}
+	
+	delete[] bmpRowData;
+	delete[] bitsRowData;
+
 	return B_OK;
 }
 
@@ -1088,13 +997,13 @@ status_t translate_from_bmp(BPositionIO *inSource, ssize_t amtread,
 		switch (infoHeader.bitsperpixel) {
 			case 32:
 			case 24:
-				return translate_from_bmp24_to_bits(inSource, outDestination,
+				return translate_from_bmpnpal_to_bits(inSource, outDestination,
 					datasize, infoHeader);
 				
 			case 8:
 				// 8 bit BMP with NO compression
 				if (infoHeader.compression == BMP_NO_COMPRESS)
-					return translate_from_bmp8_to_bits(inSource,
+					return translate_from_bmppal_to_bits(inSource,
 						outDestination, datasize, infoHeader, bmppalette);
 
 				// 8 bit RLE compressed BMP
@@ -1107,7 +1016,7 @@ status_t translate_from_bmp(BPositionIO *inSource, ssize_t amtread,
 			case 4:
 				// 4 bit BMP with NO compression
 				if (!infoHeader.compression)	
-					return translate_from_bmp4_to_bits(inSource,
+					return translate_from_bmppal_to_bits(inSource,
 						outDestination, datasize, infoHeader, bmppalette);
 
 				// 4 bit RLE compressed BMP
@@ -1118,7 +1027,7 @@ status_t translate_from_bmp(BPositionIO *inSource, ssize_t amtread,
 					return B_NO_TRANSLATOR;
 			
 			case 1:
-				return translate_from_bmp1_to_bits(inSource,
+				return translate_from_bmppal_to_bits(inSource,
 					outDestination, datasize, infoHeader, bmppalette);
 					
 			default:
