@@ -12,6 +12,7 @@
 //------------------------------------------------------------------------------
 
 BMidiRosterLooper::BMidiRosterLooper()
+	: BLooper("MidiRosterLooper")
 {
 	initLock = -1;
 	roster = NULL;
@@ -68,7 +69,7 @@ bool BMidiRosterLooper::Init(BMidiRoster* roster_)
 	// "app registered" message in our MessageReceived() hook,
 	// we release the semaphore and MidiRoster() will unblock.
 
-	initLock = create_sem(0, NULL);
+	initLock = create_sem(0, "InitLock");
 
 	if (initLock < B_OK) 
 	{ 

@@ -93,7 +93,7 @@ BMidiProducer::BMidiProducer(const char* name)
 {
 	isConsumer = false;
 	connections = new BList;
-	locker = new BLocker();
+	locker = new BLocker("MidiProducerLock");
 }
 
 //------------------------------------------------------------------------------
