@@ -7,7 +7,7 @@ Addon New\ Mail\ Notification : mail_daemon inbound_filters :
 	filter.cpp ConfigView.cpp ;
 
 LinkSharedOSLibs New\ Mail\ Notification :
-	 be mail ;
+	 be libmail.so ;
 
 Package haiku-maildaemon-cvs :
 	New\ Mail\ Notification : 

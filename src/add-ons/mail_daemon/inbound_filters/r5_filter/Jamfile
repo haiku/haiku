@@ -7,7 +7,7 @@ Addon R5\ Daemon\ Filter : mail_daemon inbound_filters :
 	filter.cpp ;
 
 LinkSharedOSLibs R5\ Daemon\ Filter :
-	 be mail ;
+	 be libmail.so ;
 
 Package haiku-maildaemon-cvs :
 	R5\ Daemon\ Filter : 

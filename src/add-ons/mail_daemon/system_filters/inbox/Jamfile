@@ -7,7 +7,7 @@ Addon Inbox : mail_daemon inbound_filters :
 	filter.cpp ;
 
 LinkSharedOSLibs Inbox :
-	 be mail ;
+	 be libmail.so ;
 
 Package haiku-maildaemon-cvs :
 	Inbox : 

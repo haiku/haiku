@@ -9,7 +9,7 @@ Addon Match\ Header : mail_daemon inbound_filters :
 	StringMatcher.cpp ;
 
 LinkSharedOSLibs Match\ Header :
-	 be mail ;
+	 be libmail.so ;
 
 Package haiku-maildaemon-cvs :
 	Match\ Header : 

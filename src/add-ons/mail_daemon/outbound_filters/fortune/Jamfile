@@ -8,7 +8,7 @@ Addon Fortune : mail_daemon outbound_fitlers :
 	filter.cpp ;
 
 LinkSharedOSLibs Fortune :
-	 be mail  ;
+	 be libmail.so  ;
 
 Package haiku-maildaemon-cvs :
 	Fortune : 

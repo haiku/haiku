@@ -14,7 +14,7 @@ Server mail_daemon :
 
 LinkSharedOSLibs mail_daemon : 
 	be 
-	mail
+	libmail.so
 	tracker
 	stdc++.r4
 ;

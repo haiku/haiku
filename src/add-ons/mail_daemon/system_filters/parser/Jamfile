@@ -7,7 +7,7 @@ Addon Message\ Parser : mail_daemon inbound_filters :
 	filter.cpp ;
 
 LinkSharedOSLibs Message\ Parser :
-	 be mail ;
+	 be libmail.so ;
 
 Package haiku-maildaemon-cvs :
 	Message\ Parser : 

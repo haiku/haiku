@@ -10,7 +10,7 @@ Addon SMTP : mail_daemon outbound_protocols :
 	md5c.c ;
 
 LinkSharedOSLibs SMTP :
-	 be mail socket bind ;
+	 be libmail.so socket bind ;
 
 Package haiku-maildaemon-cvs :
 	SMTP : 

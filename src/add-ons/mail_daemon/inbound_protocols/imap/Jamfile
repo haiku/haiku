@@ -16,10 +16,10 @@ Addon IMAP : mail_daemon inbound_protocols :
 	NestedString.cpp ;
 
 LinkSharedOSLibs IMAP :
-	 be mail socket bind ;
+	 be libmail.so socket bind ;
 
 #LinkSharedOSLibs IMAP :
-#	be mail socket bind ssl crypto ;
+#	be libmail.so socket bind ssl crypto ;
 
 Package haiku-maildaemon-cvs :
 	IMAP : 

@@ -16,10 +16,10 @@ Addon POP3 : mail_daemon inbound_protocols :
 	md5c.c ;
 
 LinkSharedOSLibs POP3 :
-	 be mail socket bind ;
+	 be libmail.so socket bind ;
 
 #LinkSharedOSLibs POP3 :
-#	be mail socket bind ssl crypto ;
+#	be libmail.so socket bind ssl crypto ;
 
 Package haiku-maildaemon-cvs :
 	POP3 : 

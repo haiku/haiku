@@ -12,7 +12,7 @@ Preference E-mail :
 	ConfigWindow.cpp
 	main.cpp ;
 
-LinkSharedOSLibs E-mail : be mail ;
+LinkSharedOSLibs E-mail : be libmail.so ;
 
 Package haiku-maildaemon-cvs :
 	E-mail : 

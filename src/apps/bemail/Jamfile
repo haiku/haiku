@@ -21,7 +21,7 @@ App BeMail :
 	Words.cpp
 	KUndoBuffer.cpp ;
 
-LinkSharedOSLibs BeMail : be mail tracker stdc++.r4 ;
+LinkSharedOSLibs BeMail : be tracker stdc++.r4 libmail.so ;
 
 Package haiku-maildaemon-cvs :
 	BeMail : 
