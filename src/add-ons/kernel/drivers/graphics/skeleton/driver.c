@@ -76,7 +76,7 @@ static status_t control_hook (void* dev, uint32 msg, void *buf, size_t len);
 static status_t map_device(device_info *di);
 static void unmap_device(device_info *di);
 static void probe_devices(void);
-static int32 nv_interrupt(void *data);
+static int32 eng_interrupt(void *data);
 
 static DeviceData		*pd;
 static isa_module_info	*isa_bus = NULL;
@@ -110,7 +110,7 @@ static struct {
 	{0x0000, NULL}
 };
 
-static settings current_settings = { // see comments in nv.settings 
+static settings current_settings = { // see comments in skel.settings 
 	// for driver
 	DRIVER_PREFIX ".accelerant",
 	false,      // dumprom
@@ -444,7 +444,7 @@ static status_t map_device(device_info *di)
 		return rom_area;
 	}
 
-	/* dump ROM to file if selected in nv.settings
+	/* dump ROM to file if selected in skel.settings
 	 * (ROM always fits in 64Kb: checked TNT1 - FX5950) */
 	if (current_settings.dumprom) dumprom (rom_temp, 65536);
 	/* make a copy of ROM for future reference */
@@ -585,7 +585,7 @@ static uint32 thread_interrupt_work(int32 *flags, vuint32 *regs, shared_info *si
 }
 
 static int32
-nv_interrupt(void *data)
+eng_interrupt(void *data)
 {
 	int32 handled = B_UNHANDLED_INTERRUPT;
 	device_info *di = (device_info *)data;
@@ -725,7 +725,7 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	else
 	{
 		/* otherwise install our interrupt handler */
-		result = install_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nv_interrupt, (void *)di, 0);
+		result = install_io_interrupt_handler(di->pcii.u.h0.interrupt_line, eng_interrupt, (void *)di, 0);
 		/* bail if we couldn't install the handler */
 		if (result != B_OK) goto delete_the_sem;
 	}
@@ -810,7 +810,7 @@ free_hook (void* dev) {
 	disable_vbi(regs);
 	
 	/* remove interrupt handler */
-	remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nv_interrupt, di);
+	remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, eng_interrupt, di);
 
 	/* delete the semaphores, ignoring any errors ('cause the owning team may have died on us) */
 	delete_sem(si->vblank);
@@ -852,14 +852,14 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		
 		/* PRIVATE ioctl from here on */
 		case NV_GET_PRIVATE_DATA: {
-			nv_get_private_data *gpd = (nv_get_private_data *)buf;
+			eng_get_private_data *gpd = (eng_get_private_data *)buf;
 			if (gpd->magic == NV_PRIVATE_DATA_MAGIC) {
 				gpd->shared_info_area = di->shared_area;
 				result = B_OK;
 			}
 		} break;
 		case NV_GET_PCI: {
-			nv_get_set_pci *gsp = (nv_get_set_pci *)buf;
+			eng_get_set_pci *gsp = (eng_get_set_pci *)buf;
 			if (gsp->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				gsp->value = get_pci(gsp->offset, gsp->size);
@@ -867,7 +867,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			}
 		} break;
 		case NV_SET_PCI: {
-			nv_get_set_pci *gsp = (nv_get_set_pci *)buf;
+			eng_get_set_pci *gsp = (eng_get_set_pci *)buf;
 			if (gsp->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				set_pci(gsp->offset, gsp->size, gsp->value);
@@ -875,14 +875,14 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			}
 		} break;
 		case NV_DEVICE_NAME: { // apsed
-			nv_device_name *dn = (nv_device_name *)buf;
+			eng_device_name *dn = (eng_device_name *)buf;
 			if (dn->magic == NV_PRIVATE_DATA_MAGIC) {
 				strcpy(dn->name, di->name);
 				result = B_OK;
 			}
 		} break;
 		case NV_RUN_INTERRUPTS: {
-			nv_set_bool_state *ri = (nv_set_bool_state *)buf;
+			eng_set_bool_state *ri = (eng_set_bool_state *)buf;
 			if (ri->magic == NV_PRIVATE_DATA_MAGIC) {
 				vuint32 *regs = di->regs;
 				if (ri->do_it) {
@@ -894,7 +894,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			}
 		} break;
 		case NV_GET_NTH_AGP_INFO: {
-			nv_nth_agp_info *nai = (nv_nth_agp_info *)buf;
+			eng_nth_agp_info *nai = (eng_nth_agp_info *)buf;
 			if (nai->magic == NV_PRIVATE_DATA_MAGIC) {
 				nai->exist = false;
 				nai->agp_bus = false;
@@ -908,7 +908,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			}
 		} break;
 		case NV_ENABLE_AGP: {
-			nv_cmd_agp *nca = (nv_cmd_agp *)buf;
+			eng_cmd_agp *nca = (eng_cmd_agp *)buf;
 			if (nca->magic == NV_PRIVATE_DATA_MAGIC) {
 				if (agp_bus) {
 					nca->agp_bus = true;
@@ -921,7 +921,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			}
 		} break;
 		case NV_ISA_OUT: {
-			nv_in_out_isa *io_isa = (nv_in_out_isa *)buf;
+			eng_in_out_isa *io_isa = (eng_in_out_isa *)buf;
 			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
@@ -950,7 +950,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
    			}
 		} break;
 		case NV_ISA_IN: {
-			nv_in_out_isa *io_isa = (nv_in_out_isa *)buf;
+			eng_in_out_isa *io_isa = (eng_in_out_isa *)buf;
 			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
