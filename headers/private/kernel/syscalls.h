@@ -12,6 +12,7 @@
 #include <vm_types.h>
 #include <thread_types.h>
 #include <OS.h>
+#include <image.h>
 #include <sys/stat.h>
 
 #ifdef __cplusplus
@@ -63,6 +64,13 @@ int sys_send_signal(pid_t tid, uint sig);
 int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 bigtime_t sys_set_alarm(bigtime_t time, uint32 mode);
 
+// image functions
+image_id sys_register_image(image_info *info, size_t size);
+status_t sys_unregister_image(image_id id);
+status_t sys_get_image_info(image_id id, image_info *info, size_t size);
+status_t sys_get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t size);
+
+// area functions
 region_id sys_vm_create_anonymous_region(const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);
 region_id sys_vm_clone_region(const char *name, void **address, int addr_type,
