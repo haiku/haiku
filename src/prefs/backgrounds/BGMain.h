@@ -12,7 +12,7 @@
 #include <Application.h>
 #include "BGWindow.h"
 
-#define APP_SIGNATURE		"application/x-vnd.obos-Backgrounds"
+#define APP_SIGNATURE		"application/x-vnd.haiku.Backgrounds"
 
 class BGApplication : public BApplication {
 	public:

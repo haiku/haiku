@@ -57,12 +57,13 @@ resource mini_icon
 	$"FFFF00000E0F0F0F0F0F0F000F0F0FFF"
 };
 
-resource app_signature "application/x-vnd.obos-Backgrounds";
+resource app_signature "application/x-vnd.haiku.Backgrounds";
 
 resource app_version
 {
-	short_info = "OBOS-Backgrounds", 
-    long_info  = "OpenBeOS version of Backgrounds"
+	short_info = "Haiku-Backgrounds", 
+    long_info  = "Haiku version of Backgrounds"
 };
 
 resource app_flags B_SINGLE_LAUNCH;
+
