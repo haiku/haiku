@@ -4,12 +4,12 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head 0.29, (Rudolf)</h1></p>
+<p><h1>nv_driver 0.30, (Rudolf)</h1></p>
 <ul>
 	<li>Overlay fix for GeForce2 and GeForce4 MX Integrated GPU boards: updated RAM amount detection. The last 64Kb RAM is used for the card's BIOS or something so it's not available to the graphicsdriver;
 	<li>Enabled coldstart switch setting (called 'usebios' in nv.settings) in drivercode. Changed the default setting to keep the driver working in the same way it did before;
 	<li>Added recognition for 25 new cards including the first PCI-express (PCX) cards: FX/PCX 6800, FX 6600, PCX 5300/5750/5900, PCX Quadro. New 'old style' cards: Quadro FX 700, Quadro FX 1000 Go, FX 5100 and FX 5700 Go. While FX6800 still seems to be non-functional, a Quadro4 280 NVS PCIe (GeForce PCX 5300 PCIe) has been confirmed working OK already;
-	<li>Card coldstarts should now be operational (if enabled in nv.settings) on most cards, except TNT1 and GeForce 6800. Tested successfully on TNT2/TNT2-M64 (NV05), GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForce4 Ti4200 (NV28) and GeForce FX5200 (NV34). Note however that laptop panels and DVI panels will not work via coldstarting yet!
+	<li>Card coldstarts should now be operational (if enabled in nv.settings) on most cards, except TNT1, GeForce 6600 and GeForce 6800. Tested successfully on TNT2/TNT2-M64 (NV05), GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForce4 Ti4200 (NV28) and GeForce FX5200 (NV34). Note however that laptop panels and DVI panels will not work via coldstarting yet!
 	<li>The 'bandwidth trouble' existing on older cards, especially on some GeForce2 types, should be fixed now if you enable card coldstarting for these cards. Note that this problem existed because of a fault in these card's BIOSes (they missed some specific register programming). Confirmed a NV15 working OK now.
 </ul>
 <p><h1>nv_driver 0.22, (Rudolf)</h1></p>
@@ -149,7 +149,7 @@ The features below are shutdown because they are possibly dangerous without feed
 <p><h1>Still todo:</h1></p>
 <ul>
 	<li>TVout support;
-	<li>(Partial) card coldstart: setup RAM and CORE speeds if possible (in progress).
+	<li>Improve/extend various stuff when/if possible.
 </ul>
 </p>
 </body>
