@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -2223,29 +2226,82 @@ lock_memory(void *buffer, ulong numBytes, ulong flags)
 	// The NewOS VM currently doesn't support locking - dunno if we'll
 	// ever change this, but if, we should definitely implement these
 	// functions :-)
-	return B_ERROR;
+	return B_OK;
 }
 
 
 long
 unlock_memory(void *buffer, ulong numBytes, ulong flags)
 {
-	return B_ERROR;
+	return B_OK;
 }
 
+
+/** According to the BeBook, this function should always succeed.
+ *	This is no longer the case.
+ */
 
 long
 get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries)
 {
-	// The BeBook says:
-	// "RETURN CODES
-	// The function always returns
-	//		B_OK."
-	// Well, not anymore :-))
-	//
-	// IOW: ToDo: implement get_memory_map()
+	vm_address_space *addressSpace;
+	addr_t physicalAddress;
+	status_t status = B_OK;
+	int32 index = -1;
+	addr_t offset;
+	int flags;
 
-	return B_ERROR;
+	TRACE(("get_memory_map(%p, %lu bytes, %ld entries)\n", address, numBytes, numEntries));
+
+	if (numEntries == 0 || numBytes == 0)
+		return B_BAD_VALUE;
+
+	// in which address space is the address to be found?	
+	if ((addr_t)address < KERNEL_BASE)
+		addressSpace = vm_get_current_user_aspace();
+	else
+		addressSpace = vm_get_kernel_aspace();
+
+	if (addressSpace == NULL)
+		return B_ERROR;
+
+	(*addressSpace->translation_map.ops->lock)(&addressSpace->translation_map);
+
+	for (offset = 0; offset < numBytes; offset += B_PAGE_SIZE) {
+		addr_t bytes = min(numBytes - offset, B_PAGE_SIZE);
+
+		status = (*addressSpace->translation_map.ops->query)(&addressSpace->translation_map,
+					(addr_t)address + offset, &physicalAddress, &flags);
+		if (status < 0)
+			break;
+
+		// need to switch to the next physical_entry?
+		if (index < 0 || (addr_t)table[index].address != physicalAddress - table[index].size) {
+			if (++index + 1 > numEntries) {
+				// table to small
+				status = B_BUFFER_OVERFLOW;
+				break;
+			}
+			table[index].address = (void *)physicalAddress;
+			table[index].size = bytes;
+		} else {
+			// page does fit in current entry
+			table[index].size += bytes;
+		}
+	}
+	(*addressSpace->translation_map.ops->unlock)(&addressSpace->translation_map);
+
+	// close the entry list
+
+	if (status == B_OK) {
+		if (++index + 1 > numEntries)
+			return B_BUFFER_OVERFLOW;
+
+		table[index].address = NULL;
+		table[index].size = 0;
+	}
+
+	return status;
 }
 
 
