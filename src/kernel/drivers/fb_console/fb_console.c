@@ -411,7 +411,7 @@ fb_console_dev_init(kernel_args *ka)
 		if(ka->fb.already_mapped) {
 			console.fb = ka->fb.mapping.start;
 		} else {
-			vm_map_physical_memory(vm_get_kernel_aspace_id(), "vesa_fb", (void *)&console.fb, REGION_ADDR_ANY_ADDRESS,
+			vm_map_physical_memory(vm_get_kernel_aspace_id(), "vesa_fb", (void *)&console.fb, B_ANY_KERNEL_ADDRESS,
 				ka->fb.mapping.size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, ka->fb.mapping.start);
 		}
 

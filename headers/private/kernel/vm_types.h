@@ -145,9 +145,6 @@ typedef struct vm_store_ops {
 
 // args for the create_area funcs
 enum {
-	REGION_ADDR_ANY_ADDRESS = 0,
-	REGION_ADDR_EXACT_ADDRESS,
-
 	// ToDo: these are here only temporarily - it's a private
 	//	addition to the BeOS create_area() flags
 	B_EXACT_KERNEL_ADDRESS = 6
@@ -159,11 +156,6 @@ enum {
 };
 
 enum {
-	REGION_WIRING_LAZY = 0,
-	REGION_WIRING_WIRED,
-	REGION_WIRING_WIRED_ALREADY,
-	REGION_WIRING_WIRED_CONTIG,
-
 	// ToDo: these are here only temporarily - it's a private
 	//	addition to the BeOS create_area() flags
 	B_ALREADY_WIRED = 6

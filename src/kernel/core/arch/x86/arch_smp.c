@@ -111,10 +111,10 @@ arch_smp_init(kernel_args *ka)
 
 		// setup regions that represent the apic & ioapic
 		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "local_apic", (void *)&apic,
-			REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY,
+			B_EXACT_KERNEL_ADDRESS, PAGE_SIZE, B_ALREADY_WIRED,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "ioapic", (void *)&ioapic,
-			REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY,
+			B_EXACT_KERNEL_ADDRESS, PAGE_SIZE, B_ALREADY_WIRED,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 		// set up the local apic on the boot cpu

@@ -51,7 +51,7 @@ arch_cpu_init2(kernel_args *ka)
 
 	gGDT = (segment_descriptor *)ka->arch_args.vir_gdt;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "gdt", (void **)&gGDT,
-		REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY,
+		B_EXACT_KERNEL_ADDRESS, PAGE_SIZE, B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	// currently taken out of the build, because it's not yet used (and assumes
@@ -79,7 +79,7 @@ arch_cpu_init2(kernel_args *ka)
 
 		sprintf(tss_name, "tss%d", i);
 		rid = vm_create_anonymous_region(vm_get_kernel_aspace_id(), tss_name, (void **)&tss[i],
-			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED,
+			B_ANY_KERNEL_ADDRESS, PAGE_SIZE, B_FULL_LOCK,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (rid < 0) {
 			panic("arch_cpu_init2: unable to create region for tss\n");

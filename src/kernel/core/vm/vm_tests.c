@@ -2,6 +2,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <vm.h>
 #include <debug.h>
@@ -13,7 +14,9 @@
 #include <ctype.h>
 #include <stdio.h>
 
-void vm_test()
+
+void
+vm_test()
 {
 //	region_id region, region2, region3;
 //	addr region_addr;
@@ -27,15 +30,15 @@ void vm_test()
 		addr region_addr;
 
 		region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "test_region", (void **)&region_addr,
-			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE * 16, REGION_WIRING_LAZY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if(region < 0)
+			B_ANY_KERNEL_ADDRESS, PAGE_SIZE * 16, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (region < 0)
 			panic("vm_test 1: failed to create test region\n");
 		dprintf("region = 0x%lx, addr = 0x%lx\n", region, region_addr);
 
 		memset((void *)region_addr, 0, PAGE_SIZE * 16);
 
 		dprintf("memsetted the region\n");
-		if(vm_delete_region(vm_get_kernel_aspace_id(), region) < 0)
+		if (vm_delete_region(vm_get_kernel_aspace_id(), region) < 0)
 			panic("vm_test 1: error deleting test region\n");
 		dprintf("deleted the region\n");
 	}
@@ -49,7 +52,7 @@ void vm_test()
 		int i;
 
 		region = vm_map_physical_memory(vm_get_kernel_aspace_id(), "test_physical_region", (void **)&ptr,
-			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE * 16, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0xb8000);
+			B_ANY_KERNEL_ADDRESS, PAGE_SIZE * 16, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0xb8000);
 		if(region < 0)
 			panic("vm_test 2: failed to create test region\n");
 
@@ -107,7 +110,7 @@ void vm_test()
 		dprintf("vid_mem region = 0x%lx\n", region);
 
 		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "vid_mem2",
-			&ptr, REGION_ADDR_ANY_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region2 < 0)
 			panic("vm_test 4: error cloning region 'vid_mem'\n");
 		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
@@ -136,7 +139,7 @@ void vm_test()
 		dprintf("vid_mem region = 0x%lx\n", region);
 
 		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "vid_mem3",
-			&ptr, REGION_ADDR_ANY_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA);
+			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA);
 		if(region2 < 0)
 			panic("vm_test 5: error cloning region 'vid_mem'\n");
 		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
@@ -161,8 +164,8 @@ void vm_test()
 		int rc;
 
 		region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "test_region", &region_addr,
-			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE * 16, REGION_WIRING_LAZY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if(region < 0)
+			B_ANY_KERNEL_ADDRESS, PAGE_SIZE * 16, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (region < 0)
 			panic("vm_test 6: error creating test region\n");
 		dprintf("region = 0x%lx, addr = %p\n", region, region_addr);
 
@@ -171,7 +174,7 @@ void vm_test()
 		dprintf("memsetted the region\n");
 
 		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "test_region2",
-			&ptr, REGION_ADDR_ANY_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region2 < 0)
 			panic("vm_test 6: error cloning test region\n");
 		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
@@ -199,10 +202,10 @@ void vm_test()
 
 		fd = sys_open("/boot/kernel", 0);
 
-		rid = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test", &ptr, REGION_ADDR_ANY_ADDRESS,
+		rid = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test", &ptr, B_ANY_KERNEL_ADDRESS,
 			PAGE_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, REGION_NO_PRIVATE_MAP, "/boot/kernel", 0);
 
-		rid2 = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test2", &ptr2, REGION_ADDR_ANY_ADDRESS,
+		rid2 = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test2", &ptr2, B_ANY_KERNEL_ADDRESS,
 			PAGE_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, REGION_NO_PRIVATE_MAP, "/boot/kernel", 0);
 
 		dprintf("diff %d\n", memcmp(ptr, ptr2, PAGE_SIZE));
@@ -230,7 +233,7 @@ void vm_test()
 		dprintf("vm_test 8: creating test region...\n");
 
 		region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "test_region", &region_addr,
-			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE * 16, REGION_WIRING_LAZY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			B_ANY_KERNEL_ADDRESS, PAGE_SIZE * 16, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region < 0)
 			panic("vm_test 8: error creating test region\n");
 		dprintf("region = 0x%lx, addr = %p\n", region, region_addr);
@@ -242,7 +245,7 @@ void vm_test()
 		dprintf("vm_test 8: cloning test region with PRIVATE_MAP\n");
 
 		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "test_region2",
-			&ptr, REGION_ADDR_ANY_ADDRESS, region, REGION_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region2 < 0)
 			panic("vm_test 8: error cloning test region\n");
 		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
@@ -310,10 +313,10 @@ void vm_test()
 
 		dprintf("vm_test 9: mapping /boot/kernel twice\n");
 
-		rid = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test", &ptr, REGION_ADDR_ANY_ADDRESS,
+		rid = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test", &ptr, B_ANY_KERNEL_ADDRESS,
 			PAGE_SIZE*4, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, REGION_NO_PRIVATE_MAP, "/boot/kernel", 0);
 
-		rid2 = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test2", &ptr2, REGION_ADDR_ANY_ADDRESS,
+		rid2 = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test2", &ptr2, B_ANY_KERNEL_ADDRESS,
 			PAGE_SIZE*4, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, REGION_PRIVATE_MAP, "/boot/kernel", 0);
 
 		err = memcmp(ptr, ptr2, PAGE_SIZE);

@@ -1085,7 +1085,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 
 			id = vm_map_file(p->_aspace_id, regionName,
 				(void **)&regionAddress,
-				REGION_ADDR_EXACT_ADDRESS,
+				B_EXACT_ADDRESS,
 				fileUpperBound,
 				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
 				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
@@ -1130,7 +1130,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 			 */
 			id = vm_map_file(p->_aspace_id, regionName,
 				(void **)&regionAddress,
-				REGION_ADDR_EXACT_ADDRESS,
+				B_EXACT_ADDRESS,
 				ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE),
 				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP,
 				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));

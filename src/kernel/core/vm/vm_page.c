@@ -260,8 +260,8 @@ vm_page_init2(kernel_args *ka)
 	void *null;
 
 	null = all_pages;
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "page_structures", &null, REGION_ADDR_EXACT_ADDRESS,
-		PAGE_ALIGN(num_pages * sizeof(vm_page)), REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "page_structures", &null, B_EXACT_KERNEL_ADDRESS,
+		PAGE_ALIGN(num_pages * sizeof(vm_page)), B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	add_debugger_command("page_stats", &dump_page_stats, "Dump statistics about page usage");
 	add_debugger_command("free_pages", &dump_free_page_table, "Dump list of free pages");

@@ -790,27 +790,27 @@ vm_translation_map_module_init2(kernel_args *ka)
 
 	temp = (void *)kernel_pgdir_virt;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_pgdir", &temp,
-		REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_EXACT_KERNEL_ADDRESS, PAGE_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)paddr_desc;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "physical_page_mapping_descriptors", &temp,
-		REGION_ADDR_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc) * 1024, PAGE_SIZE),
-		REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_EXACT_KERNEL_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc) * 1024, PAGE_SIZE),
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)virtual_pmappings;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "iospace_virtual_chunk_descriptors", &temp,
-		REGION_ADDR_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc *) * num_virtual_chunks, PAGE_SIZE),
-		REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_EXACT_KERNEL_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc *) * num_virtual_chunks, PAGE_SIZE),
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)iospace_pgtables;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "iospace_pgtables", &temp,
-		REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE * (IOSPACE_SIZE / (PAGE_SIZE * 1024)),
-		REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_EXACT_KERNEL_ADDRESS, PAGE_SIZE * (IOSPACE_SIZE / (PAGE_SIZE * 1024)),
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("vm_translation_map_module_init2: creating iospace\n"));
 	temp = (void *)IOSPACE_BASE;
 	vm_create_null_region(vm_get_kernel_aspace_id(), "iospace", &temp,
-		REGION_ADDR_EXACT_ADDRESS, IOSPACE_SIZE);
+		B_EXACT_KERNEL_ADDRESS, IOSPACE_SIZE);
 
 	TRACE(("vm_translation_map_module_init2: done\n"));
 
