@@ -436,9 +436,12 @@ PNGTranslatorSettings::SetGetInterlace(int32 *pinterlace)
 		// set to default value in case FindBool fails
 	
 	flock.Lock();
+	
 	fmsgSettings.FindInt32(PNG_SETTING_INTERLACE, &nprevValue);
-	if (pinterlace)
+	if (pinterlace && (*pinterlace == PNG_INTERLACE_NONE ||
+		*pinterlace == PNG_INTERLACE_ADAM7))
 		fmsgSettings.ReplaceInt32(PNG_SETTING_INTERLACE, *pinterlace);
+		
 	flock.Unlock();
 	
 	return nprevValue;

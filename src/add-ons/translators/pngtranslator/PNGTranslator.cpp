@@ -417,12 +417,8 @@ status_t
 identify_png_header(BPositionIO *inSource, BMessage *ioExtension,
 	translator_info *outInfo, uint32 outType, ssize_t amtread, uint8 *read)
 {
-	// Can only output to bits for now
-	if (outType != B_TRANSLATOR_BITMAP)
-		return B_NO_TRANSLATOR;
 	if (amtread != 8)
-		return B_ERROR;
-		
+		return B_ERROR;		
 	if (!png_check_sig(read, amtread))
 		// if first 8 bytes of stream don't match PNG signature bail
 		return B_NO_TRANSLATOR;
@@ -543,7 +539,7 @@ translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 	bdataonly = settings.SetGetDataOnly();
 	
 	// for storing decoded PNG row data
-	png_bytep *prows = NULL, prow = NULL;
+	uint8 **prows = NULL, *prow = NULL;
 	png_uint_32 nalloc = 0;
 	
 	png_structp ppng = NULL;
@@ -652,7 +648,7 @@ translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 		
 		if (interlace_type == PNG_INTERLACE_NONE) {
 			// allocate buffer for storing PNG row
-			prow = new png_byte[rowbytes];
+			prow = new uint8[rowbytes];
 			if (!prow) {
 				result = B_NO_MEMORY;
 				break;
@@ -671,14 +667,14 @@ translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 			
 		} else {
 			// interlaced PNG image
-			prows = new png_bytep[height];
+			prows = new uint8 *[height];
 			if (!prows) {
 				result = B_NO_MEMORY;
 				break;
 			}
 			// allocate enough memory to store the whole image
 			for (nalloc = 0; nalloc < height; nalloc++) {
-				prows[nalloc] = new png_byte[rowbytes];
+				prows[nalloc] = new uint8[rowbytes];
 				if (!prows[nalloc])
 					break;
 			}
@@ -739,6 +735,427 @@ translate_from_png(BPositionIO *inSource, BMessage *ioExtension,
 		
 		return B_OK;
 	}
+}
+
+// Convert width pixels from pbits to PNG format, storing the
+// result in ppng
+status_t
+pix_bits_to_png(uint8 *pbits, uint8 *ppng, color_space fromspace,
+	uint32 width, const color_map *pmap, int32 bitsBytesPerPixel)
+{
+	status_t bytescopied = 0;
+	uint16 val;
+	
+	switch (fromspace) {
+		case B_RGBA32:
+			bytescopied = width * bitsBytesPerPixel;
+			memcpy(ppng, pbits, bytescopied);
+			break;
+			
+		case B_RGB32:
+		case B_RGB24:
+			bytescopied = width * bitsBytesPerPixel;
+			while (width--) {
+				memcpy(ppng, pbits, 3);
+				ppng += 3;
+				pbits += bitsBytesPerPixel;
+			}
+			break;
+					
+		case B_RGBA32_BIG:
+			bytescopied = width * 4;
+			while (width--) {
+				ppng[0] = pbits[3];
+				ppng[1] = pbits[2];
+				ppng[2] = pbits[1];
+				ppng[3] = pbits[0];
+				
+				ppng += 4;
+				pbits += 4;
+			}
+			break;
+				
+		case B_CMYA32:
+			bytescopied = width * 4;
+			while (width--) {
+				ppng[0] = 255 - pbits[2];
+				ppng[1] = 255 - pbits[1];
+				ppng[2] = 255 - pbits[0];
+				ppng[3] = pbits[3];
+				
+				ppng += 4;
+				pbits += 4;
+			}
+			break;
+					
+		case B_CMYK32:
+		{
+			int32 comp;
+			bytescopied = width * 3;
+			while (width--) {			
+				comp = 255 - pbits[2] - pbits[3];
+				ppng[0] = (comp < 0) ? 0 : comp;
+					
+				comp = 255 - pbits[1] - pbits[3];
+				ppng[1] = (comp < 0) ? 0 : comp;
+					
+				comp = 255 - pbits[0] - pbits[3];
+				ppng[2] = (comp < 0) ? 0 : comp;
+				
+				ppng += 3;
+				pbits += 4;
+			}
+			break;
+		}
+				
+		case B_CMY32:
+		case B_CMY24:
+			bytescopied = width * 3;
+			while (width--) {
+				ppng[0] = 255 - pbits[2];
+				ppng[1] = 255 - pbits[1];
+				ppng[2] = 255 - pbits[0];
+				
+				ppng += 3;
+				pbits += bitsBytesPerPixel;
+			}
+			break;
+					
+		case B_RGB16:
+		case B_RGB16_BIG:
+			bytescopied = width * 3;
+			while (width--) {
+				if (fromspace == B_RGB16)
+					val = pbits[0] + (pbits[1] << 8);
+				else
+					val = pbits[1] + (pbits[0] << 8);
+
+				ppng[0] =
+					((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+				ppng[1] =
+					((val & 0x7e0) >> 3) | ((val & 0x7e0) >> 9);
+				ppng[2] =
+					((val & 0xf800) >> 8) | ((val & 0xf800) >> 13);
+					
+				ppng += 3;
+				pbits += 2;
+			}
+			break;
+
+		case B_RGB15:
+		case B_RGB15_BIG:
+			bytescopied = width * 3;
+			while (width--) {
+				if (fromspace == B_RGB15)
+					val = pbits[0] + (pbits[1] << 8);
+				else
+					val = pbits[1] + (pbits[0] << 8);
+				ppng[0] = 
+					((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+				ppng[1] =
+					((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+				ppng[2] =
+					((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+					
+				ppng += 3;
+				pbits += 2;
+			}
+			break;
+			
+		case B_RGBA15:
+		case B_RGBA15_BIG:
+			bytescopied = width * 4;
+			while (width--) {
+				if (fromspace == B_RGBA15)
+					val = pbits[0] + (pbits[1] << 8);
+				else
+					val = pbits[1] + (pbits[0] << 8);
+				ppng[0] = 
+					((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+				ppng[1] =
+					((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+				ppng[2] =
+					((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+				ppng[3] = (val & 0x8000) ? 255 : 0;
+				
+				ppng += 4;
+				pbits += 2;
+			}
+			break;
+						
+		case B_RGB32_BIG:
+			bytescopied = width * 3;
+			while (width--) {
+				ppng[0] = pbits[3];
+				ppng[1] = pbits[2];
+				ppng[2] = pbits[1];
+				
+				ppng += 3;
+				pbits += 4;
+			}
+			break;
+						
+		case B_RGB24_BIG:
+			bytescopied = width * 3;
+			while (width--) {
+				ppng[0] = pbits[2];
+				ppng[1] = pbits[1];
+				ppng[2] = pbits[0];
+				
+				ppng += 3;
+				pbits += 3;
+			}
+			break;
+				
+		case B_CMAP8:
+		{
+			rgb_color c;
+			bytescopied = width * 3;
+			while (width--) {
+				c = pmap->color_list[pbits[0]];
+				ppng[0] = c.blue;
+				ppng[1] = c.green;
+				ppng[2] = c.red;
+				
+				ppng += 3;
+				pbits++;
+			}
+			break;
+		}
+					
+		case B_GRAY8:
+			bytescopied = width;
+			memcpy(ppng, pbits, bytescopied);
+			break;
+						
+		default:
+			bytescopied = B_ERROR;
+			break;
+	} // switch (fromspace)
+	
+	return bytescopied;
+}
+
+status_t
+translate_from_bits_to_png(BPositionIO *inSource, BPositionIO *outDestination,
+	ssize_t amtread, uint8 *read, PNGTranslatorSettings &settings)
+{
+	TranslatorBitmap bitsHeader;
+		
+	status_t result;
+	
+	result = identify_bits_header(inSource, NULL, amtread, read, &bitsHeader);
+	if (result != B_OK)
+		return result;
+		
+	const color_map *pmap = NULL;
+	if (bitsHeader.colors == B_CMAP8) {
+		pmap = system_colors();
+		if (!pmap)
+			return B_ERROR;
+	}
+	
+	png_uint_32 width, height;
+	width = static_cast<png_uint_32>(bitsHeader.bounds.Width() + 1);
+	height = static_cast<png_uint_32>(bitsHeader.bounds.Height() + 1);
+	
+	int32 pngBytesPerPixel = 0;
+	int bit_depth, color_type, interlace_type;
+	bit_depth = 8;
+	switch (bitsHeader.colors) {
+		case B_RGBA32:
+		case B_RGBA32_BIG:
+		case B_CMYA32:
+		case B_RGBA15:
+		case B_RGBA15_BIG:
+			pngBytesPerPixel = 4;
+			color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+			break;
+			
+		case B_RGB32:
+		case B_RGB32_BIG:
+		case B_RGB24:
+		case B_RGB24_BIG:
+		case B_CMY32:
+		case B_CMYK32:
+		case B_CMY24:
+		case B_RGB16:
+		case B_RGB16_BIG:
+		case B_RGB15:
+		case B_RGB15_BIG:
+			pngBytesPerPixel = 3;
+			color_type = PNG_COLOR_TYPE_RGB;
+			break;
+			
+		// ADD SUPPORT FOR B_CMAP8 HERE (later)
+			
+		case B_GRAY8:
+			pngBytesPerPixel = 1;
+			color_type = PNG_COLOR_TYPE_GRAY;
+			break;
+			
+		default:
+			return B_NO_TRANSLATOR;
+	}
+	interlace_type = settings.SetGetInterlace();
+	
+	int32 bitsBytesPerPixel = 0;
+	switch (bitsHeader.colors) {
+		case B_RGBA32:
+		case B_RGBA32_BIG:
+		case B_RGB32:
+		case B_RGB32_BIG:
+		case B_CMYA32:
+		case B_CMYK32:
+		case B_CMY32:
+			bitsBytesPerPixel = 4;
+			break;
+		
+		case B_RGB24:
+		case B_RGB24_BIG:
+		case B_CMY24:
+			bitsBytesPerPixel = 3;
+			break;
+					
+		case B_RGB16:
+		case B_RGB16_BIG:
+		case B_RGBA15:
+		case B_RGBA15_BIG:
+		case B_RGB15:
+		case B_RGB15_BIG:
+			bitsBytesPerPixel = 2;
+			break;
+
+		case B_GRAY8:
+		case B_CMAP8:
+			bitsBytesPerPixel = 1;
+			break;
+			
+		default:
+			return B_NO_TRANSLATOR;
+	};
+	
+	uint8 *pbitsrow = NULL, *prow = NULL;
+		// row buffers
+	// image buffer for writing whole png image at once
+	uint8 **prows = NULL;
+	png_uint_32 nalloc = 0;
+		
+	png_structp ppng = NULL;
+	png_infop pinfo = NULL;
+	
+	result = B_NO_TRANSLATOR;
+	while (ppng == NULL) {
+		// create PNG read pointer with default error handling routines
+		ppng = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL,
+			NULL, NULL);
+		if (!ppng) {
+			result = B_ERROR;
+			break;
+		}
+		// alocate / init memory for image information
+		pinfo = png_create_info_struct(ppng);
+		if (!pinfo) {
+			result = B_ERROR;
+			break;
+		}
+		// set error handling
+		if (setjmp(png_jmpbuf(ppng))) {
+			// When an error occurs in libpng, it uses
+			// the longjmp function to continue execution
+			// from this point
+			result = B_ERROR;
+			break;
+		}
+		
+		png_set_write_fn(ppng, static_cast<void *>(outDestination), 
+			pngcb_write_data, pngcb_flush_data);
+			
+		// Allocate memory needed to buffer image data
+		pbitsrow = new uint8[bitsHeader.rowBytes];
+		if (!pbitsrow) {
+			result = B_NO_MEMORY;
+			break;
+		}
+		if (interlace_type == PNG_INTERLACE_NONE) {
+			prow = new uint8[width * pngBytesPerPixel];
+			if (!prow) {
+				result = B_NO_MEMORY;
+				break;
+			}
+		} else {
+			prows = new uint8 *[height];
+			if (!prows) {
+				result = B_NO_MEMORY;
+				break;
+			}
+			// allocate enough memory to store the whole image
+			for (nalloc = 0; nalloc < height; nalloc++) {
+				prows[nalloc] = new uint8[width * pngBytesPerPixel];
+				if (!prows[nalloc])
+					break;
+			}
+			if (nalloc < height) {
+				result = B_NO_MEMORY;
+				break;
+			}
+		}
+		
+		// Specify image info
+		png_set_IHDR(ppng, pinfo, width, height, bit_depth, color_type,
+			interlace_type, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+		png_write_info(ppng, pinfo);
+		
+		png_set_bgr(ppng);
+		
+		// write out image data
+		if (interlace_type == PNG_INTERLACE_NONE) {
+			for (png_uint_32 i = 0; i < height; i++) {
+				inSource->Read(pbitsrow, bitsHeader.rowBytes);
+				
+				pix_bits_to_png(pbitsrow, prow, bitsHeader.colors, width,
+					pmap, bitsBytesPerPixel);
+					
+				png_write_row(ppng, prow);
+			}
+		} else {
+			for (png_uint_32 i = 0; i < height; i++) {
+				inSource->Read(pbitsrow, bitsHeader.rowBytes);
+				
+				pix_bits_to_png(pbitsrow, prows[i], bitsHeader.colors, width,
+					pmap, bitsBytesPerPixel);
+			}
+			png_write_image(ppng, prows);
+		}
+		png_write_end(ppng, NULL);
+		
+		result = B_OK;
+		break;
+	}
+	
+	if (ppng) {
+		delete[] pbitsrow;
+		pbitsrow = NULL;
+		
+		delete[] prow;
+		prow = NULL;
+		
+		// delete row pointers and array of pointers to rows
+		while (nalloc) {
+			nalloc--;
+			delete[] prows[nalloc];
+		}
+		delete[] prows;
+		prows = NULL;
+		
+		// free PNG handle / info structures
+		if (!pinfo)
+			png_destroy_write_struct(&ppng, png_infopp_NULL);
+		else
+			png_destroy_write_struct(&ppng, &pinfo);
+	}
+
+	return result;
 }
 
 // ---------------------------------------------------------------
@@ -804,10 +1221,15 @@ PNGTranslator::Translate(BPositionIO *inSource, const translator_info *inInfo,
 	memcpy(&n32ch, ch, sizeof(uint32));
 	if (n32ch == nbits) {
 		// B_TRANSLATOR_BITMAP type
-		outDestination->Write(ch, 4);
-		translate_direct_copy(inSource, outDestination);
+		if (outType == B_TRANSLATOR_BITMAP) {
+			outDestination->Write(ch, 4);
+			translate_direct_copy(inSource, outDestination);
 		
-		return B_OK;
+			return B_OK;
+		} else
+			// Output to PNG
+			return translate_from_bits_to_png(inSource, outDestination,
+				4, ch, *fpsettings);
 		
 	} else {
 		// Might be PNG image, read in the rest of
