@@ -37,6 +37,8 @@
 #include "WinBorder.h"
 #include "AppServer.h"	// for new_decorator()
 
+// TODO: Document this file completely
+
 //#define DEBUG_WINBORDER
 //#define DEBUG_WINBORDER_MOUSE
 //#define DEBUG_WINBORDER_CLICK
@@ -72,9 +74,13 @@ void set_is_sliding_tab(bool state) { winborder_private::is_sliding_tab=state; }
 WinBorder * get_active_winborder(void) { return winborder_private::active_winborder; }
 void set_active_winborder(WinBorder *win) { winborder_private::active_winborder=win; }
 
-WinBorder::WinBorder(BRect r, const char *name, int32 look, int32 feel, int32 flags, ServerWindow *win)
+WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const int32 feel,
+	const int32 flags, ServerWindow *win)
  : Layer(r,name,B_FOLLOW_NONE,flags,win)
 {
+	// unlike BViews, windows start off as hidden, so we need to tweak the hidecount
+	// assignment made by Layer().
+	_hidecount=1;
 	_mbuttons=0;
 	_kmodifiers=0;
 	_win=win;
@@ -153,7 +159,7 @@ printf("Click: MoveToFront\n");
 printf("Click: Close\n");
 #endif
 			_decorator->SetClose(true);
-			_decorator->Draw();
+			_decorator->DrawClose();
 			break;
 		}
 		case CLICK_ZOOM:
@@ -162,7 +168,7 @@ printf("Click: Close\n");
 printf("Click: Zoom\n");
 #endif
 			_decorator->SetZoom(true);
-			_decorator->Draw();
+			_decorator->DrawZoom();
 			break;
 		}
 		case CLICK_MINIMIZE:
@@ -171,7 +177,7 @@ printf("Click: Zoom\n");
 printf("Click: Minimize\n");
 #endif
 			_decorator->SetMinimize(true);
-			_decorator->Draw();
+			_decorator->DrawMinimize();
 			break;
 		}
 		case CLICK_DRAG:
@@ -357,7 +363,7 @@ void WinBorder::MouseUp(int8 *buffer)
 	BPoint pt(x,y);
 	
 #ifdef DEBUG_WINBORDER_MOUSE
-printf("WinBorder %s: MouseUp unimplmented\n",_title->String());
+printf("WinBorder %s: MouseUp unimplemented\n",_title->String());
 #endif
 
 	_mbuttons=0;
@@ -374,7 +380,7 @@ printf("WinBorder %s: MouseUp unimplmented\n",_title->String());
 		case CLICK_CLOSE:
 		{
 			_decorator->SetClose(false);
-			_decorator->Draw();
+			_decorator->DrawClose();
 			
 			// call close window stuff here
 			
@@ -383,7 +389,7 @@ printf("WinBorder %s: MouseUp unimplmented\n",_title->String());
 		case CLICK_ZOOM:
 		{
 			_decorator->SetZoom(false);
-			_decorator->Draw();
+			_decorator->DrawZoom();
 			
 			// call zoom stuff here
 			
@@ -392,7 +398,7 @@ printf("WinBorder %s: MouseUp unimplmented\n",_title->String());
 		case CLICK_MINIMIZE:
 		{
 			_decorator->SetMinimize(false);
-			_decorator->Draw();
+			_decorator->DrawMinimize();
 			
 			// call minimize stuff here
 			
@@ -402,6 +408,16 @@ printf("WinBorder %s: MouseUp unimplmented\n",_title->String());
 			break;
 		}
 	}
+}
+
+/*!
+	\brief Function to pass focus value on to decorator
+	\param active Focus flag
+*/
+void WinBorder::SetFocus(const bool &active)
+{
+	if(_decorator)
+		_decorator->SetFocus(active);
 }
 
 void WinBorder::RequestDraw(const BRect &r)

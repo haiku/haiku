@@ -29,7 +29,10 @@
 #include "CursorManager.h"
 #include "ServerCursor.h"
 #include "CursorData.h"
+#include "ServerConfig.h"
 #include <Errors.h>
+#include <Directory.h>
+#include <String.h>
 #include <string.h>
 
 //! The global cursor manager object. Allocated and freed by AppServer class
@@ -39,7 +42,6 @@ CursorManager *cursormanager;
 CursorManager::CursorManager(void)
 {
 	_cursorlist=new BList(0);
-	_lock=create_sem(1,"cursor_manager_sem");
 
 	// Error code for AddCursor
 	_tokenizer.ExcludeValue(B_ERROR);
@@ -53,21 +55,21 @@ CursorManager::CursorManager(void)
 	AddCursor(ctext);
 	_textcsr=ctext;
 
-	ServerCursor *cdrag=new ServerCursor(default_drag_data);
-	AddCursor(cdrag);
-	_dragcsr=cdrag;
-
 	ServerCursor *cmove=new ServerCursor(default_move_data);
 	AddCursor(cmove);
 	_movecsr=cmove;
+
+	ServerCursor *cdrag=new ServerCursor(default_drag_data);
+	AddCursor(cdrag);
+	_dragcsr=cdrag;
 
 	ServerCursor *cresize=new ServerCursor(default_resize_data);
 	AddCursor(cresize);
 	_resizecsr=cresize;
 
-	ServerCursor *cresizeew=new ServerCursor(default_resize_ew_data);
-	AddCursor(cresizeew);
-	_resize_ew_csr=cresizeew;
+	ServerCursor *cresizenwse=new ServerCursor(default_resize_nwse_data);
+	AddCursor(cresizenwse);
+	_resize_nwse_csr=cresizenwse;
 
 	ServerCursor *cresizenesw=new ServerCursor(default_resize_nesw_data);
 	AddCursor(cresizenesw);
@@ -77,9 +79,10 @@ CursorManager::CursorManager(void)
 	AddCursor(cresizens);
 	_resize_ns_csr=cresizens;
 
-	ServerCursor *cresizenwse=new ServerCursor(default_resize_nwse_data);
-	AddCursor(cresizenwse);
-	_resize_nwse_csr=cresizenwse;
+	ServerCursor *cresizeew=new ServerCursor(default_resize_ew_data);
+	AddCursor(cresizeew);
+	_resize_ew_csr=cresizeew;
+
 }
 
 //! Does all the teardown
@@ -94,8 +97,6 @@ CursorManager::~CursorManager(void)
 	}
 	_cursorlist->MakeEmpty();
 	delete _cursorlist;
-	
-	delete_sem(_lock);
 	
 	// Note that it is not necessary to remove and delete the system
 	// cursors. These cursors are kept in the list with a NULL application
@@ -114,11 +115,11 @@ int32 CursorManager::AddCursor(ServerCursor *sc)
 	if(!sc)
 		return B_ERROR;
 	
-	acquire_sem(_lock);
+	Lock();
 	_cursorlist->AddItem(sc);
 	int32 value=_tokenizer.GetToken();
 	sc->_token=value;
-	release_sem(_lock);
+	Unlock();
 	
 	return value;
 }
@@ -131,7 +132,7 @@ int32 CursorManager::AddCursor(ServerCursor *sc)
 */
 void CursorManager::DeleteCursor(int32 token)
 {
-	acquire_sem(_lock);
+	Lock();
 
 	ServerCursor *temp;
 	for(int32 i=0; i<_cursorlist->CountItems();i++)
@@ -144,7 +145,7 @@ void CursorManager::DeleteCursor(int32 token)
 			break;
 		}
 	}
-	release_sem(_lock);
+	Unlock();
 }
 
 /*!
@@ -156,7 +157,7 @@ void CursorManager::RemoveAppCursors(const char *signature)
 	// OPTIMIZATION: For an optimization, it perhaps may be wise down 
 	// the road to replace the ServerCursor's app signature with a 
 	// pointer to its application and compare ServerApp pointers instead.
-	acquire_sem(_lock);
+	Lock();
 
 	ServerCursor *temp;
 	for(int32 i=0; i<_cursorlist->CountItems();i++)
@@ -170,37 +171,37 @@ void CursorManager::RemoveAppCursors(const char *signature)
 			break;
 		}
 	}
-	release_sem(_lock);
+	Unlock();
 }
 
 //! Wrapper around the DisplayDriver ShowCursor call
 void CursorManager::ShowCursor(void)
 {
-	acquire_sem(_lock);
+	Lock();
 
 	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
 	driver->ShowCursor();
-	release_sem(_lock);
+	Unlock();
 }
 
 //! Wrapper around the DisplayDriver HideCursor call
 void CursorManager::HideCursor(void)
 {
-	acquire_sem(_lock);
+	Lock();
 
 	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
 	driver->HideCursor();
-	release_sem(_lock);
+	Unlock();
 }
 
 //! Wrapper around the DisplayDriver ObscureCursor call
 void CursorManager::ObscureCursor(void)
 {
-	acquire_sem(_lock);
+	Lock();
 
 	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
 	driver->ObscureCursor();
-	release_sem(_lock);
+	Unlock();
 }
 
 /*!
@@ -209,7 +210,7 @@ void CursorManager::ObscureCursor(void)
 */
 void CursorManager::SetCursor(int32 token)
 {
-	acquire_sem(_lock);
+	Lock();
 	ServerCursor *c=_FindCursor(token);
 	if(c)
 	{
@@ -217,12 +218,12 @@ void CursorManager::SetCursor(int32 token)
 		driver->SetCursor(c);
 		_current_which=B_CURSOR_OTHER;
 	}
-	release_sem(_lock);
+	Unlock();
 }
 
 void CursorManager::SetCursor(cursor_which which)
 {
-	acquire_sem(_lock);
+	Lock();
 
 	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
 	switch(which)
@@ -285,7 +286,90 @@ void CursorManager::SetCursor(cursor_which which)
 			break;
 	}
 
-	release_sem(_lock);
+	Unlock();
+}
+
+/*!
+	\brief Sets all the cursors from a specified CursorSet
+	\param path Path to the cursor set
+	
+	All cursors in the set will be assigned. If the set does not specify a cursor for a
+	particular cursor specifier, it will remain unchanged. This function will fail if passed
+	a NULL path, an invalid path, or the path to a non-CursorSet file.
+*/
+void CursorManager::SetCursorSet(const char *path)
+{
+	Lock();
+	CursorSet cs(NULL);
+	
+	if(!path || cs.Load(path)!=B_OK)
+		return;
+	ServerCursor *csr;
+	
+	if(cs.FindCursor(B_CURSOR_DEFAULT,&csr)==B_OK)
+	{
+		if(_defaultcsr)
+			delete _defaultcsr;
+		_defaultcsr=csr;
+	}
+	
+	if(cs.FindCursor(B_CURSOR_TEXT,&csr)==B_OK)
+	{
+		if(_textcsr)
+			delete _textcsr;
+		_textcsr=csr;
+	}
+	
+	if(cs.FindCursor(B_CURSOR_MOVE,&csr)==B_OK)
+	{
+		if(_movecsr)
+			delete _movecsr;
+		_movecsr=csr;
+	}
+	
+	if(cs.FindCursor(B_CURSOR_DRAG,&csr)==B_OK)
+	{
+		if(_dragcsr)
+			delete _dragcsr;
+		_dragcsr=csr;
+	}
+	
+	if(cs.FindCursor(B_CURSOR_RESIZE,&csr)==B_OK)
+	{
+		if(_resizecsr)
+			delete _resizecsr;
+		_resizecsr=csr;
+	}
+	
+	if(cs.FindCursor(B_CURSOR_RESIZE_NWSE,&csr)==B_OK)
+	{
+		if(_resize_nwse_csr)
+			delete _resize_nwse_csr;
+		_resize_nwse_csr=csr;
+	}
+	
+	if(cs.FindCursor(B_CURSOR_RESIZE_NESW,&csr)==B_OK)
+	{
+		if(_resize_nesw_csr)
+			delete _resize_nesw_csr;
+		_resize_nesw_csr=csr;
+	}
+	
+	if(cs.FindCursor(B_CURSOR_RESIZE_NS,&csr)==B_OK)
+	{
+		if(_resize_ns_csr)
+			delete _resize_ns_csr;
+		_resize_ns_csr=csr;
+	}
+	
+	if(cs.FindCursor(B_CURSOR_RESIZE_EW,&csr)==B_OK)
+	{
+		if(_resize_ew_csr)
+			delete _resize_ew_csr;
+		_resize_ew_csr=csr;
+	}
+	Unlock();
+	
 }
 
 /*!
@@ -298,7 +382,7 @@ ServerCursor *CursorManager::GetCursor(cursor_which which)
 {
 	ServerCursor *temp=NULL;
 	
-	acquire_sem(_lock);
+	Lock();
 	
 	switch(which)
 	{
@@ -351,7 +435,7 @@ ServerCursor *CursorManager::GetCursor(cursor_which which)
 			break;
 	}
 	
-	release_sem(_lock);
+	Unlock();
 	return temp;
 }
 
@@ -363,9 +447,9 @@ cursor_which CursorManager::GetCursorWhich(void)
 {
 	cursor_which temp;
 	
-	acquire_sem(_lock);
+	Lock();
 	temp=_current_which;
-	release_sem(_lock);
+	Unlock();
 	return temp;
 }
 
@@ -380,7 +464,7 @@ cursor_which CursorManager::GetCursorWhich(void)
 */
 void CursorManager::ChangeCursor(cursor_which which, int32 token)
 {
-	acquire_sem(_lock);
+	Lock();
 
 	// Find the cursor, based on the token
 	ServerCursor *cursor=_FindCursor(token);
@@ -388,7 +472,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 	// Did we find a cursor with this token?
 	if(!cursor)
 	{
-		release_sem(_lock);
+		Unlock();
 		return;
 	}
 
@@ -407,6 +491,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 				delete cursor->_app_signature;
 				cursor->_app_signature=NULL;
 			}
+			_cursorlist->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_TEXT:
@@ -421,6 +506,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 				delete cursor->_app_signature;
 				cursor->_app_signature=NULL;
 			}
+			_cursorlist->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_MOVE:
@@ -435,6 +521,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 				delete cursor->_app_signature;
 				cursor->_app_signature=NULL;
 			}
+			_cursorlist->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_DRAG:
@@ -449,6 +536,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 				delete cursor->_app_signature;
 				cursor->_app_signature=NULL;
 			}
+			_cursorlist->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE:
@@ -463,6 +551,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 				delete cursor->_app_signature;
 				cursor->_app_signature=NULL;
 			}
+			_cursorlist->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_NWSE:
@@ -477,6 +566,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 				delete cursor->_app_signature;
 				cursor->_app_signature=NULL;
 			}
+			_cursorlist->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_NESW:
@@ -491,6 +581,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 				delete cursor->_app_signature;
 				cursor->_app_signature=NULL;
 			}
+			_cursorlist->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_NS:
@@ -505,6 +596,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 				delete cursor->_app_signature;
 				cursor->_app_signature=NULL;
 			}
+			_cursorlist->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_EW:
@@ -519,13 +611,14 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 				delete cursor->_app_signature;
 				cursor->_app_signature=NULL;
 			}
+			_cursorlist->RemoveItem(cursor);
 			break;
 		}
 		default:
 			break;
 	}
 	
-	release_sem(_lock);
+	Unlock();
 }
 
 /*!
@@ -544,3 +637,31 @@ ServerCursor *CursorManager::_FindCursor(int32 token)
 	}
 	return NULL;
 }
+
+//! Sets the cursors to the defaults and saves them to CURSOR_SETTINGS_DIR/"d
+void CursorManager::SetDefaults(void)
+{
+	Lock();
+	CursorSet cs("Default");
+	cs.AddCursor(B_CURSOR_DEFAULT,default_cursor_data);
+	cs.AddCursor(B_CURSOR_TEXT,default_text_data);
+	cs.AddCursor(B_CURSOR_MOVE,default_move_data);
+	cs.AddCursor(B_CURSOR_DRAG,default_drag_data);
+	cs.AddCursor(B_CURSOR_RESIZE,default_resize_data);
+	cs.AddCursor(B_CURSOR_RESIZE_NWSE,default_resize_nwse_data);
+	cs.AddCursor(B_CURSOR_RESIZE_NESW,default_resize_nesw_data);
+	cs.AddCursor(B_CURSOR_RESIZE_NS,default_resize_ns_data);
+	cs.AddCursor(B_CURSOR_RESIZE_EW,default_resize_ew_data);
+
+	BDirectory dir;
+	if(dir.SetTo(CURSOR_SET_DIR)==B_ENTRY_NOT_FOUND)
+		create_directory(CURSOR_SET_DIR,0777);
+	
+	BString string(CURSOR_SET_DIR);
+	string+="Default";
+	cs.Save(string.String(),B_CREATE_FILE | B_FAIL_IF_EXISTS);
+	
+	SetCursorSet(string.String());
+	Unlock();
+}
+

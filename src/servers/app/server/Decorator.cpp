@@ -160,6 +160,21 @@ void Decorator::SetFeel(int32 wfeel)
 	_feel=wfeel;
 }
 
+/*
+	\brief Sets the decorator's font
+	\param font The new font object to copy from
+*/
+void Decorator::SetFont(ServerFont *font)
+{
+	if(!font)
+		return;
+	
+	if(_layerdata.font)
+		delete _layerdata.font;
+	
+	_layerdata.font=new ServerFont(*font);
+}
+
 /*!
 	\brief Sets the decorator's window look
 	\param wflags New value for the look

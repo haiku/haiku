@@ -223,6 +223,7 @@ void ServerWindow::Show(void)
 	if(_winborder)
 	{
 		_winborder->Show();
+		_winborder->SetFocus(true);
 		_winborder->UpdateRegions(true);
 	}
 }
@@ -261,6 +262,7 @@ void ServerWindow::SetFocus(bool value)
 	if(_active!=value)
 	{
 		_active=value;
+		_winborder->SetFocus(value);
 		_winborder->RequestDraw();
 	}
 }
@@ -627,7 +629,7 @@ void ServerWindow::DispatchMessage(PortMessage *msg)
 		}
 		default:
 		{
-			printf("ServerWindow %s received unexpected code %s\n",_title->String(),MsgCodeToString(msg->Code()));
+			printf("ServerWindow %s received unexpected code - message offset %lx\n",_title->String(),msg->Code()-SERVER_TRUE);
 			break;
 		}
 	}

@@ -7,6 +7,9 @@ UsePrivateHeaders app interface [ FDirName servers app ] ;
 UseFreeTypeHeaders ;
 
 SharedLibrary appserver :
+	areafunc.c
+	bget.c
+	BitmapManager.cpp
 	ColorSet.cpp
 	Decorator.cpp
 	DisplayDriver.cpp
@@ -17,7 +20,9 @@ SharedLibrary appserver :
 	ServerBitmap.cpp
 	ServerCursor.cpp
 	ServerFont.cpp
+	SysCursor.cpp
 	SystemPalette.cpp
+	TokenHandler.cpp
 ;
 
 LinkSharedOSLibs libappserver.so : root be 							  
@@ -26,11 +31,8 @@ LinkSharedOSLibs libappserver.so : root be
 
 Server app_server :
 	# Misc. Sources
-	areafunc.c
 	Angle.cpp
-	bget.c
 	CursorData.cpp
-	TokenHandler.cpp
 	PicturePlayer.cpp
 
 	PNGDump.cpp
@@ -39,7 +41,6 @@ Server app_server :
 	# Manager Classes
 	AppServer.cpp
 	BitmapDriver.cpp
-	BitmapManager.cpp
 	CursorManager.cpp
 	Desktop.cpp
 	ServerApp.cpp

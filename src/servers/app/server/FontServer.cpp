@@ -37,6 +37,8 @@
 #include "ServerFont.h"
 #include "ServerConfig.h"
 
+extern FTC_Manager ftmanager; 
+FT_Library ftlib;
 FontServer *fontserver;
 
 /*!

@@ -36,7 +36,7 @@
 #include "RectUtils.h"
 
 //#define DEBUG_LAYER
-#define DEBUG_REGIONS
+//#define DEBUG_REGIONS
 
 #ifdef DEBUG_REGIONS
 #include "Desktop.h"
@@ -71,9 +71,9 @@ Layer::Layer(BRect frame, const char *name, int32 resize, int32 flags,ServerWind
 	_topchild=NULL;
 	_bottomchild=NULL;
 
-	_visible=new BRegion(Bounds());
-	_full=new BRegion(Bounds());
-	_invalid=new BRegion(Bounds());
+	_visible=new BRegion(Frame());
+	_full=new BRegion(Frame());
+	_invalid=new BRegion(Frame());
 
 	_serverwin=win;
 	

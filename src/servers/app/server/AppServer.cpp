@@ -618,6 +618,11 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			_exit_poller=true;
 			break;
 		}
+		case AS_SET_SYSCURSOR_DEFAULTS:
+		{
+			cursormanager->SetDefaults();
+			break;
+		}
 		default:
 			// we should never get here.
 			break;
@@ -980,7 +985,10 @@ Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel
 		dec=app_server->make_decorator(rect,wlook,wfeel,wflags);
 
 	gui_colorset.Lock();
+	dec->SetDriver(ddriver);
 	dec->SetColors(gui_colorset);
+	dec->SetFont(fontserver->GetSystemPlain());
+	dec->SetTitle(title);
 	gui_colorset.Unlock();
 	
 	return dec;

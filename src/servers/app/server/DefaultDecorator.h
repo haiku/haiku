@@ -59,7 +59,14 @@ protected:
 	RGBColor frame_highcol, frame_midcol, frame_lowcol, frame_highercol,
 		frame_lowercol;
 	RGBColor textcol;
+
+	RGBColor *framecolors;
+	
+	// Individual rects for handling window frame rendering the proper way
+	BRect rightborder,leftborder,topborder,bottomborder;
 	uint64 solidhigh, solidlow;
+	
+	int32 borderwidth;
 
 	bool slidetab;
 	int textoffset;

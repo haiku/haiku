@@ -38,7 +38,8 @@ class DisplayDriver;
 class WinBorder : public Layer
 {
 public:
-	WinBorder(BRect r, const char *name, int32 look, int32 feel, int32 flags, ServerWindow *win);
+	WinBorder(const BRect &r, const char *name, const int32 look, const int32 feel, 
+		const int32 flags, ServerWindow *win);
 	~WinBorder(void);
 	void RequestDraw(void);
 	void RequestDraw(const BRect &r);
@@ -53,8 +54,8 @@ public:
 	void UpdateDecorator(void);
 	void UpdateFont(void);
 	void UpdateScreen(void);
-	void RebuildRegions(bool recursive=true);
-	void Activate(bool active=false);
+	void RebuildRegions(const bool &recursive=true);
+	void SetFocus(const bool &active=false);
 	ServerWindow *Window(void) { return _win; }
 	Decorator *GetDecorator(void) { return _decorator; }
 protected:

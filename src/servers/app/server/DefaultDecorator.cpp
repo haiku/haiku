@@ -31,9 +31,8 @@
 #include "ColorUtils.h"
 #include "DefaultDecorator.h"
 #include "RGBColor.h"
-
-//#define DEBUG_DECORATOR
-
+#include "RectUtils.h"
+#include <stdio.h>
 
 #define USE_VIEW_FILL_HACK
 
@@ -44,21 +43,18 @@
 DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
  : Decorator(rect,wlook,wfeel,wflags)
 {
+
 	taboffset=0;
 	titlepixelwidth=0;
 
+	framecolors=new RGBColor[5];
+	framecolors[0].SetColor(255,255,255);
+	framecolors[1].SetColor(216,216,216);
+	framecolors[2].SetColor(152,152,152);
+	framecolors[3].SetColor(136,136,136);
+	framecolors[4].SetColor(96,96,96);
+
 	_SetFocus();
-
-	// These hard-coded assignments will go bye-bye when the system _colors 
-	// API is implemented
-	frame_highercol.SetColor(216,216,216);
-	frame_lowercol.SetColor(110,110,110);
-
-	textcol.SetColor(0,0,0);
-	
-	frame_highcol=frame_lowercol.MakeBlendColor(frame_highercol,0.75);
-	frame_midcol=frame_lowercol.MakeBlendColor(frame_highercol,0.5);
-	frame_lowcol=frame_lowercol.MakeBlendColor(frame_highercol,0.25);
 
 	_DoLayout();
 	
@@ -81,6 +77,7 @@ DefaultDecorator::~DefaultDecorator(void)
 #ifdef DEBUG_DECORATOR
 printf("DefaultDecorator: ~DefaultDecorator()\n");
 #endif
+	delete [] framecolors;
 }
 
 click_type DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
@@ -183,6 +180,21 @@ printf("DefaultDecorator: Do Layout\n");
 	_resizerect=_frame;
 	_borderrect=_frame;
 	_closerect=_frame;
+	
+	switch(GetLook())
+	{
+		case B_BORDERED_WINDOW_LOOK:
+		case B_TITLED_WINDOW_LOOK:
+		case B_DOCUMENT_WINDOW_LOOK:
+			borderwidth=5;
+			break;
+		case B_FLOATING_WINDOW_LOOK:
+		case B_MODAL_WINDOW_LOOK:
+			borderwidth=3;
+			break;
+		default:
+			borderwidth=0;
+	}
 
 	textoffset=(_look==B_FLOATING_WINDOW_LOOK)?5:7;
 
@@ -190,8 +202,22 @@ printf("DefaultDecorator: Do Layout\n");
 	_closerect.top+=(_look==B_FLOATING_WINDOW_LOOK)?6:4;
 	_closerect.right=_closerect.left+10;
 	_closerect.bottom=_closerect.top+10;
-
+	
+	
 	_borderrect.top+=19;
+
+	if(borderwidth)
+	{
+		// Set up the border rectangles to handle the window's frame
+		rightborder=leftborder=topborder=bottomborder=_borderrect;
+		
+		// We want the rectangles to intersect because of the beveled intersections, so all
+		// that is necessary is to set the short dimension of each side
+		leftborder.right=leftborder.left+borderwidth;
+		rightborder.left=rightborder.right-borderwidth;
+		topborder.bottom=topborder.top+borderwidth;
+		bottomborder.top=bottomborder.bottom-borderwidth;
+	}
 	
 	_resizerect.top=_resizerect.bottom-18;
 	_resizerect.left=_resizerect.right-18;
@@ -307,7 +333,7 @@ printf("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,up
 	_layerdata.highcolor=_colors->document_background;
 
 	if(_borderrect.Intersects(update))
-		_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+		_driver->FillRect(_borderrect & update,&_layerdata,(int8*)&solidhigh);
 	
 	_DrawFrame(update);
 }
@@ -318,9 +344,9 @@ void DefaultDecorator::Draw(void)
 	// things
 
 	// Draw the top view's client area - just a hack :)
-	_layerdata.highcolor=_colors->document_background;
+//	_layerdata.highcolor=_colors->document_background;
 
-	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+//	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 	DrawFrame();
 
 	DrawTab();
@@ -354,7 +380,7 @@ void DefaultDecorator::_DrawTab(BRect r)
 	
 	_layerdata.highcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
 	_driver->FillRect(_tabrect,&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowcol;
+	_layerdata.highcolor=framecolors[3];
 	_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(),&_layerdata,(int8*)&solidhigh);
 
 	_DrawTitle(_tabrect);
@@ -423,69 +449,154 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 
 //	_layerdata.highcolor=startcol;
 //	_driver->FillRect(r,&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowcol;
+	_layerdata.highcolor=framecolors[3];
 	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
 }
 
-void DefaultDecorator::_DrawFrame(BRect rect)
+void DefaultDecorator::_DrawFrame(BRect invalid)
 {
-	// Duh, draws the window frame, I think. ;)
+	// We need to test each side to determine whether or not it needs drawn. Additionally,
+	// we must clip the lines drawn by this function to the invalid rectangle we are given
+	
+	#ifdef USE_VIEW_FILL_HACK
+	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+	#endif
 
-#ifdef USE_VIEW_FILL_HACK
-_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
-#endif
-
-	if(_look==B_NO_BORDER_WINDOW_LOOK)
+	if(!borderwidth)
 		return;
 	
-	BRect r=_borderrect;
+	// Data specifically for the StrokeLineArray call.
+	int32 numlines=0, maxlines=20;
 
-	_layerdata.highcolor=frame_midcol;
+	BPoint points[maxlines*2];
+	RGBColor colors[maxlines];
+	
+	// For quick calculation of gradients for each side. Top is same as left, right is same as
+	// bottom
+	int8 rightindices[borderwidth],leftindices[borderwidth];
+
+	if(borderwidth==5)
+	{
+		leftindices[0]=2;
+		leftindices[1]=0;
+		leftindices[2]=1;
+		leftindices[3]=3;
+		leftindices[4]=2;
+
+		rightindices[0]=2;
+		rightindices[1]=0;
+		rightindices[2]=1;
+		rightindices[3]=3;
+		rightindices[4]=4;
+	}
+	else
+	{
+		// TODO: figure out border colors for floating window look
+	}
+	
+	// Right side
+	if(TestRectIntersection(rightborder,invalid))
+	{
+		
+		// We may not have to redraw the entire width of the frame itself. Rare case, but
+		// it must be accounted for.
+		int32 startx=(int32) MAX(invalid.left,rightborder.left);
+		int32 endx=(int32) MIN(invalid.right,rightborder.right);
+		
+
+		// We'll need these flags to see if we must include the corners in final line
+		// calculations
+		BRect r(rightborder);
+		r.bottom=r.top+borderwidth;
+		bool topcorner=TestRectIntersection(invalid,r);
+
+		r=rightborder;
+		r.top=r.bottom-borderwidth;
+		bool bottomcorner=TestRectIntersection(invalid,r);
+		
+		// Generate the lines for this side
+		for(int32 i=startx; i<endx; i++)
+		{
+			BPoint start, end;
+			
+			start.x=end.x=i;
+			
+			if(topcorner)
+			{
+				start.y=rightborder.top+(borderwidth-(i-rightborder.left));
+				start.y=MAX(start.y,invalid.top);
+			}
+			else
+				start.y=MAX(start.y+borderwidth,invalid.top);
+
+			if(bottomcorner)
+			{
+				end.y=rightborder.bottom-(borderwidth-(i-rightborder.left));
+				end.y=MAX(end.y,invalid.top);
+			}
+			else
+				end.y=MAX(end.y-borderwidth,invalid.top);
+			
+			// Make the appropriate 
+			points[numlines*2]=start;
+			points[(numlines*2)+1]=end;
+			colors[numlines]=framecolors[rightindices[endx-i]];
+			
+			numlines++;
+		}
+	}
+debugger("");
+	_driver->StrokeLineArray(points,numlines,colors,&_layerdata);
+	
+/*	BRect r=_borderrect;
+
+	_layerdata.highcolor=framecolors[2];
 	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
 		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowcol;
+	_layerdata.highcolor=framecolors[3];
 	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
 		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowercol;
+	_layerdata.highcolor=framecolors[4];
 	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
 		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowercol;
+	_layerdata.highcolor=framecolors[4];
 	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
 		&_layerdata,(int8*)&solidhigh);
 
 	r.InsetBy(1,1);
-	_layerdata.highcolor=frame_highercol;
+	_layerdata.highcolor=framecolors[0];
 	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
 		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_highercol;
+	_layerdata.highcolor=framecolors[0];
 	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
 		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_midcol;
+	_layerdata.highcolor=framecolors[2];
 	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
 		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_midcol;
+	_layerdata.highcolor=framecolors[2];
 	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
 		&_layerdata,(int8*)&solidhigh);
 	
 	r.InsetBy(1,1);
-	_layerdata.highcolor=frame_highcol;
+	_layerdata.highcolor=framecolors[1];
 	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
 
 	r.InsetBy(1,1);
-	_layerdata.highcolor=frame_lowercol;
+	_layerdata.highcolor=framecolors[4];
 	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
 		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowercol;
+	_layerdata.highcolor=framecolors[4];
 	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
 		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_highercol;
+	_layerdata.highcolor=framecolors[0];
 	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
 		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_highercol;
+	_layerdata.highcolor=framecolors[0];
 	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
 		&_layerdata,(int8*)&solidhigh);
 	_driver->StrokeRect(_borderrect,&_layerdata,(int8*)&solidhigh);
-
+	
+	
 	// Draw the resize thumb if we're supposed to
 	if(!(_flags & B_NOT_RESIZABLE))
 	{
@@ -501,10 +612,10 @@ _driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 			
 			int steps=(w<h)?w:h;
 		
-			startcol=frame_highercol.GetColor32();
-			endcol=frame_lowercol.GetColor32();
+			startcol=framecolors[0].GetColor32();
+			endcol=framecolors[4].GetColor32();
 		
-			halfcol=frame_highercol.MakeBlendColor(frame_lowercol,0.5).GetColor32();
+			halfcol=framecolors[0].MakeBlendColor(framecolors[4],0.5).GetColor32();
 		
 			rstep=(startcol.red-halfcol.red)/steps;
 			gstep=(startcol.green-halfcol.green)/steps;
@@ -525,16 +636,18 @@ _driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 				_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
 					BPoint(r.left+i,r.top+steps),&_layerdata,(int8*)&solidhigh);			
 			}
-			_layerdata.highcolor=frame_lowercol;
+			_layerdata.highcolor=framecolors[4];
 			_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
 		}
 		else
 		{
-			_layerdata.highcolor=frame_lowercol;
+			_layerdata.highcolor=framecolors[4];
 			_driver->StrokeLine(BPoint(r.right,r.top),BPoint(r.right-3,r.top),
 				&_layerdata,(int8*)&solidhigh);
 			_driver->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.left,r.bottom-3),
 				&_layerdata,(int8*)&solidhigh);
 		}
 	}
+*/
+	
 }

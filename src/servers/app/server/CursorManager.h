@@ -30,6 +30,7 @@
 #include <List.h>
 #include <OS.h>
 #include <SysCursor.h>
+#include <Locker.h>
 #include "TokenHandler.h"
 
 class ServerCursor;
@@ -42,7 +43,7 @@ class ServerCursor;
 	any BeOS platform. It also provides tokens for BCursors and frees all
 	of an application's cursors whenever an application closes.
 */
-class CursorManager
+class CursorManager : public BLocker
 {
 public:
 	CursorManager(void);
@@ -55,16 +56,16 @@ public:
 	void ObscureCursor(void);
 	void SetCursor(int32 token);
 	void SetCursor(cursor_which which);
+	void SetCursorSet(const char *path);
 	ServerCursor *GetCursor(cursor_which which);
 	cursor_which GetCursorWhich(void);
 	void ChangeCursor(cursor_which which, int32 token);
-
+	void SetDefaults(void);
 private:
 	ServerCursor *_FindCursor(int32 token);
 
 	BList *_cursorlist;
 	TokenHandler _tokenizer;
-	sem_id _lock;
 
 	// System cursor members
 	ServerCursor 	*_defaultcsr,

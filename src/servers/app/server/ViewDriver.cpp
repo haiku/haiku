@@ -1040,9 +1040,43 @@ void ViewDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 
 void ViewDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
 {
-#ifdef DEBUG_DRIVER_MODULE
-printf("ViewDriver:: StrokeLineArray unimplemented\n");
-#endif
+	if(!d || numlines==0 || !pts || !colors)
+		return;
+	
+	screenwin->Lock();
+	framebuffer->Lock();
+	SetLayerData(d);
+	
+	// Do LineArray stuff here.
+	
+//	drawview->Sync();
+//	screenwin->view->Invalidate();
+
+	// for now, just print the data and hope we don't crash
+	printf("ViewDriver::StrokeLineArray(): \n");
+	BPoint *ptindex=pts;
+	
+	for(int32 i=0; i<numlines; i++)
+	{
+		BPoint pt1=*ptindex;
+		ptindex+=sizeof(BPoint);
+		BPoint pt2=*ptindex;
+		ptindex+=sizeof(BPoint);
+		rgb_color col=colors[i].GetColor32();
+		
+		drawview->SetHighColor(col);
+		drawview->StrokeLine(pt1,pt2,B_SOLID_HIGH);
+		
+		
+		printf("\tLine (%.1f,%.1f)-(%.1f,%.1f) in color (%d,%d,%d)\n",pt1.x,pt1.y,pt2.x,pt2.y,
+			col.red,col.green,col.blue);
+	}
+	drawview->Sync();
+	screenwin->view->Invalidate();
+
+	framebuffer->Unlock();
+	screenwin->Unlock();
+
 }
 
 void ViewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)

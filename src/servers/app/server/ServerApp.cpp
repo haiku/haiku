@@ -337,11 +337,13 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			// Attached data:
 			// 1) port_id reply port
 			// 2) BRect window frame
-			// 3) uint32 window flags
-			// 4) port_id window's message port
-			// 5) uint32 workspace index
-			// 6) int32 BHandler token of the window
-			// 7) const char * title
+			// 3) uint32 window look
+			// 4) uint32 window feel
+			// 5) uint32 window flags
+			// 6) port_id window's message port
+			// 7) uint32 workspace index
+			// 8) int32 BHandler token of the window
+			// 9) const char * title
 
 			// Find the necessary data
 			port_id reply_port=*((port_id*)index); index+=sizeof(port_id);
@@ -483,33 +485,33 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		case AS_CREATE_PICTURE:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Create Picture unimplemented\n",_signature.String());
-#endif
+			#ifdef DEBUG_SERVERAPP
+			printf("ServerApp %s: Create Picture unimplemented\n",_signature.String());
+			#endif
 			break;
 		}
 		case AS_DELETE_PICTURE:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Delete Picture unimplemented\n",_signature.String());
-#endif
+			#ifdef DEBUG_SERVERAPP
+			printf("ServerApp %s: Delete Picture unimplemented\n",_signature.String());
+			#endif
 			break;
 		}
 		case AS_CLONE_PICTURE:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Clone Picture unimplemented\n",_signature.String());
-#endif
+			#ifdef DEBUG_SERVERAPP
+			printf("ServerApp %s: Clone Picture unimplemented\n",_signature.String());
+			#endif
 			break;
 		}
 		case AS_DOWNLOAD_PICTURE:
 		{
 			// TODO; Implement
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Download Picture unimplemented\n",_signature.String());
-#endif
+			#ifdef DEBUG_SERVERAPP
+			printf("ServerApp %s: Download Picture unimplemented\n",_signature.String());
+			#endif
 			break;
 		}
 		case AS_SET_SCREEN_MODE:
@@ -669,7 +671,7 @@ printf("ServerApp %s: Download Picture unimplemented\n",_signature.String());
 		default:
 		{
 			#ifdef DEBUG_SERVERAPP
-				printf("ServerApp %s received unhandled message code %lx\n",_signature.String(),code);
+				printf("ServerApp %s received unhandled message code offset %lx\n",_signature.String(),MsgCodeToString(code));
 			#endif
 			break;
 		}
