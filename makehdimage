@@ -35,7 +35,12 @@ elif [ "$1" == "" ]; then
 else
 	imagePath=$1
 fi
-imageSize=40
+
+imageSize=60
+	# Bochs parameters:
+	# 40 MB: cylinders=82, heads=16, spt=63
+	# 60 MB: cylinders=122, heads=16, spt=63
+	# 100 MB: cylinders=204, heads=16, spt=63
 
 # ufs_mount path
 ufsMount=ufs_mount
@@ -139,7 +144,7 @@ cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel
 for f in bus_managers/isa bus_managers/ide bus_managers/scsi busses/ide/ide_isa \
 		file_systems/bfs generic/blkman generic/fast_log generic/ide_adapter \
 		generic/locked_pool generic/scsi_periph partitioning_systems/intel \
-		console/vga_text; do
+		console/vga_text bus_managers/pci; do
 	cp $f $targetDir/beos/system/add-ons/kernel/$f
 done
 
@@ -150,7 +155,7 @@ done
 
 cd $sourceDir/objects/x86.R1/add-ons/kernel
 
-for f in bus_managers/config_manager bus_managers/pci; do
+for f in bus_managers/config_manager; do
 	name=$(basename $f)
 	cp $f/$name $targetDir/beos/system/add-ons/kernel/$f
 done
