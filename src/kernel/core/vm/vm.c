@@ -323,7 +323,7 @@ static int map_backing_store(vm_address_space *aspace, vm_store *store,
 //		aspace, store, *vaddr, offset, size, addr_type, wiring, lock, _region, region_name);
 
 	region = _vm_create_region_struct(aspace, region_name, wiring, lock);
-	if(!region)
+	if (!region)
 		return ENOMEM;
 
 	cache = store->cache;
@@ -331,7 +331,7 @@ static int map_backing_store(vm_address_space *aspace, vm_store *store,
 
 	// if this is a private map, we need to create a new cache & store object
 	// pair to handle the private copies of pages as they are written to
-	if(mapping == REGION_PRIVATE_MAP) {
+	if (mapping == REGION_PRIVATE_MAP) {
 		// create an anonymous store object
 		nu_store = vm_store_create_anonymous_noswap();
 		if(nu_store == NULL)
@@ -343,7 +343,7 @@ static int map_backing_store(vm_address_space *aspace, vm_store *store,
 		if(nu_cache_ref == NULL)
 			panic("map_backing_store: vm_cache_ref_create returned NULL");
 		nu_cache->temporary = 1;
-		nu_cache->scan_skip = 0;
+		nu_cache->scan_skip = cache->scan_skip;
 
 		nu_cache->source = cache;
 
@@ -503,6 +503,23 @@ region_id vm_create_anonymous_region(aspace_id aid, char *name, void **address,
 
 	dprintf("create_anonymous_region: %s: size 0x%lx\n", name, size);
 
+	/* check parameters */
+	if (addr_type != REGION_ADDR_ANY_ADDRESS && addr_type != REGION_ADDR_EXACT_ADDRESS)
+		return B_BAD_VALUE;
+	switch (wiring) {
+		case REGION_WIRING_WIRED:
+		case REGION_WIRING_WIRED_ALREADY:
+		case REGION_WIRING_WIRED_CONTIG:
+		case REGION_WIRING_LAZY:
+			break;
+		default:
+			return B_BAD_VALUE;
+	}
+
+	aspace = vm_get_aspace_by_id(aid);
+	if(aspace == NULL)
+		return ERR_VM_INVALID_ASPACE;
+
 	aspace = vm_get_aspace_by_id(aid);
 	if(aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
@@ -520,7 +537,17 @@ region_id vm_create_anonymous_region(aspace_id aid, char *name, void **address,
 	if(cache_ref == NULL)
 		panic("vm_create_anonymous_region: vm_cache_ref_create returned NULL");
 	cache->temporary = 1;
-	cache->scan_skip = 0;
+
+	switch (wiring) {
+		case REGION_WIRING_WIRED:
+		case REGION_WIRING_WIRED_ALREADY:
+		case REGION_WIRING_WIRED_CONTIG:
+			cache->scan_skip = 1;
+			break;
+		case REGION_WIRING_LAZY:
+			cache->scan_skip = 0;
+			break;
+	}
 
 //	dprintf("create_anonymous_region: calling map_backing store\n");
 
@@ -654,13 +681,13 @@ region_id vm_map_physical_memory(aspace_id aid, char *name, void **address, int 
 	// create an device store object
 	store = vm_store_create_device(phys_addr);
 	if(store == NULL)
-		panic("vm_map_physical_memory: vm_store_create_device returned NULL");
+		panic("vm_create_null_region: vm_store_create_device returned NULL");
 	cache = vm_cache_create(store);
 	if(cache == NULL)
-		panic("vm_map_physical_memory: vm_cache_create returned NULL");
+		panic("vm_create_null_region: vm_cache_create returned NULL");
 	cache_ref = vm_cache_ref_create(cache);
 	if(cache_ref == NULL)
-		panic("vm_map_physical_memory: vm_cache_ref_create returned NULL");
+		panic("vm_create_null_region: vm_cache_ref_create returned NULL");
 	// tell the page scanner to skip over this region, it's pages are special
 	cache->scan_skip = 1;
 
