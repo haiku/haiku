@@ -42,6 +42,9 @@
 #include <resource.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <limits.h>
+#include <StorageDefs.h>
+#include <fs_info.h>
 
 #ifndef TRACE_VFS
 #	define TRACE_VFS 0
@@ -54,13 +57,7 @@
 #	define FUNCTION(x) ;
 #endif
 
-// ToDo: remove this and include StorageDefs.h once it's there...
-#ifndef B_FILE_NAME_LENGTH
-#	define B_FILE_NAME_LENGTH 256
-#endif
-#include <fs_info.h>
-
-#define MAX_SYM_LINKS 16
+#define MAX_SYM_LINKS SYMLINKS_MAX
 
 // Passed in buffers from user-space shouldn't be in the kernel
 #define CHECK_USER_ADDRESS(x) \

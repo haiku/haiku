@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src kernel core fs ;
 
+UsePublicHeaders storage ;
+
 KernelStaticLibrary libfs : 
 	<$(SOURCE_GRIST)>bootfs.c 
 	<$(SOURCE_GRIST)>devfs.c 
