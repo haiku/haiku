@@ -107,6 +107,18 @@ GetAudioFormat(media_format *format, const char *codec, void *private_data, int 
 		return B_OK;
 	}
 	
+
+	if (IS_CODEC(codec, "A_MPEG/L3")) {
+		media_format_description description;
+		description.family = B_MPEG_FORMAT_FAMILY;
+		description.u.mpeg.id = B_MPEG_1_AUDIO_LAYER_3;
+		if (B_OK != formats.GetFormatFor(description, format)) 
+			format->type = B_MEDIA_ENCODED_AUDIO;
+
+		return B_OK;
+	}
+	
+	
 	if (IS_CODEC(codec, "A_AAC/MPEG4/LC/SBR")) {
 	}
 	
