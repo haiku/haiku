@@ -323,46 +323,51 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 		// how to handle this?
 	}
 	
-	// binary search to find our place
 	int64 left_granulepos = 0;
-	off_t right = GetLastPagePosition();
 	int64 right_granulepos = 0;
-	while (true) {
-		TRACE("  Seek: [%llu,%llu]: ", left, right);
-		ogg_sync_reset(&fSync);
-		ogg_stream_reset(&fStreamState);
-		if (right - left > B_PAGE_SIZE) {
-			fPosition = (right + left) / 2;
-		} else {
-			fPosition = left;
-			break;
-		}
-		do {
-			status = ReadPage(&page, B_PAGE_SIZE);
-			if (status != B_OK) {
-				TRACE("OggSeekable::Seek: ReadPage = %s\n", strerror(status));
-				return status;
+	// if not the first, perform a binary search
+	if (granulepos != fFirstGranulepos) {
+		// binary search to find our place
+		off_t right = GetLastPagePosition();
+		uint width = (uint)log10(max_c(1, fFirstGranulepos + right)) + 2;
+		while (true) {
+			ogg_sync_reset(&fSync);
+			ogg_stream_reset(&fStreamState);
+			if (right - left > B_PAGE_SIZE) {
+				TRACE("  Seek: [%*lld,%*lld]: ", width, left, width, right);
+				fPosition = (right + left) / 2;
+			} else {
+				TRACE("  Seek: [%*lld,...]\n", width, left);
+				fPosition = left;
+				break;
 			}
-			if (ogg_stream_pagein(&fStreamState, &page) != 0) {
-				TRACE("OggSeekable::Seek: ogg_stream_pagein: failed??\n");
-				return B_ERROR;
+			do {
+				status = ReadPage(&page, B_PAGE_SIZE);
+				if (status != B_OK) {
+					TRACE("OggSeekable::Seek: ReadPage = %s\n", strerror(status));
+					return status;
+				}
+				if (ogg_stream_pagein(&fStreamState, &page) != 0) {
+					TRACE("OggSeekable::Seek: ogg_stream_pagein: failed??\n");
+					return B_ERROR;
+				}
+			} while (ogg_page_granulepos(&page) == -1);
+			TRACE("granulepos = %*lld, ", width, ogg_page_granulepos(&page));
+			TRACE("fPosition = %*llu\n", width, fPosition);
+			// check the granulepos of the page against the requested frame
+			if (ogg_page_granulepos(&page) < granulepos) {
+				// The packet that the frame is in is someplace after
+				// the last complete packet in this page.  (It may yet
+				// be in this page, but in a packet completed on the
+				// next page.)
+				left = (right + left) / 2;
+				left_granulepos = ogg_page_granulepos(&page);
+				continue;
+			} else {
+				right = (right + left) / 2;
+				right_granulepos = ogg_page_granulepos(&page);
+				continue;
 			}
-		} while (ogg_page_granulepos(&page) == -1);
-		TRACE("granulepos = %lld, ", ogg_page_granulepos(&page));
-		TRACE("fPosition = %llu\n", fPosition);
-		// check the granulepos of the page against the requested frame
-		if (ogg_page_granulepos(&page) < granulepos) {
-			// The packet that the frame is in is someplace after
-			// the last complete packet in this page.  (It may yet
-			// be in this page, but in a packet completed on the
-			// next page.)
-			left = (right + left) / 2;
-			left_granulepos = ogg_page_granulepos(&page);
-			continue;
-		} else {
-			right = (right + left) / 2;
-			right_granulepos = ogg_page_granulepos(&page);
-			continue;
 		}
 	}
 
