@@ -521,7 +521,8 @@ InputServer::MessageReceived(BMessage *message)
 {
 	CALLED();
 	
-	BMessage *reply = NULL;
+	BMessage reply;
+	status_t status;
 	
 	switch(message->what)
 	{
@@ -529,102 +530,102 @@ InputServer::MessageReceived(BMessage *message)
 			HandleSetMethod(message);
 			break;
 		case IS_GET_MOUSE_TYPE: 
-			HandleGetSetMouseType(message, reply);
+			status = HandleGetSetMouseType(message, &reply);
 			break;	
 		case IS_SET_MOUSE_TYPE:
-			HandleGetSetMouseType(message, reply);
+			status = HandleGetSetMouseType(message, &reply);
 			break;
 		case IS_GET_MOUSE_ACCELERATION:
-			HandleGetSetMouseAcceleration(message, reply);
+			status = HandleGetSetMouseAcceleration(message, &reply);
 			break;
 		case IS_SET_MOUSE_ACCELERATION:
-			HandleGetSetMouseAcceleration(message, reply);
+			status = HandleGetSetMouseAcceleration(message, &reply);
 			break;
 		case IS_GET_KEY_REPEAT_DELAY:
-			HandleGetSetKeyRepeatDelay(message, reply);
+			status = HandleGetSetKeyRepeatDelay(message, &reply);
 			break;
 		case IS_SET_KEY_REPEAT_DELAY:
-			HandleGetSetKeyRepeatDelay(message, reply);
+			status = HandleGetSetKeyRepeatDelay(message, &reply);
 			break;
 		case IS_GET_KEY_INFO:
-			HandleGetKeyInfo(message, reply);
+			status = HandleGetKeyInfo(message, &reply);
 			break;
 		case IS_GET_MODIFIERS:
-			HandleGetModifiers(message, reply);
+			status = HandleGetModifiers(message, &reply);
 			break;
 		case IS_SET_MODIFIER_KEY:
-			HandleSetModifierKey(message, reply);
+			status = HandleSetModifierKey(message, &reply);
 			break;
 		case IS_SET_KEYBOARD_LOCKS:
-			HandleSetKeyboardLocks(message, reply);
+			status = HandleSetKeyboardLocks(message, &reply);
 			break;
 		case IS_GET_MOUSE_SPEED:
-			HandleGetSetMouseSpeed(message, reply);
+			status = HandleGetSetMouseSpeed(message, &reply);
 			break;
 		case IS_SET_MOUSE_SPEED:
-			HandleGetSetMouseSpeed(message, reply);
+			status = HandleGetSetMouseSpeed(message, &reply);
 			break;
 		case IS_SET_MOUSE_POSITION:
-			HandleSetMousePosition(message, reply);
+			status = HandleSetMousePosition(message, &reply);
 			break;
 		case IS_GET_MOUSE_MAP:
-			HandleGetSetMouseMap(message, reply);
+			status = HandleGetSetMouseMap(message, &reply);
 			break;
 		case IS_SET_MOUSE_MAP:
-			HandleGetSetMouseMap(message, reply);
+			status = HandleGetSetMouseMap(message, &reply);
 			break;
 		case IS_GET_KEYBOARD_ID:
-			HandleGetKeyboardID(message, reply);
+			status = HandleGetKeyboardID(message, &reply);
 			break;
 		case IS_GET_CLICK_SPEED:
-			HandleGetSetClickSpeed(message, reply);
+			status = HandleGetSetClickSpeed(message, &reply);
 			break;
 		case IS_SET_CLICK_SPEED:
-			HandleGetSetClickSpeed(message, reply);
+			status = HandleGetSetClickSpeed(message, &reply);
 			break;
 		case IS_GET_KEY_REPEAT_RATE:
-			HandleGetSetKeyRepeatRate(message, reply);
+			status = HandleGetSetKeyRepeatRate(message, &reply);
 			break;
 		case IS_SET_KEY_REPEAT_RATE:
-			HandleGetSetKeyRepeatRate(message, reply);
+			status = HandleGetSetKeyRepeatRate(message, &reply);
 			break;
 		case IS_GET_KEY_MAP:
-			HandleGetSetKeyMap(message, reply);
+			status = HandleGetSetKeyMap(message, &reply);
 			break;
 		case IS_RESTORE_KEY_MAP:
-			HandleGetSetKeyMap(message, reply);
+			status = HandleGetSetKeyMap(message, &reply);
 			break;
 		case IS_FOCUS_IM_AWARE_VIEW:
-			HandleFocusUnfocusIMAwareView(message, reply);
+			status = HandleFocusUnfocusIMAwareView(message, &reply);
 			break;
 		case IS_UNFOCUS_IM_AWARE_VIEW:
-			HandleFocusUnfocusIMAwareView(message, reply);
+			status = HandleFocusUnfocusIMAwareView(message, &reply);
 			break;
 
 		// device looper related
 		case IS_FIND_DEVICES:
-			HandleFindDevices(message, reply);
+			status = HandleFindDevices(message, &reply);
 			break;
 		case IS_WATCH_DEVICES:
-			HandleWatchDevices(message, reply);
+			status = HandleWatchDevices(message, &reply);
 			break;
 		case IS_IS_DEVICE_RUNNING:
-			HandleIsDeviceRunning(message, reply);
+			status = HandleIsDeviceRunning(message, &reply);
 			break;
 		case IS_START_DEVICE:
-			HandleStartStopDevices(message, reply);
+			status = HandleStartStopDevices(message, &reply);
 			break;
 		case IS_STOP_DEVICE:
-			HandleStartStopDevices(message, reply);
+			status = HandleStartStopDevices(message, &reply);
 			break;
 		case IS_CONTROL_DEVICES:
-			HandleControlDevices(message, reply);
+			status = HandleControlDevices(message, &reply);
 			break;
 		case SYSTEM_SHUTTING_DOWN:
-			HandleSystemShuttingDown(message, reply);
+			status = HandleSystemShuttingDown(message, &reply);
 			break;
 		case B_NODE_MONITOR:
-			HandleNodeMonitor(message);
+			status = HandleNodeMonitor(message);
 			break;
 		/*case B_QUIT_REQUESTED:
 			QuitRequested();
@@ -635,11 +636,13 @@ InputServer::MessageReceived(BMessage *message)
 			BMessenger app_server("application/x-vnd.Be-APPS", -1, NULL);
 			if (app_server.IsValid()) {
 				//app_server->SendMessage(message);
-				
 			}
-		break;
+			return;		
 		}
 	}
+	
+	reply.AddInt32("status", status);
+	message->SendReply(&reply);
 }
 
 
