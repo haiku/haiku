@@ -1107,7 +1107,15 @@ BString::ReplaceSet(const char *setOfChars, char with)
 BString&
 BString::ReplaceSet(const char *setOfChars, const char *with)
 {
-	//TODO: Implement
+	if (with == NULL)
+		return *this; //TODO: do something smart
+	
+	int32 pos;
+	int32 withLen = strlen(with);
+	while ((pos = strcspn(String(), setofChars)) < Length()) {
+		_OpenAtBy(pos, withLen - 1);
+		memcpy(_privateData + pos, with, withLen);
+	}
 	return *this;
 }
 
