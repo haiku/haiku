@@ -9,6 +9,7 @@ Preference Devices :
 	DevicesWindow.cpp
 	DevicesViews.cpp
 	ResourceUsageWindow.cpp
+	ModemWindow.cpp
 ;
 
 LinkSharedOSLibs Devices : be ;
