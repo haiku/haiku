@@ -118,6 +118,157 @@ partitionInfo->info.device[0] = '\0';
 	return error;
 }
 
+// get_partitioning_parameters
+/*!	\brief Returns parameters for partitioning a session.
+
+	The partitioning system (module) identified by \a identifier is asked to
+	return parameters for the session. If the session is already partitioned
+	using this system, then the parameters describing the current layout will
+	be returned, otherwise default values.
+
+	If the supplied buffer is too small for the parameters, the function
+	returns \c B_OK, but doesn't fill in the buffer; the required buffer
+	size is returned in \a actualSize. If the buffer is large enough,
+	\a actualSize is set to the actually used size. The size includes the
+	terminating null.
+
+	\param deviceFD The device the session to be partitioned resides on.
+	\param sessionIndex The index of the session to be partitioned.
+	\param identifier A string identifying the partitioning system to be used.
+	\param buffer Pointer to a pre-allocated buffer of size \a bufferSize.
+	\param bufferSize The size of \a buffer.
+	\param actualSize Pointer to a pre-allocated size_t to be set to the
+		   actually needed buffer size.
+	\return
+	- \c B_OK: The parameters could be retrieved or the buffer is too
+	  small. \a actualSize has to be checked!
+	- another error code, if something went wrong
+*/
+status_t
+get_partitioning_parameters(int deviceFD, int32 sessionIndex,
+							const char *identifier, char *buffer,
+							size_t bufferSize, size_t *actualSize)
+{
+	status_t error = (identifier && buffer && actualSize ? B_OK : B_BAD_VALUE);
+	disk_scanner_module_info *diskScanner = NULL;
+	session_info sessionInfo;
+	// get the disk scanner module
+	if (error == B_OK) {
+		error = get_module(DISK_SCANNER_MODULE_NAME,
+						   (module_info**)&diskScanner);
+	}
+	// get the session info
+	if (error == B_OK) {
+		error = diskScanner->get_nth_session_info(deviceFD, sessionIndex,
+												  &sessionInfo, NULL);
+	}
+	// get the parameters
+	if (error == B_OK) {
+		error = diskScanner->get_partitioning_params(deviceFD, &sessionInfo,
+			identifier, buffer, bufferSize, actualSize);
+	}
+	// put the partition scanner module
+	if (diskScanner)
+		put_module(diskScanner->module.name);
+	return error;
+}
+
+// get_fs_initialization_parameters
+/*!	\brief Returns parameters for initializing a volume.
+
+	The FS identified by \a fileSystem is asked to return parameters for
+	the volume. If the volume is already initialized with this FS, then the
+	parameters describing the current state will be returned, otherwise
+	default values.
+
+	If the supplied buffer is too small for the parameters, the function
+	returns \c B_OK, but doesn't fill in the buffer; the required buffer
+	size is returned in \a actualSize. If the buffer is large enough,
+	\a actualSize is set to the actually used size. The size includes the
+	terminating null.
+
+	\param deviceFD The device the partition to be initialized resides on.
+	\param sessionIndex The index of the session the partition to be
+						initialized resides on.
+	\param partitionIndex The index of the partition to be initialized.
+	\param fileSystem A string identifying the file system to be used.
+	\param buffer Pointer to a pre-allocated buffer of size \a bufferSize.
+	\param bufferSize The size of \a buffer.
+	\param actualSize Pointer to a pre-allocated size_t to be set to the
+		   actually needed buffer size.
+	\return
+	- \c B_OK: The parameters could be retrieved or the buffer is too
+	  small. \a actualSize has to be checked!
+	- another error code, if something went wrong
+*/
+status_t
+get_fs_initialization_parameters(int deviceFD, int32 sessionIndex,
+								 int32 partitionIndex, const char *fileSystem,
+								 char *buffer, size_t bufferSize,
+								 size_t *actualSize)
+{
+	// not yet implemented
+	return B_UNSUPPORTED;
+}
+
+// partition_session
+/*!	\brief Partitions a specified session on a device using the paritioning
+		   system identified by \a identifier and according to supplied
+		   parameters.
+	\param deviceFD The device the session to be partitioned resides on.
+	\param sessionIndex The index of the session to be partitioned.
+	\param identifier A string identifying the partitioning system to be used.
+	\param parameters Parameters according to which the session shall be
+		   partitioned. May be \c NULL, depending on the concerned partition
+		   module.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
+status_t
+partition_session(int deviceFD, int32 sessionIndex, const char *identifier,
+				  const char *parameters)
+{
+	status_t error = (identifier ? B_OK : B_BAD_VALUE);
+	disk_scanner_module_info *diskScanner = NULL;
+	session_info sessionInfo;
+	// get the disk scanner module
+	if (error == B_OK) {
+		error = get_module(DISK_SCANNER_MODULE_NAME,
+						   (module_info**)&diskScanner);
+	}
+	// get the session info
+	if (error == B_OK) {
+		error = diskScanner->get_nth_session_info(deviceFD, sessionIndex,
+												  &sessionInfo, NULL);
+	}
+	// partition the session
+	if (error == B_OK) {
+		error = diskScanner->partition(deviceFD, &sessionInfo, identifier,
+									   parameters);
+	}
+	// put the partition scanner module
+	if (diskScanner)
+		put_module(diskScanner->module.name);
+	return error;
+}
+
+// initialize_volume
+/*!	\brief Initializes a specified device using a certain file system.
+	\param where The path to the device to be initialized.
+	\param fileSystem The identifier of the file system to be used for that
+		   partition.
+	\param volumeName The name to be given to the initialized volume.
+	\param parameters Parameters according to which the session shall be
+		   initialized.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
+status_t
+initialize_volume(const char *where, const char *fileSystem, 
+				  const char *volumeName, const char *parameters)
+{
+	// not yet implemented
+	return B_UNSUPPORTED;
+}
+
 
 // the test code starts here
 
@@ -159,8 +310,8 @@ int
 main()
 {
 //	const char *deviceName = "/dev/disk/virtual/0/raw";
-//	const char *deviceName = "/dev/disk/ide/ata/0/master/0/raw";
-	const char *deviceName = "/dev/disk/ide/atapi/1/master/0/raw";
+	const char *deviceName = "/dev/disk/ide/ata/0/master/0/raw";
+//	const char *deviceName = "/dev/disk/ide/atapi/1/master/0/raw";
 
 	int device = open(deviceName, 0);
 	if (device >= 0) {
