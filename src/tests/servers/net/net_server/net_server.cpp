@@ -1,4 +1,4 @@
-/* Userland modules emulation support
+/* Network modules debug platform
 */
 
 #include <stdio.h>
