@@ -130,6 +130,10 @@ extern "C" {
 	static int bfs_free_query_cookie(void *ns, void *node, void *cookie);
 	static int bfs_read_query(void *ns, void *cookie, long *num,
 					struct dirent *buf, size_t bufsize);
+
+	// Dano compatibility (required for booting)
+	static int bfs_wake_vnode(void *ns, void *node);
+	static int bfs_suspend_vnode(void *ns, void *node);
 }	// extern "C"
 
 
@@ -202,7 +206,10 @@ vnode_ops fs_entry =  {
 	&bfs_open_query,			// open query
 	&bfs_close_query,			// close query
 	&bfs_free_query_cookie,		// free query cookie
-	&bfs_read_query				// read query
+	&bfs_read_query,			// read query
+	
+	&bfs_wake_vnode,			// these two are added for Dano compatibility;
+	&bfs_suspend_vnode			// they do nothing.
 };
 
 #define BFS_IO_SIZE	65536
@@ -433,6 +440,20 @@ bfs_remove_vnode(void *_ns, void *_node, char reenter)
 		delete inode;
 	}
 
+	return B_OK;
+}
+
+
+static int
+bfs_wake_vnode(void *_ns, void *_node)
+{
+	return B_OK;
+}
+
+
+static int
+bfs_suspend_vnode(void *_ns, void *_node)
+{
 	return B_OK;
 }
 

@@ -57,7 +57,10 @@ typedef ino_t		vnode_id;
 // missing ioctl() call added
 #define		IOCTL_FILE_UNCACHED_IO	10000
 
-#define		B_CUR_FS_API_VERSION	2
+// B_CUR_FS_API_VERSION is 2 for R5, but 3 on Dano, because of the
+// added calls for power management - so it's set to 3 here because
+// that's a requirement to let Dano boot from our fs...
+#define		B_CUR_FS_API_VERSION	3
 
 struct attr_info;
 struct index_info;
@@ -66,6 +69,8 @@ typedef int	op_read_vnode(void *ns, vnode_id vnid, char r, void **node);
 typedef int	op_write_vnode(void *ns, void *node, char r);
 typedef int	op_remove_vnode(void *ns, void *node, char r);
 typedef int	op_secure_vnode(void *ns, void *node);
+typedef int op_wake_vnode(void *ns, void *node);
+typedef int op_suspend_vnode(void *ns, void *node);
 
 typedef int	op_walk(void *ns, void *base, const char *file, char **newpath,
 					vnode_id *vnid);
@@ -221,6 +226,9 @@ typedef struct vnode_ops {
 	op_close_query			(*close_query);
 	op_free_cookie			(*free_querycookie);
 	op_read_query			(*read_query);
+	// for Dano compatibility only
+	op_wake_vnode			(*wake_vnode);
+	op_suspend_vnode		(*suspend_vnode);
 } vnode_ops;
 
 extern _IMPEXP_KERNEL int	new_path(const char *path, char **copy);
