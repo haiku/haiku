@@ -22,6 +22,9 @@
 #define HAVE_ALLOCA 1
 
 #include <stdio_private.h>
+// ToDo: implement this function for real
+#include <printf.h>
+#if 0
 #include <alloca.h>
 #include <ctype.h>
 #include <float.h>
@@ -33,7 +36,6 @@
 #include <locale/localeinfo.h>
 #include <limits.h>
 #include <math.h>
-#include <printf.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -1227,4 +1229,11 @@ group_number (wchar_t *buf, wchar_t *bufend, unsigned int intdig_no,
   while (p > buf);
 
   return bufend + ngroups;
+}
+#endif
+
+int
+__printf_fp(FILE *fp, const struct printf_info *info, const void * const *args)
+{
+	return fputs("NaN-FIXME", fp);
 }

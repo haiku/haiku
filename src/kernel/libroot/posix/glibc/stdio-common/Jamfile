@@ -24,7 +24,7 @@ KernelMergeObject posix_gnu_stdio.o : #_common.o :
 	<$(SOURCE_GRIST)>perror.c
 	<$(SOURCE_GRIST)>printf-parse.c
 	<$(SOURCE_GRIST)>printf.c
-#	<$(SOURCE_GRIST)>printf_fp.c
+	<$(SOURCE_GRIST)>printf_fp.c
 #	<$(SOURCE_GRIST)>printf_size.c
 	<$(SOURCE_GRIST)>putw.c
 	<$(SOURCE_GRIST)>reg-printf.c
