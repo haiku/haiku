@@ -121,30 +121,28 @@ BBitmapStream::~BBitmapStream()
 //
 // Returns: B_ERROR if there is no bitmap stored by the stream
 //                  or if pos is a bad value,
-//          B_BAD_VALUE if buffer is NULL
+//          B_BAD_VALUE if buffer is NULL or pos is invalid
 //          or the amount read if the result >= 0
 // ---------------------------------------------------------------
 status_t
 BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 {
-	if (!buffer)
+	if (!buffer || pos < 0 || pos >= fSize)
 		return B_BAD_VALUE;
 	if (!fBitmap)
 		return B_ERROR;
 	if (!size)
 		return B_NO_ERROR;
-	if (pos >= fSize)
-		return B_ERROR;
 
-	long toRead;
+	size_t toRead;
 	void *source;
 
-	if (fPosition < sizeof(TranslatorBitmap)) {
+	if (pos < sizeof(TranslatorBitmap)) {
 		toRead = sizeof(TranslatorBitmap) - pos;
-		source = ((char *)fpBigEndianHeader) + pos;
+		source = ((uint8 *) fpBigEndianHeader) + pos;
 	} else {
 		toRead = fSize - pos;
-		source = ((char *)fBitmap->Bits()) + fPosition -
+		source = ((uint8 *) fBitmap->Bits()) + pos -
 			sizeof(TranslatorBitmap);
 	}
 	if (toRead > size)
@@ -171,30 +169,32 @@ BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 //
 // Postconditions:
 //
-// Returns: B_BAD_VALUE if size is bad or data is NULL,
+// Returns: B_BAD_VALUE if size is bad or data is NULL or pos is invalid,
 //          B_MISMATCHED_VALUES if the bitmap header is bad,
+//			B_ERROR if error allocating memory or setting up
+//			        big endian header,
 //          or the amount written if the result is >= 0
 // ---------------------------------------------------------------
 status_t
 BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 {
-	if (!data)
+	if (!data || pos < 0 || pos > fSize)
 		return B_BAD_VALUE;
 	if (!size)
 		return B_NO_ERROR;
 
 	ssize_t written = 0;
 	while (size > 0) {
-		long toWrite;
+		size_t toWrite;
 		void *dest;
 		// We depend on writing the header separately in detecting
 		// changes to it
 		if (pos < sizeof(TranslatorBitmap)) {
 			toWrite = sizeof(TranslatorBitmap) - pos;
-			dest = ((char *)&fHeader) + pos;
+			dest = ((uint8 *) &fHeader) + pos;
 		} else {
 			toWrite = fHeader.dataSize - pos + sizeof(TranslatorBitmap);
-			dest = ((char *)fBitmap->Bits()) + pos - sizeof(TranslatorBitmap);
+			dest = ((uint8 *) fBitmap->Bits()) + pos - sizeof(TranslatorBitmap);
 		}
 		if (toWrite > size)
 			toWrite = size;
@@ -205,15 +205,17 @@ BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 		memcpy(dest, data, toWrite);
 		pos += toWrite;
 		written += toWrite;
-		data = ((char *)data) + toWrite;
+		data = ((uint8 *) data) + toWrite;
 		size -= toWrite;
 		if (pos > fSize)
 			fSize = pos;
 		// If we change the header, the rest needs to be reset
 		if (pos == sizeof(TranslatorBitmap)) {
 			// Setup both host and Big Endian byte order bitmap headers
-			ConvertBEndianToHost(&fHeader);
-			SetBigEndianHeader();
+			if (ConvertBEndianToHost(&fHeader) != B_OK)
+				return B_ERROR;
+			if (SetBigEndianHeader() != B_OK)
+				return B_ERROR;
 			
 			if (fBitmap && ((fBitmap->Bounds() != fHeader.bounds) ||
 					(fBitmap->ColorSpace() != fHeader.colors) ||
@@ -227,6 +229,8 @@ BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 				if ((fHeader.bounds.left > 0.0) || (fHeader.bounds.top > 0.0))
 					DEBUGGER("non-origin bounds!");
 				fBitmap = new BBitmap(fHeader.bounds, fHeader.colors);
+				if (!fBitmap)
+					return B_ERROR;
 				if (fBitmap->BytesPerRow() != fHeader.rowBytes)
 					return B_MISMATCHED_VALUES;
 			}
@@ -238,7 +242,7 @@ BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 }
 
 // ---------------------------------------------------------------
-// Seeks
+// Seek
 //
 // Changes the current stream position.
 //
@@ -366,17 +370,17 @@ BBitmapStream::SetSize(off_t size)
 //
 // Postconditions:
 //
-// Returns: B_BAD_VALUE, if outBitmap is NULL or the internal
-//                       bitmap is NULL
-//          B_ERROR,     if the bitmap has already been detached
+// Returns: B_BAD_VALUE, if outBitmap is NULL
+//          B_ERROR,     if the bitmap is NULL or
+//                       has already been detached
 //          B_NO_ERROR,  if the bitmap was successfully detached
 // ---------------------------------------------------------------
 status_t
 BBitmapStream::DetachBitmap(BBitmap **outBitmap)
 {
-	if (!outBitmap || !fBitmap)
+	if (!outBitmap)
 		return B_BAD_VALUE;
-	if (fDetached)
+	if (fDetached || !fBitmap)
 		return B_ERROR;
 		
 	fDetached = true;
@@ -428,13 +432,18 @@ BBitmapStream::ConvertBEndianToHost(TranslatorBitmap *pheader)
 // Postconditions:
 //
 // Returns: B_OK, if the byte swap succeeded
+//			B_ERROR, if failed to allocate memory for
+//			         big endian header
 //          B_BAD_VALUE, if the byte swap failed
 // ---------------------------------------------------------------
 status_t
 BBitmapStream::SetBigEndianHeader()
 {
-	if (!fpBigEndianHeader)
+	if (!fpBigEndianHeader) {
 		fpBigEndianHeader = new TranslatorBitmap;
+		if (!fpBigEndianHeader)
+			return B_ERROR;
+	}
 		
 	fpBigEndianHeader->magic = fHeader.magic;
 	fpBigEndianHeader->bounds = fHeader.bounds;
