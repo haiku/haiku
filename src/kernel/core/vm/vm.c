@@ -184,19 +184,28 @@ region_id vm_find_region_by_name(aspace_id aid, const char *name)
 	return id;
 }
 
-static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock)
+
+static vm_region *
+_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock)
 {
 	vm_region *region = NULL;
 
+	// restrict the area name to B_OS_NAME_LENGTH
+	size_t length = strlen(name) + 1;
+	if (length > B_OS_NAME_LENGTH)
+		length = B_OS_NAME_LENGTH;
+
 	region = (vm_region *)malloc(sizeof(vm_region));
-	if(region == NULL)
+	if (region == NULL)
 		return NULL;
-	region->name = (char *)malloc(strlen(name) + 1);
-	if(region->name == NULL) {
+
+	region->name = (char *)malloc(length);
+	if (region->name == NULL) {
 		free(region);
 		return NULL;
 	}
-	strcpy(region->name, name);
+	strlcpy(region->name, name, length);
+
 	region->id = atomic_add(&next_region_id, 1);
 	region->base = 0;
 	region->size = 0;
@@ -218,7 +227,7 @@ static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char 
 
 
 // must be called with this address space's virtual_map.sem held
-static int
+static status_t
 find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t end, int addr_type, vm_region *region)
 {
 	vm_region *last_r = NULL;
@@ -324,7 +333,55 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 		map->region_list = region;
 	}
 	map->change_count++;
-	return B_NO_ERROR;
+	return B_OK;
+}
+
+
+/**	This inserts the area/region you pass into the virtual_map of the
+ *	specified address space.
+ *	It will also set the "_address" argument to its base address when
+ *	the call succeeds.
+ *	You need to hold the virtual_map semaphore.
+ */
+
+static status_t
+insert_area(vm_address_space *addressSpace, void **_address,
+	uint32 addressSpec, addr_t size, vm_region *area)
+{
+	addr_t searchBase, searchEnd;
+	status_t status;
+
+	switch (addressSpec) {
+		case B_EXACT_ADDRESS:
+		case B_EXACT_KERNEL_ADDRESS:
+			searchBase = (addr_t)*_address;
+			searchEnd = (addr_t)*_address + size;
+			break;
+
+		case B_BASE_ADDRESS:
+			searchBase = (addr_t)*_address;
+			searchEnd = addressSpace->virtual_map.base + (addressSpace->virtual_map.size - 1);
+			break;
+
+		case B_ANY_ADDRESS:
+		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
+			searchBase = addressSpace->virtual_map.base;
+			searchEnd = addressSpace->virtual_map.base + (addressSpace->virtual_map.size - 1);
+			break;
+
+		default:
+			return B_BAD_VALUE;
+	}
+
+	status = find_and_insert_region_slot(&addressSpace->virtual_map, searchBase, size,
+				searchEnd, addressSpec, area);
+	if (status == B_OK)
+		// ToDo: do we have to do anything about B_ANY_KERNEL_ADDRESS
+		//		vs. B_ANY_KERNEL_BLOCK_ADDRESS here?
+		*_address = (void *)area->base;
+
+	return status;
 }
 
 
@@ -424,33 +481,9 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
 		goto err1b;
 	}
 
-	{
-		addr_t search_addr, search_end;
-
-		switch (addr_type) {
-			case B_EXACT_ADDRESS:
-			case B_EXACT_KERNEL_ADDRESS:
-			case B_BASE_ADDRESS:
-				search_addr = (addr_t)*vaddr;
-				search_end = (addr_t)*vaddr + size;
-				break;
-			case B_ANY_ADDRESS:
-			case B_ANY_KERNEL_ADDRESS:
-			case B_ANY_KERNEL_BLOCK_ADDRESS:
-				search_addr = aspace->virtual_map.base;
-				search_end = aspace->virtual_map.base + (aspace->virtual_map.size - 1);
-				break;
-			default:
-				err = EINVAL;
-				goto err1b;
-		}
-
-		err = find_and_insert_region_slot(&aspace->virtual_map, search_addr, size, 
-					search_end, addr_type, region);
-		if (err < 0)
-			goto err1b;
-		*vaddr = (addr_t *)region->base;
-	}
+	err = insert_area(aspace, vaddr, addr_type, size, region);
+	if (err < B_OK)
+		goto err1b;
 
 	// attach the cache to the region
 	region->cache_ref = cache_ref;
@@ -487,6 +520,55 @@ err:
 	free(region->name);
 	free(region);
 	return err;
+}
+
+
+status_t
+vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size)
+{
+	vm_address_space *addressSpace;
+	vm_region *area;
+	status_t status = B_OK;
+
+	addressSpace = vm_get_aspace_by_id(aid);
+	if (addressSpace == NULL)
+		return ERR_VM_INVALID_ASPACE;
+
+	area = malloc(sizeof(vm_region));
+	if (area == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
+
+	area->id = -1;
+		// this marks it as reserved space
+	area->map = &addressSpace->virtual_map;
+
+	acquire_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
+
+	// check to see if this aspace has entered DELETE state
+	if (addressSpace->state == VM_ASPACE_STATE_DELETION) {
+		// okay, someone is trying to delete this aspace now, so we can't
+		// insert the region, so back out
+		status = ERR_VM_INVALID_ASPACE;
+		goto err2;
+	}
+
+	status = insert_area(addressSpace, _address, addressSpec, size, area);
+	if (status < B_OK)
+		goto err2;
+
+	// the region is now reserved!
+
+	release_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0);
+	return B_OK;
+
+err2:
+	release_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0);
+	free(area);
+err1:
+	vm_put_aspace(addressSpace);
+	return status;
 }
 
 
