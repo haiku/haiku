@@ -6,7 +6,11 @@ SubDirHdrs [ FDirName $(SUBDIR) libogg ] ;
 
 Addon ogg : media plugins :
 	OggReaderPlugin.cpp
-	OggReaderPluginCodecs.cpp
+	OggStream.cpp
+	OggSpeexStream.cpp
+	OggTheoraStream.cpp
+	OggTobiasStream.cpp
+	OggVorbisStream.cpp
 	: false : libogg.a
 ;
 
