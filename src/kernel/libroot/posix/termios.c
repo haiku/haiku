@@ -1,45 +1,56 @@
 /* 
 ** Copyright 2003, Daniel Reinhold, danielre@users.sf.net. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
+
 #include <termios.h>
+#include <unistd.h>
+#include <errno.h>
 
 
-/*
- * tcsetattr - set the attributes for the tty device at fd
- *             (using the structure in the last arg for the values)
- */
+/** get the attributes of the TTY device at fd */
+
 int
-tcsetattr(int fd, int opt, const struct termios *tp)
+tcgetattr(int fd, struct termios *termios)
 {
+	return ioctl(fd, TCGETA, termios);
+}
+
+
+/** set the attributes for the TTY device at fd */
+
+int
+tcsetattr(int fd, int opt, const struct termios *termios)
+{
+	int method;
+
 	switch (opt) {
 		case TCSANOW:
 			// set the attributes immediately
-			return ioctl(fd, TCSETA, tp);
-		
+			method = TCSETA;
+			break;
 		case TCSADRAIN:
 			// wait for ouput to finish before setting the attributes
-			return ioctl(fd, TCSETAW, tp);
-		
+			method = TCSETAW;
+			break;
 		case TCSAFLUSH:
-			// wait for ouput to finish and then flush the input buffer
-			// before setting the attributes
-			return ioctl(fd, TCSETAF, tp);
-		
+			method = TCSETAF;
+			break;
+
 		default:
 			// no other valid options
 			errno = EINVAL;
 			return -1;
 	}
+
+	return ioctl(fd, method, termios);
 }
 
 
-/* tcdrain - wait for all output to be transmitted */
+/** wait for all output to be transmitted */
+
 int
 tcdrain(int fd)
 {
@@ -53,87 +64,73 @@ tcdrain(int fd)
 }
 
 
-/* tcflow - suspend or restart transmission */
+/** suspend or restart transmission */
+
 int
 tcflow(int fd, int action)
 {
-	/* action will be one of the following:
-	 *   TCIOFF -  input off (stops input)
-	 *   TCION  -  input on  (restart input)
-	 *   TCOOFF - output off (stops output)
-	 *   TCOON  - output on  (restart output)
-	 */
+	switch (action) {
+		case TCIOFF:
+		case TCION:
+		case TCOOFF:
+		case TCOON:
+			break;
+
+		default:
+			errno = EINVAL;
+			return -1;
+	}
+
 	return ioctl(fd, TCXONC, action);
 }
 
 
-/* tcflush - flush all pending data (input or output) */
+/** flush all pending data (input or output) */
+
 int
-tcflush(int fd, int queue_selector)
+tcflush(int fd, int queueSelector)
 {
-	return ioctl(fd, TCFLSH, queue_selector);
+	return ioctl(fd, TCFLSH, queueSelector);
 }
 
 
-/* tcsendbreak - send zero bits for the specified duration */
+/** send zero bits for the specified duration */
+
 int
 tcsendbreak(int fd, int duration)
 {	
-	if (duration == 0)
-		// Posix spec says this should take ~ 0.25 to 0.5 seconds
-		return ioctl(fd, TCSBRK, 0);
-	
-	/* Posix does not specify how long the transmission time
-	 * should last if 'duration' is non-zero -- i.e. it is up
-	 * to each implementation to decide what to do...
-	 *
-	 * For simplicity, here is it assumed that a positive duration
-	 * of N will mean "N time intervals" where each interval lasts
-	 * from 0.25 to 0.5 seconds. A negative duration will be treated
-	 * as an error.
-	 */
-	if (duration < 0) {
-		errno = EINVAL;
-		return -1;
-	}
-	
-	while (duration-- > 0)
-		if (ioctl(fd, TCSBRK, 0) < 0)
-			return -1;
-	
+	// Posix spec says this should take ~ 0.25 to 0.5 seconds.
+	// As the interpretation of the duration is undefined, we'll just ignore it
+	return ioctl(fd, TCSBRK, 0);
+}
+
+
+speed_t
+cfgetispeed(const struct termios *termios)
+{
+	return termios->c_ispeed;
+}
+
+
+int
+cfsetispeed(struct termios *termios, speed_t speed)
+{
+	termios->c_ispeed = speed;
 	return 0;
 }
 
 
-
-/*
- * The following four "speed control" functions are not supported
- * in the BeOS. But the interface is still part of the Posix
- * terminal IO specification, so they are implemented here as
- * stub functions for basic compliance.
- */
-
 speed_t
-cfgetispeed(const struct termios *term)
+cfgetospeed(const struct termios *termios)
 {
-	return (speed_t)0;
+	return termios->c_ospeed;
 }
+
 
 int
-cfsetispeed( struct termios *term, speed_t speed)
+cfsetospeed(struct termios *termios, speed_t speed)
 {
-	return 0;
-}
-
-speed_t
-cfgetospeed(const struct termios *term)
-{
-	return (speed_t)0;
-}
-
-int
-cfsetospeed( struct termios *term, speed_t speed)
-{
+	termios->c_ospeed = speed;
 	return 0;
 }
 
