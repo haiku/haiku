@@ -44,6 +44,7 @@ int main(int argc,char **argv)
 	for (int i=0;i<8192;i++)
 		if (i%256!=readByte(i))
 				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(i));
+	snooze(2000000);
 
 	return 0;
 }

@@ -6,6 +6,12 @@ areaManager am;
 swapFileManager swapMan;
 pageManager pageMan(10); // Obviously this hard coded number is a hack...
 	
+areaManager *vmInterface::getAM(void)
+	{
+	// Normally, we would go to the current user process to get this. Since there no such thing exists here...
+	return &am;
+	}
+
 int32 cleanerThread(void *pageMan)
 	{
 	pageManager *pm=(pageManager *)pageMan;
@@ -13,16 +19,22 @@ int32 cleanerThread(void *pageMan)
 	return 0;
 	}
 
+int32 saverThread(void *areaMan)
+	{
+	areaManager *am=(areaManager *)areaMan;
+	// This should iterate over all processes...
+	while (1)
+		{
+		snooze(250000);	
+		am->saver();	
+		}
+	}
+
 vmInterface::vmInterface(int pages) 
 	{
 	nextAreaID=0;
 	resume_thread(spawn_thread(cleanerThread,"cleanerThread",0,&pageMan));
-	}
-
-areaManager *vmInterface::getAM(void)
-	{
-	// Normally, we would go to the current user process to get this. Since there no such thing exists here...
-	return &am;
+	resume_thread(spawn_thread(saverThread,"saverThread",0,getAM()));
 	}
 
 int vmInterface::getAreaByAddress(void *address)

@@ -126,5 +126,7 @@ void vpage::pager(int desperation)
 
 void vpage::saver(void)
 	{
-	flush();
+	if (dirty)
+		flush();
+	dirty=false;
 	}
