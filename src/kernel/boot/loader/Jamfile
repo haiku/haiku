@@ -1,0 +1,58 @@
+SubDir OBOS_TOP src kernel boot loader ;
+
+SubDirHdrs $(OBOS_TOP) src add-ons kernel partitioning_systems amiga ;
+UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+{
+	local defines =
+		_BOOT_MODE
+		BOOT_SUPPORT_PARTITION_AMIGA
+		;
+	
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
+}
+
+KernelStaticLibrary boot_loader :
+	main.cpp
+	vfs.cpp
+	partitions.cpp
+	heap.cpp
+	stdio.cpp
+	list.c
+
+	amiga_rdb.cpp
+
+	kernel_cpp.cpp
+	:
+	-fno-builtin
+	;
+
+# The following is a try to make the actual partition support
+# really configurable somewhere and let the build independent
+# from it:
+
+#local boot_partition_support =
+#	amiga_rdb.cpp
+#	;
+#
+#KernelStaticLibrary boot_loader_partition :
+#	$(boot_partition_support)
+#	:
+#	;
+
+# Tell Jam where to find the utility sources
+SEARCH on [ FGristFiles kernel_cpp.cpp list.c ]
+    = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+
+SEARCH on [ FGristFiles amiga_rdb.cpp ]
+    = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems amiga ] ;
+
+SEARCH on [ FGristFiles stage2_crt0.S ]
+    = [ FDirName $(OBOS_TOP) src kernel boot arch $(OBOS_ARCH) ] ;
+
+# SubInclude OBOS_TOP src kernel boot loader partition ;
+
