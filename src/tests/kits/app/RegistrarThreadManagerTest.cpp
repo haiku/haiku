@@ -6,7 +6,7 @@
 #include <TestApp.h>
 #include <TestUtils.h>
 
-#if !TEST_R5
+#ifndef TEST_R5
 #include <RegistrarThread.h>
 #include <RegistrarThreadManager.h>
 #endif	// !TEST_R5
@@ -28,7 +28,7 @@ RegistrarThreadManagerTest::Suite() {
 	return suite;
 }
 
-#if !TEST_R5
+#ifndef TEST_R5
 // Base test thread class
 class TestThread : public RegistrarThread {
 public:
@@ -109,7 +109,7 @@ void
 RegistrarThreadManagerTest::setUp()
 {
 	BTestCase::setUp();
-#if !TEST_R5
+#ifndef TEST_R5
 	// Setup our application
 	fApplication = new BTestApp("application/x-vnd.obos.RegistrarThreadManagerTest");
 	if (fApplication->Init() != B_OK) {
@@ -124,7 +124,7 @@ RegistrarThreadManagerTest::setUp()
 void
 RegistrarThreadManagerTest::tearDown()
 {
-#if !TEST_R5
+#ifndef TEST_R5
 	// Terminate the Application
 	if (fApplication) {
 		fApplication->Terminate();
@@ -138,7 +138,7 @@ RegistrarThreadManagerTest::tearDown()
 void
 RegistrarThreadManagerTest::ShutdownTest()
 {
-#if TEST_R5
+#ifdef TEST_R5
 	Outputf("(no tests performed for R5 version)\n");
 #else
 	NextSubTest();
@@ -151,6 +151,12 @@ RegistrarThreadManagerTest::ShutdownTest()
 //	fApplication->AddHandler(&manager);
 	NextSubTest();
 	BMessenger managerMessenger(NULL, fApplication, &err);
+// TODO: Do something about this...
+if (err != B_OK) {
+fprintf(stderr, "Fails because we try to init an Haiku BMessenger with a "
+"BLooper from R5's libbe (more precisely a BTestApp living in libcppunit, "
+"which is only linked against R5's libbe).\n");
+}
 	NextSubTest();
 	CHK(err == B_OK && managerMessenger.IsValid());
 	NextSubTest();
@@ -222,7 +228,7 @@ RegistrarThreadManagerTest::ShutdownTest()
 void
 RegistrarThreadManagerTest::ThreadLimitTest()
 {
-#if TEST_R5
+#ifdef TEST_R5
 	Outputf("(no tests performed for R5 version)\n");
 #else
 	NextSubTest();
@@ -230,6 +236,12 @@ RegistrarThreadManagerTest::ThreadLimitTest()
 	RegistrarThreadManager manager;
 	CHK(fApplication && fApplication->InitCheck() == B_OK);
 	BMessenger managerMessenger(NULL, fApplication, &err);
+// TODO: Do something about this...
+if (err != B_OK) {
+fprintf(stderr, "Fails because we try to init an Haiku BMessenger with a "
+"BLooper from R5's libbe (more precisely a BTestApp living in libcppunit, "
+"which is only linked against R5's libbe).\n");
+}
 	CHK(err == B_OK && managerMessenger.IsValid());
 	
 	const uint termThreads = 2;
