@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src add-ons kernel drivers audio ac97 ich distro ;
+
+Packages openbeos-ich-ac97-cvs openbeos-ich-ac97-debug-cvs :
+	README.html install.sh uninstall.sh ;

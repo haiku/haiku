@@ -25,10 +25,12 @@ R5KernelAddon ich_ac97 : kernel drivers bin :
 #	-fno-pic -D_KERNEL_MODE
 #	;
 
-Package openbeos-ich-ac97-cvs :
-	distro/README.html distro/install.sh distro/uninstall.sh ich_ac97 ;
-Package openbeos-ich-ac97-debug-cvs :
-	distro/README.html distro/install.sh distro/uninstall.sh ich_ac97 ;
+Packages openbeos-ich-ac97-cvs openbeos-ich-ac97-debug-cvs :
+	ich_ac97 :
+	boot home config add-ons kernel drivers bin ;
+Packages openbeos-ich-ac97-cvs openbeos-ich-ac97-debug-cvs :
+	<kernel!drivers!dev!audio!multi>ich_ac97 :
+	boot home config add-ons kernel drivers dev audio multi ;
 
 # Link to kernel/drivers/dev/audio/multi
 {
@@ -37,3 +39,5 @@ Package openbeos-ich-ac97-debug-cvs :
 	MakeLocate $(instDriver) : $(dir) ;
 	RelSymLink $(instDriver) : ich_ac97 ;
 }
+
+SubInclude OBOS_TOP src add-ons kernel drivers audio ac97 ich distro ;
