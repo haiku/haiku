@@ -63,7 +63,7 @@ area_id alloc_mem(void **log, void **phy, size_t size, const char *name)
 	area_id areaid;
 	status_t rv;
 	
-	dprintf("rtl8139_nielx: allocating %d bytes for %s\n",size,name);
+	dprintf("rtl8139_nielx: allocating %ld bytes for %s\n",size,name);
 
 	size = round_to_pagesize(size);
 	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS,size,B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
@@ -82,7 +82,7 @@ area_id alloc_mem(void **log, void **phy, size_t size, const char *name)
 		*log = logadr;
 	if (phy)
 		*phy = pe.address;
-	dprintf("area = %d, size = %d, log = %#08X, phy = %#08X\n",areaid,size,logadr,pe.address);
+	dprintf("area = %ld, size = %ld, log = %p, phy = %p\n",areaid,size,logadr,pe.address);
 	return areaid;
 }
 
@@ -98,7 +98,7 @@ area_id map_mem(void **log, void *phy, size_t size, const char *name)
 	void *mapadr;
 	area_id area;
 
-	dprintf("mapping physical address %p with %#x bytes for %s\n",phy,size,name);
+	dprintf("mapping physical address %p with %#lx bytes for %s\n",phy,size,name);
 
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
 	phyadr = phy - offset;
@@ -106,7 +106,7 @@ area_id map_mem(void **log, void *phy, size_t size, const char *name)
 	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &mapadr);
 	*log = mapadr + offset;
 
-	dprintf("physical = %p, logical = %p, offset = %#x, phyadr = %p, mapadr = %p, size = %#x, area = %#x\n",
+	dprintf("physical = %p, logical = %p, offset = %#lx, phyadr = %p, mapadr = %p, size = %#lx, area = %#lx\n",
 		phy, *log, offset, phyadr, mapadr, size, area);
 	
 	return area;
