@@ -126,9 +126,8 @@ add_page_table(addr_t base)
 
 /** Creates an entry to map the specified virtualAddress to the given
  *	physicalAddress.
- *	Note, it can only map the 4 meg region right after KERNEL_BASE; this
- *	could be easily fixed, though, by dynamically adding another page
- *	table, if the need arises.
+ *	If the mapping goes beyond the current page table, it will allocate
+ *	a new one. If it cannot map the requested page, it panics.
  */
 
 static void
