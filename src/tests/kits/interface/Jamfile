@@ -3,6 +3,7 @@ SubDir OBOS_TOP src tests kits interface ;
 UsePrivateHeaders interface ;
 
 # Let Jam know where to find some of our source files
+SEARCH_SOURCE += [ FDirName $(SUBDIR) balert ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bbitmap ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bdeskbar ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bpolygon ] ;
@@ -15,6 +16,9 @@ CommonTestLib libinterfacetest.so
 	: InterfaceKitTestAddon.cpp
 
 		GraphicsDefsTest.cpp
+
+		# BAlert
+		AlertTest.cpp
 
 		# BBitmap
 		BitmapTest.cpp
