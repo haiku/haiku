@@ -39,8 +39,11 @@ public:
 							 media_header *mediaHeader);
 									 
 protected:
+	// called by OggStream through GetPageInterface
 	status_t	GetPage(ogg_page * page, int read_size = 4*B_PAGE_SIZE,
 				        bool short_page = false);
+	status_t	GetPageAt(off_t position, ogg_stream_state * stream,
+				          int read_size = 4*B_PAGE_SIZE);
 
 	ogg_sync_state			fSync;
 	serialno_OggStream_map	fStreams;
@@ -51,6 +54,8 @@ private:
 	class GetPageInterface {
 	public:
 		virtual status_t	GetNextPage() = 0;
+		virtual status_t	GetPageAt(off_t position, ogg_stream_state * stream,
+							          int read_size = 4*B_PAGE_SIZE) = 0;
 	};
 };
 

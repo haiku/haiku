@@ -1,12 +1,15 @@
+#ifndef _VORBIS_CODEC_PLUGIN_H_
+#define _VORBIS_CODEC_PLUGIN_H_
+
 #include "DecoderPlugin.h"
 
 #include "libvorbis/vorbis/codec.h"
 
-class vorbisDecoder : public Decoder
+class VorbisDecoder : public Decoder
 {
 public:
-				vorbisDecoder();
-				~vorbisDecoder();
+				VorbisDecoder();
+				~VorbisDecoder();
 	
 	void		GetCodecInfo(media_codec_info &info);
 	status_t	Setup(media_format *inputFormat,
@@ -23,9 +26,6 @@ public:
 					   media_header *mediaHeader, media_decode_info *info);
 					   
 private:
-	void		CopyInfoToEncodedFormat(media_format * format);
-	void		CopyInfoToDecodedFormat(media_raw_audio_format * raf);
-
 	vorbis_info			fInfo;
 	vorbis_comment		fComment;
 	vorbis_dsp_state	fDspState;
@@ -36,9 +36,11 @@ private:
 };
 
 
-class vorbisDecoderPlugin : public DecoderPlugin
+class VorbisDecoderPlugin : public DecoderPlugin
 {
 public:
 	Decoder *	NewDecoder();
 	status_t	RegisterDecoder();
 };
+
+#endif _VORBIS_CODEC_PLUGIN_H_

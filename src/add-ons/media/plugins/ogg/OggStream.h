@@ -5,6 +5,8 @@
 #include <MediaDefs.h>
 #include "ogg/ogg.h"
 #include "OggReaderPlugin.h"
+#include "OggFrameInfo.h"
+#include <map>
 #include <vector>
 
 namespace BPrivate { namespace media {
@@ -47,8 +49,14 @@ protected:
 	virtual off_t		TimeToPosition(bigtime_t time);
 private:
 	long				fSerialno;
+	int64				fCurrentFrame;
+	bigtime_t			fCurrentTime;
 	std::vector<off_t>	fPagePositions;
+	std::vector<OggFrameInfo> fOggFrameInfos;
 	ogg_stream_state	fStreamState;
+	uint				fCurrentPage;
+	uint				fCurrentPacket;
+	ogg_stream_state	fSeekStreamState;
 	OggReader::GetPageInterface * fReaderInterface;
 };
 

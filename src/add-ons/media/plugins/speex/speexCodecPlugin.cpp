@@ -148,7 +148,6 @@ speexDecoder::Setup(media_format *inputFormat,
 		speex_decoder_ctl(fDecoderState, SPEEX_SET_ENH, &enabled);
 	}
 	speex_decoder_ctl(fDecoderState, SPEEX_GET_FRAME_SIZE, &fHeader->frame_size);
-	fSpeexOutputLength = fHeader->frame_size * sizeof(float) * fHeader->nb_channels;
 	if (fHeader->nb_channels == 2) {
 		SpeexCallback callback;
 		SpeexStereoState stereo = SPEEX_STEREO_STATE_INIT;
@@ -197,13 +196,17 @@ void speexDecoder::CopyInfoToDecodedFormat(media_raw_audio_format * raf) {
 	raf->channel_count = fHeader->nb_channels;
 	raf->format = media_raw_audio_format::B_AUDIO_FLOAT; // XXX verify: support others?
 	raf->byte_order = B_MEDIA_HOST_ENDIAN; // XXX should support other endain, too
-	if (raf->buffer_size < 512 || raf->buffer_size > 65536) {
-		raf->buffer_size = AudioBufferSize(raf);
+	int buffer_size = raf->buffer_size;
+	if (buffer_size < 512 || buffer_size > 65536) {
+		buffer_size = AudioBufferSize(raf);
 	}
-	raf->buffer_size = ((raf->buffer_size - 1) / fSpeexOutputLength + 1) * fSpeexOutputLength;
+	int output_length = fHeader->frame_size * fHeader->nb_channels * (raf->format & 0xf);
+	buffer_size = ((buffer_size - 1) / output_length + 1) * output_length;
+	raf->buffer_size = buffer_size;
 	// setup output variables
 	fFrameSize = (raf->format & 0xf) * raf->channel_count;
-	fOutputBufferSize = raf->buffer_size;
+	fOutputBufferSize = buffer_size;
+	fSpeexOutputLength = output_length;
 }
 
 status_t

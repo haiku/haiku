@@ -1,7 +1,0 @@
-#ifndef _OGG_READER_STREAM_INTERFACE_H_
-#define _OGG_READER_STREAM_INTERFACE_H_
-
-#include <ogg/ogg.h>
-
-
-#endif // _OGG_READER_STREAM_INTERFACE_H_

@@ -57,13 +57,19 @@ OggStream::OggStream(long serialno)
 {
 	TRACE("OggStream::OggStream\n");
 	this->fSerialno = serialno;
+	fCurrentFrame = 0;
+	fCurrentTime = 0;
 	ogg_stream_init(&fStreamState,serialno);
+	fCurrentPage = 0;
+	fCurrentPacket = 0;
+	ogg_stream_init(&fSeekStreamState,serialno);
 }
 
 
 OggStream::~OggStream()
 {
-
+	ogg_stream_clear(&fStreamState);
+	ogg_stream_clear(&fSeekStreamState);
 }
 
 
@@ -142,7 +148,40 @@ OggStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 status_t
 OggStream::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 {
-	debugger("OggStream::Seek");
+	TRACE("OggStream::Seek to %lld : %lld\n",*frame,*time);
+	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
+		*frame = max_c(0, *frame); // clip to zero
+		*frame = min_c(*frame, fOggFrameInfos.size()-1); // clip to max
+		// input the page into a temporary seek stream
+		ogg_stream_state seekStreamState;
+		uint pageno = fOggFrameInfos[*frame].GetPage();
+		off_t position = fPagePositions[pageno];
+		ogg_stream_init(&seekStreamState, fSerialno);
+		status_t result = fReaderInterface->GetPageAt(position, &seekStreamState);
+		if (result != B_OK) {
+			return result; // pageno/fPagePosition corrupted?
+		}
+		// discard earlier packets from this page
+		uint packetno = fOggFrameInfos[*frame].GetPacket();
+		while (packetno-- > 0) {
+			ogg_packet packet;
+			if (ogg_stream_packetout(&fSeekStreamState, &packet) != 1) {
+				return B_ERROR; // packetno corrupted?
+			}
+		}
+		// clear out the former seek stream state
+		// this will delete its internal storage
+		ogg_stream_clear(&fSeekStreamState);
+		// initialize it with the temporary seek stream
+		// this will transfer the internal storage to it
+		fSeekStreamState = seekStreamState;
+		// we notably do not clear our temporary stream
+		// instead we just let it go out of scope
+		fCurrentFrame = *frame;
+	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
+		*frame = *time/50000;
+		return Seek(B_MEDIA_SEEK_TO_FRAME,frame,time);
+	}
 	return B_OK;
 }
 
@@ -166,12 +205,36 @@ OggStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 status_t
 OggStream::GetPacket(ogg_packet * packet)
 {
-	while (ogg_stream_packetpeek(&fStreamState,NULL) != 1) {
-		fReaderInterface->GetNextPage();
+	if (fCurrentFrame == fOggFrameInfos.size()) {
+		// at the end, pull the packet
+		uint old_page = fCurrentPage;
+		uint old_packet = fCurrentPacket;
+		while (ogg_stream_packetpeek(&fStreamState, NULL) != 1) {
+			fReaderInterface->GetNextPage();
+			fCurrentPage++;
+		}
+		if (ogg_stream_packetout(&fStreamState, packet) != 1) {
+			return B_ERROR;
+		}
+		OggFrameInfo info(old_page, old_packet);
+		fOggFrameInfos.push_back(info);
+		if (fCurrentPage != old_page) {
+			fCurrentPacket = 0;
+		} else {
+			fCurrentPacket++;
+		}
+	} else {
+		// in the middle, get packet at position
+		uint pageno = fOggFrameInfos[fCurrentFrame].GetPage();
+		while (ogg_stream_packetpeek(&fSeekStreamState, NULL) != 1) {
+			off_t position = fPagePositions[pageno++];
+			fReaderInterface->GetPageAt(position, &fSeekStreamState);
+		}
+		if (ogg_stream_packetout(&fSeekStreamState, packet) != 1) {
+			return B_ERROR;
+		}
 	}
-	if (ogg_stream_packetout(&fStreamState,packet) != 1) {
-		return B_ERROR;
-	}
+	fCurrentFrame++; // ever moving forward!
 	return B_OK;
 }
 

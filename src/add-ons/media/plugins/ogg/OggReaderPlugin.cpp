@@ -130,6 +130,10 @@ retry:
 				} while (ogg_page_serialno(&next_page) != serialno);
 				return B_OK;
 			}
+			virtual status_t GetPageAt(off_t position, ogg_stream_state * stream,
+                                       int read_size = 4*B_PAGE_SIZE) {
+				return reader->GetPageAt(position,stream,read_size);
+			}
 		};
 		fStreams[serialno] = OggStream::makeOggStream(new Interface(this, serialno), serialno, packet);
 		fCookies.push_back(fStreams[serialno]);
@@ -137,6 +141,51 @@ retry:
 	return fStreams[serialno]->AddPage(position,page);
 }
 
+
+status_t
+OggReader::GetPageAt(off_t position, ogg_stream_state * stream, int read_size)
+{
+	if (!fSeekable) {
+		return B_ERROR;
+	}
+	ogg_sync_state sync;
+	ogg_sync_init(&sync);
+	ogg_page page;
+	int result;
+	while ((result = ogg_sync_pageout(&sync,&page)) == 0) {
+		char * buffer = ogg_sync_buffer(&sync,read_size);
+		ssize_t bytes = fSeekable->ReadAt(position,buffer,read_size);
+		position += read_size;
+		if (bytes == 0) {
+			TRACE("OggReader::GetPage: Read: no data\n");
+			return B_LAST_BUFFER_ERROR;
+		}
+		if (bytes < 0) {
+			TRACE("OggReader::GetPage: Read: error\n");
+			return bytes;
+		}
+		if (ogg_sync_wrote(&sync,bytes) != 0) {
+			TRACE("OggReader::GetPage: ogg_sync_wrote failed?: error\n");
+			return B_ERROR;
+		}
+	}
+	if (result == -1) {
+		TRACE("OggReader::GetPageAt: ogg_sync_pageout: not synced??\n");
+		return B_ERROR;
+	}
+#ifdef STRICT_OGG
+	if (ogg_page_version(page) != 0) {
+		TRACE("OggReader::GetPageAt: ogg_page_version: error in page encoding??\n");
+		return B_ERROR;
+	}
+#endif
+	if (ogg_stream_pagein(stream, &page) != 0) {
+		TRACE("oggReader::GetPageAt: ogg_stream_pagein: failed??\n");
+		return B_ERROR;
+	}
+	ogg_sync_clear(&sync);
+	return B_OK;
+}
 
 static BPositionIO *
 get_seekable(BDataIO * data)
@@ -283,7 +332,7 @@ OggReader::GetNextChunk(void *cookie,
 						void **chunkBuffer, int32 *chunkSize,
 						media_header *mediaHeader)
 {
-	TRACE("OggReader::GetNextChunk\n");
+//	TRACE("OggReader::GetNextChunk\n");
 	OggStream * stream = static_cast<OggStream*>(cookie);
 	return stream->GetNextChunk(chunkBuffer,chunkSize,mediaHeader);
 }

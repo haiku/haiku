@@ -16,6 +16,7 @@
 
 #define DECODE_BUFFER_SIZE	(32 * 1024)
 
+
 inline size_t
 AudioBufferSize(media_raw_audio_format * raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
 {
@@ -23,56 +24,106 @@ AudioBufferSize(media_raw_audio_format * raf, bigtime_t buffer_duration = 50000 
          * (size_t)((raf->frame_rate * buffer_duration) / 1000000.0);
 }
 
-vorbisDecoder::vorbisDecoder()
+
+/*
+ * vorbis descriptions/formats
+ */
+
+
+static media_format_description
+vorbis_description()
 {
-	TRACE("vorbisDecoder::vorbisDecoder\n");
+	media_format_description description;
+	description.family = B_MISC_FORMAT_FAMILY;
+	description.u.misc.file_format = 'OggS';
+	description.u.misc.codec = 'vorb';
+	return description;
+}
+
+
+static void
+init_vorbis_media_raw_audio_format(media_raw_audio_format * output)
+{
+	output->format = media_raw_audio_format::B_AUDIO_FLOAT;
+	output->byte_order = B_MEDIA_HOST_ENDIAN;
+}
+
+
+static media_format
+vorbis_encoded_media_format()
+{
+	media_format format;
+	format.type = B_MEDIA_ENCODED_AUDIO;
+	format.user_data_type = B_CODEC_TYPE_INFO;
+	strncpy((char*)format.user_data, "vorb", 4);
+	format.u.encoded_audio.frame_size = sizeof(ogg_packet);
+	init_vorbis_media_raw_audio_format(&format.u.encoded_audio.output);
+	return format;
+}
+
+
+static media_format
+vorbis_decoded_media_format()
+{
+	media_format format;
+	format.type = B_MEDIA_RAW_AUDIO;
+	init_vorbis_media_raw_audio_format(&format.u.raw_audio);
+	return format;
+}
+
+
+/*
+ * VorbisDecoder
+ */
+
+
+VorbisDecoder::VorbisDecoder()
+{
+	TRACE("VorbisDecoder::VorbisDecoder\n");
 	vorbis_info_init(&fInfo);
 	vorbis_comment_init(&fComment);
-
+	
 	fStartTime = 0;
 	fFrameSize = 0;
 	fOutputBufferSize = 0;
 }
 
 
-vorbisDecoder::~vorbisDecoder()
+VorbisDecoder::~VorbisDecoder()
 {
-	TRACE("vorbisDecoder::~vorbisDecoder\n");
+	TRACE("VorbisDecoder::~VorbisDecoder\n");
 }
 
 
 void
-vorbisDecoder::GetCodecInfo(media_codec_info &info)
+VorbisDecoder::GetCodecInfo(media_codec_info &info)
 {
-	strcpy(info.short_name, "vorbis");
-	strcpy(info.pretty_name, "vorbis decoder, based on libvorbis");
+	strncpy(info.short_name, "vorbis", sizeof(info.short_name));
+	strncpy(info.pretty_name, "vorbis decoder, by Andrew Bachmann, based on libvorbis", sizeof(info.pretty_name));
 }
 
 
 status_t
-vorbisDecoder::Setup(media_format *inputFormat,
+VorbisDecoder::Setup(media_format *inputFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
-	if (inputFormat->type != B_MEDIA_ENCODED_AUDIO) {
-		TRACE("vorbisDecoder::Setup not called with audio stream: not vorbis\n");
-		return B_ERROR;
+	TRACE("VorbisDecoder::Setup\n");
+	if (!format_is_compatible(vorbis_encoded_media_format(),*inputFormat)) {
+		return B_MEDIA_BAD_FORMAT;
 	}
-	if (inputFormat->u.encoded_audio.encoding != 'vorb') {
-		TRACE("vorbisDecoder::Setup not called with 'vorb' stream: not vorbis\n");
-		return B_ERROR;
-	}
-	if (inputFormat->MetaDataSize() != sizeof(std::vector<ogg_packet> *)) {
-		TRACE("vorbisDecoder::Setup not called with ogg_packet<vector> meta data: not vorbis\n");
+	// grab header packets from meta data
+	if (inputFormat->MetaDataSize() != sizeof(std::vector<ogg_packet>)) {
+		TRACE("VorbisDecoder::Setup not called with ogg_packet<vector> meta data: not vorbis\n");
 		return B_ERROR;
 	}
 	std::vector<ogg_packet> * packets = (std::vector<ogg_packet> *)inputFormat->MetaData();
 	if (packets->size() != 3) {
-		TRACE("vorbisDecoder::Setup not called with three ogg_packets: not vorbis\n");
+		TRACE("VorbisDecoder::Setup not called with three ogg_packets: not vorbis\n");
 		return B_ERROR;
 	}
 	// parse header packet
 	if (vorbis_synthesis_headerin(&fInfo,&fComment,&(*packets)[0]) != 0) {
-		TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header\n");
+		TRACE("VorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header\n");
 		return B_ERROR;
 	}
 	// parse comment packet
@@ -88,68 +139,58 @@ vorbisDecoder::Setup(media_format *inputFormat,
 	// initialize decoder
 	vorbis_synthesis_init(&fDspState,&fInfo);
 	vorbis_block_init(&fDspState,&fBlock);
-	// fill out the encoding format
-	CopyInfoToEncodedFormat(inputFormat);
-	return B_OK;
+	// setup default output
+	media_format requested_format = vorbis_decoded_media_format();
+	((media_raw_audio_format)requested_format.u.raw_audio) = inputFormat->u.encoded_audio.output;
+	return NegotiateOutputFormat(&requested_format);
 }
 
-void vorbisDecoder::CopyInfoToEncodedFormat(media_format * format) {
-	format->type = B_MEDIA_ENCODED_AUDIO;
-// ToDo: this won't work any longer
-//	format->u.encoded_audio.encoding
-//	 = (media_encoded_audio_format::audio_encoding)'vorb';
-	if (fInfo.bitrate_nominal > 0) {
-		format->u.encoded_audio.bit_rate = fInfo.bitrate_nominal;
-	} else if (fInfo.bitrate_upper > 0) {
-		format->u.encoded_audio.bit_rate = fInfo.bitrate_upper;
-	} else if (fInfo.bitrate_lower > 0) {
-		format->u.encoded_audio.bit_rate = fInfo.bitrate_lower;
-	}
-	CopyInfoToDecodedFormat(&format->u.encoded_audio.output);
-	format->u.encoded_audio.frame_size = sizeof(ogg_packet);
-}	
-
-void vorbisDecoder::CopyInfoToDecodedFormat(media_raw_audio_format * raf) {
-	raf->frame_rate = (float)fInfo.rate; // XXX long->float ??
-	raf->channel_count = fInfo.channels;
-	raf->format = media_raw_audio_format::B_AUDIO_FLOAT; // XXX verify: support others?
-	raf->byte_order = B_MEDIA_HOST_ENDIAN; // XXX should support other endain, too
-
-	if (raf->buffer_size < 512 || raf->buffer_size > 65536) {
-		raf->buffer_size = AudioBufferSize(raf);
-    }
-	// setup output variables
-	fFrameSize = (raf->format & 0xf) * raf->channel_count;
-	fOutputBufferSize = raf->buffer_size;
-}
 
 status_t
-vorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
+VorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 {
-	TRACE("vorbisDecoder::NegotiateOutputFormat\n");
-	// BeBook says: The codec will find and return in ioFormat its best matching format
-	// => This means, we never return an error, and always change the format values
-	//    that we don't support to something more applicable
-	ioDecodedFormat->type = B_MEDIA_RAW_AUDIO;
-	CopyInfoToDecodedFormat(&ioDecodedFormat->u.raw_audio);
-	// add the media_mult_audio_format fields
-	if (ioDecodedFormat->u.raw_audio.channel_mask == 0) {
-		if (fInfo.channels == 1) {
-			ioDecodedFormat->u.raw_audio.channel_mask = B_CHANNEL_LEFT;
-		} else {
-			ioDecodedFormat->u.raw_audio.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
-		}
+	TRACE("VorbisDecoder::NegotiateOutputFormat\n");
+	// BMediaTrack::DecodedFormat
+	// Pass in ioFormat the format that you want (with wildcards
+	// as applicable). The codec will find and return in ioFormat 
+	// its best matching format.
+	//
+	// BMediaDecoder::SetOutputFormat
+	// sets the format the decoder should output. On return, 
+	// the outputFormat is changed to match the actual format
+	// that will be output; this can be different if you 
+	// specified any wildcards.
+	//
+	media_format format = vorbis_decoded_media_format();
+	format.u.raw_audio.frame_rate = (float)fInfo.rate;
+	format.u.raw_audio.channel_count = fInfo.channels;
+	format.u.raw_audio.channel_mask = B_CHANNEL_LEFT | (fInfo.channels != 1 ? B_CHANNEL_RIGHT : 0);
+	if (ioDecodedFormat->u.raw_audio.buffer_size < 512) {
+		format.u.raw_audio.buffer_size = AudioBufferSize(&format.u.raw_audio);
 	}
+	if (!format_is_compatible(format,*ioDecodedFormat)) {
+#ifdef NegotiateOutputFormat_AS_BEBOOK_SPEC
+		return B_ERROR;
+#else
+		// Be R5 behavior: never fail (?) => nuke the input format
+		*ioDecodedFormat = format;
+#endif
+	}
+	ioDecodedFormat->SpecializeTo(&format);
+	// setup output variables
+	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * 
+	             (ioDecodedFormat->u.raw_audio.channel_count);
+	fOutputBufferSize = ioDecodedFormat->u.raw_audio.buffer_size;
 	return B_OK;
 }
 
 
 status_t
-vorbisDecoder::Seek(uint32 seekTo,
+VorbisDecoder::Seek(uint32 seekTo,
 				 int64 seekFrame, int64 *frame,
 				 bigtime_t seekTime, bigtime_t *time)
 {
-	TRACE("vorbisDecoder::Seek\n");
+	TRACE("VorbisDecoder::Seek\n");
 	float **pcm;
 	// throw the old samples away!
 	int samples = vorbis_synthesis_pcmout(&fDspState,&pcm);
@@ -159,15 +200,15 @@ vorbisDecoder::Seek(uint32 seekTo,
 
 
 status_t
-vorbisDecoder::Decode(void *buffer, int64 *frameCount,
+VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
-//	TRACE("vorbisDecoder::Decode\n");
+//	TRACE("VorbisDecoder::Decode\n");
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
 	
 	mediaHeader->start_time = fStartTime;
-	//TRACE("vorbisDecoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
+	//TRACE("VorbisDecoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
 	
 	while (out_bytes_needed > 0) {
 		int samples;
@@ -182,11 +223,11 @@ vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				goto done;
 			}			
 			if (status != B_OK) {
-				TRACE("vorbisDecoder::Decode: GetNextChunk failed\n");
+				TRACE("VorbisDecoder::Decode: GetNextChunk failed\n");
 				return status;
 			}
 			if (chunkSize != sizeof(ogg_packet)) {
-				TRACE("vorbisDecoder::Decode: chunk not ogg_packet-sized\n");
+				TRACE("VorbisDecoder::Decode: chunk not ogg_packet-sized\n");
 				return B_ERROR;
 			}
 			ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
@@ -207,7 +248,7 @@ vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 		vorbis_synthesis_read(&fDspState,samples);
 		
 		fStartTime += (1000000LL * samples) / fInfo.rate;
-		//TRACE("vorbisDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
+		//TRACE("VorbisDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 	}
 	
 done:
@@ -219,8 +260,14 @@ done:
 	return B_LAST_BUFFER_ERROR;
 }
 
+
+/*
+ * VorbisDecoderPlugin
+ */
+
+
 Decoder *
-vorbisDecoderPlugin::NewDecoder()
+VorbisDecoderPlugin::NewDecoder()
 {
 	static BLocker locker;
 	static bool initdone = false;
@@ -228,28 +275,30 @@ vorbisDecoderPlugin::NewDecoder()
 	if (!initdone) {
 		initdone = true;
 	}
-	return new vorbisDecoder;
+	return new VorbisDecoder;
 }
-
 
 status_t
-vorbisDecoderPlugin::RegisterDecoder()
+VorbisDecoderPlugin::RegisterDecoder()
 {
-	media_format_description description;
-	// ToDo: what about B_OGG_FORMAT_FAMILY?
-	description.family = B_MISC_FORMAT_FAMILY;
-	description.u.misc.file_format = 'ogg ';
-	description.u.misc.codec = 'vorb';
+	media_format_description description = vorbis_description();
+	media_format format = vorbis_encoded_media_format();
 
-	media_format format;
-	format.type = B_MEDIA_ENCODED_AUDIO;
-	format.u.encoded_audio = media_encoded_audio_format::wildcard;
-
-	return BMediaFormats().MakeFormatFor(&description, 1, &format);
+	BMediaFormats formats;
+	status_t result = formats.InitCheck();
+	if (result != B_OK) {
+		return result;
+	}
+	return formats.MakeFormatFor(&description, 1, &format);
 }
+
+
+/*
+ * instantiate_plugin
+ */
 
 
 MediaPlugin *instantiate_plugin()
 {
-	return new vorbisDecoderPlugin;
+	return new VorbisDecoderPlugin;
 }

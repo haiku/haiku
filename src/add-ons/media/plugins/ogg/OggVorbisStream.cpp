@@ -85,7 +85,7 @@ OggVorbisStream::IsValidHeader(const ogg_packet & packet)
 OggVorbisStream::OggVorbisStream(long serialno)
 	: OggStream(serialno)
 {
-
+	TRACE("OggVorbisStream::OggVorbisStream\n");
 }
 
 OggVorbisStream::~OggVorbisStream()
@@ -151,9 +151,6 @@ OggVorbisStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 
 	// fill out format from header packet
-	format->type = B_MEDIA_ENCODED_AUDIO;
-	format->user_data_type = B_CODEC_TYPE_INFO;
-	strncpy((char*)format->user_data, "vorb", 4);
 	if (info.bitrate_nominal > 0) {
 		format->u.encoded_audio.bit_rate = info.bitrate_nominal;
 	} else if (info.bitrate_upper > 0) {
@@ -166,11 +163,8 @@ OggVorbisStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	} else {
 		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 	}
-	format->u.encoded_audio.frame_size = sizeof(ogg_packet);
 	format->u.encoded_audio.output.frame_rate = (float)info.rate;
 	format->u.encoded_audio.output.channel_count = info.channels;
-	format->u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	format->u.encoded_audio.output.byte_order = B_MEDIA_HOST_ENDIAN;
 	format->u.encoded_audio.output.buffer_size
 	  = AudioBufferSize(&format->u.encoded_audio.output);
 
@@ -192,7 +186,7 @@ OggVorbisStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 		SaveHeaderPacket(packet);
 	}
 
-	format->SetMetaData((void*)&fHeaderPackets,sizeof(&fHeaderPackets));
+	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
 	*duration = 80000000;
 	*frameCount = 60000;
 	return B_OK;

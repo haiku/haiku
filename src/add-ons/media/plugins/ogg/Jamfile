@@ -5,6 +5,7 @@ UsePrivateHeaders media ;
 SubDirHdrs [ FDirName $(SUBDIR) libogg ] ;
 
 Addon ogg : media plugins :
+	OggFrameInfo.cpp
 	OggReaderPlugin.cpp
 	OggStream.cpp
 	OggSpeexStream.cpp
