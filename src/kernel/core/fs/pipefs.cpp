@@ -50,6 +50,7 @@ class ReadRequest {
 		~ReadRequest();
 
 		status_t	Wait(bool nonBlocking);
+		void		Notify();
 		void		Abort();
 
 		status_t	PutBufferChain(cbuf *bufferChain, size_t *_bytesRead = NULL,
@@ -549,10 +550,8 @@ Inode::WriteBufferToChain(const void **_buffer, size_t *_bytesLeft, bool nonBloc
 	}
 
 	// join this chain with our already existing chain (if any)
+	fBufferChain = cbuf_merge_chains(fBufferChain, chain);
 
-	chain = cbuf_merge_chains(fBufferChain, chain);
-
-	fBufferChain = chain;
 	*_buffer = (const void *)((addr_t)buffer + bufferSize);
 	*_bytesLeft -= bufferSize;
 
@@ -586,12 +585,18 @@ Inode::FillPendingRequests()
 	ReadRequest *request;
 	DoublyLinked::Iterator<ReadRequest> iterator(fRequests);
 	while (bytesLeft != 0 && (request = iterator.Next()) != NULL) {
-		// try to fill this request
-		size_t bytesRead;
-		if (request->PutBufferChain(fBufferChain, &bytesRead, true) == B_OK) {
-			bytesLeft -= bytesRead;
-			MayReleaseWriter();
-		}
+		// notify the request, so that it can be filled
+		size_t space = request->SpaceLeft();
+		if (space == 0)
+			continue;
+
+		if (space > bytesLeft)
+			bytesLeft = 0;
+		else
+			bytesLeft -= space;
+
+		request->Notify();
+		MayReleaseWriter();
 	}
 }
 
@@ -781,9 +786,16 @@ ReadRequest::Wait(bool nonBlocking)
 
 
 void
+ReadRequest::Notify()
+{
+	release_sem(fLock);
+}
+
+
+void
 ReadRequest::Abort()
 {
-	fBytesRead = 0;
+	fBuffer = NULL;
 	release_sem(fLock);
 }
 
@@ -799,6 +811,9 @@ ReadRequest::PutBufferChain(cbuf *bufferChain, size_t *_bytesRead, bool releaseP
 
 	if (_bytesRead)
 		*_bytesRead = 0;
+
+	if (fBuffer == NULL)
+		return B_CANCELED;
 
 	if (bufferChain == NULL)
 		return B_OK;
@@ -824,6 +839,7 @@ ReadRequest::PutBufferChain(cbuf *bufferChain, size_t *_bytesRead, bool releaseP
 		// if that call fails, the next read will duplicate the input
 		dprintf("pipefs: cbuf_truncate_head() failed for cbuf %p\n", bufferChain);
 	}
+
 	fBytesRead += length;
 	if (_bytesRead)
 		*_bytesRead = length;
