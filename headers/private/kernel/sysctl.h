@@ -5,6 +5,8 @@
 #ifndef _SYS_SYSCTL_H
 #define _SYS_SYSCTL_H
 
+#include <sys/types.h>
+
 /* This file contains definitions for the sysctl call.
  * The call uses a heirachy of names for objects that can be
  * examined or modified. The name is expressed as a sequence
