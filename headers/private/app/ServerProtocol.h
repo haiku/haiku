@@ -98,6 +98,9 @@ AS_UPDATED_CLIENT_FONTLIST,
 AS_GET_FAMILY_ID,
 AS_GET_STYLE_ID,
 AS_GET_STYLE_FOR_FACE,
+AS_SET_SYSFONT_PLAIN,
+AS_SET_SYSFONT_BOLD,
+AS_SET_SYSFONT_FIXED,
 
 // This will be modified. Currently a kludge for the input server until
 // BScreens are implemented by the IK Taeam
