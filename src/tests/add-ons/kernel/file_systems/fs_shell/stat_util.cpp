@@ -143,7 +143,7 @@ from_platform_mode(mode_t mode)
 
 
 mode_t
-to_platform_mode(my_mode_t mode)
+to_platform_mode(my_mode_t myMode)
 {
 	#define SET_ST_MODE_BIT(flag, myFlag)	\
 		if (myMode & myFlag)			\
@@ -204,27 +204,9 @@ to_platform_mode(my_mode_t mode)
 void
 from_platform_stat(const struct stat *st, struct my_stat *myst)
 {
-	st->st_dev = myst->dev;
-	st->st_ino = myst->ino;
-	st->st_mode = from_platform_mode(myst->mode);
-	st->st_nlink = myst->nlink;
-	st->st_uid = myst->uid;
-	st->st_gid = myst->gid;
-	st->st_size = myst->size;
-	st->st_blksize = myst->blksize;
-	st->st_atime = myst->atime;
-	st->st_mtime = myst->mtime;
-	st->st_ctime = myst->ctime;
-//	st->st_crtime = myst->crtime;
-}
-
-
-void
-to_platform_stat(const struct my_stat *myst, struct stat *st)
-{
 	myst->dev = st->st_dev;
 	myst->ino = st->st_ino;
-	myst->st_mode = to_platform_mode(st->st_mode);
+	myst->mode = from_platform_mode(st->st_mode);
 	myst->nlink = st->st_nlink;
 	myst->uid = st->st_uid;
 	myst->gid = st->st_gid;
@@ -234,6 +216,24 @@ to_platform_stat(const struct my_stat *myst, struct stat *st)
 	myst->mtime = st->st_mtime;
 	myst->ctime = st->st_ctime;
 	myst->crtime = st->st_ctime;
+}
+
+
+void
+to_platform_stat(const struct my_stat *myst, struct stat *st)
+{
+	st->st_dev = myst->dev;
+	st->st_ino = myst->ino;
+	st->st_mode = to_platform_mode(myst->mode);
+	st->st_nlink = myst->nlink;
+	st->st_uid = myst->uid;
+	st->st_gid = myst->gid;
+	st->st_size = myst->size;
+	st->st_blksize = myst->blksize;
+	st->st_atime = myst->atime;
+	st->st_mtime = myst->mtime;
+	st->st_ctime = myst->ctime;
+//	st->st_crtime = myst->crtime;
 }
 
 #endif // !__BEOS__
