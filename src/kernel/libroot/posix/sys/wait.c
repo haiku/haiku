@@ -11,21 +11,20 @@
 #include <errno.h>
 
 
-// ToDo: properly implement wait(), waitpid(), and waitid()
+// ToDo: properly implement waitpid(), and waitid()
 
 
 pid_t
 wait(int *_status)
 {
-	fprintf(stderr, "wait(): NOT IMPLEMENTED\n");
-	return -1;
+	return waitpid(-1, _status, 0);
 }
 
 
 pid_t
 waitpid(pid_t pid, int *_status, int options)
 {
-	fprintf(stderr, "waitpid(): NOT IMPLEMENTED\n");
+	fprintf(stderr, "waitpid(pid = %ld, options = %d): NOT IMPLEMENTED\n", pid, options);
 	return -1;
 }
 
