@@ -1353,10 +1353,35 @@ err:
 thread_id
 find_thread(const char *name)
 {
+	struct hash_iterator iterator;
+	struct thread *thread;
+	cpu_status state;
+
 	if (name == NULL)
 		return thread_get_current_thread_id();
 
-	// ToDo: implement me!
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	// ToDo: this might not be in the same order as find_thread() in BeOS
+	//		which could be theoreticly problematic.
+	// ToDo: scanning the whole list with the thread lock held isn't exactly
+	//		cheap either - although this function is probably used very rarely.
+
+	hash_open(thread_hash, &iterator);
+	while ((thread = hash_next(thread_hash, &iterator)) != NULL) {
+		// Search through hash
+		if (thread->name != NULL && !strcmp(thread->name, name)) {
+			thread_id id = thread->id;
+
+			RELEASE_THREAD_LOCK();
+			restore_interrupts(state);
+			return id;
+		}
+	}
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
 
 	return B_ENTRY_NOT_FOUND;
 }
