@@ -19,7 +19,7 @@
 #include "DormantNodeManager.h"
 #include "Notifications.h"
 
-#define USER_ADDON_PATH "../add-ons/media"
+//#define USER_ADDON_PATH "../add-ons/media"
 
 void DumpFlavorInfo(const flavor_info *info);
 
