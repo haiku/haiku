@@ -1,5 +1,6 @@
 SUPPORT_KIT_SOURCE =
 	Archivable.cpp
+	Beep.cpp
 	BlockCache.cpp
 	ByteOrder.cpp
 	DataIO.cpp
