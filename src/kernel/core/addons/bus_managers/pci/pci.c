@@ -433,7 +433,7 @@ static int pci_get_capability(uint8 bus, uint8 dev, uint8 func, uint8 cap,
                               uint8 *offs)
 {
 	uint16 status;
-	uint32 reg_data;
+	uint8 cap_data;
 	uint8 hdr_type;
 	uint8 ofs;
 	int maxcount;
@@ -458,27 +458,33 @@ static int pci_get_capability(uint8 bus, uint8 dev, uint8 func, uint8 cap,
 			return 0;
 	}
 
-	/* the 192 bytes vendor defined configuration space
-	 * can hold as maximum 48 times a 32 bit capability
+	/* the 192 bytes vendor defined configuration space can 
+	 * hold as maximum 48 times a 32 bit aligned capability,
+	 * we use this as abort condition to avoid lock up by 
+	 * searching in a circular loop on bad hardware
 	 */
 	maxcount = 48; 
 	ofs = read_pci_config(bus, dev, func, ofs, 1);
 	while (maxcount-- != 0 && ofs != 0) {
 
-		/* mask off potentially wrong bits */
+		/* mask off low two bits, demanded by PCI standard */
 		ofs &= ~3; 
+		
+		/* PCI specification 2.2, section 6.8.1.1 and following
+		 * describe capability ID and next capability position as
+		 * two 8 bit values, the "capability ID" is at the 32 bit
+		 * aligned position, after it the "next pointer" follows.
+		 */
 
-		/* capabilities must be read as 32bit access */
-		reg_data = read_pci_config(bus, dev, func, ofs, 4);
-
-		/* lower 8 bit (0 to 7) contain the capability */
-		if ((reg_data & 0xff) == cap) {
+		/* read the 8 bit capability id is at the 32bit aligned ofs position */
+		cap_data = read_pci_config(bus, dev, func, ofs, 1);
+		if (cap_data == cap) {
 			if (offs)
 				*offs = ofs;
 			return 1;
 		}
-		/* bit 8 to 15 contain next capability position */
-		ofs = (reg_data >> 8) & 0xff;
+		/* at ofs + 1, we can read the next capability position */
+		ofs = read_pci_config(bus, dev, func, ofs + 1, 1);
 	}
 	return 0;
 }
