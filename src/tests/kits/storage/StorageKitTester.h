@@ -1,6 +1,15 @@
 #ifndef __sk_testing_is_so_much_fun_h__
 #define __sk_testing_is_so_much_fun_h__
 
+// Some nicer test macros.
+#ifdef TEST_R5
+#define SK_TEST_R5			1
+#define SK_TEST_OBOS_POSIX	0
+#else
+#define SK_TEST_R5			0
+#define SK_TEST_OBOS_POSIX	1
+#endif
+
 #include <CppUnitShell.h>
 #include <cppunit/TestCase.h>
 #include <cppunit/TestSuite.h>
