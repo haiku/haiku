@@ -86,6 +86,19 @@ scrup(void)
 
 
 static void
+clear_screen(void)
+{
+	uint16 *base = (uint16 *)origin;
+	uint32 i;
+
+	for (i = 0; i < COLUMNS * LINES; i++)
+		base[i] = 0xf20;
+
+	pos = origin;
+}
+
+
+static void
 lf(void)
 {
 	if (y+1<bottom) {
@@ -306,6 +319,7 @@ console_dev_init(kernel_args *ka)
 		dprintf("con_init: mapping vid mem\n");
 		vm_map_physical_memory(vm_get_kernel_aspace_id(), "vid_mem", (void *)&origin, B_ANY_KERNEL_ADDRESS,
 			SCREEN_END - SCREEN_START, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, SCREEN_START);
+
 		dprintf("con_init: mapped vid mem to virtual address 0x%x\n", origin);
 
 		pos = origin;
@@ -316,7 +330,10 @@ console_dev_init(kernel_args *ka)
 		 *       access to this information. We probably need to find a
 		 *       better way of doing this.
 		 */
-		gotoxy(0, ka->cons_line);
+		if (ka->cons_line != 0)
+			gotoxy(0, ka->cons_line);
+		else
+			clear_screen();
 		update_cursor(x, y);
 
 		mutex_init(&console_lock, "console_lock");
