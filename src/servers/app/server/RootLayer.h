@@ -98,10 +98,6 @@ public:
 	
 	void AddWinBorderToWorkspaces(WinBorder *winBorder, uint32 wks);
 
-	// Input related methods
-	void MouseEventHandler(int32 code, BPortLink& link);
-	void KeyboardEventHandler(int32 code, BPortLink& link);
-	
 	void SetDragMessage(BMessage *msg);
 	BMessage *DragMessage(void) const;
 
@@ -142,6 +138,10 @@ friend class Desktop;
 
 			void			invalidate_layer(Layer *layer, const BRegion &region);
 			void			redraw_layer(Layer *layer, const BRegion &region);
+
+	// Input related methods
+	void MouseEventHandler(int32 code, BPortLink& link);
+	void KeyboardEventHandler(int32 code, BPortLink& link);
 
 	Desktop *fDesktop;
 	BMessage *fDragMessage;
