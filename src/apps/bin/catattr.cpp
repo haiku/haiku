@@ -81,10 +81,8 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 
 	// limit size of the attribute, only the first 64k will make it on screen
 	off_t size = info.size;
-//	if (size > 64 * 1024)
-//		size = 64 * 1024;
-	if (size > 64)
-		size = 64;
+	if (size > 64 * 1024)
+		size = 64 * 1024;
 
 	char* buffer = new char[size];
 	ssize_t bytesRead = fs_read_attr(fd, attribute, info.type, 0, buffer, size);
