@@ -136,7 +136,6 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	fWorkspaces = index;
 	
 	fWinBorder = NULL;
-	fTopLayer = NULL;
 	
 	// fClientWinPort is the port to which the app awaits messages from the server
 	fClientWinPort = winport;
@@ -163,12 +162,6 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	if(vCode != AS_LAYER_CREATE)
 		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received! - 2\n");
 
-	// Start receiving top_view data -- pass NULL as the parent view.
-	// This should be the *only* place where this happens.
-	fTopLayer = CreateLayerTree(NULL);
-	fTopLayer->SetAsTopLayer(true);
-	cl = fTopLayer;
-
 	STRACE(("ServerWindow %s:\n",fTitle.String()));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
 	STRACE(("\tPort: %ld\n",fMessagePort));
@@ -181,8 +174,14 @@ void ServerWindow::Init(void)
 			this, desktop->GetDisplayDriver());
 	fWinBorder->RebuildFullRegion();
 
+	// Start receiving top_view data -- pass NULL as the parent view.
+	// This should be the *only* place where this happens.
+	fWinBorder->fTopLayer = CreateLayerTree(NULL);
+	fWinBorder->fTopLayer->SetAsTopLayer(true);
+	cl = fWinBorder->fTopLayer;
+
 	// connect decorator and top layer.
-	fWinBorder->AddChild(fTopLayer, NULL);
+	fWinBorder->AddChild(fWinBorder->fTopLayer, NULL);
 
 	// NOTE: this MUST be before the monitor thread is spawned!
 	desktop->AddWinBorder(fWinBorder);
@@ -216,9 +215,6 @@ ServerWindow::~ServerWindow(void)
 	
 	cl = NULL;
 	
-	if (fTopLayer)
-		delete fTopLayer;
-
 	STRACE(("#ServerWindow(%s) will exit NOW!!!\n", fTitle.String()));
 }
 //5700 - fara servo , fara cas
@@ -292,13 +288,13 @@ void ServerWindow::Show(void)
 					WinBorder		*previousFocus;
 					BRegion			invalidRegion;
 					Workspace		*ws;
-
+// TODO: can you unify this method with Desktop::MouseEventHandler::B_MOUSE_DOWN
 					ws				= rl->WorkspaceAt(i+1);
 					ws->BringToFrontANormalWindow(fWinBorder);
 					ws->SearchAndSetNewFront(fWinBorder);
 					previousFocus	= ws->FocusLayer();
 					ws->SetFocusLayer(fWinBorder);
-
+// TODO: only do this in for the active workspace!
 					// first redraw previous window's decorator. It has lost focus state.
 					if (previousFocus)
 						if (previousFocus->fDecorator)
@@ -306,9 +302,9 @@ void ServerWindow::Show(void)
 
 					// we must build the rebuild region. we have nowhere to take it from.
 					// include decorator's(if any) and fTopLayer's full regions.
-					fTopLayer->RebuildFullRegion();
+					fWinBorder->fTopLayer->RebuildFullRegion();
 					fWinBorder->RebuildFullRegion();
-					invalidRegion.Include(&(fTopLayer->fFull));
+					invalidRegion.Include(&(fWinBorder->fTopLayer->fFull));
 					if (fWinBorder->fDecorator)
 						invalidRegion.Include(&(fWinBorder->fFull));
 
@@ -828,7 +824,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			fSession->ReadInt32(&token);
 			
-			Layer *current = FindLayer(fTopLayer, token);
+			Layer *current = FindLayer(fWinBorder->fTopLayer, token);
 			
 			if (current)
 				cl=current;

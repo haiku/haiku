@@ -91,6 +91,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	fKeyModifiers	= 0;
 	fMainWinBorder	= NULL;
 	fDecorator		= NULL;
+	fTopLayer		= NULL;
 	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
 	fFlags			= B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
 
@@ -114,6 +115,11 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 WinBorder::~WinBorder(void)
 {
 	STRACE(("WinBorder(%s)::~WinBorder()\n",GetName()));
+	if (fTopLayer){
+		delete fTopLayer;
+		fTopLayer = NULL;
+	}
+
 	if (fDecorator)	
 	{
 		delete fDecorator;
@@ -132,7 +138,7 @@ void WinBorder::RebuildFullRegion(void)
 		fDecorator->GetFootprint(&fFull);
 }
 
-void WinBorder::MouseDown(PortMessage *msg)
+void WinBorder::MouseDown(PortMessage *msg, bool sendMessage)
 {
 	if (!(Window()->IsLocked()))
 		debugger("you must lock the attached ServerWindow object\n\t before calling WinBorder::MouseDown()\n");
@@ -225,8 +231,7 @@ void WinBorder::MouseDown(PortMessage *msg)
 			}
 		}
 	}
-	else
-	{
+	else if (sendMessage){
 		BMessage msg;
 		msg.what= B_MOUSE_DOWN;
 		msg.AddInt64("when", time);

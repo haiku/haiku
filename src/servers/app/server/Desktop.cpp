@@ -395,15 +395,53 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			target		= ws->SearchWinBorder(pt);
 			if (target)
 			{
+				WinBorder		*previousFocus;
+				WinBorder		*activeFocus;
+				BRegion			invalidRegion;
+
 				fGeneralLock.Lock();
 				rl->fMainLock.Lock();
-				target->Window()->Lock();
 
+				ws->BringToFrontANormalWindow(target);
 				ws->SearchAndSetNewFront(target);
-				ws->SetFocusLayer(target);
+				previousFocus	= ws->FocusLayer();
+				activeFocus		= ws->SetFocusLayer(target);
+printf("target: %s\n", target? target->GetName(): "NULL");
+printf("previousFocus: %s\n", previousFocus? previousFocus->GetName(): "NULL");
+printf("activeFocus: %s\n", activeFocus? activeFocus->GetName(): "NULL");
+				activeFocus->Window()->Lock();
+
+// TODO: more work needs to be done. Think! Think! Think again!
+// remember - front != focus. Also put modal windows into equation!
+
+// a HINT: inside Decorator 'highlight' flag is not set before a redraw with
+// activeFocus->fParent->FullInvalidate(invalidRegion);
+				if (activeFocus != previousFocus){
+					// redraw decorator in its active mode.
+					if (activeFocus){
+						if (activeFocus->fDecorator){
+							invalidRegion.Include(&(activeFocus->fVisible));
+							activeFocus->fParent->FullInvalidate(invalidRegion);
+						}
+						// let WinBorder know we have the mouse down.
+						if (activeFocus->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
+							activeFocus->MouseDown(msg, false);
+						else
+							activeFocus->MouseDown(msg, true);
+					}
+
+					// redraw previous window's decorator. It has lost focus state.
+					if (previousFocus)
+						if (previousFocus->fDecorator)
+							previousFocus->fParent->Invalidate(previousFocus->fVisible);
+				}
+				else{
+					// let WinBorder know we have the mouse down. This is the same window as before.
+					if (activeFocus)
+						activeFocus->MouseDown(msg, true);
+				}
 				
-				fMouseTarget = target;
-				target->MouseDown(msg);
+				fMouseTarget = activeFocus;
 
 				target->Window()->Unlock();
 				rl->fMainLock.Unlock();

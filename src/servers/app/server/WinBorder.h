@@ -36,6 +36,7 @@ class ServerWindow;
 class Decorator;
 class DisplayDriver;
 class PortMessage;
+class Desktop;
 
 class WinBorder : public Layer
 {
@@ -51,7 +52,7 @@ public:
 
 	virtual	void RebuildFullRegion(void);
 
-	void MouseDown(PortMessage *msg);
+	void MouseDown(PortMessage *msg, bool sendMessage);
 	void MouseMoved(PortMessage *msg);
 	void MouseUp(PortMessage *msg);
 	
@@ -79,8 +80,11 @@ public:
 protected:
 	friend class Layer;
 	friend class ServerWindow;
+	friend class Desktop;
 
 	Decorator *fDecorator;
+	Layer *fTopLayer;
+
 	int32 fMouseButtons;
 	int32 fKeyModifiers;
 	BPoint fLastMousePosition;
