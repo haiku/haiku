@@ -16,7 +16,7 @@ class TerminalWindow
 	: public BWindow
 {
 public:
-	                  TerminalWindow(BPoint topLeft, BMessage * settings = 0);
+	                  TerminalWindow(BMessage * settings = 0);
 	virtual           ~TerminalWindow();
 	
 	virtual void      Quit(void);

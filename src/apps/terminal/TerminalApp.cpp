@@ -66,8 +66,7 @@ TerminalApp::MessageReceived(BMessage *message)
 void
 TerminalApp::OpenTerminal(BMessage * message)
 {
-	BPoint windowPoint(7,26);
-	TerminalWindow * terminal = new TerminalWindow(windowPoint,message);
+	TerminalWindow * terminal = new TerminalWindow(message);
 	fWindowOpened = true;
 }
 

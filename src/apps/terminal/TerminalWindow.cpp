@@ -24,13 +24,15 @@
 
 #include <debugger.h>
 
-int id = 1;
+BRect terminalWindowBounds(0,0,560,390);
 
-TerminalWindow::TerminalWindow(BPoint topLeft, BMessage * settings)
-	: BWindow(BRect(topLeft,topLeft+BPoint(560,390)),
-			  "terminal",B_DOCUMENT_WINDOW,0)
+TerminalWindow::TerminalWindow(BMessage * settings)
+	: BWindow(terminalWindowBounds.OffsetBySelf(7,26),
+			  "Terminal",B_DOCUMENT_WINDOW,0)
 {
 	fInitStatus = B_ERROR;
+	int id = 1;
+
 	fInitStatus = InitWindow(id++);
 	Show();
 }
@@ -349,7 +351,7 @@ TerminalWindow::SwitchTerminals(BMessage * message)
 		return;
 	}
 	do {
-		index = (index-1)%teams.CountItems();
+		index = (index+teams.CountItems()-1)%teams.CountItems();
 		team_id next = (team_id)teams.ItemAt(index);
 		result = be_roster->ActivateApp(next);
 	} while (result != B_OK);
