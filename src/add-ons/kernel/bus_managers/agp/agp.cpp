@@ -302,6 +302,8 @@ void enable_agp (uint32 *command)
 		/* AGP 3.0 scheme applies */
 		if (*command & AGP_3_8x) *command |= AGP_3_4x;
 		*command &= ~0x00000004;
+		/* SBA is required for AGP3 */
+		*command |= AGP_SBA;
 	}
 	/* reset all other reserved and currently unused bits */
 	*command &= ~0x00fffce0;
@@ -366,11 +368,9 @@ void enable_agp (uint32 *command)
 		if (pd->di[count].agpi.class_base == PCI_display)
 		{
 			pci_info *pcii = &(pd->di[count].pcii);
-			/* program graphicscard */
-			set_pci(pd->di[count].agp_adress + 8, 4, *command);
+			/* program graphicscard, making sure not-implemented bits are written as zeros */
+			set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~AGP_rate_rev));
 			/* update our agp_cmd info with read back setting from register just programmed */
-			/* note:
-			 * this 'sequence' resets the non-writable register bit AGP_rate_rev in our info */
 			pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
 		}
 	}
@@ -440,8 +440,15 @@ static void check_settings(uint32 *command)
 	}
 	if (current_settings.block_sba)
 	{
-		TRACE("agp_man: blocking SBA (agp.settings)\n");
-		*command &= ~AGP_SBA;
+		if (!(*command & AGP_rate_rev))
+		{
+			TRACE("agp_man: blocking SBA (agp.settings)\n");
+			*command &= ~AGP_SBA;
+		}
+		else
+		{
+			TRACE("agp_man: SBA is required for AGP3, not blocking (agp.settings)\n");
+		}
 	}
 	if (current_settings.block_fw)
 	{
