@@ -1,6 +1,5 @@
 SubDir OBOS_TOP src add-ons print drivers canon_lips ;
 
-SubInclude OBOS_TOP src add-ons print drivers canon_lips libprint ;
 SubInclude OBOS_TOP src add-ons print drivers canon_lips lips3 ;
 SubInclude OBOS_TOP src add-ons print drivers canon_lips lips4 ;
 
