@@ -39,6 +39,8 @@ static const char *testType2
 	= "application/x-vnd.obos.app-file-info-test2";
 static const char *testType3
 	= "application/x-vnd.obos.app-file-info-test3";
+static const char *testType4
+	= "application/x-vnd.obos.app-file-info-test4";
 static const char *invalidTestType	= "invalid-mime-type";
 static const char *tooLongTestType	=
 "0123456789012345678901234567890123456789012345678901234567890123456789"
@@ -136,26 +138,26 @@ AppFileInfoTest::Suite() {
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
 	typedef CppUnit::TestCaller<AppFileInfoTest> TC;
 		
-//	suite->addTest( new TC("BAppFileInfo::Init Test1",
-//						   &AppFileInfoTest::InitTest1) );
-//	suite->addTest( new TC("BAppFileInfo::Init Test2",
-//						   &AppFileInfoTest::InitTest2) );
-//	suite->addTest( new TC("BAppFileInfo::Type Test",
-//						   &AppFileInfoTest::TypeTest) );
-//	suite->addTest( new TC("BAppFileInfo::Signature Test",
-//						   &AppFileInfoTest::SignatureTest) );
-//	suite->addTest( new TC("BAppFileInfo::App Flags Test",
-//						   &AppFileInfoTest::AppFlagsTest) );
+	suite->addTest( new TC("BAppFileInfo::Init Test1",
+						   &AppFileInfoTest::InitTest1) );
+	suite->addTest( new TC("BAppFileInfo::Init Test2",
+						   &AppFileInfoTest::InitTest2) );
+	suite->addTest( new TC("BAppFileInfo::Type Test",
+						   &AppFileInfoTest::TypeTest) );
+	suite->addTest( new TC("BAppFileInfo::Signature Test",
+						   &AppFileInfoTest::SignatureTest) );
+	suite->addTest( new TC("BAppFileInfo::App Flags Test",
+						   &AppFileInfoTest::AppFlagsTest) );
 	suite->addTest( new TC("BAppFileInfo::Supported Types Test",
 						   &AppFileInfoTest::SupportedTypesTest) );
-//	suite->addTest( new TC("BAppFileInfo::Icon Test",
-//						   &AppFileInfoTest::IconTest) );
-//	suite->addTest( new TC("BAppFileInfo::Version Info Test",
-//						   &AppFileInfoTest::VersionInfoTest) );
-//	suite->addTest( new TC("BAppFileInfo::Icon For Type Test",
-//						   &AppFileInfoTest::IconForTypeTest) );
-//	suite->addTest( new TC("BAppFileInfo::Info Location Test",
-//						   &AppFileInfoTest::InfoLocationTest) );
+	suite->addTest( new TC("BAppFileInfo::Icon Test",
+						   &AppFileInfoTest::IconTest) );
+	suite->addTest( new TC("BAppFileInfo::Version Info Test",
+						   &AppFileInfoTest::VersionInfoTest) );
+	suite->addTest( new TC("BAppFileInfo::Icon For Type Test",
+						   &AppFileInfoTest::IconForTypeTest) );
+	suite->addTest( new TC("BAppFileInfo::Info Location Test",
+						   &AppFileInfoTest::InfoLocationTest) );
 
 	return suite;
 }		
@@ -206,7 +208,7 @@ AppFileInfoTest::tearDown()
 	fApplication = NULL;
 	// remove the types we've added
 	const char * const testTypes[] = {
-		testType1, testType2, testType3,
+		testType1, testType2, testType3, testType4,
 		testAppSignature1, testAppSignature2, testAppSignature3
 	};
 	for (uint32 i = 0; i < sizeof(testTypes) / sizeof(const char*); i++) {
@@ -345,6 +347,431 @@ CheckNoResource(BFile &file, const char *name)
 	CHK(!found);
 }
 
+// TypeValue
+struct TypeValue
+{
+	TypeValue() : type() {}
+	TypeValue(const char *type) : type(type) {}
+
+	bool operator==(const TypeValue &value)
+	{
+		return (type == value.type);
+	}
+
+	string type;
+};
+
+// TypeSetter
+struct TypeSetter
+{
+	static status_t Set(BAppFileInfo &info, const TypeValue &value)
+	{
+		return info.SetType(value.type.c_str());
+	}
+};
+
+// TypeGetter
+struct TypeGetter
+{
+	static status_t Get(BAppFileInfo &info, TypeValue &value)
+	{
+		char buffer[B_MIME_TYPE_LENGTH];
+		status_t error = info.GetType(buffer);
+		if (error == B_OK)
+			value.type = buffer;
+		return error;
+	}
+};
+
+// TypeChecker
+struct TypeChecker
+{
+	static void CheckAttribute(BNode &file, const TypeValue &value)
+	{
+		CheckAttr(file, kTypeAttribute, B_MIME_STRING_TYPE, value.type.c_str(),
+				  value.type.length() + 1);
+	}
+
+	static void CheckResource(BFile &file, const TypeValue &value)
+	{
+		::CheckResource(file, kTypeAttribute, kTypeResourceID,
+						B_MIME_STRING_TYPE, value.type.c_str(),
+						value.type.length() + 1);
+	}
+};
+
+typedef TypeValue SignatureValue;
+
+// SignatureSetter
+struct SignatureSetter
+{
+	static status_t Set(BAppFileInfo &info, const SignatureValue &value)
+	{
+		return info.SetSignature(value.type.c_str());
+	}
+};
+
+// SignatureGetter
+struct SignatureGetter
+{
+	static status_t Get(BAppFileInfo &info, SignatureValue &value)
+	{
+		char buffer[B_MIME_TYPE_LENGTH];
+		status_t error = info.GetSignature(buffer);
+		if (error == B_OK)
+			value.type = buffer;
+		return error;
+	}
+};
+
+// SignatureChecker
+struct SignatureChecker
+{
+	static void CheckAttribute(BNode &file, const SignatureValue &value)
+	{
+		CheckAttr(file, kSignatureAttribute, B_MIME_STRING_TYPE, value.type.c_str(),
+				  value.type.length() + 1);
+	}
+
+	static void CheckResource(BFile &file, const SignatureValue &value)
+	{
+		::CheckResource(file, kSignatureAttribute, kSignatureResourceID,
+						B_MIME_STRING_TYPE, value.type.c_str(),
+						value.type.length() + 1);
+	}
+};
+
+// AppFlagsValue
+struct AppFlagsValue
+{
+	AppFlagsValue() : flags() {}
+	AppFlagsValue(uint32 flags) : flags(flags) {}
+
+	bool operator==(const AppFlagsValue &value)
+	{
+		return (flags == value.flags);
+	}
+
+	uint32 flags;
+};
+
+// AppFlagsSetter
+struct AppFlagsSetter
+{
+	static status_t Set(BAppFileInfo &info, const AppFlagsValue &value)
+	{
+		return info.SetAppFlags(value.flags);
+	}
+};
+
+// AppFlagsGetter
+struct AppFlagsGetter
+{
+	static status_t Get(BAppFileInfo &info, AppFlagsValue &value)
+	{
+		return info.GetAppFlags(&value.flags);
+	}
+};
+
+// AppFlagsChecker
+struct AppFlagsChecker
+{
+	static void CheckAttribute(BNode &file, const AppFlagsValue &value)
+	{
+		CheckAttr(file, kAppFlagsAttribute, APP_FLAGS_TYPE, &value.flags,
+				  sizeof(value.flags));
+	}
+
+	static void CheckResource(BFile &file, const AppFlagsValue &value)
+	{
+		::CheckResource(file, kAppFlagsAttribute, kAppFlagsResourceID,
+						APP_FLAGS_TYPE, &value.flags, sizeof(value.flags));
+	}
+};
+
+// SupportedTypesValue
+struct SupportedTypesValue
+{
+	SupportedTypesValue() : types() {}
+	SupportedTypesValue(const BMessage &types) : types(types) {}
+	SupportedTypesValue(const char **types, int32 count)
+		: types()
+	{
+		for (int32 i = 0; i < count; i++)
+			this->types.AddString("types", types[i]);
+	}
+
+	bool operator==(const SupportedTypesValue &value)
+	{
+		type_code type1, type2;
+		int32 count1, count2;
+		bool equal = (types.GetInfo("types", &type1, &count1) == B_OK
+					  && value.types.GetInfo("types", &type2, &count2) == B_OK
+					  && type1 == type2 && count1 == count2);
+		
+		for (int32 i = 0; equal && i < count1; i++) {
+			BString str1, str2;
+			equal = types.FindString("types", i, &str1) == B_OK
+					&& value.types.FindString("types", i, &str2) == B_OK
+					&& str1 == str2;
+		}
+		return equal;
+	}
+
+	BMessage types;
+};
+
+// SupportedTypesSetter
+struct SupportedTypesSetter
+{
+	static status_t Set(BAppFileInfo &info, const SupportedTypesValue &value)
+	{
+		return info.SetSupportedTypes(&value.types, false);
+	}
+};
+
+// SupportedTypesGetter
+struct SupportedTypesGetter
+{
+	static status_t Get(BAppFileInfo &info, SupportedTypesValue &value)
+	{
+		return info.GetSupportedTypes(&value.types);
+	}
+};
+
+// SupportedTypesChecker
+struct SupportedTypesChecker
+{
+	static void CheckAttribute(BNode &file, const SupportedTypesValue &value)
+	{
+		size_t size;
+		char *buffer = ReadAttr(file, kSupportedTypesAttribute,
+								B_MESSAGE_TYPE, size);
+		AutoDeleter<char> deleter(buffer, true);
+		BMessage storedTypes;
+		CHK(storedTypes.Unflatten(buffer) == B_OK);
+		SupportedTypesValue storedValue(storedTypes);
+		CHK(storedValue == value);
+	}
+
+	static void CheckResource(BFile &file, const SupportedTypesValue &value)
+	{
+		size_t size;
+		char *buffer = ReadResource(file, kSupportedTypesAttribute,
+									kSupportedTypesResourceID, B_MESSAGE_TYPE,
+									size);
+		AutoDeleter<char> deleter(buffer, true);
+		BMessage storedTypes;
+		CHK(storedTypes.Unflatten(buffer) == B_OK);
+		SupportedTypesValue storedValue(storedTypes);
+		CHK(storedValue == value);
+	}
+};
+
+// IconValue
+struct IconValue
+{
+	IconValue() : mini(BRect(0, 0, 15, 15), B_CMAP8),
+				  large(BRect(0, 0, 31, 31), B_CMAP8) {}
+	IconValue(const BBitmap *mini, const BBitmap *large)
+		: mini(BRect(0, 0, 15, 15), B_CMAP8),
+		  large(BRect(0, 0, 31, 31), B_CMAP8)
+	{
+		this->mini.SetBits(mini->Bits(), mini->BitsLength(), 0,
+						   mini->ColorSpace());
+		this->large.SetBits(large->Bits(), large->BitsLength(), 0,
+							large->ColorSpace());
+	}
+
+	bool operator==(const IconValue &value)
+	{
+		return (icon_equal(&mini, &value.mini)
+				&& icon_equal(&large, &value.large));
+	}
+
+	BBitmap mini;
+	BBitmap large;
+};
+
+// IconSetter
+struct IconSetter
+{
+	static status_t Set(BAppFileInfo &info, const IconValue &value)
+	{
+		status_t error = info.SetIcon(&value.mini, B_MINI_ICON);
+		if (error == B_OK)
+			error = info.SetIcon(&value.large, B_LARGE_ICON);
+		return error;
+	}
+};
+
+// IconGetter
+struct IconGetter
+{
+	static status_t Get(BAppFileInfo &info, IconValue &value)
+	{
+		status_t error = info.GetIcon(&value.mini, B_MINI_ICON);
+		if (error == B_OK)
+			error = info.GetIcon(&value.large, B_LARGE_ICON);
+		return error;
+	}
+};
+
+// IconChecker
+struct IconChecker
+{
+	static void CheckAttribute(BNode &file, const IconValue &value)
+	{
+		CheckAttr(file, kMiniIconAttribute, MINI_ICON_TYPE, value.mini.Bits(),
+				  value.mini.BitsLength());
+		CheckAttr(file, kLargeIconAttribute, LARGE_ICON_TYPE,
+				  value.large.Bits(), value.large.BitsLength());
+	}
+
+	static void CheckResource(BFile &file, const IconValue &value)
+	{
+		::CheckResource(file, kMiniIconAttribute, kMiniIconResourceID,
+						MINI_ICON_TYPE, value.mini.Bits(),
+						value.mini.BitsLength());
+		::CheckResource(file, kLargeIconAttribute, kLargeIconResourceID,
+						LARGE_ICON_TYPE, value.large.Bits(),
+						value.large.BitsLength());
+	}
+};
+
+// VersionInfoValue
+struct VersionInfoValue
+{
+	VersionInfoValue() : app(), system() {}
+	VersionInfoValue(const version_info &app, const version_info &system)
+		: app(app), system(system) {}
+
+	bool operator==(const VersionInfoValue &value)
+	{
+		return (app == value.app && system == value.system);
+	}
+
+	version_info app;
+	version_info system;
+};
+
+// VersionInfoSetter
+struct VersionInfoSetter
+{
+	static status_t Set(BAppFileInfo &info, const VersionInfoValue &value)
+	{
+		status_t error = info.SetVersionInfo(&value.app, B_APP_VERSION_KIND);
+		if (error == B_OK)
+			error = info.SetVersionInfo(&value.system, B_SYSTEM_VERSION_KIND);
+		return error;
+	}
+};
+
+// VersionInfoGetter
+struct VersionInfoGetter
+{
+	static status_t Get(BAppFileInfo &info, VersionInfoValue &value)
+	{
+		status_t error = info.GetVersionInfo(&value.app, B_APP_VERSION_KIND);
+		if (error == B_OK)
+			error = info.GetVersionInfo(&value.system, B_SYSTEM_VERSION_KIND);
+		return error;
+	}
+};
+
+// VersionInfoChecker
+struct VersionInfoChecker
+{
+	static void CheckAttribute(BNode &file, const VersionInfoValue &value)
+	{
+		version_info infos[] = { value.app, value.system };
+		CheckAttr(file, kVersionInfoAttribute, VERSION_INFO_TYPE,
+				  infos, sizeof(infos));
+	}
+
+	static void CheckResource(BFile &file, const VersionInfoValue &value)
+	{
+		version_info infos[] = { value.app, value.system };
+		::CheckResource(file, kVersionInfoAttribute,
+						kVersionInfoResourceID, VERSION_INFO_TYPE,
+						infos, sizeof(infos));
+	}
+};
+
+// IconForTypeValue
+struct IconForTypeValue : public IconValue
+{
+//	IconForTypeValue() : type() {}
+//	IconForTypeValue(const BBitmap *mini, const BBitmap *large,
+//					 const char *type) : IconValue(mini, large), type(type) {}
+	IconForTypeValue() : type(testType1) {}
+	IconForTypeValue(const BBitmap *mini, const BBitmap *large)
+		: IconValue(mini, large), type(testType1) {}
+
+	string	type;
+};
+
+// IconForTypeSetter
+struct IconForTypeSetter
+{
+	static status_t Set(BAppFileInfo &info, const IconForTypeValue &value)
+	{
+		status_t error = info.SetIconForType(value.type.c_str(), &value.mini,
+											 B_MINI_ICON);
+		if (error == B_OK) {
+			error = info.SetIconForType(value.type.c_str(), &value.large,
+										B_LARGE_ICON);
+		}
+		return error;
+	}
+};
+
+// IconForTypeGetter
+struct IconForTypeGetter
+{
+	static status_t Get(BAppFileInfo &info, IconForTypeValue &value)
+	{
+		status_t error = info.GetIconForType(value.type.c_str(), &value.mini,
+											 B_MINI_ICON);
+		if (error == B_OK) {
+			error = info.GetIconForType(value.type.c_str(), &value.large,
+										B_LARGE_ICON);
+		}
+		return error;
+	}
+};
+
+// IconForTypeChecker
+struct IconForTypeChecker
+{
+	static void CheckAttribute(BNode &file, const IconForTypeValue &value)
+	{
+		string attrNameM(kMiniIconForTypeAttribute);
+		attrNameM += value.type;
+		CheckAttr(file, attrNameM.c_str(), MINI_ICON_TYPE, value.mini.Bits(),
+				  value.mini.BitsLength());
+		string attrNameL(kLargeIconForTypeAttribute);
+		attrNameL += value.type;
+		CheckAttr(file, attrNameL.c_str(), LARGE_ICON_TYPE,
+				  value.large.Bits(), value.large.BitsLength());
+	}
+
+	static void CheckResource(BFile &file, const IconForTypeValue &value)
+	{
+		string attrNameM(kMiniIconForTypeAttribute);
+		attrNameM += value.type;
+		::CheckResource(file, attrNameM.c_str(), kMiniIconForTypeResourceID,
+						MINI_ICON_TYPE, value.mini.Bits(),
+						value.mini.BitsLength());
+		string attrNameL(kLargeIconForTypeAttribute);
+		attrNameL += value.type;
+		::CheckResource(file, attrNameL.c_str(), kLargeIconForTypeResourceID,
+						LARGE_ICON_TYPE, value.large.Bits(),
+						value.large.BitsLength());
+	}
+};
+
+
 // CheckTypeAttr
 static
 void
@@ -396,6 +823,22 @@ CheckAppFlagsResource(BFile &file, uint32 flags)
 {
 	CheckResource(file, kAppFlagsAttribute, kAppFlagsResourceID,
 				  APP_FLAGS_TYPE, &flags, sizeof(flags));
+}
+
+// CheckSupportedTypesAttr
+static
+void
+CheckSupportedTypesAttr(BNode &node, const BMessage *data)
+{
+	SupportedTypesChecker::CheckAttribute(node, SupportedTypesValue(*data));
+}
+
+// CheckSupportedTypesResource
+static
+void
+CheckSupportedTypesResource(BFile &file, const BMessage *data)
+{
+	SupportedTypesChecker::CheckResource(file, SupportedTypesValue(*data));
 }
 
 // CheckIconAttr
@@ -566,18 +1009,24 @@ CheckNoIconForTypeResource(BFile &file, const char *type, icon_size iconSize)
 	CheckNoResource(file, attribute.c_str());
 }
 
+
 // InitTest1
 void
 AppFileInfoTest::InitTest1()
 {
+#ifdef TEST_R5
+	const bool hasInitialLocation = false;
+#else
+	const bool hasInitialLocation = true;
+#endif
 	// BAppFileInfo()
 	// * InitCheck() == B_NO_INIT
 	NextSubTest();
 	{
 		BAppFileInfo appFileInfo;
 		CHK(appFileInfo.InitCheck() == B_NO_INIT);
-		CHK(appFileInfo.IsUsingAttributes() == false);
-		CHK(appFileInfo.IsUsingResources() == false);
+		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
+		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
 	}
 
 	// BAppFileInfo(BFile *file)
@@ -586,8 +1035,8 @@ AppFileInfoTest::InitTest1()
 	{
 		BAppFileInfo appFileInfo(NULL);
 		CHK(appFileInfo.InitCheck() == B_BAD_VALUE);
-		CHK(appFileInfo.IsUsingAttributes() == false);
-		CHK(appFileInfo.IsUsingResources() == false);
+		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
+		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
 	}
 	// * invalid file => InitCheck() == B_BAD_VALUE
 	NextSubTest();
@@ -595,8 +1044,8 @@ AppFileInfoTest::InitTest1()
 		BFile file;
 		BAppFileInfo appFileInfo(&file);
 		CHK(appFileInfo.InitCheck() == B_BAD_VALUE);
-		CHK(appFileInfo.IsUsingAttributes() == false);
-		CHK(appFileInfo.IsUsingResources() == false);
+		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
+		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
 	}
 	// * valid file => InitCheck() == B_OK
 	NextSubTest();
@@ -613,6 +1062,11 @@ AppFileInfoTest::InitTest1()
 void
 AppFileInfoTest::InitTest2()
 {
+#ifdef TEST_R5
+	const bool hasInitialLocation = false;
+#else
+	const bool hasInitialLocation = true;
+#endif
 	// status_t SetTo(BFile *file)
 	// * NULL file => InitCheck() == B_NO_INIT
 	NextSubTest();
@@ -620,8 +1074,8 @@ AppFileInfoTest::InitTest2()
 		BAppFileInfo appFileInfo;
 		CHK(appFileInfo.SetTo(NULL) == B_BAD_VALUE);
 		CHK(appFileInfo.InitCheck() == B_BAD_VALUE);
-		CHK(appFileInfo.IsUsingAttributes() == false);
-		CHK(appFileInfo.IsUsingResources() == false);
+		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
+		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
 	}
 	// * invalid file => InitCheck() == B_BAD_VALUE
 	NextSubTest();
@@ -630,8 +1084,8 @@ AppFileInfoTest::InitTest2()
 		BAppFileInfo appFileInfo;
 		CHK(appFileInfo.SetTo(&file) == B_BAD_VALUE);
 		CHK(appFileInfo.InitCheck() == B_BAD_VALUE);
-		CHK(appFileInfo.IsUsingAttributes() == false);
-		CHK(appFileInfo.IsUsingResources() == false);
+		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
+		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
 	}
 	// * valid file => InitCheck() == B_OK
 	// * reinitialize invalid/valid => InitCheck() == B_BAD_VALUE/B_OK
@@ -947,15 +1401,537 @@ AppFileInfoTest::AppFlagsTest()
 	}
 }
 
+// IsSupportingApp
+static
+bool
+IsSupportingApp(const char *type, const char *signature)
+{
+	BMessage apps;
+//	CHK(BMimeType(type).GetSupportingApps(&apps) == B_OK);
+	BMimeType(type).GetSupportingApps(&apps);
+	bool found = false;
+	BString app;
+	for (int32 i = 0;
+		 !found && apps.FindString("applications", i, &app) == B_OK;
+		 i++) {
+		found = (app == signature);
+	}
+	return found;
+}
+
 // SupportedTypesTest
 void
 AppFileInfoTest::SupportedTypesTest()
 {
-//	status_t GetSupportedTypes(BMessage *types) const;
-//	status_t SetSupportedTypes(const BMessage *types, bool syncAll);
-//	status_t SetSupportedTypes(const BMessage *types);
-//	bool IsSupportedType(const char *type) const;
-//	bool Supports(BMimeType *type) const;
+	// test data
+	BMessage testTypes1;
+	CHK(testTypes1.AddString("types", testType1) == B_OK);
+	CHK(testTypes1.AddString("types", testType2) == B_OK);
+	BMessage testTypes2;
+	CHK(testTypes2.AddString("types", testType3) == B_OK);
+	CHK(testTypes2.AddString("types", testType4) == B_OK);
+	BMimeType mimeTestType1(testType1);
+	BMimeType mimeTestType2(testType2);
+	BMimeType mimeTestType3(testType3);
+	BMimeType mimeTestType4(testType4);
+	// add and install the app signature
+	{
+		BFile file(testFile1, B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
+		CHK(BMimeType(testAppSignature1).Install() == B_OK);
+	}
+
+	// status_t GetSupportedTypes(BMessage *types) const;
+	// * uninitialized => B_NO_INIT
+	NextSubTest();
+	{
+		BAppFileInfo appFileInfo;
+		BMessage types;
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_NO_INIT);
+	}
+	// * has no supported types => B_ENTRY_NOT_FOUND
+	NextSubTest();
+	{
+		BFile file(testFile1, B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		BMessage types;
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
+	}
+	// * set, get, reset, get
+	NextSubTest();
+	{
+		BFile file(testFile1, B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		// set
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
+		// get
+		BMessage types;
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
+		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes1));
+		CHK(appFileInfo.IsSupportedType(testType1) == true);
+		CHK(appFileInfo.IsSupportedType(testType2) == true);
+		CHK(appFileInfo.Supports(&mimeTestType1) == true);
+		CHK(appFileInfo.Supports(&mimeTestType2) == true);
+		CheckSupportedTypesAttr(file, &testTypes1);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &testTypes1);
+		CHK(BMimeType(testType1).IsInstalled() == true);
+		CHK(BMimeType(testType2).IsInstalled() == true);
+		// reset
+		CHK(BMimeType(testType3).IsInstalled() == false);
+		CHK(BMimeType(testType4).IsInstalled() == false);
+		CHK(appFileInfo.SetSupportedTypes(&testTypes2) == B_OK);
+		// get
+		BMessage types2;
+		CHK(appFileInfo.GetSupportedTypes(&types2) == B_OK);
+		CHK(SupportedTypesValue(types2) == SupportedTypesValue(testTypes2));
+		CHK(appFileInfo.IsSupportedType(testType1) == false);
+		CHK(appFileInfo.IsSupportedType(testType2) == false);
+		CHK(appFileInfo.IsSupportedType(testType3) == true);
+		CHK(appFileInfo.IsSupportedType(testType4) == true);
+		CHK(appFileInfo.Supports(&mimeTestType1) == false);
+		CHK(appFileInfo.Supports(&mimeTestType2) == false);
+		CHK(appFileInfo.Supports(&mimeTestType3) == true);
+		CHK(appFileInfo.Supports(&mimeTestType4) == true);
+		CheckSupportedTypesAttr(file, &testTypes2);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &testTypes2);
+		CHK(BMimeType(testType3).IsInstalled() == true);
+		CHK(BMimeType(testType4).IsInstalled() == true);
+	}
+	// * partially filled types => types is cleared beforehand
+	NextSubTest();
+	{
+		BFile file(testFile1, B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		BMessage types2;
+		CHK(types2.AddString("types", testType1) == B_OK);
+		CHK(types2.AddString("dummy", "Hello") == B_OK);
+		CHK(appFileInfo.GetSupportedTypes(&types2) == B_OK);
+		CHK(SupportedTypesValue(types2) == SupportedTypesValue(testTypes2));
+		const char *dummy;
+		CHK(types2.FindString("dummy", &dummy) != B_OK);
+	}
+	// * NULL types => B_BAD_VALUE
+// R5: crashes when passing NULL types
+#ifndef TEST_R5
+	NextSubTest();
+	{
+		BFile file(testFile1, B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.GetSupportedTypes(NULL) == B_BAD_VALUE);
+	}
+#endif
+
+	// status_t SetSupportedTypes(const BMessage *types, bool syncAll);
+	// status_t SetSupportedTypes(const BMessage *types);
+	// * uninitialized => B_NO_INIT
+	NextSubTest();
+	{
+		BAppFileInfo appFileInfo;
+		BMessage types;
+		CHK(appFileInfo.SetSupportedTypes(&types) == B_NO_INIT);
+	}
+	// * NULL types => unsets supported types
+	NextSubTest();
+	{
+		BFile file(testFile1, B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		// set
+		CHK(appFileInfo.SetSupportedTypes(NULL) == B_OK);
+		// get
+		BMessage types;
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
+		CHK(appFileInfo.IsSupportedType(testType1) == false);
+		CHK(appFileInfo.IsSupportedType(testType2) == false);
+		CHK(appFileInfo.IsSupportedType(testType3) == false);
+		CHK(appFileInfo.IsSupportedType(testType4) == false);
+		CHK(appFileInfo.Supports(&mimeTestType1) == false);
+		CHK(appFileInfo.Supports(&mimeTestType2) == false);
+		CHK(appFileInfo.Supports(&mimeTestType3) == false);
+		CHK(appFileInfo.Supports(&mimeTestType4) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+		// set: syncAll = true
+// R5: crashes when passing NULL types
+#ifndef TEST_R5
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
+		CHK(appFileInfo.SetSupportedTypes(NULL, true) == B_OK);
+		// get
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
+		CHK(appFileInfo.IsSupportedType(testType1) == false);
+		CHK(appFileInfo.IsSupportedType(testType2) == false);
+		CHK(appFileInfo.IsSupportedType(testType3) == false);
+		CHK(appFileInfo.IsSupportedType(testType4) == false);
+		CHK(appFileInfo.Supports(&mimeTestType1) == false);
+		CHK(appFileInfo.Supports(&mimeTestType2) == false);
+		CHK(appFileInfo.Supports(&mimeTestType3) == false);
+		CHK(appFileInfo.Supports(&mimeTestType4) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+#endif
+	}
+	// * cross check with BMimeType::GetSupportingApps(): no syncAll
+	NextSubTest();
+	{
+		// clean up
+		CHK(BMimeType(testType1).Delete() == B_OK);
+		CHK(BMimeType(testType2).Delete() == B_OK);
+		CHK(BMimeType(testType3).Delete() == B_OK);
+		CHK(BMimeType(testType4).Delete() == B_OK);
+		CHK(BMimeType(testAppSignature1).Delete() == B_OK);
+		CHK(BMimeType(testAppSignature1).Install() == B_OK);
+		CHK(BEntry(testFile1).Remove() == B_OK);
+		// init
+		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
+		// set
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
+		// get
+		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
+		// reset
+		CHK(appFileInfo.SetSupportedTypes(&testTypes2) == B_OK);
+		// get
+		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType3, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType4, testAppSignature1) == true);
+	}
+	// * cross check with BMimeType::GetSupportingApps(): syncAll == false
+	NextSubTest();
+	{
+		// clean up
+		CHK(BMimeType(testType1).Delete() == B_OK);
+		CHK(BMimeType(testType2).Delete() == B_OK);
+		CHK(BMimeType(testType3).Delete() == B_OK);
+		CHK(BMimeType(testType4).Delete() == B_OK);
+		CHK(BMimeType(testAppSignature1).Delete() == B_OK);
+		CHK(BMimeType(testAppSignature1).Install() == B_OK);
+		CHK(BEntry(testFile1).Remove() == B_OK);
+		// init
+		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
+		// set
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1, false) == B_OK);
+		// get
+		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
+		// reset
+		CHK(appFileInfo.SetSupportedTypes(&testTypes2, false) == B_OK);
+		// get
+		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType3, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType4, testAppSignature1) == true);
+	}
+	// * cross check with BMimeType::GetSupportingApps(): syncAll == true
+	NextSubTest();
+	{
+		// clean up
+		CHK(BMimeType(testType1).Delete() == B_OK);
+		CHK(BMimeType(testType2).Delete() == B_OK);
+		CHK(BMimeType(testType3).Delete() == B_OK);
+		CHK(BMimeType(testType4).Delete() == B_OK);
+		CHK(BMimeType(testAppSignature1).Delete() == B_OK);
+		CHK(BMimeType(testAppSignature1).Install() == B_OK);
+		CHK(BEntry(testFile1).Remove() == B_OK);
+		// init
+		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
+		// set
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1, true) == B_OK);
+		// get
+		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
+		// reset
+		CHK(appFileInfo.SetSupportedTypes(&testTypes2, true) == B_OK);
+		// get
+		CHK(IsSupportingApp(testType1, testAppSignature1) == false);
+		CHK(IsSupportingApp(testType2, testAppSignature1) == false);
+		CHK(IsSupportingApp(testType3, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType4, testAppSignature1) == true);
+	}
+
+	// bool IsSupportedType(const char *type) const;
+	// bool Supports(BMimeType *type) const;
+	// * NULL type => false
+	NextSubTest();
+	{
+		BFile file(testFile1, B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.IsSupportedType(NULL) == false);
+// R5: crashes when passing a NULL type
+#ifndef TEST_R5
+		CHK(appFileInfo.Supports(NULL) == false);
+#endif
+	}
+	// * supports "application/octet-stream"
+	NextSubTest();
+	{
+		BFile file(testFile1, B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		BMimeType gifType("image/gif");
+		CHK(appFileInfo.IsSupportedType(gifType.Type()) == false);
+		CHK(appFileInfo.Supports(&gifType) == false);
+		BMessage types;
+		CHK(types.AddString("types", "application/octet-stream") == B_OK);
+		CHK(appFileInfo.SetSupportedTypes(&types) == B_OK);
+		CHK(appFileInfo.IsSupportedType(gifType.Type()) == true);
+		CHK(appFileInfo.Supports(&gifType) == false);
+		BMessage noTypes;
+		CHK(appFileInfo.SetSupportedTypes(&noTypes, true) == B_OK);
+	}
+
+	// various
+	// * signature not installed, syncAll = true
+	NextSubTest();
+	{
+		// clean up
+		CHK(BMimeType(testType1).Delete() == B_OK);
+		CHK(BMimeType(testType2).Delete() == B_OK);
+		CHK(BMimeType(testType3).Delete() == B_OK);
+		CHK(BMimeType(testType4).Delete() == B_OK);
+		CHK(BMimeType(testAppSignature1).Delete() == B_OK);
+		CHK(BEntry(testFile1).Remove() == B_OK);
+		// init
+		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
+		// set
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1, true) == B_OK);
+		// get
+		BMessage types;
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
+		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes1));
+		CHK(appFileInfo.IsSupportedType(testType1) == true);
+		CHK(appFileInfo.IsSupportedType(testType2) == true);
+		CHK(appFileInfo.Supports(&mimeTestType1) == true);
+		CHK(appFileInfo.Supports(&mimeTestType2) == true);
+		CheckSupportedTypesAttr(file, &testTypes1);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &testTypes1);
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+		// set
+		CHK(BMimeType(testType3).IsInstalled() == false);
+		CHK(BMimeType(testType4).IsInstalled() == false);
+		CHK(appFileInfo.SetSupportedTypes(&testTypes2, true) == B_OK);
+		// get
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
+		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes2));
+		CHK(appFileInfo.IsSupportedType(testType1) == false);
+		CHK(appFileInfo.IsSupportedType(testType2) == false);
+		CHK(appFileInfo.IsSupportedType(testType3) == true);
+		CHK(appFileInfo.IsSupportedType(testType4) == true);
+		CHK(appFileInfo.Supports(&mimeTestType1) == false);
+		CHK(appFileInfo.Supports(&mimeTestType2) == false);
+		CHK(appFileInfo.Supports(&mimeTestType3) == true);
+		CHK(appFileInfo.Supports(&mimeTestType4) == true);
+		CheckSupportedTypesAttr(file, &testTypes2);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &testTypes2);
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+		CHK(BMimeType(testType3).IsInstalled() == false);
+// R5: returns true. In fact the last SetSupportedTypes() installed testType4
+// in the database, but not testType3. Certainly a bug
+#ifndef TEST_R5
+		CHK(BMimeType(testType4).IsInstalled() == false);
+#endif
+	}
+	// * signature not installed, no syncAll
+	NextSubTest();
+	{
+		// clean up
+		BMimeType(testType1).Delete();
+		BMimeType(testType2).Delete();
+		BMimeType(testType3).Delete();
+		BMimeType(testType4).Delete();
+		BMimeType(testAppSignature1).Delete();
+		CHK(BEntry(testFile1).Remove() == B_OK);
+		// init
+		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
+		// set
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+// R5: SetSupportedTypes() returns B_ENTRY_NOT_FOUND, although it does not
+//     fail.
+#ifdef TEST_R5
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_ENTRY_NOT_FOUND);
+#else
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
+#endif
+		// get
+		BMessage types;
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
+		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes1));
+		CHK(appFileInfo.IsSupportedType(testType1) == true);
+		CHK(appFileInfo.IsSupportedType(testType2) == true);
+		CHK(appFileInfo.Supports(&mimeTestType1) == true);
+		CHK(appFileInfo.Supports(&mimeTestType2) == true);
+		CheckSupportedTypesAttr(file, &testTypes1);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &testTypes1);
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+		// set
+		CHK(BMimeType(testType3).IsInstalled() == false);
+		CHK(BMimeType(testType4).IsInstalled() == false);
+// R5: SetSupportedTypes() returns B_ENTRY_NOT_FOUND, although it does not
+//     fail.
+#ifdef TEST_R5
+		CHK(appFileInfo.SetSupportedTypes(&testTypes2) == B_ENTRY_NOT_FOUND);
+#else
+		CHK(appFileInfo.SetSupportedTypes(&testTypes2) == B_OK);
+#endif
+		// get
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
+		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes2));
+		CHK(appFileInfo.IsSupportedType(testType1) == false);
+		CHK(appFileInfo.IsSupportedType(testType2) == false);
+		CHK(appFileInfo.IsSupportedType(testType3) == true);
+		CHK(appFileInfo.IsSupportedType(testType4) == true);
+		CHK(appFileInfo.Supports(&mimeTestType1) == false);
+		CHK(appFileInfo.Supports(&mimeTestType2) == false);
+		CHK(appFileInfo.Supports(&mimeTestType3) == true);
+		CHK(appFileInfo.Supports(&mimeTestType4) == true);
+		CheckSupportedTypesAttr(file, &testTypes2);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &testTypes2);
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+		CHK(BMimeType(testType3).IsInstalled() == false);
+// R5: returns true. In fact the last SetSupportedTypes() installed testType4
+// in the database, but not testType3. Certainly a bug
+#ifndef TEST_R5
+		CHK(BMimeType(testType4).IsInstalled() == false);
+#endif
+	}
+	// * no signature
+	NextSubTest();
+	{
+		// clean up
+		BMimeType(testType1).Delete();
+		BMimeType(testType2).Delete();
+		BMimeType(testType3).Delete();
+		BMimeType(testType4).Delete();
+		BMimeType(testAppSignature1).Delete();
+		CHK(BEntry(testFile1).Remove() == B_OK);
+		// init
+		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		// set, syncAll = true
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1, true)
+			== B_ENTRY_NOT_FOUND);
+		// get
+		BMessage types;
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
+		CHK(appFileInfo.IsSupportedType(testType1) == false);
+		CHK(appFileInfo.IsSupportedType(testType2) == false);
+		CHK(appFileInfo.Supports(&mimeTestType1) == false);
+		CHK(appFileInfo.Supports(&mimeTestType2) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+		// set, no syncAll
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_ENTRY_NOT_FOUND);
+		// get
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
+		CHK(appFileInfo.IsSupportedType(testType1) == false);
+		CHK(appFileInfo.IsSupportedType(testType2) == false);
+		CHK(appFileInfo.Supports(&mimeTestType1) == false);
+		CHK(appFileInfo.Supports(&mimeTestType2) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+		CHK(BMimeType(testType1).IsInstalled() == false);
+		CHK(BMimeType(testType2).IsInstalled() == false);
+	}
+	// * set supported types, remove file, create file, get supported types
+	NextSubTest();
+	{
+		// clean up
+		BMimeType(testType1).Delete();
+		BMimeType(testType2).Delete();
+		BMimeType(testType3).Delete();
+		BMimeType(testType4).Delete();
+		BMimeType(testAppSignature1).Delete();
+		CHK(BMimeType(testAppSignature1).Install() == B_OK);
+		CHK(BEntry(testFile1).Remove() == B_OK);
+		// init
+		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
+		BAppFileInfo appFileInfo;
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
+		// set
+		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
+		// get
+		BMessage types;
+		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
+		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes1));
+		CHK(appFileInfo.IsSupportedType(testType1) == true);
+		CHK(appFileInfo.IsSupportedType(testType2) == true);
+		CHK(appFileInfo.Supports(&mimeTestType1) == true);
+		CHK(appFileInfo.Supports(&mimeTestType2) == true);
+		CheckSupportedTypesAttr(file, &testTypes1);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &testTypes1);
+		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
+		// remove the file
+		appFileInfo.SetTo(NULL);
+		file.Unset();
+		CHK(BEntry(testFile1).Remove() == B_OK);
+		// init
+		CHK(file.SetTo(testFile1, B_READ_WRITE | B_CREATE_FILE) == B_OK);
+		CHK(appFileInfo.SetTo(&file) == B_OK);
+		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
+		// get
+		BMessage types2;
+		CHK(appFileInfo.GetSupportedTypes(&types2) == B_ENTRY_NOT_FOUND);
+		CHK(appFileInfo.IsSupportedType(testType1) == false);
+		CHK(appFileInfo.IsSupportedType(testType2) == false);
+		CHK(appFileInfo.Supports(&mimeTestType1) == false);
+		CHK(appFileInfo.Supports(&mimeTestType2) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
+		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
+	}
 }
 
 // IconTest
@@ -1282,7 +2258,7 @@ AppFileInfoTest::VersionInfoTest()
 		CHK(appFileInfo.SetVersionInfo(&testInfo1, B_SYSTEM_VERSION_KIND)
 			== B_OK);
 		// unset system info
-		CHK(appFileInfo.SetVersionInfo(NULL, B_SYSTEM_VERSION_KIND)
+		CHK(appFileInfo.SetVersionInfo(NULL, B_SYSTEM_VERSION_KIND) == B_OK);
 		// try to get
 		CHK(appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND)
 			== B_ENTRY_NOT_FOUND);
@@ -1728,431 +2704,6 @@ InfoLocationTester(const Value &testValue1, const Value &testValue2,
 	Checker::CheckAttribute(file, testValue2);
 	Checker::CheckResource(file, testValue3);
 }
-
-// TypeValue
-struct TypeValue
-{
-	TypeValue() : type() {}
-	TypeValue(const char *type) : type(type) {}
-
-	bool operator==(const TypeValue &value)
-	{
-		return (type == value.type);
-	}
-
-	string type;
-};
-
-// TypeSetter
-struct TypeSetter
-{
-	static status_t Set(BAppFileInfo &info, const TypeValue &value)
-	{
-		return info.SetType(value.type.c_str());
-	}
-};
-
-// TypeGetter
-struct TypeGetter
-{
-	static status_t Get(BAppFileInfo &info, TypeValue &value)
-	{
-		char buffer[B_MIME_TYPE_LENGTH];
-		status_t error = info.GetType(buffer);
-		if (error == B_OK)
-			value.type = buffer;
-		return error;
-	}
-};
-
-// TypeChecker
-struct TypeChecker
-{
-	static void CheckAttribute(BFile &file, const TypeValue &value)
-	{
-		CheckAttr(file, kTypeAttribute, B_MIME_STRING_TYPE, value.type.c_str(),
-				  value.type.length() + 1);
-	}
-
-	static void CheckResource(BFile &file, const TypeValue &value)
-	{
-		::CheckResource(file, kTypeAttribute, kTypeResourceID,
-						B_MIME_STRING_TYPE, value.type.c_str(),
-						value.type.length() + 1);
-	}
-};
-
-typedef TypeValue SignatureValue;
-
-// SignatureSetter
-struct SignatureSetter
-{
-	static status_t Set(BAppFileInfo &info, const SignatureValue &value)
-	{
-		return info.SetSignature(value.type.c_str());
-	}
-};
-
-// SignatureGetter
-struct SignatureGetter
-{
-	static status_t Get(BAppFileInfo &info, SignatureValue &value)
-	{
-		char buffer[B_MIME_TYPE_LENGTH];
-		status_t error = info.GetSignature(buffer);
-		if (error == B_OK)
-			value.type = buffer;
-		return error;
-	}
-};
-
-// SignatureChecker
-struct SignatureChecker
-{
-	static void CheckAttribute(BFile &file, const SignatureValue &value)
-	{
-		CheckAttr(file, kSignatureAttribute, B_MIME_STRING_TYPE, value.type.c_str(),
-				  value.type.length() + 1);
-	}
-
-	static void CheckResource(BFile &file, const SignatureValue &value)
-	{
-		::CheckResource(file, kSignatureAttribute, kSignatureResourceID,
-						B_MIME_STRING_TYPE, value.type.c_str(),
-						value.type.length() + 1);
-	}
-};
-
-// AppFlagsValue
-struct AppFlagsValue
-{
-	AppFlagsValue() : flags() {}
-	AppFlagsValue(uint32 flags) : flags(flags) {}
-
-	bool operator==(const AppFlagsValue &value)
-	{
-		return (flags == value.flags);
-	}
-
-	uint32 flags;
-};
-
-// AppFlagsSetter
-struct AppFlagsSetter
-{
-	static status_t Set(BAppFileInfo &info, const AppFlagsValue &value)
-	{
-		return info.SetAppFlags(value.flags);
-	}
-};
-
-// AppFlagsGetter
-struct AppFlagsGetter
-{
-	static status_t Get(BAppFileInfo &info, AppFlagsValue &value)
-	{
-		return info.GetAppFlags(&value.flags);
-	}
-};
-
-// AppFlagsChecker
-struct AppFlagsChecker
-{
-	static void CheckAttribute(BFile &file, const AppFlagsValue &value)
-	{
-		CheckAttr(file, kAppFlagsAttribute, APP_FLAGS_TYPE, &value.flags,
-				  sizeof(value.flags));
-	}
-
-	static void CheckResource(BFile &file, const AppFlagsValue &value)
-	{
-		::CheckResource(file, kAppFlagsAttribute, kAppFlagsResourceID,
-						APP_FLAGS_TYPE, &value.flags, sizeof(value.flags));
-	}
-};
-
-// SupportedTypesValue
-struct SupportedTypesValue
-{
-	SupportedTypesValue() : types() {}
-	SupportedTypesValue(const BMessage &types) : types(types) {}
-	SupportedTypesValue(const char **types, int32 count)
-		: types()
-	{
-		for (int32 i = 0; i < count; i++)
-			this->types.AddString("types", types[i]);
-	}
-
-	bool operator==(const SupportedTypesValue &value)
-	{
-		type_code type1, type2;
-		int32 count1, count2;
-		bool equal = (types.GetInfo("types", &type1, &count1) == B_OK
-					  && value.types.GetInfo("types", &type2, &count2) == B_OK
-					  && type1 == type2 && count1 == count2);
-		
-		for (int32 i = 0; equal && i < count1; i++) {
-			BString str1, str2;
-			equal = types.FindString("types", i, &str1) == B_OK
-					&& value.types.FindString("types", i, &str2) == B_OK
-					&& str1 == str2;
-		}
-		return equal;
-	}
-
-	BMessage types;
-};
-
-// SupportedTypesSetter
-struct SupportedTypesSetter
-{
-	static status_t Set(BAppFileInfo &info, const SupportedTypesValue &value)
-	{
-		return info.SetSupportedTypes(&value.types, false);
-	}
-};
-
-// SupportedTypesGetter
-struct SupportedTypesGetter
-{
-	static status_t Get(BAppFileInfo &info, SupportedTypesValue &value)
-	{
-		return info.GetSupportedTypes(&value.types);
-	}
-};
-
-// SupportedTypesChecker
-struct SupportedTypesChecker
-{
-	static void CheckAttribute(BFile &file, const SupportedTypesValue &value)
-	{
-		size_t size;
-		char *buffer = ReadAttr(file, kSupportedTypesAttribute,
-								B_MESSAGE_TYPE, size);
-		AutoDeleter<char> deleter(buffer, true);
-		BMessage storedTypes;
-		CHK(storedTypes.Unflatten(buffer) == B_OK);
-		SupportedTypesValue storedValue(storedTypes);
-		CHK(storedValue == value);
-	}
-
-	static void CheckResource(BFile &file, const SupportedTypesValue &value)
-	{
-		size_t size;
-		char *buffer = ReadResource(file, kSupportedTypesAttribute,
-									kSupportedTypesResourceID, B_MESSAGE_TYPE,
-									size);
-		AutoDeleter<char> deleter(buffer, true);
-		BMessage storedTypes;
-		CHK(storedTypes.Unflatten(buffer) == B_OK);
-		SupportedTypesValue storedValue(storedTypes);
-		CHK(storedValue == value);
-	}
-};
-
-// IconValue
-struct IconValue
-{
-	IconValue() : mini(BRect(0, 0, 15, 15), B_CMAP8),
-				  large(BRect(0, 0, 31, 31), B_CMAP8) {}
-	IconValue(const BBitmap *mini, const BBitmap *large)
-		: mini(BRect(0, 0, 15, 15), B_CMAP8),
-		  large(BRect(0, 0, 31, 31), B_CMAP8)
-	{
-		this->mini.SetBits(mini->Bits(), mini->BitsLength(), 0,
-						   mini->ColorSpace());
-		this->large.SetBits(large->Bits(), large->BitsLength(), 0,
-							large->ColorSpace());
-	}
-
-	bool operator==(const IconValue &value)
-	{
-		return (icon_equal(&mini, &value.mini)
-				&& icon_equal(&large, &value.large));
-	}
-
-	BBitmap mini;
-	BBitmap large;
-};
-
-// IconSetter
-struct IconSetter
-{
-	static status_t Set(BAppFileInfo &info, const IconValue &value)
-	{
-		status_t error = info.SetIcon(&value.mini, B_MINI_ICON);
-		if (error == B_OK)
-			error = info.SetIcon(&value.large, B_LARGE_ICON);
-		return error;
-	}
-};
-
-// IconGetter
-struct IconGetter
-{
-	static status_t Get(BAppFileInfo &info, IconValue &value)
-	{
-		status_t error = info.GetIcon(&value.mini, B_MINI_ICON);
-		if (error == B_OK)
-			error = info.GetIcon(&value.large, B_LARGE_ICON);
-		return error;
-	}
-};
-
-// IconChecker
-struct IconChecker
-{
-	static void CheckAttribute(BFile &file, const IconValue &value)
-	{
-		CheckAttr(file, kMiniIconAttribute, MINI_ICON_TYPE, value.mini.Bits(),
-				  value.mini.BitsLength());
-		CheckAttr(file, kLargeIconAttribute, LARGE_ICON_TYPE,
-				  value.large.Bits(), value.large.BitsLength());
-	}
-
-	static void CheckResource(BFile &file, const IconValue &value)
-	{
-		::CheckResource(file, kMiniIconAttribute, kMiniIconResourceID,
-						MINI_ICON_TYPE, value.mini.Bits(),
-						value.mini.BitsLength());
-		::CheckResource(file, kLargeIconAttribute, kLargeIconResourceID,
-						LARGE_ICON_TYPE, value.large.Bits(),
-						value.large.BitsLength());
-	}
-};
-
-// VersionInfoValue
-struct VersionInfoValue
-{
-	VersionInfoValue() : app(), system() {}
-	VersionInfoValue(const version_info &app, const version_info &system)
-		: app(app), system(system) {}
-
-	bool operator==(const VersionInfoValue &value)
-	{
-		return (app == value.app && system == value.system);
-	}
-
-	version_info app;
-	version_info system;
-};
-
-// VersionInfoSetter
-struct VersionInfoSetter
-{
-	static status_t Set(BAppFileInfo &info, const VersionInfoValue &value)
-	{
-		status_t error = info.SetVersionInfo(&value.app, B_APP_VERSION_KIND);
-		if (error == B_OK)
-			error = info.SetVersionInfo(&value.system, B_SYSTEM_VERSION_KIND);
-		return error;
-	}
-};
-
-// VersionInfoGetter
-struct VersionInfoGetter
-{
-	static status_t Get(BAppFileInfo &info, VersionInfoValue &value)
-	{
-		status_t error = info.GetVersionInfo(&value.app, B_APP_VERSION_KIND);
-		if (error == B_OK)
-			error = info.GetVersionInfo(&value.system, B_SYSTEM_VERSION_KIND);
-		return error;
-	}
-};
-
-// VersionInfoChecker
-struct VersionInfoChecker
-{
-	static void CheckAttribute(BFile &file, const VersionInfoValue &value)
-	{
-		version_info infos[] = { value.app, value.system };
-		CheckAttr(file, kVersionInfoAttribute, VERSION_INFO_TYPE,
-				  infos, sizeof(infos));
-	}
-
-	static void CheckResource(BFile &file, const VersionInfoValue &value)
-	{
-		version_info infos[] = { value.app, value.system };
-		::CheckResource(file, kVersionInfoAttribute,
-						kVersionInfoResourceID, VERSION_INFO_TYPE,
-						infos, sizeof(infos));
-	}
-};
-
-// IconForTypeValue
-struct IconForTypeValue : public IconValue
-{
-//	IconForTypeValue() : type() {}
-//	IconForTypeValue(const BBitmap *mini, const BBitmap *large,
-//					 const char *type) : IconValue(mini, large), type(type) {}
-	IconForTypeValue() : type(testType1) {}
-	IconForTypeValue(const BBitmap *mini, const BBitmap *large)
-		: IconValue(mini, large), type(testType1) {}
-
-	string	type;
-};
-
-// IconForTypeSetter
-struct IconForTypeSetter
-{
-	static status_t Set(BAppFileInfo &info, const IconForTypeValue &value)
-	{
-		status_t error = info.SetIconForType(value.type.c_str(), &value.mini,
-											 B_MINI_ICON);
-		if (error == B_OK) {
-			error = info.SetIconForType(value.type.c_str(), &value.large,
-										B_LARGE_ICON);
-		}
-		return error;
-	}
-};
-
-// IconForTypeGetter
-struct IconForTypeGetter
-{
-	static status_t Get(BAppFileInfo &info, IconForTypeValue &value)
-	{
-		status_t error = info.GetIconForType(value.type.c_str(), &value.mini,
-											 B_MINI_ICON);
-		if (error == B_OK) {
-			error = info.GetIconForType(value.type.c_str(), &value.large,
-										B_LARGE_ICON);
-		}
-		return error;
-	}
-};
-
-// IconForTypeChecker
-struct IconForTypeChecker
-{
-	static void CheckAttribute(BFile &file, const IconForTypeValue &value)
-	{
-		string attrNameM(kMiniIconForTypeAttribute);
-		attrNameM += value.type;
-		CheckAttr(file, attrNameM.c_str(), MINI_ICON_TYPE, value.mini.Bits(),
-				  value.mini.BitsLength());
-		string attrNameL(kLargeIconForTypeAttribute);
-		attrNameL += value.type;
-		CheckAttr(file, attrNameL.c_str(), LARGE_ICON_TYPE,
-				  value.large.Bits(), value.large.BitsLength());
-	}
-
-	static void CheckResource(BFile &file, const IconForTypeValue &value)
-	{
-		string attrNameM(kMiniIconForTypeAttribute);
-		attrNameM += value.type;
-		::CheckResource(file, attrNameM.c_str(), kMiniIconForTypeResourceID,
-						MINI_ICON_TYPE, value.mini.Bits(),
-						value.mini.BitsLength());
-		string attrNameL(kLargeIconForTypeAttribute);
-		attrNameL += value.type;
-		::CheckResource(file, attrNameL.c_str(), kLargeIconForTypeResourceID,
-						LARGE_ICON_TYPE, value.large.Bits(),
-						value.large.BitsLength());
-	}
-};
-
 
 // InfoLocationTest
 void
