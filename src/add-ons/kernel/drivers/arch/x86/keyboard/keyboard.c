@@ -157,10 +157,10 @@ handle_keyboard_interrupt(void *data)
 		case SCR_LOCK:
 			if (leds & LED_SCROLL) {
 				leds &= ~LED_SCROLL;
-				dbg_set_serial_debug(false);
+				//set_dprintf_enabled(false);
 			} else {
 				leds |= LED_SCROLL;
-				dbg_set_serial_debug(true);
+				//set_dprintf_enabled(true);
 			}
 			set_leds();
 			break;
@@ -181,9 +181,11 @@ handle_keyboard_interrupt(void *data)
 		case SYS_REQ:
 			panic("Keyboard Requested Halt\n");
 			break;
+#if 0
 		case F11:
 			dbg_set_serial_debug(dbg_get_serial_debug() ? false : true);
 			break;
+#endif
 		case F12:
 			reboot();
 			break;
@@ -382,8 +384,10 @@ init_driver()
 	leds = 0;
 
 	// have the scroll lock reflect the state of serial debugging
+#if 0
 	if (dbg_get_serial_debug())
 		leds |= LED_SCROLL;
+#endif
 	set_leds();
 
 	head = tail = 0;
