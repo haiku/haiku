@@ -27,7 +27,7 @@
 <P class="Body" style="margin: 0px">Member Functions</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<TABLE WIDTH=618 HEIGHT=602 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+<TABLE WIDTH=464 HEIGHT=474 BORDER=1 CELLPADDING=1 CELLSPACING=2>
 	<TR>
 		<TD WIDTH=224 HEIGHT=17>
 			<P class="Body" style="margin: 0px">DisplayDriver(void)</P>
@@ -101,10 +101,10 @@
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=224 HEIGHT=32>
+		<TD WIDTH=224 HEIGHT=22>
 			<P class="Body" style="margin: 0px">void DrawPicture(SPicture *pic, BPoint pt)</P>
 			</TD>
-		<TD WIDTH=240 HEIGHT=32>
+		<TD WIDTH=240 HEIGHT=22>
 			<P class="Body" style="margin: 0px">void CopyBits(BRect src, BRect dest)</P>
 			</TD>
 	</TR>
@@ -153,8 +153,16 @@
 			<P class="Body" style="margin: 0px">bool IsCursorHidden(void)</P>
 			</TD>
 		<TD WIDTH=240 HEIGHT=17>
-			&nbsp;
-		</TD>
+			<P class="Body" style="margin: 0px">void SetCursor(ServerCursor *csr)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=32>
+			<P class="Body" style="margin: 0px">virtual float StringWidth(const char *string, int32 length, LayerData *d)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=32>
+			<P class="Body" style="margin: 0px">virtual float StringHeight(const char *string, int32 length, LayerData *d)</P>
+			</TD>
 	</TR>
 </TABLE>
 <P class="Body" style="margin: 0px"><BR>
@@ -236,6 +244,9 @@ void StrokeArc(BRect r, float angle, float span, layerdata *d, int8 *pattern)</s
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void HideCursor(void)</span></P>
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void ObscureCursor(void)</span></P>
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">bool IsCursorHidden(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetCursor(ServerCursor *csr)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">float StringWidth(const char *string, int32 length, LayerData *d)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">float StringHeight(const char *string, int32 length, LayerData *d)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 These drawing functions are the meat and potatoes of the graphics module. Defining any or all of them is completely optional. However, the default versions of these functions will do nothing. Thus, implementing them is likely a good idea, even if not required.</P>
 <P class="Body" style="margin: 0px"><BR>

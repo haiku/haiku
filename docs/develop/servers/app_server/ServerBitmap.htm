@@ -20,7 +20,7 @@
 <P class="Body" style="margin: 0px"><span class="OBOS-Title">ServerBitmap class</span><span style="color: rgb(0,0,0); font-size: 24pt"></span></P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<P class="Body" style="margin: 0px">ServerBitmaps are the server side counterpart to BBitmap.</P>
+<P class="Body" style="margin: 0px">ServerBitmaps are the server side counterpart to BBitmap. Note that they are not allocated like other objects - the BitmapManager handles all allocation and deletion tasks.</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <HR>
@@ -29,13 +29,21 @@
 Member Functions</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<TABLE WIDTH=621 HEIGHT=150 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+<TABLE WIDTH=466 HEIGHT=103 BORDER=1 CELLPADDING=1 CELLSPACING=2>
 	<TR>
 		<TD WIDTH=253 HEIGHT=47>
 			<P class="Body" style="margin: 0px">ServerBitmap(BRect r, color_space cspace, int32 flags, int32 bytesperrow=-1, screen_id screen=B_MAIN_SCREEN_ID)</P>
 			</TD>
 		<TD WIDTH=213 HEIGHT=47>
+			<P class="Body" style="margin: 0px">void _HandleSpace(color_space cs, int32 bytesperline=-1)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=253 HEIGHT=22>
 			<P class="Body" style="margin: 0px">~ServerBitmap(void)</P>
+			</TD>
+		<TD WIDTH=213 HEIGHT=22>
+			<P class="Body" style="margin: 0px">int32 BytesPerRow(void)</P>
 			</TD>
 	</TR>
 	<TR>
@@ -54,14 +62,6 @@ Member Functions</P>
 			<P class="Body" style="margin: 0px">BRect Bounds(void)</P>
 			</TD>
 	</TR>
-	<TR>
-		<TD WIDTH=253 HEIGHT=32>
-			<P class="Body" style="margin: 0px">int32 BytesPerRow(void)</P>
-			</TD>
-		<TD WIDTH=213 HEIGHT=32>
-			<P class="Body" style="margin: 0px">void _HandleSpace(color_space cs, int32 bytesperline=-1)</P>
-			</TD>
-	</TR>
 </TABLE>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
@@ -72,13 +72,14 @@ If there are any global functions associated with the class, they are listed her
 <BR>
 <HR>
 </P>
-<P class="Body" style="margin: 0px">ServerBitmap(BRect r, color_space cspace, int32 flags, int32 bytesperrow=-1, screen_id  screen=B_MAIN_SCREEN_ID)</P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">ServerBitmap(BRect r, color_space cspace, int32 flags, int32 bytesperrow=-1, screen_id  screen=B_MAIN_SCREEN_ID)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 1) Call _HandleSpace()</P>
 <P class="Body" style="margin: 0px">2) Call _HandleFlags()</P>
 <P class="Body" style="margin: 0px">3) Initialize remaining data members to parameters or safe values</P>
 <P class="Body" style="margin: 0px"><span class="Default"><BR>
-</span><span style="font-size: 16pt">~ServerBitmap(void)</span></P>
+</span><BR>
+<span style="font-size: 16pt">~ServerBitmap(void)</span></P>
 <P class="Body" style="margin: 0px"><span class="Default"><BR>
 Empty</span></P>
 <P class="Body" style="margin: 0px"><span class="Default"><BR>

@@ -29,7 +29,7 @@
 Member Functions</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<TABLE WIDTH=463 HEIGHT=208 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+<TABLE WIDTH=617 HEIGHT=270 BORDER=1 CELLPADDING=1 CELLSPACING=2>
 	<TR>
 		<TD WIDTH=203 HEIGHT=32>
 			<P class="Body" style="margin: 0px">Decorator(BRect int32 wlook, int32 wfeel, int32 wflags)</P>
@@ -95,16 +95,16 @@ Member Functions</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=203 HEIGHT=22>
+		<TD WIDTH=203 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void SetTitle(const char *string)</P>
 			</TD>
-		<TD WIDTH=260 HEIGHT=22>
+		<TD WIDTH=260 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void SetFont(SFont *sf)</P>
 			</TD>
 	</TR>
 	<TR>
 		<TD WIDTH=203 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void _ClipTitle(void)</P>
+			<P class="Body" style="margin: 0px">int32 _ClipTitle(float width)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void SetFocus(bool is_active)</P>
@@ -115,8 +115,8 @@ Member Functions</P>
 			<P class="Body" style="margin: 0px">bool GetFocus(void)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=17>
-			&nbsp;
-		</TD>
+			<P class="Body" style="margin: 0px">int32 _TitleWidth(void)</P>
+			</TD>
 	</TR>
 </TABLE>
 <P class="Body" style="margin: 0px"><BR>
@@ -125,7 +125,7 @@ Member Functions</P>
 Virtual Functions</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<TABLE WIDTH=617 HEIGHT=289 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+<TABLE WIDTH=617 HEIGHT=269 BORDER=1 CELLPADDING=1 CELLSPACING=2>
 	<TR>
 		<TD WIDTH=203 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void MoveBy(float x, float y)</P>
@@ -207,12 +207,12 @@ Virtual Functions</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=203 HEIGHT=32>
+		<TD WIDTH=203 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void _SetFocus(void)</P>
 			</TD>
-		<TD WIDTH=260 HEIGHT=32>
-			&nbsp;
-		</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">BRect SlideTab(float dx, float dy=0)</P>
+			</TD>
 	</TR>
 </TABLE>
 <P class="Body" style="margin: 0px"><BR>
@@ -279,11 +279,17 @@ Empty.</P>
 <P class="Body" style="margin: 0px"><BR>
 These functions work with the internal members common to all Decorators - assigning them and returning them. Additionally, SetTitle() and SetFont() set the clip_font flag to true.</P>
 <P class="Body" style="margin: 0px"><BR>
-<span class="OBOS-Function-Def">void ClipTitle(void)</span></P>
+<span class="OBOS-Function-Def">int32 _ClipTitle(float width)</span></P>
 <P class="Body" style="margin: 0px"><BR>
-ClipTitle calculates how much of the title will actually be displayed when _DrawTitle() is called. </P>
+ClipTitle calculates how much of the title, in characters, can be displayed in the given width.</P>
 <P class="Body" style="margin: 0px"><BR>
-<span style="color: rgb(255,51,0)">&lt;To be fleshed out once font subsystem is better understood&gt;</span></P>
+1) Call StringWidth() on the title.</P>
+<P class="Body" style="margin: 0px">2) If the string's width is less than<span style="font-style: italic">width</span>, return the string's character count</P>
+<P class="Body" style="margin: 0px">3) while the character count to display is &gt; 0</P>
+<P class="Body" style="margin: 0px">	a) calculate the string's width</P>
+<P class="Body" style="margin: 0px">	b) if the string's width is less than <span style="font-style: italic">width</span>, return the character count</P>
+<P class="Body" style="margin: 0px">	c) decrement the character count</P>
+<P class="Body" style="margin: 0px">4) If the loop completes itself without returning a value, it can't fit, so return 0.</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <span class="OBOS-Function-Def">void SetFocus(bool is_active)</span></P>
@@ -299,6 +305,11 @@ This is for handling color states when a window receives or loses the focus.</P>
 Returns the focus state held by the decorator</P>
 <P class="Body" style="margin: 0px"><BR>
 1) Return the focus flag</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">int32 _TitleWidth(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns the character count of the title or 0 if it is NULL.</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <span class="OBOS-Function-Def">Virtual Functions</span></P>
@@ -336,22 +347,23 @@ Main drawing call which checks the intersection of the rectangle passed to it an
 <P class="Body" style="margin: 0px"><BR>
 Each of these is designed to utilize their respective button rectangles. The public (void) versions simply call the internal protected ones with the button rectangle. These protected versions are, by default, empty. The rectangle passed to them is the invalid area to be drawn, which is not necessarily the entire button's rectangle.</P>
 <P class="Body" style="margin: 0px"><BR>
+<BR>
 <span class="OBOS-Function-Def">void DrawFrame(void)</span></P>
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawFrame(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Draws the frame, if any. The public version amounts to _DrawFrame(framerect). The protected version is expected to not cover up the client frame when drawing. Any drawing within the clientrect member will end up being drawn over by the window's child views.</P>
 <P class="Body" style="margin: 0px"><BR>
+<BR>
 <span class="OBOS-Function-Def">void DrawTab(void)</span></P>
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawTab(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Draws the window's tab, if any. DrawTab() amounts to _DrawTab(tabrect). If window titles are displayed, the _DrawTitle call is expected to be made here. Button-drawing calls, assuming that a window's buttons are in the tab, should be made here, as well.</P>
 <P class="Body" style="margin: 0px"><BR>
+<BR>
 <span class="OBOS-Function-Def">void DrawTitle(void)</span></P>
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawTitle(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><BR>
-These cause the window's title to be drawn. DrawTitle() amounts to _DrawTitle(titlerect). _DrawTitle() should check the clip_title flag and call ClipTitle() only if it is true.</P>
-<P class="Body" style="margin: 0px"><BR>
-<span style="color: rgb(255,51,0)">&lt;To be fleshed out once font subsystem is better understood&gt;</span></P>
+These cause the window's title to be drawn. DrawTitle() amounts to _DrawTitle(titlerect). </P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <span class="OBOS-Function-Def">void _SetFocus(void)</span></P>
@@ -369,6 +381,10 @@ This returns the "footprint" of the decorator, i.e. the area which is occupied b
 Clicked() performs hit testing for the decorator, given input conditions. This function is required by ALL subclasses expecting to do more than display itself. The return type will cause the server to take the appropriate actions, such as close the window, get ready to move it, etc.</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
+<span class="OBOS-Function-Def">BRect SlideTab(float dx, dy=0)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+SlideTab is implemented only for those decorators which allow the user to somehow slide the tab (if there is one) along the window. Currently, only the horizontal direction is supported. It returns the rectangle of the invalid region which needs redrawn as a result of the slide.</P>
+<P class="Body" style="margin: 0px"><BR>
 <span class="OBOS-Function-Def">extern "C" Decorator *create_decorator(BRect frame, int32 wlook, int32 wfeel, int32 wflags)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Required export function which simply allocates an instance of the decorator and returns it.</P>

@@ -27,126 +27,126 @@
 Member Functions</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<TABLE WIDTH=620 HEIGHT=479 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+<TABLE WIDTH=620 HEIGHT=480 BORDER=1 CELLPADDING=1 CELLSPACING=2>
 	<TR>
-		<TD WIDTH=307 HEIGHT=42>
+		<TD WIDTH=231 HEIGHT=32>
 			<P class="Body" style="margin: 0px">Layer(BRect frame, const char *name, int32 resize, int32 flags, ServerWindow *win)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=42>
+		<TD WIDTH=234 HEIGHT=32>
 			<P class="Body" style="margin: 0px">~Layer(void)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=42>
+		<TD WIDTH=231 HEIGHT=32>
 			<P class="Body" style="margin: 0px">void AddChild(Layer *child, Layer *before=NULL, bool rebuild=true)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=42>
+		<TD WIDTH=234 HEIGHT=32>
 			<P class="Body" style="margin: 0px">RemoveChild(Layer *child, bool rebuild=true)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=24>
+		<TD WIDTH=231 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void RemoveSelf(bool rebuild=true)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=24>
+		<TD WIDTH=234 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void Invalidate(BRect r)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=24>
+		<TD WIDTH=231 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void Invalidate(BRegion *region)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=24>
+		<TD WIDTH=234 HEIGHT=17>
 			<P class="Body" style="margin: 0px">BRect Frame(void)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=24>
+		<TD WIDTH=231 HEIGHT=17>
 			<P class="Body" style="margin: 0px">BRect Bounds(void)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=24>
+		<TD WIDTH=234 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void MoveBy(BPoint pt)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=24>
+		<TD WIDTH=231 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void MoveBy(float x, float y)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=24>
+		<TD WIDTH=234 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void ResizeBy(BPoint pt)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=24>
+		<TD WIDTH=231 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void ResizeBy(float x, float y)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=24>
+		<TD WIDTH=234 HEIGHT=17>
 			<P class="Body" style="margin: 0px">int32 CountChildren(void)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=24>
+		<TD WIDTH=231 HEIGHT=17>
 			<P class="Body" style="margin: 0px">bool IsDirty(void)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=24>
+		<TD WIDTH=234 HEIGHT=17>
 			<P class="Body" style="margin: 0px">BRect ConvertToTop(const BRect &amp;r)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=24>
+		<TD WIDTH=231 HEIGHT=32>
 			<P class="Body" style="margin: 0px">BRegion ConvertToTop(const BRegion &amp;r)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=24>
+		<TD WIDTH=234 HEIGHT=32>
 			<P class="Body" style="margin: 0px">BRect ConvertFromTop(const BRect &amp;r)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=42>
+		<TD WIDTH=231 HEIGHT=32>
 			<P class="Body" style="margin: 0px">BRegion ConvertFromTop(const BRegion &amp;r)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=42>
+		<TD WIDTH=234 HEIGHT=32>
 			<P class="Body" style="margin: 0px">BRect ConvertToParent(const BRect &amp;r)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=42>
+		<TD WIDTH=231 HEIGHT=32>
 			<P class="Body" style="margin: 0px">BRegion ConvertToParent(const BRegion &amp;r)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=42>
+		<TD WIDTH=234 HEIGHT=32>
 			<P class="Body" style="margin: 0px">BRect ConvertFromParent(const BRect &amp;r)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=42>
+		<TD WIDTH=231 HEIGHT=32>
 			<P class="Body" style="margin: 0px">BRegion ConvertFromParent(const BRegion &amp;r)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=42>
+		<TD WIDTH=234 HEIGHT=32>
 			<P class="Body" style="margin: 0px">void RebuildRegions(bool recursive=false)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=24>
+		<TD WIDTH=231 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void MakeTopChild(void)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=24>
+		<TD WIDTH=234 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void MakeBottomChild(void)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=24>
+		<TD WIDTH=231 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void RequestDraw(const BRect &amp;r)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=24>
+		<TD WIDTH=234 HEIGHT=17>
 			<P class="Body" style="margin: 0px">Layer *FindLayer(int32 token)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=307 HEIGHT=42>
+		<TD WIDTH=231 HEIGHT=32>
 			<P class="Body" style="margin: 0px">Layer *GetChildAt(BPoint pt, bool recursive=false)</P>
 			</TD>
-		<TD WIDTH=312 HEIGHT=42>
-			&nbsp;
-		</TD>
+		<TD WIDTH=234 HEIGHT=32>
+			<P class="Body" style="margin: 0px">PortLink *GetLink(void)</P>
+			</TD>
 	</TR>
 </TABLE>
 <P class="Body" style="margin: 0px"><BR>
@@ -377,6 +377,11 @@ if recursive is false:</P>
 <P class="Body" style="margin: 0px">	B) if the child is hidden, continue to the next iteration</P>
 <P class="Body" style="margin: 0px">	C) if the child's frame contains the point, return the child</P>
 <P class="Body" style="margin: 0px">	D) if none of the children contain the point, return this</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">PortLink *GetLink(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns the layer's internal PortLink object so a message can be sent to the Layer's window.</P>
 <DIV class="layer" id="Layer 1">
 	</DIV>
 </DIV>

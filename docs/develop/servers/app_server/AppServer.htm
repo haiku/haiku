@@ -82,21 +82,21 @@ Decorator * instantiate_decorator(Layer *owner, uint32 wflags, uint32 wlook)</P>
 </P>
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">AppServer(void)</span><span style="font-size: 16pt"></span></P>
 <P class="Body" style="margin: 0px"><BR>
-Create the message and input ports</P>
-<P class="Body" style="margin: 0px">Create any necessary semaphores for regulating the 3 main threads</P>
-<P class="Body" style="margin: 0px">Initialize all member variables</P>
-<P class="Body" style="margin: 0px">Allocate the application BList</P>
-<P class="Body" style="margin: 0px">Read in and process all configuration data</P>
-<P class="Body" style="margin: 0px">Initialize the desktop</P>
-<P class="Body" style="margin: 0px">Spawn the Picasso and Poller threads</P>
+1) Create the message and input ports</P>
+<P class="Body" style="margin: 0px">2) Create any necessary semaphores for regulating the 3 main threads</P>
+<P class="Body" style="margin: 0px">3) Initialize all member variables</P>
+<P class="Body" style="margin: 0px">4) Allocate the application BList</P>
+<P class="Body" style="margin: 0px">5) Read in and process all configuration data</P>
+<P class="Body" style="margin: 0px">6) Initialize the desktop</P>
+<P class="Body" style="margin: 0px">7) Spawn the Picasso and Poller threads</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <span class="OBOS-Function-Def">~AppServer(void)</span></P>
 <P class="Body" style="margin: 0px"><BR>
-Shut down the desktop</P>
-<P class="Body" style="margin: 0px">Empty and delete the application list</P>
-<P class="Body" style="margin: 0px">Wait for Picasso and Poller to exit</P>
-<P class="Body" style="margin: 0px">Free any allocated heap space</P>
+1) Shut down the desktop</P>
+<P class="Body" style="margin: 0px">2) Empty and delete the application list</P>
+<P class="Body" style="margin: 0px">3) Wait for Picasso and Poller to exit</P>
+<P class="Body" style="margin: 0px">4) Free any allocated heap space</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <span class="OBOS-Function-Def">void MainLoop(void)</span></P>
@@ -123,7 +123,7 @@ Attached Data:</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
 <P class="Body" style="text-align: center; margin: 0px"></P>
-<TABLE WIDTH=573 HEIGHT=88 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+<TABLE WIDTH=573 HEIGHT=110 BORDER=1 CELLPADDING=1 CELLSPACING=2>
 	<TR>
 		<TD WIDTH=112 HEIGHT=32>
 			<P class="Body" style="margin: 0px">port_id reply_port</P>
@@ -138,6 +138,14 @@ Attached Data:</P>
 			</TD>
 		<TD WIDTH=318 HEIGHT=17>
 			<P class="Body" style="margin: 0px">message port for the requesting BApplication</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int16 sig_length</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">length of the following application signature</P>
 			</TD>
 	</TR>
 	<TR>
@@ -525,8 +533,48 @@ Attached Data:</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
 <P class="Body" style="text-align: center; margin: 0px"></P>
-<TABLE HEIGHT=0 BORDER=0 CELLPADDING=1 CELLSPACING=2>
-	</TABLE>
+<TABLE WIDTH=573 HEIGHT=113 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int64 when</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">event time in seconds since 1/1/70</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int32 rawcode</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">code for the physical key pressed</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int32 modifiers</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">flags signifying the states of the modifier keys</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int8 state_count</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">number of bytes to follow containing the state of all keys</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int8 *states</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">array of the state of all keys at the time of the event</P>
+			</TD>
+	</TR>
+</TABLE>
 <P class="Body" style="text-align: center; margin: 0px"><BR>
 </P>
 <P class="Body" style="margin: 0px"><BR>
@@ -542,7 +590,51 @@ B_UNMAPPED_KEY_UP:</P>
 Attached Data:</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<P class="Body" style="text-align: center; margin: 0px">?</P>
+<P class="Body" style="text-align: center; margin: 0px"></P>
+<TABLE WIDTH=573 HEIGHT=113 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int64 when</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">event time in seconds since 1/1/70</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int32 rawcode</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">code for the physical key pressed</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int32 modifiers</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">flags signifying the states of the modifier keys</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int8 state_count</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">number of bytes to follow containing the state of all keys</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int8 *states</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">array of the state of all keys at the time of the event</P>
+			</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="text-align: center; margin: 0px"><BR>
+</P>
 <P class="Body" style="margin: 0px"><BR>
 1) Acquire the active application lock</P>
 <P class="Body" style="margin: 0px">2) Create a PortLink instance, target the active ServerApp's sender port, set the opcode to B_UNMAPPED_KEY_UP, attach the buffer <span style="font-style: italic">en masse</span>, and send it to the BApplication.</P>
@@ -557,11 +649,57 @@ Attached Data:</P>
 Attached Data:</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<P class="Body" style="text-align: center; margin: 0px">?</P>
+<P class="Body" style="text-align: center; margin: 0px"></P>
+<TABLE WIDTH=573 HEIGHT=113 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int64 when</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">event time in seconds since 1/1/70</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int32 modifiers</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">flags signifying the states of the modifier keys</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int32 old_modifiers</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">former states of the modifier keys</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int8 state_count</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">number of bytes to follow containing the state of all keys</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=112 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int8 *states</P>
+			</TD>
+		<TD WIDTH=318 HEIGHT=17>
+			<P class="Body" style="margin: 0px">array of the state of all keys at the time of the event</P>
+			</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="text-align: center; margin: 0px"><BR>
+</P>
 <P class="Body" style="margin: 0px"><BR>
 1) Acquire the active application lock</P>
 <P class="Body" style="margin: 0px">2) Create a PortLink instance, target the active ServerApp's sender port, set the opcode to B_MODIFIERS_CHANGED, attach the buffer <span style="font-style: italic">en masse</span>, and send it to the BApplication.</P>
 <P class="Body" style="margin: 0px">3) Release the active application lock</P>
+<DIV class="layer" id="Layer 1">
+	</DIV>
 </DIV>
 </BODY>
 </HTML>
