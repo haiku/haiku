@@ -13,6 +13,13 @@ Devices - DevicesWindow by Sikosis
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <FilePanel.h>
+#include <FindDirectory.h>
+#include <Node.h>
+#include <Path.h>
 #include <MenuBar.h>
 #include <Menu.h>
 #include <MenuItem.h>
@@ -27,6 +34,7 @@ Devices - DevicesWindow by Sikosis
 #include <StringView.h>
 #include <Window.h>
 #include <View.h>
+
 #include "Devices.h"
 #include "DevicesViews.h"
 #include "DevicesWindows.h"
@@ -36,7 +44,6 @@ const uint32 MENU_FILE_QUIT = 'mfqt';
 const uint32 MENU_DEVICES_REMOVE_JUMPERED_DEVICE = 'mdrj';
 const uint32 MENU_DEVICES_NEW_JUMPERED_DEVICE = 'mdnj';
 const uint32 MENU_DEVICES_RESOURCE_USAGE = 'mdru';
-
 const uint32 BTN_CONFIGURE = 'bcfg';
 
 
@@ -55,12 +62,23 @@ static void CenterWindowOnScreen(BWindow* w)
 
 
 // DevicesWindow - Constructor
-DevicesWindow::DevicesWindow(BRect frame) : BWindow (frame, "OBOS Devices Alpha", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL , 0)
+DevicesWindow::DevicesWindow(BRect frame) : BWindow (frame, "OBOS Devices", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL , 0)
 {
 	InitWindow();
 	CenterWindowOnScreen(this);
+	
+	// Load User Settings
+    BPath path;
+    find_directory(B_USER_SETTINGS_DIRECTORY,&path);
+    path.Append("Devices_Settings",true);
+    BFile file(path.Path(),B_READ_ONLY);
+    BMessage msg;
+    msg.Unflatten(&file);
+    LoadSettings (&msg);
+	
 	Show();
 }
+// ---------------------------------------------------------------------------------------------------------- //
 
 
 // DevicesWindow - Destructor
@@ -68,6 +86,7 @@ DevicesWindow::~DevicesWindow()
 {
 	exit(0);
 }
+// ---------------------------------------------------------------------------------------------------------- //
 
 
 // DevicesWindow::InitWindow -- Initialization Commands here
@@ -179,7 +198,6 @@ void DevicesWindow::InitWindow(void)
 	ptrDevicesView->AddChild(outlinesv);
 	ptrDevicesView->AddChild(btnConfigure);
 	ptrDevicesView->AddChild(BottomFrame);
-	
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
@@ -198,10 +216,44 @@ void DevicesWindow::FrameResized (float width, float height)
 // DevicesWindow::QuitRequested -- Post a message to the app to quit
 bool DevicesWindow::QuitRequested()
 {
-   be_app->PostMessage(B_QUIT_REQUESTED);
-   return true;
+	SaveSettings();
+	be_app->PostMessage(B_QUIT_REQUESTED);
+    return true;
 }
 // ---------------------------------------------------------------------------------------------------------- //
+
+
+// DevicesWindow::LoadSettings -- Loads your current settings
+void DevicesWindow::LoadSettings(BMessage *msg)
+{
+	BRect frame;
+
+	if (B_OK == msg->FindRect("windowframe",&frame)) {
+		MoveTo(frame.left,frame.top);
+		ResizeTo(frame.right-frame.left,frame.bottom-frame.top);
+	}
+}
+// -------------------------------------------------------------------------------------------------------------- //
+
+
+// DevicesWindow::SaveSettings -- Saves the Users settings
+void DevicesWindow::SaveSettings(void)
+{
+	BMessage msg;
+	msg.AddRect("windowframe",Frame());
+	
+	//printf("%i",outline->
+	
+    BPath path;
+    status_t result = find_directory(B_USER_SETTINGS_DIRECTORY,&path);
+    if (result == B_OK)
+    {
+	    path.Append("Devices_Settings",true);
+    	BFile file(path.Path(),B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	    msg.Flatten(&file);
+	}    
+}
+// ------------------------------------------------------------------------------- //
 
 
 // DevicesWindow::MessageReceived -- receives messages
@@ -210,10 +262,14 @@ void DevicesWindow::MessageReceived (BMessage *message)
 	switch(message->what)
 	{
 		case MENU_FILE_ABOUT_DEVICES:
-			(new BAlert("", "Devices\n\n\t'Just write a simple app to add a jumpered\n\tdevice to the system', he said.\n\n\tAnd many years later another he said\n\t'recreate it' ;)", "OK"))->Go();
+			{
+				(new BAlert("", "Devices\n\n\t'Just write a simple app to add a jumpered\n\tdevice to the system', he said.\n\n\tAnd many years later another he said\n\t'recreate it' ;)", "OK"))->Go();
+			}	
 			break;
 		case MENU_FILE_QUIT:
-			QuitRequested();
+			{
+				QuitRequested();
+			}	
 			break;
 		default:
 			BWindow::MessageReceived(message);
@@ -221,5 +277,3 @@ void DevicesWindow::MessageReceived (BMessage *message)
 	}
 }
 // ---------------------------------------------------------------------------------------------------------- //
-
-

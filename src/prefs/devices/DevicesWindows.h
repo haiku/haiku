@@ -24,6 +24,8 @@ class DevicesWindow : public BWindow
    	    virtual void FrameResized(float width, float height); 
 	private:
 		void InitWindow(void);
+		void LoadSettings(BMessage *msg);
+		void SaveSettings(void);
 		
         BStringView      *stvDeviceName;
         BStringView      *stvCurrentState;
