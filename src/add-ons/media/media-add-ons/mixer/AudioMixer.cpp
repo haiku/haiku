@@ -20,6 +20,9 @@
 #include "MixerUtils.h"
 #include "debug.h"
 
+#define VERSION_STRING	"0.1 alpha 1"
+#define BUILD_STRING	__DATE__ " " __TIME__
+
 #define USE_MEDIA_FORMAT_WORKAROUND 1
 
 #if USE_MEDIA_FORMAT_WORKAROUND
@@ -135,7 +138,7 @@ AudioMixer::AcceptFormat(const media_destination &dest, media_format *ioFormat)
 		return B_MEDIA_BAD_FORMAT;
 	
 	// We do not have special requirements, but just in case
-	// another mixer is connecting to us and my need a hint
+	// another mixer is connecting to us and may need a hint
 	// to create a connection at optimal frame rate and
 	// channel count, we place this information in the user_data
 	fCore->Lock();
@@ -944,10 +947,11 @@ AudioMixer::CreateBufferGroup()
 // the id is encoded with 16 bits
 // then chan and src (or dst) are encoded with 6 bits
 // the unique number with 4 bits
+// the PARAM_ETC etc is encoded with 26 bits
 #define PARAM_SRC_ENABLE(id, chan, src)		(((id) << 16) | ((chan) << 10) | ((src) << 4) | 0x1)
 #define PARAM_SRC_GAIN(id, chan, src)		(((id) << 16) | ((chan) << 10) | ((src) << 4) | 0x2)
 #define PARAM_DST_ENABLE(id, chan, dst)		(((id) << 16) | ((chan) << 10) | ((dst) << 4) | 0x3)
-
+#define PARAM_ETC(etc)						(((etc) << 16) | 0x4)
 #define PARAM_SRC_STR(id, chan)				(((id) << 16) | ((chan) << 10) | 0x5)
 #define PARAM_DST_STR(id, chan)				(((id) << 16) | ((chan) << 10) | 0x6)
 #define PARAM_MUTE(id)						(((id) << 16) | 0x7)
@@ -961,12 +965,14 @@ AudioMixer::CreateBufferGroup()
 #define PARAM_STR7(id)						(((id) << 16) | 0xf)
 
 #define PARAM(id)							((id) >> 16)
+#define ETC(id)								((id) >> 16)
 #define PARAM_CHAN(id)						(((id) >> 10) & 0x3f)
 #define PARAM_SRC(id)						(((id) >> 4) & 0x3f)
 #define PARAM_DST(id)						(((id) >> 4) & 0x3f)
 #define PARAM_IS_SRC_ENABLE(id)				(((id) & 0xf) == 0x1)
 #define PARAM_IS_SRC_GAIN(id)				(((id) & 0xf) == 0x2)
 #define PARAM_IS_DST_ENABLE(id)				(((id) & 0xf) == 0x3)
+#define PARAM_IS_ETC(id)					(((id) & 0xf) == 0x4)
 #define PARAM_IS_MUTE(id)					(((id) & 0xf) == 0x7)
 #define PARAM_IS_GAIN(id)					(((id) & 0xf) == 0x8)
 
@@ -1122,7 +1128,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			// XXX this is really annoying
 			// The slider count of the gain control needs to be changed,
 			// but calling SetChannelCount(input->GetMixerChannelCount())
-			// on it has no effect on remove parameter webs in other apps.
+			// on it has no effect on remote BParameterWebs in other apps.
 			// BroadcastChangedParameter() should be correct, but doesn't work
 			BroadcastChangedParameter(PARAM_GAIN(PARAM(id)));
 			// We trigger a complete ParameterWeb update as workaround
@@ -1149,6 +1155,7 @@ AudioMixer::UpdateParameterWeb()
 	BParameterGroup *subgroup;
 	BParameterGroup *subsubgroup;
 	BParameterGroup *subsubsubgroup;
+	BDiscreteParameter *dp;
 	MixerInput *in;
 	MixerOutput *out;
 	char buf[50];
@@ -1223,6 +1230,42 @@ AudioMixer::UpdateParameterWeb()
 				
 		}
 	}
+
+	top = web->MakeGroup("Setup"); // top level group
+	group = top->MakeGroup("");
+	
+	group->MakeDiscreteParameter(PARAM_ETC(10), B_MEDIA_RAW_AUDIO, "Attenuate mixer output by 3dB (like BeOS R5)", B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(20), B_MEDIA_RAW_AUDIO, "Use non linear gain sliders (like BeOS R5)", B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(30), B_MEDIA_RAW_AUDIO, "Display balance control for stereo connections", B_ENABLE);
+
+	group->MakeDiscreteParameter(PARAM_ETC(40), B_MEDIA_RAW_AUDIO, "Allow output channel remapping", B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(50), B_MEDIA_RAW_AUDIO, "Allow input channel remapping", B_ENABLE);
+
+	dp = group->MakeDiscreteParameter(PARAM_ETC(60), B_MEDIA_RAW_AUDIO, "Input gain controls represent", B_INPUT_MUX);
+	dp->AddItem(0, "Physical input channels");
+	dp->AddItem(1, "Virtual output channels");
+
+	dp = group->MakeDiscreteParameter(PARAM_ETC(70), B_MEDIA_RAW_AUDIO, "Resampling algorithm", B_INPUT_MUX);
+	dp->AddItem(0, "Drop/repeat samples");
+	dp->AddItem(1, "Drop/repeat samples (template based)");
+	dp->AddItem(2, "Linear interpolation");
+	dp->AddItem(3, "17th order filtering");
+
+	group->MakeDiscreteParameter(PARAM_ETC(80), B_MEDIA_RAW_AUDIO, "Refuse output format changes", B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(90), B_MEDIA_RAW_AUDIO, "Refuse input format changes", B_ENABLE);
+	group->MakeDiscreteParameter(PARAM_ETC(100), B_MEDIA_RAW_AUDIO, "Display performance profiling data", B_ENABLE);
+
+	group = top->MakeGroup("");
+	group->MakeNullParameter(PARAM_ETC(1001), B_MEDIA_RAW_AUDIO, "Info:", B_GENERIC);
+	group->MakeNullParameter(PARAM_ETC(1002), B_MEDIA_RAW_AUDIO, "OpenBeOS audio mixer", B_GENERIC);
+	group->MakeNullParameter(PARAM_ETC(1003), B_MEDIA_RAW_AUDIO, "Version: " VERSION_STRING , B_GENERIC);
+	group->MakeNullParameter(PARAM_ETC(1004), B_MEDIA_RAW_AUDIO, "Build: " BUILD_STRING
+		#if DEBUG == 0
+			", optimization disabled"
+		#elif DEBUG > 0
+			", debugging enabled"
+		#endif
+		, B_GENERIC);
 
 	fCore->Unlock();
 
