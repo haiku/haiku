@@ -1,9 +1,7 @@
 #ifndef __WIDTHBUFFER_H
 #define __WIDTHBUFFER_H
 
-#include "TextGapBuffer.h"
 #include "TextViewSupportBuffer.h"
-
 
 struct _width_table_ {
 #if B_BEOS_VERSION_DANO
@@ -17,7 +15,7 @@ struct _width_table_ {
 	void *widths;			// width table	
 };
 
-
+class _BTextGapBuffer_;
 class _BWidthBuffer_ : public _BTextViewSupportBuffer_<_width_table_> {
 public:
 	_BWidthBuffer_();
