@@ -56,6 +56,7 @@ static void _dump_port_info(struct port_entry *port);
 
 // sMaxPorts must be power of 2
 static int32 sMaxPorts = 4096;
+static int32 sUsedPorts = 0;
 
 #define MAX_QUEUE_LENGTH 4096
 #define PORT_MAX_MESSAGE_SIZE 65536
@@ -106,6 +107,8 @@ port_init(kernel_args *ka)
 
 #ifdef DEBUG
 // ToDo: the test code does not belong here!
+// the same code is present in the test_app in kernel/apps 
+// so I guess we can remove this
 /*
  * testcode
  */
@@ -361,16 +364,7 @@ port_max_ports(void)
 int32
 port_used_ports(void)
 {
-	int32 count = 0;
-	int32 i;
-
-	// ToDo: we should have a variable that counts the used ports for us
-	for (i = 0; i < sMaxPorts; i++) {
-		if (sPorts[i].id >= 0)
-			count++;
-	}
-
-	return count;
+	return sUsedPorts;
 }
 
 
@@ -396,6 +390,12 @@ create_port(int32 queueLength, const char *name)
 		|| queueLength > MAX_QUEUE_LENGTH)
 		return B_BAD_VALUE;
 
+	// check early on if there are any free port slots to use
+	if (atomic_add(&sUsedPorts, 1) >= sMaxPorts) {
+		atomic_add(&sUsedPorts, -1);
+		return B_NO_MORE_PORTS;
+	}
+
 	// check & dup name
 	if (name == NULL)
 		name = "unnamed port";
@@ -403,8 +403,10 @@ create_port(int32 queueLength, const char *name)
 	// ToDo: we could save the memory and use the semaphore name only instead
 	strlcpy(nameBuffer, name, B_OS_NAME_LENGTH);
 	name = strdup(nameBuffer);
-	if (name == NULL)
+	if (name == NULL) {
+		atomic_add(&sUsedPorts, -1);
 		return B_NO_MEMORY;
+	}
 
 	// create read sem with owner set to -1
 	// ToDo: should be B_SYSTEM_TEAM
@@ -412,6 +414,7 @@ create_port(int32 queueLength, const char *name)
 	if (readSem < B_OK) {
 		// cleanup
 		free((char *)name);
+		atomic_add(&sUsedPorts, -1);
 		return readSem;
 	}
 
@@ -421,6 +424,7 @@ create_port(int32 queueLength, const char *name)
 		// cleanup
 		delete_sem(readSem);
 		free((char *)name);
+		atomic_add(&sUsedPorts, -1);
 		return writeSem;
 	}
 
@@ -440,6 +444,7 @@ create_port(int32 queueLength, const char *name)
 
 			GRAB_PORT_LOCK(sPorts[i]);
 			sPorts[i].id = sNextPort++;
+			atomic_add(&sUsedPorts, 1);
 			RELEASE_PORT_LIST_LOCK();
 
 			sPorts[i].capacity = queueLength;
@@ -452,11 +457,16 @@ create_port(int32 queueLength, const char *name)
 			list_init(&sPorts[i].msg_queue);
 			sPorts[i].total_count = 0;
 			returnValue = sPorts[i].id;
-
+			
 			RELEASE_PORT_LOCK(sPorts[i]);
 			goto out;
 		}
 	}
+
+	// ToDo: due to sUsedPorts, this cannot happen anymore - as
+	//		long as sMaxPorts stays constant over the kernel run
+	//		time (which it should be). IOW we could simply panic()
+	//		here.
 
 	// not enough ports...
 	RELEASE_PORT_LIST_LOCK();
@@ -467,6 +477,7 @@ create_port(int32 queueLength, const char *name)
 	delete_sem(writeSem);
 	delete_sem(readSem);
 	free((char *)name);
+	atomic_add(&sUsedPorts, -1);
 
 out:
 	restore_interrupts(state);
@@ -542,6 +553,8 @@ delete_port(port_id id)
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
 	restore_interrupts(state);
+
+	atomic_add(&sUsedPorts, -1);
 
 	// free the queue
 	while ((msg = (port_msg *)list_remove_head_item(&list)) != NULL) {

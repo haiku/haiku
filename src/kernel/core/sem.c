@@ -53,6 +53,7 @@ struct sem_entry {
 
 // Todo: Compute based on the amount of available memory.
 static int32 sMaxSems = 4096;
+static int32 sUsedSems = 0;
 
 static struct sem_entry *gSems = NULL;
 static region_id         gSemRegion = 0;
@@ -224,7 +225,7 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 	char *temp_name;
 	int name_len;
 
-	if (gSemsActive == false)
+	if (gSemsActive == false || sUsedSems == sMaxSems)
 		return B_NO_MORE_SEMS;
 
 	if (name == NULL)
@@ -255,8 +256,10 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 		sem->u.used.q.head = NULL;
 		sem->u.used.name = temp_name;
 		sem->u.used.owner = owner;
-		RELEASE_SEM_LOCK(*sem);
 		retval = sem->id;
+		RELEASE_SEM_LOCK(*sem);
+
+		atomic_add(&sUsedSems, 1);
 	}
 
 	RELEASE_SEM_LIST_LOCK();
@@ -332,6 +335,7 @@ delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 	// append slot to the free list
 	GRAB_SEM_LIST_LOCK();
 	free_sem_slot(slot, id + sMaxSems);
+	atomic_add(&sUsedSems, -1);
 	RELEASE_SEM_LIST_LOCK();
 
 	if (released_threads > 0) {
@@ -930,16 +934,7 @@ sem_max_sems(void)
 int32
 sem_used_sems(void)
 {
-	int32 count = 0;
-	int32 i;
-
-	// ToDo: we should have a variable that counts the used sems for us
-	for (i = 0; i < sMaxSems; i++) {
-		if (gSems[i].id >= 0)
-			count++;
-	}
-
-	return count;
+	return sUsedSems;
 }
 
 
