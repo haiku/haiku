@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-10/2003
+   Rudolf Cornelissen 10/2002-12/2003
 */
 
 #define MODULE_BIT 0x00008000
@@ -852,21 +852,6 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* determine pixel multiple based on 2D/3D engine constraints */
 	switch (si->ps.card_arch)
 	{
-	case NV20A:
-		/* confirmed for:
-		 * GeForce4 Ti4200 */
-		switch (target->space)
-		{
-			case B_CMAP8: acc_mask = 0x3f; depth =  8; break;
-			case B_RGB15: acc_mask = 0x1f; depth = 16; break;
-			case B_RGB16: acc_mask = 0x1f; depth = 16; break;
-			case B_RGB24: acc_mask = 0x3f; depth = 24; break;
-			case B_RGB32: acc_mask = 0x0f; depth = 32; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
 	default:
 		/* confirmed for:
 		 * TNT1, TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 */
@@ -877,6 +862,23 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 			case B_RGB16: acc_mask = 0x07; depth = 16; break;
 			case B_RGB24: acc_mask = 0x0f; depth = 24; break;
 			case B_RGB32: acc_mask = 0x03; depth = 32; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+		/* NV31 (confirmed GeForceFX 5600) has NV20A granularity!
+		 * So let it fall through... */
+		if (si->ps.card_type != NV31) break;
+	case NV20A:
+		/* confirmed for:
+		 * GeForce4 Ti4200 */
+		switch (target->space)
+		{
+			case B_CMAP8: acc_mask = 0x3f; depth =  8; break;
+			case B_RGB15: acc_mask = 0x1f; depth = 16; break;
+			case B_RGB16: acc_mask = 0x1f; depth = 16; break;
+			case B_RGB24: acc_mask = 0x3f; depth = 24; break;
+			case B_RGB32: acc_mask = 0x0f; depth = 32; break;
 			default:
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
@@ -947,26 +949,6 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 			break;
 		}
 		break;
-	case NV20A:
-		/* confirmed for:
-		 * GeForce4 Ti4200 */
-		switch(target->space)
-		{
-		case B_CMAP8:
-			if (target->virtual_width > 16320) si->acc_mode = false;
-			break;
-		case B_RGB15_LITTLE:
-		case B_RGB16_LITTLE:
-			if (target->virtual_width > 8160) si->acc_mode = false;
-			break;
-		case B_RGB24_LITTLE:
-			if (target->virtual_width > 5440) si->acc_mode = false;
-			break;
-		case B_RGB32_LITTLE:
-			if (target->virtual_width > 4080) si->acc_mode = false;
-			break;
-		}
-		break;
 	default:
 		/* confirmed for:
 		 * GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 */
@@ -984,6 +966,28 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 			break;
 		case B_RGB32_LITTLE:
 			if (target->virtual_width > 4092) si->acc_mode = false;
+			break;
+		}
+		/* NV31 (confirmed GeForceFX 5600) has NV20A granularity!
+		 * So let it fall through... */
+		if (si->ps.card_type != NV31) break;
+	case NV20A:
+		/* confirmed for:
+		 * GeForce4 Ti4200 */
+		switch(target->space)
+		{
+		case B_CMAP8:
+			if (target->virtual_width > 16320) si->acc_mode = false;
+			break;
+		case B_RGB15_LITTLE:
+		case B_RGB16_LITTLE:
+			if (target->virtual_width > 8160) si->acc_mode = false;
+			break;
+		case B_RGB24_LITTLE:
+			if (target->virtual_width > 5440) si->acc_mode = false;
+			break;
+		case B_RGB32_LITTLE:
+			if (target->virtual_width > 4080) si->acc_mode = false;
 			break;
 		}
 		break;
