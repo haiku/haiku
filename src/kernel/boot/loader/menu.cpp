@@ -29,7 +29,8 @@ MenuItem::MenuItem(const char *label, Menu *subMenu)
 	fType(MENU_ITEM_STANDARD),
 	fMenu(NULL),
 	fSubMenu(subMenu),
-	fData(NULL)
+	fData(NULL),
+	fHelpText(NULL)
 {
 }
 
@@ -98,6 +99,20 @@ void
 MenuItem::SetData(void *data)
 {
 	fData = data;
+}
+
+
+/** This sets a help text that is shown when the item is
+ *	selected.
+ *	Note, unlike the label, the string is not copied, it's
+ *	just referenced and has to stay valid as long as the
+ *	item's menu is being used.
+ */
+
+void
+MenuItem::SetHelpText(const char *text)
+{
+	fHelpText = text;
 }
 
 

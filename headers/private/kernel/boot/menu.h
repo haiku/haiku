@@ -43,6 +43,9 @@ class MenuItem {
 		void SetData(void *data);
 		void *Data() const { return fData; }
 
+		void SetHelpText(const char *text);
+		const char *HelpText() const { return fHelpText; }
+
 		const char *Label() const { return fLabel; }
 		Menu *Submenu() const { return fSubMenu; }
 
@@ -59,6 +62,7 @@ class MenuItem {
 		menu_item_type	fType;
 		Menu			*fMenu, *fSubMenu;
 		void			*fData;
+		const char		*fHelpText;
 };
 
 typedef DoublyLinked::List<MenuItem> MenuItemList;
