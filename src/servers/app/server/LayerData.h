@@ -23,6 +23,7 @@ public:
 			overlay=NULL;
 			highcolor.SetColor(0,0,0,255);
 			lowcolor.SetColor(255,255,255,255);
+			viewcolor.SetColor(255,255,255,255);
 			font=fontserver->GetSystemPlain();
 			scale=1.0;
 			edelta.space=0;
@@ -44,7 +45,7 @@ public:
 	alpha_function blending_mode;
 	ServerBitmap *background;
 	ServerBitmap *overlay;
-	RGBColor highcolor, lowcolor;
+	RGBColor highcolor, lowcolor, viewcolor;
 	ServerFont *font;
 	float scale;
 	escapement_delta edelta;

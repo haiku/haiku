@@ -1149,7 +1149,9 @@ void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 		if(!family)
 			return;
 		
-		font.SetFamilyAndStyle((font_family)family->Name(),style->Name());
+		font_family fontfamily;
+		strcpy(fontfamily,family->Name());
+		font.SetFamilyAndStyle(fontfamily,style->Name());
 		font.SetFlags(sf->Flags());
 		font.SetEncoding(sf->Encoding());
 		font.SetSize(sf->Size());
