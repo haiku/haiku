@@ -45,6 +45,35 @@ test_straight_lines(Surface& s, uint32 width, uint32 height)
 	return system_time() - now;	
 }
 
+// test_fill_rect
+template<class Surface>
+bigtime_t
+test_fill_rect(Surface& s, uint32 width, uint32 height)
+{
+	bigtime_t now = system_time();
+
+	s.SetPenSize(1.0);
+	s.SetDrawingMode(B_OP_COPY);
+	s.SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+
+	s.SetHighColor(0, 0, 0, 255);
+	s.SetLowColor(130, 0, 20, 255);
+
+	const pattern pat = B_SOLID_HIGH;
+
+	BRect r;
+	for (uint32 y = 10; y <= height; y += 20) {
+		for (uint32 x = 10; x <= width; x += 20) {
+			r.Set(x - 9, y - 9, x + 9, y + 9);
+			s.FillRect(r, pat);
+		}
+	}
+
+	s.Sync();
+
+	return system_time() - now;	
+}
+
 // test_ellipses
 template<class Surface>
 bigtime_t
@@ -315,9 +344,10 @@ main(int argc, char **argv)
 		// reset bitmap contents
 		memset(bitmap->Bits(), 255, bitmap->BitsLength());
 		// run test
-		painterNow += test(painter, width, height, testBitmap);
+//		painterNow += test(painter, width, height, testBitmap);
 //		painterNow += test_lines(painter, width, height);
 //		painterNow += test_straight_lines(painter, width, height);
+		painterNow += test_fill_rect(painter, width, height);
 //		painterNow += test_ellipses(painter, width, height);
 	}
 
@@ -341,9 +371,10 @@ fprintf(stdout, " %lld µsecs\n", painterNow / iterations);
 		// reset bitmap contents
 		memset(bitmap->Bits(), 255, bitmap->BitsLength());
 		// run test
-		viewNow += test(*view, width, height, testBitmap);
+//		viewNow += test(*view, width, height, testBitmap);
 //		viewNow += test_lines(*view, width, height);
 //		viewNow += test_straight_lines(*view, width, height);
+		viewNow += test_fill_rect(*view, width, height);
 //		viewNow += test_ellipses(*view, width, height);
 	}
 
