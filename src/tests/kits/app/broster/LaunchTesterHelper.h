@@ -9,12 +9,6 @@
 #include <MessageQueue.h>
 #include <OS.h>
 
-enum {
-	MSG_1	= 'msg1',
-	MSG_2	= 'msg2',
-	MSG_3	= 'msg3',
-};
-
 // LaunchCaller
 class LaunchCaller {
 public:
@@ -138,17 +132,27 @@ private:
 class RosterLaunchApp : public BApplication {
 public:
 	RosterLaunchApp(const char *signature);
+	~RosterLaunchApp();
 
 	virtual void MessageReceived(BMessage *message);
-
-	BMessageQueue &MessageQueue();
 
 	void SetLaunchContext(LaunchContext *context);
 	LaunchContext *GetLaunchContext() const;
 
+	BHandler *Handler() { return fHandler; }
+	void SetHandler(BHandler *handler);
+
 private:
-	BMessageQueue	fMessageQueue;
 	LaunchContext	*fLaunchContext;
+	BHandler		*fHandler;
+};
+
+// RosterBroadcastHandler
+class RosterBroadcastHandler : public BHandler {
+public:
+	RosterBroadcastHandler();
+
+	virtual void MessageReceived(BMessage *message);
 };
 
 #endif	// LAUNCH_TESTER_HELPER_H

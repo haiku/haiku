@@ -251,6 +251,10 @@ LaunchContext::HandleMessage(BMessage *message)
 		case MSG_MESSAGE_RECEIVED:
 		case MSG_QUIT_REQUESTED:
 		case MSG_READY_TO_RUN:
+		case MSG_1:
+		case MSG_2:
+		case MSG_3:
+		case MSG_REPLY:
 		{
 			BMessenger messenger = message->ReturnAddress();
 			// add the message to the respective team's message list
@@ -258,9 +262,12 @@ LaunchContext::HandleMessage(BMessage *message)
 			// remote team. The R5 registrar seems to send a B_REPLY message
 			// sometimes.
 			team_id sender = -1;
+			bool dontIgnore = false;
 			if (message->FindInt32("sender", &sender) != B_OK
 				|| sender == be_app->Team()
-				|| sender == messenger.Team()) {
+				|| sender == messenger.Team()
+				|| (message->FindBool("don't ignore", &dontIgnore) == B_OK)
+					&& dontIgnore) {
 				AppInfo *info = CreateAppInfo(messenger);
 				info->AddMessage(*message);
 				if (fTerminating)
@@ -335,6 +342,11 @@ LaunchContext::CheckNextMessage(LaunchCaller &caller, team_id team,
 								int32 &cookie, uint32 what)
 {
 	BMessage *message = NextMessageFrom(team, cookie);
+if (!message)
+printf("LaunchContext::CheckNextMessage(): no more messages\n");
+else if (message->what != what)
+printf("LaunchContext::CheckNextMessage(): %.4s vs %.4s\n",
+(char*)&message->what, (char*)&what);
 	return (message && message->what == what);
 }
 
@@ -715,9 +727,15 @@ LaunchContext::NotifySleepers(uint32 messageCode)
 // constructor
 RosterLaunchApp::RosterLaunchApp(const char *signature)
 	: BApplication(signature),
-	  fMessageQueue(),
-	  fLaunchContext(NULL)
+	  fLaunchContext(NULL),
+	  fHandler(NULL)
 {
+}
+
+// destructor
+RosterLaunchApp::~RosterLaunchApp()
+{
+	SetHandler(NULL);
 }
 
 // MessageReceived
@@ -726,13 +744,6 @@ RosterLaunchApp::MessageReceived(BMessage *message)
 {
 	if (fLaunchContext)
 		fLaunchContext->HandleMessage(message);
-}
-
-// MessageQueue
-BMessageQueue&
-RosterLaunchApp::MessageQueue()
-{
-	return fMessageQueue;
 }
 
 // SetLaunchContext
@@ -747,5 +758,43 @@ LaunchContext *
 RosterLaunchApp::GetLaunchContext() const
 {
 	return fLaunchContext;
+}
+
+// SetHandler
+void
+RosterLaunchApp::SetHandler(BHandler *handler)
+{
+	Lock();
+	if (fHandler) {
+		RemoveHandler(fHandler);
+		delete fHandler;
+		fHandler = NULL;
+	}
+	if (handler) {
+		fHandler = handler;
+		AddHandler(handler);
+	}
+	Unlock();
+}
+
+
+//////////////////////////
+// RosterBroadcastHandler
+
+// constructor
+RosterBroadcastHandler::RosterBroadcastHandler()
+{
+}
+
+// MessageReceived
+void
+RosterBroadcastHandler::MessageReceived(BMessage *message)
+{
+	RosterLaunchApp *app = dynamic_cast<RosterLaunchApp*>(be_app);
+	if (LaunchContext *launchContext = app->GetLaunchContext()) {
+		message->AddInt32("original what", (int32)message->what);
+		message->what = MSG_REPLY;
+		launchContext->HandleMessage(message);
+	}
 }
 
