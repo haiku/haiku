@@ -480,12 +480,15 @@
 #define NVDAC_OUTPUT		0x0068052c
 #define NVDAC_PIXPLLC2		0x00680578 /* NV31, NV36 only */
 #define NVDAC_GENCTRL		0x00680600
+#define NVDAC_TSTCTRL		0x00680608
+#define NVDAC_TSTDATA		0x00680610
 /* secondary head */
 #define NVDAC2_CURPOS		0x00682300
 #define NVDAC2_PIXPLLC		0x00680520
 #define NVDAC2_OUTPUT		0x0068252c
 #define NVDAC2_PIXPLLC2		0x0068057c /* NV31, NV36 only */
 #define NVDAC2_GENCTRL		0x00682600
+#define NVDAC2_TSTCTRL		0x00682608
 
 /* Nvidia CRTC indexed registers */
 /* VGA standard registers: */

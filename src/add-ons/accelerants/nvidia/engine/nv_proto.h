@@ -2,7 +2,6 @@
 status_t nv_general_powerup(void);
 status_t nv_set_cas_latency(void);
 status_t nv_general_output_select(bool cross);
-status_t nv_general_dac_select(int);
 status_t nv_general_wait_retrace(void);
 status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode);
 
@@ -32,6 +31,8 @@ void fake_pins(void);
 void dump_pins(void);
 
 /* DAC functions */
+/* see if an analog VGA monitor is connected to DAC */
+bool nv_dac_crt_connected(void);
 status_t nv_dac_mode(int,float);
 status_t nv_dac_palette(uint8*,uint8*,uint8*);
 status_t nv_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
@@ -39,6 +40,7 @@ status_t nv_dac_set_pix_pll(display_mode target);
 status_t g400_dac_set_sys_pll(void);
 
 /* DAC2 functions */
+bool nv_dac2_crt_connected(void);
 status_t nv_dac2_mode(int,float);
 status_t nv_dac2_palette(uint8*,uint8*,uint8*);
 status_t nv_dac2_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);

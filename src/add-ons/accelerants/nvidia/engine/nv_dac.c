@@ -12,6 +12,56 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 static status_t g100_g400max_dac_sys_pll_find(
 	float req_sclk,float * calc_sclk,uint8 * m_result,uint8 * n_result,uint8 * p_result);
 
+/* see if an analog VGA monitor is connected to DAC */
+bool nv_dac_crt_connected(void)
+{
+	uint32 output, dac;
+	bool present;
+
+	/* save output connector setting */
+	output = DACR(OUTPUT);
+	/* save DAC state */
+	dac = DACR(TSTCTRL);
+
+	/* shut-off DAC */
+	DACW(TSTCTRL, (DACR(TSTCTRL) | 0x00010000));
+	/* select primary head and turn off CRT (and DVI?) outputs */
+	DACW(OUTPUT, (output & 0x0000feee));
+	/* wait for signal lines to stabilize */
+	snooze(1000);
+	/* re-enable CRT output */
+	DACW(OUTPUT, (DACR(OUTPUT) | 0x00000001));
+
+	/* setup RGB test signal levels to approx 30% of DAC range and enable them */
+	DACW(TSTDATA, ((0x2 << 30) | (0x140 << 20) | (0x140 << 10) | (0x140 << 0)));
+	/* route test signals to output */
+	DACW(TSTCTRL, (DACR(TSTCTRL) | 0x00001000));
+	/* wait for signal lines to stabilize */
+	snooze(1000);
+
+	/* do actual detection: all signals paths high == CRT connected */
+	if DACR(TSTCTRL & 0x10000000)
+	{
+		present = true;
+		LOG(4,("DAC: CRT detected\n"));
+	}
+	else
+	{
+		present = false;
+		LOG(4,("DAC: no CRT detected\n"));
+	}
+
+	/* kill test signal routing */
+	DACW(TSTCTRL, (DACR(TSTCTRL) & 0xffffefff));
+
+	/* restore output connector setting */
+	DACW(OUTPUT, output);
+	/* restore DAC state */
+	DACW(TSTCTRL, dac);
+
+	return present;
+}
+
 /*set the mode, brightness is a value from 0->2 (where 1 is equivalent to direct)*/
 status_t nv_dac_mode(int mode,float brightness)
 {

@@ -802,8 +802,9 @@ status_t nv_general_output_select(bool cross)
 				LOG(4,("INIT: switching outputs to be cross-connected\n"));
 
 				/* enable head 2 on connector 1 */
-				/* (b8 = select head for output,
-				 *  b0 = enable sync signals on output (if generated)) */
+				/* (b8 = select CRTC (head) for output,
+				 *  b4 = enable DVI???,
+				 *  b0 = enable CRT) */
 				DACW(OUTPUT, 0x00000101);
 				/* enable head 1 on connector 2 */
 				DAC2W(OUTPUT, 0x00000001);
@@ -828,78 +829,6 @@ status_t nv_general_output_select(bool cross)
 	{
 		return B_ERROR;
 	}
-}
-
-/*connect CRTC1 to the specified DAC*/
-status_t nv_general_dac_select(int dac)
-{
-	if (!si->ps.secondary_head)
-		return B_ERROR;
-
-	/*MISCCTRL, clock src,...*/
-	switch(dac)
-	{
-		/* G400 */
-		case DS_CRTC1DAC_CRTC2MAVEN:
-			/* connect CRTC1 to pixPLL */
-//			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1);
-			/* connect CRTC2 to vidPLL, connect CRTC1 to internal DAC and
-			 * enable CRTC2 external video timing reset signal.
-			 * (Setting for MAVEN 'master mode' TVout signal generation.) */
-//			CR2W(CTL,(CR2R(CTL)&0xffe00779)|0xD0000002);
-			/* disable CRTC1 external video timing reset signal */
-//			VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)&0x77));
-			/* select CRTC2 RGB24 MAFC mode: connects CRTC2 to MAVEN DAC */ 
-//			DXIW(MISCCTRL,(DXIR(MISCCTRL)&0x19)|0x82);
-			break;
-		case DS_CRTC1MAVEN_CRTC2DAC:
-			/* connect CRTC1 to vidPLL */
-//			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x2);
-			/* connect CRTC2 to pixPLL and internal DAC and
-			 * disable CRTC2 external video timing reset signal */
-//			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x1<<20));
-			/* enable CRTC1 external video timing reset signal.
-			 * note: this is nolonger used as G450/G550 cannot do TVout on CRTC1 */
-//			VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)|0x88));
-			/* select CRTC1 RGB24 MAFC mode: connects CRTC1 to MAVEN DAC */
-//			DXIW(MISCCTRL,(DXIR(MISCCTRL)&0x19)|0x02);
-			break;
-		/* G450/G550 */
-		case DS_CRTC1CON1_CRTC2CON2:
-			/* connect CRTC1 to pixPLL */
-//			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1);
-			/* connect CRTC2 to vidPLL, connect CRTC1 to DAC1, disable CRTC2
-			 * external video timing reset signal, set CRTC2 progressive scan mode
-			 * and disable TVout mode (b12).
-			 * (Setting for MAVEN 'slave mode' TVout signal generation.) */
-			//fixme: enable timing resets if TVout is used in master mode!
-			//otherwise keep it disabled.
-//			CR2W(CTL,(CR2R(CTL)&0x2de00779)|0x6|(0x0<<20));
-			/* connect DAC1 to CON1, CRTC2/'DAC2' to CON2 (monitor mode) */
-//			DXIW(OUTPUTCONN,0x09); 
-			/* Select 1.5 Volt MAVEN DAC ref. for monitor mode */
-//			DXIW(GENIOCTRL, DXIR(GENIOCTRL) & ~0x40);
-//			DXIW(GENIODATA, 0x00);
-			break;
-		//fixme: toggle PLL's below if possible: 
-		//       otherwise toggle PLL's for G400 2nd case?
-		case DS_CRTC1CON2_CRTC2CON1:
-			/* connect CRTC1 to pixPLL */
-//			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1);
-			/* connect CRTC2 to vidPLL and DAC1, disable CRTC2 external
-			 * video timing reset signal, and set CRTC2 progressive scan mode and
-			 * disable TVout mode (b12). */
-//			CR2W(CTL,(CR2R(CTL)&0x2de00779)|0x6|(0x1<<20));
-			/* connect DAC1 to CON2 (monitor mode), CRTC2/'DAC2' to CON1 */
-//			DXIW(OUTPUTCONN,0x05); 
-			/* Select 1.5 Volt MAVEN DAC ref. for monitor mode */
-//			DXIW(GENIOCTRL, DXIR(GENIOCTRL) & ~0x40);
-//			DXIW(GENIODATA, 0x00);
-			break;
-		default:
-			return B_ERROR;
-	}
-	return B_OK;
 }
 
 /* basic change of card state from VGA to enhanced mode:
@@ -1013,6 +942,14 @@ status_t nv_general_bios_to_powergraphics()
 	/* enable programmable PLLs */
 	DACW(PLLSEL, 0x10000700);
 	if (si->ps.secondary_head) DACW(PLLSEL, (DACR(PLLSEL) | 0x20000800));
+
+	/* turn on DAC and make sure detection testsignal routing is disabled
+	 * (b16 = disable DAC,
+	 *  b12 = enable testsignal output */
+	DACW(TSTCTRL, (DACR(TSTCTRL) & 0xfffeefff));
+	/* turn on DAC2 if it exists
+	 * (NOTE: testsignal function block resides in DAC1 only (!)) */
+	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
 
 	/* turn screen one on */
 	nv_crtc_dpms(true, true, true);
