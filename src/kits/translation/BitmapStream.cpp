@@ -1,8 +1,8 @@
 /*****************************************************************************/
 //               File: BitmapStream.cpp
 //              Class: BBitmapStream
-//   Reimplimented by: Travis Smith, Michael Wilber, Translation Kit Team
-//   Reimplimentation: 2002-04
+//   Reimplemented by: Travis Smith, Michael Wilber, Translation Kit Team
+//   Reimplementation: 2002-04
 //
 // Description: BPositionIO based object to read/write bitmap format to/from
 //              a BBitmap object.
@@ -71,8 +71,8 @@ BBitmapStream::BBitmapStream(BBitmap *bitmap)
 		fHeader.bounds = fBitmap->Bounds();
 		fHeader.rowBytes = fBitmap->BytesPerRow();
 		fHeader.colors = fBitmap->ColorSpace();
-		fHeader.dataSize = (uint32)
-			(fHeader.bounds.Height() + 1) * fHeader.rowBytes;
+		fHeader.dataSize = static_cast<uint32>
+			((fHeader.bounds.Height() + 1) * fHeader.rowBytes);
 		fSize = sizeof(TranslatorBitmap) + fHeader.dataSize;
 		
 		SetBigEndianHeader();
@@ -139,10 +139,10 @@ BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 
 	if (pos < sizeof(TranslatorBitmap)) {
 		toRead = sizeof(TranslatorBitmap) - pos;
-		source = ((uint8 *) fpBigEndianHeader) + pos;
+		source = (reinterpret_cast<uint8 *> (fpBigEndianHeader)) + pos;
 	} else {
 		toRead = fSize - pos;
-		source = ((uint8 *) fBitmap->Bits()) + pos -
+		source = (reinterpret_cast<uint8 *> (fBitmap->Bits())) + pos -
 			sizeof(TranslatorBitmap);
 	}
 	if (toRead > size)
@@ -191,10 +191,11 @@ BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 		// changes to it
 		if (pos < sizeof(TranslatorBitmap)) {
 			toWrite = sizeof(TranslatorBitmap) - pos;
-			dest = ((uint8 *) &fHeader) + pos;
+			dest = (reinterpret_cast<uint8 *> (&fHeader)) + pos;
 		} else {
 			toWrite = fHeader.dataSize - pos + sizeof(TranslatorBitmap);
-			dest = ((uint8 *) fBitmap->Bits()) + pos - sizeof(TranslatorBitmap);
+			dest = (reinterpret_cast<uint8 *> (fBitmap->Bits())) +
+				pos - sizeof(TranslatorBitmap);
 		}
 		if (toWrite > size)
 			toWrite = size;
@@ -205,7 +206,7 @@ BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 		memcpy(dest, data, toWrite);
 		pos += toWrite;
 		written += toWrite;
-		data = ((uint8 *) data) + toWrite;
+		data = (reinterpret_cast<const uint8 *> (data)) + toWrite;
 		size -= toWrite;
 		if (pos > fSize)
 			fSize = pos;
