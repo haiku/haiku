@@ -3,15 +3,17 @@
 
 #include <Point.h>
 #include <Font.h>
+#include <Region.h>
 #include <RGBColor.h>
 #include <FontServer.h>
 #include <ServerFont.h>
 #include <PatternHandler.h>
-#include "GraphicsDefs.h"
-#include "InterfaceDefs.h"
+#include <GraphicsDefs.h>
+#include <InterfaceDefs.h>
 
 class ServerBitmap;
 class ServerFont;
+class ServerPicture;
 
 class LayerData
 {
@@ -47,9 +49,16 @@ public:
 
 			edelta.space	= 0;
 			edelta.nonspace	= 0;
+			
+			prevState		= NULL;
+			clippPicture	= NULL;
+			clippInverse	= false;
 		}
 	~LayerData(void)
 		{
+			if (clippReg)
+				delete clippReg;
+
 			if (image){
 				/* NOTE: I don't know yet how bitmap allocation/deallocation
 					is managed by server. I tend to think it's a reference
@@ -58,6 +67,16 @@ public:
 					
 					TODO: tell 'image' we're finished with it! :-)
 				*/
+			}
+			if (clippPicture){
+				/* same as for 'image'
+				
+					TODO: tell 'clippPicture' we're finished with it
+				 */
+			}
+			if (prevState){
+				delete prevState;
+				prevState = NULL;
 			}
 		}
 
@@ -91,6 +110,12 @@ public:
 	//ServerBitmap	*overlay;
 
 	escapement_delta	edelta;
+	
+		// used for the state stack
+	LayerData		*prevState;
+	
+	ServerPicture	*clippPicture;
+	bool			clippInverse;
 };
 #endif
 
