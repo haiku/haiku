@@ -26,6 +26,8 @@
 #include "core_funcs.h"
 #include "net_timer.h"
 
+#include "ethernet_module.h"
+
 #include <KernelExport.h>
 #define spawn_thread spawn_kernel_thread
 #define printf dprintf
@@ -69,6 +71,7 @@ static void arpwhohas(struct arpcom *ac, struct in_addr *ia);
 
 static uint8 ether_bcast[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
+static ethernet_receiver_func pppoe_receiver = NULL;
 
 struct llinfo_arp llinfo_arp;
 struct in_ifaddr *primary_addr;
@@ -119,6 +122,27 @@ static void dump_arp(void *buffer)
 	printf(" [%08lx]\n", ntohl(*(uint32*)&arp->arp_tpa));
 }
 #endif /* ARP_DEBUG */
+
+
+static void set_ethernet_receiver(ethernet_receiver_func func)
+{
+#if DEBUG
+	printf("ethernet: set_ethernet_receiver()\n");
+#endif
+	
+	pppoe_receiver = func;
+}
+
+
+static void unset_ethernet_receiver(void)
+{
+#if DEBUG
+	printf("ethernet: unset_ethernet_receiver()\n");
+#endif
+	
+	pppoe_receiver = NULL;
+}
+
 
 /* We now actually attach the device to the system... */
 static void attach_device(int devid, char *driver, char *devno)
@@ -322,8 +346,21 @@ int32 ether_input(void *data)
 #if SHOW_DEBUG	
 		dump_ether_details(buf);
 #endif
+		// as PPPoE needs the ethernet header we process it before m_adj
+		if(eth->ether_type == ETHERTYPE_PPPOEDISC
+				|| eth->ether_type == ETHERTYPE_PPPOE) {
+			if(pppoe_receiver)
+				pppoe_receiver(m);
+			else {
+				printf("PPPoE packet detected, but no handler found :(\n");
+				m_freem(m);
+			}
+			
+			continue;
+		}
+		
 		m_adj(m, len);
-	
+		
 		switch(eth->ether_type) {
 			case ETHERTYPE_ARP:
 				arpinput(m);
@@ -334,11 +371,6 @@ int32 ether_input(void *data)
 				else
 					printf("proto[%d] = %p, not called...\n", IPPROTO_IP,
 					       proto[IPPROTO_IP]);
-				break;
-			case ETHERTYPE_PPPOEDISC:
-			case ETHERTYPE_PPPOE:
-				printf("PPPoE packet detected...not yet implemented :)\n");
-				m_freem(m);
 				break;
 			default:
 				printf("Couldn't process unknown protocol %04x\n", eth->ether_type);
@@ -789,7 +821,11 @@ static int ether_ioctl(struct ifnet *ifp, ulong cmd, caddr_t data)
 {
 	struct arpcom *ac = (struct arpcom *)ifp;
 	struct ifaddr *ifa = (struct ifaddr*)data;
-
+	
+#if DEBUG
+	printf("ether_ioctl(0x%lX)\n", cmd);
+#endif
+	
 	if (ifp->devid == -1) {
 		char path[PATH_MAX];
 		sprintf(path, "%s/%s/%d", DRIVER_DIRECTORY, ifp->name, ifp->if_unit);
@@ -814,11 +850,14 @@ static int ether_ioctl(struct ifnet *ifp, ulong cmd, caddr_t data)
 	
 	switch (cmd) {
 		case SIOCSIFADDR:
+#if DEBUG
+			printf("ether_ioctl: SIOCSIFADDR\n");
+#endif
 			ifp->if_flags |= IFF_UP;
 			switch (ifa->ifa_addr->sa_family) {
 				case AF_INET:
 					ac->ac_ipaddr = ((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
-#ifdef ETHER_DEBUG
+#if DEBUG
 					printf("setting ether_device ip address to %08lx\n", 
 						ntohl(((struct sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr));
 #endif
@@ -834,7 +873,11 @@ static int ether_ioctl(struct ifnet *ifp, ulong cmd, caddr_t data)
 		default:
 			printf("unhandled call to ethernet_ioctl\n");
 	}
-
+	
+#if DEBUG
+	printf("ether_ioctl: setting running flag\n");
+#endif
+	
 	if ((ifp->if_flags & IFF_UP) &&
 	    (ifp->rx_thread == -1 || ifp->tx_thread == -1)) {
 		/* start our threads and add the IFF_RUNNING flag... */
@@ -849,6 +892,9 @@ static int ether_ioctl(struct ifnet *ifp, ulong cmd, caddr_t data)
 		close(ifp->devid);
 		ifp->devid = -1;
 	}
+#if DEBUG
+	printf("ether_ioctl: finished\n");
+#endif
 	return 0;
 }
 
@@ -865,16 +911,19 @@ int ether_dev_stop(ifnet *dev)
 
 static int ether_init(void *cpp)
 {
+#if DEBUG
+	printf("ether_init()\n");
+#endif
+	
 	if (cpp)
 		core = (struct core_module_info*) cpp;
-
+	
 	etherq = start_ifq();
 	ether_rxt = spawn_thread(ether_input, "ethernet_input", 50, NULL);
 	if (ether_rxt > 0)
 		resume_thread(ether_rxt);
 	
 	find_devices();
-
 	
 	memset(proto, 0, sizeof(struct protosw *) * IPPROTO_MAX);
 	add_protosw(proto, NET_LAYER2);
@@ -899,16 +948,20 @@ static int ether_stop()
 	return 0;
 }
 
-struct kernel_net_module_info device_info = {
+struct ethernet_module_info device_info = {
 	{
-		"network/interfaces/ethernet",
-		0,
-		std_ops
+		{
+			NET_ETHERNET_MODULE_NAME,
+			0,
+			std_ops
+		},
+	
+		ether_init,
+		ether_stop,
+		NULL
 	},
-
-	ether_init,
-	ether_stop,
-	NULL
+	set_ethernet_receiver,
+	unset_ethernet_receiver
 };
 
 // #pragma mark -
