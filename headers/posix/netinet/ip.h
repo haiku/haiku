@@ -2,15 +2,14 @@
  * definitions for ipv4 protocol
  */
  
-#ifndef NETINET_IP_H
-#define NETINET_IP_H
+#ifndef _NETINET_IP_H
+#define _NETINET_IP_H
 
-#include <ByteOrder.h>
+//#include <ByteOrder.h>
 
-#include "sys/mbuf.h"
-#include "net_misc.h"
-#include "netinet/in_systm.h"
-#include "netinet/in.h"
+#include <mbuf.h>
+#include <netinet/in_systm.h>
+#include <netinet/in.h>
 
 /* Based on RFC 791 */
 

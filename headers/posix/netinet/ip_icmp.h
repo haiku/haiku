@@ -37,10 +37,9 @@
 #ifndef NETINET_IP_ICMP_H
 #define NETINET_IP_ICMP_H
 
-#include <ByteOrder.h>
+#include <endian.h>
 
-#include "net_misc.h"
-#include "netinet/in.h"
+#include <netinet/in.h>
 
 struct icmp {
 	uint8 icmp_type;

@@ -1,18 +1,11 @@
 /* in.h */
+
 #ifndef _NETINET_IN_H_
 #define _NETINET_IN_H_
 
-#include <ByteOrder.h> /* for htonl */
+//#include <ByteOrder.h> /* for htonl */
 
-#ifdef _NETWORK_STACK
-#include "net_misc.h"
-#endif
-#include "net/if.h"
-
-/* XXX - This really doesn't belong in here... */
-/* XXX - move these to sys/param.h */
-typedef uint32	in_addr_t; 
-typedef uint16  in_port_t;
+#include <net/if.h>
 
 /* Protocol definitions - add to as required... */
 
@@ -78,7 +71,7 @@ struct sockaddr_in {
 #define IP_ADD_MEMBERSHIP       12   /* ip_mreq; add an IP group membership */
 #define IP_DROP_MEMBERSHIP      13   /* ip_mreq; drop an IP group membership */ 
 
-#ifdef _NETWORK_STACK
+#ifdef _KERNEL_MODE
 #define __IPADDR(x)     ((uint32) htonl((uint32)(x)))
 #else
 #define __IPADDR(x)     ((uint32)(x))
@@ -95,7 +88,7 @@ struct sockaddr_in {
 
 #define IN_LOOPBACKNET          127                     /* official! */
 
-#ifndef _NETWORK_STACK
+#ifndef _KERNEL_MODE
 #define INADDR_NONE             __IPADDR(0xffffffff)
 #endif
 
@@ -133,16 +126,19 @@ struct sockaddr_in {
 
 #define IP_MAX_MEMBERSHIPS      20
 
-/* some helpful macro's :) */
-#define in_hosteq(s,t)  ((s).s_addr == (t).s_addr)
-#define in_nullhost(x)  ((x).s_addr == INADDR_ANY)
-#define satosin(sa)     ((struct sockaddr_in *)(sa))
-#define sintosa(sin)    ((struct sockaddr *)(sin))
+#ifdef _KERNEL_MODE
+  /* some helpful macro's :) */
+  #define in_hosteq(s,t)  ((s).s_addr == (t).s_addr)
+  #define in_nullhost(x)  ((x).s_addr == INADDR_ANY)
+  #define satosin(sa)     ((struct sockaddr_in *)(sa))
+  #define sintosa(sin)    ((struct sockaddr *)(sin))
 
-/* Prototypes... */
-int  in_broadcast  (struct in_addr, struct ifnet *); 
-int  in_canforward (struct in_addr);
-int  in_localaddr  (struct in_addr);
-void in_socktrim   (struct sockaddr_in*);
-
+  /* Prototypes... */
+  int    in_broadcast  (struct in_addr, struct ifnet *); 
+  int    in_canforward (struct in_addr);
+  int    in_localaddr  (struct in_addr);
+  void   in_socktrim   (struct sockaddr_in*);
+  uint16 in_cksum      (struct mbuf *, int);
+  
+#endif /* _KERNEL_MODE */
 #endif /* NETINET_IN_H */

@@ -37,14 +37,14 @@
 #ifndef NETINET_IP_VAR_H
 #define NETINET_IP_VAR_H
 
-#include "sys/socket.h"
+#include <sys/socket.h>
 
 /*
  * Overlay for ip header used by other protocols (tcp, udp).
  */
 struct ipovly {
-	caddr_t   ih_next;
-	caddr_t   ih_prev;
+	char *   ih_next;
+	char *   ih_prev;
 	uint8     ih_x1;        /* (unused) */
 	uint8     ih_pr;           /* protocol */
 	uint16    ih_len;          /* protocol length */
@@ -138,7 +138,7 @@ struct  ipstat {
         int32  ips_outhwcsum;          /* hardware checksummed on output */
 };
 
-#ifdef _NETWORK_STACK
+#ifdef _KERNEL_MODE
 
 #define IP_FORWARDING           0x1             /* most of ip header exists */
 #define IP_RAWOUTPUT            0x2             /* raw ip header exists */
@@ -148,8 +148,15 @@ struct  ipstat {
 
 struct ipstat ipstat;
 
-void    ip_stripoptions (struct mbuf *, struct mbuf *);
+void  ipv4_input(struct mbuf *, int);
+int   ipv4_output(struct mbuf *, struct mbuf *, struct route *, int, void *);
+int   ipv4_ctloutput(int, struct socket *, int, int, struct mbuf **);
 
-#endif /* _NETWORK_STACK */
+int   ip_dooptions(struct mbuf *);
+void  ip_stripoptions (struct mbuf *, struct mbuf *);
+struct mbuf *ip_srcroute(void);
+
+
+#endif /* _KERNEL_MODE */
 
 #endif /* NETINET_IP_VAR_H */

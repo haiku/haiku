@@ -2,8 +2,8 @@
 #ifndef NETINET_IN_VAR_H
 #define NETINET_IN_VAR_H
 
-#include "netinet/in.h"
-#include "net/if.h"
+#include <netinet/in.h>
+#include <net/if.h>
 
 struct in_ifaddr {
 	struct ifaddr 		ia_ifa;
@@ -37,28 +37,32 @@ struct in_aliasreq {
 
 
 struct in_multi {
-	struct in_addr inm_addr;
-	struct ifnet *inm_ifp;
+	struct in_addr    inm_addr;
+	struct ifnet     *inm_ifp;
 	struct in_ifaddr *inm_ia;
-	uint inm_refcount;
-	uint inm_timer;
-	struct in_multi *next;
+	uint              inm_refcount;
+	uint              inm_timer;
+	struct in_multi  *next;
 	struct in_multi **prev;	
-	uint inm_state;
+	uint              inm_state;
 };
 
 /*
  * Given a pointer to an in_ifaddr (ifaddr),
  * return a pointer to the addr as a sockaddr_in.
  */
-#define IA_SIN(ia) (&(((struct in_ifaddr *)(ia))->ia_addr))
 
-struct in_ifaddr *in_ifaddr;
+#ifdef _KERNEL_MODE
 
-int in_control(struct socket *so, int cmd, caddr_t data, struct ifnet *ifp);
-int in_ifinit(struct ifnet *dev, struct in_ifaddr *ia, struct sockaddr_in *sin,
+  #define IA_SIN(ia) (&(((struct in_ifaddr *)(ia))->ia_addr))
+
+  extern struct in_ifaddr *in_ifaddr;
+
+  int in_control(struct socket *so, int cmd, char *data, struct ifnet *ifp);
+  int in_ifinit(struct ifnet *dev, struct in_ifaddr *ia, struct sockaddr_in *sin,
                 int scrub);
-int inetctlerr(int cmd);
-struct in_ifaddr *get_primary_addr(void);
+  int inetctlerr(int cmd);
+  struct in_ifaddr *get_primary_addr(void);
+#endif
 
 #endif /* NETINET_IN_VAR_H */

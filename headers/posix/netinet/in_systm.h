@@ -54,9 +54,9 @@ typedef uint32 n_long;  /* long as received from the net */
 
 typedef uint32 n_time;  /* ms since 00:00 GMT, byte rev */
 
-#ifdef _NETWORK_STACK
+#ifdef _KERNEL_MODE
 #define iptime()   (htonl((uint32)real_time_clock_usecs()))
-#endif /* _NETWORK_STACK */
+#endif /* _KERNEL_MODE */
 
 #endif /* NETINET_IN_SYSTM_H */
  

@@ -54,7 +54,7 @@ struct icmpstat {
 	int32 icps_inhist[ICMP_MAXTYPE + 1];
 };
 
-#ifdef _NETWORK_STACK
+#ifdef _KERNEL_MODE
 struct icmpstat icmpstat;
 #endif
 
