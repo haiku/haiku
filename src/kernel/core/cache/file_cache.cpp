@@ -29,9 +29,9 @@
 #	define TRACE(x) ;
 #endif
 
-
-#define MAX_IO_VECS 32
-
+// maximum number of iovecs per request
+#define MAX_IO_VECS			64	// 256 kB
+#define MAX_FILE_IO_VECS	32
 
 struct file_cache_ref {
 	vm_cache_ref	*cache;
@@ -68,10 +68,11 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 		*_numBytes, doWrite ? "write" : "read"));
 
 	// translate the iovecs into direct device accesses
-	file_io_vec fileVecs[16];
-	size_t fileVecCount = 16;
+	file_io_vec fileVecs[MAX_FILE_IO_VECS];
+	size_t fileVecCount = MAX_FILE_IO_VECS;
 	size_t numBytes = *_numBytes;
 
+	// ToDo: these must be cacheable (must for the swap file, great for all other)
 	status_t status = vfs_get_file_map(ref->vnode, offset, numBytes, fileVecs, &fileVecCount);
 	if (status < B_OK)
 		return status;
@@ -192,40 +193,32 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 }
 
 
-/**	This function reads \a size bytes directly from the file into the cache.
- *	If \a bufferSize does not equal zero, the data read in is also copied to
- *	the provided buffer.
- *	This function always allocates all pages; it is the responsibility of the
- *	calling function to only ask for yet uncached ranges.
+/**	This function is called by read_into_cache() (and from there only) - it
+ *	can only handle a certain amount of bytes, and read_into_cache() makes
+ *	sure that it matches that criterion.
  */
 
-static status_t
-read_into_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
+static inline status_t
+read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t size,
+	int32 pageOffset, addr_t buffer, size_t bufferSize)
 {
-	TRACE(("read_from_cache: ref = %p, offset = %Ld, size = %lu, buffer = %p, bufferSize = %lu\n", ref, offset, size, (void *)buffer, bufferSize));
+	TRACE(("read_chunk(offset = %Ld, size = %lu, pageOffset = %ld, buffer = %#lx, bufferSize = %lu\n",
+		offset, size, pageOffset, buffer, bufferSize));
 
 	vm_cache_ref *cache = ref->cache;
+
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
 
-	// make sure "offset" is page aligned - but also remember the page offset
-	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
-	size = PAGE_ALIGN(size + pageOffset);
-	offset -= pageOffset;
-
-	vm_page *pages[32];
+	vm_page *pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
-
-	// ToDo: fix this
-	if (size > 32 * B_PAGE_SIZE)
-		panic("cannot handle large I/O - fix me!\n");
 
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE) {
 		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(PAGE_STATE_FREE);
 		page->state = PAGE_STATE_BUSY;
 
-		vm_cache_insert_page(ref->cache, page, offset + pos);
+		vm_cache_insert_page(cache, page, offset + pos);
 
 		addr_t virtualAddress;
 		vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
@@ -258,6 +251,7 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, s
 			user_memcpy((void *)buffer, (void *)(base + pageOffset), bytes);
 			buffer += bytes;
 			bufferSize -= bytes;
+			pageOffset = 0;
 		}
 
 		for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE, base += B_PAGE_SIZE)
@@ -274,25 +268,64 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, s
 }
 
 
-static status_t
-write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
-{
-	TRACE(("write_to_cache: ref = %p, offset = %Ld, size = %lu\n", ref, offset, bufferSize));
+/**	This function reads \a size bytes directly from the file into the cache.
+ *	If \a bufferSize does not equal zero, \a bufferSize bytes from the data
+ *	read in are also copied to the provided \a buffer.
+ *	This function always allocates all pages; it is the responsibility of the
+ *	calling function to only ask for yet uncached ranges.
+ *	The cache_ref lock must be hold when calling this function.
+ */
 
-	iovec vecs[MAX_IO_VECS];
-	int32 vecCount = 0;
+static status_t
+read_into_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
+{
+	TRACE(("read_from_cache: ref = %p, offset = %Ld, size = %lu, buffer = %p, bufferSize = %lu\n",
+		ref, offset, size, (void *)buffer, bufferSize));
 
 	// make sure "offset" is page aligned - but also remember the page offset
 	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
 	size = PAGE_ALIGN(size + pageOffset);
 	offset -= pageOffset;
 
-	vm_page *pages[32];
-	int32 pageIndex = 0;
+	while (true) {
+		size_t chunkSize = size;
+		if (chunkSize > (MAX_IO_VECS * B_PAGE_SIZE))
+			chunkSize = MAX_IO_VECS * B_PAGE_SIZE;
 
-	// ToDo: fix this
-	if (size > 32 * B_PAGE_SIZE)
-		panic("cannot handle large I/O - fix me!\n");
+		status_t status = read_chunk_into_cache(ref, offset, chunkSize, pageOffset, buffer, bufferSize);
+		if (status != B_OK)
+			return status;
+
+		if ((size -= chunkSize) == 0)
+			return B_OK;
+
+		if (chunkSize >= bufferSize) {
+			bufferSize = 0;
+			buffer = NULL;
+		} else {
+			bufferSize -= chunkSize - pageOffset;
+			buffer += chunkSize - pageOffset;
+		}
+
+		offset += chunkSize;
+		pageOffset = 0;
+	}
+
+	return B_OK;
+}
+
+
+/**	Like read_chunk_into_cache() but writes data into the cache */
+
+static inline status_t
+write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t size,
+	int32 pageOffset, addr_t buffer, size_t bufferSize)
+{
+	iovec vecs[MAX_IO_VECS];
+	int32 vecCount = 0;
+
+	vm_page *pages[MAX_IO_VECS];
+	int32 pageIndex = 0;
 
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE) {
@@ -314,6 +347,10 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, si
 			size_t bytesRead = B_PAGE_SIZE;
 			iovec readVec = { (void *)virtualAddress, B_PAGE_SIZE };
 
+			// ToDo: when calling pages_io(), unlocking the cache_ref would be
+			//	a great idea. But we can't do this in this loop, so the whole
+			//	thing should be changed so that pages_io() and the copy stuff
+			//	below can be called without holding the lock
 			pages_io(ref, offset + pos, &readVec, 1, &bytesRead, false);
 			// ToDo: handle errors!
 		}
@@ -326,6 +363,8 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, si
 
 			vm_page_set_state(page, PAGE_STATE_MODIFIED);
 		}
+
+		pageOffset = 0;
 	}
 
 	// ToDo: we only have to write the pages back immediately if write-back mode
@@ -353,6 +392,50 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, si
 	for (int32 i = pageIndex; i-- > 0;) {
 		if (pages[i]->state == PAGE_STATE_BUSY)
 			pages[i]->state = PAGE_STATE_ACTIVE;
+	}
+
+	return B_OK;
+}
+
+
+/**	Like read_into_cache() but writes data into the cache. To preserve data consistency,
+ *	it might also read pages into the cache, though, if only a partial page gets written.
+ *	The cache_ref lock must be hold when calling this function.
+ */
+
+static status_t
+write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
+{
+	TRACE(("write_to_cache: ref = %p, offset = %Ld, size = %lu, buffer = %p, bufferSize = %lu\n",
+		ref, offset, size, (void *)buffer, bufferSize));
+
+	// make sure "offset" is page aligned - but also remember the page offset
+	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
+	size = PAGE_ALIGN(size + pageOffset);
+	offset -= pageOffset;
+
+	while (true) {
+		size_t chunkSize = size;
+		if (chunkSize > (MAX_IO_VECS * B_PAGE_SIZE))
+			chunkSize = MAX_IO_VECS * B_PAGE_SIZE;
+
+		status_t status = write_chunk_to_cache(ref, offset, chunkSize, pageOffset, buffer, bufferSize);
+		if (status != B_OK)
+			return status;
+
+		if ((size -= chunkSize) == 0)
+			return B_OK;
+
+		if (chunkSize >= bufferSize) {
+			bufferSize = 0;
+			buffer = NULL;
+		} else {
+			bufferSize -= chunkSize - pageOffset;
+			buffer += chunkSize - pageOffset;
+		}
+
+		offset += chunkSize;
+		pageOffset = 0;
 	}
 
 	return B_OK;
