@@ -112,10 +112,10 @@ BBufferGroup::BBufferGroup(size_t size,
 	}
 	
 	// first we roundup for a better placement in memory
-	size = (size + 63) & ~63;
+	int allocsize = (size + 63) & ~63;
 
 	// now we create the area
-	area_size = ((size * count) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
+	area_size = ((allocsize * count) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
 
 	buffer_area = create_area("some buffers area", &start_addr,placement,area_size,lock,B_READ_AREA | B_WRITE_AREA);
 	if (buffer_area < B_OK) {
@@ -128,7 +128,7 @@ BBufferGroup::BBufferGroup(size_t size,
 
 	for (int32 i = 0; i < count; i++) {	
 		bci.area = buffer_area;
-		bci.offset = i * size;
+		bci.offset = i * allocsize;
 		bci.size = size;
 		buffer = new BBuffer(bci);
 		if (0 == buffer->Data()) {
