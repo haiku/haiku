@@ -5,7 +5,7 @@ SubInclude OBOS_TOP src servers input ;
 SubInclude OBOS_TOP src servers media ;
 SubInclude OBOS_TOP src servers media_addon ;
 SubInclude OBOS_TOP src servers midi ;
-SubInclude OBOS_TOP src servers net ;
+# SubInclude OBOS_TOP src servers net ;
 SubInclude OBOS_TOP src servers print ;
 SubInclude OBOS_TOP src servers registrar ;
 SubInclude OBOS_TOP src servers screensaver ;
