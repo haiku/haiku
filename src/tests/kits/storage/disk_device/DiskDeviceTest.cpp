@@ -567,12 +567,26 @@ main()
 	error = device.PrepareModifications();
 	if (error != B_OK)
 		printf("Preparing modifications failed: %s\n", strerror(error));
+	// test resize a partition
+	if (error == B_OK) {
+		if (BPartition *partition = device.ChildAt(1)) {
+			status_t status = partition->Resize(1024 * 200, false);
+			if (status != B_OK) {
+				printf("Resizing the partition failed: %s\n",
+					   strerror(status));
+			}
+		}
+		printf("\nDevice after changing it:\n");
+		device.VisitEachDescendant(&visitor);
+	}
 	// cancel modifications
 	if (error == B_OK) {
 		error = device.CancelModifications();
 		if (error != B_OK)
 			printf("Cancelling modifications failed: %s\n", strerror(error));
 	}
+	printf("\nDevice after cancelling the changes:\n");
+	device.VisitEachDescendant(&visitor);
 
 	// for userland testing only
 	KDiskDeviceManager::DeleteDefault();
