@@ -40,25 +40,18 @@ public:
 	template <uint32 length>
 		String& operator=(const array<char, length> &cs0); 
 	
-//	const char* Cs0() const { return fCs0String; }
-	const char* Cs0() const { return kTempCs0String; }
+	const char* Cs0() const { return fCs0String; }
 	const char* Utf8() const { return fUtf8String; }
-//	uint32 Cs0Length() const { return fCs0Length; }
-	uint32 Cs0Length() const { return kTempCs0Length; }
+	uint32 Cs0Length() const { return fCs0Length; }
 	uint32 Utf8Length() const { return fUtf8String ? strlen(fUtf8String) : 0; }
 	
 private:
 	void _Clear();
 
-	static const char * const kTempCs0String = "\x08Ih8Unicode";
-	static const uint32 kTempCs0Length = 12;
-
 	char *fCs0String;
 	uint32 fCs0Length;
 	char *fUtf8String;
 };
-
-void unicode_to_utf8(uint32 c, char **out);
 
 /*! \brief Creates a new String object from the given Cs0 string.
 */

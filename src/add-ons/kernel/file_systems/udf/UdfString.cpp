@@ -4,9 +4,21 @@
 
 
 /*! \brief Converts the given unicode character to utf8.
+	
+	\param c The unicode character.
+	\param out Pointer to a C-string of at least 4 characters
+	           long into which the output utf8 characters will
+	           be written. The string that is pointed to will
+	           be incremented to reflect the number of characters
+	           written, i.e. if \a out initially points to a pointer
+	           to the first character in string named \c str, and
+	           the function writes 4 characters to \c str, then
+	           upon returning, out will point to a pointer to
+	           the fifth character in \c str.
 */
+static
 void
-Udf::unicode_to_utf8(uint32 c, char **out)
+unicode_to_utf8(uint32 c, char **out)
 {
 	char *s = *out;
 
@@ -26,6 +38,57 @@ Udf::unicode_to_utf8(uint32 c, char **out)
 		*(s++) = 0x80 | (c & 0x3f);
 	}
 	*out = s;
+}
+
+/*! \brief Converts the given utf8 character to 4-byte unicode.
+
+	\param in Pointer to a C-String from which utf8 characters
+	          will be read. *in will be incremented to reflect
+	          the number of characters read, similarly to the
+	          \c out parameter for Udf::unicode_to_utf8().
+	          
+	\return The 4-byte unicode character, or **in if passed an
+	        invalid character, or 0 if passed any NULL pointers.
+*/
+static
+uint32
+utf8_to_unicode(const char **in)
+{
+	if (!in)
+		return 0;
+	uint8 *bytes = (uint8 *)*in;
+	if (!bytes)
+		return 0;
+
+	int32 length;
+	uint8 mask = 0x1f;
+
+	switch (bytes[0] & 0xf0) {
+		case 0xc0:
+		case 0xd0:	length = 2; break;
+		case 0xe0:	length = 3; break;
+		case 0xf0:
+			mask = 0x0f;
+			length = 4;
+			break;
+		default:
+			// valid 1-byte character
+			// and invalid characters
+			(*in)++;
+			return bytes[0];
+	}
+	uint32 c = bytes[0] & mask;
+	int32 i = 1;
+	for (;i < length && (bytes[i] & 0x80) > 0;i++)
+		c = (c << 6) | (bytes[i] & 0x3f);
+
+	if (i < length) {
+		// invalid character
+		(*in)++;
+		return (uint32)bytes[0];
+	}
+	*in += length;
+	return c;
 }
 
 using namespace Udf;
@@ -68,6 +131,84 @@ String::~String()
 void
 String::SetTo(const char *utf8)
 {
+	DEBUG_INIT_ETC("String", ("utf8: %p, strlen(utf8): %ld", utf8,
+	               utf8 ? strlen(utf8) : 0));	
+	_Clear();
+	if (!utf8) {
+		PRINT(("passed NULL utf8 string\n"));
+		return;
+	}		
+	uint32 length = strlen(utf8);
+	// First copy the utf8 string
+	fUtf8String = new char[length+1];
+	if (!fUtf8String){
+		PRINT(("new fUtf8String[%ld] allocation failed\n", length+1));
+		return;
+	}	
+	// Next convert to raw 4-byte unicode. Then we'll do some
+	// analysis to figure out if we have any invalid characters,
+	// and whether we can get away with compressed 8-bit unicode,
+	// or have to use burly 16-bit unicode.
+	uint32 *raw = new uint32[length];
+	if (!raw) {
+		PRINT(("new uint32 raw[%ld] temporary string allocation failed\n", length));
+		_Clear();
+		return;
+	}
+	const char *in = utf8;
+	uint32 rawLength = 0;
+	for (uint32 i = 0; i < length && uint32(in-utf8) < length; i++, rawLength++) 
+		raw[i] = utf8_to_unicode(&in);			
+	// Check for invalids. 
+	uint32 mask = 0xffff0000;
+	for (uint32 i = 0; i < rawLength; i++) {
+		if (raw[i] & mask) {
+			PRINT(("WARNING: utf8 string contained a multi-byte sequence which "
+			       "was converted into a unicode character larger than 16-bits; "
+			       "character will be converted to an underscore character for "
+			       "safety.\n"));
+			raw[i] = '_';
+		}
+	}	
+	// See if we can get away with 8-bit compressed unicode
+	mask = 0xffffff00;
+	bool canUse8bit = true;
+	for (uint32 i = 0; i < rawLength; i++) {
+		if (raw[i] & mask) {
+			canUse8bit = false;
+			break;
+		}
+	}	
+	// Build our cs0 string
+	if (canUse8bit) {
+		fCs0Length = rawLength+1;
+		fCs0String = new char[fCs0Length];
+		if (fCs0String) {
+			fCs0String[0] = '\x08';	// 8-bit compressed unicode
+			for (uint32 i = 0; i < rawLength; i++)
+				fCs0String[i+1] = raw[i] % 256;
+		} else {
+			PRINT(("new fCs0String[%ld] allocation failed\n", fCs0Length));
+			_Clear();			
+			return;
+		}
+	} else {
+		fCs0Length = rawLength*2+1;	
+		fCs0String = new char[fCs0Length];
+		if (fCs0String) {
+			fCs0String[0] = '\x10';	// 16-bit unicode
+			uint16 *string = reinterpret_cast<uint16*>(&fCs0String[1]);
+			for (uint32 i = 0; i < rawLength; i++)
+				string[i+1] = uint16(raw[i]);
+		} else {
+			PRINT(("new fCs0String[%ld] allocation failed\n", fCs0Length));
+			_Clear();			
+			return;
+		}
+	}
+	// Clean up
+	delete [] raw;
+	raw = NULL;	
 }
 
 /*! \brief Assignment from a Cs0 string.
@@ -78,7 +219,22 @@ String::SetTo(const char *cs0, uint32 length)
 	DEBUG_INIT_ETC("String", ("cs0: %p, length: %ld", cs0, length));	
 
 	_Clear();
+	if (!cs0) {
+		PRINT(("passed NULL cs0 string\n"));
+		return;
+	}		
+	
+	// First copy the Cs0 string and length
+	fCs0String = new char[length];
+	if (fCs0String) {
+		memcpy(fCs0String, cs0, length);
+	} else {
+		PRINT(("new fCs0String[%ld] allocation failed\n", length));
+		return;
+	}
 
+	// Now convert to utf8
+	
 	// The first byte of the CS0 string is the compression ID.
 	// - 8: 1 byte characters
 	// - 16: 2 byte, big endian characters
