@@ -230,34 +230,6 @@ error:
 }
 
 
-status_t
-wait_for_team(team_id id, status_t *_returnCode)
-{
-	struct team *team;
-	thread_id thread;
-	cpu_status state;
-
-	// find main thread and wait for that
-
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	team = team_get_team_struct_locked(id);
-	if (team && team->main_thread)
-		thread = team->main_thread->id;
-	else
-		thread = B_BAD_THREAD_ID;
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	if (thread < 0)
-		return thread;
-
-	return wait_for_thread(thread, _returnCode);
-}
-
-
 /** Quick check to see if we have a valid team ID.
  */
 
@@ -599,8 +571,40 @@ err1:
 }
 
 
-int
-team_kill_team(team_id id)
+//	#pragma mark -
+// public team API
+
+
+status_t
+wait_for_team(team_id id, status_t *_returnCode)
+{
+	struct team *team;
+	thread_id thread;
+	cpu_status state;
+
+	// find main thread and wait for that
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team = team_get_team_struct_locked(id);
+	if (team && team->main_thread)
+		thread = team->main_thread->id;
+	else
+		thread = B_BAD_THREAD_ID;
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	if (thread < 0)
+		return thread;
+
+	return wait_for_thread(thread, _returnCode);
+}
+
+
+status_t
+kill_team(team_id id)
 {
 	int state;
 	struct team *team;
@@ -625,7 +629,7 @@ team_kill_team(team_id id)
 
 	// just kill the main thread in the team. The cleanup code there will
 	// take care of the team
-	return thread_kill_thread(tid);
+	return kill_thread(tid);
 }
 
 
@@ -836,10 +840,11 @@ sys_getenv(const char *name, char **value)
 
 
 //	#pragma mark -
+//	User syscalls
 
 
 status_t
-user_wait_for_team(team_id id, status_t *_userReturnCode)
+_user_wait_for_team(team_id id, status_t *_userReturnCode)
 {
 	status_t returnCode;
 	status_t status;
@@ -858,8 +863,8 @@ user_wait_for_team(team_id id, status_t *_userReturnCode)
 
 
 team_id
-user_team_create_team(const char *userPath, const char *userName,
-	char **userArgs, int argCount, char **userEnv, int envCount, int priority)
+_user_create_team(const char *userPath, const char *userName, char **userArgs,
+	int argCount, char **userEnv, int envCount, int priority)
 {
 	char path[SYS_MAX_PATH_LEN];
 	char name[B_OS_NAME_LENGTH];
@@ -900,7 +905,14 @@ error:
 
 
 status_t
-user_get_team_info(team_id id, team_info *userInfo)
+_user_kill_team(team_id team)
+{
+	return kill_team(team);
+}
+
+
+status_t
+_user_get_team_info(team_id id, team_info *userInfo)
 {
 	status_t status;
 	team_info info;
@@ -919,7 +931,7 @@ user_get_team_info(team_id id, team_info *userInfo)
 
 
 status_t
-user_get_next_team_info(int32 *userCookie, team_info *userInfo)
+_user_get_next_team_info(int32 *userCookie, team_info *userInfo)
 {
 	status_t status;
 	team_info info;
@@ -939,6 +951,13 @@ user_get_next_team_info(int32 *userCookie, team_info *userInfo)
 		return B_BAD_ADDRESS;
 
 	return status;
+}
+
+
+team_id
+_user_get_current_team(void)
+{
+	return team_get_current_team_id();
 }
 
 
