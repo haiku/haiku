@@ -60,6 +60,22 @@ typedef struct rgb_color {
 	uint8		green;
 	uint8		blue;
 	uint8		alpha;
+
+#if defined(__cplusplus)
+	// some convenient additions
+
+	inline bool
+	operator==(const rgb_color& other) const
+	{
+		return *(const uint32 *)this == *(const uint32 *)&other;
+	}
+
+	inline bool
+	operator!=(const rgb_color& other) const
+	{
+		return *(const uint32 *)this != *(const uint32 *)&other;
+	}
+#endif
 } rgb_color;
 
 //------------------------------------------------------------------------------
