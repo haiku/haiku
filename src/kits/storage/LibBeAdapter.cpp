@@ -17,7 +17,9 @@
 
 #include <syscalls.h>
 
-mode_t __gUmask = S_IUMSK;
+
+mode_t __gUmask = 022;
+	// this is the standard umask and is used by BFile
 
 enum {
 	FD_TYPE_UNKNOWN,
