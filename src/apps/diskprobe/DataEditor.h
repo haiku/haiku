@@ -56,7 +56,7 @@ class DataEditor {
 		off_t ViewOffset() const { return fViewOffset; }
 
 		status_t SetViewSize(size_t size);
-		off_t ViewSize() const { return fViewSize; }
+		size_t ViewSize() const { return fViewSize; }
 
 		void SetBlockSize(size_t size);
 		size_t BlockSize() const { return fBlockSize; }
@@ -101,9 +101,7 @@ class DataEditor {
 		size_t		fBlockSize;
 };
 
-static const uint32 kMsgDataEditorUndoState = 'deUS';
-static const uint32 kMsgDataEditorRedoState = 'deRS';
-static const uint32 kMsgDataEditorModifiedState = 'deMS';
+static const uint32 kMsgDataEditorStateChange = 'deSC';
 static const uint32 kMsgDataEditorUpdate = 'deUp';
 
 #endif	/* DATA_EDITOR_H */
