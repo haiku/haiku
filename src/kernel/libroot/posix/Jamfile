@@ -5,6 +5,7 @@ UsePrivateHeaders [ FDirName syslog_daemon ] ;
 KernelMergeObject posix_main.o :
  	assert.c
  	dlfcn.c
+ 	dirent.c
  	errno.c
  	fnmatch.c
  	glob.c
