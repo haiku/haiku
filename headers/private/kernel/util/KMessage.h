@@ -100,6 +100,7 @@ public:
 
 private:
 	friend class KMessageField;
+	friend class BMessage;		// not so nice, but makes things easier
 
 	struct Header {
 		uint32		magic;
@@ -141,6 +142,8 @@ private:
 	int32			fBufferCapacity;
 	uint32			fFlags;
 	int32			fLastFieldOffset;
+
+	static const uint32	kMessageHeaderMagic;
 };
 
 // KMessageField

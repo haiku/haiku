@@ -24,8 +24,10 @@
 #	endif
 #endif
 
-static const uint32 kMessageHeaderMagic = 'kMsG';
 static const int32 kMessageReallocChunkSize = 64;
+
+// kMessageHeaderMagic
+const uint32 KMessage::kMessageHeaderMagic = 'kMsG';
 
 // _Align
 static inline
