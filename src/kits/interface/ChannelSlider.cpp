@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-// TODO: Currently tested only with a single channel slider.
+// TODO: Currently it works correctly only with vertical sliders.
 
 #include <Bitmap.h>
 #include <ChannelSlider.h>
@@ -184,7 +184,42 @@ BChannelSlider::AllDetached()
 void
 BChannelSlider::MessageReceived(BMessage *message)
 {
-	inherited::MessageReceived(message);
+	switch (message->what) {
+		case B_SET_PROPERTY:
+		case B_GET_PROPERTY:
+		{	
+			BMessage reply(B_REPLY);
+			int32 index = 0;
+			BMessage specifier;
+			int32 what = 0;
+			const char *property = NULL;
+			bool handled = false;
+			status_t status = message->GetCurrentSpecifier(&index, &specifier, &what, &property);
+			BPropertyInfo propInfo(sPropertyInfo);		
+			if (status == B_OK 
+				&& propInfo.FindMatch(message, index, &specifier, what, property) >= 0) {					
+				handled = true;
+				if (message->what == B_SET_PROPERTY) {
+					orientation orient;
+					if (specifier.FindInt32("data", (int32 *)&orient) == B_OK) {
+						SetOrientation(orient);
+						Invalidate(Bounds());
+					}
+				} else if (message->what == B_GET_PROPERTY)
+					reply.AddInt32("result", (int32)Orientation());					
+			}	
+					
+			if (handled) {
+				reply.AddInt32("error", status);
+				message->SendReply(&reply);
+			} else
+				inherited::MessageReceived(message);
+			break;
+		}
+		default:
+			inherited::MessageReceived(message);
+			break;
+	}
 }
 
 
@@ -222,9 +257,9 @@ BChannelSlider::MouseDown(BPoint where)
 			
 			float range = ThumbRangeFor(channel);
 			
-			if (Vertical()) {
+			if (Vertical()) {		
+				fMinpoint = frame.top + frame.Height() / 2;
 				frame.bottom += range;
-				fMinpoint = frame.Height();
 			} else {
 				frame.right += range;
 				fMinpoint = frame.Width();
@@ -237,7 +272,7 @@ BChannelSlider::MouseDown(BPoint where)
 				if (currentMessage != NULL)
 					currentMessage->FindInt32("buttons", (int32 *)&buttons);
 				
-				fAllChannels = (buttons & B_SECONDARY_MOUSE_BUTTON);
+				fAllChannels = (buttons & B_SECONDARY_MOUSE_BUTTON) == 0;
 				fCurrentChannel = channel;
 				
 				if (fInitialValues != NULL && fAllChannels) {
@@ -390,14 +425,14 @@ BChannelSlider::GetSupportedSuites(BMessage *data)
 void
 BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed)
 {
-	BPoint where;
-	where.x = area.Width() / 2;
-	where.y = area.top + ThumbDeltaFor(channel);
-	
-	BPoint leftTop(where.x, area.top);
-	BPoint bottomRight(where.x, area.top + ThumbRangeFor(channel));
+	BPoint leftTop(area.left + area.Width() / 2, area.top);
+	BPoint bottomRight(leftTop.x , area.top + ThumbRangeFor(channel));
 	DrawGroove(into, channel, leftTop, bottomRight);
-	DrawThumb(into, channel, where, pressed);
+	
+	BPoint thumbLocation = leftTop;
+	thumbLocation.y += ThumbDeltaFor(channel);
+	
+	DrawThumb(into, channel, thumbLocation, pressed);
 }
 
 
@@ -430,7 +465,7 @@ BChannelSlider::DrawThumb(BView *into, int32 channel, BPoint where, bool pressed
 	
 		into->SetDrawingMode(B_OP_ALPHA);
 		
-		rgb_color color = tint_color(ViewColor(), B_DARKEN_4_TINT);
+		rgb_color color = tint_color(into->ViewColor(), B_DARKEN_4_TINT);
 		color.alpha = 128;
 		into->SetHighColor(color);
 		
@@ -463,7 +498,6 @@ BChannelSlider::ThumbFor(int32 channel, bool pressed)
 }
 
 
-
 BRect
 BChannelSlider::ThumbFrameFor(int32 channel)
 {
@@ -474,9 +508,9 @@ BChannelSlider::ThumbFrameFor(int32 channel)
 	if (thumb != NULL) {
 		frame = thumb->Bounds();
 		if (Vertical())
-			frame.OffsetBy(0, fLineFeed * 2);
+			frame.OffsetBy(channel * frame.Width(), fLineFeed * 2);
 		else
-			frame.OffsetBy(fLineFeed, fLineFeed);
+			frame.OffsetBy(fLineFeed, fLineFeed + channel * frame.Height());
 	}
 	
 	return frame;	
@@ -505,8 +539,7 @@ BChannelSlider::ThumbRangeFor(int32 channel)
 {
 	UpdateFontDimens();
 	
-	float range = 0;
-	
+	float range = 0;	
 	BRect bounds = Bounds();
 	BRect frame = ThumbFrameFor(channel);
 	if (Vertical())
@@ -606,10 +639,9 @@ BChannelSlider::DrawThumbs()
 	}
 	
 	if (fBacking->Lock()) {
-		for (int32 i = 0; i < CountChannels(); i++) {
-			fBackingView->FillRect(fBackingView->Bounds(), B_SOLID_LOW);
+		fBackingView->FillRect(fBackingView->Bounds(), B_SOLID_LOW);
+		for (int32 i = 0; i < CountChannels(); i++)
 			DrawChannel(fBackingView, i, ThumbFrameFor(i), fMinpoint != 0); 
-		}
 		
 		fBackingView->Sync();
 		fBacking->Unlock();
@@ -648,14 +680,20 @@ BChannelSlider::Redraw()
 void
 BChannelSlider::MouseMovedCommon(BPoint point, BPoint point2)
 {
-	float value = fMinpoint;
-	
+	float floatValue = 0;
+	int32 limitRange = MaxLimitList()[fCurrentChannel] - MinLimitList()[fCurrentChannel];
+	float range = ThumbRangeFor(fCurrentChannel);
 	if (Vertical())
-		value -= point.y;		
+		floatValue = range - (point.y - fMinpoint);		
 	else
-		value = ThumbRangeFor(fCurrentChannel) - value + point.x;
-			
-	SetValueFor(fCurrentChannel, value);
+		floatValue = range - fMinpoint + point.x;
+	
+	int32 value = (int32)(floatValue / range * limitRange);
+	if (fAllChannels)
+		SetAllValue(value);
+	else
+		SetValueFor(fCurrentChannel, value);
+		
 	InvokeNotifyChannel(ModificationMessage());
 }
 
