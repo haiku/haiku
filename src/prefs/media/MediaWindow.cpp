@@ -641,7 +641,7 @@ MediaWindow::UpdateProgress(int stage, const char * message, void * cookie)
 	MediaAlert *alert = static_cast<MediaAlert*>(cookie);
 	PRINT(("stage : %i\n", stage));
 	char *string = "Unknown stage"; 
-	switch(stage) {
+	switch (stage) {
 		case 10:
 			string = "Stopping Media Server...";
 			break;
@@ -660,7 +660,8 @@ MediaWindow::UpdateProgress(int stage, const char * message, void * cookie)
 	}
 	
 	BAutolock locker(alert);
-	if(locker.IsLocked())
+	if (locker.IsLocked())
 		alert->TextView()->SetText(string);
 	return true;
 }
+

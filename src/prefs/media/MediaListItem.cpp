@@ -24,8 +24,8 @@
 // MediaListItem - Constructor
 MediaListItem::MediaListItem(dormant_node_info *info, uint32 level, bool isVideo, BList *icons, uint32 modifiers=0) 
 	: BListItem(level),
-	mIsVideo(isVideo),
 	mIsAudioMixer(false),
+	mIsVideo(isVideo),
 	mIsDefaultInput(false),
 	mIsDefaultOutput(false)
 {
@@ -36,11 +36,11 @@ MediaListItem::MediaListItem(dormant_node_info *info, uint32 level, bool isVideo
 	SetHeight(16 + kITEM_MARGIN);
 }
 
-MediaListItem::MediaListItem(const char* label, uint32 level, bool isVideo, BList *icons, uint32 modifiers=0) 
+MediaListItem::MediaListItem(const char *label, uint32 level, bool isVideo, BList *icons, uint32 modifiers=0) 
 	: BListItem(level),
-	mIsVideo(isVideo),
 	mLabel(label),
 	mIsAudioMixer(false),
+	mIsVideo(isVideo),
 	mIsDefaultInput(false),
 	mIsDefaultOutput(false)
 {
@@ -62,15 +62,12 @@ MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 {
 	rgb_color kHighlight = { 140,140,140,0 };
 	rgb_color kBlack = { 0,0,0,0 };
-	rgb_color kWhite = { 255,255,255,0 };
-	
+
 	BRect r(frame);
-		
-	if (IsSelected() || complete) 
-	{
+
+	if (IsSelected() || complete) {
 		rgb_color color;
-		if (IsSelected())
-		{
+		if (IsSelected()) {
 			color = kHighlight;
 		} else {
 			color = owner->ViewColor();
@@ -79,7 +76,6 @@ MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 		owner->SetLowColor(color);
 		owner->FillRect(r);
 		owner->SetHighColor(kBlack);
-		
 	} else {
 		owner->SetLowColor(owner->ViewColor());
 	}

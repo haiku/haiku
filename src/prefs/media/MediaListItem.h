@@ -12,32 +12,34 @@
 //  Created :    June 25, 2003
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-
 #ifndef __MEDIALISTITEM_H__
 #define __MEDIALISTITEM_H__
+
 
 #include <ListItem.h>
 #include <MediaAddOn.h>
 
-class MediaListItem : public BListItem
-{
+
+class MediaListItem : public BListItem {
 	public:
 		MediaListItem(dormant_node_info *info, uint32 level, bool isVideo, BList *icons, uint32 modifiers=0);
 		MediaListItem(const char* label, uint32 level, bool isVideo, BList *icons, uint32 modifiers=0);
 		~MediaListItem();
+
 		virtual void Update(BView *owner, const BFont *finfo);
 		virtual void DrawItem(BView *owner, BRect frame, bool complete = false);
+
 		void SetDefault(bool isDefaultInput, bool isInput);
 		void SetAudioMixer(bool isAudioMixer);
 		bool IsDefault(bool isInput) { return isInput ? mIsDefaultInput : mIsDefaultOutput; }
 		bool IsAudioMixer() { return mIsAudioMixer; }
 		bool IsVideo() { return mIsVideo; }
-		const char* GetLabel() { return mLabel; }
-		
+		const char *GetLabel() { return mLabel; }
+
 		dormant_node_info *mInfo;
-		
+
 		static int Compare(const void *firstArg, const void *secondArg);
+
 	private:
 		const char *mLabel;
 		bool mIsAudioMixer;
@@ -48,5 +50,4 @@ class MediaListItem : public BListItem
 		BList *mIcons;
 };
 
-
-#endif
+#endif	/* __MEDIALISTITEM_H__ */

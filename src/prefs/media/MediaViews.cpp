@@ -161,14 +161,14 @@ SettingsView::AddNodes(BList &list, bool isInput)
 {
 	BMenu *menu = isInput ? mMenu1 : mMenu2;
 	void *item;
-	while(item = menu->RemoveItem((int32)0))
+	while ((item = menu->RemoveItem((int32)0)) != NULL)
 		delete item;
-		
+
 	BMessage message(ML_DEFAULT_CHANGE);
 	message.AddBool("isVideo", mIsVideo);
 	message.AddBool("isInput", isInput);
-		
-	for(int32 i=0; i<list.CountItems(); i++) {
+
+	for (int32 i = 0; i < list.CountItems(); i++) {
 		dormant_node_info *info = static_cast<dormant_node_info *>(list.ItemAt(i));
 		menu->AddItem(new SettingsItem(info, new BMessage(message)));
 	}
@@ -179,7 +179,7 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 {
 	BMenu *menu = isInput ? mMenu1 : mMenu2;
 		
-	for(int32 i=0; i<menu->CountItems(); i++) {
+	for (int32 i = 0; i < menu->CountItems(); i++) {
 		SettingsItem *item = static_cast<SettingsItem *>(menu->ItemAt(i));
 		if(item->mInfo && item->mInfo->addon == info.addon && item->mInfo->flavor_id == info.flavor_id) {
 			item->SetMarked(true);
@@ -187,26 +187,26 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 		}
 	}
 	
-	if(!mIsVideo&&!isInput&&outputID>-1) {
+	if (!mIsVideo&&!isInput&&outputID>-1) {
 		BMenuItem *item;
-		while(item = mMenu3->RemoveItem((int32)0))
+		while ((item = mMenu3->RemoveItem((int32)0)) != NULL)
 			delete item;
 		BMediaRoster *roster = BMediaRoster::Roster();
 		media_node node;
 		media_node_id node_id;
 		status_t err;
-		if(roster->GetInstancesFor(info.addon, info.flavor_id, &node_id)!=B_OK) 
+		if (roster->GetInstancesFor(info.addon, info.flavor_id, &node_id)!=B_OK) 
 			err = roster->InstantiateDormantNode(info, &node, B_FLAVOR_IS_GLOBAL);
 		else
 			err = roster->GetNodeFor(node_id, &node);
 		
-		if(err == B_OK) {	
+		if (err == B_OK) {	
 			media_input inputs[16];
 			int32 inputCount = 16;
-			if(roster->GetAllInputsFor(node, inputs, 16, &inputCount)==B_OK) {
+			if (roster->GetAllInputsFor(node, inputs, 16, &inputCount)==B_OK) {
 				BMessage message(ML_DEFAULTOUTPUT_CHANGE);
-				Settings2Item *listItem;
-				for(int32 i=0; i<inputCount; i++) {
+
+				for (int32 i = 0; i < inputCount; i++) {
 					media_input *input = new media_input();
 					memcpy(input, &inputs[i], sizeof(*input));
 					mMenu3->AddItem(item = new Settings2Item(&info, input, new BMessage(message)));
@@ -239,4 +239,4 @@ Settings2Item::~Settings2Item()
 {
 	delete mInput;
 }
-		
+

@@ -28,13 +28,13 @@ Media::Media()
 	BRect rect(32,64,637,442);
 	
 	BPath path;
-	if(find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(SETTINGS_FILE);
 		BFile file(path.Path(),B_READ_ONLY);
-		if(file.InitCheck()==B_OK) {
+		if (file.InitCheck()==B_OK) {
 			char buffer[255];
 			ssize_t size = 0;
-			while((size = file.Read(buffer, 255))>0) {
+			while ((size = file.Read(buffer, 255)) > 0) {
 				int32 i=0;
 				while(buffer[i]=='#') {
 					while(i<size&&buffer[i]!='\n')
@@ -42,12 +42,12 @@ Media::Media()
 					i++;
 				}
 				int32 a,b,c,d;
-				if(sscanf(&buffer[i], " rect = %i,%i,%i,%i", &a, &b, &c, &d)>0){
-					if(c-a>=int(rect.Width())) {
+				if (sscanf(&buffer[i], " rect = %li,%li,%li,%li", &a, &b, &c, &d) > 0) {
+					if (c-a >= rect.IntegerWidth()) {
 						rect.left = a;
 						rect.right = c;
 					}
-					if(d-b>=int(rect.Height())) {
+					if (d-b >= rect.IntegerHeight()) {
 						rect.top = b;
 						rect.bottom = d;
 					}
