@@ -68,7 +68,7 @@ extern char		**environ;
 extern char		*getenv(const char *name);
 extern int		putenv(const char *string);
 extern int		setenv(char const *name, char const *value, int rewrite);
-extern void		unsetenv(const char *name);
+extern int		unsetenv(const char *name);
 
 /* ASCII string to number conversion */
 extern double			atof(const char *string);
