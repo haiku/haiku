@@ -500,13 +500,11 @@ udf_read_stat(void *ns, void *node, struct stat *st)
 	PRINT(("mode = 0x%lx\n", uint32(icb->Mode())));
 	st->st_size = icb->Length();
 
-
-	st->st_atime = system_time();
-	st->st_mtime = system_time();
-	st->st_ctime = system_time();
-	st->st_crtime = system_time();
-//	st->st_mtime = st->st_ctime = (time_t)(node->last_modified_time >> INODE_TIME_SHIFT);
-//	st->st_crtime = (time_t)(node->create_time >> INODE_TIME_SHIFT);
+	// File times. For now, treat the modification time as creation
+	// time as well, since true creation time is an optional extended
+	// attribute, and supporting EAs is going to be a PITA. ;-)
+	st->st_atime = icb->AccessTime();
+	st->st_mtime = st->st_ctime = st->st_crtime = icb->ModificationTime();
 
 	RETURN(B_OK);
 }
