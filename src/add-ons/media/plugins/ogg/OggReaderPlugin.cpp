@@ -213,8 +213,8 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 	TRACE("oggReader::GetStreamInfo\n");
 	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	memset(format, 0, sizeof(*format));
-	*frameCount = -1; // don't know
-	*duration = -1; // don't know
+	*frameCount = 1024*1024; // don't know
+	*duration = 1024*1024; // don't know
 	ogg_packet * packet = &fInitialHeaderPackets[stream->serialno];
 	*infoBuffer = (void*)packet;
 	*infoSize = sizeof(ogg_packet);
@@ -246,8 +246,7 @@ oggReader::GetNextChunk(void *cookie,
 						void **chunkBuffer, int32 *chunkSize,
 						media_header *mediaHeader)
 {
-	TRACE("oggReader::GetNextChunk");
-	debugger("oggReader::GetNextChunk");
+	TRACE("oggReader::GetNextChunk\n");
 	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	while (ogg_stream_packetpeek(stream,NULL) != 1) {
 		ogg_page page;

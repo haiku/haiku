@@ -33,7 +33,6 @@ vorbisDecoder::vorbisDecoder()
 
 vorbisDecoder::~vorbisDecoder()
 {
-	debugger("vorbisDecoder::~vorbisDecoder");
 	TRACE("vorbisDecoder::~vorbisDecoder\n");
 	delete [] fDecodeBuffer;
 }
@@ -43,8 +42,6 @@ status_t
 vorbisDecoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
-	debugger("vorbisDecoder::Setup");
-	TRACE("vorbisDecoder::Setup\n");
 	if ((ioEncodedFormat->type != B_MEDIA_UNKNOWN_TYPE)
 	    && (ioEncodedFormat->type != B_MEDIA_ENCODED_AUDIO)) {
 		TRACE("vorbisDecoder::Setup not called with audio/unknown stream: not vorbis");
@@ -85,6 +82,7 @@ vorbisDecoder::Setup(media_format *ioEncodedFormat,
 	// initialize decoder
 	vorbis_synthesis_init(&fDspState,&fInfo);
 	vorbis_block_init(&fDspState,&fBlock);
+	ioEncodedFormat->type = B_MEDIA_ENCODED_AUDIO;
 	return B_OK;
 }
 
@@ -96,7 +94,6 @@ size_t get_audio_buffer_size(const media_raw_audio_format & raf) {
 status_t
 vorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 {
-	debugger("vorbisDecoder::NegotiateOutputFormat");
 	TRACE("vorbisDecoder::NegotiateOutputFormat\n");
 	// BeBook says: The codec will find and return in ioFormat its best matching format
 	// => This means, we never return an error, and always change the format values
