@@ -23,8 +23,8 @@ area *poolarea::get(void)
 		}
 	else
 		{
-		//error ("poolarea::get: Getting a new page!\n");
 		page *newPage=vmBlock->pageMan->getPage();
+		error ("poolarea::get: Getting new page %lx!\n",newPage->getAddress());
 		if (!newPage)
 			throw ("Out of pages to allocate a pool!");
 		int newCount=PAGE_SIZE/sizeof(area);

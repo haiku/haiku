@@ -5,18 +5,17 @@
 #include <errno.h>
 #include <string.h>
 
-vmInterface vm(30);
+vmInterface *vm;
 
-void writeByte(unsigned long addr,unsigned int offset, char value) { vm.setByte(addr+offset,value); }
-unsigned char readByte(unsigned long addr,unsigned int offset ) { char value=vm.getByte(addr+offset); return value; }
+void writeByte(unsigned long addr,unsigned int offset, char value) { vm->setByte(addr+offset,value); }
+unsigned char readByte(unsigned long addr,unsigned int offset ) { char value=vm->getByte(addr+offset); return value; }
 
 int createFillAndTest(int pages,char *name)
 {
-	try{
 	unsigned long addr;
 	int area1;
 	error ("%s: createFillAndTest: about to create \n",name);
-	area1=vm.createArea(name,pages,(void **)(&addr));
+	area1=vm->createArea(name,pages,(void **)(&addr));
 	error ("%s: createFillAndTest: create done\n",name);
 	for (int i=0;i<pages*PAGE_SIZE;i++)
 		{				
@@ -34,6 +33,16 @@ int createFillAndTest(int pages,char *name)
 		}
 	error ("%s: createFillAndTest: reading done\n",name);
 	return area1;
+}
+
+int main(int argc,char **argv)
+{
+	try {
+	vm = new vmInterface (30);
+	error ("Starting Threads!\n");
+
+	for (int i=0;i<20;i++)
+		createFillAndTest(1,"myTest");	
 	}
 	catch (const char *t)
 	{
@@ -42,16 +51,9 @@ int createFillAndTest(int pages,char *name)
 	}
 	catch (...)
 	{
-		error ("Exception thrown!\n");
+		error ("Unknown Exception thrown!\n");
 		exit(1);
 	}
-	return 0;
-}
-
-int main(int argc,char **argv)
-{
-	error ("Starting Threads!\n");
-	createFillAndTest(1,"myTest");	
 
 	return 0;
 }

@@ -50,7 +50,7 @@ unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int page
 }
 
 status_t area::createAreaGuts( char *inName, int pageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea=NULL /* For clone only*/) {
-	error ("area::createAreaGuts : name = %s, pageCount = %d, address = %ld, addressSpec = %d, pageState = %d, protection = %d, inFinalWrite = %d, fd = %d, offset = %d,originalArea=%ld\n",
+	error ("area::createAreaGuts : name = %s, pageCount = %d, address = %lx, addressSpec = %d, pageState = %d, protection = %d, inFinalWrite = %d, fd = %d, offset = %d,originalArea=%ld\n",
 					inName,pageCount,address,type,inState,protect,inFinalWrite,fd,offset,originalArea);
 	strcpy(name,inName);
 	vpage *newPage;

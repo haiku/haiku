@@ -20,22 +20,28 @@ class hashTable : public list
 		nodeCount=0;
 		numRocks=size;
 		
-		error ("Starting to initalize hash table\n");
+		//error ("Starting to initalize hash table\n");
 		if (size*sizeof (list *)>PAGE_SIZE)
 			throw ("Hash table too big!"); 
-		error ("Getting Page\n");
+		//error ("Getting Page\n");
+		
+		// Get the block for the page of pointers
 		page *newPage=vmBlock->pageMan->getPage();
-		error ("Got Page\n");
-		if (!newPage)
+		error ("hashTable::hashTable - Got Page %x\n",newPage);
+		if (!newPage) {
+			error ("Out of pages to allocate a pool! newPage = %x\n",newPage);
 			throw ("Out of pages to allocate a pool!");
+			}
 		rocks=(list **)(newPage->getAddress());
-		error ("Got rocks\n");
+		//error ("Got rocks\n");
 
 		int listsPerPage=PAGE_SIZE/sizeof(list);
 		int pages=(size+(listsPerPage-1))/listsPerPage;
 		for (int pageCount=0;pageCount<pages;pageCount++)
 			{
+			// Allocate a page of lists
 			page *newPage=vmBlock->pageMan->getPage();
+			error ("hashTable::hashTable - Got Page %x\n",newPage);
 			if (!newPage)
 				throw ("Out of pages to allocate a pool!");
 			for (int i=0;i<listsPerPage;i++)

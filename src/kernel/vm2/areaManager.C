@@ -139,7 +139,7 @@ long areaManager::nextAreaID=0;
 
 int areaManager::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) 
 {
-	error ("Creating an area\n");
+	error ("areaManager::createArea - Creating an area\n");
 	lock();
     area *newArea = new (vmBlock->areaPool->get()) area;
     error ("areaManager::createArea - got a new area (%p) from the areaPool\n",newArea);
@@ -155,7 +155,7 @@ int areaManager::createArea(char *AreaName,int pageCount,void **address, address
 	int retVal=newArea->getAreaID();  
     error ("areaManager::createArea - new area id found\n");
 	unlock();
-	error ("Done Creating an area\n");
+	error ("areaManager::createArea - Done Creating an area\n");
     return  retVal;
 }
 

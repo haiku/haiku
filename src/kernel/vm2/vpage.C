@@ -48,8 +48,10 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 		}
 	else
 		backingNode=&(vmBlock->swapMan->findNode());
-	if (!physMem && (state!=LAZY) && (state!=NO_LOCK))
+	if (!physMem && (state!=LAZY) && (state!=NO_LOCK)) {
 		physPage=vmBlock->pageMan->getPage();
+		error ("vpage::setup, state = %d, allocated page %x\n",state,physPage);
+		}
 	else {
 		if (physMem)
 			atomic_add(&(physMem->count),1);
@@ -60,8 +62,10 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 	}
 
 void vpage::cleanup(void) {
-	if (physPage) //  Note that free means release one reference
+	if (physPage) { //  Note that free means release one reference 
+		error ("vpage::cleanup, freeing physcal page %x\n",physPage);
 		vmBlock->pageMan->freePage(physPage);
+		}
 	if (backingNode) {
 		if (backingNode->fd)
 			if (backingNode->fd==vmBlock->swapMan->getFD())
@@ -85,8 +89,7 @@ bool vpage::fault(void *fault_address, bool writeError) {
 		dirty=true;
 		if (protection==copyOnWrite) { // Else, this was just a "let me know when I am dirty"...  
 			page *newPhysPage=vmBlock->pageMan->getPage();
-			if (!newPhysPage) // No room at the inn
-				return false;
+			error ("vpage::fault - copy on write allocated page %x\n",newPhysPage);
 			memcpy((void *)(newPhysPage->getAddress()),(void *)(physPage->getAddress()),PAGE_SIZE);
 			physPage=newPhysPage;
 			protection=writable;
@@ -96,6 +99,7 @@ bool vpage::fault(void *fault_address, bool writeError) {
 		return true; 
 		}
 	physPage=vmBlock->pageMan->getPage();
+	error ("vpage::fault - regular - allocated page %x\n",physPage);
 	if (!physPage) // No room at the inn
 		return false;
 	error ("vpage::fault: New page allocated! new physical address = %x vnode.fd=%d, vnode.offset=%d, \n",physPage->getAddress(),((backingNode)?backingNode->fd:0),((backingNode)?backingNode->offset:0));

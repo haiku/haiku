@@ -21,8 +21,8 @@ vnode *poolvnode::get(void)
 		}
 	else
 		{
-		//error ("poolvnode::get: Getting a new page!\n");
 		page *newPage=vmBlock->pageMan->getPage();
+		error ("poolvnode::get: Getting new page %lx!\n",newPage->getAddress());
 		if (!newPage)
 			throw ("Out of pages to allocate a pool!");
 		int newCount=PAGE_SIZE/sizeof(vnode);

@@ -23,6 +23,7 @@ void pageManager::setup(void *area,int pages) {
 	unusedLock=create_sem (1,"unused_lock");
 	inUseLock=create_sem (1,"inuse_lock");
 	totalPages=pages;
+	error ("pageManager::setup - %d pages ready to rock and roll\n",unused.count());
 	}
 	
 page *pageManager::getPage(void) {
@@ -42,10 +43,13 @@ page *pageManager::getPage(void) {
 				ret->zero();
 			} // This could fail if someone swooped in and stole our page.
 		}
+	error ("pageManager::getPage - returning page %x, clean = %d, unused = %d, inuse = %x\n",ret,clean.count(),unused.count(),inUse.count());
 	acquire_sem(inUseLock);
 	inUse.add(ret);
 	release_sem(inUseLock);
 	ret->count++;
+	if (!ret)
+		throw ("Out of physical pages!");
 	return ret;
 	}
 
@@ -79,12 +83,16 @@ bool pageManager::getContiguousPages(int pages,page **location) {
 }
 
 void pageManager::freePage(page *toFree) {
+	error ("pageManager::freePage; count = %d, address = %p\n",toFree->count,toFree);
 	if (atomic_add(&(toFree->count),-1)==1) { // atomic_add returns the *PREVIOUS* value. So we need to check to see if the one we are wasting was the last one.
 		acquire_sem(inUseLock);
 		inUse.remove(toFree);
+		inUse.dump();
 		release_sem(inUseLock);
+
 		acquire_sem(unusedLock);
 		unused.add(toFree);
+		unused.dump();
 		release_sem(unusedLock);
 		}
 	}
