@@ -29,8 +29,9 @@ BChannelControl::BChannelControl(BRect frame, const char *name, const char *labe
 	memset(fChannelMin, 0, sizeof(int32) * channel_count);
 	
 	fChannelMax = new int32[channel_count];
-	memset(fChannelMax, 100, sizeof(int32) * channel_count);
-	
+	for (int32 i = 0; i < channel_count; i++)
+		fChannelMax[i] = 100;
+
 	fChannelValues = new int32[channel_count];
 	memset(fChannelValues, 0, sizeof(int32) * channel_count);
 }
@@ -384,7 +385,14 @@ BChannelControl::SetValue(int32 fromChannel, int32 channelCount,
 status_t
 BChannelControl::SetAllValue(int32 values)
 {
-	return B_ERROR;
+	int32 *newValues = new int32[fChannelCount];
+	for (int32 i = 0; i < fChannelCount; i++)
+		newValues[i] = values;
+	
+	delete fChannelValues;
+	fChannelValues = newValues;
+	
+	return B_OK;
 }
 
 
@@ -496,15 +504,14 @@ BChannelControl::StuffValues(int32 fromChannel, int32 channelCount,
 	if (inValues == NULL)
 		return B_BAD_VALUE;
 
-	if (fromChannel < 0 || fromChannel >= fChannelCount
-						|| fromChannel + channelCount >= fChannelCount)
+	if (fromChannel < 0 || fromChannel > fChannelCount
+						|| fromChannel + channelCount > fChannelCount)
 		return B_BAD_INDEX;
 
 	for (int32 i = 0; i < channelCount; i++) {
 		if (inValues[i] <= fChannelMax[fromChannel + i]
 						&& inValues[i] >= fChannelMin[fromChannel + i])
-			fChannelValues[fromChannel + i] = inValues[i];
-		
+			fChannelValues[fromChannel + i] = inValues[i];		
 	}
 
 	// If the current channel was updated, update also the control value
