@@ -6,6 +6,7 @@
 
 #include <boot/heap.h>
 #include <boot/platform.h>
+#include <util/kernel_cpp.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,7 +47,7 @@ struct free_chunk {
 
 
 static void *sHeapBase;
-static uint32 sHeapSize, sMaxHeapSize, sAvailable;
+static uint32 /*sHeapSize,*/ sMaxHeapSize, sAvailable;
 static free_chunk sFreeAnchor;
 
 
@@ -121,7 +122,7 @@ free_chunk::Remove(free_chunk *previous)
 {
 	if (previous == NULL) {
 		// find the previous chunk in the list
-		free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
+		free_chunk *chunk = sFreeAnchor.next;
 
 		while (chunk != NULL && chunk != this) {
 			previous = chunk;
