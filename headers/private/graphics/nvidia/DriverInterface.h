@@ -182,6 +182,8 @@ typedef struct {
 		NV31,
 		NV34,
 		NV35,
+		NV36,
+		NV38,
 		G550//remove later on
 	};
 	enum

@@ -31,23 +31,18 @@ status_t parse_pins(void);
 void fake_pins(void);
 void dump_pins(void);
 
-/*DAC functions*/
+/* DAC functions */
 status_t nv_dac_mode(int,float);
 status_t nv_dac_palette(uint8*,uint8*,uint8*);
-
 status_t nv_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t nv_dac_set_pix_pll(display_mode target);
-
 status_t g400_dac_set_sys_pll(void);
 
-/*MAVEN functions*/
-status_t nv_maven_dpms(uint8, uint8, uint8);
-status_t nv_maven_set_timing(display_mode target);
-status_t nv_maven_mode(int,float);
-
-status_t g100_g400max_maven_vid_pll_find(display_mode target,float * calc_pclk,
-				uint8 * m_result,uint8 * n_result,uint8 * p_result);
-status_t nv_maven_set_vid_pll(display_mode target);
+/* DAC2 functions */
+status_t nv_dac2_mode(int,float);
+status_t nv_dac2_palette(uint8*,uint8*,uint8*);
+status_t nv_dac2_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
+status_t nv_dac2_set_pix_pll(display_mode target);
 
 /*MAVENTV functions*/
 status_t g100_g400max_maventv_vid_pll_find(

@@ -121,8 +121,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		if (!(target2.flags & TV_BITS))
 		{
 			LOG(8,("SETMODE: target2 clock %dkHz\n",target2.timing.pixel_clock));
-			if (nv_maven_set_vid_pll(target2) == B_ERROR)
-				LOG(8,("SETMODE: error setting pixel clock (MAVEN)\n"));
+			if (nv_dac2_set_pix_pll(target2) == B_ERROR)
+				LOG(8,("SETMODE: error setting pixel clock (DAC2)\n"));
 		}
 
 		/*set the colour depth for CRTC1 and the DAC */
@@ -139,17 +139,17 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			nv_crtc_depth(BPP32);
 			break;
 		}
-		/*set the colour depth for CRTC2 and the MAVEN */
+		/*set the colour depth for CRTC2 and DAC2 */
 		switch(target2.space)
 		{
 		case B_RGB16_LITTLE:
 			colour_depth2 = 16;
-			nv_maven_mode(BPP16, 1.0);
+			nv_dac2_mode(BPP16, 1.0);
 			nv_crtc2_depth(BPP16);
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth2 = 32;
-			nv_maven_mode(BPP32DIR, 1.0);
+			nv_dac2_mode(BPP32DIR, 1.0);
 			nv_crtc2_depth(BPP32DIR);
 			break;
 		}
@@ -167,13 +167,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 		/*work out where the "right" screen starts*/
 		startadd_right=startadd+(target.timing.h_display * (colour_depth1 >> 3));
-
-		/* calculate needed MAVEN-CRTC delay: formula valid for straight-through CRTC's */
-		si->crtc_delay = 44 + 0 * (colour_depth2 == 16);
-
-		/* setup vertical timing adjust for crtc1 and crtc2 for straight-through CRTC's */
-		/* (extra "blanking" line for MAVEN) */
-		target2.timing.v_display++;
 
 		/* set the outputs */
 		switch (si->ps.card_type)
@@ -202,12 +195,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 					LOG(4,("SETMODE: no secondary TV-adapter detected, switching CRTCs\n"));
 					nv_general_dac_select(DS_CRTC1MAVEN_CRTC2DAC);
 					si->switched_crtcs = false;
-					/* re-calculate MAVEN-CRTC delay: formula valid for crossed CRTC's */
-					si->crtc_delay = 17 + 4 * (colour_depth1 == 16);
-					/* re-setup vertical timing adjust for crtc1 and crtc2 for crossed CRTC's */
-					/* (extra "blanking" line for MAVEN) */
-					target.timing.v_display++;
-					target2.timing.v_display--;
 				}
 				break;
 			}

@@ -1,178 +1,199 @@
-/* program the MAVEN in monitor mode */
-
-/* Authors:
-   Mark Watson 6/2000,
-   Rudolf Cornelissen 1/2003-4/2003
-
-   Thanx to Petr Vandrovec for writing matroxfb.
+/* program the secondary DAC */
+/* Author:
+   Rudolf Cornelissen 12/2003-1/2004
 */
 
 #define MODULE_BIT 0x00001000
 
 #include "nv_std.h"
 
-status_t g450_g550_maven_set_vid_pll(display_mode target);
-status_t g100_g400max_maven_set_vid_pll(display_mode target);
-
-status_t nv_maven_dpms(uint8 display,uint8 h,uint8 v)
-{
-	/* this function is nolonger needed on G450/G550 cards */
-	if (si->ps.card_type > G550) return B_OK;
-
-	if (display & h & v)
-	{
-		/* turn on screen */
-		if (!(si->dm.flags & TV_BITS))
-		{
-			/* monitor mode */
-			MAVW(MONEN, 0xb2);
-			MAVW(MONSET, 0x20);		/* must be set to this in monitor mode */
-			MAVW(OUTMODE, 0x03);	/* output: monitor mode */
-			MAVW(STABLE, 0x22);		/* makes picture stable? */
-			MAVW(TEST, 0x00);		/* turn off test signal */
-		}
-		else
-		{
-			/* TVout mode */
-			MAVW(MONEN, 0xb3);
-			MAVW(MONSET, 0x20);
-			MAVW(OUTMODE, 0x08);	/* output: SVideo/Composite */
-			MAVW(STABLE, 0x02);		/* makes picture stable? */
-			//fixme? linux uses 0x14...
-			MAVW(TEST, (MAVR(TEST) & 0x10));
-		}
-	}
-	else
-	{
-		/* turn off screen using a few methods! */
-		MAVW(STABLE, 0x6a);
-//		MAVW(TEST, 0x03);
-		MAVW(OUTMODE, 0x00);
-	}
-
-	return B_OK;
-}
-
-/*set a mode line - inputs are in pixels/scanlines*/
-status_t nv_maven_set_timing(display_mode target)
-{
-	/* this function is nolonger needed on G450/G550 cards */
-	if (si->ps.card_type > G550) return B_OK;
-
-	LOG(4,("MAVEN: setting timing\n"));
-
-	/*check horizontal timing parameters are to nearest 8 pixels*/
-	if ((target.timing.h_display & 0x07)	|
-		(target.timing.h_sync_start & 0x07)	|
-		(target.timing.h_sync_end & 0x07)	|
-		(target.timing.h_total & 0x07))
-	{
-		LOG(8,("MAVEN: Horizontal timing is not multiples of 8 pixels\n"));
-		return B_ERROR;
-	}
-
-	/*program the MAVEN*/
-	MAVWW(LASTLINEL, target.timing.h_total); 
-	MAVWW(HSYNCLENL, (target.timing.h_sync_end - target.timing.h_sync_start));
-	MAVWW(HSYNCSTRL, (target.timing.h_total - target.timing.h_sync_start));
-	MAVWW(HDISPLAYL, ((target.timing.h_total - target.timing.h_sync_start) +
-					   target.timing.h_display));
-	MAVWW(HTOTALL, (target.timing.h_total + 1));
-
-	MAVWW(VSYNCLENL, (target.timing.v_sync_end - target.timing.v_sync_start - 1));
-	MAVWW(VSYNCSTRL, (target.timing.v_total - target.timing.v_sync_start));
-	MAVWW(VDISPLAYL, (target.timing.v_total - 1));
-	MAVWW(VTOTALL, (target.timing.v_total - 1));
-
-	MAVWW(HVIDRSTL, (target.timing.h_total - si->crtc_delay));
-	MAVWW(VVIDRSTL, (target.timing.v_total - 2));
-
-	return B_OK;
-}
+static status_t nv10_nv20_dac2_pix_pll_find(
+	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 
 /*set the mode, brightness is a value from 0->2 (where 1 is equivalent to direct)*/
-status_t nv_maven_mode(int mode,float brightness)
+status_t nv_dac2_mode(int mode,float brightness)
 {
-	uint8 luma;
+	uint8 *r,*g,*b;
+	int i, ri;
 
-	/* this function is nolonger needed on G450/G550 cards */
-	if (si->ps.card_type > G550) return B_OK;
+	/*set colour arrays to point to space reserved in shared info*/
+	r = si->color_data;
+	g = r + 256;
+	b = g + 256;
 
-	/*set luma to a suitable value for brightness*/
-	/*assuming 1A is a sensible value*/
-	luma = (uint8)(0x1a * brightness);
-	MAVW(LUMA,luma);
-	LOG(4,("MAVEN: LUMA setting - %x\n",luma));
+	LOG(4,("DAC2: Setting screen mode %d brightness %f\n", mode, brightness));
+	/* init the palette for brightness specified */
+	/* (Nvidia cards always use MSbits from screenbuffer as index for PAL) */
+	for (i = 0; i < 256; i++)
+	{
+		ri = i * brightness;
+		if (ri > 255) ri = 255;
+		b[i] = g[i] = r[i] = ri;
+	}
+
+	if (nv_dac2_palette(r,g,b) != B_OK) return B_ERROR;
+
+	/*set the mode - also sets VCLK dividor*/
+//	DXIW(MULCTRL, mode);
+//	LOG(2,("DAC: mulctrl 0x%02x\n", DXIR(MULCTRL)));
+
+	/* disable palette RAM adressing mask */
+	NV_REG8(NV8_PAL2MASK) = 0xff;
+	LOG(2,("DAC2: PAL pixrdmsk readback $%02x\n", NV_REG8(NV8_PAL2MASK)));
 
 	return B_OK;
 }
 
-status_t nv_maven_set_vid_pll(display_mode target)
+/*program the DAC palette using the given r,g,b values*/
+status_t nv_dac2_palette(uint8 r[256],uint8 g[256],uint8 b[256])
 {
-	switch (si->ps.card_type)
+	int i;
+
+	LOG(4,("DAC2: setting palette\n"));
+
+	/* select first PAL adress before starting programming */
+	NV_REG8(NV8_PAL2INDW) = 0x00;
+
+	/* loop through all 256 to program DAC */
+	for (i = 0; i < 256; i++)
 	{
-		default:
-			return g100_g400max_maven_set_vid_pll(target);
-			break;
+		/* the 6 implemented bits are on b0-b5 of the bus */
+		NV_REG8(NV8_PAL2DATA) = r[i];
+		NV_REG8(NV8_PAL2DATA) = g[i];
+		NV_REG8(NV8_PAL2DATA) = b[i];
 	}
-	return B_ERROR;
+	if (NV_REG8(NV8_PAL2INDW) != 0x00)
+	{
+		LOG(8,("DAC2: PAL write index incorrect after programming\n"));
+		return B_ERROR;
+	}
+if (1)
+ {//reread LUT
+	uint8 R, G, B;
+
+	/* select first PAL adress to read (modulo 3 counter) */
+	NV_REG8(NV8_PAL2INDR) = 0x00;
+	for (i = 0; i < 256; i++)
+	{
+		R = NV_REG8(NV8_PAL2DATA);
+		G = NV_REG8(NV8_PAL2DATA);
+		B = NV_REG8(NV8_PAL2DATA);
+		if ((r[i] != R) || (g[i] != G) || (b[i] != B)) 
+			LOG(1,("DAC2 palette %d: w %x %x %x, r %x %x %x\n", i, r[i], g[i], b[i], R, G, B)); // apsed
+	}
+ }
+
+	return B_OK;
 }
-	
-/* program the video PLL in the MAVEN */
-status_t g100_g400max_maven_set_vid_pll(display_mode target)
+
+/*program the pixpll - frequency in kHz*/
+/*important notes:
+ * PIXPLLC is used - others should be kept as is
+ * BESCLK,CRTC2 are not touched 
+ */
+status_t nv_dac2_set_pix_pll(display_mode target)
 {
 	uint8 m=0,n=0,p=0;
+//	uint time = 0;
 
 	float pix_setting, req_pclk;
 	status_t result;
 
 	req_pclk = (target.timing.pixel_clock)/1000.0;
-	LOG(4,("MAVEN: Setting VID PLL for pixelclock %f\n", req_pclk));
+	LOG(4,("DAC2: Setting PIX PLL for pixelclock %f\n", req_pclk));
 
-	result = g100_g400max_maven_vid_pll_find(target,&pix_setting,&m,&n,&p);
+	/* signal that we actually want to set the mode */
+	result = nv_dac2_pix_pll_find(target,&pix_setting,&m,&n,&p, 1);
 	if (result != B_OK)
 	{
 		return result;
 	}
+	
+	/*reprogram (disable,select,wait for stability,enable)*/
+//	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0F)|0x04);  /*disable the PIXPLL*/
+//	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0C)|0x01);  /*select the PIXPLL*/
 
-	/*reprogram (select,wait for stability)*/
-	MAVW(PIXPLLM,(m));								/* set m value */
-	MAVW(PIXPLLN,(n));								/* set n value */
-	MAVW(PIXPLLP,(p | 0x80));						/* set p value enabling PLL */
+	/* select pixelPLL registerset C */
+	DAC2W(PLLSEL, 0x10000700);
 
-	/* Wait for the VIDPLL frequency to lock: detection is not possible it seems */
-	snooze(2000);
+	/* program new frequency */
+	DAC2W(PIXPLLC, ((p << 16) | (n << 8) | m));
 
-	LOG(2,("MAVEN: VID PLL frequency should be locked now...\n"));
+	/* Wait for the PIXPLL frequency to lock until timeout occurs */
+//fixme: do NV cards have a LOCK indication bit??
+/*	while((!(DXIR(PIXPLLSTAT)&0x40)) & (time <= 2000))
+	{
+		time++;
+		snooze(1);
+	}
+	
+	if (time > 2000)
+		LOG(2,("DAC: PIX PLL frequency not locked!\n"));
+	else
+		LOG(2,("DAC: PIX PLL frequency locked\n"));
+	DXIW(PIXCLKCTRL,DXIR(PIXCLKCTRL)&0x0B);         //enable the PIXPLL
+*/
+
+//for now:
+	/* Give the PIXPLL frequency some time to lock... */
+	snooze(1000);
+	LOG(2,("DAC2: PIX PLL frequency should be locked now...\n"));
 
 	return B_OK;
 }
 
-/* find nearest valid video PLL setting */
-status_t g100_g400max_maven_vid_pll_find(
-	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result)
+/* find nearest valid pix pll */
+status_t nv_dac2_pix_pll_find
+	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
 {
-	int m = 0, n = 0, p = 0, m_max;
+	switch (si->ps.card_type) {
+		default:   return nv10_nv20_dac2_pix_pll_find(target, calc_pclk, m_result, n_result, p_result, test);
+	}
+	return B_ERROR;
+}
+
+/* find nearest valid pixel PLL setting */
+static status_t nv10_nv20_dac2_pix_pll_find(
+	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
+{
+	int m = 0, n = 0, p = 0/*, m_max*/;
 	float error, error_best = 999999999;
 	int best[3]; 
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
-	/* determine the max. reference-frequency postscaler setting for the current card */
-	//fixme: check G100 and G200 m_max if possible...
-	switch(si->ps.card_type)
+	/* determine the max. reference-frequency postscaler setting for the 
+	 * current card (see G100, G200 and G400 specs). */
+/*	switch(si->ps.card_type)
 	{
+	case G100:
+		LOG(4,("DAC: G100 restrictions apply\n"));
+		m_max = 7;
+		break;
+	case G200:
+		LOG(4,("DAC: G200 restrictions apply\n"));
+		m_max = 7;
+		break;
 	default:
-		LOG(4,("MAVEN: G400/G400MAX restrictions apply\n"));
+		LOG(4,("DAC: G400/G400MAX restrictions apply\n"));
 		m_max = 32;
 		break;
 	}
+*/
+	LOG(4,("DAC2: NV10/NV20 restrictions apply\n"));
 
 	/* determine the max. pixelclock for the current videomode */
 	switch (target.space)
 	{
+		case B_CMAP8:
+			max_pclk = si->ps.max_dac2_clock_8;
+			break;
+		case B_RGB15_LITTLE:
 		case B_RGB16_LITTLE:
 			max_pclk = si->ps.max_dac2_clock_16;
+			break;
+		case B_RGB24_LITTLE:
+			max_pclk = si->ps.max_dac2_clock_24;
 			break;
 		case B_RGB32_LITTLE:
 			max_pclk = si->ps.max_dac2_clock_32;
@@ -187,23 +208,23 @@ status_t g100_g400max_maven_vid_pll_find(
 		max_pclk = si->ps.max_dac2_clock_32dh;
 
 	/* Make sure the requested pixelclock is within the PLL's operational limits */
-	/* lower limit is min_video_vco divided by highest postscaler-factor */
-	if (req_pclk < (si->ps.min_video_vco / 8.0))
+	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
+	if (req_pclk < (si->ps.min_video_vco / 16.0))
 	{
-		LOG(4,("MAVEN: clamping vidclock: requested %fMHz, set to %fMHz\n",
-										req_pclk, (float)(si->ps.min_video_vco / 8.0)));
-		req_pclk = (si->ps.min_video_vco / 8.0);
+		LOG(4,("DAC2: clamping pixclock: requested %fMHz, set to %fMHz\n",
+										req_pclk, (float)(si->ps.min_video_vco / 16.0)));
+		req_pclk = (si->ps.min_video_vco / 16.0);
 	}
 	/* upper limit is given by pins in combination with current active mode */
 	if (req_pclk > max_pclk)
 	{
-		LOG(4,("MAVEN: clamping vidclock: requested %fMHz, set to %fMHz\n",
+		LOG(4,("DAC2: clamping pixclock: requested %fMHz, set to %fMHz\n",
 														req_pclk, (float)max_pclk));
 		req_pclk = max_pclk;
 	}
 
 	/* iterate through all valid PLL postscaler settings */
-	for (p=0x01; p < 0x10; p = p<<1)
+	for (p=0x01; p < 0x20; p = p<<1)
 	{
 		/* calculate the needed VCO frequency for this postscaler setting */
 		f_vco = req_pclk * p;
@@ -211,16 +232,24 @@ status_t g100_g400max_maven_vid_pll_find(
 		/* check if this is within range of the VCO specs */
 		if ((f_vco >= si->ps.min_video_vco) && (f_vco <= si->ps.max_video_vco))
 		{
+			/* NV31 (FX5600) tweak (missing register for 2nd VCO postscaler) */
+			f_vco /= si->pixpll_vco_div2;
+
 			/* iterate trough all valid reference-frequency postscaler settings */
-			for (m = 2; m <= m_max; m++)
+			for (m = 7; m <= 14; m++)
 			{
+				/* check if phase-discriminator will be within operational limits */
+				if (((si->ps.f_ref / m) < 1.0) || ((si->ps.f_ref / m) > 2.0)) continue;
+
 				/* calculate VCO postscaler setting for current setup.. */
 				n = (int)(((f_vco * m) / si->ps.f_ref) + 0.5);
 				/* ..and check for validity */
-				if ((n < 8) || (n > 128))	continue;
+				if ((n < 1) || (n > 255))	continue;
 
 				/* find error in frequency this setting gives */
-				error = fabs(req_pclk - (((si->ps.f_ref / m) * n) / p));
+				/* si->pixpll_vco_div2 below is NV31 (FX5600) tweak (missing register) */
+				error =
+					fabs((req_pclk / si->pixpll_vco_div2) - (((si->ps.f_ref / m) * n) / p));
 
 				/* note the setting if best yet */
 				if (error < error_best)
@@ -235,35 +264,43 @@ status_t g100_g400max_maven_vid_pll_find(
 	}
 
 	/* setup the scalers programming values for found optimum setting */
-	m=best[0] - 1;
-	n=best[1] - 1;
-	p=best[2] - 1;
+	m = best[0];
+	n = best[1];
+	p = best[2];
 
-	/* calc the needed PLL loopbackfilter setting belonging to current VCO speed */
-	f_vco = (si->ps.f_ref / (m + 1)) * (n + 1);
-	LOG(2,("MAVEN: vid VCO frequency found %fMhz\n", f_vco));
+	/* log the VCO frequency found */
+	f_vco = ((si->ps.f_ref / m) * n);
+	/* NV31 (FX5600) tweak (missing register for 2nd VCO postscaler) */
+	f_vco *= si->pixpll_vco_div2;
 
-	switch(si->ps.card_type)
-	{
-	default:
-		for(;;)
-		{
-			if (f_vco >= 240) {p |= (0x03 << 3); break;};
-			if (f_vco >= 170) {p |= (0x02 << 3); break;};
-			if (f_vco >= 110) {p |= (0x01 << 3); break;};
-			break;
-		}
-		break;
-	}
+	LOG(2,("DAC2: pix VCO frequency found %fMhz\n", f_vco));
 
 	/* return the results */
-	*calc_pclk = f_vco / ((p & 0x07) + 1);
+	*calc_pclk = (f_vco / p);
 	*m_result = m;
 	*n_result = n;
+	switch(p)
+	{
+	case 1:
+		p = 0x00;
+		break;
+	case 2:
+		p = 0x01;
+		break;
+	case 4:
+		p = 0x02;
+		break;
+	case 8:
+		p = 0x03;
+		break;
+	case 16:
+		p = 0x04;
+		break;
+	}
 	*p_result = p;
 
 	/* display the found pixelclock values */
-	LOG(2,("MAVEN: vid PLL check: req. %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
+	LOG(2,("DAC2: pix PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
 		req_pclk, *calc_pclk, *m_result, *n_result, *p_result));
 
 	return B_OK;

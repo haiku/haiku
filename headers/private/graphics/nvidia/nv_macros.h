@@ -522,10 +522,10 @@
 #define NVDAC_PLLSEL		0x0068050c
 #define NVDAC_GENCTRL		0x00680600
 /* secondary head */
-#define NVDAC2_CURPOS		0x00682300//confirmed NV34: 0x00680b00 does not work here
-#define NVDAC2_PIXPLLC		0x00680d20//verify!!!
-#define NVDAC2_PLLSEL		0x00680d0c//verify!!!
-#define NVDAC2_GENCTRL		0x00680e00//verify!!!
+#define NVDAC2_CURPOS		0x00682300
+#define NVDAC2_PIXPLLC		0x00680520
+#define NVDAC2_PLLSEL		0x00680524//0x0068250c verify!!!
+#define NVDAC2_GENCTRL		0x00680618//0x00682600 verify!!!
 
 /* Nvidia CRTC indexed registers */
 /* VGA standard registers: */

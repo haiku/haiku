@@ -190,7 +190,7 @@ status_t nv_general_powerup()
 	case 0x017510de: /* Nvidia GeForce4 420 Go */
 	case 0x017610de: /* Nvidia GeForce4 420 Go 32M */
 	case 0x017710de: /* Nvidia GeForce4 460 Go */
-	case 0x017910de: /* Nvidia GeForce4 440 Go 64M */
+	case 0x017910de: /* Nvidia GeForce4 440 Go 64M (on PPC GeForce4 MX) */
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
 		si->ps.laptop = true;
@@ -211,16 +211,16 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro4 500 GoGL (NV17)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x017d10de: /* Nvidia unknown 4 Go */
+	case 0x017d10de: /* Nvidia GeForce4 410 Go 16M*/
 		si->ps.card_type = NV17;
 		si->ps.card_arch = NV10A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown 4 Go (NV17)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce4 410 Go (NV17)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x018010de: /* Nvidia GeForce4 MX 440 AGP8X */
-	case 0x018110de: /* Nvidia GeForce4 MX 440SE AGP8X */
-	case 0x018210de: /* Nvidia GeForce4 MX 420 AGP8X */
+	case 0x018110de: /* Nvidia GeForce4 MX 440 AGP8X */
+	case 0x018210de: /* Nvidia GeForce4 MX 440SE AGP8X */
+	case 0x018310de: /* Nvidia GeForce4 MX 420 AGP8X */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
@@ -235,6 +235,17 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x018810de: /* Nvidia Quadro4 580 XGL */
+		si->ps.card_type = NV18;
+		si->ps.card_arch = NV10A;
+		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV18)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x018910de: /* Nvidia GeForce4 MX AGP8X */
+		si->ps.card_type = NV18;
+		si->ps.card_arch = NV10A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x018a10de: /* Nvidia Quadro4 280 NVS */
 	case 0x018b10de: /* Nvidia Quadro4 380 XGL */
 		si->ps.card_type = NV18;
@@ -285,7 +296,7 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro4 XGL (NV25)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x028010de: /* Nvidia GeForce4 Ti 4600 AGP8X */
+	case 0x028010de: /* Nvidia GeForce4 Ti 4600 AGP8X (4800?) */
 	case 0x028110de: /* Nvidia GeForce4 Ti 4200 AGP8X */
 		si->ps.card_type = NV28;
 		si->ps.card_arch = NV20A;
@@ -312,11 +323,11 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro4 XGL (NV28)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x028c10de: /* Nvidia unknown 4 Go */
+	case 0x028c10de: /* Nvidia Quadro4 700 GoGL */
 		si->ps.card_type = NV28;
 		si->ps.card_arch = NV20A;
 		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown 4 Go (NV28)\n"));
+		LOG(4,("POWERUP: Detected Nvidia Quadro4 700 GoGL (NV28)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x02a010de: /* Nvidia GeForce3 Integrated GPU */
@@ -346,6 +357,18 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600 (NV31)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x031310de: /* Nvidia unknown FX */
+		si->ps.card_type = NV31;
+		si->ps.card_arch = NV30A;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV31)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x031410de: /* Nvidia GeForce FX 5600SE */
+		si->ps.card_type = NV31;
+		si->ps.card_arch = NV30A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600SE (NV31)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x031610de: /* Nvidia unknown FX Go */
 	case 0x031710de: /* Nvidia unknown FX Go */
 		si->ps.card_type = NV31;
@@ -361,8 +384,20 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600 Go (NV31)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x031b10de: /* Nvidia unknown FX Go */
-	case 0x031c10de: /* Nvidia unknown FX Go */
+	case 0x031b10de: /* Nvidia GeForce FX 5650 Go */
+		si->ps.card_type = NV31;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5650 Go (NV31)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x031c10de: /* Nvidia Quadro FX 700 Go */
+		si->ps.card_type = NV31;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia Quadro FX 700 Go (NV31)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x031d10de: /* Nvidia unknown FX Go */
 	case 0x031e10de: /* Nvidia unknown FX Go */
 	case 0x031f10de: /* Nvidia unknown FX Go */
@@ -374,6 +409,7 @@ status_t nv_general_powerup()
 		break;
 	case 0x032110de: /* Nvidia GeForce FX 5200 Ultra */
 	case 0x032210de: /* Nvidia GeForce FX 5200 */
+	case 0x032310de: /* Nvidia GeForce FX 5200SE */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 (NV34)\n"));
@@ -386,11 +422,37 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 Go (NV34)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x032510de: /* Nvidia GeForce FX 5250 Go */
+		si->ps.card_type = NV34;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5250 Go (NV34)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x032610de: /* Nvidia unknown FX Go */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
 		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV34)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x032810de: /* Nvidia GeForce FX 5200 Go */
+		si->ps.card_type = NV34;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 Go (NV34)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x032910de: /* Nvidia GeForce FX 5200 (PPC) */
+		si->ps.card_type = NV34;
+		si->ps.card_arch = NV30A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 (NV34)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x032a10de: /* Nvidia Quadro NVS 280 PCI */
+		si->ps.card_type = NV34;
+		si->ps.card_arch = NV30A;
+		LOG(4,("POWERUP: Detected Nvidia Quadro NVS 280 PCI (NV34)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x032b10de: /* Nvidia Quadro FX 500 */
@@ -399,7 +461,16 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro FX 500 (NV34)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x032c10de: /* Nvidia GeForce FX 5300 Go */
+	case 0x032d10de: /* Nvidia GeForce FX 5100 Go */
+		si->ps.card_type = NV34;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX Go (NV34)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x032e10de: /* Nvidia unknown FX Go */
+	case 0x032f10de: /* Nvidia unknown FX Go */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
@@ -413,10 +484,48 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5900 (NV35)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x033210de: /* Nvidia GeForce FX 5900 XT */
+		si->ps.card_type = NV35;
+		si->ps.card_arch = NV30A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5900 XT (NV35)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x033310de: /* Nvidia GeForce FX 5950 Ultra */
+		si->ps.card_type = NV38;
+		si->ps.card_arch = NV30A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5950 Ultra (NV38)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x033410de: /* Nvidia unknown FX Go(?) */
+		si->ps.card_type = NV38;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX Go(?) (NV38(?))\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x033810de: /* Nvidia Quadro FX 3000 */
 		si->ps.card_type = NV35;
 		si->ps.card_arch = NV30A;
 		LOG(4,("POWERUP: Detected Nvidia Quadro FX 3000 (NV35)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x034110de: /* Nvidia GeForce FX 5700 Ultra */
+	case 0x034210de: /* Nvidia GeForce FX 5700 */
+		si->ps.card_type = NV36;
+		si->ps.card_arch = NV30A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5700 (NV36)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x034e10de: /* Nvidia Quadro FX 1100 */
+		si->ps.card_type = NV36;
+		si->ps.card_arch = NV30A;
+		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1100 (NV36)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x034f10de: /* Nvidia unknown FX */
+		si->ps.card_type = NV36;
+		si->ps.card_arch = NV30A;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV36(?))\n"));
 		status = nvxx_general_powerup();
 		break;
 	/* Vendor Elsa GmbH */
@@ -789,7 +898,6 @@ status_t nv_general_bios_to_powergraphics()
 	/* unlock card registers for R/W access */
 	CRTCW(LOCK, 0x57);
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
-//fixme: verify if this works..
 	if (si->ps.secondary_head)
 	{
 		CRTC2W(LOCK, 0x57);

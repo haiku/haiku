@@ -233,7 +233,7 @@ status_t nv_crtc_set_timing(display_mode target)
 	}
 
 	/* always disable interlaced operation */
-	/* (interlace is only supported on upto and including NV15 except for NV11) */
+	/* (interlace is supported on upto and including NV10, NV15, and NV30 and up) */
 	CRTCW(INTERLACE, 0xff);
 
 	return B_OK;
