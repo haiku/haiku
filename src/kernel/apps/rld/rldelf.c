@@ -927,6 +927,10 @@ open_container(char *name, image_type type)
 
 	// duplicate environment variable before screw it!
 	strlcpy(searchPath, paths, PATH_MAX);
+		// ToDo: PATH_MAX is definitely too short for a list of paths.
+		// Better roll our own non-destructive strtok_r() replacement for this
+		// special case, so that the string doesn't need to be copied.
+		// Alternatively use strdup().
 
 	TRACE(("rld.so: open_container() %s in %s\n", name, searchPath));
 
