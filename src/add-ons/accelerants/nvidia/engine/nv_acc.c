@@ -182,11 +182,11 @@ status_t nv_acc_init()
 	ACCW(HT_HANDL_16, NV3_SURFACE_3); /* 32bit handle (not used) */
 	ACCW(HT_VALUE_16, 0x8001114e); /* instance $114e, engine = acc engine, CHID = $00 */
 
-	/* note:
-	 * why not setup NV4_CONTEXT_SURFACES_ARGB_ZS as well?? incompatible?? */
+	/* fixme note:
+	 * why not setup NV4_CONTEXT_SURFACES_ARGB_ZS as well?? (they are compatible..) */
 	if (si->ps.card_arch != NV04A)
 	{
-		ACCW(HT_HANDL_17, NV10_CONTEXT_SURFACES_ARGB_ZS); /* 32bit handle (not used) */
+		ACCW(HT_HANDL_17, NV10_CONTEXT_SURFACES_ARGB_ZS); /* 32bit handle (3D only) */
 		ACCW(HT_VALUE_17, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
 	}
 
@@ -277,7 +277,7 @@ status_t nv_acc_init()
 	ACCW(PR_CTX0_C, 0x0000005b); /* NVclass $05b, nv10+: little endian */
 	ACCW(PR_CTX2_C, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 	ACCW(PR_CTX3_C, 0x00000000); /* method traps disabled */
-	/* notes for set 'D' and set 'E':
+	/* fixme: notes for set 'D' and set 'E':
 	 * why not setup NV4_CONTEXT_SURFACES_ARGB_ZS for set 'D' as well??
 	 * NV1_RENDER_SOLID_LIN could be moved to set 'E'?? */
 	/* setup set 'D' ... */
