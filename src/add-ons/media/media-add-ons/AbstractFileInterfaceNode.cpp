@@ -119,7 +119,7 @@ BMediaAddOn * AbstractFileInterfaceNode::AddOn(
 void AbstractFileInterfaceNode::Start(
 				bigtime_t performance_time)
 {
-	fprintf(stderr,"AbstractFileInterfaceNode::Start(pt=%i)\n",performance_time);
+	fprintf(stderr,"AbstractFileInterfaceNode::Start(pt=%lld)\n",performance_time);
 	BMediaEventLooper::Start(performance_time);
 }
 
@@ -127,7 +127,11 @@ void AbstractFileInterfaceNode::Stop(
 				bigtime_t performance_time,
 				bool immediate)
 {
-	fprintf(stderr,"AbstractFileInterfaceNode::Stop(pt=%i,%s)\n",performance_time,(immediate?"now":"then"));
+	if (immediate) {
+		fprintf(stderr,"AbstractFileInterfaceNode::Stop(pt=%lld,<immediate>)\n",performance_time);
+	} else {
+		fprintf(stderr,"AbstractFileInterfaceNode::Stop(pt=%lld,<scheduled>)\n",performance_time);
+	}
 	BMediaEventLooper::Stop(performance_time,immediate);
 }
 
@@ -135,7 +139,7 @@ void AbstractFileInterfaceNode::Seek(
 				bigtime_t media_time,
 				bigtime_t performance_time)
 {
-	fprintf(stderr,"AbstractFileInterfaceNode::Seek(mt=%i,pt=%i)\n",media_time,performance_time);
+	fprintf(stderr,"AbstractFileInterfaceNode::Seek(mt=%lld,pt=%lld)\n",media_time,performance_time);
 	BMediaEventLooper::Seek(media_time,performance_time);
 }
 
@@ -150,7 +154,7 @@ void AbstractFileInterfaceNode::TimeWarp(
 				bigtime_t at_real_time,
 				bigtime_t to_performance_time)
 {
-	fprintf(stderr,"AbstractFileInterfaceNode::TimeWarp(rt=%i,pt=%i)\n",at_real_time,to_performance_time);
+	fprintf(stderr,"AbstractFileInterfaceNode::TimeWarp(rt=%lld,pt=%lld)\n",at_real_time,to_performance_time);
 	BMediaEventLooper::TimeWarp(at_real_time,to_performance_time);
 }
 
@@ -463,7 +467,7 @@ void AbstractFileInterfaceNode::SetParameterValue(
 				const void * value,
 				size_t size)
 {
-	fprintf(stderr,"AbstractFileInterfaceNode::SetParameterValue(id=%i,when=%ld,size=%i)\n",id,int32(when),int32(size));
+	fprintf(stderr,"AbstractFileInterfaceNode::SetParameterValue(id=%i,when=%lld,size=%i)\n",id,when,int32(size));
 	switch (id) {
 		case DEFAULT_CHUNK_SIZE_PARAM:
 		case DEFAULT_BIT_RATE_PARAM:
@@ -542,6 +546,7 @@ bigtime_t AbstractFileInterfaceNode::OfflineTime()
 {
 	fprintf(stderr,"AbstractFileInterfaceNode::OfflineTime\n");
 	return BMediaEventLooper::OfflineTime();
+// XXX: do something else?
 //	if (inputFile == 0) {
 //		return 0;
 //	} else {
@@ -564,12 +569,14 @@ status_t AbstractFileInterfaceNode::HandleStart(
 						bigtime_t lateness,
 						bool realTimeEvent = false)
 {
-	fprintf(stderr,"MediaReader::HandleStart()\n");
+	fprintf(stderr,"AbstractFileInterfaceNode::HandleStart()\n");
 	if (RunState() != B_STARTED) {
-		HandleBuffer(event,lateness,realTimeEvent);
-//		media_timed_event firstBufferEvent(event->event_time, BTimedEventQueue::B_HANDLE_BUFFER);
-//		//this->HandleEvent(&firstBufferEvent, 0, false);
-//		EventQueue()->AddEvent(firstBufferEvent);
+// XXX: Either use the following line or the lines that are not commented.
+// There doesn't seem to be a practical difference that i can tell.
+//		HandleBuffer(event,lateness,realTimeEvent);
+		media_timed_event firstBufferEvent(event->event_time, BTimedEventQueue::B_HANDLE_BUFFER);
+		HandleEvent(&firstBufferEvent, 0, false);
+		EventQueue()->AddEvent(firstBufferEvent);
 	}
 }
 
@@ -578,10 +585,7 @@ status_t AbstractFileInterfaceNode::HandleSeek(
 						bigtime_t lateness,
 						bool realTimeEvent = false)
 {
-	// XXX: argghh.. seek events seem broken when received from
-	//      the usual BMediaEventLooper::Seek() dispatcher :-(
-	//      They lost where we are supposed to seek to!?!
-	fprintf(stderr,"AbstractFileInterfaceNode::HandleSeek(t=%i,d=%i,bd=%ld)\n",event->event_time,event->data,event->bigdata);
+	fprintf(stderr,"AbstractFileInterfaceNode::HandleSeek(t=%lld,d=%i,bd=%lld)\n",event->event_time,event->data,event->bigdata);
 	if (fCurrentFile != 0) {
 		fCurrentFile->Seek(event->bigdata,SEEK_SET);
 	}
@@ -616,7 +620,7 @@ status_t AbstractFileInterfaceNode::HandleParameter(
 	bool chunkSizeUpdated = false, bitRateUpdated = false, bufferPeriodUpdated = false;
 	
 	size_t dataSize = size_t(event->data);
-	int32 param = int32(event->bigdata);
+	int64 param = int64(event->bigdata);
 	
 	switch (param) {
 		case DEFAULT_CHUNK_SIZE_PARAM:
