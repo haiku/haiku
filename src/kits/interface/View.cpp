@@ -28,7 +28,6 @@
 #include <Message.h>
 #include <Bitmap.h>
 #include <Cursor.h>
-#include <Message.h>
 #include <Picture.h>
 #include <Polygon.h>
 #include <Region.h>

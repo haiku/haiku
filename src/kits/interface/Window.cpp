@@ -123,7 +123,7 @@ BWindow::BWindow(BRect frame,
 				const char* title, 
 				window_type type,
 				uint32 flags,
-				uint32 workspace = B_CURRENT_WORKSPACE)
+				uint32 workspace)
 			: BLooper( title )
 {
 	window_look look;
@@ -141,7 +141,7 @@ BWindow::BWindow(BRect frame,
 				window_look look,
 				window_feel feel,
 				uint32 flags,
-				uint32 workspace = B_CURRENT_WORKSPACE)
+				uint32 workspace)
 			: BLooper( title )
 {
 	InitData( frame, title, look, feel, flags, workspace );
@@ -244,7 +244,7 @@ BArchivable* BWindow::Instantiate(BMessage* data){
 
 //------------------------------------------------------------------------------
 
-status_t BWindow::Archive(BMessage* data, bool deep = true) const{
+status_t BWindow::Archive(BMessage* data, bool deep) const{
 
 	status_t		retval;
 
@@ -332,7 +332,7 @@ void BWindow::Quit(){
 
 //------------------------------------------------------------------------------
 
-void BWindow::AddChild(BView *child, BView *before = NULL){
+void BWindow::AddChild(BView *child, BView *before){
 	top_view->AddChild( child, before );
 }
 
@@ -867,7 +867,7 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		break;}
    }
    Flush();
-} 
+}
 
 //------------------------------------------------------------------------------
 
@@ -1202,7 +1202,7 @@ BView* BWindow::CurrentFocus() const{
 
 //------------------------------------------------------------------------------
 
-void BWindow::Activate(bool active = true){
+void BWindow::Activate(bool active){
 	if (IsHidden())
 		return;
 
@@ -2139,7 +2139,7 @@ void BWindow::task_looper(){
 
 //------------------------------------------------------------------------------
 
-BMessage* BWindow::ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT){
+BMessage* BWindow::ReadMessageFromPort(bigtime_t tout){
 	int32			msgcode;
 	BMessage*		msg;
 	uint8*			msgbuffer;
@@ -2157,7 +2157,7 @@ BMessage* BWindow::ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT){
 
 //------------------------------------------------------------------------------
 
-uint8* BWindow::ReadRawFromPort(int32* code, bigtime_t tout = B_INFINITE_TIMEOUT){
+uint8* BWindow::ReadRawFromPort(int32* code, bigtime_t tout){
 
 	uint8*			msgbuffer = NULL;
 	ssize_t			buffersize;

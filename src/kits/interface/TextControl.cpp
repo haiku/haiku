@@ -160,7 +160,7 @@ void BTextControl::SetValue(int32 value)
 {
 }
 //------------------------------------------------------------------------------
-status_t BTextControl::Invoke(BMessage* msg = NULL)
+status_t BTextControl::Invoke(BMessage* msg)
 {
 	return BControl::Invoke(msg);
 }

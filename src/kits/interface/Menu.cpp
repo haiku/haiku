@@ -27,9 +27,9 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#include "Menu.h"
-#include "MenuItem.h"
-#include "Window.h"
+#include <Menu.h>
+#include <MenuItem.h>
+#include <Window.h>
 #include <PropertyInfo.h>
 #include <Errors.h>
 #include <File.h>
