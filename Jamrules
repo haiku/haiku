@@ -1903,9 +1903,16 @@ actions KernelStaticLibraryObjects
 
 rule BuildPlatformMain
 {
-	# Usage BuildPlatformMain <target> : <sources> ;
+	# Usage BuildPlatformMain <target> : <sources> [ : <resetIncludes> ] ;
+	# <target> The executable.
+	# <sources> The sources.
+	# <resetIncludes> "false", if header search dirs shall not be reset to the
+	#				  platform defaults. Defaults to "true".
+	# 
 	SetupObjectsDir ;
-	SetupDefaultIncludes ;
+	if $(3) != false {
+		SetupDefaultIncludes ;
+	}
 
 	# Remove `-nostdinc' from CCFLAGS and C++FLAGS.
 	local oldCCFLAGS = $(CCFLAGS) ;
