@@ -47,12 +47,14 @@ namespace BPrivate {
 //------------------------------------------------------------------------------
 BAppServerLink::BAppServerLink()
 {
+	be_app->Lock();
 	portlink=new PortLink(be_app->fServerFrom);
 }
 //------------------------------------------------------------------------------
 BAppServerLink::~BAppServerLink()
 {
 	delete portlink;
+	be_app->Unlock();
 }
 //------------------------------------------------------------------------------
 void BAppServerLink::Init()

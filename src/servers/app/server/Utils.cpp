@@ -1,3 +1,5 @@
+#include <Entry.h>
+#include <stdio.h>
 #include "Utils.h"
 
 /*!

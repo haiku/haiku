@@ -148,7 +148,7 @@ public:
 	void SetMode(int32 mode);
 	float StringWidth(const char *string, int32 length, LayerData *d);
 	float StringHeight(const char *string, int32 length, LayerData *d);
-//	bool DumpToFile(const char *path);
+	bool DumpToFile(const char *path);
 	VDWindow *screenwin;
 protected:
 	void SetLayerData(LayerData *d, bool set_font_data=false);

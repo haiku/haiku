@@ -6,6 +6,7 @@
 #include <List.h>
 #include <Application.h>
 #include <Window.h>
+#include <PortQueue.h>
 #include "Decorator.h"
 #include "ServerConfig.h"
 
@@ -59,6 +60,7 @@ private:
 	sem_id _active_lock, _applist_lock, _decor_lock;
 	bool _exit_poller;
 	DisplayDriver *_driver;
+	int32 _ssindex;
 };
 
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,

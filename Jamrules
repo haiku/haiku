@@ -873,6 +873,21 @@ rule PrivateHeaders
 	return $(dirs) ;
 }
 
+rule LibraryHeaders
+{
+	# LibraryHeaders <group list>
+	#
+	# Returns the directory names for the library header dirs identified by
+	# <group list>.
+
+	local list = $(1) ;
+	local dirs ;
+	for i in $(list) {
+		dirs += [ FDirName $(OBOS_TOP) headers libs $(i) ] ;
+	}
+	return $(dirs) ;
+}
+
 rule ArchHeaders
 {
 	# usage: ArchHeaders <arch> ;
@@ -1001,6 +1016,17 @@ rule UsePosixObjectHeaders
 	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
 	SourceHdrs $(1) : [ FDirName $(OBOS_TOP) headers posix ] : $(2) ;
+}
+
+rule UseLibraryHeaders
+{
+	# UseLibraryHeaders <group list> ;
+	#
+	# Adds the library header dirs given by <group list> to the header search
+	# dirs of the subdirectory.
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
+
+	UseHeaders [ LibraryHeaders $(1) ] ;
 }
 
 rule SplitPath
@@ -1576,7 +1602,6 @@ actions InstallFloppy
 	fi
 	dd if=$(2) of=$(FLOPPY_PATH) bs=18k
 }
-
 
 #-------------------------------------------------------------------------------
 # FreeType 2 specific rules and variables

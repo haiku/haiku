@@ -77,7 +77,7 @@ void InitDesktop(void)
 	DisplayDriver *tdriver;
 	Screen *s=NULL;
 	
-#if DISPLAYDRIVER == HWDRIVER
+#ifndef TEST_MODE
 
 	// If we're using the AccelerantDriver for rendering, eventually we will loop through
 	// drivers until one can't initialize in order to support multiple monitors. For now,

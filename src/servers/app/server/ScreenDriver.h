@@ -197,7 +197,7 @@ public:
 	virtual void SetMode(int32 mode);
 	float StringWidth(const char *string, int32 length, LayerData *d);
 	float StringHeight(const char *string, int32 length, LayerData *d);
-//	virtual bool DumpToFile(const char *path);
+	virtual bool DumpToFile(const char *path);
 protected:
 	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
 	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);

@@ -1,30 +1,3 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		ColorUtils.cc
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Miscellaneous useful functions for working with colors
-//					
-//  
-//------------------------------------------------------------------------------
 #include "ColorUtils.h"
 #include <stdlib.h>
 
@@ -42,11 +15,11 @@
 
 /*!
 	\brief Function for easy assignment of values to rgb_color objects
-	\param Pointer to an rgb_color
-	\param red value
-	\param green value
-	\param blue value
-	\param alpha value, defaults to 255
+	\param col Pointer to an rgb_color
+	\param r red value
+	\param g green value
+	\param b blue value
+	\param a alpha value, defaults to 255
 	
 	This function will do nothing if given a NULL color pointer.
 */
@@ -63,8 +36,8 @@ void SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a)
 
 /*!
 	\brief Function for easy conversion of 16-bit colors to 32-bit
-	\param Pointer to an rgb_color.
-	\param RGBA16 color
+	\param col Pointer to an rgb_color.
+	\param color RGBA16 color
 	
 	This function will do nothing if passed a NULL 32-bit color.
 */
@@ -88,9 +61,28 @@ void SetRGBColor(rgb_color *col,uint16 color)
 }
 
 /*!
+	\brief Function for easy conversion of 32-bit integer colors to an rgb_color structure
+	\param col Pointer to an rgb_color.
+	\param color 32-bit color as an integer
+	
+	This function will do nothing if passed a NULL 32-bit color.
+*/
+void SetRGBColor(rgb_color *col,uint32 color)
+{
+	if(!col)
+		return;
+
+	int8 *p8=(int8*)&color;
+	col->blue=p8[0];
+	col->red=p8[1];
+	col->green=p8[2];
+	col->alpha=p8[3];
+}
+
+/*!
 	\brief Finds the index of the closest matching color in a rgb_color palette array
-	\param Array of 256 rgb_color objects
-	\param Color to match
+	\param palette Array of 256 rgb_color objects
+	\param color Color to match
 	\return Index of the closest matching color
 	
 	Note that passing a NULL palette will always return 0 and passing an array of less
@@ -128,7 +120,7 @@ uint8 FindClosestColor(rgb_color *palette, rgb_color color)
 
 /*!
 	\brief Constructs a RGBA15 color which best matches a given 32-bit color
-	\param Color to match
+	\param color Color to match
 	\return The closest matching color's value
 	
 	Format is ARGB, 1:5:5:5
@@ -160,9 +152,9 @@ uint16 FindClosestColor16(rgb_color color)
 
 /*!
 	\brief Function mostly for calculating gradient colors
-	\param Start color
-	\param End color
-	\param A floating point number such that 0.0 <= position <= 1.0. 0.0 results in the
+	\param col Start color
+	\param col2 End color
+	\param position A floating point number such that 0.0 <= position <= 1.0. 0.0 results in the
 		start color and 1.0 results in the end color.
 	\return The blended color. If an invalid position was given, {0,0,0,0} is returned.
 */

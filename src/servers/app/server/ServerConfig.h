@@ -1,6 +1,11 @@
 #ifndef _APPSERVER_CONFIG_H
 #define _APPSERVER_CONFIG_H
 
+// This is defined to place the server in test mode, which modifies certain things like
+// system keyboard shortcuts. Note that it is possible, though senseless, to place it in
+// regular mode and still use a display driver which depends on the R5 app_server
+#define TEST_MODE
+
 // The ViewDriver is a BView/BWindow combination. Plenty of functionality,
 // but dog-slow.
 #define VIEWDRIVER 0
@@ -21,7 +26,7 @@
 #define HWDRIVER 3
 
 // Display driver to be used by the server.
-#define DISPLAYDRIVER SCREENDRIVER
+#define DISPLAYDRIVER VIEWDRIVER
 
 // Uncomment this if the DisplayDriver should only rely on drawing functions implemented
 // in software even though hardware-accelerated functions are available

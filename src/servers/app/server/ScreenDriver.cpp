@@ -43,6 +43,7 @@
 #include <string.h>
 #include <String.h>
 #include <math.h>
+#include "PNGDump.h"
 
 #define CLIP_X(a) ( (a < 0) ? 0 : ((a > fbuffer->gcinfo.width-1) ? \
 			fbuffer->gcinfo.width-1 : a) )
@@ -1587,6 +1588,20 @@ void ScreenDriver::SetCursor(ServerCursor *csr)
 		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
 	
 	_Unlock();
+}
+
+
+/*!
+	\brief Dumps the contents of the frame buffer to a file.
+	\param path Path and leaf of the file to be created without an extension
+	\return False if unimplemented or unsuccessful. True if otherwise.
+	
+	Subclasses should add an extension based on what kind of file is saved
+*/
+bool ScreenDriver::DumpToFile(const char *path)
+{
+	// TODO: implement calling SaveToPNG
+	return false;
 }
 
 void ScreenDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor color)

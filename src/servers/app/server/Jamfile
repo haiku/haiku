@@ -2,6 +2,7 @@ SubDir OBOS_TOP src servers app server ;
 
 AddResources app_server : app_server.rsrc ;
 
+UseLibraryHeaders png zlib ;
 UsePrivateHeaders app interface ;
 UseFreeTypeHeaders ;
 
@@ -16,6 +17,7 @@ Server app_server :
 	PicturePlayer.cpp
 
 	ColorSet.cpp
+	PNGDump.cpp
 	RectUtils.cpp
 	RGBColor.cpp
 	SystemPalette.cpp
@@ -54,7 +56,7 @@ Server app_server :
 LINKFLAGS on app_server ?= $(LINKFLAGS) ;
 LINKFLAGS on app_server += -lbe ;
 
-LinkSharedOSLibs app_server : root game translation 
+LinkSharedOSLibs app_server : root game translation libz.so libpng.so 
 							   <boot!home!config!lib>libopenbeos.so 
 							   <boot!home!config!lib>libfreetype.so ;
 

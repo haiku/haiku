@@ -25,6 +25,7 @@
 //  
 //------------------------------------------------------------------------------
 #include <AppDefs.h>
+#include <Entry.h>
 #include "AppServer.h"
 #include "Desktop.h"
 #include "DisplayDriver.h"
@@ -37,6 +38,9 @@
 #include "RGBColor.h"
 #include "BitmapManager.h"
 #include "CursorManager.h"
+#include "Utils.h"
+
+//#define DEBUG_KEYHANDLING
 
 // Globals
 
@@ -52,7 +56,7 @@ RGBColor workspace_default_color(51,102,160);
 	This loads the default fonts, allocates all the major global variables, spawns the main housekeeping
 	threads, loads user preferences for the UI and decorator, and allocates various locks.
 */
-#if DISPLAYDRIVER != HWDRIVER
+#ifdef TEST_MODE
 AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE)
 #else
 AppServer::AppServer(void)
@@ -64,6 +68,7 @@ AppServer::AppServer(void)
 	_applist=new BList(0);
 	_quitting_server=false;
 	_exit_poller=false;
+	_ssindex=1;
 
 	// Create the font server and scan the proper directories.
 	fontserver=new FontServer;
@@ -180,78 +185,78 @@ int32 AppServer::PollerThread(void *data)
 {
 	// This thread handles nothing but input messages for mouse and keyboard
 	AppServer *appserver=(AppServer*)data;
-	int32 msgcode;
-	int8 *msgbuffer=NULL,*index;
-	ssize_t buffersize,bytesread;
+	int8 *index;
+	PortQueue mousequeue(appserver->_mouseport);
+	PortMessage *msg;
 	
 	for(;;)
 	{
-		buffersize=port_buffer_size(appserver->_mouseport);
-		if(buffersize>0)
-			msgbuffer=new int8[buffersize];
-		bytesread=read_port(appserver->_mouseport,&msgcode,msgbuffer,buffersize);
+		if(!mousequeue.MessagesWaiting())
+			mousequeue.GetMessagesFromPort(true);	// wait for a message to come into the port
+		else
+			mousequeue.GetMessagesFromPort(false);
 
-		if (bytesread != B_BAD_PORT_ID && bytesread != B_TIMED_OUT && bytesread != B_WOULD_BLOCK)
+		msg=mousequeue.GetMessageFromQueue();
+		if(!msg)
+			continue;
+		
+		switch(msg->Code())
 		{
-			switch(msgcode)
+			// We don't need to do anything with these two, so just pass them
+			// onto the active application. Eventually, we will end up passing 
+			// them onto the window which is currently under the cursor.
+			case B_MOUSE_DOWN:
+			case B_MOUSE_UP:
+			case B_MOUSE_WHEEL_CHANGED:
 			{
-				// We don't need to do anything with these two, so just pass them
-				// onto the active application. Eventually, we will end up passing 
-				// them onto the window which is currently under the cursor.
-				case B_MOUSE_DOWN:
-				case B_MOUSE_UP:
-				case B_MOUSE_WHEEL_CHANGED:
-				{
-					if(!msgbuffer)
-						break;
-					ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
+				if(!msg->Buffer())
 					break;
-				}
-				
-				// Process the cursor and then pass it on
-				case B_MOUSE_MOVED:
-				{
-					// Attached data:
-					// 1) int64 - time of mouse click
-					// 2) float - x coordinate of mouse click
-					// 3) float - y coordinate of mouse click
-					// 4) int32 - buttons down
-					index=msgbuffer;
-					if(!index)
-						break;
-
-					// Time sent is not necessary for cursor processing.
-					index += sizeof(int64);
-					
-					float tempx=0,tempy=0;
-					tempx=*((float*)index);
-					index+=sizeof(float);
-					tempy=*((float*)index);
-					index+=sizeof(float);
-					
-					if(appserver->_driver)
-					{
-						appserver->_driver->MoveCursorTo(tempx,tempy);
-						ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
-					}
-					break;
-				}
-				case B_KEY_DOWN:
-				case B_KEY_UP:
-				case B_UNMAPPED_KEY_DOWN:
-				case B_UNMAPPED_KEY_UP:
-					appserver->HandleKeyMessage(msgcode,msgbuffer);
-					break;
-				default:
-					printf("Server::Poller received unexpected code %lx\n",msgcode);
-					break;
+				ServerWindow::HandleMouseEvent(msg->Code(),(int8*)msg->Buffer());
+				break;
 			}
+			
+			// Process the cursor and then pass it on
+			case B_MOUSE_MOVED:
+			{
+				// Attached data:
+				// 1) int64 - time of mouse click
+				// 2) float - x coordinate of mouse click
+				// 3) float - y coordinate of mouse click
+				// 4) int32 - buttons down
+				index=(int8*)msg->Buffer();
+				if(!index)
+					break;
 
+				// Time sent is not necessary for cursor processing.
+				index += sizeof(int64);
+				
+				float tempx=0,tempy=0;
+				tempx=*((float*)index);
+				index+=sizeof(float);
+				tempy=*((float*)index);
+				index+=sizeof(float);
+				
+				if(appserver->_driver)
+				{
+					appserver->_driver->MoveCursorTo(tempx,tempy);
+					ServerWindow::HandleMouseEvent(msg->Code(),(int8*)msg->Buffer());
+				}
+				break;
+			}
+			case B_KEY_DOWN:
+			case B_KEY_UP:
+			case B_UNMAPPED_KEY_DOWN:
+			case B_UNMAPPED_KEY_UP:
+			case B_MODIFIERS_CHANGED:
+				appserver->HandleKeyMessage(msg->Code(),(int8*)msg->Buffer());
+				break;
+			default:
+				printf("Server::Poller received unexpected code %lx\n",msg->Code());
+				break;
 		}
-
-		if(buffersize>0)
-			delete msgbuffer;
-
+		
+		delete msg;
+		
 		if(appserver->_exit_poller)
 			break;
 	}
@@ -626,43 +631,136 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			// 7) int8 number of bytes to follow containing the 
 			//		generated string
 			// 8) Character string generated by the keystroke
-			// 9) int32 number of elements in the key state array to follow
-			// 10) int8 state of all keys
+			// 9) int8[16] state of all keys
 			
 			// Obtain only what data which we'll need
 			index+=sizeof(int64);
 			int32 scancode=*((int32*)index); index+=sizeof(int32) * 3;
-			int32 modifiers=*((int32*)index); index+=sizeof(int8) * 3;
-			int8 stringlength=*index; index+=stringlength + sizeof(int8);
-			int32 keyindices=*index;
-			
-			
-			// Check for workspace change or safe video mode
-			if(scancode>0x01 && scancode<0x0e)
+			int32 modifiers=*((int32*)index); index+=sizeof(int32) + (sizeof(int8) * 3);
+			int8 stringlength=*index; index+=stringlength;
+#ifdef DEBUG_KEYHANDLING
+printf("Key Down: 0x%lx\n",scancode);
+#endif
+			if(DISPLAYDRIVER == HWDRIVER)
 			{
-				// F12
-				if(scancode==0x0d)
+				// Check for workspace change or safe video mode
+				if(scancode>0x01 && scancode<0x0e)
 				{
-					if(modifiers & B_LEFT_COMMAND_KEY &
-						B_LEFT_CONTROL_KEY & B_LEFT_SHIFT_KEY)
+					if(scancode==0x0d)
 					{
-						// TODO: Set to Safe Mode here. (DisplayDriver API change)
+						if(modifiers & (B_LEFT_COMMAND_KEY |
+							B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY))
+						{
+							// TODO: Set to Safe Mode here. (DisplayDriver API change)
+#ifdef DEBUG_KEYHANDLING
+printf("Safe Video Mode invoked - code unimplemented\n");
+#endif
+							break;
+						}
 					}
 				}
 			
-				if(modifiers & B_COMMAND_KEY)
+				if(modifiers & B_CONTROL_KEY)
+				{
+#ifdef DEBUG_KEYHANDLING
+printf("Set Workspace %ld\n",scancode-1);
+#endif
 					SetWorkspace(scancode-2);
-				
+					break;
+				}	
+
 				// Tab key
 				if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
 				{
 					ServerApp *deskbar=FindApp("application/x-vnd.Be-TSKB");
 					if(deskbar)
 					{
-						// I hope this calculation's right ;)
-						size_t msgsize=sizeof(int64) + ( sizeof(int32) * 5) +
-								( sizeof(int8) * (4+ stringlength + keyindices));
-						deskbar->PostMessage(code, msgsize, buffer);
+						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						break;
+					}
+				}
+
+				// PrintScreen
+				if(scancode==0xe)
+				{
+					if(_driver)
+					{
+						char filename[128];
+						BEntry entry;
+						
+						sprintf(filename,"/boot/home/screen%ld.png",_ssindex);
+						entry.SetTo(filename);
+						
+						while(entry.Exists())
+						{
+							_ssindex++;
+							sprintf(filename,"/boot/home/screen%ld.png",_ssindex);
+						}
+						_ssindex++;
+						_driver->DumpToFile(filename);
+						break;
+					}
+				}
+			}
+			else
+			{
+				// F12
+				if(scancode>0x1 && scancode<0xe)
+				{
+					if(scancode==0xd)
+					{
+						if(modifiers & (B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY | B_LEFT_OPTION_KEY))
+						{
+							// TODO: Set to Safe Mode here. (DisplayDriver API change)
+#ifdef DEBUG_KEYHANDLING
+printf("Safe Video Mode invoked - code unimplemented\n");
+#endif
+							break;
+						}
+					}
+					if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
+					{
+#ifdef DEBUG_KEYHANDLING
+printf("Set Workspace %ld\n",scancode-1);
+#endif
+						SetWorkspace(scancode-2);
+						break;
+					}	
+				}
+				
+				//Tab
+				if(scancode==0x26 && (modifiers & B_SHIFT_KEY))
+				{
+#ifdef DEBUG_KEYHANDLING
+printf("Twitcher\n");
+#endif
+					ServerApp *deskbar=FindApp("application/x-vnd.Be-TSKB");
+					if(deskbar)
+					{
+						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						break;
+					}
+				}
+
+				// Pause/Break
+				if(scancode==0x7f)
+				{
+					if(_driver)
+					{
+						char filename[128];
+						BEntry entry;
+						
+						sprintf(filename,"/boot/home/screen%ld.png",_ssindex);
+						entry.SetTo(filename);
+						
+						while(entry.Exists())
+						{
+							_ssindex++;
+							sprintf(filename,"/boot/home/screen%ld.png",_ssindex);
+						}
+						_ssindex++;
+
+						_driver->DumpToFile(filename);
 						break;
 					}
 				}
@@ -684,29 +782,40 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			// 6) int8 number of bytes to follow containing the 
 			//		generated string
 			// 7) Character string generated by the keystroke
-			// 8) int32 number of elements in the key state array to follow
-			// 9) int8 state of all keys
+			// 8) int8[16] state of all keys
 			
 			// Obtain only what data which we'll need
 			index+=sizeof(int64);
 			int32 scancode=*((int32*)index); index+=sizeof(int32) * 3;
 			int32 modifiers=*((int32*)index); index+=sizeof(int8) * 3;
 			int8 stringlength=*index; index+=stringlength + sizeof(int8);
-			int32 keyindices=*index;
+#ifdef DEBUG_KEYHANDLING
+printf("Key Up: 0x%lx\n",scancode);
+#endif
 			
-			// Send the key_up msg to the Deskbar for the twitcher
-			
-			// Tab key
-			if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
+			if(DISPLAYDRIVER==HWDRIVER)
 			{
-				ServerApp *deskbar=FindApp("application/x-vnd.Be-TSKB");
-				if(deskbar)
+				// Tab key
+				if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
 				{
-					// I hope this calculation's right ;)
-					size_t msgsize=sizeof(int64) + ( sizeof(int32) * 4) +
-							( sizeof(int8) * (4+ stringlength + keyindices));
-					deskbar->PostMessage(code, msgsize, buffer);
-					break;
+					ServerApp *deskbar=FindApp("application/x-vnd.Be-TSKB");
+					if(deskbar)
+					{
+						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						break;
+					}
+				}
+			}
+			else
+			{
+				if(scancode==0x26 && (modifiers & B_LEFT_SHIFT_KEY))
+				{
+					ServerApp *deskbar=FindApp("application/x-vnd.Be-TSKB");
+					if(deskbar)
+					{
+						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+						break;
+					}
 				}
 			}
 
@@ -714,6 +823,8 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			// window.
 			
 			// fall through to the next case
+			ServerWindow::HandleKeyEvent(code,buffer);
+			break;
 		}
 		case B_UNMAPPED_KEY_DOWN:
 		{
@@ -725,6 +836,12 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			// 5) int8 state of all keys
 
 			// fall through to the next case
+#ifdef DEBUG_KEYHANDLING
+index+=sizeof(bigtime_t);
+printf("Unmapped Key Down: 0x%lx\n",*((int32*)index));
+#endif
+			ServerWindow::HandleKeyEvent(code,buffer);
+			break;
 		}
 		case B_UNMAPPED_KEY_UP:
 		{
@@ -736,6 +853,12 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			// 5) int8 state of all keys
 
 			// fall through to the next case
+#ifdef DEBUG_KEYHANDLING
+index+=sizeof(bigtime_t);
+printf("Unmapped Key Up: 0x%lx\n",*((int32*)index));
+#endif
+			ServerWindow::HandleKeyEvent(code,buffer);
+			break;
 		}
 		case B_MODIFIERS_CHANGED:
 		{
@@ -746,7 +869,11 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			// 4) int32 number of elements in the key state array to follow
 			// 5) int8 state of all keys
 			
-			ServerWindow::HandleMouseEvent(code,buffer);
+#ifdef DEBUG_KEYHANDLING
+index+=sizeof(bigtime_t);
+printf("Modifiers Changed\n");
+#endif
+			ServerWindow::HandleKeyEvent(code,buffer);
 			break;
 		}
 		default:
