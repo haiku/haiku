@@ -6,6 +6,8 @@
 
 #include <Vector.h>
 
+#include <KernelExport.h>
+
 #include "KDiskDevice.h"
 #include "KDiskDeviceJob.h"
 #include "KDiskDeviceJobQueue.h"
@@ -180,7 +182,7 @@ KDiskDeviceJobQueue::Execute()
 	if (fSyncSemaphore < 0)
 		return fSyncSemaphore;
 	// spawn a thread and run it
-	fThread = spawn_thread(_ThreadEntry, "disk device jobber",
+	fThread = spawn_kernel_thread(_ThreadEntry, "disk device jobber",
 						   B_NORMAL_PRIORITY, this);
 	if (fThread < 0) {
 		delete_sem(fSyncSemaphore);
