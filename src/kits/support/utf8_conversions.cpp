@@ -4,7 +4,6 @@
 #include <CharacterSetRoster.h>
 #include <Errors.h>
 #include <errno.h>
-#include <iostream.h>
 
 using namespace BPrivate;
 
@@ -48,7 +47,6 @@ convert_to_utf8(uint32 srcEncoding,
 {
 	const BCharacterSet * charset = BCharacterSetRoster::GetCharacterSetByConversionID(srcEncoding);
 	if (charset == 0) {
-		cout << "no charset for #: " << srcEncoding << endl;
 		return B_ERROR;
 	}
 	return convert_encoding(charset->GetName(),"UTF-8",src,srcLen,dst,dstLen,state);
@@ -62,7 +60,6 @@ convert_from_utf8(uint32 dstEncoding,
 {
 	const BCharacterSet * charset = BCharacterSetRoster::GetCharacterSetByConversionID(dstEncoding);
 	if (charset == 0) {
-		cout << "no charset for #: " << dstEncoding << endl;
 		return B_ERROR;
 	}	
 	return convert_encoding("UTF-8",charset->GetName(),src,srcLen,dst,dstLen,state);
