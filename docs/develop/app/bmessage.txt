@@ -1,40 +1,186 @@
+Message header:
+Data		Bytes	Meaning
+FOB1		4		version
+			4		checksum
+			4		flattened size
+			4		'what'
+			1		flags
+
+Data field:
+Data		Bytes	Meaning
+			1		flags
+			4		type
+			1		item count (*if* there is more than one)
+			1		data length
+			1		name length
+			X		name
+	// Single item
+			4		item size (*if* this is a variable sized item)
+			Y		data
+	// Multiple items
+			4		item size (for variable sized items)
+			Y		item data - padded to 8-byte boundary
+
+//------------------------------------------------------------------------------
+// An example
+//------------------------------------------------------------------------------
+// PrintToStream()
+Data		Bytes	Meaning
+
+//BMessage: what =  (0x0, or 0)
+FOB1		4		version
+0x90010001	4		checksum
+0x00000192	4		flattened size (402 bytes)
+0x0			4		'what' (none specified)
+0x01		1		flags
+
+//    entry ATTRIBUTE_MENU, type='LONG', c=5, size= 4,
+0x07		1		flags
+LONG		4		type
+0x05		1		item count
+0x14		1		data length
+0x0e		1		name length
+ATTRIBUTE_	14		name (ATTRIBUTE_MENU)
+//			data[0]: 0x8 (8, '')
+0x8			4		data[0]
+//          data[1]: 0x8 (8, '')
+0x8			4		data[1]
+//          data[2]: 0x6 (6, '')
+0x6			4		data[2]
+//          data[3]: 0x8 (8, '')
+0x8			4		data[3]
+//          data[4]: 0x6 (6, '')
+0x6			4		data[4]
+
+//    entry  CRITERIA_MENU, type='LONG', c=5, size= 4,
+0x07		1		flags
+LONG		4		type
+0x05		1		item count
+0x14		1		data length
+0x0d		1		name length
+CRITERIA_	13		name (CRITERIA_MENU)
+//			data[0]: 0x0 (0, '')
+0x0			4		data[0]
+//          data[1]: 0x0 (0, '')
+0x0			4		data[1]
+//          data[2]: 0x0 (0, '')
+0x0			4		data[2]
+//          data[3]: 0x0 (0, '')
+0x0			4		data[3]
+//          data[4]: 0x0 (0, '')
+0x0			4		data[4]
+
+//    entry          VALUE, type='CSTR', c=5,
+0x03		1		flags
+CSTR		4		type
+0x5			1		item count
+0x90		1		data length
+0x5			1		name length
+VALUE		5		name (VALUE)
+//			size=18, data[0]: "listar@freelists."
+0x12		4		item size
+listar@fre	18		data[0]
+			2		padding to 8-byte boundary
+//          size=27, data[1]: "freelists-users@freelists."
+0x1b		4		item size
+freelists@	27		data[1]
+			1		padding to 8-byte boundary
+//          size=27, data[2]: "freelists-users@freelists."
+0x1b		4		item size
+freelists@	27		data[2]
+			1		padding to 8-byte boundary
+//          size=19, data[3]: "ecartis@freelists."
+0x13		4		item size
+ecartis@fr	19		data[3]
+			1		padding to 8-byte boundary
+//          size=26, data[4]: "freelists-news@freelists."
+0x1a		4		item size
+freelists@	26		data[4]
+			2		padding to 8-byte boundary
+
+//    entry    AND_OR_MENU, type='LONG', c=5, size= 4,
+0x07		1		flags
+LONG		4		type
+0x5			1		item count
+0x14		1		data length
+0x0b		1		name length
+AND_OR_MEN	11		name (AND_OR_MENU)
+//			data[0]: 0x1 (1, '')
+0x1			4		data[0]
+//          data[1]: 0x1 (1, '')
+0x1			4		data[1]
+//          data[2]: 0x1 (1, '')
+0x1			4		data[2]
+//          data[3]: 0x1 (1, '')
+0x1			4		data[3]
+//          data[4]: 0x0 (0, '')
+0x0			4		data[4]
+
+//    entry          COUNT, type='LONG', c=1, size= 4, data[0]: 0x5 (5, '')
+0x0f		1		flags
+LONG		4		type
+0x4			1		data length
+0x5			1		name length
+COUNT		5		name (COUNT)
+0x5			4		data
+
+//    entry    ACTION_MENU, type='LONG', c=1, size= 4, data[0]: 0x2 (2, '')
+0x0f		1		flags
+LONG		4		type
+0x4			1		data length
+0x0b		1		name length
+ACTION_MEN	11		name (ACTION_MENU)
+0x2			4		data
+
+//    entry   ACTION_VALUE, type='CSTR', c=1, size=42, data[0]: "/boot/home/mail/Erik's Mail/freelists.org"
+0x0b		1		flags
+CSTR		4		type
+0x30		1		data length
+0x0c		1		name length
+ACTION_VAL	12		name (ACTION_VALUE)
+0x2a		4		item size
+/boot/home	42		data
+			2		padding to 8-byte boundary
+
+//------------------------------------------------------------------------------
+// An old example
 Data		Bytes	Meaning
 
 1BOF(ascii)	4		version					
 ??			4		??
 0x76		4		flattened size
 DPUQ		4		what(B_QUERY_UPDATE)
-??			5		??
+??			1		??
 
-0F			1		fixed chunk size?
+0F			1		flags (including fixed chunk size)
 GNOL		4		type
 04			1		chunk size
 06			1		name length
 opcode		6		name
 1			4		data(B_ENTRY_CREATED)
 
-0F			1		fixed chunk size?
+0F			1		flags (including fixed chunk size)
 GNOL		4		type
 04			1		chunk size
 06			1		name length
 device		6		name
 4			4		data
 
-0F			1		fixed chunk size?
+0F			1		flags (including fixed chunk size)
 GNLL		4		type
 08			1		chunk size
 09			1		name length
 directory	9		name
 524992		8		data
 
-0F			1		fixed chunk size?
+0F			1		flags (including fixed chunk size)
 GNLL		4		type
 08			1		chunk size
 04			1		name length
 node		4		name
 524295		8		data
 
-0B			1		variable chunk size?
+0B			1		flags (including variable chunk size)
 RTSC		4		type
 08			1		chunk size
 04			1		name length
