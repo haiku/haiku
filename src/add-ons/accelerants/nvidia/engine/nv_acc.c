@@ -790,27 +790,30 @@ status_t nv_acc_init()
 			(NVACC_FIFO + (cnt * 0x00002000));
 	}
 	/* program FIFO assignments */
-	ACCW(FIFO_00800000, si->engine.fifo.handle[0]); /* Raster OPeration */
-	ACCW(FIFO_00802000, si->engine.fifo.handle[1]); /* Clip */
-	ACCW(FIFO_00804000, si->engine.fifo.handle[2]); /* Pattern */
-	ACCW(FIFO_00806000, si->engine.fifo.handle[3]); /* Pixmap (not used or 3D only?) */
-	ACCW(FIFO_00808000, si->engine.fifo.handle[4]); /* Blit */
-	ACCW(FIFO_0080a000, si->engine.fifo.handle[5]); /* Bitmap */
-	ACCW(FIFO_0080c000, si->engine.fifo.handle[6]); /* Line (not used or 3D only?) */
-	ACCW(FIFO_0080e000, si->engine.fifo.handle[7]); /* Textured Triangle (3D only) */
+	ACCW(FIFO_CH0, si->engine.fifo.handle[0]); /* Raster OPeration */
+	ACCW(FIFO_CH1, si->engine.fifo.handle[1]); /* Clip */
+	ACCW(FIFO_CH2, si->engine.fifo.handle[2]); /* Pattern */
+	ACCW(FIFO_CH3, si->engine.fifo.handle[3]); /* Pixmap (not used or 3D only?) */
+	ACCW(FIFO_CH4, si->engine.fifo.handle[4]); /* Blit */
+	ACCW(FIFO_CH5, si->engine.fifo.handle[5]); /* Bitmap */
+	ACCW(FIFO_CH6, si->engine.fifo.handle[6]); /* Line (not used or 3D only?) */
+	ACCW(FIFO_CH7, si->engine.fifo.handle[7]); /* Textured Triangle (3D only) */
+
+	/* initialize our local pointers */
+	nv_acc_assert_fifo();
 
 	/* do first actual acceleration engine command:
 	 * setup clipping region (workspace size) to 32768 x 32768 pixels:
 	 * wait for room in fifo for clipping cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_CLP_FIFOFREE)) >> 2) < 2)
+	while (((nv_image_black_rectangle_ptr->FifoFree) >> 2) < 2)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
 	}
 	/* now setup clipping (writing 2 32bit words) */
-	ACCW(CLP_TOPLEFT, 0x00000000);
-	ACCW(CLP_WIDHEIGHT, 0x80008000);
+	nv_image_black_rectangle_ptr->TopLeft = 0x00000000;
+	nv_image_black_rectangle_ptr->HeightWidth = 0x80008000;
 
 	return B_OK;
 }
@@ -1094,11 +1097,11 @@ void nv_acc_assert_fifo(void)
 		}
 
 		/* program new FIFO assignments */
-		ACCW(FIFO_00800000, si->engine.fifo.handle[0]); /* Raster OPeration */
-		ACCW(FIFO_00802000, si->engine.fifo.handle[1]); /* Clip */
-		ACCW(FIFO_00804000, si->engine.fifo.handle[2]); /* Pattern */
-		ACCW(FIFO_00808000, si->engine.fifo.handle[4]); /* Blit */
-		ACCW(FIFO_0080a000, si->engine.fifo.handle[5]); /* Bitmap */
+		ACCW(FIFO_CH0, si->engine.fifo.handle[0]); /* Raster OPeration */
+		ACCW(FIFO_CH1, si->engine.fifo.handle[1]); /* Clip */
+		ACCW(FIFO_CH2, si->engine.fifo.handle[2]); /* Pattern */
+		ACCW(FIFO_CH4, si->engine.fifo.handle[4]); /* Blit */
+		ACCW(FIFO_CH5, si->engine.fifo.handle[5]); /* Bitmap */
 	}
 
 	/* update our local pointers */
@@ -1124,19 +1127,19 @@ status_t nv_acc_setup_blit()
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_PAT_FIFOFREE)) >> 2) < 5)
+	while (((nv_image_pattern_ptr->FifoFree) >> 2) < 5)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
 	}
 	/* now setup pattern (writing 5 32bit words) */
-	ACCW(PAT_SHAPE, 0); /* 0 = 8x8, 1 = 64x1, 2 = 1x64 */
-	ACCW(PAT_COLOR0, 0xffffffff);
-	ACCW(PAT_COLOR1, 0xffffffff);
-	ACCW(PAT_MONO1, 0xffffffff);
-	ACCW(PAT_MONO2, 0xffffffff);
+	nv_image_pattern_ptr->SetShape = 0x00000000; /* 0 = 8x8, 1 = 64x1, 2 = 1x64 */
+	nv_image_pattern_ptr->SetColor0 = 0xffffffff;
+	nv_image_pattern_ptr->SetColor1 = 0xffffffff;
+	nv_image_pattern_ptr->SetPattern[0] = 0xffffffff;
+	nv_image_pattern_ptr->SetPattern[1] = 0xffffffff;
 
-	/* ROP3 registers (Raster OPeration):
+	/* ROP registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
 	while (((nv_rop5_solid_ptr->FifoFree) >> 2) < 1)
@@ -1145,7 +1148,7 @@ status_t nv_acc_setup_blit()
 		snooze (10);
 	}
 	/* now setup ROP (writing 1 32bit word) */
-	nv_rop5_solid_ptr->Rop3 = 0xcc;
+	nv_rop5_solid_ptr->SetRop5 = 0xcc;
 
 	return B_OK;
 }
@@ -1157,15 +1160,15 @@ status_t nv_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 	/* instruct engine what to blit:
 	 * wait for room in fifo for blit cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BLT_FIFOFREE)) >> 2) < 3)
+	while (((nv_image_blit_ptr->FifoFree) >> 2) < 3)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
 	}
 	/* now setup blit (writing 3 32bit words) */
-	ACCW(BLT_TOPLFTSRC, ((ys << 16) | xs));
-	ACCW(BLT_TOPLFTDST, ((yd << 16) | xd));
-	ACCW(BLT_SIZE, (((h + 1) << 16) | (w + 1)));
+	nv_image_blit_ptr->SourceOrg = ((ys << 16) | xs);
+	nv_image_blit_ptr->DestOrg = ((yd << 16) | xd);
+	nv_image_blit_ptr->HeightWidth = (((h + 1) << 16) | (w + 1));
 
 	return B_OK;
 }
@@ -1177,19 +1180,19 @@ status_t nv_acc_setup_rectangle(uint32 color)
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_PAT_FIFOFREE)) >> 2) < 5)
+	while (((nv_image_pattern_ptr->FifoFree) >> 2) < 5)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
 	}
 	/* now setup pattern (writing 5 32bit words) */
-	ACCW(PAT_SHAPE, 0); /* 0 = 8x8, 1 = 64x1, 2 = 1x64 */
-	ACCW(PAT_COLOR0, 0xffffffff);
-	ACCW(PAT_COLOR1, 0xffffffff);
-	ACCW(PAT_MONO1, 0xffffffff);
-	ACCW(PAT_MONO2, 0xffffffff);
+	nv_image_pattern_ptr->SetShape = 0x00000000; /* 0 = 8x8, 1 = 64x1, 2 = 1x64 */
+	nv_image_pattern_ptr->SetColor0 = 0xffffffff;
+	nv_image_pattern_ptr->SetColor1 = 0xffffffff;
+	nv_image_pattern_ptr->SetPattern[0] = 0xffffffff;
+	nv_image_pattern_ptr->SetPattern[1] = 0xffffffff;
 
-	/* ROP3 registers (Raster OPeration):
+	/* ROP registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
 	while (((nv_rop5_solid_ptr->FifoFree) >> 2) < 1)
@@ -1198,7 +1201,7 @@ status_t nv_acc_setup_rectangle(uint32 color)
 		snooze (10); 
 	}
 	/* now setup ROP (writing 1 32bit word) for GXcopy */
-	nv_rop5_solid_ptr->Rop3 = 0xcc;
+	nv_rop5_solid_ptr->SetRop5 = 0xcc;
 
 	/* setup fill color:
 	 * wait for room in fifo for bitmap cmd if needed.
@@ -1237,19 +1240,19 @@ status_t nv_acc_setup_rect_invert()
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_PAT_FIFOFREE)) >> 2) < 5)
+	while (((nv_image_pattern_ptr->FifoFree) >> 2) < 5)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
 	}
 	/* now setup pattern (writing 5 32bit words) */
-	ACCW(PAT_SHAPE, 0); /* 0 = 8x8, 1 = 64x1, 2 = 1x64 */
-	ACCW(PAT_COLOR0, 0xffffffff);
-	ACCW(PAT_COLOR1, 0xffffffff);
-	ACCW(PAT_MONO1, 0xffffffff);
-	ACCW(PAT_MONO2, 0xffffffff);
+	nv_image_pattern_ptr->SetShape = 0x00000000; /* 0 = 8x8, 1 = 64x1, 2 = 1x64 */
+	nv_image_pattern_ptr->SetColor0 = 0xffffffff;
+	nv_image_pattern_ptr->SetColor1 = 0xffffffff;
+	nv_image_pattern_ptr->SetPattern[0] = 0xffffffff;
+	nv_image_pattern_ptr->SetPattern[1] = 0xffffffff;
 
-	/* ROP3 registers (Raster OPeration):
+	/* ROP registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
 	while (((nv_rop5_solid_ptr->FifoFree) >> 2) < 1)
@@ -1258,7 +1261,7 @@ status_t nv_acc_setup_rect_invert()
 		snooze (10); 
 	}
 	/* now setup ROP (writing 1 32bit word) for GXinvert */
-	nv_rop5_solid_ptr->Rop3 = 0x55;
+	nv_rop5_solid_ptr->SetRop5 = 0x55;
 
 	/* reset fill color:
 	 * wait for room in fifo for bitmap cmd if needed.
