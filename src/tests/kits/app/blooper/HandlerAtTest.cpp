@@ -74,6 +74,8 @@ void THandlerAtTest::HandlerAtTest3()
  */
 void THandlerAtTest::HandlerAtTest4()
 {
+	DEBUGGER_ESCAPE;
+
 	BLooper Looper;
 	Looper.Unlock();
 	CPPUNIT_ASSERT(Looper.HandlerAt(0) == &Looper);
