@@ -29,7 +29,6 @@
 
 #include <View.h> // For B_FONT_FAMILY_AND_STYLE, B_FONT_SIZE, etc.
 
-
 // _BStyleRunDescBuffer_
 
 _BStyleRunDescBuffer_::_BStyleRunDescBuffer_()
@@ -67,15 +66,13 @@ _BStyleRunDescBuffer_::OffsetToRun(int32 offset) const
 		if (offset >= fBuffer[index].offset) {
 			if (index >= (fItemCount - 1)) {
 				break;
-			}
-			else {
+			} else {
 				if (offset < fBuffer[index + 1].offset)
 					break;
 				else
 					minIndex = index + 1;
 			}
-		}
-		else
+		} else
 			maxIndex = index;
 	}
 	
@@ -276,7 +273,7 @@ _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 		STEStyle style = fStyleRecord[runDesc.index]->style;
 		SetStyle(inMode, inFont, &style.font, inColor, &style.color);
 
-		styleIndex = fStyleRecord.InsertRecord(inFont, inColor);
+		styleIndex = fStyleRecord.InsertRecord(&style.font, &style.color);
 		
 		if ( (runDesc.offset == offset) && (runIndex > 0) && 
 			 (fStyleRunDesc[runIndex - 1]->index == styleIndex) ) {
@@ -470,8 +467,8 @@ _BStyleBuffer_::SetStyle(uint32 mode, const BFont *fromFont,
 	if (mode & B_FONT_SHEAR)
 		toFont->SetShear(fromFont->Shear());
 		
-	//if (mode & doColor)
-	//	*toColor = *fromColor;
+	if (!mode)
+		*toColor = *fromColor;
 }
 
 

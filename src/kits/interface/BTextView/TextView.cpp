@@ -471,7 +471,11 @@ BTextView::MouseDown(BPoint where)
 			}
 		}
 	}
-	
+
+	// Unhighlights the selection if needed
+	if (fSelStart != fSelEnd)
+		Select(fSelStart, fSelEnd);
+		
 	// get the system-wide click speed
 	bigtime_t clickSpeed = 0;
 	get_click_speed(&clickSpeed);
@@ -1585,7 +1589,6 @@ BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
 {
 	CALLED();
 	CancelInputMethod();
-	
 	// hide the caret/unhilite the selection
 	if (fActive) {
 		if (fSelStart != fSelEnd)
@@ -1628,6 +1631,7 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 								const rgb_color	*inColor)
 {
 	CALLED();
+	
 	// hide the caret/unhilite the selection
 	if (fActive) {
 		if (startOffset != endOffset)
