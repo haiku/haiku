@@ -31,7 +31,7 @@ public:
 	area_id ID() const;
 	int32 Size() const;
 
-	void *AllocateCommand(uint32 commandWhat, int32 dataSize);
+	void *AllocateCommand(uint32 commandWhat, int32 dataSize, bool &wasEmpty);
 	void CommitCommand();
 
 	void SetNextArea(MessagingArea *area);
@@ -70,7 +70,7 @@ public:
 
 private:
 	status_t _AllocateCommand(int32 commandWhat, int32 size,
-		MessagingArea *&area, void *&data);
+		MessagingArea *&area, void *&data, bool &wasEmpty);
 
 	BLocker			fLock;
 	team_id			fServerTeam;

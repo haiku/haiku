@@ -8,6 +8,7 @@
 #include <new>
 
 #include <AutoDeleter.h>
+#include <KernelExport.h>
 #include <KMessage.h>
 #include <messaging.h>
 #include <MessagingServiceDefs.h>
@@ -27,7 +28,17 @@ init_messaging_service()
 	if (!sMessagingService)
 		sMessagingService = new(buffer) MessagingService;
 
-	return sMessagingService->InitCheck();
+	status_t error = sMessagingService->InitCheck();
+
+	// cleanup on error
+	if (error != B_OK) {
+		dprintf("ERROR: Failed to init messaging service: %s\n",
+			strerror(error));
+		sMessagingService->~MessagingService();
+		sMessagingService = NULL;
+	}
+
+	return error;
 }
 
 // _user_register_messaging_service
@@ -36,7 +47,8 @@ init_messaging_service()
 	\param lockingSem A semaphore used for locking the shared data. Semaphore
 		   counter must be initialized to 0.
 	\param counterSem A semaphore released every time the kernel pushes a
-		   command. Semaphore counter must be initialized to 0.
+		   command into an empty area. Semaphore counter must be initialized
+		   to 0.
 	\return
 	- The ID of the kernel area used for communication, if everything went fine,
 	- an error code otherwise.
@@ -212,7 +224,8 @@ MessagingArea::Size() const
 
 // AllocateCommand
 void *
-MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize)
+MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize,
+	bool &wasEmpty)
 {
 	int32 size = sizeof(messaging_command) + dataSize;
 
@@ -224,7 +237,8 @@ MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize)
 
 	// the simple case first: the area is empty
 	int32 commandOffset;
-	if (fHeader->command_count == 0) {
+	wasEmpty = (fHeader->command_count == 0);
+	if (wasEmpty) {
 		commandOffset = startOffset;
 
 		// update the header
@@ -429,7 +443,7 @@ MessagingService::UnregisterService()
 	// delete all areas
 	while (fFirstArea) {
 		MessagingArea *area = fFirstArea;
-		fFirstArea = area;
+		fFirstArea = area->NextArea();
 		delete area;
 	}
 	fLastArea = NULL;
@@ -456,8 +470,9 @@ MessagingService::SendMessage(const void *message, int32 messageSize,
 	// allocate space for the command
 	MessagingArea *area;
 	void *data;
+	bool wasEmpty;
 	status_t error = _AllocateCommand(MESSAGING_COMMAND_SEND_MESSAGE, dataSize,
-		area, data);
+		area, data, wasEmpty);
 	if (error != B_OK)
 		return error;
 
@@ -471,7 +486,8 @@ MessagingService::SendMessage(const void *message, int32 messageSize,
 
 	// shoot
 	area->Unlock();
-	area->CommitCommand();
+	if (wasEmpty)
+		area->CommitCommand();
 
 	return B_OK;
 }
@@ -479,7 +495,7 @@ MessagingService::SendMessage(const void *message, int32 messageSize,
 // _AllocateCommand
 status_t
 MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
-	MessagingArea *&area, void *&data)
+	MessagingArea *&area, void *&data, bool &wasEmpty)
 {
 	if (!fFirstArea)
 		return B_NO_INIT;
@@ -507,7 +523,7 @@ MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
 	// allocate space for the command in the last area
 	area = fLastArea;
 	area->Lock();
-	data = area->AllocateCommand(commandWhat, size);
+	data = area->AllocateCommand(commandWhat, size, wasEmpty);
 
 	if (!data) {
 		// not enough space in the last area: create a new area or reuse a
@@ -528,7 +544,7 @@ MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
 		fLastArea = area;
 
 		// allocate space for the command
-		data = area->AllocateCommand(commandWhat, size);
+		data = area->AllocateCommand(commandWhat, size, wasEmpty);
 
 		if (!data) {
 			// that should never happen
