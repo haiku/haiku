@@ -203,7 +203,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			else if (audio_format->bits_per_sample <= 32)
 				format->u.raw_audio.format = B_AUDIO_FORMAT_INT32;
 			else {
-				ERROR("WavReader::AllocateCookie: unhandled bits per sample %d\n", audio_format->bits_per_sample);
+				ERROR("aviReader::AllocateCookie: unhandled bits per sample %d\n", audio_format->bits_per_sample);
 				return B_ERROR;
 			}
 			format->u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
