@@ -941,7 +941,9 @@ _IO_unbuffer_write ()
 int
 _IO_cleanup ()
 {
-  int result = INTUSE(_IO_flush_all) ();
+  /* We do *not* want locking.  Some threads might use streams but
+     that is there problem, we flush them underneath them.  */
+  int result = _IO_flush_all_lockp (0);
 
   /* We currently don't have a reliable mechanism for making sure that
      C++ static destructors are executed in the correct order.
