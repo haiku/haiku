@@ -777,6 +777,8 @@ static void nv_start_dma(void)
 		/* note:
 		 * the actual FIFO channel that gets activated does not really matter:
 		 * all FIFO fill-level info actually points at the same registers. */
+		/* note also:
+		 * NV_GENERAL_DMAPUT is a write-only register on some cards (confirmed NV11). */
 		NV_REG32(NVACC_FIFO + NV_GENERAL_DMAPUT +
 			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])]) =
 			(si->engine.dma.put << 2);
@@ -786,8 +788,7 @@ for (dummy = 0; dummy < 2; dummy++)
 {
 	LOG(4,("ACC_DMA: get $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
 		si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])));
-	LOG(4,("ACC_DMA: put $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAPUT +
-		si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])));
+	LOG(4,("ACC_DMA: put $%08x\n", si->engine.dma.put));
 }
 }
 
