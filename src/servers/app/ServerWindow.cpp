@@ -1647,6 +1647,17 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			
 			break;
 		}
+		case AS_LAYER_SET_PATTERN:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PATTERN: Layer: %s\n", fTitle.String(), cl->fName->String()));
+			pattern pat;
+			
+			link.Read(&pat, sizeof(pattern));
+			
+			cl->fLayerData->patt = pat;
+			
+			break;
+		}	
 		case AS_STROKE_LINE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE\n",fTitle.String()));
