@@ -1,3 +1,0 @@
-SubDir OBOS_TOP src kernel vm2 ;
-
-SharedLibrary vm : area.C areaManager.C areaPool.C cacheManager.C error.C page.C pageManager.C swapFileManager.C vmInterface.C vnodeManager.C vnodePool.C vpage.C ;

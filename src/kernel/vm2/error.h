@@ -1,1 +1,0 @@
-void error(char *fmt, ...);
