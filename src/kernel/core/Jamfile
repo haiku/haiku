@@ -1,10 +1,11 @@
 SubDir OBOS_TOP src kernel core ;
 
 KernelObjects 
-	<$(SOURCE_GRIST)>cbuf.c 
-	<$(SOURCE_GRIST)>console.c 
-	<$(SOURCE_GRIST)>cpu.c 
-	<$(SOURCE_GRIST)>debug.c 
+	<$(SOURCE_GRIST)>cbuf.c
+	<$(SOURCE_GRIST)>console.c
+	<$(SOURCE_GRIST)>cpu.c
+	<$(SOURCE_GRIST)>debug.c
+	<$(SOURCE_GRIST)>driver_settings.c
 	<$(SOURCE_GRIST)>elf.c 
 	<$(SOURCE_GRIST)>faults.c
 	<$(SOURCE_GRIST)>fd.c
