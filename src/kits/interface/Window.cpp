@@ -1455,10 +1455,13 @@ status_t BWindow::AddToSubset(BWindow* window){
 	if (window->Feel() == B_NORMAL_WINDOW_FEEL &&
 			(fFeel == B_MODAL_SUBSET_WINDOW_FEEL ||
 				fFeel == B_FLOATING_SUBSET_WINDOW_FEEL)){
+
+		team_id		team = Team();
 		
 		Lock();
 		session->WriteInt32( AS_ADD_TO_SUBSET );
 		session->WriteInt32( _get_object_token_(window) );
+		session->WriteData( &team, sizeof(team_id) );
 		session->Sync();
 		session->ReadInt32( &rCode );
 		Unlock();
