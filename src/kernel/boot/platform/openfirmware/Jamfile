@@ -11,6 +11,7 @@ KernelMergeObject boot_platform_openfirmware.o :
 	<$(SOURCE_GRIST)>console.cpp
 	<$(SOURCE_GRIST)>heap.cpp
 	<$(SOURCE_GRIST)>video.cpp
+	<$(SOURCE_GRIST)>menu.cpp
 	:
 	: boot_platform_openfirmware_$(OBOS_ARCH).a
 	;
