@@ -1,30 +1,50 @@
+/*****************************************************************************/
+// SGITranslator
+// Written by Stephan Aßmus <stippi@yellowbites.com>
+// derived from GIMP SGI plugin by Michael Sweet
+//
+// SGIImage.h
+//
+// SGI image file format library routines.
+//
+// Formed into a class SGIImage, adopted to Be API and modified to use
+// BPositionIO, optimizations for buffered reading.
+//
+//
+// Copyright (c) 2003 OpenBeOS Project
+// Portions Copyright 1997-1998 Michael Sweet (mike@easysw.com)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+// and/or sell copies of the Software, and to permit persons to whom the 
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included 
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+/*****************************************************************************/
+
 /*
- * "$Id: SGIImage.h,v 1.1 2004/02/02 23:55:38 mwilber Exp $"
- *
- *	 SGI image file format library definitions.
- *
- *	 Copyright 1997-1998 Michael Sweet (mike@easysw.com)
- *
- *	 This program is free software; you can redistribute it and/or modify it
- *	 under the terms of the GNU General Public License as published by the Free
- *	 Software Foundation; either version 2 of the License, or (at your option)
- *	 any later version.
- *
- *	 This program is distributed in the hope that it will be useful, but
- *	 WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *	 or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU General Public License
- *	 for more details.
- *
- *	 You should have received a copy of the GNU General Public License
- *	 along with this program; if not, write to the Free Software
- *	 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * "$Id: SGIImage.h,v 1.2 2004/02/03 00:52:18 mwilber Exp $"
  *
  * Revision History:
  *
  *	 $Log: SGIImage.h,v $
+ *	 Revision 1.2  2004/02/03 00:52:18  mwilber
+ *	 Removed GPL text as permission was obtained from Michael Sweet to allow this derivative work to be distributed under the OpenBeOS license.
+ *
  *	 Revision 1.1  2004/02/02 23:55:38  mwilber
  *	 Initial check in for Stephan Assmus' SGITranslator
- *
+ *	
  *	 Revision 1.5	1998/05/17 16:01:33	mike
  *	 Added <unistd.h> header file.
  *
