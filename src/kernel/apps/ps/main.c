@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	printf("-----------------------------------------------------------------------\n");
 	
 	while (get_next_team_info(&team_num, &team) == B_OK) {
-		printf("%s (team %d) (uid %d) (gid %d)\n",
+		printf("%s (team %ld) (uid %ld) (gid %ld)\n",
 			team.args, team.team, team.uid, team.gid);
 		thread_num = 0;
 		while (get_next_thread_info(team.team, &thread_num, &thread) == B_OK) {
@@ -57,11 +57,11 @@ int main(int argc, char **argv)
 			if (thread.state == B_THREAD_WAITING) {
 				if (get_sem_info(thread.sem, &sem) == B_OK) {
 					strcpy(sem_name, sem.name);
-					sprintf(buffer, "(%d)", sem.sem);
+					sprintf(buffer, "(%ld)", sem.sem);
 					strcat(sem_name, buffer);
 				}
 			}
-			printf(" %6d %20s  %s %3d %7d %7d %s\n",
+			printf(" %6ld %20s  %s %3ld %7d %7d %s\n",
 				thread.thread, thread.name, state(thread.state), thread.priority,
 				(int)thread.user_time, (int)thread.kernel_time, sem_name);
 		}
