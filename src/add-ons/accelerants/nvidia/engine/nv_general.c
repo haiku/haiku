@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-2 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-3 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;

@@ -357,6 +357,60 @@ static void detect_panels()
 			}
 		}
 	}
+
+	/* dump some panel configuration registers... */
+	LOG(2,("INFO: Dumping flatpanel registers:\n"));
+	LOG(2,("DAC1: FP_HDISPEND: $%08x = (dec) %d\n", DACR(FP_HDISPEND),DACR(FP_HDISPEND)));
+	LOG(2,("DAC1: FP_HTOTAL: $%08x = (dec) %d\n", DACR(FP_HTOTAL),DACR(FP_HTOTAL)));
+	LOG(2,("DAC1: FP_HCRTC: $%08x = (dec) %d\n", DACR(FP_HCRTC),DACR(FP_HCRTC)));
+	LOG(2,("DAC1: FP_HSYNC_S: $%08x = (dec) %d\n", DACR(FP_HSYNC_S),DACR(FP_HSYNC_S)));
+	LOG(2,("DAC1: FP_HSYNC_E: $%08x = (dec) %d\n", DACR(FP_HSYNC_E),DACR(FP_HSYNC_E)));
+	LOG(2,("DAC1: FP_HVALID_S: $%08x = (dec) %d\n", DACR(FP_HVALID_S),DACR(FP_HVALID_S)));
+	LOG(2,("DAC1: FP_HVALID_E: $%08x = (dec) %d\n", DACR(FP_HVALID_E),DACR(FP_HVALID_E)));
+
+	LOG(2,("DAC1: FP_VDISPEND: $%08x = (dec) %d\n", DACR(FP_VDISPEND),DACR(FP_VDISPEND)));
+	LOG(2,("DAC1: FP_VTOTAL: $%08x = (dec) %d\n", DACR(FP_VTOTAL),DACR(FP_VTOTAL)));
+	LOG(2,("DAC1: FP_VCRTC: $%08x = (dec) %d\n", DACR(FP_VCRTC),DACR(FP_VCRTC)));
+	LOG(2,("DAC1: FP_VSYNC_S: $%08x = (dec) %d\n", DACR(FP_VSYNC_S),DACR(FP_VSYNC_S)));
+	LOG(2,("DAC1: FP_VSYNC_E: $%08x = (dec) %d\n", DACR(FP_VSYNC_E),DACR(FP_VSYNC_E)));
+	LOG(2,("DAC1: FP_VVALID_S: $%08x = (dec) %d\n", DACR(FP_VVALID_S),DACR(FP_VVALID_S)));
+	LOG(2,("DAC1: FP_VVALID_E: $%08x = (dec) %d\n", DACR(FP_VVALID_E),DACR(FP_VVALID_E)));
+
+	LOG(2,("DAC1: FP_CHKSUM: $%08x = (dec) %d\n", DACR(FP_CHKSUM),DACR(FP_CHKSUM)));
+	LOG(2,("DAC1: FP_TST_CTRL: $%08x = (dec) %d\n", DACR(FP_TST_CTRL),DACR(FP_TST_CTRL)));
+	LOG(2,("DAC1: FP_TG_CTRL: $%08x = (dec) %d\n", DACR(FP_TG_CTRL),DACR(FP_TG_CTRL)));
+	LOG(2,("DAC1: FP_DEBUG0: $%08x = (dec) %d\n", DACR(FP_DEBUG0),DACR(FP_DEBUG0)));
+	LOG(2,("DAC1: FP_DEBUG1: $%08x = (dec) %d\n", DACR(FP_DEBUG1),DACR(FP_DEBUG1)));
+	LOG(2,("DAC1: FP_DEBUG2: $%08x = (dec) %d\n", DACR(FP_DEBUG2),DACR(FP_DEBUG2)));
+	LOG(2,("DAC1: FP_DEBUG3: $%08x = (dec) %d\n", DACR(FP_DEBUG3),DACR(FP_DEBUG3)));
+
+	if(si->ps.secondary_head)
+	{
+		LOG(2,("DAC2: FP_HDISPEND: $%08x = (dec) %d\n", DAC2R(FP_HDISPEND),DAC2R(FP_HDISPEND)));
+		LOG(2,("DAC2: FP_HTOTAL: $%08x = (dec) %d\n", DAC2R(FP_HTOTAL),DAC2R(FP_HTOTAL)));
+		LOG(2,("DAC2: FP_HCRTC: $%08x = (dec) %d\n", DAC2R(FP_HCRTC),DAC2R(FP_HCRTC)));
+		LOG(2,("DAC2: FP_HSYNC_S: $%08x = (dec) %d\n", DAC2R(FP_HSYNC_S),DAC2R(FP_HSYNC_S)));
+		LOG(2,("DAC2: FP_HSYNC_E: $%08x = (dec) %d\n", DAC2R(FP_HSYNC_E),DAC2R(FP_HSYNC_E)));
+		LOG(2,("DAC2: FP_HVALID_S: $%08x = (dec) %d\n", DAC2R(FP_HVALID_S),DAC2R(FP_HVALID_S)));
+		LOG(2,("DAC2: FP_HVALID_E: $%08x = (dec) %d\n", DAC2R(FP_HVALID_E),DAC2R(FP_HVALID_E)));
+
+		LOG(2,("DAC2: FP_VDISPEND: $%08x = (dec) %d\n", DAC2R(FP_VDISPEND),DAC2R(FP_VDISPEND)));
+		LOG(2,("DAC2: FP_VTOTAL: $%08x = (dec) %d\n", DAC2R(FP_VTOTAL),DAC2R(FP_VTOTAL)));
+		LOG(2,("DAC2: FP_VCRTC: $%08x = (dec) %d\n", DAC2R(FP_VCRTC),DAC2R(FP_VCRTC)));
+		LOG(2,("DAC2: FP_VSYNC_S: $%08x = (dec) %d\n", DAC2R(FP_VSYNC_S),DAC2R(FP_VSYNC_S)));
+		LOG(2,("DAC2: FP_VSYNC_E: $%08x = (dec) %d\n", DAC2R(FP_VSYNC_E),DAC2R(FP_VSYNC_E)));
+		LOG(2,("DAC2: FP_VVALID_S: $%08x = (dec) %d\n", DAC2R(FP_VVALID_S),DAC2R(FP_VVALID_S)));
+		LOG(2,("DAC2: FP_VVALID_E: $%08x = (dec) %d\n", DAC2R(FP_VVALID_E),DAC2R(FP_VVALID_E)));
+
+		LOG(2,("DAC2: FP_CHKSUM: $%08x = (dec) %d\n", DAC2R(FP_CHKSUM),DAC2R(FP_CHKSUM)));
+		LOG(2,("DAC2: FP_TST_CTRL: $%08x = (dec) %d\n", DAC2R(FP_TST_CTRL),DAC2R(FP_TST_CTRL)));
+		LOG(2,("DAC2: FP_TG_CTRL: $%08x = (dec) %d\n", DAC2R(FP_TG_CTRL),DAC2R(FP_TG_CTRL)));
+		LOG(2,("DAC2: FP_DEBUG0: $%08x = (dec) %d\n", DAC2R(FP_DEBUG0),DAC2R(FP_DEBUG0)));
+		LOG(2,("DAC2: FP_DEBUG1: $%08x = (dec) %d\n", DAC2R(FP_DEBUG1),DAC2R(FP_DEBUG1)));
+		LOG(2,("DAC2: FP_DEBUG2: $%08x = (dec) %d\n", DAC2R(FP_DEBUG2),DAC2R(FP_DEBUG2)));
+		LOG(2,("DAC2: FP_DEBUG3: $%08x = (dec) %d\n", DAC2R(FP_DEBUG3),DAC2R(FP_DEBUG3)));
+	}
+	LOG(2,("INFO: End flatpanel registers dump.\n"));
 }
 
 static void pinsnv4_fake(void)
@@ -804,16 +858,15 @@ void dump_pins(void)
 	{
 		LOG(2,("found DFP (digital flatpanel) on CRTC1; CRTC1 is "));
 		if (si->ps.slaved_tmds1) LOG(2,("slaved\n")); else LOG(2,("master\n"));
-		LOG(2,("panel width: %d\n", si->ps.panel1_width));
-		LOG(2,("panel height: %d\n", si->ps.panel1_height));
-
+		LOG(2,("panel width: %d, height: %d\n",
+			si->ps.panel1_width, si->ps.panel1_height));
 	}
 	if (si->ps.tmds2_active)
 	{
 		LOG(2,("found DFP (digital flatpanel) on CRTC2; CRTC2 is "));
 		if (si->ps.slaved_tmds2) LOG(2,("slaved\n")); else LOG(2,("master\n"));
-		LOG(2,("panel width: %d\n", si->ps.panel2_width));
-		LOG(2,("panel height: %d\n", si->ps.panel2_height));
+		LOG(2,("panel width: %d, height: %d\n",
+			si->ps.panel2_width, si->ps.panel2_height));
 	}
 	LOG(2,("INFO: end pinsdump.\n"));
 }
