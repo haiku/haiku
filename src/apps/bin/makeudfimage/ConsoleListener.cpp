@@ -68,10 +68,11 @@ ConsoleListener::OnCompletion(status_t result, const Statistics &statistics) con
 		if (result == B_OK) {
 			printf("Finished\n");
 			printf("- Build time:  %ld seconds\n", statistics.ElapsedTime());
-			printf("- Directories: %Ld directories in %Ld bytes\n",
-			       statistics.Directories(), statistics.DirectoryBytes());
-			printf("- Files:       %Ld files in %Ld bytes\n",
-			       statistics.Files(), statistics.FileBytes());
+			printf("- Directories: %Ld directories in %s\n",
+			       statistics.Directories(), statistics.DirectoryBytesString().c_str());
+			printf("- Files:       %Ld files in %s\n",
+			       statistics.Files(), statistics.FileBytesString().c_str());
+			printf("- Image size:  %s\n", statistics.ImageSizeString().c_str());
 		} else {
 			printf("----------------------------------------------------------------------\n");
 			printf("Build failed with error: 0x%lx, `%s'\n", result,
