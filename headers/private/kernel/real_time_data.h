@@ -5,7 +5,7 @@
 #ifndef _KERNEL_REAL_TIME_DATA_H
 #define _KERNEL_REAL_TIME_DATA_H
 
-
+#include <StorageDefs.h>
 #include <SupportDefs.h>
 
 
@@ -17,6 +17,8 @@ struct real_time_data {
 	uint32	system_time_conversion_factor;
 	bigtime_t	timezone_offset;
 	bool	dst_observed;
+	char 	tzfilename[B_PATH_NAME_LENGTH];
+	bool	isGMT;
 };
 
 #endif	/* _KERNEL_REAL_TIME_DATA_H */
