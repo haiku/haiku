@@ -34,4 +34,5 @@ INTERFACE_KIT_SOURCE =
 	TextGapBuffer.cpp
 	TextView.cpp
 	UndoBuffer.cpp
+	WidthBuffer.cpp
 ;
