@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers pci arch x86 ;
 
-SubDirHdrs [ FDirName $(DOTDOT) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers pci ] ;
 
 KernelStaticLibrary pci_arch_bus_manager : 
 	bios.c
