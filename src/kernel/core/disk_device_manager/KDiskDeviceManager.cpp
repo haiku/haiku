@@ -996,7 +996,7 @@ KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
 		{
 			// parent busy => child busy
 			if (partition->Parent() && partition->Parent()->IsBusy())
-				partition->Parent()->AddFlags(B_PARTITION_BUSY);
+				partition->AddFlags(B_PARTITION_BUSY);
 			return false;
 		}
 
@@ -1005,8 +1005,7 @@ KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
 			// child [descendant] busy => parent descendant busy
 			if ((partition->IsBusy() || partition->IsDescendantBusy())
 				&& partition->Parent()) {
-				partition->Parent()->AddFlags(
-					B_PARTITION_DESCENDANT_BUSY);
+				partition->Parent()->AddFlags(B_PARTITION_DESCENDANT_BUSY);
 			}
 			return false;
 		}
