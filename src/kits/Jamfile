@@ -102,6 +102,7 @@ SEARCH on [ FGristFiles KMessage.cpp ]
 	= [ FDirName $(OBOS_TOP) src kernel core messaging ] ;
 
 SubInclude OBOS_TOP src kits app ;
+SubInclude OBOS_TOP src kits debug ;
 SubInclude OBOS_TOP src kits interface ;
 SubInclude OBOS_TOP src kits mail ;
 SubInclude OBOS_TOP src kits media ;

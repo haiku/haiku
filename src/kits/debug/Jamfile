@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src kits debug ;
+
+UsePrivateHeaders debug ;
+UsePrivateHeaders shared ;
+
+SharedLibrary debug :
+	debug_support.cpp
+;
+
+LinkSharedOSLibs libdebug.so :
+	libroot.so
+;
