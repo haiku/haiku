@@ -57,6 +57,7 @@ public:
 		if (4096 - fSendPosition > size){
 			memcpy(fSendBuffer + fSendPosition, &data, size);
 			fSendPosition += size;
+			*fDataSize+=size;
 			return B_OK;
 		}
 		return B_NO_MEMORY;
