@@ -28,7 +28,6 @@
 #include <Region.h>
 #include <Message.h>
 
-#include "AccelerantDriver.h"
 #include "AppServer.h"
 #include "Desktop.h"
 #include "DisplayDriver.h"
@@ -39,10 +38,12 @@
 #include "ServerScreen.h"
 #include "ServerApp.h"
 #include "ServerWindow.h"
-#include "ViewDriver.h"
-#include "DirectDriver.h"
 #include "WinBorder.h"
 #include "Workspace.h"
+
+#include "drawing/AccelerantDriver.h"
+#include "drawing/ViewDriver.h"
+#include "drawing/DirectDriver.h"
 
 //#define DEBUG_DESKTOP
 
