@@ -24,10 +24,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
+
+// TODO: Use strlcpy instead of strcpy
+
 #include "MouseInputDevice.h"
 
 #include <stdlib.h>
 #include <unistd.h>
+
+#include <Directory.h>
+#include <Entry.h>
+#include <List.h>
+#include <NodeMonitor.h>
+#include <Path.h>
+#include <String.h>
 
 #define DEBUG 1
 #if DEBUG
@@ -36,8 +46,11 @@
 	#define LOG(text)
 #endif
 
+#include <Debug.h>
+
 FILE *MouseInputDevice::sLogFile = NULL;
-bool MouseInputDevice::sQuit = false;
+
+static MouseInputDevice *sSingletonMouseDevice = NULL;
 
 // TODO: These are "stolen" from the kb_mouse driver on bebits, which uses
 // the same protocol as BeOS one. They're just here to test this add-on with
@@ -48,6 +61,12 @@ const static uint32 kSetMouseAccel = 10102;
 const static uint32 kSetMouseType = 10104;
 const static uint32 kSetMouseMap = 10106;
 const static uint32 kSetClickSpeed = 10108;
+
+const static uint32 kMouseThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
+const static char *kMouseDevicesDirectory = "/dev/input/mouse";
+
+// "/dev/" is automatically prepended by StartMonitoringDevice()
+const static char *kMouseDevicesDirectoryUSB = "input/mouse/usb";
 
 struct mouse_movement {
   int32 ser_fd_index;
@@ -61,10 +80,22 @@ struct mouse_movement {
 
 
 struct mouse_device {
+	mouse_device(const char *path);
+	~mouse_device();
+	
+	input_device_ref device_ref;
+	char driver_path[B_PATH_NAME_LENGTH];
 	int driver_fd;
 	thread_id device_watcher;
 	uint32 buttons_state;
+	mouse_settings settings;
+	bool active;
 };
+
+
+// forward declarations
+static void scan_recursively(const char *directory, BList *list);
+static char *get_short_name(const char *longName);
 
 
 extern "C"
@@ -76,31 +107,30 @@ instantiate_input_device()
 
 
 MouseInputDevice::MouseInputDevice()
-	: 	fThread(-1)
+	:	fDevices(NULL)
+		
 {
-	// TODO: Open "/dev/input/mouse/serial/0" as well, and what about USB mouses ?
-	fFd = open("dev/input/mouse/ps2/0", O_RDWR);
-	if (fFd >= 0)
-		fThread = spawn_thread(DeviceWatcher, "mouse watcher thread",
-			B_FIRST_REAL_TIME_PRIORITY+4, this);
-
+	ASSERT(sSingletonMouseDevice == NULL);
+	sSingletonMouseDevice = this;
+			
 #if DEBUG
 	if (sLogFile == NULL)
 		sLogFile = fopen("/var/log/mouse_device_log.log", "a");
 #endif
+	
+	StartMonitoringDevice(kMouseDevicesDirectoryUSB);
 }
 
 
 MouseInputDevice::~MouseInputDevice()
 {
-	if (fThread >= 0) {
-		status_t dummy;
-		wait_for_thread(fThread, &dummy);
-	}
-	
-	if (fFd >= 0)
-		close(fFd);
+	StopMonitoringDevice(kMouseDevicesDirectoryUSB);
 
+	for (int32 i = 0; i < fDevices->CountItems(); i++)
+		delete (mouse_device *)fDevices->ItemAt(i);
+		
+	delete fDevices;
+	
 #if DEBUG
 	fclose(sLogFile);
 #endif
@@ -108,62 +138,67 @@ MouseInputDevice::~MouseInputDevice()
 
 
 status_t
-MouseInputDevice::InitFromSettings(uint32 opcode)
+MouseInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 {
+	mouse_device *device = (mouse_device *)cookie;
+	
 	// retrieve current values
 
-	if (get_mouse_map(&fSettings.map)!=B_OK)
+	if (get_mouse_map(&device->settings.map) != B_OK)
 		fprintf(stderr, "error when get_mouse_map\n");
 	else
-		ioctl(fFd, kSetMouseMap, &fSettings.map);
+		ioctl(device->driver_fd, kSetMouseMap, &device->settings.map);
 		
-	if (get_click_speed(&fSettings.click_speed)!=B_OK)
+	if (get_click_speed(&device->settings.click_speed) != B_OK)
 		fprintf(stderr, "error when get_click_speed\n");
 	else
-		ioctl(fFd, kSetClickSpeed, &fSettings.click_speed);
+		ioctl(device->driver_fd, kSetClickSpeed, &device->settings.click_speed);
 		
-	if (get_mouse_speed(&fSettings.accel.speed)!=B_OK)
+	if (get_mouse_speed(&device->settings.accel.speed) != B_OK)
 		fprintf(stderr, "error when get_mouse_speed\n");
 	else {
-		if (get_mouse_acceleration(&fSettings.accel.accel_factor)!=B_OK)
+		if (get_mouse_acceleration(&device->settings.accel.accel_factor) != B_OK)
 			fprintf(stderr, "error when get_mouse_acceleration\n");
 		else {
 			mouse_accel accel;
-			ioctl(fFd, kGetMouseAccel, &accel);
-			accel.speed = fSettings.accel.speed;
-			accel.accel_factor = fSettings.accel.accel_factor;
-			ioctl(fFd, kSetMouseAccel, &fSettings.accel);
+			ioctl(device->driver_fd, kGetMouseAccel, &accel);
+			accel.speed = device->settings.accel.speed;
+			accel.accel_factor = device->settings.accel.accel_factor;
+			ioctl(device->driver_fd, kSetMouseAccel, &device->settings.accel);
 		}
 	}
 	
-	if (get_mouse_type(&fSettings.type)!=B_OK)
+	if (get_mouse_type(&device->settings.type) != B_OK)
 		fprintf(stderr, "error when get_mouse_type\n");
 	else
-		ioctl(fFd, kSetMouseType, &fSettings.type);
+		ioctl(device->driver_fd, kSetMouseType, &device->settings.type);
 
 	return B_OK;
+
 }
 
 
 status_t
 MouseInputDevice::InitCheck()
 {
-	InitFromSettings();
+	BList list;
+	scan_recursively(kMouseDevicesDirectory, &list);
 	
-	input_device_ref **devices = NULL;
-	devices = (input_device_ref **)malloc(sizeof(input_device_ref *) * 2);
-	if (!devices)
-		return B_NO_MEMORY;
-
-	input_device_ref mouse1 = { "Mouse 1", B_POINTING_DEVICE, (void *)this };
-		
-	devices[0] = &mouse1;
-	devices[1] = NULL;
-		
-	if (fFd >= 0 && fThread >= 0) {	
-		RegisterDevices(devices);
+	char path[B_PATH_NAME_LENGTH];
+	if (list.CountItems() > 0) {
+		fDevices = new BList;
+		for (int32 i = 0; i < list.CountItems(); i++) {
+			strcpy(path, kMouseDevicesDirectory);
+			strcat(path, "/");
+			strcat(path, (char *)list.ItemAt(i));
+			AddDevice(path);
+			free(list.ItemAt(i));
+		}
+	}	
+	
+	if (fDevices && fDevices->CountItems() > 0)
 		return BInputServerDevice::InitCheck();
-	}
+		
 	return B_ERROR;
 }
 
@@ -171,11 +206,22 @@ MouseInputDevice::InitCheck()
 status_t
 MouseInputDevice::Start(const char *name, void *cookie)
 {
+	mouse_device *device = (mouse_device *)cookie;
+	
 	char log[128];
 	snprintf(log, 128, "Start(%s)\n", name);
-
+	
 	LOG(log);
-	resume_thread(fThread);
+	
+	char threadName[B_OS_NAME_LENGTH];
+	snprintf(threadName, B_OS_NAME_LENGTH, "%s watcher", name);
+	
+	device->active = true;
+	device->device_watcher = spawn_thread(DeviceWatcher, threadName,
+									kMouseThreadPriority, device);
+	
+	resume_thread(device->device_watcher);
+	
 	
 	return B_OK;
 }
@@ -184,12 +230,18 @@ MouseInputDevice::Start(const char *name, void *cookie)
 status_t
 MouseInputDevice::Stop(const char *name, void *cookie)
 {
+	mouse_device *device = (mouse_device *)cookie;
+	
 	char log[128];
 	snprintf(log, 128, "Stop(%s)\n", name);
 
 	LOG(log);
 	
-	suspend_thread(fThread);
+	device->active = false;
+	if (device->device_watcher >= 0) {
+		status_t dummy;
+		wait_for_thread(device->device_watcher, &dummy);
+	}
 	
 	return B_OK;
 }
@@ -208,41 +260,139 @@ MouseInputDevice::Control(const char *name, void *cookie,
 		HandleMonitor(message);
 	else if (command >= B_MOUSE_TYPE_CHANGED 
 		&& command <= B_MOUSE_ACCELERATION_CHANGED) {
-		InitFromSettings(command);
+		InitFromSettings(cookie, command);
 	}
 	return B_OK;
 }
 
 
+// TODO: Test this. USB doesn't work on my machine
 status_t 
 MouseInputDevice::HandleMonitor(BMessage *message)
 {
-	return B_OK;
+	int32 opcode = 0;
+	status_t status;
+	status = message->FindInt32("opcode", &opcode);
+	if (status < B_OK)
+		return status;
+	
+	BEntry entry;
+	BPath path;
+	dev_t device;
+	ino_t directory;
+	ino_t node;
+	const char *name = NULL;
+		
+	switch (opcode) {
+		case B_ENTRY_CREATED:
+		{
+			message->FindInt32("device", &device);
+			message->FindInt64("directory", &directory);
+			message->FindInt64("node", &node);
+			message->FindString("name", &name);
+			
+			entry_ref ref(device, directory, name);
+			
+			status = entry.SetTo(&ref);
+			if (status == B_OK);
+				status = entry.GetPath(&path);
+			if (status == B_OK)
+				status = path.InitCheck();
+			if (status == B_OK)
+				status = AddDevice(path.Path());
+			
+			break;
+		}
+		case B_ENTRY_REMOVED:
+		{
+			message->FindInt32("device", &device);
+			message->FindInt64("directory", &directory);
+			message->FindInt64("node", &node);
+			message->FindString("name", &name);
+			
+			entry_ref ref(device, directory, name);
+			
+			status = entry.SetTo(&ref);
+			if (status == B_OK);
+				status = entry.GetPath(&path);
+			if (status == B_OK)
+				status = path.InitCheck();
+			if (status == B_OK)
+				status = RemoveDevice(path.Path());
+			
+			break;
+		}
+		default:
+			status = B_BAD_VALUE;
+			break;
+	}
+	
+	return status;
+}
+
+
+status_t
+MouseInputDevice::AddDevice(const char *path)
+{
+	mouse_device *device = new mouse_device(path);
+	if (!device) {
+		LOG("No memory\n");
+		return B_NO_MEMORY;
+	}
+		
+	input_device_ref *devices[2];
+	devices[0] = &device->device_ref;
+	devices[1] = NULL;
+	
+	fDevices->AddItem(device);
+	
+	InitFromSettings(device);
+	
+	return RegisterDevices(devices);
+}
+
+
+status_t
+MouseInputDevice::RemoveDevice(const char *path)
+{
+	if (fDevices) {
+		int32 i = 0;
+		mouse_device *device = NULL;
+		while ((device = (mouse_device *)fDevices->ItemAt(i)) != NULL) {
+			if (!strcmp(device->driver_path, path)) {
+				fDevices->RemoveItem(device);
+				delete device;
+				return B_OK;
+			}	
+		}
+	}
+	
+	return B_ENTRY_NOT_FOUND;
 }
 
 
 int32
 MouseInputDevice::DeviceWatcher(void *arg)
 {
-	MouseInputDevice *dev = (MouseInputDevice *)arg;
+	mouse_device *dev = (mouse_device *)arg;
+	
 	mouse_movement movements;
 	BMessage *message;
 	char log[128];
-	while (!sQuit) {
-		if (ioctl(dev->fFd, kGetMouseMovements, &movements) < B_OK)
+	while (dev->active) {
+		if (ioctl(dev->driver_fd, kGetMouseMovements, &movements) < B_OK)
 			continue;
 		
-		uint32 buttons = dev->fButtons ^ movements.buttons;
+		uint32 buttons = dev->buttons_state ^ movements.buttons;	
 	
-		snprintf(log, 128, "buttons: %ld, x: %ld, y: %ld, clicks:%ld\n", 
-				movements.buttons, movements.xdelta, movements.ydelta,
-				movements.click_count);
+		snprintf(log, 128, "%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld\n",
+				dev->device_ref.name, movements.buttons, movements.xdelta,
+				movements.ydelta, movements.click_count);
 			
 		LOG(log);
 
 		// TODO: B_MOUSE_DOWN and B_MOUSE_UP messages don't seem
-		// to reach the application,
-		// for some reason. Check if they reach the input server.
+		// to be generated correctly.
 		if (buttons != 0) {
 			message = new BMessage;				
 			if ((buttons & movements.buttons) > 0) {
@@ -259,11 +409,10 @@ MouseInputDevice::DeviceWatcher(void *arg)
 			message->AddInt32("clicks", movements.click_count);
 			message->AddInt32("x", movements.xdelta);
 			message->AddInt32("y", movements.ydelta);
-			
-			dev->EnqueueMessage(message);
 						
-			dev->fButtons = movements.buttons;
-		
+			dev->buttons_state = movements.buttons;
+			
+			sSingletonMouseDevice->EnqueueMessage(message);
 		}
 
 		if (movements.xdelta != 0 || movements.ydelta != 0) {
@@ -274,7 +423,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 				message->AddInt32("x", movements.xdelta);
 				message->AddInt32("y", movements.ydelta);
 					
-				dev->EnqueueMessage(message);
+				sSingletonMouseDevice->EnqueueMessage(message);
 			}
 		}
 	}
@@ -283,3 +432,74 @@ MouseInputDevice::DeviceWatcher(void *arg)
 }
 
 
+// mouse_device
+mouse_device::mouse_device(const char *path) 
+{
+	driver_fd = -1;
+	device_watcher = -1;
+	buttons_state = 0;
+	active = false;
+	strcpy(driver_path, path);
+	device_ref.name = get_short_name(path);
+	device_ref.type = B_POINTING_DEVICE;
+	device_ref.cookie = this;
+	
+	// TODO: Add a function which checks if the object
+	// has initialized correctly. Specifically, this is one
+	// of the operations which could fail
+	driver_fd = open(driver_path, O_RDWR);
+};
+
+
+mouse_device::~mouse_device()
+{
+	free(device_ref.name);
+	if (driver_fd >= 0)
+		close(driver_fd);
+}
+	
+
+// static functions
+
+// On exit, "list" will contain a string for every file in
+// the tree, starting from the given "directory". Note that
+// the file names will also contain the name of the parent folder.  
+static void
+scan_recursively(const char *directory, BList *list)
+{
+	// TODO: See if it's simpler to use POSIX functions
+	BEntry entry;
+	BDirectory dir(directory);
+	char buf[B_OS_NAME_LENGTH];
+	while (dir.GetNextEntry(&entry) == B_OK) {
+		entry.GetName(buf);
+		BPath child(&dir, buf);
+		
+		if (entry.IsDirectory())
+			scan_recursively(child.Path(), list);
+		else {
+			BPath parent(directory);
+			BString deviceName = parent.Leaf();
+			deviceName << "/" << buf;
+			list->AddItem(strdup(deviceName.String()));
+		}
+	}
+}
+
+
+static char *
+get_short_name(const char *longName)
+{
+	BString string(longName);
+	BString name;
+	
+	int32 slash = string.FindLast("/");
+	int32 previousSlash = string.FindLast("/", slash) + 1;
+	string.CopyInto(name, slash, string.Length() - slash);
+	
+	int32 deviceIndex = atoi(name.String()) + 1;
+	string.CopyInto(name, previousSlash, slash - previousSlash); 
+	name << " mouse " << deviceIndex;
+		
+	return strdup(name.String());
+}

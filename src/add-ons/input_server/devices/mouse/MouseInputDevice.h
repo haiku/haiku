@@ -31,7 +31,6 @@
 #include <InterfaceDefs.h>
 
 #include <stdio.h>
-#include <stdlib.h>
 
 // TODO : these structs are needed in : input_server, mouse driver, mouse addon, mouse prefs
 // => factorisation has to be done in a global header, possibly private
@@ -49,6 +48,8 @@ typedef struct {
         bigtime_t       click_speed;
 } mouse_settings;
 
+
+class BList;
 class MouseInputDevice : public BInputServerDevice {
 public:
 	MouseInputDevice();
@@ -63,19 +64,16 @@ public:
 							 uint32 command, BMessage *message);
 private:
 	status_t HandleMonitor(BMessage *message);
-	status_t InitFromSettings(uint32 opcode = 0);
+	status_t InitFromSettings(void *cookie, uint32 opcode = 0);
 	
-	int32 fButtons;
+	status_t AddDevice(const char *path);
+	status_t RemoveDevice(const char *path);
 	
-	thread_id fThread;
-	int fFd;
-			
-	mouse_settings	fSettings;
-
-	static bool sQuit;
-	static FILE *sLogFile;
-
 	static int32 DeviceWatcher(void *arg);
+			
+	BList *fDevices;
+	
+	static FILE *sLogFile;	
 };
 
 extern "C" BInputServerDevice *instantiate_input_device();
