@@ -46,6 +46,8 @@ static net_timer_id timerid;
 
 struct ipstat ipstat; //XXX might need to be shared
 
+static uint16 get_ip_id(void);
+
 static void  ipv4_input(struct mbuf *, int);
 static int   ipv4_output(struct mbuf *, struct mbuf *, struct route *, int, void *);
 static int   ipv4_ctloutput(int, struct socket *, int, int, struct mbuf **);
@@ -209,11 +211,13 @@ static void ip_forward(struct mbuf *m, int srcrt)
 	struct rtentry *rt;
 	struct mbuf *mcopy;
 	n_long dest;
-	int code, type, error = 0;
-	struct ifnet *destifp = NULL;
+	int code, type, error;
+	struct ifnet *destifp;
 
-	memset(sin, 0, sizeof(*sin));	
 	dest = 0;
+	code = type = error = 0;
+	sin = NULL;
+	destifp = NULL;
 	if (m->m_flags & M_BCAST || in_canforward(ip->ip_dst) == 0) {
 		ipstat.ips_cantforward++;
 		m_freem(m);
@@ -354,7 +358,7 @@ printf("ip_dooptions\n");
 					break;
 				}
 				off--;
-				if (off > optlen - sizeof(struct in_addr)) {
+				if (off > (int) (optlen - sizeof(struct in_addr))) {
 					save_rte(cp, ip->ip_src);
 					break;
 				}
@@ -380,7 +384,7 @@ printf("ip_dooptions\n");
 					goto bad;
 				}
 				off--;
-				if (off > optlen - sizeof(struct in_addr))
+				if (off > (int) (optlen - sizeof(struct in_addr)))
 					break;
 				memcpy(&ipaddr.sin_addr, &ip->ip_dst, sizeof(ipaddr.sin_addr));
 				if ((ia = (INA)ifa_ifwithaddr((SA)&ipaddr)) == NULL &&
@@ -656,12 +660,12 @@ void ipv4_input(struct mbuf *m, int hdrlen)
 	/* Figure out of header length */
 	hlen = ip->ip_hl << 2;
 	/* Check we're at least the minimum possible length */
-	if (hlen < sizeof(struct ip)) {
+	if (hlen < (int) sizeof(struct ip)) {
 		ipstat.ips_badhlen++;
 		goto bad;
 	}
 	/* Check again we have the entire header in the first mbuf */
-	if (hlen > m->m_len) {
+	if (hlen > (int) m->m_len) {
 		if ((m = m_pullup(m, hlen)) == NULL) {
 			ipstat.ips_badhlen++;
 			goto bad;
@@ -694,7 +698,7 @@ void ipv4_input(struct mbuf *m, int hdrlen)
 
 	/* Strip excess data from mbuf */
 	if (m->m_pkthdr.len > ip->ip_len) {
-		if (m->m_len == m->m_pkthdr.len) {
+		if (m->m_pkthdr.len == (int) m->m_len) {
 			m->m_len = ip->ip_len;
 			m->m_pkthdr.len = ip->ip_len;
 		} else 
@@ -703,7 +707,7 @@ void ipv4_input(struct mbuf *m, int hdrlen)
 
 	/* options processing */	
 	ip_nhops = 0;
-	if (hlen > sizeof(struct ip) && ip_dooptions(m))
+	if (hlen > (int) (sizeof(struct ip)) && ip_dooptions(m))
 		return;
 	
 	for (ia = ip_ifaddr;ia; ia = ia->ia_next) {
@@ -968,7 +972,7 @@ static int ipv4_output(struct mbuf *m0, struct mbuf *opt, struct route *ro,
 			m->m_data += get_max_linkhdr();
 			mhip = mtod(m, struct ip*);
 			*mhip = *ip;
-			if (hlen > sizeof(struct ip)) {
+			if (hlen > (int) sizeof(struct ip)) {
 				mhlen = ip_optcopy(ip, mhip) + sizeof(struct ip);
 				mhip->ip_hl = mhlen >> 2;
 			}
@@ -1030,7 +1034,7 @@ bad:
 	goto done;
 }
 
-uint16 get_ip_id(void)
+static uint16 get_ip_id(void)
 {
 	return (uint16) atomic_add(&ip_id, 1);
 }
