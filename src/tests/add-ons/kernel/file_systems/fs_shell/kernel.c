@@ -3392,9 +3392,16 @@ send_notification(port_id port, long token, ulong what, long op, nspace_id nsida
 #endif
 }
 
-
+#ifdef COMPILE_FOR_R5
 void
 notify_select_event(selectsync *sync, uint32 ref)
 {
 }
+#else
+status_t
+notify_select_event(selectsync *sync, uint32 ref, uint8 event)
+{
+	return B_UNSUPPORTED;
+}
+#endif
 
