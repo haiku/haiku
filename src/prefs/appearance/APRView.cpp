@@ -654,6 +654,7 @@ printf("Initializing color settings to defaults\n");
 
 	ColorWhichItem whichitem(B_PANEL_BACKGROUND_COLOR);
 	rgb_color col={216,216,216,255};
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,0,0,0);
 	whichitem.SetAttribute((color_which)B_PANEL_TEXT_COLOR);
