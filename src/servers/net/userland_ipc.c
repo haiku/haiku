@@ -29,10 +29,12 @@ extern struct core_module_info *core;
 
 #define ROUND_TO_PAGE_SIZE(x) (((x) + (B_PAGE_SIZE) - 1) & ~((B_PAGE_SIZE) - 1))
 
+struct socket; /* forward declaration */
+
 typedef struct {
-	port_id		localPort,port;
-	area_id		area;
-	void		*socket;
+	port_id			localPort,port;
+	area_id			area;
+	struct socket * socket;
 
 	uint8		*buffer;
 	net_command *commands;
@@ -197,9 +199,9 @@ connection_runner(void *_cookie)
 				struct socket_args *args = (struct socket_args *)data;
 
 				printf("open a socket... family = %d, type = %d, proto = %d\n",args->family,args->type,args->proto);
-				status = core->initsocket(&cookie->socket);
+				status = core->socket_init(&cookie->socket);
 				if (status == 0)
-					status = core->socreate(args->family,cookie->socket,args->type,args->proto);
+					status = core->socket_create(cookie->socket, args->family, args->type, args->proto);
 				break;
 			}
 			case NET_STACK_GETSOCKOPT:
@@ -208,11 +210,11 @@ connection_runner(void *_cookie)
 				struct sockopt_args *sockopt = (struct sockopt_args *)data;
 
 				if (command->op == NET_STACK_GETSOCKOPT) {
-					status = core->sogetopt(cookie->socket,sockopt->level,sockopt->option,
+					status = core->socket_getsockopt(cookie->socket,sockopt->level,sockopt->option,
 						convert_to_local(&command->area[1],&area[1],sockopt->optval),
 						(size_t *)&sockopt->optlen);
 				} else {
-					status = core->sosetopt(cookie->socket,sockopt->level,sockopt->option,
+					status = core->socket_setsockopt(cookie->socket,sockopt->level,sockopt->option,
 						(const void *)convert_to_local(&command->area[1],&area[1],sockopt->optval),
 						sockopt->optlen);
 				}
@@ -228,22 +230,22 @@ connection_runner(void *_cookie)
 
 				switch (command->op) {
 					case NET_STACK_CONNECT:
-						status = core->soconnect(cookie->socket,addr,args->addrlen);
+						status = core->socket_connect(cookie->socket,addr,args->addrlen);
 						break;
 					case NET_STACK_BIND:
-						status = core->sobind(cookie->socket,addr,args->addrlen);
+						status = core->socket_bind(cookie->socket,addr,args->addrlen);
 						break;
 					case NET_STACK_GETSOCKNAME:
-						status = core->sogetsockname(cookie->socket,(struct sockaddr *)addr,&args->addrlen);
+						status = core->socket_getsockname(cookie->socket,(struct sockaddr *)addr,&args->addrlen);
 						break;
 					case NET_STACK_GETPEERNAME:
-						status = core->sogetpeername(cookie->socket,(struct sockaddr *)addr,&args->addrlen);
+						status = core->socket_getpeername(cookie->socket,(struct sockaddr *)addr,&args->addrlen);
 						break;
 				}
 				break;
 			}
 			case NET_STACK_LISTEN:
-				status = core->solisten(cookie->socket,((struct int_args *)data)->value);
+				status = core->socket_listen(cookie->socket,((struct int_args *)data)->value);
 				break;
 
 			case NET_STACK_GET_COOKIE:
@@ -253,11 +255,12 @@ connection_runner(void *_cookie)
 				 */
 				*((void **)data) = cookie;
 				break;
+				
 			case NET_STACK_ACCEPT:
 			{
 				struct accept_args *args = (struct accept_args *)data;
 				connection_cookie *otherCookie = (connection_cookie *)args->cookie;
-				status = core->soaccept(cookie->socket,&otherCookie->socket,
+				status = core->socket_accept(cookie->socket,&otherCookie->socket,
 					convert_to_local(&command->area[1],&area[1],args->addr),
 					&args->addrlen);
 			}
@@ -270,7 +273,7 @@ connection_runner(void *_cookie)
 				iov.iov_base = convert_to_local(&command->area[1],&area[1],args->data);
 				iov.iov_len = args->datalen;
 
-				status = core->writeit(cookie->socket,&iov,flags);
+				status = core->socket_writev(cookie->socket,&iov,flags);
 				break;
 			}
 			case NET_STACK_RECV:
@@ -283,7 +286,7 @@ connection_runner(void *_cookie)
 				iov.iov_len = args->datalen;
 
 				/* flags gets ignored here... */
-				status = core->readit(cookie->socket,&iov,&flags);
+				status = core->socket_readv(cookie->socket,&iov,&flags);
 				break;
 			}
 			case NET_STACK_RECVFROM:
@@ -295,7 +298,7 @@ connection_runner(void *_cookie)
 				msg->msg_iov = convert_to_local(&command->area[2],&area[2],msg->msg_iov);
 				msg->msg_control = convert_to_local(&command->area[3],&area[3],msg->msg_control);
 
-				status = core->recvit(cookie->socket, msg, (caddr_t)&msg->msg_namelen,&received);
+				status = core->socket_recv(cookie->socket, msg, (caddr_t)&msg->msg_namelen,&received);
 				if (status == 0)
 					status = received;
 
@@ -313,7 +316,7 @@ connection_runner(void *_cookie)
 				msg->msg_iov = convert_to_local(&command->area[2],&area[2],msg->msg_iov);
 				msg->msg_control = convert_to_local(&command->area[3],&area[3],msg->msg_control);
 	
-				status = core->sendit(cookie->socket,msg,msg->msg_flags,&sent);
+				status = core->socket_send(cookie->socket,msg,msg->msg_flags,&sent);
 				if (status == 0)
 					status = sent;
 
@@ -332,10 +335,10 @@ connection_runner(void *_cookie)
 		
 				if (cookie->socket_event_port != -1)
 					// start notify socket event
-					status = core->set_socket_event_callback(cookie->socket, on_socket_event, cookie, 0);
+					status = core->socket_set_event_callback(cookie->socket, on_socket_event, cookie, 0);
 				else
 					// stop notify socket event
-					status = core->set_socket_event_callback(cookie->socket, NULL, NULL, 0);
+					status = core->socket_set_event_callback(cookie->socket, NULL, NULL, 0);
 				break;
 			}
 
@@ -369,14 +372,14 @@ connection_runner(void *_cookie)
 				struct ifconf *ifc = (struct ifconf *)data;
 				ifc->ifc_buf = convert_to_local(&command->area[1],&area[1],ifc->ifc_buf);
 
-				status = core->soo_ioctl(cookie->socket,command->op,(char *)data);
+				status = core->socket_ioctl(cookie->socket,command->op,(char *)data);
 
 				ifc->ifc_buf = convert_to_foreign(&command->area[1],&area[1],ifc->ifc_buf);
 				break;
 			}
 
 			default:
-				status = core->soo_ioctl(cookie->socket,command->op,(char *)data);
+				status = core->socket_ioctl(cookie->socket,command->op,(char *)data);
 				break;
 		}
 		// mark the command as done
