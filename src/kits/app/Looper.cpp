@@ -174,7 +174,6 @@ BLooper::~BLooper()
 // isn't done.
 //	kill_thread(fTaskID);
 	delete fQueue;
-	delete_sem(fLockSem);
 	delete_port(fMsgPort);
 
 	// Clean up our filters
@@ -194,9 +193,9 @@ BLooper::~BLooper()
 		}
 	}
 
-	RemoveLooper(this);
-
 	UnlockFully();
+	RemoveLooper(this);
+	delete_sem(fLockSem);
 }
 //------------------------------------------------------------------------------
 BLooper::BLooper(BMessage* data)
@@ -559,9 +558,10 @@ DBG(OUT("  Run() has already been called and we are not the looper thread\n"));
 
 		// bonefish: We need to unlock here. Otherwise the looper thread can't
 		// dispatch the _QUIT_ message we're going to post.
-		do {
-			Unlock();
-		} while (IsLocked());
+//		do {
+//			Unlock();
+//		} while (IsLocked());
+		UnlockFully();
 
 		// As per the BeBook, if we've been called by a thread other than
 		// our own, the rest of the message queue has to get processed.  So
@@ -806,11 +806,13 @@ void BLooper::AddCommonFilter(BMessageFilter* filter)
 	if (!IsLocked())
 	{
 		debugger("Owning Looper must be locked before calling AddCommonFilter");
+		return;
 	}
 
 	if (filter->Looper())
 	{
 		debugger("A MessageFilter can only be used once.");
+		return;
 	}
 
 	if (!fCommonFilters)
@@ -852,6 +854,10 @@ void BLooper::SetCommonFilterList(BList* filters)
 	// destroyed will have a problem when it tries to delete a filter list that
 	// has already been deleted.  In R5, this results in a general protection
 	// fault; here it ends in a segment violation.
+	// TODO: Fix
+	//		 by checking first filter in list for ownership issues.  Go to
+	//		 debugger with something like  "A MessageFilter can only be used
+	//		 once." and return with out setting the list.
 	if (!IsLocked())
 	{
 		debugger("Owning Looper must be locked before calling "
@@ -859,6 +865,21 @@ void BLooper::SetCommonFilterList(BList* filters)
 		return;
 	}
 
+	BMessageFilter* filter;
+	if (filters)
+	{
+		// Check for ownership issues
+		for (int32 i = 0; i < filters->CountItems(); ++i)
+		{
+			filter = (BMessageFilter*)filters->ItemAt(i);
+			if (filter->Looper())
+			{
+				debugger("A MessageFilter can only be used once.");
+				return;
+			}
+		}
+	}
+	
 	if (fCommonFilters)
 	{
 		for (int32 i = 0; i < fCommonFilters->CountItems(); ++i)
@@ -876,7 +897,8 @@ void BLooper::SetCommonFilterList(BList* filters)
 	{
 		for (int32 i = 0; i < fCommonFilters->CountItems(); ++i)
 		{
-			((BMessageFilter*)fCommonFilters->ItemAt(i))->SetLooper(this);
+			filter = (BMessageFilter*)fCommonFilters->ItemAt(i);
+			filter->SetLooper(this);
 		}
 	}
 }
@@ -889,7 +911,7 @@ BList* BLooper::CommonFilterList() const
 status_t BLooper::Perform(perform_code d, void* arg)
 {
 	// This is sort of what we're doing for this function everywhere
-	return B_ERROR;
+	return BHandler::Perform(d, arg);
 }
 //------------------------------------------------------------------------------
 BMessage* BLooper::MessageFromPort(bigtime_t timeout)
@@ -1044,6 +1066,7 @@ DBG(OUT("BLooper::_Lock() done 4\n"));
 			}
 		}
 	
+		//	Is the looper trying to lock itself?
 		//	Check for nested lock attempt
 		curThread = find_thread(NULL);
 		if (curThread == loop->fOwner)
@@ -1054,6 +1077,7 @@ DBG(OUT("BLooper::_Lock() done 5: fOwnerCount: %ld\n", loop->fOwnerCount));
 			return B_OK;
 		}
 	
+		//	Something external to the looper is attempting to lock
 		//	Cache the semaphore
 		sem = loop->fLockSem;
 	
@@ -1555,7 +1579,26 @@ BHandler* BLooper::resolve_specifier(BHandler* target, BMessage* msg)
 //------------------------------------------------------------------------------
 void BLooper::UnlockFully()
 {
-	// TODO: implement
+	AssertLocked();
+
+/**
+	@note	What we're doing here is completely undoing the current owner's lock
+			on the looper.  This is actually pretty easy, since the owner only
+			has a single aquisition on the semaphore; every subsequent "lock"
+			is just an increment to the owner count.  The whole thing is quite
+			similar to Unlock(), except that we clear the ownership variables,
+			rather than merely decrementing them.
+ */
+	// Clear the owner count
+	fOwnerCount = 0;
+	// Nobody owns the lock now
+	fOwner = -1;
+	// There is now one less thread holding a lock on this looper
+	long atomicCount = atomic_add(&fAtomicCount, -1);
+	if (atomicCount > 0)
+	{
+		release_sem(fLockSem);
+	}
 }
 //------------------------------------------------------------------------------
 void BLooper::AddLooper(BLooper* loop)
