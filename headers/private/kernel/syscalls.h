@@ -40,8 +40,7 @@ extern int     		_kern_null();
 extern int			_kern_getrlimit(int resource, struct rlimit * rlp);
 extern int			_kern_setrlimit(int resource, const struct rlimit * rlp);
 
-extern bigtime_t	_kern_system_time();
-extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags);
+extern status_t		_kern_shutdown(bool reboot);
 
 /* sem functions */
 sem_id sys_create_sem(int count, const char *name);
@@ -187,6 +186,9 @@ extern status_t		_kern_set_real_time_clock(uint32 time);
 extern status_t		_kern_set_tzspecs(int32 timezone_offset, bool dst_observed);
 extern status_t		_kern_set_tzfilename(const char *filename, size_t length, bool is_gmt);
 extern status_t		_kern_get_tzfilename(char *filename, size_t length, bool *is_gmt);
+
+extern bigtime_t	_kern_system_time();
+extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags);
 
 // area functions
 area_id _kern_create_area(const char *name, void **address, uint32 addressSpec,
