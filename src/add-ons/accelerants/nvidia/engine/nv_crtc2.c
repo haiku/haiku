@@ -269,31 +269,30 @@ status_t nv_crtc2_depth(int mode)
 
 status_t nv_crtc2_dpms(bool display, bool h, bool v)
 {
-//	uint8 temp;
+	uint8 temp;
 
 	LOG(4,("CRTC2: setting DPMS: "));
 
-	/* enable access to CRTC2 */
+	/* enable access to CRTC2 (and SEQUENCER2) */
 	CRTC2W(OWNER, 0x03);
 
 	/* start synchronous reset: required before turning screen off! */
-//fixme: howto switch display on/off?
-//	SEQW(RESET, 0x01);
+	SEQW(RESET, 0x01);
 
 	/* turn screen off */
-//	temp = SEQR(CLKMODE);
+	temp = SEQR(CLKMODE);
 	if (display)
 	{
-//		SEQW(CLKMODE, (temp & ~0x20));
+		SEQW(CLKMODE, (temp & ~0x20));
 
 		/* end synchronous reset if display should be enabled */
-//		SEQW(RESET, 0x03);
+		SEQW(RESET, 0x03);
 
 		LOG(4,("display on, "));
 	}
 	else
 	{
-//		SEQW(CLKMODE, (temp | 0x20));
+		SEQW(CLKMODE, (temp | 0x20));
 
 		LOG(4,("display off, "));
 	}
@@ -324,12 +323,10 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 
 status_t nv_crtc2_dpms_fetch(bool *display, bool *h, bool *v)
 {
-	/* enable access to CRTC2 */
+	/* enable access to CRTC2 (and SEQUENCER2) */
 	CRTC2W(OWNER, 0x03);
 
-//fixme:
-//	*display = !(SEQR(CLKMODE) & 0x20);
-	*display = true;
+	*display = !(SEQR(CLKMODE) & 0x20);
 	*h = !(CRTC2R(REPAINT1) & 0x80);
 	*v = !(CRTC2R(REPAINT1) & 0x40);
 
@@ -375,20 +372,7 @@ status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp)
 	LOG(2,("CRTC2: frameRAM: $%08x\n", si->framebuffer));
 	LOG(2,("CRTC2: framebuffer: $%08x\n", si->fbc.frame_buffer));
 
-//fixme? on TNT1, TNT2, and GF2MX400 not needed. How about the rest??
-	/* make sure we are in retrace on MIL cards (if possible), because otherwise
-	 * distortions might occur during our reprogramming them (no double buffering) */
-//	if (si->ps.card_type < G100)
-//	{
-		/* we might have no retraces during setmode! */
-//		uint32 timeout = 0;
-		/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
-//		while ((!(ACCR(STATUS) & 0x08)) && (timeout < (25000/4)))
-//		{
-//			snooze(4);
-//			timeout++;
-//		}
-//	}
+	/* retrace sync not needed here: doublebuffering in hardware */
 
 	/* enable access to CRTC2 */
 	CRTC2W(OWNER, 0x03);

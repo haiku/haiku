@@ -291,11 +291,10 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 
 	LOG(4,("CRTC: setting DPMS: "));
 
-	/* enable access to CRTC1 on dualhead cards */
+	/* enable access to CRTC1 (and SEQUENCER1) on dualhead cards */
 	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
 
 	/* start synchronous reset: required before turning screen off! */
-	//fixme: we need to seperate the reset condition from DPMS!
 	SEQW(RESET, 0x01);
 
 	/* turn screen off */
@@ -342,7 +341,7 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 
 status_t nv_crtc_dpms_fetch(bool *display, bool *h, bool *v)
 {
-	/* enable access to CRTC1 on dualhead cards */
+	/* enable access to CRTC1 (and SEQUENCER1) on dualhead cards */
 	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
 
 	*display = !(SEQR(CLKMODE) & 0x20);
@@ -391,20 +390,7 @@ status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	LOG(2,("CRTC: frameRAM: $%08x\n", si->framebuffer));
 	LOG(2,("CRTC: framebuffer: $%08x\n", si->fbc.frame_buffer));
 
-//fixme? on TNT1, TNT2, and GF2MX400 not needed. How about the rest??
-	/* make sure we are in retrace on MIL cards (if possible), because otherwise
-	 * distortions might occur during our reprogramming them (no double buffering) */
-//	if (si->ps.card_type < G100)
-//	{
-		/* we might have no retraces during setmode! */
-//		uint32 timeout = 0;
-		/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
-//		while ((!(ACCR(STATUS) & 0x08)) && (timeout < (25000/4)))
-//		{
-//			snooze(4);
-//			timeout++;
-//		}
-//	}
+	/* retrace sync not needed here: doublebuffering in hardware */
 
 	/* enable access to CRTC1 on dualhead cards */
 	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
