@@ -123,6 +123,8 @@ _start(void)
 
 	// reading the keyboard doesn't seem to work in graphics mode (maybe a bochs problem)
 	sBootOptions = check_for_boot_keys();
+	if (sBootOptions & BOOT_OPTION_DEBUG_OUTPUT)
+		serial_enable();
 
 	main(&args);
 }

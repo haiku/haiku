@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 #ifndef CONSOLE_H
 #define CONSOLE_H
@@ -41,6 +41,9 @@ extern void console_set_cursor(int32 x, int32 y);
 extern void console_set_color(int32 foreground, int32 background);
 
 extern status_t console_init(void);
+
+extern void serial_disable(void);
+extern void serial_enable(void);
 
 #ifdef __cplusplus
 }
