@@ -67,6 +67,11 @@ public:
 	int32 GetFeel(void);
 	int32 GetFlags(void);
 	const char *GetTitle(void);
+		// we need to know its border(frame). WinBorder's _frame rect
+		// must expand to include Decorator borders. Otherwise we can't
+		// draw the border. We also add GetTabRect because I feel we'll need it
+	BRect GetBorderRect(void);
+	BRect GetTabRect(void);
 
 	bool GetClose(void);
 	bool GetMinimize(void);
