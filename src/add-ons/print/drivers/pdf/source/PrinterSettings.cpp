@@ -287,13 +287,13 @@ PrinterSettings::Update(BNode* node, BMessage* msg)
 	if (ps.Validate(msg) != B_OK) {
 		BMessage settings;
 		// check for previously saved settings
-		if (ps.ReadSettings(&settings) != B_OK) {
+		if (ps.ReadSettings(&settings) != B_OK || ps.Validate(&settings) != B_OK) {
 			// if there were none, then create a default set...
 			ps.GetDefaults(&settings);
-			// ...and save them
-			ps.WriteSettings(&settings);
 		}
-		AddFields(&settings, msg, false);
+		AddFields(msg, &settings, false);
 	}
+	// ...and save them
+	ps.WriteSettings(msg);
 }
 
