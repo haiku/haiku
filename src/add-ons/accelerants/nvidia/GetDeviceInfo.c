@@ -1,6 +1,6 @@
 /*
 	Author:
-	Rudolf Cornelissen 7/2004
+	Rudolf Cornelissen 7/2004-11/2004
 */
 
 #define MODULE_BIT 0x04000000
@@ -74,6 +74,18 @@ status_t GET_ACCELERANT_DEVICE_INFO(accelerant_device_info * adi)
 		break;
 	case NV38:
 		sprintf(adi->chipset, "NV38");
+		break;
+	case NV40:
+		sprintf(adi->chipset, "NV40");
+		break;
+	case NV41:
+		sprintf(adi->chipset, "NV41");
+		break;
+	case NV43:
+		sprintf(adi->chipset, "NV43");
+		break;
+	case NV45:
+		sprintf(adi->chipset, "NV45");
 		break;
 	default:
 		sprintf(adi->chipset, "unknown");
