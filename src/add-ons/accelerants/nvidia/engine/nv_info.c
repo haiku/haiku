@@ -15,6 +15,7 @@ typedef struct {
 	uint16	MacroTablePtr;			/* ptr to list with items containing multiple 32bit reg writes */
 	uint16	ConditionTablePtr;		/* ptr to list of PCI regs and bits to tst for exec mode */
 	uint16	IOConditionTablePtr;	/* ptr to list of ISA regs and bits to tst for exec mode */
+	uint16	IOFlagConditionTablePtr;/* ptr to list of ISA regs and bits to tst, ref'd to a matrix, for exec mode */
 	uint16	InitFunctionTablePtr;	/* ptr to list of startadresses of fixed ROM init routines */
 } PinsTables;
 
@@ -184,6 +185,7 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 		tabs.MacroTablePtr = rom[offset + 79] + (rom[offset + 80] * 256);
 		tabs.ConditionTablePtr = rom[offset + 81] + (rom[offset + 82] * 256);
 		tabs.IOConditionTablePtr = rom[offset + 83] + (rom[offset + 84] * 256);
+		tabs.IOFlagConditionTablePtr = rom[offset + 85] + (rom[offset + 86] * 256);
 		tabs.InitFunctionTablePtr = rom[offset + 87] + (rom[offset + 88] * 256);
 
 		LOG(8,("INFO: PINS 5.16 and later cmdlist pointer: $%04x\n", tabs.InitScriptTablePtr));
@@ -878,7 +880,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 	status_t result = B_OK;
 	bool end = false;
 	bool exec = true;
-	uint8 index, byte, byte2, safe;
+	uint8 index, byte, byte2, safe, shift;
 	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, safe32, offset32, size32;
 
 	LOG(8,("\nINFO: executing type2 script at adress $%04x...\n", adress));
@@ -1000,6 +1002,53 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 				LOG(8,("INFO: ---Executing following command(s):'\n"));
 			else
 				LOG(8,("INFO: ---Not executing following command(s):'\n"));
+			break;
+		case 0x39: /* new */
+			*size -= 2;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			data = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			data *= 9;
+			data += tabs.IOFlagConditionTablePtr;
+			reg = *((uint16*)(&(rom[data])));
+			index = *((uint8*)(&(rom[(data + 2)])));
+			and_out = *((uint8*)(&(rom[(data + 3)])));
+			shift = *((uint8*)(&(rom[(data + 4)])));
+			offset32 = *((uint16*)(&(rom[data + 5])));
+			and_out2 = *((uint8*)(&(rom[(data + 7)])));
+			byte2 = *((uint8*)(&(rom[(data + 8)])));
+			safe = ISARB(reg);
+			ISAWB(reg, index);
+			byte = ISARB(reg + 1);
+			ISAWB(reg, safe);
+			byte &= (uint8)and_out;
+			offset32 += (byte >> shift);
+			safe = byte = *((uint8*)(&(rom[offset32])));
+			byte &= (uint8)and_out2;
+			LOG(8,("cmd 'AND-out bits $%02x idx ISA reg $%02x via $%04x, shift-right = $%02x,\n",
+				and_out, index, reg, shift));
+			LOG(8,("INFO: (cont.) use result as index in table to get data $%02x,\n",
+				safe));
+			LOG(8,("INFO: (cont.) then chk bits AND-out $%02x for $%02x'\n",
+				and_out2, byte2));
+			if (byte != byte2)
+			{
+				LOG(8,("INFO: ---No match: not executing following command(s):\n"));
+				exec = false;
+			}
+			else
+			{
+				LOG(8,("INFO: ---Match, so this cmd has no effect.\n"));
+			}
 			break;
 		case 0x62: /* new */
 			*size -= 5;
