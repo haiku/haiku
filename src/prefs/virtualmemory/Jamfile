@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs virtualmemory ;
 
-AddResources VirtualMemory : Resource.rsrc ;
+AddResources VirtualMemory : <$(SOURCE_GRIST)>Resource.rsrc ;
 
 Preference VirtualMemory : main.cpp MainWindow.cpp VMSettings.cpp ;
 

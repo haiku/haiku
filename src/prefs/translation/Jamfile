@@ -7,4 +7,4 @@ Preference DataTranslations2 :
 	transwin.cpp
 	datatrans.cpp ;
 
-LinkSharedOSLibs DataTranslations2 : be translation ;
+LinkSharedOSLibs DataTranslations2 : be libtranslation.so ;

@@ -8,4 +8,4 @@ Preference Media :
 	MediaPrefsView.cpp
 	MediaPrefsSlider.cpp ;
 
-LinkSharedOSLibs Media : be media ;
+LinkSharedOSLibs Media : be libmedia.so ;

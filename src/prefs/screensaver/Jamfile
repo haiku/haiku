@@ -1,10 +1,19 @@
 SubDir OBOS_TOP src prefs screensaver ;
 
-Preference ScreenSaver :
+local sources =
 	OBOSScreenSaverPreferences.cpp
 	ScreenSaver.cpp
 	pwWindow.cpp
 	PreviewView.cpp
-	MouseAreaView.cpp ;
+	MouseAreaView.cpp
+;
+
+Preference ScreenSaver : $(sources) ;
 
 LinkSharedOSLibs ScreenSaver : be stdc++.r4 ;
+
+# Ugly hack: Prepend the dir containing Be's ScreenSaver.h to the list of
+# include search dirs. Otherwise it won't be found.
+# It is certainly a good idea to rename the local files.
+PrependObjectHdrs $(sources) : /boot/develop/headers/be/add-ons/screen_saver ;
+
