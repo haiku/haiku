@@ -20,73 +20,65 @@ BinCommand ci :
 	rcsgen.c
 	rcsedit.c
 	rcsfcmp.c
-	: librcs.a
+	: librcs.a be
+	: rcs.rdef
 ;
-
-LinkSharedOSLibs ci : be ;
 
 BinCommand co :
 	co.c
 	rcsgen.c
 	rcsedit.c
-	: librcs.a
+	: librcs.a be
+	: rcs.rdef
 ;
-
-LinkSharedOSLibs co : be ;
 
 BinCommand ident :
 	ident.c
 	rcsmap.c
 	version.c
+	: be
+	: rcs.rdef
 ;
-
-LinkSharedOSLibs ident : be ;
 
 BinCommand merge :
 	merge.c
 	merger.c
-	: librcs.a
+	: librcs.a be
+	: rcs.rdef
 ;
-
-LinkSharedOSLibs merge : be ;
 
 BinCommand rlog :
 	rlog.c
-	: librcs.a
+	: librcs.a be
+	: rcs.rdef
 ;
-
-LinkSharedOSLibs rlog : be ;
 
 BinCommand rcs :
 	rcs.c
 	rcsgen.c
 	rcsedit.c
-	: librcs.a
+	: librcs.a be
+	: rcs.rdef
 ;
-
-LinkSharedOSLibs rcs : be ;
 
 BinCommand rcsclean :
 	rcsclean.c
 	rcsedit.c
 	rcsfcmp.c
 	rcsgen.c
-	: librcs.a
+	: librcs.a be
+	: rcs.rdef
 ;
-
-LinkSharedOSLibs rcsclean : be ;
 
 BinCommand rcsdiff :
 	rcsdiff.c
-	: librcs.a
+	: librcs.a be
+	: rcs.rdef
 ;
-
-LinkSharedOSLibs rcsdiff : be ;
 
 BinCommand rcsmerge :
 	rcsmerge.c
 	merger.c
-	: librcs.a
+	: librcs.a be
+	: rcs.rdef
 ;
-
-LinkSharedOSLibs rcsmerge : be ;
