@@ -684,30 +684,20 @@ void APRView::SetDefaults(void)
 void APRView::NotifyServer(void)
 {
 	// Send a message to the app_server with the settings which we have.
-	// While it might be worthwhile to someday have a separate protocol for
-	// updating just one color, for now, we just need something to get things
-	// done. Extract all the colors from the settings BMessage, attach them
-	// to a PortLink message and fire it off to the server.
+
+	port_id port=find_port(SERVER_PORT_NAME);
 	
-	// For now, we do not have the OBOS app_server, so we simply do what
-	// we can with tbe R5 server
-
-	rgb_color col;
-
-	// Set menu color
-	menu_info minfo;
-	get_menu_info(&minfo);
-	col=currentset->StringToColor("Menu Background").GetColor32();
-	if(col.alpha==0 && col.red==0 && col.green==0 && col.blue==0)
+	if(port!=B_NAME_NOT_FOUND)
 	{
-		// do nothing
-	}
-	else
-	{
-		minfo.background_color=col;
-		set_menu_info(&minfo);
+		STRACE(("Notifying app_server\n"));
+		PortLink link(port);
+		
+		link.SetOpCode(AS_SET_UI_COLORS);
+		link.Attach<ColorSet>(*currentset);
+		link.Flush();
 	}
 	
+	// We also need to send the message to the window so that the Decorators tab updates itself
 	if(Window())
 		Window()->PostMessage(SET_UI_COLORS);
 }

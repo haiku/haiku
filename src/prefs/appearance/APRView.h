@@ -57,7 +57,7 @@ public:
 	void LoadSettings(void);
 	void SetDefaults(void);
 	void NotifyServer(void);
-//	rgb_color GetColorFromMessage(BMessage *msg, const char *name, int32 index=0);
+
 protected:
 	friend APRWindow;
 	void UpdateControlsFromAttr(const char *string);
