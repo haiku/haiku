@@ -16,6 +16,10 @@ KernelStaticLibraryObjects libkern.a :
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>rand.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>random.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtol.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoul.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoll.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoull.o
 
 	<$(SOURCE_GRIST)!libroot!posix!sys>chmod.o
 	<$(SOURCE_GRIST)!libroot!posix!sys>stat.o
@@ -121,6 +125,8 @@ KernelLd kernel
 	<$(SOURCE_GRIST)!core>thread.o 
 	<$(SOURCE_GRIST)!core>timer.o
 
+	linkhack.so
+
 	libbus.a
 	libfs.a
 	libvm.a
@@ -165,6 +171,8 @@ KernelLd kernel.so
 	<$(SOURCE_GRIST)!core>team.o 
 	<$(SOURCE_GRIST)!core>thread.o 
 	<$(SOURCE_GRIST)!core>timer.o
+
+	linkhack.so
 
 	libbus.a
 	libfs.a
@@ -409,6 +417,10 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>rand.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>random.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>realpath.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtol.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoul.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoll.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoull.o
 
 	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
