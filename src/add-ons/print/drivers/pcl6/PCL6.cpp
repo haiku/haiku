@@ -101,13 +101,31 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			x = rc.left;
 			y += rc.top;
 
-			int width = rc.right - rc.left + 1;
-			int widthByte = (width + 7) / 8;	/* byte boundary */
-			int padBytes = ((width + 31) / 32) * 4 - widthByte; /* line length is a multiple of 4 bytes */
-			int out_row_length = widthByte + padBytes;
-			int height    = rc.bottom - rc.top + 1;
-			int out_size  = out_row_length * height;
-			int delta     = bitmap->BytesPerRow();
+			bool color;
+			int width;
+			int widthByte;
+			int padBytes;
+			int out_row_length;
+			int height;
+			int out_size;
+			int delta;
+
+			color = getJobData()->getColor() == JobData::kCOLOR;
+
+			width = rc.right - rc.left + 1;
+			height = rc.bottom - rc.top + 1;
+			delta = bitmap->BytesPerRow();
+
+			if (color) {
+				widthByte = 3 * width;
+			} else {
+				widthByte = (width + 7) / 8;	/* byte boundary */
+			}
+
+			out_row_length = 4*((widthByte+3)/4);
+			padBytes = out_row_length - widthByte; /* line length is a multiple of 4 bytes */
+			out_size  = out_row_length * height;
+
 
 			DBGMSG(("width = %d\n", width));
 			DBGMSG(("widthByte = %d\n", widthByte));
@@ -141,11 +159,21 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 			// dither entire band into out_buffer
 			for (int i = rc.top; i <= rc.bottom; i++) {
-				__halftone->dither(out_ptr, ptr, x, y, width);
-				// invert pixels
 				uchar* out = out_ptr;
-				for (int w = widthByte; w > 0; w --, out ++) {
-					*out = ~*out;
+				if (color) {
+					uchar* in = ptr;
+					for (int w = width; w > 0; w --) {
+						*out++ = in[2];
+						*out++ = in[1];
+						*out++ = in[0];
+						in += 4;
+					}
+				} else {
+					__halftone->dither(out_ptr, ptr, x, y, width);
+					// invert pixels
+					for (int w = widthByte; w > 0; w --, out ++) {
+						*out = ~*out;
+					}
 				}
 				// pad with 0s
 				for (int w = padBytes; w > 0; w --, out ++) {
@@ -207,8 +235,9 @@ bool PCL6Driver::startPage(int)
 	// PageOrigin from Windows NT printer driver
 	int x = 142 * getJobData()->getXres() / 600;
 	int y = 100 * getJobData()->getYres() / 600;
+	bool color = getJobData()->getColor() == JobData::kCOLOR;
 	HP_SetPageOrigin_1(__stream, x, y);
-	HP_SetColorSpace_1(__stream, HP_eGray);
+	HP_SetColorSpace_1(__stream, color ? HP_eRGB : HP_eGray);
 	HP_SetPaintTxMode_1(__stream, HP_eOpaque);
 	HP_SetSourceTxMode_1(__stream, HP_eOpaque);
 	HP_SetROP_1(__stream, 204);
@@ -217,8 +246,9 @@ bool PCL6Driver::startPage(int)
 
 void PCL6Driver::startRasterGraphics(int x, int y, int width, int height)
 {
+	bool color = getJobData()->getColor() == JobData::kCOLOR;
 	__compression_method = -1;
-	HP_BeginImage_1(__stream, HP_eDirectPixel, HP_e1Bit, width, height, width, height);
+	HP_BeginImage_1(__stream, HP_eDirectPixel, color ? HP_e8Bit : HP_e1Bit, width, height, width, height);
 	HP_ReadImage_1(__stream, 0, height, HP_eNoCompression);
 }
 
