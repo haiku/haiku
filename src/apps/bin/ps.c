@@ -5,11 +5,14 @@
  * ChangeLog:
  * 04-26-2002 v1.0
  *  Initial.
+ * 10-08-2002
+ *  Added team name filtering (upon suggestion from Dano users :)
  * 
  */
 
 #include <OS.h>
 #include <stdio.h>
+#include <string.h>
 
 #define SNOOZE_TIME 100000
 
@@ -27,11 +30,25 @@ int main(int argc, char **argv)
 	char *thstate;
 	char *states[] = {"run", "rdy", "msg", "zzz", "sus", "sem" };
 	system_info sysinfo;
+	char *string_to_match; // match this in team name
 
+	if (argc == 2)
+		string_to_match = argv[1];
 	puts("");
 	puts(PS_HEADER);
 	puts(PS_SEP);
 	while ((ret = get_next_team_info(&teamcookie, &teaminfo)) >= B_OK) {
+		if (string_to_match) {
+			char *p;
+			p = teaminfo.args;
+			if ((p = strchr(p, ' ')))
+				*p = '\0'; /* remove arguments, keep only argv[0] */
+			p = strrchr(teaminfo.args, '/'); /* forget the path */
+			if (p == NULL)
+				p = teaminfo.args;
+			if (strstr(p, string_to_match) == NULL)
+				continue;
+		}
 		printf("%s (team %d) (uid %d) (gid %d)\n", teaminfo.args, teaminfo.team, teaminfo.uid, teaminfo.gid);
 		thcookie = 0;
 		while ((ret = get_next_thread_info(teaminfo.team, &thcookie, &thinfo)) >= B_OK) {
