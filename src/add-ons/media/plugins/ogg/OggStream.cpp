@@ -217,23 +217,17 @@ status_t
 OggStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
              media_header *mediaHeader)
 {
-	static ogg_packet packet;
-	uint page = fEndPage;
 	if (fCurrentPacket - fHeaderPackets.size() == fOggFrameInfos.size()) {
 		OggFrameInfo info(fEndPage,fPacketOnEndPage,fEndPacket);
 		fOggFrameInfos.push_back(info);
 	}
-	status_t result = GetPacket(&packet);
-	if (fCurrentPacket - fHeaderPackets.size() == fOggFrameInfos.size()) {
-		if (page != fEndPage) {
-		}
-	}
+	status_t result = GetPacket(&fChunkPacket);
 	if (result != B_OK) {
 		TRACE("OggStream::GetNextChunk failed: GetPacket = %s\n", strerror(result));
 		return result;
 	}
-	*chunkBuffer = &packet;
-	*chunkSize = sizeof(packet);
+	*chunkBuffer = &fChunkPacket;
+	*chunkSize = sizeof(fChunkPacket);
 	return B_OK;
 }
 

@@ -61,6 +61,7 @@ private:
 	uint				fPacketOnEndPage;
 	uint				fEndPacket;
 	OggReader::GetPageInterface * fReaderInterface;
+	ogg_packet			fChunkPacket;
 };
 
 } } // namespace BPrivate::media
