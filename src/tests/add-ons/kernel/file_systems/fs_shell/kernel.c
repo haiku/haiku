@@ -20,7 +20,10 @@
 #include "lock.h"
 #include "fsproto.h"
 #include "kprotos.h"
-#include "tracker.h"
+
+#if USED_IN_FS_SHELL
+#	include "tracker.h"
+#endif
 
 #include <sys/stat.h>
 
@@ -3248,7 +3251,11 @@ notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb, vnode_id
 	printf("notify_listener: op = %d\n", op);
 #endif
 
+#ifdef USED_IN_FS_SHELL
 	return send_notification(0, 0, FSH_NOTIFY_LISTENER, op, nsid, -1, vnida, vnidb, vnidc, name);
+#else
+	return send_notification(0, 0, 0x666, op, nsid, -1, vnida, vnidb, vnidc, name);
+#endif
 }
 
 
@@ -3257,7 +3264,9 @@ send_notification(port_id port, long token, ulong what, long op, nspace_id nsida
 		nspace_id nsidb, vnode_id vnida, vnode_id vnidb, vnode_id vnidc,
 		const char *name)
 {
+#ifdef USED_IN_FS_SHELL
 	update_message message;
+#endif
 
 #ifdef DEBUG
 	char *text;
@@ -3292,6 +3301,7 @@ send_notification(port_id port, long token, ulong what, long op, nspace_id nsida
 		text, name, port, token);
 #endif
 
+#ifdef USED_IN_FS_SHELL
 	message.op = op;
 	message.device = nsida;
 	message.toDevice = nsidb;
@@ -3306,6 +3316,9 @@ send_notification(port_id port, long token, ulong what, long op, nspace_id nsida
 		message.name[0] = '\0';
 
 	return write_port(gTrackerPort, what, &message, sizeof(message));
+#else
+	return B_OK;
+#endif
 }
 
 
