@@ -163,7 +163,7 @@ em_attach(device_t dev)
 
 	/* Allocate, clear, and link in our adapter structure */
 	if (!(adapter = device_get_softc(dev))) {
-		printf("em: adapter structure allocation failed\n");
+		dprintf("ipro1000: adapter structure allocation failed\n");
 		splx(s);
 		return(ENOMEM);
 	}
@@ -276,7 +276,7 @@ em_attach(device_t dev)
 
 
 	if (em_allocate_pci_resources(adapter)) {
-		printf("em%d: Allocation of PCI resources failed\n", 
+		dprintf("ipro1000/%d: Allocation of PCI resources failed\n", 
 		       adapter->unit);
 		error = ENXIO;
 		goto err_pci;
@@ -291,7 +291,7 @@ em_attach(device_t dev)
 	if (!(adapter->tx_desc_base = (struct em_tx_desc *)
 	      contigmalloc(tsize, M_DEVBUF, M_NOWAIT, 0, ~0, 
 			   PAGE_SIZE, 0))) {
-		printf("em%d: Unable to allocate TxDescriptor memory\n", 
+		dprintf("ipro1000/%d: Unable to allocate TxDescriptor memory\n", 
 		       adapter->unit);
 		error = ENOMEM;
 		goto err_tx_desc;
@@ -304,7 +304,7 @@ em_attach(device_t dev)
 	if (!(adapter->rx_desc_base = (struct em_rx_desc *)
 	      contigmalloc(rsize, M_DEVBUF, M_NOWAIT, 0, ~0, 
 			   PAGE_SIZE, 0))) {
-		printf("em%d: Unable to allocate rx_desc memory\n", 
+		dprintf("ipro1000/%d: Unable to allocate rx_desc memory\n", 
 		       adapter->unit);
 		error = ENOMEM;
 		goto err_rx_desc;
@@ -312,7 +312,7 @@ em_attach(device_t dev)
 
 	/* Initialize the hardware */
 	if (em_hardware_init(adapter)) {
-		printf("em%d: Unable to initialize the hardware\n",
+		dprintf("ipro1000/%d: Unable to initialize the hardware\n",
 		       adapter->unit);
 		error = EIO;
 		goto err_hw_init;
@@ -320,14 +320,14 @@ em_attach(device_t dev)
 
 	/* Copy the permanent MAC address out of the EEPROM */
 	if (em_read_mac_addr(&adapter->hw) < 0) {
-		printf("em%d: EEPROM read error while reading mac address\n",
+		dprintf("ipro1000/%d: EEPROM read error while reading mac address\n",
 		       adapter->unit);
 		error = EIO;
 		goto err_mac_addr;
 	}
 
 	if (!em_is_valid_ether_addr(adapter->hw.mac_addr)) {
-		printf("em%d: Invalid mac address\n", adapter->unit);
+		dprintf("ipro1000/%d: Invalid mac address\n", adapter->unit);
 		error = EIO;
 		goto err_mac_addr;
 	}
@@ -349,12 +349,12 @@ em_attach(device_t dev)
 	if (adapter->link_active == 1) {
 		em_get_speed_and_duplex(&adapter->hw, &adapter->link_speed, 
 					&adapter->link_duplex);
-		printf("em%d:  Speed:%d Mbps  Duplex:%s\n",
+		dprintf("ipro1000/%d:  Speed:%d Mbps  Duplex:%s\n",
 		       adapter->unit,
 		       adapter->link_speed,
 		       adapter->link_duplex == FULL_DUPLEX ? "Full" : "Half");
 	} else
-		printf("em%d:  Speed:N/A  Duplex:N/A\n", adapter->unit);
+		dprintf("ipro1000/%d:  Speed:N/A  Duplex:N/A\n", adapter->unit);
 
 	/* Identify 82544 on PCIX */
  	em_get_bus_info(&adapter->hw);	
@@ -653,7 +653,7 @@ em_watchdog(struct ifnet *ifp)
 	}
 
 	if (em_check_for_link(&adapter->hw))
-		printf("em%d: watchdog timeout -- resetting\n", adapter->unit);
+		dprintf("ipro1000/%d: watchdog timeout -- resetting\n", adapter->unit);
 
 	ifp->if_flags &= ~IFF_RUNNING;
 
@@ -694,7 +694,7 @@ em_init(void *arg)
 
 	/* Initialize the hardware */
 	if (em_hardware_init(adapter)) {
-		printf("em%d: Unable to initialize the hardware\n", 
+		dprintf("ipro1000/%d: Unable to initialize the hardware\n", 
 		       adapter->unit);
 		splx(s);
 		return;
@@ -704,7 +704,7 @@ em_init(void *arg)
 
 	/* Prepare transmit descriptors and buffers */
 	if (em_setup_transmit_structures(adapter)) {
-		printf("em%d: Could not setup transmit structures\n", 
+		dprintf("ipro1000/%d: Could not setup transmit structures\n", 
 		       adapter->unit);
 		em_stop(adapter); 
 		splx(s);
@@ -717,7 +717,7 @@ em_init(void *arg)
 
 	/* Prepare receive descriptors and buffers */
 	if (em_setup_receive_structures(adapter)) {
-		printf("em%d: Could not setup receive structures\n", 
+		dprintf("ipro1000/%d: Could not setup receive structures\n", 
 		       adapter->unit);
 		em_stop(adapter);
 		splx(s);
@@ -1004,7 +1004,7 @@ em_media_change(struct ifnet *ifp)
 			adapter->hw.forced_speed_duplex	= em_10_half;
 		break;
 	default:
-		printf("em%d: Unsupported media type\n", adapter->unit);
+		dprintf("ipro1000/%d: Unsupported media type\n", adapter->unit);
 	}
 
 	/* As the speed/duplex settings my have changed we nee to
@@ -1449,7 +1449,7 @@ em_print_link_status(struct adapter * adapter)
 			em_get_speed_and_duplex(&adapter->hw, 
 						&adapter->link_speed, 
 						&adapter->link_duplex);
-			printf("em%d: Link is up %d Mbps %s\n",
+			dprintf("ipro1000/%d: Link is up %d Mbps %s\n",
 			       adapter->unit,
 			       adapter->link_speed,
 			       ((adapter->link_duplex == FULL_DUPLEX) ?
@@ -1461,7 +1461,7 @@ em_print_link_status(struct adapter * adapter)
 		if (adapter->link_active == 1) {
 			adapter->link_speed = 0;
 			adapter->link_duplex = 0;
-			printf("em%d: Link is Down\n", adapter->unit);
+			dprintf("ipro1000/%d: Link is Down\n", adapter->unit);
 			adapter->link_active = 0;
 		}
 	}
@@ -1514,7 +1514,7 @@ em_identify_hardware(struct adapter * adapter)
 	adapter->hw.pci_cmd_word = pci_read_config(dev, PCIR_COMMAND, 2);
 	if (!((adapter->hw.pci_cmd_word & PCIM_CMD_BUSMASTEREN) &&
 	      (adapter->hw.pci_cmd_word & PCIM_CMD_MEMEN))) {
-		printf("em%d: Memory Access and/or Bus Master bits were not set!\n", 
+		dprintf("ipro1000/%d: Memory Access and/or Bus Master bits were not set!\n", 
 		       adapter->unit);
 		adapter->hw.pci_cmd_word |= 
 		(PCIM_CMD_BUSMASTEREN | PCIM_CMD_MEMEN);
@@ -1530,7 +1530,7 @@ em_identify_hardware(struct adapter * adapter)
 
 	/* Identify the MAC */
    if (em_set_mac_type(&adapter->hw))
-           printf("em%d: Unknown MAC Type\n", adapter->unit);
+           dprintf("ipro1000/%d: Unknown MAC Type\n", adapter->unit);
 
    if(adapter->hw.mac_type == em_82541 || adapter->hw.mac_type == em_82541_rev_2 ||
       adapter->hw.mac_type == em_82547 || adapter->hw.mac_type == em_82547_rev_2)
@@ -1551,7 +1551,7 @@ em_allocate_pci_resources(struct adapter * adapter)
 						 &rid, 0, ~0, 1,
 						 RF_ACTIVE);
 	if (!(adapter->res_memory)) {
-		printf("em%d: Unable to allocate bus resource: memory\n", 
+		dprintf("ipro1000/%d: Unable to allocate bus resource: memory\n", 
 		       adapter->unit);
 		return(ENXIO);
 	}
@@ -1561,7 +1561,7 @@ em_allocate_pci_resources(struct adapter * adapter)
 	if (adapter->hw.mac_type > em_82543) {
 		/* Enable IO space access, added for BeOS */
 		if (!(adapter->hw.pci_cmd_word & PCIM_CMD_IOEN)) {
-			printf("em%d: IO Access bit was not set!\n", 
+			dprintf("ipro1000/%d: IO Access bit was not set!\n", 
 			       adapter->unit);
 			adapter->hw.pci_cmd_word |= PCIM_CMD_IOEN;
 			pci_write_config(dev, PCIR_COMMAND, adapter->hw.pci_cmd_word, 2);
@@ -1582,7 +1582,7 @@ em_allocate_pci_resources(struct adapter * adapter)
 							 &adapter->io_rid, 0, ~0, 1,
 							 RF_ACTIVE);   
 		if (!(adapter->res_ioport)) {
-			printf("em%d: Unable to allocate bus resource: ioport\n",
+			dprintf("ipro1000/%d: Unable to allocate bus resource: ioport\n",
 			       adapter->unit);
 			return(ENXIO);  
 		}
@@ -1596,14 +1596,14 @@ em_allocate_pci_resources(struct adapter * adapter)
 						    &rid, 0, ~0, 1,
 						    RF_SHAREABLE | RF_ACTIVE);
 	if (!(adapter->res_interrupt)) {
-		printf("em%d: Unable to allocate bus resource: interrupt\n", 
+		dprintf("ipro1000/%d: Unable to allocate bus resource: interrupt\n", 
 		       adapter->unit);
 		return(ENXIO);
 	}
 	if (bus_setup_intr(dev, adapter->res_interrupt, INTR_TYPE_NET,
 			   em_intr, adapter,
 			   &adapter->int_handler_tag)) {
-		printf("em%d: Error registering interrupt handler!\n", 
+		dprintf("ipro1000/%d: Error registering interrupt handler!\n", 
 		       adapter->unit);
 		return(ENXIO);
 	}
@@ -1656,19 +1656,19 @@ em_hardware_init(struct adapter * adapter)
 
 	/* Make sure we have a good EEPROM before we read from it */
 	if (em_validate_eeprom_checksum(&adapter->hw) < 0) {
-		printf("em%d: The EEPROM Checksum Is Not Valid\n",
+		dprintf("ipro1000/%d: The EEPROM Checksum Is Not Valid\n",
 		       adapter->unit);
 		return(EIO);
 	}
 
 	if (em_read_part_num(&adapter->hw, &(adapter->part_num)) < 0) {
-		printf("em%d: EEPROM read error while reading part number\n",
+		dprintf("ipro1000/%d: EEPROM read error while reading part number\n",
 		       adapter->unit);
 		return(EIO);
 	}
 
 	if (em_init_hw(&adapter->hw) < 0) {
-		printf("em%d: Hardware Initialization Failed",
+		dprintf("ipro1000/%d: Hardware Initialization Failed",
 		       adapter->unit);
 		return(EIO);
 	}
@@ -1850,7 +1850,7 @@ em_allocate_transmit_structures(struct adapter * adapter)
 	      (struct em_buffer *) malloc(sizeof(struct em_buffer) *
 					     adapter->num_tx_desc, M_DEVBUF,
 					     M_NOWAIT))) {
-		printf("em%d: Unable to allocate tx_buffer memory\n", 
+		dprintf("ipro1000/%d: Unable to allocate tx_buffer memory\n", 
 		       adapter->unit);
 		return ENOMEM;
 	}
@@ -2202,7 +2202,7 @@ em_allocate_receive_structures(struct adapter * adapter)
 	      (struct em_buffer *) malloc(sizeof(struct em_buffer) *
 					     adapter->num_rx_desc, M_DEVBUF,
 					     M_NOWAIT))) {
-		printf("em%d: Unable to allocate rx_buffer memory\n", 
+		dprintf("ipro1000/%d: Unable to allocate rx_buffer memory\n", 
 		       adapter->unit);
 		return(ENOMEM);
 	}
@@ -2845,36 +2845,36 @@ em_print_debug_info(struct adapter *adapter)
 	int unit = adapter->unit;
 	uint8_t *hw_addr = adapter->hw.hw_addr;
 
-	printf("em%d: Adapter hardware address = %p \n", unit, hw_addr);
-	printf("em%d:tx_int_delay = %ld, tx_abs_int_delay = %ld\n", unit, 
+	dprintf("ipro1000/%d: Adapter hardware address = %p \n", unit, hw_addr);
+	dprintf("ipro1000/%d:tx_int_delay = %ld, tx_abs_int_delay = %ld\n", unit, 
 	       E1000_READ_REG(&adapter->hw, TIDV),
 	       E1000_READ_REG(&adapter->hw, TADV));
-	printf("em%d:rx_int_delay = %ld, rx_abs_int_delay = %ld\n", unit, 
+	dprintf("ipro1000/%d:rx_int_delay = %ld, rx_abs_int_delay = %ld\n", unit, 
 	       E1000_READ_REG(&adapter->hw, RDTR),
 	       E1000_READ_REG(&adapter->hw, RADV));
 #ifdef DBG_STATS
-	printf("em%d: Packets not Avail = %ld\n", unit, 
+	dprintf("ipro1000/%d: Packets not Avail = %ld\n", unit, 
 	       adapter->no_pkts_avail);
-	printf("em%d: CleanTxInterrupts = %ld\n", unit, 
+	dprintf("ipro1000/%d: CleanTxInterrupts = %ld\n", unit, 
 	       adapter->clean_tx_interrupts);
 #endif
-	printf("em%d: fifo workaround = %lld, fifo_reset = %lld\n", unit, 
+	dprintf("ipro1000/%d: fifo workaround = %Ld, fifo_reset = %Ld\n", unit, 
 	       (long long)adapter->tx_fifo_wrk, 
 	       (long long)adapter->tx_fifo_reset);
-	printf("em%d: hw tdh = %ld, hw tdt = %ld\n", unit,
+	dprintf("ipro1000/%d: hw tdh = %ld, hw tdt = %ld\n", unit,
 	       E1000_READ_REG(&adapter->hw, TDH), 
 	       E1000_READ_REG(&adapter->hw, TDT));
-	printf("em%d: Num Tx descriptors avail = %d\n", unit,
+	dprintf("ipro1000/%d: Num Tx descriptors avail = %d\n", unit,
 	       adapter->num_tx_desc_avail);
-	printf("em%d: Tx Descriptors not avail1 = %ld\n", unit, 
+	dprintf("ipro1000/%d: Tx Descriptors not avail1 = %ld\n", unit, 
 	       adapter->no_tx_desc_avail1);
-	printf("em%d: Tx Descriptors not avail2 = %ld\n", unit, 
+	dprintf("ipro1000/%d: Tx Descriptors not avail2 = %ld\n", unit, 
 	       adapter->no_tx_desc_avail2);
-	printf("em%d: Std mbuf failed = %ld\n", unit, 
+	dprintf("ipro1000/%d: Std mbuf failed = %ld\n", unit, 
 	       adapter->mbuf_alloc_failed);
-	printf("em%d: Std mbuf cluster failed = %ld\n", unit, 
+	dprintf("ipro1000/%d: Std mbuf cluster failed = %ld\n", unit, 
 	       adapter->mbuf_cluster_failed);
-	printf("em%d: Driver dropped packets = %ld\n", unit, 
+	dprintf("ipro1000/%d: Driver dropped packets = %ld\n", unit, 
 	       adapter->dropped_pkts);
 
 	return;
@@ -2885,42 +2885,42 @@ em_print_hw_stats(struct adapter *adapter)
 {
 	int unit = adapter->unit;
 
-	printf("em%d: Excessive collisions = %lld\n", unit,
+	dprintf("ipro1000/%d: Excessive collisions = %Ld\n", unit,
 	       (long long)adapter->stats.ecol);
-	printf("em%d: Symbol errors = %lld\n", unit, 
+	dprintf("ipro1000/%d: Symbol errors = %Ld\n", unit, 
 	       (long long)adapter->stats.symerrs);
-	printf("em%d: Sequence errors = %lld\n", unit, 
+	dprintf("ipro1000/%d: Sequence errors = %Ld\n", unit, 
 	       (long long)adapter->stats.sec);
-	printf("em%d: Defer count = %lld\n", unit, 
+	dprintf("ipro1000/%d: Defer count = %Ld\n", unit, 
 	       (long long)adapter->stats.dc);
 
-	printf("em%d: Missed Packets = %lld\n", unit, 
+	dprintf("ipro1000/%d: Missed Packets = %Ld\n", unit, 
 	       (long long)adapter->stats.mpc);
-	printf("em%d: Receive No Buffers = %lld\n", unit, 
+	dprintf("ipro1000/%d: Receive No Buffers = %Ld\n", unit, 
 	       (long long)adapter->stats.rnbc);
-	printf("em%d: Receive length errors = %lld\n", unit, 
+	dprintf("ipro1000/%d: Receive length errors = %Ld\n", unit, 
 	       (long long)adapter->stats.rlec);
-	printf("em%d: Receive errors = %lld\n", unit, 
+	dprintf("ipro1000/%d: Receive errors = %Ld\n", unit, 
 	       (long long)adapter->stats.rxerrc);
-	printf("em%d: Crc errors = %lld\n", unit, 
+	dprintf("ipro1000/%d: Crc errors = %Ld\n", unit, 
 	       (long long)adapter->stats.crcerrs);
-	printf("em%d: Alignment errors = %lld\n", unit, 
+	dprintf("ipro1000/%d: Alignment errors = %Ld\n", unit, 
 	       (long long)adapter->stats.algnerrc);
-	printf("em%d: Carrier extension errors = %lld\n", unit,
+	dprintf("ipro1000/%d: Carrier extension errors = %Ld\n", unit,
 	       (long long)adapter->stats.cexterr);
 
-	printf("em%d: XON Rcvd = %lld\n", unit, 
+	dprintf("ipro1000/%d: XON Rcvd = %Ld\n", unit, 
 	       (long long)adapter->stats.xonrxc);
-	printf("em%d: XON Xmtd = %lld\n", unit, 
+	dprintf("ipro1000/%d: XON Xmtd = %Ld\n", unit, 
 	       (long long)adapter->stats.xontxc);
-	printf("em%d: XOFF Rcvd = %lld\n", unit, 
+	dprintf("ipro1000/%d: XOFF Rcvd = %Ld\n", unit, 
 	       (long long)adapter->stats.xoffrxc);
-	printf("em%d: XOFF Xmtd = %lld\n", unit, 
+	dprintf("ipro1000/%d: XOFF Xmtd = %Ld\n", unit, 
 	       (long long)adapter->stats.xofftxc);
 
-	printf("em%d: Good Packets Rcvd = %lld\n", unit,
+	dprintf("ipro1000/%d: Good Packets Rcvd = %Ld\n", unit,
 	       (long long)adapter->stats.gprc);
-	printf("em%d: Good Packets Xmtd = %lld\n", unit,
+	dprintf("ipro1000/%d: Good Packets Xmtd = %Ld\n", unit,
 	       (long long)adapter->stats.gptc);
 
 	return;
