@@ -33,6 +33,7 @@ AddResources input_server : input_server.rdef ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders input ;
+UsePrivateHeaders interface ;
 UsePrivateHeaders storage ;
 
 SubDirC++Flags -DADD_ON_STABLE_SECONDS=1 ;	# for AddOnMonitorHandler.cpp

@@ -15,10 +15,11 @@
 
 #include "BottomlineWindow.h"
 #include "InputServer.h"
+#include "WindowPrivate.h"
 
 BottomlineWindow::BottomlineWindow(const BFont *font)
 	: BWindow(BRect(0,0,350,16), "", 
-		(window_look) 25/*B_FLOATING_WINDOW_LOOK*/, 
+				kLeftTitledWindowLook, 
 				B_FLOATING_ALL_WINDOW_FEEL,
 				B_NOT_V_RESIZABLE | B_NOT_CLOSABLE |
 				B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AVOID_FOCUS |
