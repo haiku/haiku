@@ -56,6 +56,7 @@ main(int argc, char **argv)
 			BList teams;
 			if (argc > 1) {
 				roster.GetAppList(*argv, &teams);
+				rc = B_OK;
 			}
 			if (teams.IsEmpty())
 				rc = roster.Launch(*argv);
