@@ -223,6 +223,17 @@ extern status_t		_kern_set_port_owner(port_id port, team_id team);
 extern status_t		_kern_write_port_etc(port_id port, int32 msgCode, const void *msgBuffer,
 						size_t bufferSize, uint32 flags, bigtime_t timeout);
 
+// debug support functions
+extern void			_kern_debugger(const char *message);
+extern int			_kern_disable_debugger(int state);
+
+extern status_t		_kern_install_default_debugger(port_id debuggerPort);
+extern port_id		_kern_install_team_debugger(team_id team,
+						port_id debuggerPort);
+extern status_t		_kern_remove_team_debugger(team_id team);
+extern status_t		_kern_debug_thread(thread_id thread);
+
+
 /* atomic_* ops (needed for CPUs that don't support them directly) */
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS
 extern int32		_kern_atomic_set(vint32 *value, int32 newValue);
