@@ -33,6 +33,20 @@
 #include <stdio.h>
 #include "kb_mouse_driver.h"
 
+class KeyboardInputDevice;
+
+struct keyboard_device {
+	KeyboardInputDevice *owner;
+	input_device_ref device_ref;
+	char path[B_PATH_NAME_LENGTH];
+	int fd;
+	thread_id device_watcher;
+	kb_settings settings;
+	bool active;
+	bool isAT;
+	uint32 modifiers;
+};
+
 
 class KeyboardInputDevice : public BInputServerDevice {
 public:
@@ -58,6 +72,8 @@ private:
 		
 	static int32 DeviceWatcher(void *arg);
 	static char *GetShortName(const char *longName);
+	
+	void SetLeds(keyboard_device *device);
 	
 	BList fDevices;
 	Keymap	fKeymap;

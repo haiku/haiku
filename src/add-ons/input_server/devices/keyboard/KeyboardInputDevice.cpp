@@ -357,17 +357,6 @@ const uint32 at_keycode_map[] = {
 
 FILE *KeyboardInputDevice::sLogFile = NULL;
 
-struct keyboard_device {
-	KeyboardInputDevice *owner;
-	input_device_ref device_ref;
-	char path[B_PATH_NAME_LENGTH];
-	int fd;
-	thread_id device_watcher;
-	kb_settings settings;
-	bool active;
-	bool isAT;
-};
-
 extern "C"
 BInputServerDevice *
 instantiate_input_device()
@@ -407,17 +396,33 @@ KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 	
 	keyboard_device *device = (keyboard_device *)cookie;
 
-	if (get_key_repeat_rate(&device->settings.key_repeat_rate) != B_OK)
-		LOG_ERR("error when get_key_repeat_rate\n");
-	else
-		if (ioctl(device->fd, kSetKeyRepeatRate, &device->settings.key_repeat_rate)!=B_OK)
-			LOG_ERR("error when kSetKeyRepeatRate, fd:%li\n", device->fd);
+	if (opcode == 0 
+		|| opcode == B_KEY_REPEAT_RATE_CHANGED) { 
+		if (get_key_repeat_rate(&device->settings.key_repeat_rate) != B_OK)
+			LOG_ERR("error when get_key_repeat_rate\n");
+		else
+			if (ioctl(device->fd, kSetKeyRepeatRate, &device->settings.key_repeat_rate)!=B_OK)
+				LOG_ERR("error when kSetKeyRepeatRate, fd:%li\n", device->fd);
+	}
 	
-	if (get_key_repeat_delay(&device->settings.key_repeat_delay) != B_OK)
-		LOG_ERR("error when get_key_repeat_delay\n");
-	else
-		if (ioctl(device->fd, kSetKeyRepeatDelay, &device->settings.key_repeat_delay)!=B_OK)
-			LOG_ERR("error when kSetKeyRepeatDelay, fd:%li\n", device->fd);
+	if (opcode == 0 
+		|| opcode == B_KEY_REPEAT_DELAY_CHANGED) { 
+	
+		if (get_key_repeat_delay(&device->settings.key_repeat_delay) != B_OK)
+			LOG_ERR("error when get_key_repeat_delay\n");
+		else
+			if (ioctl(device->fd, kSetKeyRepeatDelay, &device->settings.key_repeat_delay)!=B_OK)
+				LOG_ERR("error when kSetKeyRepeatDelay, fd:%li\n", device->fd);
+	}
+	
+	if (opcode == 0 
+		|| opcode == B_KEY_MAP_CHANGED 
+		|| opcode == B_KEY_LOCKS_CHANGED) {	
+		fKeymap.LoadCurrent();
+		SetLeds(device);
+		device->modifiers = fKeymap.Locks();
+	}
+	
 	return B_OK;
 }
 
@@ -592,7 +597,6 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 	CALLED();
 	keyboard_device *dev = (keyboard_device *)arg;
 	uint8 buffer[16];
-	uint32 currentModifiers = 0;
 	uint8 activeDeadKey = 0;
 	Keymap *keymap = &dev->owner->fKeymap;
 	uint32 lastKeyCode = 0;
@@ -669,13 +673,13 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				BMessage *msg = new BMessage;
 				msg->AddInt64("when", timestamp);
 				msg->what = B_MODIFIERS_CHANGED;
-				msg->AddInt32("be:old_modifiers", currentModifiers);
+				msg->AddInt32("be:old_modifiers", dev->modifiers);
 				if ((is_keydown && !(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)))
-					|| (is_keydown && !(currentModifiers & modifiers)))
-					currentModifiers |= modifiers;
+					|| (is_keydown && !(dev->modifiers & modifiers)))
+					dev->modifiers |= modifiers;
 				else
-					currentModifiers &= !modifiers;
-				msg->AddInt32("modifiers", currentModifiers);
+					dev->modifiers &= !modifiers;
+				msg->AddInt32("modifiers", dev->modifiers);
 				msg->AddData("states", B_UINT8_TYPE, states, 16);
 				if (dev->owner->EnqueueMessage(msg)!=B_OK)
 					delete msg;
@@ -686,13 +690,13 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			uint8 newDeadKey = 0;
 				
 			if (activeDeadKey == 0) {
-				newDeadKey = keymap->IsDeadKey(keycode, currentModifiers);				
+				newDeadKey = keymap->IsDeadKey(keycode, dev->modifiers);				
 			}
 		
 			
 			// new dead key behaviour
 			/*if (newDeadKey == 0) {
-				keymap->GetChars(keycode, currentModifiers, activeDeadKey, &str, &numBytes);
+				keymap->GetChars(keycode, dev->modifiers, activeDeadKey, &str, &numBytes);
 				keymap->GetChars(keycode, 0, 0, &str2, &numBytes2);
 			}
 			
@@ -701,7 +705,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			
 			// R5-like dead key behaviour
 			if (newDeadKey == 0) {
-				keymap->GetChars(keycode, currentModifiers, activeDeadKey, &str, &numBytes);
+				keymap->GetChars(keycode, dev->modifiers, activeDeadKey, &str, &numBytes);
 				keymap->GetChars(keycode, 0, 0, &str2, &numBytes2);
 			
 				BMessage *msg = new BMessage;
@@ -712,7 +716,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				
 				msg->AddInt64("when", timestamp);
 				msg->AddInt32("key", keycode);
-				msg->AddInt32("modifiers", currentModifiers);
+				msg->AddInt32("modifiers", dev->modifiers);
 				msg->AddData("states", B_UINT8_TYPE, states, 16);
 				if (numBytes>0) {
 					for (int i=0; i<numBytes; i++)
@@ -785,4 +789,24 @@ KeyboardInputDevice::RecursiveScan(const char *directory)
 		else
 			AddDevice(path.Path());
 	}
+}
+
+
+void
+KeyboardInputDevice::SetLeds(keyboard_device *device)
+{
+	if (device->fd<0)
+		return;
+	
+	uint32 locks = device->owner->fKeymap.Locks();
+	char lock_io[3];
+	memset(lock_io, 0, sizeof(lock_io));
+	if (locks & B_NUM_LOCK)
+		lock_io[0] = 1;
+	if (locks & B_CAPS_LOCK)
+		lock_io[1] = 1;
+	if (locks & B_SCROLL_LOCK)
+		lock_io[2] = 1;
+	
+	ioctl(device->fd, kSetLeds, &lock_io);
 }
