@@ -155,7 +155,7 @@ dump_address_info(int argc, char **argv)
 	if (elf_lookup_symbol_address(address, NULL, &symbol, &imageName, &exactMatch) == B_OK)
 		dprintf("%p = %s (%s)%s\n", (void *)address, symbol, imageName, exactMatch ? "" : " (nearest)");
 	else
-		dprintf("lookup failed\n");
+		dprintf("There is no image loaded at this address!\n");
 
 	return 0;
 }
