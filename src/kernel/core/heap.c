@@ -27,7 +27,7 @@
 #define PARANOID_POINTER_CHECK 1
 /* initialize newly allocated memory with something non zero */  
 #define PARANOID_KMALLOC 1
-/* check if freed pointers are already freed */  
+/* check if freed pointers are already freed, and fill freed memory with 0xdeadbeef */  
 #define PARANOID_KFREE 1
 /* use a back and front wall around each allocation */
 /* does currently not work correctly, because the VM malloc()s a PAGE_SIZE and
@@ -374,6 +374,19 @@ free(void *address)
 
 	if (bin->element_size <= PAGE_SIZE && (addr)address % bin->element_size != 0)
 		panic("kfree: passed invalid pointer %p! Supposed to be in bin for esize 0x%x\n", address, bin->element_size);
+
+#if PARANOID_KFREE
+	// mark the free space as freed
+	{
+		uint32 deadbeef = 0xdeadbeef;
+		uint8 *dead = (uint8 *)address;
+		int32 i;
+
+		// the first 4 bytes are overwritten with the next free list pointer later
+		for (i = 4; i < bin->element_size; i++)
+			dead[i] = ((uint8 *)&deadbeef)[i % 4];
+	}
+#endif
 
 	for (i = 0; i < bin->element_size / PAGE_SIZE; i++) {
 		if (page[i].bin_index != page[0].bin_index)
