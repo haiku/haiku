@@ -22,6 +22,8 @@ extern int __libc_argc;
 extern char **__libc_argv;
 extern const char *__progname;
 
+extern bool gShowMenu;
+
 
 static status_t
 get_device(const char *path, Node **_device)
@@ -179,11 +181,14 @@ platform_add_block_devices(struct stage2_args *args, NodeList *list)
 			addDevices = false;
 		else if (!strcmp(option, "--no-scsi"))
 			scsi = false;
+		else if (!strcmp(option, "--menu"))
+			gShowMenu = true;
 		else {
 			fprintf(stderr, "usage: %s [OPTIONS] [image ...]\n"
 				"  --no-devices\tDon't add real devices from /dev/disk\n"
 				"  --no-scsi\tDon't add SCSI devices (might be problematic with some\n"
-				"\t\tUSB mass storage drivers)\n", __progname);
+				"\t\tUSB mass storage drivers)\n"
+				"  --menu\tShow boot menu\n", __progname);
 			exit(0);
 		}
 	}

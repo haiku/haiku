@@ -1,16 +1,19 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <boot/platform.h>
 
 
+extern bool gShowMenu;
+
+
 uint32
 platform_boot_options(void)
 {
-	return 0;
+	return gShowMenu ? BOOT_OPTION_MENU: 0;
 }
 
 
