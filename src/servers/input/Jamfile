@@ -72,3 +72,6 @@ SEARCH on [ FGristFiles AddOnMonitor.cpp
 Package haiku-inputkit-cvs :
         input_server :
         boot beos system servers ;
+
+Packages haiku-inputkit-cvs :
+        README LICENSE install.sh ;

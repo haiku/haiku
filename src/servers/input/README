@@ -1,0 +1,60 @@
+Haiku Input Kit Replacement v1.0.0
+
+ABOUT:
+
+This is a drop-in replacement for the BeOS Input server that comes with
+BeOS. Its purpose is to be 100% compatible with the original input_server 
+and to improve it by adding features. The package contains the following
+files:
+
+  README
+   The file you are reading.
+
+  LICENSE
+   Conditions for using/distributing this package.
+
+  input_server
+   This is the new replacement Input Server. It will be installed in 
+   /boot/beos/system/servers, overwriting the original input_server file.
+
+  Addons
+   Addons are typically needed to control input devices, and will be installed in
+   /boot/home/config/add-ons/input_server
+
+  Drivers
+   Drivers are the kernel components which know your special devices, and will be 
+   installed in /boot/home/config/add-ons/kernel/drivers/bin
+
+
+INSTALLATION:
+
+Installation is through a zip file. Just unzip the
+file somewhere and double click the install.sh icon.
+
+ADDON INSTALLATION:
+
+Add-ons should be installed in /boot/home/config/add-ons/
+input_server/ in the subdirectory specified in the add on documentation.
+This directory will be automatically created by the installation process.
+The distribution contains the keyboard and mouse device addons.
+
+FILTERS:
+
+This release contains no filter addons. To enable them, use E-mail Filters
+
+IMPLEMENTATION:
+
+The latest version has the following (interesting) features:
+
+ - Add-on based architeture.
+ - Fully multithreaded.
+
+TODO:
+
+This is a partial list of what we intend to implement. Suggestions are welcome:
+
+ - More...
+
+OTHER STUFF
+Thanks to Dr. Zoidberg Enterprises for their README file :)
+
