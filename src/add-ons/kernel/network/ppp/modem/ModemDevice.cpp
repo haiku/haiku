@@ -212,7 +212,7 @@ ModemDevice::ModemDevice(KPPPInterface& interface, driver_parameter *settings)
 	fDialString = get_parameter_value(MODEM_DIAL_KEY, settings);
 	
 #if DEBUG
-	dprintf("ModemDevice::ctor: interfaceName: %s\n", fInterfaceName);
+	dprintf("ModemDevice::ctor: interfaceName: %s\n", fPortName);
 #endif
 }
 
