@@ -65,7 +65,7 @@ SOURCES = \
 	rules.c scan.c search.c timestamp.c variable.c
 
 all: jam0
-	jam0
+	./jam0
 
 jam0:
 	$(CC) $(TARGET) $(CFLAGS) $(SOURCES) $(LINKLIBS)
