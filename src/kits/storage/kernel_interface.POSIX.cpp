@@ -18,6 +18,7 @@
 #include <fsproto.h>
 #include <errno.h>		// errno
 #include <new>
+#include <fs_info.h>	//  File sytem information functions, structs, defines
 #include <fs_attr.h>	//  BeOS's C-based attribute functions
 #include <fs_query.h>	//  BeOS's C-based query functions
 #include <Entry.h>		// entry_ref
@@ -31,6 +32,18 @@
 
 // For convenience:
 struct LongDIR : DIR { char _buffer[B_FILE_NAME_LENGTH]; };
+
+
+//------------------------------------------------------------------------------
+// Device Functions
+//------------------------------------------------------------------------------
+/*! Returns information about the file system on the specified device. */
+
+status_t
+StorageKit::stat_dev(dev_t dev, fs_info* info)
+{
+	return fs_stat_dev(dev, info);
+}
 
 
 //------------------------------------------------------------------------------

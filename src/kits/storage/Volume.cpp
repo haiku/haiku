@@ -2,18 +2,19 @@
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  File Name:		Directory.cpp
+//  File Name:		Volume.cpp
 //
 //	Description:	BVolume class
 // ----------------------------------------------------------------------
 
 #include <Volume.h>
-//#include "Volume.h"
 
 #include <Directory.h>
 #include <Bitmap.h>
 #include <Node.h>
 #include <errno.h>
+#include <fs_info.h>
+#include <kernel_interface.h>
 
 
 #ifdef USE_OPENBEOS_NAMESPACE
@@ -41,6 +42,20 @@ BVolume::BVolume(void)
 BVolume::BVolume(
 	dev_t			dev)
 {
+#if !_PR3_COMPATIBLE_
+	// Initialize reserved class variables to "safe" values:
+	_reserved[0] = 0L;
+	_reserved[1] = 0L;
+	_reserved[2] = 0L;
+	_reserved[3] = 0L;
+	_reserved[4] = 0L;
+	_reserved[5] = 0L;
+	_reserved[6] = 0L;
+	_reserved[7] = 0L;
+		// Place this in a separate initialization method at
+		//	a later time.
+#endif
+
 	SetTo(dev);
 }
 
@@ -54,6 +69,20 @@ BVolume::BVolume(
 BVolume::BVolume(
 	const BVolume&	vol)
 {
+#if !_PR3_COMPATIBLE_
+	// Initialize reserved class variables to "safe" values:
+	_reserved[0] = 0L;
+	_reserved[1] = 0L;
+	_reserved[2] = 0L;
+	_reserved[3] = 0L;
+	_reserved[4] = 0L;
+	_reserved[5] = 0L;
+	_reserved[6] = 0L;
+	_reserved[7] = 0L;
+		// Place this in a separate initialization method at
+		//	a later time.
+#endif
+
 	fDev = vol.Device();
 	fCStatus = vol.InitCheck();
 }
@@ -97,7 +126,7 @@ BVolume::SetTo(
 	// Call the kernel function that gets device information
 	//	in order to determine the device status:
 	fs_info			fsInfo;
-	int				err = fs_stat_dev(dev, &fsInfo);
+	int				err = StorageKit::stat_dev(dev, &fsInfo);
 	
 	if (err != 0) {
 		fCStatus = errno;
@@ -160,7 +189,7 @@ BVolume::GetRootDirectory(
 		//	the device and root node values.
 		
 		fs_info			fsInfo;
-		int				err = fs_stat_dev(fDev, &fsInfo);
+		int				err = StorageKit::stat_dev(fDev, &fsInfo);
 		
 		if (err != 0) {
 			currentStatus = errno;
@@ -197,7 +226,7 @@ BVolume::Capacity(void) const
 		//	and calculate the total storage capacity.
 		
 		fs_info			fsInfo;
-		int				err = fs_stat_dev(fDev, &fsInfo);
+		int				err = StorageKit::stat_dev(fDev, &fsInfo);
 		
 		if (err == 0) {
 			totalBytes = fsInfo.block_size * fsInfo.total_blocks;
@@ -226,7 +255,7 @@ BVolume::FreeBytes(void) const
 		//	and calculate the free storage available.
 		
 		fs_info			fsInfo;
-		int				err = fs_stat_dev(fDev, &fsInfo);
+		int				err = StorageKit::stat_dev(fDev, &fsInfo);
 		
 		if (err == 0) {
 			remainingBytes = fsInfo.block_size * fsInfo.free_blocks;
@@ -255,7 +284,7 @@ BVolume::GetName(
 		//	and copies the device name into the buffer.
 		
 		fs_info			fsInfo;
-		int				err = fs_stat_dev(fDev, &fsInfo);
+		int				err = StorageKit::stat_dev(fDev, &fsInfo);
 		
 		if (err != 0) {
 			currentStatus = errno;
@@ -336,7 +365,7 @@ BVolume::IsRemovable(void) const
 	//	and determines whether or not the device is removable.
 	
 	fs_info			fsInfo;
-	int				err = fs_stat_dev(fDev, &fsInfo);
+	int				err = StorageKit::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeIsRemovable = (fsInfo.flags & B_FS_IS_REMOVABLE);
@@ -360,7 +389,7 @@ BVolume::IsReadOnly(void) const
 	//	and determines whether or not the device is read-only.
 	
 	fs_info			fsInfo;
-	int				err = fs_stat_dev(fDev, &fsInfo);
+	int				err = StorageKit::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeIsReadOnly = (fsInfo.flags & B_FS_IS_READONLY);
@@ -385,7 +414,7 @@ BVolume::IsPersistent(void) const
 	//	is persistent.
 	
 	fs_info			fsInfo;
-	int				err = fs_stat_dev(fDev, &fsInfo);
+	int				err = StorageKit::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeIsPersistent = (fsInfo.flags & B_FS_IS_PERSISTENT);
@@ -410,7 +439,7 @@ BVolume::IsShared(void) const
 	//	over a network.
 	
 	fs_info			fsInfo;
-	int				err = fs_stat_dev(fDev, &fsInfo);
+	int				err = StorageKit::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeIsShared = (fsInfo.flags & B_FS_IS_SHARED);
@@ -435,7 +464,7 @@ BVolume::KnowsMime(void) const
 	//	MIME types.
 	
 	fs_info			fsInfo;
-	int				err = fs_stat_dev(fDev, &fsInfo);
+	int				err = StorageKit::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeKnowsMime = (fsInfo.flags & B_FS_HAS_MIME);
@@ -461,7 +490,7 @@ BVolume::KnowsAttr(void) const
 	//	volume accept attributes.
 	
 	fs_info			fsInfo;
-	int				err = fs_stat_dev(fDev, &fsInfo);
+	int				err = StorageKit::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeKnowsAttr = (fsInfo.flags & B_FS_HAS_ATTR);
@@ -487,7 +516,7 @@ BVolume::KnowsQuery(void) const
 	//	respond to queries.
 	
 	fs_info			fsInfo;
-	int				err = fs_stat_dev(fDev, &fsInfo);
+	int				err = StorageKit::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeKnowsQuery = (fsInfo.flags & B_FS_HAS_QUERY);
@@ -582,4 +611,3 @@ void BVolume::_TurnUpTheVolume8() {}
 #ifdef USE_OPENBEOS_NAMESPACE
 }
 #endif
-

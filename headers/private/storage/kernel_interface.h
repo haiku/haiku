@@ -18,6 +18,7 @@
 #include <sys/dirent.h>		// For dirent
 #include <sys/stat.h>		// For struct stat
 #include <fcntl.h>			// For flock
+#include <fs_info.h>		// File sytem information functions, structs, defines
 
 // Forward Declarations
 typedef struct attr_info;
@@ -44,6 +45,13 @@ struct LongDirEntry : DirEntry { char _buffer[B_FILE_NAME_LENGTH]; };
 
 // Constants -- POSIX versions
 const FileDescriptor NullFd = -1;
+
+
+//------------------------------------------------------------------------------
+// Device Functions
+//------------------------------------------------------------------------------
+/*! Returns information about the file system on the specified device. */
+status_t stat_dev(dev_t dev, fs_info* info);
 
 
 //------------------------------------------------------------------------------

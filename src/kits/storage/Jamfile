@@ -39,6 +39,7 @@ SharedLibrary storage :
 	Statable.cpp
 	SymLink.cpp
 	Volume.cpp
+	VolumeRoster.cpp
 	kernel_interface.POSIX.cpp
 	storage_support.cpp
 ;
