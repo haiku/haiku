@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <image.h>
+#include <Application.h>
 #include <Translator.h>
 #include <TranslatorFormats.h>
 #include <TranslatorRoster.h>
@@ -905,6 +906,9 @@ TranslateTests(BMPTranslatorTest *ptest, BTranslatorRoster *proster,
 void
 BMPTranslatorTest::TranslateTest()
 {
+	BApplication
+		app("application/x-vnd.OpenBeOS-BMPTranslatorTest");
+		
 	// Init
 	NextSubTest();
 	status_t result = B_ERROR;
