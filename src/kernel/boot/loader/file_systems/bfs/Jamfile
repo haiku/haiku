@@ -10,6 +10,7 @@ KernelStaticLibrary boot_bfs :
 	bfs.cpp
 	Directory.cpp
 	File.cpp
+	Link.cpp
 	Stream.cpp
 	BPlusTree.cpp
 	;

@@ -1,6 +1,6 @@
 /* Stream - inode stream access functions
 **
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 #ifndef STREAM_H
@@ -31,7 +31,10 @@ class Stream : public bfs_inode {
 		status_t GetName(char *name, size_t size) const;
 		off_t Size() const { return data.Size(); }
 		off_t ID() const { return fVolume.ToVnode(inode_num); }
+		status_t ReadLink(char *buffer, size_t bufferSize);
+
 		bool IsContainer() const { return Mode() & (S_IFDIR | S_INDEX_DIR | S_ATTR_DIR); }
+		bool IsSymlink() const { return S_ISLNK(Mode()); }
 
 		static Node *NodeFactory(Volume &volume, off_t id);
 

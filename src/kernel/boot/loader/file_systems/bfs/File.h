@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 #ifndef FILE_H
@@ -30,7 +30,7 @@ class File : public Node {
 		virtual int32 Type() const;
 		virtual off_t Size() const;
 
-	private:
+	protected:
 		Stream		fStream;
 };
 

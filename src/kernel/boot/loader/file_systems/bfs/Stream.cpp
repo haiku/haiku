@@ -1,6 +1,6 @@
 /* Stream - inode stream access functions
 **
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -8,6 +8,7 @@
 #include "Stream.h"
 #include "Directory.h"
 #include "File.h"
+#include "Link.h"
 
 #include <util/kernel_cpp.h>
 
@@ -166,6 +167,21 @@ Stream::GetName(char *name, size_t size) const
 		}
 	}
 	return B_ERROR;
+}
+
+
+status_t 
+Stream::ReadLink(char *buffer, size_t bufferSize)
+{
+	// link in the stream
+
+	if (Flags() & INODE_LONG_SYMLINK)
+		return ReadAt(0, (uint8 *)buffer, &bufferSize);
+
+	// link in the inode
+
+	strlcpy(buffer, short_symlink, bufferSize);
+	return B_OK;
 }
 
 
@@ -388,6 +404,9 @@ Stream::NodeFactory(Volume &volume, off_t id)
 
 	if (stream.IsContainer())
 		return new Directory(stream);
+
+	if (stream.IsSymlink())
+		return new Link(stream);
 
 	return new File(stream);
 }

@@ -1,16 +1,23 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
 
 #include "Directory.h"
 #include "File.h"
+#include "Link.h"
 
 #include <StorageDefs.h>
+#include <KernelExport.h>
 #include <util/kernel_cpp.h>
 
 #include <string.h>
+#include <unistd.h>
+
+
+// temp. private VFS API
+extern Node *get_node_from(int fd);
 
 
 namespace BFS {
@@ -82,9 +89,25 @@ Directory::Lookup(const char *name, bool traverseLinks)
 		return NULL;
 
 	Node *node = Stream::NodeFactory(fStream.GetVolume(), id);
-	if (node->Type() == S_IFLNK) {
-		// ToDo: support links!
+
+	if (S_ISLNK(node->Type())) {
+		// the node is a symbolic link, so we have to resolve the path
+		char linkPath[B_PATH_NAME_LENGTH];
+		((Link *)node)->ReadLink(linkPath, sizeof(linkPath));
+
 		delete node;
+			// we don't need this one anymore
+
+		int fd = open_from(this, linkPath, O_RDONLY);
+		if (fd >= 0) {
+			node = get_node_from(fd);
+			if (node != NULL)
+				node->Acquire();
+
+			close(fd);
+			return node;
+		}
+
 		return NULL;
 	}
 
