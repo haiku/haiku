@@ -80,6 +80,15 @@ const ulong PSET_FORE_COLOR	= 'pfcl';
 const ulong PSET_BACK_COLOR	= 'pbcl';
 const ulong PSET__CODING	= 'pcod';
 
+// Terminal Size Messages
+const uint32 EIGHTYTWENTYFOUR 		= 'etfo';
+const uint32 EIGHTYTWENTYFIVE 		= 'etfv';
+const uint32 EIGHTYFORTY 			= 'efor';
+const uint32 ONETHREETWOTWENTYFOUR 	= 'hunf';
+const uint32 ONETHREETWOTWENTYFIVE 	= 'hunv';
+
+const uint32 MSG_FONT_CHANGED		= 'fntc';
+
 ////////////////////////////////////////////////////////////////////////////
 // Preference Read/Write Keys
 ////////////////////////////////////////////////////////////////////////////

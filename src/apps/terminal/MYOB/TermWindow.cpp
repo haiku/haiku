@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
+ * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -67,10 +68,10 @@ extern PrefHandler *gTermPref;
 //
 // help and GPL URL
 //
-#define URL_PREFIX  "file:///boot/home/config/settings/MuTerminal/help/"
-#define INDEX_FILE  "/index.html"
-#define GPL_FILE  "/gpl.html"
-#define CHLP_FILE   "file:///boot/beos/documentation/Shell%20Tools/index.html"
+//#define URL_PREFIX  "file:///boot/home/config/settings/MuTerminal/help/"
+//#define INDEX_FILE  "/index.html"
+//#define GPL_FILE  "/gpl.html"
+//#define CHLP_FILE   "file:///boot/beos/documentation/Shell%20Tools/index.html"
 
 extern int gNowCoding;  /* defined TermParce.cpp */
 char gWindowName[256] = "Terminal";
@@ -88,8 +89,7 @@ void SetCoding (int);
 //
 ////////////////////////////////////////////////////////////////////////////
 TermWindow::TermWindow( BRect frame)
-  : BWindow (frame, NULL, B_DOCUMENT_WINDOW,
-	     B_NOT_ZOOMABLE, B_CURRENT_WORKSPACE)
+  : BWindow (frame, NULL, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE)
 {
   InitWindow();
   SetWindowTitle();
@@ -285,10 +285,30 @@ TermWindow::SetupMenu(void)
    * Make Help Menu.
    */
   fHelpmenu = new BMenu("Settings");
-    fEncodingmenu = new BMenu("Font Encoding");
+  fWindowSizeMenu = new BMenu("Window Size");
+  	fWindowSizeMenu->AddItem(new BMenuItem("80x24", new BMessage(EIGHTYTWENTYFOUR)));
+  	fWindowSizeMenu->AddItem(new BMenuItem("80x25", new BMessage(EIGHTYTWENTYFIVE)));  
+   	fWindowSizeMenu->AddItem(new BMenuItem("80x40", new BMessage(EIGHTYFORTY))); 
+ 	fWindowSizeMenu->AddItem(new BMenuItem("132x24", new BMessage(ONETHREETWOTWENTYFOUR))); 
+ 	fWindowSizeMenu->AddItem(new BMenuItem("132x25", new BMessage(ONETHREETWOTWENTYFIVE))); 
+  fNewFontMenu = new BMenu("Font");
+	fNewFontMenu->SetRadioMode(true);
+		int32 numFamilies1 = count_font_families();
+		for ( int32 i = 0; i < numFamilies1; i++ ) {
+			font_family family;
+			uint32 flags;
+			if ( get_font_family(i, &family, &flags) == B_OK ) {
+				fNewFontMenu->AddItem(item = new BMenuItem(family, new BMessage(MSG_FONT_CHANGED)));
+			//	if (0 ==i) item->SetMarked(true); 
+			}
+		}
+  fNewFontMenu->FindItem (gTermPref->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
+  fEncodingmenu = new BMenu("Font Encoding");
   fEncodingmenu->SetRadioMode(true);
   MakeEncodingMenu(fEncodingmenu, gNowCoding, true);
-  fHelpmenu->AddItem(fEncodingmenu);  
+  fHelpmenu->AddItem(fEncodingmenu);
+  fHelpmenu->AddItem(fWindowSizeMenu);  
+  fHelpmenu->AddItem(fNewFontMenu);
   fHelpmenu->AddItem(new BMenuItem("About Terminal", new BMessage(MENU_SHOW_ABOUT)));
   fMenubar->AddItem(fHelpmenu);
  
@@ -436,6 +456,47 @@ TermWindow::MessageReceived(BMessage *message)
 
     fTermView->Invalidate();
     break;
+
+	case EIGHTYTWENTYFOUR:
+		gTermPref->setString(PREF_COLS, "80");
+		gTermPref->setString(PREF_ROWS, "24");
+	   	this->PostMessage (MSG_ROWS_CHANGED);
+		this->PostMessage (MSG_COLS_CHANGED);
+	break;
+
+	case EIGHTYTWENTYFIVE:
+		gTermPref->setString(PREF_COLS, "80");
+		gTermPref->setString(PREF_ROWS, "25");
+	   	this->PostMessage (MSG_ROWS_CHANGED);
+	   	this->PostMessage (MSG_COLS_CHANGED);
+	break;		
+
+	case EIGHTYFORTY:
+		gTermPref->setString(PREF_COLS, "80");
+		gTermPref->setString(PREF_ROWS, "40");
+	   	this->PostMessage (MSG_ROWS_CHANGED);
+	   	this->PostMessage (MSG_COLS_CHANGED);
+	break;	
+	
+	case ONETHREETWOTWENTYFOUR:
+		gTermPref->setString(PREF_COLS, "132");
+		gTermPref->setString(PREF_ROWS, "24");
+	   	this->PostMessage (MSG_ROWS_CHANGED);
+	   	this->PostMessage (MSG_COLS_CHANGED);
+	break;	
+	
+	case ONETHREETWOTWENTYFIVE:
+		gTermPref->setString(PREF_COLS, "132");
+		gTermPref->setString(PREF_ROWS, "25");
+	   	this->PostMessage (MSG_ROWS_CHANGED);
+	   	this->PostMessage (MSG_COLS_CHANGED);
+	break;	
+	
+	case MSG_FONT_CHANGED:
+    	gTermPref->setString (PREF_HALF_FONT_FAMILY, fNewFontMenu->FindMarked()->Label());
+    	this->PostMessage (MSG_HALF_FONT_CHANGED);
+    break;
+
 
   case MSG_COLOR_CHANGED:
     fBaseView->SetViewColor (gTermPref->getRGB (PREF_TEXT_BACK_COLOR));

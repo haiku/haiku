@@ -44,7 +44,7 @@
 #include "MenuUtil.h"
 
 #include "AppearPrefView.h"
-#include "ShellPrefView.h"
+//#include "ShellPrefView.h"
 #include "PrefView.h"
 #include "spawn.h"
 
@@ -112,7 +112,7 @@ PrefDlg::SetupContent()
   r.bottom -= fTabView->TabHeight(); 
   
   fTabView->AddTab(new AppearancePrefView (r, "Appearance", fTermWindow));
-  fTabView->AddTab(new ShellPrefView (r, "Shell", fTermWindow));
+ // fTabView->AddTab(new ShellPrefView (r, "Shell", fTermWindow));
 
   //
   // OK, Apply and Cancel button.

@@ -48,7 +48,7 @@ aboutWindow::aboutWindow(const char *)
 	Show();
 
 
-text1 = new BStringView(BRect(15,10,390,30), "text", "OpenBeOS Terminal", B_FOLLOW_NONE, B_WILL_DRAW);
+text1 = new BStringView(BRect(15,10,390,30), "text", "Haiku Terminal", B_FOLLOW_NONE, B_WILL_DRAW);
 AddChild(text1);
 
 text2 = new BStringView(BRect(15,30,390,50), "text", "Based on MuTerminal 2.3", B_FOLLOW_NONE, B_WILL_DRAW);
@@ -57,7 +57,7 @@ AddChild(text2);
 text3 = new BStringView(BRect(15,50,390,70), "text", "By Kazuho Okui and Takashi Murai", B_FOLLOW_NONE, B_WILL_DRAW);
 AddChild(text3);
 
-text4 = new BStringView(BRect(15,70,390,90), "text", "OpenBeOS Modifications by Cian Duffy", B_FOLLOW_NONE, B_WILL_DRAW);
+text4 = new BStringView(BRect(15,70,390,90), "text", "Haiku Modifications by Kian Duffy, Daniel Furrer", B_FOLLOW_NONE, B_WILL_DRAW);
 AddChild(text4);
 
 

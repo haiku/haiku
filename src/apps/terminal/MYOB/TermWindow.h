@@ -34,6 +34,8 @@
 #include <Window.h>
 #include <MessageRunner.h>
 
+#include "PrefHandler.h"
+
 class BFont;
 class TermView;
 class TermParse;
@@ -77,17 +79,15 @@ private:
    */
   TermParse	*fTermParse;
   BMenuBar	*fMenubar;
-  BMenu		*fFilemenu, *fEditmenu, *fEncodingmenu, *fHelpmenu, *fFontMenu; 
+  BMenu		*fFilemenu, *fEditmenu, *fEncodingmenu, *fHelpmenu, *fFontMenu, *fWindowSizeMenu, *fNewFontMenu; 
   TermView	*fTermView;
   BView		*fBaseView;
   CodeConv	*fCodeConv;
   BMessage	*fPrintSettings;
   PrefDlg	*fPrefWindow;
-  PrefDlg2	*fPrefWindow2;
   FindDlg	*fFindPanel;
-
   BMessageRunner *fWindowUpdate;
-
+  BMenuItem *item;
 };
 
 #endif // TERMWIN_H

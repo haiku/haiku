@@ -7,12 +7,10 @@ App Terminal2 : AboutWindow.cpp
 	CodeConv.cpp
 	CurPos.cpp
 	MenuUtil.cpp
-#	MousePrefView.cpp
 	Terminal.cpp
 	PrefDlg.cpp
 	PrefHandler.cpp
 	PrefView.cpp
-	ShellPrefView.cpp
 	spawn.cpp
 	TermApp.cpp
 	TermBaseView.cpp
