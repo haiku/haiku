@@ -9,7 +9,7 @@
 #include "DataExchange.h"
 #include "debug.h"
 
-static PluginManager _plugin_manager;
+extern PluginManager _plugin_manager;
 
 /*************************************************************
  * public BMediaDecoder
@@ -82,7 +82,9 @@ BMediaDecoder::InitCheck() const
 	return fInitStatus;
 }
 
-static DecoderPlugin * GetDecoderPlugin(const media_format * format)
+
+static DecoderPlugin *
+GetDecoderPlugin(const media_format * format)
 {
 	server_get_decoder_for_format_request request;
 	server_get_decoder_for_format_reply reply;
@@ -112,6 +114,9 @@ BMediaDecoder::SetTo(const media_format *in_format,
 					 const void *info,
 					 size_t info_size)
 {
+	// ToDo: should be moved into the PluginManager, or better yet, use
+	//		the existing function _CreateDecoder()
+
 	status_t result;
 	fNeedsInit = false;
 	fInitStatus = B_NO_INIT;
@@ -134,8 +139,10 @@ BMediaDecoder::SetTo(const media_format *in_format,
 }
 
 // ask the server for the id'th plugin
-static DecoderPlugin * GetDecoderPlugin(int32 id)
+static DecoderPlugin *
+GetDecoderPlugin(int32 id)
 {
+	// ToDo: should be moved into the PluginManager
 	if (id == 0) {
 		return NULL;
 	}
@@ -160,17 +167,21 @@ BMediaDecoder::SetTo(const media_codec_info *mci)
 	if (decoder == NULL) {
 		return fInitStatus = B_ERROR;
 	}
+	// ToDo: what's the sub_id used for? - asks Axel.
 	fDecoder = decoder;
 	fDecoderID = mci->sub_id;
 	return fInitStatus = B_OK;
 }
 
-/* SetInputFormat() sets the input data format to in_format.
-   Unlike SetTo(), the SetInputFormat() function does not
-   select a codec, so the currently-selected codec will
-   continue to be used.  You should only use SetInputFormat()
-   to refine the format settings if it will not require the
-   use of a different decoder. */
+
+/**	SetInputFormat() sets the input data format to in_format.
+ *	Unlike SetTo(), the SetInputFormat() function does not
+ *	select a codec, so the currently-selected codec will
+ *	continue to be used.  You should only use SetInputFormat()
+ *	to refine the format settings if it will not require the
+ *	use of a different decoder.
+ */
+
 status_t 
 BMediaDecoder::SetInputFormat(const media_format *in_format,
 							  const void *in_info,
@@ -178,40 +189,46 @@ BMediaDecoder::SetInputFormat(const media_format *in_format,
 {
 	if (fNeedsInit)
 		DoLateInit();
-	if (fInitStatus != B_OK) {
+	if (fInitStatus != B_OK)
 		return fInitStatus;
-	}
+
 	printf("DISCARDING FORMAT %s\n",__PRETTY_FUNCTION__);
 	media_format format = *in_format;
 	return fDecoder->Setup(&format,in_info,in_size);
 }
 
-/* SetOutputFormat() sets the format the decoder should output.
-   On return, the output_format is changed to match the actual
-   format that will be output; this can be different if you
-   specified any wildcards. */
+
+/**	SetOutputFormat() sets the format the decoder should output.
+ *	On return, the output_format is changed to match the actual
+ *	format that will be output; this can be different if you
+ *	specified any wildcards.
+ */
+
 status_t 
 BMediaDecoder::SetOutputFormat(media_format *output_format)
 {
 	if (fNeedsInit)
 		DoLateInit();
-	if (fInitStatus != B_OK) {
+	if (fInitStatus != B_OK)
 		return fInitStatus;
-	}
+
 	return fDecoder->NegotiateOutputFormat(output_format);
 }
 
-/* Decodes a chunk of media data into the output buffer specified
-   by out_buffer.  On return, out_frameCount is set to indicate how
-   many frames of data were decoded, and out_mh is the header for
-   the decoded buffer.  The media_decode_info structure info is used
-   on input to specify decoding parameters.
 
-   The amount of data decoded is part of the format determined by
-   SetTo() or SetInputFormat().  For audio, it's the buffer_size.
-   For video, it's one frame, which is height*row_bytes.  The data
-   to be decoded will be fetched from the source by the decoder
-   add-on calling the derived class' GetNextChunk() function. */
+/**	Decodes a chunk of media data into the output buffer specified
+ *	by out_buffer.  On return, out_frameCount is set to indicate how
+ *	many frames of data were decoded, and out_mh is the header for
+ *	the decoded buffer.  The media_decode_info structure info is used
+ *	on input to specify decoding parameters.
+ *
+ *	The amount of data decoded is part of the format determined by
+ *	SetTo() or SetInputFormat().  For audio, it's the buffer_size.
+ *	For video, it's one frame, which is height*row_bytes.  The data
+ *	to be decoded will be fetched from the source by the decoder
+ *	add-on calling the derived class' GetNextChunk() function.
+ */
+
 status_t 
 BMediaDecoder::Decode(void *out_buffer, 
 					  int64 *out_frameCount,
@@ -220,23 +237,30 @@ BMediaDecoder::Decode(void *out_buffer,
 {
 	if (fNeedsInit)
 		DoLateInit();
-	if (fInitStatus != B_OK) {
+	if (fInitStatus != B_OK)
 		return fInitStatus;
-	}
+
 	return fDecoder->Decode(out_buffer,out_frameCount,out_mh,info);
 }
 
+
 status_t 
-BMediaDecoder::GetDecoderInfo(media_codec_info *out_info) const
+BMediaDecoder::GetDecoderInfo(media_codec_info *outInfo) const
 {
 	if (fNeedsInit)
 		const_cast<BMediaDecoder *>(this)->DoLateInit();
-	if (fInitStatus != B_OK) {
+	if (fInitStatus != B_OK)
 		return fInitStatus;
+
+	if (fDecoder != NULL)
+		fDecoder->GetCodecInfo(*outInfo);
+	else {
+		strcpy(outInfo->short_name, "unknown");
+		strcpy(outInfo->pretty_name, "unknown");
 	}
-	UNIMPLEMENTED();
-	out_info->id = fDecoderPluginID;
-	out_info->sub_id = fDecoderID;
+
+	outInfo->id = fDecoderPluginID;
+	outInfo->sub_id = fDecoderID;
 	return B_OK;
 }
 
@@ -265,8 +289,7 @@ BMediaDecoder::DoLateInit()
 		delete fInitInfo;
 		fInitFormat = 0;
 		fInitInfo = 0;
-	}
-	else if (fInitMCI) {
+	} else if (fInitMCI) {
 		SetTo(fInitMCI);
 		delete fInitMCI;
 		fInitMCI = 0;
@@ -337,9 +360,9 @@ status_t BMediaBufferDecoder::GetNextChunk(const void **chunkData,
 										   size_t *chunkLen,
 										   media_header *mh)
 {
-	if (!buffer_size) {
+	if (!buffer_size)
 		return B_LAST_BUFFER_ERROR;
-	}
+
 	*chunkData = buffer;
 	*chunkLen = buffer_size;
 	buffer_size = 0;
