@@ -1113,9 +1113,9 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *_item, bool del)
 	// The plan is simple: If we're given a BMenuItem directly, we use it
 	// and ignore index and count. Otherwise, we use them instead.
 	if (_item != NULL) {
-		// TODO: Check if this is enough.
 		fItems.RemoveItem(_item);
-		_item->Uninstall();
+		_item->SetSuper(NULL);
+		_item->Uninstall();	
 		if (del)
 			delete _item;
 		result = true;
@@ -1126,8 +1126,8 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *_item, bool del)
 		for (int32 i = index + count - 1; i >= index; i--) {
 			item = static_cast<BMenuItem *>(fItems.ItemAt(index));
 			if (item != NULL) {
-				// TODO: Check if this is enough.
 				fItems.RemoveItem(item);
+				item->SetSuper(NULL);
 				item->Uninstall();
 				if (del)
 					delete item;
