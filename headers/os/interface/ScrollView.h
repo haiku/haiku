@@ -18,11 +18,11 @@ class BScrollView : public BView {
 			uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = 0, bool horizontal = false, bool vertical = false,
 			border_style border = B_FANCY_BORDER);
-		BScrollView(BMessage *data);
+		BScrollView(BMessage *archive);
 		virtual ~BScrollView();
 
-		static BArchivable	*Instantiate(BMessage *data);
-		virtual status_t	Archive(BMessage *data, bool deep = true) const;
+		static BArchivable	*Instantiate(BMessage *archive);
+		virtual status_t	Archive(BMessage *archive, bool deep = true) const;
 
 		virtual void		Draw(BRect updateRect);
 		virtual void		AttachedToWindow();
@@ -75,7 +75,7 @@ class BScrollView : public BView {
 		BScrollView			&operator=(const BScrollView &);
 
 		static BRect		CalcFrame(BView *target, bool h, bool v, border_style);
-		int32				ModFlags(int32 flags, border_style);
+		static int32		ModifyFlags(int32 flags, border_style);
 
 		BView				*fTarget;
 		BScrollBar			*fHorizontalScrollBar;
