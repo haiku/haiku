@@ -721,8 +721,10 @@ load_driver_settings(const char *driverName)
 	}
 
 	// we are allowed to call the driver settings pretty early in the boot process
-	if (kernel_startup)
+	if (kernel_startup) {
+		mutex_unlock(&sLock);
 		return NULL;
+	}
 #endif	// _KERNEL_MODE
 #ifdef _BOOT_MODE
 	// see if we already have these settings loaded
@@ -748,8 +750,12 @@ load_driver_settings(const char *driverName)
 
 		file = open(path, O_RDONLY);
 	}
-	if (file < B_OK)
+	if (file < B_OK) {
+#ifdef _KERNEL_MODE
+		mutex_unlock(&sLock);
+#endif
 		return NULL;
+	}
 
 	handle = load_driver_settings_from_file(file, driverName);
 
