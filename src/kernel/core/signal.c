@@ -17,33 +17,6 @@
 #include <syscalls.h>
 
 
-const char * const
-sys_siglist[NSIG] = {
-	/*  0              */  "Signal 0",
-	/*  1 - SIGHUP     */  "Hangup",
-	/*  2 - SIGINT     */  "Interrupt",
-	/*  3 - SIGQUIT    */  "Quit",
-	/*  4 - SIGILL     */  "Illegal instruction",
-	/*  5 - SIGCHLD    */  "Child exited",
-	/*  6 - SIGABRT    */  "Abort",
-	/*  7 - SIGPIPE    */  "Broken pipe",
-	/*  8 - SIGFPE     */  "Floating point exception",
-	/*  9 - SIGKILL    */  "Killed (by death)",
-	/* 10 - SIGSTOP    */  "Stopped",
-	/* 11 - SIGSEGV    */  "Segmentation violation",
-	/* 12 - SIGCONT    */  "Continued",
-	/* 13 - SIGTSTP    */  "Stopped (tty output)",
-	/* 14 - SIGALRM    */  "Alarm",
-	/* 15 - SIGTERM    */  "Termination requested",
-	/* 16 - SIGTTIN    */  "Stopped (tty input)",
-	/* 17 - SIGTTOU    */  "Stopped (tty output)",
-	/* 18 - SIGUSR1    */  "User defined signal 1",
-	/* 19 - SIGUSR2    */  "User defined signal 2",
-	/* 20 - SIGWINCH   */  "Window size changed",
-	/* 21 - SIGKILLTHR */  "Kill Thread",
-	/* 22 - SIGTRAP    */  NULL
-};
-
 
 const char * const sigstr[NSIG] = {
 	"NONE", "HUP", "INT", "QUIT", "ILL", "CHLD", "ABRT", "PIPE",
