@@ -3,12 +3,12 @@ SubDir OBOS_TOP src tests servers net net_server ;
 UsePrivateHeaders net ;
 
 AddResources
-	net_server
+	net_stack_tester
 	:
 	net_server.rsrc
 	;
 
-SimpleTest net_server :
+SimpleTest net_stack_tester :
 	userland_modules.cpp
 	userland_ipc.c
 	net_server.cpp

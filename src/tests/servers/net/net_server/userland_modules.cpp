@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <signal.h>
 
 #include <drivers/KernelExport.h>
 #include <drivers/module.h>
@@ -86,12 +87,14 @@ static int32 g_next_module_id = 1;
 // Public routines
 // ---------------
 
+extern "C" {
+
 _EXPORT status_t get_module(const char * name, module_info ** mi)
 {
 	status_t status;
 	module * m;
 	
-	printf("get_module(%s)\n", name);
+	// printf("get_module(%s)\n", name);
 	
 	m = find_loaded_module_by_name(name);
 	if (!m)
@@ -123,7 +126,7 @@ _EXPORT status_t put_module(const char * name)
 {
 	module * m;
 
-	printf("put_module(%s)\n", name);
+	// printf("put_module(%s)\n", name);
 	
 	m = find_loaded_module_by_name(name);
 	if (!m)
@@ -207,6 +210,7 @@ _EXPORT void * open_module_list(const char *prefix)
 	mlc->search_paths = (addon_path ? strdup(addon_path) : NULL);
 	mlc->search_path = strtok_r(mlc->search_paths, ":", &mlc->next_path_token);
 	mlc->dir_stack = new BList();
+	
 	mlc->ma = NULL;
 	mlc->mi = NULL;
 
@@ -250,6 +254,7 @@ _EXPORT status_t read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 		};
 		
 		// We've iterate all module names of this module addon. Find another one...
+		atomic_add(&mlc->ma->ref_count, -1);
 		unload_module_addon(mlc->ma);
 		mlc->ma = NULL;
 		mlc->mi = NULL;
@@ -314,6 +319,7 @@ _EXPORT status_t read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 		            	// WTF it's doing there?!?
 						continue;
 
+					atomic_add(&mlc->ma->ref_count, 1);
 					// call ourself to enter the module names list iteration at
 					// function begining code...
 					mlc->mi = mlc->ma->infos;
@@ -346,8 +352,10 @@ _EXPORT status_t close_module_list(void *cookie)
 	ASSERT(mlc);
 	ASSERT(mlc->prefix);
 
-	if (mlc->ma)
+	if (mlc->ma) {
+		atomic_add(&mlc->ma->ref_count, -1);
 		unload_module_addon(mlc->ma);
+	};
 
 	while((dir = (BDirectory *) mlc->dir_stack->FirstItem())) {
 		mlc->dir_stack->RemoveItem(dir);
@@ -397,6 +405,16 @@ _EXPORT thread_id spawn_kernel_thread(thread_entry func, const char *name, long 
 {
 	return spawn_thread(func, name, priority, arg);
 }
+
+
+
+_EXPORT int send_signal_etc(pid_t thid, uint sig, uint32 flags)
+{
+	return send_signal(thid, sig);
+}	
+
+
+}  // extern "C"
 
 
 // #pragma mark -
