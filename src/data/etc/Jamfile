@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src data etc ;
 
+SubInclude OBOS_TOP src data etc keymaps ;
 SubInclude OBOS_TOP src data etc timezones ;

@@ -1,0 +1,34 @@
+SubDir OBOS_TOP src data etc keymaps ;
+
+NotFile keymap_files ;
+Depends files : keymap_files ;
+
+rule MkKeymapComp
+{
+	local binary = $(1) ;
+	local source = $(2) ;
+
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
+	MakeLocate $(binary) : [ FDirName $(OBOS_ETC_DIR) Keymap ] ;
+
+	LocalDepends keymap_files : $(binary) ;
+	Depends $(binary) : $(source) keymap ;
+	MkKeymapComp1 $(binary) : keymap $(source) ;
+	LocalClean clean : $(binary) ;
+}
+
+actions MkKeymapComp1
+{
+	$(2[1]) -o "$(1)" -c "$(2[2-])" ;
+}
+
+local keymapFiles = [ GLOB $(SUBDIR) : *.keymap ] ;
+
+# generate the binary file for the keymap files
+local keymapFile ;
+for keymapFile in [ FGristFiles $(keymapFiles:D=) ] {
+	local binary = $(keymapFile:BG=keymap) ;
+	MkKeymapComp $(binary) : $(keymapFile) ;
+	Package haiku-inputkit-cvs : $(binary) : boot home config settings Keymap ;
+}
+
