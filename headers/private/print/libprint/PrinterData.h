@@ -21,23 +21,20 @@ class PrinterData {
 public:
 	PrinterData(BNode *node = NULL);
 	~PrinterData();
-/*
-	PrinterData(const PrinterData &printer_data);
-	PrinterData &operator = (const PrinterData &printer_data);
-*/
-	void load(BNode *node);
-//	void save(BNode *node = NULL);
+	void load();
+	void save();
 
 	const string &getDriverName() const;
 	const string &getPrinterName() const;
 	const string &getComments() const;
 	const string &getTransport() const;
+	int getProtocolClass() const;
 
-//	void  setDriverName(const char *s) { fDriverName = driver_name; }
 	void  setPrinterName(const char *printer_name);
 	void  setComments(const char *comments);
+	void  setProtocolClass(int protocolClass);
 
-	bool getPath(char *path) const;
+	bool getPath(string &path) const;
 
 protected:
 	PrinterData(const PrinterData &printer_data);
@@ -48,6 +45,8 @@ private:
 	string fPrinterName;
 	string fComments;
 	string fTransport;
+	int    fProtocolClass;
+	
 	BNode  *fNode;
 };
 
@@ -71,6 +70,11 @@ inline const string &PrinterData::getTransport() const
 	return fTransport;
 }
 
+inline int PrinterData::getProtocolClass() const
+{
+	return fProtocolClass;
+}
+
 inline void PrinterData::setPrinterName(const char *printer_name)
 {
 	fPrinterName = printer_name;
@@ -79,6 +83,11 @@ inline void PrinterData::setPrinterName(const char *printer_name)
 inline void PrinterData::setComments(const char *comments)
 {
 	fComments = comments;
+}
+
+inline void PrinterData::setProtocolClass(int protocolClass)
+{
+	fProtocolClass = protocolClass;
 }
 
 #endif	// __PRINTERDATA_H

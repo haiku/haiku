@@ -4,30 +4,17 @@
  */
 
 #include "PrinterCap.h"
+#include "PrinterData.h"
 
 PrinterCap::PrinterCap(const PrinterData *printer_data)
-	: fPrinterData(printer_data), fPrinterID(kUnknownPrinter)
+	: fPrinterData(printer_data), 
+	fPrinterID(kUnknownPrinter)
 {
 }
 
 PrinterCap::~PrinterCap()
 {
 }
-
-/*
-PrinterCap::PrinterCap(const PrinterCap &printer_cap)
-{
-	fPrinterData = printer_cap.fPrinterData;
-	fPrinterID   = printer_cap.fPrinterID;
-}
-
-PrinterCap::PrinterCap &operator = (const PrinterCap &printer_cap)
-{
-	fPrinterData = printer_cap.fPrinterData;
-	fPrinterID   = printer_cap.fPrinterID;
-	return *this;
-}
-*/
 
 const BaseCap *PrinterCap::getDefaultCap(CapID id) const
 {
@@ -42,4 +29,8 @@ const BaseCap *PrinterCap::getDefaultCap(CapID id) const
 		}
 	}
 	return NULL;
+}
+
+int PrinterCap::getProtocolClass() const {
+	return fPrinterData->getProtocolClass();
 }

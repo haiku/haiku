@@ -15,6 +15,7 @@
 
 #include "BeUtils.h"
 #include "AboutBox.h"
+#include "AddPrinterDlg.h"
 #include "DbgMsg.h"
 #include "Exports.h"
 #include "GraphicsDriver.h"
@@ -27,6 +28,7 @@
 
 PrinterDriver::PrinterDriver(BNode* spoolFolder)
 	: fSpoolFolder(spoolFolder)
+	, fPrinterData(NULL)
 	, fPrinterCap(NULL)
 	, fGraphicsDriver(NULL)
 {
@@ -39,9 +41,19 @@ PrinterDriver::~PrinterDriver()
 	
 	delete fPrinterCap;
 	fPrinterCap = NULL;
+
+	delete fPrinterData;
+	fPrinterData = NULL;
 }
 
-void PrinterDriver::About() 
+void 
+PrinterDriver::InitPrinterDataAndCap() {
+	fPrinterData = new PrinterData(fSpoolFolder);
+	fPrinterCap = InstantiatePrinterCap(fPrinterData);
+}
+
+void 
+PrinterDriver::About() 
 {
 	BString copyright;
 	copyright = "libprint Copyright © 1999-2000 Y.Takagi\n";
@@ -52,7 +64,8 @@ void PrinterDriver::About()
 	app.Run();
 }
 
-char* PrinterDriver::AddPrinter(char* printerName)
+char* 
+PrinterDriver::AddPrinter(char* printerName)
 {
 	// print_server has created a spool folder with name printerName in
 	// folder B_USER_PRINTERS_DIRECTORY. It can be used to store
@@ -60,10 +73,29 @@ char* PrinterDriver::AddPrinter(char* printerName)
 	DBGMSG((">%s: add_printer\n", GetDriverName()));
 	DBGMSG(("\tprinter_name: %s\n", printerName));
 	DBGMSG(("<%s: add_printer\n", GetDriverName()));
+	
+	if (fPrinterCap->isSupport(PrinterCap::kProtocolClass)) {
+		if (fPrinterCap->countCap(PrinterCap::kProtocolClass) > 1) {
+			AddPrinterDlg *dialog;
+			dialog = new AddPrinterDlg(fPrinterData, fPrinterCap);
+			if (dialog->Go() != B_OK) {
+				// dialog canceled
+				return NULL;
+			}
+		} else {
+			const ProtocolClassCap* pcCap;
+			pcCap = (const ProtocolClassCap*)fPrinterCap->getDefaultCap(PrinterCap::kProtocolClass);
+			if (pcCap != NULL) {
+				fPrinterData->setProtocolClass(pcCap->protocolClass);
+				fPrinterData->save();
+			}
+		}
+	}
 	return printerName;
 }
 
-BMessage* PrinterDriver::ConfigPage(BMessage* settings)
+BMessage* 
+PrinterDriver::ConfigPage(BMessage* settings)
 {
 	DBGMSG((">%s: config_page\n", GetDriverName()));
 	DUMP_BMESSAGE(settings);
@@ -71,9 +103,7 @@ BMessage* PrinterDriver::ConfigPage(BMessage* settings)
 	
 	BMessage pageSettings(*settings);
 	MergeWithPreviousSettings(kAttrPageSettings, &pageSettings);
-	PrinterData printerData(fSpoolFolder);
-	fPrinterCap = InstantiatePrinterCap(&printerData);
-	UIDriver drv(&pageSettings, &printerData, fPrinterCap);
+	UIDriver drv(&pageSettings, fPrinterData, fPrinterCap);
 	BMessage *result = drv.configPage();
 	WriteSettings(kAttrPageSettings, result);
 
@@ -82,7 +112,8 @@ BMessage* PrinterDriver::ConfigPage(BMessage* settings)
 	return result;
 }
 
-BMessage* PrinterDriver::ConfigJob(BMessage* settings)
+BMessage* 
+PrinterDriver::ConfigJob(BMessage* settings)
 {
 	DBGMSG((">%s: config_job\n", GetDriverName()));
 	DUMP_BMESSAGE(settings);
@@ -90,9 +121,7 @@ BMessage* PrinterDriver::ConfigJob(BMessage* settings)
 	
 	BMessage jobSettings(*settings);
 	MergeWithPreviousSettings(kAttrJobSettings, &jobSettings);
-	PrinterData printerData(fSpoolFolder);
-	fPrinterCap = InstantiatePrinterCap(&printerData);
-	UIDriver drv(&jobSettings, &printerData, fPrinterCap);
+	UIDriver drv(&jobSettings, fPrinterData, fPrinterCap);
 	BMessage *result = drv.configJob();
 	WriteSettings(kAttrJobSettings, result);
 	
@@ -101,15 +130,14 @@ BMessage* PrinterDriver::ConfigJob(BMessage* settings)
 	return result;
 }
 
-BMessage* PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
+BMessage* 
+PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 {
 	DBGMSG((">%s: take_job\n", GetDriverName()));
 	DUMP_BMESSAGE(settings);
 	DUMP_BNODE(fSpoolFolder);
 
-	PrinterData printerData(fSpoolFolder);
-	fPrinterCap = InstantiatePrinterCap(&printerData);
-	fGraphicsDriver = InstantiateGraphicsDriver(settings, &printerData, fPrinterCap);
+	fGraphicsDriver = InstantiateGraphicsDriver(settings, fPrinterData, fPrinterCap);
 	BMessage *result = fGraphicsDriver->takeJob(printJob);
 
 	DUMP_BMESSAGE(result);
@@ -118,7 +146,8 @@ BMessage* PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 }
 
 // read settings from spool folder attribute
-bool PrinterDriver::ReadSettings(const char* attrName, BMessage* settings)
+bool 
+PrinterDriver::ReadSettings(const char* attrName, BMessage* settings)
 {
 	attr_info info;
 	char*  data;
@@ -138,7 +167,8 @@ bool PrinterDriver::ReadSettings(const char* attrName, BMessage* settings)
 }
 
 // write settings to spool folder attribute
-void PrinterDriver::WriteSettings(const char* attrName, BMessage* settings)
+void 
+PrinterDriver::WriteSettings(const char* attrName, BMessage* settings)
 {
 	if (settings == NULL || settings->what != 'okok') return;
 	
@@ -155,7 +185,8 @@ void PrinterDriver::WriteSettings(const char* attrName, BMessage* settings)
 }
 
 // read settings from spool folder attribute and merge them to current settings
-void PrinterDriver::MergeWithPreviousSettings(const char* attrName, BMessage* settings)
+void 
+PrinterDriver::MergeWithPreviousSettings(const char* attrName, BMessage* settings)
 {
 	if (settings == NULL) return;
 	
@@ -182,6 +213,9 @@ private:
 PrinterDriverInstance::PrinterDriverInstance(BNode* spoolFolder)
 {
 	fInstance = instantiate_printer_driver(spoolFolder);
+	if (fInstance != NULL) {
+		fInstance->InitPrinterDataAndCap();
+	}
 }
 
 PrinterDriverInstance::~PrinterDriverInstance()

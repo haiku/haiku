@@ -71,16 +71,23 @@ struct ColorCap : public BaseCap {
 		: BaseCap(n, d), color(c) {}
 };
 
+struct ProtocolClassCap : public BaseCap {
+	int protocolClass;
+	string description;
+	ProtocolClassCap(const string &n, bool d, int p, const string &desc)
+		: BaseCap(n, d)
+		, protocolClass(p) 
+		, description(desc) {}
+};
+
+
 class PrinterData;
 
 class PrinterCap {
 public:
 	PrinterCap(const PrinterData *printer_data);
 	virtual ~PrinterCap();
-/*
-	PrinterCap(const PrinterCap &printer_cap);
-	PrinterCap &operator = (const PrinterCap &printer_cap);
-*/
+
 	enum CapID {
 		kPaper,
 		kPaperSource,
@@ -89,6 +96,7 @@ public:
 		kPrintStyle,
 		kBindingLocation,
 		kColor,
+		kProtocolClass,
 		// Static boolean settings follow.
 		// For them isSupport() has to be implemented only.
 		kCopyCommand,       // supports printer page copy command?
@@ -99,6 +107,7 @@ public:
 	virtual const BaseCap **enumCap(CapID) const = 0;
 	const BaseCap *getDefaultCap(CapID) const;
 	int getPrinterId() const;
+	int getProtocolClass() const;
 
 protected:
 	PrinterCap(const PrinterCap &);

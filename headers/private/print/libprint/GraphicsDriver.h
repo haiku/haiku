@@ -7,6 +7,7 @@
 #define	__GRAPHICSDRIVER_H
 
 #include "JobData.h"
+#include "PrinterData.h"
 #include "PrintProcess.h"
 #include "SpoolMetaData.h"
 #include "Transport.h"
@@ -45,6 +46,7 @@ protected:
 	const PrinterData *getPrinterData() const;
 	const PrinterCap *getPrinterCap() const;
 	const SpoolMetaData *getSpoolMetaData() const;
+	int getProtocolClass() const;
 
 	int getPageWidth()  const;
 	int getPageHeight() const;
@@ -109,6 +111,11 @@ inline const PrinterCap *GraphicsDriver::getPrinterCap() const
 inline const SpoolMetaData *GraphicsDriver::getSpoolMetaData() const
 {
 	return fSpoolMetaData;
+}
+
+inline int GraphicsDriver::getProtocolClass() const
+{
+	return fPrinterData->getProtocolClass();
 }
 
 inline int GraphicsDriver::getPageWidth() const

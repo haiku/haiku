@@ -62,10 +62,10 @@ Transport::Transport(const PrinterData *printer_data)
 	}
 
 	if (fInitTransport) {
-		char spool_path[256];
+		string spool_path;
 		printer_data->getPath(spool_path);
 		BMessage *msg = new BMessage('TRIN');
-		msg->AddString("printer_file", spool_path);
+		msg->AddString("printer_file", spool_path.c_str());
 		fDataStream = (*fInitTransport)(msg);
 		delete msg;
 		if (fDataStream == 0) {

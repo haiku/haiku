@@ -338,6 +338,7 @@ PageSetupView::UpdateJobData()
 	PaperCap *paperCap = GetPaperCap();	
 	BRect paper_rect = paperCap->paper_rect;
 	BRect physical_rect = paperCap->physical_rect;
+	fJobData->setPaper(paperCap->paper);
 
 	int count;
 

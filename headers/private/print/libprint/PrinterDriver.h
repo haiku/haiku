@@ -26,11 +26,18 @@ public:
 	virtual PrinterCap* InstantiatePrinterCap(PrinterData* printerData) = 0;
 	virtual GraphicsDriver* InstantiateGraphicsDriver(BMessage* settings, PrinterData* printerData, PrinterCap* printerCap) = 0;
 	
+	void InitPrinterDataAndCap();
+
 	virtual void About();
 	virtual char* AddPrinter(char* printerName);
 	BMessage* ConfigPage(BMessage* settings);
 	BMessage* ConfigJob(BMessage* settings);
 	BMessage* TakeJob(BFile* printJob, BMessage* settings);
+
+protected:
+	
+	PrinterData* GetPrinterData() { return fPrinterData; }
+	PrinterCap* GetPrinterCap() { return fPrinterCap; }
 
 private:
 	bool ReadSettings(const char* attrName, BMessage* settings);
@@ -38,6 +45,7 @@ private:
 	void MergeWithPreviousSettings(const char* attrName, BMessage* settings);
 
 	BNode*          fSpoolFolder;
+	PrinterData*    fPrinterData;
 	PrinterCap*     fPrinterCap;
 	GraphicsDriver* fGraphicsDriver;
 };

@@ -14,44 +14,24 @@ const char *PD_DRIVER_NAME      = "Driver Name";
 const char *PD_PRINTER_NAME     = "Printer Name";
 const char *PD_COMMENTS         = "Comments";
 const char *PD_TRANSPORT        = "transport";
+const char *PD_PROTOCOL_CLASS   = "libprint:protocolClass";
 
 PrinterData::PrinterData(BNode *node)
+	: fProtocolClass(0)
+	, fNode(node)
 {
-	if (node) {
-		load(node);
-	}
+	load();
 }
 
 PrinterData::~PrinterData()
 {
 }
 
-/*
-PrinterData::PrinterData(const PrinterData &printer_data)
+void PrinterData::load()
 {
-	fDriverName  = printer_data.fDriverName;
-	fPrinterName = printer_data.fPrinterName;
-	fComments     = printer_data.fComments;
-	fTransport    = printer_data.fTransport;
-	fNode         = printer_data.fNode;
-}
-
-PrinterData &PrinterData::operator = (const PrinterData &printer_data)
-{
-	fDriverName  = printer_data.fDriverName;
-	fPrinterName = printer_data.fPrinterName;
-	fComments     = printer_data.fComments;
-	fTransport    = printer_data.fTransport;
-	fNode         = printer_data.fNode;
-	return *this;
-}
-*/
-
-void PrinterData::load(BNode *node)
-{
+	if (fNode == NULL) return;
+	
 	char buffer[512];
-
-	fNode = node;
 
 	fNode->ReadAttr(PD_DRIVER_NAME,  B_STRING_TYPE, 0, buffer, sizeof(buffer));
 	fDriverName = buffer;
@@ -61,37 +41,29 @@ void PrinterData::load(BNode *node)
 	fComments = buffer;
 	fNode->ReadAttr(PD_TRANSPORT,    B_STRING_TYPE, 0, buffer, sizeof(buffer));
 	fTransport = buffer;
+	fNode->ReadAttr(PD_PROTOCOL_CLASS, B_BOOL_TYPE, 0, &fProtocolClass, sizeof(fProtocolClass));
 }
 
-/*
-void PrinterData::save(BNode *node)
+void PrinterData::save()
 {
-	BDirectory dir;
-	if (node == NULL) {
-		BPath path;
-		::find_directory(B_USER_PRINTERS_DIRECTORY, &path, false);
-		path.Append(fPrinterName.c_str());
-		BDirectory base_dir;
-		base_dir.CreateDirectory(path.Path(), &dir);
-		node = &dir;
-	}
-	node->WriteAttr(PD_DRIVER_NAME,  B_STRING_TYPE, 0, driver_name_.c_str(),  driver_name_.length()  + 1);
-	node->WriteAttr(PD_PRINTER_NAME, B_STRING_TYPE, 0, printer_name_.c_str(), printer_name_.length() + 1);
-	node->WriteAttr(PD_COMMENTS,     B_STRING_TYPE, 0, comments_.c_str(),     comments_.length()     + 1);
-}
-*/
+	if (fNode == NULL) return;
 
-bool PrinterData::getPath(char *buf) const
+	fNode->WriteAttr(PD_PROTOCOL_CLASS, B_BOOL_TYPE, 0, &fProtocolClass, sizeof(fProtocolClass));
+}
+
+bool PrinterData::getPath(string &path) const
 {
-	if (fNode) {
-		node_ref nref;
-		fNode->GetNodeRef(&nref);
-		BDirectory dir;
-		dir.SetTo(&nref);
-		BPath path(&dir, NULL);
-		strcpy(buf, path.Path());
-		return true;
-	}
-	*buf = '\0';
-	return false;
+	if (fNode == NULL) return false;
+	
+	node_ref nref;
+	if (fNode->GetNodeRef(&nref) != B_OK) return false;
+
+	BDirectory dir(&nref);
+	if (dir.InitCheck() != B_OK) return false;
+		
+	BPath path0(&dir, ".");
+	if (path0.InitCheck() != B_OK) return false;
+		
+	path = path0.Path();
+	return true;
 }
