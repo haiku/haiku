@@ -223,22 +223,59 @@ status_t nv_crtc2_set_timing(display_mode target)
 	/* (interlace is supported on upto and including NV10, NV15, and NV30 and up) */
 	CRTC2W(INTERLACE, 0xff);
 
-	/* setup flatpanel scaling if needed */
-	//fixme: unlock registers and/or setup chksum?!? doesn't work yet :-/
+	/* setup flatpanel if connected and active */
 	if (si->ps.tmds2_active)
 	{
 		uint32 iscale_x, iscale_y;
 
 		//fixme: checkout upscaling and aspect!!!
-		iscale_x = ((4096 * target.timing.h_display) / si->ps.panel2_width);
-		iscale_y = ((4096 * target.timing.v_display) / si->ps.panel2_height);
-		DAC2W(FP_DEBUG3, (iscale_x & 0x00001fff) | ((iscale_y & 0x00001fff) << 16));
+		/* calculate needed inverse scaling factors in 20.12 format */
+		iscale_x = (((1 << 12) * target.timing.h_display) / si->ps.panel2_width);
+		iscale_y = (((1 << 12) * target.timing.v_display) / si->ps.panel2_height);
 
-		/* limit last fetched line if vertical scaling is done */
-		if (iscale_y != 4096)
-			DAC2W(FP_DEBUG2, ((1 << 28) | ((target.timing.v_display - 1) << 16)));
-		else
+		/* unblock flatpanel timing programming (or something like that..) */
+		CRTC2W(FP_HTIMING, 0);
+		CRTC2W(FP_VTIMING, 0);
+
+		/* nVidia cards only support upscaling: NV11 can't scale at all */
+		if ((si->ps.card_arch == NV11) ||
+			(iscale_x > (1 << 12)) || (iscale_y > (1 << 12)))
+		{
+			LOG(2,("CRTC2: DFP needs to do scaling\n"));
+
+			/* disable last fetched line limiting */
 			DAC2W(FP_DEBUG2, 0x00000000);
+			/* inform panel to scale */
+			DAC2W(FP_TG_CTRL, (DAC2R(FP_TG_CTRL) | 0x00000100));
+		}
+		else
+		{
+			LOG(2,("CRTC2: GPU scales if needed\n"));
+
+			/* GPU scaling is automatically setup by hardware */
+//fixme: checkout non 4:3 aspect scaling.
+//			DAC2W(FP_DEBUG3, (iscale_x & 0x00001fff) | ((iscale_y & 0x00001fff) << 16));
+//			temp = (((iscale_x >> 1) & 0x00000fff) | (((iscale_y >> 1) & 0x00000fff) << 16));
+//			DAC2W(FP_DEBUG1, (temp | (1 << 12) | (1 << 28)));
+
+			/* limit last fetched line if vertical scaling is done */
+			if (iscale_y != (1 << 12))
+				DAC2W(FP_DEBUG2, ((1 << 28) | ((target.timing.v_display - 1) << 16)));
+//not needed apparantly:
+//								((1 << 12) | ((target.timing.h_display - 1) <<  0)));
+			else
+				DAC2W(FP_DEBUG2, 0x00000000);
+
+			/* inform panel not to scale */
+			DAC2W(FP_TG_CTRL, (DAC2R(FP_TG_CTRL) & 0xfffffeff));
+		}
+
+		/* do some logging.. */
+		LOG(2,("CRTC2: FP_DEBUG0 reg readback: $%08x\n", DAC2R(FP_DEBUG0)));
+		LOG(2,("CRTC2: FP_DEBUG1 reg readback: $%08x\n", DAC2R(FP_DEBUG1)));
+		LOG(2,("CRTC2: FP_DEBUG2 reg readback: $%08x\n", DAC2R(FP_DEBUG2)));
+		LOG(2,("CRTC2: FP_DEBUG3 reg readback: $%08x\n", DAC2R(FP_DEBUG3)));
+		LOG(2,("CRTC2: FP_TG_CTRL reg readback: $%08x\n", DAC2R(FP_TG_CTRL)));
 	}
 
 	return B_OK;

@@ -310,6 +310,8 @@ static void detect_panels()
 		 * relying on the cards BIOS to do it. This adds TVout options where panels
 		 * are used!
 		 * Currently we'd loose the panel setup while not being able to restore it. */
+		/* Note:
+		 * NV11 cards can't distinquish between head 1 and head 2. */
 		if (slaved_for_dev1 && !tvout1)
 		{
 			uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
@@ -322,7 +324,8 @@ static void detect_panels()
 				si->ps.panel1_height = height;
 			}
 		}
-		if (si->ps.secondary_head && slaved_for_dev2 && !tvout2)
+		if ((si->ps.card_arch != NV11) &&
+			si->ps.secondary_head && slaved_for_dev2 && !tvout2)
 		{
 			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
 			uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
@@ -346,7 +349,8 @@ static void detect_panels()
 				si->ps.panel1_height = height;
 			}
 		}
-		if (si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
+		if ((si->ps.card_arch != NV11) &&
+			si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
 		{
 			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
 			uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
