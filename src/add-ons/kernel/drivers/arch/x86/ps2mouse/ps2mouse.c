@@ -251,7 +251,7 @@ ps2_enable_mouse(bool enable)
 /** Converts a packet received by the mouse to a "movement".
  */  
 static void
-packet_to_movement(uint8 packet[], mouse_pos *pos)
+packet_to_movement(uint8 packet[], mouse_movement *pos)
 {
 	int buttons = packet[0] & 7;
 	int xDelta = ((packet[0] & 0x10) ? 0xFFFFFF00 : 0) | packet[1];
@@ -276,7 +276,7 @@ packet_to_movement(uint8 packet[], mouse_pos *pos)
 		pos->buttons = buttons;
 		pos->clicks = sClickCount;
 		pos->modifiers = 0;
-		pos->time = currentTime;
+		pos->timestamp = currentTime;
 		pos->wheel_delta = 0;
 	}
 }
@@ -285,7 +285,7 @@ packet_to_movement(uint8 packet[], mouse_pos *pos)
 /** Read a mouse event from the mouse events chain buffer.
  */
 static status_t
-ps2_mouse_read(mouse_pos *pos)
+ps2_mouse_read(mouse_movement *pos)
 {
 	status_t status;
 	uint8 packet[PS2_PACKET_SIZE];
@@ -422,7 +422,7 @@ mouse_write(void * cookie, off_t pos, const void *buf, size_t *len)
 static status_t 
 mouse_ioctl(void *cookie, uint32 op, void *buf, size_t len)
 {
-	mouse_pos *pos = (mouse_pos *)buf;
+	mouse_movement *pos = (mouse_movement *)buf;
 	switch (op) {
 		case MS_NUM_EVENTS:
 		{
