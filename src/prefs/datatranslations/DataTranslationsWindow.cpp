@@ -36,87 +36,114 @@ DataTranslationsWindow::~DataTranslationsWindow()
 }
 
 // Reads the installed translators and adds them to our BListView
-int DataTranslationsWindow::WriteTrans()
+int
+DataTranslationsWindow::WriteTrans()
 {
-	BTranslatorRoster *roster = BTranslatorRoster::Default(); 
-	
-	int32 num_translators, i; 
-	translator_id *translators; 
-	const char *tname, *tinfo;
-	
-    int32 tversion;
-	
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+
 	// Get all Translators on the system. Gives us the number of translators
 	// installed in num_translators and a reference to the first one
-
+	int32 num_translators;
+	translator_id *translators;
 	roster->GetAllTranslators(&translators, &num_translators);
 
-	for (i=0;i<num_translators;i++) {
+	for (int32 i = 0; i < num_translators; i++) {
 	    // Getting the first three Infos: Name, Info & Version
-		roster->GetTranslatorInfo(translators[i], &tname,&tinfo, &tversion);
+	    int32 tversion;
+	    const char *tname, *tinfo;
+		roster->GetTranslatorInfo(translators[i], &tname, &tinfo, &tversion);
 		fTranListView->AddItem(new BStringItem(tname));
 	} 
 	
-	delete [] translators; // Garbage collection
+	delete[] translators;
+	translators = NULL;
 	
 	return 0;
 }
 
-// Finds a specific translator by it´s id
-void DataTranslationsWindow::GetTranInfo(int32 id, const char *&tranName,
+status_t
+DataTranslationsWindow::GetTranInfo(int32 id, const char *&tranName,
 	const char *&tranInfo, int32 &tranVersion, BPath &tranPath)
 {
-	BTranslatorRoster *roster = BTranslatorRoster::Default(); 
-	
-	int32 num_translators;
-	translator_id *translators; 
-	bool has_view;
-	
-	has_view = true;  
+	// Returns information about the translator with the given id
+
+	if (id < 0)
+		return B_BAD_VALUE;
+
+	int32 num_translators = 0;
+	translator_id tid = 0, *translators = NULL;
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
 	roster->GetAllTranslators(&translators, &num_translators);
+	tid = ((id < num_translators) ? translators[id] : 0);
+	delete[] translators;
+	translators = NULL;
+	
+	if (id >= num_translators)
+		return B_BAD_VALUE;
 
 	// Getting the first three Infos: Name, Info & Version
-	roster->GetTranslatorInfo(translators[id], &tranName, &tranInfo, &tranVersion);
+	roster->GetTranslatorInfo(tid, &tranName, &tranInfo, &tranVersion);
 	
 	// Get the translator's path
 	entry_ref tranRef;
-	roster->GetRefFor(translators[id], &tranRef);
+	roster->GetRefFor(tid, &tranRef);
 	BEntry tmpEntry(&tranRef);
 	tranPath.SetTo(&tmpEntry);
 	
-	fConfigBox->RemoveChild(Konf);
-	if (roster->MakeConfigurationView( translators[id], new BMessage() , &Konf, new BRect( 0, 0, 200, 233)) != B_OK )
-		{// be_app->PostMessage(B_QUIT_REQUESTED); // Something went wrong -> Quit
-			fConfigBox->RemoveChild(Konf);
-			has_view = false;
-		}
-
-	// Konf->SetViewColor(ui_color(B_BACKGROUND_COLOR));
-	if (has_view) 
-	{
-		BRect konfRect(fConfigBox->Bounds());
-		konfRect.InsetBy(3,3);
-		konfRect.bottom -= 45;
-		float width = 0, height = 0;
-		Konf->GetPreferredSize(&width,&height);
-		float widen = max_c(0,width-konfRect.Width());
-		float heighten = max_c(0,height-konfRect.Height());
-		if ((widen > 0) || (heighten > 0)) {
-			ResizeBy(widen,heighten);
-			konfRect.right += widen;
-			konfRect.bottom += heighten;
-		}
-		Konf->MoveTo(konfRect.left,konfRect.top);
-		Konf->ResizeTo(konfRect.Width(), konfRect.Height());
-		fConfigBox->AddChild(Konf);
-	}
-	
-	UpdateIfNeeded();	
-	
-	delete [] translators; // Garbage collection
+	return B_OK;
 }
 
-void DataTranslationsWindow::BuildView()
+status_t
+DataTranslationsWindow::ShowConfigView(int32 id)
+{
+	// Shows the config panel for the translator with the given id
+	
+	if (id < 0)
+		return B_BAD_VALUE;
+
+	int32 num_translators = 0;
+	translator_id tid = 0, *translators = NULL;
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	roster->GetAllTranslators(&translators, &num_translators);
+	tid = ((id < num_translators) ? translators[id] : 0);
+	delete[] translators;
+	translators = NULL;
+
+	if (id >= num_translators)
+		return B_BAD_VALUE;
+	
+	fConfigBox->RemoveChild(fConfigView);
+	BMessage emptyMsg;
+	BRect rect(0, 0, 200, 233);
+	status_t ret = roster->MakeConfigurationView(tid, &emptyMsg, &fConfigView, &rect);
+	if (ret != B_OK) {
+		fConfigBox->RemoveChild(fConfigView);
+		return ret;
+	}
+
+	BRect konfRect(fConfigBox->Bounds());
+	konfRect.InsetBy(3, 3);
+	konfRect.bottom -= 45;
+	float width = 0, height = 0;
+	fConfigView->GetPreferredSize(&width, &height);
+	float widen = max_c(0, width - konfRect.Width());
+	float heighten = max_c(0, height - konfRect.Height());
+	if (widen > 0 || heighten > 0) {
+		ResizeBy(widen, heighten);
+		konfRect.right += widen;
+		konfRect.bottom += heighten;
+	}
+	fConfigView->MoveTo(konfRect.left, konfRect.top);
+	fConfigView->ResizeTo(konfRect.Width(), konfRect.Height());
+	fConfigBox->AddChild(fConfigView);
+	
+	UpdateIfNeeded();
+	
+	return B_OK;
+}
+
+void
+DataTranslationsWindow::BuildView()
 {
 	BRect all(0, 0, 400, 300);       		// Fenster-Groesse
 	BBox *mainBox = new BBox(all, "All_Window", B_FOLLOW_ALL_SIDES,
@@ -152,10 +179,10 @@ void DataTranslationsWindow::BuildView()
     
 	BRect konfRect(innerRect);
     konfRect.bottom = iconRect.top;
-	Konf = new BView(konfRect, "KONF", B_FOLLOW_ALL_SIDES,
+	fConfigView = new BView(konfRect, "KONF", B_FOLLOW_ALL_SIDES,
                      B_WILL_DRAW | B_FRAME_EVENTS );
-	// Konf->SetViewColor(ui_color(B_BACKGROUND_COLOR));
-	fConfigBox->AddChild(Konf);
+	// fConfigView->SetViewColor(ui_color(B_BACKGROUND_COLOR));
+	fConfigBox->AddChild(fConfigView);
 
     BRect listRect(10, 10, 120, 288);  // List View
 	fTranListView = new DataTranslationsView(listRect, "Transen", B_SINGLE_SELECTION_LIST); 
@@ -177,14 +204,14 @@ void DataTranslationsWindow::BuildView()
     fTranListView->Select(0, false);    
 }
 
-bool DataTranslationsWindow::QuitRequested()
+bool
+DataTranslationsWindow::QuitRequested()
 {
-
-	dynamic_cast<DataTranslationsApplication *>(be_app)->SetWindowCorner(BPoint(Frame().left,Frame().top));
-
+	BPoint pt(Frame().left, Frame().top);
+	dynamic_cast<DataTranslationsApplication *>(be_app)->SetWindowCorner(pt);
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	
-	return(true);
+
+	return true;
 }
 
 void
@@ -193,7 +220,7 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 	BPath tranPath;
 	BString strInfoMsg;
 	const char *tranName = NULL, *tranInfo = NULL;
-	int32 selected, tranVersion;
+	int32 selected = -1, tranVersion = 0;
 		
 	switch (message->what) {
 	
@@ -238,10 +265,11 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 				// If none selected, clear the old one
 				fIconView->DrawIcon(false);
 				fTranNameView->SetText("");
-				fConfigBox->RemoveChild(Konf);
+				fConfigBox->RemoveChild(fConfigView);
 				break;
 			}
 			
+			ShowConfigView(selected);
 			GetTranInfo(selected, tranName, tranInfo, tranVersion, tranPath);
 			fTranNameView->SetText(tranPath.Leaf());
 			fIconView->SetIcon(tranPath);
