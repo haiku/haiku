@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// #include <unistd.h>
+#include <signal.h>
 
 #include <KernelExport.h>
 #include <OS.h>
@@ -68,6 +68,7 @@ status_t start_datalink_layer()
 		close_module_list(module_list);
 	};
 
+	// auto-start interface(s)
 	acquire_sem(g_interfaces.lock);
 	iface = g_interfaces.first;
 	while (iface) {
@@ -169,7 +170,12 @@ status_t unregister_interface(ifnet_t *iface)
 	release_sem(g_interfaces.lock);
 
 	printf("datalink: unregister_interface(%s)\n", iface->if_name);
-	return iface->module->uninit(iface);
+	
+	enable_interface(iface, false);
+	iface->module->uninit(iface);
+	put_module(iface->module->info.name);
+	free(iface);
+	return B_OK;
 }
 
 
@@ -177,7 +183,9 @@ status_t unregister_interface(ifnet_t *iface)
 status_t enable_interface(ifnet_t *iface, bool enable)
 {
 	if (enable) {
+		// enable this interface
 		thread_id tid;
+		char name[B_OS_NAME_LENGTH * 2];
 
 		if (iface->if_flags & IFF_UP)
 			// already up
@@ -185,8 +193,9 @@ status_t enable_interface(ifnet_t *iface, bool enable)
 		
 		iface->module->up(iface);
 		
-		tid = spawn_kernel_thread(interface_reader, iface->if_name, 
-		                              B_NORMAL_PRIORITY, iface);
+		strncpy(name, iface->if_name, sizeof(name));
+		strncat(name, " reader", sizeof(name)); 
+		tid = spawn_kernel_thread(interface_reader, name, B_NORMAL_PRIORITY, iface);
 		if (tid < 0) {
 			printf("datalink: enable_interface(%s): failed to start reader thread -> %d [%s]\n",
 				iface->if_name, (int) tid, strerror(tid));
@@ -195,13 +204,25 @@ status_t enable_interface(ifnet_t *iface, bool enable)
 
 		iface->if_reader_thread = tid;
 		iface->if_flags |= IFF_UP;
-		printf("datalink: starting interface %s...\n", iface->if_name);
+		printf("datalink: %s interface reader started.\n", iface->if_name);
 		return resume_thread(tid);
+		
 	} else {
+	
+		// disable this interface
+		if ((iface->if_flags & IFF_UP) == 0)
+			// already down
+			return B_OK;
+	
 		if (iface->if_reader_thread) {
-			kill_thread(iface->if_reader_thread);
+			status_t status;
+			
+			send_signal_etc(iface->if_reader_thread, SIGTERM, 0);
+			wait_for_thread(iface->if_reader_thread, &status);
 			iface->if_reader_thread = -1;
+			printf("datalink: %s interface reader stopped.\n", iface->if_name);
 		};
+		
 		iface->if_flags &= ~IFF_UP;
 		return iface->module->down(iface);
 	};
@@ -213,7 +234,7 @@ status_t interface_reader(void *args)
 {
 	ifnet_t 	*iface = args;
 	net_data 	*nd;
-	status_t status;
+	status_t 	status;
 	
 	if (!iface || iface->module == NULL)
 		return B_ERROR;
@@ -222,6 +243,7 @@ status_t interface_reader(void *args)
 		status = iface->module->receive_data(iface, &nd);
 		if (status < B_OK || nd == NULL)
 			continue;
+
 		dump_data(nd);
 		delete_data(nd, false);
 	};

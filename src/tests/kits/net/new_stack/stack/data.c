@@ -842,7 +842,7 @@ void dump_memory
 			
 		for (j = i; j < len && j < i+16;j++)
 			{
-			if ( byte[j] >= ' ' && byte[j] < 0x7f )
+			if ( byte[j] >= ' ' && byte[j] <= 0x7e )
 				*ptr = byte[j];
 			else
 				*ptr = '.';
@@ -853,7 +853,8 @@ void dump_memory
 		ptr++;
 		*ptr = '\0';
 		
-		DPRINTF(prefix);
+		if (prefix)
+			DPRINTF(prefix);
 		DPRINTF(text);
 
 		// next line
