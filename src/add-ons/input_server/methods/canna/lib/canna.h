@@ -21,7 +21,7 @@
  */
 
 /*
- * @(#) 102.1 $Id: canna.h,v 1.1 2004/12/23 21:23:48 korli Exp $
+ * @(#) 102.1 $Id: canna.h,v 1.2 2005/01/26 11:07:48 korli Exp $
  */
 
 /************************************************************************/
@@ -31,6 +31,8 @@
 
 #ifndef _CANNA_H_
 #define _CANNA_H_
+
+#undef DEBUG
 
 #include "cannaconf.h"
 #include "widedef.h"
