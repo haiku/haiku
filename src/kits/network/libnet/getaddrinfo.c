@@ -527,10 +527,10 @@ explore_fqdn(pai, hostname, servname, res)
 	if (get_portmatch(pai, servname) != 0)
 		return 0;
 
-	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1)
+	if ((_res.options & RES_INIT) == 0 && res_init() == -1)
 		strncpy(lookups, "f", sizeof lookups);
 	else {
-		memcpy(lookups, _resolver_configuration.lookups, sizeof lookups);
+		memcpy(lookups, _res.lookups, sizeof lookups);
 		if (lookups[0] == '\0')
 			strncpy(lookups, "bf", sizeof lookups);
 	}
@@ -1542,7 +1542,7 @@ res_queryN(name, target)
 	rcode = NOERROR;
 	ancount = 0;
 
-	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
 		h_errno = NETDB_INTERNAL;
 		return (-1);
 	}
@@ -1561,17 +1561,17 @@ res_queryN(name, target)
 		answer = t->answer;
 		anslen = t->anslen;
 #ifdef DEBUG
-		if (_resolver_configuration.options & RES_DEBUG)
+		if (_res.options & RES_DEBUG)
 			printf(";; res_query(%s, %d, %d)\n", name, class, type);
 #endif
 
 		n = res_mkquery(QUERY, name, class, type, NULL, 0, NULL,
 		    buf, sizeof(buf));
-		if (n > 0 && (_resolver_configuration.options & RES_USE_EDNS0) != 0)
+		if (n > 0 && (_res.options & RES_USE_EDNS0) != 0)
 			n = res_opt(n, buf, sizeof(buf), anslen);
 		if (n <= 0) {
 #ifdef DEBUG
-			if (_resolver_configuration.options & RES_DEBUG)
+			if (_res.options & RES_DEBUG)
 				printf(";; res_query: mkquery failed\n");
 #endif
 			h_errno = NO_RECOVERY;
@@ -1581,7 +1581,7 @@ res_queryN(name, target)
 #if 0
 		if (n < 0) {
 #ifdef DEBUG
-			if (_resolver_configuration.options & RES_DEBUG)
+			if (_res.options & RES_DEBUG)
 				printf(";; res_query: send error\n");
 #endif
 			h_errno = TRY_AGAIN;
@@ -1592,7 +1592,7 @@ res_queryN(name, target)
 		if (n < 0 || hp->rcode != NOERROR || ntohs(hp->ancount) == 0) {
 			rcode = hp->rcode;	/* record most recent error */
 #ifdef DEBUG
-			if (_resolver_configuration.options & RES_DEBUG)
+			if (_res.options & RES_DEBUG)
 				printf(";; rcode = %d, ancount=%d\n", hp->rcode,
 				    ntohs(hp->ancount));
 #endif
@@ -1644,7 +1644,7 @@ res_searchN(name, target)
 	int trailing_dot, ret, saved_herrno;
 	int got_nodata = 0, got_servfail = 0, tried_as_is = 0;
 
-	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
 		h_errno = NETDB_INTERNAL;
 		return (-1);
 	}
@@ -1669,7 +1669,7 @@ res_searchN(name, target)
 	 * 'as is'.  The threshold can be set with the "ndots" option.
 	 */
 	saved_herrno = -1;
-	if (dots >= _resolver_configuration.ndots) {
+	if (dots >= _res.ndots) {
 		ret = res_querydomainN(name, NULL, target);
 		if (ret > 0)
 			return (ret);
@@ -1683,11 +1683,11 @@ res_searchN(name, target)
 	 *	- there is at least one dot, there is no trailing dot,
 	 *	  and RES_DNSRCH is set.
 	 */
-	if ((!dots && (_resolver_configuration.options & RES_DEFNAMES)) ||
-	    (dots && !trailing_dot && (_resolver_configuration.options & RES_DNSRCH))) {
+	if ((!dots && (_res.options & RES_DEFNAMES)) ||
+	    (dots && !trailing_dot && (_res.options & RES_DNSRCH))) {
 		int done = 0;
 
-		for (domain = (const char * const *)_resolver_configuration.dnsrch;
+		for (domain = (const char * const *)_res.dnsrch;
 		   *domain && !done;
 		   domain++) {
 
@@ -1735,7 +1735,7 @@ res_searchN(name, target)
 			 * if we got here for some reason other than DNSRCH,
 			 * we only wanted one iteration of the loop, so stop.
 			 */
-			if (!(_resolver_configuration.options & RES_DNSRCH))
+			if (!(_res.options & RES_DNSRCH))
 			        done++;
 		}
 	}
@@ -1781,12 +1781,12 @@ res_querydomainN(name, domain, target)
 	const char *longname = nbuf;
 	size_t n, d;
 
-	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
 		h_errno = NETDB_INTERNAL;
 		return (-1);
 	}
 #ifdef DEBUG
-	if (_resolver_configuration.options & RES_DEBUG)
+	if (_res.options & RES_DEBUG)
 		printf(";; res_querydomain(%s, %s)\n",
 			name, domain?domain:"<Nil>");
 #endif

@@ -85,12 +85,12 @@ res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 	register int n;
 	u_char *dnptrs[20], **dpp, **lastdnptr;
 
-	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
 		h_errno = NETDB_INTERNAL;
 		return (-1);
 	}
 #ifdef DEBUG
-	if (_resolver_configuration.options & RES_DEBUG)
+	if (_res.options & RES_DEBUG)
 		printf(";; res_mkquery(%d, %s, %d, %d)\n",
 		       op, dname, class, type);
 #endif
@@ -107,10 +107,10 @@ res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 
 	memset(buf, 0, HFIXEDSZ);
 	hp = (HEADER *) buf;
-	_resolver_configuration.id = res_randomid();
-	hp->id = htons(_resolver_configuration.id);
+	_res.id = res_randomid();
+	hp->id = htons(_res.id);
 	hp->opcode = op;
-	hp->rd = (_resolver_configuration.options & RES_RECURSE) != 0;
+	hp->rd = (_res.options & RES_RECURSE) != 0;
 	hp->rcode = NOERROR;
 	cp = buf + HFIXEDSZ;
 	buflen -= HFIXEDSZ;
@@ -212,9 +212,9 @@ res_opt(n0, buf, buflen, anslen)
 	cp += INT16SZ;
 	*cp++ = NOERROR;	/* extended RCODE */
 	*cp++ = 0;		/* EDNS version */
-	if (_resolver_configuration.options & RES_USE_DNSSEC) {
+	if (_res.options & RES_USE_DNSSEC) {
 #ifdef DEBUG
-		if (_resolver_configuration.options & RES_DEBUG)
+		if (_res.options & RES_DEBUG)
 			printf(";; res_opt()... ENDS0 DNSSEC OK\n");
 #endif /* DEBUG */
 		__putshort(DNS_MESSAGEEXTFLAG_DO, cp);	/* EDNS Z field */

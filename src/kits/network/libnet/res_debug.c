@@ -187,13 +187,13 @@ do_rrset(msg, len, cp, cnt, pflag, file, hs)
 	/*
 	 * Print answer records.
 	 */
-	sflag = (_resolver_configuration.pfcode & pflag);
+	sflag = (_res.pfcode & pflag);
 	if ((n = ntohs(cnt))) {
-		if ((!_resolver_configuration.pfcode) ||
-		    ((sflag) && (_resolver_configuration.pfcode & RES_PRF_HEAD1)))
+		if ((!_res.pfcode) ||
+		    ((sflag) && (_res.pfcode & RES_PRF_HEAD1)))
 			fprintf(file, "%s", hs);
 		while (--n >= 0) {
-			if ((!_resolver_configuration.pfcode) || sflag) {
+			if ((!_res.pfcode) || sflag) {
 				cp = p_rr(cp, msg, file);
 			} else {
 				unsigned int dlen;
@@ -208,8 +208,8 @@ do_rrset(msg, len, cp, cnt, pflag, file, hs)
 			if ((cp - msg) > len)
 				return (NULL);
 		}
-		if ((!_resolver_configuration.pfcode) ||
-		    ((sflag) && (_resolver_configuration.pfcode & RES_PRF_HEAD1)))
+		if ((!_res.pfcode) ||
+		    ((sflag) && (_res.pfcode & RES_PRF_HEAD1)))
 			putc('\n', file);
 	}
 	return (cp);
@@ -227,7 +227,7 @@ __p_query(msg)
  * This is intended to be primarily a debugging routine.
  */
 void
-__fp_resolver_configurationstat(statp, file)
+__fp_resstat(statp, file)
 	struct __res_state *statp;
 	FILE *file;
 {
@@ -235,7 +235,7 @@ __fp_resolver_configurationstat(statp, file)
 
 	fprintf(file, ";; res options:");
 	if (!statp)
-		statp = &_resolver_configuration;
+		statp = &_res;
 	for (mask = 1;  mask != 0;  mask <<= 1)
 		if (statp->options & mask)
 			fprintf(file, " %s", p_option(mask));
@@ -256,7 +256,7 @@ __fp_nquery(msg, len, file)
 	register const HEADER *hp;
 	register int n;
 
-	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1)
+	if ((_res.options & RES_INIT) == 0 && res_init() == -1)
 		return;
 
 #define TruncTest(x) if (x > endMark) goto trunc
@@ -268,16 +268,16 @@ __fp_nquery(msg, len, file)
 	hp = (HEADER *)msg;
 	cp = msg + HFIXEDSZ;
 	endMark = msg + len;
-	if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_HEADX) || hp->rcode) {
+	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEADX) || hp->rcode) {
 		fprintf(file, ";; ->>HEADER<<- opcode: %s, status: %s, id: %d",
 			_res_opcodes[hp->opcode],
 			_res_resultcodes[hp->rcode],
 			ntohs(hp->id));
 		putc('\n', file);
 	}
-	if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_HEADX))
+	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEADX))
 		putc(';', file);
-	if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_HEAD2)) {
+	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEAD2)) {
 		fprintf(file, "; flags:");
 		if (hp->qr)
 			fprintf(file, " qr");
@@ -296,13 +296,13 @@ __fp_nquery(msg, len, file)
 		if (hp->cd)
 			fprintf(file, " cd");
 	}
-	if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_HEAD1)) {
+	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_HEAD1)) {
 		fprintf(file, "; Ques: %d", ntohs(hp->qdcount));
 		fprintf(file, ", Ans: %d", ntohs(hp->ancount));
 		fprintf(file, ", Auth: %d", ntohs(hp->nscount));
 		fprintf(file, ", Addit: %d", ntohs(hp->arcount));
 	}
-	if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & 
+	if ((!_res.pfcode) || (_res.pfcode & 
 		(RES_PRF_HEADX | RES_PRF_HEAD2 | RES_PRF_HEAD1))) {
 		putc('\n',file);
 	}
@@ -310,13 +310,13 @@ __fp_nquery(msg, len, file)
 	 * Print question records.
 	 */
 	if ((n = ntohs(hp->qdcount))) {
-		if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_QUES))
+		if ((!_res.pfcode) || (_res.pfcode & RES_PRF_QUES))
 			fprintf(file, ";; QUESTIONS:\n");
 		while (--n >= 0) {
-			if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_QUES))
+			if ((!_res.pfcode) || (_res.pfcode & RES_PRF_QUES))
 				fprintf(file, ";;\t");
 			TruncTest(cp);
-			if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_QUES))
+			if ((!_res.pfcode) || (_res.pfcode & RES_PRF_QUES))
 				cp = p_cdnname(cp, msg, len, file);
 			else {
 				int n;
@@ -330,16 +330,16 @@ __fp_nquery(msg, len, file)
 			}
 			ErrorTest(cp);
 			TruncTest(cp);
-			if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_QUES))
+			if ((!_res.pfcode) || (_res.pfcode & RES_PRF_QUES))
 				fprintf(file, ", type = %s",
 					__p_type(_getshort((u_char*)cp)));
 			cp += INT16SZ;
 			TruncTest(cp);
-			if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_QUES))
+			if ((!_res.pfcode) || (_res.pfcode & RES_PRF_QUES))
 				fprintf(file, ", class = %s\n",
 					__p_class(_getshort((u_char*)cp)));
 			cp += INT16SZ;
-			if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_QUES))
+			if ((!_res.pfcode) || (_res.pfcode & RES_PRF_QUES))
 				putc('\n', file);
 		}
 	}
@@ -468,7 +468,7 @@ __p_rr(cp, msg, file)
 	char rrname[MAXDNAME];		/* The fqdn of this RR */
 	char base64_key[MAX_KEY_BASE64];
 
-	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
 		h_errno = NETDB_INTERNAL;
 		return (NULL);
 	}
@@ -486,9 +486,9 @@ __p_rr(cp, msg, file)
 	dlen = _getshort((u_char*)cp);
 	cp += INT16SZ;
 	cp1 = cp;
-	if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_TTLID))
+	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_TTLID))
 		fprintf(file, "\t%lu", (u_long)tmpttl);
-	if ((!_resolver_configuration.pfcode) || (_resolver_configuration.pfcode & RES_PRF_CLASS))
+	if ((!_res.pfcode) || (_res.pfcode & RES_PRF_CLASS))
 		fprintf(file, "\t%s", __p_class(class));
 	fprintf(file, "\t%s", __p_type(type));
 	/*

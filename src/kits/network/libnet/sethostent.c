@@ -42,15 +42,15 @@ sethostent(stayopen)
 	int stayopen;
 {
 
-	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1)
+	if ((_res.options & RES_INIT) == 0 && res_init() == -1)
 		return;
 	if (stayopen)
-		_resolver_configuration.options |= RES_STAYOPEN | RES_USEVC;
+		_res.options |= RES_STAYOPEN | RES_USEVC;
 }
 
 void
 endhostent()
 {
-	_resolver_configuration.options &= ~(RES_STAYOPEN | RES_USEVC);
+	_res.options &= ~(RES_STAYOPEN | RES_USEVC);
 	res_close();
 }

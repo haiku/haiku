@@ -105,7 +105,7 @@ static uint32 net_mask (struct in_addr);
  * Resolver state default settings.
  */
 
-struct __res_state _resolver_configuration
+struct __res_state _res
 # if defined(__BIND_RES_TEXT)
 	= { RES_TIMEOUT, }	/* Motorola, et al. */
 # endif
@@ -173,33 +173,33 @@ res_init()
 	 * set in RES_DEFAULT).  Our solution is to declare such applications
 	 * "broken".  They could fool us by setting RES_INIT but none do (yet).
 	 */
-	if (!_resolver_configuration.retrans)
-		_resolver_configuration.retrans = RES_TIMEOUT;
-	if (!_resolver_configuration.retry)
-		_resolver_configuration.retry = 4;
-	if (!(_resolver_configuration.options & RES_INIT))
-		_resolver_configuration.options = RES_DEFAULT;
+	if (!_res.retrans)
+		_res.retrans = RES_TIMEOUT;
+	if (!_res.retry)
+		_res.retry = 4;
+	if (!(_res.options & RES_INIT))
+		_res.options = RES_DEFAULT;
 
 #ifdef USELOOPBACK
-	_resolver_configuration.nsaddr.sin_addr = inet_makeaddr(IN_LOOPBACKNET, 1);
+	_res.nsaddr.sin_addr = inet_makeaddr(IN_LOOPBACKNET, 1);
 #else
-	_resolver_configuration.nsaddr.sin_addr.s_addr = INADDR_ANY;
+	_res.nsaddr.sin_addr.s_addr = INADDR_ANY;
 #endif
-	_resolver_configuration.nsaddr.sin_family = AF_INET;
-	_resolver_configuration.nsaddr.sin_port = htons(NAMESERVER_PORT);
-	_resolver_configuration.nsaddr.sin_len = sizeof(struct sockaddr_in);
+	_res.nsaddr.sin_family = AF_INET;
+	_res.nsaddr.sin_port = htons(NAMESERVER_PORT);
+	_res.nsaddr.sin_len = sizeof(struct sockaddr_in);
 #ifdef INET6
-	if (sizeof(_resolver_configuration_ext.nsaddr) >= _resolver_configuration.nsaddr.sin_len)
-		memcpy(&_resolver_configuration_ext.nsaddr, &_resolver_configuration.nsaddr, _resolver_configuration.nsaddr.sin_len);
+	if (sizeof(_res_ext.nsaddr) >= _res.nsaddr.sin_len)
+		memcpy(&_res_ext.nsaddr, &_res.nsaddr, _res.nsaddr.sin_len);
 #endif
-	_resolver_configuration.nscount = 1;
-	_resolver_configuration.ndots = 1;
-	_resolver_configuration.pfcode = 0;
-	strncpy(_resolver_configuration.lookups, "f", sizeof _resolver_configuration.lookups);
+	_res.nscount = 1;
+	_res.ndots = 1;
+	_res.pfcode = 0;
+	strncpy(_res.lookups, "f", sizeof _res.lookups);
 
 	/* Allow user to override the local domain definition */
 	if ((cp = getenv("LOCALDOMAIN")) != NULL) {
-		strncpy(_resolver_configuration.defdname, cp, sizeof(_resolver_configuration.defdname));
+		strncpy(_res.defdname, cp, sizeof(_res.defdname));
 		haveenv++;
 
 		/*
@@ -209,10 +209,10 @@ res_init()
 		 * one that they want to use as an individual (even more
 		 * important now that the rfc1535 stuff restricts searches)
 		 */
-		cp = _resolver_configuration.defdname;
-		pp = _resolver_configuration.dnsrch;
+		cp = _res.defdname;
+		pp = _res.dnsrch;
 		*pp++ = cp;
-		for (n = 0; *cp && pp < _resolver_configuration.dnsrch + MAXDNSRCH; cp++) {
+		for (n = 0; *cp && pp < _res.dnsrch + MAXDNSRCH; cp++) {
 			if (*cp == '\n')	/* silly backwards compat */
 				break;
 			else if (*cp == ' ' || *cp == '\t') {
@@ -237,7 +237,7 @@ res_init()
 	 line[sizeof(name) - 1] == '\t'))
 
 	if ((fp = fopen(_PATH_RESCONF, "r")) != NULL) {
-	    strncpy(_resolver_configuration.lookups, "bf", sizeof _resolver_configuration.lookups);
+	    strncpy(_res.lookups, "bf", sizeof _res.lookups);
 
 	    /* read the config file */
 	    buf[0] = '\0';
@@ -263,8 +263,8 @@ res_init()
 				    cp++;
 			    if ((*cp == '\0') || (*cp == '\n'))
 				    continue;
-			    strncpy(_resolver_configuration.defdname, cp, sizeof(_resolver_configuration.defdname));
-			    if ((cp = strpbrk(_resolver_configuration.defdname, " \t\n")) != NULL)
+			    strncpy(_res.defdname, cp, sizeof(_res.defdname));
+			    if ((cp = strpbrk(_res.defdname, " \t\n")) != NULL)
 				    *cp = '\0';
 		    	havesearch = 0;
 		    	continue;
@@ -272,7 +272,7 @@ res_init()
 			/* lookup types */
 			if (MATCH(buf, "lookup")) {
 			    char *sp = NULL;
-			    memset(_resolver_configuration.lookups, 0, sizeof _resolver_configuration.lookups);
+			    memset(_res.lookups, 0, sizeof _res.lookups);
 			    cp = buf + sizeof("lookup") - 1;
 			    for (n = 0;; cp++) {
 		    		    if (n == MAXDNSLUS)
@@ -280,14 +280,14 @@ res_init()
 				    if ((*cp == '\0') || (*cp == '\n')) {
 					    if (sp) {
 						    if (*sp=='y' || *sp=='b' || *sp=='f')
-							    _resolver_configuration.lookups[n++] = *sp;
+							    _res.lookups[n++] = *sp;
 						    sp = NULL;
 				    	}
 					    break;
 			    	} else if ((*cp == ' ') || (*cp == '\t') || (*cp == ',')) {
 				    	if (sp) {
 					    	if (*sp=='y' || *sp=='b' || *sp=='f')
-						    	_resolver_configuration.lookups[n++] = *sp;
+						    	_res.lookups[n++] = *sp;
 						    sp = NULL;
 					    }
 				    } else if (sp == NULL)
@@ -304,17 +304,17 @@ res_init()
 				    cp++;
 			    if ((*cp == '\0') || (*cp == '\n'))
 				    continue;
-			    strncpy(_resolver_configuration.defdname, cp, sizeof(_resolver_configuration.defdname));
-			    if ((cp = strchr(_resolver_configuration.defdname, '\n')) != NULL)
+			    strncpy(_res.defdname, cp, sizeof(_res.defdname));
+			    if ((cp = strchr(_res.defdname, '\n')) != NULL)
 				    *cp = '\0';
 			    /*
 			     * Set search list to be blank-separated strings
 			     * on rest of line.
 			     */
-			    cp = _resolver_configuration.defdname;
-			    pp = _resolver_configuration.dnsrch;
+			    cp = _res.defdname;
+			    pp = _res.dnsrch;
 			    *pp++ = cp;
-			    for (n = 0; *cp && pp < _resolver_configuration.dnsrch + MAXDNSRCH; cp++) {
+			    for (n = 0; *cp && pp < _res.dnsrch + MAXDNSRCH; cp++) {
 				    if (*cp == ' ' || *cp == '\t') {
 					    *cp = 0;
 					    n = 1;
@@ -359,19 +359,19 @@ res_init()
 			    res = NULL;
 			    if (getaddrinfo(cp, pbuf, &hints, &res) == 0 &&
 				    res->ai_next == NULL) {
-				if (res->ai_addrlen <= sizeof(_resolver_configuration_ext.nsaddr_list[nserv])) {
-				    memcpy(&_resolver_configuration_ext.nsaddr_list[nserv], res->ai_addr,
+				if (res->ai_addrlen <= sizeof(_res_ext.nsaddr_list[nserv])) {
+				    memcpy(&_res_ext.nsaddr_list[nserv], res->ai_addr,
 					res->ai_addrlen);
 				} else {
-				    memset(&_resolver_configuration_ext.nsaddr_list[nserv], 0,
-					sizeof(_resolver_configuration_ext.nsaddr_list[nserv]));
+				    memset(&_res_ext.nsaddr_list[nserv], 0,
+					sizeof(_res_ext.nsaddr_list[nserv]));
 				}
-				if (res->ai_addrlen <= sizeof(_resolver_configuration.nsaddr_list[nserv])) {
-				    memcpy(&_resolver_configuration.nsaddr_list[nserv], res->ai_addr,
+				if (res->ai_addrlen <= sizeof(_res.nsaddr_list[nserv])) {
+				    memcpy(&_res.nsaddr_list[nserv], res->ai_addr,
 					res->ai_addrlen);
 				} else {
-				    memset(&_resolver_configuration.nsaddr_list[nserv], 0,
-					sizeof(_resolver_configuration.nsaddr_list[nserv]));
+				    memset(&_res.nsaddr_list[nserv], 0,
+					sizeof(_res.nsaddr_list[nserv]));
 				}
 				nserv++;
 		    }
@@ -379,10 +379,10 @@ res_init()
 				freeaddrinfo(res);
 #else /* INET6 */
 		    if ((*cp != '\0') && (*cp != '\n') && inet_aton(cp, &a)) {
-				_resolver_configuration.nsaddr_list[nserv].sin_addr = a;
-				_resolver_configuration.nsaddr_list[nserv].sin_family = AF_INET;
-				_resolver_configuration.nsaddr_list[nserv].sin_port = htons(NAMESERVER_PORT);
-				_resolver_configuration.nsaddr_list[nserv].sin_len = sizeof(struct sockaddr_in);
+				_res.nsaddr_list[nserv].sin_addr = a;
+				_res.nsaddr_list[nserv].sin_family = AF_INET;
+				_res.nsaddr_list[nserv].sin_port = htons(NAMESERVER_PORT);
+				_res.nsaddr_list[nserv].sin_len = sizeof(struct sockaddr_in);
 				nserv++;
 		    }
 #endif /* INET6 */
@@ -410,7 +410,7 @@ res_init()
 			n = *cp;
 			*cp = 0;
 			if (inet_aton(net, &a)) {
-			    _resolver_configuration.sort_list[nsort].addr = a;
+			    _res.sort_list[nsort].addr = a;
 			    if (ISSORTMASK(n)) {
 				*cp++ = n;
 				net = cp;
@@ -420,29 +420,29 @@ res_init()
 				n = *cp;
 				*cp = 0;
 				if (inet_aton(net, &a)) {
-				    _resolver_configuration.sort_list[nsort].mask = a.s_addr;
+				    _res.sort_list[nsort].mask = a.s_addr;
 				} else {
-				    _resolver_configuration.sort_list[nsort].mask = 
-					net_mask(_resolver_configuration.sort_list[nsort].addr);
+				    _res.sort_list[nsort].mask = 
+					net_mask(_res.sort_list[nsort].addr);
 				}
 			    } else {
-				_resolver_configuration.sort_list[nsort].mask = 
-				    net_mask(_resolver_configuration.sort_list[nsort].addr);
+				_res.sort_list[nsort].mask = 
+				    net_mask(_res.sort_list[nsort].addr);
 			    }
 #ifdef INET6
-			    _resolver_configuration_ext.sort_list[nsort].af = AF_INET;
-			    _resolver_configuration_ext.sort_list[nsort].addr.ina =
-				_resolver_configuration.sort_list[nsort].addr;
-			    _resolver_configuration_ext.sort_list[nsort].mask.ina.s_addr =
-				_resolver_configuration.sort_list[nsort].mask;
+			    _res_ext.sort_list[nsort].af = AF_INET;
+			    _res_ext.sort_list[nsort].addr.ina =
+				_res.sort_list[nsort].addr;
+			    _res_ext.sort_list[nsort].mask.ina.s_addr =
+				_res.sort_list[nsort].mask;
 #endif /* INET6 */
 			    nsort++;
 			}
 #ifdef INET6
 			else if (inet_pton(AF_INET6, net, &a6) == 1) {
-			    _resolver_configuration_ext.sort_list[nsort].af = AF_INET6;
-			    _resolver_configuration_ext.sort_list[nsort].addr.in6a = a6;
-			    u = (u_char *)&_resolver_configuration_ext.sort_list[nsort].mask.in6a;
+			    _res_ext.sort_list[nsort].af = AF_INET6;
+			    _res_ext.sort_list[nsort].addr.in6a = a6;
+			    u = (u_char *)&_res_ext.sort_list[nsort].mask.in6a;
 			    *cp++ = n;
 			    net = cp;
 			    while (*cp && *cp != ';' &&
@@ -492,33 +492,33 @@ res_init()
 		}
 	    }
 	    if (nserv > 1) 
-		_resolver_configuration.nscount = nserv;
+		_res.nscount = nserv;
 #ifdef RESOLVSORT
-	    _resolver_configuration.nsort = nsort;
+	    _res.nsort = nsort;
 #endif
 	    (void) fclose(fp);
 	}
-	if (_resolver_configuration.defdname[0] == 0 &&
-	    gethostname(buf, sizeof(_resolver_configuration.defdname) - 1) == 0 &&
+	if (_res.defdname[0] == 0 &&
+	    gethostname(buf, sizeof(_res.defdname) - 1) == 0 &&
 	    (cp = strchr(buf, '.')) != NULL)
 	{
-		strncpy(_resolver_configuration.defdname, cp + 1,
-		        sizeof(_resolver_configuration.defdname));
+		strncpy(_res.defdname, cp + 1,
+		        sizeof(_res.defdname));
 	}
 
 	/* find components of local domain that might be searched */
 	if (havesearch == 0) {
-		pp = _resolver_configuration.dnsrch;
-		*pp++ = _resolver_configuration.defdname;
+		pp = _res.dnsrch;
+		*pp++ = _res.defdname;
 		*pp = NULL;
 
 #ifndef RFC1535
 		dots = 0;
-		for (cp = _resolver_configuration.defdname; *cp; cp++)
+		for (cp = _res.defdname; *cp; cp++)
 			dots += (*cp == '.');
 
-		cp = _resolver_configuration.defdname;
-		while (pp < _resolver_configuration.dnsrch + MAXDFLSRCH) {
+		cp = _res.defdname;
+		while (pp < _res.dnsrch + MAXDFLSRCH) {
 			if (dots < LOCALDOMAINPARTS)
 				break;
 			cp = strchr(cp, '.') + 1;    /* we know there is one */
@@ -527,9 +527,9 @@ res_init()
 		}
 		*pp = NULL;
 #ifdef DEBUG
-		if (_resolver_configuration.options & RES_DEBUG) {
+		if (_res.options & RES_DEBUG) {
 			printf(";; res_init()... default dnsrch list:\n");
-			for (pp = _resolver_configuration.dnsrch; *pp; pp++)
+			for (pp = _res.dnsrch; *pp; pp++)
 				printf(";;\t%s\n", *pp);
 			printf(";;\t..END..\n");
 		}
@@ -538,11 +538,11 @@ res_init()
 	}
 
 //	if (issetugid())
-//		_resolver_configuration.options |= RES_NOALIASES;
+//		_res.options |= RES_NOALIASES;
 //	else 
 	if ((cp = getenv("RES_OPTIONS")) != NULL)
 		res_setoptions(cp, "env");
-	_resolver_configuration.options |= RES_INIT;
+	_res.options |= RES_INIT;
 	return (0);
 }
 
@@ -556,7 +556,7 @@ res_setoptions(options, source)
 	long l;
 
 #ifdef DEBUG
-	if (_resolver_configuration.options & RES_DEBUG)
+	if (_res.options & RES_DEBUG)
 		printf(";; res_setoptions(\"%s\", \"%s\")...\n",
 		       options, source);
 #endif
@@ -571,31 +571,31 @@ res_setoptions(options, source)
 			if (l >= 0 && endp != p &&
 			    (*endp = '\0' || isspace(*endp))) {
 				if (l <= RES_MAXNDOTS)
-					_resolver_configuration.ndots = l;
+					_res.ndots = l;
 				else
-					_resolver_configuration.ndots = RES_MAXNDOTS;
+					_res.ndots = RES_MAXNDOTS;
 #ifdef DEBUG
-				if (_resolver_configuration.options & RES_DEBUG)
-					printf(";;\tndots=%d\n", _resolver_configuration.ndots);
+				if (_res.options & RES_DEBUG)
+					printf(";;\tndots=%d\n", _res.ndots);
 #endif
 			}
 		} else if (!strncmp(cp, "debug", sizeof("debug") - 1)) {
 #ifdef DEBUG
-			if (!(_resolver_configuration.options & RES_DEBUG)) {
+			if (!(_res.options & RES_DEBUG)) {
 				printf(";; res_setoptions(\"%s\", \"%s\")..\n",
 				       options, source);
-				_resolver_configuration.options |= RES_DEBUG;
+				_res.options |= RES_DEBUG;
 			}
 			printf(";;\tdebug\n");
 #endif
 		} else if (!strncmp(cp, "inet6", sizeof("inet6") - 1)) {
-			_resolver_configuration.options |= RES_USE_INET6;
+			_res.options |= RES_USE_INET6;
 		} else if (!strncmp(cp, "insecure1", sizeof("insecure1") - 1)) {
-			_resolver_configuration.options |= RES_INSECURE1;
+			_res.options |= RES_INSECURE1;
 		} else if (!strncmp(cp, "insecure2", sizeof("insecure2") - 1)) {
-			_resolver_configuration.options |= RES_INSECURE2;
+			_res.options |= RES_INSECURE2;
 		} else if (!strncmp(cp, "edns0", sizeof("edns0") - 1)) {
-			_resolver_configuration.options |= RES_USE_EDNS0;
+			_res.options |= RES_USE_EDNS0;
 		} else {
 			/* XXX - print a warning here? */
 		}
