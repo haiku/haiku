@@ -413,6 +413,7 @@
 #define NV32_DUALHEAD_CTRL	0x000010f0//verify!!!
 #define NV8_MISCW 			0x000c03c2
 #define NV8_MISCR 			0x000c03cc
+#define NV8_VSE2			0x000c03c3
 #define NV8_SEQIND			0x000c03c4
 #define NV16_SEQIND			0x000c03c4
 #define NV8_SEQDAT			0x000c03c5
@@ -574,6 +575,7 @@
 #define NVCRTCX_CURCTL1		0x30
 #define NVCRTCX_CURCTL0		0x31
 #define NVCRTCX_LCD			0x33
+#define NVCRTCX_RMA			0x38
 #define NVCRTCX_INTERLACE	0x39
 #define NVCRTCX_EXTRA		0x41
 #define NVCRTCX_OWNER		0x44
