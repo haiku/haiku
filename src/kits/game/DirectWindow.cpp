@@ -1,5 +1,5 @@
 /* 
- * Copyright 2003-2004, Haiku Inc.
+ * Copyright 2003-2005, Haiku Inc.
  * Authors:
  *		Stefano Ceccherini (burton666@libero.it).
  *		Carwyn Jones (turok2@currantbun.com)
@@ -10,9 +10,10 @@
 #include <DirectWindow.h>
 #include <clipping.h>
 
+#ifdef COMPILE_FOR_R5
 #include <R5_AppServerLink.h>
 #include <R5_Session.h>
-
+#endif
 
 // TODO: We'll want to move this to a private header,
 // accessible by the app server.
@@ -283,6 +284,8 @@ BDirectWindow::SetFullScreen(bool enable)
 {
 	status_t status = B_ERROR;
 	if (Lock()) {
+
+#ifdef COMPILE_FOR_R5
 		a_session->swrite_l(DW_SET_FULLSCREEN);
 		a_session->swrite_l(server_token);
 		a_session->swrite_l((int32)enable);
@@ -291,6 +294,7 @@ BDirectWindow::SetFullScreen(bool enable)
 		status_t fullScreen;
 		a_session->sread(sizeof(status_t), &fullScreen);	
 		a_session->sread(sizeof(status_t), &status);
+#endif
 		Unlock();
 
 		// TODO: Revisit this when we move to our app_server
@@ -312,13 +316,15 @@ BDirectWindow::IsFullScreen() const
 bool
 BDirectWindow::SupportsWindowMode(screen_id id)
 {
+	int32 result = 0;
+
+#ifdef COMPILE_FOR_R5
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(DW_SUPPORTS_WINDOW_MODE);
 	link.fSession->swrite_l(id.id);
 	link.fSession->sync();
-	
-	int32 result;
 	link.fSession->sread(sizeof(result), &result);
+#endif
 
 	return result & true;
 }
@@ -421,16 +427,20 @@ BDirectWindow::InitData()
 	direct_driver = NULL;
 
 	if (Lock()) {		
+		struct dw_sync_data sync_data;
+		status_t status = B_ERROR;
+
+#ifdef COMPILE_FOR_R5
 		a_session->swrite_l(DW_GET_SYNC_DATA);
 		a_session->swrite_l(server_token);
+		
 		Flush();
-
-		struct dw_sync_data sync_data;
+		
 		a_session->sread(sizeof(sync_data), &sync_data);
 		
-		status_t status;
-		a_session->sread(sizeof(status), &status);
 		
+		a_session->sread(sizeof(status), &status);
+#endif		
 		Unlock();
 		
 		if (status == B_OK) {

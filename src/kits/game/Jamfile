@@ -3,6 +3,16 @@ SubDir OBOS_TOP src kits game ;
 UsePrivateHeaders interface ;
 UsePrivateHeaders input ;
 
+if ! $(HAIKU_COMPATIBLE) {
+	SubDirC++Flags -DCOMPILE_FOR_R5 ;
+	
+	# Hack to have DirectWindow.cpp and WindowScreen.cpp
+	# include the R5 <Window .h> header.
+	PrependObjectHdrs DirectWindow.cpp : /boot/develop/headers/be/interface ;
+	PrependObjectHdrs WindowScreen.cpp : /boot/develop/headers/be/interface ;
+}
+
+
 SharedLibrary game :
 	# Public Game Kit
 	DirectWindow.cpp
@@ -20,9 +30,6 @@ SharedLibrary game :
 	GSUtility.cpp
 ;
 
-# Hack to have DirectWindow.cpp and WindowScreen.cpp include the R5 <Window .h> header.
-PrependObjectHdrs DirectWindow.cpp : /boot/develop/headers/be/interface ;
-PrependObjectHdrs WindowScreen.cpp : /boot/develop/headers/be/interface ;
 
 LinkSharedOSLibs libgame.so :
 	be libmedia.so

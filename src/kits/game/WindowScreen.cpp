@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2004,
+ * Copyright 2002-2005,
  * Marcus Overhagen, 
  * Stefano Ceccherini (burton666@libero.it),
  * Carwyn Jones (turok2@currantbun.com)
@@ -17,9 +17,12 @@
 
 #include <input_globals.h>
 #include <InputServerTypes.h> // For IS_SET_MOUSE_POSITION
-#include <R5_AppServerLink.h>
 #include <WindowPrivate.h>
 
+
+#ifdef COMPILE_FOR_R5
+#include <R5_AppServerLink.h>
+#endif
 
 // WindowScreen commands
 #define WS_PROPOSE_MODE			0x00000102
@@ -328,10 +331,12 @@ BWindowScreen::~BWindowScreen()
 	delete_sem(debug_sem);
 	
 	if (debug_state) {
+#ifdef COMPILE_FOR_R5
 		_BAppServerLink_ link;
 		link.fSession->swrite_l(WS_SWITCH_WORKSPACE);
 		link.fSession->swrite_l(debug_workspace);
 		link.fSession->sync();
+#endif
 	}
 	
 	free(new_space);
@@ -453,6 +458,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 first_index, int32 last_index
 				colorList[x] = list[x];
 		
 			// Tell the app_server about our changes
+#ifdef COMPILE_FOR_R5
 			_BAppServerLink_ link;
 			link.fSession->swrite_l(WS_SET_PALETTE);
 			link.fSession->swrite_l(screen_index);
@@ -460,7 +466,7 @@ BWindowScreen::SetColorList(rgb_color *list, int32 first_index, int32 last_index
 			link.fSession->swrite_l(last_index);
 			link.fSession->swrite(colorCount * sizeof(rgb_color), colorList);
 			link.fSession->sync();
-		
+#endif		
 			screen.WaitForRetrace();
 		}
 	
@@ -500,6 +506,9 @@ BWindowScreen::SetFrameBuffer(int32 width, int32 height)
 
 	// equivalent to BScreen::ProposeMode()
 	// TODO: So why don't we just use it instead?
+	status_t status = B_ERROR;
+
+#ifdef COMPILE_FOR_R5
 	_BAppServerLink_ link;	
 	link.fSession->swrite_l(WS_DISPLAY_UTILS);
 	link.fSession->swrite_l(screen_index);
@@ -508,10 +517,9 @@ BWindowScreen::SetFrameBuffer(int32 width, int32 height)
 	link.fSession->swrite(sizeof(display_mode), &mode);
 	link.fSession->swrite(sizeof(display_mode), &lowMode);
 	link.fSession->sync();
-	
-	status_t status;
 	link.fSession->sread(sizeof(status), &status);
 	link.fSession->sread(sizeof(display_mode), &mode);
+#endif
 
 	// If the mode is supported, change the workspace
 	// to that mode.
@@ -525,16 +533,18 @@ BWindowScreen::SetFrameBuffer(int32 width, int32 height)
 status_t
 BWindowScreen::MoveDisplayArea(int32 x, int32 y)
 {
+	status_t status = B_ERROR;
+
+#ifdef COMPILE_FOR_R5	
 	_BAppServerLink_ link;	
 	link.fSession->swrite_l(WS_DISPLAY_UTILS);
 	link.fSession->swrite_l(screen_index);
 	link.fSession->swrite_l(WS_MOVE_DISPLAY);
 	link.fSession->swrite(sizeof(int16), (int16*)&x);
 	link.fSession->swrite(sizeof(int16), (int16*)&y);
-	link.fSession->sync();
-	
-	status_t status;
+	link.fSession->sync();	
 	link.fSession->sread(sizeof(status), &status);
+#endif
 
 	if (status == B_OK) {		
 		format_info.display_x = x;
@@ -658,11 +668,12 @@ BWindowScreen::Suspend(char *label)
 			Unlock();
 		
 		// Switch to debug workspace
+#ifdef COMPILE_FOR_R5
 		_BAppServerLink_ link;
 		link.fSession->swrite_l(WS_SWITCH_WORKSPACE);
 		link.fSession->swrite_l(debug_workspace);
 		link.fSession->sync();
-
+#endif
 		// Suspend ourself
 		suspend_thread(find_thread(NULL));
 
@@ -707,18 +718,20 @@ BWindowScreen::CalcFrame(int32 index, int32 space, display_mode *dmode)
 int32
 BWindowScreen::SetFullscreen(int32 enable)
 {
+	int32 result = -1, retval = -1;
+
+#ifdef COMPILE_FOR_R5
 	a_session->swrite_l(WS_SET_FULLSCREEN);
 	a_session->swrite_l(server_token);
 	a_session->swrite_l(enable);
 	a_session->sync();
-	
-	int32 result, retval;
-	
 	a_session->sread(sizeof(result), &result);
 	a_session->sread(sizeof(retval), &retval);
+#endif
 	
 	return retval;
 }
+
 
 status_t
 BWindowScreen::InitData(uint32 space, uint32 attributes)
@@ -807,19 +820,22 @@ BWindowScreen::SetActiveState(int32 state)
 		if (status == B_OK) {				
 			be_app->ShowCursor();				
 			if (activate_state) {
+				const color_map *colorMap = system_colors();
+#ifdef COMPILE_FOR_R5				
 				_BAppServerLink_ link;
 				link.fSession->swrite_l(WS_SET_PALETTE);
 				link.fSession->swrite_l(screen_index);
 				link.fSession->swrite_l(0);
 				link.fSession->swrite_l(255);
-				const color_map *colorMap = system_colors();
 				link.fSession->swrite(256 * sizeof(rgb_color), const_cast<rgb_color *>(colorMap->color_list));
-				link.fSession->sync();					
+				link.fSession->sync();
+#endif
 			}
 		}
 	}
 	return status;
 }
+
 
 status_t
 BWindowScreen::SetLockState(int32 state)
@@ -835,18 +851,20 @@ BWindowScreen::SetLockState(int32 state)
 		acquire_engine_global = NULL;
 		release_engine_global = NULL;
 	}
-	
+
+	status_t status = B_ERROR;
+
+#ifdef COMPILE_FOR_R5	
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_SET_LOCK_STATE);
 	link.fSession->swrite_l(screen_index);
 	link.fSession->swrite_l(state);
 	link.fSession->swrite_l(server_token);
 	link.fSession->sync();
-	
-	status_t status;
 	link.fSession->sread(sizeof(status), &status);
+#endif
 	
-	if (status == B_NO_ERROR) {
+	if (status == B_OK) {
 		lock_state = state;
 		if (state == 1) {
 			if (addon_state == 0) {
@@ -923,16 +941,19 @@ BWindowScreen::GetCardInfo()
 		card_info.flags |= B_PARALLEL_BUFFER_ACCESS;
 	
 	screen_id id = screen.ID();
+	
+	status_t result = B_ERROR;
+
+#ifdef COMPILE_FOR_R5
 	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_GET_FRAMEBUFFER);
 	link.fSession->swrite_l(id.id);
 	link.fSession->sync();
-	
-	int32 result;
 	link.fSession->sread(sizeof(result), &result);
+	link.fSession->sread(sizeof(frame_buffer_config), &config);
+#endif
 	
-	if(result == B_NO_ERROR) {
-		link.fSession->sread(sizeof(frame_buffer_config), &config);
+	if(result == B_OK) {
 		card_info.id = id.id;
 		card_info.frame_buffer = config.frame_buffer;
 		card_info.bytes_per_row = config.bytes_per_row;
@@ -1009,6 +1030,11 @@ BWindowScreen::GetModeFromSpace(uint32 space, display_mode *dmode)
 status_t
 BWindowScreen::InitClone()
 {
+#ifndef COMPILE_FOR_R5
+	// TODO: Too much stuff to change, I'll just
+	return B_ERROR;
+	// for now
+#else
 	// TODO: Using BScreen::GetDeviceInfo() could do the job, I think,
 	// but it always returns B_ERROR on my system (Rudolf's Nvidia driver)
 	_BAppServerLink_ link;
@@ -1072,23 +1098,24 @@ BWindowScreen::InitClone()
 	}
 	
 	return result;
+#endif
 }
 
 
 status_t
 BWindowScreen::AssertDisplayMode(display_mode *dmode)
 {
-	status_t result;
-	_BAppServerLink_ link;
+	status_t result = B_ERROR;
 	
 	// TODO: Why not BScreen::SetMode() ?
+#ifdef COMPILE_FOR_R5
+	_BAppServerLink_ link;
 	link.fSession->swrite_l(WS_GET_DISPLAY_MODE); // check display_mode valid command
 	link.fSession->swrite_l(screen_index);
 	link.fSession->swrite(sizeof(display_mode), (void *)dmode);
 	link.fSession->sync();
-	
 	link.fSession->sread(sizeof(result), &result);
-	
+#endif	
 	// if the result is B_OK, we copy the dmode to new_space
 	if (result == B_OK) { 
 		memcpy(new_space, dmode, sizeof(display_mode));
