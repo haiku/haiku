@@ -54,7 +54,9 @@ void TIsMessageWaitingTest::IsMessageWaiting3()
 #else
 #if 0
 	// Testing to figure out why we get false positives from the R5
-	// implementation of BLooper::IsMessageWaiting().
+	// implementation of BLooper::IsMessageWaiting().  Basically, it tests for
+	// port_buffer_size_etc() != 0 -- which means that return values like
+	// B_WOULD_BLOCK make the function return true, which is just not correct.
 	CPPUNIT_ASSERT(Looper.IsLocked());
 	CPPUNIT_ASSERT(Looper.MessageQueue()->IsEmpty());
 
@@ -89,10 +91,18 @@ void TIsMessageWaitingTest::IsMessageWaiting5()
 	// Prevent a port read
 	Looper->Lock();
 	Looper->PostMessage('1234');
-	CPPUNIT_ASSERT(Looper->MessageQueue()->IsEmpty());
+//	CPPUNIT_ASSERT(Looper->MessageQueue()->IsEmpty());
 	CPPUNIT_ASSERT(Looper->IsMessageWaiting());
 
-	int32 count;
+// Tests to help figure out why the first assert above always worked under R5
+// but only sometimes for OBOS.  Answer: the OBOS implementation of BLooper
+// was attempting to lock itself prior to fetching the message from the queue.
+// I moved the lock attempt after the fetch and it worked the same.  I realized
+// that if the system was loaded heavily enough, the assert might still fail
+// simply because the looper would not had enough time to get to the fetch
+// (thereby emptying the queue), so the assert is no longer used.
+#if 0
+	ssize_t count;
 	do
 	{
 		count = port_buffer_size_etc(_get_looper_port_(Looper), B_TIMEOUT, 0);
@@ -100,10 +110,25 @@ void TIsMessageWaitingTest::IsMessageWaiting5()
 
 	cout << endl << "port_buffer_size_etc: ";
 	if (count < 0)
+	{
 		cout << strerror(count);
+	}
 	else
-		cout << count;
+	{
+		cout << count << endl;
+		char* buffer = new char[count];
+		int32 code;
+		read_port(_get_looper_port_(Looper), &code, (void*)buffer, count);
+		cout << "code: " << code << endl;
+		cout << "buffer: ";
+		for (int32 i = 0; i < count; ++i)
+		{
+			cout << buffer[i];
+		}
+		cout << endl;
+	}
 	cout << endl;
+#endif
 }
 //------------------------------------------------------------------------------
 Test* TIsMessageWaitingTest::Suite()

@@ -283,11 +283,14 @@ bool BLooper::IsMessageWaiting() const
 
 /**
 	@note:	What we're doing here differs slightly from the R5 implementation.
-			It appears that they probably return count != 0, which gives a false
-			true (!) result when port_buffer_size_etc() would block -- which
-			indicates that the port's buffer is empty, so we should return false.
-			Since we don't actually care about what the error is, we just return
-			count > 0.
+			It appears that they probably return count != 0, which gives an
+			incorrect true result when port_buffer_size_etc() would block --
+			which indicates that the port's buffer is empty, so we should return
+			false.  Since we don't actually care about what the error is, we
+			just return count > 0.  This has some interesting consequences in
+			that we will correctly return 'false' if the port is empty
+			(B_WOULD_BLOCK), whereas R5 will return true.  We call that a bug
+			where I come from. ;)
  */
 	int32 count;
 	do
@@ -779,7 +782,7 @@ status_t BLooper::_PostMessage(BMessage* msg, BHandler* handler,
 
 	if (!err)
 	{
-		err = Messenger.SendMessage(msg, reply_to);
+		err = Messenger.SendMessage(msg, reply_to, 0);
 	}
 
 	return err;
@@ -1062,7 +1065,8 @@ DBG(OUT("BLooper::ConvertToMessage()\n"));
 
 	if (raw != NULL)
 	{
-		if (bmsg->Unflatten((const char*)raw) != B_OK) {
+		if (bmsg->Unflatten((const char*)raw) != B_OK)
+		{
 DBG(OUT("BLooper::ConvertToMessage(): unflattening message failed\n"));
 			delete bmsg;
 			bmsg = NULL;
@@ -1085,6 +1089,7 @@ DBG(OUT("BLooper::task_looper()\n"));
 	while (!fTerminating)
 	{
 DBG(OUT("LOOPER: outer loop\n"));
+		// TODO: timeout determination algo
 		//	Read from message port (how do we determine what the timeout is?)
 DBG(OUT("LOOPER: MessageFromPort()...\n"));
 		BMessage* msg = MessageFromPort();
@@ -1108,25 +1113,31 @@ DBG(OUT("LOOPER: got no message\n"));
 			//	We use zero as our timeout since we know there is stuff there
 			msg = MessageFromPort(0);
 			//	Add messages to queue
-			fQueue->AddMessage(msg);
+			if (msg)
+			{
+				fQueue->AddMessage(msg);
+			}
 		}
 
 		//	loop: As long as there are messages in the queue and the port is
 		//		  empty... and we are not terminating, of course.
 		bool dispatchNextMessage = true;
-		while (!fTerminating && dispatchNextMessage) {
+		while (!fTerminating && dispatchNextMessage)
+		{
 DBG(OUT("LOOPER: inner loop\n"));
-			//	Lock the looper
-			Lock();
-
 			//	Get next message from queue (assign to fLastMessage)
 			fLastMessage = fQueue->NextMessage();
-			if (!fLastMessage) {
+
+			//	Lock the looper
+			Lock();
+			if (!fLastMessage)
+			{
 				// No more messages: Unlock the looper and terminate the
 				// dispatch loop.
 				dispatchNextMessage = false;
-				Unlock();
-			} else {
+			}
+			else
+			{
 DBG(OUT("LOOPER: fLastMessage: 0x%lx: %.4s\n", fLastMessage->what,
 (char*)&fLastMessage->what));
 DBG(fLastMessage->PrintToStream());
@@ -1186,20 +1197,23 @@ DBG(OUT("LOOPER: top_level_filter(): %p\n", handler));
 						DispatchMessage(fLastMessage, handler);
 					}
 				}
+			}
 
-				//	Unlock the looper
-				Unlock();
+			//	Unlock the looper
+			Unlock();
 
-				//	Delete the current message (fLastMessage)
+			//	Delete the current message (fLastMessage)
+			if (fLastMessage)
+			{
 				delete fLastMessage;
 				fLastMessage = NULL;
+			}
 
-				//	Are any messages on the port?
-				if (port_count(fMsgPort) > 0)
-				{
-					//	Do outer loop
-					dispatchNextMessage = false;
-				}
+			//	Are any messages on the port?
+			if (port_count(fMsgPort) > 0)
+			{
+				//	Do outer loop
+				dispatchNextMessage = false;
 			}
 		}
 	}
