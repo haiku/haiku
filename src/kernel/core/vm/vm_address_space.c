@@ -10,7 +10,6 @@
 #include <OS.h>
 #include <KernelExport.h>
 
-#include <kerrors.h>
 #include <vm.h>
 #include <vm_priv.h>
 #include <vm_page.h>

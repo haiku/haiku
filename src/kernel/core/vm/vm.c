@@ -10,7 +10,6 @@
 #include <OS.h>
 #include <KernelExport.h>
 
-#include <kerrors.h>
 #include <vm.h>
 #include <vm_priv.h>
 #include <vm_page.h>
@@ -520,7 +519,7 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddr
 	if (aspace->state == VM_ASPACE_STATE_DELETION) {
 		// okay, someone is trying to delete this aspace now, so we can't
 		// insert the area, so back out
-		err = ERR_VM_INVALID_ASPACE;
+		err = B_BAD_TEAM_ID;
 		goto err1b;
 	}
 
@@ -574,7 +573,7 @@ vm_unreserve_address_range(aspace_id aid, void *address, addr_t size)
 
 	addressSpace = vm_get_aspace_by_id(aid);
 	if (addressSpace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	acquire_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
 
@@ -582,7 +581,7 @@ vm_unreserve_address_range(aspace_id aid, void *address, addr_t size)
 	if (addressSpace->state == VM_ASPACE_STATE_DELETION) {
 		// okay, someone is trying to delete this aspace now, so we can't
 		// insert the area, so back out
-		status = ERR_VM_INVALID_ASPACE;
+		status = B_BAD_TEAM_ID;
 		goto out;
 	}
 
@@ -628,7 +627,7 @@ vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, add
 
 	addressSpace = vm_get_aspace_by_id(aid);
 	if (addressSpace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	area = _vm_create_reserved_region_struct(&addressSpace->virtual_map);
 	if (area == NULL) {
@@ -642,7 +641,7 @@ vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, add
 	if (addressSpace->state == VM_ASPACE_STATE_DELETION) {
 		// okay, someone is trying to delete this aspace now, so we can't
 		// insert the area, so back out
-		status = ERR_VM_INVALID_ASPACE;
+		status = B_BAD_TEAM_ID;
 		goto err2;
 	}
 
@@ -679,6 +678,9 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 
 	TRACE(("create_anonymous_area %s: size 0x%lx\n", name, size));
 
+	if (!arch_vm_supports_protection(protection))
+		return B_NOT_SUPPORTED;
+
 #ifdef DEBUG_KERNEL_STACKS
 	if ((protection & B_KERNEL_STACK_AREA) != 0)
 		isStack = true;
@@ -714,7 +716,7 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 
 	aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	size = PAGE_ALIGN(size);
 
@@ -900,8 +902,11 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 		" size = %lu, protection = %ld, phys = %p)\n",
 		aid, name, _address, addressSpec, size, protection, (void *)phys_addr));
 
+	if (!arch_vm_supports_protection(protection))
+		return B_NOT_SUPPORTED;
+
 	if (aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	// if the physical address is somewhat inside a page,
 	// move the actual area down to align on a page boundary
@@ -951,7 +956,7 @@ vm_create_null_area(aspace_id aid, const char *name, void **address, uint32 addr
 
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	size = PAGE_ALIGN(size);
 
@@ -1037,7 +1042,7 @@ _vm_map_file(aspace_id aid, const char *name, void **_address, uint32 addressSpe
 
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	TRACE(("_vm_map_file(\"%s\", offset = %Ld, size = %lu, mapping %ld)\n", path, offset, size, mapping));
 
@@ -1079,6 +1084,9 @@ area_id
 vm_map_file(aspace_id aid, const char *name, void **address, uint32 addressSpec,
 	addr_t size, uint32 protection, uint32 mapping, const char *path, off_t offset)
 {
+	if (!arch_vm_supports_protection(protection))
+		return B_NOT_SUPPORTED;
+
 	return _vm_map_file(aid, name, address, addressSpec, size, protection, mapping, path, offset, true);
 }
 
@@ -1101,7 +1109,7 @@ _user_vm_map_file(const char *uname, void **uaddress, int addressSpec,
 		return B_BAD_ADDRESS;
 
 	// userland created areas can always be accessed by the kernel
-	protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+	protection |= B_KERNEL_READ_AREA | (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
 
 	rc = _vm_map_file(vm_get_current_user_aspace_id(), name, &address, addressSpec, size,
 			protection, mapping, path, offset, false);
@@ -1125,12 +1133,12 @@ vm_clone_area(aspace_id aid, const char *name, void **address, uint32 addressSpe
 
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	sourceArea = vm_get_area(sourceID);
 	if (sourceArea == NULL) {
 		vm_put_aspace(aspace);
-		return ERR_VM_INVALID_REGION;
+		return B_BAD_VALUE;
 	}
 
 	if (sourceArea->aspace == kernel_aspace && aspace != kernel_aspace
@@ -1187,7 +1195,7 @@ vm_delete_area(aspace_id aid, area_id rid)
 
 	aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	err = _vm_delete_area(aspace, rid);
 	vm_put_aspace(aspace);
@@ -1436,11 +1444,8 @@ vm_set_area_protection(aspace_id aspaceID, area_id areaID, uint32 newProtection)
 	TRACE(("vm_set_area_protection(aspace = %#lx, area = %#lx, protection = %#lx)\n",
 		aspaceID, areaID, newProtection));
 
-	if ((newProtection & (B_EXECUTE_AREA | B_KERNEL_EXECUTE_AREA)) != 0
-		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
-		// executable areas must not be writable
-		return B_NOT_ALLOWED;
-	}
+	if (!arch_vm_supports_protection(newProtection))
+		return B_NOT_SUPPORTED;
 
 	area = vm_get_area(areaID);
 	if (area == NULL)
@@ -1533,7 +1538,7 @@ vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr)
 
 	aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	err = aspace->translation_map.ops->query(&aspace->translation_map,
 		vaddr, paddr, &null_flags);
@@ -1844,7 +1849,7 @@ vm_area_for(aspace_id aid, addr_t address)
 
 	addressSpace = vm_get_aspace_by_id(aid);
 	if (addressSpace == NULL)
-		return ERR_VM_INVALID_ASPACE;
+		return B_BAD_TEAM_ID;
 
 	acquire_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0, 0);
 
@@ -2640,6 +2645,26 @@ vm_try_reserve_memory(size_t amount)
 }
 
 
+/**	This function enforces some protection properties:
+ *	 - if B_WRITE_AREA is set, B_WRITE_KERNEL_AREA is set as well
+ *	 - if only B_READ_AREA has been set, B_KERNEL_READ_AREA is also set
+ *	 - if no protection is specified, it defaults to B_KERNEL_READ_AREA
+ *	   and B_KERNEL_WRITE_AREA.
+ */
+
+static void
+fix_protection(uint32 *protection)
+{
+	if ((*protection & B_KERNEL_PROTECTION) == 0) {
+		if ((*protection & B_USER_PROTECTION) == 0
+			|| (*protection & B_WRITE_AREA) != 0)
+			*protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+		else
+			*protection |= B_KERNEL_READ_AREA;
+	}
+}
+
+
 //	#pragma mark -
 
 
@@ -2922,6 +2947,8 @@ _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 status_t
 set_area_protection(area_id area, uint32 newProtection)
 {
+	fix_protection(&newProtection);
+
 	return vm_set_area_protection(vm_get_kernel_aspace_id(), area, newProtection);
 }
 
@@ -3114,8 +3141,10 @@ area_id
 map_physical_memory(const char *name, void *physicalAddress, size_t numBytes,
 	uint32 addressSpec, uint32 protection, void **_virtualAddress)
 {
-	if ((protection & B_KERNEL_PROTECTION) == 0)
-		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+	if (!arch_vm_supports_protection(protection))
+		return B_NOT_SUPPORTED;
+
+	fix_protection(&protection);
 
 	return vm_map_physical_memory(vm_get_kernel_aspace_id(), name, _virtualAddress,
 		addressSpec, numBytes, protection, (addr_t)physicalAddress);
@@ -3138,6 +3167,8 @@ area_id
 create_area_etc(struct team *team, const char *name, void **address, uint32 addressSpec,
 	uint32 size, uint32 lock, uint32 protection)
 {
+	fix_protection(&protection);
+
 	return vm_create_anonymous_area(team->aspace->id, (char *)name, address, 
 				addressSpec, size, lock, protection);
 }
@@ -3147,8 +3178,7 @@ area_id
 create_area(const char *name, void **_address, uint32 addressSpec, size_t size, uint32 lock,
 	uint32 protection)
 {
-	if ((protection & B_KERNEL_PROTECTION) == 0)
-		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+	fix_protection(&protection);
 
 	return vm_create_anonymous_area(vm_get_kernel_aspace_id(), (char *)name, _address, 
 				addressSpec, size, lock, protection);
@@ -3242,9 +3272,10 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 	if ((newProtection & ~B_USER_PROTECTION) != 0)
 		return B_BAD_VALUE;
 
+	fix_protection(&newProtection);
+
 	return vm_set_area_protection(vm_get_current_user_aspace_id(), area,
-		newProtection | B_KERNEL_READ_AREA
-			| (newProtection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0));
+		newProtection);
 }
 
 
@@ -3308,9 +3339,10 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
+	fix_protection(&protection);
+
 	clonedArea = vm_clone_area(vm_get_current_user_aspace_id(), name, &address,
-		addressSpec, protection | B_KERNEL_READ_AREA | (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0),
-		REGION_NO_PRIVATE_MAP, sourceArea);
+		addressSpec, protection, REGION_NO_PRIVATE_MAP, sourceArea);
 	if (clonedArea < B_OK)
 		return clonedArea;
 
@@ -3350,9 +3382,10 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 		&& IS_KERNEL_ADDRESS(address))
 		return B_BAD_VALUE;
 
+	fix_protection(&protection);
+
 	area = vm_create_anonymous_area(vm_get_current_user_aspace_id(), (char *)name, &address, 
-				addressSpec, size, lock, protection | B_KERNEL_READ_AREA
-					| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0));
+				addressSpec, size, lock, protection);
 
 	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
 		delete_area(area);
