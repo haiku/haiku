@@ -208,9 +208,10 @@ status_t check_acc_capability(uint32 feature)
 	}
 
 	//fixme:
-	if(si->ps.card_arch >= NV40A)
+	if ((si->settings.dma_acc && (feature != B_SCREEN_TO_SCREEN_BLIT)) ||
+		si->ps.card_arch >= NV40A)
 	{
-		LOG(4, ("Acc: Acc not setup yet; not exporting hook %s.\n", msg));
+		LOG(4, ("Acc: Function not setup yet; not exporting hook %s.\n", msg));
 		return B_ERROR;
 	}
 

@@ -35,7 +35,7 @@ status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, en
 	if (st) SYNC_TO_TOKEN(st);
 
 	/* make sure all needed engine cmd's are mapped to the FIFO */
-	if (si->ps.card_arch < NV40A)
+	if (!si->settings.dma_acc)
 		nv_acc_assert_fifo();
 	else
 		nv_acc_assert_fifo_dma();
@@ -58,7 +58,7 @@ status_t RELEASE_ENGINE(engine_token *et, sync_token *st)
 void WAIT_ENGINE_IDLE(void)
 {
 	/*wait for the engine to be totally idle*/
-	if (si->ps.card_arch < NV40A)
+	if (!si->settings.dma_acc)
 		nv_acc_wait_idle();
 	else
 		nv_acc_wait_idle_dma();

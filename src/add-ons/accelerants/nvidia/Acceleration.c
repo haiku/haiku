@@ -21,7 +21,7 @@ void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count)
 {
 	int i;
 
-	if(si->ps.card_arch < NV40A)
+	if(!si->settings.dma_acc)
 	{
 		/* init acc engine for blit function */
 		nv_acc_setup_blit();
@@ -114,7 +114,7 @@ void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list,
 {
 	int i;
 
-	if(si->ps.card_arch < NV40A)
+	if(!si->settings.dma_acc)
 	{
 		/* init acc engine for fill function */
 		nv_acc_setup_rectangle(colorIndex);
@@ -158,7 +158,7 @@ void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count)
 {
 	int i;
 
-	if(si->ps.card_arch < NV40A)
+	if(!si->settings.dma_acc)
 	{
 		/* init acc engine for invert function */
 		nv_acc_setup_rect_invert();
@@ -202,7 +202,7 @@ void FILL_SPAN(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count)
 {
 	int i;
 
-	if(si->ps.card_arch < NV40A)
+	if(!si->settings.dma_acc)
 	{
 		/* init acc engine for fill function */
 		nv_acc_setup_rectangle(colorIndex);
