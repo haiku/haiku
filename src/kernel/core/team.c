@@ -2058,9 +2058,9 @@ _user_process_info(pid_t process, int32 which)
 pid_t
 _user_setpgid(pid_t processID, pid_t groupID)
 {
-	struct team *currentTeam = thread_get_current_thread()->team;
+	struct thread *thread = thread_get_current_thread();
+	struct team *currentTeam = thread->team;
 	struct process_group *group = NULL, *freeGroup = NULL;
-	struct thread *thread;
 	struct team *team;
 	cpu_status state;
 	team_id teamID = -1;
@@ -2069,16 +2069,18 @@ _user_setpgid(pid_t processID, pid_t groupID)
 	if (groupID < 0)
 		return B_BAD_VALUE;
 
-	if (processID == 0) {
-		// get our own process ID
+	if (processID == 0)
 		processID = currentTeam->main_thread->id;
+
+	if (processID == currentTeam->main_thread->id) {
+		// we set our own group
 		teamID = currentTeam->id;
 
 		// we must not change our process group ID if we're a group leader
 		if (is_process_group_leader(currentTeam)) {
 			// if the group ID was not specified, we just return the
 			// process ID as we already are a process group leader
-			if (groupID == 0)
+			if (groupID == 0 || groupID == processID)
 				return processID;
 
 			return B_NOT_ALLOWED;
