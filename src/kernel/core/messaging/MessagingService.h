@@ -63,6 +63,7 @@ public:
 
 	status_t RegisterService(sem_id lockingSem, sem_id counterSem,
 		area_id &areaID);
+	status_t UnregisterService();
 
 	status_t SendMessage(const void *message, int32 messageSize,
 		const messaging_target *targets, int32 targetCount);
@@ -72,6 +73,7 @@ private:
 		MessagingArea *&area, void *&data);
 
 	BLocker			fLock;
+	team_id			fServerTeam;
 	sem_id			fLockSem;
 	sem_id			fCounterSem;
 	MessagingArea	*fFirstArea;

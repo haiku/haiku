@@ -60,6 +60,25 @@ _user_register_messaging_service(sem_id lockSem, sem_id counterSem)
 	return (error != B_OK ? error : areaID);
 }
 
+// _user_unregister_messaging_service
+status_t
+_user_unregister_messaging_service()
+{
+	// check, if init_messaging_service() has been called yet
+	if (!sMessagingService)
+		return B_NO_INIT;
+
+	if (!sMessagingService->Lock())
+		return B_BAD_VALUE;
+
+	status_t error = sMessagingService->UnregisterService();
+
+	sMessagingService->Unlock();
+
+	return error;
+}
+
+
 // send_message
 status_t
 send_message(const void *message, int32 messageSize,
@@ -385,6 +404,40 @@ MessagingService::RegisterService(sem_id lockSem, sem_id counterSem,
 
 	areaID = fFirstArea->ID();
 	fFirstArea->Unlock();
+
+	// store the server team and the semaphores
+	fServerTeam = threadInfo.team;
+	fLockSem = lockSem;
+	fCounterSem = counterSem;
+
+	return B_OK;
+}
+
+// UnregisterService
+status_t
+MessagingService::UnregisterService()
+{
+	// check, if the team calling this function is indeed the server team
+	thread_info threadInfo;
+	status_t error = get_thread_info(find_thread(NULL), &threadInfo);
+	if (error != B_OK)
+		return error;
+
+	if (threadInfo.team != fServerTeam)
+		return B_BAD_VALUE;
+
+	// delete all areas
+	while (fFirstArea) {
+		MessagingArea *area = fFirstArea;
+		fFirstArea = area;
+		delete area;
+	}
+	fLastArea = NULL;
+
+	// unset the other members
+	fLockSem = -1;
+	fCounterSem -1;
+	fServerTeam = -1;
 
 	return B_OK;
 }
