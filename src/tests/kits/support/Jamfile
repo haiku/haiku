@@ -11,6 +11,8 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bblockcache ] ;
 CommonTestLib libsupporttest.so
 	: SupportKitTestAddon.cpp
 
+		ByteOrderTest.cpp
+
 		# BArchivable
 		ArchivableTest.cpp
 		BArchivableTester.cpp

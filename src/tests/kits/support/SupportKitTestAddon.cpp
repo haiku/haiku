@@ -9,8 +9,12 @@
 #include "bmemoryio/MallocIOTest.h"
 #include "bstring/StringTest.h"
 #include "bblockcache/BlockCacheTest.h"
+#include "ByteOrderTest.h"
 
-BTestSuite* getTestSuite() {
+
+BTestSuite *
+getTestSuite()
+{
 	BTestSuite *suite = new BTestSuite("Support");
 
 	// ##### Add test suites here #####
@@ -21,6 +25,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BMallocIO", MallocIOTestSuite());
 	suite->addTest("BString", StringTestSuite());
 	suite->addTest("BBlockCache", BlockCacheTestSuite());
-		
+	suite->addTest("ByteOrder", ByteOrderTestSuite());
+
 	return suite;
 }
