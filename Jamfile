@@ -14,6 +14,7 @@ Depends NetworkingKit :
 	raw	ipv4 icmp udp tcp
 	libnet.so libnetapi.so 
 	ping ifconfig route traceroute arp
+	sis900 rtl8139
 ;	
  
 # Pseudo-target to build the media stuffs only
