@@ -49,8 +49,8 @@ StyledEditWindow::~StyledEditWindow()
 {
 	if (fSaveMessage)
 		delete fSaveMessage;
-	if (fPrintSettings)
-		delete fPrintSettings;
+//	if (fPrintSettings)
+//		delete fPrintSettings;
 	
 	delete fSavePanel;
 } /***~StyledEditWindow()***/
@@ -984,7 +984,7 @@ StyledEditWindow::PageSetup(const char *documentname)
 	result= printJob.ConfigPage();
 		
 	if (result== B_NO_ERROR){
-		delete fPrintSettings;
+//		delete fPrintSettings;
 		fPrintSettings= printJob.Settings();
 	}	
 				
@@ -1243,7 +1243,7 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 	
 	// clear that family's bit on the menu, if necessary
 	if (strcmp(oldFamily,fontFamily)) {
-		BMenuItem * oldItem = fMenuBar->FindItem(oldFamily);
+		BMenuItem * oldItem = fFontMenu->FindItem(oldFamily);
 		if (oldItem != 0) {
 			oldItem->SetMarked(false);
 		}
@@ -1253,7 +1253,7 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 	fTextView->SetFontAndColor(&font);
 	
 	BMenuItem * superItem;
-	superItem = fMenuBar->FindItem(fontFamily);
+	superItem = fFontMenu->FindItem(fontFamily);
 	if (superItem != 0) {
 		superItem->SetMarked(true);
 	}
