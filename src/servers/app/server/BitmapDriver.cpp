@@ -815,23 +815,9 @@ void BitmapDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &sourcerect, con
 	
 
 	// Second, check rectangle bounds against their own bitmaps
-	BRect work_rect(_target->Bounds());
+	BRect work_rect(bitmap->Bounds());
 	
-	if( !(work_rect.Contains(destrect)) )
-	{
-		// something in selection must be clipped
-		if(destrect.left < 0)
-			destrect.left = 0;
-		if(destrect.right > work_rect.right)
-			destrect.right = work_rect.right;
-		if(destrect.top < 0)
-			destrect.top = 0;
-		if(destrect.bottom > work_rect.bottom)
-			destrect.bottom = work_rect.bottom;
-	}
-
-	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
-
+	// Is there anything at all to copy?
 	if(!work_rect.Contains(sourcerect))
 		return;
 
@@ -846,6 +832,21 @@ void BitmapDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &sourcerect, con
 			source.top = 0;
 		if(source.bottom > work_rect.bottom)
 			source.bottom = work_rect.bottom;
+	}
+	
+	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
+	
+	if( !(work_rect.Contains(destrect)) )
+	{
+		// something in selection must be clipped
+		if(destrect.left < 0)
+			destrect.left = 0;
+		if(destrect.right > work_rect.right)
+			destrect.right = work_rect.right;
+		if(destrect.top < 0)
+			destrect.top = 0;
+		if(destrect.bottom > work_rect.bottom)
+			destrect.bottom = work_rect.bottom;
 	}
 
 	// Set pointers to the actual data
@@ -862,7 +863,7 @@ void BitmapDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &sourcerect, con
 	
 	
 	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
-	uint32 lines = uint32 (source.bottom-source.top+1);
+	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
 
 	for (uint32 pos_y=0; pos_y<lines; pos_y++)
 	{
@@ -924,6 +925,7 @@ void BitmapDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 
 	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
 
+	// Is there anything at all to copy?
 	if(!work_rect.Contains(sourcerect))
 		return;
 
