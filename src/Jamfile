@@ -1,8 +1,8 @@
 SubDir OBOS_TOP src ;
 
+SubInclude OBOS_TOP src kernel ;
 SubInclude OBOS_TOP src add-ons ;
 SubInclude OBOS_TOP src apps ;
-SubInclude OBOS_TOP src kernel ;
 SubInclude OBOS_TOP src kits ;
 SubInclude OBOS_TOP src prefs ;
 SubInclude OBOS_TOP src servers ;
