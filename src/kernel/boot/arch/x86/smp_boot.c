@@ -39,8 +39,8 @@ map_page(kernel_args *ka, uint32 paddr, uint32 vaddr)
 	if (pgdir[vaddr / PAGE_SIZE / 1024] == 0) {
 		unsigned int pgtable;
 		// we need to allocate a pgtable
-		pgtable = ka->phys_alloc_range[0].start + ka->phys_alloc_range[0].size;
-		ka->phys_alloc_range[0].size += PAGE_SIZE;
+		pgtable = ka->physical_allocated_range[0].start + ka->physical_allocated_range[0].size;
+		ka->physical_allocated_range[0].size += PAGE_SIZE;
 		ka->arch_args.pgtables[ka->arch_args.num_pgtables++] = pgtable;
 
 		// put it in the pgdir
@@ -390,14 +390,14 @@ smp_boot_all_cpus(kernel_args *ka)
 		uint32 j;
 
 		// create a final stack the trampoline code will put the ap processor on
-		ka->cpu_kstack[i].start = ka->virt_alloc_range[0].start + ka->virt_alloc_range[0].size;
+		ka->cpu_kstack[i].start = ka->virtual_allocated_range[0].start + ka->virtual_allocated_range[0].size;
 		ka->cpu_kstack[i].size = STACK_SIZE * PAGE_SIZE;
 		for (j = 0; j < ka->cpu_kstack[i].size / PAGE_SIZE; j++) {
 			// map the pages in
-			map_page(ka, ka->phys_alloc_range[0].start + ka->phys_alloc_range[0].size,
-				ka->virt_alloc_range[0].start + ka->virt_alloc_range[0].size);
-			ka->phys_alloc_range[0].size += PAGE_SIZE;
-			ka->virt_alloc_range[0].size += PAGE_SIZE;
+			map_page(ka, ka->physical_allocated_range[0].start + ka->physical_allocated_range[0].size,
+				ka->virtual_allocated_range[0].start + ka->virtual_allocated_range[0].size);
+			ka->physical_allocated_range[0].size += PAGE_SIZE;
+			ka->virtual_allocated_range[0].size += PAGE_SIZE;
 		}
 
 		// set this stack up
@@ -526,13 +526,13 @@ smp_boot(kernel_args *ka, uint32 kernel_entry)
 		TRACE(("ioapic_phys = %p\n", ka->arch_args.ioapic_phys));
 
 		// map in the apic & ioapic
-		map_page(ka, ka->arch_args.apic_phys, ka->virt_alloc_range[0].start + ka->virt_alloc_range[0].size);
-		ka->arch_args.apic = (uint32 *)(ka->virt_alloc_range[0].start + ka->virt_alloc_range[0].size);
-		ka->virt_alloc_range[0].size += PAGE_SIZE;
+		map_page(ka, ka->arch_args.apic_phys, ka->virtual_allocated_range[0].start + ka->virtual_allocated_range[0].size);
+		ka->arch_args.apic = (uint32 *)(ka->virtual_allocated_range[0].start + ka->virtual_allocated_range[0].size);
+		ka->virtual_allocated_range[0].size += PAGE_SIZE;
 
-		map_page(ka, ka->arch_args.ioapic_phys, ka->virt_alloc_range[0].start + ka->virt_alloc_range[0].size);
-		ka->arch_args.ioapic = (uint32 *)(ka->virt_alloc_range[0].start + ka->virt_alloc_range[0].size);
-		ka->virt_alloc_range[0].size += PAGE_SIZE;
+		map_page(ka, ka->arch_args.ioapic_phys, ka->virtual_allocated_range[0].start + ka->virtual_allocated_range[0].size);
+		ka->arch_args.ioapic = (uint32 *)(ka->virtual_allocated_range[0].start + ka->virtual_allocated_range[0].size);
+		ka->virtual_allocated_range[0].size += PAGE_SIZE;
 
 		TRACE(("apic = %p\n", ka->arch_args.apic));
 		TRACE(("ioapic = %p\n", ka->arch_args.ioapic));

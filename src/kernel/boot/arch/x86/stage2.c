@@ -236,16 +236,16 @@ _start(uint32 mem, int in_vesa, uint32 vesa_ptr)
 
 	// save the kernel args
 	ka->arch_args.system_time_cv_factor = cv_factor;
-	ka->phys_mem_range[0].start = 0;
-	ka->phys_mem_range[0].size = mem;
-	ka->num_phys_mem_ranges = 1;
+	ka->physical_memory_range[0].start = 0;
+	ka->physical_memory_range[0].size = mem;
+	ka->num_physical_memory_ranges = 1;
 	ka->str = NULL;
-	ka->phys_alloc_range[0].start = BOOTDIR_ADDR;
-	ka->phys_alloc_range[0].size = next_paddr - BOOTDIR_ADDR;
-	ka->num_phys_alloc_ranges = 1;
-	ka->virt_alloc_range[0].start = KERNEL_BASE;
-	ka->virt_alloc_range[0].size = next_vaddr - KERNEL_BASE;
-	ka->num_virt_alloc_ranges = 1;
+	ka->physical_allocated_range[0].start = BOOTDIR_ADDR;
+	ka->physical_allocated_range[0].size = next_paddr - BOOTDIR_ADDR;
+	ka->num_physical_allocated_ranges = 1;
+	ka->virtual_allocated_range[0].start = KERNEL_BASE;
+	ka->virtual_allocated_range[0].size = next_vaddr - KERNEL_BASE;
+	ka->num_virtual_allocated_ranges = 1;
 	ka->arch_args.page_hole = 0xffc00000;
 	ka->num_cpus = 1;
 #if 0
