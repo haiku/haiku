@@ -102,6 +102,28 @@ get_next_physical_page()
 }
 
 
+/**	Adds a new page table for the specified base address and makes
+ *	it current, ie. sets sPageTable to point to the new table.
+ */
+
+static void
+add_page_table(addr_t base)
+{
+	// Get new page table and clear it out
+	sPageTable = (uint32 *)get_next_physical_page();
+	if (sPageTable > (uint32 *)(8 * 1024 * 1024))
+		panic("tried to add page table beyond the indentity mapped 8 MB region\n");
+
+	gKernelArgs.arch_args.pgtables[gKernelArgs.arch_args.num_pgtables++] = (uint32)sPageTable;
+
+	for (int32 i = 0; i < 1024; i++)
+		sPageTable[i] = 0;
+
+	// put the new page table into the page directory
+	sPageDirectory[base/(4*1024*1024)] = (uint32)sPageTable | kDefaultPageFlags;
+}
+
+
 /** Creates an entry to map the specified virtualAddress to the given
  *	physicalAddress.
  *	Note, it can only map the 4 meg region right after KERNEL_BASE; this
@@ -114,8 +136,18 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 {
 	TRACE(("map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress, physicalAddress));
 
-	if (virtualAddress < KERNEL_BASE || virtualAddress >= sMaxVirtualAddress)
+	if (virtualAddress < KERNEL_BASE)
 		panic("map_page: asked to map invalid page %p!\n", (void *)virtualAddress);
+
+	if (virtualAddress >= sMaxVirtualAddress) {
+		// we need to add a new page table
+
+		add_page_table(sMaxVirtualAddress);
+		sMaxVirtualAddress += B_PAGE_SIZE * 1024;
+
+		if (virtualAddress >= sMaxVirtualAddress)
+			panic("map_page: asked to map a page to %p\n", (void *)virtualAddress);
+	}
 
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
 
@@ -214,17 +246,8 @@ init_page_directory()
 
 	sPageDirectory[1] = (uint32)pgtable | kDefaultPageFlags;
 
-	// Get new page table and clear it out
-	sPageTable = (uint32 *)get_next_physical_page();
-	gKernelArgs.arch_args.pgtables[0] = (uint32)sPageTable;
-	gKernelArgs.arch_args.num_pgtables = 1;
-
-	for (int32 i = 0; i < 1024; i++)
-		sPageTable[i] = 0;
-
-	// put the new page table into the page directory
-	// this maps the kernel at KERNEL_BASE
-	sPageDirectory[KERNEL_BASE/(4*1024*1024)] = (uint32)sPageTable | kDefaultPageFlags;
+	gKernelArgs.arch_args.num_pgtables = 0;
+	add_page_table(KERNEL_BASE);
 
 	// switch to the new pgdir and enable paging
 	asm("movl %0, %%eax;"
