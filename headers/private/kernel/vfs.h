@@ -69,12 +69,6 @@ int vfs_setrlimit(int resource, const struct rlimit * rlp);
 //	or similar places.
 extern status_t notify_select_event(struct selectsync *sync, uint32 ref, uint8 event);
 
-/* calls needed by fs internals */
-extern status_t vfs_new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode);
-extern status_t vfs_get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_privateNode);
-extern status_t vfs_put_vnode(mount_id mountID, vnode_id vnodeID);
-extern status_t vfs_remove_vnode(mount_id mountID, vnode_id vnodeID);
-
 /* calls needed by the VM for paging */
 int vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode);
 status_t vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode);
