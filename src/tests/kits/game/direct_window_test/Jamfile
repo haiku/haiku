@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src tests kits game direct_window_test ;
+
+SimpleTest direct_window_test
+	: Stars.cpp StarWindow.cpp
+	: game be root
+;
+

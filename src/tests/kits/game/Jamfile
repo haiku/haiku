@@ -3,4 +3,5 @@ SubDir OBOS_TOP src tests kits game ;
 SubInclude OBOS_TOP src tests kits game file_game_sound_test ;
 SubInclude OBOS_TOP src tests kits game set_mouse_position_test ;
 SubInclude OBOS_TOP src tests kits game simple_game_sound_test ;
+SubInclude OBOS_TOP src tests kits game direct_window_test ;
 
