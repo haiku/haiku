@@ -4,11 +4,15 @@
 #include <Messenger.h>
 #include <OS.h>
 #include <Roster.h>
+#include <Screen.h>
 #include <ScrollView.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "Network.h"
+
+#define NETWORK_WINDOW_RIGHT 435
+#define NETWORK_WINDOW_BOTTOM 309
 
 #define B_GREY 216,216,216
 
@@ -28,53 +32,72 @@ Network::Network() : BApplication("application/x-vnd.OBOS-Network")
 	fwindow ->GetEverything();
 }
 
-
-NetworkWindow::NetworkWindow() : BWindow(BRect(100,100,600,420),"Network",B_TITLED_WINDOW,B_NOT_ANCHORED_ON_ACTIVATE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE,B_CURRENT_WORKSPACE) 
+NetworkWindow::NetworkWindow() : BWindow(BRect(0, 0, NETWORK_WINDOW_RIGHT, NETWORK_WINDOW_BOTTOM),"Network",B_TITLED_WINDOW,B_NOT_ANCHORED_ON_ACTIVATE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE,B_CURRENT_WORKSPACE) 
 {
+		// if(!Network_settings)
+		// { ...
+		BScreen screen;
+
+		BRect screenframe = screen.Frame();
+		float screenx, screeny;
+		screenx = ((screenframe.right + 1) / 2) - (NETWORK_WINDOW_RIGHT / 2) - 1;
+		screeny = ((screenframe.bottom + 1) / 2) - (NETWORK_WINDOW_BOTTOM / 2) - 1;
+		MoveTo(screenx, screeny);
+		// }
+		// else
+		// {
+		// ...
+		// }
+		
 		BRect bounds = Bounds();
 		fview    = new BView(bounds,"View",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
 	
-			frestart = new BButton(BRect(10,285,130,310),"Restart_Networking","Restart Networking",new BMessage(kRestart_Networking_M));
-			frevert  = new BButton(BRect(150,285,210,310),"Revert","Revert",new BMessage(kRevert_M));
-			fsave	 = new BButton(BRect(400,285,480,310),"Save","Save",new BMessage(kSave_M));
+			frestart = new BButton(BRect(11,274,122,298),"Restart_Networking","Restart Networking",new BMessage(kRestart_Networking_M));
+			frevert  = new BButton(BRect(145,274,220,298),"Revert","Revert",new BMessage(kRevert_M));
+			fsave	 = new BButton(BRect(349,274,424,297),"Save","Save",new BMessage(kSave_M));
 			fsave->MakeDefault(true);
 			fsave->SetEnabled(false);
 			frevert->SetEnabled(false);
 	
-			bounds.bottom -= 50;
-			bounds.InsetBy(5,5);
-			ftabview = new BTabView(bounds,"tab_view");
+			bounds.bottom = Bounds().Height();
+			bounds.top += 10;
+			bounds.right = Bounds().Width();
+			ftabview = new BTabView(bounds,"tab_view", B_WIDTH_FROM_WIDEST);
 	
 				fidentity       = new BTab();
 				bounds.bottom -= ftabview->TabHeight();
 				fidentity_view  = new BView(bounds,"Identity",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
 				fservices_view  = new BView(bounds,"Services",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
-	
-					bounds.bottom -= 160;
-					bounds.right  -= 20; 
+					
+					bounds.top -= 10;
+					bounds.bottom -= 209;
+					bounds.left += 11;
+					bounds.right  -= 12; 
 					fnames 	   	   = new BBox(bounds,"Names",B_FOLLOW_LEFT | B_FOLLOW_TOP,B_WILL_DRAW | B_FRAME_EVENTS);
 					
-						fdomain     	= new BTextControl(BRect(10,15,220,45),"Domain_Name","Domain Name:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));  
-						fhost			= new BTextControl(BRect(10,50,220,90),"Host_Name","Host Name:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));   
-						fprimary_dns	= new BTextControl(BRect(240,15,440,45),"Primary_DNS","Primary DNS:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));  
-						fsecondary_dns	= new BTextControl(BRect(240,50,440,90),"Secondary_DNS","Secondary_DNS:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));   
+						fdomain     	= new BTextControl(BRect(15,19,195,50),"Domain_Name","Domain name:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));  
+						fhost			= new BTextControl(BRect(15,49,195,90),"Host_Name","Host name:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));   
+						fprimary_dns	= new BTextControl(BRect(209,19,399,45),"Primary_DNS","Primary DNS:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));  
+						fsecondary_dns	= new BTextControl(BRect(209,49,399,90),"Secondary_DNS","Secondary DNS:",NULL,new BMessage(kSOMETHING_HAS_CHANGED_M));   
 
-					bounds.top     = bounds.bottom + 10;
-					bounds.bottom  = 220; 
+					bounds.top     = bounds.bottom + 12;
+					bounds.bottom  = 208; 
 					finterfaces     = new BBox(bounds,"Network_Interfaces",B_FOLLOW_LEFT | B_FOLLOW_TOP,B_WILL_DRAW | B_FRAME_EVENTS); 
 					
-						fsettings	= new BButton(BRect(395,17,460,37),"Settings","Settings",new BMessage(kSettings_M));
-						fclear		= new BButton(BRect(395,47,460,67),"Clear","Clear",new BMessage(kClear_M));
-						fcustom		= new BButton(BRect(395,87,460,107),"Add","Add...",new BMessage(kCustom_M));
-						fsettings	->SetEnabled(false);
-						fclear		->SetEnabled(false);
+						fsettings	= new BButton(BRect(325,16,400,37),"Settings","Settings...",new BMessage(kSettings_M));
+						fclear		= new BButton(BRect(325,45,400,67),"Clear","Clear",new BMessage(kClear_M));
+						fcustom		= new BButton(BRect(325,83,400,107),"Custom","Custom...",new BMessage(kCustom_M));
+						//fsettings	->SetEnabled(false);
+						//fclear		->SetEnabled(false);
 						
 						bounds							 = finterfaces->Bounds();
 						bounds.InsetBy(20,20);
-						bounds.bottom					 += 5;
-						bounds.right					 -= 70;  
+						bounds.top						 ++;
+						bounds.bottom					 += 6;
+						bounds.right					 -= 94;
+						bounds.left						 -= 5;  
 						finterfaces_list 			 = new NetListView(bounds,"Interfaces_List");	
-						BScrollView *interfaces_scroller = new BScrollView("Interfaces_Scroller",finterfaces_list);	
+						BScrollView *interfaces_scroller = new BScrollView("Interfaces_Scroller",finterfaces_list, B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, 0, 1, B_FANCY_BORDER);	
 				
 				fservices       = new BTab();
 				fftp_server	   = new BCheckBox(BRect(10,20,120,40),"FTP_Server","FTP Server",new BMessage(kSOMETHING_HAS_CHANGED_M));
@@ -96,19 +119,26 @@ NetworkWindow::NetworkWindow() : BWindow(BRect(100,100,600,420),"Network",B_TITL
 						fremove   = new BButton(BRect(170,87,250,107),"Delete","Delete",new BMessage(kDelete_M));
 						frestore->SetEnabled(false);
 						fremove->SetEnabled(false);
-					
+						
+				BBox *hr = new BBox(BRect(1,261,Bounds().Width()-1,262), "horizontal_rule");
+				BBox *vr = new BBox(BRect(133, 274, 134, 299), "vertical_rule");
+				
+	fdomain->SetDivider(70);
 	fdomain->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fhost->SetDivider(70);
 	fhost->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fprimary_dns->SetDivider(80);
 	fprimary_dns->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);
+	fsecondary_dns->SetDivider(80);
 	fsecondary_dns->SetAlignment(B_ALIGN_RIGHT,B_ALIGN_LEFT);			
 	
 	fnames			->SetLabel("Names");
 	finterfaces		->SetLabel("Network Interfaces");
 	fconfigurations	->SetLabel("Configurations");
-	fidentity_view	->SetViewColor(B_GREY);
-	fservices_view	->SetViewColor(B_GREY);
-	ftabview		->SetViewColor(B_GREY);	
-	fview			->SetViewColor(B_GREY);
+	fidentity_view	->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fservices_view	->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	ftabview		->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));	
+	fview			->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 //Casts an AddEverything 
 	ftabview			->AddTab(fidentity_view,fidentity);
@@ -118,10 +148,10 @@ NetworkWindow::NetworkWindow() : BWindow(BRect(100,100,600,420),"Network",B_TITL
 	fnames			->AddChild(fhost);
 	fnames			->AddChild(fprimary_dns);
 	fnames			->AddChild(fsecondary_dns);
+	finterfaces		->AddChild(interfaces_scroller);
 	finterfaces		->AddChild(fsettings);
 	finterfaces		->AddChild(fclear);
 	finterfaces		->AddChild(fcustom);					
-	finterfaces		->AddChild(interfaces_scroller);
 	fidentity_view	->AddChild(fnames);
 	fidentity_view	->AddChild(finterfaces);
 	fservices_view	->AddChild(fftp_server);
@@ -138,6 +168,8 @@ NetworkWindow::NetworkWindow() : BWindow(BRect(100,100,600,420),"Network",B_TITL
 	fview			->AddChild(frestart);
 	fview			->AddChild(frevert);	
 	fview			->AddChild(fsave);
+	fview			->AddChild(hr);
+	fview			->AddChild(vr);
 	AddChild(fview);	
 }
 
