@@ -425,7 +425,6 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_CREATE_BITMAP:
 		{
-debugger("");
 			// Allocate a bitmap for an application
 			
 			// Attached Data: 
@@ -464,6 +463,7 @@ debugger("");
 			if(sbmp)
 			{
 				PortLink replylink(replyport);
+				replylink.SetOpCode(SERVER_TRUE);
 				replylink.Attach<int32>(sbmp->Token());
 				replylink.Attach<int32>(sbmp->Area());
 				replylink.Attach<int32>(sbmp->AreaOffset());
