@@ -60,7 +60,7 @@ class Journal {
 		status_t FlushLogAndBlocks();
 		Volume *GetVolume() const { return fVolume; }
 
-		inline int32 FreeLogBlocks() const;
+		inline uint32 FreeLogBlocks() const;
 
 	private:
 		friend log_entry;
@@ -73,9 +73,9 @@ class Journal {
 		Transaction *fOwner;
 		thread_id	fOwningThread;
 		BlockArray	fArray;
-		uint32		fLogSize,fMaxTransactionSize,fUsed;
+		uint32		fLogSize, fMaxTransactionSize, fUsed;
 		int32		fTransactionsInEntry;
-		SimpleLock		fEntriesLock;
+		SimpleLock	fEntriesLock;
 		list<log_entry>	fEntries;
 		log_entry	*fCurrent;
 		bool		fHasChangedBlocks;
@@ -83,7 +83,7 @@ class Journal {
 };
 
 
-inline int32 
+inline uint32 
 Journal::FreeLogBlocks() const
 {
 	return fVolume->LogStart() <= fVolume->LogEnd() ?

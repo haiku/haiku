@@ -52,7 +52,7 @@ status_t
 Journal::CheckLogEntry(int32 count,off_t *array)
 {
 	// ToDo: check log entry integrity (block numbers and entry size)
-	PRINT(("Log entry has %ld entries (%Ld)\n",count));
+	PRINT(("Log entry has %ld entries (%Ld)\n", count));
 	return B_OK;
 }
 
@@ -60,14 +60,14 @@ Journal::CheckLogEntry(int32 count,off_t *array)
 status_t
 Journal::ReplayLogEntry(int32 *_start)
 {
-	PRINT(("ReplayLogEntry(start = %u)\n",*_start));
+	PRINT(("ReplayLogEntry(start = %ld)\n", *_start));
 
 	off_t logOffset = fVolume->ToBlock(fVolume->Log());
 	off_t arrayBlock = (*_start % fLogSize) + fVolume->ToBlock(fVolume->Log());
 	int32 blockSize = fVolume->BlockSize();
-	int32 count = 1,valuesInBlock = blockSize / sizeof(off_t);
+	int32 count = 1, valuesInBlock = blockSize / sizeof(off_t);
 	int32 numArrayBlocks;
-	off_t blockNumber;
+	off_t blockNumber = 0;
 	bool first = true;
 
 	CachedBlock cached(fVolume);
@@ -78,12 +78,12 @@ Journal::ReplayLogEntry(int32 *_start)
 
 		int32 index = 0;
 		if (first) {
-			count = array[0];
-			if (count < 1 || count >= fLogSize)
+			if (array[0] < 1 || array[0] >= fLogSize)
 				return B_BAD_DATA;
 
+			count = array[0];
 			first = false;
-			
+
 			numArrayBlocks = ((count + 1) * sizeof(off_t) + blockSize - 1) / blockSize;
 			blockNumber = (*_start + numArrayBlocks) % fLogSize;
 				// first real block in this log entry
@@ -94,18 +94,19 @@ Journal::ReplayLogEntry(int32 *_start)
 		}
 		(*_start)++;
 
-		if (CheckLogEntry(count,array + 1) < B_OK)
+		if (CheckLogEntry(count, array + 1) < B_OK)
 			return B_BAD_DATA;
 
 		CachedBlock cachedCopy(fVolume);
-		for (;index < valuesInBlock && count-- > 0;index++) {
-			PRINT(("replay block %Ld in log at %Ld!\n",array[index],blockNumber));
+		for (; index < valuesInBlock && count-- > 0; index++) {
+			PRINT(("replay block %Ld in log at %Ld!\n", array[index], blockNumber));
 
 			uint8 *copy = cachedCopy.SetTo(logOffset + blockNumber);
 			if (copy == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
-			ssize_t written = write_pos(fVolume->Device(),array[index] << fVolume->BlockShift(),copy,blockSize);
+			ssize_t written = write_pos(fVolume->Device(),
+						array[index] << fVolume->BlockShift(), copy, blockSize);
 			if (written != blockSize)
 				RETURN_ERROR(B_IO_ERROR);
 
@@ -134,7 +135,6 @@ Journal::ReplayLog()
 	int32 start = fVolume->LogStart();
 	int32 lastStart = -1;
 	while (true) {
-
 		// stop if the log is completely flushed
 		if (start == fVolume->LogEnd())
 			break;
@@ -147,7 +147,7 @@ Journal::ReplayLog()
 
 		status_t status = ReplayLogEntry(&start);
 		if (status < B_OK) {
-			FATAL(("replaying log entry from %u failed: %s\n",start,strerror(status)));
+			FATAL(("replaying log entry from %ld failed: %s\n", start, strerror(status)));
 			return B_ERROR;
 		}
 		start = start % fLogSize;
@@ -169,7 +169,7 @@ Journal::ReplayLog()
  */
 
 void
-Journal::blockNotify(off_t blockNumber,size_t numBlocks,void *arg)
+Journal::blockNotify(off_t blockNumber, size_t numBlocks, void *arg)
 {
 	log_entry *logEntry = (log_entry *)arg;
 
@@ -227,10 +227,10 @@ Journal::WriteLogEntry()
 
 	// Make sure there is enough space in the log.
 	// If that fails for whatever reason, panic!
-	force_cache_flush(fVolume->Device(),false);
+	force_cache_flush(fVolume->Device(), false);
 	int32 tries = fLogSize / 2 + 1;
 	while (TransactionSize() > FreeLogBlocks() && tries-- > 0)
-		force_cache_flush(fVolume->Device(),true);
+		force_cache_flush(fVolume->Device(), true);
 
 	if (tries <= 0) {
 		fVolume->Panic();
@@ -246,8 +246,9 @@ Journal::WriteLogEntry()
 
 	uint8 *arrayBlock = (uint8 *)array;
 
-	for (int32 size = fArray.BlocksUsed();size-- > 0;) {
-		write_pos(fVolume->Device(),logOffset + (logPosition << blockShift),arrayBlock,fVolume->BlockSize());
+	for (int32 size = fArray.BlocksUsed(); size-- > 0;) {
+		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
+			arrayBlock, fVolume->BlockSize());
 
 		logPosition = (logPosition + 1) % fLogSize;
 		arrayBlock += fVolume->BlockSize();
@@ -261,7 +262,8 @@ Journal::WriteLogEntry()
 		if (block == NULL)
 			return B_IO_ERROR;
 
-		write_pos(fVolume->Device(),logOffset + (logPosition << blockShift),block,fVolume->BlockSize());
+		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
+			block, fVolume->BlockSize());
 		logPosition = (logPosition + 1) % fLogSize;
 	}
 
@@ -279,7 +281,7 @@ Journal::WriteLogEntry()
 		fCurrent = logEntry;
 		fUsed += logEntry->length;
 
-		set_blocks_info(fVolume->Device(),&array->values[0],array->count,blockNotify,logEntry);
+		set_blocks_info(fVolume->Device(), &array->values[0], array->count, blockNotify, logEntry);
 	}
 
 	// If the log goes to the next round (the log is written as a
@@ -292,7 +294,7 @@ Journal::WriteLogEntry()
 	// We need to flush the drives own cache here to ensure
 	// disk consistency.
 	// If that call fails, we can't do anything about it anyway
-	ioctl(fVolume->Device(),B_FLUSH_DRIVE_CACHE);
+	ioctl(fVolume->Device(), B_FLUSH_DRIVE_CACHE);
 
 	fArray.MakeEmpty();
 
@@ -317,11 +319,11 @@ Journal::FlushLogAndBlocks()
 	if (TransactionSize() != 0) {
 		status = WriteLogEntry();
 		if (status < B_OK)
-			FATAL(("writing current log entry failed: %s\n",status));
+			FATAL(("writing current log entry failed: %s\n", strerror(status)));
 	}
 	status = fVolume->FlushDevice();
 
-	Unlock((Transaction *)this,true);
+	Unlock((Transaction *)this, true);
 	return status;
 }
 
@@ -347,7 +349,7 @@ Journal::Lock(Transaction *owner)
 
 
 void
-Journal::Unlock(Transaction *owner,bool success)
+Journal::Unlock(Transaction *owner, bool success)
 {
 	if (owner != fOwner)
 		return;
@@ -384,7 +386,7 @@ Journal::TransactionDone(bool success)
 
 
 status_t
-Journal::LogBlocks(off_t blockNumber,const uint8 *buffer,size_t numBlocks)
+Journal::LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks)
 {
 	// ToDo: that's for now - we should change the log file size here
 	if (TransactionSize() + numBlocks + 1 > fLogSize)
@@ -393,21 +395,21 @@ Journal::LogBlocks(off_t blockNumber,const uint8 *buffer,size_t numBlocks)
 	fHasChangedBlocks = true;
 	int32 blockSize = fVolume->BlockSize();
 
-	for (;numBlocks-- > 0;blockNumber++,buffer += blockSize) {
+	for (;numBlocks-- > 0; blockNumber++, buffer += blockSize) {
 		if (fArray.Find(blockNumber) >= 0)
 			continue;
 
 		// Insert the block into the transaction's array, and write the changes
 		// back into the locked cache buffer
 		fArray.Insert(blockNumber);
-		status_t status = cached_write_locked(fVolume->Device(),blockNumber,buffer,1,blockSize);
+		status_t status = cached_write_locked(fVolume->Device(), blockNumber, buffer, 1, blockSize);
 		if (status < B_OK)
 			return status;
 	}
 
 	// If necessary, flush the log, so that we have enough space for this transaction
 	if (TransactionSize() > FreeLogBlocks())
-		force_cache_flush(fVolume->Device(),true);
+		force_cache_flush(fVolume->Device(), true);
 
 	return B_OK;
 }
@@ -417,7 +419,7 @@ Journal::LogBlocks(off_t blockNumber,const uint8 *buffer,size_t numBlocks)
 
 
 status_t 
-Transaction::Start(Volume *volume,off_t refBlock)
+Transaction::Start(Volume *volume, off_t refBlock)
 {
 	// has it already been started?
 	if (fJournal != NULL)
