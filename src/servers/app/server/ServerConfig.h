@@ -23,6 +23,10 @@
 // Display driver to be used by the server.
 #define DISPLAYDRIVER VIEWDRIVER
 
+// Define this if you want the display driver to emulate the input server.
+// Comment this out if DISPLAYDRIVER is defined as HWDRIVER.
+#define ENABLE_INPUT_SERVER_EMULATION
+
 // Server port names. The input port is the port which is used to receive
 // input messages from the Input Server. The other is the "main" port for
 // the server and is utilized mostly by BApplication objects.

@@ -38,8 +38,10 @@ Server app_server :
 	Decorator.cpp
 	DisplayDriver.cpp
 	Layer.cpp
+	ScreenDriver.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
+	ViewDriver.cpp
 ;
 LinkSharedOSLibs app_server : be root game translation 
 							   <boot!home!config!lib>libfreetype.so ;

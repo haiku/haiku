@@ -26,6 +26,17 @@
 //------------------------------------------------------------------------------
 #include "DisplayDriver.h"
 #include "Desktop.h"
+
+#ifdef VIEWDRIVER
+#include "ViewDriver.h"
+#endif
+#ifdef SCREENDRIVER
+#include "ScreenDriver.h"
+#endif
+#ifdef HWDRIVER
+#include "AccelerantDriver.h"
+#endif
+
 //#include "ServerWindow.h"
 
 namespace desktop_private {
