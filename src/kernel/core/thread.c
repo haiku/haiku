@@ -180,12 +180,13 @@ create_thread_struct(const char *name)
 	t->kernel_time = 0;
 	t->last_time = 0;
 	t->last_time_type = KERNEL_TIME;
-	t->return_code = 0;
-	t->return_flags = 0;
+	t->exit.status = 0;
+	t->exit.reason = 0;
+	list_init(&t->exit.waiters);
 
 	sprintf(temp, "thread_0x%lx_retcode_sem", t->id);
-	t->return_code_sem = create_sem(0, temp);
-	if (t->return_code_sem < B_OK)
+	t->exit.sem = create_sem(0, temp);
+	if (t->exit.sem < B_OK)
 		goto err1;
 
 	sprintf(temp, "%s send", t->name);
@@ -204,11 +205,11 @@ create_thread_struct(const char *name)
 	return t;
 
 err4:
-	delete_sem_etc(t->msg.read_sem, -1, false);
+	delete_sem(t->msg.read_sem);
 err3:
-	delete_sem_etc(t->msg.write_sem, -1, false);
+	delete_sem(t->msg.write_sem);
 err2:
-	delete_sem_etc(t->return_code_sem, -1, false);
+	delete_sem(t->exit.sem);
 err1:
 	// ToDo: put them in the dead queue instead?
 	free(t);
@@ -219,9 +220,9 @@ err1:
 static void
 delete_thread_struct(struct thread *thread)
 {
-	delete_sem_etc(thread->return_code_sem, -1, false);
-	delete_sem_etc(thread->msg.write_sem, -1, false);
-	delete_sem_etc(thread->msg.read_sem, -1, false);
+	delete_sem(thread->exit.sem);
+	delete_sem(thread->msg.write_sem);
+	delete_sem(thread->msg.read_sem);
 
 	// ToDo: put them in the dead queue instead?
 	free(thread);
@@ -245,7 +246,7 @@ thread_kthread_exit(void)
 {
 	struct thread *t = thread_get_current_thread();
 
-	t->return_flags = THREAD_RETURN_EXIT;
+	t->exit.reason = THREAD_RETURN_EXIT;
 	thread_exit();
 }
 
@@ -441,14 +442,13 @@ _dump_thread_info(struct thread *t)
 	dprintf("in_kernel:    %d\n", t->in_kernel);
 	dprintf("sem_blocking: 0x%lx\n", t->sem_blocking);
 	dprintf("sem_count:    0x%x\n", t->sem_count);
-	dprintf("sem_deleted_retcode: 0x%x\n", t->sem_deleted_retcode);
 	dprintf("sem_errcode:  0x%x\n", t->sem_errcode);
 	dprintf("sem_flags:    0x%x\n", t->sem_flags);
 	dprintf("fault_handler: %p\n", (void *)t->fault_handler);
 	dprintf("args:         %p %p\n", t->args1, t->args2);
 	dprintf("entry:        %p\n", (void *)t->entry);
 	dprintf("team:         %p\n", t->team);
-	dprintf("return_code_sem: 0x%lx\n", t->return_code_sem);
+	dprintf("exit.sem:     0x%lx\n", t->exit.sem);
 	dprintf("kernel_stack_region_id: 0x%lx\n", t->kernel_stack_region_id);
 	dprintf("kernel_stack_base: %p\n", (void *)t->kernel_stack_base);
 	dprintf("user_stack_region_id:   0x%lx\n", t->user_stack_region_id);
@@ -648,11 +648,11 @@ put_death_stack_and_reschedule(uint32 index)
 // used to pass messages between thread_exit and thread_exit2
 
 struct thread_exit_args {
-	struct thread *thread;
-	region_id old_kernel_stack;
-	int int_state;
-	uint32 death_stack;
-	sem_id death_sem;
+	struct thread	*thread;
+	area_id			old_kernel_stack;
+	cpu_status		int_state;
+	uint32			death_stack;
+	sem_id			death_sem;
 };
 
 
@@ -709,8 +709,8 @@ void
 thread_exit(void)
 {
 	cpu_status state;
-	struct thread *t = thread_get_current_thread();
-	struct team *team = t->team;
+	struct thread *thread = thread_get_current_thread();
+	struct team *team = thread->team;
 	thread_id mainParentThread = -1;
 	bool deleteTeam = false;
 	uint32 death_stack;
@@ -720,37 +720,37 @@ thread_exit(void)
 	if (!are_interrupts_enabled())
 		dprintf("thread_exit() called with interrupts disabled!\n");
 
-	TRACE(("thread 0x%lx exiting %s w/return code 0x%x\n", t->id,
-		t->return_flags & THREAD_RETURN_INTERRUPTED ? "due to signal" : "normally",
-		(int)t->return_code));
+	TRACE(("thread 0x%lx exiting %s w/return code 0x%x\n", thread->id,
+		thread->exit.reason == THREAD_RETURN_INTERRUPTED ? "due to signal" : "normally",
+		(int)thread->exit.status));
 
 	// boost our priority to get this over with
-	t->priority = B_URGENT_DISPLAY_PRIORITY;
+	thread->priority = B_URGENT_DISPLAY_PRIORITY;
 
 	// shutdown the thread messaging
 
-	status = acquire_sem_etc(t->msg.write_sem, 1, B_RELATIVE_TIMEOUT, 0);
+	status = acquire_sem_etc(thread->msg.write_sem, 1, B_RELATIVE_TIMEOUT, 0);
 	if (status == B_WOULD_BLOCK) {
 		// there is data waiting for us, so let us eat it
 		thread_id sender;
 
-		delete_sem(t->msg.write_sem);
+		delete_sem(thread->msg.write_sem);
 			// first, let's remove all possibly waiting writers
 		receive_data_etc(&sender, NULL, 0, B_RELATIVE_TIMEOUT);
 	} else {
 		// we probably own the semaphore here, and we're the last to do so
-		delete_sem(t->msg.write_sem);
+		delete_sem(thread->msg.write_sem);
 	}
 	// now we can safely remove the msg.read_sem
-	delete_sem(t->msg.read_sem);
+	delete_sem(thread->msg.read_sem);
 
 	// Cancel previously installed alarm timer, if any
-	cancel_timer(&t->alarm);
+	cancel_timer(&thread->alarm);
 
 	// delete the user stack region first, we won't need it anymore
-	if (team->aspace != NULL && t->user_stack_region_id >= 0) {
-		region_id rid = t->user_stack_region_id;
-		t->user_stack_region_id = -1;
+	if (team->aspace != NULL && thread->user_stack_region_id >= 0) {
+		region_id rid = thread->user_stack_region_id;
+		thread->user_stack_region_id = -1;
 		delete_area_etc(team, rid);
 	}
 
@@ -760,10 +760,10 @@ thread_exit(void)
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
 
-		remove_thread_from_team(team, t);
-		insert_thread_into_team(team_get_kernel_team(), t);
+		remove_thread_from_team(team, thread);
+		insert_thread_into_team(team_get_kernel_team(), thread);
 
-		if (team->main_thread == t) {
+		if (team->main_thread == thread) {
 			// this was main thread in this team
 			deleteTeam = true;
 
@@ -777,7 +777,7 @@ thread_exit(void)
 		vm_aspace_swap(team_get_kernel_team()->kaspace);
 		restore_interrupts(state);
 
-		TRACE(("thread_exit: thread 0x%lx now a kernel thread!\n", t->id));
+		TRACE(("thread_exit: thread 0x%lx now a kernel thread!\n", thread->id));
 	}
 
 	// delete the team if we're its main thread
@@ -789,12 +789,28 @@ thread_exit(void)
 	} else
 		cached_death_sem = team->death_sem;
 
-	// delete the sem that others will use to wait on us and get the retcode
+	// fill all death entries and delete the sem that others will use to wait on us
 	{
-		sem_id s = t->return_code_sem;
+		sem_id cachedExitSem = thread->exit.sem;
+		struct death_entry *death = NULL;
+		cpu_status state;
 
-		t->return_code_sem = -1;
-		delete_sem_etc(s, t->return_code, t->return_flags & THREAD_RETURN_INTERRUPTED ? true : false);
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		// make sure no one will grab this semaphore again
+		thread->exit.sem = -1;
+
+		// fill all death entries
+		while ((death = list_get_next_item(&thread->exit.waiters, death)) != NULL) {
+			death->status = thread->exit.status;
+			death->reason = thread->exit.reason;
+		}
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+
+		delete_sem(cachedExitSem);
 	}
 
 	{
@@ -803,19 +819,19 @@ thread_exit(void)
 		args.int_state = get_death_stack(&death_stack);
 			// this disables interrups for us
 
-		args.thread = t;
-		args.old_kernel_stack = t->kernel_stack_region_id;
+		args.thread = thread;
+		args.old_kernel_stack = thread->kernel_stack_region_id;
 		args.death_stack = death_stack;
 		args.death_sem = cached_death_sem;
 
 		// set the new kernel stack officially to the death stack, wont be really switched until
 		// the next function is called. This bookkeeping must be done now before a context switch
 		// happens, or the processor will interrupt to the old stack
-		t->kernel_stack_region_id = sDeathStacks[death_stack].area;
-		t->kernel_stack_base = sDeathStacks[death_stack].address;
+		thread->kernel_stack_region_id = sDeathStacks[death_stack].area;
+		thread->kernel_stack_base = sDeathStacks[death_stack].address;
 
 		// we will continue in thread_exit2(), on the new stack
-		arch_thread_switch_kstack_and_call(t, t->kernel_stack_base + KSTACK_SIZE, thread_exit2, &args);
+		arch_thread_switch_kstack_and_call(thread, thread->kernel_stack_base + KSTACK_SIZE, thread_exit2, &args);
 	}
 
 	panic("never can get here\n");
@@ -1099,8 +1115,8 @@ exit_thread(status_t returnValue)
 {
 	struct thread *thread = thread_get_current_thread();
 
-	thread->return_code = returnValue;
-	thread->return_flags = THREAD_RETURN_EXIT;
+	thread->exit.status = returnValue;
+	thread->exit.reason = THREAD_RETURN_EXIT;
 
 	send_signal_etc(thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
 }
@@ -1512,10 +1528,11 @@ snooze_until(bigtime_t timeout, int timebase)
 status_t
 wait_for_thread(thread_id id, status_t *_returnCode)
 {
+	sem_id sem = B_BAD_THREAD_ID;
+	struct death_entry death;
 	struct thread *thread;
 	cpu_status state;
 	status_t status;
-	sem_id sem;
 
 	// we need to resume the thread we're waiting for first
 	status = resume_thread(id);
@@ -1526,28 +1543,43 @@ wait_for_thread(thread_id id, status_t *_returnCode)
 	GRAB_THREAD_LOCK();
 
 	thread = thread_get_thread_struct_locked(id);
-	sem = thread != NULL ? thread->return_code_sem : B_BAD_THREAD_ID;
+	if (thread != NULL) {
+		// remember the semaphore we have to wait on and place our death entry
+		sem = thread->exit.sem;
+		list_add_link_to_head(&thread->exit.waiters, &death);
+	}
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	if (sem == B_BAD_THREAD_ID)
+	if (sem < B_OK)
 		return B_BAD_THREAD_ID;
 
 	status = acquire_sem(sem);
 
-	/* This thread died the way it should, dont ripple a non-error up */
-	if (status == B_BAD_SEM_ID) {
-		status = B_NO_ERROR;
+	if (status == B_OK) {
+		// this should never happen as the thread deletes the semaphore on exit
+		panic("could acquire exit_sem for thread %lx\n", id);
+	} else if (status == B_BAD_SEM_ID) {
+		// this is the way the thread normally exits
+		status = B_OK;
 
-		if (_returnCode) {
-			thread = thread_get_current_thread();
-			TRACE(("wait_for_thread: thread %ld got return code 0x%x\n",
-				thread->id, thread->sem_deleted_retcode));
-			*_returnCode = thread->sem_deleted_retcode;
-		}
-	} else if (status == B_OK)
-		panic("could acquire return_code_sem for thread %lx\n", id);
+		if (_returnCode)
+			*_returnCode = death.status;
+	} else {
+		// We were probably interrupted; we need to remove our death entry now.
+		// When the thread is already gone, we don't have to care
+
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		thread = thread_get_thread_struct_locked(id);
+		if (thread != NULL)
+			list_remove_link(&death);
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+	}
 
 	return status;
 }
