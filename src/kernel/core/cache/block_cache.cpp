@@ -749,7 +749,6 @@ block_cache_put(void *_cache, off_t blockNumber)
 //	#pragma mark -
 //	private BeOS compatible interface (to be removed)
 
-#if 0
 
 void
 put_cache_entry(int fd, cached_block *entry)
@@ -972,4 +971,3 @@ set_blocks_info(int fd, off_t *blocks, int numBlocks,
 	return -1;
 }
 
-#endif
