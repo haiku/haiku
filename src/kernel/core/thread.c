@@ -565,20 +565,25 @@ dump_next_thread_in_team(int argc, char **argv)
 }
 
 
-static int
-get_death_stack(void)
+/** Finds a free death stack for us and allocates it.
+ *	Leaves interrupts disabled and returns the former interrupt state.
+ */
+
+static cpu_status
+get_death_stack(uint32 *_stack)
 {
 	cpu_status state;
-	unsigned int bit;
-	int i;
+	uint32 bit;
+	int32 i;
 
 	acquire_sem(sDeathStackSem);
 
-	// grap the thread lock, find a free spot and release
 	state = disable_interrupts();
+
+	// grap the thread lock, find a free spot and release
 	GRAB_THREAD_LOCK();
 	bit = sDeathStackBitmap;
-	bit = (~bit)&~((~bit)-1);
+	bit = (~bit) & ~((~bit) - 1);
 	sDeathStackBitmap |= bit;
 	RELEASE_THREAD_LOCK();
 
@@ -596,12 +601,13 @@ get_death_stack(void)
 
 	TRACE(("get_death_stack: returning 0x%lx\n", sDeathStacks[i].address));
 
-	return i;
+	*_stack = (uint32)i;
+	return state;
 }
 
 
 static void
-put_death_stack_and_reschedule(unsigned int index)
+put_death_stack_and_reschedule(uint32 index)
 {
 	TRACE(("put_death_stack...: passed %d\n", index));
 
@@ -619,6 +625,7 @@ put_death_stack_and_reschedule(unsigned int index)
 	release_sem_etc(sDeathStackSem, 1, B_DO_NOT_RESCHEDULE);
 
 	scheduler_reschedule();
+		// requires thread lock to be held
 }
 
 
@@ -640,7 +647,7 @@ struct thread_exit_args {
 	struct thread *t;
 	region_id old_kernel_stack;
 	int int_state;
-	unsigned int death_stack;
+	uint32 death_stack;
 	sem_id death_sem;
 };
 
@@ -653,12 +660,8 @@ thread_exit2(void *_args)
 	// copy the arguments over, since the source is probably on the kernel stack we're about to delete
 	memcpy(&args, _args, sizeof(struct thread_exit_args));
 
-	// restore the interrupts
+	// we can't let the interrupts disabled at this point
 	enable_interrupts();
-	// ToDo: was:
-	// restore_interrupts(args.int_state);
-	// we probably don't want to let the interrupts disabled at this point??
-	// Actually, args.int_state will always be 0, unless we fix thread_exit() 
 
 	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.t->kernel_stack_base));
 
@@ -679,8 +682,8 @@ thread_exit2(void *_args)
 	hash_remove(sThreadHash, args.t);
 	RELEASE_THREAD_LOCK();
 
-	// ToDo: is this correct at this point?
-	//restore_interrupts(args.int_state);
+	// restore former thread interrupts (doesn't matter much at this point anyway)
+	restore_interrupts(args.int_state);
 
 	TRACE(("thread_exit2: done removing thread from lists\n"));
 
@@ -692,6 +695,7 @@ thread_exit2(void *_args)
 
 	// return the death stack and reschedule one last time
 	put_death_stack_and_reschedule(args.death_stack);
+
 	// never get to here
 	panic("thread_exit2: made it where it shouldn't have!\n");
 }
@@ -705,7 +709,7 @@ thread_exit(void)
 	struct team *team = t->team;
 	thread_id mainParentThread = -1;
 	bool delete_team = false;
-	unsigned int death_stack;
+	uint32 death_stack;
 	sem_id cached_death_sem;
 	status_t status;
 
@@ -789,21 +793,16 @@ thread_exit(void)
 		delete_sem_etc(s, t->return_code, t->return_flags & THREAD_RETURN_INTERRUPTED ? true : false);
 	}
 
-	// TODO: get_death_stack() disables interrupts
-	// and leaves them disabled, so I wonder if it's good to disable
-	// them again a bunch of lines after this
-	death_stack = get_death_stack();
 	{
 		struct thread_exit_args args;
+
+		args.int_state = get_death_stack(&death_stack);
+			// this disables interrups for us
 
 		args.t = t;
 		args.old_kernel_stack = t->kernel_stack_region_id;
 		args.death_stack = death_stack;
 		args.death_sem = cached_death_sem;
-
-		// disable the interrupts. Must remain disabled until the kernel stack pointer can be officially switched
-		// TODO: interrupts are already disabled at this point
-		args.int_state = disable_interrupts();
 
 		// set the new kernel stack officially to the death stack, wont be really switched until
 		// the next function is called. This bookkeeping must be done now before a context switch
