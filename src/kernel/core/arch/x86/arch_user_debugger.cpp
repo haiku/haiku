@@ -97,7 +97,8 @@ arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 //		frame->error_code = cpuState->error_code;
 		frame->eip = cpuState->eip;
 //		frame->cs = cpuState->cs;
-//		frame->eflags = cpuState->flags;
+		frame->flags = (frame->flags & ~X86_EFLAGS_USER_SETTABLE_FLAGS)
+			| (cpuState->eflags & X86_EFLAGS_USER_SETTABLE_FLAGS);
 		frame->user_esp = cpuState->user_esp;
 //		frame->user_ss = cpuState->user_ss;
 	}
