@@ -57,7 +57,11 @@ using namespace std;
 // debugging
 //#define DBG(x) x
 #define DBG(x)
-#define OUT	printf
+#ifdef DEBUG_PRINTF
+	#define OUT DEBUG_PRINTF
+#else
+	#define OUT	printf
+#endif
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -339,8 +343,13 @@ BRoster::GetAppList(BList *teamIDList) const
 			team_id team;
 			for (int32 i = 0; reply.FindInt32("teams", i, &team) == B_OK; i++)
 				teamIDList->AddItem((void*)team);
-		} else
+		} else {
 			reply.FindInt32("error", &error);
+			DBG(OUT("Roster request unsuccessful: %s\n", strerror(error)));
+			DBG(reply.PrintToStream());
+		}
+	} else {
+		DBG(OUT("Sending message to roster failed: %s\n", strerror(error)));
 	}
 }
 
@@ -2183,8 +2192,10 @@ DBG(OUT("  found roster port\n"));
 DBG(OUT("  got reply from roster\n"));
 			reply.FindMessenger("messenger", &fMimeMess);
 		} else {
-DBG(OUT("  no (useful) reply from roster: error: %lx: %s\n", error,
-strerror(error)));
+			DBG(OUT("  no (useful) reply from roster: error: %lx: %s\n", error,
+			strerror(error)));
+			if (error == B_OK)
+				DBG(reply.PrintToStream());
 		}
 	}
 DBG(OUT("BRoster::InitMessengers() done\n"));
