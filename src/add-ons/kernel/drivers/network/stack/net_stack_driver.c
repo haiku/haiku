@@ -5,10 +5,8 @@
  */
 
 #ifndef _KERNEL_MODE
-
-#error "This module MUST be built as a kernel driver!"
-
-#else
+	#error "This module MUST be built as a kernel driver!"
+#endif
 
 // Public/system includes
 #include <stdlib.h>
@@ -26,10 +24,15 @@
 #include <sys/protosw.h>
 #include <core_module.h>
 
-#define SHOW_INSANE_DEBUGGING   (1)
-#define SERIAL_DEBUGGING        (0)
-/* Force the driver to stay loaded in memory */
-#define STAY_LOADED             (0)	
+// Trace support
+#if defined(DEBUG)
+	#define TRACE(x) dprintf x
+#else
+	#define TRACE(x) ;
+#endif
+
+// Force the driver to stay loaded in memory
+#define STAY_LOADED             0	
 
 /*
  * Local definitions
@@ -85,10 +88,11 @@ typedef struct {
 	 * As soon as last app, via libnet.so, stop using it, it will unload,
 	 * and in turn stop the stack and unload all network kernel modules...
 	 */
-	#define UNLOAD_CMD	"stop"
+	#define UNLOAD_CMD	"unload"
 #endif
+#define STOP_CMD	"stop"
 
-/* Prototypes of device hooks functions */
+// Prototypes of device hooks functions
 static status_t net_stack_open(const char * name, uint32 flags, void ** cookie);
 static status_t net_stack_close(void * cookie);
 static status_t net_stack_free_cookie(void * cookie);
@@ -100,7 +104,7 @@ static status_t net_stack_deselect(void *cookie, uint8 event, selectsync *sync);
 // static status_t net_stack_readv(void * cookie, off_t pos, const iovec * vec, size_t count, size_t * len);
 // static status_t net_stack_writev(void * cookie, off_t pos, const iovec * vec, size_t count, size_t * len);
 
-/* Privates prototypes */
+// Privates prototypes
 static void on_socket_event(void * socket, uint32 event, void * cookie);
 static status_t r5_notify_select_event(selectsync * sync, uint32 ref, uint8 event);
 
@@ -108,6 +112,8 @@ static status_t r5_notify_select_event(selectsync * sync, uint32 ref, uint8 even
 static status_t	keep_driver_loaded();
 static status_t	unload_driver();
 #endif
+
+static const char * opcode_name(int op);
 
 /*
  * Global variables
@@ -161,11 +167,6 @@ _EXPORT status_t init_hardware(void)
 	bool safemode = false;
 	void *sfmptr;
 
-#if SERIAL_DEBUGGING	
-	// XXX - switch on/off at top of file...
-	set_dprintf_enabled(true);
-#endif
-
 	// get a pointer to the driver settings...
 	sfmptr = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
 
@@ -177,13 +178,11 @@ _EXPORT status_t init_hardware(void)
 		unload_driver_settings(sfmptr);
 	}
 	if (safemode) {
-		dprintf(LOGID WARN "init_hardware: declining offer to join the party.\n");
+		TRACE((LOGID WARN "init_hardware: declining offer to join the party.\n"));
 		return B_ERROR;
 	}
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "init_hardware done.\n");
-#endif
+	TRACE((LOGID "init_hardware done.\n"));
 
 	return B_OK;
 }
@@ -197,19 +196,13 @@ _EXPORT status_t init_driver(void)
 {
 	int rv = 0;
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "init_driver, built %s %s\n", __DATE__, __TIME__);
-#endif
-
 	rv = get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
 	if (rv < 0) {
-		dprintf(LOGID ERR "Argh, can't load " NET_CORE_MODULE_NAME " module: %d\n", rv);
+		TRACE((LOGID ERR "init_driver: Argh, can't load " NET_CORE_MODULE_NAME " module: %d\n", rv));
 		return rv;
 	}
 	
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "init_driver: core = %p\n", core);
-#endif
+	TRACE((LOGID "init_driver: built %s %s, core = %p\n", __DATE__, __TIME__, core));
 
 	// start the network stack!
 	core->start();
@@ -224,9 +217,7 @@ _EXPORT status_t init_driver(void)
  */
 _EXPORT void uninit_driver(void)
 {
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "uninit_driver\n");
-#endif
+	TRACE((LOGID "uninit_driver\n"));
 
 	if (core) {
 #if STAY_LOADED
@@ -281,13 +272,11 @@ static status_t net_stack_open(const char *name, uint32 flags, void **cookie)
   	// attach this new net_socket_cookie to file descriptor
 	*cookie = nsc; 
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "net_stack_open(%s, %s%s) return this cookie: %p\n", name,
+	TRACE((LOGID "net_stack_open(%s, %s%s) return this cookie: %p\n", name,
 						( ((flags & O_RWMASK) == O_RDONLY) ? "O_RDONLY" :
 						  ((flags & O_RWMASK) == O_WRONLY) ? "O_WRONLY" : "O_RDWR"),
 						(flags & O_NONBLOCK) ? " O_NONBLOCK" : "",
-						*cookie);
-#endif
+						*cookie));
 
 	return B_OK;
 }
@@ -299,9 +288,7 @@ static status_t net_stack_close(void *cookie)
 	net_stack_cookie *nsc = cookie;
 	int rv;
 	
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "net_stack_close(%p)\n", nsc);
-#endif
+	TRACE((LOGID "net_stack_close(%p)\n", nsc));
 
 	rv = B_ERROR;
 	if (nsc->socket) {
@@ -320,9 +307,7 @@ static status_t net_stack_free_cookie(void *cookie)
 	net_stack_cookie *nsc = cookie;
 	selecter *s;
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "net_stack_free_cookie(%p)\n", cookie);
-#endif
+	TRACE((LOGID "net_stack_free_cookie(%p)\n", cookie));
 
 	// free the selecters list
 	delete_sem(nsc->selecters_lock);
@@ -346,9 +331,8 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 	struct stack_driver_args *args = data;
 	int err = B_OK;
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "net_stack_control(%p, 0x%lX, %p, %ld)\n", cookie, op, data, len);
-#endif
+	TRACE((LOGID "net_stack_control(%p, %s (0x%lX), %p, %ld)\n",
+		cookie, opcode_name(op), op, data, len));
 
 #if STAY_LOADED
 	keep_driver_loaded();
@@ -493,14 +477,10 @@ static status_t net_stack_read(void *cookie,
 	int error;
 	int flags = 0;
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "net_stack_read(%p, %Ld, %p, %ld)\n", cookie, position, buffer, *readlen);
-#endif
+	TRACE((LOGID "net_stack_read(%p, %Ld, %p, %ld)\n", cookie, position, buffer, *readlen));
 
 #if STAY_LOADED
-# if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "Calling keep_driver_loaded()...\n");
-# endif
+	TRACE((LOGID "Calling keep_driver_loaded()...\n"));
 	keep_driver_loaded();
 #endif
 
@@ -526,9 +506,8 @@ static status_t net_stack_write(void *cookie,
 	struct iovec iov;
 	int error;
 	int flags = 0;
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "net_stack_write(%p, %Ld, %p, %ld)\n", cookie, position, buffer, *writelen);
-#endif
+
+	TRACE((LOGID "net_stack_write(%p, %Ld, %p, %ld)\n", cookie, position, buffer, *writelen));
 
 #if STAY_LOADED
 	keep_driver_loaded();
@@ -541,6 +520,10 @@ static status_t net_stack_write(void *cookie,
 			// someone write/send/tell us to unload this driver, so do it!
 			return unload_driver();
 #endif
+		if (*writelen >= strlen(STOP_CMD) &&
+		    strncmp(buffer, STOP_CMD, strlen(STOP_CMD)) == 0)
+				return core->stop();
+
 		return B_BAD_VALUE;
 	};
 
@@ -560,9 +543,7 @@ static status_t net_stack_select(void *cookie, uint8 event, uint32 ref, selectsy
 	selecter * s;
 	status_t status;
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "net_stack_select(%p, %d, %ld, %p)\n", cookie, event, ref, sync);
-#endif
+	TRACE((LOGID "net_stack_select(%p, %d, %ld, %p)\n", cookie, event, ref, sync));
 	
 	if (! nsc->socket)
 		return B_BAD_VALUE;
@@ -610,9 +591,7 @@ static status_t net_stack_deselect(void *cookie, uint8 event, selectsync *sync)
 	thread_id current_thread;
 	status_t status;
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "net_stack_deselect(%p, %d, %p)\n", cookie, event, sync);
-#endif
+	TRACE((LOGID "net_stack_deselect(%p, %d, %p)\n", cookie, event, sync));
 	
 	if (!nsc || !nsc->socket)
 		return B_BAD_VALUE;
@@ -665,15 +644,11 @@ static void on_socket_event(void * socket, uint32 event, void * cookie)
 		return;
 
 	if (nsc->socket != socket) {
-		#if SHOW_INSANE_DEBUGGING
-			dprintf(LOGID "on_socket_event(%p, %ld, %p): socket is higly suspect! Aborting.\n", socket, event, cookie);
-		#endif
+		TRACE((LOGID ERR "on_socket_event(%p, %ld, %p): socket is higly suspect! Aborting.\n", socket, event, cookie));
 		return;
 	}	
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "on_socket_event(%p, %ld, %p)\n", socket, event, cookie);
-#endif
+	TRACE((LOGID "on_socket_event(%p, %ld, %p)\n", socket, event, cookie));
 
 	// lock the selecters list
 	if (acquire_sem(nsc->selecters_lock) != B_OK)
@@ -683,7 +658,7 @@ static void on_socket_event(void * socket, uint32 event, void * cookie)
 	while (s) {
 		if (s->event == event)
 			// notify this selecter (thread/event pair)
-#ifdef COMPILRE_FOR_R5
+#ifdef COMPILE_FOR_R5
 			s->notify(s->sync, s->ref);
 #else
 			s->notify(s->sync, s->ref, event);
@@ -708,25 +683,19 @@ static status_t r5_notify_select_event(selectsync * sync, uint32 ref, uint8 even
 	struct r5_selectsync *	rss;
 	int fd;
 
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "r5_notify_select_event(%p, %ld, %d)\n", sync, ref, event);
-#endif
+	TRACE((LOGID "r5_notify_select_event(%p, %ld, %d)\n", sync, ref, event));
 
 	rss = NULL;
 	area = clone_area("r5_selectsync_area (driver)", (void **) &rss,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, (area_id) sync);
 	if (area < B_OK) {
-#if SHOW_INSANE_DEBUGGING
-		dprintf(LOGID "r5_notify_select_event: clone_area(%d) failed -> %d!\n", (int) sync, (int) area);
-#endif
+		TRACE((LOGID "r5_notify_select_event: clone_area(%d) failed -> %d!\n", (int) sync, (int) area));
 		return area;
 	};
 	
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "r5_selectsync at %p (area %ld, clone from %ld):\n"
+	TRACE((LOGID "r5_selectsync at %p (area %ld, clone from %ld):\n"
 	              "lock   %ld\n"
-	              "wakeup %ld\n", rss, area, (area_id) sync, rss->lock, rss->wakeup);
-#endif
+	              "wakeup %ld\n", rss, area, (area_id) sync, rss->lock, rss->wakeup));
 
 	if (acquire_sem(rss->lock) != B_OK)
 		// if we can't (anymore?) lock the shared r5_selectsync, select() party is done
@@ -767,40 +736,90 @@ static status_t	keep_driver_loaded()
 		return B_OK;
 		
 	/* force the driver to stay loaded by opening himself */
-#if SHOW_INSANE_DEBUGGING
-	dprintf(LOGID "keep_driver_loaded: internaly opening " NET_STACK_DRIVER_PATH " to stay loaded in memory...\n");
-#endif
+	TRACE((LOGID "keep_driver_loaded: internaly opening " NET_STACK_DRIVER_PATH " to stay loaded in memory...\n"));
 
 	g_stay_loaded_fd = open(NET_STACK_DRIVER_PATH, 0);
 
-#if SHOW_INSANE_DEBUGGING
 	if (g_stay_loaded_fd < 0)
-		dprintf(LOGID ERR "keep_driver_loaded: couldn't open(" NET_STACK_DRIVER_PATH ")!\n");
-#endif
+		TRACE((LOGID ERR "keep_driver_loaded: couldn't open(" NET_STACK_DRIVER_PATH ")!\n"));
 
 	return B_OK;
 }
 
 static status_t unload_driver()
 {
-	if ( g_stay_loaded_fd >= 0 )
-		{
+	if ( g_stay_loaded_fd >= 0 ) {
 		int tmp_fd;
 			
 		/* we need to set g_stay_loaded_fd to < 0 if we don't want
 		 * the next close enter again in this case, and so on...
 		 */
-#if SHOW_INSANE_DEBUGGING
-		dprintf(LOGID "unload_driver: unload requested.\n");
-#endif
+		TRACE((LOGID "unload_driver: unload requested.\n"));
+
 		tmp_fd = g_stay_loaded_fd;
 		g_stay_loaded_fd = -1;
 
 		close(tmp_fd);
-		};
+	};
 			
 	return B_OK;
 }
 #endif /* STAY_LOADED */
 
-#endif /* _KERNEL_MODE */
+
+static const char * opcode_name(int op)
+{
+#define C2N(op) { op, #op }
+	// op-code to name
+	struct commands_info {
+		int op;
+		const char *name;
+	} *ci, commands_info[] = {
+		C2N(NET_STACK_SOCKET), 
+		C2N(NET_STACK_BIND), 
+		C2N(NET_STACK_RECVFROM), 
+		C2N(NET_STACK_RECV), 
+		C2N(NET_STACK_SENDTO), 
+		C2N(NET_STACK_SEND), 
+		C2N(NET_STACK_LISTEN),
+		C2N(NET_STACK_ACCEPT),
+		C2N(NET_STACK_CONNECT),
+		C2N(NET_STACK_SHUTDOWN),
+		C2N(NET_STACK_GETSOCKOPT),
+		C2N(NET_STACK_SETSOCKOPT),
+		C2N(NET_STACK_GETSOCKNAME),
+		C2N(NET_STACK_GETPEERNAME),
+		C2N(NET_STACK_SYSCTL),
+		C2N(NET_STACK_SELECT),
+		C2N(NET_STACK_DESELECT),
+		C2N(NET_STACK_GET_COOKIE),
+		C2N(NET_STACK_STOP),
+		C2N(NET_STACK_NOTIFY_SOCKET_EVENT),
+		C2N(NET_STACK_CONTROL_NET_MODULE),
+
+		// Userland IPC-specific opcodes
+		// C2N(NET_STACK_OPEN),
+		// C2N(NET_STACK_CLOSE),
+		// C2N(NET_STACK_NEW_CONNECTION),
+		
+		// Standard BeOS opcodes
+		C2N(B_SET_BLOCKING_IO),
+		C2N(B_SET_NONBLOCKING_IO),
+	
+		{ 0, "Unknown!" }
+	};
+
+#undef C2N
+
+	ci = commands_info;
+	while(ci && ci->op) {
+		if (ci->op == op)
+			return ci->name;
+		ci++;
+	}
+
+	return "???";
+}
+
+
+
