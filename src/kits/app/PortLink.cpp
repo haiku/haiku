@@ -36,6 +36,7 @@
 #	include <stdio.h>
 #	define STRACE(x) printf x
 	const char *strcode(int32 code);
+	const char *bstrcode(int32 code);
 #else
 #	define STRACE(x) ;
 #endif
@@ -512,6 +513,7 @@ status_t BPortLink::AttachString(const char *string)
 
 #ifdef DEBUG_BPORTLINK
 #include <ServerProtocol.h>
+#include <AppDefs.h>
 
 static const char *kASCodeNames[] =
 {
@@ -721,7 +723,358 @@ const char *strcode(int32 code)
 	if (code >= 0 && code <= AS_SET_CURRENT_LAYER - SERVER_TRUE)
 		return kASCodeNames[code];
 	else
-		return "Unknown";
+		return bstrcode(code);
+}
+
+const char *bstrcode(int32 code)
+{
+	switch(code)
+	{
+		case B_ABOUT_REQUESTED:
+		{
+			return "B_ABOUT_REQUESTED";
+		}
+		case B_APP_ACTIVATED:
+		{
+			return "B_APP_ACTIVATED/B_WINDOW_ACTIVATED";
+		}
+		case B_ARGV_RECEIVED:
+		{
+			return "B_ARGV_RECEIVED";
+		}
+		case B_QUIT_REQUESTED:
+		{
+			return "B_QUIT_REQUESTED";
+		}
+		case B_CANCEL:
+		{
+			return "B_CANCEL";
+		}
+		case B_KEY_DOWN:
+		{
+			return "B_KEY_DOWN";
+		}
+		case B_KEY_UP:
+		{
+			return "B_KEY_UP";
+		}
+		case B_UNMAPPED_KEY_DOWN:
+		{
+			return "B_UNMAPPED_KEY_DOWN";
+		}
+		case B_UNMAPPED_KEY_UP:
+		{
+			return "B_UNMAPPED_KEY_UP";
+		}
+		case B_MODIFIERS_CHANGED:
+		{
+			return "B_MODIFIERS_CHANGED";
+		}
+		case B_MINIMIZE:
+		{
+			return "B_MINIMIZE";
+		}
+		case B_MOUSE_DOWN:
+		{
+			return "B_MOUSE_DOWN";
+		}
+		case B_MOUSE_MOVED:
+		{
+			return "B_MOUSE_MOVED";
+		}
+		case B_MOUSE_ENTER_EXIT:
+		{
+			return "B_MOUSE_ENTER_EXIT";
+		}
+		case B_MOUSE_UP:
+		{
+			return "B_MOUSE_UP";
+		}
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			return "B_MOUSE_WHEEL_CHANGED";
+		}
+		case B_OPEN_IN_WORKSPACE:
+		{
+			return "B_OPEN_IN_WORKSPACE";
+		}
+		case B_PRINTER_CHANGED:
+		{
+			return "B_PRINTER_CHANGED";
+		}
+		case B_PULSE:
+		{
+			return "B_PULSE";
+		}
+		case B_READY_TO_RUN:
+		{
+			return "B_READY_TO_RUN";
+		}
+		case B_REFS_RECEIVED:
+		{
+			return "B_REFS_RECEIVED";
+		}
+		case B_RELEASE_OVERLAY_LOCK:
+		{
+			return "B_RELEASE_OVERLAY_LOCK";
+		}
+		case B_ACQUIRE_OVERLAY_LOCK:
+		{
+			return "B_ACQUIRE_OVERLAY_LOCK";
+		}
+		case B_SCREEN_CHANGED:
+		{
+			return "B_SCREEN_CHANGED";
+		}
+		case B_VALUE_CHANGED:
+		{
+			return "B_VALUE_CHANGED";
+		}
+		case B_VIEW_MOVED:
+		{
+			return "B_VIEW_MOVED";
+		}
+		case B_VIEW_RESIZED:
+		{
+			return "B_VIEW_RESIZED";
+		}
+		case B_WINDOW_MOVED:
+		{
+			return "B_WINDOW_MOVED";
+		}
+		case B_WINDOW_RESIZED:
+		{
+			return "B_WINDOW_RESIZED";
+		}
+		case B_WORKSPACES_CHANGED:
+		{
+			return "B_WORKSPACES_CHANGED";
+		}
+		case B_WORKSPACE_ACTIVATED:
+		{
+			return "B_WORKSPACE_ACTIVATED";
+		}
+		case B_ZOOM:
+		{
+			return "B_ZOOM";
+		}
+		case _APP_MENU_:
+		{
+			return "_APP_MENU";
+		}
+		case _BROWSER_MENUS_:
+		{
+			return "_BROWSER_MENUS_";
+		}
+		case _MENU_EVENT_:
+		{
+			return "_MENU_EVENT";
+		}
+		case _PING_:
+		{
+			return "_PING_";
+		}
+		case _QUIT_:
+		{
+			return "_QUIT_";
+		}
+		case _VOLUME_MOUNTED_:
+		{
+			return "_VOLUME_MOUNTED";
+		}
+		case _VOLUME_UNMOUNTED_:
+		{
+			return "_VOLUME_UNMOUNTED";
+		}
+		case _MESSAGE_DROPPED_:
+		{
+			return "_MESSAGE_DROPPED";
+		}
+		case _DISPOSE_DRAG_:
+		{
+			return "_DISPOSE_DRAG";
+		}
+		case _MENUS_DONE_:
+		{
+			return "_MENUS_DONE_";
+		}
+		case _SHOW_DRAG_HANDLES_:
+		{
+			return "_SHOW_DRAG_HANDLES_";
+		}
+		case _EVENTS_PENDING_:
+		{
+			return "_EVENTS_PENDING_";
+		}
+		case _UPDATE_:
+		{
+			return "_UPDATE_";
+		}
+		case _UPDATE_IF_NEEDED_:
+		{
+			return "_UPDATE_IF_NEEDED_";
+		}
+		case _PRINTER_INFO_:
+		{
+			return "_PRINTER_INFO_";
+		}
+		case _SETUP_PRINTER_:
+		{
+			return "_SETUP_PRINTER_";
+		}
+		case _SELECT_PRINTER_:
+		{
+			return "_SELECT_PRINTER_";
+		}
+		case B_SET_PROPERTY:
+		{
+			return "B_SET_PROPERTY";
+		}
+		case B_GET_PROPERTY:
+		{
+			return "B_GET_PROERTY";
+		}
+		case B_CREATE_PROPERTY:
+		{
+			return "B_CREATE_PROPERTY";
+		}
+		case B_DELETE_PROPERTY:
+		{
+			return "B_DELETE_PROPERTY";
+		}
+		case B_COUNT_PROPERTIES:
+		{
+			return "B_COUNT_PROPERTIES";
+		}
+		case B_EXECUTE_PROPERTY:
+		{
+			return "B_EXECUTE_PROPERTY";
+		}
+		case B_GET_SUPPORTED_SUITES:
+		{
+			return "B_GET_SUPPORTED_SUITES";
+		}
+		case B_UNDO:
+		{
+			return "B_UNDO";
+		}
+		case B_CUT:
+		{
+			return "B_CUT";
+		}
+		case B_COPY:
+		{
+			return "B_COPY";
+		}
+		case B_PASTE:
+		{
+			return "B_PASTE";
+		}
+		case B_SELECT_ALL:
+		{
+			return "B_SELECT_ALL";
+		}
+		case B_SAVE_REQUESTED:
+		{
+			return "B_SAVE_REQUESTED";
+		}
+		case B_MESSAGE_NOT_UNDERSTOOD:
+		{
+			return "B_MESSAGE_NOT_UNDERSTOOD";
+		}
+		case B_NO_REPLY:
+		{
+			return "B_NO_REPLY";
+		}
+		case B_REPLY:
+		{
+			return "B_REPLY";
+		}
+		case B_SIMPLE_DATA:
+		{
+			return "B_SIMPLE_DATA";
+		}
+		case B_MIME_DATA:
+		{
+			return "B_MIME_DATA";
+		}
+		case B_ARCHIVED_OBJECT:
+		{
+			return "B_ARCHIVED_OBJECT";
+		}
+		case B_UPDATE_STATUS_BAR:
+		{
+			return "B_UPDATE_STATUS_BAR";
+		}
+		case B_RESET_STATUS_BAR:
+		{
+			return "B_RESET_STATUS_BAR";
+		}
+		case B_NODE_MONITOR:
+		{
+			return "B_NODE_MONITOR";
+		}
+		case B_QUERY_UPDATE:
+		{
+			return "B_QUERY_UPDATE";
+		}
+		case B_ENDORSABLE:
+		{
+			return "B_ENDORSABLE";
+		}
+		case B_COPY_TARGET:
+		{
+			return "B_COPY_TARGET";
+		}
+		case B_MOVE_TARGET:
+		{
+			return "B_MOVE_TARGET";
+		}
+		case B_TRASH_TARGET:
+		{
+			return "B_TRASH_TARGET";
+		}
+		case B_LINK_TARGET:
+		{
+			return "B_LINK_TARGET";
+		}
+		case B_INPUT_DEVICES_CHANGED:
+		{
+			return "B_INPUT_DEVICES_CHANGED";
+		}
+		case B_INPUT_METHOD_EVENT:
+		{
+			return "B_INPUT_METHOD_EVENT";
+		}
+		case B_WINDOW_MOVE_TO:
+		{
+			return "B_WINDOW_MOVE_TO";
+		}
+		case B_WINDOW_MOVE_BY:
+		{
+			return "B_WINDOW_MOVE_BY";
+		}
+		case B_SILENT_RELAUNCH:
+		{
+			return "B_SILENT_RELAUNCH";
+		}
+		case B_OBSERVER_NOTICE_CHANGE:
+		{
+			return "B_OBSERVER_NOTICE_CHANGE";
+		}
+		case B_CONTROL_INVOKED:
+		{
+			return "B_CONTROL_INVOKED";
+		}
+		case B_CONTROL_MODIFIED:
+		{
+			return "B_CONTROL_MODIFIED";
+		}
+		default:
+		{
+			return "Unknown";
+		}
+	}
 }
 #endif //DEBUG_BPORTLINK
 

@@ -971,11 +971,13 @@ void BApplication::connect_to_app_server()
 			link.Flush();
 			link.GetNextReply(&code);
 
-			// Reply code: AS_SET_SERVER_PORT
+			// Reply code: SERVER_TRUE
 			// Reply data:
 			//	1) port_id server-side application port (fServerFrom value)
-			if(code==AS_SET_SERVER_PORT)
+			if(code==SERVER_TRUE)
 				link.Read<port_id>(&fServerFrom);
+			else
+				debugger("BApplication: couldn't obtain new app_server comm port");
 		
 		} else
 			fInitError = fServerTo;
