@@ -75,11 +75,26 @@ auReader::Sniff(int32 *streamCount)
 	TRACE("  sampling_rate     %ld\n", UINT32(header.sampling_rate));
 	TRACE("  channel_count     %ld\n", UINT32(header.channel_count));
 
-	fDataStart = 28 + UINT32(header.data_start);
+	fDataStart = UINT32(header.data_start);
 	fDataSize = UINT32(header.data_size);
 	fChannelCount = UINT32(header.channel_count);
 	fFrameRate = UINT32(header.sampling_rate);
 	fFormatCode = UINT32(header.data_format);
+	
+	if (fDataStart > filesize) {
+		TRACE("auReader::Sniff: data start too large\n");
+		return B_ERROR;
+	}
+	if (fDataStart + fDataSize > filesize)
+		fDataSize = filesize - fDataStart;
+	if (fDataSize < 1) {
+		TRACE("auReader::Sniff: data size too small\n");
+		return B_ERROR;
+	}
+	if (fChannelCount < 1)
+		fChannelCount = 1;
+	if (fFrameRate < 1)
+		fFrameRate = 44100;
 
 	switch (fFormatCode) {
 		case SND_FORMAT_UNSPECIFIED: TRACE("SND_FORMAT_UNSPECIFIED\n"); break;
