@@ -55,7 +55,7 @@ public:
 	inline operator float() { return (int32)((uint32)data[2] << 24 | (uint32)data[1] << 16 | (uint32)data[0] << 8) * (1.0f / 2147483647.0f); }
 #else
 	inline operator uint8() { return (int32)data[0] + 128; }
-	inline operator int8()  { return (int8)data[1]; }
+	inline operator int8()  { return (int8)data[0]; }
 	inline operator int16() { return (int16)((uint32)data[0] << 8 | (uint32)data[1]); }
 	inline operator int32() { return (int32)((uint32)data[0] << 24 | (uint32)data[1] << 16 | (uint32)data[2] << 8); }
 	inline operator float() { return (int32)((uint32)data[0] << 24 | (uint32)data[1] << 16 | (uint32)data[2] << 8) * (1.0f / 2147483647.0f); }
