@@ -10,6 +10,7 @@
 #define BEOS_R5_COMPATIBLE
 	// for SetLimits()
 
+#include <Application.h>
 #include <Window.h>
 #include <Clipboard.h>
 #include <Autolock.h>
@@ -28,6 +29,8 @@
 #include <NodeInfo.h>
 #include <Node.h>
 #include <NodeMonitor.h>
+#include <Volume.h>
+#include <fs_attr.h>
 
 #include <stdio.h>
 
@@ -116,6 +119,7 @@ class HeaderView : public BView, public BInvoker {
 		off_t			fPosition;
 		off_t			fLastPosition;
 
+		BTextControl	*fTypeControl;
 		BTextControl	*fPositionControl;
 		BStringView		*fPathView;
 		BStringView		*fSizeView;
@@ -123,6 +127,18 @@ class HeaderView : public BView, public BInvoker {
 		BStringView		*fFileOffsetView;
 		PositionSlider	*fPositionSlider;
 		IconView		*fIconView;
+};
+
+
+class TypeMenuItem : public BMenuItem {
+	public:
+		TypeMenuItem(const char *name, const char *type, BMessage *message);
+		
+		virtual void GetContentSize(float *_width, float *_height);
+		virtual void DrawContent();
+
+	private:
+		BString fType;
 };
 
 
@@ -140,6 +156,23 @@ class UpdateLooper : public BLooper {
 
 
 //----------------------
+
+
+static void
+get_type_string(char *buffer, size_t bufferSize, type_code type)
+{
+	for (int32 i = 0; i < 4; i++) {
+		buffer[i] = type >> (24 - 8 * i);
+		if (buffer[i] < ' ' || buffer[i] == 0x7f) {
+			snprintf(buffer, bufferSize, "0x%04lx", type);
+			break;
+		} else if (i == 3)
+			buffer[4] = '\0';
+	}
+}
+
+
+//	#pragma mark -
 
 
 IconView::IconView(BRect rect, entry_ref *ref, bool isDevice)
@@ -384,7 +417,35 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, DataEditor &editor)
 	fPathView->SetFont(&plainFont);
 	AddChild(fPathView);
 
-	stringView = new BStringView(BRect(50, 27, frame.right, 50), B_EMPTY_STRING, "Block: ");
+	float top = 27;
+	if (editor.IsAttribute()) {
+		top += 3;
+		stringView = new BStringView(BRect(50, top, frame.right, top + 15), B_EMPTY_STRING, "Attribute Type: ");
+		stringView->SetFont(&boldFont);
+		stringView->ResizeToPreferred();
+		AddChild(stringView);
+
+		rect = stringView->Frame();
+		rect.left = rect.right;
+		rect.right += 100;
+		rect.OffsetBy(0, -2);
+			// BTextControl oddities
+		
+		char buffer[16];
+		get_type_string(buffer, sizeof(buffer), editor.Type());
+		fTypeControl = new BTextControl(rect, B_EMPTY_STRING, NULL, buffer, new BMessage(kMsgPositionUpdate));
+		fTypeControl->SetDivider(0.0);
+		fTypeControl->SetFont(&plainFont);
+		fTypeControl->TextView()->SetFontAndColor(&plainFont);
+		fTypeControl->SetEnabled(false);
+			// ToDo: for now
+		AddChild(fTypeControl);
+
+		top += 24;
+	} else
+		fTypeControl = NULL;
+
+	stringView = new BStringView(BRect(50, top, frame.right, top + 15), B_EMPTY_STRING, "Block: ");
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -441,8 +502,8 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, DataEditor &editor)
 
 	rect = Bounds();
 	rect.InsetBy(3, 0);
-	rect.top = 48;
-	rect.bottom = 60;
+	rect.top = top + 21;
+	rect.bottom = rect.top + 12;
 	fPositionSlider = new PositionSlider(rect, "slider", new BMessage(kMsgSliderUpdate),
 		editor.FileSize(), editor.BlockSize());
 	fPositionSlider->SetModificationMessage(new BMessage(kMsgSliderUpdate));
@@ -655,6 +716,45 @@ HeaderView::MessageReceived(BMessage *message)
 //	#pragma mark -
 
 
+/**	The TypeMenuItem is a BMenuItem that displays a type string
+ *	at its right border.
+ *	It is used to display the attribute and type in the attributes menu.
+ *	It does not mix nicely with short cuts.
+ */
+
+TypeMenuItem::TypeMenuItem(const char *name, const char *type, BMessage *message)
+	: BMenuItem(name, message),
+	fType(type)
+{
+}
+
+
+void 
+TypeMenuItem::GetContentSize(float *_width, float *_height)
+{
+	BMenuItem::GetContentSize(_width, _height);
+
+	if (_width)
+		*_width += Menu()->StringWidth(fType.String());
+}
+
+
+void 
+TypeMenuItem::DrawContent()
+{
+	// draw the label
+	BMenuItem::DrawContent();
+
+	// draw the type
+	BPoint point = Menu()->PenLocation();
+	point.x = Frame().right - 4 - Menu()->StringWidth(fType.String());
+	Menu()->DrawString(fType.String(), point);
+}
+
+
+//	#pragma mark -
+
+
 /** The purpose of this looper is to off-load the editor data
  *	loading from the main window looper.
  *	It will listen to the offset changes of the editor, let
@@ -788,6 +888,59 @@ ProbeView::DetachedFromWindow()
 }
 
 
+void
+ProbeView::UpdateAttributesMenu(BMenu *menu)
+{
+	// remove old contents
+
+	for (int32 i = menu->CountItems(); i-- > 0;) {
+		delete menu->RemoveItem(i);
+	}
+
+	// add new items (sorted)
+
+	BNode node(&fEditor.Ref());
+	if (node.InitCheck() == B_OK) {
+		char attribute[B_ATTR_NAME_LENGTH];
+		node.RewindAttrs();
+
+		while (node.GetNextAttrName(attribute) == B_OK) {
+			attr_info info;
+			if (node.GetAttrInfo(attribute, &info) != B_OK)
+				continue;
+
+			char type[16];
+			type[0] = '[';
+			get_type_string(type + 1, sizeof(type) - 2, info.type);
+			strcat(type, "]");
+
+			// find where to insert
+			int32 i;
+			for (i = 0; i < menu->CountItems(); i++) {
+				if (strcasecmp(menu->ItemAt(i)->Label(), attribute) > 0)
+					break;
+			}
+
+			BMessage *message = new BMessage(B_REFS_RECEIVED);
+			message->AddRef("refs", &fEditor.Ref());
+			message->AddString("attributes", attribute);
+
+			menu->AddItem(new TypeMenuItem(attribute, type, message), i);
+		}
+	}
+
+	if (menu->CountItems() == 0) {
+		// if there are no attributes, add an item to the menu
+		// that says so
+		BMenuItem *item = new BMenuItem("none", NULL);
+		item->SetEnabled(false);
+		menu->AddItem(item);
+	}
+
+	menu->SetTargetForItems(be_app);
+}
+
+
 void 
 ProbeView::AddFileMenuItems(BMenu *menu, int32 index)
 {
@@ -825,9 +978,11 @@ ProbeView::AttachedToWindow()
 		AddFileMenuItems(menu, 0);
 		menu->AddSeparatorItem();
 
-		menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W', B_COMMAND_KEY));
+		menu->AddItem(new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W', B_COMMAND_KEY));
 		bar->AddItem(menu);
 	}
+
+	// "Edit" menu
 
 	BMenu *menu = new BMenu("Edit");
 	BMenuItem *item;
@@ -845,6 +1000,8 @@ ProbeView::AttachedToWindow()
 	menu->AddItem(new BMenuItem("Find" B_UTF8_ELLIPSIS, NULL, 'F', B_COMMAND_KEY));
 	menu->AddItem(new BMenuItem("Find Again", NULL, 'G', B_COMMAND_KEY));
 	bar->AddItem(menu);
+
+	// "Block" menu
 
 	menu = new BMenu("Block");
 	BMessage *message = new BMessage(kMsgPositionUpdate);
@@ -870,9 +1027,23 @@ ProbeView::AttachedToWindow()
 	menu->AddItem(new BMenuItem(subMenu));
 	bar->AddItem(menu);
 
-	// Number Base (hex/decimal)
+	// "Attributes" menu (it's only visible if the underlying
+	// file system actually supports attributes)
+
+	BVolume volume;
+	if (!fEditor.IsAttribute()
+		&& fEditor.File().GetVolume(&volume) == B_OK
+		&& (volume.KnowsMime() || volume.KnowsAttr())) {
+		bar->AddItem(menu = new BMenu("Attributes"));
+		UpdateAttributesMenu(menu);
+	}
+
+	// "View" menu
 
 	menu = new BMenu("View");
+
+	// Number Base (hex/decimal)
+
 	subMenu = new BMenu("Base");
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base", kDecimalBase);
