@@ -33,6 +33,7 @@ int arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr *faultHa
 int arch_cpu_user_memset(void *s, char c, size_t count, addr *faultHandler);
 
 void arch_cpu_idle(void);
+void arch_cpu_sync_icache(void *address, size_t length);
 
 #ifdef __cplusplus
 }
