@@ -199,7 +199,7 @@ main2(void *unused)
 	// start the init process
 	{
 		team_id pid;
-		pid = team_create_team("/boot/bin/init", "init", NULL, 0, NULL, 0, B_NORMAL_PRIORITY);
+		pid = team_create_team("/bin/init", "init", NULL, 0, NULL, 0, B_NORMAL_PRIORITY);
 
 		TRACE(("Init started\n"));
 		if (pid < 0)

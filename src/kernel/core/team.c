@@ -519,7 +519,7 @@ team_create_team2(void *args)
 	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - totalSize;
 		// the exact location at the end of the user stack region
 
-	sprintf(ustack_name, "%s_primary_stack", team->name);
+	sprintf(ustack_name, "%s_main_stack", team->name);
 	t->user_stack_region_id = create_area_etc(team, ustack_name, (void **)&t->user_stack_base,
 		B_EXACT_ADDRESS, totalSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (t->user_stack_region_id < 0) {
@@ -570,7 +570,7 @@ team_create_team2(void *args)
 	path = teamArgs->path;
 	TRACE(("team_create_team2: loading elf binary '%s'\n", path));
 
-	err = elf_load_user_image("/boot/libexec/rld.so", team, 0, &entry);
+	err = elf_load_user_image("/boot/beos/system/lib/rld.so", team, 0, &entry);
 	if (err < 0) {
 		// XXX clean up team
 		return err;
