@@ -178,11 +178,14 @@ DynamicScrollView::~DynamicScrollView()
 void
 DynamicScrollView::AttachedToWindow(void)
 {
+	BRect frame = ConvertToScreen(Bounds());
+	BRect windowFrame = Window()->Frame();
+
 	fIsDocumentScroller = Parent() == NULL
 		&& Window() != NULL
 		&& Window()->Look() == B_DOCUMENT_WINDOW_LOOK
-		&& Frame().right == Window()->Bounds().right
-		&& Frame().bottom == Window()->Bounds().bottom;
+		&& frame.right == windowFrame.right
+		&& frame.bottom == windowFrame.bottom;
 
 	UpdateBars();
 }
