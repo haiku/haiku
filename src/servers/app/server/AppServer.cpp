@@ -51,7 +51,12 @@
 #include "FontServer.h"
 
 //#define DEBUG_KEYHANDLING
-
+#ifdef DEBUG_KEYHANDLING
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
+#endif
 // Globals
 
 //! Used to access the app_server from new_decorator
@@ -698,9 +703,7 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			int32 scancode=*((int32*)index); index+=sizeof(int32) * 3;
 			int32 modifiers=*((int32*)index); index+=sizeof(int32) + (sizeof(int8) * 3);
 			int8 stringlength=*index; index+=stringlength;
-#ifdef DEBUG_KEYHANDLING
-printf("Key Down: 0x%lx\n",scancode);
-#endif
+STRACE(("Key Down: 0x%lx\n",scancode));
 			if(DISPLAYDRIVER == HWDRIVER)
 			{
 				// Check for workspace change or safe video mode
@@ -712,9 +715,7 @@ printf("Key Down: 0x%lx\n",scancode);
 							B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY))
 						{
 							// TODO: Set to Safe Mode here. (DisplayDriver API change)
-#ifdef DEBUG_KEYHANDLING
-printf("Safe Video Mode invoked - code unimplemented\n");
-#endif
+STRACE(("Safe Video Mode invoked - code unimplemented\n"));
 							break;
 						}
 					}
@@ -722,9 +723,7 @@ printf("Safe Video Mode invoked - code unimplemented\n");
 			
 				if(modifiers & B_CONTROL_KEY)
 				{
-#ifdef DEBUG_KEYHANDLING
-printf("Set Workspace %ld\n",scancode-1);
-#endif
+STRACE(("Set Workspace %ld\n",scancode-1));
 					SetWorkspace(scancode-2);
 					break;
 				}	
@@ -772,17 +771,13 @@ printf("Set Workspace %ld\n",scancode-1);
 						if(modifiers & (B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY | B_LEFT_OPTION_KEY))
 						{
 							// TODO: Set to Safe Mode here. (DisplayDriver API change)
-#ifdef DEBUG_KEYHANDLING
-printf("Safe Video Mode invoked - code unimplemented\n");
-#endif
+STRACE(("Safe Video Mode invoked - code unimplemented\n"));
 							break;
 						}
 					}
 					if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
 					{
-#ifdef DEBUG_KEYHANDLING
-printf("Set Workspace %ld\n",scancode-1);
-#endif
+STRACE(("Set Workspace %ld\n",scancode-1));
 						SetWorkspace(scancode-2);
 						break;
 					}	
@@ -791,9 +786,7 @@ printf("Set Workspace %ld\n",scancode-1);
 				//Tab
 				if(scancode==0x26 && (modifiers & B_SHIFT_KEY))
 				{
-#ifdef DEBUG_KEYHANDLING
-printf("Twitcher\n");
-#endif
+STRACE(("Twitcher\n"));
 					ServerApp *deskbar=FindApp("application/x-vnd.Be-TSKB");
 					if(deskbar)
 					{
@@ -849,9 +842,7 @@ printf("Twitcher\n");
 			int32 scancode=*((int32*)index); index+=sizeof(int32) * 3;
 			int32 modifiers=*((int32*)index); index+=sizeof(int8) * 3;
 			int8 stringlength=*index; index+=stringlength + sizeof(int8);
-#ifdef DEBUG_KEYHANDLING
-printf("Key Up: 0x%lx\n",scancode);
-#endif
+STRACE(("Key Up: 0x%lx\n",scancode));
 			
 			if(DISPLAYDRIVER==HWDRIVER)
 			{
