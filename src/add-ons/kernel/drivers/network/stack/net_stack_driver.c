@@ -19,6 +19,7 @@
 #include <net_stack_driver.h>
 #include <netinet/in_var.h>
 
+#include <stdlib.h>
 #include <string.h>
 
 // Private includes
@@ -66,7 +67,7 @@ struct socket; /* forward declaration */
 typedef struct selecter {
 	struct selecter * 	next;
 	thread_id 			thread;
-	int					event;
+	uint32				event;
 	selectsync * 		sync;
 	uint32 				ref;
 } selecter;
@@ -305,6 +306,7 @@ static status_t net_stack_close(void *cookie)
 	dprintf(LOGID "net_stack_close(%p)\n", nsc);
 #endif
 
+	rv = B_ERROR;
 	if (nsc->socket) {
 		// if a socket was opened on this fd, close it now.
 		rv = core->socket_close(nsc->socket);
@@ -698,7 +700,7 @@ static void r5_notify_select_event(selectsync * sync, uint32 ref)
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, (area_id) sync);
 	if (area < B_OK) {
 #if SHOW_INSANE_DEBUGGING
-		dprintf(LOGID "r5_notify_select_event: clone_area(%d) failed -> %d!\n", (area_id) sync, area);
+		dprintf(LOGID "r5_notify_select_event: clone_area(%d) failed -> %d!\n", (int) sync, (int) area);
 #endif
 		return;
 	};
