@@ -1,19 +1,16 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
-#ifndef _LIBSYS_SYSCALLS_H
-#define _LIBSYS_SYSCALLS_H
+ * Copyright 2004, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _KERNEL_SYSCALLS_H
+#define _KERNEL_SYSCALLS_H
 
 
 #include <OS.h>
 #include <image.h>
-#include <sys/select.h>
-
 #include <disk_device_manager/ddm_userland_interface.h>
+
+#include <sys/select.h>
 
 
 #ifdef __cplusplus
@@ -47,17 +44,17 @@ extern status_t		_kern_shutdown(bool reboot);
 extern status_t		_kern_get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize);
 
 /* sem functions */
-sem_id sys_create_sem(int count, const char *name);
-int    sys_delete_sem(sem_id id);
-int    sys_acquire_sem(sem_id id);
-int    sys_acquire_sem_etc(sem_id id, uint32 count, uint32 flags, bigtime_t timeout);
-int    sys_release_sem(sem_id id);
-int    sys_release_sem_etc(sem_id id, uint32 count, uint32 flags);
-int    sys_get_sem_count(sem_id id, int32* thread_count);
-int    sys_get_sem_info(sem_id semaphore, struct sem_info *info, size_t size);
-int    sys_get_next_sem_info(team_id team, uint32 *cookie,
-			struct sem_info *info, size_t size);
-int    sys_set_sem_owner(sem_id id, team_id proc);
+extern sem_id		_kern_create_sem(int count, const char *name);
+extern status_t		_kern_delete_sem(sem_id id);
+extern status_t		_kern_acquire_sem(sem_id id);
+extern status_t		_kern_acquire_sem_etc(sem_id id, uint32 count, uint32 flags, bigtime_t timeout);
+extern status_t		_kern_release_sem(sem_id id);
+extern status_t		_kern_release_sem_etc(sem_id id, uint32 count, uint32 flags);
+extern status_t		_kern_get_sem_count(sem_id id, int32* thread_count);
+extern status_t		_kern_get_sem_info(sem_id semaphore, struct sem_info *info, size_t size);
+extern status_t		_kern_get_next_sem_info(team_id team, uint32 *cookie,
+						struct sem_info *info, size_t size);
+extern status_t		_kern_set_sem_owner(sem_id id, team_id proc);
 
 /* team & thread syscalls */
 
@@ -228,21 +225,21 @@ extern status_t		_kern_write_port_etc(port_id port, int32 msgCode, const void *m
 
 /* atomic_* ops (needed for CPUs that don't support them directly) */
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS
-int32 _kern_atomic_set(vint32 *value, int32 newValue);
-int32 _kern_atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst);
-int32 _kern_atomic_add(vint32 *value, int32 addValue);
-int32 _kern_atomic_and(vint32 *value, int32 andValue);
-int32 _kern_atomic_or(vint32 *value, int32 orValue);	
-int32 _kern_atomic_get(vint32 *value);
+extern int32		_kern_atomic_set(vint32 *value, int32 newValue);
+extern int32		_kern_atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst);
+extern int32		_kern_atomic_add(vint32 *value, int32 addValue);
+extern int32		_kern_atomic_and(vint32 *value, int32 andValue);
+extern int32		_kern_atomic_or(vint32 *value, int32 orValue);	
+extern int32		_kern_atomic_get(vint32 *value);
 #endif	// ATOMIC_FUNCS_ARE_SYSCALLS
 
 #ifdef ATOMIC64_FUNCS_ARE_SYSCALLS
-int64 _kern_atomic_set64(vint64 *value, int64 newValue);
-int64 _kern_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst);
-int64 _kern_atomic_add64(vint64 *value, int64 addValue);
-int64 _kern_atomic_and64(vint64 *value, int64 andValue);
-int64 _kern_atomic_or64(vint64 *value, int64 orValue);	
-int64 _kern_atomic_get64(vint64 *value);
+extern int64		_kern_atomic_set64(vint64 *value, int64 newValue);
+extern int64		_kern_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst);
+extern int64		_kern_atomic_add64(vint64 *value, int64 addValue);
+extern int64		_kern_atomic_and64(vint64 *value, int64 andValue);
+extern int64		_kern_atomic_or64(vint64 *value, int64 orValue);	
+extern int64		_kern_atomic_get64(vint64 *value);
 #endif	// ATOMIC64_FUNCS_ARE_SYSCALLS
 
 int sys_sysctl(int *name, uint namlen, void *oldp, size_t *oldlen,
@@ -255,17 +252,12 @@ int sys_getenv(const char *name, char **value);
 /* System informations */
 extern status_t		_kern_get_system_info(system_info *info, size_t size);
 
-void _kern_debug_output(const char *message);
+extern void			_kern_debug_output(const char *message);
 
 #ifdef __INTEL__
 // our only x86 only syscall
-status_t _kern_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
+extern status_t		_kern_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
 #endif
-
-/* This is a real BSD'ism :) Basically it returns the size of the
- * descriptor table for the current process as an integer.
- */
-//int sys_getdtablesize();
 
 
 /* DDM syscalls */
@@ -439,4 +431,4 @@ status_t stop_disk_device_watching(port_id, int32 token);
 }
 #endif
 
-#endif	/* _LIBSYS_SYSCALLS_H */
+#endif	/* _KERNEL_SYSCALLS_H */

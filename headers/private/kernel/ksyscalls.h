@@ -2,8 +2,8 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#ifndef _KERNEL_SYSCALLS_H
-#define _KERNEL_SYSCALLS_H
+#ifndef _KERNEL_KSYSCALLS_H
+#define _KERNEL_KSYSCALLS_H
 
 
 #include <SupportDefs.h>
@@ -20,4 +20,4 @@ status_t generic_syscall_init(void);
 }
 #endif
 
-#endif	/* _KERNEL_SYSCALLS_H */
+#endif	/* _KERNEL_KSYSCALLS_H */
