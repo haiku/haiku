@@ -128,3 +128,14 @@ INCLUDE_GPL_ADDONS	?= ${include_gpl_addons} ;
 TARGET_PLATFORM 	?= ${target} ;
 EOF
 
+# Generate Timezones binaries bindings
+
+for f in src/data/etc/timezones/*; 
+do 
+
+TZOBJECTS=`gawk '/^(Zone|Link)/ { print $2 } ' $f `
+
+cat << EOF >> build/BuildConfig
+TZ_OBJECTS on <src!data!etc!timezones>${f##src/data/etc/timezones/} ?= $TZOBJECTS ;
+EOF
+done
