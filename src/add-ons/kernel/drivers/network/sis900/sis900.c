@@ -59,7 +59,7 @@ gMIIChips[] = {
 
 /***************************** helper functions *****************************/
 
-uint32
+static uint32
 physicalAddress(volatile void *address,uint32 length)
 {
 	physical_entry table;
@@ -75,7 +75,7 @@ int32 intrCounter = 0;
 int32 lastIntr[100];
 
 
-int32
+static int32
 sis900_rxInterrupt(struct sis_info *info)
 {
 	int32 handled = B_UNHANDLED_INTERRUPT;
@@ -119,7 +119,7 @@ sis900_rxInterrupt(struct sis_info *info)
 }
 
 
-int32
+static int32
 sis900_txInterrupt(struct sis_info *info)
 {
 	int16 releaseTxSem = 0;
@@ -499,7 +499,7 @@ sis900_readMode(struct sis_info *info)
 }
 
 
-void
+static void
 sis900_setAutoNegotiationCapabilities(struct sis_info *info)
 {
 	uint16 status = mdio_status(info);
@@ -514,7 +514,7 @@ sis900_setAutoNegotiationCapabilities(struct sis_info *info)
 }
 
 
-void
+static void
 sis900_autoNegotiate(struct sis_info *info)
 {
 	uint16 status = mdio_status(info);

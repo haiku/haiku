@@ -123,7 +123,7 @@ dumpBlock(const char *buffer, int size, const char *prefix)
 //	#pragma mark -
 
 
-status_t
+static status_t
 checkDeviceInfo(struct sis_info *info)
 {
 	if (!info || info->cookieMagic != SiS_COOKIE_MAGIC)
@@ -133,13 +133,13 @@ checkDeviceInfo(struct sis_info *info)
 }
 
 
-void
+static void
 deleteSemaphores(struct sis_info *info)
 {
 }
 
 
-status_t
+static status_t
 createSemaphores(struct sis_info *info)
 {
 	if ((info->rxSem = create_sem(0, "sis900 receive")) < B_OK)

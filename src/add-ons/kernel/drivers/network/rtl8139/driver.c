@@ -49,7 +49,7 @@
 #define RTL_NODEBUG
 #ifdef RTL_NODEBUG
 #define TRACE no_printf
-void no_printf( const char *useless , ... ) {};
+static void no_printf( const char *useless , ... ) {};
 #else
 #define TRACE TRACE
 #endif
@@ -211,7 +211,7 @@ static status_t close_hook( void * );
 	#define READ_16( offset )			(m_pcimodule->read_io_16((data->reg_base + offset)))
 	#define READ_32( offset )			(m_pcimodule->read_io_32((data->reg_base + offset)))
 
-	void rtl8139_init_registers( rtl8139_properties_t *data )
+	static void rtl8139_init_registers( rtl8139_properties_t *data )
 	{
 		data->reg_base = data->pcii->u.h0.base_registers[0];
 	}
@@ -225,7 +225,7 @@ static status_t close_hook( void * );
 	#define READ_16( offset )			B_LENDIAN_TO_HOST_INT16(*((volatile uint16*)(data->reg_base + (offset))))
 	#define READ_32( offset )			B_LENDIAN_TO_HOST_INT32(*((volatile uint32*)(data->reg_base + (offset))))
 	
-	void rtl8139_init_registers( rtl8139_properties_t *data )
+	static void rtl8139_init_registers( rtl8139_properties_t *data )
 	{
 		int32 base, size, offset;
 		base = data->pcii->u.h0.base_registers[0];
