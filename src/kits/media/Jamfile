@@ -57,9 +57,6 @@ SharedLibrary media :
 	TimeSourceObject.cpp
 	TimeSourceObjectManager.cpp
 	SoundPlayNode.cpp
-	ChannelMixer.cpp
-	SampleConverter.cpp
-	SamplingrateConverter.cpp
 
 	# Old (R3) Media Kit
 	OldAudioModule.cpp
