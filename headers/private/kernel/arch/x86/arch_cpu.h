@@ -6,7 +6,6 @@
 #define _KERNEL_ARCH_x86_CPU_H
 
 #include <ktypes.h>
-#include <arch/x86/thread_struct.h>
 #include <arch/x86/descriptors.h>
 
 #define PAGE_SIZE 4096
@@ -85,6 +84,8 @@ struct iframe {
 };
 
 #define nop() __asm__ ("nop"::)
+
+struct arch_thread;
 
 void setup_system_time(unsigned int cv_factor);
 void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr new_pgdir);
