@@ -14,7 +14,7 @@ oldOPTIM = $(OPTIM) ;
 	}
 
 	if $(DEBUG) {
-		defines += DEBUG ;
+		#defines += DEBUG ;
 	} else {
 		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
 		OPTIM = -O1 ;
@@ -29,10 +29,11 @@ R5KernelAddon udf : [ FDirName kernel file_systems udf ] :
 	cpp.cpp
 	vfs_interface.cpp
 
-	Debug.cpp
+	UdfDebug.cpp
 	DiskStructures.cpp
 	Volume.cpp
 ;
+LinkSharedOSLibs udf : /boot/beos/system/lib/libroot.so ;
 
 rule InstallUDF
 {
