@@ -698,19 +698,17 @@ err1:
 }
 
 
-//	#pragma mark -
-// public team API
-
-
 /** This is the kernel backend for waitpid(). It is a bit more powerful when it comes
  *	to the reason why a thread has died than waitpid() can be.
  */
 
-#if 0
-team_id
-wait_for_child(thread_id child, uint32 flags, thread_id *_deadChild, int32 *_reason, status_t *_returnCode)
+
+static thread_id
+wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnCode)
 {
 	// ToDo: implement me! We need to store the death of children in the team structure!
+
+	dprintf("wait_for_child(child = %ld, flags = %lu) is not yet implemented\n", child, flags);
 
 	if (child > 0) {
 		// wait for the specified child
@@ -724,7 +722,10 @@ wait_for_child(thread_id child, uint32 flags, thread_id *_deadChild, int32 *_rea
 
 	return B_ERROR;
 }
-#endif
+
+
+//	#pragma mark -
+// public team API
 
 
 status_t
@@ -997,12 +998,65 @@ sys_getenv(const char *name, char **value)
 
 
 status_t
+_user_exec(const char *path, int32 argc, char * const *userArgv, int32 envCount, char * const *userEnvironment)
+{
+	int32 i;
+	dprintf("exec(path = \"%s\", argc = %ld, envc = %ld) is not yet implemented\n", path, argc, envCount);
+	for (i = 0; i < argc; i++) {
+		char argv[B_FILE_NAME_LENGTH];
+		user_strlcpy(argv, userArgv[i], sizeof(argv));
+
+		dprintf("  [%ld] %s\n", i, argv);
+	}
+	for (i = 0; i < envCount; i++) {
+		char env[B_FILE_NAME_LENGTH];
+		user_strlcpy(env, userEnvironment[i], sizeof(env));
+
+		dprintf("  (%ld) %s\n", i, env);
+	}
+	return B_ERROR;
+}
+
+
+thread_id
+_user_fork(void)
+{
+	dprintf("fork() is not yet implemented!\n");
+	return B_ERROR;
+}
+
+
+thread_id
+_user_wait_for_child(thread_id child, uint32 flags, int32 *_userReason, status_t *_userReturnCode)
+{
+	status_t returnCode;
+	int32 reason;
+	thread_id deadChild;
+
+	if ((_userReason != NULL && !IS_USER_ADDRESS(_userReason))
+		|| (_userReturnCode != NULL && !IS_USER_ADDRESS(_userReturnCode)))
+		return B_BAD_ADDRESS;
+
+	deadChild = wait_for_child(child, flags, &reason, &returnCode);
+
+	if (deadChild >= B_OK) {
+		// copy result data on successful completion
+		if ((_userReason != NULL && user_memcpy(_userReason, &reason, sizeof(int32)) < B_OK)
+			|| (_userReturnCode != NULL && user_memcpy(_userReturnCode, &returnCode, sizeof(status_t)) < B_OK))
+			return B_BAD_ADDRESS;
+	}
+
+	return deadChild;
+}
+
+
+status_t
 _user_wait_for_team(team_id id, status_t *_userReturnCode)
 {
 	status_t returnCode;
 	status_t status;
 
-	if (!IS_USER_ADDRESS(_userReturnCode))
+	if (_userReturnCode != NULL && !IS_USER_ADDRESS(_userReturnCode))
 		return B_BAD_ADDRESS;
 
 	status = wait_for_team(id, &returnCode);
