@@ -492,9 +492,8 @@ BMessenger::Team() const
 
 //----- Private or reserved -----------------------------------------
 
-// constructor
-/*!	\brief Creates a BMessenger and initializes it to team, target looper port
-	and handler token.
+// SetTo
+/*!	\brief Sets the messenger's team, target looper port and handler token.
 
 	If \a preferred is \c true, \a token is ignored.
 
@@ -504,11 +503,8 @@ BMessenger::Team() const
 	\param preferred \c true to rather use the looper's preferred handler
 		   instead of the one specified by \a token.
 */
-BMessenger::BMessenger(team_id team, port_id port, int32 token, bool preferred)
-		  : fPort(-1),
-			fHandlerToken(-1),
-			fTeam(-1),
-			fPreferredTarget(false)
+void
+BMessenger::SetTo(team_id team, port_id port, int32 token, bool preferred)
 {
 	fTeam = team;
 	fPort = port;
@@ -586,19 +582,23 @@ BMessenger::InitData(const char *signature, team_id team, status_t *result)
 	\return \c true, if \a a is less than \a b, \c false otherwise.
 */
 bool
-operator<(const BMessenger &a, const BMessenger &b)
+operator<(const BMessenger &_a, const BMessenger &_b)
 {
+	BMessenger::Private a(const_cast<BMessenger&>(_a));
+	BMessenger::Private b(const_cast<BMessenger&>(_b));
+	
+
 	// significance:
 	// 1. fPort
 	// 2. fHandlerToken
 	// 3. fPreferredTarget
 	// fTeam is insignificant
-	return (a.fPort < b.fPort
-			|| a.fPort == b.fPort
-				&& (a.fHandlerToken < b.fHandlerToken
-					|| a.fHandlerToken == b.fHandlerToken
-						&& !a.fPreferredTarget
-						&& b.fPreferredTarget));
+	return (a.Port() < b.Port()
+			|| a.Port() == b.Port()
+				&& (a.Token() < b.Token()
+					|| a.Token() == b.Token()
+						&& !a.IsPreferredTarget()
+						&& b.IsPreferredTarget()));
 }
 
 // !=
