@@ -169,7 +169,7 @@ kernel_args_malloc(size_t size)
 	sFirstFree = (void *)((addr_t)block + size);
 	sLast = block;
 	sFree = kChunkSize - size;
-	if (add_kernel_args_range(block, size) != B_OK)
+	if (add_kernel_args_range(block, kChunkSize) != B_OK)
 		panic("kernel_args max range to low!\n");
 
 	return block;
