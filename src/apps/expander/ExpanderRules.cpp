@@ -143,8 +143,8 @@ ExpanderRules::MatchingRule(BString &fileName, const char *filetype)
 	int32 length = fileName.Length();
 	for (int32 i=0; i<count; i++) {
 		ExpanderRule *rule = (ExpanderRule *)fList.ItemAt(i);
-		if (((!rule->MimeType().IsValid()) || (rule->MimeType()==filetype))
-			&& (fileName.FindLast(rule->FilenameExtension())==(length-rule->FilenameExtension().Length())))
+		if ((rule->MimeType().IsValid() && (rule->MimeType()==filetype))
+			|| (fileName.FindLast(rule->FilenameExtension())==(length-rule->FilenameExtension().Length())))
 			return rule;
 	}
 	return NULL;
