@@ -16,7 +16,7 @@
 
 #include <TLS.h>
 
-static int32 h_errno_tls;
+static int32 h_errno_tls = -1;
 
 void initialize_before(void);
 void terminate_after(void);
