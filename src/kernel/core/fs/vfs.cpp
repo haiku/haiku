@@ -530,7 +530,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 		if (vnode->cache)
 			vm_cache_release_ref((vm_cache_ref *)vnode->cache);
 		vnode->cache = NULL;
-
+		
 		if (vnode->delete_me)
 			FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
 		else
@@ -1417,24 +1417,30 @@ vfs_vnode_release_ref(void *vnode)
 }
 
 
-void *
-vfs_get_cache_ptr(void *vnode)
+extern "C" status_t
+vfs_get_vnode_cache(void *_vnode, void **_cache)
 {
-	return ((struct vnode *)vnode)->cache;
+	struct vnode *vnode = (struct vnode *)_vnode;
+
+	if (vnode->cache != NULL)
+		return B_OK;
+
+	mutex_lock(&sVnodeMutex);
+
+	status_t status = B_OK;
+	// The cache could have been created in the meantime
+	if (vnode->cache == NULL)
+		status = vm_create_vnode_cache(vnode, (void **)&vnode->cache);
+	else
+		*_cache = vnode->cache;
+
+	mutex_unlock(&sVnodeMutex);
+
+	return status;
 }
 
 
-int
-vfs_set_cache_ptr(void *vnode, void *cache)
-{
-	if (atomic_test_and_set((int32 *)&(((struct vnode *)vnode)->cache), (int32)cache, 0) == 0)
-		return 0;
-
-	return -1;
-}
-
-
-int
+extern "C" int
 vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode)
 {
 	*vnode = get_vnode_from_fd(fd, kernel);
@@ -1446,7 +1452,7 @@ vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode)
 }
 
 
-status_t
+extern "C" status_t
 vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 {
 	struct vnode *vnode;
@@ -1463,6 +1469,13 @@ vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 
 	*_vnode = vnode;
 	return B_OK;
+}
+
+
+extern "C" status_t
+vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
+{
+	return get_vnode(mountID, vnodeID, (struct vnode **)_vnode, true);
 }
 
 
