@@ -39,22 +39,6 @@ bool is_installed(const char *type);
 // to be shipped off to SetIcon*() and written to the database
 status_t get_icon_data(const BBitmap *icon, icon_size size, void **data, int32 *dataSize);
 
-// Common struct used to manage ansynchronous update threads
-struct async_thread_data {
-public:		
-	async_thread_data(thread_id id = -1);
-	bool should_exit() const;
-	void post_exit_notification();
-
-	thread_id id;
-private:
-	bool _should_exit;
-};		
-
-// Called by directly (synchronous calls) and indirectly (asynchronous calls)
-// by update_mime_info()
-int update_mime_info(entry_ref *ref, bool recursive, bool force, async_thread_data *data = NULL);
-
 } // namespace Mime
 } // namespace Storage
 } // namespace BPrivate

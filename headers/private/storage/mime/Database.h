@@ -34,6 +34,12 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+// types of mime update functions that may be run asynchronously
+typedef enum {
+	B_REG_UPDATE_MIME_INFO,
+	B_REG_CREATE_APP_META_MIME,
+} mime_update_function;
+
 class Database  {
 public:
 	Database();
@@ -87,10 +93,6 @@ public:
 	status_t DeleteSnifferRule(const char *type);
 	status_t DeleteSupportedTypes(const char *type, bool fullSync);
 	
-	// Asynchronous C function calls
-	status_t UpdateMimeInfoAsync(const entry_ref *ref, bool recursive, bool force);
-	status_t CleanupAfterAsyncThread(thread_id id);
-
 private:	
 	// Functions to send monitor notifications
 	status_t SendInstallNotification(const char *type);
@@ -105,16 +107,12 @@ private:
 	                             int32 action);
 	status_t SendMonitorUpdate(BMessage &msg);
 	
-	// Entry point functions for asynchronous update threads
-	static int32 UpdateMimeInfoAsyncEntry(void *data);
-	
-	status_t fCStatus;
+	status_t fStatus;
 	std::set<BMessenger> fMonitorMessengers;
 	AssociatedTypes fAssociatedTypes;
 	InstalledTypes fInstalledTypes;
 	SnifferRules fSnifferRules;
 	SupportingApps fSupportingApps;
-	std::list<async_thread_data*> fAsyncThreads;
 };
 
 } // namespace Mime

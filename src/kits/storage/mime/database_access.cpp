@@ -15,6 +15,7 @@
 #include <Node.h>
 #include <Path.h>
 #include <RegistrarDefs.h>
+#include <String.h>
 #include <storage_support.h>
 
 #include <fs_attr.h>	// For struct attr_info
@@ -415,138 +416,6 @@ get_icon_data(const BBitmap *icon, icon_size which, void **data, int32 *dataSize
 	if (otherColorSpace)
 		delete icon8;
 	return err;	
-}
-
-/*! \struct async_thread_data
-	\brief A thread id and functions to allow threads to be safely told
-	when they need to politely quit what they're doing and exit.
-	
-	As only the \c Mime::Database class will be posting exit notifications,
-	and as interested threads will only be calling \c should_exit() on their
-	respective \c async_thread_data objects, there currently is no synchronization
-	implemented with respect to accessing the \c thead_data::thread_should_exit
-	member. If this is a problem, a \c BLocker may be added and locking calls
-	placed in \c should_exit() and \c post_exit_notification().
-*/
-
-//! Creates a new \c async_thread_data object
-async_thread_data::async_thread_data(thread_id id)
-	: id(id)
-	, _should_exit(false)
-{	
-}
-
-/*! \brief Returns \c true if the thread should politely exit as soon as
-	possible, or \c false if it may continue running normally.
-*/
-bool
-async_thread_data::should_exit() const {
-	return _should_exit;
-}
-	
-/*! \brief All subsequent calls to should_exit() will return \c true.
-*/
-void
-async_thread_data::post_exit_notification() {
-	_should_exit = true;
-}
-
-// update_mime_info
-/*!	\brief Updates the MIME information (i.e MIME type) for one or more files.
-
-	If \a path points to a file, the MIME information for this file are
-	updated only. If it points to a directory and \a recursive is non-null,
-	the information for all the files in the given directory tree are updated.
-
-	\param ref An entry_ref to a file or directory. May not be NULL.
-	\param recursive \c true to trigger recursive behavior.
-	\param force If \c true, file information is updated even if said
-	             information already exists.
-	\return
-	- \c B_OK: success
-	- error code: failure
-*/
-int
-update_mime_info(entry_ref *ref, bool recursive, bool force, async_thread_data *data)
-{
-//	using BPrivate::Storage::Mime::kFileTypeAttr;
-
-	status_t err = ref ? B_OK : B_BAD_VALUE;
-	
-	BNode node;
-	bool doUpdate = false;
-	
-	// Figure out if we need to update or not
-	if (!err)
-		err = node.SetTo(ref);
-	if (!err) {
-		if (force)
-			doUpdate = true;
-		else {
-			attr_info info;
-			if (!err)
-				doUpdate = node.GetAttrInfo(kFileTypeAttr, &info) == B_ENTRY_NOT_FOUND;
-		}
-	}
-	// Update *this* node if necessary
-	if (!err && doUpdate) {
-		BMimeType type;
-		err = BMimeType::GuessMimeType(ref, &type);
-		if (!err && type.InitCheck() == B_OK) {
-			const char *typeStr = type.Type();
-			ssize_t len = strlen(typeStr)+1;
-			ssize_t bytes = node.WriteAttr(kFileTypeAttr, kFileTypeType, 0, typeStr, len);
-			if (bytes < B_OK)
-				err = bytes;
-			else
-				err = (bytes != len ? B_FILE_ERROR : B_OK);
-		}			
-	}
-	// If we're recursing and this is a directory, update each of the directory's
-	// children as well
-	if (!err && recursive && node.IsDirectory()) {		
-		node.Unset();	// Unset() to free a file descriptor, as we no longer need our BNode
-		BDirectory dir;
-		
-		err = dir.SetTo(ref);
-		if (!err) {
-			entry_ref childRef;
-			while (!err) {
-				err = dir.GetNextRef(&childRef);
-				if (err) {
-					// If we've come to the end of the directory listing,
-					// it's not an error.
-					if (err == B_ENTRY_NOT_FOUND)
-					 	err = B_OK;
-					break;
-				} else {
-					err = update_mime_info(&childRef, true, force);				
-				}			
-			}		
-		}			
-	}
-	// If we're running asynchronously, notify the database manager that
-	// our thread is finished with its task so the manager call free our
-	// associated data and remove us from the list of running threads.
-	if (data) {
-		BMessage msg(B_REG_MIME_ASYNC_THREAD_FINISHED);
-		status_t result;
-		status_t error = msg.AddInt32("thread id", data->id);
-		if (!error)
-			error = _send_to_roster_(&msg, &msg, true);
-		if (!error)
-			error = msg.what = B_REG_RESULT ? B_OK : B_BAD_VALUE;
-		if (!error)
-			error = msg.FindInt32("result", &result);
-		if (!error)
-			error = result;
-		if (error)
-			OUT("WARNING: async update_mime_info() thread failed termination notification with error 0x%lx\n", error);
-		DBG(OUT("(id: %ld) exiting async update_mime_info() thread with result 0x%lx\n", find_thread(NULL), err));
-	}
-	if (data)
-		snooze(9000000);
-	return err;			  
 }
 
 } // namespace Mime
