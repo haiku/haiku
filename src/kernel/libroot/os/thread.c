@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002-2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "libroot_private.h"
 #include "tls.h"
 #include "syscalls.h"
 
@@ -41,6 +42,9 @@ thread_entry(thread_func entry, void *data)
 thread_id
 spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 {
+	_single_threaded = false;
+		// used for I/O locking - BeOS compatibility issue
+
 	return _kern_spawn_thread(thread_entry, name, priority, entry, data);
 }
 
