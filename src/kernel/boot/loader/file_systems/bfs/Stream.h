@@ -11,6 +11,8 @@
 
 #include <sys/stat.h>
 
+class Node;
+
 
 namespace BFS {
 

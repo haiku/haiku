@@ -21,11 +21,11 @@
 using namespace BFS;
 
 
-Volume::Volume(Node *device)
+Volume::Volume(boot::Partition *partition)
 	:
 	fRootNode(NULL)
 {
-	fDevice = open_node(device, O_RDONLY);
+	fDevice = open_node(partition, O_RDONLY);
 	if (fDevice < B_OK)
 		return;
 
@@ -124,9 +124,9 @@ Volume::ToBlockRun(off_t block) const
 
 
 static status_t
-bfs_get_file_system(Node *device, ::Directory **_root)
+bfs_get_file_system(boot::Partition *partition, ::Directory **_root)
 {
-	Volume *volume = new Volume(device);
+	Volume *volume = new Volume(partition);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 

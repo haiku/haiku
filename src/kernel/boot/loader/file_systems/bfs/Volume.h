@@ -8,7 +8,9 @@
 
 #include <SupportDefs.h>
 
-class Node;
+namespace boot {
+	class Partition;
+}
 
 
 namespace BFS {
@@ -19,7 +21,7 @@ class Directory;
 
 class Volume {
 	public:
-		Volume(Node *device);
+		Volume(boot::Partition *partition);
 		~Volume();
 
 		status_t			InitCheck();
