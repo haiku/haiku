@@ -220,6 +220,9 @@ Inode::Initialize()
 	// these two will help to maintain the indices
 	fOldSize = Size();
 	fOldLastModified = LastModified();
+
+	if (IsContainer())
+		fTree = new BPlusTree(this);
 }
 
 
@@ -237,6 +240,18 @@ Inode::InitCheck(bool checkNode)
 	
 		if (status < B_OK) {
 			FATAL(("inode at block %Ld corrupt!\n", fBlockNumber));
+			RETURN_ERROR(B_BAD_DATA);
+		}
+	}
+
+	if (IsContainer()) {
+		// inodes that have a 
+		if (fTree == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+
+		status_t status = fTree->InitCheck();
+		if (status < B_OK) {
+			FATAL(("inode tree at block %Ld corrupt!\n", fBlockNumber));
 			RETURN_ERROR(B_BAD_DATA);
 		}
 	}
@@ -948,8 +963,9 @@ Inode::CreateAttribute(Transaction *transaction, const char *name, uint32 type, 
 
 
 /**	Gives the caller direct access to the b+tree for a given directory.
- *	The tree is created on demand, but lasts until the inode is
- *	deleted.
+ *	The tree is no longer created on demand, but when the inode is first
+ *	created. That will report any potential errors upfront, saves locking,
+ *	and should work as good (though a bit slower).
  */
 
 status_t
@@ -960,19 +976,6 @@ Inode::GetTree(BPlusTree **tree)
 		return B_OK;
 	}
 
-	if (IsContainer()) {
-		fTree = new BPlusTree(this);
-		if (!fTree)
-			RETURN_ERROR(B_NO_MEMORY);
-
-		*tree = fTree;
-		status_t status = fTree->InitCheck();
-		if (status < B_OK) {
-			delete fTree;
-			fTree = NULL;
-		}
-		RETURN_ERROR(status);
-	}
 	RETURN_ERROR(B_BAD_VALUE);
 }
 
