@@ -15,8 +15,7 @@ status_t nv_agp_setup(void)
 	nv_nth_agp_info nai;
 	nv_cmd_agp nca;
 	uint8 index;
-	uint8 nv_index = 0xff;
-	agp_info ai[8];
+	agp_info nv_ai;
 	bool agp = false;
 
 	/* first try to enable FW support on our card if user requested this
@@ -46,28 +45,37 @@ status_t nv_agp_setup(void)
 		/* get nth AGP device info */
 		nai.index = index;
 		ioctl(fd, NV_GET_NTH_AGP_INFO, &nai, sizeof(nai));
-		/* exit if we didn't get one */
+
+		/* abort if no agp busmanager found */
+		if (!nai.agp_bus)
+		{
+			LOG(4,("AGP: no AGP busmanager found.\n"));
+
+			/* make sure the card is in PCI mode if it's an AGP type after all */
+			CFGW(AGPCMD, 0x00000000);
+
+			return B_ERROR;
+		}
+
+		/* exit if we didn't get device info for this index */
 		if (!nai.exist)
 		{
 			if (index != 0)
 				LOG(4,("AGP: end of AGP capable devices list.\n"));
 			else
-				LOG(4,("AGP: no AGP busmanager or no AGP capable devices found.\n"));
+				LOG(4,("AGP: no AGP capable devices found.\n"));
 			break;
 		}
 
 		LOG(4,("AGP: AGP capable device #%d:\n", (index + 1)));
-
-		/* remember the info we got */
-		ai[index] = nai.agpi;
 
 		/* see if we are this one */
 		if (((((uint32)(nai.agpi.device_id)) << 16) | nai.agpi.vendor_id) == CFGR(DEVID))
 		{
 			LOG(4,("AGP: (this is the device this accelerant controls)\n"));
 			agp = true;
-			/* remember where we are */
-			nv_index = index;
+			/* remember our info */
+			nv_ai = nai.agpi;
 		}
 
 		/* log capabilities */
@@ -83,7 +91,7 @@ status_t nv_agp_setup(void)
 	 * We rely on the AGP busmanager to iterate trough this list for us. */
 	if (!agp)
 	{
-		LOG(4,("AGP: assuming the graphicscard this accelerant controls is PCI type.\n"));
+		LOG(4,("AGP: the graphicscard this accelerant controls is PCI type.\n"));
 
 		/* make sure the card is in PCI mode if it's an AGP type after all */
 		CFGW(AGPCMD, 0x00000000);
@@ -108,7 +116,7 @@ status_t nv_agp_setup(void)
 	/* let the AGP busmanager worry about what mode to set.. */
 	nca.cmd = (0xfffffff7);
 	/* ..but we do need to select the right speed scheme fetched from our card */
-	if (ai[nv_index].interface.agp_stat & AGP_rate_rev) nca.cmd |= AGP_rate_rev;
+	if (nv_ai.interface.agp_stat & AGP_rate_rev) nca.cmd |= AGP_rate_rev;
 	ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
 
 	/* list mode now activated */

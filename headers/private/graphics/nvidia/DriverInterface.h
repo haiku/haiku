@@ -326,6 +326,7 @@ typedef struct {
 used (pre 3.x or 3.x) */
 typedef struct {
 	uint32		magic;	/* magic number to make sure the caller groks us */
+	bool		agp_bus;/* indicates if we have access to the AGP busmanager */
 	uint8		index;	/* device index in list of devices found */
 	bool		exist;	/* we got AGP device info */
 	agp_info	agpi;	/* AGP interface info of a device */
@@ -334,6 +335,7 @@ typedef struct {
 /* Execute an AGP command */
 typedef struct {
 	uint32		magic;	/* magic number to make sure the caller groks us */
+	bool		agp_bus;/* indicates if we have access to the AGP busmanager */
 	uint32		cmd;	/* actual command to execute */
 } nv_cmd_agp;
 

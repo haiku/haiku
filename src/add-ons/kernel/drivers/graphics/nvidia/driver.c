@@ -989,7 +989,9 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			nv_nth_agp_info *nai = (nv_nth_agp_info *)buf;
 			if (nai->magic == NV_PRIVATE_DATA_MAGIC) {
 				nai->exist = false;
+				nai->agp_bus = false;
 				if (agp_bus) {
+					nai->agp_bus = true;
 					if ((*agp_bus->get_nth_agp_info)(nai->index, &(nai->agpi)) == B_NO_ERROR) {
 						nai->exist = true;
 					}
@@ -1001,8 +1003,10 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			nv_cmd_agp *nca = (nv_cmd_agp *)buf;
 			if (nca->magic == NV_PRIVATE_DATA_MAGIC) {
 				if (agp_bus) {
+					nca->agp_bus = true;
 					(*agp_bus->enable_agp)(&(nca->cmd));
 				} else {
+					nca->agp_bus = false;
 					nca->cmd = 0;
 				}
 				result = B_OK;
