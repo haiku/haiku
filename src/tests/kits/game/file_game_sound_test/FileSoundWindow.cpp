@@ -23,7 +23,7 @@ FileSoundWindow::FileSoundWindow(BRect windowBounds)
 	preload = false;
 	playing = false;
 	paused = false;
-	rampTime = 0;
+	rampTime = 250000; // 250 ms default
 	fileSound = 0;
 	//make openPanel and let it send its messages to this window
 	openPanel = new BFilePanel();
@@ -60,7 +60,7 @@ FileSoundWindow::FileSoundWindow(BRect windowBounds)
 	box -> AddChild(pauseButton);
 	//make textcontrol to enter delay for pausing/resuming
 	BRect delayBounds(pauseBounds.right + 10, pauseBounds.top,pauseBounds.right + 150, pauseBounds.bottom);
-	delayControl = new BTextControl(delayBounds,"delay","Ramp time (ms)","0", new BMessage(DELAY_MSG));
+	delayControl = new BTextControl(delayBounds,"delay","Ramp time (ms)","250", new BMessage(DELAY_MSG));
 	delayControl -> SetDivider(90);
 	delayControl -> SetModificationMessage(new BMessage(DELAY_MSG));
 	box -> AddChild(delayControl);
@@ -123,6 +123,7 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 						BAlert *alert = new BAlert("alert","Other kind of error!","Ok");
 						alert -> Go();
 					}				
+					break;
 				}
 				paused = false;
 				pauseButton -> SetLabel("Pause");
