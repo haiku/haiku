@@ -22,6 +22,7 @@ static status_t pins2_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
 static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size);
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size);
+static void log_pll(uint32 reg);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -223,8 +224,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 		switch (rom[adress])
 		{
 		case 0x59:
-			LOG(8,("xxx cmd, skipping...\n"));
-
 			*size -= 7;
 			if (*size < 0)
 			{
@@ -234,7 +233,30 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				break;
 			}
 
-			adress += 7;
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			data2 = *((uint16*)(&(rom[data])));
+			LOG(8,("cmd 'calculate indirect and set PLL 32bit REG $%08x for %fMHz'\n",
+				reg, ((float)data2)));
+			if (exec)
+			{
+				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
+				display_mode target;
+				float calced_clk;
+				uint8 m, n, p;
+				target.timing.pixel_clock = (data2 * 1000);
+				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
+				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
+//fixme?
+				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
+//				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
+//					DACW(PIXPLLC2, 0x80000401);
+			}
+			log_pll(reg);
 			break;
 		case 0x5a:
 			LOG(8,("xxx cmd, skipping...\n"));
@@ -476,39 +498,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 //				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
 //					DACW(PIXPLLC2, 0x80000401);
 			}
-			if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
-				LOG(8,("\nINFO: ---WARNING: check/update PLL programming script code!!!"));
-			switch (reg)
-			{
-			case NV32_MEMPLL:
-				LOG(8,("\nINFO: ---Memory PLL accessed.\n\n"));
-				break;
-			case NV32_COREPLL:
-				LOG(8,("\nINFO: ---Core PLL accessed.\n\n"));
-				break;
-			case NVDAC_PIXPLLC:
-				LOG(8,("\nINFO: ---DAC1 PLL accessed.\n\n"));
-				break;
-			case NVDAC2_PIXPLLC:
-				LOG(8,("\nINFO: ---DAC2 PLL accessed.\n\n"));
-				break;
-			/* unexpected cases, here for learning goals... */
-			case NV32_MEMPLL2:
-				LOG(8,("\nINFO: ---NV31/NV36 extension to memory PLL accessed only!\n\n"));
-				break;
-			case NV32_COREPLL2:
-				LOG(8,("\nINFO: ---NV31/NV36 extension to core PLL accessed only!\n\n"));
-				break;
-			case NVDAC_PIXPLLC2:
-				LOG(8,("\nINFO: ---NV31/NV36 extension to DAC1 PLL accessed only!\n\n"));
-				break;
-			case NVDAC2_PIXPLLC2:
-				LOG(8,("\nINFO: ---NV31/NV36 extension to DAC2 PLL accessed only!\n\n"));
-				break;
-			default:
-				LOG(8,("\nINFO: ---Unknown PLL accessed!\n\n"));
-				break;
-			}
+			log_pll(reg);
 			break;
 		case 0x7a:
 			*size -= 9;
@@ -538,6 +528,43 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 	}
 
 	return result;
+}
+
+static void log_pll(uint32 reg)
+{
+	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
+		LOG(8,("\nINFO: ---WARNING: check/update PLL programming script code!!!"));
+	switch (reg)
+	{
+	case NV32_MEMPLL:
+		LOG(8,("\nINFO: ---Memory PLL accessed.\n\n"));
+		break;
+	case NV32_COREPLL:
+		LOG(8,("\nINFO: ---Core PLL accessed.\n\n"));
+		break;
+	case NVDAC_PIXPLLC:
+		LOG(8,("\nINFO: ---DAC1 PLL accessed.\n\n"));
+		break;
+	case NVDAC2_PIXPLLC:
+		LOG(8,("\nINFO: ---DAC2 PLL accessed.\n\n"));
+		break;
+	/* unexpected cases, here for learning goals... */
+	case NV32_MEMPLL2:
+		LOG(8,("\nINFO: ---NV31/NV36 extension to memory PLL accessed only!\n\n"));
+		break;
+	case NV32_COREPLL2:
+		LOG(8,("\nINFO: ---NV31/NV36 extension to core PLL accessed only!\n\n"));
+		break;
+	case NVDAC_PIXPLLC2:
+		LOG(8,("\nINFO: ---NV31/NV36 extension to DAC1 PLL accessed only!\n\n"));
+		break;
+	case NVDAC2_PIXPLLC2:
+		LOG(8,("\nINFO: ---NV31/NV36 extension to DAC2 PLL accessed only!\n\n"));
+		break;
+	default:
+		LOG(8,("\nINFO: ---Unknown PLL accessed!\n\n"));
+		break;
+	}
 }
 
 /* fake_pins presumes the card was coldstarted by it's BIOS */
