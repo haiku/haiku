@@ -18,11 +18,12 @@ static void pinsnv20_arch_fake(void);
 static void pinsnv30_arch_fake(void);
 static void getstrap_arch_nv4(void);
 static void getstrap_arch_nv10_20_30(void);
-static status_t pins2_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
-static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
+static status_t pins2_read(uint8 *rom, uint32 offset);
+static status_t pins3_6_read(uint8 *rom, uint32 offset);
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size);
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size);
 static void log_pll(uint32 reg);
+static void	setup_ram_config(uint8* rom);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -31,7 +32,6 @@ status_t parse_pins ()
 	uint8 chksum = 0;
 	int i;
 	uint32 offset;
-	uint8 ram_cfg;
 	status_t result = B_ERROR;
 
 	/* preset PINS read status to failed */
@@ -82,19 +82,17 @@ status_t parse_pins ()
 	LOG(2,("INFO: PINS checksum is OK; PINS version is %d.%d\n",
 		rom[offset + 5], rom[offset + 6]));
 
-	/* fill out the si->ps struct if possible */
-	ram_cfg = ((NV_REG32(NV32_NVSTRAPINFO2) >> 2) & 0x0000000f);
-
+	/* fill out the si->ps struct as far as is possible */
 	switch (rom[offset + 5])
 	{
 	case 2:
-		result = pins2_read(rom, offset, ram_cfg);
+		result = pins2_read(rom, offset);
 		break;
 	case 3:
 	case 4:
 	case 5:
 	case 6:
-		result = pins3_6_read(rom, offset, ram_cfg);
+		result = pins3_6_read(rom, offset);
 		break;
 	default:
 		LOG(8,("INFO: unknown PINS version\n"));
@@ -114,7 +112,7 @@ status_t parse_pins ()
 	return B_OK;
 }
 
-static status_t pins2_read(uint8 *rom, uint32 offset, uint8 ram_cfg)
+static status_t pins2_read(uint8 *rom, uint32 offset)
 {
 	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
 	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
@@ -133,7 +131,7 @@ static status_t pins2_read(uint8 *rom, uint32 offset, uint8 ram_cfg)
 	return coldstart_card(rom, init1, init2, init_size);
 }
 
-static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg)
+static status_t pins3_6_read(uint8 *rom, uint32 offset)
 {
 	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
 	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
@@ -175,6 +173,8 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	int16 size = init_size;
 
 	LOG(8,("INFO: executing coldstart...\n"));
+
+//fixme: unlock regs etc...(!)
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
 	nv_crtc_dpms(false, false, false);
@@ -279,8 +279,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			if (exec) NV_REG32(reg) = data2;
 			break;
 		case 0x63:
-			LOG(8,("xxx cmd, skipping...\n"));
-
 			*size -= 1;
 			if (*size < 0)
 			{
@@ -290,7 +288,10 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				break;
 			}
 
+			/* execute */
 			adress += 1;
+			LOG(8,("cmd 'setup RAM config'\n"));
+			if (exec) setup_ram_config(rom);
 			break;
 		case 0x65:
 			*size -= 13;
@@ -539,38 +540,105 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 static void log_pll(uint32 reg)
 {
 	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
-		LOG(8,("\nINFO: ---WARNING: check/update PLL programming script code!!!"));
+		LOG(8,("INFO: ---WARNING: check/update PLL programming script code!!!\n"));
 	switch (reg)
 	{
 	case NV32_MEMPLL:
-		LOG(8,("\nINFO: ---Memory PLL accessed.\n\n"));
+		LOG(8,("INFO: ---Memory PLL accessed.\n"));
 		break;
 	case NV32_COREPLL:
-		LOG(8,("\nINFO: ---Core PLL accessed.\n\n"));
+		LOG(8,("INFO: ---Core PLL accessed.\n"));
 		break;
 	case NVDAC_PIXPLLC:
-		LOG(8,("\nINFO: ---DAC1 PLL accessed.\n\n"));
+		LOG(8,("INFO: ---DAC1 PLL accessed.\n"));
 		break;
 	case NVDAC2_PIXPLLC:
-		LOG(8,("\nINFO: ---DAC2 PLL accessed.\n\n"));
+		LOG(8,("INFO: ---DAC2 PLL accessed.\n"));
 		break;
 	/* unexpected cases, here for learning goals... */
 	case NV32_MEMPLL2:
-		LOG(8,("\nINFO: ---NV31/NV36 extension to memory PLL accessed only!\n\n"));
+		LOG(8,("INFO: ---NV31/NV36 extension to memory PLL accessed only!\n"));
 		break;
 	case NV32_COREPLL2:
-		LOG(8,("\nINFO: ---NV31/NV36 extension to core PLL accessed only!\n\n"));
+		LOG(8,("INFO: ---NV31/NV36 extension to core PLL accessed only!\n"));
 		break;
 	case NVDAC_PIXPLLC2:
-		LOG(8,("\nINFO: ---NV31/NV36 extension to DAC1 PLL accessed only!\n\n"));
+		LOG(8,("INFO: ---NV31/NV36 extension to DAC1 PLL accessed only!\n"));
 		break;
 	case NVDAC2_PIXPLLC2:
-		LOG(8,("\nINFO: ---NV31/NV36 extension to DAC2 PLL accessed only!\n\n"));
+		LOG(8,("INFO: ---NV31/NV36 extension to DAC2 PLL accessed only!\n"));
 		break;
 	default:
-		LOG(8,("\nINFO: ---Unknown PLL accessed!\n\n"));
+		LOG(8,("INFO: ---Unknown PLL accessed!\n"));
 		break;
 	}
+}
+
+static void	setup_ram_config(uint8* rom)
+{
+	uint32 ram_cfg, data;
+
+	/* set MRS = 256 */
+	NV_REG32(NV32_PFB_DEBUG_0) &= 0xffffffef;
+	/* read RAM config hardware(?) strap */
+	ram_cfg = ((NV_REG32(NV32_NVSTRAPINFO2) >> 2) & 0x0000000f);
+	LOG(8,("INFO: ---RAM config strap is $%01x\n", ram_cfg));
+	/* use it as a pointer in a BIOS table for prerecorded RAM configurations */
+	//fixme?: is 0x01a8 indeed fixed or should this adress be gained via pins somehow?
+	ram_cfg = *((uint16*)(&(rom[(0x01a8 + (ram_cfg * 2))])));
+	/* log info */
+	switch (ram_cfg & 0x00000003)
+	{
+	case 0:
+		LOG(8,("INFO: ---32Mb RAM should be connected\n"));
+		break;
+	case 1:
+		LOG(8,("INFO: ---4Mb RAM should be connected\n"));
+		break;
+	case 2:
+		LOG(8,("INFO: ---8Mb RAM should be connected\n"));
+		break;
+	case 3:
+		LOG(8,("INFO: ---16Mb RAM should be connected\n"));
+		break;
+	}
+	if (ram_cfg & 0x00000004)
+		LOG(8,("INFO: ---RAM should be 128bits wide\n"));
+	else
+		LOG(8,("INFO: ---RAM should be 64bits wide\n"));
+	switch ((ram_cfg & 0x00000038) >> 3)
+	{
+	case 0:
+		LOG(8,("INFO: ---RAM type: 8Mbit SGRAM\n"));
+		break;
+	case 1:
+		LOG(8,("INFO: ---RAM type: 16Mbit SGRAM\n"));
+		break;
+	case 2:
+		LOG(8,("INFO: ---RAM type: 4 banks of 16Mbit SGRAM\n"));
+		break;
+	case 3:
+		LOG(8,("INFO: ---RAM type: 16Mbit SDRAM\n"));
+		break;
+	case 4:
+		LOG(8,("INFO: ---RAM type: 64Mbit SDRAM\n"));
+		break;
+	case 5:
+		LOG(8,("INFO: ---RAM type: 64Mbit x16 SDRAM\n"));
+		break;
+	}
+	/* set RAM amount, width and type */
+	data = (NV_REG32(NV32_NV4STRAPINFO) & 0xffffffc0);
+	NV_REG32(NV32_NV4STRAPINFO) = (data | (ram_cfg & 0x0000003f));
+	/* setup write to read delay (?) */
+	data = (NV_REG32(NV32_PFB_CONFIG_1) & 0xff8ffffe);
+	data |= ((ram_cfg & 0x00000700) << 12);
+	/* force update via b0 = 0... */
+	NV_REG32(NV32_PFB_CONFIG_1) = data;
+	/* ... followed by b0 = 1(?) */
+	NV_REG32(NV32_PFB_CONFIG_1) = (data | 0x00000001);
+	//fixme?: do RAM width test
+	//fixme?: do RAM size test
 }
 
 /* fake_pins presumes the card was coldstarted by it's BIOS */
