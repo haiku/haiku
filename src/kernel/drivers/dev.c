@@ -80,7 +80,7 @@ image_id
 dev_load_dev_module(const char *name, const char *dirpath)
 {
 	image_id image;
-	char path[SYS_MAX_PATH_LEN];
+	char path[B_PATH_NAME_LENGTH];
 	uint32 *api_version = NULL;
 	status_t (*init_hardware)(void);
 	status_t (*init_driver)(void);
