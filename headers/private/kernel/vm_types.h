@@ -12,23 +12,23 @@
 
 // vm page
 typedef struct vm_page {
-	struct vm_page *queue_prev;
-	struct vm_page *queue_next;
+	struct vm_page		*queue_prev;
+	struct vm_page		*queue_next;
 
-	struct vm_page *hash_next;
+	struct vm_page		*hash_next;
 
-	addr ppn; // physical page number
-	off_t offset;
+	addr_t				ppn; // physical page number
+	off_t				offset;
 
-	struct vm_cache_ref *cache_ref;
+	struct vm_cache_ref	*cache_ref;
 
-	struct vm_page *cache_prev;
-	struct vm_page *cache_next;
+	struct vm_page		*cache_prev;
+	struct vm_page		*cache_next;
 
-	int32 ref_count;
+	int32				ref_count;
 
-	unsigned int type : 2;
-	unsigned int state : 3;
+	uint32				type : 2;
+	uint32				state : 3;
 } vm_page;
 
 enum {
@@ -50,55 +50,55 @@ enum {
 
 // vm_cache_ref
 typedef struct vm_cache_ref {
-	struct vm_cache *cache;
-	mutex lock;
+	struct vm_cache		*cache;
+	mutex				lock;
 
-	struct vm_region *region_list;
+	struct vm_region	*region_list;
 
-	int32 ref_count;
+	int32				ref_count;
 } vm_cache_ref;
 
 // vm_cache
 typedef struct vm_cache {
-	vm_page *page_list;
-	vm_cache_ref *ref;
-	struct vm_cache *source;
-	struct vm_store *store;
-	off_t virtual_size;
-	unsigned int temporary : 1;
-	unsigned int scan_skip : 1;
+	vm_page				*page_list;
+	vm_cache_ref		*ref;
+	struct vm_cache		*source;
+	struct vm_store		*store;
+	off_t				virtual_size;
+	uint32				temporary : 1;
+	uint32				scan_skip : 1;
 } vm_cache;
 
 // vm region
 typedef struct vm_region {
-	char *name;
-	region_id id;
-	addr base;
-	addr size;
-	int lock;
-	int wiring;
-	int32 ref_count;
+	char				*name;
+	region_id			id;
+	addr_t				base;
+	addr_t				size;
+	int					lock;
+	int					wiring;
+	int32				ref_count;
 
-	struct vm_cache_ref *cache_ref;
-	off_t cache_offset;
+	struct vm_cache_ref	*cache_ref;
+	off_t				cache_offset;
 
 	struct vm_address_space *aspace;
-	struct vm_region *aspace_next;
+	struct vm_region	*aspace_next;
 	struct vm_virtual_map *map;
-	struct vm_region *cache_next;
-	struct vm_region *cache_prev;
-	struct vm_region *hash_next;
+	struct vm_region	*cache_next;
+	struct vm_region	*cache_prev;
+	struct vm_region	*hash_next;
 } vm_region;
 
 // virtual map (1 per address space)
 typedef struct vm_virtual_map {
-	vm_region *region_list;
-	vm_region *region_hint;
-	int change_count;
-	sem_id sem;
+	vm_region			*region_list;
+	vm_region			*region_hint;
+	int					change_count;
+	sem_id				sem;
 	struct vm_address_space *aspace;
-	addr base;
-	addr size;
+	addr_t				base;
+	addr_t				size;
 } vm_virtual_map;
 
 enum {
@@ -108,27 +108,27 @@ enum {
 
 // address space
 typedef struct vm_address_space {
-	vm_virtual_map virtual_map;
-	vm_translation_map translation_map;
-	char *name;
-	aspace_id id;
-	int32 ref_count;
-	int32 fault_count;
-	int state;
-	addr scan_va;
-	addr working_set_size;
-	addr max_working_set;
-	addr min_working_set;
-	bigtime_t last_working_set_adjust;
+	vm_virtual_map		virtual_map;
+	vm_translation_map	translation_map;
+	char				*name;
+	aspace_id			id;
+	int32				ref_count;
+	int32				fault_count;
+	int					state;
+	addr_t				scan_va;
+	addr_t				working_set_size;
+	addr_t				max_working_set;
+	addr_t				min_working_set;
+	bigtime_t			last_working_set_adjust;
 	struct vm_address_space *hash_next;
 } vm_address_space;
 
 // vm_store
 typedef struct vm_store {
-	struct vm_store_ops *ops;
-	struct vm_cache *cache;
-	void *data;
-	off_t committed_size;
+	struct vm_store_ops	*ops;
+	struct vm_cache		*cache;
+	void				*data;
+	off_t				committed_size;
 } vm_store;
 
 // vm_store_ops
