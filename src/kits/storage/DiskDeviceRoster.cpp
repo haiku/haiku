@@ -21,6 +21,61 @@
 
 #include "AddOnImage.h"
 
+//----------------------------------------------------------------------------
+// Hack to make BDiskDeviceRoster communicate with our registrar.
+
+BRoster _be_roster;
+const BRoster *be_roster = &_be_roster;
+
+// init_roster
+struct _InitRoster {
+	_InitRoster()
+	{
+		bool initialized = false;
+		// find the registrar port
+		port_id rosterPort = find_port(kRosterPortName);
+		port_info info;
+		if (rosterPort >= 0 && get_port_info(rosterPort, &info) == B_OK) {
+			// construct the roster messenger
+			struct {
+				port_id	fPort;
+				int32	fHandlerToken;
+				team_id	fTeam;
+				int32	extra0;
+				int32	extra1;
+				bool	fPreferredTarget;
+				bool	extra2;
+				bool	extra3;
+				bool	extra4;
+			} fakeMessenger;
+			fakeMessenger.fPort = rosterPort;
+			fakeMessenger.fHandlerToken = 0;
+			fakeMessenger.fTeam = info.team;
+			fakeMessenger.fPreferredTarget = true;
+			BMessenger mainMessenger = *(BMessenger*)&fakeMessenger;
+			// ask for the MIME messenger
+			BMessage reply;
+			status_t error = mainMessenger.SendMessage(
+				B_REG_GET_MIME_MESSENGER, &reply);
+			if (error == B_OK && reply.what == B_REG_SUCCESS) {
+				BMessenger mimeMessenger;
+				reply.FindMessenger("messenger", &mimeMessenger);
+				BRoster::Private(_be_roster).SetTo(mainMessenger,
+												   mimeMessenger);
+				initialized = true;
+			} else {
+			}
+		}
+		if (!initialized) {
+			printf("initializing be_roster failed!\n");
+			exit(1);
+		}
+	}
+} _InitRosterObject;
+
+//----------------------------------------------------------------------------
+
+
 /*!	\class BDiskDeviceRoster
 	\brief An interface for iterating through the disk devices known to the
 		   system and for a notification mechanism provided to listen to their
@@ -30,7 +85,7 @@
 /*!	\brief find_directory constants of the add-on dirs to be searched. */
 static const directory_which kAddOnDirs[] = {
 	B_USER_ADDONS_DIRECTORY,
-	B_COMMON_ADDONS_DIRECTORY,
+//	B_COMMON_ADDONS_DIRECTORY,
 	B_BEOS_ADDONS_DIRECTORY
 };
 /*!	\brief Size of the kAddOnDirs array. */
@@ -808,6 +863,8 @@ BDiskDeviceRoster::_GetNextAddOnDir(BPath *path, int32 *index,
 		if (error == B_OK)
 			error = path->Append(subdir);
 	}
+if (error == B_OK)
+printf("  next add-on dir: `%s'\n", path->Path());
 	return error;
 }
 
