@@ -1,0 +1,62 @@
+SubDir OBOS_TOP src apps bin unzip ;
+
+BinCommand unzip :
+	unzip.c
+	crc32.c
+	crctab.c
+	crypt.c
+	envargs.c
+	explode.c
+	extract.c
+	fileio.c
+	globals.c
+	inflate.c
+	list.c
+	match.c
+	process.c
+	ttyio.c
+	unreduce.c
+	unshrink.c
+	zipinfo.c
+	beos.c
+	beosmain.cpp
+;
+
+LinkSharedOSLibs unzip : be ;
+
+# Gettng funzip to build is going to require quite a bit more work than the other two...
+
+#BinCommand funzip :
+#	funzip.c
+#	funzipdefs.c
+#	crc32.c
+#	crypt.c
+#	globals.c
+#	inflate.c
+#	ttyio.c
+#;
+
+#LinkSharedOSLibs funzip : be ;
+
+BinCommand unzipsfx :
+	unzip.c
+	crc32.c
+	crctab.c
+	crypt.c
+	extract.c
+	fileio.c
+	globals.c
+	inflate.c
+	match.c
+	process.c
+	ttyio.c
+	beos.c
+	beosmain.cpp
+	sfxdefs.c
+	envargs.c
+	zipinfo.c
+	list.c
+	explode.c
+;
+
+LinkSharedOSLibs unzipsfx : be ;
