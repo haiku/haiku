@@ -26,22 +26,20 @@
 #include <ctype.h>
 
 
-int dbg_register_file[2][14]; /* XXXmpetit -- must be made generic */
-
-
-static bool serial_debug_on = false;
-static spinlock dbg_spinlock = 0;
-static int debugger_on_cpu = -1;
-
-struct debugger_command
-{
+struct debugger_command {
 	struct debugger_command *next;
 	int (*func)(int, char **);
 	const char *name;
 	const char *description;
 };
 
-static struct debugger_command *commands;
+int dbg_register_file[2][14]; /* XXXmpetit -- must be made generic */
+
+static bool sSerialDebugEnabled = false;
+static spinlock dbg_spinlock = 0;
+static int debugger_on_cpu = -1;
+
+static struct debugger_command *sCommands;
 
 #define LINE_BUF_SIZE 1024
 #define MAX_ARGS 16
@@ -199,7 +197,7 @@ debug_parse_line(char *buf, char **argv, int *argc, int max_args)
 
 
 static void
-kernel_debugger_loop()
+kernel_debugger_loop(void)
 {
 	int argc;
 	struct debugger_command *cmd;
@@ -212,7 +210,7 @@ kernel_debugger_loop()
 
 	cmd = NULL;
 
-	for(;;) {
+	for (;;) {
 		dprintf("kdebug> ");
 		debug_read_line(line_buf[cur_line], LINE_BUF_SIZE);
 		debug_parse_line(line_buf[cur_line], args, &argc, MAX_ARGS);
@@ -226,27 +224,25 @@ kernel_debugger_loop()
 
 		if (argc > 0) {
 			// search command by name
-			cmd = commands;
+			cmd = sCommands;
 			while (cmd != NULL) {
 				if (strcmp(args[0], cmd->name) == 0)
 					break;
 				cmd = cmd->next;
-			};
-		};
+			}
+		}
 
 		if (cmd == NULL)
 			dprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
 		else {
-			int rc;
-
-			rc = cmd->func(argc, args);
+			int rc = cmd->func(argc, args);
 
 			if (rc == B_KDEBUG_QUIT)
 				break;	// okay, exit now.
 
 			if (rc != B_KDEBUG_CONT)
 				cmd = NULL;		// forget last command executed...
-		};
+		}
 
 		cur_line++;
 		if (cur_line >= HISTORY_SIZE)
@@ -257,18 +253,166 @@ kernel_debugger_loop()
 }
 
 
-void
-kernel_debugger(const char * message)
+char
+dbg_putch(char c)
 {
-	arch_dbg_save_registers(&(dbg_register_file[smp_get_current_cpu()][0]));
+	char ret;
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&dbg_spinlock);
 
-	if (message) {
-		dprintf(message);
-		dprintf("\n");
-	};
+	if (sSerialDebugEnabled)
+		ret = arch_dbg_con_putch(c);
+	else
+		ret = c;
 
-	dprintf("Welcome to Kernel Debugging Land...\n");
-	kernel_debugger_loop();
+	release_spinlock(&dbg_spinlock);
+	restore_interrupts(state);
+
+	return ret;
+}
+
+
+void
+dbg_puts(const char *s)
+{
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&dbg_spinlock);
+
+	if (sSerialDebugEnabled)
+		arch_dbg_con_puts(s);
+
+	release_spinlock(&dbg_spinlock);
+	restore_interrupts(state);
+}
+
+
+static int
+cmd_reboot(int argc, char **argv)
+{
+	reboot();
+	return 0;  // I'll be really suprised if this line ever run! ;-)
+}
+
+
+static int
+cmd_help(int argc, char **argv)
+{
+	struct debugger_command *cmd;
+
+	dprintf("debugger commands:\n");
+	cmd = sCommands;
+	while (cmd != NULL) {
+		dprintf(" %-32s\t\t%s\n", cmd->name, cmd->description ? cmd->description : "");
+		cmd = cmd->next;
+	}
+
+	return 0;
+}
+
+
+static int
+cmd_continue(int argc, char **argv)
+{
+	return B_KDEBUG_QUIT;
+}
+
+
+int
+dbg_init(kernel_args *ka)
+{
+	sCommands = NULL;
+
+	return arch_dbg_con_init(ka);
+}
+
+
+int
+dbg_init2(kernel_args *ka)
+{
+	add_debugger_command("help", &cmd_help, "List all debugger commands");
+	add_debugger_command("reboot", &cmd_reboot, "Reboot the system");
+	add_debugger_command("gdb", &cmd_gdb, "Connect to remote gdb");
+	add_debugger_command("continue", &cmd_continue, "Leave kernel debugger");
+	add_debugger_command("exit", &cmd_continue, NULL);
+	add_debugger_command("es", &cmd_continue, NULL);
+
+	return arch_dbg_init(ka);
+}
+
+// ToDo: this one is probably not needed
+#if 0
+bool
+dbg_get_serial_debug()
+{
+	return sSerialDebugEnabled;
+}
+#endif
+
+//	#pragma mark -
+//	public API
+
+
+int
+add_debugger_command(char *name, int (*func)(int, char **), char *desc)
+{
+	cpu_status state;
+	struct debugger_command *cmd;
+
+	cmd = (struct debugger_command *)malloc(sizeof(struct debugger_command));
+	if (cmd == NULL)
+		return ENOMEM;
+
+	cmd->func = func;
+	cmd->name = name;
+	cmd->description = desc;
+
+	state = disable_interrupts();
+	acquire_spinlock(&dbg_spinlock);
+
+	cmd->next = sCommands;
+	sCommands = cmd;
+
+	release_spinlock(&dbg_spinlock);
+	restore_interrupts(state);
+
+	return B_NO_ERROR;
+}
+
+
+int
+remove_debugger_command(char * name, int (*func)(int, char **))
+{
+	struct debugger_command *cmd = sCommands;
+	struct debugger_command *prev = NULL;
+	cpu_status state;
+
+	state = disable_interrupts();
+	acquire_spinlock(&dbg_spinlock);
+
+	while (cmd) {
+		if (!strcmp(cmd->name, name) && cmd->func == func)
+			break;
+
+		prev = cmd;
+		cmd = cmd->next;
+	}
+
+	if (cmd) {
+		if (cmd == sCommands)
+			sCommands = cmd->next;
+		else
+			prev->next = cmd->next;
+	}
+
+	release_spinlock(&dbg_spinlock);
+	restore_interrupts(state);
+
+	if (cmd) {
+		free(cmd);
+		return B_NO_ERROR;
+	}
+
+	return B_NAME_NOT_FOUND;
 }
 
 
@@ -285,7 +429,7 @@ panic(const char *fmt, ...)
 	// XXX should be renamed?
 	kernel_startup = true;
 
-	dbg_set_serial_debug(true);
+	set_dprintf_enabled(true);
 
 	state = disable_interrupts();
 
@@ -310,12 +454,37 @@ panic(const char *fmt, ...)
 
 
 void
+kernel_debugger(const char * message)
+{
+	arch_dbg_save_registers(&(dbg_register_file[smp_get_current_cpu()][0]));
+
+	if (message) {
+		dprintf(message);
+		dprintf("\n");
+	};
+
+	dprintf("Welcome to Kernel Debugging Land...\n");
+	kernel_debugger_loop();
+}
+
+
+bool
+set_dprintf_enabled(bool newState)
+{
+	bool oldState = sSerialDebugEnabled;
+	sSerialDebugEnabled = newState;
+
+	return oldState;
+}
+
+
+void
 dprintf(const char *fmt, ...)
 {
 	va_list args;
 	char temp[512];
 
-	if (serial_debug_on) {
+	if (sSerialDebugEnabled) {
 		va_start(args, fmt);
 		vsprintf(temp, fmt, args);
 		va_end(args);
@@ -325,169 +494,21 @@ dprintf(const char *fmt, ...)
 }
 
 
-
-char
-dbg_putch(char c)
-{
-	char ret;
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&dbg_spinlock);
-
-	if (serial_debug_on)
-		ret = arch_dbg_con_putch(c);
-	else
-		ret = c;
-
-	release_spinlock(&dbg_spinlock);
-	restore_interrupts(state);
-
-	return ret;
-}
+//	#pragma mark -
+//	userland syscalls
 
 
 void
-dbg_puts(const char *s)
+_user_debug_output(const char *userString)
 {
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&dbg_spinlock);
+	char string[1024];
 
-	if (serial_debug_on)
-		arch_dbg_con_puts(s);
+	if (!sSerialDebugEnabled)
+		return;
 
-	release_spinlock(&dbg_spinlock);
-	restore_interrupts(state);
+	if (!CHECK_USER_ADDRESS(userString)
+		|| user_strlcpy(string, userString, sizeof(string)) < B_OK)
+		return;
+
+	dbg_puts(userString);
 }
-
-
-int
-add_debugger_command(char *name, int (*func)(int, char **), char *desc)
-{
-	cpu_status state;
-	struct debugger_command *cmd;
-
-	cmd = (struct debugger_command *)malloc(sizeof(struct debugger_command));
-	if (cmd == NULL)
-		return ENOMEM;
-
-	cmd->func = func;
-	cmd->name = name;
-	cmd->description = desc;
-
-	state = disable_interrupts();
-	acquire_spinlock(&dbg_spinlock);
-
-	cmd->next = commands;
-	commands = cmd;
-
-	release_spinlock(&dbg_spinlock);
-	restore_interrupts(state);
-
-	return B_NO_ERROR;
-}
-
-
-int
-remove_debugger_command(char * name, int (*func)(int, char **))
-{
-	struct debugger_command *cmd = commands;
-	struct debugger_command *prev = NULL;
-	cpu_status state;
-
-	state = disable_interrupts();
-	acquire_spinlock(&dbg_spinlock);
-
-	while (cmd) {
-		if (!strcmp(cmd->name, name) && cmd->func == func)
-			break;
-
-		prev = cmd;
-		cmd = cmd->next;
-	}
-
-	if (cmd) {
-		if (cmd == commands)
-			commands = cmd->next;
-		else
-			prev->next = cmd->next;
-	}
-
-	release_spinlock(&dbg_spinlock);
-	restore_interrupts(state);
-
-	if (cmd) {
-		free(cmd);
-		return B_NO_ERROR;
-	}
-
-	return B_NAME_NOT_FOUND;
-}
-
-
-static int
-cmd_reboot(int argc, char **argv)
-{
-	reboot();
-	return 0;  // I'll be really suprised if this line ever run! ;-)
-}
-
-
-static int
-cmd_help(int argc, char **argv)
-{
-	struct debugger_command *cmd;
-
-	dprintf("debugger commands:\n");
-	cmd = commands;
-	while (cmd != NULL) {
-		dprintf(" %-32s\t\t%s\n", cmd->name, cmd->description);
-		cmd = cmd->next;
-	}
-
-	return 0;
-}
-
-
-int
-dbg_init(kernel_args *ka)
-{
-	commands = NULL;
-
-	return arch_dbg_con_init(ka);
-}
-
-
-int
-dbg_init2(kernel_args *ka)
-{
-	add_debugger_command("help", &cmd_help, "List all debugger commands");
-	add_debugger_command("reboot", &cmd_reboot, "Reboot");
-	add_debugger_command("gdb", &cmd_gdb, "Connect to remote gdb");
-
-	return arch_dbg_init(ka);
-}
-
-
-bool
-dbg_set_serial_debug(bool new_val)
-{
-	int temp = serial_debug_on;
-	serial_debug_on = new_val;
-	return temp;
-}
-
-
-bool
-dbg_get_serial_debug()
-{
-	return serial_debug_on;
-}
-
-// Wrapper(s) for BeOS R5 compatibility:
-
-bool
-set_dprintf_enabled(bool new_state)
-{
-	return dbg_set_serial_debug(new_state);
-}
-
-

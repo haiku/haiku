@@ -68,7 +68,7 @@ _start(kernel_args *oldka, int cpu_num)
 
 		// setup debug output
 		dbg_init(&ka);
-		dbg_set_serial_debug(true);
+		set_dprintf_enabled(true);
 		dprintf("Welcome to kernel debugger output!\n");
 
 		// init modules
