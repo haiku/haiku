@@ -30,6 +30,8 @@
 
 #include <OS.h>
 
+class EventQueue;
+
 class Event {
 public:
 	Event(bool autoDelete = true);
@@ -42,7 +44,7 @@ public:
 	void SetAutoDelete(bool autoDelete);
 	bool IsAutoDelete() const;
 
-	virtual	bool Do();
+	virtual	bool Do(EventQueue *queue);
 
  private:
 	bigtime_t		fTime;
