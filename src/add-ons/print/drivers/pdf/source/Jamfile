@@ -1,8 +1,7 @@
 SubDir OBOS_TOP src add-ons print drivers pdf source ;
 
-
 Addon 
-	PDF
+	PDFWriter
 	:
 	Print
 	:
@@ -36,4 +35,18 @@ Addon
 	XReferences.cpp	
 	;
 
-LinkSharedOSLibs   PDF : be textencoding translation /boot/home/config/lib/libpdf.so  ;
+LinkSharedOSLibs   
+	PDFWriter
+	: 
+	be 
+	textencoding 
+	translation 
+	/boot/home/config/lib/libpdf.so  
+	;
+
+XRes
+	PDFWriter
+	:
+	PDFWriter.rsrc
+	;
+
