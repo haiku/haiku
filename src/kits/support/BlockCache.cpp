@@ -108,7 +108,7 @@ BBlockCache::BBlockCache(size_t CacheSize, size_t BlockSize, uint32 Type)
 
 BBlockCache::~BBlockCache()
 {
-	delete[] (int8*)fCache;
+	delete[] (_Block*)fCache;
 }
 
 
