@@ -6,7 +6,9 @@ INTERFACE_KIT_SOURCE =
 	Button.cpp
 	CheckBox.cpp
 	ClientFontList.cpp
+	ColorTools.cpp
 	ColorUtils.cc
+	ColumnListView.cpp
 	Control.cpp
 	Deskbar.cpp
 	Dragger.cpp
