@@ -391,7 +391,7 @@ usage(const char *myname)
 	exit(1);
 }
 
-void
+int
 main(int argc, char **argv)
 {
 	thread_time_list_t baseline;
