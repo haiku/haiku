@@ -198,15 +198,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* Defines for printing debug information */
 
-#define INIT_DEBUGOUT(S)            if (DEBUG_INIT)  printf("ipro1000: " S "\n")
-#define INIT_DEBUGOUT1(S, A)        if (DEBUG_INIT)  printf("ipro1000: " S "\n", A)
-#define INIT_DEBUGOUT2(S, A, B)     if (DEBUG_INIT)  printf("ipro1000: " S "\n", A, B)
-#define IOCTL_DEBUGOUT(S)           if (DEBUG_IOCTL) printf("ipro1000: " S "\n")
-#define IOCTL_DEBUGOUT1(S, A)       if (DEBUG_IOCTL) printf("ipro1000: " S "\n", A)
-#define IOCTL_DEBUGOUT2(S, A, B)    if (DEBUG_IOCTL) printf("ipro1000: " S "\n", A, B)
-#define HW_DEBUGOUT(S)              if (DEBUG_HW) printf("ipro1000: " S "\n")
-#define HW_DEBUGOUT1(S, A)          if (DEBUG_HW) printf("ipro1000: " S "\n", A)
-#define HW_DEBUGOUT2(S, A, B)       if (DEBUG_HW) printf("ipro1000: " S "\n", A, B)
+#define INIT_DEBUGOUT(S)            if (DEBUG_INIT)  dprintf("ipro1000: " S "\n")
+#define INIT_DEBUGOUT1(S, A)        if (DEBUG_INIT)  dprintf("ipro1000: " S "\n", A)
+#define INIT_DEBUGOUT2(S, A, B)     if (DEBUG_INIT)  dprintf("ipro1000: " S "\n", A, B)
+#define IOCTL_DEBUGOUT(S)           if (DEBUG_IOCTL) dprintf("ipro1000: " S "\n")
+#define IOCTL_DEBUGOUT1(S, A)       if (DEBUG_IOCTL) dprintf("ipro1000: " S "\n", A)
+#define IOCTL_DEBUGOUT2(S, A, B)    if (DEBUG_IOCTL) dprintf("ipro1000: " S "\n", A, B)
+#define HW_DEBUGOUT(S)              if (DEBUG_HW) dprintf("ipro1000: " S "\n")
+#define HW_DEBUGOUT1(S, A)          if (DEBUG_HW) dprintf("ipro1000: " S "\n", A)
+#define HW_DEBUGOUT2(S, A, B)       if (DEBUG_HW) dprintf("ipro1000: " S "\n", A, B)
 
 
 /* Supported RX Buffer Sizes */
