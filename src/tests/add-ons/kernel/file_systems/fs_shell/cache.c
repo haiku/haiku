@@ -1739,7 +1739,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 {
     size_t          err = 0;
     cache_ent      *ce;
-    cache_ent_list *cel;
+    cache_ent_list *cel = NULL;
 
     if (chatty_io > 1)
         printf("cbio: bnum = %Ld, num_blocks = %Ld, bsize = %d, op = %s\n", bnum, num_blocks,
@@ -1772,7 +1772,9 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                dev, bnum, num_blocks, max_device_blocks[dev]);
 
 		// let the app crash here
-		*(int *)0x3100 = 0xc0debabe;
+		debugger("Accessed blocks out of device range!");
+		//*(int *)0x3100 = 0xc0debabe;
+
         return EINVAL;
     }
 
@@ -1786,7 +1788,6 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
         if (data == NULL || (op & CACHE_LOCKED)) {
             panic("*** asked to do a large locked io that's too hard!\n");
         }
-
 
         if (op & CACHE_READ) {
             if (read_phys_blocks(dev, bnum, data, num_blocks, bsize) != 0) {

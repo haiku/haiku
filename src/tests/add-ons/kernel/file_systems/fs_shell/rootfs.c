@@ -656,7 +656,7 @@ rootfs_readdir(void *_ns, void *_node, void *_cookie, long *num,
     long                 i;
     vnode               *vn;
     vnode_id             vnid;
-    char                *name, *last;
+    char                *name, *last = "";
     int                  sl, rl;
 
     ns = (nspace *) _ns;

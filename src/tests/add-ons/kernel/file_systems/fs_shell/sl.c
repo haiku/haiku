@@ -159,7 +159,7 @@ int InsertSL(SkipList l, void *key)
 {
   register int i,k;
   SLNode update[MaxNumberOfLevels];
-  register SLNode p,q;
+  register SLNode p,q = 0;
   int (*compare)() = l->compare;
 
   p = l->header;
@@ -262,7 +262,7 @@ int DeleteSL(SkipList l, void *key)
 void *SearchSL(SkipList l, void *key)
 {
   register int k;
-  register SLNode p,q;
+  register SLNode p,q = 0;
   int (*compare)() = l->compare;
 
   p = l->header;
