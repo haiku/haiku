@@ -95,8 +95,8 @@ enum {
 // messages sent from the debug nub thread to a debugged thread
 typedef enum {
 	B_DEBUGGED_THREAD_MESSAGE_CONTINUE	= 0,
-	B_DEBUGGED_THREAD_GET_WHY_STOPPED,
 	B_DEBUGGED_THREAD_SET_CPU_STATE,
+	B_DEBUGGED_THREAD_GET_CPU_STATE,
 	B_DEBUGGED_THREAD_DEBUGGER_CHANGED,
 } debugged_thread_message;
 
@@ -107,7 +107,7 @@ typedef struct {
 
 typedef struct {
 	port_id	reply_port;
-} debugged_thread_get_why_stopped;
+} debugged_thread_get_cpu_state;
 
 typedef struct {
 	debug_cpu_state	cpu_state;
@@ -115,8 +115,8 @@ typedef struct {
 
 typedef union {
 	debugged_thread_continue		continue_thread;
-	debugged_thread_get_why_stopped	get_why_stopped;
 	debugged_thread_set_cpu_state	set_cpu_state;
+	debugged_thread_get_cpu_state	get_cpu_state;
 } debugged_thread_message_data;
 
 
@@ -155,7 +155,8 @@ void user_debug_thread_created(thread_id threadID);
 void user_debug_thread_deleted(team_id teamID, thread_id threadID);
 void user_debug_image_created(const image_info *imageInfo);
 void user_debug_image_deleted(const image_info *imageInfo);
-void user_debug_break_or_watchpoint_hit(bool watchpoint);
+void user_debug_breakpoint_hit(bool software);
+void user_debug_watchpoint_hit();
 void user_debug_single_stepped();
 
 

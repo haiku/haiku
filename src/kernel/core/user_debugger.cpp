@@ -19,7 +19,7 @@
 #include <user_debugger.h>
 #include <arch/user_debugger.h>
 
-#define TRACE_USER_DEBUGGER
+//#define TRACE_USER_DEBUGGER
 #ifdef TRACE_USER_DEBUGGER
 #	define TRACE(x) dprintf x
 #else
@@ -220,31 +220,15 @@ get_team_debug_info(team_debug_info &teamDebugInfo)
 }
 
 
-void
-prepare_thread_stopped_message(debug_thread_stopped &message,
-	debug_why_stopped whyStopped, port_id nubPort, void *data)
-{
-	struct thread *thread = thread_get_current_thread();
-
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = nubPort;
-	message.why = whyStopped;
-	message.data = data;
-	arch_get_debug_cpu_state(&message.cpu_state);
-}
-
-
 static status_t
-thread_hit_debug_event_internal(uint32 event, const void *message, int32 size,
-	debug_why_stopped whyStopped, void *additionalData, bool requireDebugger,
-	bool &restart)
+thread_hit_debug_event_internal(debug_debugger_message event,
+	const void *message, int32 size, bool requireDebugger, bool &restart)
 {
 	restart = false;
 	struct thread *thread = thread_get_current_thread();
 
 	TRACE(("thread_hit_debug_event(): thread: %ld, event: %lu, message: %p, "
-		"size: %ld\n", thread->id, event, message, size));
+		"size: %ld\n", thread->id, (uint32)event, message, size));
 
 	// check, if there's a debug port already
 	bool setPort = !(atomic_get(&thread->debug_info.flags)
@@ -364,23 +348,6 @@ thread_hit_debug_event_internal(uint32 event, const void *message, int32 size,
 					done = true;
 					break;
 
-				case B_DEBUGGED_THREAD_GET_WHY_STOPPED:
-				{
-					port_id replyPort
-						= commandMessage.get_why_stopped.reply_port;
-
-					// prepare the message
-					debug_thread_stopped stoppedMessage;
-					prepare_thread_stopped_message(stoppedMessage, whyStopped,
-						nubPort, additionalData);
-
-					// send it
-					error = kill_interruptable_write_port(replyPort, event,
-						&stoppedMessage, sizeof(stoppedMessage));
-
-					break;
-				}
-
 				case B_DEBUGGED_THREAD_SET_CPU_STATE:
 				{
 					TRACE(("thread_hit_debug_event(): thread: %ld: "
@@ -389,6 +356,23 @@ thread_hit_debug_event_internal(uint32 event, const void *message, int32 size,
 					arch_set_debug_cpu_state(
 						&commandMessage.set_cpu_state.cpu_state);
 					
+					break;
+				}
+
+				case B_DEBUGGED_THREAD_GET_CPU_STATE:
+				{
+					port_id replyPort = commandMessage.get_cpu_state.reply_port;
+
+					// prepare the message
+					debug_nub_get_cpu_state_reply replyMessage;
+					replyMessage.error = B_OK;
+					replyMessage.message = event;
+					arch_get_debug_cpu_state(&replyMessage.cpu_state);
+
+					// send it
+					error = kill_interruptable_write_port(replyPort, event,
+						&replyMessage, sizeof(replyMessage));
+
 					break;
 				}
 
@@ -464,15 +448,15 @@ thread_hit_debug_event_internal(uint32 event, const void *message, int32 size,
 
 
 static status_t
-thread_hit_debug_event(uint32 event, const void *message, int32 size,
-	debug_why_stopped whyStopped, void *additionalData, bool requireDebugger)
+thread_hit_debug_event(debug_debugger_message event, const void *message,
+	int32 size, bool requireDebugger)
 {
 	status_t result;
 	bool restart;
 	do {
 		restart = false;
 		result = thread_hit_debug_event_internal(event, message, size,
-			whyStopped, additionalData, requireDebugger, restart);
+			requireDebugger, restart);
 	} while (result >= 0 && restart);
 
 	return result;
@@ -509,7 +493,7 @@ user_debug_pre_syscall(uint32 syscall, void *args)
 	}
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_PRE_SYSCALL, &message,
-		sizeof(message), B_PRE_SYSCALL_HIT, NULL, true);
+		sizeof(message), true);
 }
 
 
@@ -547,30 +531,7 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 	}
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_POST_SYSCALL, &message,
-		sizeof(message), B_POST_SYSCALL_HIT, NULL, true);
-}
-
-
-static status_t
-stop_thread(debug_why_stopped whyStopped, void *additionalData)
-{
-	// ensure that a debugger is installed for this team
-	port_id nubPort;
-	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
-	if (error != B_OK) {
-		dprintf("user_debug_stop_thread(): Failed to install debugger: "
-			"thread: %ld: %s\n", thread_get_current_thread()->id,
-			strerror(error));
-		return error;
-	}
-
-	// prepare the message
-	debug_thread_stopped message;
-	prepare_thread_stopped_message(message, whyStopped, nubPort,
-		additionalData);
-
-	return thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_STOPPED, &message,
-		sizeof(message), whyStopped, additionalData, true);
+		sizeof(message), true);
 }
 
 
@@ -604,8 +565,7 @@ user_debug_exception_occurred(debug_exception_type exception, int signal)
 	message.signal = signal;
 
 	status_t result = thread_hit_debug_event(
-		B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED,
-		&message, sizeof(message), B_EXCEPTION_OCCURRED, NULL, true);
+		B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED, &message, sizeof(message), true);
 	return (result != B_THREAD_DEBUG_IGNORE_EVENT);
 }
 
@@ -631,7 +591,7 @@ user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 	message.deadly = deadly;
 
 	status_t result = thread_hit_debug_event(B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED,
-		&message, sizeof(message), B_SIGNAL_RECEIVED, NULL, true);
+		&message, sizeof(message), true);
 	return (result != B_THREAD_DEBUG_IGNORE_EVENT);
 }
 
@@ -639,7 +599,24 @@ user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 void
 user_debug_stop_thread()
 {
-	stop_thread(B_THREAD_NOT_RUNNING, NULL);
+	// ensure that a debugger is installed for this team
+	struct thread *thread = thread_get_current_thread();
+	port_id nubPort;
+	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
+	if (error != B_OK) {
+		dprintf("user_debug_stop_thread(): Failed to install debugger: "
+			"thread: %ld: %s\n", thread->id, strerror(error));
+		return;
+	}
+
+	// prepare the message
+	debug_thread_debugged message;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
+	message.origin.nub_port = nubPort;
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, &message,
+		sizeof(message), true);
 }
 
 
@@ -663,7 +640,7 @@ user_debug_team_created(team_id teamID)
 	message.new_team = teamID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_TEAM_CREATED, &message,
-		sizeof(message), B_TEAM_CREATED, NULL, true);
+		sizeof(message), true);
 }
 
 
@@ -701,7 +678,7 @@ user_debug_thread_created(thread_id threadID)
 	message.new_thread = threadID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_CREATED, &message,
-		sizeof(message), B_THREAD_CREATED, NULL, true);
+		sizeof(message), true);
 }
 
 
@@ -766,7 +743,7 @@ user_debug_image_created(const image_info *imageInfo)
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
-		sizeof(message), B_IMAGE_CREATED, NULL, true);
+		sizeof(message), true);
 }
 
 
@@ -789,21 +766,83 @@ user_debug_image_deleted(const image_info *imageInfo)
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
-		sizeof(message), B_IMAGE_DELETED, NULL, true);
+		sizeof(message), true);
 }
 
 
 void
-user_debug_break_or_watchpoint_hit(bool watchpoint)
+user_debug_breakpoint_hit(bool software)
 {
-	stop_thread((watchpoint ? B_WATCHPOINT_HIT : B_BREAKPOINT_HIT), NULL);
+	// ensure that a debugger is installed for this team
+	struct thread *thread = thread_get_current_thread();
+	port_id nubPort;
+	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
+	if (error != B_OK) {
+		dprintf("user_debug_breakpoint_hit(): Failed to install debugger: "
+			"thread: %ld: %s\n", thread->id, strerror(error));
+		return;
+	}
+
+	// prepare the message
+	debug_breakpoint_hit message;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
+	message.origin.nub_port = nubPort;
+	message.software = software;
+	arch_get_debug_cpu_state(&message.cpu_state);
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_BREAKPOINT_HIT, &message,
+		sizeof(message), true);
+}
+
+
+void
+user_debug_watchpoint_hit()
+{
+	// ensure that a debugger is installed for this team
+	struct thread *thread = thread_get_current_thread();
+	port_id nubPort;
+	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
+	if (error != B_OK) {
+		dprintf("user_debug_watchpoint_hit(): Failed to install debugger: "
+			"thread: %ld: %s\n", thread->id, strerror(error));
+		return;
+	}
+
+	// prepare the message
+	debug_watchpoint_hit message;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
+	message.origin.nub_port = nubPort;
+	arch_get_debug_cpu_state(&message.cpu_state);
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_WATCHPOINT_HIT, &message,
+		sizeof(message), true);
 }
 
 
 void
 user_debug_single_stepped()
 {
-	stop_thread(B_SINGLE_STEP, NULL);
+	// ensure that a debugger is installed for this team
+	struct thread *thread = thread_get_current_thread();
+	port_id nubPort;
+	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
+	if (error != B_OK) {
+		dprintf("user_debug_watchpoint_hit(): Failed to install debugger: "
+			"thread: %ld: %s\n", thread->id, strerror(error));
+		return;
+	}
+
+	// prepare the message
+	debug_single_step message;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
+	message.origin.nub_port = nubPort;
+	arch_get_debug_cpu_state(&message.cpu_state);
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_SINGLE_STEP, &message,
+		sizeof(message), true);
 }
 
 
@@ -935,6 +974,40 @@ read_user_memory(const void *_address, void *_buffer, int32 size,
 }
 
 
+/**	\brief Debug nub thread helper function that returns the debug port of
+ *		   a thread of the same team.
+ */
+static status_t
+debug_nub_thread_get_thread_debug_port(struct thread *nubThread,
+	thread_id threadID, port_id &threadDebugPort)
+{
+	status_t result = B_OK;
+	threadDebugPort = -1;
+
+	cpu_status state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	struct thread *thread = thread_get_thread_struct_locked(threadID);
+	if (thread) {
+		if (thread->team != nubThread->team)
+			result = B_BAD_VALUE;
+		else if (thread->debug_info.flags & B_THREAD_DEBUG_STOPPED)
+			threadDebugPort = thread->debug_info.debug_port;
+		else
+			result = B_BAD_VALUE;
+	} else
+		result = B_BAD_THREAD_ID;
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	if (result == B_OK && threadDebugPort < 0)
+		result = B_ERROR;
+
+	return result;
+}
+
+
 static status_t
 debug_nub_thread(void *)
 {
@@ -984,6 +1057,7 @@ debug_nub_thread(void *)
 		union {
 			debug_nub_read_memory_reply			read_memory;
 			debug_nub_write_memory_reply		write_memory;
+			debug_nub_get_cpu_state_reply		get_cpu_state;
 			debug_nub_set_breakpoint_reply		set_breakpoint;
 			debug_nub_set_watchpoint_reply		set_watchpoint;
 			debug_nub_get_signal_masks_reply	get_signal_masks;
@@ -1112,89 +1186,35 @@ debug_nub_thread(void *)
 				break;
 			}
 
-			case B_DEBUG_MESSAGE_RUN_THREAD:
-			case B_DEBUG_MESSAGE_STEP_THREAD:
+			case B_DEBUG_MESSAGE_CONTINUE_THREAD:
 			{
 				// get the parameters
 				thread_id threadID;
 				uint32 handleEvent;
 				bool singleStep;
 
-				if (command == B_DEBUG_MESSAGE_RUN_THREAD) {
-					threadID = message.run_thread.thread;
-					handleEvent = message.run_thread.handle_event;
-					singleStep = false;
-				} else {
-					threadID = message.step_thread.thread;
-					handleEvent = message.step_thread.handle_event;
-					singleStep = true;
-				}
+				threadID = message.continue_thread.thread;
+				handleEvent = message.continue_thread.handle_event;
+				singleStep = message.continue_thread.single_step;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_%s_THREAD: "
-					"thread: %ld, handle event: %lu\n", nubThread->id,
-					(singleStep ? "STEP" : "RUN"), threadID,
-					handleEvent));
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_CONTINUE_THREAD: "
+					"thread: %ld, handle event: %lu, single step: %d\n",
+					nubThread->id, threadID, handleEvent, singleStep));
 
 				// find the thread and get its debug port
-				state = disable_interrupts();
-				GRAB_THREAD_LOCK();
-
 				port_id threadDebugPort = -1;
-				struct thread *thread
-					= thread_get_thread_struct_locked(threadID);
-				if (thread && thread->team == nubThread->team
-					&& thread->debug_info.flags & B_THREAD_DEBUG_STOPPED) {
-					threadDebugPort = thread->debug_info.debug_port;
-				}
-
-				RELEASE_THREAD_LOCK();
-				restore_interrupts(state);
+				status_t result = debug_nub_thread_get_thread_debug_port(
+					nubThread, threadID, threadDebugPort);
 
 				// send a message to the debugged thread
-				if (threadDebugPort >= 0) {
+				if (result == B_OK) {
 					debugged_thread_continue commandMessage;
 					commandMessage.handle_event = handleEvent;
 					commandMessage.single_step = singleStep;
 
-					write_port(threadDebugPort,
+					result = write_port(threadDebugPort,
 						B_DEBUGGED_THREAD_MESSAGE_CONTINUE,
 						&commandMessage, sizeof(commandMessage));
-				}
-
-				break;
-			}
-
-			case B_DEBUG_MESSAGE_GET_WHY_STOPPED:
-			{
-				// get the parameters
-				thread_id threadID = message.get_why_stopped.thread;
-				port_id replyPort = message.get_why_stopped.reply_port;
-
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_WHY_STOPPED: "
-					"thread: %ld\n", nubThread->id, threadID));
-
-				// find the thread and get its debug port
-				state = disable_interrupts();
-				GRAB_THREAD_LOCK();
-
-				port_id threadDebugPort = -1;
-				struct thread *thread
-					= thread_get_thread_struct_locked(threadID);
-				if (thread && thread->team == nubThread->team
-					&& thread->debug_info.flags & B_THREAD_DEBUG_STOPPED) {
-					threadDebugPort = thread->debug_info.debug_port;
-				}
-
-				RELEASE_THREAD_LOCK();
-				restore_interrupts(state);
-
-				// send a message to the debugged thread
-				if (threadDebugPort >= 0) {
-					debugged_thread_get_why_stopped commandMessage;
-					commandMessage.reply_port = replyPort;
-					write_port(threadDebugPort,
-						B_DEBUGGED_THREAD_GET_WHY_STOPPED, &commandMessage,
-						sizeof(commandMessage));
 				}
 
 				break;
@@ -1211,28 +1231,51 @@ debug_nub_thread(void *)
 					"thread: %ld\n", nubThread->id, threadID));
 
 				// find the thread and get its debug port
-				state = disable_interrupts();
-				GRAB_THREAD_LOCK();
-
 				port_id threadDebugPort = -1;
-				struct thread *thread
-					= thread_get_thread_struct_locked(threadID);
-				if (thread && thread->team == nubThread->team
-					&& thread->debug_info.flags & B_THREAD_DEBUG_STOPPED) {
-					threadDebugPort = thread->debug_info.debug_port;
-				}
-
-				RELEASE_THREAD_LOCK();
-				restore_interrupts(state);
+				status_t result = debug_nub_thread_get_thread_debug_port(
+					nubThread, threadID, threadDebugPort);
 
 				// send a message to the debugged thread
-				if (threadDebugPort >= 0) {
+				if (result == B_OK) {
 					debugged_thread_set_cpu_state commandMessage;
 					memcpy(&commandMessage.cpu_state, &cpuState,
 						sizeof(debug_cpu_state));
 					write_port(threadDebugPort,
 						B_DEBUGGED_THREAD_SET_CPU_STATE,
 						&commandMessage, sizeof(commandMessage));
+				}
+
+				break;
+			}
+
+			case B_DEBUG_MESSAGE_GET_CPU_STATE:
+			{
+				// get the parameters
+				thread_id threadID = message.get_cpu_state.thread;
+				replyPort = message.get_cpu_state.reply_port;
+
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_CPU_STATE: "
+					"thread: %ld\n", nubThread->id, threadID));
+
+				// find the thread and get its debug port
+				port_id threadDebugPort = -1;
+				status_t result = debug_nub_thread_get_thread_debug_port(
+					nubThread, threadID, threadDebugPort);
+
+				// send a message to the debugged thread
+				if (threadDebugPort >= 0) {
+					debugged_thread_get_cpu_state commandMessage;
+					commandMessage.reply_port = replyPort;
+					result = write_port(threadDebugPort,
+						B_DEBUGGED_THREAD_GET_CPU_STATE, &commandMessage,
+						sizeof(commandMessage));
+				}
+
+				// send a reply to the debugger in case of error
+				if (result != B_OK) {
+					reply.get_cpu_state.error = result;
+					sendReply = true;
+					replySize = sizeof(reply.get_cpu_state);
 				}
 
 				break;
@@ -1813,19 +1856,35 @@ ensure_debugger_installed(team_id teamID, port_id *_port)
 
 
 void
-_user_debugger(const char *message)
+_user_debugger(const char *userMessage)
 {
 	// install the default debugger, if there is none yet
-	status_t error = ensure_debugger_installed(B_CURRENT_TEAM);
+	struct thread *thread = thread_get_current_thread();
+	port_id nubPort;
+	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
 	if (error != B_OK) {
 		// time to commit suicide
-		dprintf("_user_debugger(): Failed to install debugger. Message is: "
-			"`%s'\n", message);
+		char buffer[128];
+		ssize_t length = user_strlcpy(buffer, userMessage, sizeof(buffer));
+		if (length >= 0) {
+			dprintf("_user_debugger(): Failed to install debugger. Message is: "
+				"`%s'\n", buffer);
+		} else {
+			dprintf("_user_debugger(): Failed to install debugger. Message is: "
+				"%p (%s)\n", userMessage, strerror(length));
+		}
 		_user_exit_team(1);
 	}
 
-	// notify the debugger
-	stop_thread(B_DEBUGGER_CALL, (void*)message);
+	// prepare the message
+	debug_debugger_call message;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
+	message.origin.nub_port = nubPort;
+	message.message = (void*)userMessage;
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_DEBUGGER_CALL, &message,
+		sizeof(message), true);
 }
 
 
@@ -1965,7 +2024,6 @@ _user_debug_thread(thread_id threadID)
 void
 _user_wait_for_debugger(void)
 {
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_STOPPED, NULL, 0,
-		B_THREAD_NOT_RUNNING, NULL, false);
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, NULL, 0, false);
 }
 
