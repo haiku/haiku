@@ -10,5 +10,5 @@
 int
 usleep(unsigned useconds)
 {
-	return sys_snooze((bigtime_t)(useconds));
+	return sys_snooze_until(sys_system_time() + (bigtime_t)(useconds), B_SYSTEM_TIMEBASE);
 }

@@ -175,8 +175,8 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SYSTEM_TIME:
 			*call_ret = system_time();
 			break;
-		case SYSCALL_SNOOZE:
-			*call_ret = snooze((bigtime_t)INT32TOINT64(arg0, arg1));
+		case SYSCALL_SNOOZE_UNTIL:
+			*call_ret = snooze_etc((bigtime_t)INT32TOINT64(arg0, arg1), (int)arg2, B_CAN_INTERRUPT);
 			break;
 		case SYSCALL_SEM_CREATE:
 			*call_ret = user_create_sem((int)arg0, (const char *)arg1);

@@ -149,16 +149,14 @@ has_data(thread_id thread)
 status_t
 snooze(bigtime_t microseconds)
 {
-	// ToDo: snooze()
-	return B_ERROR;
+	return sys_snooze_until(system_time() + microseconds, B_SYSTEM_TIMEBASE);
 }
 
 
 status_t
 snooze_until(bigtime_t time, int timeBase)
 {
-	// ToDo: snooze_until()
-	return B_ERROR;
+	return sys_snooze_until(time, timeBase);
 }
 
 

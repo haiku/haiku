@@ -884,10 +884,20 @@ thread_init_percpu(int cpu_num)
 }
 
 
+// This snooze is for internal kernel use only; doesn't interrupt on signals.
 status_t
 snooze(bigtime_t timeout)
 {
-	return acquire_sem_etc(snooze_sem, 1, B_TIMEOUT | B_CAN_INTERRUPT, timeout);
+	return acquire_sem_etc(snooze_sem, 1, B_RELATIVE_TIMEOUT, timeout);
+}
+
+
+status_t
+snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
+{
+	if (timebase != B_SYSTEM_TIMEBASE)
+		return B_BAD_VALUE;
+	return acquire_sem_etc(snooze_sem, 1, B_ABSOLUTE_TIMEOUT | flags, timeout);
 }
 
 

@@ -20,7 +20,7 @@ sleep(unsigned seconds)
 	usecs= 1000000;
 	usecs*= (bigtime_t) seconds;
 
-	err= sys_snooze(usecs);
+	err= sys_snooze_until(start + usecs, B_SYSTEM_TIMEBASE);
 
 	retval= 0;
 	if(err) {

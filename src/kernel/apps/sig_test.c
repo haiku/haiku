@@ -112,7 +112,7 @@ main(int argc, char **argv)
 	}
 	printf("Done. Entering sleep mode...\n");
 	while (1) {
-		if (sys_snooze(1000000000L) == B_INTERRUPTED)
+		if (snooze(1000000000L) == B_INTERRUPTED)
 			// this never gets called as the syscall is always restarted
 			printf("sig_test (main): snooze was interrupted!\n");
 	}

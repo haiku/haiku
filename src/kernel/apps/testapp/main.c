@@ -18,7 +18,7 @@ static int32 test_thread(void *args)
 {
 	int i = (int)args;
 
-	sys_snooze(1000000);
+	snooze(1000000);
 	for(;;) {
 		printf("%c", 'a' + i);
 	}
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 #endif
 #if 0
 	for(;;) {
-		sys_snooze(100000);
+		snooze(100000);
 		printf("booyah!");
 	}
 
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 #endif
 #if 0
 	printf("waiting 5 seconds\n");
-	sys_snooze(5000000);
+	snooze(5000000);
 #endif
 #if 0
 	fd = sys_open("/dev/net/rtl8139/0", "", STREAM_TYPE_DEVICE);
@@ -154,7 +154,7 @@ int main(int argc, char **argv)
 			resume_thread(tids[i]);
 		}
 
-		sys_snooze(5000000);
+		snooze(5000000);
 		sys_kill_team(sys_get_current_team_id());
 /*
 		sys_snooze(3000000);
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
 			printf("writing to the speaker\n");
 			data = 3;
 			sys_write(fd, &data, 0, 1);
-			sys_snooze(1000000);
+			snooze(1000000);
 			data = 0;
 			sys_write(fd, &data, 0, 1);
 			sys_close(fd);

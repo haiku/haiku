@@ -102,7 +102,7 @@ int main(int argc, char **argv)
 	resume_thread(t[1]);
 	resume_thread(t[2]);
 	
-	sys_snooze(100000);
+	snooze(100000);
 	
 	sys_wait_on_thread(t[0], NULL);
 	sys_wait_on_thread(t[1], NULL);
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 		printf("sending");
 		send_data(t[0], i, comm_test[i], strlen(comm_test[i]) + 1);
 		// Give time to the commthread to display info
-		sys_snooze(10000);
+		snooze(10000);
 	}
 	sys_wait_on_thread(t[0], NULL);
 	
