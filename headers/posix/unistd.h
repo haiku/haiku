@@ -106,14 +106,6 @@ extern int		lchown(const char *path, uid_t owner, gid_t group);
 
 extern int		mknod(const char *name, mode_t mode, dev_t dev);
 
-/* mount flags */
-#define B_MOUNT_READ_ONLY		1
-#define B_MOUNT_VIRTUAL_DEVICE	2
-
-extern int		mount(const char *filesystem, const char *where, const char *device,
-					ulong flags, void *parms, int len);
-extern int		unmount(const char *path);
-
 extern int      getdtablesize(void);
 extern long		sysconf(int name);
 extern long		fpathconf(int fd, int name);
