@@ -35,6 +35,8 @@ To make MIDI data stream through your application, you create a "network" of
 BMidi-derived objects that send and receive MIDI messages.
 
 The old Midi Kit is slowly fading into obscurity. You may want to use the
-\ref midi2 "new kit" instead. 
+\ref midi2 "new kit" instead. Also note that the OpenBeOS implementation
+of the kit sometimes behaves differently than the one from BeOS R5 or what
+the BeBook says, but usually for the better ;-)
 
 */
