@@ -629,14 +629,16 @@ BQuery::GetNextDirents(struct dirent *buf, size_t length, int32 count)
 
 // Rewind
 /*!	\brief Rewinds the entry list back to the first entry.
+
+	Not implemented for BQuery.
+
 	\return
-	- \c B_OK on success,
-	- \c B_FILE_ERROR if Fetch() has not yet been called
+	- \c B_ERROR
 */
 status_t
 BQuery::Rewind()
 {
-	return _kern_rewind_dir(fQueryFd);
+	return B_ERROR;
 }
 
 // CountEntries
