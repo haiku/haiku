@@ -6,12 +6,15 @@
 
 #include "loader.h"
 #include "elf.h"
+#include "RootFileSystem.h"
 
 #include <OS.h>
+#include <util/list.h>
 #include <boot/stage2.h>
 #include <boot/vfs.h>
 #include <boot/platform.h>
 #include <boot/stdio.h>
+#include <boot/partitions.h>
 
 #include <unistd.h>
 #include <string.h>
@@ -26,6 +29,13 @@
 
 // temp. VFS API
 extern Node *get_node_from(int fd);
+
+
+static const char *sPaths[] = {
+	"beos/system/add-ons/kernel",
+	"home/config/add-ons/kernel",
+	NULL
+};
 
 
 bool
@@ -100,17 +110,72 @@ load_modules_from(Directory *volume, const char *path)
 }
 
 
+/** Loads a module by module name. This basically works in the same
+ *	way as the kernel module loader; it will cut off the last part
+ *	of the module name until it could find a module and loads it.
+ *	It tests both, kernel and user module directories.
+ */
+
+static status_t
+load_module(Directory *volume, const char *name)
+{
+	char moduleName[B_FILE_NAME_LENGTH];
+	if (strlcpy(moduleName, name, sizeof(moduleName)) > sizeof(moduleName))
+		return B_NAME_TOO_LONG;
+
+	for (int32 i = 0; sPaths[i]; i++) {
+		// get base path
+		int baseFD = open_from(volume, sPaths[i], O_RDONLY);
+		if (baseFD < B_OK)
+			continue;
+
+		Directory *base = (Directory *)get_node_from(baseFD);
+
+		while (true) {
+			int fd = open_from(base, moduleName, O_RDONLY);
+			if (fd >= B_OK) {
+				status_t status = elf_load_image(base, moduleName);
+
+				close(fd);
+				close(baseFD);
+				return status;
+			}
+
+			// cut off last name element (or stop trying if there are no more)
+
+			char *last = strrchr(moduleName, '/');
+			if (last != NULL)
+				last[0] = '\0';
+			else
+				break;
+		}
+
+		close(baseFD);
+	}
+
+	return B_OK;
+}
+
+
 status_t 
 load_modules(stage2_args *args, Directory *volume)
 {
-	const char *paths[] = {
-		"beos/system/add-ons/kernel/boot",
-		"home/config/add-ons/kernel/boot",
-		NULL
-	};
-	
-	for (int32 i = 0; paths[i]; i++) {
-		load_modules_from(volume, paths[i]);
+	for (int32 i = 0; sPaths[i]; i++) {
+		char path[B_FILE_NAME_LENGTH];
+		sprintf(path, "%s/boot", sPaths[i]);
+
+		load_modules_from(volume, path);
+	}
+
+	// and now load all partitioning and file system modules
+	// needed to identify the boot volume
+
+	Partition *partition;
+	if (gRoot->GetPartitionFor(volume, &partition) == B_OK) {
+		while (partition != NULL) {
+			load_module(volume, partition->ModuleName());
+			partition = partition->Parent();
+		}
 	}
 
 	return B_OK;
