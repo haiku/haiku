@@ -49,8 +49,7 @@ public:
     
     //actual tests
 	void GetBitmapTest();
-	void GetStyledTextTest();
-	void PutStyledTextTest();
+	void GetPutStyledTextTest();
 	void GetDefaultSettingsTest();
 	void AddTranslationItemsTest();
 	
