@@ -81,6 +81,8 @@ find_command(char *name)
 		if (strncmp(name, command->name, length) == 0)
 			return command;
 	}
+
+	return NULL;
 }
 
 
@@ -324,9 +326,11 @@ cmd_help(int argc, char **argv)
 {
 	debugger_command *command, *specified = NULL;
 
-	if (argc > 1) {
-		// only print out the help of the specified command (and all of its aliases)
+	if (argc > 1)
 		specified = find_command(argv[1]);
+
+	if (specified != NULL) {
+		// only print out the help of the specified command (and all of its aliases)
 		dprintf("debugger command for \"%s\" and aliases:\n", specified->name);
 	} else
 		dprintf("debugger commands:\n");
