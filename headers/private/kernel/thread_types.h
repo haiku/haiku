@@ -163,9 +163,9 @@ struct thread {
 	} exit;
 
 	// stack
-	region_id		kernel_stack_region_id;
+	area_id			kernel_stack_area;
 	addr_t			kernel_stack_base;
-	region_id		user_stack_region_id;
+	area_id			user_stack_area;
 	addr_t			user_stack_base;
 	size_t			user_stack_size;
 

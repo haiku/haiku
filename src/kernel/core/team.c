@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -819,7 +819,7 @@ team_create_thread_start(void *args)
 
 	TRACE(("team_create_thread_start: entry thread %ld\n", t->id));
 
-	// create an initial primary stack region
+	// create an initial primary stack area
 
 	// ToDo: make ENV_SIZE variable and put it on the heap?
 	// ToDo: we could reserve the whole USER_STACK_REGION upfront...
@@ -828,14 +828,14 @@ team_create_thread_start(void *args)
 		get_arguments_data_size(teamArgs->args, teamArgs->arg_count));
 	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - sizeLeft;
 	t->user_stack_size = MAIN_THREAD_STACK_SIZE;
-		// the exact location at the end of the user stack region
+		// the exact location at the end of the user stack area
 
 	sprintf(ustack_name, "%s_main_stack", team->name);
-	t->user_stack_region_id = create_area_etc(team, ustack_name, (void **)&t->user_stack_base,
+	t->user_stack_area = create_area_etc(team, ustack_name, (void **)&t->user_stack_base,
 		B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if (t->user_stack_region_id < 0) {
+	if (t->user_stack_area < 0) {
 		dprintf("team_create_thread_start: could not create default user stack region\n");
-		return t->user_stack_region_id;
+		return t->user_stack_area;
 	}
 
 	// now that the TLS area is allocated, initialize TLS
@@ -1081,7 +1081,7 @@ fork_team_thread_start(void *_args)
 	struct arch_fork_arg archArgs = forkArgs->arch_info;
 		// we need a local copy of the arch dependent part
 
-	thread->user_stack_region_id = forkArgs->user_stack_area;
+	thread->user_stack_area = forkArgs->user_stack_area;
 	thread->user_stack_base = forkArgs->user_stack_base;
 	thread->user_stack_size = forkArgs->user_stack_size;
 	thread->user_local_storage = forkArgs->user_local_storage;
@@ -1166,7 +1166,7 @@ fork_team(void)
 			break;
 		}
 
-		if (info.area == parentThread->user_stack_region_id)
+		if (info.area == parentThread->user_stack_area)
 			forkArgs->user_stack_area = area;
 	}
 
