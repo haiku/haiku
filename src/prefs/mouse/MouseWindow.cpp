@@ -39,7 +39,7 @@ MouseWindow::MouseWindow(BRect rect)
 	AddChild(view);
 
 	// Add the main settings view
-	fView = new MouseView(Bounds().InsetBySelf(kBorderSpace + 1, kBorderSpace + 1));
+	fView = new MouseView(Bounds().InsetBySelf(kBorderSpace + 1, kBorderSpace + 1), fSettings);
 	view->AddChild(fView);
 
 	// Add the "Default" button
@@ -102,13 +102,8 @@ MouseWindow::MessageReceived(BMessage *message)
 		case BUTTON_REVERT: {
 			// revert to last settings
 			fView->Init();
-			set_mouse_type(fView->fMouseType);
-			set_mouse_mode(fView->fMouseMode);
-			set_click_speed(fView->fClickSpeed);
-			set_mouse_speed(fView->fMouseSpeed);
-			set_mouse_acceleration(fView->fMouseAcc);
-			set_mouse_map(&fView->fMouseMap);
-			get_mouse_map(&fView->fCurrentMouseMap);
+			fSettings.Revert();
+			//fView->Update();
 
 			SetRevertable(false);
 			break;

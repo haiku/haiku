@@ -29,11 +29,13 @@
 #include "MouseView.h"
 #include "MouseMessages.h"
 #include "MouseBitmap.h"
+#include "MouseSettings.h"
 
 
-MouseView::MouseView(BRect rect)
+MouseView::MouseView(BRect rect, MouseSettings &settings)
 	: BBox(rect, "main_view"),
 	fCurrentButton(-1),
+	fSettings(settings),
 	fButtons(0),
 	fOldButtons(0)
 {
@@ -71,14 +73,6 @@ MouseView::MouseView(BRect rect)
   	fMouseDownBitmap = new BBitmap(mouseDownRect, B_CMAP8);
   	fMouseDownBitmap->SetBits(kMouseDownBits, kMouseDownWidth*kMouseDownHeight + 30, 0, kMouseDownColorSpace);
 
-/*	// Create the main box for the controls...
-	frame = Bounds();
-	frame.left = frame.left+11;
-	frame.top = frame.top+11;
-	frame.right = frame.right-11;
-	frame.bottom = frame.bottom-44;
-	fBox = new BoxView(frame, this);	
-*/
 	// Add the "Mouse Type" pop up menu
 	mouseTypeMenu = new BPopUpMenu("Mouse Type Menu");
 	mouseTypeMenu->AddItem(new BMenuItem("1-Button", new BMessage(POPUP_MOUSE_TYPE)));

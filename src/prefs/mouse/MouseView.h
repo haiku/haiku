@@ -23,9 +23,11 @@
 #include <PopUpMenu.h>
 
 
+class MouseSettings;
+
 class MouseView : public BBox {
 	public:
-		MouseView(BRect frame);
+		MouseView(BRect frame, MouseSettings &settings);
 
 		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint where);
@@ -44,14 +46,17 @@ class MouseView : public BBox {
 		mode_mouse 	fMouseMode;
 		mouse_map 	fMouseMap, fCurrentMouseMap;
 		int32		fCurrentButton;
-		uint32		fButtons;
-		uint32		fOldButtons;
-				
+
 	private:
 		typedef BBox inherited;
-					
-		BBitmap 	*fDoubleClickBitmap, *fSpeedBitmap, *fAccelerationBitmap;
-		BBitmap		*fMouseBitmap, *fMouseDownBitmap;
+
+		MouseSettings	&fSettings;
+
+		uint32		fButtons;
+		uint32		fOldButtons;
+
+		BBitmap 		*fDoubleClickBitmap, *fSpeedBitmap, *fAccelerationBitmap;
+		BBitmap			*fMouseBitmap, *fMouseDownBitmap;
 };
 
 #endif	/* MOUSE_VIEW_H */
