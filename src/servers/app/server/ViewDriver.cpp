@@ -1064,14 +1064,9 @@ void ViewDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, 
 	screenwin->Lock();
 	framebuffer->Lock();
 	SetLayerData(d);
-	
-	// Do LineArray stuff here.
-	
-//	drawview->Sync();
-//	screenwin->view->Invalidate();
 
-	// for now, just print the data and hope we don't crash
-	int32 ptindex=0;
+	// Old stand-in for real StrokeLineArray stuff
+/*	int32 ptindex=0;
 	
 	for(int32 i=0; i<numlines; i++)
 	{
@@ -1083,6 +1078,22 @@ void ViewDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, 
 		drawview->StrokeLine(pt1,pt2,B_SOLID_HIGH);
 		
 	}
+*/
+
+	int32 ptindex=0;
+
+	drawview->BeginLineArray(numlines);
+	for(int32 i=0; i<numlines; i++)
+	{
+		BPoint pt1=pts[ptindex++];
+		BPoint pt2=pts[ptindex++];
+		rgb_color col=colors[i].GetColor32();
+		
+		drawview->AddLine(pt1,pt2,col);
+		
+	}
+	drawview->EndLineArray();
+	
 	drawview->Sync();
 	screenwin->view->Invalidate();
 
