@@ -56,13 +56,32 @@ KDiskDevice::SetTo(const char *path)
 	fFD = open(path, O_RDONLY);
 	if (fFD < 0)
 		return errno;
-	// get device geometry and media status
+	// get media status
 	error = GetMediaStatus(&fMediaStatus);
 	if (error != B_OK)
 		return error;
-	error = GetGeometry(&fDeviceData.geometry);
-	if (error != B_OK)
-		return error;
+	if (fMediaStatus == B_DEV_MEDIA_CHANGED)
+		fMediaStatus = B_OK;
+	// get device geometry
+	if (fMediaStatus == B_OK) {
+		error = GetGeometry(&fDeviceData.geometry);
+		if (error != B_OK)
+			return error;
+	} else {
+		// no media: try to get the device geometry, but don't fail, if
+		// we can't get it
+		GetGeometry(&fDeviceData.geometry);
+	}
+	// set device flags
+	if (fDeviceData.geometry.removable)
+		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_REMOVABLE);
+	if (fMediaStatus == B_OK)
+		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_HAS_MEDIA);
+	if (fDeviceData.geometry.read_only)
+		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_READ_ONLY);
+	if (fDeviceData.geometry.write_once)
+		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_WRITE_ONCE);
+	// update partition data
 	_InitPartitionData();
 	return B_OK;
 }
@@ -88,7 +107,7 @@ KDiskDevice::Unset()
 	fDeviceData.geometry.cylinder_count = 0;
 	fDeviceData.geometry.head_count = 0;
 	fDeviceData.geometry.device_type = B_DISK;
-	fDeviceData.geometry.removable = false;
+	fDeviceData.geometry.removable = true;
 	fDeviceData.geometry.read_only = true;
 	fDeviceData.geometry.write_once = false;
 }
@@ -181,6 +200,20 @@ uint32
 KDiskDevice::DeviceFlags() const
 {
 	return fDeviceData.flags;
+}
+
+// IsReadOnlyMedia
+bool
+KDiskDevice::IsReadOnlyMedia() const
+{
+	return fDeviceData.geometry.read_only;
+}
+
+// IsWriteOnce
+bool
+KDiskDevice::IsWriteOnce() const
+{
+	return fDeviceData.geometry.write_once;
 }
 
 // IsRemovable

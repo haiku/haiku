@@ -19,13 +19,6 @@ class BDiskSystem;
 class BVolume;
 struct user_partition_data;
 
-// partition statuses
-enum {
-	B_PARTITION_VALID,
-	B_PARTITION_CORRUPT,
-	B_PARTITION_UNRECOGNIZED,
-};
-
 class BPartition {
 public:
 	// Partition Info

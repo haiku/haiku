@@ -375,7 +375,7 @@ bfs_identify_partition(int fd, partition_data *partition, void **cookie)
 	return 0.5;
 }
 
-// pm_scan_partition
+// bfs_scan_partition
 static
 status_t
 bfs_scan_partition(int fd, partition_data *partition, void *cookie)
@@ -389,6 +389,8 @@ bfs_scan_partition(int fd, partition_data *partition, void *cookie)
 		   partition->block_size));
 	superBlock = (disk_super_block*)cookie;
 	// fill in the partition_data structure
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_MOUNTABLE;
 	partition->block_size = superBlock->block_size;
 	partition->content_name = strdup(superBlock->name);
 	partition->content_type = strdup(kPartitionTypeBFS);
@@ -400,7 +402,7 @@ bfs_scan_partition(int fd, partition_data *partition, void *cookie)
 	return B_OK;
 }
 
-// pm_free_identify_partition_cookie
+// bfs_free_identify_partition_cookie
 static
 void
 bfs_free_identify_partition_cookie(partition_data *partition, void *cookie)
@@ -409,7 +411,7 @@ bfs_free_identify_partition_cookie(partition_data *partition, void *cookie)
 		free(cookie);
 }
 
-// pm_free_partition_content_cookie
+// bfs_free_partition_content_cookie
 static
 void
 bfs_free_partition_content_cookie(partition_data *partition)

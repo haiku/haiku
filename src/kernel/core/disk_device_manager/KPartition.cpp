@@ -41,7 +41,7 @@ KPartition::KPartition(partition_id id)
 	fPartitionData.block_size = 0;
 	fPartitionData.child_count = 0;
 	fPartitionData.index = -1;
-	fPartitionData.status = /*B_PARTITION_UNRECOGNIZED*/ 0;
+	fPartitionData.status = B_PARTITION_UNRECOGNIZED;
 	fPartitionData.flags = 0;
 	fPartitionData.volume = -1;
 	fPartitionData.name = NULL;
@@ -194,7 +194,7 @@ KPartition::SetBusy(bool busy)
 	if (busy)
 		fPartitionData.flags |= B_PARTITION_BUSY;
 	else
-		fPartitionData.flags &= ~B_PARTITION_BUSY;
+		fPartitionData.flags &= ~(uint32)B_PARTITION_BUSY;
 }
 
 // IsBusy
@@ -211,7 +211,7 @@ KPartition::SetDescendantBusy(bool busy)
 	if (busy)
 		fPartitionData.flags |= B_PARTITION_DESCENDANT_BUSY;
 	else
-		fPartitionData.flags &= ~B_PARTITION_DESCENDANT_BUSY;
+		fPartitionData.flags &= ~(uint32)B_PARTITION_DESCENDANT_BUSY;
 }
 
 // IsDescendantBusy
@@ -469,6 +469,10 @@ void
 KPartition::SetVolumeID(dev_t volumeID)
 {
 	fPartitionData.volume = volumeID;
+	if (VolumeID() >= 0)
+		SetFlags(Flags() | B_PARTITION_MOUNTED);
+	else
+		SetFlags(Flags() & ~(uint32)B_PARTITION_MOUNTED);
 }
 
 // VolumeID
@@ -527,6 +531,8 @@ void
 KPartition::SetDevice(KDiskDevice *device)
 {
 	fDevice = device;
+	if (fDevice && fDevice->IsReadOnlyMedia())
+		SetFlags(Flags() | B_PARTITION_READ_ONLY);
 }
 
 // Device
@@ -672,6 +678,13 @@ KPartition::SetDiskSystem(KDiskSystem *diskSystem)
 	fDiskSystem = diskSystem;
 	if (fDiskSystem)
 		fDiskSystem->Load();	// can't fail, since it's already loaded
+	// update concerned partition flags
+	if (fDiskSystem) {
+		if (fDiskSystem->IsFileSystem())
+			SetFlags(Flags() | B_PARTITION_MOUNTABLE);
+		else
+			SetFlags(Flags() | B_PARTITION_PARTITIONABLE);
+	}
 }
 
 // DiskSystem

@@ -43,6 +43,8 @@ public:
 
 	void SetDeviceFlags(uint32 flags);	// comprises the ones below
 	uint32 DeviceFlags() const;
+	bool IsReadOnlyMedia() const;
+	bool IsWriteOnce() const;
 	bool IsRemovable() const;
 	bool HasMedia() const;
 

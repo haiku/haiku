@@ -27,10 +27,19 @@ enum {
 	B_PARTITION_DESCENDANT_BUSY	= 0x40,
 };
 
+// partition statuses
+enum {
+	B_PARTITION_VALID,
+	B_PARTITION_CORRUPT,
+	B_PARTITION_UNRECOGNIZED,
+};
+
 // disk device flags
 enum {
 	B_DISK_DEVICE_REMOVABLE		= 0x01,
 	B_DISK_DEVICE_HAS_MEDIA		= 0x02,
+	B_DISK_DEVICE_READ_ONLY		= 0x04,
+	B_DISK_DEVICE_WRITE_ONCE	= 0x08,
 };
 
 #ifdef __cplusplus
