@@ -41,7 +41,7 @@ class BlockAllocator {
 		status_t StopChecking(check_control *control);
 		status_t CheckNextNode(check_control *control);
 
-		status_t CheckBlockRun(block_run run, const char *type = NULL, check_control *control = NULL);
+		status_t CheckBlockRun(block_run run, const char *type = NULL, check_control *control = NULL, bool allocated = true);
 		status_t CheckInode(Inode *inode, check_control *control = NULL);
 
 		size_t BitmapSize() const;

@@ -404,7 +404,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 status_t 
 BlockAllocator::initialize(BlockAllocator *allocator)
 {
-	// The lock must already be held at this point!
+	// The lock must already be held at this point
 
 	Volume *volume = allocator->fVolume;
 	uint32 blocks = allocator->fBlocksPerGroup;
@@ -695,8 +695,8 @@ BlockAllocator::Free(Transaction *transaction, block_run run)
 	if (fGroups[group].Free(transaction, start, length) < B_OK)
 		RETURN_ERROR(B_IO_ERROR);
 
-#ifdef DEBUG	
-	if (CheckBlockRun(run) == B_OK)
+#ifdef DEBUG
+	if (CheckBlockRun(run, NULL, NULL, false) < B_OK)
 		DEBUGGER(("CheckBlockRun() reports allocated blocks (which were just freed)\n"));
 #endif
 
@@ -1042,10 +1042,10 @@ BlockAllocator::SetCheckBitmapAt(off_t block)
 
 
 status_t
-BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *control)
+BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *control, bool allocated)
 {
 	if (run.AllocationGroup() < 0 || run.AllocationGroup() >= fNumGroups
-		|| run.Start() > fGroups[run.allocation_group].fNumBits
+		|| run.Start() > fGroups[run.AllocationGroup()].fNumBits
 		|| uint32(run.Start() + run.Length()) > fGroups[run.AllocationGroup()].fNumBits
 		|| run.length == 0) {
 		PRINT(("%s: block_run(%ld, %u, %u) is invalid!\n", type, run.AllocationGroup(), run.Start(), run.Length()));
@@ -1075,9 +1075,10 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 		}
 
 		while (length < run.Length() && pos < cached.NumBlockBits()) {
-			if (!cached.IsUsed(pos)) {
+			if (cached.IsUsed(pos) != allocated) {
 				if (control == NULL) {
-					PRINT(("%s: block_run(%ld, %u, %u) is only partially allocated!\n", type, run.AllocationGroup(), run.Start(), run.Length()));
+					PRINT(("%s: block_run(%ld, %u, %u) is only partially allocated (pos = %ld, length = %ld)!\n",
+						type, run.AllocationGroup(), run.Start(), run.Length(), pos, length));
 					return B_BAD_DATA;
 				}
 				if (firstMissing == -1) {
@@ -1086,8 +1087,9 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 				}
 				control->stats.missing++;
 			} else if (firstMissing != -1) {
-				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are not allocated!\n",
-					type, run.allocation_group, run.start, run.length, firstMissing, firstGroupBlock + pos + block * bitsPerBlock - 1));
+				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are %sallocated!\n",
+					type, run.allocation_group, run.start, run.length, firstMissing,
+					firstGroupBlock + pos + block * bitsPerBlock - 1, allocated ? "not " : ""));
 				firstMissing = -1;
 			}
 
