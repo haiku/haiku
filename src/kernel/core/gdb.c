@@ -29,35 +29,20 @@ static char safe_mem[512];
 /*
  * utility functions
  */
-static
-int
-htons(short value)
-{
-	return ((value>>8)&0xff) | ((value&0xff)<<8);
-}
 
-static
-int
-htonl(int value)
-{
-	return htons((value>>16)&0xffff) | (htons(value&0xffff)<<16);
-}
-
-static
-int
+static int
 parse_nibble(int input)
 {
-	int nibble= 0xff;
+	int nibble = 0xff;
 
-	if((input>= '0') && (input<= '9')) {
-		nibble= input-'0';
-	}
-	if((input>= 'A') && (input<= 'F')) {
-		nibble= 0x0a+(input-'A');
-	}
-	if((input>= 'a') && (input<= 'f')) {
-		nibble= 0x0a+(input-'a');
-	}
+	if (input >= '0' && input <= '9')
+		nibble = input - '0';
+
+	if (input >= 'A' && input <= 'F')
+		nibble = 0x0a + input - 'A';
+
+	if (input >= 'a' && input <= 'f')
+		nibble = 0x0a + input - 'a';
 
 	return nibble;
 }
@@ -68,29 +53,29 @@ parse_nibble(int input)
  * GDB protocol ACK & NAK & Reply
  *
  */
-static
-void
+
+static void
 gdb_ack(void)
 {
 	dbg_putch('+');
 }
 
-static
-void
+
+static void
 gdb_nak(void)
 {
 	dbg_putch('-');
 }
 
-static
-void
+
+static void
 gdb_resend_reply(void)
 {
 	dbg_puts(reply);
 }
 
-static
-void
+
+static void
 gdb_reply(char const *fmt, ...)
 {
 	int i;
@@ -99,68 +84,68 @@ gdb_reply(char const *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	reply[0]= '$';
-	vsprintf(reply+1, fmt, args);
+	reply[0] = '$';
+	vsprintf(reply + 1, fmt, args);
 	va_end(args);
 
-	len= strlen(reply);
-	sum= 0;
-	for(i= 1; i< len; i++) {
-		sum+= reply[i];
+	len = strlen(reply);
+	sum = 0;
+	for (i = 1; i < len; i++) {
+		sum += reply[i];
 	}
-	sum%= 256;
+	sum %= 256;
 
-	sprintf(reply+len, "#%02x", sum);
+	sprintf(reply + len, "#%02x", sum);
 
 	gdb_resend_reply();
 }
 
-static
-void
+
+static void
 gdb_regreply(int const *regs, int numregs)
 {
 	int i;
 	int len;
 	int sum;
 
-	reply[0]= '$';
-	for(i= 0; i< numregs; i++) {
-		sprintf(reply+1+8*i, "%08x", htonl(regs[i]));
+	reply[0] = '$';
+	for (i = 0; i < numregs; i++) {
+		sprintf(reply+1+8*i, "%08lx", B_HOST_TO_BENDIAN_INT32(regs[i]));
 	}
 
-	len= strlen(reply);
-	sum= 0;
-	for(i= 1; i< len; i++) {
-		sum+= reply[i];
+	len = strlen(reply);
+	sum = 0;
+	for (i = 1; i < len; i++) {
+		sum += reply[i];
 	}
-	sum%= 256;
+	sum %= 256;
 
-	sprintf(reply+len, "#%02x", sum);
+	sprintf(reply + len, "#%02x", sum);
 
 	gdb_resend_reply();
 }
 
-static
-void
+
+static void
 gdb_memreply(char const *bytes, int numbytes)
 {
 	int i;
 	int len;
 	int sum;
 
-	reply[0]= '$';
-	for(i= 0; i< numbytes; i++) {
-		sprintf(reply+1+2*i, "%02x", (unsigned char)bytes[i]);
+	reply[0] = '$';
+	for (i = 0; i < numbytes; i++) {
+		sprintf(reply+1+2*i, "%02x", (uint8)bytes[i]);
 	}
 
-	len= strlen(reply);
-	sum= 0;
-	for(i= 1; i< len; i++) {
-		sum+= reply[i];
+	len = strlen(reply);
+	sum = 0;
+	for (i = 1; i < len; i++) {
+		sum += reply[i];
 	}
-	sum%= 256;
+	sum %= 256;
 
-	sprintf(reply+len, "#%02x", sum);
+	sprintf(reply + len, "#%02x", sum);
 
 	gdb_resend_reply();
 }
@@ -170,57 +155,51 @@ gdb_memreply(char const *bytes, int numbytes)
 /*
  * checksum verification
  */
-static
-int
+
+static int
 gdb_verify_checksum(void)
 {
 	int i;
 	int len;
 	int sum;
 
-	len= strlen(cmd);
-	sum= 0;
-	for(i= 0; i< len; i++) {
-		sum+= cmd[i];
+	len = strlen(cmd);
+	sum = 0;
+	for (i = 0; i < len; i++) {
+		sum += cmd[i];
 	}
-	sum%= 256;
+	sum %= 256;
 
-	return (sum==checksum)?1:0;
+	return (sum == checksum) ? 1 : 0;
 }
 
 
 /*
  * command parsing an dispatching
  */
-static
-int
+
+static int
 gdb_parse_command(void)
 {
-//	int retval;
-
-	if(!gdb_verify_checksum()) {
+	if (!gdb_verify_checksum()) {
 		gdb_nak();
 		return INIT;
-	} else {
+	} else
 		gdb_ack();
-	}
 
-	switch(cmd[0]) {
-
+	switch (cmd[0]) {
 		case 'H':
-			{
-				/*
-				 * Command H (actually Hct) is used to select
-				 * the current thread (-1 meaning all threads)
-				 * We just fake we recognize the the command
-				 * and send an 'OK' response.
-				 */
-				gdb_reply("OK");
-			} break;
+			/*
+			 * Command H (actually Hct) is used to select
+			 * the current thread (-1 meaning all threads)
+			 * We just fake we recognize the the command
+			 * and send an 'OK' response.
+			 */
+			gdb_reply("OK");
+			break;
 
 		case 'q':
 			{
-//				extern unsigned _start;
 				extern unsigned __data_start;
 				extern unsigned __bss_start;
 
@@ -242,28 +221,24 @@ gdb_parse_command(void)
 				 * pre-links at 0x80000000. To keep gdb
 				 * gdb happy we just substract that amount.
 				 */
-				if(strcmp(cmd+1, "Offsets")== 0) {
-					gdb_reply(
-						"Text=%x;Data=%x;Bss=%x",
-						0,
+				if (strcmp(cmd+1, "Offsets") == 0) {
+					gdb_reply("Text=%x;Data=%x;Bss=%x", 0,
 						((unsigned)(&__data_start))-0x80000000,
-						((unsigned)(&__bss_start))-0x80000000
-					);
-				} else {
+						((unsigned)(&__bss_start))-0x80000000);
+				} else
 					gdb_reply("ENS");
-				}
-			} break;
+			}
+			break;
 
 		case '?':
-			{
-				/*
-				 * command '?' is used for retrieving the signal
-				 * that stopped the program. Fully implemeting
-				 * this command requires help from the debugger,
-				 * by now we just fake a SIGKILL
-				 */
-				gdb_reply("S09");	/* SIGKILL = 9 */
-			} break;
+			/*
+			 * command '?' is used for retrieving the signal
+			 * that stopped the program. Fully implemeting
+			 * this command requires help from the debugger,
+			 * by now we just fake a SIGKILL
+			 */
+			gdb_reply("S09");	/* SIGKILL = 9 */
+			break;
 
 		case 'g':
 			{
@@ -286,9 +261,10 @@ gdb_parse_command(void)
 				 * reason (unknown to me) gdb wants the register
 				 * dump in *big endian* format.
 				 */
-				cpu= smp_get_current_cpu();
+				cpu = smp_get_current_cpu();
 				gdb_regreply(dbg_register_file[cpu], 14);
-			} break;
+			}
+			break;
 
 		case 'm':
 			{
@@ -301,26 +277,25 @@ gdb_parse_command(void)
 				 * where AAA is the address and LLL is the
 				 * number of bytes.
 				 */
-				ptr= cmd+1;
-				address= 0;
-				len= 0;
-				while(ptr && *ptr && (*ptr!= ',')) {
-					address<<= 4;
-					address+= parse_nibble(*ptr);
-					ptr+= 1;
+				ptr = cmd+1;
+				address = 0;
+				len = 0;
+				while (ptr && *ptr && (*ptr != ',')) {
+					address <<= 4;
+					address += parse_nibble(*ptr);
+					ptr += 1;
 				}
-				if(*ptr== ',') {
+				if (*ptr == ',')
 					ptr+= 1;
-				}
-				while(ptr && *ptr) {
-					len<<= 4;
-					len+= parse_nibble(*ptr);
-					ptr+= 1;
+
+				while (ptr && *ptr) {
+					len <<= 4;
+					len += parse_nibble(*ptr);
+					ptr += 1;
 				}
 
-				if(len> 128) {
-					len= 128;
-				}
+				if (len> 128)
+					len = 128;
 
 				/*
 				 * We cannot directly access the requested memory
@@ -328,31 +303,28 @@ gdb_parse_command(void)
 				 * We copy the memory to a safe buffer using
 				 * the bulletproof user_memcpy().
 				 */
-				if(user_memcpy(safe_mem, (char*)address, len)< 0) {
+				if (user_memcpy(safe_mem, (char *)address, len) < 0)
 					gdb_reply("E02");
-				} else {
+				else
 					gdb_memreply(safe_mem, len);
-				}
-			} break;
+			}
+			break;
 
 		case 'k':
-			{
-				/*
-				 * Command 'k' actual semantics is 'kill the damn thing'.
-				 * However gdb sends that command when you disconnect
-				 * from a debug session. I guess that 'kill' for the
-				 * kernel would map to reboot... however that's a
-				 * a very mean thing to do, instead we just quit
-				 * the gdb state machine and fallback to the regular
-				 * kernel debugger command prompt.
-				 */
-				return QUIT;
-			} break;
+			/*
+			 * Command 'k' actual semantics is 'kill the damn thing'.
+			 * However gdb sends that command when you disconnect
+			 * from a debug session. I guess that 'kill' for the
+			 * kernel would map to reboot... however that's a
+			 * a very mean thing to do, instead we just quit
+			 * the gdb state machine and fallback to the regular
+			 * kernel debugger command prompt.
+			 */
+			return QUIT;
 
 		default:
-			{
-				gdb_reply("E01");
-			} break;
+			gdb_reply("E01");
+			break;
 	}
 
 	return WAITACK;
@@ -363,15 +335,16 @@ gdb_parse_command(void)
 /*
  * GDB protocol state machine
  */
-static
-int
+
+static int
 gdb_init_handler(int input)
 {
-	switch(input) {
+	switch (input) {
 		case '$':
 			memset(cmd, 0, sizeof(cmd));
-			cmd_ptr= 0;
+			cmd_ptr = 0;
 			return CMDREAD;
+
 		default:
 #if 0
 			gdb_nak();
@@ -387,27 +360,28 @@ gdb_init_handler(int input)
 	}
 }
 
-static
-int
+
+static int
 gdb_cmdread_handler(int input)
 {
-	switch(input) {
+	switch (input) {
 		case '#':
 			return CKSUM1;
+
 		default:
-			cmd[cmd_ptr]= input;
-			cmd_ptr+= 1;
+			cmd[cmd_ptr] = input;
+			cmd_ptr += 1;
 			return CMDREAD;
 	}
 }
 
-static
-int
+
+static int
 gdb_cksum1_handler(int input)
 {
-	int nibble= parse_nibble(input);
+	int nibble = parse_nibble(input);
 
-	if(nibble== 0xff) {
+	if (nibble == 0xff) {
 #if 0
 		gdb_nak();
 		return INIT;
@@ -421,18 +395,18 @@ gdb_cksum1_handler(int input)
 #endif
 	}
 
-	checksum= nibble<< 4;
+	checksum = nibble << 4;
 
 	return CKSUM2;
 }
 
-static
-int
+
+static int
 gdb_cksum2_handler(int input)
 {
-	int nibble= parse_nibble(input);
+	int nibble = parse_nibble(input);
 
-	if(nibble== 0xff) {
+	if (nibble == 0xff) {
 #if 0
 		gdb_nak();
 		return INIT;
@@ -446,21 +420,22 @@ gdb_cksum2_handler(int input)
 #endif
 	}
 
-	checksum+= nibble;
+	checksum += nibble;
 
 	return gdb_parse_command();
 }
 
-static
-int
+
+static int
 gdb_waitack_handler(int input)
 {
-	switch(input) {
+	switch (input) {
 		case '+':
 			return INIT;
 		case '-':
 			gdb_resend_reply();
 			return WAITACK;
+
 		default:
 			/*
 			 * looks like gdb and us are out of synch,
@@ -471,8 +446,8 @@ gdb_waitack_handler(int input)
 	}
 }
 
-static
-int
+
+static int
 gdb_quit_handler(int input)
 {
 	(void)(input);
@@ -483,8 +458,8 @@ gdb_quit_handler(int input)
 	return QUIT;
 }
 
-static int (*dispatch_table[GDBSTATES])(int)=
-{
+
+static int (*dispatch_table[GDBSTATES])(int) = {
 	&gdb_init_handler,
 	&gdb_cmdread_handler,
 	&gdb_cksum1_handler,
@@ -493,34 +468,31 @@ static int (*dispatch_table[GDBSTATES])(int)=
 	&gdb_quit_handler
 };
 
-static
-int
+
+static int
 gdb_state_dispatch(int curr, int input)
 {
-	if(curr< INIT) {
+	if (curr < INIT || curr >= GDBSTATES)
 		return QUIT;
-	}
-	if(curr>= GDBSTATES) {
-		return QUIT;
-	}
 
 	return dispatch_table[curr](input);
 }
 
-static
-int
+
+static int
 gdb_state_machine(void)
 {
-	int state= INIT;
+	int state = INIT;
 	int c;
 
-	while(state!= QUIT) {
-		c= arch_dbg_con_read();
-		state= gdb_state_dispatch(state, c);
+	while (state != QUIT) {
+		c = arch_dbg_con_read();
+		state = gdb_state_dispatch(state, c);
 	}
 
 	return 0;
 }
+
 
 int
 cmd_gdb(int argc, char **argv)
