@@ -35,7 +35,7 @@ void SetRGBColor15(rgb_color *col,uint16 color);
 void SetRGBColor16(rgb_color *col,uint16 color);
 void SetRGBColor(rgb_color *col,uint32 color);
 
-uint8 FindClosestColor(rgb_color *palette, rgb_color color);
+uint8 FindClosestColor(const rgb_color *palette, rgb_color color);
 uint16 FindClosestColor15(rgb_color color);
 uint16 FindClosestColor16(rgb_color color);
 

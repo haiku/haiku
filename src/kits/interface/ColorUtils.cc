@@ -27,6 +27,30 @@
 #include <stdlib.h>
 
 /*!
+	\brief An approximation of 31/255, which is needed for converting from 32-bit
+		colors to 16-bit and 15-bit.
+*/
+#define RATIO_8_TO_5_BIT .121568627451
+
+/*!
+	\brief An approximation of 63/255, which is needed for converting from 32-bit
+		colors to 16-bit.
+*/
+#define RATIO_8_TO_6_BIT .247058823529
+
+/*!
+	\brief An approximation of 255/31, which is needed for converting from 16-bit
+		and 15-bit colors to 32-bit.
+*/
+#define RATIO_5_TO_8_BIT 8.22580645161
+
+/*!
+	\brief An approximation of 255/63, which is needed for converting from 16-bit
+		colors to 32-bit.
+*/
+#define RATIO_6_TO_8_BIT 4.04761904762
+
+/*!
 	\brief Function for easy assignment of values to rgb_color objects
 	\param col Pointer to an rgb_color
 	\param r red value
@@ -68,9 +92,9 @@ void SetRGBColor15(rgb_color *col,uint16 color)
 	g16= (color >> 5) & 31;
 	b16= color & 31;
 
-	col->red=uint8(r16 << 3);
-	col->green=uint8(g16 << 3);
-	col->blue=uint8(b16 << 3);
+	col->red=uint8(r16 * RATIO_5_TO_8_BIT);
+	col->green=uint8(g16 * RATIO_5_TO_8_BIT);
+	col->blue=uint8(b16 * RATIO_5_TO_8_BIT);
 }
 
 /*!
@@ -94,9 +118,9 @@ void SetRGBColor16(rgb_color *col,uint16 color)
 	g16= (color >> 5) & 63;
 	b16= color & 31;
 
-	col->red=uint8(r16 << 3);
-	col->green=uint8(g16 << 2);
-	col->blue=uint8(b16 << 3);
+	col->red=uint8(r16 * RATIO_5_TO_8_BIT);
+	col->green=uint8(g16 * RATIO_6_TO_8_BIT);
+	col->blue=uint8(b16 * RATIO_5_TO_8_BIT);
 }
 
 /*!
@@ -127,17 +151,16 @@ void SetRGBColor(rgb_color *col,uint32 color)
 	Note that passing a NULL palette will always return 0 and passing an array of less
 	than 256 rgb_colors will cause a crash.
 */
-uint8 FindClosestColor(rgb_color *palette, rgb_color color)
+uint8 FindClosestColor(const rgb_color *palette, rgb_color color)
 {
 	if(!palette)
 		return 0;
 	
 	uint16 cindex=0,cdelta=765,delta=765;
-	rgb_color *c;
 	
 	for(uint16 i=0;i<256;i++)
 	{
-		c=&(palette[i]);
+		const rgb_color *c=&(palette[i]);
 		delta=abs(c->red-color.red)+abs(c->green-color.green)+
 			abs(c->blue-color.blue);
 
@@ -169,9 +192,9 @@ uint16 FindClosestColor15(rgb_color color)
 	uint16 r16,g16,b16;
 	uint16 color16=0;
 	
-	r16=uint16(color.red >> 3);
-	g16=uint16(color.green >> 3);
-	b16=uint16(color.blue >> 3);
+	r16=uint16(color.red * RATIO_8_TO_5_BIT);
+	g16=uint16(color.green * RATIO_8_TO_5_BIT);
+	b16=uint16(color.blue * RATIO_8_TO_5_BIT);
 
 	// start with alpha value
 	color16=(color.alpha>127)?0x8000:0;
@@ -195,9 +218,9 @@ uint16 FindClosestColor16(rgb_color color)
 	uint16 r16,g16,b16;
 	uint16 color16=0;
 	
-	r16=uint16(color.red >> 3);
-	g16=uint16(color.green >> 2);
-	b16=uint16(color.blue >> 3);
+	r16=uint16(color.red * RATIO_8_TO_5_BIT);
+	g16=uint16(color.green * RATIO_8_TO_6_BIT);
+	b16=uint16(color.blue * RATIO_8_TO_5_BIT);
 
 	color16 |= r16 << 11;
 	color16 |= g16 << 5;
