@@ -41,6 +41,7 @@ KernelMergeObject kernel_core.o :
 	team.c
 	thread.c
 	timer.c
+	user_debugger.cpp
 	: -fno-pic
 	;
 
