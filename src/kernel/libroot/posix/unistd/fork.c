@@ -7,16 +7,21 @@
 #include <syscalls.h>
 
 #include <unistd.h>
-#include <stdio.h>
 #include <errno.h>
 
 
 pid_t
 fork(void)
 {
-	// ToDo: implement me
-	// ToDo: atfork()
-	fprintf(stderr, "fork(): NOT IMPLEMENTED\n");
-	return -1;
+	thread_id thread = _kern_fork();
+	if (thread < 0) {
+		errno = thread;
+		return -1;
+	}
+
+	// ToDo: initialize child
+	// ToDo: atfork() support
+
+	return thread;
 }
 
