@@ -8,6 +8,7 @@
 #include "bmessagequeue/MessageQueueTest.h"
 #include "bmessenger/MessengerTest.h"
 #include "bpropertyinfo/PropertyInfoTest.h"
+#include "broster/RosterTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("App");
@@ -19,6 +20,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BMessageQueue", MessageQueueTestSuite());
 	suite->addTest("BMessenger", MessengerTestSuite());
 	suite->addTest("BPropertyInfo", PropertyInfoTestSuite());
+	suite->addTest("BRoster", RosterTestSuite());
 	
 	return suite;
 }

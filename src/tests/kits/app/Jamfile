@@ -7,6 +7,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessenger ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bpropertyinfo ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) broster ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) common ] ;
 
 CommonTestLib libapptest.so
@@ -75,7 +76,11 @@ CommonTestLib libapptest.so
 		# BPropertyInfo
 		PropertyConstructionTest1.cpp
 		PropertyInfoTest.cpp
-		
+
+		# BRoster
+		RosterTest.cpp
+		IsRunningTester.cpp
+
 		# common
 		AppRunner.cpp
 		PipedAppRunner.cpp
