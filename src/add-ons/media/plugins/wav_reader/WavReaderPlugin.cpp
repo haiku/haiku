@@ -254,6 +254,9 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 			case 16:
 				data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
 				break;
+			case 24:
+				data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
+				break;
 			case 32:
 				data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
 				break;
