@@ -504,9 +504,9 @@ real_dump_cache_list(cache_ent_list *cel)
     
     kprintf("starting from LRU end:\n");
 
-    for(ce=cel->lru; ce; ce=ce->next) {
+    for (ce = cel->lru; ce; ce = ce->next) {
         kprintf("ce 0x%.8lx dev %2d bnum %6ld lock %d flag %d arg 0x%.8lx "
-               "clone 0x%.8lx\n", (ulong)ce, ce->dev, ce->block_num,ce->lock,
+               "clone 0x%.8lx\n", (ulong)ce, ce->dev, ce->block_num, ce->lock,
                ce->flags, (ulong)ce->arg, (ulong)ce->clone);
     }
     kprintf("MRU end\n");
@@ -1271,7 +1271,7 @@ set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
             printf("sbi: whoa nellie! ce @ 0x%lx (%ld) has lock == %d\n",
                    (ulong)ce, ce->block_num, ce->lock);
         }
-        
+
         if (ce->lock == 0) {
             delete_from_list(&bc.locked, ce);
             add_to_head(&bc.normal, ce);
@@ -1384,7 +1384,7 @@ real_remove_cached_blocks(int dev, int allow_writes, cache_ent_list *cel)
         }
 
         if (ce->lock != 0 || (ce->flags & CE_BUSY)) {
-            printf("*** remove_cached_dev: block %ld has lock = %d, flags "
+            printf("*** remove_cached_dev: block %Ld has lock = %d, flags "
                    "0x%x! ce @ 0x%lx\n", ce->block_num, ce->lock, ce->flags,
                    (ulong)ce);
         }
@@ -1554,6 +1554,7 @@ release_block(int dev, fs_off_t bnum)
         }
 
         ce->lock--;
+
         if (ce->lock < 0) {
             printf("rlsb: whoa nellie! ce %ld has lock == %d\n",
                    ce->block_num, ce->lock);

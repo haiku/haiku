@@ -223,7 +223,7 @@ PANIC(char *s, ...)
 	vfprintf(stdout, s, list);
 	va_end(list);
 
-    exit(-1);
+    debugger("fs shell kernel panic!");
 }
 
 
