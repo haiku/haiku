@@ -62,11 +62,11 @@ virtual				~_BTextGapBuffer_();
 //		void	GetString(int32 offset, int32 length, char *buffer);
 //		void	GetString(int32, int32 *);
 		
-//		char	RealCharAt(int32 offset) const;
+		char	RealCharAt(int32 offset) const;
 				
 //		void	InsertText(BFile *, int32, int32, int32); 
-//		bool	PasswordMode() const;
-//		void	SetPasswordMode(bool);
+		bool	PasswordMode() const;
+		void	SetPasswordMode(bool);
 
 //		void	Resize(int32 size);
 

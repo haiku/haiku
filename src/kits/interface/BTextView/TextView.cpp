@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
-#include <cctype>
+
 
 // System Includes -------------------------------------------------------------
 #include <Application.h>
@@ -141,6 +141,9 @@ prop_list[] =
 	},
 	{ 0 }
 };
+
+sem_id BTextView::sWidthSem;
+int32 BTextView::sWidthAtom;
 
 //------------------------------------------------------------------------------
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
@@ -281,6 +284,7 @@ BTextView::~BTextView()
 	delete fText;
 	delete fLines;
 	delete fStyles;
+	delete fDisallowedChars;
 }
 //------------------------------------------------------------------------------
 BArchivable *
@@ -971,7 +975,8 @@ BTextView::Delete(int32 startOffset, int32 endOffset)
 	Refresh(startOffset, endOffset, true, true);
 	
 	// draw the caret
-	if (fActive) {
+	if (fActive) 
+	{
 		if (!fCaretVisible)
 			InvertCaret();
 	}
@@ -1043,12 +1048,10 @@ BTextView::Copy(BClipboard *clipboard)
 {
 	BMessage *clip = NULL;
 
-	if (clipboard->Lock())
-	{
+	if (clipboard->Lock()) {
 		clipboard->Clear(); 
    
-		if ((clip = clipboard->Data()) != NULL)
-		{
+		if ((clip = clipboard->Data()) != NULL) {
 			clip->AddData("text/plain", B_MIME_TYPE, Text() + fSelStart,
 				fSelEnd - fSelStart); 
 			clipboard->Commit();
@@ -1063,16 +1066,13 @@ BTextView::Paste(BClipboard *clipboard)
 {
 	BMessage *clip = NULL;
 
-	if (clipboard->Lock())
-	{ 
-		if ((clip = clipboard->Data()) != NULL)
-		{
+	if (clipboard->Lock()) { 
+		if ((clip = clipboard->Data()) != NULL) {
 			const char *text;
 			ssize_t len;
 
 			if (clip->FindData("text/plain", B_MIME_TYPE,
-				(const void **)&text, &len) == B_OK)
-			{
+					(const void **)&text, &len) == B_OK) {
 				DeleteText(fSelStart, fSelEnd);
 				InsertText(text, len, fSelStart, NULL);
 			}
@@ -1305,7 +1305,7 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset,
 			}
 
 			fStyles->SetStyleRange(fromOffset, toOffset, textLength,
-							  	  doAll, &theRun->font, &theRun->color);
+							  	  doAll, theRun->font, &theRun->color);
 							
 			theRun++;
 		}
@@ -1544,6 +1544,8 @@ BTextView::OffsetAt(int32 line) const
 	return (*fLines)[line]->offset;
 }
 //------------------------------------------------------------------------------
+enum { B_SEPARATOR_CHARACTER, B_OTHER_CHARACTER };
+
 void 
 BTextView::FindWord(int32 inOffset, int32 *outFromOffset,
 						 int32 *outToOffset)
@@ -1552,8 +1554,7 @@ BTextView::FindWord(int32 inOffset, int32 *outFromOffset,
 
 	// check to the left
 	for (offset = inOffset; offset > 0; offset--) {
-		//TODO: Should use CharClassification() instead
-		if (CharClassification(offset - 1) == 1)
+		if (CharClassification(offset - 1) == B_SEPARATOR_CHARACTER)
 			break;
 	}
 
@@ -1562,7 +1563,7 @@ BTextView::FindWord(int32 inOffset, int32 *outFromOffset,
 	// check to the right
 	long textLen = TextLength();
 	for (offset = inOffset; offset < textLen; offset++) {
-		if (CharClassification(offset) == 1)
+		if (CharClassification(offset) == B_SEPARATOR_CHARACTER)
 			break;
 	}
 	
@@ -1878,15 +1879,15 @@ BTextView::DisallowChar(uint32 aChar)
 {
 	if (fDisallowedChars == NULL)
 		fDisallowedChars = new BList;
-	if (!fDisallowedChars->HasItem(&aChar))
-		fDisallowedChars->AddItem(&aChar);
+	if (!fDisallowedChars->HasItem(reinterpret_cast<void *>(aChar)))
+		fDisallowedChars->AddItem(reinterpret_cast<void *>(aChar));
 }
 //------------------------------------------------------------------------------
 void
 BTextView::AllowChar(uint32 aChar)
 {
 	if (fDisallowedChars != NULL)
-		fDisallowedChars->RemoveItem(&aChar);
+		fDisallowedChars->RemoveItem(reinterpret_cast<void *>(aChar));
 }
 //------------------------------------------------------------------------------
 void
@@ -1972,16 +1973,19 @@ BTextView::ResizeToPreferred()
 void
 BTextView::GetPreferredSize(float *width, float *height)
 {
+	BView::GetPreferredSize(width, height);
 }
 //------------------------------------------------------------------------------
 void
 BTextView::AllAttached()
 {
+	BView::AllAttached();
 }
 //------------------------------------------------------------------------------
 void
 BTextView::AllDetached()
 {
+	BView::AllDetached();
 }
 //------------------------------------------------------------------------------
 void *
@@ -2005,11 +2009,11 @@ BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
 	for (int32 i = 0; i < inArray->count; i++)
 	{
 		array->styles[i].offset = inArray->runs[i].offset;
-		inArray->runs[i].font.GetFamilyAndStyle(&array->styles[i].family,
+		inArray->runs[i].font->GetFamilyAndStyle(&array->styles[i].family,
 			&array->styles[i].style);
-		array->styles[i].size = inArray->runs[i].font.Size();
-		array->styles[i].shear = inArray->runs[i].font.Shear();
-		array->styles[i].face = inArray->runs[i].font.Face();
+		array->styles[i].size = inArray->runs[i].font->Size();
+		array->styles[i].shear = inArray->runs[i].font->Shear();
+		array->styles[i].face = inArray->runs[i].font->Face();
 		array->styles[i].red = inArray->runs[i].color.red;
 		array->styles[i].green = inArray->runs[i].color.green;
 		array->styles[i].blue = inArray->runs[i].color.blue;
@@ -2031,8 +2035,8 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 	if (array->magic[0] != 0x41 || array->magic[1] != 0x6c ||
 		array->magic[2] != 0x69 || array->magic[3] != 0x21 ||
 		array->version[0] != 0x00 || array->version[1] != 0x00 ||
-		array->version[2] != 0x00 || array->version[3] != 0x00)
-	{
+		array->version[2] != 0x00 || array->version[3] != 0x00) {
+		
 		if (outSize)
 		*outSize = 0;
 
@@ -2045,14 +2049,13 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 
 	run_array->count = array->count;
 
-	for (int32 i = 0; i < array->count; i++)
-	{
+	for (int32 i = 0; i < array->count; i++) {
 		run_array->runs[i].font = new BFont;
-		run_array->runs[i].font.SetFamilyAndStyle(array->styles[i].family,
+		run_array->runs[i].font->SetFamilyAndStyle(array->styles[i].family,
 			array->styles[i].style);
-		run_array->runs[i].font.SetSize(array->styles[i].size);
-		run_array->runs[i].font.SetShear(array->styles[i].shear);
-		run_array->runs[i].font.SetFace(array->styles[i].face);
+		run_array->runs[i].font->SetSize(array->styles[i].size);
+		run_array->runs[i].font->SetShear(array->styles[i].shear);
+		run_array->runs[i].font->SetFace(array->styles[i].face);
 		run_array->runs[i].color.red = array->styles[i].red;
 		run_array->runs[i].color.green = array->styles[i].green;
 		run_array->runs[i].color.blue = array->styles[i].blue;
@@ -2157,8 +2160,7 @@ BTextView::InitObject(BRect textRect, const BFont *initialFont,
 	fTextRect = textRect;
 
 	BFont font;
-	if (initialFont == NULL)
-	{
+	if (initialFont == NULL) {
 		GetFont(&font);
 		initialFont = &font;
 	}
@@ -2196,7 +2198,7 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 	// return if there's nowhere to go
 	if (fText->Length() == 0)
 		return;
-	
+			
 	int32	selStart = fSelStart;
 	int32	selEnd = fSelEnd;
 	//int32	delta = 0;
@@ -2702,6 +2704,7 @@ BTextView::DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 							 const text_run_array *inRuns,
 							 _BTextChangeResult_ *outResult)
 {
+
 }
 //------------------------------------------------------------------------------
 void
@@ -3095,14 +3098,19 @@ BTextView::NormalizeFont(BFont *font)
 uint32
 BTextView::CharClassification(int32 offset) const
 {
-	//char c = fText->RealCharAt(offset);
-	char c = *(Text() + offset);
-	
 	// Should check against a list of character containing also
 	// japanese word breakers
-	if (isspace(c) || ispunct(c))
-		return 1;
-	return 0;
+	switch (fText->RealCharAt(offset)) {
+		case B_SPACE:
+		case '/':
+		case '\\':
+		case '-':
+		case '_':
+		case '.':
+			return B_SEPARATOR_CHARACTER;
+		default:
+			return B_OTHER_CHARACTER;
+	}
 }
 //------------------------------------------------------------------------------
 int32

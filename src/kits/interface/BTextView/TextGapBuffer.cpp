@@ -209,13 +209,22 @@ _BTextGapBuffer_::Text()
 	return fText;
 }*/
 //------------------------------------------------------------------------------
-/*char 
+char 
 _BTextGapBuffer_::RealCharAt(int32 offset) const
 {
 	return *(fBuffer + offset);
-}*/
+}
 //------------------------------------------------------------------------------
-
+bool
+_BTextGapBuffer_::PasswordMode() const
+{
+	return false;
+}
+//------------------------------------------------------------------------------
+void
+_BTextGapBuffer_::SetPasswordMode(bool state)
+{
+}
 /*
  * $Log $
  *
