@@ -108,14 +108,14 @@ void DevicesWindow::InitWindow(void)
 
 	// Add File menu to menu bar
 	FileMenu = new BMenu("File");
-	FileMenu->AddItem(new BMenuItem("About Devices" B_UTF8_ELLIPSIS, new BMessage(MENU_FILE_ABOUT_DEVICES), NULL));
+	FileMenu->AddItem(new BMenuItem("About Devices" B_UTF8_ELLIPSIS, new BMessage(MENU_FILE_ABOUT_DEVICES), 0));
 	FileMenu->AddSeparatorItem();
 	FileMenu->AddItem(new BMenuItem("Quit", new BMessage(MENU_FILE_QUIT), 'Q'));
 	
 	DevicesMenu = new BMenu("Devices");
 	JumperedDevicesMenu = new BMenu("New Jumpered Device");
-	JumperedDevicesMenu->AddItem(new BMenuItem("Custom ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_CUSTOM), NULL));
-	JumperedDevicesMenu->AddItem(new BMenuItem("Modem ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM), NULL));
+	JumperedDevicesMenu->AddItem(new BMenuItem("Custom ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_CUSTOM), 0));
+	JumperedDevicesMenu->AddItem(new BMenuItem("Modem ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM), 0));
 	
 	//DevicesMenu->AddItem(new BMenuItem("New Jumpered Device", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE), NULL));
 	DevicesMenu->AddItem(JumperedDevicesMenu);

@@ -16,7 +16,7 @@ class DevicesView : public BView
 {
 	public:
     	DevicesView(BRect frame);
-    	virtual	void	Draw(BRect updateRect);	
+    	virtual	void Draw(BRect updateRect);	
 };
 
 
@@ -27,3 +27,4 @@ class ResourceUsageView : public BView
 };
 
 #endif
+

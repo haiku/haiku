@@ -13,6 +13,7 @@ Devices Windows Header by Sikosis
 #include "DevicesViews.h"
 
 class DevicesView;
+class ResourceUsageView;
 
 class DevicesWindow : public BWindow
 {
@@ -47,4 +48,5 @@ class ResourceUsageWindow : public BWindow
 };
 
 #endif
+
 
