@@ -57,6 +57,7 @@ enum {
 	B_REG_ACTIVATE_APP				= 'rgac',
 	// MIME requests
 	B_REG_MIME_SET_PARAM			= 'rgsp',
+	B_REG_MIME_DELETE_PARAM			= 'rgdp',
 	B_REG_MIME_START_WATCHING		= 'rgwb',
 	B_REG_MIME_STOP_WATCHING		= 'rgwe',
 	B_REG_MIME_INSTALL				= 'rgin',
