@@ -442,9 +442,15 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 		ioExtension->AddInt32(DOCUMENT_COUNT, document_count);
 		
 		// Check if a document index has been specified
-		ioExtension->FindInt32(DOCUMENT_INDEX, &document_index);
-		if (document_index < 1 || document_index > document_count)
+		status_t fnd = ioExtension->FindInt32(DOCUMENT_INDEX, &document_index);
+		if (fnd == B_OK && (document_index < 1 || document_index > document_count))
+			// If a document index has been supplied, and it is an invalid value,
+			// return failure
 			return B_NO_TRANSLATOR;
+		else if (fnd != B_OK)
+			// If FindInt32 failed, make certain the document index
+			// is the default value
+			document_index = 1;
 	}
 	
 	// identify the document the user specified or the first document
@@ -458,7 +464,8 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 		outInfo->quality = TIFF_IN_QUALITY;
 		outInfo->capability = TIFF_IN_CAPABILITY;
 		strcpy(outInfo->MIME, "image/tiff");
-		strcpy(outInfo->name, "TIFF image");
+		sprintf(outInfo->name, "TIFF image (page %d of %d)",
+			static_cast<int>(document_index), static_cast<int>(document_count));
 	}
 	
 	if (!poutTIFF)
