@@ -17,12 +17,15 @@ void pageManager::setup(void *area,int pages) {
 	int pageOverhead=((pages*sizeof(page))+(PAGE_SIZE-1))/PAGE_SIZE;
 	for (int i=0;i<pages-pageOverhead;i++) {
 		page *newPage=(page *)(addOffset(area,i*sizeof(page)));
+		error ("Setting up a page object at %x, passing in %x\n",
+						newPage,
+						addOffset(area,(i+pageOverhead)*PAGE_SIZE));
 		newPage->setup(addOffset(area,(i+pageOverhead)*PAGE_SIZE));
 		unused.add(newPage);
 		}
 
 	totalPages=pages;
-	//error ("pageManager::setup - %d pages ready to rock and roll\n",unused.count());
+	//error ("pageManager::setup - %d pages ready to top() and roll\n",unused.count());
 	}
 	
 // Try to get a clean page first. If that fails, get a dirty one and clean it. Loop on this.
@@ -39,7 +42,7 @@ page *pageManager::getPage(void) {
 				ret->zero();
 			} // This could fail if someone swooped in and stole our page.
 		}
-	//error ("pageManager::getPage - returning page %x, clean = %d, unused = %d, inuse = %x\n",ret,clean.count(),unused.count(),inUse.count());
+	error ("pageManager::getPage - returning page %x (phys address %x), clean = %d, unused = %d, inuse = %x\n",ret,ret->getAddress(),clean.count(),unused.count(),inUse.count());
 	inUse.add(ret);
 	ret->count++;
 	if (!ret)
@@ -88,7 +91,7 @@ int pageManager::desperation(void) { // Formula to determine how desperate syste
 void pageManager::dump(void) {
 	error ("Dumping the unused list (%d entries)\n",getUnusedCount());
 	unused.lock();
-	for (struct node *cur=unused.rock;cur;) {
+	for (struct node *cur=unused.top();cur;) {
 		page *thisPage=(page *)cur;
 		thisPage->dump();
 		cur=cur->next;
@@ -96,7 +99,7 @@ void pageManager::dump(void) {
 	unused.unlock();
 	error ("Dumping the clean list (%d entries)\n",getCleanCount());
 	clean.lock();
-	for (struct node *cur=clean.rock;cur;) {
+	for (struct node *cur=clean.top();cur;) {
 		page *thisPage=(page *)cur;
 		thisPage->dump();
 		cur=cur->next;
@@ -104,7 +107,7 @@ void pageManager::dump(void) {
 	error ("Dumping the inuse list (%d entries)\n",getInUseCount());
 	clean.unlock();
 	inUse.lock();
-	for (struct node *cur=inUse.rock;cur;) {
+	for (struct node *cur=inUse.top();cur;) {
 		page *thisPage=(page *)cur;
 		thisPage->dump();
 		cur=cur->next;

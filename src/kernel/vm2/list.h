@@ -76,8 +76,8 @@ class list {
 			return true;
 			}
 
+	protected:
 		struct node *rock;
 		int nodeCount;
-	private:
 };
 #endif

@@ -1,6 +1,5 @@
 #include <new.h>
 #include <cacheManager.h>
-#include <vpagePool.h>
 #include "vmHeaderBlock.h"
 
 // functions for hash and isEqual. No surprises
@@ -12,9 +11,7 @@ bool vnodeisEqual (node &vp,node &vp2) {
 	}
 
 extern vmHeaderBlock *vmBlock;
-// TODO - we need to (somehow) make sure that the same vnodes here are shared with mmap.
-// Maybe a vnode manager...
-// Make the cache lockable
+
 cacheManager::cacheManager(void) : area (),cacheMembers(30) {
 	myLock=create_sem(1,"Cache Manager Semaphore"); 
 	cacheMembers.setHash(vnodeHash);
@@ -42,31 +39,27 @@ void *cacheManager::findBlock(vnode *target,bool readOnly) {
 // No cache hit found; have to make a new one. Find a virtual page, create a vnode, and map.
 void *cacheManager::createBlock(vnode *target,bool readOnly, cacheMember *candidate) {
 	bool foundSpot=false;
-	vpage *prev=NULL,*cur=NULL;
+	vpage *cur=NULL;
 	unsigned long begin=CACHE_BEGIN;
-	// Find a place in the cache's virtual space to put this vnode...
-	if (vpages.rock) 
-		for (cur=(reinterpret_cast <vpage *>(vpages.rock));!foundSpot && cur;cur=reinterpret_cast <vpage *>(cur->next)) 
-			if (cur->getStartAddress()!=(void *)begin) 
-				foundSpot=true;
-			else { // no joy 
-				begin+=PAGE_SIZE;
-				prev=cur;
-				}
+
 	lock();
+	// Find a place in the cache's virtual space to put this vnode...
+	// This *HAS* to succeed, because the address space should be larger than physical memory...
+	for (int i=0;!foundSpot && i<pageCount;i++) {
+		cur=getNthVpage(i);
+		foundSpot=!cur->getPhysPage();
+		}
+		
 	// Create a vnode here
-	vpage *newPage = new (vmBlock->vpagePool->get()) vpage;
-	newPage->setup(begin,target,NULL,((readOnly)?readable:writable),NO_LOCK);
-	vpages.add(newPage); 
-	cacheMembers.add(newPage);
+	cur->setup((unsigned long)(cur->getStartAddress()),target,NULL,((readOnly)?readable:writable),NO_LOCK);
+	cacheMembers.add(cur);
 	// While this may not seem like a good idea (since this only happens on a write), 
 	// it is because someone may only write to part of the file/page...
 	if (candidate) 
-		memcpy(newPage->getStartAddress(),candidate->vp->getStartAddress(),PAGE_SIZE);
+		memcpy(cur->getStartAddress(),candidate->vp->getStartAddress(),PAGE_SIZE);
 	unlock();
 	// return address from this vnode
-	return (void *)begin;
-
+	return cur->getStartAddress();
 }
 
 void *cacheManager::readBlock(vnode *target) {

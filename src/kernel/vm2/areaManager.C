@@ -22,7 +22,7 @@ unsigned long areaManager::getNextAddress(int pages, unsigned long start) {
 		// This function needs to deal with the possibility that we run out of address space...
 //	areas.dump();
 	unsigned long end=start+(pages*PAGE_SIZE)-1;
-	for (struct node *cur=areas.rock;cur;cur=cur->next)
+	for (struct node *cur=areas.top();cur;cur=cur->next)
 		{
 		if (cur)
 			{
@@ -77,7 +77,7 @@ area *areaManager::findArea(char *address) {
 	//error ("Finding area by string\n");
 	area *retVal=NULL;
 	lock();
-	for (struct node *cur=areas.rock;cur && !retVal;cur=cur->next)
+	for (struct node *cur=areas.top();cur && !retVal;cur=cur->next)
 		{
 		area *myArea=(area *)cur;
 		if (myArea->nameMatch(address))
@@ -91,7 +91,7 @@ area *areaManager::findArea(char *address) {
 area *areaManager::findArea(const void *address) {
 	// THIS DOES NOT HAVE LOCKING - all callers must lock.
 //	error ("Finding area by void * address\n");
-	for (struct node *cur=areas.rock;cur;cur=cur->next)
+	for (struct node *cur=areas.top();cur;cur=cur->next)
 		{
 		area *myArea=(area *)cur;
 		//error ("areaManager::findArea: Looking for %x between %x and %x\n",address,myArea->getStartAddress(),myArea->getEndAddress());
@@ -114,7 +114,7 @@ area *areaManager::findAreaLock(area_id id) {
 area *areaManager::findArea(area_id id) {
 	//error ("Finding area by area_id\n");
 	area *retVal=NULL;
-	for (struct node *cur=areas.rock;cur && !retVal;cur=cur->next)
+	for (struct node *cur=areas.top();cur && !retVal;cur=cur->next)
 		{
 		area *myArea=(area *)cur;
 		if (myArea->getAreaID()==id)
@@ -166,7 +166,7 @@ int areaManager::createArea(char *AreaName,int pageCount,void **address, address
 }
 
 area *findAreaGlobal(int areaID) {
-	for (struct node *cur=vmBlock->areas.rock;cur;cur=cur->next) {
+	for (struct node *cur=vmBlock->areas.top();cur;cur=cur->next) {
 		area *myArea=(area *)cur;
 		if (((area *)(cur))->getAreaID()==areaID)
 			return myArea;
@@ -274,7 +274,7 @@ void areaManager::setInt(unsigned long address,int value) {
 // Call pager for each of our areas
 void areaManager::pager(int desperation) {
 	lock();
-	for (struct node *cur=areas.rock;cur;cur=cur->next) {
+	for (struct node *cur=areas.top();cur;cur=cur->next) {
 		area *myArea=(area *)cur;
 		//error ("areaManager::pager; area = \n");
 		//myArea->dump();
@@ -286,7 +286,7 @@ void areaManager::pager(int desperation) {
 // Call saver for each of our areas
 void areaManager::saver(void) {
 	lock();
-	for (struct node *cur=areas.rock;cur;cur=cur->next) {
+	for (struct node *cur=areas.top();cur;cur=cur->next) {
 		area *myArea=(area *)cur;
 		myArea->saver();
 		}
@@ -388,3 +388,68 @@ long areaManager::unlock_memory(void *address, ulong numBytes, ulong flags) {
 	return retVal;
 }
 
+status_t areaManager::getAreaInfo(int areaID,area_info *dest) {
+	status_t retVal;
+	lock();
+	area *oldArea=findArea(areaID);
+	if (oldArea)
+		retVal=oldArea->getInfo(dest);
+	else
+		retVal=B_ERROR;
+	unlock();
+	return retVal;
+}
+
+int areaManager::getAreaByName(char *name) {
+	int retVal;
+	lock();
+	area *oldArea=findArea(name);
+	if (oldArea)
+		retVal= oldArea->getAreaID();
+	else
+		retVal= B_ERROR; 
+	unlock();
+	return retVal;
+	}
+
+
+status_t areaManager::setProtection(int areaID,protectType prot) {
+	status_t retVal;
+	error ("area::setProtection about to lock\n");
+	lock();
+	error ("area::setProtection locked\n");
+	area *myArea=findArea(areaID);
+	if (myArea)
+		retVal= myArea->setProtection(prot);
+	else
+		retVal= B_ERROR;
+	unlock();
+	error ("area::setProtection unlocked\n");
+	return retVal;
+}
+status_t areaManager::resizeArea(int Area,size_t size) {
+	status_t retVal;				
+	lock();
+	area *oldArea=findArea(Area);
+	if (oldArea)
+		retVal= oldArea->resize(size);
+	else
+		retVal= B_ERROR; 
+	unlock();
+	return retVal;
+	}
+status_t areaManager::getInfoAfter(int32 & areaID,area_info *dest) {
+	status_t retVal;
+	lock();
+	area *oldArea=findArea(areaID);
+	if (oldArea->next)
+		{
+		area *newCurrent=(reinterpret_cast<area *>(oldArea->next));
+		retVal=newCurrent->getInfo(dest);
+		areaID=(int)newCurrent;
+		}
+	else
+		retVal=B_ERROR;
+	unlock();
+	return retVal;
+}

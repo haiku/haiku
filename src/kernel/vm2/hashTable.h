@@ -75,7 +75,7 @@ class hashTable : public list
 		if (!isEqual)
 			throw ("Attempting to use a hash table without setting up an 'isEqual' function");
 		unsigned long hashValue=hash(*findNode)%numRocks;
-		for (struct node *cur=rocks[hashValue]->rock;cur ;cur=cur->next)
+		for (struct node *cur=rocks[hashValue]->top();cur ;cur=cur->next)
 			if (isEqual(*findNode,*cur))
 				return cur;
 		return NULL;
@@ -91,7 +91,7 @@ class hashTable : public list
 		// Debugging
 	void dump(void) {
 		for (int i=0;i<numRocks;i++)
-			for (struct node *cur=rocks[i]->rock;cur;cur=cur->next)
+			for (struct node *cur=rocks[i]->top();cur;cur=cur->next)
 				error ("hashTable::dump: On bucket %d of %d, At %p, next = %p\n",i,numRocks,cur,cur->next);
 		}
 	bool ensureSane (void) {

@@ -3,7 +3,6 @@
 #include "lockedList.h"
 #include "area.h"
 #include "areaPool.h"
-#include "vpagePool.h"
 #include "vnodePool.h"
 #include "pageManager.h"
 #include "swapFileManager.h"
@@ -78,7 +77,7 @@ vmInterface::vmInterface(int pages)
 			}
 		error ("Allocated an area. Address = %x\n",vmBlock);
 		// Figure out how many pages we need
-		int pageCount = (sizeof(poolarea)+sizeof(poolvpage)+sizeof(poolvnode)+sizeof(pageManager)+sizeof(swapFileManager)+sizeof(cacheManager)+sizeof(vmHeaderBlock)+PAGE_SIZE-1)/PAGE_SIZE;
+		int pageCount = (sizeof(poolarea)+sizeof(poolvnode)+sizeof(pageManager)+sizeof(swapFileManager)+sizeof(cacheManager)+sizeof(vmHeaderBlock)+PAGE_SIZE-1)/PAGE_SIZE;
 		if (pageCount >=pages)
 			{
 			error ("Hey! Go buy some ram! Trying to create a VM with fewer pages than the setup will take!\n");
@@ -93,8 +92,6 @@ vmInterface::vmInterface(int pages)
 		//error ("Set up Page Man\n");
 		vmBlock->areaPool = new (currentAddress) poolarea;
 		currentAddress=addToPointer(currentAddress,sizeof(poolarea));
-		vmBlock->vpagePool = new (currentAddress) poolvpage;
-		currentAddress=addToPointer(currentAddress,sizeof(poolvpage));
 		vmBlock->vnodePool = new (currentAddress) poolvnode;
 		currentAddress=addToPointer(currentAddress,sizeof(poolvnode));
 		vmBlock->swapMan = new (currentAddress) swapFileManager;
@@ -193,7 +190,7 @@ int vmInterface::getAreaByName(char *name)
 	{
 	int retVal=B_NAME_NOT_FOUND;
 	vmBlock->areas.lock();
-	for (struct node *cur=vmBlock->areas.rock;cur && retVal==B_NAME_NOT_FOUND;cur=cur->next) {
+	for (struct node *cur=vmBlock->areas.top();cur && retVal==B_NAME_NOT_FOUND;cur=cur->next) {
 		area *myArea=(area *)cur;
 		error ("vmInterface::getAreaByName comapring %s to passed in %s\n",myArea->getName(),name);
 		if (myArea->nameMatch(name))	

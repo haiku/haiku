@@ -2,8 +2,9 @@
 #define _AREA_H
 #include "OS.h"
 #include "vm.h"
+#include "page.h"
 #include "lockedList.h"
-#include "hashTable.h"
+//#include "hashTable.h"
 
 class areaManager;
 class vpage;
@@ -11,19 +12,30 @@ class vpage;
 class area : public node
 {
 	protected:
-		hashTable vpages;
-		char name[B_OS_NAME_LENGTH];
-		pageState state;
-		protectType protection;
-		bool finalWrite;
-		area_id areaID;
-		int in_count;
-		int out_count;
-		int copy_count;
-		areaManager *manager;
-		unsigned long start_address;
-		unsigned long end_address;
-		vpage *findVPage(unsigned long);
+		int fullPages; // full pages of vpage pointers
+		int vpagesOnIndexPage; // number of vpages stored on the index page
+		int vpagesOnNextPage; // number of vpages on each "fullPage"
+		page *indexPage; // physical page of the index page
+
+		int pageCount; // count of the number of pages in this area
+
+		char name[B_OS_NAME_LENGTH]; // Our name
+		pageState state; // Allocation policy.
+		protectType protection; // read, r/w, copy on write
+		bool finalWrite; // Write blocks in this area out on freeing area?
+		area_id areaID; // Our numeric ID.
+		int in_count; // Number of pages read in
+		int out_count; // Number of pages written out
+		int copy_count; // Number of block copies that have been made 
+		areaManager *manager; // Our manager/process
+		unsigned long start_address; // Where we start
+
+		vpage *findVPage(unsigned long address)  { // Returns the page for this address.
+			return getNthVpage((address-start_address)/PAGE_SIZE);
+			//	error ("area::findVPage: finding %ld\n",address);
+			}
+		void allocateVPages(int pageCount); // Allocates blocks for the vpages
+		page *getNthPage(int pageNum) { return 	&(((page *)(indexPage->getAddress()))[pageNum]); }
 	public:
 		// Constructors and Destructors and related
 		area(void);
@@ -47,11 +59,12 @@ class area : public node
 		status_t getInfo(area_info *dest);
 		int getAreaID(void) {return areaID;}
 		unsigned long getSize(void) {return getEndAddress()-getStartAddress();}
-		unsigned long getPageCount(void) {return (getEndAddress()-getStartAddress())/PAGE_SIZE;}
+		unsigned long getPageCount(void) {return (pageCount);}
 		areaManager *getAreaManager(void) {return manager;}
-		unsigned long getEndAddress(void) {return end_address;}
+		unsigned long getEndAddress(void) {return getStartAddress()+(PAGE_SIZE*pageCount)-1;}
 		unsigned long getStartAddress(void) {return start_address;}
 		const char *getName(void) {return name;}
+		vpage *getNthVpage(int pageNum);
 
 		// Debugging
 		void dump(void);
@@ -62,7 +75,7 @@ class area : public node
 
 		// Comparisson with others
 		bool nameMatch(char *matchName) {return (strcmp(matchName,name)==0);}
-		bool couldAdd(unsigned long start,unsigned long end) { return ((end<start_address) || (start>end_address));}
+		bool couldAdd(unsigned long start,unsigned long end) { return ((end<start_address) || (start>getEndAddress()));}
 		bool contains(const void *address);
 		
 		// External methods for "server" type calls

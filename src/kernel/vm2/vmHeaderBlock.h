@@ -4,7 +4,6 @@
 
 #ifndef I_AM_VM_INTERFACE
 class poolarea;
-class poolvpage;
 class poolvnode;
 class pageManager;
 class swapFileManager;
@@ -16,7 +15,6 @@ class lockedList;
 struct vmHeaderBlock
 {
 	poolarea *areaPool;
-	poolvpage *vpagePool;
 	poolvnode *vnodePool;
 	pageManager *pageMan; 
 	swapFileManager *swapMan;

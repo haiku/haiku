@@ -11,7 +11,7 @@ extern vmHeaderBlock *vmBlock;
 
 // Write this vpage out if necessary
 void vpage::flush(void) {
-	if (physPage && protection==writable && dirty) {
+	if (physPage && getProtection()==writable && isDirty()) {
 //		error ("vpage::write_block: writing, backingNode->fd = %d, backingNode->offset = %d, address = %x\n",backingNode->fd, backingNode->offset,physPage->getAddress());
 		if (-1==lseek(backingNode->fd,backingNode->offset,SEEK_SET))
 			error ("vpage::flush:seek failed, fd = %d, errno = %d, %s\n",backingNode->fd,errno,strerror(errno));
@@ -36,7 +36,7 @@ void vpage::refresh(void) {
 	}
 
 // Simple, empty constructor
-vpage::vpage(void) : physPage(NULL),backingNode(NULL),protection(none),dirty(false),swappable(false),start_address(0),end_address(0), locked(false) 
+vpage::vpage(void) : physPage(NULL),backingNode(NULL),start_address(0),bits(0)
 {
 }
 
@@ -45,14 +45,16 @@ vpage::vpage(void) : physPage(NULL),backingNode(NULL),protection(none),dirty(fal
 void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType prot,pageState state, mmapSharing share) { 
 	// Basic setup from parameters
 	vpage *clonedPage; // This is the page that this page is to be the clone of...
-//	error ("vpage::setup: start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
+	error ("vpage::setup: start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
 	physPage=physMem;
 	backingNode=backing; 
-	protection=prot;
-	dirty=false;
-	swappable=(state==NO_LOCK);
+	setProtection(prot);
+	error ("vpage::setup: fields, part 1 set\n");
+	dirty(false);
+	swappable(state==NO_LOCK);
+	locked(state==NO_LOCK);
 	start_address=start;
-	end_address=start+PAGE_SIZE-1;
+	error ("vpage::setup: fields, part 2 set\n");
 
 // Set up the backing store. If one is specified, use it; if not, get a swap file page.
 	if (backingNode) { // This is an mmapped file (or a cloned area)
@@ -65,7 +67,7 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 			case PRIVATE: // This is a one way share - we get others changes (until we make a change) but no one gets our changes
 				clonedPage=vmBlock->vnodeMan->addVnode(*backingNode,*this,&backingNode); // Use the reference version which will make a new one if this one is not found
 				if (clonedPage) physPage=clonedPage->physPage;	
-				protection=(protection<=readable)?protection: copyOnWrite;
+				setProtection((getProtection()<=readable)?getProtection(): copyOnWrite);
 				break;
 			case COPY: // This is not shared - get a fresh page and fresh swap file space and copy the original page
 				physPage=vmBlock->pageMan->getPage();
@@ -83,17 +85,18 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 		backingNode=&(vmBlock->swapMan->findNode());
 		clonedPage=vmBlock->vnodeMan->addVnode(backingNode,*this); // Use the pointer version which will use this one. Should always return NULL
 	}
+	error ("vpage::setup: Backing node set up\n");
 // If there is no physical page already and we can't wait to get one, then get one now	
 	if (!physPage && (state!=LAZY) && (state!=NO_LOCK)) {
 		physPage=vmBlock->pageMan->getPage();
-//		error ("vpage::setup, state = %d, allocated page %x\n",state,physPage);
+		error ("vpage::setup, state = %d, allocated page %x\n",state,physPage);
 		}
 	else { // We either don't need it or we already have it. 
 		if (physPage)
 			atomic_add(&(physPage->count),1);
 		}
 
-//	error ("vpage::setup: ended : start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
+	error ("vpage::setup: ended : start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
 	}
 
 // Destruction. 
@@ -113,7 +116,7 @@ void vpage::cleanup(void) {
 
 // Change this pages protection
 void vpage::setProtection(protectType prot) {
-	protection=prot;
+	protection(prot);
 	// Change the hardware
 	}
 
@@ -121,16 +124,16 @@ void vpage::setProtection(protectType prot) {
 // true = OK, false = panic.  
 bool vpage::fault(void *fault_address, bool writeError, int &in_count) { 
 //	error ("vpage::fault: virtual address = %lx, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
-	if (writeError && protection != copyOnWrite && protection != writable)
+	if (writeError && getProtection() != copyOnWrite && getProtection() != writable)
 		return false;
 	if (writeError && physPage) { // If we already have a page and this is a write, it is either a copy on write or a "dirty" notice
-		dirty=true;
-		if (protection==copyOnWrite) { // Else, this was just a "let me know when I am dirty"...  
+		dirty(true);
+		if (getProtection()==copyOnWrite) { // Else, this was just a "let me know when I am dirty"...  
 			page *newPhysPage=vmBlock->pageMan->getPage();
 //			error ("vpage::fault - copy on write allocated page %x\n",newPhysPage);
 			memcpy((void *)(newPhysPage->getAddress()),(void *)(physPage->getAddress()),PAGE_SIZE);
 			physPage=newPhysPage;
-			protection=writable;
+			setProtection(writable);
 			vmBlock->vnodeMan->remove(*backingNode,*this);
 			backingNode=&(vmBlock->swapMan->findNode()); // Need new backing store for this node, since it was copied, the original is no good...
 			vmBlock->vnodeMan->addVnode(backingNode,*this);
@@ -148,7 +151,7 @@ bool vpage::fault(void *fault_address, bool writeError, int &in_count) {
 	// This refresh is unneeded if the data was never written out... 
 //	dump();
 	refresh(); // I wonder if these vnode calls are safe during an interrupt...
-	dirty=writeError; // If the client is writing, we are now dirty (or will be when we get back to user land)
+	dirty(writeError); // If the client is writing, we are now dirty (or will be when we get back to user land)
 	in_count++;
 	//error ("vpage::fault: Refreshed\n");
 //	//dump();
@@ -157,7 +160,7 @@ bool vpage::fault(void *fault_address, bool writeError, int &in_count) {
 	}
 
 bool vpage::lock(long flags) {
-	locked=true;
+	locked(true);
 	if (!physPage) {
 		physPage=vmBlock->pageMan->getPage();
 		if (!physPage)
@@ -169,8 +172,8 @@ bool vpage::lock(long flags) {
 
 void vpage::unlock(long flags) {
 	if ((flags & B_DMA_IO) || (!(flags & B_READ_DEVICE)))
-		dirty=true;
-	locked=false;
+		dirty(true);
+	locked(false);
 }
 
 char vpage::getByte(unsigned long address,areaManager *manager) {
@@ -186,7 +189,7 @@ void vpage::setByte(unsigned long address,char value,areaManager *manager) {
 	if (!physPage)
 		if (!manager->fault((void *)(address),true))
 			throw ("vpage::setByte");
-	if (protection>=writable)
+	if (getProtection()>=writable)
 		*((char *)(address-start_address+physPage->getAddress()))=value;
 	else
 		throw ("vpage::setByte - no permission to write");
@@ -208,7 +211,7 @@ void  vpage::setInt(unsigned long address,int value,areaManager *manager) {
 	if (!physPage)
 		if (!manager->fault((void *)(address),true))
 			throw ("vpage::setInt");
-	if (protection>=writable)
+	if (getProtection()>=writable)
 		*((int *)(address-start_address+physPage->getAddress()))=value;
 	else
 		throw ("vpage::setInt - no permission to write");
@@ -218,15 +221,15 @@ void  vpage::setInt(unsigned long address,int value,areaManager *manager) {
 // Swaps pages out where necessary.
 bool vpage::pager(int desperation) {
 	//error ("vpage::pager start desperation = %d\n",desperation);
-	if (!swappable)
+	if (!isSwappable())
 			return false;
 	//error ("vpage::pager swappable\n");
 	switch (desperation) {
 		case 1: return false; break;
-		case 2: if (!physPage || protection!=readable || locked)  return false;break;
-		case 3: if (!physPage || dirty || locked)  return false;break;
-		case 4: if (!physPage || locked)  return false;break;
-		case 5: if (!physPage || locked)  return false;break;
+		case 2: if (!physPage || getProtection()!=readable || isLocked())  return false;break;
+		case 3: if (!physPage || isDirty() || isLocked())  return false;break;
+		case 4: if (!physPage || isLocked())  return false;break;
+		case 5: if (!physPage || isLocked())  return false;break;
 		default: return false;break;
 		}
 	//error ("vpage::pager flushing\n");
@@ -240,8 +243,8 @@ bool vpage::pager(int desperation) {
 
 // Saves dirty pages
 void vpage::saver(void) {
-	if (dirty) {
+	if (isDirty()) {
 		flush();
-		dirty=false;
+		dirty(false);
 		}
 	}

@@ -7,33 +7,25 @@
 extern vmHeaderBlock *vmBlock;
 
 // If we can get one from an existing block, cool. If not, get a new block, create as many as will fit in the block, put them on the free list and call ourself recursively
-area *poolarea::get(void)
-	{
+area *poolarea::get(void) {
 	area *ret=NULL;
-	if (unused.count())
-		{
+	if (unused.count()) {
 		//error ("poolarea::get: Getting an unused one!\n");
-		acquire_sem(inUse);
 		ret=(area *)unused.next();
-		release_sem(inUse);
 		}
-	if (ret)
-		{
+	if (ret) {
 		//error ("poolarea::get: Returning address:%x \n",ret);
 		return ret;
 		}
-	else
-		{
+	else {
 		page *newPage=vmBlock->pageMan->getPage();
 		//error ("poolarea::get: Getting new page %lx!\n",newPage->getAddress());
 		if (!newPage)
 			throw ("Out of pages to allocate a pool!");
 		int newCount=PAGE_SIZE/sizeof(area);
-		acquire_sem(inUse);
 		//error ("poolarea::get: Adding %d new elements to the pool!\n",newCount);
 		for (int i=0;i<newCount;i++)
 			unused.add(((node *)(newPage->getAddress()+(i*sizeof(area)))));	
-		release_sem(inUse);
 		return (get()); // A little cheat - call self again to get the first one from stack...
 		}
 	}

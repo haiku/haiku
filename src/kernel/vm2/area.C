@@ -4,19 +4,13 @@
 #include "vpage.h"
 #include "vnodePool.h"
 #include "vnodeManager.h"
-#include "vpagePool.h"
 
 #include "vmHeaderBlock.h"
 
 extern vmHeaderBlock *vmBlock;
 
-ulong vpageHash (node &vp) {return reinterpret_cast <vpage &>(vp).hash();}
-bool vpageisEqual (node &vp,node &vp2) {return reinterpret_cast <vpage &>(vp)==reinterpret_cast <vpage &>(vp2);}
-
 // Simple constructor; real work is later
-area::area(void) : vpages(AREA_HASH_TABLE_SIZE) {
-	vpages.setHash(vpageHash);
-	vpages.setIsEqual(vpageisEqual);
+area::area(void) {
 	}
 
 // Not much here, either
@@ -27,94 +21,147 @@ void area::setup (areaManager *myManager) {
 	}
 
 // Decide which algorithm to use for finding the next virtual address and try to find one.
-unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int pageCount) {
+unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int inPageCount) {
 	// We will lock in the callers
 	unsigned long base,requested=(unsigned long)req;
 	switch (type) {
 		case EXACT: 
-			base=manager->getNextAddress(pageCount,requested); 
+			base=manager->getNextAddress(inPageCount,requested); 
 			if (base!=requested)
 				return 0; 
 			break;
 		case BASE: 
-			base=manager->getNextAddress(pageCount,requested); 
+			base=manager->getNextAddress(inPageCount,requested); 
 			break;
 		case ANY: 
-			base=manager->getNextAddress(pageCount,USER_BASE); 
+			base=manager->getNextAddress(inPageCount,USER_BASE); 
 			break;
 		case ANY_KERNEL: 
-			base=manager->getNextAddress(pageCount,KERNEL_BASE); 
+			base=manager->getNextAddress(inPageCount,KERNEL_BASE); 
 			break;
 		case CLONE: base=0;break; // Not sure what to do...
 		default: // should never happen
 			throw ("Unknown type passed to mapAddressSpecToAddress");
 		}
-	error ("area::mapAddressSpecToAddress, in type: %s, address = %x, size = %d\n", ((type==EXACT)?"Exact":(type==BASE)?"BASE":(type==ANY)?"ANY":(type==CLONE)?"CLONE":"ANY_KERNEL"), requested,pageCount);
+	error ("area::mapAddressSpecToAddress, in type: %s, address = %x, size = %d\n", ((type==EXACT)?"Exact":(type==BASE)?"BASE":(type==ANY)?"ANY":(type==CLONE)?"CLONE":"ANY_KERNEL"), requested,inPageCount);
 	return base;
 }
 
+vpage *area::getNthVpage(int pageNum) {
+		/*
+	error ("Inside getNthVPage; pageNum=%d, fullPages = %d, vpagesOnIndexPage=%d, vpagesOnNextPage=%d\n",pageNum,fullPages,vpagesOnIndexPage,vpagesOnNextPage);
+	error ("Inside getNthVPage; indexPage = %x, address = %x\n",indexPage,indexPage->getAddress());
+	for (int i=0;i<PAGE_SIZE/64;fprintf (stderr,"\n"),i++)
+		for (int j=0;j<32;j++)
+			fprintf (stderr,"%04.4x ",indexPage->getAddress()+i*64+j);
+			*/
+				
+	if (pageNum<=vpagesOnIndexPage) { // Skip the page pointers, then skip to the right vpage number;
+		return &(((vpage *)(getNthPage(fullPages+1)))[pageNum]);
+	}
+	else {
+		page *myPage=getNthPage(((pageNum-vpagesOnIndexPage-1)/vpagesOnNextPage));
+		return (vpage *)(myPage->getAddress()+(((pageNum-vpagesOnIndexPage-1)%vpagesOnNextPage)*sizeof(vpage)));
+	}
+}
+
+void area::allocateVPages(int pageCountIn) {
+
+	// Allocate all of the physical page space that we will need here and now for vpages
+	// Allocate number of pages necessary to hold the vpages, plus the index page...
+	pageCount=pageCountIn;	
+	indexPage=vmBlock->pageMan->getPage();
+	error ("area::allocateVPages : index page = %x, (physical address = %x\n",indexPage,indexPage->getAddress());
+	vpagesOnNextPage=PAGE_SIZE/sizeof(vpage); // Number of vpages per full physical page.
+	fullPages = pageCount / vpagesOnNextPage; // Number of full pages that we need.
+	int bytesLeftOnIndexPage = PAGE_SIZE-(fullPages*sizeof(vpage *)); // Room left on index page
+	vpagesOnIndexPage=bytesLeftOnIndexPage/sizeof(vpage); 
+	if ((fullPages*vpagesOnNextPage + vpagesOnIndexPage)< pageCount)  { // not enough room...
+		fullPages++;
+		bytesLeftOnIndexPage = PAGE_SIZE-(fullPages*sizeof(vpage *)); // Recalculate these, since they have changed.
+		vpagesOnIndexPage=bytesLeftOnIndexPage/sizeof(vpage); 
+		}
+
+	// Allocate the physical page space. 
+	for (int count=0;count<fullPages;count++) {
+		page *curPage=vmBlock->pageMan->getPage();
+		((page **)(indexPage->getAddress()))[count]=curPage;
+		}
+	error ("area::allocateVPages : index page = %x, (physical address = %x\n",indexPage,indexPage->getAddress());
+	}
+
 // This is the really interesting part of creating an area
-status_t area::createAreaGuts( char *inName, int pageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea /* For clone only*/, mmapSharing share) {
+status_t area::createAreaGuts( char *inName, int inPageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea /* For clone only*/, mmapSharing share) {
 	error ("area::createAreaGuts : name = %s, pageCount = %d, address = %lx, addressSpec = %d, pageState = %d, protection = %d, inFinalWrite = %d, fd = %d, offset = %d,originalArea=%ld\n",
-					inName,pageCount,address,type,inState,protect,inFinalWrite,fd,offset,originalArea);
+					inName,inPageCount,address,type,inState,protect,inFinalWrite,fd,offset,originalArea);
 	vpage *newPage;
 
 	// We need RAM - let's fail if we don't have enough... This is Be's way. I probably would do this differently...
-	if (!originalArea && (inState!=LAZY) && (inState!=NO_LOCK) && (pageCount>(vmBlock->pageMan->freePageCount())))
+	if (!originalArea && (inState!=LAZY) && (inState!=NO_LOCK) && (inPageCount>(vmBlock->pageMan->freePageCount())))
 			return B_NO_MEMORY;
-//	else
-//		error ("origArea = %d, instate = %d, LAZY = %d, NO_LOCK = %d, pageCountIn = %d, free pages = %d\n",
-//			originalArea, inState,LAZY ,NO_LOCK,pageCount,(vmBlock->pageMan->freePageCount()));
+	else
+		error ("origArea = %d, instate = %d, LAZY = %d, NO_LOCK = %d, pageCountIn = %d, free pages = %d\n",
+			originalArea, inState,LAZY ,NO_LOCK,inPageCount,(vmBlock->pageMan->freePageCount()));
 
 	// Get an address to start this area at
-	unsigned long base=mapAddressSpecToAddress(type,*address,pageCount);
+	unsigned long base=mapAddressSpecToAddress(type,*address,inPageCount);
 	if (base==0)
 		return B_ERROR;
 	// Set up some basic info
 	strcpy(name,inName);
 	state=inState;
 	start_address=base;
-	end_address=base+(pageCount*PAGE_SIZE)-1;
 	*address=(void *)base;
 	finalWrite=inFinalWrite;
+
+	error ("area::createAreaGuts:About to allocate vpages\n");
+
+	allocateVPages(inPageCount);
+	error ("area::createAreaGuts:done allocating vpages\n");
+	
 	// For non-cloned areas, make a new vpage for every page necesssary. 
 	if (originalArea==NULL) // Not for cloning
 		for (int i=0;i<pageCount;i++) {
-			newPage=new (vmBlock->vpagePool->get()) vpage;
+			newPage=new (getNthVpage(i)) vpage;
+			error ("got a vpage at %x\n",newPage);
 			if (fd) {
+				error ("area::createAreaGuts:populating vnode\n");
 				vnode newVnode;
 				newVnode.fd=fd;
 				newVnode.offset=offset+i*PAGE_SIZE;
 				newVnode.valid=true;
 //				vmBlock->vnodeManager->addVNode(newVnode,newPage);
+				error ("area::createAreaGuts:calling setup on %x\n",newPage);
 				newPage->setup(base+PAGE_SIZE*i,&newVnode,NULL,protect,inState,share);
+				error ("area::createAreaGuts:done with setup on %x\n",newPage);
 				}
-			else
+			else {
+				error ("area::createAreaGuts:calling setup on %x\n",newPage);
 				newPage->setup(base+PAGE_SIZE*i,NULL,NULL,protect,inState);
-			vpages.add(newPage);
+				error ("area::createAreaGuts:done with setup on %x\n",newPage);
+				}
 			}
 	else // cloned
 		// Need to lock other area, here, just in case...
 		// Make a copy of each page in the other area...	
-		for (hashIterate hi(vpages);node *cur=hi.get();) {
-			vpage *page=(vpage *)cur;
-			newPage=new (vmBlock->vpagePool->get()) vpage;	
+		for (int i=0;i<pageCount;i++) {
+			vpage *page=originalArea->getNthVpage(i);
+			newPage=new (getNthVpage(i)) vpage;
 			newPage->setup(base,page->getBacking(),page->getPhysPage(),protect,inState);// Cloned area has the same physical page and backing store...
-			vpages.add(newPage);
 			base+=PAGE_SIZE;
 			}
-	//error ("Dumping the area's hashtable");
-	//dump();
+	error ("Dumping the area's hashtable\n");
+	dump();
 	vmBlock->areas.add(this);
 	return B_OK;
 }
 
-status_t area::createAreaMappingFile(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect,int fd,size_t offset, mmapSharing share) {
-	return createAreaGuts(inName,pageCount,address,type,inState,protect,true,fd,offset,NULL,share);
+status_t area::createAreaMappingFile(char *inName, int inPageCount,void **address, addressSpec type,pageState inState,protectType protect,int fd,size_t offset, mmapSharing share) {
+	return createAreaGuts(inName,inPageCount,address,type,inState,protect,true,fd,offset,NULL,share);
 	}
 
-status_t area::createArea(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect) {
-	return createAreaGuts(inName,pageCount,address,type,inState,protect,false,0,0);
+status_t area::createArea(char *inName, int inPageCount,void **address, addressSpec type,pageState inState,protectType protect) {
+	return createAreaGuts(inName,inPageCount,address,type,inState,protect,false,0,0);
 	}
 
 // Clone another area.
@@ -136,21 +183,19 @@ status_t area::cloneArea(area *origArea, char *inName, void **address, addressSp
 // To free an area, interate over its poges, final writing them if necessary, then call cleanup and put the vpage back in the pool
 void area::freeArea(void) {
 //error ("area::freeArea: starting \n");
-
-//	vpages.dump();
-	node *cur;
-	for (hashIterate hi(vpages);node *cur=hi.get();) {
-//error ("area::freeArea: wasting a page: %x\n",cur);
-		vpage *page=reinterpret_cast<vpage *>(cur);
+	for (int vp=0;vp<pageCount;vp++) {
+		vpage *page=getNthVpage(vp);
 		if (finalWrite)  {
 			page->flush(); 
 //			error ("area::freeArea: flushed page %x\n",page);
 		}
 		page->cleanup();
-		//page->next=NULL;
-		vmBlock->vpagePool->put(page);
 		}
-	vpages.~hashTable();
+
+	for (int i=0;i<fullPages;i++)
+		vmBlock->pageMan->freePage(getNthPage(i));
+	vmBlock->pageMan->freePage(indexPage);
+
 //	error ("area::freeArea ----------------------------------------------------------------\n");
 //	vmBlock->vnodeMan->dump();
 //error ("area::freeArea: unlocking \n");
@@ -161,7 +206,7 @@ void area::freeArea(void) {
 status_t area::getInfo(area_info *dest) {
 	dest->area=areaID;
 	strcpy(dest->name,name);
-	dest->size=end_address-start_address;
+	dest->size=pageCount*PAGE_SIZE;
 	dest->lock=state;
 	dest->protection=protection; 
 	dest->team=manager->getTeam();
@@ -169,8 +214,8 @@ status_t area::getInfo(area_info *dest) {
 	dest->in_count=in_count;
 	dest->out_count=out_count;
 	dest->copy_count=0;
-	for (hashIterate hi(vpages);node *cur=hi.get();) {
-		vpage *page=(vpage *)cur;
+	for (int vp=0;vp<pageCount;vp++) {
+		vpage *page=getNthVpage(vp);
 		if (page->isMapped())
 			dest->ram_size+=PAGE_SIZE;
 		}
@@ -180,52 +225,62 @@ status_t area::getInfo(area_info *dest) {
 
 bool area::contains(const void *address) {
 	unsigned long base=(unsigned long)(address); 
-//	error ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
+//	error ("area::contains: looking for %d in %d -- %d, value = %d\n",base,getStartAddress(),getEndAddress(), ((getStartAddress()<=base) && (getEndAddress()>=base)));
 					
-	return ((start_address<=base) && (base<=end_address));
+	return ((getStartAddress()<=base) && (base<=getEndAddress()));
 	}
 
 // Resize an area. 
 status_t area::resize(size_t newSize) {
-	size_t oldSize =end_address-start_address+1;
+	size_t oldSize =pageCount*PAGE_SIZE+1;
 	// Duh. Nothing to do.
 	if (newSize==oldSize)
 		return B_OK;
-	// Grow the area. Figure out how many pages, allocate them and set them up
-	if (newSize>oldSize) {
-		int pageCount = (newSize - oldSize + PAGE_SIZE - 1) / PAGE_SIZE;
-		error ("Old size = %d, new size = %d, pageCount = %d\n",oldSize,newSize,pageCount);
-		vpage *newPage;
-		for (int i=0;i<pageCount;i++) {
-			newPage=new (vmBlock->vpagePool->get()) vpage;
-			newPage->setup(end_address+PAGE_SIZE*i-1,NULL,NULL,protection,state);
-			vpages.add(newPage);
+	
+	if (newSize>oldSize) {  // Grow the area. Figure out how many pages, allocate them and set them up
+		int newPageCount = (newSize - oldSize + PAGE_SIZE - 1) / PAGE_SIZE;
+		if (!mapAddressSpecToAddress(EXACT,(void *)(getEndAddress()+1),newPageCount)) // Ensure that the address space is available...
+			return B_ERROR;
+		int oldPageMax=vpagesOnIndexPage+(fullPages*vpagesOnNextPage); // Figure out what remaining, empty slots we have...
+		if (oldPageMax<newSize) {  // Do we have enough room in the existing area?
+			page *oldIndexPage=indexPage; // Guess not. Remember where we were...
+			int oldVpagesOnIndexPage=vpagesOnIndexPage;
+			int oldVpagesOnNextPage=vpagesOnNextPage;
+			int oldFullPages=fullPages;
+			allocateVPages(newSize/PAGE_SIZE); // Get room
+			for (int i=0;i<oldSize/PAGE_SIZE;i++)//Shift over existing space...
+				if (i<=vpagesOnIndexPage)  
+					memcpy(getNthVpage(i),(void *)((indexPage->getAddress()+sizeof(page *)*fullPages)+(sizeof(vpage)*i)),sizeof(vpage));
+				else {
+					page *myPage=(page *)(indexPage->getAddress()+((i-vpagesOnIndexPage-1)/vpagesOnNextPage)*sizeof(page *));
+					memcpy(getNthVpage(i),(void *)(myPage->getAddress()+(((i-vpagesOnIndexPage-1)%vpagesOnNextPage)*sizeof(vpage))),sizeof(vpage));
+					}
 			}
+		for (int i=oldSize;i<newSize;i+=PAGE_SIZE) { // Fill in the new space
+			vpage *newPage=new (getNthVpage(i/PAGE_SIZE)) vpage; // build a new vpage
+			newPage->setup(getEndAddress()+PAGE_SIZE*i-1,NULL,NULL,protection,state); // and set it up
+			}
+
+		error ("Old size = %d, new size = %d, pageCount = %d\n",oldSize,newSize,pageCount);
 		dump();
 		}
-	else { // Ewww. Shrinking. This is ugly right now. 
-		size_t newFinalAddress=start_address+newSize;
-		vpage *oldPage;
-		for (hashIterate hi(vpages);node *cur=hi.get();)  {
-			oldPage=reinterpret_cast<vpage *>(cur);
-			if (oldPage->getStartAddress() > (reinterpret_cast<void *> (newFinalAddress))) {
-				vpages.remove(cur);
-				if (finalWrite) 
-					oldPage->flush(); 
-				oldPage->cleanup();
-				vmBlock->vpagePool->put(oldPage);
-				}
+	else { // Shrinking - not even going to free up the vpages - that could be a bad decision
+		size_t newFinalBlock=newSize/PAGE_SIZE;
+		for (int i=newFinalBlock;i<pageCount;i++) {
+			vpage *oldPage=getNthVpage(i);
+			if (finalWrite) 
+				oldPage->flush(); 
+			oldPage->cleanup();
 			}
 		}
-	end_address=start_address+newSize;
 	return B_OK;
 	}
 
 // When the protection for the area changes, the protection for every one of the pages must change
 status_t area::setProtection(protectType prot) {
 	dump();
-	for (hashIterate hi(vpages);node *cur=hi.get();) {
-		vpage *page=(vpage *)cur;
+	for (int vp=0;vp<pageCount;vp++) {
+		vpage *page=getNthVpage(vp);
 		error ("setting protection on %x\n",page);
 		page->setProtection(prot);
 		}
@@ -233,11 +288,6 @@ status_t area::setProtection(protectType prot) {
 	return B_OK;
 	}
 
-vpage *area::findVPage(unsigned long address) {
-	vpage findMe(address);
-//	error ("area::findVPage: finding %ld\n",address);
-	return reinterpret_cast <vpage *>(vpages.find(&findMe));
-	}
 
 // To fault, find the vpage associated with the fault and call it's fault function
 bool area::fault(void *fault_address, bool writeError) { // true = OK, false = panic.  
@@ -281,8 +331,8 @@ void area::setInt(unsigned long address,int value) { // This is for testing only
 
 // For every one of our vpages, call the vpage's pager
 void area::pager(int desperation) {
-	for (hashIterate hi(vpages);node *cur=hi.get();) {
-		vpage *page=(vpage *)cur;
+	for (int vp=0;vp<pageCount;vp++) {
+		vpage *page=getNthVpage(vp);
 		if (page->pager(desperation))
 			out_count++;
 		}
@@ -290,19 +340,17 @@ void area::pager(int desperation) {
 
 // For every one of our vpages, call the vpage's saver
 void area::saver(void) {
-	for (hashIterate hi(vpages);node *cur=hi.get();) {
-		vpage *page=(vpage *)cur;
+	for (int vp=0;vp<pageCount;vp++) {
+		vpage *page=getNthVpage(vp);
 		page->saver();
 		}
 	}
 
 void area::dump(void) { 
-	error ("area::dump: size = %ld, lock = %d, address = %lx\n",end_address-start_address,state,start_address); 
-	vpages.dump();
-	for (hashIterate hi(vpages);node *cur=hi.get();) {
-		vpage *page=(vpage *)cur;
-		page->dump();
-		cur=cur->next;
+	error ("area::dump: size = %ld, lock = %d, address = %lx\n",pageCount*PAGE_SIZE,state,start_address); 
+	for (int vp=0;vp<pageCount;vp++)  {
+		error ("Dumping vpage %d of %d\n",vp,pageCount);
+		getNthVpage(vp)->dump();
 		}
 	}
 
@@ -311,8 +359,7 @@ long area::get_memory_map(const void *address, ulong numBytes, physical_entry *t
 	long prevMem=0,tableEntry=-1;
 	// Cycle over each "page to find"; 
 	for (int byteOffset=0;byteOffset<=numBytes;byteOffset+=PAGE_SIZE) {
-		vpage search(vbase+byteOffset);
-		vpage *found=reinterpret_cast<vpage *>(vpages.find(&search));
+		vpage *found=findVPage(((unsigned long)(address))+byteOffset);
 		if (!found) return B_ERROR;
 		unsigned long mem=found->getPhysPage()->getAddress();
 		if (mem!=prevMem+PAGE_SIZE) {
@@ -321,7 +368,7 @@ long area::get_memory_map(const void *address, ulong numBytes, physical_entry *t
 			prevMem=mem;
 			table[tableEntry].address=(void *)mem;
 			}
-		table[tableEntry].size+=PAGE_SIZE;
+		table[tableEntry].size=+PAGE_SIZE;
 		}
 	if (++tableEntry==numEntries)
 		return B_ERROR; // Ran out of places to fill in
@@ -331,8 +378,7 @@ long area::get_memory_map(const void *address, ulong numBytes, physical_entry *t
 long area::lock_memory(void *address, ulong numBytes, ulong flags) {
 	unsigned long vbase=(unsigned long)address;
 	for (int byteOffset=0;byteOffset<=numBytes;byteOffset+=PAGE_SIZE) {
-		vpage search(vbase+byteOffset);
-		vpage *found=reinterpret_cast<vpage *>(vpages.find(&search));
+		vpage *found=findVPage((unsigned long)address+byteOffset);
 		if (!found) return B_ERROR;
 		if (!found->lock(flags)) return B_ERROR;
 		}
@@ -342,8 +388,7 @@ long area::lock_memory(void *address, ulong numBytes, ulong flags) {
 long area::unlock_memory(void *address, ulong numBytes, ulong flags) {
 	unsigned long vbase=(unsigned long)address;
 	for (int byteOffset=0;byteOffset<=numBytes;byteOffset+=PAGE_SIZE) {
-		vpage search(vbase+byteOffset);
-		vpage *found=reinterpret_cast<vpage *>(vpages.find(&search));
+		vpage *found=findVPage((unsigned long)address+byteOffset);
 		if (!found) return B_ERROR;
 		found->unlock(flags);
 		}

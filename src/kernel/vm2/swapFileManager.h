@@ -4,13 +4,13 @@
 #include <fcntl.h>
 #include "vm.h"
 #include "OS.h"
+#include "lockedList.h"
 
 class swapFileManager {
 	private:
 	int swapFile;
 	unsigned long maxNode;
-	list swapFileFreeList;
-	sem_id lockFreeList;
+	lockedList swapFileFreeList;
 
 	public:
 		// Constructors and Destructors and related
@@ -19,10 +19,8 @@ class swapFileManager {
 
 		// Mutators
 	vnode &findNode(void); // Get an unused node
-	void write_block(vnode &node,void *loc,unsigned long size);
+	void write_block(vnode &node,void *loc,unsigned long size); // The general access points
 	void read_block(vnode &node,void *loc,unsigned long size);
-	void lock() {acquire_sem(lockFreeList);}
-	void unlock() {release_sem(lockFreeList);}
 
 		// Accessors
 	int getFD(void) {return swapFile;}

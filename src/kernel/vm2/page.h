@@ -8,7 +8,7 @@ class page : public node {
 		void *physicalAddress;
 		public:
 		// Constructors and Destructors and related
-		page(void) {cpuSpecific=NULL;physicalAddress=NULL;};
+		page(void) {};
 		void setup (void *address) {count=0;physicalAddress=address;};
 
 		// Accessors

@@ -4,20 +4,16 @@ class area;
 class poolarea
 {
 	private: 
-		list unused;
+		lockedList unused;
 		sem_id inUse;
 	public:
 		// Constructors and Destructors and related
-		poolarea(void) {
-			inUse = create_sem(1,"areapool");
-			}
+		poolarea(void) { }
 
 		// Mutators
 		area *get(void);
 		void put(area *in) {
-			acquire_sem(inUse);
 			unused.add((node *)in);
-			release_sem(inUse);
 			}
 
 };
