@@ -11,7 +11,7 @@ UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
-KernelStaticLibrary libdisk_device_manager :
+KernelMergeObject kernel_disk_device_manager.o :
 	ddm_operation_validation.cpp
 	ddm_userland_interface.cpp
 	disk_device_manager.cpp
