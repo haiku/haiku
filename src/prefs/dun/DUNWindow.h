@@ -24,6 +24,7 @@ Authors: Sikosis (beos@gravity24hr.com)
 #include <InterfaceKit.h>
 #include "ModemWindow.h"
 #include "DUNView.h"
+#include "NewConnectionWindow.h"
 #include "SettingsWindow.h"
 #include "DetailsView.h"
 #include "TreeView.h"
@@ -70,6 +71,7 @@ private:
     void InitWindow();
     DUNView* aDUNview;
     
+    NewConnectionWindow* ptrNewConnectionWindow;
     SettingsWindow    *settingsWindow;
     BBox              *topframe;
     BBox              *middleframe;

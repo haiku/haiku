@@ -26,7 +26,7 @@ Author: Sikosis (beos@gravity24hr.com)
 #include "DUNView.h"
 
 // Constants ------------------------------------------------------------------------------------------------- //
-const uint32 BTN_OKAY = 'BOky';
+const uint32 BTN_ADD = 'BAdd';
 const uint32 BTN_CANCEL = 'BCnl';
 const uint32 TXT_NEW_CONNECTION = 'TxCx';
 // ---------------------------------------------------------------------------------------------------------- //
@@ -68,26 +68,29 @@ void NewConnectionWindow::InitWindow(void)
 	BRect r;
 	r = Bounds(); // the whole view
 	
-	int LeftMargin = 6;
-	int OkayButtonSize = 60;
-	int CancelButtonSize = 60;
+	int LeftMargin = 14;
+	int AddButtonSize = 75;
+	int CancelButtonSize = 75;
 	
-	float CancelLeftMargin = (r.right / 2) - ((OkayButtonSize + 20 + CancelButtonSize) / 2);
-	float OkayLeftMargin = CancelLeftMargin + CancelButtonSize + 20;;
+	//float CancelLeftMargin = (r.right / 2) - ((AddButtonSize + 20 + CancelButtonSize) / 2);
+	//float AddLeftMargin = CancelLeftMargin + CancelButtonSize + 20;;
 	
-	int NewConnectionTop = 20;
+	float AddLeftMargin = r.right - (AddButtonSize + 10);
+	float CancelLeftMargin = AddLeftMargin - (CancelButtonSize + 11);
 	
-	txtNewConnection = new BTextControl(BRect(LeftMargin,NewConnectionTop,r.right-LeftMargin+2,NewConnectionTop+10), "txtNewConnection","New Connection:","New Connection",new BMessage(TXT_NEW_CONNECTION), B_FOLLOW_LEFT | B_FOLLOW_TOP , B_WILL_DRAW | B_NAVIGABLE);
-	txtNewConnection->SetDivider(65);
+	int NewConnectionTop = 10;
+	
+	txtNewConnection = new BTextControl(BRect(LeftMargin,NewConnectionTop,r.right-10,NewConnectionTop+10), "txtNewConnection","Connection name:","New Connection",new BMessage(TXT_NEW_CONNECTION), B_FOLLOW_LEFT | B_FOLLOW_TOP , B_WILL_DRAW | B_NAVIGABLE);
+	txtNewConnection->SetDivider(88);
 	   	
-	btnCancel = new BButton(BRect (CancelLeftMargin,r.bottom-35,CancelLeftMargin+CancelButtonSize,r.bottom-15),"Cancel","Cancel", new BMessage(BTN_CANCEL), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);		
-  	btnOkay = new BButton(BRect (OkayLeftMargin,r.bottom-35,OkayLeftMargin+OkayButtonSize,r.bottom-15),"Okay","Okay", new BMessage(BTN_OKAY), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-  	btnOkay->MakeDefault(true);
+	btnCancel = new BButton(BRect (CancelLeftMargin,r.bottom-34,CancelLeftMargin+CancelButtonSize,r.bottom-14),"Cancel","Cancel", new BMessage(BTN_CANCEL), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);		
+  	btnAdd = new BButton(BRect (AddLeftMargin,r.bottom-34,AddLeftMargin+AddButtonSize,r.bottom-14),"Add","Add", new BMessage(BTN_ADD), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+  	btnAdd->MakeDefault(true);
 		
-	//AddChild(ptrNewConnectionWindowView = new NewConnectionWindowView(r));
-	AddChild(txtNewConnection);
-	AddChild(btnCancel);
-    AddChild(btnOkay);
+	AddChild(ptrNewConnectionWindowView = new NewConnectionWindowView(r));
+	ptrNewConnectionWindowView->AddChild(txtNewConnection);
+	ptrNewConnectionWindowView->AddChild(btnCancel);
+    ptrNewConnectionWindowView->AddChild(btnAdd);
     txtNewConnection->MakeFocus(true);
 }
 // ---------------------------------------------------------------------------------------------------------- //
@@ -97,14 +100,21 @@ void NewConnectionWindow::MessageReceived (BMessage *message)
 {
 	switch(message->what)
 	{
-		case BTN_OKAY:
+		case BTN_ADD:
 			char tmp[256];
 			sprintf(tmp,"%s",txtNewConnection->Text());
 			(new BAlert("",tmp,"tmp"))->Go();
-			Hide(); // change later 
+			
+			// need to create a new file called txtNewConnection->Text() and
+			// place it in the /boot/home/config/settings/DUN/DUNCONNECT directory
+			
+			// before closing we need to change the main window to state 1
+						
+			Quit();
 			break;
 		case BTN_CANCEL:
-			Hide(); // change later 
+		    Quit();
+			//Hide(); // change later 
 			break;
 		default:
 			BWindow::MessageReceived(message);

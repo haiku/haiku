@@ -17,6 +17,7 @@ Authors: Sikosis (beos@gravity24hr.com)
 #include "DUNWindow.h"
 #include "DUNView.h"
 #include "SettingsWindow.h"
+#include "NewConnectionWindow.h"
 
 // DUNView -- the view so we can put objects like text boxes on it
 DUNView::DUNView (BRect frame) : BView (frame, "DUNView", B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW ) {
@@ -36,4 +37,12 @@ SettingsView::SettingsView (BRect frame) : BView (frame, "SettingsView", B_FOLLO
 	// Set the Background Color
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
+
+NewConnectionWindowView::NewConnectionWindowView (BRect frame) : BView (frame, "NewConnectionWindowView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
+{
+	// Set the Background Color
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
 // end

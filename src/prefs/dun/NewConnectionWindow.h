@@ -35,7 +35,7 @@ class NewConnectionWindow : public BWindow
 		void InitWindow(void);
 		
 		NewConnectionWindowView*	ptrNewConnectionWindowView;
-	    BButton         		    *btnOkay;
+	    BButton         		    *btnAdd;
 	    BButton         		    *btnCancel;
 	    BTextControl                *txtNewConnection;
 	    

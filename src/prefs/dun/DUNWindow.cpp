@@ -10,6 +10,7 @@ Authors: Sikosis (beos@gravity24hr.com)
 */
 /*-----WARNING MESSY CODE AHEAD :-)------*/
 #include "DUNWindow.h"
+#include "NewConnectionWindow.h"
 
 // Add these to Constants file
 const int DUN_WINDOW_STATE_DEFAULT = 0;  // default - closed
@@ -125,8 +126,7 @@ void DUNWindow::InitWindow() {
    topframe->SetLabel(top_frame_label);
    top_frame_label->AddChild(connectionmenufield);
    
-   passmeon = new BStringView(BRect(24,31,284,49),"tvConnectionProfile",
-   "<Create a connection profile to continue.>");
+   passmeon = new BStringView(BRect(24,31,284,49),"tvConnectionProfile", "<Create a connection profile to continue.>");
    passmeon->SetViewColor(255,0,0);
    
    
@@ -378,11 +378,13 @@ void DUNWindow::MessageReceived (BMessage *message)
 	{
 		case BTN_CONNECT:	
 		{
-   	    	disconnectbutton->SetEnabled(true);
-   	    	connectbutton->SetEnabled(false);
-			BAlert *errormsg = new BAlert("errormsg", "Chaos reigns within.\nReflect, repent, and retry.\nConnect shall return.", "   Haiku Error ;)   " , NULL, NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
-		    errormsg->SetShortcut(0, B_ESCAPE);
-    		errormsg->Go();
+   	    	//disconnectbutton->SetEnabled(true);
+   	    	//connectbutton->SetEnabled(false);
+			//BAlert *errormsg = new BAlert("errormsg", "Chaos reigns within.\nReflect, repent, and retry.\nConnect shall return.", "   Haiku Error ;)   " , NULL, NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
+		    //errormsg->SetShortcut(0, B_ESCAPE);
+    		//errormsg->Go();
+    		//debug
+  	   		ptrNewConnectionWindow = new NewConnectionWindow(BRect(0,0,260,73));
 		}	break;
 		case BTN_DISCONNECT:
 		{
@@ -393,9 +395,15 @@ void DUNWindow::MessageReceived (BMessage *message)
    	    	errormsg->Go();
    	    	
 	   	}    break;
+	   	case MENU_CON_NEW:
+	   	{
+	   		ptrNewConnectionWindow = new NewConnectionWindow(BRect(0,0,250,50));
+	   	}	break;
    	    case BTN_MODEM:
+  	   	{	
   	   		modemWindow = new ModemWindow(windowRectModem);
-	   	    break;	
+  	   		
+	   	}    break;	
   	    case BTN_SETTINGS:
   	   		settingsWindow = new SettingsWindow(BRect(367.0, 268.0, 657.0, 500.0));
  	 	    break;
