@@ -117,15 +117,15 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 		fSuppressChanges = true;
 		SetText("");
 		fSuppressChanges = false;
-		char inBuffer[256];
+		char inBuffer[32768];
 		off_t location = 0;
 		int32 textOffset = 0;
 		int32 state = 0;
 		int32 bytesRead;
-		while ((bytesRead = stream->ReadAt(location,inBuffer,256)) > 0) {
+		while ((bytesRead = stream->ReadAt(location,inBuffer,32768)) > 0) {
 			char * inPtr = inBuffer;
-			char textBuffer[256];
-			int32 textLength = 256;
+			char textBuffer[32768];
+			int32 textLength = 32768;
 			int32 bytes = bytesRead;
 			while ((textLength > 0) && (bytes > 0)) {
 				result = convert_to_utf8(id,inPtr,&bytes,textBuffer,&textLength,&state);
@@ -141,7 +141,7 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 				bytesRead -= bytes;
 				bytes = bytesRead;
 				if (textLength > 0) {
-					textLength = 256;
+					textLength = 32768;
 				}
 			}
 		}
@@ -176,10 +176,10 @@ StyledEditView::WriteStyledEditFile(BFile * file)
 			const char * outText = Text();
 			int32 sourceLength = TextLength();
 			int32 state = 0;
-			char buffer[256];
+			char buffer[32768];
 			while (sourceLength > 0) {
 				int32 length = sourceLength;
-				int32 written = 256;
+				int32 written = 32768;
 				result = convert_from_utf8(id,outText,&length,buffer,&written,&state);
 				if (result != B_OK) {
 					return result;
