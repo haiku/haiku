@@ -21,6 +21,7 @@ APP_KIT_SOURCE =
 	MessageUtils.cpp
 	PropertyInfo.cpp
 	PortLink.cpp
+	PortQueue.cpp
 	RegistrarDefs.cpp
 	RegistrarThread.cpp
 	RegistrarThreadManager.cpp
