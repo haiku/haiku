@@ -69,7 +69,7 @@ typedef uint32_t socklen_t;
 #define	SO_DEBUG		0x00000004	/* turn on debugging info recording */
 #define	SO_DONTROUTE	0x00000008	/* just use interface addresses */
 #define	SO_KEEPALIVE	0x00000010	/* keep connections alive */
-#define SO_OOBINLINE    0x00000020	/* leave received OOB data in line */
+#define SO_OOBINLINE	0x00000020	/* leave received OOB data in line */
 #define	SO_REUSEADDR	0x00000040	/* allow local address reuse */
 #define SO_REUSEPORT	0x00000080	/* allow local address & port reuse */
 #define SO_USELOOPBACK	0x00000100	/* bypass hardware when possible */
@@ -92,20 +92,24 @@ typedef uint32_t socklen_t;
 #define SO_BINDTODEVICE	0x4000000a
 
 /* only defined in OpenBeOS */
-#define SO_NETPROC      0x00001020	/* multiplex; network processing */
+#define SO_NETPROC		0x00001020	/* multiplex; network processing */
 
 /*
  * These are the valid values for the "how" field used by shutdown(2).
  */
 #ifndef BUILDING_R5_LIBNET
-#define SHUTDOWN_RECV	0
-#define SHUTDOWN_SEND	1
-#define SHUTDOWN_BOTH	2
-#else // BUILDING_R5_LIBNET
-#define SHUT_RD         1
-#define SHUT_WR         2
-#define SHUT_RDWR       3
-#endif // BUILDING_R5_LIBNET
+#define SHUT_RD			0
+#define SHUT_WR			1
+#define SHUT_RDWR		2
+/* for BONE compatibility */
+#define SHUTDOWN_RECV	SHUT_RD
+#define SHUTDOWN_SEND	SHUT_WR
+#define SHUTDOWN_BOTH	SHUT_RDWR
+#else /* BUILDING_R5_LIBNET */
+#define SHUT_RD			1
+#define SHUT_WR			2
+#define SHUT_RDWR		3
+#endif /* BUILDING_R5_LIBNET */
 
 
 struct linger {
@@ -203,16 +207,16 @@ struct msghdr {
 };
 
 /* Defines used in msghdr structure. */
-#define MSG_OOB         0x1             /* process out-of-band data */
-#define MSG_PEEK        0x2             /* peek at incoming message */
-#define MSG_DONTROUTE   0x4             /* send without using routing tables */
-#define MSG_EOR         0x8             /* data completes record */
-#define MSG_TRUNC       0x10            /* data discarded before delivery */
-#define MSG_CTRUNC      0x20            /* control data lost before delivery */
-#define MSG_WAITALL     0x40            /* wait for full request or error */
-#define MSG_DONTWAIT    0x80            /* this message should be nonblocking */
-#define MSG_BCAST       0x100           /* this message rec'd as broadcast */
-#define MSG_MCAST       0x200           /* this message rec'd as multicast */
+#define MSG_OOB			0x1				/* process out-of-band data */
+#define MSG_PEEK		0x2				/* peek at incoming message */
+#define MSG_DONTROUTE	0x4				/* send without using routing tables */
+#define MSG_EOR			0x8				/* data completes record */
+#define MSG_TRUNC		0x10			/* data discarded before delivery */
+#define MSG_CTRUNC		0x20			/* control data lost before delivery */
+#define MSG_WAITALL		0x40			/* wait for full request or error */
+#define MSG_DONTWAIT	0x80			/* this message should be nonblocking */
+#define MSG_BCAST		0x100			/* this message rec'd as broadcast */
+#define MSG_MCAST		0x200			/* this message rec'd as multicast */
 /* not defind in OpenBeOS */
 #define	MSG_EOF			0x400			/* data completes connection */
 

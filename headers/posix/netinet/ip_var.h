@@ -140,11 +140,11 @@ struct  ipstat {
 
 //#ifdef _KERNEL_MODE
 
-#define IP_FORWARDING           0x1             /* most of ip header exists */
-#define IP_RAWOUTPUT            0x2             /* raw ip header exists */
-#define IP_ROUTETOIF            SO_DONTROUTE    /* bypass routing tables */
-#define IP_ALLOWBROADCAST       SO_BROADCAST    /* can send broadcast packets */
-#define IP_MTUDISC              0x0400          /* pmtu discovery, set DF */
+#define IP_FORWARDING			0x1				/* most of ip header exists */
+#define IP_ALLOWBROADCAST		SO_BROADCAST	/* can send broadcast packets */
+#define IP_RAWOUTPUT			0x4				/* raw ip header exists */
+#define IP_ROUTETOIF			SO_DONTROUTE	/* bypass routing tables */
+#define IP_MTUDISC				0x10			/* pmtu discovery, set DF */
 
 #if 0
 //struct ipstat ipstat;
