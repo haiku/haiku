@@ -5,6 +5,10 @@
 #include <cppunit/TestFailure.h>
 #include <cppunit/TestResult.h>
 #include <cppunit/TestSuite.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <image.h>
+#include <Path.h>
 #include <TestListener.h>
 #include <set>
 #include <map>
@@ -18,10 +22,66 @@ BTestShell::BTestShell(const std::string &description, SyncObject *syncObject)
 {
 };
 
+status_t
+BTestShell::AddSuite(BTestSuite *suite) {
+	if (suite) {
+		cout << "Adding suite '" << suite->getName() << "'" << endl;
+	
+		// Add the suite
+		fSuites[suite->getName()] = suite;
+		
+		// Add its tests
+		const std::map<std::string, CppUnit::Test*> &map = suite->getTests();
+		for (std::map<std::string, CppUnit::Test*>::const_iterator i = map.begin();
+			   i != map.end();
+			      i++)
+			AddTest(i->first, i->second);
+			
+		return B_OK;
+	} else
+		return B_BAD_VALUE;
+}
+
 void
-BTestShell::AddSuite(const std::string &name, const SuiteFunction suite) {
-	if (suite != NULL)
-		fTests[name] = suite;
+BTestShell::AddTest(const std::string &name, CppUnit::Test *test) {
+	if (test != NULL)
+		fTests[name] = test;
+	else
+		fTests.erase(name);
+}
+
+int32
+BTestShell::LoadSuitesFrom(BDirectory *libDir) {
+	if (!libDir || libDir->InitCheck() != B_OK)
+		return 0;
+
+	BEntry addonEntry;
+	BPath addonPath;
+	image_id addonImage;
+	int count = 0;
+
+	typedef BTestSuite* (*suiteFunc)(void);
+	suiteFunc func;
+
+	while (libDir->GetNextEntry(&addonEntry, true) == B_OK) {
+		status_t err;
+		err = addonEntry.GetPath(&addonPath);
+		if (!err) {
+			addonImage = load_add_on(addonPath.Path());
+			err = (addonImage > 0 ? B_OK : B_ERROR);
+		}
+		if (!err) {
+			err = get_image_symbol(addonImage,
+				    "getTestSuite",
+				      B_SYMBOL_TYPE_TEXT,
+				        reinterpret_cast<void **>(&func));
+		}
+		if (!err) 
+			err = AddSuite(func());
+		if (!err)
+			count++;
+	}
+	return count;
 }
 
 int
@@ -42,16 +102,16 @@ BTestShell::Run(int argc, char *argv[]) {
 	} else if (fTestsToRun.empty()) {
 	
 		// None specified, so run them all
-		std::map<std::string, SuiteFunction>::iterator i;
+		std::map<std::string, CppUnit::Test*>::iterator i;
 		for (i = fTests.begin(); i != fTests.end(); ++i)
-			suite.addTest( i->second() );
+			suite.addTest( i->second );
 			
 	} else {
 	
 		// One or more specified, so only run those
 		std::set<std::string>::const_iterator i;
 		for (i = fTestsToRun.begin(); i != fTestsToRun.end(); ++i) 
-			suite.addTest( fTests[*i]() );
+			suite.addTest( fTests[*i] );
 			
 	}
 	
@@ -62,6 +122,8 @@ BTestShell::Run(int argc, char *argv[]) {
 
 	return 0;
 }
+
+BTestShell *BTestShell::fGlobalShell = NULL;
 
 BTestShell::VerbosityLevel
 BTestShell::Verbosity() const {
@@ -114,7 +176,7 @@ BTestShell::ProcessArguments(int argc, char *argv[]) {
 			cout << "------------------------------------------------------------------------------" << endl;
 			cout << "Available Tests:" << endl;
 			cout << "------------------------------------------------------------------------------" << endl;
-			map<std::string, SuiteFunction>::const_iterator i;			
+			std::map<std::string, CppUnit::Test*>::const_iterator i;			
 			for (i = fTests.begin(); i != fTests.end(); ++i)
 				cout << i->first << endl;
 			cout << endl;
