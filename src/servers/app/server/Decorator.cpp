@@ -551,3 +551,13 @@ click_type Decorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	return CLICK_NONE;
 }
 
+//! Hook function called when the decorator changes focus
+void Decorator::_SetFocus(void)
+{
+}
+
+//! Function for calculating layout for the decorator
+void Decorator::_DoLayout(void)
+{
+	
+}
