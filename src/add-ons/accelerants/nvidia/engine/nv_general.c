@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.27 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.28 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -899,9 +899,13 @@ static status_t nvxx_general_powerup()
 {
 	LOG(4, ("INIT: NV powerup\n"));
 
-	/* fill-in the cardspecs in the shared_info PINS struct */
-	fake_pins();
-	/* only process BIOS for specs and coldstart if requested by user;
+	/* setup cardspecs */
+	/* note:
+	 * this MUST be done before the driver attempts a card coldstart */
+	set_specs();
+
+	/* only process BIOS for finetuning specs and coldstarting card if requested
+	 * by the user;
 	 * note:
 	 * this in fact frees the driver from relying on the BIOS to be executed
 	 * at system power-up POST time. */
@@ -918,13 +922,16 @@ static status_t nvxx_general_powerup()
 		LOG(2, ("INIT: Skipping card coldstart!\n"));
 	}
 
+	/* get RAM size and fake panel startup (panel init code is still missing) */
+	fake_panel_start();
+
+	/* log the final card specifications */
+	dump_pins();
+
 	/* dump config space as it is after a possible coldstart attempt */
 	if (si->settings.logmask & 0x80000000) nv_dump_configuration_space();
 
-	/* log the final PINS struct settings */
-	dump_pins();
-
-	/* setup CRTC and DAC functions access: determined in fake_pins */
+	/* setup CRTC and DAC functions access: determined in fake_panel_start */
 	setup_virtualized_heads(si->ps.crtc2_prim);
 
 	/* do powerup needed from pre-inited card state as done by system POST cardBIOS

@@ -27,7 +27,9 @@ static void pinsnv6_fake(void);
 static void pinsnv10_arch_fake(void);
 static void pinsnv20_arch_fake(void);
 static void pinsnv30_arch_fake(void);
+static void getRAMsize_arch_nv4(void);
 static void getstrap_arch_nv4(void);
+static void getRAMsize_arch_nv10_20_30_40(void);
 static void getstrap_arch_nv10_20_30_40(void);
 static status_t pins2_read(uint8 *rom, uint32 offset);
 static status_t pins3_5_read(uint8 *rom, uint32 offset);
@@ -188,7 +190,6 @@ static status_t pins3_5_read(uint8 *rom, uint32 offset)
 		//si->ps.max_video_vco = fvco_max / 1000;
 	}
 
-	//fixme: extract RAM and core speeds from startscripts..
 	//fixme: add 'parsing scripts while not actually executing' as warmstart method,
 	//       instead of not parsing at all: this will update the driver's speeds
 	//       as below, while logging the scripts as well (for our learning pleasure :)
@@ -224,7 +225,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	status_t result = B_OK;
 	int16 size = init_size;
 
-	LOG(8,("INFO: executing coldstart...\n"));
+	LOG(8,("INFO: now executing coldstart...\n"));
 
 	/* select colormode CRTC registers base adresses */
 	NV_REG8(NV8_MISCW) = 0xcb;
@@ -292,7 +293,7 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 	status_t result = B_OK;
 	uint16 adress;
 
-	LOG(8,("INFO: executing coldstart...\n"));
+	LOG(8,("INFO: now executing coldstart...\n"));
 
 	/* select colormode CRTC registers base adresses */
 	NV_REG8(NV8_MISCW) = 0xcb;
@@ -1683,10 +1684,10 @@ static status_t	nv_crtc_setup_fifo()
 	return B_OK;
 }
 
-/* fake_pins presumes the card was coldstarted by it's BIOS */
-void fake_pins(void)
+/* (pre)set 'fixed' card specifications */
+void set_specs(void)
 {
-	LOG(8,("INFO: faking PINS\n"));
+	LOG(8,("INFO: setting up card specifications\n"));
 
 	/* set failsave speeds */
 	switch (si->ps.card_type)
@@ -1722,7 +1723,7 @@ void fake_pins(void)
 		break;
 	}
 
-	/* detect RAM amount, reference crystal frequency and dualhead */
+	/* detect reference crystal frequency and dualhead */
 	switch (si->ps.card_arch)
 	{
 	case NV04A:
@@ -1730,6 +1731,23 @@ void fake_pins(void)
 		break;
 	default:
 		getstrap_arch_nv10_20_30_40();
+		break;
+	}
+}
+
+/* this routine presumes the card was coldstarted by the card's BIOS for panel stuff */
+void fake_panel_start(void)
+{
+	LOG(8,("INFO: detecting RAM size\n"));
+
+	/* detect RAM amount */
+	switch (si->ps.card_arch)
+	{
+	case NV04A:
+		getRAMsize_arch_nv4();
+		break;
+	default:
+		getRAMsize_arch_nv10_20_30_40();
 		break;
 	}
 
@@ -1751,6 +1769,8 @@ void fake_pins(void)
 		si->ps.tvout_chip_type = ???;
 	}
 */
+
+	LOG(8,("INFO: faking panel startup\n"));
 
 	/* find out the BIOS preprogrammed panel use status... */
 	detect_panels();
@@ -2532,7 +2552,7 @@ static void pinsnv30_arch_fake(void)
 	si->ps.std_memory_clock = 190;
 }
 
-static void getstrap_arch_nv4(void)
+static void getRAMsize_arch_nv4(void)
 {
 	uint32 strapinfo = NV_REG32(NV32_NV4STRAPINFO);
 
@@ -2563,8 +2583,11 @@ static void getstrap_arch_nv4(void)
 			break;
 		}
 	}
+}
 
-	strapinfo = NV_REG32(NV32_NVSTRAPINFO2);
+static void getstrap_arch_nv4(void)
+{
+	uint32 strapinfo = NV_REG32(NV32_NVSTRAPINFO2);
 
 	/* determine PLL reference crystal frequency */
 	if (strapinfo & 0x00000040)
@@ -2576,7 +2599,7 @@ static void getstrap_arch_nv4(void)
 	si->ps.secondary_head = false;
 }
 
-static void getstrap_arch_nv10_20_30_40(void)
+static void getRAMsize_arch_nv10_20_30_40(void)
 {
 	uint32 dev_manID = CFGR(DEVID);
 	uint32 strapinfo = NV_REG32(NV32_NV10STRAPINFO);
@@ -2626,8 +2649,12 @@ static void getstrap_arch_nv10_20_30_40(void)
 			break;
 		}
 	}
+}
 
-	strapinfo = NV_REG32(NV32_NVSTRAPINFO2);
+static void getstrap_arch_nv10_20_30_40(void)
+{
+	uint32 dev_manID = CFGR(DEVID);
+	uint32 strapinfo = NV_REG32(NV32_NVSTRAPINFO2);
 
 	/* determine PLL reference crystal frequency: three types are used... */
 	if (strapinfo & 0x00000040)

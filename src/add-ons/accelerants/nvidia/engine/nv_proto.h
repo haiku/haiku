@@ -34,7 +34,8 @@ status_t i2c_maven_probe(void);
 /* card info functions */
 status_t parse_pins(void);
 void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2);
-void fake_pins(void);
+void fake_panel_start(void);
+void set_specs(void);
 void dump_pins(void);
 
 /* DAC functions */
