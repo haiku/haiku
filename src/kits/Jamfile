@@ -7,11 +7,9 @@ for subdir in $(subdirs) {
 	local file = $(subdir:S=.src) ;
 	include $(file:D=$(dir)) ;
 	UsePrivateHeaders $(subdir) ;
-	UsePublicHeaders $(subdir) ;
 	SEARCH_SOURCE += $(dir) ;
 }
 
-UsePublicHeaders [ FDirName add-ons file_system ] ;
 UsePrivateHeaders shared app ;
 
 # Add subsubdirs to the SEARCH_SOURCE.

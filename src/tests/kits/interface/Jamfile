@@ -5,9 +5,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bbitmap ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bdeskbar ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bpolygon ] ;
 
-UsePublicHeaders interface support ;
 SEARCH_SOURCE += [ FDirName $(TOP) src kits interface ] ;
-
 
 CommonTestLib libinterfacetest.so
 	: InterfaceKitTestAddon.cpp

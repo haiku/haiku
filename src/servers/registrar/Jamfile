@@ -1,6 +1,5 @@
 SubDir OBOS_TOP src servers registrar ;
 
-UsePublicHeaders app ;
 UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;

@@ -2,8 +2,6 @@ SubDir OBOS_TOP src kits midi ;
 
 UsePrivateHeaders midi ;
 
-UsePublicHeaders midi ;
-
 SharedLibrary midi :
 	Midi.cpp
 	MidiGlue.cpp

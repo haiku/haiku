@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src kits game ;
 
-UsePublicHeaders game ;
-
 SharedLibrary game :
 	# Public Game Kit
 	DirectWindow.cpp

@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src kits device ;
 
-UsePublicHeaders device ;
-
 SharedLibrary device :
 	A2D.cpp
 	D2A.cpp
