@@ -37,8 +37,8 @@ Server app_server :
 	Angle.cpp
 	CursorData.cpp
 	PicturePlayer.cpp
-
 	PNGDump.cpp
+	SessionStreamReader.cpp
 	Utils.cpp
 
 	# Manager Classes
@@ -48,8 +48,6 @@ Server app_server :
 	Desktop.cpp
 	ServerApp.cpp
 	ServerWindow.cpp
-
-	# Font Classes
 
 	# Display Classes
 	Clipper.cpp
