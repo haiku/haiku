@@ -288,15 +288,15 @@ class DisplayDriver {
 													const float &maxwidth,
 													char **outstrings) = 0;
 	
-	virtual	void				HideCursor();
-	virtual	bool				IsCursorHidden();
+	virtual	void				HideCursor() = 0;
+	virtual	bool				IsCursorHidden() = 0;
 	virtual	void				MoveCursorTo(	const float &x,
-												const float &y);
-	virtual	void				ShowCursor();
-	virtual	void				ObscureCursor();
-	virtual	void				SetCursor(ServerCursor *cursor);
-			BPoint				GetCursorPosition();
-	virtual	bool				IsCursorObscured(bool state);
+												const float &y) = 0;
+	virtual	void				ShowCursor() = 0;
+	virtual	void				ObscureCursor() = 0;
+	virtual	void				SetCursor(ServerCursor *cursor) = 0;
+	virtual	BPoint				GetCursorPosition() = 0;
+	virtual	bool				IsCursorObscured(bool state) = 0;
 	
 	
 	// Virtual methods which need to be implemented by each subclass
@@ -358,8 +358,6 @@ class DisplayDriver {
 	virtual	void				ConstrainClippingRegion(BRegion *reg) = 0;
 
  protected:
-			CursorHandler		fCursorHandler;
-
 			display_mode		fDisplayMode;
 			uint32				fDPMSState;
 			uint32				fDPMSCaps;

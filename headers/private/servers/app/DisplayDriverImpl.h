@@ -279,7 +279,19 @@ class DisplayDriverImpl : public DisplayDriver {
 													const uint32 &mode, 
 													const float &maxwidth,
 													char **outstrings);
-		
+
+	// cursor handling		
+	virtual	void				HideCursor();
+	virtual	bool				IsCursorHidden();
+	virtual	void				MoveCursorTo(	const float &x,
+												const float &y);
+	virtual	void				ShowCursor();
+	virtual	void				ObscureCursor();
+	virtual	void				SetCursor(ServerCursor *cursor);
+			BPoint				GetCursorPosition();
+	virtual	bool				IsCursorObscured(bool state);
+	
+	
 	// These two will rarely be implemented by subclasses,
 	// but it still needs to be possible
 	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
@@ -408,6 +420,7 @@ friend class WinBorder;
 
  protected:
 			BLocker				fLocker;
+			CursorHandler		fCursorHandler;
 };
 
 #endif
