@@ -55,8 +55,6 @@ static struct elf_image_info *sKernelImage = NULL;
 static mutex sImageMutex;
 static mutex sImageLoadMutex;
 
-static status_t elf_unload_image(struct elf_image_info *image);
-
 
 /** calculates hash for an image using its ID */
 
@@ -111,79 +109,6 @@ register_elf_image(struct elf_image_info *image)
 	imageInfo.data_size = image->regions[1].size;
 
 	hash_insert(sImagesHash, image);
-}
-
-
-status_t
-elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t length)
-{
-	struct hash_iterator iterator;
-	struct elf_image_info *image;
-	struct Elf32_Sym *sym;
-	struct elf_image_info *found_image;
-	struct Elf32_Sym *found_sym;
-	long found_delta;
-	uint32 i;
-	int j,rv;
-
-	TRACE(("looking up %p\n",(void *)address));
-
-	mutex_lock(&sImageMutex);
-	hash_open(sImagesHash, &iterator);
-
-	found_sym = 0;
-	found_image = 0;
-	found_delta = 0x7fffffff;
-
-	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
-		TRACE((" image %p, base = %p, size = %p\n", image, (void *)image->regions[0].start, (void *)image->regions[0].size));
-		if ((address < image->regions[0].start) || (address >= (image->regions[0].start + image->regions[0].size)))
-			continue;
-
-		TRACE((" searching...\n"));
-		found_image = image;
-		for (i = 0; i < HASHTABSIZE(image); i++) {
-			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
-				long d;
-				sym = &image->syms[j];
-
-				TRACE(("  %p looking at %s, type = %d, bind = %d, addr = %p\n",sym,SYMNAME(image, sym),ELF32_ST_TYPE(sym->st_info),ELF32_ST_BIND(sym->st_info),(void *)sym->st_value));
-				TRACE(("  symbol: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, sym->st_value, image->regions[0].delta));
-
-				if ((ELF32_ST_TYPE(sym->st_info) != STT_FUNC) || (ELF32_ST_BIND(sym->st_info) != STB_GLOBAL))
-					continue;
-
-				d = (long)address - (long)(sym->st_value + image->regions[0].delta);
-				if ((d >= 0) && (d < found_delta)) {
-					found_delta = d;
-					found_sym = sym;
-				}
-			}
-		}
-		break;
-	}
-
-	if (found_sym != 0) {
-		TRACE(("symbol at %p, in image %p, name = %s\n", found_sym, found_image, found_image->name));
-		TRACE(("name index %d, '%s'\n", found_sym->st_name, SYMNAME(found_image, found_sym)));
-		TRACE(("addr = %#lx, offset = %#lx\n",(found_sym->st_value + found_image->regions[0].delta),found_delta));
-
-		strlcpy(text, SYMNAME(found_image, found_sym), length);
-		
-		if (baseAddress)
-			*baseAddress = found_sym->st_value + found_image->regions[0].delta;
-
-		rv = B_OK;
-	} else {
-		TRACE(("symbol not found!\n"));
-		strlcpy(text, "symbol not found", length);
-		rv = B_ENTRY_NOT_FOUND;
-	}
-
-	hash_close(sImagesHash, &iterator, false);
-	mutex_unlock(&sImageMutex);
-
-	return rv;
 }
 
 
@@ -368,32 +293,6 @@ elf_find_symbol(struct elf_image_info *image, const char *name)
 }
 
 
-addr_t
-elf_lookup_symbol(image_id id, const char *symbol)
-{
-	struct elf_image_info *image;
-	struct Elf32_Sym *sym;
-
-	TRACE(("elf_lookup_symbol: %s\n", symbol));
-
-	image = find_image(id);
-	if (!image)
-		return 0;
-
-	sym = elf_find_symbol(image, symbol);
-	if (!sym)
-		return 0;
-
-	if (sym->st_shndx == SHN_UNDEF)
-		return 0;
-
-	TRACE(("found: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, 
-		sym->st_value, image->regions[0].delta));
-
-	return sym->st_value + image->regions[0].delta;
-}
-
-
 static status_t
 elf_parse_dynamic_section(struct elf_image_info *image)
 {
@@ -517,7 +416,7 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct e
 }
 
 
-// XXX for now just link against the kernel
+/** Until we have shared library support, just links against the kernel */
 
 static int
 elf_relocate(struct elf_image_info *image, const char *sym_prepend)
@@ -575,8 +474,220 @@ verify_eheader(struct Elf32_Ehdr *eheader)
 }
 
 
+#if 0
+static int
+elf_unlink_relocs(struct elf_image_info *image)
+{
+	elf_linked_image *link, *next_link;
+	
+	for (link = image->linked_images; link; link = next_link) {
+		next_link = link->next;
+		elf_unload_image(link->image);
+		free(link);
+	}
+	
+	return B_NO_ERROR;
+}
+#endif
+
+
+static status_t
+unload_elf_image(struct elf_image_info *image)
+{
+	int i;
+
+	if (atomic_add(&image->ref_count, -1) > 0)
+		return B_NO_ERROR;
+
+	//elf_unlink_relocs(image);
+		// not yet used
+
+	for (i = 0; i < 2; ++i) {
+		delete_area(image->regions[i].id);
+	}
+
+	if (image->vnode)
+		vfs_put_vnode_ptr(image->vnode);
+
+	unregister_elf_image(image);
+
+	free(image->eheader);
+	free(image->name);	
+	free(image);
+
+	return B_NO_ERROR;
+}
+
+
+static status_t
+insert_preloaded_image(struct preloaded_image *preloadedImage)
+{
+	struct Elf32_Ehdr *elfHeader;
+	struct elf_image_info *image;
+	status_t status;
+
+	elfHeader = (struct Elf32_Ehdr *)malloc(sizeof(struct Elf32_Ehdr));
+	if (elfHeader == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(elfHeader, &preloadedImage->elf_header, sizeof(struct Elf32_Ehdr));
+	status = verify_eheader(elfHeader);
+	if (status < B_OK)
+		goto error1;
+
+	image = create_image_struct();
+	if (image == NULL) {
+		status = B_NO_MEMORY;
+		goto error1;
+	}
+
+	image->vnode = NULL;
+	image->eheader = elfHeader;
+	image->name = strdup(preloadedImage->name);
+	image->dynamic_ptr = preloadedImage->dynamic_section.start;
+
+	image->regions[0] = preloadedImage->text_region;
+	image->regions[1] = preloadedImage->data_region;
+
+	status = elf_parse_dynamic_section(image);
+	if (status < B_OK)
+		goto error2;
+
+	status = elf_relocate(image, "");
+	if (status < B_OK)
+		goto error2;
+
+	register_elf_image(image);
+	return B_OK;
+
+error2:
+	free(image);
+error1:
+	free(elfHeader);
+
+	return status;
+}
+
+
+//	#pragma mark -
+//	public kernel API
+
+
 status_t
-elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
+get_image_symbol(image_id id, const char *name, int32 sclass, void **_symbol)
+{
+	struct elf_image_info *image;
+	struct Elf32_Sym *symbol;
+	status_t status = B_OK;
+
+	TRACE(("get_image_symbol(%s)\n", name));
+
+	mutex_lock(&sImageMutex);
+
+	image = find_image(id);
+	if (image == NULL) {
+		status = B_BAD_IMAGE_ID;
+		goto done;
+	}
+
+	symbol = elf_find_symbol(image, name);
+	if (symbol == NULL || symbol->st_shndx == SHN_UNDEF) {
+		status = B_ENTRY_NOT_FOUND;
+		goto done;
+	}
+
+	// ToDo: support the "sclass" parameter!
+
+	TRACE(("found: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, 
+		sym->st_value, image->regions[0].delta));
+
+	*_symbol = (void *)(symbol->st_value + image->regions[0].delta);
+
+done:
+	mutex_unlock(&sImageMutex);
+	return status;
+}
+
+
+//	#pragma mark -
+//	kernel private API
+
+
+status_t
+elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t length)
+{
+	struct hash_iterator iterator;
+	struct elf_image_info *image;
+	struct Elf32_Sym *sym;
+	struct elf_image_info *found_image;
+	struct Elf32_Sym *found_sym;
+	long found_delta;
+	uint32 i;
+	int j,rv;
+
+	TRACE(("looking up %p\n",(void *)address));
+
+	mutex_lock(&sImageMutex);
+	hash_open(sImagesHash, &iterator);
+
+	found_sym = 0;
+	found_image = 0;
+	found_delta = 0x7fffffff;
+
+	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+		TRACE((" image %p, base = %p, size = %p\n", image, (void *)image->regions[0].start, (void *)image->regions[0].size));
+		if ((address < image->regions[0].start) || (address >= (image->regions[0].start + image->regions[0].size)))
+			continue;
+
+		TRACE((" searching...\n"));
+		found_image = image;
+		for (i = 0; i < HASHTABSIZE(image); i++) {
+			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
+				long d;
+				sym = &image->syms[j];
+
+				TRACE(("  %p looking at %s, type = %d, bind = %d, addr = %p\n",sym,SYMNAME(image, sym),ELF32_ST_TYPE(sym->st_info),ELF32_ST_BIND(sym->st_info),(void *)sym->st_value));
+				TRACE(("  symbol: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, sym->st_value, image->regions[0].delta));
+
+				if ((ELF32_ST_TYPE(sym->st_info) != STT_FUNC) || (ELF32_ST_BIND(sym->st_info) != STB_GLOBAL))
+					continue;
+
+				d = (long)address - (long)(sym->st_value + image->regions[0].delta);
+				if ((d >= 0) && (d < found_delta)) {
+					found_delta = d;
+					found_sym = sym;
+				}
+			}
+		}
+		break;
+	}
+
+	if (found_sym != 0) {
+		TRACE(("symbol at %p, in image %p, name = %s\n", found_sym, found_image, found_image->name));
+		TRACE(("name index %d, '%s'\n", found_sym->st_name, SYMNAME(found_image, found_sym)));
+		TRACE(("addr = %#lx, offset = %#lx\n",(found_sym->st_value + found_image->regions[0].delta),found_delta));
+
+		strlcpy(text, SYMNAME(found_image, found_sym), length);
+		
+		if (baseAddress)
+			*baseAddress = found_sym->st_value + found_image->regions[0].delta;
+
+		rv = B_OK;
+	} else {
+		TRACE(("symbol not found!\n"));
+		strlcpy(text, "symbol not found", length);
+		rv = B_ENTRY_NOT_FOUND;
+	}
+
+	hash_close(sImagesHash, &iterator, false);
+	mutex_unlock(&sImageMutex);
+
+	return rv;
+}
+
+
+status_t
+elf_load_user_image(const char *path, struct team *p, int flags, addr *entry)
 {
 	struct Elf32_Ehdr eheader;
 	struct Elf32_Phdr *pheaders = NULL;
@@ -735,7 +846,7 @@ error:
 
 
 image_id
-elf_load_kspace(const char *path, const char *sym_prepend)
+load_kernel_add_on(const char *path)
 {
 	bool ro_segment_handled = false;
 	bool rw_segment_handled = false;
@@ -905,7 +1016,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 	if (err < 0)
 		goto error4;
 
-	err = elf_relocate(image, sym_prepend);
+	err = elf_relocate(image, "");
 	if (err < 0)
 		goto error4;
 
@@ -942,140 +1053,26 @@ error0:
 	return err;
 }
 
-#if 0
-static int
-elf_unlink_relocs(struct elf_image_info *image)
-{
-	elf_linked_image *link, *next_link;
-	
-	for (link = image->linked_images; link; link = next_link) {
-		next_link = link->next;
-		elf_unload_image(link->image);
-		free(link);
-	}
-	
-	return B_NO_ERROR;
-}
-#endif
-
-static void
-elf_unload_image_final(struct elf_image_info *image)
-{
-	int i;
-	
-	for (i = 0; i < 2; ++i) {
-		delete_area(image->regions[i].id);
-	}
-
-	if (image->vnode)
-		vfs_put_vnode_ptr(image->vnode);
-
-	unregister_elf_image(image);
-
-	free(image->eheader);
-	free(image->name);	
-	free(image);
-}
-
-
-static status_t
-elf_unload_image(struct elf_image_info *image)
-{
-	if (atomic_add(&image->ref_count, -1) > 0)
-		return B_NO_ERROR;
-
-	//elf_unlink_relocs(image);
-		// not yet used
-	elf_unload_image_final(image);
-
-	return B_NO_ERROR;
-}
-
 
 status_t
-elf_unload_kspace(const char *path)
+unload_kernel_add_on(image_id id)
 {
-	int fd;
-	int err;
-	void *vnode;
-	struct elf_image_info *image;
-	
-	fd = sys_open(path, 0);
-	if (fd < 0)
-		return fd;
-
-	err = vfs_get_vnode_from_fd(fd, true, &vnode);
-	if (err < 0)
-		goto error0;
-
-	mutex_lock(&sImageLoadMutex);
-
-	image = find_image_by_vnode(vnode);
-	if (!image) {
-		dprintf("Tried to unload image that wasn't loaded (%s)\n", path);
-		err = B_ENTRY_NOT_FOUND;
-		goto error;
-	}
-	
-	err = elf_unload_image(image);
-
-error:
-	mutex_unlock(&sImageLoadMutex);
-error0:
-	if(vnode)
-		vfs_put_vnode_ptr(vnode);
-	sys_close(fd);
-
-	return err;
-}
-
-
-static status_t
-insert_preloaded_image(struct preloaded_image *preloadedImage)
-{
-	struct Elf32_Ehdr *elfHeader;
 	struct elf_image_info *image;
 	status_t status;
 
-	elfHeader = (struct Elf32_Ehdr *)malloc(sizeof(struct Elf32_Ehdr));
-	if (elfHeader == NULL)
-		return B_NO_MEMORY;
+	mutex_lock(&sImageMutex);
+	
+	image = find_image(id);
+	if (image != NULL) {
+		mutex_lock(&sImageLoadMutex);
 
-	memcpy(elfHeader, &preloadedImage->elf_header, sizeof(struct Elf32_Ehdr));
-	status = verify_eheader(elfHeader);
-	if (status < B_OK)
-		goto error1;
+		status = unload_elf_image(image);
 
-	image = create_image_struct();
-	if (image == NULL) {
-		status = B_NO_MEMORY;
-		goto error1;
-	}
+		mutex_unlock(&sImageLoadMutex);
+	} else
+		status = B_BAD_IMAGE_ID;
 
-	image->vnode = NULL;
-	image->eheader = elfHeader;
-	image->name = strdup(preloadedImage->name);
-	image->dynamic_ptr = preloadedImage->dynamic_section.start;
-
-	image->regions[0] = preloadedImage->text_region;
-	image->regions[1] = preloadedImage->data_region;
-
-	status = elf_parse_dynamic_section(image);
-	if (status < B_OK)
-		goto error2;
-
-	status = elf_relocate(image, "");
-	if (status < B_OK)
-		goto error2;
-
-	register_elf_image(image);
-	return B_OK;
-
-error2:
-	free(image);
-error1:
-	free(elfHeader);
-
+	mutex_unlock(&sImageMutex);	
 	return status;
 }
 

@@ -364,11 +364,11 @@ unload_file_system(file_system *fs)
 	if (fs->image < B_OK)
 		return B_OK;
 
-	uninit = (void (*)())elf_lookup_symbol(fs->image, "uninit_file_system");
-	if (uninit != NULL)
+	if (get_image_symbol(fs->image, "uninit_file_system",
+			B_SYMBOL_TYPE_TEXT, (void **)&uninit) == B_OK)
 		uninit();
 
-	// ToDo: unloading is not yet supported - we need a unload image_id first...
+	unload_kernel_add_on(fs->image);
 	free(fs);
 
 	return B_OK;
@@ -385,22 +385,25 @@ load_file_system(const char *name)
 	void (*init)();
 	image_id image;
 
+	// ToDo: don't use fixed paths!!
+
 	// search in the user directory
 	sprintf(path, "/boot/home/config/add-ons/kernel/file_systems/%s", name);
-	image = elf_load_kspace(path, "");
+
+	image = load_kernel_add_on(path);
 	if (image == B_ENTRY_NOT_FOUND) {
+		// ToDo: this is not a BeOS compatible system directory (bootfs)
 		// search in the system directory
 		sprintf(path, "/boot/addons/fs/%s", name);
 		//sprintf(path, "/boot/beos/system/add-ons/kernel/file_systems/%s", name);
-		image = elf_load_kspace(path, "");
+		image = load_kernel_add_on(path);
 	}
 	if (image < B_OK)
 		return NULL;
 
-	init = (void (*)())elf_lookup_symbol(image, "init_file_system");
-	version = (int32 *)elf_lookup_symbol(image, "api_version");
-	ops = (fs_ops **)elf_lookup_symbol(image, "fs_entry");
-	if (init == NULL || version == NULL || ops == NULL) {
+	if (get_image_symbol(image, "init_file_system", B_SYMBOL_TYPE_TEXT, (void **)&init) != B_OK
+		|| get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&version) != B_OK
+		|| get_image_symbol(image, "fs_entry", B_SYMBOL_TYPE_DATA, (void **)&ops) != B_OK) {
 		dprintf("vfs: add-on \"%s\" doesn't export all necessary symbols.\n", name);
 		goto err;
 	}
@@ -422,7 +425,7 @@ load_file_system(const char *name)
 	return fs;
 
 err:
-	elf_unload_kspace(path);
+	unload_kernel_add_on(image);
 	return NULL;
 }
 

@@ -160,6 +160,7 @@ kfree_strings_array(char **strings, int strc)
 {
 	int cnt = strc;
 
+
 	if (strings != NULL) {
 		for (cnt = 0; cnt < strc; cnt++){
 			free(strings[cnt]);
@@ -543,7 +544,7 @@ team_create_team2(void *args)
 	uargs[arg_cnt] = NULL;
 
 	team->user_env_base = t->user_stack_base + STACK_SIZE + TLS_SIZE;
-	uenv  = (char **)team->user_env_base;
+	uenv = (char **)team->user_env_base;
 	udest = (char *)team->user_env_base + ENV_SIZE - 1;
 
 	TRACE(("team_create_team2: envc: %d, envp: 0x%p\n", teamArgs->envc, (void *)teamArgs->envp));
@@ -563,16 +564,14 @@ team_create_team2(void *args)
 	uspa->envc = env_cnt;
 	uspa->envp = uenv;
 
-	if (teamArgs->args != NULL)
-		kfree_strings_array(teamArgs->args, teamArgs->argc);
-	if (teamArgs->envp != NULL)
-		kfree_strings_array(teamArgs->envp, teamArgs->envc);
+	kfree_strings_array(teamArgs->args, teamArgs->argc);
+	kfree_strings_array(teamArgs->envp, teamArgs->envc);
 
 	path = teamArgs->path;
 	TRACE(("team_create_team2: loading elf binary '%s'\n", path));
 
-	err = elf_load_uspace("/boot/libexec/rld.so", team, 0, &entry);
-	if (err < 0){
+	err = elf_load_user_image("/boot/libexec/rld.so", team, 0, &entry);
+	if (err < 0) {
 		// XXX clean up team
 		return err;
 	}

@@ -237,7 +237,7 @@ load_module_image(const char *path, module_image **_moduleImage)
 	TRACE(("load_module_image(path = \"%s\", _image = %p)\n", path, _moduleImage));
 	ASSERT(_moduleImage != NULL);
 
-	image = elf_load_kspace(path, "");
+	image = load_kernel_add_on(path);
 	if (image < 0) {
 		dprintf("load_module_image failed: %s\n", strerror(image));
 		return image;
@@ -249,14 +249,16 @@ load_module_image(const char *path, module_image **_moduleImage)
 		goto err;
 	}
 
-	moduleImage->info = (module_info **)elf_lookup_symbol(image, "modules");
-	if (!moduleImage->info) {
+	if (get_image_symbol(image, "modules", B_SYMBOL_TYPE_DATA,
+			(void **)&moduleImage->info) != B_OK) {
 		FATAL(("load_module_image: Failed to load %s due to lack of 'modules' symbol\n", path));
 		status = B_BAD_TYPE;
 		goto err1;
 	}
 
-	moduleImage->dependencies = (module_dependency *)elf_lookup_symbol(image, "module_dependencies");
+	moduleImage->dependencies = NULL;
+	get_image_symbol(image, "module_dependencies", B_SYMBOL_TYPE_DATA,
+		(void **)&moduleImage->dependencies);
 		// this is allowed to be NULL
 
 	moduleImage->path = strdup(path);
@@ -279,7 +281,7 @@ load_module_image(const char *path, module_image **_moduleImage)
 err1:
 	free(moduleImage);
 err:
-	elf_unload_kspace(path);
+	unload_kernel_add_on(image);
 
 	return status;
 }
@@ -306,7 +308,7 @@ unload_module_image(module_image *moduleImage, const char *path)
 	hash_remove(sModuleImagesHash, moduleImage);
 	recursive_lock_unlock(&sModulesLock);
 
-	elf_unload_kspace(moduleImage->path);
+	unload_kernel_add_on(moduleImage->image);
 	free(moduleImage->path);
 	free(moduleImage);
 
