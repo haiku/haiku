@@ -12,3 +12,4 @@ StaticLibrary termcap :
 
 MakeLocate termcap : $(OBOS_ETC_DIR) ;
 File termcap : termcap.src ;
+LocalClean clean : termcap ;
