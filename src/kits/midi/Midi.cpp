@@ -8,128 +8,170 @@
 
 #include <List.h>
 
-#include "debug.h"
 #include "Midi.h"
+#include "debug.h"
 #include "MidiEvent.h"
 
-#define MSG_CODE_PROCESS_EVENT     1
-#define MSG_CODE_TERMINATE_THREAD  0
+#define DEBUG
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------
 
+#define MSG_CODE_PROCESS_EVENT 1
+#define MSG_CODE_TERMINATE_THREAD 0
+
+//-----------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Initialization Stuff
 BMidi::BMidi()
 {
-	connections = new BList();
-	isRunning = false;
-
-	inflowPort = create_port(1, "Inflow Port");
-
-	inflowThread = spawn_thread(
-		InflowThread, "BMidi Inflow Thread",
-		B_REAL_TIME_PRIORITY, (void*) this);
-
-	inflowAlive = (resume_thread(inflowThread) == B_OK);
+	fConnectionList = new BList();
+	fIsRunning = false;
+	
+	fInflowPort = create_port(1, "Inflow Port");
+	
+	fInflowTask = spawn_thread(
+		_inflow_task_, "BMidi Inflow Thread",
+		B_REAL_TIME_PRIORITY, (void *)this);
+		
+	fInflowAlive = resume_thread(fInflowTask) == B_OK;
 }
-
-//------------------------------------------------------------------------------
 
 BMidi::~BMidi()
 {
-	write_port(inflowPort, MSG_CODE_TERMINATE_THREAD, NULL, 0);
+	write_port(fInflowPort, MSG_CODE_TERMINATE_THREAD, NULL, 0);
 
-	status_t exitValue;
-	wait_for_thread(inflowThread, &exitValue);
+	status_t exit_value;
+	wait_for_thread(fInflowTask, &exit_value);
 
-	delete_port(inflowPort);
-	delete connections;	
+	delete_port(fInflowPort);
+	delete fConnectionList;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Stubs for midi event hooks.
+void BMidi::NoteOff(uchar chan, uchar note, uchar vel, uint32 time)
+{
+}
+void BMidi::NoteOn(uchar chan, uchar note, uchar vel, uint32 time)
+{
+}
+void BMidi::KeyPressure(uchar chan, uchar note, uchar pres, uint32 time)
+{
+}
+void BMidi::ControlChange(uchar chan, uchar ctrl_num, uchar ctrl_val, uint32 time)
+{
+}
+void BMidi::ProgramChange(uchar chan, uchar prog_num, uint32 time)
+{
+}
+void BMidi::ChannelPressure(uchar chan, uchar pres, uint32 time)
+{
+}
+void BMidi::PitchBend(uchar chan, uchar lsb, uchar msb, uint32 time)
+{
+}
+void BMidi::SystemExclusive(void * data, size_t data_len, uint32 time)
+{
+}
+void BMidi::SystemCommon(uchar stat_byte, uchar data1, uchar data2, uint32 time)
+{
+}
+void BMidi::SystemRealTime(uchar stat_byte, uint32 time)
+{
+}
+void BMidi::TempoChange(int32 bpm, uint32 time)
+{
+}
+void BMidi::AllNotesOff(bool just_chan, uint32 time)
+{
+}
 
-void BMidi::NoteOff(uchar, uchar, uchar, uint32) { } 
-void BMidi::NoteOn(uchar, uchar, uchar, uint32) { } 
-void BMidi::KeyPressure(uchar, uchar, uchar, uint32) { }
-void BMidi::ControlChange(uchar, uchar, uchar, uint32) { }
-void BMidi::ProgramChange(uchar, uchar, uint32) { } 
-void BMidi::ChannelPressure(uchar, uchar, uint32) { } 
-void BMidi::PitchBend(uchar, uchar, uchar, uint32) { } 
-void BMidi::SystemExclusive(void*, size_t, uint32) { } 
-void BMidi::SystemCommon(uchar, uchar, uchar, uint32) { }
-void BMidi::SystemRealTime(uchar, uint32) { } 
-void BMidi::TempoChange(int32, uint32) { } 
-void BMidi::AllNotesOff(bool, uint32) { }
-
-//------------------------------------------------------------------------------
-
+//-----------------------------------------------------------------------------
+// Public API Functions
 status_t BMidi::Start()
 {
-	runThread = spawn_thread(
-		RunThread, "BMidi Run Thread",
-		B_REAL_TIME_PRIORITY, (void*) this);
-
-	status_t ret = resume_thread(runThread);
-
-	if (ret == B_OK) 
-	{ 
-		isRunning = true; 
+	fRunTask = spawn_thread(_run_thread_,
+		"BMidi Run Thread", B_REAL_TIME_PRIORITY, (void *)this);
+	fIsRunning = true;
+	status_t ret = resume_thread(fRunTask);
+	if(ret != B_OK)
+	{
+		fIsRunning = false;
 	}
-
-	return ret;
+	return B_OK;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 void BMidi::Stop()
 {
-	status_t exitValue;
-	wait_for_thread(runThread, &exitValue);
-
-	isRunning = false;
+	status_t exit_value;
+	status_t ret;
+	fIsRunning = false;
+	ret = wait_for_thread(fRunTask, &exit_value);
 }
-
-//------------------------------------------------------------------------------
-
+    
 bool BMidi::IsRunning() const
 {
-	return isRunning;
+	thread_info info;
+	get_thread_info(fRunTask,&info);
+	if(find_thread("BMidi Run Thread") == fRunTask)
+		return true;
+return false;
 }
 
-//------------------------------------------------------------------------------
-
-void BMidi::Connect(BMidi* toObject)
+void BMidi::Connect(BMidi *to_object)
 {
-	connections->AddItem(toObject);
+	fConnectionList->AddItem((void *)to_object);
 }
 
-//------------------------------------------------------------------------------
-
-void BMidi::Disconnect(BMidi* fromObject)
+void BMidi::Disconnect(BMidi *from_object)
 {
-	connections->RemoveItem(fromObject);
+	fConnectionList->RemoveItem((void *)from_object);
 }
 
-//------------------------------------------------------------------------------
-
-bool BMidi::IsConnected(BMidi* toObject) const
+bool BMidi::IsConnected(BMidi * to_object) const
 {
-	return connections->HasItem(toObject);
+	return fConnectionList->HasItem((void *)to_object);
 }
 
-//------------------------------------------------------------------------------
-
-BList* BMidi::Connections() const
+BList * BMidi::Connections() const
 {
-	return connections;
+	return fConnectionList;
 }
-
-//------------------------------------------------------------------------------
 
 void BMidi::SnoozeUntil(uint32 time) const
 {
-	snooze_until((uint64) time * 1000, B_SYSTEM_TIMEBASE);
+	snooze_until((uint64)time*1000, B_SYSTEM_TIMEBASE);
 }
 
-//------------------------------------------------------------------------------
+bool BMidi::KeepRunning()
+{
+	return fIsRunning;
+}
+
+void BMidi::Run()
+{
+	while(KeepRunning())
+		snooze(50000);
+}
+
+//-----------------------------------------------------------------------------
+// Spray Functions
+void BMidi::SprayMidiEvent(BMidiEvent *e) const
+{
+//	TRACE(("Hello"))
+	int32 num_connections = fConnectionList->CountItems();
+	BMidi *m;
+	for(int32 i = 0; i < num_connections; i++)
+	{
+		m = (BMidi *)fConnectionList->ItemAt(i);
+		write_port(m->fInflowPort, MSG_CODE_PROCESS_EVENT, e, sizeof(BMidiEvent));
+	}
+}
+
+//----------------------
 
 void BMidi::SprayNoteOff(
 	uchar channel, uchar note, uchar velocity, uint32 time) const
@@ -143,7 +185,7 @@ void BMidi::SprayNoteOff(
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SprayNoteOn(
 	uchar channel, uchar note, uchar velocity, uint32 time) const
@@ -157,7 +199,7 @@ void BMidi::SprayNoteOn(
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SprayKeyPressure(
 	uchar channel, uchar note, uchar pressure, uint32 time) const
@@ -171,7 +213,7 @@ void BMidi::SprayKeyPressure(
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SprayControlChange(
 	uchar channel, uchar controlNumber, uchar controlValue, 
@@ -186,7 +228,7 @@ void BMidi::SprayControlChange(
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SprayProgramChange(
 	uchar channel, uchar programNumber, uint32 time) const
@@ -199,7 +241,7 @@ void BMidi::SprayProgramChange(
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SprayChannelPressure(
 	uchar channel, uchar pressure, uint32 time) const
@@ -212,7 +254,7 @@ void BMidi::SprayChannelPressure(
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SprayPitchBend(
 	uchar channel, uchar lsb, uchar msb, uint32 time) const
@@ -226,22 +268,22 @@ void BMidi::SprayPitchBend(
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SpraySystemExclusive(
-	void* data, size_t dataLength, uint32 time) const
+	void * data, size_t dataLength, uint32 time) const
 {
-	//TODO: Should this data be duplicated!!??
-
+	// Should this data be duplicated!!?? I think Yes.
 	BMidiEvent event;
 	event.time = time;
 	event.opcode = BMidiEvent::OP_SYSTEM_EXCLUSIVE;
-	event.systemExclusive.data = (uint8*) data;
+	event.systemExclusive.data = new uint8[dataLength];
+	memcpy(event.systemExclusive.data, data, dataLength);
 	event.systemExclusive.dataLength = dataLength;
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SpraySystemCommon(
 	uchar status, uchar data1, uchar data2, uint32 time) const
@@ -255,7 +297,7 @@ void BMidi::SpraySystemCommon(
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SpraySystemRealTime(uchar status, uint32 time) const
 {
@@ -266,7 +308,7 @@ void BMidi::SpraySystemRealTime(uchar status, uint32 time) const
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
 void BMidi::SprayTempoChange(int32 beatsPerMinute, uint32 time) const
 {
@@ -277,44 +319,20 @@ void BMidi::SprayTempoChange(int32 beatsPerMinute, uint32 time) const
 	SprayMidiEvent(&event);
 }
 
-//------------------------------------------------------------------------------
-
-bool BMidi::KeepRunning()
-{
-	return isRunning;
-}
-
-//------------------------------------------------------------------------------
-
-void BMidi::_ReservedMidi1() { }
-void BMidi::_ReservedMidi2() { }
-void BMidi::_ReservedMidi3() { }
-
-//------------------------------------------------------------------------------
-
-void BMidi::Run()
-{
-	while (KeepRunning())
-	{
-		snooze(50000);
-	}
-}
-
-//------------------------------------------------------------------------------
-
-void BMidi::Inflow()
+//-----------------------------------------------------------------------------
+// The Inflow Thread
+void BMidi::InflowTask()
 {
 	BMidiEvent event;
 	int32 code;
 	size_t len;
-
-	while (true) 
+	while(true)
 	{
-		len = read_port(inflowPort, &code, &event, sizeof(event));
-	
+		len = read_port(fInflowPort, &code, &event, sizeof(BMidiEvent));
+
 		if (code == MSG_CODE_TERMINATE_THREAD) { return; }
 
-		if (len != sizeof(event)) { continue; }  // ignore errors
+		if (len != sizeof(BMidiEvent)) { continue; }  //ignore errors
 
 		switch (event.opcode) 
 		{
@@ -332,7 +350,7 @@ void BMidi::Inflow()
 				break;
 
 			case BMidiEvent::OP_NOTE_ON:
-				NoteOff(
+				NoteOn(
 					event.noteOn.channel,
 					event.noteOn.note,
 					event.noteOn.velocity,
@@ -409,38 +427,41 @@ void BMidi::Inflow()
 	}
 }
 
-//------------------------------------------------------------------------------
+//----------------------
+//----------------------
+//----------------------
+//----------------------
+//----------------------
+//----------------------
+//----------------------
+//----------------------
 
-void BMidi::SprayMidiEvent(BMidiEvent* event) const
+void BMidi::_ReservedMidi1() {}
+void BMidi::_ReservedMidi2() {}
+void BMidi::_ReservedMidi3() {}
+
+//----------------------
+
+status_t _run_thread_(void *data)
 {
-	TRACE(("[midi] BMidi::SprayMidiEvent, event time = %u, "
-		   "current time = %u\n", event->time, B_NOW))
-
-	int32 count = connections->CountItems();
-
-	for (int32 i = 0; i < count; ++i) 
-	{
-		write_port(
-			((BMidi*) connections->ItemAt(i))->inflowPort, 
-			MSG_CODE_PROCESS_EVENT, event, sizeof(*event));
-	}
-}
-
-//------------------------------------------------------------------------------
-
-int32 BMidi::RunThread(void* data) 
-{
-	((BMidi*) data)->Run(); 
+	((BMidi*)data)->Run();
 	return 0;
 }
 
-//------------------------------------------------------------------------------
+//----------------------
 
-int32 BMidi::InflowThread(void* data) 
+status_t _inflow_task_(void * data)
 {
-	((BMidi*) data)->Inflow();
+	((BMidi*)data)->InflowTask();
 	return 0;
 }
 
-//------------------------------------------------------------------------------
-
+//-----------------------------------------------
+//-----------------------------------------------
+//-----------------------------------------------
+//-----------------------------------------------
+//-----------------------------------------------
+//-----------------------------------------------
+//-----------------------------------------------
+//-----------------------------------------------
+//-----------------------------------------------

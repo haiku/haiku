@@ -6,7 +6,7 @@
 
 //----------------------------------------
 
-#include <MidiPortConsumer.h>
+#include "MidiPortConsumer.h"
 
 //----------------------------------------
 

@@ -140,7 +140,7 @@ return fName;
 void BMidiPort::NoteOff(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	local_source->SprayNoteOff(channel, note, velocity, 0);
+	local_source->SprayNoteOff(channel, note, velocity, time);
 }
 
 //------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ void BMidiPort::NoteOff(
 void BMidiPort::NoteOn(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	local_source->SprayNoteOn(channel, note, velocity, 0);
+	local_source->SprayNoteOn(channel, note, velocity, time);
 }
 
 //------------------------------------------------------------------------------

@@ -18,6 +18,8 @@ BMidiEvent::BMidiEvent()
 
 BMidiEvent::~BMidiEvent() 
 {
+	if (opcode == OP_SYSTEM_EXCLUSIVE)
+		delete systemExclusive.data;
 }
 
 //------------------------------------------------------------------------------

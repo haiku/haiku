@@ -74,8 +74,8 @@ void Activity::Pulse(void)
 void Activity::NoteOn(uchar channel, uchar note,
 	uchar velocity, uint32 time = B_NOW)
 {//This function just update the variable
-	fActivity[channel - 1] = system_time();
-	BMidi::NoteOn(channel, note, velocity, time);
+	fActivity[channel] = system_time();
+	SprayNoteOn(channel, note, velocity, time);
 }
 
 //----------------------------------------------------------
