@@ -1090,8 +1090,11 @@ do_startquery(int argc, char **argv)
 	char *query;
 	int err;
 
+	if (gQueryCookie != NULL)
+		do_stopquery(0, NULL);
+
 	if (argc != 2) {
-		printf("query string expected");
+		printf("query string expected\n");
 		return;
 	}
 	query = argv[1];
@@ -1101,7 +1104,7 @@ do_startquery(int argc, char **argv)
 		printf("could not open query: %s\n", strerror(err));
 		return;
 	} else
-		printf("query started - use the 'stopquery' command to stop it.");
+		printf("query started - use the 'stopquery' command to stop it.\n");
 }
 
 
