@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -16,6 +16,7 @@
 
 #define REAL_MODE_STACK	0x9000
 	// the location of the stack in real mode
+
 #define SAVED_ESP		0x10000
 #define SAVED_CR3		0x10004
 #define SAVED_EAX		0x10008
@@ -56,12 +57,16 @@ _protected_code_segment:
 
 	// turn on paging again
 	movl	SAVED_CR3, %eax	// restore the saved page directory
+	orl		%eax, %eax		// is there a paging directory at all?
+	jz		_no_paging;
+
 	movl	%eax, %cr3
 
 	movl	%cr0, %eax		// set the PG bit (31) to enable paging
 	orl		$0x80000000, %eax
 	movl	%eax, %cr0
 
+_no_paging:
 	// save the return address so that we can pick it up again later
 	movl	(%esp), %eax
 	movl	%eax, REAL_MODE_STACK
