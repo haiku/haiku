@@ -128,9 +128,10 @@ private:
 	bool ShowNextImage(bool next, bool rewind);
 	bool FirstFile();
 	void ConstrainToImage(BPoint &point);
+	void ConstrainToImage(BRect &rect);
 	BBitmap* CopySelection(uchar alpha = 255);
 	bool AddSupportedTypes(BMessage* msg, BBitmap* bitmap);
-	void BeginDrag(BPoint point);
+	void BeginDrag(BPoint sourcePoint);
 	void SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap, translation_format* format);
 	void SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format);
 	bool OutputFormatForType(BBitmap* bitmap, const char* type, translation_format* format);
@@ -166,7 +167,6 @@ private:
 	float fScaleX;
 	float fScaleY;
 	bool fMovesImage;
-	bool fBeginDrag;
 	bool fMakesSelection; // is a selection being made
 	BPoint fFirstPoint;   // first point in image space of selection
 	bool fAnimateSelection; // marching ants

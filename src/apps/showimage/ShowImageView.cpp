@@ -163,7 +163,6 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fVAlignment = B_ALIGN_TOP;
 	fSlideShow = false;
 	SetSlideShowDelay(3); // 3 seconds
-	fBeginDrag = false;
 	fShowCaption = false;
 	fZoom = 1.0;
 	fMovesImage = false;
@@ -628,10 +627,13 @@ ShowImageView::Draw(BRect updateRect)
 void
 ShowImageView::DrawSelectionBox(BRect &rect)
 {
+	BRect r = rect;
+	ConstrainToImage(r);
+
 	PushState();
 	rgb_color white = {255, 255, 255};
 	SetLowColor(white);
-	BRect r(ImageToView(rect));
+	r = ImageToView(r);
 	StrokeLine(BPoint(r.left, r.top), BPoint(r.right, r.top), fPatternLeft);
 	StrokeLine(BPoint(r.right, r.top+1), BPoint(r.right, r.bottom-1), fPatternUp);
 	StrokeLine(BPoint(r.left, r.bottom), BPoint(r.right, r.bottom), fPatternRight);
@@ -649,6 +651,22 @@ void
 ShowImageView::ConstrainToImage(BPoint &point)
 {
 	point.ConstrainTo(fpBitmap->Bounds());
+}
+
+void
+ShowImageView::ConstrainToImage(BRect &rect)
+{
+	BRect bounds = fpBitmap->Bounds();
+	BPoint leftTop, rightBottom;
+	
+	leftTop = rect.LeftTop();
+	leftTop.ConstrainTo(bounds);
+	
+	rightBottom = rect.RightBottom();
+	rightBottom.ConstrainTo(bounds);
+
+	rect.SetLeftTop(leftTop);
+	rect.SetRightBottom(rightBottom);
 }
 
 BBitmap*
@@ -712,14 +730,8 @@ ShowImageView::AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
 }
 
 void
-ShowImageView::BeginDrag(BPoint point)
+ShowImageView::BeginDrag(BPoint sourcePoint)
 {
-	// mouse moved?
-	if (!fBeginDrag) return;
-	point = ViewToImage(point);
-	if (point == fFirstPoint) return;
-	fBeginDrag = false;
-	
 	BBitmap* bitmap = CopySelection(128);
 	if (bitmap == NULL) return;
 
@@ -731,7 +743,7 @@ ShowImageView::BeginDrag(BPoint point)
 	drag.AddInt32("be:actions", B_COPY_TARGET);
 	drag.AddString("be:clip_name", "Bitmap Clip"); 
 	// XXX undocumented fields
-	drag.AddPoint("be:_source_point", fFirstPoint);
+	drag.AddPoint("be:_source_point", sourcePoint);
 	drag.AddRect("be:_frame", fSelectionRect);
 	// XXX meaning unknown???
 	// drag.AddInt32("be:_format", e.g.: B_TGA_FORMAT);
@@ -743,7 +755,7 @@ ShowImageView::BeginDrag(BPoint point)
 		// avoid flickering of dragged bitmap caused by drawing into the window
 		AnimateSelection(false); 
 		// DragMessage takes ownership of bitmap
-		DragMessage(&drag, bitmap, B_OP_ALPHA, fFirstPoint - leftTop);
+		DragMessage(&drag, bitmap, B_OP_ALPHA, sourcePoint - leftTop);
 	}
 }
 
@@ -890,8 +902,37 @@ ShowImageView::MouseDown(BPoint position)
 	
 	if (fbHasSelection && fSelectionRect.Contains(point) &&
 		(buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON))) {
-		// delay drag until mouse is moved
-		fBeginDrag = true; fFirstPoint = point;
+		BPoint sourcePoint = point;
+		BeginDrag(sourcePoint);
+		
+		while (buttons) {
+			// Keep reading mouse movement until
+			// the user lets up on all mouse buttons
+			GetMouse(&point, &buttons);		
+			snooze(50000);
+				// sleep for 50 milliseconds to minimize CPU usage during loop
+		}
+		
+		if (Bounds().Contains(point)) {
+			// If selection stayed inside this view
+			// (Some of the selection may be in the border area, which can be OK)
+			BPoint last, diff;
+			last = ViewToImage(point);
+			diff = last - sourcePoint;	
+			
+			BRect newSelection = fSelectionRect;
+			newSelection.OffsetBy(diff);
+			
+			if (fpBitmap->Bounds().Intersects(newSelection)) {
+				// Do not accept the new selection box location
+				// if it does not intersect with the bitmap rectangle
+				fSelectionRect = newSelection;
+				Invalidate();
+			}
+		}
+		
+		AnimateSelection(true);
+		
 	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		// begin new selection
 		fMakesSelection = true;
@@ -943,8 +984,6 @@ ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *pmsg)
 		UpdateSelectionRect(point, false);
 	} else if (fMovesImage) {
 		MoveImage();
-	} else {
-		BeginDrag(point);
 	}
 }
 
@@ -960,9 +999,6 @@ ShowImageView::MouseUp(BPoint point)
 			fMovesImage = false;
 			Invalidate();
 		}
-	} else {
-		BeginDrag(point);
-		fBeginDrag = false;
 	}
 	AnimateSelection(true);
 }
