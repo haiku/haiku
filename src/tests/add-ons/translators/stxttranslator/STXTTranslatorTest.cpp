@@ -146,8 +146,9 @@ STXTTranslatorTest::IdentifyTest()
 	NextSubTest();
 	memset(&ti, 0, sizeof(translator_info));
 	result = proster->Identify(&wronginput, NULL, &ti);
-	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
-	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
+	CPPUNIT_ASSERT(result == B_OK);
+	CheckTranslatorInfo(&ti, B_TRANSLATOR_TEXT, B_TRANSLATOR_TEXT, 0.4f, 0.36f,
+		"Plain text file", "text/plain");
 	
 	// Identify (wrong magic)
 	NextSubTest();
@@ -156,8 +157,9 @@ STXTTranslatorTest::IdentifyTest()
 		B_READ_ONLY);
 	CPPUNIT_ASSERT(wrongmagic.InitCheck() == B_OK);
 	result = proster->Identify(&wrongmagic, NULL, &ti);
-	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
-	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
+	CPPUNIT_ASSERT(result == B_OK);
+	CheckTranslatorInfo(&ti, B_TRANSLATOR_TEXT, B_TRANSLATOR_TEXT, 0.4f, 0.36f,
+		"Plain text file", "text/plain");
 	
 	// Identify (wrong version)
 	NextSubTest();
@@ -166,8 +168,9 @@ STXTTranslatorTest::IdentifyTest()
 		B_READ_ONLY);
 	CPPUNIT_ASSERT(wrongversion.InitCheck() == B_OK);
 	result = proster->Identify(&wrongversion, NULL, &ti);
-	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
-	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
+	CPPUNIT_ASSERT(result == B_OK);
+	CheckTranslatorInfo(&ti, B_TRANSLATOR_TEXT, B_TRANSLATOR_TEXT, 0.4f, 0.36f,
+		"Plain text file", "text/plain");
 	
 	const char *aPlainFiles[] = {
 		"../src/tests/kits/translation/data/text/ascii.txt",
@@ -300,7 +303,7 @@ STXTTranslatorTest::TranslateTest()
 	BFile wronginput("../src/tests/kits/translation/data/images/image.jpg",
 		B_READ_ONLY);
 	CPPUNIT_ASSERT(wronginput.InitCheck() == B_OK);
-	BFile output("/tmp/stxt_test.out", B_WRITE_ONLY | 
+	BFile output("/tmp/stxt_test.out", B_READ_WRITE | 
 		B_CREATE_FILE | B_ERASE_FILE);
 	CPPUNIT_ASSERT(output.InitCheck() == B_OK);
 	
@@ -316,35 +319,41 @@ STXTTranslatorTest::TranslateTest()
 	NextSubTest();
 	result = proster->Translate(&wronginput, NULL, NULL, &output,
 		B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
-	CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
-	CPPUNIT_ASSERT(filesize == 0);
+	CPPUNIT_ASSERT(result == B_OK);
+	CPPUNIT_ASSERT(CompareStreams(wronginput, output) == true);
 	
 	// Translate (wrong type of input, B_TRANSLATOR_ANY_TYPE output)
 	NextSubTest();
+	CPPUNIT_ASSERT(output.Seek(0, SEEK_SET) == 0);
+	CPPUNIT_ASSERT(output.SetSize(0) == B_OK);
 	result = proster->Translate(&wronginput, NULL, NULL, &output,
 		B_TRANSLATOR_ANY_TYPE);
-	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
-	CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
-	CPPUNIT_ASSERT(filesize == 0);
+	CPPUNIT_ASSERT(result == B_OK);
+	CPPUNIT_ASSERT(CompareStreams(wronginput, output) == true);
 	
-	// Identify (wrong magic)
+	// Translate (wrong magic)
 	NextSubTest();
+	CPPUNIT_ASSERT(output.Seek(0, SEEK_SET) == 0);
+	CPPUNIT_ASSERT(output.SetSize(0) == B_OK);
 	BFile wrongmagic("../src/tests/kits/translation/data/text/wrong_magic.stxt",
 		B_READ_ONLY);
 	CPPUNIT_ASSERT(wrongmagic.InitCheck() == B_OK);
 	result = proster->Translate(&wrongmagic, NULL, NULL, &output,
 		B_TRANSLATOR_ANY_TYPE);
-	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(result == B_OK);
+	CPPUNIT_ASSERT(CompareStreams(wrongmagic, output) == true);
 	
-	// Identify (wrong version)
+	// Translate (wrong version)
 	NextSubTest();
+	CPPUNIT_ASSERT(output.Seek(0, SEEK_SET) == 0);
+	CPPUNIT_ASSERT(output.SetSize(0) == B_OK);
 	BFile wrongversion("../src/tests/kits/translation/data/text/wrong_version.stxt",
 		B_READ_ONLY);
 	CPPUNIT_ASSERT(wrongversion.InitCheck() == B_OK);
 	result = proster->Translate(&wrongversion, NULL, NULL, &output,
 		B_TRANSLATOR_ANY_TYPE);
-	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(result == B_OK);
+	CPPUNIT_ASSERT(CompareStreams(wrongversion, output) == true);
 	
 	// Translate various data
 	const char *aPlainTextFiles[] = {
