@@ -8,6 +8,7 @@ KernelMergeObject posix_string.o :
 	memcpy.c
 	memmove.c
 	memset.c
+	stpcpy.c
 	strcasecmp.c
 	strcasestr.c
 	strcat.c
