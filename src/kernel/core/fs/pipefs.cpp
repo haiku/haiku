@@ -1,5 +1,5 @@
-/* 
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -433,7 +433,7 @@ Volume::RemoveNode(Inode *directory, const char *name)
 		goto err;
 
 	RemoveNode(inode);
-	notify_listener(B_ENTRY_REMOVED, ID(), directory->ID(), 0, inode->ID(), name);
+	notify_entry_removed(ID(), directory->ID(), name, inode->ID());
 
 	// schedule this vnode to be removed when it's ref goes to zero
 	remove_vnode(ID(), inode->ID());
@@ -1101,7 +1101,7 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, 
 	*_newVnodeID = inode->ID();
 
 	if (wasCreated)
-		notify_listener(B_ENTRY_CREATED, volume->ID(), directory->ID(), 0, inode->ID(), name);
+		notify_entry_created(volume->ID(), directory->ID(), name, inode->ID());
 
 	return B_OK;
 
@@ -1512,29 +1512,29 @@ pipefs_write_stat(fs_volume _volume, fs_vnode _node, const struct stat *stat, ui
 	TRACE(("pipefs_write_stat: vnode %p (0x%Lx), stat %p\n", inode, inode->ID(), stat));
 
 	// we cannot change the size of anything
-	if (statMask & FS_WRITE_STAT_SIZE)
+	if (statMask & B_STAT_SIZE)
 		return B_BAD_VALUE;
 
 	volume->Lock();
 		// the inode's locks don't exist for the root node
 		// (but would be more appropriate to use here)
 
-	if (statMask & FS_WRITE_STAT_MODE)
+	if (statMask & B_STAT_MODE)
 		inode->SetMode(stat->st_mode);
 
-	if (statMask & FS_WRITE_STAT_UID)
+	if (statMask & B_STAT_UID)
 		inode->SetUserID(stat->st_uid);
-	if (statMask & FS_WRITE_STAT_GID)
+	if (statMask & B_STAT_GID)
 		inode->SetGroupID(stat->st_gid);
 
-	if (statMask & FS_WRITE_STAT_MTIME)
+	if (statMask & B_STAT_MODIFICATION_TIME)
 		inode->SetModificationTime(stat->st_mtime);
-	if (statMask & FS_WRITE_STAT_CRTIME) 
+	if (statMask & B_STAT_CREATION_TIME) 
 		inode->SetCreationTime(stat->st_crtime);
 
 	volume->Unlock();
 
-	notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
+	notify_stat_changed(volume->ID(), inode->ID(), statMask);
 	return B_OK;
 }
 
