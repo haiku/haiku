@@ -45,7 +45,7 @@ oggReader::Copyright()
 status_t
 oggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 {
-	TRACE("oggReader::GetPage\n");
+//	TRACE("oggReader::GetPage\n");
 	int result = ogg_sync_pageout(&fSync,page); // first read leftovers
 	while (result == 0) {
 		char * buffer = ogg_sync_buffer(&fSync,read_size);
@@ -342,7 +342,7 @@ oggReader::GetNextChunk(void *cookie,
 						void **chunkBuffer, int32 *chunkSize,
 						media_header *mediaHeader)
 {
-	TRACE("oggReader::GetNextChunk\n");
+//	TRACE("oggReader::GetNextChunk\n");
 	if (fSeekable && (fSeekable->Seek(0,SEEK_CUR) < fPostSniffPosition)) {
 		fSeekable->Seek(fPostSniffPosition,SEEK_SET);
 	}	

@@ -151,7 +151,7 @@ status_t
 vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
-	TRACE("vorbisDecoder::Decode\n");
+//	TRACE("vorbisDecoder::Decode\n");
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
 	
