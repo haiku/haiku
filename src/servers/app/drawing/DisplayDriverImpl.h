@@ -297,12 +297,21 @@ class DisplayDriverImpl : public DisplayDriver {
 	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
 	virtual void				Unlock();
 
+	// display mode access
+	virtual void				SetMode(const display_mode &mode);
+	virtual	void				GetMode(display_mode *mode);
+	virtual	const display_mode*	DisplayMode();
+	
 	virtual bool				DumpToFile(const char *path);
 	virtual ServerBitmap*		DumpToBitmap();
 
 	virtual void				StrokeLineArray(const int32 &numlines,
 												const LineArrayData *data,
 												const DrawData *d);
+
+	virtual status_t			SetDPMSMode(const uint32 &state);
+	virtual uint32				DPMSMode();
+	virtual uint32				DPMSCapabilities();
 
 	virtual status_t			GetDeviceInfo(accelerant_device_info *info);
 
@@ -421,6 +430,10 @@ friend class WinBorder;
  protected:
 			BLocker				fLocker;
 			CursorHandler		fCursorHandler;
+
+			display_mode		fDisplayMode;
+			uint32				fDPMSState;
+			uint32				fDPMSCaps;
 };
 
 #endif

@@ -64,12 +64,11 @@ DisplayDriverPainter::~DisplayDriverPainter()
 bool
 DisplayDriverPainter::Initialize()
 {
-	if (DisplayDriver::Initialize()) {
-		status_t err = fGraphicsCard->Initialize();
-		if (err < B_OK)
-			fprintf(stderr, "HWInterface::Initialize() failed: %s\n", strerror(err));
-		return err >= B_OK;
-	}
+	status_t err = fGraphicsCard->Initialize();
+	if (err < B_OK)
+		fprintf(stderr, "HWInterface::Initialize() failed: %s\n", strerror(err));
+	if (err >= B_OK)
+		return DisplayDriver::Initialize();
 	return false;
 }
 
@@ -872,7 +871,6 @@ DisplayDriverPainter::SetMode(const display_mode &mode)
 {
 	if (Lock() && fGraphicsCard->SetMode(mode) >= B_OK) {
 		fPainter->AttachToBuffer(fGraphicsCard->BackBuffer());
-		DisplayDriver::SetMode(mode);
 		Unlock();
 	} else {
 		fprintf(stderr, "DisplayDriverPainter::SetMode() - unsupported mode!\n");

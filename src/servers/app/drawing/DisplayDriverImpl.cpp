@@ -52,8 +52,13 @@ static Blitter blitter;
 DisplayDriverImpl::DisplayDriverImpl()
 	: DisplayDriver(),
 	  fLocker("DisplayDriver lock"),
-	  fCursorHandler(this)
+	  fCursorHandler(this),
+	  fDPMSState(B_DPMS_ON),
+	  fDPMSCaps(B_DPMS_ON)
 {
+	fDisplayMode.virtual_width = 640;
+	fDisplayMode.virtual_height = 480;
+	fDisplayMode.space = B_RGBA32;
 }
 
 
@@ -2419,6 +2424,86 @@ void
 DisplayDriverImpl::Unlock()
 {
 	fLocker.Unlock();
+}
+
+// Protected Internal Functions
+/*
+	\brief Sets the screen mode to specified resolution and color depth.
+	\param mode Data structure as defined in Screen.h
+	
+	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
+	to update the state variables kept internally by the DisplayDriver class.
+*/
+void
+DisplayDriverImpl::SetMode(const display_mode &mode)
+{
+	fDisplayMode = mode;
+}
+
+// GetMode
+void
+DisplayDriverImpl::GetMode(display_mode *mode)
+{
+	if (!mode)
+		return;
+	
+	Lock();
+	*mode = fDisplayMode;
+	Unlock();
+}
+
+// DisplayMode
+const display_mode*
+DisplayDriverImpl::DisplayMode()
+{
+	const display_mode* mode = NULL;
+	Lock();
+	mode = &fDisplayMode;
+	Unlock();
+	return mode;
+}
+
+/*!
+	\brief Sets the driver's Display Power Management System state
+	\param state The state which the driver should enter
+	\return B_OK if successful, B_ERROR for failure
+	
+	This function will fail if the driver's rendering context does not support a 
+	particular DPMS state. Use DPMSCapabilities to find out the supported states.
+	The default implementation supports only B_DPMS_ON.
+*/
+status_t
+DisplayDriverImpl::SetDPMSMode(const uint32 &state)
+{
+	if (state != B_DPMS_ON)
+		return B_ERROR;
+
+	fDPMSState = state;
+
+	return B_OK;
+}
+
+/*!
+	\brief Returns the driver's current DPMS state
+	\return The driver's current DPMS state
+*/
+uint32
+DisplayDriverImpl::DPMSMode()
+{
+	return fDPMSState;
+}
+
+/*!
+	\brief Returns the driver's DPMS capabilities
+	\return The driver's DPMS capabilities
+	
+	The capabilities are the modes supported by the driver. The default implementation 
+	allows only B_DPMS_ON. Other possible states are B_DPMS_STANDBY, SUSPEND, and OFF.
+*/
+uint32
+DisplayDriverImpl::DPMSCapabilities()
+{
+	return fDPMSCaps;
 }
 
 /*!
