@@ -7,7 +7,7 @@
 
 
 #include <SupportDefs.h>
-#include <list.h>
+#include <util/list.h>
 
 
 struct stage2_args;
