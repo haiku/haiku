@@ -2,6 +2,7 @@ SubDir OBOS_TOP src tests servers app painter ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders [ FDirName servers app ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter font_support ] ;
@@ -45,6 +46,7 @@ SEARCH on [ FGristFiles
 	= [ FDirName $(OBOS_TOP) src servers app ] ;
 
 SEARCH on [ FGristFiles
+	BitmapBuffer.cpp
 	PatternHandler.cpp
 	]
 	= [ FDirName $(OBOS_TOP) src servers app drawing ] ;
