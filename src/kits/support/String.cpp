@@ -474,7 +474,7 @@ BString::RemoveLast(const char *str)
 {
 	if (str) {
 		int32 len = strlen(str);
-		int32 pos = _FindBefore(str, len, -1);
+		int32 pos = _FindBefore(str, Length(), -1);
 		if (pos >= 0)
 			_ShrinkAtBy(pos, len);
 	}
@@ -510,9 +510,11 @@ BString::RemoveSet(const char *setOfCharsToRemove)
 BString&
 BString::MoveInto(BString &into, int32 from, int32 length)
 {
-	int32 len = min(Length() - from, length);
-	into.SetTo(String() + from, len);
-	_privateData = _ShrinkAtBy(from, len);
+	int32 len = Length() - from;
+	len = min(len, length);
+	into.SetTo(String() + from, length);
+	if (from + length <= Length())
+		_privateData = _ShrinkAtBy(from, len);
 
 	return *this;
 }
@@ -521,73 +523,105 @@ BString::MoveInto(BString &into, int32 from, int32 length)
 void
 BString::MoveInto(char *into, int32 from, int32 length)
 {
-	//TODO: Test
-	if (into && (from + length <= Length())) {
+	if (into) {
 		memcpy(into, String() + from, length);
-		_privateData = _ShrinkAtBy(from, length);
+		if (from + length <= Length())
+			_privateData = _ShrinkAtBy(from, length);
 		into[length] = '\0';
 	}		 
 }
 
 
 /*---- Compare functions ---------------------------------------------------*/
+bool
+BString::operator<(const char *string) const
+{
+	return strcmp(String(), string) < 0;
+}
 
-// These are implemented inline in the header file
+
+bool
+BString::operator<=(const char *string) const
+{
+	return strcmp(String(), string) <= 0;
+}
+
+
+bool
+BString::operator==(const char *string) const
+{
+	return strcmp(String(), string) == 0;
+}
+
+
+bool
+BString::operator>=(const char *string) const
+{
+	return strcmp(String(), string) >= 0;
+}
+
+
+bool
+BString::operator>(const char *string) const
+{
+	return strcmp(String(), string) > 0;
+}
+
 
 /*---- strcmp-style compare functions --------------------------------------*/
 int
 BString::Compare(const BString &string) const
 {
-	return strcmp(_privateData, string.String());
+	return strcmp(String(), string.String());
 }
 
 
 int
 BString::Compare(const char *string) const
 {
-	return strcmp(_privateData, string);
+	return strcmp(String(), string);
 }
 
 
 int
 BString::Compare(const BString &string, int32 n) const
 {
-	return strncmp(_privateData, string.String(), n);
+	return strncmp(String(), string.String(), n);
 }
 
 
 int
 BString::Compare(const char *string, int32 n) const
 {
-	return strncmp(_privateData, string, n);
+	return strncmp(String(), string, n);
 }
 
 
 int
 BString::ICompare(const BString &string) const
 {
-	return strcasecmp(_privateData, string.String());
+	return strcasecmp(String(), string.String());
 }
 
 
 int
 BString::ICompare(const char *str) const
 {
-	return strcasecmp(_privateData, str);
+	return strcasecmp(String(), str);
 }
 
 
 int
 BString::ICompare(const BString &string, int32 n) const
 {
-	return strncasecmp(_privateData, string.String(), n);
+	return strncasecmp(String(), string.String(), n);
 }
 
 
 int
 BString::ICompare(const char *str, int32 n) const
 {
-	return strncasecmp(_privateData, str, n);
+	return strncasecmp(String(), str, n);
 }
 
 
