@@ -141,7 +141,7 @@ static char *decode_class(uint8 base, uint8 sub_class)
 
 static void show_pci_details(struct pci_info *p, pci_module_info *pcim)
 {
-#ifdef THE_FULL_MONTY
+#if THE_FULL_MONTY
 	uint16 ss_vend, ss_dev;
 #endif
 	uint8 irq = 0;
