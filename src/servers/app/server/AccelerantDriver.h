@@ -115,7 +115,7 @@ protected:
 	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
 	void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
 	void Line(BPoint start, BPoint end, LayerData *d, int8 *pat);
-	void HLine(int32 x1, int32 x2, int32 y, RGBColor color);
+	void HLine(int32 x1, int32 x2, int32 y, RGBColor col);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
 	void SetPixel(int x, int y, RGBColor col);
 	void SetPixel32(int x, int y, rgb_color col);

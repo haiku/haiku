@@ -182,7 +182,7 @@ bool AccelerantDriver::Initialize(void)
 */
 void AccelerantDriver::Shutdown(void)
 {
-  uninit_accelerant UninitAccelerant = (uninit_accelerant)(*accelerant_hook)(B_UNINIT_ACCELERANT,NULL);
+  uninit_accelerant UninitAccelerant = (uninit_accelerant)accelerant_hook(B_UNINIT_ACCELERANT,NULL);
   if ( UninitAccelerant )
     UninitAccelerant();
   if (accelerant_image >= 0)
@@ -299,7 +299,6 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 {
 /* Need to add check for possible hardware acceleration of this */
-/* Probably need to verify that rectangle is in bounds */
 /* Need to deal with pattern */
 	_Lock();
 
@@ -470,6 +469,57 @@ void AccelerantDriver::SetCursor(ServerCursor *cursor)
 */
 void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 {
+/* Need to add bounds checking code */
+/* Probably should check to make sure that we have at least 4 points */
+	double Ax, Bx, Cx, Dx;
+	double Ay, By, Cy, Dy;
+	int x, y;
+	int lastx=-1, lasty=-1;
+	double t;
+	double dt = .001;
+	double dt2, dt3;
+	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
+
+	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
+	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
+	Cx = -3*pts[0].x + 3*pts[1].x;
+	Dx = pts[0].x;
+
+	Ay = -pts[0].y + 3*pts[1].y - 3*pts[2].y + pts[3].y;
+	By = 3*pts[0].y - 6*pts[1].y + 3*pts[2].y;
+	Cy = -3*pts[0].y + 3*pts[1].y;
+	Dy = pts[0].y;
+	
+	dt2 = dt * dt;
+	dt3 = dt2 * dt;
+	X = Dx;
+	dx = Ax*dt3 + Bx*dt2 + Cx*dt;
+	ddx = 6*Ax*dt3 + 2*Bx*dt2;
+	dddx = 6*Ax*dt3;
+	Y = Dy;
+	dy = Ay*dt3 + By*dt2 + Cy*dt;
+	ddy = 6*Ay*dt3 + 2*By*dt2;
+	dddy = 6*Ay*dt3;
+
+	lastx = -1;
+	lasty = -1;
+
+	for (t=0; t<=1; t+=dt)
+	{
+		x = ROUND(X);
+		y = ROUND(Y);
+		if ( (x!=lastx) || (y!=lasty) )
+			SetThickPixel(x,y,d->pensize,d->highcolor);
+		lastx = x;
+		lasty = y;
+
+		X += dx;
+		dx += ddx;
+		ddx += dddx;
+		Y += dy;
+		dy += ddy;
+		ddy += dddy;
+	}
 }
 
 /*!
@@ -497,6 +547,33 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 {
+	_Lock();
+	int x1 = ROUND(start.x);
+	int y1 = ROUND(start.y);
+	int x2 = ROUND(end.x);
+	int y2 = ROUND(end.y);
+	int dx = x2 - x1;
+	int dy = y2 - y1;
+	int steps, k;
+	double xInc, yInc;
+	double x = x1;
+	double y = y1;
+
+	if ( abs(dx) > abs(dy) )
+		steps = abs(dx);
+	else
+		steps = abs(dy);
+	xInc = dx / (double) steps;
+	yInc = dy / (double) steps;
+
+	SetPixel(ROUND(x),ROUND(y),d->highcolor);
+	for (k=0; k<steps; k++)
+	{
+		x += xInc;
+		y += yInc;
+		SetPixel(ROUND(x),ROUND(y),d->highcolor);
+	}
+	_Unlock();
 }
 
 /*!
@@ -703,3 +780,107 @@ void AccelerantDriver::GetTruncatedStrings( const char **instrings, int32 string
 {
 }
 
+void AccelerantDriver::SetPixel(int x, int y, RGBColor col)
+{
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+			{
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				rgb_color color = col.GetColor32();
+				fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
+
+void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
+{
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+			{
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				int i,j;
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + (y-thick/2)*mFrameBufferConfig.bytes_per_row) + x-thick/2;
+				rgb_color color = col.GetColor32();
+				uint32 drawcolor = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+				for (i=0; i<thick; i++)
+				{
+					for (j=0; j<thick; j++)
+					{
+						fb[j] = drawcolor;
+					}
+					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
+
+void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor col)
+{
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+			{
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				rgb_color color = col.GetColor32();
+				uint32 drawcolor = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+				int x;
+				if ( x1 > x2 )
+				{
+					x = x2;
+					x2 = x1;
+					x1 = x;
+				}
+				for (x=x1; x<x2; x++)
+					fb[x] = drawcolor;
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
