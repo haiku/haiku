@@ -12,6 +12,8 @@ void CopySamples(float *_dst, int32 _dst_sample_offset,
 				 const float *_src, int32 _src_sample_offset,
 				 int32 _sample_count);
 
+int bytes_per_sample(const media_multi_audio_format & format);
+
 int bytes_per_frame(const media_multi_audio_format & format);
 int frames_per_buffer(const media_multi_audio_format & format);
 

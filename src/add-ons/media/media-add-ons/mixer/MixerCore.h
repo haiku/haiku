@@ -6,6 +6,7 @@
 class AudioMixer;
 class MixerInput;
 class MixerOutput;
+class Resampler;
 
 class MixerCore
 {
@@ -54,7 +55,9 @@ private:
 	MixerOutput	*fOutput;
 	int32		fNextInputID;
 	bool		fRunning;
-	
+
+	Resampler		**fResampler; // array
+
 	float		*fMixBuffer;
 	int32		fMixBufferFrameRate;
 	int32		fMixBufferFrameCount;

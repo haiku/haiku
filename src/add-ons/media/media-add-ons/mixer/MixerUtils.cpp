@@ -174,6 +174,12 @@ duration_for_frames(double framerate, int64 frames)
 }
 
 int
+bytes_per_sample(const media_multi_audio_format & format)
+{
+	return format.format & 0xf;
+}
+
+int
 bytes_per_frame(const media_multi_audio_format & format)
 {
 	return format.channel_count * (format.format & 0xf);

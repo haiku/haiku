@@ -9,6 +9,7 @@
 #include "MixerOutput.h"
 #include "MixerUtils.h"
 #include "AudioMixer.h"
+#include "Resampler.h"
 #include "Debug.h"
 
 #define DOUBLE_RATE_MIXING 	1
@@ -34,6 +35,7 @@ MixerCore::MixerCore(AudioMixer *node)
 	fOutput(0),
 	fNextInputID(1),
 	fRunning(false),
+	fResampler(0),
 	fMixBuffer(0),
 	fMixBufferFrameRate(0),
 	fMixBufferFrameCount(0),
@@ -63,6 +65,13 @@ MixerCore::~MixerCore()
 	if (fTimeSource)
 		fTimeSource->Release();
 
+	// delete resamplers
+	if (fResampler) {
+		for (int i = 0; i < fMixBufferChannelCount; i++)
+			delete fResampler[i];
+		delete [] fResampler;
+	}
+	
 	delete fMixBufferChannelTypes;
 }
 
@@ -158,7 +167,7 @@ void
 MixerCore::OutputFormatChanged(const media_multi_audio_format &format)
 {
 	ASSERT_LOCKED();
-
+	
 	if (fMixBuffer)
 		rtm_free(fMixBuffer);
 		
@@ -177,6 +186,18 @@ MixerCore::OutputFormatChanged(const media_multi_audio_format &format)
 		 fMixBufferChannelTypes[i] = ChannelMaskToChannelType(GetChannelMask(i, format.channel_mask));
 
 	fMixBuffer = (float *)rtm_alloc(NULL, sizeof(float) * fMixBufferFrameCount * fMixBufferChannelCount);
+	ASSERT(fMixBuffer);
+
+	// delete resamplers
+	if (fResampler) {
+		for (int i = 0; i < fMixBufferChannelCount; i++)
+			delete fResampler[i];
+		delete [] fResampler;
+	}
+	// create new resamplers
+	fResampler = new Resampler * [fMixBufferChannelCount];
+	for (int i = 0; i < fMixBufferChannelCount; i++)
+		fResampler[i] = new Resampler(media_raw_audio_format::B_AUDIO_FLOAT, format.format);
 	
 	printf("MixerCore::OutputFormatChanged:\n");
 	printf("  fMixBufferFrameRate %ld\n", fMixBufferFrameRate);
@@ -321,12 +342,26 @@ MixerCore::MixThread()
 
 		printf("create new buffer event at %Ld, reading input frames at %Ld\n", event_time, frame_base + frame_pos);
 
+		for (int i = 0; i < fMixBufferChannelCount; i++) {
+			for (int j = 0; j < fMixBufferFrameCount; j++) {
+				fMixBuffer[(i * fMixBufferChannelCount)+j] = (i*j) / (float)(fMixBufferChannelCount * fMixBufferFrameCount);
+			}
+		}
 		
 		// request a buffer
 		BBuffer* buf = fBufferGroup->RequestBuffer(fOutput->MediaOutput().format.u.raw_audio.buffer_size, 10000);
 		if (buf) {
 		
 			// copy data from mix buffer into output buffer
+			for (int i = 0; i < fMixBufferChannelCount; i++) {
+				fResampler[i]->Resample(reinterpret_cast<char *>(fMixBuffer) + i *  sizeof(float),
+										fMixBufferChannelCount * sizeof(float),
+										fMixBufferFrameCount,
+										reinterpret_cast<char *>(buf->Data()) + (i * bytes_per_sample(fOutput->MediaOutput().format.u.raw_audio)),
+										bytes_per_frame(fOutput->MediaOutput().format.u.raw_audio),
+										frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio),
+										1.0);
+			}
 
 			// fill in the buffer header
 			media_header* hdr = buf->Header();

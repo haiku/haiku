@@ -121,16 +121,16 @@ MixerInput::BufferReceived(BBuffer *buffer)
 			   in_frames, out_frames, in_frames1, out_frames1, in_frames2, out_frames2);
 		
 		for (int i = 0; i < fInputChannelCount; i++) {
-			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_frame(fInput.format.u.raw_audio),
-									fInputChannelCount * bytes_per_frame(fInput.format.u.raw_audio),
+			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio),
+									bytes_per_frame(fInput.format.u.raw_audio),
 									in_frames1,
 									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base) + (offset * sizeof(float) * fInputChannelCount),
 									fInputChannelCount * sizeof(float),
 									out_frames1,
 									fInputChannelInfo[i].gain);
 									
-			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_frame(fInput.format.u.raw_audio),
-									fInputChannelCount * bytes_per_frame(fInput.format.u.raw_audio),
+			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio),
+									bytes_per_frame(fInput.format.u.raw_audio),
 									in_frames2,
 									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base),
 									fInputChannelCount * sizeof(float),
@@ -142,8 +142,8 @@ MixerInput::BufferReceived(BBuffer *buffer)
 		printf("  in_frames %5d, out_frames %5d\n", in_frames, out_frames);
 
 		for (int i = 0; i < fInputChannelCount; i++) {
-			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_frame(fInput.format.u.raw_audio),
-									fInputChannelCount * bytes_per_frame(fInput.format.u.raw_audio),
+			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio),
+									bytes_per_frame(fInput.format.u.raw_audio),
 									in_frames,
 									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base) + (offset * sizeof(float) * fInputChannelCount),
 									fInputChannelCount * sizeof(float),
