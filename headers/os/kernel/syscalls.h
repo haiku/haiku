@@ -31,7 +31,7 @@ int     sys_fsync(int fd);
 ssize_t sys_read(int fd, void *buf, off_t pos, size_t len);
 ssize_t sys_write(int fd, const void *buf, off_t pos, size_t len);
 int     sys_seek(int fd, off_t pos, int seek_type);
-int     sys_ioctl(int fd, ulong op, void *buf);
+int     sys_ioctl(int fd, ulong op, void *buf, size_t length);
 int     sys_create(const char *path, stream_type stream_type);
 int     sys_unlink(const char *path);
 int     sys_rename(const char *oldpath, const char *newpath);
