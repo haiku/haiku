@@ -68,7 +68,8 @@ public:
 	FontStyle *GetStyle(const char *family, const char *face);
 	FontStyle *GetStyle(const char *family, uint16 id) const;
 	FontStyle *GetStyle(const uint16 &familyid, const uint16 &styleid);
-	FontFamily *GetFamily(const uint16 &familyid);
+	FontFamily *GetFamily(const uint16 &familyid) const;
+	FontFamily *GetFamily(const char *name) const;
 	
 	ServerFont *GetSystemPlain(void);
 	ServerFont *GetSystemBold(void);
@@ -84,7 +85,6 @@ public:
 	*/
 	void FontsUpdated(void) { need_update=false; }
 protected:
-	FontFamily *_FindFamily(const char *name) const;
 	uint16 TranslateStyleToFace(const char *name) const;
 	
 	FT_CharMap _GetSupportedCharmap(const FT_Face &face);

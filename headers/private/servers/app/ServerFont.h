@@ -47,7 +47,7 @@ public:
 	float Shear(void) const { return fshear; }
 	float Rotation(void) const { return frotation; }
 	float Size(void) const { return fsize; }
-	uint32 Face(void) const { return fface; }
+	uint16 Face(void) const { return fface; }
 	uint32 CountGlyphs(void);
 	int32 CountTuned(void);
 	font_file_format FileFormat(void);
@@ -73,6 +73,8 @@ public:
 	const char *GetStyle(void) const;
 	const char *GetFamily(void) const;
 	const char *GetPath(void) const { return fstyle->GetPath(); }
+	uint16 StyleID(void) const { return fstyle->GetID(); }
+	uint16 FamilyID(void) const { return fstyle->Family()->GetID(); }
 
 	BRect BoundingBox(void);
 	void Height(font_height *fh);
@@ -88,7 +90,7 @@ protected:
 	BRect fbounds;
 	uint32 fflags;
 	uint32 fspacing;
-	uint32 fface;
+	uint16 fface;
 	font_direction fdirection;
 	uint8 ftruncate;
 	uint32 fencoding;

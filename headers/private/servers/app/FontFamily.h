@@ -62,6 +62,21 @@ typedef struct CachedFaceRec_
 } CachedFaceRec, *CachedFace;
 
 /*!
+	\brief Private structure to store font height values
+	
+	Units provided by FT2 are in font units, so they are stored in the style as
+	such. Each value must be multiplied by the point size to determine size in pixels
+	
+*/
+typedef struct
+{
+	FT_Short ascent;
+	FT_Short descent;
+	FT_Short leading;
+	FT_UShort units_per_em;
+} FontStyleHeight;
+
+/*!
 	\class FontStyle FontFamily.h
 	\brief Object used to represent a font style
 	
@@ -124,6 +139,7 @@ public:
 	uint16 GetFace(void) const { return fFace; }
 
 	const char *GetPath(void);
+	font_height GetHeight(const float &size);
 
 	// TODO: Re-enable when I understand how the FT2 Cache system changed from
 	// 2.1.4 to 2.1.8
@@ -142,6 +158,7 @@ protected:
 	BRect fbounds;
 	uint16 fID;
 	uint16 fFace;
+	FontStyleHeight fHeight;
 };
 
 /*!
