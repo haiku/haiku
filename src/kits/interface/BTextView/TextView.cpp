@@ -177,6 +177,8 @@ sPropertyList[] = {
 };
 
 
+/*! \brief Creates a BTextView object with the given charachteristics.
+*/
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 					 uint32 resizeMask, uint32 flags)
 	:	BView(frame, name, resizeMask,
@@ -187,6 +189,8 @@ BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 }
 
 
+/*! \brief Creates a BTextView object with the given charachteristics.
+*/
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 					 const BFont *initialFont, const rgb_color *initialColor,
 					 uint32 resizeMask, uint32 flags)
@@ -266,12 +270,14 @@ BTextView::BTextView(BMessage *archive)
 	}
 	
 	ssize_t runSize = 0;
-	const void *flattenedRunArray = NULL;
-	if (archive->FindData("_runs", B_RAW_TYPE, &flattenedRunArray, &runSize) == B_OK) {
+	const void *flattenedRun = NULL;
+	if (archive->FindData("_runs", B_RAW_TYPE, &flattenedRun, &runSize) == B_OK) {
 		
-		text_run_array *runArray = UnflattenRunArray(runArray, (int32 *)&runSize);
-		SetRunArray(0, TextLength(), runArray);
-		free(runArray);
+		text_run_array *runArray = UnflattenRunArray(flattenedRun, (int32 *)&runSize);
+		if (runArray) {
+			SetRunArray(0, TextLength(), runArray);
+			free(runArray);
+		}
 	}
 	
 }
@@ -4290,7 +4296,7 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	if (fInline->IsActive()) {
 		int32 oldOffset = fInline->Offset();
 		DeleteText(oldOffset, oldOffset + fInline->Length());
-		fSelStart = fSelEnd = oldOffset;
+		fClickOffset = fSelStart = fSelEnd = oldOffset;
 	}
 	
 	int32 stringLen = strlen(string);
