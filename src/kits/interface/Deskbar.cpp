@@ -347,4 +347,3 @@ status_t BDeskbar::RemoveItem(const char *name)
  * $Id  $
  *
  */
- 

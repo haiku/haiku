@@ -1,5 +1,5 @@
 //
-//  $Id: MessageQueue.cpp,v 1.1 2002/07/09 12:24:49 ejakowatz Exp $
+//  $Id: MessageQueue.cpp,v 1.2 2002/09/28 09:49:34 shatty Exp $
 //
 //  This file contains the implementation of the BMessageQueue class
 //  for the OpenBeOS project.
