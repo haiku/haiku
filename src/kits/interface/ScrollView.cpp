@@ -15,7 +15,7 @@ static const float kPlainBorderSize = 1;
 BScrollView::BScrollView(const char *name, BView *target, uint32 resizeMask,
 	uint32 flags, bool horizontal, bool vertical, border_style border)
 	: BView(CalcFrame(target, horizontal, vertical, border), name,
-		flags | (border != B_NO_BORDER ? B_WILL_DRAW : 0), resizeMask),
+		ModFlags(flags, border), resizeMask),
 	fTarget(target),
 	fHorizontalScrollBar(NULL),
 	fVerticalScrollBar(NULL),
@@ -33,12 +33,11 @@ BScrollView::BScrollView(const char *name, BView *target, uint32 resizeMask,
 	AddChild(fTarget);
 
 	BRect frame = fTarget->Frame();
-	// ToDo: find out the original scroll bar names
 	if (horizontal) {
 		BRect rect = frame;
 		rect.top = rect.bottom + 1;
 		rect.bottom += B_H_SCROLL_BAR_HEIGHT + 1;
-		fHorizontalScrollBar = new BScrollBar(rect, "horizontal", fTarget, 0, 100, B_HORIZONTAL);
+		fHorizontalScrollBar = new BScrollBar(rect, "_HSB_", fTarget, 0, 1000, B_HORIZONTAL);
 		AddChild(fHorizontalScrollBar);
 	}
 
@@ -46,7 +45,7 @@ BScrollView::BScrollView(const char *name, BView *target, uint32 resizeMask,
 		BRect rect = frame;
 		rect.left = rect.right + 1;
 		rect.right += B_V_SCROLL_BAR_WIDTH + 1;
-		fVerticalScrollBar = new BScrollBar(rect, "vertical", fTarget, 0, 100, B_VERTICAL);
+		fVerticalScrollBar = new BScrollBar(rect, "_VSB_", fTarget, 0, 1000, B_VERTICAL);
 		AddChild(fVerticalScrollBar);
 	}
 
@@ -240,6 +239,10 @@ void
 BScrollView::FrameResized(float width, float height)
 {
 	BView::FrameResized(width, height);
+
+	// ToDo: what are fPreviousWidth/fPreviousHeight used for?
+	//		I would guess there could be some problems with resizing,
+	//		but I haven't investigated it yet.
 }
 
 
@@ -264,6 +267,58 @@ BScrollView::GetPreferredSize(float *_width, float *_height)
 		*_width = frame.Width();
 	if (_height)
 		*_height = frame.Height();
+}
+
+
+
+
+/** This static method is used to calculate the frame that the
+ *	ScrollView will cover depending on the frame of its target
+ *	and which border style is used.
+ *	It is used in the constructor and at other places.
+ */
+
+BRect
+BScrollView::CalcFrame(BView *target, bool horizontal, bool vertical, border_style border)
+{
+	BRect frame = target->Frame();
+	if (vertical)
+		frame.right += B_V_SCROLL_BAR_WIDTH;
+	if (horizontal)
+		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
+
+	float borderSize = 0;
+	if (border == B_PLAIN_BORDER)
+		borderSize = kPlainBorderSize;
+	else if (border == B_FANCY_BORDER)
+		borderSize = kFancyBorderSize;
+
+	frame.InsetBy(-borderSize, -borderSize);
+
+	if (borderSize == 0) {
+		if (vertical)
+			frame.right++;
+		if (horizontal)
+			frame.bottom++;
+	}
+
+	return frame;
+}
+
+
+/** This method changes the "flags" argument as passed on to
+ *	the BView constructor.
+ *	Don't ask me why it's not as static as CalcFrame() is; so
+ *	much for consistency.
+ */
+
+int32
+BScrollView::ModFlags(int32 flags, border_style border)
+{
+	if (border != B_NO_BORDER)
+		return flags | B_WILL_DRAW;
+
+	return flags & ~B_WILL_DRAW;
 }
 
 
@@ -309,52 +364,16 @@ BScrollView::operator=(const BScrollView &)
 }
 
 
-/** This static method is used to calculate the frame that the
- *	ScrollView will cover depending on the frame of its target
- *	and which border style is used.
+/** Although BScrollView::InitObject() was defined in the original ScrollView.h,
+ *	it is not exported by the R5 libbe.so, so we don't have to export it as well.
  */
 
-BRect
-BScrollView::CalcFrame(BView *target, bool horizontal, bool vertical, border_style border)
-{
-	BRect frame = target->Frame();
-	if (vertical)
-		frame.right += B_V_SCROLL_BAR_WIDTH;
-	if (horizontal)
-		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
-
-	float borderSize = 0;
-	if (border == B_PLAIN_BORDER)
-		borderSize = kPlainBorderSize;
-	else if (border == B_FANCY_BORDER)
-		borderSize = kFancyBorderSize;
-
-	frame.InsetBy(-borderSize, -borderSize);
-
-	if (borderSize == 0) {
-		if (vertical)
-			frame.right++;
-		if (horizontal)
-			frame.bottom++;
-	}
-
-	return frame;
-}
-
-
-int32
-BScrollView::ModFlags(int32, border_style)
-{
-	// ToDo: I have no idea what this is for
-	return 0;
-}
-
-
+#if 0
 void
 BScrollView::InitObject()
 {
-	// ToDo: and what should go in here?
 }
+#endif
 
 
 //	#pragma mark -
