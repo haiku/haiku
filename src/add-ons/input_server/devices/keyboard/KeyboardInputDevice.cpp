@@ -171,20 +171,20 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
+	0x6e,   // Katakana/Hiragana, second key right to spacebar, japanese
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x6b,   // Ro (\\ key, japanese)
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
+	0x6d,   // Henkan, first key right to spacebar, japanese
 	0x00,   // UNMAPPED
+	0x6c,   // Muhenkan, key left to spacebar, japanese
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x6a,   // Yen (macron key, japanese)
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
