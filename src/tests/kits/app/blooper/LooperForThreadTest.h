@@ -1,10 +1,10 @@
 //------------------------------------------------------------------------------
-//	RunTest.h
+//	LooperForThreadTest.h
 //
 //------------------------------------------------------------------------------
 
-#ifndef RUNTEST_H
-#define RUNTEST_H
+#ifndef LOOPERFORTHREADTEST_H
+#define LOOPERFORTHREADTEST_H
 
 // Standard Includes -----------------------------------------------------------
 
@@ -19,20 +19,19 @@
 
 // Globals ---------------------------------------------------------------------
 
-class TRunTest : public TestCase
+class TLooperForThreadTest : public TestCase
 {
 	public:
-		TRunTest() {;}
-		TRunTest(std::string name) : TestCase(name) {;}
+		TLooperForThreadTest() {;}
+		TLooperForThreadTest(std::string name) : TestCase(name) {;}
 
-		void RunTest1();
-		void RunTest2();
-		void RunTest3();
+		void LooperForThreadTest1();
+		void LooperForThreadTest2();
 
 		static TestSuite* Suite();
 };
 
-#endif	//RUNTEST_H
+#endif	//LOOPERFORTHREADTEST_H
 
 /*
  * $Log $

@@ -8,6 +8,8 @@
 #include "AddHandlerTest.h"
 #include "PerformTest.h"
 #include "RunTest.h"
+#include "LooperForThreadTest.h"
+#include "AddCommonFilterTest.h"
 
 Test* LooperTestSuite()
 {
@@ -21,6 +23,8 @@ Test* LooperTestSuite()
 	tests->addTest(TAddHandlerTest::Suite());
 	tests->addTest(TPerformTest::Suite());
 	tests->addTest(TRunTest::Suite());
+	tests->addTest(TLooperForThreadTest::Suite());
+	tests->addTest(TAddCommonFilterTest::Suite());
 
 	return tests;
 }

@@ -1,10 +1,10 @@
 //------------------------------------------------------------------------------
-//	RunTest.h
+//	AddCommonFilterTest.h
 //
 //------------------------------------------------------------------------------
 
-#ifndef RUNTEST_H
-#define RUNTEST_H
+#ifndef ADDCOMMONFILTERTEST_H
+#define ADDCOMMONFILTERTEST_H
 
 // Standard Includes -----------------------------------------------------------
 
@@ -19,20 +19,21 @@
 
 // Globals ---------------------------------------------------------------------
 
-class TRunTest : public TestCase
+class TAddCommonFilterTest : public TestCase
 {
 	public:
-		TRunTest() {;}
-		TRunTest(std::string name) : TestCase(name) {;}
+		TAddCommonFilterTest() {;}
+		TAddCommonFilterTest(std::string name) : TestCase(name) {;}
 
-		void RunTest1();
-		void RunTest2();
-		void RunTest3();
+		void AddCommonFilterTest1();
+		void AddCommonFilterTest2();
+		void AddCommonFilterTest3();
+		void AddCommonFilterTest4();
 
 		static TestSuite* Suite();
 };
 
-#endif	//RUNTEST_H
+#endif	//ADDCOMMONFILTERTEST_H
 
 /*
  * $Log $

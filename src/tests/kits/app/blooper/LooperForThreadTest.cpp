@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	RunTest.cpp
+//	LooperForThreadTest.cpp
 //
 //------------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
-#include "RunTest.h"
+#include "LooperForThreadTest.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -19,59 +19,38 @@
 
 //------------------------------------------------------------------------------
 /**
-	Run()
-	@case		Attempt to call Run() twice
-	@results	debugger message "can't call BLooper::Run twice!"
+	LooperForThread(thread_id)
+	@case		tid is valid
  */
-void TRunTest::RunTest1()
-{
-	DEBUGGER_ESCAPE;
-
-	BLooper Looper;
-	Looper.Run();
-	Looper.Run();
-	Looper.Quit();
-}
-//------------------------------------------------------------------------------
-/**
-	Run()
-	@case		Check thread_id of Looper
-	@results	Run() and Thread() return the same thread_id
- */
-void TRunTest::RunTest2()
+void TLooperForThreadTest::LooperForThreadTest1()
 {
 	BLooper* Looper = new BLooper;
 	thread_id tid = Looper->Run();
-	CPPUNIT_ASSERT(tid == Looper->Thread());
+	CPPUNIT_ASSERT(Looper == BLooper::LooperForThread(tid));
 	Looper->Lock();
 	Looper->Quit();
 }
 //------------------------------------------------------------------------------
 /**
-	Run()
-	@case		Delete looper after calling Run()
-	@results	Debugger message "You can't call delete on a BLooper object
-				once it is running."
+	LooperForThread(thread_id)
+	@case		tid is not valid
  */
-void TRunTest::RunTest3()
+void TLooperForThreadTest::LooperForThreadTest2()
 {
-	BLooper* Looper = new BLooper;
-	Looper->Run();
-	delete Looper;
+	CPPUNIT_ASSERT(BLooper::LooperForThread(find_thread(NULL)) == NULL);
 }
 //------------------------------------------------------------------------------
 #ifdef ADD_TEST
 #undef ADD_TEST
 #endif
 #define ADD_TEST(__test_name__)	\
-	ADD_TEST4(BLooper, suite, TRunTest, __test_name__)
-
-TestSuite* TRunTest::Suite()
+	ADD_TEST4(BLooper, suite, TLooperForThreadTest, __test_name__)
+TestSuite* TLooperForThreadTest::Suite()
 {
-	TestSuite* suite = new TestSuite("BLooper::Run()");
+	TestSuite* suite = new TestSuite("BLooper::LooperForTest(thread_id)");
 
-	ADD_TEST(RunTest1);
-	ADD_TEST(RunTest2);
+	ADD_TEST(LooperForThreadTest1);
+	ADD_TEST(LooperForThreadTest2);
 
 	return suite;
 }

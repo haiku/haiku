@@ -69,14 +69,20 @@ case 4: handler is valid, one of many added and removed
 case 5: handler is valid, looper is unlocked
 
 PreferredHandler() const;
+--------------
 SetPreferredHandler(BHandler* handler);
+--------------
 
 Run();
 --------------
 case 1: Attempt to call Run() twice
+case 2: Check Thread() against return of Run()
+case 3: Delete looper after calling Run()
 
 Quit()
 --------------
+case : Call Quit() on unlocked BLooper
+
 QuitRequested()
 --------------
 Lock()
@@ -91,8 +97,12 @@ Thread() const
 --------------
 Team() const
 --------------
+
 LooperForThread(thread_id tid)
 --------------
+case 1: tid is valid
+case 2: tid is not valid
+
 LockingThread() const
 --------------
 CountLocks() const
@@ -105,14 +115,31 @@ ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier, int32 form, co
 --------------
 GetSupportedSuites(BMessage* data)
 --------------
+
 AddCommonFilter(BMessageFilter* filter)
 --------------
+case : NULL filter
+case : Valid filter, looper not locked
+case : Valid filter, looper locked
+case : Valid filter, looper locked, owned by another looper
+
 RemoveCommonFilter(BMessageFilter* filter)
 --------------
+case : NULL filter
+case : Valid filter, looper not locked
+case : Valid filter, not owned by looper
+case : Valid filter, owned by looper
+
 SetCommonFilterList(BList* filters)
 --------------
+case : NULL list
+case : Valid list, looper not locked
+case : Valid list, looper locked
+case : Valid list, looper locked, owned by another looper
+
 CommonFilterList() const
 --------------
+case : Default constructed BLooper
 
 Perform(perform_code d, void* arg)
 --------------

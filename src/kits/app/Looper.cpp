@@ -485,6 +485,14 @@ DBG(OUT("BLooper::Quit()\n"));
 		printf("ERROR - you must Lock a looper before calling Quit(), "
 			   "team=%ld, looper=%s", Team(), name);
 	}
+
+	// Try to lock
+	if (!Lock())
+	{
+		// We're toast already
+		return;
+	}
+
 DBG(OUT("  is locked\n"));
 
 	if (!fRunCalled || find_thread(NULL) == fTaskID)
@@ -734,7 +742,16 @@ status_t BLooper::GetSupportedSuites(BMessage* data)
 //------------------------------------------------------------------------------
 void BLooper::AddCommonFilter(BMessageFilter* filter)
 {
-	AssertLocked();
+	if (!filter)
+	{
+		return;
+	}
+
+	if (!Locked())
+	{
+		debugger("Owning Looper must be locked before calling AddCommonFilter");
+	}
+
 	if (!fCommonFilters)
 	{
 		fCommonFilters = new BList(FILTER_LIST_BLOCK_SIZE);
