@@ -178,9 +178,7 @@ media_multistream_format media_multistream_format::wildcard = {0};
 bool
 media_format::Matches(const media_format *otherFormat) const
 {
-	UNIMPLEMENTED();
-
-	return true;
+	return format_is_compatible(*this, *otherFormat);
 }
 
 
@@ -267,68 +265,144 @@ media_format::operator=(const media_format &clone)
 
 bool operator==(const media_raw_audio_format & a, const media_raw_audio_format & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return (   a.frame_rate == b.frame_rate
+			&& a.channel_count == b.channel_count
+			&& a.format == b.format
+			&& a.byte_order == b.byte_order
+			&& a.buffer_size == b.buffer_size);
 }
 
 bool operator==(const media_multi_audio_info & a, const media_multi_audio_info & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return (   a.channel_mask == b.channel_mask
+			&& a.valid_bits == b.valid_bits
+			&& a.matrix_mask == b.matrix_mask);
 }
 
 bool operator==(const media_multi_audio_format & a, const media_multi_audio_format & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return (   (media_raw_audio_format)a == (media_raw_audio_format)b
+			&& (media_multi_audio_info)a == (media_multi_audio_info)b);
 }
 
 bool operator==(const media_encoded_audio_format & a, const media_encoded_audio_format & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return (   a.output == b.output
+			&& a.encoding == b.encoding
+			&& a.bit_rate == b.bit_rate
+			&& a.frame_size == b.frame_size
+			&& a.multi_info == b.multi_info);
 }
 
 bool operator==(const media_video_display_info & a, const media_video_display_info & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return (   a.format == b.format
+			&& a.line_width == b.line_width
+			&& a.line_count == b.line_count
+			&& a.bytes_per_row == b.bytes_per_row
+			&& a.pixel_offset == b.pixel_offset
+			&& a.line_offset == b.line_offset
+			&& a.flags == b.flags);
 }
 
 bool operator==(const media_raw_video_format & a, const media_raw_video_format & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return (   a.field_rate == b.field_rate
+			&& a.interlace == b.interlace
+			&& a.first_active == b.first_active
+			&& a.last_active == b.last_active
+			&& a.orientation == b.orientation
+			&& a.pixel_width_aspect == b.pixel_width_aspect
+			&& a.pixel_height_aspect == b.pixel_height_aspect
+			&& a.display == b.display);
 }
 
 bool operator==(const media_encoded_video_format & a, const media_encoded_video_format & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return (   a.output == b.output
+			&& a.avg_bit_rate == b.avg_bit_rate
+			&& a.max_bit_rate == b.max_bit_rate
+			&& a.encoding == b.encoding
+			&& a.frame_size == b.frame_size
+			&& a.forward_history == b.forward_history
+			&& a.backward_history == b.backward_history);
 }
 
 bool operator==(const media_multistream_format::vid_info & a, const media_multistream_format::vid_info & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return (   a.frame_rate == b.frame_rate
+			&& a.width == b.width
+			&& a.height == b.height
+			&& a.space == b.space
+			&& a.sampling_rate == b.sampling_rate
+			&& a.sample_format == b.sample_format
+			&& a.byte_order == b.byte_order
+			&& a.channel_count == b.channel_count);
 }
 
 bool operator==(const media_multistream_format::avi_info & a, const media_multistream_format::avi_info & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return (   a.us_per_frame == b.us_per_frame
+			&& a.width == b.width
+			&& a.height == b.height
+			&& a.type_count == b.type_count
+			&& a.types[0] == b.types[0]
+			&& a.types[1] == b.types[1]
+			&& a.types[2] == b.types[2]
+			&& a.types[3] == b.types[3]
+			&& a.types[4] == b.types[4]);
 }
 
 bool operator==(const media_multistream_format & a, const media_multistream_format & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	if (a.avg_bit_rate != b.avg_bit_rate
+		|| a.max_bit_rate != b.max_bit_rate
+		|| a.avg_chunk_size != b.avg_chunk_size
+		|| a.max_chunk_size != b.max_chunk_size
+		|| a.format != b.format
+		|| a.flags != b.flags)
+		return false;
+
+	switch (a.format) {
+		case media_multistream_format::B_VID:
+			return a.u.vid == b.u.vid;
+			
+		case media_multistream_format::B_AVI:
+			return a.u.avi == b.u.avi;
+
+		default:
+			return true; // XXX really?
+	}
 }
 
 bool operator==(const media_format & a, const media_format & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	if (a.type != b.type
+		|| a.user_data_type != b.user_data_type
+		// XXX compare user_data[48] ?
+		|| a.require_flags != b.require_flags
+		|| a.deny_flags != b.deny_flags)
+		return false;
+		
+	switch (a.type) {
+		case B_MEDIA_RAW_AUDIO:
+			return a.u.raw_audio == b.u.raw_audio;
+			
+		case B_MEDIA_RAW_VIDEO:
+			return a.u.raw_video == b.u.raw_video;
+			
+		case B_MEDIA_MULTISTREAM:
+			return a.u.multistream == b.u.multistream;
+			
+		case B_MEDIA_ENCODED_AUDIO:
+			return a.u.encoded_audio == b.u.encoded_audio;
+			
+		case B_MEDIA_ENCODED_VIDEO:
+			return a.u.encoded_video == b.u.encoded_video;
+			
+		default:
+			return true; // XXX really?
+	}
 }
 
 /*************************************************************
