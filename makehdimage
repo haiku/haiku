@@ -86,7 +86,7 @@ jam -q rc resattr kernel boot_loader config_manager pci isa ide scsi \
 	$BEOS_BIN $BEOS_SYSTEM_LIB $BEOS_SYSTEM_SERVERS \
 	$BEOS_ADD_ONS_TRANSLATORS $BEOS_ADD_ONS_MEDIA $BEOS_ADD_ONS_INPUT_DEVICES\
 	libnet.so dprintf null zero random ps2_hid \<driver\>tty \
-	\<driver\>config timezone_files \
+	\<driver\>config timezone_files keymap_files \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
 
 # create the image and the directory structure
