@@ -36,11 +36,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define TRACE_VM 1
+#define TRACE_VM 0
 #if TRACE_VM
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
+#endif
+
+#define TRACE_PFAULT 0
+#if TRACE_PFAULT
+#	define TRACEPFAULT dprintf("in pfault at line %d\n", __LINE__)
+#else
+#	define TRACEPFAULT
 #endif
 
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
@@ -205,15 +212,17 @@ static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char 
 	return region;
 }
 
+
 // must be called with this address space's virtual_map.sem held
-static int find_and_insert_region_slot(vm_virtual_map *map, addr start, addr size, addr end, int addr_type, vm_region *region)
+static int
+find_and_insert_region_slot(vm_virtual_map *map, addr start, addr size, addr end, int addr_type, vm_region *region)
 {
 	vm_region *last_r = NULL;
 	vm_region *next_r;
 	bool foundspot = false;
 
-	dprintf("find_and_insert_region_slot: map %p, start 0x%lx, size %ld, end 0x%lx, addr_type %d, region %p\n",
-		map, start, size, end, addr_type, region);
+	TRACE(("find_and_insert_region_slot: map %p, start 0x%lx, size %ld, end 0x%lx, addr_type %d, region %p\n",
+		map, start, size, end, addr_type, region));
 //	dprintf("map->base 0x%x, map->size 0x%x\n", map->base, map->size);
 
 	// do some sanity checking
@@ -326,8 +335,8 @@ static int map_backing_store(vm_address_space *aspace, vm_store *store,
 
 	int err;
 
-//	dprintf("map_backing_store: aspace 0x%x, store 0x%x, *vaddr 0x%x, offset 0x%Lx, size %d, addr_type %d, wiring %d, lock %d, _region 0x%x, region_name '%s'\n",
-//		aspace, store, *vaddr, offset, size, addr_type, wiring, lock, _region, region_name);
+	TRACE(("map_backing_store: aspace 0x%x, store 0x%x, *vaddr 0x%x, offset 0x%Lx, size %d, addr_type %d, wiring %d, lock %d, _region 0x%x, region_name '%s'\n",
+		aspace, store, *vaddr, offset, size, addr_type, wiring, lock, _region, region_name));
 
 	region = _vm_create_region_struct(aspace, region_name, wiring, lock);
 	if (!region)
@@ -479,7 +488,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 	vm_address_space *aspace;
 	vm_cache_ref *cache_ref;
 
-	dprintf("create_anonymous_region: %s: size 0x%lx\n", name, size);
+	TRACE(("create_anonymous_region: %s: size 0x%lx\n", name, size));
 
 	/* check parameters */
 	if (addr_type != REGION_ADDR_ANY_ADDRESS && addr_type != REGION_ADDR_EXACT_ADDRESS)
@@ -932,7 +941,7 @@ _vm_delete_region(vm_address_space *aspace, region_id rid)
 {
 	vm_region *region;
 
-	dprintf("vm_delete_region: aspace id 0x%lx, region id 0x%lx\n", aspace->id, rid);
+	TRACE(("vm_delete_region: aspace id 0x%lx, region id 0x%lx\n", aspace->id, rid));
 
 	region = vm_get_region_by_id(rid);
 	if (region == NULL)
@@ -1087,7 +1096,9 @@ int vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr)
 	return err;
 }
 
-static int display_mem(int argc, char **argv)
+
+static int
+display_mem(int argc, char **argv)
 {
 	int item_size;
 	int display_width;
@@ -1096,7 +1107,7 @@ static int display_mem(int argc, char **argv)
 	int i;
 	int j;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		dprintf("not enough arguments\n");
 		return 0;
 	}
@@ -1482,7 +1493,7 @@ void vm_put_aspace(vm_address_space *aspace)
 	if(!removeit)
 		return;
 
-	dprintf("vm_put_aspace: reached zero ref, deleting aspace\n");
+	TRACE(("vm_put_aspace: reached zero ref, deleting aspace\n"));
 
 	if(aspace == kernel_aspace)
 		panic("vm_put_aspace: tried to delete the kernel aspace!\n");
@@ -1509,7 +1520,7 @@ aspace_id vm_create_aspace(const char *name, addr base, addr size, bool kernel)
 	if(aspace == NULL)
 		return ENOMEM;
 
-	dprintf("vm_create_aspace: %s: %lx bytes starting at 0x%lx => %p\n", name, size, base, aspace);
+	TRACE(("vm_create_aspace: %s: %lx bytes starting at 0x%lx => %p\n", name, size, base, aspace));
 
 	aspace->name = (char *)malloc(strlen(name) + 1);
 	if(aspace->name == NULL ) {
@@ -1553,7 +1564,9 @@ aspace_id vm_create_aspace(const char *name, addr base, addr size, bool kernel)
 	return aspace->id;
 }
 
-int vm_delete_aspace(aspace_id aid)
+
+int
+vm_delete_aspace(aspace_id aid)
 {
 	vm_region *region;
 	vm_region *next;
@@ -1563,7 +1576,7 @@ int vm_delete_aspace(aspace_id aid)
 	if(aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
-	dprintf("vm_delete_aspace: called on aspace 0x%lx\n", aid);
+	TRACE(("vm_delete_aspace: called on aspace 0x%lx\n", aid));
 
 	// put this aspace in the deletion state
 	// this guarantees that no one else will add regions to the list
@@ -1668,13 +1681,15 @@ vm_thread_dump_max_commit(void *unused)
 
 	for(;;) {
 		snooze(1000000);
-		if(oldmax != max_commit)
-			dprintf("max_commit 0x%x\n", max_commit);
+		if (oldmax != max_commit)
+			TRACE(("max_commit 0x%x\n", max_commit));
 		oldmax = max_commit;
 	}
 }
 
-int vm_init(kernel_args *ka)
+
+int
+vm_init(kernel_args *ka)
 {
 	int err = 0;
 	unsigned int i;
@@ -1683,7 +1698,7 @@ int vm_init(kernel_args *ka)
 	addr heap_base;
 	void *null_addr;
 
-	dprintf("vm_init: entry\n");
+	TRACE(("vm_init: entry\n"));
 	err = vm_translation_map_module_init(ka);
 	err = arch_vm_init(ka);
 
@@ -1698,7 +1713,7 @@ int vm_init(kernel_args *ka)
 
 	// map in the new heap and initialize it
 	heap_base = vm_alloc_from_ka_struct(ka, HEAP_SIZE, LOCK_KERNEL|LOCK_RW);
-	dprintf("heap at 0x%lx\n", heap_base);
+	TRACE(("heap at 0x%lx\n", heap_base));
 	heap_init(heap_base);
 
 	// initialize the free page list and physical page mapper
@@ -1781,12 +1796,14 @@ int vm_init(kernel_args *ka)
 	add_debugger_command("ds", &display_mem, "dump memory shorts (16-bit)");
 	add_debugger_command("db", &display_mem, "dump memory bytes (8-bit)");
 
-	dprintf("vm_init: exit\n");
+	TRACE(("vm_init: exit\n"));
 
 	return err;
 }
 
-int vm_init_postsem(kernel_args *ka)
+
+int
+vm_init_postsem(kernel_args *ka)
 {
 	vm_region *region;
 
@@ -1852,9 +1869,9 @@ int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user,
 	*newip = 0;
 
 	err = vm_soft_fault(address, is_write, is_user);
-	if(err < 0) {
-		dprintf("vm_page_fault: vm_soft_fault returned error %d on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
-			err, address, fault_address, is_write, is_user, thread_get_current_thread_id());
+	if (err < 0) {
+		TRACE(("vm_page_fault: vm_soft_fault returned error %d on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
+			err, address, fault_address, is_write, is_user, thread_get_current_thread_id()));
 		if(!is_user) {
 			struct thread *t = thread_get_current_thread();
 			if(t && t->fault_handler != 0) {
@@ -1876,15 +1893,9 @@ int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user,
 	return B_HANDLED_INTERRUPT;
 }
 
-#define TRACE_PFAULT 0
 
-#if TRACE_PFAULT
-#define TRACE dprintf("in pfault at line %d\n", __LINE__)
-#else
-#define TRACE
-#endif
-
-static int vm_soft_fault(addr address, bool is_write, bool is_user)
+static int
+vm_soft_fault(addr address, bool is_write, bool is_user)
 {
 	vm_address_space *aspace;
 	vm_virtual_map *map;
@@ -1947,7 +1958,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 		return ERR_VM_PF_BAD_PERM; // BAD_PERMISSION
 	}
 
-	TRACE;
+	TRACEPFAULT;
 
 	top_cache_ref = region->cache_ref;
 	cache_offset = address - region->base + region->cache_offset;
@@ -1963,7 +1974,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 		return err;
 	}
 
-	TRACE;
+	TRACEPFAULT;
 
 	dummy_page.state = PAGE_STATE_INACTIVE;
 	dummy_page.type = PAGE_TYPE_DUMMY;
@@ -1972,7 +1983,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 	for(cache_ref = top_cache_ref; cache_ref; cache_ref = (cache_ref->cache->source) ? cache_ref->cache->source->ref : NULL) {
 		mutex_lock(&cache_ref->lock);
 
-		TRACE;
+		TRACEPFAULT;
 
 		for(;;) {
 			page = vm_cache_lookup_page(cache_ref, cache_offset);
@@ -1985,7 +1996,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 			if(page == NULL)
 				break;
 
-			TRACE;
+			TRACEPFAULT;
 
 			// page must be busy
 			mutex_unlock(&cache_ref->lock);
@@ -1993,12 +2004,12 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 			mutex_lock(&cache_ref->lock);
 		}
 
-		TRACE;
+		TRACEPFAULT;
 
-		if(page != NULL)
+		if (page != NULL)
 			break;
 
-		TRACE;
+		TRACEPFAULT;
 
 		// insert this dummy page here to keep other threads from faulting on the
 		// same address and chasing us up the cache chain
@@ -2012,7 +2023,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 			if(cache_ref->cache->store->ops->has_page(cache_ref->cache->store, cache_offset)) {
 				IOVECS(vecs, 1);
 
-				TRACE;
+				TRACEPFAULT;
 
 				mutex_unlock(&cache_ref->lock);
 
@@ -2039,10 +2050,10 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 		}
 		mutex_unlock(&cache_ref->lock);
 		last_cache_ref = cache_ref;
-		TRACE;
+		TRACEPFAULT;
 	}
 
-	TRACE;
+	TRACEPFAULT;
 
 	// we rolled off the end of the cache chain, so we need to decide which
 	// cache will get the new page we're about to create
@@ -2053,7 +2064,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 			cache_ref = top_cache_ref; // put it in the topmost cache
 	}
 
-	TRACE;
+	TRACEPFAULT;
 
 	if(page == NULL) {
 		// still haven't found a page, so zero out a new one
@@ -2075,7 +2086,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 		}
 	}
 
-	TRACE;
+	TRACEPFAULT;
 
 	if(page->cache_ref != top_cache_ref && is_write) {
 		// now we have a page that has the data we want, but in the wrong cache object
@@ -2121,7 +2132,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 		}
 	}
 
-	TRACE;
+	TRACEPFAULT;
 
 	err = 0;
 	acquire_sem_etc(map->sem, READ_COUNT, 0, 0);
@@ -2136,7 +2147,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 		}
 	}
 
-	TRACE;
+	TRACEPFAULT;
 
 	if (err == 0) {
 		int new_lock = region->lock;
@@ -2150,11 +2161,11 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 		(*aspace->translation_map.ops->unlock)(&aspace->translation_map);
 	}
 
-	TRACE;
+	TRACEPFAULT;
 
 	release_sem_etc(map->sem, READ_COUNT, 0);
 
-	TRACE;
+	TRACEPFAULT;
 
 	if(dummy_page.state == PAGE_STATE_BUSY) {
 		vm_cache_ref *temp_cache = dummy_page.cache_ref;
@@ -2164,19 +2175,21 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 		dummy_page.state = PAGE_STATE_INACTIVE;
 	}
 
-	TRACE;
+	TRACEPFAULT;
 
 	vm_page_set_state(page, PAGE_STATE_ACTIVE);
 
 	vm_cache_release_ref(top_cache_ref);
 	vm_put_aspace(aspace);
 
-	TRACE;
+	TRACEPFAULT;
 
 	return err;
 }
 
-static vm_region *vm_virtual_map_lookup(vm_virtual_map *map, addr address)
+
+static vm_region *
+vm_virtual_map_lookup(vm_virtual_map *map, addr address)
 {
 	vm_region *region;
 
