@@ -131,7 +131,7 @@ main2(void *unused)
 	TRACE(("start of main2: initializing devices\n"));
 
 	/* bootstrap all the filesystems */
-	TRACE(("Bootstrap all filesystems\n");
+	TRACE(("Bootstrap all filesystems\n"));
 	vfs_bootstrap_all_filesystems();
 
 	TRACE(("Init modules\n"));
