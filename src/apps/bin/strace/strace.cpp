@@ -236,6 +236,7 @@ run_thread(port_id nubPort, thread_id thread)
 {
 	debug_nub_run_thread message;
 	message.thread = thread;
+	message.handle_event = B_THREAD_DEBUG_HANDLE_EVENT;
 
 	while (true) {
 		status_t error = write_port(nubPort, B_DEBUG_MESSAGE_RUN_THREAD,
@@ -485,9 +486,7 @@ main(int argc, const char *const *argv)
 	}
 
 	// set team debugging flags
-	int32 teamDebugFlags
-		= (printArguments ? 0 : B_TEAM_DEBUG_SYSCALL_FAST_TRACE)
-		| (traceTeam ? B_TEAM_DEBUG_POST_SYSCALL : 0);
+	int32 teamDebugFlags = (traceTeam ? B_TEAM_DEBUG_POST_SYSCALL : 0);
 	set_team_debugging_flags(nubPort, teamDebugFlags);
 
 	// set thread debugging flags
