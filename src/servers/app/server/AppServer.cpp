@@ -414,6 +414,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			// Find the necessary data
 			port_id reply_port=*((port_id*)index); index+=sizeof(port_id);
 			port_id app_port=*((port_id*)index); index+=sizeof(port_id);
+			int32 htoken=*((int32*)index); index+=sizeof(int32);
 			char *app_signature=(char *)index;
 			
 			// Create the ServerApp subthread for this app
@@ -426,7 +427,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 				printf("No more ports left. Time to crash. Have a nice day! :)\n");
 				break;
 			}
-			ServerApp *newapp=new ServerApp(app_port,r,app_signature);
+			ServerApp *newapp=new ServerApp(app_port,r,htoken,app_signature);
 			_applist->AddItem(newapp);
 			
 			release_sem(_applist_lock);
@@ -822,4 +823,3 @@ int main( int argc, char** argv )
 	delete app_server;
 	return 0;
 }
-

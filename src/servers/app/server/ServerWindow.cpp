@@ -50,7 +50,7 @@ TokenHandler win_token_handler;
 	monitor thread.
 */
 ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
-	uint32 wfeel, uint32 wflags, ServerApp *winapp,  port_id winport, uint32 index)
+	uint32 wfeel, uint32 wflags, ServerApp *winapp,  port_id winport, uint32 index, int32 handlerID)
 {
 	_title=new BString;
 	if(string)
@@ -59,6 +59,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	_flags=wflags;
 	_look=wlook;
 	_feel=wfeel;
+	_handlertoken=handlerID;
 
 	_winborder=new WinBorder(_frame,_title->String(),wlook,wfeel,wflags,this);
 
@@ -329,15 +330,27 @@ void ServerWindow::DispatchMessage(int32 code, int8 *msgbuffer)
 			Hide();
 			break;
 		}
+		case AS_SEND_BEHIND:
+		case AS_ENABLE_UPDATES:
+		case AS_DISABLE_UPDATES:
+		case AS_NEEDS_UPDATE:
+		case AS_WINDOW_TITLE:
+		case AS_ADD_TO_SUBSET:
+		case AS_REM_FROM_SUBSET:
+		case AS_SET_LOOK:
+		case AS_SET_FLAGS:
+		case AS_SET_FEEL:
+		case AS_SET_ALIGNMENT:
+		case AS_GET_ALIGNMENT:
+		case AS_GET_WORKSPACES:
+		case AS_SET_WORKSPACES:
+		case AS_WINDOW_RESIZEBY:
+		case AS_WINDOW_RESIZETO:
 		case B_MINIMIZE:
 		case B_WINDOW_ACTIVATED:
 		case B_ZOOM:
 		case B_WINDOW_MOVE_TO:
 		case B_WINDOW_MOVE_BY:
-		case AS_SET_LOOK:
-		case AS_SET_FEEL:
-		case AS_SET_FLAGS:
-		case AS_SEND_BEHIND:
 			break;
 		default:
 		{
@@ -345,6 +358,16 @@ void ServerWindow::DispatchMessage(int32 code, int8 *msgbuffer)
 			break;
 		}
 	}
+}
+
+/*!
+	\brief Iterator for graphics update messages
+	\param msgsize Size of the buffer containing the graphics messages
+	\param msgbuffer Buffer containing the graphics message
+*/
+void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
+{
+	
 }
 
 /*!
@@ -385,6 +408,11 @@ int32 ServerWindow::MonitorWin(void *data)
 					win->_applink->SetOpCode(AS_DELETE_WINDOW);
 					win->_applink->Attach((int32)win->_token);
 					win->_applink->Flush();
+					break;
+				}
+				case AS_BEGIN_UPDATE:
+				{
+					win->DispatchGraphicsMessage(buffersize,msgbuffer);
 					break;
 				}
 				default:

@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ServerProtocol.h>
+#include "SMessage.h"
 
 #include "BitmapManager.h"
 #include "CursorManager.h"
@@ -43,6 +44,9 @@
 #include "ServerBitmap.h"
 #include "ServerConfig.h"
 #include "LayerData.h"
+#include "Utils.h"
+
+#define DEBUG_SERVERAPP
 
 /*!
 	\brief Constructor
@@ -53,11 +57,14 @@
 	\param _signature NULL-terminated string which contains the BApplication's
 	MIME _signature.
 */
-ServerApp::ServerApp(port_id sendport, port_id rcvport, char *signature)
+ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *signature)
 {
 	// need to copy the _signature because the message buffer
 	// owns the copy which we are passed as a parameter.
-	_signature=(signature)?signature:"BeApplication";
+	_signature=(signature)?signature:"application/x-vnd.unknown-application";
+	
+	// token ID of the BApplication's BHandler object. Used for BMessage target specification
+	_handlertoken=handlerID;
 
 	// _sender is the our BApplication's event port
 	_sender=sendport;
@@ -83,11 +90,20 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, char *signature)
 
 	_driver=GetGfxDriver();
 	_cursorhidden=false;
+
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s:\n",_signature.String());
+printf("\tBApp port: %ld\n",_sender);
+printf("\tReceiver port: %ld\n",_receiver);
+#endif
 }
 
 //! Does all necessary teardown for application
 ServerApp::~ServerApp(void)
 {
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s:~ServerApp()\n",_signature.String());
+#endif
 	int32 i;
 	
 	ServerWindow *tempwin;
@@ -130,6 +146,9 @@ ServerApp::~ServerApp(void)
 */
 bool ServerApp::Run(void)
 {
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s:Run()\n",_signature.String());
+#endif
 	// Unlike a BApplication, a ServerApp is *supposed* to return immediately
 	// when its Run() function is called.
 	_monitor_thread=spawn_thread(MonitorApp,_signature.String(),B_NORMAL_PRIORITY,this);
@@ -216,17 +235,24 @@ int32 ServerApp::MonitorApp(void *data)
 // -------------- Messages received from the Server ------------------------
 				case AS_QUIT_APP:
 				{
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s:Server shutdown notification received\n",app->_signature.String());
+#endif
 					// If we are using the real, accelerated version of the
 					// DisplayDriver, we do NOT want the user to be able shut down
 					// the server. The results would NOT be pretty
-					if(DISPLAYDRIVER==HWDRIVER)
+					if(DISPLAYDRIVER!=HWDRIVER)
 					{
 						// This message is received from the app_server thread
 						// because the server was asked to quit. Thus, we
 						// ask all apps to quit. This is NOT the same as system
 						// shutdown and will happen only in testing
-						app->_applink->SetOpCode(B_QUIT_REQUESTED);
-						app->_applink->Flush();
+						BMessage *shutdown=new BMessage(B_QUIT_REQUESTED);
+						shutdown->fPreferred=true;
+						SendMessage(app->_sender,shutdown);
+#ifdef DEBUG_SERVERAPP
+printf("ServerApp %s:Sent server shutdown message to BApp\n",app->_signature.String());
+#endif
 					}
 					break;
 				}
@@ -302,7 +328,8 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			// 3) uint32 window flags
 			// 4) port_id window's message port
 			// 5) uint32 workspace index
-			// 6) const char * title
+			// 6) int32 BHandler token of the window
+			// 7) const char * title
 
 			// Find the necessary data
 			port_id reply_port=*((port_id*)index); index+=sizeof(port_id);
@@ -313,11 +340,12 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			uint32 winflags=*((uint32*)index); index+=sizeof(uint32);
 
 			port_id win_port=*((port_id*)index); index+=sizeof(port_id);
+			int32 htoken=*((int32*)index); index+=sizeof(int32);
 			uint32 workspace=*((uint32*)index); index+=sizeof(uint32);
 
 			// Create the ServerWindow object for this window
 			ServerWindow *newwin=new ServerWindow(rect,(const char *)index,
-				winlook, winfeel, winflags,this,win_port,workspace);
+				winlook, winfeel, winflags,this,win_port,workspace,htoken);
 			_winlist->AddItem(newwin);
 
 			// Window looper is waiting for our reply. Send back the

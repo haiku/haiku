@@ -57,7 +57,7 @@ class ServerWindow
 {
 public:
 	ServerWindow(BRect rect, const char *string, uint32 wlook, uint32 wfeel,
-		uint32 wflags, ServerApp *winapp,  port_id winport, uint32 index);
+		uint32 wflags, ServerApp *winapp,  port_id winport, uint32 index, int32 handlerID);
 	~ServerWindow(void);
 	
 	void ReplaceDecorator(void);
@@ -85,6 +85,7 @@ public:
 	bool IsLocked(void);
 	
 	void DispatchMessage(int32 code, int8 *msgbuffer);
+	void DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
 	static int32 MonitorWin(void *data);
 	static void HandleMouseEvent(int32 code, int8 *buffer);
 	static void HandleKeyEvent(int32 code, int8 *buffer);
@@ -114,6 +115,7 @@ protected:
 	BLocker _locker;
 	BRect _frame;
 	uint32 _token;
+	int32 _handlertoken;
 };
 
 void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin);

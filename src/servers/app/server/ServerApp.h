@@ -43,7 +43,7 @@ class ServerCursor;
 class ServerApp
 {
 public:
-	ServerApp(port_id sendport, port_id rcvport, char *signature);
+	ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *signature);
 	~ServerApp(void);
 
 	bool Run(void);
@@ -85,6 +85,7 @@ protected:
 	sem_id _lock;
 	bool _cursorhidden;
 	bool _isactive;
+	int32 _handlertoken;
 };
 
 #endif
