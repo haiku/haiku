@@ -1,8 +1,10 @@
 /*
-** Copyright 2002, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
-
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef RUN_TIME_LINKER_H
 #define RUN_TIME_LINKER_H
 
@@ -26,8 +28,8 @@ void rldelf_init(struct uspace_program_args const *uspa);
 void rldexport_init(struct uspace_program_args *uspa);
 
 // RLD heap
-void  rldheap_init(void);
+void rldheap_init(void);
 void *rldalloc(size_t);
-void  rldfree(void *p);
+void rldfree(void *p);
 
 #endif	/* RUN_TIME_LINKER_H */

@@ -39,7 +39,6 @@
 
 // ToDo: implement better locking strategy
 // ToDo: implement unload_program()
-// ToDo: implement search paths $LIBRARY_PATH, $ADDON_PATH
 // ToDo: implement lazy binding
 
 #define	PAGE_MASK (B_PAGE_SIZE - 1)
@@ -209,6 +208,8 @@ rld_lock()
 char *
 getenv(const char *name)
 {
+	// ToDo: this should use the real environ pointer once available!
+	//	(or else, any updates to the search paths while the app is running are ignored)
 	char **environ = gProgramArgs->envp;
 	int32 length = strlen(name);
 	int32 i;
@@ -1021,7 +1022,6 @@ try_open_container(const char *dir, int dirLen, const char *name, char *path,
 		memcpy(buffer, dir, dirLen);
 		buffer[dirLen] = '/';
 		strcpy(buffer + dirLen + 1, name);
-
 	} else {
 		if (nameLen >= pathLen)
 			return B_NAME_TOO_LONG;
@@ -1347,16 +1347,8 @@ put_image(image_t *image)
 
 
 //	#pragma mark -
+//	Exported functions (to libroot.so)
 
-/*
- * exported functions:
- *
- *	+ load_program()
- *	+ load_library()
- *	+ unload_program()
- *	+ unload_library()
- *	+ dynamic_symbol()
- */
 
 image_id
 load_program(char const *path, void **_entry)

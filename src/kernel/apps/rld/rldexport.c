@@ -1,8 +1,11 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Copyright 2002, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 
 #include "rld_priv.h"
 
@@ -13,8 +16,6 @@
 static image_id
 export_load_add_on(char const *name, uint32 flags)
 {
-	// ToDo: use load_add_on() here when it's implemented, or better, unify
-	//		load_library() and load_add_on().
 	return load_library(name, flags, true);
 }
 
