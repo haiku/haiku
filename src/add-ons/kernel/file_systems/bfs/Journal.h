@@ -44,14 +44,14 @@ class Journal {
 		status_t InitCheck();
 
 		status_t Lock(Transaction *owner);
-		void Unlock(Transaction *owner,bool success);
+		void Unlock(Transaction *owner, bool success);
 
 		status_t CheckLogEntry(int32 count, off_t *array);
 		status_t ReplayLogEntry(int32 *start);
 		status_t ReplayLog();
 
 		status_t WriteLogEntry();
-		status_t LogBlocks(off_t blockNumber,const uint8 *buffer, size_t numBlocks);
+		status_t LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks);
 
 		thread_id CurrentThread() const { return fOwningThread; }
 		Transaction *CurrentTransaction() const { return fOwner; }
@@ -98,18 +98,18 @@ Journal::FreeLogBlocks() const
 
 class Transaction {
 	public:
-		Transaction(Volume *volume,off_t refBlock)
+		Transaction(Volume *volume, off_t refBlock)
 			:
 			fJournal(NULL)
 		{
-			Start(volume,refBlock);
+			Start(volume, refBlock);
 		}
 
-		Transaction(Volume *volume,block_run refRun)
+		Transaction(Volume *volume, block_run refRun)
 			:
 			fJournal(NULL)
 		{
-			Start(volume,volume->ToBlock(refRun));
+			Start(volume, volume->ToBlock(refRun));
 		}
 
 		Transaction()
@@ -121,26 +121,24 @@ class Transaction {
 		~Transaction()
 		{
 			if (fJournal)
-				fJournal->Unlock(this,false);
+				fJournal->Unlock(this, false);
 		}
 
-		status_t Start(Volume *volume,off_t refBlock);
+		status_t Start(Volume *volume, off_t refBlock);
 
 		void Done()
 		{
 			if (fJournal != NULL)
-				fJournal->Unlock(this,true);
+				fJournal->Unlock(this, true);
 			fJournal = NULL;
 		}
 
-		status_t WriteBlocks(off_t blockNumber,const uint8 *buffer,size_t numBlocks = 1)
+		status_t WriteBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks = 1)
 		{
 			if (fJournal == NULL)
 				return B_NO_INIT;
 
-			return fJournal->LogBlocks(blockNumber,buffer,numBlocks);
-			//status_t status = cached_write/*_locked*/(fVolume->Device(),blockNumber,buffer,numBlocks,fVolume->BlockSize());
-			//return status;
+			return fJournal->LogBlocks(blockNumber, buffer, numBlocks);
 		}
 
 		Volume	*GetVolume() { return fJournal != NULL ? fJournal->GetVolume() : NULL; }
