@@ -16,6 +16,6 @@ RelSymLink <develop>libtextencoding.so : libtextencoding.so ;
 
 Package haiku-maildaemon-cvs :
 	libtextencoding.so :
-	boot home config lib ;
+	boot beos system lib ;
 
 SubInclude OBOS_TOP src kits textencoding libiconv ;
