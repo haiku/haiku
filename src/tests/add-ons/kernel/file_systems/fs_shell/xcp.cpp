@@ -59,6 +59,7 @@ public:
 		void *buffer, int size) = 0;
 	virtual ssize_t WriteAttr(const char *name, uint32 type, fs_off_t pos,
 		const void *buffer, int size) = 0;
+	virtual status_t RemoveAttr(const char *name) = 0;
 
 protected:
 	struct my_stat	fStat;	// To be initialized by implementing classes.
@@ -92,7 +93,7 @@ public:
 // FSDomain
 class FSDomain {
 public:
-	virtual status_t Open(const char *path, bool followLink, Node *&node) = 0;
+	virtual status_t Open(const char *path, int openMode, Node *&node) = 0;
 	
 	virtual status_t CreateFile(const char *path, const struct my_stat &st,
 		File *&file) = 0;
@@ -180,6 +181,12 @@ public:
 		ssize_t bytesWritten = fs_write_attr(fFD, name, type, pos, buffer,
 			size);
 		return (bytesWritten >= 0 ? bytesWritten : from_platform_error(errno));
+	}
+
+	virtual status_t RemoveAttr(const char *name)
+	{
+		return (fs_remove_attr(fFD, name) == 0
+			? 0 : from_platform_error(errno));
 	}
 
 protected:
@@ -312,11 +319,10 @@ public:
 	HostFSDomain() {}
 	virtual ~HostFSDomain() {}
 
-	virtual status_t Open(const char *path, bool followLink, Node *&_node)
+	virtual status_t Open(const char *path, int openMode, Node *&_node)
 	{
 		// open the node
-		int fd = open(path, O_RDONLY 
-			| (followLink ? 0 : O_NOTRAVERSE));
+		int fd = open(path, to_platform_open_mode(openMode));
 		if (fd < 0)
 			return from_platform_error(errno);
 
@@ -546,6 +552,11 @@ public:
 		return sys_write_attr(true, fFD, name, type, buffer, size, pos);
 	}
 
+	virtual status_t RemoveAttr(const char *name)
+	{
+		return sys_remove_attr(true, fFD, name);
+	}
+
 protected:
 	int				fFD;
 	int				fAttrDir;
@@ -638,12 +649,10 @@ public:
 	GuestFSDomain() {}
 	virtual ~GuestFSDomain() {}
 
-	virtual status_t Open(const char *path, bool followLink, Node *&_node)
+	virtual status_t Open(const char *path, int openMode, Node *&_node)
 	{
 		// open the node
-		int fd = sys_open(true, -1, path,
-			MY_O_RDONLY | (followLink ? 0 : MY_O_NOTRAVERSE),
-			0, true);
+		int fd = sys_open(true, -1, path, openMode, 0, true);
 		if (fd < 0)
 			return fd;
 
@@ -887,6 +896,9 @@ static status_t
 copy_attribute(const char *source, Node *sourceNode, const char *target,
 	Node *targetNode, const char *name, const my_attr_info &info)
 {
+	// remove the attribute first
+	targetNode->RemoveAttr(name);
+
 	// special case: empty attribute
 	if (info.size <= 0) {
 		ssize_t bytesWritten = targetNode->WriteAttr(name, info.type, 0,
@@ -970,7 +982,8 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 {
 	// open the source node
 	Node *sourceNode;
-	status_t error = sourceDomain->Open(source, options.dereference,
+	status_t error = sourceDomain->Open(source,
+		MY_O_RDONLY | (options.dereference ? 0 : MY_O_NOTRAVERSE),
 		sourceNode);
 	if (error != FS_OK) {
 		fprintf(stderr, "Failed to open source path `%s': %s\n", source,
@@ -981,12 +994,24 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 
 	// check, if target exists
 	Node *targetNode = NULL;
-	error = targetDomain->Open(target, false, targetNode);
+	// try opening with resolving symlinks first
+	error = targetDomain->Open(target, MY_O_RDONLY | MY_O_NOTRAVERSE,
+		targetNode);
 	NodeDeleter targetDeleter;
 	if (error == FS_OK) {
 		// 1. target exists:
 		//    check, if it is a dir and, if so, whether source is a dir too
 		targetDeleter.SetTo(targetNode);
+
+		// if the target is a symlink, try resolving it
+		if (targetNode->IsSymLink()) {
+			Node *resolvedTargetNode;
+			error = targetDomain->Open(target, MY_O_RDONLY, resolvedTargetNode);
+			if (error == FS_OK) {
+				targetNode = resolvedTargetNode;
+				targetDeleter.SetTo(targetNode);
+			}
+		}
 
 		if (sourceNode->IsDirectory() && targetNode->IsDirectory()) {
 			// 1.1. target and source are dirs:
@@ -994,19 +1019,34 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 			// ...
 		} else {
 			// 1.2. source and/or target are no dirs
-			//      -> if /force/, remove the target and continue with 2.,
-			//         otherwise fail
-			if (!options.force) {
+
+			if (options.force) {
+				// 1.2.1. /force/
+				//        -> remove the target and continue with 2.
+				targetDeleter.Delete();
+				targetNode = NULL;
+				error = targetDomain->Unlink(target);
+				if (error != FS_OK) {
+					fprintf(stderr, "Failed to remove `%s'\n", target);
+					return error;
+				}
+			} else if (sourceNode->IsFile() && targetNode->IsFile()) {
+				// 1.2.1.1. !/force/, but both source and target are files
+				//          -> truncate the target file and continue
+				targetDeleter.Delete();
+				targetNode = NULL;
+				error = targetDomain->Open(target, MY_O_RDWR | MY_O_TRUNC,
+					targetNode);
+				if (error != FS_OK) {
+					fprintf(stderr, "Failed to open `%s' for writing\n",
+						target);
+					return error;
+				}
+			} else {
+				// 1.2.1.2. !/force/, source or target isn't a file
+				//          -> fail
 				fprintf(stderr, "File `%s' does exist.\n", target);
 				return FS_FILE_EXISTS;
-			}
-
-			targetDeleter.SetTo(NULL);
-			targetNode = NULL;
-			error = targetDomain->Unlink(target);
-			if (error != FS_OK) {
-				fprintf(stderr, "Failed to remove `%s'\n", target);
-				return error;
 			}
 		}
 	} // else: 2. target doesn't exist: -> just create it
@@ -1014,10 +1054,12 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 	// create the target node
 	error = FS_OK;
 	if (sourceNode->IsFile()) {
-		File *file = NULL;
-		error = targetDomain->CreateFile(target, sourceNode->Stat(), file);
-		if (error == 0)
-			targetNode = file;
+		if (!targetNode) {
+			File *file = NULL;
+			error = targetDomain->CreateFile(target, sourceNode->Stat(), file);
+			if (error == 0)
+				targetNode = file;
+		}
 	} else if (sourceNode->IsDirectory()) {
 		// check /recursive/
 		if (!options.recursive) {
@@ -1060,7 +1102,6 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 			fs_strerror(error));
 		return error;
 	}
-	targetDeleter.Detach();
 	targetDeleter.SetTo(targetNode);
 
 	// copy attributes
@@ -1138,7 +1179,7 @@ do_xcp(int argc, char **argv)
 	DomainDeleter targetDomainDeleter(targetDomain);
 
 	Node *targetNode;
-	status_t error = targetDomain->Open(target, true, targetNode);
+	status_t error = targetDomain->Open(target, MY_O_RDONLY, targetNode);
 	if (error == 0) {
 		NodeDeleter targetDeleter(targetNode);
 		targetExists = true;
@@ -1191,7 +1232,8 @@ do_xcp(int argc, char **argv)
 				//           (copy_dir_contents())
 				// open the source dir
 				Node *sourceNode;
-				error = sourceDomain->Open(source, options.dereference,
+				error = sourceDomain->Open(source,
+					MY_O_RDONLY | (options.dereference ? 0 : MY_O_NOTRAVERSE),
 					sourceNode);
 				if (error != FS_OK) {
 					fprintf(stderr, "Failed to open `%s': %s.\n", source,
