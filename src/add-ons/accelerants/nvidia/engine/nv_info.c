@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-8/2004
+   Rudolf Cornelissen 7/2003-9/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -159,6 +159,10 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 		uint32 fvco_min = *((uint32*)(&(rom[offset + 71])));
 
 		LOG(8,("INFO: PLL VCO range is %dkHz - %dkHz\n", fvco_min, fvco_max));
+
+		/* modify presets to reflect card capability */
+//		si->ps.min_video_vco = fvco_min / 1000;
+//		si->ps.max_video_vco = fvco_max / 1000;
 
 		/* only pins 5 contains this info */
 		//fixme: not finished..
@@ -1428,6 +1432,8 @@ void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
 
 static void pinsnv4_fake(void)
 {
+	/* we have a standard PLL */
+	si->ps.ext_pll = false;
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 256;
 	si->ps.min_system_vco = 128;
@@ -1460,6 +1466,8 @@ static void pinsnv4_fake(void)
 
 static void pinsnv5_nv5m64_fake(void)
 {
+	/* we have a standard PLL */
+	si->ps.ext_pll = false;
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 300;
 	si->ps.min_system_vco = 128;
@@ -1492,6 +1500,8 @@ static void pinsnv5_nv5m64_fake(void)
 
 static void pinsnv6_fake(void)
 {
+	/* we have a standard PLL */
+	si->ps.ext_pll = false;
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 300;
 	si->ps.min_system_vco = 128;
@@ -1524,6 +1534,8 @@ static void pinsnv6_fake(void)
 
 static void pinsnv10_arch_fake(void)
 {
+	/* we have a standard PLL */
+	si->ps.ext_pll = false;
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 350;
 	si->ps.min_system_vco = 128;
@@ -1574,6 +1586,8 @@ static void pinsnv10_arch_fake(void)
 
 static void pinsnv20_arch_fake(void)
 {
+	/* we have a standard PLL */
+	si->ps.ext_pll = false;
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 350;
 	si->ps.min_system_vco = 128;
@@ -1608,6 +1622,21 @@ static void pinsnv20_arch_fake(void)
 
 static void pinsnv30_arch_fake(void)
 {
+	/* determine PLL type */
+	LOG(8,("INFO: NV30 architecture chip, PIXPLLC2 DAC1 = $%08x, DAC2 = $%08x\n",
+		DACR(PIXPLLC2), DAC2R(PIXPLLC2)));
+	switch (si->ps.card_type)
+	{
+	case NV31:
+	case NV36:
+		/* we have a extended PLL */
+		si->ps.ext_pll = true;
+		break;
+	default:
+		/* we have a standard PLL */
+		si->ps.ext_pll = false;
+		break;
+	}
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 350;
 	si->ps.min_system_vco = 128;
@@ -1794,6 +1823,8 @@ void dump_pins(void)
 	char *msg = "";
 
 	LOG(2,("INFO: pinsdump follows:\n"));
+	LOG(2,("PLL type: "));
+	if (si->ps.ext_pll) LOG(2,("extended\n")); else LOG(2,("standard\n"));
 	LOG(2,("f_ref: %fMhz\n", si->ps.f_ref));
 	LOG(2,("max_system_vco: %dMhz\n", si->ps.max_system_vco));
 	LOG(2,("min_system_vco: %dMhz\n", si->ps.min_system_vco));

@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-7/2004
+   Rudolf Cornelissen 12/2003-9/2004
 */
 
 #define MODULE_BIT 0x00010000
@@ -183,8 +183,7 @@ status_t nv_dac_set_pix_pll(display_mode target)
 	DACW(PIXPLLC, ((p << 16) | (n << 8) | m));
 
 	/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
-	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
-		DACW(PIXPLLC2, 0x80000401);
+	if (si->ps.ext_pll) DACW(PIXPLLC2, 0x80000401);
 
 	/* Wait for the PIXPLL frequency to lock until timeout occurs */
 //fixme: do NV cards have a LOCK indication bit??
@@ -300,7 +299,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 		if ((f_vco >= si->ps.min_pixel_vco) && (f_vco <= si->ps.max_pixel_vco))
 		{
 			/* FX5600 and FX5700 tweak for 2nd set N and M scalers */
-			if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36)) f_vco /= 4;
+			if (si->ps.ext_pll) f_vco /= 4;
 
 			/* iterate trough all valid reference-frequency postscaler settings */
 			for (m = 7; m <= 14; m++)
@@ -323,7 +322,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 				if ((n < 1) || (n > 255))	continue;
 
 				/* find error in frequency this setting gives */
-				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
+				if (si->ps.ext_pll)
 				{
 					/* FX5600 and FX5700 tweak for 2nd set N and M scalers */
 					error = fabs((req_pclk / 4) - (((si->ps.f_ref / m) * n) / p));
@@ -351,7 +350,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 	/* log the VCO frequency found */
 	f_vco = ((si->ps.f_ref / m) * n);
 	/* FX5600 and FX5700 tweak for 2nd set N and M scalers */
-	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36)) f_vco *= 4;
+	if (si->ps.ext_pll) f_vco *= 4;
 
 	LOG(2,("DAC: pix VCO frequency found %fMhz\n", f_vco));
 

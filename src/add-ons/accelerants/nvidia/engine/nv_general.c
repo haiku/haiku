@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-8/2004
+   Rudolf Cornelissen 10/2002-9/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.25 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.26 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
