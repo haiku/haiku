@@ -1,7 +1,8 @@
 SubDir OBOS_TOP src apps bin unzip ;
 
-StaticLibrary unzip :
+StaticLibrary unzip : 
 	crc32.c
+	ttyio.c
 	crctab.c
 	crypt.c
 	envargs.c
@@ -13,40 +14,34 @@ StaticLibrary unzip :
 	list.c
 	match.c
 	process.c
-	ttyio.c
 	zipinfo.c
 	beos.c
 	beosmain.cpp
+	: : unzip.rdef
 ;
 
 BinCommand unzip :
 	unzip.c
 	unreduce.c
 	unshrink.c
-	: libunzip.a
+	: libunzip.a be : unzip.rdef
 ;
-
-LinkSharedOSLibs unzip : be ;
-
 
 BinCommand funzip :
 	funzip.c
-	crc32.c
 	cryptf.c
 	globalsf.c
 	inflatef.c
+	crc32.c
 	ttyio.c
+	: be : unzip.rdef
 ;
-
-LinkSharedOSLibs funzip : be ;
 
 BinCommand unzipsfx :
 	unzip.c
 	sfxdefs.c
-	: libunzip.a
+	: libunzip.a be : unzip.rdef
 ;
-
-LinkSharedOSLibs unzipsfx : be ;
 
 {
 	MakeLocate <bin>zipgrep : $(OBOS_BIN_DIR) ;

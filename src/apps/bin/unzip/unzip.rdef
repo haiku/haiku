@@ -1,0 +1,11 @@
+resource app_version
+{
+	major = 5,
+	middle = 5,
+	minor = 0,
+	variety = 5,
+	internal = 0,
+	short_info = "5.50", 
+    long_info  = "5.50 ©2002 Info-ZIP"
+};
+
