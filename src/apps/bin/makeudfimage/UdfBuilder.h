@@ -20,11 +20,13 @@
 #include "Allocator.h"
 #include "OutputFile.h"
 #include "ProgressListener.h"
+#include "UdfString.h"
 
 class UdfBuilder {
 public:
 	UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
-	           bool doIso, const ProgressListener &listener);
+	           bool doIso, const char *udfVolumeName, const char *isoVolumeName,
+	           const ProgressListener &listener);
 	status_t InitCheck() const;
 	status_t Build();
 private:
@@ -36,6 +38,8 @@ private:
 	uint32 _BlockShift() const { return fBlockShift; }	
 	bool _DoUdf() const { return fDoUdf; }
 	bool _DoIso() const { return fDoIso; }
+	Udf::String& _UdfVolumeName() { return fUdfVolumeName; }
+	Udf::String& _IsoVolumeName() { return fIsoVolumeName; }
 	Allocator& _Allocator() { return fAllocator; }
 
 	status_t _FormatString(char *message, const char *formatString, va_list arguments) const;
@@ -50,6 +54,8 @@ private:
 	uint32 fBlockShift;
 	bool fDoUdf;
 	bool fDoIso;
+	Udf::String fUdfVolumeName;
+	Udf::String fIsoVolumeName;
 	const ProgressListener &fListener;
 	Allocator fAllocator;
 };

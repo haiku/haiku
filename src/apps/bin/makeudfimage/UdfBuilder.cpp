@@ -12,7 +12,9 @@
 
 #include "UdfBuilder.h"
 
+#include <OS.h>
 #include <stdio.h>
+#include <string>
 
 #include "UdfDebug.h"
 #include "Utils.h"
@@ -23,7 +25,9 @@ using Udf::check_size_error;
 /*! \brief Creates a new UdfBuilder object.
 */
 UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
-                       bool doIso, const ProgressListener &listener)
+                       bool doIso, const char *udfVolumeName,
+                       const char *isoVolumeName,
+                       const ProgressListener &listener)
 	: fInitStatus(B_NO_INIT)
 	, fOutputFile(outputFile, B_READ_WRITE | B_CREATE_FILE)
 	, fOutputFilename(outputFile)
@@ -31,6 +35,8 @@ UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
 	, fBlockShift(0)
 	, fDoUdf(doUdf)
 	, fDoIso(doIso)
+	, fUdfVolumeName(udfVolumeName)
+	, fIsoVolumeName(isoVolumeName)
 	, fListener(listener)
 	, fAllocator(blockSize)
 {
@@ -39,32 +45,56 @@ UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
 
 	// Check the output file
 	status_t error = _OutputFile().InitCheck();
+	if (error) {
+		_PrintError("Error opening output file: 0x%lx, `%s'", error,
+		            strerror(error));
+	}
+	// Check the allocator
 	if (!error) {
-		// Check the allocator
 		error = _Allocator().InitCheck();
-		if (!error) {
-			// Check the block size
-			if (!error)
-				error = Udf::get_block_shift(_BlockSize(), fBlockShift);
-			if (!error)
-				error = _BlockSize() >= 512 ? B_OK : B_BAD_VALUE;
-			if (!error) {
-				// Check that at least one type of filesystem has
-				// been requested
-				error = _DoUdf() || _DoIso() ? B_OK : B_BAD_VALUE;
-				if (error) {
-					_PrintError("No filesystems requested.");
-				}			
-			} else {
-				_PrintError("Invalid block size: %ld", blockSize);
-			}
-		} else {
+		if (error) {
 			_PrintError("Error creating block allocator: 0x%lx, `%s'", error,
 			            strerror(error));
 		}
-	} else {
-		_PrintError("Error opening output file: 0x%lx, `%s'", error,
-		            strerror(error));
+	}
+	// Check the block size
+	if (!error) {
+		error = Udf::get_block_shift(_BlockSize(), fBlockShift);
+		if (!error)
+			error = _BlockSize() >= 512 ? B_OK : B_BAD_VALUE;
+		if (error)
+			_PrintError("Invalid block size: %ld", blockSize);
+	}
+	// Check that at least one type of filesystem has
+	// been requested
+	if (!error) {
+		error = _DoUdf() || _DoIso() ? B_OK : B_BAD_VALUE;
+		if (error)
+			_PrintError("No filesystems requested.");
+	}			
+	// Check the volume names
+	if (!error) {
+		if (_UdfVolumeName().Utf8Length() == 0)
+			_UdfVolumeName().SetTo("(Unnamed UDF Volume)");
+		if (_IsoVolumeName().Utf8Length() == 0)
+			_IsoVolumeName().SetTo("UNNAMED_ISO");
+		if (_DoUdf()) {
+			error = _UdfVolumeName().Cs0Length() <= 128 ? B_OK : B_ERROR;
+			if (error) {
+				_PrintError("Udf volume name too long (%ld bytes, max "
+				            "length is 128 bytes.",
+				            _UdfVolumeName().Cs0Length());
+			}
+		}
+		if (!error && _DoIso()) {		
+			error = _IsoVolumeName().Utf8Length() <= 32 ? B_OK : B_ERROR;
+			// ToDo: Should also check for illegal characters
+			if (error) {
+				_PrintError("Iso volume name too long (%ld bytes, max "
+				            "length is 32 bytes.",
+				            _IsoVolumeName().Cs0Length());
+			}
+		}
 	}
 	
 	if (!error) {
@@ -221,6 +251,53 @@ UdfBuilder::Build()
 				error = check_size_error(bytes, _BlockSize()-sizeof(anchor));
 			}
 		}
+		// build primary vds
+		uint32 vdsNumber = 0;
+		Udf::primary_volume_descriptor primary;
+		primary.set_vds_number(vdsNumber++);
+		primary.set_primary_volume_descriptor_number(0);
+		uint32 nameLength = _UdfVolumeName().Cs0Length();
+		if (nameLength > 32) {
+			_PrintWarning("udf: Truncating volume name as stored in primary "
+			              "volume descriptor to 32 byte limit. This shouldn't matter, "
+			              "as the complete name is %d bytes long, which is short enough "
+			              "to fit completely in the logical volume descriptor.",
+			              nameLength);
+			nameLength = 32;
+		}
+		memcpy(primary.volume_identifier().data, _UdfVolumeName().Cs0(),
+		       nameLength);
+		primary.set_volume_sequence_number(1);
+		primary.set_max_volume_sequence_number(1);
+		primary.set_interchange_level(2);
+		primary.set_max_interchange_level(3);
+		primary.set_character_set_list(1);
+		primary.set_max_character_set_list(1);
+		// first 16 chars of volume set id must be unique. first 8 must be
+		// a hex representation of a timestamp
+		char timestamp[9];
+		sprintf(timestamp, "%lx", real_time_clock());
+		std::string volumeSetId(timestamp);
+		volumeSetId = volumeSetId + "--------" + "(unnamed volume set)";
+		Udf::String Cs0VolumeSetId(volumeSetId.c_str());
+		memcpy(primary.volume_set_identifier().data, Cs0VolumeSetId.Cs0(),
+		       Cs0VolumeSetId.Cs0Length());
+		primary.descriptor_character_set() = Udf::kCs0CharacterSet;
+		primary.explanatory_character_set() = Udf::kCs0CharacterSet;
+		Udf::extent_address nullAddress(0, 0);
+		primary.volume_abstract() = nullAddress;
+		primary.volume_copyright_notice() = nullAddress;
+		primary.tag().set_id(Udf::TAGID_PRIMARY_VOLUME_DESCRIPTOR);
+		primary.tag().set_version(3);
+		primary.tag().set_serial_number(0);
+		DUMP(primary);
+
+		// build logical vds
+//		Udf::logical_volume_descriptor logical;
+
+		// build partition descriptor
+//		Udf::partition_descriptor partition;
+		
 		// write primary vds
 
 		// write reserve vds
@@ -233,7 +310,7 @@ UdfBuilder::Build()
 	}
 
 	if (!error)
-		_PrintUpdate(VERBOSITY_LOW, "Finished.");
+		_PrintUpdate(VERBOSITY_LOW, "Finished");
 	RETURN(error);
 }
 
