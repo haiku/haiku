@@ -2,6 +2,10 @@
 	play.cpp
 	Copyright (C) 1995 Be Incorporated.  All Rights Reserved.
 +++++ */
+/*
+ * was released as sample code; source:
+ * ftp://planetmirror.com/raid/13/beos/samples/media_kit/obsolete/play.cpp
+ */
 
 #include <errno.h>
 #include <fcntl.h>
