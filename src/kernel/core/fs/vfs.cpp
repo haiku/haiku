@@ -10,6 +10,11 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+#include <OS.h>
+#include <StorageDefs.h>
+#include <fs_info.h>
+#include <fs_interface.h>
+
 #include <kernel.h>
 #include <boot/kernel_args.h>
 #include <vfs.h>
@@ -22,16 +27,9 @@
 #include <malloc.h>
 #include <arch/cpu.h>
 #include <elf.h>
-#include <Errors.h>
 #include <kerrors.h>
 #include <fd.h>
 #include <fs/node_monitor.h>
-
-#include <OS.h>
-#include <StorageDefs.h>
-#include <fs_info.h>
-
-#include "builtin_fs.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -86,20 +84,12 @@ struct vnode_hash_key {
 	vnode_id	vnode;
 };
 
-typedef struct file_system {
-	struct file_system	*next;
-	struct fs_ops		*ops;
-	const char			*name;
-	image_id			image;
-	int32				ref_count;
-} file_system;
-
-#define FS_CALL(vnode, op) (vnode->mount->fs->ops->op)
-#define FS_MOUNT_CALL(mount, op) (mount->fs->ops->op)
+#define FS_CALL(vnode, op) (vnode->mount->fs->op)
+#define FS_MOUNT_CALL(mount, op) (mount->fs->op)
 
 struct fs_mount {
 	struct fs_mount	*next;
-	file_system		*fs;
+	file_system_info *fs;
 	mount_id		id;
 	void			*cookie;
 	char			*mount_point;
@@ -110,7 +100,6 @@ struct fs_mount {
 	bool			unmounting;
 };
 
-static file_system *sFileSystems;
 static mutex sFileSystemsMutex;
 
 static mutex sMountMutex;
@@ -326,148 +315,25 @@ put_mount(struct fs_mount *mount)
 }
 
 
-/**	Creates a new file_system structure.
- *	The sFileSystems lock must be hold when you call this function.
- */
-
-static file_system *
-new_file_system(const char *name, struct fs_ops *ops)
+static status_t
+put_file_system(file_system_info *fs)
 {
-	file_system *fs;
+	return put_module(fs->module_info.name);
+}
 
-	ASSERT_LOCKED_MUTEX(&sFileSystemsMutex);
 
-	fs = (struct file_system *)malloc(sizeof(struct file_system));
-	if (fs == NULL)
+static file_system_info *
+get_file_system(const char *fsName)
+{
+	// construct module name (we currently support only one API)
+	char name[B_FILE_NAME_LENGTH];
+	snprintf(name, sizeof(name), "file_systems/%s/v1", fsName);
+
+	file_system_info *info;
+	if (get_module(name, (module_info **)&info) != B_OK)
 		return NULL;
 
-	fs->name = name;
-	fs->ops = ops;
-	fs->image = -1;
-	fs->ref_count = 0;
-
-	// add it to the queue
-
-	fs->next = sFileSystems;
-	sFileSystems = fs;
-
-	return fs;
-}
-
-
-static status_t
-unload_file_system(file_system *fs)
-{
-	void (*uninit)();
-
-	// The image_id is invalid if it's an internal file system
-	if (fs->image < B_OK)
-		return B_OK;
-
-	if (get_image_symbol(fs->image, "uninit_file_system",
-			B_SYMBOL_TYPE_TEXT, (void **)&uninit) == B_OK)
-		uninit();
-
-	unload_kernel_add_on(fs->image);
-	free(fs);
-
-	return B_OK;
-}
-
-
-static file_system *
-load_file_system(const char *name)
-{
-	char path[SYS_MAX_PATH_LEN];
-	file_system *fs;
-	struct fs_ops **ops;
-	int32 *version;
-	void (*init)();
-	image_id image;
-
-	// ToDo: don't use fixed paths!!
-
-	// search in the user directory
-	sprintf(path, "/boot/home/config/add-ons/kernel/file_systems/%s", name);
-
-	image = load_kernel_add_on(path);
-	if (image == B_ENTRY_NOT_FOUND) {
-		// ToDo: this is not a BeOS compatible system directory (bootfs)
-		// search in the system directory
-		sprintf(path, "/boot/addons/fs/%s", name);
-		//sprintf(path, "/boot/beos/system/add-ons/kernel/file_systems/%s", name);
-		image = load_kernel_add_on(path);
-	}
-	if (image < B_OK)
-		return NULL;
-
-	if (get_image_symbol(image, "init_file_system", B_SYMBOL_TYPE_TEXT, (void **)&init) != B_OK
-		|| get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&version) != B_OK
-		|| get_image_symbol(image, "fs_entry", B_SYMBOL_TYPE_DATA, (void **)&ops) != B_OK) {
-		dprintf("vfs: add-on \"%s\" doesn't export all necessary symbols.\n", name);
-		goto err;
-	}
-
-	if (*version != B_CURRENT_FS_API_VERSION) {
-		dprintf("vfs: add-on \"%s\" supports unknown API version %ld\n", name, *version);
-		goto err;
-	}
-
-	fs = new_file_system(name, *ops);
-	if (fs == NULL)
-		goto err;
-
-	fs->image = image;
-
-	// initialize file system add-on
-	init();
-
-	return fs;
-
-err:
-	unload_kernel_add_on(image);
-	return NULL;
-}
-
-
-static status_t
-put_file_system(file_system *fs)
-{
-	status_t status;
-
-	mutex_lock(&sFileSystemsMutex);
-
-	if (--fs->ref_count == 0)
-		status = unload_file_system(fs);
-	else
-		status = B_OK;
-
-	mutex_unlock(&sFileSystemsMutex);
-	return status;
-}
-
-
-static file_system *
-get_file_system(const char *name)
-{
-	file_system *fs;
-
-	mutex_lock(&sFileSystemsMutex);
-
-	for (fs = sFileSystems; fs != NULL; fs = fs->next) {
-		if (!strcmp(name, fs->name))
-			break;
-	}
-
-	if (fs == NULL)
-		fs = load_file_system(name);
-
-	// if we find a suitable file system, increment its reference counter
-	if (fs)
-		fs->ref_count++;
-
-	mutex_unlock(&sFileSystemsMutex);
-	return fs;
+	return info;
 }
 
 
@@ -1309,7 +1175,23 @@ remove_vnode(mount_id mountID, vnode_id vnodeID)
 		vnode->delete_me = true;
 
 	mutex_unlock(&sVnodeMutex);
-	return 0;
+	return B_OK;
+}
+
+
+extern "C" status_t 
+unremove_vnode(mount_id mountID, vnode_id vnodeID)
+{
+	struct vnode *vnode;
+
+	mutex_lock(&sVnodeMutex);
+
+	vnode = lookup_vnode(mountID, vnodeID);
+	if (vnode)
+		vnode->delete_me = false;
+
+	mutex_unlock(&sVnodeMutex);
+	return B_OK;
 }
 
 
@@ -1713,8 +1595,6 @@ vfs_bootstrap_file_systems(void)
 	status_t status;
 
 	// bootstrap the root filesystem
-	bootstrap_rootfs();
-
 	status = sys_mount("/", NULL, "rootfs", NULL);
 	if (status < B_OK)
 		panic("error mounting rootfs!\n");
@@ -1722,20 +1602,25 @@ vfs_bootstrap_file_systems(void)
 	sys_setcwd(-1, "/");
 
 	// bootstrap the devfs
-	bootstrap_devfs();
-
 	sys_create_dir("/dev", 0755);
 	status = sys_mount("/dev", NULL, "devfs", NULL);
 	if (status < B_OK)
 		panic("error mounting devfs\n");
 
 	// bootstrap the pipefs
-	bootstrap_pipefs();
-
 	sys_create_dir("/pipe", 0755);
 	status = sys_mount("/pipe", NULL, "pipefs", NULL);
 	if (status < B_OK)
 		panic("error mounting pipefs\n");
+
+	// bootstrap the bootfs (if possible)
+	sys_create_dir("/boot", 0755);
+	status = sys_mount("/boot", NULL, "bootfs", NULL);
+	if (status < B_OK) {
+		// this is no fatal exception at this point, as we may mount
+		// a real on disk file system later
+		dprintf("error mounting bootfs\n");
+	}
 
 	// create some standard links on the rootfs
 
@@ -1751,15 +1636,9 @@ vfs_bootstrap_file_systems(void)
 status_t
 vfs_mount_boot_file_system()
 {
-	// bootstrap the bootfs
+	// ToDo: mount real file system!
 
-	bootstrap_bootfs();
-
-	sys_create_dir("/boot", 0755);
-	dev_t bootDevice = sNextMountID;
-	status_t status = sys_mount("/boot", NULL, "bootfs", NULL);
-	if (status < B_OK)
-		panic("error mounting bootfs\n");
+	dev_t bootDevice = sNextMountID - 1;
 
 	// create link for the name of the boot device
 
@@ -1772,26 +1651,6 @@ vfs_mount_boot_file_system()
 	}
 
 	return B_OK;
-}
-
-
-status_t
-vfs_register_file_system(const char *name, struct fs_ops *ops)
-{
-	status_t status = B_OK;
-	file_system *fs;
-
-	if (name == NULL || *name == '\0' || ops == NULL)
-		return B_BAD_VALUE;
-
-	mutex_lock(&sFileSystemsMutex);
-
-	fs = new_file_system(name, ops);
-	if (fs == NULL)
-		status = B_NO_MEMORY;
-
-	mutex_unlock(&sFileSystemsMutex);
-	return status;
 }
 
 
@@ -1815,7 +1674,6 @@ vfs_init(kernel_args *ka)
 
 	node_monitor_init();
 
-	sFileSystems = NULL;
 	sRoot = NULL;
 
 	if (mutex_init(&sFileSystemsMutex, "vfs_lock") < 0)
