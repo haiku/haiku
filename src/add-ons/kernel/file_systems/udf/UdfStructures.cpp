@@ -1062,7 +1062,7 @@ extended_file_icb_entry::dump() const
 	PRINT(("file_link_count:           %d\n", file_link_count()));
 	PRINT(("record_format:             %d\n", record_format()));
 	PRINT(("record_display_attributes: %d\n", record_display_attributes()));
-	PRINT(("record_length:             %d\n", record_length()));
+	PRINT(("record_length:             %ld\n", record_length()));
 	PRINT(("information_length:        %Ld\n", information_length()));
 	PRINT(("logical_blocks_recorded:   %Ld\n", logical_blocks_recorded()));
 	PRINT(("access_date_and_time:\n"));

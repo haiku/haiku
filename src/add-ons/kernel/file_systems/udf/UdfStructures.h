@@ -476,6 +476,9 @@ public:
 	
 	const array<uint8, 6>& implementation_use() const { return _implementation_use; }
 	array<uint8, 6>& implementation_use() { return _implementation_use; }
+	
+	uint16 flags() const { return B_LENDIAN_TO_HOST_INT16(_accessor().flags); }
+	uint32 unique_id() const { return B_LENDIAN_TO_HOST_INT32(_accessor().unique_id); }
 
 	void set_type(uint8 type) {
 		type_and_length_accessor t;
@@ -491,17 +494,33 @@ public:
 	}
 	void set_block(uint32 block) { _location.set_block(block); }
 	void set_partition(uint16 partition) { _location.set_partition(partition); }
+	
+	void set_flags(uint16 flags) { _accessor().flags = B_HOST_TO_LENDIAN_INT16(flags); }
+	void set_unique_id(uint32 id) { _accessor().unique_id = B_HOST_TO_LENDIAN_INT32(id); }
 
 	void set_to(uint32 block, uint16 partition, uint32 length = 1,
-	       uint8 type = EXTENT_TYPE_RECORDED)
+	       uint8 type = EXTENT_TYPE_RECORDED, uint16 flags = 0, uint32 unique_id = 0)
 	{
 		set_block(block);
 		set_partition(partition);
 		set_length(length);
 		set_type(type);
+		set_flags(flags);
+		set_unique_id(unique_id);
 	}
 
 private:
+	//! See UDF-2.50 2.3.4.3
+	struct _implementation_use_accessor {
+		uint16 flags;
+		uint32 unique_id;
+	} __attribute__((packed));
+	
+	_implementation_use_accessor& _accessor() { return
+		*reinterpret_cast<_implementation_use_accessor*>(implementation_use().data); }
+	const _implementation_use_accessor& _accessor() const { return
+		*reinterpret_cast<const _implementation_use_accessor*>(implementation_use().data); }
+	
 	uint32 type_and_length() const { return B_LENDIAN_TO_HOST_INT32(_type_and_length); }
 	void set_type_and_length(uint32 value) { _type_and_length = B_HOST_TO_LENDIAN_INT32(value); }
 
@@ -1517,6 +1536,7 @@ struct partition_header_descriptor {
 */
 struct file_id_descriptor {
 public:
+	uint32 descriptor_size() const { return total_length(); }
 	void dump() const;
 
 	descriptor_tag & tag() { return _tag; }
@@ -1561,7 +1581,7 @@ public:
 	long_address& icb() { return _icb; }
 	const long_address& icb() const { return _icb; }
 
-	uint8 implementation_use_length() const { return _implementation_use_length; }
+	uint16 implementation_use_length() const { return B_LENDIAN_TO_HOST_INT16(_implementation_use_length); }
 	
 	/*! If implementation_use_length is greater than 0, the first 32
 		bytes of implementation_use() shall be an entity_id identifying
@@ -1618,7 +1638,7 @@ public:
 	
 
 	void set_id_length(uint8 id_length) { _id_length = id_length; }
-	void set_implementation_use_length(uint8 implementation_use_length) { _implementation_use_length = implementation_use_length; }
+	void set_implementation_use_length(uint16 implementation_use_length) { _implementation_use_length = B_HOST_TO_LENDIAN_INT16(implementation_use_length); }
 	
 	
 	
@@ -1646,7 +1666,7 @@ private:
 	uint8 _characteristics;
 	uint8 _id_length;
 	long_address _icb;
-	uint8 _implementation_use_length;	
+	uint16 _implementation_use_length;	
 } __attribute__((packed));
 
 
