@@ -1,5 +1,5 @@
 /*
-	$Id: DeskbarGetItemTest.h,v 1.1 2002/09/12 05:14:36 jrand Exp $
+	$Id: DeskbarGetItemTest.h,v 1.2 2002/09/13 03:51:09 jrand Exp $
 	
 	This file defines a class for performing a test of BDeskbar
 	functionality.

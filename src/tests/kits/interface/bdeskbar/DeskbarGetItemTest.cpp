@@ -1,5 +1,5 @@
 /*
-	$Id: DeskbarGetItemTest.cpp,v 1.1 2002/09/12 05:14:36 jrand Exp $
+	$Id: DeskbarGetItemTest.cpp,v 1.2 2002/09/13 03:51:09 jrand Exp $
 	
 	This file implements tests for the following use cases of BDeskbar:
 	  - Count Items
@@ -40,7 +40,9 @@
 
 /*
  *  Method:  DeskbarGetItemTest::PerformTest()
- *   Descr:  This member function 
+ *   Descr:  This member function iterates over all of the items in the 
+ *           deskbar shelf and gets information about each item and confirms
+ *           that all of the information is self-consistent.
  */
 
 
