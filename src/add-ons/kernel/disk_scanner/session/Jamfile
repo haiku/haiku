@@ -1,1 +1,8 @@
 SubDir OBOS_TOP src add-ons kernel disk_scanner session ;
+
+UsePrivateHeaders $(DOT) ;
+
+R5KernelAddon intel : kernel disk_scanner session :
+	cdrom.c
+;
+
