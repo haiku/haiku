@@ -186,7 +186,8 @@ OBOS_KERNEL_DIR ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system ] ;
 OBOS_PREFS_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos preferences ] ;
 OBOS_SERVER_DIR ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system servers ] ;
 OBOS_SHLIB_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system lib ] ;
-OBOS_STLIB_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system lib ] ;
+OBOS_STLIB_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) develop lib
+							  $(OBOS_ARCH) ] ;
 OBOS_TEST_DIR   ?= [ FDirName $(OBOS_TOP) tests ] ;
 
 OBOS_KERNEL_CONFIG = config.$(OBOS_ARCH).ini ;
@@ -744,14 +745,23 @@ rule MakeLocateObjects
 
 rule StaticLibrary
 {
-	# StaticLibrary <name> : <sources> ;
-
-	local lib = lib$(<)$(SUFLIB) ;
+	# StaticLibrary <name> : <sources> [ : <target dir> ] ;
+	# Creates a static library from sources.
+	# <name>: Basename of the library, without leading "lib" and trailing ".a".
+	# <source>: List of source files.
+	# <target dir>: Directory into which the library shall be placed. Defaults
+	#               to the standard directory for static libs.
+	#
+	local lib = lib$(1)$(SUFLIB) ;
 	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
-	Library $(lib) : $(>) ;
-	MakeLocate $(lib) : $(OBOS_STLIB_DIR) ;
+	Library $(lib) : $(2) ;
+	local targetDir = $(3) ;
+	if ! $(targetDir) {
+		targetDir = $(OBOS_STLIB_DIR) ;
+	}
+	MakeLocate $(lib) : $(targetDir) ;
 
 	# If KEEPOBJS is set, Library doesn't make the library depend on
 	# `lib'.
