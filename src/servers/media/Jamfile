@@ -2,6 +2,7 @@ SubDir OBOS_TOP src servers media ;
 
 UsePrivateHeaders media ;
 UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
 
 AddResources media_server : media_server.rdef ;
 
@@ -16,5 +17,14 @@ Server media_server :
 	NodeManager.cpp
 	NotificationManager.cpp
 	Queue.cpp
+
+	# storage
+	AddOnMonitor.cpp
+	AddOnMonitorHandler.cpp
+	NodeMonitorHandler.cpp
 ;
 LinkSharedOSLibs media_server : be libmedia.so ;
+
+SEARCH on [ FGristFiles AddOnMonitor.cpp
+	AddOnMonitorHandler.cpp
+	NodeMonitorHandler.cpp ] += [ FDirName $(SUBDIR) .. .. kits storage ] ;

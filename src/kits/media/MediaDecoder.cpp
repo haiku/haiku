@@ -125,7 +125,7 @@ BMediaDecoder::SetTo(const media_format *in_format,
 	if (plugin == NULL) {
 		return fInitStatus = B_ERROR;
 	}
-	Decoder * decoder = plugin->NewDecoder();
+	Decoder * decoder = plugin->NewDecoder(0);
 	if (decoder == NULL) {
 		return fInitStatus = B_ERROR;
 	}
@@ -163,7 +163,7 @@ BMediaDecoder::SetTo(const media_codec_info *mci)
 	if (plugin == NULL) {
 		return fInitStatus = B_ERROR;
 	}
-	Decoder * decoder = plugin->NewDecoder();
+	Decoder * decoder = plugin->NewDecoder(0);
 	if (decoder == NULL) {
 		return fInitStatus = B_ERROR;
 	}

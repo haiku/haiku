@@ -100,7 +100,7 @@ _CreateDecoder(Decoder **_decoder, const media_format *format)
 		return B_ERROR;
 	}
 	
-	*_decoder = decoderPlugin->NewDecoder();
+	*_decoder = decoderPlugin->NewDecoder(0);
 	if (*_decoder == NULL) {
 		printf("_CreateDecoder: NewDecoder() failed\n");
 		return B_ERROR;

@@ -15,6 +15,8 @@
 #include "DataExchange.h"
 #include "TList.h"
 
+#include "AddOnMonitor.h"
+#include "AddOnMonitorHandler.h"
 
 class AddOnManager {
 	public:
@@ -30,14 +32,8 @@ class AddOnManager {
 		status_t	GetReaders(xfer_entry_ref *out_res, int32 *out_count,
 						int32 max_count);
 
-		status_t	MakeEncoderFormats(const media_format_description *descriptions,
-						int32 descriptionCount, media_format *format, uint32 flags);
-		status_t	MakeDecoderFormats(const media_format_description *descriptions,
-						int32 descriptionCount, media_format *format, uint32 flags);
-
 	private:
 		status_t	RegisterAddOn(BEntry &entry);
-		void		RegisterAddOnsFor(BPath path);
 		void		RegisterAddOns();
 
 		void		RegisterReader(ReaderPlugin *reader, const entry_ref &ref);
@@ -65,6 +61,9 @@ class AddOnManager {
 		List<encoder_info> fEncoderList;
 
 		decoder_info	*fCurrentDecoder;
+
+		AddOnMonitorHandler	*fHandler;
+		AddOnMonitor		*fAddOnMonitor;
 };
 
 #endif // _ADD_ON_MANAGER_H

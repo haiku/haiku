@@ -49,8 +49,8 @@ class DecoderPlugin : public virtual MediaPlugin
 	public:
 		DecoderPlugin();
 
-		virtual Decoder *NewDecoder() = 0;
-		virtual status_t RegisterDecoder() = 0;
+		virtual Decoder *NewDecoder(uint index) = 0;
+		virtual status_t GetSupportedFormats(media_format ** formats, size_t * count) = 0;
 };
 
 } } // namespace BPrivate::media

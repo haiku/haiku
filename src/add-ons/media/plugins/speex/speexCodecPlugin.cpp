@@ -315,7 +315,7 @@ done:
 
 
 Decoder *
-SpeexDecoderPlugin::NewDecoder()
+SpeexDecoderPlugin::NewDecoder(uint index)
 {
 	static BLocker locker;
 	static bool initdone = false;
@@ -327,18 +327,29 @@ SpeexDecoderPlugin::NewDecoder()
 }
 
 
+static media_format speex_formats[1];
+
 status_t
-SpeexDecoderPlugin::RegisterDecoder()
+SpeexDecoderPlugin::GetSupportedFormats(media_format ** formats, size_t * count)
 {
 	media_format_description description = speex_description();
 	media_format format = speex_encoded_media_format();
 
-	BMediaFormats formats;
-	status_t result = formats.InitCheck();
+	BMediaFormats mediaFormats;
+	status_t result = mediaFormats.InitCheck();
 	if (result != B_OK) {
 		return result;
 	}
-	return formats.MakeFormatFor(&description, 1, &format);
+	result = mediaFormats.MakeFormatFor(&description, 1, &format);
+	if (result != B_OK) {
+		return result;
+	}
+	speex_formats[0] = format;
+
+	*formats = speex_formats;
+	*count = 1;
+
+	return result;
 }
 
 

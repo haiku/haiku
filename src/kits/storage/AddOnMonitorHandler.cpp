@@ -31,6 +31,14 @@ AddOnMonitorHandler::MessageReceived(BMessage * msg)
 /* virtual */ status_t
 AddOnMonitorHandler::AddDirectory(const node_ref * nref)
 {
+	// ignore directories added twice
+	std::list<add_on_directory_info>::iterator diter = directories.begin();
+	for( ; diter != directories.end() ; diter++) {
+		if (diter->nref == *nref) {
+			return B_OK;
+		}
+	}
+
 	BDirectory directory(nref);
 	status_t status = directory.InitCheck();
 	if (status != B_OK) {

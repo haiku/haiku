@@ -106,8 +106,8 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 
 	// get the format for the description
 	media_format_description description = tobias_description();
-	description.u.avi.codec = header->subtype[0] << 24 | header->subtype[1] << 16 
-	                        | header->subtype[2] <<  8 | header->subtype[3];
+	description.u.avi.codec = header->subtype[3] << 24 | header->subtype[2] << 16 
+	                        | header->subtype[1] <<  8 | header->subtype[0];
 	BMediaFormats formats;
 	result = formats.InitCheck();
 	if (result == B_OK) {
@@ -139,5 +139,15 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
 	*duration = 80000000;
 	*frameCount = 60000;
+	return B_OK;
+}
+
+status_t
+OggTobiasStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+                              media_header *mediaHeader)
+{
+	OggStream::GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
+	*chunkSize = ((ogg_packet*)chunkBuffer)->bytes;
+	*chunkBuffer = ((ogg_packet*)chunkBuffer)->packet;
 	return B_OK;
 }

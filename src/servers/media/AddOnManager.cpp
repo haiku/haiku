@@ -50,22 +50,6 @@ class ImageLoader {
 };
 
 
-static status_t
-register_decoder(const media_format_description *descriptions,
-	int32 descriptionCount, media_format *format, uint32 flags)
-{
-	return gAddOnManager->MakeDecoderFormats(descriptions, descriptionCount, format, flags);
-}
-
-/* not yet used
-static status_t
-register_encoder(const media_format_description *descriptions,
-	int32 descriptionCount, media_format *format, uint32 flags)
-{
-	return gAddOnManager->MakeEncoderFormats(descriptions, descriptionCount, format, flags);
-}
-*/
-
 //	#pragma mark -
 
 
@@ -190,47 +174,62 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 		RegisterDecoder(decoder, ref);
 
 	delete plugin;
-}
-
-
-void
-AddOnManager::RegisterAddOnsFor(BPath path)
-{
-	path.Append("media/plugins");
-
-	BDirectory directory(path.Path());
-	if (directory.InitCheck() != B_OK)
-		return;
-
-	BEntry entry;
-	while (directory.GetNextEntry(&entry) == B_OK)
-		RegisterAddOn(entry);
+	
+	return B_OK;
 }
 
 
 void
 AddOnManager::RegisterAddOns()
 {
-	BPath path;
-
-	// user add-ons come first, so that they can lay over system
-	// add-ons (add-ons are identified by name for registration)
+	class CodecHandler : public AddOnMonitorHandler {
+	private:
+		AddOnManager * fManager;
+	public:
+		CodecHandler(AddOnManager * manager) {
+			fManager = manager;
+		}
+		virtual void	AddOnCreated(const add_on_entry_info * entry_info) {
+		}
+		virtual void	AddOnEnabled(const add_on_entry_info * entry_info) {
+			entry_ref ref;
+			make_entry_ref(entry_info->dir_nref.device, entry_info->dir_nref.node,
+			               entry_info->name, &ref);
+			BEntry entry(&ref, true);
+			fManager->RegisterAddOn(entry);
+		}
+		virtual void	AddOnDisabled(const add_on_entry_info * entry_info) {
+		}
+		virtual void	AddOnRemoved(const add_on_entry_info * entry_info) {
+		}
+	};
 
 	const directory_which directories[] = {
 		B_USER_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
 		B_BEOS_ADDONS_DIRECTORY,
 	};
+	fHandler = new CodecHandler(this);
+	fAddOnMonitor = new AddOnMonitor(fHandler);
 
-	for (uint32 i = 0; i < sizeof(directories) / sizeof(directory_which); i++) {
-		if (find_directory(directories[i], &path) == B_OK)
-			RegisterAddOnsFor(path);
+	node_ref nref;
+	BDirectory directory;
+	BPath path;
+	for (uint i = 0 ; i < sizeof(directories) / sizeof(directory_which) ; i++) {
+		if ((find_directory(directories[i], &path) == B_OK)
+			&& (path.Append("media/plugins") == B_OK)
+			&& (directory.SetTo(path.Path()) == B_OK) 
+			&& (directory.GetNodeRef(&nref) == B_OK)) {
+			fHandler->AddDirectory(&nref);
+		}
 	}
 
 	// ToDo: this is for our own convenience only, and should be removed
 	//	in the final release
-	path.SetTo("/boot/home/develop/openbeos/current/distro/x86.R1/beos/system/add-ons");
-	RegisterAddOnsFor(path);
+	if ((directory.SetTo("/boot/home/develop/openbeos/current/distro/x86.R1/beos/system/add-ons/media/plugins") == B_OK)
+		&& (directory.GetNodeRef(&nref) == B_OK)) {
+		fHandler->AddDirectory(&nref);
+	}
 }
 
 
@@ -257,7 +256,7 @@ AddOnManager::RegisterReader(ReaderPlugin *reader, const entry_ref &ref)
 
 
 void
-AddOnManager::RegisterDecoder(DecoderPlugin *decoder, const entry_ref &ref)
+AddOnManager::RegisterDecoder(DecoderPlugin *plugin, const entry_ref &ref)
 {
 	BAutolock locker(fLock);
 
@@ -274,48 +273,16 @@ AddOnManager::RegisterDecoder(DecoderPlugin *decoder, const entry_ref &ref)
 	decoder_info info;
 	info.ref = ref;
 
-	fCurrentDecoder = &info;
-	BPrivate::media::_gMakeFormatHook = register_decoder;
-
-	if (decoder->RegisterDecoder() != B_OK) {
-		printf("AddOnManager::RegisterDecoder(): decoder->RegisterDecoder() failed!\n");
+	media_format * formats = 0;
+	size_t count = 0;
+	if (plugin->GetSupportedFormats(&formats,&count) != B_OK) {
+		printf("AddOnManager::RegisterDecoder(): plugin->GetSupportedFormats(...) failed!\n");
 		return;
 	}
-
+	for (uint i = 0 ; i < count ; i++) {
+		info.formats.Insert(formats[i]);
+	}
 	fDecoderList.Insert(info);
-	fCurrentDecoder = NULL;
-	BPrivate::media::_gMakeFormatHook = NULL;
 }
 
-
-status_t 
-AddOnManager::MakeEncoderFormats(const media_format_description *descriptions,
-	int32 descriptionCount, media_format *format, uint32 flags)
-{
-	//ASSERT(fCurrentEncoder != NULL);
-
-	status_t status = gFormatManager->RegisterEncoder(descriptions,
-							descriptionCount, format, flags);
-	if (status < B_OK)
-		return status;
-
-	//fCurrentEncoder->format = *format;
-	return B_OK;
-}
-
-
-status_t 
-AddOnManager::MakeDecoderFormats(const media_format_description *descriptions,
-	int32 descriptionCount, media_format *format, uint32 flags)
-{
-	ASSERT(fCurrentDecoder != NULL);
-
-	status_t status = gFormatManager->RegisterDecoder(descriptions,
-							descriptionCount, format, flags);
-	if (status < B_OK)
-		return status;
-
-	fCurrentDecoder->formats.Insert(*format);
-	return B_OK;
-}
 

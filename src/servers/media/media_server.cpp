@@ -112,6 +112,7 @@ private:
 	BLocker *fLocker;
 	
 	virtual void MessageReceived(BMessage *msg);
+	virtual void ReadyToRun();
 	typedef BApplication inherited;
 };
 
@@ -134,8 +135,13 @@ ServerApp::ServerApp()
 //	StartSystemTimeSource();
 	gNodeManager->LoadState();
 	gFormatManager->LoadState();
-	gAddOnManager->LoadState();
-	gAppManager->StartAddonServer();
+	
+
+}
+
+void ServerApp::ReadyToRun()
+{
+	be_app_messenger.SendMessage(MEDIA_SERVER_READY);
 }
 
 ServerApp::~ServerApp()
@@ -726,6 +732,11 @@ ServerApp::MessageReceived(BMessage *msg)
 {
 	TRACE("ServerApp::MessageReceived %lx enter\n", msg->what);
 	switch (msg->what) {
+		case MEDIA_SERVER_READY:
+			gAppManager->StartAddonServer();
+			gAddOnManager->LoadState();
+			break;
+
 		case MEDIA_SERVER_REQUEST_NOTIFICATIONS:
 		case MEDIA_SERVER_CANCEL_NOTIFICATIONS:
 		case MEDIA_SERVER_SEND_NOTIFICATIONS:
@@ -738,6 +749,10 @@ ServerApp::MessageReceived(BMessage *msg)
 		
 		case MEDIA_SERVER_GET_FORMATS:
 			gFormatManager->GetFormats(*msg);
+			break;
+
+		case MEDIA_SERVER_MAKE_FORMAT_FOR:
+			gFormatManager->MakeFormatFor(*msg);
 			break;
 
 		default:

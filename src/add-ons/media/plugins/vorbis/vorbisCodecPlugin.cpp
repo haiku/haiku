@@ -246,7 +246,7 @@ done:
 
 
 Decoder *
-VorbisDecoderPlugin::NewDecoder()
+VorbisDecoderPlugin::NewDecoder(uint index)
 {
 	static BLocker locker;
 	static bool initdone = false;
@@ -257,18 +257,29 @@ VorbisDecoderPlugin::NewDecoder()
 	return new VorbisDecoder;
 }
 
+static media_format vorbis_formats[1];
+
 status_t
-VorbisDecoderPlugin::RegisterDecoder()
+VorbisDecoderPlugin::GetSupportedFormats(media_format ** formats, size_t * count)
 {
 	media_format_description description = vorbis_description();
 	media_format format = vorbis_encoded_media_format();
 
-	BMediaFormats formats;
-	status_t result = formats.InitCheck();
+	BMediaFormats mediaFormats;
+	status_t result = mediaFormats.InitCheck();
 	if (result != B_OK) {
 		return result;
 	}
-	return formats.MakeFormatFor(&description, 1, &format);
+	result = mediaFormats.MakeFormatFor(&description, 1, &format);
+	if (result != B_OK) {
+		return result;
+	}
+	vorbis_formats[0] = format;
+
+	*formats = vorbis_formats;
+	*count = 1;
+
+	return result;
 }
 
 

@@ -478,15 +478,18 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 
 
 Decoder *
-RawDecoderPlugin::NewDecoder()
+RawDecoderPlugin::NewDecoder(uint index)
 {
 	return new RawDecoder;
 }
 
+
+static media_format raw_formats[2];
+
 status_t
-RawDecoderPlugin::RegisterDecoder()
+RawDecoderPlugin::GetSupportedFormats(media_format ** formats, size_t * count)
 {
-	BMediaFormats formats;
+	BMediaFormats mediaFormats;
 	media_format_description description;
 	media_format format;
 
@@ -497,9 +500,10 @@ RawDecoderPlugin::RegisterDecoder()
 	format.type = B_MEDIA_RAW_AUDIO;
 	format.u.raw_audio = media_multi_audio_format::wildcard;
 
-	status_t status = formats.MakeFormatFor(&description, 1, &format);
+	status_t status = mediaFormats.MakeFormatFor(&description, 1, &format);
 	if (status < B_OK)
 		return status;
+	raw_formats[0] = format;
 
 	// video decoder
 
@@ -507,7 +511,15 @@ RawDecoderPlugin::RegisterDecoder()
 	format.type = B_MEDIA_RAW_VIDEO;
 	format.u.raw_video = media_raw_video_format::wildcard;
 
-	return formats.MakeFormatFor(&description, 1, &format);
+	status = mediaFormats.MakeFormatFor(&description, 1, &format);
+	if (status < B_OK)
+		return status;
+	raw_formats[1] = format;
+
+	*formats = raw_formats;
+	*count = 2;
+
+	return B_OK;
 }
 
 MediaPlugin *instantiate_plugin()

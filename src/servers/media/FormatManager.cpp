@@ -77,74 +77,82 @@ FormatManager::GetFormats(BMessage &message)
 }
 
 
-status_t 
-FormatManager::RegisterDecoder(const media_format_description *descriptions,
-	int32 descriptionCount, media_format *format, uint32 flags)
-{
-	return RegisterDescriptions(descriptions, descriptionCount, format, flags, false);
-}
-
-
-status_t 
-FormatManager::RegisterEncoder(const media_format_description *descriptions,
-	int32 descriptionCount, media_format *format, uint32 flags)
-{
-	return RegisterDescriptions(descriptions, descriptionCount, format, flags, true);
-}
-
-
-status_t 
-FormatManager::RegisterDescriptions(const media_format_description *descriptions,
-	int32 descriptionCount, media_format *format, uint32 flags, bool encoder)
+void
+FormatManager::MakeFormatFor(BMessage &message)
 {
 	BAutolock locker(fLock);
 
-	int32 codec = fNextCodecID++;
-	fLastUpdate = system_time();
+	media_format format;
+	const void * data;
+	ssize_t size;
+	if (message.FindData("format", B_RAW_TYPE, 0, &data, &size) != B_OK
+		|| size != sizeof(format)) {
+		// couldn't get the format
+		BMessage reply;
+		reply.AddInt32("result", B_ERROR);
+		message.SendReply(&reply, (BHandler *)NULL, TIMEOUT);
+		return;
+	}
+	// copy the BMessage's data into our format
+	format = *(media_format *)data;
 
-	switch (format->type) {
+	int codec = fNextCodecID;
+	switch (format.type) {
+		case B_MEDIA_RAW_AUDIO:
+		case B_MEDIA_RAW_VIDEO:
+			// no marker
+			break;
 		case B_MEDIA_ENCODED_AUDIO:
-			format->u.encoded_audio.encoding = (media_encoded_audio_format::audio_encoding)codec;
+			if (format.u.encoded_audio.encoding == 0) {
+				format.u.encoded_audio.encoding = (media_encoded_audio_format::audio_encoding)fNextCodecID++;
+			} else {
+				UNIMPLEMENTED();
+				// TODO: check the encoding and the format passed in for compatibility
+				//       return B_MISMATCHED_VALUES if incompatible - perhaps something else based on flags?
+			}
 			break;
 		case B_MEDIA_ENCODED_VIDEO:
-			format->u.encoded_video.encoding = (media_encoded_video_format::video_encoding)codec;
+			if (format.u.encoded_video.encoding == 0) {
+				format.u.encoded_video.encoding = (media_encoded_video_format::video_encoding)fNextCodecID++;
+			} else {
+				UNIMPLEMENTED();
+				// TODO: check the encoding and the format passed in for compatibility
+				//       return B_MISMATCHED_VALUES if incompatible - perhaps something else based on flags?
+			}
 			break;
 		case B_MEDIA_MULTISTREAM:
-			format->u.multistream.format = codec;
+			if (format.u.multistream.format == 0) {
+				format.u.multistream.format = fNextCodecID++;
+			} else {
+				UNIMPLEMENTED();
+				// TODO: check the encoding and the format passed in for compatibility
+				//       return B_MISMATCHED_VALUES if incompatible - perhaps something else based on flags?
+			}
 			break;
 		default:
-			// ToDo: what can we do for the raw formats?
-			break;
+			// nothing to do
+			BMessage reply;
+			reply.AddInt32("result", B_OK);
+			reply.AddData("format", B_RAW_TYPE, &format, sizeof(format));
+			message.SendReply(&reply, (BHandler *)NULL, TIMEOUT);
+			return;
 	}
+	fLastUpdate = system_time();
 
 	// ToDo: support "flags" (B_SET_DEFAULT, B_EXCLUSIVE, B_NO_MERGE)!
-
-	for (int32 i = 0; i < descriptionCount; i++) {
-		meta_format *metaFormat = new meta_format(descriptions[i], *format, codec);
-
-		if (encoder)
-			fEncoderFormats.BinaryInsert(metaFormat, meta_format::Compare);
-		else
-			fDecoderFormats.BinaryInsert(metaFormat, meta_format::Compare);
+	int32 i = 0;
+	while (message.FindData("description", B_RAW_TYPE, i++, &data, &size) == B_OK
+	       && size == sizeof(media_format_description)) {
+		meta_format *metaFormat = new meta_format(*(media_format_description*)data, format, codec);
 
 		fList.BinaryInsert(metaFormat, meta_format::Compare);
 	}
 
-	return B_OK;
-}
-
-
-void 
-FormatManager::UnregisterDecoder(media_format &format)
-{
-	UNIMPLEMENTED();
-}
-
-
-void 
-FormatManager::UnregisterEncoder(media_format &format)
-{
-	UNIMPLEMENTED();
+	BMessage reply;
+	reply.AddInt32("result", B_OK);
+	reply.AddData("format", B_RAW_TYPE, &format, sizeof(format));
+	message.SendReply(&reply, (BHandler *)NULL, TIMEOUT);
+	return;
 }
 
 

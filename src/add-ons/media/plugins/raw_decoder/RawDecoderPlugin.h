@@ -44,6 +44,6 @@ private:
 class RawDecoderPlugin : public DecoderPlugin
 {
 public:
-	Decoder *	NewDecoder();
-	status_t	RegisterDecoder();
+	Decoder *	NewDecoder(uint index);
+	status_t	GetSupportedFormats(media_format ** formats, size_t * count);
 };

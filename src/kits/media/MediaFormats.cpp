@@ -24,8 +24,6 @@ static BLocker sLock;
 static BObjectList<meta_format> sFormats;
 static bigtime_t sLastFormatsUpdate;
 
-_MakeFormatHookFunc BPrivate::media::_gMakeFormatHook = NULL;
-
 
 status_t
 get_next_encoder(int32 *cookie, const media_file_format *_fileFormat,
@@ -515,14 +513,43 @@ status_t
 BMediaFormats::MakeFormatFor(const media_format_description *descriptions,
 	int32 descriptionCount, media_format *format, uint32 flags, void * _reserved)
 {
-	if (_gMakeFormatHook == NULL)
-		return B_NOT_ALLOWED;
+	BMessage request(MEDIA_SERVER_MAKE_FORMAT_FOR);
+	for (int32 i = 0 ; i < descriptionCount ; i++) {
+		request.AddData("description", B_RAW_TYPE, &descriptions[i], sizeof(descriptions[i]));
+	}
+	request.AddData("format", B_RAW_TYPE, format, sizeof(*format));
+	request.AddData("flags", B_UINT32_TYPE, &flags, sizeof(flags));
+	request.AddPointer("_reserved", _reserved);
+	
+	BMessage reply;
+	status_t status = QueryServer(request, reply);
+	if (status != B_OK) {
+		ERROR("BMediaFormats: Could not make a format: %s\n", strerror(status));
+		return status;
+	}
 
-	// This function is callable from the server in the
-	// context of a codec registration only.
-	// The add-on manager is locked during this call
+	// check the status
+	if (reply.FindInt32("result", &status) < B_OK) {
+		return B_ERROR;
+	}
+	if (status != B_OK) {
+		return status;
+	}
 
-	return _gMakeFormatHook(descriptions, descriptionCount, format, flags);
+	// get the format
+	const void * data;
+	ssize_t size;
+	if (reply.FindData("format", B_RAW_TYPE, 0, &data, &size) != B_OK) {
+		return B_ERROR;
+	}
+	if (size != sizeof(*format)) {
+		return B_ERROR;
+	}
+
+	// copy the BMessage's data into our format
+	*format = *(media_format *)data;
+
+	return B_OK;
 }
 
 /* --- begin deprecated API --- */

@@ -29,12 +29,17 @@ static port_id MediaAddonServerPort;
 void find_media_server_port();
 void find_media_addon_server_port();
 
+static BMessenger * GetMediaServerMessenger() {
+	static BMessenger * messenger = new BMessenger(NEW_MEDIA_SERVER_SIGNATURE);
+	return MediaServerMessenger = messenger;
+}
+
 class initit
 {
 public:
 	initit()
 	{
-		MediaServerMessenger = new BMessenger(NEW_MEDIA_SERVER_SIGNATURE);
+		MediaServerMessenger = 0;
 		find_media_server_port();
 		find_media_addon_server_port();
 
@@ -82,7 +87,7 @@ request_data::SendReply(status_t result, reply_data *reply, int replysize) const
 status_t SendToServer(BMessage *msg)
 {
 	status_t rv;
-	rv = MediaServerMessenger->SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
+	rv = GetMediaServerMessenger()->SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
 	if (rv != B_OK) {
 		ERROR("SendToServer: SendMessage failed, error 0x%08lx (%s)\n", rv, strerror(rv));
 		DEBUG_ONLY(msg->PrintToStream());
@@ -94,7 +99,7 @@ status_t SendToServer(BMessage *msg)
 status_t 
 QueryServer(BMessage &request, BMessage &reply)
 {
-	status_t status = MediaServerMessenger->SendMessage(&request, &reply, TIMEOUT, TIMEOUT);
+	status_t status = GetMediaServerMessenger()->SendMessage(&request, &reply, TIMEOUT, TIMEOUT);
 	if (status != B_OK) {
 		ERROR("QueryServer: SendMessage failed, error 0x%08lx (%s)\n", status, strerror(status));
 		DEBUG_ONLY(request.PrintToStream());

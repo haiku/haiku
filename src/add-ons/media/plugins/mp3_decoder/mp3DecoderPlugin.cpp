@@ -330,7 +330,7 @@ mp3Decoder::GetFrameLength(void *header)
 
 
 Decoder *
-mp3DecoderPlugin::NewDecoder()
+mp3DecoderPlugin::NewDecoder(uint index)
 {
 	static BLocker locker;
 	static bool initdone = false;
@@ -344,8 +344,10 @@ mp3DecoderPlugin::NewDecoder()
 }
 
 
+static media_format mp3_formats[1];
+
 status_t
-mp3DecoderPlugin::RegisterDecoder()
+mp3DecoderPlugin::GetSupportedFormats(media_format ** formats, size_t * count)
 {
 	const mpeg_id ids[] = {
 		B_MPEG_1_AUDIO_LAYER_1,
@@ -374,12 +376,21 @@ mp3DecoderPlugin::RegisterDecoder()
 	format.type = B_MEDIA_ENCODED_AUDIO;
 	format.u.encoded_audio = media_encoded_audio_format::wildcard;
 
-	BMediaFormats formats;
-	status_t result = formats.InitCheck();
+	BMediaFormats mediaFormats;
+	status_t result = mediaFormats.InitCheck();
 	if (result != B_OK) {
 		return result;
 	}
-	return formats.MakeFormatFor(descriptions, numIDs, &format);
+	result = mediaFormats.MakeFormatFor(descriptions, numIDs, &format);
+	if (result != B_OK) {
+		return result;
+	}
+	mp3_formats[0] = format;
+
+	*formats = mp3_formats;
+	*count = 1;
+
+	return result;
 }
 
 

@@ -14,8 +14,8 @@ class MusePackPlugin : public ReaderPlugin, public DecoderPlugin {
 	public:
 		Reader *NewReader();
 
-		Decoder *NewDecoder();
-		status_t RegisterDecoder();
+	Decoder *	NewDecoder(uint index);
+	status_t	GetSupportedFormats(media_format ** formats, size_t * count);
 };
 
 #endif	/* MUSEPACK_PLUGIN_H */
