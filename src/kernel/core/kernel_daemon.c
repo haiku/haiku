@@ -1,11 +1,12 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
 
 #include <KernelExport.h>
 #include <malloc.h>
+#include <signal.h>
 
 #include <kernel_daemon.h>
 #include <lock.h>
@@ -131,5 +132,7 @@ kernel_daemon_init(void)
 	list_init(&gDaemons);
 
 	thread = spawn_kernel_thread(&kernel_daemon, "kernel daemon", B_LOW_PRIORITY, NULL);
-	return resume_thread(thread);
+	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+
+	return B_OK;
 }
