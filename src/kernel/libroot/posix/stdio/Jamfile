@@ -48,13 +48,5 @@ KernelMergeObject posix_stdio.o :
 #  	<$(SOURCE_GRIST)>vsprintf.c
 # 	<$(SOURCE_GRIST)>wbuf.c
 # 	<$(SOURCE_GRIST)>wsetup.c
- 	:
- 	-fPIC -DPIC
+ 	: -fPIC -DPIC
  	;
-
-KernelMergeObject kernel_posix_stdio.o :
-	<$(SOURCE_GRIST)>kernel_vsprintf.c
-	:
-	-fPIC -DPIC
-	;
-

@@ -29,28 +29,5 @@ KernelMergeObject posix_unistd.o :
 	<$(SOURCE_GRIST)>usergroup.c
 	<$(SOURCE_GRIST)>usleep.c
 	<$(SOURCE_GRIST)>write.c
-	:
-	-fPIC -DPIC
-	;
-
-MergeObjectFromObjects kernel_posix_unistd.o :
-	<$(SOURCE_GRIST)>access.o
-	<$(SOURCE_GRIST)>chown.o
-	<$(SOURCE_GRIST)>close.o
-	<$(SOURCE_GRIST)>conf.o
-	<$(SOURCE_GRIST)>directory.o
-	<$(SOURCE_GRIST)>dup.o
-	<$(SOURCE_GRIST)>fcntl.o
-	<$(SOURCE_GRIST)>hostname.o
-	<$(SOURCE_GRIST)>ioctl.o
-	<$(SOURCE_GRIST)>link.o
-	<$(SOURCE_GRIST)>lseek.o
-	<$(SOURCE_GRIST)>mount.o
-	<$(SOURCE_GRIST)>open.o
-	<$(SOURCE_GRIST)>read.o
-#	<$(SOURCE_GRIST)>sleep.o
-	<$(SOURCE_GRIST)>truncate.o
-	<$(SOURCE_GRIST)>usergroup.o
-#	<$(SOURCE_GRIST)>usleep.o
-	<$(SOURCE_GRIST)>write.o
+	: -fPIC -DPIC
 	;

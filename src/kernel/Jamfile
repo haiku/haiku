@@ -11,8 +11,8 @@ KernelLd boot_loader :
 
 	# libroot functions needed by the stage2 boot loader
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>byteorder.o
-	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
-	<$(SOURCE_GRIST)!libroot!posix!stdio>kernel_vsprintf.o
+	<$(SOURCE_GRIST)!libroot>ctype.o
+	<$(SOURCE_GRIST)!libroot>kernel_vsprintf.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
@@ -27,7 +27,7 @@ KernelLd boot_loader :
 	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strchr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strrchr.o
-	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
+	<$(SOURCE_GRIST)!libroot>qsort.o
 	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/boot_loader.ld 
 	: -Bstatic
 	;
@@ -36,18 +36,15 @@ KernelLd stage2 :
 	boot_arch_stage2.o
 
 	# posix functions needed by the stage2 boot loader
-	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
-	<$(SOURCE_GRIST)!libroot!posix!stdio>kernel_vsprintf.o
+	<$(SOURCE_GRIST)!libroot>ctype.o
+	<$(SOURCE_GRIST)!libroot>kernel_vsprintf.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/stage2.ld 
+	: -dN
 	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/stage2.ld 
-	:
-	-dN
-	:
-	:
-	bootstrap
+	: bootstrap
 	;
 
 KernelLd kernel :
@@ -67,22 +64,13 @@ KernelLd kernel :
 	# kernel libroot parts
 	kernel_os_main.o
 	kernel_os_arch_$(OBOS_ARCH).o
-
-	kernel_posix_locale.o
-	kernel_posix_main.o
-	kernel_posix_stdio.o
-	kernel_posix_stdlib.o
-	kernel_posix_sys.o
-	kernel_posix_time.o
-	kernel_posix_unistd.o
+	kernel_posix.o
 	posix_string.o
+
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/kernel.ld 
+	: -Bdynamic -export-dynamic -dynamic-linker /foo/bar
 	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/kernel.ld 
-	:
-	-Bdynamic -export-dynamic -dynamic-linker /foo/bar
-	:
-	:
-	kernel
+	: kernel
 	;
 
 KernelLd kernel.so :
@@ -104,29 +92,19 @@ KernelLd kernel.so :
 	# kernel libroot parts
 	kernel_os_main.o
 	kernel_os_arch_$(OBOS_ARCH).o
-
-	kernel_posix_locale.o
-	kernel_posix_main.o
-	kernel_posix_stdio.o
-	kernel_posix_stdlib.o
-	kernel_posix_sys.o
-	kernel_posix_time.o
-	kernel_posix_unistd.o
+	kernel_posix.o
 	posix_string.o
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/kernel.ld 
-	:
-	-Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
+
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/kernel.ld 
+	: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
 	;
 
 KernelLd libglue.o :	# libglue.o is used for dynamic libraries
 	<$(SOURCE_GRIST)!glue>crt0.o
 	<$(SOURCE_GRIST)!glue>init_term_dyn.o
 	:
-	:
-	-r
-	:
-	no_gcc
+	: -r
+	: no_gcc
 	;
 
 UnarchiveObjects $(LIBGCC_OBJECTS) : $(LIBGCC_DIR)/libgcc.a ;
@@ -169,22 +147,18 @@ KernelLd libglue2.o :	# libglue2.o is used for executables
 	<$(SOURCE_GRIST)!glue>init_term_dyn.o
 	<$(SOURCE_GRIST)!glue>start_dyn.o
 	:
-	:
-	-r
-	:
-	no_gcc
+	: -r
+	: no_gcc
 	;
 
 KernelLd init :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>init.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/init
+	: beos/bin/init
 	;
 
 KernelStaticLibraryObjects librld.a :
@@ -196,7 +170,7 @@ KernelStaticLibraryObjects librld.a :
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
 
  	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
-  	<$(SOURCE_GRIST)!libroot!posix!stdio>kernel_vsprintf.o
+  	<$(SOURCE_GRIST)!libroot>kernel_vsprintf.o
   	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
 
 	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
@@ -236,84 +210,70 @@ KernelLd rld.so :
 	<$(SOURCE_GRIST)!apps!rld>rldheap.o
 	<$(SOURCE_GRIST)!apps!rld>rldaux.o
 	librld.a
-	:
-	$(SUBDIR)/apps/rld/arch/$(OBOS_ARCH)/rld.ld
-	:
+	: $(SUBDIR)/apps/rld/arch/$(OBOS_ARCH)/rld.ld
 	:
 	:
-	beos/system/lib/rld.so
+	: beos/system/lib/rld.so
 	;
 
 KernelLd false :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>false_main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/false
+	: beos/bin/false
 	;
 
 KernelLd true :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>true_main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/true
+	: beos/bin/true
 	;
 
 KernelLd fibo :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>fibo_main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/fibo
+	: beos/bin/fibo
 	;
 
 KernelLd sig_test :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>sig_test.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/sig_test
+	: beos/bin/sig_test
 	;
 
 KernelLd monitor_test :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>monitor_test.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/monitor_test
+	: beos/bin/monitor_test
 	;
 
 KernelLd fortune :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!fortune>main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/fortune
+	: beos/bin/fortune
 	;
 
 KernelConfigSection beos/etc/fortunes : data : $(SUBDIR)/apps/fortune/fortunes ;
@@ -322,24 +282,20 @@ KernelLd kernel_ls :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!ls>main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/ls
+	: beos/bin/ls
 	;
 
 KernelLd symlink :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!symlink>main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/symlink
+	: beos/bin/symlink
 	;
 
 # Note: shell is a built in target, thus we need the grist.
@@ -355,60 +311,50 @@ KernelLd obos_shell :
 	<$(SOURCE_GRIST)!apps!shell>statements.o
 	<$(SOURCE_GRIST)!apps!shell>shell_history.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/shell
+	: beos/bin/shell
 	;
 
 KernelLd testapp :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!testapp>main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/testapp
+	: beos/bin/testapp
 	;
 
 KernelLd tls_test :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>tls_test.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/tls_test
+	: beos/bin/tls_test
 	;
 
 KernelLd pipe_test :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>pipe_test.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/pipe_test
+	: beos/bin/pipe_test
 	;
 
 KernelLd envtest :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!envtest>main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/envtest
+	: beos/bin/envtest
 	;
 
 #if $(OS) = "BEOS" 
@@ -432,36 +378,30 @@ KernelLd ps :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!ps>main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/ps
+	: beos/bin/ps
 	; 
 
 KernelLd echo :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!echo>main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/echo
+	: beos/bin/echo
 	; 
 
 KernelLd uname :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!uname>main.o
 	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	beos/bin/uname
+	: beos/bin/uname
 	;
 
 WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;

@@ -2,8 +2,68 @@ SubDir OBOS_TOP src kernel libroot ;
 
 KernelObjects
 	<$(SOURCE_GRIST)>libroot_init.c
-	:
-	-fPIC -DPIC
+	: -fPIC -DPIC
+	;
+
+# kernel libroot posix files
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) posix ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) posix locale ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) posix stdio ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) posix stdlib ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) posix sys ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) posix time ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) posix unistd ] ;
+
+KernelMergeObject kernel_posix.o :
+	# main
+ 	<$(SOURCE_GRIST)>kerrno.c
+ 	<$(SOURCE_GRIST)>poll.c
+ 	<$(SOURCE_GRIST)>utime.c
+ 	# locale
+	<$(SOURCE_GRIST)>ctype.c
+	# stdio
+	<$(SOURCE_GRIST)>kernel_vsprintf.c
+	# stdlib
+	<$(SOURCE_GRIST)>abs.c
+	<$(SOURCE_GRIST)>atoi.c
+	<$(SOURCE_GRIST)>bsearch.c
+	<$(SOURCE_GRIST)>merge.c
+	<$(SOURCE_GRIST)>qsort.c
+	<$(SOURCE_GRIST)>rand.c
+	<$(SOURCE_GRIST)>random.c
+	<$(SOURCE_GRIST)>strtol.c
+	<$(SOURCE_GRIST)>strtoll.c
+	<$(SOURCE_GRIST)>strtoul.c
+	<$(SOURCE_GRIST)>strtoull.c
+	# sys
+	<$(SOURCE_GRIST)>chmod.c
+	<$(SOURCE_GRIST)>stat.c
+	<$(SOURCE_GRIST)>mkdir.c
+ 	<$(SOURCE_GRIST)>select.c
+ 	<$(SOURCE_GRIST)>gettimeofday.c
+	# time
+	<$(SOURCE_GRIST)>time.c
+	# unistd
+	<$(SOURCE_GRIST)>access.c
+	<$(SOURCE_GRIST)>chown.c
+	<$(SOURCE_GRIST)>close.c
+	<$(SOURCE_GRIST)>conf.c
+	<$(SOURCE_GRIST)>directory.c
+	<$(SOURCE_GRIST)>dup.c
+	<$(SOURCE_GRIST)>fcntl.c
+	<$(SOURCE_GRIST)>hostname.c
+	<$(SOURCE_GRIST)>ioctl.c
+	<$(SOURCE_GRIST)>link.c
+	<$(SOURCE_GRIST)>lseek.c
+	<$(SOURCE_GRIST)>mount.c
+	<$(SOURCE_GRIST)>open.c
+	<$(SOURCE_GRIST)>read.c
+	<$(SOURCE_GRIST)>truncate.c
+	<$(SOURCE_GRIST)>usergroup.c
+	<$(SOURCE_GRIST)>write.c
+
+	: -fno-pic
 	;
 
 SubInclude OBOS_TOP src kernel libroot os ;

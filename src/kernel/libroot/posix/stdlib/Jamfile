@@ -21,21 +21,5 @@ KernelMergeObject posix_stdlib.o :
 	<$(SOURCE_GRIST)>strtoll.c
 	<$(SOURCE_GRIST)>strtoul.c
 	<$(SOURCE_GRIST)>strtoull.c
-	:
-	-fPIC -DPIC
+	: -fPIC -DPIC
 	;
-
-MergeObjectFromObjects kernel_posix_stdlib.o :
-	<$(SOURCE_GRIST)>abs.o
-	<$(SOURCE_GRIST)>atoi.o
-	<$(SOURCE_GRIST)>bsearch.o
-	<$(SOURCE_GRIST)>merge.o
-	<$(SOURCE_GRIST)>qsort.o
-	<$(SOURCE_GRIST)>rand.o
-	<$(SOURCE_GRIST)>random.o
-	<$(SOURCE_GRIST)>strtol.o
-	<$(SOURCE_GRIST)>strtoll.o
-	<$(SOURCE_GRIST)>strtoul.o
-	<$(SOURCE_GRIST)>strtoull.o
-	;
-
