@@ -77,6 +77,7 @@ class DataView : public BView {
 		void UpdateFromEditor(BMessage *message = NULL);
 		void ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size);
 
+		bool AcceptsDrop(const BMessage *message);
 		void InitiateDrag(view_focus focus);
 		void Copy();
 		void Paste();
@@ -99,6 +100,8 @@ class DataView : public BView {
 		int32		fKeySelectionStart;
 		int32		fBitPosition;
 		bool		fFitFontSize;
+		int32		fDragMessageSize;
+		int32		fStoredStart, fStoredEnd;
 };
 
 static const uint32 kMsgBaseType = 'base';

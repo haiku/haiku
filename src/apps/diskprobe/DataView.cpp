@@ -60,7 +60,8 @@ DataView::DataView(BRect rect, DataEditor &editor)
 	fMouseSelectionStart(-1),
 	fKeySelectionStart(-1),
 	fBitPosition(0),
-	fFitFontSize(false)
+	fFitFontSize(false),
+	fDragMessageSize(-1)
 {
 	fPositionLength = 4;
 	fStart = fEnd = 0;
@@ -154,7 +155,16 @@ DataView::UpdateFromEditor(BMessage *message)
 }
 
 
-void 
+bool
+DataView::AcceptsDrop(const BMessage *message)
+{
+	return !fEditor.IsReadOnly()
+		&& (message->HasData("text/plain", B_MIME_TYPE)
+			|| message->HasData(B_FILE_MIME_TYPE, B_MIME_TYPE));
+}
+
+
+void
 DataView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
@@ -222,6 +232,20 @@ DataView::MessageReceived(BMessage *message)
 
 		case B_REDO:
 			fEditor.Redo();
+			break;
+
+		case B_MIME_DATA:
+			if (AcceptsDrop(message)) {
+				const void *data;
+				ssize_t size;
+				if (message->FindData("text/plain", B_MIME_TYPE, &data, &size) == B_OK
+					|| message->FindData(B_FILE_MIME_TYPE, B_MIME_TYPE, &data, &size) == B_OK) {
+					if (fEditor.Replace(fOffset + fStart, (const uint8 *)data, size) != B_OK)
+						SetSelection(fStoredStart, fStoredEnd);
+
+					fDragMessageSize = -1;
+				}
+			}
 			break;
 
 		default:
@@ -933,6 +957,10 @@ DataView::InitiateDrag(view_focus focus)
 		frame = bounds & frame;
 
 	DragMessage(drag, frame, NULL);
+
+	fStoredStart = fStart;
+	fStoredEnd = fEnd;
+	fDragMessageSize = length;
 }
 
 
@@ -982,8 +1010,36 @@ DataView::MouseDown(BPoint where)
 
 
 void 
-DataView::MouseMoved(BPoint where, uint32 transit, const BMessage */*dragMessage*/)
+DataView::MouseMoved(BPoint where, uint32 transit, const BMessage *dragMessage)
 {
+	if (transit == B_EXITED_VIEW && fDragMessageSize > 0) {
+		SetSelection(fStoredStart, fStoredEnd);
+		fDragMessageSize = -1;
+	}
+
+	if (dragMessage && AcceptsDrop(dragMessage)) {
+		// handle drag message and tracking
+
+		if (transit == B_ENTERED_VIEW) {
+			fStoredStart = fStart;
+			fStoredEnd = fEnd;
+
+			const void *data;
+			ssize_t size;
+			if (dragMessage->FindData("text/plain", B_MIME_TYPE, &data, &size) == B_OK
+				|| dragMessage->FindData("text/plain", B_MIME_TYPE, &data, &size) == B_OK)
+				fDragMessageSize = size;
+		} else if (fDragMessageSize > 0) {
+			view_focus newFocus;
+			int32 start = PositionAt(kNoFocus, where, &newFocus);
+			int32 end = start + fDragMessageSize - 1;
+
+			SetSelection(start, end);
+			MakeVisible(start);
+		}
+		return;
+	}
+
 	if (fMouseSelectionStart == -1)
 		return;
 
