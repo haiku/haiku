@@ -3,10 +3,20 @@ SubDir OBOS_TOP src tests add-ons kernel file_systems bfs bfs_shell ;
 SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
 
+
 {
-	local defines = [ FDefines USER DEBUG ] ; # _NO_INLINE_ASM
-	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
-	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
+	# set MALLOC_DEBUG to something when doing tests against memory corruption
+	# (although this has the downside that "jam" is also debugged...)
+	local malloc_debug_defines ;
+	local malloc_debug_flags ;
+	if $(MALLOC_DEBUG) {
+		malloc_debug_defines = _NO_INLINE_ASM ;
+		malloc_debug_flags = -fcheck-memory-usage ;
+	}
+
+	local defines = [ FDefines USER DEBUG $(malloc_debug_defines) ] ;
+	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
+	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
 }
 
 SimpleTest bfs_shell
