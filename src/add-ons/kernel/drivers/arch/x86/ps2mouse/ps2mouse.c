@@ -62,49 +62,46 @@
 #define DEVICE_NAME "ps2mouse"
 int32	api_version = B_CUR_DRIVER_API_VERSION;
 
+
 /////////////////////////////////////////////////////////////////////////
 // interrupt
 
-/*
- * handle_mouse_interrupt:
- * Interrupt handler for the mouse device. Called whenever the I/O
- * controller generates an interrupt for the PS/2 mouse. Reads mouse
- * information from the data port, and stores it, so it can be accessed
- * by read() operations. The full data is obtained using 3 consecutive
- * calls to the handler, each holds a different byte on the data port.
- * Parameters:
- * void*, ignored
- * Return value:
- * int, ???
+
+/** Interrupt handler for the mouse device. Called whenever the I/O
+ *	controller generates an interrupt for the PS/2 mouse. Reads mouse
+ *	information from the data port, and stores it, so it can be accessed
+ *	by read() operations. The full data is obtained using 3 consecutive
+ *	calls to the handler, each holds a different byte on the data port.
  */
+
 static int32 
 handle_mouse_interrupt(void* data)
 {
-   char c;
+	char c;
 	static int next_input = 0;
 
 	// read port
-   c = in8(PS2_PORT_DATA);
+	c = in8(PS2_PORT_DATA);
 
 	// put port contents in the appropriate data member, according to
 	// current cycle
-	switch(next_input) {
-   // status byte
+	switch (next_input) {
+	// status byte
 	case 0:
-	   md_int.status = c;
+		md_int.status = c;
 		break;
 
 	// x-axis change
-   case 1:
-      md_int.delta_x += c;
+	case 1:
+		md_int.delta_x += c;
 		break;
 
 	// y-axis change
 	case 2:
-      md_int.delta_y += c;
+		md_int.delta_y += c;
 
 		// check if someone is waiting to read data
-		if(in_read) {
+		if (in_read) {
 		   // copy data to read structure, and release waiting process
          memcpy(&md_read, &md_int, sizeof(mouse_data));
 			memset(&md_int, 0, sizeof(mouse_data));
@@ -116,50 +113,45 @@ handle_mouse_interrupt(void* data)
 
 	next_input = (next_input + 1) % 3;
 	return B_HANDLED_INTERRUPT;
-} // handle_mouse_interrupt
+}
+
 
 /////////////////////////////////////////////////////////////////////////
 // file operations
 
-/*
- * mouse_open:
- */
+
 static status_t 
 mouse_open(const char *name, uint32 flags, void **cookie)
 {
 	*cookie = NULL;
 	return 0;
-} // mouse_open
+}
 
-/*
- * mouse_close:
- */
+
 static status_t 
 mouse_close(void * cookie)
 {
 	return 0;
-} // mouse_close
+}
 
-/*
- * mouse_freecookie:
- */
+
 static status_t 
 mouse_freecookie(void * cookie)
 {
 	return 0;
-} // mouse_freecookie
+}
 
-/*
- * mouse_read:
- * Gets a mouse data packet.
- * Parameters:
- * void *, ignored
- * void*, pointer to a buffer that accepts the data
- * off_t, ignored
- * ssize_t, buffer size, must be at least the size of the data packet
+
+/** Gets a mouse data packet.
+ *	Parameters:
+ *	cookie, ignored
+ *	buf, pointer to a buffer that accepts the data
+ *	pos, ignored
+ *	len, buffer size, must be at least the size of the data packet
  */
+
 static ssize_t 
-mouse_read(void * cookie, off_t pos, void* buf, size_t *len)
+mouse_read(void *cookie, off_t pos, void *buf, size_t *len)
 {
    // inform interrupt handler that data is being waited for
    in_read = true;
@@ -184,26 +176,22 @@ mouse_read(void * cookie, off_t pos, void* buf, size_t *len)
 
 	*len = PACKET_SIZE;
 	return 0;
-} // mouse_read
+}
 
-/*
- * mouse_write:
- */
+
 static ssize_t 
 mouse_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
 	*len = 0;
 	return EROFS;
-} // mouse_write
+}
 
-/*
- * mouse_ioctl:
- */
+
 static status_t 
 mouse_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 {
 	return EINVAL;
-} // mouse_ioctl
+}
 
 /*
  * function structure used for file-op registration
@@ -219,51 +207,52 @@ device_hooks ps2_mouse_hooks = {
 	NULL,
 	NULL,
 	NULL
-}; // ps2_mouse_hooks
+};
+
 
 /////////////////////////////////////////////////////////////////////////
 // initialization
 
-/*
- * wait_write_ctrl:
- * Wait until the control port is ready to be written. This requires that
- * the "Input buffer full" and "Output buffer full" bits will both be set
- * to 0.
+
+/** Wait until the control port is ready to be written. This requires that
+ *	the "Input buffer full" and "Output buffer full" bits will both be set
+ *	to 0.
  */
+
 static void 
 wait_write_ctrl()
 {
-	while(in8(PS2_PORT_CTRL) & 0x3);
-} // wait_for_ctrl_output
+	while (in8(PS2_PORT_CTRL) & 0x3);
+}
 
-/*
- * wait_write_data:
- * Wait until the data port is ready to be written. This requires that
- * the "Input buffer full" bit will be set to 0.
+
+/** Wait until the data port is ready to be written. This requires that
+ *	the "Input buffer full" bit will be set to 0.
  */
+
 static void 
 wait_write_data()
 {
-	while(in8(PS2_PORT_CTRL) & 0x2);
-} // wait_write_data
+	while (in8(PS2_PORT_CTRL) & 0x2);
+}
 
-/*
- * wait_read_data:
- * Wait until the data port can be read from. This requires that the
- * "Output buffer full" bit will be set to 1.
+
+/** Wait until the data port can be read from. This requires that the
+ *	"Output buffer full" bit will be set to 1.
  */
+
 static void 
 wait_read_data()
 {
-	while((in8(PS2_PORT_CTRL) & 0x1) == 0);
-} // wait_read_data
+	while ((in8(PS2_PORT_CTRL) & 0x1) == 0);
+}
 
-/*
- * write_command_byte:
- * Writes a command byte to the data port of the PS/2 controller.
- * Parameters:
- * unsigned char, byte to write
+
+/** Writes a command byte to the data port of the PS/2 controller.
+ *	Parameters:
+ *	unsigned char, byte to write
  */
+
 static void 
 write_command_byte(unsigned char b)
 {
@@ -271,16 +260,16 @@ write_command_byte(unsigned char b)
 	out8(PS2_CTRL_WRITE_CMD, PS2_PORT_CTRL);
 	wait_write_data();
 	out8(b, PS2_PORT_DATA);
-} // write_command_byte
+}
 
-/*
- * write_aux_byte:
- * Writes a byte to the mouse device. Uses the control port to indicate
- * that the byte is sent to the auxiliary device (mouse), instead of the
- * keyboard.
- * Parameters:
- * unsigned char, byte to write
+
+/** Writes a byte to the mouse device. Uses the control port to indicate
+ *	that the byte is sent to the auxiliary device (mouse), instead of the
+ *	keyboard.
+ *	Parameters:
+ *	unsigned char, byte to write
  */
+
 static void 
 write_aux_byte(unsigned char b)
 {
@@ -288,21 +277,20 @@ write_aux_byte(unsigned char b)
 	out8(PS2_CTRL_WRITE_AUX, PS2_PORT_CTRL);
 	wait_write_data();
 	out8(b, PS2_PORT_DATA);
-} // write_aux_byte
+}
 
-/*
- * read_data_byte:
- * Reads a single byte from the data port.
- * Return value:
- * unsigned char, byte read
+
+/** Reads a single byte from the data port.
+ *	Return value:
+ *	unsigned char, byte read
  */
+
 static unsigned char 
 read_data_byte()
 {
 	wait_read_data();
 	return in8(PS2_PORT_DATA);
-} // read_data_byte
-
+}
 
 
 status_t 
@@ -313,8 +301,8 @@ init_hardware()
 	 * the detection here 
 	 */
 	dprintf("Should detect PS/2 mouse here, always assuming we have it\n");
-	return 0;
-} // mouse_dev_init
+	return B_OK;
+}
 
 
 const char **
@@ -347,30 +335,30 @@ init_driver()
 	// init device driver
 	memset(&md_int, 0, sizeof(mouse_data));
 
-	// register interrupt handler
-	install_io_interrupt_handler(INT_PS2_MOUSE,
-	                             &handle_mouse_interrupt, NULL, 0);
-
 	// enable auxilary device, IRQs and PS/2 mouse
 	write_command_byte(PS2_CMD_DEV_INIT);
 	write_aux_byte(PS2_CMD_ENABLE_MOUSE);
 
 	// controller should send ACK if mouse was detected
-	if(read_data_byte() != PS2_RES_ACK) {
+	if (read_data_byte() != PS2_RES_ACK) {
 		dprintf("No PS/2 mouse found\n");
 		return -1;
-	} 
-	
+	}
+
 	dprintf("A PS/2 mouse has been successfully detected\n");
 
 	// create the mouse semaphore, used for synchronization between
 	// the interrupt handler and the read() operation
 	mouse_sem = create_sem(0, "ps2_mouse_sem");
-	if(mouse_sem < 0)
+	if (mouse_sem < 0)
 		panic("failed to create PS/2 mouse semaphore!\n");
-	
-	return 0;
+
+	// register interrupt handler
+	install_io_interrupt_handler(INT_PS2_MOUSE, &handle_mouse_interrupt, NULL, 0);
+
+	return B_OK;
 }
+
 
 void 
 uninit_driver()
