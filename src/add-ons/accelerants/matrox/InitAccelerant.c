@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-1/2004.
+	Rudolf Cornelissen 10/2002-2/2004.
 */
 
 #define MODULE_BIT 0x00800000
@@ -114,7 +114,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 	if (result != B_OK) goto error0;
 	// LOG now available: !NULL si
 
-	/* signal CRTC2 DPMS on G450/G550 which connector to program (before powerup) */
+	/* assume G450/G550 signals are connected straight through (before powerup) */
 	si->crossed_conns = false;
 
 	/* call the device specific init code */

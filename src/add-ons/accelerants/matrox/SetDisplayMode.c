@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-1/2004
+	Rudolf Cornelissen 11/2002-2/2004
 */
 
 #define MODULE_BIT 0x00200000

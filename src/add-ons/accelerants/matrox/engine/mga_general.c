@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-1/2004
+   Rudolf Cornelissen 10/2002-2/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -54,7 +54,7 @@ status_t gx00_general_powerup()
 	status_t status;
 	uint32 card_class;
 
-	LOG(1,("POWERUP: Matrox (open)BeOS Accelerant 0.16-1 running.\n"));
+	LOG(1,("POWERUP: Matrox (open)BeOS Accelerant 0.16-2 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -603,6 +603,17 @@ status_t g450_general_powerup()
 	/* log the PINS struct settings */
 	dump_pins();
 
+//test:
+//gx50_general_output_select();
+
+	/* check output connector setup */
+	if (si->ps.primary_dvi && si->ps.secondary_head &&
+		si->ps.secondary_tvout && (i2c_sec_tv_adapter() != B_OK))
+	{
+		/* signal CRTC2 DPMS which connector to program or readout */
+		si->crossed_conns = true;
+	}
+
 	/* if the user doesn't want a coldstart OR the BIOS pins info could not be found warmstart */
 	if (si->settings.usebios || (result != B_OK)) return gx00_general_bios_to_powergraphics();
 
@@ -729,7 +740,8 @@ status_t g450_general_powerup()
 	/*turn on display one*/
 	gx00_crtc_dpms(true, true, true);
 
-	/* enable 'straight-through' sync outputs on both analog output connectors */
+	/* enable 'straight-through' sync outputs on both analog output connectors and
+	 * make sure CRTC1 sync outputs are patched through! */
 	DXIW(SYNCCTRL,0x00); 
 
 	return B_OK;
@@ -741,23 +753,29 @@ status_t gx50_general_output_select()
 	if ((si->ps.card_type != G450) && (si->ps.card_type != G550)) return B_ERROR;
 
 	/* choose primary analog outputconnector */
-	if ((si->ps.primary_dvi) && (si->ps.secondary_head) && (si->ps.secondary_tvout))
+	if (si->ps.primary_dvi && si->ps.secondary_head && si->ps.secondary_tvout)
 	{
 		if (i2c_sec_tv_adapter() == B_OK)
 		{
 			LOG(4,("INIT: secondary TV-adapter detected, using primary connector\n"));
 			DXIW(OUTPUTCONN,0x01); 
+			/* signal CRTC2 DPMS which connector to program */
+			si->crossed_conns = false;
 		}
 		else
 		{
 			LOG(4,("INIT: no secondary TV-adapter detected, using secondary connector\n"));
 			DXIW(OUTPUTCONN,0x04); 
+			/* signal CRTC2 DPMS which connector to program */
+			si->crossed_conns = true;
 		}
 	}
 	else
 	{
 		LOG(4,("INIT: using primary connector\n"));
 		DXIW(OUTPUTCONN,0x01); 
+		/* signal CRTC2 DPMS which connector to program */
+		si->crossed_conns = false;
 	}
 	return B_OK;
 }
@@ -875,7 +893,8 @@ status_t gx00_general_bios_to_powergraphics()
 		case G550:
 			/* power up everything except DVI electronics (for now) */
 			DXIW(PWRCTRL,0x1b); 
-			/* enable 'straight-through' sync outputs on both analog output connectors */
+			/* enable 'straight-through' sync outputs on both analog output
+			 * connectors and make sure CRTC1 sync outputs are patched through! */
 			DXIW(SYNCCTRL,0x00); 
 			break;
 		default:

@@ -2,7 +2,7 @@
 /* Authors:
    Mark Watson 2/2000,
    Apsed,
-   Rudolf Cornelissen 11/2002-1/2004
+   Rudolf Cornelissen 11/2002-2/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -314,6 +314,21 @@ status_t gx00_crtc_dpms(bool display, bool h, bool v) // MIL2
 	/* set some required fixed values for proper MGA mode initialisation */
 	VGAW_I(CRTC,0x17,0xC3);
 	VGAW_I(CRTC,0x14,0x00);
+
+	/* make sure CRTC1 sync is patched through on connector on G450/G550! */
+	if (si->ps.card_type >= G450)
+	{
+		if (si->crossed_conns)
+		{
+			/* patch through HD15 hsync and vsync unmodified */
+			DXIW(SYNCCTRL, (DXIR(SYNCCTRL) & 0x0f));
+		}
+		else
+		{
+			/* patch through DVI-A hsync and vsync unmodified */
+			DXIW(SYNCCTRL, (DXIR(SYNCCTRL) & 0xf0));
+		}
+	}
 
 	return B_OK;
 }
