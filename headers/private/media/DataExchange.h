@@ -10,6 +10,7 @@
 #include <MediaNode.h>
 #include <MediaAddOn.h>
 #include <Messenger.h>
+#include <Buffer.h>
 #include <Entry.h>
 
 namespace BPrivate {
@@ -22,7 +23,7 @@ struct command_data;
 
 // BMessage based data exchange with the media_server
 status_t SendToServer(BMessage *msg);
-status_t QueryServer(BMessage *request, BMessage *reply);
+//status_t QueryServer(BMessage *request, BMessage *reply);
 
 // Raw data based data exchange with the media_server
 status_t SendToServer(int32 msgcode, command_data *msg, int size);
@@ -93,6 +94,9 @@ enum {
 	SERVER_UNREGISTER_NODE,
 	SERVER_GET_DORMANT_NODE_FOR,
 	SERVER_GET_INSTANCES_FOR,
+	SERVER_GET_SHARED_BUFFER_AREA,
+	SERVER_REGISTER_BUFFER,
+	SERVER_UNREGISTER_BUFFER,	
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
 	
@@ -805,14 +809,32 @@ struct server_get_mediaaddon_ref_reply : public reply_data
 	xfer_entry_ref	ref; // a ref to the file
 };
 
+struct server_get_shared_buffer_area_request : public request_data
+{
+};
 
+struct server_get_shared_buffer_area_reply : public reply_data
+{
+	area_id area;
+};
 
+struct server_register_buffer_request : public request_data
+{
+	team_id team;
+	//either info.buffer is != 0, or the area, size, offset is used
+	buffer_clone_info info;
+};
 
+struct server_register_buffer_reply : public reply_data
+{
+	buffer_clone_info info;
+};
 
-
-
-
-
+struct server_unregister_buffer_command : public command_data
+{
+	team_id team;
+	media_buffer_id bufferid;
+};
 
 struct node_request_completed_command : public command_data
 {
