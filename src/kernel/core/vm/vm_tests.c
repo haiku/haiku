@@ -100,7 +100,7 @@ vm_test(void)
 		void *ptr;
 		int rc;
 
-		region = vm_find_region_by_name(vm_get_kernel_aspace_id(), "vid_mem");
+		region = find_area("vid_mem");
 		if(region < 0)
 			panic("vm_test 4: error finding region 'vid_mem'\n");
 		dprintf("vid_mem region = 0x%lx\n", region);
@@ -129,8 +129,8 @@ vm_test(void)
 		void *ptr;
 		int rc;
 
-		region = vm_find_region_by_name(vm_get_kernel_aspace_id(), "vid_mem");
-		if(region < 0)
+		region = find_area("vid_mem");
+		if (region < 0)
 			panic("vm_test 5: error finding region 'vid_mem'\n");
 		dprintf("vid_mem region = 0x%lx\n", region);
 
