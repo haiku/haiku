@@ -17,18 +17,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-/*
-  processheap.h
-  ------------------------------------------------------------------------
-  We use one processHeap for the whole program.
-  ------------------------------------------------------------------------
-  @(#) $Id: processheap.h,v 1.1 2002/10/05 17:13:30 axeld Exp $
-  ------------------------------------------------------------------------
-  Emery Berger                    | <http://www.cs.utexas.edu/users/emery>
-  Department of Computer Sciences |             <http://www.cs.utexas.edu>
-  University of Texas at Austin   |                <http://www.utexas.edu>
-  ========================================================================
-*/
+/* We use one processHeap for the whole program. */
 
 #ifndef _PROCESSHEAP_H_
 #define _PROCESSHEAP_H_

@@ -23,7 +23,7 @@
 #include "processheap.h"
 #include "superblock.h"
 
-static const char version[] = "The Hoard memory allocator, version 2.0 (http://www.hoard.org). Copyright (C) 1998, 1999, 2000 The University of Texas at Austin. $Id: heap.cpp,v 1.1 2002/10/05 17:13:30 axeld Exp $";
+static const char version[] = "The Hoard memory allocator, version 2.0 (http://www.hoard.org). Copyright (C) 1998, 1999, 2000 The University of Texas at Austin. $Id: heap.cpp,v 1.2 2005/02/10 18:47:16 axeld Exp $";
 
 // NB: Use maketable.cpp to update this
 //     if SIZE_CLASSES, ALIGNMENT, SIZE_CLASS_BASE, MAX_EMPTY_SUPERBLOCKS,
@@ -61,7 +61,7 @@ hoardHeap::hoardHeap (void)
 #endif
 {
   // Initialize the per-heap lock.
-  hoardLockInit (_lock);
+  hoardLockInit(_lock, "hoard heap");
   for (int i = 0; i < SUPERBLOCK_FULLNESS_GROUP; i++) {
     for (int j = 0; j < SIZE_CLASSES; j++) {
       // Initialize all superblocks lists to empty.

@@ -62,9 +62,9 @@ processHeap::processHeap (void)
   }
 #endif
 #if HEAP_FRAG_STATS
-  hoardLockInit (_statsLock);
+  hoardLockInit(_statsLock, "hoard stats");
 #endif
-  hoardLockInit (_bufferLock);
+  hoardLockInit(_bufferLock, "hoard buffer");
 }
 
 

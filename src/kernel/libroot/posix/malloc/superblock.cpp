@@ -22,7 +22,7 @@
   The superblock class controls a number of blocks (which are
   allocatable units of memory).
   ------------------------------------------------------------------------
-  @(#) $Id: superblock.cpp,v 1.1 2002/10/05 17:13:30 axeld Exp $
+  @(#) $Id: superblock.cpp,v 1.2 2005/02/10 18:47:16 axeld Exp $
   ------------------------------------------------------------------------
   Emery Berger                    | <http://www.cs.utexas.edu/users/emery>
   Department of Computer Sciences |             <http://www.cs.utexas.edu>
@@ -84,7 +84,7 @@ superblock::superblock (int numBlocks,	// The number of blocks in the sb.
   computeFullness();
   assert ((unsigned long) b <= hoardHeap::align (sizeof(superblock) + blksize * _numBlocks) + (unsigned long) this);
 
-  hoardLockInit (_upLock);
+  hoardLockInit(_upLock, "hoard superblock");
 }
 
 superblock * superblock::makeSuperblock (int sizeclass,

@@ -17,27 +17,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-/*
-  heap.h
-  ------------------------------------------------------------------------
-  hoardHeap, the base class for threadHeap and processHeap.
-  ------------------------------------------------------------------------
-  @(#) $Id: heap.h,v 1.1 2002/10/05 17:13:30 axeld Exp $
-  ------------------------------------------------------------------------
-  Emery Berger                    | <http://www.cs.utexas.edu/users/emery>
-  Department of Computer Sciences |             <http://www.cs.utexas.edu>
-  University of Texas at Austin   |                <http://www.utexas.edu>
-  ========================================================================
-*/
-
+/* hoardHeap, the base class for threadHeap and processHeap. */
 
 #ifndef _HEAP_H_
 #define _HEAP_H_
 
-#include "config.h"
+#include <OS.h>
 
-//include <assert.h>
-//#include <math.h>
+#include "config.h"
 
 #include "arch-specific.h"
 #include "superblock.h"
@@ -74,7 +61,7 @@ public:
   // number of threads -- Hoard imposes no such limit.)  This must be
   // a power of two! NB: This number is twice the maximum number of
   // PROCESSORS supported by Hoard.
-  enum { MAX_HEAPS = 128 };
+  enum { MAX_HEAPS = B_MAX_CPU_COUNT };
 
   // ANDing with this rounds to MAX_HEAPS.
   enum { MAX_HEAPS_MASK = MAX_HEAPS - 1 };
@@ -93,7 +80,7 @@ public:
 #elif MAX_INTERNAL_FRAGMENTATION == 10
   enum { SIZE_CLASSES = 32 };
 #else
-#error "Undefined size class base."
+#	error "Undefined size class base."
 #endif
 
   // Every object is aligned so that it can always hold a double.
@@ -203,7 +190,7 @@ private:
   // For sanity checking.
   const unsigned long _magic;
 #else
-  #define _magic HEAP_MAGIC
+#	define _magic HEAP_MAGIC
 #endif
 
   // Heap statistics.
