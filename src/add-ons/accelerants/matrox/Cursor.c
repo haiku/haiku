@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 4/2003
+	Rudolf Cornelissen 4/2003-11/2004
 */
 
 #define MODULE_BIT 0x20000000
@@ -131,11 +131,10 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 		vds = y;
 
 	/* reposition the desktop _and_ the overlay on the display if required */
-	if ((hds!=si->dm.h_display_start) || (vds!=si->dm.v_display_start)) 
+	if ((hds!=si->dm.h_display_start) || (vds!=si->dm.v_display_start))
 	{
 		MOVE_DISPLAY(hds,vds);
-		//fixme: implement:
-		//move_overlay(hds,vds);
+		gx00_bes_move_overlay();
 	}
 
 	/* put cursor in correct physical position */
