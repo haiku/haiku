@@ -24,7 +24,7 @@ extern "C" {
 
 #undef	__ptr_t
 #if defined __cplusplus || (defined __STDC__ && __STDC__) || defined WINDOWS32
-# if !defined __GLIBC__ || !defined __P
+# if !defined __GLIBC__ || !defined __P || !defined __PMT
 #  undef __P
 #  undef __PMT
 #  define __P(protos)	protos

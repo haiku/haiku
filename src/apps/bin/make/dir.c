@@ -20,6 +20,7 @@ Boston, MA 02111-1307, USA.  */
 
 #include "make.h"
 #include "hash.h"
+#include "glob.h"
 
 #ifdef	HAVE_DIRENT_H
 # include <dirent.h>
