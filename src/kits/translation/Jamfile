@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src kits translation ;
 
+UsePrivateHeaders translation ;
+
 SharedLibrary translation :
 	BitmapStream.cpp
 	FuncTranslator.cpp

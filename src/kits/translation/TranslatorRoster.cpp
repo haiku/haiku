@@ -34,6 +34,7 @@
 /*****************************************************************************/
 
 #include <TranslatorRoster.h>
+#include <FuncTranslator.h> // for BFuncTranslator and the translator
 
 // Initialize static member variable
 BTranslatorRoster *BTranslatorRoster::fspDefaultTranslators = NULL;
