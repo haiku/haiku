@@ -22,6 +22,9 @@ public:
 	_SoundPlayNode(const char *name, const media_multi_audio_format *format, BSoundPlayer *player);
 	~_SoundPlayNode();
 	
+	bool IsPlaying();
+	bigtime_t Latency();
+	
 /*************************/
 /* begin from BMediaNode */
 public:

@@ -68,6 +68,18 @@ _SoundPlayNode::~_SoundPlayNode()
 	Quit();
 }
 
+bool
+_SoundPlayNode::IsPlaying()
+{
+	return RunState() == B_STARTED;
+}
+
+bigtime_t
+_SoundPlayNode::Latency()
+{
+	return EventLatency();
+}
+
 
 media_multi_audio_format 
 _SoundPlayNode::Format() const

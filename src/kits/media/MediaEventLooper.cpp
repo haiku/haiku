@@ -110,8 +110,7 @@ BMediaEventLooper::Stop(bigtime_t performance_time,
 	if (immediate) {
 		// always be sure to add to the front of the queue so we can make sure it is
 		// handled before any buffers are sent!
-		performance_time = fEventQueue.FirstEventTime();
-		performance_time = (performance_time == B_INFINITE_TIMEOUT) ? 0 : performance_time - 1;
+		performance_time = 0;
 	}
 	fEventQueue.AddEvent(media_timed_event(performance_time, BTimedEventQueue::B_STOP));
 }
@@ -372,7 +371,7 @@ void
 BMediaEventLooper::SetRunState(run_state state)
 {
 	CALLED();
-	
+
 	// don't allow run state changes while quitting,
 	// also needed for correct terminating of the ControlLoop()
 	if (fRunState == B_QUITTING && state != B_TERMINATED)

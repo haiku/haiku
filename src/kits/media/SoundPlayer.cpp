@@ -145,7 +145,7 @@ BSoundPlayer::Start()
 	
 	if (!_m_node)
 		return B_ERROR;
-		
+
 	BMediaRoster *roster = BMediaRoster::Roster();
 	if (!roster) {
 		TRACE("BSoundPlayer::Start: Couldn't get BMediaRoster\n");
@@ -171,6 +171,10 @@ BSoundPlayer::Stop(bool block,
 
 	if (!_m_node)
 		return;
+	
+	// XXX flush is ignored
+		
+	TRACE("BSoundPlayer::Stop: block %d, flush %d\n", (int)block, (int)flush);
 		
 	BMediaRoster *roster = BMediaRoster::Roster();
 	if (!roster) {
@@ -179,7 +183,18 @@ BSoundPlayer::Stop(bool block,
 	}
 	
 	roster->StopNode(_m_node->Node(), 0, true);
-
+	
+	if (block) {
+		// wait until the node is stopped
+		int maxtrys;
+		for (maxtrys = 250; _m_node->IsPlaying() && maxtrys != 0; maxtrys--)
+			snooze(2000);
+		
+		DEBUG_ONLY(if (maxtrys == 0) printf("BSoundPlayer::Stop: waiting for node stop failed\n"));
+		
+		// wait until all buffers on the way to the physical output have been played		
+		snooze(_m_node->Latency() + 2000);
+	}
 }
 
 BSoundPlayer::BufferPlayerFunc
@@ -634,6 +649,7 @@ BSoundPlayer::PlayBuffer(void *buffer,
 						 const media_raw_audio_format &format)
 {
 //	CALLED();
+
 	_m_lock.Lock();
 	if (_PlayBuffer)
 		(*_PlayBuffer)(_m_cookie,buffer,size,format);
