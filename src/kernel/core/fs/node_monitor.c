@@ -12,7 +12,7 @@
 #include <fd.h>
 #include <lock.h>
 #include <khash.h>
-#include <list.h>
+#include <util/list.h>
 
 #include <malloc.h>
 #include <stddef.h>

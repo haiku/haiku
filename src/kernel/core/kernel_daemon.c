@@ -9,7 +9,7 @@
 
 #include <kernel_daemon.h>
 #include <lock.h>
-#include <list.h>
+#include <util/list.h>
 
 
 // ToDo: the use of snooze() in the kernel_daemon() function is very inaccurate, of
