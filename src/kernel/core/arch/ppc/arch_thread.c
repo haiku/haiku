@@ -109,9 +109,10 @@ arch_thread_enter_uspace(struct thread *thread, addr entry, void *arg1, void *ar
 }
 
 
-void
+status_t
 arch_setup_signal_frame(struct thread *thread, struct sigaction *sa, int sig, int sigMask)
 {
+	return B_ERROR;
 }
 
 
