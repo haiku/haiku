@@ -16,12 +16,8 @@
 
 
 void
-vm_test()
+vm_test(void)
 {
-//	region_id region, region2, region3;
-//	addr region_addr;
-//	int i;
-
 	dprintf("vm_test: entry\n");
 #if 1
 	dprintf("vm_test 1: creating anonymous region and writing to it\n");
@@ -356,6 +352,71 @@ vm_test()
 
 		dprintf("vm_test 9: passed\n");
 	}
+#endif
+#if 1
+	dprintf("vm_test 10: copy area\n");
+	{
+		area_id a, b;
+		void *address = NULL;
+		uint32 *ta, *tb;
+
+		a = create_area("source of copy", &address, B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 4,
+				B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		ta = (uint32 *)address;
+		ta[0] = 0x1234;
+		ta[1024] = 0x5678;
+		ta[2048] = 0xabcd;
+		ta[3072] = 0xefef;
+		
+		b = vm_copy_area(vm_get_kernel_aspace_id(), "copy of source", &address, B_ANY_KERNEL_ADDRESS,
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, a);
+		tb = (uint32 *)address;
+		if (tb[0] != 0x1234 || tb[1024] != 0x5678 || tb[2048] != 0xabcd || tb[3072] != 0xefef)
+			panic("vm_test 10: wrong values %lx, %lx, %lx, %lx\n", tb[0], tb[1024], tb[2048], tb[3072]);
+
+		tb[0] = 0xaaaa;
+		if (tb[0] != 0xaaaa || ta[0] != 0x1234)
+			panic("vm_test 10: %lx (aaaa), %lx (1234)\n", tb[0], ta[0]);
+
+		ta[1024] = 0xbbbb;
+		if (ta[1024] != 0xbbbb || tb[1024] != 0x5678)
+			panic("vm_test 10: %lx (bbbb), %lx (5678)\n", ta[1024], tb[1024]);
+
+		dprintf("vm_test 10: remove areas\n");
+
+		vm_delete_region(vm_get_kernel_aspace_id(), a);
+		vm_delete_region(vm_get_kernel_aspace_id(), b);
+	}
+	dprintf("vm_test 10: passed\n");
+#endif
+#if 1
+	dprintf("vm_test 11: resize area\n");
+	{
+		void *address = NULL;
+		status_t status;
+		area_id a;
+
+		a = create_area("resizable", &address, B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 4,
+				B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
+		status = resize_area(a, B_PAGE_SIZE * 2);
+		if (status != B_OK)
+			panic("vm_test 11: resize_area() failed trying to shrink area: %s\n", strerror(status));
+
+		status = resize_area(a, B_PAGE_SIZE * 4);
+		if (status != B_OK) {
+			dprintf("vm_test 11: resize_area() failed trying to grow area: %s\n", strerror(status));
+		} else {
+			uint32 *values = (uint32 *)address;
+			dprintf("vm_test 11: write something in the enlarged section\n");
+			values[3072] = 0x1234;
+		}
+
+		dprintf("vm_test 11: remove areas\n");
+
+		vm_delete_region(vm_get_kernel_aspace_id(), a);
+	}
+	dprintf("vm_test 11: passed\n");
 #endif
 	dprintf("vm_test: done\n");
 }
