@@ -181,8 +181,6 @@ private:
 
 		media_input input;
 		
-		bool fInputEnabled;
-		
 		BBufferGroup * fBufferGroup;
 		bigtime_t fInternalLatency;
 		// this is computed from the real (negotiated) chunk size and bit rate,
