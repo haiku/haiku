@@ -35,7 +35,7 @@ rtc_hw_to_system(void)
 	uint32 current_time;
 
 	current_time = arch_rtc_get_hw_time();
-	rtc_set_system_time(current_time);
+	set_real_time_clock(current_time);
 }
 
 
@@ -66,7 +66,7 @@ rtc_debug(int argc, char **argv)
 		rtc_print();
 	} else {
 		// If there was an argument, reset the system and hw time.
-		rtc_set_system_time(strtoul(argv[1], NULL, 10));
+		set_real_time_clock(strtoul(argv[1], NULL, 10));
 		rtc_system_to_hw();
 	}
 
