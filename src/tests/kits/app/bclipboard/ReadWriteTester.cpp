@@ -12,6 +12,8 @@
 
 #define CHK	CPPUNIT_ASSERT
 
+#include <TestShell.h>
+
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
@@ -36,7 +38,7 @@ void ReadWriteTester::Clear1()
 #ifdef TEST_R5
   CHK(false);
 #endif
-  CHK(clip.Clear() == B_ERROR);
+  CPPUNIT_ASSERT_DEBUGGER(clip.Clear());
 }
 
 /*
@@ -72,7 +74,7 @@ void ReadWriteTester::Revert1()
 #ifdef TEST_R5
   CHK(false);
 #endif
-  CHK(clip.Revert() == B_ERROR);
+  CPPUNIT_ASSERT_DEBUGGER(clip.Revert());
 }
 
 /*
@@ -130,7 +132,7 @@ void ReadWriteTester::Commit1()
 #ifdef TEST_R5
   CHK(false);
 #endif
-  CHK(clip.Commit() == B_ERROR);
+  CPPUNIT_ASSERT_DEBUGGER(clip.Commit());
 }
 
 /*
@@ -182,7 +184,7 @@ void ReadWriteTester::Data1()
 #ifdef TEST_R5
   CHK(false);
 #endif
-  CHK(!clip.Data());
+  CPPUNIT_ASSERT_DEBUGGER(clip.Data());
 }
 
 /*
