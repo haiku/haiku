@@ -38,6 +38,61 @@ static int resize_string_list(string_list *list, int size);
 static int push_string(string_list *list, char *string);
 static char* pop_string(string_list *list);
 
+
+// file_read_line
+/*!	\brief Reads a line from the supplied file and writes it to the supplied
+		   buffer.
+
+	If the line end in a LF, it is chopped off.
+
+	\param file The file.
+	\param value The pointer to where the read value shall be written.
+	\return \c ~0, if a number could be read, 0 otherwise.
+*/
+static
+int
+file_read_line(FILE *file, char *buffer, int bufferSize)
+{
+	int len;
+
+	if (!fgets(buffer, bufferSize, file))
+		return 0;
+
+	len = strlen(buffer);
+	if (len > 0 && buffer[len - 1] == '\n')
+		buffer[len - 1] = '\0';
+
+	return 1;
+}
+
+// file_read_line_long
+/*!	\brief Reads a line from the supplied file and interprets it as long value.
+
+	This is almost equivalent to \code fscanf(file, "%ld", value) \endcode,
+	save that fscanf() seems to eat all following LFs, while this function
+	only reads one.
+
+	\param file The file.
+	\param value The pointer to where the read value shall be written.
+	\return \c ~0, if a number could be read, 0 otherwise.
+*/
+static
+int
+file_read_line_long(FILE *file, long *value)
+{
+	char buffer[32];
+	int result;
+
+	result = file_read_line(file, buffer, sizeof(buffer));
+	if (!result)
+		return result;
+
+	if (sscanf(buffer, "%ld\n", value) != 1)
+		return 0;
+
+	return 1;
+}
+
 // new_string_list
 /*!	\brief Creates a new string_list.
 	\param block_size Granularity (number of entries) to be used for
@@ -433,21 +488,22 @@ read_jcache(jamfile_cache* cache, char* filename)
 		if ((file = fopen(filename, "r")) != 0) {
 			// read the file
 			char buffer[512];
-			int count = 0;
+			long count = 0;
 			int i;
 			result = !0;
 			// read number of cache entries
-			result = (fscanf(file, "%d\n", &count) == 1);
+			result = file_read_line_long(file, &count);
 			// read the cache entries
 			for (i = 0; result && i < count; i++) {
-				char entryname[512];
-				int lineCount = 0;
+				char entryname[PATH_MAX];
+				long lineCount = 0;
 				time_t time = 0;
 				jcache_entry entry = { 0, 0, 0 };
 				// entry name, time and line count
-				if (fscanf(file, "%s\n", entryname) == 1
-					&& (fscanf(file, "%ld\n", &time) == 1)
-					&& (fscanf(file, "%d\n", &lineCount) == 1)
+				if (file_read_line(file, entryname, sizeof(entryname))
+					&& strlen(entryname) > 0
+					&& file_read_line_long(file, &time)
+					&& file_read_line_long(file, &lineCount)
 					&& (init_jcache_entry(&entry, entryname, time, 0)) != 0) {
 					// read the lines
 					int j;
@@ -459,11 +515,17 @@ read_jcache(jamfile_cache* cache, char* filename)
 								result = push_string(entry.strings, string);
 							} else
 								result = 0;
-						} else
+						} else {
+							fprintf(stderr, "warning: Invalid jamfile cache: "
+								"Unexpected end of file.\n");
 							result = 0;
+						}
 					}
-				} else
+				} else {
+					fprintf(stderr, "warning: Invalid jamfile cache: "
+						"Failed to read file info.\n");
 					result = 0;
+				}
 				if (result) {
 					// add only, if there's no entry for that file yet
 					if (find_jcache_entry(cache, entry.filename))
