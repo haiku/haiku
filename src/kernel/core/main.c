@@ -23,7 +23,6 @@
 #include <cbuf.h>
 #include <elf.h>
 #include <cpu.h>
-#include <beos.h>
 #include <devs.h>
 #include <bus.h>
 #include <kmodule.h>

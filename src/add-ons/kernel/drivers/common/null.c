@@ -7,7 +7,6 @@
 #include <memheap.h>
 #include <devfs.h>
 #include <Errors.h>
-#include <null.h>
 #include <string.h>
 
 #define DEVICE_NAME "null"

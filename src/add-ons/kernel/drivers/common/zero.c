@@ -7,7 +7,6 @@
 #include <memheap.h>
 #include <devfs.h>
 #include <vm.h>
-#include <zero.h>
 #include <string.h>
 #include <Errors.h>
 
