@@ -14,14 +14,20 @@
 #include <BeBuild.h>
 #include <View.h>
 
-/*----------------------------------------------------------------*/
-/*----- scroll bar defines ---------------------------------------*/
+#include <BeBuild.h>
+#include <View.h>
+
+//----------------------------------------------------------------
+//----- scroll bar defines ---------------------------------------
 
 #define B_V_SCROLL_BAR_WIDTH	14.0
 #define B_H_SCROLL_BAR_HEIGHT	14.0
 
-/*----------------------------------------------------------------*/
-/*----- BScrollBar class -----------------------------------------*/
+//----------------------------------------------------------------
+//----- BScrollBar class -----------------------------------------
+
+class BScrollArrowButton;
+class BScrollBarPrivateData;
 
 class BScrollBar : public BView {
 
@@ -76,20 +82,18 @@ virtual void		AllDetached();
 virtual status_t	GetSupportedSuites(BMessage *data);
 
 
-/*----- Private or reserved -----------------------------------------*/
+//----- Private or reserved -----------------------------------------
 virtual status_t	Perform(perform_code d, void *arg);
 
 private:
-
-friend class BWindow;
-friend class BApplication;
-
+		friend BScrollArrowButton;
 virtual	void		_ReservedScrollBar1();
 virtual	void		_ReservedScrollBar2();
 virtual	void		_ReservedScrollBar3();
 virtual	void		_ReservedScrollBar4();
 
 		BScrollBar	&operator=(const BScrollBar &);
+		void 		DoScroll(float delta);
 
 		void		InitObject(float min, float max, orientation o, BView *t);
 		float		fMin;
@@ -101,10 +105,13 @@ virtual	void		_ReservedScrollBar4();
 		BView*		fTarget;	
 		orientation	fOrientation;
 		char		*fTargetName;
-		uint32		_reserved[4];
+
+		BScrollBarPrivateData *privatedata;
+
+		uint32		_reserved[3];
 };
 
-/*-------------------------------------------------------------*/
-/*-------------------------------------------------------------*/
+//-------------------------------------------------------------
+//-------------------------------------------------------------
 
-#endif /* _SCROLL_BAR_H */
+#endif // _SCROLL_BAR_H
