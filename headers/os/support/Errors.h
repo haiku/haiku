@@ -177,6 +177,7 @@ enum {
 #define EMSGSIZE        (B_POSIX_ERROR_BASE + 42)
 #define EOPNOTSUPP      (B_POSIX_ERROR_BASE + 43)                       
 #define ENOTSOCK		(B_POSIX_ERROR_BASE + 44)
+#define EHOSTDOWN		(B_POSIX_ERROR_BASE + 45)
 
 #define ENOMEM			B_NO_MEMORY
 #define EACCES			B_PERMISSION_DENIED
