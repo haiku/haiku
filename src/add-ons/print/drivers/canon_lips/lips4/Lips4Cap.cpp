@@ -209,6 +209,7 @@ bool Lips4Cap::isSupport(CapID capid) const
 	case kPrintStyle:
 	case kBindingLocation:
 	case kColor:
+	case kCopyCommand:
 		return true;
 	default:
 		return false;
