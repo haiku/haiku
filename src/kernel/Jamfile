@@ -22,10 +22,14 @@ KernelStaticLibraryObjects libkern.a :
 	<$(SOURCE_GRIST)!libc!string>memcpy.o
 	<$(SOURCE_GRIST)!libc!string>memmove.o
 	<$(SOURCE_GRIST)!libc!string>memset.o
+	<$(SOURCE_GRIST)!libc!string>strcasecmp.o
+	<$(SOURCE_GRIST)!libc!string>strcasestr.o
 	<$(SOURCE_GRIST)!libc!string>strcat.o
 	<$(SOURCE_GRIST)!libc!string>strchr.o
 	<$(SOURCE_GRIST)!libc!string>strcmp.o
 	<$(SOURCE_GRIST)!libc!string>strcpy.o
+	<$(SOURCE_GRIST)!libc!string>strcspn.o
+	<$(SOURCE_GRIST)!libc!string>strdup.o
 	<$(SOURCE_GRIST)!libc!string>strerror.o
 	<$(SOURCE_GRIST)!libc!string>strlcat.o
 	<$(SOURCE_GRIST)!libc!string>strlcpy.o
@@ -324,10 +328,14 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!string>memcpy.o
 	<$(SOURCE_GRIST)!libc!string>memmove.o
 	<$(SOURCE_GRIST)!libc!string>memset.o
+	<$(SOURCE_GRIST)!libc!string>strcasecmp.o
+	<$(SOURCE_GRIST)!libc!string>strcasestr.o
 	<$(SOURCE_GRIST)!libc!string>strcat.o
 	<$(SOURCE_GRIST)!libc!string>strchr.o
 	<$(SOURCE_GRIST)!libc!string>strcmp.o
 	<$(SOURCE_GRIST)!libc!string>strcpy.o
+	<$(SOURCE_GRIST)!libc!string>strcspn.o
+	<$(SOURCE_GRIST)!libc!string>strdup.o
 	<$(SOURCE_GRIST)!libc!string>strerror.o
 	<$(SOURCE_GRIST)!libc!string>strlcat.o
 	<$(SOURCE_GRIST)!libc!string>strlcpy.o
