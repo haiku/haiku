@@ -32,11 +32,11 @@ SECTIONS
 	.rel.plt : { *(.rel.plt) }
 	.rela.plt : { *(.rela.plt) }
 	.init : { *(.init) } =0x9090
+	.fini : { *(.fini) } =0x9090
 	.plt : { *(.plt) }
 
 	/* text/read-only data */
 	.text :	{ *(.text .gnu.linkonce.t.*) }
-
 	.rodata : { *(.rodata) }
 
 	/* writable data  */
@@ -60,7 +60,6 @@ SECTIONS
     .got	 : { *(.got.plt) *(.got) }
 	.dynamic : { *(.dynamic) }
 
-
 	/* unintialized data (in same segment as writable data) */
 	PROVIDE (__bss_start = .);
 	.bss : { *(.bss) }
@@ -69,5 +68,5 @@ SECTIONS
 	PROVIDE (_end = .);
 
 	/* Strip unnecessary stuff */
-	/DISCARD/ : { *(.comment .note .eh_frame .dtors) }
+	/DISCARD/ : { *(.comment .note .eh_frame) }
 }

@@ -32,6 +32,7 @@ SECTIONS
 	.rel.plt : { *(.rel.plt) }
 	.rela.plt : { *(.rela.plt) }
 	.init : { *(.init) } =0x9090
+	.fini : { *(.fini) } =0x9090
 	.plt : { *(.plt) }
 
 	/* text/read-only data */
@@ -69,5 +70,5 @@ SECTIONS
 	PROVIDE (_end = .);
 
 	/* Strip unnecessary stuff */
-	/DISCARD/ : { *(.comment .note .eh_frame .dtors) }
+	/DISCARD/ : { *(.comment .note .eh_frame) }
 }
