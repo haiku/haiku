@@ -13,6 +13,7 @@
 #include <storage/StorageDefs.h>
 #include <storage/FindDirectory.h>
 #include <storage/Path.h>
+#include <storage/Directory.h>
 
 #define ASSERT(condition)	if (!(condition)) { debugger("Assertion failed!"); }
 
@@ -47,7 +48,12 @@ typedef struct module_addon {
 
 typedef struct module_list_cookie {
 	char * prefix;
-	// TODO
+	char * search_paths;
+	char * search_path;
+	char * next_path_token;
+	BList * dir_stack;
+	module_addon * ma;	// current module addon looked up
+	module_info ** mi;	// current module addon module info
 } module_list_cookie;
 
 #define LOCK_MODULES		acquire_sem(g_modules_lock)
@@ -178,6 +184,7 @@ status_t get_next_loaded_module_name(uint32 *cookie, char *buf, size_t *bufsize)
 void * open_module_list(const char *prefix)
 {
 	module_list_cookie * mlc;
+	char * addon_path;
 	
 	if (prefix == NULL)
 		return NULL;
@@ -185,6 +192,13 @@ void * open_module_list(const char *prefix)
 	mlc = (module_list_cookie *) malloc(sizeof(*mlc));
 	mlc->prefix = strdup(prefix);
 	
+	addon_path = getenv("ADDON_PATH");
+	mlc->search_paths = (addon_path ? strdup(addon_path) : NULL);
+	mlc->search_path = strtok_r(mlc->search_paths, ":", &mlc->next_path_token);
+	mlc->dir_stack = new BList();
+	mlc->ma = NULL;
+	mlc->mi = NULL;
+
 	return mlc;
 }
 
@@ -193,27 +207,125 @@ status_t read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 {
 	module_list_cookie * mlc = (module_list_cookie *) cookie;
 	
-	if (!mlc)
+	if (!bufsize)
 		return B_BAD_VALUE;
 	
-	// TODO
-	return B_ERROR;
+	if (!mlc)
+		return B_BAD_VALUE;
+		
+	if (mlc->ma && mlc->mi) {
+		// we have a module addon loaded, so keep looking at his exported module names
+		while (*mlc->mi) {
+			module_info * mi = *mlc->mi;
+			mlc->mi++;
+			if(strstr(mi->name, mlc->prefix)) {
+				if (buf) strncpy(buf, mi->name, *bufsize);
+				*bufsize = strlen(mi->name);
+				return B_OK;
+			};
+		};
+		
+		unload_module_addon(mlc->ma);
+		mlc->ma = NULL;
+		mlc->mi = NULL;
+	};
+		
+	while (mlc->search_path) {
+		BDirectory * dir;
+		BEntry entry;
+		BPath path;
+		status_t status;
+			
+		dir = (BDirectory *) mlc->dir_stack->LastItem();
+		if (!dir) {
+			if (strncmp(mlc->search_path, "%A/", 3) == 0) {
+				// compute "%A/..." path
+				app_info ai;
+				
+				be_app->GetAppInfo(&ai);
+				entry.SetTo(&ai.ref);
+				entry.GetPath(&path);
+				path.GetParent(&path);
+				path.Append(mlc->search_path + 3);
+			} else {
+				path.SetTo(mlc->search_path);
+			};
+			path.Append(mlc->prefix);
+
+			printf("Looking module(s) in %s/%s...\n", mlc->search_path, mlc->prefix);
+			 
+			dir = new BDirectory(path.Path());
+			if (dir)
+				mlc->dir_stack->AddItem(dir);
+		};
+		
+		if (dir) {  
+			while (dir->GetNextEntry(&entry) == B_OK) {
+				entry.GetPath(&path);
+				// printf("  %s ?\n", path.Path());
+
+				if (entry.IsDirectory()) {
+					BDirectory * subdir;
+					// push this directory on dir_stack
+					subdir = new BDirectory(path.Path());
+					if (!subdir)
+						continue;
+						
+					mlc->dir_stack->AddItem(subdir);
+					// recursivly search this sub-directory
+					return read_next_module_name(cookie, buf, bufsize);
+				};
+				
+				if (entry.IsFile()) {
+					mlc->ma = load_module_addon(path.Path());
+		            if (!mlc->ma)
+		            	// Oh-oh, not a loadable module addon!?
+		            	continue;
+
+					mlc->mi = mlc->ma->infos;
+					return read_next_module_name(cookie, buf, bufsize);
+				};
+			};
+			
+			status = mlc->dir_stack->RemoveItem(dir);
+			delete dir;
+		};
+		
+		if (!mlc->dir_stack->IsEmpty())
+			continue;
+
+		mlc->search_path = strtok_r(NULL, ":", &mlc->next_path_token);
+	};
+
+	// Module(s) list search done, ending...
+	return B_ERROR;		
 }
 
 
 status_t close_module_list(void *cookie)
 {
 	module_list_cookie * mlc = (module_list_cookie *) cookie;
+	BDirectory * dir;
 
 	ASSERT(mlc);
 	ASSERT(mlc->prefix);
+
+	if (mlc->ma)
+		unload_module_addon(mlc->ma);
+
+	while((dir = (BDirectory *) mlc->dir_stack->FirstItem())) {
+		mlc->dir_stack->RemoveItem(dir);
+		delete dir;
+	};
+
+	delete mlc->dir_stack;	
 	
+	free(mlc->search_paths);
 	free(mlc->prefix);
 	free(mlc);
 
 	return B_ERROR;
 }
-
 
 // #pragma mark -
 // Private routines
@@ -227,17 +339,20 @@ static module_addon * load_module_addon(const char * path)
 
 	ASSERT(path);
 
-	printf("Loading %s addon\n", path);
 	addon_id = load_add_on(path);
-	if (addon_id < 0)
+	if (addon_id < 0) {
+		printf("Failed to load %s addon: %s.\n", path, strerror(addon_id));
 		return NULL;
+	};
+	
+	// printf("Addon %s loaded.\n", path);
 		
 	ma = NULL;
 		
 	status = get_image_symbol(addon_id, "modules", B_SYMBOL_TYPE_DATA, (void **) &mi);
 	if (status != B_OK) {
 		//  No "modules" symbol found in this addon
-		printf("No \"modules\" symbol found in %s addon: not a module addon!\n", path);
+		printf("Symbol \"modules\" not found in %s addon: not a module addon!\n", path);
 		goto error;
 	};
 
@@ -324,8 +439,8 @@ error:
 		free(ma);
 	};
 
-	printf("Unloading %s addon\n", path);
 	unload_add_on(addon_id);
+	printf("Addon %s unloaded.\n", path);
 	return NULL;
 }
 
@@ -348,16 +463,15 @@ static status_t unload_module_addon(module_addon * ma)
 		return B_OK;
 
 	if (ma->addon_image < 0)
+		// built-in addon, it seems...
 		return B_OK;
 
-	status = B_ERROR;
-	
-	printf("Unloading %s addon\n", ma->path);
 	status = unload_add_on(ma->addon_image);
 	if (status != B_OK) {
-		printf("unload_add_on(%ld -> %s) failed: %ld!\n", ma->addon_image, ma->path, status);
+		printf("Failed to unload %s addon: %s.\n", ma->path, strerror(status));
 		return status;
 	};
+	// printf("Addon %s unloaded.\n", ma->path);
 		
 	LOCK_MODULES;
 
@@ -413,36 +527,37 @@ static module * search_module(const char * name)
 	BPath path;
 	BPath addons_path;
 	BEntry entry;
-	int i;
 	module * found_module;
-	directory_which addons_paths[] = {
-		(directory_which) -2,	// APP_ADDONS_DIRECTORY
-		B_USER_ADDONS_DIRECTORY,
-		// B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY,
-		(directory_which) -1
-	};
-	
+	char * search_paths;
+	char * search_path;
+	char * next_path_token; 
+
 	printf("search_module(%s):\n", name);
 
+	search_paths = getenv("ADDON_PATH");
+	if (!search_paths)
+		// Nowhere to search addons!!!
+		return NULL;
+		
+	search_paths = strdup(search_paths);
+	search_path = strtok_r(search_paths, ":", &next_path_token);
+	
 	found_module = NULL;
-	for (i = 0; addons_paths[i] != -1 && found_module == NULL; i++) {
-		if (addons_paths[i] == -2) {
-			// compute "%A/add-ons" path
+	while (search_path && found_module == NULL) {
+		if (strncmp(search_path, "%A/", 3) == 0) {
+			// compute "%A/..." path
 			app_info ai;
+			
 			be_app->GetAppInfo(&ai);
 			entry.SetTo(&ai.ref);
 			entry.GetPath(&addons_path);
 			addons_path.GetParent(&addons_path);
-			addons_path.Append("add-ons");
+			addons_path.Append(search_path + 3);
 		} else {
-			// try in "net_server" subfolder of officials add-ons repositories
-			if (find_directory(addons_paths[i], &addons_path, false, NULL) != B_OK)
-				continue;
-			addons_path.Append("net_server");
+			addons_path.SetTo(search_path);
 		};
 		
-		printf("Looking into %s\n", addons_path.Path());
+		printf("Looking into %s\n", search_path);
 
 		path.SetTo(addons_path.Path());
 		path.Append(name);
@@ -467,7 +582,11 @@ static module * search_module(const char * name)
 			// okay, remove the current path leaf and try again...
 			path.GetParent(&path);
 		};
+		
+		search_path = strtok_r(NULL, ":", &next_path_token);
 	};
+
+	free(search_paths);
 
 	if (found_module)
 		printf("  Found it in %s addon module!\n",
@@ -592,7 +711,7 @@ static module * find_loaded_module_by_id(uint32 id)
 #define NET_ETHERNET_MODULE_NAME 	"network/interfaces/ethernet"
 #define NET_IPV4_MODULE_NAME 		"network/protocols/ipv4/v1"
 
-#define MODULE_LIST_PREFIX	"network/protocols"
+#define MODULE_LIST_PREFIX	"network"
 
 int main(int argc, char **argv)
 {
@@ -610,12 +729,13 @@ int main(int argc, char **argv)
 	ml_cookie = open_module_list(MODULE_LIST_PREFIX);
 	sz = sizeof(module_name);
 	while(read_next_module_name(ml_cookie, module_name, &sz) == B_OK) {
-		printf("  %s\n", module_name);
+		if (strlen(module_name))
+			printf("  %s\n", module_name);
 		sz = sizeof(module_name);
 	};
 	close_module_list(ml_cookie);
 	printf("close_module_list()\n");
-	
+	// return 0;
 	
 	core = NULL;
 	get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
