@@ -37,16 +37,16 @@ const char* Udf::kVSDID_ECMA167_2 	= "NSR02";
 const char* Udf::kVSDID_ECMA167_3 	= "NSR03";
 const char* Udf::kVSDID_ECMA168		= "CDW02";
 
-// udf_entity_ids
-const udf_entity_id Udf::kMetadataPartitionMapId(0, "*UDF Metadata Partition");
-const udf_entity_id Udf::kSparablePartitionMapId(0, "*UDF Sparable Partition");
-const udf_entity_id Udf::kVirtualPartitionMapId(0, "*UDF Virtual Partition");
+// entity_ids
+const entity_id Udf::kMetadataPartitionMapId(0, "*UDF Metadata Partition");
+const entity_id Udf::kSparablePartitionMapId(0, "*UDF Sparable Partition");
+const entity_id Udf::kVirtualPartitionMapId(0, "*UDF Virtual Partition");
 
 //----------------------------------------------------------------------
 // Helper functions
 //----------------------------------------------------------------------
 
-const char *Udf::udf_tag_id_to_string(udf_tag_id id)
+const char *Udf::tag_id_to_string(tag_id id)
 {
 	switch (id) {
 		case TAGID_UNDEFINED:
@@ -103,39 +103,39 @@ const char *Udf::udf_tag_id_to_string(udf_tag_id id)
 
 
 //----------------------------------------------------------------------
-// udf_volume_structure_descriptor_header
+// volume_structure_descriptor_header
 //----------------------------------------------------------------------
 
 /*! \brief Returns true if the given \a id matches the header's id.
 */
 bool
-udf_volume_structure_descriptor_header::id_matches(const char *id)
+volume_structure_descriptor_header::id_matches(const char *id)
 {
 	return strncmp(this->id, id, 5) == 0;
 }
 
 
 //----------------------------------------------------------------------
-// udf_charspec
+// charspec
 //----------------------------------------------------------------------
 
 void
-udf_charspec::dump() const
+charspec::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_charspec");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "charspec");
 	PRINT(("character_set_type: %d\n", character_set_type()));
 	PRINT(("character_set_info: `%s'\n", character_set_info()));
 }
 
 
 //----------------------------------------------------------------------
-// udf_timestamp
+// timestamp
 //----------------------------------------------------------------------
 
 void
-udf_timestamp::dump() const
+timestamp::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_timestamp");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "timestamp");
 	PRINT(("type:                %d\n", type()));
 	PRINT(("timezone:            %d\n", timezone()));
 	PRINT(("year:                %d\n", year()));
@@ -150,10 +150,10 @@ udf_timestamp::dump() const
 }
 
 //----------------------------------------------------------------------
-// udf_entity_id
+// entity_id
 //----------------------------------------------------------------------
 
-udf_entity_id::udf_entity_id(uint8 flags, char *identifier, char *identifier_suffix)
+entity_id::entity_id(uint8 flags, char *identifier, char *identifier_suffix)
 	: _flags(flags)
 {
 	if (identifier)
@@ -167,19 +167,19 @@ udf_entity_id::udf_entity_id(uint8 flags, char *identifier, char *identifier_suf
 }
 
 void
-udf_entity_id::dump() const
+entity_id::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_entity_id");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "entity_id");
 	PRINT(("flags:             %d\n", flags()));
 	PRINT(("identifier:        `%.23s'\n", identifier()));
 	PRINT(("identifier_suffix: `%s'\n", identifier_suffix()));
 }
 
 bool
-udf_entity_id::matches(const udf_entity_id &id) const
+entity_id::matches(const entity_id &id) const
 {
 	bool result = true;
-	for (int i = 0; i < udf_entity_id::kIdentifierLength; i++) {
+	for (int i = 0; i < entity_id::kIdentifierLength; i++) {
 		if (identifier()[i] != id.identifier()[i]) {
 			result = false;
 			break;
@@ -189,29 +189,29 @@ udf_entity_id::matches(const udf_entity_id &id) const
 }
 
 //----------------------------------------------------------------------
-// udf_extent_address
+// extent_address
 //----------------------------------------------------------------------
 
 void
-udf_extent_address::dump() const
+extent_address::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_extent_address");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "extent_address");
 	PRINT(("length:   %ld\n", length()));
 	PRINT(("location: %ld\n", location()));
 }
 
 void
-udf_logical_block_address::dump() const
+logical_block_address::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_logical_block_address");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "logical_block_address");
 	PRINT(("block:     %ld\n", block()));
 	PRINT(("partition: %d\n", partition()));
 }
 
 void
-udf_long_address::dump() const
+long_address::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_long_address");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "long_address");
 	PRINT(("length:   %ld\n", length()));
 	PRINT(("block:    %ld\n", block()));
 	PRINT(("partiton: %d\n", partition()));
@@ -220,14 +220,14 @@ udf_long_address::dump() const
 }
 
 //----------------------------------------------------------------------
-// udf_tag
+// descriptor_tag 
 //----------------------------------------------------------------------
 
 void
-udf_tag::dump() const
+descriptor_tag ::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_descriptor_tag");
-	PRINT(("id:            %d (%s)\n", id(), udf_tag_id_to_string(udf_tag_id(id()))));
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "descriptor_tag");
+	PRINT(("id:            %d (%s)\n", id(), tag_id_to_string(tag_id(id()))));
 	PRINT(("version:       %d\n", version()));
 	PRINT(("checksum:      %d\n", checksum()));
 	PRINT(("serial_number: %d\n", serial_number()));
@@ -243,9 +243,9 @@ udf_tag::dump() const
 	\todo Calc the CRC.
 */
 status_t 
-udf_tag::init_check(uint32 diskBlock)
+descriptor_tag ::init_check(uint32 diskBlock)
 {
-	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_HIGH_VOLUME, "udf_descriptor_tag");
+	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_HIGH_VOLUME, "descriptor_tag");
 	PRINT(("location (paramater)    == %ld\n", diskBlock));
 	PRINT(("location (in structure) == %ld\n", location()));
 	status_t error = (diskBlock == location()) ? B_OK : B_NO_INIT;
@@ -265,13 +265,13 @@ udf_tag::init_check(uint32 diskBlock)
 
 
 //----------------------------------------------------------------------
-// udf_primary_descriptor
+// primary_descriptor
 //----------------------------------------------------------------------
 
 void
-udf_primary_descriptor::dump() const
+primary_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_primary_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "primary_descriptor");
 	
 	CS0String string;
 	
@@ -309,13 +309,13 @@ udf_primary_descriptor::dump() const
 
 
 //----------------------------------------------------------------------
-// udf_anchor_volume_descriptor_pointer
+// anchor_volume_descriptor_pointer
 //----------------------------------------------------------------------
 
 void
-udf_anchor_descriptor::dump() const
+anchor_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_anchor_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "anchor_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("main_vds:\n"));
@@ -326,13 +326,13 @@ udf_anchor_descriptor::dump() const
 
 
 //----------------------------------------------------------------------
-// udf_implementation_use_descriptor
+// implementation_use_descriptor
 //----------------------------------------------------------------------
 
 void
-udf_implementation_use_descriptor::dump() const
+implementation_use_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_implementation_use_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "implementation_use_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number: %ld\n", vds_number()));
@@ -343,15 +343,15 @@ udf_implementation_use_descriptor::dump() const
 }
 
 //----------------------------------------------------------------------
-// udf_partition_descriptor
+// partition_descriptor
 //----------------------------------------------------------------------
 
 const uint8 Udf::kMaxPartitionDescriptors = 2;
 
 void
-udf_partition_descriptor::dump() const
+partition_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_partition_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "partition_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number:                %ld\n", vds_number()));
@@ -372,13 +372,13 @@ udf_partition_descriptor::dump() const
 }
 
 //----------------------------------------------------------------------
-// udf_logical_descriptor
+// logical_descriptor
 //----------------------------------------------------------------------
 
 void
-udf_logical_descriptor::dump() const
+logical_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_logical_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "logical_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number:                %ld\n", vds_number()));
@@ -418,7 +418,7 @@ udf_logical_descriptor::dump() const
 			case 2: {
 				PRINT(("  partition_number: %d\n", *reinterpret_cast<const uint16*>(&(maps[offset+38]))));
 				PRINT(("  entity_id:\n"));
-				const udf_entity_id *id = reinterpret_cast<const udf_entity_id*>(&(maps[offset+4]));
+				const entity_id *id = reinterpret_cast<const entity_id*>(&(maps[offset+4]));
 				if (id)	// To kill warning when DEBUG==0
 					PDUMP(id);
 				break;
@@ -430,8 +430,8 @@ udf_logical_descriptor::dump() const
 }
 
 
-udf_logical_descriptor&
-udf_logical_descriptor::operator=(const udf_logical_descriptor &rhs)
+logical_descriptor&
+logical_descriptor::operator=(const logical_descriptor &rhs)
 {
 	_tag = rhs._tag;
 	_vds_number = rhs._vds_number;
@@ -459,13 +459,13 @@ udf_logical_descriptor::operator=(const udf_logical_descriptor &rhs)
 
 
 //----------------------------------------------------------------------
-// udf_physical_partition_map 
+// physical_partition_map 
 //----------------------------------------------------------------------
 
 void
-udf_physical_partition_map::dump()
+physical_partition_map::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_physical_partition_map");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "physical_partition_map");
 	PRINT(("type: %d\n", type()));
 	PRINT(("length: %d\n", length()));
 	PRINT(("volume_sequence_number: %d\n", volume_sequence_number()));
@@ -473,13 +473,13 @@ udf_physical_partition_map::dump()
 }
 
 //----------------------------------------------------------------------
-// udf_sparable_partition_map 
+// sparable_partition_map 
 //----------------------------------------------------------------------
 
 void
-udf_sparable_partition_map::dump()
+sparable_partition_map::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_sparable_partition_map");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "sparable_partition_map");
 	PRINT(("type: %d\n", type()));
 	PRINT(("length: %d\n", length()));
 	PRINT(("partition_type_id:"));
@@ -494,13 +494,13 @@ udf_sparable_partition_map::dump()
 }
 
 //----------------------------------------------------------------------
-// udf_unallocated_space_descriptor
+// unallocated_space_descriptor
 //----------------------------------------------------------------------
 
 void
-udf_unallocated_space_descriptor::dump() const
+unallocated_space_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_unallocated_space_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "unallocated_space_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number:                  %ld\n", vds_number()));
@@ -510,25 +510,25 @@ udf_unallocated_space_descriptor::dump() const
 
 
 //----------------------------------------------------------------------
-// udf_terminating_descriptor
+// terminating_descriptor
 //----------------------------------------------------------------------
 
 void
-udf_terminating_descriptor::dump() const
+terminating_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_terminating_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "terminating_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 }
 
 //----------------------------------------------------------------------
-// udf_file_set_descriptor
+// file_set_descriptor
 //----------------------------------------------------------------------
 
 void
-udf_file_set_descriptor::dump() const
+file_set_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_file_set_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "file_set_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("recording_date_and_time:\n"));
@@ -562,9 +562,9 @@ udf_file_set_descriptor::dump() const
 }
 
 void
-udf_file_id_descriptor::dump() const
+file_id_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS, "udf_file_id_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS, "file_id_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("version_number:            %d\n", version_number()));
@@ -584,9 +584,9 @@ udf_file_id_descriptor::dump() const
 }
 
 void
-udf_icb_entry_tag::dump() const
+icb_entry_tag::dump() const
 {
-	DUMP_INIT(CF_PUBLIC, "udf_icb_entry_tag");
+	DUMP_INIT(CF_PUBLIC, "icb_entry_tag");
 	PRINT(("prior_entries: %ld\n", prior_recorded_number_of_direct_entries()));
 	PRINT(("strategy_type: %d\n", strategy_type()));
 	PRINT(("strategy_parameters:\n"));
@@ -604,7 +604,7 @@ udf_icb_entry_tag::dump() const
 	uint16 entry_count;
 	uint8 reserved;
 	uint8 file_type;
-	udf_logical_block_address parent_icb_location;
+	logical_block_address parent_icb_location;
 	union {
 		uint16 all_flags;
 		struct {
@@ -629,9 +629,9 @@ udf_icb_entry_tag::dump() const
 }
 
 void
-udf_icb_header::dump() const
+icb_header::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_icb_header");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "icb_header");
 
 	PRINT(("tag:\n"));
 	DUMP(tag());

@@ -24,11 +24,11 @@ extern "C" {
 
 namespace Udf {
 
-udf_long_address to_long_address(vnode_id id, uint32 length = 0);
+long_address to_long_address(vnode_id id, uint32 length = 0);
 
-vnode_id to_vnode_id(udf_long_address address);
+vnode_id to_vnode_id(long_address address);
 
-time_t make_time(udf_timestamp &timestamp);
+time_t make_time(timestamp &timestamp);
 
 } // namespace Udf
 

@@ -31,7 +31,7 @@ class DirectoryIterator;
 class Volume;
 
 /*! \brief Abstract interface to file entry structure members
-	that are not commonly accessible through udf_file_icb_entry().
+	that are not commonly accessible through file_icb_entry().
 	
 	This is necessary, since we can't use virtual functions in
 	the disk structure structs themselves, since we generally
@@ -62,7 +62,7 @@ private:
 
 class Icb {
 public:
-	Icb(Volume *volume, udf_long_address address);
+	Icb(Volume *volume, long_address address);
 	status_t InitCheck();
 	vnode_id Id() { return fId; }
 	
@@ -94,18 +94,18 @@ public:
 private:
 	Icb();	// unimplemented
 		
-	udf_tag& Tag() { return (reinterpret_cast<udf_icb_header*>(fData.Block()))->tag(); }
-	udf_icb_entry_tag& IcbTag() { return (reinterpret_cast<udf_icb_header*>(fData.Block()))->icb_tag(); }
+	descriptor_tag & Tag() { return (reinterpret_cast<icb_header*>(fData.Block()))->tag(); }
+	icb_entry_tag& IcbTag() { return (reinterpret_cast<icb_header*>(fData.Block()))->icb_tag(); }
 	AbstractFileEntry* AbstractEntry() {
 		DEBUG_INIT(CF_PRIVATE | CF_HIGH_VOLUME, "Icb");
 		return (Tag().id() == TAGID_EXTENDED_FILE_ENTRY)
-//	             ? reinterpret_cast<udf_extended_file_icb_entry*>(fData.Block())
-//	             : reinterpret_cast<udf_file_icb_entry*>(fData.Block()));
+//	             ? reinterpret_cast<extended_file_icb_entry*>(fData.Block())
+//	             : reinterpret_cast<file_icb_entry*>(fData.Block()));
 	             ? &fExtendedEntry
 	             : &fFileEntry;
 	}
-	udf_file_icb_entry* FileEntry() { return (reinterpret_cast<udf_file_icb_entry*>(fData.Block())); }
-	udf_extended_file_icb_entry& ExtendedEntry() { return *(reinterpret_cast<udf_extended_file_icb_entry*>(fData.Block())); }
+	file_icb_entry* FileEntry() { return (reinterpret_cast<file_icb_entry*>(fData.Block())); }
+	extended_file_icb_entry& ExtendedEntry() { return *(reinterpret_cast<extended_file_icb_entry*>(fData.Block())); }
 
 	template <class DescriptorList>
 	status_t _Read(DescriptorList &list, off_t pos, void *buffer, size_t *length, uint32 *block);
@@ -117,8 +117,8 @@ private:
 	status_t fInitStatus;
 	vnode_id fId;
 	SinglyLinkedList<DirectoryIterator*> fIteratorList;
-	FileEntry<udf_file_icb_entry> fFileEntry;
-	FileEntry<udf_extended_file_icb_entry> fExtendedEntry;	
+	FileEntry<file_icb_entry> fFileEntry;
+	FileEntry<extended_file_icb_entry> fExtendedEntry;	
 };
 
 /*! \brief Does the dirty work of reading using the given DescriptorList object
@@ -147,7 +147,7 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 		PRINT(("pos: %Ld\n", pos));
 		PRINT(("bytesLeft: %ld\n", bytesLeft));
 		
-		udf_long_address extent;
+		long_address extent;
 		bool isEmpty = false;
 		error = list.FindExtent(pos, &extent, &isEmpty);
 		if (!error) {

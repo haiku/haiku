@@ -41,7 +41,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 		return B_ENTRY_NOT_FOUND;
 
 	uint8 data[kMaxFileIdSize];
-	udf_file_id_descriptor *entry = reinterpret_cast<udf_file_id_descriptor*>(data);
+	file_id_descriptor *entry = reinterpret_cast<file_id_descriptor*>(data);
 
 	uint32 block = 0;
 	off_t offset = fPosition;
@@ -51,7 +51,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 	// then, based on the information therein, read in the variable
 	// length tail portion as well.
 	error = Parent()->Read(offset, entry, &entryLength, &block);
-	if (!error && entryLength >= sizeof(udf_file_id_descriptor) && entry->tag().init_check(block) == B_OK) {
+	if (!error && entryLength >= sizeof(file_id_descriptor) && entry->tag().init_check(block) == B_OK) {
 		PDUMP(entry);
 		offset += entry->total_length();
 		

@@ -61,7 +61,7 @@ public:
 		\param isEmpty If set to true, indicates that the given extent is unrecorded
 		       and thus its contents should be interpreted as all zeros.
 	*/
-	status_t FindExtent(off_t start, udf_long_address *extent, bool *isEmpty) {
+	status_t FindExtent(off_t start, long_address *extent, bool *isEmpty) {
 		DEBUG_INIT_ETC(CF_PUBLIC | CF_FILE_OPS | CF_HIGH_VOLUME, "AllocationDescriptorList<>",
 		               ("start: %Ld, extent: %p, isEmpty: %p", start, extent, isEmpty));
 		off_t startBlock = start >> fVolume->BlockShift();
@@ -213,7 +213,7 @@ public:
 	{
 	}
 		
-	typedef udf_short_address DescriptorType;
+	typedef short_address DescriptorType;
 
 	inline uint8 GetType(DescriptorType &descriptor) const {
 		return descriptor.type();
@@ -236,7 +236,7 @@ private:
 
 class LongDescriptorAccessor {
 public:
-	typedef udf_long_address DescriptorType;
+	typedef long_address DescriptorType;
 
 	inline uint8 GetType(DescriptorType &descriptor) const {
 		return descriptor.type();

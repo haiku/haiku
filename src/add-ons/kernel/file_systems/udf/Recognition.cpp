@@ -16,14 +16,14 @@ walk_volume_recognition_sequence(int device, off_t offset,
 static status_t
 walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
                                         uint32 blockSize, uint32 blockShift,
-                                        udf_logical_descriptor &logicalVolumeDescriptor,
-							            udf_partition_descriptor partitionDescriptors[],
+                                        logical_descriptor &logicalVolumeDescriptor,
+							            partition_descriptor partitionDescriptors[],
 							            uint8 &partitionDescriptorCount);
 static status_t
-walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
+walk_volume_descriptor_sequence(extent_address descriptorSequence,
 								int device, uint32 blockSize, uint32 blockShift,
-							    udf_logical_descriptor &logicalVolumeDescriptor,
-							    udf_partition_descriptor partitionDescriptors[],
+							    logical_descriptor &logicalVolumeDescriptor,
+							    partition_descriptor partitionDescriptors[],
 							    uint8 &partitionDescriptorCount);
 
 //------------------------------------------------------------------------------
@@ -32,8 +32,8 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 
 status_t
 Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
-                   uint32 &blockShift, udf_logical_descriptor &logicalVolumeDescriptor,
-				   udf_partition_descriptor partitionDescriptors[],
+                   uint32 &blockShift, logical_descriptor &logicalVolumeDescriptor,
+				   partition_descriptor partitionDescriptors[],
 				   uint8 &partitionDescriptorCount)
 {
 	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("device: %d, offset: %Ld, length: %Ld, "
@@ -78,8 +78,8 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("device: %d, offset: %Ld, length: %Ld, "
 	               "blockSize: %ld, volumeName: %p", device, offset, length,
 	               blockSize, volumeName));
-	udf_logical_descriptor logicalVolumeDescriptor;
-	udf_partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
+	logical_descriptor logicalVolumeDescriptor;
+	partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
 	uint8 partitionDescriptorCount;
 	uint32 blockShift;
 	status_t error = udf_recognize(device, offset, length, blockSize, blockShift,
@@ -118,8 +118,8 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize, uin
 			ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
 			if (bytesRead == (ssize_t)blockSize)
 		    {
-		    	udf_volume_structure_descriptor_header* descriptor =
-		    	  reinterpret_cast<udf_volume_structure_descriptor_header*>(chunk.Data());
+		    	volume_structure_descriptor_header* descriptor =
+		    	  reinterpret_cast<volume_structure_descriptor_header*>(chunk.Data());
 				if (descriptor->id_matches(kVSDID_ISO)) {
 					SIMPLE_PRINT(("found ISO9660 descriptor\n"));
 					foundISO = true;
@@ -166,8 +166,8 @@ static
 status_t
 walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
                                         uint32 blockSize, uint32 blockShift,
-                                        udf_logical_descriptor &logicalVolumeDescriptor,
-							            udf_partition_descriptor partitionDescriptors[],
+                                        logical_descriptor &logicalVolumeDescriptor,
+							            partition_descriptor partitionDescriptors[],
 							            uint8 &partitionDescriptorCount)
 {
 	DEBUG_INIT(CF_PRIVATE, NULL);
@@ -183,7 +183,7 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 		off_t block = avds_locations[i];
 		off_t address = (offset + block) << blockShift;
 		MemoryChunk chunk(blockSize);
-		udf_anchor_descriptor *anchor = NULL;
+		anchor_descriptor *anchor = NULL;
 			
 		status_t anchorErr = chunk.InitCheck();
 		if (!anchorErr) {
@@ -195,7 +195,7 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 			}
 		}			
 		if (!anchorErr) {
-			anchor = reinterpret_cast<udf_anchor_descriptor*>(chunk.Data());
+			anchor = reinterpret_cast<anchor_descriptor*>(chunk.Data());
 			anchorErr = anchor->tag().init_check(block+offset);
 			if (anchorErr) {
 				PRINT(("block %Ld: invalid anchor\n", block));
@@ -235,10 +235,10 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 
 static
 status_t
-walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
+walk_volume_descriptor_sequence(extent_address descriptorSequence,
 								int device, uint32 blockSize, uint32 blockShift,
-							    udf_logical_descriptor &logicalVolumeDescriptor,
-							    udf_partition_descriptor partitionDescriptors[],
+							    logical_descriptor &logicalVolumeDescriptor,
+							    partition_descriptor partitionDescriptors[],
 							    uint8 &partitionDescriptorCount)
 {
 	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("descriptorSequence.loc:%ld, descriptorSequence.len:%ld",
@@ -254,7 +254,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 		off_t block = descriptorSequence.location()+i;
 		off_t address = block << blockShift; 
 		MemoryChunk chunk(blockSize);
-		udf_tag *tag = NULL;
+		descriptor_tag  *tag = NULL;
 
 		PRINT(("descriptor #%ld (block %Ld):\n", i, block));
 
@@ -268,7 +268,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 			}
 		}
 		if (!loopErr) {
-			tag = reinterpret_cast<udf_tag*>(chunk.Data());
+			tag = reinterpret_cast<descriptor_tag *>(chunk.Data());
 			loopErr = tag->init_check(block);
 		}
 		if (!loopErr) {
@@ -279,7 +279,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 					
 				case TAGID_PRIMARY_VOLUME_DESCRIPTOR:
 				{
-					udf_primary_descriptor *primary = reinterpret_cast<udf_primary_descriptor*>(tag);
+					primary_descriptor *primary = reinterpret_cast<primary_descriptor*>(tag);
 					PDUMP(primary);				
 					(void)primary;	// kill the warning		
 					break;
@@ -293,7 +293,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 
 				case TAGID_IMPLEMENTATION_USE_VOLUME_DESCRIPTOR:
 				{
-					udf_implementation_use_descriptor *imp_use = reinterpret_cast<udf_implementation_use_descriptor*>(tag);
+					implementation_use_descriptor *imp_use = reinterpret_cast<implementation_use_descriptor*>(tag);
 					PDUMP(imp_use);				
 					(void)imp_use;	// kill the warning		
 					break;
@@ -301,7 +301,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 
 				case TAGID_PARTITION_DESCRIPTOR:
 				{
-					udf_partition_descriptor *partition = reinterpret_cast<udf_partition_descriptor*>(tag);
+					partition_descriptor *partition = reinterpret_cast<partition_descriptor*>(tag);
 					PDUMP(partition);
 					if (partition->tag().init_check(block) == B_OK) {
 						// Check for a previously discovered partition descriptor with
@@ -376,7 +376,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 					
 				case TAGID_LOGICAL_VOLUME_DESCRIPTOR:
 				{
-					udf_logical_descriptor *logical = reinterpret_cast<udf_logical_descriptor*>(tag);
+					logical_descriptor *logical = reinterpret_cast<logical_descriptor*>(tag);
 					PDUMP(logical);
 					if (foundLogicalVolumeDescriptor) {
 						// Keep the vd with the highest vds_number
@@ -392,7 +392,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 					
 				case TAGID_UNALLOCATED_SPACE_DESCRIPTOR:
 				{
-					udf_unallocated_space_descriptor *unallocated = reinterpret_cast<udf_unallocated_space_descriptor*>(tag);
+					unallocated_space_descriptor *unallocated = reinterpret_cast<unallocated_space_descriptor*>(tag);
 					PDUMP(unallocated);				
 					(void)unallocated;	// kill the warning		
 					break;
@@ -400,7 +400,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 					
 				case TAGID_TERMINATING_DESCRIPTOR:
 				{
-					udf_terminating_descriptor *terminating = reinterpret_cast<udf_terminating_descriptor*>(tag);
+					terminating_descriptor *terminating = reinterpret_cast<terminating_descriptor*>(tag);
 					PDUMP(terminating);
 					(void)terminating;	// kill the warning		
 					break;

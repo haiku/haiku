@@ -1,3 +1,9 @@
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
+//---------------------------------------------------------------------
 #include "Icb.h"
 
 #include "time.h"
@@ -9,7 +15,7 @@
 
 using namespace Udf;
 
-Icb::Icb(Volume *volume, udf_long_address address)
+Icb::Icb(Volume *volume, long_address address)
 	: fVolume(volume)
 	, fData(volume)
 	, fInitStatus(B_NO_INIT)
@@ -25,7 +31,7 @@ Icb::Icb(Volume *volume, udf_long_address address)
 		off_t block;
 		error = fVolume->MapBlock(address, &block);
 		if (!error) {
-			udf_icb_header *header = reinterpret_cast<udf_icb_header*>(fData.SetTo(block));
+			icb_header *header = reinterpret_cast<icb_header*>(fData.SetTo(block));
 			PDUMP(header);
 			error = header->tag().init_check(address.block());
 		}

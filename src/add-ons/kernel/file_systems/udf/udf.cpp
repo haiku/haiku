@@ -487,7 +487,8 @@ udf_walk(void *ns, void *_dir, const char *filename, char **resolvedPath, vnode_
 int 
 udf_ioctl(void *ns, void *node, void *cookie, int cmd, void *buffer, size_t bufferLength)
 {
-	DEBUG_INIT(CF_ENTRY | CF_VOLUME_OPS, NULL);
+	DEBUG_INIT_ETC(CF_ENTRY | CF_VOLUME_OPS, NULL, ("node: %p, cmd: 0x%x, "
+	               "buf: %p, len: %ld\n", node, cmd, buffer, bufferLength));
 	// FUNCTION_START(("node: %p, cmd: %d, buf: %p, len: %ld\n", node, cmd, buffer, bufferLength));
 	RETURN(B_ERROR);
 }

@@ -44,8 +44,8 @@ public:
 	status_t Unmount();
 	
 	// Address mapping
-	status_t MapBlock(udf_long_address address, off_t *mappedBlock);
-	status_t MapExtent(udf_long_address logicalExtent, udf_extent_address &physicalExtent);
+	status_t MapBlock(long_address address, off_t *mappedBlock);
+	status_t MapExtent(long_address logicalExtent, extent_address &physicalExtent);
 
 	// Miscellaneous info
 	const char *Name() const;
@@ -77,7 +77,7 @@ private:
 	uint32 fBlockSize;
 	uint32 fBlockShift;
 	Partition *fPartitions[UDF_MAX_PARTITION_MAPS];
-	Icb *fRootIcb;	// Destroyed by vfs via callback to udf_release_node()
+	Icb *fRootIcb;	// Destroyed by vfs via callback to release_node()
 	CS0String fName;
 };
 

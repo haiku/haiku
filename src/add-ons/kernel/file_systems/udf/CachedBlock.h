@@ -43,7 +43,7 @@ class CachedBlock {
 		inline void Keep();
 		inline void Unset();
 		inline uint8 *SetTo(off_t block, bool empty = false);
-		inline uint8 *SetTo(udf_long_address address, bool empty = false);
+		inline uint8 *SetTo(long_address address, bool empty = false);
 		template <class Accessor, class Descriptor>
 			inline uint8* SetTo(Accessor &accessor, Descriptor &descriptor,
 			bool empty = false);
@@ -126,7 +126,7 @@ CachedBlock::SetTo(off_t block, bool empty = false)
 }
 
 inline uint8 *
-CachedBlock::SetTo(udf_long_address address, bool empty = false)
+CachedBlock::SetTo(long_address address, bool empty = false)
 {
 	off_t block;
 	if (fVolume->MapBlock(address, &block) == B_OK)
@@ -139,8 +139,8 @@ template <class Accessor, class Descriptor>
 inline uint8*
 CachedBlock::SetTo(Accessor &accessor, Descriptor &descriptor, bool empty = false)
 {
-	// Make a udf_long_address out of the descriptor and call it a day
-	udf_long_address address;
+	// Make a long_address out of the descriptor and call it a day
+	long_address address;
 	address.set_to(accessor.GetBlock(descriptor),
                              accessor.GetPartition(descriptor));
     return SetTo(address, empty);

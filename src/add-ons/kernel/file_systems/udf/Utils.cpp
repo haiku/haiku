@@ -23,11 +23,11 @@ extern "C" {
 
 namespace Udf {
 
-udf_long_address
+long_address
 to_long_address(vnode_id id, uint32 length)
 {
 	DEBUG_INIT_ETC(CF_PUBLIC | CF_HELPER, NULL, ("vnode_id: %Ld (0x%Lx), length: %ld", id, id, length));
-	udf_long_address result;
+	long_address result;
 	result.set_block((id >> 16) & 0xffffffff);
 	result.set_partition(id & 0xffff);
 	result.set_length(length);
@@ -36,7 +36,7 @@ to_long_address(vnode_id id, uint32 length)
 }
 
 vnode_id
-to_vnode_id(udf_long_address address)
+to_vnode_id(long_address address)
 {
 	DEBUG_INIT(CF_PUBLIC | CF_HELPER, NULL);
 	vnode_id result = address.block();
@@ -50,7 +50,7 @@ to_vnode_id(udf_long_address address)
 }
 
 time_t
-make_time(udf_timestamp &timestamp)
+make_time(timestamp &timestamp)
 {
 	DEBUG_INIT_ETC(CF_HELPER | CF_HIGH_VOLUME, NULL, ("timestamp: (tnt: 0x%x, type: %d, timezone: %d = 0x%x, year: %d, " 
 	           "month: %d, day: %d, hour: %d, minute: %d, second: %d)", timestamp.type_and_timezone(),

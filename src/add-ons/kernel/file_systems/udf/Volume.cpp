@@ -72,11 +72,13 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 		}
 	}
 
-	udf_logical_descriptor logicalVolumeDescriptor;
-	udf_partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
+	logical_descriptor logicalVolumeDescriptor;
+	partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
 	uint8 partitionDescriptorCount;
 	uint32 blockShift;
 
+	// Run through the volume recognition and descriptor sequences to
+	// see if we have a potentially valid UDF volume on our hands
 	error = udf_recognize(device, offset, length, blockSize, blockShift,
 	                               logicalVolumeDescriptor, partitionDescriptors,
 	                               partitionDescriptorCount);
@@ -98,15 +100,15 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 		     && !error; i++)
 		{
 			uint8 *maps = logicalVolumeDescriptor.partition_maps();
-			udf_partition_map_header *header =
-				reinterpret_cast<udf_partition_map_header*>(maps+offset);
+			partition_map_header *header =
+				reinterpret_cast<partition_map_header*>(maps+offset);
 			PRINT(("partition map %d (type %d):\n", i, header->type()));
 			if (header->type() == 1) {
 				PRINT(("map type: physical\n"));
-				udf_physical_partition_map* map =
-					reinterpret_cast<udf_physical_partition_map*>(header);
+				physical_partition_map* map =
+					reinterpret_cast<physical_partition_map*>(header);
 				// Find the corresponding partition descriptor
-				udf_partition_descriptor *descriptor = NULL;
+				partition_descriptor *descriptor = NULL;
 				for (uint8 j = 0; j < partitionDescriptorCount; j++) {
 					if (map->partition_number() ==
 					    partitionDescriptors[j].partition_number())
@@ -135,27 +137,27 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 					error = B_ERROR;
 				}
 			} else if (header->type() == 2) {
-				// Figure out what kind of partition map we have based
+				// Figure out what kind of type 2 partition map we have based
 				// on the type identifier
-				const udf_entity_id &typeId = header->partition_type_id();
+				const entity_id &typeId = header->partition_type_id();
 				DUMP(typeId);
 				DUMP(kSparablePartitionMapId);
 				if (typeId.matches(kVirtualPartitionMapId)) {
 					PRINT(("map type: virtual\n"));
-					udf_virtual_partition_map* map =
-						reinterpret_cast<udf_virtual_partition_map*>(header);
+					virtual_partition_map* map =
+						reinterpret_cast<virtual_partition_map*>(header);
 					virtualCount++;
 					(void)map;	// kill the warning for now
 				} else if (typeId.matches(kSparablePartitionMapId)) {
 					PRINT(("map type: sparable\n"));
-					udf_sparable_partition_map* map =
-						reinterpret_cast<udf_sparable_partition_map*>(header);
+					sparable_partition_map* map =
+						reinterpret_cast<sparable_partition_map*>(header);
 					sparableCount++;
 					(void)map;	// kill the warning for now
 				} else if (typeId.matches(kMetadataPartitionMapId)) {
 					PRINT(("map type: metadata\n"));
-					udf_metadata_partition_map* map =
-						reinterpret_cast<udf_metadata_partition_map*>(header);
+					metadata_partition_map* map =
+						reinterpret_cast<metadata_partition_map*>(header);
 					metadataCount++;
 					(void)map;	// kill the warning for now
 				} else {
@@ -224,8 +226,8 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 			}
 			// See if it's valid, and if so, create the root icb
 			if (!error) {
-				udf_file_set_descriptor *fileSet =
-				 	reinterpret_cast<udf_file_set_descriptor*>(chunk.Data());
+				file_set_descriptor *fileSet =
+				 	reinterpret_cast<file_set_descriptor*>(chunk.Data());
 				fileSet->tag().init_check(0);
 				PDUMP(fileSet);
 				fRootIcb = new Icb(this, fileSet->root_directory_icb());
@@ -267,10 +269,11 @@ Volume::Name() const {
 /*! \brief Maps the given logical block to a physical block.
 */
 status_t
-Volume::MapBlock(udf_long_address address, off_t *mappedBlock)
+Volume::MapBlock(long_address address, off_t *mappedBlock)
 {
-	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Volume", ("long_address(block: %ld, partition: %d), %p",
-		address.block(), address.partition(), mappedBlock));
+	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Volume",
+		           ("partition: %d, block: %ld, mappedBlock: %p",
+		           address.partition(), address.block(), mappedBlock));
 	status_t error = mappedBlock ? B_OK : B_BAD_VALUE;
 	if (!error) {
 		Partition *partition = _GetPartition(address.partition());
