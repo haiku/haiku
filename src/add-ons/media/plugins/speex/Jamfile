@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons media plugins speex ;
+
+UsePrivateHeaders media ;
+
+SubDirHdrs $(SUBDIR) .. ogg libogg ;
+SubDirHdrs $(SUBDIR) libspeex ;
+
+Addon speex : media plugins :
+	speexCodecPlugin.cpp
+	: false : libspeex.a libogg.a
+;
+
+LinkSharedOSLibs speex : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins speex libspeex ;

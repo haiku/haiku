@@ -1,0 +1,18 @@
+Features
+-Add maximum/minimum bit-rate control for VBR
+-Get the encoder to use the rate of packet loss (more conservative pitch gains)
+
+Long-term quality improvements
+-Improve perceptual enhancement (including wideband)
+
+Standards
+*Complete Speex RTP profile
+-MIME type registration
+-MS ACM wrapper
+
+*required for 1.0
+
+ideas:
+Peelable stream (double codebook, higher bands, stereo)
+LPC from spectral domain
+Better psycho-acoustics? Masking curve from Vorbis

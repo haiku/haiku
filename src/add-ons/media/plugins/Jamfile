@@ -14,3 +14,4 @@ SubInclude OBOS_TOP src add-ons media plugins raw_decoder ;
 
 SubInclude OBOS_TOP src add-ons media plugins avcodec ;
 SubInclude OBOS_TOP src add-ons media plugins vorbis ;
+SubInclude OBOS_TOP src add-ons media plugins speex ;

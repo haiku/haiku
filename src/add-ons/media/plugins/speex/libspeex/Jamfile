@@ -1,0 +1,37 @@
+SubDir OBOS_TOP src add-ons media plugins speex libspeex ;
+
+SubDirHdrs [ FDirName $(SUBDIR) .. .. ogg libogg ] ;
+
+SubDirCcFlags -DVERSION=\\\"1.0.3\\\" ;
+
+StaticLibrary speex :
+	nb_celp.c
+	sb_celp.c
+ 	lpc.c
+ 	ltp.c
+ 	lsp.c
+ 	quant_lsp.c
+ 	lsp_tables_nb.c
+ 	gain_table.c
+ 	gain_table_lbr.c
+ 	cb_search.c
+ 	filters.c
+ 	bits.c
+ 	modes.c
+ 	vq.c
+ 	high_lsp_tables.c
+ 	vbr.c
+ 	hexc_table.c
+ 	exc_5_256_table.c
+ 	exc_5_64_table.c
+ 	exc_8_128_table.c
+ 	exc_10_32_table.c
+ 	exc_10_16_table.c
+ 	exc_20_32_table.c
+ 	hexc_10_32_table.c
+ 	misc.c
+ 	speex_header.c
+ 	speex_callbacks.c
+ 	math_approx.c
+ 	stereo.c
+;
