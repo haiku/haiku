@@ -25,9 +25,9 @@
 
 
 static uint32 *apic = NULL;
-static uint32 cpu_apic_id[SMP_MAX_CPUS] = { 0, 0};
-static uint32 cpu_os_id[SMP_MAX_CPUS] = { 0, 0};
-static uint32 cpu_apic_version[SMP_MAX_CPUS] = { 0, 0};
+static uint32 cpu_apic_id[SMP_MAX_CPUS] = {0, 0};
+static uint32 cpu_os_id[SMP_MAX_CPUS] = {0, 0};
+static uint32 cpu_apic_version[SMP_MAX_CPUS] = {0, 0};
 static uint32 *ioapic = NULL;
 static uint32 apic_timer_tics_per_sec = 0;
 
@@ -74,15 +74,15 @@ i386_smp_error_interrupt(void *data)
 }
 
 
-static unsigned int
-apic_read(unsigned int *addr)
+static uint32
+apic_read(uint32 *addr)
 {
 	return *addr;
 }
 
 
 static void
-apic_write(unsigned int *addr, unsigned int data)
+apic_write(uint32 *addr, uint32 data)
 {
 	*addr = data;
 }
@@ -157,9 +157,9 @@ arch_smp_ack_interrupt(void)
 int
 arch_smp_set_apic_timer(bigtime_t relative_timeout)
 {
-	unsigned int config;
+	uint32 config;
+	uint32 ticks;
 	int state;
-	unsigned int ticks;
 
 	if (apic == NULL)
 		return -1;

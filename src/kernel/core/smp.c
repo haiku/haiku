@@ -359,7 +359,7 @@ smp_intercpu_int_handler(void)
 
 
 void
-smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long data2, unsigned long data3, void *data_ptr, int flags)
+smp_send_ici(int target_cpu, int message, uint32 data, uint32 data2, uint32 data3, void *data_ptr, int flags)
 {
 	struct smp_msg *msg;
 
@@ -417,7 +417,7 @@ smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long data
 
 
 void
-smp_send_broadcast_ici(int message, unsigned long data, unsigned long data2, unsigned long data3, void *data_ptr, int flags)
+smp_send_broadcast_ici(int message, uint32 data, uint32 data2, uint32 data3, void *data_ptr, int flags)
 {
 	struct smp_msg *msg;
 
@@ -505,8 +505,8 @@ smp_wait_for_ap_cpus(kernel_args *ka)
 	int retry;
 	do {
 		retry = 0;
-		for(i=1; i < ka->num_cpus; i++) {
-			if(boot_cpu_spin[i] != 1)
+		for (i = 1; i < ka->num_cpus; i++) {
+			if (boot_cpu_spin[i] != 1)
 				retry = 1;
 		}
 	} while (retry == 1);
