@@ -120,15 +120,12 @@ public:
 	const char *Name(void);
 	FontFamily *Family(void) { return family; }
 
-	// TODO: Re-enable when I understand how the FT2 Cache system changed from
-	// 2.1.4 to 2.1.8
-//	FT_Face GetFace(void);
+	FT_Face GetFace(void);
 
 	const char *GetPath(void);
 
-	// TODO: Re-enable when I understand how the FT2 Cache system changed from
-	// 2.1.4 to 2.1.8
-//	int16 ConvertToUnicode(uint16 c);
+	int16 ConvertToUnicode(uint16 c);
+
 protected:
 	friend class FontFamily;
 	FontFamily *family;
