@@ -4,6 +4,7 @@
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <Autolock.h>
+#include "NotificationProcessor.h"
 #include "ServerInterface.h"
 #include "BufferManager.h"
 #include "NodeManager.h"
@@ -64,8 +65,6 @@ public:
 	void UnregisterNode(BMessage *);
 	void SetDefault(BMessage *);
 	void AcquireNodeReference(BMessage *);
-	void RequestNotifications(BMessage *);
-	void CancelNotifications(BMessage *);
 	void SetOutputBuffers(BMessage *);
 	void ReclaimOutputBuffers(BMessage *);
 	void OrphanReclaimableBuffers(BMessage *);
@@ -107,6 +106,7 @@ private:
 	port_id		control_port;
 	thread_id	control_thread;
 
+	NotificationProcessor *fNotificationProcessor;
 	BufferManager *fBufferManager;
 	AppManager *fAppManager;
 	NodeManager *fNodeManager;
@@ -121,6 +121,7 @@ private:
 
 ServerApp::ServerApp()
  	: BApplication(NEW_MEDIA_SERVER_SIGNATURE),
+ 	fNotificationProcessor(new NotificationProcessor),
  	fBufferManager(new BufferManager),
 	fAppManager(new AppManager),
 	fNodeManager(new NodeManager),
@@ -138,6 +139,7 @@ ServerApp::ServerApp()
 
 ServerApp::~ServerApp()
 {
+	delete fNotificationProcessor;
 	delete fBufferManager;
 	delete fAppManager;
 	delete fNodeManager;
@@ -447,16 +449,6 @@ void ServerApp::AcquireNodeReference(BMessage *msg)
 }
 
 
-void ServerApp::RequestNotifications(BMessage *msg)
-{
-}
-
-
-void ServerApp::CancelNotifications(BMessage *msg)
-{
-}
-
-
 void ServerApp::SetOutputBuffers(BMessage *msg)
 {
 }
@@ -555,6 +547,9 @@ void ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_GET_SHARED_BUFFER_AREA: GetSharedBufferArea(msg); break;
 		case MEDIA_SERVER_REGISTER_BUFFER: RegisterBuffer(msg); break;
 		case MEDIA_SERVER_UNREGISTER_BUFFER: UnregisterBuffer(msg); break;
+		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: fNotificationProcessor->RequestNotifications(msg); break;
+		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: fNotificationProcessor->CancelNotifications(msg); break;
+		case MEDIA_SERVER_SEND_NOTIFICATIONS: fNotificationProcessor->SendNotifications(msg); break;
 	
 	
 		case MEDIA_SERVER_GET_NODE_ID: GetNodeID(msg); break;
@@ -576,8 +571,6 @@ void ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_UNREGISTER_NODE: UnregisterNode(msg); break;
 		case MEDIA_SERVER_SET_DEFAULT: SetDefault(msg); break;
 		case MEDIA_SERVER_ACQUIRE_NODE_REFERENCE: AcquireNodeReference(msg); break;
-		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: RequestNotifications(msg); break;
-		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: CancelNotifications(msg); break;
 		case MEDIA_SERVER_SET_OUTPUT_BUFFERS: SetOutputBuffers(msg); break;
 		case MEDIA_SERVER_RECLAIM_OUTPUT_BUFFERS: ReclaimOutputBuffers(msg); break;
 		case MEDIA_SERVER_ORPHAN_RECLAIMABLE_BUFFERS: OrphanReclaimableBuffers(msg); break;

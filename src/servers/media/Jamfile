@@ -7,6 +7,7 @@ Server media_server :
 	AppManager.cpp
 	BufferManager.cpp
 	NodeManager.cpp
+	NotificationProcessor.cpp
 	Queue.cpp
 ;
 LinkSharedOSLibs media_server : be libmedia.so root ;
