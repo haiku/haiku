@@ -3,11 +3,11 @@
 #include <KernelExport.h>
 #include <malloc.h>
 #include <string.h>
+#include <ether_driver.h>
 
 #include "b44mm.h"
 #include "b44lm.h"
 #include "mempool.h"
-#include "ether_driver.h"
 
 struct pci_module_info *pci = NULL;
 
