@@ -50,15 +50,22 @@ const struct screen_id B_MAIN_SCREEN_ID = {0};
 
 // GraphicsDefs.h
 
+// Note: one would think that these functions need to query the app server to retrieve
+// the needed values, since this kind of stuff is kept server side. Well, a quick 
+// examination of the asm dump showed that it's not the case, at least on BeOS R5.
+// libbe probably keeps some global struct which is updated when the resolution changes.
+
 _IMPEXP_BE status_t
-get_pixel_size_for(color_space space, size_t * pixel_chunk, size_t * row_alignment, size_t * pixels_per_chunk)
+get_pixel_size_for(color_space space, size_t *pixelChunk, size_t *rowAlignment, size_t *pixelsPerChunk)
 {
 	// TODO: Implement
+	return B_ERROR;
 }
 
 
 _IMPEXP_BE bool
-bitmaps_support_space(color_space space, uint32 * support_flags)
+bitmaps_support_space(color_space space, uint32 *supportFlags)
 {
 	// TODO: Implement
+	return false;
 }
