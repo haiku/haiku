@@ -2,7 +2,7 @@
 
 Devices - DevicesWindow by Sikosis
 
-(C)2003 OBOS
+(C)2003-2004 OBOS
 
 */
 

@@ -4,7 +4,7 @@ ResourceUsageWindow
 
 Author: Sikosis
 
-(C)2003 OBOS - Released under the MIT License
+(C)2003-2004 OBOS - Released under the MIT License
 
 */
 
@@ -108,6 +108,11 @@ void ResourceUsageWindow::InitWindow(void)
 	IRQListView->AddItem(new BStringItem(tmp.String()));
 	Unlock();
     ptrIRQView->AddChild(IRQListView);
+    
+    // write function to add items to IRQ list 
+    
+    // write another function that just deals with getting the IRQ list
+    
 	
 	// Create the Views
 	AddChild(ptrResourceUsageView = new ResourceUsageView(r));
