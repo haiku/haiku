@@ -14,7 +14,7 @@
 
 #include "SupportDefs.h"
 
-namespace UDF {
+namespace Udf {
 
 /*! \brief Slightly more typesafe static array type than built-in arrays,
 	with array length information stored implicitly (i.e. consuming no
@@ -28,8 +28,13 @@ public:
 		for (uint32 i = 0; i < arrayLength; i++)
 			data[i].print();
 	}
+	
 	uint32 length() const { return arrayLength; }
 	uint32 size() const { return arrayLength * sizeof(DataType); }
+	
+	// This doesn't appear to work. I don't know why.
+	DataType operator[] (int index) const { return data[index]; }
+	
 	DataType data[arrayLength];
 };
 
