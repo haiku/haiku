@@ -558,7 +558,7 @@ ShowImageView::DrawCaption()
 	pos.y = bounds.bottom - fontHeight.descent - 5;
 	
 	// background rectangle
-	rect.Set(0, 0, (width-1)+4, (height-1)+4+1); // 2 for border and 1 for text shadow
+	rect.Set(0, 0, (width-1)+4, (height-1)+4+1); // 4 for border and 1 for text shadow
 	rect.OffsetTo(pos);
 	rect.OffsetBy(-3, -2-fontHeight.ascent); // -2 for border
 		
@@ -601,9 +601,9 @@ ShowImageView::EraseCaption()
 	pos.y = bounds.bottom - fontHeight.descent - 5;
 	
 	// background rectangle
-	rect.Set(0, 0, (width-1)+2, (height-1)+2+1); // 2 for border and 1 for text shadow
+	rect.Set(0, 0, (width-1)+4, (height-1)+4+1); // 4 for border and 1 for text shadow
 	rect.OffsetTo(pos);
-	rect.OffsetBy(-1, -1-fontHeight.ascent); // -1 for border
+	rect.OffsetBy(-3, -2-fontHeight.ascent); // -2 for border
 	
 	// draw over portion of image where caption is located
 	Draw(rect);
