@@ -1,6 +1,7 @@
 // DrawingModeFactory.h
 
 
+#include "DrawingModeAdd.h"
 #include "DrawingModeCopy.h"
 #include "DrawingModeInvert.h"
 #include "DrawingModeOver.h"
@@ -20,6 +21,9 @@ DrawingModeFactory::DrawingModeFor(drawing_mode mode)
 			break;
 		case B_OP_OVER:
 			return new agg::DrawingModeBGRA32Over();
+			break;
+		case B_OP_ADD:
+			return new agg::DrawingModeBGRA32Add();
 			break;
 
 		default:
