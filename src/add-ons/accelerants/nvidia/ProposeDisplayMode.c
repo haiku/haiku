@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-4/2004
+	Rudolf Cornelissen 9/2002-5/2004
 */
 
 #define MODULE_BIT 0x00400000
@@ -430,6 +430,11 @@ status_t create_mode_list(void) {
 
 	color_space spaces[4] = {B_RGB32_LITTLE,B_RGB16_LITTLE,B_RGB15_LITTLE,B_CMAP8};
 
+	/* see if there are panels connected and get their native modelines */
+	bool pan1 = false, pan2 = false, pan1_added = false, pan2_added = false;
+	display_mode p1, p2;
+	get_panel_modelines(&p1, &p2, &pan1, &pan2);
+
 	/* figure out how big the list could be, and adjust up to nearest multiple of B_PAGE_SIZE */
 	/* note: two extra modes might be added for flatpanels */
 	max_size = ((((MODE_COUNT + 2) * 4) * sizeof(display_mode)) + (B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
@@ -473,83 +478,69 @@ status_t create_mode_list(void) {
 				si->mode_count++;
 			}
 		}
+
 		/* advance to next mode */
 		src++;
-	}
 
-	/* add flatpanel native modes if panel(s) found */
-	{
-		bool pan1 = FALSE, pan2 = FALSE;
-		display_mode p1, p2;
-		get_panel_modelines(&p1, &p2, &pan1, &pan2);
-
-		if (pan1)
+		/* add flatpanel 1 native mode if it's found and when it's time */
+		if (pan1 && !pan1_added && (i < (MODE_COUNT - 1)))
 		{
-			/* set ranges for acceptable values */
-			low = high = p1;
-			/* range is 6.25% of default clock: arbitrarily picked */ 
-			pix_clk_range = low.timing.pixel_clock >> 5;
-			low.timing.pixel_clock -= pix_clk_range;
-			high.timing.pixel_clock += pix_clk_range;
-			/* 'some cards need wider virtual widths for certain modes':
-			 * Not true. They might need a wider pitch, but this is _not_ reflected in
-			 * virtual_width, but in fbc.bytes_per_row. */
-			//So disable next line: 
-			//high.virtual_width = 4096;
-			/* do it once for each depth we want to support */
-			for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
+			if (src->timing.h_display > p1.timing.h_display)
 			{
-				/* set target values */
-				*dst = p1;
-				/* poke the specific space */
-				dst->space = low.space = high.space = spaces[j];
-				/* ask for a compatible mode */
-				/* We have to check for B_OK, because otherwise the pix_clk_range
-				 * won't be taken into account!! */
-				//So don't do this: 
-				//if (PROPOSE_DISPLAY_MODE(dst, &low, &high) != B_ERROR) {
-				//Instead, do this:
-				if (PROPOSE_DISPLAY_MODE(dst, &low, &high) == B_OK)
+				/* set ranges for acceptable values */
+				low = high = p1;
+				/* range is 6.25% of default clock: arbitrarily picked */ 
+				pix_clk_range = low.timing.pixel_clock >> 5;
+				low.timing.pixel_clock -= pix_clk_range;
+				high.timing.pixel_clock += pix_clk_range;
+				/* do it once for each depth we want to support */
+				for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
 				{
-					/* count it, and move on to next mode */
-					dst++;
-					si->mode_count++;
+					/* set target values */
+					*dst = p1;
+					/* poke the specific space */
+					dst->space = low.space = high.space = spaces[j];
+					/* ask for a compatible mode */
+					if (PROPOSE_DISPLAY_MODE(dst, &low, &high) == B_OK)
+					{
+						/* count it, and move on to next mode */
+						dst++;
+						si->mode_count++;
+					}
 				}
+				/* panel1 modeline has been added */
+				pan1_added = true;
 			}
 		}
 
-		if (pan2)
+		/* add flatpanel 2 native mode if it's found and when it's time */
+		if (pan2 && !pan2_added && (i < (MODE_COUNT - 1)))
 		{
-			/* set ranges for acceptable values */
-			low = high = p2;
-			/* range is 6.25% of default clock: arbitrarily picked */ 
-			pix_clk_range = low.timing.pixel_clock >> 5;
-			low.timing.pixel_clock -= pix_clk_range;
-			high.timing.pixel_clock += pix_clk_range;
-			/* 'some cards need wider virtual widths for certain modes':
-			 * Not true. They might need a wider pitch, but this is _not_ reflected in
-			 * virtual_width, but in fbc.bytes_per_row. */
-			//So disable next line: 
-			//high.virtual_width = 4096;
-			/* do it once for each depth we want to support */
-			for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
+			if (src->timing.h_display > p2.timing.h_display)
 			{
-				/* set target values */
-				*dst = p2;
-				/* poke the specific space */
-				dst->space = low.space = high.space = spaces[j];
-				/* ask for a compatible mode */
-				/* We have to check for B_OK, because otherwise the pix_clk_range
-				 * won't be taken into account!! */
-				//So don't do this: 
-				//if (PROPOSE_DISPLAY_MODE(dst, &low, &high) != B_ERROR) {
-				//Instead, do this:
-				if (PROPOSE_DISPLAY_MODE(dst, &low, &high) == B_OK)
+				/* set ranges for acceptable values */
+				low = high = p2;
+				/* range is 6.25% of default clock: arbitrarily picked */ 
+				pix_clk_range = low.timing.pixel_clock >> 5;
+				low.timing.pixel_clock -= pix_clk_range;
+				high.timing.pixel_clock += pix_clk_range;
+				/* do it once for each depth we want to support */
+				for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
 				{
-					/* count it, and move on to next mode */
-					dst++;
-					si->mode_count++;
+					/* set target values */
+					*dst = p2;
+					/* poke the specific space */
+					dst->space = low.space = high.space = spaces[j];
+					/* ask for a compatible mode */
+					if (PROPOSE_DISPLAY_MODE(dst, &low, &high) == B_OK)
+					{
+						/* count it, and move on to next mode */
+						dst++;
+						si->mode_count++;
+					}
 				}
+				/* panel2 modeline has been added */
+				pan2_added = true;
 			}
 		}
 	}

@@ -712,10 +712,10 @@ void get_panel_modelines(display_mode *p1, display_mode *p2, bool *pan1, bool *p
 		p1->h_display_start = 0;
 		p1->v_display_start = 0;
 		p1->flags = 0;
-		*pan1 = TRUE;
+		*pan1 = true;
 	}
 	else
-		*pan1 = FALSE;
+		*pan1 = false;
 
 	if (si->ps.tmds2_active)
 	{
@@ -742,10 +742,10 @@ void get_panel_modelines(display_mode *p1, display_mode *p2, bool *pan1, bool *p
 		p2->h_display_start = 0;
 		p2->v_display_start = 0;
 		p2->flags = 0;
-		*pan2 = TRUE;
+		*pan2 = true;
 	}
 	else
-		*pan2 = FALSE;
+		*pan2 = false;
 }
 
 static void pinsnv4_fake(void)

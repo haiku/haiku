@@ -314,7 +314,7 @@ status_t
 init_hardware(void) {
 	long		pci_index = 0;
 	pci_info	pcii;
-	bool		found_one = FALSE;
+	bool		found_one = false;
 	
 	/* choke if we can't find the PCI bus */
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
@@ -333,7 +333,7 @@ init_hardware(void) {
 					/* if we match a supported device */
 					if (*devices == pcii.device_id ) {
 						
-						found_one = TRUE;
+						found_one = true;
 						goto done;
 					}
 					/* next supported device */
