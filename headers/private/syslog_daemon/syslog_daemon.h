@@ -9,8 +9,12 @@
 #include <OS.h>
 
 
-#define SYSLOG_PORT_NAME	"syslog_daemon"
-#define SYSLOG_MESSAGE		'_Syl'
+#define SYSLOG_PORT_NAME		"syslog_daemon"
+
+#define SYSLOG_MESSAGE			'_Syl'
+#define SYSLOG_ADD_LISTENER		'aSyl'
+#define SYSLOG_REMOVE_LISTENER	'rSyl'
+
 
 // This message is sent from both, the POSIX syslog API and the kernel's
 // dprintf() logging facility if logging to syslog was enabled.
