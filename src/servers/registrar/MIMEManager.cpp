@@ -116,13 +116,21 @@ MIMEManager::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case B_REG_MIME_UNSUPPORT_TYPES:
+		case B_REG_MIME_GET_SUPPORTING_APPS:
 		{
-			// TODO: implement
-printf("MIMEMan: B_REG_MIME_UNSUPPORT_TYPES\n");
+			BMessage apps;
+			const char *type;
+			err = message->FindString("type", &type);
+			if (!err) 
+				err = fDatabase.GetSupportingApps(type, &apps);
+				
+			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", err);
+			reply.AddMessage("signatures", &apps);
+			message->SendReply(&reply, this);				
 			break;
 		}
-	
+		
 		default:
 			printf("MIMEMan: msg->what == %.4s\n", (char*)&(message->what));
 			BLooper::MessageReceived(message);
@@ -225,9 +233,12 @@ MIMEManager::HandleSetParam(BMessage *message)
 			case B_REG_MIME_SUPPORTED_TYPES:
 			{
 				BMessage types;
+				bool fullSync = true;
 				err = message->FindMessage("types", &types);
 				if (!err)
-					err = fDatabase.SetSupportedTypes(type, &types);
+					err = message->FindBool("full sync", &fullSync);
+				if (!err)
+					err = fDatabase.SetSupportedTypes(type, &types, fullSync);
 				break;
 			}
 		
