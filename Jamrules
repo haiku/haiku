@@ -400,9 +400,10 @@ actions C++
 
 rule App
 {
-	# App <name> : <sources> : <libraries> ;
+	# App <name> : <sources> : <libraries> : <res> ;
 	SetupIncludes ;
 	SetupObjectsDir ;
+	AddResources $(1) : $(4) ;
 	Main $(1) : $(2) ;
 	MakeLocate $(1) : $(OBOS_APPS_DIR) ;
 	LinkSharedOSLibs $(1) : $(3) ;
