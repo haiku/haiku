@@ -1,3 +1,4 @@
+#include <Region.h>
 #include <String.h>
 #include <Locker.h>
 #include <Region.h>
@@ -9,7 +10,7 @@
 #include "Desktop.h"
 #include "WindowBorder.h"
 
-//#define DEBUG_WINBORDER
+#define DEBUG_WINBORDER
 
 #ifdef DEBUG_WINBORDER
 #include <stdio.h>
@@ -17,6 +18,7 @@
 
 bool is_moving_window=false;
 bool is_resizing_window=false;
+bool is_sliding_tab=false;
 extern ServerWindow *active_serverwindow;
 
 WindowBorder::WindowBorder(ServerWindow *win, const char *bordertitle)
@@ -24,10 +26,13 @@ WindowBorder::WindowBorder(ServerWindow *win, const char *bordertitle)
    (win==NULL)?NULL:win->title->String())
 {
 #ifdef DEBUG_WINBORDER
-printf("WindowBorder(%s)\n",bordertitle);
+printf("WindowBorder(%p, %s)\n",win,bordertitle);
 #endif
 	mbuttons=0;
 	swin=win;
+	if(swin)
+		frame=swin->frame;
+
 	mousepos.Set(0,0);
 	update=false;
 
@@ -103,6 +108,11 @@ printf("WindowBorder(): Click Tab\n");
 				MoveToBack();
 			break;
 		}
+		case CLICK_SLIDETAB:
+		{
+			is_sliding_tab=true;
+			break;
+		}
 		case CLICK_RESIZE:
 		{
 #ifdef DEBUG_WINBORDER
@@ -156,7 +166,24 @@ void WindowBorder::MouseMoved(BPoint pt, int32 buttons, int32 modifiers)
 		decor->Draw();
 	}	
 
-	if(is_moving_window==true)
+	if(is_sliding_tab)
+	{
+		float dx=pt.x-mousepos.x;
+
+		if(dx!=0)
+		{
+			// SlideTab returns how much things were moved, and currently
+			// supports just the x direction, so get the value so
+			// we can invalidate the proper area.
+			decor->SlideTab(dx,0);
+			BRegion r(frame),*footprint=decor->GetFootprint();
+			parent->Invalidate(footprint->Frame());
+			parent->RequestDraw();
+			decor->DrawTab();
+			delete footprint;
+		}
+	}
+	if(is_moving_window)
 	{
 		float dx=pt.x-mousepos.x,
 			dy=pt.y-mousepos.y;
@@ -179,7 +206,7 @@ void WindowBorder::MouseMoved(BPoint pt, int32 buttons, int32 modifiers)
 			layerlock->Unlock();
 		}
 	}
-	if(is_resizing_window==true)
+	if(is_resizing_window)
 	{
 		float dx=pt.x-mousepos.x,
 			dy=pt.y-mousepos.y;
@@ -211,6 +238,7 @@ void WindowBorder::MouseUp(BPoint pt, int32 buttons, int32 modifiers)
 	kmodifiers=modifiers;
 	is_moving_window=false;
 	is_resizing_window=false;
+	is_sliding_tab=false;
 
 	click_type click=decor->Clicked(pt, mbuttons, kmodifiers);
 
