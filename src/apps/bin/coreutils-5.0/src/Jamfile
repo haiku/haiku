@@ -103,8 +103,8 @@ BinCommand rm :
 BinCommand chgroup : 
 	chgrp.c chown-core.c : libfetish.a : $(coreutils_rsrc) ;
 
-BinCommand chmod : 
-	chmod.c chown-core.c : libfetish.a : $(coreutils_rsrc) ;
+BinCommand chown : 
+	chown.c chown-core.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand cp : 
 	cp.c copy.c cp-hash.c : libfetish.a : $(coreutils_rsrc) ;
