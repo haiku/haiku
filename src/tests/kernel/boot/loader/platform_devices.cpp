@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,6 +17,12 @@
 #include <stdio.h>
 
 
+// we're using some libroot specials
+extern int __libc_argc;
+extern char **__libc_argv;
+extern const char *__progname;
+
+
 static status_t
 get_device(const char *path, Node **_device)
 {
@@ -25,6 +31,9 @@ get_device(const char *path, Node **_device)
 		return B_NO_MEMORY;
 
 	if (device->InitCheck() != B_OK) {
+		fprintf(stderr, "%s: Could not open image \"%s\": %s\n",
+			__progname, path, strerror(device->InitCheck()));
+
 		delete device;
 		return B_ERROR;
 	}
@@ -80,12 +89,56 @@ recursive_add_device(const char *path, NodeList *list)
 }
 
 
+static char *
+get_next_argument(int32 *cookie, bool options)
+{
+	int32 i = *cookie + 1;
+
+	if (i == 1 && !options) {
+		// filter out options at the start
+		while (i < __libc_argc && __libc_argv[i][0] == '-')
+			i++;
+	}
+
+	for (; i < __libc_argc; i++) {
+		// Options come at the start
+		if (options && __libc_argv[i][0] != '-')
+			return NULL;
+
+		*cookie = i;
+		return __libc_argv[i];
+	}
+
+	return NULL;
+}
+
+
+static char *
+get_next_option(int32 *cookie)
+{
+	return get_next_argument(cookie, true);
+}
+
+
+static char *
+get_next_device(int32 *cookie)
+{
+	return get_next_argument(cookie, false);
+}
+
+
 //	#pragma mark -
 
 
 status_t 
 platform_get_boot_device(struct stage2_args *args, Node **_device)
 {
+	// we accept a boot device from the command line
+	int32 cookie = 0;
+	char *path = get_next_device(&cookie);
+	if (path != NULL)
+		return get_device(path, _device);
+
 	return get_device("/boot/home/test-file-device", _device);
 }
 
@@ -94,7 +147,7 @@ status_t
 platform_get_boot_partition(struct stage2_args *args, Node *device,
 	NodeList *list, boot::Partition **_partition)
 {
-	NodeIterator iterator = list->Iterator();
+	NodeIterator iterator = list->GetIterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
 		// just take the first partition
@@ -109,9 +162,39 @@ platform_get_boot_partition(struct stage2_args *args, Node *device,
 status_t
 platform_add_block_devices(struct stage2_args *args, NodeList *list)
 {
-	recursive_add_device("/dev/disk/ide", list);
-	recursive_add_device("/dev/disk/scsi", list);
-	recursive_add_device("/dev/disk/virtual", list);
+	int32 cookie = 0;
+	if (get_next_device(&cookie) != NULL) {
+		// add the devices provided on the command line
+		char *path;
+		while ((path = get_next_device(&cookie)) != NULL)
+			add_device(path, list);
+	}
+
+	bool addDevices = true;
+	bool scsi = true;
+	char *option;
+	cookie = 0;
+	while ((option = get_next_option(&cookie)) != NULL) {
+		if (!strcmp(option, "--no-devices"))
+			addDevices = false;
+		else if (!strcmp(option, "--no-scsi"))
+			scsi = false;
+		else {
+			fprintf(stderr, "usage: %s [OPTIONS] [image ...]\n"
+				"  --no-devices\tDon't add real devices from /dev/disk\n"
+				"  --no-scsi\tDon't add SCSI devices (might be problematic with some\n"
+				"\t\tUSB mass storage drivers)\n", __progname);
+			exit(0);
+		}
+	}
+
+	if (addDevices) {
+		recursive_add_device("/dev/disk/ide", list);
+		recursive_add_device("/dev/disk/virtual", list);
+
+		if (scsi)
+			recursive_add_device("/dev/disk/scsi", list);
+	}
 
 	return B_OK;
 }

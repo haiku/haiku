@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -33,6 +33,8 @@ platform_start_kernel(void)
 int
 main(int argc, char **argv)
 {
+	// The command arguments are evaluated in platform_devices.cpp!
+
 	boot_main(NULL);
 
 	return 0;
