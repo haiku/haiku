@@ -1,8 +1,9 @@
-#ifndef _DIRENT_H
-#define	_DIRENT_H
 /* 
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
+#ifndef _DIRENT_H
+#define _DIRENT_H
+
 
 #include <sys/types.h>
 
@@ -33,14 +34,14 @@ typedef struct {
 extern "C" {
 #endif
 
-DIR			 	*opendir(const char *dirname);
-struct dirent	*readdir(DIR *dirp);
-int				 closedir(DIR *dirp);
-void			 rewinddir(DIR *dirp);
+DIR				*opendir(const char *dirname);
+struct dirent	*readdir(DIR *dir);
+int				readdir_r(DIR *dir, struct dirent *entry, struct dirent **_result);
+int				closedir(DIR *dir);
+void			rewinddir(DIR *dir);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _DIRENT_H */
-
+#endif	/* _DIRENT_H */
