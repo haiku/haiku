@@ -26,6 +26,23 @@ if $(METROWERKS) {
 	OBOS_TARGET_DIR ?= "x86" ;
 }
 
+# Enable warnings only if WARNINGS is defined
+# Should be enabled by default later
+
+if $(WARNINGS) {
+	# For an explanation of the different warning options, see:
+	# http://gcc.gnu.org/onlinedocs/gcc-2.95.3/gcc_2.html
+	# to get even more warnings, add:
+	# -Wwrite-strings  	(doesn't work well with some Be headers)
+	# -Wundef			(dito)
+	# -Wconversion		(gets you many warnings about implicit conversions)
+	# -W				(gets you even more warnigs)
+	CCFLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes" ;
+	CCFLAGS += "-Wpointer-arith -Wcast-align -Wsign-compare" ;
+	C++FLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes -Wno-ctor-dtor-privacy -Woverloaded-virtual" ;
+	C++FLAGS += "-Wpointer-arith -Wcast-align -Wsign-compare" ;
+}
+
 KERNEL_CCFLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc" ;
 KERNEL_CCFLAGS += "-fno-builtin -D$(OBOS_TARGET_DEFINE) " ;
 
