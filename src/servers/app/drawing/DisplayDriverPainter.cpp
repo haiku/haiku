@@ -656,6 +656,26 @@ DisplayDriverPainter::GetTruncatedStrings(const char **instrings,
 	printf("DisplayDriverPainter::GetTruncatedStrings()\n");
 }
 
+// Lock
+bool
+DisplayDriverPainter::Lock(bigtime_t timeout)
+{
+	// NOTE: I'm hoping I don't change the semantics and implications of
+	// the original implementation, but I need the locker to be somewhere
+	// else in order to serialize only the access to the back buffer
+	if (timeout == B_INFINITE_TIMEOUT)
+		return fGraphicsCard->Lock();
+	
+	return (fGraphicsCard->LockWithTimeout(timeout) >= B_OK) ? true : false;
+}
+
+// Unlock
+void
+DisplayDriverPainter::Unlock()
+{
+	fGraphicsCard->Unlock();
+}
+
 // SetMode
 void
 DisplayDriverPainter::SetMode(const display_mode &mode)

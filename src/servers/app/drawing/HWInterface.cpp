@@ -4,6 +4,7 @@
 
 // constructor
 HWInterface::HWInterface()
+	: BLocker("hw interface lock")
 {
 }
 

@@ -840,10 +840,14 @@ ViewHWInterface::BackBuffer() const
 status_t
 ViewHWInterface::Invalidate(const BRect& frame)
 {
-// TODO: get this working, figure out semaphores...
+	return CopyBackToFront(frame);;
+
+// TODO: get this working, the locking in the DisplayDriverPainter needs
+// to be based on locking this object, which essentially means the access
+// to the back buffer is locked, or more precise the access to the invalid
+// region scheduled to be copied to the front buffer
 //	fUpdateExecutor->AddRect(frame);
 //	return B_OK;
-	return CopyBackToFront(frame);
 }
 
 // CopyBackToFront

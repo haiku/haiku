@@ -50,10 +50,10 @@ UpdateQueue::InitCheck()
 void
 UpdateQueue::AddRect(const BRect& rect)
 {
-	Lock();
+//	Lock();
 	fUpdateRegion.Include(rect);
 	_Reschedule();
-	Unlock();
+//	Unlock();
 }
 
 // _execute_updates_
@@ -76,16 +76,13 @@ UpdateQueue::_ExecuteUpdates()
 			case B_OK:
 			case B_TIMED_OUT:
 				// execute updates
-				if (Lock()) {
-//					if (fInterface->Lock()) {
-						int32 count = fUpdateRegion.CountRects();
-						for (int32 i = 0; i < count; i++) {
-							fInterface->CopyBackToFront(fUpdateRegion.RectAt(i));
-						}
-//						fInterface->Unlock();
-						fUpdateRegion.MakeEmpty();
-//					}
-					Unlock();
+				if (fInterface->LockWithTimeout(20000) >= B_OK) {
+					int32 count = fUpdateRegion.CountRects();
+					for (int32 i = 0; i < count; i++) {
+						fInterface->CopyBackToFront(fUpdateRegion.RectAt(i));
+					}
+					fUpdateRegion.MakeEmpty();
+					fInterface->Unlock();
 				}
 				break;
 			case B_BAD_SEM_ID:

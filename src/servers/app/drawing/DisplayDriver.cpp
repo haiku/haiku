@@ -38,8 +38,7 @@
 	\brief Sets up internal variables needed by all DisplayDriver subclasses
 */
 DisplayDriver::DisplayDriver()
-	: fLocker("DisplayDriver lock"),
-	  fCursorHandler(this),
+	: fCursorHandler(this),
 	  fDPMSState(B_DPMS_ON),
 	  fDPMSCaps(B_DPMS_ON)
 {
@@ -203,33 +202,6 @@ DisplayDriver::IsCursorObscured(bool state)
 	Unlock();
 	
 	return obscured;
-}
-
-/*!
-	\brief Locks the driver
-	\param timeout Optional timeout specifier
-	\return True if the lock was successful, false if not.
-	
-	The return value need only be checked if a timeout was specified. Each public
-	member function should lock the driver before doing anything else. Functions
-	internal to the driver (protected/private) need not do this.
-*/
-bool
-DisplayDriver::Lock(bigtime_t timeout)
-{
-	if (timeout == B_INFINITE_TIMEOUT)
-		return fLocker.Lock();
-	
-	return (fLocker.LockWithTimeout(timeout) == B_OK) ? true : false;
-}
-
-/*!
-	\brief Unlocks the driver
-*/
-void
-DisplayDriver::Unlock()
-{
-	fLocker.Unlock();
 }
 
 // Protected Internal Functions

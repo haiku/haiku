@@ -50,7 +50,8 @@ static Blitter blitter;
 	\brief Sets up internal variables needed by all DisplayDriverImpl subclasses
 */
 DisplayDriverImpl::DisplayDriverImpl()
-	: DisplayDriver()
+	: DisplayDriver(),
+	  fLocker("DisplayDriver lock")
 {
 }
 
@@ -2269,6 +2270,33 @@ void DisplayDriverImpl::GetTruncatedStrings(const char **instrings,const int32 &
 	const uint32 &mode, const float &maxwidth, char **outstrings)
 {
 	// TODO: Implement DisplayDriverImpl::GetTruncatedStrings
+}
+
+/*!
+	\brief Locks the driver
+	\param timeout Optional timeout specifier
+	\return True if the lock was successful, false if not.
+	
+	The return value need only be checked if a timeout was specified. Each public
+	member function should lock the driver before doing anything else. Functions
+	internal to the driver (protected/private) need not do this.
+*/
+bool
+DisplayDriverImpl::Lock(bigtime_t timeout)
+{
+	if (timeout == B_INFINITE_TIMEOUT)
+		return fLocker.Lock();
+	
+	return (fLocker.LockWithTimeout(timeout) == B_OK) ? true : false;
+}
+
+/*!
+	\brief Unlocks the driver
+*/
+void
+DisplayDriverImpl::Unlock()
+{
+	fLocker.Unlock();
 }
 
 /*!

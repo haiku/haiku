@@ -11,12 +11,13 @@
 
 #include <Accelerant.h>
 #include <GraphicsCard.h>
+#include <Locker.h>
 #include <OS.h>
 
 class RenderingBuffer;
 class BRect;
 
-class HWInterface {
+class HWInterface : public BLocker {
  public:
 								HWInterface();
 	virtual						~HWInterface();

@@ -217,6 +217,9 @@ class DisplayDriverPainter : public DisplayDriver {
 													const float &maxwidth,
 													char **outstrings);
 	
+	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
+	virtual void				Unlock();
+
 /*	virtual	void				HideCursor();
 	virtual	bool				IsCursorHidden();
 	virtual	void				MoveCursorTo(	const float &x,
