@@ -108,8 +108,8 @@ codec_table codecs[] =
 	{ CODEC_ID_AD1886,	0xffffffff, ad1886_init,	"Analog Devices AD1886 SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1886A,	0xffffffff, ad1881_init,	"Analog Devices AD1886A SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1887,	0xffffffff, ad1881_init,	"Analog Devices AD1887 SoundMAX"B_UTF8_REGISTERED },
-	{ 0x41445370,		0xffffffff, ad1980_init,	"ad?" },
-	{ 0x41445371,		0xffffffff, default_init,	"ad?" },
+	{ 0x41445370,		0xffffffff, ad1980_init,	"Analog Devices 0x41445370 (???)" },
+	{ 0x41445371,		0xffffffff, default_init,	"Analog Devices 0x41445371 (???)" },
 	{ 0x41445372,		0xffffffff, ad1881_init,	"Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AK4540,	0xffffffff, default_init,	"Asahi Kasei AK4540" },
 	{ CODEC_ID_AK4542,	0xffffffff, default_init,	"Asahi Kasei AK4542" },
@@ -719,19 +719,42 @@ void stac9756_init(ac97_dev *dev)
 void tr28028_init(ac97_dev *dev)
 {
 	LOG(("tr28028_init\n"));
+	ac97_reg_cached_write(dev, AC97_POWERDOWN, 0x0300);
+	ac97_reg_cached_write(dev, AC97_POWERDOWN, 0x0000);
+	ac97_reg_cached_write(dev, AC97_SURR_VOLUME, 0x0000);
+	ac97_reg_cached_write(dev, AC97_SPDIF_CONTROL, 0x0000);
 }
 
 void wm9701_init(ac97_dev *dev)
 {
 	LOG(("wm9701_init\n"));
+	/* ALSA writes some of these registers, but the codec
+	 * documentation states explicitly that 0x38 and 0x70 to 0x74
+	 * are not used in the WM9701A
+	 */
+
+	/* DVD noise patch (?) */
+	ac97_reg_cached_write(dev, 0x5a, 0x0200);
 }
 
 void wm9703_init(ac97_dev *dev)
 {
 	LOG(("wm9703_init\n"));
+	/* Set front mixer value to unmuted */
+	ac97_reg_cached_write(dev, 0x72, 0x0808);
+	/* Disable loopback, etc */
+	ac97_reg_cached_write(dev, AC97_GENERAL_PURPOSE, 0x8000);
 }
 
 void wm9704_init(ac97_dev *dev)
 {
 	LOG(("wm9704_init\n"));
+	/* Set read DAC value to unmuted */
+	ac97_reg_cached_write(dev, 0x70, 0x0808);
+	/* Set front mixer value to unmuted */
+	ac97_reg_cached_write(dev, 0x72, 0x0808);
+	/* Set rear mixer value to unmuted */
+	ac97_reg_cached_write(dev, 0x74, 0x0808);
+	/* DVD noise patch (?) */
+	ac97_reg_cached_write(dev, 0x5a, 0x0200);
 }
