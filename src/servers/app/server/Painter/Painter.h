@@ -132,7 +132,11 @@ class Painter {
 
 								// strings
 			void				DrawString(		const char* utf8String,
-												BPoint baseLine) const;
+												const escapement_delta* delta = NULL);
+
+			void				DrawString(		const char* utf8String,
+												BPoint baseLine,
+												const escapement_delta* delta = NULL);
 
 								// bitmaps
 			void				DrawBitmap(		const BBitmap* bitmap,
@@ -156,13 +160,6 @@ class Painter {
 
 			void				DrawChar(		char aChar,
 												BPoint location);
-
-			void				DrawString(		const char* string,
-												const escapement_delta* delta = NULL);
-
-			void				DrawString(		const char* string,
-												BPoint location,
-												const escapement_delta* delta = NULL);
 
 			void				DrawString(		const char* string,
 												int32 length,

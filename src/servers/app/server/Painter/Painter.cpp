@@ -555,23 +555,38 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 
 // DrawString
 void
-Painter::DrawString(const char* utf8String, BPoint baseLine) const
+Painter::DrawString(const char* utf8String, const escapement_delta* delta)
+{
+	// TODO: to be moved elsewhere
+	DrawString(utf8String, fPenLocation, delta);
+}
+
+// DrawString
+void
+Painter::DrawString(const char* utf8String, BPoint baseLine,
+					const escapement_delta* delta)
 {
 	fPatternHandler->SetPattern(B_SOLID_HIGH);
-
-	_Transform(&baseLine);
 
 	Transformable transform;
 // TODO: convert BFont::Shear(), which is in degrees 45°...135° to whatever AGG is using
 //	transform.ShearBy(B_ORIGIN, fFont.Shear(), 0.0);
 	transform.RotateBy(B_ORIGIN, -fFont.Rotation());
-	transform.ScaleBy(B_ORIGIN, fScale, fScale);
 	transform.TranslateBy(baseLine);
+	transform.ScaleBy(B_ORIGIN, fScale, fScale);
+	transform.TranslateBy(fOrigin);
 
 	fTextRenderer->RenderString(utf8String,
 								fFontRendererSolid,
 								fFontRendererBin,
-								transform);
+								transform,
+								&fPenLocation);
+	// pen location is not transformed in quite the same way,
+	// or transformations would add up
+	transform.Reset();
+	transform.RotateBy(B_ORIGIN, -fFont.Rotation());
+	transform.TranslateBy(baseLine);
+	transform.Transform(&fPenLocation);
 }
 
 // #pragma mark -
