@@ -139,7 +139,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* log currently selected output */
 	nm_general_output_select();
 
-	MSG(("SETMODE: booted since %f mS\n", system_time()/1000.0));
+	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
 
 	/* enable interrupts using the kernel driver */
 	interrupt_enable(true);
