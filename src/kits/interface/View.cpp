@@ -239,7 +239,7 @@ BArchivable* BView::Instantiate(BMessage* data){
 
 //---------------------------------------------------------------------------
 
-status_t BView::Archive(BMessage* data, bool deep = true) const{
+status_t BView::Archive(BMessage* data, bool deep) const{
 	status_t		retval;
 
 	retval		= BHandler::Archive( data, deep );
@@ -773,7 +773,7 @@ uint32 BView::ResizingMode() const {
 
 //---------------------------------------------------------------------------
 
-void BView::SetViewCursor(const BCursor *cursor, bool sync=true) {
+void BView::SetViewCursor(const BCursor *cursor, bool sync) {
 
 	if (!cursor)
 		return;
@@ -906,7 +906,7 @@ void BView::WindowActivated(bool state){
 //---------------------------------------------------------------------------
 
 void BView::BeginRectTracking(BRect startRect,
-									  uint32 style = B_TRACK_WHOLE_RECT)
+									  uint32 style)
 {
 	if (do_owner_check()) {
 		owner->session->WriteInt32( AS_LAYER_BEGIN_RECT_TRACK );
@@ -926,7 +926,7 @@ void BView::EndRectTracking(){
 //---------------------------------------------------------------------------
 
 void BView::DragMessage(BMessage* aMessage, BRect dragRect,
-								BHandler* reply_to = NULL)
+								BHandler* reply_to)
 {
 	if ( !aMessage || !dragRect.IsValid())
 		return;
@@ -984,7 +984,7 @@ void BView::DragMessage(BMessage* aMessage, BRect dragRect,
 //---------------------------------------------------------------------------
 
 void BView::DragMessage(BMessage* aMessage, BBitmap* anImage, BPoint offset,
-								BHandler* reply_to = NULL)
+								BHandler* reply_to)
 {
 	DragMessage( aMessage, anImage, B_OP_COPY, offset, reply_to );
 }
@@ -993,7 +993,7 @@ void BView::DragMessage(BMessage* aMessage, BBitmap* anImage, BPoint offset,
 
 void BView::DragMessage(BMessage* aMessage, BBitmap* anImage,
 								drawing_mode dragMode, BPoint offset,
-								BHandler* reply_to = NULL)
+								BHandler* reply_to)
 {
 	if ( !aMessage || !anImage )
 		return;
@@ -1048,7 +1048,7 @@ void BView::DragMessage(BMessage* aMessage, BBitmap* anImage,
 //---------------------------------------------------------------------------
 
 void BView::GetMouse(BPoint* location, uint32* buttons,
-							 bool checkMessageQueue = true)
+							 bool checkMessageQueue)
 {
 	do_owner_check();
 	
@@ -1105,7 +1105,7 @@ void BView::GetMouse(BPoint* location, uint32* buttons,
 
 //---------------------------------------------------------------------------
 
-void BView::MakeFocus(bool focusState = true){
+void BView::MakeFocus(bool focusState){
 	if (owner){
 			// if a view is in focus
 		BView		*focus = owner->CurrentFocus();
@@ -1173,7 +1173,7 @@ void BView::ScrollTo(BPoint where){
 
 //---------------------------------------------------------------------------
 
-status_t BView::SetEventMask(uint32 mask, uint32 options=0){
+status_t BView::SetEventMask(uint32 mask, uint32 options){
 	if (fEventMask == mask && fEventOptions == options)
 		return B_ERROR;
 		
@@ -1194,7 +1194,7 @@ uint32 BView::EventMask(){
 
 //---------------------------------------------------------------------------
 
-status_t BView::SetMouseEventMask(uint32 mask, uint32 options=0){
+status_t BView::SetMouseEventMask(uint32 mask, uint32 options){
 	if (fEventMask == mask && fEventOptions == options) {
 		return B_ERROR;
 	}
@@ -1217,7 +1217,7 @@ status_t BView::SetMouseEventMask(uint32 mask, uint32 options=0){
 // Graphic State Functions
 //---------------------------------------------------------------------------
 void BView::SetLineMode(cap_mode lineCap, join_mode lineJoin,
-						float miterLimit = B_DEFAULT_MITER_LIMIT)
+						float miterLimit)
 {
 	if (lineCap == fState->lineCap && lineJoin == fState->lineJoin &&
 			miterLimit == fState->miterLimit)
@@ -1652,7 +1652,7 @@ void BView::ForceFontAliasing(bool enable){
 
 //---------------------------------------------------------------------------
 
-void BView::SetFont(const BFont* font, uint32 mask = B_FONT_ALL){
+void BView::SetFont(const BFont* font, uint32 mask){
 
 	if (!font || mask == 0)
 		return;
@@ -1754,8 +1754,8 @@ void BView::TruncateString(BString* in_out, uint32 mode, float width) const{
 //---------------------------------------------------------------------------
 
 void BView::ClipToPicture(BPicture* picture,
-						  BPoint where = B_ORIGIN,
-						  bool sync = true)
+						  BPoint where,
+						  bool sync)
 {
 	if ( picture == NULL )
 		return;
@@ -1779,8 +1779,8 @@ void BView::ClipToPicture(BPicture* picture,
 //---------------------------------------------------------------------------
 
 void BView::ClipToInversePicture(BPicture* picture,
-								 BPoint where = B_ORIGIN,
-								 bool sync = true)
+								 BPoint where,
+								 bool sync)
 {
 	if ( picture == NULL )
 		return;
@@ -1975,7 +1975,7 @@ void BView::DrawChar(char aChar, BPoint location){
 //---------------------------------------------------------------------------
 
 void BView::DrawString(const char* aString,
-						escapement_delta* delta = NULL)
+						escapement_delta* delta)
 {
 	if ( !aString )
 		return;
@@ -1986,7 +1986,7 @@ void BView::DrawString(const char* aString,
 //---------------------------------------------------------------------------
 
 void BView::DrawString(const char* aString, BPoint location,
-						escapement_delta* delta = NULL)
+						escapement_delta* delta)
 {
 	if ( !aString )
 		return;
@@ -1997,7 +1997,7 @@ void BView::DrawString(const char* aString, BPoint location,
 //---------------------------------------------------------------------------
 
 void BView::DrawString(const char* aString, int32 length,
-						escapement_delta* delta = NULL)
+						escapement_delta* delta)
 {
 	if ( !aString )
 		return;
@@ -2008,7 +2008,7 @@ void BView::DrawString(const char* aString, int32 length,
 //---------------------------------------------------------------------------
 
 void BView::DrawString(const char* aString, int32 length, BPoint location,
-									   escapement_delta* delta = NULL)
+									   escapement_delta* delta)
 {
 	if ( !aString )
 		return;
@@ -2030,7 +2030,7 @@ void BView::DrawString(const char* aString, int32 length, BPoint location,
 
 void BView::StrokeEllipse(BPoint center,
 							float xRadius, float yRadius,
-							pattern p = B_SOLID_HIGH)
+							pattern p)
 {
 	if (owner){
 		check_lock();
@@ -2047,7 +2047,7 @@ void BView::StrokeEllipse(BPoint center,
 
 //---------------------------------------------------------------------------
 
-void BView::StrokeEllipse(BRect r, pattern p = B_SOLID_HIGH) {
+void BView::StrokeEllipse(BRect r, pattern p) {
 	if (owner)
 	StrokeEllipse( 	r.LeftTop() + BPoint(r.Width()/2, r.Height()/2),
 					r.Width()/2, r.Height()/2, p );
@@ -2057,7 +2057,7 @@ void BView::StrokeEllipse(BRect r, pattern p = B_SOLID_HIGH) {
 
 void BView::FillEllipse(BPoint center,
 						float xRadius, float yRadius,
-						pattern p = B_SOLID_HIGH)
+						pattern p)
 {
 	if (owner){
 		check_lock();
@@ -2074,7 +2074,7 @@ void BView::FillEllipse(BPoint center,
 
 //---------------------------------------------------------------------------
 
-void BView::FillEllipse(BRect r, pattern p = B_SOLID_HIGH) {
+void BView::FillEllipse(BRect r, pattern p) {
 	if (owner)
 	FillEllipse( 	r.LeftTop() + BPoint(r.Width()/2, r.Height()/2),
 					r.Width()/2, r.Height()/2, p );
@@ -2086,7 +2086,7 @@ void BView::FillEllipse(BRect r, pattern p = B_SOLID_HIGH) {
 void BView::StrokeArc(BPoint center,
 					  float xRadius, float yRadius,
 					  float start_angle, float arc_angle,
-					  pattern p = B_SOLID_HIGH)
+					  pattern p)
 {
 	if (owner){
 		check_lock();
@@ -2107,7 +2107,7 @@ void BView::StrokeArc(BPoint center,
 
 void BView::StrokeArc(BRect r,
 					  float start_angle, float arc_angle,
-					  pattern p = B_SOLID_HIGH)
+					  pattern p)
 {
 	if (owner)
 	StrokeArc( 	r.LeftTop() + BPoint(r.Width()/2, r.Height()/2),
@@ -2120,7 +2120,7 @@ void BView::StrokeArc(BRect r,
 void BView::FillArc(BPoint center,
 					float xRadius, float yRadius,
 					float start_angle, float arc_angle,
-					pattern p = B_SOLID_HIGH)
+					pattern p)
 {
 	if (owner){
 		check_lock();
@@ -2141,7 +2141,7 @@ void BView::FillArc(BPoint center,
 
 void BView::FillArc(BRect r,
 					float start_angle, float arc_angle,
-					pattern p = B_SOLID_HIGH)
+					pattern p)
 {
 	if (owner)
 	FillArc( 	r.LeftTop() + BPoint(r.Width()/2, r.Height()/2),
@@ -2151,7 +2151,7 @@ void BView::FillArc(BRect r,
 
 //---------------------------------------------------------------------------
 
-void BView::StrokeBezier(BPoint* controlPoints, pattern p = B_SOLID_HIGH){
+void BView::StrokeBezier(BPoint* controlPoints, pattern p){
 	if (owner){
 		check_lock();
 		
@@ -2168,7 +2168,7 @@ void BView::StrokeBezier(BPoint* controlPoints, pattern p = B_SOLID_HIGH){
 
 //---------------------------------------------------------------------------
 
-void BView::FillBezier(BPoint* controlPoints, pattern p = B_SOLID_HIGH){
+void BView::FillBezier(BPoint* controlPoints, pattern p){
 	if (owner){
 		check_lock();
 		
@@ -2186,7 +2186,7 @@ void BView::FillBezier(BPoint* controlPoints, pattern p = B_SOLID_HIGH){
 //---------------------------------------------------------------------------
 
 void BView::StrokePolygon(const BPolygon* aPolygon,
-						  bool closed = true, pattern p = B_SOLID_HIGH)
+						  bool closed, pattern p)
 {
 	if ( !aPolygon )
 		return;
@@ -2211,7 +2211,7 @@ void BView::StrokePolygon(const BPolygon* aPolygon,
 //---------------------------------------------------------------------------
 
 void BView::StrokePolygon(const BPoint* ptArray, int32 numPts,
-						  bool closed = true, pattern p = B_SOLID_HIGH)
+						  bool closed, pattern p)
 {
 	if ( !ptArray )
 		return;
@@ -2223,7 +2223,7 @@ void BView::StrokePolygon(const BPoint* ptArray, int32 numPts,
 //---------------------------------------------------------------------------
 
 void BView::StrokePolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
-						  bool closed = true, pattern p = B_SOLID_HIGH)
+						  bool closed, pattern p)
 {
 	if ( !ptArray )
 		return;
@@ -2236,7 +2236,7 @@ void BView::StrokePolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
 //---------------------------------------------------------------------------
 
 void BView::FillPolygon(const BPolygon* aPolygon,
-						pattern p = B_SOLID_HIGH)
+						pattern p)
 {
 	if ( !aPolygon )
 		return;
@@ -2260,7 +2260,7 @@ void BView::FillPolygon(const BPolygon* aPolygon,
 //---------------------------------------------------------------------------
 
 void BView::FillPolygon(const BPoint* ptArray, int32 numPts,
-						pattern p = B_SOLID_HIGH)
+						pattern p)
 {
 	if ( !ptArray )
 		return;
@@ -2272,7 +2272,7 @@ void BView::FillPolygon(const BPoint* ptArray, int32 numPts,
 //---------------------------------------------------------------------------
 
 void BView::FillPolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
-						pattern p = B_SOLID_HIGH)
+						pattern p)
 {
 	if ( !ptArray )
 		return;
@@ -2284,7 +2284,7 @@ void BView::FillPolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
 
 //---------------------------------------------------------------------------
 
-void BView::StrokeRect(BRect r, pattern p = B_SOLID_HIGH){
+void BView::StrokeRect(BRect r, pattern p){
 	if (owner){
 		check_lock();
 		
@@ -2298,7 +2298,7 @@ void BView::StrokeRect(BRect r, pattern p = B_SOLID_HIGH){
 
 //---------------------------------------------------------------------------
 
-void BView::FillRect(BRect r, pattern p = B_SOLID_HIGH){
+void BView::FillRect(BRect r, pattern p){
 	if (owner){
 		check_lock();
 		
@@ -2313,7 +2313,7 @@ void BView::FillRect(BRect r, pattern p = B_SOLID_HIGH){
 //---------------------------------------------------------------------------
 
 void BView::StrokeRoundRect(BRect r, float xRadius, float yRadius,
-							pattern p = B_SOLID_HIGH)
+							pattern p)
 {
 	if (owner){
 		check_lock();
@@ -2331,7 +2331,7 @@ void BView::StrokeRoundRect(BRect r, float xRadius, float yRadius,
 //---------------------------------------------------------------------------
 
 void BView::FillRoundRect(BRect r, float xRadius, float yRadius,
-						  pattern p = B_SOLID_HIGH)
+						  pattern p)
 {
 	if (owner){
 		check_lock();
@@ -2348,7 +2348,7 @@ void BView::FillRoundRect(BRect r, float xRadius, float yRadius,
 
 //---------------------------------------------------------------------------
 
-void BView::FillRegion(BRegion* a_region, pattern p= B_SOLID_HIGH){
+void BView::FillRegion(BRegion* a_region, pattern p){
 	if ( !a_region )
 		return;
 
@@ -2372,7 +2372,7 @@ void BView::FillRegion(BRegion* a_region, pattern p= B_SOLID_HIGH){
 //---------------------------------------------------------------------------
 
 void BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
-						   BRect bounds, pattern p = B_SOLID_HIGH)
+						   BRect bounds, pattern p)
 {
 	if (owner){
 		check_lock();
@@ -2392,7 +2392,7 @@ void BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 //---------------------------------------------------------------------------
 
 void BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
-						   pattern p = B_SOLID_HIGH)
+						   pattern p)
 {
 	if (owner){
 			// we construct the smallest rectangle that contains the 3 points
@@ -2432,7 +2432,7 @@ void BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 //---------------------------------------------------------------------------
 
 void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
-						 pattern p = B_SOLID_HIGH)
+						 pattern p)
 {
 	if (owner){
 			// we construct the smallest rectangle that contains the 3 points
@@ -2472,7 +2472,7 @@ void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 //---------------------------------------------------------------------------
 
 void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
-						 BRect bounds, pattern p = B_SOLID_HIGH)
+						 BRect bounds, pattern p)
 {
 	if (owner){
 		check_lock();
@@ -2491,13 +2491,13 @@ void BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 
 //---------------------------------------------------------------------------
 
-void BView::StrokeLine(BPoint toPt, pattern p = B_SOLID_HIGH){
+void BView::StrokeLine(BPoint toPt, pattern p){
 	StrokeLine( PenLocation(), toPt, p);
 }
 
 //---------------------------------------------------------------------------
 
-void BView::StrokeLine(BPoint pt0, BPoint pt1, pattern p = B_SOLID_HIGH){
+void BView::StrokeLine(BPoint pt0, BPoint pt1, pattern p){
 	if (owner){
 		check_lock();
 		
@@ -2515,7 +2515,7 @@ void BView::StrokeLine(BPoint pt0, BPoint pt1, pattern p = B_SOLID_HIGH){
 
 //---------------------------------------------------------------------------
 
-void BView::StrokeShape(BShape* shape, pattern p = B_SOLID_HIGH){
+void BView::StrokeShape(BShape* shape, pattern p){
 	if ( !shape )
 		return;
 
@@ -2541,7 +2541,7 @@ void BView::StrokeShape(BShape* shape, pattern p = B_SOLID_HIGH){
 
 //---------------------------------------------------------------------------
 
-void BView::FillShape(BShape* shape, pattern p = B_SOLID_HIGH){
+void BView::FillShape(BShape* shape, pattern p){
 	if ( !shape )
 		return;
 
@@ -2690,8 +2690,8 @@ BPicture* BView::EndPicture(){
 
 void BView::SetViewBitmap(const BBitmap* bitmap,
 						  BRect srcRect, BRect dstRect,
-						  uint32 followFlags = B_FOLLOW_TOP|B_FOLLOW_LEFT,
-						  uint32 options = B_TILE_BITMAP)
+						  uint32 followFlags,
+						  uint32 options)
 {
 	setViewImage(bitmap, srcRect, dstRect, followFlags, options);
 }
@@ -2699,8 +2699,8 @@ void BView::SetViewBitmap(const BBitmap* bitmap,
 //---------------------------------------------------------------------------
 
 void BView::SetViewBitmap(const BBitmap* bitmap,
-						  uint32 followFlags = B_FOLLOW_TOP|B_FOLLOW_LEFT,
-						  uint32 options = B_TILE_BITMAP)
+						  uint32 followFlags,
+						  uint32 options)
 {
 	BRect rect;
  	if (bitmap)
@@ -2722,8 +2722,8 @@ void BView::ClearViewBitmap(){
 status_t BView::SetViewOverlay(const BBitmap* overlay,
 							   BRect srcRect, BRect dstRect,
 							   rgb_color* colorKey,
-							   uint32 followFlags = B_FOLLOW_TOP|B_FOLLOW_LEFT,
-							   uint32 options = 0)
+							   uint32 followFlags,
+							   uint32 options)
 {
 	status_t err = setViewImage(overlay, srcRect, dstRect, followFlags,
 								options | 0x4);
@@ -2736,8 +2736,8 @@ status_t BView::SetViewOverlay(const BBitmap* overlay,
 //---------------------------------------------------------------------------
 
 status_t BView::SetViewOverlay(const BBitmap* overlay, rgb_color* colorKey,
-							   uint32 followFlags = B_FOLLOW_TOP|B_FOLLOW_LEFT,
-							   uint32 options = 0)
+							   uint32 followFlags,
+							   uint32 options)
 {
 	BRect rect;
  	if (overlay)
@@ -2907,7 +2907,7 @@ void BView::InvertRect(BRect r){
 
 // View Hierarchy Functions
 //---------------------------------------------------------------------------
-void BView::AddChild(BView* child, BView* before = NULL){
+void BView::AddChild(BView* child, BView* before){
 	if ( !child )
 		return;
 
@@ -3435,7 +3435,7 @@ bool BView::removeFromList(){
 
 //---------------------------------------------------------------------------
 
-bool BView::addToList(BView *aView, BView *before = NULL){
+bool BView::addToList(BView *aView, BView *before){
 	if ( !aView )
 		return false;
 
@@ -3897,7 +3897,7 @@ inline uint32 _get_uint32_color( rgb_color c ){
 
 //---------------------------------------------------------------------------
 
-inline rgb_color _set_static_rgb_color( uint8 r, uint8 g, uint8 b, uint8 a=255 ){
+inline rgb_color _set_static_rgb_color( uint8 r, uint8 g, uint8 b, uint8 a ){
 	rgb_color		color;
 	color.red		= r;
 	color.green		= g;
@@ -3910,7 +3910,7 @@ inline rgb_color _set_static_rgb_color( uint8 r, uint8 g, uint8 b, uint8 a=255 )
 //---------------------------------------------------------------------------
 
 inline void _set_ptr_rgb_color( rgb_color* c, uint8 r, uint8 g,
-								uint8 b, uint8 a=255 )
+								uint8 b, uint8 a )
 {
 	c->red			= r;
 	c->green		= g;
