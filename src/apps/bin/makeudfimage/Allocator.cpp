@@ -1,0 +1,217 @@
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
+//----------------------------------------------------------------------
+
+/*! \file Allocator.cpp
+
+	Physical block allocator class implementation.
+*/
+
+#include "Allocator.h"
+
+#include <limits.h>
+
+#include "Utils.h"
+
+/*! \brief Creates a new Allocator object.
+*/
+Allocator::Allocator(uint32 blockSize)
+	: fLength(0)
+	, fBlockSize(blockSize)
+	, fBlockShift(0)
+	, fInitStatus(B_NO_INIT)
+{
+	status_t error = Udf::get_block_shift(BlockSize(), fBlockShift);
+	if (!error)
+		fInitStatus = B_OK;
+}
+
+status_t
+Allocator::InitCheck() const
+{
+	return fInitStatus;
+}
+
+/*! \brief Allocates the given block, if available.
+
+	\return
+	- B_OK: Success.
+	- error code: Failure, the block has already been allocated.
+*/
+status_t
+Allocator::GetBlock(uint32 block)
+{
+	Udf::extent_address extent(block, BlockSize());
+	return GetExtent(extent);
+}
+
+/*! \brief Allocates the given extent, if available.
+
+	\return
+	- B_OK: Success.
+	- error code: Failure, the extent (or some portion of it) has already
+	              been allocated.
+*/
+status_t
+Allocator::GetExtent(Udf::extent_address extent)
+{
+	status_t error = InitCheck();
+	if (!error) {
+		uint32 offset = extent.location();
+		uint32 length = BlocksFor(extent.length());
+		// First see if the extent is past the allocation tail,
+		// since we then don't have to do any chunklist traversal
+		if (offset >= Length()) {
+			// Add a new chunk to the end of the chunk list if
+			// necessary
+			if (offset > Length()) {
+				Udf::extent_address chunk(Length(), (offset-Length())<<BlockShift());
+				fChunkList.push_back(chunk);
+			}
+			// Adjust the tail
+			fLength = offset+length;
+			return B_OK;
+		} else {
+			// Block is not past tail, so check the chunk list
+			for (list<Udf::extent_address>::iterator i = fChunkList.begin();
+			       i != fChunkList.end();
+			         i++)
+			{
+				uint32 chunkOffset = i->location();
+				uint32 chunkLength = BlocksFor(i->length());
+				if (chunkOffset <= offset && (offset+length) <= (chunkOffset+chunkLength)) {
+					// Found it. Split the chunk. First look for an orphan
+					// before the block, then after.
+					if (chunkOffset < offset) {
+						// Orhpan before; add a new chunk in front
+						// of the current one
+						Udf::extent_address chunk(chunkOffset, (offset-chunkOffset)<<BlockShift());
+						fChunkList.insert(i, chunk);
+					}
+					if ((offset+length) < (chunkOffset+chunkLength)) {
+						// Orphan after; resize the original chunk
+						i->set_location(offset+length);
+						i->set_length(((chunkOffset+chunkLength)-(offset+length))<<BlockSize());					
+					} else {
+						// No orphan after; remove the original chunk
+						fChunkList.erase(i);
+					}
+					return B_OK;
+				}
+			}
+		}
+		
+	}
+	return error;
+}
+
+/*! \brief Allocates the next available block.
+
+	\param block Output parameter into which the number of the
+	             allocated block is stored.
+
+	\return
+	- B_OK: Success.
+	- error code: Failure, no blocks available.
+*/
+status_t
+Allocator::GetNextBlock(uint32 &block)
+{
+	status_t error = InitCheck();
+	if (!error) {
+		Udf::extent_address extent;
+		error = GetNextExtent(BlockSize(), true, extent);
+		if (!error)
+			block = extent.location();
+	}
+	return error;
+}
+
+/*! \brief Allocates the next available block.
+
+	\param length The desired length (in bytes) of the extent.
+	\param contiguous If false, signals that an extent of shorter length will
+	                  be accepted. This allows for small chunks of
+	                  unallocated space to be consumed, provided a
+	                  contiguous chunk is not needed. 
+	\param block Output parameter into which the extent as allocated
+	             is stored. Note that the length field of the extent
+	             may be shorter than the length parameter passed
+	             to this function is \a contiguous is false.
+
+	\return
+	- B_OK: Success.
+	- error code: Failure.
+*/
+status_t
+Allocator::GetNextExtent(uint32 _length, bool contiguous,
+                           Udf::extent_address &extent)
+{
+	uint32 length = BlocksFor(_length);
+	bool isPartial = false;
+	status_t error = InitCheck();
+	if (!error) {
+		for (list<Udf::extent_address>::iterator i = fChunkList.begin();
+		       i != fChunkList.end();
+		         i++)
+		{
+			uint32 chunkOffset = i->location();
+			uint32 chunkLength = BlocksFor(i->length());			
+			if (length <= chunkLength) {
+				// Chunk is larger than necessary. Allocate first
+				// length blocks, and resize the chunk appropriately.
+				extent.set_location(chunkOffset);
+				extent.set_length(_length);
+				if (length != chunkLength) {
+					i->set_location(chunkOffset+length);
+					i->set_length((chunkLength-length)<<BlockShift());
+				} else {
+					fChunkList.erase(i);
+				}
+				return B_OK;					
+			} else if (!contiguous) {
+				extent.set_location(chunkOffset);
+				extent.set_length(chunkLength<<BlockShift());
+				fChunkList.erase(i);
+				return B_OK;					
+			}			 
+		}
+		// No sufficient chunk found, so try to allocate from the tail
+		uint32 maxLength = LONG_MAX-Length();
+		if (length > maxLength) {
+			if (contiguous)
+				error = B_DEVICE_FULL;
+			else {
+				isPartial = true;
+				length = maxLength;
+			}
+		}
+		if (!error) {
+			extent.set_location(Length());
+			extent.set_length(isPartial ? length<<BlockShift() : _length);
+			fLength += length;		
+		}		
+	}
+	return error;
+}
+
+/*! \brief Returns the number of blocks needed to accomodate the
+	given number of bytes.
+*/
+uint32
+Allocator::BlocksFor(uint32 bytes)
+{
+	if (BlockSize() == 0) {
+//		DEBUG_INIT_ETC("Allocator", ("bytes: %ld\n", bytes));
+//		PRINT(("WARNING: Allocator::BlockSize() == 0!\n")); 
+		return 0;
+	} else {
+		uint32 blocks = bytes / BlockSize();
+		if (bytes % BlockSize() != 0)
+			blocks++;
+		return blocks;
+	}
+}
