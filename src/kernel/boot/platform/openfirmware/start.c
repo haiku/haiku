@@ -1,10 +1,11 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
 
 #include <OS.h>
+#include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/heap.h>
 #include <platform_arch.h>
@@ -74,6 +75,14 @@ determine_machine(void)
 
 	if (!strcasecmp("pegasos", buffer))
 		gMachine |= MACHINE_PEGASOS;
+}
+
+
+void
+platform_start_kernel(void)
+{
+	printf("kernel entry at %p\n", (void *)gKernelEntry);
+	of_exit();
 }
 
 

@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -128,8 +128,8 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 
 
 status_t
-platform_get_boot_partition(struct stage2_args *args, NodeList *list,
-	boot::Partition **_partition)
+platform_get_boot_partition(struct stage2_args *args, Node *device,
+	NodeList *list, boot::Partition **_partition)
 {
 	NodeIterator iterator = list->Iterator();
 	boot::Partition *partition = NULL;

@@ -71,6 +71,8 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer, size
 		string += length;
 		bufferSize -= length;
 	}
+
+	return string - (char *)buffer;
 }
 
 
