@@ -3,6 +3,9 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
+#include <OS.h>
+
 #include <kernel.h>
 #include <console.h>
 #include <debug.h>
@@ -12,9 +15,7 @@
 #include <vm.h>
 #include <int.h>
 #include <timer.h>
-#include <Errors.h>
-#include <stage2.h>
-#include <OS.h>
+#include <boot/stage2.h>
 
 #include <arch/cpu.h>
 #include <arch/timer.h>
@@ -22,6 +23,7 @@
 
 static timer * volatile events[SMP_MAX_CPUS] = { NULL, };
 static spinlock timer_spinlock[SMP_MAX_CPUS] = { 0, };
+
 
 int timer_init(kernel_args *ka)
 {

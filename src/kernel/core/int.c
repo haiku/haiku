@@ -10,7 +10,7 @@
 #include <smp.h>
 #include <arch/int.h>
 #include <errno.h>
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <string.h>
 #include <stdio.h>
 #include <kqueue.h>

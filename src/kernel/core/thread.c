@@ -5,6 +5,9 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+#include <OS.h>
+#include <Errors.h>
+
 #include <kernel.h>
 #include <debug.h>
 #include <console.h>
@@ -18,15 +21,13 @@
 #include <arch/int.h>
 #include <arch/cpu.h>
 #include <arch/vm.h>
-#include <OS.h>
 #include <sem.h>
 #include <port.h>
 #include <vfs.h>
 #include <elf.h>
 #include <malloc.h>
 #include <user_runtime.h>
-#include <Errors.h>
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <string.h>
 #include <kimage.h>
 #include <stdio.h>

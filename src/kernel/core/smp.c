@@ -11,7 +11,6 @@
 #include <debug.h>
 #include <int.h>
 #include <arch/int.h>
-#include <smp_priv.h>
 #include <smp.h>
 #include <malloc.h>
 #include <Errors.h>
@@ -20,7 +19,6 @@
 #include <cpu.h>
 #include <arch/cpu.h>
 #include <arch/smp.h>
-//#include <arch/pmap.h>
 
 #include <string.h>
 

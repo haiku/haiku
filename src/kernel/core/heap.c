@@ -11,10 +11,8 @@
 #include <memheap.h>
 #include <malloc.h>
 #include <debug.h>
-
 #include <arch/cpu.h>
-
-#include <stage2.h>
+#include <boot/stage2.h>
 
 #include <string.h>
 

@@ -5,13 +5,14 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <Errors.h>
 #include <kernel.h>
 #include <console.h>
 #include <debug.h>
-#include <faults.h>
+#include <arch/faults.h>
 #include <arch/int.h>
+#include <arch/cpu.h>
 #include <vm.h>
 #include <timer.h>
 #include <smp.h>
@@ -31,9 +32,6 @@
 
 #include <string.h>
 
-#include <arch/cpu.h>
-#include <arch/faults.h>
-
 
 #define TRACE_BOOT 1
 #if TRACE_BOOT
@@ -47,8 +45,8 @@ bool kernel_startup;
 static kernel_args ka;
 
 static int32 main2(void *);
-
 int _start(kernel_args *oldka, int cpu);	/* keep compiler happy */
+
 
 int
 _start(kernel_args *oldka, int cpu_num)

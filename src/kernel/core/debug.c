@@ -260,7 +260,7 @@ kernel_debugger_loop()
 void
 kernel_debugger(const char * message)
 {
-	dbg_save_registers(&(dbg_register_file[smp_get_current_cpu()][0]));
+	arch_dbg_save_registers(&(dbg_register_file[smp_get_current_cpu()][0]));
 
 	if (message) {
 		dprintf(message);
