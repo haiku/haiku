@@ -12,6 +12,3 @@ SubDir OBOS_TOP src tests kits net ;
 #UseArchHeaders $(OBOS_ARCH) ;
 
 #SimpleTest at_client : at_client.c : ;
-
-SubInclude OBOS_TOP src tests kits net ppp ;
-
