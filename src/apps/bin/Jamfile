@@ -108,6 +108,7 @@ SubInclude OBOS_TOP src apps bin rcs ;
 # Network command line tools
 SubInclude OBOS_TOP src apps bin arp ;
 SubInclude OBOS_TOP src apps bin ifconfig ;
+SubInclude OBOS_TOP src apps bin ppp_up ;
 SubInclude OBOS_TOP src apps bin pppconfig ;
 SubInclude OBOS_TOP src apps bin ping ;
 SubInclude OBOS_TOP src apps bin route ;

@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src apps bin ppp_up ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src tests kits net DialUpPreflet ] ;
+
+AddResources ppp_up : ppp_up.rdef ;
+
+BinCommand ppp_up :
+	ConnectionView.cpp
+	ConnectionWindow.cpp
+	PPPUpApplication.cpp
+;
+
+LinkSharedOSLibs ppp_up : libdunview.a libppp.a be ;

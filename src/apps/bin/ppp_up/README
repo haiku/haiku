@@ -1,0 +1,7 @@
+Usage:
+ppp_up INTERFACENAME
+
+The app waits until it receives a thread message containing the interface id. The sender of this message will wait for a reply that indicates that ppp_up is ready to run. The replying thread will be registered as a report message receiver (no reply timeout).
+If the interface is configured to ask the user before dialing or if the password is missing although a login is needed, ppp_up will open a request window and wait for the user to enter the login information. All changes will be saved. Actually, the login view that is presented to the user is the same as the one used in the dial-up settings (including its behaviour).
+
+If a connection could be established ppp_up will add a connection status replicant to the Deskbar.
