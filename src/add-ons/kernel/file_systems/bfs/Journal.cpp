@@ -1,8 +1,8 @@
 /* Journal - transaction and logging
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Journal.h"
@@ -11,6 +11,7 @@
 
 #include <Drivers.h>
 #include <util/kernel_cpp.h>
+#include <errno.h>
 
 
 Journal::Journal(Volume *volume)
@@ -50,13 +51,18 @@ Journal::InitCheck()
 
 
 status_t
-Journal::CheckLogEntry(int32 count, off_t *array)
+Journal::CheckLogEntry(int32 count, const off_t *array)
 {
 	// ToDo: check log entry integrity (block numbers and entry size)
 	PRINT(("Log entry has %ld entries (%Ld)\n", count, array[0]));
 	return B_OK;
 }
 
+
+/**	Replays an entry in the log.
+ *	\a _start points to the entry in the log, and will be bumped to the next
+ *	one if replaying succeeded.
+ */
 
 status_t
 Journal::ReplayLogEntry(int32 *_start)
@@ -72,8 +78,9 @@ Journal::ReplayLogEntry(int32 *_start)
 	bool first = true;
 
 	CachedBlock cached(fVolume);
+
 	while (count > 0) {
-		off_t *array = (off_t *)cached.SetTo(arrayBlock);
+		const off_t *array = (const off_t *)cached.SetTo(arrayBlock);
 		if (array == NULL)
 			return B_IO_ERROR;
 
@@ -102,7 +109,7 @@ Journal::ReplayLogEntry(int32 *_start)
 		for (; index < valuesInBlock && count-- > 0; index++) {
 			PRINT(("replay block %Ld in log at %Ld!\n", array[index], blockNumber));
 
-			uint8 *copy = cachedCopy.SetTo(logOffset + blockNumber);
+			const uint8 *copy = cachedCopy.SetTo(logOffset + blockNumber);
 			if (copy == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
@@ -170,15 +177,9 @@ Journal::ReplayLog()
  */
 
 void
-Journal::blockNotify(off_t blockNumber, size_t numBlocks, void *arg)
+Journal::blockNotify(int32 transactionID, void *arg)
 {
 	log_entry *logEntry = (log_entry *)arg;
-
-	logEntry->cached_blocks -= numBlocks;
-	if (logEntry->cached_blocks > 0) {
-		// nothing to do yet...
-		return;
-	}
 
 	Journal *journal = logEntry->journal;
 	disk_super_block &superBlock = journal->fVolume->SuperBlock();
@@ -222,13 +223,24 @@ Journal::WriteLogEntry()
 	fTransactionsInEntry = 0;
 	fHasChangedBlocks = false;
 
+	// insert all changed blocks into the log array
+	uint32 cookie = 0;
+	{
+		off_t blockNumber;
+		while (cache_next_block_in_transaction(fVolume->BlockCache(), fTransactionID, &cookie,
+				&blockNumber, NULL, NULL) == B_OK)  {
+			fArray.Insert(blockNumber);
+		}
+	}
+
 	sorted_array *array = fArray.Array();
 	if (array == NULL || array->count == 0)
 		return B_OK;
 
 	// Make sure there is enough space in the log.
 	// If that fails for whatever reason, panic!
-	force_cache_flush(fVolume->Device(), false);
+	// ToDo:
+/*	force_cache_flush(fVolume->Device(), false);
 	int32 tries = fLogSize / 2 + 1;
 	while (TransactionSize() > FreeLogBlocks() && tries-- > 0)
 		force_cache_flush(fVolume->Device(), true);
@@ -237,7 +249,7 @@ Journal::WriteLogEntry()
 		fVolume->Panic();
 		return B_BAD_DATA;
 	}
-
+*/
 	int32 blockShift = fVolume->BlockShift();
 	off_t logOffset = fVolume->ToBlock(fVolume->Log()) << blockShift;
 	off_t logStart = fVolume->LogEnd();
@@ -257,14 +269,11 @@ Journal::WriteLogEntry()
 
 	// Write logged blocks into the log
 
-	CachedBlock cached(fVolume);
-	for (int32 i = 0;i < array->count;i++) {
+	cookie = 0;
+	const uint8 *block;
+	while (cache_next_block_in_transaction(fVolume->BlockCache(), fTransactionID, &cookie,
+			NULL, (void **)&block, NULL) == B_OK) {
 		// ToDo: combine blocks if possible (using iovecs)!
-
-		uint8 *block = cached.SetTo(array->values[i]);
-		if (block == NULL)
-			return B_IO_ERROR;
-
 		write_pos(fVolume->Device(), logOffset + (logPosition << blockShift),
 			block, fVolume->BlockSize());
 		logPosition = (logPosition + 1) % fLogSize;
@@ -283,9 +292,9 @@ Journal::WriteLogEntry()
 
 		fCurrent = logEntry;
 		fUsed += logEntry->length;
-
-		set_blocks_info(fVolume->Device(), &array->values[0], array->count, blockNotify, logEntry);
 	}
+
+	cache_end_transaction(fVolume->BlockCache(), fTransactionID, blockNotify, fCurrent);
 
 	// If the log goes to the next round (the log is written as a
 	// circular buffer), all blocks will be flushed out which is
@@ -318,7 +327,7 @@ Journal::FlushLogAndBlocks()
 		return status;
 
 	// write the current log entry to disk
-	
+
 	if (TransactionSize() != 0) {
 		status = WriteLogEntry();
 		if (status < B_OK)
@@ -341,9 +350,17 @@ Journal::Lock(Transaction *owner)
 	if (status == B_OK)
 		fOwner = owner;
 
+/*	ToDo:
 	// if the last transaction is older than 2 secs, start a new one
 	if (fTransactionsInEntry != 0 && system_time() - fTimestamp > 2000000L)
 		WriteLogEntry();
+*/
+
+	fTransactionID = cache_start_transaction(fVolume->BlockCache());
+	if (fTransactionID < B_OK) {
+		fLock.Unlock();
+		return fTransactionID;
+	}
 
 	return B_OK;
 }
@@ -357,6 +374,7 @@ Journal::Unlock(Transaction *owner, bool success)
 
 	TransactionDone(success);
 
+	fTransactionID = -1;
 	fTimestamp = system_time();
 	fOwner = NULL;
 	fLock.Unlock();
@@ -383,6 +401,13 @@ Journal::CurrentTransaction()
 status_t
 Journal::TransactionDone(bool success)
 {
+	if (!success) {
+		cache_abort_transaction(fVolume->BlockCache(), fTransactionID);
+		return B_OK;
+	}
+
+// ToDo:
+/*
 	if (!success && fTransactionsInEntry == 0) {
 		// we can safely abort the transaction
 		sorted_array *array = fArray.Array();
@@ -404,6 +429,7 @@ Journal::TransactionDone(bool success)
 
 		return B_OK;
 	}
+*/
 
 	return WriteLogEntry();
 }
@@ -412,6 +438,8 @@ Journal::TransactionDone(bool success)
 status_t
 Journal::LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks)
 {
+	panic("LogBlocks() called!\n");
+
 	// ToDo: that's for now - we should change the log file size here
 	if (TransactionSize() + numBlocks + 1 > fLogSize)
 		return B_DEVICE_FULL;
@@ -425,25 +453,29 @@ Journal::LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks)
 			// Note, this is only necessary if this method is called with a buffer
 			// different from the cached block buffer - which is unlikely but
 			// we'll make sure this way (costs one cache lookup, though).
-			status_t status = cached_write(fVolume->Device(), blockNumber, buffer, 1, blockSize);
+			// ToDo:
+/*			status_t status = cached_write(fVolume->Device(), blockNumber, buffer, 1, blockSize);
 			if (status < B_OK)
 				return status;
-
+*/
 			continue;
 		}
 
 		// Insert the block into the transaction's array, and write the changes
 		// back into the locked cache buffer
 		fArray.Insert(blockNumber);
-		status_t status = cached_write_locked(fVolume->Device(), blockNumber, buffer, 1, blockSize);
+
+		// ToDo:
+/*		status_t status = cached_write_locked(fVolume->Device(), blockNumber, buffer, 1, blockSize);
 		if (status < B_OK)
 			return status;
-	}
+*/	}
 
+	// ToDo:
 	// If necessary, flush the log, so that we have enough space for this transaction
-	if (TransactionSize() > FreeLogBlocks())
+/*	if (TransactionSize() > FreeLogBlocks())
 		force_cache_flush(fVolume->Device(), true);
-
+*/
 	return B_OK;
 }
 

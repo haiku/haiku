@@ -1,8 +1,8 @@
 /* kernel_interface - file system interface to BeOS' vnode layer
-**
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the Haiku License.
-*/
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Debug.h"
@@ -22,13 +22,6 @@
 #include <NodeMonitor.h>
 #include <fs_interface.h>
 #include <fs_cache.h>
-
-#ifndef _IMPEXP_KERNEL
-#	define _IMPEXP_KERNEL
-#endif
-
-#include <cache.h>
-#include <lock.h>
 
 #include <fs_attr.h>
 #include <fs_info.h>
@@ -53,7 +46,8 @@ strtod(const char */*start*/, char **/*end*/)
 
 
 static status_t
-bfs_mount(mount_id mountID, const char *device, uint32 flags, const char *args, void **data, vnode_id *rootID)
+bfs_mount(mount_id mountID, const char *device, uint32 flags, const char *args,
+	void **_data, vnode_id *_rootID)
 {
 	FUNCTION();
 
@@ -62,11 +56,11 @@ bfs_mount(mount_id mountID, const char *device, uint32 flags, const char *args, 
 		return B_NO_MEMORY;
 
 	status_t status;
-	if ((status = volume->Mount(device, B_MOUNT_READ_ONLY/*flags*/)) == B_OK) {
-		*data = volume;
-		*rootID = volume->ToVnode(volume->Root());
+	if ((status = volume->Mount(device, flags)) == B_OK) {
+		*_data = volume;
+		*_rootID = volume->ToVnode(volume->Root());
 		INFORM(("mounted \"%s\" (root node at %Ld, device = %s)\n",
-			volume->Name(), *rootID, device));
+			volume->Name(), *_rootID, device));
 	}
 	else
 		delete volume;
@@ -232,7 +226,7 @@ restartIfBusy:
 	// If not, we create a new one here
 
 	if (inode == NULL) {
-		inode = new Inode(&cached);
+		inode = new Inode(volume, id);
 		if (inode == NULL)
 			return B_NO_MEMORY;
 
@@ -242,12 +236,8 @@ restartIfBusy:
 	} else
 		status = inode->InitCheck(false);
 
-	if (status == B_OK) {
-		if (inode->IsFile() && inode->FileCache() == NULL)
-			inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(), inode->Size(), volume->Device()));
-
+	if (status == B_OK)
 		*_node = inode;
-	}
 
 	return status;
 }
@@ -299,7 +289,7 @@ bfs_remove_vnode(void *_ns, void *_node, bool reenter)
 		localTransaction.Start(volume, inode->BlockNumber());
 	}
 
-	status_t status = inode->Free(transaction);
+	status_t status = inode->Free(*transaction);
 	if (status == B_OK) {
 		if (transaction == &localTransaction)
 			localTransaction.Done();
@@ -471,31 +461,6 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, ulong cmd, void *buffer, size_t
 	Inode *inode = (Inode *)_node;
 
 	switch (cmd) {
-		case IOCTL_FILE_UNCACHED_IO:
-		{
-			if (inode == NULL)
-				return B_BAD_VALUE;
-
-			// if the inode is already set up for uncached access, bail out
-			if (inode->Flags() & INODE_NO_CACHE) {
-				FATAL(("File %Ld is already uncached\n", inode->ID()));
-				return B_ERROR;
-			}
-
-			PRINT(("uncached access to inode %Ld\n", inode->ID()));
-
-			// ToDo: sync the cache for this file!
-			// Unfortunately, we can't remove any blocks from the cache in BeOS,
-			// that means we can't guarantee consistency for the file contents
-			// spanning over both access modes.
-
-			// request buffers for being able to access the file without
-			// using the cache or allocating memory
-			status_t status = volume->Pool().RequestBuffers(volume->BlockSize());
-			if (status == B_OK)
-				inode->Node()->flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_NO_CACHE);
-			return status;
-		}
 		case BFS_IOCTL_VERSION:
 		{
 			uint32 *version = (uint32 *)buffer;
@@ -511,7 +476,7 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, ulong cmd, void *buffer, size_t
 
 			status_t status = allocator.StartChecking(control);
 			if (status == B_OK && inode != NULL)
-				inode->Node()->flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_CHKBFS_RUNNING);
+				inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_CHKBFS_RUNNING);
 
 			return status;
 		}
@@ -523,7 +488,7 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, ulong cmd, void *buffer, size_t
 
 			status_t status = allocator.StopChecking(control);
 			if (status == B_OK && inode != NULL)
-				inode->Node()->flags &= HOST_ENDIAN_TO_BFS_INT32(~INODE_CHKBFS_RUNNING);
+				inode->Node().flags &= HOST_ENDIAN_TO_BFS_INT32(~INODE_CHKBFS_RUNNING);
 
 			return status;
 		}
@@ -543,14 +508,12 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, ulong cmd, void *buffer, size_t
 			Transaction transaction(volume, 0);
 			CachedBlock cached(volume);
 			block_run run;
-			while (allocator.AllocateBlocks(&transaction, 8, 0, 64, 1, run) == B_OK) {
+			while (allocator.AllocateBlocks(transaction, 8, 0, 64, 1, run) == B_OK) {
 				PRINT(("write block_run(%ld, %d, %d)\n", run.allocation_group, run.start, run.length));
 				for (int32 i = 0;i < run.length;i++) {
-					uint8 *block = cached.SetTo(run);
-					if (block != NULL) {
+					uint8 *block = cached.SetToWritable(transaction, run);
+					if (block != NULL)
 						memset(block, 0, volume->BlockSize());
-						cached.WriteBack(&transaction);
-					}
 				}
 			}
 			return B_OK;
@@ -560,11 +523,13 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, ulong cmd, void *buffer, size_t
 			return B_OK;
 		case 56744:
 			if (inode != NULL)
-				dump_inode(inode->Node());
+				dump_inode(&inode->Node());
 			return B_OK;
 		case 56745:
-			if (inode != NULL)
-				dump_block((const char *)inode->Node(), volume->BlockSize());
+			if (inode != NULL) {
+				NodeGetter node(volume, inode);
+				dump_block((const char *)node.Node(), volume->BlockSize());
+			}
 			return B_OK;
 #endif
 	}
@@ -630,26 +595,27 @@ bfs_read_stat(void *_ns, void *_node, struct stat *st)
 
 	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
-	bfs_inode *node = inode->Node();
+
+	const bfs_inode &node = inode->Node();
 
 	st->st_dev = volume->ID();
 	st->st_ino = inode->ID();
 	st->st_nlink = 1;
 	st->st_blksize = BFS_IO_SIZE;
 
-	st->st_uid = node->UserID();
-	st->st_gid = node->GroupID();
-	st->st_mode = node->Mode();
+	st->st_uid = node.UserID();
+	st->st_gid = node.GroupID();
+	st->st_mode = node.Mode();
 
-	if (inode->IsSymLink() && (node->Flags() & INODE_LONG_SYMLINK) == 0) {
+	if (inode->IsSymLink() && (node.Flags() & INODE_LONG_SYMLINK) == 0) {
 		// symlinks report the size of the link here
-		st->st_size = strlen(node->short_symlink) + 1;
+		st->st_size = strlen(node.short_symlink) + 1;
 	} else
-		st->st_size = node->data.Size();
+		st->st_size = inode->Size();
 
 	st->st_atime = time(NULL);
-	st->st_mtime = st->st_ctime = (time_t)(node->LastModifiedTime() >> INODE_TIME_SHIFT);
-	st->st_crtime = (time_t)(node->CreateTime() >> INODE_TIME_SHIFT);
+	st->st_mtime = st->st_ctime = (time_t)(node.LastModifiedTime() >> INODE_TIME_SHIFT);
+	st->st_crtime = (time_t)(node.CreateTime() >> INODE_TIME_SHIFT);
 
 	return B_NO_ERROR;
 }
@@ -684,7 +650,7 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 
 	Transaction transaction(volume, inode->BlockNumber());
 
-	bfs_inode *node = inode->Node();
+	bfs_inode &node = inode->Node();
 
 	if (mask & FS_WRITE_STAT_SIZE) {
 		// Since WSTAT_SIZE is the only thing that can fail directly, we
@@ -694,7 +660,7 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 			return B_IS_A_DIRECTORY;
 
 		if (inode->Size() != stat->st_size) {
-			status = inode->SetFileSize(&transaction, stat->st_size);
+			status = inode->SetFileSize(transaction, stat->st_size);
 			if (status < B_OK)
 				return status;
 
@@ -702,34 +668,34 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 			inode->FillGapWithZeros(inode->OldSize(), inode->Size());
 
 			Index index(volume);
-			index.UpdateSize(&transaction, inode);
+			index.UpdateSize(transaction, inode);
 
 			if ((mask & FS_WRITE_STAT_MTIME) == 0)
-				index.UpdateLastModified(&transaction, inode);
+				index.UpdateLastModified(transaction, inode);
 		}
 	}
 
 	if (mask & FS_WRITE_STAT_MODE) {
-		PRINT(("original mode = %ld, stat->st_mode = %d\n", node->mode, stat->st_mode));
-		node->mode = node->mode & ~S_IUMSK | stat->st_mode & S_IUMSK;
+		PRINT(("original mode = %ld, stat->st_mode = %d\n", node.Mode(), stat->st_mode));
+		node.mode = HOST_ENDIAN_TO_BFS_INT32(node.Mode() & ~S_IUMSK | stat->st_mode & S_IUMSK);
 	}
 
 	if (mask & FS_WRITE_STAT_UID)
-		node->uid = stat->st_uid;
+		node.uid = HOST_ENDIAN_TO_BFS_INT32(stat->st_uid);
 	if (mask & FS_WRITE_STAT_GID)
-		node->gid = stat->st_gid;
+		node.gid = HOST_ENDIAN_TO_BFS_INT32(stat->st_gid);
 
 	if (mask & FS_WRITE_STAT_MTIME) {
 		// Index::UpdateLastModified() will set the new time in the inode
 		Index index(volume);
-		index.UpdateLastModified(&transaction, inode,
+		index.UpdateLastModified(transaction, inode,
 			(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
 	}
 	if (mask & FS_WRITE_STAT_CRTIME) {
-		node->create_time = (bigtime_t)stat->st_crtime << INODE_TIME_SHIFT;
+		node.create_time = HOST_ENDIAN_TO_BFS_INT64((bigtime_t)stat->st_crtime << INODE_TIME_SHIFT);
 	}
 
-	if ((status = inode->WriteBack(&transaction)) == B_OK)
+	if ((status = inode->WriteBack(transaction)) == B_OK)
 		transaction.Done();
 
 	notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
@@ -774,7 +740,7 @@ bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode,
 #endif
 	Transaction transaction(volume, directory->BlockNumber());
 
-	status = Inode::Create(&transaction, directory, name, S_FILE | (mode & S_IUMSK),
+	status = Inode::Create(transaction, directory, name, S_FILE | (mode & S_IUMSK),
 		omode, 0, vnodeID);
 
 	if (status >= B_OK) {
@@ -817,22 +783,24 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *pa
 
 	Inode *link;
 	off_t id;
-	status = Inode::Create(&transaction, directory, name, S_SYMLINK | 0777, 0, 0, &id, &link);
+	status = Inode::Create(transaction, directory, name, S_SYMLINK | 0777, 0, 0, &id, &link);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
 	size_t length = strlen(path);
 	if (length < SHORT_SYMLINK_NAME_LENGTH) {
-		strcpy(link->Node()->short_symlink, path);
-		status = link->WriteBack(&transaction);
+		strcpy(link->Node().short_symlink, path);
 	} else {
-		link->Node()->flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_LONG_SYMLINK | INODE_LOGGED);
+		link->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_LONG_SYMLINK | INODE_LOGGED);
 		// The following call will have to write the inode back, so
 		// we don't have to do that here...
-		status = link->WriteAt(&transaction, 0, (const uint8 *)path, &length);
+		status = link->WriteAt(transaction, 0, (const uint8 *)path, &length);
 	}
 	// ToDo: would be nice if Inode::Create() would let the INODE_NOT_READY
 	//	flag set until here, so that it can be accessed directly
+
+	if (status == B_OK)
+		status = link->WriteBack(transaction);
 
 	// Inode::Create() left the inode locked in memory
 	put_vnode(volume->ID(), id);
@@ -881,7 +849,7 @@ bfs_unlink(void *_ns, void *_directory, const char *name)
 	Transaction transaction(volume, directory->BlockNumber());
 
 	off_t id;
-	if ((status = directory->Remove(&transaction, name, &id)) == B_OK) {
+	if ((status = directory->Remove(transaction, name, &id)) == B_OK) {
 		transaction.Done();
 
 		notify_listener(B_ENTRY_REMOVED, volume->ID(), directory->ID(), 0, id, NULL);
@@ -968,7 +936,7 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			RETURN_ERROR(status);
 	}
 
-	status = newTree->Insert(&transaction, (const uint8 *)newName, strlen(newName), id);
+	status = newTree->Insert(transaction, (const uint8 *)newName, strlen(newName), id);
 	if (status == B_NAME_IN_USE) {
 		// If there is already a file with that name, we have to remove
 		// it, as long it's not a directory with files in it
@@ -983,13 +951,13 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 		if (vnode.Get(&other) < B_OK)
 			return B_NAME_IN_USE;
 
-		status = newDirectory->Remove(&transaction, newName, NULL, other->IsDirectory());
+		status = newDirectory->Remove(transaction, newName, NULL, other->IsDirectory());
 		if (status < B_OK)
 			return status;
 
 		notify_listener(B_ENTRY_REMOVED, volume->ID(), newDirectory->ID(), 0, clobber, NULL);
 
-		status = newTree->Insert(&transaction, (const uint8 *)newName, strlen(newName), id);
+		status = newTree->Insert(transaction, (const uint8 *)newName, strlen(newName), id);
 	}
 	if (status < B_OK)
 		return status;
@@ -1001,18 +969,18 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 	// update the name only when they differ
 	bool nameUpdated = false;
 	if (strcmp(oldName, newName)) {
-		status = inode->SetName(&transaction, newName);
+		status = inode->SetName(transaction, newName);
 		if (status == B_OK) {
 			Index index(volume);
-			index.UpdateName(&transaction, oldName, newName, inode);
+			index.UpdateName(transaction, oldName, newName, inode);
 			nameUpdated = true;
 		}
 	}
 
 	if (status == B_OK) {
-		status = tree->Remove(&transaction, (const uint8 *)oldName, strlen(oldName), id);
+		status = tree->Remove(transaction, (const uint8 *)oldName, strlen(oldName), id);
 		if (status == B_OK) {
-			inode->Node()->parent = newDirectory->BlockRun();
+			inode->Parent() = newDirectory->BlockRun();
 
 			// if it's a directory, update the parent directory pointer
 			// in its tree if necessary
@@ -1020,17 +988,17 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			if (oldDirectory != newDirectory
 				&& inode->IsDirectory()
 				&& (status = inode->GetTree(&movedTree)) == B_OK)
-				status = movedTree->Replace(&transaction, (const uint8 *)"..", 2, newDirectory->ID());
+				status = movedTree->Replace(transaction, (const uint8 *)"..", 2, newDirectory->ID());
+
+			if (status == B_OK)
+				status = inode->WriteBack(transaction);
 
 			if (status == B_OK) {
-				status = inode->WriteBack(&transaction);
-				if (status == B_OK)	{
-					transaction.Done();
+				transaction.Done();
 
-					notify_listener(B_ENTRY_MOVED, volume->ID(), oldDirectory->ID(),
-						newDirectory->ID(), id, newName);
-					return B_OK;
-				}
+				notify_listener(B_ENTRY_MOVED, volume->ID(), oldDirectory->ID(),
+					newDirectory->ID(), id, newName);
+				return B_OK;
 			}
 			// If we get here, something has gone wrong already!
 
@@ -1039,25 +1007,25 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			// for us)
 			// Anyway, if we overwrote a file in the target directory
 			// this is lost now (only in-memory, not on-disk)...
-			bailStatus = tree->Insert(&transaction, (const uint8 *)oldName, strlen(oldName), id);
+			bailStatus = tree->Insert(transaction, (const uint8 *)oldName, strlen(oldName), id);
 			if (movedTree != NULL)
-				movedTree->Replace(&transaction, (const uint8 *)"..", 2, oldDirectory->ID());
+				movedTree->Replace(transaction, (const uint8 *)"..", 2, oldDirectory->ID());
 		}
 	}
 
 	if (bailStatus == B_OK && nameUpdated) {
-		bailStatus = inode->SetName(&transaction, oldName);
+		bailStatus = inode->SetName(transaction, oldName);
 		if (status == B_OK) {
 			// update inode and index
-			inode->WriteBack(&transaction);
+			inode->WriteBack(transaction);
 
 			Index index(volume);
-			index.UpdateName(&transaction, newName, oldName, inode);
+			index.UpdateName(transaction, newName, oldName, inode);
 		}
 	}
 
 	if (bailStatus == B_OK)
-		bailStatus = newTree->Remove(&transaction, (const uint8 *)newName, strlen(newName), id);
+		bailStatus = newTree->Remove(transaction, (const uint8 *)newName, strlen(newName), id);
 
 	if (bailStatus < B_OK)
 		volume->Panic();
@@ -1092,7 +1060,7 @@ bfs_open(void *_ns, void *_node, int omode, void **_cookie)
 		//return B_IS_A_DIRECTORY;
 	}
 
-	status_t status = inode->CheckPermissions(oModeToAccess(omode));
+	status_t status = inode->CheckPermissions(openModeToAccess(omode));
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
@@ -1119,7 +1087,7 @@ bfs_open(void *_ns, void *_node, int omode, void **_cookie)
 		WriteLocked locked(inode->Lock());
 		Transaction transaction(volume, inode->BlockNumber());
 
-		status_t status = inode->SetFileSize(&transaction, 0);
+		status_t status = inode->SetFileSize(transaction, 0);
 		if (status < B_OK) {
 			// bfs_free_cookie() is only called if this function is successful
 			free(cookie);
@@ -1150,7 +1118,7 @@ bfs_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer, size_t 
 	}
 
 	ReadLocked locked(inode->Lock());
-	return file_cache_read(inode->FileCache(), pos, buffer, _length);
+	return inode->ReadAt(pos, (uint8 *)buffer, _length);
 }
 
 
@@ -1184,7 +1152,7 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 		// it might not be needed at all (the contents of
 		// regular files aren't logged)
 
-	status_t status = inode->WriteAt(&transaction, pos, (const uint8 *)buffer, _length);
+	status_t status = inode->WriteAt(transaction, pos, (const uint8 *)buffer, _length);
 
 	if (status == B_OK)
 		transaction.Done();
@@ -1201,12 +1169,6 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 			cookie->last_size = inode->Size();
 			cookie->last_notification = system_time();
 		}
-
-		// This will flush the dirty blocks to disk from time to time.
-		// It's done here and not in Inode::WriteAt() so that it won't
-		// add to the duration of a transaction - it might even be a
-		// good idea to offload those calls to another thread
-		volume->WriteCachedBlocksIfNecessary();
 	}
 
 	return status;
@@ -1256,19 +1218,19 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		Index index(volume);
 
 		if (inode->OldSize() != inode->Size()) {
-			status = inode->Trim(&transaction);
+			status = inode->Trim(transaction);
 			if (status < B_OK)
 				FATAL(("Could not trim preallocated blocks!"));
 	
-			index.UpdateSize(&transaction, inode);
+			index.UpdateSize(transaction, inode);
 			changed = true;
 		}
 		if (inode->OldLastModified() != inode->LastModified()) {
-			index.UpdateLastModified(&transaction, inode, inode->LastModified());
+			index.UpdateLastModified(transaction, inode, inode->LastModified());
 			changed = true;
-			
+
 			// updating the index doesn't write back the inode
-			inode->WriteBack(&transaction);
+			inode->WriteBack(transaction);
 		}
 
 		if (status == B_OK)
@@ -1276,14 +1238,6 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 
 		if (changed)
 			notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
-	}
-
-	if (inode->Flags() & INODE_NO_CACHE) {
-		volume->Pool().ReleaseBuffers();
-		inode->Node()->flags &= HOST_ENDIAN_TO_BFS_INT32(~INODE_NO_CACHE);
-			// We don't need to save the inode, because INODE_NO_CACHE is a
-			// non-permanent flag which will be removed when the inode is loaded
-			// into memory.
 	}
 
 	if (inode->Flags() & INODE_CHKBFS_RUNNING) {
@@ -1340,7 +1294,7 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t bufferSize)
 		return B_OK;
 	}
 
-	if (strlcpy(buffer, inode->Node()->short_symlink, bufferSize) > bufferSize)
+	if (strlcpy(buffer, inode->Node().short_symlink, bufferSize) > bufferSize)
 		return B_BUFFER_OVERFLOW;
 
 	return B_OK;
@@ -1378,7 +1332,7 @@ bfs_create_dir(void *_ns, void *_directory, const char *name, int mode, vnode_id
 	// Inode::Create() locks the inode if we pass the "id" parameter, but we
 	// need it anyway
 	off_t id;
-	status = Inode::Create(&transaction, directory, name, S_DIRECTORY | (mode & S_IUMSK), 0, 0, &id);
+	status = Inode::Create(transaction, directory, name, S_DIRECTORY | (mode & S_IUMSK), 0, 0, &id);
 	if (status == B_OK) {
 		*_newVnodeID = id;
 		put_vnode(volume->ID(), id);
@@ -1408,7 +1362,7 @@ bfs_remove_dir(void *_ns, void *_directory, const char *name)
 	Transaction transaction(volume, directory->BlockNumber());
 
 	off_t id;
-	status_t status = directory->Remove(&transaction, name, &id, true);
+	status_t status = directory->Remove(transaction, name, &id, true);
 	if (status == B_OK) {
 		transaction.Done();
 
@@ -1475,11 +1429,7 @@ bfs_read_dir(void *_ns, void *_node, void *_cookie, struct dirent *dirent,
 	dirent->d_dev = volume->ID();
 	dirent->d_ino = id;
 
-#ifdef KEEP_WRONG_DIRENT_RECLEN
-	dirent->d_reclen = length;
-#else
 	dirent->d_reclen = sizeof(struct dirent) + length;
-#endif
 
 	*_num = 1;
 	return B_OK;
@@ -1602,11 +1552,7 @@ bfs_read_attrdir(void *_ns, void *node, void *_cookie, long *num, struct dirent 
 	Volume *volume = (Volume *)_ns;
 
 	dirent->d_dev = volume->ID();
-#ifdef KEEP_WRONG_DIRENT_RECLEN
-	dirent->d_reclen = length;
-#else
 	dirent->d_reclen = sizeof(struct dirent) + length;
-#endif
 
 	*num = 1;
 	return B_OK;
@@ -1633,7 +1579,7 @@ bfs_remove_attr(void *_ns, void *_node, const char *name)
 #endif
 	Transaction transaction(volume, inode->BlockNumber());
 
-	status = inode->RemoveAttribute(&transaction, name);
+	status = inode->RemoveAttribute(transaction, name);
 	if (status == B_OK) {
 		transaction.Done();
 
@@ -1725,7 +1671,7 @@ bfs_write_attr(void *_ns, void *_node, const char *name, int type, const void *b
 #endif
 	Transaction transaction(volume, inode->BlockNumber());
 
-	status = inode->WriteAttribute(&transaction, name, type, pos, (const uint8 *)buffer, _length);
+	status = inode->WriteAttribute(transaction, name, type, pos, (const uint8 *)buffer, _length);
 	if (status == B_OK) {
 		transaction.Done();
 
@@ -1830,7 +1776,7 @@ bfs_read_indexdir(fs_volume _fs, fs_cookie _cookie, struct dirent *dirent, size_
 static status_t
 bfs_create_index(fs_volume _fs, const char *name, uint32 type, uint32 flags)
 {
-	FUNCTION_START(("name = \"%s\", type = %d, flags = %d\n", name, type, flags));
+	FUNCTION_START(("name = \"%s\", type = %ld, flags = %ld\n", name, type, flags));
 	if (_fs == NULL || name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
@@ -1849,7 +1795,7 @@ bfs_create_index(fs_volume _fs, const char *name, uint32 type, uint32 flags)
 	Transaction transaction(volume, volume->Indices());
 
 	Index index(volume);
-	status_t status = index.Create(&transaction, name, type);
+	status_t status = index.Create(transaction, name, type);
 
 	if (status == B_OK)
 		transaction.Done();
@@ -1883,7 +1829,7 @@ bfs_remove_index(void *_ns, const char *name)
 #endif
 	Transaction transaction(volume, volume->Indices());
 
-	status_t status = indices->Remove(&transaction, name);
+	status_t status = indices->Remove(transaction, name);
 	if (status == B_OK)
 		transaction.Done();
 
@@ -1904,21 +1850,21 @@ bfs_stat_index(fs_volume _fs, const char *name, struct stat *stat)
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
-	bfs_inode *node = index.Node()->Node();
+	bfs_inode &node = index.Node()->Node();
 
 	stat->st_type = index.Type();
-	stat->st_size = node->data.Size();
-	stat->st_mode = node->Mode();
+	stat->st_size = node.data.Size();
+	stat->st_mode = node.Mode();
 
 	stat->st_nlink = 1;
 	stat->st_blksize = 65536;
 
-	stat->st_uid = node->UserID();
-	stat->st_gid = node->GroupID();
+	stat->st_uid = node.UserID();
+	stat->st_gid = node.GroupID();
 
 	stat->st_atime = time(NULL);
-	stat->st_mtime = stat->st_ctime = (time_t)(node->LastModifiedTime() >> INODE_TIME_SHIFT);
-	stat->st_crtime = (time_t)(node->CreateTime() >> INODE_TIME_SHIFT);
+	stat->st_mtime = stat->st_ctime = (time_t)(node.LastModifiedTime() >> INODE_TIME_SHIFT);
+	stat->st_crtime = (time_t)(node.CreateTime() >> INODE_TIME_SHIFT);
 
 	return B_OK;
 }

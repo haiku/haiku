@@ -3,27 +3,19 @@ SubDir OBOS_TOP src add-ons kernel file_systems bfs ;
 # save original optimization level
 oldOPTIM = $(OPTIM) ;
 
+# R5 support is currently disabled!
+#
+# Have a look in src/tests/add-ons/kernel/file_systems/bfs/r5/
+# for an R5 compatible version.
+# In order to make the current BFS version R5 compatible again,
+# we would need to port over the Haiku cache API to R5.
+
 # set some additional defines
 {
 	local defines =
-		KEEP_WRONG_DIRENT_RECLEN
 		UNSAFE_GET_VNODE
 		#BFS_BIG_ENDIAN_ONLY
 		;
-
-	# By default, the R5 API version is used unless you define this
-	if $(COMPILE_FOR_ZETA) {
-		defines += COMPILE_FOR_ZETA ;
-	}
-
-	# Enable OpenBFS to be compiled as a full BFS replacement. Will
-	# report itself as "bfs" instead of "obfs" (only R5 version)
-	if $(BFS_REPLACEMENT) {
-		defines += BFS_REPLACEMENT ;
-		bfsAddOnName = bfs ;
-	} else {
-		bfsAddOnName = obfs ;
-	}
 
 	if $(DEBUG) = 0 {
 		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
@@ -39,7 +31,7 @@ UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
-KernelStaticLibrary libbfs :
+KernelAddon bfs : kernel file_systems :
 	BlockAllocator.cpp
 	BPlusTree.cpp
 	kernel_cpp.cpp
@@ -50,37 +42,14 @@ KernelStaticLibrary libbfs :
 	Query.cpp
 	Utility.cpp
 	Volume.cpp
-	BufferPool.cpp
-	;
 
-KernelAddon bfs : kernel file_systems :
 	kernel_interface.cpp
 	disk_device_interface.cpp
-	: libbfs.a
-	;
-
-R5KernelAddon $(bfsAddOnName)_r5 : kernel file_systems :
-	kernel_interface_r5.cpp
-	: libbfs.a
 	;
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
 	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
-
-#-----------------------------------------------------
-
-rule InstallBFS
-{
-	Depends $(<) : $(>) ;
-}
-
-actions ignore InstallBFS
-{
-	cp $(>) /boot/home/config/add-ons/kernel/file_systems/
-}
-
-InstallBFS install : obfs ;
 
 # restore original optimization level
 OPTIM = $(oldOPTIM) ;

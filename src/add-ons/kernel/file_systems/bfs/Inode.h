@@ -1,10 +1,10 @@
+/* Inode - inode access functions
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef INODE_H
 #define INODE_H
-/* Inode - inode access functions
-**
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include <KernelExport.h>
@@ -17,9 +17,6 @@
 #	define _IMPEXP_KERNEL
 #endif
 
-#include <lock.h>
-#include <cache.h>
-
 #include <string.h>
 #include <unistd.h>
 
@@ -28,12 +25,14 @@
 #include "Lock.h"
 #include "Chain.h"
 #include "Debug.h"
+#include "CachedBlock.h"
 
 
 class BPlusTree;
 class TreeIterator;
 class AttributeIterator;
 class InodeAllocator;
+class NodeGetter;
 
 
 enum inode_type {
@@ -46,59 +45,21 @@ enum inode_type {
 						| S_ULONG_LONG_INDEX | S_FLOAT_INDEX | S_DOUBLE_INDEX)
 };
 
-
-// The CachedBlock class is completely implemented as inlines.
-// It should be used when cache single blocks to make sure they
-// will be properly released after use (and it's also very
-// convenient to use them).
-
-class CachedBlock {
+class Inode {
 	public:
-		CachedBlock(Volume *volume);
-		CachedBlock(Volume *volume, off_t block, bool empty = false);
-		CachedBlock(Volume *volume, block_run run, bool empty = false);
-		CachedBlock(CachedBlock *cached);
-		~CachedBlock();
-
-		inline void Keep();
-		inline void Unset();
-		inline uint8 *SetTo(off_t block, bool empty = false);
-		inline uint8 *SetTo(block_run run, bool empty = false);
-		inline status_t WriteBack(Transaction *transaction);
-
-		uint8 *Block() const { return fBlock; }
-		off_t BlockNumber() const { return fBlockNumber; }
-		uint32 BlockSize() const { return fVolume->BlockSize(); }
-		uint32 BlockShift() const { return fVolume->BlockShift(); }
-
-	private:
-		CachedBlock(const CachedBlock &);
-		CachedBlock &operator=(const CachedBlock &);
-			// no implementation
-
-	protected:
-		Volume	*fVolume;
-		off_t	fBlockNumber;
-		uint8	*fBlock;
-};
-
-//--------------------------------------
-
-class Inode : public CachedBlock {
-	public:
-		Inode(Volume *volume, vnode_id id, bool empty = false, uint8 reenter = 0);
-		Inode(CachedBlock *cached);
+		Inode(Volume *volume, vnode_id id);
+		Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode, block_run &run);
+		//Inode(CachedBlock *cached);
 		~Inode();
 
-		bfs_inode *Node() const { return (bfs_inode *)fBlock; }
-		vnode_id ID() const { return fVolume->ToVnode(fBlockNumber); }
+		//bfs_inode *Node() const { return (bfs_inode *)fBlock; }
+		vnode_id ID() const { return fID; }
+		off_t BlockNumber() const { return fVolume->VnodeToBlock(fID); }
 
 		ReadWriteLock &Lock() { return fLock; }
 		SimpleLock &SmallDataLock() { return fSmallDataLock; }
+		status_t WriteBack(Transaction &transaction);
 
-		mode_t Mode() const { return Node()->Mode(); }
-		uint32 Type() const { return Node()->Type(); }
-		int32 Flags() const { return Node()->Flags(); }
 		bool IsContainer() const { return Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR); }
 			// note, that this test will also be true for S_IFBLK (not that it's used in the fs :)
 		bool IsDirectory() const { return (Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR)) == S_DIRECTORY; }
@@ -113,12 +74,17 @@ class Inode : public CachedBlock {
 		bool HasUserAccessableStream() const { return S_ISREG(Mode()); }
 			// currently only files can be accessed with bfs_read()/bfs_write()
 
-		off_t Size() const { return Node()->data.Size(); }
-		off_t LastModified() const { return Node()->last_modified_time; }
+		mode_t Mode() const { return fNode.Mode(); }
+		uint32 Type() const { return fNode.Type(); }
+		int32 Flags() const { return fNode.Flags(); }
 
-		block_run &BlockRun() const { return Node()->inode_num; }
-		block_run &Parent() const { return Node()->parent; }
-		block_run &Attributes() const { return Node()->attributes; }
+		off_t Size() const { return fNode.data.Size(); }
+		off_t LastModified() const { return fNode.last_modified_time; }
+
+		const block_run &BlockRun() const { return fNode.inode_num; }
+		block_run &Parent() { return fNode.parent; }
+		block_run &Attributes() { return fNode.attributes; }
+
 		Volume *GetVolume() const { return fVolume; }
 
 		status_t InitCheck(bool checkNode = true);
@@ -126,25 +92,25 @@ class Inode : public CachedBlock {
 		status_t CheckPermissions(int accessMode) const;
 
 		// small_data access methods
-		status_t MakeSpaceForSmallData(Transaction *transaction, const char *name, int32 length);
-		status_t RemoveSmallData(Transaction *transaction, const char *name);
-		status_t AddSmallData(Transaction *transaction, const char *name, uint32 type,
+		status_t MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node, const char *name, int32 length);
+		status_t RemoveSmallData(Transaction &transaction, NodeGetter &node, const char *name);
+		status_t AddSmallData(Transaction &transaction, NodeGetter &node, const char *name, uint32 type,
 					const uint8 *data, size_t length, bool force = false);
-		status_t GetNextSmallData(small_data **_smallData) const;
-		small_data *FindSmallData(const char *name) const;
-		const char *Name() const;
+		status_t GetNextSmallData(bfs_inode *node, small_data **_smallData) const;
+		small_data *FindSmallData(const bfs_inode *node, const char *name) const;
+		const char *Name(const bfs_inode *node) const;
 		status_t GetName(char *buffer) const;
-		status_t SetName(Transaction *transaction, const char *name);
+		status_t SetName(Transaction &transaction, const char *name);
 
 		// high-level attribute methods
 		status_t ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer, size_t *_length);
-		status_t WriteAttribute(Transaction *transaction, const char *name, int32 type, off_t pos, const uint8 *buffer, size_t *_length);
-		status_t RemoveAttribute(Transaction *transaction, const char *name);
+		status_t WriteAttribute(Transaction &transaction, const char *name, int32 type, off_t pos, const uint8 *buffer, size_t *_length);
+		status_t RemoveAttribute(Transaction &transaction, const char *name);
 
 		// attribute methods
 		status_t GetAttribute(const char *name, Inode **attribute);
 		void ReleaseAttribute(Inode *attribute);
-		status_t CreateAttribute(Transaction *transaction, const char *name, uint32 type, Inode **attribute);
+		status_t CreateAttribute(Transaction &transaction, const char *name, uint32 type, Inode **attribute);
 
 		// for directories only:
 		status_t GetTree(BPlusTree **);
@@ -154,25 +120,27 @@ class Inode : public CachedBlock {
 		status_t FindBlockRun(off_t pos, block_run &run, off_t &offset);
 
 		status_t ReadAt(off_t pos, uint8 *buffer, size_t *length);
-		status_t WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer, size_t *length);
+		status_t WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer, size_t *length);
 		status_t FillGapWithZeros(off_t oldSize, off_t newSize);
 
-		status_t SetFileSize(Transaction *transaction, off_t size);
-		status_t Append(Transaction *transaction, off_t bytes);
-		status_t Trim(Transaction *transaction);
+		status_t SetFileSize(Transaction &transaction, off_t size);
+		status_t Append(Transaction &transaction, off_t bytes);
+		status_t Trim(Transaction &transaction);
 
-		status_t Free(Transaction *transaction);
+		status_t Free(Transaction &transaction);
 		status_t Sync();
 
+		bfs_inode &Node() { return fNode; }
+
 		// create/remove inodes
-		status_t Remove(Transaction *transaction, const char *name, off_t *_id = NULL,
+		status_t Remove(Transaction &transaction, const char *name, off_t *_id = NULL,
 					bool isDirectory = false);
-		static status_t Create(Transaction *transaction, Inode *parent, const char *name,
+		static status_t Create(Transaction &transaction, Inode *parent, const char *name,
 					int32 mode, int omode, uint32 type, off_t *_id = NULL, Inode **_inode = NULL);
 
 		// index maintaining helper
 		void UpdateOldSize() { fOldSize = Size(); }
-		void UpdateOldLastModified() { fOldLastModified = Node()->LastModifiedTime(); }
+		void UpdateOldLastModified() { fOldLastModified = Node().LastModifiedTime(); }
 		off_t OldSize() { return fOldSize; }
 		off_t OldLastModified() { return fOldLastModified; }
 
@@ -186,33 +154,69 @@ class Inode : public CachedBlock {
 			// no implementation
 
 		friend void dump_inode(Inode &inode);
-		friend AttributeIterator;
-		friend InodeAllocator;
+		friend class AttributeIterator;
+		friend class InodeAllocator;
 
-		void Initialize();
-
-		status_t RemoveSmallData(small_data *item, int32 index);
+		status_t RemoveSmallData(bfs_inode *node, small_data *item, int32 index);
 
 		void AddIterator(AttributeIterator *iterator);
 		void RemoveIterator(AttributeIterator *iterator);
 
-		status_t FreeStaticStreamArray(Transaction *transaction, int32 level, block_run run,
+		status_t FreeStaticStreamArray(Transaction &transaction, int32 level, block_run run,
 					off_t size, off_t offset, off_t &max);
-		status_t FreeStreamArray(Transaction *transaction, block_run *array, uint32 arrayLength,
+		status_t FreeStreamArray(Transaction &transaction, block_run *array, uint32 arrayLength,
 					off_t size, off_t &offset, off_t &max);
-		status_t AllocateBlockArray(Transaction *transaction, block_run &run);
-		status_t GrowStream(Transaction *transaction, off_t size);
-		status_t ShrinkStream(Transaction *transaction, off_t size);
+		status_t AllocateBlockArray(Transaction &transaction, block_run &run);
+		status_t GrowStream(Transaction &transaction, off_t size);
+		status_t ShrinkStream(Transaction &transaction, off_t size);
 
+	private:
+		ReadWriteLock	fLock;
+		Volume			*fVolume;
+		vnode_id		fID;
 		BPlusTree		*fTree;
 		Inode			*fAttributes;
-		ReadWriteLock	fLock;
+		void			*fCache;
+		bfs_inode		fNode;
 		off_t			fOldSize;			// we need those values to ensure we will remove
 		off_t			fOldLastModified;	// the correct keys from the indices
-		void			*fCache;
 
 		mutable SimpleLock	fSmallDataLock;
 		Chain<AttributeIterator> fIterators;
+};
+
+
+class NodeGetter : public CachedBlock {
+	public:
+		NodeGetter(Volume *volume)
+			: CachedBlock(volume)
+		{
+		}
+
+		NodeGetter(Volume *volume, const Inode *inode)
+			: CachedBlock(volume)
+		{
+			SetTo(volume->VnodeToBlock(inode->ID()));
+		}
+
+		NodeGetter(Volume *volume, Transaction &transaction, const Inode *inode, bool empty = false)
+			: CachedBlock(volume)
+		{
+			SetToWritable(transaction, volume->VnodeToBlock(inode->ID()), empty);
+		}
+
+		~NodeGetter()
+		{
+		}
+
+		const bfs_inode *
+		SetToNode(const Inode *inode)
+		{
+			return (const bfs_inode *)SetTo(fVolume->VnodeToBlock(inode->ID()));
+		}
+
+		const bfs_inode *Node() const { return (const bfs_inode *)Block(); }
+		bfs_inode *WritableNode() const { return (bfs_inode *)Block();  }
 };
 
 
@@ -241,13 +245,13 @@ class Vnode {
 			Put();
 		}
 
-		status_t Get(Inode **inode)
+		status_t Get(Inode **_inode)
 		{
 			// should we check inode against NULL here? it should not be necessary
 #ifdef UNSAFE_GET_VNODE
 			RecursiveLocker locker(fVolume->Lock());
 #endif
-			return get_vnode(fVolume->ID(), fID, (void **)inode);
+			return get_vnode(fVolume->ID(), fID, (void **)_inode);
 		}
 
 		void Put()
@@ -291,113 +295,20 @@ class AttributeIterator {
 };
 
 
-//--------------------------------------
-// inlines
-
-
-inline
-CachedBlock::CachedBlock(Volume *volume)
-	:
-	fVolume(volume),
-	fBlock(NULL)
-{
-}
-
-
-inline
-CachedBlock::CachedBlock(Volume *volume, off_t block, bool empty)
-	:
-	fVolume(volume),
-	fBlock(NULL)
-{
-	SetTo(block, empty);
-}
-
-
-inline
-CachedBlock::CachedBlock(Volume *volume, block_run run, bool empty)
-	:
-	fVolume(volume),
-	fBlock(NULL)
-{
-	SetTo(volume->ToBlock(run), empty);
-}
-
-
-inline 
-CachedBlock::CachedBlock(CachedBlock *cached)
-	:
-	fVolume(cached->fVolume),
-	fBlockNumber(cached->BlockNumber()),
-	fBlock(cached->fBlock)
-{
-	cached->Keep();
-}
-
-
-inline
-CachedBlock::~CachedBlock()
-{
-	Unset();
-}
-
-
-inline void
-CachedBlock::Keep()
-{
-	fBlock = NULL;
-}
-
-
-inline void
-CachedBlock::Unset()
-{
-	if (fBlock != NULL)
-		release_block(fVolume->Device(), fBlockNumber);
-}
-
-
-inline uint8 *
-CachedBlock::SetTo(off_t block, bool empty)
-{
-	Unset();
-	fBlockNumber = block;
-	return fBlock = empty ? (uint8 *)get_empty_block(fVolume->Device(), block, BlockSize())
-						  : (uint8 *)get_block(fVolume->Device(), block, BlockSize());
-}
-
-
-inline uint8 *
-CachedBlock::SetTo(block_run run, bool empty)
-{
-	return SetTo(fVolume->ToBlock(run), empty);
-}
-
-
-inline status_t
-CachedBlock::WriteBack(Transaction *transaction)
-{
-	if (transaction == NULL || fBlock == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
-	return transaction->WriteBlocks(fBlockNumber, fBlock);
-}
-
-
-/**	Converts the "omode", the open flags given to bfs_open(), into
+/**	Converts the open mode, the open flags given to bfs_open(), into
  *	access modes, e.g. since O_RDONLY requires read access to the
  *	file, it will be converted to R_OK.
  */
 
 inline int
-oModeToAccess(int omode)
+openModeToAccess(int openMode)
 {
-	omode &= O_RWMASK;
-	if (omode == O_RDONLY)
+	openMode &= O_RWMASK;
+	if (openMode == O_RDONLY)
 		return R_OK;
-	else if (omode == O_WRONLY)
+	else if (openMode == O_WRONLY)
 		return W_OK;
-	
+
 	return R_OK | W_OK;
 }
 

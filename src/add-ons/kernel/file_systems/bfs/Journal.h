@@ -1,10 +1,10 @@
+/* Journal - transaction and logging
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef JOURNAL_H
 #define JOURNAL_H
-/* Journal - transaction and logging
-**
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include <KernelExport.h>
@@ -17,9 +17,6 @@
 #ifndef _IMPEXP_KERNEL
 #	define _IMPEXP_KERNEL
 #endif
-
-#include <lock.h>
-#include <cache.h>
 
 #include "Volume.h"
 #include "Chain.h"
@@ -52,7 +49,7 @@ class Journal {
 		status_t Lock(Transaction *owner);
 		void Unlock(Transaction *owner, bool success);
 
-		status_t CheckLogEntry(int32 count, off_t *array);
+		status_t CheckLogEntry(int32 count, const off_t *array);
 		status_t ReplayLogEntry(int32 *start);
 		status_t ReplayLog();
 
@@ -64,13 +61,14 @@ class Journal {
 
 		status_t FlushLogAndBlocks();
 		Volume *GetVolume() const { return fVolume; }
+		int32 TransactionID() const { return fTransactionID; }
 
 		inline uint32 FreeLogBlocks() const;
 
 	private:
 		friend log_entry;
 
-		static void blockNotify(off_t blockNumber, size_t numBlocks, void *arg);
+		static void blockNotify(int32 transactionID, void *arg);
 		status_t TransactionDone(bool success);
 
 		Volume		*fVolume;
@@ -84,6 +82,7 @@ class Journal {
 		log_entry	*fCurrent;
 		bool		fHasChangedBlocks;
 		bigtime_t	fTimestamp;
+		int32		fTransactionID;
 };
 
 
@@ -143,10 +142,15 @@ class Transaction {
 			if (fJournal == NULL)
 				return B_NO_INIT;
 
+			// ToDo: implement this properly!
+#if 0
 			return fJournal->LogBlocks(blockNumber, buffer, numBlocks);
+#endif
+			return B_ERROR;
 		}
 
 		Volume	*GetVolume() { return fJournal != NULL ? fJournal->GetVolume() : NULL; }
+		int32 ID() const { return fJournal->TransactionID(); }
 
 	private:
 		Transaction(const Transaction &);

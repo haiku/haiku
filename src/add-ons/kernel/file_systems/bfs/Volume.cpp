@@ -1,8 +1,8 @@
 /* Volume - BFS super block, mounting, etc.
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Debug.h"
@@ -40,8 +40,8 @@ class DeviceOpener {
 		~DeviceOpener();
 
 		int Open(const char *device, int mode);
-		status_t InitCache(off_t numBlocks);
-		void RemoveCache(int mode);
+		void *InitCache(off_t numBlocks, uint32 blockSize);
+		void RemoveCache(bool allowWrites);
 
 		void Keep();
 
@@ -51,13 +51,13 @@ class DeviceOpener {
 
 	private:
 		int		fDevice;
-		bool	fCached;
+		void	*fBlockCache;
 };
 
 
 DeviceOpener::DeviceOpener(const char *device, int mode)
 	:
-	fCached(false)
+	fBlockCache(NULL)
 {
 	Open(device, mode);
 }
@@ -66,14 +66,13 @@ DeviceOpener::DeviceOpener(const char *device, int mode)
 DeviceOpener::~DeviceOpener()
 {
 	if (fDevice >= B_OK) {
+		RemoveCache(false);
 		close(fDevice);
-		if (fCached)
-			remove_cached_device_blocks(fDevice, NO_WRITES);
 	}
 }
 
 
-int 
+int
 DeviceOpener::Open(const char *device, int mode)
 {
 	fDevice = open(device, mode);
@@ -81,30 +80,25 @@ DeviceOpener::Open(const char *device, int mode)
 }
 
 
-status_t
-DeviceOpener::InitCache(off_t numBlocks)
+void *
+DeviceOpener::InitCache(off_t numBlocks, uint32 blockSize)
 {
-	if (init_cache_for_device(fDevice, numBlocks) == B_OK) {
-		fCached = true;
-		return B_OK;
-	}
-
-	return B_ERROR;
+	return block_cache_create(fDevice, numBlocks, blockSize);
 }
 
 
-void 
-DeviceOpener::RemoveCache(int mode)
+void
+DeviceOpener::RemoveCache(bool allowWrites)
 {
-	if (!fCached)
+	if (fBlockCache == NULL)
 		return;
 
-	remove_cached_device_blocks(fDevice, mode);
-	fCached = false;
+	block_cache_delete(fBlockCache, allowWrites);
+	fBlockCache = NULL;
 }
 
 
-void 
+void
 DeviceOpener::Keep()
 {
 	fDevice = -1;
@@ -115,7 +109,7 @@ DeviceOpener::Keep()
  *	to compute the size, or fstat() if that failed.
  */
 
-status_t 
+status_t
 DeviceOpener::GetSize(off_t *_size, uint32 *_blockSize)
 {
 	device_geometry geometry;
@@ -247,7 +241,7 @@ Volume::IsValidSuperBlock()
 }
 
 
-void 
+void
 Volume::Panic()
 {
 	FATAL(("we have to panic... switch to read-only mode!\n"));
@@ -325,7 +319,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	fLogStart = fSuperBlock.LogStart();
 	fLogEnd = fSuperBlock.LogEnd();
 
-	if (opener.InitCache(NumBlocks()) != B_OK)
+	if ((fBlockCache = opener.InitCache(NumBlocks(), fBlockSize)) == NULL)
 		return B_ERROR;
 
 	fJournal = new Journal(this);
@@ -392,14 +386,14 @@ Volume::Unmount()
 
 	delete fIndicesNode;
 
-	remove_cached_device_blocks(fDevice, IsReadOnly() ? NO_WRITES : ALLOW_WRITES);
+	block_cache_delete(fBlockCache, !IsReadOnly());
 	close(fDevice);
 
 	return B_OK;
 }
 
 
-status_t 
+status_t
 Volume::Sync()
 {
 	return fJournal->FlushLogAndBlocks();
@@ -421,7 +415,7 @@ Volume::ValidateBlockRun(block_run run)
 }
 
 
-block_run 
+block_run
 Volume::ToBlockRun(off_t block) const
 {
 	block_run run;
@@ -433,7 +427,7 @@ Volume::ToBlockRun(off_t block) const
 
 
 status_t
-Volume::CreateIndicesRoot(Transaction *transaction)
+Volume::CreateIndicesRoot(Transaction &transaction)
 {
 	off_t id;
 	status_t status = Inode::Create(transaction, NULL, NULL,
@@ -446,14 +440,14 @@ Volume::CreateIndicesRoot(Transaction *transaction)
 }
 
 
-status_t 
-Volume::AllocateForInode(Transaction *transaction, const Inode *parent, mode_t type, block_run &run)
+status_t
+Volume::AllocateForInode(Transaction &transaction, const Inode *parent, mode_t type, block_run &run)
 {
 	return fBlockAllocator.AllocateForInode(transaction, &parent->BlockRun(), type, run);
 }
 
 
-status_t 
+status_t
 Volume::WriteSuperBlock()
 {
 	if (write_pos(fDevice, 512, &fSuperBlock, sizeof(disk_super_block)) != sizeof(disk_super_block))
@@ -484,7 +478,7 @@ Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type, const
  *	the queries - it wouldn't safe you anything in this case.
  */
 
-bool 
+bool
 Volume::CheckForLiveQuery(const char *attribute)
 {
 	// ToDo: check for a live query that depends on the specified attribute
@@ -492,7 +486,7 @@ Volume::CheckForLiveQuery(const char *attribute)
 }
 
 
-void 
+void
 Volume::AddQuery(Query *query)
 {
 	if (fQueryLock.Lock() < B_OK)
@@ -504,7 +498,7 @@ Volume::AddQuery(Query *query)
 }
 
 
-void 
+void
 Volume::RemoveQuery(Query *query)
 {
 	if (fQueryLock.Lock() < B_OK)

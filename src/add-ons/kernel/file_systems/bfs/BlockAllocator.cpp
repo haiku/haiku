@@ -1,8 +1,8 @@
 /* BlockAllocator - block bitmap handling and allocation policies
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Debug.h"
@@ -62,12 +62,16 @@ class AllocationBlock : public CachedBlock {
 		inline bool IsUsed(uint16 block);
 
 		status_t SetTo(AllocationGroup &group, uint16 block);
+		status_t SetToWritable(Transaction &transaction, AllocationGroup &group, uint16 block);
 
 		uint32 NumBlockBits() const { return fNumBits; }
 		uint32 &Block(int32 index) { return ((uint32 *)fBlock)[index]; }
 
 	private:
-		uint32 fNumBits;
+		uint32	fNumBits;
+#ifdef DEBUG
+		bool	fWritable;
+#endif
 };
 
 
@@ -78,8 +82,8 @@ class AllocationGroup {
 		void AddFreeRange(int32 start, int32 blocks);
 		bool IsFull() const { return fFreeBits == 0; }
 
-		status_t Allocate(Transaction *transaction, uint16 start, int32 length);
-		status_t Free(Transaction *transaction, uint16 start, int32 length);
+		status_t Allocate(Transaction &transaction, uint16 start, int32 length);
+		status_t Free(Transaction &transaction, uint16 start, int32 length);
 
 		uint32 fNumBits;
 		int32 fStart;
@@ -104,7 +108,26 @@ AllocationBlock::SetTo(AllocationGroup &group, uint16 block)
 	if ((block + 1) * fNumBits > group.fNumBits)
 		fNumBits = group.fNumBits % fNumBits;
 
+#ifdef DEBUG
+	fWritable = false;
+#endif
 	return CachedBlock::SetTo(group.fStart + block) != NULL ? B_OK : B_ERROR;
+}
+
+
+status_t 
+AllocationBlock::SetToWritable(Transaction &transaction, AllocationGroup &group, uint16 block)
+{
+	// 8 blocks per byte
+	fNumBits = fVolume->BlockSize() << 3;
+	// the last group may have less bits in the last block
+	if ((block + 1) * fNumBits > group.fNumBits)
+		fNumBits = group.fNumBits % fNumBits;
+
+#ifdef DEBUG
+	fWritable = true;
+#endif
+	return CachedBlock::SetToWritable(transaction, group.fStart + block) != NULL ? B_OK : B_ERROR;
 }
 
 
@@ -123,6 +146,9 @@ AllocationBlock::Allocate(uint16 start, uint16 numBlocks)
 {
 	ASSERT(start < fNumBits);
 	ASSERT(uint32(start + numBlocks) <= fNumBits);
+#ifdef DEBUG
+	ASSERT(fWritable);
+#endif
 
 	if (uint32(start + numBlocks) > fNumBits) {
 		FATAL(("Allocation::Allocate(): tried to allocate too many blocks: %u (numBlocks = %lu)!\n", numBlocks, fNumBits));
@@ -154,6 +180,9 @@ AllocationBlock::Free(uint16 start, uint16 numBlocks)
 {
 	ASSERT(start < fNumBits);
 	ASSERT(uint32(start + numBlocks) <= fNumBits);
+#ifdef DEBUG
+	ASSERT(fWritable);
+#endif
 
 	if (uint32(start + numBlocks) > fNumBits) {
 		FATAL(("Allocation::Free(): tried to free too many blocks: %u (numBlocks = %lu)!\n", numBlocks, fNumBits));
@@ -214,7 +243,7 @@ AllocationGroup::AddFreeRange(int32 start, int32 blocks)
  */
 
 status_t
-AllocationGroup::Allocate(Transaction *transaction, uint16 start, int32 length)
+AllocationGroup::Allocate(Transaction &transaction, uint16 start, int32 length)
 {
 	if (start > fNumBits)
 		return B_ERROR;
@@ -226,7 +255,7 @@ AllocationGroup::Allocate(Transaction *transaction, uint16 start, int32 length)
 		fFirstFree = start + length;
 	fFreeBits -= length;
 
-	Volume *volume = transaction->GetVolume();
+	Volume *volume = transaction.GetVolume();
 
 	// calculate block in the block bitmap and position within
 	uint32 bitsPerBlock = volume->BlockSize() << 3;
@@ -236,7 +265,7 @@ AllocationGroup::Allocate(Transaction *transaction, uint16 start, int32 length)
 	AllocationBlock cached(volume);
 
 	while (length > 0) {
-		if (cached.SetTo(*this, block) < B_OK)
+		if (cached.SetToWritable(transaction, *this, block) < B_OK)
 			RETURN_ERROR(B_IO_ERROR);
 
 		uint32 numBlocks = length;
@@ -244,9 +273,6 @@ AllocationGroup::Allocate(Transaction *transaction, uint16 start, int32 length)
 			numBlocks = cached.NumBlockBits() - start;
 
 		cached.Allocate(start, numBlocks);
-
-		if (cached.WriteBack(transaction) < B_OK)
-			return B_IO_ERROR;
 
 		length -= numBlocks;
 		start = 0;
@@ -267,7 +293,7 @@ AllocationGroup::Allocate(Transaction *transaction, uint16 start, int32 length)
  */
 
 status_t
-AllocationGroup::Free(Transaction *transaction, uint16 start, int32 length)
+AllocationGroup::Free(Transaction &transaction, uint16 start, int32 length)
 {
 	if (start > fNumBits)
 		return B_ERROR;
@@ -278,7 +304,7 @@ AllocationGroup::Free(Transaction *transaction, uint16 start, int32 length)
 		fFirstFree = start;
 	fFreeBits += length;
 
-	Volume *volume = transaction->GetVolume();
+	Volume *volume = transaction.GetVolume();
 
 	// calculate block in the block bitmap and position within
 	uint32 bitsPerBlock = volume->BlockSize() << 3;
@@ -288,7 +314,7 @@ AllocationGroup::Free(Transaction *transaction, uint16 start, int32 length)
 	AllocationBlock cached(volume);
 
 	while (length > 0) {
-		if (cached.SetTo(*this, block) < B_OK)
+		if (cached.SetToWritable(transaction, *this, block) < B_OK)
 			RETURN_ERROR(B_IO_ERROR);
 
 		uint16 freeLength = length;
@@ -296,9 +322,6 @@ AllocationGroup::Free(Transaction *transaction, uint16 start, int32 length)
 			freeLength = cached.NumBlockBits() - start;
 
 		cached.Free(start, freeLength);
-
-		if (cached.WriteBack(transaction) < B_OK)
-			return B_IO_ERROR;
 
 		length -= freeLength;
 		start = 0;
@@ -363,6 +386,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 
 	uint32 blocks = fBlocksPerGroup;
 	uint32 numBits = 8 * blocks * fVolume->BlockSize();
+	uint32 blockShift = fVolume->BlockShift();
 
 	uint32 *buffer = (uint32 *)malloc(numBits >> 3);
 	if (buffer == NULL)
@@ -375,7 +399,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 	// initialize the AllocationGroup objects and clear the on-disk bitmap
 
 	for (int32 i = 0; i < fNumGroups; i++) {
-		if (cached_write(fVolume->Device(), offset, buffer, blocks, fVolume->BlockSize()) < B_OK)
+		if (write_pos(fVolume->Device(), offset << blockShift, buffer, blocks << blockShift) < B_OK)
 			return B_ERROR;
 
 		// the last allocation group may contain less blocks than the others
@@ -391,7 +415,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction &transaction)
 	// reserve the boot block, the log area, and the block bitmap itself
 	uint32 reservedBlocks = fVolume->Log().Start() + fVolume->Log().Length();
 
-	if (fGroups[0].Allocate(&transaction, 0, reservedBlocks) < B_OK) {
+	if (fGroups[0].Allocate(transaction, 0, reservedBlocks) < B_OK) {
 		FATAL(("could not allocate reserved space for block bitmap/log!\n"));
 		return B_ERROR;
 	}
@@ -409,6 +433,7 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 	Volume *volume = allocator->fVolume;
 	uint32 blocks = allocator->fBlocksPerGroup;
 	uint32 numBits = 8 * blocks * volume->BlockSize();
+	uint32 blockShift = volume->BlockShift();
 	off_t freeBlocks = 0;
 
 	uint32 *buffer = (uint32 *)malloc(numBits >> 3);
@@ -421,8 +446,8 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 	off_t offset = 1;
 	int32 num = allocator->fNumGroups;
 
-	for (int32 i = 0;i < num;i++) {
-		if (cached_read(volume->Device(), offset, buffer, blocks, volume->BlockSize()) < B_OK)
+	for (int32 i = 0; i < num; i++) {
+		if (read_pos(volume->Device(), offset << blockShift, buffer, blocks << blockShift) < B_OK)
 			break;
 
 		// the last allocation group may contain less blocks than the others
@@ -457,7 +482,7 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 	uint32 reservedBlocks = volume->Log().Start() + volume->Log().Length();
 	if (allocator->CheckBlockRun(block_run::Run(0, 0, reservedBlocks)) < B_OK) {
 		Transaction transaction(volume, 0);
-		if (groups[0].Allocate(&transaction, 0, reservedBlocks) < B_OK) {
+		if (groups[0].Allocate(transaction, 0, reservedBlocks) < B_OK) {
 			FATAL(("could not allocate reserved space for block bitmap/log!\n"));
 			volume->Panic();
 		} else {
@@ -481,7 +506,7 @@ BlockAllocator::initialize(BlockAllocator *allocator)
 
 
 status_t
-BlockAllocator::AllocateBlocks(Transaction *transaction, int32 group, uint16 start,
+BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group, uint16 start,
 	uint16 maximum, uint16 minimum, block_run &run)
 {
 	if (maximum == 0)
@@ -586,7 +611,7 @@ BlockAllocator::AllocateBlocks(Transaction *transaction, int32 group, uint16 sta
 
 
 status_t 
-BlockAllocator::AllocateForInode(Transaction *transaction, const block_run *parent,
+BlockAllocator::AllocateForInode(Transaction &transaction, const block_run *parent,
 	mode_t type, block_run &run)
 {
 	// apply some allocation policies here (AllocateBlocks() will break them
@@ -604,7 +629,7 @@ BlockAllocator::AllocateForInode(Transaction *transaction, const block_run *pare
 
 
 status_t 
-BlockAllocator::Allocate(Transaction *transaction, const Inode *inode, off_t numBlocks,
+BlockAllocator::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks,
 	block_run &run, uint16 minimum)
 {
 	if (numBlocks <= 0)
@@ -633,19 +658,19 @@ BlockAllocator::Allocate(Transaction *transaction, const Inode *inode, off_t num
 
 	// are there already allocated blocks? (then just try to allocate near the last one)
 	if (inode->Size() > 0) {
-		data_stream *data = &inode->Node()->data;
+		const data_stream &data = inode->Node().data;
 		// ToDo: we currently don't care for when the data stream
 		// is already grown into the indirect ranges
-		if (data->max_double_indirect_range == 0
-			&& data->max_indirect_range == 0) {
+		if (data.max_double_indirect_range == 0
+			&& data.max_indirect_range == 0) {
 			// Since size > 0, there must be a valid block run in this stream
 			int32 last = 0;
 			for (; last < NUM_DIRECT_BLOCKS - 1; last++)
-				if (data->direct[last + 1].IsZero())
+				if (data.direct[last + 1].IsZero())
 					break;
 
-			group = data->direct[last].AllocationGroup();
-			start = data->direct[last].Start() + data->direct[last].Length();
+			group = data.direct[last].AllocationGroup();
+			start = data.direct[last].Start() + data.direct[last].Length();
 		}
 	} else if (inode->IsContainer() || inode->IsSymLink()) {
 		// directory and symbolic link data will go in the same allocation
@@ -661,7 +686,7 @@ BlockAllocator::Allocate(Transaction *transaction, const Inode *inode, off_t num
 
 
 status_t 
-BlockAllocator::Free(Transaction *transaction, block_run run)
+BlockAllocator::Free(Transaction &transaction, block_run run)
 {
 	Locker lock(fLock);
 
@@ -955,8 +980,9 @@ BlockAllocator::CheckNextNode(check_control *control)
 			// check if the inode's name is the same as in the b+tree
 			if (inode->IsRegularNode()) {
 				SimpleLocker locker(inode->SmallDataLock());
+				NodeGetter node(fVolume, inode);
 
-				const char *localName = inode->Name();
+				const char *localName = inode->Name(node.Node());
 				if (localName == NULL || strcmp(localName, name)) {
 					control->errors |= BFS_NAMES_DONT_MATCH;
 					FATAL(("Names differ: tree \"%s\", inode \"%s\"\n", name, localName));
@@ -986,8 +1012,8 @@ BlockAllocator::CheckNextNode(check_control *control)
 					// the bitmap anyway
 					Transaction transaction(fVolume, cookie->parent->BlockNumber());
 
-					inode->Node()->flags |= INODE_DONT_FREE_SPACE;
-					status = cookie->parent->Remove(&transaction, name, NULL, inode->IsContainer());
+					inode->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DONT_FREE_SPACE);
+					status = cookie->parent->Remove(transaction, name, NULL, inode->IsContainer());
 					if (status == B_OK)
 						transaction.Done();
 				} else
@@ -1140,7 +1166,7 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 	if (status < B_OK)
 		return status;
 
-	data_stream *data = &inode->Node()->data;
+	data_stream *data = &inode->Node().data;
 
 	// check the direct range
 

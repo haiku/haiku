@@ -1,8 +1,8 @@
 /* Index - index access functions
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Debug.h"
@@ -57,7 +57,7 @@ Index::Unset()
  *	the updated attribute.
  */
 
-status_t 
+status_t
 Index::SetTo(const char *name)
 {
 	// remove the old node, if the index is set for the second time
@@ -102,7 +102,7 @@ Index::SetTo(const char *name)
  *	corrupted somehow or not that of an index).
  */
 
-uint32 
+uint32
 Index::Type()
 {
 	if (fNode == NULL)
@@ -161,7 +161,7 @@ Index::KeySize()
 
 
 status_t
-Index::Create(Transaction *transaction, const char *name, uint32 type)
+Index::Create(Transaction &transaction, const char *name, uint32 type)
 {
 	Unset();
 
@@ -217,7 +217,7 @@ Index::Create(Transaction *transaction, const char *name, uint32 type)
  */
 
 status_t
-Index::Update(Transaction *transaction, const char *name, int32 type, const uint8 *oldKey,
+Index::Update(Transaction &transaction, const char *name, int32 type, const uint8 *oldKey,
 	uint16 oldLength, const uint8 *newKey, uint16 newLength, Inode *inode)
 {
 	if (name == NULL
@@ -277,22 +277,22 @@ Index::Update(Transaction *transaction, const char *name, int32 type, const uint
 }
 
 
-status_t 
-Index::InsertName(Transaction *transaction, const char *name, Inode *inode)
+status_t
+Index::InsertName(Transaction &transaction, const char *name, Inode *inode)
 {
 	return UpdateName(transaction, NULL, name, inode);
 }
 
 
-status_t 
-Index::RemoveName(Transaction *transaction, const char *name, Inode *inode)
+status_t
+Index::RemoveName(Transaction &transaction, const char *name, Inode *inode)
 {
 	return UpdateName(transaction, name, NULL, inode);
 }
 
 
-status_t 
-Index::UpdateName(Transaction *transaction, const char *oldName, const char *newName, Inode *inode)
+status_t
+Index::UpdateName(Transaction &transaction, const char *oldName, const char *newName, Inode *inode)
 {
 	uint16 oldLength = oldName ? strlen(oldName) : 0;
 	uint16 newLength = newName ? strlen(newName) : 0;
@@ -301,16 +301,16 @@ Index::UpdateName(Transaction *transaction, const char *oldName, const char *new
 }
 
 
-status_t 
-Index::InsertSize(Transaction *transaction, Inode *inode)
+status_t
+Index::InsertSize(Transaction &transaction, Inode *inode)
 {
 	off_t size = inode->Size();
 	return Update(transaction, "size", B_INT64_TYPE, NULL, 0, (uint8 *)&size, sizeof(int64), inode);
 }
 
 
-status_t 
-Index::RemoveSize(Transaction *transaction, Inode *inode)
+status_t
+Index::RemoveSize(Transaction &transaction, Inode *inode)
 {
 	// Inode::OldSize() is the size that's in the index
 	off_t size = inode->OldSize();
@@ -319,7 +319,7 @@ Index::RemoveSize(Transaction *transaction, Inode *inode)
 
 
 status_t
-Index::UpdateSize(Transaction *transaction, Inode *inode)
+Index::UpdateSize(Transaction &transaction, Inode *inode)
 {
 	off_t oldSize = inode->OldSize();
 	off_t newSize = inode->Size();
@@ -333,8 +333,8 @@ Index::UpdateSize(Transaction *transaction, Inode *inode)
 }
 
 
-status_t 
-Index::InsertLastModified(Transaction *transaction, Inode *inode)
+status_t
+Index::InsertLastModified(Transaction &transaction, Inode *inode)
 {
 	off_t modified = inode->LastModified();
 	return Update(transaction, "last_modified", B_INT64_TYPE, NULL, 0,
@@ -342,8 +342,8 @@ Index::InsertLastModified(Transaction *transaction, Inode *inode)
 }
 
 
-status_t 
-Index::RemoveLastModified(Transaction *transaction, Inode *inode)
+status_t
+Index::RemoveLastModified(Transaction &transaction, Inode *inode)
 {
 	// Inode::OldLastModified() is the value which is in the index
 	off_t modified = inode->OldLastModified();
@@ -352,8 +352,8 @@ Index::RemoveLastModified(Transaction *transaction, Inode *inode)
 }
 
 
-status_t 
-Index::UpdateLastModified(Transaction *transaction, Inode *inode, off_t modified)
+status_t
+Index::UpdateLastModified(Transaction &transaction, Inode *inode, off_t modified)
 {
 	off_t oldModified = inode->OldLastModified();
 	if (modified == -1)
@@ -363,7 +363,7 @@ Index::UpdateLastModified(Transaction *transaction, Inode *inode, off_t modified
 	status_t status = Update(transaction, "last_modified", B_INT64_TYPE, (uint8 *)&oldModified,
 		sizeof(int64), (uint8 *)&modified, sizeof(int64), inode);
 
-	inode->Node()->last_modified_time = modified;
+	inode->Node().last_modified_time = HOST_ENDIAN_TO_BFS_INT64(modified);
 	if (status == B_OK)
 		inode->UpdateOldLastModified();
 

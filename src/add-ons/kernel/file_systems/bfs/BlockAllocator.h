@@ -1,10 +1,10 @@
+/* BlockAllocator - block bitmap handling and allocation policies
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef BLOCK_ALLOCATOR_H
 #define BLOCK_ALLOCATOR_H
-/* BlockAllocator - block bitmap handling and allocation policies
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include "Lock.h"
@@ -28,13 +28,13 @@ class BlockAllocator {
 		status_t Initialize(bool full = true);
 		status_t InitializeAndClearBitmap(Transaction &transaction);
 
-		status_t AllocateForInode(Transaction *transaction, const block_run *parent,
+		status_t AllocateForInode(Transaction &transaction, const block_run *parent,
 					mode_t type, block_run &run);
-		status_t Allocate(Transaction *transaction, const Inode *inode, off_t numBlocks,
+		status_t Allocate(Transaction &transaction, Inode *inode, off_t numBlocks,
 					block_run &run, uint16 minimum = 1);
-		status_t Free(Transaction *transaction, block_run run);
+		status_t Free(Transaction &transaction, block_run run);
 
-		status_t AllocateBlocks(Transaction *transaction, int32 group, uint16 start,
+		status_t AllocateBlocks(Transaction &transaction, int32 group, uint16 start,
 					uint16 numBlocks, uint16 minimum, block_run &run);
 
 		status_t StartChecking(check_control *control);

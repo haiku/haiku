@@ -1,26 +1,18 @@
+/* Volume - BFS super block, mounting, etc.
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef VOLUME_H
 #define VOLUME_H
-/* Volume - BFS super block, mounting, etc.
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include <KernelExport.h>
 #include <fs_interface.h>
-
-extern "C" {
-	#ifndef _IMPEXP_KERNEL
-	#	define _IMPEXP_KERNEL
-	#endif
-	#include "lock.h"
-	#include "cache.h"
-}
+#include <fs_cache.h>
 
 #include "bfs.h"
 #include "BlockAllocator.h"
-#include "BufferPool.h"
 #include "Chain.h"
 
 class Journal;
@@ -82,22 +74,20 @@ class Volume {
 		off_t				ToVnode(off_t block) const { return block; }
 		off_t				VnodeToBlock(vnode_id id) const { return (off_t)id; }
 
-		status_t			CreateIndicesRoot(Transaction *transaction);
+		status_t			CreateIndicesRoot(Transaction &transaction);
 
 		// block bitmap
 		BlockAllocator		&Allocator();
-		status_t			AllocateForInode(Transaction *transaction, const Inode *parent,
+		status_t			AllocateForInode(Transaction &transaction, const Inode *parent,
 								mode_t type, block_run &run);
-		status_t			AllocateForInode(Transaction *transaction, const block_run *parent,
+		status_t			AllocateForInode(Transaction &transaction, const block_run *parent,
 								mode_t type, block_run &run);
-		status_t			Allocate(Transaction *transaction,const Inode *inode,
+		status_t			Allocate(Transaction &transaction, Inode *inode,
 								off_t numBlocks, block_run &run, uint16 minimum = 1);
-		status_t			Free(Transaction *transaction, block_run run);
+		status_t			Free(Transaction &transaction, block_run run);
 
 		// cache access
 		status_t			WriteSuperBlock();
-		status_t			WriteBlocks(off_t blockNumber, const uint8 *block, uint32 numBlocks);
-		void				WriteCachedBlocksIfNecessary();
 		status_t			FlushDevice();
 
 		// queries
@@ -111,7 +101,7 @@ class Volume {
 		status_t			Sync();
 		Journal				*GetJournal(off_t refBlock) const;
 
-		BufferPool			&Pool();
+		void				*BlockCache() { return fBlockCache; }
 
 		uint32				GetUniqueID();
 
@@ -142,13 +132,13 @@ class Volume {
 		int32				fUniqueID;
 		uint32				fFlags;
 
-		BufferPool			fBufferPool;
+		void				*fBlockCache;
 };
 
 
 // inline functions
 
-inline bool 
+inline bool
 Volume::IsReadOnly() const
 {
 	 return fFlags & VOLUME_READ_ONLY;
@@ -169,51 +159,31 @@ Volume::Allocator()
 }
 
 
-inline status_t 
-Volume::AllocateForInode(Transaction *transaction, const block_run *parent, mode_t type, block_run &run)
+inline status_t
+Volume::AllocateForInode(Transaction &transaction, const block_run *parent, mode_t type, block_run &run)
 {
 	return fBlockAllocator.AllocateForInode(transaction, parent, type, run);
 }
 
 
-inline status_t 
-Volume::Allocate(Transaction *transaction, const Inode *inode, off_t numBlocks, block_run &run, uint16 minimum)
+inline status_t
+Volume::Allocate(Transaction &transaction, Inode *inode, off_t numBlocks, block_run &run, uint16 minimum)
 {
 	return fBlockAllocator.Allocate(transaction, inode, numBlocks, run, minimum);
 }
 
 
-inline status_t 
-Volume::Free(Transaction *transaction, block_run run)
+inline status_t
+Volume::Free(Transaction &transaction, block_run run)
 {
 	return fBlockAllocator.Free(transaction, run);
 }
 
 
-inline status_t 
-Volume::WriteBlocks(off_t blockNumber, const uint8 *block, uint32 numBlocks)
-{
-	atomic_add(&fDirtyCachedBlocks, numBlocks);
-	return cached_write(fDevice, blockNumber, block, numBlocks, fSuperBlock.block_size);
-}
-
-
-inline void 
-Volume::WriteCachedBlocksIfNecessary()
-{
-	// the specific values are only valid for the current BeOS cache
-	if (fDirtyCachedBlocks > 128) {
-		force_cache_flush(fDevice, false);
-		atomic_add(&fDirtyCachedBlocks, -64);
-	}
-}
-
-
-inline status_t 
+inline status_t
 Volume::FlushDevice()
 {
-	fDirtyCachedBlocks = 0;
-	return flush_device(fDevice, 0);
+	return block_cache_sync(fBlockCache);
 }
 
 
@@ -224,14 +194,7 @@ Volume::GetJournal(off_t /*refBlock*/) const
 }
 
 
-inline BufferPool &
-Volume::Pool()
-{
-	 return fBufferPool;
-}
-
-
-inline uint32 
+inline uint32
 Volume::GetUniqueID()
 {
 	 return atomic_add(&fUniqueID, 1);

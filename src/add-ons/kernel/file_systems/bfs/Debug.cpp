@@ -1,10 +1,10 @@
 /* Debug - debug stuff
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** Some code is based on work previously done by Marcus Overhagen
-**
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Some code is based on work previously done by Marcus Overhagen.
+ *
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Debug.h"
@@ -44,13 +44,12 @@ dump_block_run(const char *prefix, block_run &run)
 }
 
 
-void 
+void
 dump_inode(Inode &inode)
 {
 	Print("Inode (%p) {\n", &inode);
 	Print("\tfVolume = %p\n", inode.fVolume);
-	Print("\tfBlockNumber = 0x%16Lx\n", inode.fBlockNumber);
-	Print("\tfNode = %p\n", inode.Node());
+	Print("\tfBlockNumber = 0x%16Lx\n", inode.BlockNumber());
 	Print("\tfTree = %p\n", inode.fTree);
 	Print("\tfAttributes = %p\n", inode.fAttributes);
 	Print("\tfOldSize = 0x%16Lx\n", inode.fOldSize);
@@ -261,13 +260,12 @@ dump_bplustree_node(bplustree_node *node,bplustree_header *header,Volume *volume
 
 
 #ifndef USER
-//#warn Don't mount more than once... would register twice the debugger commands!
 
 static int
 dbg_inode(int argc, char **argv)
 {
 	if (argc < 2) {
-		kprintf("usage: obfsinode ptr-to-inode\n");
+		kprintf("usage: bfsinode ptr-to-inode\n");
 		return 0;
 	}
 
@@ -283,7 +281,7 @@ void
 remove_debugger_commands()
 {
 #ifndef USER
-	remove_debugger_command("obfsinode", dbg_inode);
+	remove_debugger_command("bfsinode", dbg_inode);
 #endif
 }
 
@@ -292,7 +290,7 @@ void
 add_debugger_commands()
 {
 #ifndef USER
-	add_debugger_command("obfsinode", dbg_inode, "dump an Inode object");
+	add_debugger_command("bfsinode", dbg_inode, "dump an Inode object");
 #endif
 }
 
