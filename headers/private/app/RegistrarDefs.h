@@ -45,6 +45,7 @@ enum {
 	// general requests
 	B_REG_GET_MIME_MESSENGER				= 'rgmm',
 	B_REG_GET_CLIPBOARD_MESSENGER			= 'rgcm',
+	B_REG_GET_DISK_DEVICE_MESSENGER			= 'rgdm',
 	// roster requests
 	B_REG_ADD_APP							= 'rgaa',
 	B_REG_COMPLETE_REGISTRATION				= 'rgcr',
@@ -93,12 +94,18 @@ enum {
 	// internal registrar messages
 	B_REG_ROSTER_SANITY_EVENT				= 'rgir',
 	// clipboard handler requests
-	B_REG_ADD_CLIPBOARD					= 'rgCa',
+	B_REG_ADD_CLIPBOARD						= 'rgCa',
 	B_REG_GET_CLIPBOARD_COUNT				= 'rgCc',
 	B_REG_CLIPBOARD_START_WATCHING			= 'rgCw',
 	B_REG_CLIPBOARD_STOP_WATCHING			= 'rgCx',
 	B_REG_DOWNLOAD_CLIPBOARD				= 'rgCd',
-	B_REG_UPLOAD_CLIPBOARD				= 'rgCu',
+	B_REG_UPLOAD_CLIPBOARD					= 'rgCu',
+	// disk device request
+	B_REG_NEXT_DISK_DEVICE					= 'rgnx',
+	B_REG_GET_DISK_DEVICE					= 'rgdd',
+	B_REG_UPDATE_DISK_DEVICE				= 'rgud',
+	B_REG_DEVICE_START_WATCHING				= 'rgwd',
+	B_REG_DEVICE_STOP_WATCHING				= 'rgsd',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants 
@@ -112,6 +119,13 @@ enum {
 	B_REG_MIME_PREFERRED_APP		= 'rgmp',
 	B_REG_MIME_SNIFFER_RULE			= 'rgmr',
 	B_REG_MIME_SUPPORTED_TYPES		= 'rgms',
+};
+
+// B_REG_UPDATE_DISK_DEVICE "update_policy" constants
+enum {
+  B_REG_DEVICE_UPDATE_CHECK,
+  B_REG_DEVICE_UPDATE_CHANGED,
+  B_REG_DEVICE_UPDATE_DEVICE_CHANGED,
 };
 
 // type constants
