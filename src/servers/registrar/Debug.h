@@ -5,6 +5,9 @@
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
 ** This file may be used under the terms of the OpenBeOS License.
 */
+#ifndef DEBUG
+#	define DEBUG 1
+#endif
 
 #include <stdio.h>
 #define __out printf
@@ -26,8 +29,9 @@
 #define DEBUG_APP "REG"
 #ifdef DEBUG
 	#define PRINT(x) { __out(DEBUG_APP ": "); __out x; }
-	#define REPORT_ERROR(status) __out(DEBUG_APP ": %s:%ld: %s\n",__FUNCTION__,__LINE__,strerror(status));
+	#define REPORT_ERROR(status) __out(DEBUG_APP ": %s:%d: %s\n",__FUNCTION__,__LINE__,strerror(status));
 	#define RETURN_ERROR(err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); return _status;}
+	#define SET_ERROR(var, err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); var = _status; }
 	#define FATAL(x) { __out(DEBUG_APP ": "); __out x; }
 	#define INFORM(x) { __out(DEBUG_APP ": "); __out x; }
 	#define FUNCTION(x) { __out(DEBUG_APP ": %s() ",__FUNCTION__); __out x; }
@@ -38,6 +42,7 @@
 	#define PRINT(x) ;
 	#define REPORT_ERROR(status) ;
 	#define RETURN_ERROR(status) return status;
+	#define SET_ERROR(var, err) var = err;
 	#define FATAL(x) { __out(DEBUG_APP ": "); __out x; }
 	#define INFORM(x) { __out(DEBUG_APP ": "); __out x; }
 	#define FUNCTION(x) ;
