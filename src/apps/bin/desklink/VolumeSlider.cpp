@@ -27,6 +27,7 @@
 #include "iconfile.h"
 
 #define VOLUME_CHANGED 'vlcg'
+#define VOLUME_UPDATED 'vlud'
 
 VolumeSlider::VolumeSlider(BRect frame)
 	: BWindow(frame, "VolumeSlider", B_BORDERED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_WILL_ACCEPT_FIRST_CLICK, 0),
@@ -48,14 +49,34 @@ VolumeSlider::VolumeSlider(BRect frame)
 		MoveBy(0, kMargin + screenFrame.top - windowRect.top);
 
 	float value = 0.0;
+	bool retrying = false;
 	
 	aOutNode = new media_node();
 
-	status_t err;
+	status_t err = B_OK; /* BMediaRoster::Roster() doesn't set it if all is ok */
+	const char *errString = NULL;
 	BMediaRoster* roster = BMediaRoster::Roster(&err);
+
+ retry:
+	/* here we release the BMediaRoster once if we can't access the system mixer,
+	 * to make sure it really isn't there, and it's not BMediaRoster that is messed up.
+	 */
+	if (retrying) {
+		errString = NULL;
+		PRINT(("retrying to get a Media Roster\n"));
+		/* BMediaRoster looks doomed */
+		roster = BMediaRoster::CurrentRoster();
+		if (roster) {
+			roster->Lock();
+			roster->Quit();
+		}
+		snooze(10000);
+		roster = BMediaRoster::Roster(&err);
+	}
 	
-	if(roster && (err==B_OK)) {
-		if((err = roster->GetAudioOutput(aOutNode)) == B_OK) {
+	if (roster && (err==B_OK)) {
+		//if((err = roster->GetAudioOutput(aOutNode)) == B_OK) {
+		if((err = roster->GetAudioMixer(aOutNode)) == B_OK) {
 			if((err = roster->GetParameterWebFor(*aOutNode, &paramWeb)) == B_OK) {
 			
 				//Finding the Mixer slider in the audio output ParameterWeb 
@@ -63,8 +84,9 @@ VolumeSlider::VolumeSlider(BRect frame)
 				BParameter* p = NULL;
 				for (int i = 0; i < numParams; i++) {
 					p = paramWeb->ParameterAt(i);
-					printf("%i %s\n", i, p->Name());
-					if (!strcmp(p->Name(), "Master")) {
+					PRINT(("BParameter[%i]: %s\n", i, p->Name()));
+					//if (!strcmp(p->Name(), "Master")) {
+					if (!strcmp(p->Kind(), B_MASTER_GAIN)) {
 						for (; i < numParams; i++) {
 							p = paramWeb->ParameterAt(i);
 							if (strcmp(p->Kind(), B_MASTER_GAIN)) p=NULL;
@@ -74,45 +96,55 @@ VolumeSlider::VolumeSlider(BRect frame)
 					} else p = NULL;
 				}
 				if (p==NULL) {
-					printf("Could not find the mixer.\n");
-					exit(1);
+					errString = "Could not find the mixer";
 				} else if(p->Type()!=BParameter::B_CONTINUOUS_PARAMETER) {
-					printf("Mixer is unknown.\n");
-					exit(2);
-				}
+					errString = "Mixer is unknown";
+				} else {
 			
-				mixerParam= dynamic_cast<BContinuousParameter*>(p);
-				min = mixerParam->MinValue();
-				max = mixerParam->MaxValue();
-				step = mixerParam->ValueStep();
-				
-				float chanData[2];
-				bigtime_t lastChange;
-				size_t size = sizeof(chanData);
-						
-				mixerParam->GetValue( &chanData, &size, &lastChange );
-				
-				value = (chanData[0]-min)*100/(max-min);
+					mixerParam = dynamic_cast<BContinuousParameter*>(p);
+					min = mixerParam->MinValue();
+					max = mixerParam->MaxValue();
+					step = mixerParam->ValueStep();
+					
+					float chanData[2];
+					bigtime_t lastChange;
+					size_t size = sizeof(chanData);
+					
+					mixerParam->GetValue( &chanData, &size, &lastChange );
+					
+					value = (chanData[0]-min)*100/(max-min);
+				}
 			} else {
-				printf("No parameter web\n");
+				errString = "No parameter web";
 			}
 		} else {
-			printf("No Audio output\n");
+			if (!retrying) {
+				retrying = true;
+				goto retry;
+			}
+			errString = "No Audio output";
 		}
 	} else {
-		printf("No Media Roster\n");			
+		if (!retrying) {
+			retrying = true;
+			goto retry;
+		}
+		errString = "No Media Roster";
 	}
 	
 	if(err!=B_OK) {
 		delete aOutNode;
 		aOutNode = NULL;
 	}
+	if (errString)
+		fprintf(stderr, "VolumeSlider: %s.\n", errString);
 	
 	BBox *box = new BBox(Bounds(), "sliderbox", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
 	AddChild(box);
-	
+
+	hasChanged = false; /* make sure we don't beep if we don't change anything */
 	slider = new SliderView(box->Bounds().InsetByCopy(1, 1), new BMessage(VOLUME_CHANGED), 
-		mixerParam ? "Volume" : "No Media Server", B_FOLLOW_LEFT | B_FOLLOW_TOP, value);
+		(errString==NULL) ? "Volume" : errString, B_FOLLOW_LEFT | B_FOLLOW_TOP, value);
 	box->AddChild(slider);
 	
 	slider->SetTarget(this);
@@ -133,43 +165,47 @@ VolumeSlider::~VolumeSlider()
 void
 VolumeSlider::WindowActivated(bool active)
 {
-	if (!active) {
-		Lock();
-		Quit();
-	}
+	/* don't Quit() ! thanks for FFM users */
 }
-
 
 void 
 VolumeSlider::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case VOLUME_CHANGED:
-		{
-			printf("VOLUME_CHANGED\n");
-			if(mixerParam) {
-				float chanData[2];
-				bigtime_t lastChange;
-				size_t size = sizeof(chanData);
-				
-				mixerParam->GetValue( &chanData, &size, &lastChange );
-		
-				for( int i=0; i<2; i++) {
-					chanData[i] = (slider->Value() * (max - min) / 100) / step * step + min;
-				}
-				
-				PRINT(("Min value: %f      Max Value: %f\nData: %f     %f\n", mixerParam->MinValue(), mixerParam->MaxValue(), chanData[0], chanData[1]));
-				mixerParam->SetValue(&chanData, sizeof(chanData), 0);
-				
-				beep();
-			}
-			
-			Quit();
-			break;
+	case VOLUME_UPDATED:
+		PRINT(("VOLUME_UPDATED\n"));
+		UpdateVolume(mixerParam);
+		hasChanged = true;
+		break;
+	case VOLUME_CHANGED:
+		if (hasChanged) {
+			PRINT(("VOLUME_CHANGED\n"));
+			UpdateVolume(mixerParam);
+			beep();
 		}
-		default:
-			BWindow::MessageReceived(msg);		// not a slider message, not our problem
-	} 
+		Quit();
+		break;
+	default:
+		BWindow::MessageReceived(msg);		// not a slider message, not our problem
+	}
+}
+
+void VolumeSlider::UpdateVolume(BContinuousParameter* param)
+{
+	if (!param)
+		return;
+	float chanData[2];
+	bigtime_t lastChange;
+	size_t size = sizeof(chanData);
+
+	mixerParam->GetValue( &chanData, &size, &lastChange );
+
+	for( int i=0; i<2; i++) {
+		chanData[i] = (slider->Value() * (max - min) / 100) / step * step + min;
+	}
+
+	PRINT(("Min value: %f      Max Value: %f\nData: %f     %f\n", mixerParam->MinValue(), mixerParam->MaxValue(), chanData[0], chanData[1]));
+	mixerParam->SetValue(&chanData, sizeof(chanData), system_time()+1000);
 }
 
 #define REDZONESTART 151
@@ -180,7 +216,6 @@ SliderView::SliderView(BRect rect, BMessage *msg, const char *title, uint32 resi
 	leftBitmap(BRect(0, 0, kLeftWidth - 1, kLeftHeight - 1), B_CMAP8),
 	rightBitmap(BRect(0, 0, kRightWidth - 1, kRightHeight - 1), B_CMAP8),
 	buttonBitmap(BRect(0, 0, kButtonWidth - 1, kButtonHeight - 1), B_CMAP8),
-	fTrackingX(11 + (192-11) * value / 100),
 	fTitle(title)
 {
 	leftBitmap.SetBits(kLeftBits, kLeftWidth * kLeftHeight, 0, B_CMAP8);
@@ -205,11 +240,9 @@ SliderView::Pulse()
 	uint32 mouseButtons;
 	BPoint where;
 	GetMouse(&where, &mouseButtons, true);
-	
 	// button not pressed, exit
 	if (! (mouseButtons & B_PRIMARY_MOUSE_BUTTON)) {
 		SetTracking(false);
-		SetValue( (fTrackingX - 11) / (192-11) * 100 );
 		Invoke();
 	}
 }
@@ -233,20 +266,21 @@ SliderView::Draw(BRect updateRect)
 
 	DrawBitmapAsync(&leftBitmap, BPoint(5,1));
 	DrawBitmapAsync(&rightBitmap, BPoint(193,1));
-	
-	float right = (fTrackingX < REDZONESTART) ? fTrackingX : REDZONESTART;
+
+	float position = 11 + (192-11) * Value() / 100;
+	float right = (position < REDZONESTART) ? position : REDZONESTART;
 	SetHighColor(99,151,99);
 	FillRect(BRect(11,3,right,4));
 	SetHighColor(156,203,156);
 	FillRect(BRect(11,5,right,13));
 	if(right == REDZONESTART) {
 		SetHighColor(156,101,99);
-		FillRect(BRect(REDZONESTART,3,fTrackingX,4));
+		FillRect(BRect(REDZONESTART,3,position,4));
 		SetHighColor(255,154,156);
-		FillRect(BRect(REDZONESTART,5,fTrackingX,13));
+		FillRect(BRect(REDZONESTART,5,position,13));
 	}		
 	SetHighColor(156,154,156);
-	FillRect(BRect(fTrackingX,3,192,13));
+	FillRect(BRect(position,3,192,13));
 	
 	BFont font;
 	float width = font.StringWidth(fTitle);
@@ -254,7 +288,7 @@ SliderView::Draw(BRect updateRect)
 	SetHighColor(49,154,49);
 	DrawString(fTitle, BPoint(11 + (192-11-width)/2, 12));
 		
-	DrawBitmapAsync(&buttonBitmap, BPoint(fTrackingX-5,3));
+	DrawBitmapAsync(&buttonBitmap, BPoint(position-5,3));
 	
 	Sync();
 	
@@ -280,15 +314,15 @@ SliderView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 		
 	if (!Bounds().InsetBySelf(2,2).Contains(point))
 		return;
-		
-	fTrackingX = point.x;
-	if(fTrackingX < 11)
-		fTrackingX = 11;
-	if(fTrackingX > 192)
-		fTrackingX = 192;	
+
+	float v = MIN(MAX(point.x, 11), 192);
+	v = (v - 11) / (192-11) * 100;
+	v = MAX(MIN(v,100), 0);
+	SetValue(v);
 	Draw(Bounds());
 	Flush();
-	
+	if (Window())
+		Window()->PostMessage(VOLUME_UPDATED);
 }
 
 
@@ -297,20 +331,15 @@ SliderView::MouseUp(BPoint point)
 {
 	if (!IsTracking())
 		return;
-	
-	SetValue( (point.x - 11) / (192-11) * 100 );
-	if(Value()<0)
-		SetValue(0);
-	if(Value()>100)
-		SetValue(100);
+	if (Bounds().InsetBySelf(2,2).Contains(point)) {
+		float v = MIN(MAX(point.x, 11), 192);
+		v = (v - 11) / (192-11) * 100;
+		v = MAX(MIN(v,100), 0);
+		SetValue(v);
+	}
 	
 	Invoke();
 	SetTracking(false);
-	fTrackingX = point.x;
-	if(fTrackingX < 11)
-		fTrackingX = 11;
-	if(fTrackingX > 192)
-		fTrackingX = 192;	
 	Draw(Bounds());
 	Flush();
 }

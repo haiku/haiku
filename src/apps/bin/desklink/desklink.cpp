@@ -208,12 +208,7 @@ VCButton::MouseDown(BPoint point)
 void
 VCButton::MouseUp(BPoint point)
 {
-	if(volumeSlider) {
-		volumeSlider->Lock();
-		volumeSlider->Quit();
-		delete volumeSlider;
-		volumeSlider = NULL;
-	}	
+	/* don't Quit() ! thanks for FFM users */
 }
 
 

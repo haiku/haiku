@@ -32,7 +32,6 @@ public:
 	virtual void Pulse();
 private:
 	BBitmap leftBitmap, rightBitmap, buttonBitmap;
-	float fTrackingX;
 	const char* fTitle;
 };
 
@@ -45,10 +44,12 @@ public:
 	void MessageReceived(BMessage*);
 	void WindowActivated(bool active);
 private:
+	void UpdateVolume(BContinuousParameter* param);
 	media_node *aOutNode;
 	BParameterWeb* paramWeb;
 	BContinuousParameter* mixerParam;
 	float min, max, step;
+	bool hasChanged;
 	SliderView *slider;
 };
 
