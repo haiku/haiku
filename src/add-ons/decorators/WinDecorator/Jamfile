@@ -8,3 +8,5 @@ Addon WinDecorator : decorators :
 	DisplayDriver.cpp
 	RGBColor.cpp
 ;
+
+LinkSharedOSLibs WinDecorator : be ;
