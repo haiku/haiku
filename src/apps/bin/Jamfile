@@ -12,6 +12,8 @@ StdBinCommands
 	lsindex.cpp
 	modifiers.cpp
 	open.cpp
+	play.cpp
+	query.cpp
 	quit.cpp
 	setversion.cpp
 	shutdown.cpp
