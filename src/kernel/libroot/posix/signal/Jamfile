@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src kernel libroot posix signal ;
+
+KernelMergeObject posix_signal.o :
+	<$(SOURCE_GRIST)>strsignal.c
+	:
+	-fPIC -DPIC
+	;
+
+MergeObjectFromObjects kernel_posix_signal.o :
+	<$(SOURCE_GRIST)>strsignal.o
+	:
+	-fPIC -DPIC
+	;
+

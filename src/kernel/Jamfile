@@ -34,13 +34,14 @@ KernelLd kernel :
 
 	kernel_os_arch_$(OBOS_ARCH).o
 
-	kernel_posix_main.o
 	kernel_posix_locale.o
+	kernel_posix_main.o
+	kernel_posix_signal.o
 	kernel_posix_stdio.o
 	kernel_posix_stdlib.o
 	kernel_posix_sys.o
-	kernel_posix_unistd.o
 	kernel_posix_time.o
+	kernel_posix_unistd.o
 	posix_string.o
 	:
 	$(SUBDIR)/core/arch/$(OBOS_ARCH)/kernel.ld 
@@ -66,13 +67,14 @@ KernelLd kernel.so :
 
 	kernel_os_arch_$(OBOS_ARCH).o
 
-	kernel_posix_main.o
 	kernel_posix_locale.o
+	kernel_posix_main.o
+	kernel_posix_signal.o
 	kernel_posix_stdio.o
 	kernel_posix_stdlib.o
 	kernel_posix_sys.o
-	kernel_posix_unistd.o
 	kernel_posix_time.o
+	kernel_posix_unistd.o
 	posix_string.o
 	:
 	$(SUBDIR)/core/arch/$(OBOS_ARCH)/kernel.ld 
