@@ -1,16 +1,21 @@
 #!/bin/sh
 
+# Usage: makehdimage [image path/target dir]
+#
 # This script will compile all files needed to create a bootable Haiku image,
 # create such an image, and copy the files to the correct location.
 #
 # You need the Userland FS Server package from Ingo Weinhold to successfully
 # create the image, and you also need to have the UserlandFSServer running
-# in the background when you start the script.
+# in the background when you start the script (as long as you don't use
+# the target directory mode).
 #
-# Usage: makehdimage [image path]
 # If you don't specify the image, $sourceDir/haiku.image will be used. In
 # the current default configuration, you have to start this script in the
 # "current" directory of the Haiku tree. A 40 MB image will be created there.
+#
+# If you specify a target directory, no image is going to be created at
+# all, and also the Userland FS Server is not needed.
 #
 # You may want to change it to suit your needs. Have fun!
 
@@ -49,7 +54,7 @@ RUN_WITHOUT_APP_SERVER=1
 
 BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	true false ls df mount unmount cp mv ps sh mkdir sleep \
-	grep cat less clockconfig du rm date"
+	grep cat less clockconfig du rm date shutdown safemode"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so"
 
@@ -140,7 +145,8 @@ done
 
 cd $sourceDir/distro/x86.R1/beos/bin
 cp ../apps/consoled $BEOS_BIN $targetDir/beos/bin/
-
+cd $targetDir/beos/bin
+ln -s less more
 
 # scripts and data files
 cd $sourceDir
