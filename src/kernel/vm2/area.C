@@ -248,7 +248,7 @@ char area::getByte(unsigned long address) { // This is for testing only
 	if (page)
 		return page->getByte(address,manager);
 	else
-		return 0;
+		throw ("area::getByte - attempting an address out of range!");
 	}
 
 void area::setByte(unsigned long address,char value) { // This is for testing only
