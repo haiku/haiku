@@ -2,7 +2,6 @@ SubDir OBOS_TOP src kernel libroot ;
 
 KernelObjects
 	<$(SOURCE_GRIST)>libroot_init.c
-	<$(SOURCE_GRIST)>syscalls.S
 	:
 	-fPIC -DPIC
 	;

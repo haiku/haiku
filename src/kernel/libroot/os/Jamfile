@@ -9,6 +9,7 @@ KernelObjects
 	<$(SOURCE_GRIST)>team.c
 	<$(SOURCE_GRIST)>thread.c
 	<$(SOURCE_GRIST)>time.c
+	<$(SOURCE_GRIST)>syscalls.S
 	:
 	-fPIC -DPIC
 	;

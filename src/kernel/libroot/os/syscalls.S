@@ -1,26 +1,26 @@
 #ifdef ARCH_x86
-#include "arch/x86/syscalls.inc"
+#	include "arch/x86/syscalls.inc"
 #endif
 #ifdef ARCH_alpha
-#include "arch/alpha/syscalls.inc"
+#	include "arch/alpha/syscalls.inc"
 #endif
 #ifdef ARCH_sh4
-#include "arch/sh4/syscalls.inc"
+#	include "arch/sh4/syscalls.inc"
 #endif
 #ifdef ARCH_sparc
-#include "arch/sparc/syscalls.inc"
+#	include "arch/sparc/syscalls.inc"
 #endif
 #ifdef ARCH_sparc64
-#include "arch/sparc64/syscalls.inc"
+#	include "arch/sparc64/syscalls.inc"
 #endif
 #ifdef ARCH_mips
-#include "arch/mips/syscalls.inc"
+#	include "arch/mips/syscalls.inc"
 #endif
 #ifdef ARCH_ppc
-#include "arch/ppc/syscalls.inc"
+#	include "arch/ppc/syscalls.inc"
 #endif
 #ifdef ARCH_m68k
-#include "arch/m68k/syscalls.inc"
+#	include "arch/m68k/syscalls.inc"
 #endif
 
 /* ToDo: we should do something about this file; either machine generate it */
