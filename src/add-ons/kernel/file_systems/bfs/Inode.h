@@ -23,6 +23,7 @@ extern "C" {
 }
 
 #include <string.h>
+#include <unistd.h>
 
 #include "Volume.h"
 #include "Journal.h"
