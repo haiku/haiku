@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel apps ls ;
+SubDir OBOS_TOP src tests kernel boot_floppy ls ;
 
 KernelObjects
 	<$(SOURCE_GRIST)>main.c

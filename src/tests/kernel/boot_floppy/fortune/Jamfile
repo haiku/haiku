@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel apps fortune ;
+SubDir OBOS_TOP src tests kernel boot_floppy fortune ;
 
 KernelObjects
 	<$(SOURCE_GRIST)>main.c

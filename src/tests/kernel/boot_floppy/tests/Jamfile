@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel apps tests ;
+SubDir OBOS_TOP src tests kernel boot_floppy tests ;
 
 KernelObjects 
 	<$(SOURCE_GRIST)>thread_test.c 

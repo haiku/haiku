@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel apps cpuinfo ;
+SubDir OBOS_TOP src tests kernel boot_floppy cpuinfo ;
 
 KernelObjects
 	<$(SOURCE_GRIST)>main.c
