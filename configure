@@ -83,11 +83,11 @@ if [ -n "$floppy" ]; then
 fi
 
 # BeOS
-if [ "${platform}" == "BeOS" ] ; then
+if [ "${platform}" = "BeOS" ] ; then
 	standard_gcc_settings
 
 # Linux
-else if [ "${platform}" == "Linux" ] ; then
+else if [ "${platform}" = "Linux" ] ; then
 	standard_gcc_settings
 
 # Unknown platform
