@@ -22,6 +22,10 @@ class BResources;
 class BAppFileInfo;
 class BMessenger;
 
+namespace BPrivate {
+	class MimeDatabase;
+}
+
 enum app_verb {
 	B_OPEN
 };
@@ -180,13 +184,13 @@ private:
 					 bool large = true) const;
 */
 
-	char		*fType;
-	BFile		*fMeta;
-	char		*fMimePath;			// Was: "void *_unused;"
-	entry_ref	fRef;
-	int			fWhere;
-	status_t	fCStatus;
-	uint32		_reserved[3];
+	char					*fType;
+	BFile					*fMeta;
+	BPrivate::MimeDatabase	*fMimeDatabase;			// Was: "void *_unused;"
+	entry_ref				fRef;
+	int						fWhere;
+	status_t				fCStatus;
+	uint32					_reserved[3];
 };
 
 

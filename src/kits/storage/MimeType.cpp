@@ -7,10 +7,13 @@
 	BMimeType implementation.
 */
 #include <MimeType.h>
-#include <ctype.h>		// For tolower()
-#include <new.h>		// For new(nothrow)
-#include <stdio.h>		// For printf()
-#include <string.h>		// For strncpy()
+#include <ctype.h>			// For tolower()
+#include <new.h>			// For new(nothrow)
+#include <stdio.h>			// For printf()
+#include <string.h>			// For strncpy()
+#include <MimeDatabase.h>	
+#include <RegistrarDefs.h>
+#include <Roster.h>			// For _send_to_roster_()
 
 #include <sniffer/Rule.h>
 #include <sniffer/Parser.h>
@@ -39,6 +42,7 @@ const char *B_APP_MIME_TYPE			= B_ELF_APP_MIME_TYPE;
 BMimeType::BMimeType()
 	: fType(NULL)
 	, fCStatus(B_NO_INIT)
+	, fMimeDatabase(new(nothrow) BPrivate::MimeDatabase())
 {
 }
 
@@ -52,6 +56,7 @@ BMimeType::BMimeType()
 BMimeType::BMimeType(const char *mimeType)
 	: fType(NULL)
 	, fCStatus(B_NO_INIT)
+	, fMimeDatabase(new(nothrow) BPrivate::MimeDatabase())
 {
 	SetTo(mimeType);
 }
@@ -62,6 +67,7 @@ BMimeType::BMimeType(const char *mimeType)
 BMimeType::~BMimeType()
 {
 	Unset();
+	delete fMimeDatabase;
 }
 
 // SetTo
@@ -91,6 +97,8 @@ BMimeType::SetTo(const char *mimeType)
 {
 	if (!mimeType || !BMimeType::IsValid(mimeType)) {
 		fCStatus = B_BAD_VALUE;
+	} else if (!fMimeDatabase) {
+		fCStatus = B_NO_MEMORY;
 	} else {
 		Unset();
 		fType = new(nothrow) char[strlen(mimeType)+1];
@@ -184,7 +192,7 @@ BMimeType::IsSupertypeOnly() const
 bool
 BMimeType::IsInstalled() const
 {
-	return false;	// not implemented
+	return InitCheck() == B_OK && fMimeDatabase->IsInstalled(Type());
 }
 
 // GetSupertype
@@ -304,7 +312,24 @@ BMimeType::Contains(const BMimeType *type) const
 status_t
 BMimeType::Install()
 {
-	return NOT_IMPLEMENTED;
+	status_t err = InitCheck();	
+
+	BMessage msg(B_REG_MIME_INSTALL);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // Delete
@@ -323,7 +348,24 @@ BMimeType::Install()
 status_t
 BMimeType::Delete()
 {
-	return NOT_IMPLEMENTED;
+	status_t err = InitCheck();	
+
+	BMessage msg(B_REG_MIME_DELETE);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // GetIcon
@@ -480,7 +522,7 @@ BMimeType::GetFileExtensions(BMessage *extensions) const
 status_t
 BMimeType::GetShortDescription(char *description) const
 {
-	return NOT_IMPLEMENTED;
+	return fMimeDatabase->GetShortDescription(Type(), description);
 }
 
 // GetLongDescription
@@ -499,7 +541,7 @@ BMimeType::GetShortDescription(char *description) const
 status_t
 BMimeType::GetLongDescription(char *description) const
 {
-	return NOT_IMPLEMENTED;
+	return fMimeDatabase->GetLongDescription(Type(), description);
 }
 
 // GetSupportingApps
@@ -718,7 +760,32 @@ BMimeType::SetFileExtensions(const BMessage *extensions)
 status_t
 BMimeType::SetShortDescription(const char *description)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = description ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = InitCheck();	
+
+	BMessage msg(B_REG_MIME_SET_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_DESCRIPTION);
+	if (!err) 
+		err = msg.AddString("description", description);
+	if (!err)
+		err = msg.AddBool("long", false);
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // SetLongDescription
@@ -737,7 +804,32 @@ BMimeType::SetShortDescription(const char *description)
 status_t
 BMimeType::SetLongDescription(const char *description)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = description ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = InitCheck();	
+
+	BMessage msg(B_REG_MIME_SET_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_DESCRIPTION);
+	if (!err) 
+		err = msg.AddString("description", description);
+	if (!err)
+		err = msg.AddBool("long", true);
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // GetInstalledSupertypes
@@ -1178,7 +1270,7 @@ BMimeType::GuessMimeType(const char *filename, BMimeType *result)
 // StartWatching
 /*!	\brief Starts monitoring the MIME database for a given target.
 	Until StopWatching() is called for the target, an update message is sent
-	to it, whenever the MIME database changes.
+	to it whenever the MIME database changes.
 	\param target A BMessenger identifying the target for the update messages.
 	\return
 	- \c B_OK: Everything went fine.
@@ -1187,7 +1279,22 @@ BMimeType::GuessMimeType(const char *filename, BMimeType *result)
 status_t
 BMimeType::StartWatching(BMessenger target)
 {
-	return NOT_IMPLEMENTED;
+	BMessage msg(B_REG_MIME_START_WATCHING);
+	BMessage reply;
+	status_t result;
+	status_t err;
+	
+	// Build and send the message, read the reply
+	err = msg.AddMessenger("target", target);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // StopWatching
@@ -1201,7 +1308,22 @@ BMimeType::StartWatching(BMessenger target)
 status_t
 BMimeType::StopWatching(BMessenger target)
 {
-	return NOT_IMPLEMENTED;
+	BMessage msg(B_REG_MIME_STOP_WATCHING);
+	BMessage reply;
+	status_t result;
+	status_t err;
+	
+	// Build and send the message, read the reply
+	err = msg.AddMessenger("target", target);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // SetType
