@@ -76,8 +76,7 @@ void
 OpenWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case kMsgProbeDevice:
-		{
+		case kMsgProbeDevice: {
 			BMenuItem *item = fDevicesMenu->FindMarked();
 			if (item == NULL)
 				break;
@@ -97,7 +96,21 @@ OpenWindow::MessageReceived(BMessage *message)
 				Quit();
 			break;
 
+		case B_SIMPLE_DATA: {
+			// if it's a file drop, open it
+			entry_ref ref;
+			if (message->FindRef("refs", 0, &ref) == B_OK) {
+				BMessage openMessage(*message);
+				openMessage.what = B_REFS_RECEIVED;
+
+				be_app_messenger.SendMessage(&openMessage);
+				PostMessage(B_QUIT_REQUESTED);
+			}
+			break;
+		}
+
 		default:
+			message->PrintToStream();
 			BWindow::MessageReceived(message);
 			break;
 	}
