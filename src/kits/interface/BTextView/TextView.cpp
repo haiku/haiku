@@ -3670,18 +3670,22 @@ void
 BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 						  bool erase)
 {
-	// TODO: Draw on the "fOffscreen" BBitmap, then draw it on the view
-
 	// clip the text
 	BRect clipRect = Bounds() & fTextRect;
 	clipRect.InsetBy(-1, -1);
-	BRegion newClip;
-	newClip.Set(clipRect);
-	ConstrainClippingRegion(&newClip);
-
+	
+	BView *view = this;
+	if (fOffscreen && fOffscreen->Lock()) {
+		view = fOffscreen->ChildAt(0);
+	} else {
+		BRegion newClip;
+		newClip.Set(clipRect);
+		ConstrainClippingRegion(&newClip);	
+	}
+		
 	// set the low color to the view color so that 
 	// drawing to a non-white background will work	
-	SetLowColor(ViewColor());
+	view->SetLowColor(view->ViewColor());
 
 	long maxLine = fLines->NumLines() - 1;
 	startLine = (startLine < 0) ? 0 : startLine;
@@ -3711,7 +3715,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 		eraseRect.top = line->origin + fTextRect.top;
 		eraseRect.bottom = (line + 1)->origin + fTextRect.top;
 		
-		FillRect(eraseRect, B_SOLID_LOW);
+		view->FillRect(eraseRect, B_SOLID_LOW);
 
 		eraseRect = clipRect;
 	}
@@ -3731,13 +3735,13 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 			startLeft += fTextRect.left;
 		}
 			
-		MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top);
+		view->MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top);
 
 		if (erase && i >= startEraseLine) {
 			eraseRect.top = line->origin + fTextRect.top;
 			eraseRect.bottom = (line + 1)->origin + fTextRect.top;
 			
-			FillRect(eraseRect, B_SOLID_LOW);
+			view->FillRect(eraseRect, B_SOLID_LOW);
 		}
 		
 		// do we have any text to draw?
@@ -3751,8 +3755,8 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 			int32 numChars;
 			// iterate through each style on this line
 			while ((numChars = fStyles->Iterate(offset, length, fInline, &font, &color)) != 0) {
-				SetFont(font);
-				SetHighColor(*color);
+				view->SetFont(font);
+				view->SetHighColor(*color);
 				
 				tabChars = numChars;
 				do {
@@ -3778,10 +3782,9 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 							BRect rect(PointAt(inlineOffset), rightBottom);
 							
 							// Highlight in blue the inputted text
-							PushState();	
-							SetLowColor(kBlueInputColor);
-							FillRect(rect, B_SOLID_LOW);
-							PopState();
+							view->PushState();	
+							view->SetLowColor(kBlueInputColor);
+							view->FillRect(rect, B_SOLID_LOW);
 							
 							// Highlight in red the selected part
 							if (fInline->SelectionLength() > 0) {
@@ -3790,15 +3793,14 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 								rightBottom.y += height;
 								rect.SetLeftTop(PointAt(inlineOffset + fInline->SelectionOffset()));
 								rect.SetRightBottom(rightBottom);
-								PushState();
-								SetLowColor(kRedInputColor);
-								FillRect(rect, B_SOLID_LOW);
-								PopState();
-							}		
+								view->SetLowColor(kRedInputColor);
+								view->FillRect(rect, B_SOLID_LOW);				
+							}
+							view->PopState();
 						}
 					}
 					
-					DrawString(fText->GetString(offset, tabChars), tabChars);
+					view->DrawString(fText->GetString(offset, tabChars), tabChars);
 					
 					if (foundTab) {
 						float penPos = PenLocation().x - fTextRect.left;
@@ -3806,7 +3808,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 						if (numTabs > 1)
 							tabWidth += ((numTabs - 1) * fTabWidth);
 							
-						MovePenBy(tabWidth, 0.0);
+						view->MovePenBy(tabWidth, 0.0);
 
 						tabChars += numTabs;
 					}
@@ -3822,7 +3824,13 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 		line++;
 	}
 
-	ConstrainClippingRegion(NULL);
+	if (view == this)
+		ConstrainClippingRegion(NULL);
+	else {
+		view->Sync();
+		fOffscreen->Unlock();
+		DrawBitmap(fOffscreen, B_ORIGIN);
+	}
 }
 
 
@@ -4108,7 +4116,6 @@ BTextView::NewOffscreen(float padding)
 	if (fOffscreen != NULL)
 		DeleteOffscreen();
 	
-	// TODO: Is this correct ?
 	BRect bitmapRect(0, 0, fTextRect.Width() + padding, fTextRect.Height());
 	fOffscreen = new BBitmap(bitmapRect, fColorSpace, true, false);
 	if (fOffscreen != NULL && fOffscreen->Lock()) {
