@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src kernel core cache ;
+
+KernelMergeObject kernel_cache.o :
+	block_cache.cpp
+
+	: -fno-pic -Wno-unused -D_KERNEL_MODE=1
+	;
