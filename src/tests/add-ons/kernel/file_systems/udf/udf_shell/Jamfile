@@ -4,12 +4,10 @@ SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems udf ;
 
 {
-	local defines = [ FDefines USER DEBUG ] ; # _NO_INLINE_ASM
+	local defines = [ FDefines USER ] ; # DEBUG _NO_INLINE_ASM
 	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
 }
-
-NO_TEST_DEBUG = true ;
 
 SimpleTest udf_shell
 	:
