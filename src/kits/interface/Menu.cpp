@@ -44,6 +44,8 @@
 
 // Globals ---------------------------------------------------------------------
 
+menu_info BMenu::sMenuInfo;
+
 static property_info prop_list[] =
 {
 	{ "Enabled", { B_GET_PROPERTY, 0 },
@@ -1225,6 +1227,7 @@ status_t BMenu::DoCreateMsg(BMenuItem *ti, BMenu *tm, BMessage *m,
 
 
 // Temporary mouse hooks
+#if 0
 //------------------------------------------------------------------------------
 void BMenu::MouseDown(BPoint point)
 {
@@ -1266,6 +1269,7 @@ void BMenu::MouseUp(BPoint point)
 {
 
 }
+#endif
 //------------------------------------------------------------------------------
 status_t set_menu_info(menu_info *info)
 {
