@@ -83,7 +83,7 @@ typedef void (*notify_select_event_function)(selectsync * sync, uint32 ref);
 typedef struct selecter {
 	struct selecter * 	next;
 	thread_id 			thread;
-	int					event;
+	uint32				event;
 	selectsync * 		sync;
 	uint32 				ref;
 } selecter;
@@ -779,7 +779,7 @@ init_connection(void **cookie)
 	if (nsc->local_port < B_OK) {
 		FATAL(("open: couldn't create port: %s\n", strerror(nsc->local_port)));
 		free(cookie);
-		return bytes;
+		return B_ERROR;
 	}
 	set_port_owner(nsc->local_port, B_SYSTEM_TEAM);
 
@@ -820,17 +820,28 @@ init_connection(void **cookie)
 	nsc->area = clone_area("net connection buffer", (void **) &nsc->commands,
 					B_CLONE_ADDRESS, B_READ_AREA | B_WRITE_AREA, connection.area);
 	if (nsc->area < B_OK) {
-		FATAL(("could clone command queue: %s\n", strerror(nsc->area)));
+		status_t err;
+		FATAL(("couldn't clone command queue: %s\n", strerror(nsc->area)));
+		err = nsc->area;
 		delete_port(nsc->local_port);
 		free(nsc);
-		return nsc->area;
+		return err;
 	}
 	
 	nsc->nb_commands = connection.numCommands;
 	nsc->command_index = 0;
+	nsc->selecters = NULL;
 
 	nsc->selecters_lock = create_sem(1, "socket_selecters_lock");
-	nsc->selecters = NULL;
+	if (nsc->selecters_lock < B_OK) {
+		status_t err;
+		FATAL(("couldn't create socket_selecters_lock semaphore: %s\n", strerror(nsc->selecters_lock)));
+		err = nsc->selecters_lock;
+		delete_port(nsc->local_port);
+		delete_area(nsc->area);
+		free(nsc);
+		return err;
+	}
 
 	*cookie = nsc;
 	return B_OK;
