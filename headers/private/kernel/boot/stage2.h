@@ -12,7 +12,6 @@
 struct stage2_args;
 
 extern struct kernel_args gKernelArgs;
-extern addr_t gKernelEntry;
 
 #ifdef __cplusplus
 extern "C" {
