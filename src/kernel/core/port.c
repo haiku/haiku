@@ -1141,7 +1141,7 @@ user_get_next_port_info(team_id uteam, int32 *ucookie, struct port_info *uinfo)
 	
 	res = get_next_port_info(uteam, &cookie, &info);
 	// copy to userspace
-	rc = user_memcpy(ucookie, &info, sizeof(int32));
+	rc = user_memcpy(ucookie, &cookie, sizeof(int32));
 	if (rc < 0)
 		return rc;
 	rc = user_memcpy(uinfo,   &info, sizeof(struct port_info));
