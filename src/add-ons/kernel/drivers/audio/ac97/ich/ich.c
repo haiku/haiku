@@ -434,9 +434,6 @@ ich_clock_calibrate()
 	} else if (rate > (48000 - 1000) && rate < (48000 + 1000)) {
 		LOG(("ich_clock_calibrate: setting clock 48000\n"));
 		ac97_set_clock(config->ac97, 48000);
-	} else if (rate > (41194 - 1000) && rate < (41194 + 1000)) {
-		LOG(("ich_clock_calibrate: setting clock 41194\n"));
-		ac97_set_clock(config->ac97, 41194);
 	} else if (rate > (55930 - 1000) && rate < (55930 + 1000)) {
 		LOG(("ich_clock_calibrate: setting clock 55930\n"));
 		ac97_set_clock(config->ac97, 55930);

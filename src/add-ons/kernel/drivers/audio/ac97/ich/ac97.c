@@ -332,7 +332,7 @@ ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 	if (dev->set_rate)
 		return dev->set_rate(dev, reg, rate);
 
-	value = (uint32)((rate * (uint64)dev->clock) / 48000); /* use 64 bit calculation for rates 96000 or higher */
+	value = (uint32)((rate * 48000ULL) / dev->clock); /* need 64 bit calculation for rates 96000 or higher */
 
 	LOG(("ac97_set_rate: clock = %d, rate = %d, value = %d\n", dev->clock, rate, value));
 	
@@ -370,7 +370,7 @@ ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
 	if (ac97_reg_cached_read(dev, AC97_EXTENDED_STAT_CTRL) & 0x0002)
 		value *= 2;
 
-	*rate = (value * 48000ULL) / dev->clock; /* use 64 bit calculation to avoid overflow*/
+	*rate = (uint32)((value * (uint64)dev->clock) / 48000); /* need 64 bit calculation to avoid overflow*/
 	return true;
 }
 
@@ -640,7 +640,7 @@ ad1819_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 {
 	uint32 value;
 	
-	value = (uint32)((rate * (uint64)dev->clock) / 48000); /* use 64 bit calculation for rates 96000 or higher */
+	value = (uint32)((rate * 48000ULL) / dev->clock); /* need 64 bit calculation for rates 96000 or higher */
 
 	LOG(("ad1819_set_rate: clock = %d, rate = %d, value = %d\n", dev->clock, rate, value));
 	
@@ -679,7 +679,7 @@ ad1819_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
 			return false;
 	}
 
-	*rate = (value * 48000) / dev->clock;
+	*rate = (uint32)((value * (uint64)dev->clock) / 48000); /* need 64 bit calculation to avoid overflow*/
 	return true;
 }
 
