@@ -30,11 +30,11 @@
 #include <GraphicsDefs.h>
 #include <Font.h>
 
+#include "Angle.h"
 #include "PortLink.h"
 #include "ServerProtocol.h"
 #include "ServerBitmap.h"
 #include "ViewDriver.h"
-#include "ServerCursor.h"
 #include "ServerFont.h"
 #include "FontFamily.h"
 //#include "DebugTools.h"
@@ -323,7 +323,7 @@ printf("ViewDriver:: ObscureCursor()\n");
 #ifdef DEBUG_DRIVER_MODULE
 printf("ViewDriver:: SetCursor()\n");
 #endif
-			ServerCursor *cdata;
+			ServerBitmap *cdata;
 			msg->FindPointer("SCursor",(void**)&cdata);
 
 			if(cdata!=NULL)
@@ -331,13 +331,13 @@ printf("ViewDriver:: SetCursor()\n");
 				BBitmap *bmp=new BBitmap(cdata->Bounds(), B_RGBA32);
 
 				// Copy the server bitmap in the cursor to a BBitmap
-				uint8	*sbmppos=(uint8*)cdata->Buffer(),
+				uint8	*sbmppos=(uint8*)cdata->Bits(),
 						*bbmppos=(uint8*)bmp->Bits();
 
-				int32 bytes=cdata->BytesPerLine(),
+				int32 bytes=cdata->BytesPerRow(),
 					bbytes=bmp->BytesPerRow();
 
-				for(int i=0;i<cdata->Height();i++)
+				for(int i=0;i<cdata->Bounds().IntegerHeight();i++)
 					memcpy(bbmppos+(i*bbytes), sbmppos+(i*bytes), bytes);
 
 				// Replace the bitmap
@@ -526,7 +526,7 @@ printf("ViewDriver:: DrawChar(%c, BPoint(%f,%f))\n",c,pt.x,pt.y);
 	str[1]='\0';
 	DrawString(str, 1, pt, d);
 }
-
+/*
 void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
 {
 #ifdef DEBUG_DRIVER_MODULE
@@ -559,6 +559,7 @@ printf("ViewDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x,
 	screenwin->Unlock();
 	
 }
+*/
 /*
 bool ViewDriver::DumpToFile(const char *path)
 {
@@ -994,4 +995,456 @@ printf("ViewDriver::SetLayerData font had a NULL family\n");
 		font.SetSpacing(sf->Spacing());
 		drawview->SetFont(&font);
 	}
+}
+
+void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL)
+{
+	if(!string || !d || !d->font)
+		return;
+	screenwin->Lock();
+
+	pt.y--;	// because of Be's backward compatibility hack
+
+	ServerFont *font=d->font;
+	FontStyle *style=font->Style();
+
+	if(!style)
+		return;
+
+	FT_Face face;
+	FT_GlyphSlot slot;
+	FT_Matrix rmatrix,smatrix;
+	FT_UInt glyph_index, previous=0;
+	FT_Vector pen,delta,space,nonspace;
+	int16 error=0;
+	int32 strlength,i;
+	Angle rotation(font->Rotation()), shear(font->Shear());
+
+	bool antialias=( (font->Size()<18 && font->Flags()& B_DISABLE_ANTIALIASING==0)
+		|| font->Flags()& B_FORCE_ANTIALIASING)?true:false;
+
+	// Originally, I thought to do this shear checking here, but it really should be
+	// done in BFont::SetShear()
+	float shearangle=shear.Value();
+	if(shearangle>135)
+		shearangle=135;
+	if(shearangle<45)
+		shearangle=45;
+
+	if(shearangle>90)
+		shear=90+((180-shearangle)*2);
+	else
+		shear=90-(90-shearangle)*2;
+	
+	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	if(error)
+	{
+		printf("Couldn't create face object\n");
+		return;
+	}
+
+	slot=face->glyph;
+
+	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
+	
+	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
+	if(error)
+	{
+		printf("Couldn't set character size - error 0x%x\n",error);
+		return;
+	}
+
+	// if we do any transformation, we do a call to FT_Set_Transform() here
+	
+	// First, rotate
+	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
+	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000); 
+	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000); 
+	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
+	
+	// Next, shear
+	smatrix.xx = (FT_Fixed)(0x10000); 
+	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000); 
+	smatrix.yx = (FT_Fixed)(0); 
+	smatrix.yy = (FT_Fixed)(0x10000); 
+
+	FT_Matrix_Multiply(&rmatrix,&smatrix);
+	
+	// Set up the increment value for escapement padding
+	space.x=int32(d->edelta.space * rotation.Cosine()*64);
+	space.y=int32(d->edelta.space * rotation.Sine()*64);
+	nonspace.x=int32(d->edelta.nonspace * rotation.Cosine()*64);
+	nonspace.y=int32(d->edelta.nonspace * rotation.Sine()*64);
+	
+	// set the pen position in 26.6 cartesian space coordinates
+	pen.x=(int32)pt.x * 64;
+	pen.y=(int32)pt.y * 64;
+	
+	slot=face->glyph;
+
+	
+	strlength=strlen(string);
+	if(length<strlength)
+		strlength=length;
+
+	for(i=0;i<strlength;i++)
+	{
+		FT_Set_Transform(face,&smatrix,&pen);
+
+		// Handle escapement padding option
+		if((uint8)string[i]<=0x20)
+		{
+			pen.x+=space.x;
+			pen.y+=space.y;
+		}
+		else
+		{
+			pen.x+=nonspace.x;
+			pen.y+=nonspace.y;
+		}
+
+	
+		// get kerning and move pen
+		if(use_kerning && previous && glyph_index)
+		{
+			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
+			pen.x+=delta.x;
+			pen.y+=delta.y;
+		}
+
+		error=FT_Load_Char(face,string[i],
+			((antialias)?FT_LOAD_RENDER:FT_LOAD_RENDER | FT_LOAD_MONOCHROME) );
+
+		if(!error)
+		{
+			if(antialias)
+				BlitGray2RGB32(&slot->bitmap,
+					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
+			else
+				BlitMono2RGB32(&slot->bitmap,
+					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
+		}
+		else
+			printf("Couldn't load character %c\n", string[i]);
+
+		// increment pen position
+		pen.x+=slot->advance.x;
+		pen.y+=slot->advance.y;
+		previous=glyph_index;
+	}
+
+	// TODO: implement properly
+	// calculate the invalid rectangle
+	BRect r;
+	r.left=MIN(pt.x,pen.x>>6);
+	r.right=MAX(pt.x,pen.x>>6);
+	r.top=pt.y-face->height;
+	r.bottom=pt.y+face->height;
+
+	screenwin->view->Invalidate(r);
+	r.PrintToStream();
+	screenwin->Unlock();
+
+	FT_Done_Face(face);
+}
+
+void ViewDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
+{
+	rgb_color color=d->highcolor.GetColor32();
+	
+	// pointers to the top left corner of the area to be copied in each bitmap
+	uint8 *srcbuffer, *destbuffer;
+	
+	// index pointers which are incremented during the course of the blit
+	uint8 *srcindex, *destindex, *rowptr, value;
+	
+	// increment values for the index pointers
+	int32 srcinc=src->pitch, destinc=framebuffer->BytesPerRow();
+	
+	int16 i,j,k, srcwidth=src->pitch, srcheight=src->rows;
+	int32 x=(int32)pt.x,y=(int32)pt.y;
+	
+	// starting point in source bitmap
+	srcbuffer=(uint8*)src->buffer;
+
+	if(y<0)
+	{
+		if(y<pt.y)
+			y++;
+		srcbuffer+=srcinc * (0-y);
+		srcheight-=srcinc;
+		destbuffer+=destinc * (0-y);
+	}
+
+	if(y+srcheight>framebuffer->Bounds().IntegerHeight())
+	{
+		if(y>pt.y)
+			y--;
+		srcheight-=(y+srcheight-1)-framebuffer->Bounds().IntegerHeight();
+	}
+
+	if(x+srcwidth>framebuffer->Bounds().IntegerWidth())
+	{
+		if(x>pt.x)
+			x--;
+		srcwidth-=(x+srcwidth-1)-framebuffer->Bounds().IntegerWidth();
+	}
+	
+	if(x<0)
+	{
+		if(x<pt.x)
+			x++;
+		srcbuffer+=(0-x)>>3;
+		srcwidth-=0-x;
+		destbuffer+=(0-x)*4;
+	}
+	
+	// starting point in destination bitmap
+	destbuffer=(uint8*)framebuffer->Bits()+int32( (pt.y*framebuffer->BytesPerRow())+(pt.x*4) );
+
+	srcindex=srcbuffer;
+	destindex=destbuffer;
+
+	for(i=0; i<srcheight; i++)
+	{
+		rowptr=destindex;		
+
+		for(j=0;j<srcwidth;j++)
+		{
+			for(k=0; k<8; k++)
+			{
+				value=*(srcindex+j) & (1 << (7-k));
+				if(value)
+				{
+					rowptr[0]=color.blue;
+					rowptr[1]=color.green;
+					rowptr[2]=color.red;
+					rowptr[3]=color.alpha;
+				}
+
+				rowptr+=4;
+			}
+
+		}
+		
+		srcindex+=srcinc;
+		destindex+=destinc;
+	}
+
+}
+
+void ViewDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
+{
+	// pointers to the top left corner of the area to be copied in each bitmap
+	uint8 *srcbuffer=NULL, *destbuffer=NULL;
+	
+	// index pointers which are incremented during the course of the blit
+	uint8 *srcindex=NULL, *destindex=NULL, *rowptr=NULL;
+	
+	rgb_color highcolor=d->highcolor.GetColor32(), lowcolor=d->lowcolor.GetColor32();	float rstep,gstep,bstep,astep;
+
+	rstep=float(highcolor.red-lowcolor.red)/255.0;
+	gstep=float(highcolor.green-lowcolor.green)/255.0;
+	bstep=float(highcolor.blue-lowcolor.blue)/255.0;
+	astep=float(highcolor.alpha-lowcolor.alpha)/255.0;
+	
+	// increment values for the index pointers
+	int32 x=(int32)pt.x,
+		y=(int32)pt.y,
+		srcinc=src->pitch,
+//		destinc=dest->BytesPerRow(),
+		destinc=framebuffer->BytesPerRow(),
+		srcwidth=src->width,
+		srcheight=src->rows,
+		incval=0;
+	
+	int16 i,j;
+	
+	// starting point in source bitmap
+	srcbuffer=(uint8*)src->buffer;
+
+	// starting point in destination bitmap
+//	destbuffer=(uint8*)dest->Bits()+(y*dest->BytesPerRow()+(x*4));
+	destbuffer=(uint8*)framebuffer->Bits()+(y*framebuffer->BytesPerRow()+(x*4));
+
+
+	if(y<0)
+	{
+		if(y<pt.y)
+			y++;
+		
+		incval=0-y;
+		
+		srcbuffer+=incval * srcinc;
+		srcheight-=incval;
+		destbuffer+=incval * destinc;
+	}
+
+	if(y+srcheight>framebuffer->Bounds().IntegerHeight())
+	{
+		if(y>pt.y)
+			y--;
+		srcheight-=(y+srcheight-1)-framebuffer->Bounds().IntegerHeight();
+	}
+
+	if(x+srcwidth>framebuffer->Bounds().IntegerWidth())
+	{
+		if(x>pt.x)
+			x--;
+		srcwidth-=(x+srcwidth-1)-framebuffer->Bounds().IntegerWidth();
+	}
+	
+	if(x<0)
+	{
+		if(x<pt.x)
+			x++;
+		incval=0-x;
+		srcbuffer+=incval;
+		srcwidth-=incval;
+		destbuffer+=incval*4;
+	}
+
+	int32 value;
+
+	srcindex=srcbuffer;
+	destindex=destbuffer;
+
+	for(i=0; i<srcheight; i++)
+	{
+		rowptr=destindex;		
+
+		for(j=0;j<srcwidth;j++)
+		{
+			value=*(srcindex+j) ^ 255;
+
+			if(value!=255)
+			{
+				if(d->draw_mode==B_OP_COPY)
+				{
+					rowptr[0]=uint8(highcolor.blue-(value*bstep));
+					rowptr[1]=uint8(highcolor.green-(value*gstep));
+					rowptr[2]=uint8(highcolor.red-(value*rstep));
+					rowptr[3]=255;
+				}
+				else
+					if(d->draw_mode==B_OP_OVER)
+					{
+						if(highcolor.alpha>127)
+						{
+							rowptr[0]=uint8(highcolor.blue-(value*(float(highcolor.blue-rowptr[0])/255.0)));
+							rowptr[1]=uint8(highcolor.green-(value*(float(highcolor.green-rowptr[1])/255.0)));
+							rowptr[2]=uint8(highcolor.red-(value*(float(highcolor.red-rowptr[2])/255.0)));
+							rowptr[3]=255;
+						}
+					}
+			}
+			rowptr+=4;
+
+		}
+		
+		srcindex+=srcinc;
+		destindex+=destinc;
+	}
+}
+
+rgb_color ViewDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true)
+{
+	rgb_color returncolor={0,0,0,0};
+	int16 value;
+	if(!d)
+		return returncolor;
+	
+	switch(d->draw_mode)
+	{
+		case B_OP_COPY:
+		{
+			return src;
+		}
+		case B_OP_ADD:
+		{
+			value=src.red+dest.red;
+			returncolor.red=(value>255)?255:value;
+
+			value=src.green+dest.green;
+			returncolor.green=(value>255)?255:value;
+
+			value=src.blue+dest.blue;
+			returncolor.blue=(value>255)?255:value;
+			return returncolor;
+		}
+		case B_OP_SUBTRACT:
+		{
+			value=src.red-dest.red;
+			returncolor.red=(value<0)?0:value;
+
+			value=src.green-dest.green;
+			returncolor.green=(value<0)?0:value;
+
+			value=src.blue-dest.blue;
+			returncolor.blue=(value<0)?0:value;
+			return returncolor;
+		}
+		case B_OP_BLEND:
+		{
+			value=int16(src.red+dest.red)>>1;
+			returncolor.red=value;
+
+			value=int16(src.green+dest.green)>>1;
+			returncolor.green=value;
+
+			value=int16(src.blue+dest.blue)>>1;
+			returncolor.blue=value;
+			return returncolor;
+		}
+		case B_OP_MIN:
+		{
+			
+			return ( uint16(src.red+src.blue+src.green) > 
+				uint16(dest.red+dest.blue+dest.green) )?dest:src;
+		}
+		case B_OP_MAX:
+		{
+			return ( uint16(src.red+src.blue+src.green) < 
+				uint16(dest.red+dest.blue+dest.green) )?dest:src;
+		}
+		case B_OP_OVER:
+		{
+			return (use_high && src.alpha>127)?src:dest;
+		}
+		case B_OP_INVERT:
+		{
+			returncolor.red=dest.red ^ 255;
+			returncolor.green=dest.green ^ 255;
+			returncolor.blue=dest.blue ^ 255;
+			return (use_high && src.alpha>127)?returncolor:dest;
+		}
+		// This is a pain in the arse to implement, so I'm saving it for the real
+		// server
+		case B_OP_ALPHA:
+		{
+			return src;
+		}
+		case B_OP_ERASE:
+		{
+			// This one's tricky. 
+			return (use_high && src.alpha>127)?d->lowcolor.GetColor32():dest;
+		}
+		case B_OP_SELECT:
+		{
+			// This one's tricky, too. We are passed a color in src. If it's the layer's
+			// high color or low color, we check for a swap.
+			if(d->highcolor==src)
+				return (use_high && d->highcolor==dest)?d->lowcolor.GetColor32():dest;
+			
+			if(d->lowcolor==src)
+				return (use_high && d->lowcolor==dest)?d->highcolor.GetColor32():dest;
+
+			return dest;
+		}
+		default:
+		{
+			break;
+		}
+	}
+	return returncolor;
 }

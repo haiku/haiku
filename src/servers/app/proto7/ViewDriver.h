@@ -11,11 +11,12 @@
 #include <Region.h>
 #include <Font.h>
 #include "DisplayDriver.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 class BBitmap;
 class PortLink;
 class VDWindow;
-class ServerCursor;
 class LayerData;
 
 class VDView : public BView
@@ -104,6 +105,9 @@ public:
 	VDWindow *screenwin;
 protected:
 	void SetLayerData(LayerData *d, bool set_font_data=false);
+	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
+	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
+	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
 	int hide_cursor;
 	bool obscure_cursor;
 	BBitmap *framebuffer;
