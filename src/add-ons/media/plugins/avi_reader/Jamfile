@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src add-ons media plugins avi_reader ;
+
+UsePrivateHeaders media ;
+
+Addon avi_reader : media plugins :
+	avi_reader.cpp
+;
+
+LinkSharedOSLibs avi_reader : be libmedia.so ;
