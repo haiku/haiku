@@ -29,7 +29,9 @@ private:
 	uint32 fBlockSize;
 	bool fDoUdf;
 	bool fDoIso;
+	std::string fSourceDirectory;
 	std::string fOutputFile;
+	std::string fUdfVolumeName;
 };
 
 

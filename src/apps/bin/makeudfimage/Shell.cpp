@@ -20,12 +20,15 @@
 
 Shell::Shell()
 	// The following settings are essentially default values
-	// for all the command-line options.
+	// for all the command-line options (except for the last
+	// three vars).
 	: fVerbosityLevel(VERBOSITY_LOW)
 	, fBlockSize(2048)
 	, fDoUdf(true)
-	, fDoIso(true)
+	, fDoIso(false)
+	, fSourceDirectory("")
 	, fOutputFile("")
+	, fUdfVolumeName("")
 {
 }
 
@@ -37,8 +40,8 @@ Shell::Run(int argc, char *argv[])
 	if (!error) {
 		ConsoleListener listener(fVerbosityLevel);
 		UdfBuilder builder(fOutputFile.c_str(), fBlockSize, fDoUdf, fDoIso,
-		                   "(Unnamed UDF volume)", "ISO_VOLUME",
-		                   "/boot/home/Desktop/udftest", listener);
+		                   fUdfVolumeName.c_str(), "ISO_VOLUME",
+		                   fSourceDirectory.c_str(), listener);
 		error = builder.InitCheck();
 		if (!error) 
 			error = builder.Build();
@@ -59,7 +62,9 @@ Shell::_ProcessArguments(int argc, char *argv[]) {
 	for (int i = 1; i < argc; i++) 
 		argumentList.push_back(std::string(argv[i]));
 
+	bool foundSourceDirectory = false;
 	bool foundOutputFile = false;
+	bool foundUdfVolumeName = false;
 		
 	// Now bust out some processing
 	int argumentCount = argumentList.size();
@@ -71,7 +76,7 @@ Shell::_ProcessArguments(int argc, char *argv[]) {
 		std::string &arg = *i;
 		if (arg == "--help") {
 			RETURN(B_ERROR);
-		} else if (arg == "-v0") {
+		} else if (arg == "-v0" || arg == "--quiet") {
 			fVerbosityLevel = VERBOSITY_NONE;
 		} else if (arg == "-v1") {
 			fVerbosityLevel = VERBOSITY_LOW;
@@ -80,10 +85,18 @@ Shell::_ProcessArguments(int argc, char *argv[]) {
 		} else if (arg == "-v3") {
 			fVerbosityLevel = VERBOSITY_HIGH;
 		} else {
-			if (index == argumentCount-1) {
+			if (index == argumentCount-3) {
+				// Take this argument as the source dir
+				fSourceDirectory = arg;
+				foundSourceDirectory = true;
+			} else if (index == argumentCount-2) {
 				// Take this argument as the output filename
 				fOutputFile = arg;
 				foundOutputFile = true;
+			} else if (index == argumentCount-1) {
+				// Take this argument as the udf volume name
+				fUdfVolumeName = arg;
+				foundUdfVolumeName = true;
 			} else {
 				printf("ERROR: invalid argument `%s'\n", arg.c_str());
 				printf("\n");
@@ -94,24 +107,31 @@ Shell::_ProcessArguments(int argc, char *argv[]) {
 		index++;
 	}
 	
+	status_t error = B_OK;
+	if (!foundSourceDirectory) {
+		printf("ERROR: no source directory specified\n");
+		error = B_ERROR;
+	}	
 	if (!foundOutputFile) {
 		printf("ERROR: no output file specified\n");
-		printf("\n");
-		RETURN(B_ERROR);
+		error = B_ERROR;
+	}	
+	if (!foundUdfVolumeName) {
+		printf("ERROR: no volume name specified\n");
+		error = B_ERROR;
 	}	
 	
-	RETURN(B_OK);
+	if (error)
+		printf("\n");
+	RETURN(error);
 }
 
 void
 Shell::_PrintHelp() {
-	printf("usage: makeudfimage [options] <output-filename>\n");
+	printf("usage: makeudfimage [options] <source-directory> <output-file> <udf-volume-name>\n");
 	printf("\n");
 	printf("VALID ARGUMENTS:\n");
 	printf("  --help:   Displays this help text\n");
-	printf("  -v0:      Sets verbosity level to 0 (silent)\n"); 
-	printf("  -v1:      Sets verbosity level to 1 (low, *default*)\n"); 
-	printf("  -v2:      Sets verbosity level to 2 (medium)\n"); 
-	printf("  -v3:      Sets verbosity level to 3 (high)\n");
+	printf("  --quiet:  Turns off program output\n");
 	printf("\n");
 }
