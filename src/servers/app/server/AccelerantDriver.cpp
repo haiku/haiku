@@ -28,6 +28,7 @@
 #include "AccelerantDriver.h"
 #include "ServerCursor.h"
 #include "ServerBitmap.h"
+#include "LayerData.h"
 #include <FindDirectory.h>
 #include <graphic_driver.h>
 #include <malloc.h>
@@ -89,91 +90,86 @@ bool AccelerantDriver::Initialize(void)
   //card_fd = open("/dev/graphics/1002_4755_000400",B_READ_WRITE);
   card_fd = open("/dev/graphics/nv10_010000",B_READ_WRITE);
   //card_fd = open("/dev/graphics/stub",B_READ_WRITE);
-printf("foo 1\n");
   if ( card_fd < 0 )
+  {
+	printf("Failed to open graphics device\n");
 	return false;
-printf("foo 2\n");
+  }
+
   if (ioctl(card_fd, B_GET_ACCELERANT_SIGNATURE, &signature, sizeof(signature)) != B_OK)
   {
 	close(card_fd);
 	return false;
   }
-printf("signature %s\n",signature);
-printf("foo 3\n");
+//printf("signature %s\n",signature);
+
   accelerant_image = -1;
   for (i=0; i<3; i++)
   {
-printf("BAR 1\n");
 	if (find_directory (dirs[i], -1, false, path, PATH_MAX) != B_OK)
 	  continue;
-printf("BAR 2\n");
 	strcat(path,"/accelerants/");
 	strcat(path,signature);
 	if (stat(path, &accelerant_stat) != 0)
 	  continue;
-printf("BAR 3\n");
 	accelerant_image = load_add_on(path);
-printf("image_id %lu\n",accelerant_image);
 	if (accelerant_image >= 0)
 	{
-printf("BAR 4\n");
 	  if ( get_image_symbol(accelerant_image,B_ACCELERANT_ENTRY_POINT,
 			B_SYMBOL_TYPE_ANY,(void**)(&accelerant_hook)) != B_OK )
 		return false;
-printf("BAR 5\n");
+
 	  init_accelerant InitAccelerant;
 	  InitAccelerant = (init_accelerant)accelerant_hook(B_INIT_ACCELERANT,NULL);
 	  if (!InitAccelerant || (InitAccelerant(card_fd) != B_OK))
 		return false;
-printf("BAR 6\n");
 	  break;
 	}
   }
-printf("foo 4\n");
   if (accelerant_image < 0)
 	return false;
 
   int mode_count;
   accelerant_mode_count GetModeCount = (accelerant_mode_count)accelerant_hook(B_ACCELERANT_MODE_COUNT, NULL);
-printf("foo 5\n");
   if ( !GetModeCount )
 	return false;
   mode_count = GetModeCount();
-printf("foo 6\n");
   if ( !mode_count )
 	return false;
   get_mode_list GetModeList = (get_mode_list)accelerant_hook(B_GET_MODE_LIST, NULL);
-printf("foo 7\n");
   if ( !GetModeList )
 	return false;
   mode_list = (display_mode *)calloc(sizeof(display_mode), mode_count);
-printf("foo 8\n");
   if ( !mode_list )
 	return false;
-printf("foo 9\n");
   if ( GetModeList(mode_list) != B_OK )
 	return false;
+
+#if 0
   set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
-printf("foo 10\n");
   if ( !SetDisplayMode )
 	return false;
   /* Use the first mode in the list */
-printf("foo 11\n");
   if ( SetDisplayMode(mode_list) != B_OK )
 	return false;
+#endif
+
+  get_display_mode GetDisplayMode = (get_display_mode)accelerant_hook(B_GET_DISPLAY_MODE,NULL);
+  if ( !GetDisplayMode )
+	return false;
+  if ( GetDisplayMode(&mDisplayMode) != B_OK )
+	return FALSE;
+  //_SetDepth(mDisplayMode.space);
+  _SetWidth(mDisplayMode.virtual_width);
+  _SetHeight(mDisplayMode.virtual_height);
+  //_SetMode(mDisplayMode.flags); ???
+
+
   get_frame_buffer_config GetFrameBufferConfig = (get_frame_buffer_config)accelerant_hook(B_GET_FRAME_BUFFER_CONFIG, NULL);
-printf("foo 12\n");
   if ( !GetFrameBufferConfig )
 	return false;
-printf("foo 13\n");
   if ( GetFrameBufferConfig(&mFrameBufferConfig) != B_OK )
 	return false;
-printf("foo 14\n");
-  _SetDepth(mode_list[0].space);
-  _SetWidth(mode_list[0].virtual_width);
-  _SetHeight(mode_list[0].virtual_height);
-  //_SetMode(mode_list[0].flags); ???
-  memset(mFrameBufferConfig.frame_buffer,0,sizeof(mFrameBufferConfig.frame_buffer));
 
   return true;
 }
@@ -302,6 +298,47 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 */
 void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 {
+/* Need to add check for possible hardware acceleration of this */
+/* Probably need to verify that rectangle is in bounds */
+/* Need to deal with pattern */
+	_Lock();
+
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+			{
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + (int)r.top*mFrameBufferConfig.bytes_per_row);
+				int x,y;
+				rgb_color color = d->highcolor.GetColor32();
+				uint32 drawcolor = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+				for (y=(int)r.top; y<=(int)r.bottom; y++)
+				{
+					for (x=(int)r.left; x<=r.right; x++)
+					{
+						fb[x] = drawcolor;
+					}
+					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+
+	_Unlock();
 }
 
 /*!

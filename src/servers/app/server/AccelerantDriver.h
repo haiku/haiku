@@ -134,6 +134,7 @@ protected:
 	GetAccelerantHook accelerant_hook;
 	frame_buffer_config mFrameBufferConfig;
 	display_mode *mode_list;
+	display_mode mDisplayMode;
 };
 
 #endif
