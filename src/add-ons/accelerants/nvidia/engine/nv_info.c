@@ -1,12 +1,22 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003
+   Rudolf Cornelissen 7/2003-1/2004
 */
 
 #define MODULE_BIT 0x00002000
 
 #include "nv_std.h"
+
+static void pinsnv4_fake(void);
+static void pinsnv5_nv5m64_fake(void);
+static void pinsnv6_fake(void);
+static void pinsnv10_arch_fake(void);
+static void pinsnv20_arch_fake(void);
+static void pinsnv30_arch_fake(void);
+static void getstrap_arch_nv4(void);
+static void getstrap_arch_nv10_20_30(void);
+static status_t pins5_read(uint8 *pins, uint8 length);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -90,7 +100,7 @@ status_t parse_pins ()
 }
 
 /* pins v5 is used by G450 and G550 */
-status_t pins5_read(uint8 *pins, uint8 length)
+static status_t pins5_read(uint8 *pins, uint8 length)
 {
 	unsigned int m_factor = 6;
 
@@ -216,7 +226,7 @@ void fake_pins(void)
 		getstrap_arch_nv4();
 		break;
 	default:
-		getstrap_arch_nv10_20();
+		getstrap_arch_nv10_20_30();
 		break;
 	}
 
@@ -233,7 +243,7 @@ void fake_pins(void)
 */
 }
 
-void pinsnv4_fake(void)
+static void pinsnv4_fake(void)
 {
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 256;
@@ -269,7 +279,7 @@ void pinsnv4_fake(void)
 	si->ps.std_memory_clock = 110;
 }
 
-void pinsnv5_nv5m64_fake(void)
+static void pinsnv5_nv5m64_fake(void)
 {
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 300;
@@ -305,7 +315,7 @@ void pinsnv5_nv5m64_fake(void)
 	si->ps.std_memory_clock = 150;
 }
 
-void pinsnv6_fake(void)
+static void pinsnv6_fake(void)
 {
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 300;
@@ -341,7 +351,7 @@ void pinsnv6_fake(void)
 	si->ps.std_memory_clock = 125;
 }
 
-void pinsnv10_arch_fake(void)
+static void pinsnv10_arch_fake(void)
 {
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 350;
@@ -378,7 +388,7 @@ void pinsnv10_arch_fake(void)
 	si->ps.std_memory_clock = 150;
 }
 
-void pinsnv20_arch_fake(void)
+static void pinsnv20_arch_fake(void)
 {
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 350;
@@ -415,7 +425,7 @@ void pinsnv20_arch_fake(void)
 	si->ps.std_memory_clock = 200;
 }
 
-void pinsnv30_arch_fake(void)
+static void pinsnv30_arch_fake(void)
 {
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 350;
@@ -452,7 +462,7 @@ void pinsnv30_arch_fake(void)
 	si->ps.std_memory_clock = 190;
 }
 
-void getstrap_arch_nv4(void)
+static void getstrap_arch_nv4(void)
 {
 	uint32 strapinfo = NV_REG32(NV32_NV4STRAPINFO);
 
@@ -496,7 +506,7 @@ void getstrap_arch_nv4(void)
 	si->ps.secondary_head = false;
 }
 
-void getstrap_arch_nv10_20(void)
+static void getstrap_arch_nv10_20_30(void)
 {
 	uint32 dev_manID = CFGR(DEVID);
 	uint32 strapinfo = NV_REG32(NV32_NV10STRAPINFO);
@@ -504,13 +514,18 @@ void getstrap_arch_nv10_20(void)
 	switch (dev_manID)
 	{
 	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
+		//fixme: need kerneldriver function to readout other device PCI config space!?!
+		//linux: int amt = pciReadLong(pciTag(0, 0, 1), 0x7C);
 		si->ps.memory_size = (((CFGR(GF2IGPU) & 0x000007c0) >> 6) + 1);
 		break;
 	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
+		//fixme: need kerneldriver function to readout other device PCI config space!?!
+		//linux: int amt = pciReadLong(pciTag(0, 0, 1), 0x84);
 		si->ps.memory_size = (((CFGR(GF4MXIGPU) & 0x000007f0) >> 4) + 1);
-//remove this line if det. is OK:	int amt = pciReadLong(pciTag(0, 0, 1), 0x84);
 		break;
 	default:
+		LOG(8,("INFO: (Memory detection) Strapinfo value is: $%08x\n", strapinfo));
+
 		switch ((strapinfo & 0x0ff00000) >> 20)
 		{
 		case 2:
@@ -537,7 +552,7 @@ void getstrap_arch_nv10_20(void)
 		default:
 			si->ps.memory_size = 16;
 
-			LOG(8,("INFO: NV10/20 architecture chip with unknown RAM amount detected;\n"));
+			LOG(8,("INFO: NV10/20/30 architecture chip with unknown RAM amount detected;\n"));
 			LOG(8,("INFO: Setting 16Mb\n"));
 			break;
 		}
@@ -649,8 +664,14 @@ void dump_pins(void)
 	case SAA7102:
 		msg = "Philips SAA7102";
 		break;
+	case SAA7104:
+		msg = "Philips SAA7104";
+		break;
 	case SAA7108:
 		msg = "Philips SAA7108";
+		break;
+	case SAA7114:
+		msg = "Philips SAA7114";
 		break;
 	case BT868:
 		msg = "Brooktree/Conexant BT868";
