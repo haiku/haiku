@@ -296,8 +296,18 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 {
 	status_t result = B_OK;
 	uint16 adress;
+	uint32 fb_mrs1 = 0;
+	uint32 fb_mrs2 = 0;
 
 	LOG(8,("INFO: now executing coldstart...\n"));
+
+	/* get some strapinfo(?) for NV28 framebuffer access */
+	//fixme?: works on at least one NV28... how about other cards?
+	if (si->ps.card_type == NV28)
+	{
+		fb_mrs2 = NV_REG32(NV32_FB_MRS2);
+		fb_mrs1 = NV_REG32(NV32_FB_MRS1);
+	}
 
 	/* select colormode CRTC registers base adresses */
 	NV_REG8(NV8_MISCW) = 0xcb;
@@ -356,6 +366,14 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 			/* next command script, please */
 			index += 2;
 			adress = *((uint16*)(&(rom[index])));
+		}
+
+		/* get NV28 RAM access up and running */
+		//fixme?: works on at least one NV28... how about other cards?
+		if (si->ps.card_type == NV28)
+		{
+			NV_REG32(NV32_FB_MRS2) = fb_mrs2;
+			NV_REG32(NV32_FB_MRS1) = fb_mrs1;
 		}
 
 		/* now enable ROM shadow or the card will remain shut-off! */
@@ -1421,6 +1439,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			*exec = true;
 			break;
 		case 0x74: /* identical to type1 */
+			//fixme? on at least NV28 this cmd hammers the CRTC PCI-timeout register
+			//'data' number of times instead of snoozing.
+			//Couldn't see any diff in behaviour though!
 			*size -= 3;
 			if (*size < 0)
 			{
