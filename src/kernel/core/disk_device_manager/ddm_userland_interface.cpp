@@ -77,9 +77,9 @@ move_descendants_contents(KPartition *partition)
 	return B_OK;
 }
 
-// _kern_get_next_disk_device_id
+// _user_get_next_disk_device_id
 partition_id
-_kern_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
+_user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 {
 	if (!_cookie)
 		return B_BAD_VALUE;
@@ -107,9 +107,9 @@ _kern_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 	return id;
 }
 
-// _kern_find_disk_device
+// _user_find_disk_device
 partition_id
-_kern_find_disk_device(const char *_filename, size_t *neededSize)
+_user_find_disk_device(const char *_filename, size_t *neededSize)
 {
 	if (!_filename)
 		return B_BAD_VALUE;
@@ -138,9 +138,9 @@ _kern_find_disk_device(const char *_filename, size_t *neededSize)
 	return id;
 }
 
-// _kern_find_partition
+// _user_find_partition
 partition_id
-_kern_find_partition(const char *_filename, size_t *neededSize)
+_user_find_partition(const char *_filename, size_t *neededSize)
 {
 	if (!_filename)
 		return B_BAD_VALUE;
@@ -174,7 +174,7 @@ _kern_find_partition(const char *_filename, size_t *neededSize)
 	return id;
 }
 
-// _kern_get_disk_device_data
+// _user_get_disk_device_data
 /*!	\brief Writes data describing the disk device identified by ID and all
 		   its partitions into the supplied buffer.
 
@@ -217,7 +217,7 @@ _kern_find_partition(const char *_filename, size_t *neededSize)
 	- another error code...
 */
 status_t
-_kern_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
+_user_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
 						   user_disk_device_data *buffer, size_t bufferSize,
 						   size_t *_neededSize)
 {
@@ -269,9 +269,9 @@ _kern_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
 	return B_ENTRY_NOT_FOUND;
 }
 
-// _kern_get_partitionable_spaces
+// _user_get_partitionable_spaces
 status_t
-_kern_get_partitionable_spaces(partition_id partitionID, int32 changeCounter,
+_user_get_partitionable_spaces(partition_id partitionID, int32 changeCounter,
 							   partitionable_space_data *_buffer,
 							   int32 count, int32 *_actualCount)
 {
@@ -315,9 +315,9 @@ _kern_get_partitionable_spaces(partition_id partitionID, int32 changeCounter,
 	return error;
 }
 
-// _kern_register_file_device
+// _user_register_file_device
 partition_id
-_kern_register_file_device(const char *_filename)
+_user_register_file_device(const char *_filename)
 {
 	if (!_filename)
 		return B_BAD_VALUE;
@@ -334,9 +334,9 @@ _kern_register_file_device(const char *_filename)
 	return B_ERROR;
 }
 
-// _kern_unregister_file_device
+// _user_unregister_file_device
 status_t
-_kern_unregister_file_device(partition_id deviceID, const char *_filename)
+_user_unregister_file_device(partition_id deviceID, const char *_filename)
 {
 	if (deviceID < 0 && !_filename)
 		return B_BAD_VALUE;	
@@ -352,9 +352,9 @@ _kern_unregister_file_device(partition_id deviceID, const char *_filename)
 	}
 }
 
-// _kern_get_disk_system_info
+// _user_get_disk_system_info
 status_t
-_kern_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
+_user_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
 {
 	if (!_info)
 		return B_BAD_VALUE;
@@ -371,9 +371,9 @@ _kern_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
 	return B_ENTRY_NOT_FOUND;
 }
 
-// _kern_get_next_disk_system_info
+// _user_get_next_disk_system_info
 status_t
-_kern_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
+_user_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
 {
 	if (!_cookie || !_info)
 		return B_BAD_VALUE;
@@ -394,9 +394,9 @@ _kern_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
 	return result;
 }
 
-// _kern_find_disk_system
+// _user_find_disk_system
 status_t
-_kern_find_disk_system(const char *_name, user_disk_system_info *_info)
+_user_find_disk_system(const char *_name, user_disk_system_info *_info)
 {
 	if (!_name || !_info)
 		return B_BAD_VALUE;
@@ -417,9 +417,9 @@ _kern_find_disk_system(const char *_name, user_disk_system_info *_info)
 	return B_ENTRY_NOT_FOUND;
 }
 
-// _kern_supports_defragmenting_partition
+// _user_supports_defragmenting_partition
 bool
-_kern_supports_defragmenting_partition(partition_id partitionID,
+_user_supports_defragmenting_partition(partition_id partitionID,
 									   int32 changeCounter, bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -438,9 +438,9 @@ _kern_supports_defragmenting_partition(partition_id partitionID,
 	return result;										   
 }
 
-// _kern_supports_repairing_partition
+// _user_supports_repairing_partition
 bool
-_kern_supports_repairing_partition(partition_id partitionID,
+_user_supports_repairing_partition(partition_id partitionID,
 								   int32 changeCounter, bool checkOnly,
 								   bool *_whileMounted)
 {
@@ -460,9 +460,9 @@ _kern_supports_repairing_partition(partition_id partitionID,
 	return result;										   
 }
 
-// _kern_supports_resizing_partition
+// _user_supports_resizing_partition
 bool
-_kern_supports_resizing_partition(partition_id partitionID,
+_user_supports_resizing_partition(partition_id partitionID,
 								  int32 changeCounter, bool *_canResizeContents,
 								  bool *_whileMounted)
 {
@@ -505,9 +505,9 @@ _kern_supports_resizing_partition(partition_id partitionID,
 	return result;
 }
 
-// _kern_supports_moving_partition
+// _user_supports_moving_partition
 bool
-_kern_supports_moving_partition(partition_id partitionID, int32 changeCounter,
+_user_supports_moving_partition(partition_id partitionID, int32 changeCounter,
 								partition_id *_unmovable,
 								partition_id *_needUnmounting,
 								size_t bufferSize)
@@ -567,9 +567,9 @@ _kern_supports_moving_partition(partition_id partitionID, int32 changeCounter,
 	return result;
 }
 
-// _kern_supports_setting_partition_name
+// _user_supports_setting_partition_name
 bool
-_kern_supports_setting_partition_name(partition_id partitionID,
+_user_supports_setting_partition_name(partition_id partitionID,
 									  int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -596,9 +596,9 @@ _kern_supports_setting_partition_name(partition_id partitionID,
 	return diskSystem->SupportsSettingName(partition);
 }
 
-// _kern_supports_setting_partition_content_name
+// _user_supports_setting_partition_content_name
 bool
-_kern_supports_setting_partition_content_name(partition_id partitionID,
+_user_supports_setting_partition_content_name(partition_id partitionID,
 											  int32 changeCounter,
 											  bool *_whileMounted)
 {
@@ -626,9 +626,9 @@ _kern_supports_setting_partition_content_name(partition_id partitionID,
 	return result;
 }
 
-// _kern_supports_setting_partition_type
+// _user_supports_setting_partition_type
 bool
-_kern_supports_setting_partition_type(partition_id partitionID,
+_user_supports_setting_partition_type(partition_id partitionID,
 									  int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -655,9 +655,9 @@ _kern_supports_setting_partition_type(partition_id partitionID,
 	return diskSystem->SupportsSettingType(partition);
 }
 
-// _kern_supports_setting_partition_parameters
+// _user_supports_setting_partition_parameters
 bool
-_kern_supports_setting_partition_parameters(partition_id partitionID,
+_user_supports_setting_partition_parameters(partition_id partitionID,
 											int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -684,9 +684,9 @@ _kern_supports_setting_partition_parameters(partition_id partitionID,
 	return diskSystem->SupportsSettingParameters(partition);
 }
 
-// _kern_supports_setting_partition_content_parameters
+// _user_supports_setting_partition_content_parameters
 bool
-_kern_supports_setting_partition_content_parameters(partition_id partitionID,
+_user_supports_setting_partition_content_parameters(partition_id partitionID,
 													int32 changeCounter,
 													bool *_whileMounted)
 {
@@ -715,9 +715,9 @@ _kern_supports_setting_partition_content_parameters(partition_id partitionID,
 	return result;
 }
 
-// _kern_supports_initializing_partition
+// _user_supports_initializing_partition
 bool
-_kern_supports_initializing_partition(partition_id partitionID,
+_user_supports_initializing_partition(partition_id partitionID,
 									  int32 changeCounter,
 									  const char *_diskSystemName)
 {
@@ -749,9 +749,9 @@ _kern_supports_initializing_partition(partition_id partitionID,
 // TODO: Ask the parent partitioning system as well.
 }
 
-// _kern_supports_creating_child_partition
+// _user_supports_creating_child_partition
 bool
-_kern_supports_creating_child_partition(partition_id partitionID,
+_user_supports_creating_child_partition(partition_id partitionID,
 										int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -774,9 +774,9 @@ _kern_supports_creating_child_partition(partition_id partitionID,
 	return diskSystem->SupportsCreatingChild(partition);
 }
 
-// _kern_supports_deleting_child_partition
+// _user_supports_deleting_child_partition
 bool
-_kern_supports_deleting_child_partition(partition_id partitionID,
+_user_supports_deleting_child_partition(partition_id partitionID,
 										int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -790,9 +790,9 @@ _kern_supports_deleting_child_partition(partition_id partitionID,
 	return (validate_delete_child_partition(partition, changeCounter) == B_OK);
 }
 
-// _kern_is_sub_disk_system_for
+// _user_is_sub_disk_system_for
 bool
-_kern_is_sub_disk_system_for(disk_system_id diskSystemID,
+_user_is_sub_disk_system_for(disk_system_id diskSystemID,
 							 partition_id partitionID, int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -813,9 +813,9 @@ _kern_is_sub_disk_system_for(disk_system_id diskSystemID,
 	return diskSystem->IsSubSystemFor(partition);
 }
 
-// _kern_validate_resize_partition
+// _user_validate_resize_partition
 status_t
-_kern_validate_resize_partition(partition_id partitionID, int32 changeCounter,
+_user_validate_resize_partition(partition_id partitionID, int32 changeCounter,
 								off_t *_size)
 {
 	if (!_size)
@@ -838,9 +838,9 @@ _kern_validate_resize_partition(partition_id partitionID, int32 changeCounter,
 	return result;								        
 }
 
-// _kern_validate_move_partition
+// _user_validate_move_partition
 status_t
-_kern_validate_move_partition(partition_id partitionID, int32 changeCounter,
+_user_validate_move_partition(partition_id partitionID, int32 changeCounter,
 							  off_t *_newOffset)
 {
 	if (!_newOffset)
@@ -861,9 +861,9 @@ _kern_validate_move_partition(partition_id partitionID, int32 changeCounter,
 	return result;
 }
 
-// _kern_validate_set_partition_name
+// _user_validate_set_partition_name
 status_t
-_kern_validate_set_partition_name(partition_id partitionID,
+_user_validate_set_partition_name(partition_id partitionID,
 								  int32 changeCounter, char *_name)
 {
 	if (!_name)
@@ -886,9 +886,9 @@ _kern_validate_set_partition_name(partition_id partitionID,
 	return error;
 }
 
-// _kern_validate_set_partition_content_name
+// _user_validate_set_partition_content_name
 status_t
-_kern_validate_set_partition_content_name(partition_id partitionID,
+_user_validate_set_partition_content_name(partition_id partitionID,
 										  int32 changeCounter, char *_name)
 {
 	if (!_name)
@@ -911,9 +911,9 @@ _kern_validate_set_partition_content_name(partition_id partitionID,
 	return error;
 }
 
-// _kern_validate_set_partition_type
+// _user_validate_set_partition_type
 status_t
-_kern_validate_set_partition_type(partition_id partitionID,
+_user_validate_set_partition_type(partition_id partitionID,
 								  int32 changeCounter, const char *_type)
 {
 	if (!_type)
@@ -933,9 +933,9 @@ _kern_validate_set_partition_type(partition_id partitionID,
 	return validate_set_partition_type(partition, changeCounter, type);
 }
 
-// _kern_validate_initialize_partition
+// _user_validate_initialize_partition
 status_t
-_kern_validate_initialize_partition(partition_id partitionID,
+_user_validate_initialize_partition(partition_id partitionID,
 									int32 changeCounter,
 									const char *_diskSystemName, char *_name,
 									const char *_parameters,
@@ -975,9 +975,9 @@ _kern_validate_initialize_partition(partition_id partitionID,
 	return error;											  
 }
 
-// _kern_validate_create_child_partition
+// _user_validate_create_child_partition
 status_t
-_kern_validate_create_child_partition(partition_id partitionID,
+_user_validate_create_child_partition(partition_id partitionID,
 									  int32 changeCounter, off_t *_offset,
 									  off_t *_size, const char *_type,
 									  const char *_parameters,
@@ -1023,9 +1023,9 @@ _kern_validate_create_child_partition(partition_id partitionID,
 	return error;
 }
 
-// _kern_get_next_supported_partition_type
+// _user_get_next_supported_partition_type
 status_t
-_kern_get_next_supported_partition_type(partition_id partitionID,
+_user_get_next_supported_partition_type(partition_id partitionID,
 										int32 changeCounter, int32 *_cookie,
 										char *_type)
 {
@@ -1061,9 +1061,9 @@ _kern_get_next_supported_partition_type(partition_id partitionID,
 	return error;
 }
 
-// _kern_get_partition_type_for_content_type
+// _user_get_partition_type_for_content_type
 status_t
-_kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
+_user_get_partition_type_for_content_type(disk_system_id diskSystemID,
 										  const char *_contentType, char *_type)
 {
 	if (!_contentType || !_type)
@@ -1086,9 +1086,9 @@ _kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
 	return B_ERROR;
 }
 
-// _kern_prepare_disk_device_modifications
+// _user_prepare_disk_device_modifications
 status_t
-_kern_prepare_disk_device_modifications(partition_id deviceID)
+_user_prepare_disk_device_modifications(partition_id deviceID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the device
@@ -1104,9 +1104,9 @@ _kern_prepare_disk_device_modifications(partition_id deviceID)
 	return B_ENTRY_NOT_FOUND;
 }
 
-// _kern_commit_disk_device_modifications
+// _user_commit_disk_device_modifications
 status_t
-_kern_commit_disk_device_modifications(partition_id deviceID, port_id port,
+_user_commit_disk_device_modifications(partition_id deviceID, port_id port,
 									   int32 token, bool completeProgress)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -1137,9 +1137,9 @@ _kern_commit_disk_device_modifications(partition_id deviceID, port_id port,
 	return B_ENTRY_NOT_FOUND;
 }
 
-// _kern_cancel_disk_device_modifications
+// _user_cancel_disk_device_modifications
 status_t
-_kern_cancel_disk_device_modifications(partition_id deviceID)
+_user_cancel_disk_device_modifications(partition_id deviceID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the device
@@ -1155,9 +1155,9 @@ _kern_cancel_disk_device_modifications(partition_id deviceID)
 	return B_ENTRY_NOT_FOUND;
 }
 
-// _kern_is_disk_device_modified
+// _user_is_disk_device_modified
 bool
-_kern_is_disk_device_modified(partition_id deviceID)
+_user_is_disk_device_modified(partition_id deviceID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the device
@@ -1173,9 +1173,9 @@ _kern_is_disk_device_modified(partition_id deviceID)
 	return B_ENTRY_NOT_FOUND;
 }
 
-// _kern_defragment_partition
+// _user_defragment_partition
 status_t
-_kern_defragment_partition(partition_id partitionID, int32 changeCounter)
+_user_defragment_partition(partition_id partitionID, int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -1194,9 +1194,9 @@ _kern_defragment_partition(partition_id partitionID, int32 changeCounter)
 	return B_OK;
 }
 
-// _kern_repair_partition
+// _user_repair_partition
 status_t
-_kern_repair_partition(partition_id partitionID, int32 changeCounter,
+_user_repair_partition(partition_id partitionID, int32 changeCounter,
 					   bool checkOnly)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -1220,9 +1220,9 @@ _kern_repair_partition(partition_id partitionID, int32 changeCounter,
 	return B_OK;
 }
 
-// _kern_resize_partition
+// _user_resize_partition
 status_t
-_kern_resize_partition(partition_id partitionID, int32 changeCounter,
+_user_resize_partition(partition_id partitionID, int32 changeCounter,
 					   off_t size)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -1260,9 +1260,9 @@ _kern_resize_partition(partition_id partitionID, int32 changeCounter,
 	return error;
 }
 
-// _kern_move_partition
+// _user_move_partition
 status_t
-_kern_move_partition(partition_id partitionID, int32 changeCounter,
+_user_move_partition(partition_id partitionID, int32 changeCounter,
 					 off_t newOffset)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -1296,9 +1296,9 @@ _kern_move_partition(partition_id partitionID, int32 changeCounter,
 	return move_descendants_contents(partition);
 }
 
-// _kern_set_partition_name
+// _user_set_partition_name
 status_t
-_kern_set_partition_name(partition_id partitionID, int32 changeCounter,
+_user_set_partition_name(partition_id partitionID, int32 changeCounter,
 						 const char *_name)
 {
 	if (!_name)
@@ -1334,9 +1334,9 @@ _kern_set_partition_name(partition_id partitionID, int32 changeCounter,
 		partition, B_PARTITION_SET_NAME);
 }
 
-// _kern_set_partition_content_name
+// _user_set_partition_content_name
 status_t
-_kern_set_partition_content_name(partition_id partitionID, int32 changeCounter,
+_user_set_partition_content_name(partition_id partitionID, int32 changeCounter,
 								 const char *_name)
 {
 	if (!_name)
@@ -1372,9 +1372,9 @@ _kern_set_partition_content_name(partition_id partitionID, int32 changeCounter,
 		partition, B_PARTITION_SET_CONTENT_NAME);
 }
 
-// _kern_set_partition_type
+// _user_set_partition_type
 status_t
-_kern_set_partition_type(partition_id partitionID, int32 changeCounter,
+_user_set_partition_type(partition_id partitionID, int32 changeCounter,
 						 const char *_type)
 {
 	if (!_type)
@@ -1406,9 +1406,9 @@ _kern_set_partition_type(partition_id partitionID, int32 changeCounter,
 		partition, B_PARTITION_SET_TYPE);
 }
 
-// _kern_set_partition_parameters
+// _user_set_partition_parameters
 status_t
-_kern_set_partition_parameters(partition_id partitionID, int32 changeCounter,
+_user_set_partition_parameters(partition_id partitionID, int32 changeCounter,
 							   const char *_parameters, size_t parametersSize)
 {
 	if (!_parameters || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
@@ -1447,9 +1447,9 @@ _kern_set_partition_parameters(partition_id partitionID, int32 changeCounter,
 	return error;
 }
 
-// _kern_set_partition_content_parameters
+// _user_set_partition_content_parameters
 status_t
-_kern_set_partition_content_parameters(partition_id partitionID,
+_user_set_partition_content_parameters(partition_id partitionID,
 									   int32 changeCounter,
 									   const char *_parameters,
 									   size_t parametersSize)
@@ -1490,9 +1490,9 @@ _kern_set_partition_content_parameters(partition_id partitionID,
 	return error;
 }
 
-// _kern_initialize_partition
+// _user_initialize_partition
 status_t
-_kern_initialize_partition(partition_id partitionID, int32 changeCounter,
+_user_initialize_partition(partition_id partitionID, int32 changeCounter,
 						   const char *_diskSystemName, const char *_name,
 						   const char *_parameters, size_t parametersSize)
 {
@@ -1558,9 +1558,9 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 	return error;
 }
 
-// _kern_uninitialize_partition
+// _user_uninitialize_partition
 status_t
-_kern_uninitialize_partition(partition_id partitionID, int32 changeCounter)
+_user_uninitialize_partition(partition_id partitionID, int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -1574,9 +1574,9 @@ _kern_uninitialize_partition(partition_id partitionID, int32 changeCounter)
 	return partition->UninitializeContents(true);
 }
 
-// _kern_create_child_partition
+// _user_create_child_partition
 status_t
-_kern_create_child_partition(partition_id partitionID, int32 changeCounter,
+_user_create_child_partition(partition_id partitionID, int32 changeCounter,
 							 off_t offset, off_t size, const char *_type,
 							 const char *_parameters, size_t parametersSize,
 							 partition_id *_childID)
@@ -1642,9 +1642,9 @@ _kern_create_child_partition(partition_id partitionID, int32 changeCounter,
 	return error;
 }
 
-// _kern_delete_partition
+// _user_delete_partition
 status_t
-_kern_delete_partition(partition_id partitionID, int32 changeCounter)
+_user_delete_partition(partition_id partitionID, int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -1666,9 +1666,9 @@ _kern_delete_partition(partition_id partitionID, int32 changeCounter)
 	return B_OK;
 }
 
-// _kern_get_next_disk_device_job_info
+// _user_get_next_disk_device_job_info
 status_t
-_kern_get_next_disk_device_job_info(int32 *_cookie,
+_user_get_next_disk_device_job_info(int32 *_cookie,
 									user_disk_device_job_info *_info)
 {
 	if (!_cookie || !_info)
@@ -1702,9 +1702,9 @@ _kern_get_next_disk_device_job_info(int32 *_cookie,
 	return error;
 }
 
-// _kern_get_disk_device_job_info
+// _user_get_disk_device_job_info
 status_t
-_kern_get_disk_device_job_info(disk_job_id id, user_disk_device_job_info *_info)
+_user_get_disk_device_job_info(disk_job_id id, user_disk_device_job_info *_info)
 {
 	if (!_info)
 		return B_BAD_VALUE;
@@ -1721,9 +1721,9 @@ _kern_get_disk_device_job_info(disk_job_id id, user_disk_device_job_info *_info)
 	return error;
 }
 
-// _kern_get_disk_device_job_status
+// _user_get_disk_device_job_status
 status_t
-_kern_get_disk_device_job_progress_info(disk_job_id id,
+_user_get_disk_device_job_progress_info(disk_job_id id,
 										disk_device_job_progress_info *_info)
 {
 	if (!_info)
@@ -1741,9 +1741,9 @@ _kern_get_disk_device_job_progress_info(disk_job_id id,
 	return error;
 }
 
-// _kern_pause_disk_device_job
+// _user_pause_disk_device_job
 status_t
-_kern_pause_disk_device_job(disk_job_id id)
+_user_pause_disk_device_job(disk_job_id id)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
@@ -1760,9 +1760,9 @@ _kern_pause_disk_device_job(disk_job_id id)
 	return B_ENTRY_NOT_FOUND;
 }
 
-// _kern_cancel_disk_device_job
+// _user_cancel_disk_device_job
 status_t
-_kern_cancel_disk_device_job(disk_job_id id, bool reverse)
+_user_cancel_disk_device_job(disk_job_id id, bool reverse)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
