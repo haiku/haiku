@@ -95,10 +95,10 @@ static device_hooks graphics_device_hooks = {
 	NULL
 };
 
-#define VENDOR_ID_NVIDIA	0x10de /* Nvidia */
+#define VENDOR_ID_NVIDIA	0x1106 /* Via */
 
 static uint16 nvidia_device_list[] = {
-//	0x0020, /* Nvidia TNT1 */
+	0x3122, /*  */
 	0
 };
 
@@ -340,8 +340,8 @@ static status_t map_device(device_info *di)
 	area_id rom_area;
 
 	/* Nvidia cards have registers in [0] and framebuffer in [1] */
-	int registers = 0;
-	int frame_buffer = 1;
+	int registers = 1;
+	int frame_buffer = 0;
 //	int pseudo_dma = 2;
 
 	/* enable memory mapped IO, disable VGA I/O - this is defined in the PCI standard */
