@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // Usb port transport add-on,
-// changes by Andreas Benzler
+// changes by Andreas Benzler, Philippe Houdoin
 //
 // Original from Parallel 
 // port transport add-on.
@@ -12,7 +12,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2001-2003 OpenBeOS Project
+// Copyright (c) 2001-2004 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -34,11 +34,14 @@
 /*****************************************************************************/
 
 
-#include <unistd.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <string.h>
 
 #include <StorageKit.h>
 #include <SupportKit.h>
+
+#include <USB_printer.h>
 
 #include "PrintTransportAddOn.h"
 
@@ -62,6 +65,7 @@ class UsbPort : public BDataIO {
 BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg) {
 	UsbPort* transport = new UsbPort(printer, msg);
 	if (transport->IsOk()) {
+		msg->what = 'okok';
 		return transport;
 	} else {
 		delete transport; return NULL;
@@ -74,8 +78,48 @@ BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg) {
 UsbPort::UsbPort(BDirectory* printer, BMessage *msg) 
 	: fFile(-1)
 {
+	char device_id[USB_PRINTER_DEVICE_ID_LENGTH + 1];
+	char name[USB_PRINTER_DEVICE_ID_LENGTH + 1];
+	char *desc;
+	char *value;
+	int ret;
+	bool bidirectional = true;
+	
 	// We support only one USB printer, so does BeOS R5.
 	fFile = open("/dev/printer/usb/0", O_RDWR | O_EXCL | O_BINARY, 0);
+	if (fFile < 0) {
+		// Try unidirectional access mode
+		bidirectional = false;
+		fFile = open("/dev/printer/usb/0", O_WRONLY | O_EXCL | O_BINARY, 0);
+	}
+	
+	if (fFile < 0)
+		return;
+	
+	// Get printer's DEVICE ID string
+	ret = ioctl(fFile, USB_PRINTER_GET_DEVICE_ID, device_id, sizeof(device_id));
+	if (ret < 0) {
+		close(fFile);
+		fFile = -1;
+		return;
+	}
+	
+	// Fill up the message
+	msg->AddBool("bidirectional", bidirectional);
+	msg->AddString("device_id", device_id);
+
+	// parse and split the device_id string into separate parameters
+	desc = strtok(device_id, ":");	
+	while (desc) {
+		snprintf(name, sizeof(name), "DEVID:%s", desc);
+		value = strtok(NULL, ";");
+		if (!value)
+			break;
+		msg->AddString(name, value);
+		
+		// next device descriptor
+		desc = strtok(NULL, ":");	
+	}
 }
 
 
