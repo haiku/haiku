@@ -41,6 +41,10 @@ private:
 	Udf::String& _UdfVolumeName() { return fUdfVolumeName; }
 	Udf::String& _IsoVolumeName() { return fIsoVolumeName; }
 	Allocator& _Allocator() { return fAllocator; }
+	time_t _BuildTime() const { return fBuildTime; }
+	Udf::timestamp& _BuildTimeStamp() { return fBuildTimeStamp; }
+
+	void _SetBuildTime(time_t time);
 
 	status_t _FormatString(char *message, const char *formatString, va_list arguments) const;
 	void _PrintError(const char *formatString, ...) const;
@@ -58,6 +62,8 @@ private:
 	Udf::String fIsoVolumeName;
 	const ProgressListener &fListener;
 	Allocator fAllocator;
+	time_t fBuildTime;
+	Udf::timestamp fBuildTimeStamp;
 };
 
 

@@ -22,6 +22,9 @@
 using Udf::bool_to_string;
 using Udf::check_size_error;
 
+//! Application identifier entity_id
+static const Udf::entity_id kApplicationId(0, "*OpenBeOS makeudfimage");
+
 /*! \brief Creates a new UdfBuilder object.
 */
 UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
@@ -39,6 +42,7 @@ UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
 	, fIsoVolumeName(isoVolumeName)
 	, fListener(listener)
 	, fAllocator(blockSize)
+	, fBuildTime(0)	// set at start of Build()
 {
 	DEBUG_INIT_ETC("UdfBuilder", ("blockSize: %ld, doUdf: %s, doIso: %s",
 	               blockSize, bool_to_string(doUdf), bool_to_string(doIso)));
@@ -117,6 +121,11 @@ UdfBuilder::Build()
 	status_t error = InitCheck();
 	if (error)
 		RETURN(error);
+		
+	// Note the time at which we're starting
+	time_t timer = time(&timer);
+//	_SetBuildTime(real_time_clock());
+	_SetBuildTime(timer);
 
 	_OutputFile().Seek(0, SEEK_SET);		
 	_PrintUpdate(VERBOSITY_LOW, "Output file: `%s'", fOutputFilename.c_str());		
@@ -251,56 +260,95 @@ UdfBuilder::Build()
 				error = check_size_error(bytes, _BlockSize()-sizeof(anchor));
 			}
 		}
-		// build primary vds
 		uint32 vdsNumber = 0;
-		Udf::primary_volume_descriptor primary;
-		primary.set_vds_number(vdsNumber++);
-		primary.set_primary_volume_descriptor_number(0);
-		uint32 nameLength = _UdfVolumeName().Cs0Length();
-		if (nameLength > 32) {
-			_PrintWarning("udf: Truncating volume name as stored in primary "
-			              "volume descriptor to 32 byte limit. This shouldn't matter, "
-			              "as the complete name is %d bytes long, which is short enough "
-			              "to fit completely in the logical volume descriptor.",
-			              nameLength);
-			nameLength = 32;
+		// write primary_vd
+		if (!error) {
+			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing primary volume descriptor");
+			// build primary_vd
+			Udf::primary_volume_descriptor primary;
+			primary.set_vds_number(vdsNumber);
+			primary.set_primary_volume_descriptor_number(0);
+			uint32 nameLength = _UdfVolumeName().Cs0Length();
+			if (nameLength > 32) {
+				_PrintWarning("udf: Truncating volume name as stored in primary "
+				              "volume descriptor to 32 byte limit. This shouldn't matter, "
+				              "as the complete name is %d bytes long, which is short enough "
+				              "to fit completely in the logical volume descriptor.",
+				              nameLength);
+				nameLength = 32;
+			}
+			memcpy(primary.volume_identifier().data, _UdfVolumeName().Cs0(),
+			       nameLength);
+			primary.set_volume_sequence_number(1);
+			primary.set_max_volume_sequence_number(1);
+			primary.set_interchange_level(2);
+			primary.set_max_interchange_level(3);
+			primary.set_character_set_list(1);
+			primary.set_max_character_set_list(1);
+			// first 16 chars of volume set id must be unique. first 8 must be
+			// a hex representation of a timestamp
+			char timestamp[9];
+			sprintf(timestamp, "%08lX", _BuildTime());
+			std::string volumeSetId(timestamp);
+			volumeSetId = volumeSetId + "--------" + "(unnamed volume set)";
+			Udf::String Cs0VolumeSetId(volumeSetId.c_str());
+			memcpy(primary.volume_set_identifier().data, Cs0VolumeSetId.Cs0(),
+			       Cs0VolumeSetId.Cs0Length());
+			primary.descriptor_character_set() = Udf::kCs0CharacterSet;
+			primary.explanatory_character_set() = Udf::kCs0CharacterSet;
+			Udf::extent_address nullAddress(0, 0);
+			primary.volume_abstract() = nullAddress;
+			primary.volume_copyright_notice() = nullAddress;
+			primary.application_id() = kApplicationId;
+			primary.recording_date_and_time() = _BuildTimeStamp();
+			primary.implementation_id() = Udf::kImplementationId;
+			memset(primary.implementation_use().data, 0,
+			       primary.implementation_use().size());
+			primary.set_predecessor_volume_descriptor_sequence_location(0);
+			primary.set_flags(0);	// ToDo: maybe 1 is more appropriate?	       
+			memset(primary.reserved().data, 0, primary.reserved().size());
+			primary.tag().set_id(Udf::TAGID_PRIMARY_VOLUME_DESCRIPTOR);
+			primary.tag().set_version(3);
+			primary.tag().set_serial_number(0);
+				// note that the checksums haven't been set yet, since the
+				// location is dependent on which sequence (primary or reserve)
+				// the descriptor is currently being written to. Thus we have to
+				// recalculate the checksums for each sequence.
+			DUMP(primary);
+			// write primary_vd to primary vds
+			primary.tag().set_location(primaryExtent.location()+vdsNumber);
+			primary.tag().set_checksums(primary);
+			ssize_t bytes = _OutputFile().WriteAt(primary.tag().location() << _BlockShift(),
+			                              &primary, sizeof(primary));
+			error = check_size_error(bytes, sizeof(primary));                              
+			if (!error && bytes < ssize_t(_BlockSize())) {
+				ssize_t bytesLeft = _BlockSize() - bytes;
+				bytes = _OutputFile().ZeroAt((primary.tag().location() << _BlockShift())
+				                             + bytes, bytesLeft);
+				error = check_size_error(bytes, bytesLeft);			                             
+			}
+			// write primary_vd to reserve vds				                             
+			if (!error) {
+				primary.tag().set_location(reserveExtent.location()+vdsNumber);
+				primary.tag().set_checksums(primary);
+				ssize_t bytes = _OutputFile().WriteAt(primary.tag().location() << _BlockShift(),
+	        			                              &primary, sizeof(primary));
+				error = check_size_error(bytes, sizeof(primary));                              
+				if (!error && bytes < ssize_t(_BlockSize())) {
+					ssize_t bytesLeft = _BlockSize() - bytes;
+					bytes = _OutputFile().ZeroAt((primary.tag().location() << _BlockShift())
+					                             + bytes, bytesLeft);
+					error = check_size_error(bytes, bytesLeft);			                             
+				}
+			}
 		}
-		memcpy(primary.volume_identifier().data, _UdfVolumeName().Cs0(),
-		       nameLength);
-		primary.set_volume_sequence_number(1);
-		primary.set_max_volume_sequence_number(1);
-		primary.set_interchange_level(2);
-		primary.set_max_interchange_level(3);
-		primary.set_character_set_list(1);
-		primary.set_max_character_set_list(1);
-		// first 16 chars of volume set id must be unique. first 8 must be
-		// a hex representation of a timestamp
-		char timestamp[9];
-		sprintf(timestamp, "%lx", real_time_clock());
-		std::string volumeSetId(timestamp);
-		volumeSetId = volumeSetId + "--------" + "(unnamed volume set)";
-		Udf::String Cs0VolumeSetId(volumeSetId.c_str());
-		memcpy(primary.volume_set_identifier().data, Cs0VolumeSetId.Cs0(),
-		       Cs0VolumeSetId.Cs0Length());
-		primary.descriptor_character_set() = Udf::kCs0CharacterSet;
-		primary.explanatory_character_set() = Udf::kCs0CharacterSet;
-		Udf::extent_address nullAddress(0, 0);
-		primary.volume_abstract() = nullAddress;
-		primary.volume_copyright_notice() = nullAddress;
-		primary.tag().set_id(Udf::TAGID_PRIMARY_VOLUME_DESCRIPTOR);
-		primary.tag().set_version(3);
-		primary.tag().set_serial_number(0);
-		DUMP(primary);
+		vdsNumber++;			
 
-		// build logical vds
+		// write logical vds
 //		Udf::logical_volume_descriptor logical;
 
-		// build partition descriptor
+		// write partition descriptor
 //		Udf::partition_descriptor partition;
-		
-		// write primary vds
-
-		// write reserve vds
 		
 		// Error check
 		if (error) {				 
@@ -312,6 +360,16 @@ UdfBuilder::Build()
 	if (!error)
 		_PrintUpdate(VERBOSITY_LOW, "Finished");
 	RETURN(error);
+}
+
+/*! \brief Sets the time at which image building began.
+*/
+void
+UdfBuilder::_SetBuildTime(time_t time)
+{
+	fBuildTime = time;
+	Udf::timestamp stamp(time);
+	fBuildTimeStamp = stamp;
 }
 
 /*! \brief Uses vsprintf() to output the given format string and arguments
