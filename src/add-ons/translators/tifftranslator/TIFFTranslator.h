@@ -46,13 +46,18 @@
 
 #define TIFF_IN_QUALITY 0.1
 #define TIFF_IN_CAPABILITY 0.1
-#define TIFF_OUT_QUALITY 0.0
-#define TIFF_OUT_CAPABILITY 0.0
+#define TIFF_OUT_QUALITY 0.6
+#define TIFF_OUT_CAPABILITY 0.2
 
 #define BBT_IN_QUALITY 0.4
 #define BBT_IN_CAPABILITY 0.6
 #define BBT_OUT_QUALITY 0.4
 #define BBT_OUT_CAPABILITY 0.6
+
+enum TIFF_IMAGE_TYPE {
+	TIFF_RGB = 1,
+	TIFF_CMYK
+};
 
 // structure for storing only the TIFF fields
 // that are of interest to the TIFFTranslator
@@ -60,7 +65,12 @@ struct TiffDetails {
 	uint32 width;
 	uint32 height;
 	uint32 compression;
+	uint32 rowsPerStrip;
+	uint32 stripsPerImage;
+	uint32 *pstripOffsets;
+	uint32 *pstripByteCounts;
 	uint16 interpretation;
+	uint16 imageType;
 };
 
 class TIFFTranslator : public BTranslator {

@@ -175,6 +175,42 @@ TiffIfd::GetUint(uint16 tag, uint32 index)
 	throw TiffIfdFieldNotFoundException();
 }
 
+uint32
+TiffIfd::GetUintArray(uint16 tag, uint32 **pout)
+{
+	TiffField *pfield = GetField(tag);
+	if (pfield) {
+	
+		TiffUintField *puintField = NULL;		
+		puintField = dynamic_cast<TiffUintField *>(pfield);
+		if (puintField) {
+		
+			uint32 count = puintField->GetCount();
+			(*pout) = new uint32[count];
+			uint32 *puints = (*pout);
+			if (!puints)
+				throw TiffIfdNoMemoryException();
+				
+			for (uint32 i = 0; i < count; i++) {
+				uint32 num;
+				status_t ret = puintField->GetUint(num, i + 1);
+				if (ret == B_BAD_INDEX)
+					throw TiffIfdBadIndexException();
+				else if (ret == B_BAD_TYPE)
+					throw TiffIfdUnexpectedTypeException();
+					
+				puints[i] = num;
+			}
+			
+			return count;
+				
+		} else
+			throw TiffIfdUnexpectedTypeException();
+	}
+	
+	throw TiffIfdFieldNotFoundException();
+}
+
 TiffField *
 TiffIfd::GetField(uint16 tag)
 {

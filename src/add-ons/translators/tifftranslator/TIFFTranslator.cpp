@@ -34,6 +34,7 @@
 #include "TIFFTranslator.h"
 #include "TIFFView.h"
 #include "TiffIfd.h"
+#include "StreamBuffer.h"
 
 // The input formats that this translator supports.
 translation_format gInputFormats[] = {
@@ -341,7 +342,7 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 		outInfo->group = B_TRANSLATOR_BITMAP;
 		outInfo->quality = BBT_IN_QUALITY;
 		outInfo->capability = BBT_IN_CAPABILITY;
-		strcpy(outInfo->name, "Be Bitmap Format (TGATranslator)");
+		strcpy(outInfo->name, "Be Bitmap Format (TIFFTranslator)");
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
 	}
 	
@@ -362,10 +363,14 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 status_t
 check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 {
-	TiffDetails details;
-	memset(&details, 0, sizeof(TiffDetails));
+	TiffDetails dtls;
+	memset(&dtls, 0, sizeof(TiffDetails));
 	
-	try {	
+	try {
+		// Extra Samples are not yet supported
+		if (ifd.HasField(TAG_EXTRA_SAMPLES))
+			return B_NO_TRANSLATOR;
+			
 		// Only the default values are supported for the
 		// following fields.  HasField is called so that
 		// if a field is not present, a TiffIfdFieldNotFoundException
@@ -387,29 +392,82 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 			return B_NO_TRANSLATOR;
 			
 		// Copy fields useful to TIFFTranslator
-		details.width			= ifd.GetUint(TAG_IMAGE_WIDTH);
-		details.height			= ifd.GetUint(TAG_IMAGE_HEIGHT);
-		details.compression		= ifd.GetUint(TAG_COMPRESSION);
-		details.interpretation	= ifd.GetUint(TAG_PHOTO_INTERPRETATION);
+		dtls.width			= ifd.GetUint(TAG_IMAGE_WIDTH);
+		dtls.height			= ifd.GetUint(TAG_IMAGE_HEIGHT);
+		dtls.compression	= ifd.GetUint(TAG_COMPRESSION);
+		dtls.interpretation	= ifd.GetUint(TAG_PHOTO_INTERPRETATION);
+		
+		if (dtls.compression != COMPRESSION_NONE &&
+			dtls.compression != COMPRESSION_PACKBITS)
+			return B_NO_TRANSLATOR;
+		
+		// Currently, only uncompressed 
+		// RGB or CMYK images are supported
+		if (dtls.interpretation == PHOTO_RGB) {
+			if (ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 3)
+				return B_NO_TRANSLATOR;
+			if (ifd.GetCount(TAG_BITS_PER_SAMPLE) != 3 ||
+				ifd.GetUint(TAG_BITS_PER_SAMPLE, 1) != 8 ||
+				ifd.GetUint(TAG_BITS_PER_SAMPLE, 2) != 8 ||
+				ifd.GetUint(TAG_BITS_PER_SAMPLE, 3) != 8)
+				return B_NO_TRANSLATOR;
+				
+			dtls.imageType = TIFF_RGB;
+			
+		} else if (dtls.interpretation == PHOTO_SEPARATED) {
+			// CMYK (default ink set)
+			// is the only ink set supported
+			if (ifd.HasField(TAG_INK_SET) &&
+				ifd.GetUint(TAG_INK_SET) != INK_SET_CMYK)
+				return B_NO_TRANSLATOR;
+				
+			if (ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 4)
+				return B_NO_TRANSLATOR;
+			if (ifd.GetCount(TAG_BITS_PER_SAMPLE) != 4 ||
+				ifd.GetUint(TAG_BITS_PER_SAMPLE, 1) != 8 ||
+				ifd.GetUint(TAG_BITS_PER_SAMPLE, 2) != 8 ||
+				ifd.GetUint(TAG_BITS_PER_SAMPLE, 3) != 8 ||
+				ifd.GetUint(TAG_BITS_PER_SAMPLE, 4) != 8)
+				return B_NO_TRANSLATOR;
+				
+			dtls.imageType = TIFF_CMYK;
+			
+		} else
+			return B_NO_TRANSLATOR;
+		
+		if (!ifd.HasField(TAG_ROWS_PER_STRIP))
+			dtls.rowsPerStrip = DEFAULT_ROWS_PER_STRIP;
+		else
+			dtls.rowsPerStrip = ifd.GetUint(TAG_ROWS_PER_STRIP);
+		dtls.stripsPerImage =
+			(dtls.height + dtls.rowsPerStrip - 1) / dtls.rowsPerStrip;
+			
+		if (ifd.GetCount(TAG_STRIP_OFFSETS) != dtls.stripsPerImage ||
+			ifd.GetCount(TAG_STRIP_BYTE_COUNTS) != dtls.stripsPerImage)
+			return B_NO_TRANSLATOR;
 		
 		printf("width: %d\nheight: %d\ncompression: %d\ninterpretation: %d\n",
-			details.width, details.height, details.compression,
-			details.interpretation);
-			
-		// Currently, only uncompressed, non-tile RGB
-		// images are supported
-		if (details.compression != COMPRESSION_NONE)
-			return B_NO_TRANSLATOR;
-		if (details.interpretation != PHOTO_RGB)
-			return B_NO_TRANSLATOR;
+			dtls.width, dtls.height, dtls.compression,
+			dtls.interpretation);
 		
 		// return read in details if output 
 		// pointer is supplied
-		if (pdetails)
-			memcpy(pdetails, &details, sizeof(TiffDetails));
+		if (pdetails) {
+			ifd.GetUintArray(TAG_STRIP_OFFSETS, &dtls.pstripOffsets);
+			ifd.GetUintArray(TAG_STRIP_BYTE_COUNTS, &dtls.pstripByteCounts);
+			
+			memcpy(pdetails, &dtls, sizeof(TiffDetails));
+		}
 			
 	} catch (TiffIfdException) {
+	
 		printf("-- Caught TiffIfdException --\n");
+				
+		delete[] dtls.pstripOffsets;
+		dtls.pstripOffsets = NULL;
+		delete[] dtls.pstripByteCounts;
+		dtls.pstripByteCounts = NULL;
+
 		return B_NO_TRANSLATOR;
 	}
 		
@@ -445,14 +503,24 @@ identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
 	// this particular TIFF image is supported by this translator
 	
 	// Check the required fields
-	if (initcheck == B_OK)
-		return check_tiff_fields(ifd, pdetails);
+	if (initcheck == B_OK) {
+		if (outInfo) {
+			outInfo->type = B_TIFF_FORMAT;
+			outInfo->group = B_TRANSLATOR_BITMAP;
+			outInfo->quality = TIFF_IN_QUALITY;
+			outInfo->capability = TIFF_IN_CAPABILITY;
+			strcpy(outInfo->MIME, "image/tiff");
+			strcpy(outInfo->name, "TIFF Image");
+		}
 		
-	if (initcheck != B_OK && initcheck != B_ERROR && initcheck != B_NO_MEMORY)
+		return check_tiff_fields(ifd, pdetails);
+	}
+		
+	if (initcheck != B_ERROR && initcheck != B_NO_MEMORY)
 		// return B_NO_TRANSLATOR if unexpected data was encountered
 		return B_NO_TRANSLATOR;
 	else
-		// return B_OK, B_ERROR or B_NO_MEMORY
+		// return B_ERROR or B_NO_MEMORY
 		return initcheck;
 }
 
@@ -516,7 +584,6 @@ TIFFTranslator::Identify(BPositionIO *inSource,
 	// Read in the magic number and determine if it
 	// is a supported type
 	uint8 ch[4];
-	inSource->Seek(0, SEEK_SET);
 	if (inSource->Read(ch, 4) != 4)
 		return B_NO_TRANSLATOR;
 		
@@ -565,6 +632,216 @@ TIFFTranslator::Identify(BPositionIO *inSource,
 	}
 }
 
+void
+tiff_to_bits(uint8 *ptiff, uint32 tifflen, uint8 *pbits, uint16 type)
+{
+	uint8 *ptiffend = ptiff + tifflen;
+	
+	switch (type) {
+		case TIFF_RGB:
+			while (ptiff < ptiffend) {
+				pbits[2] = ptiff[0];
+				pbits[1] = ptiff[1];
+				pbits[0] = ptiff[2];
+
+				ptiff += 3;
+				pbits += 4;
+			}
+			break;
+			
+		case TIFF_CMYK:
+		{
+			while (ptiff < ptiffend) {
+				int32 comp;
+				comp = 255 - ptiff[0] - ptiff[3];
+				pbits[2] = (comp < 0) ? 0 : comp;
+
+				comp = 255 - ptiff[1] - ptiff[3];
+				pbits[1] = (comp < 0) ? 0 : comp;
+				
+				comp = 255 - ptiff[2] - ptiff[3];
+				pbits[0] = (comp < 0) ? 0 : comp;
+				
+				ptiff += 4;
+				pbits += 4;
+			}
+			break;
+		}
+	}
+}
+
+// unpack the Packbits compressed data from
+// pstreambuf and put it into tiffbuffer
+ssize_t
+unpack(StreamBuffer *pstreambuf, uint8 *tiffbuffer, uint32 tiffbufferlen)
+{
+	uint32 tiffwrit = 0, read = 0, len;
+	while (tiffwrit < tiffbufferlen) {
+	
+		uint8 uctrl;
+		if (pstreambuf->Read(&uctrl, 1) != 1)
+			return B_ERROR;
+		read++;
+			
+		int32 control;
+		control = static_cast<signed char>(uctrl);
+				
+		// copy control + 1 bytes literally
+		if (control >= 0 && control <= 127) {
+		
+			len = control + 1;
+			if (tiffwrit + len > tiffbufferlen)
+				return B_ERROR;
+			if (pstreambuf->Read(tiffbuffer + tiffwrit, len) !=
+				static_cast<ssize_t>(len))
+				return B_ERROR;
+			read += len;
+				
+			tiffwrit += len;
+		
+		// copy the next byte (-control) + 1 times
+		} else if (control >= -127 && control <= -1) {
+		
+			uint8 byt;
+			if (pstreambuf->Read(&byt, 1) != 1)
+				return B_ERROR;
+			read++;
+				
+			len = (-control) + 1;
+			if (tiffwrit + len > tiffbufferlen)
+				return B_ERROR;
+			memset(tiffbuffer + tiffwrit, byt, len);
+			
+			tiffwrit += len;			
+		}
+	}
+	
+	return read;
+}
+
+status_t
+translate_from_tiff(BPositionIO *inSource, ssize_t amtread, uint8 *read,
+	swap_action swp, uint32 outType, BPositionIO *outDestination)
+{
+	// Can only output to bits for now
+	if (outType != B_TRANSLATOR_BITMAP)
+		return B_NO_TRANSLATOR;
+
+	status_t result;
+	
+	TiffDetails details;
+	result = identify_tiff_header(inSource, NULL,
+		amtread, read, swp, &details);
+	if (result == B_OK) {
+		// If the TIFF is supported by this translator
+		
+		TranslatorBitmap bitsHeader;
+		bitsHeader.magic = B_TRANSLATOR_BITMAP;
+		bitsHeader.bounds.left = 0;
+		bitsHeader.bounds.top = 0;
+		bitsHeader.bounds.right = details.width - 1;
+		bitsHeader.bounds.bottom = details.height - 1;
+		bitsHeader.rowBytes = 4 * details.width;
+		bitsHeader.colors = B_RGB32;
+		bitsHeader.dataSize = bitsHeader.rowBytes * details.height;
+		
+		// write out Be's Bitmap header
+		if (swap_data(B_UINT32_TYPE, &bitsHeader,
+			sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN) != B_OK)
+			return B_ERROR;
+		outDestination->Write(&bitsHeader, sizeof(TranslatorBitmap));
+		
+		uint32 inbufferlen, outbufferlen;
+		outbufferlen = 4 * details.width;
+		switch (details.imageType) {
+			case TIFF_RGB:
+				inbufferlen = 3 * details.width;
+				break;
+				
+			case TIFF_CMYK:
+				inbufferlen = 4 * details.width;
+				break;
+				
+			default:
+				// just to be safe
+				return B_NO_TRANSLATOR;
+		}
+		
+		uint8 *inbuffer = new uint8[inbufferlen],
+			*outbuffer = new uint8[outbufferlen];
+		if (!inbuffer || !outbuffer)
+			return B_NO_MEMORY;
+		// set all channels to 0xff so that I won't have
+		// to set the alpha byte to 0xff every time
+		memset(outbuffer, 0xff, outbufferlen);
+		
+		// buffer for making reading compressed data
+		// fast and convenient
+		StreamBuffer *pstreambuf = NULL;
+		if (details.compression == COMPRESSION_PACKBITS) {
+			pstreambuf = new StreamBuffer(inSource, 2048, false);
+			if (pstreambuf->InitCheck() != B_OK)
+				return B_NO_MEMORY;
+		}
+			
+		for (uint32 i = 0; i < details.stripsPerImage; i++) {
+			uint32 read = 0;
+			
+			// If Packbits compression, prepare streambuffer
+			// for reading
+			if (details.compression == COMPRESSION_PACKBITS &&
+				!pstreambuf->Seek(details.pstripOffsets[i]))
+				return B_NO_TRANSLATOR;
+				
+			// Read / Write one line at a time for each
+			// line in the strip
+			while (read < details.pstripByteCounts[i]) {
+			
+				ssize_t ret = 0;
+				if (details.compression == COMPRESSION_NONE) {
+					ret = inSource->ReadAt(details.pstripOffsets[i] + read,
+						inbuffer, inbufferlen);
+					if (ret != static_cast<ssize_t>(inbufferlen))
+						break;
+						
+				} else if (details.compression == COMPRESSION_PACKBITS) {
+					ret = unpack(pstreambuf, inbuffer, inbufferlen);
+					if (ret < 1)
+						break;
+				}
+					
+				read += ret;
+				tiff_to_bits(inbuffer, inbufferlen, outbuffer,
+					details.imageType);
+				outDestination->Write(outbuffer, outbufferlen);
+			}
+			// If while loop was broken...
+			if (read < details.pstripByteCounts[i])
+				break;
+		}
+		
+		// Clean up
+		if (pstreambuf) {
+			delete pstreambuf;
+			pstreambuf = NULL;
+		}
+		
+		delete[] inbuffer;
+		inbuffer = NULL;
+		delete[] outbuffer;
+		outbuffer = NULL;
+		
+		delete[] details.pstripOffsets;
+		details.pstripOffsets = NULL;
+		delete[] details.pstripByteCounts;
+		details.pstripByteCounts = NULL;
+		
+		return B_OK;
+		
+	} else
+		return result;
+}
+
 // ---------------------------------------------------------------
 // Translate
 //
@@ -605,9 +882,67 @@ TIFFTranslator::Translate(BPositionIO *inSource,
 		outType = B_TRANSLATOR_BITMAP;
 	if (outType != B_TRANSLATOR_BITMAP && outType != B_TIFF_FORMAT)
 		return B_NO_TRANSLATOR;
+	
+	// Convert the magic numbers to the various byte orders so that
+	// I won't have to convert the data read in to see whether or not
+	// it is a supported type
+	uint32 nbits = B_TRANSLATOR_BITMAP;
+	if (swap_data(B_UINT32_TYPE, &nbits, sizeof(uint32),
+		B_SWAP_HOST_TO_BENDIAN) != B_OK)
+		return B_ERROR;
+	
+	// Read in the magic number and determine if it
+	// is a supported type
+	uint8 ch[4];
+	inSource->Seek(0, SEEK_SET);
+	if (inSource->Read(ch, 4) != 4)
+		return B_NO_TRANSLATOR;
 		
-	return B_NO_TRANSLATOR;
-		// translator isn't implemented yet
+	// Read settings from ioExtension
+	bool bheaderonly = false, bdataonly = false;
+	if (ioExtension) {
+		if (ioExtension->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly))
+			// if failed, make sure bool is default value
+			bheaderonly = false;
+		if (ioExtension->FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly))
+			// if failed, make sure bool is default value
+			bdataonly = false;
+			
+		if (bheaderonly && bdataonly)
+			// can't both "only write the header" and "only write the data"
+			// at the same time
+			return B_BAD_VALUE;
+	}
+	
+	uint32 n32ch;
+	memcpy(&n32ch, ch, sizeof(uint32));
+	// if B_TRANSLATOR_BITMAP type	
+	if (n32ch == nbits)
+		return B_NO_TRANSLATOR;
+			// Not implemented yet
+		
+	// Might be TIFF image
+	else {
+		// TIFF Byte Order / Magic
+		const uint8 kleSig[] = { 0x49, 0x49, 0x2a, 0x00 };
+		const uint8 kbeSig[] = { 0x4d, 0x4d, 0x00, 0x2a };
+		
+		swap_action swp;
+		if (memcmp(ch, kleSig, 4) == 0) {
+			swp = B_SWAP_LENDIAN_TO_HOST;
+			printf("Byte Order: little endian\n");
+		} else if (memcmp(ch, kbeSig, 4) == 0) {
+			swp = B_SWAP_BENDIAN_TO_HOST;
+			printf("Byte Order: big endian\n");		
+		} else {
+			// If not a TIFF or a Be Bitmap image
+			printf("Invalid byte order value\n");
+			return B_NO_TRANSLATOR;
+		}
+		
+		return translate_from_tiff(inSource, 4, ch, swp, outType,
+			outDestination);
+	}
 }
 
 // ---------------------------------------------------------------

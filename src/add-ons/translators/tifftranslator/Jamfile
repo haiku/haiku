@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src add-ons translators tifftranslator ;
 
 Translator TIFFTranslator : 
+	StreamBuffer.cpp
 	TiffField.cpp
 	TiffUintField.cpp
 	TiffUnknownField.cpp

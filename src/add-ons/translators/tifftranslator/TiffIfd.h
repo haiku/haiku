@@ -52,6 +52,10 @@ class TiffIfdBadIndexException : public TiffIfdException {
 public:
 	TiffIfdBadIndexException() { };
 };
+class TiffIfdNoMemoryException : public TiffIfdException {
+public:
+	TiffIfdNoMemoryException() { };
+};
 
 class TiffIfd {
 public:
@@ -73,6 +77,16 @@ public:
 		// throws: TiffIfdFieldNotFoundException(),
 		// TiffIfdUnexpectedTypeException(),
 		// TiffIfdBadIndexException()
+		
+	uint32 GetUintArray(uint16 tag, uint32 **pout);
+		// copies all of the uints from tag to
+		// the pointer pointed to by pout
+		// and returns the number of uints copied
+		//
+		// throws: TiffIfdFieldNotFoundException(),
+		// TiffIfdUnexpectedTypeException(),
+		// TiffIfdBadIndexException()
+		// TiffIfdNoMemoryException()
 
 private:
 	void LoadFields(uint32 offset, BPositionIO &io, swap_action swp);

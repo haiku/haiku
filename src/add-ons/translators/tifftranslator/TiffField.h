@@ -60,15 +60,20 @@
 	#define PHOTO_RGB					2
 	#define PHOTO_PALETTE				3
 	#define PHOTO_MASK					4
+	#define PHOTO_SEPARATED				5
 #define TAG_FILL_ORDER						266
 #define TAG_STRIP_OFFSETS					273
 #define TAG_ORIENTATION						274
 #define TAG_SAMPLES_PER_PIXEL				277
 #define TAG_ROWS_PER_STRIP					278
+	#define DEFAULT_ROWS_PER_STRIP		4294967295L
 #define TAG_STRIP_BYTE_COUNTS				279
 #define TAG_PLANAR_CONFIGURATION			284
 #define TAG_RESOLUTION_UNIT					296
 #define TAG_COLOR_MAP						320
+#define TAG_INK_SET							332
+	#define INK_SET_CMYK				1
+	#define INK_SET_NOT_CMYK			2
 #define TAG_EXTRA_SAMPLES					338
 #define TAG_SAMPLE_FORMAT					339
 
