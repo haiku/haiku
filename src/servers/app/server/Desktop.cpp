@@ -124,8 +124,10 @@ void Desktop::Init(void)
 		}
 	}
 
-	if (driverCount < 1)
+	if (driverCount < 1){
 		delete this;
+		return;
+	}
 	
 	InitMode();
 
@@ -146,6 +148,7 @@ void Desktop::InitMode(void)
 		
 		RootLayer	*rl = new RootLayer(name, 4, this, GetDisplayDriver());
 		rl->SetScreens(screens, 1, 1);
+		rl->RebuildFullRegion();
 		
 		fRootLayerList.AddItem(rl);
 	}
@@ -197,6 +200,7 @@ void Desktop::SetActiveRootLayer(RootLayer* rl)
 // Rebuild & Invalidate
 // hide the mouse in the old ActiveRootLayer
 // show the mouse in new ActiveRootLayer
+	fActiveRootLayer->FullInvalidate(fActiveRootLayer->Bounds());
 }
 
 RootLayer* Desktop::ActiveRootLayer(void) const
