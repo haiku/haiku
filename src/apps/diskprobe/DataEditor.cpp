@@ -54,13 +54,7 @@ ReplaceChange::ReplaceChange(off_t bufferOffset, uint8 *buffer,
 	fNewData = (uint8 *)malloc(size);
 	fOldData = (uint8 *)malloc(size);
 	if (fNewData != NULL && fOldData != NULL) {
-		// Save old data, and replace the data in the supplied buffer.
-		// Note, the buffer must be large enough to hold the changes
-		// at this point!
 		memcpy(fNewData, data, size);
-		memcpy(fOldData, buffer + offset - bufferOffset, size);
-		memcpy(buffer + offset - bufferOffset, fNewData, size);
-
 		fSize = size;		
 	} else
 		fSize = 0;
@@ -110,7 +104,8 @@ ReplaceChange::Apply(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 	if (size == 0)
 		return;
 
-	// now we can safely change the buffer!
+	// now we can safely exchange the buffer!
+	memcpy(fOldData + dataOffset, buffer + offset - bufferOffset, size);
 	memcpy(buffer + offset - bufferOffset, fNewData + dataOffset, size);
 }
 
@@ -252,6 +247,8 @@ DataEditor::AddChange(DataChange *change)
 
 	fChanges.AddItem(change);
 	fLastChange = change;
+
+	fLastChange->Apply(fRealViewOffset, fView, fRealViewSize);
 }
 
 
