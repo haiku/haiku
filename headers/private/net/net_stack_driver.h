@@ -37,8 +37,9 @@ enum {
 	NET_STACK_SYSCTL,							// sysctl_args *
 	NET_STACK_SELECT,							// select_args *
 	NET_STACK_DESELECT,							// select_args *
-	NET_STACK_ASSOCIATE_SOCKET,					// associate_args *
-	
+
+	NET_STACK_GET_COOKIE,                       // void ** 
+
 	NET_STACK_STOP,
 	
 	NET_STACK_NOTIFY_SOCKET_EVENT,				// notify_socket_event_args * (userland stack only)
@@ -46,11 +47,7 @@ enum {
 	NET_STACK_IOCTL_MAX
 };
 
-struct int_args {	// used by NET_STACK_LISTEN/_SHUTDOWN 
-	int value;
-};
-
-struct sockaddr_args {	// used by NET_STACK_CONNECT/_BIND/_ACCEPT/_GETSOCKNAME/_GETPEERNAME
+struct sockaddr_args {	// used by NET_STACK_CONNECT/_BIND/_GETSOCKNAME/_GETPEERNAME
 	struct sockaddr *addr;
 	int addrlen;
 };
@@ -62,7 +59,7 @@ struct sockopt_args {	// used by NET_STACK_SETSOCKOPT/_GETSOCKOPT
 	int   	optlen;
 };
 
-struct xfer_args {	// used by NET_STACK_SEND/_RECV
+struct transfer_args {	// used by NET_STACK_SEND/_RECV
 	void *data;
 	size_t datalen;
 	int flags;
@@ -76,8 +73,10 @@ struct socket_args {	// used by NET_STACK_SOCKET
 	int proto;
 };
 
-struct associate_socket_args {	// used by NET_STACK_ASSOCIATE_SOCKET
-	void *socket;
+struct accept_args {  // used by NET_STACK_ACCEPT 
+	void *cookie; 
+	struct sockaddr *addr; 
+	int addrlen; 
 };
 
 struct sysctl_args {	// used by NET_STACK_SYSCTL
@@ -135,12 +134,12 @@ struct r5_selectsync {
 
 struct stack_driver_args {
 	union {
-		struct int_args 				integer;
+		int								integer;
 		struct socket_args				socket;
+		struct accept_args				accept;
 		struct sockaddr_args 			sockaddr;
 		struct sockopt_args				sockopt;
-		struct associate_socket_args	associate;
-		struct xfer_args				xfer;
+		struct transfer_args			transfer;
 		struct sysctl_args				sysctl;
 		struct select_args				select;
 	} u;

@@ -149,6 +149,7 @@ struct core_module_info {
 	int (*socket_getpeername)	(struct socket *so, struct sockaddr *, int *);
 	int (*socket_getsockname)	(struct socket *so, struct sockaddr *, int *);
 	int (*socket_set_event_callback)(struct socket *so, socket_event_callback, void *, int);
+	int (*socket_shutdown)		(struct socket *so, int how);
 };
 
 #define NET_CORE_MODULE_NAME	"network/core/v1"
