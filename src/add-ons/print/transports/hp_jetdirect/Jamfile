@@ -8,5 +8,5 @@ Addon HP\ JetDirect : print transport :
 	SetupWindow.cpp
 ;
 
-# LinkSharedOSLibs HP\ JetDirect : be netapi ;  # for net_server 
-LinkSharedOSLibs HP\ JetDirect : be bnetapi ;  # for BONE
+LinkSharedOSLibs HP\ JetDirect : be netapi ;  # for net_server 
+# LinkSharedOSLibs HP\ JetDirect : be bnetapi ;  # for BONE
