@@ -8,6 +8,7 @@
 #include <Drivers.h>
 #include <OS.h>
 #include <drivers/ISA.h>
+#include <kernel.h>
 
 #include <string.h>
 #include <lock.h>
@@ -206,7 +207,7 @@ handle_keyboard_interrupt(void *data)
 			break;
 #endif
 		case F12:
-			reboot();
+			shutdown(true);
 			break;
 
 		case HOME:
