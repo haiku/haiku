@@ -33,8 +33,8 @@
 #include "TGATranslator.h"
 #include "TGAView.h"
 #include "StreamBuffer.h"
-#include <SupportDefs.h>
-	// for min()/max()
+
+#define min(a,b) ((a < b) ? (a) : (b))
 
 // The input formats that this translator supports.
 translation_format gInputFormats[] = {
@@ -363,6 +363,23 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 	}
 	
 	return B_OK;
+}
+
+uint8
+tga_alphabits(TGAImageSpec &imagespec)
+{
+	uint8 nalpha;
+	if (imagespec.depth == 32)
+		// Some programs that generate 32-bit TGA files 
+		// have an alpha channel, but have an incorrect
+		// descriptor which says there are no alpha bits.
+		// This logic is so that the alpha data can be
+		// obtained from TGA files that lie.
+		nalpha = 8;
+	else
+		nalpha = imagespec.descriptor & TGA_DESC_ALPHABITS;
+		
+	return nalpha;
 }
 
 // ---------------------------------------------------------------
@@ -1789,8 +1806,7 @@ translate_from_tganm_to_bits(BPositionIO *inSource,
 		bvflip = false;
 	else
 		bvflip = true;
-	uint8 nalpha = imagespec.descriptor & TGA_DESC_ALPHABITS;
-
+	uint8 nalpha = tga_alphabits(imagespec);
 	int32 bitsRowBytes = imagespec.width * 4;
 	uint8 tgaBytesPerPixel = (imagespec.depth / 8) +
 		((imagespec.depth % 8) ? 1 : 0);
@@ -1882,8 +1898,7 @@ translate_from_tganmrle_to_bits(BPositionIO *inSource,
 		bvflip = false;
 	else
 		bvflip = true;
-	uint8 nalpha = imagespec.descriptor & TGA_DESC_ALPHABITS;
-
+	uint8 nalpha = tga_alphabits(imagespec);
 	int32 bitsRowBytes = imagespec.width * 4;
 	uint8 tgaBytesPerPixel = (imagespec.depth / 8) +
 		((imagespec.depth % 8) ? 1 : 0);
@@ -2398,7 +2413,7 @@ translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		bitsHeader.rowBytes = imagespec.width * 4;
 		if (fileheader.imagetype != TGA_NOCOMP_BW &&
 			fileheader.imagetype != TGA_RLE_BW &&
-			imagespec.descriptor & TGA_DESC_ALPHABITS)
+			tga_alphabits(imagespec))
 			bitsHeader.colors = B_RGBA32;
 		else
 			bitsHeader.colors = B_RGB32;
