@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"> 
+
+<HTML> 
+<HEAD> 
+<TITLE>OpenBeOS Network Kit</TITLE> 
+<META http-equiv=Content-Type content="text/html; charset=windows-1252"> 
+<STYLE type="text/css"> 
+body 
+{ 
+        text-indent: 0in; 
+        font-stretch: normal; 
+        text-align: left; 
+        font-weight: normal; 
+        text-decoration: none; 
+        font-variant: normal; 
+        color: #000000; 
+        font-size: 12pt; 
+        font-style: normal; 
+        widows: 2; 
+        font-family: "Century Gothic", "Trebuchet MS", "Trebuchet", "Arial", "Helvetica"; 
+        background-color: #ffffff; 
+} 
+</STYLE> 
+</HEAD> 
+<BODY text=#000000 vLink=#0000a0 aLink=#0000ff link=#0000c0 bgColor=#ffffff> 
+
+<H1>OpenBeOS Network Kit: Debugging instructions</H1>
+
+<P>For debugging purpose, and eventually stack internals learning purpose, we have develop
+an userland stack version, sharing most of the <A href="stack.html">network stack</A>
+source code but hosted by a app, <i>net_stack_tester</i>, in contrast with the real one hosted in kernelland, behind the
+<A href="stack_driver.html">stack driver</A>.
+</P>
+
+<P>The following image shows this debug platform overall design:</P>
+
+<IMG ALT="OpenBeOS Network Stack debugging platform block diagram" SRC="obos_net_server_design_1.gif"><BR>
+
+<P>The <A href="libs.html#libnet">libnet.so</A> library was modified to check if the NET_STACK_DRIVER_PATH
+environment variable is defined and use his value as driver path to interface with. 
+To switch to <i>net_stack_tester</i> hosted stack version, just run this
+from a Terminal:</P>
+
+  <p>
+  <TABLE cellpadding=6 bgcolor=#E5E5E5 border=0> 
+  <TR><TD><TT>$ export NET_STACK_DRIVER_PATH=/dev/net/server</TT>
+  </TABLE> 
+  </p>
+
+<P>Starting from there, all apps using libnet.so services will use the debug stack version.
+</P>
+
+<HR>
+<H6>Philippe Houdoin, January 12th, 2004</H6>
+
+</BODY>
+</HTML>

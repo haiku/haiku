@@ -24,7 +24,7 @@ body
 </HEAD> 
 <BODY text=#000000 vLink=#0000a0 aLink=#0000ff link=#0000c0 bgColor=#ffffff> 
 
-<H1>OpenBeOS Network Kit: R5 compatibility</H1>
+<H1>OpenBeOS Network Kit: R5 compatibility issues</H1>
 
 <P>Unfortunatly, R5 and sooner (net_server based) network stack development header file (/develop/headers/be/net/socket.h) definition of 
 network structures and constantes are not BSD standard ones.<BR>
@@ -62,7 +62,10 @@ OpenBeOS.
 <TR bgcolor=#E5E5E5><TD>SOL_SOCKET<TD>1<TD>0xffffffff<TD>idem as BONE
 <TR bgcolor=#E5E5E5><TD>SO_DEBUG<TD>1<TD>0x00000004<TD>idem as BONE
 <TR bgcolor=#E5E5E5><TD>SO_REUSEADDR<TD>2<TD>0x00000040<TD>idem as BONE
-<TR bgcolor=#E5E5E5><TD>SO_NONBLOCK<TD>3<TD>SO_NONBLOCK<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>SO_NONBLOCK<TD>3<TD>0x40000009<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>SO_REUSEPORT<TD>4<TD>0x00000080<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>SO_FIONREAD<TD>5<TD>?<TD>?
+
 
 <TR bgcolor=#E5E5E5 valign="top"><TD>sockaddr
 <TD><TT>struct sockaddr {<BR>
@@ -76,8 +79,8 @@ OpenBeOS.
 };</TT>
 <TD>idem as BONE
 
-<TR bgcolor=#E5E5E5><TD>shutdown()
-<TD>not defined<TD>defined<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>closesocket()
+<TD>defined<TD>not defined<TD>defined, call close()
 
 
 <TR bgcolor=#E5E5E5 valign="top">
