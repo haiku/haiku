@@ -365,9 +365,9 @@ mp3DecoderPlugin::RegisterDecoder()
 	descriptions[1].u.wav.codec = 0x0055;
 	for (size_t i = 2; i < numIDs; i++) {
 		descriptions[i].family = B_MPEG_FORMAT_FAMILY;
-		descriptions[i].u.mpeg.id = ids[i];
+		descriptions[i].u.mpeg.id = ids[i-2];
 	}
- 
+
 	media_format format;
 	format.type = B_MEDIA_ENCODED_AUDIO;
 	format.u.encoded_audio = media_encoded_audio_format::wildcard;
