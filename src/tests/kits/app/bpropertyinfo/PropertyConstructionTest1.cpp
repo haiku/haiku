@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyConstructionTest1.cpp,v 1.3 2002/08/13 05:02:46 jrand Exp $
+	$Id: PropertyConstructionTest1.cpp,v 1.4 2002/08/13 05:17:55 jrand Exp $
 	
 	This file implements the first test for the OpenBeOS BPropertyInfo code.
 	It tests the Construction use cases.  It does so by doing the following:
@@ -56,8 +56,8 @@
 
 	void PropertyConstructionTest1::CheckProperty(
 		BPropertyInfo *propTest,
-	    property_info *prop_list,
-	    value_info *value_list,
+	    const property_info *prop_list,
+	    const value_info *value_list,
 	    int32 prop_count,
 	    int32 value_count,
 	    ssize_t flat_size,
@@ -209,6 +209,12 @@
 		CheckProperty(propTest, prop_lists[i], NULL, prop_counts[i], 0,
 				      prop_size[i], flattened_data[i][0]);
 		delete propTest;
+		propTest = new BPropertyInfo;
+		assert(propTest->Unflatten(B_PROPERTY_INFO_TYPE, flattened_data[i][0],
+		                           prop_size[i]) == B_OK);
+		CheckProperty(propTest, propTest->Properties(), NULL, prop_counts[i],
+					  0, prop_size[i], flattened_data[i][0]);
+		delete propTest;
 	
 		for (j=0; j < sizeof(value_counts) / sizeof(int); j++) {
 			propTest = new BPropertyInfo(prop_lists[i], value_lists[j]);
@@ -219,6 +225,15 @@
 			
 			propTest = new BPropertyInfo(prop_lists[i], value_lists[j], false);
 			CheckProperty(propTest, prop_lists[i], value_lists[j],
+			              prop_counts[i], value_counts[j],
+			              prop_size[i] + value_size[j], flattened_data[i][j]);
+			delete propTest;
+				
+			propTest = new BPropertyInfo;
+			assert(propTest->Unflatten(B_PROPERTY_INFO_TYPE,
+			                           flattened_data[i][j],
+			                           prop_size[i] + value_size[j]) == B_OK);
+			CheckProperty(propTest, propTest->Properties(), propTest->Values(),
 			              prop_counts[i], value_counts[j],
 			              prop_size[i] + value_size[j], flattened_data[i][j]);
 			delete propTest;

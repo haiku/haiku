@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyConstructionTest1.h,v 1.2 2002/08/13 05:02:46 jrand Exp $
+	$Id: PropertyConstructionTest1.h,v 1.3 2002/08/13 05:17:55 jrand Exp $
 	
 	This file defines a class for performing one test of BPropertyInfo
 	functionality.
@@ -20,8 +20,8 @@ class PropertyConstructionTest1 :
 	
 private:
 	void CheckProperty(BPropertyInfo *propTest,
-	                   property_info *prop_list,
-	                   value_info *value_list,
+	                   const property_info *prop_list,
+	                   const value_info *value_list,
 	                   int32 prop_count,
 	                   int32 value_count,
 	                   ssize_t flat_size,
