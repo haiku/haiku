@@ -785,7 +785,7 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 	int startQuad, endQuad;
 	bool useQuad1, useQuad2, useQuad3, useQuad4;
 	bool shortspan = false;
-	int thick = d->pensize;
+	int thick = (int)d->pensize;
 
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
