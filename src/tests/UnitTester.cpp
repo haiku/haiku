@@ -1,79 +1,46 @@
-#include "UnitTester.h"
-#include <SemaphoreSyncObject.h>
-#include <Directory.h>
+#include <string>
+#include <iostream>
+#include <unistd.h>
 
-// ##### Include headers for statically linked tests here #####
-//#include <ExampleTest.h>
-
-UnitTesterShell shell("OpenBeOS Unit Testing Framework", new SemaphoreSyncObject);
-
-int main(int argc, char *argv[]) {
-	// ##### Add test suites for statically linked tests here #####
-//	shell.AddTest( "Example", ExampleTest::Suite() );
-
-	BTestShell::SetGlobalShell(&shell);
-
-	// Load our dynamically linked tests
-
-	return shell.Run(argc, argv);
-}
-
-//const std::string UnitTesterShell::defaultLibDir = "./lib";
-
-UnitTesterShell::UnitTesterShell(const std::string &description, SyncObject *syncObject)
-	: BTestShell(description, syncObject)
-	, doR5Tests(false)
-{
-}
-
-void
-UnitTesterShell::PrintDescription(int argc, char *argv[]) {
-	std::string AppName = argv[0];
-	cout << endl;
-	cout << "This program is the central testing framework for the purpose" << endl;
-	cout << "of testing and verifying the various kits, classes, functions," << endl;
-	cout << "and the like that comprise OpenBeOS." << endl;
-		
-/*
-	if (AppName.rfind("UnitTester_r5") != std::string::npos) {
-		cout << endl;
-		cout << "Judging by its name (UnitTester_r5), this copy was" << endl;
-		cout << "probably linked against Be Inc.'s R5 implementations" << endl;
-		cout << "for the sake of comparison." << endl;
-	} else if (AppName.rfind("UnitTester") != std::string::npos) {
-		cout << endl;
-		cout << "Judging by its name (UnitTester), this copy was probably" << endl;
-		cout << "linked against our own OpenBeOS implementations." << endl;
-	}
+/* Since some of our obos libraries (such as libtranslation.so) have
+   identically named R5 equivalents, it was necessary to have two
+   separate unit testing programs, each with their own lib/ subdir,
+   to make sure that the obos tests are run with obos libs while
+   the r5 tests are run with r5 libs.
+   
+   In the interest of keeping things simple (and not invalidating
+   the instructions sitting in the newsletter article I wrote :-),
+   this shell program has been created to allow all unit tests to
+   still be run from a single application. All it does is filter
+   out "-obos" and "-r5" arguments and run the appropriate
+   UnitTesterHelper program (which does all the hard work).
 */
+int main(int argc, char *argv[]) {
+	// Look for "-obos" or "-r5" arguments, then run
+	// the appropriate UnitTesterHelper program, letting
+	// it do all the dirty work.
+	bool doR5Tests = false;
+	bool beVerbose = false;
+	std::string cmd = "";
+	for (int i = 1; i < argc; i++) {
+		std::string arg(argv[i]);
+		if (arg == "-r5")
+			doR5Tests = true;
+		else if (arg == "-obos")
+			doR5Tests = false;
+		else {
+			if (arg.length() == 3 && arg[0] == '-' && arg[1] == 'v'
+				  && '0' <= arg[2] && arg[2] <= '9')
+			{
+				beVerbose = (arg[2] - '0') >= 4;
+			}
+			cmd += " " + arg;
+		}
+	}	
+	cmd = (doR5Tests ? "unittester_r5/UnitTesterHelper_r5" : "unittester/UnitTesterHelper") + cmd;
+	if (beVerbose)
+		cout << "Executing: '" << cmd << "'" << endl;	
+	system(cmd.c_str());
+	return 0;
 }
 
-void
-UnitTesterShell::PrintValidArguments() {
-	BTestShell::PrintValidArguments();
-	cout << indent << "-obos        Runs tests linked against our OpenBeOS libraries (*default*)" << endl;
-	cout << indent << "-r5          Runs tests linked against Be Inc.'s R5 libraries (instead" << endl;
-	cout << indent << "             of our libraries) for the sake of comparison." << endl;
-}
-
-bool
-UnitTesterShell::ProcessArgument(std::string arg, int argc, char *argv[]) {
-	if (arg == "-r5") {
-		doR5Tests = true;
-	} else if (arg == "-obos") {
-		doR5Tests = false;
-	} else
-		return BTestShell::ProcessArgument(arg, argc, argv);
-		
-	return true;
-}
-
-void
-UnitTesterShell::LoadDynamicSuites() {
-	// Add the appropriate test lib path 
-	string defaultLibDir = string(GlobalTestDir()) + "/lib";
-	fLibDirs.insert(defaultLibDir + (doR5Tests ? "_r5" : ""));
-
-	// Load away
-	BTestShell::LoadDynamicSuites();
-}

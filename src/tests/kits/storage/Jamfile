@@ -26,7 +26,7 @@ CommonTestLib libstoragetest.so
 
 # To run the tests the libraries must be around.
 {
-	local libdir = [ on UnitTester FDirName $(LOCATE[1]) lib ] ;
+	local libdir = [ on UnitTesterHelper FDirName $(LOCATE[1]) lib ] ;
 	MakeLocate <$(SOURCE_GRIST)>libstorage.so : $(libdir) ;
 	MakeLocate <$(SOURCE_GRIST)>libbeadapter.so : $(libdir) ;
 	RelSymLink <$(SOURCE_GRIST)>libstorage.so : libstorage.so ;
@@ -38,7 +38,7 @@ CommonTestLib libstoragetest.so
 # To run the tests some test files must be around.
 {
 	local resdir = <storage!kit!test!files>resources ;
-	MakeLocate $(resdir) : [ on UnitTester return $(LOCATE[1]) ] ;
+	MakeLocate $(resdir) : [ on UnitTesterHelper return $(LOCATE[1]) ] ;
 	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] ;
 	DEPENDS libstoragetest.so : $(resdir) ;
 }

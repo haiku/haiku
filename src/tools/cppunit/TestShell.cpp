@@ -148,7 +148,11 @@ BTestShell::Run(int argc, char *argv[]) {
 		for (i = fTestsToRun.begin(); i != fTestsToRun.end(); ++i) {
 			// See if it's a suite (since it may just be a single test)
 			if (fSuites.find(*i) != fSuites.end()) {
-				suitesToRemove.insert(*i);	// Note the suite name for later
+				// Note the suite name for later removal unless the
+				// name is also the name of an available individual test
+				if (fTests.find(*i) == fTests.end()) {
+					suitesToRemove.insert(*i);
+				}
 				const TestMap &tests = fSuites[*i]->getTests();
 				TestMap::const_iterator j;
 				for (j = tests.begin(); j != tests.end(); j++) {
@@ -158,7 +162,8 @@ BTestShell::Run(int argc, char *argv[]) {
 		}
 		
 		// Remove the names of all of the suites we discovered from the
-		// list of tests to run
+		// list of tests to run (unless there's also an installed individual
+		// test of the same name).
 		for (i = suitesToRemove.begin(); i != suitesToRemove.end(); i++) {
 			fTestsToRun.erase(*i);
 		}
@@ -382,6 +387,18 @@ BTestShell::LoadDynamicSuites() {
 	
 	if (Verbosity() >= v3)
 		cout << endl;
+
+	// Look for suites and tests with the same name and give a
+	// warning, as this is only asking for trouble... :-)
+	for (SuiteMap::const_iterator i = fSuites.begin(); i != fSuites.end(); i++) {
+		if (fTests.find(i->first) != fTests.end() && Verbosity() > v0) {
+			cout << "WARNING: '" << i->first << "' refers to both a test suite *and* an individual" <<
+			endl << "         test. Both will be executed, but it is reccommended you rename" <<
+			endl << "         one of them to resolve the conflict." <<  
+			endl << endl;
+		}
+	}		
+	
 }
 
 void

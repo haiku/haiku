@@ -8,11 +8,26 @@ CommonTestLib libexampletest.so
 	:
 ;
 
-UnitTest UnitTester 
+UnitTest UnitTester
 	: UnitTester.cpp
-	: 
+	:
 	: be stdc++.r4
-#	: be stdc++.r4
+	:
+;
+
+UnitTest UnitTesterHelper
+	: UnitTesterHelper.cpp
+	: unittester
+	: be stdc++.r4
+	: be stdc++.r4
+	:
+;
+
+R5UnitTest UnitTesterHelper
+	: UnitTesterHelper.cpp
+	: unittester_r5
+	: be stdc++.r4
+	: be stdc++.r4
 	:
 ;
 
