@@ -67,6 +67,7 @@ enum ENTRY_TYPE {
 	TIFF_SBYTE,
 	TIFF_UNDEFINED,
 	TIFF_SSHORT,
+	TIFF_SLONG,
 	TIFF_SRATIONAL,
 	TIFF_FLOAT,
 	TIFF_DOUBLE
@@ -170,11 +171,11 @@ print_ifd_value(IFDEntry &entry, BFile &file, swap_action swp)
 		case 254: // NewSubfileType
 			if (entry.count == 1 && entry.fieldType == TIFF_LONG) {
 				if (entry.longval & 1)
-					printf("Low Res ");
+					printf("Low Res (1) ");
 				if (entry.longval & 2)
-					printf("Page ");
+					printf("Page (2) ");
 				if (entry.longval & 4)
-					printf("Mask ");
+					printf("Mask (4) ");
 				
 				printf("(0x%.8lx)", entry.longval);
 				return;
@@ -195,16 +196,22 @@ print_ifd_value(IFDEntry &entry, BFile &file, swap_action swp)
 			if (entry.count == 1 && entry.fieldType == TIFF_SHORT) {
 				switch (entry.shortvals[0]) {
 					case 1:
-						printf("No Compression");
+						printf("No Compression (1)");
 						return;
 					case 2:
-						printf("CCITT Group 3 1-Dimensional Modified Huffman run-length encoding");
+						printf("CCITT Group 3 1-Dimensional Modified Huffman run-length encoding (2)");
+						return;
+					case 3:
+						printf("Fax Group 3 (3)");
+						return;
+					case 4:
+						printf("Fax Group 4 (4)");
 						return;
 					case 5:
-						printf("LZW");
+						printf("LZW (5)");
 						return;
 					case 32773:
-						printf("PackBits");
+						printf("PackBits (32773)");
 						return;
 				}
 			}
@@ -236,32 +243,42 @@ print_ifd_value(IFDEntry &entry, BFile &file, swap_action swp)
 			if (entry.count == 1 && entry.fieldType == TIFF_SHORT) {
 				switch (entry.shortvals[0]) {
 					case 1:
-						printf("top to bottom, left to right");
+						printf("top to bottom, left to right (1)");
 						return;
 					case 2:
-						printf("top to bottom, right to left");
+						printf("top to bottom, right to left (2)");
 						return;
 					case 3:
-						printf("bottom to top, right to left");
+						printf("bottom to top, right to left (3)");
 						return;
 					case 4:
-						printf("bottom to top, left to right");
+						printf("bottom to top, left to right (4)");
 						return;
 					case 5:
-						printf("left to right, top to bottom");
+						printf("left to right, top to bottom (5)");
 						return;
 					case 6:
-						printf("right to left, top to bottom");
+						printf("right to left, top to bottom (6)");
 						return;
 					case 7:
-						printf("right to left, bottom to top");
+						printf("right to left, bottom to top (7)");
 						return;
 					case 8:
-						printf("left to right, bottom to top");
+						printf("left to right, bottom to top (8)");
 						return;
 				}
 			}
 			break;
+			
+		case 278: // RowsPerStrip
+		{
+			const uint32 ksinglestrip = 0xffffffffUL;
+			printf("%u",
+					static_cast<unsigned int>(entry.longval));
+			if (entry.longval == ksinglestrip)
+				printf(" (All rows in first strip)");
+			return;
+		}
 			
 		case 284: // PlanarConfiguration
 			if (entry.count == 1 && entry.fieldType == TIFF_SHORT) {
@@ -315,16 +332,41 @@ print_ifd_value(IFDEntry &entry, BFile &file, swap_action swp)
 				if (nread == 8 &&
 					swap_data(B_UINT32_TYPE, &rational, 8, swp) == B_OK) {
 					
-					printf("%d / %d",
+					printf("%u / %u (offset: 0x%.8lx)",
 						static_cast<unsigned int>(rational.numerator),
-						static_cast<unsigned int>(rational.denominator));
+						static_cast<unsigned int>(rational.denominator),
+						entry.longval);
+					return;
+				}				
+			} else if (entry.fieldType == TIFF_SRATIONAL && entry.count == 1) {
+				struct { int32 numerator; int32 denominator; } srational;
+				
+				ssize_t	nread = file.ReadAt(entry.longval, &srational, 8);
+				if (nread == 8 &&
+					swap_data(B_INT32_TYPE, &srational, 8, swp) == B_OK) {
+					
+					printf("%d / %d (offset: 0x%.8lx)",
+						static_cast<int>(srational.numerator),
+						static_cast<int>(srational.denominator),
+						entry.longval);
 					return;
 				}				
 			} else if (entry.fieldType == TIFF_LONG && entry.count == 1) {
-				printf("%d",
+				printf("%u",
 					static_cast<unsigned int>(entry.longval));
 				return;
+			} else if (entry.fieldType == TIFF_SLONG && entry.count == 1) {
+				printf("%d",
+					static_cast<int>(entry.longval));
+				return;
 			} else if (entry.fieldType == TIFF_SHORT && entry.count <= 2) {
+				for (uint32 i = 0; i < entry.count; i++) {
+					if (i > 0)
+						printf(", ");
+					printf("%u", entry.shortvals[i]);
+				}
+				return;
+			} else if (entry.fieldType == TIFF_SSHORT && entry.count <= 2) {
 				for (uint32 i = 0; i < entry.count; i++) {
 					if (i > 0)
 						printf(", ");
@@ -335,7 +377,22 @@ print_ifd_value(IFDEntry &entry, BFile &file, swap_action swp)
 				for (uint32 i = 0; i < entry.count; i++) {
 					if (i > 0)
 						printf(", ");
+					printf("%u", entry.bytevals[i]);
+				}
+				return;
+			} else if (entry.fieldType == TIFF_SBYTE && entry.count <= 4) {
+				for (uint32 i = 0; i < entry.count; i++) {
+					if (i > 0)
+						printf(", ");
 					printf("%d", entry.bytevals[i]);
+				}
+				return;
+			} else if (entry.fieldType == TIFF_UNDEFINED && entry.count <= 4) {
+				for (uint32 i = 0; i < entry.count; i++) {
+					if (i > 0)
+						printf(", ");
+					printf("0x%.2lx",
+						static_cast<unsigned long>(entry.bytevals[i]));
 				}
 				return;
 			}
@@ -358,6 +415,7 @@ int swap_value_field(IFDEntry &entry, swap_action swp)
 			return 1;
 			
 		case TIFF_LONG:
+		case TIFF_SLONG:
 		case TIFF_RATIONAL:
 		case TIFF_SRATIONAL:
 		case TIFF_DOUBLE:
