@@ -34,11 +34,9 @@
 #include "RectUtils.h"
 #include "ServerCursor.h"
 
-// TODO: Major cleanup is left.  Public functions should be repsonsible for locking.
-// Clean the locking code from the protected functions.  Remove bounds checking stuff
-// since clipper must handle all needed boundary checks (otherwise we could have windows
-// bleeding into other windows).
-// TODO: Add pixel, line, and rect functions for handling all of the options from LayerData
+// TODO: Remove remnants of old API.  Inplement all functions.  Bounds checking needs to be
+// handled by the public drawing functions.
+// Add clipping and make sure public functions have Lock & Unlock.
 
 LineCalc::LineCalc()
 {
@@ -849,20 +847,15 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 {
 }
 
-void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, const DrawData *d)
-{
-}
-
 /*!
 	\brief Called for all BView::FillArc calls
 	\param r Rectangle enclosing the entire arc
 	\param angle Starting angle for the arc in degrees
 	\param span Span of the arc in degrees. Ending angle = angle+span.
-	\param setLIne The horizontal line drawing function which handles needed things like pattern,
-	               color, and line thickness
+	\param d  Object holding the bazillion other options
 */
-void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, 
-	DisplayDriver* driver, SetHorizontalLineFuncType setLine)
+
+void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, const DrawData *d)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -883,12 +876,11 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 	int startQuad, endQuad;
 	bool useQuad1, useQuad2, useQuad3, useQuad4;
 	bool shortspan = false;
-	//BPoint center(xc,yc);
 
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
-	  FillEllipse(r,driver,setLine);
+	  FillEllipse(r,d);
 	  return;
 	}
 
@@ -939,27 +931,13 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 	}
 
 	if ( useQuad1 )
-		(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+		StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
 	if ( useQuad2 )
-		(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc-y));
+		StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc-x),ROUND(yc-y),d);
 	if ( useQuad3 )
-		(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc+y));
+		StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc-x),ROUND(yc+y),d);
 	if ( useQuad4 )
-		(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
-	/*
-	if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
-	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-		StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
-	if ( (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
-	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-		StrokeLine(BPoint(xc-x,yc-y),center,d,pat);
-	if ( (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
-	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-		StrokeLine(BPoint(xc-x,yc+y),center,d,pat);
-	if ( (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
-	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-		StrokeLine(BPoint(xc+x,yc+y),center,d,pat);
-		*/
+		StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -976,23 +954,23 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 		}
 
 		if ( useQuad1 )
-			(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+			StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
 		if ( useQuad2 )
-			(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc-y));
+			StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc-x),ROUND(yc-y),d);
 		if ( useQuad3 )
-			(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc+y));
+			StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc-x),ROUND(yc+y),d);
 		if ( useQuad4 )
-			(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
+			StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 		if ( !shortspan )
 		{
 			if ( startQuad == 1 )
 			{
 				if ( x <= startx )
-					(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
 				else
 				{
 					xclip = ROUND(y*startx/(double)starty);
-					(driver->*setLine)(ROUND(xc),ROUND(xc+xclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc+xclip),ROUND(yc-y),d);
 				}
 			}
 			else if ( startQuad == 2 )
@@ -1000,17 +978,17 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 				if ( x >= startx )
 				{
 					xclip = ROUND(y*startx/(double)starty);
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc-xclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc-xclip),ROUND(yc-y),d);
 				}
 			}
 			else if ( startQuad == 3 )
 			{
 				if ( x <= startx )
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc),ROUND(yc+y),d);
 				else
 				{
 					xclip = ROUND(y*startx/(double)starty);
-					(driver->*setLine)(ROUND(xc-xclip),ROUND(xc),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-xclip),ROUND(yc+y),ROUND(xc),ROUND(yc+y),d);
 				}
 			}
 			else if ( startQuad == 4 )
@@ -1018,7 +996,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 				if ( x >= startx )
 				{
 					xclip = ROUND(y*startx/(double)starty);
-					(driver->*setLine)(ROUND(xc+xclip),ROUND(xc+x),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc+xclip),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 				}
 			}
 
@@ -1027,17 +1005,17 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 				if ( x >= endx )
 				{
 					xclip = ROUND(y*endx/(double)endy);
-					(driver->*setLine)(ROUND(xc+xclip),ROUND(xc+x),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc+xclip),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
 				}
 			}
 			else if ( endQuad == 2 )
 			{
 				if ( x <= endx )
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc),ROUND(yc-y),d);
 				else
 				{
 					xclip = ROUND(y*endx/(double)endy);
-					(driver->*setLine)(ROUND(xc-xclip),ROUND(xc),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-xclip),ROUND(yc-y),ROUND(xc),ROUND(yc-y),d);
 				}
 			}
 			else if ( endQuad == 3 )
@@ -1045,17 +1023,17 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 				if ( x >= endx )
 				{
 					xclip = ROUND(y*endx/(double)endy);
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc-xclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc-xclip),ROUND(yc+y),d);
 				}
 			}
 			else if ( endQuad == 4 )
 			{
 				if ( x <= endx )
-					(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 				else
 				{
 					xclip = ROUND(y*endx/(double)endy);
-					(driver->*setLine)(ROUND(xc),ROUND(xc+xclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc+xclip),ROUND(yc+y),d);
 				}
 			}
 		}
@@ -1066,30 +1044,30 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 			if ( startQuad == 1 )
 			{
 				if ( (x <= startx) && (x >= endx) )
-					(driver->*setLine)(ROUND(xc+endclip),ROUND(xc+x),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc+endclip),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
 				else
-					(driver->*setLine)(ROUND(xc+endclip),ROUND(xc+startclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc+endclip),ROUND(yc-y),ROUND(xc+startclip),ROUND(yc-y),d);
 			}
 			else if ( startQuad == 2 )
 			{
 				if ( (x <= startx) && (x >= endx) )
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc-startclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc-startclip),ROUND(yc-y),d);
 				else
-					(driver->*setLine)(ROUND(xc-endclip),ROUND(xc-startclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-endclip),ROUND(yc-y),ROUND(xc-startclip),ROUND(yc-y),d);
 			}
 			else if ( startQuad == 3 )
 			{
 				if ( (x <= startx) && (x >= endx) )
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc-endclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc-endclip),ROUND(yc+y),d);
 				else
-					(driver->*setLine)(ROUND(xc-startclip),ROUND(xc-endclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-startclip),ROUND(yc+y),ROUND(xc-endclip),ROUND(yc+y),d);
 			}
 			else if ( startQuad == 4 )
 			{
 				if ( (x <= startx) && (x >= endx) )
-					(driver->*setLine)(ROUND(xc+startclip),ROUND(xc+x),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc+startclip),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 				else
-					(driver->*setLine)(ROUND(xc+startclip),ROUND(xc+endclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc+startclip),ROUND(yc+y),ROUND(xc+endclip),ROUND(yc+y),d);
 			}
 		}
 	}
@@ -1109,23 +1087,23 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 		}
 
 		if ( useQuad1 )
-			(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+			StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
 		if ( useQuad2 )
-			(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc-y));
+			StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc-x),ROUND(yc-y),d);
 		if ( useQuad3 )
-			(driver->*setLine)(ROUND(xc),ROUND(xc-x),ROUND(yc+y));
+			StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc-x),ROUND(yc+y),d);
 		if ( useQuad4 )
-			(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
+			StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 		if ( !shortspan )
 		{
 			if ( startQuad == 1 )
 			{
 				if ( x <= startx )
-					(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
 				else
 				{
 					xclip = ROUND(y*startx/(double)starty);
-					(driver->*setLine)(ROUND(xc),ROUND(xc+xclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc+xclip),ROUND(yc-y),d);
 				}
 			}
 			else if ( startQuad == 2 )
@@ -1133,17 +1111,17 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 				if ( x >= startx )
 				{
 					xclip = ROUND(y*startx/(double)starty);
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc-xclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc-xclip),ROUND(yc-y),d);
 				}
 			}
 			else if ( startQuad == 3 )
 			{
 				if ( x <= startx )
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc),ROUND(yc+y),d);
 				else
 				{
 					xclip = ROUND(y*startx/(double)starty);
-					(driver->*setLine)(ROUND(xc-xclip),ROUND(xc),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-xclip),ROUND(yc+y),ROUND(xc),ROUND(yc+y),d);
 				}
 			}
 			else if ( startQuad == 4 )
@@ -1151,7 +1129,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 				if ( x >= startx )
 				{
 					xclip = ROUND(y*startx/(double)starty);
-					(driver->*setLine)(ROUND(xc+xclip),ROUND(xc+x),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc+xclip),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 				}
 			}
 
@@ -1160,17 +1138,17 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 				if ( x >= endx )
 				{
 					xclip = ROUND(y*endx/(double)endy);
-					(driver->*setLine)(ROUND(xc+xclip),ROUND(xc+x),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc+xclip),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
 				}
 			}
 			else if ( endQuad == 2 )
 			{
 				if ( x <= endx )
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc),ROUND(yc-y),d);
 				else
 				{
 					xclip = ROUND(y*endx/(double)endy);
-					(driver->*setLine)(ROUND(xc-xclip),ROUND(xc),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-xclip),ROUND(yc-y),ROUND(xc),ROUND(yc-y),d);
 				}
 			}
 			else if ( endQuad == 3 )
@@ -1178,17 +1156,17 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 				if ( x >= endx )
 				{
 					xclip = ROUND(y*endx/(double)endy);
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc-xclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc-xclip),ROUND(yc+y),d);
 				}
 			}
 			else if ( endQuad == 4 )
 			{
 				if ( x <= endx )
-					(driver->*setLine)(ROUND(xc),ROUND(xc+x),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 				else
 				{
 					xclip = ROUND(y*endx/(double)endy);
-					(driver->*setLine)(ROUND(xc),ROUND(xc+xclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc+xclip),ROUND(yc+y),d);
 				}
 			}
 		}
@@ -1199,34 +1177,35 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 			if ( startQuad == 1 )
 			{
 				if ( (x <= startx) && (x >= endx) )
-					(driver->*setLine)(ROUND(xc+endclip),ROUND(xc+x),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc+endclip),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
 				else
-					(driver->*setLine)(ROUND(xc+endclip),ROUND(xc+startclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc+endclip),ROUND(yc-y),ROUND(xc+startclip),ROUND(yc-y),d);
 			}
 			else if ( startQuad == 2 )
 			{
 				if ( (x <= startx) && (x >= endx) )
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc-startclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc-startclip),ROUND(yc-y),d);
 				else
-					(driver->*setLine)(ROUND(xc-endclip),ROUND(xc-startclip),ROUND(yc-y));
+					StrokePatternLine(ROUND(xc-endclip),ROUND(yc-y),ROUND(xc-startclip),ROUND(yc-y),d);
 			}
 			else if ( startQuad == 3 )
 			{
 				if ( (x <= startx) && (x >= endx) )
-					(driver->*setLine)(ROUND(xc-x),ROUND(xc-endclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc-endclip),ROUND(yc+y),d);
 				else
-					(driver->*setLine)(ROUND(xc-startclip),ROUND(xc-endclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc-startclip),ROUND(yc+y),ROUND(xc-endclip),ROUND(yc+y),d);
 			}
 			else if ( startQuad == 4 )
 			{
 				if ( (x <= startx) && (x >= endx) )
-					(driver->*setLine)(ROUND(xc+startclip),ROUND(xc+x),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc+startclip),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 				else
-					(driver->*setLine)(ROUND(xc+startclip),ROUND(xc+endclip),ROUND(yc+y));
+					StrokePatternLine(ROUND(xc+startclip),ROUND(yc+y),ROUND(xc+endclip),ROUND(yc+y),d);
 			}
 		}
 	}
 	Unlock();
+
 }
 
 void DisplayDriver::FillBezier(BPoint *pts, RGBColor &color)
@@ -1321,16 +1300,13 @@ void DisplayDriver::FillEllipse(const BRect &r, RGBColor &color)
 {
 }
 
-void DisplayDriver::FillEllipse(const BRect &r, const DrawData *d)
-{
-}
-
 /*!
 	\brief Called for all BView::FillEllipse calls
 	\param r BRect enclosing the ellipse to be drawn.
-	\param setLine Horizontal line drawing routine which handles things like color and pattern.
+	\param d DrawData containing the endless options
 */
-void DisplayDriver::FillEllipse(const BRect &r, DisplayDriver* driver, SetHorizontalLineFuncType setLine)
+
+void DisplayDriver::FillEllipse(const BRect &r, const DrawData *d)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -1348,10 +1324,8 @@ void DisplayDriver::FillEllipse(const BRect &r, DisplayDriver* driver, SetHorizo
 
 	Lock();
 
-	//SetPixel(ROUND(xc),ROUND(yc-y),pattern.GetColor(xc,yc-y));
-	(driver->*setLine)(ROUND(xc),ROUND(xc),ROUND(yc-y));
-	//SetPixel(ROUND(xc),ROUND(yc+y),pattern.GetColor(xc,yc+y));
-	(driver->*setLine)(ROUND(xc),ROUND(xc),ROUND(yc+y));
+	StrokePatternLine(ROUND(xc),ROUND(yc-y),ROUND(xc),ROUND(yc-y),d);
+	StrokePatternLine(ROUND(xc),ROUND(yc+y),ROUND(xc),ROUND(yc+y),d);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -1367,8 +1341,8 @@ void DisplayDriver::FillEllipse(const BRect &r, DisplayDriver* driver, SetHorizo
 			p += Ry2 + px - py;
 		}
 
-               	(driver->*setLine)(ROUND(xc-x),ROUND(xc+x),ROUND(yc-y));
-                (driver->*setLine)(ROUND(xc-x),ROUND(xc+x),ROUND(yc+y));
+               	StrokePatternLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
+                StrokePatternLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -1385,8 +1359,8 @@ void DisplayDriver::FillEllipse(const BRect &r, DisplayDriver* driver, SetHorizo
 			p += Rx2 - py +px;
 		}
 
-               	(driver->*setLine)(ROUND(xc-x),ROUND(xc+x),ROUND(yc-y));
-                (driver->*setLine)(ROUND(xc-x),ROUND(xc+x),ROUND(yc+y));
+               	StrokePatternLine(ROUND(xc-x),ROUND(yc-y),ROUND(xc+x),ROUND(yc-y),d);
+                StrokePatternLine(ROUND(xc-x),ROUND(yc+y),ROUND(xc+x),ROUND(yc+y),d);
 	}
 	Unlock();
 }
@@ -1395,20 +1369,13 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, RGBColor &color)
 {
 }
 
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d)
-{
-}
-
 /*!
 	\brief Called for all BView::FillPolygon calls
 	\param ptlist Array of BPoints defining the polygon.
 	\param numpts Number of points in the BPoint array.
-	\param setLine Horizontal line drawing routine which handles things like color and pattern.
-
-	The points in the array are not guaranteed to be within the framebuffer's 
-	coordinate range.
+	\param d      The 50 bazillion drawing options (inluding clip region)
 */
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, DisplayDriver* driver, SetHorizontalLineFuncType setLine)
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d)
 {
 	/* Here's the plan.  Record all line segments in polygon.  If a line segments crosses
 	   the y-value of a point not in the segment, split the segment into 2 segments.
@@ -1508,16 +1475,16 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, DisplayDriver* dri
 			{
 				if ( (segmentArray[i].MinX() < _displaymode.virtual_width) &&
 					(segmentArray[i].MaxX() >= 0) )
-					(driver->*setLine)(ROUND(segmentArray[i].MinX()),
-					      ROUND(segmentArray[i].MaxX()), y);
+					StrokePatternLine(ROUND(segmentArray[i].MinX()), y,
+							  ROUND(segmentArray[i].MaxX()), y, d);
 				i++;
 			}
 			else
 			{
 				if ( (segmentArray[i].GetX(y) < _displaymode.virtual_width) &&
 					(segmentArray[i+1].GetX(y) >= 0) )
-					(driver->*setLine)(ROUND(segmentArray[i].GetX(y)),
-					      ROUND(segmentArray[i+1].GetX(y)), y);
+					StrokePatternLine(ROUND(segmentArray[i].GetX(y)), y,
+							  ROUND(segmentArray[i+1].GetX(y)), y, d);
 				i+=2;
 			}
 		}
@@ -1591,19 +1558,14 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 {
 }
 
-void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const DrawData *d)
-{
-}
-
 /*!
 	\brief Called for all BView::FillRoundRect calls
 	\param r The rectangle itself
 	\param xrad X radius of the corner arcs
 	\param yrad Y radius of the corner arcs
-	\param setRect Rectangle filling routine which handles things like color and pattern
-	\param setLine Horizontal line drawing function which handles things like color and pattern
+	\param d    DrawData containing all other options
 */
-void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, DisplayDriver* driver, SetRectangleFuncType setRect, SetHorizontalLineFuncType setLine)
+void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const DrawData *d)
 {
 	float arc_x;
 	float yrad2 = yrad*yrad;
@@ -1612,12 +1574,13 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 	for (i=0; i<=(int)yrad; i++)
 	{
 		arc_x = xrad*sqrt(1-i*i/yrad2);
-		(driver->*setLine)(ROUND(r.left+xrad-arc_x), ROUND(r.right-xrad+arc_x),
-			ROUND(r.top+yrad-i));
-		(driver->*setLine)(ROUND(r.left+xrad-arc_x), ROUND(r.right-xrad+arc_x),
-			ROUND(r.bottom-yrad+i));
+		StrokePatternLine(ROUND(r.left+xrad-arc_x), ROUND(r.top+yrad-i),
+			ROUND(r.right-xrad+arc_x), ROUND(r.top+yrad-i),d);
+		StrokePatternLine(ROUND(r.left+xrad-arc_x), ROUND(r.bottom-yrad+i),
+			ROUND(r.right-xrad+arc_x), ROUND(r.bottom-yrad+i),d);
 	}
-	(driver->*setRect)((int)(r.left),(int)(r.top+yrad),(int)(r.right),(int)(r.bottom-yrad));
+	FillPatternRect(BRect(r.left,r.top+yrad,r.right,r.bottom-yrad),d);
+
 }
 
 //void DisplayDriver::FillShape(SShape *sh, const DrawData *d, const Pattern &pat)
@@ -1628,16 +1591,12 @@ void DisplayDriver::FillTriangle(BPoint *pts, RGBColor &color)
 {
 }
 
-void DisplayDriver::FillTriangle(BPoint *pts, const DrawData *d)
-{
-}
-
 /*!
 	\brief Called for all BView::FillTriangle calls
 	\param pts Array of 3 BPoints. Always non-NULL.
 	\param setLine Horizontal line drawing routine which handles things like color and pattern.
 */
-void DisplayDriver::FillTriangle(BPoint *pts, DisplayDriver* driver, SetHorizontalLineFuncType setLine)
+void DisplayDriver::FillTriangle(BPoint *pts, const DrawData *d)
 {
 	if ( !pts )
 		return;
@@ -1686,7 +1645,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, DisplayDriver* driver, SetHorizont
 		end.y=first.y;
 		start.x=MIN(first.x,MIN(second.x,third.x));
 		end.x=MAX(first.x,MAX(second.x,third.x));
-		(driver->*setLine)(ROUND(start.x), ROUND(end.x), ROUND(start.y));
+		StrokePatternLine(ROUND(start.x), ROUND(start.y), ROUND(end.x), ROUND(start.y), d);
 		return;
 	}
 
@@ -1698,9 +1657,9 @@ void DisplayDriver::FillTriangle(BPoint *pts, DisplayDriver* driver, SetHorizont
 		LineCalc lineA(first, third);
 		LineCalc lineB(second, third);
 		
-		(driver->*setLine)(ROUND(first.x), ROUND(second.x), ROUND(first.y));
+		StrokePatternLine(ROUND(first.x), ROUND(first.y), ROUND(second.x), ROUND(first.y), d);
 		for(i=(int32)first.y+1; i<=third.y; i++)
-			(driver->*setLine)(ROUND(lineA.GetX(i)), ROUND(lineB.GetX(i)), i);
+			StrokePatternLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
 		return;
 	}
 	
@@ -1710,9 +1669,9 @@ void DisplayDriver::FillTriangle(BPoint *pts, DisplayDriver* driver, SetHorizont
 		LineCalc lineA(first, second);
 		LineCalc lineB(first, third);
 		
-		(driver->*setLine)(ROUND(second.x), ROUND(third.x), ROUND(second.y));
+		StrokePatternLine(ROUND(second.x), ROUND(second.y), ROUND(third.x), ROUND(second.y), d);
 		for(i=(int32)first.y; i<third.y; i++)
-			(driver->*setLine)(ROUND(lineA.GetX(i)), ROUND(lineB.GetX(i)), i);
+			StrokePatternLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
 		return;
 	}
 	
@@ -1722,10 +1681,11 @@ void DisplayDriver::FillTriangle(BPoint *pts, DisplayDriver* driver, SetHorizont
 	LineCalc lineC(second, third);
 	
 	for(i=(int32)first.y; i<(int32)second.y; i++)
-		(driver->*setLine)(ROUND(lineA.GetX(i)), ROUND(lineB.GetX(i)), i);
+		StrokePatternLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
 
 	for(i=(int32)second.y; i<=third.y; i++)
-		(driver->*setLine)(ROUND(lineC.GetX(i)), ROUND(lineB.GetX(i)), i);
+		StrokePatternLine(ROUND(lineC.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
+
 }
 
 /*!
@@ -2236,7 +2196,8 @@ void DisplayDriver::StrokeEllipse(const BRect &r, DisplayDriver* driver, SetPixe
 void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, RGBColor &color)
 {
 	Lock();
-	StrokeSolidLine(start,end,color);
+	//Not quite that simple bub
+	//StrokeSolidLine(start,end,color);
 	Unlock();
 }
 
@@ -2289,23 +2250,12 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, RGBColor &color,
 		return;
 
 	Lock();
+	/*
 	for(int32 i=0; i<(numpts-1); i++)
 		StrokeSolidLine(ptlist[i],ptlist[i+1],color);
 	if(is_closed)
 		StrokeSolidLine(ptlist[numpts-1],ptlist[0],color);
-	Unlock();
-}
-
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *d, bool is_closed)
-{
-	if(!ptlist)
-		return;
-
-	Lock();
-	for(int32 i=0; i<(numpts-1); i++)
-		StrokePatternLine(ptlist[i],ptlist[i+1],d);
-	if(is_closed)
-		StrokePatternLine(ptlist[numpts-1],ptlist[0],d);
+		*/
 	Unlock();
 }
 
@@ -2313,14 +2263,19 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *
 	\brief Called for all BView::StrokePolygon calls
 	\param ptlist Array of BPoints defining the polygon.
 	\param numpts Number of points in the BPoint array.
-	\param setPixel Pixel drawing function which handles things like size and pattern.
+	\param d      DrawData containing all of the other options
 */
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, DisplayDriver* driver, SetPixelFuncType setPixel, bool is_closed)
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *d, bool is_closed)
 {
+	if(!ptlist)
+		return;
+
+	Lock();
 	for(int32 i=0; i<(numpts-1); i++)
-		StrokeLine(ptlist[i],ptlist[i+1],driver,setPixel);
+		StrokeLine(ptlist[i],ptlist[i+1],d);
 	if(is_closed)
-		StrokeLine(ptlist[numpts-1],ptlist[0],driver,setPixel);
+		StrokeLine(ptlist[numpts-1],ptlist[0],d);
+	Unlock();
 }
 
 /*!
@@ -2339,19 +2294,11 @@ void DisplayDriver::StrokeRect(const BRect &r, RGBColor &color)
 void DisplayDriver::StrokeRect(const BRect &r, const DrawData *d)
 {
 	Lock();
-	StrokePatternLine(r.LeftTop(),r.RightTop(),d);
-	StrokePatternLine(r.LeftTop(),r.LeftBottom(),d);
-	StrokePatternLine(r.RightTop(),r.RightBottom(),d);
-	StrokePatternLine(r.LeftBottom(),r.RightBottom(),d);
+	StrokeLine(r.LeftTop(),r.RightTop(),d);
+	StrokeLine(r.LeftTop(),r.LeftBottom(),d);
+	StrokeLine(r.RightTop(),r.RightBottom(),d);
+	StrokeLine(r.LeftBottom(),r.RightBottom(),d);
 	Unlock();
-}
-
-void DisplayDriver::StrokeRect(const BRect &r, DisplayDriver* driver, SetHorizontalLineFuncType setHLine, SetVerticalLineFuncType setVLine)
-{
-	(driver->*setHLine)((int)ROUND(r.left), (int)ROUND(r.right), (int)ROUND(r.top));
-	(driver->*setVLine)((int)ROUND(r.right), (int)ROUND(r.top), (int)ROUND(r.bottom));
-	(driver->*setHLine)((int)ROUND(r.left), (int)ROUND(r.right), (int)ROUND(r.bottom));
-	(driver->*setVLine)((int)ROUND(r.left), (int)ROUND(r.top), (int)ROUND(r.bottom));
 }
 
 /*!
@@ -2385,20 +2332,14 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 {
 }
 
-void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, const DrawData *d)
-{
-}
-
 /*!
 	\brief Called for all BView::StrokeRoundRect calls
 	\param r The rect itself
 	\param xrad X radius of the corner arcs
 	\param yrad Y radius of the corner arcs
-	\param setHLine Horizontal line drawing function
-	\param setVLine Vertical line drawing function
-	\param setPixel Pixel drawing function
+	\param d    DrawData containing all other options
 */
-void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, DisplayDriver* driver, SetHorizontalLineFuncType setHLine, SetVerticalLineFuncType setVLine, SetPixelFuncType setPixel)
+void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, const DrawData *d)
 {
 	int hLeft, hRight;
 	int vTop, vBottom;
@@ -2412,17 +2353,20 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 	bRight = hRight -xrad;
 	bTop = vTop + yrad;
 	bBottom = vBottom - yrad;
-	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, driver, setPixel);
-	(driver->*setHLine)(hRight, hLeft, (int)ROUND(r.top));
+
+	Lock();
+	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, d);
+	StrokeLine(BPoint(hRight, r.top), BPoint(hLeft, r.top), d);
 	
-	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, driver, setPixel);
-	(driver->*setVLine)((int)ROUND(r.left),vTop,vBottom);
+	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, d);
+	StrokeLine(BPoint(r.left, vTop), BPoint(r.left, vBottom), d);
 
-	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, driver, setPixel);
-	(driver->*setHLine)(hLeft, hRight, ROUND(r.bottom));
+	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, d);
+	StrokeLine(BPoint(hLeft, r.bottom), BPoint(hRight, r.bottom), d);
 
-	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, driver, setPixel);
-	(driver->*setVLine)((int)ROUND(r.right),vBottom,vTop);
+	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d);
+	StrokeLine(BPoint(r.right, vBottom), BPoint(r.right, vTop), d);
+	Unlock();
 }
 
 //void DisplayDriver::StrokeShape(SShape *sh, const DrawData *d, const Pattern &pat)
@@ -2447,9 +2391,9 @@ void DisplayDriver::StrokeTriangle(BPoint *pts, RGBColor &color)
 void DisplayDriver::StrokeTriangle(BPoint *pts, const DrawData *d)
 {
 	Lock();
-	StrokePatternLine(pts[0],pts[1],d);
-	StrokePatternLine(pts[1],pts[2],d);
-	StrokePatternLine(pts[2],pts[0],d);
+	StrokeLine(pts[0],pts[1],d);
+	StrokeLine(pts[1],pts[2],d);
+	StrokeLine(pts[2],pts[0],d);
 	Unlock();
 }
 
@@ -3013,11 +2957,13 @@ void DisplayDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 {
 }
 
+/* Draws a line with pensize 1.  Coordinates are guarenteed to be in bounds */
 void DisplayDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
 {
 }
 
-void DisplayDriver::StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d)
+/* Draws a line with pensize 1.  Coordinates are guarenteed to be in bounds */
+void DisplayDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
 {
 }
 

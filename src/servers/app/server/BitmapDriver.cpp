@@ -762,7 +762,7 @@ void BitmapDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBCo
 {
 }
 
-void BitmapDriver::StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d)
+void BitmapDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
 {
 }
 

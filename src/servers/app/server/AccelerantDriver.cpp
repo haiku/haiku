@@ -82,7 +82,7 @@ AccelerantDriver::~AccelerantDriver(void)
 */
 bool AccelerantDriver::Initialize(void)
 {
-/*	int i;
+	int i;
 	char signature[1024];
 	char path[PATH_MAX];
 	struct stat accelerant_stat;
@@ -154,12 +154,7 @@ bool AccelerantDriver::Initialize(void)
 		return false;
 	if ( GetDisplayMode(&mDisplayMode) != B_OK )
 		return false;
-	_SetDepth(GetDepthFromColorspace(mDisplayMode.space));
-	_SetWidth(mDisplayMode.virtual_width);
-	_SetHeight(mDisplayMode.virtual_height);
-	_SetMode(GetModeFromResolution(mDisplayMode.virtual_width,mDisplayMode.virtual_height,
-		GetDepthFromColorspace(mDisplayMode.space)));
-
+	SetMode(mDisplayMode);
 	memcpy(&R5DisplayMode,&mDisplayMode,sizeof(display_mode));
 #else
 	SetMode(B_8_BIT_640x480);
@@ -187,7 +182,6 @@ bool AccelerantDriver::Initialize(void)
 	FillRect(BRect(0,0,1024,768),blue);
 #endif
 
-*/
 	return true;
 }
 
@@ -199,7 +193,6 @@ bool AccelerantDriver::Initialize(void)
 */
 void AccelerantDriver::Shutdown(void)
 {
-/*
 #ifdef RUN_UNDER_R5
 	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
 	if ( SetDisplayMode )
@@ -212,7 +205,6 @@ void AccelerantDriver::Shutdown(void)
 		unload_add_on(accelerant_image);
 	if (card_fd >= 0)
 		close(card_fd);
-*/
 }
 
 /*!
@@ -1521,4 +1513,141 @@ int AccelerantDriver::GetDepthFromColorspace(int space)
 			break;
 	}
 	return depth;
+}
+
+void AccelerantDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
+{
+}
+
+void AccelerantDriver::FillSolidRect(const BRect &rect, RGBColor &color)
+{
+}
+
+void AccelerantDriver::FillPatternRect(const BRect &rect, const DrawData *d)
+{
+}
+
+void AccelerantDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
+{
+}
+
+void AccelerantDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
+{
+	int32 dx = x2 - x1;
+	int32 dy = y2 - y1;
+	int32 steps, k;
+	double xInc, yInc;
+	double x = x1;
+	double y = y1;
+
+	if ( abs(dx) > abs(dy) )
+		steps = abs(dx);
+	else
+		steps = abs(dy);
+	xInc = dx / (double) steps;
+	yInc = dy / (double) steps;
+
+	//(driver->*setPixel)(ROUND(x),ROUND(y));
+	for (k=0; k<steps; k++)
+	{
+		x += xInc;
+		y += yInc;
+		//(driver->*setPixel)(ROUND(x),ROUND(y));
+	}
+}
+
+void AccelerantDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
+{
+}
+
+void AccelerantDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
+{
+}
+
+void AccelerantDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
+{
+  /*
+	if(!destbmp)
+	{
+		printf("CopyToBitmap returned - not init or NULL bitmap\n");
+		return;
+	}
+	
+	if(((uint32)destbmp->ColorSpace() & 0x000F) != (_displaymode.space & 0x000F))
+	{
+		printf("CopyToBitmap returned - unequal buffer pixel depth\n");
+		return;
+	}
+	
+	BRect destrect(destbmp->Bounds()), source(sourcerect);
+	
+	uint8 colorspace_size=destbmp->BitsPerPixel()/8;
+	
+	// First, clip source rect to destination
+	if(source.Width() > destrect.Width())
+		source.right=source.left+destrect.Width();
+	
+	if(source.Height() > destrect.Height())
+		source.bottom=source.top+destrect.Height();
+	
+
+	// Second, check rectangle bounds against their own bitmaps
+	BRect work_rect(destbmp->Bounds());
+	
+	if( !(work_rect.Contains(destrect)) )
+	{
+		// something in selection must be clipped
+		if(destrect.left < 0)
+			destrect.left = 0;
+		if(destrect.right > work_rect.right)
+			destrect.right = work_rect.right;
+		if(destrect.top < 0)
+			destrect.top = 0;
+		if(destrect.bottom > work_rect.bottom)
+			destrect.bottom = work_rect.bottom;
+	}
+
+	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
+
+	if(!work_rect.Contains(sourcerect))
+		return;
+
+	if( !(work_rect.Contains(source)) )
+	{
+		// something in selection must be clipped
+		if(source.left < 0)
+			source.left = 0;
+		if(source.right > work_rect.right)
+			source.right = work_rect.right;
+		if(source.top < 0)
+			source.top = 0;
+		if(source.bottom > work_rect.bottom)
+			source.bottom = work_rect.bottom;
+	}
+
+	// Set pointers to the actual data
+	uint8 *dest_bits  = (uint8*) destbmp->Bits();	
+	uint8 *src_bits = (uint8*) _target->Bits();
+
+	// Get row widths for offset looping
+	uint32 dest_width  = uint32 (destbmp->BytesPerRow());
+	uint32 src_width = uint32 (_target->BytesPerRow());
+
+	// Offset bitmap pointers to proper spot in each bitmap
+	src_bits += uint32 ( (source.top  * src_width)  + (source.left  * colorspace_size) );
+	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
+	
+	
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
+	uint32 lines = uint32 (source.bottom-source.top+1);
+
+	for (uint32 pos_y=0; pos_y<lines; pos_y++)
+	{
+		memcpy(dest_bits,src_bits,line_length);
+
+		// Increment offsets
+ 		src_bits += src_width;
+ 		dest_bits += dest_width;
+	}
+*/
 }

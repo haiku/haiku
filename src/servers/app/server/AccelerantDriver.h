@@ -84,6 +84,17 @@ protected:
 	int GetHeightFromMode(int mode);
 	int GetDepthFromMode(int mode);
 	int GetDepthFromColorspace(int space);
+
+	// Support functions for the rest of the driver
+	void Blit(const BRect &src, const BRect &dest, const DrawData *d);
+	void FillSolidRect(const BRect &rect, RGBColor &color);
+	void FillPatternRect(const BRect &rect, const DrawData *d);
+	void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
+	void StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d);
+	void StrokeSolidRect(const BRect &rect, RGBColor &color);
+	void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
+	void CopyToBitmap(ServerBitmap *target, const BRect &source);
+	
 	ServerCursor *cursor, *under_cursor;
 
 	BRect cursorframe;
