@@ -5,6 +5,8 @@
 
 #include "KDiskSystem.h"
 
+struct partition_module_info;
+
 namespace BPrivate {
 namespace DiskDevice {
 
@@ -12,6 +14,8 @@ class KPartitioningSystem : public KDiskSystem {
 public:
 	KPartitioningSystem(const char *name);
 	virtual ~KPartitioningSystem();
+
+	virtual status_t Init();
 
 	virtual bool IsFileSystem() const;
 

@@ -20,6 +20,21 @@ KPartitioningSystem::~KPartitioningSystem()
 {
 }
 
+// Init
+status_t
+KPartitioningSystem::Init()
+{
+	status_t error = KDiskSystem::Init();
+	if (error != B_OK)
+		return error;
+	error = Load();
+	if (error != B_OK)
+		return error;
+	error = SetPrettyName(fModule->pretty_name);
+	Unload();
+	return error;
+}
+
 // IsFileSystem
 bool
 KPartitioningSystem::IsFileSystem() const

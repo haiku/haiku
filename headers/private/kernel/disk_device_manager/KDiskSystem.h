@@ -16,12 +16,12 @@ public:
 	KDiskSystem(const char *name);
 	virtual ~KDiskSystem();
 
+	virtual status_t Init();
+
 	void SetID(disk_system_id id);
 	disk_system_id ID() const;
 	const char *Name() const;
 	virtual const char *PrettyName();
-		// TODO: Add an Init(), make PrettyName() non-virtual and add a
-		// protected setter.
 
 	virtual bool IsFileSystem() const;
 	bool IsPartitioningSystem() const;
@@ -108,9 +108,12 @@ protected:
 	virtual status_t LoadModule();
 	virtual void UnloadModule();
 
+	status_t SetPrettyName(const char *name);
+
 private:
 	disk_system_id	fID;
 	char			*fName;
+	char			*fPrettyName;
 	int32			fLoadCounter;
 };
 

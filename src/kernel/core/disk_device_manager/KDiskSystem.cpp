@@ -9,6 +9,7 @@
 KDiskSystem::KDiskSystem(const char *name)
 	: fID(-1),
 	  fName(NULL),
+	  fPrettyName(NULL),
 	  fLoadCounter(0)
 {
 }
@@ -17,6 +18,14 @@ KDiskSystem::KDiskSystem(const char *name)
 KDiskSystem::~KDiskSystem()
 {
 	free(fName);
+}
+
+// Init
+status_t
+KDiskSystem::Init()
+{
+	// to be implemented by derived classes
+	return B_OK;
 }
 
 // SetID
@@ -44,8 +53,7 @@ KDiskSystem::Name() const
 const char *
 KDiskSystem::PrettyName()
 {
-	// to be implemented by derived classes
-	return NULL;
+	return fPrettyName;
 }
 
 // IsFileSystem
@@ -390,5 +398,12 @@ void
 KDiskSystem::UnloadModule()
 {
 	// to be implemented by derived classes
+}
+
+// SetPrettyName
+status_t
+KDiskSystem::SetPrettyName(const char *name)
+{
+	return set_string(fPrettyName, name);
 }
 
