@@ -647,7 +647,8 @@ rule PublicHeaders
 	# <group list>.
 
 	local list = $(1) ;
-	local dirs ;
+	local dirs = [ FDirName $(OBOS_TOP) headers os ] ;
+
 	for i in $(list) {
 		dirs += [ FDirName $(OBOS_TOP) headers os $(i) ] ;
 	}
