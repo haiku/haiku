@@ -1,5 +1,9 @@
 SubDir OBOS_TOP src kits textencoding libiconv ;
 
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
 SubDirCcFlags
 	-DLIBDIR="\\\"/boot/home/config/lib\\\""
 	-DENABLE_RELOCATABLE=1
@@ -19,3 +23,5 @@ StaticLibrary iconv :
 	relocatable.c
 	;
 
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;

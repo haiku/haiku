@@ -11,4 +11,7 @@ SharedLibrary textencoding :
 	: libiconv.a ;
 LinkSharedOSLibs libtextencoding.so : be ;
 
+MakeLocate <develop>libtextencoding.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libtextencoding.so : libtextencoding.so ;
+
 SubInclude OBOS_TOP src kits textencoding libiconv ;
