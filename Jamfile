@@ -44,6 +44,7 @@ Depends MediaKit :
 #	demultiplexer.media_addon 
 
 	# codecs
+	ac3_decoder
 	aiff_reader
 	au_reader
 	avcodec
