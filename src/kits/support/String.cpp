@@ -1731,14 +1731,12 @@ BString::UnlockBuffer(int32 length)
 {
 	_SetUsingAsCString(false); //debug
 	
-	int32 len = length;
+	if (length < 0)
+		length = (_privateData == NULL) ? 0 : strlen(_privateData);
 
-	if (len < 0)
-		len = (_privateData == NULL) ? 0 : strlen(_privateData);
+	if (length != Length())
+		_GrowBy(length - Length());
 
-	if (len != Length())
-		_GrowBy(len - Length());
-		
 	return *this;
 }
 
@@ -2014,7 +2012,7 @@ BString::operator<<(float f)
 
 
 /*---- Private or Reserved ------------------------------------------------*/
-char*
+char *
 BString::_Alloc(int32 dataLen)
 {
 	char *dataPtr = _privateData ? _privateData - sizeof(int32) : NULL;
@@ -2028,9 +2026,9 @@ BString::_Alloc(int32 dataLen)
 	if (dataPtr) {
 		dataPtr += sizeof(int32);
 		_privateData = dataPtr;
-		int32 newLen = allocLen - sizeof(int32) - 1;
-		_SetLength(newLen);
-		_privateData[newLen] = '\0';
+
+		_SetLength(dataLen);
+		_privateData[dataLen] = '\0';
 	}
 	return dataPtr;
 }	
