@@ -27,7 +27,14 @@ class RootFileSystem : public Directory {
 		virtual status_t AddNode(Node *node);
 
 	private:
-		list	fList;
+		struct entry {
+			DoublyLinked::Link	link;
+			Directory	*root;
+		};
+		typedef DoublyLinked::Iterator<entry, &entry::link> EntryIterator;
+		typedef DoublyLinked::List<entry, &entry::link> EntryList;
+
+		EntryList fList;
 };
 
 

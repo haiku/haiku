@@ -13,27 +13,16 @@
 #include <fcntl.h>
 
 
-struct file_system_entry {
-	list_link	link;
-	Directory	*root;
-};
-
-struct dir_cookie {
-	file_system_entry *current;
-};
-
-
 RootFileSystem::RootFileSystem()
 {
-	list_init(&fList);
 }
 
 
 RootFileSystem::~RootFileSystem()
 {
-	file_system_entry *entry = NULL;
+	struct entry *entry = NULL;
 
-	while ((entry = (file_system_entry *)list_remove_head_item(&fList)) != NULL) {
+	while ((entry = fList.RemoveHead()) != NULL) {
 		entry->root->Release();
 		delete entry;
 	}
@@ -43,12 +32,11 @@ RootFileSystem::~RootFileSystem()
 status_t 
 RootFileSystem::Open(void **_cookie, int mode)
 {
-	dir_cookie *cookie = new dir_cookie();
-	if (cookie == NULL)
+	EntryIterator *iterator = new EntryIterator(fList.Iterator());
+	if (iterator == NULL)
 		return B_NO_MEMORY;
 	
-	cookie->current = NULL;
-	*_cookie = cookie;
+	*_cookie = iterator;
 
 	return B_OK;
 }
@@ -57,7 +45,7 @@ RootFileSystem::Open(void **_cookie, int mode)
 status_t 
 RootFileSystem::Close(void *cookie)
 {
-	delete (dir_cookie *)cookie;
+	delete (EntryIterator *)cookie;
 	return B_OK;
 }
 
@@ -65,9 +53,10 @@ RootFileSystem::Close(void *cookie)
 Node *
 RootFileSystem::Lookup(const char *name, bool /*traverseLinks*/)
 {
-	file_system_entry *entry = NULL;
+	EntryIterator iterator = fList.Iterator();
+	struct entry *entry = NULL;
 
-	while ((entry = (file_system_entry *)list_get_next_item(&fList, entry)) != NULL) {
+	while ((entry = iterator.Next()) != NULL) {
 		char entryName[B_OS_NAME_LENGTH];
 		if (entry->root->GetName(entryName, sizeof(entryName)) != B_OK)
 			continue;
@@ -85,10 +74,10 @@ RootFileSystem::Lookup(const char *name, bool /*traverseLinks*/)
 status_t 
 RootFileSystem::GetNextEntry(void *_cookie, char *name, size_t size)
 {
-	dir_cookie *cookie = (dir_cookie *)_cookie;
-	file_system_entry *entry;
+	EntryIterator *iterator = (EntryIterator *)_cookie;
+	struct entry *entry;
 
-	entry = cookie->current = (file_system_entry *)list_get_next_item(&fList, cookie->current);
+	entry = iterator->Next();
 	if (entry != NULL)
 		return entry->root->GetName(name, size);
 
@@ -99,10 +88,10 @@ RootFileSystem::GetNextEntry(void *_cookie, char *name, size_t size)
 status_t 
 RootFileSystem::GetNextNode(void *_cookie, Node **_node)
 {
-	dir_cookie *cookie = (dir_cookie *)_cookie;
-	file_system_entry *entry;
+	EntryIterator *iterator = (EntryIterator *)_cookie;
+	struct entry *entry;
 
-	entry = cookie->current = (file_system_entry *)list_get_next_item(&fList, cookie->current);
+	entry = iterator->Next();
 	if (entry != NULL) {
 		*_node = entry->root;
 		return B_OK;
@@ -114,9 +103,7 @@ RootFileSystem::GetNextNode(void *_cookie, Node **_node)
 status_t 
 RootFileSystem::Rewind(void *_cookie)
 {
-	dir_cookie *cookie = (dir_cookie *)_cookie;
-
-	cookie->current = NULL;
+	// ToDo: implement
 	return B_OK;	
 }
 
@@ -124,7 +111,7 @@ RootFileSystem::Rewind(void *_cookie)
 bool 
 RootFileSystem::IsEmpty()
 {
-	return list_is_empty(&fList);
+	return fList.IsEmpty();
 }
 
 
@@ -135,14 +122,14 @@ RootFileSystem::AddNode(Node *node)
 	if (node->Type() != S_IFDIR)
 		return B_BAD_TYPE;
 
-	file_system_entry *entry = new file_system_entry();
+	struct entry *entry = new RootFileSystem::entry();
 	if (entry == NULL)
 		return B_NO_MEMORY;
 
 	node->Acquire();
 	entry->root = (Directory *)node;
 
-	list_add_item(&fList, entry);
+	fList.Add(entry);
 
 	return B_OK;
 }
