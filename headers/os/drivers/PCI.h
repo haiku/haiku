@@ -84,7 +84,13 @@ typedef struct pci_info {
 			uchar	interrupt_line;			/* interrupt line */
 			uchar	interrupt_pin;			/* interrupt pin */
 			ushort	bridge_control;		
-		} h1; 
+			ushort	subsystem_id;			/* subsystem (add-in card) id */
+			ushort	subsystem_vendor_id;	/* subsystem (add-in card) vendor id */
+		} h1;
+		struct {
+			ushort	subsystem_id;			/* subsystem (add-in card) id */
+			ushort	subsystem_vendor_id;	/* subsystem (add-in card) vendor id */
+		} h2;			
 	} u;
 } pci_info;
 
@@ -187,10 +193,33 @@ struct pci_module_info {
 #define PCI_prefetchable_memory_limit_upper32		0x2C
 #define PCI_io_base_upper16							0x30 /* (2 bytes) */
 #define PCI_io_limit_upper16						0x32 /* (2 bytes) */
+#define PCI_sub_vendor_id_1                         0x34 /* (2 bytes) */
+#define PCI_sub_device_id_1                         0x36 /* (2 bytes) */
 #define PCI_bridge_rom_base							0x38
 #define PCI_bridge_control							0x3E /* (1 byte) */																		
 
 
+/* PCI type 2 header offsets */
+
+#define PCI_secondary_status_2                      0x16
+#define PCI_primary_bus_2							0x18 /* (1 byte) */
+#define PCI_secondary_bus_2							0x19 /* (1 byte) */
+#define PCI_subordinate_bus_2						0x1A /* (1 byte) */
+#define PCI_secondary_latency_2                     0x1B /* (1 byte) latency of secondary bus */	
+#define PCI_memory_base0_2                          0x1C /* (4 bytes) */
+#define PCI_memory_limit0_2                         0x20 /* (4 bytes) */
+#define PCI_memory_base1_2                          0x24 /* (4 bytes) */
+#define PCI_memory_limit1_2                         0x28 /* (4 bytes) */
+#define PCI_io_base0_2                              0x2c /* (4 bytes) */
+#define PCI_io_limit0_2                             0x30 /* (4 bytes) */
+#define PCI_io_base1_2                              0x34 /* (4 bytes) */
+#define PCI_io_limit1_2                             0x38 /* (4 bytes) */
+#define PCI_bridge_control_2                        0x3E /* (1 byte) */
+
+#define PCI_sub_vendor_id_2                         0x40 /* (2 bytes) */
+#define PCI_sub_device_id_2                         0x42 /* (2 bytes) */
+
+#define PCI_card_interface_2                        0x44 /* ?? */
 
 /* ---
 	values for the class_base field in the common header
@@ -230,7 +259,7 @@ struct pci_module_info {
 #define PCI_ide				0x01			/* IDE controller */
 #define PCI_floppy			0x02			/* floppy disk controller */
 #define PCI_ipi				0x03			/* IPI bus controller */
-#define PCI_raid			0x03			/* RAID controller */
+#define PCI_raid			0x04			/* RAID controller */
 #define PCI_mass_storage_other 0x80			/* other mass storage controller */
 
 
@@ -242,6 +271,7 @@ struct pci_module_info {
 #define PCI_token_ring		0x01			/* Token Ring controller */
 #define PCI_fddi			0x02			/* FDDI controller */
 #define PCI_atm				0x03			/* ATM controller */
+#define PCI_isdn            0x04            /* ISDN controller */
 #define PCI_network_other	0x80			/* other network controller */
 
 
@@ -251,6 +281,7 @@ struct pci_module_info {
 
 #define PCI_vga				0x00			/* VGA controller */
 #define PCI_xga				0x01			/* XGA controller */
+#define PCI_3d              0x02            /* £d controller */
 #define PCI_display_other	0x80			/* other display controller */
 
 
@@ -258,8 +289,9 @@ struct pci_module_info {
 	values for the class_sub field for class_base = 0x04 (multimedia device)
 --- */
 
-#define PCI_video			0x00			/* video */
-#define PCI_audio			0x01			/* audio */
+#define PCI_video			 0x00			/* video */
+#define PCI_audio			 0x01			/* audio */
+#define PCI_telephony        0x02           /* computer telephony device */
 #define PCI_multimedia_other 0x80			/* other multimedia device */
 
 
@@ -284,6 +316,7 @@ struct pci_module_info {
 #define PCI_pcmcia			0x05			/* PCMCIA bridge */
 #define PCI_nubus			0x06			/* NuBus bridge */
 #define PCI_cardbus			0x07			/* CardBus bridge */
+#define PCI_raceway         0x08            /* RACEway bridge */
 #define PCI_bridge_other	0x80			/* other bridge device */
 
 
@@ -294,6 +327,8 @@ struct pci_module_info {
 
 #define PCI_serial						0x00	/* serial port controller */
 #define PCI_parallel					0x01	/* parallel port */
+#define PCI_multiport_serial            0x02    /* multiport serial controller */
+#define PCI_modem                       0x03    /* modem */
 #define PCI_simple_communications_other	0x80	/* other communications device */
 
 /* ---
@@ -327,6 +362,7 @@ struct pci_module_info {
 #define PCI_dma						0x01	/* dma controller */
 #define PCI_timer					0x02	/* timers */
 #define PCI_rtc						0x03	/* real time clock */
+#define PCI_generic_hot_plug        0x04    /* generic PCI hot-plug controller */
 #define PCI_system_peripheral_other	0x80	/* other generic system peripheral */
 
 /* ---
@@ -377,6 +413,8 @@ struct pci_module_info {
 #define PCI_keyboard			0x00	/* keyboard controller */
 #define PCI_pen					0x01	/* pen */
 #define PCI_mouse				0x02	/* mouse controller */
+#define PCI_scanner             0x03    /* scanner controller */
+#define PCI_gameport            0x04    /* gameport controller */
 #define PCI_input_other			0x80	/* other input controller */
 
 
@@ -395,6 +433,7 @@ struct pci_module_info {
 #define PCI_pentium				0x02	/* Pentium */
 #define PCI_alpha				0x10	/* Alpha */
 #define PCI_PowerPC				0x20	/* PowerPC */
+#define PCI_mips                0x30    /* MIPS */
 #define PCI_coprocessor			0x40	/* co-processor */
 
 /* ---
@@ -472,8 +511,8 @@ struct pci_module_info {
 --- */
 
 #define PCI_header_type_generic				0x00		
-#define PCI_header_type_PCI_to_PCI_bridge		0x01		
-
+#define PCI_header_type_PCI_to_PCI_bridge	0x01		
+#define PCI_header_type_cardbus             0x02
 
 
 /* ---
@@ -490,7 +529,10 @@ struct pci_module_info {
 --- */
 
 #define PCI_address_space		0x01		/* 0 = memory space, 1 = i/o space */
-
+#define PCI_register_start      0x10
+#define PCI_register_end        0x24
+#define PCI_register_ppb_end    0x18
+#define PCI_register_pcb_end    0x14
 
 /* ---
 	masks for flags in memory space base address registers
@@ -519,6 +561,16 @@ struct pci_module_info {
 
 #define PCI_rom_enable			0x00000001	/* 1 = expansion rom decode enabled */
 #define PCI_rom_address_mask	0xFFFFF800	/* mask to get expansion rom addr */
+
+/* PCI interrupt pin values */
+#define PCI_pin_mask            0x07
+#define PCI_pin_none            0x00
+#define PCI_pin_a               0x01
+#define PCI_pin_b               0x02
+#define PCI_pin_c               0x03
+#define PCI_pin_d               0x04
+#define PCI_pin_max             0x04
+
 
 #ifdef __cplusplus
 }
