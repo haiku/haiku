@@ -300,7 +300,6 @@ BSlider *slider = new BSlider(BRect(5, 100, 275, 130), NULL, "Volume",
 								new BMessage(CHANGE_VOLUME_SYNTH),
 								0, 1500, B_TRIANGLE_THUMB);
 	temp = (int32)(be_synth->SynthVolume() * be_synth->SampleVolume() * 1000);
-	slider->SetModificationMessage(new BMessage(CHANGE_VOLUME_SYNTH));
 	slider->SetValue(temp);
 	slider->SetLimitLabels("Min", "Max");
 	aView->AddChild(slider);
