@@ -4,6 +4,7 @@ SubDir OBOS_TOP src tests kits interface ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bbitmap ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bdeskbar ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bpolygon ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bregion ] ;
 
 SEARCH_SOURCE += [ FDirName $(TOP) src kits interface ] ;
 
@@ -26,6 +27,15 @@ CommonTestLib libinterfacetest.so
 		DummyPolygon.cpp
 		CreatePolygonTest.cpp
 		MapPolygonTest.cpp
+
+		# BRegion
+		RegionTest.cpp
+		RegionTestcase.cpp
+		RegionConstruction.cpp
+		RegionExclude.cpp
+		RegionInclude.cpp
+		RegionIntersect.cpp
+		RegionOffsetBy.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4

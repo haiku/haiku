@@ -5,6 +5,7 @@
 #include "bbitmap/BitmapTest.h"
 #include "bdeskbar/DeskbarTest.h"
 #include "bpolygon/PolygonTest.h"
+#include "bregion/RegionTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("Interface");
@@ -13,6 +14,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BBitmap", BitmapTestSuite());
 	suite->addTest("BDeskbar", DeskbarTestSuite());
 	suite->addTest("BPolygon", PolygonTestSuite());
+	suite->addTest("BRegion", RegionTestSuite());
 	
 	return suite;
 }
