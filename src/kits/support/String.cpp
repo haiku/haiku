@@ -254,8 +254,9 @@ BString::Append(const char *str, int32 length)
 BString&
 BString::Append(char c, int32 count)
 {
+	int32 len = Length();
 	_GrowBy(count);
-	memset(_privateData + Length() - count, c, count);
+	memset(_privateData + len, c, count);
 
 	return *this;
 }
@@ -303,7 +304,7 @@ BString::Prepend(const BString &string, int32 len)
 BString&
 BString::Prepend(char c, int32 count)
 {
-	_GrowBy(count);
+	_OpenAtBy(0, count);
 	memset(_privateData, c, count);
 	
 	return *this;
@@ -395,7 +396,7 @@ BString::Truncate(int32 newLength, bool lazy = true)
 	if (newLength < Length()) {
 #if 0 
 		if (lazy)
-			; //ToDo: Implement
+			; //ToDo: Implement?
 		else
 #endif		
 			_privateData = _GrowBy(newLength - Length()); //Negative	
@@ -627,6 +628,34 @@ BString::FindFirst(char c, int32 fromOffset) const
 }
 
 
+int32
+BString::IFindFirst(const BString &string) const
+{
+	return _IFindAfter(string.String(), 0, -1);
+}
+
+
+int32
+BString::IFindFirst(const char *string) const
+{
+	return _IFindAfter(string, 0, -1);
+}
+
+
+int32
+BString::IFindFirst(const BString &string, int32 fromOffset) const
+{
+	return _IFindAfter(string.String(), fromOffset, -1);
+}
+
+
+int32
+BString::IFindFirst(const char *string, int32 fromOffset) const
+{
+	return _IFindAfter(string, fromOffset, -1);
+}
+
+
 /*---- Replacing -----------------------------------------------------------*/
 BString&
 BString::ReplaceFirst(char replaceThis, char withThis)
@@ -641,7 +670,9 @@ BString::ReplaceFirst(char replaceThis, char withThis)
 BString&
 BString::ReplaceLast(char replaceThis, char withThis)
 {
-	//TODO: Implement
+	int32 pos = FindLast(replaceThis, Length());
+	if (pos <= Length())
+		_privateData[pos] = withThis;
 	return *this;
 }
 
@@ -661,7 +692,16 @@ BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 BString&
 BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
 {
-	//TODO: Implement
+	int32 pos = B_ERROR;
+	int32 replaceCount = 0;
+
+	while ((pos = FindFirst(replaceThis, fromOffset)) >= 0) {
+		_privateData[pos] = withThis;
+		fromOffset += pos;
+		
+		if (++replaceCount == maxReplaceCount)
+			break;
+	}
 	return *this;
 }
 
@@ -971,7 +1011,7 @@ BString&
 BString::operator<<(float f)
 {
 	char num[64];
-	sprintf(num, "%.00f", f);
+	sprintf(num, "%.2f", f);
 	
 	return *this << num;
 }
@@ -1103,12 +1143,12 @@ BString::_IFindAfter(const char *str, int32 offset, int32 ) const
 	assert(str != NULL);
 	if (offset > Length())
 		return B_ERROR;
-#if 0
+
 	char *ptr = strcasestr(String() + offset, str);
 
 	if (ptr != NULL)
 		return ptr - (String() + offset);
-#endif
+
 	return B_ERROR;
 }
 
