@@ -750,12 +750,12 @@ BQuery::_EvaluateStack()
 
 
 // FBC
-void BQuery::_ReservedQuery1() {}
-void BQuery::_ReservedQuery2() {}
-void BQuery::_ReservedQuery3() {}
-void BQuery::_ReservedQuery4() {}
-void BQuery::_ReservedQuery5() {}
-void BQuery::_ReservedQuery6() {}
+void BQuery::_QwertyQuery1() {}
+void BQuery::_QwertyQuery2() {}
+void BQuery::_QwertyQuery3() {}
+void BQuery::_QwertyQuery4() {}
+void BQuery::_QwertyQuery5() {}
+void BQuery::_QwertyQuery6() {}
 
 
 

@@ -104,12 +104,12 @@ private:
 	status_t _EvaluateStack();
 
 	// FBC
-	virtual void _ReservedQuery1();
-	virtual void _ReservedQuery2();
-	virtual void _ReservedQuery3();
-	virtual void _ReservedQuery4();
-	virtual void _ReservedQuery5();
-	virtual void _ReservedQuery6();
+	virtual void _QwertyQuery1();
+	virtual void _QwertyQuery2();
+	virtual void _QwertyQuery3();
+	virtual void _QwertyQuery4();
+	virtual void _QwertyQuery5();
+	virtual void _QwertyQuery6();
 
 private:
 	int32		_reservedData[4];	// FBC
