@@ -294,12 +294,12 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 	BAutolock autolock(fPositionLock);
 	off_t pos = Seek(0, SEEK_SET);
 	if (pos < 0) {
-		TRACE("OggSeekable::Seek: Seek = %s\n", strerror(status));
-		return status;
+		TRACE("OggSeekable::Seek: Seek = %s\n", strerror(pos));
+		return pos;
 	}
 	uint header_packets_left = GetHeaderPackets().size();
 	while (header_packets_left > 0) {
-		status_t status = ReadPage(&page, B_PAGE_SIZE);
+		status = ReadPage(&page, B_PAGE_SIZE);
 		if (status != B_OK) {
 			TRACE("OggSeekable::Seek: ReadPage = %s\n", strerror(status));
 			return status;
@@ -310,8 +310,8 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 	TRACE("OggSeekable::Seek: header packets end after = %llu\n", left);
 	pos = Seek(left, SEEK_SET);
 	if (pos < 0) {
-		TRACE("OggSeekable::Seek: Seek2 = %s\n", strerror(status));
-		return status;
+		TRACE("OggSeekable::Seek: Seek2 = %s\n", strerror(pos));
+		return pos;
 	}
 	status = ReadPage(&page, B_PAGE_SIZE);
 	if (status != B_OK) {
