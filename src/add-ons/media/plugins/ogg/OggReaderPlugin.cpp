@@ -156,7 +156,6 @@ OggReader::GetPageAt(off_t position, ogg_stream_state * stream, int read_size)
 	while ((result = ogg_sync_pageout(&sync,&page)) == 0) {
 		char * buffer = ogg_sync_buffer(&sync,read_size);
 		ssize_t bytes = fSeekable->ReadAt(position,buffer,read_size);
-		position += read_size;
 		if (bytes == 0) {
 			TRACE("OggReader::GetPage: Read: no data\n");
 			return B_LAST_BUFFER_ERROR;
@@ -165,6 +164,7 @@ OggReader::GetPageAt(off_t position, ogg_stream_state * stream, int read_size)
 			TRACE("OggReader::GetPage: Read: error\n");
 			return bytes;
 		}
+		position += bytes;
 		if (ogg_sync_wrote(&sync,bytes) != 0) {
 			TRACE("OggReader::GetPage: ogg_sync_wrote failed?: error\n");
 			return B_ERROR;

@@ -3,6 +3,7 @@
 #include "OggTheoraStream.h"
 #include "OggTobiasStream.h"
 #include "OggVorbisStream.h"
+#include <Autolock.h>
 #include <stdio.h>
 
 #define TRACE_THIS 1
@@ -56,20 +57,33 @@ OggStream::findIdentifier(const ogg_packet & packet, const char * id, uint pos)
 OggStream::OggStream(long serialno)
 {
 	TRACE("OggStream::OggStream\n");
-	this->fSerialno = serialno;
 	fCurrentFrame = 0;
 	fCurrentTime = 0;
-	ogg_stream_init(&fStreamState,serialno);
-	fCurrentPage = 0;
-	fCurrentPacket = 0;
+	this->fSerialno = serialno;
+	ogg_sync_init(&fSync);
 	ogg_stream_init(&fSeekStreamState,serialno);
+	fCurrentPage = 0;
+	fPacketOnCurrentPage = 0;
+	fCurrentPacket = 0;
+	ogg_stream_init(&fEndStreamState,serialno);
+	fEndPage = 0;
+	fPacketOnEndPage = 0;
+	fEndPacket = 0;
 }
 
 
 OggStream::~OggStream()
 {
-	ogg_stream_clear(&fStreamState);
+	// free internal header packet storage
+	std::vector<ogg_packet>::iterator iter = fHeaderPackets.begin();
+	while (iter != fHeaderPackets.end()) {
+		delete iter->packet;
+		iter++;
+	}
+	// free internal stream state storage
+	ogg_sync_clear(&fSync);
 	ogg_stream_clear(&fSeekStreamState);
+	ogg_stream_clear(&fEndStreamState);
 }
 
 
@@ -87,7 +101,14 @@ OggStream::AddPage(off_t position, ogg_page * page)
 	if (position >= 0) {
 		fPagePositions.push_back(position);
 	}
-	ogg_stream_pagein(&fStreamState,page);
+	BAutolock autolock(fSyncLock);
+	char * buffer;
+	buffer = ogg_sync_buffer(&fSync,page->header_len);
+	memcpy(buffer,page->header,page->header_len);
+	ogg_sync_wrote(&fSync,page->header_len);
+	buffer = ogg_sync_buffer(&fSync,page->body_len);
+	memcpy(buffer,page->body,page->body_len);
+	ogg_sync_wrote(&fSync,page->body_len);
 	return B_OK;
 }
 
@@ -135,7 +156,7 @@ OggStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	strncpy((char*)format->user_data, (char*)(&packet), 4);
 
 	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
-	*duration = 80000000;
+	*duration = 140000000;
 	*frameCount = 60000;
 	return B_OK;
 }
@@ -146,8 +167,14 @@ OggStream::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 {
 	TRACE("OggStream::Seek to %lld : %lld\n", *frame, *time);
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
+		if (*frame > fOggFrameInfos.size() - 1) {
+			// seek to end
+			fCurrentPage = fEndPage;
+			fPacketOnCurrentPage = fPacketOnEndPage;
+			fCurrentPacket = fEndPacket;
+			return B_OK;
+		}
 		*frame = max_c(0, *frame); // clip to zero
-		*frame = min_c(*frame, fOggFrameInfos.size()-1); // clip to max
 		// input the page into a temporary seek stream
 		ogg_stream_state seekStreamState;
 		uint pageno = fOggFrameInfos[*frame].GetPage();
@@ -159,13 +186,11 @@ OggStream::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 			return result; // pageno/fPagePosition corrupted?
 		}
 		// discard earlier packets from this page
-		uint packetno = fOggFrameInfos[*frame].GetPacket();
+		uint packetno = fOggFrameInfos[*frame].GetPacketOnPage();
 		while (packetno-- > 0) {
 			ogg_packet packet;
-			if (ogg_stream_packetout(&fSeekStreamState, &packet) != 1) {
-				TRACE("OggStream::GetPageAt packetno corrupt?\n");
-				return B_ERROR; // packetno corrupted?
-			}
+			// don't check for errors, we may have a packet ending on page
+			ogg_stream_packetout(&seekStreamState, &packet);
 		}
 		// clear out the former seek stream state
 		// this will delete its internal storage
@@ -175,7 +200,9 @@ OggStream::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 		fSeekStreamState = seekStreamState;
 		// we notably do not clear our temporary stream
 		// instead we just let it go out of scope
-		fCurrentFrame = *frame;
+		fCurrentPage = fOggFrameInfos[*frame].GetPage();
+		fPacketOnCurrentPage = fOggFrameInfos[*frame].GetPacketOnPage();
+		fCurrentPacket = fOggFrameInfos[*frame].GetPacket();
 	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
 		*frame = *time/50000;
 		return Seek(B_MEDIA_SEEK_TO_FRAME,frame,time);
@@ -189,9 +216,13 @@ OggStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
              media_header *mediaHeader)
 {
 	static ogg_packet packet;
+	if (fCurrentPacket - fHeaderPackets.size() == fOggFrameInfos.size()) {
+		OggFrameInfo info(fEndPage,fPacketOnEndPage,fEndPacket);
+		fOggFrameInfos.push_back(info);
+	}
 	status_t result = GetPacket(&packet);
 	if (result != B_OK) {
-		TRACE("OggStream::GetNextChunk failed: GetPacket failed\n");
+		TRACE("OggStream::GetNextChunk failed: GetPacket = %s\n", strerror(result));
 		return result;
 	}
 	*chunkBuffer = &packet;
@@ -204,42 +235,65 @@ OggStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 status_t
 OggStream::GetPacket(ogg_packet * packet)
 {
-	if (fCurrentFrame == fOggFrameInfos.size()) {
+	if (fCurrentPacket >= fEndPacket) {
 		// at the end, pull the packet
-		uint old_page = fCurrentPage;
-		uint old_packet = fCurrentPacket;
-		while (ogg_stream_packetpeek(&fStreamState, NULL) != 1) {
-			status_t result = fReaderInterface->GetNextPage();
-			if (result != B_OK) {
-				return result;
+		uint8 pageno = fEndPage;
+		while (ogg_stream_packetpeek(&fEndStreamState, NULL) != 1) {
+			BAutolock autolock(fSyncLock);
+			int result;
+			ogg_page page;
+			while ((result = ogg_sync_pageout(&fSync,&page)) == 0) {
+				status_t result = fReaderInterface->GetNextPage();
+				if (result != B_OK) {
+					TRACE("OggStream::GetPacket: GetNextPage = %s\n", strerror(result));
+					return result;
+				}
 			}
-			fCurrentPage++;
+			if (result == -1) {
+				TRACE("OggStream::GetPacket: ogg_sync_pageout: not synced??\n");
+				return B_ERROR;
+			}
+			if (ogg_stream_pagein(&fEndStreamState,&page) != 0) {
+				TRACE("OggStream::GetPacket: ogg_stream_pagein: failed??\n");
+				return B_ERROR;
+			}
+			fEndPage++;
 		}
-		if (ogg_stream_packetout(&fStreamState, packet) != 1) {
+		if (ogg_stream_packetout(&fEndStreamState, packet) != 1) {
+			TRACE("OggStream::GetPacket: ogg_stream_packetout failed at the end\n");
 			return B_ERROR;
 		}
-		OggFrameInfo info(old_page, old_packet);
-		fOggFrameInfos.push_back(info);
-		if (fCurrentPage != old_page) {
-			fCurrentPacket = 0;
+		fEndPacket++;
+		if (pageno != fEndPage) {
+			fPacketOnEndPage = 0;
 		} else {
-			fCurrentPacket++;
+			fPacketOnEndPage++;
 		}
+		fCurrentPacket = fEndPacket;
+		fPacketOnCurrentPage = fPacketOnEndPage;
+		fCurrentPage = fEndPage;
 	} else {
 		// in the middle, get packet at position
-		uint pageno = fOggFrameInfos[fCurrentFrame].GetPage();
+		uint8 page = fCurrentPage;
 		while (ogg_stream_packetpeek(&fSeekStreamState, NULL) != 1) {
-			off_t position = fPagePositions[pageno++];
+			off_t position = fPagePositions[fCurrentPage++];
 			status_t result = fReaderInterface->GetPageAt(position, &fSeekStreamState);
 			if (result != B_OK) {
+				TRACE("OggStream::GetPacket: GetPageAt = %s\n", strerror(result));
 				return result;
 			}
 		}
 		if (ogg_stream_packetout(&fSeekStreamState, packet) != 1) {
+			TRACE("OggStream::GetPacket: ogg_stream_packetout failed in the middle\n");
 			return B_ERROR;
 		}
+		fCurrentPacket++;
+		if (page != fCurrentPage) {
+			fPacketOnCurrentPage = 0;
+		} else {
+			fPacketOnCurrentPage++;
+		}
 	}
-	fCurrentFrame++; // ever moving forward!
 	return B_OK;
 }
 
@@ -254,32 +308,3 @@ OggStream::SaveHeaderPacket(ogg_packet packet)
 	fHeaderPackets.push_back(packet);
 }
 
-
-// estimate 1 frame = 256 bytes
-int64
-OggStream::PositionToFrame(off_t position)
-{
-	return position/256;
-}
-
-
-off_t
-OggStream::FrameToPosition(int64 frame)
-{
-	return frame*256;
-}
-
-
-// estimate 1 byte = 125 microseconds
-bigtime_t
-OggStream::PositionToTime(off_t position)
-{
-	return position*125;
-}
-
-
-off_t
-OggStream::TimeToPosition(bigtime_t time)
-{
-	return time/125;
-}

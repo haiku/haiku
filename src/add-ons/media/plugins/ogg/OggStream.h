@@ -42,21 +42,24 @@ protected:
 	void		SaveHeaderPacket(ogg_packet packet);
 	std::vector<ogg_packet> fHeaderPackets;
 
-	// Seek helpers
-	virtual int64		PositionToFrame(off_t position);
-	virtual off_t		FrameToPosition(int64 frame);
-	virtual bigtime_t	PositionToTime(off_t position);
-	virtual off_t		TimeToPosition(bigtime_t time);
-private:
-	long				fSerialno;
+protected:
 	int64				fCurrentFrame;
 	bigtime_t			fCurrentTime;
+
+private:
+	long				fSerialno;
 	std::vector<off_t>	fPagePositions;
 	std::vector<OggFrameInfo> fOggFrameInfos;
-	ogg_stream_state	fStreamState;
-	uint				fCurrentPage;
-	uint				fCurrentPacket;
+	ogg_sync_state		fSync;
+	BLocker				fSyncLock;
 	ogg_stream_state	fSeekStreamState;
+	uint				fCurrentPage;
+	uint				fPacketOnCurrentPage;
+	uint				fCurrentPacket;
+	ogg_stream_state	fEndStreamState;
+	uint				fEndPage;
+	uint				fPacketOnEndPage;
+	uint				fEndPacket;
 	OggReader::GetPageInterface * fReaderInterface;
 };
 
