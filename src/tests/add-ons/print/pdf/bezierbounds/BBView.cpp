@@ -1,8 +1,8 @@
 #include "BezierBounds.h"
-#include "View.h"
+#include "BBView.h"
 #include <InterfaceKit.h>
 
-View::View(BRect rect) 
+BBView::BBView(BRect rect) 
 	: BView(rect, NULL, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_SUBPIXEL_PRECISE) {
 	//SetViewColor(B_TRANSPARENT_COLOR);
 	fMode = kStroke;
@@ -10,7 +10,7 @@ View::View(BRect rect)
 	fWidth = 16;
 }
 
-void View::Draw(BRect updateRect) {
+void BBView::Draw(BRect updateRect) {
 	if (fMode == kDrawOutline) {
 
 	} else if (fMode == kStroke) {
@@ -55,7 +55,7 @@ void View::Draw(BRect updateRect) {
 	}
 }
 
-void View::MouseDown(BPoint point) {
+void BBView::MouseDown(BPoint point) {
 	uint32 buttons;
 	GetMouse(&point, &buttons, false);
 
@@ -74,18 +74,18 @@ void View::MouseDown(BPoint point) {
 	Invalidate();
 }
 
-void View::MouseMoved(BPoint point, uint32 transit, const BMessage *message) {
+void BBView::MouseMoved(BPoint point, uint32 transit, const BMessage *message) {
 	if (fCurPoint != -1) {
 		fPath.AtPut(fCurPoint, point);
 		Invalidate();
 	}
 }
 
-void View::MouseUp(BPoint point) {
+void BBView::MouseUp(BPoint point) {
 	fCurPoint = -1;
 }
 
-void View::SetClose(bool close) {
+void BBView::SetClose(bool close) {
 	if (close) fPath.Close();
 	else fPath.Open();
 }

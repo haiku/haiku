@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "BBApp.h"
 
 BMessage* NewMessage(uint32 what, uint32 data)
 {
@@ -44,7 +44,7 @@ AppWindow::AppWindow(BRect aRect)
 	// add view
 	aRect.Set(0, menubar->Bounds().Height()+1, aRect.Width(), aRect.Height());
 	view = NULL;
-	AddChild(view = new View(aRect));
+	AddChild(view = new BBView(aRect));
 	// make window visible
 	Show();
 }

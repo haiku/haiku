@@ -4,7 +4,7 @@
 #include "SubPath.h"
 #include <View.h>
 
-class View : public BView {
+class BBView : public BView {
 	SubPath fPath;
 	enum {
 		kDrawOutline,
@@ -14,7 +14,7 @@ class View : public BView {
 	float fWidth;
 	
 public:
-	View(BRect rect);
+	BBView(BRect rect);
 	void Draw(BRect updateRect);
 	void MouseDown(BPoint point);
 	void MouseUp(BPoint point);

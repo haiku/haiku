@@ -3,7 +3,7 @@
 
 #include <AppKit.h>
 #include <InterfaceKit.h>
-#include "View.h"
+#include "BBView.h"
 #include "MsgConsts.h"
 
 #define APPLICATION "Application"
@@ -12,7 +12,7 @@
 class AppWindow : public BWindow {
 public:
 	BMenuBar *menubar;
-	View *view;
+	BBView *view;
 	AppWindow(BRect);
 	bool QuitRequested();
 	void AboutRequested();	
