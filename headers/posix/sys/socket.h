@@ -97,7 +97,6 @@ typedef uint32_t socklen_t;
 /*
  * These are the valid values for the "how" field used by shutdown(2).
  */
-#ifndef BUILDING_R5_LIBNET
 #define SHUT_RD			0
 #define SHUT_WR			1
 #define SHUT_RDWR		2
@@ -105,11 +104,6 @@ typedef uint32_t socklen_t;
 #define SHUTDOWN_RECV	SHUT_RD
 #define SHUTDOWN_SEND	SHUT_WR
 #define SHUTDOWN_BOTH	SHUT_RDWR
-#else /* BUILDING_R5_LIBNET */
-#define SHUT_RD			1
-#define SHUT_WR			2
-#define SHUT_RDWR		3
-#endif /* BUILDING_R5_LIBNET */
 
 
 struct linger {
