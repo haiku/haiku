@@ -219,15 +219,6 @@ status_t check_acc_capability(uint32 feature)
 	 * memory pitch.. */
 	if (si->acc_mode)
 	{
-		/* see if we support hardware rectangle fills in the current mode:
-		 * the Matrox card's acc engine can adress upto 16Mbyte memory for this cmd! */
-		if (fill &&
-			((si->fbc.bytes_per_row * si->dm.virtual_height) > (16 * 1024 * 1024)))
-		{
-			LOG(4, ("Acc: Not exporting hook %s.\n", msg));
-			return B_ERROR;
-		}
-
 		LOG(4, ("Acc: Exporting hook %s.\n", msg));
 		return B_OK;
 	}

@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 4/2003-1/2004
+   Rudolf Cornelissen 4/2003-3/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -602,11 +602,16 @@ status_t nm_crtc_cursor_init()
 		CR1W(22CURFGCOLOR, 0x00ffffff);
 	}
 
-	/*clear cursor*/
-	fb = (uint32 *) si->framebuffer + curadd;
-	for (i=0;i<(1024/4);i++)
+	/* we must set a valid colordepth to get full RAM access on Neomagic cards:
+	 * in old pre 8-bit color VGA modes some planemask is in effect apparantly,
+	 * allowing access only to every 7th and 8th RAM byte across the entire RAM. */
+	nm_crtc_depth(BPP8);
+
+	/* clear cursor: so we need full RAM access! */
+	fb = ((uint32 *)(((uint32)si->framebuffer) + curadd));
+	for (i = 0; i < (1024/4); i++)
 	{
-		fb[i]=0;
+		fb[i] = 0;
 	}
 
 	/* activate hardware cursor */

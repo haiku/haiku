@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-4 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-5 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -350,6 +350,10 @@ status_t nm_general_bios_to_powergraphics()
 
 	/* enable memory above 256Kb: set b4 (disables adress wraparound at 256Kb boundary) */
 	ISAGRPHW(FBSTADDE, 0x10);
+
+	/* this speeds up RAM writes according to XFree driver */
+//	fixme: don't touch until more is known: part of RAM or CORE PLL???
+//	ISAGRPHW(SPEED, 0xc0);
 
 	/* turn on display */
 	nm_crtc_dpms(true, true, true);

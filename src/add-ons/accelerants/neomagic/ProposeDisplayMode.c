@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors for nm driver:
-	Rudolf Cornelissen 4/2003-1/2004
+	Rudolf Cornelissen 4/2003-3/2004
 */
 
 #define MODULE_BIT 0x00400000
@@ -136,6 +136,13 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		}
 	}	
 	#endif
+
+	/* NM2070 cannot do 24 bit color */
+	if ((si->ps.card_type == NM2070) && (target->space == B_RGB24_LITTLE))
+	{
+		LOG(4, ("PROPOSEMODE: 24bit color not supported on NM2070, aborted.\n"));
+		return B_ERROR;
+	}
 
 	/*find a nearby valid timing from that given*/
 	result = nm_crtc_validate_timing
