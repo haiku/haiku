@@ -1492,13 +1492,13 @@ rule Bison
 {
 	local _h ;
 
-	_h = $(1).h ;
+	_h = $(1:S=.hpp) ;
 
 	MakeLocate $(<) $(_h) : $(LOCATE_SOURCE) ;
 
-    Depends $(<) $(_h) : $(>) ;
-    Bison1 $(<) $(_h) : $(>) ;
-    LocalClean clean : $(<) $(_h) ;
+	Depends $(<) $(_h) : $(>) ;
+	Bison1 $(<) $(_h) : $(>) ;
+	LocalClean clean : $(<) $(_h) ;
 
 	# make sure someone includes $(_h) else it will be
 	# a deadly independent target
@@ -1509,6 +1509,7 @@ rule Bison
 actions Bison1
 {
 	bison $(YACCFLAGS) -o $(1[1]) $(2)
+	[ -f $(1[1]).h ] && mv $(1[1]).h $(1[2]) || true
 }
 
 # BeOS specific rules
