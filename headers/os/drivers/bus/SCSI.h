@@ -20,9 +20,9 @@
 	- single entry system as proposed by CAM involves extra tests and overhead 
 	  because of generalized data structure
 
-	  
+
 	For peripheral driver writers:
-	
+
 	Something about requests involving data transfer: you can either specify
 	the virtual address in <data> of CCB (in which case it must be continuous),
 	or store a pointer to a S/G list that contains physical addresses in
@@ -31,12 +31,12 @@
 	in a different thread context. This is also the	reason why the S/G list has 
 	to contain physical addresses. For obvious reason, the data buffer specified
 	by <sg_list> must be locked, but <data> doesn't need to be.
-	
+
 	You can either execute the request synchronously ("sync_io") or 
 	asynchronously ("async_io"; you have to acquire <completion_sem> to find 
 	out when the request is finished). In the first case you can use either 
 	<data> or <sg_list>, in the latter <sg_list> only. 
-	
+
 	The SCSI bus manager takes care that the controller can access the data
 	via DMA by copying it into a buffer if necessary. For the paging path,
 	this can lead to problems (if the system writes a page to disk and the SCSI
@@ -44,13 +44,13 @@
 	therefore the blk_man takes care that is not necessary for reads/writes.
 	To safe some microseconds, you should set the SCSI_DMA_SAFE flag for these
 	requests, so the SCSI bus manager ommittes the test.
-	
+
 	Effectively, using synchronous execution and specifying the address via
 	<data> is a safe bet.
-	
+
 
 	For SIM writers: 
-	
+
 	Requests sent by peripheral drivers are forwarded to the <scsi_io> entry
 	of the SIM. You should return as soon as some waiting is required. 
 	Usually, the controller raises an IRQ when a request can be continued
@@ -71,14 +71,14 @@
 	Because of the asynchronous nature,	requests may still arrive after the 
 	overflow condition being signalled, so you should add a safety test to 
 	<scsi_io>. 
-	
+
 	If a problem occurs during execution, you can ask for a restart via
 	<resubmit>. The request in question will be submitted as soon as possible.
-	
+
 	If you want to be not disturbed, you can block further requests via
 	<block_bus>/<block_device>. As said above, you must have a safety test
 	at <scsi_io> though.
-	
+
 	If the SIM uses a non-SCSI protocol, it can ask the SCSI bus manager
 	to emulate unsupported SCSI commands by translating them other (supported)
 	commands. The bus manager calls <get_restriction> during detection for
@@ -95,7 +95,6 @@
 
 #include <KernelExport.h>
 #include <device_manager.h>
-//#include "r5_wrapper.h"
 
 
 #define SCSI_MAX_CDB_SIZE 16	// max size of cdb
@@ -112,7 +111,7 @@ typedef struct scsi_device_info *scsi_device;
 typedef struct scsi_ccb
 {
 	struct scsi_ccb *next, *prev;	// internal
-	
+
 	uchar		subsys_status;		// Returned subsystem status
 	uchar		device_status;		// Returned scsi device status
 
@@ -120,36 +119,36 @@ typedef struct scsi_ccb
 	uchar		target_id;			// Target device ID
 	uchar		target_lun;			// Target LUN number
 	uint32		flags;				// Flags for operation of the subsystem
-	
+
 	// released once after asynchronous execution of request;
 	// initialised by alloc_ccb, can be replaced for action but
 	// must be restored before returning via free_ccb
 	sem_id		completion_sem;
-	
+
 	uint8		cdb[SCSI_MAX_CDB_SIZE];  // command data block
 	uchar		cdb_len;			// length of command in bytes
 	int64		sort;				// value of command to sort on (<0 means n/a)
 	bigtime_t	timeout;			// timeout - 0 = use default
-	
+
 	uchar		*data;				// pointer to data
 	const physical_entry *sg_list;	// SG list
 	uint16		sg_cnt;				// number of SG entries
 	uint32		data_len;			// length of data
 	int32		data_resid;			// data transfer residual length: 2's comp
-	
+
 	uchar		sense[SCSI_MAX_SENSE_SIZE]; // autosense data
 	uchar		sense_resid;		// autosense resid length: 2's comp
-	
+
 	// private
 	bool		ordered : 1;		// request cannot overtake/be overtaken by others
 	bool		buffered : 1;		// data is buffered to make it DMA safe
 	bool		emulated : 1;		// command is executed as part of emulation
-	
+
 	scsi_bus	bus;				// associated bus
 	scsi_device	device;				// associated device
 	struct dma_buffer *dma_buffer;	// used dma buffer, or NULL
 	uchar 		state;				// bus manager state
-	
+
 	// original data before command emulation was applied
 	uint8		orig_cdb[SCSI_MAX_CDB_SIZE];
 	uchar		orig_cdb_len;
@@ -261,7 +260,7 @@ typedef struct
 	uint32		hba_queue_size;			// size of adapaters command queue
 	char		sim_vid[SCSI_SIM_ID];	/* Vendor ID of the SIM */
 	char		hba_vid[SCSI_HBA_ID];	/* Vendor ID of the HBA */
-	
+
 	char		sim_version[SCSI_VERS];	/* SIM version number */
 	char		hba_version[SCSI_VERS];	/* HBA version number */
 	char		controller_family[SCSI_FAM_ID]; /* Controller family */
@@ -301,7 +300,7 @@ typedef struct scsi_device_interface {
 	scsi_ccb *(*alloc_ccb)(scsi_device device);
 	// free CCB
 	void (*free_ccb)(scsi_ccb *ccb);
-	
+
 	// execute command asynchronously
 	// when it's finished, the semaphore of the ccb is released
 	// you must provide a S/G list if data_len != 0
@@ -309,7 +308,7 @@ typedef struct scsi_device_interface {
 	// execute command synchronously
 	// you don't need to provide a S/G list nor have to lock data
 	void (*sync_io)(scsi_ccb *ccb);
-	
+
 	// abort request
 	uchar (*abort)(scsi_ccb *ccb_to_abort);
 	// reset device
@@ -375,7 +374,7 @@ typedef struct scsi_for_sim_interface {
 	//               e.g. if three were already running plus this request makes 
 	//               num_requests=4
 	void (*finished)(scsi_ccb *ccb, uint num_requests);
-	
+
 	// following functions return error on invalid arguments only
 	status_t (*alloc_dpc)(scsi_dpc_cookie *dpc);
 	status_t (*free_dpc)(scsi_dpc_cookie dpc);
