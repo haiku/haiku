@@ -425,6 +425,9 @@ ImageView::SetImage(BMessage *pmsg)
 		// determine what type the image is
 		translator_info tinfo;
 		BMessage ioExtension;
+		if (ref != fcurrentRef)
+			// if new image, reset to first document
+			fdocumentIndex = 1;
 		chk = ioExtension.AddInt32("/documentIndex", fdocumentIndex);
 		chk = proster->Identify(&file, &ioExtension, &tinfo, 0, NULL,
 			B_TRANSLATOR_BITMAP);
