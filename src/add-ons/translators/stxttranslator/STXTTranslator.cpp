@@ -411,6 +411,7 @@ status_t
 identify_txt_header(uint8 *data, int32 nread,
 	BPositionIO *inSource, translator_info *outInfo, uint32 outType)
 {
+	float capability = TEXT_IN_CAPABILITY;
 	uint8 ch;
 	ssize_t readlater = 0;
 	readlater = inSource->Read(data + nread, DATA_BUFFER_SIZE - nread);
@@ -420,24 +421,24 @@ identify_txt_header(uint8 *data, int32 nread,
 	nread += readlater;
 	for (int32 i = 0; i < nread; i++) {
 		ch = data[i];
-		// if any null characters or
-		// control characters (other than a few)
-		// are found, abort, as the data is
-		// probably not plain text
+		// if any null characters or control characters
+		// are found, reduce our ability to handle the data
 		if (ch < 0x20 && 
 			ch != 0x08 && // backspace
 			ch != 0x09 && // tab
 			ch != 0x0A && // line feed
 			ch != 0x0C && // form feed
-			ch != 0x0D)   // carriage return
-			return B_NO_TRANSLATOR;
+			ch != 0x0D) { // carriage return
+			capability *= 0.6;
+			break;
+		}
 	}
 
 	// return information about the data in the stream
 	outInfo->type = B_TRANSLATOR_TEXT;
 	outInfo->group = B_TRANSLATOR_TEXT;
 	outInfo->quality = TEXT_IN_QUALITY;
-	outInfo->capability = TEXT_IN_CAPABILITY;
+	outInfo->capability = capability;
 	strcpy(outInfo->name, "Plain text file");
 	strcpy(outInfo->MIME, "text/plain");
 	
