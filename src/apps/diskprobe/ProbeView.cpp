@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -1689,7 +1689,7 @@ ProbeView::MessageReceived(BMessage *message)
 
 			UpdateBookmarkMenuItems();
 
-			// update the applications settings
+			// update the application's settings
 			BMessage update(*message);
 			update.what = kMsgSettingsChanged;
 			be_app_messenger.SendMessage(&update);
@@ -1704,7 +1704,7 @@ ProbeView::MessageReceived(BMessage *message)
 
 			fDataView->SetFontSize(size);
 
-			// update the applications settings
+			// update the application's settings
 			BMessage update(*message);
 			update.what = kMsgSettingsChanged;
 			be_app_messenger.SendMessage(&update);
