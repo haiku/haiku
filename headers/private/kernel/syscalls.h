@@ -201,6 +201,8 @@ extern area_id		_kern_find_area(const char *name);
 extern status_t		_kern_get_area_info(area_id area, area_info *info);
 extern status_t		_kern_get_next_area_info(team_id team, int32 *cookie, area_info *info);
 extern status_t		_kern_resize_area(area_id area, size_t newSize);
+extern status_t		_kern_transfer_area(area_id area, void **_address, uint32 addressSpec,
+						team_id target);
 extern status_t		_kern_set_area_protection(area_id area, uint32 newProtection);
 extern area_id		_kern_clone_area(const char *name, void **_address, uint32 addressSpec, 
 						uint32 protection, area_id sourceArea);
