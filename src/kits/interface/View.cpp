@@ -2474,35 +2474,17 @@ void BView::FillBezier(BPoint* controlPoints, pattern p)
 
 void BView::StrokePolygon(const BPolygon* aPolygon,bool closed, pattern p)
 {
-	if ( !aPolygon )
+	if(!aPolygon)
 		return;
 	
-	if ( aPolygon->fCount <= 2 )
-		return;
-	
-	if (owner)
-	{
-		check_lock();
-		
-		if ( _is_new_pattern( fState->patt, p ) )
-			SetPattern( p );
-		
-		owner->fLink->StartMessage( AS_STROKE_POLYGON );
-		owner->fLink->Attach<int8>( closed );
-		owner->fLink->Attach<int32>( aPolygon->fCount );
-		owner->fLink->Attach(aPolygon->fPts,aPolygon->fCount * sizeof(BPoint) );
-	}
+	StrokePolygon(aPolygon->fPts, aPolygon->fCount, aPolygon->Frame(), closed, p);
 }
 
 //---------------------------------------------------------------------------
 
 void BView::StrokePolygon(const BPoint* ptArray, int32 numPts,bool closed, pattern p)
 {
-	if ( !ptArray )
-		return;
-
-	BPolygon		pol( ptArray, numPts );
-	StrokePolygon( &pol, closed, p );
+	StrokePolygon( ptArray, numPts, closed, p );
 }
 
 //---------------------------------------------------------------------------
@@ -2512,10 +2494,26 @@ void BView::StrokePolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
 {
 	if ( !ptArray )
 		return;
-
-	BPolygon		pol( ptArray, numPts );
-	pol.MapTo( pol.Frame(), bounds);
-	StrokePolygon( &pol, closed, p );
+	
+	if(numPts<=2)
+		return;
+	
+	if (owner)
+	{
+		check_lock();
+		
+		if ( _is_new_pattern( fState->patt, p ) )
+			SetPattern( p );
+		
+		BPolygon pol(ptArray,numPts);
+		pol.MapTo(pol.Frame(),bounds);
+		
+		owner->fLink->StartMessage( AS_STROKE_POLYGON );
+		owner->fLink->Attach<BRect>(pol.Frame());
+		owner->fLink->Attach<int8>( closed );
+		owner->fLink->Attach<int32>( pol.fCount );
+		owner->fLink->Attach(pol.fPts,pol.fCount * sizeof(BPoint) );
+	}
 }
 
 //---------------------------------------------------------------------------
