@@ -1,0 +1,37 @@
+2003-03-18  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Remove lib/c-stack.c.
+
+2003-02-16  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add Finnish (fi).
+
+2003-01-11  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Add src/readlink.c.
+
+2002-11-21  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add ms (Malay).
+
+2002-11-14  Jim Meyering  <jim@meyering.net>
+
+	* POTFILES.in: Remove lib/long-options.c and lib/same.c.
+	Although each defines `_', neither actually used it.
+
+2002-11-09  Jim Meyering  <jim@meyering.net>
+
+	* Makevars (EXTRA_LOCALE_CATEGORIES): Add LC_TIME.
+	Patch by Tim Waugh for Red Hat bug #73669.
+
+2002-09-25  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.in.in: Upgrade to gettext-0.11.5.
+
+2002-09-16  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add be (Belarusian).
+
+2002-09-02  Jim Meyering  <jim@meyering.net>
+
+	* LINGUAS: Add lg (Luganda).
