@@ -32,10 +32,10 @@ StringCharAccessTest::PerformTest(void)
 	
 	//ByteAt(int32)
 	NextSubTest();
-	CPPUNIT_ASSERT(string[-10] == 0);
-	CPPUNIT_ASSERT(string[200] == 0);
-	CPPUNIT_ASSERT(string[1] == ' ');
-	CPPUNIT_ASSERT(string[7] == 'e');
+	CPPUNIT_ASSERT(string.ByteAt(-10) == 0);
+	CPPUNIT_ASSERT(string.ByteAt(200) == 0);
+	CPPUNIT_ASSERT(string.ByteAt(1) == ' ');
+	CPPUNIT_ASSERT(string.ByteAt(7) == 'e');
 }
 
 
