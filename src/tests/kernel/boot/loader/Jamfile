@@ -92,6 +92,7 @@ SimpleTest BootLoaderTest :
 
 	# utility functions - Dano has a strlcpy() function in libroot.so, while R5 has not
 	list.c
+	strlcat.c
 	strlcpy.c
 	driver_settings.c
 
@@ -103,7 +104,7 @@ SimpleTest BootLoaderTest :
 SEARCH on [ FGristFiles list.c ]
 	= [ FDirName $(OBOS_TOP) src kernel core util ] ;
 
-SEARCH on [ FGristFiles strlcpy.c ]
+SEARCH on [ FGristFiles strlcat.c strlcpy.c ]
 	= [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
 
 SEARCH on [ FGristFiles driver_settings.c ]
