@@ -457,8 +457,8 @@ mmu_init(void)
 	map_page(gKernelArgs.arch_args.vir_pgdir, (uint32)sPageDirectory, kDefaultPageFlags);
 
 	// map in a kernel stack
-	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL, 8192);
-	gKernelArgs.cpu_kstack[0].size = 8192;
+	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
+	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE;
 
 	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
