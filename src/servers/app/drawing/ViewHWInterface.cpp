@@ -831,35 +831,6 @@ ViewHWInterface::CopyBackToFront(const BRect& frame)
 				break;
 		}
 
-
-
-
-		int32 pixelSize = 0;
-		color_space dstFormat = into->ColorSpace();
-		// NOTE: there is no check if the bitmaps
-		// are of the same format, because they are
-		if (dstFormat == B_RGBA32 || dstFormat == B_RGB32) {
-			pixelSize = 4;
-		} else if (dstFormat == B_RGB24) {
-			pixelSize = 3;
-		} else if (dstFormat == B_RGB15 || dstFormat == B_RGB16) {
-			pixelSize = 2;
-		} else if (dstFormat == B_GRAY8 || dstFormat == B_CMAP8) {
-			pixelSize = 1;
-		}
-		int32 bytes = (right - x + 1) * pixelSize;
-
-		if (bytes > 0) {
-			// offset pointers to left top of area
-			dst += y * dstBPR + x * pixelSize;
-			src += y * srcBPR + x * pixelSize;
-			// copy
-			for (; y <= bottom; y++) {
-				memcpy(dst, src, bytes);
-				dst += dstBPR;
-				src += srcBPR;
-			}
-		}
 		// update the region on screen
 		fWindow->Invalidate(area);
 	}
