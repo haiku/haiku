@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src apps bin chkbfs ;
 
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+UsePrivateHeaders kernel ;
 
 StdBinCommands
 	chkbfs.cpp
