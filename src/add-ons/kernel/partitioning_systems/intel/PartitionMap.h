@@ -12,6 +12,7 @@
 #define _INTEL_PARTITION_MAP_H
 
 #include <SupportDefs.h>
+#include <util/kernel_cpp.h>
 
 // is_empty_type
 static inline
