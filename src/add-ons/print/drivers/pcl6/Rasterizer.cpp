@@ -37,18 +37,8 @@ Rasterizer::SetBitmap(int x, int y, BBitmap *bitmap, int pageHeight)
 		return false;
 	}
 
-	fprintf(stderr, "valid rect (%d, %d, %d, %d)\n",	
-		fBounds.left, fBounds.top, fBounds.right, fBounds.bottom);
-
 	fWidth = fBounds.right - fBounds.left + 1;
 	fHeight = fBounds.bottom - fBounds.top + 1;	
-
-	if (fWidth < 0 || fHeight < 0) {
-		fprintf(stderr, "Error: get_valid_rect returned an empty rect (%f, %f, %f, %f) -> (%d, %d, %d, %d)!",
-			bounds.left, bounds.top, bounds.right, bounds.bottom,
-			fBounds.left, fBounds.top, fBounds.right, fBounds.bottom);
-		return false;
-	}
 	
 	fBPR = bitmap->BytesPerRow();
 	fBits = (uchar*)bitmap->Bits();
