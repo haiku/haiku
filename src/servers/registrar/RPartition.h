@@ -31,6 +31,8 @@ public:
 	RDiskDevice *Device() const;
 	RSession *Session() const { return fSession; }
 
+	status_t PartitionChanged();
+
 	int32 ID() const { return fID; }
 	int32 ChangeCounter() const { return fChangeCounter.Count(); }
 	void Changed();

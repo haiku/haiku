@@ -6,6 +6,7 @@
 #ifndef DISK_DEVICE_LIST_H
 #define DISK_DEVICE_LIST_H
 
+#include <DiskDeviceRoster.h>
 #include <Messenger.h>
 #include <ObjectList.h>
 
@@ -20,20 +21,6 @@ class RDiskDevice;
 class RPartition;
 class RSession;
 class WatchingService;
-
-// device list modification causes
-// TODO: to be moved to <DiskDeviceRoster.h>
-enum {
-	// helpful causes
-	B_DEVICE_CAUSE_MEDIA_CHANGED,
-	B_DEVICE_CAUSE_FORMATTED,
-	B_DEVICE_CAUSE_PARTITIONED,
-	B_DEVICE_CAUSE_INITIALIZED,
-	// unknown cause
-	B_DEVICE_CAUSE_UNKNOWN,
-	// for internal use only (e.g.: partition added, because device added)
-	B_DEVICE_CAUSE_PARENT_CHANGED,
-};
 
 class RDiskDeviceList : public MessageHandler, public RVolumeListListener {
 public:
@@ -82,6 +69,8 @@ public:
 					 uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
 	void DeviceRemoved(RDiskDevice *device,
 					   uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
+	void MediaChanged(RDiskDevice *device,
+					  uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
 	void SessionAdded(RSession *session,
 					  uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
 	void SessionRemoved(RSession *session,
@@ -90,6 +79,9 @@ public:
 						uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
 	void PartitionRemoved(RPartition *partition,
 						  uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
+	void PartitionChanged(RPartition *partition,
+						  uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
+
 
 	void Dump() const;
 

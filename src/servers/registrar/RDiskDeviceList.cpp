@@ -374,7 +374,12 @@ RDiskDeviceList::DeviceAdded(RDiskDevice *device, uint32 cause)
 	for (int32 i = 0; RSession *session = device->SessionAt(i); i++)
 		SessionAdded(session, B_DEVICE_CAUSE_PARENT_CHANGED);
 	// notifications
-	// ...
+	BMessage notification(B_DEVICE_UPDATE);
+	if (_InitNotificationMessage(&notification, B_DEVICE_ADDED,
+								 cause, device) == B_OK) {
+		EventMaskWatcherFilter filter(B_DEVICE_REQUEST_DEVICE_LIST);
+		fWatchingService->NotifyWatchers(&notification, &filter);
+	}
 }
 
 // DeviceRemoved
@@ -385,7 +390,25 @@ RDiskDeviceList::DeviceRemoved(RDiskDevice *device, uint32 cause)
 	for (int32 i = 0; RSession *session = device->SessionAt(i); i++)
 		SessionRemoved(session, B_DEVICE_CAUSE_PARENT_CHANGED);
 	// notifications
-	// ...
+	BMessage notification(B_DEVICE_UPDATE);
+	if (_InitNotificationMessage(&notification, B_DEVICE_REMOVED,
+								 cause, device) == B_OK) {
+		EventMaskWatcherFilter filter(B_DEVICE_REQUEST_DEVICE_LIST);
+		fWatchingService->NotifyWatchers(&notification, &filter);
+	}
+}
+
+// MediaChanged
+void
+RDiskDeviceList::MediaChanged(RDiskDevice *device, uint32 cause)
+{
+	// notifications
+	BMessage notification(B_DEVICE_UPDATE);
+	if (_InitNotificationMessage(&notification, B_DEVICE_MEDIA_CHANGED,
+								 cause, device) == B_OK) {
+		EventMaskWatcherFilter filter(B_DEVICE_REQUEST_DEVICE);
+		fWatchingService->NotifyWatchers(&notification, &filter);
+	}
 }
 
 // SessionAdded
@@ -398,7 +421,15 @@ RDiskDeviceList::SessionAdded(RSession *session, uint32 cause)
 	for (int32 i = 0; RPartition *partition = session->PartitionAt(i); i++)
 		PartitionAdded(partition, B_DEVICE_CAUSE_PARENT_CHANGED);
 	// notifications
-	// ...
+// TODO: bundle multiple session added events per device
+	if (cause != B_DEVICE_CAUSE_PARENT_CHANGED) {
+		BMessage notification(B_DEVICE_UPDATE);
+		if (_InitNotificationMessage(&notification, B_DEVICE_SESSION_ADDED,
+									 cause, session) == B_OK) {
+			EventMaskWatcherFilter filter(B_DEVICE_REQUEST_DEVICE);
+			fWatchingService->NotifyWatchers(&notification, &filter);
+		}
+	}
 }
 
 // SessionRemoved
@@ -415,7 +446,15 @@ RDiskDeviceList::SessionRemoved(RSession *session, uint32 cause)
 	for (int32 i = 0; RPartition *partition = session->PartitionAt(i); i++)
 		PartitionRemoved(partition, B_DEVICE_CAUSE_PARENT_CHANGED);
 	// notifications
-	// ...
+// TODO: bundle multiple session removed events per device
+	if (cause != B_DEVICE_CAUSE_PARENT_CHANGED) {
+		BMessage notification(B_DEVICE_UPDATE);
+		if (_InitNotificationMessage(&notification, B_DEVICE_SESSION_REMOVED,
+									 cause, session) == B_OK) {
+			EventMaskWatcherFilter filter(B_DEVICE_REQUEST_DEVICE);
+			fWatchingService->NotifyWatchers(&notification, &filter);
+		}
+	}
 }
 
 // PartitionAdded
@@ -431,7 +470,15 @@ RDiskDeviceList::PartitionAdded(RPartition *partition, uint32 cause)
 	if (const RVolume *volume = fVolumeList.VolumeForDevicePath(path))
 		partition->SetVolume(volume);
 	// notifications
-	// ...
+// TODO: bundle multiple partition added events per session
+	if (cause != B_DEVICE_CAUSE_PARENT_CHANGED) {
+		BMessage notification(B_DEVICE_UPDATE);
+		if (_InitNotificationMessage(&notification, B_DEVICE_PARTITION_ADDED,
+									 cause, partition) == B_OK) {
+			EventMaskWatcherFilter filter(B_DEVICE_REQUEST_SESSION);
+			fWatchingService->NotifyWatchers(&notification, &filter);
+		}
+	}
 }
 
 // PartitionRemoved
@@ -445,7 +492,30 @@ RDiskDeviceList::PartitionRemoved(RPartition *partition, uint32 cause)
 	if (success)
 		fPartitions.RemoveItemAt(index);
 	// notifications
-	// ...
+// TODO: bundle multiple partition removed events per session
+	if (cause != B_DEVICE_CAUSE_PARENT_CHANGED) {
+		BMessage notification(B_DEVICE_UPDATE);
+		if (_InitNotificationMessage(&notification, B_DEVICE_PARTITION_REMOVED,
+									 cause, partition) == B_OK) {
+			EventMaskWatcherFilter filter(B_DEVICE_REQUEST_SESSION);
+			fWatchingService->NotifyWatchers(&notification, &filter);
+		}
+	}
+}
+
+// PartitionChanged
+void
+RDiskDeviceList::PartitionChanged(RPartition *partition, uint32 cause)
+{
+	// notifications
+	if (cause != B_DEVICE_CAUSE_PARENT_CHANGED) {
+		BMessage notification(B_DEVICE_UPDATE);
+		if (_InitNotificationMessage(&notification, B_DEVICE_PARTITION_CHANGED,
+									 cause, partition) == B_OK) {
+			EventMaskWatcherFilter filter(B_DEVICE_REQUEST_PARTITION);
+			fWatchingService->NotifyWatchers(&notification, &filter);
+		}
+	}
 }
 
 // Dump

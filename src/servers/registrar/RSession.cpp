@@ -64,6 +64,7 @@ status_t
 RSession::PartitionLayoutChanged()
 {
 PRINT(("RSession::PartitionLayoutChanged()\n"));
+	Changed();
 	status_t error = (fDevice ? B_OK : B_ERROR);
 	if (error == B_OK)
 		error = _RescanPartitions(fDevice->FD(), B_DEVICE_CAUSE_UNKNOWN);
@@ -113,6 +114,8 @@ RSession::AddPartition(RPartition *partition, uint32 cause)
 		success = fPartitions.AddItem(partition);
 		if (success) {
 			partition->SetSession(this);
+			Changed();
+			// trigger notifications
 			if (RDiskDeviceList *deviceList = DeviceList())
 				deviceList->PartitionAdded(partition, cause);
 		}
@@ -126,6 +129,7 @@ RSession::RemovePartition(int32 index, uint32 cause)
 {
 	RPartition *partition = PartitionAt(index);
 	if (partition) {
+		Changed();
 		if (RDiskDeviceList *deviceList = DeviceList())
 			deviceList->PartitionRemoved(partition, cause);
 		partition->SetSession(NULL);
@@ -152,8 +156,14 @@ RSession::RemovePartition(RPartition *partition, uint32 cause)
 status_t
 RSession::Update(const session_info *sessionInfo)
 {
+	RChangeCounter::Locker lock(fChangeCounter);
 	status_t error = (fDevice ? B_OK : B_ERROR);
-	// TODO: Check the session info for changes!
+	// check the session info for changes
+	// Currently there is very little that can have changed. offset and size
+	// must not be changed, logical_block_size is ignored anyway and index
+	// doesn't change. So only flags remains, but that indicates only, if the
+	// session is virtual or a data/audio partition. So we don't do anything
+	// for now.
 	fInfo = *sessionInfo;
 	int fd = (fDevice ? fDevice->FD() : -1);
 	// check the partitions
@@ -175,8 +185,10 @@ RSession::Update(const session_info *sessionInfo)
 				// remove disappeared partitions
 				for (int32 k = CountPartitions() - 1; k >= i; k--)
 					RemovePartition(k, B_DEVICE_CAUSE_UNKNOWN);
-			} else
-				error = status;
+			} else {
+				// ignore errors -- we can't help it
+//				error = status;
+			}
 			break;
 		}
 		// check the partition
@@ -269,8 +281,10 @@ RSession::_RescanPartitions(int fd, uint32 cause)
 		status_t status = get_nth_partition_info(fd, fInfo.index, i,
 			&partitionInfo, (i == 0 ? fPartitioningSystem : NULL));
 		if (status != B_OK) {
-			if (status != B_ENTRY_NOT_FOUND)
-				error = status;
+			if (status != B_ENTRY_NOT_FOUND) {
+				// ignore errors -- we can't help it
+//				error = status;
+			}
 			break;
 		}
 		// create and add a RPartition

@@ -17,11 +17,12 @@ public:
 
 	bool Lock() { fLocked++; return true; }
 	void Unlock() { if (fLocked > 0) fLocked--; }
+	bool IsLocked() const { return (fLocked > 0); }
 
 	bool Increment()
 	{
 		bool changed = false;
-		if (fLocked && !fChanged) {
+		if (IsLocked() && !fChanged) {
 			fCount++;
 			changed = fChanged = true;
 		}

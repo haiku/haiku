@@ -3,6 +3,7 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
+#include <errno.h>
 #include <fcntl.h>
 #include <new.h>
 #include <stdio.h>
@@ -96,6 +97,7 @@ status_t
 RDiskDevice::MediaChanged()
 {
 PRINT(("RDiskDevice::MediaChanged()\n"));
+	Changed();
 	status_t error = B_OK;
 	// get the new media status
 	status_t mediaStatus;
@@ -110,7 +112,7 @@ PRINT(("RDiskDevice::MediaChanged()\n"));
 			case B_DEV_DOOR_OPEN:
 				break;
 			case B_DEV_MEDIA_CHANGED:
-				// Ignore changes between the our ioctl() and the one before;
+				// Ignore changes between the ioctl() and the one before;
 				// we rescan the sessions anyway.
 				fMediaStatus = B_OK;
 				break;
@@ -119,10 +121,15 @@ PRINT(("RDiskDevice::MediaChanged()\n"));
 				break;
 		}
 	}
+	// get the device geometry
+	if (ioctl(fFD, B_GET_GEOMETRY, &fGeometry) != 0)
+		error = errno;
 	// rescan sessions
-	error = _RescanSessions(B_DEVICE_CAUSE_PARENT_CHANGED);
-	// TODO: send notification
-	// ...
+	if (error == B_OK)
+		error = _RescanSessions(B_DEVICE_CAUSE_PARENT_CHANGED);
+	// notification
+	if (fDeviceList)
+		fDeviceList->MediaChanged(this, B_DEVICE_CAUSE_MEDIA_CHANGED);
 	return error;
 }
 
@@ -131,6 +138,7 @@ status_t
 RDiskDevice::SessionLayoutChanged()
 {
 PRINT(("RDiskDevice::SessionLayoutChanged()\n"));
+	Changed();
 	status_t error = B_OK;
 	error = _RescanSessions(B_DEVICE_CAUSE_UNKNOWN);
 	return error;
@@ -169,6 +177,7 @@ RDiskDevice::AddSession(RSession *session, uint32 cause)
 		success = fSessions.AddItem(session);
 		if (success) {
 			session->SetDevice(this);
+			Changed();
 			if (RDiskDeviceList *deviceList = DeviceList())
 				deviceList->SessionAdded(session, cause);
 		}
@@ -182,6 +191,7 @@ RDiskDevice::RemoveSession(int32 index, uint32 cause)
 {
 	RSession *session = SessionAt(index);
 	if (session) {
+		Changed();
 		if (RDiskDeviceList *deviceList = DeviceList())
 			deviceList->SessionRemoved(session, cause);
 		session->SetDevice(NULL);
@@ -208,6 +218,7 @@ RDiskDevice::RemoveSession(RSession *session, uint32 cause)
 status_t
 RDiskDevice::Update()
 {
+	RChangeCounter::Locker lock(fChangeCounter);
 	status_t error = B_OK;
 	status_t mediaStatus = B_OK;
 	if (ioctl(fFD, B_GET_MEDIA_STATUS, &mediaStatus) == 0) {
@@ -233,8 +244,10 @@ RDiskDevice::Update()
 							// remove disappeared sessions
 							for (int32 k = CountSessions() - 1; k >= i; k--)
 								RemoveSession(k, B_DEVICE_CAUSE_UNKNOWN);
-						} else
-							error = status;
+						} else {
+							// ignore errors -- we can't help it
+//							error = status;
+						}
 						break;
 					}
 					// check the session
@@ -323,8 +336,10 @@ RDiskDevice::_RescanSessions(uint32 cause)
 			// get the session info
 			status_t status = get_nth_session_info(fFD, i, &sessionInfo);
 			if (status != B_OK) {
-				if (status != B_ENTRY_NOT_FOUND)
-					error = status;
+				if (status != B_ENTRY_NOT_FOUND) {
+					// ignore errors -- we can't help it
+//					error = status;
+				}
 				break;
 			}
 			// create and add a RSession

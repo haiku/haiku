@@ -41,6 +41,18 @@ RPartition::Unset()
 	fID = -1;
 }
 
+// PartitionChanged
+status_t
+RPartition::PartitionChanged()
+{
+	Changed();
+	status_t error = B_OK;
+	// notification
+	if (RDiskDeviceList *deviceList = DeviceList())
+		deviceList->PartitionChanged(this, B_DEVICE_CAUSE_UNKNOWN);
+	return error;
+}
+
 // DeviceList
 RDiskDeviceList *
 RPartition::DeviceList() const
@@ -88,9 +100,28 @@ RPartition::GetPath(char *path) const
 status_t
 RPartition::Update(const extended_partition_info *partitionInfo)
 {
+	RChangeCounter::Locker lock(fChangeCounter);
 	status_t error = B_OK;
-	// TODO: Check the partition info for changes!
-	fInfo = *partitionInfo;
+	// check the partition info for changes
+	// Currently there is very little that can have changed. offset and size
+	// must not be changed, logical_block_size and device are ignored anyway
+	// and session and partition index don't change.
+	// So only the fields in extended_partition_info - partition_info remain.
+	if (partitionInfo->flags != fInfo.flags
+		|| strcmp(partitionInfo->partition_name, fInfo.partition_name)
+		|| strcmp(partitionInfo->partition_type, fInfo.partition_type)
+		|| strcmp(partitionInfo->file_system_short_name,
+				   fInfo.file_system_short_name)
+		|| strcmp(partitionInfo->file_system_short_name,
+				  fInfo.file_system_short_name)
+		|| strcmp(partitionInfo->file_system_long_name,
+				  fInfo.file_system_long_name)
+		|| strcmp(partitionInfo->volume_name, fInfo.volume_name)
+		|| partitionInfo->partition_code != fInfo.partition_code
+		|| partitionInfo->file_system_flags != fInfo.file_system_flags) {
+		fInfo = *partitionInfo;
+		PartitionChanged();
+	}
 	return error;
 }
 
