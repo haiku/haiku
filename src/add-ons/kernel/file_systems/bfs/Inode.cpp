@@ -2100,7 +2100,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 			RETURN_ERROR(B_BAD_VALUE);
 	}
 
-	WriteLocked locker(tree != NULL ? &parent->Lock() : NULL);
+	WriteLocked locker(parent != NULL ? &parent->Lock() : NULL);
 		// the parent directory is locked during the whole inode creation
 
 	if (tree != NULL) {
@@ -2359,12 +2359,8 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type, vnode_id 
 
 	// if you haven't yet access to the attributes directory, get it
 	if (fAttributes == NULL) {
-#ifdef UNSAFE_GET_VNODE
-		RecursiveLocker locker(volume->Lock());
-#endif
 		if (get_vnode(volume->ID(), volume->ToVnode(fInode->Attributes()),
-				(void **)&fAttributes) != 0
-			|| fAttributes == NULL) {
+				(void **)&fAttributes) != B_OK) {
 			FATAL(("get_vnode() failed in AttributeIterator::GetNext(vnode_id = %Ld,name = \"%s\")\n",fInode->ID(),name));
 			return B_ENTRY_NOT_FOUND;
 		}
