@@ -110,13 +110,13 @@ else
 	}
 	
 	if (offer) 
-		mss = min(mss, offer);
+		mss = min(mss, (int) offer);
 	
 	mss = max(mss, 32);
 	if (mss < tp->t_maxseg || offer != 0) {
 		if ((bufsize = rt->rt_rmx.rmx_sendpipe) == 0)
 			bufsize = so->so_snd.sb_hiwat;
-		if (bufsize < mss)
+		if ((int) bufsize < mss)
 			mss = bufsize;
 		else {
 			bufsize = roundup(bufsize, mss);
@@ -128,7 +128,7 @@ else
 		
 		if ((bufsize = rt->rt_rmx.rmx_recvpipe) == 0)
 			bufsize = so->so_rcv.sb_hiwat;
-		if (bufsize > mss) {
+		if ((int) bufsize > mss) {
 			bufsize = roundup(bufsize, mss);
 			if (bufsize > sb_max)
 				bufsize = sb_max;
@@ -137,7 +137,7 @@ else
 	}
 	tp->snd_cwnd = mss;
 	if (rt->rt_rmx.rmx_ssthresh) {
-		tp->snd_ssthresh = max(2 * mss, rt->rt_rmx.rmx_ssthresh);
+		tp->snd_ssthresh = max(2 * mss, (int) rt->rt_rmx.rmx_ssthresh);
 	}
 	return mss;
 }
@@ -225,7 +225,7 @@ again:
 			goto send;
 		if (tp->t_force)
 			goto send;
-		if (len >= tp->max_sndwnd / 2)
+		if (len >= (int) tp->max_sndwnd / 2)
 			goto send;
 		if (SEQ_LT(tp->snd_nxt, tp->snd_max))
 			goto send;
@@ -235,7 +235,7 @@ again:
 		            (tp->rcv_adv - tp->rcv_nxt);
 		if (adv >= (int32)(2 * tp->t_maxseg))
 			goto send;
-		if (2 * adv >= (int32)so->so_rcv.sb_hiwat)
+		if (2 * adv >= (int32) so->so_rcv.sb_hiwat)
 			goto send;
 	}
 	if (tp->t_flags & TF_ACKNOW)
@@ -294,7 +294,7 @@ send:
 	}
 	hdrlen += optlen;
 	
-	if (len > tp->t_maxseg - optlen) {
+	if (len > (int) (tp->t_maxseg - optlen)) {
 		len = tp->t_maxseg - optlen;
 		sendalot = 1;
 	}
@@ -317,7 +317,7 @@ send:
 		}
 		m->m_data += get_max_linkhdr();
 		m->m_len = hdrlen;
-		if (len <= MHLEN - hdrlen - get_max_linkhdr()) {
+		if (len <= (int) (MHLEN - hdrlen - get_max_linkhdr())) {
 			m_copydata(so->so_snd.sb_mb, off, (int)len, mtod(m, caddr_t) + hdrlen);
 			m->m_len += len;
 		} else {

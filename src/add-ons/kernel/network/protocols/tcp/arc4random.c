@@ -45,6 +45,11 @@ struct arc4_stream {
 int                        rs_initialized;
 static struct arc4_stream  rs;
 
+void arc4random_stir(void);
+void arc4random_addrandom(u_char *dat, int datlen);
+uint32 arc4random(void);
+
+
 
 static inline void arc4_init(struct arc4_stream *as)
 {
@@ -138,7 +143,7 @@ void arc4random_addrandom(u_char *dat, int datlen)
 }
 
 
-uint32 arc4random()
+uint32 arc4random(void)
 {
 	if (!rs_initialized)
 		arc4random_stir();

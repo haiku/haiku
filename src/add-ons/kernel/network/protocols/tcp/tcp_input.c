@@ -139,6 +139,9 @@ extern uint32 sb_max;
 	}\
 }
 
+int tcp_reass(struct tcpcb *tp, struct tcpiphdr *ti, struct mbuf *m);
+
+
 /*
  * Insert segment ti into reassembly queue of tcp with
  * control block tp.  Return TH_FIN if reassembly now includes
@@ -340,7 +343,7 @@ void tcp_input(struct mbuf *m, int iphlen)
 	 */
 	ti = mtod(m, struct tcpiphdr*);
 
-	if (iphlen > sizeof(struct ip))
+	if (iphlen > (int) sizeof(struct ip))
 		ipm->ip_stripoptions(m, NULL);
 
 	if (m->m_len < sizeof(struct tcpiphdr)) {
@@ -368,7 +371,7 @@ void tcp_input(struct mbuf *m, int iphlen)
 	}
 	
 	off = ti->ti_off << 2;
-	if (off < sizeof(struct tcphdr) || off > tlen) {
+	if (off < (int) sizeof(struct tcphdr) || off > tlen) {
 		tcpstat.tcps_rcvbadoff++;
 		printf("tcp_input: bad len\n");
 		goto drop;
@@ -377,7 +380,7 @@ void tcp_input(struct mbuf *m, int iphlen)
 	tlen -=off;
 	ti->ti_len = tlen;
 		
-	if (off > sizeof(struct tcphdr)) {
+	if (off > (int) sizeof(struct tcphdr)) {
 		if (m->m_len < sizeof(struct ip) + off) {
 			if ((m = m_pullup(m, sizeof(struct ip) + off)) == NULL) {
 				tcpstat.tcps_rcvshort++;
@@ -1164,7 +1167,7 @@ close:
 
 			if (cw > tp->snd_ssthresh)
 				incr = incr * incr / cw + incr / 8;
-			tp->snd_cwnd = min(cw + incr, TCP_MAXWIN << tp->snd_scale);
+			tp->snd_cwnd = min((int) (cw + incr), TCP_MAXWIN << tp->snd_scale);
 		}
 		if (acked > so->so_snd.sb_cc) {
 			tp->snd_wnd -= so->so_snd.sb_cc;
@@ -1275,7 +1278,7 @@ step6:
 		 * soreceive.  It's hard to imagine someone
 		 * actually wanting to send this much urgent data.
 		 */
-		if (ti->ti_urp + so->so_rcv.sb_cc > sb_max) {
+		if (ti->ti_urp + so->so_rcv.sb_cc > (int) sb_max) {
 			ti->ti_urp = 0;			/* XXX */
 			tiflags &= ~TH_URG;		/* XXX */
 			goto dodata;			/* XXX */
@@ -1526,7 +1529,7 @@ void tcp_pulloutofband(struct socket *so, struct tcpiphdr *ti, struct mbuf *m)
 	int cnt = ti->ti_urp - 1;
 	
 	while (cnt >= 0) {
-		if (m->m_len > cnt) {
+		if ((int) m->m_len > cnt) {
 			char *cp = mtod(m, caddr_t) + cnt;
 			struct tcpcb *tp = sototcpcb(so);
 
@@ -1683,7 +1686,7 @@ void tcp_mss_update(struct tcpcb *tp)
 	if ((bufsize = rt->rt_rmx.rmx_sendpipe) == 0)
 #endif
 		bufsize = so->so_snd.sb_hiwat;
-	if (bufsize < mss) {
+	if ((int) bufsize < mss) {
 		mss = bufsize;
 		/* Update t_maxseg and t_maxopd */
 		tcp_mss(tp, mss);
@@ -1698,7 +1701,7 @@ void tcp_mss_update(struct tcpcb *tp)
 	if ((bufsize = rt->rt_rmx.rmx_recvpipe) == 0)
 #endif
 		bufsize = so->so_rcv.sb_hiwat;
-	if (bufsize > mss) {
+	if ((int) bufsize > mss) {
 		bufsize = roundup(bufsize, mss);
 		if (bufsize > sb_max)
 			bufsize = sb_max;
@@ -1722,7 +1725,7 @@ void tcp_mss_update(struct tcpcb *tp)
 		 * the slow start threshhold, but set the
 		 * threshold to no less than 2*mss.
 		 */
-		tp->snd_ssthresh = max(2 * mss, rt->rt_rmx.rmx_ssthresh);
+		tp->snd_ssthresh = max(2 * mss, (int) rt->rt_rmx.rmx_ssthresh);
 	}
 #endif /* RTV_MTU */
 }
