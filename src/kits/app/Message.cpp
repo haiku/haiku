@@ -577,7 +577,8 @@ status_t BMessage::Flatten(BDataIO* stream, ssize_t* size) const
 		if (!err)
 		{
 			// size is an optional parameter, don't crash on NULL
-			if (size != NULL) {
+			if (size != NULL)
+			{
 				*size = len;
 			}
 			err = stream->Write(buffer, len);

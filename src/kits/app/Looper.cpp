@@ -729,6 +729,8 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
  */
 	BPropertyInfo PropertyInfo(gLooperPropInfo);
 	uint32 data;
+	status_t err = B_OK;
+	const char* errMsg = "";
 	if (PropertyInfo.FindMatch(msg, index, specifier, form, property, &data) >= 0)
 	{
 		switch (data)
@@ -752,9 +754,16 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 				}
 				else
 				{
-					// TODO: test and implement
+					err = B_BAD_INDEX;
+					errMsg = "handler index out of range";
 				}
+				break;
 			}
+
+			default:
+				err = B_BAD_SCRIPT_SYNTAX;
+				errMsg = "Didn't understand the specifier(s)";
+				break;
 		}
 	}
 	else
@@ -764,8 +773,8 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 	}
 
 	BMessage Reply(B_MESSAGE_NOT_UNDERSTOOD);
-	Reply.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
-	Reply.AddString("message", "Didn't understand the specifier(s)");
+	Reply.AddInt32("error", err);
+	Reply.AddString("message", errMsg);
 	msg->SendReply(&Reply);
 
 	return NULL;
@@ -1476,7 +1485,7 @@ BHandler* BLooper::top_level_filter(BMessage* msg, BHandler* target)
 		{
 			if (target->Looper() != this)
 			{
-				// TODO: debugger message?
+				debugger("Targeted handler does not belong to the looper.");
 				target = NULL;
 			}
 			else
@@ -1501,7 +1510,7 @@ BHandler* BLooper::handler_only_filter(BMessage* msg, BHandler* target)
 		target = apply_filters(oldTarget->FilterList(), msg, oldTarget);
 		if (target && (target->Looper() != this))
 		{
-			// TODO: debugger message?
+			debugger("Targeted handler does not belong to the looper.");
 			target = NULL;
 		}
 	}
@@ -1574,8 +1583,48 @@ void BLooper::check_lock()
 //------------------------------------------------------------------------------
 BHandler* BLooper::resolve_specifier(BHandler* target, BMessage* msg)
 {
-	// TODO: implement
-	return NULL;
+	// Check params
+	if (!target || !msg)
+	{
+		return NULL;
+	}
+
+	int32 index;
+	BMessage specifier;
+	int32 form;
+	const char* property;
+	status_t err = B_OK;
+	BHandler* newTarget = target;
+	//	Loop to deal with nested specifiers
+	//	(e.g., the 3rd button on the 4th view)
+	do
+	{
+		err = msg->GetCurrentSpecifier(&index, &specifier, &form, &property);
+		if (err)
+		{
+			BMessage reply(B_REPLY);
+			reply.AddInt32("error", err);
+			msg->SendReply(&reply);
+			return NULL;
+		}
+		//	Current target gets what was the new target
+		target = newTarget;
+		newTarget = target->ResolveSpecifier(msg, index, &specifier, form,
+											 property);
+		//	Check that new target is owned by looper;
+		//	use IndexOf() to avoid dereferencing newTarget
+		//	(possible race condition with object destruction
+		//	by another looper)
+		if (!newTarget || IndexOf(newTarget) < 0)
+		{
+			return NULL;
+		}
+
+		//	Get current specifier index (may change in ResolveSpecifier())
+		msg->GetCurrentSpecifier(&index);
+	} while (newTarget && newTarget != target && index >= 0);
+
+	return newTarget;
 }
 //------------------------------------------------------------------------------
 void BLooper::UnlockFully()
