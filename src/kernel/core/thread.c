@@ -738,7 +738,7 @@ thread_exit(void)
 	cancel_timer(&t->alarm);
 
 	// delete the user stack region first
-	if (team->_aspace_id >= 0 && t->user_stack_region_id >= 0) {
+	if (team->aspace != NULL && t->user_stack_region_id >= 0) {
 		region_id rid = t->user_stack_region_id;
 		t->user_stack_region_id = -1;
 		delete_area_etc(team, rid);

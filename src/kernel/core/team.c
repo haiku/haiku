@@ -1,5 +1,3 @@
-/* Team functions */
-
 /*
 ** Copyright 2002-2004, The Haiku Team. All rights reserved.
 ** Distributed under the terms of the Haiku License.
@@ -7,6 +5,8 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
+/* Team functions */
 
 #include <OS.h>
 
@@ -76,8 +76,7 @@ _dump_team_info(struct team *p)
 	dprintf("pending_signals: 0x%x\n", p->pending_signals);
 	dprintf("io_context:  %p\n", p->io_context);
 //	dprintf("path:        '%s'\n", p->path);
-	dprintf("aspace_id:   0x%lx\n", p->_aspace_id);
-	dprintf("aspace:      %p\n", p->aspace);
+	dprintf("aspace:      %p (id = %ld)\n", p->aspace, p->aspace->id);
 	dprintf("kaspace:     %p\n", p->kaspace);
 	dprintf("main_thread: %p\n", p->main_thread);
 	dprintf("thread_list: %p\n", p->thread_list);
@@ -374,7 +373,6 @@ create_team_struct(const char *name, bool kernel)
 	strlcpy(team->name, name, B_OS_NAME_LENGTH);
 	team->num_threads = 0;
 	team->io_context = NULL;
-	team->_aspace_id = -1;
 	team->aspace = NULL;
 	team->kaspace = vm_get_kernel_aspace();
 	vm_put_aspace(team->kaspace);
@@ -454,8 +452,9 @@ team_delete_team(struct team *team)
 	}
 
 	// free team resources
+
+	ASSERT(team->aspace->ref_count == 1);
 	vm_put_aspace(team->aspace);
-	vm_delete_aspace(team->_aspace_id);
 	delete_owned_ports(team->id);
 	sem_delete_owned_sems(team->id);
 	remove_images(team);
@@ -668,12 +667,9 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	}
 
 	// create an address space for this team
-	team->_aspace_id = vm_create_aspace(team->name, USER_BASE, USER_SIZE, false);
-	if (team->_aspace_id < 0) {
-		err = team->_aspace_id;
+	err = vm_create_aspace(team->name, USER_BASE, USER_SIZE, false, &team->aspace);
+	if (err < B_OK)
 		goto err3;
-	}
-	team->aspace = vm_get_aspace_by_id(team->_aspace_id);
 
 	// cut the path from the main thread name
 	threadName = strrchr(name, '/');
@@ -695,7 +691,6 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 
 err4:
 	vm_put_aspace(team->aspace);
-	vm_delete_aspace(team->_aspace_id);
 err3:
 	vfs_free_io_context(team->io_context);
 err2:
@@ -756,6 +751,9 @@ exec_team(const char *path, int32 argCount, char **args, int32 envCount, char **
 
 	// sorry, we have to kill us, there is no way out anymore (without any areas left and all that)
 	exit_thread(status);
+	
+	// we'll never make it here
+	return B_ERROR;
 }
 
 

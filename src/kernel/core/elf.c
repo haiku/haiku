@@ -1090,7 +1090,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 
 			sprintf(regionName, "%s_seg%drw", baseName, i);
 
-			id = vm_map_file(p->_aspace_id, regionName,
+			id = vm_map_file(p->aspace->id, regionName,
 				(void **)&regionAddress,
 				B_EXACT_ADDRESS,
 				fileUpperBound,
@@ -1137,7 +1137,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 			 */
 			sprintf(regionName, "%s_seg%dro", baseName, i);
 
-			id = vm_map_file(p->_aspace_id, regionName,
+			id = vm_map_file(p->aspace->id, regionName,
 				(void **)&regionAddress,
 				B_EXACT_ADDRESS,
 				ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE),
@@ -1375,7 +1375,7 @@ load_kernel_add_on(const char *path)
 
 done:
 	mutex_unlock(&sImageLoadMutex);
-	
+
 	return image->id;
 
 error5:
