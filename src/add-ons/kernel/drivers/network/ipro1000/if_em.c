@@ -600,10 +600,7 @@ em_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 			if (adapter->hw.mac_type == em_82542_rev2_0) {
 				em_initialize_receive_unit(adapter);
 			}
-#ifdef DEVICE_POLLING
-			if (!(ifp->if_ipending & IFF_POLLING))
-#endif
-				em_enable_intr(adapter);
+			em_enable_intr(adapter);
 		}
 		break;
 	case SIOCSIFMEDIA:
@@ -614,8 +611,6 @@ em_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 	case SIOCSIFCAP:
 		IOCTL_DEBUGOUT("ioctl rcv'd: SIOCSIFCAP (Set Capabilities)");
 		mask = ifr->ifr_reqcap ^ ifp->if_capenable;
-		if (mask & IFCAP_POLLING)
-			ifp->if_capenable ^= IFCAP_POLLING;
 		if (mask & IFCAP_HWCSUM) {
 			ifp->if_capenable ^= IFCAP_HWCSUM;
 			if (ifp->if_flags & IFF_RUNNING)
@@ -742,15 +737,6 @@ em_init(void *arg)
 
 	adapter->timer_handle = timeout(em_local_timer, adapter, 2*hz);
 	em_clear_hw_cntrs(&adapter->hw);
-#ifdef DEVICE_POLLING
-        /*
-         * Only enable interrupts if we are not polling, make sure
-         * they are off otherwise.
-         */
-        if (ifp->if_ipending & IFF_POLLING)
-                em_disable_intr(adapter);
-        else
-#endif /* DEVICE_POLLING */
 	em_enable_intr(adapter);
 
 	/* Don't reset the phy next time init gets called */
@@ -760,43 +746,6 @@ em_init(void *arg)
 	return;
 }
 
-
-#ifdef DEVICE_POLLING
-static poll_handler_t em_poll;
-        
-static void     
-em_poll(struct ifnet *ifp, enum poll_cmd cmd, int count)
-{
-        struct adapter *adapter = ifp->if_softc;
-        u_int32_t reg_icr;
-
-	if (!(ifp->if_capenable & IFCAP_POLLING)) {
-		ether_poll_deregister(ifp);
-		cmd = POLL_DEREGISTER;
-	}
-        if (cmd == POLL_DEREGISTER) {       /* final call, enable interrupts */
-                em_enable_intr(adapter);
-                return;
-        }
-        if (cmd == POLL_AND_CHECK_STATUS) {
-                reg_icr = E1000_READ_REG(&adapter->hw, ICR);
-                if (reg_icr & (E1000_ICR_RXSEQ | E1000_ICR_LSC)) {
-                        untimeout(em_local_timer, adapter, adapter->timer_handle);
-                        adapter->hw.get_link_status = 1;
-                        em_check_for_link(&adapter->hw);
-                        em_print_link_status(adapter);
-                        adapter->timer_handle = timeout(em_local_timer, adapter, 2*hz);
-                }
-        }
-        if (ifp->if_flags & IFF_RUNNING) {
-                em_process_receive_interrupts(adapter, count);
-                em_clean_transmit_interrupts(adapter);
-        }
-	
-        if (ifp->if_flags & IFF_RUNNING && ifp->if_snd.ifq_head != NULL)
-                em_start(ifp);
-}
-#endif /* DEVICE_POLLING */
 
 /*********************************************************************
  *
@@ -814,17 +763,6 @@ em_intr(void *arg)
 
         ifp = &adapter->interface_data.ac_if;  
 
-#ifdef DEVICE_POLLING
-        if (ifp->if_ipending & IFF_POLLING)
-                return B_UNHANDLED_INTERRUPT;
-
-	if ((ifp->if_capenable & IFCAP_POLLING) &&
-	    ether_poll_register(em_poll, ifp)) {
-                em_disable_intr(adapter);
-                em_poll(ifp, 0, 1);
-                return B_UNHANDLED_INTERRUPT;
-        }
-#endif /* DEVICE_POLLING */
 	
 	reg_icr = E1000_READ_REG(&adapter->hw, ICR);
 	if (!reg_icr) {
@@ -1734,11 +1672,6 @@ em_setup_interface(device_t dev, struct adapter * adapter)
         ifp->if_data.ifi_hdrlen = sizeof(struct ether_vlan_header);
 #if __FreeBSD_version >= 500000
         ifp->if_capabilities |= IFCAP_VLAN_HWTAGGING | IFCAP_VLAN_MTU;
-#endif
-
-#ifdef DEVICE_POLLING
-	ifp->if_capabilities |= IFCAP_POLLING;
-	ifp->if_capenable |= IFCAP_POLLING;
 #endif
 
 	/* 
