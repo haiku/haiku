@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -12,6 +12,8 @@
 #include <OS.h>
 #include <thread_types.h>
 #include <arch/thread.h>
+
+struct kernel_args;
 
 
 #ifdef __cplusplus
@@ -33,7 +35,7 @@ void thread_atkernel_entry(void);
 	// called when the thread enters the kernel on behalf of the thread
 void thread_atkernel_exit(void);
 
-status_t thread_init(kernel_args *ka);
+status_t thread_init(struct kernel_args *args);
 status_t thread_per_cpu_init(int32 cpu_num);
 void thread_exit(void);
 
