@@ -295,8 +295,6 @@ void BControl::MakeFocus(bool focused)
 //------------------------------------------------------------------------------
 void BControl::KeyDown(const char *bytes, int32 numBytes)
 {
-	BMessage* message = Window()->CurrentMessage();
-
 	if (numBytes == 1)
 	{
 		switch (bytes[0])
