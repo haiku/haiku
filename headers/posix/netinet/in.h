@@ -7,6 +7,10 @@
 #include <net/if.h>
 #include <endian.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif 
+
 typedef unsigned short	in_port_t;
 typedef unsigned long	in_addr_t;
 
@@ -168,4 +172,9 @@ struct sockaddr_in {
   uint16 in_cksum(struct mbuf *m, int len, int off);
   
 #endif /* _KERNEL_MODE */
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* NETINET_IN_H */
