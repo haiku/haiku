@@ -24,14 +24,30 @@ wait(int *_status)
 pid_t
 waitpid(pid_t pid, int *_status, int options)
 {
-	fprintf(stderr, "waitpid(pid = %ld, options = %d): NOT IMPLEMENTED\n", pid, options);
-	return -1;
+	status_t returnCode;
+	int32 reason;
+
+	thread_id thread = _kern_wait_for_child(pid, options, &reason, &returnCode);
+
+	if (_status != NULL) {
+		// ToDo: fill in _status!
+	}
+
+	if (thread < B_OK) {
+		errno = thread;
+		if (thread == B_WOULD_BLOCK && (options & WNOHANG) != 0)
+			return 0;
+		return -1;
+	}
+
+	return thread;
 }
 
 
 int
 waitid(idtype_t idType, id_t id, siginfo_t *info, int options)
 {
+	// waitid() is not available on BeOS so we may be lazy here and remove it...
 	fprintf(stderr, "waitid(): NOT IMPLEMENTED\n");
 	return -1;
 }
