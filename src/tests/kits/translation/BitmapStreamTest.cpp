@@ -56,7 +56,7 @@ BitmapStreamTest::~BitmapStreamTest() {
 CppUnit::Test*
 BitmapStreamTest::Suite() {
 	/* create our suite */
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite("BitmapStreamTest Suite");
+	CppUnit::TestSuite *suite = new CppUnit::TestSuite("BitmapStream");
 		
 	/* add suckers */
 	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::Initialize Test", &BitmapStreamTest::InitializeTest));
@@ -77,6 +77,7 @@ BitmapStreamTest::Suite() {
  */
 void BitmapStreamTest::InitializeTest() {
 	//aquire default roster
+	NextSubTest();
 	roster = BTranslatorRoster::Default();
 	CPPUNIT_ASSERT(roster != NULL);
 }
@@ -94,7 +95,9 @@ void BitmapStreamTest::ConstructorTest() {
  */
 void BitmapStreamTest::DetachBitmapTest() {
 	BApplication app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
-	BFile file("../src/tests/kits/translation/data/images/image.gif", B_READ_ONLY);
+	
+	NextSubTest();
+	BFile file("../src/tests/kits/translation/data/images/image.jpg", B_READ_ONLY);
 	CPPUNIT_ASSERT(file.InitCheck() == B_OK);
 
 	NextSubTest();
@@ -102,7 +105,7 @@ void BitmapStreamTest::DetachBitmapTest() {
 	BBitmap* result = NULL;
 	roster = BTranslatorRoster::Default();
 	CPPUNIT_ASSERT(roster->Translate(&file, NULL, NULL, &stream, B_TRANSLATOR_BITMAP) == B_OK);
-	stream.DetachBitmap(&result);
+	CPPUNIT_ASSERT(stream.DetachBitmap(&result) == B_NO_ERROR);
 	
 	CPPUNIT_ASSERT(result != NULL);
 	if(result != NULL) {
