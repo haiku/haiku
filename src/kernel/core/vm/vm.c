@@ -1356,8 +1356,10 @@ vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32
 	addressSpace = vm_get_aspace_by_id(addressSpaceID);
 	cacheRef = source->cache_ref;
 
-	if (addressSpec == B_CLONE_ADDRESS)
+	if (addressSpec == B_CLONE_ADDRESS) {
+		addressSpec = B_EXACT_ADDRESS;
 		*_address = (void *)source->base;
+	}
 
 	// First, create a cache on top of the source area
 
