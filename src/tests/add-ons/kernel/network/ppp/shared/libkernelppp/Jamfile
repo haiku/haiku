@@ -14,6 +14,7 @@ StaticLibrary <userland>kernelppp :
 	KPPPLCP.cpp
 	KPPPLCPExtension.cpp
 	KPPPOptionHandler.cpp
+	KPPPProfile.cpp
 	KPPPProtocol.cpp
 	KPPPReportManager.cpp
 	KPPPStateMachine.cpp
@@ -24,4 +25,11 @@ StaticLibrary <userland>kernelppp :
 	_KPPPMRUHandler.cpp
 	_KPPPAuthenticationHandler.cpp
 	_KPPPPFCHandler.cpp
+	
+	# for driver_settings
+	driver_settings.c
+	_libppputils.cpp
 ;
+
+SEARCH on [ FGristFiles _libppputils.cpp ] = [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp ] ;
+SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;

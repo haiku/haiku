@@ -40,6 +40,9 @@ Depends userland_network_modules :
 	<userland>ppp
 
 	# ppp modules
+	<userland>ipcp
+	<userland>modem
+	<userland>pap
 	<userland>pppoe
 
 	# protocols modules
