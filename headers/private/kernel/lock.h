@@ -6,11 +6,12 @@
 #define _KERNEL_LOCK_H
 
 #include <kernel.h>
+#include <debug.h>
 
 typedef struct recursive_lock {
+	sem_id sem;
 	thread_id holder;
 	int recursion;
-	sem_id sem;
 } recursive_lock;
 
 int recursive_lock_create(recursive_lock *lock);
@@ -19,15 +20,19 @@ bool recursive_lock_lock(recursive_lock *lock);
 bool recursive_lock_unlock(recursive_lock *lock);
 int recursive_lock_get_recursion(recursive_lock *lock);
 
+#define ASSERT_LOCKED_RECURSIVE(r) { ASSERT(thread_get_current_thread_id() == (r)->holder); }
+
 typedef struct mutex {
-	int count;
 	sem_id sem;
+	thread_id holder;
 } mutex;
 
 int mutex_init(mutex *m, const char *name);
 void mutex_destroy(mutex *m);
 void mutex_lock(mutex *m);
 void mutex_unlock(mutex *m);
+
+#define ASSERT_LOCKED_MUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
 
 // for read/write locks
 #define MAX_READERS 100000
@@ -41,6 +46,13 @@ typedef struct benaphore benaphore;
 
 // it may make sense to add a status field to the rw_lock to
 // be able to check if the semaphore could be locked
+
+// Note: using rw_lock in this way probably doesn't make too much sense
+// for use in the kernel, we may change this in the near future.
+// It basically uses 2 benaphores to create the rw_lock which is not
+// necessary in the kernel -- axeld, 2002/07/18.
+// Furthermore, those should probably be __inlines - I didn't know about
+// them earlier... :-)
 
 struct rw_lock {
 	sem_id		sem;
@@ -119,5 +131,4 @@ typedef struct rw_lock rw_lock;
 	}
 
 
-#endif
-
+#endif	/* _KERNEL_LOCK_H */
