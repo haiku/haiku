@@ -60,8 +60,8 @@ typedef struct fs_ops {
 
 	/* VM file access */
 	status_t (*can_page)(fs_volume fs, fs_vnode v);
-	ssize_t (*read_page)(fs_volume fs, fs_vnode v, iovecs *vecs, off_t pos);
-	ssize_t (*write_page)(fs_volume fs, fs_vnode v, iovecs *vecs, off_t pos);
+	ssize_t (*read_pages)(fs_volume fs, fs_vnode v, iovecs *vecs, off_t pos);
+	ssize_t (*write_pages)(fs_volume fs, fs_vnode v, iovecs *vecs, off_t pos);
 
 	/* common operations */
 	status_t (*ioctl)(fs_volume fs, fs_vnode v, fs_cookie cookie, ulong op, void *buffer, size_t length);
@@ -86,7 +86,6 @@ typedef struct fs_ops {
 	status_t (*free_cookie)(fs_volume fs, fs_vnode v, fs_cookie cookie);
 	ssize_t (*read)(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, void *buffer, size_t *length);
 	ssize_t (*write)(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, const void *buffer, size_t *length);
-	off_t (*seek)(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, int seekType);
 
 	/* directory operations */
 	status_t (*create_dir)(fs_volume fs, fs_vnode parent, const char *name, int perms, vnode_id *_newVnodeID);
@@ -111,7 +110,6 @@ typedef struct fs_ops {
 	status_t (*free_attr_cookie)(fs_volume fs, fs_vnode file, fs_cookie cookie);
 	ssize_t (*read_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, void *buffer, size_t *len);
 	ssize_t (*write_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, const void *buffer, size_t *len);
-	status_t (*seek_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, int seekType);
 
 	status_t (*read_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, struct stat *stat);
 	status_t (*write_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, const struct stat *stat, int statMask);
