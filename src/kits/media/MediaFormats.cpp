@@ -4,6 +4,7 @@
  *  DESCR: 
  ***********************************************************************/
 #include <MediaFormats.h>
+#include <string.h>
 #include "debug.h"
 
 /*************************************************************
@@ -54,23 +55,22 @@ bool does_file_accept_format(const media_file_format *mfi,
 
 _media_format_description::_media_format_description()
 {
-	UNIMPLEMENTED();
+	memset(this, 0, sizeof(*this));
 }
 
 _media_format_description::~_media_format_description()
 {
-	UNIMPLEMENTED();
 }
 
 _media_format_description::_media_format_description(const _media_format_description & other)
 {
-	UNIMPLEMENTED();
+	memcpy(this, &other, sizeof(*this));
 }
 
 _media_format_description & 
 _media_format_description::operator=(const _media_format_description & other)
 {
-	UNIMPLEMENTED();
+	memcpy(this, &other, sizeof(*this));
 	return *this;
 }
 
@@ -316,25 +316,71 @@ BLocker BMediaFormats::s_lock("BMediaFormats locker");
 
 bool operator==(const media_format_description & a, const media_format_description & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	if (a.family != b.family)
+		return false;
+	switch (a.family) {
+		case B_BEOS_FORMAT_FAMILY:
+			return a.u.beos.format == b.u.beos.format;
+		case B_QUICKTIME_FORMAT_FAMILY:
+			return a.u.quicktime.codec == b.u.quicktime.codec && a.u.quicktime.vendor == b.u.quicktime.vendor;
+		case B_AVI_FORMAT_FAMILY:
+			return a.u.avi.codec == b.u.avi.codec;
+		case B_ASF_FORMAT_FAMILY:
+			return a.u.asf.guid == b.u.asf.guid;
+		case B_MPEG_FORMAT_FAMILY:
+			return a.u.mpeg.id == b.u.mpeg.id;
+		case B_WAV_FORMAT_FAMILY:
+			return a.u.wav.codec == b.u.wav.codec;
+		case B_AIFF_FORMAT_FAMILY:
+			return a.u.aiff.codec == b.u.aiff.codec;
+		case B_AVR_FORMAT_FAMILY:
+			return a.u.avr.id == b.u.avr.id;
+		case B_MISC_FORMAT_FAMILY:
+			return a.u.misc.file_format == b.u.misc.file_format && a.u.misc.codec == b.u.misc.codec;
+		case B_META_FORMAT_FAMILY:
+			return strncmp(a.u.meta.description, b.u.meta.description, sizeof(a.u.meta.description)) == 0;
+		default:
+			return false;
+	}
 }
 
 bool operator<(const media_format_description & a, const media_format_description & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	if (a.family != b.family)
+		return a.family < b.family;
+	switch (a.family) {
+		case B_BEOS_FORMAT_FAMILY:
+			return a.u.beos.format < b.u.beos.format;
+		case B_QUICKTIME_FORMAT_FAMILY:
+			return a.u.quicktime.codec < b.u.quicktime.codec || a.u.quicktime.vendor < b.u.quicktime.vendor;
+		case B_AVI_FORMAT_FAMILY:
+			return a.u.avi.codec < b.u.avi.codec;
+		case B_ASF_FORMAT_FAMILY:
+			return a.u.asf.guid < b.u.asf.guid;
+		case B_MPEG_FORMAT_FAMILY:
+			return a.u.mpeg.id < b.u.mpeg.id;
+		case B_WAV_FORMAT_FAMILY:
+			return a.u.wav.codec < b.u.wav.codec;
+		case B_AIFF_FORMAT_FAMILY:
+			return a.u.aiff.codec < b.u.aiff.codec;
+		case B_AVR_FORMAT_FAMILY:
+			return a.u.avr.id < b.u.avr.id;
+		case B_MISC_FORMAT_FAMILY:
+			return a.u.misc.file_format < b.u.misc.file_format || a.u.misc.codec < b.u.misc.codec;
+		case B_META_FORMAT_FAMILY:
+			return strncmp(a.u.meta.description, b.u.meta.description, sizeof(a.u.meta.description)) < 0;
+		default:
+			return true;
+	}
 }
 
 bool operator==(const GUID & a, const GUID & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return memcmp(&a, &b, sizeof(a)) == 0;
 }
 
 bool operator<(const GUID & a, const GUID & b)
 {
-	UNIMPLEMENTED();
-	return false;
+	return memcmp(&a, &b, sizeof(a)) < 0;
 }
 
