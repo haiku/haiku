@@ -18,7 +18,6 @@ typedef const void *string_token;
 
 // Networking attribute(s) definition
 typedef struct net_attribute net_attribute;
-typedef struct net_attribute * net_attribute_list;
 
 #define NET_ATTRIBUTE_TYPE_MASK 	0xFF		// Up to 256 basic types
 #define NET_ATTRIBUTE_FLAGS_MASK	0xFFFFFF00
@@ -81,7 +80,7 @@ struct net_layer {
 	uint32					use_count;	
 	struct net_layer 		**layers_above;
 	struct net_layer		**layers_below;
-	net_attribute_list	 	*attributes;  // layer attributes
+	net_attribute			*attributes;  // layer attributes
 };
 
 // Network stack main module definition

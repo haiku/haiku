@@ -63,7 +63,7 @@ status_t start_layers_manager(void)
 		struct net_layer_module_info *nlmi;
 		
 		sz = sizeof(module_name);
-		while(read_next_module_name(module_list, module_name, &sz) == B_OK) {
+		while (read_next_module_name(module_list, module_name, &sz) == B_OK) {
 			sz = sizeof(module_name);
 			if (!strlen(module_name))
 				continue;

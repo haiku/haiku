@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <drivers/module.h>
 #include <drivers/KernelExport.h>

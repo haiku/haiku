@@ -72,6 +72,7 @@ static void dump_ipv4_header(net_buffer *buffer)
 	dump_ipv4_addr(&ip.src);
 	dprintf(" ----> ");
 	dump_ipv4_addr(&ip.dst);
+	dprintf("\n");
 	dprintf("Protocol: %d (%s)\n", ip.protocol, pname);
 	dprintf("Version:  %d\n", ip.version_header_length >> 4);
 	dprintf("Header Length (32 bit words): %d (%d bytes)\n",
