@@ -1,3 +1,0 @@
-SubDir OBOS_TOP src tests apps bin ;
-
-SubInclude OBOS_TOP src tests apps bin makeudfimage ;
