@@ -8,7 +8,7 @@
 
 #include "mga_std.h"
 
-static status_t test_ram();
+static status_t test_ram(void);
 static status_t mil_general_powerup (void);
 static status_t g100_general_powerup (void);
 static status_t g200_general_powerup (void);
