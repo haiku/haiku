@@ -12,6 +12,9 @@
 
 #include <SupportDefs.h>
 
+#include "bfs_endian.h"
+
+
 #ifndef B_BEOS_VERSION_DANO
 #	define B_BAD_DATA B_ERROR
 #endif
@@ -21,7 +24,11 @@ struct block_run {
 	int32		allocation_group;
 	uint16		start;
 	uint16		length;
-	
+
+	int32 AllocationGroup() const { return BFS_ENDIAN_TO_HOST_INT32(allocation_group); }
+	uint16 Start() const { return BFS_ENDIAN_TO_HOST_INT16(start); }
+	uint16 Length() const { return BFS_ENDIAN_TO_HOST_INT16(length); }
+
 	inline bool operator==(const block_run &run) const;
 	inline bool operator!=(const block_run &run) const;
 	inline bool IsZero();
@@ -65,6 +72,22 @@ struct disk_super_block {
 	inode_addr	root_dir;
 	inode_addr	indices;
 	int32		pad[8];
+
+	int32 Magic1() const { return BFS_ENDIAN_TO_HOST_INT32(magic1); }
+	int32 Magic2() const { return BFS_ENDIAN_TO_HOST_INT32(magic2); }
+	int32 Magic3() const { return BFS_ENDIAN_TO_HOST_INT32(magic3); }
+	int32 ByteOrder() const { return BFS_ENDIAN_TO_HOST_INT32(fs_byte_order); }
+	uint32 BlockSize() const { return BFS_ENDIAN_TO_HOST_INT32(block_size); }
+	uint32 BlockShift() const { return BFS_ENDIAN_TO_HOST_INT32(block_shift); }
+	off_t NumBlocks() const { return BFS_ENDIAN_TO_HOST_INT64(num_blocks); }
+	off_t UsedBlocks() const { return BFS_ENDIAN_TO_HOST_INT64(used_blocks); }
+	int32 InodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(inode_size); }
+	int32 BlocksPerAllocationGroup() const { return BFS_ENDIAN_TO_HOST_INT32(blocks_per_ag); }
+	int32 AllocationGroups() const { return BFS_ENDIAN_TO_HOST_INT32(num_ags); }
+	int32 AllocationGroupShift() const { return BFS_ENDIAN_TO_HOST_INT32(ag_shift); }
+	int32 Flags() const { return BFS_ENDIAN_TO_HOST_INT32(flags); }
+	off_t LogStart() const { return BFS_ENDIAN_TO_HOST_INT64(log_start); }
+	off_t LogEnd() const { return BFS_ENDIAN_TO_HOST_INT64(log_end); }
 };
 
 #define SUPER_BLOCK_FS_LENDIAN		'BIGE'		/* BIGE */
@@ -88,6 +111,11 @@ struct data_stream {
 	block_run	double_indirect;
 	off_t		max_double_indirect_range;
 	off_t		size;
+
+	off_t MaxDirectRange() const { return BFS_ENDIAN_TO_HOST_INT64(max_direct_range); }
+	off_t MaxIndirectRange() const { return BFS_ENDIAN_TO_HOST_INT64(max_indirect_range); }
+	off_t MaxDoubleIndirectRange() const { return BFS_ENDIAN_TO_HOST_INT64(max_double_indirect_range); }
+	off_t Size() const { return BFS_ENDIAN_TO_HOST_INT64(size); }
 };
 
 // This defines the size of the indirect and double indirect
@@ -106,7 +134,11 @@ struct small_data {
 	uint16		name_size;
 	uint16		data_size;
 	char		name[0];	// name_size long, followed by data
-	
+
+	uint32 Type() const { return BFS_ENDIAN_TO_HOST_INT32(type); }
+	uint16 NameSize() const { return BFS_ENDIAN_TO_HOST_INT16(name_size); }
+	uint16 DataSize() const { return BFS_ENDIAN_TO_HOST_INT16(data_size); }
+
 	inline char		*Name();
 	inline uint8	*Data();
 	inline uint32	Size();
@@ -148,6 +180,14 @@ struct bfs_inode {
 	};
 	int32		pad[4];
 	small_data	small_data_start[0];
+
+	int32 Magic1() const { return BFS_ENDIAN_TO_HOST_INT32(magic1); }
+	int32 UserID() const { return BFS_ENDIAN_TO_HOST_INT32(uid); }
+	int32 GroupID() const { return BFS_ENDIAN_TO_HOST_INT32(gid); }
+	int32 Mode() const { return BFS_ENDIAN_TO_HOST_INT32(mode); }
+	int32 Flags() const { return BFS_ENDIAN_TO_HOST_INT32(flags); }
+	int32 Type() const { return BFS_ENDIAN_TO_HOST_INT32(type); }
+	int32 InodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(inode_size); }
 
 	status_t InitCheck(Volume *volume);
 		// defined in Inode.cpp
@@ -254,21 +294,18 @@ inline bool
 block_run::MergeableWith(block_run run) const
 {
 	// 65535 is the maximum allowed run size for BFS
-	if (allocation_group == run.allocation_group
-		&& start + length == run.start
-		&& (uint32)length + run.length <= MAX_BLOCK_RUN_LENGTH)
-		return true;
-
-	return false;
+	return allocation_group == run.allocation_group
+		&& Start() + Length() == run.Start()
+		&& (uint32)Length() + run.Length() <= MAX_BLOCK_RUN_LENGTH;
 }
 
 
 inline void
 block_run::SetTo(int32 _group,uint16 _start,uint16 _length)
 {
-	allocation_group = _group;
-	start = _start;
-	length = _length;
+	allocation_group = HOST_ENDIAN_TO_BFS_INT32(_group);
+	start = HOST_ENDIAN_TO_BFS_INT16(_start);
+	length = HOST_ENDIAN_TO_BFS_INT16(_length);
 }
 
 
@@ -276,9 +313,9 @@ inline block_run
 block_run::Run(int32 group, uint16 start, uint16 length)
 {
 	block_run run;
-	run.allocation_group = group;
-	run.start = start;
-	run.length = length;
+	run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(group);
+	run.start = HOST_ENDIAN_TO_BFS_INT16(start);
+	run.length = HOST_ENDIAN_TO_BFS_INT16(length);
 	return run;
 }
 
@@ -297,14 +334,14 @@ small_data::Name()
 inline uint8 *
 small_data::Data()
 {
-	return (uint8 *)name + name_size + 3;
+	return (uint8 *)name + NameSize() + 3;
 }
 
 
 inline uint32 
 small_data::Size()
 {
-	return sizeof(small_data) + name_size + 3 + data_size + 1;
+	return sizeof(small_data) + NameSize() + 3 + DataSize() + 1;
 }
 
 
@@ -321,7 +358,7 @@ small_data::IsLast(bfs_inode *inode)
 	// we need to check the location first, because if name_size is already beyond
 	// the block, we would touch invalid memory (although that can't cause wrong
 	// results)
-	return (uint32)this > (uint32)inode + inode->inode_size - sizeof(small_data) || name_size == 0;
+	return (uint32)this > (uint32)inode + inode->InodeSize() - sizeof(small_data) || name_size == 0;
 }
 
 
