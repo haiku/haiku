@@ -37,6 +37,7 @@ class AGGTextRenderer : public TextRenderer {
 											 BPoint* nextCharPos = NULL);
 
 	virtual	BRect				Bounds(const char* utf8String,
+									   uint32 length,
 									   const Transformable& transform);
 
  private:

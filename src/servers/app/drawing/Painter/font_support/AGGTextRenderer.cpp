@@ -331,7 +331,7 @@ AGGTextRenderer::RenderString(const char* string,
 
 // Bounds
 BRect
-AGGTextRenderer::Bounds(const char* string,
+AGGTextRenderer::Bounds(const char* string, uint32 length,
 						const Transformable& transform)
 {
 	fFontEngine.hinting(fHinted);
@@ -342,7 +342,7 @@ AGGTextRenderer::Bounds(const char* string,
 	// do a UTF8 -> Unicode conversion
 	if (string) {
 	
-		int32 srcLength = strlen(string);
+		int32 srcLength = min_c(strlen(string), length);
 		if (srcLength > 0) {
 
 			int32 dstLength = srcLength * 4;

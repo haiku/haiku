@@ -60,7 +60,7 @@ class TextRenderer : public BArchivable {
 											 BRect constrainRect,
 											 const Transformable& transform) = 0;*/
 
-	virtual	BRect				Bounds(const char* utf8String,
+	virtual	BRect				Bounds(const char* utf8String, uint32 length,
 									   const Transformable& transform) = 0;
 
 	virtual	void				Update() {};
