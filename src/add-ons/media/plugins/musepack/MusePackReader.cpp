@@ -121,9 +121,9 @@ MusePackReader::GetStreamInfo(void *cookie, int64 *_frameCount, bigtime_t *_dura
 	if (cookie != NULL)
 		return B_BAD_VALUE;
 
-	*_frameCount = fInfo.simple.Frames;
-	*_duration = bigtime_t(1000.0 * (fInfo.simple.Frames - 0.5) * FRAMELEN
-		/ (fInfo.simple.SampleFreq / 1000) + 0.5);
+	*_frameCount = FRAMELEN * (int64)fInfo.simple.Frames;
+	*_duration = bigtime_t(1000.0 * fInfo.simple.Frames * FRAMELEN
+		/ (fInfo.simple.SampleFreq / 1000.0) + 0.5);
 
 	*format = fFormat;
 
