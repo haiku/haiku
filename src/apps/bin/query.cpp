@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 #include <storage/Path.h>
 #include <storage/Query.h>
 #include <storage/Entry.h>
@@ -20,13 +22,6 @@
 #include <support/SupportDefs.h>
 #include <support/String.h>
 
-
-extern "C" {
-	// ToDo: include the correct header
-	int32 getopt(int32, const char **, const char *);
-	extern char *optarg;
-	extern int32 optind;
-}
 
 // Option variables.
 bool o_all_volumes = false;       // Query all volumes?
@@ -89,7 +84,7 @@ main(int32 argc, const char **argv)
 	strcpy(volumePath, ".");
 
 	// Parse command-line arguments.
-	int32 opt;
+	int opt;
 	while ((opt = getopt(argc, argv, "eav:")) != -1) {
 		switch(opt) {
 		case 'a':
