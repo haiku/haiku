@@ -24,6 +24,11 @@ class DataView : public BView {
 		virtual void MessageReceived(BMessage *message);
 		virtual void Draw(BRect updateRect);
 
+		virtual void SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
+		virtual void GetPreferredSize(float *_width, float *_height);
+
+		void SetFontSize(float point);
+
 	private:
 		void UpdateFromEditor(BMessage *message = NULL);
 		void ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size);
@@ -33,7 +38,8 @@ class DataView : public BView {
 		uint8		*fData;
 		uint32		fDataSize;
 		off_t		fOffset;
-		float		fFontHeight;
+		float		fAscent;
+		int32		fFontHeight;
 };
 
 #endif	/* DATA_VIEW_H */

@@ -16,6 +16,7 @@
 class BScrollView;
 
 class HeaderView;
+class DataView;
 
 
 class ProbeView : public BView {
@@ -29,9 +30,12 @@ class ProbeView : public BView {
 
 		void AddFileMenuItems(BMenu *menu, int32 index);
 
+		void UpdateSizeLimits();
+
 	private:
 		DataEditor		fEditor;
 		HeaderView		*fHeaderView;
+		DataView		*fDataView;
 		BScrollView		*fScrollView;
 };
 

@@ -70,6 +70,8 @@ ProbeWindow::ProbeWindow(BRect rect, entry_ref *ref, const char *attribute)
 	ProbeView *probeView = new ProbeView(rect, ref, attribute);
 	probeView->AddFileMenuItems(menu, menu->CountItems() - 4);
 	AddChild(probeView);
+
+	probeView->UpdateSizeLimits();
 }
 
 

@@ -11,16 +11,19 @@
 
 
 static const uint32 kBlockSize = 16;
+static const uint32 kHorizontalSpace = 8;
+static const uint32 kVerticalSpace = 4;
 
 
 DataView::DataView(BRect rect, DataEditor &editor)
-	: BView(rect, "dataView", B_FOLLOW_NONE, B_WILL_DRAW),
+	: BView(rect, "dataView", B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS),
 	fEditor(editor)
 {
 	fPositionLength = 4;
 	fDataSize = fEditor.ViewSize();
 	fData = (uint8 *)malloc(fDataSize);
-	fFontHeight = 15;
+
+	SetFontSize(12.0);
 
 	UpdateFromEditor();
 
@@ -94,14 +97,11 @@ DataView::ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size
 	line += sprintf(line, "%0*Lx:  ", (int)fPositionLength, offset);
 
 	for (uint32 i = 0; i < kBlockSize; i++) {
-		if (!(i % 4))
-			*line++ = ' ';
-
 		if (i >= size) {
 			strcpy(line, "  ");
 			line += 2;
 		} else
-			line += sprintf(line, "%02x", *(unsigned char *)(buffer + i));
+			line += sprintf(line, "%02x ", *(unsigned char *)(buffer + i));
 	}
 
 	strcpy(line, "   ");
@@ -111,7 +111,7 @@ DataView::ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size
 		if (i < size) {
 			char c = buffer[i];
 
-			if (c < 30)
+			if (c < ' ' || c == 0x7f)
 				*line++ = '.';
 			else
 				*line++ = c;
@@ -132,7 +132,7 @@ DataView::Draw(BRect updateRect)
 	// ToDo: take "updateRect" into account!
 
 	char line[255];
-	BPoint location(8, fFontHeight);
+	BPoint location(kHorizontalSpace, kVerticalSpace + fAscent);
 
 	for (uint32 i = 0; i < fDataSize; i += kBlockSize) {
 		ConvertLine(line, fOffset + i, fData + i, fDataSize - i);
@@ -141,5 +141,48 @@ DataView::Draw(BRect updateRect)
 		location.y += fFontHeight;
 	}
 	// ToDo: clear unused space!
+}
+
+
+void 
+DataView::SetFont(const BFont *font, uint32 properties)
+{
+	if (!font->IsFixed())
+		return;
+
+	BView::SetFont(font, properties);
+	
+	font_height fontHeight;
+	font->GetHeight(&fontHeight);
+
+	fFontHeight = int32(fontHeight.ascent + fontHeight.descent + fontHeight.leading);
+	fAscent = fontHeight.ascent;
+}
+
+
+void 
+DataView::SetFontSize(float point)
+{
+	BFont font = be_fixed_font;
+	font.SetSize(point);
+
+	SetFont(&font);
+}
+
+
+void 
+DataView::GetPreferredSize(float *_width, float *_height)
+{
+	if (_width) {
+		BFont font;
+		GetFont(&font);
+		*_width = font.StringWidth("w") * (kBlockSize * 4 + fPositionLength + 6)
+			+ 2 * kHorizontalSpace;
+	}
+
+	if (_height) {
+		*_height = fFontHeight * ((fDataSize + kBlockSize - 1) / kBlockSize)
+			 + 2 * kVerticalSpace;
+	}
 }
 

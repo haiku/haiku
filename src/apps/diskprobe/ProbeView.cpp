@@ -361,15 +361,29 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
 	rect.top = rect.bottom + 3;
 	rect.bottom = Bounds().bottom - B_H_SCROLL_BAR_HEIGHT;
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	BView *view = new DataView(rect, fEditor);
+	fDataView = new DataView(rect, fEditor);
 
-	fScrollView = new BScrollView("scroller", view, B_FOLLOW_ALL, B_WILL_DRAW, true, true);
+	fScrollView = new BScrollView("scroller", fDataView, B_FOLLOW_ALL, B_WILL_DRAW, true, true);
 	AddChild(fScrollView);
 }
 
 
 ProbeView::~ProbeView()
 {
+}
+
+
+void 
+ProbeView::UpdateSizeLimits()
+{
+	if (Window() == NULL)
+		return;
+
+	float width, height;
+	fDataView->GetPreferredSize(&width, &height);
+
+	Window()->SetSizeLimits(200, width + B_V_SCROLL_BAR_WIDTH,
+		200, height + fHeaderView->Frame().bottom + 1 + B_H_SCROLL_BAR_HEIGHT + Frame().top);
 }
 
 
