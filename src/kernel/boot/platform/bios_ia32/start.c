@@ -14,6 +14,7 @@
 #include <boot/platform.h>
 #include <boot/heap.h>
 #include <boot/stage2.h>
+#include <arch/cpu.h>
 
 #include <string.h>
 
@@ -74,7 +75,7 @@ platform_start_kernel(void)
 	mmu_init_for_kernel();
 	cpu_boot_other_cpus();
 
-	printf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
+	dprintf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
@@ -93,10 +94,8 @@ platform_start_kernel(void)
 void
 platform_exit(void)
 {
-	struct bios_regs regs;
-	regs.eax = 0x0;
-	call_bios(0x19, &regs);
-		// this should reboot the system (but doesn't seem to work...)
+	// reset the system using the keyboard controller
+	out8(0xfe, 0x64);
 }
 
 
