@@ -8,7 +8,6 @@
 #include "DiscoveryPacket.h"
 
 #include <core_funcs.h>
-#include <kernel_cpp.h>
 
 
 DiscoveryPacket::DiscoveryPacket(uint8 code, uint16 sessionID = 0x0000)

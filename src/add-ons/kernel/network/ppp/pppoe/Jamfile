@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src add-ons kernel network ppp pppoe ;
 
-# for kernel_cpp.cpp/h and BLocker
+# for kernel_cpp.h and BLocker
 UsePrivateHeaders net ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;

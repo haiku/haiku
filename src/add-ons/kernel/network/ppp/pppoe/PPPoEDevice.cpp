@@ -10,7 +10,6 @@
 
 #include <core_funcs.h>
 #include <cstdlib>
-#include <kernel_cpp.h>
 
 // from libkernelppp
 #include <settings_tools.h>

@@ -30,6 +30,8 @@
 
 #ifdef _KERNEL_MODE
 	#include <kernel_cpp.h>
+#else
+	#include <new.h>
 #endif
 
 #include <stdlib.h>

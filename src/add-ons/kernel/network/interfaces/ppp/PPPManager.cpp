@@ -9,16 +9,17 @@
 #include <PPPControl.h>
 #include <KPPPUtils.h>
 
-#include <kernel_cpp.h>
 #include <LockerHelper.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <sys/sockio.h>
 
 
 #ifdef _KERNEL_MODE
 	#define spawn_thread spawn_kernel_thread
 	#define printf dprintf
+#else
+	#include <cstdio>
 #endif
 
 

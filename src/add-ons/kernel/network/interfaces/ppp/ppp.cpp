@@ -9,8 +9,6 @@
 #include <KernelExport.h>
 #include <driver_settings.h>
 
-#include <kernel_cpp.h>
-
 #include <PPPDefs.h>
 #include "PPPManager.h"
 

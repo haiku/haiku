@@ -5,7 +5,7 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-// stdio.h must be included before PPPModule.h/PPPManager.h because
+// cstdio must be included before PPPModule.h/PPPManager.h because
 // dprintf is defined twice with different return values, once with
 // void (KernelExport.h) and once with int (stdio.h).
 #include <cstdio>
