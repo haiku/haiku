@@ -89,7 +89,8 @@ arch_dbg_init(kernel_args *ka)
 {
 	// at this stage, the debugger command system is alive
 
-	add_debugger_command("sc", &dbg_stack_trace, "Stack crawl for current thread");
+	add_debugger_command("where", &dbg_stack_trace, "Stack crawl for current thread");
+	add_debugger_command("sc", &dbg_stack_trace, NULL);
 
 	return B_NO_ERROR;
 }
