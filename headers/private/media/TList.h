@@ -1,3 +1,5 @@
+#ifndef _MEDIA_T_LIST_H
+#define _MEDIA_T_LIST_H
 
 template<class value> class List
 {
@@ -38,3 +40,4 @@ private:
 	int count;
 };
 
+#endif // _MEDIA_T_LIST_H
