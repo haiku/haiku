@@ -61,7 +61,7 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 		}
 		
 		dir.ReadAttr("hp_jetdirect:host", B_STRING_TYPE, 0, fHost, sizeof(fHost));
-		dir.ReadAttr("hp_jetdirect:port", B_INT16_TYPE, 0, &fPort, sizeof(fPort));
+		dir.ReadAttr("hp_jetdirect:port", B_UINT16_TYPE, 0, &fPort, sizeof(fPort));
 	};
 
 	fEndpoint = new BNetEndpoint(SOCK_STREAM);

@@ -2,31 +2,11 @@ SubDir OBOS_TOP src add-ons print transports hp_jetdirect ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
-<<<<<<< Jamfile
 Addon HP\ JetDirect : print transport : 
 	print_transport.cpp 
 	HPJetDirectTransport.cpp
 	SetupWindow.cpp
-=======
-UsePrivateHeaders net ;
-
-Addon LPR
-	: print transport
-	: Lpr.cpp
-	  LprSetupDlg.cpp
-	  LprTransport.cpp
-	  LpsClient.cpp
-	  Socket.o
-	  SocketStream2.o
-	  DbgMsg.o
->>>>>>> 1.4
 ;
 
 # LinkSharedOSLibs HP\ JetDirect : be netapi ;  # for net_server 
 LinkSharedOSLibs HP\ JetDirect : be bnetapi ;  # for BONE
-
-<<<<<<< Jamfile
-=======
-LinkSharedOSLibs LPR : be net stdc++.r4 ;
->>>>>>> 1.4
-
