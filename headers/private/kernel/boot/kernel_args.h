@@ -8,25 +8,17 @@
 
 #include <SupportDefs.h>
 
-
-typedef struct addr_range {
-	addr_t start;
-	addr_t size;
-} addr_range;
-
+#include <boot/elf.h>
 #include <platform_kernel_args.h>
 #include <arch_kernel_args.h>
 
-struct preloaded_image;
 
 typedef struct kernel_args {
 	uint32		cons_line;
 	char		*str;
 	addr_range	bootdir_addr;
-	addr_range	kernel_seg0_addr;
-	addr_range	kernel_seg1_addr;
-	addr_range	kernel_dynamic_section_addr;
 
+	struct preloaded_image kernel_image;
 	struct preloaded_image *preloaded_images;
 
 	uint32		num_physical_memory_ranges;
