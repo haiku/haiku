@@ -17,6 +17,7 @@
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
 #include <disk_device_manager/KDiskDeviceUtils.h>
+#include <disk_device_manager/KPartitionVisitor.h>
 #include <disk_device_manager/KDiskSystem.h>
 #include <KPath.h>
 #include <syscalls.h>
@@ -2754,30 +2755,26 @@ vfs_mount_boot_file_system(kernel_args *args)
 
 		// ToDo: do this for real! It will currently only use the partition offset;
 		//	it does not yet use the disk_identifier information.
-		//	It does also only search the first level.
 
 		KPartition *bootPartition = NULL;
+
+		struct BootPartitionVisitor : KPartitionVisitor {
+			BootPartitionVisitor(off_t offset) : fOffset(offset) {}
+		
+			virtual bool VisitPre(KPartition *partition)
+			{
+				return (partition->ContainsFileSystem()
+						&& partition->Offset() == fOffset);
+			}
+			private:
+				off_t	fOffset;
+		} visitor(args->boot_disk.partition_offset);
 
 		KDiskDevice *device;
 		int32 cookie = 0;
 		while ((device = manager->NextDevice(&cookie)) != NULL) {
-			if (device->ContainsFileSystem()
-				&& device->Offset() == args->boot_disk.partition_offset) {
-				bootPartition = device;
-				break;
-			}
-
-			for (int32 i = device->CountChildren(); i-- > 0; ) {
-				KPartition *partition = device->ChildAt(i);
-
-				if (partition->Offset() == args->boot_disk.partition_offset
-					&& partition->ContainsFileSystem()) {
-					bootPartition = partition;
-					break;
-				}
-			}
-
-			if (bootPartition != NULL)
+			bootPartition = device->VisitEachDescendant(&visitor);
+			if (bootPartition)
 				break;
 		}
 
