@@ -40,6 +40,7 @@ KernelMergeObject posix_stdio.o :
 	<$(SOURCE_GRIST)>vfprintf.c
 	<$(SOURCE_GRIST)>vfscanf.c
 	<$(SOURCE_GRIST)>vscanf.c
+ 	<$(SOURCE_GRIST)>vsnprintf.c
  	<$(SOURCE_GRIST)>vsprintf.c
 	<$(SOURCE_GRIST)>wbuf.c
 	<$(SOURCE_GRIST)>wsetup.c
