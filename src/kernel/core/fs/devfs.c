@@ -634,7 +634,7 @@ devfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 	struct devfs_cookie *cookie;
 	int status = 0;
 
-	TRACE(("devfs_open: vnode %p, oflags 0x%x\n", vnode, oflags));
+	TRACE(("devfs_open: fs_cookie %p vnode %p, oflags 0x%x, file_cookie %p \n", fs, vnode, oflags, _cookie));
 
 	cookie = kmalloc(sizeof(struct devfs_cookie));
 	if (cookie == NULL)

@@ -47,7 +47,7 @@
 #include <fs_info.h>
 
 #ifndef TRACE_VFS
-#	define TRACE_VFS 0
+#	define TRACE_VFS 1
 #endif
 #if TRACE_VFS
 #	define PRINT(x) dprintf x

@@ -19,7 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define ROOTFS_TRACE 0
+#define ROOTFS_TRACE 1
 
 #if ROOTFS_TRACE
 #define TRACE(x) dprintf x
@@ -332,7 +332,7 @@ rootfs_unmount(fs_cookie _fs)
 	struct rootfs_vnode *v;
 	struct hash_iterator i;
 
-	TRACE(("rootfs_unmount: entry fs = 0x%x\n", fs));
+	TRACE(("rootfs_unmount: entry fs = %p\n", fs));
 
 	// put_vnode on the root to release the ref to it
 	vfs_put_vnode(fs->id, fs->root_vnode->id);
@@ -370,7 +370,7 @@ rootfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *_id, int
 	struct rootfs_vnode *v1;
 	int status;
 
-	TRACE(("rootfs_lookup: entry dir 0x%x, name '%s'\n", dir, name));
+	TRACE(("rootfs_lookup: entry dir %p, name '%s'\n", dir, name));
 	if (dir->stream.type != STREAM_TYPE_DIR)
 		return B_NOT_A_DIRECTORY;
 
@@ -414,7 +414,7 @@ rootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
 
-	TRACE(("rootfs_getvnode: asking for vnode 0x%x 0x%x, r %d\n", id, reenter));
+	TRACE(("rootfs_getvnode: asking for vnode 0x%Lx, r %d\n", id, reenter));
 
 	if (!reenter)
 		mutex_lock(&fs->lock);
@@ -424,7 +424,7 @@ rootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 	if (!reenter)
 		mutex_unlock(&fs->lock);
 
-	TRACE(("rootfs_getnvnode: looked it up at 0x%x\n", *_vnode));
+	TRACE(("rootfs_getnvnode: looked it up at %p\n", *_vnode));
 
 	if (*_vnode)
 		return B_NO_ERROR;
@@ -439,7 +439,7 @@ rootfs_put_vnode(fs_cookie _fs, fs_vnode _vnode, bool reenter)
 #if ROOTFS_TRACE
 	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode;
 
-	TRACE(("rootfs_putvnode: entry on vnode 0x%x 0x%x, r %d\n", vnode->id, reenter));
+	TRACE(("rootfs_putvnode: entry on vnode 0x%Lx, r %d\n", vnode->id, reenter));
 #endif
 	return 0; // whatever
 }
@@ -451,7 +451,7 @@ rootfs_remove_vnode(fs_cookie _fs, fs_vnode _vnode, bool reenter)
 	struct rootfs *fs = (struct rootfs *)_fs;
 	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode;
 
-	TRACE(("rootfs_removevnode: remove 0x%x (0x%x 0x%x), r %d\n", vnode, vnode->id, reenter));
+	TRACE(("rootfs_removevnode: remove %p (0x%Lx), r %d\n", vnode, vnode->id, reenter));
 
 	if (!reenter)
 		mutex_lock(&fs->lock);
@@ -492,7 +492,7 @@ rootfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 	struct rootfs_vnode *v = _v;
 	struct rootfs_cookie *cookie = _cookie;
 
-	TRACE(("rootfs_close: entry vnode 0x%x, cookie 0x%x\n", v, cookie));
+	TRACE(("rootfs_close: entry vnode %p, cookie %p\n", v, cookie));
 #endif
 	return 0;
 }
@@ -505,7 +505,7 @@ rootfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 #if ROOTFS_TRACE
 	struct rootfs_vnode *v = _v;
 
-	TRACE(("rootfs_freecookie: entry vnode 0x%x, cookie 0x%x\n", v, cookie));
+	TRACE(("rootfs_freecookie: entry vnode %p, cookie %p\n", v, cookie));
 #endif
 	if (cookie)
 		kfree(cookie);
@@ -531,7 +531,7 @@ rootfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, void *bu
 static ssize_t
 rootfs_write(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, const void *buf, size_t *len)
 {
-	TRACE(("rootfs_write: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, len 0x%x\n", v, cookie, pos, *len));
+	TRACE(("rootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", v, cookie, pos, *len));
 
 	return EPERM;
 }
@@ -553,7 +553,7 @@ rootfs_create_dir(fs_cookie _fs, fs_vnode _dir, const char *name, int perms, vno
 	bool created_vnode = false;
 	int status = 0;
 
-	TRACE(("rootfs_create_dir: dir 0x%x, name = '%s', stream_type = %d\n", dir, name, st));
+	TRACE(("rootfs_create_dir: dir %p, name = '%s', perms = %d, id = 0x%Lx pointer id = %p\n", dir, name, perms,*new_vnid, new_vnid));
 
 	mutex_lock(&fs->lock);
 
@@ -603,7 +603,7 @@ rootfs_remove_dir(fs_cookie _fs, fs_vnode _dir, const char *name)
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
 
-	TRACE(("rootfs_remove_dir: dir 0x%x (0x%x 0x%x), name '%s'\n", dir, dir->id, name));
+	TRACE(("rootfs_remove_dir: dir %p (0x%Lx), name '%s'\n", dir, dir->id, name));
 
 	return rootfs_remove(fs, dir, name, true);
 }
@@ -616,7 +616,7 @@ rootfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
 	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_v;
 	struct rootfs_cookie *cookie;
 
-	TRACE(("rootfs_open: vnode 0x%x\n", vnode));
+	TRACE(("rootfs_open: vnode %p\n", vnode));
 
 	if (vnode->stream.type != STREAM_TYPE_DIR)
 		return B_BAD_VALUE;
@@ -646,7 +646,7 @@ rootfs_read_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie, struct dire
 	struct rootfs *fs = _fs;
 	status_t status = 0;
 
-	TRACE(("rootfs_read_dir: vnode 0x%x, cookie 0x%x, buffer = 0x%x, bufferSize = 0x%x\n", v, cookie, dirent, bufferSize));
+	TRACE(("rootfs_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %ld, num = %p\n", _vnode, cookie, dirent, bufferSize,_num));
 
 	mutex_lock(&fs->lock);
 
@@ -698,7 +698,7 @@ rootfs_rewind_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie)
 static int
 rootfs_ioctl(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, ulong op, void *buf, size_t len)
 {
-	TRACE(("rootfs_ioctl: vnode 0x%x, cookie 0x%x, op %d, buf 0x%x, len 0x%x\n", _v, _cookie, op, buf, len));
+	TRACE(("rootfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n", _v, _cookie, op, buf, len));
 
 	return EINVAL;
 }
@@ -751,7 +751,7 @@ rootfs_symlink(fs_cookie _fs, fs_vnode _dir, const char *name, const char *path,
 	bool created_vnode = false;
 	int status = 0;
 
-	TRACE(("rootfs_symlink: dir 0x%x, name = '%s', path = %s\n", dir, name, path));
+	TRACE(("rootfs_symlink: dir %p, name = '%s', path = %s\n", dir, name, path));
 
 	mutex_lock(&fs->lock);
 
@@ -804,7 +804,7 @@ rootfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
 
-	TRACE(("rootfs_unlink: dir 0x%x (0x%x 0x%x), name '%s'\n", dir, dir->id, name));
+	TRACE(("rootfs_unlink: dir %p (0x%Lx), name '%s'\n", dir, dir->id, name));
 
 	return rootfs_remove(fs, dir, name, false);
 }
@@ -819,7 +819,7 @@ rootfs_rename(fs_cookie _fs, fs_vnode _olddir, const char *oldname, fs_vnode _ne
 	struct rootfs_vnode *v1, *v2;
 	int err;
 
-	TRACE(("rootfs_rename: olddir 0x%x (0x%x 0x%x), oldname '%s', newdir 0x%x (0x%x 0x%x), newname '%s'\n",
+	TRACE(("rootfs_rename: olddir %p (0x%Lx), oldname '%s', newdir %p (0x%Lx), newname '%s'\n",
 		olddir, olddir->id, oldname, newdir, newdir->id, newname));
 
 	mutex_lock(&fs->lock);
@@ -887,7 +887,7 @@ rootfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 {
 	struct rootfs_vnode *vnode = _v;
 
-	TRACE(("rootfs_rstat: vnode 0x%x (0x%x 0x%x), stat 0x%x\n", vnode, vnode->id, stat));
+	TRACE(("rootfs_rstat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id, stat));
 
 	// stream exists, but we know to return size 0, since we can only hold directories
 	stat->st_ino = vnode->id;
@@ -905,7 +905,7 @@ rootfs_write_stat(fs_cookie _fs, fs_vnode _v, const struct stat *stat, int stat_
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *v = _v;
 
-	TRACE(("rootfs_wstat: vnode 0x%x (0x%x 0x%x), stat 0x%x\n", v, v->id, stat));
+	TRACE(("rootfs_wstat: vnode %p (0x%Lx), stat %p\n", v, v->id, stat));
 #endif
 	// cannot change anything
 	return EINVAL;

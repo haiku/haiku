@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define BOOTFS_TRACE 0
+#define BOOTFS_TRACE 1
 
 #if BOOTFS_TRACE
 #define TRACE(x) dprintf x
@@ -461,7 +461,7 @@ bootfs_unmount(fs_cookie _fs)
 	struct bootfs_vnode *v;
 	struct hash_iterator i;
 
-	TRACE(("bootfs_unmount: entry fs = 0x%x\n", fs));
+	TRACE(("bootfs_unmount: entry fs = %p\n", fs));
 
 	// delete all of the vnodes
 	hash_open(fs->vnode_list_hash, &i);
@@ -495,7 +495,7 @@ bootfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *_id, int
 	struct bootfs_vnode *vnode, *vdummy;
 	int status;
 
-	TRACE(("bootfs_lookup: entry dir 0x%x, name '%s'\n", dir, name));
+	TRACE(("bootfs_lookup: entry dir %p, name '%s'\n", dir, name));
 
 	if (dir->stream.type != STREAM_TYPE_DIR)
 		return B_NOT_A_DIRECTORY;
@@ -541,7 +541,7 @@ bootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 	struct bootfs *fs = (struct bootfs *)_fs;
 	int err;
 
-	TRACE(("bootfs_get_vnode: asking for vnode 0x%x 0x%x, r %d\n", id, r));
+	TRACE(("bootfs_get_vnode: asking for vnode 0x%Lx, r %d\n", id, r));
 
 	if(!r)
 		mutex_lock(&fs->lock);
@@ -551,7 +551,7 @@ bootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 	if(!r)
 		mutex_unlock(&fs->lock);
 
-	TRACE(("bootfs_get_vnode: looked it up at 0x%x\n", *v));
+	TRACE(("bootfs_get_vnode: looked it up at %p\n", *v));
 
 	if(*v)
 		return 0;
@@ -565,7 +565,7 @@ bootfs_put_vnode(fs_cookie _fs, fs_vnode _v, bool r)
 {
 	struct bootfs_vnode *v = (struct bootfs_vnode *)_v;
 
-	TRACE(("bootfs_put_vnode: entry on vnode 0x%x 0x%x, r %d\n", v->id, r));
+	TRACE(("bootfs_put_vnode: entry on vnode 0x%Lx r %d\n", v->id, r));
 
 	return 0; // whatever
 }
@@ -579,7 +579,7 @@ bootfs_remove_vnode(fs_cookie _fs, fs_vnode _v, bool reenter)
 	struct bootfs_vnode dummy;
 	int err;
 
-	TRACE(("bootfs_remove_vnode: remove 0x%x (0x%x 0x%x), r %d\n", v, v->id, r));
+	TRACE(("bootfs_remove_vnode: remove %p (0x%Lx) r %d\n", v, v->id, reenter));
 
 	if (!reenter)
 		mutex_lock(&fs->lock);
@@ -615,7 +615,7 @@ bootfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 	struct bootfs_vnode *vnode = _v;
 	struct bootfs_cookie *cookie;
 
-	TRACE(("bootfs_open: vnode 0x%x, oflags 0x%x\n", vnode, oflags));
+	TRACE(("bootfs_open: vnode %p, oflags 0x%x\n", vnode, oflags));
 
 	cookie = kmalloc(sizeof(struct bootfs_cookie));
 	if (cookie == NULL)
@@ -640,7 +640,7 @@ bootfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 	struct bootfs_vnode *v = _v;
 	struct bootfs_cookie *cookie = _cookie;
 
-	TRACE(("bootfs_close: entry vnode 0x%x, cookie 0x%x\n", v, cookie));
+	TRACE(("bootfs_close: entry vnode %p, cookie %p\n", v, cookie));
 
 	return 0;
 }
@@ -653,7 +653,7 @@ bootfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 	struct bootfs_vnode *v = _v;
 	struct bootfs_cookie *cookie = _cookie;
 
-	TRACE(("bootfs_freecookie: entry vnode 0x%x, cookie 0x%x\n", v, cookie));
+	TRACE(("bootfs_freecookie: entry vnode %p, cookie %p\n", v, cookie));
 
 	if (cookie)
 		kfree(cookie);
@@ -677,7 +677,7 @@ bootfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, void *bu
 	struct bootfs_cookie *cookie = _cookie;
 	ssize_t err = 0;
 
-	TRACE(("bootfs_read: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, len 0x%x\n", v, cookie, pos, len));
+	TRACE(("bootfs_read: vnode %p, cookie %p, pos 0x%Lx, len 0x%lx\n", v, cookie, pos, *len));
 
 	mutex_lock(&fs->lock);
 
@@ -721,7 +721,7 @@ err:
 static ssize_t
 bootfs_write(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, const void *buf, size_t *len)
 {
-	TRACE(("bootfs_write: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, len 0x%x\n", v, cookie, pos, *len));
+	TRACE(("bootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", v, cookie, pos, *len));
 
 	return EROFS;
 }
@@ -735,7 +735,7 @@ bootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int seek
 	struct bootfs_cookie *cookie = _cookie;
 	int err = B_OK;
 
-	TRACE(("bootfs_seek: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, seek_type %d\n", v, cookie, pos, st));
+	TRACE(("bootfs_seek: vnode %p, cookie %p, pos 0x%Lx , seek_type %d\n", v, cookie, pos, seekType));
 
 	if (cookie->s->type != STREAM_TYPE_FILE)
 		return EINVAL;
@@ -796,7 +796,7 @@ bootfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
 	struct bootfs_cookie *cookie;
 	int status = 0;
 
-	TRACE(("bootfs_open_dir: vnode 0x%x\n", vnode));
+	TRACE(("bootfs_open_dir: vnode %p\n", vnode));
 
 	if (vnode->stream.type != STREAM_TYPE_DIR)
 		return EINVAL;
@@ -824,7 +824,7 @@ bootfs_read_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie, struct dire
 	struct bootfs *fs = _fs;
 	status_t status;
 
-	TRACE(("bootfs_read_dir(vnode = 0x%x, cookie = 0x%x, buffer = 0x%x, bufferSize = 0x%x)\n", v, cookie, buffer, bufferSize));
+	TRACE(("bootfs_read_dir(fs_cookie = %p vnode = %p, file_cookie = %p, buffer = %p, bufferSize = %ld, num = %d)\n",_fs, _vnode, cookie, dirent, bufferSize, *_num));
 
 	mutex_lock(&fs->lock);
 
@@ -874,7 +874,7 @@ bootfs_rewind_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie)
 static int
 bootfs_ioctl(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, ulong op, void *buf, size_t len)
 {
-	TRACE(("bootfs_ioctl: vnode 0x%x, cookie 0x%x, op %d, buf 0x%x, len 0x%x\n", _v, _cookie, op, buf, len));
+	TRACE(("bootfs_ioctl: fs_cookie %p vnode %p, file_cookie %p, op %lu, buf %p, len %ld\n", _fs, _v, _cookie, op, buf, len));
 	return EINVAL;
 }
 
@@ -884,7 +884,7 @@ bootfs_can_page(fs_cookie _fs, fs_vnode _v)
 {
 	struct bootfs_vnode *v = _v;
 
-	TRACE(("bootfs_canpage: vnode 0x%x\n", v));
+	TRACE(("bootfs_canpage: vnode %p\n", v));
 
 	if (v->stream.type == STREAM_TYPE_FILE)
 		return 1;
@@ -900,7 +900,7 @@ bootfs_read_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 	struct bootfs_vnode *v = _v;
 	unsigned int i;
 
-	TRACE(("bootfs_readpage: vnode 0x%x, vecs 0x%x, pos 0x%x 0x%x\n", v, vecs, pos));
+	TRACE(("bootfs_readpage: fs_cookie %p vnode %p, vecs %p, pos 0x%Ld\n",fs, v, vecs, pos));
 
 	for (i = 0; i < vecs->num; i++) {
 		if (pos >= v->stream.u.file.len) {
@@ -930,7 +930,7 @@ bootfs_write_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
 
-	TRACE(("bootfs_writepage: vnode 0x%x, vecs 0x%x, pos 0x%x 0x%x\n", v, vecs, pos));
+	TRACE(("bootfs_writepage: fs_cookie %p vnode %p, vecs %p, pos %Ld \n", fs, v, vecs, pos));
 
 	return EPERM;
 }
@@ -957,7 +957,7 @@ bootfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 	struct bootfs_vnode *v = _v;
 	int err = 0;
 
-	TRACE(("bootfs_rstat: vnode 0x%x (0x%x 0x%x), stat 0x%x\n", v, v->id, stat));
+	TRACE(("bootfs_rstat: fs_cookie %p vnode %p v->id 0x%Lx , stat %p\n", fs, v, v->id, stat));
 
 	mutex_lock(&fs->lock);
 
@@ -995,7 +995,7 @@ bootfs_write_stat(fs_cookie _fs, fs_vnode _v, const struct stat *stat, int stat_
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
 
-	TRACE(("bootfs_wstat: vnode 0x%x (0x%x 0x%x), stat 0x%x\n", v, v->id, stat));
+	TRACE(("bootfs_wstat: fs_cookie %p, vnode %p, v->id 0x%Lx, stat 0x%p, stat_mask 0x%x\n", fs, v, v->id, stat, stat_mask));
 
 	// cannot change anything
 	return EROFS;
