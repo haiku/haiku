@@ -156,7 +156,7 @@ struct ifnet {
 #define if_addrlen      ifd.ifi_addrlen
 #define if_hdrlen       ifd.ifi_hdrlen
 #define if_metric       ifd.ifi_metric
-#define if_baudrate	    ifd.ifi_baurdate
+#define if_baudrate	    ifd.ifi_baudrate
 #define if_ipackets     ifd.ifi_ipackets
 #define if_ierrors      ifd.ifi_ierrors
 #define if_opackets     ifd.ifi_opackets
