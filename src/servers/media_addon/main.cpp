@@ -19,11 +19,11 @@
 
 void DumpFlavorInfo(const flavor_info *info);
 
-class Application : BApplication
+class MediaAddonServer : BApplication
 {
 public:
-	Application(const char *sig);
-	~Application();
+	MediaAddonServer(const char *sig);
+	~MediaAddonServer();
 	void ReadyToRun();
 	void MessageReceived(BMessage *msg);
 	
@@ -44,7 +44,7 @@ public:
 	thread_id	control_thread;
 };
 
-Application::Application(const char *sig) : 
+MediaAddonServer::MediaAddonServer(const char *sig) : 
 	BApplication(sig)
 {
 	mediaroster = BMediaRoster::Roster();
@@ -54,7 +54,7 @@ Application::Application(const char *sig) :
 	resume_thread(control_thread);
 }
 
-Application::~Application()
+MediaAddonServer::~MediaAddonServer()
 {
 	delete_port(control_port);
 	status_t err;
@@ -69,7 +69,7 @@ Application::~Application()
 }
 
 void 
-Application::HandleMessage(int32 code, void *data, size_t size)
+MediaAddonServer::HandleMessage(int32 code, void *data, size_t size)
 {
 	switch (code) {
 		case ADDONSERVER_INSTANTIATE_DORMANT_NODE:
@@ -87,7 +87,7 @@ Application::HandleMessage(int32 code, void *data, size_t size)
 			BMediaAddOn *addon;
 			addon = _DormantNodeManager->GetAddon(msg->addonid);
 			if (!addon) {
-				printf("Can't find a addon object for id %d\n",(int)msg->addonid);
+				printf("rescan flavors: Can't find a addon object for id %d\n",(int)msg->addonid);
 				break;
 			}
 			ScanAddOnFlavors(addon);
@@ -101,14 +101,14 @@ Application::HandleMessage(int32 code, void *data, size_t size)
 }
 
 int32
-Application::controlthread(void *arg)
+MediaAddonServer::controlthread(void *arg)
 {
 	char data[B_MEDIA_MESSAGE_SIZE];
-	Application *app;
+	MediaAddonServer *app;
 	ssize_t size;
 	int32 code;
 	
-	app = (Application *)arg;
+	app = (MediaAddonServer *)arg;
 	while ((size = read_port_etc(app->control_port, &code, data, sizeof(data), 0, 0)) > 0)
 		app->HandleMessage(code, data, size);
 
@@ -116,7 +116,7 @@ Application::controlthread(void *arg)
 }
 
 void 
-Application::ReadyToRun()
+MediaAddonServer::ReadyToRun()
 {
 	node_ref nref;
 
@@ -132,7 +132,7 @@ Application::ReadyToRun()
 }
 
 void 
-Application::ScanAddOnFlavors(BMediaAddOn *addon)
+MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 {
 	int flavorcount;
 	media_addon_id purge_id;
@@ -142,7 +142,7 @@ Application::ScanAddOnFlavors(BMediaAddOn *addon)
 	ASSERT(addon);
 	ASSERT(addon->AddonID() > 0);
 	
-	printf("scanning media add-on flavors for id %d\n",addon->AddonID());
+	printf("MediaAddonServer::ScanAddOnFlavors: id %d\n",addon->AddonID());
 	
 	port = find_port("media_server port");
 	if (port <= B_OK) {
@@ -188,7 +188,7 @@ Application::ScanAddOnFlavors(BMediaAddOn *addon)
 
 		rv = write_port(port, SERVER_REGISTER_DORMANT_NODE, msg, msgsize);
 		if (rv != B_OK) {
-			printf("couldn't register dormant node\n");
+			printf("MediaAddonServer::ScanAddOnFlavors: couldn't register dormant node\n");
 		}
 
 		free(msg);
@@ -200,9 +200,9 @@ Application::ScanAddOnFlavors(BMediaAddOn *addon)
 }
 
 void 
-Application::AddOnAdded(const char *path, ino_t file_node)
+MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 {
-	printf("\n\nloading BMediaAddOn from %s\n",path);
+	printf("\n\nMediaAddonServer::AddOnAdded: path %s\n",path);
 
 	BMediaAddOn *addon;
 	media_addon_id id;
@@ -210,17 +210,18 @@ Application::AddOnAdded(const char *path, ino_t file_node)
 	
 	id = _DormantNodeManager->RegisterAddon(path);
 	if (id <= 0) {
-		printf("failed to register add-on\n");
+		printf("MediaAddonServer::AddOnAdded: failed to register add-on\n");
 		return;
 	}
 	
 	addon = _DormantNodeManager->GetAddon(id);
 	if (addon == NULL) {
 		printf("failed to get add-on\n");
+		_DormantNodeManager->UnregisterAddon(id);
 		return;
 	}
 
-	printf("adding media add-on %d\n",(int)id);
+	printf("MediaAddonServer::AddOnAdded: loading finished, id %d\n",(int)id);
 
 	filemap->Insert(file_node, id);
 
@@ -278,11 +279,11 @@ flavor 0:
 
 
 void
-Application::AddOnRemoved(ino_t file_node)
+MediaAddonServer::AddOnRemoved(ino_t file_node)
 {	
 	media_addon_id id;
 	if (!filemap->Get(file_node,&id)) {
-		printf("inode %Ld removed, but no media add-on found\n",file_node);
+		printf("MediaAddonServer::AddOnRemoved: inode %Ld removed, but no media add-on found\n",file_node);
 		return;
 	}
 	filemap->Remove(file_node);
@@ -290,7 +291,7 @@ Application::AddOnRemoved(ino_t file_node)
 }
 
 void 
-Application::WatchDir(BEntry *dir)
+MediaAddonServer::WatchDir(BEntry *dir)
 {
 	BEntry e;
 	BDirectory d(dir);
@@ -314,7 +315,7 @@ Application::WatchDir(BEntry *dir)
 }
 
 void 
-Application::MessageReceived(BMessage *msg)
+MediaAddonServer::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) 
 	{
@@ -385,7 +386,7 @@ Application::MessageReceived(BMessage *msg)
 
 int main()
 {
-	new Application("application/x-vnd.OpenBeOS-media-addon-server");
+	new MediaAddonServer("application/x-vnd.OpenBeOS-media-addon-server");
 	be_app->Run();
 	return 0;
 }

@@ -152,6 +152,17 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 {
 	status_t rv;
 	switch (code) {
+		case SERVER_GET_MEDIAADDON_REF:
+		{
+			xfer_server_get_mediaaddon_ref *msg = (xfer_server_get_mediaaddon_ref *)data;
+			xfer_server_get_mediaaddon_ref_reply reply;
+			entry_ref tempref;
+			reply.result = fNodeManager->GetAddonRef(&tempref, msg->addonid);
+			reply.ref = tempref;
+			write_port(msg->reply_port, 0, &reply, sizeof(reply));
+			break;
+		}
+
 		case SERVER_GET_NODE:
 		{
 			xfer_server_get_node *msg = (xfer_server_get_node *)data;
@@ -174,7 +185,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			xfer_server_register_mediaaddon *msg = (xfer_server_register_mediaaddon *)data;
 			xfer_server_register_mediaaddon_reply reply;
-			fNodeManager->RegisterAddon(&reply.addonid);
+			fNodeManager->RegisterAddon(msg->ref, &reply.addonid);
 			write_port(msg->reply_port, 0, &reply, sizeof(reply));
 			break;
 		}

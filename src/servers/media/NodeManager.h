@@ -1,4 +1,5 @@
 #include "TList.h"
+#include "TMap.h"
 
 class BufferManager;
 
@@ -27,8 +28,9 @@ public:
 
 	void AddDormantFlavorInfo(const dormant_flavor_info &dfi);	
 	void RemoveDormantFlavorInfo(media_addon_id id);	
-	void RegisterAddon(media_addon_id *newid);
+	void RegisterAddon(const entry_ref &ref, media_addon_id *newid);
 	void UnregisterAddon(media_addon_id id);
+	status_t GetAddonRef(entry_ref *ref, media_addon_id id);
 	status_t GetDormantNodes(dormant_node_info * out_info,
 							  int32 * io_count,
 							  const media_format * has_input /* = NULL */,
@@ -45,4 +47,5 @@ private:
 	media_addon_id nextaddonid;
 	
 	List<dormant_flavor_info> *fDormantFlavorList;
+	Map<media_addon_id,entry_ref> *fAddonPathMap;
 };

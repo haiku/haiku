@@ -4,6 +4,7 @@
 #include <MediaDefs.h>
 #include <MediaNode.h>
 #include <MediaAddOn.h>
+#include <Entry.h>
 
 #define NEW_MEDIA_SERVER_SIGNATURE 	"application/x-vnd.OpenBeOS-media-server"
 
@@ -93,6 +94,7 @@ enum {
 	ADDONSERVER_INSTANTIATE_DORMANT_NODE,
 	SERVER_REGISTER_MEDIAADDON,
 	SERVER_UNREGISTER_MEDIAADDON,
+	SERVER_GET_MEDIAADDON_REF,
 	ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS,
 	SERVER_REGISTER_DORMANT_NODE,
 	SERVER_GET_NODE,
@@ -114,6 +116,38 @@ enum node_type
 	TIME_SOURCE, 
 	SYSTEM_TIME_SOURCE 
 };
+
+
+/* We can't send an entry_ref through a port to another team,
+ * but we can assign it to an xfer_entry_ref and send this one,
+ * when we receive it we can assign it to a normal entry_ref
+ */
+struct xfer_entry_ref
+{
+public:
+	xfer_entry_ref()
+		{
+			device = -1;
+			directory = -1;
+			name[0] = 0;
+		}
+	operator entry_ref() const
+		{
+			entry_ref ref(device, directory, name);
+			return ref;
+		}
+	void operator=(const entry_ref &ref)
+		{
+			device = ref.device;
+			directory = ref.directory;
+			strcpy(name, ref.name);
+		}
+private:
+	dev_t	device;
+	ino_t	directory;
+	char	name[B_FILE_NAME_LENGTH];
+};
+
 
 struct xfer_server_get_dormant_flavor_info
 {
@@ -198,7 +232,8 @@ struct xfer_addonserver_rescan_mediaaddon_flavors
 
 struct xfer_server_register_mediaaddon
 {
-	port_id reply_port;
+	port_id 	reply_port;
+	xfer_entry_ref	ref; // a ref to the file
 };
 
 struct xfer_server_register_mediaaddon_reply
@@ -209,6 +244,18 @@ struct xfer_server_register_mediaaddon_reply
 struct xfer_server_unregister_mediaaddon
 {
 	media_addon_id addonid;
+};
+
+struct xfer_server_get_mediaaddon_ref
+{
+	media_addon_id addonid;
+	port_id 	reply_port;
+};
+
+struct xfer_server_get_mediaaddon_ref_reply
+{
+	status_t result;
+	xfer_entry_ref	ref; // a ref to the file
 };
 
 struct xfer_producer_format_suggestion_requested

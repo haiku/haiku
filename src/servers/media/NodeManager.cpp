@@ -1,8 +1,10 @@
 #include <OS.h>
+#include <Entry.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <MediaDefs.h>
 #include <MediaAddOn.h>
+#include "debug.h"
 #include "NodeManager.h"
 
 // XXX locking is missing
@@ -11,24 +13,31 @@ NodeManager::NodeManager() :
 	nextaddonid(1)
 {
 	fDormantFlavorList = new List<dormant_flavor_info>;
+	fAddonPathMap = new Map<media_addon_id,entry_ref>;
 }
 
 NodeManager::~NodeManager()
 {
 	delete fDormantFlavorList;
+	delete fAddonPathMap;
 }
 
 void 
-NodeManager::RegisterAddon(media_addon_id *newid)
+NodeManager::RegisterAddon(const entry_ref &ref, media_addon_id *newid)
 {
-	*newid = nextaddonid++;
+	media_addon_id id;
+	id = nextaddonid;
+	nextaddonid += 1;
+	
+	fAddonPathMap->Insert(id, ref);
+	*newid = id;
 }
 
 void
 NodeManager::UnregisterAddon(media_addon_id id)
 {
 	RemoveDormantFlavorInfo(id);
-	// unload the image once it's no longer used (refcounting!)
+	fAddonPathMap->Remove(id);
 }
 
 void
@@ -40,6 +49,13 @@ NodeManager::AddDormantFlavorInfo(const dormant_flavor_info &dfi)
 void
 NodeManager::RemoveDormantFlavorInfo(media_addon_id id)
 {
+	UNIMPLEMENTED();
+}
+
+status_t
+NodeManager::GetAddonRef(entry_ref *ref, media_addon_id id)
+{
+	return fAddonPathMap->Get(id, ref) ? B_OK : B_ERROR;
 }
 
 status_t 
