@@ -567,8 +567,9 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			}
 			
 			BString str;
-			if (pmsg->FindString("status", &str) == B_OK)
+			if (pmsg->FindString("status", &str) == B_OK) {
 				status << str;
+			}
 			
 			fStatusView->SetText(status);
 			
@@ -1058,7 +1059,9 @@ ShowImageWindow::Print(BMessage *msg)
 		// XXX: eventually print large images on several pages
 		printJob.BeginJob();
 		fImageView->SetScale(width / imageWidth);
-		printJob.DrawView(fImageView, bitmap->Bounds(), BPoint(printableRect.left, printableRect.top));
+		// coordinates are relative to printable rectangle
+		BRect bounds(bitmap->Bounds());
+		printJob.DrawView(fImageView, bounds, BPoint(0, 0));
 		fImageView->SetScale(1.0);
 		printJob.SpoolPage();
 		printJob.CommitJob();
