@@ -457,11 +457,14 @@ status_t
 BMessenger::SendMessage(BMessage *message, BMessage *reply,
 						bigtime_t deliveryTimeout, bigtime_t replyTimeout) const
 {
-	status_t error = (message ? B_OK : B_BAD_VALUE);
-	if (error) {
+	status_t error = (message && reply ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
 		error = message->send_message(fPort, fTeam, fHandlerToken,
 									  fPreferredTarget, reply, deliveryTimeout,
 									  replyTimeout);
+		// Map this error for now:
+		if (error == B_BAD_TEAM_ID)
+			error = B_BAD_PORT_ID;
 	}
 	return error;
 }
@@ -484,6 +487,7 @@ BMessenger::operator=(const BMessenger &from)
 		fTeam = from.fTeam;
 		fPreferredTarget = from.fPreferredTarget;
 	}
+	return *this;
 }
 
 // ==
@@ -497,9 +501,9 @@ BMessenger::operator=(const BMessenger &from)
 bool
 BMessenger::operator==(const BMessenger &other) const
 {
+	// Note: The fTeam fields are not compared.
 	return (fPort == other.fPort
 			&& fHandlerToken == other.fHandlerToken
-			&& fTeam == other.fTeam
 			&& fPreferredTarget == other.fPreferredTarget);
 }
 
@@ -585,8 +589,8 @@ BMessenger::InitData(const char *signature, team_id team, status_t *result)
 	second one.
 
 	This method defines an order on BMessengers based on their member
-	variables \c fPort, \c fHandlerToken, \c fTeam and \c fPreferredTarget.
-s
+	variables \c fPort, \c fHandlerToken and \c fPreferredTarget.
+
 	\param a The first messenger.
 	\param b The second messenger.
 	\return \c true, if \a a is less than \a b, \c false otherwise.
@@ -594,14 +598,17 @@ s
 bool
 operator<(const BMessenger &a, const BMessenger &b)
 {
+	// significance:
+	// 1. fPort
+	// 2. fHandlerToken
+	// 3. fPreferredTarget
+	// fTeam is insignificant
 	return (a.fPort < b.fPort
-			|| (a.fPort == b.fPort
-				&& a.fHandlerToken < b.fHandlerToken
-				|| (a.fHandlerToken == b.fHandlerToken
-					&& a.fTeam < b.fTeam
-					|| (a.fTeam == b.fTeam
-						&& a.fPreferredTarget == false
-						&& b.fPreferredTarget == true))));
+			|| a.fPort == b.fPort
+				&& (a.fHandlerToken < b.fHandlerToken
+					|| a.fHandlerToken == b.fHandlerToken
+						&& !a.fPreferredTarget
+						&& b.fPreferredTarget));
 }
 
 // !=
