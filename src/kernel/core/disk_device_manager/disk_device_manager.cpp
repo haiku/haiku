@@ -5,6 +5,8 @@
 #include "disk_device_manager.h"
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
+#include "KDiskDeviceUtils.h"
+#include "KDiskSystem.h"
 #include "KPartition.h"
 
 // debugging
@@ -160,5 +162,17 @@ void
 partition_modified(partition_id partitionID)
 {
 	// not implemented
+}
+
+// find_disk_system
+disk_system_id
+find_disk_system(const char *name)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		if (KDiskSystem *diskSystem = manager->DiskSystemWithName(name))
+			return diskSystem->ID();
+	}
+	return -1;
 }
 

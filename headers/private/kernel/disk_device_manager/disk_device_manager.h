@@ -84,6 +84,9 @@ bool delete_partition(partition_id partitionID);
 void partition_modified(partition_id partitionID);
 	// tells the disk device manager, that the parition has been modified
 
+// disk systems
+disk_system_id find_disk_system(const char *name);
+
 // jobs
 bool set_disk_device_job_status(disk_job_id job, uint32 status);
 	// probably not needed
