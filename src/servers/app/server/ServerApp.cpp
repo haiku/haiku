@@ -574,6 +574,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 
 			if(sbmp)
 			{
+				fBitmapList->AddItem(sbmp);
 				PortLink replylink(replyport);
 				replylink.SetOpCode(SERVER_TRUE);
 				replylink.Attach<int32>(sbmp->Token());
@@ -607,7 +608,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<int32>(&bmp_id);
 			msg->Read<int32>(&replyport);
 			
-			ServerBitmap *sbmp=_FindBitmap(bmp_id);
+			ServerBitmap *sbmp=FindBitmap(bmp_id);
 			if(sbmp)
 			{
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",fSignature.String(),bmp_id));
@@ -920,7 +921,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 	\param token ID token of the bitmap to find
 	\return The bitmap having that ID or NULL if not found
 */
-ServerBitmap *ServerApp::_FindBitmap(int32 token)
+ServerBitmap *ServerApp::FindBitmap(int32 token)
 {
 	ServerBitmap *temp;
 	for(int32 i=0; i<fBitmapList->CountItems();i++)

@@ -705,6 +705,93 @@ void ServerWindow::DispatchMessage(int32 code)
 	switch(code)
 	{
 		//--------- BView Messages -----------------
+		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
+		{
+			int32		bitmapToken;
+			BPoint 		point;
+			
+			fSession->ReadInt32(&bitmapToken);
+			fSession->ReadPoint(&point);
+			
+			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
+			if(sbmp)
+			{
+				BRect src, dst;
+				BRegion region;
+				
+				src = sbmp->Bounds();
+				dst = cl->_parent->ConvertFromParent(cl->_full.Frame());
+				region = cl->_parent->ConvertFromParent(&(cl->_full));
+				dst.OffsetBy(point);
+				
+				cl->fDriver->DrawBitmap(&region, sbmp, src, dst, cl->_layerdata);
+			}
+			break;
+		}
+		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
+		{
+			int32		bitmapToken;
+			BPoint 		point;
+			
+			fSession->ReadInt32(&bitmapToken);
+			fSession->ReadPoint(&point);
+			
+			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
+			if(sbmp)
+			{
+				BRect src, dst;
+				BRegion region;
+				
+				src = sbmp->Bounds();
+				dst = cl->_parent->ConvertFromParent(cl->_full.Frame());
+				region = cl->_parent->ConvertFromParent(&(cl->_full));
+				dst.OffsetBy(point);
+				
+				cl->fDriver->DrawBitmap(&region, sbmp, src, dst, cl->_layerdata);
+			}
+			break;
+		}
+		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
+		{
+			int32		bitmapToken;
+			BRect		srcRect, dstRect;
+			
+			fSession->ReadInt32(&bitmapToken);
+			fSession->ReadRect(&dstRect);
+			fSession->ReadRect(&srcRect);
+			
+			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
+			if(sbmp)
+			{
+				//cl->fDriver->DrawBitmap(&region, sbmp, srcRect, dstRect, cl->_layerdata);
+			}
+			break;
+		}
+		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
+		{
+			int32		bitmapToken;
+			BRect		srcRect, dstRect;
+			
+			fSession->ReadInt32(&bitmapToken);
+			fSession->ReadRect(&dstRect);
+			fSession->ReadRect(&srcRect);
+			
+			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
+			if(sbmp)
+			{
+				BRegion		region;
+				BRect		dst;
+				region = cl->_parent->ConvertFromParent(&(cl->_full));
+				dst = cl->_parent->ConvertFromParent(cl->_full.Frame());
+				dstRect.OffsetBy(dst.left, dst.top);
+				
+				cl->fDriver->DrawBitmap(&region, sbmp, srcRect, dstRect, cl->_layerdata);
+				//printf("%d %d %d %d %d %d %d %d %d %d\n", (int)cl->_boundsLeftTop.x, (int)cl->_boundsLeftTop.y,
+				//	(int)cl->_frame.left, (int)cl->_frame.top, (int)cl->_frame.right, (int)cl->_frame.bottom,
+				//	(int)cl->_parent->_frame.left, (int)cl->_parent->_frame.top, (int)cl->_parent->_frame.right, (int)cl->_parent->_frame.bottom);
+			}
+			break;
+		}
 		case AS_SET_CURRENT_LAYER:
 		{
 			int32 token;
@@ -2095,7 +2182,7 @@ printf("Deleting window...\n");
 			}
 			default:
 			{
-				STRACE(("ServerWindow %s: got a message to dispatch\n",win->Title()));
+				//STRACE(("ServerWindow %s: got a message to dispatch\n",win->Title()));
 				win->DispatchMessage(code);
 				break;
 			}

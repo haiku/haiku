@@ -38,6 +38,210 @@
 // handled by the public drawing functions.
 // Add clipping and make sure public functions have Lock & Unlock.
 
+struct integer_rect
+{
+	int32 x;
+	int32 y;
+	int32 w;
+	int32 h;
+};
+
+struct integer_scaling_info
+{
+	int32 k;
+};
+
+static inline void BRect_to_integer_rect(BRect source_rect, integer_rect &dest_rect)
+{
+	dest_rect.x = (int32)source_rect.left;
+	dest_rect.y = (int32)source_rect.top;
+	dest_rect.w = (int32)(source_rect.right - source_rect.left) + 1;
+	dest_rect.h = (int32)(source_rect.bottom - source_rect.top) + 1;
+}
+
+static inline integer_rect BRect_to_integer_rect(BRect source_rect)
+{
+	integer_rect dest_rect;
+	dest_rect.x = (int32)source_rect.left;
+	dest_rect.y = (int32)source_rect.top;
+	dest_rect.w = (int32)(source_rect.right - source_rect.left) + 1;
+	dest_rect.h = (int32)(source_rect.bottom - source_rect.top) + 1;
+	return dest_rect;
+}
+
+class Blitter
+{
+public:
+	Blitter();
+	void draw_8_to_8(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	void draw_8_to_16(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	void draw_8_to_32(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	
+	void draw_16_to_8(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	void draw_16_to_16(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	void draw_16_to_32(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	
+	void draw_32_to_8(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	void draw_32_to_16(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	void draw_32_to_32(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	
+	void draw_none(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor) {}
+	void Draw(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	
+	void Select(int32 source_bits_per_pixel, int32 dest_bits_per_pixel);
+	
+	drawing_mode GetDrawMode() const { return mode; }
+	void SetDrawMode(drawing_mode draw_mode) { mode = draw_mode; }
+	
+private:
+	void (Blitter::*DrawFunc)(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor);
+	drawing_mode mode;
+};
+
+static Blitter blitter;
+
+Blitter::Blitter()
+{
+	DrawFunc = &Blitter::draw_none;
+}
+
+void Blitter::draw_8_to_8(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	uint8 *s = (uint8 *)src;
+	uint8 *d = (uint8 *)dst;
+	
+	while(width--)
+	{
+		*d++ = s[xscale_position >> 16];
+		xscale_position += xscale_factor;
+	}
+}
+
+void Blitter::draw_8_to_16(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	uint8 *s = (uint8 *)src;
+	uint16 *d = (uint16 *)dst;
+	
+	while(width--)
+	{
+		*d++ = s[xscale_position >> 16];
+		xscale_position += xscale_factor;
+	}
+}
+
+void Blitter::draw_8_to_32(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	uint8 *s = (uint8 *)src;
+	uint32 *d = (uint32 *)dst;
+	
+	while(width--)
+	{
+		*d++ = s[xscale_position >> 16];
+		xscale_position += xscale_factor;
+	}
+}
+	
+void Blitter::draw_16_to_8(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	uint16 *s = (uint16 *)src;
+	uint8 *d = (uint8 *)dst;
+	
+	while(width--)
+	{
+		*d++ = s[xscale_position >> 16];
+		xscale_position += xscale_factor;
+	}
+}
+
+void Blitter::draw_16_to_16(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	uint16 *s = (uint16 *)src;
+	uint16 *d = (uint16 *)dst;
+	
+	while(width--)
+	{
+		*d++ = s[xscale_position >> 16];
+		xscale_position += xscale_factor;
+	}
+}
+
+void Blitter::draw_16_to_32(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	uint16 *s = (uint16 *)src;
+	uint32 *d = (uint32 *)dst;
+	
+	while(width--)
+	{
+		*d++ = s[xscale_position >> 16];
+		xscale_position += xscale_factor;
+	}
+}
+	
+void Blitter::draw_32_to_8(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	uint32 *s = (uint32 *)src;
+	uint8 *d = (uint8 *)dst;
+	
+	while(width--)
+	{
+		*d++ = s[xscale_position >> 16];
+		xscale_position += xscale_factor;
+	}
+}
+
+void Blitter::draw_32_to_16(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	uint32 *s = (uint32 *)src;
+	uint16 *d = (uint16 *)dst;
+	
+	while(width--)
+	{
+		*d++ = s[xscale_position >> 16];
+		xscale_position += xscale_factor;
+	}
+}
+
+void Blitter::draw_32_to_32(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	uint32 *s = (uint32 *)src;
+	uint32 *d = (uint32 *)dst;
+	
+	while(width--)
+	{
+		*d++ = s[xscale_position >> 16];
+		xscale_position += xscale_factor;
+	}
+}
+	
+void Blitter::Draw(uint8 *src, uint8 *dst, int32 width, int32 xscale_position, int32 xscale_factor)
+{
+	(this->*DrawFunc)(src, dst, width, xscale_position, xscale_factor);
+}
+
+void Blitter::Select(int32 source_bits_per_pixel, int32 dest_bits_per_pixel)
+{
+	if(source_bits_per_pixel == 8 && dest_bits_per_pixel == 8)
+		DrawFunc = &Blitter::draw_8_to_8;
+	else if(source_bits_per_pixel == 8 && dest_bits_per_pixel == 16)
+		DrawFunc = &Blitter::draw_8_to_16;
+	else if(source_bits_per_pixel == 8 && dest_bits_per_pixel == 32)
+		DrawFunc = &Blitter::draw_8_to_32;
+	else if(source_bits_per_pixel == 16 && dest_bits_per_pixel == 16)
+		DrawFunc = &Blitter::draw_16_to_16;
+	else if(source_bits_per_pixel == 16 && dest_bits_per_pixel == 8)
+		DrawFunc = &Blitter::draw_16_to_8;
+	else if(source_bits_per_pixel == 16 && dest_bits_per_pixel == 32)
+		DrawFunc = &Blitter::draw_16_to_32;
+	else if(source_bits_per_pixel == 32 && dest_bits_per_pixel == 32)
+		DrawFunc = &Blitter::draw_32_to_32;
+	else if(source_bits_per_pixel == 32 && dest_bits_per_pixel == 16)
+		DrawFunc = &Blitter::draw_32_to_16;
+	else if(source_bits_per_pixel == 32 && dest_bits_per_pixel == 8)
+		DrawFunc = &Blitter::draw_32_to_8;
+	else
+		DrawFunc = &Blitter::draw_none;
+}
+
 LineCalc::LineCalc()
 {
 }
@@ -304,14 +508,169 @@ void DisplayDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 
 /*!
 	\brief Called for all BView::DrawBitmap calls
+	\param region Destination rects in screen coordinates
 	\param bmp Bitmap to be drawn. It will always be non-NULL and valid. The color 
 	space is not guaranteed to match.
 	\param src Source rectangle
 	\param dest Destination rectangle. Source will be scaled to fit if not the same size.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 */
+
+void DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
+{
+	Lock();
+
+	FBBitmap		frameBuffer;
+	FBBitmap		*bmp = &frameBuffer;
+	
+	blitter.Select(32, 32);
+	
+	if(!AcquireBuffer(&frameBuffer))
+	{
+		debugger("ERROR: Couldn't acquire framebuffer in DrawBitmap()\n");
+		return;
+	}
+	
+	uint8 colorspace_size = (bitmap->BitsPerPixel() + 7) / 8;
+	
+	int32 count = region->CountRects();
+	
+	BRect bitmaprect(bitmap->Bounds());
+	BRect sourcerect(source);
+	
+	BRect destrect(dest);
+	destrect.right *= d->scale;
+	destrect.bottom *= d->scale;
+	
+	if(sourcerect.left < 0) sourcerect.left = 0;
+	if(sourcerect.top < 0) sourcerect.top = 0;
+	
+	if(sourcerect.Width() > bitmaprect.Width())
+		sourcerect.right = bitmaprect.left + bitmaprect.Width();
+	
+	if(sourcerect.Height() > bitmaprect.Height())
+		sourcerect.bottom = bitmaprect.top + bitmaprect.Height();
+	
+	int32 sourcewidth = (int32)sourcerect.Width() + 1;
+	int32 sourceheight = (int32)sourcerect.Height() + 1;
+	
+	int32 destwidth = (int32)destrect.Width() + 1;
+	int32 destheight = (int32)destrect.Height() + 1;
+	
+	int32 xscale_factor = (sourcewidth << 16) / destwidth;
+	int32 yscale_factor = (sourceheight << 16) / destheight;
+	
+	uint8 *src_bits = (uint8 *)bitmap->Bits();
+	uint8 *dest_bits = (uint8*)bmp->Bits();
+	
+	int32 src_row = bitmap->BytesPerRow();
+	int32 dest_row = bmp->BytesPerRow();
+	
+	src_bits += uint32((sourcerect.top * src_row) + (sourcerect.left * colorspace_size));
+	
+	integer_rect src_integer_rectangle = BRect_to_integer_rect(sourcerect);
+	integer_rect dst_integer_rectangle = BRect_to_integer_rect(destrect);
+	
+	int32 xscale_position = 0, yscale_position = 0, clipped_xscale_position = 0;
+	
+	for(int32 c = 0; c < count; c++)
+	{
+		integer_rect screen_integer_rect = BRect_to_integer_rect(region->RectAt(c));
+		integer_rect src_integer_rect = src_integer_rectangle;
+		integer_rect dst_integer_rect = dst_integer_rectangle;
+		
+		xscale_position = 0, yscale_position = 0, clipped_xscale_position = 0;
+		
+		if(dst_integer_rect.x < screen_integer_rect.x)
+		{
+			dst_integer_rect.x -= screen_integer_rect.x;
+			dst_integer_rect.w += dst_integer_rect.x;
+			src_integer_rect.x -= dst_integer_rect.x;
+			dst_integer_rect.x = screen_integer_rect.x;
+		}
+		
+		if(dst_integer_rect.y < screen_integer_rect.y)
+		{
+			dst_integer_rect.y -= screen_integer_rect.y;
+			dst_integer_rect.h += dst_integer_rect.y;
+			src_integer_rect.y -= dst_integer_rect.y;
+			dst_integer_rect.y = screen_integer_rect.y;
+		}
+		
+		if(dst_integer_rect.w > screen_integer_rect.w)
+			dst_integer_rect.w = screen_integer_rect.w;
+		
+		if(dst_integer_rect.h > screen_integer_rect.h)
+			dst_integer_rect.h = screen_integer_rect.h;
+		
+		if(src_integer_rect.x > src_integer_rectangle.x)
+		{
+			int32 x_scale_pixel_multiply = src_integer_rect.x - src_integer_rectangle.x;
+			clipped_xscale_position = xscale_factor * x_scale_pixel_multiply;
+		}
+		
+		if(src_integer_rect.y > src_integer_rectangle.y)
+		{
+			int32 y_scale_pixel_multiply = src_integer_rect.y - src_integer_rectangle.y;
+			yscale_position = yscale_factor * y_scale_pixel_multiply;
+		}
+		
+		if(dst_integer_rect.w > 0 && dst_integer_rect.h > 0)
+		{
+			uint8 *src_data = src_bits;
+			uint8 *dst_data = (uint8 *)dest_bits + dst_integer_rect.y * dest_row + dst_integer_rect.x * colorspace_size;
+			
+			while(dst_integer_rect.h--)
+			{
+				xscale_position = clipped_xscale_position;
+				uint8 *s = (uint8 *)((uint8 *)src_data + (yscale_position >> 16) * src_row);
+				uint8 *d = (uint8 *)((uint8 *)dst_data);
+				
+				blitter.Draw(s, d, dst_integer_rect.w, xscale_position, xscale_factor);
+				#if 0
+				for(int32 x = 0; x < dst_integer_rect.w; x++)
+				{
+					*d++ = s[xscale_position >> 16];
+					xscale_position += xscale_factor;
+				}
+				#endif
+				dst_data += dest_row;
+				yscale_position += yscale_factor;
+			}
+		}
+	}
+	
+	ReleaseBuffer();
+	Unlock();
+	Invalidate(destrect);
+}
+
+/*!
+	\brief Called for all BView::DrawBitmap calls
+	\param bmp Bitmap to be drawn. It will always be non-NULL and valid. The color 
+	space is not guaranteed to match.
+	\param src Source rectangle
+	\param dest Destination rectangle. Source will be scaled to fit if not the same size.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+*/
+
 void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d)
 {
+	Lock();
+
+	FBBitmap		frameBuffer;
+	FBBitmap		*fbmp = &frameBuffer;
+	
+	if(!AcquireBuffer(&frameBuffer))
+	{
+		debugger("ERROR: Couldn't acquire framebuffer in DrawBitmap()\n");
+		return;
+	}
+	
+	ReleaseBuffer();
+	Unlock();
+	
+	Invalidate(dest);
 }
 
 void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BRegion* clipReg)

@@ -72,6 +72,7 @@ public:
 	
 	void SendMessageToClient( const BMessage* msg ) const;
 	void SetAppCursor(void);
+	ServerBitmap *FindBitmap(int32 token);
 	
 	team_id	ClientTeamID();
 	
