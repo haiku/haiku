@@ -166,9 +166,8 @@ arch_int_init2(kernel_args *ka)
 	// create a region to map the irq vector code into (physical address 0x0)
 	handlers = (void *)ka->arch_args.exception_handlers.start;
 	exception_region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "exception_handlers",
-		&handlers, REGION_ADDR_EXACT_ADDRESS,
-		ka->arch_args.exception_handlers.size, 
-		REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		&handlers, B_EXACT_ADDRESS, ka->arch_args.exception_handlers.size, 
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (exception_region < 0)
 		panic("arch_int_init2: could not create exception handler region\n");
 

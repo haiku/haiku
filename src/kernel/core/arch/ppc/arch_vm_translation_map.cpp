@@ -40,7 +40,7 @@ typedef struct vm_translation_map_arch_info_struct {
 } vm_translation_map_arch_info;
 
 
-static int 
+static status_t
 lock_tmap(vm_translation_map *map)
 {
 	recursive_lock_lock(&map->lock);
@@ -48,7 +48,7 @@ lock_tmap(vm_translation_map *map)
 }
 
 
-static int 
+static status_t
 unlock_tmap(vm_translation_map *map)
 {
 	recursive_lock_unlock(&map->lock);
@@ -103,16 +103,17 @@ fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID,
 }
 
 
-static int 
-map_tmap(vm_translation_map *map, addr_t virtualAddress, addr_t physicalAddress, unsigned int attributes)
+static status_t
+map_tmap(vm_translation_map *map, addr_t virtualAddress, addr_t physicalAddress, uint32 attributes)
 {
 	// lookup the vsid based off the va
 	uint32 virtualSegmentID = VADDR_TO_ASID(map, virtualAddress);
+	uint32 protection = 0;
 
-	if (attributes & LOCK_KERNEL)
-		attributes = 0; // all kernel mappings are R/W to supervisor code
-	else
-		attributes = (attributes & LOCK_RW) ? PTE_READ_WRITE : PTE_READ_ONLY;
+	// ToDo: check this
+	// all kernel mappings are R/W to supervisor code
+	if (attributes & (B_READ_AREA | B_WRITE_AREA))
+		protection = (attributes & B_WRITE_AREA) ? PTE_READ_WRITE : PTE_READ_ONLY;
 
 	//dprintf("vm_translation_map.map_tmap: vsid %d, pa 0x%lx, va 0x%lx\n", vsid, pa, va);
 
@@ -128,7 +129,7 @@ map_tmap(vm_translation_map *map, addr_t virtualAddress, addr_t physicalAddress,
 			continue;
 
 		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress, 
-			attributes, false);
+			protection, false);
 		map->map_count++;
 		return B_OK;
 	}
@@ -145,7 +146,7 @@ map_tmap(vm_translation_map *map, addr_t virtualAddress, addr_t physicalAddress,
 			continue;
 
 		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress, 
-			attributes, false);
+			protection, false);
 		map->map_count++;
 		return B_OK;
 	}
@@ -196,13 +197,13 @@ lookup_pagetable_entry(vm_translation_map *map, addr_t virtualAddress)
 }
 
 
-static int 
+static status_t
 unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 {
 	page_table_entry *entry;
 
-	start = ROUNDOWN(start, PAGE_SIZE);
-	end = ROUNDUP(end, PAGE_SIZE);
+	start = ROUNDOWN(start, B_PAGE_SIZE);
+	end = ROUNDUP(end, B_PAGE_SIZE);
 
 	dprintf("vm_translation_map.unmap_tmap: start 0x%lx, end 0x%lx\n", start, end);
 
@@ -218,31 +219,34 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 		start += B_PAGE_SIZE;
 	}
 
-	return 0;
+	return B_OK;
 }
 
 
-static int
-query_tmap(vm_translation_map *map, addr_t va, addr_t *out_physical, unsigned int *out_flags)
+static status_t
+query_tmap(vm_translation_map *map, addr_t va, addr_t *_outPhysical, uint32 *_outFlags)
 {
 	page_table_entry *entry;
 
 	// default the flags to not present
-	*out_flags = 0;
-	*out_physical = 0;
+	*_outFlags = 0;
+	*_outPhysical = 0;
 
 	entry = lookup_pagetable_entry(map, va);
 	if (entry == NULL)
 		return B_NO_ERROR;
 
-	*out_flags |= (entry->page_protection == PTE_READ_ONLY) ? LOCK_RO : LOCK_RW;
-	if (va >= KERNEL_BASE)
-		*out_flags |= LOCK_KERNEL; // XXX is this enough?
-	*out_flags |= entry->changed ? PAGE_MODIFIED : 0;
-	*out_flags |= entry->referenced ? PAGE_ACCESSED : 0;
-	*out_flags |= entry->valid ? PAGE_PRESENT : 0;
+	// ToDo: check this!
+	if (IS_KERNEL_ADDRESS(va))
+		*_outFlags |= B_KERNEL_READ_AREA | (entry->page_protection == PTE_READ_ONLY ? 0 : B_KERNEL_WRITE_AREA);
+	else
+		*_outFlags |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | (entry->page_protection == PTE_READ_ONLY ? 0 : B_WRITE_AREA);
 
-	*out_physical = entry->physical_page_number * B_PAGE_SIZE;
+	*_outFlags |= entry->changed ? PAGE_MODIFIED : 0;
+	*_outFlags |= entry->referenced ? PAGE_ACCESSED : 0;
+	*_outFlags |= entry->valid ? PAGE_PRESENT : 0;
+
+	*_outPhysical = entry->physical_page_number * B_PAGE_SIZE;
 
 	return B_OK;
 }
@@ -255,16 +259,16 @@ get_mapped_size_tmap(vm_translation_map *map)
 }
 
 
-static int 
-protect_tmap(vm_translation_map *map, addr_t base, addr_t top, unsigned int attributes)
+static status_t
+protect_tmap(vm_translation_map *map, addr_t base, addr_t top, uint32 attributes)
 {
 	// XXX finish
-	return -1;
+	return B_ERROR;
 }
 
 
-static int 
-clear_flags_tmap(vm_translation_map *map, addr_t virtualAddress, unsigned int flags)
+static status_t
+clear_flags_tmap(vm_translation_map *map, addr_t virtualAddress, uint32 flags)
 {
 	page_table_entry *entry = lookup_pagetable_entry(map, virtualAddress);
 	if (entry == NULL)
@@ -288,26 +292,26 @@ flush_tmap(vm_translation_map *map)
 }
 
 
-static int 
-get_physical_page_tmap(addr_t pa, addr_t *va, int flags)
+static status_t
+get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags)
 {
 	pa = ROUNDOWN(pa, PAGE_SIZE);
 
-	if(pa > IOSPACE_SIZE)
+	if (pa > IOSPACE_SIZE)
 		panic("get_physical_page_tmap: asked for pa 0x%lx, cannot provide\n", pa);
 
 	*va = (IOSPACE_BASE + pa);
-	return 0;
+	return B_OK;
 }
 
 
-static int 
+static status_t
 put_physical_page_tmap(addr_t va)
 {
 	if (va < IOSPACE_BASE || va >= IOSPACE_BASE + IOSPACE_SIZE)
 		panic("put_physical_page_tmap: va 0x%lx out of iospace region\n", va);
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -396,8 +400,8 @@ vm_translation_map_module_init2(kernel_args *ka)
 {
 	// create a region to cover the page table
 	sPageTableRegion = vm_create_anonymous_region(vm_get_kernel_aspace_id(), 
-		"page_table", (void **)&sPageTable, REGION_ADDR_EXACT_ADDRESS, 
-		sPageTableSize, REGION_WIRING_WIRED_ALREADY, LOCK_KERNEL | LOCK_RW);
+		"page_table", (void **)&sPageTable, B_EXACT_ADDRESS, 
+		sPageTableSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	// ToDo: for now just map 0 - 512MB of physical memory to the iospace region
 	block_address_translation bat;
@@ -440,7 +444,7 @@ vm_translation_map_module_init2(kernel_args *ka)
 	// create a region to cover the iospace
 	void *temp = (void *)IOSPACE_BASE;
 	vm_create_null_region(vm_get_kernel_aspace_id(), "iospace", &temp,
-		REGION_ADDR_EXACT_ADDRESS, IOSPACE_SIZE);
+		B_EXACT_ADDRESS, IOSPACE_SIZE);
 
 	return 0;
 }

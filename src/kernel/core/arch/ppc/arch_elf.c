@@ -32,9 +32,9 @@ arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 	addr_t S = 0;
 	addr_t final_val;
 
-#define P         ((addr_t)(image->regions[0].delta + rel[i].r_offset))
+#define P         ((addr_t)(image->text_region.delta + rel[i].r_offset))
 #define A         ((addr_t)rel[i].r_addend)
-#define B         (image->regions[0].delta)
+#define B         (image->text_region.delta)
 
 	for (i = 0; i * (int)sizeof(struct Elf32_Rela) < rel_len; i++) {
 #if CHATTY

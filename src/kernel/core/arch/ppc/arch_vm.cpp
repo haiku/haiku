@@ -86,8 +86,8 @@ arch_vm_init_existing_maps(kernel_args *ka)
 	void *temp = (void *)ka->fb.mapping.start;
 
 	// create a region for the framebuffer
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "framebuffer", &temp, REGION_ADDR_EXACT_ADDRESS,
-		ka->fb.mapping.size, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "framebuffer", &temp, B_EXACT_ADDRESS,
+		ka->fb.mapping.size, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	return B_NO_ERROR;
 }
