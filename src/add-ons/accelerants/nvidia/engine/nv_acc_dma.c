@@ -47,9 +47,11 @@ status_t nv_acc_wait_idle_dma()
 	 * we hit a timeout; abort if we failed at least three times before:
 	 * if DMA stalls, we have to forget about it alltogether at some point, or
 	 * the system will almost come to a complete halt.. */
-	while ((NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
-			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])
-			!= (si->engine.dma.put << 2)) &&
+	/* note:
+	 * it doesn't matter which FIFO channel's DMA registers we access, they are in
+	 * fact all the same set. It also doesn't matter if the channel was assigned a
+	 * command or not. */
+	while ((NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET) != (si->engine.dma.put << 2)) &&
 			(cnt < 10000) && (err < 3))
 	{
 		/* snooze a bit so I do not hammer the bus */
@@ -710,7 +712,9 @@ status_t nv_acc_init_dma()
 
 	/*** init FIFO via DMA command buffer. ***/
 	/* wait for room in fifo for new FIFO assigment cmds if needed: */
-	if (nv_acc_fifofree_dma(16) != B_OK) return B_ERROR;
+//fixme if CH6 and CH7 are assigned..
+//	if (nv_acc_fifofree_dma(16) != B_OK) return B_ERROR;
+	if (nv_acc_fifofree_dma(12) != B_OK) return B_ERROR;
 
 	/* program new FIFO assignments */
 	/* Raster OPeration: */
@@ -726,13 +730,11 @@ status_t nv_acc_init_dma()
 	/* Bitmap: */
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH5, si->engine.fifo.handle[5]);
 	/* Line: (not used or 3D only?) */
-//fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
+//fixme..
 //	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH6, si->engine.fifo.handle[6]);
-	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH6, si->engine.fifo.handle[0]);
 	/* Textured Triangle: (3D only) */
-//fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
+//fixme..
 //	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[7]);
-	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[0]);
 
 	/*** Set pixel width ***/
 	switch(si->dm.space)
@@ -795,20 +797,17 @@ static void nv_start_dma(void)
 	if (si->engine.dma.current != si->engine.dma.put)
 	{
 		si->engine.dma.put = si->engine.dma.current;
-		/* fixme: is this actually needed? (force some flush somewhere) */
-//		ISAWB(0x03d0, 0x00);
 		/* dummy read the first adress of the framebuffer: flushes MTRR-WC buffers so
 		 * we know for sure the DMA command buffer received all data. */
 		dummy = *((char *)(si->framebuffer));
 		/* actually start DMA to execute all commands now in buffer */
 		/* note:
-		 * the actual FIFO channel that gets activated does not really matter:
-		 * all FIFO fill-level info actually points at the same registers. */
+		 * it doesn't matter which FIFO channel's DMA registers we access, they are in
+		 * fact all the same set. It also doesn't matter if the channel was assigned a
+		 * command or not. */
 		/* note also:
 		 * NV_GENERAL_DMAPUT is a write-only register on some cards (confirmed NV11). */
-		NV_REG32(NVACC_FIFO + NV_GENERAL_DMAPUT +
-			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])]) =
-			(si->engine.dma.put << 2);
+		NV_REG32(NVACC_FIFO + NV_GENERAL_DMAPUT) = (si->engine.dma.put << 2);
 	}
 }
 
@@ -831,8 +830,11 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 		/* see where the engine is currently fetching from the buffer */
 		/* note:
 		 * read this only once in the code as accessing registers is relatively slow */
-		dmaget = ((NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
-			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])) >> 2);
+		/* note also:
+		 * it doesn't matter which FIFO channel's DMA registers we access, they are in
+		 * fact all the same set. It also doesn't matter if the channel was assigned a
+		 * command or not. */
+		dmaget = ((NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET)) >> 2);
 
 		/* update timeout counter: on NV11 on a Pentium4 2.8Ghz max reached count
 		 * using BeRoMeter 1.2.6 was about 600; so counting 10000 before generating
