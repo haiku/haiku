@@ -28,6 +28,8 @@ udf_long_address to_long_address(vnode_id id, uint32 length = 0);
 
 vnode_id to_vnode_id(udf_long_address address);
 
+time_t make_time(udf_timestamp &timestamp);
+
 } // namespace Udf
 
 #endif	// _UDF_UTILS_H
