@@ -930,6 +930,14 @@ probe_for_device_type(const char *type)
 			return B_NO_MEMORY;
 		}
 
+		if (S_ISDIR(stat.st_mode)) {
+			// We need to make sure that drivers in ie. "audio/raw/" can
+			// be found as well - therefore, we must make sure that "audio"
+			// exists on /dev.
+			if (type[0])
+				devfs_publish_directory(type);
+			continue;
+		}
 		entry->device = stat.st_dev;
 		entry->node = stat.st_ino;
 
