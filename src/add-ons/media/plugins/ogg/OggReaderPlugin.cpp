@@ -98,12 +98,8 @@ oggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 #ifdef STRICT_OGG
 		return B_ERROR;
 #else
-		if (ogg_stream_clear(fStreams[serialno]) != 0) {
-			TRACE("oggReader::GetPage: ogg_stream_destroy failed?: error\n");
-			return B_ERROR;
-		}
-		if (ogg_stream_init(fStreams[serialno],serialno) != 0) {
-			TRACE("oggReader::GetPage: ogg_stream_init failed?: error\n");
+		if (ogg_stream_reset(fStreams[serialno]) != 0) {
+			TRACE("oggReader::GetPage: ogg_stream_reset failed?: error\n");
 			return B_ERROR;
 		}
 #endif
@@ -222,6 +218,21 @@ oggReader::FreeCookie(void *cookie)
 	return B_OK;
 }
 
+// estimate: 1 frame = 256 bytes
+int filePositionToFrame(int position) {
+	return position/256;
+}
+int frameToFilePosition(int frame) {
+	return frame*256;
+}
+
+// estimate: 1 second = 8 bytes
+int filePositionToTime(int position) {
+	return position*1000/8;
+}
+int timeToFilePosition(int duration) {
+	return duration*8/1000;
+}
 
 status_t
 oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
@@ -237,8 +248,8 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 			input_length = fSeekable->Seek(0,SEEK_END);
 			fSeekable->Seek(current_position,SEEK_SET);
 		}
-		*frameCount = input_length/256;  // estimate: 1 frame = 256 bytes
-		*duration = input_length*1000/8; // estimate: 1 second = 8 bytes
+		*frameCount = filePositionToFrame(input_length);
+		*duration = filePositionToTime(input_length);
 	} else {
 		assert(sizeof(bigtime_t)==sizeof(uint64_t));
 		// if the input is not seekable, we return really large sizes
@@ -258,8 +269,6 @@ oggReader::Seek(void *cookie,
 				int64 *frame, bigtime_t *time)
 {
 	TRACE("oggReader::Seek\n");
-	return B_OK;
-	debugger("oggReader::Seek");
 	if (!fSeekable) {
 		TRACE("oggReader::Seek: not a PositionIO: not seekable\n");
 		return B_ERROR;
@@ -267,20 +276,22 @@ oggReader::Seek(void *cookie,
 	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	int position;
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
-		position = *frame;
+		position = frameToFilePosition(*frame);
 	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
-		position = *time;
+		position = timeToFilePosition(*time);
 	} else {
 		return B_ERROR;
 	}
+	*frame = filePositionToFrame(position);
+	*time = filePositionToTime(position);
+
 	// TODO: use B_MEDIA_SEEK_CLOSEST_BACKWARD, B_MEDIA_SEEK_CLOSEST_FORWARD to find key frame
-	int serialno = stream->serialno;
-	if (ogg_stream_clear(stream) != 0) {
-		TRACE("oggReader::GetPage: ogg_stream_destroy failed?: error\n");
+	if (ogg_sync_clear(&fSync) != 0) {
+		TRACE("oggReader::Seek: ogg_sync_clear failed?: error\n");
 		return B_ERROR;
 	}
-	if (ogg_stream_init(stream,serialno) != 0) {
-		TRACE("oggReader::GetPage: ogg_stream_init failed?: error\n");
+	if (ogg_stream_reset(stream) != 0) {
+		TRACE("oggReader::Seek: ogg_stream_reset failed?: error\n");
 		return B_ERROR;
 	}
 	fSeekable->Seek(position,SEEK_SET);
