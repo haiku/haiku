@@ -127,7 +127,6 @@ typedef struct vm_address_space {
 typedef struct vm_store {
 	struct vm_store_ops	*ops;
 	struct vm_cache		*cache;
-	void				*data;
 	off_t				committed_size;
 } vm_store;
 
