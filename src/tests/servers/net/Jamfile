@@ -1,4 +1,3 @@
 SubDir OBOS_TOP src tests servers net ;
 
-# SubInclude OBOS_TOP src tests servers net userland_modules ;
 SubInclude OBOS_TOP src tests servers net net_server ;

@@ -6,11 +6,13 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include <drivers/KernelExport.h>
+#include <drivers/module.h>
+
 #include <app/Application.h>
 #include <app/Roster.h>
 #include <kernel/OS.h>
 #include <kernel/image.h>
-#include <drivers/module.h>
 #include <storage/StorageDefs.h>
 #include <storage/FindDirectory.h>
 #include <storage/Path.h>
@@ -86,8 +88,8 @@ static int32 g_next_module_id = 1;
 
 _EXPORT status_t get_module(const char * name, module_info ** mi)
 {
-	module * m;
 	status_t status;
+	module * m;
 	
 	printf("get_module(%s)\n", name);
 	
@@ -98,17 +100,20 @@ _EXPORT status_t get_module(const char * name, module_info ** mi)
 	if (!m)
 		return B_NAME_NOT_FOUND;
 	
-	status = B_OK;
 	*mi = m->info;
 	
+	status = B_OK;
+
 	if (m->addon) // built-in modules don't comes from addon...
 		atomic_add(&m->addon->ref_count, 1);
 
 	if (atomic_add(&m->ref_count, 1) == 0) {
 		// first time we reference this module, so let's init it:
 		status = init_module(m);
-		if (status != B_OK && m->addon != NULL)
-			unload_module_addon(m->addon);
+		if (status != B_OK) {
+			printf("Failed to init module %s: %s.\n", m->name, strerror(status));
+			unload_module_addon(m->addon);	// unload the module addon...
+		};
 	};
 		
 	return status;
@@ -277,7 +282,7 @@ _EXPORT status_t read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 			// We look *only* under prefix-matching sub-path 
 			path.Append(mlc->prefix);
 
-			printf("Looking module(s) in %s/%s...\n", mlc->search_path, mlc->prefix);
+			// printf("Looking module(s) in %s/%s...\n", mlc->search_path, mlc->prefix);
 			 
 			dir = new BDirectory(path.Path());
 			if (dir)
@@ -381,7 +386,7 @@ _EXPORT void kprintf(const char *fmt, ...)
 }
 
 
-_EXPORT int load_driver_symbols(const char *driver_name)
+_EXPORT status_t load_driver_symbols(char *driver_name)
 {
 	// Userland debugger will extract symbols itself...
 	return B_OK;
@@ -507,7 +512,7 @@ error:
 	};
 
 	unload_add_on(addon_id);
-	printf("Addon %s unloaded.\n", path);
+	// printf("Addon %s unloaded.\n", path);
 	return NULL;
 }
 
@@ -517,7 +522,9 @@ static status_t unload_module_addon(module_addon * ma)
 	module * prev;
 	status_t status;
 	
-	ASSERT(ma);
+	if (!ma)
+		// built-in modules are addon-less, so nothing to do...
+		return B_OK;
 
 	if (ma->keep_loaded) {
 		printf("B_KEEP_LOADED flag set for %s module addon. Will be *never* unloaded!\n",
@@ -599,7 +606,7 @@ static module * search_module(const char * name)
 	char * search_path;
 	char * next_path_token; 
 
-	printf("search_module(%s):\n", name);
+	// printf("search_module(%s):\n", name);
 
 	search_paths = getenv("ADDON_PATH");
 	if (!search_paths)
@@ -624,13 +631,13 @@ static module * search_module(const char * name)
 			addons_path.SetTo(search_path);
 		};
 		
-		printf("Looking into %s\n", search_path);
+		// printf("Looking into %s\n", search_path);
 
 		path.SetTo(addons_path.Path());
 		path.Append(name);
 		
 		while(path != addons_path) {
-			printf("  %s ?\n", path.Path());
+			// printf("  %s ?\n", path.Path());
 			entry.SetTo(path.Path());
 			if (entry.IsFile() || entry.IsSymLink()) {
 				module_addon * ma;
@@ -655,10 +662,12 @@ static module * search_module(const char * name)
 
 	free(search_paths);
 
+/*
 	if (found_module)
 		printf("  Found it in %s addon module!\n",
 				found_module->addon ? found_module->addon->path : "BUILTIN");
-	
+*/
+
 	return found_module;
 }
 
@@ -673,16 +682,16 @@ static status_t init_module(module * m)
 	case MODULE_LOADED:
 		m->state = MODULE_INITING;
 		ASSERT(m->info);
-		printf("Initing module %s... ", m->name);
+		// printf("Initing module %s... ", m->name);
 		status = m->info->std_ops(B_MODULE_INIT);
-		printf("done (%s).\n", strerror(status));
+		// printf("done (%s).\n", strerror(status));
 		m->state = (status == B_OK) ? MODULE_READY : MODULE_LOADED;
 		
 		if (m->state == MODULE_READY && m->keep_loaded && m->addon) {
   			// one module (at least) was inited and request to never being
 			// unload from memory, so keep the corresponding addon loaded
-   			printf("module %s set B_KEEP_LOADED flag:\nmodule addon %s will never be unloaded!\n",
-				m->name, m->addon->path);
+   			// printf("module %s set B_KEEP_LOADED flag:\nmodule addon %s will never be unloaded!\n",
+			//	m->name, m->addon->path);
    			m->addon->keep_loaded = true;
    		};
 		break;
@@ -713,9 +722,9 @@ static status_t uninit_module(module * m)
 	case MODULE_READY:		
 		m->state = MODULE_UNINITING;
 		ASSERT(m->info);
-		printf("Uniniting module %s... ", m->name);
+		// printf("Uniniting module %s... ", m->name);
 		status = m->info->std_ops(B_MODULE_UNINIT);
-		printf("done (%s).\n", strerror(status));
+		// printf("done (%s).\n", strerror(status));
 		m->state = (status == B_OK) ? MODULE_LOADED : MODULE_ERROR;
 		break;
 		

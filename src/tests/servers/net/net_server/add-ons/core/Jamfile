@@ -22,5 +22,5 @@ Addon core : net_server/network :
 	socket.c
 ;
 
-LinkSharedOSLibs core : root /system/servers/net_server ;
+LinkSharedOSLibs core : root be _APP_ ;
 
