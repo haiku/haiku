@@ -15,7 +15,9 @@
 #include <scsi.h>
 
 #include <fsproto.h>
+#ifndef COMPILE_IN_BEOS
 #include <fs_volume.h>
+#endif
 #include <lock.h>
 #include <cache.h>
 
