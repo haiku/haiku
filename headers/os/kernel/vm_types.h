@@ -1,6 +1,8 @@
 #ifndef _PUBLIC_KERNEL_VM_TYPES_H
 #define _PUBLIC_KERNEL_VM_TYPES_H
 
+// ToDo: this file shouldn't be in the public folder
+
 #include <kernel.h>
 #include <stage2.h>
 #include <defines.h>

@@ -351,9 +351,9 @@ typedef int32 (*thread_func) (void *);
  * @note the maximum length of name is B_OS_NAME_LENGTH characters
  */
 thread_id spawn_thread (thread_func, const char *, int32, void *);
-int       kill_thread(thread_id thread);
-int       resume_thread(thread_id thread);
-int       suspend_thread(thread_id thread);
+status_t  kill_thread(thread_id thread);
+status_t  resume_thread(thread_id thread);
+status_t  suspend_thread(thread_id thread);
 
 thread_id find_thread(const char *);
 

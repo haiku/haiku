@@ -8,7 +8,6 @@
 /* this file shouldn't be in the public folder! */
 
 #include <ktypes.h>
-#include <types.h>
 #include <defines.h>
 #include <resource.h>
 #include <vfs_types.h>
@@ -33,9 +32,9 @@ int     sys_snooze(bigtime_t time);
 sem_id sys_create_sem(int count, const char *name);
 int    sys_delete_sem(sem_id id);
 int    sys_acquire_sem(sem_id id);
-int    sys_acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout);
+int    sys_acquire_sem_etc(sem_id id, uint32 count, uint32 flags, bigtime_t timeout);
 int    sys_release_sem(sem_id id);
-int    sys_release_sem_etc(sem_id id, int count, int flags);
+int    sys_release_sem_etc(sem_id id, uint32 count, uint32 flags);
 int    sys_sem_get_count(sem_id id, int32* thread_count);
 int    sys_get_sem_info(sem_id, struct sem_info *, size_t);
 int    sys_get_next_sem_info(team_id, uint32 *, struct sem_info *, size_t);
@@ -44,7 +43,7 @@ int    sys_set_sem_owner(sem_id id, team_id proc);
 void sys_exit(int retcode);
 team_id sys_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
 
-thread_id sys_spawn_thread(int (*func)(void*), const char *, int, void *);
+thread_id sys_spawn_thread(int32 (*func)(void*), const char *, int32, void *);
 thread_id sys_get_current_thread_id(void);
 int       sys_suspend_thread(thread_id tid);
 int       sys_resume_thread(thread_id tid);
