@@ -76,9 +76,11 @@ PartitionMapParser::_ParsePrimary(const partition_table_sector *pts)
 			const partition_descriptor *descriptor = &pts->table[i];
 			PrimaryPartition *partition = fMap->PrimaryPartitionAt(i);
 			partition->SetTo(descriptor, 0, fBlockSize);
-			// fail, if location is bad
+			// ignore, if location is bad
 			if (!partition->CheckLocation(fSessionSize, fBlockSize)) {
-				error = B_BAD_DATA;
+				TRACE(("intel: _ParsePrimary(): partition %ld: bad location, "
+					"ignoring\n"));
+				partition->Unset();
 				break;
 			}
 		}
