@@ -91,6 +91,7 @@ union value {
 class Term {
 	public:
 		Term(int8 op) : fOp(op), fParent(NULL) {}
+		virtual ~Term() {}
 
 		int8		Op() const { return fOp; }
 
@@ -127,7 +128,7 @@ class Term {
 class Equation : public Term {
 	public:
 		Equation(char **expr);
-		~Equation();
+		virtual ~Equation();
 
 		virtual status_t InitCheck();
 
@@ -175,7 +176,7 @@ class Equation : public Term {
 class Operator : public Term {
 	public:
 		Operator(Term *,int8,Term *);
-		~Operator();
+		virtual ~Operator();
 
 		Term		*Left() const { return fLeft; }
 		Term		*Right() const { return fRight; }
