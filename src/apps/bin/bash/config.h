@@ -127,7 +127,7 @@
 
 /* Define NETWORK_REDIRECTIONS if you want /dev/(tcp|udp)/host/port to open
    socket connections when used in redirections */
-#define NETWORK_REDIRECTIONS 1
+//#define NETWORK_REDIRECTIONS 1
 
 /* Define PROGRAMMABLE_COMPLETION for the programmable completion features
    and the complete builtin. */

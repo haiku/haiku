@@ -19,7 +19,7 @@ StaticLibrary sh :
 	shtty.c
 	inet_aton.c
 	netconn.c
-	netopen.c
+#	netopen.c
 	timeval.c
 	makepath.c
 	pathcanon.c
