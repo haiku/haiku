@@ -8,30 +8,31 @@
 
 // Device Types
 
-#define B_DEVICE_TYPE_FLOPPY_DISK	"Floppy Disk Media";
-#define B_DEVICE_TYPE_HARD_DISK		"Hard Disk Media";
-#define B_DEVICE_TYPE_CD			"CD-ROM Media";
-#define B_DEVICE_TYPE_DVD			"DVD-ROM Media";
+const char *kDeviceTypeFloppyDisk	= "Floppy Disk Media";
+const char *kDeviceTypeHardDisk		= "Hard Disk Media";
+const char *kDeviceTypeOptical		= "Optical Media";
 
 // Partition types
 
-#define B_PARTITION_TYPE_UNFORMATTED	"Unformatted";
+const char *kPartitionTypeUnrecognized	= "Unrecognized";
 
-#define B_PARTITION_TYPE_MULTISESSION	"Multisession Storage Device";
+const char *kPartitionTypeMultisession	= "Multisession Storage Device";
 
-#define B_PARTITION_TYPE_CD_AUDIO		"Compact Disc Audio Session";
+const char *kPartitionTypeCDDA			= "Compact Disc Audio Session";
 
-#define B_PARTITION_TYPE_APPLE			"Apple Partition Map";
-#define B_PARTITION_TYPE_INTEL			"Intel Partition Map";
-#define B_PARTITION_TYPE_INTEL_EXTENDED	"Intel Extended Partition";
+const char *kPartitionTypeAmiga			= "Amiga Partition Map";
+const char *kPartitionTypeApple			= "Apple Partition Map";
+const char *kPartitionTypeIntel			= "Intel Partition Map";
+const char *kPartitionTypeIntelExtended	= "Intel Extended Partition";
 
-#define B_PARTITION_TYPE_BFS			"BFS Filesystem";
-#define B_PARTITION_TYPE_EXT2			"EXT2 Filesystem";
-#define B_PARTITION_TYPE_EXT3			"EXT3 Filesystem";
-#define B_PARTITION_TYPE_FAT12			"FAT12 Filesystem";
-#define B_PARTITION_TYPE_FAT32			"FAT32 Filesystem";
-#define B_PARTITION_TYPE_ISO9660		"ISO9660 Filesystem";
-#define B_PARTITION_TYPE_REISER			"Reiser Filesystem";
-#define B_PARTITION_TYPE_UDF			"UDF Filesystem";
+const char *kPartitionTypeAmigaFFS		= "AmigaFFS Filesystem";
+const char *kPartitionTypeBFS			= "BFS Filesystem";
+const char *kPartitionTypeEXT2			= "EXT2 Filesystem";
+const char *kPartitionTypeEXT3			= "EXT3 Filesystem";
+const char *kPartitionTypeFAT12			= "FAT12 Filesystem";
+const char *kPartitionTypeFAT32			= "FAT32 Filesystem";
+const char *kPartitionTypeISO9660		= "ISO9660 Filesystem";
+const char *kPartitionTypeReiser		= "Reiser Filesystem";
+const char *kPartitionTypeUDF			= "UDF Filesystem";
 
 #endif // _DISK_DEVICE_TYPES_H

@@ -8,7 +8,6 @@
 
 class BDiskDevice;
 class BPartition;
-class BSession;
 
 // BDiskDeviceVisitor
 class BDiskDeviceVisitor {
@@ -18,7 +17,6 @@ public:
 
 	// return true to abort iteration
 	virtual bool Visit(BDiskDevice *device);
-	virtual bool Visit(BSession *session);
 	virtual bool Visit(BPartition *partition);
 };
 

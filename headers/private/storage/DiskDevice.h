@@ -8,17 +8,19 @@
 
 class BDiskDevice : public BPartition {
 public:
-	void Unset();	// What is this for?
-	
 	char* DeviceType() const;
-	virtual char* Path() const;
-
 	bool IsRemovable() const;
 	bool HasMedia() const;
 
 	status_t Eject(bool update = false);
 
 	status_t Update(bool *updated = NULL);
+	void Unset();
+	
+	bool IsModified() const;
+	int32 CommitModifications(bool synchronously = true,
+		BMessenger progressMessenger = BMessenger(),
+		BMessage *template = NULL);
 private:
 	friend class BDiskDeviceList;
 	friend class BDiskDeviceRoster;

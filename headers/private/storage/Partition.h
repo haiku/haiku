@@ -8,78 +8,102 @@
 
 #include <ObjectList.h>
 
+class BDiskDevice;
+
+// partition statuses
+enum {
+	B_PARTITION_VALID,
+	B_PARTITION_CORRUPT,
+	B_PARTITION_UNRECOGNIZED,
+}
+
 class BPartition {
 public:
-	// General Info
+	// Partition Info
 	
 	off_t Offset() const;		// 0 for devices
 	off_t Size() const;
 	int32 BlockSize() const;
 	int32 Index() const;		// 0 for devices
+	uint32 Status() const;
 	
-	bool IsMountable();
-	bool IsPartitionable();
-	bool IsDevice();
+	bool IsMountable() const;
+	bool IsPartitionable() const;
+
+	bool IsDevice() const;
 	bool IsReadOnly() const;
+	bool IsMounted() const;
 	
 	const char* Name() const;
 	const char* Type() const;   // See DiskDeviceTypes.h
 	int32 UniqueID() const;
-	virtual char* Path() const; // Recursively obtained down to the parent device
+	uint32 Flags() const;		
 	
-	uint32 Flags() const;		// not sure if this is really necessary anymore
-	
+	status_t GetPath(BPath *path) const;
+	status_t GetVolume(BVolume *volume) const;
+	status_t GetIcon(BBitmap *icon, icon_size which) const;
 
+	status_t Mount(uint32 mountFlags = 0, const char *parameters = NULL);
+	status_t Unmount();
+	
 	// Hierarchy Info
 
-	const BPartition* Parent();
-	BPartition* PartitionAt(int32 index) const;
-	BPartition* PartitionWithID(int32 id);
+	BDiskDevice* Device() const;
+	BPartition* Parent() const;
+	BPartition* ChildAt(int32 index) const;
+	int32 CountChildren() const;
 
-	int32 CountChildren() const;	// Immediate descendents
-	int32 CountDescendents() const;	// All descendents
+	BPartitionableSpace* PartitionableSpaceAt(int32 index) const;
+	int32 CountPartitionableSpaces() const;
 	
 	BPartition* VisitEachChild(BDiskDeviceVisitor *visitor);
-	bool Traverse(BDiskDeviceVisitor *visitor);
+	BPartition* VisitSubtree(BDiskDeviceVisitor *visitor);
 
+	// Self Modification
 
-	// Functions relevant to manipulating *this* partition
-
-	off_t MinimumSize();
-	off_t MaximumSize();
-		// Both based on information obtained from the system used for the
-		// partition and the partitioning system used for its parent
-
-	int32 MoveTo(off_t start, BMessenger progressMessenger);
-	int32 Resize(off_t size, BMessenger progressMessenger);
+	bool IsLocked() const;
+	status_t Lock();	// to be non-blocking
+	status_t Unlock();
 	
-	status_t GetParameterEditor(BDiskScannerParameterEditor **editor,
-	                            BDiskScannerParameterEditor **parentEditor);
-		// For changing parameters of the partition after it's been initialized,
-		// i.e. file system block size, volume name, etc. "editor" is an editor
-		// for the system with which this partition is initialized, "parentEditor"
-		// is an editor for any settings the parent partitioning system may
-		// allow to be edited ("*parentEditor" will be set to NULL if not
-		// applicable).
+	bool CanDefragment() const;
+	status_t Defragment() const;
+	
+	bool CanRepair(bool checkOnly) const;
+	status_t Repair(bool checkOnly) const;
 
-	status_t GetInitializationParameterEditor(const char *system,
-	                                          BDiskScannerParameterEditor **editor);
-	int32 Initialize(const char *system,
-	                 const char *parameters,
-	                 BMessenger progressMessenger);
-	                 	// Initialization is used to set up a partition with either
-	                 	// an empty file system or an empty partitioning system
+	bool CanResize() const;
+	bool CanResizeWhileMounted() const;
+	status_t ValidateResize(off_t*) const;
+	status_t Resize(off_t);
 
+	bool CanMove() const;
+	status_t ValidateMove(off_t*) const;
+	status_t Move(off_t);
 
-	// Functions relevant to manipluating *child* partitions
+	bool CanEditParameters() const;
+	status_t GetParameterEditor(
+           BDiskScannerParameterEditor **editor,
+           BDiskScannerParameterEditor **parentEditor);
+    status_t ValidateSetParameters(const char **parameters) const;
+    status_t SetParameters(const char *parameters);
 
-	status_t GetPartitionCreationParameterEditor(BDiskScannerParameterEditor **editor);
-	int32 CreateChildPartition(off_t start,
-	                           off_t length,
-	                           const char *parameters,
-	                           BMessenger progressMessenger);
-	int32 DeleteChildPartition(int32 index,
-	                           BMessenger progressMessenger);	
+	bool CanInitialize() const;
+	status_t GetInitializationParameterEditor(const char *system,       
+               BDiskScannerParameterEditor **editor) const;
+    status_t ValidateInitialize(const char *diskSystem, const char **parameters) const;
+	status_t Initialize(const char *diskSystem,
+	                 const char *parameters);
+	
+	// Modification of child partitions
+
+	bool CanCreateChild() const;
+	status_t ValidateCreateChild(
+	           off_t *start, 
+	           off_t *size) const;
+	status_t CreateChild(off_t start, off_t size);
+	
+	bool CanDeleteChild(int32 index) const;
+	status_t DeleteChild();
 	
 protected:
 	BObjectList<BPartition>	fChildren;
