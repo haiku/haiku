@@ -17,7 +17,6 @@
 /*! \brief Returns a string describing the given number of bytes
 	in the most appropriate units (i.e. bytes, KB, MB, etc.).
 */
-static
 std::string
 bytes_to_string(uint64 bytes)
 {
@@ -54,7 +53,7 @@ bytes_to_string(uint64 bytes)
 	double scaledValue = double(bytes) / double(divisor);
 	char scaledString[10];
 		// Should really only need 7 chars + NULL...
-	sprintf(scaledString, "%.1f ", scaledValue);
+	sprintf(scaledString, divisor == 1 ? "%.0f " : "%.1f ", scaledValue);
 	return std::string(scaledString) + units;	
 }
 

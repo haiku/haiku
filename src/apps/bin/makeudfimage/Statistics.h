@@ -17,6 +17,8 @@
 #include <string>
 #include <SupportDefs.h>
 
+std::string bytes_to_string(uint64 bytes);
+
 class Statistics {
 public:
 	Statistics();
