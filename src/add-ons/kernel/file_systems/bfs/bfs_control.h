@@ -2,20 +2,12 @@
 #define BFS_CONTROL_H
 /* bfs_control - additional functionality exported via ioctl()
 **
-** Initial version by Axel Dörfler, axeld@pinc-software.de
+** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "fsproto.h"
-
-#ifdef __cplusplus
-}
-#endif
+#include <fs_interface.h>
 
 
 /* ioctl to check the version of BFS used - parameter is a uint32 *
