@@ -251,14 +251,44 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 		return NULL;
 
 	BRect rect(hintRect);
-	BView *view = new BView(rect, group.Name(), B_FOLLOW_ALL, B_WILL_DRAW);
+	BView *view = new BView(rect, group.Name(), B_FOLLOW_NONE, B_WILL_DRAW);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	// Add the sub-group views
+	// Create the parameter views - but don't add them yet
 
 	rect.OffsetTo(B_ORIGIN);
 	rect.InsetBySelf(5, 5);
+	
+	BList views;
+	for (int32 i = 0; i < group.CountParameters(); i++) {
+		BParameter *parameter = group.ParameterAt(i);
+		if (parameter == NULL)
+			continue;
+
+		BView *parameterView = MakeSelfHostingViewFor(*parameter, rect);
+		if (parameterView == NULL)
+			continue;
+
+		parameterView->SetViewColor(view->ViewColor());
+			// ToDo: dunno why this is needed, but the controls
+			// sometimes (!) have a white background without it
+
+		views.AddItem(parameterView);
+	}
+
+	// Identify a title view, and add it at the top if present
+
+	TitleView *titleView = dynamic_cast<TitleView *>((BView *)views.ItemAt(0));
+	if (titleView != NULL) {
+		view->AddChild(titleView);
+		rect.OffsetBy(0, titleView->Bounds().Height());
+	}
+
+	// Add the sub-group views
+	
 	rect.right = rect.left + 50;
+	rect.bottom = rect.top + 10;
+	float lastHeight;
 
 	for (int32 i = 0; i < group.CountGroups(); i++) {
 		BParameterGroup *subGroup = group.GroupAt(i);
@@ -271,9 +301,11 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 
 		if (i > 0) {
 			// add separator view
-			BRect separatorRect(rect);
+			BRect separatorRect(groupView->Frame());
 			separatorRect.left -= 3;
 			separatorRect.right = separatorRect.left + 1;
+			if (lastHeight > separatorRect.Height())
+				separatorRect.bottom = separatorRect.top + lastHeight;
 
 			view->AddChild(new SeparatorView(separatorRect));
 		}
@@ -282,31 +314,33 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 
 		rect.OffsetBy(groupView->Bounds().Width() + 5, 0);
 
-		if (groupView->Bounds().Height() > rect.Height())
-			rect.bottom = groupView->Bounds().Height() - 1;
+		lastHeight = groupView->Bounds().Height();
+		if (lastHeight > rect.Height())
+			rect.bottom = rect.top + lastHeight - 1;
 	}
 
-	view->ResizeTo(rect.left + 10, rect.bottom + 10);
-	rect.left = 5;
-
-	// add the parameter views part of the group
+	view->ResizeTo(rect.left + 10, rect.bottom + 5);
 
 	if (group.CountParameters() == 0)
 		return view;
 
-	if (view->CountChildren() > 0)
-		rect.OffsetBy(0, rect.Height() + 10);
+	// add the parameter views part of the group
 
-	BList views;
+	if (group.CountGroups() > 0) {
+		rect.top = rect.bottom + 10;
+		rect.bottom = rect.top + 20;
+	}
+
 	bool center = false;
 
-	for (int32 i = 0; i < group.CountParameters(); i++) {
-		BParameter *parameter = group.ParameterAt(i);
-		if (parameter == NULL)
-			continue;
+	for (int32 i = 0; i < views.CountItems(); i++) {
+		BView *parameterView = static_cast<BView *>(views.ItemAt(i));
 
-		BView *parameterView = MakeSelfHostingViewFor(*parameter, rect);
-		if (parameterView == NULL)
+		if (parameterView->Bounds().Width() + 5 > rect.Width())
+			rect.right = parameterView->Bounds().Width() + rect.left + 5;
+
+		// we don't need to add the title view again
+		if (parameterView == titleView)
 			continue;
 
 		// if there is a BChannelSlider (ToDo: or any vertical slider?)
@@ -314,20 +348,13 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 		if (dynamic_cast<BChannelSlider *>(parameterView) != NULL)
 			center = true;
 
-		parameterView->SetViewColor(view->ViewColor());
-			// ToDo: dunno why this is needed, but the controls
-			// sometimes (!) have a white background without it
-
+		parameterView->MoveTo(parameterView->Frame().left, rect.top);
 		view->AddChild(parameterView);
-		views.AddItem(parameterView);
 
 		rect.OffsetBy(0, parameterView->Bounds().Height() + 5);
-
-		if (parameterView->Bounds().Width() + 5 > rect.Width())
-			rect.right = parameterView->Bounds().Width() + rect.left + 5;
 	}
 
-	if (group.CountParameters() > 0)
+	if (views.CountItems() > (titleView != NULL ? 1 : 0))
 		view->ResizeTo(rect.right + 5, rect.top + 5);
 
 	// center the parameter views if needed, and tweak some views
