@@ -10,6 +10,7 @@
 #include <OS.h>
 #include <stdio.h>
 #include <MediaRoster.h>
+#include "MediaMisc.h"
 #include "TimeSourceObject.h"
 #include "TimeSourceObjectManager.h"
 
@@ -32,7 +33,9 @@ TimeSourceObject::TimeSourceObject(const media_node &node)
 	}
 
 	AddNodeKind(NODE_KIND_SHADOW_TIMESOURCE);
-	fControlPort = -1234;
+	AddNodeKind(NODE_KIND_NO_REFCOUNTING);
+	fControlPort = SHADOW_TIMESOURCE_CONTROL_PORT; // XXX if we don't do this, we get a infinite loop somewhere. This needs to be debugged
+	
 //	printf("TimeSourceObject::TimeSourceObject leave, node id %ld\n", fNodeID);
 }
 
@@ -71,6 +74,7 @@ SystemTimeSourceObject::SystemTimeSourceObject(const media_node &node)
 //	printf("SystemTimeSourceObject::SystemTimeSourceObject enter, id = %ld\n", id);
 	fIsRealtime = true;
 	AddNodeKind(NODE_KIND_SYSTEM_TIMESOURCE);
+	AddNodeKind(NODE_KIND_NO_REFCOUNTING);
 //	printf("SystemTimeSourceObject::SystemTimeSourceObject leave, node id %ld\n", ID());
 }
 

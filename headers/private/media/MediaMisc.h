@@ -15,6 +15,10 @@
 
 #define NODE_UNREGISTERED_ID	-2
 
+#define SHADOW_TIMESOURCE_CONTROL_PORT	-333
+
+#define NODE_KIND_NO_REFCOUNTING		0x80000000
+
 #define ROUND_UP_TO_PAGE(size)			(((size) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1))
 
 namespace BPrivate { namespace media {

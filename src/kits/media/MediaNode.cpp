@@ -195,10 +195,17 @@ BTimeSource *
 BMediaNode::TimeSource() const
 {
 	CALLED();
+	
+	// return the currently assigned time source
 	if (fTimeSource != 0)
 		return fTimeSource;
 	
-	BMediaNode *self = const_cast<BMediaNode *>(this);
+	// If the node hasn't been assigned a time source
+	// so far, we assign the system time source. This
+	// can't be done in the BMediaNode constructor, since
+	// a BTimeSource is also a BMediaNode that would be
+	// a infinite loop... loop... loop... loop...
+	
 	BMediaRoster *roster = BMediaRoster::Roster();
 	status_t rv;
 	media_node clone;
@@ -207,6 +214,8 @@ BMediaNode::TimeSource() const
 		FATAL("BMediaNode::TimeSource: Error, GetSystemTimeSource failed\n");
 		return NULL;
 	}
+
+	BMediaNode *self = const_cast<BMediaNode *>(this);
 	self->fTimeSource = roster->MakeTimeSourceFor(clone);
 	ASSERT(fTimeSource == self->fTimeSource);
 	if (fTimeSource == 0) {
@@ -214,10 +223,11 @@ BMediaNode::TimeSource() const
 	} else {
 		fTimeSource->AddMe(self);
 	}
-	rv = roster->ReleaseNode(clone);
-	if (rv != B_OK) {
-		FATAL("BMediaNode::TimeSource: Error, ReleaseNode failed\n");
-	}
+
+//	rv = roster->ReleaseNode(clone);
+//	if (rv != B_OK) {
+//		FATAL("BMediaNode::TimeSource: Error, ReleaseNode failed\n");
+//	}
 
 	return fTimeSource;
 }
@@ -466,13 +476,18 @@ BMediaNode::SetTimeSource(BTimeSource *time_source)
 	// this is a hook function, and 
 	// may be overriden by derived classes.
 
+	if (time_source == NULL || time_source == fTimeSource)
+		return;
+	
+	// we just trip into debugger, code that tries to do this is broken.
+	debugger("BMediaNode::SetTimeSource() can't be used to set a timesource, use BMediaRoster::SetTimeSourceFor()!\n");
+
+	/*
+	FATAL("BMediaNode::SetTimeSource used to set a time source for this node\n");
 
 	// the functionality here is only to
 	// support those people that don't
 	// use the roster to set a time source
-	if (time_source == NULL || time_source == fTimeSource)
-		return;
-	FATAL("BMediaNode::SetTimeSource used to set a time source for this node\n");
 
 	// some stupid code to do a stupid thing that should not be done
 	BMediaNode *newnode = time_source->Acquire();
@@ -486,9 +501,12 @@ BMediaNode::SetTimeSource(BTimeSource *time_source)
 		fTimeSource->RemoveMe(this);
 		fTimeSource->Release();
 		newsource->AddMe(this);
+		printf("#### BMediaNode::SetTimeSource: node %ld has been assigned  time source %ld\n", ID(), time_source->ID());
+			
 	}
 	fTimeSource = newsource;
 	//BMediaRoster::Roster()->StartTimeSource(fTimeSource->Node(), fTimeSource->RealTime());
+	*/
 }
 
 /*************************************************************
@@ -575,6 +593,10 @@ BMediaNode::HandleMessage(int32 message,
 			status_t rv;
 			printf("NODE_SET_TIMESOURCE, node %ld, timesource %ld\n", fNodeID, command->timesource_id);
 			roster = BMediaRoster::Roster();
+			
+			// Time sources are not reference counted. But since
+			// BMediaRoster::GetNodeFor() will create a clone of
+			// any node, we will need to release it!
 			rv = roster->GetNodeFor(command->timesource_id, &clone);
 			if (rv != B_OK) {
 				FATAL("NODE_SET_TIMESOURCE: Error, GetNodeFor failed\n");
@@ -583,19 +605,31 @@ BMediaNode::HandleMessage(int32 message,
 			newsource = roster->MakeTimeSourceFor(clone);
 			if (newsource == 0) {
 				FATAL("NODE_SET_TIMESOURCE: Error, MakeTimeSourceFor failed\n");
-				roster->ReleaseNode(clone);
+				roster->ReleaseNode(clone); // release cloned node
 				return B_OK;
 			}
-			roster->ReleaseNode(clone);
+			roster->ReleaseNode(clone); // release cloned node
 			if (fTimeSource) {
+				// as this node already had a timesource, we need
+				// we need to remove this node from time source control
 				fTimeSource->RemoveMe(this);
+				// Then released the time source
 				fTimeSource->Release();
+				// now the new one is assigned
 				fTimeSource = newsource;
+				// we add this node to the time source controll
+				fTimeSource->AddMe(this);
+				// and call the SetTimeSource hook function to notify
+				// any derived class
 				SetTimeSource(fTimeSource);
 			} else {
+				// the new time source is assigned to this node
 				fTimeSource = newsource;
+				// we add this node to the time source controll
+				fTimeSource->AddMe(this);
 			}
-			fTimeSource->AddMe(this);
+			printf("#### BMediaNode::HandleMessage NODE_SET_TIMESOURCE: node %ld has been assigned time source %ld\n", ID(), fTimeSource->ID());
+			
 			//roster->StartTimeSource(fTimeSource->Node(), fTimeSource->RealTime());
 			return B_OK;
 		}
@@ -839,7 +873,7 @@ BMediaNode::_InitObject(const char *name, media_node_id id, uint64 kinds)
 	fTimeSourceThis = 0;
 
 	// create control port
-	fControlPort = create_port(64,fName);
+	fControlPort = create_port(64, fName);
 }
 
 

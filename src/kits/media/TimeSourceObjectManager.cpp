@@ -2,6 +2,9 @@
  * Copyright (c) 2002 Marcus Overhagen. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
  *
+ * This works like a cache for time source objects, to make sure
+ * each team only has one object representation for each time source.
+ *
  ***********************************************************************/
 
 #include <OS.h>
@@ -47,6 +50,10 @@ TimeSourceObjectManager::~TimeSourceObjectManager()
 	delete fMap;
 }
 
+/* BMediaRoster::MakeTimeSourceFor does use this function to request
+ * a time source object. If it is already in memory, it will be
+ * Acquired(), if not, a new TimeSourceObject will be created.
+ */
 BTimeSource *
 TimeSourceObjectManager::GetTimeSource(const media_node &node)
 {
@@ -74,7 +81,8 @@ TimeSourceObjectManager::GetTimeSource(const media_node &node)
 	BTimeSource **pts;
 	if (fMap->Get(node.node, &pts))
 		return dynamic_cast<BTimeSource *>((*pts)->Acquire());
-		
+
+/*		
 	media_node clone;
 	status_t rv;
 	
@@ -88,8 +96,18 @@ TimeSourceObjectManager::GetTimeSource(const media_node &node)
 	ts = new TimeSourceObject(clone);
 	fMap->Insert(clone.node, ts);
 	return ts;
+*/
+	// time sources are not accounted in node reference counting
+	BTimeSource *ts;
+	ts = new TimeSourceObject(node);
+	fMap->Insert(node.node, ts);
+	return ts;
 }
 
+/* This function is called during deletion of the time source object.
+ *
+ * I'm not sure if there is a race condition with the function above.
+ */
 void
 TimeSourceObjectManager::ObjectDeleted(BTimeSource *timesource)
 {

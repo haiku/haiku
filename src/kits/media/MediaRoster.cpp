@@ -298,7 +298,22 @@ status_t
 BMediaRoster::GetTimeSource(media_node * out_node)
 {
 	CALLED();
-	return MediaRosterEx(this)->GetNode(TIME_SOURCE, out_node);
+	status_t rv;
+
+	// XXX need to do this in a nicer way.
+
+	rv = MediaRosterEx(this)->GetNode(TIME_SOURCE, out_node); 
+	if (rv != B_OK)
+		return rv;
+		
+	// We don't do reference counting for timesources, that's why we
+	// release the node immediately.
+	ReleaseNode(*out_node);
+
+	// we need to remember to not use this node with server side reference counting
+	out_node->kind |= NODE_KIND_NO_REFCOUNTING;
+	
+	return B_OK;
 }
 
 
@@ -404,7 +419,22 @@ status_t
 BMediaRoster::GetSystemTimeSource(media_node * clone)
 {
 	CALLED();
-	return MediaRosterEx(this)->GetNode(SYSTEM_TIME_SOURCE, clone);
+	status_t rv;
+
+	// XXX need to do this in a nicer way.
+
+	rv = MediaRosterEx(this)->GetNode(SYSTEM_TIME_SOURCE, clone); 
+	if (rv != B_OK)
+		return rv;
+		
+	// We don't do reference counting for timesources, that's why we
+	// release the node immediately.
+	ReleaseNode(*clone);
+
+	// we need to remember to not use this node with server side reference counting
+	clone->kind |= NODE_KIND_NO_REFCOUNTING;
+	
+	return B_OK;
 }
 
 
@@ -414,6 +444,11 @@ BMediaRoster::ReleaseNode(const media_node & node)
 	CALLED();
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
+		
+	if (node.kind & NODE_KIND_NO_REFCOUNTING) {
+		printf("BMediaRoster::ReleaseNode, trying to release reference counting disabled timesource, node %ld, port %ld, team %ld\n", node.node, node.port, team);
+		return B_OK;
+	}
 
 	server_release_node_request request;
 	server_release_node_reply reply;
@@ -447,7 +482,7 @@ BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 		media_node clone;
 		GetSystemTimeSource(&clone);
 		source = _TimeSourceObjectManager->GetTimeSource(clone);
-		ReleaseNode(clone);
+//		ReleaseNode(clone);
 	} else {
 		source = _TimeSourceObjectManager->GetTimeSource(for_node);
 	}
@@ -1404,6 +1439,11 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 	CALLED();
 	if (node == NULL)
 		return B_BAD_VALUE;
+
+	if (node->fKinds & NODE_KIND_NO_REFCOUNTING) {
+		printf("BMediaRoster::UnregisterNode, trying to unregister reference counting disabled timesource, node %ld, port %ld, team %ld\n", node->ID(), node->ControlPort(), team);
+		return B_OK;
+	}
 	
 	if (node->fRefCount != 0) {
 		FATAL("BMediaRoster::UnregisterNode: Warning node id %ld, name '%s' has local reference count of %ld\n", node->ID(), node->Name(), node->fRefCount);
@@ -1485,12 +1525,17 @@ BMediaRoster::SetTimeSourceFor(media_node_id node,
 	media_node clone;
 	status_t rv, result;
 	
+	// we need to get a clone of the node to have a port id
 	rv = GetNodeFor(node, &clone);
 	if (rv != B_OK) {
 		FATAL("BMediaRoster::SetTimeSourceFor, GetNodeFor failed, node id %ld\n", node);
 		return B_ERROR;
 	}
+
+	printf("#### BMediaRoster::SetTimeSourceFor: node %ld will be assigned time source %ld\n", node, time_source);
 	
+	// we just send the request to set time_source-id as timesource to the node,
+	// the NODE_SET_TIMESOURCE handler code will do the real assignment
 	result = B_OK;
 	node_set_timesource_command cmd;
 	cmd.timesource_id = time_source;
@@ -1500,6 +1545,7 @@ BMediaRoster::SetTimeSourceFor(media_node_id node,
 		result = B_ERROR;
 	}
 
+	// we release the colone
 	rv = ReleaseNode(clone);
 	if (rv != B_OK) {
 		FATAL("BMediaRoster::SetTimeSourceFor, ReleaseNode failed, node id %ld\n", node);
@@ -1732,7 +1778,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		FATAL("BMediaRoster::InstantiateDormantNode Error: requested B_FLAVOR_IS_GLOBAL, but dormant node has B_FLAVOR_IS_LOCAL\n");
 		return B_BAD_VALUE;
 	}
-#if 0
+//#if 0
 	// If either the node, or the caller requested to make the instance global
 	// we will do it by forwarding this request into the media_addon_server, which
 	// in turn will call BMediaRosterEx::InstantiateDormantNode to create the node
@@ -1758,8 +1804,8 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	
 		return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, out_node);
 	}
-#endif
-	return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, out_node);
+//#endif
+//	return MediaRosterEx(this)->InstantiateDormantNode(in_info.addon, in_info.flavor_id, out_node);
 }
 
 									 
