@@ -1,34 +1,58 @@
-/******************************************************************************
-/
-/	File:			Clipboard.h
-/
-/	Description:	BClipboard class defines clipboard functionality.
-/					The global be_clipboard represents the default clipboard.
-/
-/	Copyright 1995-98, Be Incorporated, All Rights Reserved.
-/
-*******************************************************************************/
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		Clipboard.h
+//	Author:			Gabe Yoder (gyoder@stny.rr.com)
+//	Description:	BClipboard provides an interface to a system-wide clipboard
+//                  storage area.
+//------------------------------------------------------------------------------
 
 #ifndef _CLIPBOARD_H
 #define	_CLIPBOARD_H
 
+// Standard Includes -----------------------------------------------------------
+
+// System Includes -------------------------------------------------------------
 #include <BeBuild.h>
 #include <Messenger.h>
 #include <Locker.h>
 
+// Project Includes ------------------------------------------------------------
+
+// Local Includes --------------------------------------------------------------
+
+// Local Defines ---------------------------------------------------------------
+
+// Globals ---------------------------------------------------------------------
 class BMessage;
 
 enum {
 	B_CLIPBOARD_CHANGED = 'CLCH'
 };
 
-/*------------------------------------------------------------------*/
-/*----- BClipboard class --------------------------------------------*/
-
+// BClipboard class ---------------------------------------------------------------
 class BClipboard {
 public:
-					BClipboard(const char *name, bool transient = false);
-virtual				~BClipboard();
+				BClipboard(const char *name, bool transient = false);
+		virtual		~BClipboard();
 
 		const char	*Name() const;
 
@@ -50,12 +74,12 @@ virtual				~BClipboard();
 
 /*----- Private or reserved -----------------------------------------*/
 private:
-					BClipboard(const BClipboard &);
+				BClipboard(const BClipboard &);
 		BClipboard	&operator=(const BClipboard &);
 
-virtual	void		_ReservedClipboard1();
-virtual	void		_ReservedClipboard2();
-virtual	void		_ReservedClipboard3();
+		virtual	void	_ReservedClipboard1();
+		virtual	void	_ReservedClipboard2();
+		virtual	void	_ReservedClipboard3();
 
 		bool		AssertLocked() const;
 		status_t	DownloadFromSystem(bool force = false);
@@ -71,12 +95,11 @@ virtual	void		_ReservedClipboard3();
 		uint32		_reserved[4];
 };
 
-/*----------------------------------------------------------------*/
-/*----- Global Clipboard -----------------------------------------*/
+//----- Global Clipboard -------------------------------------------------------
 
 extern _IMPEXP_BE BClipboard *be_clipboard;
 
-/*-------------------------------------------------------------*/
-/*-------------------------------------------------------------*/
+//------------------------------------------------------------------------------
 
-#endif /* _CLIPBOARD_H */
+#endif	// _CLIPBOARD_H
+
