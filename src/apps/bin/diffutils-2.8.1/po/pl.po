@@ -1,0 +1,930 @@
+# Polish translations for the GNU diffutils messages
+# Copyright (C) 1996, 2002 Free Software Foundation, Inc.
+# Rafa³ Maszkowski <rzm@icm.edu.pl>, 1996, 2002.
+# corrections: Pawe³ Krawczyk <kravietz@pipeta.chemia.pk.edu.pl>, 1996
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GNU diffutils 2.7.10\n"
+"POT-Creation-Date: 2002-04-05 14:10-0800\n"
+"PO-Revision-Date: 2002-03-12 15:00+0100\n"
+"Last-Translator: Rafa³ Maszkowski <rzm@icm.edu.pl>\n"
+"Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+#: lib/c-stack.c:188
+msgid "program error"
+msgstr "b³±d programu"
+
+#: lib/c-stack.c:189
+msgid "stack overflow"
+msgstr "przepe³nienie stosu"
+
+#: lib/error.c:128 lib/error.c:156
+msgid "Unknown system error"
+msgstr "Niezany b³±d systemu"
+
+#: lib/freesoft.c:27
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute copies of this program\n"
+"under the terms of the GNU General Public License.\n"
+"For more information about these matters, see the file named COPYING."
+msgstr ""
+"Autorzy nie daj± ¯ADNYCH gwarancji, do granic, na które zezwala prawo.\n"
+"Program mo¿e byæ rozpowszechniany na warunkach Ogólnej Licencji Publicznej\n"
+"GNU; szczególy s± opisane w pliku COPYING."
+
+#: lib/getopt.c:693
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: opcja `%s' is ambiguous\n"
+
+#: lib/getopt.c:718
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: opcja `--%s' nie mo¿e mieæ argumentu\n"
+
+#: lib/getopt.c:723
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: opcja `%c%s' nie mo¿e mieæ argumentu\n"
+
+#: lib/getopt.c:741 lib/getopt.c:914
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: opcja `%s' wymaga argumentu\n"
+
+#: lib/getopt.c:770
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: nierozpoznana opcja `--%s'\n"
+
+#: lib/getopt.c:774
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: unrecognized option `%c%s'\n"
+
+#: lib/getopt.c:800
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: nielegalna opcja -- %c\n"
+
+#: lib/getopt.c:803
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: b³êdna opcja -- %c\n"
+
+#: lib/getopt.c:833 lib/getopt.c:963
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: opcja wymaga argumentu -- %c\n"
+
+#: lib/getopt.c:880
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: opcja `-W %s' jest niejednoznaczna\n"
+
+#: lib/getopt.c:898
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: opcja `-W %s' nie mo¿e mieæ argumentu\n"
+
+#: lib/regex.c:1367
+msgid "Success"
+msgstr "Powodzenie"
+
+#: lib/regex.c:1370
+msgid "No match"
+msgstr "Nie pasuje"
+
+#: lib/regex.c:1373
+msgid "Invalid regular expression"
+msgstr "Z³e wyra¿enie regularne"
+
+#: lib/regex.c:1376
+msgid "Invalid collation character"
+msgstr "Zly znak zbiorczy"
+
+#: lib/regex.c:1379
+msgid "Invalid character class name"
+msgstr "Z³a nazwa klasy znaków"
+
+#: lib/regex.c:1382
+msgid "Trailing backslash"
+msgstr "Koñcowy uko¶nik odwrotny"
+
+#: lib/regex.c:1385
+msgid "Invalid back reference"
+msgstr "Z³y odno¶nik wstecz"
+
+#: lib/regex.c:1388
+msgid "Unmatched [ or [^"
+msgstr "Nie sparowany [ lub [^"
+
+#: lib/regex.c:1391
+msgid "Unmatched ( or \\("
+msgstr "Nie sparowany ( lub \\("
+
+#: lib/regex.c:1394
+msgid "Unmatched \\{"
+msgstr "Nie sparowany \\{"
+
+#: lib/regex.c:1397
+msgid "Invalid content of \\{\\}"
+msgstr "Z³a zawarto¶æ \\{\\}"
+
+#: lib/regex.c:1400
+msgid "Invalid range end"
+msgstr "Z³y koniec zakresu"
+
+#: lib/regex.c:1403
+msgid "Memory exhausted"
+msgstr "Brak pamiêci"
+
+#: lib/regex.c:1406
+msgid "Invalid preceding regular expression"
+msgstr "Z³e poprzedzj±ce wyra¿enie regularne"
+
+#: lib/regex.c:1409
+msgid "Premature end of regular expression"
+msgstr "Przedwczesny koniec wyra¿enia regularnego"
+
+#: lib/regex.c:1412
+msgid "Regular expression too big"
+msgstr "Wyra¿enia regularne jest za du¿e"
+
+#: lib/regex.c:1415
+msgid "Unmatched ) or \\)"
+msgstr "Nie sparowany ) lub \\)"
+
+#: lib/regex.c:8034
+msgid "No previous regular expression"
+msgstr "Brak porzedniego wyra¿enia regularnego"
+
+#: lib/xmalloc.c:63
+msgid "memory exhausted"
+msgstr "brak pamiêci"
+
+#: src/analyze.c:809 src/diff.c:1283
+#, c-format
+msgid "Files %s and %s differ\n"
+msgstr "Pliki %s i %s ró¿ni± siê\n"
+
+#: src/analyze.c:812
+#, c-format
+msgid "Binary files %s and %s differ\n"
+msgstr "Pliki binarne %s i %s siê ró¿ni±\n"
+
+#: src/analyze.c:1058 src/diff3.c:1413 src/util.c:526
+msgid "No newline at end of file"
+msgstr "Brak znaku nowej linii na koñcu pliku"
+
+#: src/cmp.c:43
+msgid "Written by Torbjorn Granlund and David MacKenzie."
+msgstr "Napisany przez Torbjorna Gralunda i Davida MacKenzie."
+
+#: src/cmp.c:118 src/diff.c:817 src/diff3.c:427 src/sdiff.c:168
+#, c-format
+msgid "Try `%s --help' for more information."
+msgstr "Napisz `%s --help' ¿eby dowiedzieæ siê wiêcej."
+
+#: src/cmp.c:137
+#, c-format
+msgid "invalid --ignore-initial value `%s'"
+msgstr "b³êdna warto¶æ --ignore-initial `%s'"
+
+#: src/cmp.c:146
+msgid "options -l and -s are incompatible"
+msgstr "sprzeczne opcje -l i -s"
+
+#: src/cmp.c:154 src/diff.c:826 src/diff3.c:435 src/sdiff.c:177
+#: src/sdiff.c:313 src/sdiff.c:320 src/sdiff.c:910 src/util.c:194
+#: src/util.c:286 src/util.c:293
+msgid "write failed"
+msgstr "zapis nieudany"
+
+#: src/cmp.c:156 src/diff.c:828 src/diff.c:1354 src/diff3.c:437
+#: src/sdiff.c:179
+msgid "standard output"
+msgstr "standardowe wyj¶cie"
+
+#: src/cmp.c:160
+msgid "-b  --print-bytes  Print differing bytes."
+msgstr "-b  --print-chars  Wypisanie ró¿ni±cych siê bajtów."
+
+#: src/cmp.c:161
+msgid "-i SKIP  --ignore-initial=SKIP  Skip the first SKIP bytes of input."
+msgstr "-i OMIÑ  --ignore-initial=OMIÑ  PRzeskoczenie pierwszych OMIÑ bajtów."
+
+#: src/cmp.c:162
+msgid "-i SKIP1:SKIP2  --ignore-initial=SKIP1:SKIP2"
+msgstr "-i SKOK1:SKOK2--ignore-initial=SKOK1:SKOK2"
+
+#: src/cmp.c:163
+msgid ""
+"  Skip the first SKIP1 bytes of FILE1 and the first SKIP2 bytes of FILE2."
+msgstr "  Przeskoczenie pierwszych SKOK1 bajtów PLIKU1 i SKOK2 bajtów PLIKU2."
+
+#: src/cmp.c:164
+msgid "-l  --verbose  Output byte numbers and values of all differing bytes."
+msgstr ""
+"-I  --verbose  Wypisanie po³o¿eñ i kodów wszystkich ró¿ni±cych siê bajtów."
+
+#: src/cmp.c:165
+msgid "-n LIMIT  --bytes=LIMIT  Compare at most LIMIT bytes."
+msgstr "-n LIMIT  --bytes=LIMIT  Porównanie najwy¿ej LIMIT bajtów."
+
+#: src/cmp.c:166
+msgid "-s  --quiet  --silent  Output nothing; yield exit status only."
+msgstr ""
+"-s  --quiet  --silnet  Bez wypisania wyników; tylko przekazanie statusu."
+
+#: src/cmp.c:167 src/diff.c:904 src/diff3.c:455 src/sdiff.c:204
+msgid "-v  --version  Output version info."
+msgstr "-v  --version  Wypisanie informacji o wersji."
+
+#: src/cmp.c:168 src/diff.c:905 src/diff3.c:456 src/sdiff.c:205
+msgid "--help  Output this help."
+msgstr "--help  Wypisanie tego helpu."
+
+#: src/cmp.c:177
+#, c-format
+msgid "Usage: %s [OPTION]... FILE1 [FILE2 [SKIP1 [SKIP2]]]\n"
+msgstr "U¿ycie: %s [OPCJA]... PLIK1 [PLIK2 [SKOK1 [SKOK2]]]\n"
+
+#: src/cmp.c:179
+msgid "Compare two files byte by byte."
+msgstr "Porównanie plików bajt po bajcie."
+
+#: src/cmp.c:183
+msgid "SKIP1 and SKIP2 are the number of bytes to skip in each file."
+msgstr "SKOK1 i SKOK2 to liczby bajtów do pominiêcia w ka¿dym z plików."
+
+#: src/cmp.c:184
+msgid ""
+"SKIP values may be followed by the following multiplicative suffixes:\n"
+"kB 1000, K 1024, MB 1,000,000, M 1,048,576,\n"
+"GB 1,000,000,000, G 1,073,741,824, and so on for T, P, E, Z, Y."
+msgstr ""
+"Po warto¶ci SKOKU mog± byæ dodane nastêpuj±ce przyrostki:\n"
+"kB 1000, K 1024, MB 1,000,000, M 1,048,576,\n"
+"GB 1,000,000,000, G 1,073,741,824, i tak dalej dla T, P, E, Z, Y."
+
+#: src/cmp.c:187
+msgid "If a FILE is `-' or missing, read standard input."
+msgstr "Je¿eli PLIK to `-' lub go brak, czytane jest standardowe wej¶cie."
+
+#: src/cmp.c:188 src/diff.c:911 src/diff3.c:475 src/sdiff.c:223
+msgid "Report bugs to <bug-gnu-utils@gnu.org>."
+msgstr "Inofmracje o b³êdach: bug-gnu-utils@gnu.org ."
+
+#: src/cmp.c:231
+#, c-format
+msgid "invalid --bytes value `%s'"
+msgstr "b³êdna warto¶æ --bytes `%s'"
+
+#: src/cmp.c:258 src/diff.c:734 src/diff3.c:333 src/sdiff.c:558
+#, c-format
+msgid "missing operand after `%s'"
+msgstr "brakuj±cy argument po `%s'"
+
+#: src/cmp.c:270 src/diff.c:736 src/diff3.c:335 src/sdiff.c:560
+#, c-format
+msgid "extra operand `%s'"
+msgstr "nadmiarowy argument `%s'"
+
+#: src/cmp.c:477
+#, c-format
+msgid "%s %s differ: byte %s, line %s\n"
+msgstr "%s %s ró¿ni± siê: bajt %s, linia %s\n"
+
+#: src/cmp.c:495
+#, c-format
+msgid "%s %s differ: byte %s, line %s is %3o %s %3o %s\n"
+msgstr "%s %s ró¿ni± siê: bajt %s, linia %s zawiera %3o %s %3o %s\n"
+
+#: src/cmp.c:543
+#, c-format
+msgid "cmp: EOF on %s\n"
+msgstr "cmp: EOF przy %s\n"
+
+#: src/diff.c:41
+msgid ""
+"Written by Paul Eggert, Mike Haertel, David Hayes,\n"
+"Richard Stallman, and Len Tower."
+msgstr ""
+"Napisany przez Paula Eggerta, Mike'a Haertela, Davida Hayesa,\n"
+"Richarda Stallmana i Lena Towera."
+
+#: src/diff.c:322
+#, c-format
+msgid "invalid context length `%s'"
+msgstr "b³êdna d³ugo¶æ kontekstu `%s'"
+
+#: src/diff.c:405
+msgid "pagination not supported on this host"
+msgstr "stronicowanie nie jest mo¿liwe na tej maszynie"
+
+#: src/diff.c:420 src/diff3.c:315
+msgid "too many file label options"
+msgstr "za du¿o opcji etykietowania plików"
+
+#: src/diff.c:498
+#, c-format
+msgid "invalid width `%s'"
+msgstr "b³êdna szeroko¶æ `%s'"
+
+#: src/diff.c:502
+msgid "conflicting width options"
+msgstr "sprzeczne opcje szeroko¶ci"
+
+#: src/diff.c:526
+#, c-format
+msgid "invalid horizon length `%s'"
+msgstr "b³êdna d³ugo¶æ horyzontu `%s'"
+
+#: src/diff.c:629
+#, c-format
+msgid "`-%ld' option is obsolete; use `-%c %ld'"
+msgstr "opcja `-%ld' jest przestarza³a, u¿yj `-%c %ld'"
+
+#: src/diff.c:641
+#, c-format
+msgid "`-%ld' option is obsolete; omit it"
+msgstr "opcja `-%ld' jest przestarza³a, opu¶æ j±"
+
+#: src/diff.c:709
+msgid "--from-file and --to-file both specified"
+msgstr "równocze¶nie podane --from-file i --to-file"
+
+#: src/diff.c:832
+msgid "Compare files line by line."
+msgstr "Porównanie plików kolejnymi liniami."
+
+#: src/diff.c:834
+msgid "-i  --ignore-case  Ignore case differences in file contents."
+msgstr ""
+"-i  --ignore-case  Ignorowanie ró¿nic miêdzy wielkimi i ma³ymi literami."
+
+#: src/diff.c:835
+msgid "--ignore-file-name-case  Ignore case when comparing file names."
+msgstr ""
+"--ignore-space-change    Zignorowanie wielko¶ci liter przy porównywaniu\n"
+"                         nazw plików."
+
+#: src/diff.c:836
+msgid "--no-ignore-file-name-case  Consider case when comparing file names."
+msgstr ""
+"--no-ignore-file-name-case  Uwzglêdnianie wielko¶ci liter przy porównywaniu\n"
+"                            nazw plików."
+
+#: src/diff.c:837 src/sdiff.c:186
+msgid "-E  --ignore-tab-expansion  Ignore changes due to tab expansion."
+msgstr ""
+"-E  --ignore-tab-expansion  Zignorowanie zmian spowodowanych rozwiniêciem\n"
+"                            TABów."
+
+#: src/diff.c:838 src/sdiff.c:187
+msgid "-b  --ignore-space-change  Ignore changes in the amount of white space."
+msgstr "-b  --ignore-space-change  Zignorowanie zmian ilo¶ci znaków odstêpu."
+
+#: src/diff.c:839
+msgid "-w  --ignore-all-space  Ignore all white space."
+msgstr "-w  --ignore-all-space  Zignorowanie znaków odstêpu."
+
+#: src/diff.c:840 src/sdiff.c:189
+msgid "-B  --ignore-blank-lines  Ignore changes whose lines are all blank."
+msgstr "-B  --ignore-blank-lines  Zignorowanie zmian ilo¶ci pustych linii."
+
+#: src/diff.c:841 src/sdiff.c:190
+msgid ""
+"-I RE  --ignore-matching-lines=RE  Ignore changes whose lines all match RE."
+msgstr ""
+"-I RE  --ignore-matching-lines=RE  Zignorowanie zmian w liniach pasuj±cych\n"
+"                                   do RE."
+
+#: src/diff.c:842 src/sdiff.c:191
+msgid "--strip-trailing-cr  Strip trailing carriage return on input."
+msgstr "--strip-trailing-cr  Pominiêcie znaków nowej linii na wej¶ciu."
+
+#: src/diff.c:844
+msgid "--binary  Read and write data in binary mode."
+msgstr "--binary  Czytanie i zapisywanie danych binarnie."
+
+#: src/diff.c:846 src/diff3.c:451 src/sdiff.c:192
+msgid "-a  --text  Treat all files as text."
+msgstr "-a  --text  Traktowanie plików jako tekstowych."
+
+#: src/diff.c:848
+msgid ""
+"-c  -C NUM  --context[=NUM]  Output NUM (default 3) lines of copied "
+"context.\n"
+"-u  -U NUM  --unified[=NUM]  Output NUM (default 3) lines of unified "
+"context.\n"
+"  --label LABEL  Use LABEL instead of file name.\n"
+"  -p  --show-c-function  Show which C function each change is in.\n"
+"  -F RE  --show-function-line=RE  Show the most recent line matching RE."
+msgstr ""
+"-c  -C ILE  --context[=ILE]  Skopiowanie ILE (domy¶lnie 2) linii kontekstu.\n"
+"-u  -U ILE  --unified[=ILE]  ILE (domy¶lnie 2) linii zunifikowanego "
+"kontekstu.\n"
+"  --label ETYKIETA           U¿ycie ETYKIETY zamiast nazwy pilku.\n"
+"  -p  --show-c-function      Wskazanie funkcji C, w których s± zmiany.\n"
+"  -F RE  --show-function-line=RE  Pokazanie ostatniej linii pasuj±cej do RE."
+
+#: src/diff.c:853
+msgid "-q  --brief  Output only whether files differ."
+msgstr "-q  --brief  Wypisanie wyniku tylko gdy pliki siê ró¿ni±."
+
+#: src/diff.c:854
+msgid "-e  --ed  Output an ed script."
+msgstr "-e  --ed  Wynik w postaci komend ed-a"
+
+#: src/diff.c:855
+msgid "--normal  Output a normal diff."
+msgstr "--normal  Wynik w postaci zwyk³ego diff-a."
+
+#: src/diff.c:856
+msgid "-n  --rcs  Output an RCS format diff."
+msgstr "-n  --rcs  Wynik w postaci diff-a z RCS."
+
+#: src/diff.c:857
+msgid ""
+"-y  --side-by-side  Output in two columns.\n"
+"  -W NUM  --width=NUM  Output at most NUM (default 130) print columns.\n"
+"  --left-column  Output only the left column of common lines.\n"
+"  --suppress-common-lines  Do not output common lines."
+msgstr ""
+"-y  --side-by-side  Wynik w dwóch kolumnach.\n"
+"  -W ILE  --width=ILE  Wypisanie najwy¿ej ILE (domy¶nie 130) znaków w "
+"linii.\n"
+"  --left-column  Wypisanie tylko lewej kolumny dla wspólnych linii.\n"
+"  --suppress-common-lines  Bez wypisywania wspólnych linii."
+
+#: src/diff.c:861
+msgid "-D NAME  --ifdef=NAME  Output merged file to show `#ifdef NAME' diffs."
+msgstr ""
+"-D NAZWA  --ifdef=NAZWA  Wypisanie po³±czonego pliu dla pokazania ró¿nic\n"
+"                         w `#ifdef NAZWA'."
+
+#: src/diff.c:862
+msgid ""
+"--GTYPE-group-format=GFMT  Similar, but format GTYPE input groups with GFMT."
+msgstr ""
+"--TYPG-group-format=GFMT   Podobnie, ale z u¿yciem GFMT do sformatowania "
+"grup\n"
+"                           wej¶ciowych type TYPG"
+
+#: src/diff.c:863
+msgid "--line-format=LFMT  Similar, but format all input lines with LFMT."
+msgstr ""
+"--line-format=LFMT  Podobnie, ale z u¿yciem LFMT do sformatowania linii\n"
+"                    wej¶ciowych."
+
+#: src/diff.c:864
+msgid ""
+"--LTYPE-line-format=LFMT  Similar, but format LTYPE input lines with LFMT."
+msgstr ""
+"--TYPL-group-format=LFMT   Podobnie, ale z u¿yciem LFMT do sformatowania "
+"grup\n"
+"                           wej¶ciowych typu TYPL"
+
+#: src/diff.c:865
+msgid "  LTYPE is `old', `new', or `unchanged'.  GTYPE is LTYPE or `changed'."
+msgstr "TYPL to `old', `news' lub `unchanged'.  TYPG to TYPL lub `changed'."
+
+#: src/diff.c:866
+msgid ""
+"  GFMT may contain:\n"
+"    %<  lines from FILE1\n"
+"    %>  lines from FILE2\n"
+"    %=  lines common to FILE1 and FILE2\n"
+"    %[-][WIDTH][.[PREC]]{doxX}LETTER  printf-style spec for LETTER\n"
+"      LETTERs are as follows for new group, lower case for old group:\n"
+"        F  first line number\n"
+"        L  last line number\n"
+"        N  number of lines = L-F+1\n"
+"        E  F-1\n"
+"        M  L+1"
+msgstr ""
+"  GFMT mo¿e zawieraæ:\n"
+"    %<  linie z PLIKU1\n"
+"    %>  linie z PLIKU2\n"
+"    %=  linie wspólne dla PLIKU1 i PLIKU2\n"
+"    %[-][SZER][.[DOK£]]{doxX}LITERA  specyfikacja w stylu printf dla LITERY\n"
+"      LITERY s± nastêpuj±ce dla nowej grupy (ma³e dla starej grupy):\n"
+"        F  numer pierwszej linii\n"
+"        L  numer ostatniej linii\n"
+"        N  ilo¶æ linii = L-F+1\n"
+"        E  F-1\n"
+"        M  L+1"
+
+#: src/diff.c:877
+msgid ""
+"  LFMT may contain:\n"
+"    %L  contents of line\n"
+"    %l  contents of line, excluding any trailing newline\n"
+"    %[-][WIDTH][.[PREC]]{doxX}n  printf-style spec for input line number"
+msgstr ""
+"  LFMT mo¿e zawieraæ:\n"
+"    %L  zawarto¶æ linii\n"
+"    %l  zawarto¶c linii, z wy³±czeniem znaku nowej linii\n"
+"    %[-][SZER][.[DOK£]]{doxX}n  specyfikacjê numeru linii w stylu printf"
+
+#: src/diff.c:881
+msgid ""
+"  Either GFMT or LFMT may contain:\n"
+"    %%  %\n"
+"    %c'C'  the single character C\n"
+"    %c'\\OOO'  the character with octal code OOO"
+msgstr ""
+"  GFMT i LFMT mog± zawieraæ:\n"
+"    %%  %\n"
+"    %c'C'  pojedyñczy znak C\n"
+"    %c'\\OOO'  znak o kodzie ósemkowym OOO"
+
+#: src/diff.c:886
+msgid "-l  --paginate  Pass the output through `pr' to paginate it."
+msgstr "-I  --paginate  Przepuszczenie wyniku przez `pr' ¿eby go stronnicowaæ."
+
+#: src/diff.c:887 src/sdiff.c:198
+msgid "-t  --expand-tabs  Expand tabs to spaces in output."
+msgstr "-t  --expand-tabs  Rozwiniêcie TABów w spacje w wyniku."
+
+#: src/diff.c:888 src/diff3.c:452
+msgid "-T  --initial-tab  Make tabs line up by prepending a tab."
+msgstr "-T  --initial-tab  Wyrównanie linii przez u¿ycie TABów."
+
+#: src/diff.c:890
+msgid "-r  --recursive  Recursively compare any subdirectories found."
+msgstr "-r  --recursive  Porównanie podkatalogów rekurencyjnie."
+
+#: src/diff.c:891
+msgid "-N  --new-file  Treat absent files as empty."
+msgstr "-N  --new-file  Traktowanie brakuj±cych plików jak pustych."
+
+#: src/diff.c:892
+msgid "--unidirectional-new-file  Treat absent first files as empty."
+msgstr ""
+"--unidirectional-new-file  Traktowanie brakuj±cych pierwszych plików\n"
+"                               w pierwszym zestawie jako pustych."
+
+#: src/diff.c:893
+msgid "-s  --report-identical-files  Report when two files are the same."
+msgstr ""
+"-s  --report-identical-files  Informowanie gdy dwa pliki s± takie same."
+
+#: src/diff.c:894
+msgid "-x PAT  --exclude=PAT  Exclude files that match PAT."
+msgstr "-x WZÓR  --exclude=WZÓR  Wykluczenie plików pasuj±cych do WZORu."
+
+#: src/diff.c:895
+msgid ""
+"-X FILE  --exclude-from=FILE  Exclude files that match any pattern in FILE."
+msgstr ""
+"-X PLIK  --exclude-from=PLIK  Pominiêcie plików pasuj±cych do wzorców w "
+"PLIKu."
+
+#: src/diff.c:896
+msgid ""
+"-S FILE  --starting-file=FILE  Start with FILE when comparing directories."
+msgstr ""
+"-S PLIK  --starting-file=PLIK  Zacznij od PLIKu przy porównywaniu katalogów."
+
+#: src/diff.c:897
+msgid ""
+"--from-file=FILE1  Compare FILE1 to all operands.  FILE1 can be a directory."
+msgstr ""
+"--from-file=PLIK1  Porównanie PLIKU1 z wszystkimi argumentami.\n"
+"                   PLIK1 mo¿e byæ katalogiem."
+
+#: src/diff.c:898
+msgid ""
+"--to-file=FILE2  Compare all operands to FILE2.  FILE2 can be a directory."
+msgstr ""
+"--to-file=PLIK2  Porównanie wszystkich argumentów z PLIKIEM2.\n"
+"                 PLIK2 mo¿e byæ katalogiem."
+
+#: src/diff.c:900
+msgid "--horizon-lines=NUM  Keep NUM lines of the common prefix and suffix."
+msgstr ""
+"--horizon-lines=ILE  Zostawienie ILE linii wspólnego przedrostka i "
+"przyrostka."
+
+#: src/diff.c:901 src/sdiff.c:200
+msgid "-d  --minimal  Try hard to find a smaller set of changes."
+msgstr "-d  --minimal  Usi³owanie znalezienia mniejszego zbioru zmian."
+
+#: src/diff.c:902
+msgid ""
+"--speed-large-files  Assume large files and many scattered small changes."
+msgstr "--speed-large-files  Du¿e pliki i rozrzucone ma³e zmiany."
+
+#: src/diff.c:907
+msgid ""
+"FILES are `FILE1 FILE2' or `DIR1 DIR2' or `DIR FILE...' or `FILE... DIR'."
+msgstr ""
+"PLIKI to `PLIK1 PLIK2' albo `KATALOG1 KATALOG2' albo `KATALOG PLIK...' albo\n"
+"PLIK... KATALOG'."
+
+#: src/diff.c:908
+msgid ""
+"If --from-file or --to-file is given, there are no restrictions on FILES."
+msgstr ""
+"Je¿eli u¿yta jest opcja --from-file albo --to-file, nie ma ograniczeñ co do\n"
+"PLIKÓW."
+
+#: src/diff.c:909 src/diff3.c:474 src/sdiff.c:222
+msgid "If a FILE is `-', read standard input."
+msgstr "Je¿eli PLIK to `-', czytane jest standardowe wej¶cie."
+
+#: src/diff.c:920
+#, c-format
+msgid "Usage: %s [OPTION]... FILES\n"
+msgstr "U¿ycie: %s [OPCJA]... PLIKI\n"
+
+#: src/diff.c:949
+#, c-format
+msgid "conflicting %s option value `%s'"
+msgstr "sprzeczna warto¶æ opcji %s: `%s'"
+
+#: src/diff.c:962
+msgid "conflicting output style options"
+msgstr "sprzeczne opcje stylu wyniku"
+
+#: src/diff.c:976
+msgid "regular empty file"
+msgstr "zwyk³y pusty plik"
+
+#: src/diff.c:976
+msgid "regular file"
+msgstr "zwyk³y plik"
+
+#: src/diff.c:978
+msgid "directory"
+msgstr "katalog"
+
+#: src/diff.c:981
+msgid "block special file"
+msgstr "specjalny plik blokowy"
+
+#: src/diff.c:984
+msgid "character special file"
+msgstr "specjalny plik znakowy"
+
+#: src/diff.c:987
+msgid "fifo"
+msgstr "fifo"
+
+#: src/diff.c:991
+msgid "socket"
+msgstr "gniazdo"
+
+#: src/diff.c:994
+msgid "message queue"
+msgstr "kolejka komunikatów"
+
+#: src/diff.c:997
+msgid "semaphore"
+msgstr "semafor"
+
+#: src/diff.c:1000
+msgid "shared memory object"
+msgstr "obiekt w pamiêci dzielonej"
+
+#: src/diff.c:1003
+msgid "typed memory object"
+msgstr "obiekt w pamiêci z okre¶leniem typu"
+
+#: src/diff.c:1006
+msgid "weird file"
+msgstr "dziwny plik"
+
+#: src/diff.c:1070 src/diff.c:1256
+#, c-format
+msgid "Only in %s: %s\n"
+msgstr "Tylko w %s: %s\n"
+
+#: src/diff.c:1193
+msgid "cannot compare `-' to a directory"
+msgstr "nie mo¿na porównaæ `-' z katalogiem"
+
+#: src/diff.c:1220
+msgid "-D option not supported with directories"
+msgstr "-D opcja nie dzia³a dla katalogów"
+
+#: src/diff.c:1229
+#, c-format
+msgid "Common subdirectories: %s and %s\n"
+msgstr "Wspólne podkatalogi: %s i %s\n"
+
+#: src/diff.c:1266
+#, c-format
+msgid "File %s is a %s while file %s is a %s\n"
+msgstr "Plik %s jest %s, podczas gdy plik %s jest %s\n"
+
+#: src/diff.c:1345
+#, c-format
+msgid "Files %s and %s are identical\n"
+msgstr "Pliki %s i %s s± identyczne\n"
+
+#: src/diff3.c:26
+msgid "Written by Randy Smith."
+msgstr "Napisany przez Randiego Smitha."
+
+#: src/diff3.c:328
+msgid "incompatible options"
+msgstr "niezgodne opcje"
+
+#: src/diff3.c:368
+msgid "`-' specified for more than one input file"
+msgstr "`-' podany dla wiêcej ni¿ jednego pliku wej¶ciowego"
+
+#: src/diff3.c:408 src/diff3.c:1232 src/diff3.c:1645 src/diff3.c:1700
+#: src/sdiff.c:305 src/sdiff.c:879 src/sdiff.c:890
+msgid "read failed"
+msgstr "nieudany odczyt"
+
+#: src/diff3.c:441
+msgid "-e  --ed  Output unmerged changes from OLDFILE to YOURFILE into MYFILE."
+msgstr ""
+"-e  --ed  Wypisanie niez³±czonych zmian miêdzy STARY_PLIK a NOWY_PLIK do\n"
+"          MÓJ_PLIK."
+
+#: src/diff3.c:442
+msgid "-E  --show-overlap  Output unmerged changes, bracketing conflicts."
+msgstr ""
+"-E  --show-overlap  Wypisanie niez³±czonych zmian, konflikty w nawiasach."
+
+#: src/diff3.c:443
+msgid "-A  --show-all  Output all changes, bracketing conflicts."
+msgstr "-A  --show-all  Wypisanie wszystkich zmian, konflikty w nawiasach."
+
+#: src/diff3.c:444
+msgid "-x  --overlap-only  Output overlapping changes."
+msgstr "-x  --overlap-only  Wypisanie nachodz±cych zmian."
+
+#: src/diff3.c:445
+msgid "-X  Output overlapping changes, bracketing them."
+msgstr "-X  Wypisanie nachodz±cych zmian w nawiasach."
+
+#: src/diff3.c:446
+msgid "-3  --easy-only  Output unmerged nonoverlapping changes."
+msgstr "-3  --easy-only  Wypisanie niez³±czonych nienachodz±cych zmian."
+
+#: src/diff3.c:448
+msgid "-m  --merge  Output merged file instead of ed script (default -A)."
+msgstr ""
+"-m   -merge  Wypisanie po³±czonych plików zamiast komend ed-a (domy¶lnie -A)."
+
+#: src/diff3.c:449
+msgid "-L LABEL  --label=LABEL  Use LABEL instead of file name."
+msgstr "-L ETYKIETA --label=ETYKIETA  U¿ycie ETYKIETY zamiast nazwy pliku."
+
+#: src/diff3.c:450
+msgid "-i  Append `w' and `q' commands to ed scripts."
+msgstr "-i  Dodanie komendy `w' i `q' do komend ed-a."
+
+#: src/diff3.c:453 src/sdiff.c:202
+msgid "--diff-program=PROGRAM  Use PROGRAM to compare files."
+msgstr "--diff-program=PROGRAM  U¿ycie PROGRAMU do porównania plików."
+
+#: src/diff3.c:465
+#, c-format
+msgid "Usage: %s [OPTION]... MYFILE OLDFILE YOURFILE\n"
+msgstr "U¿ycie: %s [OPCJA]... MÓJ_PLIK STARY_PLIK TWÓJ_PLIK\n"
+
+#: src/diff3.c:467
+msgid "Compare three files line by line."
+msgstr "Porównanie trzech plików linia po linii."
+
+#: src/diff3.c:673
+msgid "internal error: screwup in format of diff blocks"
+msgstr "b³ad wewnêtrzny: spieprzony format bloków diff"
+
+#: src/diff3.c:971
+#, c-format
+msgid "%s: diff failed: "
+msgstr "%s: diff nie zadzia³a³: "
+
+#: src/diff3.c:993
+msgid "internal error: invalid diff type in process_diff"
+msgstr "b³±d wewnêtrzny: b³êdny typ diff w process_diff"
+
+#: src/diff3.c:1018
+msgid "invalid diff format; invalid change separator"
+msgstr "b³êdny format diff; b³êdny separator zmian"
+
+#: src/diff3.c:1242
+msgid "invalid diff format; incomplete last line"
+msgstr "b³êdny format diff; niekompletna ostatnia linia"
+
+#: src/diff3.c:1265 src/sdiff.c:273
+#, c-format
+msgid "subsidiary program `%s' not executable"
+msgstr "program pomocniczy `%s' nie jest wykonywalny"
+
+#: src/diff3.c:1268 src/sdiff.c:276 src/util.c:298
+#, c-format
+msgid "subsidiary program `%s' not found"
+msgstr "nie znaleziono programu pomocniczego `%s'"
+
+#: src/diff3.c:1272 src/sdiff.c:268 src/util.c:301
+#, c-format
+msgid "subsidiary program `%s' failed"
+msgstr "nie zadzia³a³ program pomocniczy `%s'"
+
+#: src/diff3.c:1294
+msgid "invalid diff format; incorrect leading line chars"
+msgstr "b³êdny format diff; nieprawid³owe znaki na pocz±tku linii"
+
+#: src/diff3.c:1370
+msgid "internal error: invalid diff type passed to output"
+msgstr "b³±d wenwêtrzny: b³êdny typ diff-a przekazany na wyj¶cie"
+
+#: src/diff3.c:1647 src/diff3.c:1704
+msgid "input file shrank"
+msgstr "plik wej¶ciowy siê zmiejszy³"
+
+#: src/dir.c:162
+#, c-format
+msgid "cannot compare file names `%s' and `%s'"
+msgstr "nie mo¿na porównaæ nazw plików `%s' i `%s'"
+
+#: src/sdiff.c:35
+msgid "Written by Thomas Lord."
+msgstr "Napisany przez Thomasa Lorda."
+
+#: src/sdiff.c:183
+msgid "-o FILE  --output=FILE  Operate interactively, sending output to FILE."
+msgstr "-o PLIK  --output=PLIK  Tryb interakcyjny, wyniki wysy³ane do PLIKu."
+
+#: src/sdiff.c:185
+msgid "-i  --ignore-case  Consider upper- and lower-case to be the same."
+msgstr "-i  --ignore-case  Traktowanie ma³ych i wielkich liter tak samo."
+
+#: src/sdiff.c:188
+msgid "-W  --ignore-all-space  Ignore all white space."
+msgstr "-W  --ignore-all-space  Ignorowanie wszystkich znaków odstêpu."
+
+#: src/sdiff.c:194
+msgid "-w NUM  --width=NUM  Output at most NUM (default 130) columns per line."
+msgstr ""
+"-w ILE  --width=ILE  Wypisanie najwy¿ej ILE (domy¶nie 130) znaków w linii."
+
+#: src/sdiff.c:195
+msgid "-l  --left-column  Output only the left column of common lines."
+msgstr "-I  --left-column  Wypisanie tylko lewej kolumny dla wspólnych linii."
+
+#: src/sdiff.c:196
+msgid "-s  --suppress-common-lines  Do not output common lines."
+msgstr "-s  --suppress-common-lines  Bez wypisania wspólnych linii."
+
+#: src/sdiff.c:201
+msgid ""
+"-H  --speed-large-files  Assume large files and many scattered small changes."
+msgstr "-H  --speed-large-files  Du¿e pliki i rozrzucone ma³e zmiany."
+
+#: src/sdiff.c:214
+#, c-format
+msgid "Usage: %s [OPTION]... FILE1 FILE2\n"
+msgstr "U¿ycie: %s [OPCJA]... PLIK1 PLIK2\n"
+
+#: src/sdiff.c:215
+msgid "Side-by-side merge of file differences."
+msgstr "Interaktywne po³±czenie plików."
+
+#: src/sdiff.c:327
+msgid "cannot interactively merge standard input"
+msgstr "nie mogê interakcyjnie ³±czyæ standardowego wej¶cia"
+
+#: src/sdiff.c:588
+msgid "both files to be compared are directories"
+msgstr "oba maj±ce byæ porównane pliki to katalogi"
+
+#: src/sdiff.c:853
+msgid ""
+"ed:\tEdit then use both versions, each decorated with a header.\n"
+"eb:\tEdit then use both versions.\n"
+"el:\tEdit then use the left version.\n"
+"er:\tEdit then use the right version.\n"
+"e:\tEdit a new version.\n"
+"l:\tUse the left version.\n"
+"r:\tUse the right version.\n"
+"s:\tSilently include common lines.\n"
+"v:\tVerbosely include common lines.\n"
+"q:\tQuit.\n"
+msgstr ""
+"ed:\tEdycja i u¿ycie obu wersji, ka¿dej z nag³ówkiem.\n"
+"eb:\tEdycja i u¿ycie obu wersji.\n"
+"el:\tiU¿ycie wersji po lewej.\n"
+"er:\tEdycja i u¿ycie wersji po prawej.\n"
+"e:\tEdycja nowej wersji.\n"
+"l:\tU¿ycie wersji po lewej.\n"
+"r:\tU¿ycie wersji po prawej.\n"
+"s:\tDo³±czenie wspólnych linii bez informoawania o tym.\n"
+"v:\tDo³±czenie wspólnych linii z podaniem informacji.\n"
+"q:\tZakoñczenie.\n"

@@ -1,0 +1,53 @@
+Installation instructions specific to GNU Diffutils
+
+	Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+
+	This file is part of GNU Diffutils.
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2, or (at your option)
+	any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; see the file COPYING.  If not, write to
+	the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+	Boston, MA 02111-1307, USA.
+
+
+Please send comments and problem reports to <bug-gnu-utils@gnu.org>.
+
+If you have a problem with internationalization, you might be able to
+work around it as described in ABOUT-NLS by invoking `./configure
+--disable-nls'.  Many of the problems arise from dynamic linking
+issues on non-GNU platforms (e.g. with the iconv library).  Such
+problems tend to be shared by other GNU applications on these
+platforms, and can usually be fixed by carefully tweaking your non-GNU
+installation.  If you have an older version of libiconv, please
+upgrade to the latest one, preferably libiconv-1.8 or newer.
+(libiconv-1.8 is not yet available as of this writing, but it should
+be out soon.)  If the problem seems isolated to diffutils, though,
+please report a bug.
+
+This program requires a Standard C compiler (C89 or later); if you
+have an older K&R compiler, please install GCC first.
+
+If you make changes to the source code, you may need recent test
+versions of GNU build tools to regenerate the intermediate files.  The
+following versions were used to generate the intermediate files in
+this distribution:
+
+* GNU Autoconf 2.53 <ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.53.tar.gz>
+
+* GNU Automake 1.6 <ftp://ftp.gnu.org/gnu/automake/automake-1.6.tar.gz>
+
+* GNU gettext 0.11.1 <ftp://ftp.gnu.org/gnu/gettext/gettext-0.11.1.tar.gz>
+
+* GNU help2man 1.27 <ftp://ftp.gnu.org/gnu/help2man/help2man-1.27.tar.gz>
+
+* GNU texinfo 4.2 <ftp://ftp.gnu.org/gnu/texinfo/texinfo-4.2.tar.gz>

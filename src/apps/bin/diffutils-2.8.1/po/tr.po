@@ -1,0 +1,956 @@
+# Diffutils Turkish translation
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Deniz Akkus Kanca <deniz@arayan.com>, 2001.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: diffutils 2.8\n"
+"POT-Creation-Date: 2002-04-05 14:10-0800\n"
+"PO-Revision-Date: 2002-04-03 07:35EET\n"
+"Last-Translator: Deniz Akkus Kanca <deniz@arayan.com>\n"
+"Language-Team: Turkish <gnu-tr-u12a@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 0.9.5\n"
+
+#: lib/c-stack.c:188
+msgid "program error"
+msgstr "yazılım hatası"
+
+#: lib/c-stack.c:189
+msgid "stack overflow"
+msgstr "yığıt taşması"
+
+#: lib/error.c:128 lib/error.c:156
+msgid "Unknown system error"
+msgstr "Bilinmeyen sistem hatası"
+
+#: lib/freesoft.c:27
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute copies of this program\n"
+"under the terms of the GNU General Public License.\n"
+"For more information about these matters, see the file named COPYING."
+msgstr ""
+"Bu yazılım, kanunun izin verdiği ölçüde, HİÇ BİR GARANTİ içermez.\n"
+"Bu yazılımın kopyalarını GNU Genel Kamu Lisansı'nın koşulları altında\n"
+"dağıtabilirsiniz. Bu konular ile ilgili daha fazla bilgi için lütfen "
+"COPYING\n"
+"adındaki dosyaya bakın."
+
+#: lib/getopt.c:693
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: `%s' seçeneği belirsiz\n"
+
+#: lib/getopt.c:718
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: `--%s' seçeneği argümansız kullanılır\n"
+
+#: lib/getopt.c:723
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: seçenek `%c%s' argümansız kullanılır\n"
+
+#: lib/getopt.c:741 lib/getopt.c:914
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: `%s' seçeneği bir argümanla kullanılır\n"
+
+#: lib/getopt.c:770
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: `--%s' seçeneği bilinmiyor\n"
+
+#: lib/getopt.c:774
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: `%c%s' seçeneği bilinmiyor\n"
+
+#: lib/getopt.c:800
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: kuraldışı seçenek -- %c\n"
+
+#: lib/getopt.c:803
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: geçersiz seçenek -- %c\n"
+
+#: lib/getopt.c:833 lib/getopt.c:963
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: seçenek bir argümanla kullanılır -- %c\n"
+
+#: lib/getopt.c:880
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: `-W %s' seçeneği belirsiz\n"
+
+#: lib/getopt.c:898
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: `-W %s' seçeneği argümansız kullanılır\n"
+
+#: lib/regex.c:1367
+msgid "Success"
+msgstr "Başarılı"
+
+#: lib/regex.c:1370
+msgid "No match"
+msgstr "Eşleme yok"
+
+#: lib/regex.c:1373
+msgid "Invalid regular expression"
+msgstr "Düzenli ifade geçersiz"
+
+#: lib/regex.c:1376
+msgid "Invalid collation character"
+msgstr "Harmanlama karakteri geçersiz"
+
+#: lib/regex.c:1379
+msgid "Invalid character class name"
+msgstr "Karakter sınıf ismi geçersiz"
+
+#: lib/regex.c:1382
+msgid "Trailing backslash"
+msgstr "İzleyen ters kesme"
+
+#: lib/regex.c:1385
+msgid "Invalid back reference"
+msgstr "Geriye başvuru geçersiz"
+
+#: lib/regex.c:1388
+msgid "Unmatched [ or [^"
+msgstr "[ ya da [^ eşleşmiyor"
+
+#: lib/regex.c:1391
+msgid "Unmatched ( or \\("
+msgstr "( ya da \\( eşleşmiyor"
+
+#: lib/regex.c:1394
+msgid "Unmatched \\{"
+msgstr "\\{ eşleşmiyor"
+
+#: lib/regex.c:1397
+msgid "Invalid content of \\{\\}"
+msgstr "\\{\\} içeriği geçersiz"
+
+#: lib/regex.c:1400
+msgid "Invalid range end"
+msgstr "Kapsam sonu geçersiz"
+
+#: lib/regex.c:1403
+msgid "Memory exhausted"
+msgstr "Bellek tükendi"
+
+#: lib/regex.c:1406
+msgid "Invalid preceding regular expression"
+msgstr "Önceki düzenli ifade geçersiz"
+
+#: lib/regex.c:1409
+msgid "Premature end of regular expression"
+msgstr "Düzenli ifadenin sonu eksik kalmış"
+
+#: lib/regex.c:1412
+msgid "Regular expression too big"
+msgstr "Düzenli ifade çok büyük"
+
+#: lib/regex.c:1415
+msgid "Unmatched ) or \\)"
+msgstr ") ya da  \\) eşleşmiyor"
+
+#: lib/regex.c:8034
+msgid "No previous regular expression"
+msgstr "Daha önce düzenli ifade yok"
+
+#: lib/xmalloc.c:63
+msgid "memory exhausted"
+msgstr "bellek tükendi"
+
+#: src/analyze.c:809 src/diff.c:1283
+#, c-format
+msgid "Files %s and %s differ\n"
+msgstr "%s ve %s dosyaları birbirinden farklı\n"
+
+#: src/analyze.c:812
+#, c-format
+msgid "Binary files %s and %s differ\n"
+msgstr "İkilik dosyalar %s ve %s birbirinden farklı\n"
+
+#: src/analyze.c:1058 src/diff3.c:1413 src/util.c:526
+msgid "No newline at end of file"
+msgstr "Dosya sonunda yenisatır yok."
+
+#: src/cmp.c:43
+msgid "Written by Torbjorn Granlund and David MacKenzie."
+msgstr "Torbjorn Granlund ve David MacKenzie tarafından yazılmıştır."
+
+#: src/cmp.c:118 src/diff.c:817 src/diff3.c:427 src/sdiff.c:168
+#, c-format
+msgid "Try `%s --help' for more information."
+msgstr "Daha fazla bilgi için `%s --help' komutunu kullanın."
+
+#: src/cmp.c:137
+#, c-format
+msgid "invalid --ignore-initial value `%s'"
+msgstr "geçersiz -- ilk değer `%s' yoksayılmış"
+
+#: src/cmp.c:146
+msgid "options -l and -s are incompatible"
+msgstr "-l ve -s seçenekleri beraber kullanılamaz"
+
+#: src/cmp.c:154 src/diff.c:826 src/diff3.c:435 src/sdiff.c:177
+#: src/sdiff.c:313 src/sdiff.c:320 src/sdiff.c:910 src/util.c:194
+#: src/util.c:286 src/util.c:293
+msgid "write failed"
+msgstr "yazma başarısız oldu"
+
+#: src/cmp.c:156 src/diff.c:828 src/diff.c:1354 src/diff3.c:437
+#: src/sdiff.c:179
+msgid "standard output"
+msgstr "standart çıktı"
+
+#: src/cmp.c:160
+msgid "-b  --print-bytes  Print differing bytes."
+msgstr "-b  --print-bytes  Bayt farklarını çıktılar."
+
+#: src/cmp.c:161
+msgid "-i SKIP  --ignore-initial=SKIP  Skip the first SKIP bytes of input."
+msgstr "-i ATLA --ignore-initial=ATLA  Girdinin ilk ATLA baytını atlar."
+
+#: src/cmp.c:162
+msgid "-i SKIP1:SKIP2  --ignore-initial=SKIP1:SKIP2"
+msgstr "-i ATLA1:ATLA2  --ignore-initial=ATLA1:ATLA2"
+
+#: src/cmp.c:163
+msgid ""
+"  Skip the first SKIP1 bytes of FILE1 and the first SKIP2 bytes of FILE2."
+msgstr "  DOSYA1'in ilk ATLA1 baytını ve DOSYA2'nin ilk ATLA2 baytını atlar."
+
+#: src/cmp.c:164
+msgid "-l  --verbose  Output byte numbers and values of all differing bytes."
+msgstr ""
+"-l  --verbose  Bütün farklı baytların numaralarını ve değerlerini gösterir."
+
+#: src/cmp.c:165
+msgid "-n LIMIT  --bytes=LIMIT  Compare at most LIMIT bytes."
+msgstr "-n LİMİT  --bytes=LİMİT  En fazla LİMİT baytı karşılaştırır."
+
+#: src/cmp.c:166
+msgid "-s  --quiet  --silent  Output nothing; yield exit status only."
+msgstr ""
+"-s  --quiet  --silent  Hiç bir şey çıktılamaz, yalnızca çıkış durumunu "
+"bildirir."
+
+#: src/cmp.c:167 src/diff.c:904 src/diff3.c:455 src/sdiff.c:204
+msgid "-v  --version  Output version info."
+msgstr "-v  --version  Sürüm bilgisini gösterir."
+
+#: src/cmp.c:168 src/diff.c:905 src/diff3.c:456 src/sdiff.c:205
+msgid "--help  Output this help."
+msgstr "--help  Bu yardımı gösterir."
+
+#: src/cmp.c:177
+#, c-format
+msgid "Usage: %s [OPTION]... FILE1 [FILE2 [SKIP1 [SKIP2]]]\n"
+msgstr "Kullanım: %s [SEÇENEK]... DOSYA1 [DOSYA2 [ATLA1 [ATLA2]]]\n"
+
+#: src/cmp.c:179
+msgid "Compare two files byte by byte."
+msgstr "İki dosyayı bayt bayt karşılaştırır."
+
+#: src/cmp.c:183
+msgid "SKIP1 and SKIP2 are the number of bytes to skip in each file."
+msgstr "ATLA1 ve ATLA2 her dosyada atlanacak bayt sayısını gösterir."
+
+#: src/cmp.c:184
+msgid ""
+"SKIP values may be followed by the following multiplicative suffixes:\n"
+"kB 1000, K 1024, MB 1,000,000, M 1,048,576,\n"
+"GB 1,000,000,000, G 1,073,741,824, and so on for T, P, E, Z, Y."
+msgstr ""
+"ATLA değerleri aşağıdaki çarpanlarla sonlanabilir:\n"
+"kB 1000, K 1024, MB 1,000,000, M 1,048,576,\n"
+"GB 1,000,000,000, G 1,073,741,824, ve T, P, E, Z, Y için devam eder."
+
+#: src/cmp.c:187
+msgid "If a FILE is `-' or missing, read standard input."
+msgstr "Eğer DOSYA `-' ise veya yoksa, standart girdi okunur."
+
+#: src/cmp.c:188 src/diff.c:911 src/diff3.c:475 src/sdiff.c:223
+msgid "Report bugs to <bug-gnu-utils@gnu.org>."
+msgstr ""
+"Yazılım hatalarını <bug-gnu-utils@gnu.org> adresine, \n"
+"çeviri hatalarını <gnu-tr-u12a@lists.sourceforge.net> adresine bildirin."
+
+#: src/cmp.c:231
+#, c-format
+msgid "invalid --bytes value `%s'"
+msgstr "geçersiz --bytes değeri `%s'"
+
+#: src/cmp.c:258 src/diff.c:734 src/diff3.c:333 src/sdiff.c:558
+#, c-format
+msgid "missing operand after `%s'"
+msgstr "`%s'den sonra işlenen eksik"
+
+#: src/cmp.c:270 src/diff.c:736 src/diff3.c:335 src/sdiff.c:560
+#, c-format
+msgid "extra operand `%s'"
+msgstr "fazla işlenen `%s'"
+
+#: src/cmp.c:477
+#, c-format
+msgid "%s %s differ: byte %s, line %s\n"
+msgstr "%s %s farklı: bayt %s, satır %s\n"
+
+#: src/cmp.c:495
+#, c-format
+msgid "%s %s differ: byte %s, line %s is %3o %s %3o %s\n"
+msgstr "%s %s farklı: bayt %s, satır %s: %3o %s %3o %s\n"
+
+#: src/cmp.c:543
+#, c-format
+msgid "cmp: EOF on %s\n"
+msgstr "cmp: %s'da EOF (dosyasonu)\n"
+
+#: src/diff.c:41
+msgid ""
+"Written by Paul Eggert, Mike Haertel, David Hayes,\n"
+"Richard Stallman, and Len Tower."
+msgstr ""
+"Paul Eggert, Mike Haertel, David Hayes, Richard Stallman, ve Len Tower\n"
+"tarafından yazılmıştır."
+
+#: src/diff.c:322
+#, c-format
+msgid "invalid context length `%s'"
+msgstr "`%s' içerik uzunluğu geçersiz"
+
+#: src/diff.c:405
+msgid "pagination not supported on this host"
+msgstr "sayfalama bu makina üzerinde desteklenmiyor"
+
+#: src/diff.c:420 src/diff3.c:315
+msgid "too many file label options"
+msgstr "çok fazla dosya etiket seçeneği"
+
+#: src/diff.c:498
+#, c-format
+msgid "invalid width `%s'"
+msgstr "geçersiz genişlik `%s'"
+
+#: src/diff.c:502
+msgid "conflicting width options"
+msgstr "çelişkili genişlik seçenekleri"
+
+#: src/diff.c:526
+#, c-format
+msgid "invalid horizon length `%s'"
+msgstr "geçersiz ufuk uzunluğu `%s'"
+
+#: src/diff.c:629
+#, c-format
+msgid "`-%ld' option is obsolete; use `-%c %ld'"
+msgstr "`-%ld' seçeneği kullanımdan kalktı; `-%c %ld' kullanın"
+
+#: src/diff.c:641
+#, c-format
+msgid "`-%ld' option is obsolete; omit it"
+msgstr "`-%ld' seçeneği kullanımdan kalktı; kullanmayın"
+
+#: src/diff.c:709
+msgid "--from-file and --to-file both specified"
+msgstr "hem --from-file hem de --to-file belirtilmiş"
+
+#: src/diff.c:832
+msgid "Compare files line by line."
+msgstr "Dosyaları satır satır karşılaştırır."
+
+#: src/diff.c:834
+msgid "-i  --ignore-case  Ignore case differences in file contents."
+msgstr ""
+"-i --ignore-case  Dosya içeriğinde büyük/küçük harf farklarını yoksayar."
+
+#: src/diff.c:835
+msgid "--ignore-file-name-case  Ignore case when comparing file names."
+msgstr ""
+"--ignore-file-name-case  Dosya isimlerinde büyük/küçük harf farklarını "
+"yoksayar."
+
+#: src/diff.c:836
+msgid "--no-ignore-file-name-case  Consider case when comparing file names."
+msgstr ""
+"--no-ignore-file-name-case  Dosya isimlerinde büyük/küçük harf farkı gözetir."
+
+#: src/diff.c:837 src/sdiff.c:186
+msgid "-E  --ignore-tab-expansion  Ignore changes due to tab expansion."
+msgstr ""
+"-E  --ignore-tab-expansion  Sekmelerin açılmasından doğan farkları yoksayar."
+
+#: src/diff.c:838 src/sdiff.c:187
+msgid "-b  --ignore-space-change  Ignore changes in the amount of white space."
+msgstr ""
+"-b  --ignore-space-change  Boşluk miktarındaki değişiklikleri yoksayar."
+
+#: src/diff.c:839
+msgid "-w  --ignore-all-space  Ignore all white space."
+msgstr "-w  --ignore-all-space  Bütün boşlukları yoksayar."
+
+#: src/diff.c:840 src/sdiff.c:189
+msgid "-B  --ignore-blank-lines  Ignore changes whose lines are all blank."
+msgstr ""
+"-B  --ignore-blank-lines  Satırları boş olan değişiklikleri dikkate almaz."
+
+#: src/diff.c:841 src/sdiff.c:190
+msgid ""
+"-I RE  --ignore-matching-lines=RE  Ignore changes whose lines all match RE."
+msgstr ""
+"-I DÜZİF  --ignore-matching-lines=DÜZİF  Satırları DÜZİF kalıbına uyan\n"
+"                                         farkları yok sayar."
+
+#: src/diff.c:842 src/sdiff.c:191
+msgid "--strip-trailing-cr  Strip trailing carriage return on input."
+msgstr "--strip-trailing-cr  Girdiden en sonda sarkan satır başını soyar."
+
+#: src/diff.c:844
+msgid "--binary  Read and write data in binary mode."
+msgstr "--binary  Datayı ikilik kipte yazar ve okur."
+
+#: src/diff.c:846 src/diff3.c:451 src/sdiff.c:192
+msgid "-a  --text  Treat all files as text."
+msgstr "-a  --text  Bütün dosyaları metin imişcesine işler."
+
+#: src/diff.c:848
+msgid ""
+"-c  -C NUM  --context[=NUM]  Output NUM (default 3) lines of copied "
+"context.\n"
+"-u  -U NUM  --unified[=NUM]  Output NUM (default 3) lines of unified "
+"context.\n"
+"  --label LABEL  Use LABEL instead of file name.\n"
+"  -p  --show-c-function  Show which C function each change is in.\n"
+"  -F RE  --show-function-line=RE  Show the most recent line matching RE."
+msgstr ""
+"-c  -C SAYI  --context[=SAYI]  SAYI kadar bağlam satırı kopyalar (öntanımlı "
+"3)\n"
+"-u  -U SAYI  --unified[=SAYI]  SAYI kadar birleşmiş bağlam satırı kopyalar\n"
+"                               (öntanımlı 3)\n"
+"  --label ETİKET  Dosya adı yerine ETİKET'i kullanır.\n"
+"  -p  --show-c-function  Her farkın hangi C işlevi içinde olduğunu "
+"gösterir.\n"
+"  -F DÜZİF  --show-function-line=DÜZİF  DÜZİF düzenli ifade kalıbına uygun "
+"olan\n"
+"                               en son satırı gösterir."
+
+#: src/diff.c:853
+msgid "-q  --brief  Output only whether files differ."
+msgstr "-q  --brief  Yalnızca dosyaların farklı olup olmadığını gösterir."
+
+#: src/diff.c:854
+msgid "-e  --ed  Output an ed script."
+msgstr "-e  --ed  Bir ed betiği çıktılar."
+
+#: src/diff.c:855
+msgid "--normal  Output a normal diff."
+msgstr "--normal  Normal bir diff çıktılar."
+
+#: src/diff.c:856
+msgid "-n  --rcs  Output an RCS format diff."
+msgstr "-n  --rcs  RCS biçeminde diff çıktılar."
+
+#: src/diff.c:857
+msgid ""
+"-y  --side-by-side  Output in two columns.\n"
+"  -W NUM  --width=NUM  Output at most NUM (default 130) print columns.\n"
+"  --left-column  Output only the left column of common lines.\n"
+"  --suppress-common-lines  Do not output common lines."
+msgstr ""
+"-y  --side-by-side  İki sütun halinde çıktı verir.\n"
+"  -w SAYI  --width=SAYI  Satır başına en fazla SAYI kadar karakter çıktılar\n"
+"                    (öntanımlı 130).\n"
+"  --left-column     Ortak satırlarda yalnız sol sütunu gösterir.\n"
+"  --suppress-common-lines  Ortak satırları göstermez."
+
+#: src/diff.c:861
+msgid "-D NAME  --ifdef=NAME  Output merged file to show `#ifdef NAME' diffs."
+msgstr ""
+"-D İSİM  --ifdef=İSİM  #ifdef İSİM farklarını gösteren harmanlanmış\n"
+"                       dosya çıktılar."
+
+#: src/diff.c:862
+msgid ""
+"--GTYPE-group-format=GFMT  Similar, but format GTYPE input groups with GFMT."
+msgstr ""
+"--GTÜR-group-format=GBÇ  Benzer, fakat GTÜR biçeminde girdi grupları\n"
+"                         GBÇ ile biçemlendirilir."
+
+#: src/diff.c:863
+msgid "--line-format=LFMT  Similar, but format all input lines with LFMT."
+msgstr ""
+"--line-format=LBÇ  Benzer, fakat bütün girdi satırları LBÇ ile "
+"biçemlendirilir."
+
+#: src/diff.c:864
+msgid ""
+"--LTYPE-line-format=LFMT  Similar, but format LTYPE input lines with LFMT."
+msgstr ""
+"--LTÜR-line-format=LBÇ  Benzer, fakat LTÜR girdi satırları \n"
+"                        LBÇ ile biçemlendirilir."
+
+#: src/diff.c:865
+msgid "  LTYPE is `old', `new', or `unchanged'.  GTYPE is LTYPE or `changed'."
+msgstr ""
+"  LTÜR, `old' (eski), `new' (yeni) veya `unchanged' (değişmemiş) olabilir. \n"
+"  GTÜR, LTÜR veya `changed' (değişmiş) olabilir."
+
+#: src/diff.c:866
+msgid ""
+"  GFMT may contain:\n"
+"    %<  lines from FILE1\n"
+"    %>  lines from FILE2\n"
+"    %=  lines common to FILE1 and FILE2\n"
+"    %[-][WIDTH][.[PREC]]{doxX}LETTER  printf-style spec for LETTER\n"
+"      LETTERs are as follows for new group, lower case for old group:\n"
+"        F  first line number\n"
+"        L  last line number\n"
+"        N  number of lines = L-F+1\n"
+"        E  F-1\n"
+"        M  L+1"
+msgstr ""
+"  GBÇ aşağıdakileri içerebilir:\n"
+"    %<  DOSYA1'den satırlar\n"
+"    %>  DOSYA2'den satırlar\n"
+"    %=  DOSYA1 ve DOSYA2'de ortak olan satırlar\n"
+"    %[-][GENİŞLİK][.[KESİNLİK]]{doxX}HARF  HARF için printf tarzı biçem\n"
+"      HARF'ler yeni grup için aşağıdaki gibi, eski grup için ise\n"
+"      küçük harf olurlar:\n"
+"        F  ilk satır numarası\n"
+"        L  son satır numarası\n"
+"        N  satır sayısı = L-F+1\n"
+"        E  F-1\n"
+"        M  L+1"
+
+#: src/diff.c:877
+msgid ""
+"  LFMT may contain:\n"
+"    %L  contents of line\n"
+"    %l  contents of line, excluding any trailing newline\n"
+"    %[-][WIDTH][.[PREC]]{doxX}n  printf-style spec for input line number"
+msgstr ""
+"  LBÇ aşağıdakileri içerebilir:\n"
+"    %L  satırın içeriği\n"
+"    %l  sonlayan yenisatır karakteri hariç, satırın içeriği\n"
+"    %[-][GENİŞLİK][.[KESİNLİK]]{doxX}n  girdi satır sayısı için printf\n"
+"     tarzı biçem"
+
+#: src/diff.c:881
+msgid ""
+"  Either GFMT or LFMT may contain:\n"
+"    %%  %\n"
+"    %c'C'  the single character C\n"
+"    %c'\\OOO'  the character with octal code OOO"
+msgstr ""
+"  GBÇ veya LBÇ aşağıdakileri içerebilir:\n"
+"    %%  %\n"
+"    %c'C'  tekli karakter C\n"
+"    %c'\\OOO'  Sekizlik kodu OOO olan karakter"
+
+#: src/diff.c:886
+msgid "-l  --paginate  Pass the output through `pr' to paginate it."
+msgstr "-l  --paginate  Çıktıyı `pr' komutundan geçirerek sayfalar."
+
+#: src/diff.c:887 src/sdiff.c:198
+msgid "-t  --expand-tabs  Expand tabs to spaces in output."
+msgstr "-t  --expand-tabs  Çıktıda sekmeleri boşluk haline getirir."
+
+#: src/diff.c:888 src/diff3.c:452
+msgid "-T  --initial-tab  Make tabs line up by prepending a tab."
+msgstr ""
+"-T  --initial-tab  Başlarına bir sekme ilave ederek sekmelerin "
+"hizalanmasını\n"
+"                   sağlar."
+
+#: src/diff.c:890
+msgid "-r  --recursive  Recursively compare any subdirectories found."
+msgstr ""
+"-r  --recursive  Çevrimli olarak bulunan bütün alt dizinleri karşılaştırır."
+
+#: src/diff.c:891
+msgid "-N  --new-file  Treat absent files as empty."
+msgstr "-N  --new-file  Var olmayan dosyaları boş varsayar."
+
+#: src/diff.c:892
+msgid "--unidirectional-new-file  Treat absent first files as empty."
+msgstr "--unidirectional-new-file  Var olmayan birinci dosyayı boş varsayar."
+
+#: src/diff.c:893
+msgid "-s  --report-identical-files  Report when two files are the same."
+msgstr ""
+"-s  --report-identical-files  iki dosyanın birbirinin aynısı olup "
+"olmadığını\n"
+"                              bildirir."
+
+#: src/diff.c:894
+msgid "-x PAT  --exclude=PAT  Exclude files that match PAT."
+msgstr "-x KALIP  --exclude=KALIP  KALIP'a uyan dosyaları işleme dahil etmez."
+
+#: src/diff.c:895
+msgid ""
+"-X FILE  --exclude-from=FILE  Exclude files that match any pattern in FILE."
+msgstr ""
+"-X DOSYA  --exclude-from=DOSYA  DOSYA'da bulunan kalıplara uyan dosyaları\n"
+"                                işlem dışı tutar."
+
+#: src/diff.c:896
+msgid ""
+"-S FILE  --starting-file=FILE  Start with FILE when comparing directories."
+msgstr ""
+"-S DOSYA  --starting-file=DOSYA  Dizinleri karşılaştırırken DOSYA'dan başlar."
+
+#: src/diff.c:897
+msgid ""
+"--from-file=FILE1  Compare FILE1 to all operands.  FILE1 can be a directory."
+msgstr ""
+"--from-file=DOSYA1 DOSYA1'i bütün işlenenlerle karşılaştırır. DOSYA1 dizin\n"
+"                   olabilir."
+
+#: src/diff.c:898
+msgid ""
+"--to-file=FILE2  Compare all operands to FILE2.  FILE2 can be a directory."
+msgstr ""
+"--to-file=DOSYA2  Bütün işlenenleri DOSYA2 ile karşılaştırı. DOSYA2 dizin\n"
+"                  olabilir."
+
+#: src/diff.c:900
+msgid "--horizon-lines=NUM  Keep NUM lines of the common prefix and suffix."
+msgstr "--horizon-lines=SAYI  ortak ilkek ve soneklerin SAYI satırını tutar."
+
+#: src/diff.c:901 src/sdiff.c:200
+msgid "-d  --minimal  Try hard to find a smaller set of changes."
+msgstr "-d  --minimal  Daha küçük bir fark kümesi bulmaya çalışır."
+
+#: src/diff.c:902
+msgid ""
+"--speed-large-files  Assume large files and many scattered small changes."
+msgstr ""
+"--speed-large-files  Büyük dosyalar ve çok sayıda dağınık küçük \n"
+"                         farklar olduğunu farzeder."
+
+#: src/diff.c:907
+msgid ""
+"FILES are `FILE1 FILE2' or `DIR1 DIR2' or `DIR FILE...' or `FILE... DIR'."
+msgstr ""
+"DOSYAlar: `DOSYA1 DOSYA2' veya `DİZİN1 DİZİN2' veya `DİZİN DOSYA...' \n"
+"          veya `DOSYA...DİZİN';"
+
+#: src/diff.c:908
+msgid ""
+"If --from-file or --to-file is given, there are no restrictions on FILES."
+msgstr ""
+"eğer --from-file veya --to-file kullanılmışsa, DOSYAlar üzerinde \n"
+"kısıtlama yoktur."
+
+#: src/diff.c:909 src/diff3.c:474 src/sdiff.c:222
+msgid "If a FILE is `-', read standard input."
+msgstr "Eğer bir DOSYA `-' ise, standart girdi okunur."
+
+#: src/diff.c:920
+#, c-format
+msgid "Usage: %s [OPTION]... FILES\n"
+msgstr "Kullanım: %s [SEÇENEK]... DOSYAlar\n"
+
+#: src/diff.c:949
+#, c-format
+msgid "conflicting %s option value `%s'"
+msgstr "çelişkili %s seçeneği değeri: `%s'"
+
+#: src/diff.c:962
+msgid "conflicting output style options"
+msgstr "çelişkili çıktı tarz seçenekleri"
+
+#: src/diff.c:976
+msgid "regular empty file"
+msgstr "normal boş dosya"
+
+#: src/diff.c:976
+msgid "regular file"
+msgstr "normal dosya"
+
+#: src/diff.c:978
+msgid "directory"
+msgstr "dizin"
+
+#: src/diff.c:981
+msgid "block special file"
+msgstr "blok özel dosyası"
+
+#: src/diff.c:984
+msgid "character special file"
+msgstr "karakter özel dosyası"
+
+#: src/diff.c:987
+msgid "fifo"
+msgstr "fifo"
+
+#: src/diff.c:991
+msgid "socket"
+msgstr "soket"
+
+#: src/diff.c:994
+msgid "message queue"
+msgstr "ileti kuyruğu"
+
+#: src/diff.c:997
+msgid "semaphore"
+msgstr "semafor"
+
+#: src/diff.c:1000
+msgid "shared memory object"
+msgstr "ortak bellek nesnesi"
+
+#: src/diff.c:1003
+msgid "typed memory object"
+msgstr "türlenmiş bellek nesnesi"
+
+#: src/diff.c:1006
+msgid "weird file"
+msgstr "dosya garip"
+
+#: src/diff.c:1070 src/diff.c:1256
+#, c-format
+msgid "Only in %s: %s\n"
+msgstr "Yalnızca %s'da: %s\n"
+
+#: src/diff.c:1193
+msgid "cannot compare `-' to a directory"
+msgstr "`-', bir dizinle karşılaştırılamaz"
+
+#: src/diff.c:1220
+msgid "-D option not supported with directories"
+msgstr "-D seçenek dizinler için kullanılamaz."
+
+#: src/diff.c:1229
+#, c-format
+msgid "Common subdirectories: %s and %s\n"
+msgstr "Ortak alt dizinler: %s ve %s\n"
+
+#: src/diff.c:1266
+#, c-format
+msgid "File %s is a %s while file %s is a %s\n"
+msgstr "%s dosyası, bir %s, halbuki %s dosyası bir %s\n"
+
+#: src/diff.c:1345
+#, c-format
+msgid "Files %s and %s are identical\n"
+msgstr "%s ve %s dosyaları birbirinin aynı\n"
+
+#: src/diff3.c:26
+msgid "Written by Randy Smith."
+msgstr "Randy Smith tarafından yazılmıştır."
+
+#: src/diff3.c:328
+msgid "incompatible options"
+msgstr "uyumsuz seçenekler"
+
+#: src/diff3.c:368
+msgid "`-' specified for more than one input file"
+msgstr "`-' birden fazla girdi dosyası için belirtilmiş"
+
+#: src/diff3.c:408 src/diff3.c:1232 src/diff3.c:1645 src/diff3.c:1700
+#: src/sdiff.c:305 src/sdiff.c:879 src/sdiff.c:890
+msgid "read failed"
+msgstr "okuma başarısız oldu"
+
+#: src/diff3.c:441
+msgid "-e  --ed  Output unmerged changes from OLDFILE to YOURFILE into MYFILE."
+msgstr ""
+"-e  --ed  ESKİDOSYA ile SİZİNDOSYA arasındaki harmanlanmamış farkları\n"
+"          BENİMDOSYA'ya çıktılar."
+
+#: src/diff3.c:442
+msgid "-E  --show-overlap  Output unmerged changes, bracketing conflicts."
+msgstr ""
+"-E  --show-overlap  Harmanlanmamış değişiklikleri çıktılar, ihtilafları \n"
+"                    köşeli parantez içinde gösterir."
+
+#: src/diff3.c:443
+msgid "-A  --show-all  Output all changes, bracketing conflicts."
+msgstr ""
+"-A  --show-all  Bütün değişiklikleri çıktılar, ihtilafları köşeli parantez\n"
+"                içine alır."
+
+#: src/diff3.c:444
+msgid "-x  --overlap-only  Output overlapping changes."
+msgstr "-x  --overlap-only  Birbiri ile örtüşen farkları gösterir."
+
+#: src/diff3.c:445
+msgid "-X  Output overlapping changes, bracketing them."
+msgstr ""
+"-X  Birbiriyle örtüşen farkları köşeli parantez içinde göstererek çıktılar."
+
+#: src/diff3.c:446
+msgid "-3  --easy-only  Output unmerged nonoverlapping changes."
+msgstr ""
+"-3  --easy-only  Harmanlanmamış, tekrarlanmayan değişiklikleri çıktılar."
+
+#: src/diff3.c:448
+msgid "-m  --merge  Output merged file instead of ed script (default -A)."
+msgstr ""
+"-m  --merge  Ed betiği yerine harmanlanmış dosya çıktılar. (öntanımlı -A)"
+
+#: src/diff3.c:449
+msgid "-L LABEL  --label=LABEL  Use LABEL instead of file name."
+msgstr "-L ETİKET  --label=ETİKET  Dosya adı yerine ETİKET'i kullanır."
+
+#: src/diff3.c:450
+msgid "-i  Append `w' and `q' commands to ed scripts."
+msgstr "-i  Ed betiklerinin sonuna `w' ve `q' komutlarını ekler."
+
+#: src/diff3.c:453 src/sdiff.c:202
+msgid "--diff-program=PROGRAM  Use PROGRAM to compare files."
+msgstr ""
+"--diff-program=YAZILIM  Dosyaları karşılaştırmak için YAZILIM'ı kullanır."
+
+#: src/diff3.c:465
+#, c-format
+msgid "Usage: %s [OPTION]... MYFILE OLDFILE YOURFILE\n"
+msgstr "Kullanım: %s [SEÇENEK]... BENİMDOSYA ESKİDOSYA SİZİNDOSYA\n"
+
+#: src/diff3.c:467
+msgid "Compare three files line by line."
+msgstr "Üç dosyayı satır satır karşılaştırır."
+
+#: src/diff3.c:673
+msgid "internal error: screwup in format of diff blocks"
+msgstr "iç hata: diff blokları biçemlemesinde hata oluştu"
+
+#: src/diff3.c:971
+#, c-format
+msgid "%s: diff failed: "
+msgstr "%s: diff başarısız oldu:"
+
+#: src/diff3.c:993
+msgid "internal error: invalid diff type in process_diff"
+msgstr "iç hata: process_diff işlevi içinde geçersiz diff türü"
+
+#: src/diff3.c:1018
+msgid "invalid diff format; invalid change separator"
+msgstr "geçersiz diff biçemi; geçersiz fark ayracı"
+
+#: src/diff3.c:1242
+msgid "invalid diff format; incomplete last line"
+msgstr "geçersiz diff biçemi; tamamlanmamış son satır"
+
+#: src/diff3.c:1265 src/sdiff.c:273
+#, c-format
+msgid "subsidiary program `%s' not executable"
+msgstr "alt yazılım `%s' çalışır değil"
+
+#: src/diff3.c:1268 src/sdiff.c:276 src/util.c:298
+#, c-format
+msgid "subsidiary program `%s' not found"
+msgstr "alt yazılım `%s' bulunamadı"
+
+#: src/diff3.c:1272 src/sdiff.c:268 src/util.c:301
+#, c-format
+msgid "subsidiary program `%s' failed"
+msgstr "alt yazılım `%s' başarısız oldu"
+
+#: src/diff3.c:1294
+msgid "invalid diff format; incorrect leading line chars"
+msgstr "geçersiz diff biçemi; geçersiz satır başı karakterleri"
+
+#: src/diff3.c:1370
+msgid "internal error: invalid diff type passed to output"
+msgstr "iç hata: çıktıya geçersiz diff türü geçirildi"
+
+#: src/diff3.c:1647 src/diff3.c:1704
+msgid "input file shrank"
+msgstr "girdi dosyası küçüldü"
+
+#: src/dir.c:162
+#, c-format
+msgid "cannot compare file names `%s' and `%s'"
+msgstr "dosya isimleri `%s' ve `%s' karşılaştırılamıyor"
+
+#: src/sdiff.c:35
+msgid "Written by Thomas Lord."
+msgstr "Thomas Lord tarafından yazılmıştır."
+
+#: src/sdiff.c:183
+msgid "-o FILE  --output=FILE  Operate interactively, sending output to FILE."
+msgstr ""
+"-o DOSYA  --output=DOSYA  Interaktif olarak çalışır, çıktıyı DOSYA'ya\n"
+"                          yönlendirir."
+
+#: src/sdiff.c:185
+msgid "-i  --ignore-case  Consider upper- and lower-case to be the same."
+msgstr "-i  --ignore-case  Büyük harf/küçük harf farkı gözetmez."
+
+#: src/sdiff.c:188
+msgid "-W  --ignore-all-space  Ignore all white space."
+msgstr "-W  --ignore-all-space  Bütün boşlukları yok sayar."
+
+#: src/sdiff.c:194
+msgid "-w NUM  --width=NUM  Output at most NUM (default 130) columns per line."
+msgstr ""
+"-w SAYI  --width=SAYI  Satır başına en fazla SAYI kadar karakter çıktılar\n"
+"                       (öntanımlı 130)."
+
+#: src/sdiff.c:195
+msgid "-l  --left-column  Output only the left column of common lines."
+msgstr "-l  --left-column  Ortak satırları yalnızca sol sütunda çıktılar."
+
+#: src/sdiff.c:196
+msgid "-s  --suppress-common-lines  Do not output common lines."
+msgstr "-s  --suppress-common-lines  Ortak satırları göstermez."
+
+#: src/sdiff.c:201
+msgid ""
+"-H  --speed-large-files  Assume large files and many scattered small changes."
+msgstr ""
+"-H  --speed-large-files  Büyük dosyalar ve çok sayıda dağınık küçük \n"
+"                         farklar olduğunu farzeder."
+
+#: src/sdiff.c:214
+#, c-format
+msgid "Usage: %s [OPTION]... FILE1 FILE2\n"
+msgstr "Kullanım: %s [SEÇENEK]... DOSYA1 DOSYA2\n"
+
+#: src/sdiff.c:215
+msgid "Side-by-side merge of file differences."
+msgstr "Dosya farklarının yanyana katıştırılması."
+
+#: src/sdiff.c:327
+msgid "cannot interactively merge standard input"
+msgstr "interaktif olarak standart girdi harmanlanamaz"
+
+#: src/sdiff.c:588
+msgid "both files to be compared are directories"
+msgstr "karşılaştırılacak her iki dosya da dizin"
+
+#: src/sdiff.c:853
+msgid ""
+"ed:\tEdit then use both versions, each decorated with a header.\n"
+"eb:\tEdit then use both versions.\n"
+"el:\tEdit then use the left version.\n"
+"er:\tEdit then use the right version.\n"
+"e:\tEdit a new version.\n"
+"l:\tUse the left version.\n"
+"r:\tUse the right version.\n"
+"s:\tSilently include common lines.\n"
+"v:\tVerbosely include common lines.\n"
+"q:\tQuit.\n"
+msgstr ""
+"ed:\tDüzenler, sonra iki tarafı da kullanır, bir başlıkla süsler.\n"
+"eb:\tDüzenler, sonra iki tarafı da kullanır.\n"
+"el:\tDüzenler, sonra sol tarafı kullanır.\n"
+"er:\tDüzenler, sonra sağ tarafı kullanır.\n"
+"e:\tYeni bir sürüm düzenler.\n"
+"l:\tSol tarafı kullanır.\n"
+"r:\tSağ tarafı kullanır.\n"
+"s:\tOrtak satırları sessizce dahil eder.\n"
+"v:\tOrtak satırları bilgi vererek dahil eder.\n"
+"q:\tÇıkar.\n"

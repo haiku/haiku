@@ -1,0 +1,66 @@
+This directory contains files required to build GNU Diffutils on
+MS_DOS and MS-Windows using the DJGPP tools.
+
+To build Diffutils, you will need the following packages:
+
+    . the basic DJGPP development kit: GCC, Binutils, and djdevNNN.zip
+    . a DJGPP port of Bash (bsh204b.zip)
+    . GNU Fileutils (fil40b.zip)
+    . GNU Textutils (txt20b.zip)
+    . GNU Sh-utils (shl112b.zip)
+    . GNU Grep (grep24b.zip)
+    . GNU Awk (gwk306b.zip)
+    . GNU Sed (sed302b.zip)
+    . GNU Make (mak3791b.zip)
+
+The package names in parentheses indicate the oldest version which
+should work; newer versions are okay.  All those packages can be found
+on the usual DJGPP sites, in the v2gnu directory.  Please see
+<http://www.delorie.com/djgpp/getting.html> for a list of DJGPP sites.
+
+The source distribution of Diffutils you find on DJGPP sites comes
+preconfigured for the latest officially released version of the DJGPP
+library, and without NLS support.  If that is what you have installed,
+and if you don't need NLS support in Diffutils, you don't need to run
+the configure script; proceed directly to the "make" step below.
+
+If you are building the official GNU distribution, or your library is
+not the latest official release, or if you modified your headers or
+installed optional libraries, or if you want to have NLS support in
+Diffutils, you will have to reconfigure the package.  To this end,
+after unpacking the sources, chdir to the top-level directory created
+by unpacking, and type this command:
+
+   ms\config [nls]
+
+The "nls" option, if given, will configure the package for NLS
+support.
+
+This will run for a while and create the Makefile's and the config.h
+header file.
+
+Next type "make"; this will build the programs.
+
+To install the package, type "make install".
+
+That's it!
+
+-----
+Copyright (C) 2001 Free Software Foundation, Inc.
+
+This file is part of GNU DIFF.
+
+GNU DIFF is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU DIFF is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with tar; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.

@@ -21,6 +21,9 @@ StdBinCommands
 	yes.cpp
 	: be ;
 
+StdBinCommands
+	sleep.cpp
+	: root ;
 #UsePrivateHeaders kernel ;
 #StdBinCommands
 #	factor.cpp

@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src apps bin diffutils-2.8.1 ;
+
+SubInclude OBOS_TOP src apps bin diffutils-2.8.1 lib ;
+SubInclude OBOS_TOP src apps bin diffutils-2.8.1 src ; 

@@ -1,0 +1,942 @@
+# Перевод сообщений diffutils
+# Copyright (C) 1998 Free Software Foundation, Inc.
+# Oleg S. Tihonov <tihonov@ffke-campus.mipt.ru>, 1998, 2001, 2002.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: diffutils 2.8\n"
+"POT-Creation-Date: 2002-04-05 14:10-0800\n"
+"PO-Revision-Date: 2002-04-03 14:06+0400\n"
+"Last-Translator: Oleg S. Tihonov <tihonov@ffke-campus.mipt.ru>\n"
+"Language-Team: Russian <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=koi8-r\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/c-stack.c:188
+msgid "program error"
+msgstr "ошибка программы"
+
+#: lib/c-stack.c:189
+msgid "stack overflow"
+msgstr "переполнение стека"
+
+#: lib/error.c:128 lib/error.c:156
+msgid "Unknown system error"
+msgstr "Неизвестная системная ошибка"
+
+#: lib/freesoft.c:27
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute copies of this program\n"
+"under the terms of the GNU General Public License.\n"
+"For more information about these matters, see the file named COPYING."
+msgstr ""
+"Copyright (C) %s Free Software Foundation, Inc.\n"
+"Мы НЕ предоставляем гарантий, в той мере, которая допустима законом.\n"
+"Вы можете распространять эти программы при соблюдении\n"
+"условий Универсальной Общественной Лицензии GNU.\n"
+"Для получения подробной информации о возможности распространения смотрите\n"
+"файл COPYING."
+
+#: lib/getopt.c:693
+#, c-format
+msgid "%s: option `%s' is ambiguous\n"
+msgstr "%s: неоднозначный ключ `%s'\n"
+
+#: lib/getopt.c:718
+#, c-format
+msgid "%s: option `--%s' doesn't allow an argument\n"
+msgstr "%s: ключ `--%s' должен использоваться без аргумента\n"
+
+#: lib/getopt.c:723
+#, c-format
+msgid "%s: option `%c%s' doesn't allow an argument\n"
+msgstr "%s: ключ `%c%s' должен использоваться без аргумента\n"
+
+#: lib/getopt.c:741 lib/getopt.c:914
+#, c-format
+msgid "%s: option `%s' requires an argument\n"
+msgstr "%s: ключ `%s' должен использоваться c аргументом\n"
+
+#: lib/getopt.c:770
+#, c-format
+msgid "%s: unrecognized option `--%s'\n"
+msgstr "%s: неизвестный ключ `--%s'\n"
+
+#: lib/getopt.c:774
+#, c-format
+msgid "%s: unrecognized option `%c%s'\n"
+msgstr "%s: неизвестный ключ `%c%s'\n"
+
+#: lib/getopt.c:800
+#, c-format
+msgid "%s: illegal option -- %c\n"
+msgstr "%s: недопустимый ключ -- %c\n"
+
+#: lib/getopt.c:803
+#, c-format
+msgid "%s: invalid option -- %c\n"
+msgstr "%s: неверный ключ -- %c\n"
+
+#: lib/getopt.c:833 lib/getopt.c:963
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: ключ %c должен бы использоваться c аргументом\n"
+
+#: lib/getopt.c:880
+#, c-format
+msgid "%s: option `-W %s' is ambiguous\n"
+msgstr "%s: неоднозначный ключ `-W %s'\n"
+
+#: lib/getopt.c:898
+#, c-format
+msgid "%s: option `-W %s' doesn't allow an argument\n"
+msgstr "%s: ключ `-W %s' должен использоваться без аргумента\n"
+
+#: lib/regex.c:1367
+msgid "Success"
+msgstr "Успех"
+
+#: lib/regex.c:1370
+msgid "No match"
+msgstr "Совпадений нет"
+
+#: lib/regex.c:1373
+msgid "Invalid regular expression"
+msgstr "Неверное регулярное выражение"
+
+#: lib/regex.c:1376
+msgid "Invalid collation character"
+msgstr "Недопустимый для сортировки символ"
+
+#: lib/regex.c:1379
+msgid "Invalid character class name"
+msgstr "Неверное имя класса символа"
+
+#: lib/regex.c:1382
+msgid "Trailing backslash"
+msgstr "Обратная косая черта стоит последней"
+
+#: lib/regex.c:1385
+msgid "Invalid back reference"
+msgstr "Неверная ссылка"
+
+#: lib/regex.c:1388
+msgid "Unmatched [ or [^"
+msgstr "Непарная [ или [^"
+
+#: lib/regex.c:1391
+msgid "Unmatched ( or \\("
+msgstr "Непарная ( или \\("
+
+#: lib/regex.c:1394
+msgid "Unmatched \\{"
+msgstr "Непарная \\{"
+
+#: lib/regex.c:1397
+msgid "Invalid content of \\{\\}"
+msgstr "Неверное содержимое \\{\\}"
+
+#: lib/regex.c:1400
+msgid "Invalid range end"
+msgstr "Неверный нижний предел"
+
+#: lib/regex.c:1403
+msgid "Memory exhausted"
+msgstr "Оперативная память исчерпана"
+
+#: lib/regex.c:1406
+msgid "Invalid preceding regular expression"
+msgstr "Неверное предшествующее регулярное выражение"
+
+#: lib/regex.c:1409
+msgid "Premature end of regular expression"
+msgstr "Преждевременный конец регулярного выражения"
+
+#: lib/regex.c:1412
+msgid "Regular expression too big"
+msgstr "Регулярное выражение слишком велико"
+
+#: lib/regex.c:1415
+msgid "Unmatched ) or \\)"
+msgstr "Непарная ) или \\)"
+
+#: lib/regex.c:8034
+msgid "No previous regular expression"
+msgstr "Регулярное выражение не было задано раньше"
+
+#: lib/xmalloc.c:63
+msgid "memory exhausted"
+msgstr "память исчерпана"
+
+#: src/analyze.c:809 src/diff.c:1283
+#, c-format
+msgid "Files %s and %s differ\n"
+msgstr "Файлы %s и %s различаются\n"
+
+#: src/analyze.c:812
+#, c-format
+msgid "Binary files %s and %s differ\n"
+msgstr "Двоичные файлы %s и %s различаются\n"
+
+#: src/analyze.c:1058 src/diff3.c:1413 src/util.c:526
+msgid "No newline at end of file"
+msgstr "В конце файла нет новой строки"
+
+#: src/cmp.c:43
+msgid "Written by Torbjorn Granlund and David MacKenzie."
+msgstr "Авторы Torbjorn Granlund и David MacKenzie."
+
+#: src/cmp.c:118 src/diff.c:817 src/diff3.c:427 src/sdiff.c:168
+#, c-format
+msgid "Try `%s --help' for more information."
+msgstr "Попробуйте `%s --help' для получения более подробного описания."
+
+#: src/cmp.c:137
+#, c-format
+msgid "invalid --ignore-initial value `%s'"
+msgstr "недопустимое значение --ignore-initial `%s'"
+
+#: src/cmp.c:146
+msgid "options -l and -s are incompatible"
+msgstr "ключи -l и -s несовместимы"
+
+#: src/cmp.c:154 src/diff.c:826 src/diff3.c:435 src/sdiff.c:177
+#: src/sdiff.c:313 src/sdiff.c:320 src/sdiff.c:910 src/util.c:194
+#: src/util.c:286 src/util.c:293
+msgid "write failed"
+msgstr "запись неуспешна"
+
+#: src/cmp.c:156 src/diff.c:828 src/diff.c:1354 src/diff3.c:437
+#: src/sdiff.c:179
+msgid "standard output"
+msgstr "стандартный вывод"
+
+#: src/cmp.c:160
+msgid "-b  --print-bytes  Print differing bytes."
+msgstr "-b  --print-bytes  Выводить различающиеся байты."
+
+#: src/cmp.c:161
+msgid "-i SKIP  --ignore-initial=SKIP  Skip the first SKIP bytes of input."
+msgstr ""
+"-i Н  --ignore-initial=Н  Игнорировать различия в первых Н байтах ввода."
+
+#: src/cmp.c:162
+msgid "-i SKIP1:SKIP2  --ignore-initial=SKIP1:SKIP2"
+msgstr "-i Н1:Н2  --ignore-initial=Н1:Н2"
+
+#: src/cmp.c:163
+msgid ""
+"  Skip the first SKIP1 bytes of FILE1 and the first SKIP2 bytes of FILE2."
+msgstr "Пропустить первые Н1 байт файла ФАЙЛ1 и первые Н2 байт файла ФАЙЛ2."
+
+#: src/cmp.c:164
+msgid "-l  --verbose  Output byte numbers and values of all differing bytes."
+msgstr "-l  --verbose  Выводить номера и значения всех различающихся байт."
+
+#: src/cmp.c:165
+msgid "-n LIMIT  --bytes=LIMIT  Compare at most LIMIT bytes."
+msgstr "-n ПРЕДЕЛ  --bytes=ПРЕДЕЛ  Сравнивать не более указанного числа байт."
+
+#: src/cmp.c:166
+msgid "-s  --quiet  --silent  Output nothing; yield exit status only."
+msgstr ""
+"-s  --quiet  --silent  Не выводить, только сообщить возвращаемое значение."
+
+#: src/cmp.c:167 src/diff.c:904 src/diff3.c:455 src/sdiff.c:204
+msgid "-v  --version  Output version info."
+msgstr "-v  --version  Показать информацию о версии и выйти."
+
+#: src/cmp.c:168 src/diff.c:905 src/diff3.c:456 src/sdiff.c:205
+msgid "--help  Output this help."
+msgstr "--help  Показать эту справку и выйти."
+
+#: src/cmp.c:177
+#, c-format
+msgid "Usage: %s [OPTION]... FILE1 [FILE2 [SKIP1 [SKIP2]]]\n"
+msgstr "Использование: %s [КЛЮЧ]... ФАЙЛ1 [ФАЙЛ2 [Н1 [Н2]]]\n"
+
+#: src/cmp.c:179
+msgid "Compare two files byte by byte."
+msgstr "Побайтово сравнивает два файла."
+
+#: src/cmp.c:183
+msgid "SKIP1 and SKIP2 are the number of bytes to skip in each file."
+msgstr "Н1 и Н2 -- это число байт, которые следует пропустить в каждом файле."
+
+#: src/cmp.c:184
+msgid ""
+"SKIP values may be followed by the following multiplicative suffixes:\n"
+"kB 1000, K 1024, MB 1,000,000, M 1,048,576,\n"
+"GB 1,000,000,000, G 1,073,741,824, and so on for T, P, E, Z, Y."
+msgstr ""
+"К значениям Н можно приписывать один из следующих множительных суффиксов:\n"
+"kB 1000, K 1024, MB 1,000,000, M 1,048,576,\n"
+"GB 1,000,000,000, G 1,073,741,824, и так далее для T, P, E, Z, Y."
+
+#: src/cmp.c:187
+msgid "If a FILE is `-' or missing, read standard input."
+msgstr "Если ФАЙЛ не задан или задан как `-', читает стандартный ввод."
+
+#: src/cmp.c:188 src/diff.c:911 src/diff3.c:475 src/sdiff.c:223
+msgid "Report bugs to <bug-gnu-utils@gnu.org>."
+msgstr "Об ошибках сообщайте <bug-gnu-utils@gnu.org>."
+
+#: src/cmp.c:231
+#, c-format
+msgid "invalid --bytes value `%s'"
+msgstr "недопустимое значение --bytes `%s'"
+
+#: src/cmp.c:258 src/diff.c:734 src/diff3.c:333 src/sdiff.c:558
+#, c-format
+msgid "missing operand after `%s'"
+msgstr "пропущен операнд после `%s'"
+
+#: src/cmp.c:270 src/diff.c:736 src/diff3.c:335 src/sdiff.c:560
+#, c-format
+msgid "extra operand `%s'"
+msgstr "излишний операнд `%s'"
+
+#: src/cmp.c:477
+#, c-format
+msgid "%s %s differ: byte %s, line %s\n"
+msgstr "%s %s различаются: байт %s, строка %s\n"
+
+#: src/cmp.c:495
+#, c-format
+msgid "%s %s differ: byte %s, line %s is %3o %s %3o %s\n"
+msgstr "%s %s различаются: байт %s, строка %s равен %3o %s %3o %s\n"
+
+#: src/cmp.c:543
+#, c-format
+msgid "cmp: EOF on %s\n"
+msgstr "cmp: коней файла в %s\n"
+
+#: src/diff.c:41
+msgid ""
+"Written by Paul Eggert, Mike Haertel, David Hayes,\n"
+"Richard Stallman, and Len Tower."
+msgstr ""
+"Авторы Paul Eggert, Mike Haertel, David Hayes,\n"
+"Richard Stallman, и Len Tower."
+
+#: src/diff.c:322
+#, c-format
+msgid "invalid context length `%s'"
+msgstr "недопустимая длина контекста `%s'"
+
+#: src/diff.c:405
+msgid "pagination not supported on this host"
+msgstr "разбиение на страницы не поддерживается на данной машине"
+
+#: src/diff.c:420 src/diff3.c:315
+msgid "too many file label options"
+msgstr "слишком много ключей задающих метки файлов"
+
+#: src/diff.c:498
+#, c-format
+msgid "invalid width `%s'"
+msgstr "недопустимая ширина `%s'"
+
+#: src/diff.c:502
+msgid "conflicting width options"
+msgstr "противоречивые ключи задания ширины"
+
+#: src/diff.c:526
+#, c-format
+msgid "invalid horizon length `%s'"
+msgstr "недопустимая длина горизонта `%s'"
+
+#: src/diff.c:629
+#, c-format
+msgid "`-%ld' option is obsolete; use `-%c %ld'"
+msgstr "ключ `-%ld' устарел; используйте `-%c %ld'"
+
+#: src/diff.c:641
+#, c-format
+msgid "`-%ld' option is obsolete; omit it"
+msgstr "ключ `-%ld' устарел; опускайте его"
+
+#: src/diff.c:709
+msgid "--from-file and --to-file both specified"
+msgstr "необходимо задать как --from-file, так и --to-file"
+
+#: src/diff.c:832
+msgid "Compare files line by line."
+msgstr "Построчно сравнивает два файла."
+
+#: src/diff.c:834
+msgid "-i  --ignore-case  Ignore case differences in file contents."
+msgstr "-i  --ignore-case  Игнорировать регистр букв в содержимом файлов."
+
+#: src/diff.c:835
+msgid "--ignore-file-name-case  Ignore case when comparing file names."
+msgstr "--ignore-file-name-case  Игнорировать регистр букв в именах файлов."
+
+#: src/diff.c:836
+msgid "--no-ignore-file-name-case  Consider case when comparing file names."
+msgstr "--no-ignore-file-name-case  Учитывать регистр букв в именах файлов."
+
+#: src/diff.c:837 src/sdiff.c:186
+msgid "-E  --ignore-tab-expansion  Ignore changes due to tab expansion."
+msgstr ""
+"-E  --ignore-tab-expansion  Игнорировать изменения, вызванные раскрытием "
+"табуляции."
+
+#: src/diff.c:838 src/sdiff.c:187
+msgid "-b  --ignore-space-change  Ignore changes in the amount of white space."
+msgstr ""
+"-b  --ignore-space-change  Игнорировать изменения числа пробельных символов."
+
+#: src/diff.c:839
+msgid "-w  --ignore-all-space  Ignore all white space."
+msgstr "-w  --ignore-all-space  Игнорировать все пробельные символы."
+
+#: src/diff.c:840 src/sdiff.c:189
+msgid "-B  --ignore-blank-lines  Ignore changes whose lines are all blank."
+msgstr "-B  --ignore-blank-lines  Игнорировать изменения числа пустых строк."
+
+#: src/diff.c:841 src/sdiff.c:190
+msgid ""
+"-I RE  --ignore-matching-lines=RE  Ignore changes whose lines all match RE."
+msgstr ""
+"-I РВ  --ignore-matching-lines=РВ  Игнорировать изменения, строки которых\n"
+"                        полностью соответствуют заданному регулярному "
+"выражению"
+
+#: src/diff.c:842 src/sdiff.c:191
+msgid "--strip-trailing-cr  Strip trailing carriage return on input."
+msgstr "--strip-trailing-cr  Удалить на выводе завершающий возврат каретки."
+
+#: src/diff.c:844
+msgid "--binary  Read and write data in binary mode."
+msgstr "--binary  Читать и записывать файлы в двоичной форме."
+
+#: src/diff.c:846 src/diff3.c:451 src/sdiff.c:192
+msgid "-a  --text  Treat all files as text."
+msgstr "-a  --text  Считать все файлы текстовыми."
+
+#: src/diff.c:848
+msgid ""
+"-c  -C NUM  --context[=NUM]  Output NUM (default 3) lines of copied "
+"context.\n"
+"-u  -U NUM  --unified[=NUM]  Output NUM (default 3) lines of unified "
+"context.\n"
+"  --label LABEL  Use LABEL instead of file name.\n"
+"  -p  --show-c-function  Show which C function each change is in.\n"
+"  -F RE  --show-function-line=RE  Show the most recent line matching RE."
+msgstr ""
+"-c  -C ЧИСЛО  --context[=ЧИСЛО]  Копировать ЧИСЛО (по умолчанию 3) строк "
+"контекста.\n"
+"-u  -U ЧИСЛО  --unified[=ЧИСЛО]  Выводить ЧИСЛО (по умолчанию 3) строк\n"
+"                                 объединенного контекста.\n"
+"  -L МЕТКА  --label МЕТКА  Использовать МЕТКУ вместо имени файла.\n"
+"  -p  --show-c-function  Показывать C-функцию, содержащую изменение.\n"
+"  -F РВ  --show-function-line=РВ  Показывать предшествующую строку, "
+"совпадающую\n"
+"                                  с заданным регулярным выражением."
+
+#: src/diff.c:853
+msgid "-q  --brief  Output only whether files differ."
+msgstr "-q  --brief  Напечатать только различаются ли файлы."
+
+#: src/diff.c:854
+msgid "-e  --ed  Output an ed script."
+msgstr "-e  --ed  Выводить сценарий ed."
+
+#: src/diff.c:855
+msgid "--normal  Output a normal diff."
+msgstr "--normal  Выводить в обычном формате diff."
+
+#: src/diff.c:856
+msgid "-n  --rcs  Output an RCS format diff."
+msgstr "-n  --rcs  Выводить в формате RCS."
+
+#: src/diff.c:857
+msgid ""
+"-y  --side-by-side  Output in two columns.\n"
+"  -W NUM  --width=NUM  Output at most NUM (default 130) print columns.\n"
+"  --left-column  Output only the left column of common lines.\n"
+"  --suppress-common-lines  Do not output common lines."
+msgstr ""
+"-y  --side-by-side  Выводить в две колонки.\n"
+"  -W ЧИСЛО  --width=ЧИСЛО  Выводить максимум заданное ЧИСЛО знаков в "
+"строке.\n"
+"                           (по умолчанию 130)\n"
+"  --left-column  Выводить только левую колонку общих строк.\n"
+"  --suppress-common-lines  Не выводить общие строки."
+
+#: src/diff.c:861
+msgid "-D NAME  --ifdef=NAME  Output merged file to show `#ifdef NAME' diffs."
+msgstr ""
+"-D ИМЯ  --ifdef=ИМЯ  Выводить заплаты, использующие конструкцию `#ifdef ИМЯ'."
+
+#: src/diff.c:862
+msgid ""
+"--GTYPE-group-format=GFMT  Similar, but format GTYPE input groups with GFMT."
+msgstr ""
+"--ГТИП-group-format=ГФМТ  Аналогично, но форматировать входные группы типа "
+"ГТИП\n"
+"                          в соответствии с форматом ГФМТ."
+
+#: src/diff.c:863
+msgid "--line-format=LFMT  Similar, but format all input lines with LFMT."
+msgstr ""
+"--line-format=СФМТ  Аналогично, но форматировать все входные строки с СФМТ."
+
+#: src/diff.c:864
+msgid ""
+"--LTYPE-line-format=LFMT  Similar, but format LTYPE input lines with LFMT."
+msgstr ""
+"--СТИП-group-format=СФМТ  Аналогично, но форматировать входные строки типа "
+"СТИП\n"
+"                          в соответствии с форматом СФМТ."
+
+#: src/diff.c:865
+msgid "  LTYPE is `old', `new', or `unchanged'.  GTYPE is LTYPE or `changed'."
+msgstr ""
+"  СТИП может быть `old', `new', или `unchanged', ГТИП -- то же и `changed'."
+
+#: src/diff.c:866
+msgid ""
+"  GFMT may contain:\n"
+"    %<  lines from FILE1\n"
+"    %>  lines from FILE2\n"
+"    %=  lines common to FILE1 and FILE2\n"
+"    %[-][WIDTH][.[PREC]]{doxX}LETTER  printf-style spec for LETTER\n"
+"      LETTERs are as follows for new group, lower case for old group:\n"
+"        F  first line number\n"
+"        L  last line number\n"
+"        N  number of lines = L-F+1\n"
+"        E  F-1\n"
+"        M  L+1"
+msgstr ""
+"  ГФМТ может содержать:\n"
+"    %<  строки из ФАЙЛА1\n"
+"    %>  строки из ФАЙЛА2\n"
+"    %=  строки, общие для ФАЙЛА1 и ФАЙЛА2\n"
+"    %[-][ШИРИНА][.[ТОЧН]]{doxX}БУКВА  формат для БУКВЫ в стиле printf\n"
+"      БУКВА принимает следующие значения для новых групп, для старых "
+"строчные:\n"
+"        F  номер первой строки\n"
+"        L  номер последней строки\n"
+"        N  число строк = L-F+1\n"
+"        E  F-1\n"
+"        M  L+1"
+
+#: src/diff.c:877
+msgid ""
+"  LFMT may contain:\n"
+"    %L  contents of line\n"
+"    %l  contents of line, excluding any trailing newline\n"
+"    %[-][WIDTH][.[PREC]]{doxX}n  printf-style spec for input line number"
+msgstr ""
+"  СФМТ может содержать:\n"
+"    %L  содержимое строки\n"
+"    %l  содержимое строки, исключая все новые строки в конце\n"
+"    %[-][ШИРИНА][.[ТОЧН]]{doxX}n  формат номера входной строки в стиле printf"
+
+#: src/diff.c:881
+msgid ""
+"  Either GFMT or LFMT may contain:\n"
+"    %%  %\n"
+"    %c'C'  the single character C\n"
+"    %c'\\OOO'  the character with octal code OOO"
+msgstr ""
+"  Оба ГФМТ и СФМТ могут содержать:\n"
+"    %%  %\n"
+"    %c'С'  один символ С\n"
+"    %c'\\OOO'  один символ с восьмеричным кодом OOO"
+
+#: src/diff.c:886
+msgid "-l  --paginate  Pass the output through `pr' to paginate it."
+msgstr ""
+"-l  --paginate  Направить вывод программе `pr' для разбиения на страницы."
+
+#: src/diff.c:887 src/sdiff.c:198
+msgid "-t  --expand-tabs  Expand tabs to spaces in output."
+msgstr "-t  --expand-tabs  Раскрывать при выводе символы табуляции в пробелы."
+
+#: src/diff.c:888 src/diff3.c:452
+msgid "-T  --initial-tab  Make tabs line up by prepending a tab."
+msgstr ""
+"-T  --initial-tab  Выравнивать табуляцию добавляя в начало символ табуляции."
+
+#: src/diff.c:890
+msgid "-r  --recursive  Recursively compare any subdirectories found."
+msgstr "-r  --recursive  Рекурсивно сравнивать подкаталоги."
+
+#: src/diff.c:891
+msgid "-N  --new-file  Treat absent files as empty."
+msgstr "-N  --new-file  Воспринимать несуществующие файлы как пустые."
+
+#: src/diff.c:892
+msgid "--unidirectional-new-file  Treat absent first files as empty."
+msgstr ""
+"--unidirectional-new-file  Воспринимать несуществующие первые файлы как "
+"пустые."
+
+#: src/diff.c:893
+msgid "-s  --report-identical-files  Report when two files are the same."
+msgstr "-s  --report-identical-files  Сообщать об одинаковых файлах."
+
+#: src/diff.c:894
+msgid "-x PAT  --exclude=PAT  Exclude files that match PAT."
+msgstr ""
+"-x ОБРАЗЕЦ --exclude=ОБРАЗЕЦ  Исключить файлы, чьи имена совпадают с "
+"ОБРАЗЦОМ."
+
+#: src/diff.c:895
+msgid ""
+"-X FILE  --exclude-from=FILE  Exclude files that match any pattern in FILE."
+msgstr ""
+"-X ФАЙЛ  --exclude-from=ФАЙЛ  Исключить файлы, чьи имена совпадают с каким-"
+"либо\n"
+"                              образцом из записанных в ФАЙЛЕ."
+
+#: src/diff.c:896
+msgid ""
+"-S FILE  --starting-file=FILE  Start with FILE when comparing directories."
+msgstr "-S ФАЙЛ  --starting-file=ФАЙЛ  При сравнении каталогов начать с ФАЙЛА."
+
+#: src/diff.c:897
+msgid ""
+"--from-file=FILE1  Compare FILE1 to all operands.  FILE1 can be a directory."
+msgstr ""
+"--from-file=ФАЙЛ1  Сравнить ФАЙЛ1 со всеми операндами.\n"
+"                   ФАЙЛ1 может быть каталогом."
+
+#: src/diff.c:898
+msgid ""
+"--to-file=FILE2  Compare all operands to FILE2.  FILE2 can be a directory."
+msgstr ""
+"--to-file=ФАЙЛ2  Сравнить все операнды с ФАЙЛОМ2.  ФАЙЛ2 может быть "
+"каталогом."
+
+#: src/diff.c:900
+msgid "--horizon-lines=NUM  Keep NUM lines of the common prefix and suffix."
+msgstr ""
+"--horizon-lines=ЧИСЛО  Выводить ЧИСЛО общих строк до и после различающихся."
+
+#: src/diff.c:901 src/sdiff.c:200
+msgid "-d  --minimal  Try hard to find a smaller set of changes."
+msgstr "-d  --minimal  Пытаться найти наименьший набор изменений."
+
+#: src/diff.c:902
+msgid ""
+"--speed-large-files  Assume large files and many scattered small changes."
+msgstr ""
+"--speed-large-files  Предполагать, что файлы большие со многими\n"
+"                         разбросанными мелкими изменениями."
+
+#: src/diff.c:907
+msgid ""
+"FILES are `FILE1 FILE2' or `DIR1 DIR2' or `DIR FILE...' or `FILE... DIR'."
+msgstr ""
+"ФАЙЛЫ это `ФАЙЛ1 ФАЙЛ2', или `КАТАЛОГ1 КАТАЛОГ2', или `КАТАЛОГ ФАЙЛ...',\n"
+"или `ФАЙЛ... КАТАЛОГ'."
+
+#: src/diff.c:908
+msgid ""
+"If --from-file or --to-file is given, there are no restrictions on FILES."
+msgstr "Если задан --from-file или --to-file, на ФАЙЛЫ нет ограничений."
+
+#: src/diff.c:909 src/diff3.c:474 src/sdiff.c:222
+msgid "If a FILE is `-', read standard input."
+msgstr "Если ФАЙЛ задан как `-', читает стандартный ввод."
+
+#: src/diff.c:920
+#, c-format
+msgid "Usage: %s [OPTION]... FILES\n"
+msgstr "Использование: %s [КЛЮЧ]... ФАЙЛЫ\n"
+
+#: src/diff.c:949
+#, c-format
+msgid "conflicting %s option value `%s'"
+msgstr "противоречивое значение %s для ключа `%s'"
+
+#: src/diff.c:962
+msgid "conflicting output style options"
+msgstr "противоречивые ключи задания стиля вывода"
+
+#: src/diff.c:976
+msgid "regular empty file"
+msgstr "обычный пустой файл"
+
+#: src/diff.c:976
+msgid "regular file"
+msgstr "обычный файл"
+
+#: src/diff.c:978
+msgid "directory"
+msgstr "каталог"
+
+#: src/diff.c:981
+msgid "block special file"
+msgstr "специальный файл с поблочным доступом"
+
+#: src/diff.c:984
+msgid "character special file"
+msgstr "специальный файл с посимвольным доступом"
+
+#: src/diff.c:987
+msgid "fifo"
+msgstr "очередь"
+
+#: src/diff.c:991
+msgid "socket"
+msgstr "сокет"
+
+#: src/diff.c:994
+msgid "message queue"
+msgstr "очередь сообщений"
+
+#: src/diff.c:997
+msgid "semaphore"
+msgstr "семафор"
+
+#: src/diff.c:1000
+msgid "shared memory object"
+msgstr "разделяемый объект"
+
+#: src/diff.c:1003
+msgid "typed memory object"
+msgstr ""
+
+#: src/diff.c:1006
+msgid "weird file"
+msgstr "странный файл"
+
+#: src/diff.c:1070 src/diff.c:1256
+#, c-format
+msgid "Only in %s: %s\n"
+msgstr "Только в %s: %s\n"
+
+#: src/diff.c:1193
+msgid "cannot compare `-' to a directory"
+msgstr "невозможно сравнить `-' с каталогом"
+
+#: src/diff.c:1220
+msgid "-D option not supported with directories"
+msgstr "-D option not supported with directories"
+
+#: src/diff.c:1229
+#, c-format
+msgid "Common subdirectories: %s and %s\n"
+msgstr "Общие подкаталоги: %s и %s\n"
+
+#: src/diff.c:1266
+#, c-format
+msgid "File %s is a %s while file %s is a %s\n"
+msgstr "Файл %s это %s, тогда как файл %s -- %s\n"
+
+#: src/diff.c:1345
+#, c-format
+msgid "Files %s and %s are identical\n"
+msgstr "Файлы %s и %s идентичны\n"
+
+#: src/diff3.c:26
+msgid "Written by Randy Smith."
+msgstr "Автор Randy Smith."
+
+#: src/diff3.c:328
+msgid "incompatible options"
+msgstr "несовместимые ключи"
+
+#: src/diff3.c:368
+msgid "`-' specified for more than one input file"
+msgstr "`-' задан для более одного входного файла"
+
+#: src/diff3.c:408 src/diff3.c:1232 src/diff3.c:1645 src/diff3.c:1700
+#: src/sdiff.c:305 src/sdiff.c:879 src/sdiff.c:890
+msgid "read failed"
+msgstr "чтение неуспешно"
+
+#: src/diff3.c:441
+msgid "-e  --ed  Output unmerged changes from OLDFILE to YOURFILE into MYFILE."
+msgstr ""
+"-e  --ed  Выводить не объединенные изменения в СТОРОМ-ФАЙЛЕ из ВАШЕГО-ФАЙЛА\n"
+"          в МОЙ-ФАЙЛ."
+
+#: src/diff3.c:442
+msgid "-E  --show-overlap  Output unmerged changes, bracketing conflicts."
+msgstr ""
+"-E  --show-overlap  Выводить не объединенные изменения,\n"
+"                    заключая конфликтные места в скобки."
+
+#: src/diff3.c:443
+msgid "-A  --show-all  Output all changes, bracketing conflicts."
+msgstr ""
+"-A  --show-all  Выводить все изменения, заключая конфликтные места в скобки."
+
+#: src/diff3.c:444
+msgid "-x  --overlap-only  Output overlapping changes."
+msgstr "-x  --overlap-only  Выводить перекрывающиеся изменения."
+
+#: src/diff3.c:445
+msgid "-X  Output overlapping changes, bracketing them."
+msgstr "-X  Выводить пересекающиеся изменения, заключая их в скобки."
+
+#: src/diff3.c:446
+msgid "-3  --easy-only  Output unmerged nonoverlapping changes."
+msgstr "-3  --easy-only  Выводить не объединенные непересекающиеся изменения."
+
+#: src/diff3.c:448
+msgid "-m  --merge  Output merged file instead of ed script (default -A)."
+msgstr ""
+"-m  --merge  Выводить объединенный файл вместо сценария ed (по умолчанию -A)."
+
+#: src/diff3.c:449
+msgid "-L LABEL  --label=LABEL  Use LABEL instead of file name."
+msgstr "-L МЕТКА  --label=МЕТКА  Использовать МЕТКУ вместо имени файла."
+
+#: src/diff3.c:450
+msgid "-i  Append `w' and `q' commands to ed scripts."
+msgstr "-i  Добавить команды `w' и `q' в конец сценария ed."
+
+#: src/diff3.c:453 src/sdiff.c:202
+msgid "--diff-program=PROGRAM  Use PROGRAM to compare files."
+msgstr ""
+"--diff-program=ПРОГРАММА  Использовать для сравния файлов указанную "
+"ПРОГРАММУ."
+
+#: src/diff3.c:465
+#, c-format
+msgid "Usage: %s [OPTION]... MYFILE OLDFILE YOURFILE\n"
+msgstr "Использование: %s [КЛЮЧ]... МОЙ-ФАЙЛ СТАРЫЙ-ФАЙЛ ВАШ-ФАЙЛ\n"
+
+#: src/diff3.c:467
+msgid "Compare three files line by line."
+msgstr "Построчно сравнивает три файла."
+
+#: src/diff3.c:673
+msgid "internal error: screwup in format of diff blocks"
+msgstr "внутренняя ошибка: поврежденный формат блоков заплаты"
+
+#: src/diff3.c:971
+#, c-format
+msgid "%s: diff failed: "
+msgstr "%s: поиск различий неуспешен: "
+
+#: src/diff3.c:993
+msgid "internal error: invalid diff type in process_diff"
+msgstr "внутренняя ошибка: неверный тип заплаты в функции `process_diff'"
+
+#: src/diff3.c:1018
+msgid "invalid diff format; invalid change separator"
+msgstr "неверный формат заплаты; неверный разделитель изменения"
+
+#: src/diff3.c:1242
+msgid "invalid diff format; incomplete last line"
+msgstr "неверный формат заплаты; неполная последняя строка"
+
+#: src/diff3.c:1265 src/sdiff.c:273
+#, c-format
+msgid "subsidiary program `%s' not executable"
+msgstr "невозможно выполнить вспомогательную программа `%s'"
+
+#: src/diff3.c:1268 src/sdiff.c:276 src/util.c:298
+#, c-format
+msgid "subsidiary program `%s' not found"
+msgstr "не найдена вспомогательная программа `%s'"
+
+#: src/diff3.c:1272 src/sdiff.c:268 src/util.c:301
+#, c-format
+msgid "subsidiary program `%s' failed"
+msgstr "дочерняя программа `%s' завершилась неуспешно"
+
+#: src/diff3.c:1294
+msgid "invalid diff format; incorrect leading line chars"
+msgstr "неверный формат заплаты; неправльные первые символы строки"
+
+#: src/diff3.c:1370
+msgid "internal error: invalid diff type passed to output"
+msgstr "внутренняя ошибка: на выход передан неверный тип заплаты"
+
+#: src/diff3.c:1647 src/diff3.c:1704
+msgid "input file shrank"
+msgstr "входной файл уменьшился"
+
+#: src/dir.c:162
+#, c-format
+msgid "cannot compare file names `%s' and `%s'"
+msgstr "невозможно сравнить имена файлов `%s' и `%s'"
+
+#: src/sdiff.c:35
+msgid "Written by Thomas Lord."
+msgstr "Автор Томас Лорд."
+
+#: src/sdiff.c:183
+msgid "-o FILE  --output=FILE  Operate interactively, sending output to FILE."
+msgstr "-o ФАЙЛ  --output=ФАЙЛ  Работать интерактивно, записывая вывод в ФАЙЛ."
+
+#: src/sdiff.c:185
+msgid "-i  --ignore-case  Consider upper- and lower-case to be the same."
+msgstr "-i  --ignore-case  Игнорировать регистр букв."
+
+#: src/sdiff.c:188
+msgid "-W  --ignore-all-space  Ignore all white space."
+msgstr "-W  --ignore-all-space  Игнорировать все пробельные символы."
+
+#: src/sdiff.c:194
+msgid "-w NUM  --width=NUM  Output at most NUM (default 130) columns per line."
+msgstr ""
+"-w ЧИСЛО  --width=ЧИСЛО  Выводить максимум заданное ЧИСЛО знаков в строке.\n"
+"                         (по умолчанию 130)"
+
+#: src/sdiff.c:195
+msgid "-l  --left-column  Output only the left column of common lines."
+msgstr "-l  --left-column  Выводить только левую колонку общих строк."
+
+#: src/sdiff.c:196
+msgid "-s  --suppress-common-lines  Do not output common lines."
+msgstr "-s  --suppress-common-lines  Не выводить общие строки."
+
+#: src/sdiff.c:201
+msgid ""
+"-H  --speed-large-files  Assume large files and many scattered small changes."
+msgstr ""
+"-H  --speed-large-files  Предполагать, что файлы большие со многими\n"
+"                         разбросанными мелкими изменениями."
+
+#: src/sdiff.c:214
+#, c-format
+msgid "Usage: %s [OPTION]... FILE1 FILE2\n"
+msgstr "Использование: %s [КЛЮЧ]... ФАЙЛ1 ФАЙЛ2\n"
+
+#: src/sdiff.c:215
+msgid "Side-by-side merge of file differences."
+msgstr "Интерактивно сливает различия файлов."
+
+#: src/sdiff.c:327
+msgid "cannot interactively merge standard input"
+msgstr "невозможно интерактивно сливать стандартный ввод"
+
+#: src/sdiff.c:588
+msgid "both files to be compared are directories"
+msgstr "оба сравниваемых файла -- каталоги"
+
+#: src/sdiff.c:853
+msgid ""
+"ed:\tEdit then use both versions, each decorated with a header.\n"
+"eb:\tEdit then use both versions.\n"
+"el:\tEdit then use the left version.\n"
+"er:\tEdit then use the right version.\n"
+"e:\tEdit a new version.\n"
+"l:\tUse the left version.\n"
+"r:\tUse the right version.\n"
+"s:\tSilently include common lines.\n"
+"v:\tVerbosely include common lines.\n"
+"q:\tQuit.\n"
+msgstr ""
+"ed:\tРедактировать и использовать обе версии, включив в каждую заголовок.\n"
+"eb:\tРедактировать и использовать обе версии.\n"
+"el:\tРедактировать и использовать левую версию.\n"
+"er:\tРедактировать и использовать правую версию.\n"
+"e:\tИспользовать новую версию.\n"
+"l:\tИспользовать правую версию.\n"
+"r:\tИспользовать правую версию.\n"
+"s:\tВключать общие строки, не выдавая сообщения.\n"
+"v:\tВключать общие строки, выдавая сообщение.\n"
+"q:\tВыйти.\n"

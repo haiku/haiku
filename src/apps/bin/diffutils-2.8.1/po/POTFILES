@@ -1,0 +1,13 @@
+     ../lib/c-stack.c \
+     ../lib/error.c \
+     ../lib/freesoft.c \
+     ../lib/getopt.c \
+     ../lib/regex.c \
+     ../lib/xmalloc.c \
+     ../src/analyze.c \
+     ../src/cmp.c \
+     ../src/diff.c \
+     ../src/diff3.c \
+     ../src/dir.c \
+     ../src/sdiff.c \
+     ../src/util.c
