@@ -792,9 +792,14 @@ TypeMenuItem::DrawContent()
 	// draw the label
 	BMenuItem::DrawContent();
 
+	font_height fontHeight;
+	Menu()->GetFontHeight(&fontHeight);
+
 	// draw the type
-	BPoint point = Menu()->PenLocation();
+	BPoint point = ContentLocation();
 	point.x = Frame().right - 4 - Menu()->StringWidth(fType.String());
+	point.y += fontHeight.ascent;
+
 	Menu()->DrawString(fType.String(), point);
 }
 
