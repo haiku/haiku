@@ -2,7 +2,7 @@
 #define USB_AUDIO_H
 
 // (Partial) USB Class Definitions for Audio Devices, version 1.0
-// (usb_audio_class_10.pdf)
+// Reference: http://www.usb.org/developers/devclass_docs/audio10.pdf
 
 #define USB_AUDIO_DEVICE_CLASS 			0x01
 #define USB_AUDIO_CLASS_VERSION			0x0100

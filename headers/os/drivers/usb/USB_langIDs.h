@@ -2,7 +2,7 @@
 #define USB_LANGIDS_H
 
 // USB Language Identifiers, 3/29/2000, version 1.0
-// (http://www.usb.org/developers/data/USB_LANGIDs.pdf)
+// Reference: http://www.usb.org/developers/docs/USB_LANGIDs.pdf
 
 #define USB_LANGIDS_VERSION		0x0100	// version 1.0
 

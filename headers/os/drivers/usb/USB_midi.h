@@ -4,7 +4,7 @@
 #include "USB_audio.h"
 
 // (Partial) USB Class Definitions for MIDI Devices, version 1.0
-// (usb_midi_class_10.pdf)
+// Reference: http://www.usb.org/developers/devclass_docs/midi10.pdf
 
 #define USB_MIDI_CLASS_VERSION		0x0100	// Class specification version 1.0
 

@@ -2,7 +2,7 @@
 #define USB_CDC_H
 
 // (Partial) USB Class Definitions for Communication Devices (CDC), version 1.1
-// (usbcdc11.pdf)
+// Reference: http://www.usb.org/developers/devclass_docs/usbcdc11.pdf
 
 #define USB_COMMUNICATION_DEVICE_CLASS 			0x02
 
