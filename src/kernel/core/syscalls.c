@@ -26,6 +26,7 @@
 #include <kimage.h>
 #include <ksignal.h>
 #include <real_time_clock.h>
+#include <system_info.h>
 #include <sys/ioccom.h>
 #include <sys/socket.h>
 #include <user_atomic.h>
@@ -451,7 +452,9 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 		case SYSCALL_SET_ALARM:
 			*call_ret = user_set_alarm((bigtime_t)INT32TOINT64(arg0, arg1), (uint32)arg2);
 			break;
-
+		case SYSCALL_GET_SYSTEM_INFO:
+			*call_ret = _user_get_system_info((system_info *)arg0, (size_t)arg1);
+			break;
 		// 32 bit atomic functions
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS
 		case SYSCALL_ATOMIC_SET:

@@ -1,37 +1,47 @@
 SubDir OBOS_TOP src kernel core ;
 
+{
+	local defines =
+		OBOS_ARCH=\\\"$(OBOS_ARCH)\\\"
+		;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
 KernelMergeObject kernel_core.o :
 	<$(SOURCE_GRIST)>cbuf.c
 	<$(SOURCE_GRIST)>console.c
 	<$(SOURCE_GRIST)>cpu.c
 	<$(SOURCE_GRIST)>debug.c
-	<$(SOURCE_GRIST)>elf.c 
+	<$(SOURCE_GRIST)>elf.c
 	<$(SOURCE_GRIST)>faults.c
-	<$(SOURCE_GRIST)>gdb.c 
-	<$(SOURCE_GRIST)>heap.c 
-	<$(SOURCE_GRIST)>image.c 
-	<$(SOURCE_GRIST)>int.c 
-	<$(SOURCE_GRIST)>kernel_daemon.c 
-	<$(SOURCE_GRIST)>khash.c 
-	<$(SOURCE_GRIST)>linkhack.c 
-	<$(SOURCE_GRIST)>lock.c 
-	<$(SOURCE_GRIST)>main.c 
-	<$(SOURCE_GRIST)>misc.c 
-	<$(SOURCE_GRIST)>module.c 
-#	<$(SOURCE_GRIST)>pools.c 
-	<$(SOURCE_GRIST)>port.c 
+	<$(SOURCE_GRIST)>gdb.c
+	<$(SOURCE_GRIST)>heap.c
+	<$(SOURCE_GRIST)>image.c
+	<$(SOURCE_GRIST)>int.c
+	<$(SOURCE_GRIST)>kernel_daemon.c
+	<$(SOURCE_GRIST)>khash.c
+	<$(SOURCE_GRIST)>linkhack.c
+	<$(SOURCE_GRIST)>lock.c
+	<$(SOURCE_GRIST)>main.c
+	<$(SOURCE_GRIST)>misc.c
+	<$(SOURCE_GRIST)>module.c
+	<$(SOURCE_GRIST)>port.c
 	<$(SOURCE_GRIST)>queue.c
 	<$(SOURCE_GRIST)>real_time_clock.c
-	<$(SOURCE_GRIST)>scheduler.c 
+	<$(SOURCE_GRIST)>scheduler.c
 	<$(SOURCE_GRIST)>sem.c
 	<$(SOURCE_GRIST)>signal.c
+	<$(SOURCE_GRIST)>system_info.c
 	<$(SOURCE_GRIST)>smp.c
-	<$(SOURCE_GRIST)>syscalls.c 
+	<$(SOURCE_GRIST)>syscalls.c
 	<$(SOURCE_GRIST)>sysctl.c
-	<$(SOURCE_GRIST)>team.c 
-	<$(SOURCE_GRIST)>thread.c 
-	<$(SOURCE_GRIST)>timer.c 
-	: 
+	<$(SOURCE_GRIST)>team.c
+	<$(SOURCE_GRIST)>thread.c
+	<$(SOURCE_GRIST)>timer.c
+	:
 	-fno-pic -D_KERNEL_MODE
 	;
 

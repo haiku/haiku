@@ -52,7 +52,7 @@ struct sem_entry {
 };
 
 // Todo: Compute based on the amount of available memory.
-#define MAX_SEMS 4096
+static int32 sMaxSems = 4096;
 
 static struct sem_entry *gSems = NULL;
 static region_id         gSemRegion = 0;
@@ -80,7 +80,7 @@ dump_sem_list(int argc, char **argv)
 {
 	int i;
 
-	for (i = 0; i < MAX_SEMS; i++) {
+	for (i = 0; i < sMaxSems; i++) {
 		if (gSems[i].id >= 0)
 			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &gSems[i], gSems[i].id,
 					gSems[i].u.used.name);
@@ -126,7 +126,7 @@ dump_sem_info(int argc, char **argv)
 			dump_sem((struct sem_entry *)num);
 			return 0;
 		} else {
-			unsigned slot = num % MAX_SEMS;
+			unsigned slot = num % sMaxSems;
 			if (gSems[slot].id != (int)num) {
 				dprintf("sem 0x%lx doesn't exist!\n", num);
 				return 0;
@@ -137,7 +137,7 @@ dump_sem_info(int argc, char **argv)
 	}
 
 	// walk through the sem list, trying to match name
-	for (i = 0; i < MAX_SEMS; i++) {
+	for (i = 0; i < sMaxSems; i++) {
 		if (gSems[i].u.used.name != NULL
 			&& strcmp(argv[1], gSems[i].u.used.name) == 0) {
 			dump_sem(&gSems[i]);
@@ -185,12 +185,12 @@ sem_init(kernel_args *ka)
 
 	// create and initialize semaphore table
 	gSemRegion = create_area("sem_table", (void **)&gSems, B_ANY_KERNEL_ADDRESS,
-		sizeof(struct sem_entry) * MAX_SEMS, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		sizeof(struct sem_entry) * sMaxSems, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (gSemRegion < 0)
 		panic("unable to allocate semaphore table!\n");
 
-	memset(gSems, 0, sizeof(struct sem_entry) * MAX_SEMS);
-	for (i = 0; i < MAX_SEMS; i++) {
+	memset(gSems, 0, sizeof(struct sem_entry) * sMaxSems);
+	for (i = 0; i < sMaxSems; i++) {
 		gSems[i].id = -1;
 		free_sem_slot(i, i);
 	}
@@ -298,7 +298,7 @@ delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 	if (id < 0)
 		return B_BAD_SEM_ID;
 
-	slot = id % MAX_SEMS;
+	slot = id % sMaxSems;
 
 	state = disable_interrupts();
 	GRAB_SEM_LOCK(gSems[slot]);
@@ -331,7 +331,7 @@ delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 
 	// append slot to the free list
 	GRAB_SEM_LIST_LOCK();
-	free_sem_slot(slot, id + MAX_SEMS);
+	free_sem_slot(slot, id + sMaxSems);
 	RELEASE_SEM_LIST_LOCK();
 
 	if (released_threads > 0) {
@@ -365,7 +365,7 @@ sem_timeout(timer *data)
 	t = thread_get_thread_struct(args->blocked_thread);
 	if (t == NULL)
 		return B_HANDLED_INTERRUPT;
-	slot = args->blocked_sem_id % MAX_SEMS;
+	slot = args->blocked_sem_id % sMaxSems;
 
 	state = disable_interrupts();
 	GRAB_SEM_LOCK(gSems[slot]);
@@ -406,7 +406,7 @@ acquire_sem(sem_id id)
 status_t
 acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
-	int slot = id % MAX_SEMS;
+	int slot = id % sMaxSems;
 	int state;
 	status_t status = B_OK;
 	
@@ -538,7 +538,7 @@ release_sem(sem_id id)
 status_t
 release_sem_etc(sem_id id, int32 count, uint32 flags)
 {
-	int slot = id % MAX_SEMS;
+	int slot = id % sMaxSems;
 	int state;
 	int released_threads = 0;
 	struct thread_queue release_queue;
@@ -630,7 +630,7 @@ get_sem_count(sem_id id, int32 *thread_count)
 	if (thread_count == NULL)
 		return EINVAL;
 
-	slot = id % MAX_SEMS;
+	slot = id % sMaxSems;
 
 	state = disable_interrupts();
 	GRAB_SEM_LOCK(gSems[slot]);
@@ -689,7 +689,7 @@ _get_sem_info(sem_id id, struct sem_info *info, size_t size)
 	if (info == NULL || size != sizeof(sem_info))
 		return B_BAD_VALUE;
 
-	slot = id % MAX_SEMS;
+	slot = id % sMaxSems;
 
 	state = disable_interrupts();
 	GRAB_SEM_LOCK(gSems[slot]);
@@ -732,13 +732,13 @@ _get_next_sem_info(team_id team, int32 *_cookie, struct sem_info *info, size_t s
 		return B_BAD_TEAM_ID; 
 
 	slot = *_cookie;
-	if (slot >= MAX_SEMS)
+	if (slot >= sMaxSems)
 		return B_BAD_VALUE;
 
 	state = disable_interrupts();
 	GRAB_SEM_LIST_LOCK();
 
-	while (slot < MAX_SEMS) {
+	while (slot < sMaxSems) {
 		if (gSems[slot].id != -1 && gSems[slot].u.used.owner == team) {
 			GRAB_SEM_LOCK(gSems[slot]);
 			if (gSems[slot].id != -1 && gSems[slot].u.used.owner == team) {
@@ -778,7 +778,7 @@ set_sem_owner(sem_id id, team_id team)
 	if (team < 0 || !team_is_valid(team))
 		return B_BAD_TEAM_ID;
 
-	slot = id % MAX_SEMS;
+	slot = id % sMaxSems;
 
 	state = disable_interrupts();
 	GRAB_SEM_LOCK(gSems[slot]);
@@ -822,7 +822,7 @@ sem_interrupt_thread(struct thread *t)
 	if (!(t->sem_flags & B_CAN_INTERRUPT))
 		return B_NOT_ALLOWED;
 
-	slot = t->sem_blocking % MAX_SEMS;
+	slot = t->sem_blocking % sMaxSems;
 
 	GRAB_SEM_LOCK(gSems[slot]);
 
@@ -898,7 +898,7 @@ sem_delete_owned_sems(team_id owner)
 	state = disable_interrupts();
 	GRAB_SEM_LIST_LOCK();
 
-	for (i = 0; i < MAX_SEMS; i++) {
+	for (i = 0; i < sMaxSems; i++) {
 		if (gSems[i].id != -1 && gSems[i].u.used.owner == owner) {
 			sem_id id = gSems[i].id;
 
@@ -915,6 +915,29 @@ sem_delete_owned_sems(team_id owner)
 
 	RELEASE_SEM_LIST_LOCK();
 	restore_interrupts(state);
+
+	return count;
+}
+
+
+int32
+sem_max_sems(void)
+{
+	return sMaxSems;
+}
+
+
+int32
+sem_used_sems(void)
+{
+	int32 count = 0;
+	int32 i;
+
+	// ToDo: we should have a variable that counts the used sems for us
+	for (i = 0; i < sMaxSems; i++) {
+		if (gSems[i].id >= 0)
+			count++;
+	}
 
 	return count;
 }

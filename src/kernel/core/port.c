@@ -54,8 +54,8 @@ static int dump_port_info(int argc, char **argv);
 static void _dump_port_info(struct port_entry *port);
 
 
-// gMaxPorts must be power of 2
-int32 gMaxPorts = 4096;
+// sMaxPorts must be power of 2
+static int32 sMaxPorts = 4096;
 
 #define MAX_QUEUE_LENGTH 4096
 #define PORT_MAX_MESSAGE_SIZE 65536
@@ -77,7 +77,7 @@ status_t
 port_init(kernel_args *ka)
 {
 	int i;
-	int size = sizeof(struct port_entry) * gMaxPorts;
+	int size = sizeof(struct port_entry) * sMaxPorts;
 
 	// create and initialize ports table
 	sPortArea = create_area("port_table", (void **)&sPorts, B_ANY_KERNEL_ADDRESS,
@@ -91,7 +91,7 @@ port_init(kernel_args *ka)
 	//	might do it as well, though :-)
 
 	memset(sPorts, 0, size);
-	for (i = 0; i < gMaxPorts; i++)
+	for (i = 0; i < sMaxPorts; i++)
 		sPorts[i].id = -1;
 
 	// add debugger commands
@@ -212,7 +212,7 @@ dump_port_list(int argc, char **argv)
 {
 	int i;
 
-	for (i = 0; i < gMaxPorts; i++) {
+	for (i = 0; i < sMaxPorts; i++) {
 		if (sPorts[i].id >= 0)
 			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &sPorts[i], sPorts[i].id, sPorts[i].name);
 	}
@@ -251,11 +251,11 @@ dump_port_info(int argc, char **argv)
 
 		if (num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
 			// XXX semi-hack
-			// one can use either address or a port_id, since KERNEL_BASE > gMaxPorts assumed
+			// one can use either address or a port_id, since KERNEL_BASE > sMaxPorts assumed
 			_dump_port_info((struct port_entry *)num);
 			return 0;
 		} else {
-			unsigned slot = num % gMaxPorts;
+			unsigned slot = num % sMaxPorts;
 			if(sPorts[slot].id != (int)num) {
 				dprintf("port 0x%lx doesn't exist!\n", num);
 				return 0;
@@ -266,7 +266,7 @@ dump_port_info(int argc, char **argv)
 	}
 
 	// walk through the ports list, trying to match name
-	for (i = 0; i < gMaxPorts; i++) {
+	for (i = 0; i < sMaxPorts; i++) {
 		if (sPorts[i].name != NULL
 			&& strcmp(argv[1], sPorts[i].name) == 0) {
 			_dump_port_info(&sPorts[i]);
@@ -296,7 +296,7 @@ delete_owned_ports(team_id owner)
 	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
 
-	for (i = 0; i < gMaxPorts; i++) {
+	for (i = 0; i < sMaxPorts; i++) {
 		if (sPorts[i].id != -1 && sPorts[i].owner == owner) {
 			port_id id = sPorts[i].id;
 
@@ -348,6 +348,29 @@ get_port_msg(int32 code, size_t bufferSize)
 	msg->buffer_chain = bufferChain;
 	msg->size = bufferSize;
 	return msg;
+}
+
+
+int32
+port_max_ports(void)
+{
+	return sMaxPorts;
+}
+
+
+int32
+port_used_ports(void)
+{
+	int32 count = 0;
+	int32 i;
+
+	// ToDo: we should have a variable that counts the used ports for us
+	for (i = 0; i < sMaxPorts; i++) {
+		if (sPorts[i].id >= 0)
+			count++;
+	}
+
+	return count;
 }
 
 
@@ -407,13 +430,13 @@ create_port(int32 queueLength, const char *name)
 	GRAB_PORT_LIST_LOCK();
 
 	// find the first empty spot
-	for (i = 0; i < gMaxPorts; i++) {
+	for (i = 0; i < sMaxPorts; i++) {
 		if (sPorts[i].id == -1) {
 			// make the port_id be a multiple of the slot it's in
-			if (i >= sNextPort % gMaxPorts)
-				sNextPort += i - sNextPort % gMaxPorts;
+			if (i >= sNextPort % sMaxPorts)
+				sNextPort += i - sNextPort % sMaxPorts;
 			else
-				sNextPort += gMaxPorts - (sNextPort % gMaxPorts - i);
+				sNextPort += sMaxPorts - (sNextPort % sMaxPorts - i);
 
 			GRAB_PORT_LOCK(sPorts[i]);
 			sPorts[i].id = sNextPort++;
@@ -461,7 +484,7 @@ close_port(port_id id)
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
-	slot = id % gMaxPorts;
+	slot = id % sMaxPorts;
 
 	// walk through the sem list, trying to match name
 	state = disable_interrupts();
@@ -497,7 +520,7 @@ delete_port(port_id id)
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
-	slot = id % gMaxPorts;
+	slot = id % sMaxPorts;
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
@@ -553,7 +576,7 @@ find_port(const char *name)
 	// the port lock in question, not the port list lock
 
 	// loop over list
-	for (i = 0; i < gMaxPorts && portFound < B_OK; i++) {
+	for (i = 0; i < sMaxPorts && portFound < B_OK; i++) {
 		// lock every individual port before comparing
 		state = disable_interrupts();
 		GRAB_PORT_LOCK(sPorts[i]);
@@ -605,7 +628,7 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
-	slot = id % gMaxPorts;
+	slot = id % sMaxPorts;
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
@@ -639,7 +662,7 @@ _get_next_port_info(team_id team, int32 *_cookie, struct port_info *info, size_t
 		return B_BAD_PORT_ID;
 
 	slot = *_cookie;
-	if (slot >= gMaxPorts)
+	if (slot >= sMaxPorts)
 		return B_BAD_PORT_ID;
 
 	if (team == B_CURRENT_TEAM)
@@ -651,7 +674,7 @@ _get_next_port_info(team_id team, int32 *_cookie, struct port_info *info, size_t
 	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
 
-	while (slot < gMaxPorts) {
+	while (slot < sMaxPorts) {
 		GRAB_PORT_LOCK(sPorts[slot]);
 		if (sPorts[slot].id != -1 && sPorts[slot].capacity != 0 && sPorts[slot].owner == team) {
 			// found one!
@@ -695,7 +718,7 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
-	slot = id % gMaxPorts;
+	slot = id % sMaxPorts;
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
@@ -761,7 +784,7 @@ port_count(port_id id)
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
-	slot = id % gMaxPorts;
+	slot = id % sMaxPorts;
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
@@ -814,7 +837,7 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 		return B_BAD_VALUE;
 
 	flags = flags & (B_CAN_INTERRUPT | B_TIMEOUT);
-	slot = id % gMaxPorts;
+	slot = id % sMaxPorts;
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
@@ -922,7 +945,7 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 
 	// mask irrelevant flags (for acquire_sem() usage)
 	flags = flags & (B_CAN_INTERRUPT | B_TIMEOUT);
-	slot = id % gMaxPorts;
+	slot = id % sMaxPorts;
 
 	if (bufferSize > PORT_MAX_MESSAGE_SIZE)
 		return EINVAL;
@@ -1020,7 +1043,7 @@ set_port_owner(port_id id, team_id team)
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
-	slot = id % gMaxPorts;
+	slot = id % sMaxPorts;
 
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
