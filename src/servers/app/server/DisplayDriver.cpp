@@ -1166,7 +1166,7 @@ void DisplayDriver::BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 		srcindex+=srcinc;
 		destindex+=destinc;
 	}
-	Invalidate(BRect(0,0,srcwidth,srcheight));
+	Invalidate(BRect(pt.x, pt.y, pt.x + srcwidth, pt.y + srcheight));
 	ReleaseBuffer();
 }
 
@@ -1288,7 +1288,7 @@ void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 		srcindex+=srcinc;
 		destindex+=destinc;
 	}
-	Invalidate(BRect(0,0,srcwidth,srcheight));
+	Invalidate(BRect(pt.x, pt.y, pt.x + srcwidth, pt.y + srcheight));
 	ReleaseBuffer();
 }
 
