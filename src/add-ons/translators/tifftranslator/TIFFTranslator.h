@@ -80,6 +80,7 @@ public:
 	uint32 *pstripOffsets;
 	uint32 *pstripByteCounts;
 	uint16 interpretation;
+	uint16 bitsPerPixel;
 	uint16 imageType;
 };
 

@@ -420,21 +420,28 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 			compression != COMPRESSION_PACKBITS)
 			return B_NO_TRANSLATOR;
 		
-		uint16 imageType;
+		uint16 imageType = 0, bitsPerPixel = 0;
 		switch (interpretation) {
-			// Bilevel images
+			// black and white or grayscale images
 			case PHOTO_WHITEZERO:
 			case PHOTO_BLACKZERO:
 				// default value for samples per pixel is 1
 				if (ifd.HasField(TAG_SAMPLES_PER_PIXEL) &&
 					ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 1)
 					return B_NO_TRANSLATOR;
+					
 				// default value for bits per sample is 1
-				if (ifd.HasField(TAG_BITS_PER_SAMPLE) &&
-					ifd.GetUint(TAG_BITS_PER_SAMPLE) != 1)
+				if (!ifd.HasField(TAG_BITS_PER_SAMPLE) ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE) == 1)
+					bitsPerPixel = 1;
+				else if (ifd.GetUint(TAG_BITS_PER_SAMPLE) == 4 ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE) == 8)
+					bitsPerPixel = ifd.GetUint(TAG_BITS_PER_SAMPLE);
+				else
 					return B_NO_TRANSLATOR;
 					
 				imageType = TIFF_BILEVEL;
+					
 				break;
 				
 			// Palette color images
@@ -521,10 +528,13 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 			pdetails->rowsPerStrip		= rowsPerStrip;
 			pdetails->stripsPerImage	= stripsPerImage;
 			pdetails->interpretation	= interpretation;
+			pdetails->bitsPerPixel		= bitsPerPixel;
 			pdetails->imageType			= imageType;
 			
-			ifd.GetUintArray(TAG_STRIP_OFFSETS, &pdetails->pstripOffsets);
-			ifd.GetUintArray(TAG_STRIP_BYTE_COUNTS, &pdetails->pstripByteCounts);
+			ifd.GetUintArray(TAG_STRIP_OFFSETS,
+				&pdetails->pstripOffsets);
+			ifd.GetUintArray(TAG_STRIP_BYTE_COUNTS,
+				&pdetails->pstripByteCounts);
 		}
 			
 	} catch (TiffIfdException) {
@@ -704,28 +714,49 @@ tiff_to_bits(uint8 *ptiff, uint32 tifflen, uint8 *pbits, TiffDetails &details)
 	
 	switch (details.imageType) {
 		case TIFF_BILEVEL:
-		{
-			uint8 black[3] = { 0x00, 0x00, 0x00 },
-				white[3] = { 0xFF, 0xFF, 0xFF };
-			uint8 *colors[2];
-			if (details.interpretation == PHOTO_WHITEZERO) {
-				colors[0] = white;
-				colors[1] = black;
+			if (details.bitsPerPixel == 1) {
+				// black and white
+				uint8 black[3] = { 0x00, 0x00, 0x00 },
+					white[3] = { 0xFF, 0xFF, 0xFF };
+				uint8 *colors[2];
+				if (details.interpretation == PHOTO_WHITEZERO) {
+					colors[0] = white;
+					colors[1] = black;
+				} else {
+					colors[0] = black;
+					colors[1] = white;
+				}
+			
+				for (uint32 i = 0; i < details.width; i++) {
+					uint8 eightbits = (ptiff + (i / 8))[0];
+					uint8 abit;
+					abit = (eightbits >> (7 - (i % 8))) & 1;
+				
+					memcpy(pbits + (i * 4), colors[abit], 3);
+				}
 			} else {
-				colors[0] = black;
-				colors[1] = white;
+				// grayscale
+				uint8 invert = 0;
+				if (details.interpretation == PHOTO_WHITEZERO)
+					invert = 0xff;
+
+				if (details.bitsPerPixel == 8) {
+					for (uint32 i = 0; i < details.width; i++) {
+						memset(pbits, invert + ptiff[i], 3);
+						pbits += 4;
+					}
+				} else if (details.bitsPerPixel == 4) {
+					const uint8 mask = 0x0f;				
+					for (uint32 i = 0; i < details.width; i++) {
+						uint8 values = (ptiff + (i / 2))[0];
+						uint8 value = (values >> (4 * (1 - (i % 2)))) & mask;
+						memset(pbits, invert + (value * 16), 3);
+						pbits += 4;
+					}
+				}
 			}
 			
-			for (uint32 i = 0; i < details.width; i++) {
-				uint8 eightbits = (ptiff + (i / 8))[0];
-				uint8 abit;
-				abit = (eightbits >> (7 - (i % 8))) & 1;
-				
-				memcpy(pbits + (i * 4), colors[abit], 3);
-			}		
-			
 			break;
-		}
 			
 		case TIFF_RGB:
 			while (ptiff < ptiffend) {
@@ -904,9 +935,12 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 		outbufferlen = 4 * details.width;
 		switch (details.imageType) {
 			case TIFF_BILEVEL:
-				inbufferlen = (details.width / 8) +
-					((details.width % 8) ? 1 : 0);
+			{
+				uint32 pixelsPerByte = 8 / details.bitsPerPixel;
+				inbufferlen = (details.width / pixelsPerByte) +
+					((details.width % pixelsPerByte) ? 1 : 0);
 				break;
+			}
 			case TIFF_RGB:
 				inbufferlen = 3 * details.width;
 				break;
