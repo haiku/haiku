@@ -12,18 +12,28 @@ Authors: Sikosis (beos@gravity24hr.com)
 #ifndef __DUNVIEW_H__
 #define __DUNVIEW_H__
 
-class DUNView : public BView {
-public:
-   DUNView(BRect frame);
+class DUNView : public BView
+{
+	public:
+   		DUNView(BRect frame);
 };
 
-class ModemView : public BView {
-public:
-   ModemView(BRect frame);
+class ModemView : public BView
+{
+	public:
+		ModemView(BRect frame);
 };
 
-class SettingsView : public BView {
-public:
-	SettingsView(BRect frame);
+class SettingsView : public BView
+{
+	public:
+		SettingsView(BRect frame);
 };
+
+class NewConnectionWindowView : public BView
+{
+	public:
+		NewConnectionWindowView(BRect frame);
+};
+
 #endif
