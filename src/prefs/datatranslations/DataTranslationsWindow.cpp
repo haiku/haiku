@@ -18,14 +18,26 @@ DataTranslationsWindow::DataTranslationsWindow()
 	: BWindow(BRect(0, 0, DTW_RIGHT, DTW_BOTTOM),
 		"DataTranslations", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
 {
-	BScreen screen;
-
 	MoveTo(dynamic_cast<DataTranslationsApplication *>(be_app)->WindowCorner());
 
-	// Code to make sure that the window doesn't get drawn off screen...
-	if (!(screen.Frame().right >= Frame().right && screen.Frame().bottom >= Frame().bottom))
-		MoveTo((screen.Frame().right-Bounds().right)*.5,(screen.Frame().bottom-Bounds().bottom)*.5);
-	// above does not work correctly....have to work on it.
+	// Make sure that the window isn't positioned off screen
+	BScreen screen;
+	BRect scrf = screen.Frame(), winf = Frame();
+	float x = winf.left, y = winf.top;
+	scrf.top += 24;
+	scrf.left += 5;
+	scrf.right -= 5;
+	if (winf.left < scrf.left)
+		x = scrf.left;
+	if (winf.right > scrf.right)
+		x = scrf.right - winf.Width() - 5;
+	if (winf.top < scrf.top)
+		y = scrf.top;
+	if (winf.bottom > scrf.bottom)
+		y = scrf.bottom - winf.Height() - 15;
+	
+	if (x != winf.left || y != winf.top)
+		MoveTo(x, y);
 	
 	BuildView();
 	Show();
