@@ -7,6 +7,7 @@
 #include <kernel.h>
 #include <vm.h>
 #include <lock.h>
+#include <int.h>
 #include <memheap.h>
 #include <malloc.h>
 #include <debug.h>
@@ -241,6 +242,9 @@ malloc(size_t size)
 	struct heap_page *page;
 
 	TRACE(("kmalloc: asked to allocate size %d\n", size));
+	
+	if (!kernel_startup && !are_interrupts_enabled())
+		panic("malloc: called with interrupts disabled\n");
 
 	mutex_lock(&heap_lock);
 
@@ -257,7 +261,7 @@ malloc(size_t size)
 	if (bin_index == bin_count) {
 		// XXX fix the raw alloc later.
 		//address = raw_alloc(size, bin_index);
-		panic("kmalloc: asked to allocate too much for now!\n");
+		panic("malloc: asked to allocate too much for now!\n");
 		goto out;
 	} else {
 		if (bins[bin_index].free_list != NULL) {
@@ -328,22 +332,25 @@ free(void *address)
 	struct heap_bin *bin;
 	unsigned int i;
 
+	if (!kernel_startup && !are_interrupts_enabled())
+		panic("free: called with interrupts disabled\n");
+
 	if (address == NULL)
 		return;
 
 	if ((addr)address < heap_base || (addr)address >= (heap_base + heap_size))
-		panic("free(): asked to free invalid address %p\n", address);
+		panic("free: asked to free invalid address %p\n", address);
 
 #if USE_WALL
 	{
 		uint32 *wall = (uint32 *)((uint8 *)address - 12);
 		uint32 size = wall[0];
 		if (wall[1] != 0xabadcafe || wall[2] != 0xabadcafe)
-			panic("kfree: front wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[1], wall[2]);
+			panic("free: front wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[1], wall[2]);
 
 		wall = (uint32 *)((uint8 *)address + size);
 		if (wall[0] != 0xabadcafe || wall[1] != 0xabadcafe)
-			panic("kfree: back wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[0], wall[1]);
+			panic("free: back wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[0], wall[1]);
 
 		address = (uint8 *)address - 12;
 	}
@@ -409,6 +416,9 @@ realloc(void *address, size_t newSize)
 {
 	void *newAddress = NULL;
 	size_t maxSize = 0, minSize;
+
+	if (!kernel_startup && !are_interrupts_enabled())
+		panic("realloc(): called with interrupts disabled\n");
 
 	if (address != NULL && ((addr)address < heap_base || (addr)address >= (heap_base + heap_size)))
 		panic("realloc(): asked to realloc invalid address %p\n", address);

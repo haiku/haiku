@@ -946,12 +946,14 @@ module_init(kernel_args *ka, module_info **sys_module_headers)
 status_t
 get_module(const char *path, module_info **vec)
 {
-	module *m = (module *)hash_get(modules_list, path, strlen(path));
+	module *m;
 	loaded_module *lm;
 	int res = B_NO_ERROR;
 	*vec = NULL;
 	
 	dprintf("*** get_module: %s\n", path);
+	
+	m = (module *)hash_get(modules_list, path, strlen(path));
 	
 	/* If m == NULL we didn't find any record of the module 
 	 * in our hash. We'll now call serach_mdoules which will do
@@ -1012,8 +1014,11 @@ get_module(const char *path, module_info **vec)
 status_t
 put_module(const char *path)
 {
-	module *m = (module *)hash_get(modules_list, path, strlen(path));
+	module *m;
 	
+	dprintf("*** put_module: path %s\n", path);
+	
+	m = (module *)hash_get(modules_list, path, strlen(path));
 	if (!m) {
 		dprintf("We don't seem to have a reference to module %s\n", path);
 		return EINVAL;

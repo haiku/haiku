@@ -8,6 +8,7 @@
 #include <kernel.h>
 #include <OS.h>
 #include <lock.h>
+#include <int.h>
 #include <debug.h>
 #include <arch/cpu.h>
 #include <Errors.h>
@@ -58,6 +59,9 @@ recursive_lock_lock(recursive_lock *lock)
 {
 	thread_id thid = thread_get_current_thread_id();
 	bool retval = false;
+
+	if (!kernel_startup && !are_interrupts_enabled())
+		panic("recursive_lock_lock: called with interrupts disabled for lock %p, sem %#lx\n", lock, lock->sem);
 	
 	if (thid != lock->holder) {
 		acquire_sem(lock->sem);
@@ -129,6 +133,9 @@ void
 mutex_lock(mutex *mutex)
 {
 	thread_id me = thread_get_current_thread_id();
+
+	if (!kernel_startup && !are_interrupts_enabled())
+		panic("mutex_lock: called with interrupts disabled for mutex %p, sem %#lx\n", mutex, mutex->sem);
 
 	if (me == mutex->holder)
 		panic("mutex_lock failure: mutex %p acquired twice by thread 0x%lx\n", mutex, me);

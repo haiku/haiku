@@ -60,10 +60,7 @@ void pool_debug_walk(struct pool_ctl *p)
 void pool_debug(struct pool_ctl *p, char *name)
 {
 	p->debug = 1;
-	if (strlen(name) < POOL_DEBUG_NAME_SZ)
-		strncpy(p->name, name, strlen(name));
-	else
-		strncpy(p->name, name, POOL_DEBUG_NAME_SZ);
+	strlcpy(p->name, name, POOL_DEBUG_NAME_SZ);
 }
 
 static struct pool_mem *get_mem_block(struct pool_ctl *pool)
@@ -128,6 +125,9 @@ static struct pool_mem *get_mem_block(struct pool_ctl *pool)
 int32 pool_init(struct pool_ctl **_newPool, size_t size)
 {
 	struct pool_ctl *pool = NULL;
+	
+	/* if the init failes, the new pool will be set to NULL */
+	*_newPool = NULL;
 
 	if (init_sem == -1)
 		create_sem(1, "pool_init_sem");

@@ -41,6 +41,7 @@
 #	define TRACE(x) ;
 #endif
 
+bool kernel_startup;
 
 static kernel_args ka;
 
@@ -51,6 +52,8 @@ int _start(kernel_args *oldka, int cpu);	/* keep compiler happy */
 int
 _start(kernel_args *oldka, int cpu_num)
 {
+	kernel_startup = true;
+
 	memcpy(&ka, oldka, sizeof(kernel_args));
 
 	smp_set_num_cpus(ka.num_cpus);
@@ -87,6 +90,10 @@ _start(kernel_args *oldka, int cpu_num)
 
 		sem_init(&ka);
 
+		dprintf("##################################################################\n");
+		dprintf("semaphores now available\n");
+		dprintf("##################################################################\n");
+
 		// now we can create and use semaphores
 		vm_init_postsem(&ka);
 		cbuf_init();
@@ -112,6 +119,10 @@ _start(kernel_args *oldka, int cpu_num)
 		// this is run per cpu for each AP processor after they've been set loose
 		thread_init_percpu(cpu_num);
 	}
+	dprintf("##################################################################\n");
+	dprintf("interrupts now enabled\n");
+	dprintf("##################################################################\n");
+	kernel_startup = false;
 	enable_interrupts();
 
 	TRACE(("main: done... begin idle loop on cpu %d\n", cpu_num));

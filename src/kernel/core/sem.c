@@ -371,9 +371,13 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 	int slot = id % MAX_SEMS;
 	int state;
 	status_t status = B_OK;
-
+	
 	if (gSemsActive == false)
 		return B_NO_MORE_SEMS;
+
+	if (!kernel_startup && !are_interrupts_enabled())
+		panic("acquire_sem_etc: called with interrupts disabled for sem %#lx\n", id);
+
 	if (id < 0)
 		return B_BAD_SEM_ID;
 	if (count <= 0)

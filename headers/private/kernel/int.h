@@ -65,4 +65,7 @@ long 	remove_io_interrupt_handler (long,
 
 /** @} */
 
+/* during kernel startup, interrupts are disabled */
+extern bool kernel_startup;
+
 #endif /* _KERNEL_INT_H */

@@ -187,7 +187,9 @@ i386_handle_trap(struct iframe frame)
 
 			// get the old interrupt enable/disable state and restore to that
 			if(frame.flags & 0x200) {
-//				dprintf("page_fault: enabling interrupts\n");
+				dprintf("page_fault: enabling interrupts\n");
+				if (!kernel_startup)
+					dprintf("page_fault, but interrupts are disabled. touching address %p from eip %p\n", cr2, frame.eip);
 				enable_interrupts();
 			}
 			ret = vm_page_fault(cr2, frame.eip,

@@ -42,6 +42,11 @@ hash_init(unsigned int table_size, int next_ptr_offset,
 		return NULL;
 
 	t->table = (struct hash_elem **)malloc(sizeof(void *) * table_size);
+	if (t->table == NULL) {
+		free(t);
+		return NULL;
+	}
+	
 	for (i = 0; i<table_size; i++)
 		t->table[i] = NULL;
 	t->table_size = table_size;
@@ -243,20 +248,28 @@ static void nhash_this(hash_table_index *hi, const void **key, ssize_t *klen,
 new_hash_table *
 hash_make(void)
 {
+	status_t rv;
 	new_hash_table *nn;
 
 	nn = (new_hash_table *)malloc(sizeof(new_hash_table));
-	if (!nn)
+	if (nn == NULL)
 		return NULL;
 
 	nn->count = 0;
 	nn->max = MAX_INITIAL;
 
 	nn->array = (hash_entry **)malloc(sizeof(hash_entry) * (nn->max + 1));
-	memset(nn->array, 0, sizeof(hash_entry) * (nn->max +1));
-	pool_init(&nn->pool, sizeof(hash_entry));
-	if (!nn->pool)
+	if (nn == NULL) {
+		free(nn);
 		return NULL;
+	}
+	memset(nn->array, 0, sizeof(hash_entry) * (nn->max +1));
+	rv = pool_init(&nn->pool, sizeof(hash_entry));
+	if (rv < B_OK || nn->pool == NULL) {
+		free(nn->array);
+		free(nn);
+		return NULL;
+	}
 	return nn;
 }
 
@@ -291,11 +304,13 @@ expand_array(new_hash_table *nh)
 {
 	hash_index *hi;
 	hash_entry **new_array;
-	int new_max = nh->max * 2 +1;
+	int new_max = (nh->max + 1) * 2 - 1;
 	int i;
 
-	new_array = (hash_entry **)malloc(sizeof(hash_entry) * new_max);
-	memset(new_array, 0, sizeof(hash_entry) * new_max);
+	new_array = (hash_entry **)malloc(sizeof(hash_entry) * new_max + 1);
+	if (new_array == NULL)
+		panic("khash, expand_array failed\n"); // XXX stupid, this function should return an error if it failes
+	memset(new_array, 0, sizeof(hash_entry) * new_max + 1);
 	for (hi = new_hash_first(nh); hi; hi = new_hash_next(hi)) {
 		i = hi->this_idx->hash & new_max;
 		hi->this_idx->next = new_array[i];
@@ -323,6 +338,7 @@ find_entry(new_hash_table *nh, const void *key, ssize_t klen, const void *val)
 		hash = hash * 33 + *p;
 
 	for (hep = &nh->array[hash & nh->max], he = *hep; he; hep = &he->next, he = *hep) {
+		dprintf("khash, find_entry looking at hep %p, he %p\n", hep, he);
 		if (he->hash == hash && he->klen == klen
 			&& memcmp(he->key, key, klen) == 0) {
 				break;
@@ -348,12 +364,19 @@ find_entry(new_hash_table *nh, const void *key, ssize_t klen, const void *val)
 void *
 hash_get(new_hash_table *nh, const void *key, ssize_t klen)
 {
-	hash_entry *he;
-	he = *find_entry(nh, key, klen, NULL);
-	if (he)
-		return (void*)he->val;
+	hash_entry **hepp;
+	hash_entry *hep;
+	
+	hepp = find_entry(nh, key, klen, NULL);
+	dprintf("khash, find_entry returned %p\n", hepp);
+	if (hepp == NULL)
+		return NULL;
 
-	return NULL;
+	hep = *hepp;
+	if (hep == NULL)
+		return NULL;
+	
+	return (void *) hep->val; /* XXX casting away the const */
 }
 
 
