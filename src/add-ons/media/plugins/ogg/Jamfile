@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src add-ons media plugins ogg ;
+
+UsePrivateHeaders media ;
+
+SubDirHdrs $(SUBDIR) libogg ogg ;
+
+Addon ogg : media plugins :
+	OggReaderPlugin.cpp
+	: false : libogg.a
+;
+
+LinkSharedOSLibs ogg : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins ogg libogg ;

@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src add-ons media plugins ogg libogg ;
+
+StaticLibrary ogg :
+	bitwise.c
+	framing.c
+;
