@@ -60,7 +60,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 			case R_386_RELATIVE:
 			case R_386_GOTOFF:
 			case R_386_GOTPC:
-				A = *(addr_t *)(image->regions[0].delta + rel[i].r_offset);
+				A = *(addr_t *)(image->text_region.delta + rel[i].r_offset);
 				TRACE(("A %p\n", (void *)A));
 				break;
 		}
@@ -70,7 +70,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 			case R_386_GOT32:
 			case R_386_PLT32:
 			case R_386_GOTPC:
-				P = image->regions[0].delta + rel[i].r_offset;
+				P = image->text_region.delta + rel[i].r_offset;
 				TRACE(("P %p\n", (void *)P));
 				break;
 		}
@@ -86,7 +86,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 				break;
 			case R_386_RELATIVE:
 				// B + A;
-				final_val = image->regions[0].delta + A;
+				final_val = image->text_region.delta + A;
 				break;
 			case R_386_JMP_SLOT:
 			case R_386_GLOB_DAT:
@@ -97,7 +97,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 				dprintf("arch_elf_relocate_rel: unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info));
 				return EPERM;
 		}
-		*(addr_t *)(image->regions[0].delta + rel[i].r_offset) = final_val;
+		*(addr_t *)(image->text_region.delta + rel[i].r_offset) = final_val;
 	}
 
 	return B_NO_ERROR;
