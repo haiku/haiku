@@ -18,8 +18,23 @@
 #include <unistd.h>
 #include <termios.h>
 
-#define SERIAL_DIR "/dev/ports"
+/* The directory where the serial driver publishes its devices */ 
+#define SERIAL_DIR "/dev/ports" 
 
+
+/* Creates and initializes a BSerialPort object,	*/
+/* query the driver, and builds a list of available */
+/* serial ports.									*/
+
+/* The BSerialPort object is initialized to these   */
+/* values: */
+/* 19200 BPS,	*/
+/* 8 Data Bits, */
+/* 1 Stop Bit,	*/
+/* No Parity,	*/
+/* Hardware Flow Control, */
+/* Infinite Timeout	*/
+/* and Blocking mode. */	
 BSerialPort::BSerialPort()
 	:	ffd(-1),
 		fBaudRate(B_19200_BPS),
@@ -35,18 +50,20 @@ BSerialPort::BSerialPort()
 }
 
 
+/* Closes the port, if it's open, and deletes the devices list */ 
 BSerialPort::~BSerialPort()
 {
 	if (ffd > 0)
 		close(ffd);
 	
 	for (int32 count = _fDevices->CountItems() - 1; count >= 0; count--)
-		free(_fDevices->ItemAt(count));
+		free(_fDevices->RemoveItem(count));
 	
 	delete _fDevices;
 }
 
 
+/* Opens a serial port. @param a valid port name */
 status_t
 BSerialPort::Open(const char *portName)
 {
@@ -67,6 +84,7 @@ BSerialPort::Open(const char *portName)
 }
 
 
+/* Closes the port */
 void
 BSerialPort::Close(void)
 {
@@ -76,6 +94,9 @@ BSerialPort::Close(void)
 }
 
 
+/* Read some data from the serial port. */
+/* @param the buffer where to transfer the data */
+/* @param how many bytes to read	*/
 ssize_t
 BSerialPort::Read(void *buf, size_t count)
 {
@@ -86,6 +107,9 @@ BSerialPort::Read(void *buf, size_t count)
 }
 
 
+/* Write some data to the serial port. */
+/* @param the buffer from which transfer the data */
+/* @param how many bytes to write	*/
 ssize_t
 BSerialPort::Write(const void *buf, size_t count)
 {
@@ -96,6 +120,7 @@ BSerialPort::Write(const void *buf, size_t count)
 }
 
 
+/* Set blocking mode */
 void
 BSerialPort::SetBlocking(bool Blocking)
 {
@@ -104,6 +129,8 @@ BSerialPort::SetBlocking(bool Blocking)
 }
 
 
+/* Set the timeout for the port */
+/* Valid values: B_INFINITE_TIMEOUT or any value between 0 and 25000000 */
 status_t
 BSerialPort::SetTimeout(bigtime_t microSeconds)
 {	
@@ -119,6 +146,7 @@ BSerialPort::SetTimeout(bigtime_t microSeconds)
 }
 
 
+/* Set the data rate (Baud rate) for the port */
 status_t
 BSerialPort::SetDataRate(data_rate bitsPerSecond)
 {
@@ -128,6 +156,7 @@ BSerialPort::SetDataRate(data_rate bitsPerSecond)
 }
 
 
+/* Get the data rate (Baud Rate) */
 data_rate
 BSerialPort::DataRate(void)
 {
@@ -135,6 +164,7 @@ BSerialPort::DataRate(void)
 }
 
 
+/* Set the data bits (7 or 8) */
 void
 BSerialPort::SetDataBits(data_bits numBits)
 {
@@ -143,6 +173,7 @@ BSerialPort::SetDataBits(data_bits numBits)
 }
 
 
+/* Get the data bits */
 data_bits
 BSerialPort::DataBits(void)
 {
@@ -150,6 +181,7 @@ BSerialPort::DataBits(void)
 }
 
 
+/* Set the stop bits (1 or 2) */
 void
 BSerialPort::SetStopBits(stop_bits numBits)
 {
@@ -158,6 +190,7 @@ BSerialPort::SetStopBits(stop_bits numBits)
 }
 
 
+/* Get the stop bits */
 stop_bits
 BSerialPort::StopBits(void)
 {
@@ -165,6 +198,7 @@ BSerialPort::StopBits(void)
 }
 
 
+/* Set the parity mode (ODD, PAIR, or NONE) */
 void
 BSerialPort::SetParityMode(parity_mode which)
 {
@@ -173,6 +207,7 @@ BSerialPort::SetParityMode(parity_mode which)
 }
 
 
+/* Get the parity mode */
 parity_mode
 BSerialPort::ParityMode(void)
 {
@@ -180,6 +215,7 @@ BSerialPort::ParityMode(void)
 }
 
 
+/* Clear the input buffer */
 void
 BSerialPort::ClearInput(void)
 {
@@ -187,6 +223,7 @@ BSerialPort::ClearInput(void)
 }
 
 
+/* Clear the output buffer */
 void
 BSerialPort::ClearOutput(void)
 {
@@ -194,6 +231,7 @@ BSerialPort::ClearOutput(void)
 }
 
 
+/* Set the flow control (HARDWARE, SOFTWARE, or NONE) */ 
 void
 BSerialPort::SetFlowControl(uint32 method)
 {
@@ -202,6 +240,7 @@ BSerialPort::SetFlowControl(uint32 method)
 }
 
 
+/* Get the flow control */
 uint32
 BSerialPort::FlowControl(void)
 {
@@ -209,6 +248,7 @@ BSerialPort::FlowControl(void)
 }
 
 
+/* Set the DTR */
 status_t
 BSerialPort::SetDTR(bool asserted)
 {
@@ -218,6 +258,7 @@ BSerialPort::SetDTR(bool asserted)
 }
 
 
+/* Set the RTS status */
 status_t
 BSerialPort::SetRTS(bool asserted)
 {
@@ -227,6 +268,8 @@ BSerialPort::SetRTS(bool asserted)
 }
 
 
+/* See how many chars are queued on the serial port, */
+/* waiting to be read */
 status_t
 BSerialPort::NumCharsAvailable(int32 *wait_until_this_many)
 {
@@ -234,10 +277,12 @@ BSerialPort::NumCharsAvailable(int32 *wait_until_this_many)
 	if (ffd < 0)
 		return B_ERROR;
 	
+	//TODO: Implement
 	return B_OK;
 }
 
 
+/* See if CTS is set */
 bool
 BSerialPort::IsCTS(void)
 {
@@ -250,6 +295,7 @@ BSerialPort::IsCTS(void)
 }
 
 
+/* See if DSR is set */
 bool
 BSerialPort::IsDSR(void)
 {
@@ -262,6 +308,7 @@ BSerialPort::IsDSR(void)
 }
 
 
+/* See if RI is set */
 bool
 BSerialPort::IsRI(void)
 {
@@ -274,6 +321,7 @@ BSerialPort::IsRI(void)
 }
 
 
+/* See if DCD is set */
 bool
 BSerialPort::IsDCD(void)
 {
@@ -286,16 +334,21 @@ BSerialPort::IsDCD(void)
 }
 
 
+/* Wait until there's something to read from the serial port. */
+/* If no data is ready, it will always block, ignoring the    */
+/* value of SetBlocking(); however, it respects the timeout   */
+/* set by SetTimeout(). */
 ssize_t
 BSerialPort::WaitForInput(void)
 {
-	int size;
-	int err = ioctl(ffd, TCWAITEVENT, &size, sizeof(size));
+	ssize_t size;
+	int err = ioctl(ffd, TCWAITEVENT, &size, sizeof size);
 	
 	return (err < B_OK) ? errno : size;
 }
 
 
+/* Returns the number of available Serial Ports. */
 int32
 BSerialPort::CountDevices()
 {
@@ -308,6 +361,11 @@ BSerialPort::CountDevices()
 }
 
 
+/* Get the device name for the given device.*/
+/* The first parameter is the number of the device */
+/* you want to know the name, the second is the buffer */
+/* where you want to store the name, and the third is  */
+/* the length of that buffer. */
 status_t
 BSerialPort::GetDeviceName(int32 n, char *name, size_t bufSize)
 {
@@ -325,8 +383,10 @@ BSerialPort::GetDeviceName(int32 n, char *name, size_t bufSize)
 }
 
 
-// Private or Reserved
+/* Private or Reserved */
 
+/* Query the serial driver about the available devices, */
+/* and build a list of them. */
 void
 BSerialPort::ScanDevices()
 {
@@ -336,10 +396,8 @@ BSerialPort::ScanDevices()
 	
 	//First, we empty the list
 	for (int32 count = _fDevices->CountItems() - 1; count >= 0; count--)
-		free(_fDevices->ItemAt(count));
-	
-	_fDevices->MakeEmpty();
-	
+		free(_fDevices->RemoveItem(count));
+		
 	//Then, add the devices to the list
 	while (dir.GetNextEntry(&entry) == B_OK)
 	{
@@ -349,6 +407,9 @@ BSerialPort::ScanDevices()
 }
 
 
+/* Send the options to the serial driver. */
+/* Returns B_OK if all goes fine, an error code */
+/* if something goes wrong. */
 int
 BSerialPort::DriverControl()
 {
@@ -418,7 +479,7 @@ BSerialPort::DriverControl()
 }
 
 
-//FBC
+/* These functions are here to maintain Binary Compatibility */ 
 void BSerialPort::_ReservedSerialPort1() {}
 void BSerialPort::_ReservedSerialPort2() {}
 void BSerialPort::_ReservedSerialPort3() {}
