@@ -5,9 +5,10 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include <core_funcs.h>
 #include <KernelExport.h>
 #include <driver_settings.h>
+#include <core_funcs.h>
+#include <net_module.h>
 
 #include <ethernet_module.h>
 
@@ -27,7 +28,7 @@
 #endif
 
 
-#define PPPoE_MODULE_NAME		"network/ppp/pppoe"
+#define PPPoE_MODULE_NAME		NETWORK_MODULES_ROOT "ppp/pppoe"
 
 struct core_module_info *core = NULL;
 static struct ethernet_module_info *sEthernet;

@@ -7,10 +7,8 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
-
-R5KernelAddon ipcp : kernel network ppp :
+R5KernelAddon ipcp : kernel obos_network ppp :
 	inet_addr.c
-	
 	ipcp.cpp
 	Protocol.cpp
 ;
@@ -21,5 +19,9 @@ LinkSharedOSLibs ipcp : libkernelppp.a ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/ppp
+	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: ipcp ;
+
+Package openbeos-networkingkit-cvs :
+	ipcp :
+	boot home config add-ons kernel obos_network ppp ;

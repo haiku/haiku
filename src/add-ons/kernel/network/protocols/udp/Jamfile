@@ -2,11 +2,15 @@ SubDir OBOS_TOP src add-ons kernel network protocols udp ;
 
 UsePrivateHeaders net ;
 
-R5KernelAddon udp : kernel network protocols :
+R5KernelAddon udp : kernel obos_network protocols :
 	udp.c
 ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/protocols
+	: /boot/home/config/add-ons/kernel/obos_network/protocols
 	: udp ;
+
+Package openbeos-networkingkit-cvs :
+	udp :
+	boot home config add-ons kernel obos_network protocols ;

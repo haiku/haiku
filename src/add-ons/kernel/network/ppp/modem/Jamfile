@@ -8,7 +8,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
 
-R5KernelAddon modem : kernel network ppp :
+R5KernelAddon modem : kernel obos_network ppp :
 	modem.cpp
 	ModemDevice.cpp
 	ACFCHandler.cpp
@@ -18,5 +18,9 @@ LinkSharedOSLibs modem : libkernelppp.a ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/ppp
+	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: modem ;
+
+Package openbeos-networkingkit-cvs :
+	modem :
+	boot home config add-ons kernel obos_network ppp ;

@@ -10,6 +10,8 @@
 
 #include <SupportDefs.h>
 
+#include "net_module.h"
+
 
 typedef uint32 interface_id;
 
@@ -30,7 +32,7 @@ typedef uint32 interface_id;
 #define PPP_SERVER_MODE_VALUE				"Server"
 
 // path defines
-#define PPP_MODULES_PATH					"network/ppp"
+#define PPP_MODULES_PATH					NETWORK_MODULES_ROOT "ppp"
 
 // built-in protocols
 #define PPP_LCP_PROTOCOL					0xC021

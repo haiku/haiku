@@ -5,9 +5,10 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include <core_funcs.h>
 #include <KernelExport.h>
 #include <driver_settings.h>
+#include <core_funcs.h>
+#include <net_module.h>
 
 #include <KPPPInterface.h>
 #include <KPPPModule.h>
@@ -24,7 +25,7 @@
 #endif
 
 
-#define PAP_MODULE_NAME		"network/ppp/pap"
+#define PAP_MODULE_NAME		NETWORK_MODULES_ROOT "ppp/pap"
 
 struct core_module_info *core = NULL;
 status_t std_ops(int32 op, ...);

@@ -2,11 +2,15 @@ SubDir OBOS_TOP src add-ons kernel network interfaces ethernet ;
 
 UsePrivateHeaders net ;
 
-R5KernelAddon ethernet : kernel network interfaces :
+R5KernelAddon ethernet : kernel obos_network interfaces :
 	ethernet.c
 ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/interfaces
+	: /boot/home/config/add-ons/kernel/obos_network/interfaces
 	: ethernet ;
+
+Package openbeos-networkingkit-cvs :
+	ethernet :
+	boot home config add-ons kernel obos_network interfaces ;

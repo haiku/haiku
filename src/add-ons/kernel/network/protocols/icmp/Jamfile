@@ -2,11 +2,15 @@ SubDir OBOS_TOP src add-ons kernel network protocols icmp ;
 
 UsePrivateHeaders net ;
 
-R5KernelAddon icmp : kernel network protocols :
+R5KernelAddon icmp : kernel obos_network protocols :
 	icmp.c
 ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/protocols
+	: /boot/home/config/add-ons/kernel/obos_network/protocols
 	: icmp ;
+
+Package openbeos-networkingkit-cvs :
+	icmp :
+	boot home config add-ons kernel obos_network protocols ;

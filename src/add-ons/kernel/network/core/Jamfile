@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons kernel network core ;
 
 UsePrivateHeaders net ;
 
-R5KernelAddon core : kernel network :
+R5KernelAddon core : kernel obos_network :
 	cksum.c
 	core.c
 	if.c
@@ -21,5 +21,9 @@ R5KernelAddon core : kernel network :
 ;
 
 # Installation
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/network
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/obos_network
 	: core ;
+
+Package openbeos-networkingkit-cvs :
+	core :
+	boot home config add-ons kernel obos_network ;

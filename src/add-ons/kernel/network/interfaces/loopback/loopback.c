@@ -141,7 +141,7 @@ static int loopback_module_init(void *cpp)
 
 struct kernel_net_module_info device_info = {
 	{
-		"network/interfaces/loopback",
+		NETWORK_MODULES_ROOT "interfaces/loopback",
 		0,
 		std_ops
 	},

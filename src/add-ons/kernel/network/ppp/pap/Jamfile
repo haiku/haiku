@@ -8,7 +8,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
 
-R5KernelAddon pap : kernel network ppp :
+R5KernelAddon pap : kernel obos_network ppp :
 	pap.cpp
 	Protocol.cpp
 ;
@@ -17,5 +17,9 @@ LinkSharedOSLibs pap : libkernelppp.a ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/ppp
+	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: pap ;
+
+Package openbeos-networkingkit-cvs :
+	pap :
+	boot home config add-ons kernel obos_network ppp ;

@@ -38,8 +38,8 @@
 #include <net_socket.h>
 
 /* Defines we need */
-#define NETWORK_INTERFACES	"network/interfaces"
-#define NETWORK_PROTOCOLS	"network/protocols"
+#define NETWORK_INTERFACES	NETWORK_MODULES_ROOT "interfaces"
+#define NETWORK_PROTOCOLS	NETWORK_MODULES_ROOT "protocols"
 
 /* Variables used in other core modules */
 int ndevs = 0;

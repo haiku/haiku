@@ -13,7 +13,7 @@
 #include <PPPReportDefs.h>
 
 
-#define PPP_INTERFACE_MODULE_NAME		 "network/interfaces/ppp"
+#define PPP_INTERFACE_MODULE_NAME		 NETWORK_MODULES_ROOT "interfaces/ppp"
 
 #define PPP_UNDEFINED_INTERFACE_ID	0
 	// create_interface() returns this value on failure

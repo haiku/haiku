@@ -25,6 +25,7 @@
 #include "core_module.h"
 #include "core_funcs.h"
 #include "net_timer.h"
+#include "ether_driver.h"
 
 #include "ethernet_module.h"
 
@@ -161,7 +162,7 @@ static void attach_device(int devid, char *driver, char *devno)
 	ifp = &ed->sc_if;
 	
 	/* get the MAC address... */
-	status = ioctl(devid, IF_GETADDR, &ed->sc_addr, 6);
+	status = ioctl(devid, ETHER_GETADDR, &ed->sc_addr, 6);
 	if (status < B_OK) {
 		printf("%s/%s: ignored: Failed to get a MAC address\n", driver, devno);
 		close(devid);
@@ -169,9 +170,9 @@ static void attach_device(int devid, char *driver, char *devno)
 		return;
 	}
 	/* Try to detrmine the MTU to use */
-	status = ioctl(devid, IF_GETFRAMESIZE, &fsz, sizeof(fsz));
+	status = ioctl(devid, ETHER_GETFRAMESIZE, &fsz, sizeof(fsz));
 	if (status < 0) {
-		printf("%s/%s: IF_GETFRAMESIZE not supported, defaulting to %d\n",
+		printf("%s/%s: ETHER_GETFRAMESIZE not supported, defaulting to %d\n",
 		       driver, devno, ETHERMTU);
 		ifp->if_mtu = ETHERMTU;
 	} else
@@ -234,12 +235,54 @@ static void open_device(char *driver, char *devno)
 		return;
 	}
 
-	status = ioctl(dev, IF_INIT, NULL, 0);
+	status = ioctl(dev, ETHER_INIT, NULL, 0);
 	if (status == B_OK)
 		attach_device(dev, driver, devno);
 
 	close(dev);
 };
+
+#if 0
+static void find_devices(char *root)
+{
+	DIR *dir;
+	struct dirent *de;
+	struct stat st;
+	char path[1024];
+
+	dir = opendir(root);
+	if (!dir) {
+		printf("ethernet: Couldn't open the directory %s\n", root);
+		return;
+	};
+
+	while ((de = readdir(dir)) != NULL) {
+		if (strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0)
+			continue;	// skip pseudo-directories
+		
+		sprintf(path, "%s/%s", root, de->d_name);
+		
+		if (stat(path, &st) < 0) {
+			printf("ethernet: Can't stat(%s) entry! Skipping...\n", path);
+			continue;
+		};
+		
+		if (S_ISDIR(st.st_mode))
+			find_devices(path);
+		else if (S_ISCHR(st.st_mode)) {	// char device = driver!
+			if (strcmp(de->d_name, "socket") == 0 ||	// OBOS old socket driver
+				strcmp(de->d_name, "stack") == 0 ||		// OBOS stack driver
+				strcmp(de->d_name, "server") == 0 ||	// OBOS server driver
+				strcmp(de->d_name, "api") == 0)			// BONE stack driver
+				continue;	// skip pseudo-entries
+
+			open_device(path, de->d_name);
+		};
+	};
+	
+	closedir(dir);
+}
+#else
 
 static void find_devices(void)
 {
@@ -257,7 +300,7 @@ static void find_devices(void)
 		/* hmm, is it a driver? */
 		if (strcmp(de->d_name, ".") == 0 ||
 	    	strcmp(de->d_name, "..") == 0 ||
-	    	strcmp(de->d_name, "socket") == 0 ||
+	    	strcmp(de->d_name, "server") == 0 ||
 	    	strcmp(de->d_name, "stack") == 0)
 			continue;
 
@@ -288,6 +331,8 @@ static void find_devices(void)
 
 	return;
 }
+#endif
+
 
 #if DEBUG
 static void dump_ether_details(struct mbuf *buf)
@@ -929,7 +974,7 @@ static int ether_init(void *cpp)
 	if (ether_rxt > 0)
 		resume_thread(ether_rxt);
 	
-	find_devices();
+	find_devices(); // "/dev/net");
 	
 	memset(proto, 0, sizeof(struct protosw *) * IPPROTO_MAX);
 	add_protosw(proto, NET_LAYER2);

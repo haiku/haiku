@@ -2,11 +2,15 @@ SubDir OBOS_TOP src add-ons kernel network interfaces loopback ;
 
 UsePrivateHeaders net ;
 
-R5KernelAddon loopback : kernel network interfaces :
+R5KernelAddon loopback : kernel obos_network interfaces :
 	loopback.c
 ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/interfaces
+	: /boot/home/config/add-ons/kernel/obos_network/interfaces
 	: loopback ;
+
+Package openbeos-networkingkit-cvs :
+	loopback :
+	boot home config add-ons kernel obos_network interfaces ;

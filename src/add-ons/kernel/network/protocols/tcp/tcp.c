@@ -30,7 +30,7 @@
 #include "net_timer.h"
 
 #include <KernelExport.h>
-#define NET_TCP_MODULE_NAME		"network/protocols/tcp"
+#define NET_TCP_MODULE_NAME		NETWORK_MODULES_ROOT "protocols/tcp"
 status_t std_ops(int32 op, ...);
 
 struct core_module_info *core = NULL;

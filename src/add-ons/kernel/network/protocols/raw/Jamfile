@@ -2,11 +2,15 @@ SubDir OBOS_TOP src add-ons kernel network protocols raw ;
 
 UsePrivateHeaders net ;
 
-R5KernelAddon raw : kernel network protocols :
+R5KernelAddon raw : kernel obos_network protocols :
 	raw.c
 ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/protocols
+	: /boot/home/config/add-ons/kernel/obos_network/protocols
 	: raw ;
+
+Package openbeos-networkingkit-cvs :
+	raw :
+	boot home config add-ons kernel obos_network protocols ;

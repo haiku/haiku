@@ -8,7 +8,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
 
-R5KernelAddon pppoe : kernel network ppp :
+R5KernelAddon pppoe : kernel obos_network ppp :
 	pppoe.cpp
 	PPPoEDevice.cpp
 	DiscoveryPacket.cpp
@@ -18,5 +18,9 @@ LinkSharedOSLibs pppoe : libkernelppp.a ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/ppp
+	: /boot/home/config/add-ons/kernel/obos_network/ppp
 	: pppoe ;
+
+Package openbeos-networkingkit-cvs :
+	pppoe :
+	boot home config add-ons kernel obos_network ppp ;

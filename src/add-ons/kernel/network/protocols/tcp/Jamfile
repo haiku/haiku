@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons kernel network protocols tcp ;
 
 UsePrivateHeaders net ;
 
-R5KernelAddon tcp : kernel network protocols :
+R5KernelAddon tcp : kernel obos_network protocols :
 	arc4random.c
 	tcp.c
 	tcp_debug.c
@@ -13,5 +13,9 @@ R5KernelAddon tcp : kernel network protocols :
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/protocols
+	: /boot/home/config/add-ons/kernel/obos_network/protocols
 	: tcp ;
+
+Package openbeos-networkingkit-cvs :
+	tcp :
+	boot home config add-ons kernel obos_network protocols ;

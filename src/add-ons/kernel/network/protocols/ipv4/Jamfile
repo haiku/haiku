@@ -2,11 +2,15 @@ SubDir OBOS_TOP src add-ons kernel network protocols ipv4 ;
 
 UsePrivateHeaders net ;
 
-R5KernelAddon ipv4 : kernel network protocols :
+R5KernelAddon ipv4 : kernel obos_network protocols :
 	ipv4.c
 ;
 
 # Installation
 OBOSInstall install-networking
-	: /boot/home/config/add-ons/kernel/network/protocols
+	: /boot/home/config/add-ons/kernel/obos_network/protocols
 	: ipv4 ;
+
+Package openbeos-networkingkit-cvs :
+	ipv4 :
+	boot home config add-ons kernel obos_network protocols ;

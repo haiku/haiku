@@ -26,7 +26,7 @@
 
 #include <KernelExport.h>
 status_t std_ops(int32 op, ...);
-#define NET_UDP_MODULE_NAME		"network/protocols/udp"
+#define NET_UDP_MODULE_NAME		NETWORK_MODULES_ROOT "protocols/udp"
 
 /* Private variables */
 static struct core_module_info *core = NULL;
