@@ -55,7 +55,8 @@ BChannelControl::BChannelControl(BMessage *archive)
 		memset(fChannelMin, 0, sizeof(int32) * fChannelCount);
 	
 		fChannelMax = new int32[fChannelCount];
-		memset(fChannelMax, 100, sizeof(int32) * fChannelCount);
+		for (int32 i = 0; i < fChannelCount; i++)
+			fChannelMax[i] = 100;
 	
 		fChannelValues = new int32[fChannelCount];
 		memset(fChannelValues, 0, sizeof(int32) * fChannelCount);
@@ -68,7 +69,7 @@ BChannelControl::BChannelControl(BMessage *archive)
 	}
 	
 	const char *label = NULL;
-	if (archive->FindString("be:_m_min_*label", &label) == B_OK)
+	if (archive->FindString("be:_m_min_label", &label) == B_OK)
 		fMinLabel = label;
 	if (archive->FindString("be:_m_max_label", &label) == B_OK)
 		fMaxLabel = label;
@@ -389,7 +390,7 @@ BChannelControl::SetAllValue(int32 values)
 	for (int32 i = 0; i < fChannelCount; i++)
 		newValues[i] = values;
 	
-	delete fChannelValues;
+	delete[] fChannelValues;
 	fChannelValues = newValues;
 	
 	return B_OK;
