@@ -36,6 +36,7 @@
 #include "Desktop.h"
 #include "WinBorder.h"
 #include "AppServer.h"	// for new_decorator()
+#include "TokenHandler.h"
 
 // TODO: Document this file completely
 
@@ -47,82 +48,93 @@
 //#define DEBUG_WINBORDER_CLICK
 
 #ifdef DEBUG_WINBORDER
-#include <stdio.h>
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
 #endif
 
 #ifdef DEBUG_WINBORDER_MOUSE
-#include <stdio.h>
+#	include <stdio.h>
+#	define STRACE_MOUSE(x) printf x
+#else
+#	define STRACE_MOUSE(x) ;
 #endif
 
 #ifdef DEBUG_WINBORDER_CLICK
-#include <stdio.h>
+#	include <stdio.h>
+#	define STRACE_CLICK(x) printf x
+#else
+#	define STRACE_CLICK(x) ;
 #endif
 
 namespace winborder_private
 {
-	bool is_moving_window=false;
-	bool is_resizing_window=false;
-	bool is_sliding_tab=false;
-	WinBorder *active_winborder=NULL;
+	bool is_moving_window		= false;
+	bool is_resizing_window		= false;
+	bool is_sliding_tab			= false;
+	WinBorder *active_winborder	= NULL;
 };
 
-extern ServerWindow *active_serverwindow;
+//! TokenHandler object used to provide IDs for all WinBorder objects
+TokenHandler	border_token_handler;
 
-bool is_moving_window(void) { return winborder_private::is_moving_window; }
-void set_is_moving_window(bool state) { winborder_private::is_moving_window=state; }
-bool is_resizing_window(void) { return winborder_private::is_resizing_window; }
-void set_is_resizing_window(bool state) { winborder_private::is_resizing_window=state; }
-bool is_sliding_tab(void) { return winborder_private::is_sliding_tab; }
-void set_is_sliding_tab(bool state) { winborder_private::is_sliding_tab=state; }
-WinBorder * get_active_winborder(void) { return winborder_private::active_winborder; }
-void set_active_winborder(WinBorder *win) { winborder_private::active_winborder=win; }
+extern ServerWindow	*active_serverwindow;
+
+bool	is_moving_window(void) { return winborder_private::is_moving_window; }
+void	set_is_moving_window(bool state) { winborder_private::is_moving_window=state; }
+bool	is_resizing_window(void) { return winborder_private::is_resizing_window; }
+void	set_is_resizing_window(bool state) { winborder_private::is_resizing_window=state; }
+bool	is_sliding_tab(void) { return winborder_private::is_sliding_tab; }
+void	set_is_sliding_tab(bool state) { winborder_private::is_sliding_tab=state; }
+void	set_active_winborder(WinBorder *win) { winborder_private::active_winborder=win; }
+WinBorder*	get_active_winborder(void) { return winborder_private::active_winborder; }
 
 WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const int32 feel,
-	const int32 flags, ServerWindow *win)
- : Layer(r,name,B_FOLLOW_NONE,flags,win)
+		const int32 flags, ServerWindow *win)
+	: Layer(r, name, B_NULL_TOKEN, B_FOLLOW_NONE, flags, win)
 {
 	// unlike BViews, windows start off as hidden, so we need to tweak the hidecount
 	// assignment made by Layer().
-	_hidecount=1;
-	_mbuttons=0;
-	_kmodifiers=0;
-	_win=win;
-	if(_win)
-		_frame=_win->_frame;
-	_clientframe=_frame;
-	_mousepos.Set(0,0);
-	_update=false;
+	_hidden		= true;
+	_mbuttons	= 0;
+	_kmodifiers	= 0;
+	_win		= win;
 
-	_title=new BString(name);
-	_hresizewin=false;
-	_vresizewin=false;
-	_driver=GetGfxDriver(ActiveScreen());
-	_decorator=new_decorator(r,name,look,feel,flags,GetGfxDriver(ActiveScreen()));
+	_mousepos.Set(0,0);
+	_update		= false;
+
+	_title		= new BString(name);
+	_hresizewin	= false;
+	_vresizewin	= false;
+	_driver		= GetGfxDriver(ActiveScreen());
+	_decorator	= new_decorator(r,name,look,feel,flags,GetGfxDriver(ActiveScreen()));
 
 	// We need to do this because GetFootprint is supposed to generate a new BRegion.
 	// I suppose the call probably ought to be void GetFootprint(BRegion *recipient), but we can
 	// change that later.
+
+	delete _visible; // it was initialized in Layer's constructor.
+	_visible	= _decorator->GetFootprint();
+	*_full		= *_visible;
+	*_invalid	= *_visible;
+	_frame		= _visible->Frame();
 	
-	if(_visible)
-		delete _visible;
-	_visible=_decorator->GetFootprint();
-	*_full=*_visible;
+		// I tend to think it is not needed, so if it isn't, DW, please remove it.
+	_view_token	= border_token_handler.GetToken();
 
 	_decorator->SetDriver(_driver);
 	_decorator->SetTitle(name);
 	
-#ifdef DEBUG_WINBORDER
-printf("WinBorder %s:\n",_title->String());
-printf("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom);
-printf("\tWindow %s\n",win?win->Title():"NULL");
-#endif
+
+STRACE(("WinBorder %s:\n",_title->String()));
+STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
+STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
 }
 
 WinBorder::~WinBorder(void)
 {
-#ifdef DEBUG_WINBORDER
-printf("WinBorder %s:~WinBorder()\n",_title->String());
-#endif
+STRACE(("WinBorder %s:~WinBorder()\n",_title->String()));
 	delete _title;
 }
 
@@ -152,48 +164,33 @@ void WinBorder::MouseDown(int8 *buffer)
 	{
 		case CLICK_MOVETOBACK:
 		{
-			#ifdef DEBUG_WINBORDER_CLICK
-			printf("Click: MoveToBack\n");
-			#endif
-
+STRACE_CLICK(("Click: MoveToBack\n"));
 			MakeTopChild();
 			break;
 		}
 		case CLICK_MOVETOFRONT:
 		{
-			#ifdef DEBUG_WINBORDER_CLICK
-			printf("Click: MoveToFront\n");
-			#endif
-
+STRACE_CLICK(("Click: MoveToFront\n"));
 			MakeBottomChild();
 			break;
 		}
 		case CLICK_CLOSE:
 		{
-			#ifdef DEBUG_WINBORDER_CLICK
-			printf("Click: Close\n");
-			#endif
-
+STRACE_CLICK(("Click: Close\n"));
 			_decorator->SetClose(true);
 			_decorator->DrawClose();
 			break;
 		}
 		case CLICK_ZOOM:
 		{
-			#ifdef DEBUG_WINBORDER_CLICK
-			printf("Click: Zoom\n");
-			#endif
-
+STRACE_CLICK(("Click: Zoom\n"));
 			_decorator->SetZoom(true);
 			_decorator->DrawZoom();
 			break;
 		}
 		case CLICK_MINIMIZE:
 		{
-			#ifdef DEBUG_WINBORDER_CLICK
-			printf("Click: Minimize\n");
-			#endif
-
+STRACE_CLICK(("Click: Minimize\n"));
 			_decorator->SetMinimize(true);
 			_decorator->DrawMinimize();
 			break;
@@ -202,30 +199,21 @@ void WinBorder::MouseDown(int8 *buffer)
 		{
 			if(buttons==B_PRIMARY_MOUSE_BUTTON)
 			{
-				#ifdef DEBUG_WINBORDER_CLICK
-				printf("Click: Drag\n");
-				#endif
-
+STRACE_CLICK(("Click: Drag\n"));
 				MakeBottomChild();
 				set_is_moving_window(true);
 			}
 
 			if(buttons==B_SECONDARY_MOUSE_BUTTON)
 			{
-				#ifdef DEBUG_WINBORDER_CLICK
-				printf("Click: MoveToBack\n");
-				#endif
-
+STRACE_CLICK(("Click: MoveToBack\n"));
 				MakeTopChild();
 			}
 			break;
 		}
 		case CLICK_SLIDETAB:
 		{
-			#ifdef DEBUG_WINBORDER_CLICK
-			printf("Click: Slide Tab\n");
-			#endif
-
+STRACE_CLICK(("Click: Slide Tab\n"));
 			set_is_sliding_tab(true);
 			break;
 		}
@@ -233,10 +221,7 @@ void WinBorder::MouseDown(int8 *buffer)
 		{
 			if(buttons==B_PRIMARY_MOUSE_BUTTON)
 			{
-				#ifdef DEBUG_WINBORDER_CLICK
-				printf("Click: Resize\n");
-				#endif
-
+STRACE_CLICK(("Click: Resize\n"));
 				set_is_resizing_window(true);
 			}
 			break;
@@ -287,10 +272,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 	if(is_sliding_tab())
 	{
-		#ifdef DEBUG_WINBORDER_CLICK
-		printf("ClickMove: Slide Tab\n");
-		#endif
-
+STRACE_CLICK(("ClickMove: Slide Tab\n"));
 		float dx=pt.x-_mousepos.x;
 		float dy=pt.y-_mousepos.y;		
 
@@ -313,14 +295,9 @@ void WinBorder::MouseMoved(int8 *buffer)
 		// We are moving the window. Because speed is of the essence, we need to handle a lot
 		// of stuff which we might otherwise not need to.
 
-		#ifdef DEBUG_WINBORDER_CLICK
-		printf("ClickMove: Drag\n");
-		#endif
-		
-		// 1) Get deltas
-		float dx=pt.x-_mousepos.x,
-			dy=pt.y-_mousepos.y;
-
+STRACE_CLICK(("ClickMove: Drag\n"));
+		float	dx	= pt.x - _mousepos.x,
+				dy	= pt.y - _mousepos.y;
 		if(buttons!=0 && (dx!=0 || dy!=0))
 		{
 			// 2) Offset necessary data members
@@ -379,12 +356,9 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 	if(is_resizing_window())
 	{
-		#ifdef DEBUG_WINBORDER_CLICK
-		printf("ClickMove: Resize\n");
-		#endif
-
-		float dx=pt.x-_mousepos.x,
-			dy=pt.y-_mousepos.y;
+STRACE_CLICK(("ClickMove: Resize\n"));
+		float	dx	= pt.x - _mousepos.x,
+				dy	= pt.y - _mousepos.y;
 		if(buttons!=0 && (dx!=0 || dy!=0))
  		{
 			_clientframe.right+=dx;
@@ -410,6 +384,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 void WinBorder::MouseUp(int8 *buffer)
 {
+STRACE_MOUSE(("WinBorder %s: MouseUp() \n",_title->String()));
 	// buffer data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
@@ -421,7 +396,6 @@ void WinBorder::MouseUp(int8 *buffer)
 	int32 modifiers=*((int32*)index);
 	BPoint pt(x,y);
 	
-
 	_mbuttons=0;
 	_kmodifiers=modifiers;
 
@@ -439,9 +413,7 @@ void WinBorder::MouseUp(int8 *buffer)
 			_decorator->DrawClose();
 			
 			// call close window stuff here
-			#ifdef DEBUG_WINBORDER_MOUSE
-			printf("WinBorder %s: MouseUp:CLICK_CLOSE unimplemented\n",_title->String());
-			#endif
+			STRACE_MOUSE(("WinBorder %s: MouseUp:CLICK_CLOSE unimplemented\n",_title->String()));
 			
 			break;
 		}
@@ -451,9 +423,7 @@ void WinBorder::MouseUp(int8 *buffer)
 			_decorator->DrawZoom();
 			
 			// call zoom stuff here
-			#ifdef DEBUG_WINBORDER_MOUSE
-			printf("WinBorder %s: MouseUp:CLICK_ZOOM unimplemented\n",_title->String());
-			#endif
+			STRACE_MOUSE(("WinBorder %s: MouseUp:CLICK_ZOOM unimplemented\n",_title->String()));
 			
 			break;
 		}
@@ -463,9 +433,7 @@ void WinBorder::MouseUp(int8 *buffer)
 			_decorator->DrawMinimize();
 			
 			// call minimize stuff here
-			#ifdef DEBUG_WINBORDER_MOUSE
-			printf("WinBorder %s: MouseUp:CLICK_MINIMIZE unimplemented\n",_title->String());
-			#endif
+			STRACE_MOUSE(("WinBorder %s: MouseUp:CLICK_MINIMIZE unimplemented\n",_title->String()));
 			
 		}
 		default:
@@ -487,9 +455,9 @@ void WinBorder::SetFocus(const bool &active)
 
 void WinBorder::RequestDraw(const BRect &r)
 {
+	STRACE(("WinBorder %s: RequestDraw(BRect)\n",_title->String()));
 	#ifdef DEBUG_WINBORDER
-	printf("WinBorder %s: RequestDraw(BRect)\n",_title->String());
-	PrintToStream();
+		PrintToStream();
 	#endif
 
 	_decorator->Draw(r);
@@ -499,9 +467,9 @@ void WinBorder::RequestDraw(const BRect &r)
 
 void WinBorder::RequestDraw(void)
 {
+	STRACE(("WinBorder %s::RequestDraw()\n",_title->String()));
 	#ifdef DEBUG_WINBORDER
-	printf("WinBorder %s::RequestDraw()\n",_title->String());
-	PrintToStream();
+		PrintToStream();
 	#endif
 	
 	if(_invalid)
@@ -534,28 +502,20 @@ void WinBorder::ResizeBy(float x, float y)
 */
 void WinBorder::UpdateColors(void)
 {
-	#ifdef DEBUG_WINBORDER
-	printf("WinBorder %s: UpdateColors\n",_title->String());
-	#endif
+STRACE(("WinBorder %s: UpdateColors unimplemented\n",_title->String()));
 }
 
 void WinBorder::UpdateDecorator(void)
 {
-	#ifdef DEBUG_WINBORDER
-	printf("WinBorder %s: UpdateDecorator\n",_title->String());
-	#endif
+STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",_title->String()));
 }
 
 void WinBorder::UpdateFont(void)
 {
-	#ifdef DEBUG_WINBORDER
-	printf("WinBorder %s: UpdateFont\n",_title->String());
-	#endif
+STRACE(("WinBorder %s: UpdateFont unimplemented\n",_title->String()));
 }
 
 void WinBorder::UpdateScreen(void)
 {
-	#ifdef DEBUG_WINBORDER
-	printf("WinBorder %s: UpdateScreen\n",_title->String());
-	#endif
+STRACE(("WinBorder %s: UpdateScreen unimplemented\n",_title->String()));
 }
