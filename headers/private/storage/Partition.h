@@ -12,10 +12,10 @@
 
 class BBitmap;
 class BDiskDevice;
+class BDiskDeviceParameterEditor;
 class BDiskDeviceVisitor;
-class BPartitioningInfo;
-class BDiskScannerParameterEditor;	// TODO: Rename!
 class BDiskSystem;
+class BPartitioningInfo;
 class BVolume;
 struct user_partition_data;
 
@@ -72,16 +72,16 @@ public:
 	bool CanDefragment(bool *whileMounted = NULL) const;
 	status_t Defragment() const;
 	
-	bool CanRepair(bool *checkOnly, bool *whileMounted = NULL) const;
+	bool CanRepair(bool checkOnly, bool *whileMounted = NULL) const;
 	status_t Repair(bool checkOnly) const;
 
 	bool CanResize(bool *whileMounted = NULL) const;
-	status_t ValidateResize(off_t*) const;
-	status_t Resize(off_t);
+	status_t ValidateResize(off_t *size) const;
+	status_t Resize(off_t size);
 
 	bool CanMove(bool *whileMounted = NULL) const;
-	status_t ValidateMove(off_t*) const;
-	status_t Move(off_t);
+	status_t ValidateMove(off_t *offset) const;
+	status_t Move(off_t offset);
 
 	bool CanSetName() const;
 	status_t ValidateSetName(char *name) const;
@@ -101,33 +101,37 @@ public:
 
 	bool CanEditParameters(bool *whileMounted = NULL) const;
 	status_t GetParameterEditor(
-               BDiskScannerParameterEditor **editor,
-               BDiskScannerParameterEditor **contentEditor);
+               BDiskDeviceParameterEditor **editor,
+               BDiskDeviceParameterEditor **contentEditor);
     status_t SetParameters(const char *parameters,
     					   const char *contentParameters);
 
 	bool CanInitialize(const char *diskSystem) const;
 	status_t GetInitializationParameterEditor(const char *system,       
-               BDiskScannerParameterEditor **editor) const;
-	status_t Initialize(const char *diskSystem, const char *parameters);
+               BDiskDeviceParameterEditor **editor) const;
+	status_t ValidateInitialize(const char *diskSystem, char *name,
+								const char *parameters);
+	status_t Initialize(const char *diskSystem, const char *name,
+						const char *parameters);
 	
 	// Modification of child partitions
 
 	bool CanCreateChild() const;
 	status_t GetChildCreationParameterEditor(const char *system,
-               BDiskScannerParameterEditor **editor) const;
+               BDiskDeviceParameterEditor **editor) const;
 	status_t ValidateCreateChild(off_t *start, off_t *size,
 				const char *type, const char *parameters) const;
 	status_t CreateChild(off_t start, off_t size, const char *type,
-				const char *parameters, BPartition** child = NULL);
+				const char *parameters, BPartition **child = NULL);
 	
 	bool CanDeleteChild(int32 index) const;
 	status_t DeleteChild(int32 index);
 	
 private:
 	BPartition();
-	BPartition(const Partition &);
+	BPartition(const BPartition &);
 	virtual ~BPartition();
+	BPartition & operator=(const BPartition &);
 
 	status_t _SetTo(BDiskDevice *device, BPartition *parent,
 					user_partition_data *data);

@@ -10,6 +10,7 @@
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
 #include <DiskDeviceVisitor.h>
+#include <DiskSystem.h>
 #include <Message.h>
 #include <Volume.h>
 
@@ -224,8 +225,11 @@ BPartition::ID() const
 status_t
 BPartition::GetDiskSystem(BDiskSystem *diskSystem) const
 {
-	// not implemented
-	return B_ERROR;
+	if (!fPartitionData || !diskSystem)
+		return B_BAD_VALUE;
+	if (fPartitionData->disk_system < 0)
+		return B_ENTRY_NOT_FOUND;
+	return diskSystem->_SetTo(fPartitionData->disk_system);
 }
 
 // GetPath
@@ -398,6 +402,299 @@ BPartition::VisitEachDescendant(BDiskDeviceVisitor *visitor)
 	return NULL;
 }
 
+// CanDefragment
+bool
+BPartition::CanDefragment(bool *whileMounted) const
+{
+	return (fPartitionData && _DiskSystem() >= 0
+			&& _kern_supports_defragmenting_partition(_DiskSystem(),
+					_ShadowID(), whileMounted));
+}
+
+// Defragment
+status_t
+BPartition::Defragment() const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanRepair
+bool
+BPartition::CanRepair(bool checkOnly, bool *whileMounted) const
+{
+	return (fPartitionData && _DiskSystem() >= 0
+			&& _kern_supports_repairing_partition(_DiskSystem(), _ShadowID(),
+					checkOnly, whileMounted));
+}
+
+// Repair
+status_t
+BPartition::Repair(bool checkOnly) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanResize
+bool
+BPartition::CanResize(bool *whileMounted) const
+{
+	if (!fPartitionData || IsDevice() || !Parent() || _DiskSystem() < 0
+		|| Parent()->_DiskSystem() < 0) {
+		return false;
+	}
+	if (!_kern_supports_resizing_partition(_DiskSystem(), _ShadowID(),
+										   whileMounted)) {
+		return false;
+	}
+	return _kern_supports_resizing_child_partition(Parent()->_DiskSystem(),
+												   _ShadowID());
+}
+
+// ValidateResize
+status_t
+BPartition::ValidateResize(off_t *size) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// Resize
+status_t
+BPartition::Resize(off_t size)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanMove
+bool
+BPartition::CanMove(bool *whileMounted) const
+{
+	// not implemented
+	return false;
+}
+
+// ValidateMove
+status_t
+BPartition::ValidateMove(off_t *offset) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// Move
+status_t
+BPartition::Move(off_t offset)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanSetName
+bool
+BPartition::CanSetName() const
+{
+	return (fPartitionData && Parent() && Parent()->_DiskSystem() >= 0
+			&& _kern_supports_setting_partition_name(Parent()->_DiskSystem(),
+					_ShadowID()));
+}
+
+// ValidateSetName
+status_t
+BPartition::ValidateSetName(char *name) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// SetName
+status_t
+BPartition::SetName(const char *name)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanSetContentName
+bool
+BPartition::CanSetContentName(bool *whileMounted) const
+{
+	return (fPartitionData && _DiskSystem() >= 0
+			&& _kern_supports_setting_partition_content_name(_DiskSystem(),
+					_ShadowID(), whileMounted));
+}
+
+// ValidateSetContentName
+status_t
+BPartition::ValidateSetContentName(char *name) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// SetContentName
+status_t
+BPartition::SetContentName(const char *name)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanSetType
+bool
+BPartition::CanSetType() const
+{
+	return (fPartitionData && Parent() && Parent()->_DiskSystem() >= 0
+			&& _kern_supports_setting_partition_type(Parent()->_DiskSystem(),
+					_ShadowID()));
+}
+
+// ValidateSetType
+status_t
+BPartition::ValidateSetType(const char *type) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// SetType
+status_t
+BPartition::SetType(const char *type)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanEditParameters
+bool
+BPartition::CanEditParameters(bool *whileMounted) const
+{
+	// not implemented
+	return false;
+}
+
+// GetParameterEditor
+status_t
+BPartition::GetParameterEditor(BDiskDeviceParameterEditor **editor,
+							   BDiskDeviceParameterEditor **contentEditor)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// SetParameters
+status_t
+BPartition::SetParameters(const char *parameters,
+						  const char *contentParameters)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanInitialize
+bool
+BPartition::CanInitialize(const char *diskSystem) const
+{
+	// not implemented
+	return false;
+}
+
+// GetInitializationParameterEditor
+status_t
+BPartition::GetInitializationParameterEditor(const char *system,
+	BDiskDeviceParameterEditor **editor) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// ValidateInitialize
+status_t
+BPartition::ValidateInitialize(const char *diskSystem, char *name,
+							   const char *parameters)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// Initialize
+status_t
+BPartition::Initialize(const char *diskSystem, const char *name,
+					   const char *parameters)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanCreateChild
+bool
+BPartition::CanCreateChild() const
+{
+	// not implemented
+	return false;
+}
+
+// GetChildCreationParameterEditor
+status_t
+BPartition::GetChildCreationParameterEditor(const char *system,	
+	BDiskDeviceParameterEditor **editor) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// ValidateCreateChild
+status_t
+BPartition::ValidateCreateChild(off_t *start, off_t *size, const char *type,
+								const char *parameters) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CreateChild
+status_t
+BPartition::CreateChild(off_t start, off_t size, const char *type,
+						const char *parameters, BPartition **child)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanDeleteChild
+bool
+BPartition::CanDeleteChild(int32 index) const
+{
+	// not implemented
+	return false;
+}
+
+// DeleteChild
+status_t
+BPartition::DeleteChild(int32 index)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// constructor
+/*!	\brief Privatized copy constructor to avoid usage.
+*/
+BPartition::BPartition(const BPartition &)
+{
+}
+
+// =
+/*!	\brief Privatized assignment operator to avoid usage.
+*/
+BPartition &
+BPartition::operator=(const BPartition &)
+{
+	return *this;
+}
+
 // _SetTo
 status_t
 BPartition::_SetTo(BDiskDevice *device, BPartition *parent,
@@ -500,223 +797,3 @@ BPartition::_VisitEachDescendant(BDiskDeviceVisitor *visitor, int32 level)
 	return NULL;
 }
 
-
-#if 0
-
-// GetInitializationParameters
-/*!	\brief Asks the user to set the parameters for initializing this partition.
-
-	A dialog window will be opened, centered at \a dialogCenter, asking the
-	user for setting the parameters to be used for initializing this partition
-	with the file system specified by \a fileSystem.
-
-	The method does not return until the user has confirmed or cancelled the
-	dialog. In the latter case \a cancelled is set to \c true, otherwise to
-	\c false.
-
-	\param fileSystem The file system the parameters shall be asked for.
-	\param volumeName The volume name set by the user.
-	\param parameters Pointer to a pre-allocated BString to be set to the
-		   parameters the user has specified.
-	\param dialogCenter The rectangle over which to center the dialog. If
-		   omitted, the dialog is displayed centered to the screen.
-	\param cancelled Pointer to a pre-allocated bool to be set to \c true, if
-		   the dialog has been cancelled by the user, or to \c false
-		   otherwise. May be \c NULL.
-	\return
-	- \c B_OK: The parameters have been retrieved successfully.
-	- \c B_ERROR: Either the dialog has been cancelled -- then \a cancelled
-	  is set accordingly -- or some other error occured.
-	- another error code
-*/
-status_t
-BPartition::GetInitializationParameters(const char *fileSystem,
-										BString *volumeName,
-										BString *parameters,
-										BRect dialogCenter,
-										bool *cancelled)
-{
-	return B_ERROR;	// not implemented
-}
-
-// Initialize
-/*!	\brief Initializes the partition according to the supplied parameters.
-	\param fileSystem The file system to be used for initialization.
-	\param volumeName The new volume name.
-	\param parameters File system specific parameters.
-	\return
-	- \c B_OK: Everything went fine.
-	- another error code, if an error occured
-*/
-status_t
-BPartition::Initialize(const char *fileSystem, const char *volumeName,
-					   const char *parameters)
-{
-	return B_ERROR;	// not implemented
-}
-
-// Initialize
-/*!	\brief Initializes the partition after asking the user for the respective
-		   parameters.
-
-	A dialog window will be opened, centered at \a dialogCenter, asking the
-	user for setting the parameters to be used for initializing this partition
-	with the file system specified by \a fileSystem.
-
-	The method does not return until the user has either confirmed the dialog
-	and the initialization is done, or the dialog has been cancelled. In the
-	latter case \a cancelled is set to \c true, otherwise to \c false.
-
-	\param fileSystem The file system to be used for the initialization.
-	\param dialogCenter The rectangle over which to center the dialog. If
-		   omitted, the dialog is displayed centered to the screen.
-	\param cancelled Pointer to a pre-allocated bool to be set to \c true, if
-		   the dialog has been cancelled by the user, or to \c false
-		   otherwise. May be \c NULL.
-	\return
-	- \c B_OK: The parameters have been retrieved successfully and the
-	  initialization went fine, too.
-	- \c B_ERROR: Either the dialog has been cancelled -- then \a cancelled
-	  is set accordingly -- or some other error occured.
-	- another error code
-*/
-status_t
-BPartition::Initialize(const char *fileSystem, BRect dialogCenter,
-					   bool *cancelled)
-{
-	return B_ERROR;	// not implemented
-}
-
-// constructor
-/*!	\brief Creates an uninitialized BPartition object.
-*/
-BPartition::BPartition()
-	: fSession(NULL),
-	  fUniqueID(-1),
-	  fChangeCounter(0),
-	  fVolumeID(-1)
-{
-	fInfo.info.offset = 0;
-	fInfo.info.size = 0;
-	fInfo.flags = 0;
-	fInfo.partition_name[0] = '\0';
-	fInfo.partition_type[0] = '\0';
-	fInfo.file_system_short_name[0] = '\0';
-	fInfo.file_system_long_name[0] = '\0';
-	fInfo.volume_name[0] = '\0';
-	fInfo.file_system_flags = 0;
-}
-
-// constructor
-/*!	\brief Privatized copy constructor to avoid usage.
-*/
-BPartition::BPartition(const BPartition &)
-{
-}
-
-// =
-/*!	\brief Privatized assignment operator to avoid usage.
-*/
-BPartition &
-BPartition::operator=(const BPartition &)
-{
-	return *this;
-}
-
-// _Unset
-void
-BPartition::_Unset()
-{
-	fSession = NULL;
-	fUniqueID = -1;
-	fChangeCounter = 0;
-	fIndex = -1;
-	fInfo.info.offset = 0;
-	fInfo.info.size = 0;
-	fInfo.flags = 0;
-	fInfo.partition_name[0] = '\0';
-	fInfo.partition_type[0] = '\0';
-	fInfo.file_system_short_name[0] = '\0';
-	fInfo.file_system_long_name[0] = '\0';
-	fInfo.volume_name[0] = '\0';
-	fInfo.file_system_flags = 0;
-	fVolumeID = -1;
-}
-
-// find_string
-static
-status_t
-find_string(BMessage *message, const char *name, char *buffer)
-{
-	const char *str;
-	status_t error = message->FindString(name, &str);
-	if (error == B_OK)
-		strcpy(buffer, str);
-	return error;
-}
-
-// _Unarchive
-status_t
-BPartition::_Unarchive(BMessage *archive)
-{
-//printf("BPartition::_Unarchive()\n");
-	_Unset();
-	status_t error = (archive ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		// ID, change counter and index
-		if (error == B_OK)
-			error = archive->FindInt32("id", &fUniqueID);
-		if (error == B_OK)
-			error = archive->FindInt32("change_counter", &fChangeCounter);
-		if (error == B_OK)
-			error = archive->FindInt32("index", &fIndex);
-//printf("  check: %s\n", strerror(error));
-		// fInfo.info.*
-		if (error == B_OK)
-			error = archive->FindInt64("offset", &fInfo.info.offset);
-		if (error == B_OK)
-			error = archive->FindInt64("size", &fInfo.info.size);
-//printf("  check: %s\n", strerror(error));
-		// fInfo.*
-		if (error == B_OK)
-			error = archive->FindInt32("flags", (int32*)&fInfo.flags);
-		if (error == B_OK)
-			error = find_string(archive, "name", fInfo.partition_name);
-		if (error == B_OK)
-			error = find_string(archive, "type", fInfo.partition_type);
-		if (error == B_OK) {
-			error = find_string(archive, "fs_short_name",
-								fInfo.file_system_short_name);
-		}
-		if (error == B_OK) {
-			error = find_string(archive, "fs_long_name",
-								fInfo.file_system_long_name);
-		}
-		if (error == B_OK)
-			error = find_string(archive, "volume_name", fInfo.volume_name);
-		if (error == B_OK) {
-			error = archive->FindInt32("fs_flags",
-									   (int32*)&fInfo.file_system_flags);
-		}
-//printf("  check: %s\n", strerror(error));
-		// dev_t, if mounted
-		if (error == B_OK) {
-			if (archive->FindInt32("volume_id", &fVolumeID) != B_OK)
-				fVolumeID = -1;
-		}
-	}
-	// cleanup on error
-	if (error != B_OK)
-		_Unset();
-//printf("BPartition::_Unarchive() done: %s\n", strerror(error));
-	return error;
-}
-
-// _SetSession
-void
-BPartition::_SetSession(BSession *session)
-{
-	fSession = session;
-}
-
-#endif	// 0
