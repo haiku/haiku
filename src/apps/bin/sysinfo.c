@@ -40,7 +40,8 @@ struct cache_description {
 	{0x39, "L2 cache: 128 KB, 4-way set associative, 64 bytes/line, sectored"},
 	{0x3B, "L2 cache: 128 KB, 2-way set associative, 64 bytes/line, sectored"},
 	{0x3C, "L2 cache: 256 KB, 4-way set associative, 64 bytes/line, sectored"},
-	{0x40, "No integrated L2 cache (P6 core) or L3 cache (P4 core)"},
+	{0x40, NULL /*"No integrated L2 cache (P6 core) or L3 cache (P4 core)"*/},
+		// this one is separately handled
 	{0x41, "L2 cache: 128 KB, 4-way set associative, 32 bytes/line"},
 	{0x42, "L2 cache: 256 KB, 4-way set associative, 32 bytes/line"},
 	{0x43, "L2 cache: 512 KB, 4-way set associative, 32 bytes/line"},
@@ -58,7 +59,7 @@ struct cache_description {
 	{0x70, "Inst trace cache: 12K µOPs, 8-way set associative"},
 	{0x71, "Inst trace cache: 16K µOPs, 8-way set associative"},
 	{0x72, "Inst trace cache: 32K µOPs, 8-way set associative"},
-	{0x77, /* IA-64 */ "L1I cache: 16 KB, 4-way set associative, 64 bytes/line, sectored"},
+	{0x77, /* IA-64 */ "L1 inst cache: 16 KB, 4-way set associative, 64 bytes/line, sectored"},
 	{0x79, "L2 cache: 128 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x7A, "L2 cache: 256 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x7B, "L2 cache: 512 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
@@ -87,7 +88,7 @@ struct cache_description {
 
 
 static void
-print_intel_cache_descriptors(cpuid_info *info)
+print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 {
 	int i, j;
 
@@ -99,7 +100,13 @@ print_intel_cache_descriptors(cpuid_info *info)
 
 		for (j = 0; sIntelCacheDescriptions[j].code; j++) {
 			if (info->eax_2.cache_descriptors[i] == sIntelCacheDescriptions[j].code) {
-				printf("\t%s\n", sIntelCacheDescriptions[j].description);
+				if (info->eax_2.cache_descriptors[i] == 0x40) {
+					printf("\tNo integrated L%u cache\n",
+						type >= B_CPU_INTEL_PENTIUM_IV
+						&& (type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86 ?
+							3 : 2);
+				} else
+					printf("\t%s\n", sIntelCacheDescriptions[j].description);
 				break;
 			}
 		}
@@ -200,6 +207,33 @@ print_transmeta_features(uint32 features)
 
 
 static void
+print_amd_power_management_features(uint32 features)
+{
+	static const char *kFeatures[6] = {
+		"TS", "FID", "VID", "TTP", "TM", "STC",
+	};
+	int32 found = 4;
+	int32 i;
+
+	printf("\tPower Management Features:");
+
+	for (i = 0; i < 6; i++) {
+		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
+			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
+			found++;
+			if (found > 0 && (found % 16) == 0) {
+				putchar('\n');
+				found = 0;
+			}
+		}
+	}
+
+	if (found != 0)
+		putchar('\n');
+}
+
+
+static void
 print_amd_features(uint32 features)
 {
 	static const char *kFeatures[32] = {
@@ -262,8 +296,8 @@ print_features(uint32 features)
 static void
 print_processor_signature(cpuid_info *info, const char *prefix)
 {
-	printf("\t%stype %u, family %u, model %u, stepping %u, features 0x%08lx\n",
-		prefix ? prefix : "",
+	printf("\t%s%sype %u, family %u, model %u, stepping %u, features 0x%08lx\n",
+		prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
 		info->eax_1.type,
 		info->eax_1.family + (info->eax_1.family == 0xf ? info->eax_1.extended_family : 0),
 		info->eax_1.model + (info->eax_1.model == 0xf ? info->eax_1.extended_model << 4 : 0),
@@ -358,11 +392,15 @@ dump_cpu(system_info *info, int32 cpu)
 	/* Extended CPUID */
 	if (max_extended_eax >= 1 && (info->cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_INTEL_x86) {
 		get_cpuid(&cpuInfo, 0x80000001, cpu);
-		print_processor_signature(&cpuInfo, "extended: ");
+		print_processor_signature(&cpuInfo, "Extended: ");
 
-		if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86)
+		if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
 			print_amd_features(cpuInfo.regs.edx);
-		else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_TRANSMETA_x86)
+			if (max_extended_eax >= 7) {
+				get_cpuid(&cpuInfo, 0x80000007, cpu);
+				print_amd_power_management_features(cpuInfo.regs.edx);
+			}
+		} else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_TRANSMETA_x86)
 			print_transmeta_features(cpuInfo.regs.edx);
 	}
 
@@ -370,7 +408,7 @@ dump_cpu(system_info *info, int32 cpu)
 	if (max_extended_eax >= 5) {
 		if (!strncmp(baseInfo.eax_0.vendor_id, "CyrixInstead", 12)) {
 			get_cpuid(&cpuInfo, 0x80000005, cpu);
-			print_intel_cache_descriptors(&cpuInfo);
+			print_intel_cache_descriptors(info->cpu_type, &cpuInfo);
 		} else
 			print_cache_descriptors(cpu);
 	}
@@ -380,7 +418,7 @@ dump_cpu(system_info *info, int32 cpu)
 			get_cpuid(&cpuInfo, 2, cpu);
 
 			if (cpuInfo.eax_2.call_num > 0)
-				print_intel_cache_descriptors(&cpuInfo);
+				print_intel_cache_descriptors(info->cpu_type, &cpuInfo);
 		} while (cpuInfo.eax_2.call_num > 1);
 	}
 
