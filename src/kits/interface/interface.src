@@ -9,6 +9,7 @@ INTERFACE_KIT_SOURCE =
 	ColorUtils.cc
 	Control.cpp
 	Deskbar.cpp
+	Dragger.cpp
 	Font.cpp
 	Globals.cpp
 	Input.cpp
@@ -32,6 +33,7 @@ INTERFACE_KIT_SOURCE =
 	ScrollBar.cpp
 	ScrollView.cpp
 	Shape.cpp
+	Shelf.cpp
 	StatusBar.cpp
 	StringView.cpp
 	TextControl.cpp
@@ -39,6 +41,7 @@ INTERFACE_KIT_SOURCE =
 	TPicture.cpp
 	View.cpp
 	Window.cpp
+	ZombieReplicantView.cpp
 
 	# BTextView
 	LineBuffer.cpp
