@@ -49,9 +49,9 @@ init_driver(void)
 	drv_count = 0;
 	
 	for (pciindex = 0; B_OK == pcimodule->get_nth_pci_info(pciindex, pciinfo); pciindex++) { 
-		dprintf("Checking PCI device, vendor 0x%04x, id 0x%04x, bus 0x%02x, dev 0x%02x, func 0x%02x, rev 0x%02x, api 0x%02x, sub 0x%02x, base 0x%02x\n",
-			pciinfo->vendor_id, pciinfo->device_id, pciinfo->bus, pciinfo->device, pciinfo->function,
-			pciinfo->revision, pciinfo->class_api, pciinfo->class_sub, pciinfo->class_base);
+//		dprintf("Checking PCI device, vendor 0x%04x, id 0x%04x, bus 0x%02x, dev 0x%02x, func 0x%02x, rev 0x%02x, api 0x%02x, sub 0x%02x, base 0x%02x\n",
+//			pciinfo->vendor_id, pciinfo->device_id, pciinfo->bus, pciinfo->device, pciinfo->function,
+//			pciinfo->revision, pciinfo->class_api, pciinfo->class_sub, pciinfo->class_base);
 			
 		for (devindex = 0; driver_info.table[devindex].vendor != 0; devindex++) {
 			if (driver_info.table[devindex].vendor != -1 && driver_info.table[devindex].vendor != pciinfo->vendor_id)
@@ -84,8 +84,8 @@ init_driver(void)
 			drv_data[drv_count]->name		= driver_info.table[devindex].name;
 			drv_data[drv_count]->flags		= driver_info.table[devindex].flags;
 			drv_data[drv_count]->open_count	= 0;
-			drv_data[drv_count]->cookie		= 0;
-		
+			drv_data[drv_count]->cookie		= malloc(driver_info.cookie_size);
+
 			drv_count++;
 			break;
 		}
@@ -106,6 +106,7 @@ uninit_driver(void)
 	
 	for (i = 0; i < drv_count; i++) {
 		free(drv_path[i]);
+		free(drv_data[i]->cookie);
 		free(drv_data[i]);
 	}
 	delete_sem(drv_sem);
@@ -130,7 +131,8 @@ ich_open(const char *name, uint32 flags, void** cookie)
 	*cookie = (void *) index;
 	
 	if (drv_data[index]->open_count == 0) {
-		res = driver_info.attach(drv_data[index], &drv_data[index]->cookie);
+		memset(drv_data[index]->cookie, 0, driver_info.cookie_size);
+		res = driver_info.attach(drv_data[index], drv_data[index]->cookie);
 		drv_data[index]->open_count = (res == B_OK) ? 1 : 0;
 	} else {
 		res = B_OK;

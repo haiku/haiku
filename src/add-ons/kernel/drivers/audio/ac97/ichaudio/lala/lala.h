@@ -35,7 +35,7 @@ typedef struct {
 	uint32	flags;
 } id_table_t;
 
-typedef status_t (*drv_attach)		(drv_t *drv, void **cookie);
+typedef status_t (*drv_attach)		(drv_t *drv, void *cookie);
 typedef status_t (*drv_powerctl)	(drv_t *drv, void *cookie);
 typedef status_t (*drv_detach)		(drv_t *drv, void *cookie);
 
@@ -43,6 +43,7 @@ typedef struct
 {
 	id_table_t *	table;
 	const char *	basename;
+	size_t			cookie_size;
 	drv_attach		attach;
 	drv_detach		detach;
 	drv_powerctl	powerctl;

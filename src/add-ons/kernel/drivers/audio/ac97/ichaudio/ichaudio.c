@@ -1,7 +1,7 @@
 #include "lala/lala.h"
 #include "ichaudio.h"
 
-status_t ichaudio_attach(drv_t *drv, void **cookie);
+status_t ichaudio_attach(drv_t *drv, void *cookie);
 status_t ichaudio_powerctl(drv_t *drv, void *cookie);
 status_t ichaudio_detach(drv_t *drv, void *cookie);
 
@@ -30,6 +30,7 @@ id_table_t ichaudio_id_table[] = {
 driver_info_t driver_info = {
 	ichaudio_id_table,
 	"audio/lala/ichaudio",
+	sizeof(ichaudio_cookie),
 	ichaudio_attach,
 	ichaudio_detach,
 	ichaudio_powerctl,
@@ -37,11 +38,9 @@ driver_info_t driver_info = {
 
 
 status_t
-ichaudio_attach(drv_t *drv, void **_cookie)
+ichaudio_attach(drv_t *drv, void *cookie)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *) malloc(sizeof(ichaudio_cookie));
-	if (!cookie) return B_ERROR;
-	*_cookie = cookie;
+	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
 	
 	dprintf("ichaudio_attach\n");
 
