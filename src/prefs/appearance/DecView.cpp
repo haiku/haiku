@@ -100,7 +100,7 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	// Finish setup
 	ldata.highcolor.SetColor(51,102,160);
 	pat_solid_high=0xFFFFFFFFFFFFFFFFLL;
-	driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
+	driver->FillRect(preview_bounds,&ldata);
 
 	decorator=NULL;
 	decorator_id=-1;
@@ -110,7 +110,7 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	BString path(ConvertIndexToPath(0L));
 	if(LoadDecorator(path.String()))
 	{
-		driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
+		driver->FillRect(preview_bounds,&ldata);
 		if(decorator)
 		{
 			BStringItem *item=(BStringItem*)declist->ItemAt(declist->CurrentSelection());
@@ -166,7 +166,7 @@ void DecView::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
+			driver->FillRect(preview_bounds,&ldata);
 			if(decorator)
 			{
 				BStringItem *item=(BStringItem*)declist->ItemAt(declist->CurrentSelection());
@@ -415,7 +415,7 @@ void DecView::SetColors(const ColorSet &set)
 	colorset=set;
 	if(decorator)
 	{
-		driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
+		driver->FillRect(preview_bounds,&ldata);
 		decorator->SetColors(colorset);
 		decorator->Draw();
 	}

@@ -45,7 +45,7 @@ class ColorSet;
 class PVView : public BView
 {
 public:
-	PVView(BRect bounds);
+	PVView(const BRect &bounds);
 	~PVView(void);
 	void AttachedToWindow(void);
 	void DetachedFromWindow(void);
@@ -61,39 +61,27 @@ public:
 	PreviewDriver(void);
 	~PreviewDriver(void);
 
-	bool Initialize(void);
-	void Shutdown(void);
-	void CopyBits(BRect src, BRect dest);
-	void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
-	void DrawChar(char c, BPoint pt);
-//	void DrawPicture(SPicture *pic, BPoint pt);
-	void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
-	void InvertRect(BRect r);
-	void StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat);
-	void FillBezier(BPoint *pts, LayerData *d, const Pattern &pat);
-	void StrokeEllipse(BRect r, LayerData *d, const Pattern &pat);
-	void FillEllipse(BRect r, LayerData *d, const Pattern &pat);
-	void StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	void FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	void StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat);
-	void StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed=true);
-	void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat);
-	void StrokeRect(BRect r, LayerData *d, const Pattern &pat);
-	void FillRect(BRect r, LayerData *d, const Pattern &pat);
-	void StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
-	void FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
-//	void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
-//	void FillShape(SShape *sh, LayerData *d, const Pattern &pat);
-	void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
-	void FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
-	void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
-	void SetMode(int32 mode);
-	float StringWidth(const char *string, int32 length, LayerData *d);
-	void GetTruncatedStrings( const char **instrings, int32 stringcount, uint32 mode, float maxwidth, char **outstrings);
-	bool DumpToFile(const char *path);
+	bool Initialize(void);		// Sets the driver
+	void Shutdown(void);		// You never know when you'll need this
+	
+	// Drawing functions
+	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
 
+	void InvertRect(const BRect &r);
+
+	virtual void StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors);
+
+	void SetMode(const int32 &mode);
+	void SetMode(const display_mode &mode);
+	
 	BView *View(void) { return (BView*)view; };
 protected:
+	virtual void FillSolidRect(const BRect &rect, RGBColor &color);
+	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
+	virtual void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
+	virtual void StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d);
+	virtual void StrokeSolidRect(const BRect &rect, RGBColor &color);
+
 	BBitmap *framebuffer;
 	BView *drawview;
 
