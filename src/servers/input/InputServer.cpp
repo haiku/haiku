@@ -164,9 +164,12 @@ InputServer::InitKeyboardMouseStates(void)
 	sMousePos.x = 200;
 	sMousePos.y = 200;
 
-	LoadKeymap();
+	if (LoadKeymap()!=B_OK)
+		LoadSystemKeymap();
 }
 
+
+#include "SystemKeymap.cpp"
 
 status_t
 InputServer::LoadKeymap()
@@ -207,6 +210,21 @@ InputServer::LoadKeymap()
 	
 	return B_OK;
 }
+
+
+status_t
+InputServer::LoadSystemKeymap()
+{
+	if (!fChars)
+		delete[] fChars;
+	fKeys = sSystemKeymap;
+	fCharsSize = sSystemKeyCharsSize;
+	fChars = new char[fCharsSize];
+	memcpy(fChars, sSystemKeyChars, fCharsSize);
+	
+	// TODO : save this keymap to file
+}
+
 
 /*
  *  Method: InputServer::QuitRequested()
@@ -654,7 +672,8 @@ InputServer::HandleGetSetKeyMap(BMessage *message,
 		if (status == B_OK)
 			status = reply->AddData("key_buffer", B_ANY_TYPE, fChars, fCharsSize);
 	} else {
-		LoadKeymap();
+		if (LoadKeymap()!=B_OK)
+			LoadSystemKeymap();
 		
 		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_MAP_CHANGED, NULL);
 	}

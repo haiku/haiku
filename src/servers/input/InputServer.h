@@ -183,6 +183,7 @@ public:
 	
 private:
 	status_t 	LoadKeymap();
+	status_t 	LoadSystemKeymap();
 
 	bool 			sEventLoopRunning;
 	bool 			sSafeMode;
