@@ -23,3 +23,6 @@ CommonUnitTest RosterShell
 	: be stdc++.r4
 	: app
 ;
+
+SimpleTest message_deliverer_test : message_deliverer_test.cpp
+	: <boot!home!config!lib>libopenbeos.so ;
