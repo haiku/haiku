@@ -25,7 +25,11 @@ reader_func(void *data)
 			// null-terminate, just in case
 		printf("reader: (%d) %s\n", bytes, buffer);
 
-		if (!strcmp(buffer, "QUIT"))
+		if (buffer[0] == '2') {
+			puts("reader: wait a second and let the writer lead (the pipe has to be buffered)");
+			snooze(1000000);
+		}
+		if (strstr(buffer, "QUIT"))
 			break;
 	}
 	puts("reader quits");
@@ -41,11 +45,11 @@ writer_func(void *data)
 	int i;
 
 	const char *strings[] = {
-		"1. If you read this",
-		"2. the pipe implementation",
-		"3. seems to work",
-		"4. at least a bit",
-		"QUIT",
+		"1. If you read this ",
+		"2. the pipe implementation ",
+		"3. seems to work ",
+		"4. at least a bit ",
+		"5. QUIT",
 		NULL};
 
 	for (i = 0; strings[i] != NULL; i++) {
@@ -53,7 +57,7 @@ writer_func(void *data)
 			// make sure the reader is waiting for us...
 			// (needed by the current pipefs implementation :)
 
-		printf("writer: (%ld)\n", write(output, strings[i], strlen(strings[i]) + 1));
+		printf("writer: (%ld)\n", write(output, strings[i], strlen(strings[i])));
 	}
 	puts("writer quits");
 
