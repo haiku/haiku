@@ -58,6 +58,8 @@ class PPPEncapsulator {
 			{ return fUpRequested; }
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
+		virtual status_t StackControl(uint32 op, void *data);
+			// called by netstack (forwarded by PPPInterface)
 		
 		void SetNext(PPPEncapsulator *next)
 			{ fNext = next; }

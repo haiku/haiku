@@ -313,7 +313,10 @@ PPPStateMachine::DownEvent(PPPInterface& interface)
 			}
 		}
 		
-		Interface().SetMRU(MRU);
+		if(MRU == 0)
+			Interface().SetMRU(1500);
+		else
+			Interface().SetMRU(MRU);
 		
 		if(count == 0) {
 			locker.UnlockNow();
@@ -1341,7 +1344,7 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 		
 		result = handler->ParseRequest(request, index, nak, reject);
 		
-		if(result != B_OK && result != PPP_UNHANDLED) {
+		if(result != B_OK) {
 			// the request contains a value that has been sent more than
 			// once or the value is corrupted
 			m_freem(packet);
@@ -1359,7 +1362,7 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 				result = handler->ParseRequest(request, request.CountItems(),
 					nak, reject);
 				
-				if(result != B_OK && result != PPP_UNHANDLED) {
+				if(result != B_OK) {
 					// the request contains a value that has been sent more than
 					// once or the value is corrupted
 					m_freem(packet);

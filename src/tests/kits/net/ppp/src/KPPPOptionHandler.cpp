@@ -68,3 +68,15 @@ PPPOptionHandler::Control(uint32 op, void *data, size_t length)
 	
 	return B_OK;
 }
+
+
+status_t
+PPPOptionHandler::StackControl(uint32 op, void *data)
+{
+	switch(op) {
+		default:
+			return B_BAD_VALUE;
+	}
+	
+	return B_OK;
+}

@@ -56,7 +56,6 @@ PPPDevice::Control(uint32 op, void *data, size_t length)
 			strcpy(info->name, Name());
 			info->settings = Settings();
 			info->MTU = MTU();
-			info->preferredMTU = PreferredMTU();
 			info->inputTransferRate = InputTransferRate();
 			info->outputTransferRate = OutputTransferRate();
 			info->outputBytesCount = CountOutputBytes();

@@ -18,9 +18,6 @@
 #include <sys/socket.h>
 
 
-#define PPP_PROTOCOL_OVERHEAD				2
-
-
 PPPLCP::PPPLCP(PPPInterface& interface)
 	: PPPProtocol("LCP", PPP_ESTABLISHMENT_PHASE, PPP_LCP_PROTOCOL,
 		AF_UNSPEC, interface, NULL, PPP_ALWAYS_ALLOWED),
@@ -177,7 +174,7 @@ PPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
 uint32
 PPPLCP::AdditionalOverhead() const
 {
-	uint32 overhead = PPP_PROTOCOL_OVERHEAD;
+	uint32 overhead = 0;
 	
 	if(Target())
 		overhead += Target()->Overhead();

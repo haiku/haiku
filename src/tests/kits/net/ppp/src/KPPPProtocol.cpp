@@ -105,8 +105,13 @@ PPPProtocol::Control(uint32 op, void *data, size_t length)
 
 
 status_t
-PPPProtocol::SetupDialOnDemand()
+PPPProtocol::StackControl(uint32 op, void *data)
 {
+	switch(op) {
+		default:
+			return B_BAD_VALUE;
+	}
+	
 	return B_OK;
 }
 

@@ -50,7 +50,6 @@ enum {
 	PPP_UNHANDLED = PPP_ERROR_BASE,
 		// The packet does not belong to this handler.
 		// Do not delete the packet when you return this!
-		// For PPPOptionHandler: the item is unrecognized
 	
 	// return values of PPPInterface::Receive()
 	PPP_DISCARDED,

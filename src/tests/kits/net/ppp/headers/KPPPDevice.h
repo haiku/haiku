@@ -33,10 +33,8 @@ class PPPDevice {
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		
-		virtual bool SetMTU(uint32 MTU);
 		uint32 MTU() const
 			{ return fMTU; }
-		virtual uint32 PreferredMTU() const = 0;
 		
 		// these calls must not block
 		virtual void Up() = 0;
@@ -64,6 +62,9 @@ class PPPDevice {
 		virtual void Pulse();
 
 	protected:
+		void SetMTU(uint32 MTU)
+			{ fMTU = MTU; }
+		
 		// Report that we are going up/down
 		// (from now on, the Up() process can be aborted).
 		// Abort if false is returned!
@@ -77,6 +78,7 @@ class PPPDevice {
 
 	protected:
 		uint32 fMTU;
+			// always hold this value up-to-date!
 		bool fIsUp;
 		
 		status_t fInitStatus;

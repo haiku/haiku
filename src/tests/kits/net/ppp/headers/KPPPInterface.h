@@ -36,17 +36,19 @@ struct ppp_module_info;
 
 class PPPInterface {
 		friend class PPPStateMachine;
+		friend class PPPManager;
 
 	private:
 		// copies are not allowed!
 		PPPInterface(const PPPInterface& copy);
 		PPPInterface& operator= (const PPPInterface& copy);
-
-	public:
+		
+		// only PPPManager may construct us!
 		PPPInterface(interface_id ID, driver_settings *settings,
 			PPPInterface *parent = NULL);
 		~PPPInterface();
-		
+
+	public:
 		void Delete();
 		
 		status_t InitCheck() const;
@@ -80,12 +82,12 @@ class PPPInterface {
 		uint32 DisconnectAfterIdleSince() const
 			{ return fDisconnectAfterIdleSince; }
 		
-		void SetMRU(uint32 MRU);
+		bool SetMRU(uint32 MRU);
 		uint32 MRU() const
 			{ return fMRU; }
 				// this is the smallest MRU that we and the peer have
-		void SetInterfaceMTU(uint32 interfaceMTU)
-			{ SetMRU(interfaceMTU - fHeaderLength); }
+		bool SetInterfaceMTU(uint32 interfaceMTU)
+			{ return SetMRU(interfaceMTU - fHeaderLength); }
 		uint32 InterfaceMTU() const
 			{ return fInterfaceMTU; }
 				// this is the MRU including encapsulator overhead
@@ -125,11 +127,11 @@ class PPPInterface {
 		bool IsMultilink() const
 			{ return fIsMultilink; }
 		
-		void SetAutoRedial(bool autoredial = true);
+		void SetAutoRedial(bool autoRedial = true);
 		bool DoesAutoRedial() const
 			{ return fAutoRedial; }
 		
-		void SetDialOnDemand(bool dialondemand = true);
+		void SetDialOnDemand(bool dialOnDemand = true);
 		bool DoesDialOnDemand() const
 			{ return fDialOnDemand; }
 		
@@ -192,13 +194,11 @@ class PPPInterface {
 		
 		status_t StackControl(uint32 op, void *data);
 			// stack routes ioctls to interface
-		status_t ControlEachHandler(uint32 op, void *data, size_t length);
-			// this calls Control() with the given parameters for each handler
+		status_t StackControlEachHandler(uint32 op, void *data);
+			// this calls StackControl() with the given parameters for each handler
 		
 		void CalculateInterfaceMTU();
 		void CalculateBaudRate();
-		
-		bool SetupDialOnDemand();
 		
 		void Redial(uint32 delay);
 		

@@ -59,10 +59,6 @@ enum ppp_control_ops {
 	PPPC_SET_ENABLED,
 	PPPC_GET_SIMPLE_HANDLER_INFO,
 		// PPPOptionHandler and PPPLCPExtension
-	PPPC_STACK_IOCTL,
-		// Ioctls from the stack are passed to all handlers and the interface
-		// using a ppp_control_info (only op and data are defined!).
-		// You should return B_BAD_VALUE if you did not handle this ioctl.
 	// -----------------------------------------------------
 	
 	PPP_CONTROL_OPS_END = B_DEVICE_OP_CODES_END + 0xFFFF
@@ -119,7 +115,7 @@ typedef struct ppp_device_info {
 	
 	const driver_parameter *settings;
 	
-	uint32 MTU, preferredMTU;
+	uint32 MTU;
 	uint32 inputTransferRate, outputTransferRate, outputBytesCount;
 } ppp_device_info;
 typedef struct ppp_device_info_t {

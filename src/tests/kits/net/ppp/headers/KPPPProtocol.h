@@ -55,15 +55,12 @@ class PPPProtocol {
 			{ return fUpRequested; }
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
-		
-		virtual status_t SetupDialOnDemand();
-			// This is not called when the protocol is added to the interface,
-			// but only when someone enables DialOnDemand and interface is down.
-			// Of course, your constructor may/should use this method (if needed).
+		virtual status_t StackControl(uint32 op, void *data);
+			// called by netstack (forwarded by PPPInterface)
 		
 		virtual bool Up() = 0;
 		virtual bool Down() = 0;
-			// if DialOnDemand is implemented check for DialOnDemand settings change
+			// if DialOnDemand is supported check for DialOnDemand settings change
 		bool IsUp() const
 			{ return fConnectionStatus == PPP_ESTABLISHED_PHASE; }
 		bool IsDown() const

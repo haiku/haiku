@@ -31,6 +31,16 @@ is_handler_allowed(T& handler, ppp_state state, ppp_phase phase)
 		return false;
 }
 
+// the list template does not support iterating over each item :(
+// this template iterates over each item in an indexed list
+template<class _LIST, class _FUNCTION>
+inline
+void
+ForEachItem(_LIST& list, _FUNCTION function)
+{
+	for(int index = 0; index < list.CountItems(); index++)
+		function(list.ItemAt(index));
+}
 
 // These are very simple send/receive_data functions with a timeout
 // and there is a race condition beween has_data() and send/receive_data().

@@ -25,6 +25,6 @@ R5KernelStaticLibrary kernelppp :
 	cpp.cpp
 	
 	# integrated modules
+	_KPPPMRUHandler.cpp
 	_KPPPPFCHandler.cpp
 ;
-

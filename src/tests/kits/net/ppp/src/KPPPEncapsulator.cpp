@@ -103,6 +103,18 @@ PPPEncapsulator::Control(uint32 op, void *data, size_t length)
 
 
 status_t
+PPPEncapsulator::StackControl(uint32 op, void *data)
+{
+	switch(op) {
+		default:
+			return B_BAD_VALUE;
+	}
+	
+	return B_OK;
+}
+
+
+status_t
 PPPEncapsulator::SendToNext(struct mbuf *packet, uint16 protocol) const
 {
 	// Find the next possible handler for this packet.
