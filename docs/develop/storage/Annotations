@@ -472,3 +472,51 @@ Description: Crashes when getting B_LARGE_ICON and passing a BBitmap with
              B_RGB32 color space. B_MINI_ICON works just fine.
              
 
+OS:          BeOS R5
+Module:      BAppFileInfo
+Location:    GetSupportedTypes()
+Description: Crashes when passing a NULL BMessage.
+             
+
+OS:          BeOS R5
+Module:      BAppFileInfo
+Location:    Supports()
+Description: Crashes when passing a NULL BMimeType.
+             
+
+OS:          BeOS R5
+Module:      BAppFileInfo
+Location:    SetSupportedTypes(const BMessage *types, bool syncAll)
+Description: Crashes when passing a NULL BMessage and syncAll = true.
+             
+
+OS:          BeOS R5
+Module:      BAppFileInfo
+Location:    SetSupportedTypes()
+Description: Sometimes installs a supported type, also when the file's
+             signature is not installed in the MIME database. This happens
+             e.g. when setting two supported types and then setting two
+             different types. The second of the new types is installed.
+             
+
+OS:          BeOS R5
+Module:      BAppFileInfo
+Location:    SetSupportedTypes(const BMessage *types)
+Description: Returns B_ENTRY_NOT_FOUND when the file's signature is not
+             installed in the MIME database, although the operation is
+             carried out successfully.
+             
+
+OS:          BeOS R5
+Module:      BAppFileInfo
+Location:    GetIcon(), GetIconForType()
+Description: Crashes when getting B_LARGE_ICON and passing a BBitmap with
+             B_RGB32 color space. B_MINI_ICON works just fine.
+             
+
+OS:          BeOS R5
+Module:      BAppFileInfo
+Location:    GetVersionInfo(), SetVersionInfo()
+Description: Crash when passing a NULL version_info.
+             
+
