@@ -1,0 +1,39 @@
+SubDir OBOS_TOP src servers app proto7 ;
+
+UseFreeTypeHeaders ;
+
+Server OBAppServer :
+	# Misc. Sources
+	BeDecorator.cpp
+	ColorUtils.cc
+	DebugTools.cpp
+	Decorator.cpp
+	PortLink.cpp
+	SystemPalette.cpp
+	RGBColor.cpp
+
+	# Operating Classes
+	AppServer.cpp
+	Desktop.cpp
+	Layer.cpp
+	ServerApp.cpp
+	ServerBitmap.cpp
+	ServerCursor.cpp
+	ServerWindow.cpp
+	WindowBorder.cpp
+
+	# Font Classes
+	FontFamily.cpp
+	FontServer.cpp
+	ServerFont.cpp
+
+	# Display Modules
+	DisplayDriver.cpp
+	LineCalc.cpp
+	ScreenDriver.cpp
+	ViewDriver.cpp
+;
+LinkSharedOSLibs OBAppServer : be root game translation stdc++.r4 freetype ;
+
+SubInclude OBOS_TOP src servers app proto7 testobapp ;
+
