@@ -7,13 +7,15 @@
 
 
 #include <SupportDefs.h>
-#include <platform_kernel_args.h>
 
 
 typedef struct address_range {
 	uint32 start;
 	uint32 size;
 } addr_range;
+
+#include <platform_kernel_args.h>
+#include <arch_kernel_args.h>
 
 typedef struct kernel_args {
 	uint32		cons_line;
@@ -34,6 +36,7 @@ typedef struct kernel_args {
 	addr_range	cpu_kstack[MAX_BOOT_CPUS];
 
 	platform_kernel_args platform_args;
+	arch_kernel_args arch_args;
 
 	struct framebuffer {
 		int		enabled;
