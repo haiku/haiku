@@ -38,6 +38,7 @@
 #include <ByteOrder.h>
 #include <File.h>
 #include <TranslatorFormats.h>
+#include <StorageDefs.h>
 
 #define max(x,y) ((x > y) ? x : y)
 #define DATA_BUFFER_SIZE 64

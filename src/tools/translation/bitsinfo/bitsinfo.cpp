@@ -40,6 +40,7 @@
 #include <ByteOrder.h>
 #include <File.h>
 #include <TranslatorFormats.h>
+#include <StorageDefs.h>
 
 struct ColorSpaceName { 
 	color_space id;
