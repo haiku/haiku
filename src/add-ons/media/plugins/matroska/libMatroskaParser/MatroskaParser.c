@@ -125,8 +125,6 @@ struct Queue {
   struct QueueEntry *tail;
 };
 
-typedef struct FileCache FileCache;
-
 #define	MPF_ERROR 0x10000
 #define	IBSZ	  1024
 
