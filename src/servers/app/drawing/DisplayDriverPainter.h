@@ -243,8 +243,8 @@ class DisplayDriverPainter : public DisplayDriver {
 												const DrawData *d);
 
 	virtual status_t			SetDPMSMode(const uint32 &state);
-	virtual uint32				DPMSMode() const;
-	virtual uint32				DPMSCapabilities() const;
+	virtual uint32				DPMSMode();
+	virtual uint32				DPMSCapabilities();
 	virtual status_t			GetDeviceInfo(accelerant_device_info *info);
 
 	virtual status_t			GetModeList(display_mode **mode_list,

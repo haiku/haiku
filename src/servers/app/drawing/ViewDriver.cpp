@@ -679,13 +679,13 @@ status_t ViewDriver::SetDPMSMode(const uint32 &state)
 	return BScreen().SetDPMS(state);
 }
 
-uint32 ViewDriver::DPMSMode() const
+uint32 ViewDriver::DPMSMode()
 {
 	// See note for SetDPMSMode if there are questions
 	return BScreen().DPMSState();
 }
 
-uint32 ViewDriver::DPMSCapabilities() const
+uint32 ViewDriver::DPMSCapabilities()
 {
 	// See note for SetDPMSMode if there are questions
 	return BScreen().DPMSCapabilites();

@@ -917,7 +917,7 @@ DisplayDriverPainter::SetDPMSMode(const uint32 &state)
 
 // DPMSMode
 uint32
-DisplayDriverPainter::DPMSMode() const
+DisplayDriverPainter::DPMSMode()
 {
 	uint32 mode = 0;
 	if (Lock()) {
@@ -929,7 +929,7 @@ DisplayDriverPainter::DPMSMode() const
 
 // DPMSCapabilities
 uint32
-DisplayDriverPainter::DPMSCapabilities() const
+DisplayDriverPainter::DPMSCapabilities()
 {
 	uint32 caps = 0;
 	if (Lock()) {

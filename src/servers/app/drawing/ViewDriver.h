@@ -121,8 +121,8 @@ public:
 			VDWindow			*screenwin;
 
 	virtual	status_t			SetDPMSMode(const uint32 &state);
-	virtual	uint32				DPMSMode() const;
-	virtual	uint32				DPMSCapabilities() const;
+	virtual	uint32				DPMSMode();
+	virtual	uint32				DPMSCapabilities();
 	virtual	status_t			GetDeviceInfo(accelerant_device_info *info);
 	virtual	status_t			GetModeList(display_mode **mode_list, uint32 *count);
 	virtual	status_t			GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);

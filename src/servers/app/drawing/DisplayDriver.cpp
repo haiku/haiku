@@ -133,7 +133,7 @@ DisplayDriver::SetDPMSMode(const uint32 &state)
 	\return The driver's current DPMS state
 */
 uint32
-DisplayDriver::DPMSMode() const
+DisplayDriver::DPMSMode()
 {
 	return fDPMSState;
 }
@@ -146,7 +146,7 @@ DisplayDriver::DPMSMode() const
 	allows only B_DPMS_ON. Other possible states are B_DPMS_STANDBY, SUSPEND, and OFF.
 */
 uint32
-DisplayDriver::DPMSCapabilities() const
+DisplayDriver::DPMSCapabilities()
 {
 	return fDPMSCaps;
 }

@@ -439,14 +439,14 @@ status_t DirectDriver::SetDPMSMode(const uint32 &state)
 	return BScreen().SetDPMS(state);
 }
 
-uint32 DirectDriver::DPMSMode() const
+uint32 DirectDriver::DPMSMode()
 {
 	STRACE(("DirectDriver::DPMSMode\n"));
 	// This is a hack, but should do enough to be ok for our purposes
 	return BScreen().DPMSState();
 }
 
-uint32 DirectDriver::DPMSCapabilities() const
+uint32 DirectDriver::DPMSCapabilities()
 {
 	STRACE(("DirectDriver::DPMSCapabilities\n"));
 	
