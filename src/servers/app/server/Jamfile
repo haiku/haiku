@@ -13,24 +13,25 @@ Server app_server :
 	# against libopenbeos
 	ColorUtils.cc
 	ColorSet.cpp
-	Decorator.cpp
-	SystemPalette.cpp
-	RGBColor.cpp
 	RectUtils.cpp
+	RGBColor.cpp
+	SystemPalette.cpp
 
-	# Operating Classes
+	# Manager Classes
 	AppServer.cpp
-	ServerBitmap.cpp
-	ServerCursor.cpp
+	CursorManager.cpp
 
 	# Font Classes
 	FontFamily.cpp
 	FontServer.cpp
 	ServerFont.cpp
 
-	# Display Modules
-	DisplayDriver.cpp
+	# Display Classes
 	AccelerantDriver.cpp
+	Decorator.cpp
+	DisplayDriver.cpp
+	ServerBitmap.cpp
+	ServerCursor.cpp
 ;
 LinkSharedOSLibs app_server : be root game translation 
 							   <boot!home!config!lib>libfreetype.so ;

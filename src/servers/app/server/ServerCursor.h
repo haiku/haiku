@@ -60,7 +60,7 @@ private:
 	
 	BPoint _hotspot;
 	char *_app_signature;
-	int32 token;
+	int32 _token;
 };
 
 #endif
