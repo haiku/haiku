@@ -32,8 +32,7 @@ private:
 	SpeexHeader	*	fHeader;
 	SpeexStereoState * fStereoState;
 
-	int				fSpeexFrameSize;
-	float *			fSpeexBuffer;
+	int				fSpeexOutputLength;
 
 	bigtime_t		fStartTime;
 	int				fFrameSize;
