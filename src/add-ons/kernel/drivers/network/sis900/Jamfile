@@ -3,12 +3,26 @@ SubDir OBOS_TOP src add-ons kernel drivers network sis900 ;
 # set some additional flags
 SubDirCcFlags -Wall ;
 
+# For ether_driver.h
+UsePrivateHeaders net ;
+
 R5KernelAddon sis900 : kernel drivers bin :
 	driver.c
 	device.c
 	interface.c
 	sis900.c
 	;
+
+Package openbeos-sis900-cvs :
+	sis900 : 
+	boot home config add-ons kernel drivers bin ;
+Package openbeos-sis900-cvs :
+	<kernel!drivers!dev!net>sis900 :
+	boot home config add-ons kernel drivers dev net ;
+Package openbeos-sis900-cvs :
+	sis900.settings :
+	boot home config settings kernel drivers sample ;
+
 
 # Link driver(s) to kernel/drivers/dev/net
 {
@@ -34,12 +48,12 @@ actions ignore InstallSiS900
 
 # Installation
 
-# OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
-# 	sis900 
-# ;
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+ 	sis900 
+;
 
-# OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
-# 	<installed>sis900 : 
-#	installed-symlink 
-# ;
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>sis900 : 
+	installed-symlink 
+;
 

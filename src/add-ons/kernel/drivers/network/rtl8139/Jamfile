@@ -3,10 +3,26 @@ SubDir OBOS_TOP src add-ons kernel drivers network rtl8139 ;
 # set some additional flags
 SubDirCcFlags -Wall ;
 
+# For ether_driver.h
+UsePrivateHeaders net ;
+
 R5KernelAddon rtl8139 : kernel drivers bin :
 	driver.c
 	util.c
 	;
+
+Package openbeos-rtl8139-cvs :
+	rtl8139 : 
+	boot home config add-ons kernel drivers bin ;
+Package openbeos-rtl8139-cvs :
+	<kernel!drivers!dev!net>rtl8139 :
+	boot home config add-ons kernel drivers dev net ;
+
+# Package openbeos-rtl8139-cvs :
+#	rtl8139.settings :
+#	boot home config settings kernel drivers sample ;
+
+
 
 # Link driver(s) to kernel/drivers/dev/net
 {
@@ -33,13 +49,13 @@ actions ignore InstallRTL8139
 
 # Installation
 
-# OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
-# 	rtl8139 
-# ;
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+ 	rtl8139 
+;
 
-# OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
-# 	<installed>rtl8139 : 
-# 	installed-symlink 
-# ;
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>rtl8139 : 
+	installed-symlink 
+;
 
 
