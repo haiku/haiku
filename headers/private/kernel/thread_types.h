@@ -13,6 +13,7 @@
 #include <smp.h>
 #include <signal.h>
 #include <timer.h>
+#include <kqueue.h>
 #include <arch/thread_struct.h>
 
 
@@ -47,6 +48,8 @@ enum team_state {
 #define THREAD_RETURN_EXIT			0x1
 #define THREAD_RETURN_INTERRUPTED	0x2
 
+struct image;
+	// defined in image.c
 
 struct team {
 	struct team		*next;			/* next team in the hash */
@@ -63,6 +66,7 @@ struct team {
 	addr			user_env_base;
 	struct thread	*main_thread;
 	struct thread	*thread_list;
+	struct quehead	image_queue;
 	struct arch_team arch_info;
 };
 
