@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -65,7 +65,7 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferS
 {
 	const char *string = (const char *)buffer;
 
-	if (gKernelArgs.fb.enabled)
+	if (gKernelArgs.frame_buffer.enabled)
 		return bufferSize;
 
 	for (uint32 i = 0; i < bufferSize; i++) {
@@ -89,7 +89,7 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferS
 void
 console_clear_screen(void)
 {
-	if (gKernelArgs.fb.enabled)
+	if (gKernelArgs.frame_buffer.enabled)
 		return;
 
 	for (uint32 i = 0; i < sScreenWidth * sScreenHeight; i++)

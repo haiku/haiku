@@ -39,6 +39,7 @@ static vbe_info_block sInfo;
 video_mode *sMode;
 bool sVesaCompatible;
 struct list sModeList;
+static addr_t sFrameBuffer;
 
 
 static void
@@ -319,9 +320,9 @@ platform_switch_to_logo(void)
 	if (vesa_set_mode(sMode->mode) != B_OK)
 		return;
 
-	gKernelArgs.fb.enabled = 1;
+	gKernelArgs.frame_buffer.enabled = 1;
 
-	if (!gKernelArgs.fb.already_mapped) {
+	if (gKernelArgs.frame_buffer.physical_buffer.start == 0) {
 		// the graphics memory has not been mapped yet!
 		struct vbe_mode_info modeInfo;
 		if (vesa_get_mode_info(sMode->mode, &modeInfo) != B_OK) {
@@ -329,17 +330,19 @@ platform_switch_to_logo(void)
 			return;
 		}
 
-		gKernelArgs.fb.x_size = modeInfo.width;
-		gKernelArgs.fb.y_size = modeInfo.height;
-		gKernelArgs.fb.bit_depth = modeInfo.bits_per_pixel;
-		gKernelArgs.fb.mapping.size = gKernelArgs.fb.x_size * gKernelArgs.fb.y_size * (gKernelArgs.fb.bit_depth/8);
-		gKernelArgs.fb.mapping.start = mmu_map_physical_memory(modeInfo.physical_base, gKernelArgs.fb.mapping.size, 0x03);
-		gKernelArgs.fb.already_mapped = 1;
+		gKernelArgs.frame_buffer.width = modeInfo.width;
+		gKernelArgs.frame_buffer.height = modeInfo.height;
+		gKernelArgs.frame_buffer.depth = modeInfo.bits_per_pixel;
+		gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
+			* gKernelArgs.frame_buffer.height * (gKernelArgs.frame_buffer.depth / 8);
+		gKernelArgs.frame_buffer.physical_buffer.start = modeInfo.physical_base;
+		sFrameBuffer = mmu_map_physical_memory(modeInfo.physical_base,
+							gKernelArgs.frame_buffer.physical_buffer.size, 0x03);
 
 		// clear the video memory
 		// ToDo: this shouldn't be necessary on real hardware (and Bochs), but
 		//	at least booting with Qemu looks ugly when this is missing
-		memset((void *)gKernelArgs.fb.mapping.start, 0, gKernelArgs.fb.mapping.size);
+		memset((void *)sFrameBuffer, 0, gKernelArgs.frame_buffer.physical_buffer.size);
 	}
 
 	if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
@@ -358,9 +361,12 @@ platform_switch_to_logo(void)
 #endif
 
 	// ToDo: this is a temporary hack!
-	addr_t start = gKernelArgs.fb.mapping.start + gKernelArgs.fb.x_size * (gKernelArgs.fb.y_size - kHeight - 60) * (gKernelArgs.fb.bit_depth/8) + gKernelArgs.fb.x_size - kWidth - 40;
+	addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.width
+		* (gKernelArgs.frame_buffer.height - kHeight - 60)
+		* (gKernelArgs.frame_buffer.depth/8) + gKernelArgs.frame_buffer.width - kWidth - 40;
 	for (int32 i = 0; i < kHeight; i++) {
-		memcpy((void *)(start + gKernelArgs.fb.x_size * i), &kImageData[i * kWidth], kWidth);
+		memcpy((void *)(start + gKernelArgs.frame_buffer.width * i),
+			&kImageData[i * kWidth], kWidth);
 	}
 }
 
@@ -368,20 +374,20 @@ platform_switch_to_logo(void)
 extern "C" void
 platform_switch_to_text_mode(void)
 {
-	if (!gKernelArgs.fb.enabled)
+	if (!gKernelArgs.frame_buffer.enabled)
 		return;
 
 	bios_regs regs;
 	regs.eax = 3;
 	call_bios(0x10, &regs);
-	gKernelArgs.fb.enabled = 0;
+	gKernelArgs.frame_buffer.enabled = 0;
 }
 
 
 extern "C" status_t 
 platform_init_video(void)
 {
-	gKernelArgs.fb.enabled = 0;
+	gKernelArgs.frame_buffer.enabled = 0;
 	list_init(&sModeList);
 
 	sVesaCompatible = vesa_init(&sInfo, &sMode) == B_OK;
