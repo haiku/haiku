@@ -89,7 +89,10 @@ private:
 	int32 			fMixBufferFrameRate;
 	int				fMixBufferFrameCount;
 	
+	int32			fLastDataFrameWritten;
 	bigtime_t		fLastDataAvailableTime;
+	
+	double			fFractionalFrames;
 	
 	Resampler		**fResampler; // array
 	rtm_pool		*fRtmPool;
@@ -115,7 +118,7 @@ MixerInput::GetMixerChannelInfo(int mixer_channel, int64 framepos, bigtime_t tim
 
 #if 0
 	if (time < (fLastDataAvailableTime - duration_for_frames(fMixBufferFrameRate, fMixBufferFrameCount))
-		|| (time + duration_for_frames(fMixBufferFrameRate, debugMixBufferFrames)) > fLastDataAvailableTime)
+		|| (time + duration_for_frames(fMixBufferFrameRate, debugMixBufferFrames)) >= fLastDataAvailableTime)
 		ERROR("MixerInput::GetMixerChannelInfo: reading wrong data, have %Ld to %Ld, reading from %Ld to %Ld\n",
 				fLastDataAvailableTime - duration_for_frames(fMixBufferFrameRate, fMixBufferFrameCount), fLastDataAvailableTime, time, time + duration_for_frames(fMixBufferFrameRate, debugMixBufferFrames));
 #endif

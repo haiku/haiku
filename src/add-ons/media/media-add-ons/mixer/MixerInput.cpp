@@ -21,7 +21,9 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrame
 	fMixBuffer(0),
 	fMixBufferFrameRate(0),
 	fMixBufferFrameCount(0),
+	fLastDataFrameWritten(-1),
 	fLastDataAvailableTime(-1),
+	fFractionalFrames(0.0),
 	fResampler(0),
 	fRtmPool(0),
 	fUserOverridesChannelDestinations(false)
@@ -86,6 +88,7 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	void *data;
 	size_t size;
 	bigtime_t start;
+	bigtime_t buffer_duration;
 	
 	if (!fMixBuffer) {
 		ERROR("MixerInput::BufferReceived: dropped incoming buffer as we don't have a mix buffer\n");
@@ -95,29 +98,76 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	data = buffer->Data();
 	size = buffer->SizeUsed();
 	start = buffer->Header()->start_time;
+	buffer_duration = duration_for_frames(fInput.format.u.raw_audio.frame_rate, size / bytes_per_frame(fInput.format.u.raw_audio));
 	if (start < 0) {
 		ERROR("MixerInput::BufferReceived: buffer with negative start time of %Ld dropped\n", start);
 		return;
 	}
 	
-	fLastDataAvailableTime = start + buffer_duration(fInput.format.u.raw_audio);
-
 	// swap the byte order of this buffer, if necessary
 	if (fInputByteSwap)
 		fInputByteSwap->Swap(data, size);
 
 	int offset = frames_for_duration(fMixBufferFrameRate, start) % fMixBufferFrameCount;
-
+	
 	PRINT(4, "MixerInput::BufferReceived: buffer start %10Ld, offset %6d\n", start, offset);
-
+	
 	int in_frames = size / bytes_per_frame(fInput.format.u.raw_audio);
-	int out_frames = int((in_frames * fMixBufferFrameRate) / fInput.format.u.raw_audio.frame_rate); // XXX losing fractions
-	// XXX we should better accumulate the fractions from previous buffers, and also check previous end offset
-	// XXX to only add an output frame if needed (but we also need to use arrival times to cope with lost buffers).
-	// XXX This workaround will very often (but not always) cause the first sample of the next buffer to overwrite
-	// XXX the last sample of the current buffer (but that's better then having some random data at that place)
-	if (fMixBufferFrameRate % int(0.5 + fInput.format.u.raw_audio.frame_rate) != 0)
+	double frames = double(in_frames * fMixBufferFrameRate) / fInput.format.u.raw_audio.frame_rate;
+	int out_frames = int(frames);
+	fFractionalFrames += frames - double(out_frames);
+	if (fFractionalFrames >= 1.0) {
+		fFractionalFrames -= 1.0;
 		out_frames++;
+	}
+
+	// if fLastDataFrameWritten != -1, then we have a valid last position
+	// and can do glitch compensation
+	if (fLastDataFrameWritten >= 0) {
+		int expected_frame = (fLastDataFrameWritten + 1) % fMixBufferFrameCount;
+		if (offset != expected_frame) {
+
+			// due to rounding and other errors, offset might be off by +/- 1
+			// this is not really a bad glitch, we just adjust the position
+		
+			if (offset == fLastDataFrameWritten) {
+				//printf("MixerInput::BufferReceived: -1 frame GLITCH! last frame was %ld, expected frame was %d, new frame is %d\n", fLastDataFrameWritten, expected_frame, offset);
+				offset = expected_frame;
+			} else if (offset == ((fLastDataFrameWritten + 2) % fMixBufferFrameCount)) {
+				//printf("MixerInput::BufferReceived: +1 frame GLITCH! last frame was %ld, expected frame was %d, new frame is %d\n", fLastDataFrameWritten, expected_frame, offset);
+				offset = expected_frame;
+			} else {
+				printf("MixerInput::BufferReceived: GLITCH! last frame was %ld, expected frame was %d, new frame is %d\n", fLastDataFrameWritten, expected_frame, offset);
+
+				if (start > fLastDataAvailableTime) {
+					if ((start - fLastDataAvailableTime) < (buffer_duration / 10)) {
+						// buffer is less than 10% of buffer duration too late
+						printf("short glitch, buffer too late, time delta %Ld\n", start - fLastDataAvailableTime);
+						offset = expected_frame;
+						out_frames++;
+					} else {
+						// buffer more than 10% of buffer duration too late
+						// XXX zerofill buffer
+						printf("MAJOR glitch, buffer too late, time delta %Ld\n", start - fLastDataAvailableTime);
+					}
+				} else { // start <= fLastDataAvailableTime
+					// the new buffer is too early
+					if ((fLastDataAvailableTime - start) < (buffer_duration / 10)) {
+						// buffer is less than 10% of buffer duration too early
+						printf("short glitch, buffer too early, time delta %Ld\n", fLastDataAvailableTime - start);
+						offset = expected_frame;
+						out_frames--;
+						if (out_frames < 1)
+							out_frames = 1;
+					} else {
+						// buffer more than 10% of buffer duration too early
+						// XXX zerofill buffer
+						printf("MAJOR glitch, buffer too early, time delta %Ld\n", fLastDataAvailableTime - start);
+					}
+				}
+			}
+		}
+	}
 
 	//printf("data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n", start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames);
 	
@@ -128,10 +178,12 @@ MixerInput::BufferReceived(BBuffer *buffer)
 		int in_frames1 = (out_frames1 * in_frames) / out_frames;
 		int in_frames2 = in_frames - in_frames1;
 
+		//printf("at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld and %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames1 - 1, 0, out_frames2 - 1);
 		PRINT(3, "at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld and %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames1 - 1, 0, out_frames2 - 1);
-
 		PRINT(5, "  in_frames %5d, out_frames %5d, in_frames1 %5d, out_frames1 %5d, in_frames2 %5d, out_frames2 %5d\n",
 			  in_frames, out_frames, in_frames1, out_frames1, in_frames2, out_frames2);
+
+		fLastDataFrameWritten = out_frames2 - 1;
 
 		offset *= sizeof(float) * fInputChannelCount; // convert offset from frames into bytes
 
@@ -151,11 +203,15 @@ MixerInput::BufferReceived(BBuffer *buffer)
 									fInputChannelCount * sizeof(float),
 									out_frames2,
 									fInputChannelInfo[i].gain);
+									
 		}
 	} else {
 
+		//printf("at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames - 1);
 		PRINT(3, "at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames - 1);
 		PRINT(5, "  in_frames %5d, out_frames %5d\n", in_frames, out_frames);
+
+		fLastDataFrameWritten = offset + out_frames - 1;
 
 		offset *= sizeof(float) * fInputChannelCount; // convert offset from frames into bytes
 
@@ -169,6 +225,8 @@ MixerInput::BufferReceived(BBuffer *buffer)
 									fInputChannelInfo[i].gain);
 		}
 	}
+
+	fLastDataAvailableTime = start + buffer_duration;
 }
 
 media_input &
@@ -504,8 +562,11 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 	TRACE("  outputBufferLength %10Ld\n", outputBufferLength);
 	TRACE("  mixerBufferLength  %10Ld\n", mixerBufferLength);
 	TRACE("  fMixBufferFrameCount   %10d\n", fMixBufferFrameCount);
-	
+
 	ASSERT((fMixBufferFrameCount % frames) == 0);
+	
+	fLastDataFrameWritten = -1;
+	fFractionalFrames = 0.0;
 	
 	if (fMixBuffer)
 		rtm_free(fMixBuffer);
