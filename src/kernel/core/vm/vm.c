@@ -815,41 +815,23 @@ region_id vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
 region_id user_vm_map_file(char *uname, void **uaddress, int addr_type,
 	addr size, int lock, int mapping, const char *upath, off_t offset)
 {
-	char name[SYS_MAX_OS_NAME_LEN];
+	char name[B_OS_NAME_LENGTH];
 	void *address;
 	char path[SYS_MAX_PATH_LEN];
-	int rc, rc2;
+	int rc;
 
-	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	if((addr)uaddress >= KERNEL_BASE && (addr)uaddress <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	if((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-	if(rc < 0)
-		return rc;
-	name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if(rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	rc = user_memcpy(&address, uaddress, sizeof(address));
-	if(rc < 0)
-		return rc;
+	if (!IS_USER_ADDRESS(uname) || !IS_USER_ADDRESS(uaddress) || !IS_USER_ADDRESS(upath)
+		|| user_strlcpy(name, uname, B_OS_NAME_LENGTH) < B_OK
+		|| user_strlcpy(path, upath, SYS_MAX_PATH_LEN) < B_OK
+		|| user_memcpy(&address, uaddress, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	rc = _vm_map_file(vm_get_current_user_aspace_id(), name, &address, addr_type, size, lock, mapping, path, offset, false);
-	if(rc < 0)
+	if (rc < 0)
 		return rc;
 
-	rc2 = user_memcpy(uaddress, &address, sizeof(address));
-	if(rc2 < 0)
-		return rc2;
+	if (user_memcpy(uaddress, &address, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return rc;
 }
@@ -2161,19 +2143,21 @@ void vm_increase_max_commit(addr delta)
 	restore_interrupts(state);
 }
 
-int user_memcpy(void *to, const void *from, size_t size)
+
+//	#pragma mark -
+
+
+int
+user_memcpy(void *to, const void *from, size_t size)
 {
 	return arch_cpu_user_memcpy(to, from, size, &thread_get_current_thread()->fault_handler);
 }
 
-int user_strcpy(char *to, const char *from)
+
+int
+user_strcpy(char *to, const char *from)
 {
 	return arch_cpu_user_strcpy(to, from, &thread_get_current_thread()->fault_handler);
-}
-
-int user_strncpy(char *to, const char *from, size_t size)
-{
-	return arch_cpu_user_strncpy(to, from, size, &thread_get_current_thread()->fault_handler);
 }
 
 
@@ -2184,7 +2168,8 @@ user_strlcpy(char *to, const char *from, size_t size)
 }
 
 
-int user_memset(void *s, char c, size_t count)
+int
+user_memset(void *s, char c, size_t count)
 {
 	return arch_cpu_user_memset(s, c, count, &thread_get_current_thread()->fault_handler);
 }
