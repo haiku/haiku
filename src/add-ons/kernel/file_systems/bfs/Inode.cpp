@@ -695,11 +695,11 @@ Inode::Name(const bfs_inode *node) const
 
 
 /** Copies the node's name into the provided buffer.
- *	The buffer must be B_FILE_NAME_LENGTH bytes large.
+ *	The buffer should be B_FILE_NAME_LENGTH bytes large.
  */
 
 status_t
-Inode::GetName(char *buffer) const
+Inode::GetName(char *buffer, size_t size) const
 {
 	NodeGetter node(fVolume, this);
 	SimpleLocker locker(fSmallDataLock);
@@ -708,7 +708,7 @@ Inode::GetName(char *buffer) const
 	if (name == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	strlcpy(buffer, name, B_FILE_NAME_LENGTH);
+	strlcpy(buffer, name, size);
 	return B_OK;
 }
 

@@ -100,7 +100,7 @@ class Inode {
 		status_t GetNextSmallData(bfs_inode *node, small_data **_smallData) const;
 		small_data *FindSmallData(const bfs_inode *node, const char *name) const;
 		const char *Name(const bfs_inode *node) const;
-		status_t GetName(char *buffer) const;
+		status_t GetName(char *buffer, size_t bufferSize = B_FILE_NAME_LENGTH) const;
 		status_t SetName(Transaction &transaction, const char *name);
 
 		// high-level attribute methods
