@@ -284,8 +284,8 @@ GetTobiasCodecStreamInfo(std::vector<ogg_packet> * packets,
 	format->type = B_MEDIA_ENCODED_VIDEO;
 	format->user_data_type = B_CODEC_TYPE_INFO;
 	strncpy((char*)format->user_data,header->subtype,4);
-	int32 encoding = header->subtype[3] << 24 | header->subtype[2] << 16 
-                   | header->subtype[1] <<  8 | header->subtype[0];
+	int32 encoding = header->subtype[0] << 24 | header->subtype[1] << 16 
+                   | header->subtype[2] <<  8 | header->subtype[3];
 	format->u.encoded_video.encoding
 	   = (media_encoded_video_format::video_encoding)encoding;
 	format->u.encoded_video.frame_size
