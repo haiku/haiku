@@ -141,33 +141,57 @@ BArchivable *BStatusBar::Instantiate(BMessage *archive)
 //------------------------------------------------------------------------------
 status_t BStatusBar::Archive(BMessage *archive, bool deep) const
 {
-	BView::Archive(archive, deep);
+	status_t err = BView::Archive(archive, deep);
+
+	if (err != B_OK)
+		return err;
 
 	if (fBarHeight != 16.0f)
-		archive->AddFloat("_high", fBarHeight);
+		err = archive->AddFloat("_high", fBarHeight);
+
+	if (err != B_OK)
+		return err;
 
 	// TODO: Should we compare the color with (50, 150, 255) ?
-	archive->AddData("_bcolor", B_INT32_TYPE, &fBarColor, sizeof( int32 ));
-	
+	err = archive->AddData("_bcolor", B_INT32_TYPE, &fBarColor, sizeof( int32 ));
+
+	if (err != B_OK)
+		return err;
+
 	if (fCurrent != 0.0f)
-		archive->AddFloat("_val", fCurrent);
+		err = archive->AddFloat("_val", fCurrent);
 
+	if (err != B_OK)
+		return err;
+			
 	if (fMax != 100.0f )
-		archive->AddFloat("_max", fMax); 
-	
+		err = archive->AddFloat("_max", fMax);
+      
+	if (err != B_OK)
+		return err;
+ 
 	if (fText )
-		archive->AddString("_text", fText);
-	
-	if (fTrailingText)
-		archive->AddString("_ttext", fTrailingText);
+		err = archive->AddString("_text", fText);
 
+	if (err != B_OK)
+		return err;
+
+	if (fTrailingText)
+		err = archive->AddString("_ttext", fTrailingText);
+
+	if (err != B_OK)
+		return err;
+			
 	if (fLabel)
-		archive->AddString("_label", fLabel);
+		err = archive->AddString("_label", fLabel);
+
+	if (err != B_OK)
+		return err;
 
 	if (fTrailingLabel)
-		archive->AddString ("_tlabel", fTrailingLabel);
+		err = archive->AddString ("_tlabel", fTrailingLabel);
 
-	return B_OK;
+	return err;
 }
 //------------------------------------------------------------------------------
 void BStatusBar::AttachedToWindow()
