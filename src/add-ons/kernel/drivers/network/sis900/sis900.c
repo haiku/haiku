@@ -1,6 +1,6 @@
 /* sis900.c - SiS900 chip specific functions
 **
-** Copyright © 2001-2003 pinc Software. All Rights Reserved.
+** Copyright © 2001-2004 pinc Software. All Rights Reserved.
 */
 
 
@@ -509,7 +509,7 @@ sis900_setAutoNegotiationCapabilities(struct sis_info *info)
 		| (status & MII_STATUS_CAN_T_FDX  ? MII_NWAY_T_FDX : 0)
 		| (status & MII_STATUS_CAN_T      ? MII_NWAY_T : 0);
 
-	TRACE((DEVICE_NAME ": write capabilities %ld\n", capabilities));
+	TRACE((DEVICE_NAME ": write capabilities %d\n", capabilities));
 	mdio_write(info, MII_AUTONEG_ADV, capabilities);
 }
 
