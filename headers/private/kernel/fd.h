@@ -9,13 +9,16 @@
 #include <lock.h>
 #include <memheap.h>
 #include <sys/stat.h>
-//#include <list.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct select_sync;
 
 struct fd_ops {
-	ssize_t		(*fd_read) (struct file_descriptor *, off_t pos, void *buffer, size_t *length);
+	ssize_t		(*fd_read)(struct file_descriptor *, off_t pos, void *buffer, size_t *length);
 	ssize_t		(*fd_write)(struct file_descriptor *, off_t pos, const void *buffer, size_t *length);
 	off_t		(*fd_seek)(struct file_descriptor *, off_t pos, int seekType);
 	status_t	(*fd_ioctl)(struct file_descriptor *, ulong op, void *buffer, size_t length);
@@ -83,5 +86,9 @@ get_current_io_context(bool kernel)
 
 	return (struct io_context *)thread_get_current_thread()->team->io_context;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _FD_H */

@@ -5,11 +5,16 @@
 #ifndef _KERNEL_VM_CACHE_H
 #define _KERNEL_VM_CACHE_H
 
+
 #include <kernel.h>
 #include <vm.h>
 
 struct kernel_args;
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int vm_cache_init(struct kernel_args *ka);
 vm_cache *vm_cache_create(vm_store *store);
@@ -21,5 +26,9 @@ void vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset);
 void vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page);
 int vm_cache_insert_region(vm_cache_ref *cache_ref, vm_region *region);
 int vm_cache_remove_region(vm_cache_ref *cache_ref, vm_region *region);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KERNEL_VM_CACHE_H */
