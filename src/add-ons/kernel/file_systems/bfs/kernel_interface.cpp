@@ -1744,7 +1744,7 @@ bfs_read_attr(void *_ns, void *_node, const char *name, int type, void *buffer,
 
 	return inode->ReadAttribute(name, type, pos, (uint8 *)buffer, _length);
 }
-
+#endif
 
 //	#pragma mark -
 //	Index functions
@@ -1772,61 +1772,61 @@ bfs_open_indexdir(void *_ns, void **_cookie)
 
 
 static status_t
-bfs_close_indexdir(void *_ns, void *_cookie)
+bfs_close_indexdir(fs_volume _fs, fs_cookie _cookie)
 {
 	FUNCTION();
-	if (_ns == NULL || _cookie == NULL)
+	if (_fs == NULL || _cookie == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	Volume *volume = (Volume *)_ns;
-	RETURN_ERROR(bfs_close_dir(_ns, volume->IndicesNode(), _cookie));
+	Volume *volume = (Volume *)_fs;
+	RETURN_ERROR(bfs_close_dir(_fs, volume->IndicesNode(), _cookie));
 }
 
 
 static status_t
-bfs_free_indexdir_cookie(void *_ns, void *_node, void *_cookie)
+bfs_free_indexdir_cookie(fs_volume _fs, fs_cookie _cookie)
 {
 	FUNCTION();
-	if (_ns == NULL || _cookie == NULL)
+	if (_fs == NULL || _cookie == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	Volume *volume = (Volume *)_ns;
-	RETURN_ERROR(bfs_free_dir_cookie(_ns, volume->IndicesNode(), _cookie));
+	Volume *volume = (Volume *)_fs;
+	RETURN_ERROR(bfs_free_dir_cookie(_fs, volume->IndicesNode(), _cookie));
 }
 
 
 static status_t
-bfs_rewind_indexdir(void *_ns, void *_cookie)
+bfs_rewind_indexdir(fs_volume _fs, fs_cookie _cookie)
 {
 	FUNCTION();
-	if (_ns == NULL || _cookie == NULL)
+	if (_fs == NULL || _cookie == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	Volume *volume = (Volume *)_ns;
-	RETURN_ERROR(bfs_rewind_dir(_ns, volume->IndicesNode(), _cookie));
+	Volume *volume = (Volume *)_fs;
+	RETURN_ERROR(bfs_rewind_dir(_fs, volume->IndicesNode(), _cookie));
 }
 
 
 static status_t
-bfs_read_indexdir(void *_ns, void *_cookie, long *num, struct dirent *dirent, size_t bufferSize)
+bfs_read_indexdir(fs_volume _fs, fs_cookie _cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	FUNCTION();
-	if (_ns == NULL || _cookie == NULL)
+	if (_fs == NULL || _cookie == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	Volume *volume = (Volume *)_ns;
-	RETURN_ERROR(bfs_read_dir(_ns, volume->IndicesNode(), _cookie, num, dirent, bufferSize));
+	Volume *volume = (Volume *)_fs;
+	RETURN_ERROR(bfs_read_dir(_fs, volume->IndicesNode(), _cookie, dirent, bufferSize, _num));
 }
 
 
 static status_t
-bfs_create_index(void *_ns, const char *name, int type, int flags)
+bfs_create_index(fs_volume _fs, const char *name, uint32 type, uint32 flags)
 {
 	FUNCTION_START(("name = \"%s\", type = %d, flags = %d\n", name, type, flags));
-	if (_ns == NULL || name == NULL || *name == '\0')
+	if (_fs == NULL || name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -1884,30 +1884,13 @@ bfs_remove_index(void *_ns, const char *name)
 
 
 static status_t
-bfs_rename_index(void *ns, const char *oldname, const char *newname)
-{
-	FUNCTION_START(("from = %s, to = %s\n", oldname, newname));
-
-	// Well, renaming an index doesn't make that much sense, as you
-	// would also need to remove every file in it (or the index
-	// would contain wrong data)
-	// But in that case, you can better remove the old one, and
-	// create a new one...
-	// There is also no way to call this function from a userland
-	// application.
-
-	RETURN_ERROR(B_ENTRY_NOT_FOUND);
-}
-
-
-static status_t
-bfs_stat_index(void *_ns, const char *name, struct index_info *indexInfo)
+bfs_stat_index(fs_volume _fs, const char *name, struct stat *stat)
 {
 	FUNCTION_START(("name = %s\n", name));
-	if (_ns == NULL || name == NULL || indexInfo == NULL)
+	if (_fs == NULL || name == NULL || stat == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Index index(volume);
 	status_t status = index.SetTo(name);
 	if (status < B_OK)
@@ -1915,12 +1898,19 @@ bfs_stat_index(void *_ns, const char *name, struct index_info *indexInfo)
 
 	bfs_inode *node = index.Node()->Node();
 
-	indexInfo->type = index.Type();
-	indexInfo->size = node->data.Size();
-	indexInfo->modification_time = (time_t)(node->LastModifiedTime() >> INODE_TIME_SHIFT);
-	indexInfo->creation_time = (time_t)(node->CreateTime() >> INODE_TIME_SHIFT);
-	indexInfo->uid = node->UserID();
-	indexInfo->gid = node->GroupID();
+	stat->st_type = index.Type();
+	stat->st_size = node->data.Size();
+	stat->st_mode = node->Mode();
+
+	stat->st_nlink = 1;
+	stat->st_blksize = 65536;
+
+	stat->st_uid = node->UserID();
+	stat->st_gid = node->GroupID();
+
+	stat->st_atime = time(NULL);
+	stat->st_mtime = stat->st_ctime = (time_t)(node->LastModifiedTime() >> INODE_TIME_SHIFT);
+	stat->st_crtime = (time_t)(node->CreateTime() >> INODE_TIME_SHIFT);
 
 	return B_OK;
 }
@@ -1929,7 +1919,7 @@ bfs_stat_index(void *_ns, const char *name, struct index_info *indexInfo)
 //	#pragma mark -
 //	Query functions
 
-
+#if 0
 static status_t
 bfs_open_query(void *_ns, const char *queryString, ulong flags, port_id port,
 	long token, void **cookie)
@@ -2093,8 +2083,10 @@ static file_system_info sBeFileSystem = {
 	&bfs_free_dir_cookie,		// free_dircookie
 	&bfs_read_dir,				// readdir
 	&bfs_rewind_dir,			// rewinddir
-#if 0
-#endif
+	
+	NULL, NULL, NULL, NULL, NULL,	// attr dir
+	NULL, NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, NULL,	// attr
 #if 0
 	/* attribute directory operations */
 	&bfs_open_attrdir,			// open attr dir
@@ -2109,18 +2101,18 @@ static file_system_info sBeFileSystem = {
 	&bfs_remove_attr,			// remove attr
 	&bfs_rename_attr,			// rename attr
 	&bfs_stat_attr,				// stat attr
-	
+#endif	
 	/* index directory & index operations */
 	&bfs_open_indexdir,			// open index dir
 	&bfs_close_indexdir,		// close index dir
 	&bfs_free_indexdir_cookie,	// free index dir cookie
-	&bfs_rewind_indexdir,		// rewind index dir
 	&bfs_read_indexdir,			// read index dir
+	&bfs_rewind_indexdir,		// rewind index dir
+
 	&bfs_create_index,			// create index
 	&bfs_remove_index,			// remove index
-	&bfs_rename_index,			// rename index
 	&bfs_stat_index,			// stat index
-
+#if 0
 	/* query operations */
 	&bfs_open_query,			// open query
 	&bfs_close_query,			// close query
