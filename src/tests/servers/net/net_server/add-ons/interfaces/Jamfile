@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src tests servers net net_server add-ons interfaces ;
+
+SubInclude OBOS_TOP src tests servers net net_server add-ons interfaces ethernet ;
+SubInclude OBOS_TOP src tests servers net net_server add-ons interfaces loopback ;
+
