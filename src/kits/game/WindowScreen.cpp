@@ -60,7 +60,7 @@ release_engine release_engine_global;
 
 // Helper methods which translates the pre r5 graphics methods to r5 ones
 static int32
-sync()
+card_sync()
 {
 	wait_idle_global();
 	return 0;
@@ -84,7 +84,9 @@ blit(int32 sx, int32 sy, int32 dx, int32 dy, int32 width, int32 height)
 	return 0;
 }
 
-
+// TODO: This function seems not to be exported through CardHookAt().
+// At least, nothing I've tried uses it. 
+/*
 static int32
 transparent_blit(int32 sx, int32 sy, int32 dx, int32 dy,
 			int32 width, int32 height, uint32 transparent_color)
@@ -102,7 +104,7 @@ transparent_blit(int32 sx, int32 sy, int32 dx, int32 dy,
 	release_engine_global(et_global, 0);
 	return 0;
 }
-
+*/
 
 static int32
 scaled_filtered_blit(int32 sx, int32 sy, int32 sw, int32 sh, int32 dx, int32 dy, int32 dw, int32 dh)
@@ -606,7 +608,7 @@ BWindowScreen::CardHookAt(int32 index)
 			hook = (graphics_card_hook)scaled_filtered_blit;
 			break;
 		case 10: // sync aka wait for graphics card idle
-			hook = (graphics_card_hook)sync;
+			hook = (graphics_card_hook)card_sync;
 			break;
 		case 13: // 16 bit fill rect
 			hook = (graphics_card_hook)m_gah(B_FILL_RECTANGLE, 0);
