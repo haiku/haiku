@@ -29,7 +29,7 @@
 
 static char *bootdir = NULL;
 static off_t bootdir_len = 0;
-static region_id bootdir_region = -1;
+static area_id bootdir_region = -1;
 
 struct bootfs_stream {
 	int type;
