@@ -32,8 +32,9 @@
 
 
 #include <stdlib.h>
-#include <udb/USB_hid.h>
+#include <SupportDefs.h>
 #include "hidparse.h"
+#include <usb/USB_hid.h>
 
 /*
 	decompose report descriptor into array of uniform structure
@@ -396,7 +397,7 @@ count_controls(report_insn *insns, size_t num_insns,
 			}
 			break;
 
-		case USAGE_PAGE_BUTTONS:
+		case USAGE_PAGE_BUTTON:
 			if (insn->num_bits == 1) {
 				buttons++;
 				insn->ctrl_type = TYPE_BUTTON;
