@@ -35,7 +35,7 @@
 
 #include <View.h>
 #include <Bitmap.h>
-#include <MessageRunner.h>
+#include <Path.h>
 
 class ImageView : public BView {
 public:
@@ -54,6 +54,8 @@ public:
 	bool HasImage() { return fpbitmap ? true : false; };
 	
 private:
+	void UpdateInfoWindow(const BPath &path, const translator_info &info,
+		const char *tranname, const char *traninfo, int32 tranversion);
 	void ReDraw() { Draw(Bounds()); };
 	void AdjustScrollBars();
 	void SaveImageAtDropLocation(BMessage *pmsg);

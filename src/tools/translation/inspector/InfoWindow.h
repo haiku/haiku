@@ -37,7 +37,8 @@
 
 class InfoWindow : public BWindow {
 public:
-	InfoWindow(BRect rect, const char *name);
+	InfoWindow(BRect rect, const char *name, const char *text =
+		"This space for rent");
 	~InfoWindow();
 	void FrameResized(float width, float height);
 	void MessageReceived(BMessage *pmsg);

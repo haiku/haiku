@@ -34,8 +34,9 @@
 #include <Application.h>
 #include <ScrollView.h>
 #include <Message.h>
+#include <String.h>
 
-InfoWindow::InfoWindow(BRect rect, const char *name)
+InfoWindow::InfoWindow(BRect rect, const char *name, const char *text)
 	: BWindow(rect, name, B_DOCUMENT_WINDOW, 0)
 {
 	BRect rctframe = Bounds();
@@ -52,9 +53,8 @@ InfoWindow::InfoWindow(BRect rect, const char *name)
 	AddChild(psv = new BScrollView("infoscrollview", fptextView,
 				B_FOLLOW_ALL_SIDES, 0, true, true));
 	fptextView->MakeEditable(false);
-	fptextView->MakeResizable(true);
-	fptextView->SetText("Sample text here! blah blah blah blah blah blah");
-	fptextView->MakeFocus(true);
+	//fptextView->MakeResizable(true);
+	fptextView->SetText(text);
 	
 	SetSizeLimits(100, 10000, 100, 10000);
 	
@@ -84,6 +84,16 @@ void
 InfoWindow::MessageReceived(BMessage *pmsg)
 {
 	switch (pmsg->what) {
+		case M_INFO_WINDOW_TEXT:
+		{
+			// App is telling me new info has arrived;
+			// The view text must be updated
+			BString bstr;
+			if (pmsg->FindString("text", &bstr) == B_OK)
+				fptextView->SetText(bstr.String());
+			break;
+		}
+			
 		default:
 			BWindow::MessageReceived(pmsg);
 			break;

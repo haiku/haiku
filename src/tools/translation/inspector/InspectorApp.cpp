@@ -34,6 +34,8 @@
 #include "Constants.h"
 #include "ImageWindow.h"
 #include <Window.h>
+#include <Message.h>
+#include <String.h>
 
 InspectorApp::InspectorApp()
 	: BApplication(APP_SIG)
@@ -52,8 +54,16 @@ InspectorApp::MessageReceived(BMessage *pmsg)
 	switch (pmsg->what) {
 		case M_INFO_WINDOW:
 			if (!fpinfowin)
-				fpinfowin = new InfoWindow(
-					BRect(50, 50, 150, 150), "Info Win");
+				fpinfowin = new InfoWindow(BRect(50, 50, 150, 150),
+					"Info Win", fbstrInfo.String());
+			break;
+			
+		case M_INFO_WINDOW_TEXT:
+			// If image view is telling me to
+			// update the info window...
+			pmsg->FindString("text", &fbstrInfo);
+			if (fpinfowin)
+				fpinfowin->PostMessage(pmsg);
 			break;
 			
 		case M_INFO_WINDOW_QUIT:

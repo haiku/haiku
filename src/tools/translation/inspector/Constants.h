@@ -37,6 +37,7 @@
 #define M_OPEN_FILE_PANEL			'ofpl'
 #define M_INFO_WINDOW				'infw'
 #define M_INFO_WINDOW_QUIT			'infq'
+#define M_INFO_WINDOW_TEXT			'inft'
 
 
 // String constants

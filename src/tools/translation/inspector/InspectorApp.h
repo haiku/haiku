@@ -35,6 +35,7 @@
 
 #include "InfoWindow.h"
 #include <Application.h>
+#include <String.h>
 
 class InspectorApp : public BApplication {
 public:
@@ -43,6 +44,7 @@ public:
 	void RefsReceived(BMessage *pmsg);
 	
 private:
+	BString fbstrInfo;
 	InfoWindow *fpinfowin;
 };
 

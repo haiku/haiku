@@ -34,6 +34,9 @@
 #include "ImageView.h"
 #include "Constants.h"
 #include "StatusCheck.h"
+#include <Application.h>
+#include <Message.h>
+#include <String.h>
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
 #include <BitmapStream.h>
@@ -204,31 +207,192 @@ ImageView::AdjustScrollBars()
 	}
 }
 
+struct ColorSpaceName { 
+	color_space id;
+	const char *name;
+};
+#define COLORSPACENAME(id) {id, #id}
+
+// convert colorspace numerical value to
+// a string value
+const char *
+get_color_space_name(color_space colors)
+{
+	// print out colorspace if it matches an item in the list
+	const ColorSpaceName kcolorspaces[] = {
+		COLORSPACENAME(B_NO_COLOR_SPACE),
+		COLORSPACENAME(B_RGB32),
+		COLORSPACENAME(B_RGBA32),
+		COLORSPACENAME(B_RGB24),
+		COLORSPACENAME(B_RGB16),
+		COLORSPACENAME(B_RGB15),
+		COLORSPACENAME(B_RGBA15),
+		COLORSPACENAME(B_CMAP8),
+		COLORSPACENAME(B_GRAY8),
+		COLORSPACENAME(B_GRAY1),
+		COLORSPACENAME(B_RGB32_BIG),
+		COLORSPACENAME(B_RGBA32_BIG),
+		COLORSPACENAME(B_RGB24_BIG),
+		COLORSPACENAME(B_RGB16_BIG),
+		COLORSPACENAME(B_RGB15_BIG),
+		COLORSPACENAME(B_RGBA15_BIG),
+		COLORSPACENAME(B_YCbCr422),
+		COLORSPACENAME(B_YCbCr411),
+		COLORSPACENAME(B_YCbCr444),
+		COLORSPACENAME(B_YCbCr420),
+		COLORSPACENAME(B_YUV422),
+		COLORSPACENAME(B_YUV411),
+		COLORSPACENAME(B_YUV444),
+		COLORSPACENAME(B_YUV420),
+		COLORSPACENAME(B_YUV9),
+		COLORSPACENAME(B_YUV12),
+		COLORSPACENAME(B_UVL24),
+		COLORSPACENAME(B_UVL32),
+		COLORSPACENAME(B_UVLA32),
+		COLORSPACENAME(B_LAB24),
+		COLORSPACENAME(B_LAB32),
+		COLORSPACENAME(B_LABA32),
+		COLORSPACENAME(B_HSI24),
+		COLORSPACENAME(B_HSI32),
+		COLORSPACENAME(B_HSIA32),
+		COLORSPACENAME(B_HSV24),
+		COLORSPACENAME(B_HSV32),
+		COLORSPACENAME(B_HSVA32),
+		COLORSPACENAME(B_HLS24),
+		COLORSPACENAME(B_HLS32),
+		COLORSPACENAME(B_HLSA32),
+		COLORSPACENAME(B_CMY24),
+		COLORSPACENAME(B_CMY32),
+		COLORSPACENAME(B_CMYA32),
+		COLORSPACENAME(B_CMYK32)
+	};
+	const int32 kncolorspaces =  sizeof(kcolorspaces) /
+		sizeof(ColorSpaceName);
+	for (int32 i = 0; i < kncolorspaces; i++) {
+		if (colors == kcolorspaces[i].id)
+			return kcolorspaces[i].name;
+	}
+
+	return "Unknown";
+}
+
+// return a string of the passed number formated
+// as a hexadecimal number in lowercase with a leading "0x"
+const char *
+hex_format(uint32 num)
+{
+	static char str[11] = { 0 };
+	sprintf(str, "0x%.8lx", num);
+	
+	return str;
+}
+
+// convert passed number to a string of 4 characters
+// and return that string
+const char *
+char_format(uint32 num)
+{
+	static char str[5] = { 0 };
+	uint32 bnum = B_HOST_TO_BENDIAN_INT32(num);
+	memcpy(str, &bnum, 4);
+	
+	return str;
+}
+
+// Send information about the currently open image to the
+// BApplication object so it can send it to the InfoWindow
+void
+ImageView::UpdateInfoWindow(const BPath &path, const translator_info &tinfo,
+	const char *tranname, const char *traninfo, int32 tranversion)
+{
+	BMessage msg(M_INFO_WINDOW_TEXT);
+	BString bstr;
+	
+	// Bitmap Info
+	bstr << "Image: " << path.Path() << "\n";
+	color_space cs = fpbitmap->ColorSpace();
+	bstr << "Color Space: " << get_color_space_name(cs) << " (" << 
+		hex_format(static_cast<uint32>(cs)) << ")\n";
+	bstr << "Dimensions: " << fpbitmap->Bounds().IntegerWidth() + 1 << " x " <<
+		fpbitmap->Bounds().IntegerHeight() + 1 << "\n";
+	bstr << "Bytes per Row: " << fpbitmap->BytesPerRow() << "\n";
+	bstr << "Total Bytes: " << fpbitmap->BitsLength() << "\n";
+	
+	// Identify Info
+	bstr << "\nIdentify Info:\n";
+	bstr << "ID String: " << tinfo.name << "\n";
+	bstr << "MIME Type: " << tinfo.MIME << "\n";
+	bstr << "Type: '" << char_format(tinfo.type) << "' (" <<
+		hex_format(tinfo.type) <<")\n";
+	bstr << "Translator ID: " << tinfo.translator << "\n";
+	bstr << "Group: '" << char_format(tinfo.group) << "' (" <<
+		hex_format(tinfo.group) << ")\n";
+	bstr << "Quality: " << tinfo.quality << "\n";
+	bstr << "Capability: " << tinfo.capability << "\n";
+	
+	// Translator Info
+	bstr << "\nTranslator Used:\n";
+	bstr << "Name: " << tranname << "\n";
+	bstr << "Info: " << traninfo << "\n";
+	bstr << "Version: " << tranversion << "\n";
+	
+	msg.AddString("text", bstr);
+	be_app->PostMessage(&msg);
+}
+
 void
 ImageView::SetImage(BMessage *pmsg)
 {
 	// Replace current image with the image
 	// specified in the given BMessage
-	entry_ref ref;
-	if (pmsg->FindRef("refs", &ref) != B_OK)
-		return;
 	
-	BBitmap *pbitmap = BTranslationUtils::GetBitmap(&ref);
-	if (pbitmap) {
-		delete fpbitmap;
+	StatusCheck chk;
+	
+	try {
+		entry_ref ref;
+		chk = pmsg->FindRef("refs", &ref);
+
+		BFile file(&ref, B_READ_ONLY);
+		chk = file.InitCheck();
+	
+		BTranslatorRoster *proster = BTranslatorRoster::Default();
+		if (!proster)
+			// throw exception
+			chk = B_ERROR;
+		
+		// determine what type the image is
+		translator_info tinfo;
+		chk = proster->Identify(&file, NULL, &tinfo, 0, NULL,
+			B_TRANSLATOR_BITMAP);
+			
+		// get the name and info about the translator
+		const char *tranname = NULL, *traninfo = NULL;
+		int32 tranversion = 0;
+		chk = proster->GetTranslatorInfo(tinfo.translator, &tranname,
+			&traninfo, &tranversion);
+			
+		// perform the actual translation
+		BBitmapStream outstream;
+		chk = proster->Translate(&file, &tinfo, NULL, &outstream,
+			B_TRANSLATOR_BITMAP);
+		BBitmap *pbitmap = NULL;
+		chk = outstream.DetachBitmap(&pbitmap);
 		fpbitmap = pbitmap;
+		pbitmap = NULL;
 		
 		// Set the name of the Window to reflect the file name
 		BWindow *pwin = Window();
 		BEntry entry(&ref);
+		BPath path;
 		if (entry.InitCheck() == B_OK) {
-			BPath path(&entry);
-			if (path.InitCheck() == B_OK)
+			if (path.SetTo(&entry) == B_OK)
 				pwin->SetTitle(path.Leaf());
 			else
 				pwin->SetTitle(IMAGEWINDOW_TITLE);
 		} else
 			pwin->SetTitle(IMAGEWINDOW_TITLE);
+			
+		UpdateInfoWindow(path, tinfo, tranname, traninfo, tranversion);
 		
 		// Resize parent window and set size limits to 
 		// reflect the size of the new bitmap
@@ -255,12 +419,14 @@ ImageView::SetImage(BMessage *pmsg)
 			// window while taking into account the size of
 			// the screen, the tab and borders of the window
 			//
-			// HACK: Works well enough, but not exactly how I would like
+			// HACK: Need to fix case where window un-zooms
+			// when the window is already the correct size
+			// for the current image
 		
 		// repaint view
 		FillRect(Bounds());
 		ReDraw();
-	} else {
+	} catch (StatusNotOKException) {
 		BAlert *palert = new BAlert(NULL,
 			"Sorry, unable to load the image.", "OK");
 		palert->Go();
