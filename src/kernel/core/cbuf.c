@@ -135,25 +135,26 @@ allocate_cbuf_mem(size_t size)
 //		dprintf("allocate_cbuf_mem: returned %d of memory, %d left\n", found_size, size);
 
 		buffer = (cbuf *)_buffer;
-		if (!headBuffer)
+		if (headBuffer == NULL) {
 			headBuffer = buffer;
+			headBuffer->flags |= CBUF_FLAG_CHAIN_HEAD;
+		}
 
 		for (i = 0; i < count; i++) {
 			initialize_cbuf(buffer);
 			if (lastBuffer)
 				lastBuffer->next = buffer;
-			if (buffer == headBuffer) {
-				buffer->flags |= CBUF_FLAG_CHAIN_HEAD;
-				buffer->total_length = (size / CBUF_LENGTH) * sizeof(buffer->dat);
-			}
+			if (headBuffer)
+				buffer->total_length += buffer->length;
+
 			lastBuffer = buffer;
 			buffer++;
 		}
 	}
 
-	if (buffer) {
-		buffer->next = NULL;
-		buffer->flags |= CBUF_FLAG_CHAIN_TAIL;
+	if (lastBuffer) {
+		lastBuffer->next = NULL;
+		lastBuffer->flags |= CBUF_FLAG_CHAIN_TAIL;
 	}
 
 	return headBuffer;
@@ -722,9 +723,6 @@ cbuf_get_ptr(cbuf *buffer, size_t offset)
 		if (buffer->length > offset)
 			return (void *)((int)buffer->data + offset);
 
-		if (buffer->length > offset)
-			return NULL;
-
 		offset -= buffer->length;
 		buffer = buffer->next;
 	}
@@ -765,9 +763,6 @@ cbuf_ones_cksum16(cbuf *buffer, size_t offset, size_t length)
 	while (buffer) {
 		if (buffer->length > offset)
 			break;
-
-		if (buffer->length > offset)
-			return 0;
 
 		offset -= buffer->length;
 		buffer = buffer->next;
@@ -840,6 +835,7 @@ cbuf_truncate_tail(cbuf *buffer, size_t truncBytes)
 		return B_BAD_VALUE;
 
 	offset = buffer->total_length - truncBytes;
+		// ToDo: what happens if truncBytes >= total_length??
 	bufferOffset = 0;
 	while (buffer && offset > 0) {
 		if (offset < buffer->length) {
@@ -854,14 +850,15 @@ cbuf_truncate_tail(cbuf *buffer, size_t truncBytes)
 		return B_ERROR;
 
 	head->total_length -= buffer->length - bufferOffset;
-	buffer->length -= buffer->length - bufferOffset;
+	buffer->length -= bufferOffset;
+		// ToDo: is this correct?
+		// Isn't bufferOffset the part that has to stay in the buffer?
+		// can't we just have head->total_length -= truncBytes?
 
 	// clear out the rest of the buffers in this chain
-	buffer = buffer->next;
-	while (buffer) {
+	while ((buffer = buffer->next) != NULL) {
 		head->total_length -= buffer->length;
 		buffer->length = 0;
-		buffer = buffer->next;
 	}
 
 	return B_OK;
