@@ -1946,156 +1946,137 @@ void DisplayDriverImpl::DrawString(const char *string, const int32 &length, cons
 	// TODO: properly calculate intersecting rectangle with cursor in DisplayDriverImpl::DrawString
 	
 	// Rough guesstimate for size
-	BRect intersection(pt.x,pt.x,pt.y,pt.y);
-	intersection.top-=d->font.Size()*1.5;
-	intersection.right+=d->font.Size()*1.5*length;
-	if(fCursorHandler.IntersectsCursor(intersection))
+	BRect intersection(pt.x, pt.x, pt.y, pt.y);
+	intersection.top -= d->font.Size() * 1.5;
+	intersection.right += d->font.Size() * 1.5 * length;
+	
+	if (fCursorHandler.IntersectsCursor(intersection))
 		fCursorHandler.DriverHide();
 	
 	BPoint point(pt);
+	const ServerFont *font = &(d->font);
 	
-	const ServerFont *font=&(d->font);
+	bool antialias = true;
+	if (font->Size() < 18 && font->Flags() & B_DISABLE_ANTIALIASING)
+		antialias = false;
 	
-	FT_Face face;
-	FT_GlyphSlot slot;
-	FT_Matrix rmatrix,smatrix;
-	FT_UInt glyph_index=0, previous=0;
-	FT_Vector pen,delta,space,nonspace;
-	int16 error=0;
-	int32 strlength,i;
-	Angle rotation(font->Rotation()), shear(font->Shear());
-	
-	bool antialias=true;
-	
-	if(font->Size()<18 && (font->Flags()& B_DISABLE_ANTIALIASING==1))
-		antialias=false;
-
 	// Originally, I thought to do this shear checking here, but it really should be
 	// done in BFont::SetShear()
-	float shearangle=shear.Value();
-	if(shearangle>135)
-		shearangle=135;
-	if(shearangle<45)
-		shearangle=45;
-
-	if(shearangle>90)
-		shear=90+((180-shearangle)*2);
-	else
-		shear=90-(90-shearangle)*2;
+	Angle shear(font->Shear());
+	if (font->Shear() != 90) {
+		float shearangle = shear.Value();
+		if (shearangle > 135)
+			shearangle = 135;
+		if (shearangle < 45)
+			shearangle = 45;
+		
+		if(shearangle > 90)
+			shear = 90 + ((180 - shearangle) * 2);
+		else
+			shear = 90 - (90 - shearangle) * 2;
+	}
 	
-	error=FT_New_Face(ftlib, font->GetPath(), 0, &face);
-	if(error)
-	{
+	FT_Face face = font->GetFTFace();
+	if (!face) {
 		Unlock();
 		return;
 	}
-
-	slot=face->glyph;
-
-	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
 	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-	{
+	uint16 error = FT_Set_Char_Size(face, 0, int32(font->Size()) * 64, 72, 72);
+	if (error) {
 		Unlock();
 		return;
 	}
-
-	// if we do any transformation, we do a call to FT_Set_Transform() here
+	
+	bool use_kerning = font->HasKerning() && font->Spacing() == B_STRING_SPACING;
+	
+	FT_Vector space, nonspace;
+	Angle rotation(font->Rotation());
 	
 	// First, rotate
-	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
-	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000); 
-	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000); 
-	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
+	FT_Matrix rmatrix;
+	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000);
+	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000);
+	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000);
+	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000);
 	
 	// Next, shear
+	FT_Matrix smatrix;
 	smatrix.xx = (FT_Fixed)(0x10000); 
-	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000); 
-	smatrix.yx = (FT_Fixed)(0); 
-	smatrix.yy = (FT_Fixed)(0x10000); 
-
-	FT_Matrix_Multiply(&rmatrix,&smatrix);
+	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000);
+	smatrix.yx = (FT_Fixed)(0);
+	smatrix.yy = (FT_Fixed)(0x10000);
+	
+	// Multiply togheter
+	FT_Matrix_Multiply(&rmatrix, &smatrix);
 	
 	// Set up the increment value for escapement padding
-	space.x=int32(d->edelta.space * rotation.Cosine()*64);
-	space.y=int32(d->edelta.space * rotation.Sine()*64);
-	nonspace.x=int32(d->edelta.nonspace * rotation.Cosine()*64);
-	nonspace.y=int32(d->edelta.nonspace * rotation.Sine()*64);
-	
+	space.x = int32(d->edelta.space * rotation.Cosine() * 64);
+	space.y = int32(d->edelta.space * rotation.Sine() * 64);
+	nonspace.x = int32(d->edelta.nonspace * rotation.Cosine() * 64);
+	nonspace.y = int32(d->edelta.nonspace * rotation.Sine() * 64);
+		
 	// set the pen position in 26.6 cartesian space coordinates
-	pen.x=(int32)point.x * 64;
-	pen.y=(int32)point.y * 64;
+	FT_Vector pen;
+	pen.x = (int32)point.x * 64;
+	pen.y = (int32)point.y * 64;
 	
-	slot=face->glyph;
-
+	int32 strlength = strlen(string);
+	if(length < strlength)
+		strlength = length;
 	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
-		FT_Set_Transform(face,&smatrix,&pen);
-
+	FT_Vector delta;
+	FT_GlyphSlot slot = face->glyph;
+	FT_UInt glyph_index = 0, previous = 0;
+	for (int32 i = 0; i < strlength; i++) {
+		FT_Set_Transform(face, &smatrix, &pen);
+		
 		// Handle escapement padding option
-		if((uint8)string[i]<=0x20)
-		{
-			pen.x+=space.x;
-			pen.y+=space.y;
+		if((uint8)string[i] <= 0x20) {
+			pen.x += space.x;
+			pen.y += space.y;
+		} else {
+			pen.x += nonspace.x;
+			pen.y += nonspace.y;
 		}
-		else
-		{
-			pen.x+=nonspace.x;
-			pen.y+=nonspace.y;
-		}
-
-	
+		
 		// get kerning and move pen
-		if(use_kerning && previous && glyph_index)
-		{
-			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
-			pen.x+=delta.x;
-			pen.y+=delta.y;
+		if(use_kerning && previous && glyph_index) {
+			FT_Get_Kerning(face, previous, glyph_index, ft_kerning_default, &delta);
+			pen.x += delta.x;
+			pen.y += delta.y;
 		}
-
-		error=FT_Load_Char(face,string[i],
-			((antialias)?FT_LOAD_RENDER:FT_LOAD_RENDER | FT_LOAD_MONOCHROME) );
-
-		if(!error)
-		{
-			if(antialias)
-				BlitGray2RGB32(&slot->bitmap,
-					BPoint(slot->bitmap_left,point.y-(slot->bitmap_top-point.y)), d);
-			else
-				BlitMono2RGB32(&slot->bitmap,
-					BPoint(slot->bitmap_left,point.y-(slot->bitmap_top-point.y)), d);
-		}
-
+		
+		error = FT_Load_Char(face, string[i], (antialias ? FT_LOAD_RENDER : FT_LOAD_RENDER | FT_LOAD_MONOCHROME));
+		if (error)
+			continue;
+		
+		if (antialias)
+			BlitGray2RGB32(&slot->bitmap, BPoint(slot->bitmap_left, point.y - (slot->bitmap_top - point.y)), d);
+		else
+			BlitMono2RGB32(&slot->bitmap, BPoint(slot->bitmap_left, point.y - (slot->bitmap_top - point.y)), d);
+		
 		// increment pen position
-		pen.x+=slot->advance.x;
-		pen.y+=slot->advance.y;
-		previous=glyph_index;
+		pen.x += slot->advance.x;
+		pen.y += slot->advance.y;
+		previous = glyph_index;
 	}
 
 	// TODO: implement calculation of invalid rectangle in DisplayDriverImpl::DrawString properly
 	BRect r;
-	r.left=MIN(point.x,pen.x>>6);
-	r.right=MAX(point.x,pen.x>>6);
-	r.top=point.y-face->height;
-	r.bottom=point.y+face->height;
+	r.left = MIN(point.x, pen.x >> 6);
+	r.right = MAX(point.x, pen.x >> 6);
+	r.top = point.y - face->height;
+	r.bottom = point.y + face->height;
 	
 	fCursorHandler.DriverShow();
 	Invalidate(r);
 	
 	// Update the caller's pen position
-	d->penlocation.x=pen.x / 64;
-	d->penlocation.y=pen.y / 64;
+	d->penlocation.x = pen.x / 64;
+	d->penlocation.y = pen.y / 64;
 	
-	FT_Done_Face(face);
-
 	Unlock();
-
 }
 
 /*!
@@ -2111,66 +2092,53 @@ float DisplayDriverImpl::StringWidth(const char *string, int32 length, const Dra
 {
 	if(!string || !d)
 		return 0.0;
+	
 	Lock();
-
-	const ServerFont *font=&(d->font);
 	
-	FT_Face face;
-	FT_GlyphSlot slot;
-	FT_UInt glyph_index=0, previous=0;
-	FT_Vector pen,delta;
-	int16 error=0;
-	int32 strlength,i;
-	float returnval;
-
-	error=FT_New_Face(ftlib, font->GetPath(), 0, &face);
-	if(error)
-	{
+	const ServerFont *font = &(d->font);
+	
+	FT_Face face = font->GetFTFace();
+	if(!face) {
 		Unlock();
 		return 0.0;
 	}
-
-	slot=face->glyph;
-
-	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
 	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-	{
+	uint16 error = FT_Set_Char_Size(face, 0, int32(font->Size()) * 64, 72, 72);
+	if (error) {
 		Unlock();
 		return 0.0;
 	}
-
+	
+	bool use_kerning = font->HasKerning() && font->Spacing() == B_STRING_SPACING;
+	
 	// set the pen position in 26.6 cartesian space coordinates
-	pen.x=0;
+	FT_Vector pen, delta;
+	pen.x = 0;
 	
-	slot=face->glyph;
+	int32 strlength = strlen(string);
+	if (length < strlength)
+		strlength = length;
 	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
+	FT_GlyphSlot slot = face->glyph;
+	FT_UInt glyph_index = 0, previous = 0;
+	for (int32 i = 0; i < strlength; i++) {
 		// get kerning and move pen
-		if(use_kerning && previous && glyph_index)
-		{
-			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
-			pen.x+=delta.x;
+		if (use_kerning && previous && glyph_index) {
+			FT_Get_Kerning(face, previous, glyph_index, ft_kerning_default, &delta);
+			pen.x += delta.x;
 		}
-
-		error=FT_Load_Char(face,string[i],FT_LOAD_MONOCHROME);
-
+		
+		error = FT_Load_Char(face, string[i], FT_LOAD_MONOCHROME);
+		if (error)
+			continue;
+		
 		// increment pen position
-		pen.x+=slot->advance.x;
-		previous=glyph_index;
+		pen.x += slot->advance.x;
+		previous = glyph_index;
 	}
-
-	FT_Done_Face(face);
+	
 	Unlock();
-
-	returnval=pen.x>>6;
-	return returnval;
+	return pen.x >> 6;
 }
 
 /*!
@@ -2187,54 +2155,40 @@ float DisplayDriverImpl::StringWidth(const char *string, int32 length, const Dra
 */
 float DisplayDriverImpl::StringHeight(const char *string, int32 length, const DrawData *d)
 {
-	if(!string || !d)
+	if (!string || !d)
 		return 0.0;
+	
 	Lock();
-
-	const ServerFont *font=&(d->font);
-
-	FT_Face face;
-	FT_GlyphSlot slot;
-	int16 error=0;
-	int32 strlength,i;
-	float returnval=0.0,ascent=0.0,descent=0.0;
-
-	error=FT_New_Face(ftlib, font->GetPath(), 0, &face);
-	if(error)
-	{
+	
+	const ServerFont *font = &(d->font);
+	
+	FT_Face face = font->GetFTFace();
+	if (!face) {
 		Unlock();
 		return 0.0;
 	}
-
-	slot=face->glyph;
 	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-	{
-		Unlock();
-		return 0.0;
-	}
-
-	slot=face->glyph;
+	uint16 error = FT_Set_Char_Size(face, 0, int32(font->Size()) * 64, 72, 72);
 	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
-		FT_Load_Char(face,string[i],FT_LOAD_RENDER);
-		if(slot->metrics.horiBearingY<slot->metrics.height)
-			descent=MAX((slot->metrics.height-slot->metrics.horiBearingY)>>6,descent);
+	int32 strlength = strlen(string);
+	if (length < strlength)
+		strlength = length;
+	
+	FT_GlyphSlot slot = face->glyph;
+	float ascent = 0.0, descent = 0.0;
+	for (int32 i = 0; i < strlength; i++) {
+		error = FT_Load_Char(face, string[i], FT_LOAD_MONOCHROME);
+		if (error)
+			continue;
+		
+		if (slot->metrics.horiBearingY < slot->metrics.height)
+			descent = MAX((slot->metrics.height - slot->metrics.horiBearingY) >> 6, descent);
 		else
-			ascent=MAX(slot->bitmap.rows,ascent);
+			ascent = MAX(slot->bitmap.rows, ascent);
 	}
-
-	FT_Done_Face(face);
-
+	
 	Unlock();
-	returnval=ascent+descent;
-	return returnval;
+	return ascent + descent;
 }
 
 /*!
