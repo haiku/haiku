@@ -10,6 +10,8 @@
 #include <media/MediaNode.h>
 #include <support/Locker.h>
 
+struct audio_buffer_header;
+
 class LegacyAudioConsumer :
 	public virtual BMediaEventLooper,
 	public virtual BBufferConsumer
@@ -106,8 +108,8 @@ class LegacyAudioConsumer :
 
 		size_t				mBuffer_size;
 
-		volatile void		*io_buf1;
-		volatile void		*io_buf2;
+		volatile audio_buffer_header *io_buf1;
+		volatile audio_buffer_header *io_buf2;
 		volatile void		*io_buf;
 
 		int					fd; 			//file descriptor for hw driver

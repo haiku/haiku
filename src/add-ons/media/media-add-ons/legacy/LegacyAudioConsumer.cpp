@@ -51,17 +51,22 @@ LegacyAudioConsumer::LegacyAudioConsumer( BMediaAddOn *addon, const char *name, 
 
 	mBuffer_size = 4096;
 
-	io_buf1 = malloc( 2 * ( sizeof( audio_buffer_header ) + mBuffer_size ) );
+	io_buf1 = static_cast<audio_buffer_header *>(
+				malloc( 2 * ( sizeof( audio_buffer_header ) + mBuffer_size ))
+				);
 
 	if ( io_buf1 == NULL ) {
 		close( fd );
 		return;
 	}
 
-	io_buf2 = static_cast<char *>( io_buf1 ) + sizeof( audio_buffer_header ) + mBuffer_size;
+	io_buf2 = reinterpret_cast<audio_buffer_header *>(
+				reinterpret_cast<char *>(const_cast<audio_buffer_header *>( io_buf1 ))
+				+ sizeof( audio_buffer_header )
+				+ mBuffer_size);
 
-	static_cast<audio_buffer_header *>( io_buf1 )->reserved_1 = sizeof( audio_buffer_header ) + mBuffer_size;
-	static_cast<audio_buffer_header *>( io_buf2 )->reserved_1 = sizeof( audio_buffer_header ) + mBuffer_size;
+	io_buf1->reserved_1 = sizeof( audio_buffer_header ) + mBuffer_size;
+	io_buf2->reserved_1 = sizeof( audio_buffer_header ) + mBuffer_size;
 
 	mInitStatus = B_OK;
 	return;
@@ -84,7 +89,7 @@ LegacyAudioConsumer::~LegacyAudioConsumer()
 	}
 
 	if ( io_buf1 != NULL ) {
-		free( static_cast<void *>( io_buf1 ) );
+		free( static_cast<void *>(const_cast<audio_buffer_header *>(io_buf1)) );
 	}
 
 	if ( fd != 0 ) {
@@ -375,16 +380,16 @@ LegacyAudioConsumer::HandleSeek( bigtime_t performance_time )
 void
 LegacyAudioConsumer::HandleBuffer( BBuffer *buffer )
 {
-	void *buf;
+	audio_buffer_header *buf;
 
 	//wait for free buffer
 	acquire_sem( mBuffer_free );
 
 	//avoid buffer currently in use
-	buf = static_cast<void *>( ( io_buf == io_buf2 ) ? io_buf1 : io_buf2 );
+	buf = const_cast<audio_buffer_header *>( ( io_buf == io_buf2 ) ? io_buf1 : io_buf2 );
 
 	//prepare buffer
-	memcpy( static_cast<char *>( buf ) + sizeof( audio_buffer_header ), buffer->Data(), buffer->SizeUsed() );
+	memcpy( reinterpret_cast<char *>( buf ) + sizeof( audio_buffer_header ), buffer->Data(), buffer->SizeUsed() );
 
 	//tell the io thread a new buffer is ready
 	release_sem( mBuffer_avail );
