@@ -19,8 +19,12 @@ struct syslog_message {
 	thread_id	from;
 	time_t		when;
 	int32		options;
+	int16		priority;
 	char		ident[B_OS_NAME_LENGTH];
 	char		message[1];
 };
+
+#define SYSLOG_PRIORITY(options)	((options) & 0x7)
+#define SYSLOG_FACILITY(options)	((options) & 0x03f8)
 
 #endif	/* SYSLOG_DAEMON_H */
