@@ -15,6 +15,7 @@
 #include <smp.h> /* for spinlocks */
 #include <arch/cpu.h>
 #include <arch/int.h>
+#include <OS.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -252,8 +253,62 @@ static int pci_get_capability(uint8 bus, uint8 dev, uint8 func, uint8 cap,
 	return 0;
 }
 
-//static int pci_set_power_state
+/* pci_set_power_state
+ * This attempts to set the device into one of the 4 power management
+ * modes, where PCI_pm_state_d0 is "Full Power" and _d3 is the lowest.
+ * The delay's at the end come from code I've seen but they really need
+ * to be checked against the spec, which can be found at
+ * PCI PM 1.1, section 5.6.1 table 18
+ *
+ * There is a note on Linux to say that whilst we can jump straight to
+ * D0 we can't move to D3 unless we're already at D1, though the code they
+ * use to check this seems suspect. We may want to check against the spec.
+ *
+ * Returns
+ * EIO if the device doesn't support the power management state requested
+ * 
+ */
+static int pci_set_power_state(uint8 bus, uint8 dev, uint8 func, int state)
+{
+	uint8 pm_reg, cur_state;
+	uint16 cur_status;
 
+	if (pci_get_capability(bus, dev, func, PCI_cap_id_pm, &pm_reg) == 0)
+		return EIO;
+		
+	if (state > PCI_pm_state_d3)
+		state = PCI_pm_state_d3;
+	
+	cur_status = read_pci_config(bus, dev, func, pm_reg + PCI_pm_status, 1);
+	cur_state = cur_status & PCI_pm_mask;
+	
+	if (cur_state == state)
+		return 0;
+
+	if (state == PCI_pm_state_d1 || state == PCI_pm_state_d2) {
+		uint16 pmc;
+		pmc = read_pci_config(bus, dev, func, pm_reg + PCI_pm_ctrl, 2);
+		if (state == PCI_pm_state_d1 && !(pmc & PCI_pm_d1supp))
+			return EIO;
+		if (state == PCI_pm_state_d2 && !(pmc & PCI_pm_d2supp))
+			return EIO;
+	}
+
+	if (cur_state != PCI_pm_state_d3) {
+		cur_status &= ~PCI_pm_mask;
+		cur_status |= state;
+	}
+	
+	write_pci_config(bus, dev, func, pm_reg + PCI_pm_status, 2, cur_status);
+	
+	if (state == PCI_pm_state_d3 || cur_state == PCI_pm_state_d3) {
+		snooze(10 * 1000);
+	} else if (state == PCI_pm_state_d2 || cur_state == PCI_pm_state_d2)
+		snooze(200); 
+	
+	return 0;
+}
+		
 /* set_pci_mechanism()
  * Try to determine which configuration mechanism the PCI Host Bridge
  * wants to deal with.
@@ -499,8 +554,7 @@ static void scan_pci(void)
 
 				if (pci_get_capability(bus, dev, func, PCI_cap_id_agp, &offset))
 					dprintf("Device @ %d:%d:%d has AGP capability\n", bus, dev, func);
-				if (pci_get_capability(bus, dev, func, PCI_cap_id_pm, &offset))
-					dprintf("Device @ %d:%d:%d has Power Management capability\n", bus, dev, func);
+				pci_set_power_state(bus, dev, func, PCI_pm_state_d0);
 				
 				/* basic header */
 				pcii->bus = bus;
