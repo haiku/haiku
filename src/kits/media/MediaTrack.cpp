@@ -26,6 +26,7 @@
 #include <MediaTrack.h>
 #include <Roster.h>
 #include <string.h>
+#include <stdlib.h>
 #include "MediaExtractor.h"
 #include "PluginManager.h"
 #include "ReaderPlugin.h"
@@ -292,8 +293,8 @@ BMediaTrack::ReadFrames(void *out_buffer,
 	}
 	if (mh)
 		*mh = header;
-
-//	printf("BMediaTrack::ReadFrames: %Ld frames, start-time %Ld\n", *out_frameCount, header.start_time);
+		
+	printf("BMediaTrack::ReadFrames: stream %ld, start-time %5Ld.%06Ld, %Ld frames\n", fStream,  header.start_time / 1000000, header.start_time % 1000000, *out_frameCount);
 
 	return result;
 }
