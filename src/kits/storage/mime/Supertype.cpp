@@ -78,7 +78,7 @@ Supertype::AddSubtype(const char *sub)
 	if (!err) 
 		err = fSubtypes.insert(sub).second ? B_OK : B_NAME_IN_USE;
 	if (!err && fCachedMessage) {
-		char type[B_PATH_NAME_LENGTH+1];
+		char type[B_PATH_NAME_LENGTH];
 		sprintf(type, "%s/%s", fName.c_str(), sub);
 		err = fCachedMessage->AddString("types", type);
 	}
@@ -132,7 +132,7 @@ Supertype::FillMessageWithTypes(BMessage &msg) const
 	status_t err = B_OK;
 	std::set<std::string>::const_iterator i;
 	for (i = fSubtypes.begin(); i != fSubtypes.end() && !err; i++) {
-		char type[B_PATH_NAME_LENGTH+1];
+		char type[B_PATH_NAME_LENGTH];
 		sprintf(type, "%s/%s", fName.c_str(), (*i).c_str());
 		err = msg.AddString(kTypesField, type);
 	}

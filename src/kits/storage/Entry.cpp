@@ -377,15 +377,15 @@ BEntry::SetTo(const BDirectory *dir, const char *path, bool traverse)
 		if (dir->InitCheck() != B_OK)
 			fCStatus = B_BAD_VALUE;
 		// get the dir's path
-		char rootPath[B_PATH_NAME_LENGTH + 1];
+		char rootPath[B_PATH_NAME_LENGTH];
 		if (fCStatus == B_OK) {
 			fCStatus = BPrivate::Storage::dir_to_path(dir->get_fd(), rootPath,
-											   B_PATH_NAME_LENGTH + 1);
+											   B_PATH_NAME_LENGTH);
 		}
 		// Concatenate our two path strings together
 		if (fCStatus == B_OK && path) {
 			// The concatenated strings must fit into our buffer.
-			if (strlen(rootPath) + strlen(path) + 2 > B_PATH_NAME_LENGTH + 1)
+			if (strlen(rootPath) + strlen(path) + 2 > B_PATH_NAME_LENGTH)
 				fCStatus = B_NAME_TOO_LONG;
 			else {
 				strcat(rootPath, "/");
@@ -416,10 +416,10 @@ BEntry::SetTo(const entry_ref *ref, bool traverse)
 		return (fCStatus = B_BAD_VALUE);
 	}
 
-	char path[B_PATH_NAME_LENGTH + 1];
+	char path[B_PATH_NAME_LENGTH];
 
 	fCStatus = BPrivate::Storage::entry_ref_to_path(ref, path,
-											 B_PATH_NAME_LENGTH + 1);
+													B_PATH_NAME_LENGTH);
 	return (fCStatus == B_OK) ? SetTo(path, traverse) : fCStatus ;
 }
 
@@ -656,7 +656,7 @@ BEntry::GetParent(BDirectory *dir) const
 /*! \brief Gets the name of the entry's leaf.
 
 	\c buffer must be pre-allocated and of sufficient
-	length to hold the entire string. A length of \c B_FILE_NAME_LENGTH+1 is recommended.
+	length to hold the entire string. A length of \c B_FILE_NAME_LENGTH is recommended.
 
 	\param buffer pointer to a pre-allocated string into which the result is copied
 	\return
@@ -708,11 +708,11 @@ BEntry::Rename(const char *path, bool clobber)
 		
 	status_t status = B_OK;
 	// Convert the given path to an absolute path, if it isn't already.
-	char fullPath[B_PATH_NAME_LENGTH + 1];
+	char fullPath[B_PATH_NAME_LENGTH];
 	if (!BPrivate::Storage::is_absolute_path(path)) {
 		// Convert our directory to an absolute pathname
 		status = BPrivate::Storage::dir_to_path(fDirFd, fullPath,
-										 B_PATH_NAME_LENGTH + 1);
+												B_PATH_NAME_LENGTH);
 		if (status == B_OK) {
 			// Concatenate our pathname to it
 			strcat(fullPath, "/");
@@ -781,9 +781,9 @@ BEntry::MoveTo(BDirectory *dir, const char *path = NULL, bool clobber)
 	// Determine the absolute path of the target entry.
 	if (!BPrivate::Storage::is_absolute_path(path)) {
 		// Convert our directory to an absolute pathname
-		char fullPath[B_PATH_NAME_LENGTH + 1];
+		char fullPath[B_PATH_NAME_LENGTH];
 		status = BPrivate::Storage::dir_to_path(dir->get_fd(), fullPath,
-										 B_PATH_NAME_LENGTH + 1);
+												B_PATH_NAME_LENGTH);
 		// Concatenate our pathname to it
 		if (status == B_OK) {
 			strcat(fullPath, "/");
@@ -965,7 +965,7 @@ BEntry::set(BPrivate::Storage::FileDescriptor dirFd, const char *leaf, bool trav
 		// convert the dir FD into a BPath
 		entry_ref ref;
 		error = BPrivate::Storage::dir_to_self_entry_ref(dirFd, &ref);
-		char dirPathname[B_PATH_NAME_LENGTH + 1];
+		char dirPathname[B_PATH_NAME_LENGTH];
 		if (error == B_OK) {
 			error = BPrivate::Storage::entry_ref_to_path(&ref, dirPathname,
 												  sizeof(dirPathname));

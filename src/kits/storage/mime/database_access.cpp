@@ -51,7 +51,7 @@ namespace Mime {
 status_t
 get_app_hint(const char *type, entry_ref *ref)
 {
-	char path[B_MIME_TYPE_LENGTH+1];
+	char path[B_MIME_TYPE_LENGTH];
 	BEntry entry;
 	ssize_t err = ref ? B_OK : B_BAD_VALUE;
 	if (!err)
@@ -92,7 +92,7 @@ get_attr_info(const char *type, BMessage *info)
 // get_short_description
 //!	Fetches the short description for the given MIME type.
 /*!	The string pointed to by \c description must be long enough to
-	hold the short description; a length of \c B_MIME_TYPE_LENGTH+1 is
+	hold the short description; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
 	
 	\param type The MIME type of interest
@@ -116,7 +116,7 @@ get_short_description(const char *type, char *description)
 // get_long_description
 //!	Fetches the long description for the given MIME type.
 /*!	The string pointed to by \c description must be long enough to
-	hold the long description; a length of \c B_MIME_TYPE_LENGTH+1 is
+	hold the long description; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
 	
 	\param type The MIME type of interest
@@ -283,7 +283,7 @@ get_icon_for_type(const char *type, const char *fileType, BBitmap *icon,
 // get_preferred_app
 //!	Fetches signature of the MIME type's preferred application for the given action.
 /*!	The string pointed to by \c signature must be long enough to
-	hold the short description; a length of \c B_MIME_TYPE_LENGTH+1 is
+	hold the short description; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
 	
 	Currently, the only supported app verb is \c B_OPEN.

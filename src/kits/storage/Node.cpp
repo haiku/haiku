@@ -196,11 +196,11 @@ status_t
 BNode::SetTo(const entry_ref *ref)
 {
 	Unset();
-	char path[B_PATH_NAME_LENGTH + 1];
+	char path[B_PATH_NAME_LENGTH];
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		error = BPrivate::Storage::entry_ref_to_path(ref, path,
-											  B_PATH_NAME_LENGTH + 1);
+													 B_PATH_NAME_LENGTH);
 	}
 	if (error == B_OK)
 		error = SetTo(path);
@@ -475,7 +475,7 @@ status_t
 BNode::GetNextAttrName(char *buffer)
 {
 	// We're allowed to assume buffer is at least
-	// B_BUFFER_NAME_LENGTH chars long, but NULLs
+	// B_ATTR_NAME_LENGTH chars long, but NULLs
 	// are not acceptable.
 	if (buffer == NULL)
 		return B_BAD_VALUE;	// /new R5 crashed when passed NULL

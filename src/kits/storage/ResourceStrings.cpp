@@ -137,7 +137,7 @@ BResourceStrings::SetStringFile(const entry_ref *ref)
 		fileRef = *ref;
 		fFileRef = *ref;
 	} else {
-		char appPath[B_PATH_NAME_LENGTH + 1];
+		char appPath[B_PATH_NAME_LENGTH];
 		error = BPrivate::Storage::get_app_path(appPath);
 		if (error == B_OK)
 			error = get_ref_for_path(appPath, &fileRef);

@@ -146,11 +146,11 @@ status_t
 BDirectory::SetTo(const entry_ref *ref)
 {
 	Unset();	
-	char path[B_PATH_NAME_LENGTH + 1];
+	char path[B_PATH_NAME_LENGTH];
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		error = BPrivate::Storage::entry_ref_to_path(ref, path,
-											  B_PATH_NAME_LENGTH + 1);
+													 B_PATH_NAME_LENGTH);
 	}
 	if (error == B_OK)
 		error = SetTo(path);
@@ -488,16 +488,16 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 	// If the directory is initialized, get the canonical paths of the dir and
 	// the entry and check, if the latter is a prefix of the first one.
 	if (result && InitCheck() == B_OK) {
-		char dirPath[B_PATH_NAME_LENGTH + 1];
-		char entryPath[B_PATH_NAME_LENGTH + 1];
+		char dirPath[B_PATH_NAME_LENGTH];
+		char entryPath[B_PATH_NAME_LENGTH];
 		result = (BPrivate::Storage::dir_to_path(fDirFd, dirPath,
-										  B_PATH_NAME_LENGTH + 1) == B_OK);
+												 B_PATH_NAME_LENGTH) == B_OK);
 		entry_ref ref;
 		if (result)
 			result = (entry->GetRef(&ref) == B_OK);
 		if (result) {
 			result = (BPrivate::Storage::entry_ref_to_path(&ref, entryPath,
-													B_PATH_NAME_LENGTH + 1)
+														   B_PATH_NAME_LENGTH)
 					  == B_OK);
 		}
 		if (result)

@@ -125,7 +125,7 @@ BPath::SetTo(const entry_ref *ref)
 	Unset();
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		char path[B_PATH_NAME_LENGTH + 1];
+		char path[B_PATH_NAME_LENGTH];
 		error = BPrivate::Storage::entry_ref_to_path(ref, path, sizeof(path));
 		if (error == B_OK)
 			error = set_path(path);	// the path is already normalized
@@ -175,7 +175,7 @@ BPath::SetTo(const char *path, const char *leaf, bool normalize)
 	status_t error = (path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK && leaf && BPrivate::Storage::is_absolute_path(leaf))
 		error = B_BAD_VALUE;
-	char newPath[B_PATH_NAME_LENGTH + 1];
+	char newPath[B_PATH_NAME_LENGTH];
 	if (error == B_OK) {
 		// we always normalize relative paths
 		normalize |= !BPrivate::Storage::is_absolute_path(path);
@@ -212,7 +212,7 @@ BPath::SetTo(const char *path, const char *leaf, bool normalize)
 		// normalize the path, if necessary, otherwise just set it
 		if (error == B_OK) {
 			if (normalize) {
-				char normalizedPath[B_PATH_NAME_LENGTH + 1];
+				char normalizedPath[B_PATH_NAME_LENGTH];
 				error = BPrivate::Storage::get_canonical_path(newPath, normalizedPath,
 													   sizeof(normalizedPath));
 				if (error == B_OK)
@@ -351,7 +351,7 @@ BPath::GetParent(BPath *path) const
 		if (len == 1)	// handle "/"
 			error = B_ENTRY_NOT_FOUND;
 		else {
-			char parentPath[B_PATH_NAME_LENGTH + 1];
+			char parentPath[B_PATH_NAME_LENGTH];
 			len--;
 			while (fName[len] != '/' && len > 0)
 				len--;

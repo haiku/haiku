@@ -342,10 +342,10 @@ BPrivate::Storage::get_stat(FileDescriptor file, Stat *s)
 status_t
 BPrivate::Storage::get_stat(entry_ref &ref, Stat *result)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
+	char path[B_PATH_NAME_LENGTH];
 	status_t status;
 	
-	status = BPrivate::Storage::entry_ref_to_path(&ref, path, B_PATH_NAME_LENGTH + 1);
+	status = BPrivate::Storage::entry_ref_to_path(&ref, path, B_PATH_NAME_LENGTH);
 	return (status != B_OK) ? status : BPrivate::Storage::get_stat(path, result);
 }		
 
@@ -1045,11 +1045,11 @@ BPrivate::Storage::get_canonical_path(const char *path, char *&result)
 {
 	status_t error = (path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		result = new(nothrow) char[B_PATH_NAME_LENGTH + 1];
+		result = new(nothrow) char[B_PATH_NAME_LENGTH];
 		if (!result)
 			error = B_NO_MEMORY;
 		if (error == B_OK) {
-			error = get_canonical_path(path, result, B_PATH_NAME_LENGTH + 1);
+			error = get_canonical_path(path, result, B_PATH_NAME_LENGTH);
 			if (error != B_OK) {
 				delete[] result;
 				result = NULL;
@@ -1090,12 +1090,11 @@ BPrivate::Storage::get_canonical_dir_path(const char *path, char *&result)
 {
 	status_t error = (path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		result = new(nothrow) char[B_PATH_NAME_LENGTH + 1];
+		result = new(nothrow) char[B_PATH_NAME_LENGTH];
 		if (!result)
 			error = B_NO_MEMORY;
 		if (error == B_OK) {
-			error = get_canonical_dir_path(path, result,
-										   B_PATH_NAME_LENGTH + 1);
+			error = get_canonical_dir_path(path, result, B_PATH_NAME_LENGTH);
 			if (error != B_OK) {
 				delete[] result;
 				result = NULL;

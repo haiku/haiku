@@ -162,7 +162,7 @@ InstalledTypes::AddType(const char *type)
 				err = AddSupertype(type, i);
 			} else {
 				// Copy the supertype
-				char super[B_PATH_NAME_LENGTH+1];
+				char super[B_PATH_NAME_LENGTH];
 				strncpy(super, type, i);
 				super[i] = 0;
 				
@@ -205,7 +205,7 @@ InstalledTypes::RemoveType(const char *type)
 				err = RemoveSupertype(type);
 			} else {
 				// Copy the supertype
-				char super[B_PATH_NAME_LENGTH+1];
+				char super[B_PATH_NAME_LENGTH];
 				strncpy(super, type, i);
 				super[i] = 0;
 				
@@ -287,7 +287,7 @@ InstalledTypes::AddSubtype(Supertype &super, const char *sub)
 	if (!err) 
 		err = super.AddSubtype(sub);
 	if (!err && fCachedMessage) {
-		char type[B_PATH_NAME_LENGTH+1];
+		char type[B_PATH_NAME_LENGTH];
 		sprintf(type, "%s/%s", super.GetName(), sub);
 		err = fCachedMessage->AddString("types", type);
 	}
@@ -383,7 +383,7 @@ InstalledTypes::BuildInstalledTypesList()
 				break;
 			} else {
 				// Check that this entry is both a directory and a valid MIME string
-				char supertype[B_PATH_NAME_LENGTH+1];	
+				char supertype[B_PATH_NAME_LENGTH];	
 				if (entry.IsDirectory()
 				      && entry.GetName(supertype) == B_OK
 				         && BMimeType::IsValid(supertype))
@@ -413,7 +413,7 @@ InstalledTypes::BuildInstalledTypesList()
 								break;
 							} else {																	
 								// Get the subtype's name
-								char subtype[B_PATH_NAME_LENGTH+1];
+								char subtype[B_PATH_NAME_LENGTH];
 								if (subEntry.GetName(subtype) == B_OK) {
 									BPrivate::Storage::to_lower(subtype);
 								

@@ -205,7 +205,7 @@ BSymLink::ReadLink(char *buf, size_t size)
 	entry_ref ref;
 	if (error == B_OK)
 		error = fSecretEntry->GetRef(&ref);
-	char path[B_PATH_NAME_LENGTH + 1];
+	char path[B_PATH_NAME_LENGTH];
 	if (error == B_OK)
 		error = BPrivate::Storage::entry_ref_to_path(&ref, path, sizeof(path));
 	if (error == B_OK)
@@ -259,7 +259,7 @@ ssize_t
 BSymLink::MakeLinkedPath(const BDirectory *dir, BPath *path)
 {
 	ssize_t result = (dir && path ? 0 : B_BAD_VALUE);
-	char contents[B_PATH_NAME_LENGTH + 1];
+	char contents[B_PATH_NAME_LENGTH];
 	if (result == 0)
 		result = ReadLink(contents, sizeof(contents));
 	if (result >= 0) {
@@ -283,7 +283,7 @@ BSymLink::MakeLinkedPath(const BDirectory *dir, BPath *path)
 bool
 BSymLink::IsAbsolute()
 {
-	char contents[B_PATH_NAME_LENGTH + 1];
+	char contents[B_PATH_NAME_LENGTH];
 	bool result = (ReadLink(contents, sizeof(contents)) >= 0);
 	if (result)
 		result = BPrivate::Storage::is_absolute_path(contents);

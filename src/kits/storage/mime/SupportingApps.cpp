@@ -284,7 +284,7 @@ SupportingApps::BuildSupportingAppsTable()
 			} else {
 				BPath path;
 				BMessage msg;
-				char appSig[B_PATH_NAME_LENGTH+1];
+				char appSig[B_PATH_NAME_LENGTH];
 				err = path.SetTo(&ref);
 				if (!err) {
 					// Construct a mime type string

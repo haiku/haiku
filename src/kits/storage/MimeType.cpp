@@ -222,7 +222,7 @@ BMimeType::GetSupertype(BMimeType *superType) const
 		if (i == len)
 			err = B_BAD_VALUE;		// IsSupertypeOnly() == true
 		else {
-			char superMime[B_MIME_TYPE_LENGTH+1];
+			char superMime[B_MIME_TYPE_LENGTH];
 			strncpy(superMime, fType, i);
 			superMime[i] = 0;
 			err = superType->SetTo(superMime);
@@ -241,8 +241,8 @@ BMimeType::GetSupertype(BMimeType *superType) const
 bool
 BMimeType::operator==(const BMimeType &type) const
 {
-	char lower1[B_MIME_TYPE_LENGTH+1];
-	char lower2[B_MIME_TYPE_LENGTH+1];
+	char lower1[B_MIME_TYPE_LENGTH];
+	char lower2[B_MIME_TYPE_LENGTH];
 	
 	if (InitCheck() == B_OK && type.InitCheck() == B_OK) {
 		status_t err = toLower(Type(), lower1);
@@ -399,7 +399,7 @@ BMimeType::GetIcon(BBitmap *icon, icon_size size) const
 	that's associated with the file's type.
 	
 	The string pointed to by \c signature must be long enough to
-	hold the preferred applications signature; a length of \c B_MIME_TYPE_LENGTH+1 is
+	hold the preferred applications signature; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
 	
 	\param signature Pointer to a pre-allocated string into which the signature of the preferred app is copied. If
@@ -519,7 +519,7 @@ BMimeType::GetFileExtensions(BMessage *extensions) const
 // GetShortDescription
 //! Fetches the MIME type's short description from the MIME database
 /*! The string pointed to by \c description must be long enough to
-	hold the short description; a length of \c B_MIME_TYPE_LENGTH+1 is
+	hold the short description; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
 	
 	\param description Pointer to a pre-allocated string into which the long description is copied. If
@@ -541,7 +541,7 @@ BMimeType::GetShortDescription(char *description) const
 // GetLongDescription
 //! Fetches the MIME type's long description from the MIME database
 /*! The string pointed to by \c description must be long enough to
-	hold the long description; a length of \c B_MIME_TYPE_LENGTH+1 is
+	hold the long description; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
 
 	\param description Pointer to a pre-allocated string into which the long description is copied. If
@@ -672,7 +672,7 @@ BMimeType::SetIcon(const BBitmap *icon, icon_size which)
 	that's associated with the file's type.
 	
 	The string pointed to by \c signature must be of
-	length less than or equal to \c B_MIME_TYPE_LENGTH characters.
+	length less than \c B_MIME_TYPE_LENGTH characters.
 	
 	\note If the MIME type is not installed, it will first be installed, and then
 	the preferred app will be set.
@@ -849,7 +849,7 @@ BMimeType::SetFileExtensions(const BMessage *extensions)
 // SetShortDescription
 //! Sets the short description field for the MIME type
 /*! The string pointed to by \c description must be of
-	length less than or equal to \c B_MIME_TYPE_LENGTH characters.
+	length less than \c B_MIME_TYPE_LENGTH characters.
 	
 	\note If the MIME type is not installed, it will first be installed, and then
 	the short description will be set.
@@ -891,7 +891,7 @@ BMimeType::SetShortDescription(const char *description)
 // SetLongDescription
 //! Sets the long description field for the MIME type
 /*! The string pointed to by \c description must be of
-	length less than or equal to \c B_MIME_TYPE_LENGTH characters.
+	length less than \c B_MIME_TYPE_LENGTH characters.
 	
 	\note If the MIME type is not installed, it will first be installed, and then
 	the long description will be set.
@@ -1064,7 +1064,7 @@ BMimeType::IsValid(const char *string)
 		
 	bool foundSlash = false;		
 	int len = strlen(string);
-	if (len > B_MIME_TYPE_LENGTH || len == 0)
+	if (len >= B_MIME_TYPE_LENGTH || len == 0)
 		return false;
 		
 	for (int i = 0; i < len; i++) {

@@ -251,14 +251,6 @@ parse_first_path_component(const char *path, char *&component,
 	- \c B_BAD_VALUE, if \a entry is \c NULL or contains a "/",
 	- \c B_NAME_TOO_LONG, if \a entry is too long
 	\note \c "" is considered a valid entry name.
-	\note According to a couple of tests the deal is the following:
-		  The length of an entry name must not exceed \c B_FILE_NAME_LENGTH
-		  including the terminating null character, whereas the null character
-		  is not included in the \c B_PATH_NAME_LENGTH characters for a path
-		  name.
-		  Therefore the sufficient buffer sizes for entry/path names are
-		  \c B_FILE_NAME_LENGTH and \c B_PATH_NAME_LENGTH + 1 respectively.
-		  However, I recommend to use "+ 1" in both cases.
 */
 status_t
 check_entry_name(const char *entry)
@@ -278,7 +270,7 @@ check_entry_name(const char *entry)
 }
 
 /*!	An path name is considered valid, if its length doesn't exceed
-	\c B_PATH_NAME_LENGTH (NOT including the terminating null) and each of
+	\c B_PATH_NAME_LENGTH (including the terminating null) and each of
 	its components is a valid entry name.
 	\param entry the entry name
 	\return
@@ -286,14 +278,6 @@ check_entry_name(const char *entry)
 	- \c B_BAD_VALUE, if \a path is \c NULL,
 	- \c B_NAME_TOO_LONG, if \a path, or any of its components is too long
 	\note \c "" is considered a valid path name.
-	\note According to a couple of tests the deal is the following:
-		  The length of an entry name must not exceed \c B_FILE_NAME_LENGTH
-		  including the terminating null character, whereas the null character
-		  is not included in the \c B_PATH_NAME_LENGTH characters for a path
-		  name.
-		  Therefore the sufficient buffer sizes for entry/path names are
-		  \c B_FILE_NAME_LENGTH and \c B_PATH_NAME_LENGTH + 1 respectively.
-		  However, I recommend to use "+ 1" in both cases.
 */
 status_t
 check_path_name(const char *path)
@@ -311,7 +295,7 @@ check_path_name(const char *path)
 		}
 	} while (error == B_OK && nextComponent != 0);
 	// check the length of the path
-	if (error == B_OK && strlen(path) > B_PATH_NAME_LENGTH)
+	if (error == B_OK && strlen(path) >= B_PATH_NAME_LENGTH)
 		error = B_NAME_TOO_LONG;
 	return error;
 }
@@ -333,7 +317,7 @@ to_lower(const char *str, std::string &result)
 {
 	if (str) {
 		result = "";
-		for (int i = 0; i < strlen(str); i++)
+		for (int i = 0; i < (int)strlen(str); i++)
 			result += tolower(str[i]);
 	} else
 		result = "(null)";
@@ -347,7 +331,7 @@ to_lower(const char *str, char *result)
 {
 	if (str && result) {
 		int i;
-		for (i = 0; i < strlen(str); i++)
+		for (i = 0; i < (int)strlen(str); i++)
 			result[i] = tolower(str[i]);
 		result[i] = 0;
 	}	
@@ -362,6 +346,4 @@ to_lower(char *str)
 
 };	// namespace Storage
 };	// namespace BPrivate
-
-
 
