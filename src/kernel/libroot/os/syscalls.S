@@ -64,6 +64,14 @@ SYSCALL4(sys_acquire_sem_etc, 21)
 SYSCALL1(sys_release_sem, 22)
 SYSCALL3(sys_release_sem_etc, 23)
 
+/* VFS attribute calls */
+SYSCALL2(sys_open_attr_dir, 97)
+SYSCALL4(sys_create_attr, 98)
+SYSCALL3(sys_open_attr, 99)
+SYSCALL3(sys_write_attr_stat, 100)
+SYSCALL2(sys_remove_attr, 101)
+SYSCALL4(sys_rename_attr, 102)
+
 /* Thread calls */
 SYSCALL0(sys_get_current_thread_id, 24)
 SYSCALL4(sys_spawn_thread, 35)

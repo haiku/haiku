@@ -3,6 +3,7 @@ SubDir OBOS_TOP src kernel libroot os ;
 KernelObjects
 	<$(SOURCE_GRIST)>area.c
 	<$(SOURCE_GRIST)>debug.c
+	<$(SOURCE_GRIST)>fs_attr.c
 	<$(SOURCE_GRIST)>port.c
 	<$(SOURCE_GRIST)>sem.c
 	<$(SOURCE_GRIST)>systeminfo.c
