@@ -19,6 +19,14 @@
 // sService -- the singleton instance
 MessagingService *MessagingService::sService = NULL;
 
+/*!	\class MessagingArea
+	\brief Represents an area of the messaging service shared between kernel
+		   and registrar.
+
+	The main purpose of the class is to retrieve (and remove) commands from
+	the area.
+*/
+
 // constructor
 MessagingArea::MessagingArea()
 {
@@ -187,6 +195,37 @@ class MessagingService::DefaultSendCommandHandler
 struct MessagingService::CommandHandlerMap
 	: map<uint32, MessagingCommandHandler*> {
 };
+
+
+/*! \class MessagingService
+	\brief Userland implementation of the kernel -> userland messaging service.
+
+	This service provides a way for the kernel to send BMessages (usually
+	notification (e.g. node monitoring) messages) to userland applications.
+
+	The kernel could write the messages directly to the respective target ports,
+	but this has the disadvantage, that a message needs to be dropped, if the
+	port is full at the moment of sending. By transferring the message to the
+	registrar, it is possible to use the MessageDeliverer which retries sending
+	messages on full ports.
+
+	The message transfer is implemented via areas shared between kernel
+	and registrar. By default one area is used as a ring buffer. The kernel
+	adds messages to it, the registrar removes them. If the area is full, the
+	kernel creates a new one and adds it to the area list.
+
+	While the service is called `messaging service' and we were speaking of
+	`messages' being passed through the areas, the service is actually more
+	general. In fact `commands' are passed through the areas. Currently the
+	only implemented command type is to send a message, but it is very easy
+	to add further command types (e.g. one for alerting the user in case of
+	errors).
+
+	The MessagingService maintains a mapping of command types to command
+	handlers (MessagingCommandHandler, which perform the actual processing
+	of the commands), that can be altered via
+	MessagingService::SetCommandHandler().
+*/
 
 // constructor
 MessagingService::MessagingService()

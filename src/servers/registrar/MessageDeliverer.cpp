@@ -32,6 +32,11 @@ static const int32		kMaxMessagesPerPort	= 10000;
 static const int32		kMaxDataPerPort		= 50 * 1024 * 1024;	// 50 MB
 
 // Message
+/*!	\brief Encapsulates a message to be delivered.
+
+	Besides the flattened message it also stores the when the message was
+	created and when the delivery attempts shall time out.
+*/
 class MessageDeliverer::Message : public Referenceable {
 public:
 	Message(void *data, int32 dataSize, bigtime_t timeout)
@@ -98,6 +103,16 @@ private:
 };
 
 // TargetMessage
+/*!	\brief Encapsulates a Message to be sent to a specific handler.
+
+	A TargetMessage is always associated with (i.e. queued in) a TargetPort.
+	While a Message stores only the message data and some timing info, this
+	object adds the token of a the target BHandler.
+
+	A Message can be referred to by more than one TargetMessage (when
+	broadcasting), but a TargetMessage is referred to exactly once, by
+	the TargetPort.
+*/
 class MessageDeliverer::TargetMessage
 	: public DoublyLinkedListLinkImpl<MessageDeliverer::TargetMessage> {
 public:
@@ -131,6 +146,14 @@ private:
 };
 
 // TargetMessageHandle
+/*!	\brief A small wrapper for TargetMessage providing a complete order.
+
+	This class only exists to provide the comparison operators required to
+	put a TargetMessage into a set. The order implemented is by ascending by
+	timeout time (primary) and by TargetMessage pointer (secondary).
+	Hence TargetMessageHandles referring to the same TargetMessage are equal
+	(and only those).
+*/
 class MessageDeliverer::TargetMessageHandle {
 public:
 	TargetMessageHandle(TargetMessage *message)
@@ -180,6 +203,14 @@ private:
 };
 
 // TargetPort
+/*!	\brief Represents a full target port, queuing the not yet delivered
+		   messages.
+
+	A TargetPort internally queues TargetMessages in the order the are to be
+	delivered. Furthermore the object maintains an ordered set of
+	TargetMessages that can timeout (in ascending order of timeout time), so
+	that timed out messages can be dropped easily.
+*/
 class MessageDeliverer::TargetPort {
 public:
 	TargetPort(port_id portID)
@@ -309,6 +340,20 @@ struct MessageDeliverer::TargetPortMap : public map<port_id, TargetPort*> {
 
 // #pragma mark -
 
+/*!	\class MessageDeliverer
+	\brief Service for delivering messages, which retries the delivery as long
+		   as the target port is full.
+
+	For the user of the service only the MessageDeliverer::DeliverMessage()
+	will be of interest. Some of them allow broadcasting a message to several
+	recepients.
+
+	The class maintains a TargetPort for each target port which was full at the
+	time a message was to be delivered to it. A TargetPort has a queue of
+	undelivered messages. A separate worker thread retries periodically to send
+	the yet undelivered messages to the respective target ports.
+*/
+
 // constructor
 MessageDeliverer::MessageDeliverer()
 	: fLock("message deliverer"),
@@ -393,6 +438,21 @@ MessageDeliverer::Default()
 }
 
 // DeliverMessage
+/*!	\brief Delivers a message to the supplied target.
+
+	The method tries to send the message right now (if there are not already
+	messages pending for the target port). If that fails due to a full target
+	port, the message is queued for later delivery.
+
+	\param message The message to be delivered.
+	\param target A BMessenger identifying the delivery target.
+	\param timeout If given, the message will be dropped, when it couldn't be
+		   delivered after this amount of microseconds.
+	\return
+	- \c B_OK, if sending the message succeeded or if the target port was
+	  full and the message has been queued,
+	- another error code otherwise.		
+*/
 status_t
 MessageDeliverer::DeliverMessage(BMessage *message, BMessenger target,
 	bigtime_t timeout)
@@ -405,6 +465,22 @@ MessageDeliverer::DeliverMessage(BMessage *message, BMessenger target,
 }
 
 // DeliverMessage
+/*!	\brief Delivers a message to the supplied target.
+
+	The method tries to send the message right now (if there are not already
+	messages pending for the target port). If that fails due to a full target
+	port, the message is queued for later delivery.
+
+	\param message The message to be delivered.
+	\param port The port the message shall be sent to.
+	\param token The token identifying the target BHandler.
+	\param timeout If given, the message will be dropped, when it couldn't be
+		   delivered after this amount of microseconds.
+	\return
+	- \c B_OK, if sending the message succeeded or if the target port was
+	  full and the message has been queued,
+	- another error code otherwise.		
+*/
 status_t
 MessageDeliverer::DeliverMessage(BMessage *message, port_id port, int32 token,
 	bigtime_t timeout)
@@ -429,6 +505,23 @@ MessageDeliverer::DeliverMessage(BMessage *message, port_id port, int32 token,
 }
 
 // DeliverMessage
+/*!	\brief Delivers a flattened message to the supplied target.
+
+	The method tries to send the message right now (if there are not already
+	messages pending for the target port). If that fails due to a full target
+	port, the message is queued for later delivery.
+
+	\param message The flattened message to be delivered. This may be a
+		   flattened BMessage or KMessage.
+	\param messageSize The size of the flattened message buffer.
+	\param target A BMessenger identifying the delivery target.
+	\param timeout If given, the message will be dropped, when it couldn't be
+		   delivered after this amount of microseconds.
+	\return
+	- \c B_OK, if sending the message succeeded or if the target port was
+	  full and the message has been queued,
+	- another error code otherwise.		
+*/
 status_t
 MessageDeliverer::DeliverMessage(const void *message, int32 messageSize,
 	BMessenger target, bigtime_t timeout)
@@ -441,6 +534,24 @@ MessageDeliverer::DeliverMessage(const void *message, int32 messageSize,
 }
 
 // DeliverMessage
+/*!	\brief Delivers a flattened message to the supplied target.
+
+	The method tries to send the message right now (if there are not already
+	messages pending for the target port). If that fails due to a full target
+	port, the message is queued for later delivery.
+
+	\param message The flattened message to be delivered. This may be a
+		   flattened BMessage or KMessage.
+	\param messageSize The size of the flattened message buffer.
+	\param port The port the message shall be sent to.
+	\param token The token identifying the target BHandler.
+	\param timeout If given, the message will be dropped, when it couldn't be
+		   delivered after this amount of microseconds.
+	\return
+	- \c B_OK, if sending the message succeeded or if the target port was
+	  full and the message has been queued,
+	- another error code otherwise.		
+*/
 status_t
 MessageDeliverer::DeliverMessage(const void *message, int32 messageSize,
 	port_id port, int32 token, bigtime_t timeout)
@@ -452,6 +563,22 @@ MessageDeliverer::DeliverMessage(const void *message, int32 messageSize,
 }
 
 // DeliverMessage
+/*!	\brief Delivers a message to the supplied targets.
+
+	The method tries to send the message right now to each of the given targets
+	(if there are not already messages pending for a target port). If that
+	fails due to a full target port, the message is queued for later delivery.
+
+	\param message The message to be delivered.
+	\param targets An array of BMessengers identifying the delivery targets.
+	\param targetCount The number of delivery targets.
+	\param timeout If given, the message will be dropped, when it couldn't be
+		   delivered after this amount of microseconds.
+	\return
+	- \c B_OK, if for each of the given targets sending the message succeeded
+	  or if the target port was full and the message has been queued,
+	- another error code otherwise.		
+*/
 status_t
 MessageDeliverer::DeliverMessage(BMessage *message, const BMessenger *targets,
 	int32 targetCount, bigtime_t timeout)
@@ -492,6 +619,25 @@ MessageDeliverer::DeliverMessage(BMessage *message, const BMessenger *targets,
 }
 
 // DeliverMessage
+/*!	\brief Delivers a flattened message to the supplied targets.
+
+	The method tries to send the message right now to each of the given targets
+	(if there are not already messages pending for a target port). If that
+	fails due to a full target port, the message is queued for later delivery.
+
+	\param message The flattened message to be delivered. This may be a
+		   flattened BMessage or KMessage.
+	\param messageSize The size of the flattened message buffer.
+	\param targets An array of messaging_targets identifying the delivery
+		   targets.
+	\param targetCount The number of delivery targets.
+	\param timeout If given, the message will be dropped, when it couldn't be
+		   delivered after this amount of microseconds.
+	\return
+	- \c B_OK, if for each of the given targets sending the message succeeded
+	  or if the target port was full and the message has been queued,
+	- another error code otherwise.		
+*/
 status_t
 MessageDeliverer::DeliverMessage(const void *messageData, int32 messageSize,
 	const messaging_target *targets, int32 targetCount, bigtime_t timeout)
