@@ -100,6 +100,8 @@ class BIOSDrive : public Node {
 
 		virtual off_t Size() const;
 
+		uint32 BlockSize() const { return fBlockSize; }
+
 	protected:
 		uint8	fDriveID;
 		bool	fLBA;
@@ -316,18 +318,21 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 
 
 status_t
-platform_get_boot_partition(struct stage2_args *args, NodeList *list,
-	boot::Partition **_partition)
+platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
+	NodeList *list, boot::Partition **_partition)
 {
-	printf("boot partition offset: %lu\n", gBootPartitionOffset);
+	BIOSDrive *drive = static_cast<BIOSDrive *>(bootDevice);
+	off_t offset = (off_t)gBootPartitionOffset * drive->BlockSize();
+
+	printf("boot partition offset: %Ld\n", offset);
 
 	NodeIterator iterator = list->Iterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
 		// search for the partition that contains the partition
 		// offset as reported by the BFS boot block
-		if (gBootPartitionOffset >= partition->offset
-			&& gBootPartitionOffset < partition->offset + partition->size) {
+		if (offset >= partition->offset
+			&& offset < partition->offset + partition->size) {
 			*_partition = partition;
 			return B_OK;
 		}
