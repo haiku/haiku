@@ -146,12 +146,10 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 			const bool color = getJobData()->getColor() == JobData::kColor;
 			const int num_planes = color ? 3 : 1;
-			const int fill_bits = in_size * 8 - width;
-			const uchar fill_mask = 0xff >> (8 - fill_bits);
-			// ASSERT(0 <= fill_bits && fill_bits < 8);
 			
 			if (color) {
 				fHalftone->setPlanes(Halftone::kPlaneRGB1);
+				fHalftone->setBlackValue(Halftone::kLowValueMeansBlack);
 			}
 			
 			for (int i = rc.top; i <= rc.bottom; i++) {
@@ -159,13 +157,7 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 				for (int plane = 0; plane < num_planes; plane ++) {
 										
 					fHalftone->dither(in_buffer, ptr, x, y, width);
-					
-					if (color) {
-						// in color mode a value of 1 in all three planes means white
-						// fill the remaining bits to the bytes boundary with 1s
-						in_buffer[in_size - 1] |= fill_mask;
-					}
-		
+							
 					compressed_size = pack_bits(out_buffer, in_buffer, in_size);
 					
 					if (compressed_size + bytesToEnterCompressionMethod(2) < in_size + bytesToEnterCompressionMethod(0)) {

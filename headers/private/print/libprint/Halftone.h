@@ -51,16 +51,21 @@ public:
 		kPlaneMonochrome1, // 1 bit depth (0 white, 1 black)
 		kPlaneRGB1,        // 3 planes, 1 bit depth (0 black, 7 white)
 	};
+	enum BlackValue {
+		kHighValueMeansBlack,
+		kLowValueMeansBlack,
+	};
 	Halftone(color_space cs, double gamma = 1.4, DitherType dither_type = kTypeFloydSteinberg);
 	~Halftone();
 	void setPlanes(Planes planes);
+	void setBlackValue(BlackValue blackValue);
 	int dither(uchar *dst, const uchar *src, int x, int y, int width);
 	int getPixelDepth() const;
-	const rgb_color *getPalette() const;
 	const uchar *getPattern() const;
 	void setPattern(const uchar *pattern);
 
 protected:
+	// PFN_gray: return value of 0 means low density (or black) and value of 255 means high density (or white)
 	PFN_gray getGrayFunction() const;
 	void setGrayFunction(PFN_gray gray);
 	void setGrayFunction(GrayFunction grayFunction);
@@ -68,6 +73,7 @@ protected:
 	void createGammaTable(double gamma);
 	void initElements(int x, int y, uchar *elements);
 	uint getDensity(ColorRGB32 c) const;
+	uchar convertUsingBlackValue(uchar byte) const;
 	int ditherRGB32(uchar *dst, const uchar *src, int x, int y, int width);
 
 	void initFloydSteinberg();
@@ -88,6 +94,7 @@ private:
 	PFN_gray        fGray;
 	int             fPixelDepth;
 	Planes          fPlanes;
+	BlackValue      fBlackValue;
 	const uchar     *fPattern;
 	uint            fGammaTable[kGammaTableSize];
 	int             fNumberOfPlanes;
@@ -126,6 +133,16 @@ inline void Halftone::setGrayFunction(PFN_gray gray)
 inline uint Halftone::getDensity(ColorRGB32 c) const
 {
 	return fGammaTable[fGray(c)];
+}
+
+inline uchar Halftone::convertUsingBlackValue(uchar byte) const
+{
+	// bits with value = '1' in byte mean black
+	if (fBlackValue == kHighValueMeansBlack) {
+		return byte;
+	} else {
+		return ~byte;
+	}
 }
 
 #endif	/* __HALFTONE_H */

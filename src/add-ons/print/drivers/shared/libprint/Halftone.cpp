@@ -22,9 +22,9 @@ using namespace std;
 static uint gray(ColorRGB32 c)
 {
 	if (c.little.red == c.little.green && c.little.red == c.little.blue) {
-		return 255 - c.little.red;
+		return c.little.red;
 	} else {
-		return 255 - (c.little.red * 3 + c.little.green * 6 + c.little.blue) / 10;
+		return (c.little.red * 3 + c.little.green * 6 + c.little.blue) / 10;
 	}
 }
 
@@ -48,6 +48,7 @@ Halftone::Halftone(color_space cs, double gamma, DitherType dither_type)
 	fPixelDepth = color_space2pixel_depth(cs);
 	fGray       = gray;
 	setPlanes(kPlaneMonochrome1);
+	setBlackValue(kHighValueMeansBlack);
 	
 	initFloydSteinberg();
 	
@@ -97,6 +98,11 @@ void Halftone::setPlanes(Planes planes)
 		fNumberOfPlanes = 3;
 	}
 	fCurrentPlane = 0;
+}
+
+void Halftone::setBlackValue(BlackValue blackValue)
+{
+	fBlackValue = blackValue;
 }
 
 void Halftone::createGammaTable(double gamma)
@@ -196,7 +202,7 @@ int Halftone::ditherRGB32(
 		remainder = 8;
 
 	ColorRGB32 c;
-	uchar cur;
+	uchar cur; // cleared bit means white, set bit means black
 	uint  density;
 	int i, j;
 	uchar *e = elements;
@@ -217,11 +223,11 @@ int Halftone::ditherRGB32(
 					density = getDensity(c);
 				}
 				src++;
-				if (density > *e++) {
+				if (density <= *e++) {
 					cur |= (0x80 >> j);
 				}
 			}
-			*dst++ = cur;
+			*dst++ = convertUsingBlackValue(cur);
 		}
 	}
 	if (remainder > 0) {
@@ -235,11 +241,11 @@ int Halftone::ditherRGB32(
 				density = getDensity(c);
 			}
 			src++;
-			if (density > *e++) {
+			if (density <= *e++) {
 				cur |= (0x80 >> j);
 			}
 		}
-		*dst++ = cur;
+		*dst++ = convertUsingBlackValue(cur);
 	}
 
 	return widthByte;
@@ -291,22 +297,16 @@ int Halftone::ditherFloydSteinberg(uchar *dst, const uchar* a_src, int x, int y,
 	int* error_table = &fErrorTables[fCurrentPlane][1];
 	int current_error = 0, error;
 	const ColorRGB32 *src = (const ColorRGB32 *)a_src;
+	uchar cur = 0; // cleared bit means white, set bit means black
 	for (int x = 0; x < width; x ++, src ++) {
-		const int bit = 7 - x % 8;
-		if (bit == 7) {
-			// clear byte if at first pixel in byte
-			*dst = 0;
-		}
-		
-		int density = getDensity(*src) + current_error / 16;
+		const int bit = 7 - x % 8;		
+		const int density = getDensity(*src) + current_error / 16;
 		
 		if (density < 128) {
-			// white pixel
 			error = density;
+			cur |= (1 << bit);
 		} else {
-			// black pixel
 			error = density - 255;
-			*dst |= (1 << bit);
 		}
 		
 		// distribute error
@@ -321,9 +321,16 @@ int Halftone::ditherFloydSteinberg(uchar *dst, const uchar* a_src, int x, int y,
 		*left += 3 * error;
 		
 		if (bit == 0) {
+			*dst = convertUsingBlackValue(cur);
 			// advance to next byte
 			dst ++;
+			cur = 0;
 		}
+	}
+	
+	const bool hasRest = (width % 8) != 0;
+	if (hasRest) {
+		*dst = convertUsingBlackValue(cur);
 	}
 }
 
