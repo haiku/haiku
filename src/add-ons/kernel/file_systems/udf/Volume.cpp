@@ -117,7 +117,7 @@ Volume::MapBlock(udf_long_address address, off_t *mappedBlock)
 	if (!err)
 		err = _InitStatus() >= B_IDENTIFIED ? B_OK : B_NO_INIT;
 	if (!err) {
-		udf_partition_descriptor* partition = fPartitionMap.Find(address.partition());
+		const udf_partition_descriptor* partition = fPartitionMap.Find(address.partition());
 		err = partition ? B_OK : B_BAD_ADDRESS;
 		if (!err) {
 			*mappedBlock = Start() + partition->start() + address.block();	
@@ -504,7 +504,7 @@ Volume::_WalkVolumeDescriptorSequence(udf_extent_address extent)
 					udf_partition_descriptor *partition = reinterpret_cast<udf_partition_descriptor*>(tag);
 					PDUMP(partition);
 					if (partition->tag().init_check(block) == B_OK) {
-						udf_partition_descriptor *current = fPartitionMap.Find(partition->partition_number());
+						const udf_partition_descriptor *current = fPartitionMap.Find(partition->partition_number());
 						if (!current || current->vds_number() < partition->vds_number()) {
 							PRINT(("adding partition #%d with vds_number %ld to partition map\n",
 							       partition->partition_number(), partition->vds_number()));
