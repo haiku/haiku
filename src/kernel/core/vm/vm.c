@@ -1303,6 +1303,7 @@ vm_copy_on_write_area(vm_region *area)
 	upperCache->temporary = 1;
 	upperCache->scan_skip = lowerCache->scan_skip;
 	upperCache->source = lowerCache;
+	upperCache->ref = upperCacheRef;
 	upperCacheRef->cache = upperCache;
 
 	// we need to manually alter the ref_count
