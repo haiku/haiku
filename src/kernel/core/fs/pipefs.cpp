@@ -779,9 +779,10 @@ pipefs_get_vnode(fs_volume _volume, vnode_id id, fs_vnode *_inode, bool reenter)
 static status_t
 pipefs_put_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
 {
+#if TRACE_PIPEFS
 	Inode *inode = (Inode *)_node;
-
 	TRACE(("pipefs_putvnode: entry on vnode 0x%Lx, r %d\n", inode->ID(), reenter));
+#endif
 
 	// ToDo: delete pipe - it isn't needed anymore!
 
@@ -1022,13 +1023,6 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	mutex_unlock(inode->WriteMutex());
 
 	return status;
-}
-
-
-static off_t
-pipefs_seek(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, off_t pos, int seekType)
-{
-	return ESPIPE;
 }
 
 
