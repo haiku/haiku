@@ -1,7 +1,6 @@
-/* net_server.c */
+/* core.c */
 
-/* this is just a hack to get us an application that
- * we can develop while we continue to develop the net stack
+/* This the heart of network stack
  */
 
 #include <stdio.h>
@@ -15,10 +14,6 @@
 #include <Drivers.h>
 #include <module.h>
 #include <KernelExport.h>
-
-#ifdef _KERNEL_MODE
-#define spawn_thread spawn_kernel_thread
-#endif
 
 #include <driver_settings.h>
 
@@ -69,6 +64,8 @@ static struct net_module *module_list = NULL;
 /* Wider scoped prototypes */
 int net_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
                void *newp, size_t newlen);
+
+struct protosw * protocols;
 
 struct core_module_info core_info = {
 	{
@@ -299,11 +296,11 @@ void start_rx_thread(struct ifnet *dev)
 			dev->rxq = start_ifq();
 		if (!dev->rxq)
 			return;
-		dev->rx_thread = spawn_thread(rx_thread, name, 
+		dev->rx_thread = spawn_kernel_thread(rx_thread, name, 
 		                              priority, dev);
 	} else {
 		/* don't need an rxq... */
-		dev->rx_thread = spawn_thread(if_thread, name, 
+		dev->rx_thread = spawn_kernel_thread(if_thread, name, 
 		                              priority, dev);
 	}		
 	
@@ -326,7 +323,7 @@ void start_tx_thread(struct ifnet *dev)
 		return;
 
 	sprintf(name, "%s_tx_thread", dev->if_name);
-	dev->tx_thread = spawn_thread(tx_thread, name, priority, dev);
+	dev->tx_thread = spawn_kernel_thread(tx_thread, name, priority, dev);
 	if (dev->tx_thread < 0) {
 		printf("Failed to start the tx_thread for %s\n", dev->if_name);
 		dev->tx_thread = -1;
