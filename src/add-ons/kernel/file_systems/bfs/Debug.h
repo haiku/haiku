@@ -96,7 +96,8 @@
 	extern void dump_data_stream(data_stream *stream);
 	extern void dump_inode(bfs_inode *inode);
 	extern void dump_bplustree_header(bplustree_header *header);
-	extern void dump_bplustree_node(bplustree_node *node,bplustree_header *header = NULL,Volume *volume = NULL);
+	extern void dump_bplustree_node(bplustree_node *node,
+					bplustree_header *header = NULL, Volume *volume = NULL);
 	extern void dump_block(const char *buffer, int size);
 
 	extern void remove_debugger_commands();

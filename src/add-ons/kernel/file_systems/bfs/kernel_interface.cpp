@@ -54,14 +54,14 @@ static int bfs_remove_vnode(void *ns, void *node, char r);
 static int bfs_walk(void *_ns, void *_base, const char *file,
 				char **newpath, vnode_id *vnid);
 	
-static int bfs_ioctl(void *ns, void *node, void *cookie, int cmd, void *buf,size_t len);
+static int bfs_ioctl(void *ns, void *node, void *cookie, int cmd, void *buf, size_t len);
 static int bfs_setflags(void *ns, void *node, void *cookie, int flags);
 
 static int bfs_select(void *ns, void *node, void *cookie, uint8 event,
 				uint32 ref, selectsync *sync);
 static int bfs_deselect(void *ns, void *node, void *cookie, uint8 event,
 				selectsync *sync);
-static int bfs_fsync(void *ns,void *node);
+static int bfs_fsync(void *ns, void *node);
 
 static int bfs_create(void *ns, void *dir, const char *name,
 				int perms, int omode, vnode_id *vnid, void **cookie);
@@ -117,7 +117,7 @@ static int bfs_open_indexdir(void *ns, void **cookie);
 static int bfs_close_indexdir(void *ns, void *cookie);
 static int bfs_free_indexdir_cookie(void *ns, void *node, void *cookie);
 static int bfs_rewind_indexdir(void *ns, void *cookie);
-static int bfs_read_indexdir(void *ns, void *cookie, long *num,struct dirent *dirent,
+static int bfs_read_indexdir(void *ns, void *cookie, long *num, struct dirent *dirent,
 				size_t bufferSize);
 static int bfs_create_index(void *ns, const char *name, int type, int flags);
 static int bfs_remove_index(void *ns, const char *name);
@@ -306,7 +306,8 @@ bfs_read_fs_stat(void *_ns, struct fs_info *info)
 static int
 bfs_write_fs_stat(void *_ns, struct fs_info *info, long mask)
 {
-	FUNCTION_START(("mask = %ld\n",mask));
+	FUNCTION_START(("mask = %ld\n", mask));
+
 	Volume *volume = (Volume *)_ns;
 	disk_super_block &superBlock = volume->SuperBlock();
 
@@ -427,9 +428,9 @@ restartIfBusy:
 static int
 bfs_release_vnode(void *ns, void *_node, char reenter)
 {
-	//FUNCTION_START(("node = %p\n",_node));
+	//FUNCTION_START(("node = %p\n", _node));
 	Inode *inode = (Inode *)_node;
-	
+
 	delete inode;
 
 	return B_NO_ERROR;
@@ -507,8 +508,7 @@ bfs_suspend_vnode(void *_ns, void *_node)
 static int
 bfs_walk(void *_ns, void *_directory, const char *file, char **_resolvedPath, vnode_id *_vnodeID)
 {
-	//FUNCTION_START(("file = %s\n",file));
-
+	//FUNCTION_START(("file = %s\n", file));
 	if (_ns == NULL || _directory == NULL || file == NULL || _vnodeID == NULL)
 		return B_BAD_VALUE;
 
@@ -846,7 +846,8 @@ bfs_write_stat(void *_ns, void *_node, struct stat *stat, long mask)
 	if (mask & WSTAT_MTIME) {
 		// Index::UpdateLastModified() will set the new time in the inode
 		Index index(volume);
-		index.UpdateLastModified(&transaction,inode,(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
+		index.UpdateLastModified(&transaction, inode,
+			(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
 	}
 	if (mask & WSTAT_CRTIME) {
 		node->create_time = (bigtime_t)stat->st_crtime << INODE_TIME_SHIFT;
@@ -978,7 +979,7 @@ bfs_link(void *ns, void *dir, const char *name, void *node)
 int 
 bfs_unlink(void *_ns, void *_directory, const char *name)
 {
-	FUNCTION_START(("name = \"%s\"\n",name));
+	FUNCTION_START(("name = \"%s\"\n", name));
 
 	if (_ns == NULL || _directory == NULL || name == NULL || *name == '\0')
 		return B_BAD_VALUE;
@@ -1059,7 +1060,7 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			else if (parent == root || parent == oldDirectory->ID())
 				break;
 
-			Vnode vnode(volume,parent);
+			Vnode vnode(volume, parent);
 			Inode *parentNode;
 			if (vnode.Get(&parentNode) < B_OK)
 				return B_ERROR;
@@ -1092,7 +1093,7 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 		if (clobber == id)
 			return B_BAD_VALUE;
 
-		Vnode vnode(volume,clobber);
+		Vnode vnode(volume, clobber);
 		Inode *other;
 		if (vnode.Get(&other) < B_OK)
 			return B_NAME_IN_USE;
@@ -1745,7 +1746,7 @@ bfs_remove_attr(void *_ns, void *_node, const char *name)
 static int
 bfs_rename_attr(void *ns, void *node, const char *oldname, const char *newname)
 {
-	FUNCTION_START(("name = \"%s\",to = \"%s\"\n", oldname, newname));
+	FUNCTION_START(("name = \"%s\", to = \"%s\"\n", oldname, newname));
 
 	// ToDo: implement bfs_rename_attr()!
 	// I'll skip the implementation here, and will do it for OpenBeOS - at least
@@ -1759,7 +1760,7 @@ bfs_rename_attr(void *ns, void *node, const char *oldname, const char *newname)
 static int
 bfs_stat_attr(void *ns, void *_node, const char *name, struct attr_info *attrInfo)
 {
-	FUNCTION_START(("name = \"%s\"\n",name));
+	FUNCTION_START(("name = \"%s\"\n", name));
 
 	Inode *inode = (Inode *)_node;
 	if (inode == NULL || inode->Node() == NULL)
@@ -1767,8 +1768,7 @@ bfs_stat_attr(void *ns, void *_node, const char *name, struct attr_info *attrInf
 
 	// first, try to find it in the small data region
 	small_data *smallData = NULL;
-	if (inode->SmallDataLock().Lock() == B_OK)
-	{
+	if (inode->SmallDataLock().Lock() == B_OK) {
 		if ((smallData = inode->FindSmallData((const char *)name)) != NULL) {
 			attrInfo->type = smallData->Type();
 			attrInfo->size = smallData->DataSize();
@@ -1797,8 +1797,7 @@ static int
 bfs_write_attr(void *_ns, void *_node, const char *name, int type, const void *buffer,
 	size_t *_length, off_t pos)
 {
-	FUNCTION_START(("name = \"%s\"\n",name));
-
+	FUNCTION_START(("name = \"%s\"\n", name));
 	if (_ns == NULL || _node == NULL || name == NULL || *name == '\0')
 		RETURN_ERROR(B_BAD_VALUE);
 
@@ -1859,7 +1858,6 @@ static int
 bfs_open_indexdir(void *_ns, void **_cookie)
 {
 	FUNCTION();
-
 	if (_ns == NULL || _cookie == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
@@ -2003,7 +2001,7 @@ bfs_rename_index(void *ns, const char *oldname, const char *newname)
 static int
 bfs_stat_index(void *_ns, const char *name, struct index_info *indexInfo)
 {
-	FUNCTION_START(("name = %s\n",name));
+	FUNCTION_START(("name = %s\n", name));
 	if (_ns == NULL || name == NULL || indexInfo == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 

@@ -150,7 +150,7 @@ class CachedNode {
 			fNode(NULL),
 			fBlock(NULL)
 		{
-			SetTo(offset,check);
+			SetTo(offset, check);
 		}
 
 		~CachedNode()
