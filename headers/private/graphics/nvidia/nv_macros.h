@@ -482,6 +482,9 @@
 #define NVDAC_GENCTRL		0x00680600
 #define NVDAC_TSTCTRL		0x00680608
 #define NVDAC_TSTDATA		0x00680610
+/* (flatpanel registers) */
+#define NVDAC_FP_VDISPEND	0x00680800
+#define NVDAC_FP_HDISPEND	0x00680820
 /* secondary head */
 #define NVDAC2_CURPOS		0x00682300
 #define NVDAC2_PIXPLLC		0x00680520
@@ -489,6 +492,9 @@
 #define NVDAC2_PIXPLLC2		0x0068057c /* NV31, NV36 only */
 #define NVDAC2_GENCTRL		0x00682600
 #define NVDAC2_TSTCTRL		0x00682608
+/* (flatpanel registers) */
+#define NVDAC2_FP_VDISPEND	0x00682800
+#define NVDAC2_FP_HDISPEND	0x00682820
 
 /* Nvidia CRTC indexed registers */
 /* VGA standard registers: */
@@ -524,6 +530,7 @@
 #define NVCRTCX_CURCTL2		0x2f
 #define NVCRTCX_CURCTL1		0x30
 #define NVCRTCX_CURCTL0		0x31
+#define NVCRTCX_LCD			0x33
 #define NVCRTCX_INTERLACE	0x39
 #define NVCRTCX_EXTRA		0x41
 #define NVCRTCX_OWNER		0x44

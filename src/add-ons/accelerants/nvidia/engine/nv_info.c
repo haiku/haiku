@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-1/2004
+   Rudolf Cornelissen 7/2003-3/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -241,6 +241,73 @@ void fake_pins(void)
 		si->ps.tvout_chip_type = ???;
 	}
 */
+
+	/* detect if the BIOS enabled a LCD (internal panel or DVI) or TVout */
+	{
+		/* both TMDS transmitters (used for LCD/DVI) and TVencoders are slave devices */
+		bool slavedev1_active = false, slavedev2_active = false;
+		bool tvout1_active = false, tvout2_active = false;
+
+		/* check primary head: */
+		/* enable access to CRTC1 on dualhead cards */
+		if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+
+		/* unlock CRTC1 */
+		CRTCW(LOCK, 0x57);
+		CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+		/* detect active slave device (if any) */
+		slavedev1_active = (CRTCR(PIXEL) & 0x80);
+		if (slavedev1_active)
+		{
+			/* if the panel isn't selected, tvout is.. */
+			tvout1_active = !(CRTCR(LCD) & 0x01);
+		}
+
+		if (si->ps.secondary_head)
+		{
+			/* check secondary head: */
+			/* enable access to CRTC2 */
+			CRTCW(OWNER, 0x03);
+			/* unlock CRTC2 */
+			CRTCW(LOCK, 0x57);
+			CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+			/* detect active slave device (if any) */
+			slavedev2_active = (CRTCR(PIXEL) & 0x80);
+			if (slavedev2_active)
+			{
+				/* if the panel isn't selected, tvout is.. */
+				tvout2_active = !(CRTCR(LCD) & 0x01);
+			}
+		}
+
+		/* fixme: doing some logging, but (also) use for DVI outputs on non-laptops.. */
+		if (slavedev1_active && ! tvout1_active)
+		{
+			LOG(2,("CRTC1 is currently programmed for DFP\n"));
+			LOG(2,("panel size is %d x %d\n",
+				((DACR(FP_HDISPEND) & 0x0000ffff) + 1),
+				((DACR(FP_VDISPEND) & 0x0000ffff) + 1)));
+		}
+		if (slavedev2_active && ! tvout2_active)
+		{
+			LOG(2,("CRTC2 is currently programmed for DFP\n"));
+			LOG(2,("panel size is %d x %d\n",
+				((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1),
+				((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1)));
+		}
+
+		/* fixme?: assuming laptop panel always on CRTC1 for now... */
+		if (si->ps.laptop)
+		{
+			si->ps.panel_width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
+			si->ps.panel_height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
+		}
+		else
+		{
+			si->ps.panel_width = 0;
+			si->ps.panel_height = 0;
+		}
+	}
 }
 
 static void pinsnv4_fake(void)
@@ -666,17 +733,20 @@ void dump_pins(void)
 	case CH7007:
 		msg = "Chrontel CH7007";
 		break;
+	case CH7008:
+		msg = "Chrontel CH7008";
+		break;
 	case SAA7102:
 		msg = "Philips SAA7102";
+		break;
+	case SAA7103:
+		msg = "Philips SAA7103";
 		break;
 	case SAA7104:
 		msg = "Philips SAA7104";
 		break;
-	case SAA7108:
-		msg = "Philips SAA7108";
-		break;
-	case SAA7114:
-		msg = "Philips SAA7114";
+	case SAA7105:
+		msg = "Philips SAA7105";
 		break;
 	case BT868:
 		msg = "Brooktree/Conexant BT868";
@@ -707,5 +777,11 @@ void dump_pins(void)
 	if (si->ps.sdram) LOG(2,("SDRAM card\n")); else LOG(2,("SGRAM card\n"));
 	LOG(2,("laptop: "));
 	if (si->ps.laptop) LOG(2,("yes\n")); else LOG(2,("no\n"));
+//fixme: testing...
+//	if (si->ps.laptop)
+	{
+		LOG(2,("panel width: %d\n", si->ps.panel_width));
+		LOG(2,("panel height: %d\n", si->ps.panel_height));
+	}
 	LOG(2,("INFO: end pinsdump.\n"));
 }

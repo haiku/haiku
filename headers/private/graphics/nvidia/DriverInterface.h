@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-1/2004.
+	Rudolf Cornelissen 10/2002-2/2004.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -200,10 +200,11 @@ typedef struct {
 		CH7005,
 		CH7006,
 		CH7007,
+		CH7008,
 		SAA7102,
+		SAA7103,
 		SAA7104,
-		SAA7108,
-		SAA7114,
+		SAA7105,
 		BT868,
 		BT869,
 		CX25870,
@@ -219,6 +220,8 @@ typedef struct {
 		uint32 card_type;           /* see card_type enum above */
 		uint32 card_arch;           /* see card_arch enum above */
 		bool laptop;	            /* mobile chipset or not ('internal' flatpanel!) */
+		uint16 panel_width;			/* native horizontal resolution for laptop panels */
+		uint16 panel_height;		/* navive vertical resolution for laptop panels */
 		uint32 tvout_chip_type;     /* see tvchip_type enum above */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
 		bool sdram;					/* TRUE if SDRAM card: needed info for 2D acceleration */
