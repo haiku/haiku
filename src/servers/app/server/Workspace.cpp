@@ -343,10 +343,10 @@ WinBorder* Workspace::SearchWinBorder(BPoint pt){
 //---------------------------------------------------------------------------
 void Workspace::Invalidate(){
 //TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
-	opLock.Lock();
+/*	opLock.Lock();
 	if(fOwner->ActiveWorkspace() == this)
 		fOwner->FullInvalidate(fOwner->Bounds());
-	opLock.Unlock();
+	opLock.Unlock();*/
 //----------------
 }
 //---------------------------------------------------------------------------

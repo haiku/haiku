@@ -634,9 +634,6 @@ void RootLayer::SetActiveWorkspace(Workspace *ws)
 		return;
 	
 	fActiveWorkspace	= ws;
-	
-//	RebuildRegions(Frame());
-//	Invalidate(Frame());
 }
 
 int32 RootLayer::ActiveWorkspaceIndex() const{
@@ -656,8 +653,6 @@ void RootLayer::SetBGColor(const RGBColor &col)
 	ActiveWorkspace()->SetBGColor(col);
 	
 	fLayerData->viewcolor	= col;
-	
-//	Invalidate(Frame());
 }
 
 RGBColor RootLayer::BGColor(void) const

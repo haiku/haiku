@@ -289,7 +289,8 @@ void ServerWindow::Show(void)
 		rl->fMainLock.Lock();
 		STRACE(("ServerWindow(%s)::Show() - Main lock acquired\n", fWinBorder->GetName()));
 
-		// TODO: 'false' couldn't this be made otherwise???
+		// make WinBorder unhidden, but *do not* rebuild and redraw! We'll do that
+		// after we bring it (its modal and floating windows also) in front.
 		fWinBorder->Show(false);
 
 		if ( (fFeel == B_FLOATING_SUBSET_WINDOW_FEEL || fFeel == B_MODAL_SUBSET_WINDOW_FEEL)
@@ -305,19 +306,30 @@ void ServerWindow::Show(void)
 			{
 				if (fWorkspaces & (0x00000001UL << i))
 				{
-					Workspace		*ws = rl->WorkspaceAt(i+1);
+					WinBorder		*previousFocus;
+					BRegion			invalidRegion;
+					Workspace		*ws;
+
+					ws				= rl->WorkspaceAt(i+1);
 					ws->BringToFrontANormalWindow(fWinBorder);
 					ws->SearchAndSetNewFront(fWinBorder);
+					previousFocus	= ws->FocusLayer();
 					ws->SetFocusLayer(fWinBorder);
-// TODO: this is UGLY.
-// Normaly you have to easy pass a "FullInvalidate". But in this case, WinBorder
-// is children dependant, so we CANOT rely on ANY region (full, fullVisible, visible)
-//   You have to figure out a way to do this 'internaly', I mean add support in
-// Layer::FullInvalidate or Layer::[Start]RebuildRegions()
 
-// What we are doinf here is BAD. We pass a rectangle instead of a region. Some areas may
-// ger redrawed while there is no need for that!!!
-					fWinBorder->fParent->FullInvalidate(fWinBorder->fFull.Frame());
+					// first redraw previous window's decorator. It has lost focus state.
+					if (previousFocus)
+						if (previousFocus->fDecorator)
+							fWinBorder->fParent->Invalidate(previousFocus->fVisible);
+
+					// we must build the rebuild region. we have nowhere to take it from.
+					// include decorator's(if any) and fTopLayer's full regions.
+					fTopLayer->RebuildFullRegion();
+					fWinBorder->RebuildFullRegion();
+					invalidRegion.Include(&(fTopLayer->fFull));
+					if (fWinBorder->fDecorator)
+						invalidRegion.Include(&(fWinBorder->fFull));
+
+					fWinBorder->fParent->FullInvalidate(invalidRegion);
 				}
 			}
 		}
