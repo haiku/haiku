@@ -18,6 +18,7 @@
 #include <arch/smp.h>
 
 #include <arch/x86/smp_priv.h>
+#include <arch/x86/smp_apic.h>
 #include <arch/x86/timer.h>
 
 #include <string.h>
@@ -75,15 +76,16 @@ i386_smp_error_interrupt(void *data)
 
 
 static uint32
-apic_read(uint32 *addr)
+apic_read(uint32 offset)
 {
-	return *addr;
+	return *(uint32 *)((uint32)apic + offset);
 }
 
 
 static void
-apic_write(uint32 *addr, uint32 data)
+apic_write(uint32 offset, uint32 data)
 {
+	uint32 *addr = (uint32 *)((uint32)apic + offset);
 	*addr = data;
 }
 
@@ -120,7 +122,7 @@ arch_smp_init(kernel_args *ka)
 void
 arch_smp_send_broadcast_ici(void)
 {
-	int config;
+	uint32 config;
 	int state = disable_interrupts();
 
 	config = apic_read(APIC_ICR1) & APIC_ICR1_WRITE_MASK;
@@ -133,7 +135,7 @@ arch_smp_send_broadcast_ici(void)
 void
 arch_smp_send_ici(int target_cpu)
 {
-	int config;
+	uint32 config;
 	int state = disable_interrupts();
 
 	config = apic_read(APIC_ICR2) & APIC_ICR2_MASK;
@@ -191,7 +193,7 @@ arch_smp_set_apic_timer(bigtime_t relative_timeout)
 int
 arch_smp_clear_apic_timer(void)
 {
-	unsigned int config;
+	uint32 config;
 	int state;
 
 	if (apic == NULL)
