@@ -251,6 +251,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 	uint32 count = descriptorSequence.length() >> blockShift;
 		
 	bool foundLogicalVolumeDescriptor = false;
+	bool foundUnallocatedSpaceDescriptor = false;
 	uint8 uniquePartitions = 0;
 	status_t error = B_OK;
 	
@@ -397,7 +398,8 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 				case TAGID_UNALLOCATED_SPACE_DESCRIPTOR:
 				{
 					unallocated_space_descriptor *unallocated = reinterpret_cast<unallocated_space_descriptor*>(tag);
-					PDUMP(unallocated);				
+					PDUMP(unallocated);
+					foundUnallocatedSpaceDescriptor = true;		
 					(void)unallocated;	// kill the warning		
 					break;
 				}
@@ -425,7 +427,8 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 	       (uniquePartitions == 1 ? "" : "s")));
 	
 	if (!error) 
-		error = foundLogicalVolumeDescriptor ? B_OK : B_ERROR;
+		error = foundLogicalVolumeDescriptor && foundUnallocatedSpaceDescriptor
+		        ? B_OK : B_ERROR;
 	if (!error) 
 		error = uniquePartitions >= 1 ? B_OK : B_ERROR;
 	if (!error) 
