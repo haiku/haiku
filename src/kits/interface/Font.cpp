@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <Font.h>
 #include <PortLink.h>
+#include <AppServerLink.h>
+#include <ServerProtocol.h>
 
 //----------------------------------------------------------------------------------------
 //		Globals
@@ -43,12 +45,51 @@ const BFont *be_fixed_font = &sFixedFont;
 
 
 /*!
-	\brief Private function used by Be. Exists only for compatibility. Does nothing.
+	\brief Private function originally used by Be. Now used for initialization
+	\param font The font to initialize
+	\param cmd message code to send to the app_server
+	\param data unused
+	
+	While it is not known what Be used it for, Haiku uses it to initialize the
+	three system fonts when the interface kit is initialized when an app starts.
 */
 
 void
 _font_control_(BFont *font, int32 cmd, void *data)
 {
+	if(!font || (cmd!=AS_SET_SYSFONT_PLAIN && cmd!=AS_SET_SYSFONT_BOLD &&
+				cmd!=AS_SET_SYSFONT_FIXED) )
+	{
+		// this shouldn't ever happen, but just in case....
+		printf("DEBUG: Bad parameters in _font_control_()\n");
+		return;
+	}
+		
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(cmd);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+	{
+		// Once again, this shouldn't ever happen, but I want to know about it
+		// if it does
+		printf("DEBUG: Couldn't initialize font in _font_control()\n");
+		return;
+	}
+	
+	// there really isn't that much data that we need to set for such cases -- most
+	// of them need to be set to the defaults. The stuff that can change are family,
+	// style/face, size, and height.
+	link.Read<uint16>(&font->fFamilyID);
+	link.Read<uint16>(&font->fStyleID);
+	link.Read<float>(&font->fSize);
+	link.Read<uint16>(&font->fFace);
+	
+	// we may or may not need this ultimately
+	link.Read<font_height>(&font->fHeight);
 }
 
 
