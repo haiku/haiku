@@ -26,34 +26,38 @@ struct stat {
 };
 
 /* extended file types */
-#define 	S_ATTR_DIR    		01000000000	/* attribute directory */
-#define 	S_ATTR        		02000000000	/* attribute */
-#define 	S_INDEX_DIR   		04000000000	/* index (or index directory) */
-#define 	S_STR_INDEX   		00100000000	/* string index */
-#define 	S_INT_INDEX   		00200000000	/* int32 index */
-#define 	S_UINT_INDEX   		00400000000	/* uint32 index */
-#define 	S_LONG_LONG_INDEX   00010000000	/* int64 index */
-#define 	S_ULONG_LONG_INDEX  00020000000	/* uint64 index */
-#define 	S_FLOAT_INDEX 		00040000000	/* float index */
-#define 	S_DOUBLE_INDEX 		00001000000	/* double index */
-#define 	S_ALLOW_DUPS  		00002000000	/* allow duplicate entries (currently unused) */
+#define S_ATTR_DIR			01000000000	/* attribute directory */
+#define S_ATTR				02000000000	/* attribute */
+#define S_INDEX_DIR			04000000000	/* index (or index directory) */
+#define S_STR_INDEX			00100000000	/* string index */
+#define S_INT_INDEX			00200000000	/* int32 index */
+#define S_UINT_INDEX		00400000000	/* uint32 index */
+#define S_LONG_LONG_INDEX	00010000000	/* int64 index */
+#define S_ULONG_LONG_INDEX	00020000000	/* uint64 index */
+#define S_FLOAT_INDEX		00040000000	/* float index */
+#define S_DOUBLE_INDEX		00001000000	/* double index */
+#define S_ALLOW_DUPS		00002000000	/* allow duplicate entries (currently unused) */
+
+/* link types */
+#define	S_LINK_SELF_HEALING	00001000000	/* link will be updated if you move its target */
+#define S_LINK_AUTO_DELETE	00002000000	/* link will be deleted if you delete its target */
 
 /* standard file types */
-#define     S_IFMT  			00000170000 /* type of file */
-#define		S_IFLNK				00000120000 /* symbolic link */
-#define     S_IFREG 			00000100000 /* regular */
-#define     S_IFBLK 			00000060000 /* block special */
-#define     S_IFDIR 			00000040000 /* directory */
-#define     S_IFCHR 			00000020000 /* character special */
-#define     S_IFIFO 			00000010000 /* fifo */
+#define S_IFMT				00000170000 /* type of file */
+#define	S_IFLNK				00000120000 /* symbolic link */
+#define S_IFREG 			00000100000 /* regular */
+#define S_IFBLK 			00000060000 /* block special */
+#define S_IFDIR 			00000040000 /* directory */
+#define S_IFCHR 			00000020000 /* character special */
+#define S_IFIFO 			00000010000 /* fifo */
 
-#define     S_ISREG(m)    (((m) & S_IFMT) == S_IFREG)
-#define 	S_ISLNK(m)	  (((m) & S_IFMT) == S_IFLNK)
-#define     S_ISBLK(m)    (((m) & S_IFMT) == S_IFBLK)
-#define     S_ISDIR(m)    (((m) & S_IFMT) == S_IFDIR)
-#define     S_ISCHR(m)    (((m) & S_IFMT) == S_IFCHR)
-#define     S_ISFIFO(m)   (((m) & S_IFMT) == S_IFIFO)
-#define     S_ISINDEX(m)  (((m) & S_INDEX_DIR) == S_INDEX_DIR)
+#define S_ISREG(m)		(((m) & S_IFMT) == S_IFREG)
+#define S_ISLNK(m)		(((m) & S_IFMT) == S_IFLNK)
+#define S_ISBLK(m)		(((m) & S_IFMT) == S_IFBLK)
+#define S_ISDIR(m)		(((m) & S_IFMT) == S_IFDIR)
+#define S_ISCHR(m)		(((m) & S_IFMT) == S_IFCHR)
+#define S_ISFIFO(m)		(((m) & S_IFMT) == S_IFIFO)
+#define S_ISINDEX(m)	(((m) & S_INDEX_DIR) == S_INDEX_DIR)
 
 #define	S_IUMSK 07777		/* user settable bits */
 
