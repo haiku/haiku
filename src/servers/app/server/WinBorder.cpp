@@ -302,7 +302,7 @@ printf("ClickMove: Drag\n");
 			BRegion reg2(oldmoveframe);
 			MoveBy(dx,dy);
 			_decorator->MoveBy(BPoint(dx, dy));
-			reg->OffsetBy(dx, dy);
+			reg->OffsetBy((int32)dx, (int32)dy);
 			reg2.Exclude(reg);
 			_parent->RebuildRegions();
 			_parent->RequestDraw();
