@@ -819,25 +819,20 @@ status_t AbstractFileInterfaceNode::HandleParameter(
 
 // public:
 
-flavor_info * AbstractFileInterfaceNode::GetFlavor(int32 id)
+void AbstractFileInterfaceNode::GetFlavor(flavor_info * info, int32 id)
 {
 	fprintf(stderr,"AbstractFileInterfaceNode::GetFlavor\n");
-	static bool initialized = false;
-	static flavor_info info;
-	if (initialized == false) {
-		info.name = "AbstractFileInterfaceNode";
-		info.info = "A AbstractFileInterfaceNode node handles a file.";
-		info.kinds = B_FILE_INTERFACE | B_CONTROLLABLE;
-		info.flavor_flags = B_FLAVOR_IS_LOCAL;
-		info.possible_count = INT_MAX;
-		info.in_format_count = 0; // no inputs
-		info.in_formats = 0;
-		info.out_format_count = 0; // no outputs
-		info.out_formats = 0;
-		info.internal_id = id;
-		initialized = true;	
-	}	
-	return &info;
+	info->name = "AbstractFileInterfaceNode";
+	info->info = "A AbstractFileInterfaceNode node handles a file.";
+	info->kinds = B_FILE_INTERFACE | B_CONTROLLABLE;
+	info->flavor_flags = B_FLAVOR_IS_LOCAL;
+	info->possible_count = INT_MAX;
+	info->in_format_count = 0; // no inputs
+	info->in_formats = 0;
+	info->out_format_count = 0; // no outputs
+	info->out_formats = 0;
+	info->internal_id = id;
+	return;
 }
 
 media_format * AbstractFileInterfaceNode::GetFormat()
