@@ -458,7 +458,8 @@ STXTTranslatorTest::LoadAddOnTest()
 	TranslatorLoadAddOnTest("/boot/home/config/add-ons/Translators/STXTTranslator",
 		this,
 		gSTXTInputFormats, sizeof(gSTXTInputFormats) / sizeof(translation_format),
-		gSTXTOutputFormats, sizeof(gSTXTOutputFormats) / sizeof(translation_format));
+		gSTXTOutputFormats, sizeof(gSTXTOutputFormats) / sizeof(translation_format),
+		B_TRANSLATION_MAKE_VER(1,0,0));
 }
 
 #endif // #if !TEST_R5
