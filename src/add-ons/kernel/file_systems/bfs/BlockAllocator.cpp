@@ -120,15 +120,11 @@ void
 AllocationBlock::Allocate(uint16 start, uint16 numBlocks)
 {
 	ASSERT(start < fNumBits);
+	ASSERT(start + numBlocks <= fNumBits);
 
-	if (numBlocks == 0xffff) {
-		// allocate all blocks after "start"
-		numBlocks = fNumBits - start;
-	} else if (start + numBlocks > fNumBits) {
+	if (start + numBlocks > fNumBits) {
 		FATAL(("Allocation::Allocate(): tried to allocate too many blocks: %u (numBlocks = %u)!\n", numBlocks, fNumBits));
-		DEBUGGER(("Allocation::Allocate(): tried to allocate too many blocks"));
-
-		numBlocks = fNumBits - start;
+		DIE(("Allocation::Allocate(): tried to allocate too many blocks"));
 	}
 
 	int32 block = start >> 5;
@@ -155,12 +151,11 @@ void
 AllocationBlock::Free(uint16 start, uint16 numBlocks)
 {
 	ASSERT(start < fNumBits);
+	ASSERT(start + numBlocks <= fNumBits);
 
 	if (start + numBlocks > fNumBits) {
 		FATAL(("Allocation::Free(): tried to free too many blocks: %u (numBlocks = %u)!\n", numBlocks, fNumBits));
-		DEBUGGER(("Allocation::Free(): tried to free too many blocks"));
-
-		numBlocks = fNumBits - start;
+		DIE(("Allocation::Free(): tried to free too many blocks"));
 	}
 
 	int32 block = start >> 5;
