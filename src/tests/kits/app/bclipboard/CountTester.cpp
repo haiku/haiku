@@ -6,6 +6,7 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
+#include <Application.h>
 #include <Clipboard.h>
 
 #define CHK	CPPUNIT_ASSERT
@@ -28,6 +29,7 @@
  */
 void CountTester::LocalCount1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("LocalCount1");
 
   CHK(clip.LocalCount() == 0);
@@ -40,6 +42,7 @@ void CountTester::LocalCount1()
  */
 void CountTester::LocalCount2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("LocalCount2");
   BMessage *data;
 
@@ -64,6 +67,7 @@ void CountTester::LocalCount2()
  */
 void CountTester::LocalCount3()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clipA("LocalCount3");
   BClipboard clipB("LocalCount3");
   BMessage *data;
@@ -95,6 +99,7 @@ void CountTester::LocalCount3()
  */
 void CountTester::LocalCount4()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clipA("LocalCount4");
   BClipboard clipB("LocalCount4");
   BMessage *data;
@@ -136,6 +141,7 @@ void CountTester::LocalCount4()
  */
 void CountTester::LocalCount5()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clipA("LocalCount5");
   BClipboard clipB("LocalCount5");
   BMessage *data;
@@ -173,6 +179,7 @@ void CountTester::LocalCount5()
  */
 void CountTester::LocalCount6()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clipA("LocalCount6A");
   BClipboard clipB("LocalCount6B");
   BMessage *data;
@@ -203,6 +210,7 @@ void CountTester::LocalCount6()
  */
 void CountTester::SystemCount1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("SystemCount1");
 
   CHK(clip.SystemCount() == 0);
@@ -216,6 +224,7 @@ void CountTester::SystemCount1()
  */
 void CountTester::SystemCount2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clipA("SystemCount2");
   BClipboard clipB("SystemCount2");
   BMessage *data;
@@ -243,6 +252,7 @@ void CountTester::SystemCount2()
  */
 void CountTester::SystemCount3()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clipA("SystemCount3A");
   BClipboard clipB("SystemCount3B");
   BMessage *data;

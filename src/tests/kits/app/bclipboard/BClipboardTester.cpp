@@ -7,6 +7,7 @@
 #include <string.h>
 
 // System Includes -------------------------------------------------------------
+#include <Application.h>
 #include <Clipboard.h>
 
 #define CHK	CPPUNIT_ASSERT
@@ -29,6 +30,7 @@
  */
 void BClipboardTester::BClipboard1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
 #ifdef TEST_R5
   CHK(false);
 #endif
@@ -43,6 +45,7 @@ void BClipboardTester::BClipboard1()
  */
 void BClipboardTester::BClipboard2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   char name[18] = "BClipboard Case 2";
   BClipboard clip(name);
 

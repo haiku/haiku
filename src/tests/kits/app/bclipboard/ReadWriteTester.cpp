@@ -41,7 +41,7 @@ void ReadWriteTester::Clear1()
 
 /*
 	status_t Clear()
-	@case 1
+	@case 2
 	@results		Clear() returns B_OK
 				data message is empty
  */
@@ -297,7 +297,10 @@ void ReadWriteTester::StartWatching1()
   char *str;
   ssize_t size;
 
+  BLooper *looper = new BLooper();
   RWHandler handler;
+  looper->AddHandler(&handler);
+  looper->Run();
   BMessenger target(&handler);
   CHK(clip.StartWatching(target) == B_OK);
   if ( clip.Lock() )
@@ -308,6 +311,9 @@ void ReadWriteTester::StartWatching1()
     clip.Commit();
     clip.Unlock();
   }
+  snooze(100000);
+  looper->Lock();
+  looper->Quit();
   CHK(handler.ClipboardModified());
   clip.StopWatching(target);
 }

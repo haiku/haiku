@@ -8,28 +8,28 @@ case 2: name points to valid string =>
 
 status_t Clear(void)
 case 1: BClipboard not locked =>
-	return B_ERROR
+	return B_ERROR (R5 segfaults)
 case 2: BClipboard is locked =>
 	return B_OK
 	Data() returns an empty message
 
 status_t Commit(void)
 case 1: BClipboard not locked =>
-	return B_ERROR
+	return B_ERROR (R5 segfaults)
 case 2: BClipboard is locked =>
 	return B_OK
 	data is uploaded to system
 
 status_t Revert(void)
 case 1: BClipboard not locked =>
-	return B_ERROR
+	return B_ERROR (R5 segfaults)
 case 2: BClipboard is locked =>
 	return B_OK
 	message returned by Data() is reset to value acquired on Lock()
 
 BMessage *Data(void) const
 case 1: BClipboard not locked =>
-	return NULL
+	return NULL (R5 segfaults)
 case 2: BClipboard is locked =>
 	returns a BMessage containing correct data
 

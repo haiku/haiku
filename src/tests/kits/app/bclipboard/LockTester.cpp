@@ -6,6 +6,7 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
+#include <Application.h>
 #include <Clipboard.h>
 
 #define CHK	CPPUNIT_ASSERT
@@ -28,6 +29,7 @@
  */
 void LockTester::Lock1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("Lock1");
 
   CHK(clip.Lock());
@@ -37,7 +39,7 @@ static int32 LockTest2(void *data)
 {
   BClipboard *clip = (BClipboard *)data;
   clip->Lock();
-  snooze(3000000); //Should be 3 seconds
+  snooze(300000); //Should be .3 seconds
   delete clip;
   return 0;
 }
@@ -48,21 +50,21 @@ static int32 LockTest2(void *data)
  */
 void LockTester::Lock2()
 {
-  CHK(false); // fail until I figure out why it is hanging
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard *clip = new BClipboard("Lock2");
 
   /* This method isn't guaranteed to work, but *should* work.
-     Spawn a thread which locks the clipboard, waits several seconds
+     Spawn a thread which locks the clipboard, waits .3 seconds
      and then deletes the locked clipboard.  After spawning
-     the thread, the main thread should keep checking if the clipboard
-     is locked.  Once it is locked, the thread tries to lock it and gets
-     blocked.  Once the clipboard is deleted, it should return false.
+     the thread, the main thread waits .1 second.  It then tries to
+     lock the clipboard and gets blocked.  Once the clipboard is deleted,
+     it should return false.
      */
   thread_id thread = spawn_thread(LockTest2,"locktest",B_NORMAL_PRIORITY,clip);
-
-  while(!clip->IsLocked());
+  CHK(thread >= B_OK);
+  resume_thread(thread);
+  snooze(100000); //Should be .1 seconds
   CHK(clip->Lock() == false);
-  kill_thread(thread);
 }
 
 /*
@@ -72,6 +74,7 @@ void LockTester::Lock2()
  */
 void LockTester::IsLocked1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("IsLocked1");
 
   clip.Lock();
@@ -85,6 +88,7 @@ void LockTester::IsLocked1()
  */
 void LockTester::IsLocked2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("IsLocked2");
 
   CHK(!clip.IsLocked());
@@ -97,6 +101,7 @@ void LockTester::IsLocked2()
  */
 void LockTester::Unlock1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("Unlock1");
 
   clip.Lock();
