@@ -65,6 +65,8 @@ status_t get_partitionable_spaces(partition_id partitionID, bool shadow,
 // disk systems
 status_t find_disk_system(const char *name, disk_system_id *id);
 status_t get_next_disk_system(disk_system_id *id, char *name, int32 *cookie);
+	// TODO: Add pretty name. Maybe better put all that into a
+	// user_disk_system structure.
 bool supports_partition_operation(uint32 operation, void *parameters);
 bool validate_partition_operation(uint32 operation, void *parameters);
 	// TODO: Sorry, I was too lazy: supports_validates_parameters.h is only

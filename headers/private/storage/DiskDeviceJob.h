@@ -53,6 +53,7 @@ public:
 	const char *Description() const;
 	status_t GetProgressInfo(disk_devive_progress_info *info) const;
 	uint32 CancelProperties() const;
+// TODO: Add Cancel() and Pause(), SupportsPause().
 	
 	partition_id PartitionID() const;
 
