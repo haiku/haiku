@@ -1,6 +1,3 @@
-BUGs/Hacks:
-- FIXME: the MessageDriverSettings API uses a little hack to allow adding new entries to sub-messages without replacing the old one
-
 Short-term TODOs:
 - see if we can reuse some code from the original DUN preflet
 - add "Protocols" tab
@@ -8,10 +5,8 @@ Short-term TODOs:
 - add "Revert Changes" button
 - load add-ons
 - write IP (IPCP) protocol add-on
-- write PAP authenticator add-on
-- write PPPoE device add-on
 - move DEVNOTES into a doxygen file and document the rest of the API
-- remove static window positions
+- use dynamic window positioning based on screen size instead of static coordinates
 
 Long-term TODOs:
 - allow selecting multiple authenticators
