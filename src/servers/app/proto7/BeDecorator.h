@@ -7,9 +7,11 @@
 class BeDecorator: public Decorator
 {
 public:
-	BeDecorator(BRect frame, int32 wlook, int32 wfeel, int32 wflags);
+	BeDecorator(BRect frame, const char *title, int32 wlook, int32 wfeel, int32 wflags,
+		DisplayDriver *ddriver);
 	~BeDecorator(void);
 	
+	void SetTitle(const char *string);
 	void MoveBy(float x, float y);
 	void MoveBy(BPoint pt);
 	void ResizeBy(float x, float y);
@@ -36,9 +38,10 @@ protected:
 		frame_lowercol;
 	RGBColor textcol;
 	uint64 solidhigh, solidlow;
+	float titlewidth;
 
 	bool slidetab;
-	int textoffset;
+	int textoffset, titlechars;
 };
 
 #endif

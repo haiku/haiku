@@ -41,7 +41,7 @@
 
 // Define this if you want to use the spacebar to launch the server prototype's
 // test application
-//#define LAUNCH_TESTAPP
+#define LAUNCH_TESTAPP
 
 #ifdef LAUNCH_TESTAPP
 #include <Roster.h>
@@ -1348,7 +1348,7 @@ void ScreenDriver::SetCursor(ServerBitmap *csr, const BPoint &spot)
 #ifdef DEBUG_DRIVER
 printf("ScreenDriver::SetCursor\n");
 #endif
-	if(!csr)
+/*	if(!csr)
 		return;
 		
 	Lock();
@@ -1380,6 +1380,7 @@ printf("ScreenDriver::SetCursor\n");
 		BlitBitmap(cursor,cursor->Bounds(),cursorframe);
 	
 	Unlock();
+*/
 }
 
 void ScreenDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor color)

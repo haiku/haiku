@@ -13,8 +13,9 @@
 #include <stdio.h>
 #endif
 
-BeDecorator::BeDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
- : Decorator(rect,wlook,wfeel,wflags)
+BeDecorator::BeDecorator(BRect rect, const char *title, int32 wlook, int32 wfeel, int32 wflags,
+	DisplayDriver *ddriver)
+ : Decorator(rect,title,wlook,wfeel,wflags,ddriver)
 {
 #ifdef DEBUG_DECOR
 printf("BeDecorator()\n");
@@ -147,16 +148,14 @@ printf("BeDecorator()::_DoLayout()"); rect.PrintToStream();
 	resizerect.left=resizerect.right-18;
 	
 	tabrect.bottom=tabrect.top+18;
-/*	if(GetTitle())
+	if(titlewidth>0)
 	{
-		float titlewidth=closerect.right
-			+driver->StringWidth(layer->name->String(),
-			layer->name->Length())
-			+35;
-		tabrect.right=(titlewidth<frame.right -1)?titlewidth:frame.right;
+		tabrect.right=closerect.right+textoffset+titlewidth+15;
+		if(tabrect.right>frame.right)
+			tabrect.right=frame.right;
 	}
 	else
-*/		tabrect.right=tabrect.left+tabrect.Width()/2;
+		tabrect.right=tabrect.left+tabrect.Width()/2;
 
 	if(look==WLOOK_FLOATING)
 		tabrect.top+=4;
@@ -169,6 +168,17 @@ printf("BeDecorator()::_DoLayout()"); rect.PrintToStream();
 	zoomrect.bottom=zoomrect.top+10;
 	
 	textoffset=(look==WLOOK_FLOATING)?5:7;
+//	titlechars=_ClipTitle(zoomrect.left-(closerect.right+textoffset));
+	titlechars=_ClipTitle(zoomrect.left-closerect.right);
+}
+
+void BeDecorator::SetTitle(const char *string)
+{
+	Decorator::SetTitle(string);
+	if(string && driver)
+		titlewidth=driver->StringWidth(GetTitle(),strlen(GetTitle()),&layerdata);
+	else
+		titlewidth=0;
 }
 
 void BeDecorator::MoveBy(float x, float y)
@@ -214,14 +224,12 @@ void BeDecorator::_DrawTitle(BRect r)
 {
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
-/*	driver->SetDrawingMode(B_OP_OVER);
-	rgb_color tmpcol=driver->HighColor();
-	driver->SetHighColor(textcol.red,textcol.green,textcol.blue);
-	driver->DrawString((char *)string,strlen(string),
-		BPoint(closerect.right+textoffset,closerect.bottom-1));
-	driver->SetHighColor(tmpcol.red,tmpcol.green,tmpcol.blue);
-	driver->SetDrawingMode(B_OP_COPY);
-*/
+	layerdata.draw_mode=B_OP_OVER;
+	layerdata.highcolor=colors->window_tab_text;
+	driver->DrawString(GetTitle(),titlechars,
+		BPoint(closerect.right+textoffset,closerect.bottom),&layerdata);
+	layerdata.draw_mode=B_OP_COPY;
+
 }
 
 void BeDecorator::_SetFocus(void)
@@ -312,8 +320,6 @@ void BeDecorator::_DrawTab(BRect r)
 	
 	layerdata.highcolor=frame_lowcol;
 	driver->StrokeRect(tabrect,&layerdata,(int8*)&solidhigh);
-
-//	UpdateTitle(layer->name->String());
 
 	layerdata.highcolor=colors->window_tab;
 	driver->FillRect(tabrect.InsetByCopy(1,1),&layerdata,(int8*)&solidhigh);
@@ -494,7 +500,8 @@ extern "C" float get_decorator_version(void)
 	return 1.00;
 }
 
-extern "C" Decorator *instantiate_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
+extern "C" Decorator *instantiate_decorator(BRect rect, const char *title, 
+	int32 wlook, int32 wfeel, int32 wflags,DisplayDriver *ddriver)
 {
-	return new BeDecorator(rect,wlook,wfeel,wflags);
+	return new BeDecorator(rect,title, wlook,wfeel,wflags,ddriver);
 }

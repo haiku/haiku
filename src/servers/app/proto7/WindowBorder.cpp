@@ -4,11 +4,12 @@
 #include <Debug.h>
 #include "View.h"	// for mouse button defines
 #include "ServerWindow.h"
-#include "WindowBorder.h"
 #include "Decorator.h"
+#include "DisplayDriver.h"
 #include "Desktop.h"
+#include "WindowBorder.h"
 
-#define DEBUG_WINBORDER
+//#define DEBUG_WINBORDER
 
 #ifdef DEBUG_WINBORDER
 #include <stdio.h>
@@ -23,7 +24,7 @@ WindowBorder::WindowBorder(ServerWindow *win, const char *bordertitle)
    (win==NULL)?NULL:win->title->String())
 {
 #ifdef DEBUG_WINBORDER
-printf("WindowBorder()\n");
+printf("WindowBorder(%s)\n",bordertitle);
 #endif
 	mbuttons=0;
 	swin=win;
@@ -33,7 +34,6 @@ printf("WindowBorder()\n");
 	title=new BString(bordertitle);
 	hresizewin=false;
 	vresizewin=false;
-
 }
 
 WindowBorder::~WindowBorder(void)
@@ -276,6 +276,8 @@ printf("WindowBorder::SetDecorator(%p)\n",newdecor);
 	if(newdecor)
 	{
 		decor=newdecor;
+		decor->SetTitle(title->String());
+		decor->ResizeBy(0,0);
 //		if(visible)
 //			delete visible;
 //		visible=decor->GetFootprint();

@@ -1,13 +1,14 @@
 #include "Decorator.h"
-#include <string.h>
+#include "DisplayDriver.h"
 
-Decorator::Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
+Decorator::Decorator(BRect rect, const char *title, int32 wlook, int32 wfeel, int32 wflags,
+	DisplayDriver *ddriver)
 {
 	close_state=false;
 	minimize_state=false;
 	zoom_state=false;
-	title_string=NULL;
-	driver=NULL;
+	title_string=new BString(title);
+	driver=ddriver;
 
 	closerect.Set(0,0,1,1);
 	zoomrect.Set(0,0,1,1);
@@ -41,7 +42,10 @@ void Decorator::SetColors(ColorSet cset)
 
 void Decorator::SetDriver(DisplayDriver *d)
 {
+	// lots of subclasses will depend on the driver for text support, so call
+	// _DoLayout() after this
 	driver=d;
+	_DoLayout();
 }
 
 void Decorator::SetClose(bool is_down)
@@ -106,25 +110,12 @@ int32 Decorator::GetFlags(void)
 
 void Decorator::SetTitle(const char *string)
 {
-	if(string)
-	{
-		size_t size=strlen(string);
-		if(!(size>0))
-			return;
-		delete title_string;
-		title_string=new char[size];
-		strcpy(title_string,string);
-	}
-	else
-	{
-		delete title_string;
-		title_string=NULL;
-	}
+	title_string->SetTo(string);
 }
 
 const char *Decorator::GetTitle(void)
 {
-	return title_string;
+	return title_string->String();
 }
 
 void Decorator::SetFocus(bool is_active)
@@ -138,8 +129,24 @@ void Decorator::SetFont(SFont *sf)
 {
 }
 */
-void Decorator::_ClipTitle(void)
+int32 Decorator::_ClipTitle(float width)
 {
+	if(driver)
+	{
+		int32 strlength=title_string->CountChars();
+		float pixwidth=driver->StringWidth(title_string->String(),strlength,&layerdata);
+	
+		while(strlength>=0)
+		{
+			if(pixwidth<width)
+				break;
+			strlength--;
+			pixwidth=driver->StringWidth(title_string->String(),strlength,&layerdata);
+		}
+		
+		return strlength;
+	}
+	return 0;
 }
 
 //-------------------------------------------------------------------------
@@ -230,6 +237,7 @@ void Decorator::_DrawTitle(BRect r)
 void Decorator::_DrawZoom(BRect r)
 {
 }
+
 /*
 SRegion Decorator::GetFootprint(void)
 {

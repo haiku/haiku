@@ -27,7 +27,7 @@ public:
 	void UnlockDecorator(void) { if(decor_lock) decor_lock->Unlock(); }
 	create_decorator *make_decorator;	// global function pointer
 private:
-	friend Decorator *instantiate_decorator(Layer *lay, uint32 dflags, uint32 wlook);
+	friend Decorator *instantiate_decorator(Layer *lay, const char *title, uint32 dflags, uint32 wlook);
 
 	void DispatchMessage(int32 code, int8 *buffer);
 	static int32 PollerThread(void *data);
@@ -47,5 +47,6 @@ private:
 	DisplayDriver *driver;
 };
 
-Decorator *instantiate_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags);
+Decorator *instantiate_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
+	int32 wflags, DisplayDriver *ddriver);
 #endif

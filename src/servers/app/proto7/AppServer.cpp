@@ -59,8 +59,8 @@ printf("Server input port: %ld\n",mouseport);
 //	fontserver->ScanDirectory("/boot/home/config/fonts/psfonts/");
 	fontserver->SaveList();
 
-	if(!fontserver->SetSystemPlain("Dutch801 Rm BT","Roman",12))
-		printf("Couldn't set plain to Dutch801 Rm BT, Roman 12 pt\n");
+	if(!fontserver->SetSystemPlain("Swis721 BT","Roman",12))
+		printf("Couldn't set plain to Swis721 BT, Roman 12 pt\n");
 	if(!fontserver->SetSystemBold("Dutch801 Rm BT","Bold",12))
 		printf("Couldn't set bold to Dutch801 Rm BT, Bold 12 pt\n");
 	if(!fontserver->SetSystemFixed("Courier10 BT","Roman",12))
@@ -236,9 +236,18 @@ printf("AppServer: Create App\n");
 
 			// Find the necessary data
 			port_id reply_port=*((port_id*)index); index+=sizeof(port_id);
+#ifdef DEBUG_APPSERVER_THREAD
+printf("\tCreate App: reply port is %lu\n",reply_port);
+#endif
 			port_id app_port=*((port_id*)index); index+=sizeof(port_id);
+#ifdef DEBUG_APPSERVER_THREAD
+printf("\tCreate App: ServerApp port is %lu\n", app_port);
+#endif
 
 			char *app_signature=(char *)index;
+#ifdef DEBUG_APPSERVER_THREAD
+printf("\tCreate App: Signature received is %s\n", app_signature);
+#endif
 			
 			// Create the ServerApp subthread for this app
 			applist_lock->Lock();
@@ -463,7 +472,8 @@ void AppServer::LoadDefaultDecorator(void)
 	
 }
 
-Decorator *instantiate_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
+Decorator *instantiate_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel, int32 wflags,
+	DisplayDriver *ddriver)
 {
 	Decorator *decor=NULL;
 
@@ -471,11 +481,8 @@ Decorator *instantiate_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wfl
 	if(app_server->make_decorator!=NULL)
 		decor=app_server->make_decorator(rect,wlook,wfeel,wflags);
 	else
-	{
-		decor=new BeDecorator(rect,wlook,wfeel,wflags);
-//		decor=new WinDecorator(lay, dflags, wlook);
-//		decor=new YMakDecorator(lay, dflags, wlook);
-	}
+		decor=new BeDecorator(rect,title,wlook,wfeel,wflags,ddriver);
+
 	decor->SetDriver(get_gfxdriver());
 	app_server->UnlockDecorator();
 	return decor;
@@ -508,6 +515,7 @@ void AppServer::Poller(void)
 #ifdef DEBUG_POLLER_THREAD
 printf("Poller: MouseDown() - Empty buffer\n");
 #endif
+						ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
 						break;
 					}
 				case B_MOUSE_UP:

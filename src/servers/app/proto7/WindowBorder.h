@@ -7,6 +7,7 @@
 
 class ServerWindow;
 class Decorator;
+class DisplayDriver;
 
 class WindowBorder : public Layer
 {

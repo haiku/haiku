@@ -38,7 +38,7 @@ printf("OBWindow(%s)\n",title);
 	if(inport==B_BAD_VALUE || inport==B_NO_MORE_PORTS)
 		printf("OBWindow: Couldn't create message port\n");
 
-	// Notify app that we exist
+	// Notify BApplication that we exist
 	OBWindow *win=this;
 	PortLink *link=new PortLink(obe_app->messageport);
 	link->SetOpCode(ADDWINDOW);
@@ -67,7 +67,10 @@ printf("OBWindow(%s)\n",title);
 		serverlink->Attach((int32)wflags);
 		serverlink->Attach(&inport,sizeof(port_id));
 		serverlink->Attach((int32)wkspace);
-		serverlink->Attach((char*)wtitle->String(),wtitle->Length());
+		//We add one so that the string will end up NULL-terminated. Otherwise, when
+		// we go to use the thing in the app_server, it will sometimes get junk
+		// characters at the end.
+		serverlink->Attach((char*)wtitle->String(),wtitle->CountChars()+1);
 	
 		// Send and wait for ServerWindow port. Necessary here so we can respond to
 		// messages as soon as Show() is called.

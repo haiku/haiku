@@ -36,7 +36,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	else
 		title->SetTo("Window");
 #ifdef DEBUG_SERVERWIN
-printf("ServerWindow() %s\n",title->String());
+printf("ServerWindow(%s)\n",title->String());
 #endif
 
 	// This must happen before the WindowBorder object - it needs this object's frame
@@ -53,14 +53,14 @@ printf("ServerWindow() %s\n",title->String());
 
 	// hard code this for now - window look also needs to be attached and sent to
 	// server by BWindow constructor
-	decorator=instantiate_decorator(frame,winlook,winfeel,winflags);
+	decorator=instantiate_decorator(frame,title->String(),winlook,winfeel,winflags,get_gfxdriver());
 #ifdef DEBUG_SERVERWIN
 if(decorator==NULL)
-	printf("ServerWindow() %s: NULL decorator returned\n",title->String());
+	printf("\tNULL decorator returned\n");
 #endif
 	winborder->SetDecorator(decorator);
 #ifdef DEBUG_SERVERWIN
-printf("ServerWindow() %s: decorator set\n",title->String());
+printf("\tdecorator set\n");
 #endif
 
 	// sender is the monitored app's event port
@@ -72,7 +72,7 @@ printf("ServerWindow() %s: decorator set\n",title->String());
 	else
 		applink=NULL;
 #ifdef DEBUG_SERVERWIN
-printf("ServerWindow() %s: PortLink established\n",title->String());
+printf("\tPortLink established\n");
 #endif
 	
 	// receiver is the port to which the app sends messages for the server
@@ -86,14 +86,14 @@ printf("ServerWindow() %s: PortLink established\n",title->String());
 	if(thread!=B_NO_MORE_THREADS && thread!=B_NO_MEMORY)
 		resume_thread(thread);
 #ifdef DEBUG_SERVERWIN
-printf("ServerWindow() %s: MonitorThread spawned\n",title->String());
+printf("\tMonitorThread spawned\n");
 #endif
 
 	workspace=index;
 
 	AddWindowToDesktop(this,index);
 #ifdef DEBUG_SERVERWIN
-printf("ServerWindow() %s: Added to Desktop\n",title->String());
+printf("\tAdded to Desktop\n");
 #endif
 }
 

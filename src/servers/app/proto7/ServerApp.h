@@ -6,7 +6,6 @@
 class BMessage;
 class PortLink;
 class BList;
-class ServerCursor;
 class DisplayDriver;
 
 class ServerApp

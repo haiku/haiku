@@ -504,6 +504,7 @@ printf("ViewDriver:: CopyBits()\n"); src.PrintToStream(); dest.PrintToStream();
 	framebuffer->Lock();
 	drawview->CopyBits(src,dest);
 	drawview->Sync();
+	screenwin->view->Invalidate(src);
 	screenwin->view->Invalidate(dest);
 	framebuffer->Unlock();
 	screenwin->Unlock();

@@ -3,6 +3,7 @@
 
 #include <SupportDefs.h>
 #include <Rect.h>
+#include <String.h>
 #include "ColorSet.h"
 #include "LayerData.h"
 
@@ -55,7 +56,8 @@ typedef enum { CLICK_NONE=0, CLICK_ZOOM, CLICK_CLOSE, CLICK_MINIMIZE,
 class Decorator
 {
 public:
-	Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags);
+	Decorator(BRect rect, const char *title, int32 wlook, int32 wfeel, int32 wflags,
+			DisplayDriver *ddriver);
 	virtual ~Decorator(void);
 	void SetColors(ColorSet cset);
 	void SetDriver(DisplayDriver *d);
@@ -71,12 +73,11 @@ public:
 	int32 GetLook(void);
 	int32 GetFeel(void);
 	int32 GetFlags(void);
-	void SetTitle(const char *string);
+	virtual void SetTitle(const char *string);
 	void SetFocus(bool is_active);
 	bool GetFocus(void) { return has_focus; };
 	const char *GetTitle(void);
 //	void SetFont(SFont *sf);
-	void _ClipTitle(void);
 	ColorSet GetColors(void) { if(colors) return *colors; else return ColorSet(); }
 	
 	virtual void MoveBy(float x, float y);
@@ -95,6 +96,8 @@ public:
 	virtual click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
 
 protected:
+	int32 _ClipTitle(float width);
+	int32 TitleWidth(void) { return (title_string)?title_string->CountChars():0; }
 	virtual void _DrawClose(BRect r);
 	virtual void _DrawFrame(BRect r);
 	virtual void _DrawMinimize(BRect r);
@@ -112,7 +115,7 @@ protected:
 private:
 	bool close_state, zoom_state, minimize_state;
 	bool has_focus;
-	char *title_string;
+	BString *title_string;
 };
 
 typedef float get_version(void);
