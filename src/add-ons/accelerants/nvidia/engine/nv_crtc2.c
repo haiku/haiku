@@ -94,20 +94,57 @@ status_t nv_crtc2_set_timing(display_mode target)
 	/* setup fixed modeline for flatpanel if connected and active */
 	if (si->ps.tmds2_active)
 	{
+		display_mode p1, p2;
+		bool pan1, pan2;
+
 		LOG(2,("CRTC2: DFP active: tuning modeline\n"));
 
+		get_panel_modelines(&p1, &p2, &pan1, &pan2);
+
 		/* horizontal timing */
-		//fixme (?): maybe we need real modeline calculations here...
 		//testing (640x480): total = 135% is too much, 120% to small...
 		//total = display + 160 equals panel modeline: but must be smaller...?
-		target.timing.h_total = target.timing.h_display + 152;//160;//128
-		target.timing.h_sync_start = target.timing.h_total - 136;//144;//112
-		target.timing.h_sync_end = target.timing.h_total - 40;//48;//16
+//		target.timing.h_total = target.timing.h_display + 152;//160;//128
+//		target.timing.h_sync_start = target.timing.h_total - 136;//144;//112
+//		target.timing.h_sync_end = target.timing.h_total - 40;//48;//16
+		//adaptive to panel: fixme: test on 4:3 and 16:10 panels!
+		target.timing.h_sync_start =
+			((uint16)((p2.timing.h_sync_start / ((float)p2.timing.h_display)) *
+			target.timing.h_display)) & 0xfff8;
+
+		target.timing.h_sync_end =
+			((uint16)((p2.timing.h_sync_end / ((float)p2.timing.h_display)) *
+			target.timing.h_display)) & 0xfff8;
+
+		target.timing.h_total =
+			((uint16)((p2.timing.h_total / ((float)p2.timing.h_display)) *
+			target.timing.h_display)) & 0xfff8;
+
+		if (target.timing.h_sync_start == target.timing.h_display)
+			target.timing.h_sync_start += 8;
+		if (target.timing.h_sync_end == target.timing.h_total)
+			target.timing.h_sync_end -= 8;
 
 		/* vertical timing */
-		target.timing.v_total = target.timing.v_display + 6;
-		target.timing.v_sync_start = target.timing.v_total - 3;
-		target.timing.v_sync_end = target.timing.v_total - 2;
+//		target.timing.v_total = target.timing.v_display + 6;
+//		target.timing.v_sync_start = target.timing.v_total - 3;
+//		target.timing.v_sync_end = target.timing.v_total - 2;
+		target.timing.v_sync_start =
+			((uint16)((p2.timing.v_sync_start / ((float)p2.timing.v_display)) *
+			target.timing.v_display));
+
+		target.timing.v_sync_end =
+			((uint16)((p2.timing.v_sync_end / ((float)p2.timing.v_display)) *
+			target.timing.v_display));
+
+		target.timing.v_total =
+			((uint16)((p2.timing.v_total / ((float)p2.timing.v_display)) *
+			target.timing.v_display));
+
+		if (target.timing.v_sync_start == target.timing.v_display)
+			target.timing.v_sync_start += 1;
+		if (target.timing.v_sync_end == target.timing.v_total)
+			target.timing.v_sync_end -= 1;
 
 		/* disable GPU scaling testmode so automatic scaling will be done */
 		DAC2W(FP_DEBUG1, 0);
