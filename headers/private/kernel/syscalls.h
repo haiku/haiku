@@ -85,6 +85,7 @@ extern status_t		_kern_unmount(const char *path);
 extern status_t		_kern_read_fs_info(dev_t device, struct fs_info *info);
 extern status_t		_kern_write_fs_info(dev_t device, const struct fs_info *info, int mask);
 extern status_t		_kern_sync(void);
+extern status_t		_kern_dir_node_ref_to_path(dev_t device, ino_t inode, char *userPath, size_t pathLength);
 extern int			_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
 extern int			_kern_open(const char *path, int omode);
 extern int			_kern_open_dir_node_ref(dev_t device, ino_t inode);

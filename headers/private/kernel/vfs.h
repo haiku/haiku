@@ -89,6 +89,7 @@ status_t _user_unmount(const char *path);
 status_t _user_read_fs_info(dev_t device, struct fs_info *info);
 status_t _user_write_fs_info(dev_t device, const struct fs_info *info, int mask);
 status_t _user_sync(void);
+status_t _user_dir_node_ref_to_path(dev_t device, ino_t inode, char *userPath, size_t pathLength);
 int _user_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
 int _user_open(const char *path, int omode);
 int _user_open_dir_node_ref(dev_t device, ino_t inode);
