@@ -1,0 +1,78 @@
+/* 
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+
+#include "FileWindow.h"
+#include "OpenWindow.h"
+#include "DiskProbe.h"
+#include "ProbeView.h"
+
+#include <Application.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <Path.h>
+
+
+FileWindow::FileWindow(BRect rect, entry_ref *ref)
+	: ProbeWindow(rect, ref)
+{
+	// Set alternative window title for devices
+
+	BEntry entry(ref);
+	struct stat stat;
+	if (entry.GetStat(&stat) == B_OK && (stat.st_mode & (S_IFBLK | S_IFCHR)) != 0) {
+		BPath path(ref);
+		SetTitle(path.Path());
+	}
+
+	// add the menu
+
+	BMenuBar *menuBar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
+	AddChild(menuBar);
+
+	BMenu *menu = new BMenu("File");
+	menu->AddItem(new BMenuItem("New" B_UTF8_ELLIPSIS,
+					new BMessage(kMsgOpenOpenWindow), 'N', B_COMMAND_KEY));
+
+	BMenu *devicesMenu = new BMenu("Open Device");
+	OpenWindow::CollectDevices(devicesMenu);
+	devicesMenu->SetTargetForItems(be_app);
+	menu->AddItem(new BMenuItem(devicesMenu));
+
+	menu->AddItem(new BMenuItem("Open File" B_UTF8_ELLIPSIS,
+					new BMessage(kMsgOpenFilePanel), 'O', B_COMMAND_KEY));
+	menu->AddSeparatorItem();
+
+	// the ProbeView file menu items will be inserted here
+	menu->AddSeparatorItem();
+
+	menu->AddItem(new BMenuItem("About DiskProbe" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddSeparatorItem();
+
+	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q', B_COMMAND_KEY));
+	menu->SetTargetForItems(be_app);
+	menuBar->AddItem(menu);
+
+	// add our interface widgets
+
+	BRect rect = Bounds();
+	rect.top = menuBar->Bounds().Height() + 1;
+	ProbeView *probeView = new ProbeView(rect, ref);
+	probeView->AddFileMenuItems(menu, menu->CountItems() - 4);
+	AddChild(probeView);
+
+	probeView->UpdateSizeLimits();
+}
+
+
+bool
+FileWindow::Contains(const entry_ref &ref, const char *attribute)
+{
+	if (attribute != NULL)
+		return false;
+
+	return ref == Ref();
+}
+

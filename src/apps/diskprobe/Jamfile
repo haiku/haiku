@@ -9,6 +9,8 @@ App DiskProbe :
 	DataEditor.cpp
 	DataView.cpp
 	ProbeWindow.cpp
+	FileWindow.cpp
+	AttributeWindow.cpp
 	ProbeView.cpp
 	OpenWindow.cpp
 	;

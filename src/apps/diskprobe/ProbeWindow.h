@@ -12,13 +12,16 @@
 
 class ProbeWindow : public BWindow {
 	public:
-		ProbeWindow(BRect rect, entry_ref *ref, const char *attribute = NULL);
+		ProbeWindow(BRect rect, entry_ref *ref);
 		virtual ~ProbeWindow();
 
 		virtual void MessageReceived(BMessage *message);
 		virtual bool QuitRequested();
 
-		const entry_ref &EntryRef() const { return fRef; }
+		virtual bool Contains(const entry_ref &ref, const char *attribute) = 0;
+
+	protected:
+		const entry_ref &Ref() const { return fRef; }
 
 	private:
 		entry_ref	fRef;

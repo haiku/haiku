@@ -6,7 +6,8 @@
 
 #include "DiskProbe.h"
 #include "DataEditor.h"
-#include "ProbeWindow.h"
+#include "FileWindow.h"
+#include "AttributeWindow.h"
 #include "OpenWindow.h"
 
 #include <Application.h>
@@ -42,7 +43,7 @@ class DiskProbe : public BApplication {
 		virtual bool QuitRequested();
 
 	private:
-		status_t Probe(entry_ref &ref);
+		status_t Probe(entry_ref &ref, const char *attribute = NULL);
 
 		BFilePanel	*fFilePanel;
 		BWindow		*fOpenWindow;
@@ -93,7 +94,7 @@ DiskProbe::ReadyToRun()
  */
 
 status_t 
-DiskProbe::Probe(entry_ref &ref)
+DiskProbe::Probe(entry_ref &ref, const char *attribute)
 {
 	int32 probeWindows = 0;
 
@@ -102,8 +103,8 @@ DiskProbe::Probe(entry_ref &ref)
 		ProbeWindow *window = dynamic_cast<ProbeWindow *>(WindowAt(i));
 		if (window == NULL)
 			continue;
-		
-		if (window->EntryRef() == ref) {
+
+		if (window->Contains(ref, attribute)) {
 			window->Activate(true);
 			return B_OK;
 		}
@@ -120,7 +121,12 @@ DiskProbe::Probe(entry_ref &ref)
 	BRect rect = fWindowPosition;
 	rect.OffsetBy(probeWindows * kCascadeOffset, probeWindows * kCascadeOffset);
 
-	BWindow *window = new ProbeWindow(rect, &ref);
+	BWindow *window;
+	if (attribute != NULL)
+		window = new AttributeWindow(rect, &ref, attribute);
+	else
+		window = new FileWindow(rect, &ref);
+
 	window->Show();
 	fWindowCount++;
 
@@ -134,7 +140,10 @@ DiskProbe::RefsReceived(BMessage *message)
 	int32 index = 0;
 	entry_ref ref;
 	while (message->FindRef("refs", index++, &ref) == B_OK) {
-		Probe(ref);
+		const char *attribute = NULL;
+		message->FindString("attributes", index - 1, &attribute);
+
+		Probe(ref, attribute);
 	}
 }
 
