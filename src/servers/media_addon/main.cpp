@@ -432,7 +432,7 @@ MediaAddonServer::InstantiatePhysialInputsAndOutputs(AddOnInfo *info)
 			printf("MediaAddonServer::InstantiatePhysialInputsAndOutputs: \"%s\" is a physical input/output\n", flavorinfo->name);
 			rv = mediaroster->InstantiateDormantNode(dni, &node);
 			if (rv != B_OK) {
-				printf("Couldn't instantiate node\n");
+				ERROR("MediaAddonServer::InstantiatePhysialInputsAndOutputs Couldn't instantiate node flavor, internal_id %ld, name %s\n", flavorinfo->internal_id, flavorinfo->name);
 			} else {
 				printf("Node created!\n");
 				info->active_flavors.Insert(node);
