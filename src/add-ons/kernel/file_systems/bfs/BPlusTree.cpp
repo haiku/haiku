@@ -381,8 +381,8 @@ BPlusTree::SetTo(Inode *stream)
 			RETURN_ERROR(fStatus = B_BAD_TYPE);
 		}
 
-		 // although it's in stat.h, the S_ALLOW_DUPS flag is obviously unused
-		 // in the original BFS code - we will honour it nevertheless
+		// although it's in stat.h, the S_ALLOW_DUPS flag is obviously unused
+		// in the original BFS code - we will honour it nevertheless
 		fAllowDuplicates = ((stream->Mode() & S_INDEX_DIR) == S_INDEX_DIR
 							&& stream->BlockRun() != stream->Parent())
 							|| (stream->Mode() & S_ALLOW_DUPS) != 0;
