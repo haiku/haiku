@@ -125,6 +125,25 @@ KDiskDevice::SetID(partition_id id)
 	fDeviceData.id = id;
 }
 
+// PublishDevice
+status_t
+KDiskDevice::PublishDevice()
+{
+	// PublishDevice() and UnpublishDevice() are no-ops for KDiskDevices,
+	// since they are always published.
+	return B_OK;
+}
+
+// UnpublishDevice
+status_t
+KDiskDevice::UnpublishDevice()
+{
+	// PublishDevice() and UnpublishDevice() are no-ops for KDiskDevices,
+	// since they are always published.
+	return B_OK;
+}
+
+
 // SetDeviceFlags
 void
 KDiskDevice::SetDeviceFlags(uint32 flags)

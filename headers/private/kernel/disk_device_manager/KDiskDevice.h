@@ -41,6 +41,9 @@ public:
 
 	virtual void SetID(partition_id id);
 
+	virtual status_t PublishDevice();
+	virtual status_t UnpublishDevice();
+
 	void SetDeviceFlags(uint32 flags);	// comprises the ones below
 	uint32 DeviceFlags() const;
 	bool IsRemovable() const;

@@ -5,7 +5,9 @@
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
+#include <Drivers.h>
 #include <Errors.h>
 
 //#include <Partition.h>
@@ -103,16 +105,46 @@ KPartition::Open(int flags, int *fd)
 status_t
 KPartition::PublishDevice()
 {
-	// not implemented
-	return B_ERROR;
+	// prepare a partition_info
+	partition_info info;
+	info.offset = Offset();
+	info.size = Size();
+	info.logical_block_size = BlockSize();
+	info.session = 0;
+	info.partition = ID();
+	if (strlen(Device()->Path()) >= 256)
+		return B_NAME_TOO_LONG;
+	strcpy(info.device, Device()->Path());
+	// get the entry path
+	char path[B_PATH_NAME_LENGTH];
+	status_t error = GetPath(path);
+	if (error != B_OK)
+		return error;
+	// create the entry
+	int fd = creat(path, 0666);
+	if (fd < 0)
+		return errno;
+	// set the partition info
+	error = B_OK;
+	if (ioctl(fd, B_SET_PARTITION, &info) < 0)
+		error = errno;
+	close(fd);
+	return error;
 }
 
 // UnpublishDevice
 status_t
 KPartition::UnpublishDevice()
 {
-	// not implemented
-	return B_ERROR;
+	// get the entry path
+	char path[B_PATH_NAME_LENGTH];
+	status_t error = GetPath(path);
+	if (error != B_OK)
+		return error;
+	// remove the entry
+	if (remove(path) < 0)
+		return errno;
+	return B_OK;
 }
 
 // SetBusy
@@ -381,7 +413,10 @@ KPartition::GetPath(char *path) const
 		int32 leafLen = strlen("/raw");
 		if (len <= leafLen || strcmp(path + len - leafLen, "/raw"))
 			return B_ERROR;
-		sprintf(path + len - leafLen + 1, "%ld", Index());
+// TODO: For the time being the name is "obos_*" to not interfere with R5's
+// names.
+//		sprintf(path + len - leafLen + 1, "%ld", Index());
+		sprintf(path + len - leafLen + 1, "obos_%ld", Index());
 	} else {
 		// Our parent is a normal partition, no device: Append our index.
 		sprintf(path + len, "_%ld", Index());

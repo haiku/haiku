@@ -37,8 +37,8 @@ public:
 	int32 CountReferences() const;
 
 	status_t Open(int flags, int *fd);
-	status_t PublishDevice();
-	status_t UnpublishDevice();
+	virtual status_t PublishDevice();
+	virtual status_t UnpublishDevice();
 
 	void SetBusy(bool busy);
 	bool IsBusy() const;
