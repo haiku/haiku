@@ -1,0 +1,23 @@
+# FreeType 2 src/bdf Jamfile (c) 2002 David Turner
+#
+
+SubDir  FT2_TOP src bdf ;
+
+SubDirHdrs  [ FT2_SubDir  src bdf ] ;
+
+{
+  local  _sources ;
+
+  if $(FT2_MULTI)
+  {
+    _sources = bdfdrivr bdflib ;
+  }
+  else
+  {
+    _sources = bdf ;
+  }
+
+  Library  $(FT2_LIB) : $(_sources).c ;
+}
+
+# end of src/bdf Jamfile
