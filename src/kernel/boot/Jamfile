@@ -20,3 +20,5 @@ BuildPlatformMain makeflop : makeflop.c ;
 #CCFLAGS = $(oldccflags) ;
 
 SubInclude OBOS_TOP src kernel boot arch ;
+SubInclude OBOS_TOP src kernel boot platform ;
+SubInclude OBOS_TOP src kernel boot loader ;
