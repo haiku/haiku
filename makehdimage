@@ -110,7 +110,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	strace rmdir error"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
-	libtranslation.so libbind.so libnetapi.so libsocket.so"
+	libtranslation.so libbind.so libnetapi.so libsocket.so libdebug.so"
 
 BEOS_SYSTEM_SERVERS="registrar debug_server syslog_daemon media_server \
 	media_addon_server input_server"
