@@ -5,6 +5,7 @@ SubInclude OBOS_TOP src add-ons kernel drivers bus ;
 SubInclude OBOS_TOP src add-ons kernel drivers audio ;
 SubInclude OBOS_TOP src add-ons kernel drivers common ;
 SubInclude OBOS_TOP src add-ons kernel drivers disk ;
+SubInclude OBOS_TOP src add-ons kernel drivers input ;
 SubInclude OBOS_TOP src add-ons kernel drivers graphics ;
 SubInclude OBOS_TOP src add-ons kernel drivers misc ;
 SubInclude OBOS_TOP src add-ons kernel drivers network ;
