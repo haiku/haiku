@@ -50,7 +50,7 @@ class UsbPort : public BDataIO {
 		UsbPort(BDirectory* printer, BMessage* msg);
 		~UsbPort();
 
-		bool IsOk() { return fFile > -1; }
+		bool InitCheck() { return fFile > -1; }
 
 		ssize_t Read(void* buffer, size_t size);
 		ssize_t Write(const void* buffer, size_t size);
@@ -64,13 +64,11 @@ class UsbPort : public BDataIO {
 
 BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg) {
 	UsbPort* transport = new UsbPort(printer, msg);
-	if (transport->IsOk()) {
-		if (msg)
-			msg->what = 'okok';
+	if (transport->InitCheck())
 		return transport;
-	} else {
-		delete transport; return NULL;
-	}
+	
+	delete transport; 
+	return NULL;
 }
 
 
@@ -111,6 +109,8 @@ UsbPort::UsbPort(BDirectory* printer, BMessage *msg)
 		return;
 	
 	// Fill up the message
+	msg->what = 'okok';
+	
 	msg->AddBool("bidirectional", bidirectional);
 	msg->AddString("device_id", device_id);
 
@@ -131,10 +131,8 @@ UsbPort::UsbPort(BDirectory* printer, BMessage *msg)
 
 UsbPort::~UsbPort()
 {
-	if (IsOk()) {
+	if (fFile > -1)
 		close(fFile);
-		fFile = -1;
-	}
 }
 
 
