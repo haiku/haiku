@@ -72,8 +72,9 @@ typedef struct area_info {
 #define	B_ANY_KERNEL_ADDRESS	4
 
 /* area protection */
-#define B_READ_AREA				1	
-#define B_WRITE_AREA			2	
+#define B_READ_AREA				0x01
+#define B_WRITE_AREA			0x02
+#define B_USER_CLONEABLE_AREA	0x04	// relevant for kernel areas only
 
 extern area_id	create_area(const char *name, void **start_addr, uint32 addr_spec,
 					size_t size, uint32 lock, uint32 protection);
