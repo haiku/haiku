@@ -9,17 +9,13 @@ Author: Sikosis
 */
 
 // Includes ------------------------------------------------------------------------------------------ //
-#include <Alert.h>
 #include <Application.h>
-#include <Button.h>
-#include <ListItem.h>
-#include <ListView.h>
 #include <Path.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <stdio.h>
 #include <string.h>
-#include <TextControl.h>
+#include <TabView.h>
 #include <Window.h>
 #include <View.h>
 
@@ -31,7 +27,8 @@ Author: Sikosis
 // CenterWindowOnScreen -- Centers the BWindow to the Current Screen
 static void CenterWindowOnScreen(BWindow* w)
 {
-	BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());	BPoint	pt;
+	BRect screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
+	BPoint pt;
 	pt.x = screenFrame.Width()/2 - w->Bounds().Width()/2;
 	pt.y = screenFrame.Height()/2 - w->Bounds().Height()/2;
 
@@ -39,6 +36,7 @@ static void CenterWindowOnScreen(BWindow* w)
 		w->MoveTo(pt);
 }
 // -------------------------------------------------------------------------------------------------- //
+
 
 // ResourceUsageWindow - Constructor
 ResourceUsageWindow::ResourceUsageWindow(BRect frame) : BWindow (frame, "Resource Usage", B_TITLED_WINDOW, B_MODAL_SUBSET_WINDOW_FEEL , 0)
@@ -49,36 +47,44 @@ ResourceUsageWindow::ResourceUsageWindow(BRect frame) : BWindow (frame, "Resourc
 }
 // -------------------------------------------------------------------------------------------------- //
 
+
 // ResourceUsageWindow - Destructor
 ResourceUsageWindow::~ResourceUsageWindow()
 {
-	exit(0);
+	//exit(0);
 }
 // -------------------------------------------------------------------------------------------------- //
+
 
 // ResourceUsageWindow::InitWindow -- Initialization Commands here
 void ResourceUsageWindow::InitWindow(void)
 {
 	BRect r;
+	BRect rtab;
 	r = Bounds(); // the whole view
-	
-	/*lsvProjectFiles = new BListView(BRect(5,5,200,80), "ltvProjectFiles",
-					  B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-					  B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS);
-
-	//BListView *list = new BListView(r, "City", B_MULTIPLE_SELECTION_LIST);
-	lsvProjectFiles->AddItem(new BStringItem("Brisbane"));
-	lsvProjectFiles->AddItem(new BStringItem("Sydney"));
-	lsvProjectFiles->AddItem(new BStringItem("Melbourne"));
-	lsvProjectFiles->AddItem(new BStringItem("Adelaide"));
-	
-//	lsiItem = new BListItem();
-	
-//	lsvProjectFiles.AddItem(lsiItem);*/
+    rtab = Bounds();
+    
+	rtab.InsetBy(0,10);
+	tabView = new BTabView(rtab,"resource_usage_tabview");
+	tabView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	rtab = tabView->Bounds();
+	rtab.InsetBy(5,5);
+	tab = new BTab();
+	tabView->AddTab(new IRQView(r), tab);
+	tab->SetLabel("IRQ");
+	tab = new BTab();
+	tabView->AddTab(new DMAView(r), tab);
+	tab->SetLabel("DMA");
+	tab = new BTab();
+	tabView->AddTab(new IORangeView(r), tab);
+	tab->SetLabel("IO Range");
+	tab = new BTab();
+	tabView->AddTab(new MemoryRangeView(r), tab);
+	tab->SetLabel("Memory Range");
 	
 	// Create the Views
 	AddChild(ptrResourceUsageView = new ResourceUsageView(r));
-	//ptrResourceUsageView->AddChild(...);
+	ptrResourceUsageView->AddChild(tabView);
 }
 // -------------------------------------------------------------------------------------------------- //
 

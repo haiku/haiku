@@ -26,5 +26,33 @@ class ResourceUsageView : public BView
     	ResourceUsageView(BRect frame);
 };
 
+
+class IRQView : public BView
+{
+	public:
+		IRQView(BRect frame);
+};		
+
+
+class DMAView : public BView
+{
+	public:
+		DMAView(BRect frame);
+};		
+		
+		
+class IORangeView : public BView
+{
+	public:
+		IORangeView(BRect frame);
+};		
+
+
+class MemoryRangeView : public BView
+{
+	public:
+		MemoryRangeView(BRect frame);
+};				
+
 #endif
 

@@ -24,6 +24,9 @@ class ResourceUsageWindow : public BWindow
 	private:
 		void InitWindow(void);
 	    ResourceUsageView*	 ptrResourceUsageView;
+	    
+	    BTabView		*tabView;
+	    BTab			*tab;
 };
 
 

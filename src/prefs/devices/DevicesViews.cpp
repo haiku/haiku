@@ -41,3 +41,33 @@ ResourceUsageView::ResourceUsageView (BRect frame) : BView (frame, "ResourceUsag
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 // ---------------------------------------------------------------------------------------------------------- //
+
+
+// IRQView - used in Resource Usage Window
+IRQView::IRQView (BRect frame) : BView (frame, "IRQView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+// ---------------------------------------------------------------------------------------------------------- //
+
+
+// DMAView - used in Resource Usage Window
+DMAView::DMAView (BRect frame) : BView (frame, "DMAView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+// ---------------------------------------------------------------------------------------------------------- //
+
+// IORangeView - used in Resource Usage Window
+IORangeView::IORangeView (BRect frame) : BView (frame, "IORangeView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+// ---------------------------------------------------------------------------------------------------------- //
+
+// MemoryRangeView - used in Resource Usage Window
+MemoryRangeView::MemoryRangeView (BRect frame) : BView (frame, "MemoryRangeView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+// ---------------------------------------------------------------------------------------------------------- //
