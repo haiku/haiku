@@ -115,3 +115,16 @@ noconv:
 
 	return acc;
 }
+
+
+unsigned long long __strtoull_internal(const char *number, char **_end, int base, int group);
+
+unsigned long long
+__strtoull_internal(const char *number, char **_end, int base, int group)
+{
+	// ToDo: group is currently not supported!
+	(void)group;
+
+	return strtoull(number, _end, base);
+}
+

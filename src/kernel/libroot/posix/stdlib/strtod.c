@@ -1601,6 +1601,18 @@ strtod(const char * __restrict s00, char ** __restrict se)
 }
 
 
+double __strtod_internal(const char *number, char **_end, int group);
+
+double
+__strtod_internal(const char *number, char **_end, int group)
+{
+	// ToDo: group is currently not supported!
+	(void)group;
+
+	return strtod(number, _end);
+}
+
+
 /* removed from the build, is only used by __dtoa() */
 #if 0
 static int
