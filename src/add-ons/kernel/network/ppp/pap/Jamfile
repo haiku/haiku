@@ -11,9 +11,9 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 R5KernelAddon pap : kernel network ppp :
 	pap.cpp
 	Protocol.cpp
-	
-	: libkernelppp.a
 ;
+
+LinkSharedOSLibs pap : libkernelppp.a ;
 
 # Installation
 OBOSInstall install-networking

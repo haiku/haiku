@@ -13,8 +13,6 @@ R5KernelAddon ipcp : kernel network ppp :
 	
 	ipcp.cpp
 	Protocol.cpp
-	
-	: libkernelppp.a
 ;
 
 SEARCH on [ FGristFiles inet_addr.c ] = [ FDirName $(OBOS_TOP) src kits network libnet ] ;
