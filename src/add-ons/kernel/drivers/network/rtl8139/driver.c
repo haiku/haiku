@@ -34,7 +34,6 @@
 
 #include "ether_driver.h"
 #include "util.h"
-#include "packetlist.h"
 
 /* ----------
 	global data
@@ -161,6 +160,7 @@ typedef struct rtl8139_properties
 	ether_address_t address;		/* holds the MAC address */
 	sem_id 		lock;				/* lock this structure: still interrupt */
 	sem_id		input_wait;			/* locked until there is a packet to be read */
+	uint8		nonblocking;			/* determines if the card blocks on read requests */
 } rtl8139_properties_t;
 
 typedef struct packetheader
@@ -216,7 +216,7 @@ init_driver (void)
 	// Try if the PCI module is loaded (it would be weird if it wouldn't, but alas)
 	if( ( status = get_module( B_PCI_MODULE_NAME, (module_info **)&m_pcimodule )) != B_OK) 
 	{
-		dprintf( "rtl8139_nielx init_driver(): Get PCI module failed! %u\n", status);
+		dprintf( "rtl8139_nielx init_driver(): Get PCI module failed! %lu \n", status);
 		return status;
 	}
 	
@@ -311,7 +311,6 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	set_sem_owner( data->lock , B_SYSTEM_TEAM );
 	data->input_wait = create_sem( 0 , "rtl8139_nielx read wait" );
 	set_sem_owner( data->input_wait , B_SYSTEM_TEAM );
-	set_sem( data->input_wait ); //give the packet list the sem
 	
 	//Set up the cookie
 	data->pcii = m_device;
@@ -403,6 +402,8 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	m_pcimodule->write_io_32( data->reg_base + RxConfig , /*RXFTH2 | RXFTH1 | */
 		RBLEN_1 | RBLEN_0 | WRAP | MXDMA_2 | MXDMA_1 | APM | AB);
 	
+	//Disable blocking
+	data->nonblocking = 0;
 	//Allocate the ring buffer for the receiver. 
 	// Size is set above: as 16k + 16 bytes + 1.5 kB--- 16 bytes for last CRC (a
 	data->receivebuffer = alloc_mem( &(data->receivebufferlog) , &(data->receivebufferphy) , 1024 * 64 + 16 , "rx buffer" );
@@ -500,32 +501,67 @@ static status_t
 read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 {
 	rtl8139_properties_t *data =/* (rtl8139_properties_t *)*/cookie;
-	uint16 length;
-	net_packet_t *packet;
+	packetheader_t *packet_header;
 	
 	dprintf( "rtl8139_nielx: read_hook()\n" );
 
-	acquire_sem_etc( data->input_wait , 1 , B_CAN_INTERRUPT , 0 );
-
-	packet = get_packet();
-	if ( packet == 0 ) //No packets in queue
-		return B_ERROR;
-		
-	if ( packet->len > *num_bytes )
+	//if( !data->nonblocking )
+		acquire_sem_etc( data->input_wait , 1 , B_CAN_INTERRUPT , 0 );
+	
+	//Next: check in command register if there's actually anything to be read
+	if ( m_pcimodule->read_io_8( data->reg_base + Command ) & BUFE  )
 	{
-		free( packet->buffer );
-		free ( packet );
+		dprintf( "rtl8139_nielx read_hook: Nothing to read!!!\n" );
 		return B_IO_ERROR;
-	} 
+	}
 	
-	length = packet->len;
+	// Retrieve the packet header
+	packet_header = (packetheader_t *) ( ( uint8 *)data->receivebufferlog + data->receivebufferoffset );
 	
-	memcpy( buf , packet->buffer , length );
+	// Check if the transfer is already done: EarlyRX
+	if ( packet_header->length == 0xfff0 )
+	{
+		dprintf( "rtl8139_nielx read_hook: The transfer is not yet finished!!!\n" );
+		return B_IO_ERROR;
+	}
 	
-	free( packet->buffer );
-	free( packet );
+	//Check for an error: if needed: resetrx
+	if ( !( packet_header->bits & 0x1 ) || packet_header->length > 1500 )
+	{
+		dprintf( "rtl8139_nielx read_hook: Error in package reception!!!\n" );
+		return B_IO_ERROR;
+	}
 	
-	return length;
+	dprintf( "rtl8139_nielx read_hook(): Packet size: %u Receiveheader: %u Buffer size: %lu\n" , packet_header->length , packet_header->bits , *num_bytes );
+	
+	// Check if the packet goes beyond the buffer
+	/*
+	if ( bufferoffset + packet_header.length > 1024 * 16 + 16 )
+	{
+		dprintf( "rtl8139_nielx read_hook(): Packet goes beyond end of buffer!\n" );
+		//Taken from sample code, I have no idea whether it works
+		memcpy( data->receivebufferlog + 1024 * 16 + 16 , data->receivebufferlog , (bufferoffset + packet_header.length - 1024 * 16 + 16 ) );
+	}
+	*/
+	
+	//Copy the packet
+	*num_bytes = packet_header->length - 4;
+	memcpy( buf , data->receivebufferlog + data->receivebufferoffset + 4 , packet_header->length - 4);  //length-4 because we don't want to copy the 4 bytes CRC
+	
+	//Update the buffer -- 4 for the header length, plus 3 for the dword allignment
+	data->receivebufferoffset = ( data->receivebufferoffset + packet_header->length + 4 + 3 ) & ~3;
+			
+	m_pcimodule->write_io_16( data->reg_base + CAPR , data->receivebufferoffset - 16 ); //-16, avoid overflow
+	
+	dprintf( "rtl8139_nielx read_hook(): CBP %u CAPR %u \n" , m_pcimodule->read_io_16( data->reg_base + CBR ) , m_pcimodule->read_io_16( data->reg_base + CAPR ) );
+	
+	// Re-enable interrupts
+	m_pcimodule->write_io_16( data->reg_base + ISR , ReceiveOk );
+	m_pcimodule->write_io_16( data->reg_base + IMR , 
+		ReceiveOk | ReceiveError | TransmitOk | TransmitError | 
+		ReceiveOverflow | ReceiveUnderflow | ReceiveFIFOOverrun |
+		TimeOut | SystemError );
+	return packet_header->length - 4;
 }
 
 
@@ -574,7 +610,7 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	else
 		data->nexttransmitstatus++;
 	
-	dprintf( "rtl8139_nielx write_hook(): TransmitID: %u Packagelen: %u Register: %x\n" , transmitid , buflen , TSD0 + (sizeof(uint32) * transmitid ) );
+	dprintf( "rtl8139_nielx write_hook(): TransmitID: %u Packagelen: %u Register: %lx\n" , transmitid , buflen , TSD0 + (sizeof(uint32) * transmitid ) );
 	
 	if ( transmitid == -1 )
 	{
@@ -596,7 +632,7 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	
 	//Clear OWN and start transfer Create transmit description with early Tx FIFO, size
 	transmitdescription = ( buflen | 0x80000 | transmitdescription ) ^OWN; //0x80000 = early tx treshold
-	dprintf( "rtl8139_nielx write: transmitdescription = %u\n" , transmitdescription );
+	dprintf( "rtl8139_nielx write: transmitdescription = %lu\n" , transmitdescription );
 	m_pcimodule->write_io_32( data->reg_base + TSD0 + (sizeof(uint32) * transmitid ) , transmitdescription );
 
 	dprintf( "rtl8139_nielx write: TSAD: %u\n" , m_pcimodule->read_io_16( data->reg_base + TSAD ) );
@@ -614,18 +650,62 @@ static status_t
 control_hook (void* cookie, uint32 op, void* arg, size_t len)
 {
 	rtl8139_properties_t *data = (rtl8139_properties_t *)cookie;
-	
+	ether_address_t address;
 	dprintf( "rtl8139_nielx control_hook()\n" );
 	
 	
 	switch ( op )
 	{	
+	case ETHER_INIT:
+		dprintf( "rtl8139_nielx control_hook(): Wants us to init... ;-)\n" );
+		return B_NO_ERROR;
+		
 	case ETHER_GETADDR:
 		if ( data == NULL )
 			return B_ERROR;
 			
 		dprintf( "rtl8139_nielx control_hook(): Wants our address...\n" );
 		memcpy( arg , (void *) &(data->address) , sizeof( ether_address_t ) );
+		return B_OK;
+	
+	case ETHER_ADDMULTI:
+		if (data == NULL )
+			return B_ERROR;
+		//Check if the maximum of multicast addresses isn't reached
+		if ( data->multiset == 8 )
+			return B_ERROR;
+			
+		dprintf( "rtl8139_nielx control_hook(): Add multicast...\n" );
+		memcpy( &address , arg , sizeof( address ) );
+		dprintf( "Multicast address: %i %i %i %i %i %i \n" , address.ebyte[0] ,
+		address.ebyte[1] , address.ebyte[2] , address.ebyte[3] , address.ebyte[4] ,
+		address.ebyte[5] );
+		return B_OK;
+
+		/*data->multiset;
+		m_pcimodule->write_io_32( MAR0 , address[0] ); //First 32 bits
+		m_pcimodule->write_io_32( MAR0 + 0x4 , address
+		*/
+	
+	case ETHER_NONBLOCK:
+		if ( data == NULL )
+			return B_ERROR;
+		
+		dprintf( "rtl8139_nielx control_hook(): Wants to set block/nonblock\n" );
+		memcpy( &data->nonblocking , arg , sizeof( data->nonblocking ) );
+		return B_NO_ERROR;
+		
+	case ETHER_REMMULTI:
+		dprintf( "rtl8139_nielx control_hook(): Wants REMMULTI\n" );
+		return B_OK;
+		
+	case ETHER_SETPROMISC:
+		dprintf("rtl8139_nielx control_hook(): Wants PROMISC\n" );
+		return B_OK;
+	
+	case ETHER_GETFRAMESIZE:
+		dprintf("rtl8139_nielx control_hook(): Wants GETFRAMESIZE\n" ) ;
+		*( (unsigned int *)arg ) = 1514;
 		return B_OK;
 	}
 	return B_BAD_VALUE;
@@ -652,39 +732,11 @@ rtl8139_interrupt( void *cookie )
 	dprintf( "NIELX INTERRUPT: %u \n" , isr_contents );
 	if( isr_contents & ReceiveOk )
 	{
-		dprintf( "rtl8139_nielx interrupt ReceiveOk: %x\n" , m_pcimodule->read_io_16( data->reg_base + CBR ) );
-		isr_write |= ReceiveOk;
-		retval = B_HANDLED_INTERRUPT;
-		//Next: check in command register if there's actually anything to be read
-		while ( !( m_pcimodule->read_io_8( data->reg_base + Command ) & BUFE  ) )
-		{
-			packetheader_t *packet_header;
-			
-			// Retrieve the packet header
-			packet_header = (packetheader_t *) ( ( uint8 *)data->receivebufferlog + data->receivebufferoffset );
-			
-			// Check if the transfer is already done: EarlyRX THIS SHOULD NEVER HAPPEN
-			if ( packet_header->length == 0xfff0 )
-			{
-				dprintf( "rtl8139_nielx interrupt: The transfer is not yet finished!!!\n" );
-				break;
-			}
-			
-			//Check for an error: if needed: resetrx
-			if ( !( packet_header->bits & 0x1 ) || packet_header->length > 1500 )
-			{
-				dprintf( "rtl8139_nielx Interrupt: Error in package reception!!!\n" );
-				break;
-			}
-				
-			//Append the packet to the list
-			append_packet( data->receivebufferlog + data->receivebufferoffset + 4 , packet_header->length - 4 ); //-4 -- we don't want CRC
-	
-			//Update read pointer
-			data->receivebufferoffset = ( data->receivebufferoffset + packet_header->length + 4 + 3 ) & ~3;
-			m_pcimodule->write_io_16( data->reg_base + CAPR , data->receivebufferoffset - 16 ); //-16, avoid overflow
-			dprintf( "rtl8139_nielx interrupt: Packet received ok!!!\n" );
-		}
+		dprintf( "rtl8139_nielx interrupt ReceiveOk\n" );
+		release_sem_etc( data->input_wait , 1 , B_DO_NOT_RESCHEDULE );
+		// First, disable all interrupts until the read hook is finished. It will re-enable them.
+		m_pcimodule->write_io_16( data->reg_base + IMR , 0 );
+		retval = B_INVOKE_SCHEDULER;
 	}
 	
 	if (isr_contents & 	ReceiveError )
@@ -702,7 +754,7 @@ rtl8139_interrupt( void *cookie )
 			if ( data->transmitstatus[temp8] != 1 )
 				continue;
 			txstatus = m_pcimodule->read_io_32( data->reg_base + TSD0 + temp8 * sizeof( int32 ) );
-			dprintf( "run: %u txstatus: %u Register: %x\n" , temp8 , txstatus , TSD0 + temp8 * sizeof( int32 ) );
+			dprintf( "run: %u txstatus: %lu Register: %lx\n" , temp8 , txstatus , TSD0 + temp8 * sizeof( int32 ) );
 			
 			//m_pcimodule->write_io_32( data->reg_base + TSAD0 + temp8 * sizeof( int32) , (m_pcimodule->read_io_32( data->reg_base + TSAD0 + temp8 * sizeof( int32 ) ) ) | OWN ) ;
 			

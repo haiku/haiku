@@ -14,7 +14,6 @@ SubDir OBOS_TOP src add-ons kernel drivers network rtl8139 ;
 
 R5KernelAddon rtl8139 : [ FDirName kernel drivers network ] :
 	driver.c
-	packetlist.c
 	util.c
 	;
 
