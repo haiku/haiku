@@ -5,87 +5,52 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
+
 #include <kmodule.h>
 #include <lock.h>
 #include <Errors.h>
-#include <arch/cpu.h>
-#include <debug.h>
 #include <khash.h>
-#include <kqueue.h>
 #include <malloc.h>
 #include <elf.h>
-#include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <ktypes.h>
+#include <errno.h>
+
+#define MODULE_HASH_SIZE 16
 
 static bool modules_disable_user_addons = false;
 
-#define debug_level_flow  0
-#define debug_level_error 1
-#define debug_level_info  1
-
-#define WAIT 
-#define WAIT_ERROR
-#define MSG_PREFIX "MODULE -- "
-
-#define FUNC_NAME MSG_PREFIX __FUNCTION__ ": "
-
-#define SHOW_FLOW(seriousness, format, param...) \
-	do { if (debug_level_flow > seriousness ) { \
-		dprintf( "%s"##format, FUNC_NAME, param ); WAIT \
-	}} while( 0 )
-
-#define SHOW_FLOW0(seriousness, format) \
-	do { if (debug_level_flow > seriousness ) { \
-		dprintf( "%s"##format, FUNC_NAME); WAIT \
-	}} while( 0 )
-
-#define SHOW_ERROR(seriousness, format, param...) \
-	do { if (debug_level_error > seriousness ) { \
-		dprintf( "%s"##format, FUNC_NAME, param ); WAIT_ERROR \
-	}} while( 0 )
-
-#define SHOW_ERROR0(seriousness, format) \
-	do { if (debug_level_error > seriousness ) { \
-		dprintf( "%s"##format, FUNC_NAME); WAIT_ERROR \
-	}} while( 0 )
-
-#define SHOW_INFO(seriousness, format, param...) \
-	do { if (debug_level_info > seriousness ) { \
-		dprintf( "%s"##format, FUNC_NAME, param ); WAIT \
-	}} while( 0 )
-
-#define SHOW_INFO0(seriousness, format) \
-	do { if (debug_level_info > seriousness ) { \
-		dprintf( "%s"##format, FUNC_NAME); WAIT \
-	}} while( 0 )
+#define TRACE_MODULE 0
+#if TRACE_MODULE
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+#define FATAL(x) dprintf x
 
 
 typedef enum {
-	MOD_QUERIED = 0,
-	MOD_LOADED,
-	MOD_INIT,
-	MOD_RDY,
-	MOD_UNINIT,
-	MOD_ERROR
+	MODULE_QUERIED = 0,
+	MODULE_LOADED,
+	MODULE_INIT,
+	MODULE_READY,
+	MODULE_UNINIT,
+	MODULE_ERROR
 } module_state;
 
 /* This represents the actual loaded module. The module is loaded and
- * may have more than one exported images, 
- * i.e. the module foo may actually have module_info structures for foo and bar
- * To allow for this each module_info structure within the module loaded is represented
- * by a loaded_module_info structure.
+ * may have more than one exported image, i.e. the module foo may actually have
+ * module_info structures for foo and bar.
+ * To allow for this each module_info structure within the module loaded is
+ * represented by a loaded_module_info structure.
  */
 typedef struct loaded_module {
 	struct loaded_module	*next;
-	struct loaded_module	*prev;
 	module_info				**info;		/* the module_info we use */
 	char					*path;		/* the full path for the module */
-	int						ref_cnt;	/* how many ref's to this file */
+	image_id				image;
+	int32					ref_count;	/* how many ref's to this file */
 } loaded_module;
-struct loaded_module loaded_modules;
 
 /* This is used to keep a list of module and the file it's found
  * in. It's used when we do searches to record that a module_info for 
@@ -94,27 +59,24 @@ struct loaded_module loaded_modules;
  */
 typedef struct module {
 	struct module			*next;
-	struct module			*prev;
-	struct loaded_module	*module;
+	struct loaded_module	*loaded_module;
 	char					*name;
 	char					*file;
-	int						ref_cnt;
-	module_info				*ptr;		/* will only be valid if ref_cnt > 0 */
+	int32					ref_count;
+	module_info				*info;		/* will only be valid if ref_cnt > 0 */
 	int						offset;		/* this is the offset in the headers */
-	int						state;		/* state of module */
+	module_state			state;		/* state of module */
 	bool					keep_loaded;
 } module;
 
-/* This is used to provide a list of modules we know about */
-static struct module known_modules; 
 
 #define INC_MOD_REF_COUNT(x) \
-	x->ref_cnt++; \
-	x->module->ref_cnt++;
+	x->ref_count++; \
+	x->loaded_module->ref_count++;
 
 #define DEC_MOD_REF_COUNT(x) \
-	x->ref_cnt--; \
-	x->module->ref_cnt--;
+	x->ref_count--; \
+	x->loaded_module->ref_count--;
 
 
 typedef struct module_iterator {
@@ -125,8 +87,8 @@ typedef struct module_iterator {
 	int							err;
 	int							module_pos;	/* This is used to keep track of which module_info
 											 * within a module we're addressing. */
-	module_info					**cur_header;
-	char						*cur_path;
+	module_info					**current_header;
+	char						*current_path;
 } module_iterator;
 
 typedef struct module_dir_iterator {
@@ -138,12 +100,12 @@ typedef struct module_dir_iterator {
 } module_dir_iterator;
 
 
-/* XXX locking scheme: there is a global lock only; having several locks
+/* locking scheme: there is a global lock only; having several locks
  * makes trouble if dependent modules get loaded concurrently ->
  * they have to wait for each other, i.e. we need one lock per module;
  * also we must detect circular references during init and not dead-lock
  */
-static recursive_lock modules_lock;		
+static recursive_lock gModulesLock;		
 
 /* These are the standard paths that we look on for mdoules to load.
  * By default we only look on these plus the prefix, though we do search
@@ -155,432 +117,482 @@ static recursive_lock modules_lock;
  * but will NOT match
  *      /boot/addons/kernel/media
  */
-const char *const module_paths[] = {
+const char *const gModulePaths[] = {
 	"/boot/user-addons", 
 	"/boot/addons"
 };
 
-#define num_module_paths (sizeof( module_paths ) / sizeof( module_paths[0] ))
+#define NUM_MODULE_PATHS (sizeof(gModulePaths) / sizeof(gModulePaths[0]))
 
-/* the hash tables we use */
-new_hash_table *module_files = NULL;
-new_hash_table *modules_list = NULL;
+/* we store the loaded modules by directory path, and all known modules by module name
+ * in a hash table for quick access
+ */
+hash_table *gLoadedModulesHash;
+hash_table *gModulesHash;
 
 
-/* load_module_file
- * Try to load the module file we've found into memory.
- * This may fail if all the symbols can't be resolved.
- * Returns 0 on success, -1 on failure.
+/** calculates hash for a module using its name */
+
+static uint32
+module_hash(void *_module, const void *_key, uint32 range)
+{
+	module *module = (struct module *)_module;
+	const char *name = (const char *)_key;
+
+	if (module != NULL)
+		return hash_hash_string(module->name) % range;
+	
+	if (name != NULL)
+		return hash_hash_string(name) % range;
+
+	return 0;
+}
+
+
+/** compares a module to a given name */
+
+static int
+module_compare(void *_module, const void *_key)
+{
+	module *module = (struct module *)_module;
+	const char *name = (const char *)_key;
+	if (name == NULL)
+		return -1;
+
+	return strcmp(module->name, name);
+}
+
+
+/** calculates the hash of a loaded module using its path */
+
+static uint32
+loaded_module_hash(void *_module, const void *_key, uint32 range)
+{
+	loaded_module *loadedModule = (loaded_module *)_module;
+	const char *path = (const char *)_key;
+
+	if (loadedModule != NULL)
+		return hash_hash_string(loadedModule->path) % range;
+
+	if (path != NULL)
+		return hash_hash_string(path) % range;
+
+	return 0;
+}
+
+
+/** compares a loaded module to a path */
+
+static int
+loaded_module_compare(void *_module, const void *_key)
+{
+	loaded_module *loadedModule = (loaded_module *)_module;
+	const char *path = (const char *)_key;
+	if (path == NULL)
+		return -1;
+
+	return strcmp(loadedModule->path, path);
+}
+
+
+/** Try to load the module file we've found into memory.
+ *	This may fail if all the symbols can't be resolved.
+ *	Returns 0 on success, -1 on failure.
  *
- * NB hdrs can be passed as a NULL if the modules ** header
- * pointer isn't required.
+ *	NB hdrs can be passed as a NULL if the modules ** header
+ *	pointer isn't required.
  *
- * Returns
- *   NULL on failure
- *   pointer to modules symbol on success
+ *	Returns
+ *		NULL on failure
+ *		pointer to modules symbol on success
  */
 
 static module_info **
-load_module_file(const char *path) 
+load_module_file(const char *path)
 {
-	image_id file_image = elf_load_kspace(path, "");
-	loaded_module *lm;
-	
-	if (file_image < 0 ) {
-		SHOW_FLOW( 3, "couldn't load image %s (%s)\n", path, strerror(file_image));
-		dprintf("load_module_file failed! returned %ld\n", file_image);
+	loaded_module *loadedModule;
+
+	image_id image = elf_load_kspace(path, "");
+	if (image < 0) {
+		dprintf("load_module_file failed: %s\n", strerror(image));
 		return NULL;
 	}
 
-	lm = (loaded_module*)malloc(sizeof(loaded_module));
-	if (!lm)
-		return NULL;
-	
-	lm->info = (module_info**) elf_lookup_symbol(file_image, "modules");
-	if (!lm->info) {
-		dprintf("Failed to load %s due to lack of 'modules' symbol\n", path);
-		free(lm);
+	loadedModule = (loaded_module *)malloc(sizeof(loaded_module));
+	if (!loadedModule) {
+		elf_unload_kspace(path);
 		return NULL;
 	}
-		
-	lm->path = (char*)malloc(strlen(path) + 1);
-	if (!lm->path) {
-		free(lm);
+
+	loadedModule->info = (module_info **)elf_lookup_symbol(image, "modules");
+	if (!loadedModule->info) {
+		FATAL(("load_module_file: Failed to load %s due to lack of 'modules' symbol\n", path));
+		elf_unload_kspace(path);
+		free(loadedModule);
 		return NULL;
 	}
-	strcpy(lm->path, path);
-	lm->ref_cnt = 0;
 
-	recursive_lock_lock(&modules_lock);
+	loadedModule->path = strdup(path);
+	if (!loadedModule->path) {
+		elf_unload_kspace(path);
+		free(loadedModule);
+		return NULL;
+	}
 
-	insque(lm, &loaded_modules);
-	hash_set(module_files, path, strlen(path), lm);
+	loadedModule->image = image;
+	loadedModule->ref_count = 0;
 
-	recursive_lock_unlock(&modules_lock);
+	recursive_lock_lock(&gModulesLock);
+	hash_insert(gLoadedModulesHash, loadedModule);
+	recursive_lock_unlock(&gModulesLock);
 
-	return lm->info;
+	return loadedModule->info;
 }
 
 
 static inline void
 unload_module_file(const char *path)
 {
-	loaded_module *themod; 
-dprintf("unload_mdoule_file: %s\n", path);
+	loaded_module *loadedModule;
 
-//	themod = (loaded_module*)hash_get(module_files, path, strlen(path));
-	if ((themod = (loaded_module*)hash_get(module_files, path, strlen(path))) == NULL)
+	TRACE(("unload_mdoule_file: %s\n", path));
+
+	loadedModule = (loaded_module *)hash_lookup(gLoadedModulesHash, path);
+	if (loadedModule == NULL)
 		return;
 
-	if (themod->ref_cnt != 0) {
-		dprintf("Can't unload %s due to ref_cnt = %d\n", themod->path, themod->ref_cnt);
+	if (loadedModule->ref_count != 0) {
+		FATAL(("Can't unload %s due to ref_cnt = %ld\n", loadedModule->path, loadedModule->ref_count));
 		return;
 	}
 
-	recursive_lock_lock(&modules_lock);
+	recursive_lock_lock(&gModulesLock);
+	hash_remove(gLoadedModulesHash, loadedModule);
+	recursive_lock_unlock(&gModulesLock);
 
-	remque(themod);
-	hash_set(module_files, path, strlen(path), NULL);
-
-	recursive_lock_unlock(&modules_lock);
-
-	elf_unload_kspace(themod->path);
-	free(themod);
+	elf_unload_kspace(loadedModule->path);
+	free(loadedModule->path);
+	free(loadedModule);
 }
 
 
-/* simple_module_info()
- * Extract the information from the module_info structure pointed at
- * by mod and create the entries required for access to it's details.
- *
- * Returns
- *  -1 if error
- *   0 if ok
+/** Extract the information from the module_info structure pointed at
+ *	by "info" and create the entries required for access to it's details.
  */
 
 static int
-simple_module_info(module_info *mod, const char *file, int offset)
+create_module(module_info *info, const char *file, int offset, module **_module)
 {
-	module *m;
-	
-	if (!mod->name)
-		return -1;
+	module *module;
 
-	m = (module*)hash_get(modules_list, mod->name, strlen(mod->name));
-	if (m) {
-		dprintf("Duplicate module name (%s) detected...ignoring\n", mod->name);
-		return -1;
+	if (!info->name)
+		return B_BAD_VALUE;
+
+	module = (struct module *)hash_lookup(gModulesHash, info->name);
+	if (module) {
+		FATAL(("Duplicate module name (%s) detected... ignoring new one\n", info->name));
+		return B_FILE_EXISTS;
 	}
 
-	if ((m = (module*)malloc(sizeof(module))) == NULL)
-		return -1;
-	
-	SHOW_FLOW(3, "simple_module_info(%s, %s)\n", mod->name, file);
-	
-	dprintf("simple_module_info: '%s'\n", mod->name);
-	m->module = NULL; /* back pointer */
-	m->name = (char*)malloc(strlen(mod->name) + 1);
-	if (!m->name) {
-		free(m);
-		return -1;
-	}
-	strcpy(m->name, mod->name);	
-	m->state = MOD_QUERIED;
-	/* Record where the module_info can be found */
-	m->offset = offset;
-	m->file = strdup(file);
-	m->ref_cnt = 0;
-	/* set the keep_loaded flag */
-	if (mod->flags & B_KEEP_LOADED) {
-		dprintf("module %s wants to be kept loaded\n", m->name);
-		m->keep_loaded = true;
+	if ((module = (struct module *)malloc(sizeof(module))) == NULL)
+		return B_NO_MEMORY;
+
+	TRACE(("create_module(%s, %s)\n", info->name, file));
+
+	module->loaded_module = NULL;
+	module->name = strdup(info->name);
+	if (module->name == NULL) {
+		free(module);
+		return B_NO_MEMORY;
 	}
 
-	recursive_lock_lock(&modules_lock);
+	module->file = strdup(file);
+	if (module->file == NULL) {
+		free(module->name);
+		free(module);
+		return B_NO_MEMORY;
+	}
 
-	/* Insert into linked list */
-	insque(m, &known_modules);
-	hash_set(modules_list, mod->name, strlen(mod->name), m);
+	module->state = MODULE_QUERIED;
+	module->offset = offset;
+		// record where the module_info can be found in the module_info array
+	module->ref_count = 0;
 
-	recursive_lock_unlock(&modules_lock);
+	if (info->flags & B_KEEP_LOADED) {
+		TRACE(("module %s wants to be kept loaded\n", module->name));
+		module->keep_loaded = true;
+	}
 
-	return 0;
+	recursive_lock_lock(&gModulesLock);
+	hash_insert(gModulesHash, module);
+	recursive_lock_unlock(&gModulesLock);
+
+	if (_module)
+		*_module = module;
+
+	return B_OK;
 }
 
 
-/* recurse_check_file
- * Load the file filepath and check to see if we have a module within it
- * that matches module_wanted.
- *
- * NB module_wanted could be NULL if we're just scanning the modules.
- *
- * Return
- *  -1 on error
- *   0 on no match
- *   1 on match
+/** Loads the file at "path" and scans all modules contained therein.
+ *	Returns B_OK if "searchedName" could be found under those modules,
+ *	B_ENTRY_NOT_FOUND if not.
+ *	Must only be called for files that haven't been scanned yet.
+ *	"searchedName" is allowed to be NULL (if all modules should be scanned)
  */
 
-static int
-recurse_check_file(const char *filepath, const char *module_wanted)
+static status_t
+check_module_file(const char *path, const char *searchedName)
 {
-	module_info **hdr = NULL, **chk;
-	int i = 0, match = 0;
+	module_info **header = NULL, **info;
+	int index = 0, match = B_ENTRY_NOT_FOUND;
 
-	if ((hdr = load_module_file(filepath)) == NULL)
+	ASSERT(hash_lookup(gLoadedModulesHash, path) == NULL);
+
+	if ((header = load_module_file(path)) == NULL)
 		return -1;
-	
-	for (chk = hdr; *chk; chk++) {
-		/* if simple_module_info returns 0 then we have found a new
-		 * module and added it to the hash table. The question is now
-		 * is this new module the one we're looking for?
-		 * module_wanted may be a NULL, which is why we check for it.
-		 */
-		if (simple_module_info((*chk), filepath, i++) == 0) {
-			if (module_wanted && strcmp((*chk)->name, module_wanted) == 0)
-				match = 1;
+
+	for (info = header; *info; info++) {
+		// try to create a module for every module_info, check if the
+		// name matches if it was a new entry
+		if (create_module(*info, path, index++, NULL) == B_OK) {
+			if (searchedName && !strcmp((*info)->name, searchedName))
+				match = B_OK;
 		}
 	}
 
-	/* If match != 1 then the modules we've found in the file don't match
-	 * the one we're looking for. Unload the module as we're not about to need
-	 * anything from it.
-	 */	
-	if (match != 1) {
-//		dprintf("unloading module file %s\n", filepath);
-		unload_module_file(filepath);
+	// The module we looked for couldn't be found, so we can unload the
+	// loaded module at this point
+	if (match != B_OK) {
+		TRACE(("check_module_file: unloading module file %s\n", path));
+		unload_module_file(path);
 	}
 
 	return match;
 }
 
 	
-/* recurse_directory
- * Enter the directory and try every entry, entering directories if
- * we encounter them.
- *
- * NB match can be NULL if we're just doing a scan of the modules
- *    to build our cache.
- *
- * The recurse loop has these values
- *  -1 for error
- *   0 for no match
- *   1 for match
+/** Recursively scans through the provided path for the specified module
+ *	named "searchedName".
+ *	If "searchedName" is NULL, all modules will be scanned.
+ *	Returns B_OK if the module could be found, B_ENTRY_NOT_FOUND if not,
+ *	or some other error occured during scanning.
  */
 
-static int
-recurse_directory(const char *path, const char *match)
+static status_t
+recurse_directory(const char *path, const char *searchedName)
 {
-	/* ToDo: should just use opendir(), readdir(), ... */
-	int res = 0, dir;
-	int bufferSize = sizeof(struct dirent) + SYS_MAX_NAME_LEN + 1;
-	struct dirent *dirent;
+	status_t status;
+	DIR *dir = opendir(path);
+	if (dir == NULL);
+		return errno;
 
-	if ((dir = sys_open_dir(path)) < 0)
-		return -1;
+	errno = 0;
 
-	dirent = malloc(bufferSize);
-	if (!dirent) {
-		sys_close(dir);
-		return -1;
-	}
-
-	/* loop until we have a match or we run out of entries */
-	while (res <= 0) {
+	// loop until we have a match or we run out of entries
+	while (true) {
+		struct dirent *dirent;
 		struct stat st;
-		char *newpath;
-		size_t slen = 0;
-		SHOW_FLOW(3, "scanning %s\n", path);
+		char *newPath;
+		size_t size = 0;
 
-		if ((res = sys_read_dir(dir, dirent, bufferSize, 1)) <= 0)
-			break;
+		TRACE(("scanning %s\n", path));
 
-		dirent->d_name[dirent->d_reclen] = '\0';
-
-		slen = strlen(path) + strlen(dirent->d_name) + 2;	
-		newpath = (char*)malloc(slen);
-		strlcpy(newpath, path, slen);
-		strlcat(newpath, "/", slen);
-		strlcat(newpath, dirent->d_name, slen);
-
-		if ((res = stat(newpath, &st)) != B_NO_ERROR) {
-			free(newpath);
-			break;
+		dirent = readdir(dir);
+		if (dirent == NULL) {
+			// we tell the upper layer we couldn't find anything in here
+			status = errno == 0 ? B_ENTRY_NOT_FOUND : errno;
+			goto exit;
 		}
 
-		/* If we got here, we have either a file or a directory.
-		 * If it's a file, do we have the details on record?
-		 *  If we don't, then load the file and record it's details.
-		 *  If it matches our search path we'll return afterwards.
-		 */
+		size = strlen(path) + strlen(dirent->d_name) + 2;	
+		newPath = (char *)malloc(size);
+		if (newPath == NULL) {
+			status = B_NO_MEMORY;
+			goto exit;
+		}
+
+		strlcpy(newPath, path, size);
+		strlcat(newPath, "/", size);
+			// two slashes wouldn't hurt
+		strlcat(newPath, dirent->d_name, size);
+
+		if (stat(newPath, &st) != 0) {
+			free(newPath);
+			errno = 0;
+
+			// If we couldn't stat the current file, we will just ignore it;
+			// it's a problem of the file system, not ours.
+			continue;
+		}
+
 		if (S_ISREG(st.st_mode)) {
-			/* do we already know about this file? 
-			 * If we do res = 0 and we'll just carry on, if
-			 * not, it's a new file so we need to read in the
-			 * file details via recurse_file_check() function.
-			 */
-			if (hash_get(module_files, newpath, strlen(newpath)) != NULL)
-				res = 0;
-			else
-				res = recurse_check_file(newpath, match);
+			// if it's a file, check if we already have it in the hash table,
+			// because then we know it doesn't contain the module we are
+			// searching for (we are here because it couldn't be found in
+			// the first place)
+			if (hash_lookup(gLoadedModulesHash, newPath) != NULL)
+				continue;
 
-		} else if (S_ISDIR(st.st_mode)) {
-			res = recurse_directory(newpath, match);
-		}
-		free(newpath);
+			status = check_module_file(newPath, searchedName);
+		} else if (S_ISDIR(st.st_mode))
+			status = recurse_directory(newPath, searchedName);
+		else
+			status = B_ERROR;
+
+		if (status == B_OK)
+			goto exit;
+
+		free(newPath);
 	}
 
-	free(dirent);
-	sys_close(dir);
-
-	return res;
+exit:
+	closedir(dir);
+	return status;
 }
 
 
-/* This is only called if we fail to find a module already in our cache...saves us
- * some extra checking here :)
+/** This is only called if we fail to find a module already in our cache...
+ *	saves us some extra checking here :)
  */
 
 static module *
 search_module(const char *name)
 {
 	int i, res = 0;
-	SHOW_FLOW(3, "search_module(%s)\n", name);
+	TRACE(("search_module(%s)\n", name));
 	
-	for (i = 0; i < (int)num_module_paths; ++i) {
-		if ((res = recurse_directory(module_paths[i], name)) == 1)
+	for (i = 0; i < (int)NUM_MODULE_PATHS; ++i) {
+		if ((res = recurse_directory(gModulePaths[i], name)) == 1)
 			break;
 	}
 
 	if (res != 1)
 		return NULL;
-	
-	return (module*)hash_get(modules_list, name, strlen(name));
+
+	return (module *)hash_lookup(gModulesHash, name);
 }
 
 
-static inline int
+/** Initializes a loaded module depending on its state */
+
+static inline status_t
 init_module(module *module)
 {
-	int res = 0;
 		
-	switch(module->state) {
-		case MOD_QUERIED:
-		case MOD_LOADED:
-			module->state = MOD_INIT;	
-			SHOW_FLOW( 3, "initing module %s... \n", module->name );
-			res = module->ptr->std_ops(B_MODULE_INIT);
-			SHOW_FLOW(3, "...done (%s)\n", strerror(res));
+	switch (module->state) {
+		case MODULE_QUERIED:
+		case MODULE_LOADED:
+		{
+			status_t status;
+			module->state = MODULE_INIT;
 
-			if (!res ) 
-				module->state = MOD_RDY;
+			TRACE(("initing module %s... \n", module->name));
+			status = module->info->std_ops(B_MODULE_INIT);
+			TRACE(("...done (%s)\n", strerror(status)));
+
+			if (!status) 
+				module->state = MODULE_READY;
 			else
-				module->state = MOD_LOADED;
-			break;
+				module->state = MODULE_LOADED;
 
-		case MOD_RDY:	
-			res = B_NO_ERROR;
-			break;
-		
-		case MOD_INIT:
-			SHOW_ERROR( 0, "circular reference to %s\n", module->name );
-			res = B_ERROR;
-			break;
-		
-		case MOD_UNINIT:
-			SHOW_ERROR( 0, "tried to load module %s which is currently unloading\n", module->name );
-			res = B_ERROR;
-			break;
+			return status;
+		}
 
-		case MOD_ERROR:
-			SHOW_INFO( 0, "cannot load module %s because its earlier unloading failed\n", module->name );
-			res = B_ERROR;
-			break;
-		
+		case MODULE_READY:
+			return B_NO_ERROR;
+
+		case MODULE_INIT:
+			FATAL(("circular reference to %s\n", module->name));
+			return B_ERROR;
+
+		case MODULE_UNINIT:
+			FATAL(("tried to load module %s which is currently unloading\n", module->name));
+			return B_ERROR;
+
+		case MODULE_ERROR:
+			FATAL(("cannot load module %s because its earlier unloading failed\n", module->name));
+			return B_ERROR;
+
 		default:
-			res = B_ERROR;
+			return B_ERROR;
 	}
-	
-	return res;
+	// never trespasses here
 }
 
+
+/** Uninitializes a module depeding on its state */
 
 static inline int
 uninit_module(module *module)
 {
-	switch( module->state ) {
-		case MOD_QUERIED:
-		case MOD_LOADED:
+	switch (module->state) {
+		case MODULE_QUERIED:
+		case MODULE_LOADED:
 			return B_NO_ERROR;
 
-		case MOD_INIT:
-			panic( "Trying to unload module %s which is initializing\n", 
-				module->name );
+		case MODULE_INIT:
+			panic("Trying to unload module %s which is initializing\n", module->name);
 			return B_ERROR;
 
-		case MOD_UNINIT:
-			panic( "Trying to unload module %s which is un-initializing\n", module->name );
+		case MODULE_UNINIT:
+			panic("Trying to unload module %s which is un-initializing\n", module->name);
 			return B_ERROR;
-		
-		case MOD_RDY:
-			{
-				int res;
-			
-				module->state = MOD_UNINIT;
 
-				SHOW_FLOW( 2, "uniniting module %s...\n", module->name );
-				res = module->ptr->std_ops(B_MODULE_UNINIT);
-				SHOW_FLOW( 2, "...done (%s)\n", strerror( res ));
+		case MODULE_READY:
+		{
+			status_t status;
 
-				if (res == B_NO_ERROR ) {
-					module->state = MOD_LOADED;
-					return 0;
-				}
-			
-				SHOW_ERROR( 0, "Error unloading module %s (%i)\n", module->name, res );
+			module->state = MODULE_UNINIT;
+
+			TRACE(("uniniting module %s...\n", module->name));
+			status = module->info->std_ops(B_MODULE_UNINIT);
+			TRACE(("...done (%s)\n", strerror(status)));
+
+			if (status == B_NO_ERROR) {
+				module->state = MODULE_LOADED;
+				return 0;
 			}
-		
-			module->state = MOD_ERROR;
+
+			FATAL(("Error unloading module %s (%s)\n", module->name, strerror(status)));
+
+			module->state = MODULE_ERROR;
 			module->keep_loaded = true;
-			
-		// fall through
+
+			return status;
+		}
 		default:	
 			return B_ERROR;		
 	}
+	// never trespasses here
 }
 
 
-static int
-process_module_info(module_iterator *iter, char *buf, size_t *bufsize)
+static status_t
+process_module_info(module_iterator *iterator, char *buffer, size_t *_bufferSize)
 {
-	module *m = NULL;
-	module_info **mod;
-	int res = B_NO_ERROR;
-		
-	mod = iter->cur_header;
-	if (!mod || !(*mod)) {
-		res = EINVAL;
+	module *module = NULL;
+	module_info **info = iterator->current_header;
+	status_t status = B_NO_ERROR;
+
+	if (!info || !(*info)) {
+		status = B_BAD_VALUE;
 	} else {
-		res = simple_module_info(*mod, iter->cur_path, iter->module_pos++);
-		
-		m = (module*)hash_get(modules_list, (*mod)->name, strlen((*mod)->name));
-		if (m) {
-			strlcpy(buf, m->name, *bufsize);
-			*bufsize = strlen(m->name);
+		status = create_module(*info, iterator->current_path, iterator->module_pos++, &module);
+		if (status == B_OK) {
+			strlcpy(buffer, module->name, *_bufferSize);
+			*_bufferSize = strlen(module->name);
 		}
 	}
-	
-	/* Deal with the header pointer!
-	 * Basically if we have a valid pointer (mod) and the next (++mod) is NOT null,
-	 * then we advance the cur_header pointer, otherwise we specify it as
-	 * NULL to make sure we don't have trouble :)
-	 */
-	if (mod && *(++mod) != NULL)
-		iter->cur_header++;
-	else
-		iter->cur_header = NULL;
 
-	return res;
-}	
+	// If we have a valid "info" pointer, traverse to the next, or mark the end
+	if (info && *(++info) != NULL)
+		iterator->current_header++;
+	else
+		iterator->current_header = NULL;
+
+	return status;
+}
 
 
 static inline int
@@ -589,10 +601,10 @@ module_create_dir_iterator(module_iterator *iter, int file, const char *name)
 	module_dir_iterator *dir;
 
 	/* if we're creating a dir_iterator, there is no way that the
-	 * cur_header value can be valid, so make sure and reset it
+	 * current_header value can be valid, so make sure and reset it
 	 * here.
 	 */
-	iter->cur_header = NULL;
+	iter->current_header = NULL;
 
 	dir = (struct module_dir_iterator *)malloc(sizeof(*dir));
 	if (dir == NULL )
@@ -615,7 +627,7 @@ module_create_dir_iterator(module_iterator *iter, int file, const char *name)
 		
 	iter->cur_dir = dir;
 
-	SHOW_FLOW( 3, "created dir iterator for %s\n", name );		
+	TRACE(("created dir iterator for %s\n", name));
 	return B_NO_ERROR;
 }
 
@@ -625,39 +637,38 @@ module_enter_dir(module_iterator *iter, const char *path)
 {
 	int dir;
 	int res;
-	
+
+	// ToDo: use opendir() instead
 	dir = sys_open_dir(path);
 	if (dir < 0) {
-		SHOW_FLOW(3, "couldn't open directory %s (%s)\n", path, strerror(dir));
+		TRACE(("couldn't open directory %s (%s)\n", path, strerror(dir)));
 
 		// there are so many errors for "not found" that we don't bother
 		// and always assume that the directory suddenly disappeared
 		return B_NO_ERROR;
 	}
-						
+
 	res = module_create_dir_iterator(iter, dir, path);
 	if (res != B_NO_ERROR) {
 		sys_close(dir);
 		return ENOMEM;
 	}
 
-	SHOW_FLOW(3, "entered directory %s\n", path);
+	TRACE(("entered directory %s\n", path));
 	return B_NO_ERROR;
 }
 
 
 static inline void
-destroy_dir_iterator( module_iterator *iter )
+destroy_dir_iterator(module_iterator *iter)
 {
-	module_dir_iterator *dir;
-	
-	dir = iter->cur_dir;
-	
-	SHOW_FLOW( 3, "destroying directory iterator for sub-dir %s\n", dir->name );
-	
-	if (dir->parent_dir )
+	module_dir_iterator *dir = iter->cur_dir;
+
+	TRACE(("destroying directory iterator for sub-dir %s\n", dir->name));
+
+	if (dir->parent_dir)
 		dir->parent_dir->sub_dir = NULL;
-		
+
 	iter->cur_dir = dir->parent_dir;
 
 	free(dir->name);
@@ -666,54 +677,53 @@ destroy_dir_iterator( module_iterator *iter )
 
 
 static inline void
-module_leave_dir( module_iterator *iter )
+module_leave_dir(module_iterator *iter)
 {
 	module_dir_iterator *parent_dir;
 	
-	SHOW_FLOW( 3, "leaving directory %s\n", iter->cur_dir->name );
-	
+	TRACE(("leaving directory %s\n", iter->cur_dir->name));
+
 	parent_dir = iter->cur_dir->parent_dir;
-	iter->cur_header = NULL;	
-	sys_close( iter->cur_dir->file );
-	destroy_dir_iterator( iter );
-	
+	iter->current_header = NULL;	
+	sys_close(iter->cur_dir->file);
+	destroy_dir_iterator(iter);
+
 	iter->cur_dir = parent_dir;
 }
 
-static void compose_path( char *path, module_iterator *iter, const char *name, bool full_path )
+
+static void
+compose_path(char *path, module_iterator *iter, const char *name, bool full_path)
 {
 	module_dir_iterator *dir;
 	
-	if (full_path ) {
-		strlcpy( path, iter->base_dir->name, SYS_MAX_PATH_LEN );
-		strlcat( path, "/", SYS_MAX_PATH_LEN );
+	if (full_path) {
+		strlcpy(path, iter->base_dir->name, SYS_MAX_PATH_LEN);
+		strlcat(path, "/", SYS_MAX_PATH_LEN);
 	} else {
-		strlcpy( path, iter->prefix, SYS_MAX_PATH_LEN );
-		if (*iter->prefix )
-			strlcat( path, "/", SYS_MAX_PATH_LEN );
+		strlcpy(path, iter->prefix, SYS_MAX_PATH_LEN);
+		if (*iter->prefix)
+			strlcat(path, "/", SYS_MAX_PATH_LEN);
 	}
-	
-	for( dir = iter->base_dir->sub_dir; dir; dir = dir->sub_dir ) {
-		strlcat( path, dir->name, SYS_MAX_PATH_LEN );
-		strlcat( path, "/", SYS_MAX_PATH_LEN );
+
+	for (dir = iter->base_dir->sub_dir; dir; dir = dir->sub_dir) {
+		strlcat(path, dir->name, SYS_MAX_PATH_LEN);
+		strlcat(path, "/", SYS_MAX_PATH_LEN);
 	}
-		
-	strlcat( path, name, SYS_MAX_PATH_LEN );
-	
-	SHOW_FLOW( 3, "name: %s, %s -> %s\n", name, 
-		full_path ? "full path" : "relative path", 
-		path );
+
+	strlcat(path, name, SYS_MAX_PATH_LEN);
+
+	TRACE(("name: %s, %s -> %s\n", name, full_path ? "full path" : "relative path", path));
 }
 
 
-/* module_traverse_directory
- * Logic as follows...
- * If we have a headers pointer,
- * - check if the next structure is NULL, if not process that module_info structure
- * - if it's null, close the file, NULL the headers pointer and fall through
+/** Logic as follows...
+ *	If we have a headers pointer,
+ *	 - check if the next structure is NULL, if not process that module_info structure
+ *	 - if it's null, close the file, NULL the headers pointer and fall through
  *
- * This function tries to find the next module filename and then set the headers
- * pointer in the cur_dir structure.
+ *	This function tries to find the next module filename and then set the headers
+ *	pointer in the cur_dir structure.
  */
 
 static inline int
@@ -725,25 +735,25 @@ module_traverse_dir(module_iterator *iter)
 	char path[SYS_MAX_PATH_LEN];
 	int res;
 
-	/* If (*iter->cur_header) != NULL we have another module within
+	/* If (*iter->current_header) != NULL we have another module within
 	 * the existing file to return, so just return.
 	 * Otherwise, actually find the next file to read.
 	 */ 
-	if (iter->cur_header) {
-		if (*iter->cur_header != NULL)
+	if (iter->current_header) {
+		if (*iter->current_header != NULL)
 			return B_OK;
 
-		unload_module_file(iter->cur_path);
+		unload_module_file(iter->current_path);
 	}
 
-	SHOW_FLOW( 3, "scanning %s\n", iter->cur_dir->name);
+	TRACE(("scanning %s\n", iter->cur_dir->name));
 	if ((res = sys_read_dir(iter->cur_dir->file, dirent, sizeof(buffer), 1)) <= 0) {
-		SHOW_FLOW(3, "got error: %s\n", strerror(res));
+		TRACE(("got error: %s\n", strerror(res)));
 		module_leave_dir(iter);
 		return B_NO_ERROR;
 	}
 
-	SHOW_FLOW(3, "got %s\n", dirent->d_name);
+	TRACE(("got %s\n", dirent->d_name));
 
 	if (strcmp(dirent->d_name, ".") == 0
 		|| strcmp(dirent->d_name, "..") == 0 )
@@ -754,7 +764,7 @@ module_traverse_dir(module_iterator *iter)
 	/* As we're doing a new file, reset the pointers that might get
 	 * screwed up...
 	 */
-	iter->cur_header = NULL;
+	iter->current_header = NULL;
 	iter->module_pos = 0;
 
 	if ((res = stat(path, &st)) != B_NO_ERROR)
@@ -763,8 +773,8 @@ module_traverse_dir(module_iterator *iter)
 	if (S_ISREG(st.st_mode)) {
 		module_info **hdrs = NULL;
 		if ((hdrs = load_module_file(path)) != NULL) {
-			iter->cur_header = hdrs;
-			iter->cur_path = strdup(path);			
+			iter->current_header = hdrs;
+			iter->current_path = strdup(path);			
 			return B_NO_ERROR;
 		}
 		return EINVAL; /* not sure what we should return here */
@@ -773,14 +783,13 @@ module_traverse_dir(module_iterator *iter)
 	if (S_ISDIR(st.st_mode))
 		return module_enter_dir(iter, path);
 
-	SHOW_FLOW(3, "entry %s not a file nor a directory - ignored\n", dirent->d_name);
+	TRACE(("entry %s not a file nor a directory - ignored\n", dirent->d_name));
 	return B_NO_ERROR;
 }
 
 
-/* module_enter_base_path
- * Basically try each of the directories we have listed as module paths,
- * trying each with the prefix we've been allocated.
+/** Basically try each of the directories we have listed as module paths,
+ *	trying each with the prefix we've been allocated.
  */
 
 static inline int
@@ -790,18 +799,18 @@ module_enter_base_path(module_iterator *iter)
 
 	++iter->base_path_id;
 
-	if (iter->base_path_id >= (int)num_module_paths) {
-		SHOW_FLOW0(3, "no locations left\n");
-		return ENOENT;
+	if (iter->base_path_id >= NUM_MODULE_PATHS) {
+		TRACE(("no locations left\n"));
+		return B_ENTRY_NOT_FOUND;
 	}
 
-	SHOW_FLOW(3, "trying base path (%s)\n", module_paths[iter->base_path_id]);
+	TRACE(("trying base path (%s)\n", gModulePaths[iter->base_path_id]));
 
 	if (iter->base_path_id == 0 && modules_disable_user_addons) {
-		SHOW_FLOW0(3, "ignoring user add-ons (they are disabled)\n");
+		TRACE(("ignoring user add-ons (they are disabled)\n"));
 		return B_NO_ERROR;
 	}
-	strcpy(path, module_paths[iter->base_path_id]);
+	strcpy(path, gModulePaths[iter->base_path_id]);
 	if (*iter->prefix) {
 		strcat(path, "/");
 		strlcat(path, iter->prefix, sizeof(path));
@@ -811,126 +820,26 @@ module_enter_base_path(module_iterator *iter)
 }
 
 
-/* open_module_list
- * This returns a pointer to a structure that can be used to
- * iterate through a list of all modules available under
- * a given prefix.
- * All paths will be searched and the returned list will
- * contain all modules available under the prefix.
- * The structure is then used by the read_next_module_name function
- * and MUST be freed or memory will be leaked.
- */
-
-void *
-open_module_list(const char *prefix)
-{
-	module_iterator *iter;
-
-	SHOW_FLOW(3, "prefix: %s\n", prefix);
-
-	iter = (module_iterator *)malloc(sizeof( module_iterator));
-	if (!iter)
-		return NULL;
-
-	iter->prefix = strdup(prefix);
-	if (iter->prefix == NULL) {
-		free(iter);
-		return NULL;
-	}
-
-	iter->base_path_id = -1;
-	iter->base_dir = iter->cur_dir = NULL;
-	iter->err = B_NO_ERROR;
-	iter->module_pos = 0;
-
-	return (void *)iter;
-}
+//	#pragma mark -
+//	Exported Kernel API (private part)
 
 
-/* read_next_module_name
- * Return the next module name from the available list, using
- * a structure previously created by a call to open_module_list.
- * Returns 0 if a module was available.
- */
-
-status_t
-read_next_module_name(void *cookie, char *buf, size_t *bufsize)
-{
-	module_iterator *iter = (module_iterator *)cookie;
-	int res;
-
-	*buf = '\0';
-
-	if (!iter)
-		return EINVAL;
-
-	res = iter->err;
-
-	SHOW_FLOW0(3, "looking for next module\n");
-	while (res == B_NO_ERROR) {	
-		SHOW_FLOW0(3, "searching for module\n");
-		if (iter->cur_dir == NULL) {
-			res = module_enter_base_path(iter);
-		} else {
-			if ((res = module_traverse_dir(iter)) == B_NO_ERROR) {
-				/* By this point we should have a valid pointer to a module_info structure
-				 * in iter->cur_header
-				 */
-				if (process_module_info(iter, buf, bufsize) == B_NO_ERROR)
-					break;			
-			}
-		}
-	}
-
-	/* did we get something?? */
-	if (*buf == '\0')
-		res = ENOENT;
-
-	iter->err = res;
-
-	SHOW_FLOW(3, "finished with status %s\n", strerror(iter->err));
-	return iter->err;
-}
-
-
-status_t
-close_module_list(void *cookie)
-{
-	module_iterator *iter = (module_iterator *)cookie;
-
-	SHOW_FLOW0(3, "\n");
-
-	if (!iter)
-		return EINVAL;
-
-	while (iter->cur_dir)
-		module_leave_dir(iter);
-
-	free(iter->prefix);
-	free(iter);
-
-	return 0;
-}
-
-
-/* module_init
- * setup module structures and data for use
+/** Setup the module structures and data for use - must be called
+ *	before any other module call.
  */
 
 status_t
 module_init(kernel_args *ka, module_info **sys_module_headers)
 {
-	SHOW_FLOW0(0, "\n");
-	recursive_lock_create(&modules_lock);
-	
-	modules_list = hash_make();
-	module_files = hash_make();
-	                         
-	if (modules_list == NULL || module_files == NULL)
-		return ENOMEM;
+	recursive_lock_create(&gModulesLock);
 
-	initque(&loaded_modules);
-	initque(&known_modules);
+	gModulesHash = hash_init(MODULE_HASH_SIZE, 0, module_compare, module_hash);
+	if (gModulesHash == NULL)
+		return B_NO_MEMORY;
+
+	gLoadedModulesHash = hash_init(MODULE_HASH_SIZE, 0, loaded_module_compare, loaded_module_hash);
+	if (gLoadedModulesHash == NULL)
+		return B_NO_MEMORY;
 
 /*
 	if (sys_module_headers) { 
@@ -943,100 +852,248 @@ module_init(kernel_args *ka, module_info **sys_module_headers)
 }
 
 
-status_t
-get_module(const char *path, module_info **vec)
+//	#pragma mark -
+//	Exported Kernel API (public part)
+
+
+/** This returns a pointer to a structure that can be used to
+ *	iterate through a list of all modules available under
+ *	a given prefix.
+ *	All paths will be searched and the returned list will
+ *	contain all modules available under the prefix.
+ *	The structure is then used by read_next_module_name(), and
+ *	must be freed by calling close_module_list().
+ */
+
+void *
+open_module_list(const char *prefix)
 {
-	module *m;
-	loaded_module *lm;
-	int res = B_NO_ERROR;
-	*vec = NULL;
+	module_iterator *iterator;
+
+	TRACE(("open_module_list(prefix = %s)\n", prefix));
+
+	iterator = (module_iterator *)malloc(sizeof( module_iterator));
+	if (!iterator)
+		return NULL;
+
+	// ToDo: possibly, the prefix don't have to be copied, just referenced
+	iterator->prefix = strdup(prefix);
+	if (iterator->prefix == NULL) {
+		free(iterator);
+		return NULL;
+	}
+
+	iterator->base_path_id = -1;
+	iterator->base_dir = iterator->cur_dir = NULL;
+	iterator->err = B_NO_ERROR;
+	iterator->module_pos = 0;
+
+	return (void *)iterator;
+}
+
+
+/** Frees the cookie allocated by open_module_list()
+ */
+
+status_t
+close_module_list(void *cookie)
+{
+	module_iterator *iterator = (module_iterator *)cookie;
+
+	TRACE(("close_module_list()\n"));
+
+	if (iterator == NULL)
+		return B_BAD_VALUE;
+
+	while (iterator->cur_dir)
+		module_leave_dir(iterator);
+
+	free(iterator->prefix);
+	free(iterator);
+
+	return 0;
+}
+
+
+/** Return the next module name from the available list, using
+ *	a structure previously created by a call to open_module_list.
+ *	Returns B_OK as long as it found another module, B_ENTRY_NOT_FOUND
+ *	when done.
+ */
+
+status_t
+read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
+{
+	module_iterator *iterator = (module_iterator *)cookie;
+	status_t status;
+
+	if (iterator == NULL || buffer == NULL || _bufferSize == NULL)
+		return B_BAD_VALUE;
+
+	TRACE(("read_next_module_name: looking for next module\n"));
 	
-	dprintf("*** get_module: %s\n", path);
-	
-	m = (module *)hash_get(modules_list, path, strlen(path));
-	
-	/* If m == NULL we didn't find any record of the module 
-	 * in our hash. We'll now call serach_mdoules which will do
-	 * scan of the possible directories that may contain it.
-	 */
-	if (!m) {
-		m = search_module(path);
-		if (!m) {
-			dprintf("Search for %s failed.\n", path);
-			return ENOENT;
+	status = iterator->err;
+	recursive_lock_lock(&gModulesLock);
+
+	while (status == B_OK) {
+		TRACE(("searching for module\n"));
+
+		if (iterator->cur_dir != NULL) {
+			if ((status = module_traverse_dir(iterator)) == B_NO_ERROR) {
+				// By this point we should have a valid pointer to a 
+				// module_info structure in iterator->current_header
+				status = process_module_info(iterator, buffer, _bufferSize);
+				if (status == B_OK)
+					break;
+			}
+		} else
+			status = module_enter_base_path(iterator);
+	}
+
+	iterator->err = status;
+	recursive_lock_unlock(&gModulesLock);
+
+	TRACE(("finished with status %s\n", strerror(status)));
+	return status;
+}
+
+
+/** Iterates through all loaded modules, and stores its path in "buffer".
+ *	ToDo: check if the function in BeOS really does that (could also mean:
+ *		iterate through all modules that are currently loaded; have a valid
+ *		loaded_module pointer, which would be hard to test for)
+ */
+
+status_t 
+get_next_loaded_module_name(uint32 *cookie, char *buffer, size_t *_bufferSize)
+{
+	hash_iterator *iterator = (hash_iterator *)*cookie;
+	loaded_module *loadedModule;
+	status_t status;
+
+	TRACE(("get_next_loaded_module_name()\n"));
+
+	if (cookie == NULL || buffer == NULL || _bufferSize == NULL)
+		return B_BAD_VALUE;
+
+	if (iterator == NULL) {
+		iterator = hash_open(gLoadedModulesHash, NULL);
+		if (iterator == NULL)
+			return B_NO_MEMORY;
+
+		*(hash_iterator **)cookie = iterator;
+	}
+
+	recursive_lock_lock(&gModulesLock);
+
+	loadedModule = hash_next(gLoadedModulesHash, iterator);
+	if (loadedModule != NULL) {
+		strlcpy(buffer, loadedModule->path, *_bufferSize);
+		*_bufferSize = strlen(loadedModule->path);
+		status = B_OK;
+	} else {
+		hash_close(gLoadedModulesHash, iterator, true);
+		status = B_ENTRY_NOT_FOUND;
+	}
+
+	recursive_lock_unlock(&gModulesLock);
+
+	return status;
+}
+
+
+status_t
+get_module(const char *path, module_info **_info)
+{
+	loaded_module *loadedModule;
+	module *module;
+	status_t status;
+
+	TRACE(("get_module(%s)\n", path));
+	if (path == NULL)
+		return B_BAD_VALUE;
+
+	recursive_lock_lock(&gModulesLock);
+
+	module = (struct module *)hash_lookup(gModulesHash, path);
+
+	// if we don't have it cached yet, search for it
+	if (module == NULL) {
+		module = search_module(path);
+		if (module == NULL) {
+			FATAL(("module: Search for %s failed.\n", path));
+			goto err;
 		}
 	}
-	
-	/* If we've got here then we basically have a pointer to the
-	 * module structure representing the requested module in m;
-	 */
-	
-	recursive_lock_lock(&modules_lock);
 
-	/* We now need to find the module_file structure. This should
+	/* We now need to find the loaded_module for the module. This should
 	 * be in memory if we have just run search_modules, but may not be
 	 * if we are used cached information.
+	 * We can't use the module->loaded_module pointer, because it is not
+	 * reliable at this point (it won't be set to NULL when the loaded_module
+	 * is unloaded).
 	 */
-	lm = (loaded_module*)hash_get(module_files, m->file, strlen(m->file));
-	if (!lm) {
-		if (load_module_file(m->file) == NULL)
-			return ENOENT;
-		
-		lm = (loaded_module*)hash_get(module_files, m->file, strlen(m->file));
-		if (!lm)
-			return ENOENT;
+	loadedModule = (loaded_module *)hash_lookup(gLoadedModulesHash, module->file);
+	if (loadedModule == NULL) {
+		if (load_module_file(module->file) == NULL)
+			goto err;
+
+		loadedModule = (loaded_module *)hash_lookup(gLoadedModulesHash, module->file);
+		if (loadedModule == NULL)
+			goto err;
 	}
 
-	/* We have the module file required in memory! */
-	m->ptr = lm->info[m->offset];
-	m->module = lm;
-	INC_MOD_REF_COUNT(m);
-	*vec = m->ptr;
-	/* The state will be adjusted by the call to init_module */
+	// (re)set in-memory data for the loaded module
+	module->info = loadedModule->info[module->offset];
+	module->loaded_module = loadedModule;
+	INC_MOD_REF_COUNT(module);
 
-	recursive_lock_unlock(&modules_lock);
-	
-	if (res != B_NO_ERROR) {
-		vec = NULL;
-		return res;
-	}
-	
-	/* Only run the init routine if we have ref_cnt == 1. This should
-	 * indicate that we have just been loaded.
-	 */
-	if (m->ref_cnt == 1)
-		res = init_module(m);
+	// The state will be adjusted by the call to init_module
+	// if we have just loaded the file
+	if (module->ref_count == 1)
+		status = init_module(module);
+	else
+		status = B_OK;
 
-	return res;
+	recursive_lock_unlock(&gModulesLock);
+
+	if (status == B_OK)
+		*_info = module->info;
+
+	return status;
+
+err:
+	recursive_lock_unlock(&gModulesLock);
+	return B_ENTRY_NOT_FOUND;
 }
 
 
 status_t
 put_module(const char *path)
 {
-	module *m;
-	
-	dprintf("*** put_module: path %s\n", path);
-	
-	m = (module *)hash_get(modules_list, path, strlen(path));
-	if (!m) {
-		dprintf("We don't seem to have a reference to module %s\n", path);
-		return EINVAL;
-	}
-	DEC_MOD_REF_COUNT(m);
+	module *module;
 
-	if (m->ref_cnt == 0) {
-		/* We have no more references to this module. Next, do we need to 
-		 * keep_loaded? If we do just return;
-		 */
-		if (m->keep_loaded == false) {
-			/* so we should be OK to unload the actual module file, but just
-			 * check first if ir provides any other modules that are still in use.
-			 */
-			uninit_module(m);
-			if (m->module->ref_cnt == 0)
-				unload_module_file(m->file);
-		}
+	TRACE(("put_module(path = %s)\n", path));
+
+	recursive_lock_lock(&gModulesLock);
+
+	module = (struct module *)hash_lookup(gModulesHash, path);
+	if (module == NULL) {
+		FATAL(("module: We don't seem to have a reference to module %s\n", path));
+		recursive_lock_unlock(&gModulesLock);
+		return B_BAD_VALUE;
 	}
-	return B_NO_ERROR;
+	DEC_MOD_REF_COUNT(module);
+
+	// If there are nomore references to this module - must we keep it loaded?
+	if (module->ref_count == 0 && !module->keep_loaded) {
+		// destruct the module, and check if we can also unload the
+		// loaded module it refers to
+		uninit_module(module);
+		if (module->loaded_module->ref_count == 0)
+			unload_module_file(module->file);
+	}
+
+	recursive_lock_unlock(&gModulesLock);
+	return B_OK;
 }
