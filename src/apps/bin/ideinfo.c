@@ -32,6 +32,7 @@ int main(int argc, char **argv)
 		int f;
 		f = open("/tmp/ideinfo.dump", O_WRONLY|O_CREAT, 0666);
 		write(f, buffer, IDE_INFO_LEN*sizeof(uint16));
+		printf("IMPLEMENT ME\n"); /* see hdparm for the data */
 	}
 	close(fd);
 	return 0;
