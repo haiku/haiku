@@ -426,6 +426,8 @@ BTextView::AttachedToWindow()
 	CALLED();
 	BView::AttachedToWindow();
 	
+	SetDrawingMode(B_OP_COPY);
+
 	Window()->SetPulseRate(500000);
 	
 	fCaretVisible = false;
@@ -869,14 +871,40 @@ BTextView::MessageReceived(BMessage *message)
 			SelectAll();
 			break;
 		
-		case B_INPUT_METHOD_CHANGED:
-			HandleInputMethodChanged(message);
-			break;
-		
-		case B_INPUT_METHOD_LOCATION_REQUEST:
-			HandleInputMethodLocationRequest();
-			break;
 
+		case B_INPUT_METHOD_EVENT:
+		{
+			int32 opcode;
+			if (message->FindInt32("be:opcode", &opcode) == B_OK) {
+				switch (opcode) {
+					case B_INPUT_METHOD_STARTED:
+					{
+						printf("B_INPUT_METHOD_STARTED\n");
+						break;
+					}	
+					
+					case B_INPUT_METHOD_STOPPED:
+					{
+						printf("B_INPUT_METHOD_STOPPED\n");
+						break;
+					}
+					
+					case B_INPUT_METHOD_CHANGED:
+						printf("B_INPUT_METHOD_CHANGED\n");
+						HandleInputMethodChanged(message);
+						break;
+		
+					case B_INPUT_METHOD_LOCATION_REQUEST:
+						printf("B_INPUT_METHOD_LOCATION_REQUEST\n");
+						HandleInputMethodLocationRequest();
+						break;
+					
+					default:
+						break;
+				}
+			}
+			break;
+		}
 		case B_SET_PROPERTY:
 		case B_GET_PROPERTY:
 		case B_COUNT_PROPERTIES:
