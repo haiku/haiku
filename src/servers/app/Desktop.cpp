@@ -262,6 +262,7 @@ void Desktop::AddWinBorder(WinBorder *winBorder)
 	if (fWinBorderList.HasItem(winBorder))
 	{
 		Unlock();
+		ActiveRootLayer()->Unlock();
 		debugger("AddWinBorder: WinBorder already in Desktop list\n");
 		return;
 	}
@@ -356,6 +357,7 @@ void Desktop::RemoveWinBorder(WinBorder *winBorder)
 	else
 	{
 		Unlock();
+		ActiveRootLayer()->Unlock();
 		debugger("RemoveWinBorder: WinBorder not found in Desktop list\n");
 		return;
 	}

@@ -120,7 +120,8 @@ public:
 			void				GoRedraw(const Layer *layer, const BRegion &region);
 
 			// Debug methods
-			void			PrintToStream(void);
+			void				PrintToStream(void);
+			thread_id			LockingThread() { return fAllRegionsLock.LockingThread(); }
 	
 			BRegion				fRedrawReg;
 			BList				fCopyRegList;

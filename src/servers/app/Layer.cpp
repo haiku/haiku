@@ -589,7 +589,12 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 		{
 			// server drawings are immediate.
 			// No IPC is needed so this is done in place.
-			
+			if (fClassID == AS_WINBORDER_CLASS)
+			{
+				WinBorder	*wb = (WinBorder*)this;
+				wb->zUpdateReg.Include(&reg);
+			}
+
 			fUpdateReg = fVisible;
 			if (fFlags & B_FULL_UPDATE_ON_RESIZE
 				&& fFrameAction	== B_LAYER_ACTION_RESIZE)
@@ -625,16 +630,7 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 			common.IntersectWith(&reg);
 			
 			if (common.CountRects() > 0)
-			{
-				// lock/unlock if we are a winborder
-				if (lay->fClassID == AS_WINBORDER_CLASS)
-					lay->Window()->Lock();
-				
 				lay->RequestDraw(reg, NULL);
-				
-				if (lay->fClassID == AS_WINBORDER_CLASS)
-					lay->Window()->Unlock();
-			}
 		}
 	}
 }
@@ -659,15 +655,26 @@ void Layer::UpdateStart()
 {
 	// During updates we only want to draw what's in the update region
 	fInUpdate = true;
+	if (fClassID == AS_WINBORDER_CLASS)
+	{
+		WinBorder	*wb = (WinBorder*)this;
+		wb->yUpdateReg = wb->zUpdateReg;
+		wb->zUpdateReg.MakeEmpty();
+	}
 	fClipReg = &fUpdateReg;
 }
 
 void Layer::UpdateEnd()
 {
 	// The usual case. Drawing is permitted in the whole visible area.
-	fInUpdate = false;
-	fClipReg = &fVisible;
 	fUpdateReg.MakeEmpty();
+	if (fClassID == AS_WINBORDER_CLASS)
+	{
+		WinBorder	*wb = (WinBorder*)this;
+		wb->yUpdateReg.MakeEmpty();
+	}
+
+	fInUpdate = false;
 }
 
 /*!

@@ -1408,7 +1408,9 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_BEGIN_UPDATE:
 		{
 			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n",fTitle.String()));
+			fWinBorder->GetRootLayer()->Lock();
 			cl->UpdateStart();
+			fWinBorder->GetRootLayer()->Unlock();
 			break;
 		}
 		case AS_END_UPDATE:
@@ -1636,10 +1638,23 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			STRACE(("ServerWindow %s: Message Zoom unimplemented\n",fTitle.String()));
 			break;
 		}
-		
+		default:
+		{
+			DispatchGraphicsMessage(code, link);
+		}
+	}
+}
 		// -------------------- Graphics messages ----------------------------------
-		
-		
+void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
+{
+	fWinBorder->GetRootLayer()->Lock();
+	BRegion		rreg(cl->fVisible);
+	rreg.Include(&fWinBorder->zUpdateReg);
+
+	desktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
+
+	switch (code)
+	{
 		case AS_LAYER_SET_HIGH_COLOR:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
@@ -2222,6 +2237,9 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			break;
 		}
 	}
+
+	desktop->GetDisplayDriver()->ConstrainClippingRegion(NULL);
+	fWinBorder->GetRootLayer()->Unlock();
 }
 //------------------------------------------------------------------------------
 /*!

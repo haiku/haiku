@@ -131,6 +131,7 @@ private:
 
 	// message handle methods.
 	void DispatchMessage(int32 code, LinkMsgReader &link);
+	void DispatchGraphicsMessage(int32 code, LinkMsgReader &link);
 	static int32 MonitorWin(void *data);
 
 

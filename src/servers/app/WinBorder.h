@@ -112,6 +112,9 @@ protected:
 	Decorator *fDecorator;
 	Layer *fTopLayer;
 
+	BRegion	 zUpdateReg;
+	BRegion	 yUpdateReg;
+
 	int32 fMouseButtons;
 	int32 fKeyModifiers;
 	BPoint fLastMousePosition;
