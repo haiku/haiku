@@ -3,7 +3,7 @@
 /* 
 ** Distributed under the terms of the OpenBeOS License.
 */
-
+#include <size_t.h>
 
 typedef void *iconv_t;
 
