@@ -31,6 +31,7 @@
 #include <kmodule.h>
 #include <int.h>
 #include <team.h>
+#include <kdevice_manager.h>
 #include <real_time_clock.h>
 #include <kernel_daemon.h>
 
@@ -153,6 +154,9 @@ main2(void *unused)
 
 	TRACE(("Init modules\n"));
 	module_init(&ka);
+
+	TRACE(("Init Device Manager\n"));
+	device_manager_init(&ka);
 
 	// ToDo: device manager starts here, bus_init()/dev_init() won't be necessary anymore,
 	//	but instead, the hardware and drivers are rescanned then.
