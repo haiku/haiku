@@ -514,6 +514,12 @@ ac97_dump_capabilities(ac97_dev *dev)
 		LOG(("CAP_PCM_RATE_96000\n"));
 }
 
+bool
+ac97_has_capability(ac97_dev *dev, uint64 cap)
+{
+	return (dev->capabilities & cap);
+}
+
 /*************************************************
  * Codec specific initialization, etc.
  */
@@ -528,7 +534,7 @@ ac97_reg_is_valid(ac97_dev *dev, uint8 reg)
 
 	switch (dev->codec_id) {
 		case CODEC_ID_ALC201A:
-			if (reg != 0x56)
+			if (reg != 0x54) /* reading register 0x54 causes a semaphore timeout on the next register accessed */
 				return true;
 			return false;
 

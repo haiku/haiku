@@ -57,7 +57,7 @@ enum AC97_REGISTER {
 	AC97_PCM_FRONT_DAC_RATE = 0x2C,
 	AC97_PCM_SURR_DAC_RATE	= 0x2E,
 	AC97_PCM_LFE_DAC_RATE	= 0x30,
-	AC97_PCM_L_R_DAC_RATE	= 0x32,
+	AC97_PCM_L_R_ADC_RATE	= 0x32,
 	AC97_MIC_ADC_RATE		= 0x34,
 	AC97_CENTER_LFE_VOLUME	= 0x36,
 	AC97_SURR_VOLUME		= 0x38,
@@ -124,7 +124,7 @@ enum {
 };
 
 // capabilities
-enum {
+enum ac97_capability {
 	CAP_PCM_MIC				= 0x0000000000000001ULL, /* dedicated mic PCM channel */
 	CAP_BASS_TREBLE_CTRL	= 0x0000000000000002ULL,
 	CAP_SIMULATED_STEREO	= 0x0000000000000004ULL,
@@ -206,6 +206,8 @@ bool	ac97_reg_update_bits(ac97_dev *dev, uint8 reg, uint16 mask, uint16 value);
 
 bool	ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate);
 bool	ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate);
+
+bool	ac97_has_capability(ac97_dev *dev, uint64 cap);
 
 void	ac97_set_clock(ac97_dev *dev, uint32 clock);
 

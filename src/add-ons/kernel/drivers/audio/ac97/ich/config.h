@@ -47,6 +47,9 @@ typedef struct
 	area_id area_mbbar; // ich4
 	uint32	codecoffset;
 	ac97_dev *ac97;
+
+	uint32 input_rate;
+	uint32 output_rate;
 } device_config;
 
 extern device_config *config;

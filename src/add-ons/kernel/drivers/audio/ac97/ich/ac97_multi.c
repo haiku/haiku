@@ -106,15 +106,68 @@ static status_t get_description(multi_description *data)
 		memcpy(data->channels,&chans,sizeof(chans));
 	}
 
-	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 44100)) {
-		data->output_rates = B_SR_44100;
-		data->input_rates = B_SR_44100;
-		data->max_cvsr_rate = 44100;
+	/* determine output rates */	
+	data->output_rates = 0;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 8000))
+		data->output_rates |= B_SR_8000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 11025))
+		data->output_rates |= B_SR_11025;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 12000))
+		data->output_rates |= B_SR_12000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 16000))
+		data->output_rates |= B_SR_16000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 22050))
+		data->output_rates |= B_SR_22050;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 24000))
+		data->output_rates |= B_SR_24000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 32000))
+		data->output_rates |= B_SR_32000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 44100))
+		data->output_rates |= B_SR_44100;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 48000))
+		data->output_rates |= B_SR_48000;
+
+	/* determine input rates */	
+	data->input_rates = 0;
+	if (ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 8000))
+		data->input_rates |= B_SR_8000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 11025))
+		data->input_rates |= B_SR_11025;
+	if (ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 12000))
+		data->input_rates |= B_SR_12000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 16000))
+		data->input_rates |= B_SR_16000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 22050))
+		data->input_rates |= B_SR_22050;
+	if (ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 24000))
+		data->input_rates |= B_SR_24000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 32000))
+		data->input_rates |= B_SR_32000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 44100))
+		data->input_rates |= B_SR_44100;
+	if (ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 48000))
+		data->input_rates |= B_SR_48000;
+
+	/* try to set 44100 rate */	
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 44100)
+		&& ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 44100)) {
+		config->input_rate = B_SR_44100;
+		config->output_rate = B_SR_44100;
 	} else {
-		data->output_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
-		data->input_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
-		data->max_cvsr_rate = 48000;
+		/* if that didn't work, continue with 48000 */	
+		ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 48000);
+		ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 48000);
+		config->input_rate = B_SR_48000;
+		config->output_rate = B_SR_48000;
 	}
+
+	/* force existance of 48kHz if variable rates are not supported */
+	if (data->output_rates == 0)
+		data->output_rates = B_SR_48000;
+	if (data->input_rates == 0)
+		data->input_rates = B_SR_48000;
+
+	data->max_cvsr_rate = 0;
 	data->min_cvsr_rate = 0;
 
 	data->output_formats = B_FMT_16BIT;
@@ -122,7 +175,7 @@ static status_t get_description(multi_description *data)
 	data->lock_sources = B_MULTI_LOCK_INTERNAL;
 	data->timecode_sources = 0;
 	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;
-	data->start_latency = 3000;
+	data->start_latency = 30000;
 
 	strcpy(data->control_panel,"");
 
@@ -150,21 +203,92 @@ static status_t get_global_format(multi_format_info *data)
 	data->output_latency = 0;
 	data->input_latency = 0;
 	data->timecode_kind = 0;
-	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 44100)) {
-		data->input.rate = B_SR_44100;
-		data->input.cvsr = 44100;
-		data->output.rate = B_SR_44100;
-		data->output.cvsr = 44100;
-	} else {
-		data->input.rate = B_SR_48000;
-		data->input.cvsr = 48000;
-		data->output.rate = B_SR_48000;
-		data->output.cvsr = 48000;
-	}
 	data->input.format = B_FMT_16BIT;
 	data->output.format = B_FMT_16BIT;
+	data->input.rate = config->input_rate;
+	data->output.rate = config->output_rate;
 	return B_OK;
 }
+
+static status_t set_global_format(multi_format_info *data)
+{
+	bool in, out;
+	LOG(("set_global_format: input.rate  = 0x%x\n", data->input.rate));
+	LOG(("set_global_format: input.cvsr  = %d\n", data->input.cvsr));
+	LOG(("set_global_format: output.rate = 0x%x\n", data->output.rate));
+	LOG(("set_global_format: output.cvsr = %d\n", data->output.cvsr));
+	switch (data->input.rate) {
+		case B_SR_8000:
+			in = ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 8000);
+			break;
+		case B_SR_11025:
+			in = ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 11025);
+			break;
+		case B_SR_12000:
+			in = ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 12000);
+			break;
+		case B_SR_16000:
+			in = ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 16000);
+			break;
+		case B_SR_22050:
+			in = ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 22050);
+			break;
+		case B_SR_24000:
+			in = ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 24000);
+			break;
+		case B_SR_32000:
+			in = ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 32000);
+			break;
+		case B_SR_44100:
+			in = ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 44100);
+			break;
+		case B_SR_48000:
+			in = ac97_set_rate(config->ac97, AC97_PCM_L_R_ADC_RATE, 48000);
+			break;
+		default:
+			in = false;
+	}
+
+	switch (data->output.rate) {
+		case B_SR_8000:
+			out = ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 8000);
+			break;
+		case B_SR_11025:
+			out = ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 11025);
+			break;
+		case B_SR_12000:
+			out = ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 12000);
+			break;
+		case B_SR_16000:
+			out = ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 16000);
+			break;
+		case B_SR_22050:
+			out = ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 22050);
+			break;
+		case B_SR_24000:
+			out = ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 24000);
+			break;
+		case B_SR_32000:
+			out = ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 32000);
+			break;
+		case B_SR_44100:
+			out = ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 44100);
+			break;
+		case B_SR_48000:
+			out = ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 48000);
+			break;
+		default:
+			out = false;
+	}
+
+	if (!in || !out)
+		return B_ERROR;
+		
+	config->input_rate = data->input.rate;
+	config->output_rate = data->output.rate;
+	return B_OK;
+}
+
 
 static status_t get_buffers(multi_buffer_list *data)
 {
@@ -334,6 +458,7 @@ status_t multi_control(void *cookie, uint32 op, void *data, size_t length)
 			return get_global_format((multi_format_info *)data);
 		case B_MULTI_SET_GLOBAL_FORMAT:
 			LOG(("B_MULTI_SET_GLOBAL_FORMAT\n"));
+			set_global_format((multi_format_info *)data);
 			return B_OK; /* XXX BUG! we *MUST* return B_OK, returning B_ERROR will prevent 
 						  * BeOS to accept the format returned in B_MULTI_GET_GLOBAL_FORMAT
 						  */
