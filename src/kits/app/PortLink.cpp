@@ -21,7 +21,7 @@
 //
 //	File Name:		PortLink.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Class for low-overhead port-based messaging
+//	Description:	Class for low-overhead packet-style port-based messaging
 //  
 //------------------------------------------------------------------------------
 #include <stdlib.h>
@@ -29,18 +29,17 @@
 #include <ServerProtocol.h>
 #include "PortLink.h"
 #include "PortMessage.h"
-#include "Session.h"
 
 PortLink::PortLink(port_id port)
 {
 	port_info pi;
-	port_ok			= (get_port_info(port, &pi)==B_OK)? true: false;
+	fPortValid			= (get_port_info(port, &pi)==B_OK)? true: false;
 
 	fSendPort		= port;
 	fReceivePort	= create_port(30,"PortLink reply port");	
 
 	fSendCode		= 0;
-	fSendBuffer		= (char*)malloc(4096);//new char[4096];
+	fSendBuffer		= new char[SESSION_BUFFER_SIZE * 4];
 	fSendPosition	= 8;
 	fDataSize		= (int32*)(fSendBuffer+sizeof(int32));
 	*fDataSize		= 0;
@@ -48,13 +47,13 @@ PortLink::PortLink(port_id port)
 
 PortLink::PortLink( const PortLink &link )
 {
-	port_ok			= link.port_ok;
+	fPortValid			= link.fPortValid;
 
 	fSendPort		= link.fSendPort;
 	fReceivePort	= create_port(30,"PortLink reply port");
 	
 	fSendCode		= 0;
-	fSendBuffer		= (char*)malloc(4096);//new char[4096];
+	fSendBuffer		= new char[SESSION_BUFFER_SIZE * 4];
 	fSendPosition	= 8;
 	fDataSize		= (int32*)(fSendBuffer+sizeof(int32));
 	*fDataSize		= 0;
@@ -62,7 +61,7 @@ PortLink::PortLink( const PortLink &link )
 
 PortLink::~PortLink(void)
 {
-	free(fSendBuffer);//delete [] fSendBuffer;
+	delete [] fSendBuffer;
 }
 
 void PortLink::SetOpCode( int32 code )
@@ -77,7 +76,7 @@ void PortLink::SetPort( port_id port )
 	port_info pi;
 	
 	fSendPort=port;
-	port_ok=(get_port_info(port, &pi) == B_OK)? true: false;
+	fPortValid=(get_port_info(port, &pi) == B_OK)? true: false;
 }
 
 port_id PortLink::GetPort()
@@ -89,7 +88,7 @@ status_t PortLink::Flush(bigtime_t timeout)
 {
 	status_t	write_stat;
 	
-	if(!port_ok)
+	if(!fPortValid)
 		return B_BAD_VALUE;
 	
 	if(timeout!=B_INFINITE_TIMEOUT)
@@ -106,7 +105,7 @@ status_t PortLink::Flush(bigtime_t timeout)
 
 status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout )
 {
-	if(!port_ok || !msg)
+	if(!fPortValid || !msg)
 		return B_BAD_VALUE;
 
 	// attach our reply port_id at the end
@@ -123,12 +122,13 @@ status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout )
 	return B_OK;
 }
 
-status_t PortLink::FlushToSession(){
-	BSession	ses(0, fSendPort);
-// !!!!!!!!!!!!!!!!!!!
-// DW, if you modify PortLink, DON'T forget to modify
-//		BSession::CopyToSendBuffer() as well!!!
-// !!!!!!!!!!!!!!!!!!!
+// Deprecated compatibility hack added to allow PortLink to send messages in a fashion
+// like BSession. This was because originally there were differences in how they sent
+// messages across ports. This is no longer the case, so this call should never need to be
+// made. It remains only until current calls to it can be removed.
+status_t PortLink::FlushToSession()
+{
+	BSession ses(0, fSendPort);
 	ses.CopyToSendBuffer(fSendBuffer, fSendPosition - 8);
 	ses.Sync();
 	return B_OK;
@@ -139,7 +139,7 @@ status_t PortLink::Attach(const void *data, size_t size)
 	if (size <= 0)
 		return B_ERROR;
   
-	if (4096 - fSendPosition > (int32)size)
+	if (SESSION_BUFFER_SIZE - fSendPosition > (int32)size)
 	{
 		memcpy(fSendBuffer + fSendPosition, data, size);
 		fSendPosition += size;

@@ -36,8 +36,6 @@
 #endif
 */
 
-#define BUFFER_SIZE 1024
-
 /*!
 	\brief Standard constructor
 	\param receivePort ID of the port the BSession is to receive messages from
@@ -52,11 +50,11 @@ BSession::BSession(port_id receivePort, port_id sendPort)
 	fSendPosition		= 0;
 
 	fReceiveBuffer		= NULL;
-	fReceiveSize		= BUFFER_SIZE;
-	fReceivePosition	= BUFFER_SIZE;
+	fReceiveSize		= SESSION_BUFFER_SIZE;
+	fReceivePosition	= SESSION_BUFFER_SIZE;
 
-	fSendBuffer			= new char[BUFFER_SIZE];
-	fReceiveBuffer		= new char[BUFFER_SIZE];
+	fSendBuffer			= new char[SESSION_BUFFER_SIZE];
+	fReceiveBuffer		= new char[SESSION_BUFFER_SIZE];
 }
 
 /*!
@@ -74,18 +72,18 @@ BSession::BSession( const BSession &ses)
 	fSendPosition		= 0;
 
 	fReceiveBuffer		= NULL;
-	fReceiveSize		= BUFFER_SIZE;
-	fReceivePosition	= BUFFER_SIZE;
+	fReceiveSize		= SESSION_BUFFER_SIZE;
+	fReceivePosition	= SESSION_BUFFER_SIZE;
 
-	fSendBuffer			= new char[BUFFER_SIZE];
-	fReceiveBuffer		= new char[BUFFER_SIZE];
+	fSendBuffer			= new char[SESSION_BUFFER_SIZE];
+	fReceiveBuffer		= new char[SESSION_BUFFER_SIZE];
 }
 
 //! Deletes the allocated messaging buffers. Ports used are not deleted.
 BSession::~BSession(void)
 {
-	delete fSendBuffer;
-	delete fReceiveBuffer;
+	delete [] fSendBuffer;
+	delete [] fReceiveBuffer;
 }
 
 /*!
@@ -344,23 +342,23 @@ void BSession::ReadData( void *data, int32 size)
 			if (portSize == B_BAD_PORT_ID)
 				return;
 			else
-				fReceiveSize= (portSize > BUFFER_SIZE)? BUFFER_SIZE: portSize;
+				fReceiveSize= (portSize > SESSION_BUFFER_SIZE)? SESSION_BUFFER_SIZE: portSize;
 			
 			ssize_t rv;
 			do
 			{
-				rv = read_port(fReceivePort, &fRecvCode, fReceiveBuffer, BUFFER_SIZE);
+				rv = read_port(fReceivePort, &fRecvCode, fReceiveBuffer, SESSION_BUFFER_SIZE);
 
 				#ifdef DEBUG_BSESSION
-				if (fRecvCode != AS_SERVER_SESSION)
+				if (fRecvCode != AS_SERVER_SESSION && fRecvCodw != AS_SERVER_PORTLINK)
 				{
-					printf("BSession received a code DIFFERENT from AS_SERVER_SESSION. ");
+					printf("BSession received a message not using BSession/PortLink protocol");
 					printf("offset: %ld", fRecvCode - SERVER_TRUE);
 				}
 				printf("did read something...\n");
 				#endif
 			
-			} while( fRecvCode != AS_SERVER_SESSION );
+			} while( fRecvCode != AS_SERVER_SESSION && fRecvCode != AS_SERVER_PORTLINK );
 					
 			fReceivePosition = 0;
 
@@ -599,7 +597,7 @@ void BSession::WriteData(const void *data, int32 size)
 	if (size <= 0)
 		return;
   
-	if (BUFFER_SIZE - fSendPosition > size)
+	if (SESSION_BUFFER_SIZE - fSendPosition > size)
 	{
 		memcpy(fSendBuffer + fSendPosition, data, size);
 		fSendPosition += size;
@@ -609,7 +607,7 @@ void BSession::WriteData(const void *data, int32 size)
 	status_t rv;
 	do
 	{
-		int32 copySize = BUFFER_SIZE - fSendPosition;
+		int32 copySize = SESSION_BUFFER_SIZE - fSendPosition;
 		
 		if (size < copySize)
 			copySize = size;
@@ -624,7 +622,7 @@ void BSession::WriteData(const void *data, int32 size)
 		size -= copySize;
 		fSendPosition += copySize;
 
-		if (fSendPosition != BUFFER_SIZE)
+		if (fSendPosition != SESSION_BUFFER_SIZE)
 			return;
 
 		rv = write_port(fSendPort, AS_SERVER_SESSION, fSendBuffer, fSendPosition);
@@ -647,13 +645,6 @@ void BSession::Sync(void)
 	rv = write_port(fSendPort, AS_SERVER_SESSION, fSendBuffer, fSendPosition);
 		
 	fSendPosition = 0;
-}
-
-//! Flushes the message cache and deletes the BSession object
-void BSession::Close(void)
-{
-	Sync();
-	delete this;	
 }
 
 /*!
@@ -679,7 +670,7 @@ void BSession::CopyToSendBuffer(void* buffer, int32 count)
 
 	fSendPosition = sizeof(int32); // = 4
 	
-	int32 compensated_buffer_size=BUFFER_SIZE-sizeof(int32);
+	int32 compensated_buffer_size=SESSION_BUFFER_SIZE-sizeof(int32);
 	
 	memcpy( fSendBuffer + sizeof(int32),
 			buf + 2*sizeof(int32), 
