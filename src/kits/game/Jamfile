@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src kits game ;
 
+UsePrivateHeaders interface ;
+
 SharedLibrary game :
 	# Public Game Kit
 	DirectWindow.cpp
@@ -16,6 +18,9 @@ SharedLibrary game :
 	GameSoundDevice.cpp
 	GSUtility.cpp
 ;
+
+# Hack to have DirectWindow.cpp include the R5 <Window .h> header.
+PrependObjectHdrs DirectWindow.cpp : /boot/develop/headers/be/interface ;
 
 LinkSharedOSLibs libgame.so :
 	be media
