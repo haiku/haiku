@@ -228,7 +228,9 @@ public:
 		if (recLen > size)
 			return FS_NAME_TOO_LONG;
 
-		entry->d_dev = hostEntry->d_dev;
+		#ifdef __BEOS__
+			entry->d_dev = hostEntry->d_dev;
+		#endif
 		entry->d_ino = hostEntry->d_ino;
 		strcpy(entry->d_name, hostEntry->d_name);
 		entry->d_reclen = recLen;
@@ -506,7 +508,7 @@ public:
 		return FS_OK;
 	}
 
-	virtual	status_t GetNextAttr(char *name, int size)
+	virtual	ssize_t GetNextAttr(char *name, int size)
 	{
 		if (fAttrDir < 0)
 			return 0;
@@ -578,7 +580,7 @@ public:
 		return FS_OK;
 	}
 
-	virtual	status_t GetNextEntry(struct my_dirent *entry, int size)
+	virtual	ssize_t GetNextEntry(struct my_dirent *entry, int size)
 	{
 		return sys_readdir(true, fDir, entry, size, 1);
 	}
