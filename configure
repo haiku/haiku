@@ -17,6 +17,7 @@ options:
   --floppy <floppy location>    Specifies the location of the floppy
                                 (device or image).
   --bochs-debug                 Activates bochs serial debug emulation.
+  --include-gpl-addons		Include GPL licensed add-ons.
   --help                        Prints out this help.
 EOF
 }
@@ -57,11 +58,13 @@ platform=`uname`
 gcc_version=
 floppy=
 bochs_debug=0
+include_gpl_addons=0
 
 # parse parameters
 #
 while [ $# \> 0 ] ; do
 	case "$1" in
+		--include-gpl-addons)	include_gpl_addons=1; shift 1;;
 		--floppy)		assertparam "$1" $#; floppy=$2; shift 2;;
 		--bochs-debug)	bochs_debug=1; shift 1;;
 		--help | -h)	usage; exit 0;;
@@ -103,5 +106,6 @@ PLATFORM_LINKLIBS	?= ${PLATFORM_LINKLIBS} ;
 PLATFORM_HEADERS	?= ${PLATFORM_HEADERS} ;
 GCC_RAW_VERSION		?= ${gcc_version} ;
 BOCHS_DEBUG_HACK	?= ${bochs_debug} ;
+INCLUDE_GPL_ADDONS	?= ${include_gpl_addons} ;
 EOF
 

@@ -2173,3 +2173,11 @@ actions together LinkInstallZip
 {
 	ln -sf "`pwd`/$(2)" "$(1)" ;
 }
+
+rule SubIncludeGPL
+{
+	# SubInclude rule that can be used to conditionally include GPL licensed add-ons
+	if $(INCLUDE_GPL_ADDONS) = 1 {
+		SubInclude $(1) ;
+	} 
+}
