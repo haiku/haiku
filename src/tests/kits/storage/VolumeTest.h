@@ -7,9 +7,10 @@
 #include <SupportDefs.h>
 #include <BasicTest.h>
 
-class BApplication;
+class BTestApp;
 class BBitmap;
 class CppUnit::Test;
+class TestHandler;
 
 class VolumeTest : public BasicTest
 {
@@ -27,12 +28,17 @@ public:
 	//------------------------------------------------------------
 	void InitTest1();
 	void InitTest2();
-	void Assignment();
-	void Comparisson();
-	void SetName();
+	void AssignmentTest();
+	void ComparissonTest();
+	void SetNameTest();
+	void BadValuesTest();
+
+	void IterationTest();
+	void WatchingTest();
+
 
 private:
-	BApplication	*fApplication;
+	BTestApp	*fApplication;
 };
 
 #endif	// VOLUME_TEST_H

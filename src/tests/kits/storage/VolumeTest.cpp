@@ -11,16 +11,20 @@
 #include <File.h>
 #include <fs_attr.h>
 #include <fs_info.h>
+#include <Node.h>
+#include <NodeMonitor.h>
 #include <Path.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <String.h>
 #include <TypeConstants.h>
 #include <Volume.h>
+#include <VolumeRoster.h>
 
 #include <cppunit/Test.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
+#include <TestApp.h>
 #include <TestShell.h>
 #include <TestUtils.h>
 #include <cppunit/TestAssert.h>
@@ -43,7 +47,6 @@ icon_equal(const BBitmap *icon1, const BBitmap *icon2)
 			&& memcmp(icon1->Bits(), icon2->Bits(), icon1->BitsLength()) == 0);
 }
 
-
 // Suite
 CppUnit::Test*
 VolumeTest::Suite() {
@@ -54,12 +57,18 @@ VolumeTest::Suite() {
 						   &VolumeTest::InitTest1) );
 	suite->addTest( new TC("BVolume::Init Test2",
 						   &VolumeTest::InitTest2) );
-	suite->addTest( new TC("BVolume::Assignment",
-						   &VolumeTest::Assignment) );
-	suite->addTest( new TC("BVolume::Comparisson",
-						   &VolumeTest::Comparisson) );
-	suite->addTest( new TC("BVolume::SetName",
-						   &VolumeTest::SetName) );
+	suite->addTest( new TC("BVolume::Assignment Test",
+						   &VolumeTest::AssignmentTest) );
+	suite->addTest( new TC("BVolume::Comparisson Test",
+						   &VolumeTest::ComparissonTest) );
+	suite->addTest( new TC("BVolume::SetName Test",
+						   &VolumeTest::SetNameTest) );
+	suite->addTest( new TC("BVolume::BadValues Test",
+						   &VolumeTest::BadValuesTest) );
+	suite->addTest( new TC("BVolumeRoster::Iteration Test",
+						   &VolumeTest::IterationTest) );
+	suite->addTest( new TC("BVolumeRoster::Watching Test",
+						   &VolumeTest::WatchingTest) );
 
 	return suite;
 }		
@@ -76,8 +85,12 @@ VolumeTest::setUp()
 	// create and mount image
 	createVolume(testFile1, testMountPoint, 1);
 	// create app
-	fApplication
-		= new BApplication("application/x-vnd.obos.volume-test");
+	fApplication = new BTestApp("application/x-vnd.obos.volume-test");
+	if (fApplication->Init() != B_OK) {
+		fprintf(stderr, "Failed to initialize application.\n");
+		delete fApplication;
+		fApplication = NULL;
+	}
 }
 	
 // tearDown
@@ -85,8 +98,11 @@ void
 VolumeTest::tearDown()
 {
 	// delete the application
-	delete fApplication;
-	fApplication = NULL;
+	if (fApplication) {
+		fApplication->Terminate();
+		delete fApplication;
+		fApplication = NULL;
+	}
 	// unmount and delete image
 	deleteVolume(testFile1, testMountPoint);
 	// delete the test dir
@@ -202,6 +218,22 @@ VolumeTest::InitTest1()
 		BVolume volume(device);
 		CheckVolume(volume, device, (device >= 0 ? B_OK : B_BAD_VALUE));
 	}
+	// invalid device ID
+	NextSubTest();
+	{
+		BVolume volume(-2);
+		CHK(volume.InitCheck() == B_BAD_VALUE);
+	}
+	// invalid device ID
+	NextSubTest();
+	{
+		dev_t device = 213;
+		fs_info info;
+		while (fs_stat_dev(device, &info) == 0)
+			device++;
+		BVolume volume(device);
+		CHK(volume.InitCheck() == B_ENTRY_NOT_FOUND);
+	}
 }
 
 // InitTest2
@@ -235,11 +267,29 @@ VolumeTest::InitTest2()
 		volume2.Unset();
 		CheckVolume(volume2, device, B_NO_INIT);
 	}
+	// invalid device ID
+	NextSubTest();
+	{
+		BVolume volume;
+		CHK(volume.SetTo(-2) == B_BAD_VALUE);
+		CHK(volume.InitCheck() == B_BAD_VALUE);
+	}
+	// invalid device ID
+	NextSubTest();
+	{
+		dev_t device = 213;
+		fs_info info;
+		while (fs_stat_dev(device, &info) == 0)
+			device++;
+		BVolume volume;
+		CHK(volume.SetTo(device) == B_ENTRY_NOT_FOUND);
+		CHK(volume.InitCheck() == B_ENTRY_NOT_FOUND);
+	}
 }
 
-// Assignment
+// AssignmentTest
 void
-VolumeTest::Assignment()
+VolumeTest::AssignmentTest()
 {
 	// volumes for testing
 	const char *volumes[] = {
@@ -268,9 +318,9 @@ VolumeTest::Assignment()
 	}
 }
 
-// Comparisson
+// ComparissonTest
 void
-VolumeTest::Comparisson()
+VolumeTest::ComparissonTest()
 {
 	// volumes for testing
 	const char *volumes[] = {
@@ -303,9 +353,9 @@ VolumeTest::Comparisson()
 	}
 }
 
-// SetName
+// SetNameTest
 void
-VolumeTest::SetName()
+VolumeTest::SetNameTest()
 {
 	// status_t SetName(const char* name);
 	dev_t device = dev_for_path(testMountPoint);
@@ -342,5 +392,223 @@ VolumeTest::SetName()
 	NextSubTest();
 	volume.Unset();
 	CHK(volume.SetName(newName) == B_BAD_VALUE);
+}
+
+// BadValuesTest
+void
+VolumeTest::BadValuesTest()
+{
+	BVolume volume(dev_for_path("/boot"));
+	CHK(volume.InitCheck() == B_OK);
+	// NULL arguments
+// R5: crashes, when passing a NULL BDirectory.
+#ifndef TEST_R5
+	NextSubTest();
+	CHK(volume.GetRootDirectory(NULL) == B_BAD_VALUE);
+#endif
+	NextSubTest();
+	CHK(volume.GetIcon(NULL, B_MINI_ICON) == B_BAD_VALUE);
+	CHK(volume.GetIcon(NULL, B_LARGE_ICON) == B_BAD_VALUE);
+	// incompatible icon formats
+// R5: returns B_OK
+#ifndef TEST_R5
+	NextSubTest();
+	// mini
+	BBitmap largeIcon(BRect(0, 0, 31, 31), B_CMAP8);
+	CHK(volume.GetIcon(&largeIcon, B_MINI_ICON) == B_BAD_VALUE);
+	// large
+	BBitmap miniIcon(BRect(0, 0, 15, 15), B_CMAP8);
+	CHK(volume.GetIcon(&miniIcon, B_LARGE_ICON) == B_BAD_VALUE);
+#endif
+}
+
+
+// BVolumeRoster tests
+
+//  GetAllDevices
+static
+void
+GetAllDevices(set<dev_t> &devices)
+{
+//printf("GetAllDevices()\n");
+	int32 cookie = 0;
+	dev_t device;
+	while ((device = next_dev(&cookie)) >= 0)
+{
+//printf("  device: %ld\n", device);
+//BVolume dVolume(device);
+//char name[B_FILE_NAME_LENGTH];
+//dVolume.GetName(name);
+//BDirectory rootDir;
+//dVolume.GetRootDirectory(&rootDir);
+//BEntry rootEntry;
+//rootDir.GetEntry(&rootEntry);
+//BPath rootPath;
+//rootEntry.GetPath(&rootPath);
+//printf("  name: `%s', root: `%s'\n", name, rootPath.Path());
+		devices.insert(device);
+}
+//printf("GetAllDevices() done\n");
+}
+
+// IterationTest
+void
+VolumeTest::IterationTest()
+{
+	// status_t GetBootVolume(BVolume *volume)
+	NextSubTest();
+	BVolumeRoster roster;
+	BVolume volume;
+	CHK(roster.GetBootVolume(&volume) == B_OK);
+	dev_t device = dev_for_path("/boot");
+	CHK(device >= 0);
+	CheckVolume(volume, device, B_OK);
+
+	// status_t GetNextVolume(BVolume *volume)
+	// void Rewind()
+	set<dev_t> allDevices;
+	GetAllDevices(allDevices);
+	int32 allDevicesCount = allDevices.size();
+	for (int32 i = 0; i <= allDevicesCount; i++) {
+		NextSubTest();
+		// iterate through the first i devices
+		set<dev_t> devices(allDevices);
+		volume.Unset();
+		int32 checkCount = i;
+		while (--checkCount >= 0 && roster.GetNextVolume(&volume) == B_OK) {
+			device = volume.Device();
+			CHK(device >= 0);
+			CheckVolume(volume, device, B_OK);
+			CHK(devices.find(device) != devices.end());
+			devices.erase(device);
+		}
+		// rewind and iterate through all devices
+		devices = allDevices;
+		roster.Rewind();
+		volume.Unset();
+		status_t error;
+		while ((error = roster.GetNextVolume(&volume)) == B_OK) {
+			device = volume.Device();
+			CHK(device >= 0);
+			CheckVolume(volume, device, B_OK);
+			CHK(devices.find(device) != devices.end());
+			devices.erase(device);
+		}
+		CHK(error == B_BAD_VALUE);
+		CHK(devices.empty());
+		roster.Rewind();
+	}
+
+	// bad argument
+// R5: crashes when passing a NULL BVolume
+#ifndef TEST_R5
+	NextSubTest();
+	CHK(roster.GetNextVolume(NULL) == B_BAD_VALUE);
+#endif
+}
+
+// CheckWatchingMessage
+static
+void
+CheckWatchingMessage(bool mounted, dev_t expectedDevice, BTestHandler &handler,
+					 node_ref nodeRef = node_ref())
+{
+	snooze(100000);
+	// get the message
+	BMessageQueue &queue = handler.Queue();
+	BMessage *_message = queue.NextMessage();
+	CHK(_message);
+	BMessage message(*_message);
+	delete _message;
+	// check the message
+	if (mounted) {
+		// volume mounted
+		int32 opcode;
+		dev_t device;
+		dev_t parentDevice;
+		ino_t directory;
+		CHK(message.FindInt32("opcode", &opcode) == B_OK);
+		CHK(message.FindInt32("new device", &device) == B_OK);
+		CHK(message.FindInt32("device", &parentDevice) == B_OK);
+		CHK(message.FindInt64("directory", &directory) == B_OK);
+		CHK(opcode == B_DEVICE_MOUNTED);
+		CHK(device == expectedDevice);
+		CHK(parentDevice == nodeRef.device);
+		CHK(directory == nodeRef.node);
+	} else {
+		// volume unmounted
+		int32 opcode;
+		dev_t device;
+		CHK(message.FindInt32("opcode", &opcode) == B_OK);
+		CHK(message.FindInt32("device", &device) == B_OK);
+		CHK(opcode == B_DEVICE_UNMOUNTED);
+		CHK(device == expectedDevice);
+	}
+}
+
+// WatchingTest
+void
+VolumeTest::WatchingTest()
+{
+	// status_t StartWatching(BMessenger msngr=be_app_messenger);
+	// void StopWatching(void);
+	// BMessenger Messenger(void) const;
+
+	// start watching
+	NextSubTest();
+	BVolumeRoster roster;
+	CHK(!roster.Messenger().IsValid());
+	BMessenger target(&fApplication->Handler());
+	CHK(roster.StartWatching(target) == B_OK);
+	CHK(roster.Messenger() == target);
+	dev_t device = dev_for_path(testMountPoint);
+	CHK(device >= 0);
+	// unmount volume
+	NextSubTest();
+	deleteVolume(testFile1, testMountPoint, false);
+	CHK(roster.Messenger() == target);
+	CheckWatchingMessage(false, device, fApplication->Handler());
+	// get the node_ref of the mount point
+	node_ref nodeRef;
+	CHK(BDirectory(testMountPoint).GetNodeRef(&nodeRef) == B_OK);
+	// mount volume
+	NextSubTest();
+	createVolume(testFile1, testMountPoint, 1, false);
+	CHK(roster.Messenger() == target);
+	device = dev_for_path(testMountPoint);
+	CHK(device >= 0);
+	CheckWatchingMessage(true, device, fApplication->Handler(), nodeRef);
+	// start watching with another target
+	BTestHandler *handler2 = fApplication->CreateTestHandler();
+	BMessenger target2(handler2);
+	CHK(roster.StartWatching(target2) == B_OK);
+	CHK(roster.Messenger() == target2);
+	// unmount volume
+	NextSubTest();
+	deleteVolume(testFile1, testMountPoint, false);
+	CHK(roster.Messenger() == target2);
+	CheckWatchingMessage(false, device, *handler2);
+	// mount volume
+	NextSubTest();
+	createVolume(testFile1, testMountPoint, 1, false);
+	CHK(roster.Messenger() == target2);
+	device = dev_for_path(testMountPoint);
+	CHK(device >= 0);
+	CheckWatchingMessage(true, device, *handler2, nodeRef);
+	// stop watching
+	NextSubTest();
+	roster.StopWatching();
+	CHK(!roster.Messenger().IsValid());
+	// unmount, mount volume
+	NextSubTest();
+	deleteVolume(testFile1, testMountPoint, false);
+	createVolume(testFile1, testMountPoint, 1, false);
+	snooze(100000);
+	CHK(fApplication->Handler().Queue().IsEmpty());
+	CHK(handler2->Queue().IsEmpty());
+
+	// try start watching with a bad messenger
+	NextSubTest();
+	CHK(roster.StartWatching(BMessenger()) == B_ERROR);
 }
 
