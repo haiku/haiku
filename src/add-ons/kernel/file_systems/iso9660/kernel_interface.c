@@ -27,6 +27,13 @@
 
 #include "iso.h"
 
+#define TRACE_ISO9660 0
+#if TRACE_ISO9660
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 /*  Start of fundamental (read-only) required functions */
 static int		fs_mount(nspace_id nsid, const char *device, ulong flags,
@@ -228,17 +235,17 @@ static int
 fs_unmount(void *_ns)
 {
 	int result = B_NO_ERROR;
-	
-	nspace* ns = (nspace*)_ns;
-	//dprintf("fs_unmount - ENTER\n");
-	//dprintf("fs_unmount - removing cached blocks\n");
+	nspace *ns = (nspace *)_ns;
+
+	TRACE(("fs_unmount - ENTER\n"));
+
 	remove_cached_device_blocks(ns->fd, 0);
-	//dprintf("fs_unmount - closing volume\n");
 	close(ns->fdOfSession);
 	result = close(ns->fd);
-	//dprintf("fs_unmount - freeing volume data\n");
+
 	free(ns);
-	//dprintf("fs_unmount - EXIT, result is %s\n", strerror(result));
+
+	TRACE(("fs_unmount - EXIT, result is %s\n", strerror(result)));
 	return result;
 }
 
@@ -250,7 +257,7 @@ fs_read_fs_stat(void *_ns, struct fs_info *fss)
 	nspace *ns = (nspace *)_ns;
 	int i;
 	
-	//dprintf("fs_rfsstat - ENTER\n");
+	TRACE(("fs_rfsstat - ENTER\n"));
 	
 	// Fill in device id.
 	//fss->dev = ns->fd;
@@ -277,19 +284,19 @@ fs_read_fs_stat(void *_ns, struct fs_info *fss)
 	strncpy(fss->device_name, ns->devicePath, sizeof(fss->device_name));
 
 	strncpy(fss->volume_name, ns->volIDString, sizeof(fss->volume_name));
-	for (i=strlen(fss->volume_name)-1;i>=0;i--)
+	for (i = strlen(fss->volume_name)-1; i >=0 ; i--)
 		if (fss->volume_name[i] != ' ')
 			break;
 
 	if (i < 0)
 		strcpy(fss->volume_name, "UNKNOWN");
 	else
-		fss->volume_name[i+1] = 0;
+		fss->volume_name[i + 1] = 0;
 	
 	// File system name
-	strcpy(fss->fsh_name,"iso9660");
+	strcpy(fss->fsh_name, "iso9660");
 	
-	//dprintf("fs_rfsstat - EXIT\n");
+	TRACE(("fs_rfsstat - EXIT\n"));
 	return 0;
 }
 
@@ -304,145 +311,125 @@ fs_walk(void *_ns, void *base, const char *file, char **newpath,
 {
 	/* Starting at the base, find file in the subdir, and return path
 		string and vnode id of file. */
-	nspace*		ns = (nspace*)_ns;
-	vnode* 		baseNode = (vnode*)base;
-	uint32		dataLen = baseNode->dataLen[FS_DATA_FORMAT];
-	vnode*		newNode = NULL;
-	int			result = ENOENT;
-	bool		done = FALSE;
-	uint32		totalRead = 0;
-	off_t		block;
+	nspace *ns = (nspace *)_ns;
+	vnode *baseNode = (vnode*)base;
+	uint32 dataLen = baseNode->dataLen[FS_DATA_FORMAT];
+	vnode *newNode = NULL;
+	int	result = ENOENT;
+	bool done = FALSE;
+	uint32 totalRead = 0;
+	off_t block = baseNode->startLBN[FS_DATA_FORMAT];
+
+	TRACE(("fs_walk - looking for %s in dir file of length %d\n", file,
+		baseNode->dataLen[FS_DATA_FORMAT]));
 	
-	block = baseNode->startLBN[FS_DATA_FORMAT];
-	
-	//dprintf("fs_walk - ENTER\n");
-	//dprintf("fs_walk - looking for %s in dir file of length %d\n", file,baseNode->dataLen[FS_DATA_FORMAT]);
-	
-	if (strcmp(file,".") == 0) 
-	{
-		//dprintf("fs_walk - found \".\" file.\n");
+	if (strcmp(file, ".") == 0)  {
+		// base directory
+		TRACE(("fs_walk - found \".\" file.\n"));
 		*vnid = baseNode->id;
-		if (get_vnode(ns->id,*vnid,(void **)&newNode) != 0)
-	    		result = EINVAL;
+		if (get_vnode(ns->id, *vnid, (void **)&newNode) != 0)
+    		result = EINVAL;
 	    else
-	    {
 	    	result = B_NO_ERROR;
-	    }
-	}
-	else if (strcmp(file, "..") == 0)
-	{
-		//dprintf("fs_walk - found \"..\" file.\n");
+	} else if (strcmp(file, "..") == 0) {
+		// parent directory
+		TRACE(("fs_walk - found \"..\" file.\n"));
 		*vnid = baseNode->parID;
-		if (get_vnode(ns->id, *vnid, (void**)&newNode) != 0)
+		if (get_vnode(ns->id, *vnid, (void **)&newNode) != 0)
 			result = EINVAL;
 		else
-		{
 			result = B_NO_ERROR;
-		}
-	}
+	} else {
+		// look up file in the directory
+		char *blockData;
 
-	else 
-	{
-		char* blockData;
-		while ((totalRead < dataLen) && !done) 
-		{
-			off_t	cachedBlock = block;
+		while ((totalRead < dataLen) && !done) {
+			off_t cachedBlock = block;
 			
-			blockData = (char*)get_block(ns->fd, block,  ns->logicalBlkSize[FS_DATA_FORMAT]);
-			if (blockData != NULL)
-			{
-				int				bytesRead = 0;
-				off_t		blockBytesRead = 0;
-				vnode 			node;
-				int				initResult;
-				//dprintf("fs_walk - read buffer from disk at LBN %Ld into buffer 0x%x.\n", block, blockData);
-				//kernel_debugger("");
+			blockData = (char *)get_block(ns->fd, block,  ns->logicalBlkSize[FS_DATA_FORMAT]);
+			if (blockData != NULL) {
+				int bytesRead = 0;
+				off_t blockBytesRead = 0;
+				vnode node;
+				int initResult;
+
+				TRACE(("fs_walk - read buffer from disk at LBN %Ld into buffer 0x%x.\n",
+					block, blockData));
+
 				// Move to the next 2-block set if necessary				
 				// Don't go over end of buffer, if dir record sits on boundary.
 			
 				node.fileIDString = NULL;
 				node.attr.slName = NULL;
 				
-				while (blockBytesRead  < 2*ns->logicalBlkSize[FS_DATA_FORMAT] && 
-						 (totalRead + blockBytesRead < dataLen) &&
-						 blockData[0] != 0 &&
-						 !done)
+				while (blockBytesRead  < 2*ns->logicalBlkSize[FS_DATA_FORMAT]
+					&& totalRead + blockBytesRead < dataLen
+					&& blockData[0] != 0
+					&& !done)
 				{
-					
 					initResult = InitNode(&node, blockData, &bytesRead, ns->joliet_level);
-					//dprintf("fs_walk - InitNode returned %s, filename %s, %d bytes read\n", strerror(initResult), node.fileIDString, bytesRead);
-					
-					if (initResult == B_NO_ERROR)
-					{
-						if ((strlen(node.fileIDString) == strlen(file)) &&
-								!strncmp(node.fileIDString, file, strlen(file)))
+					TRACE(("fs_walk - InitNode returned %s, filename %s, %d bytes read\n", strerror(initResult), node.fileIDString, bytesRead));
+	
+					if (initResult == B_NO_ERROR) {
+						if (strlen(node.fileIDString) == strlen(file)
+							&& !strncmp(node.fileIDString, file, strlen(file)))
 						{
-							//dprintf("fs_walk - success, found vnode at block %Ld, pos %Ld\n", block, blockBytesRead);
+							TRACE(("fs_walk - success, found vnode at block %Ld, pos %Ld\n", block, blockBytesRead));
 							*vnid = (block << 30) + (blockBytesRead & 0xFFFFFFFF);
-							//dprintf("fs_walk - New vnode id is %Ld\n", *vnid);
-							if (get_vnode(ns->id,*vnid,(void **)&newNode) != 0)
+							TRACE(("fs_walk - New vnode id is %Ld\n", *vnid));
+
+							if (get_vnode(ns->id, *vnid, (void **)&newNode) != 0)
 								result = EINVAL;
-							else 
-							{
+							else {
 								newNode->parID = baseNode->id;
 								done = TRUE;
 								result = B_NO_ERROR;
 							}
-						}
-						else
-						{
-							if (node.fileIDString != NULL)
-							{
+						} else {
+							if (node.fileIDString != NULL) {
 								free(node.fileIDString);
 								node.fileIDString = NULL;
 							}
-							if (node.attr.slName != NULL)
-							{
+							if (node.attr.slName != NULL) {
 								free(node.attr.slName);
 								node.attr.slName = NULL;
 							}
 						}
-					}
-					else
-					{	
+					} else {	
 						result = initResult;
-						if (bytesRead == 0) done = TRUE;
+						if (bytesRead == 0)
+							done = TRUE;
 					}
 					blockData += bytesRead;
 					blockBytesRead += bytesRead;
-					//dprintf("fs_walk - Adding %d bytes to blockBytes read (total %Ld/%Ld).\n", bytesRead, blockBytesRead, baseNode->dataLen[FS_DATA_FORMAT]);
+
+					TRACE(("fs_walk - Adding %d bytes to blockBytes read (total %Ld/%Ld).\n",
+						bytesRead, blockBytesRead, baseNode->dataLen[FS_DATA_FORMAT]));
 				}
 				totalRead += ns->logicalBlkSize[FS_DATA_FORMAT];
 				block++;
-				//dprintf("fs_walk - moving to next block %Ld, total read %Ld\n", block, totalRead);
+				
+				TRACE(("fs_walk - moving to next block %Ld, total read %Ld\n", block, totalRead));
 				release_block(ns->fd, cachedBlock);
 
-			}
-			else done = TRUE;
+			} else
+				done = TRUE;
 		}
-		
+
 		// Check to see if vnode is a symbolic link. If so, fill in the newpath variable
 		// with the path to the real file, and call put_vnode.
-		if (newNode != NULL)
-		{
-			if ( S_ISLNK(newNode->attr.stat[FS_DATA_FORMAT].st_mode) && newpath != NULL)
-			{
-				//dprintf ("fs_walk - symbolic link file \'%s\' requested.\n", newNode->attr.slName);
+		if (newNode != NULL) {
+			if (S_ISLNK(newNode->attr.stat[FS_DATA_FORMAT].st_mode) && newpath != NULL) {
+				TRACE(("fs_walk - symbolic link file \'%s\' requested.\n", newNode->attr.slName));
 				result = new_path(newNode->attr.slName, newpath);
-				//dprintf ("fs_walk - putting vnode.\n");
 				put_vnode(ns->id, *vnid);
 			}
 		}
 	}
-	//dprintf("fs_walk - EXIT, result is %s, vnid is %Lu\n", strerror(result), *vnid);
+	TRACE(("fs_walk - EXIT, result is %s, vnid is %Lu\n", strerror(result), *vnid));
 	return result;
 }
 
-
-// fs_read_vnode - Using vnode id, read in vnode information into fs-specific struct,
-//					and return it in node. the reenter flag tells you if this function
-//					is being called via some other fs routine, so that things like 
-//					double-locking can be avoided.
 
 int		
 fs_read_vnode(void *_ns, vnode_id vnid, char reenter, void **node)
@@ -457,40 +444,41 @@ fs_read_vnode(void *_ns, vnode_id vnid, char reenter, void **node)
 	pos = (vnid & 0x3FFFFFFF);
 	block = (vnid >> 30);
 
-	//dprintf("fs_read_vnode - ENTER, block = %ld, pos = %ld, raw = %Lu node 0x%x\n", block, pos, vnid, newNode);
-	
-	if (newNode != NULL)
-	{
-		if (vnid == ISO_ROOTNODE_ID)
-		{
-			//dprintf("fs_read_vnode - root node requested.\n");
+	TRACE(("fs_read_vnode - ENTER, block = %ld, pos = %ld, raw = %Lu node 0x%x\n",
+		block, pos, vnid, newNode));
+
+	if (newNode != NULL) {
+		if (vnid == ISO_ROOTNODE_ID) {
+			TRACE(("fs_read_vnode - root node requested.\n"));
 			memcpy(newNode, &(ns->rootDirRec), sizeof(vnode));
 			*node = (void*)newNode;
-		}
-		else
-		{
-			char* blockData = (char*)get_block(ns->fd, block, ns->logicalBlkSize[FS_DATA_FORMAT]);
+		} else {
+			char *blockData = (char *)get_block(ns->fd, block, ns->logicalBlkSize[FS_DATA_FORMAT]);
+
 			if (pos > ns->logicalBlkSize[FS_DATA_FORMAT]) {
-				if(blockData != NULL) release_block(ns->fd, block);
+				if (blockData != NULL)
+					release_block(ns->fd, block);
+
 				result = EINVAL;
 		 	} else if (blockData != NULL) {
 				result = InitNode(newNode, blockData + pos, NULL, ns->joliet_level);
 				release_block(ns->fd, block);
 				newNode->id = vnid;
-				//dprintf("fs_read_vnode - init result is %s\n", strerror(result));
-				*node = (void*)newNode;
-				//dprintf("fs_read_vnode - new file %s, size %ld\n", newNode->fileIDString, newNode->dataLen[FS_DATA_FORMAT]);
+
+				TRACE(("fs_read_vnode - init result is %s\n", strerror(result)));
+				*node = (void *)newNode;
+				TRACE(("fs_read_vnode - new file %s, size %ld\n", newNode->fileIDString, newNode->dataLen[FS_DATA_FORMAT]));
 			}
 		}
-	}
-	else result = ENOMEM;
-	
-	//dprintf("fs_read_vnode - EXIT, result is %s\n", strerror(result));
+	} else
+		result = ENOMEM;
+
+	TRACE(("fs_read_vnode - EXIT, result is %s\n", strerror(result)));
 	return result;
 }
 
 
-int		
+int
 fs_write_vnode(void *ns, void *_node, char reenter)
 {
 	int result = B_NO_ERROR;
@@ -499,17 +487,20 @@ fs_write_vnode(void *ns, void *_node, char reenter)
 	(void)ns;
 	(void)reenter;
 
-	//dprintf("fs_write_vnode - ENTER (0x%x)\n", node);
+	TRACE(("fs_write_vnode - ENTER (0x%x)\n", node));
+
 	if (node != NULL) { 
 		if (node->id != ISO_ROOTNODE_ID) {
 			if (node->fileIDString != NULL)
 				free (node->fileIDString);
 			if (node->attr.slName != NULL)
 				free (node->attr.slName);
+
 			free(node);
 		}
 	}
-	//dprintf("fs_write_vnode - EXIT\n");
+
+	TRACE(("fs_write_vnode - EXIT\n"));
 	return result;
 }
 
@@ -522,7 +513,8 @@ fs_read_stat(void *_ns, void *_node, struct stat *st)
 	int result = B_NO_ERROR;
 	time_t time;
 
-	//dprintf("fs_rstat - ENTER\n");
+	TRACE(("fs_rstat - ENTER\n"));
+
 	st->st_dev = ns->id;
 	st->st_ino = node->id;
 	st->st_nlink = node->attr.stat[FS_DATA_FORMAT].st_nlink;
@@ -535,14 +527,13 @@ fs_read_stat(void *_ns, void *_node, struct stat *st)
 	st->st_size = node->dataLen[FS_DATA_FORMAT];
 	if (ConvertRecDate(&(node->recordDate), &time) == B_NO_ERROR) 
 		st->st_ctime = st->st_mtime = st->st_atime = time;
-	//dprintf("fs_rstat - EXIT, result is %s\n", strerror(result));
+
+	TRACE(("fs_rstat - EXIT, result is %s\n", strerror(result)));
 
 	return result;
 }
 
 
-// fs_open - Create a vnode cookie, if necessary, to use when
-// 				reading/writing a file
 static int		
 fs_open(void *_ns, void *_node, int omode, void **cookie)
 {
@@ -560,12 +551,9 @@ fs_open(void *_ns, void *_node, int omode, void **cookie)
 	return result;
 }
 
-// fs_read
-// Read a file specified by node, using information in cookie
-// and at offset specified by pos. read len bytes into buffer buf.
+
 static int		
-fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf, 
-			size_t *len)
+fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf, size_t *len)
 {
 	nspace *ns = (nspace *)_ns;			// global stuff
 	vnode *node = (vnode *)_node;		// The read file vnode.
@@ -602,7 +590,7 @@ fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf,
 		startLen = blockSize - blockPos;
 
 	if (blockPos == 0 && reqLen >= blockSize) {
-		//dprintf("Setting startLen to 0, even block read\n");
+		TRACE(("Setting startLen to 0, even block read\n"));
 		startLen = 0;
 	}
 
@@ -645,7 +633,7 @@ fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf,
 
 	// Read in the middle blocks.
 	if (numBlocks > 0 && result == B_NO_ERROR) {
-		//dprintf("fs_read - getting middle blocks\n");
+		TRACE(("fs_read - getting middle blocks\n"));
 		result = cached_read(ns->fd, startBlock, 
 					((char *)buf) + startLen, 
 					numBlocks, 
@@ -668,13 +656,11 @@ fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf,
 			result = EIO;
 	}
 
-	//dprintf("fs_read - EXIT, result is %s\n", strerror(result));
+	TRACE(("fs_read - EXIT, result is %s\n", strerror(result)));
 	return result;
 }
 
 
-// fs_close - Do whatever is necessary to close a file, EXCEPT for freeing
-//				the cookie!
 static int		
 fs_close(void *ns, void *node, void *cookie)
 {
@@ -743,16 +729,14 @@ fs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 static int		
 fs_open_dir(void *_ns, void *_node, void **cookie)
 {
-	// creates fs-specific "cookie" struct that keeps track of where
-	// you are at in reading through directory entries in fs_readdir.
-
 	vnode *node = (vnode *)_node;
 	int result = B_NO_ERROR;
 	dircookie *dirCookie = (dircookie *)malloc(sizeof(dircookie));
 
 	(void)_ns;
 
-	//dprintf("fs_opendir - ENTER, node is 0x%x\n", _node); 
+	TRACE(("fs_opendir - ENTER, node is 0x%x\n", _node));
+
 	if (!(node->flags & ISO_ISDIR))
 		result = EMFILE;
 
@@ -766,7 +750,7 @@ fs_open_dir(void *_ns, void *_node, void **cookie)
 	} else
 		result = ENOMEM;
 
-	//dprintf("fs_opendir - EXIT\n");
+	TRACE(("fs_opendir - EXIT\n"));
 	return result;
 }
 
@@ -781,7 +765,8 @@ fs_read_dir(void *_ns, void *_node, void *_cookie, long *num,
 
 	(void)_node;
 
-	//dprintf("fs_readdir - ENTER\n");
+	TRACE(("fs_readdir - ENTER\n"));
+
 	result = ISOReadDirEnt(ns, dirCookie, buffer, bufferSize);
 
 	// If we succeeded, return 1, the number of dirents we read.
@@ -796,7 +781,7 @@ fs_read_dir(void *_ns, void *_node, void *_cookie, long *num,
 	if (result == ENOENT)
 		result = B_NO_ERROR;
 
-	//dprintf("fs_readdir - EXIT, result is %s\n", strerror(result));
+	TRACE(("fs_readdir - EXIT, result is %s\n", strerror(result)));
 	return result;
 }
 			

@@ -27,7 +27,7 @@
 #include "rock.h"
 #include "iso.h"
 
-#define TRACE_ISO9660 1
+#define TRACE_ISO9660 0
 #if TRACE_ISO9660
 #	define TRACE(x) dprintf x
 #else
@@ -204,20 +204,20 @@ ISOMount(const char *path, const int flags, nspace **newVol, bool allow_joliet)
 		return ENOMEM;
 	}
 
-	memset(&partitionInfo,0,sizeof(partition_info));
+	memset(&partitionInfo, 0, sizeof(partition_info));
 
 	/* open and lock the device */
 	vol->fdOfSession = open(path, O_RDONLY);
 
 	/* try to open the raw device to get access to the other sessions as well */
 	if (vol->fdOfSession >= 0) {
-		if (ioctl(vol->fdOfSession,B_GET_PARTITION_INFO,&partitionInfo) < B_NO_ERROR) {
+		if (ioctl(vol->fdOfSession, B_GET_PARTITION_INFO, &partitionInfo) < B_NO_ERROR) {
 			TRACE(("B_GET_PARTITION_INFO: ioctl returned error\n"));
-			strcpy(partitionInfo.device,path);
+			strcpy(partitionInfo.device, path);
 		}
-		TRACE(("ISOMount: open device/file \"%s\"\n",partitionInfo.device));
+		TRACE(("ISOMount: open device/file \"%s\"\n", partitionInfo.device));
 
-		vol->fd = open(partitionInfo.device,O_RDONLY);
+		vol->fd = open(partitionInfo.device, O_RDONLY);
 	}
 
 	if (vol->fdOfSession < 0 || vol->fd < 0) {
