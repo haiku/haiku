@@ -75,8 +75,6 @@ class PPPStateMachine {
 	private:
 		BLocker& Locker()
 			{ return fLock; }
-		void LeaveConstructionPhase();
-		void EnterDestructionPhase();
 		
 		// private StateMachine methods
 		void NewState(PPP_STATE next);
@@ -121,6 +119,10 @@ class PPPStateMachine {
 		
 		void BringHandlersUp();
 		uint32 BringPhaseUp();
+		
+		void DownProtocols();
+		void DownEncapsulators();
+		void ResetOptionHandlers();
 
 	private:
 		PPPInterface *fInterface;

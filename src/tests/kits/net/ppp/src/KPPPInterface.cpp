@@ -450,6 +450,14 @@ PPPInterface::Up()
 	while(true) {
 		if(IsUp()) {
 			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			
+			if(me == fUpThread) {
+				fLock.Lock();
+				fDialRetry = 0;
+				fUpThread = -1;
+				fLock.Unlock();
+			}
+			
 			return true;
 		}
 		
@@ -457,6 +465,11 @@ PPPInterface::Up()
 			continue;
 		
 		if(IsUp()) {
+			if(me == fUpThread) {
+				fDialRetry = 0;
+				fUpThread = -1;
+			}
+			
 			PPP_REPLY(sender, B_OK);
 			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
 			return true;
@@ -464,6 +477,11 @@ PPPInterface::Up()
 		
 		
 		if(report.type == PPP_DESTRUCTION_REPORT) {
+			if(me == fUpThread) {
+				fDialRetry = 0;
+				fUpThread = -1;
+			}
+			
 			PPP_REPLY(sender, B_OK);
 			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
 			return false;
@@ -476,12 +494,25 @@ PPPInterface::Up()
 			PPP_REPLY(sender, B_OK);
 			continue;
 		} else if(report.code == PPP_REPORT_UP_SUCCESSFUL) {
+			if(me == fUpThread) {
+				fDialRetry = 0;
+				fUpThread = -1;
+			}
+			
 			PPP_REPLY(sender, B_OK);
 			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
 			return true;
 		} else if(report.code == PPP_REPORT_DOWN_SUCCESSFUL
 				|| report.code == PPP_REPORT_UP_ABORTED
 				|| report.code == PPP_REPORT_AUTHENTICATION_FAILED) {
+			if(me == fUpThread) {
+				fDialRetry = 0;
+				fUpThread = -1;
+				
+				if(!DoesDialOnDemand() && report.code != PPP_REPORT_DOWN_SUCCESSFUL)
+					fManager->delete_interface(this);
+			}
+			
 			PPP_REPLY(sender, B_OK);
 			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
 			return false;
@@ -514,6 +545,11 @@ PPPInterface::Up()
 				if(fDialRetry >= fDialRetriesLimit) {
 					fDialRetry = 0;
 					fUpThread = -1;
+					
+					if(!DoesDialOnDemand()
+							&& report.code != PPP_REPORT_DOWN_SUCCESSFUL)
+						fManager->delete_interface(this);
+					
 					PPP_REPLY(sender, B_OK);
 					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
 					return false;
@@ -536,6 +572,11 @@ PPPInterface::Up()
 					fUpThread = -1;
 					PPP_REPLY(sender, B_OK);
 					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+					
+					if(!DoesDialOnDemand()
+							&& report.code != PPP_REPORT_DOWN_SUCCESSFUL)
+						fManager->delete_interface(this);
+					
 					return false;
 				}
 			}

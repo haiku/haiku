@@ -40,9 +40,8 @@ PPPStateMachine::NextID()
 void
 PPPStateMachine::NewState(PPP_STATE next)
 {
-	// TODO:
-//	if(State() == PPP_OPENED_STATE)
-//		ResetOptionHandlers();
+	if(State() == PPP_OPENED_STATE && next != State())
+		ResetOptionHandlers();
 	
 	fState = next;
 }
@@ -195,8 +194,8 @@ PPPStateMachine::DownEvent(PPPInterface *interface)
 	if(Interface()->IsMultilink() && !Interface()->Parent()) {
 		uint32 count = 0;
 		PPPInterface *child;
-		for(int32 i = 0; i < Interface()->CountChildren(); i++) {
-			child = Interface()->ChildAt(i);
+		for(int32 index = 0; index < Interface()->CountChildren(); index++) {
+			child = Interface()->ChildAt(index);
 			
 			if(child && child->IsUp())
 				++count;
@@ -213,8 +212,20 @@ PPPStateMachine::DownEvent(PPPInterface *interface)
 void
 PPPStateMachine::UpFailedEvent(PPPProtocol *protocol)
 {
-	if(protocol->Flags() & PPP_NOT_IMPORTANT)
-		CloseEvent();
+	if((protocol->Flags() & PPP_NOT_IMPORTANT) == 0) {
+		if(Interface()->Mode() == PPP_CLIENT_MODE) {
+			// pretend we lost connection:
+			if(Interface()->IsMultilink() && !Interface()->Parent())
+				for(int32 index = 0; index < Interface()->CountChildren(); index++)
+					Interface()->ChildAt(index)->StateMachine().CloseEvent();
+			else if(Interface()->Device())
+				Interface()->Device()->Down();
+			else
+				CloseEvent();
+					// just to be on the secure side ;)
+		} else
+			CloseEvent();
+	}
 }
 
 
@@ -237,8 +248,20 @@ PPPStateMachine::DownEvent(PPPProtocol *protocol)
 void
 PPPStateMachine::UpFailedEvent(PPPEncapsulator *encapsulator)
 {
-	if(encapsulator->Flags() & PPP_NOT_IMPORTANT)
-		CloseEvent();
+	if((encapsulator->Flags() & PPP_NOT_IMPORTANT) == 0) {
+		if(Interface()->Mode() == PPP_CLIENT_MODE) {
+			// pretend we lost connection:
+			if(Interface()->IsMultilink() && !Interface()->Parent())
+				for(int32 index = 0; index < Interface()->CountChildren(); index++)
+					Interface()->ChildAt(index)->StateMachine().CloseEvent();
+			else if(Interface()->Device())
+				Interface()->Device()->Down();
+			else
+				CloseEvent();
+					// just to be on the secure side ;)
+		} else
+			CloseEvent();
+	}
 }
 
 
@@ -287,12 +310,6 @@ bool
 PPPStateMachine::TLFNotify()
 {
 	LockerHelper locker(fLock);
-	
-	if(Phase() == PPP_ESTABLISHMENT_PHASE) {
-		// we may not go down because an OpenEvent indicates that the
-		// user wants to connect
-		return false;
-	}
 	
 	// from now on no packets may be sent to the device
 	NewPhase(PPP_DOWN_PHASE);
@@ -357,7 +374,7 @@ PPPStateMachine::UpEvent()
 				return;
 			}
 			
-			// TODO: handle server-up!
+			// TODO: handle server-up! (maybe already done correctly)
 			NewState(PPP_REQ_SENT_STATE);
 			InitializeRestartCount();
 			locker.UnlockNow();
@@ -418,10 +435,11 @@ PPPStateMachine::DownEvent()
 			IllegalEvent(PPP_DOWN_EVENT);
 	}
 	
-	// TODO:
-	// DownProtocols();
-	// DownEncapsulators();
-	// ResetOptionHandlers();
+	DownProtocols();
+	DownEncapsulators();
+	
+	fAuthenticationStatus = PPP_NOT_AUTHENTICATED;
+	fPeerAuthenticationStatus = PPP_NOT_AUTHENTICATED;
 	
 	NewPhase(PPP_DOWN_PHASE);
 	
@@ -451,8 +469,6 @@ PPPStateMachine::DownEvent()
 		NewState(PPP_INITIAL_STATE);
 		
 		if(Interface()->DoesAutoRedial()) {
-			// TODO:
-			// if we are reconfiguring we should redial, too
 			if(needsRedial)
 				Interface()->Redial();
 		} else if(!Interface()->DoesDialOnDemand())
@@ -487,9 +503,9 @@ PPPStateMachine::OpenEvent()
 			
 			if(Interface()->IsMultilink() && !Interface()->Parent()) {
 				NewPhase(PPP_ESTABLISHMENT_PHASE);
-				for(int32 i = 0; i < Interface()->CountChildren(); i++)
-					if(Interface()->ChildAt(i)->Mode() == Interface()->Mode())
-						Interface()->ChildAt(i)->StateMachine().OpenEvent();
+				for(int32 index = 0; index < Interface()->CountChildren(); index++)
+					if(Interface()->ChildAt(index)->Mode() == Interface()->Mode())
+						Interface()->ChildAt(index)->StateMachine().OpenEvent();
 			} else {
 				locker.UnlockNow();
 				ThisLayerStarted();
@@ -528,8 +544,8 @@ PPPStateMachine::CloseEvent()
 		
 		ThisLayerDown();
 		
-		for(int32 i = 0; i < Interface()->CountChildren(); i++)
-			Interface()->ChildAt(i)->StateMachine().CloseEvent();
+		for(int32 index = 0; index < Interface()->CountChildren(); index++)
+			Interface()->ChildAt(index)->StateMachine().CloseEvent();
 		
 		return;
 	}
@@ -673,7 +689,7 @@ PPPStateMachine::RCRGoodEvent(mbuf *packet)
 			// tld,scr,sca/8
 			NewState(PPP_ACK_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
-				// tell handlers that we are reconfiguring
+				// indicates to handlers that we are reconfiguring
 			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
@@ -708,7 +724,7 @@ PPPStateMachine::RCRBadEvent(mbuf *nak, mbuf *reject)
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
-				// tell handlers that we are reconfiguring
+				// indicates to handlers that we are reconfiguring
 			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
@@ -747,8 +763,8 @@ PPPStateMachine::RCAEvent(mbuf *packet)
 	PPPOptionHandler *handler;
 	PPPConfigurePacket ack(packet);
 	
-	for(int32 i = 0; i < LCP().CountOptionHandlers(); i++) {
-		handler = LCP().OptionHandlerAt(i);
+	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
+		handler = LCP().OptionHandlerAt(index);
 		handler->ParseAck(ack);
 	}
 	
@@ -785,7 +801,7 @@ PPPStateMachine::RCAEvent(mbuf *packet)
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
-				// tell handlers that we are reconfiguring
+				// indicates to handlers that we are reconfiguring
 			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
@@ -811,8 +827,8 @@ PPPStateMachine::RCNEvent(mbuf *packet)
 	PPPOptionHandler *handler;
 	PPPConfigurePacket nak_reject(packet);
 	
-	for(int32 i = 0; i < LCP().CountOptionHandlers(); i++) {
-		handler = LCP().OptionHandlerAt(i);
+	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
+		handler = LCP().OptionHandlerAt(index);
 		
 		if(nak_reject.Code() == PPP_CONFIGURE_NAK)
 			handler->ParseNak(nak_reject);
@@ -846,7 +862,7 @@ PPPStateMachine::RCNEvent(mbuf *packet)
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
-				// tell handlers that we are reconfiguring
+				// indicates to handlers that we are reconfiguring
 			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
@@ -865,6 +881,9 @@ PPPStateMachine::RTREvent(mbuf *packet)
 	if(fID == mtod(packet, lcp_packet*)->id)
 		fID -= 128;
 	
+	fAuthenticationStatus = PPP_NOT_AUTHENTICATED;
+	fPeerAuthenticationStatus = PPP_NOT_AUTHENTICATED;
+	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
@@ -875,7 +894,7 @@ PPPStateMachine::RTREvent(mbuf *packet)
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_REQ_SENT_STATE);
 			NewPhase(PPP_TERMINATION_PHASE);
-				// tell handlers that we are terminating
+				// indicates to handlers that we are terminating
 			locker.UnlockNow();
 			SendTerminateAck(packet);
 		break;
@@ -883,7 +902,7 @@ PPPStateMachine::RTREvent(mbuf *packet)
 		case PPP_OPENED_STATE:
 			NewState(PPP_STOPPING_STATE);
 			NewPhase(PPP_TERMINATION_PHASE);
-				// tell handlers that we are terminating
+				// indicates to handlers that we are terminating
 			ZeroRestartCount();
 			locker.UnlockNow();
 			ThisLayerDown();
@@ -892,7 +911,7 @@ PPPStateMachine::RTREvent(mbuf *packet)
 		
 		default:
 			NewPhase(PPP_TERMINATION_PHASE);
-				// tell handlers that we are terminating
+				// indicates to handlers that we are terminating
 			locker.UnlockNow();
 			SendTerminateAck(packet);
 	}
@@ -1104,7 +1123,7 @@ PPPStateMachine::RCREvent(mbuf *packet)
 		
 		for(int32 index = 0; index < LCP().CountOptionHandlers();
 			index++) {
-			handler = LCP().OptionHandlerAt(i);
+			handler = LCP().OptionHandlerAt(index);
 			error = handler->ParseRequest(&request, item, &nak, &reject);
 			if(error == PPP_UNHANLED)
 				continue;
@@ -1216,11 +1235,9 @@ PPPStateMachine::ThisLayerUp()
 void
 PPPStateMachine::ThisLayerDown()
 {
-	// TODO:
-	// DownProtocols();
-	// DownEncapsulators();
-	
 	// PPPProtocol/Encapsulator::Down() should block if needed.
+	DownProtocols();
+	DownEncapsulators();
 }
 
 
@@ -1273,9 +1290,9 @@ PPPStateMachine::SendConfigureRequest()
 	request.SetID(NextID());
 	fConfigureID = request.ID();
 	
-	for(int32 i = 0; i < LCP().CountOptionHandlers(); i++) {
+	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
 		// add all items
-		if(!LCP().OptionHandlerAt(i)->AddToRequest(&request)) {
+		if(!LCP().OptionHandlerAt(index)->AddToRequest(&request)) {
 			CloseEvent();
 			return;
 		}
@@ -1293,8 +1310,8 @@ PPPStateMachine::SendConfigureAck(mbuf *packet)
 	mtod(packet, lcp_packet*)->code = PPP_CONFIGURE_ACK;
 	PPPConfigurePacket ack(packet);
 	
-	for(int32 i = 0; i < LCP().CountOptionHandlers; i++)
-		LCP().OptionHandlerAt(i)->SendingAck(&ack);
+	for(int32 index = 0; index < LCP().CountOptionHandlers; index++)
+		LCP().OptionHandlerAt(index)->SendingAck(&ack);
 	
 	LCP().Send(packet);
 }
@@ -1433,4 +1450,31 @@ PPPStateMachine::BringPhaseUp()
 	}
 	
 	return count;
+}
+
+
+void
+PPPStateMachine::DownProtocols()
+{
+	for(int32 index = 0; index < Interface()->CountProtocols(); index++)
+		Interface()->ProtocolAt(index)->Down();
+}
+
+
+void
+PPPStateMachine::DownEncapsulators()
+{
+	PPPEncapsulator *encapsulator_handler = Interface()->FirstEncapsulator();
+	
+	for(; encapsulator_handler;
+			encapsulator_handler = encapsulator_handler->Next())
+		encapsualtor_handler->Down();
+}
+
+
+void
+PPPStateMachine::ResetOptionHandlers()
+{
+	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++)
+		LCP().OptionHandlerAt(index)->Reset();
 }
