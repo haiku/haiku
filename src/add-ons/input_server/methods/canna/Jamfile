@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src add-ons input_server methods canna ;
+
+Addon canna : input_server/methods : 
+	CannaInterface.cpp
+	CannaLooper.cpp
+	CannaMethod.cpp
+	KouhoWindow.cpp
+	PaletteWindow.cpp
+	: false
+	: be textencoding input_server libcanna.a librk.a ;
+
+SubInclude OBOS_TOP src add-ons input_server methods canna lib ;
+SubInclude OBOS_TOP src add-ons input_server methods canna rk ;

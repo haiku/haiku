@@ -1,0 +1,25 @@
+SubDir OBOS_TOP src add-ons input_server methods canna rk ;
+
+SubDirCcFlags -x c++ -ansi -trigraphs -funsigned-char -funsigned-bitfields -Wall -Wno-multichar -Wno-ctor-dtor-privacy -pedantic -Wno-long-long -Woverloaded-virtual -D_BUILDING_CANNALIB -D_WCHAR_T ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) canna ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+StaticLibrary rk :
+	RKutil.c
+	bits.c
+	bun.c
+	context.c
+	dd.c
+	dic.c
+	dicsw.c
+	fq.c
+#	kana.c
+	ngram.c
+	ncache.c
+	nword.c
+	permdic.c
+	tempdic.c
+;
+
