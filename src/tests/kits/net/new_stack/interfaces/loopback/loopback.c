@@ -18,26 +18,26 @@ static struct net_stack_module_info *g_stack = NULL;
 
 
 // -------------------
-status_t init(net_layer *me)
+static status_t init(net_layer *me)
 {
 	dprintf("%s: initing layer\n", me->name);
 	return B_OK;
 }
 
-status_t uninit(net_layer *me)
+static status_t uninit(net_layer *me)
 {
 	dprintf("loopback: uniniting layer\n");
 	return B_OK;
 }
 
 
-status_t enable(net_layer *me, bool enable)
+static status_t enable(net_layer *me, bool enable)
 {
 	return B_OK;
 }
 
 
-status_t process_output(net_layer *me, net_buffer *buffer)
+static status_t process_output(net_layer *me, net_buffer *buffer)
 {
 	if (!buffer)
 		return B_ERROR;

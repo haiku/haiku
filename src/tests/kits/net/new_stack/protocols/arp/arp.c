@@ -69,7 +69,7 @@ static void dump_arp(net_buffer *buffer)
 	default: pname = "unknown"; break;
 	};
 		
-	dprintf("========== Address Resolution Protocol ==========\n");
+	dprintf("========== Address Resolution Protocol (ARP) ====\n");
 	dprintf("Hardware :  %s\n",
 		ntohs(arp.hardware_type) == ARP_HARDWARE_TYPE_ETHERNET ? "ethernet" : "unknown");
 	dprintf("Protocol :  0x%04x (%s)\n", ntohs(arp.protocol_type), pname);
@@ -142,7 +142,6 @@ static status_t process_input(net_layer *me, net_buffer *buffer)
 		return B_ERROR;
 
 	// TODO!
-	// dprintf("%s: packet %p is an ARP packet!\n", me->name, buffer);
 	dump_arp(buffer);
 	g_stack->delete_buffer(buffer, false);
 
