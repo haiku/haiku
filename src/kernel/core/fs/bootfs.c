@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include <KernelExport.h>
 
-#include <bootdir.h>
+#include <boot/bootdir.h>
 
 #include <string.h>
 #include <stdio.h>

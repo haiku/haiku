@@ -13,7 +13,7 @@
 */
 
 #include <kernel.h>
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_cache.h>
