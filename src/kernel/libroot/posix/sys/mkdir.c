@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -20,7 +20,7 @@
 int
 mkdir(const char *path, mode_t mode)
 {
-	status_t status = sys_create_dir(path, mode);
+	status_t status = _kern_create_dir(path, mode);
 
 	RETURN_AND_SET_ERRNO(status);
 }

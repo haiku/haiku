@@ -31,15 +31,15 @@ fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos, void *buffer
 {
 	ssize_t bytes;
 
-	int attr = sys_open_attr(fd, attribute, O_RDONLY);
+	int attr = _kern_open_attr(fd, attribute, O_RDONLY);
 	if (attr < 0)
 		RETURN_AND_SET_ERRNO(attr);
 
 	// type is not used at all in this function
 	(void)type;
 
-	bytes = sys_read(fd, pos, buffer, readBytes);
-	sys_close(attr);
+	bytes = _kern_read(fd, pos, buffer, readBytes);
+	_kern_close(attr);
 
 	RETURN_AND_SET_ERRNO(bytes);
 }
@@ -50,12 +50,12 @@ fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos, const void 
 {
 	ssize_t bytes;
 
-	int attr = sys_create_attr(fd, attribute, type, O_WRONLY);
+	int attr = _kern_create_attr(fd, attribute, type, O_WRONLY);
 	if (attr < 0)
 		RETURN_AND_SET_ERRNO(attr);
 
-	bytes = sys_write(fd, pos, buffer, readBytes);
-	sys_close(attr);
+	bytes = _kern_write(fd, pos, buffer, readBytes);
+	_kern_close(attr);
 
 	RETURN_AND_SET_ERRNO(bytes);
 }
@@ -64,7 +64,7 @@ fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos, const void 
 int 
 fs_remove_attr(int fd, const char *attribute)
 {
-	status_t status = sys_remove_attr(fd, attribute);
+	status_t status = _kern_remove_attr(fd, attribute);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -76,7 +76,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 	struct stat stat;
 	status_t status;
 
-	int attr = sys_open_attr(fd, attribute, O_RDONLY);
+	int attr = _kern_open_attr(fd, attribute, O_RDONLY);
 	if (attr < 0)
 		RETURN_AND_SET_ERRNO(attr);
 
@@ -85,7 +85,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 		attrInfo->type = stat.st_type;
 		attrInfo->size = stat.st_size;
 	}
-	sys_close(attr);
+	_kern_close(attr);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -108,9 +108,9 @@ fs_open_attr(int fd, const char *attribute, uint32 type, int openMode)
 	status_t status;
 
 	if (openMode & O_CREAT)
-		status = sys_create_attr(fd, attribute, type, openMode);
+		status = _kern_create_attr(fd, attribute, type, openMode);
 	else
-		status = sys_open_attr(fd, attribute, openMode);
+		status = _kern_open_attr(fd, attribute, openMode);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -119,7 +119,7 @@ fs_open_attr(int fd, const char *attribute, uint32 type, int openMode)
 int 
 fs_close_attr(int fd)
 {
-	status_t status = sys_close(fd);
+	status_t status = _kern_close(fd);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -130,7 +130,7 @@ open_attr_dir(int file, const char *path)
 {
 	DIR *dir;
 
-	int fd = sys_open_attr_dir(file, path);
+	int fd = _kern_open_attr_dir(file, path);
 	if (fd < 0) {
 		errno = fd;
 		return NULL;
@@ -139,7 +139,7 @@ open_attr_dir(int file, const char *path)
 	/* allocate the memory for the DIR structure */
 	if ((dir = (DIR *)malloc(sizeof(DIR) + BUFFER_SIZE)) == NULL) {
 		errno = B_NO_MEMORY;
-		sys_close(fd);
+		_kern_close(fd);
 		return NULL;
 	}
 
@@ -166,7 +166,7 @@ fs_fopen_attr_dir(int fd)
 int 
 fs_close_attr_dir(DIR *dir)
 {
-	int status = sys_close(dir->fd);
+	int status = _kern_close(dir->fd);
 
 	free(dir);
 
@@ -177,7 +177,7 @@ fs_close_attr_dir(DIR *dir)
 struct dirent *
 fs_read_attr_dir(DIR *dir)
 {
-	ssize_t count = sys_read_dir(dir->fd, &dir->ent, BUFFER_SIZE, 1);
+	ssize_t count = _kern_read_dir(dir->fd, &dir->ent, BUFFER_SIZE, 1);
 	if (count <= 0) {
 		if (count < 0)
 			errno = count;
@@ -191,7 +191,7 @@ fs_read_attr_dir(DIR *dir)
 void 
 fs_rewind_attr_dir(DIR *dir)
 {
-	int status = sys_rewind_dir(dir->fd);
+	int status = _kern_rewind_dir(dir->fd);
 	if (status < 0)
 		errno = status;
 }

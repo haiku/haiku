@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -16,7 +16,7 @@ pselect(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
 	if (tv)
 		timeout = tv->tv_sec * 1000000LL + tv->tv_nsec / 1000LL;
 
-	return sys_select(numBits, readBits, writeBits, errorBits, timeout, sigMask);
+	return _kern_select(numBits, readBits, writeBits, errorBits, timeout, sigMask);
 }
 
 
@@ -28,6 +28,6 @@ select(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
 	if (tv)
 		timeout = tv->tv_sec * 1000000LL + tv->tv_usec;
 
-	return sys_select(numBits, readBits, writeBits, errorBits, timeout, NULL);
+	return _kern_select(numBits, readBits, writeBits, errorBits, timeout, NULL);
 }
 

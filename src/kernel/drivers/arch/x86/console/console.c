@@ -200,7 +200,7 @@ static status_t
 console_read(void *cookie, off_t pos, void *buf, size_t *len)
 {
 	/* XXX - optimistic!! */
-	*len = sys_read(keyboard_fd, 0, buf, *len);
+	*len = _kern_read(keyboard_fd, 0, buf, *len);
 	return B_OK;
 }
 
@@ -327,7 +327,7 @@ console_dev_init(kernel_args *ka)
 		update_cursor(x, y);
 
 		mutex_init(&console_lock, "console_lock");
-		keyboard_fd = sys_open("/dev/keyboard", 0);
+		keyboard_fd = _kern_open("/dev/keyboard", 0);
 		if (keyboard_fd < 0)
 			panic("console_dev_init: error opening /dev/keyboard\n");
 
