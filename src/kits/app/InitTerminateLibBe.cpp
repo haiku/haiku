@@ -42,7 +42,7 @@ initialize_before()
 DBG(OUT("initialize_before()\n"));
 
 	_init_message_();
-	_init_roster_();
+	BRoster::Private::InitBeRoster();
 	BPrivate::init_clipboard();
 
 DBG(OUT("initialize_before() done\n"));
@@ -55,7 +55,7 @@ terminate_after()
 {
 DBG(OUT("terminate_after()\n"));
 
-	_delete_roster_();
+	BRoster::Private::DeleteBeRoster();
 	_delete_message_();
 	_msg_cache_cleanup_();
 

@@ -98,36 +98,24 @@ BRoster::Private::IsMessengerValid(bool mime) const
 							 : fRoster->fMess.IsValid()));
 }
 
-
-// _init_roster_
+// InitBeRoster
 /*!	\brief Initializes the global be_roster variable.
 
 	Called before the global constructors are invoked.
-
-	\return Unknown!
-
-	\todo Investigate what the return value means.
 */
-int
-_init_roster_()
+void
+BRoster::Private::InitBeRoster()
 {
 	be_roster = new BRoster;
-	return 0;
 }
 
-// _delete_roster_
+// DeleteBeRoster
 /*!	\brief Deletes the global be_roster.
 
 	Called after the global destructors are invoked.
-
-	\return Unknown!
-
-	\todo Investigate what the return value means.
 */
-int
-_delete_roster_()
+void
+BRoster::Private::DeleteBeRoster()
 {
 	delete be_roster;
-	return 0;
 }
-

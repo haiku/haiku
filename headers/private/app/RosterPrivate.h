@@ -63,11 +63,11 @@ public:
 	void SaveRecentLists(const char *file) const
 		{ fRoster->SaveRecentLists(file); }
 
+	static void InitBeRoster();
+	static void DeleteBeRoster();
+
 private:
 	BRoster	*fRoster;
 };
-
-extern "C" int	_init_roster_();
-extern "C" int	_delete_roster_();
 
 #endif	// _ROSTER_PRIVATE_H
