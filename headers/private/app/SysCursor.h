@@ -21,11 +21,15 @@
 //
 //	File Name:		SysCursor.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	*PRIVATE* Definition header for system cursor API
+//	Description:	Private file encapsulating OBOS system cursor API
 //  
 //------------------------------------------------------------------------------
 #ifndef SYSCURSOR_H_
 #define SYSCURSOR_H_
+
+#include <Bitmap.h>
+#include <Cursor.h>
+#include <Message.h>
 
 typedef enum
 {
@@ -41,5 +45,35 @@ typedef enum
 	B_CURSOR_OTHER,
 	B_CURSOR_INVALID
 } cursor_which;
+
+class ServerCursor;
+
+void set_syscursor(cursor_which which, const BCursor *cursor);
+void set_syscursor(cursor_which which, const BBitmap *bitmap);
+
+cursor_which get_syscursor(void);
+
+void setcursor(cursor_which which);
+
+const char *CursorWhichToString(cursor_which which);
+BBitmap *CursorDataToBitmap(int8 *data);
+
+/*!
+	\brief Class to manage system cursor sets
+*/
+class CursorSet : public BMessage
+{
+public:
+	CursorSet(const char *name);
+	status_t Save(const char *path,int32 saveflags=0);
+	status_t Load(const char *path);
+	status_t AddCursor(cursor_which which,const BBitmap *cursor, const BPoint &hotspot);
+	status_t AddCursor(cursor_which which, int8 *data);
+	void RemoveCursor(cursor_which which);
+	status_t FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot);
+	status_t FindCursor(cursor_which which, ServerCursor **cursor);
+	void Rename(const char *name);
+};
+
 
 #endif
