@@ -10,6 +10,7 @@
 #include <SupportDefs.h>
 #include <boot/platform.h>
 #include <boot/heap.h>
+#include <boot/stage2.h>
 
 #include <string.h>
 
@@ -48,6 +49,24 @@ bool
 platform_user_menu_requested(void)
 {
 	return false;
+}
+
+
+void
+platform_start_kernel(void)
+{
+	mmu_init_for_kernel();
+	printf("kernel args at %p\n", &gKernelArgs);
+
+	asm("movl	%0, %%eax;	"			// move stack out of way
+		"movl	%%eax, %%esp; "
+		: : "m" (gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
+	asm("pushl  $0x0; "					// we're the BSP cpu (0)
+		"pushl 	%0;	"					// kernel args
+		"pushl 	$0x0;"					// dummy retval for call to main
+		"pushl 	%1;	"					// this is the start address
+		"ret;		"					// jump.
+		: : "g" (&gKernelArgs), "g" (gKernelEntry));
 }
 
 
