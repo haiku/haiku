@@ -702,12 +702,15 @@ BRect BView::Frame() const {
 
 //---------------------------------------------------------------------------
 
-void BView::Hide(){
+void
+BView::Hide()
+{
 // TODO: You may hide it by relocating with -17000 coord units to the left???
-	if ( owner && fShowLevel == 0){
+//	"I don't think you want to do that" - axeld.
+	if (owner && fShowLevel == 0) {
 		check_lock();
-			
-		owner->session->WriteInt32( AS_LAYER_HIDE );
+
+		owner->session->WriteInt32(AS_LAYER_HIDE);
 	}
 
 	fShowLevel++;
@@ -739,18 +742,35 @@ bool BView::IsFocus() const {
 
 //---------------------------------------------------------------------------
 
-bool BView::IsHidden() const{
+bool 
+BView::IsHidden(const BView *lookingFrom) const
+{
 	if (fShowLevel > 0)
 		return true;
 
-	if (owner)
-		if (owner->IsHidden())
-			return true;
+	// may we be egocentric?
+	if (lookingFrom == this)
+		return false;
 
+	// we have the same visibility state as our
+	// parent, if there is one
 	if (parent)
 		return parent->IsHidden();
 
+	// if we're the top view, and we're interested
+	// in the "global" view, we're inheriting the
+	// state of the window's visibility
+	if (owner && lookingFrom == NULL)
+		return owner->IsHidden();
+
 	return false;
+}
+
+
+bool
+BView::IsHidden() const
+{
+	return IsHidden(NULL);
 }
 
 //---------------------------------------------------------------------------
