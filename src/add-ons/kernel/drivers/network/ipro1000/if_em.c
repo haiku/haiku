@@ -500,7 +500,6 @@ stop_event_thread(struct adapter *adapter)
  *  the packet is requeued.
  **********************************************************************/
 
-// can be called from within interrupt
 static void
 em_start(struct ifnet *ifp)
 {
@@ -802,7 +801,7 @@ event_handler(void *cookie)
 	int32 events;
 	
 	for (;;) {
-		if (acquire_sem_etc(adapter->event_sem, 1, B_CAN_INTERRUPT, 0) != B_OK)
+		if (acquire_sem_etc(adapter->event_sem, 1, B_CAN_INTERRUPT, 0) == B_BAD_SEM_ID)
 			return 0;
 
 		events = atomic_read(&adapter->event_flags); // read
@@ -819,6 +818,7 @@ event_handler(void *cookie)
 
 		if (events & EVENT_RESTART_TX) {
 			TRACE("EVENT_RESTART_TX\n");
+			PRINT("EVENT_RESTART_TX not implemented!\n");
 // XXX not multithread save?
 //        	if (ifp->if_flags & IFF_RUNNING && ifp->if_snd.ifq_head != NULL)
 //                em_start(ifp);
