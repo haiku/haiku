@@ -41,6 +41,9 @@ extern	 int optreset;
 
 extern   char **environ;
 
+int readlink(const char *path, char *buffer, size_t bufferSize);
+int symlink(const char *path, const char *toPath);
+
 off_t   lseek(int, off_t, int);
 ssize_t read(int, void *, size_t);
 ssize_t pread(int, void *, size_t, off_t);

@@ -499,14 +499,10 @@ get_vnode_from_fd(struct io_context *ioContext, int fd)
 		return NULL;
 
 	vnode = descriptor->vnode;
-	if (vnode == NULL)
-		goto out;
+	if (vnode != NULL)
+		inc_vnode_ref_count(vnode);
 
-	inc_vnode_ref_count(vnode);
-
-out:
 	put_fd(descriptor);
-
 	return vnode;
 }
 
@@ -562,7 +558,7 @@ entry_ref_to_vnode(fs_id fsID,vnode_id directoryID,const char *name,struct vnode
 
 
 static int
-vnode_path_to_vnode(struct vnode *vnode, char *path, struct vnode **_vnode, int count)
+vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, struct vnode **_vnode, int count)
 {
 	int status = 0;
 
@@ -624,44 +620,63 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, struct vnode **_vnode, int 
 			return ERR_VFS_PATH_NOT_FOUND;
 		}
 
+		// If the new node is a symbolic link, resolve it (if we've been told to do it)
+		if (S_ISLNK(type) && !(!traverseLeafLink && nextPath[0] == '\0')) {
+			char *buffer;
+
+			// it's not exactly nice style using goto in this way, but hey, it works :-/
+			if (count + 1 > MAX_SYM_LINKS) {
+				status = B_LINK_LIMIT;
+				goto resolve_link_error;
+			}
+
+			buffer = kmalloc(SYS_MAX_PATH_LEN);
+			if (buffer == NULL) {
+				status = B_NO_MEMORY;
+				goto resolve_link_error;
+			}
+
+			status = FS_CALL(nextVnode,fs_read_link)(nextVnode->mount->cookie, nextVnode->private_node, buffer, SYS_MAX_PATH_LEN);
+			if (status < B_OK) {
+				kfree(buffer);
+
+resolve_link_error:
+				put_vnode(vnode);
+				put_vnode(nextVnode);
+
+				return status;
+			}
+			put_vnode(nextVnode);
+
+			// Check if we start from the root directory or the current
+			// directory ("vnode" still points to that one).
+			// Cut off all leading slashes if it's the root directory
+			path = buffer;
+			if (path[0] == '/') {
+				// we don't need the old directory anymore
+				put_vnode(vnode);
+
+				while (*++path == '/')
+					;
+				vnode = root_vnode;
+				inc_vnode_ref_count(vnode);
+			}
+
+			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, &nextVnode, count + 1);
+
+			kfree(buffer);
+
+			if (status < B_OK) {
+				put_vnode(vnode);
+				return status;
+			}
+		}
+
 		// decrease the ref count on the old dir we just looked up into
 		put_vnode(vnode);
 
 		path = nextPath;
 		vnode = nextVnode;
-
-		// If the new node is a symbolic link, resolve it
-		if (S_ISLNK(type)) {
-			char *buffer;
-
-			if (count + 1 > MAX_SYM_LINKS) {
-				put_vnode(vnode);
-				return B_LINK_LIMIT;
-			}
-
-			buffer = kmalloc(SYS_MAX_PATH_LEN);
-			if (buffer == NULL) {
-				put_vnode(vnode);
-				return B_NO_MEMORY;
-			}
-			
-			status = FS_CALL(vnode,fs_read_link)(vnode->mount->cookie, vnode->private_node, buffer, SYS_MAX_PATH_LEN);
-			if (status < B_OK) {
-				put_vnode(vnode);
-				kfree(buffer);
-				return status;
-			}
-			
-			status = vnode_path_to_vnode(vnode, buffer, &nextVnode, count + 1);
-
-			put_vnode(vnode);
-			kfree(buffer);
-			
-			if (status < B_OK)
-				return status;
-
-			vnode = nextVnode;
-		}
 
 		// see if we hit a mount point
 		if (vnode->covered_by) {
@@ -678,7 +693,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, struct vnode **_vnode, int 
 
 
 static int
-path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
+path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 {
 	struct vnode *start;
 	int linkCount = 0;
@@ -702,7 +717,7 @@ path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 		mutex_unlock(&context->io_mutex);
 	}
 
-	return vnode_path_to_vnode(start, path, _vnode, 0);
+	return vnode_path_to_vnode(start, path, traverseLink, _vnode, 0);
 }
 
 
@@ -730,7 +745,7 @@ path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel
 			p[1] = '\0';
 		}
 	}
-	return path_to_vnode(path, _vnode, kernel);
+	return path_to_vnode(path, true, _vnode, kernel);
 }
 
 
@@ -1013,9 +1028,9 @@ vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode)
 
 
 int
-vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode)
+vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 {
-	struct vnode *v;
+	struct vnode *vnode;
 	int err;
 	char buf[SYS_MAX_PATH_LEN+1];
 
@@ -1024,13 +1039,10 @@ vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode)
 	strncpy(buf, path, SYS_MAX_PATH_LEN);
 	buf[SYS_MAX_PATH_LEN] = 0;
 
-	err = path_to_vnode(buf, &v, kernel);
-	if (err < 0)
-		goto err;
+	err = path_to_vnode(buf, true, &vnode, kernel);
+	if (err >= 0)
+		*_vnode = vnode;
 
-	*vnode = v;
-
-err:
 	return err;
 }
 
@@ -1731,7 +1743,7 @@ file_open(char *path, int omode, bool kernel)
 	FUNCTION(("file_open: entry. path = '%s', omode %d, kernel %d\n", path, omode, kernel));
 
 	// get the vnode matching the path
-	status = path_to_vnode(path, &vnode, kernel);
+	status = path_to_vnode(path, true, &vnode, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -1884,7 +1896,7 @@ dir_open(char *path, bool kernel)
 
 	FUNCTION(("dir_open: path = '%s', kernel %d\n", path, kernel));
 
-	status = path_to_vnode(path, &vnode, kernel);
+	status = path_to_vnode(path, true, &vnode, kernel);
 	if (status < 0)
 		return status;
 
@@ -1980,12 +1992,35 @@ common_sync(int fd, bool kernel)
 
 
 static int
+common_read_link(char *path, char *buffer, size_t bufferSize, bool kernel)
+{
+	struct vnode *vnode;
+	int status;
+
+	status = path_to_vnode(path, false, &vnode, kernel);
+	if (status < B_OK)
+		return status;
+
+	if (FS_CALL(vnode,fs_read_link) != NULL)
+		status = FS_CALL(vnode,fs_read_link)(vnode->mount->cookie, vnode->private_node, buffer, bufferSize);
+	else
+		status = B_BAD_VALUE;
+
+	put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
 common_symlink(char *path, const char *toPath, bool kernel)
 {
 	// path validity checks have to be in the calling function!
 	char name[B_FILE_NAME_LENGTH];
 	struct vnode *vnode;
 	int status;
+
+	FUNCTION(("common_symlink(path = %s, toPath = %s, kernel = %d)\n", path, toPath, kernel));
 
 	status = path_to_dir_vnode(path, &vnode, name, kernel);
 	if (status < B_OK)
@@ -2009,7 +2044,7 @@ common_unlink(char *path, bool kernel)
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("vfs_unlink: path '%s', kernel %d\n", path, kernel));
+	FUNCTION(("common_unlink: path '%s', kernel %d\n", path, kernel));
 
 	status = path_to_dir_vnode(path, &vnode, filename, kernel);
 	if (status < 0)
@@ -2027,18 +2062,20 @@ common_unlink(char *path, bool kernel)
 
 
 static int
-common_rename(char *path, char *newpath, bool kernel)
+common_rename(char *path, char *newPath, bool kernel)
 {
 	struct vnode *vnode1, *vnode2;
 	char filename1[SYS_MAX_NAME_LEN];
 	char filename2[SYS_MAX_NAME_LEN];
 	int status;
 
+	FUNCTION(("common_rename(path = %s, newPath = %s, kernel = %d)\n", path, newPath, kernel));
+
 	status = path_to_dir_vnode(path, &vnode1, filename1, kernel);
 	if (status < 0)
 		goto err;
 
-	status = path_to_dir_vnode(newpath, &vnode2, filename2, kernel);
+	status = path_to_dir_vnode(newPath, &vnode2, filename2, kernel);
 	if (status < 0)
 		goto err1;
 
@@ -2062,14 +2099,14 @@ err:
 
 
 static int
-common_write_stat(char *path, const struct stat *stat, int statMask, bool kernel)
+common_write_stat(char *path, bool traverseLeafLink, const struct stat *stat, int statMask, bool kernel)
 {
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("vfs_write_stat: path '%s', stat 0x%p, stat_mask %d, kernel %d\n", path, stat, statMask, kernel));
+	FUNCTION(("common_write_stat: path '%s', stat 0x%p, stat_mask %d, kernel %d\n", path, stat, statMask, kernel));
 
-	status = path_to_vnode(path, &vnode, kernel);
+	status = path_to_vnode(path, traverseLeafLink, &vnode, kernel);
 	if (status < 0)
 		return status;
 
@@ -2137,7 +2174,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 
 		mount->covers_vnode = NULL; // this is the root mount
 	} else {
-		err = path_to_vnode(path,&covered_vnode,kernel);
+		err = path_to_vnode(path, true, &covered_vnode, kernel);
 		if (err < 0)
 			goto err2;
 
@@ -2210,7 +2247,7 @@ fs_unmount(char *path, bool kernel)
 
 	FUNCTION(("vfs_unmount: entry. path = '%s', kernel %d\n", path, kernel));
 
-	err = path_to_vnode(path, &vnode, kernel);
+	err = path_to_vnode(path, true, &vnode, kernel);
 	if (err < 0)
 		return ERR_VFS_PATH_NOT_FOUND;
 
@@ -2395,10 +2432,10 @@ set_cwd(char *path, bool kernel)
 	struct stat stat;
 	int rc;
 
-	FUNCTION(("vfs_set_cwd: path = \'%s\'\n", path));
+	FUNCTION(("set_cwd: path = \'%s\'\n", path));
 
 	// Get vnode for passed path, and bail if it failed
-	rc = path_to_vnode(path, &vnode, kernel);
+	rc = path_to_vnode(path, true, &vnode, kernel);
 	if (rc < 0)
 		return rc;
 
@@ -2580,7 +2617,20 @@ sys_create_dir(const char *path, int perms)
 
 
 int
-sys_symlink(const char *userPath, const char *userToPath)
+sys_read_link(const char *path, char *buffer, size_t bufferSize)
+{
+	char pathCopy[SYS_MAX_PATH_LEN + 1];
+	int status;
+
+	strncpy(pathCopy, path, SYS_MAX_PATH_LEN);
+	pathCopy[SYS_MAX_PATH_LEN] = '\0';
+
+	return common_read_link(pathCopy, buffer, bufferSize, true);
+}
+
+
+int
+sys_create_symlink(const char *userPath, const char *userToPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char toPath[SYS_MAX_PATH_LEN + 1];
@@ -2629,37 +2679,37 @@ sys_rename(const char *oldpath, const char *newpath)
 
 
 int
-sys_read_stat(const char *path, struct stat *stat)
+sys_read_stat(const char *path, bool traverseLeafLink, struct stat *stat)
 {
-	char buf[SYS_MAX_PATH_LEN+1];
+	char buffer[SYS_MAX_PATH_LEN + 1];
 	struct vnode *vnode;
 	int status;
 
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
+	strncpy(buffer, path, SYS_MAX_PATH_LEN);
+	buffer[SYS_MAX_PATH_LEN] = 0;
 
 	FUNCTION(("sys_read_stat: path '%s', stat %p,\n", path, stat));
 
-	status = path_to_vnode(buf, &vnode, true);
+	status = path_to_vnode(buffer, traverseLeafLink, &vnode, true);
 	if (status < 0)
 		return status;
 
 	status = FS_CALL(vnode,fs_read_stat)(vnode->mount->cookie, vnode->private_node, stat);
 
-	dec_vnode_ref_count(vnode, false);
+	put_vnode(vnode);
 	return status;
 }
 
 
 int
-sys_write_stat(const char *path, struct stat *stat, int stat_mask)
+sys_write_stat(const char *path, bool traverseLeafLink, struct stat *stat, int statMask)
 {
-	char buf[SYS_MAX_PATH_LEN+1];
+	char buffer[SYS_MAX_PATH_LEN + 1];
 
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
+	strncpy(buffer, path, SYS_MAX_PATH_LEN);
+	buffer[SYS_MAX_PATH_LEN] = 0;
 
-	return common_write_stat(buf, stat, stat_mask, true);
+	return common_write_stat(buffer, traverseLeafLink, stat, statMask, true);
 }
 
 
@@ -2901,15 +2951,15 @@ user_create_dir_entry_ref(dev_t device, ino_t inode, const char *uname, int perm
 
 
 int
-user_create_dir(const char *upath, int perms)
+user_create_dir(const char *userPath, int perms)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
 
-	if (!CHECK_USER_ADDRESS(upath))
+	if (!CHECK_USER_ADDRESS(userPath))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	status = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
 	path[SYS_MAX_PATH_LEN] = '\0';
@@ -2919,7 +2969,31 @@ user_create_dir(const char *upath, int perms)
 
 
 int
-user_symlink(const char *userPath, const char *userToPath)
+user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
+{
+	char path[SYS_MAX_PATH_LEN + 1];
+	char buffer[SYS_MAX_PATH_LEN + 1];
+	int status;
+
+	if (!CHECK_USER_ADDRESS(userPath)
+		|| !CHECK_USER_ADDRESS(userBuffer))
+		return B_BAD_ADDRESS;
+
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN] = '\0';
+
+	status = common_read_link(path, buffer, bufferSize, false);
+	if (status < B_OK)
+		return status;
+
+	return user_strncpy(userBuffer, buffer, SYS_MAX_PATH_LEN);
+}
+
+
+int
+user_create_symlink(const char *userPath, const char *userToPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char toPath[SYS_MAX_PATH_LEN + 1];
@@ -2993,25 +3067,25 @@ user_rename(const char *uoldpath, const char *unewpath)
 
 
 int
-user_read_stat(const char *upath, struct stat *ustat)
+user_read_stat(const char *userPath, bool traverseLink, struct stat *userStat)
 {
-	char path[SYS_MAX_PATH_LEN];
+	char path[SYS_MAX_PATH_LEN + 1];
 	struct vnode *vnode = NULL;
 	struct stat stat;
 	int rc;
 
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(userPath)
+		|| !CHECK_USER_ADDRESS(userStat))
+		return B_BAD_ADDRESS;
 
-	if ((addr)ustat >= KERNEL_BASE && (addr)ustat <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
+	rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (rc < 0)
 		return rc;
-	path[SYS_MAX_PATH_LEN-1] = 0;
+	path[SYS_MAX_PATH_LEN] = 0;
 
-	rc = path_to_vnode(path, &vnode, false);
+	FUNCTION(("user_read_stat(path = %s, traverseLeafLink = %d)\n", path, traverseLink));
+
+	rc = path_to_vnode(path, traverseLink, &vnode, false);
 	if (rc < 0)
 		return rc;
 
@@ -3023,35 +3097,31 @@ user_read_stat(const char *upath, struct stat *ustat)
 	if (rc < 0)
 		return rc;
 
-	rc = user_memcpy(ustat, &stat, sizeof(struct stat));
-
-	return rc;
+	return user_memcpy(userStat, &stat, sizeof(struct stat));
 }
 
 
 int
-user_write_stat(const char *upath, struct stat *ustat, int stat_mask)
+user_write_stat(const char *userPath, bool traverseLeafLink, struct stat *userStat, int statMask)
 {
 	char path[SYS_MAX_PATH_LEN+1];
 	struct stat stat;
 	int rc;
 
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(userPath)
+		|| !CHECK_USER_ADDRESS(userStat))
+		return B_BAD_ADDRESS;
 
-	if ((addr)ustat >= KERNEL_BASE && (addr)ustat <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (rc < 0)
 		return rc;
 	path[SYS_MAX_PATH_LEN] = 0;
 
-	rc = user_memcpy(&stat, ustat, sizeof(struct stat));
+	rc = user_memcpy(&stat, userStat, sizeof(struct stat));
 	if (rc < 0)
 		return rc;
 
-	return common_write_stat(path, &stat, stat_mask, false);
+	return common_write_stat(path, traverseLeafLink, &stat, statMask, false);
 }
 
 

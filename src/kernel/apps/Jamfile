@@ -7,6 +7,7 @@ SubInclude OBOS_TOP src kernel apps filetest ;
 SubInclude OBOS_TOP src kernel apps fortune ;
 SubInclude OBOS_TOP src kernel apps hostname ;
 SubInclude OBOS_TOP src kernel apps ls ;
+SubInclude OBOS_TOP src kernel apps symlink ;
 SubInclude OBOS_TOP src kernel apps ps ;
 SubInclude OBOS_TOP src kernel apps rld ;
 SubInclude OBOS_TOP src kernel apps shell ;

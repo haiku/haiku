@@ -20,15 +20,14 @@ typedef int    team_id;
 typedef int    sem_id;
 typedef int    port_id;
 typedef int    image_id;
+typedef uint32 dev_t;
 typedef uint64 ino_t;
 typedef uint64 vnode_id;
 typedef uint32 fs_id;
 typedef uint16 nlink_t;
 typedef uint32 uid_t;
 typedef uint32 gid_t;
-
-/* compat with beos (was int32 on beos) */
-typedef int status_t;
+typedef int32 status_t;
 
 
 #ifdef  _OBOS_TIME_T_

@@ -12,7 +12,7 @@
 
 extern char *__progname;
 
-void (*disp_func)(const char *, struct stat *) = NULL;
+void (*disp_func)(const char *, const char *, struct stat *) = NULL;
 static int show_all = 0;
 
 mode_t perms [9] = {
@@ -27,7 +27,9 @@ mode_t perms [9] = {
 	S_IXOTH
 };
 	
-static void display_l(const char *filename, struct stat *stat)
+
+static void
+display_l(const char *path, const char *filename, struct stat *stat)
 {
 	const char *type;
 	char perm[11];
@@ -51,16 +53,32 @@ static void display_l(const char *filename, struct stat *stat)
 	}
 	if (S_ISDIR(stat->st_mode))
 		perm[0] = 'd';
-			
-	printf("%10s %12lld %s\n" ,perm ,stat->st_size ,filename);
+	else if (S_ISLNK(stat->st_mode))
+		perm[0] = 'l';
+	else if (S_ISCHR(stat->st_mode))
+		perm[0] = 'c';
+
+	printf("%10s %12lld %s" ,perm ,stat->st_size ,filename);
+
+	if (S_ISLNK(stat->st_mode)) {
+		char buffer[1024];
+		if (readlink(path, buffer, sizeof(buffer)) != 0)
+			strcpy(buffer, "???");
+		printf(" (-> %s)\n", buffer);
+	} else
+		putchar('\n');
 }
 
-static void display(const char *filename, struct stat *stat)
+
+static void
+display(const char *path, const char *filename, struct stat *stat)
 {
 	printf("%s\n", filename);
 }
 
-int main(int argc, char *argv[])
+
+int
+main(int argc, char *argv[])
 {
 	int rc;
 	int rc2;
@@ -85,14 +103,13 @@ int main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
-	if(*argv == NULL) {
+	if (*argv == NULL)
 		arg = ".";
-	} else {
+	else
 		arg = *argv;
-	}
 	
 	rc = stat(arg, &st);
-	if(rc < 0) {
+	if (rc < 0) {
 		printf("%s: %s: %s\n", __progname,
 		       arg, strerror(rc));
 		goto err_ls;
@@ -109,7 +126,7 @@ int main(int argc, char *argv[])
 				/* process the '.' entry */
 				rc = stat(arg, &st);
 				if (rc == 0) {
-					(*disp_func)(".", &st);
+					(*disp_func)(arg, ".", &st);
 					totbytes += st.st_size;
 				}
 			}
@@ -128,9 +145,9 @@ int main(int argc, char *argv[])
 				}
 				strlcat(buf2, de->d_name, sizeof(buf2));
 
-				rc2 = stat(buf2, &st);
+				rc2 = lstat(buf2, &st);
 				if (rc2 == 0) {
-					(*disp_func)(de->d_name, &st);
+					(*disp_func)(buf2, de->d_name, &st);
 					totbytes += st.st_size;
 				}
 				count++;
@@ -140,7 +157,7 @@ int main(int argc, char *argv[])
 
 		printf("%lld bytes in %d files\n", totbytes, count);
 	} else {
-		(*disp_func)(arg, &st);
+		(*disp_func)(arg, arg, &st);
 	}
 
 err_ls:

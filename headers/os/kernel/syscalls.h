@@ -37,8 +37,6 @@ off_t   sys_seek(int fd, off_t pos, int seek_type);
 int     sys_ioctl(int fd, ulong op, void *buf, size_t length);
 int     sys_unlink(const char *path);
 int     sys_rename(const char *oldpath, const char *newpath);
-int     sys_rstat(const char *path, struct stat *stat);
-int     sys_wstat(const char *path, struct stat *stat, int stat_mask);
 int     sys_fstat(int, struct stat *);
 char   *sys_getcwd(char* buf, size_t size);
 int     sys_setcwd(const char* path);

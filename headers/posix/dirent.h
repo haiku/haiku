@@ -10,7 +10,7 @@
 // This file should reside in headers/posix, not here...
 // needs ino_t (int64), and dev_t (long)
 #include <ktypes.h>
-typedef long dev_t;
+
 
 typedef struct dirent {
 	dev_t			d_dev;

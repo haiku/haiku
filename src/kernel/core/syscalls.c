@@ -111,20 +111,26 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_CREATE_DIR:
 			*call_ret = user_create_dir((const char *)arg0, (int)arg1);
 			break;
+		case SYSCALL_CREATE_SYMLINK:
+			*call_ret = user_create_symlink((const char *)arg0, (const char *)arg1);
+			break;
+		case SYSCALL_READ_LINK:
+			*call_ret = user_read_link((const char *)arg0, (char *)arg1, (size_t)arg2);
+			break;
 		case SYSCALL_UNLINK:
 			*call_ret = user_unlink((const char *)arg0);
 			break;
 		case SYSCALL_RENAME:
 			*call_ret = user_rename((const char *)arg0, (const char *)arg1);
 			break;
-		case SYSCALL_RSTAT:
-			*call_ret = user_read_stat((const char *)arg0, (struct stat *)arg1);
+		case SYSCALL_READ_STAT:
+			*call_ret = user_read_stat((const char *)arg0, (bool)arg1, (struct stat *)arg2);
 			break;
-		case SYSCALL_FSTAT:
+		case SYSCALL_FD_STAT:
 			*call_ret = user_fstat((int)arg0, (struct stat*)arg1);
 			break;
-		case SYSCALL_WSTAT:
-			*call_ret = user_write_stat((const char *)arg0, (struct stat *)arg1, (int)arg2);
+		case SYSCALL_WRITE_STAT:
+			*call_ret = user_write_stat((const char *)arg0, (bool)arg1, (struct stat *)arg2, (int)arg3);
 			break;
 		case SYSCALL_SYSTEM_TIME:
 			*call_ret = system_time();

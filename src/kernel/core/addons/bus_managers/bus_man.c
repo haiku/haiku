@@ -99,7 +99,7 @@ static int bus_find_device_recurse(int *n, char *base_path, int max_path_len, in
 		dirent->d_name[dirent->d_reclen] = '\0';
 		strlcat(base_path, dirent->d_name, max_path_len);
 
-		err = sys_read_stat(base_path, &stat);
+		err = sys_read_stat(base_path, true, &stat);
 		if (err < 0)
 			continue;
 

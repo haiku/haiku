@@ -158,10 +158,12 @@ int sys_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode
 int sys_create(const char *path, int omode, int perms);
 int sys_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int sys_create_dir(const char *path, int perms);
-int sys_symlink(const char *path, const char *toPath);
+int sys_read_link(const char *path, char *buffer, size_t bufferSize);
+int sys_create_symlink(const char *path, const char *toPath);
 int sys_unlink(const char *path);
 int sys_rename(const char *oldpath, const char *newpath);
-int sys_write_stat(const char *path, struct stat *stat, int stat_mask);
+int sys_read_stat(const char *path, bool traverseLink, struct stat *stat);
+int sys_write_stat(const char *path, bool traverseLink, struct stat *stat, int statMask);
 char *sys_getcwd(char *buf, size_t size);
 int sys_setcwd(const char* path);
 
@@ -180,11 +182,12 @@ int user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omod
 int user_create(const char *path, int omode, int perms);
 int user_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int user_create_dir(const char *path, int perms);
-int user_symlink(const char *path, const char *toPath);
+int user_read_link(const char *path, char *buffer, size_t bufferSize);
+int user_create_symlink(const char *path, const char *toPath);
 int user_unlink(const char *path);
 int user_rename(const char *oldpath, const char *newpath);
-int user_read_stat(const char *path, struct stat *stat);
-int user_write_stat(const char *path, struct stat *stat, int stat_mask);
+int user_read_stat(const char *path, bool traverseLink, struct stat *stat);
+int user_write_stat(const char *path, bool traverseLink, struct stat *stat, int statMask);
 int user_getcwd(char *buf, size_t size);
 int user_setcwd(const char* path);
 
@@ -194,7 +197,6 @@ extern ssize_t sys_write(int fd, const void *buf, off_t pos, size_t len);
 extern int sys_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t sys_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t sys_rewind_dir(int fd);
-extern int sys_read_stat(const char *path, struct stat *stat);
 extern int sys_close(int fd);
 extern int sys_dup(int fd);
 extern int sys_dup2(int ofd, int nfd);

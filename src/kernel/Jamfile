@@ -351,6 +351,7 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!unistd>lseek.o
 	<$(SOURCE_GRIST)!libc!unistd>open.o
 	<$(SOURCE_GRIST)!libc!unistd>opendir.o
+	<$(SOURCE_GRIST)!libc!unistd>link.o
 	<$(SOURCE_GRIST)!libc!unistd>pread.o
 	<$(SOURCE_GRIST)!libc!unistd>pwrite.o
 	<$(SOURCE_GRIST)!libc!unistd>read.o
@@ -467,6 +468,7 @@ KernelLd libc.so :
 	<$(SOURCE_GRIST)!libc!unistd>lseek.o
 	<$(SOURCE_GRIST)!libc!unistd>open.o
 	<$(SOURCE_GRIST)!libc!unistd>opendir.o
+	<$(SOURCE_GRIST)!libc!unistd>link.o
 	<$(SOURCE_GRIST)!libc!unistd>pread.o
 	<$(SOURCE_GRIST)!libc!unistd>pwrite.o
 	<$(SOURCE_GRIST)!libc!unistd>read.o
@@ -583,6 +585,19 @@ KernelLd ls :
 	:
 	:
 	bin/ls
+	;
+
+KernelLd symlink :
+	libglue2.o
+	<$(SOURCE_GRIST)!apps!symlink>main.o
+	libc.so
+	libm.so
+	:
+	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
+	:
+	:
+	:
+	bin/symlink
 	;
 
 # Note: shell is a built in target, thus we need the grist.

@@ -415,7 +415,7 @@ static int recurse_directory(const char *path, const char *match)
 		strlcat(newpath, "/", slen);
 		strlcat(newpath, dirent->d_name, slen);
 
-		if ((res = sys_read_stat(newpath, &stat)) != B_NO_ERROR) {
+		if ((res = sys_read_stat(newpath, true, &stat)) != B_NO_ERROR) {
 			kfree(newpath);
 			break;
 		}
@@ -758,7 +758,7 @@ static inline int module_traverse_dir(module_iterator *iter)
 	iter->cur_header = NULL;
 	iter->module_pos = 0;
 		
-	if ((res = sys_read_stat(path, &stat)) != B_NO_ERROR)
+	if ((res = sys_read_stat(path, true, &stat)) != B_NO_ERROR)
 		return res;
 		
 	if (S_ISREG(stat.st_mode)) {
