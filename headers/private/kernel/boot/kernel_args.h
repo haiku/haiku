@@ -9,9 +9,9 @@
 #include <SupportDefs.h>
 
 
-typedef struct address_range {
-	uint32 start;
-	uint32 size;
+typedef struct addr_range {
+	addr_t start;
+	addr_t size;
 } addr_range;
 
 #include <platform_kernel_args.h>
