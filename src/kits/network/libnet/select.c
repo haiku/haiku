@@ -31,7 +31,7 @@ _EXPORT int select(int nbits, struct fd_set * rbits,
 {
 	int fd;
 	int n;
-	struct select_args args;
+	struct stack_driver_args args;
 	status_t status;
 	area_id area;
 	struct r5_selectsync * rss;
@@ -74,7 +74,7 @@ _EXPORT int select(int nbits, struct fd_set * rbits,
 	/* Beware, ugly hacky hack: we pass the area_id of our shared r5_selectsync,
 	   that net_stack_driver should udate directly
 	*/
-	args.sync = (struct selectsync *) area;
+	args.u.select.sync = (struct selectsync *) area;
 
 	/* call, indirectly, net_stack_select() for each event to monitor
 	 * as we are not the vfs, we can't call this device hook ourself, but 
@@ -83,17 +83,17 @@ _EXPORT int select(int nbits, struct fd_set * rbits,
 	n = 0;
 	for (fd = 0; fd < nbits; fd++) {
 		if (rbits && FD_ISSET(fd, rbits)) {
-			args.ref = (fd << 8) | 1;
+			args.u.select.ref = (fd << 8) | 1;
 			if (ioctl(fd, NET_STACK_SELECT, &args, sizeof(args)) >= 0)
 				n++;
     	};
 		if (wbits && FD_ISSET(fd, wbits)) {
-			args.ref = (fd << 8) | 2;
+			args.u.select.ref = (fd << 8) | 2;
 			if (ioctl(fd, NET_STACK_SELECT, &args, sizeof(args)) >= 0)
 				n++;
     	};
 		if (ebits && FD_ISSET(fd, ebits)) {
-			args.ref = (fd << 8) | 3;
+			args.u.select.ref = (fd << 8) | 3;
 			if (ioctl(fd, NET_STACK_SELECT, &args, sizeof(args)) >= 0)
 				n++;
     	};
@@ -126,15 +126,15 @@ _EXPORT int select(int nbits, struct fd_set * rbits,
 	// unregister socket event notification
  	for(fd = 0; fd < nbits; fd++) {
 		if (rbits && FD_ISSET(fd, rbits)) {
-			args.ref = (fd << 8) | 1;
+			args.u.select.ref = (fd << 8) | 1;
        		ioctl(fd, NET_STACK_DESELECT, &args, sizeof(args));
     	};
 		if (wbits && FD_ISSET(fd, wbits)) {
-			args.ref = (fd << 8) | 2;
+			args.u.select.ref = (fd << 8) | 2;
 			ioctl(fd, NET_STACK_DESELECT, &args, sizeof(args));
     	};
 		if (ebits && FD_ISSET(fd, ebits)) {
-			args.ref = (fd << 8) | 3;
+			args.u.select.ref = (fd << 8) | 3;
 			ioctl(fd, NET_STACK_DESELECT, &args, sizeof(args));
 		};
 	};
