@@ -5,7 +5,7 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 # set some additional defines
 {
-	SubDirCcFlags -DHAVE_CONFIG_H -DLOCATE_DB='\"/var/locatedb\"' ;
+	SubDirCcFlags -DHAVE_CONFIG_H -DLOCATE_DB='\"/var/locatedb\"' -w ;
 }
 
 local findutils_rsrc = [ FGristFiles findutils.rsrc ] ;
