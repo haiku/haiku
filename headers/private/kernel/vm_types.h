@@ -8,11 +8,14 @@
 #ifndef _KERNEL_VM_TYPES_H
 #define _KERNEL_VM_TYPES_H
 
+
 #include <kernel.h>
-#include <ktypes.h>
 #include <defines.h>
 #include <vfs.h>
 #include <arch/vm_translation_map.h>
+
+
+typedef int32  aspace_id;
 
 // vm page
 typedef struct vm_page {

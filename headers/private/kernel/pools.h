@@ -6,7 +6,6 @@
 #define _KERNEL_POOLS_H
 
 
-#include <ktypes.h>
 #include <lock.h>
 
 typedef struct pool_ctl	pool_ctl;
