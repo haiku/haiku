@@ -1599,7 +1599,7 @@ Inode::Sync()
 
 
 status_t
-Inode::Remove(Transaction *transaction,const char *name,off_t *_id,bool isDirectory)
+Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDirectory)
 {
 	BPlusTree *tree;
 	if (GetTree(&tree) != B_OK)
@@ -1607,19 +1607,25 @@ Inode::Remove(Transaction *transaction,const char *name,off_t *_id,bool isDirect
 
 	// does the file even exists?
 	off_t id;
-	if (tree->Find((uint8 *)name,(uint16)strlen(name),&id) < B_OK)
+	if (tree->Find((uint8 *)name, (uint16)strlen(name), &id) < B_OK)
 		return B_ENTRY_NOT_FOUND;
 
 	if (_id)
 		*_id = id;
 
-	Vnode vnode(fVolume,id);
+	Vnode vnode(fVolume, id);
 	Inode *inode;
 	status_t status = vnode.Get(&inode);
 	if (status < B_OK) {
 		REPORT_ERROR(status);
 		return B_ENTRY_NOT_FOUND;
 	}
+
+	// You can't unlink a mounted or the VM file while it is being used - while
+	// this is not really necessary, it copies the behaviour of the original BFS
+	// and let you and me feel a little bit safer
+	if (inode->Flags() & INODE_NO_CACHE)
+		return B_NOT_ALLOWED;
 
 	// It's a bit stupid, but indices are regarded as directories
 	// in BFS - so a test for a directory always succeeds, but you
@@ -1636,11 +1642,11 @@ Inode::Remove(Transaction *transaction,const char *name,off_t *_id,bool isDirect
 	}
 
 	// remove_vnode() allows the inode to be accessed until the last put_vnode()
-	if (remove_vnode(fVolume->ID(),id) != B_OK)
+	if (remove_vnode(fVolume->ID(), id) != B_OK)
 		return B_ERROR;
 
-	if (tree->Remove(transaction,(uint8 *)name,(uint16)strlen(name),id) < B_OK) {
-		unremove_vnode(fVolume->ID(),id);
+	if (tree->Remove(transaction,(uint8 *)name, (uint16)strlen(name), id) < B_OK) {
+		unremove_vnode(fVolume->ID(), id);
 		RETURN_ERROR(B_ERROR);
 	}
 
@@ -1652,15 +1658,15 @@ Inode::Remove(Transaction *transaction,const char *name,off_t *_id,bool isDirect
 
 	Index index(fVolume);
 	if ((inode->Mode() & (S_ATTR_DIR | S_ATTR | S_INDEX_DIR)) == 0) {
-		index.RemoveName(transaction,name,inode);
+		index.RemoveName(transaction, name, inode);
 			// If removing from the index fails, it is not regarded as a
 			// fatal error and will not be reported back!
 			// Deleted inodes won't be visible in queries anyway.
 	}
 	
 	if ((inode->Mode() & (S_FILE | S_SYMLINK)) != 0) {
-		index.RemoveSize(transaction,inode);
-		index.RemoveLastModified(transaction,inode);
+		index.RemoveSize(transaction, inode);
+		index.RemoveLastModified(transaction, inode);
 	}
 
 	if (inode->WriteBack(transaction) < B_OK)
@@ -1682,7 +1688,8 @@ Inode::Remove(Transaction *transaction,const char *name,off_t *_id,bool isDirect
  */
 
 status_t 
-Inode::Create(Transaction *transaction,Inode *parent, const char *name, int32 mode, int omode, uint32 type, off_t *_id, Inode **_inode)
+Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 mode,
+	int omode, uint32 type, off_t *_id, Inode **_inode)
 {
 	block_run parentRun = parent ? parent->BlockRun() : block_run::Run(0,0,0);
 	Volume *volume = transaction->GetVolume();
@@ -1711,6 +1718,11 @@ Inode::Create(Transaction *transaction,Inode *parent, const char *name, int32 mo
 			// if it's a directory, bail out!
 			if (inode->IsDirectory())
 				return B_IS_A_DIRECTORY;
+
+			// if it is a mounted device or the VM file, we don't allow to delete it
+			// while it is open and in use
+			if (inode->Flags() & INODE_NO_CACHE)
+				return B_NOT_ALLOWED;
 
 			// if omode & O_TRUNC, truncate the existing file
 			if (omode & O_TRUNC) {
