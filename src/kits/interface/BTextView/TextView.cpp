@@ -1305,7 +1305,7 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset,
 			}
 
 			fStyles->SetStyleRange(fromOffset, toOffset, textLength,
-							  	  doAll, theRun->font, &theRun->color);
+							  	  doAll, &theRun->font, &theRun->color);
 							
 			theRun++;
 		}
@@ -2009,11 +2009,11 @@ BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
 	for (int32 i = 0; i < inArray->count; i++)
 	{
 		array->styles[i].offset = inArray->runs[i].offset;
-		inArray->runs[i].font->GetFamilyAndStyle(&array->styles[i].family,
+		inArray->runs[i].font.GetFamilyAndStyle(&array->styles[i].family,
 			&array->styles[i].style);
-		array->styles[i].size = inArray->runs[i].font->Size();
-		array->styles[i].shear = inArray->runs[i].font->Shear();
-		array->styles[i].face = inArray->runs[i].font->Face();
+		array->styles[i].size = inArray->runs[i].font.Size();
+		array->styles[i].shear = inArray->runs[i].font.Shear();
+		array->styles[i].face = inArray->runs[i].font.Face();
 		array->styles[i].red = inArray->runs[i].color.red;
 		array->styles[i].green = inArray->runs[i].color.green;
 		array->styles[i].blue = inArray->runs[i].color.blue;
@@ -2051,11 +2051,11 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 
 	for (int32 i = 0; i < array->count; i++) {
 		run_array->runs[i].font = new BFont;
-		run_array->runs[i].font->SetFamilyAndStyle(array->styles[i].family,
+		run_array->runs[i].font.SetFamilyAndStyle(array->styles[i].family,
 			array->styles[i].style);
-		run_array->runs[i].font->SetSize(array->styles[i].size);
-		run_array->runs[i].font->SetShear(array->styles[i].shear);
-		run_array->runs[i].font->SetFace(array->styles[i].face);
+		run_array->runs[i].font.SetSize(array->styles[i].size);
+		run_array->runs[i].font.SetShear(array->styles[i].shear);
+		run_array->runs[i].font.SetFace(array->styles[i].face);
 		run_array->runs[i].color.red = array->styles[i].red;
 		run_array->runs[i].color.green = array->styles[i].green;
 		run_array->runs[i].color.blue = array->styles[i].blue;
