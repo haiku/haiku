@@ -1,0 +1,11 @@
+#serial_debug_port <num>|<port>
+	# serial interface number (as enumerated by the BIOS) or the
+	# base port of the serial interface to be used for kernel
+	# debug output and the kernel debugger
+
+#serial_debug_speed <9600|19200|38400|57600|115200>
+
+#bochs_debug_output true
+	# Activates Bochs debug output if enabled in the kernel
+	# (available on x86 as a build option only)
+
