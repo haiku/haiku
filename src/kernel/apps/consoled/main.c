@@ -34,7 +34,7 @@ struct console theconsole;
 
 
 static int32
-console_reader(void *arg)
+keyboard_reader(void *arg)
 {
 	struct console *con = (struct console *)arg;
 	char buffer[1024];
@@ -96,17 +96,17 @@ start_console(struct console *con)
 	if (dir != NULL) {
 		struct dirent *entry;
 		char name[64];
-	
+
 		while ((entry = readdir(dir)) != NULL) {
 			if (entry->d_name[0] == '.')
 				continue;
-	
+
 			sprintf(name, "/dev/pt/%s", entry->d_name);
-	
+
 			con->tty_master_fd = open(name, O_RDWR);
 			if (con->tty_master_fd >= 0) {
 				sprintf(name, "/dev/tt/%s", entry->d_name);
-	
+
 				con->tty_slave_fd = open(name, O_RDWR);
 				if (con->tty_slave_fd < 0) {
 					fprintf(stderr, "Could not open tty!\n");
@@ -133,7 +133,7 @@ start_console(struct console *con)
 	if (con->tty_master_fd < 0 || con->tty_slave_fd < 0)
 		return -4;
 
-	con->keyboard_reader = spawn_thread(&console_reader, "console reader", B_URGENT_DISPLAY_PRIORITY, con);
+	con->keyboard_reader = spawn_thread(&keyboard_reader, "console reader", B_URGENT_DISPLAY_PRIORITY, con);
 	if (con->keyboard_reader < 0)
 		return -7;
 
@@ -202,9 +202,8 @@ main(void)
 		const char *argv[3];
 
 		argv[0] = "/bin/sh";
-//		argv[1] = "-s";
-//		argv[2] = "/boot/loginscript";
-		shell_process = start_process(1, argv, &theconsole);
+		argv[1] = "--login";
+		shell_process = start_process(2, argv, &theconsole);
 
 		wait_for_thread(shell_process, &retcode);
 
