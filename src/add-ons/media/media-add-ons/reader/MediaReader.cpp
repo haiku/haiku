@@ -212,7 +212,8 @@ void print_media_format(media_format * format) {
 	default:					fprintf(stderr,"????"); break;
 	}
 	fprintf(stderr,"}");
-}*/
+}
+*/
 
 bool multistream_format_is_acceptible(
 						const media_multistream_format & producer_format,
