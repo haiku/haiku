@@ -87,6 +87,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	uint8 m,n,p;
 	status_t result;
 	uint32 max_vclk, row_bytes, pointer_reservation;
+	bool acc_mode;
 	double target_refresh = ((double)target->timing.pixel_clock * 1000.0) /
 			(
 				(double)target->timing.h_total * 
@@ -174,7 +175,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		target->virtual_height = target->timing.v_display;
 
 	/* nail virtual size and 'subsequently' calculate rowbytes */
-	result = nv_general_validate_pic_size (target, &row_bytes);
+	result = nv_general_validate_pic_size (target, &row_bytes, &acc_mode);
 	if (result == B_ERROR)
 	{
 		LOG(4, ("PROPOSEMODE: could not validate virtual picture size, aborted.\n"));

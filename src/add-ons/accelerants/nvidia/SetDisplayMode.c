@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-12/2003
+	Rudolf Cornelissen 11/2002-1/2004
 */
 
 #define MODULE_BIT 0x00200000
@@ -51,10 +51,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	uint8 colour_depth1 = 32;
 	status_t result;
 	uint32 startadd,startadd_right;
-// apsed TODO startadd is 19 bits if < g200
-
 	bool display, h, v;
-	si->switched_crtcs = false;
 
 	/* Adjust mode to valid one and fail if invalid */
 	target /*= bounds*/ = *mode_to_set;
@@ -79,6 +76,10 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	}
 	LOG(1, ("SETMODE: (CONT.) validated command modeflags: $%08x\n", target.flags));
 
+	/* overlay engine, cursor and MOVE_DISPLAY need to know the status even when
+	 * in singlehead mode */
+	si->switched_crtcs = false;
+
 	/* disable interrupts using the kernel driver */
 	interrupt_enable(false);
 
@@ -91,7 +92,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
 
 	/* calculate and set new mode bytes_per_row */
-	nv_general_validate_pic_size (&target, &si->fbc.bytes_per_row);
+	nv_general_validate_pic_size (&target, &si->fbc.bytes_per_row, &si->acc_mode);
 
 	/*Perform the very long mode switch!*/
 	if (target.flags & DUALHEAD_BITS) /*if some dualhead mode*/

@@ -4,8 +4,7 @@ status_t nv_set_cas_latency(void);
 status_t gx50_general_output_select(void);
 status_t nv_general_dac_select(int);
 status_t nv_general_wait_retrace(void);
-status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row);
-//status_t nv_general_bios_to_powergraphics(void);
+status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode);
 
 /* apsed: logging macros */
 #define MSG(args) do { /* if needed or si->settings with si NULL */ \

@@ -1,13 +1,12 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-12/2003
+   Rudolf Cornelissen 10/2002-1/2004
 */
 
 #define MODULE_BIT 0x00008000
 
 #include "nv_std.h"
-//apsed #include "memory"
 
 status_t test_ram(void);
 static status_t nvxx_general_powerup (void);
@@ -81,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-1 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-2 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -864,7 +863,7 @@ status_t nv_general_bios_to_powergraphics()
  * Mode slopspace is reflected in fbc->bytes_per_row BTW. */
 //fixme: seperate heads for real dualhead modes:
 //CRTC1 and 2 constraints differ!
-status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row)
+status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode)
 {
 	/* Note:
 	 * This routine assumes that the CRTC memory pitch granularity is 'smaller than',
@@ -950,7 +949,7 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 
 	/* check if we can setup this mode with acceleration:
 	 * Max sizes need to adhere to both the acceleration engine _and_ the CRTC constraints! */
-	si->acc_mode = true;
+	*acc_mode = true;
 	/* check virtual_width */
 	switch (si->ps.card_arch)
 	{
@@ -960,17 +959,17 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		switch(target->space)
 		{
 		case B_CMAP8:
-			if (target->virtual_width > 8176) si->acc_mode = false;
+			if (target->virtual_width > 8176) *acc_mode = false;
 			break;
 		case B_RGB15_LITTLE:
 		case B_RGB16_LITTLE:
-			if (target->virtual_width > 4088) si->acc_mode = false;
+			if (target->virtual_width > 4088) *acc_mode = false;
 			break;
 		case B_RGB24_LITTLE:
-			if (target->virtual_width > 2720) si->acc_mode = false;
+			if (target->virtual_width > 2720) *acc_mode = false;
 			break;
 		case B_RGB32_LITTLE:
-			if (target->virtual_width > 2044) si->acc_mode = false;
+			if (target->virtual_width > 2044) *acc_mode = false;
 			break;
 		}
 		break;
@@ -980,17 +979,17 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		switch(target->space)
 		{
 		case B_CMAP8:
-			if (target->virtual_width > 16368) si->acc_mode = false;
+			if (target->virtual_width > 16368) *acc_mode = false;
 			break;
 		case B_RGB15_LITTLE:
 		case B_RGB16_LITTLE:
-			if (target->virtual_width > 8184) si->acc_mode = false;
+			if (target->virtual_width > 8184) *acc_mode = false;
 			break;
 		case B_RGB24_LITTLE:
-			if (target->virtual_width > 5456) si->acc_mode = false;
+			if (target->virtual_width > 5456) *acc_mode = false;
 			break;
 		case B_RGB32_LITTLE:
-			if (target->virtual_width > 4092) si->acc_mode = false;
+			if (target->virtual_width > 4092) *acc_mode = false;
 			break;
 		}
 		/* NV31 (confirmed GeForceFX 5600) has NV20A granularity!
@@ -1002,17 +1001,17 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		switch(target->space)
 		{
 		case B_CMAP8:
-			if (target->virtual_width > 16320) si->acc_mode = false;
+			if (target->virtual_width > 16320) *acc_mode = false;
 			break;
 		case B_RGB15_LITTLE:
 		case B_RGB16_LITTLE:
-			if (target->virtual_width > 8160) si->acc_mode = false;
+			if (target->virtual_width > 8160) *acc_mode = false;
 			break;
 		case B_RGB24_LITTLE:
-			if (target->virtual_width > 5440) si->acc_mode = false;
+			if (target->virtual_width > 5440) *acc_mode = false;
 			break;
 		case B_RGB32_LITTLE:
-			if (target->virtual_width > 4080) si->acc_mode = false;
+			if (target->virtual_width > 4080) *acc_mode = false;
 			break;
 		}
 		break;
@@ -1020,7 +1019,7 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* virtual_height */
 	/* (NV cards can even do more than this(?)...
 	 *  but 4096 is confirmed on all cards at max. accelerated width.) */
-	if (target->virtual_height > 4096) si->acc_mode = false;
+	if (target->virtual_height > 4096) *acc_mode = false;
 
 	/* now check NV virtual_size based on CRTC constraints */
 	{
@@ -1056,7 +1055,7 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
 	 * it was confined above, so we can finally calculate safely if we need slopspace
 	 * for this mode... */
-	if (si->acc_mode)
+	if (*acc_mode)
 		video_pitch = ((target->virtual_width + acc_mask) & ~acc_mask);
 	else
 		video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
