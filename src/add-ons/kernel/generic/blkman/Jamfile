@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src add-ons kernel generic blkman ;
+
+UsePrivateHeaders kernel ;
+UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+
+KernelAddon blkman : kernel generic :
+	blkman.c
+	io.c
+	virtual_memory.c
+	;
+
