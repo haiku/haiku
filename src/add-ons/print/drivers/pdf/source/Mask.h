@@ -1,6 +1,6 @@
 /*
 
-Image Cache.
+Mask Cache Item.
 
 Copyright (c) 2003 OpenBeOS. 
 
@@ -27,38 +27,59 @@ THE SOFTWARE.
 
 */
 
-#ifndef _IMAGE_CACHE_H
-#define _IMAGE_CACHE_H
+#ifndef _MASK_CACHE_ITEM_H
+#define _MASK_CACHE_ITEM_H
 
-#include <Bitmap.h>
-#include <InterfaceDefs.h>
 #include <String.h>
 
 #include "pdflib.h"
-#include "Utils.h"
 #include "Cache.h"
 
-extern const char* kTemporaryPath;
-extern const char* kCachePath;
-extern const char* kImagePathPrefix;
-extern const char* kMaskPathPrefix;
-
-#define STORE_AS_BBITMAP 1
-
-class ImageCache {
+class MaskDescription : public CIDescription {
 public:
-	ImageCache();
-	~ImageCache();
-	void Flush();
+	MaskDescription(PDF* pdf, const char* mask, int length, int width, int height, int bpc);
 	
-	void NextPass();
-	int GetImage(PDF* pdf, BBitmap* bitmap, int mask);
-	int GetMask(PDF* pdf, const char* mask, int length, int width, int height, int bpc);
+	CacheItem* NewItem(int id);
+
+	const char* Mask() const { return fMask; }
+	int Length() const { return fLength; }
+	int Width() const { return fWidth; }
+	int Height() const { return fHeight; }
+	int BPC() const { return fBPC; }
 
 private:
-	Cache fImageCache;
-	Cache fMaskCache;
+	bool StoreMask(const char* name);
+	int MakePDFMask();
+
+	PDF* fPDF;
+	const char* fMask;
+	int fLength;
+	int fWidth;
+	int fHeight;
+	int fBPC;
+};
+
+class Mask : public CacheItem {
+public:
+	Mask(PDF* pdf, int imageID, const char* fileName, int length, int width, int height, int bpc);
+	~Mask();
+	
+	int ImageID() const { return fImageID; };
+	const char* FileName() const  { return fFileName.String(); };
+	int Length() const { return fLength; };
+	int Width() const { return fWidth; }
+	int Height() const { return fHeight; }
+	int BPC() const { return fBPC; }
+	bool Equals(CIDescription* desc) const;
+
+private:
+	PDF* fPDF;
+	int fImageID;
+	BString fFileName;
+	int fLength;
+	int fWidth;
+	int fHeight;
+	int fBPC;
 };
 
 #endif
-

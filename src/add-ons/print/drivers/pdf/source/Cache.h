@@ -1,6 +1,6 @@
 /*
 
-Image Cache.
+"Special" Cache.
 
 Copyright (c) 2003 OpenBeOS. 
 
@@ -27,38 +27,49 @@ THE SOFTWARE.
 
 */
 
-#ifndef _IMAGE_CACHE_H
-#define _IMAGE_CACHE_H
+#ifndef _CACHE_H
+#define _CACHE_H
 
-#include <Bitmap.h>
-#include <InterfaceDefs.h>
-#include <String.h>
-
-#include "pdflib.h"
 #include "Utils.h"
-#include "Cache.h"
 
-extern const char* kTemporaryPath;
-extern const char* kCachePath;
-extern const char* kImagePathPrefix;
-extern const char* kMaskPathPrefix;
+class CacheItem;
+class CacheItemReference;
 
-#define STORE_AS_BBITMAP 1
-
-class ImageCache {
+// CacheItemDescription
+class CIDescription {
 public:
-	ImageCache();
-	~ImageCache();
-	void Flush();
+	CIDescription() {};
+	virtual ~CIDescription() {};
 	
-	void NextPass();
-	int GetImage(PDF* pdf, BBitmap* bitmap, int mask);
-	int GetMask(PDF* pdf, const char* mask, int length, int width, int height, int bpc);
+	virtual CacheItem* NewItem(int id) { return NULL; }
+};
 
+class CacheItem {
+public:
+	CacheItem() {}
+	virtual ~CacheItem() {}
+	
+	virtual bool Equals(CIDescription* desc) const = 0;
+	virtual CacheItem* Reference() { return this; }
+};
+
+class Cache {
+public:
+	Cache();
+	virtual ~Cache() {};
+
+	void NextPass(); 
+
+	// returns the CacheItem at "NextID", returns NULL on error
+	CacheItem* Find(CIDescription* desc);
+	void MakeEmpty() { fCache.MakeEmpty(); }
+	int32 CountItems() const { return fCache.CountItems(); }
+	CacheItem* ItemAt(int32 i) const { return fCache.ItemAt(i); }
+	
 private:
-	Cache fImageCache;
-	Cache fMaskCache;
+	int8  fPass;
+	int32 fNextID;
+	TList<CacheItem> fCache;
 };
 
 #endif
-

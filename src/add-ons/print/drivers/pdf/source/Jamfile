@@ -10,17 +10,20 @@ Addon
 	AdvancedSettingsWindow.cpp
 	Bezier.cpp
 	Bookmark.cpp
+	Cache.cpp
 	DocInfoWindow.cpp
 	DrawShape.cpp
 	Driver.cpp
 	Fonts.cpp
 	FontsWindow.cpp
+	Image.cpp
 	ImageCache.cpp
 	InterfaceUtils.cpp
 	JobSetupWindow.cpp
 	LinePathBuilder.cpp
 	Link.cpp
 	MarginView.cpp
+	Mask.cpp
 	PDFLinePathBuilder.cpp
 	PDFText.cpp
 	PDFWriter.cpp

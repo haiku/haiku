@@ -121,7 +121,7 @@ PDFWriter::PrintPage(int32	pageNumber, int32 pageCount)
 			REPORT(kDebug, fPage, ">>>>> Collecting patterns...");
 		} else if (MakesPDF()) {
 			REPORT(kDebug, fPage, ">>>>> Generating PDF...");
-			fImageCache.ResetID();
+			fImageCache.NextPass();
 		}
 	}
 	
@@ -231,7 +231,7 @@ PDFWriter::EndJob()
 		fprintf(fLog, ": %s\n", rr->Desc()); 
 	}
 #endif
-	fImageCache.Flush(fPdf);
+	fImageCache.Flush();
 	
 	PDF_close(fPdf);
 	REPORT(kDebug, 0, ">>>> PDF_close");
@@ -800,8 +800,8 @@ PDFWriter::CreatePattern()
 		REPORT(kError, fPage, "CreatePattern could not create pattern");
 #if !USE_IMAGE_CACHE
 		PDF_close_image(fPdf, image);
-#endif
 		if (mask != -1) PDF_close_image(fPdf, mask);
+#endif
 		return;
 	}
 	PDF_setcolor(fPdf, "both", "rgb", 0, 0, 1, 0);
@@ -809,8 +809,8 @@ PDFWriter::CreatePattern()
 	PDF_end_pattern(fPdf);
 #if !USE_IMAGE_CACHE
 	PDF_close_image(fPdf, image);
-#endif
 	if (mask != -1) PDF_close_image(fPdf, mask);
+#endif
 #endif
 	
 	Pattern* p = new Pattern(fState->pattern0, fState->backgroundColor, fState->foregroundColor, pattern);
@@ -1623,19 +1623,26 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 	}
 	
 	if (mask) {
+// PDFlib deprecated:
 //		*maskId = PDF_open_image(fPdf, "raw", "memory", (const char *) mask, length, width, height, 1, bpc, "mask");
+#if USE_IMAGE_CACHE
+		*maskId = fImageCache.GetMask(fPdf, (char*)mask, length, width, height, bpc);
+#else
 		BString options;
 		PDF_create_pvf(fPdf, "mask", 0, mask, length, NULL);
 		options << "width " << width << " height " << height << " components 1 bpc " << bpc;  
 		*maskId = PDF_load_image(fPdf, "raw", "mask", 0, options.String());
-		delete []mask;
 		PDF_delete_pvf(fPdf, "mask", 0);
+#endif
+		delete []mask;
 	}
 
 	BBitmap * bm = ConvertBitmap(src, bytesPerRow, pixelFormat, flags, data);
 	if (!bm) {
 		REPORT(kError, fPage, "ConvertBitmap failed!");
+#if !USE_IMAGE_CACHE
 		if (*maskId != -1) PDF_close_image(fPdf, *maskId);
+#endif
 		return false;
 	}
 
@@ -1650,7 +1657,9 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 	if (!StoreTranslatorBitmap(bm, bitmapFileName, beosFormat)) {
 		delete bm;
 		REPORT(kError, fPage, "StoreTranslatorBitmap failed");
+#if !USE_IMAGE_CACHE
 		if (*maskId != -1) PDF_close_image(fPdf, *maskId);
+#endif
 		return false;
 	}
 	delete bm;
@@ -2170,11 +2179,13 @@ PDFWriter::DrawPixels(BRect src, BRect dest, int32 width, int32 height, int32 by
 #if !USE_IMAGE_CACHE
 		PDF_close_image(fPdf, image);
 #endif
-	} else 
+	} else {
 		REPORT(kError, fPage, "PDF_open_image_file failed!");
-
-	if (maskId != -1) PDF_close_image(fPdf, maskId);
+	}
 	
+#if !USE_IMAGE_CACHE
+	if (maskId != -1) PDF_close_image(fPdf, maskId);
+#endif	
 	EndTransparency();
 	
 	if (needs_scaling) PDF_restore(fPdf);
