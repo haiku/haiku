@@ -42,6 +42,7 @@ StdBinCommands
 	;
 
 #SubInclude OBOS_TOP src apps bin gnu ;
+SubInclude OBOS_TOP src apps bin addattr ;
 SubInclude OBOS_TOP src apps bin chkbfs ;
 SubInclude OBOS_TOP src apps bin listdev ;
 SubInclude OBOS_TOP src apps bin mkdos ;
@@ -54,5 +55,7 @@ SubInclude OBOS_TOP src apps bin ifconfig ;
 SubInclude OBOS_TOP src apps bin ping ;
 SubInclude OBOS_TOP src apps bin route ;
 SubInclude OBOS_TOP src apps bin traceroute ;
+
+# Compression command line tools
 SubInclude OBOS_TOP src apps bin unzip ;
 SubInclude OBOS_TOP src apps bin zip ;

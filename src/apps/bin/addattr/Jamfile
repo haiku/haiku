@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src apps bin addattr ;
+
+BinCommand addattr :
+	addAttr.cpp
+	main.cpp
+	messages.cpp
+	: be
+;
+
