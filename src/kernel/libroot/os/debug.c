@@ -1,11 +1,12 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <debugger.h>
 #include <OS.h>
+#include <Debug.h>
 #include "syscalls.h"
 
 #include <stdio.h>
@@ -104,6 +105,7 @@ debug_thread(thread_id thread)
  *	their debugged teams via fork() and want the child to wait till they have
  *	installed themselves as team debugger before continuing with exec*().
  */
+
 void
 wait_for_debugger(void)
 {
@@ -139,6 +141,7 @@ get_debug_message_string(debug_debugger_message message, char *buffer,
 		(uint32)message, buffer, bufferSize);
 }
 
+
 void
 get_debug_exception_string(debug_exception_type exception, char *buffer,
 	int32 bufferSize)
@@ -148,11 +151,12 @@ get_debug_exception_string(debug_exception_type exception, char *buffer,
 }
 
 
-// relating to Debug.h
-// TODO: verify these functions
-// TODO: add implementations for printfs
+//	#pragma mark -
+//	Debug.h functions
 
-#include <Debug.h>
+// TODO: verify these functions
+// TODO: add implementations for printfs?
+
 
 bool _rtDebugFlag = false;
 
@@ -178,8 +182,6 @@ _debugPrintf(const char *fmt, ...)
 	va_list ap;
 	int ret;
 
-	// TODO : we need locking here
-
 	va_start(ap, fmt);
 	ret = vfprintf(stdout, fmt, ap);
 	va_end(ap);
@@ -191,22 +193,18 @@ _debugPrintf(const char *fmt, ...)
 int
 _sPrintf(const char *fmt, ...)
 {
+	char buffer[1024];
 	va_list ap;
 	int ret;
-	char buffer[256]; // seems to be the size used in R5
 
-	// TODO : we need locking here
-	
 	va_start(ap, fmt);
-	ret = vsnprintf(buffer, 256, fmt, ap);
+	ret = vsnprintf(buffer, sizeof(buffer), fmt, ap);
 	va_end(ap);
 
-	if (ret < 0)
-		return ret;
+	if (ret >= 0)
+		_kern_debug_output(buffer);	
 
-	_kern_debug_output(buffer);	
-
-	return 0;
+	return ret;
 }
 
 
@@ -233,6 +231,7 @@ _debuggerAssert(const char * file, int line, char * message)
 }
 
 // TODO: Remove. Temporary debug helper.
+// (accidently these are more or less the same as _sPrintf())
 
 void
 debug_printf(const char *format, ...)
