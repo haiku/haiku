@@ -55,8 +55,9 @@ extern "C" {
 status_t vfs_init(struct kernel_args *ka);
 status_t vfs_bootstrap_file_systems(void);
 status_t vfs_mount_boot_file_system(void);
-void *vfs_new_io_context(void *parent_ioctx);
-int vfs_free_io_context(void *ioctx);
+void vfs_exec_io_context(void *context);
+void *vfs_new_io_context(void *parentContext);
+int vfs_free_io_context(void *context);
 
 struct rlimit;
 int vfs_getrlimit(int resource, struct rlimit * rlp);
