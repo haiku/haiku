@@ -17,3 +17,15 @@ R5KernelAddon emuxki : kernel drivers bin :
 	MakeLocate $(instDriver) : $(dir) ;
 	RelSymLink $(instDriver) : emuxki ;
 }
+
+Package openbeos-emuxki-cvs
+	:
+	emuxki
+	:
+	boot home config add-ons kernel drivers bin ;
+
+Package openbeos-emuxki-cvs
+	:
+	<kernel!drivers!dev!audio!multi>emuxki
+	:
+	boot home config add-ons kernel drivers dev audio multi ;
