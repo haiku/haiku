@@ -5,7 +5,7 @@
 
 #include <KernelExport.h>
 
-#include <ktypes.h>
+#include <kernel.h>
 #include <user_atomic.h>
 
 /*
@@ -104,18 +104,19 @@ _user_atomic_set64(vint64 *value, int64 newValue)
 {
 	cpu_status status;
 	int64 oldValue;
-	if (!CHECK_USER_ADDRESS(value))
+	if (!CHECK_USER_ADDRESS(value)
+		|| lock_memory((void *)value, 8, B_READ_DEVICE) != B_OK)
 		goto access_violation;
-	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
-		goto access_violation;
+
 	status = disable_interrupts();
 	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
 	*value = newValue;
 	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
-	unlock_memory(value, 8, B_READ_DEVICE))
+	unlock_memory((void *)value, 8, B_READ_DEVICE);
 	return oldValue;
+
 access_violation:
 	// XXX kill application
 	return -1;
@@ -126,10 +127,10 @@ _user_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
 {
 	cpu_status status;
 	int64 oldValue;
-	if (!CHECK_USER_ADDRESS(value))
+	if (!CHECK_USER_ADDRESS(value)
+		|| lock_memory((void *)value, 8, B_READ_DEVICE) != B_OK)
 		goto access_violation;
-	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
-		goto access_violation;
+
 	status = disable_interrupts();
 	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
@@ -137,8 +138,9 @@ _user_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
 		*value = newValue;
 	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
-	unlock_memory(value, 8, B_READ_DEVICE))
+	unlock_memory((void *)value, 8, B_READ_DEVICE);
 	return oldValue;
+
 access_violation:
 	// XXX kill application
 	return -1;
@@ -149,18 +151,19 @@ _user_atomic_add64(vint64 *value, int64 addValue)
 {
 	cpu_status status;
 	int64 oldValue;
-	if (!CHECK_USER_ADDRESS(value))
+	if (!CHECK_USER_ADDRESS(value)
+		|| lock_memory((void *)value, 8, B_READ_DEVICE) != B_OK)
 		goto access_violation;
-	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
-		goto access_violation;
+
 	status = disable_interrupts();
 	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
 	*value += addValue;
 	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
-	unlock_memory(value, 8, B_READ_DEVICE))
+	unlock_memory((void *)value, 8, B_READ_DEVICE);
 	return oldValue;
+
 access_violation:
 	// XXX kill application
 	return -1;
@@ -171,18 +174,19 @@ _user_atomic_and64(vint64 *value, int64 andValue)
 {
 	cpu_status status;
 	int64 oldValue;
-	if (!CHECK_USER_ADDRESS(value))
+	if (!CHECK_USER_ADDRESS(value)
+		|| lock_memory((void *)value, 8, B_READ_DEVICE) != B_OK)
 		goto access_violation;
-	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
-		goto access_violation;
+
 	status = disable_interrupts();
 	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
 	*value &= andValue;
 	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
-	unlock_memory(value, 8, B_READ_DEVICE))
+	unlock_memory((void *)value, 8, B_READ_DEVICE);
 	return oldValue;
+
 access_violation:
 	// XXX kill application
 	return -1;
@@ -193,17 +197,17 @@ _user_atomic_or64(vint64 *value, int64 orValue)
 {
 	cpu_status status;
 	int64 oldValue;
-	if (!CHECK_USER_ADDRESS(value))
+	if (!CHECK_USER_ADDRESS(value)
+		|| lock_memory((void *)value, 8, B_READ_DEVICE) != B_OK)
 		goto access_violation;
-	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
-		goto access_violation;
+
 	status = disable_interrupts();
 	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
 	*value |= orValue;
 	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
-	unlock_memory(value, 8, B_READ_DEVICE))
+	unlock_memory((void *)value, 8, B_READ_DEVICE);
 	return oldValue;
 access_violation:
 	// XXX kill application
@@ -215,17 +219,18 @@ _user_atomic_get64(vint64 *value)
 {
 	cpu_status status;
 	int64 oldValue;
-	if (!CHECK_USER_ADDRESS(value))
+	if (!CHECK_USER_ADDRESS(value)
+		|| lock_memory((void *)value, 8, B_READ_DEVICE) != B_OK)
 		goto access_violation;
-	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
-		goto access_violation;
+
 	status = disable_interrupts();
 	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
 	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
-	unlock_memory(value, 8, B_READ_DEVICE))
+	unlock_memory((void *)value, 8, B_READ_DEVICE);
 	return oldValue;
+
 access_violation:
 	// XXX kill application
 	return -1;
