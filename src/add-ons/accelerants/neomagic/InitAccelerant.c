@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-4/2004.
+	Rudolf Cornelissen 10/2002-11/2004.
 */
 
 #define MODULE_BIT 0x00800000
@@ -127,7 +127,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 	status_t result;
 	int cnt; 				 //used for iteration through the overlay buffers
 
-	if (1) {
+	if (0) {
 		time_t now = time (NULL);
 		// LOG not available from here to next LOG: NULL si
 		MSG(("INIT_ACCELERANT: %s", ctime (&now)));
@@ -196,6 +196,9 @@ status_t INIT_ACCELERANT(int the_fd) {
 	}
 	/* make sure overlay unit is 'marked' as being free */
 	si->overlay.myToken = NULL;	
+
+	/* note that overlay is not in use (for nm_bes_move_overlay()) */
+	si->overlay.active = false;
 
 	/* bail out if something failed */
 	if (result != B_OK) goto error1;

@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.10 running.\n"));
+	LOG(1,("POWERUP: Haiku-OS Neomagic Accelerant 0.11 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -202,75 +202,7 @@ static status_t nmxxxx_general_powerup()
 	/* setup sequencer clocking mode */
 	ISASEQW(CLKMODE, 0x21);
 
-	/* G100 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
-	 * (this would create electrical shortcuts,
-	 * resulting in extra chip heat and distortions visible on screen */
-	/* set voltage reference - using DAC reference block partly */
-//	DXIW(VREFCTRL,0x03);
-	/* wait for 100ms for voltage reference to stabilize */
-	delay(100000);
-	/* power up the SYSPLL */
-//	CFGW(OPTION,CFGR(OPTION)|0x20);
-	/* power up the PIXPLL */
-//	DXIW(PIXCLKCTRL,0x08);
-
-	/* disable pixelclock oscillations before switching on CLUT */
-//	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
-	/* disable 15bit mode CLUT-overlay function */
-//	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
-	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
-//	DXIW(MISCCTRL,0x1b);
-//	snooze(250);
-	/* re-enable pixelclock oscillations */
-//	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) & 0xfb));
-
-	/*make sure card is in powergraphics mode*/
-//	VGAW_I(CRTCEXT,3,0x80);      
-
-	/*set the system clocks to powergraphics speed*/
-//	LOG(2,("INIT: Setting system PLL to powergraphics speeds\n"));
-//	g100_dac_set_sys_pll();
-
-	/* 'official' RAM initialisation */
-//	LOG(2,("INIT: RAM init\n"));
-	/* disable plane write mask (needed for SDRAM): actual change needed to get it sent to RAM */
-//	ACCW(PLNWT,0x00000000);
-//	ACCW(PLNWT,0xffffffff);
-	/* program memory control waitstates */
-//	ACCW(MCTLWTST,si->ps.mctlwtst_reg);
-	/* set memory configuration including:
-	 * - no split framebuffer.
-	 * - Mark says b14 (G200) should be done also though not defined for G100 in spec,
-	 * - b3 v3_mem_type was included by Mark for memconfig setup: but looks like not defined */
-//	CFGW(OPTION,(CFGR(OPTION)&0xFFFF8FFF) | ((si->ps.v3_mem_type & 0x04) << 10));
-	/* set memory buffer type:
-	 * - Mark says: if((v3_mem_type & 0x03) == 0x03) then do not or-in bits in option2;
-	 *   but looks like v3_mem_type b1 is not defined,
-	 * - Mark also says: place v3_mem_type b1 in option2 bit13 (if not 0x03) but b13 = reserved. */
-//	CFGW(OPTION2,(CFGR(OPTION2)&0xFFFFCFFF)|((si->ps.v3_mem_type & 0x01) << 12));
-	/* set RAM read tap delay */
-//	CFGW(OPTION2,(CFGR(OPTION2)&0xFFFFFFF0) | ((si->ps.v3_mem_type & 0xf0) >> 4));
-	/* wait 200uS minimum */
-//	snooze(250);
-
-	/* reset memory (MACCESS is a write only register!) */
-//	ACCW(MACCESS, 0x00000000);
-	/* select JEDEC reset method */
-//	ACCW(MACCESS, 0x00004000);
-	/* perform actual RAM reset */
-//	ACCW(MACCESS, 0x0000c000);
-//	snooze(250);
-	/* start memory refresh */
-//	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff) | (si->ps.option_reg & 0x001f8000));
-	/* set memory control waitstate again AFTER the RAM reset */
-//	ACCW(MCTLWTST,si->ps.mctlwtst_reg);
-	/* end 'official' RAM initialisation. */
-
-	/* Bus parameters: enable retries, use advanced read */
-//	CFGW(OPTION,(CFGR(OPTION)|(1<<22)|(0<<29)));
-
-	/*enable writing to crtc registers*/
-//	VGAW_I(CRTC,0x11,0);
+	//fixme: setup coldstart capability...
 
 	/* turn on display */
 	nm_crtc_dpms(true, true, true);
