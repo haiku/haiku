@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Window.cpp
-//	Author:			Adrian Oanca (e2joseph@hotpop.com)
+//	Author:			Adrian Oanca (adioanca@mymail.ro)
 //	Description:	A BWindow object represents a window that can be displayed
 //					on the screen, and that can be the target of user events
 //------------------------------------------------------------------------------
@@ -2028,26 +2028,6 @@ void BWindow::InitData(	BRect frame,
 
 	pmsg.Read<port_id>(&send_port);
 
-/*
-	session->WriteInt32( AS_CREATE_WINDOW );
-	session->WriteRect( fFrame );
-	session->WriteInt32( (int32)fLook );
-	session->WriteInt32( (int32)fFeel );
-	session->WriteUInt32( fFlags );
-	session->WriteUInt32( workspace );
-	session->WriteData( &team, sizeof(team_id));
-	session->WriteInt32( _get_object_token_(this) );
-	session->WriteData( &receive_port, sizeof(port_id) );
-	session->WriteData( &fMsgPort, sizeof(port_id) );
-	session->WriteString( title );
-
-printf("look: %ld\n", (int32)fLook);
-printf("title: %s\n", title);
-	session->Sync();
-		// The port on witch app_server will listen for us	
-	STRACE(("here\n"));
-	session->ReadData( &send_port, sizeof(port_id) );
-*/
 		// unlock, so other threads can do their job.
 	if( locked )
 		be_app->Unlock();
@@ -2157,7 +2137,7 @@ void BWindow::task_looper(){
 			session->Sync();
 
 			Unlock();
-printf("Lock released\n");
+
 			//	Delete the current message (fLastMessage)
 			if (fLastMessage)
 			{
@@ -2174,12 +2154,6 @@ printf("Lock released\n");
 		}
 	}
 
-}
-
-//------------------------------------------------------------------------------
-
-BMessage* BWindow::ReadMessageFromPort(bigtime_t tout){
-// TODO: remove!
 }
 
 //------------------------------------------------------------------------------
@@ -2587,335 +2561,8 @@ void BWindow::sendMessageUsingEventMask( int32 message, BPoint where ){
 
 //------------------------------------------------------------------------------
 
-BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
-
-	BMessage	*msg;
-	msg			= new BMessage();
-		// time since 01/01/70
-	int64		when;
-
-	switch(code){
-		case B_WINDOW_ACTIVATED:{
-			bool		active;
-
-			session->ReadInt64( &when );
-			session->ReadBool( &active );
-
-			msg->what	= B_WINDOW_ACTIVATED;
-			msg->AddInt64("when", when);
-			msg->AddBool("active", active);
-
-			break;}
-
-		case B_QUIT_REQUESTED:{
-
-			msg->what	= B_QUIT_REQUESTED;
-			msg->AddBool("shortcut", false);
-
-			break;}
-			
-		case B_KEY_DOWN:{
-			int32			physicalKeyCode,
-							repeat,
-							modifiers,
-							ASCIIcode;
-			char			*bytes = NULL;
-			uint8			states;
-			int8			UTF8_1, UTF8_2, UTF8_3;
-
-			session->ReadInt64( &when );
-			session->ReadInt32( &physicalKeyCode );
-			session->ReadInt32( &repeat );
-			session->ReadInt32( &modifiers );
-			session->ReadUInt8( &states );
-			session->ReadInt8( &UTF8_1 );
-			session->ReadInt8( &UTF8_2 );
-			session->ReadInt8( &UTF8_3 );
-			session->ReadInt32( &ASCIIcode );
-			bytes			= session->ReadString();
-			
-			msg->what		= B_KEY_DOWN;
-			msg->AddInt64("when", when);
-			msg->AddInt32("key", physicalKeyCode);
-			msg->AddInt32("be:key_repeat", repeat);
-			msg->AddInt32("modifiers", modifiers);
-			msg->AddInt8("states", states);
-			msg->AddInt8("byte", UTF8_1);
-			msg->AddInt8("byte", UTF8_2);
-			msg->AddInt8("byte", UTF8_3);
-			msg->AddInt32("raw_char", ASCIIcode);
-			msg->AddString("bytes", bytes);
-			
-			if (bytes)
-				delete bytes;
-
-			break;}
-
-		case B_KEY_UP:{
-			int32			physicalKeyCode,
-							modifiers,
-							ASCIIcode;
-			char			*bytes;
-			uint8			states;
-			int8			UTF8_1, UTF8_2, UTF8_3;
-
-			session->ReadInt64( &when );
-			session->ReadInt32( &physicalKeyCode );
-			session->ReadInt32( &modifiers );
-			session->ReadUInt8( &states );
-			session->ReadInt8( &UTF8_1 );
-			session->ReadInt8( &UTF8_2 );
-			session->ReadInt8( &UTF8_3 );
-			session->ReadInt32( &ASCIIcode );
-			bytes			= session->ReadString();
-
-			msg->what		= B_KEY_UP;
-			msg->AddInt64("when", when);
-			msg->AddInt32("key", physicalKeyCode);
-			msg->AddInt32("modifiers", modifiers);
-			msg->AddInt8("states", states);
-			msg->AddInt8("byte", UTF8_1);
-			msg->AddInt8("byte", UTF8_2);
-			msg->AddInt8("byte", UTF8_3);
-			msg->AddInt32("raw_char", ASCIIcode);
-			msg->AddString("bytes", bytes);
-
-			if (bytes)
-				delete bytes;
-
-			break;}
-
-		case B_UNMAPPED_KEY_DOWN:{
-			int32			physicalKeyCode,
-							modifiers;
-			uint8			states;
-
-			session->ReadInt64( &when );
-			session->ReadInt32( &physicalKeyCode );
-			session->ReadInt32( &modifiers );
-			session->ReadUInt8( &states );
-
-			msg->what		= B_UNMAPPED_KEY_DOWN;
-			msg->AddInt64("when", when);
-			msg->AddInt32("key", physicalKeyCode);
-			msg->AddInt32("modifiers", modifiers);
-			msg->AddInt8("states", states);
-
-			break;}
-
-		case B_UNMAPPED_KEY_UP:{
-			int32			physicalKeyCode,
-							modifiers;
-			uint8			states;
-
-			session->ReadInt64( &when );
-			session->ReadInt32( &physicalKeyCode );
-			session->ReadInt32( &modifiers );
-			session->ReadUInt8( &states );
-
-			msg->what		= B_UNMAPPED_KEY_UP;
-			msg->AddInt64("when", when);
-			msg->AddInt32("key", physicalKeyCode);
-			msg->AddInt32("modifiers", modifiers);
-			msg->AddInt8("states", states);
-
-			break;}
-
-		case B_MODIFIERS_CHANGED:{
-			int32			modifiers,
-							modifiersOld;
-			uint8			states;
-
-			session->ReadInt64( &when );
-			session->ReadInt32( &modifiers );
-			session->ReadInt32( &modifiersOld );
-			session->ReadUInt8( &states );
-
-			msg->what		= B_MODIFIERS_CHANGED;
-			msg->AddInt64("when", when);
-			msg->AddInt32("modifiers", modifiers);
-			msg->AddInt32("be:old_modifiers", modifiersOld);
-			msg->AddInt8("states", states);
-
-			break;}
-
-		case B_MINIMIZE:{
-			bool			minimize;
-
-			session->ReadInt64( &when );
-			session->ReadBool( &minimize );
-
-			msg->what		= B_MINIMIZE;
-			msg->AddInt64("when", when);
-			msg->AddBool("minimize", minimize);
-
-			break;}
-
-		case B_MOUSE_DOWN:{
-			int32			modifiers,
-							buttons,
-							noOfClicks;
-			BPoint			where;
-
-			session->ReadInt64( &when );
-			session->ReadPoint( &where );
-			session->ReadInt32( &modifiers );
-			session->ReadInt32( &buttons );
-			session->ReadInt32( &noOfClicks );
-
-			msg->what		= B_MOUSE_DOWN;
-			msg->AddInt64("when", when);
-			msg->AddPoint("where", where);
-			msg->AddInt32("modifiers", modifiers);
-			msg->AddInt32("buttons", buttons);
-			msg->AddInt32("clicks", noOfClicks);
-
-			break;}
-
-		case B_MOUSE_MOVED:{
-			int32			buttons;
-			int32			modifiers;		// added by OBOS Team
-			BPoint			where;
-
-			session->ReadInt64( &when );
-			session->ReadPoint( &where );
-			session->ReadInt32( &buttons );
-			session->ReadInt32( &modifiers );
-
-			msg->what		= B_MOUSE_MOVED;
-			msg->AddInt64("when", when);
-			msg->AddPoint("where", where);
-			msg->AddInt32("buttons", buttons);
-			msg->AddInt32("modifiers", modifiers);
-
-			break;}
-
-		case B_MOUSE_UP:{
-			int32			modifiers,
-							buttons;
-			BPoint			where;
-
-			session->ReadInt64( &when );
-			session->ReadPoint( &where );
-			session->ReadInt32( &buttons );
-			session->ReadInt32( &modifiers );
-
-			msg->what		= B_MOUSE_UP;
-			msg->AddInt64("when", when);
-			msg->AddPoint("where", where);
-			msg->AddInt32("modifiers", modifiers);
-			msg->AddInt32("buttons", buttons);
-
-			break;}
-
-		case B_MOUSE_WHEEL_CHANGED:{
-			float			whellChangeX,
-							whellChangeY;
-
-			session->ReadInt64( &when );
-			session->ReadFloat( &whellChangeX );
-			session->ReadFloat( &whellChangeY );
-
-			msg->what		= B_MOUSE_WHEEL_CHANGED;
-			msg->AddInt64("when", when);
-			msg->AddFloat("be:wheel_delta_x", whellChangeX);
-			msg->AddFloat("be:wheel_delta_y", whellChangeY);
-
-			break;}
-
-		case B_SCREEN_CHANGED:{
-			int32			colorSpace;
-			BRect			frame;
-
-			session->ReadInt64( &when );
-			session->ReadRect( &frame );
-			session->ReadInt32( &colorSpace );
-
-			msg->what		= B_SCREEN_CHANGED;
-			msg->AddInt64("when", when);
-			msg->AddRect("frame", frame);
-			msg->AddInt32("mode", colorSpace);
-
-			break;}
-
-		case B_WINDOW_MOVED:{
-			BPoint			where;
-
-			session->ReadInt64( &when );
-			session->ReadPoint( &where );
-
-			msg->what		= B_WINDOW_MOVED;
-			msg->AddInt64("when", when);
-			msg->AddPoint("where", where);
-
-			break;}
-
-		case B_WINDOW_RESIZED:{
-			int32			newWidth,
-							newHeight;
-
-			session->ReadInt64( &when );
-			session->ReadInt32( &newWidth );
-			session->ReadInt32( &newHeight );
-			
-			msg->what		= B_WINDOW_RESIZED;
-			msg->AddInt64("when", when);
-			msg->AddInt32("width", newWidth);
-			msg->AddInt32("height", newHeight);
-
-			break;}
-
-		case B_WORKSPACES_CHANGED:{
-			int32			newWorkSpace,
-							oldWorkSpace;
-
-			session->ReadInt64( &when );
-			session->ReadInt32( &newWorkSpace );
-			session->ReadInt32( &oldWorkSpace );
-
-			msg->what		= B_WORKSPACES_CHANGED;
-			msg->AddInt64("when", when);
-			msg->AddInt32("old", oldWorkSpace);
-			msg->AddInt32("new", newWorkSpace);
-
-			break;}
-
-		case B_WORKSPACE_ACTIVATED:{
-			int32			workSpace;
-			bool			active;
-
-			session->ReadInt64( &when );
-			session->ReadInt32( &workSpace );
-			session->ReadBool( &active );
-
-			msg->what		= B_WORKSPACE_ACTIVATED;
-			msg->AddInt64("when", when);
-			msg->AddInt32("workspace", workSpace);
-			msg->AddBool("active", active);
-
-			break;}
-
-		case B_ZOOM:{
-
-			session->ReadInt64( &when );
-
-			msg->what		= B_ZOOM;
-			msg->AddInt64("when", when);
-
-			break;}
-		
-		default:{
-			delete msg;
-			
-			msg		= BLooper::ConvertToMessage( raw1, code );
-			if (!msg)
-				printf("***PANIC: app_server message NOT understood: '%c%c%c%c'***\n",
-					(char)((code & 0xFF000000) >> 24), (char)((code & 0x00FF0000) >> 16),
-					(char)((code & 0x0000FF00) >> 8), (char)(code & 0x000000FF) );
-			}
-	}
-	
-	return msg;
+BMessage* BWindow::ConvertToMessage(void* raw, int32 code){
+	return BLooper::ConvertToMessage( raw, code );
 }
 
 //------------------------------------------------------------------------------
@@ -3315,13 +2962,8 @@ TODO list:
 	*) what's with this flag B_ASYNCHRONOUS_CONTROLS ?
 	*) test arguments for SetWindowAligment
 	*) call hook functions: MenusBeginning, MenusEnded. Add menu activation code.
-	
-	* add handlers for B_VIEW_MOVED/RESIZED in DispatchMessage()
-	* modify _UPDATE_ handler in DispatchMessage()
 */
 
 /*
  @log
-	*modified ReadRawFromPort() and ConvertToMessage() methods to use BSession class.
-	*modified/added B_VIEW_(MOVED/RESIZED) handlers in ConvertToMessage()/DispatchMessage()
 */
