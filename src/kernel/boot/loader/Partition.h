@@ -26,12 +26,11 @@ class Partition : public partition_data, public Node {
 		Partition *Parent() const { return fParent; }
 		bool IsFileSystem() const { return fIsFileSystem; }
 
-		static int32 NextOffset() { return offsetof(Partition, fNext); }
+		static size_t LinkOffset() { return sizeof(partition_data); }
 
 	private:
 		void SetParent(Partition *parent) { fParent = parent; }
 
-		Partition	*fNext;
 		int			fFD;
 		list		fChildren;
 		Partition	*fParent;

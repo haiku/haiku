@@ -60,7 +60,7 @@ Partition::Partition(int fd)
 
 	// it's safe to close the file
 	fFD = dup(fd);
-	list_init_etc(&fChildren, Partition::NextOffset());
+	list_init_etc(&fChildren, Partition::LinkOffset());
 }
 
 

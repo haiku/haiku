@@ -343,7 +343,7 @@ vfs_init(stage2_args *args)
 status_t
 mount_boot_file_systems()
 {
-	list_init_etc(&gPartitions, Partition::NextOffset());
+	list_init_etc(&gPartitions, Partition::LinkOffset());
 
 	gRoot = new RootFileSystem();
 	if (gRoot == NULL)
@@ -362,7 +362,7 @@ mount_boot_file_systems()
 	}
 
 	if (list_is_empty(&gPartitions))
-		panic("Could not find any partitions on the boot devices");
+		return B_ENTRY_NOT_FOUND;
 
 	return B_OK;
 }
