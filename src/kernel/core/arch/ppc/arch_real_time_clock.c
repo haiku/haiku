@@ -1,7 +1,5 @@
 /*
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de
- * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
- *
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +11,7 @@
 status_t
 arch_rtc_init(kernel_args *args, struct real_time_data *data)
 {
+	return B_OK;
 }
 
 
@@ -26,4 +25,5 @@ arch_rtc_get_hw_time(void)
 void
 arch_rtc_set_hw_time(uint32 seconds)
 {
-}	
+}
+
