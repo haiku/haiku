@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2003, Niels S. Reedijk
+//	Copyright (c) 2003-2004, Niels S. Reedijk
 //
 //  AllocArea implementation (c) 2002 Marcus Overhagen <marcus@overhagen.de>
 //
