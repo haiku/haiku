@@ -92,6 +92,13 @@ BPartition::Size() const
 	return (fPartitionData ? fPartitionData->size : 0);
 }
 
+// ContentSize
+off_t
+BPartition::ContentSize() const
+{
+	return (fPartitionData ? fPartitionData->content_size : 0);
+}
+
 // BlockSize
 /*!	\brief Returns the block size of the device.
 	\return The block size of the device in bytes.
@@ -513,10 +520,8 @@ BPartition::CanMove(BObjectList<BPartition> *unmovableDescendants,
 					BObjectList<BPartition> *movableOnlyIfUnmounted) const
 {
 	// check parameters
-	if (!unmovableDescendants || !movableOnlyIfUnmounted || !fPartitionData
-		|| IsDevice() || !Parent() || !_IsShadow()) {
+	if (!fPartitionData || IsDevice() || !Parent() || !_IsShadow())
 		return false;
-	}
 	// count descendants and allocate partition_id arrays large enough
 	int32 descendantCount = _CountDescendants();
 	partition_id *unmovableIDs = NULL;
@@ -542,18 +547,24 @@ BPartition::CanMove(BObjectList<BPartition> *unmovableDescendants,
 						_ChangeCounter(), unmovableIDs, needUnmountingIDs,
 						descendantCount);
 	if (result) {
-		// find unmovable BPartition objects for returned IDs
-		for (int32 i = 0; i < descendantCount && unmovableIDs[i] != -1; i++) {
-			BPartition *descendant = FindDescendant(unmovableIDs[i]);
-			if (!descendant || !unmovableDescendants->AddItem(descendant))
-				return false;
+		// get unmovable BPartition objects for returned IDs
+		if (unmovableDescendants) {
+			for (int32 i = 0; i < descendantCount && unmovableIDs[i] != -1;
+				 i++) {
+				BPartition *descendant = FindDescendant(unmovableIDs[i]);
+				if (!descendant || !unmovableDescendants->AddItem(descendant))
+					return false;
+			}
 		}
-		// find BPartition objects needing to be unmounted for returned IDs
-		for (int32 i = 0; i < descendantCount && needUnmountingIDs[i] != -1;
-			 i++) {
-			BPartition *descendant = FindDescendant(needUnmountingIDs[i]);
-			if (!descendant || !movableOnlyIfUnmounted->AddItem(descendant))
-				return false;
+		// get BPartition objects needing to be unmounted for returned IDs
+		if (movableOnlyIfUnmounted) {
+			for (int32 i = 0;
+				 i < descendantCount && needUnmountingIDs[i] != -1;
+				 i++) {
+				BPartition *descendant = FindDescendant(needUnmountingIDs[i]);
+				if (!descendant || !movableOnlyIfUnmounted->AddItem(descendant))
+					return false;
+			}
 		}
 	}
 	return result;

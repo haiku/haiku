@@ -26,6 +26,7 @@ public:
 	
 	off_t Offset() const;		// 0 for devices
 	off_t Size() const;
+	off_t ContentSize() const;	// 0 if uninitialized
 	uint32 BlockSize() const;
 	int32 Index() const;		// 0 for devices
 	uint32 Status() const;
@@ -76,12 +77,13 @@ public:
 	bool CanRepair(bool checkOnly, bool *whileMounted = NULL) const;
 	status_t Repair(bool checkOnly) const;
 
-	bool CanResize(bool *canResizeContents, bool *whileMounted = NULL) const;
+	bool CanResize(bool *canResizeContents = NULL,
+				   bool *whileMounted = NULL) const;
 	status_t ValidateResize(off_t *size, bool resizeContents = true) const;
 	status_t Resize(off_t size, bool resizeContents = true);
 
-	bool CanMove(BObjectList<BPartition> *unmovableDescendants,
-				 BObjectList<BPartition> *movableOnlyIfUnmounted) const;
+	bool CanMove(BObjectList<BPartition> *unmovableDescendants = NULL,
+				 BObjectList<BPartition> *movableOnlyIfUnmounted = NULL) const;
 	status_t ValidateMove(off_t *newOffset, bool force = false) const;
 	status_t Move(off_t newOffset, bool force = false);
 
