@@ -45,12 +45,11 @@ _IMPEXP_BE const color_map *system_colors()
 _IMPEXP_BE status_t set_screen_space(int32 index, uint32 res, bool stick = true)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_SET_SCREEN_MODE);
-	link->portlink->Attach(index);
-	link->portlink->Attach((int32)res);
-	link->portlink->Attach(stick);
-	link->portlink->Flush();
+	link->SetOpCode(AS_SET_SCREEN_MODE);
+	link->Attach(index);
+	link->Attach((int32)res);
+	link->Attach(stick);
+	link->Flush();
 	delete link;
 }
 
@@ -64,10 +63,9 @@ _IMPEXP_BE status_t get_scroll_bar_info(scroll_bar_info *info)
 _IMPEXP_BE status_t set_scroll_bar_info(scroll_bar_info *info)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_SET_SCROLLBAR_INFO);
-	link->portlink->Attach(info, sizeof(scroll_bar_info));
-	link->portlink->Flush();
+	link->SetOpCode(AS_SET_SCROLLBAR_INFO);
+	link->Attach(info, sizeof(scroll_bar_info));
+	link->Flush();
 	delete link;
 }
 
@@ -204,9 +202,8 @@ _IMPEXP_BE int32 count_workspaces()
 	int32 count;
 	
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_COUNT_WORKSPACES);
-	link->portlink->FlushWithReply(&replydata);
+	link->SetOpCode(AS_COUNT_WORKSPACES);
+	link->FlushWithReply(&replydata);
 	
 	count=*((int32*)replydata.buffer);
 	
@@ -217,10 +214,9 @@ _IMPEXP_BE int32 count_workspaces()
 _IMPEXP_BE void set_workspace_count(int32 count)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_SET_WORKSPACE_COUNT);
-	link->portlink->Attach(count);
-	link->portlink->Flush();
+	link->SetOpCode(AS_SET_WORKSPACE_COUNT);
+	link->Attach(count);
+	link->Flush();
 	delete link;
 }
 
@@ -230,9 +226,8 @@ _IMPEXP_BE int32 current_workspace()
 	int32 index;
 	
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_CURRENT_WORKSPACE);
-	link->portlink->FlushWithReply(&replydata);
+	link->SetOpCode(AS_CURRENT_WORKSPACE);
+	link->FlushWithReply(&replydata);
 	
 	index=*((int32*)replydata.buffer);
 	
@@ -243,10 +238,9 @@ _IMPEXP_BE int32 current_workspace()
 _IMPEXP_BE void activate_workspace(int32 workspace)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_ACTIVATE_WORKSPACE);
-	link->portlink->Attach(workspace);
-	link->portlink->Flush();
+	link->SetOpCode(AS_ACTIVATE_WORKSPACE);
+	link->Attach(workspace);
+	link->Flush();
 	delete link;
 }
 
@@ -256,9 +250,8 @@ _IMPEXP_BE bigtime_t idle_time()
 	bigtime_t idletime;
 	
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_IDLE_TIME);
-	link->portlink->FlushWithReply(&replydata);
+	link->SetOpCode(AS_IDLE_TIME);
+	link->FlushWithReply(&replydata);
 	
 	idletime=*((bigtime_t*)replydata.buffer);
 	
@@ -288,10 +281,9 @@ _IMPEXP_BE void run_be_about()
 _IMPEXP_BE void set_focus_follows_mouse(bool follow)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_SET_FOCUS_FOLLOWS_MOUSE);
-	link->portlink->Attach(follow);
-	link->portlink->Flush();
+	link->SetOpCode(AS_SET_FOCUS_FOLLOWS_MOUSE);
+	link->Attach(follow);
+	link->Flush();
 	delete link;
 }
 
@@ -302,10 +294,9 @@ _IMPEXP_BE bool focus_follows_mouse()
 _IMPEXP_BE void set_mouse_mode(mode_mouse mode)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_SET_MOUSE_MODE);
-	link->portlink->Attach((int32)mode);
-	link->portlink->Flush();
+	link->SetOpCode(AS_SET_MOUSE_MODE);
+	link->Attach((int32)mode);
+	link->Flush();
 	delete link;
 }
 
@@ -315,9 +306,8 @@ _IMPEXP_BE mode_mouse mouse_mode()
 	mode_mouse mode;
 	
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_GET_MOUSE_MODE);
-	link->portlink->FlushWithReply(&replydata);
+	link->SetOpCode(AS_GET_MOUSE_MODE);
+	link->FlushWithReply(&replydata);
 	
 	mode=*((mode_mouse*)replydata.buffer);
 	
@@ -331,9 +321,8 @@ _IMPEXP_BE rgb_color ui_color(color_which which)
 	rgb_color color;
 	
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
-	link->Init();
-	link->portlink->SetOpCode(AS_GET_UI_COLOR);
-	link->portlink->FlushWithReply(&replydata);
+	link->SetOpCode(AS_GET_UI_COLOR);
+	link->FlushWithReply(&replydata);
 	
 	color=*((rgb_color*)replydata.buffer);
 	

@@ -86,9 +86,9 @@ BPicture::BPicture(const BPicture &picture)
 		BPrivate::BAppServerLink link;
 		PortLink::ReplyData replydata;
 
-		link.portlink->SetOpCode(AS_CLONE_PICTURE);
-		link.portlink->Attach(picture.token);
-		link.portlink->FlushWithReply(&replydata);
+		link.SetOpCode(AS_CLONE_PICTURE);
+		link.Attach(picture.token);
+		link.FlushWithReply(&replydata);
 		token=*((int32*)replydata.buffer);
 
 	}
@@ -162,17 +162,17 @@ BPicture::BPicture(BMessage *archive)
 			PortLink::ReplyData replydata;
 			BPicture *pic;
 			
-			link.portlink->SetOpCode(AS_CREATE_PICTURE);
-			link.portlink->Attach(extent->fPictures.CountItems());
+			link.SetOpCode(AS_CREATE_PICTURE);
+			link.Attach(extent->fPictures.CountItems());
 			for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
 			{
 				pic=(BPicture*)extent->fPictures.ItemAt(i);
 				if(pic)
-					link.portlink->Attach(pic->token);
+					link.Attach(pic->token);
 			}
-			link.portlink->Attach(extent->fNewSize);
-			link.portlink->Attach(extent->fNewData,extent->fNewSize);
-			link.portlink->FlushWithReply(&replydata);
+			link.Attach(extent->fNewSize);
+			link.Attach(extent->fNewData,extent->fNewSize);
+			link.FlushWithReply(&replydata);
 			token=*((int32*)replydata.buffer);
 		}
 	}
@@ -204,9 +204,9 @@ BPicture::~BPicture()
 	{
 		BPrivate::BAppServerLink link;
 
-		link.portlink->SetOpCode(AS_DELETE_PICTURE);
-		link.portlink->Attach(token);
-		link.portlink->Flush();
+		link.SetOpCode(AS_DELETE_PICTURE);
+		link.Attach(token);
+		link.Flush();
 	}
 
 	if (extent->fNewData != NULL)
@@ -343,17 +343,17 @@ status_t BPicture::Unflatten(BDataIO *stream)
 	PortLink::ReplyData replydata;
 	BPicture *pic;
 
-	link.portlink->SetOpCode(AS_CREATE_PICTURE);
-	link.portlink->Attach(extent->fPictures.CountItems());
+	link.SetOpCode(AS_CREATE_PICTURE);
+	link.Attach(extent->fPictures.CountItems());
 	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
 	{
 		pic=(BPicture*)extent->fPictures.ItemAt(i);
 		if(pic)
-			link.portlink->Attach(pic->token);
+			link.Attach(pic->token);
 	}
-	link.portlink->Attach(extent->fNewSize);
-	link.portlink->Attach(extent->fNewData, extent->fNewSize);
-	link.portlink->FlushWithReply(&replydata);
+	link.Attach(extent->fNewSize);
+	link.Attach(extent->fNewData, extent->fNewSize);
+	link.FlushWithReply(&replydata);
 	token=*((int32*)replydata.buffer);
 
 	if (extent->fNewData)
@@ -396,15 +396,15 @@ void BPicture::import_data(const void *data, int32 size, BPicture **subs,
 	BPrivate::BAppServerLink link;
 	PortLink::ReplyData replydata;
 
-	link.portlink->SetOpCode(AS_CREATE_PICTURE);
-	link.portlink->Attach(subCount);
+	link.SetOpCode(AS_CREATE_PICTURE);
+	link.Attach(subCount);
 
 	for (int32 i = 0; i < subCount; i++)
-		link.portlink->Attach(subs[i]->token);
+		link.Attach(subs[i]->token);
 
-	link.portlink->Attach(size);
-	link.portlink->Attach(data, size);
-	link.portlink->FlushWithReply(&replydata);
+	link.Attach(size);
+	link.Attach(data, size);
+	link.FlushWithReply(&replydata);
 	token=*((int32*)replydata.buffer);
 }
 //------------------------------------------------------------------------------
@@ -422,11 +422,11 @@ void BPicture::import_old_data(const void *data, int32 size)
 	BPrivate::BAppServerLink link;
 	PortLink::ReplyData replydata;
 
-	link.portlink->SetOpCode(AS_CREATE_PICTURE);
-	link.portlink->Attach(0L);
-	link.portlink->Attach(extent->fNewSize);
-	link.portlink->Attach(extent->fNewData,extent->fNewSize);
-	link.portlink->FlushWithReply(&replydata);
+	link.SetOpCode(AS_CREATE_PICTURE);
+	link.Attach(0L);
+	link.Attach(extent->fNewSize);
+	link.Attach(extent->fNewData,extent->fNewSize);
+	link.FlushWithReply(&replydata);
 	token=*((int32*)replydata.buffer);
 	
 	// Do we free all data now?
@@ -455,9 +455,9 @@ bool BPicture::assert_local_copy()
 	PortLink::ReplyData replydata;
 	int32 count;
 
-	link.portlink->SetOpCode(AS_DOWNLOAD_PICTURE);
-	link.portlink->Attach(token);
-	link.portlink->FlushWithReply(&replydata);
+	link.SetOpCode(AS_DOWNLOAD_PICTURE);
+	link.Attach(token);
+	link.FlushWithReply(&replydata);
 	count=*((int32*)replydata.buffer);
 
 	// Read sub picture tokens
@@ -505,13 +505,13 @@ bool BPicture::assert_server_copy()
 	BPrivate::BAppServerLink link;
 	PortLink::ReplyData replydata;
 
-	link.portlink->SetOpCode(AS_CREATE_PICTURE);
-	link.portlink->Attach(extent->fPictures.CountItems());
+	link.SetOpCode(AS_CREATE_PICTURE);
+	link.Attach(extent->fPictures.CountItems());
 	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
-		link.portlink->Attach(extent->fPictures.ItemAt(i)->token);
-	link.portlink->Attach(extent->fNewSize);
-	link.portlink->Attach(extent->fNewData,extent->fNewSize);
-	link.portlink->FlushWithReply(&replydata);
+		link.Attach(extent->fPictures.ItemAt(i)->token);
+	link.Attach(extent->fNewSize);
+	link.Attach(extent->fNewData,extent->fNewSize);
+	link.FlushWithReply(&replydata);
 	token=*((int32*)replydata.buffer);
 
 	return token != -1;*/
@@ -552,9 +552,9 @@ void BPicture::usurp(BPicture *lameDuck)
 	{
 		BPrivate::BAppServerLink link;
 
-		link.portlink->SetOpCode(AS_DELETE_PICTURE);
-		link.portlink->Attach(token);
-		link.portlink->Flush();
+		link.SetOpCode(AS_DELETE_PICTURE);
+		link.Attach(token);
+		link.Flush();
 	}
 
 	if (extent->fNewData != NULL)
