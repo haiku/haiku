@@ -345,9 +345,9 @@ status_t CursorSet::FindCursor(cursor_which which, ServerCursor **cursor)
 */
 const char *CursorSet::GetName(void)
 {
-	BString name;
-	if(FindString("name",&name)==B_OK)
-		return name.String();
+	const char *name = NULL;
+	if (FindString("name", &name) == B_OK)
+		return name;
 	return NULL;
 }
 
