@@ -98,6 +98,7 @@
 
 #undef h_errno
 	// was defined by netdb.h
+extern int h_errno;
 
 #ifdef YP
 #include <rpc/rpc.h>
@@ -1517,7 +1518,6 @@ _yp_getaddrinfo(name, pai)
 /* resolver logic */
 
 extern const char *__hostalias (const char *);
-extern int h_errno;
 extern int res_opt (int, u_char *, int, int);
 
 /*

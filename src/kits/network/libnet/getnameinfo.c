@@ -54,6 +54,7 @@
 
 #undef h_errno
 	// was defined by netdb.h
+extern int h_errno;
 
 static const struct afd {
 	int a_af;

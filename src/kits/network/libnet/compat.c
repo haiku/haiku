@@ -13,6 +13,7 @@
 
 #include <TLS.h>
 
+extern int h_errno;
 #undef h_errno
 	// was defined by netdb.h
 static int32 h_errno_tls;

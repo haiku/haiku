@@ -93,6 +93,7 @@
 
 #undef h_errno
 	// was defined by netdb.h
+extern int h_errno;
 
 extern const char *_res_opcodes[];
 extern const char *_res_resultcodes[];
