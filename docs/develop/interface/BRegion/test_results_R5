@@ -1,0 +1,30 @@
+Tests executed on a Duron 1200
+
+ikki:~/projects/current# tests/UnitTester -r5 BRegion
+------------------------------------------------------------------------------
+Tests
+------------------------------------------------------------------------------
+BRegion::Construction Test
+  + PASSED
+    Clock time: 0 ms
+
+BRegion::Exclude Test
+  + PASSED
+    Clock time: 284 ms
+
+BRegion::Include Test
+  + PASSED
+    Clock time: 265 ms
+
+BRegion::Intersect Test
+  + PASSED
+    Clock time: 113 ms
+
+BRegion::OffsetBy Test
+  + PASSED
+    Clock time: 0 ms
+
+------------------------------------------------------------------------------
+Results
+------------------------------------------------------------------------------
++ PASSED
