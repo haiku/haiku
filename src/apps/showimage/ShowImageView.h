@@ -73,7 +73,7 @@ public:
 	int32 PageCount();
 	
 	void SelectAll();
-	void Unselect();
+	void ClearSelection();
 	
 	void CopySelectionToClipboard();
 	
@@ -112,6 +112,8 @@ private:
 	void AnimateSelection(bool a);
 	void Notify(const char* status);
 	void AddToRecentDocuments();
+	void GetSelMergeRects(BRect &srcBits, BRect &destRect);
+	void MergeSelection();
 	void DeleteScaler();
 	void DeleteBitmap();
 	void DeleteSelBitmap();

@@ -258,12 +258,11 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Undo", B_UNDO, 'Z', 0, 'W', false);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Cut", B_CUT, 'X', 0, 'W', false);
-	AddItemMenu(pmenu, "Copy", B_COPY, 'C', 0, 'W', true);
+	AddItemMenu(pmenu, "Copy", B_COPY, 'C', 0, 'W', false);
 	AddItemMenu(pmenu, "Paste", B_PASTE, 'V', 0, 'W', false);
 	AddItemMenu(pmenu, "Clear", MSG_CLEAR_SELECT, 0, 0, 'W', false);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', true);
-	AddItemMenu(pmenu, "Select None", MSG_SELECT_NONE, 0, 0, 'W', true);
 	pbar->AddItem(pmenu);
 
 	pmenu = fpBrowseMenu = new BMenu("Browse");
@@ -500,6 +499,20 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			UpdateTitle();
 			break;
 		}
+		
+		case MSG_SELECTION:
+		{
+			// The view sends this message when a selection is
+			// made or the selection is cleared so that the window
+			// can update the state of the appropriate menu items
+			bool benable;
+			if (pmsg->FindBool("has_selection", &benable) == B_OK) {
+				EnableMenuItem(fpBar, B_CUT, benable);
+				EnableMenuItem(fpBar, B_COPY, benable);
+				EnableMenuItem(fpBar, MSG_CLEAR_SELECT, benable);
+			}
+			break;
+		}
 
 		case B_UNDO:
 			break;
@@ -511,12 +524,10 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case B_PASTE:
 			break;
 		case MSG_CLEAR_SELECT:
+			fpImageView->ClearSelection();
 			break;
 		case MSG_SELECT_ALL:
 			fpImageView->SelectAll();
-			break;
-		case MSG_SELECT_NONE:
-			fpImageView->Unselect();
 			break;
 			
 		case MSG_PAGE_FIRST:

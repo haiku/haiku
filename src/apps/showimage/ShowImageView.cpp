@@ -625,30 +625,10 @@ ShowImageView::Draw(BRect updateRect)
 			
 			if (HasSelection()) {
 				if (fSelBitmap) {
-					BRect clippedRect, bounds;
-					clippedRect = fSelectionRect;
-					ConstrainToImage(clippedRect);
-					clippedRect = ImageToView(clippedRect);
-					
-					bounds = fSelectionRect;
-					if (bounds.left < 0)
-						bounds.left = -(bounds.left);
-					else
-						bounds.left = 0;
-					if (bounds.top < 0)
-						bounds.top = -(bounds.top);
-					else
-						bounds.top = 0;
-					if (bounds.right > fBitmap->Bounds().right)
-						bounds.right = bounds.left + clippedRect.Width();
-					else
-						bounds.right = fSelBitmap->Bounds().right;
-					if (bounds.bottom > fBitmap->Bounds().bottom)
-						bounds.bottom = bounds.top + clippedRect.Height();
-					else
-						bounds.bottom = fSelBitmap->Bounds().bottom;
-					
-					DrawBitmap(fSelBitmap, bounds, clippedRect);
+					BRect srcBits, destRect;
+					GetSelMergeRects(srcBits, destRect);
+					destRect = ImageToView(destRect);
+					DrawBitmap(fSelBitmap, srcBits, destRect);
 				}
 				DrawSelectionBox(fSelectionRect);
 			}
@@ -925,6 +905,61 @@ ShowImageView::GetMouseButtons()
 }
 
 void
+ShowImageView::GetSelMergeRects(BRect &srcBits, BRect &destRect)
+{
+	destRect = fSelectionRect;
+	ConstrainToImage(destRect);
+	
+	srcBits = fSelectionRect;
+	if (srcBits.left < 0)
+		srcBits.left = -(srcBits.left);
+	else
+		srcBits.left = 0;
+	if (srcBits.top < 0)
+		srcBits.top = -(srcBits.top);
+	else
+		srcBits.top = 0;
+	if (srcBits.right > fBitmap->Bounds().right)
+		srcBits.right = srcBits.left + destRect.Width();
+	else
+		srcBits.right = fSelBitmap->Bounds().right;
+	if (srcBits.bottom > fBitmap->Bounds().bottom)
+		srcBits.bottom = srcBits.top + destRect.Height();
+	else
+		srcBits.bottom = fSelBitmap->Bounds().bottom;
+}
+
+void
+ShowImageView::MergeSelection()
+{
+	if (!HasSelection() || !fSelBitmap)
+		return;
+
+	// Merge selection with background
+	BView view(fBitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW);
+	BBitmap *bitmap = new BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
+	if (bitmap == NULL)
+		return;
+
+	if (bitmap->Lock()) {
+		bitmap->AddChild(&view);
+		view.DrawBitmap(fBitmap, fBitmap->Bounds());
+		
+		BRect srcBits, destRect;
+		GetSelMergeRects(srcBits, destRect);
+		view.DrawBitmap(fSelBitmap, srcBits, destRect);
+		
+		view.Sync();
+		bitmap->RemoveChild(&view);
+		bitmap->Unlock();
+		
+		DeleteBitmap();
+		fBitmap = bitmap;
+	} else
+		delete bitmap;
+}
+
+void
 ShowImageView::MouseDown(BPoint position)
 {
 	BPoint point;
@@ -971,6 +1006,11 @@ ShowImageView::MouseDown(BPoint position)
 		AnimateSelection(true);
 		
 	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
+		if (HasSelection())
+			// If there is an existing selection, 
+			// Make it part of the background image
+			MergeSelection();
+	
 		// begin new selection
 		SetHasSelection(true);
 		fMakesSelection = true;
@@ -1271,7 +1311,7 @@ ShowImageView::SelectAll()
 }
 
 void
-ShowImageView::Unselect()
+ShowImageView::ClearSelection()
 {
 	if (HasSelection()) {
 		SetHasSelection(false);
@@ -1284,6 +1324,11 @@ ShowImageView::SetHasSelection(bool bHasSelection)
 {
 	DeleteSelBitmap();
 	fbHasSelection = bHasSelection;
+	
+	BMessage msg(MSG_SELECTION);
+	msg.AddBool("has_selection", fbHasSelection);
+	BMessenger msgr(Window());
+	msgr.SendMessage(&msg);
 }
 
 void
