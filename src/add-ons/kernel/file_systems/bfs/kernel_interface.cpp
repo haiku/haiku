@@ -479,11 +479,11 @@ bfs_suspend_vnode(void *_ns, void *_node)
  */
 
 static int
-bfs_walk(void *_ns, void *_directory, const char *file, char **_resolvedPath, vnode_id *vnid)
+bfs_walk(void *_ns, void *_directory, const char *file, char **_resolvedPath, vnode_id *_vnodeID)
 {
 	//FUNCTION_START(("file = %s\n",file));
 
-	if (_ns == NULL || _directory == NULL || file == NULL)
+	if (_ns == NULL || _directory == NULL || file == NULL || _vnodeID == NULL)
 		return B_BAD_VALUE;
 
 	Volume *volume = (Volume *)_ns;
@@ -498,11 +498,13 @@ bfs_walk(void *_ns, void *_directory, const char *file, char **_resolvedPath, vn
 	if (directory->GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	if ((status = tree->Find((uint8 *)file, (uint16)strlen(file), vnid)) < B_OK)
-		RETURN_ERROR(status);
+	if ((status = tree->Find((uint8 *)file, (uint16)strlen(file), _vnodeID)) < B_OK) {
+		PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
+		return status;
+	}
 
 	Inode *inode;
-	if ((status = get_vnode(volume->ID(), *vnid, (void **)&inode)) != B_OK) {
+	if ((status = get_vnode(volume->ID(), *_vnodeID, (void **)&inode)) != B_OK) {
 		REPORT_ERROR(status);
 		return B_ENTRY_NOT_FOUND;
 	}
@@ -1495,7 +1497,9 @@ bfs_open_dir(void *_ns, void *_node, void **_cookie)
 	
 	Inode *inode = (Inode *)_node;
 
-	if (!inode->IsDirectory())
+	// we don't ask here for directories only, because the bfs_open_index_dir()
+	// function utilizes us (so we must be able to open indices as well)
+	if (!inode->IsContainer())
 		RETURN_ERROR(B_BAD_VALUE);
 
 	BPlusTree *tree;
