@@ -49,6 +49,8 @@
 // Project Includes ------------------------------------------------------------
 #include <LooperList.h>
 #include <ObjectLocker.h>
+#include <PortLink.h>
+#include <ServerProtocol.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -367,22 +369,36 @@ BHandler* BApplication::ResolveSpecifier(BMessage* msg, int32 index,
 //------------------------------------------------------------------------------
 void BApplication::ShowCursor()
 {
-	// TODO: talk to app_server
+	PortLink *link=new PortLink(fServerTo);
+	link->SetOpCode(SHOW_CURSOR);
+	link->Flush();
+	delete link;
 }
 //------------------------------------------------------------------------------
 void BApplication::HideCursor()
 {
-	// TODO: talk to app_server
+	PortLink *link=new PortLink(fServerTo);
+	link->SetOpCode(HIDE_CURSOR);
+	link->Flush();
+	delete link;
 }
 //------------------------------------------------------------------------------
 void BApplication::ObscureCursor()
 {
-	// TODO: talk to app_server
+	PortLink *link=new PortLink(fServerTo);
+	link->SetOpCode(OBSCURE_CURSOR);
+	link->Flush();
+	delete link;
 }
 //------------------------------------------------------------------------------
 bool BApplication::IsCursorHidden() const
 {
 	// TODO: talk to app_server
+
+	// Requires FlushWithReply(). Waiting until it has been updated.
+	// Protocol: Setup link, set opcode to QUERY_CURSOR_HIDDEN and FlushWithReply
+	// The replied message will be SERVER_TRUE if hidden, SERVER_FALSE if not. --DW
+	
 	return false;	// not implemented
 }
 //------------------------------------------------------------------------------
@@ -397,7 +413,13 @@ void BApplication::SetCursor(const void* cursor)
 //------------------------------------------------------------------------------
 void BApplication::SetCursor(const BCursor* cursor, bool sync)
 {
-	// TODO: talk to app_server
+	// TODO: add sync support - working on updating FlushWithReply --DW
+	PortLink *link=new PortLink(fServerTo);
+	link->SetOpCode(SET_CURSOR_BCURSOR);
+	link->Attach(sync);
+	link->Attach(cursor->m_serverToken);
+	link->Flush();
+	delete link;
 }
 //------------------------------------------------------------------------------
 int32 BApplication::CountWindows() const
@@ -762,6 +784,15 @@ void* BApplication::global_ro_offs_to_ptr(uint32 offset)
 //------------------------------------------------------------------------------
 void BApplication::connect_to_app_server()
 {
+	// TODO: implement. Working on updated FlushWithReply -- DW
+	//	1) get the app_server's main message port - find_port on SERVER_PORT_NAME
+	//	2) create a portlink pointed at the server
+	//	3) attach application's "inbox" port
+	//	4) attach length of signature
+	//	5) attach signature
+	//	6) set opcode to CREATE_APP, Flush(), and wait for reply
+	//	7) receive from the server the message with the buffer being a port_id *.
+	//	8) set fServerTo to the value of the returned port_id
 }
 //------------------------------------------------------------------------------
 void BApplication::send_drag(BMessage* msg, int32 vs_token, BPoint offset, BRect drag_rect, BHandler* reply_to)
