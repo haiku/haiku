@@ -122,18 +122,25 @@ static status_t vfs_rewind_dir(struct file_descriptor *);
 static int vfs_read_stat(struct file_descriptor *, struct stat *);
 static int vfs_close(struct file_descriptor *, int, struct io_context *);
 
-static int common_ioctl(struct file_descriptor *, ulong, void *buf, size_t len);
-static int common_read_stat(struct file_descriptor *, struct stat *);
-
+// file descriptor operation prototypes
 static ssize_t file_read(struct file_descriptor *, off_t pos, void *buffer, size_t *);
 static ssize_t file_write(struct file_descriptor *, off_t pos, const void *buffer, size_t *);
 static off_t file_seek(struct file_descriptor *, off_t pos, int seek_type);
-static status_t dir_read(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
-static status_t dir_rewind(struct file_descriptor *);
 static void file_free_fd(struct file_descriptor *);
 static int file_close(struct file_descriptor *);
+static status_t dir_read(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
+static status_t dir_rewind(struct file_descriptor *);
 static void dir_free_fd(struct file_descriptor *);
 static int dir_close(struct file_descriptor *);
+static ssize_t attr_read(struct file_descriptor *, off_t pos, void *buffer, size_t *);
+static ssize_t attr_write(struct file_descriptor *, off_t pos, const void *buffer, size_t *);
+static off_t attr_seek(struct file_descriptor *, off_t pos, int seek_type);
+static void attr_free_fd(struct file_descriptor *);
+static int attr_close(struct file_descriptor *);
+static int attr_read_stat(struct file_descriptor *, struct stat *);
+
+static int common_ioctl(struct file_descriptor *, ulong, void *buf, size_t len);
+static int common_read_stat(struct file_descriptor *, struct stat *);
 
 static int vfs_open(char *path, int omode, bool kernel);
 static int vfs_open_dir(char *path, bool kernel);
@@ -166,6 +173,19 @@ struct fd_ops dir_ops = {
 	common_read_stat,
 	dir_close,
 	dir_free_fd
+};
+
+struct fd_ops attr_ops = {
+	"attribute",
+	attr_read,
+	attr_write,
+	attr_seek,
+	common_ioctl,
+	NULL,
+	NULL,
+	attr_read_stat,
+	attr_close,
+	attr_free_fd
 };
 
 #define VNODE_HASH_TABLE_SIZE 1024
@@ -450,67 +470,6 @@ static inline void
 put_vnode(struct vnode *vnode)
 {
 	dec_vnode_ref_count(vnode, false);
-}
-
-
-static struct file_descriptor *
-get_fd_and_vnode(int fd, struct vnode **_vnode, bool kernel)
-{
-	struct file_descriptor *descriptor = get_fd(get_current_io_context(kernel), fd);
-	if (descriptor == NULL)
-		return NULL;
-
-	if (descriptor->vnode == NULL) {
-		put_fd(descriptor);
-		return NULL;
-	}
-
-	*_vnode = descriptor->vnode;
-	return descriptor;
-}
-
-
-static void
-file_free_fd(struct file_descriptor *descriptor)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	if (vnode != NULL) {
-		FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
-		dec_vnode_ref_count(vnode, false);
-	}
-}
-
-
-static void
-dir_free_fd(struct file_descriptor *descriptor)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	if (vnode != NULL) {
-		//FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
-		FS_CALL(vnode, free_dir_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
-		dec_vnode_ref_count(vnode, false);
-	}
-}
-
-
-static struct vnode *
-get_vnode_from_fd(struct io_context *ioContext, int fd)
-{
-	struct file_descriptor *descriptor;
-	struct vnode *vnode;
-
-	descriptor = get_fd(ioContext, fd);
-	if (descriptor == NULL)
-		return NULL;
-
-	vnode = descriptor->vnode;
-	if (vnode != NULL)
-		inc_vnode_ref_count(vnode);
-
-	put_fd(descriptor);
-	return vnode;
 }
 
 
@@ -943,6 +902,42 @@ check_path(char *to)
 }
 
 
+static struct file_descriptor *
+get_fd_and_vnode(int fd, struct vnode **_vnode, bool kernel)
+{
+	struct file_descriptor *descriptor = get_fd(get_current_io_context(kernel), fd);
+	if (descriptor == NULL)
+		return NULL;
+
+	if (descriptor->vnode == NULL) {
+		put_fd(descriptor);
+		return NULL;
+	}
+
+	*_vnode = descriptor->vnode;
+	return descriptor;
+}
+
+
+static struct vnode *
+get_vnode_from_fd(struct io_context *ioContext, int fd)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+
+	descriptor = get_fd(ioContext, fd);
+	if (descriptor == NULL)
+		return NULL;
+
+	vnode = descriptor->vnode;
+	if (vnode != NULL)
+		inc_vnode_ref_count(vnode);
+
+	put_fd(descriptor);
+	return vnode;
+}
+
+
 static status_t
 fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_vnode, bool kernel)
 {
@@ -951,7 +946,7 @@ fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_
 	if (fd != -1) {
 		struct file_descriptor *descriptor = get_fd_and_vnode(fd, &vnode, kernel);
 		if (descriptor == NULL)
-			return EBADF;
+			return B_FILE_ERROR;
 
 		inc_vnode_ref_count(vnode);
 		put_fd(descriptor);
@@ -961,6 +956,46 @@ fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_
 	}
 
 	return path_to_vnode(path, traverseLeafLink, _vnode, kernel);
+}
+
+
+static int
+get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	int fd;
+
+	descriptor = alloc_fd();
+	if (!descriptor)
+		return B_NO_MEMORY;
+
+	descriptor->vnode = vnode;
+	descriptor->cookie = cookie;
+	switch (type) {
+		case FDTYPE_FILE:
+			descriptor->ops = &file_ops;
+			break;
+		case FDTYPE_DIR:
+			descriptor->ops = &dir_ops;
+			break;
+		case FDTYPE_ATTR:
+			descriptor->ops = &attr_ops;
+			break;
+		default:
+			// ToDo: perhaps we should better panic here...
+			descriptor->ops = NULL;
+			break;
+	}
+	descriptor->type = type;
+	descriptor->open_mode = openMode;
+
+	fd = new_fd(get_current_io_context(kernel), descriptor);
+	if (fd < 0) {
+		kfree(descriptor);
+		return B_NO_MORE_FDS;
+	}
+
+	return fd;
 }
 
 
@@ -1574,36 +1609,12 @@ vfs_init(kernel_args *ka)
 //	The filetype-dependent implementations (fd_ops + open/create/rename/remove, ...)
 
 
-static int
-new_file_fd(struct vnode *vnode, fs_cookie cookie, int openMode, bool kernel)
-{
-	struct file_descriptor *descriptor;
-	int fd;
-
-	descriptor = alloc_fd();
-	if (!descriptor)
-		return ENOMEM;
-
-	descriptor->vnode = vnode;
-	descriptor->cookie = cookie;
-	descriptor->ops = &file_ops;
-	descriptor->type = FDTYPE_FILE;
-	descriptor->open_mode = openMode;
-
-	fd = new_fd(get_current_io_context(kernel), descriptor);
-	if (fd < 0)
-		return ERR_VFS_FD_TABLE_FULL;
-
-	return fd;
-}
-
-
 /** Calls fs_open() on the given vnode and returns a new
  *	file descriptor for it
  */
 
 static int
-create_vnode(struct vnode *directory, const char *name, int omode, int perms, bool kernel)
+create_vnode(struct vnode *directory, const char *name, int openMode, int perms, bool kernel)
 {
 	struct vnode *vnode;
 	fs_cookie cookie;
@@ -1613,7 +1624,7 @@ create_vnode(struct vnode *directory, const char *name, int omode, int perms, bo
 	if (FS_CALL(directory, create) == NULL)
 		return EROFS;
 
-	status = FS_CALL(directory, create)(directory->mount->cookie, directory->private_node, name, omode, perms, &cookie, &newID);
+	status = FS_CALL(directory, create)(directory->mount->cookie, directory->private_node, name, openMode, perms, &cookie, &newID);
 	if (status < B_OK)
 		return status;
 
@@ -1626,9 +1637,10 @@ create_vnode(struct vnode *directory, const char *name, int omode, int perms, bo
 		return EINVAL;
 	}
 
-	if ((status = new_file_fd(vnode,cookie,omode,kernel)) >= 0)
+	if ((status = get_new_fd(FDTYPE_FILE, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
-		
+
+err:		
 	FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, cookie);
 	FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
 	put_vnode(vnode);
@@ -1653,7 +1665,7 @@ open_vnode(struct vnode *vnode, int omode, bool kernel)
 	if (status < 0)
 		return status;
 
-	status = new_file_fd(vnode, cookie, omode, kernel);
+	status = get_new_fd(FDTYPE_FILE, vnode, cookie, omode, kernel);
 	if (status < 0) {
 		FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, cookie);
 		FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
@@ -1678,23 +1690,9 @@ open_dir_vnode(struct vnode *vnode, bool kernel)
 		return status;
 
 	// file is opened, create a fd
-	descriptor = alloc_fd();
-	if (!descriptor) {
-		status = ENOMEM;
-		goto err;
-	}
-	descriptor->vnode = vnode;
-	descriptor->cookie = cookie;
-	descriptor->ops = &dir_ops;
-	descriptor->type = FDTYPE_DIR;
-
-	fd = new_fd(get_current_io_context(kernel), descriptor);
+	fd = get_new_fd(FDTYPE_DIR, vnode, cookie, 0, kernel);
 	if (fd >= 0)
 		return fd;
-
-err1:
-	status = B_NO_MORE_FDS;
-	kfree(descriptor);
 
 err:
 	FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
@@ -1725,22 +1723,22 @@ file_create_entry_ref(fs_id fsID, vnode_id directoryID, const char *name, int om
 
 
 static int
-file_create(char *path, int omode, int perms, bool kernel)
+file_create(char *path, int openMode, int perms, bool kernel)
 {
 	char filename[SYS_MAX_NAME_LEN];
-	struct vnode *directory,*vnode;
+	struct vnode *directory, *vnode;
 	fs_cookie cookie;
 	vnode_id newID;
 	int status;
 
-	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path, omode, perms, kernel));
+	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path, openMode, perms, kernel));
 
 	// get directory to put the new file in	
 	status = path_to_dir_vnode(path, &directory, filename, kernel);
 	if (status < 0)
 		return status;
 
-	status = create_vnode(directory,filename,omode,perms,kernel);
+	status = create_vnode(directory, filename, openMode, perms, kernel);
 	put_vnode(directory);
 
 	return status;
@@ -1796,12 +1794,24 @@ file_close(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->vnode;
 
-	FUNCTION(("file_close(descriptor = %p)\n",descriptor));
-	
+	FUNCTION(("file_close(descriptor = %p)\n", descriptor));
+
 	if (FS_CALL(vnode, close))
-		return FS_CALL(vnode, close)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
+		return FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
 
 	return B_OK;
+}
+
+
+static void
+file_free_fd(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	if (vnode != NULL) {
+		FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		put_vnode(vnode);
+	}
 }
 
 
@@ -1944,6 +1954,32 @@ dir_open(char *path, bool kernel)
 }
 
 
+static int
+dir_close(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("dir_close(descriptor = %p)\n", descriptor));
+
+	if (FS_CALL(vnode, close_dir))
+		return FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+
+	return B_OK;
+}
+
+
+static void
+dir_free_fd(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	if (vnode != NULL) {
+		FS_CALL(vnode, free_dir_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		put_vnode(vnode);
+	}
+}
+
+
 static status_t 
 dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
@@ -1968,20 +2004,6 @@ dir_rewind(struct file_descriptor *descriptor)
 }
 
 
-static int
-dir_close(struct file_descriptor *descriptor)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	FUNCTION(("dir_close(descriptor = %p)\n",descriptor));
-	
-	if (FS_CALL(vnode, close_dir))
-		return FS_CALL(vnode, close_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
-
-	return B_OK;
-}
-
-
 static status_t
 dir_remove(char *path, bool kernel)
 {
@@ -2000,16 +2022,6 @@ dir_remove(char *path, bool kernel)
 
 	put_vnode(directory);
 	return status;
-}
-
-
-static int
-common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
-{
-	struct vnode *vnode = descriptor->vnode;
-
-	FUNCTION(("common_read_stat: stat 0x%p\n", stat));
-	return FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
 }
 
 
@@ -2235,12 +2247,22 @@ err:
 
 
 static int
+common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("common_read_stat: stat 0x%p\n", stat));
+	return FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
+}
+
+
+static int
 common_write_stat(int fd, char *path, bool traverseLeafLink, const struct stat *stat, int statMask, bool kernel)
 {
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("common_write_stat: path '%s', stat 0x%p, stat_mask %d, kernel %d\n", path, stat, statMask, kernel));
+	FUNCTION(("common_write_stat: path '%s', stat %p, stat_mask %d, kernel %d\n", path, stat, statMask, kernel));
 
 	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, kernel);
 	if (status < 0)
@@ -2251,7 +2273,179 @@ common_write_stat(int fd, char *path, bool traverseLeafLink, const struct stat *
 	else
 		status = EROFS;
 
-	dec_vnode_ref_count(vnode, false);
+	put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
+attr_create(int fd, const char *name, uint32 type, int openMode, bool kernel)
+{
+	struct vnode *vnode;
+	fs_cookie cookie;
+	int status;
+
+	vnode = get_vnode_from_fd(get_current_io_context(kernel), fd);
+	if (vnode == NULL)
+		return B_FILE_ERROR;
+
+	if (FS_CALL(vnode, create_attr) == NULL) {
+		status = EROFS;
+		goto err;
+	}
+
+	status = FS_CALL(vnode, create_attr)(vnode->mount->cookie, vnode->private_node, name, type, openMode, &cookie);
+	if (status < B_OK)
+		goto err;
+
+	if ((status = get_new_fd(FDTYPE_ATTR, vnode, cookie, openMode, kernel)) >= 0)
+		return status;
+
+err1:
+	FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, free_attr_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+
+	FS_CALL(vnode, remove_attr)(vnode->mount->cookie, vnode->private_node, name);
+
+err:
+	put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
+attr_open(int fd, const char *name, int openMode, bool kernel)
+{
+	struct vnode *vnode;
+	fs_cookie cookie;
+	int status;
+
+	vnode = get_vnode_from_fd(get_current_io_context(kernel), fd);
+	if (vnode == NULL)
+		return B_FILE_ERROR;
+
+	if (FS_CALL(vnode, open_attr) == NULL) {
+		status = EOPNOTSUPP;
+		goto err;
+	}
+
+	status = FS_CALL(vnode, open_attr)(vnode->mount->cookie, vnode->private_node, name, openMode, &cookie);
+	if (status < B_OK)
+		goto err;
+
+	if ((status = get_new_fd(FDTYPE_ATTR, vnode, cookie, openMode, kernel)) >= 0)
+		return status;
+
+err1:
+	FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, free_attr_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+
+err:
+	put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
+attr_close(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("attr_close(descriptor = %p)\n", descriptor));
+
+	if (FS_CALL(vnode, close_attr))
+		return FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+
+	return B_OK;
+}
+
+
+static void
+attr_free_fd(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	if (vnode != NULL) {
+		FS_CALL(vnode, free_attr_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		put_vnode(vnode);
+	}
+}
+
+
+static ssize_t
+attr_read(struct file_descriptor *descriptor, off_t pos, void *buffer, size_t *length)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("attr_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length, *length));
+	if (!FS_CALL(vnode, read_attr))
+		return EOPNOTSUPP;
+
+	return FS_CALL(vnode, read_attr)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
+}
+
+
+static ssize_t
+attr_write(struct file_descriptor *descriptor, off_t pos, const void *buffer, size_t *length)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("attr_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
+	if (!FS_CALL(vnode, write_attr))
+		return EOPNOTSUPP;
+
+	return FS_CALL(vnode, write_attr)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
+}
+
+
+static off_t
+attr_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("attr_seek: pos 0x%Ld, seek_type %d\n", pos, seekType));
+	if (!FS_CALL(vnode, seek_attr))
+		return EOPNOTSUPP;
+
+	return FS_CALL(vnode, seek_attr)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, seekType);
+}
+
+
+static int
+attr_read_stat(struct file_descriptor *descriptor, struct stat *stat)
+{
+	struct vnode *vnode = descriptor->vnode;
+
+	FUNCTION(("attr_read_stat: stat 0x%p\n", stat));
+	if (!FS_CALL(vnode, read_attr_stat))
+		return EOPNOTSUPP;
+
+	return FS_CALL(vnode, read_attr_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, stat);
+}
+
+
+static int
+attr_write_stat(int fd, const struct stat *stat, int statMask, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+	int status;
+
+	FUNCTION(("attr_write_stat: fd = %d, stat = %p, statMask %d, kernel %d\n", fd, stat, statMask, kernel));
+
+	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	if (FS_CALL(vnode, write_attr_stat))
+		status = FS_CALL(vnode, write_attr_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, stat, statMask);
+	else
+		status = EROFS;
+
+	put_vnode(vnode);
 
 	return status;
 }
