@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src add-ons kernel drivers net stack ;
+
+UsePrivateHeaders net ;
+UsePublicHeaders posix ;
+
+R5KernelAddon stack : kernel drivers bin :
+	net_stack_driver.c
+;
+
+# For OpenBeOS we should be building the driver objects this way.
+#KernelObjects
+#	net_stack_driver.c
+#	:
+#	-fno-pic -D_KERNEL_MODE
+#	;
+
+# Link to kernel/drivers/dev/net
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
+	local instDriver = <kernel!drivers!dev!net>stack ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : stack ;
+}
