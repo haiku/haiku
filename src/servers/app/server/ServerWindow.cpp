@@ -244,77 +244,14 @@ void ServerWindow::Quit(void)
 //! Shows the window's WinBorder
 void ServerWindow::Show(void)
 {
+
 	if (!IsLocked())
 		debugger("you must lock a ServerWindow object before calling ::Show()\n");
 
 	if(!fWinBorder->IsHidden())
 		return;
 
-	STRACE(("ServerWindow (%s): Show()\n",fTitle.String()));
-	if(fWinBorder)
-	{
-		RootLayer *rl = fWinBorder->GetRootLayer();
-		int32 wksCount;
-
-		desktop->fGeneralLock.Lock();
-		rl->fMainLock.Lock();
-
-		// make WinBorder unhidden, but *do not* rebuild and redraw! We'll do that
-		// after we bring it (its modal and floating windows also) in front.
-		fWinBorder->Show(false);
-
-		if ( (fFeel == B_FLOATING_SUBSET_WINDOW_FEEL || fFeel == B_MODAL_SUBSET_WINDOW_FEEL)
-			 && fWinBorder->MainWinBorder() == NULL)
-		{
-			// This window hasn't been added to a normal window subset,	
-			// so don't call placement or redrawing methods
-		}
-		else
-		{
-			wksCount	= rl->WorkspaceCount();
-			for(int32 i = 0; i < wksCount; i++)
-			{
-				if (fWorkspaces & (0x00000001UL << i))
-				{
-					WinBorder		*previousFocus;
-					BRegion			invalidRegion;
-					Workspace		*ws;
-					
-					// TODO: can you unify this method with Desktop::MouseEventHandler::B_MOUSE_DOWN
-					
-					ws				= rl->WorkspaceAt(i+1);
-					ws->BringToFrontANormalWindow(fWinBorder);
-					ws->SearchAndSetNewFront(fWinBorder);
-					previousFocus	= ws->FocusLayer();
-					ws->SearchAndSetNewFocus(fWinBorder);
-					
-					// TODO: only do this in for the active workspace!
-					
-					// first redraw previous window's decorator. It has lost focus state.
-					if (previousFocus)
-						if (previousFocus->fDecorator)
-							fWinBorder->fParent->Invalidate(previousFocus->fVisible);
-
-					// we must build the rebuild region. we have nowhere to take it from.
-					// include decorator's(if any) and fTopLayer's full regions.
-					fWinBorder->fTopLayer->RebuildFullRegion();
-					fWinBorder->RebuildFullRegion();
-					invalidRegion.Include(&(fWinBorder->fTopLayer->fFull));
-					if (fWinBorder->fDecorator)
-						invalidRegion.Include(&(fWinBorder->fFull));
-
-					fWinBorder->fParent->FullInvalidate(invalidRegion);
-				}
-			}
-		}
-
-		rl->fMainLock.Unlock();
-		desktop->fGeneralLock.Unlock();
-	}
-	else
-	{
-		debugger("WARNING: NULL fWinBorder\n");
-	}
+	fWinBorder->GetRootLayer()->ShowWinBorder(fWinBorder);
 }
 //------------------------------------------------------------------------------
 //! Hides the window's WinBorder
@@ -326,40 +263,7 @@ void ServerWindow::Hide(void)
 	if(fWinBorder->IsHidden())
 		return;
 
-	STRACE(("ServerWindow %s: Hide\n",fTitle.String()));
-	if(fWinBorder)
-	{
-		RootLayer *rl = fWinBorder->GetRootLayer();
-		Workspace *ws = NULL;
-		
-		desktop->fGeneralLock.Lock();
-		rl->fMainLock.Lock();
-		
-		fWinBorder->Hide();
-		
-		int32		wksCount= rl->WorkspaceCount();
-		for(int32 i = 0; i < wksCount; i++)
-		{
-			ws = rl->WorkspaceAt(i+1);
-
-			if (ws->FrontLayer() == fWinBorder)
-			{
-				ws->HideSubsetWindows(fWinBorder);
-				ws->SearchAndSetNewFocus(ws->FrontLayer());
-			}
-			else
-			{
-				if (ws->FocusLayer() == fWinBorder)
-					ws->SearchAndSetNewFocus(fWinBorder);
-				else{
-					// TODO: RootLayer or Desktop class should take care of invalidating
-//					ws->Invalidate();
-				}
-			}
-		}
-		rl->fMainLock.Unlock();
-		desktop->fGeneralLock.Unlock();
-	}
+	fWinBorder->GetRootLayer()->HideWinBorder(fWinBorder);
 }
 //------------------------------------------------------------------------------
 /*
@@ -2366,9 +2270,6 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 //------------------------------------------------------------------------------
 void ServerWindow::SendMessageToClient(const BMessage* msg) const
 {
-	if (!IsLocked())
-		debugger("you must lock a ServerWindow object before calling ::SendMessageToClient()\n");
-
 	ssize_t		size;
 	char		*buffer;
 	
