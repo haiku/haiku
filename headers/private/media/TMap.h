@@ -114,6 +114,14 @@ public:
 		return _Get(item_iter, v);
 	}
 	
+	bool GetCurrentKey(key **k)
+	{
+		if (item_iter < 0 || item_iter >= item_count)
+			return false;
+		*k = &items[item_iter]->k;
+		return true;
+	}
+	
 	bool RemoveCurrent()
 	{
 		return _Remove(item_iter);
