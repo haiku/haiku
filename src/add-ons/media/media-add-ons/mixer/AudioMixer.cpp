@@ -7,6 +7,7 @@
 #include <Buffer.h>
 #include <TimeSource.h>
 #include <ParameterWeb.h>
+#include <MediaRoster.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +25,10 @@
 #if USE_MEDIA_FORMAT_WORKAROUND
 static void multi_audio_format_specialize(media_multi_audio_format *format, const media_multi_audio_format *other);
 #endif
+
+#define FORMAT_USER_DATA_TYPE 		0x7294a8f3
+#define FORMAT_USER_DATA_MAGIC_1	0xc84173bd
+#define FORMAT_USER_DATA_MAGIC_2	0x4af62b7d
 
 AudioMixer::AudioMixer(BMediaAddOn *addOn)
 		:	BMediaNode("Audio Mixer"),
@@ -129,6 +134,21 @@ AudioMixer::AcceptFormat(const media_destination &dest, media_format *ioFormat)
 	if (ioFormat->type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
 	
+	// We do not have special requirements, but just in case
+	// another mixer is connecting to us and my need a hint
+	// to create a connection at optimal frame rate and
+	// channel count, we place this information in the user_data
+	fCore->Lock();
+	MixerOutput *output = fCore->Output();
+	uint32 channel_count = output ? output->MediaOutput().format.u.raw_audio.channel_count : 0;
+	float frame_rate = output ? output->MediaOutput().format.u.raw_audio.frame_rate : 0.0;
+	fCore->Unlock();
+	ioFormat->user_data_type = FORMAT_USER_DATA_TYPE;
+	*(uint32 *)&ioFormat->user_data[0] = FORMAT_USER_DATA_MAGIC_1;
+	*(uint32 *)&ioFormat->user_data[4] = channel_count;
+	*(float *)&ioFormat->user_data[20] = frame_rate;
+	*(uint32 *)&ioFormat->user_data[44] = FORMAT_USER_DATA_MAGIC_2;
+
 	return B_OK;
 }
 
@@ -385,7 +405,7 @@ AudioMixer::FormatProposal(const media_source &output, media_format *ioFormat)
 	// we require a raw audio format
 	if (ioFormat->type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
-		
+
 	return B_OK;
 }
 
@@ -449,8 +469,8 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
 	
-	//printf("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
-	//SendLatencyChange(source, destination, EventLatency());
+	TRACE("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
+	SendLatencyChange(source, destination, EventLatency());
 
 	// apply latency change
 	fCore->SetTimingInfo(TimeSource(), fDownstreamLatency);
@@ -536,6 +556,30 @@ AudioMixer::GetLatency(bigtime_t *out_latency)
 	return B_OK;
 }
 
+void
+AudioMixer::LatencyChanged(const media_source & source, const media_destination & destination,
+						   bigtime_t new_latency, uint32 flags)
+{
+	TRACE("AudioMixer::LatencyChanged: downstream latency changed from %Ld to %Ld\n", fDownstreamLatency, new_latency);
+
+	fDownstreamLatency = new_latency;
+	SetEventLatency(fDownstreamLatency + fInternalLatency);
+	
+	fCore->Lock();
+	fCore->SetTimingInfo(TimeSource(), fDownstreamLatency);
+
+	MixerInput *input;	
+	for (int i = 0; (input = fCore->Input(i)) != 0; i++) {
+		TRACE("AudioMixer: SendLatencyChange from %d/%d to %d/%d event latency is now %Ld\n",
+			input->MediaInput().source.port, input->MediaInput().source.id,
+			input->MediaInput().destination.port, input->MediaInput().destination.id,
+			EventLatency());
+		SendLatencyChange(input->MediaInput().source, input->MediaInput().destination, EventLatency());
+	}
+
+	fCore->Unlock();
+}
+
 status_t
 AudioMixer::PrepareToConnect(const media_source &what, const media_destination &where, 
 							 media_format *format, media_source *out_source, char *out_name)
@@ -570,6 +614,43 @@ AudioMixer::PrepareToConnect(const media_source &what, const media_destination &
 		fCore->Unlock();
 		ERROR("AudioMixer::PrepareToConnect: already connected\n");
 		return B_MEDIA_ALREADY_CONNECTED;
+	}
+
+	// It is possible that another mixer is connecting.
+	// To avoid using the default format, we use one of
+	// a) the format that it indicated as hint in the user_data,
+	// b) the output format of the system audio mixer
+	// c) the input format of the system DAC device
+	// d) if everything failes, keep the wildcard
+	if (format->u.raw_audio.channel_count == 0
+		&& format->u.raw_audio.frame_rate < 1
+		&& format->user_data_type == FORMAT_USER_DATA_TYPE
+		&& *(uint32 *)&format->user_data[0] == FORMAT_USER_DATA_MAGIC_1
+		&& *(uint32 *)&format->user_data[44] == FORMAT_USER_DATA_MAGIC_2) {
+		// ok, a mixer is connecting
+		uint32 channel_count = *(uint32 *)&format->user_data[4];
+		float frame_rate = *(float *)&format->user_data[20];
+		if (channel_count > 0 && frame_rate > 0) {
+			// format is good, use it
+			format->u.raw_audio.channel_count = channel_count;
+			format->u.raw_audio.frame_rate = frame_rate;
+		} else {
+			// other mixer's output is probably not connected
+			media_node node;
+			BMediaRoster *roster = BMediaRoster::Roster();
+			media_output out;
+			media_input in;
+			int32 count;
+			if (B_OK == roster->GetAudioMixer(&node) && B_OK == roster->GetConnectedOutputsFor(node, &out, 1, &count) && count == 1) {
+				// use mixer output format
+				format->u.raw_audio.channel_count = out.format.u.raw_audio.channel_count;
+				format->u.raw_audio.frame_rate = out.format.u.raw_audio.frame_rate;
+			} else if (B_OK == roster->GetAudioOutput(&node) && B_OK == roster->GetAllInputsFor(node, &in, 1, &count) && count == 1) {
+				// use DAC input format
+				format->u.raw_audio.channel_count = in.format.u.raw_audio.channel_count;
+				format->u.raw_audio.frame_rate = in.format.u.raw_audio.frame_rate;
+			}
+		}
 	}
 
 	/* set source and suggest a name */
@@ -626,6 +707,12 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 		return;
 	}
 
+	/* Switch our prefered format to have the same
+	 * frame_rate and channel count as the output.
+	 */
+	fDefaultFormat.u.raw_audio.frame_rate = format.u.raw_audio.frame_rate;
+	fDefaultFormat.u.raw_audio.channel_count = format.u.raw_audio.channel_count;
+
 	// if the connection has no name, we set it now
 	if (strlen(io_name) == 0)
 		strcpy(io_name, "Mixer Output");
@@ -645,8 +732,8 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
 	
-	//printf("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
-	//SendLatencyChange(source, dest, EventLatency());
+	TRACE("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
+	SendLatencyChange(source, dest, EventLatency());
 
 	// Set up the buffer group for our connection, as long as nobody handed us a
 	// buffer group (via SetBufferGroup()) prior to this.  That can happen, for example,
@@ -692,6 +779,12 @@ AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 		fCore->Unlock();
 		return;
 	}
+
+	/* Switch our prefered format back to default
+	 * frame rate and channel count.
+	 */
+	fDefaultFormat.u.raw_audio.frame_rate = 96000;
+	fDefaultFormat.u.raw_audio.channel_count = 2;
 	
 	// force a stop
 	fCore->Stop();

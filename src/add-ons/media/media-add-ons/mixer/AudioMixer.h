@@ -173,6 +173,10 @@ class AudioMixer :
 		const media_source & what,
 		bool enabled,
 		int32* _deprecated_);
+		
+	void LatencyChanged(const media_source & source,
+						const media_destination & destination,
+						bigtime_t new_latency, uint32 flags);
 								
 	// BMediaEventLooper methods
 	
