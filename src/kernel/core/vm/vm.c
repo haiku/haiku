@@ -831,7 +831,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			// the cache object.
 			addr_t va;
 			addr_t pa;
-			unsigned int flags;
+			uint32 flags;
 			int err;
 			vm_page *page;
 			off_t offset = 0;
@@ -839,8 +839,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			mutex_lock(&cache_ref->lock);
 			(*aspace->translation_map.ops->lock)(&aspace->translation_map);
 			for (va = region->base; va < region->base + region->size; va += PAGE_SIZE, offset += PAGE_SIZE) {
-				err = (*aspace->translation_map.ops->query)(&aspace->translation_map,
-					va, &pa, &flags);
+				err = (*aspace->translation_map.ops->query)(&aspace->translation_map, va, &pa, &flags);
 				if (err < 0) {
 //					dprintf("vm_create_anonymous_region: error looking up mapping for va 0x%x\n", va);
 					continue;
@@ -1273,11 +1272,11 @@ int
 vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr)
 {
 	vm_address_space *aspace;
-	unsigned int null_flags;
+	uint32 null_flags;
 	int err;
 
 	aspace = vm_get_aspace_by_id(aid);
-	if(aspace == NULL)
+	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
 	err = aspace->translation_map.ops->query(&aspace->translation_map,
@@ -2580,7 +2579,7 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 	status_t status = B_OK;
 	int32 index = -1;
 	addr_t offset = 0;
-	int flags;
+	uint32 flags;
 
 	TRACE(("get_memory_map(%p, %lu bytes, %ld entries)\n", address, numBytes, numEntries));
 

@@ -27,7 +27,7 @@ scan_pages(vm_address_space *aspace, addr free_target)
 	vm_page *page;
 	addr va;
 	addr pa;
-	unsigned int flags, flags2;
+	uint32 flags, flags2;
 //	int err;
 	int quantum = PAGE_SCAN_QUANTUM;
 
