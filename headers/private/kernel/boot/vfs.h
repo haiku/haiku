@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef KERNEL_BOOT_VFS_H
 #define KERNEL_BOOT_VFS_H
 
@@ -78,11 +78,13 @@ class ConsoleNode : public Node {
 /* function prototypes */
 
 extern status_t vfs_init(stage2_args *args);
-extern void register_boot_file_system(Directory *directory);
+extern status_t register_boot_file_system(Directory *directory);
 extern Directory *get_boot_file_system(stage2_args *args);
 extern status_t mount_file_systems(stage2_args *args);
 extern int open_node(Node *node, int mode);
 extern int open_from(Directory *directory, const char *path, int mode);
+
+extern Node *get_node_from(int fd);
 
 extern status_t add_partitions_for(int fd, bool mountFileSystems);
 extern status_t add_partitions_for(Node *device, bool mountFileSystems);

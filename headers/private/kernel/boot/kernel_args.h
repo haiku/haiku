@@ -1,10 +1,10 @@
 /* 
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef KERNEL_BOOT_KERNEL_ARGS_H
 #define KERNEL_BOOT_KERNEL_ARGS_H
 
@@ -12,6 +12,7 @@
 #include <SupportDefs.h>
 
 #include <boot/elf.h>
+#include <boot/disk_identifier.h>
 #include <platform_kernel_args.h>
 #include <arch_kernel_args.h>
 
@@ -40,6 +41,11 @@ typedef struct kernel_args {
 
 	uint32		num_cpus;
 	addr_range	cpu_kstack[MAX_BOOT_CPUS];
+
+	struct {
+		disk_identifier identifier;
+		off_t	partition_offset;
+	} boot_disk;
 
 	struct {
 		bool	enabled;
