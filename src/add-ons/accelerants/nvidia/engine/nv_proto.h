@@ -1,11 +1,11 @@
 /*general card functions*/
-status_t nv_general_powerup();
-status_t nv_set_cas_latency();
-status_t gx50_general_output_select();
+status_t nv_general_powerup(void);
+status_t nv_set_cas_latency(void);
+status_t gx50_general_output_select(void);
 status_t nv_general_dac_select(int);
-status_t nv_general_wait_retrace();
+status_t nv_general_wait_retrace(void);
 status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row);
-//status_t nv_general_bios_to_powergraphics();
+//status_t nv_general_bios_to_powergraphics(void);
 
 /* apsed: logging macros */
 #define MSG(args) do { /* if needed or si->settings with si NULL */ \
@@ -49,7 +49,7 @@ status_t nv_dac_palette(uint8*,uint8*,uint8*);
 status_t nv_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t nv_dac_set_pix_pll(display_mode target);
 
-status_t g400_dac_set_sys_pll();
+status_t g400_dac_set_sys_pll(void);
 
 /*MAVEN functions*/
 status_t nv_maven_dpms(uint8, uint8, uint8);
@@ -74,23 +74,23 @@ status_t nv_crtc_validate_timing(
 status_t nv_crtc_set_timing(display_mode target);
 status_t nv_crtc_depth(int mode);
 status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp); 
-status_t nv_crtc_set_display_pitch();
+status_t nv_crtc_set_display_pitch(void);
 
 status_t nv_crtc_dpms(bool, bool, bool);
 status_t nv_crtc_dpms_fetch(bool*, bool*, bool*);
 status_t nv_crtc_mem_priority(uint8);
 
-status_t nv_crtc_cursor_init(); /*Yes, cursor follows CRTC1 - not the DAC!*/
+status_t nv_crtc_cursor_init(void); /*Yes, cursor follows CRTC1 - not the DAC!*/
 status_t nv_crtc_cursor_define(uint8*,uint8*);
 status_t nv_crtc_cursor_position(uint16 x ,uint16 y);
-status_t nv_crtc_cursor_show();
-status_t nv_crtc_cursor_hide();
+status_t nv_crtc_cursor_show(void);
+status_t nv_crtc_cursor_hide(void);
 
 /*CRTC2 functions*/
 /*XXX - validate_timing*/
 status_t g400_crtc2_set_timing(display_mode target);
 status_t g400_crtc2_depth(int mode);
-status_t g400_crtc2_set_display_pitch(); 
+status_t g400_crtc2_set_display_pitch(void); 
 status_t g400_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
 
 status_t g400_crtc2_dpms(uint8 display,uint8 h,uint8 v);
@@ -98,27 +98,27 @@ status_t g400_crtc2_dpms_fetch(uint8 * display,uint8 * h,uint8 * v);
 
 /*acceleration functions*/
 status_t check_acc_capability(uint32 feature);
-status_t nv_acc_init();
-status_t nv_acc_setup_blit();
+status_t nv_acc_init(void);
+status_t nv_acc_setup_blit(void);
 status_t nv_acc_blit(uint16,uint16,uint16, uint16,uint16,uint16 );
 status_t nv_acc_setup_rectangle(uint32 color);
 status_t nv_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
-status_t nv_acc_setup_rect_invert();
+status_t nv_acc_setup_rect_invert(void);
 status_t nv_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
 status_t nv_acc_transparent_blit(uint16,uint16,uint16, uint16,uint16,uint16, uint32);
 status_t nv_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 	uint16 xd,uint16 yd,uint16 wd,uint16 hd);
-status_t nv_acc_wait_idle();
+status_t nv_acc_wait_idle(void);
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
-status_t nv_bes_init();
+status_t nv_bes_init(void);
 status_t nv_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);
-status_t nv_release_bes();
+status_t nv_release_bes(void);
 
 /* I2C functions */
-status_t i2c_sec_tv_adapter();
+status_t i2c_sec_tv_adapter(void);
 
 /*driver structures and enums*/
 enum{BPP8=0,BPP15=1,BPP16=2,BPP24=3,BPP32DIR=4,BPP32=7};

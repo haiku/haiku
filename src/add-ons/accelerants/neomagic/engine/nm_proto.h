@@ -1,12 +1,12 @@
 /*general card functions*/
-status_t mn_general_powerup();
-status_t nm_set_cas_latency();
-status_t nm_general_output_select();
-uint8 nm_general_output_read();
+status_t mn_general_powerup(void);
+status_t nm_set_cas_latency(void);
+status_t nm_general_output_select(void);
+uint8 nm_general_output_read(void);
 status_t mn_general_dac_select(int);
-status_t mn_general_wait_retrace();
+status_t mn_general_wait_retrace(void);
 status_t mn_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row);
-//status_t mn_general_bios_to_powergraphics();
+//status_t mn_general_bios_to_powergraphics(void);
 
 /* apsed: logging macros */
 #define MSG(args) do { /* if needed or si->settings with si NULL */ \
@@ -40,35 +40,35 @@ status_t mn_crtc_validate_timing(
 status_t mn_crtc_set_timing(display_mode target, bool crt_only);
 status_t mn_crtc_depth(int mode);
 status_t mn_crtc_set_display_start(uint32 startadd,uint8 bpp); 
-status_t mn_crtc_set_display_pitch();
+status_t mn_crtc_set_display_pitch(void);
 status_t mn_crtc_center(display_mode target);
 
 status_t mn_crtc_dpms(bool, bool, bool);
 status_t mn_crtc_dpms_fetch(bool*, bool*, bool*);
 status_t mn_crtc_mem_priority(uint8);
 
-status_t mn_crtc_cursor_init(); /*Yes, cursor follows CRTC1 - not the DAC!*/
+status_t mn_crtc_cursor_init(void); /*Yes, cursor follows CRTC1 - not the DAC!*/
 status_t mn_crtc_cursor_define(uint8*,uint8*);
 status_t mn_crtc_cursor_position(uint16 x ,uint16 y);
-status_t mn_crtc_cursor_show();
-status_t mn_crtc_cursor_hide();
+status_t mn_crtc_cursor_show(void);
+status_t mn_crtc_cursor_hide(void);
 
 /*acceleration functions*/
 status_t check_acc_capability(uint32 feature);
-status_t mn_acc_init();
+status_t mn_acc_init(void);
 status_t mn_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
 status_t mn_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
 status_t mn_acc_blit(uint16,uint16,uint16, uint16,uint16,uint16 );
 status_t mn_acc_transparent_blit(uint16,uint16,uint16, uint16,uint16,uint16, uint32);
 status_t mn_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 	uint16 xd,uint16 yd,uint16 wd,uint16 hd);
-status_t mn_acc_wait_idle();
+status_t mn_acc_wait_idle(void);
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
 status_t mn_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);
-status_t mn_release_bes();
+status_t mn_release_bes(void);
 
 /*driver structures and enums*/
 enum{BPP8=0,BPP15=1,BPP16=2,BPP24=3};
