@@ -16,10 +16,10 @@
 struct media_codec_info {
 	char	pretty_name[96];   // eg: "SuperSqueeze Encoder by Foo Inc"
 	char	short_name[32];    // eg: "supersqueeze"
-	
+
 	int32	id;                // opaque id passed to BMediaFile::CreateTrack
 	int32	sub_id;
-	
+
 	int32	pad[63];
 };
 
@@ -27,40 +27,41 @@ struct media_codec_info {
 // Use this to iterate through the available encoders for a file format.
 //
 status_t get_next_encoder(int32 *cookie,
-						  const media_file_format *mfi,		// this comes from get_next_file_format()
-						  const media_format *input_format,	// this is the type of data given to the encoder
-						  media_format *output_format,		// this is the type of data encoder will output 
-						  media_codec_info *ei);			// information about the encoder
- 
+			const media_file_format *fileFormat,// this comes from get_next_file_format()
+			const media_format *inFormat,		// this is the type of data given to the encoder
+			media_format *_outFormat,			// this is the type of data encoder will output 
+			media_codec_info *_codecInfo);		// information about the encoder
+
 status_t get_next_encoder(
-	int32 *cookie,
-	const media_file_format *mfi,		// this comes from get_next_file_format()
-										// pass NULL if you don't care
-	const media_format *input_format,	// this is the type of data given to the
-										// encoder, wildcards are accepted
-	const media_format *output_format,	// this is the type of data encoder
-										// you want the encoder to output.
-										// Wildcards are accepted
-	media_codec_info *ei,				// information about the encoder
-	media_format *accepted_input_format,// this is the type of data that the
-										// encoder will accept as input.
-										// Wildcards in input_format will be
-										// specialized here.
-	media_format *accepted_output_format// this is the type of data that the
-										// encoder will output.
-										// Wildcards in output_format will be
-										// specialized here.
-	);
+			int32 *cookie,
+			const media_file_format *fileFormat,// this comes from get_next_file_format()
+												// pass NULL if you don't care
+			const media_format *inFormat,		// this is the type of data given to the
+												// encoder, wildcards are accepted
+			const media_format *_outFormat,		// this is the type of data encoder
+												// you want the encoder to output.
+												// Wildcards are accepted
+			media_codec_info *codecInfo,		// information about the encoder
+			media_format *_acceptedInputFormat,	// this is the type of data that the
+												// encoder will accept as input.
+												// Wildcards in input_format will be
+												// specialized here.
+			media_format *_acceptedOutputFormat	// this is the type of data that the
+												// encoder will output.
+												// Wildcards in output_format will be
+												// specialized here.
+		);
 
+status_t get_next_encoder(int32 *cookie, media_codec_info *_codecInfo);
 
-status_t get_next_encoder(int32 *cookie, media_codec_info *ei);
 
 enum media_file_accept_format_flags {
 	B_MEDIA_REJECT_WILDCARDS = 0x1
 };
 
-bool does_file_accept_format(const media_file_format *mfi,
-                             media_format *format, uint32 flags = 0);
+bool does_file_accept_format(const media_file_format *fileFormat,
+		media_format *format, uint32 flags = 0);
+
 
 typedef struct {
 	uint8 data[16];
@@ -150,21 +151,19 @@ typedef struct _media_format_description {
 	} u;
 } media_format_description;
 
-#if defined(__cplusplus)
 
-// temporary functionality, will go away...
-status_t _get_format_for_description(media_format *out_format, const media_format_description &in_desc);
-status_t _get_meta_description_for_format(media_format_description *out_desc, const media_format &in_format);
+#ifdef __cplusplus
+
 
 class BMediaFormats {
-public:
-			BMediaFormats();
-virtual		~BMediaFormats();
+	public:
+		BMediaFormats();
+		virtual	~BMediaFormats();
 
 		status_t InitCheck();
 
-				// Make sure you memset() your descs to 0 before you start filling
-				// them in! Else you may register some bogus value.
+		// Make sure you memset() your descs to 0 before you start filling
+		// them in! Else you may register some bogus value.
 		enum make_format_flags {
 			B_EXCLUSIVE = 0x1,			//	Fail if this format has already been registered
 			B_NO_MERGE = 0x2,			//	Don't re-number any formats if there are multiple
@@ -173,49 +172,40 @@ virtual		~BMediaFormats();
 										//	format family (when registering more than one in
 										//	the same family). Only use in Encoder add-ons.
 		};
-		status_t MakeFormatFor(
-				const media_format_description * descs,
-				int32 desc_count,
-				media_format * io_format,
-				uint32 flags = 0,
-				void * _reserved = 0);
-		status_t GetFormatFor(
-				const media_format_description & desc,
-				media_format * out_format);
 
-		//	convenience functions
-		static status_t GetBeOSFormatFor(
-				uint32 fourcc, media_format * out_format,
-				media_type type = B_MEDIA_UNKNOWN_TYPE);
-		static status_t GetAVIFormatFor(
-				uint32 fourcc, media_format * out_format,
-				media_type type = B_MEDIA_UNKNOWN_TYPE);
-		static status_t GetQuicktimeFormatFor(
-				uint32 vendor, uint32 fourcc, media_format * out_format,
-				media_type type = B_MEDIA_UNKNOWN_TYPE);
+		status_t MakeFormatFor(const media_format_description *descriptions,
+					int32 descriptionCount, media_format *inOutFormat,
+					uint32 flags = 0, void * _reserved = 0);
+		status_t GetFormatFor(const media_format_description &description,
+					media_format *_outFormat);
 
-		status_t GetCodeFor(
-				const media_format & format,
-				media_format_family family,
-				media_format_description * out_description);
+		status_t GetCodeFor(const media_format &format,
+					media_format_family family, media_format_description *_outDescription);
 
 		status_t RewindFormats();
-		status_t GetNextFormat(
-				media_format * out_format,
-				media_format_description * out_description);
+		status_t GetNextFormat(media_format *_outFormat,
+					media_format_description *_outDescription);
+
 		//	You need to lock/unlock (only) when using RewindFormats()/GetNextFormat()
 		bool Lock();
 		void Unlock();
 
+		//	convenience functions
+		static status_t GetBeOSFormatFor(uint32 fourcc,
+							media_format *_outFormat, media_type type = B_MEDIA_UNKNOWN_TYPE);
+		static status_t GetAVIFormatFor(uint32 fourcc,
+							media_format *_outFormat, media_type type = B_MEDIA_UNKNOWN_TYPE);
+		static status_t GetQuicktimeFormatFor(uint32 vendor, uint32 fourcc,
+							media_format *_outFormat, media_type type = B_MEDIA_UNKNOWN_TYPE);
+
 	/* --- begin deprecated API --- */
-		status_t MakeFormatFor(
-				const media_format_description & desc,
-				const media_format & in_format,
-				media_format * out_format);
-private:
-		BLocker *	fLocker;
-		int32		fIndex;
-		uint32		_reserved[21];
+
+		status_t MakeFormatFor(const media_format_description &description,
+					const media_format &inFormat, media_format *_outFormat);
+
+	private:
+		int32	fIteratorIndex;
+		uint32	_reserved[30];
 };
 
 _IMPEXP_MEDIA bool operator==(const media_format_description & a, const media_format_description & b);
@@ -223,7 +213,8 @@ _IMPEXP_MEDIA bool operator<(const media_format_description & a, const media_for
 
 _IMPEXP_MEDIA bool operator==(const GUID & a, const GUID & b);
 _IMPEXP_MEDIA bool operator<(const GUID & a, const GUID & b);
-#endif
+
+#endif	/* __cplusplus */
 
 #endif	/* _MEDIA_TYPES_H */
 
