@@ -32,6 +32,8 @@ int   setenv(char const *, char const *, int);
 int   putenv(char const *);
 void  unsetenv(char const *);
 
+char 	*realpath(const char *path, char *resolved);
+
 void *bsearch(void const *, void const *, size_t, size_t, int (*) (void const *, void const *));
 int   heapsort(void *, size_t , size_t , int (*)(void const *, void const *));
 int   mergesort(void *, size_t, size_t, int (*)(void const *, void const *));
