@@ -29,6 +29,11 @@
 #include <stdio.h>
 
 
+#define DRAW_SLIDER_BAR
+	// if this is defined, the standard slider bar is replaced with
+	// one that looks exactly like the one in the original DiskProbe
+	// (even in Dano/Zeta)
+
 static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgPositionUpdate = 'poup';
 
@@ -56,7 +61,9 @@ class PositionSlider : public BSlider {
 			off_t size, uint32 blockSize);
 		virtual ~PositionSlider();
 
+#ifdef DRAW_SLIDER_BAR
 		virtual void DrawBar();
+#endif
 
 		off_t Position() const;
 		off_t Size() const { return fSize; }
@@ -190,6 +197,11 @@ PositionSlider::PositionSlider(BRect rect, const char *name, BMessage *message,
 	fBlockSize(blockSize)
 {
 	Reset();
+
+#ifndef DRAW_SLIDER_BAR
+	rgb_color color =  ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+	UseFillColor(true, &color);
+#endif
 }
 
 
@@ -198,6 +210,7 @@ PositionSlider::~PositionSlider()
 }
 
 
+#ifdef DRAW_SLIDER_BAR
 void 
 PositionSlider::DrawBar()
 {
@@ -246,6 +259,7 @@ PositionSlider::DrawBar()
 
 	view->EndLineArray();
 }
+#endif	// DRAW_SLIDER_BAR
 
 
 void
