@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src add-ons kernel network protocols route ;
+
+UsePrivateHeaders net ;
+
+R5KernelAddon route : kernel obos_network protocols :
+	route.c
+;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/home/config/add-ons/kernel/obos_network/protocols
+	: route ;
+
+Package openbeos-networkingkit-cvs :
+	route :
+	boot home config add-ons kernel obos_network protocols ;
