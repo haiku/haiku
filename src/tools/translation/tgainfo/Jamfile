@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src tools translation tgainfo ;
+
+BinCommand tgainfo : tgainfo.cpp : be ;
+
