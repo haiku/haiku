@@ -156,7 +156,7 @@ enum {
 
 extern sem_id	create_sem(int32 count, const char *name);
 extern status_t	delete_sem(sem_id id);
-extern status_t	delete_sem_etc(sem_id id, status_t returnCode); /* ToDo: not public BeOS */
+extern status_t	delete_sem_etc(sem_id id, status_t returnCode, bool interrupted); /* ToDo: not public BeOS */
 extern status_t	acquire_sem(sem_id id);
 extern status_t	acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout);
 extern status_t	release_sem(sem_id id);

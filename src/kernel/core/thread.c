@@ -270,6 +270,8 @@ create_thread_struct(const char *name)
 	t->user_time = 0;
 	t->kernel_time = 0;
 	t->last_time = 0;
+	t->return_code = 0;
+	t->return_flags = 0;
 
 	sprintf(temp, "thread_0x%lx_retcode_sem", t->id);
 	t->return_code_sem = create_sem(0, temp);
@@ -292,11 +294,11 @@ create_thread_struct(const char *name)
 	return t;
 
 err4:
-	delete_sem_etc(t->msg.read_sem, -1);
+	delete_sem_etc(t->msg.read_sem, -1, false);
 err3:
-	delete_sem_etc(t->msg.write_sem, -1);
+	delete_sem_etc(t->msg.write_sem, -1, false);
 err2:
-	delete_sem_etc(t->return_code_sem, -1);
+	delete_sem_etc(t->return_code_sem, -1, false);
 err1:
 	kfree(t);
 err:
@@ -308,11 +310,11 @@ static void
 delete_thread_struct(struct thread *t)
 {
 	if (t->return_code_sem >= 0)
-		delete_sem_etc(t->return_code_sem, -1);
+		delete_sem_etc(t->return_code_sem, -1, false);
 	if (t->msg.write_sem >= 0)
-		delete_sem_etc(t->msg.write_sem, -1);
+		delete_sem_etc(t->msg.write_sem, -1, false);
 	if (t->msg.read_sem >= 0)
-		delete_sem_etc(t->msg.read_sem, -1);
+		delete_sem_etc(t->msg.read_sem, -1, false);
 	kfree(t);
 }
 
@@ -957,7 +959,7 @@ thread_exit2(void *_args)
 
 
 void
-thread_exit(int retcode)
+thread_exit(void)
 {
 	int state;
 	struct thread *t = thread_get_current_thread();
@@ -966,7 +968,9 @@ thread_exit(int retcode)
 	unsigned int death_stack;
 	sem_id cached_death_sem;
 
-	dprintf("thread 0x%lx exiting w/return code 0x%x\n", t->id, retcode);
+	dprintf("thread 0x%lx exiting %s w/return code 0x%x\n", t->id,
+		t->return_flags & THREAD_RETURN_INTERRUPTED ? "due to signal" : "normally",
+		(int)t->return_code);
 
 	// boost our priority to get this over with
 	thread_set_priority(t->id, B_FIRST_REAL_TIME_PRIORITY);
@@ -1048,7 +1052,7 @@ thread_exit(int retcode)
 		sem_id s = t->return_code_sem;
 
 		t->return_code_sem = -1;
-		delete_sem_etc(s, retcode);
+		delete_sem_etc(s, t->return_code, t->return_flags & THREAD_RETURN_INTERRUPTED ? true : false);
 	}
 
 	death_stack = get_death_stack();
@@ -1077,6 +1081,23 @@ thread_exit(int retcode)
 }
 
 
+void
+sys_exit_thread(status_t return_value)
+{
+	struct thread *t = thread_get_current_thread();
+	int state;
+	
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+	t->return_code = return_value;
+	t->return_flags = THREAD_RETURN_EXIT;
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+	
+	send_signal_etc(t->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+}
+
+
 int
 thread_kill_thread(thread_id id)
 {
@@ -1102,7 +1123,10 @@ thread_kill_thread_nowait(thread_id id)
 static void
 thread_kthread_exit(void)
 {
-	thread_exit(0);
+	struct thread *t = thread_get_current_thread();
+	
+	t->return_flags = THREAD_RETURN_EXIT;
+	thread_exit();
 }
 
 

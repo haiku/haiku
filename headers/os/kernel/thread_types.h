@@ -52,9 +52,10 @@ enum {
 	TEAM_STATE_DEATH	// being killed
 };
 
-#define SIG_NONE 0
-#define SIG_SUSPEND	1
-#define SIG_KILL 2
+
+#define THREAD_RETURN_EXIT			0x1
+#define THREAD_RETURN_INTERRUPTED	0x2
+
 
 /**
  * The team structure; equivalent to a common process.
@@ -128,7 +129,9 @@ struct thread {
 	addr entry;
 	void *args;
 	struct team *team;
+	status_t return_code;
 	sem_id return_code_sem;
+	int return_flags;
 	region_id kernel_stack_region_id;
 	addr kernel_stack_base;
 	region_id user_stack_region_id;

@@ -376,7 +376,7 @@ create_team_struct(const char *name, bool kernel)
 	p->thread_list = NULL;
 	p->main_thread = NULL;
 	p->state = TEAM_STATE_BIRTH;
-	p->pending_signals = SIG_NONE;
+	p->pending_signals = 0;
 	p->death_sem = -1;
 	p->user_env_base = 0;
 

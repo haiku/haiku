@@ -48,6 +48,7 @@ thread_id sys_get_current_thread_id(void);
 int       sys_suspend_thread(thread_id tid);
 int       sys_resume_thread(thread_id tid);
 int       sys_kill_thread(thread_id tid);
+void      sys_exit_thread(status_t return_value);
 
 status_t sys_wait_on_thread(thread_id tid, status_t *retcode);
 int sys_kill_team(team_id tid);

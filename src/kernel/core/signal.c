@@ -72,9 +72,11 @@ handle_signals(struct thread *t, int state)
 						case SIGKILL:
 						case SIGKILLTHR:
 						default:
+							if (!(t->return_flags & THREAD_RETURN_EXIT))
+								t->return_flags |= THREAD_RETURN_INTERRUPTED;
 							RELEASE_THREAD_LOCK();
 							restore_interrupts(state);
-							thread_exit(sig);
+							thread_exit();
 					}
 				}
 				

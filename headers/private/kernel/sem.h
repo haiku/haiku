@@ -16,7 +16,7 @@
 /* user calls */
 sem_id user_create_sem(int32 count, const char *name);
 status_t user_delete_sem(sem_id id);
-status_t user_delete_sem_etc(sem_id id, status_t return_code);
+status_t user_delete_sem_etc(sem_id id, status_t return_code, bool interrupted);
 status_t user_acquire_sem(sem_id id);
 status_t user_acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout);
 status_t user_release_sem(sem_id id);

@@ -200,7 +200,8 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = thread_get_current_thread_id();
 			break;
 		case SYSCALL_EXIT_THREAD:
-			thread_exit((int)arg0);
+			sys_exit_thread((status_t)arg0);
+//			thread_exit((int)arg0);
 			*call_ret = 0;
 			break;
 		case SYSCALL_CREATE_TEAM:

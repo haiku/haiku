@@ -245,12 +245,12 @@ create_sem(int32 count, const char *name)
 status_t
 delete_sem(sem_id id)
 {
-	return delete_sem_etc(id, 0);
+	return delete_sem_etc(id, 0, false);
 }
 
 
 status_t
-delete_sem_etc(sem_id id, status_t return_code)
+delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 {
 	int slot;
 	int state;
@@ -282,7 +282,7 @@ delete_sem_etc(sem_id id, status_t return_code)
 	// free any threads waiting for this semaphore
 	while ((t = thread_dequeue(&gSems[slot].q)) != NULL) {
 		t->state = B_THREAD_READY;
-		t->sem_errcode = B_BAD_SEM_ID;
+		t->sem_errcode = interrupted ? B_INTERRUPTED : B_BAD_SEM_ID;
 		t->sem_deleted_retcode = return_code;
 		t->sem_count = 0;
 		thread_enqueue(t, &release_queue);
@@ -851,7 +851,7 @@ sem_delete_owned_sems(team_id owner)
 			RELEASE_SEM_LIST_LOCK();
 			restore_interrupts(state);
 
-			delete_sem_etc(id, 0);
+			delete_sem(id);
 			count++;
 
 			state = disable_interrupts();
@@ -896,9 +896,9 @@ user_delete_sem(sem_id id)
 
 
 status_t
-user_delete_sem_etc(sem_id id, status_t return_code)
+user_delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 {
-	return delete_sem_etc(id, return_code);
+	return delete_sem_etc(id, return_code, interrupted);
 }
 
 

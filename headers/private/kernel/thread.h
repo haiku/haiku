@@ -43,7 +43,7 @@ int thread_resume_thread(thread_id id);
 status_t thread_set_priority(thread_id id, int32 priority);
 int thread_init(kernel_args *ka);
 int thread_init_percpu(int cpu_num);
-void thread_exit(int retcode);
+void thread_exit(void);
 int thread_kill_thread(thread_id id);
 int thread_kill_thread_nowait(thread_id id);
 
