@@ -21,11 +21,11 @@ extern "C" {
 
 int     sys_null();
 
-int     sys_getrlimit(int resource, struct rlimit * rlp);
-int     sys_setrlimit(int resource, const struct rlimit * rlp);
+extern int			_kern_getrlimit(int resource, struct rlimit * rlp);
+extern int			_kern_setrlimit(int resource, const struct rlimit * rlp);
 
-bigtime_t sys_system_time();
-status_t  sys_snooze_etc(bigtime_t time, int timebase, int32 flags);
+extern bigtime_t	_kern_system_time();
+extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags);
 
 /* sem functions */
 sem_id sys_create_sem(int count, const char *name);
@@ -39,26 +39,30 @@ int    sys_get_sem_info(sem_id, struct sem_info *, size_t);
 int    sys_get_next_sem_info(team_id, uint32 *, struct sem_info *, size_t);
 int    sys_set_sem_owner(sem_id id, team_id proc);
 
-void sys_exit(int retcode);
-team_id sys_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
+/* thread syscalls */
 
-thread_id sys_spawn_thread(int32 (*func)(thread_func, void *), const char *, int32, void *, void *);
-thread_id sys_get_current_thread_id(void);
-int       sys_suspend_thread(thread_id tid);
-int       sys_resume_thread(thread_id tid);
-int       sys_kill_thread(thread_id tid);
-void      sys_exit_thread(status_t return_value);
+extern void			_kern_exit(int returnCode);
+extern team_id		_kern_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
+extern status_t		_kern_kill_team(team_id team);
+extern team_id		_kern_get_current_team();
+extern status_t		_kern_wait_for_team(team_id thread, int *_returnCode);
 
-status_t sys_wait_on_thread(thread_id tid, status_t *retcode);
-int sys_kill_team(team_id tid);
+extern thread_id	_kern_spawn_thread(int32 (*func)(thread_func, void *), const char *, int32, void *, void *);
+extern thread_id	_kern_find_thread(const char *name);
+extern status_t		_kern_suspend_thread(thread_id thread);
+extern status_t		_kern_resume_thread(thread_id thread);
+extern status_t		_kern_set_thread_priority(thread_id thread, int32 newPriority);
+extern status_t		_kern_kill_thread(thread_id thread);
+extern void			_kern_exit_thread(status_t returnValue);
+extern status_t		_kern_wait_for_thread(thread_id thread, status_t *_returnCode);
+extern bool			_kern_has_data(thread_id thread);
+extern status_t		_kern_send_data(thread_id thread, int32 code, const void *buffer, size_t buffer_size);
+extern status_t		_kern_receive_data(thread_id *_sender, void *buffer, size_t buffer_size);
 
-team_id sys_get_current_team_id();
-int sys_wait_on_team(team_id tid, int *retcode);
-
-status_t sys_get_thread_info(thread_id id, thread_info *info);
-status_t sys_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
-status_t sys_get_team_info(team_id id, team_info *info);
-status_t sys_get_next_team_info(int32 *cookie, team_info *info);
+extern status_t		_kern_get_thread_info(thread_id id, thread_info *info);
+extern status_t		_kern_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
+extern status_t		_kern_get_team_info(team_id id, team_info *info);
+extern status_t		_kern_get_next_team_info(int32 *cookie, team_info *info);
 
 int sys_send_signal(pid_t tid, uint sig);
 int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
