@@ -86,6 +86,8 @@ static int32 g_next_module_id = 1;
 // Public routines
 // ---------------
 
+extern "C" {
+
 _EXPORT status_t get_module(const char * name, module_info ** mi)
 {
 	status_t status;
@@ -397,6 +399,8 @@ _EXPORT thread_id spawn_kernel_thread(thread_entry func, const char *name, long 
 {
 	return spawn_thread(func, name, priority, arg);
 }
+
+}  // extern "C"
 
 
 // #pragma mark -
