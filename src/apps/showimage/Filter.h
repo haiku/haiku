@@ -32,21 +32,66 @@
 #include <OS.h>
 #include <Bitmap.h>
 #include <Messenger.h>
+#include <StopWatch.h>
+
+#define TIME_FILTER 0
+
+class Filter;
+
+// Used by class Filter 
+class FilterThread {
+public:
+	FilterThread(Filter* filter, int i);
+	~FilterThread();
+	
+private:
+	status_t Run();
+	static status_t worker_thread(void* data);
+	thread_id fWorkerThread;
+	Filter* fFilter;
+	int fI;
+};
 
 class Filter {
 public:
+	// The filter uses the input "image" as source image
+	// for an operation executed in Run() method which 
+	// writes into the destination image, that can be 
+	// retrieve using GetBitmap() method.
+	// GetBitmap() can be called any time, but it
+	// may contain "invalid" pixels.
+	// To start the operation Start() method has to
+	// be called. The operation is executed in as many
+	// threads as CPUs are active.
+	// IsRunning() is true as long as there are any
+	// threads running.
+	// The operation is complete when IsRunning() is false
+	// and Stop() has not been called.
+	// To abort an operation Stop() method has to
+	// be called. Stop() has to be called after Start().
+	// When the operation is done (and has not been aborted). 
+	// Then listener receives a message with the specified "what" value.
 	Filter(BBitmap* image, BMessenger listener, uint32 what);
 	virtual ~Filter();
 	
+	// The bitmap the filter writes into
 	BBitmap* GetBitmap();
 	
+	// Starts one or more FilterThreads
 	void Start();
+	// Has to be called after Start() (even if IsRunning() is false)
 	void Stop();
+	// Are there any running FilterThreads?
 	bool IsRunning() const;
-	volatile bool *IsRunningAddr() { return &fIsRunning; }
 
+	// To be implemented by inherited class
 	virtual BBitmap* CreateDestImage(BBitmap* srcImage) = 0;
-	virtual void Run() = 0;
+	// Should calculate part i of n of the image. i starts with zero
+	virtual void Run(int i, int n) = 0;
+
+	// Used by FilterThread only!
+	void Done();
+	int32 CPUCount() const { return fCPUCount; }
 
 protected:
 	BBitmap* GetSrcImage();
@@ -55,23 +100,32 @@ protected:
 private:
 	BMessenger fListener;
 	uint32 fWhat;
-	static status_t worker_thread(void* data);
+	int32 fCPUCount;
+	bool fStarted;
+	sem_id fWaitForThreads;
+	volatile int32 fNumberOfThreads;
 	volatile bool fIsRunning;
-	thread_id fWorkerThread;
 	BBitmap* fSrcImage;
 	BBitmap* fDestImage;		
+#if TIME_FILTER
+	BStopWatch* fStopWatch;
+#endif
 };
 
 class Scaler : public Filter {
 public:
-	Scaler(BBitmap* image, float scale, BMessenger listener, uint32 what);
+	Scaler(BBitmap* image, BRect rect, BMessenger listener, uint32 what);
 	~Scaler();
 
 	BBitmap* CreateDestImage(BBitmap* srcImage);
-	void Run();
-	float Scale() const { return fScale; }
+	void Run(int i, int n);
+	bool Matches(BRect rect) const;
+	
 private:
-	float fScale;	
+	void ScaleBilinear(int32 fromRow, int32 toRow);
+	void ScaleBilinearFP(int32 fromRow, int32 toRow);
+
+	BRect fRect;
 };
 
 #endif

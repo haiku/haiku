@@ -47,8 +47,12 @@ public:
 	
 	void SetImage(const entry_ref *pref);
 	void SetShowCaption(bool show);
-	void ResizeToViewBounds(bool resize);
-	bool GetResizeToViewBounds() const { return fResizeToViewBounds; }
+	void SetShrinkToBounds(bool enable);
+	bool GetShrinkToBounds() const { return fShrinkToBounds; }
+	void SetZoomToBounds(bool enable);
+	bool GetZoomToBounds() const { return fZoomToBounds; }
+	void SetBorder(bool hasBorder);
+	bool HasBorder() const { return fHasBorder; }
 	void SetAlignment(alignment horizontal, vertical_alignment vertical);
 	BBitmap *GetBitmap();
 	void GetName(BString *name);
@@ -67,6 +71,7 @@ public:
 
 	virtual void MessageReceived(BMessage *pmsg);
 	
+	void FixupScrollBar(orientation o, float bitmapLength, float viewLength);
 	void FixupScrollBars();
 	
 	int32 CurrentPage();
@@ -148,7 +153,7 @@ private:
 	void DrawCaption();
 	void EraseCaption();
 	void DrawSelectionBox(BRect &rect);
-	Scaler* GetScaler();
+	Scaler* GetScaler(BRect rect);
 	void DrawImage(BRect rect);
 	float LimitToRange(float v, orientation o, bool absolute);
 	void ScrollRestricted(float x, float y, bool absolute);
@@ -157,22 +162,24 @@ private:
 	void MouseWheelChanged(BMessage* msg);
 	void ShowPopUpMenu(BPoint screen);
 	
-	entry_ref fCurrentRef;
-	int32 fDocumentIndex;
-	int32 fDocumentCount;
-	BBitmap *fBitmap;
-	BBitmap *fSelBitmap;
-	float fZoom;
-	bool fScaleBilinear;
-	Scaler* fScaler;
-	bool fResizeToViewBounds;
-	alignment fHAlignment;
-	vertical_alignment fVAlignment;
+	entry_ref fCurrentRef; // of the image
+	int32 fDocumentIndex;  // of the image in the file
+	int32 fDocumentCount;  // number of images in the file
+	BBitmap *fBitmap;      // to be displayed
+	BBitmap *fSelBitmap;   // the bitmap in the selection
+	float fZoom;           // factor to be used to display the image
+	bool fScaleBilinear;   // use bilinear scaling?
+	Scaler* fScaler;       // holds the scaled image if bilinear scaling is enabled
+	bool fShrinkToBounds;  // shrink images to view bounds that are larger than the view
+	bool fZoomToBounds;    // zoom images to view bounds that are smaller than the view
+	bool fHasBorder;       // should the image have a border?
+	alignment fHAlignment; // horizontal alignment (left and centered only)
+	vertical_alignment fVAlignment; // vertical alignment (left and centered only)
 	float fLeft;         // the origin of the image in the view
 	float fTop;
-	float fScaleX;
+	float fScaleX;       // to convert image from/to view coordinates
 	float fScaleY;
-	bool fMovesImage;
+	bool fMovesImage;     // is the image being moved with the mouse
 	bool fMakesSelection; // is a selection being made
 	BPoint fFirstPoint;   // first point in image space of selection
 	bool fAnimateSelection; // marching ants
@@ -182,12 +189,12 @@ private:
 		// the portion of the background bitmap the selection is made from
 	pattern fPatternUp, fPatternDown, fPatternLeft, fPatternRight;
 	
-	bool fSlideShow;
-	int fSlideShowDelay;
-	int fSlideShowCountDown;
+	bool fSlideShow; // is slide show enabled?
+	int fSlideShowDelay; // in pulse rate units
+	int fSlideShowCountDown; // shows next image if it reaches zero
 	
-	bool fShowCaption;
-	BString fCaption;
+	bool fShowCaption; // display caption?
+	BString fCaption; // caption text
 };
 
 #endif /* _ShowImageView_h */

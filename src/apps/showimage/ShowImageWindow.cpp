@@ -212,19 +212,24 @@ ShowImageWindow::BuildViewMenu(BMenu *pmenu)
 	AddItemMenu(pmenu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, 'W', true);	
 	AddItemMenu(pmenu, "Scale Bilinear", MSG_SCALE_BILINEAR, 0, 0, 'W', true);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Shrink to Window", MSG_SHRINK_TO_WINDOW, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Zoom to Window", MSG_ZOOM_TO_WINDOW, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, 'W', true);
 	MarkMenuItem(pmenu, MSG_FULL_SCREEN, fFullScreen);
 	AddItemMenu(pmenu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0, 0, 'W', true);
 	MarkMenuItem(pmenu, MSG_SHOW_CAPTION, fShowCaption);
 
 	if (fpImageView) {
+		bool shrink, zoom, enabled;
 		MarkMenuItem(pmenu, MSG_SCALE_BILINEAR, fpImageView->GetScaleBilinear());
-		bool resize = fpImageView->GetResizeToViewBounds();
-		MarkMenuItem(pmenu, MSG_FIT_TO_WINDOW_SIZE, resize);
-		EnableMenuItem(pmenu, MSG_ORIGINAL_SIZE, !resize);
-		EnableMenuItem(pmenu, MSG_ZOOM_IN, !resize);
-		EnableMenuItem(pmenu, MSG_ZOOM_OUT, !resize);
+		shrink = fpImageView->GetShrinkToBounds();
+		zoom = fpImageView->GetZoomToBounds();
+		MarkMenuItem(pmenu, MSG_SHRINK_TO_WINDOW, shrink);
+		MarkMenuItem(pmenu, MSG_ZOOM_TO_WINDOW, zoom);
+	 	enabled = !(shrink || zoom);
+		EnableMenuItem(pmenu, MSG_ORIGINAL_SIZE, enabled);
+		EnableMenuItem(pmenu, MSG_ZOOM_IN, enabled);
+		EnableMenuItem(pmenu, MSG_ZOOM_OUT, enabled);
 	}
 }
 
@@ -413,6 +418,23 @@ ShowImageWindow::MarkSlideShowDelay(float value)
 	}
 }
 
+
+void
+ShowImageWindow::ResizeToWindow(bool shrink, uint32 what)
+{
+	bool enabled;
+	enabled = ToggleMenuItem(what);
+	if (shrink) {
+		fpImageView->SetShrinkToBounds(enabled);
+	} else {
+		fpImageView->SetZoomToBounds(enabled);
+	}
+	enabled = !(fpImageView->GetShrinkToBounds() || fpImageView->GetZoomToBounds());
+	EnableMenuItem(fpBar, MSG_ORIGINAL_SIZE, enabled);
+	EnableMenuItem(fpBar, MSG_ZOOM_IN, enabled);
+	EnableMenuItem(fpBar, MSG_ZOOM_OUT, enabled);
+}
+
 void
 ShowImageWindow::MessageReceived(BMessage *pmsg)
 {
@@ -571,15 +593,11 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			ToggleMenuItem(pmsg->what);
 			break;
 		
-		case MSG_FIT_TO_WINDOW_SIZE:
-			{
-				bool resize;
-				resize = ToggleMenuItem(pmsg->what);
-				fpImageView->ResizeToViewBounds(resize);
-				EnableMenuItem(fpBar, MSG_ORIGINAL_SIZE, !resize);
-				EnableMenuItem(fpBar, MSG_ZOOM_IN, !resize);
-				EnableMenuItem(fpBar, MSG_ZOOM_OUT, !resize);
-			}
+		case MSG_SHRINK_TO_WINDOW:
+			ResizeToWindow(true, pmsg->what);
+			break;
+		case MSG_ZOOM_TO_WINDOW:
+			ResizeToWindow(false, pmsg->what);
 			break;
 
 		case MSG_FILE_PREV:
@@ -768,6 +786,7 @@ ShowImageWindow::ToggleFullScreen()
 		SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
 		fpImageView->SetAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
 	}
+	fpImageView->SetBorder(!fFullScreen);
 	fpImageView->SetShowCaption(fFullScreen && fShowCaption);
 	MoveTo(frame.left, frame.top);
 	ResizeTo(frame.Width(), frame.Height());

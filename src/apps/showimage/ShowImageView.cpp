@@ -159,7 +159,9 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fDocumentCount = 1;
 	fAnimateSelection = true;
 	fbHasSelection = false;
-	fResizeToViewBounds = false;
+	fShrinkToBounds = false;
+	fZoomToBounds = false;
+	fHasBorder = true;
 	fHAlignment = B_ALIGN_LEFT;
 	fVAlignment = B_ALIGN_TOP;
 	fSlideShow = false;
@@ -317,10 +319,30 @@ ShowImageView::SetShowCaption(bool show)
 }
 
 void
-ShowImageView::ResizeToViewBounds(bool resize)
+ShowImageView::SetShrinkToBounds(bool enable)
 {
-	if (fResizeToViewBounds != resize) {
-		fResizeToViewBounds = resize;
+	if (fShrinkToBounds != enable) {
+		fShrinkToBounds = enable;
+		FixupScrollBars();
+		Invalidate();
+	}
+}
+
+void
+ShowImageView::SetZoomToBounds(bool enable)
+{
+	if (fZoomToBounds != enable) {
+		fZoomToBounds = enable;
+		FixupScrollBars();
+		Invalidate();
+	}
+}
+
+void
+ShowImageView::SetBorder(bool hasBorder)
+{
+	if (fHasBorder != hasBorder) {
+		fHasBorder = hasBorder;
 		FixupScrollBars();
 		Invalidate();
 	}
@@ -402,29 +424,27 @@ ShowImageView::AlignBitmap()
 	width = Bounds().Width()-2*PEN_SIZE+1;
 	height = Bounds().Height()-2*PEN_SIZE+1;
 	if (width == 0 || height == 0) return rect;
-	if (fResizeToViewBounds) {
+	if (fShrinkToBounds && (rect.Width() >= Bounds().Width() || rect.Height() >= Bounds().Height()) ||
+		fZoomToBounds && rect.Width() < Bounds().Width() && rect.Height() < Bounds().Height()) {
 		float s;
-		s = width / (rect.Width()+1);
+		s = width / (rect.Width()+1.0);
 			
-		if (s * rect.Height() <= height) {
-			// XXX temporary solution, fZoom should not be changed here
-			fZoom = s;
+		if (s * (rect.Height()+1.0) <= height) {
 			rect.right = width-1;
-			rect.bottom = static_cast<int>(s * (rect.Height()+1))-1;
+			rect.bottom = static_cast<int>(s * (rect.Height()+1.0))-1;
 			// center vertically
 			rect.OffsetBy(0, (height - rect.Height()) / 2);
 		} else {
-			// XXX temporary solution, fZoom should not be changed here
-			fZoom = height / (rect.Height()+1);
-			rect.right = static_cast<int>(fZoom * (rect.Width()+1))-1;
+			s = height / (rect.Height()+1.0);
+			rect.right = static_cast<int>(s * (rect.Width()+1.0))-1;
 			rect.bottom = height-1;
 			// center horizontally
 			rect.OffsetBy((width - rect.Width()) / 2, 0);
 		}
 	} else {
 		// zoom image
-		rect.right = static_cast<int>((rect.right+1)*fZoom)-1; 
-		rect.bottom = static_cast<int>((rect.bottom+1)*fZoom)-1;
+		rect.right = static_cast<int>((rect.right+1.0)*fZoom)-1; 
+		rect.bottom = static_cast<int>((rect.bottom+1.0)*fZoom)-1;
 		// align
 		switch (fHAlignment) {
 			case B_ALIGN_CENTER:
@@ -435,7 +455,9 @@ ShowImageView::AlignBitmap()
 				// fall through
 			default:
 			case B_ALIGN_LEFT:
-				rect.OffsetBy(BORDER_WIDTH, 0);
+				if (fHasBorder) {
+					rect.OffsetBy(BORDER_WIDTH, 0);
+				}
 				break;
 		}
 		switch (fVAlignment) {
@@ -447,7 +469,9 @@ ShowImageView::AlignBitmap()
 				// fall through
 			default:
 			case B_ALIGN_TOP:
-				rect.OffsetBy(0, BORDER_WIDTH);
+				if (fHasBorder) {
+					rect.OffsetBy(0, BORDER_WIDTH);
+				}
 				break;
 		}
 	}
@@ -460,8 +484,8 @@ ShowImageView::Setup(BRect rect)
 {
 	fLeft = rect.left;
 	fTop = rect.top;
-	fScaleX = (rect.Width()+1.0) / (fBitmap->Bounds().Width()+1.0);
-	fScaleY = (rect.Height()+1.0) / (fBitmap->Bounds().Height()+1.0);
+	fScaleX = rect.Width() / fBitmap->Bounds().Width();
+	fScaleY = rect.Height() / fBitmap->Bounds().Height();
 }
 
 BPoint
@@ -572,12 +596,12 @@ ShowImageView::EraseCaption()
 }
 
 Scaler*
-ShowImageView::GetScaler()
+ShowImageView::GetScaler(BRect rect)
 {
-	if (fScaler == NULL || fScaler->Scale() != fZoom) {
+	if (fScaler == NULL || !fScaler->Matches(rect)) {
 		DeleteScaler();
 		BMessenger msgr(this, Window());
-		fScaler = new Scaler(fBitmap, fZoom, msgr, MSG_INVALIDATE);
+		fScaler = new Scaler(fBitmap, rect, msgr, MSG_INVALIDATE);
 		fScaler->Start();
 	}
 	return fScaler;
@@ -587,7 +611,7 @@ void
 ShowImageView::DrawImage(BRect rect)
 {
 	if (fScaleBilinear) {
-		Scaler* scaler = GetScaler();
+		Scaler* scaler = GetScaler(rect);
 		if (scaler != NULL && scaler->GetBitmap() != NULL && !scaler->IsRunning()) {
 			BBitmap* bitmap = scaler->GetBitmap();
 			DrawBitmap(bitmap, BPoint(rect.left, rect.top));
@@ -847,10 +871,6 @@ ShowImageView::HandleDrop(BMessage* msg)
 	
 	sendInMessage = (!saveToFile) && msg->FindString("be:types", &type) == B_OK;
 
-	fprintf(stderr, "HandleDrop saveToFile %s, sendInMessage %s\n",
-		saveToFile ? "yes" : "no",
-		sendInMessage ? "yes" : "no");
-
 	bitmap = CopySelection();
 	if (bitmap == NULL) return;
 
@@ -1109,8 +1129,6 @@ ShowImageView::LimitToRange(float v, orientation o, bool absolute)
 void
 ShowImageView::ScrollRestricted(float x, float y, bool absolute)
 {
-	if (fResizeToViewBounds) return;
-	
 	if (x != 0) {
 		x = LimitToRange(x, B_HORIZONTAL, absolute);
 	}
@@ -1247,46 +1265,41 @@ ShowImageView::MessageReceived(BMessage *pmsg)
 }
 
 void
-ShowImageView::FixupScrollBars()
+ShowImageView::FixupScrollBar(orientation o, float bitmapLength, float viewLength)
 {
+	float prop, range;
 	BScrollBar *psb;	
 
-	if (fResizeToViewBounds) {
-		psb = ScrollBar(B_HORIZONTAL);
-		if (psb) psb->SetRange(0, 0);
-		psb = ScrollBar(B_VERTICAL);
-		if (psb) psb->SetRange(0, 0);
-		return;
+	psb = ScrollBar(o);
+	if (psb) {
+		if (fHasBorder) {
+			bitmapLength += BORDER_WIDTH*2;
+		}
+		range = bitmapLength - viewLength;
+		if (range < 0.0) {
+			range = 0.0;
+		}
+		prop = viewLength / bitmapLength;
+		if (prop > 1.0) {
+			prop = 1.0;
+		}
+		psb->SetRange(0, range);
+		psb->SetProportion(prop);
+		psb->SetSteps(10, 100);		
 	}
+}
 
+void
+ShowImageView::FixupScrollBars()
+{
 	BRect rctview = Bounds(), rctbitmap(0, 0, 0, 0);
 	if (fBitmap) {
 		BRect rect(AlignBitmap());
 		rctbitmap.Set(0, 0, rect.Width(), rect.Height());
 	}
 	
-	float prop, range;
-	psb = ScrollBar(B_HORIZONTAL);
-	if (psb) {
-		range = rctbitmap.Width() + (BORDER_WIDTH * 2) - rctview.Width();
-		if (range < 0) range = 0;
-		prop = rctview.Width() / (rctbitmap.Width() + (BORDER_WIDTH * 2));
-		if (prop > 1.0f) prop = 1.0f;
-		psb->SetRange(0, range);
-		psb->SetProportion(prop);
-		psb->SetSteps(10, 100);
-	}
-	
-	psb = ScrollBar(B_VERTICAL);
-	if (psb) {
-		range = rctbitmap.Height() + (BORDER_HEIGHT * 2) - rctview.Height();
-		if (range < 0) range = 0;
-		prop = rctview.Height() / (rctbitmap.Height() + (BORDER_HEIGHT * 2));
-		if (prop > 1.0f) prop = 1.0f;
-		psb->SetRange(0, range);
-		psb->SetProportion(prop);
-		psb->SetSteps(10, 100);
-	}
+	FixupScrollBar(B_HORIZONTAL, rctbitmap.Width(), rctview.Width());
+	FixupScrollBar(B_VERTICAL, rctbitmap.Height(), rctview.Height());
 }
 
 int32

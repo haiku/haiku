@@ -73,6 +73,7 @@ private:
 	void EnableMenuItem(BMenu *menu, uint32 what, bool enable);
 	void MarkMenuItem(BMenu *menu, uint32 what, bool marked);
 	void MarkSlideShowDelay(float value);
+	void ResizeToWindow(bool shrink, uint32 what);
 			
 	void SaveAs(BMessage *pmsg);
 		// Handle Save As submenu choice
