@@ -22,3 +22,6 @@ LinkSharedOSLibs mail_daemon :
 Package haiku-maildaemon-cvs :
 	mail_daemon : 
 	boot beos system servers ;
+
+Packages haiku-maildaemon-cvs :
+	README LICENSE install.sh ;
