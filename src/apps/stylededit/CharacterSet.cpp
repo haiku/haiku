@@ -192,8 +192,8 @@ CharacterSetRoster::CharacterSetRoster()
 		cs->aliases[0] = "iso-ir-127";
 		cs->aliases[1] = "ISO_8859-6";
 		cs->aliases[2] = cs->mime_name = "ISO-8859-6";
-		cs->aliases[5] = "ECMA-114";
-		cs->aliases[5] = "ASMO-708";
+		cs->aliases[3] = "ECMA-114";
+		cs->aliases[4] = "ASMO-708";
 		cs->aliases[5] = "arabic";
 		cs->aliases[6] = "csISOLatinArabic";
 		character_sets[cs->id] = cs;
@@ -209,8 +209,8 @@ CharacterSetRoster::CharacterSetRoster()
 		cs->aliases[0] = "iso-ir-126";
 		cs->aliases[1] = "ISO_8859-7";
 		cs->aliases[2] = cs->mime_name = "ISO-8859-7";
-		cs->aliases[5] = "ELOT_928";
-		cs->aliases[5] = "ECMA-118";
+		cs->aliases[3] = "ELOT_928";
+		cs->aliases[4] = "ECMA-118";
 		cs->aliases[5] = "greek";
 		cs->aliases[6] = "greek8";
 		cs->aliases[7] = "csISOLatinGreek";
