@@ -7,7 +7,6 @@
 
 
 #include <OS.h>
-#include <kernel.h>
 #include <debug.h>
 
 
