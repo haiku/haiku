@@ -102,8 +102,9 @@ Allocator::GetExtent(Udf::extent_address extent)
 					return B_OK;
 				}
 			}
-		}
-		
+			// No matching chunk found, we're SOL.
+			error = B_ERROR;
+		}		
 	}
 	return error;
 }
@@ -212,23 +213,26 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 			}			 
 		}
 		// No sufficient chunk found, so try to allocate from the tail
-		uint32 maxLength = LONG_MAX-Length();
-		if (minimumStartingBlock > Tail())
-			maxLength -= minimumStartingBlock - Tail();
-		uint32 tail = minimumStartingBlock > Tail() ? minimumStartingBlock : Tail();
-		if (length > maxLength) {
-			if (contiguous)
-				error = B_DEVICE_FULL;
-			else {
-				isPartial = true;
-				length = maxLength;
-			}
-		}
+		uint32 maxLength = BlocksFor(ULONG_MAX)-Length();
+		error = maxLength > 0 ? B_OK : B_DEVICE_FULL;
 		if (!error) {
-			Udf::extent_address newExtent(tail, isPartial ? length<<BlockShift() : _length);
-			if (GetExtent(newExtent) == B_OK) {
-				extent = newExtent;
-				return B_OK;
+			if (minimumStartingBlock > Tail())
+				maxLength -= minimumStartingBlock - Tail();
+			uint32 tail = minimumStartingBlock > Tail() ? minimumStartingBlock : Tail();
+			if (length > maxLength) {
+				if (contiguous)
+					error = B_DEVICE_FULL;
+				else {
+					isPartial = true;
+					length = maxLength;
+				}
+			}
+			if (!error) {
+				Udf::extent_address newExtent(tail, isPartial ? length<<BlockShift() : _length);
+				if (GetExtent(newExtent) == B_OK) {
+					extent = newExtent;
+					return B_OK;
+				}
 			}
 		}
 	}
