@@ -9,6 +9,7 @@
 #include <Looper.h>
 
 #include "RDiskDeviceList.h"
+#include "RVolumeList.h"
 
 class DiskDeviceManager : public BLooper {
 public:
@@ -19,6 +20,7 @@ public:
 
 private:
 	RDiskDeviceList	fDeviceList;
+	RVolumeList		fVolumeList;
 };
 
 #endif	// DISK_DEVICE_MANAGER_H

@@ -10,8 +10,11 @@
 // constructor
 DiskDeviceManager::DiskDeviceManager()
 	: BLooper("disk device manager"),
-	  fDeviceList()
+	  fDeviceList(),
+	  fVolumeList()
 {
+	AddHandler(&fVolumeList);
+	fVolumeList.Dump();
 	fDeviceList.Rescan();
 	fDeviceList.Dump();
 }
@@ -19,6 +22,9 @@ DiskDeviceManager::DiskDeviceManager()
 // destructor
 DiskDeviceManager::~DiskDeviceManager()
 {
+	Lock();
+	RemoveHandler(&fVolumeList);
+	Unlock();
 }
 
 // MessageReceived
