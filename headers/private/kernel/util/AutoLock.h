@@ -62,6 +62,12 @@ class AutoLocker {
 private:
 	typedef AutoLocker<Lockable, Locking>	ThisClass;
 public:
+	inline AutoLocker()
+		: fLockable(NULL),
+		  fLocked(false)
+	{
+	}
+
 	inline AutoLocker(Lockable *lockable, bool alreadyLocked = false)
 		: fLockable(lockable),
 		  fLocked(fLockable && alreadyLocked)
