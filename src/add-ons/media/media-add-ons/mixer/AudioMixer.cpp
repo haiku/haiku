@@ -100,23 +100,6 @@ AudioMixer::AddOn(int32 *internal_id) const
 }
 
 //
-// BControllable methods
-//
-
-status_t 
-AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change, 
-							  void *value, size_t *ioSize)
-{
-	return B_ERROR;
-}
-
-void 
-AudioMixer::SetParameterValue(int32 id, bigtime_t when, 
-							  const void *value, size_t size)
-{
-}
-
-//
 // BBufferConsumer methods
 //
 
@@ -308,11 +291,13 @@ AudioMixer::Connected(const media_source &producer, const media_destination &whe
 	fCore->AddInput(*out_input);
 
 	fCore->Unlock();
-
+	
 	// If we want the producer to use a specific BBufferGroup, we now need to call
 	// BMediaRoster::SetOutputBuffersFor() here to set the producer's buffer group.
 	// But we have no special buffer requirements anyway...
 	
+	UpdateParameterWeb();
+
 	return B_OK;
 }
 
@@ -334,6 +319,8 @@ AudioMixer::Disconnected(const media_source &producer, const media_destination &
 	}
 	
 	fCore->Unlock();
+	
+	UpdateParameterWeb();
 }
 
 status_t
@@ -686,6 +673,8 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	fCore->SetTimingInfo(TimeSource(), fDownstreamLatency);
 	fCore->SetOutputBufferGroup(fBufferGroup);
 	fCore->Unlock();
+
+	UpdateParameterWeb();
 }
 
 
@@ -716,6 +705,8 @@ AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 	fCore->SetOutputBufferGroup(0);
 	
 	fCore->Unlock();
+
+	UpdateParameterWeb();
 }
 
 
@@ -772,6 +763,7 @@ AudioMixer::NodeRegistered()
 #else
 		SetPriority(120);
 #endif
+	UpdateParameterWeb();
 }
 
 void
@@ -846,6 +838,197 @@ AudioMixer::CreateBufferGroup()
 	
 	TRACE("AudioMixer: allocating %ld buffers of %ld bytes each\n", count, size);
 	return new BBufferGroup(size, count);
+}
+
+//
+// BControllable methods
+//
+
+#define PARAM_INPUT(a)		(10*(a) + 0)
+#define PARAM_FORMAT(a) 	(10*(a) + 1)
+#define PARAM_MUTE(a)		(10*(a) + 2)
+#define PARAM_GAIN(a)		(10*(a) + 3)
+#define PARAM_OUTPUT(a)		(10*(a) + 4)
+#define PARAM(a)			((a) / 10)
+#define PARAM_IS_MUTE(a)	((a) % 10 == 2)
+#define PARAM_IS_GAIN(a)	((a) % 10 == 3)
+#define DB_TO_GAIN(_db)		(20.0 * log10(_db))
+#define GAIN_TO_DB(_gain)	(pow(10.0, (_gain) / 20.0))
+
+status_t 
+AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change, 
+							  void *value, size_t *ioSize)
+{
+	TRACE("GetParameterValue: id %ld, ioSize %ld\n", id, *ioSize);
+	int param = PARAM(id);
+	fCore->Lock();
+	if (param == 0) {
+		MixerOutput *output = fCore->Output();
+		if ((!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id)) || !output)
+			goto err;
+		if (PARAM_IS_MUTE(id)) {
+			// output mute control
+			printf("get output mute control size %d\n", *ioSize);
+			if (*ioSize < sizeof(int32))
+				goto err;
+			*ioSize = sizeof(int32);
+			static_cast<int32 *>(value)[0] = 0;
+		}
+		if (PARAM_IS_GAIN(id)) {
+			// output gain control
+			if (*ioSize < output->GetOutputChannelCount() * sizeof(float))
+				goto err;
+			*ioSize = output->GetOutputChannelCount() * sizeof(float);
+			for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
+				static_cast<float *>(value)[chan] = DB_TO_GAIN(output->GetOutputChannelGain(chan));
+		}
+	} else {
+		MixerInput *input;
+		for (int i = 0; (input = fCore->Input(i)); i++)
+			if (input->ID() == param)
+				break;
+		if ((!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id)) || !input)
+			goto err;
+		if (PARAM_IS_MUTE(id)) {
+			// input mute control
+			printf("get input mute control size %d\n", *ioSize);
+			if (*ioSize < sizeof(int32))
+				goto err;
+			*ioSize = sizeof(int32);
+			static_cast<int32 *>(value)[0] = 0;
+		}
+		if (PARAM_IS_GAIN(id)) {
+			// input gain control
+			if (*ioSize < input->GetMixerChannelCount() * sizeof(float))
+				goto err;
+			*ioSize = input->GetMixerChannelCount() * sizeof(float);
+			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
+				static_cast<float *>(value)[chan] = DB_TO_GAIN(input->GetMixerChannelGain(chan));
+		}
+	}
+	*last_change = TimeSource()->Now(); // XXX we could do better
+	fCore->Unlock();
+	return B_OK;
+err:
+	fCore->Unlock();
+	return B_ERROR;
+}
+
+void 
+AudioMixer::SetParameterValue(int32 id, bigtime_t when, 
+							  const void *value, size_t size)
+{
+	TRACE("SetParameterValue: id %ld, size %ld\n", id, size);
+	int param = PARAM(id);
+	fCore->Lock();
+	if (param == 0) {
+		MixerOutput *output = fCore->Output();
+		if ((!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id)) || !output)
+			goto err;
+		if (PARAM_IS_MUTE(id)) {
+			// output mute control
+			printf("set output mute control size %d\n", size);
+			if (size != sizeof(int32))
+				goto err;
+		}
+		if (PARAM_IS_GAIN(id)) {
+			// output gain control
+			if (size < output->GetOutputChannelCount() * sizeof(float))
+				goto err;
+			for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
+				output->SetOutputChannelGain(chan, GAIN_TO_DB(static_cast<float *>(value)[chan]));
+		}
+	} else {
+		MixerInput *input;
+		for (int i = 0; (input = fCore->Input(i)); i++)
+			if (input->ID() == param)
+				break;
+		if ((!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id)) || !input)
+			goto err;
+		if (PARAM_IS_MUTE(id)) {
+			// input mute control
+			printf("set input mute control size %d\n", size);
+			if (size != sizeof(int32))
+				goto err;
+		}
+		if (PARAM_IS_GAIN(id)) {
+			// input gain control
+			if (size < input->GetMixerChannelCount() * sizeof(float))
+				goto err;
+			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
+				input->SetMixerChannelGain(chan, GAIN_TO_DB(static_cast<float *>(value)[chan]));
+		}
+	}
+	BroadcastNewParameterValue(when, id, const_cast<void *>(value), size);
+err:
+	fCore->Unlock();
+}
+
+void
+AudioMixer::UpdateParameterWeb()
+{
+	fCore->Lock();
+	BParameterWeb *web = new BParameterWeb(); 
+	BParameterGroup *top;
+	BParameterGroup *output;
+	BParameterGroup *inputs;
+	BParameterGroup *outputchannels;
+	BParameterGroup *inputchannels;
+	BParameterGroup *group;
+	MixerInput *in;
+	MixerOutput *out;
+	
+	top = web->MakeGroup("Gain Controls"); // top level group
+	output = top->MakeGroup("");
+	inputs = top->MakeGroup("");
+	
+	group = output->MakeGroup("");
+	out = fCore->Output();
+	if (!out) {
+		group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Gain", B_WEB_BUFFER_INPUT); 
+		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
+	} else {
+		group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Gain", B_WEB_BUFFER_INPUT); 
+		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, StringForFormat(out), B_GENERIC);
+		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
+		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 0.5) 
+									   ->SetChannelCount(out->GetOutputChannelCount()); 
+		group->MakeNullParameter(PARAM_OUTPUT(0), B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT); 
+	}
+
+	if (!fCore->Input(0)) {
+		//group = inputs->MakeGroup("");
+		//group->MakeNullParameter(100, B_MEDIA_RAW_AUDIO, "Input", B_WEB_BUFFER_INPUT); 
+		//group->MakeNullParameter(100, B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
+	}
+	for (int i = 0; (in = fCore->Input(i)); i++) {
+		group = inputs->MakeGroup("");
+		group->MakeNullParameter(PARAM_INPUT(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_WEB_BUFFER_INPUT); 
+		group->MakeNullParameter(PARAM_FORMAT(in->ID()), B_MEDIA_RAW_AUDIO, StringForFormat(in), B_GENERIC);
+		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
+		group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 0.5) 
+									   ->SetChannelCount(in->GetMixerChannelCount()); 
+		group->MakeNullParameter(PARAM_OUTPUT(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
+	}
+
+	top = web->MakeGroup("Output Channels"); // top level group
+	outputchannels = top->MakeGroup("");
+	group = outputchannels->MakeGroup("");
+	
+	group->MakeNullParameter(10001, B_MEDIA_RAW_AUDIO, "Output Channel Sources", B_WEB_BUFFER_OUTPUT); 
+
+	top = web->MakeGroup("Input Channels"); // top level group
+	inputchannels = top->MakeGroup("");
+
+	group = inputchannels->MakeGroup("");
+	group->MakeNullParameter(10002, B_MEDIA_RAW_AUDIO, "Input Channel Sources 0", B_WEB_BUFFER_OUTPUT); 
+
+	group = inputchannels->MakeGroup("");
+	group->MakeNullParameter(10003, B_MEDIA_RAW_AUDIO, "Input Channel Sources 1", B_WEB_BUFFER_OUTPUT); 
+
+	SetParameterWeb(web);
+
+	fCore->Unlock();
 }
 
 #if USE_MEDIA_FORMAT_WORKAROUND

@@ -232,6 +232,7 @@ MixerOutput::GetOutputChannelDesignation(int channel)
 void
 MixerOutput::SetOutputChannelGain(int channel, float gain)
 {
+	TRACE("SetOutputChannelGain chan %d, gain %.5f\n", channel, gain);
 	if (channel < 0 || channel >= fOutputChannelCount)
 		return;
 	fOutputChannelInfo[channel].gain = gain;

@@ -536,7 +536,7 @@ MixerCore::MixThread()
 										reinterpret_cast<char *>(buf->Data()) + (i * bytes_per_sample(fOutput->MediaOutput().format.u.raw_audio)),
 										bytes_per_frame(fOutput->MediaOutput().format.u.raw_audio),
 										frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio),
-										1.0);
+										fOutput->GetOutputChannelGain(i));
 			}
 			PRINT(4, "send buffer, inframes %ld, outframes %ld\n", fMixBufferFrameCount, frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio));
 			

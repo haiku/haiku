@@ -1,6 +1,4 @@
-#include <MediaNode.h>
 #include <Buffer.h>
-#include <RealtimeAlloc.h>
 #include <string.h>
 #include <TimeSource.h> // XXX debug only
 #include "MixerInput.h"
@@ -423,6 +421,7 @@ MixerInput::GetMixerChannelCount()
 void
 MixerInput::SetMixerChannelGain(int channel, float gain)
 {
+	TRACE("SetMixerChannelGain chan %d, gain %.5f\n", channel, gain);
 	if (channel < 0 || channel >= fMixerChannelCount)
 		return;
 	if (gain < 0.0f)

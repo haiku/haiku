@@ -34,4 +34,10 @@ uint32 ChannelTypeToChannelMask(int type);
 double us_to_s(bigtime_t usecs);
 bigtime_t s_to_us(double secs);
 
+class MixerInput;
+class MixerOutput;
+
+const char *StringForFormat(MixerOutput *output);	// not thread save
+const char *StringForFormat(MixerInput *input);		// not thread save
+
 #endif //_MIXER_UTILS_H

@@ -42,8 +42,7 @@ class AudioMixer :
 		
 	// AudioMixer support
 					
-		
-		BParameterWeb	*	BuildParameterWeb(); // used to create the initial 'master' web
+		void				UpdateParameterWeb();
 		void				MakeWebForInput(char *name, media_format format);
 		
 		void				HandleInputBuffer(BBuffer *buffer, bigtime_t lateness);

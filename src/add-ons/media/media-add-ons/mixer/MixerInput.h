@@ -1,6 +1,8 @@
 #ifndef _MIXER_INPUT_H
 #define _MIXER_INPUT_H
 
+#include <RealtimeAlloc.h>
+#include <MediaNode.h>
 #include "debug.h"
 
 class MixerCore;

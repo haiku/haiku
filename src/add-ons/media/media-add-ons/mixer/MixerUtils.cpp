@@ -4,7 +4,11 @@
 #include <math.h>
 
 #include "MixerUtils.h"
+#include "MixerInput.h"
+#include "MixerOutput.h"
 #include "debug.h"
+
+const char *StringForFormat(const media_format & format, int index);
 
 void
 string_for_channel_mask(char *str, uint32 mask)
@@ -234,4 +238,54 @@ bigtime_t
 s_to_us(double secs)
 {
 	return (bigtime_t) (secs * 1000000.0);
+}
+
+const char *StringForFormat(const media_format & format, int index)
+{
+	static char str[2][50];
+	static char fmtstr[2][40];
+	const char *fmt;
+	switch (format.u.raw_audio.format) {
+		case media_raw_audio_format::B_AUDIO_FLOAT:
+			fmt = "float";
+			break;
+		case media_raw_audio_format::B_AUDIO_INT:
+			if (format.u.raw_audio.valid_bits != 0) {
+				sprintf(fmtstr[index & 1], "%d bit", format.u.raw_audio.valid_bits);
+				fmt = fmtstr[index & 1];
+			} else {
+				fmt = "32 bit";
+			}
+			break;
+		case media_raw_audio_format::B_AUDIO_SHORT:
+			fmt = "16 bit";
+			break;
+		case media_raw_audio_format::B_AUDIO_CHAR:
+			fmt = "8 bit";
+			break;
+		case media_raw_audio_format::B_AUDIO_UCHAR:
+			fmt = "8 bit unsigned";
+			break;
+		default:
+			fmt = "unknown";
+			break;
+	}
+	int a,b;
+	a = int(format.u.raw_audio.frame_rate + 0.05) / 1000;
+	b = int(format.u.raw_audio.frame_rate + 0.05) % 1000;
+	if (b)
+		sprintf(str[index & 1], "%d.%d kHz %s", a, b / 100, fmt);
+	else
+		sprintf(str[index & 1], "%d kHz %s", a, fmt);
+	return str[index & 1];
+}
+
+const char *StringForFormat(MixerOutput *output)
+{
+	return StringForFormat(output->MediaOutput().format, 0);
+}
+
+const char *StringForFormat(MixerInput *input)
+{
+	return StringForFormat(input->MediaInput().format, 1);
 }
