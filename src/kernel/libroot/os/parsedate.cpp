@@ -184,6 +184,7 @@ static const known_identifier kIdentifiers[] = {
 
 	{"years",		"year",	TYPE_UNIT, FLAG_RELATIVE, UNIT_YEAR, 1},
 	{"months",		"month",TYPE_UNIT, FLAG_RELATIVE, UNIT_MONTH, 1},
+	{"weeks",		"week",	TYPE_UNIT, FLAG_RELATIVE, UNIT_DAY, 7},
 	{"days",		"day",	TYPE_UNIT, FLAG_RELATIVE, UNIT_DAY, 1},
 	{"hour",		NULL,	TYPE_UNIT, FLAG_RELATIVE, UNIT_SECOND, 1 * 60 * 60},
 	{"hours",		"hrs",	TYPE_UNIT, FLAG_RELATIVE, UNIT_SECOND, 1 * 60 * 60},
@@ -384,6 +385,18 @@ preparseDate(const char *dateString, parsed_element *elements)
 			// skip number
 			while (isdigit(dateString[1]))
 				dateString++;
+			
+			// check for "1st", "2nd, "3rd", "4th", ...
+			
+			const char *suffixes[] = {"th", "st", "nd", "rd"};
+			const char *validSuffix = elements[index].value > 3 ? "th" : suffixes[elements[index].value];
+			if (!strncasecmp(dateString + 1, validSuffix, 2)
+				&& !isalpha(dateString[3])) {
+				// for now, just ignore the suffix - but we might be able
+				// to deduce some meaning out of it, since it's not really
+				// possible to put it in anywhere
+				dateString += 2;
+			}
 		} else if (isalpha(c)) {
 			// fetch whole string
 
@@ -536,7 +549,6 @@ computeDate(const char *format, bool *optional, parsed_element *elements, time_t
 	parsed_element *element = elements;
 	uint32 position = 0;
 	struct tm tm;
-	bool relative = false;
 
 	if (now == -1)
 		now = time(NULL);
