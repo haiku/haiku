@@ -12,7 +12,6 @@
 #include <LockerHelper.h>
 
 #include <cstring>
-//#include <netinet/in.h>
 #include <netinet/in_var.h>
 #include <core_funcs.h>
 #include <sys/sockio.h>
@@ -192,11 +191,11 @@ IPCP::Send(struct mbuf *packet, uint16 protocolNumber = IPCP_PROTOCOL)
 status_t
 IPCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
-	if(protocolNumber == IP_PROTOCOL)
-		return ReceiveIPPacket(packet, protocolNumber);
-	
 	if(!packet)
 		return B_ERROR;
+	
+	if(protocolNumber == IP_PROTOCOL)
+		return ReceiveIPPacket(packet, protocolNumber);
 	
 	if(protocolNumber != IPCP_PROTOCOL)
 		return PPP_UNHANDLED;
@@ -256,9 +255,6 @@ IPCP::ReceiveIPPacket(struct mbuf *packet, uint16 protocolNumber)
 {
 	if(protocolNumber != IP_PROTOCOL || State() != PPP_OPENED_STATE)
 		return PPP_UNHANDLED;
-	
-	if(!packet)
-		return B_ERROR;
 	
 	// TODO: add VJC support (the packet would be decoded here)
 	

@@ -49,8 +49,10 @@ uint32 NewHostUniq();
 void add_device(PPPoEDevice *device);
 void remove_device(PPPoEDevice *device);
 
+#if DEBUG
 // defined in PPPoEDevice.cpp
 void dump_packet(struct mbuf *packet);
+#endif // DEBUG
 
 
 #endif

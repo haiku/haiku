@@ -68,6 +68,9 @@ PPPoEDevice::PPPoEDevice(PPPInterface& interface, driver_parameter *settings)
 		printf("PPPoEDevice::ctor: No settings!\n");
 #endif
 	
+	interface.SetPFCOptions(PPP_ALLOW_PFC);
+		// we do not want to fail just because the other side requests PFC
+	
 	memset(fPeer, 0xFF, sizeof(fPeer));
 	SetMTU(1494);
 		// MTU size does not contain PPP header
@@ -249,7 +252,7 @@ PPPoEDevice::Down()
 	EthernetIfnet()->output(EthernetIfnet(), packet, &destination, NULL);
 	DownEvent();
 	
-	return false;
+	return true;
 }
 
 
@@ -284,16 +287,19 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 	dump_packet(packet);
 #endif
 	
-	if(InitCheck() != B_OK || protocolNumber != 0) {
+	if(!packet)
+		return B_ERROR;
+	else if(InitCheck() != B_OK || protocolNumber != 0) {
 		m_freem(packet);
 		return B_ERROR;
-	} else if(!packet)
-		return B_ERROR;
+	}
 	
 	LockerHelper locker(fLock);
 	
-	if(!IsUp())
+	if(!IsUp()) {
+		m_freem(packet);
 		return PPP_NO_CONNECTION;
+	}
 	
 	uint16 length = packet->m_flags & M_PKTHDR ? packet->m_pkthdr.len : packet->m_len;
 	
@@ -332,11 +338,12 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 status_t
 PPPoEDevice::Receive(struct mbuf *packet, uint16 protocolNumber = 0)
 {
-	if(InitCheck() != B_OK || IsDown()) {
+	if(!packet)
+		return B_ERROR;
+	else if(InitCheck() != B_OK || IsDown()) {
 		m_freem(packet);
 		return B_ERROR;
-	} else if(!packet)
-		return B_ERROR;
+	}
 	
 	complete_pppoe_header *completeHeader = mtod(packet, complete_pppoe_header*);
 	if(!completeHeader) {

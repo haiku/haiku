@@ -26,7 +26,7 @@ status_t
 _PPPPFCHandler::AddToRequest(PPPConfigurePacket& request)
 {
 	// is PFC not requested or was it rejected?
-	if(fLocalPFCState & PPP_PFC_REJECTED
+	if(fLocalPFCState == PPP_PFC_REJECTED
 			|| (Interface().PFCOptions() & PPP_REQUEST_PFC) == 0)
 		return B_OK;
 	

@@ -45,6 +45,9 @@ PPPLayer::InitCheck() const
 status_t
 PPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 {
+	if(!packet)
+		return B_ERROR;
+	
 	// Find the next possible handler for this packet.
 	// Normal protocols (Level() >= PPP_PROTOCOL_LEVEL) do not encapsulate anything.
 	if(Next()) {

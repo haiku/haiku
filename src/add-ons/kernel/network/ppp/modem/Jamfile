@@ -1,0 +1,22 @@
+SubDir OBOS_TOP src add-ons kernel network ppp modem ;
+
+# for kernel_cpp.h and BLocker
+UsePrivateHeaders net ;
+UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
+
+
+R5KernelAddon modem : kernel network ppp :
+	modem.cpp
+	ModemDevice.cpp
+	ACFCHandler.cpp
+;
+
+LinkSharedOSLibs modem : libkernelppp.a ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/home/config/add-ons/kernel/network/ppp
+	: modem ;

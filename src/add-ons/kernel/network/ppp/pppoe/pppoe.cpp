@@ -126,7 +126,7 @@ bool
 add_to(PPPInterface& mainInterface, PPPInterface *subInterface,
 	driver_parameter *settings, ppp_module_key_type type)
 {
-	if(type != PPP_DEVICE_KEY_TYPE)
+	if(mainInterface.Mode() != PPP_CLIENT_MODE || type != PPP_DEVICE_KEY_TYPE)
 		return B_ERROR;
 	
 	PPPoEDevice *device;

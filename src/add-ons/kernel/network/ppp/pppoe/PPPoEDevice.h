@@ -15,11 +15,11 @@
 
 enum pppoe_state {
 	INITIAL,
-		// the same as IsDown()
+		// the same as IsDown() == true
 	PADI_SENT,
 	PADR_SENT,
 	OPENED
-		// the same as IsUp()
+		// the same as IsUp() == true
 };
 
 

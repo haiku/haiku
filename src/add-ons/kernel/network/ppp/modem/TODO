@@ -1,0 +1,5 @@
+- get escape character from S-Register 2 (default: +)
+- get escape guard time from S-Register 12 (default: 1 second)
+- add support for server mode
+- add ACCM support (including ACCM option handler and encoding)
+- add chat login authentication (like terminal login)

@@ -1,0 +1,3 @@
+- add CHAP
+- add ISDN (CAPI)
+- add PPP over TCP/IP (this is a virtual device that uses TCP/IP to connect to some other PPP server on the net)

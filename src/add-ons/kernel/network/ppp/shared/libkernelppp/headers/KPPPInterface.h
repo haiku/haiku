@@ -146,7 +146,7 @@ class PPPInterface : public PPPLayer {
 				// the peer PFC state says if the peer accepted a request us
 				// i.e.: the peer might send PFC-compressed packets to us
 		bool UseLocalPFC() const
-			{ return LocalPFCState() & PPP_PFC_ACCEPTED; }
+			{ return LocalPFCState() == PPP_PFC_ACCEPTED; }
 		
 		virtual bool Up();
 			// in server mode Up() listens for an incoming connection

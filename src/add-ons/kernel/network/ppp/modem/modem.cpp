@@ -1,0 +1,97 @@
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//---------------------------------------------------------------------
+
+#include <core_funcs.h>
+#include <KernelExport.h>
+#include <driver_settings.h>
+
+#include <KPPPInterface.h>
+#include <KPPPModule.h>
+#include <LockerHelper.h>
+
+#include "ModemDevice.h"
+
+
+#ifdef _KERNEL_MODE
+	#define spawn_thread spawn_kernel_thread
+	#define printf dprintf
+#else
+	#include <cstdio>
+#endif
+
+
+#define MODEM_MODULE_NAME		"network/ppp/modem"
+
+struct core_module_info *core = NULL;
+status_t std_ops(int32 op, ...);
+
+
+static
+bool
+add_to(PPPInterface& mainInterface, PPPInterface *subInterface,
+	driver_parameter *settings, ppp_module_key_type type)
+{
+	if(mainInterface.Mode() != PPP_CLIENT_MODE || type != PPP_DEVICE_KEY_TYPE)
+		return B_ERROR;
+	
+	ModemDevice *device;
+	bool success;
+	if(subInterface) {
+		device = new ModemDevice(*subInterface, settings);
+		success = subInterface->SetDevice(device);
+	} else {
+		device = new ModemDevice(mainInterface, settings);
+		success = mainInterface.SetDevice(device);
+	}
+	
+#if DEBUG
+	printf("Modem: add_to(): %s\n",
+		success && device && device->InitCheck() == B_OK ? "OK" : "ERROR");
+#endif
+	
+	return success && device && device->InitCheck() == B_OK;
+}
+
+
+static ppp_module_info modem_module = {
+	{
+		MODEM_MODULE_NAME,
+		0,
+		std_ops
+	},
+	NULL,
+	add_to
+};
+
+
+_EXPORT
+status_t
+std_ops(int32 op, ...) 
+{
+	switch(op) {
+		case B_MODULE_INIT:
+			if(get_module(NET_CORE_MODULE_NAME, (module_info**)&core) != B_OK)
+				return B_ERROR;
+		return B_OK;
+		
+		case B_MODULE_UNINIT:
+			put_module(NET_CORE_MODULE_NAME);
+		break;
+		
+		default:
+			return B_ERROR;
+	}
+	
+	return B_OK;
+}
+
+
+_EXPORT
+module_info *modules[] = {
+	(module_info*) &modem_module,
+	NULL
+};
