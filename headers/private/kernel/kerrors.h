@@ -12,9 +12,7 @@
 
 /* General errors */
 #define ERR_GENERAL              -1
-#define ERR_NO_MEMORY            ENOMEM
 #define ERR_IO_ERROR             EIO
-#define ERR_INVALID_ARGS         EINVAL
 #define ERR_TIMED_OUT            ETIMEDOUT
 #define ERR_NOT_ALLOWED          EPERM
 #define ERR_PERMISSION_DENIED    EACCES
@@ -27,14 +25,7 @@
 #define ERR_NOT_IMPLEMENTED_YET  ERR_GENERAL-13
 
 /* Semaphore errors */
-#define ERR_SEM_GENERAL          -1024
-#define ERR_SEM_DELETED          ERR_SEM_GENERAL-1
-#define ERR_SEM_TIMED_OUT        ERR_SEM_GENERAL-2
-#define ERR_SEM_OUT_OF_SLOTS     ERR_SEM_GENERAL-3
-#define ERR_SEM_NOT_ACTIVE       ERR_SEM_GENERAL-4
-#define ERR_SEM_INTERRUPTED      ERR_SEM_GENERAL-5
-#define ERR_SEM_NOT_INTERRUPTABLE ERR_SEM_GENERAL-6
-#define ERR_SEM_NOT_FOUND        ERR_SEM_GENERAL-7
+#define ERR_SEM_NOT_INTERRUPTABLE -1030
 
 
 /* Tasker errors */
