@@ -28,21 +28,44 @@
 #	define __out dprintf
 #endif
 
-/*! \def DIE(x)
-	\brief Drops the user into the appropriate debugger (user or kernel)
-	after printing out the handy message bundled in the parenthesee
-	enclosed printf-style format string found in \a x.
-
-	\param x A printf-style format string enclosed in an extra set of parenteses,
-	         e.g. PRINT(("%d\n", 0));	
-*/
-#ifdef USER
-#	define DIE(x) debugger x
-#else
-#	define DIE(x) kernel_debugger x
-#endif
-
 int32 _get_debug_indent_level();
+
+/*! \brief Categories specifiable via the categoryFlags parameter to DEBUG_INIT()
+*/
+enum _DebugCategoryFlags {
+	// Function visibility categories
+	CF_ENTRY 			= 0x00000001,	//!< fs entry functions
+	CF_PUBLIC			= 0x00000002,	//!< public methods and global functions
+	CF_PRIVATE			= 0x00000004,	//!< private methods
+	
+	// Function type categories
+	CF_VOLUME_OPS		= 0x00000008,
+	CF_FILE_OPS			= 0x00000010,
+	CF_DIRECTORY_OPS	= 0x00000020,
+	CF_ATTRIBUTE_OPS	= 0x00000040,
+	CF_INDEX_OPS		= 0x00000080,
+	CF_QUERY_OPS		= 0x00000100,
+	
+	// Misc categories
+	CF_HIGH_VOLUME		= 0x00000200,	//!< often-called functions
+	
+	//-------------------------------
+	
+	// Handy combinations
+	CF_ALL				= 0xffffffff,
+	CF_ALL_VISIBILITIES = 0x00000007,
+	CF_ALL_OPS			= 0x000001f8,
+	CF_ALL_LOW_VOLUME	= ~CF_HIGH_VOLUME,
+};
+
+/*! \def CATEGORY_FILTER
+	\brief Bitmask of currently enabled debugging categories.
+*/
+#define CATEGORY_FILTER	CF_ALL
+//#define CATEGORY_FILTER	CF_ENTRY
+//#define CATEGORY_FILTER	(CF_ENTRY | CF_PUBLIC)
+//#define CATEGORY_FILTER	(CF_ENTRY | CF_PUBLIC | CF_PRIVATE)
+//#define CATEGORY_FILTER	(CF_ENTRY | CF_PUBLIC | CF_PRIVATE | CF_HIGH_VOLUME)
 
 /*! \brief Helper class that is allocated on the stack by
 	the \c DEBUG_INIT() macro. On creation, it increases the
@@ -52,160 +75,77 @@ int32 _get_debug_indent_level();
 class _DebugHelper
 {
 public:
-	_DebugHelper();
+	_DebugHelper(uint32 categoryFlags);
 	~_DebugHelper();
+	
+	uint32 CategoryFlags() { return fCategoryFlags; }
+	
+private:
+	uint32 fCategoryFlags;
 };
 
-//----------------------------------------------------------------------
-// Long-winded overview of the debug output macros:
-//----------------------------------------------------------------------
-/*! \def DEBUG_INIT()
-	\brief Increases the indentation level, prints out the enclosing function's
-	name, and creates a \c _DebugHelper object on the stack to automatically
-	decrease the indentation level upon function exit.
-	
-	This macro should be called at the very beginning of any function in
-	which you wish to use any of the other debugging macros.
-	
-	If DEBUG is undefined, does nothing.
-*/
-//----------------------------------------------------------------------
-/*! \def PRINT(x)
-	\brief Prints out the enclosing function's name followed by the contents
-	of \a x at the current indentation level.
-	
-	\param x A printf-style format string enclosed in an extra set of parenteses,
-	         e.g. PRINT(("%d\n", 0));
-	
-	If DEBUG is undefined, does nothing.
-*/
-//----------------------------------------------------------------------
-/*! \def LPRINT(x)
-	\brief Identical to \c PRINT(x), except that the line number in the source
-	file at which the macro is invoked is also printed.
-	
-	\param x A printf-style format string enclosed in an extra set of parenteses,
-	         e.g. PRINT(("%d\n", 0));
-	
-	If DEBUG is undefined, does nothing.
-*/
-//----------------------------------------------------------------------
-/*! \def SIMPLE_PRINT(x)
-	\brief Directly prints the contents of \a x with no extra formatting or
-	information included (just like a straight \c printf() call).
 
-	\param x A printf-style format string enclosed in an extra set of parenteses,
-	         e.g. PRINT(("%d\n", 0));
+//----------------------------------------------------------------------
+// NOTE: See UdfDebug.cpp for complete descriptions of the following
+// debug macros.
+//----------------------------------------------------------------------
 
-	If DEBUG is undefined, does nothing.
-*/	         
-//----------------------------------------------------------------------
-/*! \def PRINT_INDENT()
-	\brief Prints out enough indentation characters to indent the current line
-	to the current indentation level (assuming the cursor was flush left to
-	begin with...).
-	
-	This function is called by the other \c *PRINT* macros, and isn't really
-	intended for general consumption, but you might find it useful.
-	
-	If DEBUG is undefined, does nothing.
-*/
-//----------------------------------------------------------------------
-/*! \def REPORT_ERROR(err)
-	\brief Calls \c LPRINT(x) with a format string listing the error
-	code in \c err (assumed to be a \c status_t value) and the
-	corresponding text error code returned by a call to \c strerror().
-	
-	This function is called by the \c RETURN* macros, and isn't really
-	intended for general consumption, but you might find it useful.
-	
-	\param err A \c status_t error code to report.
-	
-	If DEBUG is undefined, does nothing.
-*/
-//----------------------------------------------------------------------
-/*! \def RETURN_ERROR(err)
-	\brief Calls \c REPORT_ERROR(err) if err is a an error code (i.e.
-	negative), otherwise remains silent. In either case, the enclosing
-	function is then exited with a call to \c "return err;".
-		
-	\param err A \c status_t error code to report (if negative) and return.
-	
-	If DEBUG is undefined, silently returns the value in \c err.
-*/
-//----------------------------------------------------------------------
-/*! \def RETURN(err)
-	\brief Prints out a description of the error code being returned
-	(which, in this case, may be either "erroneous" or "successful")
-	and then exits the enclosing function with a call to \c "return err;".
-		
-	\param err A \c status_t error code to report and return.
-	
-	If DEBUG is undefined, silently returns the value in \c err.
-*/
-//----------------------------------------------------------------------
-/*! \def FATAL(x)
-	\brief Prints out a fatal error message.
-	
-	This one's still a work in progress...
-
-	\param x A printf-style format string enclosed in an extra set of parenteses,
-	         e.g. PRINT(("%d\n", 0));
-	
-	If DEBUG is undefined, does nothing.
-*/
-//----------------------------------------------------------------------
-/*! \def INFORM(x)
-	\brief Directly prints the contents of \a x with no extra formatting or
-	information included (just like a straight \c printf() call). Does so
-	whether \c DEBUG is defined or not.
-
-	\param x A printf-style format string enclosed in an extra set of parenteses,
-	         e.g. PRINT(("%d\n", 0));
-
-	I'll say it again: Prints its output regardless to DEBUG being defined or
-	undefined.
-*/
-//----------------------------------------------------------------------
-/*! \def DBG(x)
-	\brief If debug is defined, \a x is passed along to the code and
-	executed unmodified. If \c DEBUG is undefined, the contents of
-	\a x disappear into the ether.
-	
-	\param x Damn near anything resembling valid C\C++.
-*/
 
 //----------------------------------------------------------------------
 // DEBUG-independent macros
 //----------------------------------------------------------------------
 #define INFORM(x) { __out("udf: "); __out x; }
+#ifdef USER
+#	define DIE(x) debugger x
+#else
+#	define DIE(x) kernel_debugger x
+#endif
 
 //----------------------------------------------------------------------
 // DEBUG-dependent macros
 //----------------------------------------------------------------------
 #ifdef DEBUG
-	#define DEBUG_INIT()					\
-		_DebugHelper _debug_helper_object;	\
+	#define DEBUG_INIT(categoryFlags)					\
+		_DebugHelper _debug_helper((categoryFlags));	\
 		PRINT(("\n"));
 
-	#define PRINT(x) {												\
-		PRINT_INDENT();												\
-		__out("udf(%ld): %s(): ", find_thread(NULL), __FUNCTION__);	\
-		__out x; 													\
+	#define PRINT(x) { 													\
+		if ((_debug_helper.CategoryFlags() & CATEGORY_FILTER)			\
+		       == _debug_helper.CategoryFlags()) 						\
+		{																\
+			PRINT_INDENT();												\
+			__out("udf(%ld): %s(): ", find_thread(NULL), __FUNCTION__);	\
+			__out x; 													\
+		} 																\
 	}
 
-	#define LPRINT(x) {																	\
-		PRINT_INDENT();																	\
-		__out("udf(%ld): %s(): line %d: ", find_thread(NULL), __FUNCTION__, __LINE__);	\
-		__out x;																		\
+	#define LPRINT(x) { 																	\
+		if ((_debug_helper.CategoryFlags() & CATEGORY_FILTER)								\
+		       == _debug_helper.CategoryFlags()) 											\
+		{																					\
+			PRINT_INDENT();																	\
+			__out("udf(%ld): %s(): line %d: ", find_thread(NULL), __FUNCTION__, __LINE__);	\
+			__out x;																		\
+		} 																					\
 	}
 
-	#define SIMPLE_PRINT(x) { __out x; }
+	#define SIMPLE_PRINT(x) { 									\
+		if ((_debug_helper.CategoryFlags() & CATEGORY_FILTER)	\
+		       == _debug_helper.CategoryFlags()) 				\
+		{														\
+			__out x; 											\
+		} 														\
+	}
 
-	#define PRINT_INDENT() {								\
-		int32 _level = _get_debug_indent_level();			\
-		for (int32 i = 0; i < _level-1; i++)				\
-			__out(" ");										\
+	#define PRINT_INDENT() { 									\
+		if ((_debug_helper.CategoryFlags() & CATEGORY_FILTER)	\
+		       == _debug_helper.CategoryFlags()) 				\
+		{														\
+			int32 _level = _get_debug_indent_level();			\
+			for (int32 i = 0; i < _level-1; i++) {				\
+				__out(" ");										\
+			}													\
+		}														\
 	}
 	
 	#define REPORT_ERROR(err) {											\
@@ -238,7 +178,7 @@ public:
 	#define DBG(x) x ;					
 	
 #else	// ifdef DEBUG
-	#define DEBUG_INIT() ;
+	#define DEBUG_INIT(x) ;
 	#define PRINT(x) ;
 	#define LPRINT(x) ;
 	#define SIMPLE_PRINT(x) ;

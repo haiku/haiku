@@ -17,12 +17,176 @@
 #include <TLS.h>
 
 //----------------------------------------------------------------------
+// Long-winded overview of the debug output macros:
+//----------------------------------------------------------------------
+/*! \def DEBUG_INIT(categoryFilter)
+	\brief Increases the indentation level, prints out the enclosing function's
+	name, and creates a \c _DebugHelper object on the stack to automatically
+	decrease the indentation level upon function exit.
+	
+	This macro should be called at the very beginning of any function in
+	which you wish to use any of the other debugging macros.
+	
+	\param categoryFilter Combination of _DebugCategoryFlags values specifying
+	       the category of the enclosing function.
+	
+	If DEBUG is undefined, does nothing.
+	
+	\note If the enclosing function's category flags are not part of the currently
+	defined CATEGORY_FILTER, printing will be suppressed.
+*/
+//----------------------------------------------------------------------
+/*! \def PRINT(x)
+	\brief Prints out the enclosing function's name followed by the contents
+	of \a x at the current indentation level.
+	
+	\param x A printf-style format string enclosed in an extra set of parenteses,
+	         e.g. PRINT(("%d\n", 0));
+	
+	If DEBUG is undefined, does nothing.
+
+	\note If the enclosing function's category flags are not part of the currently
+	defined CATEGORY_FILTER, printing will be suppressed.
+*/
+//----------------------------------------------------------------------
+/*! \def LPRINT(x)
+	\brief Identical to \c PRINT(x), except that the line number in the source
+	file at which the macro is invoked is also printed.
+	
+	\param x A printf-style format string enclosed in an extra set of parenteses,
+	         e.g. PRINT(("%d\n", 0));
+	
+	If DEBUG is undefined, does nothing.
+
+	\note If the enclosing function's category flags are not part of the currently
+	defined CATEGORY_FILTER, printing will be suppressed.
+*/
+//----------------------------------------------------------------------
+/*! \def SIMPLE_PRINT(x)
+	\brief Directly prints the contents of \a x with no extra formatting or
+	information included (just like a straight \c printf() call).
+
+	\param x A printf-style format string enclosed in an extra set of parenteses,
+	         e.g. PRINT(("%d\n", 0));
+
+	If DEBUG is undefined, does nothing.
+
+	\note If the enclosing function's category flags are not part of the currently
+	defined CATEGORY_FILTER, printing will be suppressed.
+*/	         
+//----------------------------------------------------------------------
+/*! \def PRINT_INDENT()
+	\brief Prints out enough indentation characters to indent the current line
+	to the current indentation level (assuming the cursor was flush left to
+	begin with...).
+	
+	This function is called by the other \c *PRINT* macros, and isn't really
+	intended for general consumption, but you might find it useful.
+	
+	If DEBUG is undefined, does nothing.
+
+	\note If the enclosing function's category flags are not part of the currently
+	defined CATEGORY_FILTER, printing will be suppressed.
+*/
+//----------------------------------------------------------------------
+/*! \def REPORT_ERROR(err)
+	\brief Calls \c LPRINT(x) with a format string listing the error
+	code in \c err (assumed to be a \c status_t value) and the
+	corresponding text error code returned by a call to \c strerror().
+	
+	This function is called by the \c RETURN* macros, and isn't really
+	intended for general consumption, but you might find it useful.
+	
+	\param err A \c status_t error code to report.
+	
+	If DEBUG is undefined, does nothing.
+
+	\note If the enclosing function's category flags are not part of the currently
+	defined CATEGORY_FILTER, printing will be suppressed.
+*/
+//----------------------------------------------------------------------
+/*! \def RETURN_ERROR(err)
+	\brief Calls \c REPORT_ERROR(err) if err is a an error code (i.e.
+	negative), otherwise remains silent. In either case, the enclosing
+	function is then exited with a call to \c "return err;".
+		
+	\param err A \c status_t error code to report (if negative) and return.
+	
+	If DEBUG is undefined, silently returns the value in \c err.
+
+	\note If the enclosing function's category flags are not part of the currently
+	defined CATEGORY_FILTER, printing will be suppressed.
+*/
+//----------------------------------------------------------------------
+/*! \def RETURN(err)
+	\brief Prints out a description of the error code being returned
+	(which, in this case, may be either "erroneous" or "successful")
+	and then exits the enclosing function with a call to \c "return err;".
+		
+	\param err A \c status_t error code to report and return.
+	
+	If DEBUG is undefined, silently returns the value in \c err.
+
+	\note If the enclosing function's category flags are not part of the currently
+	defined CATEGORY_FILTER, printing will be suppressed.
+*/
+//----------------------------------------------------------------------
+/*! \def FATAL(x)
+	\brief Prints out a fatal error message.
+	
+	This one's still a work in progress...
+
+	\param x A printf-style format string enclosed in an extra set of parenteses,
+	         e.g. PRINT(("%d\n", 0));
+	
+	If DEBUG is undefined, does nothing.
+
+	\note Category flags have no effect on this macro.
+*/
+//----------------------------------------------------------------------
+/*! \def INFORM(x)
+	\brief Directly prints the contents of \a x with no extra formatting or
+	information included (just like a straight \c printf() call). Does so
+	whether \c DEBUG is defined or not.
+
+	\param x A printf-style format string enclosed in an extra set of parenteses,
+	         e.g. PRINT(("%d\n", 0));
+
+	I'll say it again: Prints its output regardless to DEBUG being defined or
+	undefined.
+
+	\note Category flags have no effect on this macro.
+*/
+//----------------------------------------------------------------------
+/*! \def DBG(x)
+	\brief If debug is defined, \a x is passed along to the code and
+	executed unmodified. If \c DEBUG is undefined, the contents of
+	\a x disappear into the ether.
+	
+	\param x Damn near anything resembling valid C\C++.
+	
+	\note Category flags have no effect on this macro.
+*/
+//----------------------------------------------------------------------
+/*! \def DIE(x)
+	\brief Drops the user into the appropriate debugger (user or kernel)
+	after printing out the handy message bundled in the parenthesee
+	enclosed printf-style format string found in \a x.
+
+	\param x A printf-style format string enclosed in an extra set of parenteses,
+	         e.g. PRINT(("%d\n", 0));	
+*/
+
+
+//----------------------------------------------------------------------
 // declarations
 //----------------------------------------------------------------------
 
 static void indent();
 static void unindent();
-static int32 get_tls_handle();
+#ifdef USER
+	static int32 get_tls_handle();
+#endif
 
 //! Used to keep the tls handle from being allocated more than once.
 vint32 tls_spinlock = 0;
@@ -42,11 +206,18 @@ int32 tls_handle = 0;
 
 /*! \brief Returns the current debug indentation level for the
 	current thread.
+	
+	NOTE: indentation is currently unsupported for R5::kernelland due
+	to lack of thread local storage support.
 */
 int32
 _get_debug_indent_level()
 {
+#ifdef USER
 	return (int32)tls_get(get_tls_handle());
+#else
+	return 1;
+#endif
 }
 	
 //----------------------------------------------------------------------
@@ -59,7 +230,9 @@ _get_debug_indent_level()
 void
 indent()
 {
+#ifdef USER
 	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()+1));
+#endif
 }
 
 /*! \brief Decreases the current debug indentation level for
@@ -68,9 +241,12 @@ indent()
 void
 unindent()
 {
+#ifdef USER
 	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()-1));
+#endif
 }
 
+#ifdef USER
 /*! \brief Returns the thread local storage handle used to store
 	indentation information, allocating the handle first if
 	necessary.
@@ -94,6 +270,7 @@ get_tls_handle()
 	}
 	return tls_handle;
 }
+#endif
 
 //----------------------------------------------------------------------
 // _DebugHelper
@@ -101,15 +278,18 @@ get_tls_handle()
 
 /*! \brief Increases the current indentation level.
 */
-_DebugHelper::_DebugHelper()
+_DebugHelper::_DebugHelper(uint32 categoryFlags)
+	: fCategoryFlags(categoryFlags)
 {
-	indent();
+	if ((CategoryFlags() & CATEGORY_FILTER) == CategoryFlags())
+		indent();
 }
 
 /*! \brief Decreases the current indentation level.
 */
 _DebugHelper::~_DebugHelper()
 {
-	unindent();
+	if ((CategoryFlags() & CATEGORY_FILTER) == CategoryFlags())
+		unindent();
 }
 
