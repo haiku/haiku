@@ -390,29 +390,10 @@ dormant_flavor_info::Unflatten(type_code c,
 
 /* explicit */ 
 BMediaAddOn::BMediaAddOn(image_id image) :
-	_fImage(image),
-	_fAddon(0)
+	fImage(image),
+	fAddon(0)
 {
 	CALLED();
-	xfer_server_register_mediaaddon msg;
-	xfer_server_register_mediaaddon_reply reply;
-	port_id port;
-	status_t rv;
-	int32 code;
-	port = find_port("media_server port");
-	if (port <= B_OK)
-			return;
-	msg.reply_port = _PortPool->GetPort();
-	rv = write_port(port, SERVER_REGISTER_MEDIAADDON, &msg, sizeof(msg));
-	if (rv != B_OK) {
-		_PortPool->PutPort(msg.reply_port);
-		return;
-	}
-	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-	_PortPool->PutPort(msg.reply_port);
-	if (rv < B_OK)
-		return;
-	_fAddon = reply.addonid;
 }
 
 
@@ -420,15 +401,6 @@ BMediaAddOn::BMediaAddOn(image_id image) :
 BMediaAddOn::~BMediaAddOn()
 {
 	CALLED();
-	if (_fAddon != 0) {
-		xfer_server_unregister_mediaaddon msg;
-		port_id port;
-		port = find_port("media_server port");
-		if (port <= B_OK)
-			return;
-		msg.addonid = _fAddon;
-		write_port(port, SERVER_UNREGISTER_MEDIAADDON, &msg, sizeof(msg));
-	}
 }
 
 
@@ -558,14 +530,14 @@ BMediaAddOn::SniffTypeKind(const BMimeType &type,
 image_id
 BMediaAddOn::ImageID()
 {
-	return _fImage;
+	return fImage;
 }
 
 
 media_addon_id
 BMediaAddOn::AddonID()
 {
-	return _fAddon;
+	return fAddon;
 }
 
 /*************************************************************
@@ -575,7 +547,7 @@ BMediaAddOn::AddonID()
 status_t
 BMediaAddOn::NotifyFlavorChange()
 {
-	if (_fAddon == 0)
+	if (fAddon == 0)
 		return B_ERROR;
 	
 	port_id port;
@@ -584,7 +556,7 @@ BMediaAddOn::NotifyFlavorChange()
 		return B_ERROR;
 
 	xfer_addonserver_rescan_mediaaddon_flavors msg;
-	msg.addonid = _fAddon;
+	msg.addonid = fAddon;
 	return write_port(port, ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS, &msg, sizeof(msg));
 }
 
