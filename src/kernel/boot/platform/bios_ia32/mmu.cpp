@@ -25,7 +25,8 @@
  *	0x100000			kernel args
  *	0x101000			1st temporary page table (identity maps 0-4 MB)
  *	0x102000			2nd (4-8 MB)
- *	0x110000 -			free physical memory
+ *	0x110000			boot loader heap (32 kB)
+ *	0x118000 -			free physical memory
  *
  *	The first 8 MB are identity mapped (0x0 - 0x0800000); paging is turned
  *	on. The kernel is mapped at 0x80000000, all other stuff mapped by the
@@ -233,10 +234,33 @@ init_page_directory()
 
 
 extern "C" void *
-mmu_allocate(void */*virtualAddress*/, size_t size)
+mmu_allocate(void *virtualAddress, size_t size)
 {
+	printf("requested vaddr: %p, next free vaddr: 0x%lx, size: %ld\n",
+		virtualAddress, sNextVirtualAddress, size);
+
 	size = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 		// get number of pages to map
+
+	if (virtualAddress != NULL) {
+		// This special path is almost only useful for loading the
+		// kernel into memory; it will only allow you to map the
+		// 1 MB following the kernel base address.
+		// Also, it won't check for already mapped addresses, so
+		// you better know why you are here :)
+		addr_t address = (addr_t)virtualAddress;
+
+		// is the address within the valid range?
+		if (address < KERNEL_BASE || address + size >= KERNEL_BASE + 0x100000)
+			return NULL;
+		
+		for (uint32 i = 0; i < size; i++) {
+			map_page(address, get_next_physical_page(), kDefaultPageFlags);
+			address += B_PAGE_SIZE;
+		}
+
+		return virtualAddress;
+	}
 
 	void *address = (void *)sNextVirtualAddress;
 
@@ -445,4 +469,50 @@ mmu_init(void)
 
 	ka->arch_args.page_hole = 0xffc00000;
 }
+
+
+//	#pragma mark -
+
+
+extern "C" status_t
+platform_allocate_region(void **_address, size_t size, uint8 protection)
+{
+	void *address = mmu_allocate(*_address, size);
+	if (address == NULL)
+		return B_NO_MEMORY;
+
+	*_address = address;
+	return B_OK;
+}
+
+
+extern "C" status_t
+platform_free_region(void *address, size_t size)
+{
+	puts(__FUNCTION__);
+	return B_ERROR;
+}
+
+
+void
+platform_release_heap(struct stage2_args *args, void *base)
+{
+	// It will be freed automatically, since it is in the
+	// identity mapped region, and not stored in the kernel's
+	// page tables.
+}
+
+
+status_t
+platform_init_heap(struct stage2_args *args, void **_base, void **_top)
+{
+	void *heap = (void *)get_next_physical_address(args->heap_size);
+	if (heap == NULL)
+		return B_NO_MEMORY;
+
+	*_base = heap;
+	*_top = (void *)((int8 *)heap + args->heap_size);
+	return B_OK;
+}
+
 

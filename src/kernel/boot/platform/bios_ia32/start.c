@@ -51,42 +51,6 @@ platform_user_menu_requested(void)
 }
 
 
-status_t
-platform_allocate_region(void **_address, size_t size, uint8 protection)
-{
-	puts(__FUNCTION__);
-	return B_ERROR;
-}
-
-
-status_t
-platform_free_region(void *address, size_t size)
-{
-	puts(__FUNCTION__);
-	return B_ERROR;
-}
-
-
-void
-platform_release_heap(struct stage2_args *args, void *base)
-{
-	mmu_free(base, args->heap_size);
-}
-
-
-status_t
-platform_init_heap(struct stage2_args *args, void **_base, void **_top)
-{
-	void *heap = mmu_allocate(NULL, args->heap_size);
-	if (heap == NULL)
-		return B_NO_MEMORY;
-
-	*_base = heap;
-	*_top = (void *)((int8 *)heap + args->heap_size);
-	return B_OK;
-}
-
-
 void
 _start(void)
 {
