@@ -552,6 +552,8 @@ void RootLayer::SetActiveWorkspace(int32 index)
 		}
 	}
 
+	desktop->Unlock();
+
 	if (ActiveWorkspace()->Focus())
 	{
 		BMessage	activateMsg(B_WINDOW_ACTIVATED);
@@ -609,10 +611,6 @@ void RootLayer::SetActiveWorkspace(int32 index)
 // TODO: if the user is holding/moving a window, *IF* the window *is not*
 //       in future active workspace, remove from curent one and place in
 //       future active workspace.
-
-	// RootLayer::Invalidate(&RootLayer's fFullVisible)
-
-	desktop->Unlock();
 }
 
 void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex)
@@ -1360,7 +1358,19 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					{
 						STRACE(("Set Workspace %ld\n",scancode-1));
 						//TODO: SetWorkspace in KeyboardEventHandler
-						//SetWorkspace(scancode-2);
+						if (scancode - 1 > 0 && scancode -1 <= fWsCount
+							&& scancode - 2 != fActiveWksIndex)
+						{
+							WinBorder		*exFocus = FocusWinBorder();
+
+							SetActiveWorkspace(scancode-2);
+
+							get_workspace_windows();
+
+							invalidate_layer(this, fFull);
+
+							draw_window_tab(exFocus, FocusWinBorder());
+						}
 						if (string)
 							free(string);
 						break;
