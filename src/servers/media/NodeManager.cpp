@@ -5,6 +5,8 @@
 #include <OS.h>
 #include <Entry.h>
 #include <Message.h>
+#include <Locker.h>
+#include <Autolock.h>
 #include <Messenger.h>
 #include <MediaDefs.h>
 #include <MediaAddOn.h>
@@ -13,12 +15,11 @@
 #include "debug.h"
 #include "NodeManager.h"
 
-// XXX locking is missing
-
 NodeManager::NodeManager() :
 	nextaddonid(1),
 	nextnodeid(1)
 {
+	fLocker = new BLocker("node manager locker");
 	fDormantFlavorList = new List<dormant_flavor_info>;
 	fAddonPathMap = new Map<media_addon_id,entry_ref>;
 	fRegisteredNodeMap = new Map<media_node_id,registered_node>;
@@ -27,6 +28,7 @@ NodeManager::NodeManager() :
 
 NodeManager::~NodeManager()
 {
+	delete fLocker;
 	delete fDormantFlavorList;
 	delete fAddonPathMap;
 	delete fRegisteredNodeMap;
@@ -36,6 +38,7 @@ NodeManager::~NodeManager()
 status_t
 NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 addon_flavor_id, const char *name, uint64 kinds, port_id port, team_id team)
 {
+	BAutolock lock(fLocker);
 	bool b;
 	registered_node rn;
 	rn.nodeid = nextnodeid;
@@ -60,6 +63,7 @@ NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 
 status_t
 NodeManager::UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team_id team)
 {
+	BAutolock lock(fLocker);
 	bool b;
 	registered_node *rn;
 	TRACE("NodeManager::UnregisterNode enter: node %ld, team %ld\n", nodeid, team);
@@ -87,6 +91,7 @@ NodeManager::UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team
 status_t
 NodeManager::IncrementGlobalRefCount(media_node_id nodeid, team_id team)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	bool b;
 	TRACE("NodeManager::IncrementGlobalRefCount enter: node %ld, team %ld\n", nodeid, team);
@@ -115,6 +120,7 @@ NodeManager::IncrementGlobalRefCount(media_node_id nodeid, team_id team)
 status_t
 NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	bool b;
 	TRACE("NodeManager::DecrementGlobalRefCount enter: node %ld, team %ld\n", nodeid, team);
@@ -144,6 +150,7 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 status_t
 NodeManager::GetCloneForId(media_node *node, media_node_id nodeid, team_id team)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	bool b;
 	TRACE("NodeManager::GetCloneForId enter: node %ld team %ld\n", nodeid, team);
@@ -171,6 +178,7 @@ NodeManager::GetCloneForId(media_node *node, media_node_id nodeid, team_id team)
 status_t
 NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_type type, team_id team)
 {
+	BAutolock lock(fLocker);
 	TRACE("!!! NodeManager::GetClone not implemented\n");
 	*node = media_node::null;
 	return B_ERROR;
@@ -180,6 +188,7 @@ NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_
 status_t
 NodeManager::ReleaseNode(const media_node &node, team_id team)
 {
+	BAutolock lock(fLocker);
 	TRACE("NodeManager::ReleaseNode enter: node %ld team %ld\n", node.node, team);
 	if (B_OK != DecrementGlobalRefCount(node.node, team)) {
 		TRACE("!!! NodeManager::ReleaseNode: Error: couldn't decrement node %ld team %ld ref count\n", node.node, team);
@@ -192,6 +201,7 @@ NodeManager::ReleaseNode(const media_node &node, team_id team)
 status_t
 NodeManager::PublishInputs(const media_node &node, const media_input *inputs, int32 count)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	bool b;
 	b = fRegisteredNodeMap->GetPointer(node.node, &rn);
@@ -209,6 +219,7 @@ NodeManager::PublishInputs(const media_node &node, const media_input *inputs, in
 status_t
 NodeManager::PublishOutputs(const media_node &node, const media_output *outputs, int32 count)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	bool b;
 	b = fRegisteredNodeMap->GetPointer(node.node, &rn);
@@ -226,6 +237,7 @@ NodeManager::PublishOutputs(const media_node &node, const media_output *outputs,
 status_t
 NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	for (int32 i = 0; fRegisteredNodeMap->GetPointerAt(i, &rn); i++) {
 		if (rn->port == port) {
@@ -258,6 +270,7 @@ NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
 status_t
 NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	for (int32 i = 0; fRegisteredNodeMap->GetPointerAt(i, &rn); i++) {
 		if (rn->nodeid == node.node) {
@@ -278,6 +291,7 @@ NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
 status_t
 NodeManager::GetInstances(media_node_id *node_ids, int32* count, int32 maxcount, media_addon_id addon_id, int32 addon_flavor_id)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	*count = 0;
 	for (int32 i = 0; (maxcount > 0) &&  fRegisteredNodeMap->GetPointerAt(i, &rn); i++) {
@@ -295,6 +309,7 @@ NodeManager::GetInstances(media_node_id *node_ids, int32* count, int32 maxcount,
 status_t
 NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, const media_format *inputformat /* = NULL */, const media_format *outputformat /* = NULL */, const char* name /* = NULL */, uint64 require_kinds /* = 0 */)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	int namelen;
 
@@ -358,6 +373,7 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 status_t
 NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &node)
 {
+	BAutolock lock(fLocker);
 	// XXX not sure if this is correct
 	registered_node *rn;
 	for (int32 i = 0; fRegisteredNodeMap->GetPointerAt(i, &rn); i++) {
@@ -382,6 +398,7 @@ NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &
 status_t
 NodeManager::GetLiveNodes(BMessage *msg)
 {
+	BAutolock lock(fLocker);
 	registered_node *rn;
 	for (int32 i = 0; fRegisteredNodeMap->GetPointerAt(i, &rn); i++)
 		msg->AddInt32("media_node_id", rn->nodeid);
@@ -391,6 +408,7 @@ NodeManager::GetLiveNodes(BMessage *msg)
 void 
 NodeManager::RegisterAddon(const entry_ref &ref, media_addon_id *newid)
 {
+	BAutolock lock(fLocker);
 	media_addon_id id;
 	id = nextaddonid;
 	nextaddonid += 1;
@@ -402,6 +420,7 @@ NodeManager::RegisterAddon(const entry_ref &ref, media_addon_id *newid)
 void
 NodeManager::UnregisterAddon(media_addon_id id)
 {
+	BAutolock lock(fLocker);
 	RemoveDormantFlavorInfo(id);
 	fAddonPathMap->Remove(id);
 }
@@ -409,18 +428,21 @@ NodeManager::UnregisterAddon(media_addon_id id)
 void
 NodeManager::AddDormantFlavorInfo(const dormant_flavor_info &dfi)
 {
+	BAutolock lock(fLocker);
 	fDormantFlavorList->Insert(dfi);
 }
 
 void
 NodeManager::RemoveDormantFlavorInfo(media_addon_id id)
 {
+	BAutolock lock(fLocker);
 	UNIMPLEMENTED();
 }
 
 status_t
 NodeManager::GetAddonRef(entry_ref *ref, media_addon_id id)
 {
+	BAutolock lock(fLocker);
 	return fAddonPathMap->Get(id, ref) ? B_OK : B_ERROR;
 }
 
@@ -433,6 +455,7 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 							  uint64 require_kinds /* = NULL */,
 							  uint64 deny_kinds /* = NULL */)
 {
+	BAutolock lock(fLocker);
 	int32 maxcount;
 	int32 index;
 	dormant_flavor_info dfi;
@@ -492,9 +515,16 @@ NodeManager::GetDormantFlavorInfoFor(media_addon_id addon,
 									 int32 flavor_id,
 									 dormant_flavor_info *outFlavor)
 {
+	BAutolock lock(fLocker);
 	for (int32 index = 0; fDormantFlavorList->GetAt(index, outFlavor); index++) {
 		if (outFlavor->node_info.addon == addon && outFlavor->node_info.flavor_id == flavor_id)
 			return B_OK;
 	}
 	return B_ERROR;
+}
+
+void
+NodeManager::CleanupTeam(team_id team)
+{
+	BAutolock lock(fLocker);
 }

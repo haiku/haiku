@@ -17,6 +17,7 @@
 status_t				
 BBufferGroup::InitBufferGroup()
 {
+	CALLED();
 	area_id id;
 	
 	// some defaults

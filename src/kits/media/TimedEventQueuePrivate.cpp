@@ -16,7 +16,7 @@
 #include "debug.h"
 
 _event_queue_imp::_event_queue_imp() :
-	fLock("BTimedEventQueue locker"),
+	fLock(new BLocker("BTimedEventQueue locker")),
 	fEventCount(0),
 	fFirstEntry(NULL),
 	fLastEntry(NULL),
@@ -36,6 +36,7 @@ _event_queue_imp::~_event_queue_imp()
 		entry = entry->next;
 		delete deleteme;
 	}
+	delete fLock;
 }
 
 	

@@ -70,7 +70,7 @@ void
 BBuffer::SetSizeUsed(size_t size_used)
 {
 	CALLED();
-	fMediaHeader.size_used = min_c(size_used,fSize);
+	fMediaHeader.size_used = min_c(size_used, fSize);
 }
 
 

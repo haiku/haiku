@@ -1,4 +1,4 @@
-/* 
+	/* 
  * Copyright 2002, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -133,6 +133,12 @@ BufferManager::UnregisterBuffer(team_id teamid, media_buffer_id bufferid)
 	TRACE("failed to unregister buffer! team = 0x%08x, bufferid = 0x%08x\n",(int)teamid,(int)bufferid);
 	return B_ERROR;
 }
+
+void
+BufferManager::CleanupTeam(team_id teamid)
+{
+}
+
 
 void
 BufferManager::PrintToStream()

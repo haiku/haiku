@@ -41,7 +41,7 @@ namespace media {
 
 DormantNodeManager::DormantNodeManager()
 {
-	fLock = new BLocker();
+	fLock = new BLocker("dormant node manager locker");
 	fAddonmap = new Map<media_addon_id,loaded_addon_info>;
 }
 

@@ -10,6 +10,7 @@
 #include "BufferManager.h"
 #include "NodeManager.h"
 #include "AppManager.h"
+#include "media_server.h"
 #define DEBUG 1
 #include <Debug.h>
 #include "debug.h"
@@ -86,7 +87,7 @@ private:
 
 ServerApp::ServerApp()
  	: BApplication(NEW_MEDIA_SERVER_SIGNATURE),
-	fLocker(new BLocker("server locker"))
+	fLocker(new BLocker("media server locker"))
 {
 	//load volume settings from config file
 	//mVolumeLeft = ???;

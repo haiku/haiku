@@ -83,10 +83,13 @@ public:
 									 int32 flavor_id,
 									 dormant_flavor_info *outFlavor);
 
+	void CleanupTeam(team_id team);
+	
 private:
 	media_addon_id nextaddonid;
 	media_node_id nextnodeid;
 	
+	BLocker *fLocker;
 	List<dormant_flavor_info> *fDormantFlavorList;
 	Map<media_addon_id,entry_ref> *fAddonPathMap;
 	Map<media_node_id,registered_node> *fRegisteredNodeMap;

@@ -15,12 +15,16 @@
 #include <stdio.h>
 #include <Debug.h>
 #include "AppManager.h"
+#include "NodeManager.h"
+#include "BufferManager.h"
+#include "NotificationManager.h"
+#include "media_server.h"
 
 AppManager::AppManager()
  :	fAddonServer(-1)
 {
 	fAppMap = new Map<team_id, App>;
-	fLocker = new BLocker;
+	fLocker = new BLocker("app manager locker");
 	fQuit = create_sem(0, "big brother waits");
 	fBigBrother = spawn_thread(bigbrother, "big brother is watching you", B_NORMAL_PRIORITY, this);
 	resume_thread(fBigBrother);
@@ -174,6 +178,9 @@ void AppManager::CleanupTeam(team_id team)
 
 	printf("AppManager: cleaning up team %ld\n", team);
 
+	gNodeManager->CleanupTeam(team);
+	gBufferManager->CleanupTeam(team);
+	gNotificationManager->CleanupTeam(team);
 }
 
 void AppManager::CleanupAddonServer()

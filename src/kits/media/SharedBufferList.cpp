@@ -50,12 +50,13 @@ _shared_buffer_list::Clone(area_id id)
 		//TRACE("cloned area, id = 0x%08lx, ptr = 0x%08x\n",status,(int)adr);
 	}
 	
-	return (status < B_OK) ? NULL : adr;
+	return (status < B_OK) ? 	NULL : adr;
 }
 
 void
 _shared_buffer_list::Unmap()
 {
+	CALLED();
 	// unmap the memory used by this struct
 	// XXX is this save?
 	area_id id;

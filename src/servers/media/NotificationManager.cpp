@@ -13,9 +13,8 @@
 #include "DataExchange.h"
 #include "Notifications.h"
 #include "NotificationManager.h"
+#include "media_server.h"
 #include "Queue.h"
-
-extern NodeManager *gNodeManager;
 
 
 #define NOTIFICATION_THREAD_PRIORITY 19
@@ -24,7 +23,7 @@ extern NodeManager *gNodeManager;
 NotificationManager::NotificationManager()
  :	fNotificationQueue(new Queue),
 	fNotificationThreadId(-1),
-	fLocker(new BLocker),
+	fLocker(new BLocker("notification manager locker")),
 	fNotificationList(new List<Notification>)
 {
 	fNotificationThreadId = spawn_thread(NotificationManager::worker_thread, "notification broadcast", NOTIFICATION_THREAD_PRIORITY, this);

@@ -67,7 +67,7 @@ private:
 	event_queue_entry *GetEnd_BeforeTime(bigtime_t eventTime, bool inclusive);
 	event_queue_entry *GetStart_AfterTime(bigtime_t eventTime, bool inclusive);
 
-	BLocker				fLock;
+	BLocker *			fLock;
 	int32				fEventCount;
 	event_queue_entry 	*fFirstEntry;
 	event_queue_entry 	*fLastEntry;

@@ -309,7 +309,7 @@ BMediaFormats::find_addons(
 int32 BMediaFormats::s_cleared;
 BMessenger BMediaFormats::s_server;
 BList BMediaFormats::s_formats;
-BLocker BMediaFormats::s_lock;
+BLocker BMediaFormats::s_lock("BMediaFormats locker");
 
 /*************************************************************
  * 

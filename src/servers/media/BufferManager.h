@@ -19,6 +19,8 @@ public:
 							   media_buffer_id *bufferid);
 
 	status_t	UnregisterBuffer(team_id teamid, media_buffer_id bufferid);
+	
+	void		CleanupTeam(team_id teamid);
 
 	void 		PrintToStream();
 

@@ -20,8 +20,8 @@
 
 Queue::Queue()
  :	fList(new BList),
-	fLocker(new BLocker),
-	fSem(create_sem(0,"queue sem"))
+	fLocker(new BLocker("queue locker")),
+	fSem(create_sem(0, "queue sem"))
 {
 }
 
