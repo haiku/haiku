@@ -87,15 +87,12 @@ KDiskDeviceJobGenerator::GenerateJobs()
 		|| fJobQueue->Device() != fDevice || !fDevice->ShadowPartition()) {
 		return B_BAD_VALUE;
 	}
-	// Generate jobs for all physical partitions that don't have an associated
-	// shadow partition, i.e. those that shall be deleted.
-	status_t error = _GenerateDeleteChildJobs(fDevice);
-	if (error != B_OK)
-		return error;
-	// Generate uninitialize jobs for all partition whose initialization
+	// 1) Generate jobs for all physical partitions that don't have an
+	// associated shadow partition, i.e. those that shall be deleted.
+	// 2) Generate uninitialize jobs for all partition whose initialization
 	// changes, also those that shall be initialized with a disk system.
 	// This simplifies moving and resizing.
-	error = _GenerateUninitializeJobs(fDevice);
+	status_t error = _GenerateCleanupJobs(fDevice);
 	if (error != B_OK)
 		return error;
 	// Generate jobs that move and resize the remaining physical partitions
@@ -109,7 +106,7 @@ KDiskDeviceJobGenerator::GenerateJobs()
 	error = _GenerateRemainingJobs(NULL, fDevice->ShadowPartition());
 	if (error != B_OK)
 		return error;
-	return B_ERROR;
+	return B_OK;
 }
 
 // _AddJob
@@ -125,32 +122,12 @@ KDiskDeviceJobGenerator::_AddJob(KDiskDeviceJob *job)
 	return B_OK;
 }
 
-
-// _GenerateDeleteChildJobs
+// _GenerateCleanupJobs
 status_t
-KDiskDeviceJobGenerator::_GenerateDeleteChildJobs(KPartition *partition)
+KDiskDeviceJobGenerator::_GenerateCleanupJobs(KPartition *partition)
 {
-	for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++) {
-		if (child->ShadowPartition()) {
-			// recurse
-			status_t error = _GenerateDeleteChildJobs(child);
-			if (error != B_OK)
-				return error;
-		} else {
-			// create job and add it to the queue
-			status_t error = _AddJob(fJobFactory->CreateDeleteChildJob(
-				partition->ID(), child->ID()));
-			if (error != B_OK)
-				return error;
-		}
-	}
-	return B_OK;
-}
-
-// _GenerateUninitializeJobs
-status_t
-KDiskDeviceJobGenerator::_GenerateUninitializeJobs(KPartition *partition)
-{
+// TODO: Depending on how this shall be handled, we might want to unmount
+// all descendants of a partition to be uninitialized or removed.
 	if (KPartition *shadow = partition->ShadowPartition()) {
 		if (shadow->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION) {
 			// partition changes initialization
@@ -161,11 +138,17 @@ KDiskDeviceJobGenerator::_GenerateUninitializeJobs(KPartition *partition)
 		} else {
 			// recurse
 			for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++) {
-				status_t error = _GenerateUninitializeJobs(child);
+				status_t error = _GenerateCleanupJobs(child);
 				if (error != B_OK)
 					return error;
 			}
 		}
+	} else if (KPartition *parent = partition->Parent()) {
+		// create job and add it to the queue
+		status_t error = _AddJob(fJobFactory->CreateDeleteChildJob(
+			parent->ID(), partition->ID()));
+		if (error != B_OK)
+			return error;
 	}
 	return B_OK;
 }
@@ -226,7 +209,7 @@ KDiskDeviceJobGenerator::_GenerateChildPlacementJobs(KPartition *partition)
 	// nothing to do, if the partition contains no partitioning system or
 	// shall be re-initialized
 	if (!shadow->DiskSystem()
-		|| !(shadow->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION)) {
+		|| (shadow->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION)) {
 		return B_OK;
 	}
 	// first resize all children that shall shrink and place their descendants
@@ -317,7 +300,7 @@ KDiskDeviceJobGenerator::_GenerateChildPlacementJobs(KPartition *partition)
 			}
 		}
 	}
-	return B_ERROR;
+	return B_OK;
 }
 
 // _GenerateMoveJob

@@ -36,8 +36,7 @@ private:
 
 	status_t _AddJob(KDiskDeviceJob *job);
 
-	status_t _GenerateDeleteChildJobs(KPartition *partition);
-	status_t _GenerateUninitializeJobs(KPartition *partition);
+	status_t _GenerateCleanupJobs(KPartition *partition);
 	status_t _GeneratePlacementJobs(KPartition *partition);
 	status_t _GenerateResizeJob(KPartition *partition);
 	status_t _GenerateChildPlacementJobs(KPartition *partition);
