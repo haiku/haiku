@@ -298,9 +298,11 @@ void JobSetupView::AttachedToWindow()
 	AddChild(box);
 	box->SetLabel("Quality");
 
-	marked = false;
+/*
+	// always B_RGB32
 	__surface_type = new BPopUpMenu("");
 	__surface_type->SetRadioMode(true);
+
 	count = sizeof(surfaces) / sizeof(surfaces[0]);
 	const SurfaceCap **surface_cap = surfaces;
 	uint32 support_flags;
@@ -317,9 +319,34 @@ void JobSetupView::AttachedToWindow()
 	}
 	menufield = new BMenuField(bpp_rect, "", "Surface Type", __surface_type);
 	box->AddChild(menufield);
-	width = StringWidth("Surface Type") + 10;
+	width = StringWidth("Color") + 10;
 	menufield->SetDivider(width);
+*/
 
+	/* color */
+	marked = false;
+	__color_type = new BPopUpMenu("");
+	__color_type->SetRadioMode(true);
+
+	count = __printer_cap->countCap(PrinterCap::COLOR);
+	const ColorCap **color_cap = (const ColorCap **)__printer_cap->enumCap(PrinterCap::COLOR);
+	while (count--) {
+		item = new BMenuItem((*color_cap)->label.c_str(), NULL);
+		__color_type->AddItem(item);
+		if ((*color_cap)->color == __job_data->getColor()) {
+			item->SetMarked(true);
+			marked = true;
+		}
+		color_cap++;
+	}
+	if (!marked && item)
+		item->SetMarked(true);
+	menufield = new BMenuField(bpp_rect, "", "Color", __color_type);
+
+	box->AddChild(menufield);
+	width = StringWidth("Color") + 10;
+	menufield->SetDivider(width);
+	
 	__gamma = new BTextControl(gamma_rect, "", "Gamma", "", NULL);
 	box->AddChild(__gamma);
 	__gamma->SetDivider(width);
@@ -491,6 +518,7 @@ bool JobSetupView::UpdateJobData()
 {
 	int count;
 
+/*
 	count = sizeof(surfaces) / sizeof(surfaces[0]);
 	const SurfaceCap **surface_cap = surfaces;
 	const char *surface_label = __surface_type->FindMarked()->Label();
@@ -501,7 +529,18 @@ bool JobSetupView::UpdateJobData()
 		}
 		surface_cap++;
 	}
-
+*/
+	count = __printer_cap->countCap(PrinterCap::COLOR);
+	const ColorCap **color_cap = (const ColorCap**)__printer_cap->enumCap(PrinterCap::COLOR);
+	const char *color_label = __color_type->FindMarked()->Label();
+	while (count--) {
+		if (!strcmp((*color_cap)->label.c_str(), color_label)) {
+			__job_data->setColor((*color_cap)->color);
+			break;
+		}
+		color_cap++;
+	}	
+	
 	__job_data->setGamma(atof(__gamma->Text()));
 
 	int first_page;

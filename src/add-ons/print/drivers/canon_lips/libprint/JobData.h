@@ -200,12 +200,12 @@ public:
 		MEDIUM = -3,
 		HIGH   = -4
 	};
-
-	enum COLOR {
-		MONOCHROME = 1,
-		COLOR
-	};
 */
+	enum COLOR {
+		kMONOCHROME = 1,
+		kCOLOR
+	};
+
 
 private:
 	PAPER       __paper;
@@ -228,6 +228,7 @@ private:
 	BINDINGLOCATION __binding_location;
 	PAGEORDER   __page_order;
 	BMessage    *__msg;
+	bool        __color;
 
 public:
 	JobData(BMessage *msg, const PrinterCap *cap);
@@ -272,7 +273,7 @@ public:
 	int32 getLastPage() const { return __last_page; }
 	void  setLastPage(int32 last_page) { __last_page = last_page; }
 
-	color_space getSurfaceType() const { return __surface_type; }
+	color_space getSurfaceType() const { return B_RGB32; /* __surface_type;*/ }
 	void setSurfaceType(color_space surface_type) { __surface_type = surface_type; }
 
 	float getGamma() const { return __gamma; }
@@ -295,6 +296,9 @@ public:
 
 	PAGEORDER getPageOrder() const { return __page_order; }
 	void setPageOrder(PAGEORDER page_order) { __page_order = page_order; }
+	
+	COLOR getColor() const { return __color ? kCOLOR : kMONOCHROME; }
+	void setColor(COLOR color) { __color = color == kCOLOR; }
 /*
 protected:
 	JobData(const JobData &job_data);

@@ -13,6 +13,7 @@ StaticLibrary print :
 	PrinterData.cpp
 	PrinterCap.cpp
 	PrintProcess.cpp
+	SpoolMetaData.cpp
 	Transport.cpp
 	UIDriver.cpp
 	ValidRect.cpp

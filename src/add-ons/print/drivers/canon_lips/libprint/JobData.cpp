@@ -29,6 +29,7 @@ const char *JD_REVERSE          = "JJJJ_reverse";
 const char *JD_PRINT_STYLE      = "JJJJ_print_style";
 const char *JD_BINDING_LOCATION = "JJJJ_binding_location";
 const char *JD_PAGE_ORDER       = "JJJJ_page_order";
+const char *JD_COLOR            = "JJJJ_color";
 
 JobData::JobData(BMessage *msg, const PrinterCap *cap)
 {
@@ -61,6 +62,7 @@ JobData::JobData(const JobData &job_data)
 	__binding_location = job_data.__binding_location;
 	__page_order       = job_data.__page_order;
 	__msg              = job_data.__msg;
+	__color            = job_data.__color;
 }
 
 JobData &JobData::operator = (const JobData &job_data)
@@ -85,6 +87,7 @@ JobData &JobData::operator = (const JobData &job_data)
 	__binding_location = job_data.__binding_location;
 	__page_order       = job_data.__page_order;
 	__msg              = job_data.__msg;
+	__color            = job_data.__color;
 	return *this;
 }
 
@@ -204,6 +207,11 @@ void JobData::load(BMessage *msg, const PrinterCap *cap)
 		__page_order = (PAGEORDER)msg->FindInt32(JD_PAGE_ORDER);
 	else
 		__page_order = ACROSS_FROM_LEFT;
+
+	if (msg->HasBool(JD_COLOR))
+		__color = msg->FindBool(JD_COLOR);
+	else
+		__color = false;
 }
 
 void JobData::save(BMessage *msg)
@@ -306,4 +314,9 @@ void JobData::save(BMessage *msg)
 		msg->ReplaceInt32(JD_PAGE_ORDER, __page_order);
 	else
 		msg->AddInt32(JD_PAGE_ORDER, __page_order);
+
+	if (msg->HasBool(JD_COLOR))
+		msg->ReplaceBool(JD_COLOR, __color);
+	else
+		msg->AddBool(JD_COLOR, __color);
 }

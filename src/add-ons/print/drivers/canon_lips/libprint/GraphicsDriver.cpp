@@ -37,11 +37,12 @@ using namespace std;
 GraphicsDriver::GraphicsDriver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
 	: __msg(msg), __printer_data(printer_data), __printer_cap(printer_cap)
 {
-	__view          = NULL;
-	__bitmap        = NULL;
-	__transport     = NULL;
-	__org_job_data  = NULL;
-	__real_job_data = NULL;
+	__view            = NULL;
+	__bitmap          = NULL;
+	__transport       = NULL;
+	__org_job_data    = NULL;
+	__real_job_data   = NULL;
+	__spool_meta_data = NULL;
 }
 
 GraphicsDriver::~GraphicsDriver()
@@ -82,14 +83,18 @@ void GraphicsDriver::setupData(BFile *spool_file, long page_count)
 	} else {
 		__internal_copies = 1;
 	}
+	
+	__spool_meta_data = new SpoolMetaData(spool_file);
 }
 
 void GraphicsDriver::cleanupData()
 {
 	delete __real_job_data;
 	delete __org_job_data;
-	__real_job_data = NULL;
-	__org_job_data  = NULL;
+	delete __spool_meta_data;
+	__real_job_data   = NULL;
+	__org_job_data    = NULL;
+	__spool_meta_data = NULL;
 }
 
 #define MAX_MEMORY_SIZE		(4 *1024 *1024)
@@ -576,3 +581,74 @@ void GraphicsDriver::writeSpoolChar(char c) throw(TransportException)
 		__transport->write(&c, 1);
 	}
 }
+
+
+void GraphicsDriver::rgb32_to_rgb24(void* src, void* dst, int width) {
+	uint8* d = (uint8*)dst;
+	rgb_color* s = (rgb_color*)src;
+	for (int i = width; i > 0; i --) {
+		*d ++ = s->red;
+		*d ++ = s->green;
+		*d ++ = s->blue;
+		s++;
+	}
+}
+
+void GraphicsDriver::cmap8_to_rgb24(void* src, void* dst, int width) {
+	uint8* d = (uint8*)dst;
+	uint8* s = (uint8*)src;
+	const color_map* cmap = system_colors();
+	for (int i = width; i > 0; i --) {
+		const rgb_color* rgb = &cmap->color_list[*s];
+		*d ++ = rgb->red;
+		*d ++ = rgb->green;
+		*d ++ = rgb->blue;
+		s ++;		
+	}
+}
+
+void GraphicsDriver::convert_to_rgb24(void* src, void* dst, int width, color_space cs) {
+	if (cs == B_RGB32) rgb32_to_rgb24(src, dst, width);
+	else if (cs == B_CMAP8) cmap8_to_rgb24(src, dst, width);
+	else {
+		DBGMSG(("color_space %d not supported", cs));
+	}
+}
+
+uint8 GraphicsDriver::gray(uint8 r, uint8 g, uint8 b) {
+	if (r == g && g == b) {
+		return r;
+	} else {
+		return (r * 3 + g * 6 + b) / 10;
+	}
+}
+
+
+void GraphicsDriver::rgb32_to_gray(void* src, void* dst, int width) {
+	uint8* d = (uint8*)dst;
+	rgb_color* s = (rgb_color*)src;
+	for (int i = width; i > 0; i --) {
+		*d ++ = gray(s->red, s->green, s->blue);
+		s++;
+	}
+}
+
+void GraphicsDriver::cmap8_to_gray(void* src, void* dst, int width) {
+	uint8* d = (uint8*)dst;
+	uint8* s = (uint8*)src;
+	const color_map* cmap = system_colors();
+	for (int i = width; i > 0; i --) {
+		const rgb_color* rgb = &cmap->color_list[*s];
+		*d ++ = gray(rgb->red, rgb->green, rgb->blue);
+		s ++;		
+	}
+}
+
+void GraphicsDriver::convert_to_gray(void* src, void* dst, int width, color_space cs) {
+	if (cs == B_RGB32) rgb32_to_gray(src, dst, width);
+	else if (cs == B_CMAP8) cmap8_to_gray(src, dst, width);
+	else {
+		DBGMSG(("color_space %d not supported", cs));
+	}
+}
+
