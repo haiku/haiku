@@ -6,6 +6,7 @@ CommonUnitTest BLooperTester
 	  RemoveHandlerTest.cpp
 	  IndexOfTest.cpp
 	  CountHandlersTest.cpp
+	  HandlerAtTest.cpp
 	: kits app
 	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
 	: be stdc++.r4

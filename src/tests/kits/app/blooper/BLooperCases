@@ -47,6 +47,7 @@ HandlerAt(int32 index) const;
 case : No handlers added, check for looper itself
 case : Index out of range (CountHandlers() + 1)
 case : Several handlers added, checked against expected indices
+case : Looper is not locked
 
 IndexOf(BHandler* handler) const;
 --------------

@@ -20,6 +20,7 @@
 #include "RemoveHandlerTest.h"
 #include "IndexOfTest.h"
 #include "CountHandlersTest.h"
+#include "HandlerAtTest.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -43,6 +44,7 @@ Test* addonTestFunc(void)
 	tests->addTest(TRemoveHandlerTest::Suite());
 	tests->addTest(TIndexOfTest::Suite());
 	tests->addTest(TCountHandlersTest::Suite());
+	tests->addTest(THandlerAtTest::Suite());
 
 	return tests;
 }

@@ -360,7 +360,10 @@ int32 BLooper::CountHandlers() const
 //------------------------------------------------------------------------------
 BHandler* BLooper::HandlerAt(int32 index) const
 {
-	AssertLocked();
+	if (!IsLocked())
+	{
+		debugger("Looper must be locked before calling HandlerAt.");
+	}
 
 	return (BHandler*)fHandlers.ItemAt(index);
 }
