@@ -125,6 +125,27 @@ void BLooperList::GetLooperList(BList* list)
 	}
 }
 //------------------------------------------------------------------------------
+int32 BLooperList::CountLoopers()
+{
+	BAutolock Listlock(fLock);
+	AssertLocked();
+	return (int32)fData.size();
+}
+//------------------------------------------------------------------------------
+BLooper* BLooperList::LooperAt(int32 index)
+{
+	BAutolock Listlock(fLock);
+	AssertLocked();
+
+	BLooper* Looper = NULL;
+	if (index < (int32)fData.size())
+	{
+		Looper = fData[(uint32)index].looper;
+	}
+
+	return Looper;
+}
+//------------------------------------------------------------------------------
 BLooper* BLooperList::LooperForThread(thread_id tid)
 {
 	BAutolock Listlock(fLock);

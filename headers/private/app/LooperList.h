@@ -60,6 +60,8 @@ class BLooperList
 		bool		IsLooperValid(const BLooper* l);
 		bool		RemoveLooper(BLooper* l);
 		void		GetLooperList(BList* list);
+		int32		CountLoopers();
+		BLooper*	LooperAt(int32 index);
 		BLooper*	LooperForThread(thread_id tid);
 		BLooper*	LooperForName(const char* name);
 		BLooper*	LooperForPort(port_id port);

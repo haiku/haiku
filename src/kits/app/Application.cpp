@@ -44,8 +44,11 @@
 #include <PropertyInfo.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
+#include <Window.h>
 
 // Project Includes ------------------------------------------------------------
+#include <LooperList.h>
+#include <ObjectLocker.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -60,97 +63,97 @@ BLocker		BApplication::_app_resources_lock("_app_resources_lock");
 
 property_info gApplicationPropInfo[] =
 {
-        {
-                "Window",
-                        {},
-                        {B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
-                        NULL, 0,
-                        {},
-                        {},
-                        {}
-        },
-        {
-                "Window",
-                        {},
-                        {B_NAME_SPECIFIER},
-                        NULL, 1,
-                        {},
-                        {},
-                        {}
-        },
-        {
-                "Looper",
-                        {},
-                        {B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
-                        NULL, 2,
-                        {},
-                        {},
-                        {}
-        },
-        {
-                "Looper",
-                        {},
-                        {B_ID_SPECIFIER},
-                        NULL, 3,
-                        {},
-                        {},
-                        {}
-        },
-        {
-                "Looper",
-                        {},
-                        {B_NAME_SPECIFIER},
-                        NULL, 4,
-                        {},
-                        {},
-                        {}
-        },
-        {
-                "Name",
-                        {B_GET_PROPERTY},
-                        {B_DIRECT_SPECIFIER},
-                        NULL, 5,
-                        {B_STRING_TYPE},
-                        {},
-                        {}
-        },
-        {
-                "Window",
-                        {B_COUNT_PROPERTIES},
-                        {B_DIRECT_SPECIFIER},
-                        NULL, 5,
-                        {B_INT32_TYPE},
-                        {},
-                        {}
-        },
-        {
-                "Loopers",
-                        {B_GET_PROPERTY},
-                        {B_DIRECT_SPECIFIER},
-                        NULL, 5,
-                        {B_MESSENGER_TYPE},
-                        {},
-                        {}
-        },
-        {
-                "Windows",
-                        {B_GET_PROPERTY},
-                        {B_DIRECT_SPECIFIER},
-                        NULL, 5,
-                        {B_MESSENGER_TYPE},
-                        {},
-                        {}
-        },
-        {
-                "Looper",
-                        {B_COUNT_PROPERTIES},
-                        {B_DIRECT_SPECIFIER},
-                        NULL, 5,
-                        {B_INT32_TYPE},
-                        {},
-                        {}
-        },
-        {}
+	{
+		"Window",
+			{},
+			{B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
+			NULL, 0,
+			{},
+			{},
+			{}
+	},
+	{
+		"Window",
+			{},
+			{B_NAME_SPECIFIER},
+			NULL, 1,
+			{},
+			{},
+			{}
+	},
+	{
+		"Looper",
+			{},
+			{B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
+			NULL, 2,
+			{},
+			{},
+			{}
+	},
+	{
+		"Looper",
+			{},
+			{B_ID_SPECIFIER},
+			NULL, 3,
+			{},
+			{},
+			{}
+	},
+	{
+		"Looper",
+			{},
+			{B_NAME_SPECIFIER},
+			NULL, 4,
+			{},
+			{},
+			{}
+	},
+	{
+		"Name",
+			{B_GET_PROPERTY},
+			{B_DIRECT_SPECIFIER},
+			NULL, 5,
+			{B_STRING_TYPE},
+			{},
+			{}
+	},
+	{
+		"Window",
+			{B_COUNT_PROPERTIES},
+			{B_DIRECT_SPECIFIER},
+			NULL, 5,
+			{B_INT32_TYPE},
+			{},
+			{}
+	},
+	{
+		"Loopers",
+			{B_GET_PROPERTY},
+			{B_DIRECT_SPECIFIER},
+			NULL, 5,
+			{B_MESSENGER_TYPE},
+			{},
+			{}
+	},
+	{
+		"Windows",
+			{B_GET_PROPERTY},
+			{B_DIRECT_SPECIFIER},
+			NULL, 5,
+			{B_MESSENGER_TYPE},
+			{},
+			{}
+	},
+	{
+		"Looper",
+			{B_COUNT_PROPERTIES},
+			{B_DIRECT_SPECIFIER},
+			NULL, 5,
+			{B_INT32_TYPE},
+			{},
+			{}
+	},
+	{}
 };
 
 // argc/argv
@@ -398,14 +401,27 @@ BWindow* BApplication::WindowAt(int32 index) const
 //------------------------------------------------------------------------------
 int32 BApplication::CountLoopers() const
 {
-	// Tough nut to crack; not documented *anywhere*.  Dug down into BLooper and
-	// found its private sLooperCount var
-	return 0;	// not implemented
+	using namespace BPrivate;
+	BObjectLocker<BLooperList> ListLock(gLooperList);
+	if (ListLock.IsLocked())
+	{
+		return gLooperList.CountLoopers();
+	}
+
+	return B_ERROR;	// Some bad, non-specific thing has happened
 }
 //------------------------------------------------------------------------------
 BLooper* BApplication::LooperAt(int32 index) const
 {
-	return NULL;	// not implemented
+	using namespace BPrivate;
+	BLooper* Looper = NULL;
+	BObjectLocker<BLooperList> ListLock(gLooperList);
+	if (ListLock.IsLocked())
+	{
+		Looper = gLooperList.LooperAt(index);
+	}
+
+	return Looper;
 }
 //------------------------------------------------------------------------------
 bool BApplication::IsLaunching() const
@@ -767,12 +783,64 @@ uint32 BApplication::InitialWorkspace()
 //------------------------------------------------------------------------------
 int32 BApplication::count_windows(bool incl_menus) const
 {
-	return 0;	// not implemented
+	using namespace BPrivate;
+
+	// Windows are BLoopers, so we can just check each BLooper to see if it's
+	// a BWindow (or BMenuWindow)
+	int32 count = 0;
+	BObjectLocker<BLooperList> ListLock(gLooperList);
+	if (ListLock.IsLocked())
+	{
+		BLooper* Looper = NULL;
+		for (int32 i = 0; i < gLooperList.CountLoopers(); ++i)
+		{
+			Looper = gLooperList.LooperAt(i);
+			if (dynamic_cast<BWindow*>(Looper))
+			{
+				if (incl_menus || dynamic_cast<BMenuWindow*>(Looper) == NULL)
+				{
+					++count;
+				}
+			}
+		}
+	}
+
+	return count;
 }
 //------------------------------------------------------------------------------
 BWindow* BApplication::window_at(uint32 index, bool incl_menus) const
 {
-	return NULL;	// not implemented
+	using namespace BPrivate;
+
+	// Windows are BLoopers, so we can just check each BLooper to see if it's
+	// a BWindow (or BMenuWindow)
+	uint32 count = 0;
+	BWindow* Window = NULL;
+	BObjectLocker<BLooperList> ListLock(gLooperList);
+	if (ListLock.IsLocked())
+	{
+		BLooper* Looper = NULL;
+		for (int32 i = 0; i < gLooperList.CountLoopers() && !Window; ++i)
+		{
+			Looper = gLooperList.LooperAt(i);
+			if (dynamic_cast<BWindow*>(Looper))
+			{
+				if (incl_menus || dynamic_cast<BMenuWindow*>(Looper) == NULL)
+				{
+					if (count == index)
+					{
+						Window = Looper;
+					}
+					else
+					{
+						++count;
+					}
+				}
+			}
+		}
+	}
+
+	return Window;
 }
 //------------------------------------------------------------------------------
 status_t BApplication::get_window_list(BList* list, bool incl_menus) const
