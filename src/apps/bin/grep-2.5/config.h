@@ -322,7 +322,7 @@
 /* #undef malloc */
 
 /* Define to a type if <wchar.h> does not define. */
-#define mbstate_t int
+//#define mbstate_t int
 
 /* Define to `long' if <sys/types.h> does not define. */
 /* #undef off_t */

@@ -92,7 +92,7 @@
 
 /* Define to 1 if you have the declaration of `ferror_unlocked', and to 0 if
    you don't. */
-#define HAVE_DECL_FERROR_UNLOCKED 1
+#define HAVE_DECL_FERROR_UNLOCKED 0
 
 /* Define to 1 if you have the declaration of `fflush_unlocked', and to 0 if
    you don't. */
@@ -148,7 +148,7 @@
 
 /* Define to 1 if you have the declaration of `strerror_r', and to 0 if you
    don't. */
-#define HAVE_DECL_STRERROR_R 0
+#define HAVE_DECL_STRERROR_R 1
 
 /* Define to 1 if you have the declaration of `strtoimax', and to 0 if you
    don't. */
@@ -637,7 +637,7 @@
 /* #undef malloc */
 
 /* Define to a type if <wchar.h> does not define. */
-#define mbstate_t int
+//#define mbstate_t int
 
 /* Type of minor device numbers. */
 #define minor_t int

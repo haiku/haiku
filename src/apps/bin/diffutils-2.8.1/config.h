@@ -150,7 +150,7 @@
 
 /* Define to 1 if you have the declaration of `ferror_unlocked', and to 0 if
    you don't. */
-#define HAVE_DECL_FERROR_UNLOCKED 1
+#define HAVE_DECL_FERROR_UNLOCKED 0
 
 /* Define to 1 if you have the declaration of `fflush_unlocked', and to 0 if
    you don't. */
@@ -1372,7 +1372,7 @@
 /* #undef malloc */
 
 /* Define to a type if <wchar.h> does not define. */
-#define mbstate_t int
+//#define mbstate_t int
 
 /* Define to rpl_memcmp if the replacement function should be used. */
 /* #undef memcmp */
@@ -1387,7 +1387,7 @@
 /* #undef mkstemp */
 
 /* Define to rpl_mktime if the replacement function should be used. */
-#define mktime rpl_mktime
+//#define mktime rpl_mktime
 
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef mode_t */
