@@ -167,6 +167,24 @@ extern status_t send_notification(port_id port, long token, ulong what, long op,
 					mount_id device, mount_id toDevice, vnode_id parentNode,
 					vnode_id toParentNode, vnode_id node, const char *name);
 
+extern status_t notify_entry_created(mount_id device, vnode_id directory,
+					const char *name, vnode_id node);
+extern status_t notify_entry_removed(mount_id device, vnode_id directory,
+					const char *name, vnode_id node);
+extern status_t notify_entry_moved(mount_id device, vnode_id fromDirectory,
+					const char *fromName, vnode_id toDirectory,
+					const char *toName, vnode_id node);
+extern status_t notify_stat_changed(mount_id device, vnode_id node);
+extern status_t notify_attribute_changed(mount_id device, vnode_id node,
+					const char *attribute);
+
+extern status_t notify_query_entry_created(port_id port, int32 token,
+					mount_id device, vnode_id directory, const char *name,
+					vnode_id node);
+extern status_t notify_query_entry_removed(port_id port, int32 token,
+					mount_id device, vnode_id directory, const char *name,
+					vnode_id node);
+
 #ifdef __cplusplus
 }
 #endif
