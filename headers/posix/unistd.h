@@ -123,7 +123,6 @@ extern int		execvp(const char *file, char *const *argv);
 
 extern void		_exit(int status);
 
-extern int		system(const char *string);
 extern pid_t	tcgetpgrp(int fd);
 extern int		tcsetpgrp(int fd, pid_t pgrpid);
 extern void		*sbrk(long incr);
@@ -151,7 +150,6 @@ extern uid_t	geteuid(void);
 extern gid_t	getgid(void);
 extern int		getgroups(int groupSize, gid_t groupList[]);
 extern uid_t	getuid(void);
-extern char		*cuserid(char *s);
 
 extern int		setgid(gid_t gid);
 extern int		setuid(uid_t uid);
@@ -167,7 +165,6 @@ extern int		gethostname(char *hostName, size_t nameSize);
 extern int		isatty(int fd);
 extern char		*ttyname(int fd);
 extern int		ttyname_r(int fd, char *buffer, size_t bufferSize);
-extern char		*ctermid(char *s);
 
 /* misc */
 extern char 	*crypt(const char *key, const char *salt);
