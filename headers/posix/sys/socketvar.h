@@ -1,13 +1,13 @@
 /* socketvar.h */
 
 
-#ifndef SYS_SOCKETVAR_H
-#define SYS_SOCKETVAR_H
+#ifndef _SYS_SOCKETVAR_H
+#define _SYS_SOCKETVAR_H
 
-#include <kernel/OS.h>
-#include "sys/mbuf.h"
-#include "sys/net_uio.h"
-#include "sys/socket.h"
+#include <OS.h>
+#include <mbuf.h>
+#include <sys/uio.h>
+#include <sys/socket.h>
 
 struct  sockbuf {
 	uint32  sb_cc;			/* actual chars in buffer */
@@ -39,8 +39,8 @@ struct socket {
 	uint16  so_options;      /* socket options */
 	int16   so_linger;       /* dreaded linger value */
 	int16   so_state;        /* socket state */
-	caddr_t so_pcb;	         /* pointer to the control block */
-	sem_id so_lock;          /* socket lock */
+	char   *so_pcb;	         /* pointer to the control block */
+	sem_id  so_lock;          /* socket lock */
 	sem_id  so_timeo;        /* our wait channel */
 
 	struct protosw *so_proto; /* pointer to protocol module */
@@ -151,7 +151,7 @@ struct socket {
 /* we don't handle upcall for sockets */
 #define sowwakeup(so)   sowakeup((so), &(so)->so_snd)
 
-#ifdef _NETWORK_STACK
+#ifdef _KERNEL_MODE
 
 uint32 sb_max;
 
@@ -160,21 +160,21 @@ uint32 sb_max;
 /* These are the ones we export to libnet.so */
 
 int     initsocket(void **);
-int     socreate  (int, void *, int, int);
+int     socreate  (int, struct socket **, int, int);
 int     soshutdown(void *, int);
 int     soclose   (void *);
 
-int     sobind    (void *, caddr_t, int);
+int     sobind    (void *, char *, int);
 int     solisten  (void *, int);
-int     soconnect (void *, caddr_t, int);
+int     soconnect (void *, char *, int);
 int     soaccept  (void *, void **, void *, int *);
 
 int     writeit   (void *, struct iovec *, int);
 int     readit    (void *, struct iovec *, int *);
 int     sendit    (void *, struct msghdr *, int, int *);
-int     recvit    (void *, struct msghdr *, caddr_t, int *);
+int     recvit    (void *, struct msghdr *, char *, int *);
 
-int     soo_ioctl (void *, int, caddr_t);
+//int     so_ioctl (void *, int, void *, size_t);
 int     sosysctl  (int *, uint, void *, size_t *, void *, size_t);
 int     sosetopt  (void *, int, int, const void *, size_t);
 int     sogetopt  (void *, int, int, void *, size_t *);
@@ -208,6 +208,8 @@ int     sbappendcontrol (struct sockbuf *sb, struct mbuf *m0,
 void    sbappendrecord (struct sockbuf *sb, struct mbuf *m0);
 void    sbcheck (struct sockbuf *sb);
 void    sbcompress (struct sockbuf *sb, struct mbuf *m, struct mbuf *n);
+void    sbinsertoob(struct sockbuf *, struct mbuf *);
+
 int     soreceive (struct socket *so, struct mbuf **paddr, struct uio *uio,
             struct mbuf **mp0, struct mbuf **controlp, int *flagsp);
 void    sowakeup(struct socket *so, struct sockbuf *sb);
@@ -231,6 +233,6 @@ int     sb_lock(struct sockbuf *sb);
 int     nsleep(sem_id chan, char *msg, int timeo);
 void    wakeup(sem_id chan);
 
-#endif /* _NETWORK_STACK */
+#endif /* _KERNEL_MODE */
 
-#endif /* SYS_SOCKETVAR_H */
+#endif /* _SYS_SOCKETVAR_H */

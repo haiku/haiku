@@ -1,10 +1,10 @@
 /* protosw.h */
 
-#ifndef PROTOSW_H
-#define PROTOSW_H
+#ifndef _SYS_PROTOSW_H
+#define _SYS_PROTOSW_H
 
-#include "sys/socketvar.h" /* for struct socket */
-#include "net/route.h"
+#include <sys/socketvar.h> /* for struct socket */
+#include <net/route.h>
 
 #define PRCO_SETOPT    0
 #define PRCO_GETOPT    1
@@ -136,12 +136,22 @@ struct protosw {
 
 
 /* Network stack defines... */
-#ifdef _NETWORK_STACK
-struct protosw *protocols;
-void add_protocol(struct protosw *pr, int fam);
-void remove_protocol(struct protosw *pr);
+#ifdef _KERNEL_MODE
+  struct protosw *protocols;
+
+  enum {
+	NET_LAYER1 = 1,
+	NET_LAYER2,
+	NET_LAYER3,
+	NET_LAYER4
+  };
+  
+  void add_protosw     (struct protosw *prt[], int);
+  void add_protocol    (struct protosw *, int);
+  void remove_protocol (struct protosw *);
 #endif
+
 struct protosw *pffindproto(int domain, int protocol, int type);
 struct protosw *pffindtype(int domain, int type);
 
-#endif /* PROTOSW_H */
+#endif /* _SYS_PROTOSW_H */
