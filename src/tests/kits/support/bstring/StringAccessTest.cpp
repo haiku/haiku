@@ -1,5 +1,6 @@
 #include "StringAccessTest.h"
 #include "cppunit/TestCaller.h"
+#include <stdio.h>
 #include <String.h>
 #include <UTF8.h>
 

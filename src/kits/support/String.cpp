@@ -86,17 +86,24 @@ int32
 BString::CountChars() const
 {
 	int32 count = 0;
-	char *ptr = _privateData;
-	
-	if (ptr == NULL)
-		return 0;
-		
+	const char *ptr = String();
+
 	while (*ptr)
 	{
+		// Jump to next UTF8 character
 		// ejaesler: BGA's nifty function
 		ptr += utf8_char_len(*ptr);
 		count++;
 	}
+#if 0
+	while (*ptr++)
+	{
+		count++;
+
+		// Jump to next UTF8 character
+		 for (; (*ptr & 0xc0) == 0x80; ptr++);
+	}
+#endif
 
 	return count;
 }
@@ -1503,7 +1510,9 @@ BString::_GrowBy(int32 size)
 	ASSERT(curLen + size >= 0);
 	
 	if (_privateData != NULL)
+	{
 		_privateData -= sizeof(int32);
+	}
 		
 	_privateData = (char*)realloc(_privateData, 
 		curLen + size + sizeof(int32) + 1);
@@ -1517,7 +1526,7 @@ BString::_GrowBy(int32 size)
 }
 
 
-char*
+char *
 BString::_OpenAtBy(int32 offset, int32 length)
 {
 	ASSERT(offset >= 0);
