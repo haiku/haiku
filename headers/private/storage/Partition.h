@@ -6,7 +6,7 @@
 #ifndef _PARTITION_H
 #define _PARTITION_H
 
-#include <fs_device.h>
+#include <disk_scanner.h>
 #include <Mime.h>
 #include <ObjectList.h>
 #include <Point.h>
@@ -18,6 +18,8 @@ class BVolume;
 
 class BPartition {
 public:
+	~BPartition();
+
 	BSession *Session() const;
 	BDiskDevice *Device() const;
 
@@ -68,19 +70,26 @@ public:
 private:
 	BPartition();
 	BPartition(const BPartition &);
-	~BPartition();
 
 	BPartition &operator=(const BPartition &);
 
+	void _Unset();
+	status_t _Unarchive(BMessage *archive);
+
+	void _SetSession(BSession *session);
+
 private:
+	friend class BSession;
+
 	BSession				*fSession;
+	int32					fUniqueID;
+	int32					fChangeCounter;
+	int32					fIndex;
 // TODO: Also contains the device name, which we can get from Device() anyway.
 //		 We could either remove it from extended_partition_info or list
 //		 the individual fields here.
 	extended_partition_info	fInfo;
-	int32					fUniqueID;
 	dev_t					fVolumeID;
-	node_ref				fMountPoint;
 };
 
 #endif	// _PARTITION_H

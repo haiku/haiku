@@ -17,8 +17,8 @@ class BDiskDeviceVisitor {
 
 	// return true to abort iteration
 	virtual bool Visit(BDiskDevice *device);
-	virtual bool Visit(BSession *device);
-	virtual bool Visit(BPartition *device);
+	virtual bool Visit(BSession *session);
+	virtual bool Visit(BPartition *partition);
 };
 
 #endif _DISK_DEVICE_VISITOR_H

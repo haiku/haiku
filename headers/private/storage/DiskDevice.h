@@ -17,6 +17,8 @@ public:
 	BDiskDevice();
 	~BDiskDevice();
 
+	void Unset();
+
 	off_t Size() const;
 	int32 BlockSize() const;
 
@@ -25,7 +27,7 @@ public:
 
 	int32 CountPartitions() const;
 
-	const char *DevicePath() const;
+	const char *Path() const;
 	void GetName(BString *name, bool includeBusID = true, 
 				 bool includeLUN = false) const;
 	void GetName(char *name, bool includeBusID = true, 
@@ -52,14 +54,24 @@ private:
 	BDiskDevice(const BDiskDevice &);
 	BDiskDevice &operator=(const BDiskDevice &);
 
+	status_t _Unarchive(BMessage *archive);
+
+	bool _AddSession(BSession *session);
+
 private:
-	BObjectList<Session *>	fSessions;
+	friend class BDiskDeviceRoster;
+
+	BObjectList<BSession>	fSessions;
 	int32					fUniqueID;
+	int32					fChangeCounter;
+	status_t				fMediaStatus;
+	off_t					fSize;
 	int32					fBlockSize;
-	char					fPath[B_FILE_NAME_LENGTH];
+	uint8					fType;
 	bool					fReadOnly;
 	bool					fRemovable;
-	bool					fIsFloppy;
+//	bool					fIsFloppy;
+	char					fPath[B_FILE_NAME_LENGTH];
 };
 
 #endif	// _DISK_DEVICE_H

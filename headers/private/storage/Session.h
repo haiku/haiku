@@ -7,7 +7,7 @@
 #define _SESSION_H
 
 #include <DiskDeviceVisitor.h>
-#include <fs_device.h>
+#include <disk_scanner.h>
 #include <ObjectList.h>
 #include <Point.h>
 #include <String.h>
@@ -19,10 +19,13 @@ extern const char *B_INTEL_PARTITIONING;
 
 class BSession {
 public:
+	~BSession();
+
 	BDiskDevice *Device() const;
 
 	off_t Offset() const;
 	off_t Size() const;
+	int32 BlockSize() const;
 
 	int32 CountPartitions() const;
 	BPartition *PartitionAt(int32 index) const;
@@ -53,15 +56,27 @@ public:
 
 private:
 	BSession();
-	~BSession();
 	BSession(const BSession &);
 	BSession &operator=(const BSession &);
 
+	void _Unset();
+	status_t _Unarchive(BMessage *archive);
+
+	void _SetDevice(BDiskDevice *device);
+
+	bool _AddPartition(BPartition *partition);
+
 private:
-	BDiskDevice					*fDevice;
-	BObjectList<BPartition *>	fPartitions;
-	int32						fUniqueID;
-	session_info				fInfo;
+	friend class BDiskDevice;
+
+	BDiskDevice				*fDevice;
+	BObjectList<BPartition>	fPartitions;
+	int32					fUniqueID;
+	int32					fChangeCounter;
+	int32					fIndex;
+// TODO: Only offset, size and flags are used. Cleanup!
+	session_info			fInfo;
+	BString					fPartitioningSystem;
 };
 
 #endif	// _SESSION_H

@@ -82,7 +82,8 @@ public:
 	status_t StopWatching(BMessenger target);
 
 private:
-	int32	fDeviceID;	// iteration state
+	BMessenger	fManager;
+	int32		fCookie;
 };
 
 #endif	// _DISK_DEVICE_ROSTER_H
