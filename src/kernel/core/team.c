@@ -1288,14 +1288,14 @@ update_wait_for_any(struct team *team, thread_id child, int32 change)
 static status_t
 unregister_wait_for_any(struct team *team, thread_id child)
 {
-	update_wait_for_any(team, child, -1);
+	return update_wait_for_any(team, child, -1);
 }
 
 
 static status_t
 register_wait_for_any(struct team *team, thread_id child)
 {
-	update_wait_for_any(team, child, 1);
+	return update_wait_for_any(team, child, 1);
 }
 
 
