@@ -11,7 +11,6 @@ ObjectsDefines
 	main.cpp
 	vfs.cpp
 	partitions.cpp
-	stdio.cpp
 	RootFileSystem.cpp
 
 	# partitions
@@ -23,7 +22,9 @@ ObjectsDefines
 	# file systems
 	bfs.cpp
 	Directory.cpp
+	File.cpp
 	Stream.cpp
+	BPlusTree.cpp
 	:
 	read_pos=boot_read_pos fstat=boot_fstat open=boot_open close=boot_close
 	;
@@ -71,7 +72,9 @@ SimpleTest BootLoaderTest :
 	# file systems
 	bfs.cpp
 	Directory.cpp
+	File.cpp
 	Stream.cpp
+	BPlusTree.cpp
 
 	list.c
 	:
@@ -80,7 +83,7 @@ SimpleTest BootLoaderTest :
 
 # Tell Jam where to find the utility sources
 SEARCH on [ FGristFiles list.c ]
-    = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+	= [ FDirName $(OBOS_TOP) src kernel core util ] ;
 
 SEARCH on [ FGristFiles 
 		main.cpp vfs.cpp partitions.cpp
@@ -88,13 +91,14 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src kernel boot loader ] ;
 
 SEARCH on [ FGristFiles amiga_rdb.cpp ]
-    = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems amiga ] ;
+	= [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems amiga ] ;
 
 SEARCH on [ FGristFiles apple.cpp ]
-    = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems apple ] ;
+	= [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems apple ] ;
 
 SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp ]
-    = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems intel ] ;
+	= [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems intel ] ;
 
-SEARCH on [ FGristFiles bfs.cpp Directory.cpp Stream.cpp ]
-    = [ FDirName $(OBOS_TOP) src kernel boot loader file_systems bfs ] ;
+SEARCH on [ FGristFiles
+		bfs.cpp Directory.cpp File.cpp Stream.cpp BPlusTree.cpp
+	] = [ FDirName $(OBOS_TOP) src kernel boot loader file_systems bfs ] ;
