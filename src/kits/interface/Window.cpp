@@ -49,6 +49,8 @@
 #include <TokenSpace.h>
 #include <MessageUtils.h>
 #include <WindowAux.h>
+#include <AppServerLink.h>
+#include <PortMessage.h>
 
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
@@ -1990,20 +1992,25 @@ void BWindow::InitData(	BRect frame,
 	bool	locked = false;
 	if ( !(be_app->IsLocked()) )
 		{ be_app->Lock(); locked = true; }
-		
-	session->WriteInt32( AS_CREATE_WINDOW );
-	session->WriteRect( fFrame );
-	session->WriteInt32( (int32)fLook );
-	session->WriteInt32( (int32)fFeel );
-	session->WriteUInt32( fFlags );
-	session->WriteUInt32( workspace );
-	session->WriteInt32( _get_object_token_(this) );
-	session->WriteData( &receive_port, sizeof(port_id) );
-	session->WriteData( &fMsgPort, sizeof(port_id) );
-	session->WriteString( title );
-	session->Sync();
+
+	BPrivate::BAppServerLink *serverlink=new BPrivate::BAppServerLink;
+	PortMessage pmsg;
+	
+	serverlink->SetOpCode( AS_CREATE_WINDOW );
+	serverlink->Attach<BRect>( fFrame );
+	serverlink->Attach<int32>( (int32)fLook );
+	serverlink->Attach<int32>( (int32)fFeel );
+	serverlink->Attach<uint32>( fFlags );
+	serverlink->Attach<uint32>( workspace );
+	serverlink->Attach<int32>( _get_object_token_(this) );
+	serverlink->Attach( &receive_port, sizeof(port_id) );
+	serverlink->Attach( &fMsgPort, sizeof(port_id) );
+	serverlink->AttachString( title );
+	serverlink->FlushWithReply(&pmsg);
 		// The port on witch app_server will listen for us	
-	session->ReadData( &send_port, sizeof(port_id) );
+	pmsg.Read<port_id>( &send_port );
+	
+	delete serverlink;
 	
 		// unlock, so other threads can do their job.
 	if( locked )
