@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src apps codycam ;
+
+AddResources CodyCam : codycam.rsrc ;
+
+Application CodyCam :
+	CodyCam.cpp
+	FTPClient.cpp
+	Settings.cpp
+	SettingsHandler.cpp
+	VideoConsumer.cpp;
+
+LinkSharedOSLibs CodyCam : be media translation netapi stdc++.r4;
+
