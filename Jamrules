@@ -296,6 +296,43 @@ rule R5ObjectNames
 	return [ FGristFiles $(objects:S=$(SUFOBJ)) ] ;
 }
 
+rule SimpleTest
+{
+	# UnitTest <target> : <sources> : <libraries>
+	# Builds a unit test for an OBOS module.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkSharedOSLibs).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	local target = $(1) ;
+	local sources = $(2) ;
+	local libraries = $(3) ;
+	local relPath = [ FRelPath src tests : $(SUBDIR_TOKENS) ] ;
+
+	# Turn optimization off.
+	local optim = $(OPTIM) ;
+	OPTIM = ;
+
+#	SetupIncludes ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(sources) ;
+	Main $(target) : $(sources) ;
+	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(relPath) ] ;
+	DEPENDS obostests : $(target) ;
+	LinkSharedOSLibs $(target) : $(libraries) ;
+	ObjectDefines $(sources) : TEST_OBOS ;
+
+	# Turn debugging on. That is usually desired for test code.
+	ObjectCcFlags $(sources) : "-g" ;
+	ObjectC++Flags $(sources) : "-g" ;
+
+	# Turn optimization on again.
+	OPTIM = $(optim) ;
+}
+
 rule Addon
 {
 	# Addon <name> : <relpath> : <sources> ;	
@@ -397,7 +434,7 @@ rule AddResources
 {
 	# AddResources <name> : <resourcefiles> ;
 
-	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+	SEARCH on $(2) += $(SEARCH_SOURCE) ;
 	RESFILES on $(1) += $(2) ;
 }
 
@@ -573,6 +610,27 @@ rule SplitPath
 	return $(components) ;
 }
 
+rule PrependObjectHdrs
+{
+	# PrependObjectHdrs <objects_or_sources> : <dirs> ;
+	# Prepends <dirs> to the list of header search dirs of the objects
+	# specified by <objects_or_sources>. The HDRS variable will not be
+	# changed, only CCHDRS.
+	# Note: A subsequent ObjectHdrs invocation will therefore undo the
+	# effect of this rule.
+	# NOTE: This is a hack.
+
+	local objects = [ FGristFiles $(1:S=$(SUFOBJ)) ] ;
+	local dirs = $(2) ;
+	for object in $(objects) {
+		# Don't change HDRS to avoid screwing up the header scanning.
+		PREPENDED_HDRS on $(object)
+			= $(dirs) [ on $(object) return $(PREPENDED_HDRS) ] ;
+		CCHDRS on $(object)
+			= [ FIncludes [ on $(object) return $(PREPENDED_HDRS) $(HDRS) ] ] ;
+	}
+}
+
 rule SymLink
 {
 	# SymLink <target> : <source> ;
@@ -743,6 +801,30 @@ rule ObjectReferences
 	for source in $(1) {
 		ObjectReference [ FGristFiles $(source) ] : $(source) ;
 	}
+}
+
+rule Filter
+{
+	# Filter <list> : <excludes> ;
+	# Removes all occurrences of <excludes> in <list>.
+
+	local list = $(1) ;
+	local excludes = $(2) ;
+	local newList ;
+	local item ;
+	for item in $(list) {
+		local skip ;
+		local exclude ;
+		for exclude in $(excludes) {
+			if $(item) = $(exclude) {
+				skip = true ;
+			}
+		}
+		if ! $(skip) {
+			newList += item ;
+		}
+	}
+	return $(newList) ;
 }
 
 
