@@ -843,10 +843,10 @@ AudioMixer::CreateBufferGroup()
 // BControllable methods
 //
 
-#define DB_TO_GAIN(_db)			(20.0 * log10(_db))
-#define GAIN_TO_DB(_gain)		(pow(10.0, (_gain) / 20.0))
-#define PERCENT_TO_GAIN(_db)	((_db) / 100.0)
-#define GAIN_TO_PERCENT(_gain)	((_gain)  * 100.0)
+#define DB_TO_GAIN(db)			(pow(10.0, (db) / 20.0))
+#define GAIN_TO_DB(gain)		(20.0 * log10(gain))
+#define PERCENT_TO_GAIN(pct)	((pct) / 100.0)
+#define GAIN_TO_PERCENT(gain)	((gain)  * 100.0)
 
 // the id is encoded with 16 bits
 // then chan and src (or dst) are encoded with 6 bits
@@ -902,7 +902,7 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 				goto err;
 			*ioSize = output->GetOutputChannelCount() * sizeof(float);
 			for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
-				static_cast<float *>(value)[chan] = DB_TO_GAIN(output->GetOutputChannelGain(chan));
+				static_cast<float *>(value)[chan] = GAIN_TO_DB(output->GetOutputChannelGain(chan));
 		}
 		if (PARAM_IS_SRC_ENABLE(id)) {
 			if (*ioSize < sizeof(int32))
@@ -936,7 +936,7 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 				goto err;
 			*ioSize = input->GetMixerChannelCount() * sizeof(float);
 			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
-				static_cast<float *>(value)[chan] = DB_TO_GAIN(input->GetMixerChannelGain(chan));
+				static_cast<float *>(value)[chan] = GAIN_TO_DB(input->GetMixerChannelGain(chan));
 		}
 		if (PARAM_IS_DST_ENABLE(id)) {
 			if (*ioSize < sizeof(int32))
@@ -976,7 +976,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			if (size < output->GetOutputChannelCount() * sizeof(float))
 				goto err;
 			for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
-				output->SetOutputChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
+				output->SetOutputChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
 		}
 		if (PARAM_IS_SRC_ENABLE(id)) {
 			if (size != sizeof(int32))
@@ -1010,7 +1010,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			if (size < input->GetMixerChannelCount() * sizeof(float))
 				goto err;
 			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
-				input->SetMixerChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
+				input->SetMixerChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
 		}
 		if (PARAM_IS_DST_ENABLE(id)) {
 			if (size != sizeof(int32))
@@ -1069,8 +1069,8 @@ AudioMixer::UpdateParameterWeb()
 		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
 	} else {
 		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO, StringForFormat(buf, out), B_GENERIC);
-		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
-		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", -60.0, 18.0, 0.5) 
+		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
+		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", -60.0, 18.0, 0.1)
 									   ->SetChannelCount(out->GetOutputChannelCount()); 
 		group->MakeNullParameter(PARAM_STR3(0), B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT); 
 	}
@@ -1082,7 +1082,7 @@ AudioMixer::UpdateParameterWeb()
 		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
 		// XXX the gain control is ugly once you have more than two channels,
 		//     as you don't know what channel each slider controls. Tooltips might help...
-		group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 0.5) 
+		group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 0.1) 
 									   ->SetChannelCount(in->GetMixerChannelCount()); 
 		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
 	}
@@ -1105,7 +1105,7 @@ AudioMixer::UpdateParameterWeb()
 				subsubgroup = subgroup->MakeGroup("");
 				subsubgroup->MakeDiscreteParameter(PARAM_SRC_ENABLE(0, chan, src), B_MEDIA_RAW_AUDIO, "", B_ENABLE); 
 				subsubgroup->MakeContinuousParameter(PARAM_SRC_GAIN(0, chan, src), B_MEDIA_RAW_AUDIO,
-													 StringForChannelType(buf, src), B_GAIN, "%", 0.0, 100.0, 1.0);
+													 StringForChannelType(buf, src), B_GAIN, "%", 0.0, 100.0, 0.1);
 			}
 				
 		}
