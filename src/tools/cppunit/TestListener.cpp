@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <OS.h>
 
+_EXPORT
 void
 BTestListener::startTest( CppUnit::Test *test ) {
    	fOkay = true;
@@ -14,6 +15,7 @@ BTestListener::startTest( CppUnit::Test *test ) {
    	startTime = real_time_clock_usecs();
 }
 
+_EXPORT
 void
 BTestListener::addFailure( const CppUnit::TestFailure &failure ) {
    	fOkay = false;
@@ -26,6 +28,7 @@ BTestListener::addFailure( const CppUnit::TestFailure &failure ) {
    	cout << endl;	
 }
 
+_EXPORT
 void
 BTestListener::endTest( CppUnit::Test *test )  {
 	bigtime_t length = real_time_clock_usecs() - startTime;
@@ -37,6 +40,7 @@ BTestListener::endTest( CppUnit::Test *test )  {
    	cout << endl;
 }	 
 
+_EXPORT
 void
 BTestListener::printTime(bigtime_t time) {
 	// Print out the elapsed time all pretty and stuff:

@@ -21,32 +21,42 @@
 
 #include <TestShell.h>
 #include <TestListener.h>
-#include <ElfSymbolPatcher.h>
 
-BTestShell *BTestShell::fGlobalShell = NULL;
+#ifndef NO_ELF_SYMBOL_PATCHING
+#	include <ElfSymbolPatcher.h>
+#endif
+
+_EXPORT BTestShell *BTestShell::fGlobalShell = NULL;
 const char BTestShell::indent[] = "  ";
 
+_EXPORT
 BTestShell::BTestShell(const string &description, SyncObject *syncObject)
 	: fVerbosityLevel(v2)
 	, fTestResults(syncObject)
 	, fDescription(description)
 	, fListTestsAndExit(false)
 	, fTestDir(NULL)
+#ifndef NO_ELF_SYMBOL_PATCHING
 	, fPatchGroupLocker(new(nothrow) BLocker)
 	, fPatchGroup(NULL)
 	, fOldDebuggerHook(NULL)
 	, fOldLoadAddOnHook(NULL)
 	, fOldUnloadAddOnHook(NULL)
+#endif // ! NO_ELF_SYMBOL_PATCHING
 {
 	fTLSDebuggerCall = tls_allocate();
 }
 
+_EXPORT
 BTestShell::~BTestShell() {
 	delete fTestDir;
+#ifndef NO_ELF_SYMBOL_PATCHING
 	delete fPatchGroupLocker;
+#endif // ! NO_ELF_SYMBOL_PATCHING
 }
 
 
+_EXPORT
 status_t
 BTestShell::AddSuite(BTestSuite *suite) {
 	if (suite) {
@@ -71,6 +81,7 @@ BTestShell::AddSuite(BTestSuite *suite) {
 		return B_BAD_VALUE;
 }
 
+_EXPORT
 void
 BTestShell::AddTest(const string &name, CppUnit::Test *test) {
 	if (test != NULL)
@@ -79,6 +90,7 @@ BTestShell::AddTest(const string &name, CppUnit::Test *test) {
 		fTests.erase(name);
 }
 
+_EXPORT
 int32
 BTestShell::LoadSuitesFrom(BDirectory *libDir) {
 	if (!libDir || libDir->InitCheck() != B_OK)
@@ -117,6 +129,7 @@ BTestShell::LoadSuitesFrom(BDirectory *libDir) {
 	return count;
 }
 
+_EXPORT
 int
 BTestShell::Run(int argc, char *argv[]) {
 	// Make note of which directory we started in
@@ -206,11 +219,13 @@ BTestShell::Run(int argc, char *argv[]) {
 	return 0;
 }
 
+_EXPORT
 BTestShell::VerbosityLevel
 BTestShell::Verbosity() const {
 	return fVerbosityLevel;
 } 
 
+_EXPORT
 const char*
 BTestShell::TestDir() const {
 	return (fTestDir ? fTestDir->Path() : NULL);
@@ -222,6 +237,7 @@ BTestShell::TestDir() const {
 	A subsequent call of debugger() will be intercepted and a respective
 	flag will be set. WasDebuggerCalled() will then return \c true.
 */
+_EXPORT
 void
 BTestShell::ExpectDebuggerCall()
 {
@@ -238,6 +254,7 @@ BTestShell::ExpectDebuggerCall()
 	\return \c true, if debugger() has been called by the current thread since
 			the last invocation of ExpectDebuggerCall(), \c false otherwise.
 */
+_EXPORT
 bool
 BTestShell::WasDebuggerCalled()
 {
@@ -246,11 +263,13 @@ BTestShell::WasDebuggerCalled()
 	return ((int)var > 1);
 }
 
+_EXPORT
 void
 BTestShell::PrintDescription(int argc, char *argv[]) {
 	cout << endl << fDescription;
 }
 
+_EXPORT
 void
 BTestShell::PrintHelp() {
 	cout << endl;
@@ -260,6 +279,7 @@ BTestShell::PrintHelp() {
 	
 }
 
+_EXPORT
 void
 BTestShell::PrintValidArguments() {
 	cout << indent << "--help       Displays this help text plus some other garbage" << endl;
@@ -281,6 +301,7 @@ BTestShell::PrintValidArguments() {
 	cout << indent << "             libraries" << endl;
 }
 
+_EXPORT
 void
 BTestShell::PrintInstalledTests() {
 	// Print out the list of installed suites
@@ -302,6 +323,7 @@ BTestShell::PrintInstalledTests() {
 	cout << endl;
 }
 
+_EXPORT
 bool
 BTestShell::ProcessArguments(int argc, char *argv[]) {
 	// If we're given no parameters, the default settings
@@ -321,6 +343,7 @@ BTestShell::ProcessArguments(int argc, char *argv[]) {
 	return true;
 }
 
+_EXPORT
 bool
 BTestShell::ProcessArgument(string arg, int argc, char *argv[]) {
 	if (arg == "--help") {
@@ -347,6 +370,7 @@ BTestShell::ProcessArgument(string arg, int argc, char *argv[]) {
 	return true;
 }			
 
+_EXPORT
 void
 BTestShell::InitOutput() {
 	// For vebosity level 2, we output info about each test
@@ -361,6 +385,7 @@ BTestShell::InitOutput() {
 	fTestResults.addListener(&fResultsCollector);
 }
 
+_EXPORT
 void
 BTestShell::PrintResults() {
 
@@ -411,6 +436,7 @@ BTestShell::PrintResults() {
 	
 }
 
+_EXPORT
 void
 BTestShell::LoadDynamicSuites() {
 	if (Verbosity() >= v3) {
@@ -447,6 +473,7 @@ BTestShell::LoadDynamicSuites() {
 	
 }
 
+_EXPORT
 void
 BTestShell::UpdateTestDir(char *argv[]) {
 	BPath path(argv[0]);
@@ -465,9 +492,11 @@ BTestShell::UpdateTestDir(char *argv[]) {
 	load_add_on() and unload_add_on() are patches as well, to keep the
 	patch group up to date, when images are loaded/unloaded.
 */
+_EXPORT
 void
 BTestShell::InstallPatches()
 {
+#ifndef NO_ELF_SYMBOL_PATCHING
 	if (fPatchGroup) {
 		cerr << "BTestShell::InstallPatches(): Patch group already exist!"
 			<< endl;
@@ -503,14 +532,17 @@ BTestShell::InstallPatches()
 			<< endl;
 		UninstallPatches();
 	}
+#endif // ! NO_ELF_SYMBOL_PATCHING
 }
 
 // UninstallPatches
 /*!	\brief Undoes the patches applied by InstallPatches().
 */
+_EXPORT
 void
 BTestShell::UninstallPatches()
 {
+#ifndef NO_ELF_SYMBOL_PATCHING
 	BAutolock locker(fPatchGroupLocker);
 	if (!locker.IsLocked()) {
 		cerr << "BTestShell::UninstallPatches(): "
@@ -522,9 +554,13 @@ BTestShell::UninstallPatches()
 		delete fPatchGroup;
 		fPatchGroup = NULL;
 	}
+#endif // ! NO_ELF_SYMBOL_PATCHING
 }
 
+#ifndef NO_ELF_SYMBOL_PATCHING
+
 // _Debugger
+_EXPORT
 void
 BTestShell::_Debugger(const char *message)
 {
@@ -546,6 +582,7 @@ cout << "debugger() called: " << message << endl;
 }
 
 // _LoadAddOn
+_EXPORT
 image_id
 BTestShell::_LoadAddOn(const char *path)
 {
@@ -560,6 +597,7 @@ BTestShell::_LoadAddOn(const char *path)
 }
 
 // _UnloadAddOn
+_EXPORT
 status_t
 BTestShell::_UnloadAddOn(image_id image)
 {
@@ -577,6 +615,7 @@ BTestShell::_UnloadAddOn(image_id image)
 }
 
 // _DebuggerHook
+_EXPORT
 void
 BTestShell::_DebuggerHook(const char *message)
 {
@@ -584,6 +623,7 @@ BTestShell::_DebuggerHook(const char *message)
 }
 
 // _LoadAddOnHook
+_EXPORT
 image_id
 BTestShell::_LoadAddOnHook(const char *path)
 {
@@ -591,9 +631,11 @@ BTestShell::_LoadAddOnHook(const char *path)
 }
 
 // _UnloadAddOnHook
+_EXPORT
 status_t
 BTestShell::_UnloadAddOnHook(image_id image)
 {
 	return fGlobalShell->_UnloadAddOn(image);
 }
 
+#endif // ! NO_ELF_SYMBOL_PATCHING

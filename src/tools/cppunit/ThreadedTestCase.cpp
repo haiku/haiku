@@ -1,8 +1,10 @@
 #include <TestShell.h>
 #include <ThreadedTestCase.h>
 #include <Autolock.h>
-#include <stdio.h>	
+#include <stdio.h>
+#include <stdarg.h>
 
+_EXPORT
 BThreadedTestCase::BThreadedTestCase(string name, string progressSeparator)
 	: BTestCase(name)
 	, fProgressSeparator(progressSeparator)
@@ -10,6 +12,7 @@ BThreadedTestCase::BThreadedTestCase(string name, string progressSeparator)
 {
 }
 
+_EXPORT
 BThreadedTestCase::~BThreadedTestCase() {
 	// Kill our locker
 	delete fUpdateLock;
@@ -23,6 +26,7 @@ BThreadedTestCase::~BThreadedTestCase() {
 	}		   
 }
 
+_EXPORT
 void
 BThreadedTestCase::NextSubTest() {
 	// Find out what thread we're in
@@ -47,6 +51,7 @@ BThreadedTestCase::NextSubTest() {
 	BTestCase::NextSubTest();	
 }
 
+_EXPORT
 void
 BThreadedTestCase::Outputf(const char *str, ...) {
 	if (BTestShell::GlobalBeVerbose()) {
@@ -78,6 +83,7 @@ BThreadedTestCase::Outputf(const char *str, ...) {
 	}
 }
 
+_EXPORT
 void
 BThreadedTestCase::InitThreadInfo(thread_id id, string threadName) {
 	BAutolock lock(fUpdateLock);	// Lock the number map
@@ -94,6 +100,7 @@ BThreadedTestCase::InitThreadInfo(thread_id id, string threadName) {
 	}
 }
 
+_EXPORT
 bool
 BThreadedTestCase::RegisterForUse() {
 	if (!fInUse) {
@@ -103,17 +110,20 @@ BThreadedTestCase::RegisterForUse() {
 		return false;
 }
 
+_EXPORT
 void
 BThreadedTestCase::UnregisterForUse() {
 	fInUse = false;
 }
 
+_EXPORT
 vector<string>&
 BThreadedTestCase::AcquireUpdateList() {
 	fUpdateLock->Lock();
 	return fUpdateList;
 }
 
+_EXPORT
 void
 BThreadedTestCase::ReleaseUpdateList() {
 	fUpdateLock->Unlock();

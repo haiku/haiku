@@ -16,7 +16,7 @@ class CppUnit::Exception;
 	You should not need to explicitly use this class in any
 	of your tests.
 */
-class BTestListener : public CppUnit::TestListener {
+class CPPUNIT_API BTestListener : public CppUnit::TestListener {
 public:
     virtual void startTest( CppUnit::Test *test );
 	virtual void addFailure( const CppUnit::TestFailure &failure );

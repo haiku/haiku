@@ -46,7 +46,7 @@ typedef CppUnit::SynchronizedObject::SynchronizationObject SyncObject;
 	user can get a list of each test installed via AddSuite(), and optionally
 	can opt to run only a specified set of them.
 */
-class BTestShell {
+class CPPUNIT_API BTestShell {
 public:
 	BTestShell(const string &description = "", SyncObject *syncObject = 0);	
 	virtual ~BTestShell();
@@ -120,13 +120,14 @@ protected:
 	static const char indent[];
 	bool fListTestsAndExit;
 	BPath *fTestDir;
-	BLocker *fPatchGroupLocker;
 	int32 fTLSDebuggerCall;
+#ifndef NO_ELF_SYMBOL_PATCHING
+	BLocker *fPatchGroupLocker;
 	ElfSymbolPatchGroup *fPatchGroup;
 	void (*fOldDebuggerHook)(const char*);
 	image_id (*fOldLoadAddOnHook)(const char*);
 	status_t (*fOldUnloadAddOnHook)(image_id);
-
+#endif // ! NO_ELF_SYMBOL_PATCHING
 
 	//! Prints a brief description of the program.
 	virtual void PrintDescription(int argc, char *argv[]);
@@ -177,6 +178,7 @@ private:
 	//! Prevents the use of the copy operator.
 	void operator =( const BTestShell &copy );
 
+#ifndef NO_ELF_SYMBOL_PATCHING
 	void _Debugger(const char* message);
 	image_id _LoadAddOn(const char* path);
 	status_t _UnloadAddOn(image_id image);
@@ -184,6 +186,7 @@ private:
 	static void _DebuggerHook(const char* message);
 	static image_id _LoadAddOnHook(const char* path);
 	static status_t _UnloadAddOnHook(image_id image);
+#endif	// ! NO_ELF_SYMBOL_PATCHING
 	
 };	// class BTestShell
 

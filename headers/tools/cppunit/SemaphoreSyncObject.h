@@ -8,7 +8,7 @@
 /*!	This class is used to serialize access to a TestResult object. You should
 	not need to explicitly use it anywhere in your testing code.
 */
-class SemaphoreSyncObject : public CppUnit::SynchronizedObject::SynchronizationObject {
+class CPPUNIT_API SemaphoreSyncObject : public CppUnit::SynchronizedObject::SynchronizationObject {
 public:
 	SemaphoreSyncObject();
 	virtual ~SemaphoreSyncObject();

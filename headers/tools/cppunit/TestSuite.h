@@ -8,7 +8,7 @@
 class CppUnit::TestResult;
 
 //! Groups together a set of tests for a given kit.
-class BTestSuite : public CppUnit::Test {
+class CPPUNIT_API BTestSuite : public CppUnit::Test {
 public:
 	BTestSuite( string name = "" );
 	virtual ~BTestSuite();

@@ -14,7 +14,7 @@
 class TestResult;
 
 template <class TestClass, class ExpectedException = CppUnit::NoExceptionExpected>
-class BThreadedTestCaller : public CppUnit::TestCase { 
+class CPPUNIT_API BThreadedTestCaller : public CppUnit::TestCase { 
 public:
 	/*! \brief Pointer to a test function in the given class.
 		Each ThreadMethod added with addThread() is run in its own thread.

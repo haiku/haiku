@@ -6,7 +6,7 @@
 #include <SupportDefs.h>
 
 //! Base class for single threaded unit tests
-class BTestCase : public CppUnit::TestCase {
+class CPPUNIT_API BTestCase : public CppUnit::TestCase {
 public:
 	BTestCase(string Name = "");
 	

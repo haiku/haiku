@@ -9,7 +9,7 @@
 #include <vector>
 
 //! Base class for single threaded unit tests
-class BThreadedTestCase : public BTestCase {
+class CPPUNIT_API BThreadedTestCase : public BTestCase {
 public:
 	BThreadedTestCase(string Name = "", string progressSeparator = ".");
 	virtual ~BThreadedTestCase();

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "UnitTesterHelper.h"
 #include <SemaphoreSyncObject.h>
 #include <Directory.h>
@@ -23,16 +25,16 @@ int main(int argc, char *argv[]) {
 	return result;
 }
 
-//const std::string UnitTesterShell::defaultLibDir = "./lib";
+//const string UnitTesterShell::defaultLibDir = "./lib";
 
-UnitTesterShell::UnitTesterShell(const std::string &description, SyncObject *syncObject)
+UnitTesterShell::UnitTesterShell(const string &description, SyncObject *syncObject)
 	: BTestShell(description, syncObject)
 {
 }
 
 void
 UnitTesterShell::PrintDescription(int argc, char *argv[]) {
-	std::string AppName = argv[0];
+	string AppName = argv[0];
 	cout << endl;
 	cout << "This program is the central testing framework for the purpose" << endl;
 	cout << "of testing and verifying the various kits, classes, functions," << endl;

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+_EXPORT
 BTestCase::BTestCase(string name)
 	: CppUnit::TestCase(name)
 	, fValidCWD(false)
@@ -11,12 +12,14 @@ BTestCase::BTestCase(string name)
 {
 }
 
+_EXPORT
 void
 BTestCase::tearDown() {
 	if (fSubTestNum != 0)
 		NextSubTestBlock();
 }
 
+_EXPORT
 void
 BTestCase::NextSubTest() {
 	if (BTestShell::GlobalBeVerbose()) {
@@ -25,12 +28,14 @@ BTestCase::NextSubTest() {
 	}
 }
 
+_EXPORT
 void
 BTestCase::NextSubTestBlock() {
 	if (BTestShell::GlobalBeVerbose()) 
 		printf("\n");
 }
 
+_EXPORT
 void
 BTestCase::Outputf(const char *str, ...) {
 	if (BTestShell::GlobalBeVerbose()) {
@@ -43,6 +48,7 @@ BTestCase::Outputf(const char *str, ...) {
 }
 
 /*! To return to the last saved working directory, call RestoreCWD(). */
+_EXPORT
 void
 BTestCase::SaveCWD() {
 	fValidCWD = getcwd(fCurrentWorkingDir, B_PATH_NAME_LENGTH);
@@ -53,6 +59,7 @@ BTestCase::SaveCWD() {
 	changed to alternate. If alternate is null, the current working directory
 	is not modified.
 */
+_EXPORT
 void
 BTestCase::RestoreCWD(const char *alternate) {
 	if (fValidCWD)

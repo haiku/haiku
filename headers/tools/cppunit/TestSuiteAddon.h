@@ -3,8 +3,6 @@
 
 class BTestSuite;
 
-extern "C" {
-	BTestSuite* getTestSuite();
-}
+extern "C" CPPUNIT_API BTestSuite* getTestSuite();
 
 #endif	// _beos_test_suite_addon_h_

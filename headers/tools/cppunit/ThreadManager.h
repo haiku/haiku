@@ -13,7 +13,7 @@
 
 // Helper class to handle thread management
 template <class TestClass, class ExpectedException>
-class BThreadManager {
+class CPPUNIT_API BThreadManager {
 public:
 	typedef void (TestClass::*ThreadMethod)();
 	

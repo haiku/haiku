@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <iostream>
 
+_EXPORT
 status_t DecodeResult(status_t result) {
 	if (!BTestShell::GlobalBeVerbose())
 		return result;
@@ -178,17 +179,20 @@ status_t DecodeResult(status_t result) {
 	return result;
 }
 
+_EXPORT
 string IntToStr(int i) {
 	char num[32];
 	sprintf(num, "%d", i);
 	return string(num);
 }
 
+_EXPORT
 void ExecCommand(const char *command) {
 	if (command)
 		system(command);
 }
 
+_EXPORT
 void ExecCommand(const char *command, const char *parameter) {
 	if (command && parameter) {
 		char *cmdLine = new char[strlen(command) + strlen(parameter) + 1];
@@ -199,6 +203,7 @@ void ExecCommand(const char *command, const char *parameter) {
 	}
 }
 
+_EXPORT
 void ExecCommand(const char *command, const char *parameter1,
 							const char *parameter2) {
 	if (command && parameter1 && parameter2) {

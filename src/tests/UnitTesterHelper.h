@@ -6,7 +6,7 @@
 
 class UnitTesterShell : public BTestShell {
 public:
-	UnitTesterShell(const std::string &description = "", SyncObject *syncObject = 0);
+	UnitTesterShell(const string &description = "", SyncObject *syncObject = 0);
 protected:
 	virtual void PrintDescription(int argc, char *argv[]);
 	virtual void PrintValidArguments();

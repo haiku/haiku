@@ -7,6 +7,8 @@
 #include <List.h>
 #include <MessageQueue.h>
 
+#include <cppunit/Portability.h>
+
 // TestHandler
 
 class BTestHandler : public BHandler {
@@ -21,7 +23,7 @@ private:
 
 // TestApp
 
-class BTestApp : public BApplication {
+class CPPUNIT_API BTestApp : public BApplication {
 public:
 	BTestApp(const char *signature);
 	virtual ~BTestApp();

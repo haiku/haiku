@@ -7,6 +7,7 @@
 // TestHandler
 
 // MessageReceived
+_EXPORT
 void
 BTestHandler::MessageReceived(BMessage *message)
 {
@@ -18,6 +19,7 @@ BTestHandler::MessageReceived(BMessage *message)
 }
 
 // Queue
+_EXPORT
 BMessageQueue &
 BTestHandler::Queue()
 {
@@ -28,6 +30,7 @@ BTestHandler::Queue()
 // TestApp
 
 // constructor
+_EXPORT
 BTestApp::BTestApp(const char *signature)
 	   : BApplication(signature),
 		 fAppThread(B_ERROR),
@@ -38,6 +41,7 @@ BTestApp::BTestApp(const char *signature)
 }
 
 // destructor
+_EXPORT
 BTestApp::~BTestApp()
 {
 	int32 count = fHandlers.CountItems();
@@ -46,6 +50,7 @@ BTestApp::~BTestApp()
 }
 
 // Init
+_EXPORT
 status_t
 BTestApp::Init()
 {
@@ -65,6 +70,7 @@ BTestApp::Init()
 }
 
 // Terminate
+_EXPORT
 void
 BTestApp::Terminate()
 {
@@ -74,12 +80,14 @@ BTestApp::Terminate()
 }
 
 // ReadyToRun
+_EXPORT
 void
 BTestApp::ReadyToRun()
 {
 }
 
 // CreateTestHandler
+_EXPORT
 BTestHandler *
 BTestApp::CreateTestHandler()
 {
@@ -92,6 +100,7 @@ BTestApp::CreateTestHandler()
 }
 
 // DeleteTestHandler
+_EXPORT
 bool
 BTestApp::DeleteTestHandler(BTestHandler *handler)
 {
@@ -107,6 +116,7 @@ BTestApp::DeleteTestHandler(BTestHandler *handler)
 }
 
 // Handler
+_EXPORT
 BTestHandler &
 BTestApp::Handler()
 {
@@ -116,6 +126,7 @@ BTestApp::Handler()
 }
 
 // TestHandlerAt
+_EXPORT
 BTestHandler *
 BTestApp::TestHandlerAt(int32 index)
 {
@@ -124,6 +135,7 @@ BTestApp::TestHandlerAt(int32 index)
 }
 
 // _AppThreadStart
+_EXPORT
 int32
 BTestApp::_AppThreadStart(void *data)
 {

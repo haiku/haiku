@@ -6,13 +6,20 @@ rule CppUnitLibrary
 {
 	# CppUnitLibrary <sources> ;
 	local _lib = libcppunit.so ;
-	
+
 	UseCppUnitHeaders ;
 	SetupObjectsDir ;
-	MakeLocateObjects [ FGristFiles $(<) ] ;
-	BuildPlatformMain $(_lib) : $(<) ;
+	MakeLocateObjects [ FGristFiles $(1) ] ;
+	BuildPlatformMain $(_lib) : $(1) ;
 	MakeLocate $(_lib) : /boot/home/config/lib ;
 	LINKFLAGS on $(_lib) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(_lib)\" ;
+
+	local defines = BUILDING_CPPUNIT ;
+
+	if $(OS) = BEOS && $(OSPLAT) = PPC {
+		defines += NO_ELF_SYMBOL_PATCHING ;
+	}
+	ObjectsDefines $(1) : $(defines) ;
 }
 
 CppUnitLibrary
@@ -49,7 +56,10 @@ CppUnitLibrary
 ;
 
 LinkSharedOSLibs libcppunit.so :
-	stdc++.r4
-	/boot/develop/lib/x86/libbe.so
-	libelfsymbolpatcher.a
+	stdc++.r4	# is called `mslcpp_4_0' on PPC -- just create a symlink
+	be
 ;
+
+if  $(OS) != BEOS || $(OSPLAT) != PPC {
+	LinkSharedOSLibs libcppunit.so : libelfsymbolpatcher.a ;
+}
