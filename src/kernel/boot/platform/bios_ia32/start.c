@@ -41,8 +41,22 @@ platform_user_menu_requested(void)
 }
 
 
+status_t
+platform_allocate_region(void **_address, size_t size, uint8 protection)
+{
+	return B_ERROR;
+}
+
+
+status_t
+platform_free_region(void *address, size_t size)
+{
+	return B_ERROR;
+}
+
+
 void
-platform_release_heap(void *base)
+platform_release_heap(struct stage2_args *args, void *base)
 {
 }
 

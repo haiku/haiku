@@ -15,7 +15,7 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 
 
 status_t
-platform_get_boot_partition(struct stage2_args *args, struct list *list,
+platform_get_boot_partition(struct stage2_args *args, NodeList *list,
 	boot::Partition **_partition)
 {
 	return B_ERROR;
@@ -23,7 +23,7 @@ platform_get_boot_partition(struct stage2_args *args, struct list *list,
 
 
 status_t
-platform_add_block_devices(stage2_args *args, list *devicesList)
+platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 {
 	return B_ERROR;
 }
