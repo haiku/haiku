@@ -36,6 +36,7 @@ public:
 	virtual void DetachedFromWindow();
 	virtual void Draw(BRect updateRect);
 
+	void SetPlaying(bool flag);
 	void SetEnabled(bool flag);
 	void SetHaveFile(bool flag);
 
@@ -48,9 +49,11 @@ private:
 	
 	void DrawNoFile();
 	void DrawDisabled();
+	void DrawStopped();
 	void DrawPlaying();
 	
 	bool finished;
+	bool playing;
 	bool enabled;
 	bool haveFile;
 	int32 sampleCount;

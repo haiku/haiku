@@ -68,14 +68,12 @@ private:
 	void LoadSettings();
 	void SaveSettings();
 
-	static int32 _LoadThread(void* data);
-	int32 LoadThread();
-
-	static int32 _StopThread(void* data);
-	int32 StopThread();
-
+	void LoadFile(entry_ref* ref);
 	void StartSynth();
 	void StopSynth();
+
+	static void _StopHook(int32 arg);
+	void StopHook();
 
 	void OnPlayStop();
 	void OnShowScope();
@@ -101,14 +99,12 @@ private:
 
 	bool playing;
 	bool scopeEnabled;
+	int32 inputId;
 	reverb_mode reverb;
 	int32 volume;
 	float windowX;
 	float windowY;
 	BMidiSynthFile synth;
-	entry_ref ref;
-	thread_id threadId;
-	int32 inputId;
 };
 
 #endif // MIDI_PLAYER_WINDOW_H

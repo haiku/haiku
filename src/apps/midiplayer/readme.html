@@ -28,13 +28,10 @@
 <li>Play and Stop are now one and the same button.</li>
 <li>There is no Open File... function.</li>
 <li>You cannot set the Quality of the sound (always 44100 Hz).</li>
+<li>While the song fades out, the scope temporarily freezes; the R5 MidiPlayer kept repainting during the fade-out (which, admittedly, looks better). At one point, the Haiku MidiPlayer did that too but the code made my head hurt, so I pulled it out again :-)</li>
 </ul>
 
 <p>If people really <i>really</i> want these missing features, then feel free to add them :-)</p>
-
-<h3>Implementation notes</h3>
-
-<p>The code can be a little tricky at times, since it uses fire-and-forget threads to load new songs and to stop playback. The reason for this is the scope: we want to keep repainting the ScopeView even when fading out a song (because this looks cool), but fading blocks the calling thread. If we were to block the window's looper, then the scope wouldn't repaint during the fade-out. So we fade using a separate thread instead. Unfortunately, this makes the code much less clean as it introduces several race conditions. Yech. See the source for more details.</p>
 
 </body>
 </html>

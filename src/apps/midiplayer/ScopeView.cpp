@@ -33,6 +33,7 @@ ScopeView::ScopeView()
 {
 	SetViewColor(0, 0, 0);
 
+	playing = false;
 	enabled = true;
 	haveFile = false;
 	
@@ -87,10 +88,21 @@ void ScopeView::Draw(BRect updateRect)
 	{
 		DrawDisabled();
 	}
+	else if (!playing)
+	{
+		DrawStopped();
+	}
 	else 
 	{
 		DrawPlaying();
 	}
+}
+
+//------------------------------------------------------------------------------
+
+void ScopeView::SetPlaying(bool flag)
+{
+	playing = flag;
 }
 
 //------------------------------------------------------------------------------
@@ -124,7 +136,7 @@ int32 ScopeView::Thread()
 
 	while (!finished)
 	{
-		if (enabled && haveFile)
+		if (enabled && playing && haveFile)
 		{
 			if (LockLooperWithTimeout(50000) == B_OK)
 			{
@@ -164,6 +176,17 @@ void ScopeView::DrawNoFile()
 void ScopeView::DrawDisabled()
 {
 	SetHighColor(64, 64, 64);
+
+	StrokeLine(
+		BPoint(0, Bounds().Height() / 2), 
+		BPoint(Bounds().Width(), Bounds().Height() / 2));
+}
+
+//------------------------------------------------------------------------------
+
+void ScopeView::DrawStopped()
+{
+	SetHighColor(0, 130, 0);
 
 	StrokeLine(
 		BPoint(0, Bounds().Height() / 2), 
