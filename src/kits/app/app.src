@@ -1,4 +1,5 @@
 APP_KIT_SOURCE =
+	Application.cpp
 	Cursor.cpp
 	Handler.cpp
 	Invoker.cpp
@@ -7,5 +8,7 @@ APP_KIT_SOURCE =
 	MessageFilter.cpp
 	MessageQueue.cpp
 	Messenger.cpp
+	RegistrarDefs.cpp
+	Roster.cpp
 	TokenSpace.cpp
 ;
