@@ -11,7 +11,6 @@
 #include <lock.h>
 #include <vm.h>
 #include <Errors.h>
-#include <kerrors.h>
 #include <Drivers.h>
 #include <sys/stat.h>
 #include <KernelExport.h>
@@ -294,7 +293,9 @@ static status_t
 devfs_get_partition_info( struct devfs *fs, struct devfs_vnode *v, 
 	struct devfs_cookie *cookie, void *buf, size_t len)
 {
-	devfs_partition_info *info = (devfs_partition_info *)buf;
+	// ToDo: make me userspace safe!
+
+	partition_info *info = (partition_info *)buf;
 	struct devfs_part_map *part_map = v->stream.u.dev.part_map;
 
 	if (v->stream.type != STREAM_TYPE_DEVICE || part_map == NULL)
@@ -308,7 +309,7 @@ devfs_get_partition_info( struct devfs *fs, struct devfs_vnode *v,
 
 	// XXX: todo - create raw device name out of raw_vnode 
 	//             we need vfs support for that (see vfs_get_cwd)
-	strcpy(info->raw_device, "something_raw");
+	strcpy(info->device, "something_raw");
 	
 	return B_NO_ERROR;
 }
@@ -322,42 +323,41 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 	struct devfs_vnode *part_node;
 	int res;
 	char part_name[30];
-	devfs_partition_info info;
-	
-	info = *(devfs_partition_info *)buf;
-	
+
+	partition_info info = *(partition_info *)buf;
+
 	if (v->stream.type != STREAM_TYPE_DEVICE)
 		return EINVAL;
-		
+
 	// we don't support nested partitions
 	if (v->stream.u.dev.part_map)
 		return EINVAL;
-	
+
 	// reduce checks to a minimum - things like negative offsets could be useful
 	if (info.size < 0)
 		return EINVAL;
-				
+
 	// create partition map
 	part_map = malloc(sizeof(*part_map));
 	if (!part_map)
 		return ENOMEM;
-		
+
 	part_map->offset = info.offset;
 	part_map->size = info.size;
 	part_map->logical_block_size = info.logical_block_size;
 	part_map->session = info.session;
 	part_map->partition = info.partition;
-		
+
 	sprintf(part_name, "%li_%li", info.session, info.partition);
 
 	mutex_lock(&gDeviceFileSystem->lock);
-	
+
 	// you cannot change a partition once set
 	if (devfs_find_in_dir( v->parent, part_name)) {
 		res = EINVAL;
 		goto err1;
 	}
-	
+
 	// increase reference count of raw device - 
 	// the partition device really needs it 
 	// (at least to resolve its name on GET_PARTITION_INFO)
@@ -367,7 +367,7 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 
 	// now create the partition node	
 	part_node = devfs_create_vnode(fs, part_name);
-	
+
 	if (part_node == NULL) {
 		res = B_NO_MEMORY;
 		goto err2;
@@ -383,11 +383,11 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 	devfs_insert_in_dir(v->parent, part_node);
 
 	mutex_unlock(&gDeviceFileSystem->lock);
-	
+
 	TRACE(("SET_PARTITION: Added partition\n"));
 
 	return B_NO_ERROR;
-	
+
 err1:
 	mutex_unlock(&gDeviceFileSystem->lock);
 
@@ -417,7 +417,7 @@ devfs_mount(mount_id id, const char *devfs, void *args, fs_volume *_fs, vnode_id
 
 	if (gDeviceFileSystem) {
 		dprintf("double mount of devfs attempted\n");
-		err = ERR_GENERAL;
+		err = B_ERROR;
 		goto err;
 	}
 
@@ -580,7 +580,7 @@ devfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 	if (*_vnode)
 		return 0;
 
-	return ERR_NOT_FOUND;
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -855,30 +855,31 @@ devfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-devfs_ioctl(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, ulong op, void *buf, size_t len)
+devfs_ioctl(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, ulong op, void *buffer, size_t len)
 {
 	struct devfs *fs = _fs;
-	struct devfs_vnode *v = _v;
+	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;
 
-	TRACE(("devfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n", _v, _cookie, op, buf, len));
+	TRACE(("devfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n", _v, _cookie, op, buffer, len));
 	
-	if (v->stream.type == STREAM_TYPE_DEVICE) {
+	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
 		switch (op) {
-			case IOCTL_DEVFS_GET_PARTITION_INFO:
-				return devfs_get_partition_info(fs, v, cookie, buf, len);
+			case B_GET_PARTITION_INFO:
+				return devfs_get_partition_info(fs, vnode, cookie, buffer, len);
 
-			case IOCTL_DEVFS_SET_PARTITION:
-				return devfs_set_partition(fs, v, cookie, buf, len);
+			case B_SET_PARTITION:
+				return devfs_set_partition(fs, vnode, cookie, buffer, len);
 		}
 
-		return v->stream.u.dev.ops->control(cookie->u.dev.dcookie, op, buf, len);
+		return vnode->stream.u.dev.ops->control(cookie->u.dev.dcookie, op, buffer, len);
 	}
-	return EINVAL;
+
+	return B_BAD_VALUE;
 }
 
 
-/*
+#if 0
 static int devfs_canpage(fs_volume _fs, fs_vnode _v)
 {
 	struct devfs_vnode *v = _v;
@@ -953,7 +954,8 @@ static ssize_t devfs_writepage(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t p
 		return ERR_NOT_ALLOWED;
 	}
 }
-*/
+#endif
+
 
 static status_t
 devfs_unlink(fs_volume _fs, fs_vnode _dir, const char *name)
@@ -1099,7 +1101,7 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 {
 	int err = 0;
 	int i, last;
-	char temp[SYS_MAX_PATH_LEN+1];
+	char temp[B_PATH_NAME_LENGTH + 1];
 	struct devfs_vnode *dir;
 	struct devfs_vnode *v;
 	bool at_leaf;
@@ -1113,12 +1115,11 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 
 	if (!gDeviceFileSystem) {
 		panic("devfs_publish_device called before devfs mounted\n");
-		return ERR_GENERAL;
+		return B_ERROR;
 	}
 
 	// copy the path over to a temp buffer so we can munge it
-	strncpy(temp, path, SYS_MAX_PATH_LEN);
-	temp[SYS_MAX_PATH_LEN] = 0;
+	strlcpy(temp, path, B_PATH_NAME_LENGTH);
 
 	mutex_lock(&gDeviceFileSystem->lock);
 
@@ -1157,7 +1158,7 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 			// we are at the leaf and hit another node
 			// or we aren't but hit a non-dir node.
 			// we're screwed
-			err = ERR_VFS_ALREADY_EXISTS;
+			err = B_FILE_EXISTS;
 			goto err;
 		} else {
 			v = devfs_create_vnode(gDeviceFileSystem, &temp[last]);
