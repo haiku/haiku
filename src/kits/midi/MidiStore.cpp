@@ -436,8 +436,8 @@ void BMidiStore::Run()
 	paused = false;
 	finished = false;
 	
-	int32 timeAdjust;
-	uint32 baseTime;
+	int32 timeAdjust = 0;
+	uint32 baseTime = 0;
 	bool firstEvent = true;
 	bool resetTime = false;
 
@@ -980,8 +980,8 @@ void BMidiStore::WriteTrack()
 	Write32Bit(0);
 
 	byteCount = 0;
-	uint32 oldTime;
-	uint32 newTime;
+	uint32 oldTime = 0;
+	uint32 newTime = 0;
 
 	for (uint32 t = 0; t < CountEvents(); ++t)
 	{

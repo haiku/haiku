@@ -230,7 +230,7 @@ void BMidiLocalProducer::SpraySystemExclusive(
 void BMidiLocalProducer::SpraySystemCommon(
 	uchar status, uchar data1, uchar data2, bigtime_t time) const
 {
-	size_t len;
+	size_t len = 0;
 	uchar data[3];
 	data[0] = status;
 	data[1] = data1;
