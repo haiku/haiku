@@ -9,7 +9,7 @@
 #include <kerrors.h>
 
 
-char const *
+char *
 strerror(int errnum)
 {
 	switch (errnum) {
