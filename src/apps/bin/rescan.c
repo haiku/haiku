@@ -18,6 +18,10 @@ int main(int argc, char **argv)
 	int scan_index = 0;
 	int fd_dev;
 
+	if (argc == 2 && !strcmp(argv[1], "--help")) {
+		printf("usage: rescan [driver]\n");
+		return 0;
+	}
 	if (argc > 1) {
 		scan = scan_names = argv;
 		scan_count = argc;
@@ -29,5 +33,6 @@ int main(int argc, char **argv)
 		write(fd_dev, scan[scan_index], strlen(scan[scan_index]));
 		close(fd_dev);
 	}
+	return 0;
 }
 
