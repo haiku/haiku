@@ -30,22 +30,21 @@ Especially owners of laptops are encouraged to be extra carefull with their inte
 <hr>
 <h2>Features:</h2>
 <ul>
-	<li>Hardware cursor support;
+	<li>Hardware cursor support (on both heads on dualhead cards);
 	<li>Full 2D acceleration;
 	<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
-	<li>DPMS support;
-	<li>B_YCbCr422 hardware overlay support on all cards (so on both TNT and GeForce series).
+	<li>DPMS support (on both heads on dualhead cards);
+	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards (only on primary head on dualhead cards);
+	<li>Dualhead support (use Mark Watson's 'G400 Dualhead Setup' from BeBits for now).
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
 	<li>If the driver does not load make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
-	<li>If the driver seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site);
-	<li>256Mb RAM detection is still missing for cards that have that much of it: Please set the amount manually for now via the nv.settings file (driver defaults to 16Mb if you don't);
 	<li>Flatpanel protection for laptops is not yet in place: be carefull! External only output has been reported functional though.
 	<li>No DVI support: you have to use a standard VGA cable to connect external flatpanels;
 	<li>Embedded GeForce RAM detection is non-functional: please set amount manually for now via the nv.settings file (driver probably defaults to 1Mb if you don't). If you have overlay trouble, set a slightly smaller amount of RAM than you actually specified in the system BIOS (1Mb less or so);
-	<li>A few cards have hardcursor trouble. If you encounter this use the softcursor: select this via the nv.settings file;
-	<li>GeForce FX 5700 and FX 5950 are not yet supported (mail me if you own such a card!).
+	<li>A few cards still might have hardcursor trouble. If you encounter this use the softcursor: select this via the nv.settings file. Make sure you mail me if you still have trouble but also if this version fixed that!;
+	<li>If the driver still seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
 </ul>
 <br>
 <hr>
@@ -123,6 +122,6 @@ Dumprom is another 'tool' for bug-tracking purposes.
 <hr>
 <br>
 <a href="mailto:rag.cornelissen@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on January 17, 2004)</p>
+<p>(Page last updated on January 22, 2004)</p>
 </body>
 </html>

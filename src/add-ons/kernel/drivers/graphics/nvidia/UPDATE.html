@@ -4,16 +4,19 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.08-4, Rudolf)</h1></p>
+<p><h1>head (0.08-6, Rudolf)</h1></p>
 <ul>
-	<li>Fixed GeForceFX 5600 monitor 'refresh out of range' / shutoff fault. nVidia changed the pixelPLL for the NV31 (fix is a hack for now due to missing specs);
+	<li>Fixed GeForceFX 5600 and FX 5700 monitor 'refresh out of range' / shutoff fault. nVidia changed the pixelPLL for the NV31 and NV36;
 	<li>Fixed acceleration engine restrictions code to adhere to GeForceFX 5600 restrictions: those are still NV20 style for this card;
 	<li>Fixed overlay scaling restriction code to adhere to GeForceFX 5600 restrictions: engine is still the NV10/NV20 one, so it can downscale to 1/8 of the picture size;
 	<li>Kernel driver now signals abort on not being able to setup the INT routine instead of letting the machine freeze during accelerant initialisation;
 	<li>BWindowScreen R3-style function update for acceleration and page flipping/virtualscreens in apps ('Allegro' update): fixed cloning accelerants;
 	<li>Now only programming options head select register on dualhead cards. This fixes driver hanging on integrated GeForce2 cards (ID 0x01a0), and maybe also on some other cards;
 	<li>Expanded modelist to include suggested modes above 1600x1200 upto 2048x1536 resolution (if a card supports them): Done by Andrew Bachmann;
-	<li>Added card recognition for GeForceFX 5700, FX 5950 and some other (older) cards.
+	<li>Added card recognition for GeForceFX 5700, FX 5950 and some other (older) cards;
+	<li>Added 256Mb RAM detection;
+	<li>Improved startup code: this should (could) fix random trouble on some cards like for instance hardcursor trouble on especially laptops; 
+	<li>Added dualhead support (use Mark Watson's 'G400 Dualhead Setup' from BeBits for now): Note that dualhead switch mode still has to be setup, and overlay is fixed to the primary head for now.
 </ul>
 <p><h1>nv_driver 0.07 (Rudolf)</h1></p>
 <ul>
@@ -65,9 +68,8 @@
 </ul>
 <p><h1>Still todo:</h1></p>
 <ul>
-	<li>Dualhead support on some GeForce series cards;
-	<li>TVout support;
 	<li>Add support for internal display panels (laptops);
+	<li>TVout support;
 	<li>Partial card coldstart: setup RAM and CORE speeds (if possible).
 </ul>
 </p>
