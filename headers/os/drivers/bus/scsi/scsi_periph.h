@@ -84,7 +84,7 @@ typedef struct scsi_periph_callbacks {
 
 // functions provided by this module
 typedef struct scsi_periph_interface {
-	module_info module;
+	module_info info;
 
 	// *** init/cleanup ***
 	status_t (*register_device)( 
@@ -92,7 +92,7 @@ typedef struct scsi_periph_interface {
 		scsi_periph_callbacks *callbacks,
 		scsi_device scsi_device, 
 		scsi_device_interface *scsi,
-		pnp_node_handle node,
+		device_node_handle node,
 		bool removable,
 		scsi_periph_device *driver );
 	status_t (*unregister_device)( scsi_periph_device driver );
@@ -150,8 +150,7 @@ typedef struct scsi_periph_interface {
 
 	// compose device name consisting of prefix and path/target/LUN
 	// (result must be freed by caller)
-	char *(*compose_device_name)( pnp_node_handle device_node, 
-		const char *prefix );
+	char *(*compose_device_name)(device_node_handle device_node, const char *prefix);
 		
 	// fill data with icon (for B_GET_ICON ioctl)
 	status_t (*get_icon)( icon_type type, device_icon *data );

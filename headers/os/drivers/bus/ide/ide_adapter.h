@@ -1,7 +1,11 @@
 /*
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-04, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _IDE_PCI_H
+#define _IDE_PCI_H
 
 /*
 	IDE adapter library
@@ -12,8 +16,6 @@
 	free to access any controller or channel data of this library.
 */
 
-#ifndef _IDE_PCI_H
-#define _IDE_PCI_H
 
 #include <bus/PCI.h>
 #include <bus/IDE.h>
@@ -114,7 +116,7 @@ typedef struct ide_adapter_channel_info {
 							// be accessed anymore
 	
 	ide_channel ide_channel;
-	pnp_node_handle node;
+	device_node_handle node;
 	
 	int32 (*inthand)( void *arg );
 	
@@ -135,90 +137,84 @@ typedef struct ide_adapter_controller_info {
 	uint32 lost;			// != 0 if device got removed, i.e. if it must not
 							// be accessed anymore
 	
-	pnp_node_handle node;
+	device_node_handle node;
 } ide_adapter_controller_info;
 
 
 // interface of IDE adapter library
 typedef struct {
-	module_info minfo;
+	module_info info;
 
 	// function calls that can be forwarded from actual driver
-	status_t (*write_command_block_regs)
-		(ide_adapter_channel_info *channel, ide_task_file *tf, ide_reg_mask mask);
-	status_t (*read_command_block_regs)
-		(ide_adapter_channel_info *channel, ide_task_file *tf, ide_reg_mask mask);
+	status_t (*write_command_block_regs)(ide_adapter_channel_info *channel,
+					ide_task_file *tf, ide_reg_mask mask);
+	status_t (*read_command_block_regs)(ide_adapter_channel_info *channel,
+					ide_task_file *tf, ide_reg_mask mask);
 
 	uint8 (*get_altstatus) (ide_adapter_channel_info *channel);
 	status_t (*write_device_control) (ide_adapter_channel_info *channel, uint8 val);	
 
-	status_t (*write_pio) (ide_adapter_channel_info *channel, uint16 *data, int count, bool force_16bit );
-	status_t (*read_pio) (ide_adapter_channel_info *channel, uint16 *data, int count, bool force_16bit );
+	status_t (*write_pio)(ide_adapter_channel_info *channel, uint16 *data, int count, bool force_16bit);
+	status_t (*read_pio)(ide_adapter_channel_info *channel, uint16 *data, int count, bool force_16bit);
 
-	status_t (*prepare_dma)(ide_adapter_channel_info *channel, 
-							const physical_entry *sg_list, size_t sg_list_count,
-	                        bool to_device );
+	status_t (*prepare_dma)(ide_adapter_channel_info *channel, const physical_entry *sg_list,
+					size_t sg_list_count, bool to_device);
 	status_t (*start_dma)(ide_adapter_channel_info *channel);
 	status_t (*finish_dma)(ide_adapter_channel_info *channel);
-	
-	
+
 	// default functions that should be replaced by a more specific version
 	// (copy them from source code of this library and modify them at will)
-	int32 (*inthand)( void *arg );
-	
+	int32 (*inthand)(void *arg);
+
 	// functions that must be called by init/uninit etc. of channel driver
-	status_t (*init_channel)( pnp_node_handle node, ide_channel ide_channel, 
-		ide_adapter_channel_info **cookie, size_t total_data_size,
-		int32 (*inthand)( void *arg ) );
-	status_t (*uninit_channel)( ide_adapter_channel_info *channel );
-	void (*channel_removed)( pnp_node_handle node, ide_adapter_channel_info *channel );
+	status_t (*init_channel)(device_node_handle node, ide_channel ide_channel,
+					ide_adapter_channel_info **cookie, size_t total_data_size,
+					int32 (*inthand)(void *arg));
+	status_t (*uninit_channel)(ide_adapter_channel_info *channel);
+	void (*channel_removed)(device_node_handle node, ide_adapter_channel_info *channel);
 
 	// publish channel node
-	status_t (*publish_channel)( pnp_node_handle controller_node, 
-		const char *channel_module_name,
-		uint16 command_block_base, uint16 control_block_base,
-		uint8 intnum, bool can_dma, bool is_primary, const char *name, 
-		io_resource_handle *resources, pnp_node_handle *node );
+	status_t (*publish_channel)(device_node_handle controller_node,
+					const char *channel_module_name, uint16 command_block_base,
+					uint16 control_block_base, uint8 intnum, bool can_dma,
+					bool is_primary, const char *name, 
+					io_resource_handle *resources, device_node_handle *node);
 	// verify channel configuration and publish node on success
-	status_t (*detect_channel)( 	
-		pci_device_module_info *pci, pci_device pci_device,
-		pnp_node_handle controller_node, 
-		const char *channel_module_name, bool controller_can_dma,
-		uint16 command_block_base, uint16 control_block_base, uint16 bus_master_base,
-		uint8 intnum, bool is_primary, const char *name, pnp_node_handle *node,
-		bool supports_compatibility_mode );
+	status_t (*detect_channel)(pci_device_module_info *pci, pci_device pci_device,
+					device_node_handle controller_node, const char *channel_module_name,
+					bool controller_can_dma, uint16 command_block_base,
+					uint16 control_block_base, uint16 bus_master_base,
+					uint8 intnum, bool is_primary, const char *name,
+					device_node_handle *node, bool supports_compatibility_mode);
 
 	// functions that must be called by init/uninit etc. of controller driver
-	status_t (*init_controller)( pnp_node_handle node, void *user_cookie, 
-		ide_adapter_controller_info **cookie, size_t total_data_size );
-	status_t (*uninit_controller)( ide_adapter_controller_info *controller );
-	void (*controller_removed)( pnp_node_handle node, ide_adapter_controller_info *controller );
+	status_t (*init_controller)(device_node_handle node, void *user_cookie,
+					ide_adapter_controller_info **cookie, size_t total_data_size);
+	status_t (*uninit_controller)(ide_adapter_controller_info *controller);
+	void (*controller_removed)(device_node_handle node, ide_adapter_controller_info *controller);
 
 	// publish controller node
-	status_t (*publish_controller)( 	
-		pnp_node_handle parent, 
-		uint16 bus_master_base,	io_resource_handle *resources, 
-		const char *controller_driver, const char *controller_driver_type,
-		const char *controller_name, 
-		bool can_dma, bool can_cq, uint32 dma_alignment, uint32 dma_boundary,
-		uint32 max_sg_block_size, pnp_node_handle *node );
+	status_t (*publish_controller)(device_node_handle parent, uint16 bus_master_base,
+					io_resource_handle *resources, const char *controller_driver,
+					const char *controller_driver_type, const char *controller_name,
+					bool can_dma, bool can_cq, uint32 dma_alignment, uint32 dma_boundary,
+					uint32 max_sg_block_size, device_node_handle *node);
 	// verify controller configuration and publish node on success
-	status_t (*detect_controller)( 	
-		pci_device_module_info *pci, pci_device pci_device,
-		pnp_node_handle parent,	uint16 bus_master_base,	
-		const char *controller_driver, const char *controller_driver_type,
-		const char *controller_name, 
-		bool can_dma, bool can_cq, uint32 dma_alignment, uint32 dma_boundary,
-		uint32 max_sg_block_size, pnp_node_handle *node );
+	status_t (*detect_controller)(pci_device_module_info *pci, pci_device pci_device,
+					device_node_handle parent, uint16 bus_master_base,
+					const char *controller_driver, const char *controller_driver_type,
+					const char *controller_name, bool can_dma, bool can_cq,
+					uint32 dma_alignment, uint32 dma_boundary, uint32 max_sg_block_size,
+					device_node_handle *node);
 	// standard master probe for controller that registers controller and channel nodes
-	status_t (*probe_controller)( pnp_node_handle parent,
-		const char *controller_driver, const char *controller_driver_type,
-		const char *controller_name, const char *channel_module_name,
-		bool can_dma, bool can_cq, uint32 dma_alignment, uint32 dma_boundary,
-		uint32 max_sg_block_size, bool supports_compatibility_mode );
+	status_t (*probe_controller)(device_node_handle parent, const char *controller_driver,
+					const char *controller_driver_type, const char *controller_name,
+					const char *channel_module_name, bool can_dma, bool can_cq,
+					uint32 dma_alignment, uint32 dma_boundary, uint32 max_sg_block_size,
+					bool supports_compatibility_mode);
 } ide_adapter_interface;
 
 
 #define IDE_ADAPTER_MODULE_NAME "generic/ide_adapter/v1"
 
-#endif
+#endif	/* _IDE_PCI_H */

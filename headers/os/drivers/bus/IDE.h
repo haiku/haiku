@@ -319,7 +319,7 @@ typedef struct ide_channel_info *ide_channel_cookie;
 
 // interface of controller driver
 typedef struct {
-	pnp_driver_info dinfo;
+	driver_module_info info;
 
 	status_t (*write_command_block_regs)
 		(ide_channel_cookie channel, ide_task_file *tf, ide_reg_mask mask);
@@ -349,7 +349,7 @@ typedef struct ide_bus_info *ide_channel;
 // interface of bus manager as seen from controller driver
 // use this interface as the fixed consumer of your controller driver
 typedef struct {
-	pnp_driver_info dinfo;
+	driver_module_info info;
 
 	// status - status read from controller (_not_ alt_status, as reading
 	//          normal status acknowledges IRQ request of device)
@@ -360,4 +360,4 @@ typedef struct {
 #define IDE_FOR_CONTROLLER_MODULE_NAME "bus_managers/ide/controller/v1"
 
 
-#endif
+#endif	/* __IDE_H__ */

@@ -64,7 +64,7 @@ typedef struct phys_vecs {
 
 // interface to be provided by device driver
 typedef struct blkdev_interface {
-	pnp_driver_info dinfo;
+	driver_module_info dinfo;
 
 	// iovecs are physical address here
 	// pos and num_blocks are in blocks; bytes_transferred in bytes

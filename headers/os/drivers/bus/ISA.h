@@ -35,8 +35,8 @@
 #define B_MAX_ISA_DMA_COUNT	0x10000
 
 typedef struct isa2_module_info {
-	pnp_bus_info binfo;
-	
+	bus_module_info info;
+
 	uint8 (*read_io_8)( int mapped_io_addr );
 	void (*write_io_8)( int mapped_io_addr, uint8 value );
 	uint16 (*read_io_16)( int mapped_io_addr );

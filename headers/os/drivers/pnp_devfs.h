@@ -30,7 +30,7 @@ typedef status_t (*pnp_device_open_hook)(void *device_cookie, uint32 flags,
 
 // new interface to devfs
 typedef struct pnp_devfs_driver_info {
-	pnp_driver_info			dinfo;
+	driver_module_info		info;
 
 	pnp_device_open_hook	open;			// called to open the device
 	device_close_hook		close;			// called to close the device

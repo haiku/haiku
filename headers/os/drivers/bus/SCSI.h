@@ -1,7 +1,9 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef __SCSI_BUSMANAGER_H__
+#define __SCSI_BUSMANAGER_H__
 
 /*
 	Part of Open SCSI bus manager
@@ -90,10 +92,6 @@
 	may be enhanced/generalized in the future.
 */
 
-// warning: Be defined a scsi.h (lower case) header file already,
-//          so we cannot use that for the ifdef
-#ifndef __SCSI_BUSMANAGER_H__
-#define __SCSI_BUSMANAGER_H__
 
 #include <KernelExport.h>
 #include <device_manager.h>
@@ -295,29 +293,29 @@ typedef struct
 
 // bus manager device interface for peripheral driver
 typedef struct scsi_device_interface {
-	pnp_driver_info dinfo;
+	driver_module_info info;
 
 	// get CCB
 	// warning: if pool of CCBs is exhausted, this call is delayed until a 
 	// CCB is freed, so don't try to allocate more then one CCB at once!
-	scsi_ccb *(*alloc_ccb)( scsi_device device );
+	scsi_ccb *(*alloc_ccb)(scsi_device device);
 	// free CCB
-	void (*free_ccb)( scsi_ccb *ccb );
+	void (*free_ccb)(scsi_ccb *ccb);
 	
 	// execute command asynchronously
 	// when it's finished, the semaphore of the ccb is released
 	// you must provide a S/G list if data_len != 0
-	void (*async_io)( scsi_ccb *ccb );
+	void (*async_io)(scsi_ccb *ccb);
 	// execute command synchronously
 	// you don't need to provide a S/G list nor have to lock data
-	void (*sync_io)( scsi_ccb *ccb );
+	void (*sync_io)(scsi_ccb *ccb);
 	
 	// abort request
-	uchar (*abort)( scsi_ccb *ccb_to_abort );
+	uchar (*abort)(scsi_ccb *ccb_to_abort);
 	// reset device
-	uchar (*reset_device)( scsi_device device );
+	uchar (*reset_device)(scsi_device device);
 	// terminate request
-	uchar (*term_io)( scsi_ccb *ccb_to_terminate );
+	uchar (*term_io)(scsi_ccb *ccb_to_terminate);
 } scsi_device_interface;
 
 #define SCSI_DEVICE_MODULE_NAME "bus_managers/scsi/driver/v1"
@@ -336,12 +334,12 @@ typedef struct scsi_device_interface {
 // This interface can be used by peripheral drivers to access the 
 // bus directly.
 typedef struct scsi_bus_interface {
-	pnp_bus_info binfo;
+	bus_module_info info;
 
 	// get information about host controller
-	uchar (*path_inquiry)( scsi_bus bus, scsi_path_inquiry *inquiry_data );
+	uchar (*path_inquiry)(scsi_bus bus, scsi_path_inquiry *inquiry_data);
 	// reset SCSI bus
-	uchar (*reset_bus)( scsi_bus bus );
+	uchar (*reset_bus)(scsi_bus bus);
 } scsi_bus_interface;
 
 // name of SCSI bus node driver
@@ -357,8 +355,8 @@ typedef struct scsi_dpc_info *scsi_dpc_cookie;
 // SCSI controller drivers get this interface passed via their init_device 
 // method. Further, they must specify this driver as their fixed consumer.
 typedef struct scsi_for_sim_interface {
-	pnp_driver_info dinfo;
-	
+	driver_module_info info;
+
 	// put request into wait queue because of overflow
 	// bus_overflow: true - too many bus requests
 	//               false - too many device requests
@@ -366,41 +364,41 @@ typedef struct scsi_for_sim_interface {
 	// is called or a request is finished via finished(); 
 	// to avoid race conditions (reporting a full and a available bus at once)
 	// the SIM should synchronize calls to requeue, resubmit and finished
-	void (*requeue)( scsi_ccb *ccb, bool bus_overflow );
+	void (*requeue)(scsi_ccb *ccb, bool bus_overflow);
 	// resubmit request ASAP
 	// to be used if execution of request went wrong and must be retried
-	void (*resubmit)( scsi_ccb *ccb );
+	void (*resubmit)(scsi_ccb *ccb);
 	// mark request as being finished
 	// num_requests: number of requests that were handled by device
 	//               when the request was sent (read: how full was the device
 	//               queue); needed to find out how large the device queue is;
 	//               e.g. if three were already running plus this request makes 
 	//               num_requests=4
-	void (*finished)( scsi_ccb *ccb, uint num_requests );
+	void (*finished)(scsi_ccb *ccb, uint num_requests);
 	
 	// following functions return error on invalid arguments only
-	status_t (*alloc_dpc)( scsi_dpc_cookie *dpc );
-	status_t (*free_dpc)( scsi_dpc_cookie dpc );
-	status_t (*schedule_dpc)( scsi_bus cookie, scsi_dpc_cookie dpc, /*int flags,*/
-		void (*func)( void * ), void *arg );
-		
+	status_t (*alloc_dpc)(scsi_dpc_cookie *dpc);
+	status_t (*free_dpc)(scsi_dpc_cookie dpc);
+	status_t (*schedule_dpc)(scsi_bus cookie, scsi_dpc_cookie dpc, /*int flags,*/
+		void (*func)( void * ), void *arg);
+
 	// block entire bus (can be nested)
 	// no more request will be submitted to this bus
-	void (*block_bus)( scsi_bus bus );
+	void (*block_bus)(scsi_bus bus);
 	// unblock entire bus
 	// requests will be submitted to bus ASAP
-	void (*unblock_bus)( scsi_bus bus );
+	void (*unblock_bus)(scsi_bus bus);
 	// block one device
 	// no more requests will be submitted to this device
-	void (*block_device)( scsi_device device );
+	void (*block_device)(scsi_device device);
 	// unblock device
 	// requests for this device will be submitted ASAP
-	void (*unblock_device)( scsi_device device );
-	
+	void (*unblock_device)(scsi_device device);
+
 	// terminate bus overflow condition (see "requeue")
-	void (*cont_send_bus)( scsi_bus bus );
+	void (*cont_send_bus)(scsi_bus bus);
 	// terminate device overflow condition (see "requeue")
-	void (*cont_send_device)( scsi_device device );
+	void (*cont_send_device)(scsi_device device);
 } scsi_for_sim_interface;
 
 
@@ -421,7 +419,7 @@ typedef struct scsi_sim_cookie *scsi_sim_cookie;
 // SIM interface
 // SCSI controller drivers must provide this interface
 typedef struct scsi_sim_interface {
-	pnp_driver_info dinfo;
+	driver_module_info info;
 
 	// execute request
 	void (*scsi_io)( scsi_sim_cookie cookie, scsi_ccb *ccb );
@@ -456,4 +454,4 @@ typedef struct scsi_sim_interface {
 } scsi_sim_interface;
 
 
-#endif
+#endif	/* __SCSI_BUSMANAGER_H__ */

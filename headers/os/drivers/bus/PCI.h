@@ -87,7 +87,7 @@ typedef struct pci_device_info *pci_device;
 //	Actually, this is a _function_ of a device only, but 
 //	pci_function_module_info would be a bit non-intuitive
 typedef struct pci_device_module_info {
-	pnp_driver_info	dinfo;
+	driver_module_info info;
 
 	uint8	(*read_io_8) (pci_device device, int mapped_io_addr);
 	void	(*write_io_8) (pci_device device, int mapped_io_addr, uint8 value);

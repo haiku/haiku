@@ -1,4 +1,9 @@
 /*
+ * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ */
+
+/*
 	Copyright (c) 2003-04, Thomas Kurschel
 
 	PnP manager; Takes care of registration and loading of PnP drivers
@@ -156,7 +161,7 @@ typedef struct {
 		// ISA DMA channel: must be 1
 } io_resource;
 
-// attribute of device node
+// attribute of a device node
 typedef struct {
 	const char		*name;
 	type_code		type;			// for supported types, see value
@@ -171,49 +176,40 @@ typedef struct {
 			size_t	len;
 		} raw;
 	} value;
-} pnp_node_attr;
+} device_attr;
 
 
-// handle of PnP node
-typedef struct pnp_node_info *pnp_node_handle;
+// handle of device node
+typedef struct device_node_info *device_node_handle;
 
 // handle of acquired I/O resource
 typedef struct io_resource_info *io_resource_handle;
 
 // handle of node attribute
-typedef struct pnp_node_attr_info *pnp_node_attr_handle;
+typedef struct device_attr_info *device_attr_handle;
 
 
-typedef struct pnp_driver_info pnp_driver_info;
+typedef struct driver_module_info driver_module_info;
 
 // interface of PnP manager
 typedef struct device_manager_info {
-	module_info minfo;
+	module_info info;
 
 	// load driver
 	// node - node whos driver is to be loaded
 	// user_cookie - cookie to be passed to init_device of driver
 	// interface - interface of loaded driver
 	// cookie - device cookie issued by loaded driver
-	status_t	(*load_driver) (
-					pnp_node_handle		node,
-					void				*user_cookie,
-					pnp_driver_info		**interface,
-					void				**cookie
-				);
+	status_t (*load_driver)(device_node_handle node, void *userCookie,
+					driver_module_info **interface, void **cookie);
 	// unload driver
-	status_t	(*unload_driver) (
-					pnp_node_handle		node
-				);
-				
+	status_t (*unload_driver)(device_node_handle node);
+
 	// rescan node for new dynamic drivers
 	// node - node whose dynamic drivers are to be scanned
 	// depth - recursive depth (>= 1)
-	status_t 	(*rescan) (
-					pnp_node_handle 	node, 
-					uint				depth
-				);
-	
+	status_t (*rescan)(device_node_handle node, uint32 depth);
+
 	// register device
 	// parent - parent node
 	// attributes - NULL-terminated array of node attributes
@@ -222,63 +218,46 @@ typedef struct device_manager_info {
 	// on return, io_resources are invalid: on success I/O resources belong 
 	// to node, on fail they are released;
 	// if device is already registered, B_OK is returned but *node is NULL
-	status_t	(*register_device) (
-					pnp_node_handle		parent,
-					const pnp_node_attr	*attrs,
+	status_t (*register_device)(device_node_handle parent,
+					const device_attr *attrs,
 					const io_resource_handle *io_resources,
-					pnp_node_handle		*node
-				);
+					device_node_handle *node);
 	// unregister device
 	// all nodes having this node as their parent are unregistered too.
 	// if the node contains PNP_MANAGER_ID_GENERATOR/PNP_MANAGER_AUTO_ID
 	// pairs, the id specified this way is freed too
-	status_t	(*unregister_device) (
-					pnp_node_handle		node
-				);
-				
+	status_t (*unregister_device)(device_node_handle node);
+
 	// acquire I/O resources
 	// resources - NULL-terminated array of resources to acquire
 	// handles - NULL-terminated array of handles (one per resource); 
 	//           array must be provided by caller
 	// return B_BUSY if a resource is used by a loaded driver
-	status_t	(*acquire_io_resources) (
-					io_resource			*resources,
-					io_resource_handle	*handles
-				);
+	status_t (*acquire_io_resources)(io_resource *resources,
+					io_resource_handle *handles);
 	// release I/O resources
 	// handles - NULL-terminated array of handles
-	status_t	(*release_io_resources) (
-					const io_resource_handle *handles
-				);
-				
+	status_t (*release_io_resources)(const io_resource_handle *handles);
+
 	// find device by node content
 	// the given attributes must _uniquely_ identify a device node;
 	// parent - parent node (-1 for don't-care)
 	// attrs - list of attributes (can be NULL)
 	// return: NULL if no device or multiple(!) devices found
-	pnp_node_handle (*find_device) ( 
-					pnp_node_handle		parent,
-					const pnp_node_attr	*attrs 
-				);
-				
+	device_node_handle (*find_device)(device_node_handle parent,
+					const device_attr *attrs);
+
 	// create unique id
 	// generator - name of id set
 	// if result >= 0 - unique id
 	//    result < 0 - error code
-	int32		(*create_id)( 
-					const char 			*generator
-				);
+	int32 (*create_id)(const char *generator);
 	// free unique id
-	status_t	(*free_id)(
-					const char			*generator,
-					uint32				id
-				);
+	status_t (*free_id)(const char *generator, uint32 id);
 
 	// get parent device node
-	pnp_node_handle (*get_parent)(
-					pnp_node_handle		node 
-				);				
-				
+	device_node_handle (*get_parent)(device_node_handle node);
+
 	// helpers to extract attribute by name.
 	// if <recursive> is true, parent nodes are scanned if 
 	// attribute isn't found in current node; unless you declared
@@ -286,43 +265,19 @@ typedef struct device_manager_info {
 	// intermittent nodes, e.g. defined by filter drivers, transparently.
 	// for raw and string attributes, you get a copy that must 
 	// be freed by caller 
-	status_t	(*get_attr_uint8)(
-					pnp_node_handle		node,
-					const char			*name,
-					uint8				*value,
-					bool				recursive
-				);
-	status_t	(*get_attr_uint16)(
-					pnp_node_handle		node,
-					const char			*name,
-					uint16				*value,
-					bool				recursive
-				);
-	status_t	(*get_attr_uint32)(
-					pnp_node_handle		node,
-					const char			*name,
-					uint32				*value,
-					bool				recursive
-				);
-	status_t	(*get_attr_uint64)(
-					pnp_node_handle		node,
-					const char			*name,
-					uint64				*value,
-					bool				recursive
-				);
-	status_t	(*get_attr_string)(
-					pnp_node_handle		node,
-					const char			*name,
-					char				**value,
-					bool				recursive
-				);
-	status_t	(*get_attr_raw)(
-					pnp_node_handle		node,
-					const char			*name,
-					void				**data,
-					size_t				*len,
-					bool				recursive
-				);
+	status_t (*get_attr_uint8)(device_node_handle node,
+					const char *name, uint8 *value, bool recursive);
+	status_t (*get_attr_uint16)(device_node_handle node,
+					const char *name, uint16 *value, bool recursive);
+	status_t (*get_attr_uint32)(device_node_handle node,
+					const char *name, uint32 *value, bool recursive);
+	status_t (*get_attr_uint64)(device_node_handle node,
+					const char *name, uint64 *value, bool recursive);
+	status_t (*get_attr_string)(device_node_handle node,
+					const char *name, char **value, bool recursive);
+	status_t (*get_attr_raw)(device_node_handle node,
+					const char *name, void **data, size_t *_size,
+					bool recursive);
 
 	// get next attribute of node;
 	// on call, *<attr_handle> must contain handle of an attribute;
@@ -332,38 +287,27 @@ typedef struct device_manager_info {
 	// the returned handle must be released by either passing it to
 	// another get_next_attr() call or by using release_attr()
 	// directly
-	status_t	(*get_next_attr)(
-					pnp_node_handle		node,
-					pnp_node_attr_handle *attr_handle
-				);
-				
+	status_t (*get_next_attr)(device_node_handle node,
+					device_attr_handle *attrHandle);
+
 	// release attribute handle <attr_handle> of <node>;
 	// see get_next_attr
-	status_t	(*release_attr)(
-					pnp_node_handle		node,
-					pnp_node_attr_handle attr_handle
-				);
-				
+	status_t (*release_attr)(device_node_handle node,
+					device_attr_handle attr_handle);
+
 	// retrieve attribute data with handle given;
 	// <attr> is only valid as long as you don't release <attr_handle> 
 	// implicitely or explicitely
-	status_t	(*retrieve_attr)(
-					pnp_node_attr_handle attr_handle,
-					const pnp_node_attr	**attr
-				);
-			
+	status_t (*retrieve_attr)(device_attr_handle attr_handle,
+					const device_attr **attr);
+
 	// change/add attribute <attr> of/to node
-	status_t	(*write_attr)(
-					pnp_node_handle		node,
-					const pnp_node_attr	*attr
-				);
-				
+	status_t (*write_attr)(device_node_handle node,
+					const device_attr *attr);
+
 	// remove attribute of node by name
 	// <name> is name of attribute
-	status_t	(*remove_attr)(
-					pnp_node_handle		node,
-					const char 			*name
-				);
+	status_t (*remove_attr)(device_node_handle node, const char *name);
 } device_manager_info;
 
 
@@ -461,32 +405,32 @@ typedef struct device_manager_info {
 */
 
 
-// interface of PnP driver
-struct pnp_driver_info {
-	module_info minfo;
+// interface of device driver
+struct driver_module_info {
+	module_info info;
 
-	status_t	(*init_device)(pnp_node_handle node, void *user_cookie, void **cookie);
+	status_t (*init_device)(device_node_handle node, void *user_cookie, void **cookie);
 		// driver is loaded.
 		// node - node of device
 		// user_cookie - cookie passed by loading driver
 		// cookie - cookie issued by this driver
 
-	status_t	(*uninit_device)(void *cookie);
+	status_t (*uninit_device)(void *cookie);
 		// driver gets unloaded.
 	
-	status_t	(*probe)(pnp_node_handle parent);
+	status_t (*probe)(device_node_handle parent);
 		// parent was added or is rescanned.
 		// check whether this parent is supported and register 
 		// any consumer device. Dynamic consumers must return
 		// B_OK if they support this parent. All other return
 		// values are ignored.
 
-	void		(*device_removed)(pnp_node_handle node, void *cookie);
+	void (*device_removed)(device_node_handle node, void *cookie);
 		// a device node, registered by this driver, got removed.
 		// if the driver wasn't loaded when this happenes, no (un)init_device 
 		// is called and thus <cookie> is NULL;
 
-	void		(*device_cleanup)(pnp_node_handle node);
+	void (*device_cleanup)(device_node_handle node);
 		// a device node, registered by this driver, got removed and
 		// the driver got unloaded
 };
@@ -576,14 +520,14 @@ struct pnp_driver_info {
 
 
 // interface of PnP bus
-typedef struct pnp_bus_info {
-	pnp_driver_info	dinfo;
-	
+typedef struct bus_module_info {
+	driver_module_info info;
+
 	// (re)scan bus and register all devices.
 	// driver is always loaded during this call, but other hooks may
 	// be called concurrently
-	status_t (*rescan) ( void *cookie );
-} pnp_bus_info;
+	status_t (*rescan) (void *cookie);
+} bus_module_info;
 
 
 // standard attributes:
