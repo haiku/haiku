@@ -1,0 +1,22 @@
+SubDir OBOS_TOP src libs pdflib libs png ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs flate ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs pdcore ] ;
+
+UseLibraryHeaders pdflib ;
+
+StaticLibrary pdf : 
+	png.c
+	pngerror.c
+	pngget.c
+	pngmem.c
+	pngread.c
+	pngrio.c
+	pngrtran.c
+	pngrutil.c
+	pngset.c
+	pngtrans.c
+	pngvcrd.c 
+: STATIC_LIBRARY_DIR
+;
+

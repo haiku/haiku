@@ -1,0 +1,87 @@
+PS-Resources-1.0
+
+% This is a sample UPR file for use with PDFlib. The complete description
+% of the UPR file format can be found in the PDFlib manual.
+% All resources can also be set at runtime via PDF_set_parameter().
+% Some resources will also be search in the Windows registry.
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% List of all resource categories which are specified in the file
+
+SearchPath
+FontAFM
+FontPFM
+FontOutline
+Encoding
+ICCProfile
+StandardOutputIntent
+.
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The SearchPath section.
+% PDFlib will search for any files (font, PDFs, ICC profiles, images)
+% in all the directories listed here. Modify as appropriate.
+% Do not mix SearchPath with the deprecated "prefix" feature.
+
+SearchPath
+% /var/fonts
+% C:/psfonts
+% d:/myimagefolder
+.
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The AFM font metrics section, one line per font in the format
+% <fontname>=<filename>
+% Note that PostScript font names must not contain any blank character
+
+FontAFM
+.
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The PFM font metrics section, one line per font in the format
+% <fontname>=<filename>
+% Note that PostScript font names must not contain any blank character
+
+FontPFM
+%Poetica-ChanceryI=Poetica-ChanceryI.pfm
+.
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The PostScript, TrueType, and OpenType font outline section, one line per
+% font in the format
+% <fontname>=<filename>
+% Note that PostScript font names must not contain any blank character,
+% but TrueType font names may contain blank characters (and often do).
+
+FontOutline
+.
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The Encoding section, one line per encoding in the format
+% <encodingname>=<filename>
+% This will only rarely be required since PDFlib contains a lot of built-in
+% encodings.
+
+Encoding
+%cp0874=cp0874.cpg
+.
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The ICCProfile section lists the names of known ICC color profiles in the
+% format
+% <encodingname>=<filename>
+
+ICCProfile
+%highspeedprinter=cmykhighspeed.icc
+.
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The StandardOutputIntent section lists the names of known standard output
+% intents for PDF/X. This will only be used when standard intent names other
+% than those known to PDFlib internally will be used.
+% format
+% <intentname>=<description>
+
+StandardOutputIntent
+.

@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src libs pdflib libs flate ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs pdcore ] ;
+
+UseLibraryHeaders pdflib ;
+
+StaticLibrary pdf : 
+	adler32.c
+	uncompr.c
+	infutil.c
+	compress.c
+	zutil.c
+	inffast.c
+	crc32.c
+	deflate.c
+	trees.c
+	inftrees.c
+	infblock.c
+	inflate.c
+	infcodes.c
+: STATIC_LIBRARY_DIR
+;
+

@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src libs pdflib libs ;
+
+SubInclude OBOS_TOP src libs pdflib libs flate ;
+SubInclude OBOS_TOP src libs pdflib libs pdcore ;
+SubInclude OBOS_TOP src libs pdflib libs pdflib ;
+SubInclude OBOS_TOP src libs pdflib libs png ;
+SubInclude OBOS_TOP src libs pdflib libs tiff ;
