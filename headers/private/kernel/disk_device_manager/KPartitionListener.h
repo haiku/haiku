@@ -1,41 +1,21 @@
-// KPartition.h
+// KPartitionListener.h
 
-#ifndef _K_DISK_DEVICE_SHADOW_PARTITION_H
-#define _K_DISK_DEVICE_SHADOW_PARTITION_H
+#ifndef _K_DISK_DEVICE_PARTITION_LISTENER_H
+#define _K_DISK_DEVICE_PARTITION_LISTENER_H
 
-#include <KPartition.h>
-#include <KPartitionListener.h>
+#include "disk_device_manager.h"
 
 namespace BPrivate {
 namespace DiskDevice {
 
-class KPhysicalPartition;
+class KDiskSystem;
+class KPartition;
 
-class KShadowPartition : public KPartition, private KPartitionListener {
+class KPartitionListener {
 public:
-	KShadowPartition(KPhysicalPartition *physicalPartition);
-	virtual ~KShadowPartition();
+	KPartitionListener();
+	virtual ~KPartitionListener();
 
-	// Hierarchy
-
-	virtual status_t CreateChild(partition_id id, int32 index,
-								 KPartition **child = NULL);
-
-	// Shadow Partition
-
-	virtual KShadowPartition *ShadowPartition() const;
-	virtual bool IsShadowPartition() const;
-	void UnsetPhysicalPartition();
-	virtual KPhysicalPartition *PhysicalPartition() const;
-
-	void SyncWithPhysicalPartition();
-
-	virtual void WriteUserData(UserDataWriter &writer,
-							   user_partition_data *data);
-
-	virtual void Dump(bool deep, int32 level);
-
-private:
 	virtual void OffsetChanged(KPartition *partition, off_t offset);
 	virtual void SizeChanged(KPartition *partition, off_t size);
 	virtual void ContentSizeChanged(KPartition *partition, off_t size);
@@ -61,15 +41,11 @@ private:
 								   KDiskSystem *diskSystem);
 	virtual void CookieChanged(KPartition *partition, void *cookie);
 	virtual void ContentCookieChanged(KPartition *partition, void *cookie);
-
-private:
-	KPhysicalPartition	*fPhysicalPartition;
-
 };
 
 } // namespace DiskDevice
 } // namespace BPrivate
 
-using BPrivate::DiskDevice::KShadowPartition;
+using BPrivate::DiskDevice::KPartitionListener;
 
-#endif	// _K_DISK_DEVICE_SHADOW_PARTITION_H
+#endif	// _K_DISK_DEVICE_PARTITION_LISTENER_H

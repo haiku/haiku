@@ -3,9 +3,8 @@
 #ifndef _K_DISK_DEVICE_PARTITION_H
 #define _K_DISK_DEVICE_PARTITION_H
 
+#include <disk_device_manager.h>
 #include <Vector.h>
-
-#include "disk_device_manager.h"
 
 struct user_partition_data;
 
@@ -16,6 +15,7 @@ class UserDataWriter;
 
 class KDiskDevice;
 class KDiskSystem;
+class KPartitionListener;
 class KPartitionVisitor;
 class KPhysicalPartition;
 class KShadowPartition;
@@ -164,6 +164,11 @@ public:
 	void SetContentCookie(void *cookie);
 	void *ContentCookie() const;
 
+	// Listener Support
+
+	bool AddListener(KPartitionListener *listener);
+	bool RemoveListener(KPartitionListener *listener);
+
 	// Change Tracking
 
 	void Changed(uint32 flags, uint32 clearFlags = 0);
@@ -181,18 +186,42 @@ public:
 
 	virtual void Dump(bool deep, int32 level);
 
+protected:
+	void FireOffsetChanged(off_t offset);
+	void FireSizeChanged(off_t size);
+	void FireContentSizeChanged(off_t size);
+	void FireBlockSizeChanged(uint32 blockSize);
+	void FireIndexChanged(int32 index);
+	void FireStatusChanged(uint32 status);
+	void FireFlagsChanged(uint32 flags);
+	void FireNameChanged(const char *name);
+	void FireContentNameChanged(const char *name);
+	void FireTypeChanged(const char *type);
+	void FireIDChanged(partition_id id);
+	void FireVolumeIDChanged(dev_t volumeID);
+	void FireMountCookieChanged(void *cookie);
+	void FireParametersChanged(const char *parameters);
+	void FireContentParametersChanged(const char *parameters);
+	void FireChildAdded(KPartition *child, int32 index);
+	void FireChildRemoved(KPartition *child, int32 index);
+	void FireDiskSystemChanged(KDiskSystem *diskSystem);
+	void FireCookieChanged(void *cookie);
+	void FireContentCookieChanged(void *cookie);
+
 private:
 	void _UpdateChildIndices(int32 index);
 	static int32 _NextID();
 
 protected:
 	typedef Vector<KPartition*> PartitionVector;
+	struct ListenerSet;
 
 	partition_data		fPartitionData;
 	PartitionVector		fChildren;
 	KDiskDevice			*fDevice;
 	KPartition			*fParent;
 	KDiskSystem			*fDiskSystem;
+	ListenerSet			*fListeners;
 	uint32				fChangeFlags;
 	int32				fChangeCounter;
 	uint32				fAlgorithmData;

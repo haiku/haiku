@@ -10,13 +10,16 @@
 #include <Drivers.h>
 #include <Errors.h>
 
-#include "ddm_userland_interface.h"
-#include "KDiskDevice.h"
-#include "KDiskDeviceManager.h"
-#include "KDiskDeviceUtils.h"
-#include "KDiskSystem.h"
-#include "KPartition.h"
-#include "KPartitionVisitor.h"
+#include <ddm_userland_interface.h>
+#include <KDiskDevice.h>
+#include <KDiskDeviceManager.h>
+#include <KDiskDeviceUtils.h>
+#include <KDiskSystem.h>
+#include <KPartition.h>
+#include <KPartitionListener.h>
+#include <KPartitionVisitor.h>
+#include <VectorSet.h>
+
 #include "UserDataWriter.h"
 
 using namespace std;
@@ -26,6 +29,9 @@ using namespace std;
 #define DBG(x) x
 #define OUT printf
 
+// ListenerSet
+struct KPartition::ListenerSet : VectorSet<KPartitionListener*> {};
+
 // constructor
 KPartition::KPartition(partition_id id)
 	: fPartitionData(),
@@ -33,6 +39,7 @@ KPartition::KPartition(partition_id id)
 	  fDevice(NULL),
 	  fParent(NULL),
 	  fDiskSystem(NULL),
+	  fListeners(NULL),
 	  fChangeFlags(0),
 	  fChangeCounter(0),
 	  fAlgorithmData(0),
@@ -63,6 +70,7 @@ KPartition::KPartition(partition_id id)
 // destructor
 KPartition::~KPartition()
 {
+	delete fListeners;
 	SetDiskSystem(NULL);
 	free(fPartitionData.name);
 	free(fPartitionData.content_name);
@@ -234,7 +242,10 @@ KPartition::IsDescendantBusy() const
 void
 KPartition::SetOffset(off_t offset)
 {
-	fPartitionData.offset = offset;
+	if (fPartitionData.offset != offset) {
+		fPartitionData.offset = offset;
+		FireOffsetChanged(offset);
+	}
 }
 
 // Offset
@@ -248,7 +259,10 @@ KPartition::Offset() const
 void
 KPartition::SetSize(off_t size)
 {
-	fPartitionData.size = size;
+	if (fPartitionData.size != size) {
+		fPartitionData.size = size;
+		FireSizeChanged(size);
+	}
 }
 
 // Size
@@ -262,7 +276,10 @@ KPartition::Size() const
 void
 KPartition::SetContentSize(off_t size)
 {
-	fPartitionData.content_size = size;
+	if (fPartitionData.content_size != size) {
+		fPartitionData.content_size = size;
+		FireContentSizeChanged(size);
+	}
 }
 
 // ContentSize
@@ -276,7 +293,10 @@ KPartition::ContentSize() const
 void
 KPartition::SetBlockSize(uint32 blockSize)
 {
-	fPartitionData.block_size = blockSize;
+	if (fPartitionData.block_size != blockSize) {
+		fPartitionData.block_size = blockSize;
+		FireBlockSizeChanged(blockSize);
+	}
 }
 
 // BlockSize
@@ -290,7 +310,10 @@ KPartition::BlockSize() const
 void
 KPartition::SetIndex(int32 index)
 {
-	fPartitionData.index = index;
+	if (fPartitionData.index != index) {
+		fPartitionData.index = index;
+		FireIndexChanged(index);
+	}
 }
 
 // Index
@@ -304,7 +327,10 @@ KPartition::Index() const
 void
 KPartition::SetStatus(uint32 status)
 {
-	fPartitionData.status = status;
+	if (fPartitionData.status != status) {
+		fPartitionData.status = status;
+		FireStatusChanged(status);
+	}
 }
 
 // Status
@@ -325,21 +351,30 @@ KPartition::IsUninitialized() const
 void
 KPartition::SetFlags(uint32 flags)
 {
-	fPartitionData.flags = flags;
+	if (fPartitionData.flags != flags) {
+		fPartitionData.flags = flags;
+		FireFlagsChanged(flags);
+	}
 }
 
 // AddFlags
 void
 KPartition::AddFlags(uint32 flags)
 {
-	fPartitionData.flags |= flags;
+	if (~fPartitionData.flags & flags) {
+		fPartitionData.flags |= flags;
+		FireFlagsChanged(fPartitionData.flags);
+	}
 }
 
 // ClearFlags
 void
 KPartition::ClearFlags(uint32 flags)
 {
-	fPartitionData.flags &= ~flags;
+	if (fPartitionData.flags & flags) {
+		fPartitionData.flags &= ~flags;
+		FireFlagsChanged(fPartitionData.flags);
+	}
 }
 
 // Flags
@@ -388,7 +423,9 @@ KPartition::IsDevice() const
 status_t
 KPartition::SetName(const char *name)
 {
-	return set_string(fPartitionData.name, name);
+	status_t error = set_string(fPartitionData.name, name);
+	FireNameChanged(fPartitionData.name);
+	return error;
 }
 
 // Name
@@ -402,7 +439,9 @@ KPartition::Name() const
 status_t
 KPartition::SetContentName(const char *name)
 {
-	return set_string(fPartitionData.content_name, name);
+	status_t error = set_string(fPartitionData.content_name, name);
+	FireContentNameChanged(fPartitionData.content_name);
+	return error;
 }
 
 // ContentName
@@ -416,7 +455,9 @@ KPartition::ContentName() const
 status_t
 KPartition::SetType(const char *type)
 {
-	return set_string(fPartitionData.type, type);
+	status_t error = set_string(fPartitionData.type, type);
+	FireTypeChanged(fPartitionData.type);
+	return error;
 }
 
 // Type
@@ -451,7 +492,10 @@ KPartition::PartitionData() const
 void
 KPartition::SetID(partition_id id)
 {
-	fPartitionData.id = id;
+	if (fPartitionData.id != id) {
+		fPartitionData.id = id;
+		FireIDChanged(id);
+	}
 }
 
 // ID
@@ -497,11 +541,14 @@ KPartition::GetPath(char *path) const
 void
 KPartition::SetVolumeID(dev_t volumeID)
 {
-	fPartitionData.volume = volumeID;
-	if (VolumeID() >= 0)
-		AddFlags(B_PARTITION_MOUNTED);
-	else
-		ClearFlags(B_PARTITION_MOUNTED);
+	if (fPartitionData.volume != volumeID) {
+		fPartitionData.volume = volumeID;
+		FireVolumeIDChanged(volumeID);
+		if (VolumeID() >= 0)
+			AddFlags(B_PARTITION_MOUNTED);
+		else
+			ClearFlags(B_PARTITION_MOUNTED);
+	}
 }
 
 // VolumeID
@@ -515,7 +562,10 @@ KPartition::VolumeID() const
 void
 KPartition::SetMountCookie(void *cookie)
 {
-	fPartitionData.mount_cookie = cookie;
+	if (fPartitionData.mount_cookie != cookie) {
+		fPartitionData.mount_cookie = cookie;
+		FireMountCookieChanged(cookie);
+	}
 }
 
 // MountCookie
@@ -545,7 +595,9 @@ KPartition::Unmount()
 status_t
 KPartition::SetParameters(const char *parameters)
 {
-	return set_string(fPartitionData.parameters, parameters);
+	status_t error = set_string(fPartitionData.parameters, parameters);
+	FireParametersChanged(fPartitionData.parameters);
+	return error;
 }
 
 // Parameters
@@ -559,7 +611,9 @@ KPartition::Parameters() const
 status_t
 KPartition::SetContentParameters(const char *parameters)
 {
-	return set_string(fPartitionData.content_parameters, parameters);
+	status_t error = set_string(fPartitionData.content_parameters, parameters);
+	FireContentParametersChanged(fPartitionData.content_parameters);
+	return error;
 }
 
 // ContentParameters
@@ -625,6 +679,8 @@ KPartition::AddChild(KPartition *partition, int32 index)
 		fPartitionData.child_count++;
 		partition->SetParent(this);
 		partition->SetDevice(Device());
+		// notify listeners
+		FireChildAdded(partition, index);
 		return B_OK;
 	}
 	return B_ERROR;
@@ -649,6 +705,8 @@ KPartition::RemoveChild(int32 index)
 		fPartitionData.child_count--;
 		partition->SetParent(NULL);
 		partition->SetDevice(NULL);
+		// notify listeners
+		FireChildAdded(partition, index);
 		return true;
 	}
 	return false;
@@ -757,6 +815,8 @@ KPartition::SetDiskSystem(KDiskSystem *diskSystem)
 		else
 			AddFlags(B_PARTITION_PARTITIONING_SYSTEM);
 	}
+	// notify listeners
+	FireDiskSystemChanged(fDiskSystem);
 }
 
 // DiskSystem
@@ -777,7 +837,10 @@ KPartition::ParentDiskSystem() const
 void
 KPartition::SetCookie(void *cookie)
 {
-	fPartitionData.cookie = cookie;
+	if (fPartitionData.cookie != cookie) {
+		fPartitionData.cookie = cookie;
+		FireCookieChanged(cookie);
+	}
 }
 
 // Cookie
@@ -791,7 +854,10 @@ KPartition::Cookie() const
 void
 KPartition::SetContentCookie(void *cookie)
 {
-	fPartitionData.content_cookie = cookie;
+	if (fPartitionData.content_cookie != cookie) {
+		fPartitionData.content_cookie = cookie;
+		FireContentCookieChanged(cookie);
+	}
 }
 
 // ContentCookie
@@ -799,6 +865,37 @@ void *
 KPartition::ContentCookie() const
 {
 	return fPartitionData.content_cookie;
+}
+
+// AddListener
+bool
+KPartition::AddListener(KPartitionListener *listener)
+{
+	if (!listener)
+		return false;
+	// lazy create listeners
+	if (!fListeners) {
+		fListeners = new(nothrow) ListenerSet;
+		if (!fListeners)
+			return false;
+	}
+	// add listener
+	return (fListeners->Insert(listener) == B_OK);
+}
+
+// RemoveListener
+bool
+KPartition::RemoveListener(KPartitionListener *listener)
+{
+	if (!listener || !fListeners)
+		return false;
+	// remove listener and delete the set, if empty now
+	bool result = (fListeners->Remove(listener) > 0);
+	if (fListeners->IsEmpty()) {
+		delete fListeners;
+		fListeners = NULL;
+	}
+	return result;
 }
 
 // Changed
@@ -850,8 +947,6 @@ KPartition::UninitializeContents(bool logChanges)
 		}
 		// volume
 		if (VolumeID() >= 0) {
-			// TODO: More? Unmounting would be a bit drastical for changes
-			// only on a shadow partition.
 			SetVolumeID(-1);
 			flags |= B_PARTITION_CHANGED_VOLUME;
 		}
@@ -992,6 +1087,246 @@ KPartition::Dump(bool deep, int32 level)
 	if (deep) {
 		for (int32 i = 0; KPartition *child = ChildAt(i); i++)
 			child->Dump(true, level + 1);
+	}
+}
+
+// FireOffsetChanged
+void
+KPartition::FireOffsetChanged(off_t offset)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->OffsetChanged(this, offset);
+		}
+	}
+}
+
+// FireSizeChanged
+void
+KPartition::FireSizeChanged(off_t size)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->SizeChanged(this, size);
+		}
+	}
+}
+
+// FireContentSizeChanged
+void
+KPartition::FireContentSizeChanged(off_t size)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->ContentSizeChanged(this, size);
+		}
+	}
+}
+
+// FireBlockSizeChanged
+void
+KPartition::FireBlockSizeChanged(uint32 blockSize)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->BlockSizeChanged(this, blockSize);
+		}
+	}
+}
+
+// FireIndexChanged
+void
+KPartition::FireIndexChanged(int32 index)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->IndexChanged(this, index);
+		}
+	}
+}
+
+// FireStatusChanged
+void
+KPartition::FireStatusChanged(uint32 status)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->StatusChanged(this, status);
+		}
+	}
+}
+
+// FireFlagsChanged
+void
+KPartition::FireFlagsChanged(uint32 flags)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->FlagsChanged(this, flags);
+		}
+	}
+}
+
+// FireNameChanged
+void
+KPartition::FireNameChanged(const char *name)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->NameChanged(this, name);
+		}
+	}
+}
+
+// FireContentNameChanged
+void
+KPartition::FireContentNameChanged(const char *name)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->ContentNameChanged(this, name);
+		}
+	}
+}
+
+// FireTypeChanged
+void
+KPartition::FireTypeChanged(const char *type)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->TypeChanged(this, type);
+		}
+	}
+}
+
+// FireIDChanged
+void
+KPartition::FireIDChanged(partition_id id)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->IDChanged(this, id);
+		}
+	}
+}
+
+// FireVolumeIDChanged
+void
+KPartition::FireVolumeIDChanged(dev_t volumeID)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->VolumeIDChanged(this, volumeID);
+		}
+	}
+}
+
+// FireMountCookieChanged
+void
+KPartition::FireMountCookieChanged(void *cookie)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->MountCookieChanged(this, cookie);
+		}
+	}
+}
+
+// FireParametersChanged
+void
+KPartition::FireParametersChanged(const char *parameters)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->ParametersChanged(this, parameters);
+		}
+	}
+}
+
+// FireContentParametersChanged
+void
+KPartition::FireContentParametersChanged(const char *parameters)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->ContentParametersChanged(this, parameters);
+		}
+	}
+}
+
+// FireChildAdded
+void
+KPartition::FireChildAdded(KPartition *child, int32 index)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->ChildAdded(this, child, index);
+		}
+	}
+}
+
+// FireChildRemoved
+void
+KPartition::FireChildRemoved(KPartition *child, int32 index)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->ChildRemoved(this, child, index);
+		}
+	}
+}
+
+// FireDiskSystemChanged
+void
+KPartition::FireDiskSystemChanged(KDiskSystem *diskSystem)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->DiskSystemChanged(this, diskSystem);
+		}
+	}
+}
+
+// FireCookieChanged
+void
+KPartition::FireCookieChanged(void *cookie)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->CookieChanged(this, cookie);
+		}
+	}
+}
+
+// FireContentCookieChanged
+void
+KPartition::FireContentCookieChanged(void *cookie)
+{
+	if (fListeners) {
+		for (ListenerSet::Iterator it = fListeners->Begin();
+			 it != fListeners->End(); ++it) {
+			(*it)->ContentCookieChanged(this, cookie);
+		}
 	}
 }
 

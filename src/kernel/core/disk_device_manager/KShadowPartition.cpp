@@ -26,14 +26,18 @@ using namespace std;
 // constructor
 KShadowPartition::KShadowPartition(KPhysicalPartition *partition)
 	: KPartition(),
+	  KPartitionListener(),
 	  fPhysicalPartition(partition)
 {
 	SyncWithPhysicalPartition();
+	if (fPhysicalPartition)
+		fPhysicalPartition->AddListener(this);
 }
 
 // destructor
 KShadowPartition::~KShadowPartition()
 {
+	UnsetPhysicalPartition();
 }
 
 // CreateChild
@@ -78,7 +82,10 @@ KShadowPartition::ShadowPartition() const
 void
 KShadowPartition::UnsetPhysicalPartition()
 {
-	fPhysicalPartition = NULL;
+	if (fPhysicalPartition) {
+		fPhysicalPartition->RemoveListener(this);
+		fPhysicalPartition = NULL;
+	}
 }
 
 // PhysicalPartition
@@ -108,7 +115,7 @@ KShadowPartition::SyncWithPhysicalPartition()
 	SetVolumeID(fPhysicalPartition->VolumeID());
 	SetParameters(fPhysicalPartition->Parameters());
 	SetContentParameters(fPhysicalPartition->ContentParameters());
-	// Cookie, ContentCookie, MountCookie?
+	// TODO: Cookie, ContentCookie, MountCookie?
 }
 
 // WriteUserData
@@ -130,5 +137,155 @@ void
 KShadowPartition::Dump(bool deep, int32 level)
 {
 	KPartition::Dump(deep, level);
+}
+
+// OffsetChanged
+void
+KShadowPartition::OffsetChanged(KPartition *partition, off_t offset)
+{
+	SetOffset(offset);
+}
+
+// SizeChanged
+void
+KShadowPartition::SizeChanged(KPartition *partition, off_t size)
+{
+	SetSize(size);
+}
+
+// ContentSizeChanged
+void
+KShadowPartition::ContentSizeChanged(KPartition *partition, off_t size)
+{
+	SetContentSize(size);
+}
+
+// BlockSizeChanged
+void
+KShadowPartition::BlockSizeChanged(KPartition *partition, uint32 blockSize)
+{
+	SetBlockSize(blockSize);
+}
+
+// IndexChanged
+void
+KShadowPartition::IndexChanged(KPartition *partition, int32 index)
+{
+	// should be set automatically
+}
+
+// StatusChanged
+void
+KShadowPartition::StatusChanged(KPartition *partition, uint32 status)
+{
+	SetStatus(status);
+}
+
+// FlagsChanged
+void
+KShadowPartition::FlagsChanged(KPartition *partition, uint32 flags)
+{
+	SetFlags(flags);
+}
+
+// NameChanged
+void
+KShadowPartition::NameChanged(KPartition *partition, const char *name)
+{
+	SetName(name);
+}
+
+// ContentNameChanged
+void
+KShadowPartition::ContentNameChanged(KPartition *partition, const char *name)
+{
+	SetContentName(name);
+}
+
+// TypeChanged
+void
+KShadowPartition::TypeChanged(KPartition *partition, const char *type)
+{
+	SetType(type);
+}
+
+// IDChanged
+void
+KShadowPartition::IDChanged(KPartition *partition, partition_id id)
+{
+	// nothing to do
+}
+
+// VolumeIDChanged
+void
+KShadowPartition::VolumeIDChanged(KPartition *partition, dev_t volumeID)
+{
+	SetVolumeID(volumeID);
+}
+
+// MountCookieChanged
+void
+KShadowPartition::MountCookieChanged(KPartition *partition, void *cookie)
+{
+	// TODO: set the mount cookie?
+}
+
+// ParametersChanged
+void
+KShadowPartition::ParametersChanged(KPartition *partition,
+									const char *parameters)
+{
+	SetParameters(parameters);
+}
+
+// ContentParametersChanged
+void
+KShadowPartition::ContentParametersChanged(KPartition *partition,
+										   const char *parameters)
+{
+	SetContentParameters(parameters);
+}
+
+// ChildAdded
+void
+KShadowPartition::ChildAdded(KPartition *partition, KPartition *child,
+							 int32 index)
+{
+	// TODO: Mmh, in the CreateShadowPartition() phase, creating and
+	// adding the shadow partitions is done recursively and we shouldn't
+	// do that here. But when a new partition is added later?
+	// Maybe KPhysicalPartition::CreateChild() should create a shadow for
+	// the new child manually.
+}
+
+// ChildRemoved
+void
+KShadowPartition::ChildRemoved(KPartition *partition, KPartition *child,
+							   int32 index)
+{
+	// TODO: We could remove the corresponding partition, but for consistency
+	// we should proceed analogously to adding partitions.
+}
+
+// DiskSystemChanged
+void
+KShadowPartition::DiskSystemChanged(KPartition *partition,
+									KDiskSystem *diskSystem)
+{
+	SetDiskSystem(diskSystem);
+}
+
+// CookieChanged
+void
+KShadowPartition::CookieChanged(KPartition *partition, void *cookie)
+{
+	// TODO: set the cookie?
+}
+
+// ContentCookieChanged
+void
+KShadowPartition::ContentCookieChanged(KPartition *partition, void *cookie)
+{
+	// TODO: set the content cookie?
 }
 
