@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 #ifndef _KERNEL_VFS_H
 #define _KERNEL_VFS_H
@@ -79,6 +79,8 @@ status_t vfs_write_pages(void *vnode, void *cookie, off_t pos, const iovec *vecs
 status_t vfs_get_vnode_cache(void *vnode, struct vm_cache_ref **_cache);
 status_t vfs_get_file_map( void *_vnode, off_t offset, size_t size, struct file_io_vec *vecs, size_t *_count);
 status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void **_node);
+status_t vfs_stat_vnode(void *_vnode, struct stat *stat);
+status_t vfs_get_vnode_name(void *vnode, char *name, size_t nameSize);
 
 /* special module convenience call */
 status_t vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer, size_t bufferSize);
@@ -101,8 +103,8 @@ dev_t _user_next_device(int32 *_cookie);
 status_t _user_sync(void);
 status_t _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 			char *userPath, size_t pathLength);
-int _user_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
-int _user_open(int fd, const char *path, int omode);
+int _user_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode, int perms);
+int _user_open(int fd, const char *path, int openMode, int perms);
 int _user_open_dir_node_ref(dev_t device, ino_t inode);
 int _user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname);
 int _user_open_dir(int fd, const char *path);
@@ -114,8 +116,6 @@ status_t _user_read_stat(int fd, const char *path, bool traverseLink,
 status_t _user_write_stat(int fd, const char *path, bool traverseLink,
 			const struct stat *stat, size_t statSize, int statMask);
 off_t _user_seek(int fd, off_t pos, int seekType);
-int _user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms);
-int _user_create(const char *path, int omode, int perms);
 status_t _user_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 status_t _user_create_dir(int fd, const char *path, int perms);
 status_t _user_remove_dir(const char *path);

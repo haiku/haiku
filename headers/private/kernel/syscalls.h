@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Haiku Inc. All rights reserved.
+ * Copyright 2004-2005, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_SYSCALLS_H
@@ -116,8 +116,8 @@ extern dev_t		_kern_next_device(int32 *_cookie);
 extern status_t		_kern_sync(void);
 extern status_t		_kern_entry_ref_to_path(dev_t device, ino_t inode,
 						const char *leaf, char *userPath, size_t pathLength);
-extern int			_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
-extern int			_kern_open(int fd, const char *path, int omode);
+extern int			_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode, int perms);
+extern int			_kern_open(int fd, const char *path, int openMode, int perms);
 extern int			_kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name);
 extern int			_kern_open_dir(int fd, const char *path);
 extern int			_kern_open_parent_dir(int fd, char *name,
@@ -125,8 +125,6 @@ extern int			_kern_open_parent_dir(int fd, char *name,
 extern status_t		_kern_fcntl(int fd, int op, uint32 argument);
 extern status_t		_kern_fsync(int fd);
 extern off_t		_kern_seek(int fd, off_t pos, int seekType);
-extern int			_kern_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms);
-extern int			_kern_create(const char *path, int omode, int perms);
 extern status_t		_kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 extern status_t		_kern_create_dir(int fd, const char *path, int perms);
 extern status_t		_kern_remove_dir(const char *path);
