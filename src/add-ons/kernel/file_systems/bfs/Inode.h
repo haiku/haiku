@@ -110,6 +110,11 @@ class CachedBlock {
 		uint32 BlockSize() const { return fVolume->BlockSize(); }
 		uint32 BlockShift() const { return fVolume->BlockShift(); }
 
+	private:
+		CachedBlock(const CachedBlock &);
+		CachedBlock &operator=(const CachedBlock &);
+			// no implementation
+
 	protected:
 		Volume	*fVolume;
 		off_t	fBlockNumber;
@@ -198,6 +203,10 @@ class Inode : public CachedBlock {
 		off_t OldLastModified() { return fOldLastModified; }
 
 	private:
+		Inode(const Inode &);
+		Inode &operator=(const Inode &);
+			// no implementation
+
 		friend AttributeIterator;
 
 		status_t RemoveSmallData(small_data *item,int32 index);

@@ -1170,7 +1170,7 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 		// it might not be needed at all
 
 	status_t status = inode->WriteAt(&transaction,pos,(const uint8 *)buffer,_length);
-	
+
 	if (status == B_OK)
 		transaction.Done();
 
@@ -1186,7 +1186,7 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 			cookie->last_size = inode->Size();
 			cookie->last_notification = system_time();
 		}
-	
+
 		// This will flush the dirty blocks to disk from time to time.
 		// It's done here and not in Inode::WriteAt() so that it won't
 		// add to the duration of a transaction - it might even be a

@@ -43,6 +43,10 @@ class Index {
 		status_t UpdateLastModified(Transaction *transaction, Inode *inode,off_t modified = -1);
 
 	private:
+		Index(const Index &);
+		Index &operator=(const Index &);
+			// no implementation
+
 		Volume		*fVolume;
 		Inode		*fNode;
 		const char	*fName;

@@ -125,6 +125,7 @@ class Transaction {
 		}
 
 		status_t Start(Volume *volume, off_t refBlock);
+		bool IsStarted() const { return fJournal != NULL; }
 
 		void Done()
 		{
@@ -143,7 +144,11 @@ class Transaction {
 
 		Volume	*GetVolume() { return fJournal != NULL ? fJournal->GetVolume() : NULL; }
 
-	protected:
+	private:
+		Transaction(const Transaction &);
+		Transaction &operator=(const Transaction &);
+			// no implementation
+
 		Journal	*fJournal;
 };
 

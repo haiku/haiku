@@ -92,6 +92,7 @@ AllocationBlock::IsUsed(uint16 block)
 {
 	if (block > fNumBits)
 		return true;
+	// the block bitmap is accessed in 32-bit blocks
 	return ((uint32 *)fBlock)[block >> 5] & (1UL << (block % 32));
 }
 

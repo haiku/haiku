@@ -162,7 +162,7 @@ class CachedNode {
 
 class BPlusTree {
 	public:
-		BPlusTree(Transaction *transaction,Inode *stream,int32 nodeSize = BPLUSTREE_NODE_SIZE);
+		BPlusTree(Transaction *transaction, Inode *stream, int32 nodeSize = BPLUSTREE_NODE_SIZE);
 		BPlusTree(Inode *stream);
 		BPlusTree();
 		~BPlusTree();
@@ -174,16 +174,16 @@ class BPlusTree {
 		status_t	InitCheck();
 		status_t	Validate();
 
-		status_t	Remove(Transaction *transaction,const uint8 *key, uint16 keyLength, off_t value);
-		status_t	Insert(Transaction *transaction,const uint8 *key, uint16 keyLength, off_t value);
+		status_t	Remove(Transaction *transaction, const uint8 *key, uint16 keyLength, off_t value);
+		status_t	Insert(Transaction *transaction, const uint8 *key, uint16 keyLength, off_t value);
 
-		status_t	Insert(Transaction *transaction,const char *key, off_t value);
-		status_t	Insert(Transaction *transaction,int32 key, off_t value);
-		status_t	Insert(Transaction *transaction,uint32 key, off_t value);
-		status_t	Insert(Transaction *transaction,int64 key, off_t value);
-		status_t	Insert(Transaction *transaction,uint64 key, off_t value);
-		status_t	Insert(Transaction *transaction,float key, off_t value);
-		status_t	Insert(Transaction *transaction,double key, off_t value);
+		status_t	Insert(Transaction *transaction, const char *key, off_t value);
+		status_t	Insert(Transaction *transaction, int32 key, off_t value);
+		status_t	Insert(Transaction *transaction, uint32 key, off_t value);
+		status_t	Insert(Transaction *transaction, int64 key, off_t value);
+		status_t	Insert(Transaction *transaction, uint64 key, off_t value);
+		status_t	Insert(Transaction *transaction, float key, off_t value);
+		status_t	Insert(Transaction *transaction, double key, off_t value);
 
 		status_t	Replace(Transaction *transaction, const uint8 *key, uint16 keyLength, off_t value);
 		status_t	Find(const uint8 *key, uint16 keyLength, off_t *value);
@@ -192,6 +192,10 @@ class BPlusTree {
 		static int32 ModeToKeyType(mode_t mode);
 
 	private:
+		BPlusTree(const BPlusTree &);
+		BPlusTree &operator=(const BPlusTree &);
+			// no implementation
+
 		int32		CompareKeys(const void *key1, int keylength1, const void *key2, int keylength2);
 		status_t	FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uint16 *index = NULL, off_t *next = NULL);
 		status_t	SeekDown(Stack<node_and_key> &stack, const uint8 *key, uint16 keyLength);

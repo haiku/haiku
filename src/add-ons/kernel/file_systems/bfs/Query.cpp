@@ -141,6 +141,10 @@ class Equation : public Term {
 #endif
 
 	private:
+		Equation(const Equation &);
+		Equation &operator=(const Equation &);
+			// no implementation
+
 		status_t	ConvertValue(type_code type);
 		bool		CompareTo(const uint8 *value, uint16 size);
 		uint8		*Value() const { return (uint8 *)&fValue; }
@@ -166,12 +170,13 @@ class Operator : public Term {
 		Term		*Left() const { return fLeft; }
 		Term		*Right() const { return fRight; }
 
-		virtual status_t Match(Inode *inode,const char *attribute = NULL,int32 type = 0,const uint8 *key = NULL,size_t size = 0);
+		virtual status_t Match(Inode *inode, const char *attribute = NULL, int32 type = 0,
+			const uint8 *key = NULL, size_t size = 0);
 		virtual void Complement();
-		
+
 		virtual void CalculateScore(Index &index);
 		virtual int32 Score() const;
-		
+
 		virtual status_t InitCheck();
 
 		//Term		*Copy() const;
@@ -179,7 +184,11 @@ class Operator : public Term {
 		virtual void PrintToStream();
 #endif
 
-	protected:
+	private:
+		Operator(const Operator &);
+		Operator &operator=(const Operator &);
+			// no implementation
+
 		Term		*fLeft,*fRight;
 };
 

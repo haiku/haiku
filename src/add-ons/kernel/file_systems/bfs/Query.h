@@ -37,6 +37,10 @@ class Expression {
 		bool IsOperator(char **expr,char op);
 
 	private:
+		Expression(const Expression &);
+		Expression &operator=(const Expression &);
+			// no implementation
+
 		char *fPosition;
 		Term *fTerm;
 };

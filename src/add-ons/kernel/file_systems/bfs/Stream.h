@@ -496,7 +496,9 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 			return B_BAD_VALUE;
 
 		// the transaction doesn't have to be started already
-		if ((Flags() & INODE_NO_TRANSACTION) == 0)
+		// ToDo: what's that INODE_NO_TRANSACTION flag good for again?
+		if ((Flags() & INODE_NO_TRANSACTION) == 0
+			&& !transaction->IsStarted())
 			transaction->Start(fVolume, BlockNumber());
 
 		// let's grow the data stream to the size needed
@@ -519,7 +521,8 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 	}
 
 	bool logStream = (Flags() & INODE_LOGGED) == INODE_LOGGED;
-	if (logStream)
+	if (logStream
+		&& !transaction->IsStarted())
 		transaction->Start(fVolume, BlockNumber());
 
 	uint32 bytesWritten = 0;
