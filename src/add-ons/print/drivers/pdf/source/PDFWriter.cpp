@@ -575,6 +575,65 @@ void
 PDFWriter::CreatePattern() 
 {
 	REPORT(kDebug, fPage, "CreatePattern");
+#if 1
+	// use filled pathes for pattern
+	// pro: see con of bitmap pattern
+	// con: not rendered (correctly) in BePDF with small zoom factor
+	int pattern = PDF_begin_pattern(fPdf, 8, 8, 8, 8, 1);
+	
+	if (pattern == -1) {
+		REPORT(kError, fPage, "CreatePattern could not create pattern");
+		return;
+	}
+	
+	for (int pass = 0; pass < 2; pass ++) {
+		float r, g, b;
+		bool is_transparent;
+	
+		if (pass == 0) {
+			r =  fState->foregroundColor.red / 255.0;
+			g =  fState->foregroundColor.green / 255.0;
+			b =  fState->foregroundColor.blue / 255.0;
+			is_transparent = fState->foregroundColor.alpha < 128;
+		} else {
+			r =  fState->backgroundColor.red / 255.0;
+			g =  fState->backgroundColor.green / 255.0;
+			b =  fState->backgroundColor.blue / 255.0;
+			is_transparent = fState->backgroundColor.alpha < 128;
+		}
+	
+		PDF_setcolor(fPdf, "fill", "rgb", r, g, b, 0);
+	
+		if (is_transparent) continue;
+		
+		uint8* data = (uint8*)fState->pattern0.data;
+		for (int8 y = 0; y <= 7; y ++, data ++) {
+			uint8  d = *data;
+			for (int8 x = 0; x <= 7; x ++, d >>= 1) {
+				if (d & 1 == 1) { // foreground
+					if (pass != 0) continue;
+				} else { // background
+					if (pass != 1) continue;
+				}
+				
+				// create rectangle for pixel
+				float x1 = x + 1, y1 = y + 1;
+				PDF_moveto(fPdf, x, y);
+				PDF_lineto(fPdf, x, y1);
+				PDF_lineto(fPdf, x1, y1);
+				PDF_lineto(fPdf, x1, y);
+				PDF_closepath(fPdf);
+				PDF_fill(fPdf);
+			} 
+		}
+	}
+	
+	PDF_end_pattern(fPdf);
+
+#else
+	// use bitmap for pattern
+	// pro: BePDF renders pattern also with small zoom factor
+	// con: BePDF omits mask during rendering
 	BBitmap bm(BRect(0, 0, 7, 7), B_RGBA32);
 	
 	uint8* data = (uint8*)fState->pattern0.data;
@@ -624,6 +683,7 @@ PDFWriter::CreatePattern()
 	PDF_end_pattern(fPdf);
 	PDF_close_image(fPdf, image);
 	if (mask != -1) PDF_close_image(fPdf, mask);
+#endif
 	
 	Pattern* p = new Pattern(fState->pattern0, fState->backgroundColor, fState->foregroundColor, pattern);
 	fPatterns.AddItem(p);
