@@ -874,6 +874,9 @@ return nv_general_bios_to_powergraphics();
 	return B_OK;
 }
 
+/* this routine switches the CRTC/DAC sets to 'connectors', but only for analog
+ * outputs. We need this to make sure the analog 'switch' is set in the same way the
+ * digital 'switch' is set by the BIOS or we might not be able to use dualhead. */
 status_t nv_general_output_select(bool cross)
 {
 	/* make sure this call is warranted */
@@ -881,12 +884,11 @@ status_t nv_general_output_select(bool cross)
 	{
 		/* NV11 cards can't switch heads; we lack info to switch heads via outputs
 		 * if flatpanels are used */
-		//fixme: nolonger used: will be removed later on.
-		if (0)//(si->ps.card_type != NV11) && !si->ps.tmds1_active && !si->ps.tmds2_active)
+		if (si->ps.card_type != NV11)
 		{
 			if (cross)
 			{
-				LOG(4,("INIT: switching outputs to be cross-connected\n"));
+				LOG(4,("INIT: switching analog outputs to be cross-connected\n"));
 
 				/* enable head 2 on connector 1 */
 				/* (b8 = select CRTC (head) for output,
@@ -898,7 +900,7 @@ status_t nv_general_output_select(bool cross)
 			}
 			else
 			{
-				LOG(4,("INIT: switching outputs to be straight-through\n"));
+				LOG(4,("INIT: switching analog outputs to be straight-through\n"));
 
 				/* enable head 1 on connector 1 */
 				DACW(OUTPUT, 0x00000001);
@@ -908,35 +910,37 @@ status_t nv_general_output_select(bool cross)
 		}
 		else
 		{
-			/* make sure we have outputs wired straight through first */
-			if (si->ps.card_type == NV11)
-			{
-				LOG(4,("INIT: NV11 outputs are hardwired to be straight-through\n"));
-			}
-			else
-			{
-				LOG(4,("INIT: switching outputs to be straight-through\n"));
-
-				/* enable head 1 on connector 1 */
-				DACW(OUTPUT, 0x00000001);
-				/* enable head 2 on connector 2 */
-				DAC2W(OUTPUT, 0x00000101);
-			}
-
-			/* now invert CRTC use to do switching */
-			if (cross)
-			{
-				LOG(4,("INIT: switching CRTC use to be cross-connected\n"));
-				si->crtc_switch_mode = !si->ps.crtc2_prim;
-			}
-			else
-			{
-				LOG(4,("INIT: switching CRTC use to be straight-through\n"));
-				si->crtc_switch_mode = si->ps.crtc2_prim;
-			}
-			/* update CRTC and DAC functions access */
-			setup_virtualized_heads(si->crtc_switch_mode);
+			LOG(4,("INIT: NV11 analog outputs are hardwired to be straight-through\n"));
 		}
+		return B_OK;
+	}
+	else
+	{
+		return B_ERROR;
+	}
+}
+
+/* this routine switches CRTC/DAC set use. We need this because it's unknown howto
+ * switch digital panels to/from a specific CRTC/DAC set. */
+status_t nv_general_head_select(bool cross)
+{
+	/* make sure this call is warranted */
+	if (si->ps.secondary_head)
+	{
+		/* invert CRTC/DAC use to do switching */
+		if (cross)
+		{
+			LOG(4,("INIT: switching CRTC/DAC use to be cross-connected\n"));
+			si->crtc_switch_mode = !si->ps.crtc2_prim;
+		}
+		else
+		{
+			LOG(4,("INIT: switching CRTC/DAC use to be straight-through\n"));
+			si->crtc_switch_mode = si->ps.crtc2_prim;
+		}
+		/* update CRTC and DAC functions access */
+		setup_virtualized_heads(si->crtc_switch_mode);
+
 		return B_OK;
 	}
 	else
@@ -947,8 +951,7 @@ status_t nv_general_output_select(bool cross)
 
 /* basic change of card state from VGA to enhanced mode:
  * Should work from VGA BIOS POST init state. */
-static 
-status_t nv_general_bios_to_powergraphics()
+static status_t nv_general_bios_to_powergraphics()
 {
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 

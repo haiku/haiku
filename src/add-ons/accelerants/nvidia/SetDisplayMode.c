@@ -132,9 +132,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* set output connectors assignment if possible */
 		if ((target.flags & DUALHEAD_BITS) == DUALHEAD_SWITCH)
 			/* invert output assignment in switch mode */
-			nv_general_output_select(true);
+			nv_general_head_select(true);
 		else
-			nv_general_output_select(false);
+			nv_general_head_select(false);
 
 		/* set the pixel clock PLL(s) */
 		LOG(8,("SETMODE: target clock %dkHz\n",target.timing.pixel_clock));
@@ -263,7 +263,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 //					cross = false;
 //			}
 			/* set output connectors assignment if possible */
-			nv_general_output_select(false);
+			nv_general_head_select(false);
 		}
 
 		switch(target.space)

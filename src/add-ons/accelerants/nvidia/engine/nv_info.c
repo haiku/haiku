@@ -246,9 +246,58 @@ void fake_pins(void)
 	/* find out the BIOS preprogrammed panel use status... */
 	detect_panels();
 
+//in progress!
+	if (si->ps.secondary_head)
+	{
+		if (si->ps.card_type != NV11)
+		{
+			uint8 monitors = 0x00;
+
+			/* presetup by the card's BIOS, we can't change this (lack of info) */
+			if (si->ps.tmds1_active) monitors |= 0x01;
+			if (si->ps.tmds2_active) monitors |= 0x02;
+//fixme: checkout NV25, NV18, NV11... NV34 must use DAC _and_ DAC2 for det.
+			/* connect analog outputs straight through */
+			nv_general_output_select(false);
+			/* sense analog monitor on primary connector */
+			if (nv_dac_crt_connected()) monitors |= 0x04;
+			/* cross connect analog outputs */
+			nv_general_output_select(true);
+			/* sense analog monitor on secondary connector */
+			if (nv_dac_crt_connected()) monitors |= 0x08;
+			/* re-connect analog outputs straight through */
+			nv_general_output_select(false);
+
+//fixme! two monitors on one DAC _can_ happen!!! (switch analog outputs then!)
+			switch (monitors)
+			{
+			case 0x01:	/* digital panel on DAC1, nothing on DAC2 */
+			case 0x04:	/* analog panel or CRT on DAC1, nothing on DAC2 */
+			case 0x05:	/* both types on DAC1, nothing on DAC2 (shouldn't happen) */
+				LOG(2,("INFO: head 1 has a monitor only: defaulting to head 1 use\n"));
+				break;
+			case 0x02:	/* digital panel on DAC2, nothing on DAC1 */
+			case 0x08:	/* analog panel or CRT on DAC2, nothing on DAC1 */
+			case 0x0a:	/* both types on DAC2, nothing on DAC1 (shouldn't happen) */
+				LOG(2,("INFO: head 2 has a monitor only: defaulting to head 2 use\n"));
+				si->ps.crtc2_prim = true;
+				break;
+			default:	/* monitors found on both DACs, or nothing found at all */
+				LOG(2,("INFO: head 2 has a monitor only: defaulting to head 2 use\n"));
+				break;
+			}
+		}
+		else
+		{
+			LOG(4,("INFO: NV11 outputs are hardwired to be straight-through\n"));
+		}
+	}
+//
+
+//fixme: remove..
 	/* if no panel, but one analog monitor is detected, and it's on the secondary
 	 * head on dualhead cards, we use that head as primary head */
-	if (si->ps.secondary_head && !si->ps.tmds1_active && !si->ps.tmds2_active)
+/*	if (si->ps.secondary_head && !si->ps.tmds1_active && !si->ps.tmds2_active)
 	{
 		if (nv_dac2_crt_connected() && !nv_dac_crt_connected())
 		{
@@ -256,6 +305,7 @@ void fake_pins(void)
 			si->ps.crtc2_prim = true;
 		}
 	}
+*/
 
 	/* select other CRTC for primary head use if specified by user in settings file */
 	if (si->ps.secondary_head && si->settings.switchhead)
@@ -449,7 +499,7 @@ static void detect_panels()
 	 * we use that head as primary head */
 	if (si->ps.secondary_head && si->ps.tmds2_active && !si->ps.tmds1_active)
 	{
-		LOG(2,("INFO: CRTC2 has a panel only: defaulting to CRTC2 use\n"));
+		LOG(2,("INFO: CRTC2 has a panel only: defaulting to CRTC2 for primary use\n"));
 		si->ps.crtc2_prim = true;
 	}
 
