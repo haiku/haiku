@@ -1633,20 +1633,46 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 void RootLayer::get_workspace_windows()
 {
 	int32	bufferSize = fWinBorderListLength;
+	int32	exCount = fWinBorderCount;
+	bool	present;
+	bool	newMemory = false;
 
-	memcpy(fWinBorderList2, fWinBorderList, fWinBorderCount);
+	memcpy(fWinBorderList2, fWinBorderList, fWinBorderCount * sizeof(WinBorder*));
 
 	if (!(ActiveWorkspace()->GetWinBorderList((void**)fWinBorderList, &bufferSize)))
 	{
-		fWinBorderList2	= (WinBorder**)realloc(fWinBorderList2, bufferSize);
-		fWinBorderList	= (WinBorder**)realloc(fWinBorderList, bufferSize);
-		fWinBorderListLength = bufferSize;
+		newMemory		= true;
+		// grow by a factor of 8.
+		fWinBorderListLength = (bufferSize / 8 + 1) * 8;
+		fWinBorderList	= (WinBorder**)realloc(fWinBorderList, fWinBorderListLength);
 		ActiveWorkspace()->GetWinBorderList((void**)fWinBorderList, &bufferSize);
 	}
 	
 	fWinBorderCount = bufferSize;
 
 	fWinBorderIndex	= 0;
+
+	// clear visible and full visible regions for windows no more visible.
+	for (int32 i = 0; i < exCount; i++)
+	{
+		present	= false;
+
+		for (int32 j = 0; j < fWinBorderCount; j++)
+			if (fWinBorderList2[i] == fWinBorderList[j])
+				present = true;
+
+		if (!present)
+			empty_visible_regions(fWinBorderList2[i]);
+//		{
+//			fWinBorderList2[i]->fVisible.MakeEmpty();
+//			fWinBorderList2[i]->fFullVisible.MakeEmpty();
+//		}
+	}
+
+	// enlarge 2nd buffer also
+	if (newMemory)
+		fWinBorderList2	= (WinBorder**)realloc(fWinBorderList2, fWinBorderListLength);
+
 //for (int32 i = 0; i < fWinBorderCount; i++)
 //{
 //	printf("Adi: %ld get_workspace_windows(%p)\n", i, fWinBorderList[i]);
@@ -1671,5 +1697,23 @@ void RootLayer::draw_window_tab(WinBorder *exFocus, WinBorder *focus)
 				reg.Include(&focus->fVisible);
 			redraw_layer(this, reg);
 		}
+	}
+}
+
+inline
+void RootLayer::empty_visible_regions(Layer *layer)
+{
+// TODO: optimize by avoiding recursion?
+	// NOTE: first 'layer' must be a WinBorder
+	Layer	*child;
+
+	layer->fFullVisible.MakeEmpty();
+	layer->fVisible.MakeEmpty();
+
+	child	= layer->VirtualBottomChild();
+	while(child)
+	{
+		empty_visible_regions(child);
+		child = layer->VirtualUpperSibling();
 	}
 }
