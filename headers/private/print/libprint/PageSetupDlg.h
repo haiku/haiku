@@ -29,6 +29,7 @@ private:
 	BRadioButton     *fPortrait;
 	BPopUpMenu       *fPaper;
 	BPopUpMenu       *fResolution;
+	BTextControl     *fScaling;
 };
 
 class PageSetupDlg : public DialogWindow {

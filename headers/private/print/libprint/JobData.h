@@ -220,7 +220,9 @@ private:
 	Orientation fOrientation;
 	float       fScaling;
 	BRect       fPaperRect;
+	BRect       fScaledPaperRect;
 	BRect       fPrintableRect;
+	BRect       fScaledPrintableRect;
 	int32       fNup;
 	int32       fFirstPage;
 	int32       fLastPage;
@@ -266,8 +268,14 @@ public:
 	const BRect &getPaperRect() const { return fPaperRect; }
 	void  setPaperRect(const BRect &paper_rect) { fPaperRect = paper_rect; }
 
+	const BRect &getScaledPaperRect() const { return fScaledPaperRect; }
+	void  setScaledPaperRect(const BRect &paper_rect) { fScaledPaperRect = paper_rect; }
+
 	const BRect &getPrintableRect() const { return fPrintableRect; }
 	void  setPrintableRect(const BRect &printable_rect) { fPrintableRect = printable_rect; }
+
+	const BRect &getScaledPrintableRect() const { return fScaledPrintableRect; }
+	void  setScaledPrintableRect(const BRect &printable_rect) { fScaledPrintableRect = printable_rect; }
 
 	int32 getNup() const { return fNup; }
 	void  setNup(int32 nup) { fNup = nup; }
