@@ -69,7 +69,7 @@ get_tupel(uint32 id)
 #endif
 
 
-status_t
+static status_t
 get_next_partition(int fd, rigid_disk_block &rdb, uint32 &cookie, partition_block &partition)
 {
 	if (cookie == 0) {
@@ -85,12 +85,18 @@ get_next_partition(int fd, rigid_disk_block &rdb, uint32 &cookie, partition_bloc
 	if (bytesRead < (ssize_t)sizeof(partition_block))
 		return B_ERROR;
 
+	// ToDo: Should we retry with the next block if the following test fails, as
+	//		long as this we find partition_blocks within a reasonable range?
+
+	if (partition.ID() != RDB_PARTITION_ID || !validate_check_sum<partition_block>(&partition))
+		return B_BAD_DATA;
+
 	cookie = partition.Next();
 	return B_OK;
 }
 
 
-bool
+static bool
 search_rdb(int fd, rigid_disk_block **_rdb)
 {
 	for (int32 sector = 0; sector < RDB_LOCATION_LIMIT; sector++) {
@@ -164,10 +170,6 @@ amiga_rdb_scan_partition(int fd, partition_data *partition, void *_cookie)
 	status_t status;
 
 	while ((status = get_next_partition(fd, rdb, cookie, partitionBlock)) == B_OK) {
-		if (partitionBlock.ID() != RDB_PARTITION_ID
-			||!validate_check_sum<partition_block>(&partitionBlock))
-			continue;
-
 		disk_environment &environment = *(disk_environment *)&partitionBlock.environment[0];
 		TRACE(("amiga_rdb: file system: %s\n", get_tupel(B_BENDIAN_TO_HOST_INT32(environment.dos_type))));
 
