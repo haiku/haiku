@@ -588,7 +588,7 @@ status_t BEntry::GetParent(BEntry *entry) const
 	if (status == B_OK) {
 	
 		// Verify we aren't an entry representing "/"
-		status = BPrivate::Storage::entry_ref_is_root_dir(ref) ? B_ENTRY_NOT_FOUND
+		status = BPrivate::Storage::entry_ref_is_root_dir(&ref) ? B_ENTRY_NOT_FOUND
 														: B_OK ;
 		if (status == B_OK) {
 
@@ -635,7 +635,7 @@ BEntry::GetParent(BDirectory *dir) const
 	if (status == B_OK) {
 	
 		// Verify we aren't an entry representing "/"
-		status = BPrivate::Storage::entry_ref_is_root_dir(ref) ? B_ENTRY_NOT_FOUND : B_OK ;
+		status = BPrivate::Storage::entry_ref_is_root_dir(&ref) ? B_ENTRY_NOT_FOUND : B_OK ;
 		if (status == B_OK) {
 
 			// Now point the entry_ref to the parent directory (instead of ourselves)
