@@ -22,21 +22,25 @@ int main(int, char**) {
 }
 
 // Construct the server app. Doesn't do much, at this point.
-ScreenSaverApp::ScreenSaverApp() : BApplication("application/x-vnd.OBOS-ScreenSaverApp"),addon_image(0),win(NULL) {
+ScreenSaverApp::ScreenSaverApp() : BApplication("application/x-vnd.OBOS-ScreenSaverApp"),win(NULL) {
 	blankTime=real_time_clock();
 }
 
 void ScreenSaverApp::ReadyToRun(void) {
-	if (!pref.LoadSettings() || (!LoadAddOn()))
+	if (!pref.LoadSettings()) 
 		exit(1);
 	else {	// If everything works OK, create a BDirectWindow and start the render thread.
 		BScreen theScreen(B_MAIN_SCREEN_ID);
-		win=new SSAwindow(theScreen.Frame(),saver);
-		if (B_OK!=win->SetFullScreen(true)) {
-			exit(1);
-		}
+		win=new SSAwindow(theScreen.Frame());
 		pww=new pwWindow();
-		thrd=new ScreenSaverThread(saver,win,win->view,&pref);
+		thrd=new ScreenSaverThread(win,win->view,&pref);
+
+		saver=thrd->LoadAddOn();
+		if (!saver)
+			exit(1);
+		win->SetSaver(saver);
+		win->SetFullScreen(true);
+		win->Show();
 		threadID=spawn_thread(threadFunc,"ScreenSaverRenderer",0,thrd);
 		resume_thread(threadID);
 		HideCursor();
@@ -53,8 +57,6 @@ void ScreenSaverApp::ShowPW(void) {
 			pww->Sync();
 			}
 		win->Unlock();
-		pww->Lock();
-		pww->Unlock();
 }
 
 void ScreenSaverApp::MessageReceived(BMessage *message) {
@@ -64,7 +66,8 @@ void ScreenSaverApp::MessageReceived(BMessage *message) {
 			beep();
 			pww->Hide();
 			win->SetFullScreen(true);
-			resume_thread(threadID);
+			if (threadID)
+				resume_thread(threadID);
 			}
 			else  {
 				printf ("Quitting!\n");
@@ -83,63 +86,10 @@ void ScreenSaverApp::MessageReceived(BMessage *message) {
   }
 }
 bool ScreenSaverApp::QuitRequested(void) {
-	kill_thread(threadID);
-	delete thrd;
-	return true;
-}
-
-bool ScreenSaverApp::LoadAddOn() {
-	BScreenSaver *(*instantiate)(BMessage *, image_id );
-	if (addon_image) { // This is a new set of preferences. Free up what we did have 
-		unload_add_on(addon_image);
-		if (saver)
-			delete saver;
-		}
-	char temp[B_PATH_NAME_LENGTH]; // Yes, this is a lot...
-	if (B_OK==find_directory(B_BEOS_ADDONS_DIRECTORY,NULL,false,temp,B_PATH_NAME_LENGTH)) { 
-		sprintf (temp,"%s/Screen Savers/%s",temp,pref.ModuleName());
-		//printf ("Trying to open add-on: %s\n",temp);
-		addon_image = load_add_on(temp);
-		}
-	if (addon_image<0)  {
-		//printf ("Unable to open add-on: %s\n",temp);
-		sprintf (temp,"%s/Screen Savers/%s",temp,pref.ModuleName());
-		if (B_OK==find_directory(B_COMMON_ADDONS_DIRECTORY,NULL,false,temp,B_PATH_NAME_LENGTH)) { 
-			sprintf (temp,"%s/Screen Savers/%s",temp,pref.ModuleName());
-			//printf ("Trying to open add-on: %s\n",temp);
-			addon_image = load_add_on(temp);
-			}
-		}
-	if (addon_image<0)  {
-		//printf ("Unable to open add-on: %s\n",temp);
-		if (B_OK==find_directory(B_USER_ADDONS_DIRECTORY,NULL,false,temp,B_PATH_NAME_LENGTH)) { 
-			sprintf (temp,"%s/Screen Savers/%s",temp,pref.ModuleName());
-			//printf ("Trying to open add-on: %s\n",temp);
-			addon_image = load_add_on(temp);
-			}
-		}
-	if (addon_image<0) {
-		printf ("Unable to open add-on: %s\n",temp);
-		printf ("add on image = %ld!\n",addon_image);
-		return false;
-		}
-	else {
-		// Look for the one C function that should exist.
-		status_t retVal;
-		if (B_OK != (retVal=get_image_symbol(addon_image, "instantiate_screen_saver", B_SYMBOL_TYPE_TEXT,(void **) &instantiate))) {
-			printf ("Unable to find the instantiator\n");
-			printf ("Error = %ld\n",retVal);
-			return false;
-			}
-		else
-			saver=instantiate(pref.GetState(),addon_image);
-			if (B_OK!=saver->InitCheck()) {
-				unload_add_on(addon_image);
-				delete saver;
-				saver=NULL;
-				return false;
-				}
-		}
+	if (threadID)
+		kill_thread(threadID);
+	if (thrd)
+		delete thrd;
 	return true;
 }
 

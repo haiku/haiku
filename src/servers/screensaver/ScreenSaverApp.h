@@ -20,7 +20,6 @@ public:
 	void ShowPW(void);
 private:
 	ScreenSaverPrefs pref;
-	image_id addon_image;
 	SSAwindow *win;
 	BScreenSaver *saver;
 	ScreenSaverThread *thrd;
