@@ -24,6 +24,7 @@
 #include "argv.h"
 
 #include <fs_attr.h>
+#include <fs_query.h>
 
 static void do_lat_fs(int argc, char **argv);
 static void do_fsh(void);
@@ -1060,6 +1061,50 @@ do_sync(int argc, char **argv)
 }
 
 
+void *gQueryCookie = NULL;
+
+
+static void
+do_stopquery(int argc, char **argv)
+{
+	int err;
+
+	if (gQueryCookie == NULL) {
+		printf("no query running (use the 'startquery' command to start a query).\n");
+		return;
+	}
+
+	err = sys_close_query(true, -1, "/myfs/.", gQueryCookie);
+	if (err < 0) {
+		printf("could not close query: %s\n", strerror(err));
+		return;
+	}
+
+	gQueryCookie = NULL;
+}
+
+
+static void
+do_startquery(int argc, char **argv)
+{
+	char *query;
+	int err;
+
+	if (argc != 2) {
+		printf("query string expected");
+		return;
+	}
+	query = argv[1];
+
+	err = sys_open_query(true, -1, "/myfs/.", query, B_LIVE_QUERY, &gQueryCookie);
+	if (err < 0) {
+		printf("could not open query: %s\n", strerror(err));
+		return;
+	} else
+		printf("query started - use the 'stopquery' command to stop it.");
+}
+
+
 static void
 do_query(int argc, char **argv)
 {
@@ -1076,14 +1121,14 @@ do_query(int argc, char **argv)
 	}
 	query = argv[1];
 
-	err = sys_open_query(true,-1,"/myfs/.",query,&cookie);
+	err = sys_open_query(true, -1, "/myfs/.", query, 0, &cookie);
 	if (err < 0) {
-		printf("could not open query: %s\n",strerror(err));
+		printf("could not open query: %s\n", strerror(err));
 		return;
 	}
 	
 	while (true) {
-		err = sys_read_query(true,-1,"/myfs/.",cookie, dent, sizeof(buffer), 1);
+		err = sys_read_query(true, -1, "/myfs/.", cookie, dent, sizeof(buffer), 1);
 		if (err < 0) {
 			printf("readdir failed for: %s\n", dent->d_name);
 			if (max_err-- <= 0)
@@ -1095,12 +1140,12 @@ do_query(int argc, char **argv)
 		if (err == 0)
 			break;
 
-		printf("%s\n",dent->d_name);
+		printf("%s\n", dent->d_name);
 	}
 
-	err = sys_close_query(true,-1,"/myfs/.",cookie);
+	err = sys_close_query(true, -1, "/myfs/.", cookie);
 	if (err < 0) {
-		printf("could not close query: %s\n",strerror(err));
+		printf("could not close query: %s\n", strerror(err));
 		return;
 	}
 }
@@ -1307,6 +1352,8 @@ cmd_entry fsh_cmds[] =
     { "create",  do_create, "create N files. default is 100" },
     { "delete",  do_delete, "delete N files. default is 100" },
     { "query",   do_query, "run a query on the file system" },
+    { "startquery", do_startquery, "run a live query on the file system" },
+    { "stopquery",  do_stopquery, "stops the live query" },
     { "ioctl",   do_ioctl, "execute ioctl() without an inode (okay, with the root node)" },
     { "fcntl",   do_fcntl, "execute ioctl() with the active inode" },
     { "cptest",  do_copytest, "copies all files from the given path" },

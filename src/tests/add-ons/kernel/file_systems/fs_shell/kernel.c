@@ -215,9 +215,15 @@ static int          free_fds(fdarray *fds);
 #include <stdio.h>
 
 static void
-PANIC(char *s)
+PANIC(char *s, ...)
 {
-    printf(s);
+	va_list list;
+	
+	va_start(list, s);
+	vfprintf(stdout, s, list);
+	va_end(list);
+
+    exit(-1);
 }
 
 
@@ -1821,7 +1827,7 @@ error1:
 
 
 int
-sys_open_query(bool kernel, int fd, const char *path, const char *query, void **cookie)
+sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, void **cookie)
 {
 	int		err;
 	nspace	*ns;
@@ -1842,7 +1848,7 @@ sys_open_query(bool kernel, int fd, const char *path, const char *query, void **
 		dec_vnode(root, FALSE);
 		return EPERM;
 	}
-	err = (*fs->ops.open_query)(ns->data, query, 0, -1, 0, cookie);
+	err = (*fs->ops.open_query)(ns->data, query, flags, -1, 0, cookie);
 	printf("sys_open_query() -- end: %d\n",err);
 	dec_vnode(root, FALSE);
 
@@ -2232,11 +2238,38 @@ put_vnode(nspace_id nsid, vnode_id vnid)
 int
 new_vnode(nspace_id nsid, vnode_id vnid, void *data)
 {
-    int         err;
-    vnode       *vn;
+    int retries = 20;
+    vnode *vn;
+    int err;
 
-    LOCK(vnlock);
-    vn = steal_vnode(FREE_LIST);
+	LOCK(vnlock);
+
+restart:
+	if ((vn = lookup_vnode(nsid, vnid)) != NULL) {
+		// oh, we requested a new vnode although there already
+		// exist one - compare the private node data and bail
+		// out if needed.
+
+		if (vn->busy) {
+			printf("new_vnode(): vnode exists and is busy!\n");
+			snooze(500);
+			if (retries-- >= 0)
+				goto restart;
+
+			printf("new_vnode(): still busy, but continue to our doom!\n");
+		}
+
+		if (vn->data != data)
+			PANIC("new_vnode(): vnode already exists with different data (vnode id = %Ld)!\n", vnid);
+		else {
+			printf("new_vnode(): vnode already exists with the same data (vnode id = %Ld)\n", vnid);
+			vn->rcnt++;
+			return;
+        	UNLOCK(vnlock);
+		}
+	}
+
+	vn = steal_vnode(FREE_LIST);
     if (!vn) {
         vn = steal_vnode(USED_LIST);
         if (!vn) {
