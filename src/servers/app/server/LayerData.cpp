@@ -49,7 +49,7 @@ DrawData::DrawData(void)
 	scale=1.0;
 	fontAliasing=true;
 
-	if(fontserver)
+	if(fontserver && fontserver->GetSystemPlain())
 		font=*(fontserver->GetSystemPlain());
 	
 	clipReg=NULL;

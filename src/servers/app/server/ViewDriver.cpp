@@ -753,6 +753,7 @@ void ViewDriver::SetDrawData(const DrawData *d, bool set_font_data)
 		unlock=true;
 	}
 	
+	drawview->ConstrainClippingRegion(d->clipReg);
 	drawview->SetPenSize(d->pensize);
 	drawview->SetDrawingMode(d->draw_mode);
 	drawview->SetHighColor(d->highcolor.GetColor32());

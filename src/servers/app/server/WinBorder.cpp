@@ -304,30 +304,40 @@ void WinBorder::MouseUp(PointerEvent& evt)
 	if (!(Window()->IsLocked()))
 		debugger("you must lock the attached ServerWindow object\n\t before calling WinBorder::MouseUp()\n");
 
-	if (fIsMoving)
+	click_type action;
+
+	// find out where user clicked in Decorator
+	action = fDecorator->Clicked(evt.where, evt.buttons, evt.modifiers);
+	
+	if(fIsMoving)
 	{
 		fIsMoving	= false;
 		return;
 	}
+	
 	if (fIsResizing)
 	{
 		fIsResizing	= false;
 		return;
 	}
+	
 	if (fIsZooming)
 	{
 		fIsZooming	= false;
 		fDecorator->SetZoom(false);
 		fDecorator->DrawZoom();
-		Window()->Zoom();
+		
+		if(action==DEC_ZOOM)
+			Window()->Zoom();
 		return;
 	}
-	if (fIsClosing)
+	if(fIsClosing)
 	{
 		fIsClosing	= false;
 		fDecorator->SetClose(false);
 		fDecorator->DrawClose();
-		Window()->Quit();
+		if(action==DEC_CLOSE)
+			Window()->Quit();
 		return;
 	}
 	if(fIsMinimizing)
@@ -335,7 +345,8 @@ void WinBorder::MouseUp(PointerEvent& evt)
 		fIsMinimizing = false;
 		fDecorator->SetMinimize(false);
 		fDecorator->DrawMinimize();
-		Window()->Minimize(true);
+		if(action==DEC_MINIMIZE)
+			Window()->Minimize(true);
 		return;
 	}
 }

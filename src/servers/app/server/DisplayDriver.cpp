@@ -146,6 +146,7 @@ void DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap, const BRec
 	if(!AcquireBuffer(&frameBuffer))
 	{
 		debugger("ERROR: Couldn't acquire framebuffer in DrawBitmap()\n");
+		Unlock();
 		return;
 	}
 	
@@ -306,6 +307,7 @@ void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BReg
 	if(!AcquireBuffer(&frameBuffer))
 	{
 		debugger("ERROR: Couldn't acquire framebuffer in CopyRegionList()\n");
+		Unlock();
 		return;
 	}
 	
@@ -2382,6 +2384,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		end.x=MAX(first.x,MAX(second.x,third.x));
 		StrokeSolidLine(ROUND(start.x), ROUND(start.y), ROUND(end.x), ROUND(start.y), color);
 		fCursorHandler.DriverShow();
+		Unlock();
 		return;
 	}
 
@@ -2397,6 +2400,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		for(i=(int32)first.y+1; i<=third.y; i++)
 			StrokeSolidLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
 		fCursorHandler.DriverShow();
+		Unlock();
 		return;
 	}
 	
@@ -2410,6 +2414,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		for(i=(int32)first.y; i<third.y; i++)
 			StrokeSolidLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
 		fCursorHandler.DriverShow();
+		Unlock();
 		return;
 	}
 	
@@ -2500,6 +2505,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			end.x=MAX(first.x,MAX(second.x,third.x));
 			StrokePatternLine(ROUND(start.x), ROUND(start.y), ROUND(end.x), ROUND(start.y), d);
 			fCursorHandler.DriverShow();
+			Unlock();
 			return;
 		}
 
@@ -2515,6 +2521,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			for(i=(int32)first.y+1; i<=third.y; i++)
 				StrokePatternLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
 			fCursorHandler.DriverShow();
+			Unlock();
 			return;
 		}
 	
@@ -2528,6 +2535,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			for(i=(int32)first.y; i<third.y; i++)
 				StrokePatternLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
 			fCursorHandler.DriverShow();
+			Unlock();
 			return;
 		}
 	
@@ -2697,6 +2705,7 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 	{
 		StrokeEllipse(r,color);
 		fCursorHandler.DriverShow();
+		Unlock();
 		return;
 	}
 
@@ -2865,6 +2874,7 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 	{
 		StrokeEllipse(r,d);
 		fCursorHandler.DriverShow();
+		Unlock();
 		return;
 	}
 
@@ -3733,8 +3743,11 @@ float DisplayDriver::StringWidth(const char *string, int32 length, const DrawDat
 	FontStyle *style=font->Style();
 
 	if(!style)
+	{
+		Unlock();
 		return 0.0;
-
+	}
+	
 	FT_Face face;
 	FT_GlyphSlot slot;
 	FT_UInt glyph_index=0, previous=0;
