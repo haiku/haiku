@@ -48,13 +48,13 @@ IDFinderVisitor::IDFinderVisitor(int32 id)
 bool
 IDFinderVisitor::Visit(BDiskDevice *device)
 {
-	return (device->UniqueID() == fID);
+	return (device->ID() == fID);
 }
 
 // Visit
 bool
 IDFinderVisitor::Visit(BPartition *partition, int32 level)
 {
-	return (partition->UniqueID() == fID);
+	return (partition->ID() == fID);
 }
 
