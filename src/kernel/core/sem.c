@@ -562,8 +562,13 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	// order in sem_interrupt_thread.
 	releaseQueue.head = releaseQueue.tail = NULL;
 
-	if (flags & B_RELEASE_ALL)
+	if (flags & B_RELEASE_ALL) {
 		count = -gSems[slot].u.used.count;
+
+		// is there anything to do for us at all?
+		if (count == 0)
+			goto err;
+	}
 
 	while (count > 0) {
 		int delta = count;
