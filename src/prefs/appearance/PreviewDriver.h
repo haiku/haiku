@@ -11,10 +11,10 @@
 #include <Region.h>
 #include "DisplayDriver.h"
 
-
 class BBitmap;
 class PortLink;
 class ServerCursor;
+class ColorSet;
 
 class PVView : public BView
 {
@@ -38,7 +38,7 @@ public:
 	virtual bool Initialize(void);
 	virtual void Shutdown(void);
 	virtual void CopyBits(BRect src, BRect dest);
-	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest);
+	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
 	virtual void DrawChar(char c, BPoint pt);
 //	virtual void DrawPicture(SPicture *pic, BPoint pt);
 //	virtual void DrawString(const char *string, int32 length, BPoint pt, escapement_delta *delta=NULL);

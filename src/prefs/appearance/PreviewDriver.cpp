@@ -28,6 +28,7 @@
 #include "PortLink.h"
 #include "PreviewDriver.h"
 #include "LayerData.h"
+#include "ColorSet.h"
 
 BRect preview_bounds(0,0,200,200);;
 
@@ -97,7 +98,7 @@ void PreviewDriver::CopyBits(BRect src, BRect dest)
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest)
+void PreviewDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d)
 {
 }
 

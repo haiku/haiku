@@ -16,9 +16,10 @@
 #include <stdio.h>
 
 #include "APRView.h"
-#include "PortLink.h"
+#include <PortLink.h>
 #include "defs.h"
 #include "ColorWell.h"
+#include "ColorUtils.h"
 
 //#define DEBUG_COLORSET
 
@@ -29,9 +30,6 @@
 #define DELETE_COLORSET 'dlcs'
 #define LOAD_COLORSET 'ldcs'
 #define COLOR_DROPPED 'cldp'
-
-void SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a=255);
-void PrintRGBColor(rgb_color col);
 
 APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags), settings(B_SIMPLE_DATA)
@@ -841,17 +839,4 @@ const char *APRView::SelectionToString(int32 index)
 			return "DESKTOP";
 			break;
 	}
-}
-
-void SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a=255)
-{
-	col->red=r;
-	col->green=g;
-	col->blue=b;
-	col->alpha=a;
-}
-
-void PrintRGBColor(rgb_color col)
-{
-	printf("RGB Color (%d,%d,%d,%d)\n",col.red,col.green,col.blue,col.alpha);
 }

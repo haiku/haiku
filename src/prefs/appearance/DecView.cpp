@@ -1,18 +1,39 @@
-/*
-	DecView.cpp:	The Appearance app's decorator handler
-
-	Utilizes app_server graphics module emulation to allows decorators to display
-	a preview. Saves the chosen decorator's path in a settings file in the app_server
-	settings directory.
-*/
-
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		DecView.cpp
+//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//	Description:	decorator handler for the app
+//  
+//	Utilizes app_server graphics module emulation to allows decorators to display
+//	a preview. Saves the chosen decorator's path in a settings file in the app_server
+//	settings directory.
+//------------------------------------------------------------------------------
 #include <OS.h>
 #include <String.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <Path.h>
 #include "DecView.h"
-#include "PortLink.h"
+#include <PortLink.h>
 #include <Directory.h>
 #include <File.h>
 #include <stdio.h>
@@ -117,7 +138,7 @@ printf("MSG: Decorator NOT Chosen - couldn't load decorator\n");
 				break;
 			}
 			
-			ldata.highcolor.SetColor(colorset.desktop);
+//			ldata.highcolor.SetColor(colorset.desktop);
 			driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
 			if(decorator)
 			{
@@ -278,13 +299,13 @@ bool DecView::LoadDecorator(const char *path)
 	if(!path)
 		return false;
 	create_decorator *pcreatefunc=NULL;
-	get_decorator_version *pversionfunc=NULL;
+//	get_decorator_version *pversionfunc=NULL;
 	status_t stat;
 	image_id addon;
 	
 	addon=load_add_on(path);
 
-	stat=get_image_symbol(addon, "get_decorator_version", B_SYMBOL_TYPE_TEXT, (void**)&pversionfunc);
+/*	stat=get_image_symbol(addon, "get_decorator_version", B_SYMBOL_TYPE_TEXT, (void**)&pversionfunc);
 	if(stat!=B_OK)
 	{
 		unload_add_on(addon);
@@ -293,7 +314,7 @@ printf("LoadDecorator(%s): Couldn't get version symbol\n",path);
 #endif
 		return false;
 	}
-
+*/
 	// As of now, we do nothing with decorator versions, but the possibility exists
 	// that the API will change even though I cannot forsee any reason to do so. If
 	// we *did* do anything with decorator versions, the assignment to a global would
@@ -323,7 +344,8 @@ printf("LoadDecorator(): Deleting old decorator\n");
 //		unload_add_on(decorator_id);
 	}
 	decorator_id=addon;
-	decorator=pcreatefunc(BRect(50,50,150,150),WLOOK_TITLED,WFEEL_NORMAL,0);
+	decorator=pcreatefunc(BRect(50,50,150,150),B_TITLED_WINDOW_LOOK,
+		B_NORMAL_WINDOW_FEEL,0);
 	decorator->SetDriver(driver);
 	decorator->SetFocus(true);
 //	decorator->Draw();
@@ -357,7 +379,7 @@ printf("DecView::SetColors\n");
 	{
 		if(decorator)
 		{
-			ldata.highcolor.SetColor(colorset.desktop);
+//			ldata.highcolor.SetColor(colorset.desktop);
 			driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
 			decorator->SetColors(colorset);
 			decorator->Draw();
@@ -404,9 +426,9 @@ printf("UnpackSettings(): NULL parameter\n");
 		set->menu_selected_text.SetColor(*col);
 	if(msg->FindData("WINDOW_TAB",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		set->window_tab.SetColor(*col);
-	if(msg->FindData("KEYBOARD_NAVIGATION",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->keyboard_navigation.SetColor(*col);
-	if(msg->FindData("DESKTOP",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
-		set->desktop.SetColor(*col);
+	if(msg->FindData("KEYBOARD_NAVIGATION_BASE",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->keyboard_navigation_base.SetColor(*col);
+	if(msg->FindData("KEYBOARD_NAVIGATION_PULSE",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->keyboard_navigation_pulse.SetColor(*col);
 	return true;
 }
