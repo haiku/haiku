@@ -295,7 +295,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 	 * brightness and contrast. */
 
 /* Preset maven PAL output (625lines, 50Hz mode) */
-void gxx0_maventv_PAL_init(uint8* buffer) 
+static void gxx0_maventv_PAL_init(uint8* buffer) 
 {
 	uint16 value;
 
@@ -449,7 +449,7 @@ void gxx0_maventv_PAL_init(uint8* buffer)
 }
 
 /* Preset maven NTSC output (525lines, 59.94Hz mode) */
-void gxx0_maventv_NTSC_init(uint8* buffer) 
+static void gxx0_maventv_NTSC_init(uint8* buffer) 
 {
 	uint16 value;
 
@@ -605,7 +605,7 @@ void gxx0_maventv_NTSC_init(uint8* buffer)
 	buffer[0x3d] = 0x00;
 }
 
-void gx50_maventv_PAL_timing(gx50_maven_timing *m_timing)
+static void gx50_maventv_PAL_timing(gx50_maven_timing *m_timing)
 {
 	/* values are given in picoseconds */
 	m_timing->h_total = 64000000;
@@ -622,7 +622,7 @@ void gx50_maventv_PAL_timing(gx50_maven_timing *m_timing)
 	m_timing->chroma_subcarrier = 4.43361875;
 }
 
-void gx50_maventv_NTSC_timing(gx50_maven_timing *m_timing)
+static void gx50_maventv_NTSC_timing(gx50_maven_timing *m_timing)
 {
 	/* values are given in picoseconds */
 	m_timing->h_total = 63555556;

@@ -10,7 +10,7 @@
 //apsed #include "memory"
 //#include "mga_init.c" //Nicole's test stuff.
 
-status_t test_ram();
+static status_t test_ram();
 static status_t mil_general_powerup (void);
 static status_t g100_general_powerup (void);
 static status_t g200_general_powerup (void);
@@ -121,7 +121,7 @@ status_t gx00_general_powerup()
 	return status;
 }
 
-status_t test_ram()
+static status_t test_ram()
 {
 	uint32 value, offset;
 	status_t result = B_OK;

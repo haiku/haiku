@@ -70,7 +70,7 @@ status_t i2c_sec_tv_adapter()
  */
 #define I2C_DELAY 2
 #define I2C_TIMEOUT 100
-int i2c_set_lines(int clock,int data)
+static int i2c_set_lines(int clock,int data)
 {
 	int count=0;
 	int program;
@@ -107,7 +107,7 @@ int i2c_set_lines(int clock,int data)
 	return 0;
 }
 
-int i2c_get_data()
+static int i2c_get_data()
 {
 	int data;
 	int clock;
@@ -139,7 +139,7 @@ int i2c_get_data()
 /*----------------------- 
  *Standard I2C operations
  */
-void i2c_start()
+static void i2c_start()
 {
 	int error=0;
 
@@ -154,7 +154,7 @@ void i2c_start()
 	}
 }
 
-void i2c_stop()
+static void i2c_stop()
 {
 	int error=0;
 
@@ -169,7 +169,7 @@ void i2c_stop()
 	}
 }
 
-void i2c_high()
+static void i2c_high()
 {
 	int error=0;
 
@@ -183,7 +183,7 @@ void i2c_high()
 	}
 }
 
-void i2c_low()
+static void i2c_low()
 {
 	int error=0;
 
@@ -197,7 +197,7 @@ void i2c_low()
 	}
 }
 
-int i2c_get_ack()
+static int i2c_get_ack()
 {
 	int error=0;
 	int ack;
@@ -215,7 +215,7 @@ int i2c_get_ack()
 	return ack;
 }
 
-void i2c_send_ack()
+static void i2c_send_ack()
 {
 	int error=0;
     
@@ -233,7 +233,7 @@ void i2c_send_ack()
  *use above functions to send and receive bytes
  */
 
-int i2c_sendbyte(unsigned char data)
+static int i2c_sendbyte(unsigned char data)
 {
 	int i;
 
@@ -252,7 +252,7 @@ int i2c_sendbyte(unsigned char data)
 	return i2c_get_ack();
 }
 
-unsigned char i2c_readbyte(int ack_required)
+static unsigned char i2c_readbyte(int ack_required)
 {
 	int i;
 	unsigned char data=0;

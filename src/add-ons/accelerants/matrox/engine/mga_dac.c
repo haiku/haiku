@@ -232,7 +232,7 @@ status_t gx00_dac_set_pix_pll(display_mode target)
 	return B_OK;
 }
 
-status_t gx50_dac_check_pix_pll(uint8 m, uint8 n, uint8 p)
+static status_t gx50_dac_check_pix_pll(uint8 m, uint8 n, uint8 p)
 {
 	uint time = 0, count = 0;
 
@@ -267,7 +267,7 @@ status_t gx50_dac_check_pix_pll(uint8 m, uint8 n, uint8 p)
 	return B_ERROR;
 }
 
-status_t gx50_dac_check_pix_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *q)
+static status_t gx50_dac_check_pix_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *q)
 {
 	uint8 s=0, p_backup = *p;
 
@@ -867,7 +867,7 @@ static status_t g100_g400max_dac_sys_pll_find(
 	return B_OK;
 }
 
-status_t gx50_dac_check_sys_pll(uint8 m, uint8 n, uint8 p)
+static status_t gx50_dac_check_sys_pll(uint8 m, uint8 n, uint8 p)
 {
 	uint time = 0, count = 0;
 
@@ -900,7 +900,7 @@ status_t gx50_dac_check_sys_pll(uint8 m, uint8 n, uint8 p)
 	return B_ERROR;
 }
 
-status_t gx50_dac_check_sys_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *q)
+static status_t gx50_dac_check_sys_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *q)
 {
 	uint8 s=0, p_backup = *p;
 

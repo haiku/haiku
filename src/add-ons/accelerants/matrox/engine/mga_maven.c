@@ -450,7 +450,7 @@ status_t g100_g400max_maven_vid_pll_find(
 	return B_OK;
 }
 
-status_t gx50_maven_check_vid_pll(uint8 m, uint8 n, uint8 p)
+static status_t gx50_maven_check_vid_pll(uint8 m, uint8 n, uint8 p)
 {
 	uint time = 0, count = 0;
 
@@ -484,7 +484,7 @@ status_t gx50_maven_check_vid_pll(uint8 m, uint8 n, uint8 p)
 	return B_ERROR;
 }
 
-status_t gx50_maven_check_vid_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *q)
+static status_t gx50_maven_check_vid_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *q)
 {
 	uint8 s=0, p_backup = *p;
 
