@@ -12,7 +12,9 @@ class DrawingModeFactory {
 								DrawingModeFactory() {}
 	virtual						~DrawingModeFactory() {}
 
-	static	agg::DrawingMode*		DrawingModeFor(drawing_mode mode);
+	static	agg::DrawingMode*		DrawingModeFor(drawing_mode mode,
+												   source_alpha alphaSrcMode,
+												   alpha_function alphaFncMode);
 };
 
 #endif // DRAWING_MODE_FACTORY_H
