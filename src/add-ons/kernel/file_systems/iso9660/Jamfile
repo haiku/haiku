@@ -22,7 +22,7 @@ oldOPTIM = $(OPTIM) ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
 }
 
-R5KernelAddon iso9660 : [ FDirName kernel file_systems iso9660 ] :
+R5KernelAddon iso9660 : kernel file_systems :
 	iso.c
 	kernel_interface.c
 	;
