@@ -38,14 +38,6 @@ template<class T> class Stack {
 			return true;
 		}
 		
-		bool GetPointerAt(int32 index, T **value)
-		{
-			if (index < 0 || index >= fUsed) 
-				return false;
-			*value = &(fArray[index]);
-			return true;
-		}
-
 		bool Pop(T *value)
 		{
 			if (fUsed == 0)
