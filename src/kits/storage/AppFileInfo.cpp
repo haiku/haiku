@@ -21,6 +21,8 @@
 #include <Roster.h>
 #include <String.h>
 
+using namespace std;
+
 // attributes
 static const char *kTypeAttribute				= "BEOS:TYPE";
 static const char *kSignatureAttribute			= "BEOS:APP_SIG";
