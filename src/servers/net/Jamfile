@@ -7,11 +7,6 @@ UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src tests kits net DialUpPreflet ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pppoe ] ; # PPPoE
-UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp ipcp ] ; # IPCP
-
-# additional sources for built-in add-ons:
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src tests kits net DialUpPreflet ] ;
 
 
 Server net_server :
@@ -23,16 +18,6 @@ Server net_server :
 	# built-in add-ons
 	PPPServer.cpp
 	
-	# PPPServer needs this
-	DialUpView.cpp
-	InterfaceUtils.cpp
-	MessageDriverSettingsUtils.cpp
-	TextRequestDialog.cpp
-	ConnectionOptionsAddon.cpp
-	GeneralAddon.cpp
-	IPCPAddon.cpp
-	PPPoEAddon.cpp
-	
 	# old net_server (was a netstack tester app)
 #	userland_server.c
 #	userland_ipc.c 
@@ -42,5 +27,8 @@ LinkSharedOSLibs net_server :
 	be 
 	libsocket.so
 	libbind.so
+	
+	# for PPP
+	libdunview.a
 	libppp.a
 ;

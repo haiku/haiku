@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef _PPP_SERVER__H
 #define _PPP_SERVER__H
@@ -27,6 +25,7 @@ class PPPServer : public BHandler {
 		bool AskBeforeDialing(ppp_interface_id id);
 		
 		void HandleReportMessage(BMessage *message);
+		void OpenDialRequestWindow(ppp_interface_id id, thread_id sender);
 
 	private:
 		SimpleMessageFilter *fFilter;

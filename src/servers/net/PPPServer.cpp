@@ -1,9 +1,7 @@
-//-----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  Copyright (c) 2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//-----------------------------------------------------------------------
+/*
+ * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "PPPServer.h"
 #include "SimpleMessageFilter.h"
@@ -47,8 +45,6 @@ PPPServer::MessageReceived(BMessage *message)
 			HandleReportMessage(message);
 		break;
 		
-		// TODO: handle 
-		
 		default:
 			BHandler::MessageReceived(message);
 	}
@@ -90,7 +86,7 @@ PPPServer::HandleReportMessage(BMessage *message)
 		switch(code) {
 			case PPP_REPORT_GOING_UP: {
 				if(AskBeforeDialing(id)) {
-//					OpenDialRequestWindow(id, sender);
+					OpenDialRequestWindow(id, sender);
 					return;
 				}
 			} break;
@@ -100,4 +96,11 @@ PPPServer::HandleReportMessage(BMessage *message)
 	}
 	
 	send_data(sender, B_OK, NULL, 0);
+}
+
+
+void
+PPPServer::OpenDialRequestWindow(ppp_interface_id id, thread_id sender)
+{
+	
 }
