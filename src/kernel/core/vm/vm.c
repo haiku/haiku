@@ -2233,6 +2233,35 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 				thread_get_current_thread()->team->id, fault_address,
 				area ? area->name : "???", fault_address - (area ? area->base : 0x0));
 
+// We can print a stack trace of the userland thread here. Since we're accessing
+// user memory freely and unchecked, this is not enabled by default.
+#if 0
+			if (area) {
+				struct stack_frame {
+					#ifdef __INTEL__
+						struct stack_frame*	previous;
+						void*				return_address;
+					#else
+						// ...
+					#endif
+				};
+				struct iframe *iframe = i386_get_user_iframe();
+				struct stack_frame *frame = (struct stack_frame *)iframe->ebp;
+			
+				dprintf("stack trace:\n");
+				for (; frame; frame = frame->previous) {
+					dprintf("  0x%p", frame->return_address);
+					area = vm_virtual_map_lookup(map,
+						(addr_t)frame->return_address);
+					if (area) {
+						dprintf(" (%s + %#lx)", area->name,
+							(addr_t)frame->return_address - area->base);
+					}
+					dprintf("\n");
+				}
+			}
+#endif	// 0 (stack trace)
+
 			release_sem_etc(map->sem, READ_COUNT, 0);
 			vm_put_aspace(aspace);
 #endif
@@ -3222,6 +3251,8 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 status_t
 _user_resize_area(area_id area, size_t newSize)
 {
+	// ToDo: Since we restrict deleting of areas to those owned by the team,
+	// we should also do that for resizing (check other functions, too).
 	return resize_area(area, newSize);
 }
 
