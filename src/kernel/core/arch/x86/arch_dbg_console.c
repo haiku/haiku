@@ -26,7 +26,9 @@
  * disabled and redirected to Bochs.
  * Define this only if not used as compile parameter.
  */
-// #define BOCHS_DEBUG_HACK 0
+#ifndef BOCHS_DEBUG_HACK
+#	define BOCHS_DEBUG_HACK 0
+#endif
 
 
 enum serial_register_offsets {
