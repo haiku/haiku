@@ -2,9 +2,6 @@
  * NetAddress.h -- Interface definition for the BNetAddress class.
  *
  * Written by S.T. Mansfield (thephantom@mac.com)
- *
- * Remarks:
- *     Mr. Phipps, put that fish away, dude.
  *=--------------------------------------------------------------------------=*
  * Copyright (c) 2002, The OpenBeOS project.
  *
@@ -31,10 +28,10 @@
 #ifndef _NETADDRESS_H
 #define _NETADDRESS_H
 
+#include <BeBuild.h>
+#include <SupportDefs.h>
 #include <Archivable.h>
-#include <Errors.h>
-#include <Application.h>
-#include <Message.h>
+#include <socket.h>
 
 /*
  * Empty forward declaration to satisfy the GetImpl method.
@@ -50,7 +47,7 @@ public:
     virtual  status_t Archive( BMessage* into, bool deep = true ) const;
     static   BArchivable* Instantiate( BMessage* archive );
 
-    BNetAddress( const char* hostname = NULL, unsigned short port = 0 );
+    BNetAddress( const char* hostname = 0, unsigned short port = 0 );
     BNetAddress( const struct sockaddr_in& sa );
     BNetAddress( in_addr addr, int port = 0 );
     BNetAddress( uint32 addr, int port = 0 );
@@ -59,7 +56,7 @@ public:
 
     BNetAddress& operator=( const BNetAddress& );
 
-    status_t InitCheck( void ) const;
+    status_t InitCheck( void );
 
     status_t SetTo( const char* hostname, const char* protocol, const char* service );
     status_t SetTo( const char* hostname = NULL, unsigned short port = 0 );
