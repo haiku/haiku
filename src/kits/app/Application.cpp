@@ -170,7 +170,7 @@ enum {
 
 // prototypes of helper functions
 static const char* looper_name_for(const char *signature);
-static void assert_app_signature(const char *signature);
+static status_t check_app_signature(const char *signature);
 
 //------------------------------------------------------------------------------
 BApplication::BApplication(const char* signature)
@@ -261,7 +261,9 @@ thread_id BApplication::Run()
 		debugger("");
 	}
 
-	fTaskID = find_thread(NULL);
+	// Note: We need a local variable too (for the return value), since
+	// fTaskID is cleared by Quit().
+	thread_id thread = fTaskID = find_thread(NULL);
 
 	if (fMsgPort == B_NO_MORE_PORTS || fMsgPort == B_BAD_VALUE)
 	{
@@ -272,7 +274,7 @@ thread_id BApplication::Run()
 
 	run_task();
 
-	return fTaskID;
+	return thread;
 }
 //------------------------------------------------------------------------------
 void BApplication::Quit()
@@ -569,7 +571,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 	if (be_app)
 		debugger("2 BApplication objects were created. Only one is allowed.");
 	// check signature
-	assert_app_signature(signature);
+	fInitError = check_app_signature(signature);
 	fAppName = signature;
 	bool isRegistrar = (signature && !strcmp(signature, kRegistrarSignature));
 	// get team and thread
@@ -577,7 +579,8 @@ void BApplication::InitData(const char* signature, status_t* error)
 	thread_id thread = main_thread_for(team);
 	// get app executable ref
 	entry_ref ref;
-	fInitError = get_app_ref(&ref);
+	if (fInitError == B_OK)
+		fInitError = get_app_ref(&ref);
 	// get the BAppFileInfo and extract the information we need
 	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
 	if (fInitError == B_OK) {
@@ -611,9 +614,10 @@ void BApplication::InitData(const char* signature, status_t* error)
 		} else
 			appInfo.port = fMsgPort;
 		// Create a B_ARGV_RECEIVED message and send it to ourselves.
+		// Do that even, if we are B_ARGV_ONLY.
 		// TODO: When BLooper::AddMessage() is done, use that instead of
 		// PostMessage().
-		if (!(appFlags & B_ARGV_ONLY) && __libc_argc > 1) {
+		if (__libc_argc > 1) {
 			BMessage argvMessage(B_ARGV_RECEIVED);
 			do_argv(&argvMessage);
 			PostMessage(&argvMessage, this);
@@ -624,47 +628,48 @@ void BApplication::InitData(const char* signature, status_t* error)
 	} else if (fInitError == B_OK) {
 		// not pre-registered -- try to register the application
 		team_id otherTeam = -1;
-		status_t regError = B_OK;
 		// the registrar must not register
 		if (!isRegistrar) {
-			regError = be_roster->AddApplication(signature, &ref, appFlags,
+			fInitError = be_roster->AddApplication(signature, &ref, appFlags,
 				team, thread, fMsgPort, true, NULL, &otherTeam);
 		}
-		if (regError == B_ALREADY_RUNNING) {
+		if (fInitError == B_ALREADY_RUNNING) {
 			// An instance is already running and we asked for
-			// single/exclusive launch. Send our argv to the running app and
-			// exit.
-			if (!(appFlags & B_ARGV_ONLY) && otherTeam >= 0
-				&& __libc_argc > 1) {
-				BMessage argvMessage(B_ARGV_RECEIVED);
-				do_argv(&argvMessage);
-				// We need to replace the first argv string with the path
-				// of the respective application.
+			// single/exclusive launch. Send our argv to the running app.
+			// Do that only, if the app is NOT B_ARGV_ONLY.
+			if (otherTeam >= 0 && __libc_argc > 1) {
 				app_info otherAppInfo;
 				if (be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo)
-					== B_OK) {
+					== B_OK && !(otherAppInfo.flags & B_ARGV_ONLY)) {
+					// create an B_ARGV_RECEIVED message
+					BMessage argvMessage(B_ARGV_RECEIVED);
+					do_argv(&argvMessage);
+					// replace the first argv string with the path of the
+					// other application
 					BPath path;
 					if (path.SetTo(&otherAppInfo.ref) == B_OK)
 						argvMessage.ReplaceString("argv", 0, path.Path());
+					// send the message
+					BMessenger(NULL, otherTeam).SendMessage(&argvMessage);
 				}
-				BMessenger(NULL, otherTeam).SendMessage(&argvMessage);
 			}
-			exit(0);
-		}
-		if (regError == B_OK) {
+		} else if (fInitError == B_OK) {
 			// the registrations was successful
 			// Create a B_ARGV_RECEIVED message and send it to ourselves.
+			// Do that even, if we are B_ARGV_ONLY.
 			// TODO: When BLooper::AddMessage() is done, use that instead of
 			// PostMessage().
-			if (!(appFlags & B_ARGV_ONLY) && __libc_argc > 1) {
+			if (__libc_argc > 1) {
 				BMessage argvMessage(B_ARGV_RECEIVED);
 				do_argv(&argvMessage);
 				PostMessage(&argvMessage, this);
 			}
 			// send a B_READY_TO_RUN message as well
 			PostMessage(B_READY_TO_RUN, this);
-		} else
-			fInitError = regError;
+		} else if (fInitError > B_ERRORS_END) {
+			// Registrar internal errors shouldn't fall into the user's hands.
+			fInitError = B_ERROR;
+		}
 	}
 	// init be_app and be_app_messenger
 	if (fInitError == B_OK) {
@@ -673,9 +678,12 @@ void BApplication::InitData(const char* signature, status_t* error)
 	}
 	// TODO: SetName()
 	// TODO: create_app_meta_mime()
-	// return the error
+	// Return the error or exit, if there was an error and no error variable
+	// has been supplied.
 	if (error)
 		*error = fInitError;
+	else if (fInitError != B_OK)
+		exit(0);
 }
 //------------------------------------------------------------------------------
 void BApplication::BeginRectTracking(BRect r, bool trackWhole)
@@ -778,13 +786,19 @@ int32 BApplication::async_quit_entry(void* data)
 }
 //------------------------------------------------------------------------------
 
-// assert_app_signature
-//
-// Terminates with and error message, when the supplied signature is not a
-// valid application signature.
+// check_app_signature
+/*!	\brief Checks whether the supplied string is a valid application signature.
+
+	An error message is printed, if the string is no valid app signature.
+
+	\param signature The string to be checked.
+	\return
+	- \c B_OK: \a signature is a valid app signature.
+	- \c B_BAD_VALUE: \a signature is \c NULL or no valid app signature.
+*/
 static
-void
-assert_app_signature(const char *signature)
+status_t
+check_app_signature(const char *signature)
 {
 	bool isValid = false;
 	BMimeType type(signature);
@@ -796,14 +810,18 @@ assert_app_signature(const char *signature)
 		printf("bad signature (%s), must begin with \"application/\" and "
 			   "can't conflict with existing registered mime types inside "
 			   "the \"application\" media type.\n", signature);
-		exit(1);
 	}
+	return (isValid ? B_OK : B_BAD_VALUE);
 }
 
 // looper_name_for
-//
-// Returns the looper name for a given signature: Normally "AppLooperPort",
-// but in case of the registrar a special name.
+/*!	\brief Returns the looper name for a given signature.
+
+	Normally this is "AppLooperPort", but in case of the registrar a
+	special name.
+
+	\return The looper name.
+*/
 static
 const char*
 looper_name_for(const char *signature)
