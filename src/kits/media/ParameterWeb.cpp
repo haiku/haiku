@@ -1191,7 +1191,7 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 		if (groupSize > size_left(size, bufferStart, buffer))
 			return B_BAD_VALUE;
 
-		BParameterGroup *group = new BParameterGroup(this, "sub-unnamed");
+		BParameterGroup *group = new BParameterGroup(mWeb, "sub-unnamed");
 		if (group == NULL) {
 			FATAL("BParameterGroup::Unflatten(): MakeGroup() failed\n");
 			return B_ERROR;
