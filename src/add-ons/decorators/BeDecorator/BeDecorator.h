@@ -2,33 +2,31 @@
 #define _BEOS_DECORATOR_H_
 
 #include "Decorator.h"
-#include "SRect.h"
-#include "SPoint.h"
 
 class BeDecorator: public Decorator
 {
 public:
-	BeDecorator(SRect frame, int32 wlook, int32 wfeel, int32 wflags);
+	BeDecorator(BRect frame, int32 wlook, int32 wfeel, int32 wflags);
 	~BeDecorator(void);
 	
 	void MoveBy(float x, float y);
-	void MoveBy(SPoint pt);
+	void MoveBy(BPoint pt);
 //	void ResizeBy(float x, float y);
-//	void ResizeBy(SPoint pt);
-	void Draw(SRect r);
+//	void ResizeBy(BPoint pt);
+	void Draw(BRect r);
 	void Draw(void);
 	//SRegion GetFootprint(void);
-	click_type Clicked(SPoint pt, int32 buttons, int32 modifiers);
+	click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
 
 protected:
-	void _DrawClose(SRect r);
-	void _DrawFrame(SRect r);
-	void _DrawTab(SRect r);
-	void _DrawTitle(SRect r);
-	void _DrawZoom(SRect r);
+	void _DrawClose(BRect r);
+	void _DrawFrame(BRect r);
+	void _DrawTab(BRect r);
+	void _DrawTitle(BRect r);
+	void _DrawZoom(BRect r);
 	void _DoLayout(void);
 	void _SetFocus(void);
-	void DrawBlendedRect(SRect r, bool down);
+	void DrawBlendedRect(BRect r, bool down);
 	uint32 taboffset;
 
 	RGBColor tab_highcol, tab_lowcol;

@@ -7,6 +7,4 @@ Addon BeDecorator : decorators :
 	Decorator.cpp
 	DisplayDriver.cpp
 	RGBColor.cpp
-	SPoint.cpp
-	SRect.cpp
 ;

@@ -2,7 +2,7 @@
 #define _DECORATOR_H_
 
 #include <SupportDefs.h>
-#include "SRect.h"
+#include <Rect.h>
 #include "ColorSet.h"
 #include "LayerData.h"
 
@@ -54,7 +54,7 @@ typedef enum { CLICK_NONE=0, CLICK_ZOOM, CLICK_CLOSE, CLICK_MINIMIZE,
 class Decorator
 {
 public:
-	Decorator(SRect rect, int32 wlook, int32 wfeel, int32 wflags);
+	Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags);
 	virtual ~Decorator(void);
 	void SetColors(ColorSet cset);
 	void SetDriver(DisplayDriver *d);
@@ -79,10 +79,10 @@ public:
 	ColorSet GetColors(void) { if(colors) return *colors; else return ColorSet(); }
 	
 	virtual void MoveBy(float x, float y);
-	virtual void MoveBy(SPoint pt);
+	virtual void MoveBy(BPoint pt);
 	virtual void ResizeBy(float x, float y);
-	virtual void ResizeBy(SPoint pt);
-	virtual void Draw(SRect r);
+	virtual void ResizeBy(BPoint pt);
+	virtual void Draw(BRect r);
 	virtual void Draw(void);
 	virtual void DrawClose(void);
 	virtual void DrawFrame(void);
@@ -91,22 +91,22 @@ public:
 	virtual void DrawTitle(void);
 	virtual void DrawZoom(void);
 	//virtual SRegion GetFootprint(void);
-	virtual click_type Clicked(SPoint pt, int32 buttons, int32 modifiers);
+	virtual click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
 
 protected:
-	virtual void _DrawClose(SRect r);
-	virtual void _DrawFrame(SRect r);
-	virtual void _DrawMinimize(SRect r);
-	virtual void _DrawTab(SRect r);
-	virtual void _DrawTitle(SRect r);
-	virtual void _DrawZoom(SRect r);
+	virtual void _DrawClose(BRect r);
+	virtual void _DrawFrame(BRect r);
+	virtual void _DrawMinimize(BRect r);
+	virtual void _DrawTab(BRect r);
+	virtual void _DrawTitle(BRect r);
+	virtual void _DrawZoom(BRect r);
 	virtual void _SetFocus(void)=0;
 	virtual void _DoLayout(void)=0;
 	ColorSet *colors;
 	int32 look, feel, flags;
 	DisplayDriver *driver;
 	LayerData layerdata;
-	SRect zoomrect,closerect,minimizerect,tabrect,frame,
+	BRect zoomrect,closerect,minimizerect,tabrect,frame,
 		resizerect,borderrect;
 private:
 	bool close_state, zoom_state, minimize_state;

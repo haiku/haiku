@@ -11,7 +11,7 @@
 #include <stdio.h>
 #endif
 
-BeDecorator::BeDecorator(SRect rect, int32 wlook, int32 wfeel, int32 wflags)
+BeDecorator::BeDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
  : Decorator(rect,wlook,wfeel,wflags)
 {
 #ifdef DEBUG_DECOR
@@ -52,7 +52,7 @@ printf("~BeDecorator()\n");
 #endif
 }
 
-click_type BeDecorator::Clicked(SPoint pt, int32 buttons, int32 modifiers)
+click_type BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
 	if(closerect.Contains(pt))
 	{
@@ -96,10 +96,10 @@ printf("BeDecorator():Clicked() - Resize thumb\n");
 	}
 
 	// We got this far, so user is clicking on the border?
-	SRect srect(frame);
-	srect.top+=19;
-	SRect clientrect(srect.InsetByCopy(3,3));
-	if(srect.Contains(pt) && !clientrect.Contains(pt))
+	BRect brect(frame);
+	brect.top+=19;
+	BRect clientrect(brect.InsetByCopy(3,3));
+	if(brect.Contains(pt) && !clientrect.Contains(pt))
 	{
 #ifdef DEBUG_DECOR
 printf("BeDecorator():Clicked() - Drag\n");
@@ -170,10 +170,10 @@ printf("BeDecorator()::_DoLayout()"); rect.PrintToStream();
 
 void BeDecorator::MoveBy(float x, float y)
 {
-	MoveBy(SPoint(x,y));
+	MoveBy(BPoint(x,y));
 }
 
-void BeDecorator::MoveBy(SPoint pt)
+void BeDecorator::MoveBy(BPoint pt)
 {
 	// Move all internal rectangles the appropriate amount
 	frame.OffsetBy(pt);
@@ -196,7 +196,7 @@ SRegion * BeDecorator::GetFootprint(void)
 }
 */
 
-void BeDecorator::_DrawTitle(SRect r)
+void BeDecorator::_DrawTitle(BRect r)
 {
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
@@ -204,7 +204,7 @@ void BeDecorator::_DrawTitle(SRect r)
 	rgb_color tmpcol=driver->HighColor();
 	driver->SetHighColor(textcol.red,textcol.green,textcol.blue);
 	driver->DrawString((char *)string,strlen(string),
-		SPoint(closerect.right+textoffset,closerect.bottom-1));
+		BPoint(closerect.right+textoffset,closerect.bottom-1));
 	driver->SetHighColor(tmpcol.red,tmpcol.green,tmpcol.blue);
 	driver->SetDrawingMode(B_OP_COPY);
 */
@@ -236,7 +236,7 @@ void BeDecorator::_SetFocus(void)
 
 }
 
-void BeDecorator::Draw(SRect update)
+void BeDecorator::Draw(BRect update)
 {
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
@@ -271,11 +271,11 @@ void BeDecorator::Draw(void)
 
 }
 
-void BeDecorator::_DrawZoom(SRect r)
+void BeDecorator::_DrawZoom(BRect r)
 {
 	// If this has been implemented, then the decorator has a Zoom button
 	// which should be drawn based on the state of the member zoomstate
-	SRect zr=r;
+	BRect zr=r;
 	zr.left+=zr.Width()/3;
 	zr.top+=zr.Height()/3;
 
@@ -283,13 +283,13 @@ void BeDecorator::_DrawZoom(SRect r)
 	DrawBlendedRect(zr.OffsetToCopy(r.LeftTop()),GetZoom());
 }
 
-void BeDecorator::_DrawClose(SRect r)
+void BeDecorator::_DrawClose(BRect r)
 {
 	// Just like DrawZoom, but for a close button
 	DrawBlendedRect(r,GetClose());
 }
 
-void BeDecorator::_DrawTab(SRect r)
+void BeDecorator::_DrawTab(BRect r)
 {
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
@@ -311,7 +311,7 @@ void BeDecorator::_DrawTab(SRect r)
 		_DrawZoom(zoomrect);
 }
 
-void BeDecorator::DrawBlendedRect(SRect r, bool down)
+void BeDecorator::DrawBlendedRect(BRect r, bool down)
 {
 	// This bad boy is used to draw a rectangle with a gradient.
 	// Note that it is not part of the Decorator API - it's specific
@@ -348,16 +348,16 @@ void BeDecorator::DrawBlendedRect(SRect r, bool down)
 			uint8(startcol.green-(i*gstep)),
 			uint8(startcol.blue-(i*bstep)));
 		layerdata.highcolor=tmpcol;
-		driver->StrokeLine(SPoint(r.left,r.top+i),
-			SPoint(r.left+i,r.top),&layerdata,(int8*)&solidhigh);
+		driver->StrokeLine(BPoint(r.left,r.top+i),
+			BPoint(r.left+i,r.top),&layerdata,(int8*)&solidhigh);
 
 		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
 			uint8(halfcol.blue-(i*bstep)));
 
 		layerdata.highcolor=tmpcol;
-		driver->StrokeLine(SPoint(r.left+steps,r.top+i),
-			SPoint(r.left+i,r.top+steps),&layerdata,(int8*)&solidhigh);
+		driver->StrokeLine(BPoint(r.left+steps,r.top+i),
+			BPoint(r.left+i,r.top+steps),&layerdata,(int8*)&solidhigh);
 
 	}
 
@@ -367,40 +367,40 @@ void BeDecorator::DrawBlendedRect(SRect r, bool down)
 	driver->StrokeRect(r,&layerdata,(int8*)&solidhigh);
 }
 
-void BeDecorator::_DrawFrame(SRect rect)
+void BeDecorator::_DrawFrame(BRect rect)
 {
 	// Duh, draws the window frame, I think. ;)
 
 	if(look==WLOOK_NO_BORDER)
 		return;
 	
-	SRect r=borderrect;
+	BRect r=borderrect;
 
 	layerdata.highcolor=frame_midcol;
-	driver->StrokeLine(SPoint(r.left,r.top),SPoint(r.right-1,r.top),
+	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
 		&layerdata,(int8*)&solidhigh);
 	layerdata.highcolor=frame_lowcol;
-	driver->StrokeLine(SPoint(r.left,r.top),SPoint(r.left,r.bottom),
+	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
 		&layerdata,(int8*)&solidhigh);
 	layerdata.highcolor=frame_lowercol;
-	driver->StrokeLine(SPoint(r.right,r.bottom),SPoint(r.right,r.top),
+	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
 		&layerdata,(int8*)&solidhigh);
 	layerdata.highcolor=frame_lowercol;
-	driver->StrokeLine(SPoint(r.right,r.bottom),SPoint(r.left,r.bottom),
+	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
 		&layerdata,(int8*)&solidhigh);
 
 	r.InsetBy(1,1);
 	layerdata.highcolor=frame_highercol;
-	driver->StrokeLine(SPoint(r.left,r.top),SPoint(r.right-1,r.top),
+	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
 		&layerdata,(int8*)&solidhigh);
 	layerdata.highcolor=frame_highercol;
-	driver->StrokeLine(SPoint(r.left,r.top),SPoint(r.left,r.bottom),
+	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
 		&layerdata,(int8*)&solidhigh);
 	layerdata.highcolor=frame_midcol;
-	driver->StrokeLine(SPoint(r.right,r.bottom),SPoint(r.right,r.top),
+	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
 		&layerdata,(int8*)&solidhigh);
 	layerdata.highcolor=frame_midcol;
-	driver->StrokeLine(SPoint(r.right,r.bottom),SPoint(r.left,r.bottom),
+	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
 		&layerdata,(int8*)&solidhigh);
 	
 	r.InsetBy(1,1);
@@ -409,16 +409,16 @@ void BeDecorator::_DrawFrame(SRect rect)
 
 	r.InsetBy(1,1);
 	layerdata.highcolor=frame_lowercol;
-	driver->StrokeLine(SPoint(r.left,r.top),SPoint(r.right-1,r.top),
+	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
 		&layerdata,(int8*)&solidhigh);
 	layerdata.highcolor=frame_lowercol;
-	driver->StrokeLine(SPoint(r.left,r.top),SPoint(r.left,r.bottom),
+	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
 		&layerdata,(int8*)&solidhigh);
 	layerdata.highcolor=frame_highercol;
-	driver->StrokeLine(SPoint(r.right,r.bottom),SPoint(r.right,r.top),
+	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
 		&layerdata,(int8*)&solidhigh);
 	layerdata.highcolor=frame_highercol;
-	driver->StrokeLine(SPoint(r.right,r.bottom),SPoint(r.left,r.bottom),
+	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
 		&layerdata,(int8*)&solidhigh);
 	driver->StrokeRect(borderrect,&layerdata,(int8*)&solidhigh);
 
@@ -452,14 +452,14 @@ void BeDecorator::_DrawFrame(SRect rect)
 					uint8(startcol.green-(i*gstep)),
 					uint8(startcol.blue-(i*bstep)));
 				
-				driver->StrokeLine(SPoint(r.left,r.top+i),
-					SPoint(r.left+i,r.top),&layerdata,(int8*)&solidhigh);
+				driver->StrokeLine(BPoint(r.left,r.top+i),
+					BPoint(r.left+i,r.top),&layerdata,(int8*)&solidhigh);
 		
 				layerdata.highcolor.SetColor(uint8(halfcol.red-(i*rstep)),
 					uint8(halfcol.green-(i*gstep)),
 					uint8(halfcol.blue-(i*bstep)));
-				driver->StrokeLine(SPoint(r.left+steps,r.top+i),
-					SPoint(r.left+i,r.top+steps),&layerdata,(int8*)&solidhigh);			
+				driver->StrokeLine(BPoint(r.left+steps,r.top+i),
+					BPoint(r.left+i,r.top+steps),&layerdata,(int8*)&solidhigh);			
 			}
 			layerdata.highcolor=frame_lowercol;
 			driver->StrokeRect(r,&layerdata,(int8*)&solidhigh);
@@ -467,9 +467,9 @@ void BeDecorator::_DrawFrame(SRect rect)
 		else
 		{
 			layerdata.highcolor=frame_lowercol;
-			driver->StrokeLine(SPoint(r.right,r.top),SPoint(r.right-3,r.top),
+			driver->StrokeLine(BPoint(r.right,r.top),BPoint(r.right-3,r.top),
 				&layerdata,(int8*)&solidhigh);
-			driver->StrokeLine(SPoint(r.left,r.bottom),SPoint(r.left,r.bottom-3),
+			driver->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.left,r.bottom-3),
 				&layerdata,(int8*)&solidhigh);
 		}
 	}
@@ -480,7 +480,7 @@ extern "C" float get_decorator_version(void)
 	return 1.00;
 }
 
-extern "C" Decorator *instantiate_decorator(SRect rect, int32 wlook, int32 wfeel, int32 wflags)
+extern "C" Decorator *instantiate_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 {
 	return new BeDecorator(rect,wlook,wfeel,wflags);
 }

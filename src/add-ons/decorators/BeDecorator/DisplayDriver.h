@@ -5,8 +5,7 @@
 #include <SupportDefs.h>
 #include <OS.h>
 
-#include "SRect.h"
-#include "SPoint.h"
+#include <Rect.h>
 #include "RGBColor.h"
 
 class ServerBitmap;
@@ -64,30 +63,30 @@ public:
 	virtual ~DisplayDriver(void);
 	virtual bool Initialize(void);
 	virtual void Shutdown(void)=0;
-	virtual void CopyBits(SRect src, SRect dest)=0;
-	virtual void DrawBitmap(ServerBitmap *bmp, SRect src, SRect dest)=0;
-	virtual void DrawChar(char c, SPoint pt)=0;
-//	virtual void DrawPicture(SPicture *pic, SPoint pt)=0;
-//	virtual void DrawString(const char *string, int32 length, SPoint pt, escapement_delta *delta=NULL)=0;
-	virtual void InvertRect(SRect r)=0;
-	virtual void StrokeBezier(SPoint *pts, LayerData *d, int8 *pat)=0;
-	virtual void FillBezier(SPoint *pts, LayerData *d, int8 *pat)=0;
-	virtual void StrokeEllipse(SRect r, LayerData *d, int8 *pat)=0;
-	virtual void FillEllipse(SRect r, LayerData *d, int8 *pat)=0;
-	virtual void StrokeArc(SRect r, float angle, float span, LayerData *d, int8 *pat)=0;
-	virtual void FillArc(SRect r, float angle, float span, LayerData *d, int8 *pat)=0;
-	virtual void StrokeLine(SPoint start, SPoint end, LayerData *d, int8 *pat)=0;
-	virtual void StrokePolygon(SPoint *ptlist, int32 numpts, SRect rect, LayerData *d, int8 *pat, bool is_closed=true)=0;
-	virtual void FillPolygon(SPoint *ptlist, int32 numpts, SRect rect, LayerData *d, int8 *pat)=0;
-	virtual void StrokeRect(SRect r, LayerData *d, int8 *pat)=0;
-	virtual void FillRect(SRect r, LayerData *d, int8 *pat)=0;
-	virtual void StrokeRoundRect(SRect r, float xrad, float yrad, LayerData *d, int8 *pat)=0;
-	virtual void FillRoundRect(SRect r, float xrad, float yrad, LayerData *d, int8 *pat)=0;
+	virtual void CopyBits(BRect src, BRect dest)=0;
+	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest)=0;
+	virtual void DrawChar(char c, BPoint pt)=0;
+//	virtual void DrawPicture(SPicture *pic, BPoint pt)=0;
+//	virtual void DrawString(const char *string, int32 length, BPoint pt, escapement_delta *delta=NULL)=0;
+	virtual void InvertRect(BRect r)=0;
+	virtual void StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)=0;
+	virtual void FillBezier(BPoint *pts, LayerData *d, int8 *pat)=0;
+	virtual void StrokeEllipse(BRect r, LayerData *d, int8 *pat)=0;
+	virtual void FillEllipse(BRect r, LayerData *d, int8 *pat)=0;
+	virtual void StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)=0;
+	virtual void FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)=0;
+	virtual void StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)=0;
+	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)=0;
+	virtual void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat)=0;
+	virtual void StrokeRect(BRect r, LayerData *d, int8 *pat)=0;
+	virtual void FillRect(BRect r, LayerData *d, int8 *pat)=0;
+	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)=0;
+	virtual void FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)=0;
 //	virtual void StrokeShape(SShape *sh, LayerData *d, int8 *pat)=0;
 //	virtual void FillShape(SShape *sh, LayerData *d, int8 *pat)=0;
-	virtual void StrokeTriangle(SPoint *pts, SRect r, LayerData *d, int8 *pat)=0;
-	virtual void FillTriangle(SPoint *pts, SRect r, LayerData *d, int8 *pat)=0;
-	virtual void StrokeLineArray(SPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)=0;
+	virtual void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)=0;
+	virtual void FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)=0;
+	virtual void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)=0;
 	virtual void SetMode(int32 mode)=0;
 	virtual bool DumpToFile(const char *path)=0;
 
