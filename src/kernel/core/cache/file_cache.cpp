@@ -57,10 +57,11 @@ add_to_iovec(iovec *vecs, int32 &index, int32 max, addr_t address, size_t size)
 
 
 static status_t
-readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
+pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	size_t *_numBytes, bool doWrite)
 {
-	TRACE(("read_pages: ref = %p, offset = %Ld, size = %lu\n", ref, offset, *_numBytes));
+	TRACE(("pages_io: ref = %p, offset = %Ld, size = %lu, %s\n", ref, offset,
+		*_numBytes, doWrite ? "write" : "read"));
 
 	// translate the iovecs into direct device accesses
 	file_io_vec fileVecs[16];
@@ -79,36 +80,46 @@ readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t cou
 		dprintf("[%lu] offset = %Ld, size = %Ld\n", i, fileVecs[i].offset, fileVecs[i].length);
 #endif
 
-	// now directly read the data from the device
-	// the first file_io_vec can be read directly
+	uint32 fileVecIndex;
+	size_t size;
 
-	size_t size = fileVecs[0].length;
-	if (size > numBytes)
-		size = numBytes;
+	if (!doWrite) {
+		// now directly read the data from the device
+		// the first file_io_vec can be read directly
 
-	if (doWrite)
-		status = vfs_write_pages(ref->device, ref->cookie, fileVecs[0].offset, vecs, count, &size);
-	else
-		status = vfs_read_pages(ref->device, ref->cookie, fileVecs[0].offset, vecs, count, &size);
-	if (status < B_OK)
-		return status;
-
-	// ToDo: this is a work-around for buggy device drivers!
-	if (size > fileVecs[0].length) {
-		dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
 		size = fileVecs[0].length;
-	}
+		if (size > numBytes)
+			size = numBytes;
 
-	ASSERT(size <= fileVecs[0].length);
+		status = vfs_read_pages(ref->device, ref->cookie, fileVecs[0].offset, vecs, count, &size);
+		if (status < B_OK)
+			return status;
 
-	// If the file portion was contiguous, we're already done now
-	if (size == numBytes)
-		return B_OK;
+		// ToDo: this is a work-around for buggy device drivers!
+		//	When our own drivers honour the length, we can:
+		//	a) also use this direct I/O for writes (otherwise, it would overwrite precious data)
+		//	b) panic if the term below is true (at least for writes)
+		if (size > fileVecs[0].length) {
+			dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
+			size = fileVecs[0].length;
+		}
 
-	// if we reached the end of the file, we can return as well
-	if (size != fileVecs[0].length) {
-		*_numBytes = size;
-		return B_OK;
+		ASSERT(size <= fileVecs[0].length);
+
+		// If the file portion was contiguous, we're already done now
+		if (size == numBytes)
+			return B_OK;
+
+		// if we reached the end of the file, we can return as well
+		if (size != fileVecs[0].length) {
+			*_numBytes = size;
+			return B_OK;
+		}
+		
+		fileVecIndex = 1;
+	} else {
+		fileVecIndex = 0;
+		size = 0;
 	}
 
 	// Too bad, let's process the rest of the file_io_vecs
@@ -126,7 +137,7 @@ readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t cou
 
 	size_t vecOffset = size;
 
-	for (uint32 fileVecIndex = 1; fileVecIndex < fileVecCount; fileVecIndex++) {
+	for (; fileVecIndex < fileVecCount; fileVecIndex++) {
 		file_io_vec &fileVec = fileVecs[fileVecIndex];
 		iovec tempVecs[8];
 		uint32 tempCount = 1;
@@ -158,7 +169,7 @@ readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t cou
 
 		size_t bytes = size;
 		if (doWrite)
-			status = vfs_read_pages(ref->device, ref->cookie, fileVec.offset, tempVecs, tempCount, &bytes);
+			status = vfs_write_pages(ref->device, ref->cookie, fileVec.offset, tempVecs, tempCount, &bytes);
 		else
 			status = vfs_read_pages(ref->device, ref->cookie, fileVec.offset, tempVecs, tempCount, &bytes);
 		if (status < B_OK)
@@ -212,7 +223,7 @@ read_from_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, s
 	}
 
 	// read file into reserved pages
-	status_t status = readwrite_pages(ref, offset, vecs, vecCount, &size, false);
+	status_t status = pages_io(ref, offset, vecs, vecCount, &size, false);
 	if (status < B_OK) {
 		// ToDo: remove allocated pages...
 		panic("file_cache: remove allocated pages! read pages failed: %s\n", strerror(status));
@@ -286,7 +297,7 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, si
 			size_t bytesRead = B_PAGE_SIZE;
 			iovec readVec = { (void *)virtualAddress, B_PAGE_SIZE };
 
-			readwrite_pages(ref, offset + pos, &readVec, 1, &bytesRead, false);
+			pages_io(ref, offset + pos, &readVec, 1, &bytesRead, false);
 			// ToDo: handle errors!
 		}
 
@@ -295,9 +306,13 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, si
 			user_memcpy((void *)(virtualAddress + pageOffset), (void *)buffer, bytes);
 			buffer += bytes;
 			bufferSize -= bytes;
+
+			vm_page_set_state(page, PAGE_STATE_MODIFIED);
 		}
 	}
 
+	// ToDo: we only have to write the pages back immediately if write-back mode
+	//	is disabled, which is not possible right now
 #if 0
 	// write cached pages back to the file if we were asked to do that
 	status_t status = readwrite_pages(ref, offset, vecs, vecCount, &size, true);
@@ -318,21 +333,26 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, si
 	}
 
 	// make the pages accessible in the cache
-	for (int32 i = pageIndex; i-- > 0;)
-		pages[i]->state = PAGE_STATE_ACTIVE;
+	for (int32 i = pageIndex; i-- > 0;) {
+		if (pages[i]->state == PAGE_STATE_BUSY)
+			pages[i]->state = PAGE_STATE_ACTIVE;
+	}
 
 	return B_OK;
 }
 
 
 static status_t
-readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool doWrite)
+cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool doWrite)
 {
+	if (_cacheRef == NULL)
+		panic("cache_io() called with NULL ref!\n");
+
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 	vm_cache_ref *cache = ref->cache;
-	off_t fileSize = ((vnode_store *)cache->cache->store)->size;
+	off_t fileSize = cache->cache->virtual_size;
 
-	TRACE(("readwrite(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s\n",
+	TRACE(("cache_io(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s)\n",
 		ref, offset, (void *)bufferBase, *_size, doWrite ? "write" : "read"));
 
 	// out of bounds access?
@@ -427,7 +447,7 @@ readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool 
 extern "C" void *
 file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 {
-	TRACE(("file_cache create(mountID = %ld, vnodeID = %Ld, size = %Ld, fd = %d)\n", mountID, vnodeID, size, fd));
+	TRACE(("file_cache_create(mountID = %ld, vnodeID = %Ld, size = %Ld, fd = %d)\n", mountID, vnodeID, size, fd));
 
 	file_cache_ref *ref = new file_cache_ref;
 	if (ref == NULL)
@@ -441,14 +461,14 @@ file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 	if (vfs_get_cookie_from_fd(fd, &ref->cookie) != B_OK)
 		goto err2;
 
-	// get the vnode for the object, this also grabs a ref to it
+	// get the vnode for the object
 	if (vfs_get_vnode(mountID, vnodeID, &ref->vnode) != B_OK)
 		goto err2;
 
 	if (vfs_get_vnode_cache(ref->vnode, (void **)&ref->cache) != B_OK)
 		goto err3;
 
-	((vnode_store *)ref->cache->cache->store)->size = size;
+	ref->cache->cache->virtual_size = size;
 	return ref;
 
 err3:
@@ -469,6 +489,8 @@ file_cache_delete(void *_cacheRef)
 	if (ref == NULL)
 		return;
 
+	TRACE(("file_cache_delete(ref = %p)\n", ref));
+
 	vfs_vnode_release_ref(ref->device);
 	delete ref;
 }
@@ -479,17 +501,27 @@ file_cache_set_size(void *_cacheRef, off_t size)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	((vnode_store *)(ref->cache->cache->store))->size = size;
-	// ToDo: remove all pages outside of the new file size!
-	return B_OK;
+	TRACE(("file_cache_set_size(ref = %p, size = %Ld)\n", ref, size));
+
+	if (ref == NULL)
+		return B_OK;
+
+	mutex_lock(&ref->cache->lock);
+	status_t status = vm_cache_resize(ref->cache, size);
+	mutex_unlock(&ref->cache->lock);
+
+	return status;
 }
 
 
 extern "C" status_t
 file_cache_sync(void *_cacheRef)
 {
-	// ToDo: implement me!
-	return B_ERROR;
+	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+	if (ref == NULL)
+		return B_BAD_VALUE;
+
+	return vm_cache_write_modified(ref->cache);
 }
 
 
@@ -498,7 +530,7 @@ file_cache_read_pages(void *_cacheRef, off_t offset, const iovec *vecs, size_t c
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	return readwrite_pages(ref, offset, vecs, count, _numBytes, false);
+	return pages_io(ref, offset, vecs, count, _numBytes, false);
 }
 
 
@@ -507,7 +539,11 @@ file_cache_write_pages(void *_cacheRef, off_t offset, const iovec *vecs, size_t 
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	return readwrite_pages(ref, offset, vecs, count, _numBytes, true);
+	status_t status = pages_io(ref, offset, vecs, count, _numBytes, true);
+	TRACE(("file_cache_write_pages(ref = %p, offset = %Ld, vecs = %p, count = %lu, bytes = %lu) = %ld\n",
+		ref, offset, vecs, count, *_numBytes, status));
+
+	return status;
 }
 
 
@@ -516,10 +552,10 @@ file_cache_read(void *_cacheRef, off_t offset, void *bufferBase, size_t *_size)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu\n",
+	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu)\n",
 		ref, offset, bufferBase, *_size));
 
-	return readwrite(ref, offset, (addr_t)bufferBase, _size, false);
+	return cache_io(ref, offset, (addr_t)bufferBase, _size, false);
 }
 
 
@@ -528,10 +564,11 @@ file_cache_write(void *_cacheRef, off_t offset, const void *buffer, size_t *_siz
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	TRACE(("file_cache_write(ref = %p, offset = %Ld, buffer = %p, size = %lu\n",
-		ref, offset, buffer, *_size));
+	status_t status = cache_io(ref, offset, (addr_t)const_cast<void *>(buffer), _size, true);
+	TRACE(("file_cache_write(ref = %p, offset = %Ld, buffer = %p, size = %lu) = %ld\n",
+		ref, offset, buffer, *_size, status));
 
-	return readwrite(ref, offset, (addr_t)const_cast<void *>(buffer), _size, false);
+	return status;
 }
 
 
