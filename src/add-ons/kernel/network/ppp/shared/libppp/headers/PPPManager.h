@@ -25,7 +25,10 @@ class PPPManager {
 		
 		status_t Control(uint32 op, void *data, size_t length) const;
 		
-		ppp_interface_id CreateInterface(const driver_settings *settings) const;
+		ppp_interface_id CreateInterface(const driver_settings *settings,
+			const driver_settings *profile = NULL) const;
+		ppp_interface_id CreateInterfaceWithName(const char *name,
+			const driver_settings *profile = NULL) const;
 		bool DeleteInterface(ppp_interface_id ID) const;
 		
 		ppp_interface_id *Interfaces(int32 *count,
@@ -35,7 +38,8 @@ class PPPManager {
 			ppp_interface_filter filter = PPP_REGISTERED_INTERFACES) const;
 				// make sure interfaces has enough space for count items
 		ppp_interface_id InterfaceWithSettings(const driver_settings *settings) const;
-		ppp_interface_id InterfaceWithUnit(int32 if_unit);
+		ppp_interface_id InterfaceWithUnit(int32 if_unit) const;
+		ppp_interface_id InterfaceWithName(const char *name) const;
 		int32 CountInterfaces(ppp_interface_filter filter =
 			PPP_REGISTERED_INTERFACES) const;
 		

@@ -8,6 +8,9 @@
 #include "PPPManager.h"
 #include "PPPInterface.h"
 
+#include <cstring>
+#include <cstdlib>
+#include <cctype>
 #include <settings_tools.h>
 #include <unistd.h>
 #include "_libppputils.h"
@@ -51,13 +54,31 @@ PPPManager::Control(uint32 op, void *data, size_t length) const
 	return ioctl(fFD, NET_STACK_CONTROL_NET_MODULE, &args);
 }
 
+
 ppp_interface_id
-PPPManager::CreateInterface(const driver_settings *settings) const
+PPPManager::CreateInterface(const driver_settings *settings,
+	const driver_settings *profile = NULL) const
 {
-	ppp_interface_settings_info info;
-	info.settings = settings;
+	ppp_interface_description_info info;
+	info.u.settings = settings;
+	info.profile = profile;
 	
 	if(Control(PPPC_CREATE_INTERFACE, &info, sizeof(info)) != B_OK)
+		return PPP_UNDEFINED_INTERFACE_ID;
+	else
+		return info.interface;
+}
+
+
+ppp_interface_id
+PPPManager::CreateInterfaceWithName(const char *name,
+	const driver_settings *profile = NULL) const
+{
+	ppp_interface_description_info info;
+	info.u.name = name;
+	info.profile = profile;
+	
+	if(Control(PPPC_CREATE_INTERFACE_WITH_NAME, &info, sizeof(info)) != B_OK)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	else
 		return info.interface;
@@ -125,33 +146,18 @@ PPPManager::GetInterfaces(ppp_interface_id *interfaces, int32 count,
 ppp_interface_id
 PPPManager::InterfaceWithSettings(const driver_settings *settings) const
 {
-	int32 count;
-	ppp_interface_id *interfaces = Interfaces(&count, PPP_ALL_INTERFACES);
+	ppp_interface_description_info info;
+	info.u.settings = settings;
+	info.interface = PPP_UNDEFINED_INTERFACE_ID;
 	
-	if(!interfaces)
-		return PPP_UNDEFINED_INTERFACE_ID;
+	Control(PPPC_FIND_INTERFACE_WITH_SETTINGS, &info, sizeof(info));
 	
-	ppp_interface_id id = PPP_UNDEFINED_INTERFACE_ID;
-	PPPInterface interface;
-	ppp_interface_info_t info;
-	
-	for(int32 index = 0; index < count; index++) {
-		interface.SetTo(interfaces[index]);
-		if(interface.InitCheck() == B_OK && interface.GetInterfaceInfo(&info)
-				&& equal_driver_settings(settings, info.info.settings)) {
-			id = interface.ID();
-			break;
-		}
-	}
-	
-	delete interfaces;
-	
-	return id;
+	return info.interface;
 }
 
 
 ppp_interface_id
-PPPManager::InterfaceWithUnit(int32 if_unit)
+PPPManager::InterfaceWithUnit(int32 if_unit) const
 {
 	int32 count;
 	ppp_interface_id *interfaces = Interfaces(&count, PPP_REGISTERED_INTERFACES);
@@ -175,6 +181,44 @@ PPPManager::InterfaceWithUnit(int32 if_unit)
 	delete interfaces;
 	
 	return id;
+}
+
+
+ppp_interface_id
+PPPManager::InterfaceWithName(const char *name) const
+{
+	if(!name)
+		return PPP_UNDEFINED_INTERFACE_ID;
+	
+	int32 count;
+	ppp_interface_id *interfaces = Interfaces(&count, PPP_REGISTERED_INTERFACES);
+	
+	if(!interfaces)
+		return PPP_UNDEFINED_INTERFACE_ID;
+	
+	ppp_interface_id id = PPP_UNDEFINED_INTERFACE_ID;
+	PPPInterface interface;
+	ppp_interface_info_t info;
+	
+	for(int32 index = 0; index < count; index++) {
+		interface.SetTo(interfaces[index]);
+		if(interface.InitCheck() == B_OK && interface.GetInterfaceInfo(&info)
+				&& strlen(info.info.name) > 0 && !strcasecmp(info.info.name, name)) {
+			id = interface.ID();
+			break;
+		}
+	}
+	
+	delete interfaces;
+	
+	if(id != PPP_UNDEFINED_INTERFACE_ID)
+		return id;
+	else if(!strncmp(name, "ppp", 3) && strlen(name) > 3 && isdigit(name[3]))
+		return InterfaceWithUnit(atoi(name + 3));
+	else if(isdigit(name[0]))
+		return atoi(name);
+	else
+		return PPP_UNDEFINED_INTERFACE_ID;
 }
 
 
