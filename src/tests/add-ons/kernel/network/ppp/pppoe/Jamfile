@@ -13,4 +13,4 @@ Addon <userland>pppoe : userland network ppp :
 	DiscoveryPacket.cpp
 ;
 
-LinkSharedOSLibs <userland>pppoe : libuserlandppp.a <installed>net_stack_tester be ;
+LinkSharedOSLibs <userland>pppoe : <userland>libkernelppp.a <installed>net_stack_tester be ;

@@ -6,7 +6,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
 
-StaticLibrary userlandppp :
+StaticLibrary <userland>kernelppp :
 	KPPPConfigurePacket.cpp
 	KPPPDevice.cpp
 	KPPPInterface.cpp
