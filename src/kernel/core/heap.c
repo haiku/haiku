@@ -380,7 +380,7 @@ free(void *address)
 	{
 		uint32 deadbeef = 0xdeadbeef;
 		uint8 *dead = (uint8 *)address;
-		int32 i;
+		uint32 i;
 
 		// the first 4 bytes are overwritten with the next free list pointer later
 		for (i = 4; i < bin->element_size; i++)
