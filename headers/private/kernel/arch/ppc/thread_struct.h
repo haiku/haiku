@@ -14,4 +14,8 @@ struct arch_team {
 	// nothing here
 };
 
+struct arch_fork_arg {
+	// nothing here yet
+};
+
 #endif	/* KERNEL_ARCH_PPC_THREAD_STRUCT_H */
