@@ -4,6 +4,7 @@ KernelStaticLibraryObjects libkern.a :
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
 
 	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
+	<$(SOURCE_GRIST)!libroot!posix!locale>localeconv.o
 
 	<$(SOURCE_GRIST)!libroot!posix!stdio>kvsprintf.o
 
@@ -218,6 +219,7 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libroot!posix!malloc>wrapper.o
 
 	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
+	<$(SOURCE_GRIST)!libroot!posix!locale>localeconv.o
 
 	<$(SOURCE_GRIST)!libroot!posix!stdio>fclose.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>feof.o
@@ -362,6 +364,7 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!malloc>wrapper.o
 	
 	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
+	<$(SOURCE_GRIST)!libroot!posix!locale>localeconv.o
 
 	<$(SOURCE_GRIST)!libroot!posix!stdio>fclose.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>feof.o
