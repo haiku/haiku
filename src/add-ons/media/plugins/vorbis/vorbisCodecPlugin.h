@@ -33,6 +33,7 @@ private:
 	bigtime_t		fStartTime;
 	int				fFrameSize;
 	int				fOutputBufferSize;
+	bool				fSoundplayLossage;
 };
 
 
