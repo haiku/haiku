@@ -2047,6 +2047,19 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 	return B_OK;
 }
 
+void
+Inode::KDumpMe()
+{
+	kprintf("Inode {\n");
+	CachedBlock::KDumpMe();
+	kprintf("fTree = 0x%08lx\n", fTree);
+	kprintf("fAttributes = 0x%08lx\n", fAttributes);
+	kprintf("fLock {}\n");
+	kprintf("fOldSize = 0x%16Lx\n", fOldSize);
+	kprintf("fOldLastModified = 0x%16Lx\n", fOldLastModified);
+	kprintf("}\n");
+}
+
 
 //	#pragma mark -
 

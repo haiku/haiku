@@ -222,12 +222,29 @@ vnode_ops fs_entry =  {
 
 int32	api_version = B_CUR_FS_API_VERSION;
 
+#ifdef DEBUG
+//#warn Don't mount more than once... would register twice the debugger commands!
+int db_obfsinode(int argc, char **argv)
+{
+	Inode *ino;
+	if (argc < 2) {
+		kprintf("usage: obfsinode ptr\n");
+		return 0;
+	}
+	ino = (Inode *)parse_expression(argv[1]);
+	ino->KDumpMe();
+	return 0;
+}
+#endif
 
 static int
 bfs_mount(nspace_id nsid, const char *device, ulong flags, void *parms,
 		size_t len, void **data, vnode_id *rootID)
 {
 	FUNCTION();
+#ifdef DEBUG
+	add_debugger_command("obfsinode", db_obfsinode, "dump an OpenBFS Inode");
+#endif
 
 	Volume *volume = new Volume(nsid);
 	if (volume == NULL)
@@ -256,6 +273,9 @@ bfs_unmount(void *ns)
 	status_t status = volume->Unmount();
 	delete volume;
 
+#ifdef DEBUG
+	remove_debugger_command("obfsinode", db_obfsinode);
+#endif
 	RETURN_ERROR(status);
 }
 
