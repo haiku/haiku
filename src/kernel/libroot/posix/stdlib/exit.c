@@ -25,6 +25,8 @@ static int32 sExitStackIndex = 0;
 void
 abort()
 {
+	fprintf(stderr, "Abort\n");
+
 	raise(SIGABRT);
 	exit(EXIT_FAILURE);
 }
