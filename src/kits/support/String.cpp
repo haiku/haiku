@@ -795,7 +795,7 @@ BString&
 BString::ReplaceFirst(char replaceThis, char withThis)
 {
 	char tmp[2] = { replaceThis, '\0' };
-	int32 pos = _FindAfter(tmp, 0, 1);
+	int32 pos = _ShortFindAfter(tmp, 1);
 	
 	if (pos >= 0)
 		_privateData[pos] = withThis;
@@ -832,18 +832,18 @@ BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 BString&
 BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
 {
-	int32 pos = B_ERROR;
-	int32 replaceCount = 0;
+	
 	char tmp[2] = { replaceThis, '\0' };
 	
 	if (maxReplaceCount <= 0)
 		return *this;
-		
+	
+	int32 pos;	
 	while ((pos = _FindAfter(tmp, fromOffset, 1)) >= 0) {
 		_privateData[pos] = withThis;
 		fromOffset = pos;
 		
-		if (++replaceCount == maxReplaceCount)
+		if (--maxReplaceCount == 0) //Exit if we're done
 			break;
 	}
 	return *this;
@@ -857,15 +857,17 @@ BString::ReplaceFirst(const char *replaceThis, const char *withThis)
 		return *this;
 	
 	int32 firstStringLength = strlen(replaceThis);	
-	int32 pos = _FindAfter(replaceThis, 0, firstStringLength);
+	int32 pos = _ShortFindAfter(replaceThis, firstStringLength);
 	
 	if (pos >= 0) {
 		int32 len = (withThis ? strlen(withThis) : 0);
 		int32 difference = len - firstStringLength;
+		
 		if (difference > 0)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
 			_ShrinkAtBy(pos, -difference);
+		
 		memcpy(_privateData + pos, withThis, len);
 	}
 		
@@ -885,10 +887,12 @@ BString::ReplaceLast(const char *replaceThis, const char *withThis)
 	if (pos >= 0) {
 		int32 len = (withThis ? strlen(withThis) : 0);
 		int32 difference = len - firstStringLength;
+		
 		if (difference > 0)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
 			_ShrinkAtBy(pos, -difference);
+		
 		memcpy(_privateData + pos, withThis, len);
 	}
 		
@@ -908,6 +912,7 @@ BString::ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOff
 	
 	int32 pos; 
 	while ((pos = _FindAfter(replaceThis, fromOffset, firstStringLength)) >= 0) {
+		
 		if (difference > 0)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
@@ -927,22 +932,22 @@ BString::Replace(const char *replaceThis, const char *withThis, int32 maxReplace
 	if (replaceThis == NULL || maxReplaceCount <= 0)
 		return *this;
 	
-	int32 replaceCount = 0;
 	int32 firstStringLength = strlen(replaceThis);	
 	int32 len = (withThis ? strlen(withThis) : 0);
 	int32 difference = len - firstStringLength;
 	
 	int32 pos; 
 	while ((pos = _FindAfter(replaceThis, fromOffset, firstStringLength)) >= 0) {
+		
 		if (difference > 0)
 			_OpenAtBy(pos, difference);			
 		else if (difference < 0)
 			_ShrinkAtBy(pos, -difference);
-		memcpy(_privateData + pos, withThis, len);
 		
+		memcpy(_privateData + pos, withThis, len);
 		fromOffset = pos + difference;
 		
-		if (++replaceCount == maxReplaceCount)
+		if (--maxReplaceCount == 0) //Exit if we're done
 			break;
 	}
 	return *this;
@@ -954,6 +959,7 @@ BString::IReplaceFirst(char replaceThis, char withThis)
 {
 	char tmp[2] = { replaceThis, '\0' };
 	int32 pos = _FindAfter(tmp, 0, 1);
+	
 	if (pos >= 0)
 		_privateData[pos] = withThis;
 
@@ -966,6 +972,7 @@ BString::IReplaceLast(char replaceThis, char withThis)
 {
 	char tmp[2] = { replaceThis, '\0' };	
 	int32 pos = _IFindBefore(tmp, Length(), 1);
+	
 	if (pos >= 0)
 		_privateData[pos] = withThis;
 	
@@ -991,17 +998,16 @@ BString&
 BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
 {
 	int32 pos = B_ERROR;
-	int32 replaceCount = 0;
 	char tmp[2] = { replaceThis, '\0' };
 	
 	if (_privateData == NULL || maxReplaceCount <= 0)
 		return *this;
 		
-	while ((pos = _FindAfter(tmp, fromOffset, 1)) >= 0) {
+	while ((pos = _IFindAfter(tmp, fromOffset, 1)) >= 0) {
 		_privateData[pos] = withThis;
 		fromOffset = pos;
 		
-		if (++replaceCount == maxReplaceCount)
+		if (--maxReplaceCount == 0) //Exit if we're done
 			break;
 	}
 	return *this;
@@ -1025,6 +1031,7 @@ BString::IReplaceFirst(const char *replaceThis, const char *withThis)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
 			_ShrinkAtBy(pos, -difference);
+		
 		memcpy(_privateData + pos, withThis, len);
 	}
 		
@@ -1039,7 +1046,7 @@ BString::IReplaceLast(const char *replaceThis, const char *withThis)
 		return *this;
 		
 	int32 firstStringLength = strlen(replaceThis);		
-	int32 pos = _FindBefore(replaceThis, Length(), firstStringLength);
+	int32 pos = _IFindBefore(replaceThis, Length(), firstStringLength);
 	
 	if (pos >= 0) {
 		int32 len = (withThis ? strlen(withThis) : 0);
@@ -1049,6 +1056,7 @@ BString::IReplaceLast(const char *replaceThis, const char *withThis)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
 			_ShrinkAtBy(pos, -difference);
+		
 		memcpy(_privateData + pos, withThis, len);
 	}
 		
@@ -1072,6 +1080,7 @@ BString::IReplaceAll(const char *replaceThis, const char *withThis, int32 fromOf
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
 			_ShrinkAtBy(pos, -difference);
+		
 		memcpy(_privateData + pos, withThis, len);
 		fromOffset = pos + difference;
 	}
@@ -1086,7 +1095,6 @@ BString::IReplace(const char *replaceThis, const char *withThis, int32 maxReplac
 	if (replaceThis == NULL || maxReplaceCount <= 0)
 		return *this;
 	
-	int32 replaceCount = 0;
 	int32 firstStringLength = strlen(replaceThis);	
 	int32 len = (withThis ? strlen(withThis) : 0);
 	int32 difference = len - firstStringLength;
@@ -1097,10 +1105,11 @@ BString::IReplace(const char *replaceThis, const char *withThis, int32 maxReplac
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
 			_ShrinkAtBy(pos, -difference);
+		
 		memcpy(_privateData + pos, withThis, len);
 		fromOffset = pos + difference;
 		
-		if (++replaceCount == maxReplaceCount)
+		if (--maxReplaceCount == 0) //Exit if we're done
 			break;
 	}
 	return *this;
@@ -1112,8 +1121,10 @@ BString::ReplaceSet(const char *setOfChars, char with)
 {
 	int32 pos;
 	int32 length = Length();
+	
 	while ((pos = strcspn(String(), setOfChars)) < length)
 		_privateData[pos] = with;
+	
 	return *this;
 }
 
