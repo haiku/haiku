@@ -682,28 +682,46 @@ out:
 
 
 extern "C" void
-cache_node_opened(vm_cache_ref *cache, mount_id mountID, vnode_id vnodeID)
+cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache, mount_id mountID,
+	vnode_id parentID, vnode_id vnodeID, const char *name)
 {
-	if (cache == NULL)
+	if (sCacheModule == NULL)
 		return;
 
-	file_cache_ref *ref = (file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
+	off_t size = -1;
+	if (cache != NULL) {
+		file_cache_ref *ref = (file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
+		if (ref != NULL)
+			size = ref->cache->cache->virtual_size;
+	}
 
-	if (ref != NULL && sCacheModule != NULL)
-		sCacheModule->node_opened(mountID, vnodeID, ref->cache->cache->virtual_size);
+	sCacheModule->node_opened(vnode, fdType, mountID, parentID, vnodeID, name, size);
 }
 
 
 extern "C" void
-cache_node_closed(vm_cache_ref *cache, mount_id mountID, vnode_id vnodeID)
+cache_node_closed(void *vnode, int32 fdType, vm_cache_ref *cache,
+	mount_id mountID, vnode_id vnodeID)
 {
-	if (cache == NULL)
+	if (sCacheModule == NULL)
 		return;
 
-	file_cache_ref *ref = (file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
+	int32 accessType = 0;
+	if (cache != NULL) {
+		// ToDo: set accessType
+	}
 
-	if (ref != NULL && sCacheModule != NULL)
-		sCacheModule->node_closed(mountID, vnodeID);
+	sCacheModule->node_closed(vnode, fdType, mountID, vnodeID, accessType);
+}
+
+
+extern "C" void 
+cache_node_launched(size_t argCount, char * const *args)
+{
+	if (sCacheModule == NULL)
+		return;
+
+	sCacheModule->node_launched(argCount, args);
 }
 
 

@@ -25,6 +25,7 @@
 #include <kernel.h>
 #include <vm.h>
 #include <vfs.h>
+#include <file_cache.h>
 
 #include <sys/wait.h>
 #include <string.h>
@@ -1014,6 +1015,8 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 pr
 	if (err < B_OK)
 		goto err3;
 
+	cache_node_launched(argCount, args);
+
 	// cut the path from the main thread name
 	threadName = strrchr(args[0], '/');
 	if (threadName != NULL)
@@ -1098,6 +1101,8 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	sem_delete_owned_sems(team->id);
 	remove_images(team);
 	vfs_exec_io_context(team->io_context);
+
+	cache_node_launched(argCount, args);
 
 	// rename the team
 
