@@ -141,6 +141,7 @@ void start_chan(ich_chan *chan)
 void stop_chan(ich_chan *chan)
 {
 	ich_reg_write_8(chan->regbase + ICH_REG_X_CR, ich_reg_read_8(chan->regbase + ICH_REG_X_CR) & ~CR_RPBM);
+	ich_reg_read_8(chan->regbase + ICH_REG_X_CR); // force PCI-to-PCI bridge cache flush
 	chan->running = false;
 	snooze(10000); // 10 ms
 }
@@ -149,6 +150,7 @@ void reset_chan(ich_chan *chan)
 {
 	int i, cr;
 	ich_reg_write_8(chan->regbase + ICH_REG_X_CR, 0);
+	ich_reg_read_8(chan->regbase + ICH_REG_X_CR); // force PCI-to-PCI bridge cache flush
 	snooze(10000); // 10 ms
 
 	chan->running = false;
@@ -200,6 +202,7 @@ bool interrupt_test(void)
 
 	// disable interrupts & busmaster transfer
 	ich_reg_write_8(chan_po->regbase + ICH_REG_X_CR, 0);
+	ich_reg_read_8(chan_po->regbase + ICH_REG_X_CR); // force PCI-to-PCI bridge cache flush
 
 	snooze(25000);
 
@@ -414,15 +417,24 @@ ich_clock_calibrate()
 	#if DEBUG > 0
 		{
 			int i;
-			for (i = 0; i < 20; i++)
-				LOG(("ich_clock_calibrate: rate %ld\n", ich_clock_get()));
+			uint32 r = 0;
+			for (i = 0; i < 20; i++) {
+				uint32 c = ich_clock_get();
+				LOG(("ich_clock_calibrate: rate %ld\n", c));
+				r += c;
+			}
+			r /= 20;
+			LOG(("ich_clock_calibrate: mean rate %ld\n", r));
 		}
 	#endif
 
 	rate = ich_clock_get();
 	LOG(("ich_clock_calibrate: rate %ld\n", rate));
 
-	if (rate > (44100 - 1000) && rate < (44100 + 1000)) {
+	if (rate > (36898 - 1000) && rate < (36898 + 1000)) {
+		LOG(("ich_clock_calibrate: setting clock 36898\n"));
+		ac97_set_clock(config->ac97, 36898);
+	} else if (rate > (44100 - 1000) && rate < (44100 + 1000)) {
 		LOG(("ich_clock_calibrate: setting clock 44100\n"));
 		ac97_set_clock(config->ac97, 44100);
 	} else if (rate > (48000 - 1000) && rate < (48000 + 1000)) {
@@ -481,6 +493,7 @@ init_driver(void)
 	/* do a cold reset */
 	LOG(("cold reset\n"));
 	ich_reg_write_32(ICH_REG_GLOB_CNT, 0);
+	ich_reg_read_32(ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
 	snooze(50000); // 50 ms
 	ich_reg_write_32(ICH_REG_GLOB_CNT, CNT_COLD | CNT_PRIE);
 	LOG(("cold reset finished\n"));
