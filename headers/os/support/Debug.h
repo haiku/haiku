@@ -25,7 +25,7 @@ extern "C" {
 #endif
 	extern _IMPEXP_ROOT bool _rtDebugFlag;
 
-	_IMPEXP_ROOT bool _debugFlag();
+	_IMPEXP_ROOT bool _debugFlag(void);
 	_IMPEXP_ROOT bool _setDebugFlag(bool);
 	
 	_IMPEXP_ROOT int _debugPrintf(const char *, ...);
