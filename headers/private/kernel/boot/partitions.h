@@ -76,5 +76,6 @@ struct file_system_module_info {
 };
 
 extern file_system_module_info gBFSFileSystemModule;
+extern file_system_module_info gAmigaFFSFileSystemModule;
 
 #endif	/* KERNEL_BOOT_PARTITIONS_H */
