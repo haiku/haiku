@@ -1,239 +1,225 @@
-//	lsindex - for OpenBeOS
+//	lsindex - for Haiku
 //
 //	authors, in order of contribution:
 //	jonas.sundstrom@kirilla.com
 //	revol@free.fr
+//	axeld@pinc-software.de
 //
 
-// std C includes
+#include <TypeConstants.h>
+#include <fs_info.h>
+#include <fs_index.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 
-// BeOS C includes
-#include <fs_info.h>
-#include <fs_index.h>
-#include <TypeConstants.h>
 
-void	print_help	(void);
-void	print_index_stat_r5style (const index_info * const a_index_info, char *name);
-void	print_index_stat (const index_info * const a_index_info, char *name);
-const char	*print_index_type (const index_info * const a_index_info, bool as_mkindex);
-
-int	main (int32 argc, char **argv)
+static void
+print_help(void)
 {
-	dev_t		vol_device			=	dev_for_path(".");
-	DIR		*	dev_index_dir		=	NULL;
-	bool		verbose				=	false;
-	bool		long_listing		=	false;
-	bool		mkindex_output		=	false; /* mkindexi-ready output */
-	
-	for (int i = 1;  i < argc;  i++)
-	{
-		if (! strcmp(argv[i], "--help"))
-		{
-			print_help();
-			return (0);
-		}
-	
-		if (argv[i][0] == '-')
-		{
-			if 	(! strcmp(argv[i], "--verbose"))
-				verbose =	true;
-			else if 	(! strcmp(argv[i], "-l"))
-				long_listing = true;
-			else if 	(! strcmp(argv[i], "--mkindex"))
-				mkindex_output =	true;
-			else
-			{	
-				fprintf(stderr, "%s: option %s is not understood (use --help for help)\n", argv[0], argv[i]);
-				return (-1);
-			}
-		}
-		else
-		{
-			vol_device	=	dev_for_path(argv[i]);
-			
-			if (vol_device < 0)
-			{
-				fprintf(stderr, "%s: can't get information about volume: %s\n", argv[0], argv[i]);
-				return (-1);
-			}
-		}
+	fprintf (stderr, 
+		"Usage: lsindex [--help | -v | --verbose | --mkindex | -l | --long] [volume path]\n"
+		"   -l --long\t outputs long listing\n"
+		"   -v --verbose\t gives index type, dates and owner\n"
+		"      --mkindex\t outputs mkindex commands to recreate all the indices\n"
+		"      --help\t prints out this text\n\n"
+		"   If no volume is specified, the volume of the current directory is assumed.\n");
+}
+
+
+static const char *
+print_index_type(const index_info &info, bool mkindexOutput)
+{
+	static char buffer[30];
+
+	switch (info.type) {
+		case B_INT32_TYPE:
+			return mkindexOutput ? "int" : "Int-32";
+		case B_INT64_TYPE:
+			return mkindexOutput ? "llong" : "Int-64";
+		case B_STRING_TYPE:
+			return mkindexOutput ? "string" : "Text";
+		case B_FLOAT_TYPE:
+			return mkindexOutput ? "float" : "Float";
+		case B_DOUBLE_TYPE:
+			return mkindexOutput ? "double" : "Double";
+
+		default:
+			sprintf(buffer, mkindexOutput ? "0x%08lx" : "Unknown type (0x%x)", info.type);
+			return buffer;
 	}
-	
-	dev_index_dir =	fs_open_index_dir(vol_device);
-	
-	if (dev_index_dir == NULL)
-	{
-		fprintf(stderr, "%s: can't open index dir of device %ld\n", argv[0], vol_device);
-		return (-1);
+}
+
+
+static const char *
+type_string(type_code type)
+{
+	// all types from <TypeConstants.h> listed for completeness,
+	// even though they don't all apply to attribute indices
+
+#define RETURN_TYPE(x) case x: return #x
+
+	switch (type) {
+		RETURN_TYPE(B_ANY_TYPE);
+		RETURN_TYPE(B_BOOL_TYPE);
+		RETURN_TYPE(B_CHAR_TYPE);
+		RETURN_TYPE(B_COLOR_8_BIT_TYPE);
+		RETURN_TYPE(B_DOUBLE_TYPE);
+		RETURN_TYPE(B_FLOAT_TYPE);
+		RETURN_TYPE(B_GRAYSCALE_8_BIT_TYPE);
+		RETURN_TYPE(B_INT64_TYPE);
+		RETURN_TYPE(B_INT32_TYPE);
+		RETURN_TYPE(B_INT16_TYPE);
+		RETURN_TYPE(B_INT8_TYPE);
+		RETURN_TYPE(B_MESSAGE_TYPE);
+		RETURN_TYPE(B_MESSENGER_TYPE);
+		RETURN_TYPE(B_MIME_TYPE);
+		RETURN_TYPE(B_MONOCHROME_1_BIT_TYPE);
+		RETURN_TYPE(B_OBJECT_TYPE);
+		RETURN_TYPE(B_OFF_T_TYPE);
+		RETURN_TYPE(B_PATTERN_TYPE);
+		RETURN_TYPE(B_POINTER_TYPE);
+		RETURN_TYPE(B_POINT_TYPE);
+		RETURN_TYPE(B_RAW_TYPE);
+		RETURN_TYPE(B_RECT_TYPE);
+		RETURN_TYPE(B_REF_TYPE);
+		RETURN_TYPE(B_RGB_32_BIT_TYPE);
+		RETURN_TYPE(B_RGB_COLOR_TYPE);
+		RETURN_TYPE(B_SIZE_T_TYPE);
+		RETURN_TYPE(B_SSIZE_T_TYPE);
+		RETURN_TYPE(B_STRING_TYPE);
+		RETURN_TYPE(B_TIME_TYPE);
+		RETURN_TYPE(B_UINT64_TYPE);
+		RETURN_TYPE(B_UINT32_TYPE);
+		RETURN_TYPE(B_UINT16_TYPE);
+		RETURN_TYPE(B_UINT8_TYPE);
+		RETURN_TYPE(B_MEDIA_PARAMETER_TYPE);
+		RETURN_TYPE(B_MEDIA_PARAMETER_WEB_TYPE);
+		RETURN_TYPE(B_MEDIA_PARAMETER_GROUP_TYPE);
+		RETURN_TYPE(B_ASCII_TYPE);
+
+		default:
+			return NULL;
+	}
+#undef RETURN_TYPE
+}
+
+
+static void
+print_index_long_stat(const index_info &info, char *name)
+{
+	char modified[30];
+	strftime(modified, 30, "%m/%d/%Y %I:%M %p", localtime(&info.modification_time));
+	printf("%16s  %s  %8Ld %s\n", print_index_type(info, false), modified, info.size, name);
+}
+
+
+static void
+print_index_verbose_stat(const index_info &info, char *name)
+{
+	printf("%-18s\t", name);
+
+	// Type
+	const char *typeString = type_string(info.type);
+	if (typeString != NULL)
+		printf("%-10s\t", typeString);
+	else
+		printf("%ld\t", info.type);
+
+	// Size
+	printf("%10Ld  ", info.size);
+
+	// Created
+	char string[30];
+	strftime(string, sizeof(string), "%Y-%m-%d %H:%M", localtime(&info.creation_time)); 
+	printf("%s  ", string);
+
+	// Modified
+	strftime(string, sizeof(string), "%Y-%m-%d %H:%M", localtime(&info.modification_time)); 
+	printf("%s", string);
+
+	// User
+	printf("%5d", info.uid);
+
+	// Group
+	printf("%5d\n", info.gid);
+}
+
+
+int
+main(int32 argc, char **argv)
+{
+	dev_t device = dev_for_path(".");
+	DIR *indices = NULL;
+	bool verbose = false;
+	bool longListing = false;
+	bool mkindexOutput = false; /* mkindex-ready output */
+
+	for (int i = 1; i < argc; i++) {
+		if (argv[i][0] == '-') {
+			if (!strcmp(argv[i], "--help")) {
+				print_help();
+				return 0;
+			} else if (!strcmp(argv[i], "--verbose") || !strcmp(argv[i], "-v"))
+				verbose = true;
+			else if (!strcmp(argv[i], "--long") || !strcmp(argv[i], "-l"))
+				longListing = true;
+			else if (!strcmp(argv[i], "--mkindex"))
+				mkindexOutput = true;
+			else {
+				fprintf(stderr, "%s: option %s is not understood (use --help for help)\n", argv[0], argv[i]);
+				return -1;
+			}
+		} else {
+			device = dev_for_path(argv[i]);
+			if (device < 0) {
+				fprintf(stderr, "%s: can't get information about volume: %s\n", argv[0], argv[i]);
+				return -1;
+			}
+		}
 	}
 
-	if (verbose)
-	{
+	indices = fs_open_index_dir(device);
+	if (indices == NULL) {
+		fprintf(stderr, "%s: can't open index dir of device %ld\n", argv[0], device);
+		return -1;
+	}
+
+	if (verbose) {
 		printf(" Name   Type   Size   Created   Modified   User   Group\n");
 		printf("********************************************************\n");
 	}
 
-	while (1)
-	{
-		dirent	*	index_entry	=	fs_read_index_dir (dev_index_dir);
-		if (index_entry == NULL)
-		{
-			if (errno != B_ENTRY_NOT_FOUND && errno != B_OK)
-			{
+	while (1) {
+		dirent *index = fs_read_index_dir(indices);
+		if (index == NULL) {
+			if (errno != B_ENTRY_NOT_FOUND && errno != B_OK) {
 				printf("%s: fs_read_index_dir: (%d) %s\n", argv[0], errno, strerror(errno));
-				return (errno);
+				return errno;
 			}
-			
 			break;
 		}
 
+		if (verbose || longListing || mkindexOutput) {
+			index_info info;
 
-		if (verbose || long_listing || mkindex_output)
-		{
-			index_info	i_info;
-			status_t	status	=	B_OK;
-			
-			status	=	fs_stat_index(vol_device, index_entry->d_name, & i_info);
-			
-			if (status != B_OK)
-			{
+			if (fs_stat_index(device, index->d_name, &info) != B_OK) {
 				printf("%s: fs_stat_index(): (%d) %s\n", argv[0], errno, strerror(errno));
-				return (errno);
+				return errno;
 			}
-			if (verbose) {
-				print_index_stat (& i_info, index_entry->d_name);
-			} else if (long_listing) { /* R5 long output */
-				print_index_stat_r5style (& i_info, index_entry->d_name);
-			} else { /* mkindex_output */
-				printf("mkindex -t %s '%s'\n", print_index_type(& i_info, true), index_entry->d_name);
-			}	
-		}
-		else
-		{
-			printf("%s\n", index_entry->d_name);
-		}
+
+			if (verbose)
+				print_index_verbose_stat(info, index->d_name);
+			else if (longListing)
+				print_index_long_stat(info, index->d_name);
+			else /* mkindexOutput */
+				printf("mkindex -t %s '%s'\n", print_index_type(info, true), index->d_name);
+		} else
+			printf("%s\n", index->d_name);
 	}
-	
-	fs_close_index_dir (dev_index_dir);
 
-	return (0);
-}
-
-void print_help (void)
-{
-	fprintf (stderr, 
-		"Usage: lsindex [--help | --verbose | --mkindex | -l] [volume path]\n"
-		"   --verbose gives index type, dates and owner,\n"
-		"   --mkindex outputs mkindex commands to recreate all the indices,\n"
-		"   -l outputs long listing, R5 style,\n"
-		"   If no volume is specified, the volume of the current directory is assumed.\n");
-}
-
-const char *print_index_type (const index_info * const a_index_info, bool as_mkindex)
-{
-	static char buff[30];
-	// type
-	switch (a_index_info->type)
-	{
-		case B_INT32_TYPE:
-			return(as_mkindex?"int":"Int-32");
-		case B_INT64_TYPE:
-			return(as_mkindex?"llong":"Int-64");
-		case B_STRING_TYPE:
-			return(as_mkindex?"string":"Text");
-		case B_FLOAT_TYPE:
-			return(as_mkindex?"float":"Float");
-		case B_DOUBLE_TYPE:
-			return(as_mkindex?"double":"Double");
-		default:
-			sprintf(buff, as_mkindex?"0x%08lx":"Unknown type (0x%x)", (unsigned) a_index_info->type);
-			return buff;
-	}
-}
-
-void print_index_stat_r5style (const index_info * const a_index_info, char *name)
-{
-	char modified[30];
-	strftime(modified, 30, "%m/%d/%y %I:%M %p", localtime(& a_index_info->modification_time));
-	printf("%16s  %s  %8Ld %s\n", print_index_type(a_index_info, false), modified, a_index_info->size, name);
-}
-
-void print_index_stat (const index_info * const a_index_info, char *name)
-{
-	printf("%-10s\t", name);
-	// type
-	switch (a_index_info->type)
-	{
-		// all types from <TypeConstants.h> listed for completeness,
-		// even though they don't all apply to attribute indices
-		
-		case B_ANY_TYPE:					printf("B_ANY_TYPE");					break;
-		case B_BOOL_TYPE:					printf("B_BOOL_TYPE");					break;
-		case B_CHAR_TYPE:					printf("B_CHAR_TYPE");					break;
-		case B_COLOR_8_BIT_TYPE:			printf("B_COLOR_8_BIT_TYPE");			break;
-		case B_DOUBLE_TYPE:				printf("B_DOUBLE_TYPE");				break;
-		case B_FLOAT_TYPE:					printf("B_FLOAT_TYPE");					break;
-		case B_GRAYSCALE_8_BIT_TYPE:		printf("B_GRAYSCALE_8_BIT_TYPE");		break;
-		case B_INT64_TYPE:					printf("B_INT64_TYPE");					break;
-		case B_INT32_TYPE:					printf("B_INT32_TYPE");					break;
-		case B_INT16_TYPE:					printf("B_INT16_TYPE");					break;
-		case B_INT8_TYPE:					printf("B_INT8_TYPE");					break;
-		case B_MESSAGE_TYPE:				printf("B_MESSAGE_TYPE");				break;
-		case B_MESSENGER_TYPE:				printf("B_MESSENGER_TYPE");				break;
-		case B_MIME_TYPE:					printf("B_MIME_TYPE");					break;
-		case B_MONOCHROME_1_BIT_TYPE:		printf("B_MONOCHROME_1_BIT_TYPE");		break;
-		case B_OBJECT_TYPE:					printf("B_OBJECT_TYPE");				break;
-		case B_OFF_T_TYPE:					printf("B_OFF_T_TYPE");					break;
-		case B_PATTERN_TYPE:				printf("B_PATTERN_TYPE");				break;
-		case B_POINTER_TYPE:				printf("B_POINTER_TYPE");				break;
-		case B_POINT_TYPE:					printf("B_POINT_TYPE");					break;
-		case B_RAW_TYPE:					printf("B_RAW_TYPE");					break;
-		case B_RECT_TYPE:					printf("B_RECT_TYPE");					break;
-		case B_REF_TYPE:					printf("B_REF_TYPE");					break;
-		case B_RGB_32_BIT_TYPE:				printf("B_RGB_32_BIT_TYPE");			break;
-		case B_RGB_COLOR_TYPE:				printf("B_RGB_COLOR_TYPE");				break;
-		case B_SIZE_T_TYPE:					printf("B_SIZE_T_TYPE");				break;
-		case B_SSIZE_T_TYPE:				printf("B_SSIZE_T_TYPE");				break;
-		case B_STRING_TYPE:					printf("B_STRING_TYPE");				break;
-		case B_TIME_TYPE:					printf("B_TIME_TYPE");					break;
-		case B_UINT64_TYPE:					printf("B_UINT64_TYPE");				break;
-		case B_UINT32_TYPE:					printf("B_UINT32_TYPE");				break;
-		case B_UINT16_TYPE:					printf("B_UINT16_TYPE");				break;
-		case B_UINT8_TYPE:					printf("B_UINT8_TYPE");					break;
-		case B_MEDIA_PARAMETER_TYPE:		printf("B_MEDIA_PARAMETER_TYPE");		break;
-		case B_MEDIA_PARAMETER_WEB_TYPE:	printf("B_MEDIA_PARAMETER_WEB_TYPE");	break;
-		case B_MEDIA_PARAMETER_GROUP_TYPE:	printf("B_MEDIA_PARAMETER_GROUP_TYPE");	break;
-		case B_ASCII_TYPE:					printf("B_ASCII_TYPE");					break;	
-		
-		default:	printf("%ld\t", a_index_info->type);	break;
-	}
-	
-	printf("\t");
-
-	// Size
-	printf("%Ld\t", a_index_info->size);
-	
-	// Created
-	char * created	=	new char [30];
-	strftime(created, 30, "%Y-%m-%d %H:%M", localtime(& a_index_info->creation_time)); 
-	printf("%s\t", created);
-	delete [] created;
-	
-	// Modified
-	char * modified	=	new char [30];
-	strftime(modified, 30, "%Y-%m-%d %H:%M", localtime(& a_index_info->modification_time)); 
-	printf("%s\t", modified);
-	delete [] modified;
-
-	// User
-	printf("%d\t", a_index_info->uid);
-	
-	// Group
-	printf("%d\t", a_index_info->gid);
-	
-	printf("\n");
+	fs_close_index_dir(indices);
+	return 0;
 }
 
