@@ -41,7 +41,7 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>If the driver does not load make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
 	<li>Embedded GeForce RAM detection is non-functional: please set amount manually for now via the nv.settings file (driver probably defaults to 1Mb if you don't). If you have overlay trouble, set a slightly smaller amount of RAM than you actually specified in the system BIOS (1Mb less or so);
 	<li>If the driver still seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
-	<li>If on a laptop the internal panel doesn't work when you connect an external monitor, make sure you set 'output device selection' to 'internal' (instead of 'auto') in the system BIOS if it has such an option. If you have this symptom on a normal card, or on a laptop without that BIOS option then you are probably out of luck.
+	<li>If on a laptop the internal panel doesn't work when you connect an external monitor, make sure you set 'output device selection' to 'internal' (instead of 'auto') in the system BIOS if it has such an option. If you have this symptom on a normal card, or on a laptop without that BIOS option then you are probably out of luck for dualhead support.
 </ul>
 <br>
 <hr>
@@ -115,18 +115,22 @@ Dumprom is another 'tool' for bug-tracking purposes.
 		<strong>dumprom true</strong> lets the driver dump a copy of your VGA BIOS in a file called <strong>nv.rom</strong> in your <strong>~ (home)</strong> folder.
 	</ul>
 <li><strong>switchhead:</strong><br>
-With this option you can select which output on your card is the primary output (only for dualhead cards).
+The driver always autodetects which output should be used as primary one, but you can let the driver 'invert' the outcome of that detection with this option (only for dualhead cards).
 	<ul>
 		<li><strong>false:</strong> (default setting)<br>
-		Keep it set to <strong>switchhead false</strong>, unless you feel you want the card's other output to be used as primary one. Note that if a single digitally connected flatpanel is found, that panel will be the driver's primary output with this setting.
+		Keep it set to <strong>switchhead false</strong>, unless you feel you want the card's other output to be used as primary one. Note that if a single connected screen is found, that screen will be the driver's primary output with this setting.
 		<li><strong>true:</strong><br>
-		<strong>switchhead true</strong> lets the driver 'invert' the output assignments for all modes.
+		<strong>switchhead true</strong> lets the driver 'invert' the output assignments for all modes. Use only when you have two screens connected, otherwise the one connected screen will remain black as the other (not connected) output is being used.<br>
 	</ul>
+<strong>Note:</strong>
+<ul>
+	<li>If the driver determines it cannot use a digital panel <strong>despite</strong> it being physically connected and powered on, using the switchhead option will not fix this. This is no fault in your card or the panel, but happens only because the driver relies on certain functions inside your cards BIOS to behave in a certain way.
+</ul>
 </ul>
 
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on June 10, 2004)</p>
+<p>(Page last updated on June 12, 2004)</p>
 </body>
 </html>
