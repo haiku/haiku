@@ -132,7 +132,7 @@ void
 ShowImageView::Pulse()
 {
 	// animate marching ants
-	if (fbHasSelection && fAnimateSelection && Window()->IsActive()) {	
+	if (HasSelection() && fAnimateSelection && Window()->IsActive()) {	
 		RotatePatterns();
 		DrawSelectionBox(fSelectionRect);
 	}
@@ -153,7 +153,8 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 {
 	InitPatterns();
 	
-	fpBitmap = NULL;
+	fBitmap = NULL;
+	fSelBitmap = NULL;
 	fDocumentIndex = 1;
 	fDocumentCount = 1;
 	fAnimateSelection = true;
@@ -238,15 +239,22 @@ void
 ShowImageView::DeleteBitmap()
 {
 	DeleteScaler();
-	delete fpBitmap;
-	fpBitmap = NULL;
+	DeleteSelBitmap();
+	delete fBitmap;
+	fBitmap = NULL;
+}
+
+void ShowImageView::DeleteSelBitmap()
+{
+	delete fSelBitmap;
+	fSelBitmap = NULL;
 }
 
 void
 ShowImageView::SetImage(const entry_ref *pref)
 {
 	DeleteBitmap();
-	fbHasSelection = false;
+	SetHasSelection(false);
 	fMakesSelection = false;
 	
 	entry_ref ref;
@@ -276,7 +284,7 @@ ShowImageView::SetImage(const entry_ref *pref)
 	if (proster->Translate(&file, &info, &ioExtension, &outstream,
 		B_TRANSLATOR_BITMAP) != B_OK)
 		return;
-	if (outstream.DetachBitmap(&fpBitmap) != B_OK)
+	if (outstream.DetachBitmap(&fBitmap) != B_OK)
 		return;
 	fCurrentRef = ref;
 	
@@ -334,7 +342,7 @@ ShowImageView::SetAlignment(alignment horizontal, vertical_alignment vertical)
 BBitmap *
 ShowImageView::GetBitmap()
 {
-	return fpBitmap;
+	return fBitmap;
 }
 
 void
@@ -389,7 +397,7 @@ ShowImageView::AttachedToWindow()
 BRect
 ShowImageView::AlignBitmap()
 {
-	BRect rect(fpBitmap->Bounds());
+	BRect rect(fBitmap->Bounds());
 	float width, height;
 	width = Bounds().Width()-2*PEN_SIZE+1;
 	height = Bounds().Height()-2*PEN_SIZE+1;
@@ -452,8 +460,8 @@ ShowImageView::Setup(BRect rect)
 {
 	fLeft = rect.left;
 	fTop = rect.top;
-	fScaleX = (rect.Width()+1.0) / (fpBitmap->Bounds().Width()+1.0);
-	fScaleY = (rect.Height()+1.0) / (fpBitmap->Bounds().Height()+1.0);
+	fScaleX = (rect.Width()+1.0) / (fBitmap->Bounds().Width()+1.0);
+	fScaleY = (rect.Height()+1.0) / (fBitmap->Bounds().Height()+1.0);
 }
 
 BPoint
@@ -569,7 +577,7 @@ ShowImageView::GetScaler()
 	if (fScaler == NULL || fScaler->Scale() != fZoom) {
 		DeleteScaler();
 		BMessenger msgr(this, Window());
-		fScaler = new Scaler(fpBitmap, fZoom, msgr, MSG_INVALIDATE);
+		fScaler = new Scaler(fBitmap, fZoom, msgr, MSG_INVALIDATE);
 		fScaler->Start();
 	}
 	return fScaler;
@@ -586,13 +594,13 @@ ShowImageView::DrawImage(BRect rect)
 			return;
 		}
 	}
-	DrawBitmap(fpBitmap, fpBitmap->Bounds(), rect);
+	DrawBitmap(fBitmap, fBitmap->Bounds(), rect);
 }
 
 void
 ShowImageView::Draw(BRect updateRect)
 {
-	if (fpBitmap) {
+	if (fBitmap) {
 		if (!IsPrinting()) {
 			BRect rect = AlignBitmap();
 			Setup(rect);
@@ -615,11 +623,37 @@ ShowImageView::Draw(BRect updateRect)
 				DrawCaption();
 			}
 			
-			if (fbHasSelection) {
+			if (HasSelection()) {
+				if (fSelBitmap) {
+					BRect clippedRect, bounds;
+					clippedRect = fSelectionRect;
+					ConstrainToImage(clippedRect);
+					clippedRect = ImageToView(clippedRect);
+					
+					bounds = fSelectionRect;
+					if (bounds.left < 0)
+						bounds.left = -(bounds.left);
+					else
+						bounds.left = 0;
+					if (bounds.top < 0)
+						bounds.top = -(bounds.top);
+					else
+						bounds.top = 0;
+					if (bounds.right > fBitmap->Bounds().right)
+						bounds.right = bounds.left + clippedRect.Width();
+					else
+						bounds.right = fSelBitmap->Bounds().right;
+					if (bounds.bottom > fBitmap->Bounds().bottom)
+						bounds.bottom = bounds.top + clippedRect.Height();
+					else
+						bounds.bottom = fSelBitmap->Bounds().bottom;
+					
+					DrawBitmap(fSelBitmap, bounds, clippedRect);
+				}
 				DrawSelectionBox(fSelectionRect);
 			}
 		} else {
-			DrawBitmap(fpBitmap);
+			DrawBitmap(fBitmap);
 		}
 	}
 }
@@ -650,13 +684,13 @@ ShowImageView::FrameResized(float /* width */, float /* height */)
 void
 ShowImageView::ConstrainToImage(BPoint &point)
 {
-	point.ConstrainTo(fpBitmap->Bounds());
+	point.ConstrainTo(fBitmap->Bounds());
 }
 
 void
 ShowImageView::ConstrainToImage(BRect &rect)
 {
-	BRect bounds = fpBitmap->Bounds();
+	BRect bounds = fBitmap->Bounds();
 	BPoint leftTop, rightBottom;
 	
 	leftTop = rect.LeftTop();
@@ -674,16 +708,16 @@ ShowImageView::CopySelection(uchar alpha)
 {
 	bool hasAlpha = alpha != 255;
 	
-	if (!fbHasSelection) return NULL;
+	if (!HasSelection()) return NULL;
 	
-	BRect rect(0, 0, fSelectionRect.IntegerWidth(), fSelectionRect.IntegerHeight());
+	BRect rect(0, 0, fCopyFromRect.IntegerWidth(), fCopyFromRect.IntegerHeight());
 	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
-	BBitmap *bitmap = new BBitmap(rect, hasAlpha ? B_RGBA32 : fpBitmap->ColorSpace(), true);
+	BBitmap *bitmap = new BBitmap(rect, hasAlpha ? B_RGBA32 : fBitmap->ColorSpace(), true);
 	if (bitmap == NULL) return NULL;
 	
 	if (bitmap->Lock()) {
 		bitmap->AddChild(&view);
-		view.DrawBitmap(fpBitmap, fSelectionRect, rect);
+		view.DrawBitmap(fBitmap, fCopyFromRect, rect);
 		if (hasAlpha) {
 			view.SetDrawingMode(B_OP_SUBTRACT);
 			view.SetHighColor(0, 0, 0, 255-alpha);
@@ -900,8 +934,11 @@ ShowImageView::MouseDown(BPoint position)
 	point = ViewToImage(position);
 	buttons = GetMouseButtons();
 	
-	if (fbHasSelection && fSelectionRect.Contains(point) &&
+	if (HasSelection() && fSelectionRect.Contains(point) &&
 		(buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON))) {
+		if (!fSelBitmap) {
+			fSelBitmap = CopySelection();
+		}
 		BPoint sourcePoint = point;
 		BeginDrag(sourcePoint);
 		
@@ -909,8 +946,8 @@ ShowImageView::MouseDown(BPoint position)
 			// Keep reading mouse movement until
 			// the user lets up on all mouse buttons
 			GetMouse(&point, &buttons);		
-			snooze(50000);
-				// sleep for 50 milliseconds to minimize CPU usage during loop
+			snooze(25 * 1000);
+				// sleep for 25 milliseconds to minimize CPU usage during loop
 		}
 		
 		if (Bounds().Contains(point)) {
@@ -923,7 +960,7 @@ ShowImageView::MouseDown(BPoint position)
 			BRect newSelection = fSelectionRect;
 			newSelection.OffsetBy(diff);
 			
-			if (fpBitmap->Bounds().Intersects(newSelection)) {
+			if (fBitmap->Bounds().Intersects(newSelection)) {
 				// Do not accept the new selection box location
 				// if it does not intersect with the bitmap rectangle
 				fSelectionRect = newSelection;
@@ -935,12 +972,13 @@ ShowImageView::MouseDown(BPoint position)
 		
 	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		// begin new selection
+		SetHasSelection(true);
 		fMakesSelection = true;
-		fbHasSelection = true;
 		SetMouseEventMask(B_POINTER_EVENTS);
 		ConstrainToImage(point);
 		fFirstPoint = point;
-		fSelectionRect.Set(point.x, point.y, point.x, point.y);
+		fCopyFromRect.Set(point.x, point.y, point.x, point.y);
+		fSelectionRect = fCopyFromRect;
 		Invalidate(); 
 	} else if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		ShowPopUpMenu(ConvertToScreen(position));
@@ -955,22 +993,23 @@ ShowImageView::MouseDown(BPoint position)
 
 void
 ShowImageView::UpdateSelectionRect(BPoint point, bool final) {
-	BRect oldSelection = fSelectionRect;
+	BRect oldSelection = fCopyFromRect;
 	point = ViewToImage(point);
 	ConstrainToImage(point);
-	fSelectionRect.left = min(fFirstPoint.x, point.x);
-	fSelectionRect.right = max(fFirstPoint.x, point.x);
-	fSelectionRect.top = min(fFirstPoint.y, point.y);
-	fSelectionRect.bottom = max(fFirstPoint.y, point.y);
+	fCopyFromRect.left = min(fFirstPoint.x, point.x);
+	fCopyFromRect.right = max(fFirstPoint.x, point.x);
+	fCopyFromRect.top = min(fFirstPoint.y, point.y);
+	fCopyFromRect.bottom = max(fFirstPoint.y, point.y);
+	fSelectionRect = fCopyFromRect;
 	if (final) {
 		// selection must contain a few pixels
-		if (fSelectionRect.Width() * fSelectionRect.Height() <= 1) {
-			fbHasSelection = false;
+		if (fCopyFromRect.Width() * fCopyFromRect.Height() <= 1) {
+			SetHasSelection(false);
 		}
 	}
-	if (oldSelection != fSelectionRect || !fbHasSelection) {
+	if (oldSelection != fCopyFromRect || !HasSelection()) {
 		BRect updateRect;
-		updateRect = oldSelection | fSelectionRect;
+		updateRect = oldSelection | fCopyFromRect;
 		updateRect = ImageToView(updateRect);
 		updateRect.InsetBy(-PEN_SIZE, -PEN_SIZE);
 		Invalidate(updateRect);
@@ -1181,7 +1220,7 @@ ShowImageView::FixupScrollBars()
 	}
 
 	BRect rctview = Bounds(), rctbitmap(0, 0, 0, 0);
-	if (fpBitmap) {
+	if (fBitmap) {
 		BRect rect(AlignBitmap());
 		rctbitmap.Set(0, 0, rect.Width(), rect.Height());
 	}
@@ -1225,24 +1264,32 @@ ShowImageView::PageCount()
 void
 ShowImageView::SelectAll()
 {
-	fbHasSelection = true;
-	fSelectionRect.Set(0, 0, fpBitmap->Bounds().Width(), fpBitmap->Bounds().Height());
+	SetHasSelection(true);
+	fCopyFromRect.Set(0, 0, fBitmap->Bounds().Width(), fBitmap->Bounds().Height());
+	fSelectionRect = fCopyFromRect;
 	Invalidate();
 }
 
 void
 ShowImageView::Unselect()
 {
-	if (fbHasSelection) {
-		fbHasSelection = false;
+	if (HasSelection()) {
+		SetHasSelection(false);
 		Invalidate();
 	}
 }
 
 void
+ShowImageView::SetHasSelection(bool bHasSelection)
+{
+	DeleteSelBitmap();
+	fbHasSelection = bHasSelection;
+}
+
+void
 ShowImageView::CopySelectionToClipboard()
 {
-	if (fbHasSelection && be_clipboard->Lock()) {
+	if (HasSelection() && be_clipboard->Lock()) {
 		be_clipboard->Clear();
 		BMessage *clip = NULL;
 		if ((clip = be_clipboard->Data()) != NULL) {
@@ -1527,14 +1574,14 @@ ShowImageView::DoImageOperation(image_operation op)
 	int32 x, y, destX, destY;
 	BRect rect;
 	
-	if (fpBitmap == NULL) return;
+	if (fBitmap == NULL) return;
 	
-	cs = fpBitmap->ColorSpace();
+	cs = fBitmap->ColorSpace();
 	bpp = BytesPerPixel(cs);	
 	if (bpp < 1) return;
 	
-	width = fpBitmap->Bounds().IntegerWidth();
-	height = fpBitmap->Bounds().IntegerHeight();
+	width = fBitmap->Bounds().IntegerWidth();
+	height = fBitmap->Bounds().IntegerHeight();
 	
 	if (op == kRotateClockwise || op == kRotateAntiClockwise) {
 		rect.Set(0, 0, height, width);
@@ -1545,9 +1592,9 @@ ShowImageView::DoImageOperation(image_operation op)
 	bm = new BBitmap(rect, cs);
 	if (bm == NULL) return;
 	
-	src = (uchar*)fpBitmap->Bits();
+	src = (uchar*)fBitmap->Bits();
 	dest = (uchar*)bm->Bits();
-	bpr = fpBitmap->BytesPerRow();
+	bpr = fBitmap->BytesPerRow();
 	destBPR = bm->BytesPerRow();
 	
 	switch (op) {
@@ -1598,9 +1645,9 @@ ShowImageView::DoImageOperation(image_operation op)
 
 	// set new bitmap
 	DeleteBitmap();
-	fpBitmap = bm; 
+	fBitmap = bm; 
 	// remove selection
-	fbHasSelection = false;
+	SetHasSelection(false);
 	Notify(NULL);	
 }
 

@@ -107,11 +107,14 @@ private:
 	};
 	void InitPatterns();
 	void RotatePatterns();
+	bool HasSelection() { return fbHasSelection; }
+	void SetHasSelection(bool bHasSelection);
 	void AnimateSelection(bool a);
 	void Notify(const char* status);
 	void AddToRecentDocuments();
 	void DeleteScaler();
 	void DeleteBitmap();
+	void DeleteSelBitmap();
 	int32 BytesPerPixel(color_space cs) const;
 	inline void CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR, uchar* src, int32 x, int32 y, int32 bpr, int32 bpp);
 	inline void InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src, int32 bpr, int32 bpp);
@@ -155,7 +158,8 @@ private:
 	entry_ref fCurrentRef;
 	int32 fDocumentIndex;
 	int32 fDocumentCount;
-	BBitmap *fpBitmap;
+	BBitmap *fBitmap;
+	BBitmap *fSelBitmap;
 	float fZoom;
 	bool fScaleBilinear;
 	Scaler* fScaler;
@@ -171,7 +175,9 @@ private:
 	BPoint fFirstPoint;   // first point in image space of selection
 	bool fAnimateSelection; // marching ants
 	bool fbHasSelection;  // is fSelectionRect valid 
-	BRect fSelectionRect; // the selection in image space
+	BRect fSelectionRect; // the current location of the selection rectangle
+	BRect fCopyFromRect;
+		// the portion of the background bitmap the selection is made from
 	pattern fPatternUp, fPatternDown, fPatternLeft, fPatternRight;
 	
 	bool fSlideShow;
