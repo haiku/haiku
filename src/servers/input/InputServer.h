@@ -212,7 +212,6 @@ private:
 
 	sem_id 		fCursorSem;
 	port_id		fAsPort;
-	area_id		fAppArea;
 	area_id		fCloneArea;
 	uint32		*fAppBuffer;
 #endif 

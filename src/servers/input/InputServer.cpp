@@ -128,9 +128,9 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 		fCursorSem = buffer[0];
 		area_id appArea = buffer[1];
 		
-		fAppArea = clone_area("isClone", (void**)&fAppBuffer, B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, appArea);
-		if (fAppArea < B_OK) {
-			PRINT(("clone_area error : %s\n", strerror(fAppArea)));
+		fCloneArea = clone_area("isClone", (void**)&fAppBuffer, B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, appArea);
+		if (fCloneArea < B_OK) {
+			PRINT(("clone_area error : %s\n", strerror(fCloneArea)));
 		}
 
 		fAsPort = create_port(100, "is_as");
@@ -164,7 +164,7 @@ InputServer::~InputServer(void)
 	
 #ifdef COMPILE_FOR_R5
 	delete_port(fAsPort);
-	delete_area(fAppArea);
+	delete_area(fCloneArea);
 #endif
 
 #if DEBUG == 2
