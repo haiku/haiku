@@ -83,7 +83,7 @@ class RWLocker {
 			bool				ReadLock();
 			status_t			ReadLockWithTimeout(bigtime_t timeout);
 			void				ReadUnlock();
-			bool				IsReadLocked() const;
+			bool				IsReadLocked(bool orWriteLock = true) const;
 
 			bool				WriteLock();
 			status_t			WriteLockWithTimeout(bigtime_t timeout);

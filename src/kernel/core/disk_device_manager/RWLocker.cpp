@@ -118,15 +118,15 @@ RWLocker::ReadUnlock()
 
 // IsReadLocked
 //
-// Returns whether or not the calling thread owns a read lock or even a
-// write lock.
+// Returns whether or not the calling thread owns a read lock or, if
+// orWriteLock is true, at least a write lock.
 bool
-RWLocker::IsReadLocked() const
+RWLocker::IsReadLocked(bool orWriteLock) const
 {
 	bool result = false;
 	if (_AcquireBenaphore(fLock) == B_OK) {
 		thread_id thread = find_thread(NULL);
-		result = (thread == fWriter || _IndexOf(thread) >= 0);
+		result = ((orWriteLock && thread == fWriter) || _IndexOf(thread) >= 0);
 		_ReleaseBenaphore(fLock);
 	}
 	return result;
