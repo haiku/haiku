@@ -19,10 +19,6 @@
 #include <sys/stat.h>
 #include <ktypes.h>
 
-#if 1
-#include <isa.h>
-#endif
-
 static bool modules_disable_user_addons = false;
 
 #define debug_level_flow  0
@@ -946,8 +942,6 @@ int close_module_list(void *cookie)
  */
 int module_init( kernel_args *ka, module_info **sys_module_headers )
 {
-	int res;
-		
 	SHOW_FLOW0( 0, "\n" );
 	recursive_lock_create( &modules_lock );
 	
@@ -969,41 +963,6 @@ int module_init( kernel_args *ka, module_info **sys_module_headers )
 			return ENOMEM;
 	}
 */	
-	#if 1
-	{
-		isa_bus_manager *isa_interface;
-		int i;
-		char module_name[SYS_MAX_PATH_LEN];
-		size_t name_len;
-		const char prefix[] = "bus_managers";
-		void *modules_cookie;
-		
-		if ((res = get_module(ISA_MODULE_NAME, (module_info **)&isa_interface)) != 0) 
-			dprintf( "Cannot load isa module (%s)\n", strerror( res ));
-		else {
-
-			dprintf("ISA: Test : ");
-			for (i = 'A'; i <= 'Z'; ++i)
-				isa_interface->write_io_8(0xe9, i);
-			dprintf("\n");
-				
-			put_module(ISA_MODULE_NAME);
-		}
-		
-		modules_cookie = open_module_list( prefix );
-
-		name_len = sizeof(module_name);
-		while(read_next_module_name( modules_cookie, module_name, &name_len ) == 0)
-		{
-			dprintf( "Found module %s\n", module_name );
-			name_len = sizeof(module_name);
-			get_module(module_name, (module_info**)&isa_interface);
-		}
-
-		close_module_list( modules_cookie );		
-		dprintf( "done\n" );
-	}
-	#endif
 	
 	return B_NO_ERROR;
 }
