@@ -117,16 +117,6 @@ static mount_id gNextMountID = 0;
 
 
 /* function declarations */
-static int vfs_mount(char *path, const char *device, const char *fs_name, void *args, bool kernel);
-static int vfs_unmount(char *path, bool kernel);
-
-static ssize_t vfs_read(struct file_descriptor *, void *, off_t, size_t *);
-static ssize_t vfs_write(struct file_descriptor *, const void *, off_t, size_t *);
-static int vfs_ioctl(struct file_descriptor *, ulong, void *buf, size_t len);
-static status_t vfs_read_dir(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
-static status_t vfs_rewind_dir(struct file_descriptor *);
-static int vfs_read_stat(struct file_descriptor *, struct stat *);
-static int vfs_close(struct file_descriptor *, int, struct io_context *);
 
 // file descriptor operation prototypes
 static ssize_t file_read(struct file_descriptor *, off_t pos, void *buffer, size_t *);
@@ -158,12 +148,10 @@ static status_t common_ioctl(struct file_descriptor *, ulong, void *buf, size_t 
 static status_t common_read_stat(struct file_descriptor *, struct stat *);
 static status_t common_write_stat(struct file_descriptor *, const struct stat *, int statMask);
 
-static int vfs_open(char *path, int omode, bool kernel);
-static int vfs_open_dir(char *path, bool kernel);
-static int vfs_create(char *path, int omode, int perms, bool kernel);
-static int vfs_create_dir(char *path, int perms, bool kernel);
-
 static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize);
+static void inc_vnode_ref_count(struct vnode *vnode);
+static status_t dec_vnode_ref_count(struct vnode *vnode, bool reenter);
+static inline void put_vnode(struct vnode *vnode);
 
 struct fd_ops gFileOps = {
 	file_read,
@@ -280,6 +268,37 @@ find_mount(mount_id id)
 	mount = hash_lookup(gMountsTable, &id);
 
 	return mount;
+}
+
+
+static struct fs_mount *
+get_mount(mount_id id)
+{
+	struct fs_mount *mount;
+
+	mutex_lock(&gMountMutex);
+
+	mount = find_mount(id);
+	if (mount) {
+		// ToDo: the volume is locked (against removal) by locking
+		//	its root node - investigate if that's a good idea
+		if (mount->root_vnode)
+			inc_vnode_ref_count(mount->root_vnode);
+		else
+			mount = NULL;
+	}
+
+	mutex_unlock(&gMountMutex);
+
+	return mount;
+}
+
+
+static void
+put_mount(struct fs_mount *mount)
+{
+	if (mount)
+		put_vnode(mount->root_vnode);
 }
 
 
@@ -1021,7 +1040,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 
 	// add the mountpoint
 	length = strlen(vnode->mount->mount_point);
-	if (bufferSize - (sizeof(path) - insert) < length + 1) {
+	if (bufferSize - (sizeof(path) - insert) < (uint32)length + 1) {
 		status = ENOBUFS;
 		goto out;
 	}
@@ -1475,7 +1494,7 @@ int
 vfs_free_io_context(void *_ioContext)
 {
 	struct io_context *context = (struct io_context *)_ioContext;
-	int i;
+	uint32 i;
 
 	if (context->cwd)
 		dec_vnode_ref_count(context->cwd, false);
@@ -1510,7 +1529,7 @@ vfs_resize_fd_table(struct io_context *context, const int newSize)
 
 	mutex_lock(&context->io_mutex);
 
-	if (newSize < context->table_size) {
+	if ((size_t)newSize < context->table_size) {
 		// shrink the fd table
 		int i;
 
@@ -1720,7 +1739,6 @@ int
 vfs_bootstrap_all_filesystems(void)
 {
 	int err;
-	int fd;
 
 	// bootstrap the root filesystem
 	bootstrap_rootfs();
@@ -1853,7 +1871,8 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 	if ((status = get_new_fd(FDTYPE_FILE, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
 
-err:		
+	// something went wrong, clean up
+
 	FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, cookie);
 	FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
 	put_vnode(vnode);
@@ -1894,7 +1913,6 @@ open_vnode(struct vnode *vnode, int omode, bool kernel)
 static int
 open_dir_vnode(struct vnode *vnode, bool kernel)
 {
-	struct file_descriptor *descriptor;
 	fs_cookie cookie;
 	int status;
 
@@ -1907,7 +1925,6 @@ open_dir_vnode(struct vnode *vnode, bool kernel)
 	if (status >= 0)
 		return status;
 
-err:
 	FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
 	FS_CALL(vnode, free_dir_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
 
@@ -1923,7 +1940,6 @@ err:
 static int
 open_attr_dir_vnode(struct vnode *vnode, bool kernel)
 {
-	struct file_descriptor *descriptor;
 	fs_cookie cookie;
 	int status;
 
@@ -1936,7 +1952,6 @@ open_attr_dir_vnode(struct vnode *vnode, bool kernel)
 	if (status >= 0)
 		return status;
 
-err:
 	FS_CALL(vnode, close_attr_dir)(vnode->mount->cookie, vnode->private_node, cookie);
 	FS_CALL(vnode, free_attr_dir_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
 
@@ -1947,7 +1962,7 @@ err:
 static int
 file_create_entry_ref(mount_id mountID, vnode_id directoryID, const char *name, int openMode, int perms, bool kernel)
 {
-	struct vnode *directory,*vnode;
+	struct vnode *directory;
 	int status;
 
 	FUNCTION(("file_create_entry_ref: name = '%s', omode %x, perms %d, kernel %d\n", name, openMode, perms, kernel));
@@ -1968,9 +1983,7 @@ static int
 file_create(char *path, int openMode, int perms, bool kernel)
 {
 	char name[B_FILE_NAME_LENGTH];
-	struct vnode *directory, *vnode;
-	fs_cookie cookie;
-	vnode_id newID;
+	struct vnode *directory;
 	int status;
 
 	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path, openMode, perms, kernel));
@@ -2014,10 +2027,8 @@ file_open_entry_ref(mount_id mountID, vnode_id directoryID, const char *name, in
 static int
 file_open(char *path, int omode, bool kernel)
 {
-	struct file_descriptor *descriptor;
 	struct vnode *vnode = NULL;
 	int status;
-	int fd;
 
 	FUNCTION(("file_open: entry. path = '%s', omode %d, kernel %d\n", path, omode, kernel));
 
@@ -2692,7 +2703,6 @@ attr_create(int fd, const char *name, uint32 type, int openMode, bool kernel)
 	if ((status = get_new_fd(FDTYPE_ATTR, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
 
-err1:
 	FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, cookie);
 	FS_CALL(vnode, free_attr_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
 
@@ -2731,7 +2741,6 @@ attr_open(int fd, const char *name, int openMode, bool kernel)
 	if ((status = get_new_fd(FDTYPE_ATTR, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
 
-err1:
 	FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, cookie);
 	FS_CALL(vnode, free_attr_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
 
@@ -2939,40 +2948,35 @@ index_dir_open(mount_id mountID, bool kernel)
 {
 	struct fs_mount *mount;
 	fs_cookie cookie;
-	int status;
+	status_t status;
 
 	FUNCTION(("index_dir_open(mountID = %ld, kernel = %d)\n", mountID, kernel));
 
-	mutex_lock(&gMountMutex);	
-
-	mount = find_mount(mountID);
+	mount = get_mount(mountID);
 	if (mount == NULL)
-		goto err;
+		return B_BAD_VALUE;
 
-	// ToDo: lock the mount in some way - i.e. increment the root node's ref counter
-	mutex_unlock(&gMountMutex);	
-
-	if (FS_MOUNT_CALL(mount, open_index_dir) == NULL)
-		return EOPNOTSUPP;
+	if (FS_MOUNT_CALL(mount, open_index_dir) == NULL) {
+		status = EOPNOTSUPP;
+		goto out;
+	}
 
 	status = FS_MOUNT_CALL(mount, open_index_dir)(mount->cookie, &cookie);
 	if (status < B_OK)
-		return status;
+		goto out;
 
 	// get fd for the index directory
 	status = get_new_fd(FDTYPE_INDEX_DIR, (void *)mount, cookie, 0, kernel);
 	if (status >= 0)
-		return status;
+		goto out;
 
-err1:
+	// something went wrong
 	FS_MOUNT_CALL(mount, close_index_dir)(mount->cookie, cookie);
 	FS_MOUNT_CALL(mount, free_index_dir_cookie)(mount->cookie, cookie);
 
+out:
+	put_mount(mount);
 	return status;
-
-err:
-	mutex_unlock(&gMountMutex);	
-	return B_BAD_VALUE;
 }
 
 
@@ -3031,28 +3035,24 @@ static status_t
 index_create(mount_id mountID, const char *name, uint32 type, uint32 flags, bool kernel)
 {
 	struct fs_mount *mount;
-	fs_cookie cookie;
-	int status;
+	status_t status;
 
 	FUNCTION(("index_create(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
 
-	mutex_lock(&gMountMutex);	
-
-	mount = find_mount(mountID);
+	mount = get_mount(mountID);
 	if (mount == NULL)
-		goto err;
+		return B_BAD_VALUE;
 
-	// ToDo: lock the mount in some way - i.e. increment the root node's ref counter
-	mutex_unlock(&gMountMutex);	
+	if (FS_MOUNT_CALL(mount, create_index) == NULL) {
+		status = EROFS;
+		goto out;
+	}
 
-	if (FS_MOUNT_CALL(mount, create_index) == NULL)
-		return EROFS;
+	status = FS_MOUNT_CALL(mount, create_index)(mount->cookie, name, type, flags);
 
-	return FS_MOUNT_CALL(mount, create_index)(mount->cookie, name, type, flags);
-
-err:
-	mutex_unlock(&gMountMutex);	
-	return B_BAD_VALUE;
+out:
+	put_mount(mount);
+	return status;
 }
 
 
@@ -3075,28 +3075,24 @@ static status_t
 index_name_read_stat(mount_id mountID, const char *name, struct stat *stat, bool kernel)
 {
 	struct fs_mount *mount;
-	fs_cookie cookie;
-	int status;
+	status_t status;
 
 	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
 
-	mutex_lock(&gMountMutex);	
-
-	mount = find_mount(mountID);
+	mount = get_mount(mountID);
 	if (mount == NULL)
-		goto err;
+		return B_BAD_VALUE;
 
-	// ToDo: lock the mount in some way - i.e. increment the root node's ref counter
-	mutex_unlock(&gMountMutex);	
+	if (FS_MOUNT_CALL(mount, read_index_stat) == NULL) {
+		status = EOPNOTSUPP;
+		goto out;
+	}
 
-	if (FS_MOUNT_CALL(mount, read_index_stat) == NULL)
-		return EOPNOTSUPP;
+	status = FS_MOUNT_CALL(mount, read_index_stat)(mount->cookie, name, stat);
 
-	return FS_MOUNT_CALL(mount, read_index_stat)(mount->cookie, name, stat);
-
-err:
-	mutex_unlock(&gMountMutex);	
-	return B_BAD_VALUE;
+out:
+	put_mount(mount);
+	return status;
 }
 
 
@@ -3104,28 +3100,24 @@ static status_t
 index_remove(mount_id mountID, const char *name, bool kernel)
 {
 	struct fs_mount *mount;
-	fs_cookie cookie;
-	int status;
+	status_t status;
 
 	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
 
-	mutex_lock(&gMountMutex);	
-
-	mount = find_mount(mountID);
+	mount = get_mount(mountID);
 	if (mount == NULL)
-		goto err;
+		return B_BAD_VALUE;
 
-	// ToDo: lock the mount in some way - i.e. increment the root node's ref counter
-	mutex_unlock(&gMountMutex);	
+	if (FS_MOUNT_CALL(mount, remove_index) == NULL) {
+		status = EROFS;
+		goto out;
+	}
 
-	if (FS_MOUNT_CALL(mount, remove_index) == NULL)
-		return EROFS;
+	status = FS_MOUNT_CALL(mount, remove_index)(mount->cookie, name);
 
-	return FS_MOUNT_CALL(mount, remove_index)(mount->cookie, name);
-
-err:
-	mutex_unlock(&gMountMutex);	
-	return B_BAD_VALUE;
+out:
+	put_mount(mount);
+	return status;
 }
 
 
@@ -4276,7 +4268,6 @@ int
 user_create_attr(int fd, const char *userName, uint32 type, int openMode)
 {
 	char name[B_FILE_NAME_LENGTH];
-	status_t status;
 
 	if (!CHECK_USER_ADDRESS(userName)
 		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
