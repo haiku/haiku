@@ -20,3 +20,15 @@ void		pci_write_irq(uint8 bus, uint8 device, uint8 function, uint8 line, uint8 i
 
 extern int	gMaxBusDevices;
 extern bool gIrqRouterAvailable;
+
+#define PCI_LOCK_CONFIG(status) \
+{ \
+	status = disable_interrupts(); \
+	acquire_spinlock(&gConfigLock); \
+}
+
+#define PCI_UNLOCK_CONFIG(cpu_status) \
+{ \
+	release_spinlock(&gConfigLock); \
+	restore_interrupts(cpu_status); \
+}
