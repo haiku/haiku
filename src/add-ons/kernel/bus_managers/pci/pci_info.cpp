@@ -1,5 +1,6 @@
 #include <KernelExport.h>
 #include <PCI.h>
+#include "pci_info.h"
 #include "pci.h"
 
 
