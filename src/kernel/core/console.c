@@ -11,25 +11,15 @@
 
 #include <OS.h>
 #include <KernelExport.h>
+
 #include <boot/kernel_args.h>
 #include <console.h>
+#include <frame_buffer_console.h>
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <unistd.h>
 
-
-// ToDo: this mechanism will be changed so that these lines can go away
-#ifdef ARCH_x86
-#	include <arch/x86/console_dev.h>
-#else
-enum {
-	CONSOLE_OP_WRITEXY = 2376
-};
-#endif
-
-
-#include <fb_console.h>
 
 
 struct console_op_xy_struct {
@@ -57,7 +47,7 @@ kprintf(const char *fmt, ...)
 	}
 }
 
-
+#if 0
 void
 kprintf_xy(int x, int y, const char *fmt, ...)
 {
@@ -75,18 +65,11 @@ kprintf_xy(int x, int y, const char *fmt, ...)
 		ioctl(console_fd, CONSOLE_OP_WRITEXY, &buf, ret + sizeof(buf.x) + sizeof(buf.y));
 	}
 }
-
+#endif
 
 int
 con_init(kernel_args *args)
 {
-	/* now run the oddballs we have, consoles at present */
-	// ToDo: this mechanism will be changed so that these lines can go away
-#ifdef ARCH_x86
-	console_dev_init(args);
-#endif
-	fb_console_dev_init(args);
-
-	console_fd = open("/dev/console", O_RDWR);
-	return console_fd >= 0;
+	frame_buffer_console_init(args);
+	return B_OK;
 }

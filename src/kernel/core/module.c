@@ -43,6 +43,7 @@
 extern module_info gDeviceManagerModule;
 extern module_info gDeviceRootModule;
 extern module_info gDeviceForDriversModule;
+extern module_info gFrameBufferConsoleModule;
 
 // file systems
 extern module_info gRootFileSystem;
@@ -54,6 +55,7 @@ static module_info *sBuiltInModules[] = {
 	&gDeviceManagerModule,
 	&gDeviceRootModule,
 	&gDeviceForDriversModule,
+	&gFrameBufferConsoleModule,
 
 	&gRootFileSystem,
 	&gDeviceFileSystem,
