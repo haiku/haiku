@@ -32,7 +32,7 @@
 #include <stdio.h>
 
 #include <sys/types.h>
-#ifndef _MINIX
+#if !defined(_MINIX) && !defined(__BEOS__)
 #  include <sys/file.h>
 #endif
 #include "posixstat.h"
