@@ -140,24 +140,27 @@ void BMessage::_ReservedMessage3() {}
 
 //------------------------------------------------------------------------------
 BMessage::BMessage()
-	:	what(0)
+	:	what(0), fBody(NULL)
 {
 	init_data();
 }
 //------------------------------------------------------------------------------
 BMessage::BMessage(uint32 w)
+	:	fBody(NULL)
 {
 	init_data();
 	what = w;
 }
 //------------------------------------------------------------------------------
 BMessage::BMessage(const BMessage& a_message)
+	:	fBody(NULL)
 {
 	init_data();
 	*this = a_message;
 }
 //------------------------------------------------------------------------------
 BMessage::BMessage(BMessage *a_message)
+	:	fBody(NULL)
 {
 	init_data();
 	*this = *a_message;
