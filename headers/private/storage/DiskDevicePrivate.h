@@ -46,14 +46,10 @@ private:
 	partition_id		fID;
 };
 
-status_t get_unique_partition_mount_point(BPartition *partition,
-	BPath *mountPoint);
-
 }	// namespace BPrivate
 
 using BPrivate::PartitionFilter;
 using BPrivate::PartitionFilterVisitor;
 using BPrivate::IDFinderVisitor;
-using BPrivate::get_unique_partition_mount_point;
 
 #endif	// _DISK_DEVICE_PRIVATE_H

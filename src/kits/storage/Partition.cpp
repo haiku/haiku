@@ -10,6 +10,7 @@
 
 #include <syscalls.h>
 
+#include <Directory.h>
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
 #include <DiskDeviceVisitor.h>
@@ -365,6 +366,70 @@ BPartition::GetIcon(BBitmap *icon, icon_size which) const
 	return B_ERROR;
 }
 
+// GetMountPoint
+/*!	\brief Returns the mount point for the partition.
+
+	If the partition is mounted this is the actual mount point. If it is not
+	mounted, but contains a file system, derived from the partition name
+	the name for a not yet existing directory in the root directory is
+	constructed and the path to it returned.
+
+	For partitions not containing a file system the method returns an error.
+
+	\param mountPoint Pointer to the path to be set to refer the mount point
+		   (respectively potential mount point) of the partition.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
+status_t
+BPartition::GetMountPoint(BPath *mountPoint) const
+{
+	if (!mountPoint || !ContainsFileSystem())
+		return B_BAD_VALUE;
+
+	// if the partition is mounted, return the actual mount point
+	BVolume volume;
+	if (GetVolume(&volume) == B_OK) {
+		BDirectory dir;
+		status_t error = volume.GetRootDirectory(&dir);
+		if (error == B_OK)
+			error = mountPoint->SetTo(&dir, NULL);
+		return error;
+	}
+
+	// partition not mounted
+	// get the volume name
+	const char *volumeName = ContentName();
+	if (volumeName || strlen(volumeName) == 0)
+		volumeName = Name();
+	if (!volumeName || strlen(volumeName) == 0)
+		volumeName = "unnamed volume";
+
+	// construct a path name from the volume name
+	// replace '/'s and prepend a '/'
+	BString mountPointPath(volumeName);
+	mountPointPath.ReplaceAll('/', '-');
+	mountPointPath.Insert("/", 0);
+
+	// make the name unique
+	BString basePath(mountPointPath);
+	int counter = 1;
+	while (true) {
+		BEntry entry;
+		status_t error = entry.SetTo(mountPointPath.String());
+		if (error != B_OK)
+			return error;
+
+		if (!entry.Exists())
+			break;
+		mountPointPath = basePath;
+		mountPointPath << counter;
+		counter++;
+	}
+
+	return mountPoint->SetTo(mountPointPath.String());
+}
+
+
 // Mount
 /*!	\brief Mounts the volume.
 
@@ -401,7 +466,7 @@ BPartition::Mount(const char *mountPoint, uint32 mountFlags,
 	BPath mountPointPath;
 	if (!mountPoint) {
 		// get a unique mount point
-		error = get_unique_partition_mount_point(this, &mountPointPath);
+		error = GetMountPoint(&mountPointPath);
 		if (error != B_OK)
 			return error;
 

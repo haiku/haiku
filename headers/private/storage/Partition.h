@@ -17,6 +17,7 @@ class BDiskDeviceParameterEditor;
 class BDiskDeviceVisitor;
 class BDiskSystem;
 class BPartitioningInfo;
+class BPath;
 class BVolume;
 struct user_partition_data;
 
@@ -52,6 +53,7 @@ public:
 	virtual status_t GetPath(BPath *path) const;
 	status_t GetVolume(BVolume *volume) const;
 	status_t GetIcon(BBitmap *icon, icon_size which) const;
+	status_t GetMountPoint(BPath *mountPoint) const;
 
 	status_t Mount(const char *mountPoint = NULL, uint32 mountFlags = 0,
 		const char *parameters = NULL);
