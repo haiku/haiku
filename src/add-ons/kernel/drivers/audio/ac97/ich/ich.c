@@ -491,44 +491,42 @@ init_driver(void)
 	}
 	
 	dump_hardware_regs();
-	
+
 	/* We don't do a cold reset here, because this would reset general purpose
 	 * IO pins of the controller. These pins can be used by the machine vendor
 	 * to control external amplifiers, and resetting them prevents audio output
 	 * on some notebooks, like "Compaq Presario 2700".
-	 * If a cold reset is still in progress, we need to finish it.
-	 * We perform a warm reset, this should be save to do, as it is required
-	 * to leave some power down modes.
+	 * If a cold reset is still in progress, we need to finish it by writing
+	 * a 1 to the cold reset bit (CNT_COLD). We do not preserve others bits,
+	 * since this can have strange effects (at least on my system, playback
+	 * speed is 320% in this case).
+	 * Doing a warm reset it required to leave certain power down modes. Warm
+	 * reset does also reset GPIO pins, but the ICH hardware does only execute
+	 * the reset request if BIT_CLOCK is not running and if it's really required.
 	 */
-	val = ich_reg_read_32(ICH_REG_GLOB_CNT);
-	if ((val & CNT_COLD) == 0) {
-		LOG(("finishing cold reset\n"));
-		// need to write 1-bit to finish cold reset
-		val |= CNT_COLD;
-	} else {
-		LOG(("performing warm reset\n"));
-		// need to write 1-bit to start warm reset
-		val |= CNT_WARM;
-	}
-	val &= ~CNT_SHUT; // enable AC-link
-	ich_reg_write_32(ICH_REG_GLOB_CNT, val);
+	LOG(("reset starting, ICH_REG_GLOB_CNT = 0x%08x\n", ich_reg_read_32(ICH_REG_GLOB_CNT)));
+	DEBUG_ONLY(start = system_time());
+	// finish cold reset by writing a 1 and clear all other bits to 0
+	ich_reg_write_32(ICH_REG_GLOB_CNT, CNT_COLD);
 	ich_reg_read_32(ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
+	snooze(20000);
+	// request warm reset by setting the bit, it will clear when reset is done
+	ich_reg_write_32(ICH_REG_GLOB_CNT, ich_reg_read_32(ICH_REG_GLOB_CNT) | CNT_WARM);
+	ich_reg_read_32(ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
+	snooze(20000);
 	// wait up to 1 second for warm reset to be finished
 	for (i = 0; i < 20; i++) {
-		if ((ich_reg_read_32(ICH_REG_GLOB_CNT) & CNT_WARM) == 0)
+		val = ich_reg_read_32(ICH_REG_GLOB_CNT);
+		if ((val & CNT_WARM) == 0 && (val & CNT_COLD) != 0)
 			break;
 		snooze(50000);
 	}
-	if ((ich_reg_read_32(ICH_REG_GLOB_CNT) & CNT_COLD) == 0) {
-		LOG(("cold reset failed\n"));
+	if (i == 20) {
+		LOG(("reset failed, ICH_REG_GLOB_CNT = 0x%08x\n", val));
 		unmap_io_memory();
 		return B_ERROR;
 	}
-	if ((ich_reg_read_32(ICH_REG_GLOB_CNT) & CNT_WARM) != 0) {
-		LOG(("warm reset failed\n"));
-		unmap_io_memory();
-		return B_ERROR;
-	}
+	LOG(("reset finished after %Ld, ICH_REG_GLOB_CNT = 0x%08x\n", system_time() - start, val));
 
 	/* detect which codecs are ready */
 	s0cr = s1cr = s2cr = false;
