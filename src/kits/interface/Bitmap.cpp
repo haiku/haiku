@@ -35,6 +35,7 @@
 #include <InterfaceDefs.h>
 #include <Locker.h>
 #include <OS.h>
+#include <View.h>
 
 // Includes to be able to talk to the app_server
 #include <Application.h>
@@ -837,20 +838,61 @@ BBitmap::~BBitmap()
 
 // unarchiving constructor
 /*!	\brief Unarchives a bitmap from a BMessage.
-
-	Implements BFlattenable.
-
 	\param data The archive.
 */
 BBitmap::BBitmap(BMessage *data)
+	: BArchivable(data),
+	  fBasePtr(NULL),
+	  fSize(0),
+	  fColorSpace(B_NO_COLOR_SPACE),
+	  fBounds(0, 0, -1, -1),
+	  fBytesPerRow(0),
+	  fWindow(NULL),
+	  fServerToken(-1),
+	  fToken(-1),
+	  fArea(-1),
+	  fOrigArea(-1),
+	  fFlags(0),
+	  fInitError(B_NO_INIT)
 {
+	BRect bounds;
+	data->FindRect("_frame", &bounds);
+	
+	color_space cspace;
+	data->FindInt32("_cspace", (int32 *)&cspace);
+	
+	int32 flags = 0;
+	data->FindInt32("_bmflags", &flags);
+	
+	int32 rowbytes = 0;
+	data->FindInt32("_rowbytes", &rowbytes);
+	
+	InitObject(bounds, cspace, flags, rowbytes, B_MAIN_SCREEN_ID);
+	
+	if (data->HasData("_data", B_RAW_TYPE) && InitCheck() == B_OK) {
+			ssize_t size = 0;
+			const void *buffer;
+			if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK)
+				memcpy(fBasePtr, buffer, size);
+	}
+	
+	if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
+		BArchivable *obj;
+		BMessage message;
+		int i = 0;
+		
+		while (data->FindMessage("_view", i++, &message) == B_OK) {
+			obj = instantiate_object(&message);
+			BView *view = dynamic_cast<BView *>(obj);
+			
+			if (view)
+				AddChild(view);
+		}
+	}
 }
 
 // Instantiate
 /*!	\brief Instantiates a BBitmap from an archive.
-
-	Implements BFlattenable.
-
 	\param data The archive.
 	\return A bitmap reconstructed from the archive or \c NULL, if an error
 			occured.
@@ -858,14 +900,14 @@ BBitmap::BBitmap(BMessage *data)
 BArchivable *
 BBitmap::Instantiate(BMessage *data)
 {
-	return NULL;	// not implemented
+	if (validate_instantiation(data, "BBitmap"))
+		return new BBitmap(data);
+	
+	return NULL;
 }
 
 // Archive
 /*!	\brief Archives the BBitmap object.
-
-	Implements BFlattenable.
-
 	\param data The archive.
 	\param deep \c true, if child object shall be archived as well, \c false
 		   otherwise.
@@ -874,7 +916,30 @@ BBitmap::Instantiate(BMessage *data)
 status_t
 BBitmap::Archive(BMessage *data, bool deep) const
 {
-	return NOT_IMPLEMENTED;
+	BArchivable::Archive(data, deep);
+	
+	data->AddRect("_frame", fBounds);
+	data->AddInt32("_cspace", (int32)fColorSpace);
+	data->AddInt32("_bmflags", fFlags);
+	data->AddInt32("_rowbytes", fBytesPerRow);
+	
+	if (deep) {
+		if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
+			BMessage views;
+			for (int32 i = 0; i < CountChildren(); i++) {
+				if (ChildAt(i)->Archive(&views, deep))
+					data->AddMessage("_views", &views);
+			}
+		}
+		// Note: R5 does not archive the data if B_BITMAP_IS_CONTIGNUOUS is
+		// true and it does save all formats as B_RAW_TYPE and it does save
+		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
+		// the BeBook)
+			
+		data->AddData("_data", B_RAW_TYPE, fBasePtr, fSize);
+	}
+	
+	return B_OK;
 }
 
 // InitCheck
