@@ -42,6 +42,20 @@
 
 // Globals ---------------------------------------------------------------------
 
+// Enumerated types ------------------------------------------------------------
+
+typedef enum
+{
+	B_CURSOR_DEFAULT=0,
+	B_CURSOR_TEXT,
+	B_CURSOR_MOVE,
+	B_CURSOR_DRAG,
+	B_CURSOR_RESIZE,
+	B_CURSOR_RESIZE_NW,
+	B_CURSOR_RESIZE_SE,
+	B_CURSOR_RESIZE_NS,
+	B_CURSOR_RESIZE_EW
+} cursor_which;
 
 // BCursor class ---------------------------------------------------------------
 class BCursor : BArchivable {
