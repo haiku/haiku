@@ -9,7 +9,6 @@
 extern "C" {
 #endif
 
-//#include <types.h>
 #include <SupportDefs.h>
 
 typedef uint16 mode_t;
@@ -23,12 +22,9 @@ typedef int32  port_id;
 typedef int32  image_id;
 typedef uint32 dev_t;
 typedef uint64 ino_t;
-typedef uint64 vnode_id;
-typedef uint32 fs_id;
 typedef uint16 nlink_t;
 typedef uint32 uid_t;
 typedef uint32 gid_t;
-//typedef int32 status_t;
 
 
 #ifndef NULL
@@ -57,21 +53,10 @@ typedef unsigned short          u_short;
 typedef unsigned int            u_int;
 typedef unsigned long           u_long;
 
-//typedef unsigned char           uchar;
-//typedef unsigned short          ushort; 
-//typedef unsigned int            uint;
-//typedef unsigned long           ulong;
-
 typedef unsigned long			addr;
-
-// Handled in arch_ktypes.h
-
-//typedef unsigned long addr;
-
-//typedef uint32                  socklen_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif	/* _KERNEL_KTYPES_H */

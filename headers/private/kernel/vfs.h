@@ -41,9 +41,9 @@ int vfs_setrlimit(int resource, const struct rlimit * rlp);
 image_id vfs_load_fs_module(const char *path);
 
 /* calls needed by fs internals */
-int vfs_get_vnode(fs_id fsid, vnode_id vnid, fs_vnode *v);
-int vfs_put_vnode(fs_id fsid, vnode_id vnid);
-int vfs_remove_vnode(fs_id fsid, vnode_id vnid);
+int vfs_get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *v);
+int vfs_put_vnode(mount_id mountID, vnode_id vnodeID);
+int vfs_remove_vnode(mount_id mountID, vnode_id vnodeID);
 
 /* calls needed by the VM for paging */
 int vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode);

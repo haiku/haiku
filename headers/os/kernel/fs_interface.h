@@ -13,6 +13,8 @@ struct dirent;
 struct stat;
 struct fs_info;
 
+typedef dev_t mount_id;
+typedef ino_t vnode_id;
 
 /* the file system's private data structures */
 typedef void *fs_volume;
@@ -40,7 +42,7 @@ extern "C" {
 
 struct fs_calls {
 	/* general operations */
-	status_t (*mount)(fs_id id, const char *device, void *args, fs_volume *_fs, vnode_id *_rootVnodeID);
+	status_t (*mount)(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_id *_rootVnodeID);
 	status_t (*unmount)(fs_volume fs);
 
 	status_t (*read_fs_info)(fs_volume fs, struct fs_info *info);
