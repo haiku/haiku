@@ -1396,11 +1396,57 @@ BParameter::GetValue(void *buffer, size_t *ioSize, bigtime_t *when)
 status_t
 BParameter::SetValue(const void *buffer, size_t size, bigtime_t when)
 {
-	UNIMPLEMENTED();
-	/*
-	 * XXX ToDo! call BControllable::SetControlValue() here.
-	 */
-	return B_BAD_VALUE;
+	CALLED();
+
+	controllable_set_parameter_data_request request;
+	controllable_set_parameter_data_reply reply;
+	media_node node;
+	area_id area;
+	status_t rv;
+	void *data;
+
+	if (buffer == 0)
+		return B_BAD_VALUE;
+	if (size <= 0)
+		return B_NO_MEMORY;
+		
+	if (mWeb == 0) {
+		FATAL("BParameter::SetValue: no parent BParameterWeb\n");
+		return B_NO_INIT;
+	}
+	
+	node = mWeb->Node();
+	if (IS_INVALID_NODE(node)) {
+		FATAL("BParameter::SetValue: the parent BParameterWeb is not assigned to a BMediaNode\n");
+		return B_NO_INIT;
+	}
+	
+	if (size > MAX_PARAMETER_DATA) {
+		// create an area if large data needs to be transfered
+		area = create_area("set parameter data", &data, B_ANY_ADDRESS, ROUND_UP_TO_PAGE(size), B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		if (area < B_OK) {
+			FATAL("BParameter::SetValue can't create area of %ld bytes\n", size);
+			return B_NO_MEMORY;
+		}
+	} else {
+		area = -1;
+		data = request.rawdata;
+	}
+
+	memcpy(data, buffer, size);
+	request.parameter_id = mID;
+	request.when = when;
+	request.area = area;
+	request.size = size;
+
+	rv = QueryPort(node.port, CONTROLLABLE_SET_PARAMETER_DATA, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		FATAL("BParameter::SetValue querying node failed\n");
+
+	if (area != -1)
+		delete_area(area);
+	
+	return rv;
 }
 
 

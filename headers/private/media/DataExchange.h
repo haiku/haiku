@@ -882,7 +882,7 @@ struct controllable_get_parameter_data_request : public request_data
 {
 	int32 parameter_id;
 	size_t requestsize;
-	area_id area; //if area != -1, data is to large and must be passed in area
+	area_id area; //if area != -1, data is too large and must be passed in the area
 };
 
 struct controllable_get_parameter_data_reply : public reply_data
@@ -892,5 +892,17 @@ struct controllable_get_parameter_data_reply : public reply_data
 	size_t size;
 };
 
+struct controllable_set_parameter_data_request : public request_data
+{
+	int32 parameter_id;
+	bigtime_t when;
+	area_id area; //if area != -1, data is too large and is passed in the area
+	size_t size;
+	char rawdata[MAX_PARAMETER_DATA];
+};
+
+struct controllable_set_parameter_data_reply : public reply_data
+{
+};
 
 #endif // _DATA_EXCHANGE_H
