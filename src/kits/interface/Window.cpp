@@ -795,7 +795,7 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			if ( !handleKeyDown( string[0], (uint32)modifiers) )
 			{
 				if(fFocus)
-					fFocus->KeyDown( string, strlen(string)-1 );
+					fFocus->KeyDown( string, strlen(string) );
 				else
 					printf("Adi: No Focus\n");
 			}
@@ -808,7 +808,7 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindString( "bytes", &string );
 
 			if(fFocus)
-				fFocus->KeyUp( string, strlen(string)-1 );
+				fFocus->KeyUp( string, strlen(string) );
 
 			break;
 		}
@@ -2713,7 +2713,7 @@ bool BWindow::handleKeyDown( const char key, uint32 modifiers){
 		const char		*chars;		// just to be sure
 		CurrentMessage()->FindString("bytes", &chars);
 
-		DefaultButton()->KeyDown( chars, strlen(chars)-1 );
+		DefaultButton()->KeyDown( chars, strlen(chars) );
 		return true;
 	}
 
