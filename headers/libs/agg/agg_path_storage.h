@@ -166,11 +166,6 @@ namespace agg
                       bool solid_path = false,
                       unsigned end_flags = path_flags_none);
 
-        void add_vertices(const double* vertices, unsigned num)
-        {
-            add_poly(vertices, num, path_flags_none);
-        }
-
         template<class VertexSource> 
         void add_path(VertexSource& vs, 
                       unsigned path_id = 0, 

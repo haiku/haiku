@@ -148,34 +148,6 @@ namespace agg
     };
 
 
-    
-    //----------------------------------------------------------clipping_flags
-    // Determine the clipping code of the vertex according to the 
-    // Cyrus-Beck line clipping algorithm
-    //
-    //        |        |
-    //  0110  |  0010  | 0011
-    //        |        |
-    // -------+--------+-------- clip_box.y2
-    //        |        |
-    //  0100  |  0000  | 0001
-    //        |        |
-    // -------+--------+-------- clip_box.y1
-    //        |        |
-    //  1100  |  1000  | 1001
-    //        |        |
-    //  clip_box.x1  clip_box.x2
-    //
-    // 
-    inline unsigned clipping_flags(int x, int y, const rect& clip_box)
-    {
-        return  (x > clip_box.x2) |
-               ((y > clip_box.y2) << 1) |
-               ((x < clip_box.x1) << 2) |
-               ((y < clip_box.y1) << 3);
-    }
-
-
     //==================================================rasterizer_scanline_aa
     // Polygon rasterizer that is used to render filled polygons with 
     // high-quality Anti-Aliasing. Internally, by default, the class uses 
@@ -207,7 +179,7 @@ namespace agg
     //
     // filling_rule() and gamma() can be called anytime before "sweeping".
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift=8> class rasterizer_scanline_aa
+    template<unsigned XScale=1, unsigned AA_Shift=8> class rasterizer_scanline_aa
     {
         enum status
         {
@@ -455,9 +427,9 @@ namespace agg
     private:
         //--------------------------------------------------------------------
         // Disable copying
-        rasterizer_scanline_aa(const rasterizer_scanline_aa<AA_Shift>&);
-        const rasterizer_scanline_aa<AA_Shift>& 
-            operator = (const rasterizer_scanline_aa<AA_Shift>&);
+        rasterizer_scanline_aa(const rasterizer_scanline_aa<XScale, AA_Shift>&);
+        const rasterizer_scanline_aa<XScale, AA_Shift>& 
+            operator = (const rasterizer_scanline_aa<XScale, AA_Shift>&);
 
         //--------------------------------------------------------------------
         void move_to_no_clip(int x, int y);
@@ -492,23 +464,23 @@ namespace agg
 
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::reset() 
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::reset() 
     { 
         m_outline.reset(); 
         m_status = status_initial;
     }
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::filling_rule(filling_rule_e filling_rule) 
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::filling_rule(filling_rule_e filling_rule) 
     { 
         m_filling_rule = filling_rule; 
     }
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::clip_box(double x1, double y1, double x2, double y2)
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::clip_box(double x1, double y1, double x2, double y2)
     {
         reset();
         m_clip_box = rect(poly_coord(x1), poly_coord(y1),
@@ -518,8 +490,8 @@ namespace agg
     }
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::reset_clipping()
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::reset_clipping()
     {
         reset();
         m_clipping = false;
@@ -528,14 +500,14 @@ namespace agg
 
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::move_to_no_clip(int x, int y)
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::move_to_no_clip(int x, int y)
     {
         if(m_status == status_line_to)
         {
             close_polygon_no_clip();
         }
-        m_outline.move_to(x, y); 
+        m_outline.move_to(x * XScale, y); 
         m_clipped_start_x = x;
         m_clipped_start_y = y;
         m_status = status_line_to;
@@ -543,32 +515,32 @@ namespace agg
 
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::line_to_no_clip(int x, int y)
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::line_to_no_clip(int x, int y)
     {
         if(m_status != status_initial)
         {
-            m_outline.line_to(x, y); 
+            m_outline.line_to(x * XScale, y); 
             m_status = status_line_to;
         }
     }
 
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::close_polygon_no_clip()
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::close_polygon_no_clip()
     {
         if(m_status == status_line_to)
         {
-            m_outline.line_to(m_clipped_start_x, m_clipped_start_y);
+            m_outline.line_to(m_clipped_start_x * XScale, m_clipped_start_y);
             m_status = status_closed;
         }
     }
 
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::clip_segment(int x, int y) 
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::clip_segment(int x, int y) 
     {
         unsigned flags = clipping_flags(x, y, m_clip_box);
         if(m_prev_flags == flags)
@@ -615,8 +587,8 @@ namespace agg
 
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::add_vertex(double x, double y, unsigned cmd)
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::add_vertex(double x, double y, unsigned cmd)
     {
         if(is_close(cmd))
         {
@@ -641,8 +613,8 @@ namespace agg
 
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::move_to(int x, int y) 
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::move_to(int x, int y) 
     { 
         if(m_clipping)
         {
@@ -670,8 +642,8 @@ namespace agg
     }
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::line_to(int x, int y) 
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::line_to(int x, int y) 
     { 
         if(m_clipping)
         {
@@ -684,8 +656,8 @@ namespace agg
     }
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::close_polygon() 
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::close_polygon() 
     { 
         if(m_clipping)
         {
@@ -695,23 +667,23 @@ namespace agg
     }
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::move_to_d(double x, double y) 
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::move_to_d(double x, double y) 
     { 
         move_to(poly_coord(x), poly_coord(y)); 
     }
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    void rasterizer_scanline_aa<AA_Shift>::line_to_d(double x, double y) 
+    template<unsigned XScale, unsigned AA_Shift> 
+    void rasterizer_scanline_aa<XScale, AA_Shift>::line_to_d(double x, double y) 
     { 
         line_to(poly_coord(x), poly_coord(y)); 
     }
 
 
     //------------------------------------------------------------------------
-    template<unsigned AA_Shift> 
-    bool rasterizer_scanline_aa<AA_Shift>::hit_test(int tx, int ty)
+    template<unsigned XScale, unsigned AA_Shift> 
+    bool rasterizer_scanline_aa<XScale, AA_Shift>::hit_test(int tx, int ty)
     {
         close_polygon();
         const cell_aa* const* cells = m_outline.cells();

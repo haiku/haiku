@@ -54,7 +54,8 @@ namespace agg
         //--------------------------------------------------------------------
         color_type* generate(int x, int y, unsigned len)
         {
-            base_type::interpolator().begin(x, y, len);
+            base_type::interpolator().begin(x + base_type::filter_dx_dbl(), 
+                                            y + base_type::filter_dy_dbl(), len);
 
             int fg[4];
 
@@ -139,7 +140,8 @@ namespace agg
         //--------------------------------------------------------------------
         color_type* generate(int x, int y, unsigned len)
         {
-            base_type::interpolator().begin(x, y, len);
+            base_type::interpolator().begin(x + base_type::filter_dx_dbl(), 
+                                            y + base_type::filter_dy_dbl(), len);
 
             int fg[4];
             int back_r = base_type::background_color().r;
@@ -162,8 +164,12 @@ namespace agg
 
                 base_type::interpolator().coordinates(&x_hr, &y_hr);
 
+                x_hr -= base_type::filter_dx_int();
+                y_hr -= base_type::filter_dy_int();
+
                 int x_lr = x_hr >> image_subpixel_shift;
                 int y_lr = y_hr >> image_subpixel_shift;
+
                 int weight;
 
                 if(x_lr >= 0    && y_lr >= 0 &&
@@ -176,6 +182,7 @@ namespace agg
 
                     x_hr &= image_subpixel_mask;
                     y_hr &= image_subpixel_mask;
+
                     fg_ptr = base_type::source_image().row(y_lr) + (x_lr << 2);
 
                     weight = (image_subpixel_size - x_hr) * 
@@ -362,7 +369,8 @@ namespace agg
         //--------------------------------------------------------------------
         color_type* generate(int x, int y, unsigned len)
         {
-            base_type::interpolator().begin(x, y, len);
+            base_type::interpolator().begin(x + base_type::filter_dx_dbl(), 
+                                            y + base_type::filter_dy_dbl(), len);
 
             int fg[4];
 
@@ -393,6 +401,9 @@ namespace agg
             do
             {
                 base_type::interpolator().coordinates(&x, &y);
+
+                x -= base_type::filter_dx_int();
+                y -= base_type::filter_dy_int();
 
                 int x_hr = x; 
                 int y_hr = y; 
@@ -446,10 +457,10 @@ namespace agg
                     if(fg[2] < 0) fg[2] = 0;
                     if(fg[3] < 0) fg[3] = 0;
 
-                    if(fg[0] > 255) fg[0] = 255;
-                    if(fg[1] > 255) fg[1] = 255;
-                    if(fg[2] > 255) fg[2] = 255;
-                    if(fg[3] > 255) fg[3] = 255;
+                    if(fg[Order::A] > 255)          fg[Order::A] = 255;
+                    if(fg[Order::R] > fg[Order::A]) fg[Order::R] = fg[Order::A];
+                    if(fg[Order::G] > fg[Order::A]) fg[Order::G] = fg[Order::A];
+                    if(fg[Order::B] > fg[Order::A]) fg[Order::B] = fg[Order::A];
                 }
                 else
                 {
@@ -517,10 +528,10 @@ namespace agg
                         if(fg[2] < 0) fg[2] = 0;
                         if(fg[3] < 0) fg[3] = 0;
 
-                        if(fg[0] > 255) fg[0] = 255;
-                        if(fg[1] > 255) fg[1] = 255;
-                        if(fg[2] > 255) fg[2] = 255;
-                        if(fg[3] > 255) fg[3] = 255;
+                        if(fg[Order::A] > 255)          fg[Order::A] = 255;
+                        if(fg[Order::R] > fg[Order::A]) fg[Order::R] = fg[Order::A];
+                        if(fg[Order::G] > fg[Order::A]) fg[Order::G] = fg[Order::A];
+                        if(fg[Order::B] > fg[Order::A]) fg[Order::B] = fg[Order::A];
                     }
                 }
 

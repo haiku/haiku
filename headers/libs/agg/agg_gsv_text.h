@@ -132,8 +132,8 @@ namespace agg
         void rewind(unsigned id) 
         { 
             m_trans.rewind(id); 
-            m_polyline.line_join(vcgen_stroke::round_join);
-            m_polyline.line_cap(vcgen_stroke::round_cap);
+            m_polyline.line_join(round_join);
+            m_polyline.line_cap(round_cap);
         }
 
         unsigned vertex(double* x, double* y)

@@ -29,6 +29,16 @@ namespace agg
     template<class T> class row_ptr_cache
     {
     public:
+        //--------------------------------------------------------------------
+        struct row_data
+        {
+            int x1, x2;
+            const int8u* ptr;
+            row_data() {}
+            row_data(int x1_, int x2_, const int8u* ptr_) : 
+                x1(x1_), x2(x2_), ptr(ptr_) {}
+        };
+
         //-------------------------------------------------------------------
         ~row_ptr_cache()
         {
@@ -121,6 +131,22 @@ namespace agg
                 memcpy(row(y), mtx.row(y), l);
             }
         }
+
+        //--------------------------------------------------------------------
+        void clear(T value)
+        {
+            unsigned y;
+            for(y = 0; y < height(); y++)
+            {
+                T* p = row(y);
+                unsigned x;
+                for(x = 0; x < stride_abs(); x++)
+                {
+                    *p++ = value;
+                }
+            }
+        }
+
 
     private:
         //--------------------------------------------------------------------

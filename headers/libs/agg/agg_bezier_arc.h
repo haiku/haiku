@@ -39,6 +39,7 @@ namespace agg
     class bezier_arc
     {
     public:
+        //--------------------------------------------------------------------
         bezier_arc() : m_vertex(26) {}
         bezier_arc(double x,  double y, 
                    double rx, double ry, 
@@ -48,6 +49,7 @@ namespace agg
             init(x, y, rx, ry, start_angle, sweep_angle);
         }
 
+        //--------------------------------------------------------------------
         void init(double x,  double y, 
                   double rx, double ry, 
                   double start_angle, 

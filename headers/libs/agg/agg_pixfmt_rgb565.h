@@ -36,6 +36,8 @@ namespace agg
     {
     public:
         typedef rgba8 color_type;
+        typedef bool  order_type;
+        typedef rendering_buffer::row_data row_data;
 
         //--------------------------------------------------------------------
         pixfmt_rgb565(rendering_buffer& rb)
@@ -48,12 +50,18 @@ namespace agg
         unsigned height() const { return m_rbuf->height(); }
 
         //--------------------------------------------------------------------
-        color_type pixel(int x, int y)
+        color_type pixel(int x, int y) const
         {
             unsigned rgb = ((int16u*)(m_rbuf->row(y)))[x];
             return color_type((rgb >> 8) & 0xF8, 
                               (rgb >> 3) & 0xFC, 
                               (rgb << 3) & 0xF8);
+        }
+
+        //--------------------------------------------------------------------
+        row_data span(int x, int y) const
+        {
+            return row_data(x, width() - 1, m_rbuf->row(y) + x * 2);
         }
 
         //--------------------------------------------------------------------

@@ -72,9 +72,13 @@ namespace agg
                         if(x < xmin)
                         {
                             len -= xmin - x;
-                            covers += xmin - x;
+                            if(!solid) 
+                            {
+                                covers += xmin - x;
+                            }
                             x = xmin;
                         }
+
                         if(len > 0)
                         {
                             if(x + len > xmax)

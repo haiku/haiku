@@ -303,12 +303,13 @@ namespace agg
 
                 sp.x         = span_iterator->x;
                 sp.len       = span_iterator->len;
+                int len      = abs(int(sp.len));
                 sp.covers_id = 
                     m_covers.add_cells(span_iterator->covers, 
-                                       unsigned(abs(int(sp.len))));
+                                       unsigned(len));
                 m_spans.add(sp);
                 int x1 = sp.x;
-                int x2 = sp.x + sp.len - 1;
+                int x2 = sp.x + len - 1;
                 if(x1 < m_min_x) m_min_x = x1;
                 if(x2 > m_max_x) m_max_x = x2;
                 ++span_iterator;

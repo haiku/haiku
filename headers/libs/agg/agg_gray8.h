@@ -30,6 +30,7 @@ namespace agg
     //===================================================================gray8
     struct gray8 
     {
+        typedef int8u alpha_type;
         int8u v;
         int8u a;
 

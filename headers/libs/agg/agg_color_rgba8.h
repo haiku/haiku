@@ -38,6 +38,7 @@ namespace agg
     //==================================================================rgba8
     struct rgba8 
     {
+        typedef int8u alpha_type;
         enum order  { rgb, bgr  };
         enum premul { pre };
 
@@ -230,7 +231,7 @@ namespace agg
 
 
     //------------------------------------------------------------------------
-    inline rgba8 rgba8_pre(unsigned r, unsigned g, unsigned b, unsigned a=1.0)
+    inline rgba8 rgba8_pre(unsigned r, unsigned g, unsigned b, unsigned a=255)
     {
         return rgba8(rgba8::pre, r, g, b, a);
     }

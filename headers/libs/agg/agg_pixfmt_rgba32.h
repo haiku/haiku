@@ -29,6 +29,8 @@ namespace agg
     {
     public:
         typedef rgba8 color_type;
+        typedef Order order_type;
+        typedef rendering_buffer::row_data row_data;
 
         //--------------------------------------------------------------------
         pixel_formats_rgba32(rendering_buffer& rb)
@@ -41,10 +43,16 @@ namespace agg
         unsigned height() const { return m_rbuf->height(); }
 
         //--------------------------------------------------------------------
-        color_type pixel(int x, int y)
+        color_type pixel(int x, int y) const
         {
             int8u* p = m_rbuf->row(y) + (x << 2);
             return color_type(p[Order::R], p[Order::G], p[Order::B], p[Order::A]);
+        }
+
+        //--------------------------------------------------------------------
+        row_data span(int x, int y) const
+        {
+            return row_data(x, width() - 1, m_rbuf->row(y) + (x << 2));
         }
 
         //--------------------------------------------------------------------
@@ -205,6 +213,59 @@ namespace agg
             memmove(m_rbuf->row(ydst) + xdst * 4, 
                     (const void*)(from.row(ysrc) + xsrc * 4), len * 4);
         }
+
+
+
+        //--------------------------------------------------------------------
+        template<class SrcPixelFormatRenderer>
+        void blend_from(const SrcPixelFormatRenderer& from, 
+                        const int8u* psrc,
+                        int xdst, int ydst,
+                        int xsrc, int ysrc,
+                        unsigned len)
+        {
+            typedef typename SrcPixelFormatRenderer::order_type src_order;
+
+            int8u* pdst = m_rbuf->row(ydst) + (xdst << 2);
+            int incp = 4;
+            if(xdst > xsrc)
+            {
+                psrc += (len-1) << 2;
+                pdst += (len-1) << 2;
+                incp = -4;
+            }
+            do 
+            {
+                int alpha = psrc[src_order::A];
+
+                if(alpha)
+                {
+                    if(alpha == 255)
+                    {
+                        pdst[Order::R] = psrc[src_order::R];
+                        pdst[Order::G] = psrc[src_order::G];
+                        pdst[Order::B] = psrc[src_order::B];
+                        pdst[Order::A] = psrc[src_order::A];
+                    }
+                    else
+                    {
+                        int r = pdst[Order::R];
+                        int g = pdst[Order::G];
+                        int b = pdst[Order::B];
+                        int a = pdst[Order::A];
+                        pdst[Order::R] = (int8u)((((psrc[src_order::R] - r) * alpha) + (r << 8)) >> 8);
+                        pdst[Order::G] = (int8u)((((psrc[src_order::G] - g) * alpha) + (g << 8)) >> 8);
+                        pdst[Order::B] = (int8u)((((psrc[src_order::B] - b) * alpha) + (b << 8)) >> 8);
+                        pdst[Order::A] = (int8u)((alpha + a) - ((alpha * a) >> 8));
+                    }
+                }
+                psrc += incp;
+                pdst += incp;
+            }
+            while(--len);
+        }
+
+
 
 
         //--------------------------------------------------------------------

@@ -30,6 +30,9 @@ namespace agg
     {
     public:
         typedef gray8 color_type;
+        typedef bool  order_type;
+        typedef rendering_buffer::row_data row_data;
+
 
         //--------------------------------------------------------------------
         pixfmt_gray8_base(rendering_buffer& rb)
@@ -42,9 +45,15 @@ namespace agg
         unsigned height() const { return m_rbuf->height(); }
 
         //--------------------------------------------------------------------
-        color_type pixel(int x, int y)
+        color_type pixel(int x, int y) const
         {
             return color_type(m_rbuf->row(y)[x * Step + Offset]);
+        }
+
+        //--------------------------------------------------------------------
+        row_data span(int x, int y) const
+        {
+            return row_data(x, width() - 1, m_rbuf->row(y) + x);
         }
 
         //--------------------------------------------------------------------

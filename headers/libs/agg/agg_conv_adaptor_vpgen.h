@@ -51,6 +51,7 @@ namespace agg
         double        m_start_x;
         double        m_start_y;
         unsigned      m_poly_flags;
+        int           m_vertices;
     };
 
 
@@ -64,6 +65,7 @@ namespace agg
         m_start_x    = 0;
         m_start_y    = 0;
         m_poly_flags = 0;
+        m_vertices   = 0;
     }
 
 
@@ -77,11 +79,25 @@ namespace agg
             cmd = m_vpgen.vertex(x, y);
             if(!is_stop(cmd)) break;
 
-            if(m_poly_flags)
+            if(m_poly_flags && !m_vpgen.auto_unclose())
             {
+                *x = 0.0;
+                *y = 0.0;
                 cmd = m_poly_flags;
                 m_poly_flags = 0;
                 break;
+            }
+
+            if(m_vertices < 0)
+            {
+                if(m_vertices < -1) 
+                {
+                    m_vertices = 0;
+                    return path_cmd_stop;
+                }
+                m_vpgen.move_to(m_start_x, m_start_y);
+                m_vertices = 1;
+                continue;
             }
 
             double tx, ty;
@@ -90,13 +106,24 @@ namespace agg
             {
                 if(is_move_to(cmd)) 
                 {
+                    if(m_vpgen.auto_close() && m_vertices > 2)
+                    {
+                        m_vpgen.line_to(m_start_x, m_start_y);
+                        m_poly_flags = path_cmd_end_poly | path_flags_close;
+                        m_start_x    = tx;
+                        m_start_y    = ty;
+                        m_vertices   = -1;
+                        continue;
+                    }
                     m_vpgen.move_to(tx, ty);
-                    m_start_x = tx;
-                    m_start_y = ty;
+                    m_start_x  = tx;
+                    m_start_y  = ty;
+                    m_vertices = 1;
                 }
                 else 
                 {
                     m_vpgen.line_to(tx, ty);
+                    ++m_vertices;
                 }
             }
             else
@@ -104,14 +131,26 @@ namespace agg
                 if(is_end_poly(cmd))
                 {
                     m_poly_flags = cmd;
-                    if(is_closed(cmd))
+                    if(is_closed(cmd) || m_vpgen.auto_close())
                     {
-                        m_vpgen.line_to(m_start_x, m_start_y);
+                        if(m_vpgen.auto_close()) m_poly_flags |= path_flags_close;
+                        if(m_vertices > 2)
+                        {
+                            m_vpgen.line_to(m_start_x, m_start_y);
+                        }
+                        m_vertices = 0;
                     }
                 }
                 else
                 {
-                    // The adaptor should be transparent to all unknown commands
+                    // path_cmd_stop
+                    if(m_vpgen.auto_close() && m_vertices > 2)
+                    {
+                        m_vpgen.line_to(m_start_x, m_start_y);
+                        m_poly_flags = path_cmd_end_poly | path_flags_close;
+                        m_vertices   = -2;
+                        continue;
+                    }
                     break;
                 }
             }

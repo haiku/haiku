@@ -61,8 +61,8 @@ namespace agg
         //--------------------------------------------------------------------
         color_type* generate(int x, int y, unsigned len)
         {
-            base_type::interpolator().begin(x, y, len);
-
+            base_type::interpolator().begin(x + base_type::filter_dx_dbl(), 
+                                            y + base_type::filter_dy_dbl(), len);
             int fg[3];
             int src_alpha;
             int back_r = m_gamma->dir(base_type::background_color().r);
@@ -84,6 +84,9 @@ namespace agg
                 int y_hr;
                 
                 base_type::interpolator().coordinates(&x_hr, &y_hr);
+
+                x_hr -= base_type::filter_dx_int();
+                y_hr -= base_type::filter_dy_int();
 
                 int x_lr = x_hr >> image_subpixel_shift;
                 int y_lr = y_hr >> image_subpixel_shift;
@@ -290,8 +293,8 @@ namespace agg
         //--------------------------------------------------------------------
         color_type* generate(int x, int y, unsigned len)
         {
-            base_type::interpolator().begin(x, y, len);
-
+            base_type::interpolator().begin(x + base_type::filter_dx_dbl(), 
+                                            y + base_type::filter_dy_dbl(), len);
             int fg[3];
             int src_alpha;
             int back_r = m_gamma->dir(base_type::background_color().r);
@@ -321,6 +324,9 @@ namespace agg
             do
             {
                 base_type::interpolator().coordinates(&x, &y);
+
+                x -= base_type::filter_dx_int();
+                y -= base_type::filter_dy_int();
 
                 int x_hr = x;
                 int y_hr = y;

@@ -58,8 +58,8 @@ namespace agg
 
         void active_point(int i);
 
-        const double* spline()         const { return m_spline_values;  }
-        const unsigned char* spline8() const { return m_spline_values8; }
+        const double* spline()  const { return m_spline_values;  }
+        const int8u*  spline8() const { return m_spline_values8; }
         double value(double x) const;
         void   value(unsigned idx, double y);
         void   point(unsigned idx, double x, double y);
@@ -87,7 +87,7 @@ namespace agg
         double   m_yp[32];
         bspline  m_spline;
         double   m_spline_values[256];
-        unsigned char m_spline_values8[256];
+        int8u    m_spline_values8[256];
         double   m_border_width;
         double   m_border_extra;
         double   m_curve_width;

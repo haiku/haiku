@@ -236,18 +236,8 @@ namespace agg
 
             for(i = 0; i < m_scanlines.size(); ++i)
             {
-                size += sizeof(int16) * 2; // Y, num_spans
-
-                const scanline_data& sl_this = m_scanlines[i];
-
-                unsigned num_spans = sl_this.num_spans;
-                unsigned span_idx  = sl_this.start_span;
-                do
-                {
-                    const span_data& sp = m_spans[span_idx++];
-                    size += sizeof(int16) * 2;                // X, span_len
-                }
-                while(--num_spans);
+                size += sizeof(int16) * 2 + // Y, num_spans
+                        unsigned(m_scanlines[i].num_spans) * sizeof(int16) * 2; // X, span_len
             }
             return size;
         }

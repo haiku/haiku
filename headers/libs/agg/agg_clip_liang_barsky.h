@@ -24,6 +24,35 @@
 namespace agg
 {
 
+    //----------------------------------------------------------clipping_flags
+    // Determine the clipping code of the vertex according to the 
+    // Cyrus-Beck line clipping algorithm
+    //
+    //        |        |
+    //  0110  |  0010  | 0011
+    //        |        |
+    // -------+--------+-------- clip_box.y2
+    //        |        |
+    //  0100  |  0000  | 0001
+    //        |        |
+    // -------+--------+-------- clip_box.y1
+    //        |        |
+    //  1100  |  1000  | 1001
+    //        |        |
+    //  clip_box.x1  clip_box.x2
+    //
+    // 
+    template<class T>
+    inline unsigned clipping_flags(T x, T y, const rect_base<T>& clip_box)
+    {
+        return  (x > clip_box.x2) |
+               ((y > clip_box.y2) << 1) |
+               ((x < clip_box.x1) << 2) |
+               ((y < clip_box.y1) << 3);
+    }
+
+
+
     //-------------------------------------------------------clip_liang_barsky
     template<class T>
     inline unsigned clip_liang_barsky(T x1, T y1, T x2, T y2,

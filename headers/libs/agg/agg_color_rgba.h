@@ -28,6 +28,7 @@ namespace agg
     //====================================================================rgba
     struct rgba
     {
+        typedef double alpha_type;
         enum premul { pre };
 
         double r;

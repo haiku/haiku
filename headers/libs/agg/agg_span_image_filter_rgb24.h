@@ -52,7 +52,8 @@ namespace agg
         //--------------------------------------------------------------------
         color_type* generate(int x, int y, unsigned len)
         {
-            base_type::interpolator().begin(x, y, len);
+            base_type::interpolator().begin(x + base_type::filter_dx_dbl(), 
+                                            y + base_type::filter_dy_dbl(), len);
 
             int fg[3];
             int src_alpha;
@@ -130,8 +131,8 @@ namespace agg
         //--------------------------------------------------------------------
         color_type* generate(int x, int y, unsigned len)
         {
-            base_type::interpolator().begin(x, y, len);
-
+            base_type::interpolator().begin(x + base_type::filter_dx_dbl(), 
+                                            y + base_type::filter_dy_dbl(), len);
             int fg[3];
             int src_alpha;
             int back_r = base_type::background_color().r;
@@ -153,6 +154,9 @@ namespace agg
                 int y_hr;
                 
                 base_type::interpolator().coordinates(&x_hr, &y_hr);
+
+                x_hr -= base_type::filter_dx_int();
+                y_hr -= base_type::filter_dy_int();
 
                 int x_lr = x_hr >> image_subpixel_shift;
                 int y_lr = y_hr >> image_subpixel_shift;
@@ -349,7 +353,8 @@ namespace agg
         //--------------------------------------------------------------------
         color_type* generate(int x, int y, unsigned len)
         {
-            base_type::interpolator().begin(x, y, len);
+            base_type::interpolator().begin(x + base_type::filter_dx_dbl(), 
+                                            y + base_type::filter_dy_dbl(), len);
 
             int fg[3];
             int src_alpha;
@@ -380,6 +385,9 @@ namespace agg
             do
             {
                 base_type::interpolator().coordinates(&x, &y);
+
+                x -= base_type::filter_dx_int();
+                y -= base_type::filter_dy_int();
 
                 int x_hr = x;
                 int y_hr = y;
@@ -502,10 +510,10 @@ namespace agg
                         if(fg[2] < 0) fg[2] = 0;
                         if(src_alpha < 0) src_alpha = 0;
 
-                        if(fg[0] > 255) fg[0] = 255;
-                        if(fg[1] > 255) fg[1] = 255;
-                        if(fg[2] > 255) fg[2] = 255;
                         if(src_alpha > 255) src_alpha = 255;
+                        if(fg[0] > src_alpha) fg[0] = src_alpha;
+                        if(fg[1] > src_alpha) fg[1] = src_alpha;
+                        if(fg[2] > src_alpha) fg[2] = src_alpha;
                     }
                 }
 

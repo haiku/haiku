@@ -15,6 +15,7 @@
 #ifndef AGG_ARRAY_INCLUDED
 #define AGG_ARRAY_INCLUDED
 
+#include <stddef.h>
 #include <string.h>
 #include "agg_basics.h"
 
@@ -45,7 +46,10 @@ namespace agg
 
         void add(const T& v)  { m_array[m_size++] = v; }
         void inc_size(unsigned size) { m_size += size; } 
-        unsigned size() const { return m_size; }
+        unsigned size()      const { return m_size; }
+        unsigned byte_size() const { return m_size * sizeof(T); }
+        void serialize(int8u* ptr) const;
+        void deserialize(const int8u* data, unsigned byte_size);
         const T& operator [] (unsigned idx) const { return m_array[idx]; }
               T& operator [] (unsigned idx)       { return m_array[idx]; }
 
@@ -116,9 +120,20 @@ namespace agg
         return *this;
     }
 
+    //------------------------------------------------------------------------
+    template<class T> void pod_array<T>::serialize(int8u* ptr) const
+    { 
+        if(m_size) memcpy(ptr, m_array, m_size * sizeof(T)); 
+    }
 
-
-
+    //------------------------------------------------------------------------
+    template<class T> 
+    void pod_array<T>::deserialize(const int8u* data, unsigned byte_size)
+    {
+        byte_size /= sizeof(T);
+        capacity(byte_size);
+        if(byte_size) memcpy(m_array, data, byte_size * sizeof(T));
+    }
 
     //------------------------------------------------------------------------
     template<class T> class pod_array_adaptor
@@ -154,6 +169,7 @@ namespace agg
     //------------------------------------------------------------------------
     template<class T, unsigned S=6> class pod_deque
     {
+    public:
         enum 
         {   
             block_shift = S,
@@ -161,7 +177,6 @@ namespace agg
             block_mask  = block_size - 1
         };
 
-    public:
         typedef T value_type;
 
         ~pod_deque();
@@ -180,6 +195,23 @@ namespace agg
         void remove_last();
 
         int allocate_continuous_block(unsigned num_elements);
+
+        void add_array(const T* ptr, unsigned num_elem)
+        {
+            while(num_elem--)
+            {
+                add(*ptr++);
+            }
+        }
+
+        template<class DataAccessor> void add_data(DataAccessor& data)
+        {
+            while(data.size())
+            {
+                add(*data);
+                ++data;
+            }
+        }
 
         void cut_at(unsigned size)
         {
@@ -240,6 +272,58 @@ namespace agg
 
         unsigned byte_size() const;
         void serialize(int8u* ptr) const;
+        void deserialize(const int8u* data, unsigned byte_size);
+        void deserialize(unsigned start, const T& empty_val, 
+                         const int8u* data, unsigned byte_size);
+
+        template<class ByteAccessor> 
+        void deserialize(ByteAccessor data)
+        {
+            remove_all();
+            unsigned elem_size = data.size() / sizeof(T);
+
+            for(unsigned i = 0; i < elem_size; ++i)
+            {
+                int8u* ptr = (int8u*)data_ptr();
+                for(unsigned j = 0; j < sizeof(T); ++j)
+                {
+                    *ptr++ = *data;
+                    ++data;
+                }
+                ++m_size;
+            }
+        }
+
+        template<class ByteAccessor>
+        void deserialize(unsigned start, const T& empty_val, ByteAccessor data)
+        {
+            while(m_size < start)
+            {
+                add(empty_val);
+            }
+
+            unsigned elem_size = data.size() / sizeof(T);
+            for(unsigned i = 0; i < elem_size; ++i)
+            {
+                int8u* ptr;
+                if(start + i < m_size)
+                {
+                    ptr = (int8u*)(&((*this)[start + i]));
+                }
+                else
+                {
+                    ptr = (int8u*)data_ptr();
+                    ++m_size;
+                }
+                for(unsigned j = 0; j < sizeof(T); ++j)
+                {
+                    *ptr++ = *data;
+                    ++data;
+                }
+            }
+        }
+
+        const T* block(unsigned nb) const { return m_blocks[nb]; }
 
     private:
         void allocate_block(unsigned nb);
@@ -251,8 +335,6 @@ namespace agg
         T**             m_blocks;
         unsigned        m_block_ptr_inc;
     };
-
-
 
 
     //------------------------------------------------------------------------
@@ -461,8 +543,49 @@ namespace agg
         }
     }
 
+    //------------------------------------------------------------------------
+    template<class T, unsigned S> 
+    void pod_deque<T, S>::deserialize(const int8u* data, unsigned byte_size)
+    {
+        remove_all();
+        byte_size /= sizeof(T);
+        for(unsigned i = 0; i < byte_size; ++i)
+        {
+            T* ptr = data_ptr();
+            memcpy(ptr, data, sizeof(T));
+            ++m_size;
+            data += sizeof(T);
+        }
+    }
 
 
+    // Replace or add a number of elements starting from "start" position
+    //------------------------------------------------------------------------
+    template<class T, unsigned S> 
+    void pod_deque<T, S>::deserialize(unsigned start, const T& empty_val, 
+                                      const int8u* data, unsigned byte_size)
+    {
+        while(m_size < start)
+        {
+            add(empty_val);
+        }
+
+        byte_size /= sizeof(T);
+        for(unsigned i = 0; i < byte_size; ++i)
+        {
+            if(start + i < m_size)
+            {
+                memcpy(&((*this)[start + i]), data, sizeof(T));
+            }
+            else
+            {
+                T* ptr = data_ptr();
+                memcpy(ptr, data, sizeof(T));
+                ++m_size;
+            }
+            data += sizeof(T);
+        }
+    }
 
 
     //-----------------------------------------------------------pod_allocator
@@ -520,7 +643,7 @@ namespace agg
                 int8u* ptr = m_buf_ptr;
                 if(alignment > 1)
                 {
-                    unsigned align = (alignment - unsigned(ptr) % alignment) % alignment;
+                    unsigned align = (alignment - unsigned((size_t)ptr) % alignment) % alignment;
                     size += align;
                     ptr += align;
                     if(size <= m_rest)

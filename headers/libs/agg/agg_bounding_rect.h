@@ -35,6 +35,11 @@ namespace agg
         double y;
         bool first = true;
 
+        *x1 = CoordT(1);
+        *y1 = CoordT(1);
+        *x2 = CoordT(0);
+        *y2 = CoordT(0);
+
         for(i = 0; i < num; i++)
         {
             vs.rewind(gi[start + i]);
@@ -73,6 +78,11 @@ namespace agg
         double x;
         double y;
         bool first = true;
+
+        *x1 = CoordT(1);
+        *y1 = CoordT(1);
+        *x2 = CoordT(0);
+        *y2 = CoordT(0);
 
         vs.rewind(path_id);
         unsigned cmd;

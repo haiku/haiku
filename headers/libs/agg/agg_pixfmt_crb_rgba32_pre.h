@@ -13,25 +13,25 @@
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
 
-#ifndef AGG_PIXFMT_RGBA32_PLAIN_INCLUDED
-#define AGG_PIXFMT_RGBA32_PLAIN_INCLUDED
+#ifndef AGG_PIXFMT_CRB_RGBA32_PRE_INCLUDED
+#define AGG_PIXFMT_CRB_RGBA32_PRE_INCLUDED
 
 #include <string.h>
 #include "agg_basics.h"
 #include "agg_color_rgba8.h"
-#include "agg_rendering_buffer.h"
 
 namespace agg
 {
 
-
-    //===============================================pixel_formats_rgba32_plain
-    template<class Order> class pixel_formats_rgba32_plain
+    //============================================pixel_formats_crb_rgba32_pre
+    template<class RenBuf, class Order> class pixel_formats_crb_rgba32_pre
     {
     public:
-        typedef rgba8 color_type;
-        typedef Order order_type;
-        typedef rendering_buffer::row_data row_data;
+        typedef rgba8  color_type;
+        typedef RenBuf buffer_type;
+        typedef Order  order_type;
+
+        typedef typename RenBuf::row_data row_data;
 
     private:
         //--------------------------------------------------------------------
@@ -44,37 +44,29 @@ namespace agg
         }
 
         //--------------------------------------------------------------------
-        static inline void blend_pix(int8u* p, const color_type& c, unsigned alpha)
+        static inline void blend_pix(int8u* p, const color_type& c, 
+                                     unsigned cover, unsigned alpha)
         {
-            int a = p[Order::A];
-            int r = p[Order::R] * a;
-            int g = p[Order::G] * a;
-            int b = p[Order::B] * a;
-            a = ((alpha << 8) + (a << 16)) - alpha * a;
-            p[Order::A] = (int8u)(a >> 16);
-            p[Order::R] = (int8u)((((((c.r << 8) - r) * alpha) + (r << 16)) / a));
-            p[Order::G] = (int8u)((((((c.g << 8) - g) * alpha) + (g << 16)) / a));
-            p[Order::B] = (int8u)((((((c.b << 8) - b) * alpha) + (b << 16)) / a));
+            p[Order::R] = (int8u)((p[Order::R] * alpha + ((c.r * cover) << 8)) >> 16);
+            p[Order::G] = (int8u)((p[Order::G] * alpha + ((c.g * cover) << 8)) >> 16);
+            p[Order::B] = (int8u)((p[Order::B] * alpha + ((c.b * cover) << 8)) >> 16);
+            p[Order::A] = (int8u)(255 - ((alpha * (255 - p[Order::A])) >> 16));
         }
 
         //--------------------------------------------------------------------
         static inline void copy_or_blend_pix(int8u* p, const color_type& c, unsigned cover)
         {
-            unsigned alpha = cover * c.a;
-// For testing 
-//color_type c2 = c; 
-//c2.a = alpha >> 8;
-//copy_or_blend_pix(p, c2);
+            unsigned alpha = 65535 - cover * c.a;
 
-            if(alpha)
+            if(alpha < 65535)
             {
-                if(alpha == 255*255)
+                if(alpha <= 65535-255*255)
                 {
                     copy_pix(p, c);
                 }
                 else
                 {
-                    blend_pix(p, c, alpha);
+                    blend_pix(p, c, cover, alpha);
                 }
             }
         }
@@ -82,36 +74,26 @@ namespace agg
         //--------------------------------------------------------------------
         static inline void copy_or_blend_pix(int8u* p, const color_type& c)
         {
-            unsigned alpha = c.a;
-            if(alpha)
+            unsigned alpha = 255 - c.a;
+            if(alpha < 255)
             {
-                if(alpha == 255)
+                if(alpha == 0)
                 {
                     copy_pix(p, c);
                 }
                 else
                 {
-                    int a = p[Order::A];
-                    int r = p[Order::R] * a;
-                    int g = p[Order::G] * a;
-                    int b = p[Order::B] * a;
-                    a = ((alpha + a) << 8) - alpha * a;
-                    p[Order::A] = (int8u)(a >> 8);
-                    p[Order::R] = (int8u)((((((c.r << 8) - r) * alpha) + (r << 8)) / a));
-                    p[Order::G] = (int8u)((((((c.g << 8) - g) * alpha) + (g << 8)) / a));
-                    p[Order::B] = (int8u)((((((c.b << 8) - b) * alpha) + (b << 8)) / a));
+                    p[Order::R] = (int8u)((p[Order::R] * alpha + (c.r << 8)) >> 8);
+                    p[Order::G] = (int8u)((p[Order::G] * alpha + (c.g << 8)) >> 8);
+                    p[Order::B] = (int8u)((p[Order::B] * alpha + (c.b << 8)) >> 8);
+                    p[Order::A] = (int8u)(255 - ((alpha * (255 - p[Order::A])) >> 8));
                 }
             }
         }
 
-
-
     public:
         //--------------------------------------------------------------------
-        pixel_formats_rgba32_plain(rendering_buffer& rb)
-            : m_rbuf(&rb)
-        {
-        }
+        pixel_formats_crb_rgba32_pre(RenBuf& rb) : m_rbuf(&rb) {}
 
         //--------------------------------------------------------------------
         unsigned width()  const { return m_rbuf->width();  }
@@ -120,20 +102,21 @@ namespace agg
         //--------------------------------------------------------------------
         color_type pixel(int x, int y) const
         {
-            int8u* p = m_rbuf->row(y) + (x << 2);
-            return color_type(p[Order::R], p[Order::G], p[Order::B], p[Order::A]);
+            const int8u* p = m_rbuf->span_ptr(x, y, 1);
+            return p ? color_type(p[Order::R], p[Order::G], p[Order::B], p[Order::A]) :
+                       color_type::no_color();
         }
 
         //--------------------------------------------------------------------
         row_data span(int x, int y) const
         {
-            return row_data(x, width() - 1, m_rbuf->row(y) + (x << 2));
+            return m_rbuf->span(x, y);
         }
 
         //--------------------------------------------------------------------
         void copy_pixel(int x, int y, const color_type& c)
         {
-            int8u* p = m_rbuf->row(y) + (x << 2);
+            int8u* p = m_rbuf->span_ptr(x, y, 1);
             p[Order::R] = (int8u)c.r;
             p[Order::G] = (int8u)c.g;
             p[Order::B] = (int8u)c.b;
@@ -143,7 +126,7 @@ namespace agg
         //--------------------------------------------------------------------
         void blend_pixel(int x, int y, const color_type& c, int8u cover)
         {
-            copy_or_blend_pix(m_rbuf->row(y) + (x << 2), c, cover);
+            copy_or_blend_pix(m_rbuf->span_ptr(x, y, 1), c, cover);
         }
 
         //--------------------------------------------------------------------
@@ -151,7 +134,7 @@ namespace agg
         {
             int32u v;
             copy_pix((int8u*)&v, c);
-            int32u* p32 = (int32u*)(m_rbuf->row(y)) + x;
+            int32u* p32  = (int32u*)(m_rbuf->span_ptr(x, y, len));
             do
             {
                 *p32++ = v;
@@ -164,11 +147,10 @@ namespace agg
         {
             int32u v;
             copy_pix((int8u*)&v, c);
-            int8u* p = m_rbuf->row(y) + (x << 2);
             do
             {
-                *(int32u*)p = v; 
-                p += m_rbuf->stride();
+                *(int32u*)(m_rbuf->span_ptr(x, y, 1)) = v;
+                ++y;
             }
             while(--len);
         }
@@ -177,30 +159,28 @@ namespace agg
         void blend_hline(int x, int y, unsigned len, 
                          const color_type& c, int8u cover)
         {
-            unsigned alpha = unsigned(cover) * c.a;
-            if(alpha)
+            int alpha = int(cover) * int(c.a);
+            if(alpha == 255*255)
             {
-                if(alpha == 255*255)
+                int32u v;
+                copy_pix((int8u*)&v, c);
+                int32u* p32  = (int32u*)(m_rbuf->span_ptr(x, y, len));
+                do
                 {
-                    int32u v;
-                    copy_pix((int8u*)&v, c);
-                    int32u* p32 = (int32u*)(m_rbuf->row(y)) + x;
-                    do
-                    {
-                        *p32++ = v;
-                    }
-                    while(--len);
+                    *p32++ = v;
                 }
-                else
+                while(--len);
+            }
+            else
+            {
+                int8u* p = m_rbuf->span_ptr(x, y, len);
+                alpha = 65535 - alpha;
+                do
                 {
-                    int8u* p = m_rbuf->row(y) + (x << 2);
-                    do
-                    {
-                        blend_pix(p, c, alpha);
-                        p += 4;
-                    }
-                    while(--len);
+                    blend_pix(p, c, cover, alpha);
+                    p += 4;
                 }
+                while(--len);
             }
         }
 
@@ -208,43 +188,89 @@ namespace agg
         void blend_vline(int x, int y, unsigned len, 
                          const color_type& c, int8u cover)
         {
-            int8u* p = m_rbuf->row(y) + (x << 2);
-            unsigned alpha = unsigned(cover) * c.a;
-            if(alpha)
+            int alpha = int(cover) * c.a;
+            if(alpha == 255*255)
             {
-                unsigned alpha = unsigned(cover) * c.a;
-                if(alpha == 255*255)
+                int32u v;
+                copy_pix((int8u*)&v, c);
+                do
                 {
-                    int32u v;
-                    copy_pix((int8u*)&v, c);
-                    do
-                    {
-                        *(int32u*)p = v; 
-                        p += m_rbuf->stride();
-                    }
-                    while(--len);
+                    *(int32u*)(m_rbuf->span_ptr(x, y, 1)) = v;
+                    ++y;
                 }
-                else
+                while(--len);
+            }
+            else
+            {
+                alpha = 65535 - alpha;
+                do
                 {
-                    do
-                    {
-                        blend_pix(p, c, alpha);
-                        p += m_rbuf->stride();
-                    }
-                    while(--len);
+                    blend_pix(m_rbuf->span_ptr(x, y, 1), c, cover, alpha);
+                    ++y;
                 }
+                while(--len);
             }
         }
 
 
+
         //--------------------------------------------------------------------
-        void copy_from(const rendering_buffer& from, 
-                       int xdst, int ydst,
-                       int xsrc, int ysrc,
-                       unsigned len)
+        template<class RenBuf2> void copy_from(const RenBuf2& from, 
+                                               int xdst, int ydst,
+                                               int xsrc, int ysrc,
+                                               unsigned len)
         {
-            memmove(m_rbuf->row(ydst) + xdst * 4, 
-                    (const void*)(from.row(ysrc) + xsrc * 4), len * 4);
+            const int8u* p = from.row(ysrc);
+            if(p)
+            {
+                p += xsrc << 2;
+                memmove(m_rbuf->span_ptr(xdst, ydst, len), p, len * 4);
+            }
+        }
+
+
+
+        //--------------------------------------------------------------------
+        template<class SrcPixelFormatRenderer> 
+        void blend_from(const SrcPixelFormatRenderer& from, 
+                        const int8u* psrc,
+                        int xdst, int ydst,
+                        int xsrc, int ysrc,
+                        unsigned len)
+        {
+            typedef typename SrcPixelFormatRenderer::order_type src_order;
+            int8u* pdst = m_rbuf->span_ptr(xdst, ydst, len);
+            int incp = 4;
+            if(xdst > xsrc)
+            {
+                psrc += (len-1) << 2;
+                pdst += (len-1) << 2;
+                incp = -4;
+            }
+            do 
+            {
+                unsigned alpha = 255 - psrc[src_order::A];
+                if(alpha < 255)
+                {
+                    if(alpha == 0)
+                    {
+                        pdst[Order::R] = psrc[src_order::R];
+                        pdst[Order::G] = psrc[src_order::G];
+                        pdst[Order::B] = psrc[src_order::B];
+                        pdst[Order::A] = psrc[src_order::A];
+                    }
+                    else
+                    {
+                        pdst[Order::R] = (int8u)((pdst[Order::R] * alpha + (psrc[src_order::R] << 8)) >> 8);
+                        pdst[Order::G] = (int8u)((pdst[Order::G] * alpha + (psrc[src_order::G] << 8)) >> 8);
+                        pdst[Order::B] = (int8u)((pdst[Order::B] * alpha + (psrc[src_order::B] << 8)) >> 8);
+                        pdst[Order::A] = (int8u)(255 - ((alpha * (255 - pdst[Order::A])) >> 8));
+                    }
+                }
+                psrc += incp;
+                pdst += incp;
+            }
+            while(--len);
         }
 
 
@@ -252,7 +278,7 @@ namespace agg
         void blend_solid_hspan(int x, int y, unsigned len, 
                                const color_type& c, const int8u* covers)
         {
-            int8u* p = m_rbuf->row(y) + (x << 2);
+            int8u* p = m_rbuf->span_ptr(x, y, len);
             do 
             {
                 copy_or_blend_pix(p, c, *covers++);
@@ -267,11 +293,10 @@ namespace agg
         void blend_solid_vspan(int x, int y, unsigned len, 
                                const color_type& c, const int8u* covers)
         {
-            int8u* p = m_rbuf->row(y) + (x << 2);
             do 
             {
-                copy_or_blend_pix(p, c, *covers++);
-                p += m_rbuf->stride();
+                copy_or_blend_pix(m_rbuf->span_ptr(x, y, 1), c, *covers++);
+                ++y;
             }
             while(--len);
         }
@@ -283,7 +308,7 @@ namespace agg
                                const int8u* covers,
                                int8u cover)
         {
-            int8u* p = m_rbuf->row(y) + (x << 2);
+            int8u* p = m_rbuf->span_ptr(x, y, len);
             do 
             {
                 copy_or_blend_pix(p, *colors++, covers ? *covers++ : cover);
@@ -299,24 +324,22 @@ namespace agg
                                const int8u* covers,
                                int8u cover)
         {
-            int8u* p = m_rbuf->row(y) + (x << 2);
             do 
             {
-                copy_or_blend_pix(p, *colors++, covers ? *covers++ : cover);
-                p += m_rbuf->stride();
+                copy_or_blend_pix(m_rbuf->span_ptr(x, y, 1), 
+                                  *colors++, 
+                                  covers ? *covers++ : cover);
+                ++y;
             }
             while(--len);
         }
 
     private:
-        rendering_buffer* m_rbuf;
+        RenBuf* m_rbuf;
     };
 
-    typedef pixel_formats_rgba32_plain<order_rgba32> pixfmt_rgba32_plain; //----pixfmt_rgba32_plain
-    typedef pixel_formats_rgba32_plain<order_argb32> pixfmt_argb32_plain; //----pixfmt_argb32_plain
-    typedef pixel_formats_rgba32_plain<order_abgr32> pixfmt_abgr32_plain; //----pixfmt_abgr32_plain
-    typedef pixel_formats_rgba32_plain<order_bgra32> pixfmt_bgra32_plain; //----pixfmt_bgra32_plain
+
 }
 
-
 #endif
+

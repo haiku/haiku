@@ -39,7 +39,7 @@ namespace agg
         color_type* generate(int x, int y, unsigned len)
         {
             color_type* span = m_span_gen->generate(x, y, len);
-            m_conv->convert(span, len);
+            m_conv->convert(span, x, y, len);
             return span;
         }
 
