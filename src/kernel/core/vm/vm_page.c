@@ -354,12 +354,12 @@ int vm_mark_page_range_inuse(addr start_page, addr len)
 
 	if(physical_page_offset > start_page) {
 		dprintf("vm_mark_page_range_inuse: start page %ld is before free list\n", start_page);
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 	start_page -= physical_page_offset;
 	if(start_page + len >= num_pages) {
 		dprintf("vm_mark_page_range_inuse: range would extend past free list\n");
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 
 	state = int_disable_interrupts();
