@@ -227,11 +227,9 @@ typedef struct {
 		bool master_tmds2;			/* on die TMDS encoder active on CRTC2 */
 		bool tmds1_active;			/* found panel on CRTC1 that is active */
 		bool tmds2_active;			/* found panel on CRTC2 that is active */
-		uint16 panel1_width;		/* native horizontal resolution for digital panels */
-		uint16 panel1_height;		/* navive vertical resolution for digital panels */
+		display_timing p1_timing;	/* 'modeline' fetched for panel 1 */
+		display_timing p2_timing;	/* 'modeline' fetched for panel 2 */
 		float panel1_aspect;		/* panel's aspect ratio */
-		uint16 panel2_width;		/* native horizontal resolution for digital panels */
-		uint16 panel2_height;		/* navive vertical resolution for digital panels */
 		float panel2_aspect;		/* panel's aspect ratio */
 		bool crtc2_prim;			/* using CRTC2 as primary CRTC */
 		uint32 tvout_chip_type;     /* see tvchip_type enum above */

@@ -305,8 +305,8 @@ status_t nv_crtc_set_timing(display_mode target)
 		uint32 iscale_x, iscale_y;
 
 		/* calculate inverse scaling factors used by hardware in 20.12 format */
-		iscale_x = (((1 << 12) * target.timing.h_display) / si->ps.panel1_width);
-		iscale_y = (((1 << 12) * target.timing.v_display) / si->ps.panel1_height);
+		iscale_x = (((1 << 12) * target.timing.h_display) / si->ps.p1_timing.h_display);
+		iscale_y = (((1 << 12) * target.timing.v_display) / si->ps.p1_timing.v_display);
 
 		/* unblock flatpanel timing programming (or something like that..) */
 		CRTCW(FP_HTIMING, 0);
@@ -316,10 +316,10 @@ status_t nv_crtc_set_timing(display_mode target)
 
 		/* enable full width visibility on flatpanel */
 		DACW(FP_HVALID_S, 0);
-		DACW(FP_HVALID_E, (si->ps.panel1_width - 1));
+		DACW(FP_HVALID_E, (si->ps.p1_timing.h_display - 1));
 		/* enable full height visibility on flatpanel */
 		DACW(FP_VVALID_S, 0);
-		DACW(FP_VVALID_E, (si->ps.panel1_height - 1));
+		DACW(FP_VVALID_E, (si->ps.p1_timing.v_display - 1));
 
 		/* nVidia cards support upscaling except on ??? */
 		/* NV11 cards can upscale after all! */
@@ -382,11 +382,11 @@ status_t nv_crtc_set_timing(display_mode target)
 				/* enable testmode (b12) and program modified X-scaling factor */
 				DACW(FP_DEBUG1, (((iscale_x >> 1) & 0x00000fff) | (1 << 12)));
 				/* center/cut-off left and right side of screen */
-				diff = ((si->ps.panel1_width -
+				diff = ((si->ps.p1_timing.h_display -
 						(target.timing.h_display * ((1 << 12) / ((float)iscale_x))))
 						/ 2);
 				DACW(FP_HVALID_S, diff);
-				DACW(FP_HVALID_E, ((si->ps.panel1_width - diff) - 1));
+				DACW(FP_HVALID_E, ((si->ps.p1_timing.h_display - diff) - 1));
 			}
 			/* correct for portrait panels... */
 			/* NOTE:

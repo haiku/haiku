@@ -437,7 +437,7 @@ status_t create_mode_list(void)
 	/* see if there are panels connected and get their native modelines */
 	bool pan1 = false, pan2 = false, pan1_added = false, pan2_added = false;
 	display_mode p1, p2;
-	get_panel_modelines(&p1, &p2, &pan1, &pan2);
+	get_panel_modes(&p1, &p2, &pan1, &pan2);
 
 	/* figure out how big the list could be, and adjust up to nearest multiple of B_PAGE_SIZE */
 	/* note: two extra modes might be added for flatpanels */

@@ -157,11 +157,8 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	{
 		LOG(4,("DAC2: Fixing DFP refresh to 62Hz!\n"));
 
-		/* readout the panel's modeline to determine the needed pixelclock */
-		target.timing.pixel_clock = (
-			((DAC2R(FP_HTOTAL) & 0x0000ffff) + 1) *
-			((DAC2R(FP_VTOTAL) & 0x0000ffff) + 1) *
-			62) / 1000;
+		/* use the panel's modeline to determine the needed pixelclock */
+		target.timing.pixel_clock = si->ps.p2_timing.pixel_clock;
 	}
 
 	req_pclk = (target.timing.pixel_clock)/1000.0;

@@ -325,11 +325,11 @@ static void detect_panels()
 	LOG(2,("INFO: End flatpanel related CRTC registers dump.\n"));
 
 	/* do some presets */
-	si->ps.panel1_width = 0;
-	si->ps.panel1_height = 0;
+	si->ps.p1_timing.h_display = 0;
+	si->ps.p1_timing.v_display = 0;
 	si->ps.panel1_aspect = 0;
-	si->ps.panel2_width = 0;
-	si->ps.panel2_height = 0;
+	si->ps.p2_timing.h_display = 0;
+	si->ps.p2_timing.v_display = 0;
 	si->ps.panel2_aspect = 0;
 	si->ps.slaved_tmds1 = false;
 	si->ps.slaved_tmds2 = false;
@@ -367,8 +367,8 @@ static void detect_panels()
 		{
 			si->ps.slaved_tmds1 = true;
 			si->ps.tmds1_active = true;
-			si->ps.panel1_width = width;
-			si->ps.panel1_height = height;
+			si->ps.p1_timing.h_display = width;
+			si->ps.p1_timing.v_display = height;
 		}
 	}
 
@@ -380,8 +380,8 @@ static void detect_panels()
 		{
 			si->ps.slaved_tmds2 = true;
 			si->ps.tmds2_active = true;
-			si->ps.panel2_width = width;
-			si->ps.panel2_height = height;
+			si->ps.p2_timing.h_display = width;
+			si->ps.p2_timing.v_display = height;
 		}
 	}
 
@@ -393,8 +393,8 @@ static void detect_panels()
 		{
 			si->ps.master_tmds1 = true;
 			si->ps.tmds1_active = true;
-			si->ps.panel1_width = width;
-			si->ps.panel1_height = height;
+			si->ps.p1_timing.h_display = width;
+			si->ps.p1_timing.v_display = height;
 		}
 	}
 
@@ -406,8 +406,8 @@ static void detect_panels()
 		{
 			si->ps.master_tmds2 = true;
 			si->ps.tmds2_active = true;
-			si->ps.panel2_width = width;
-			si->ps.panel2_height = height;
+			si->ps.p2_timing.h_display = width;
+			si->ps.p2_timing.v_display = height;
 		}
 	}
 
@@ -416,8 +416,8 @@ static void detect_panels()
 	//otherwise we probably get into trouble here if the checked specs match.
 	if (si->ps.laptop && si->ps.tmds1_active && si->ps.tmds2_active &&
 		((DACR(FP_TG_CTRL) & 0x80000000) == (DAC2R(FP_TG_CTRL) & 0x80000000)) &&
-		(si->ps.panel1_width == si->ps.panel2_width) &&
-		(si->ps.panel1_height == si->ps.panel2_height))
+		(si->ps.p1_timing.h_display == si->ps.p2_timing.h_display) &&
+		(si->ps.p1_timing.v_display == si->ps.p2_timing.v_display))
 	{
 		LOG(2,("INFO: correcting double detection of single panel!\n"));
 
@@ -427,8 +427,8 @@ static void detect_panels()
 			si->ps.slaved_tmds1 = false;
 			si->ps.master_tmds1 = false;
 			si->ps.tmds1_active = false;
-			si->ps.panel1_width = 0;
-			si->ps.panel1_height = 0;
+			si->ps.p1_timing.h_display = 0;
+			si->ps.p1_timing.v_display = 0;
 		}
 		else
 		{
@@ -436,16 +436,58 @@ static void detect_panels()
 			si->ps.slaved_tmds2 = false;
 			si->ps.master_tmds2 = false;
 			si->ps.tmds2_active = false;
-			si->ps.panel2_width = 0;
-			si->ps.panel2_height = 0;
+			si->ps.p2_timing.h_display = 0;
+			si->ps.p2_timing.v_display = 0;
 		}
 	}
 
-	/* determine panel(s) aspect ratio(s) */
+	/* fetch panel(s) modeline(s) */
 	if (si->ps.tmds1_active)
-		si->ps.panel1_aspect = (si->ps.panel1_width / ((float)si->ps.panel1_height));
+	{
+		/* determine panel aspect ratio */
+		si->ps.panel1_aspect =
+			(si->ps.p1_timing.h_display / ((float)si->ps.p1_timing.v_display));
+		/* horizontal timing */
+		si->ps.p1_timing.h_sync_start = (DACR(FP_HSYNC_S) & 0x0000ffff) + 1;
+		si->ps.p1_timing.h_sync_end = (DACR(FP_HSYNC_E) & 0x0000ffff) + 1;
+		si->ps.p1_timing.h_total = (DACR(FP_HTOTAL) & 0x0000ffff) + 1;
+		/* vertical timing */
+		si->ps.p1_timing.v_sync_start = (DACR(FP_VSYNC_S) & 0x0000ffff) + 1;
+		si->ps.p1_timing.v_sync_end = (DACR(FP_VSYNC_E) & 0x0000ffff) + 1;
+		si->ps.p1_timing.v_total = (DACR(FP_VTOTAL) & 0x0000ffff) + 1;
+		/* sync polarity */
+		si->ps.p1_timing.flags = 0;
+		if (DACR(FP_TG_CTRL) & 0x00000001) si->ps.p1_timing.flags |= B_POSITIVE_VSYNC;
+		if (DACR(FP_TG_CTRL) & 0x00000010) si->ps.p1_timing.flags |= B_POSITIVE_HSYNC;
+		/* refreshrate:
+		 * fix a DVI or laptop flatpanel to 62Hz refresh!
+		 * (we can't risk getting below 60.0Hz as some panels shut-off then!) */
+		si->ps.p1_timing.pixel_clock =
+			(si->ps.p1_timing.h_total * si->ps.p1_timing.v_total * 62) / 1000;
+	}
 	if (si->ps.tmds2_active)
-		si->ps.panel2_aspect = (si->ps.panel2_width / ((float)si->ps.panel2_height));
+	{
+		/* determine panel aspect ratio */
+		si->ps.panel2_aspect =
+			(si->ps.p2_timing.h_display / ((float)si->ps.p2_timing.v_display));
+		/* horizontal timing */
+		si->ps.p2_timing.h_sync_start = (DAC2R(FP_HSYNC_S) & 0x0000ffff) + 1;
+		si->ps.p2_timing.h_sync_end = (DAC2R(FP_HSYNC_E) & 0x0000ffff) + 1;
+		si->ps.p2_timing.h_total = (DAC2R(FP_HTOTAL) & 0x0000ffff) + 1;
+		/* vertical timing */
+		si->ps.p2_timing.v_sync_start = (DAC2R(FP_VSYNC_S) & 0x0000ffff) + 1;
+		si->ps.p2_timing.v_sync_end = (DAC2R(FP_VSYNC_E) & 0x0000ffff) + 1;
+		si->ps.p2_timing.v_total = (DAC2R(FP_VTOTAL) & 0x0000ffff) + 1;
+		/* sync polarity */
+		si->ps.p2_timing.flags = 0;
+		if (DAC2R(FP_TG_CTRL) & 0x00000001) si->ps.p2_timing.flags |= B_POSITIVE_VSYNC;
+		if (DAC2R(FP_TG_CTRL) & 0x00000010) si->ps.p2_timing.flags |= B_POSITIVE_HSYNC;
+		/* refreshrate:
+		 * fix a DVI or laptop flatpanel to 62Hz refresh!
+		 * (we can't risk getting below 60.0Hz as some panels shut-off then!) */
+		si->ps.p2_timing.pixel_clock =
+			(si->ps.p2_timing.h_total * si->ps.p2_timing.v_total * 62) / 1000;
+	}
 
 	/* dump some panel configuration registers... */
 	LOG(2,("INFO: Dumping flatpanel registers:\n"));
@@ -685,26 +727,12 @@ static void setup_output_matrix()
 	}
 }
 
-void get_panel_modelines(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
+void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
 {
 	if (si->ps.tmds1_active)
 	{
-		/* horizontal timing */
-		p1->timing.h_display = (DACR(FP_HDISPEND) & 0x0000ffff) + 1;
-		p1->timing.h_sync_start = (DACR(FP_HSYNC_S) & 0x0000ffff) + 1;
-		p1->timing.h_sync_end = (DACR(FP_HSYNC_E) & 0x0000ffff) + 1;
-		p1->timing.h_total = (DACR(FP_HTOTAL) & 0x0000ffff) + 1;
-		/* vertical timing */
-		p1->timing.v_display = (DACR(FP_VDISPEND) & 0x0000ffff) + 1;
-		p1->timing.v_sync_start = (DACR(FP_VSYNC_S) & 0x0000ffff) + 1;
-		p1->timing.v_sync_end = (DACR(FP_VSYNC_E) & 0x0000ffff) + 1;
-		p1->timing.v_total = (DACR(FP_VTOTAL) & 0x0000ffff) + 1;
-		/* sync polarity */
-		p1->timing.flags = 0;
-		if (DACR(FP_TG_CTRL) & 0x00000001) p1->timing.flags |= B_POSITIVE_VSYNC;
-		if (DACR(FP_TG_CTRL) & 0x00000010) p1->timing.flags |= B_POSITIVE_HSYNC;
-		/* refreshrate */
-		p1->timing.pixel_clock = (p1->timing.h_total * p1->timing.v_total * 60) / 1000;
+		/* timing ('modeline') */
+		p1->timing = si->ps.p1_timing;
 		/* setup the rest */
 		p1->space = B_CMAP8;
 		p1->virtual_width = p1->timing.h_display;
@@ -719,22 +747,8 @@ void get_panel_modelines(display_mode *p1, display_mode *p2, bool *pan1, bool *p
 
 	if (si->ps.tmds2_active)
 	{
-		/* horizontal timing */
-		p2->timing.h_display = (DAC2R(FP_HDISPEND) & 0x0000ffff) + 1;
-		p2->timing.h_sync_start = (DAC2R(FP_HSYNC_S) & 0x0000ffff) + 1;
-		p2->timing.h_sync_end = (DAC2R(FP_HSYNC_E) & 0x0000ffff) + 1;
-		p2->timing.h_total = (DAC2R(FP_HTOTAL) & 0x0000ffff) + 1;
-		/* vertical timing */
-		p2->timing.v_display = (DAC2R(FP_VDISPEND) & 0x0000ffff) + 1;
-		p2->timing.v_sync_start = (DAC2R(FP_VSYNC_S) & 0x0000ffff) + 1;
-		p2->timing.v_sync_end = (DAC2R(FP_VSYNC_E) & 0x0000ffff) + 1;
-		p2->timing.v_total = (DAC2R(FP_VTOTAL) & 0x0000ffff) + 1;
-		/* sync polarity */
-		p2->timing.flags = 0;
-		if (DAC2R(FP_TG_CTRL) & 0x00000001) p2->timing.flags |= B_POSITIVE_VSYNC;
-		if (DAC2R(FP_TG_CTRL) & 0x00000010) p2->timing.flags |= B_POSITIVE_HSYNC;
-		/* refreshrate */
-		p2->timing.pixel_clock = (p2->timing.h_total * p2->timing.v_total * 60) / 1000;
+		/* timing ('modeline') */
+		p2->timing = si->ps.p2_timing;
 		/* setup the rest */
 		p2->space = B_CMAP8;
 		p2->virtual_width = p2->timing.h_display;
@@ -1213,14 +1227,14 @@ void dump_pins(void)
 		LOG(2,("found DFP (digital flatpanel) on CRTC1; CRTC1 is "));
 		if (si->ps.slaved_tmds1) LOG(2,("slaved\n")); else LOG(2,("master\n"));
 		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
-			si->ps.panel1_width, si->ps.panel1_height, si->ps.panel1_aspect));
+			si->ps.p1_timing.h_display, si->ps.p1_timing.v_display, si->ps.panel1_aspect));
 	}
 	if (si->ps.tmds2_active)
 	{
 		LOG(2,("found DFP (digital flatpanel) on CRTC2; CRTC2 is "));
 		if (si->ps.slaved_tmds2) LOG(2,("slaved\n")); else LOG(2,("master\n"));
 		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
-			si->ps.panel2_width, si->ps.panel2_height, si->ps.panel2_aspect));
+			si->ps.p2_timing.h_display, si->ps.p2_timing.v_display, si->ps.panel2_aspect));
 	}
 	LOG(2,("monitor (output devices) setup matrix: $%02x\n", si->ps.monitors));
 	LOG(2,("INFO: end pinsdump.\n"));
