@@ -1448,6 +1448,15 @@ _user_remove_team_debugger(team_id teamID)
 	if (error == B_OK)
 		destroy_team_debug_info(&info);
 
+// TODO: There's more to do! There might still be stopped threads blocking on
+// their ports. They should continue now. The same goes, if the debugger just
+// terminates or gets killed, i.e. the nub thread should best do the cleanup.
+// It could just broadcast a new message to all threads and the threads will
+// do the necessary cleanup. To support _user_wait_for_debugger() the thread
+// should enter debugged state (thread_hit_debug_event()) and just wait for
+// the nub thread to broadcast a special message that indicates the begin of
+// debugging.
+
 	return error;
 }
 
@@ -1492,5 +1501,11 @@ _user_debug_thread(thread_id threadID)
 	restore_interrupts(state);
 
 	return error;
+}
+
+void
+_user_wait_for_debugger(void)
+{
+	// TODO: Implement!
 }
 
