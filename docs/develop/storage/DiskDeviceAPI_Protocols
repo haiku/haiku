@@ -1,0 +1,36 @@
+Disk Device Protocols
+=====================
+
+disk device job progress update message
+
+target:		Registered progress update BMessenger for the given job
+message:	B_DISK_DEVICE_JOB_UPDATE
+			"job_id": B_INT32_TYPE
+			"progress": B_UINT8_TYPE
+			[ "description": B_STRING_TYPE ]
+reply:      none (asynchronous message)
+
+message fields:
+- job_id: Unique job identifier
+- progress: Percent of job completed (0 to 100)
+- description: Optional description of current action being taken, i.e.
+               "allocating inodes", "writing superblock", etc.
+
+-----------------------------------------------------------------------
+
+disk device job finished message
+
+target:		Registered progress update BMessenger for the given job
+message:	B_DISK_DEVICE_JOB_FINISHED
+			"job_id": B_INT32_TYPE
+reply:      none (asynchronous message)
+
+message fields:
+- job_id: Unique job identifier
+
+notes:
+A separate job finished message is needed, as rounding error in
+the computation of job progress may result in multiple
+B_DISK_DEVICE_JOB_UPDATE messages with "progress" fields of 100.
+
+-----------------------------------------------------------------------
