@@ -233,9 +233,8 @@ typedef struct
 	unsigned char duplex_full;   /* Full-Duplex Operation Requested. */
 	unsigned char duplex_lock;
 
-	uint8  cur_tx;
 	uint8  cur_rx;
-	int32  inrw;                /* In Read or Write Function          */
+	uint8  cur_tx;
 	int    nonblocking;
 
 	/*

@@ -1,5 +1,5 @@
 /*
- * VIA VT86C100A Rhine-II and VIA VT3043 Rhine Based Card Driver By Richard Houle
+ * VIA VT86C100A Rhine-II and VIA VT3043 Rhine Based Card Driver
  * for the BeOS Release 5
  */
  
@@ -27,18 +27,16 @@
 #include "via-rhine.h"
 
 /*
- * PCI Information Table (VT6102/VT6103/VT6105/VT6105M added by Karina Goddard, March 04, VT6103 and VT6105 seem to work, but buggy)
+ * PCI Information Table
  */
 struct viarhine_pci_id_info pci_tbl[] =
 {
-	{"VIA VT86C100A Rhine-II", 0x1106, 0x6100, 0xffff, PCI_command_io | PCI_command_master, 128},
-	{"VIA VT3042 Rhine",       0x1106, 0x3043, 0xffff, PCI_command_io | PCI_command_master, 128},
-	{"VIA VT6102 Rhine-II/VT6103 Tahoe 10/100M Fast Ethernet Adapter", 0x1106, 0x3065, 0xffff, PCI_command_io | PCI_command_master, 256},
-	{"VIA VT6105 Rhine-III Management Adapter", 0x1106, 0x3106, 0xffff, PCI_command_io | PCI_command_master, 256},
-	{"VIA VT6105M Rhine-III Management Adapter", 0x1106, 0x3053, 0xffff, PCI_command_io | PCI_command_master, 256},
-
-{0}
-
+	{"VIA VT3042 Rhine",							0x1106, 0x3043, 0xffff, PCI_command_io | PCI_command_master, 128},	
+	{"VIA VT6102 Rhine-II",							0x1106, 0x3065, 0xffff, PCI_command_io | PCI_command_master, 128},
+	{"VIA VT86C100A Rhine-II",						0x1106, 0x6100, 0xffff, PCI_command_io | PCI_command_master, 128},
+//	{"VIA VT6105M/LOM Rhine-III",					0x1106, 0x3106, 0xffff, PCI_command_io | PCI_command_master, 128},
+//	{"VIA VT6105M Rhine-III Management Adaptor",	0x1106, 0x3053, 0xffff, PCI_command_io | PCI_command_master, 128},
+	{0}
 };
 
 /*
@@ -46,6 +44,7 @@ struct viarhine_pci_id_info pci_tbl[] =
  */
 struct viarhine_chip_info cap_tbl[] =
 {
+	{128, CanHaveMII},
 	{128, CanHaveMII},
 	{128, CanHaveMII}
 };

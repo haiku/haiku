@@ -32,7 +32,7 @@ status_t res_allocate(viarhine_private *device)
 	debug_printf("device_allocate_resources\n");
 #endif
 
-	device->olock = create_sem(1, "via-rhine output");
+	device->olock = create_sem(TX_BUFFERS, "via-rhine output");
 	set_sem_owner(device->olock, B_SYSTEM_TEAM);
 	device->ilock = create_sem(0, "via-rhine input");
 	set_sem_owner(device->ilock, B_SYSTEM_TEAM);

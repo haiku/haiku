@@ -59,7 +59,7 @@ void rx_setmode(viarhine_private *device)
 
 	write32(device->addr + MulticastFilter0, 0);	
 	write32(device->addr + MulticastFilter1, 0);	
-	rx_mode = 0x1A;
+	rx_mode = 0xA; // was 0x1A => PRO should not be set
 #endif
 
 	write8(device->addr + RxConfig, device->rx_thresh | rx_mode);

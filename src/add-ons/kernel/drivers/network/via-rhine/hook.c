@@ -50,27 +50,28 @@ int32 hook_interrupt(void *_device)
 		if (reg & IntrRxDone)
 		{
 			wakeup_reader++;
-			write16(device->addr, CmdRxDemand | device->cmd);
+			//write16(device->addr + ChipCmd, CmdRxDemand | read16(device->addr + ChipCmd));
 			handled = B_HANDLED_INTERRUPT;
 			continue;
 		}
 		if (reg & IntrTxDone)
 		{
 			wakeup_writer++;
+			//write16(device->addr + ChipCmd, CmdTxDemand | read16(device->addr + ChipCmd));
 			handled = B_HANDLED_INTERRUPT;
 			continue;
 		}
 
 		if (reg & (IntrRxErr | IntrRxDropped | IntrRxWakeUp | IntrRxEmpty | IntrRxNoBuf))
 		{
-			write16(device->addr, CmdRxDemand | device->cmd);
+			write16(device->addr + ChipCmd, CmdRxDemand | read16(device->addr + ChipCmd));
 			handled = B_HANDLED_INTERRUPT;
 			continue;
 		}
 		if (reg & IntrTxAbort)
 		{
 			/* Just restart Tx. */
-			write16(device->addr, CmdTxDemand | device->cmd);
+			write16(device->addr + ChipCmd, CmdTxDemand | read16(device->addr + ChipCmd));
 			handled = B_HANDLED_INTERRUPT;
 			continue;
 		}
@@ -78,7 +79,7 @@ int32 hook_interrupt(void *_device)
 		{
 			if (device->tx_thresh < 0xE0)
 				write8(device->addr + TxConfig, device->tx_thresh += 0x20);
-			write16(device->addr, CmdTxDemand | device->cmd);
+			write16(device->addr + ChipCmd, CmdTxDemand | read16(device->addr + ChipCmd));
 			handled = B_HANDLED_INTERRUPT;
 			continue;
 		}
@@ -88,7 +89,7 @@ int32 hook_interrupt(void *_device)
 				device->tx--;
 
 			if (device->tx > 0)
-				write16(device->addr, CmdTxDemand | device->cmd);
+				write16(device->addr + ChipCmd, CmdTxDemand | read16(device->addr + ChipCmd));
 		}
 */
 		if (--worklimit < 0)
@@ -97,7 +98,8 @@ int32 hook_interrupt(void *_device)
 
 	if (wakeup_reader)
 	{
-		for (i = 0, j = 0; i < RX_BUFFERS; i++)
+
+/*		for (i = 0, j = 0; i < RX_BUFFERS; i++)
 		{
 			if (!(device->rx_desc[i].rx_status & DescOwn))
 			{
@@ -106,6 +108,7 @@ int32 hook_interrupt(void *_device)
 		}
 		
 		device->cur_rx = j;
+*/
 		input_unwait(device, 1);
 	}
 
@@ -127,6 +130,8 @@ status_t hook_open(const char *name, uint32 flags,  void **cookie)
 	status_t          status;
 	uint32            size;
 	viarhine_private *device;
+
+	(void)flags; /* get rid of compiler warning */
 
 	// Find Device Name
 	for (devID = 0; (devName = pDevNameList[devID]); devID++)
@@ -189,6 +194,10 @@ status_t hook_open(const char *name, uint32 flags,  void **cookie)
 			{
 				device->mii_phys[phy_idx++] = phy;
 				device->mii_advertising     = mdio_read(device, phy, 4);
+				
+#ifdef __VIARHINE_DEBUG__
+				debug_printf("mii status=%lx, advertising=%lx\n", mii_status, device->mii_advertising);
+#endif
 			}
 		}
 		
@@ -294,6 +303,8 @@ status_t hook_ioctl(void *_data, uint32 msg, void *buf, size_t len)
 {
 	viarhine_private *device = (viarhine_private*)_data;
 
+	(void)len; /* get rid of compiler warning */
+
 	switch (msg)
 	{
 	case ETHER_GETADDR:
@@ -356,40 +367,31 @@ status_t hook_read(void *_data, off_t pos, void *buf, size_t *len)
 {
 	viarhine_private *device = (viarhine_private*)_data;
 	ulong             buflen;
-	int               packet_len = 0;
 	unsigned int      entry;
 	char             *addr;
 	uint32            data_size;
 	uint32            desc_status;
+
+	(void)pos; /* get rid of compiler warning */
 	
 	buflen = *len;
-	atomic_add(&device->inrw, 1);
 
-ReturnInLoop:
-	write16(device->addr, CmdRxDemand | device->cmd);
-	while ((device->cur_rx == 0) && (!device->nonblocking))
-	{
-		input_wait(device);
+	//write16(device->addr + ChipCmd, CmdRxDemand | read16(device->addr + ChipCmd));
+	input_wait(device);
 		
-		if (device->interrupted)
-		{
-			*len = 0;
-			return B_INTERRUPTED;
-		}
-	}
-
-	if (device->cur_rx != 0)
-	{
-		device->cur_rx--;
-	}
-	else if (device->nonblocking)
+	if (device->interrupted)
 	{
 		*len = 0;
-		atomic_add(&device->inrw, 1);
+		return B_INTERRUPTED;
+	}
+
+	if (device->nonblocking)
+	{
+		*len = 0;
 		return 0;
 	}
 	
-	entry = 0;
+	entry = device->cur_rx;
 	while (device->rx_desc[entry].rx_status & DescOwn)
 	{
 		entry++;
@@ -406,17 +408,10 @@ ReturnInLoop:
 	
 	addr = &device->rx_buf[entry * BUFFER_SIZE];
 
-	if (!is_mine(device, addr))
-	{
-		device->rx_desc[entry].desc_length = 1536;
-		device->rx_desc[entry].rx_status   = DescOwn;
-		goto ReturnInLoop;
-	}
-
 #ifdef __VIARHINE_DEBUG__
 	debug_printf("hook_read: received (%u)(%u) (%02x:%02x:%02x:%02x:%02x:%02x)\n",
 			data_size,
-			device->cur_rx,
+			entry,
 			(unsigned char)addr[0],
 			(unsigned char)addr[1],
 			(unsigned char)addr[2],
@@ -431,7 +426,10 @@ ReturnInLoop:
 	device->rx_desc[entry].desc_length = MAX_FRAME_SIZE;
 	device->rx_desc[entry].rx_status   = DescOwn;
 
-	atomic_add(&device->inrw, -1);
+	entry++;
+	entry %= RX_BUFFERS;
+	device->cur_rx = entry;
+
 	return B_OK;
 }
 
@@ -441,56 +439,52 @@ status_t hook_write(void *_data, off_t pos, const void *buf, size_t *len)
 	ulong             buflen;
 	status_t          status;
 	unsigned int      entry;
-	unsigned int      i, j;
 	void             *addr;
 
-	buflen = *len;
-	atomic_add(&device->inrw, 1);
+	(void)pos; /* get rid of compiler warning */
+	
+	if (device->interrupted)
+		return B_INTERRUPTED;
 
-	do
-	{
-		if (device->interrupted)
-		{
-			atomic_add(&device->inrw, -1);
-			return B_INTERRUPTED;
-		}
-
-		status = output_wait(device, ETHER_TRANSMIT_TIMEOUT);
-		if (status < B_NO_ERROR)
-		{
-			atomic_add(&device->inrw, -1);
-			return status;
-		}
-
-	} while (device->tx_desc[device->cur_tx].tx_status & DescOwn);
+	status = output_wait(device, ETHER_TRANSMIT_TIMEOUT);
+	if (status != B_OK) {
+#ifdef __VIARHINE_DEBUG__
+		debug_printf("hook_write: leave (%s)\n", strerror(status));
+#endif
+		return status;
+	}
 
 	entry = device->cur_tx;
-	device->cur_tx++;
-	device->cur_tx %= TX_BUFFERS;
+	while(device->tx_desc[entry].tx_status & DescOwn)
+	{
+		entry++;
+		entry %= RX_BUFFERS;
+	}
+
+	buflen = *len;
 
 	device->tx_desc[entry].tx_status = DescOwn;
 	addr = &device->tx_buf[entry * BUFFER_SIZE];
 	memcpy(addr, buf, buflen);
 
 	if (buflen < 60)
-	{
 		buflen = 60;
-	}
 
-	if (buflen & 3)
-	{
+	if (buflen & 3) {
 		buflen &= (~3);
 		buflen += 4;
 	}
 	
 	device->tx_desc[entry].desc_length = 0x00E08000 | buflen;
-	write16(device->addr + ChipCmd, CmdTxDemand | device->cmd);
+	entry++;
+	entry %= TX_BUFFERS;
+	device->cur_tx = entry;
+	//write16(device->addr + ChipCmd, CmdTxDemand | read16(device->addr + ChipCmd));
 
 #ifdef __VIARHINE_DEBUG__
-	debug_printf("hook_write: sent (%u)(%u)\n", buflen, device->cur_tx);
+	debug_printf("hook_write: sent (%u)(%u)\n", buflen, entry);
 #endif
 
-	atomic_add(&device->inrw, -1);
 	*len = buflen;
 	return B_OK;
 }
