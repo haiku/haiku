@@ -461,11 +461,15 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 		copies = fRealJobData->getCopies();
 	}
 	
+	// printing of even/odd numbered pages only is valid in simplex mode
+	bool simplex = fRealJobData->getPrintStyle() == JobData::kSimplex;
+	
 	if (spool_data->startEnum()) {
 		do {
 			DBGMSG(("page index = %d\n", page_index));
 
-			if (fRealJobData->getPageSelection() == JobData::kEvenNumberedPages) {
+			if (simplex && 
+				fRealJobData->getPageSelection() == JobData::kEvenNumberedPages) {
 				// skip odd numbered page
 				more = skipPages(spool_data);
 			}
@@ -478,7 +482,8 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 			PageDataList pages;
 			more = collectPages(spool_data, &pages);
 			
-			if (more && fRealJobData->getPageSelection() == JobData::kOddNumberedPages) {
+			if (more && simplex && 
+				fRealJobData->getPageSelection() == JobData::kOddNumberedPages) {
 				// skip even numbered page
 				more = skipPages(spool_data);
 			}

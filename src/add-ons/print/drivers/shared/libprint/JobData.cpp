@@ -364,9 +364,9 @@ void JobData::save(BMessage *msg)
 		msg->AddInt32(kJDPageOrder, fPageOrder);
 
 	if (msg->HasBool(kJDColor))
-		msg->ReplaceBool(kJDColor, fColor);
+		msg->ReplaceBool(kJDColor, fColor == kColor);
 	else
-		msg->AddBool(kJDColor, fColor);
+		msg->AddBool(kJDColor, fColor == kColor);
 
 	if (msg->HasInt32(kJDDitherType))
 		msg->ReplaceInt32(kJDDitherType, fDitherType);
