@@ -46,9 +46,9 @@ struct read_request {
 	void			*buffer;
 	size_t			buffer_size;
 	size_t			bytes_read;
-	
+
 	size_t SpaceLeft() const { return buffer_size - bytes_read; }
-	void Fill(Volume *volume);
+	void Fill(Inode *inode);
 	status_t PutBuffer(const void **_buffer, size_t *_bufferSize);
 };
 
@@ -132,10 +132,12 @@ class Inode {
 		sem_id		ReadLock() { return fReadLock; }
 		mutex		*WriteMutex() { return &fWriteMutex; }
 
+		status_t	WriteBufferToChain(const void *buffer, size_t bufferSize);
+		status_t	ReadBufferFromChain(void *buffer, size_t *_bufferSize);
+
 		static int32 HashNextOffset();
 		static uint32 hash_func(void *_node, const void *_key, uint32 range);
 		static int compare_func(void *_node, const void *_key);
-
 
 	private:
 		Inode		*fNext;
@@ -143,6 +145,8 @@ class Inode {
 		vnode_id	fID;
 		int32		fType;
 		const char	*fName;
+
+		cbuf		*fBufferChain;
 
 		sem_id		fReadLock;
 		mutex		fWriteMutex;
@@ -398,7 +402,8 @@ err:
 Inode::Inode(Volume *volume, const char *name, int32 type)
 	:
 	fNext(NULL),
-	fHashNext(NULL)
+	fHashNext(NULL),
+	fBufferChain(NULL)
 {
 	fName = strdup(name);
 	if (fName == NULL)
@@ -431,6 +436,78 @@ Inode::InitCheck()
 	if (fName == NULL
 		|| fType == S_IFIFO && (fReadLock < B_OK || fWriteMutex.sem < B_OK))
 		return B_ERROR;
+
+	return B_OK;
+}
+
+
+/** Adds the specified buffer to the inode's buffer chain by copying
+ *	its contents. The Inode::WriteLock() must be held when calling
+ *	this method.
+ *	Releases the reader sem if necessary, so that blocking
+ *	readers will get started.
+ *	Returns B_NO_MEMORY if the chain couldn't be allocated, B_BAD_ADDRESS
+ *	if copying from the buffer failed, and B_OK on success.
+ */
+
+status_t
+Inode::WriteBufferToChain(const void *buffer, size_t bufferSize)
+{
+	cbuf *chain = cbuf_get_chain(bufferSize);
+	if (chain == NULL)
+		return B_NO_MEMORY;
+	
+	if (cbuf_user_memcpy_to_chain(chain, 0, buffer, bufferSize) < B_OK)
+		return B_BAD_ADDRESS;
+
+	// join this chain with our already existing chain (if any)
+
+	chain = cbuf_merge_chains(fBufferChain, chain);
+
+	// let waiting readers go on
+	if (fBufferChain == NULL)
+		release_sem(ReadLock());
+
+	fBufferChain = chain;
+	return B_OK;
+}
+
+
+/** Reads the contents of the buffer chain to the specified
+ *	buffer, if any.
+ *	Unblocks other waiting readers if there would be still
+ *	some bytes left in the stream.
+ */
+
+status_t 
+Inode::ReadBufferFromChain(void *buffer, size_t *_bufferSize)
+{
+	if (fBufferChain == NULL) {
+		*_bufferSize = 0;
+		return B_OK;
+	}
+
+	size_t length = cbuf_get_length(fBufferChain);
+
+	// we read *_bufferSize bytes at maximum - but never
+	// more than there are in the chain
+	if (*_bufferSize > length)
+		*_bufferSize = length;
+	else {
+		length = *_bufferSize;
+
+		// we unlock another reader here, so that it can read
+		// the rest of the pending bytes
+		release_sem(ReadLock());
+	}
+
+	if (cbuf_user_memcpy_from_chain(buffer, fBufferChain, 0, length) < B_OK)
+		return B_BAD_ADDRESS;
+
+	if (cbuf_truncate_head(fBufferChain, length) < B_OK) {
+		// if that call fails, the next read will duplicate the input
+		dprintf("pipefs: cbuf_truncate_head() failed for inode %Ld\n", ID());
+	}
 
 	return B_OK;
 }
@@ -473,11 +550,16 @@ Inode::compare_func(void *_node, const void *_key)
 //	#pragma mark -
 
 
-void 
-read_request::Fill(Volume *volume)
+void
+read_request::Fill(Inode *inode)
 {
-	// ToDo: implement me - fill this request with waiting buffers
-	return;
+	size_t length = SpaceLeft();
+
+	if (inode->ReadBufferFromChain(buffer, &length) < B_OK) {
+		// ToDo: should add status to read_request
+		dprintf("reading from chain failed!");
+	} else
+		bytes_read += length;
 }
 
 
@@ -867,7 +949,7 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	requests.Lock();
 
 	if (status == B_OK)
-		request.Fill(volume);
+		request.Fill(inode);
 
 	requests.Remove(request);
 	requests.Unlock();
@@ -908,7 +990,7 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		if (request != NULL) {
 			// fill this request
 
-			request->Fill(volume);
+			request->Fill(inode);
 			if (request->SpaceLeft() > 0) {
 				// place our data into that buffer
 				request->PutBuffer(&buffer, &bytesLeft);
@@ -928,11 +1010,9 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		// there is no read request pending, so we have to put
 		// our data in a temporary buffer
 
-		// ToDo: do that using cbufs!
-		*_length -= bytesLeft;
-		dprintf("pipefs: lazy write saw no read_request...\n");
-		release_sem(inode->ReadLock());
-		status = B_OK;
+		status = inode->WriteBufferToChain(buffer, bytesLeft);
+		if (status != B_OK)
+			*_length -= bytesLeft;
 	} else {
 		// could write everything without the need to copy!
 		status = B_OK;
