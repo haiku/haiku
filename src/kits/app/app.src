@@ -10,6 +10,7 @@ APP_KIT_SOURCE =
 	MessageFilter.cpp
 	MessageQueue.cpp
 	Messenger.cpp
+	PropertyInfo.cpp
 	RegistrarDefs.cpp
 	Roster.cpp
 	TokenSpace.cpp
