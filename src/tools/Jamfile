@@ -1,5 +1,5 @@
 SubDir OBOS_TOP src tools ;
 
 SubInclude OBOS_TOP src tools cppunit ;
-SubInclude OBOS_TOP src tools key ;
+SubInclude OBOS_TOP src tools hey ;
 SubInclude OBOS_TOP src tools jam ;
