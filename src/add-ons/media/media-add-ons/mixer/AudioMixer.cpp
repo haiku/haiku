@@ -340,10 +340,7 @@ AudioMixer::Connected(const media_source &producer, const media_destination &whe
 	// if the input has no name, assign one
 	if (strlen(out_input->name) == 0)
 		sprintf(out_input->name, "Input %ld", out_input->destination.id);
-	out_input->node = Node();
-	out_input->source = producer;
-	out_input->format = with_format;
-
+	
 	// add a new input to the mixer engine
 	MixerInput *input;
 	input = fCore->AddInput(*out_input);
