@@ -78,9 +78,10 @@ static void _set_gate(desc_table *gate_addr, unsigned int addr, int type, int dp
 
 void arch_int_enable_io_interrupt(int irq)
 {
-	if(irq < 0x20 || irq >= 0x30) return;
-	irq -= 0x20;
-	// if this is a external interrupt via 8239, enable it here
+	if (irq < 0 || irq >= 0x10)
+		return;
+dprintf("arch_int_enable_io_interrupt: irq %d\n", irq);
+	/* if this is a external interrupt via 8239, enable it here */
 	if (irq < 8)
 		out8(in8(0x21) & ~(1 << irq), 0x21);
 	else
@@ -89,9 +90,9 @@ void arch_int_enable_io_interrupt(int irq)
 
 void arch_int_disable_io_interrupt(int irq)
 {
-	if(irq < 0x20 || irq >= 0x30) return;
-	irq -= 0x20;
-	// if this is a external interrupt via 8239, disable it here
+	if (irq < 0 || irq >= 0x10)
+		return;
+	/* if this is a external interrupt via 8239, disable it here */
 	if (irq < 8)
 		out8(in8(0x21) | (1 << irq), 0x21);
 	else

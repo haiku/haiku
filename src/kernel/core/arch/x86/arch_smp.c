@@ -92,10 +92,10 @@ int arch_smp_init(kernel_args *ka)
 		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "ioapic", (void *)&ioapic,
 			REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 
-		install_io_interrupt_handler(0xfb, &i386_timer_interrupt, NULL, 0);
-		install_io_interrupt_handler(0xfd, &i386_ici_interrupt, NULL, 0);
-		install_io_interrupt_handler(0xfe, &i386_smp_error_interrupt, NULL, 0);
-		install_io_interrupt_handler(0xff, &i386_spurious_interrupt, NULL, 0);
+		install_interrupt_handler(0xfb, &i386_timer_interrupt, NULL);
+		install_interrupt_handler(0xfd, &i386_ici_interrupt, NULL);
+		install_interrupt_handler(0xfe, &i386_smp_error_interrupt, NULL);
+		install_interrupt_handler(0xff, &i386_spurious_interrupt, NULL);
 	} else {
 		num_cpus = 1;
 	}

@@ -51,17 +51,20 @@ int_init2(kernel_args *ka)
 	return arch_int_init2(ka); 
 } 
 
-
-/* install_io_interrupt_handler
- * install a handler to be called when an interrupt is triggered
- * for the given irq with data as the argument
- */
-long install_io_interrupt_handler(long irq, interrupt_handler handler,
-                                 void* data, ulong flags) 
-{ 
+/* install_interrupt_handler
+ * This function is used internally to install a handler on the given vector.
+ * NB this does NOT take an IRQ, but a system interrupt value.
+ * As this is intended for system use this function doe NOT call
+ * arch_int_enable_io_interrupt() as it only works for IRQ values
+ */ 
+long install_interrupt_handler(long vector, interrupt_handler handler,
+                               void* data)
+{
 	struct io_handler *io = NULL; 
-	int state; 
+	int state;
 
+	dprintf("install_interrupt_handler: vector %ld\n", vector);
+	
 	/* find the chain of handlers for this irq.
 	 * NB there can be multiple handlers for the same IRQ, especially for
 	 * PCI drivers. Where we have multiple handlers we will call each in turn
@@ -74,18 +77,36 @@ long install_io_interrupt_handler(long irq, interrupt_handler handler,
 	io->data = data; 
 
 	/* Make sure our list is init'd or bad things will happen */
-	if (io_vectors[irq].handler_list.next == NULL) {
-		io_vectors[irq].handler_list.next = &io_vectors[irq].handler_list;
-		io_vectors[irq].handler_list.prev = &io_vectors[irq].handler_list;
+	if (io_vectors[vector].handler_list.next == NULL) {
+		io_vectors[vector].handler_list.next = &io_vectors[vector].handler_list;
+		io_vectors[vector].handler_list.prev = &io_vectors[vector].handler_list;
 	}
 	
 	/* Disable the interrupts, get the spinlock for this irq only
 	 * and then insert the handler */
 	state = int_disable_interrupts();
-	acquire_spinlock(&io_vectors[irq].vector_lock); 
-	insque(io, &io_vectors[irq].handler_list);
-	release_spinlock(&io_vectors[irq].vector_lock); 
+	acquire_spinlock(&io_vectors[vector].vector_lock); 
+	insque(io, &io_vectors[vector].handler_list);
+	release_spinlock(&io_vectors[vector].vector_lock); 
 	int_restore_interrupts(state); 
+
+	return 0;
+}
+
+/* install_io_interrupt_handler
+ * install a handler to be called when an interrupt is triggered
+ * for the given irq with data as the argument
+ */
+long install_io_interrupt_handler(long irq, interrupt_handler handler,
+                                 void* data, ulong flags) 
+{ 
+	long vector = irq + 0x20;
+	long rv;
+	dprintf("install_io_interrupt_handler: irq %ld\n", irq);
+	rv = install_interrupt_handler(vector, handler, data);
+	
+	if (rv != 0)
+		return rv;
 
 	/* If we were passed the bit-flag B_NO_ENABLE_COUNTER then 
 	 * we're being asked to not alter whether the interrupt is set
@@ -97,50 +118,60 @@ long install_io_interrupt_handler(long irq, interrupt_handler handler,
 	return 0; 
 }
 
+/* remove_interrupt_handler
+ * read notes for install_interrupt_handler
+ */
+long remove_interrupt_handler(long vector, interrupt_handler handler, 
+                              void* data) 
+{ 
+	struct io_handler *io = NULL; 
+
+	/* lock the structures down so it is not modified while we search */
+	int state = int_disable_interrupts(); 
+	acquire_spinlock(&io_vectors[vector].vector_lock); 
+
+	/* loop through the available handlers and try to find a match.
+	 * We go forward through the list but this means we start with the 
+	 * most recently added handlers.
+	 */
+	io = io_vectors[vector].handler_list.next; 
+	for (io = io_vectors[vector].handler_list.next;
+	     io != &io_vectors[vector].handler_list;
+	     io = io->next) { 
+		/* we have to match both function and data */ 
+		if (io->func == handler && io->data == data) 
+			break; 
+	} 
+
+	if (io) {
+		remque(io);
+		kfree(io); 
+	}
+	
+	// release our lock as we're done with the vector 
+	release_spinlock(&io_vectors[vector].vector_lock); 
+	int_restore_interrupts(state); 
+
+	return (io != NULL) ? 0 : EINVAL; 
+} 
+
 /* remove_io_interrupt_handler
  * remove an interrupt handler previously inserted
  */
 long remove_io_interrupt_handler(long irq, interrupt_handler handler, 
                                      void* data) 
 { 
-	struct io_handler *io = NULL; 
-	int state; 
-
-	// lock the structures down so it is not modified while we search 
-	state = int_disable_interrupts(); 
-	acquire_spinlock(&io_vectors[irq].vector_lock); 
-
-	/* loop through the available handlers and try to find a match.
-	 * We go forward through the list but this means we start with the 
-	 * most recently added handlers.
-	 */
-	io = io_vectors[irq].handler_list.next; 
-	while (io != &io_vectors[irq].handler_list) { 
-		/* we have to match both function and data */ 
-		if (io->func == handler && io->data == data) 
-			break; 
-		io = io->next; 
-	} 
-
-	if (io) 
-		remque(io);
+	long vector = irq + 0x20;
+	long rv = remove_interrupt_handler(vector, handler, data);
 	
-	// release our lock as we're done with the vector 
-	release_spinlock(&io_vectors[irq].vector_lock); 
-	int_restore_interrupts(state); 
+	if (rv < 0)
+		return rv;
 
-	// and disable the IRQ if nothing left 
-	if (io != NULL) { 
-		/* we still have handlers left if the next handler doesn't point back
-		 * to the head of the list.
-		 */
-		if (io_vectors[irq].handler_list.next != &io_vectors[irq].handler_list) 
-			arch_int_disable_io_interrupt(irq); 
-	
-		kfree(io); 
-	} 
+	/* Check if we need to disable interrupts... */
+	if (io_vectors[vector].handler_list.next != &io_vectors[vector].handler_list) 
+		arch_int_disable_io_interrupt(irq); 
 
-	return (io != NULL) ? 0 : EINVAL; 
+	return 0; 
 } 
 
 /* int_io_interrupt_handler
@@ -165,6 +196,18 @@ int int_io_interrupt_handler(int vector)
 		 *                        attention is required
 		 * - B_INVOKE_SCHEDULER, the interrupt has been handled, but the function wants
 		 *                       the scheduler to be invoked
+		 *
+		 * XXX - this is a change of behaviour from newos where every handler registered
+		 *       be called, even if the interrupt had been "handled" by a previous
+		 *       function.
+		 *       The logic now is that if there are no handlers then we return
+		 *       B_UNHANDLED_INTERRUPT and let the system do as it will.
+		 *       When we have the first function that claims to have "handled" the
+		 *       interrupt, by returning B_HANDLED_... or B_INVOKE_SCHEDULER we simply
+		 *       stop calling further handlers and return the value from that
+		 *       handler.
+		 *       This may not be correct but appears to be what BeOS did and seems
+		 *       right.
 		 */
 		for (io = io_vectors[vector].handler_list.next; 
 		     io != &io_vectors[vector].handler_list;
