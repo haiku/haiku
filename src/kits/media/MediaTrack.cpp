@@ -69,8 +69,7 @@ BMediaTrack::DecodedFormat(media_format *inout_format)
 	if (!fExtractor || !fDecoder)
 		return B_NO_INIT;
 		
-	return fDecoder->Setup(fExtractor->EncodedFormat(fStream), inout_format,
-						   fExtractor->InfoBuffer(fStream), fExtractor->InfoBufferSize(fStream));
+	return fDecoder->NegotiateOutputFormat(inout_format);
 }
 
 

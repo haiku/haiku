@@ -7,24 +7,36 @@
 #if TRACE_THIS
   #define TRACE printf
 #else
-  #define TRACE ((void)0)
+  #define TRACE TRACE(a...)
 #endif
 
 
 status_t
-RawDecoder::Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
+RawDecoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
 	if (ioEncodedFormat->type != B_MEDIA_RAW_AUDIO && ioEncodedFormat->type != B_MEDIA_RAW_VIDEO)
 		return B_ERROR;
+		
+	fInputFormat = *ioEncodedFormat;
 		
 	if (ioEncodedFormat->type == B_MEDIA_RAW_VIDEO)
 		fFrameSize = ioEncodedFormat->u.raw_video.display.line_count * ioEncodedFormat->u.raw_video.display.bytes_per_row;
 	else
 		fFrameSize = (ioEncodedFormat->u.raw_audio.format & 0xf) * ioEncodedFormat->u.raw_audio.channel_count;
 
-	*ioDecodedFormat = *ioEncodedFormat;
+	return B_OK;
+}
 
+
+status_t
+RawDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
+{
+	// BeBook says: The codec will find and return in ioFormat its best matching format
+	// => This means, we never return an error, and always change the format values
+	//    that we don't support to something more applicable
+
+	*ioDecodedFormat = fInputFormat;
 	return B_OK;
 }
 

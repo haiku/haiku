@@ -8,8 +8,10 @@ public:
 				mp3Decoder();
 				~mp3Decoder();
 	
-	status_t	Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
+	status_t	Setup(media_format *ioEncodedFormat,
 					  const void *infoBuffer, int32 infoSize);
+
+	status_t	NegotiateOutputFormat(media_format *ioDecodedFormat);
 
 	status_t	Seek(uint32 seekTo,
 					 int64 seekFrame, int64 *frame,
@@ -26,9 +28,12 @@ private:
 	int32			fResidualBytes;
 	uint8 *			fResidualBuffer;
 	uint8 *			fDecodeBuffer;
-	int32			fFrameSize;
-	int32			fFps;
 	bigtime_t		fStartTime;
+	int				fFrameSize;
+	int				fFrameRate;
+	int				fBitRate;
+	int				fChannelCount;
+	int				fOutputBufferSize;
 };
 
 

@@ -15,8 +15,9 @@ public:
 	virtual				~Decoder();
 	
 						// Setup get's called with the info data from Reader::GetStreamInfo
-	virtual status_t	Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
-							  const void *infoBuffer, int32 infoSize) = 0;
+	virtual status_t	Setup(media_format *ioEncodedFormat, const void *infoBuffer, int32 infoSize) = 0;
+
+	virtual status_t	NegotiateOutputFormat(media_format *ioDecodedFormat) = 0;
 	
 	virtual status_t	Seek(uint32 seekTo,
 							 int64 seekFrame, int64 *frame,

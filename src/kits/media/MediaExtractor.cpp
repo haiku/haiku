@@ -90,7 +90,7 @@ MediaExtractor::StreamCount()
 	return fStreamCount;
 }
 
-media_format *
+const media_format *
 MediaExtractor::EncodedFormat(int32 stream)
 {
 	return &fStreamInfo[stream].encodedFormat;
@@ -124,18 +124,6 @@ MediaExtractor::Duration(int32 stream) const
 	fReader->GetStreamInfo(fStreamInfo[stream].cookie, &frameCount, &duration, &format, &infoBuffer, &infoSize);
 
 	return duration;
-}
-
-void *
-MediaExtractor::InfoBuffer(int32 stream) const
-{
-	return fStreamInfo[stream].infoBuffer;
-}
-
-int32
-MediaExtractor::InfoBufferSize(int32 stream) const
-{
-	return fStreamInfo[stream].infoBufferSize;
 }
 
 status_t
@@ -178,8 +166,13 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info 
 		return B_ERROR;
 	}
 
-	(*decoder)->Setup(this, stream);	
+	(*decoder)->Setup(this, stream);
 	
-	return B_OK;
+	status_t res;
+	res = (*decoder)->Setup(&fStreamInfo[stream].encodedFormat, fStreamInfo[stream].infoBuffer , fStreamInfo[stream].infoBufferSize);
+	if (res != B_OK) {
+		printf("MediaExtractor::CreateDecoder Setup failed for stream %ld\n", stream);
+	}
+	return res;
 }
 

@@ -343,7 +343,7 @@ static	BMediaRoster * CurrentRoster();			//	won't create it if there isn't one
 				int32 channel_count,
 				uint32 sample_format,
 				float frame_rate,
-				bus_type bus_kind);
+				bus_type bus_kind = B_UNKNOWN_BUS);
 
 		/* Use MediaFlags to inquire about specific features of the Media Kit. */
 		/* Returns < 0 for "not present", positive size for output data size. */

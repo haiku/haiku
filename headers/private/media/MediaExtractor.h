@@ -28,11 +28,9 @@ public:
 
 	int32			StreamCount();
 	
-	media_format *	EncodedFormat(int32 stream);
+	const media_format * EncodedFormat(int32 stream);
 	int64			CountFrames(int32 stream) const;
 	bigtime_t		Duration(int32 stream) const;
-	void *			InfoBuffer(int32 stream) const;
-	int32			InfoBufferSize(int32 stream) const;
 
 	status_t		Seek(int32 stream, uint32 seekTo,
 						 int64 *frame, bigtime_t *time);

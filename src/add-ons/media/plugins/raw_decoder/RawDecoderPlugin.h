@@ -3,8 +3,10 @@
 class RawDecoder : public Decoder
 {
 public:
-	status_t	Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
+	status_t	Setup(media_format *ioEncodedFormat,
 					  const void *infoBuffer, int32 infoSize);
+					  
+	status_t	NegotiateOutputFormat(media_format *ioDecodedFormat);
 	
 	status_t	Seek(uint32 seekTo,
 					 int64 seekFrame, int64 *frame,
@@ -13,7 +15,8 @@ public:
 	status_t	Decode(void *buffer, int64 *frameCount,
 					   media_header *mediaHeader, media_decode_info *info);
 private:
-	int32		fFrameSize;
+	int32			fFrameSize;
+	media_format	fInputFormat;
 };
 
 
