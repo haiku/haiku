@@ -34,6 +34,7 @@
 #include "TokenHandler.h"
 
 class ServerBitmap;
+class AreaPool;
 
 /*!
 	\class BitmapManager BitmapManager.h
@@ -57,6 +58,7 @@ protected:
 	int8 *buffer;
 	TokenHandler tokenizer;
 	sem_id lock;
+	AreaPool *fMemPool;
 };
 
 extern BitmapManager *bitmapmanager;
