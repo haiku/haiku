@@ -46,27 +46,36 @@ class BTextControl;
 // _BTextInput_ class ----------------------------------------------------------
 class _BTextInput_ : public BTextView {
 public:
-							_BTextInput_(BTextControl* parent, BRect frame,
-										 const char* name, BRect rect,
-										 uint32 mask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-										 uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
-							~_BTextInput_();
+						_BTextInput_(BRect frame, BRect textRect,
+							uint32 resizeMask,
+							uint32 flags = B_WILL_DRAW | B_PULSE_NEEDED);
+						_BTextInput_(BMessage *data);
+						~_BTextInput_();
 
-	virtual	void			AttachedToWindow();
-	virtual	void			MakeFocus(bool state = true);
-	virtual	void			SetViewColor(rgb_color);
-			rgb_color		ViewColor();
-	virtual bool			CanEndLine(int32);
-	virtual void			KeyDown(const char* bytes, int32 numBytes);
-	virtual void			Draw(BRect);
-	virtual	void			SetEnabled(bool state);
-	virtual	void			MouseDown(BPoint where);
+static	BArchivable*	Instantiate(BMessage *data);
+virtual	status_t		Archive(BMessage *data, bool deep = true) const;
+
+virtual	void			FrameResized(float width, float height);
+virtual	void			KeyDown(const char *bytes, int32 numBytes);
+virtual	void			MakeFocus(bool focusState = true);
+
+		void			AlignTextRect();
+		void			SetInitialText();
+
+virtual	void			Paste(BClipboard *clipboard);
+
+protected:
+
+virtual	void			InsertText(const char *inText, int32 inLength,
+								   int32 inOffset, const text_run_array *inRuns);
+virtual	void			DeleteText(int32 fromOffset, int32 toOffset);
 
 private:
-		  	rgb_color		fViewColor;
-		  	bool			fEnabled;
-		  	bool			fChanged;
-			BTextControl*	fParent;
+
+		BTextControl	*TextControl();
+
+		char			*fPreviousText;
+		bool			fBool;
 };
 //------------------------------------------------------------------------------
 

@@ -46,197 +46,197 @@
 
 
 //------------------------------------------------------------------------------
-_BTextInput_::_BTextInput_(BTextControl* parent, BRect frame, const char* name,
-						   BRect rect, uint32 mask, uint32 flags)
-	:	BTextView(frame, name, rect, mask, flags),
-		fEnabled(true),
-		fChanged(false),
-		fParent(parent)
+_BTextInput_::_BTextInput_(BRect frame, BRect textRect, uint32 resizeMask,
+						   uint32 flags)
+	:	BTextView(frame, "_input_", textRect, resizeMask, flags),
+		fPreviousText(NULL),
+		fBool(false)
 {
-	SetMaxBytes(255);
-	SetWordWrap(false);
+	MakeResizable(true);
+}
+//------------------------------------------------------------------------------
+_BTextInput_::_BTextInput_(BMessage *archive)
+	:	BTextView(archive),
+		fPreviousText(NULL),
+		fBool(false)
+{
+	MakeResizable(true);
 }
 //------------------------------------------------------------------------------
 _BTextInput_::~_BTextInput_()
 {
+	if (fPreviousText)
+		free(fPreviousText);
 }
 //------------------------------------------------------------------------------
-void _BTextInput_::SetEnabled(bool state)
+BArchivable *_BTextInput_::Instantiate(BMessage *archive)
 {
-	fEnabled = state;
-	if (fEnabled)
-	{
-		BView::SetFlags(Flags() | B_NAVIGABLE);
-	}
+	if (validate_instantiation(archive, "_BTextInput_"))
+		return new _BTextInput_(archive);
 	else
-	{
-		BView::SetFlags(Flags() & (0xffffffff - B_NAVIGABLE));
-	}
-
-	Invalidate();
+		return NULL;
 }
 //------------------------------------------------------------------------------
-void _BTextInput_::AttachedToWindow()
+status_t _BTextInput_::Archive(BMessage *data, bool deep) const
 {
-	BFont font;
-	GetFont(&font);
-	float h = font.Size() + 6.0f;
-	ResizeTo(Bounds().Width(), h);
-
-	fViewColor = BTextView::ViewColor();
+	return BTextView::Archive(data, true);
 }
 //------------------------------------------------------------------------------
-rgb_color _BTextInput_::ViewColor()
+void _BTextInput_::FrameResized(float width, float height)
 {
-	return fViewColor;
-}
-//------------------------------------------------------------------------------
-void _BTextInput_::SetViewColor(rgb_color color)
-{
-	fViewColor = color;
-}
-//------------------------------------------------------------------------------
-void _BTextInput_::MakeFocus(bool state)
-{
-	BTextView::MakeFocus(state);
-	if (state)
-	{
-		BTextView::SetViewColor(255, 255, 255, 255);
-		fChanged = false;
-		SelectAll();
-	}
-	else
-	{
-		BTextView::SetViewColor(fViewColor);
-	}
-
-	Invalidate();
-}
-//------------------------------------------------------------------------------
-bool _BTextInput_::CanEndLine(int32 end)
-{
-	return false;
+	BTextView::FrameResized(width, height);
+	AlignTextRect();
 }
 //------------------------------------------------------------------------------
 void _BTextInput_::KeyDown(const char* bytes, int32 numBytes)
 {
-	bool send = false;
-
-	BMessage* msg = Window()->CurrentMessage();
-	if (numBytes == 1)
+	switch (*bytes)
 	{
-		switch (bytes[0])
+		case B_ENTER:
 		{
-			case B_UP_ARROW:
-				msg->ReplaceInt64("when", (int64)system_time());
-				msg->ReplaceInt32("key", 38);
-				msg->ReplaceInt32("raw_char", B_TAB);
-				msg->ReplaceInt32("modifiers", B_SCROLL_LOCK | B_SHIFT_KEY);
-				msg->ReplaceInt8("byte", B_TAB);
-				msg->ReplaceString("bytes", "");
-				fParent->BView::MakeFocus(true);
-				Looper()->PostMessage(msg);
-				send = true;
+			if (!TextControl()->IsEnabled())
 				break;
-
-			case B_ENTER:
+			
+			if(strcmp(Text(), fPreviousText) != 0)
 			{
-				SelectAll();
-				send = true;
-				fChanged = true;
-				break;
-			}		
+				TextControl()->Invoke();
+				free(fPreviousText);
+				fPreviousText = strdup(Text());
+			}
 
-			case B_DOWN_ARROW:
-				msg->ReplaceInt64("when", (int64)system_time());
-				msg->ReplaceInt32("key", 38);
-				msg->ReplaceInt32("raw_char", B_TAB);
-				msg->ReplaceInt8("byte", B_TAB);
-				msg->ReplaceString("bytes", "");
-				Looper()->PostMessage(msg);
-				send = true;
-				break;
+			SelectAll();
+			break;
+		}		
 
-			case B_TAB:
-				// This will make sure that it will skip to the next object
-				BView::KeyDown(bytes, numBytes);
-				send = true;
-				break;
-		
-			default:
-				BTextView::KeyDown(bytes, numBytes);
-		}
-	}
-	else
-	{
-		BTextView::KeyDown(bytes, numBytes);
-	}
-
-	if (send)
-	{
-		if (fChanged)
-		{
-			Window()->PostMessage(new BMessage(B_CONTROL_INVOKED), fParent);
-		}
-	}
-	else
-	{
-		Window()->PostMessage(new BMessage(B_CONTROL_MODIFIED), fParent);
-	}
-
-	fChanged = true;
-}
-//------------------------------------------------------------------------------
-void _BTextInput_::MouseDown(BPoint where)
-{
-	if (fEnabled)
-	{
-		BTextView::MouseDown(where);
-	}
-}
-//------------------------------------------------------------------------------
-void _BTextInput_::Draw(BRect rect)
-{
-
-	BTextView::Draw(rect);
+		case B_TAB:
+			BView::KeyDown(bytes, numBytes);
+			break;
 	
-	rect = Bounds();
-
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetHighColor(tint_color(base, fEnabled ?
-							B_DARKEN_4_TINT : B_LIGHTEN_2_TINT));
-	StrokeLine(BPoint(rect.left,rect.bottom), BPoint(rect.left, rect.top));
-	StrokeLine(BPoint(rect.left+1.0f,rect.top), BPoint(rect.right, rect.top));
-	SetHighColor(tint_color(base, B_NO_TINT));
-	StrokeLine(BPoint(rect.left+1.0f,rect.bottom),
-			   BPoint(rect.right, rect.bottom));
-	StrokeLine(BPoint(rect.right,rect.bottom),
-			   BPoint(rect.right, rect.top+1.0f));
-
-	if (IsFocus())
-	{
-		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		StrokeRect(rect);
-	}
-
-	if (!fEnabled)
-	{
-		rect.InsetBy(1,1);
-		SetDrawingMode(B_OP_ALPHA);
-		rgb_color color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-									 B_LIGHTEN_1_TINT);
-		color.alpha = 140;
-		SetHighColor(color);
-		FillRect(rect);
-		SetDrawingMode(B_OP_COPY);
+		default:
+			BTextView::KeyDown(bytes, numBytes);
 	}
 }
 //------------------------------------------------------------------------------
+void _BTextInput_::MakeFocus(bool state)
+{
+	if (state == IsFocus())
+		return;
 
-/*
- * $Log $
- *
- * $Id  $
- *
- */
+	BTextView::MakeFocus(state);
 
+	if (state)
+	{
+		SetInitialText();
+
+		fBool = true;
+
+		if (Window())
+		{
+			BMessage *msg = Window()->CurrentMessage();
+
+			if (msg && msg->what == B_KEY_DOWN)
+				SelectAll();
+		}
+	}
+	else
+	{
+		if (strcmp(Text(), fPreviousText) != 0)
+			TextControl()->Invoke();
+
+		free(fPreviousText);
+		fPreviousText = NULL;
+		fBool = false;
+
+		if (Window())
+		{
+			BMessage *msg = Window()->CurrentMessage();
+
+			if (msg && msg->what == B_MOUSE_DOWN)
+			{
+				Select(0, 0);
+			}
+		}
+	}
+
+	if (Window())
+	{
+		Draw(Bounds());
+		Flush();
+	}
+}
+//------------------------------------------------------------------------------
+void _BTextInput_::AlignTextRect()
+{
+	// TODO
+}
+//------------------------------------------------------------------------------
+void _BTextInput_::SetInitialText()
+{
+	if (fPreviousText)
+	{
+		free(fPreviousText);
+		fPreviousText = NULL;
+	}
+
+	if (Text())
+		fPreviousText = strdup(Text());
+}
+//------------------------------------------------------------------------------
+void _BTextInput_::Paste(BClipboard *clipboard)
+{
+	BTextView::Paste(clipboard);
+	Invalidate();
+}
+//------------------------------------------------------------------------------
+void _BTextInput_::InsertText(const char *inText, int32 inLength,
+							  int32 inOffset, const text_run_array *inRuns)
+{
+	char *buffer = NULL;
+
+	if (strpbrk(inText, "\r\n") && inLength <= 1024)
+	{
+		buffer = (char*)malloc(inLength);
+
+		if (buffer)
+		{
+			strcpy(buffer, inText);
+
+			for (int32 i = 0; i < inLength; i++)
+				if (buffer[i] == '\r' || buffer[i] == '\n')
+					buffer[i] = ' ';
+		}
+	}
+
+	BTextView::InsertText(buffer ? buffer : inText, inLength, inOffset,
+		inRuns);
+
+	TextControl()->InvokeNotify(TextControl()->ModificationMessage(),
+		B_CONTROL_MODIFIED);
+
+	if (buffer)
+		free(buffer);
+}
+//------------------------------------------------------------------------------
+void _BTextInput_::DeleteText(int32 fromOffset, int32 toOffset)
+{
+	BTextView::DeleteText(fromOffset, toOffset);
+
+	TextControl()->InvokeNotify(TextControl()->ModificationMessage(),
+		B_CONTROL_MODIFIED);
+}
+//------------------------------------------------------------------------------
+BTextControl *_BTextInput_::TextControl()
+{
+	BTextControl *textControl;
+
+	if (Parent())
+		textControl = dynamic_cast<BTextControl*>(Parent());
+	else
+		textControl = NULL;
+
+	if (!textControl)
+		debugger("_BTextInput_ should have a BTextControl as parent");
+
+	return textControl;
+}
+//------------------------------------------------------------------------------

@@ -55,12 +55,13 @@ BTab::BTab(BView *tabView)
 //------------------------------------------------------------------------------
 BTab::~BTab()
 {
-	if (fView->Window() != NULL)
-	{
+	if (!fView)
+		return;
+
+	if (fSelected)
 		fView->RemoveSelf();
 
-		delete fView;
-	}
+	delete fView;
 }
 //------------------------------------------------------------------------------
 BTab::BTab(BMessage *archive)
@@ -68,10 +69,12 @@ BTab::BTab(BMessage *archive)
 		fFocus(false),
 		fView(NULL)
 {
-	if (archive->FindBool("_disable", &fEnabled) != B_OK)
-		fEnabled = true;
+	bool disable;
+
+	if (archive->FindBool("_disable", &disable) != B_OK)
+		SetEnabled(true);
 	else
-		fEnabled = !fEnabled;
+		SetEnabled(!disable);
 }
 //------------------------------------------------------------------------------
 BArchivable *BTab::Instantiate(BMessage *archive)
@@ -89,7 +92,7 @@ status_t BTab::Archive(BMessage *archive, bool deep) const
 	if (err != B_OK)
 		return err;
 
-	if ( !fEnabled )
+	if (!fEnabled)
 		err = archive->AddBool("_disable", false);
 
 	return err;
@@ -97,7 +100,7 @@ status_t BTab::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 status_t BTab::Perform(uint32 d, void *arg)
 {
-	return B_ERROR;
+	return BArchivable::Perform(d, arg);
 }
 //------------------------------------------------------------------------------
 const char *BTab::Label() const
@@ -110,8 +113,13 @@ const char *BTab::Label() const
 //------------------------------------------------------------------------------
 void BTab::SetLabel(const char *label)
 {
-	if (fView)
-		fView->SetName(label);
+	if (!label)
+		return;
+
+	if (!fView)
+		return;
+
+	fView->SetName(label);
 }
 //------------------------------------------------------------------------------
 bool BTab::IsSelected() const
@@ -121,14 +129,25 @@ bool BTab::IsSelected() const
 //------------------------------------------------------------------------------
 void BTab::Select(BView *owner)
 {	
-	dynamic_cast<BTabView*>(owner)->ContainerView()->AddChild(fView);
+	if (!owner)
+		return;
+
+	if (!View())
+		return;
+
+	if (!owner->Window())
+		return;
+
+	owner->AddChild(fView);
+	//fView->Show();
 
 	fSelected = true;
 }
 //------------------------------------------------------------------------------
 void BTab::Deselect()
 {
-	fView->RemoveSelf();
+	if (View())
+		View()->RemoveSelf();
 
 	fSelected = false;
 }
@@ -155,9 +174,20 @@ bool BTab::IsFocus() const
 //------------------------------------------------------------------------------
 void BTab::SetView(BView *view)
 {
-	// TODO: do we need to remove the previous view and add the new one if
-	// selected?
-	fView = view;
+	if (!view)
+		return;
+
+	if (fView == view)
+		return;
+
+	if (fView == NULL)
+		fView = view;
+	else
+	{
+		fView->RemoveSelf();
+		delete fView;
+		fView = view;
+	}
 }
 //------------------------------------------------------------------------------
 BView *BTab::View() const
@@ -257,78 +287,82 @@ BTab &BTab::operator=(const BTab &)
 //------------------------------------------------------------------------------
 BTabView::BTabView(BRect frame, const char *name, button_width width, 
 		uint32 resizingMode, uint32 flags)
-	:	BView(frame, name, resizingMode, flags),
-		fTabWidthSetting(width),
-		fTabWidth(0.0f),
-		fSelection(-1),
-		fInitialSelection(-1),
-		fFocus(-1)
+	:	BView(frame, name, resizingMode, flags)
 {
-	fTabList = new BList;
+	_InitObject();
 
-	//font_height fh;
-	//GetFontHeight(&fh);
-	//fTabHeight = fh.ascent + fh.descent + 8.0f;
-	fTabHeight = 20.0f;
-
-	BRect bounds = Bounds();
-
-	bounds.top += fTabHeight + 1.0f;
-	bounds.InsetBy ( 2.0f, 2.0f );
-
-	fContainerView = new BView(bounds, "_fContainerView", B_FOLLOW_ALL,
-		B_FRAME_EVENTS);
-	AddChild(fContainerView);
+	fTabWidthSetting = width;
 }
 //------------------------------------------------------------------------------
 BTabView::~BTabView()
 {
 	for (int32 i = 0; i < CountTabs(); i++)
-		delete TabAt(i);
+	{
+		if (TabAt(i))
+			delete TabAt(i);
+	}
 
 	delete fTabList;
 }
 //------------------------------------------------------------------------------
 BTabView::BTabView(BMessage *archive)
 	:	BView(archive),
-		fInitialSelection(-1),
 		fFocus(-1)
 {
+	fContainerView == NULL;
 	fTabList = new BList;
+
+	int16 width;
+
+	if (archive->FindInt16("_but_width", &width) == B_OK)
+		fTabWidthSetting = (button_width)width;
+	else
+		fTabWidthSetting = B_WIDTH_AS_USUAL;
 
 	if (archive->FindFloat("_high", &fTabHeight) != B_OK)
 	{
-		//font_height fh;
-		//GetFontHeight(&fh);
-		//fTabHeight = fh.ascent + fh.descent + 8.0f;
-		fTabHeight = 20.0f;
+		font_height fh;
+		GetFontHeight(&fh);
+		fTabHeight = fh.ascent + fh.descent + fh.leading + 8.0f;
 	}
 	
-	if (archive->FindInt16("_but_width", (int16*)&fTabWidthSetting) != B_OK)
-		fTabWidthSetting = B_WIDTH_AS_USUAL;
+	fFocus = -1;
 		
 	if (archive->FindInt32("_sel", &fSelection) != B_OK)
-		fSelection = -1;
+		fSelection = 0;
+
+	if (fContainerView == NULL)
+		fContainerView = ChildAt(0);
 
 	int32 i = 0;
-	BMessage msg;
+	BMessage tabMsg;
 
-	while (archive->FindMessage("_l_items", i++, &msg) == B_OK)
+	while (archive->FindMessage("_l_items", i, &tabMsg) == B_OK)
 	{
-		BTab *tab = dynamic_cast<BTab*>(instantiate_object(&msg));
-		
-		if (tab)
-			AddTab(NULL, tab);
+		BArchivable *archivedTab = instantiate_object(&tabMsg);
+
+		if (archivedTab)
+		{
+			BTab *tab = dynamic_cast<BTab*>(archivedTab);
+
+			BMessage viewMsg;
+
+			if (archive->FindMessage("_view_list", i, &viewMsg) == B_OK)
+			{
+				BArchivable *archivedView = instantiate_object(&viewMsg);
+
+				if (archivedView)
+				{
+					BView *view = dynamic_cast<BView*>(archivedView);
+
+					AddTab(view, tab);
+				}
+			}
+		}
+
+		tabMsg.MakeEmpty();
+		i++;
 	}
-
-	BRect bounds = Bounds();
-
-	bounds.top += fTabHeight + 1.0f;
-	bounds.InsetBy ( 2.0f, 2.0f );
-
-	fContainerView = new BView(bounds, "_fContainerView", B_FOLLOW_ALL,
-		B_FRAME_EVENTS);
-	AddChild(fContainerView);
 }
 //------------------------------------------------------------------------------
 BArchivable *BTabView::Instantiate(BMessage *archive)
@@ -341,41 +375,42 @@ BArchivable *BTabView::Instantiate(BMessage *archive)
 //------------------------------------------------------------------------------
 status_t BTabView::Archive(BMessage *archive, bool deep) const
 {
-	status_t err = BView::Archive(archive, deep);
+	if(CountTabs() > 0)
+		TabAt(Selection())->View()->RemoveSelf();
 
-	if (err != B_OK)
-		return err;
+	BView::Archive(archive, deep);
 
-	err = archive->AddFloat("_high", fTabHeight);
-
-	if (err != B_OK)
-		return err;
-
-	if (fTabHeight != B_WIDTH_AS_USUAL)
-	{
-		err = archive->AddInt16("_but_width", fTabWidthSetting);
+	archive->AddInt16("_but_width", fTabWidthSetting);
+	archive->AddFloat("_high", fTabHeight);
+	archive->AddInt32("_sel", fSelection);
 		
-		if (err != B_OK)
-			return err;
-	}
-
-	if (fSelection != -1)
-	{
-		err = archive->AddInt32("_sel", fSelection);
-		
-		if (err != B_OK)
-			return err;
-	}
-
 	if (deep)
 	{
-		BMessage tabArchive;
-		
 		for (int32 i = 0; i < CountTabs(); i++)
-			if ((err = TabAt(i)->Archive(&tabArchive, deep)) == B_OK)
+		{
+			BMessage tabArchive;
+			BTab *tab = TabAt(i);
+			
+			if (!tab)
+				continue;
+
+			if (tab->Archive(&tabArchive, true) == B_OK)
 				archive->AddMessage("_l_items", &tabArchive);
-			else
-				return err;
+
+			if (!tab->View())
+				continue;
+
+			BMessage viewArchive;
+
+			if (tab->View()->Archive(&viewArchive, true) == B_OK)
+				archive->AddMessage("_view_list", &viewArchive);
+		}
+	}
+
+	if(CountTabs() > 0)
+	{
+		if (TabAt(Selection())->View() && ContainerView())
+			TabAt(Selection())->Select(ContainerView());
 	}
 
 	return B_OK;
@@ -383,7 +418,7 @@ status_t BTabView::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 status_t BTabView::Perform(perform_code d, void *arg)
 {
-	return B_ERROR;
+	return BTabView::Perform(d, arg);
 }
 //------------------------------------------------------------------------------
 void BTabView::WindowActivated(bool active)
@@ -397,12 +432,7 @@ void BTabView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	// TODO: check if this color is set in the BeOS implementation
-	//if (Parent())
-    // SetViewColor(Parent()->ViewColor ());
-    SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	Select(0);
+	Select(fSelection);
 }
 //------------------------------------------------------------------------------
 void BTabView::AllAttached()
@@ -437,6 +467,9 @@ void BTabView::FrameResized(float width,float height)
 //------------------------------------------------------------------------------
 void BTabView::KeyDown(const char *bytes, int32 numBytes)
 {
+	if (IsHidden())
+		return;
+
 	switch (bytes[0])
 	{
 		case B_DOWN_ARROW:
@@ -470,13 +503,16 @@ void BTabView::MouseDown(BPoint point)
 		{
 			if (TabFrame(i).Contains(point))
 			{
-				Select(i);
-				return;
+				if (i != Selection())
+				{
+					Select(i);
+					return;
+				}
 			}
 		}
 	}
-	else
-		BView::MouseDown(point);
+
+	BView::MouseDown(point);
 }
 //------------------------------------------------------------------------------
 void BTabView::MouseUp(BPoint point)
@@ -494,22 +530,25 @@ void BTabView::Pulse()
 	BView::Pulse();
 }
 //------------------------------------------------------------------------------
-void BTabView::Select(int32 tab)
+void BTabView::Select(int32 index)
 {
-	if (tab < 0 || tab >= CountTabs())
-		return;
+	if (index < 0 || index >= CountTabs())
+		index = Selection();
 
-	if (tab == fSelection)
-		return;
+	BTab *tab = TabAt(Selection());
 
-	if (fSelection != -1)
-		TabAt(fSelection)->Deselect();
+	if (tab)
+		tab->Deselect();
 
-	if (tab != -1)
-		TabAt(tab)->Select(this);
+	tab = TabAt(index);
 
-	fSelection = tab;
+	if (tab && ContainerView())
+	{
+		tab->Select(ContainerView());
+		fSelection = index;
+	}
 
+	//Draw(Bounds());
 	Invalidate();
 }
 //------------------------------------------------------------------------------
@@ -527,7 +566,7 @@ void BTabView::MakeFocus(bool focused)
 //------------------------------------------------------------------------------
 void BTabView::SetFocusTab(int32 tab, bool focused)
 {
-	if (tab < 0 || tab >= CountTabs())
+	if (tab >= CountTabs())
 		return;
 
 	if (focused)
@@ -570,7 +609,7 @@ BRect BTabView::DrawTabs()
 			(i == fSelection) ? B_TAB_FRONT : (i == 0) ? B_TAB_FIRST : B_TAB_ANY,
 			(i + 1 != fSelection));
 
-	if (fSelection > -1)
+	if (fSelection < CountTabs())
 		return TabFrame(fSelection);
 	else
 		return BRect();
@@ -613,6 +652,7 @@ BRect BTabView::TabFrame(int32 tab_index) const
 		}
 		case B_WIDTH_FROM_WIDEST:
 		{
+			float x = 6.0f;
 			float width = 0.0f;
 
 			for (int32 i = 0; i < CountTabs(); i++)
@@ -649,15 +689,12 @@ void BTabView::SetResizingMode(uint32 mode)
 //------------------------------------------------------------------------------
 void BTabView::GetPreferredSize(float *width, float *height)
 {
-	*width = Bounds().Width();
-	*height = Bounds().Height();
+	BTabView::GetPreferredSize(width, height);
 }
 //------------------------------------------------------------------------------
 void BTabView::ResizeToPreferred()
 {
-	float width, height;
-	GetPreferredSize(&width, &height);
-	BView::ResizeTo(width, height);
+	BView::ResizeToPreferred();
 }
 //------------------------------------------------------------------------------
 BHandler *BTabView::ResolveSpecifier(BMessage *message, int32 index,
@@ -679,28 +716,26 @@ void BTabView::AddTab(BView *target, BTab *tab)
 		tab->SetView(target);
 
 	fTabList->AddItem(tab);
-
-	// TODO: check if we need to select the new tab
-	if (fSelection == -1)
-		Select(0);
-
-	Invalidate();
 }
 //------------------------------------------------------------------------------
 BTab *BTabView::RemoveTab(int32 tab_index)
 {
-	// TODO: check if we need to change the selection and focus
-	if (fSelection == CountTabs() - 1)
-		Select(fSelection - 1);
+	if (tab_index < 0 || tab_index >= CountTabs())
+		return NULL;
+
+	BTab *tab = (BTab*)fTabList->RemoveItem(tab_index);
+
+	tab->Deselect();
+
+	if (tab_index <= fSelection && fSelection != 0)
+		fSelection--;
+
+	Select(fSelection);
 	
 	if (fFocus == CountTabs() - 1)
 		SetFocusTab(fFocus, false);
 	else
 		SetFocusTab(fFocus, true);
-
-	BTab *tab = (BTab*)fTabList->RemoveItem(tab_index);
-
-	Invalidate();
 
 	return tab;
 }
@@ -727,6 +762,7 @@ void BTabView::SetTabHeight(float height)
 	if (fTabHeight == height)
 		return;
 
+	fContainerView->MoveBy(0.0f, height - fTabHeight);
 	fContainerView->ResizeBy(0.0f, height - fTabHeight);
 
 	fTabHeight = height;
@@ -761,6 +797,33 @@ BView *BTabView::ViewForTab(int32 tabIndex) const
 //------------------------------------------------------------------------------
 void BTabView::_InitObject()
 {
+	fTabList = new BList;
+
+	fTabWidthSetting = B_WIDTH_AS_USUAL;
+	fSelection = 0;
+	fFocus = -1;
+
+	rgb_color color = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+	SetViewColor(color);
+	SetLowColor(color);
+
+	font_height fh;
+	GetFontHeight(&fh);
+	fTabHeight = fh.ascent + fh.descent + fh.leading + 8.0f;
+
+	BRect bounds = Bounds();
+
+	bounds.top += 1.0f + TabHeight();
+	bounds.InsetBy(2.0f, 2.0f);
+
+	fContainerView = new BView(bounds, "view container", B_FOLLOW_ALL,
+		B_WILL_DRAW);
+
+	fContainerView->SetViewColor(color);
+	fContainerView->SetLowColor(color);
+
+	AddChild(fContainerView);
 }
 //------------------------------------------------------------------------------
 void BTabView::_ReservedTabView1() {}
