@@ -91,7 +91,7 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchStr
 void ReplaceWindow::MessageReceived(BMessage *msg){
 	switch(msg->what){
 		case B_QUIT_REQUESTED:
-			QuitRequested();
+			Quit();
 		break;
 		case MSG_REPLACE:
 			ExtractToMsg(new BMessage(MSG_REPLACE));
