@@ -70,6 +70,8 @@ public:
 	void SetShadowOwner(team_id team);
 	team_id ShadowOwner() const;
 
+	virtual void WriteUserData(UserDataWriter &writer,
+		user_partition_data *data);
 	void WriteUserData(UserDataWriter &writer, bool shadow);
 
 	virtual void Dump(bool deep = true, int32 level = 0);
