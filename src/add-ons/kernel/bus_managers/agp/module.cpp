@@ -36,14 +36,14 @@ bus_std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			TRACE(("agp_man: bus module: init\n"));
+			TRACE("agp_man: bus module: init\n");
 			if (init() != B_OK)
 			{
 				return ENODEV;
 			}
 			break;
 		case B_MODULE_UNINIT:
-			TRACE(("agp_man: bus module: uninit\n"));
+			TRACE("agp_man: bus module: uninit\n");
 			uninit();
 			break;
 		default:
@@ -70,11 +70,11 @@ struct agp_module_info m_module_info =
 		NULL 							// the rescan function
 	} ,
 	//my functions
-	&get_nth_agp_info,
-	&enable_agp,
+	get_nth_agp_info,
+	enable_agp
 };
 
-module_info *modules[] = {
+_EXPORT module_info *modules[] = {
 	(module_info *)&m_module_info ,
 	NULL
 };

@@ -2,10 +2,11 @@
 #define AGP_PROTO_H
 
 
+#include <KernelExport.h>
 #include <PCI.h>
 #include "AGP.h"
 
-//#define AGP_DEBUG
+#define AGP_DEBUG
 #ifdef AGP_DEBUG
 #define TRACE dprintf
 #else

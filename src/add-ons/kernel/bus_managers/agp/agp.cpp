@@ -83,7 +83,7 @@ status_t init(void)
 	INIT_BEN(pd->kernel);
 
 	/* find all of our supported devices, if any */
-	if (!probe_devices())
+	if (probe_devices() != B_OK)
 	{
 		/* free the driver data */
 		DELETE_BEN(pd->kernel);
@@ -150,6 +150,7 @@ next_device:
 
 	/* note actual number of AGP devices found */
 	pd->count = count;
+	TRACE("agp_man: found %d AGP capable device(s)\n", (uint16)count);
 
 	/* if we didn't find any devices no AGP bus exists */
 	if (!count) return B_ERROR;
@@ -162,7 +163,7 @@ next_device:
 			if ((pd->di[count - 1].agpi.interface.agp_stat & AGP_rate_rev) !=
 				(pd->di[count].agpi.interface.agp_stat & AGP_rate_rev))
 			{
-				TRACE(("agp_man: compatibility problem detected, aborting\n"));
+				TRACE("agp_man: compatibility problem detected, aborting\n");
 				return B_ERROR;
 			}
 		}
@@ -216,13 +217,16 @@ static bool has_AGP_interface(pci_info *pcii, uint8 *adress)
 
 long get_nth_agp_info (long index, agp_info *info)
 {
-	pci_info *pcii = &(pd->di[index].pcii);
+	pci_info *pcii;
+
+	TRACE("agp_man: get_nth_agp_info called with index %d\n", (uint16)index);
 
 	/* check if we have a device here */
-	if (index > pd->count) return B_ERROR;
-	
+	if (index >= pd->count) return B_ERROR;
+
 	/* refresh from the contents of the AGP registers from this device */
 	/* (note: also get agp_stat as some graphicsdriver may have been tweaking, like nvidia) */
+	pcii = &(pd->di[index].pcii);
 	pd->di[index].agpi.interface.agp_stat = get_pci(pd->di[index].agp_adress + 4, 4);
 	pd->di[index].agpi.interface.agp_cmd = get_pci(pd->di[index].agp_adress + 8, 4);
 
@@ -236,6 +240,8 @@ void enable_agp (uint32 *command)
 {
 	long count;
 	pci_info *pcii;
+
+	TRACE("agp_man: enable_agp called\n");
 
 	/* validate the given command: */
 	/* if we should set PCI mode, reset all options */
