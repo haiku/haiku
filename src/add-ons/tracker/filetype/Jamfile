@@ -11,6 +11,8 @@ App FileType-F :
 	FileTypeWindow.cpp
 	AppTypeWindow.cpp
 	AppTypeView.cpp
+	AppTypeAppFlagsView.cpp
+	AppTypeSupportedTypesView.cpp
 	AppTypeVersionInfoView.cpp
 	process_refs.cpp
 	;

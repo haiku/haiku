@@ -4,6 +4,8 @@
 #include <Entry.h>
 #include <Node.h>
 #include <NodeInfo.h>
+#include <String.h>
+#include <unistd.h>
 
 #include <FileTypeApp.h>
 #include <AppTypeView.h>
