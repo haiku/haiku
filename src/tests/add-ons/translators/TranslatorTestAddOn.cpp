@@ -6,6 +6,7 @@
 // ##### Include headers for your tests here #####
 #include "bmptranslator/BMPTranslatorTest.h"
 #include "stxttranslator/STXTTranslatorTest.h"
+#include "tgatranslator/TGATranslatorTest.h"
 #include "tifftranslator/TIFFTranslatorTest.h"
 
 // helper function used by multiple tests to
@@ -53,6 +54,7 @@ getTestSuite()
 	// ##### Add test suites here #####
 	suite->addTest("BMPTranslator", BMPTranslatorTest::Suite());
 	suite->addTest("STXTTranslator", STXTTranslatorTest::Suite());
+	suite->addTest("TGATranslator", TGATranslatorTest::Suite());
 	suite->addTest("TIFFTranslator", TIFFTranslatorTest::Suite());
 
 	return suite;
