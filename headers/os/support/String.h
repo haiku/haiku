@@ -345,7 +345,7 @@ BString::Length() const
 {
 	return _privateData ? (*((int32 *)_privateData - 1) & 0x7fffffff) : 0;
 		/* the most significant bit is reserved; accessing
-		 * it in any way will case the computer to explode
+		 * it in any way will cause the computer to explode
 		 */
 }
 
