@@ -1,7 +1,7 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <unistd.h>
@@ -27,9 +27,9 @@ readlink(const char *path, char *buffer, size_t bufferSize)
 
 
 int
-symlink(const char *path, const char *toPath)
+symlink(const char *toPath, const char *symlinkPath)
 {
-	int status = _kern_create_symlink(-1, path, toPath, 0);
+	int status = _kern_create_symlink(-1, symlinkPath, toPath, 0);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -45,9 +45,9 @@ unlink(const char *path)
 
 
 int
-link(const char *path, const char *toPath)
+link(const char *toPath, const char *linkPath)
 {
-	int status = _kern_create_link(path, toPath);
+	int status = _kern_create_link(linkPath, toPath);
 
 	RETURN_AND_SET_ERRNO(status);
 }
