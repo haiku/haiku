@@ -296,7 +296,7 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 				out_buffer[i] /= 32000.0;
 			}
 			out_buffer += fHeader->frame_size;
-			out_bytes_needed -= fHeader->frame_size*fFrameSize;
+			out_bytes_needed -= fHeader->frame_size*sizeof(float);
 		}
 	}
 
