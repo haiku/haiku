@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	if (st.dma_status > 6)
 		printf("dma_status bad\n");
 	else
-		printf("dma_status %s\n", dma_status_strings[st.dma_status]);
+		printf("dma_status: %s\n", dma_status_strings[st.dma_status]);
 	printf("pio mode: %d\n", st.pio_mode);
 	printf("dma mode: 0x%02x\n", st.dma_mode);
 	close(fd);
