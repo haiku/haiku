@@ -127,9 +127,9 @@ BBitmapStream::~BBitmapStream()
 status_t
 BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 {
-	if (!buffer || pos < 0 || pos >= fSize)
+	if (!buffer || pos < 0)
 		return B_BAD_VALUE;
-	if (!fBitmap)
+	if (!fBitmap || pos >= fSize)
 		return B_ERROR;
 	if (!size)
 		return B_NO_ERROR;
