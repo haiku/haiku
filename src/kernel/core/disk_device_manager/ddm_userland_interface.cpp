@@ -941,7 +941,7 @@ _kern_validate_initialize_partition(partition_id partitionID,
 									const char *_parameters,
 									size_t parametersSize)
 {
-	if (!_diskSystemName || !_name)
+	if (!_diskSystemName || !_name || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 	char diskSystemName[B_OS_NAME_LENGTH];
 	char name[B_FILE_NAME_LENGTH];
@@ -983,8 +983,11 @@ _kern_validate_create_child_partition(partition_id partitionID,
 									  const char *_parameters,
 									  size_t parametersSize)
 {
-	if (!_offset || !_size || !_type)
+	if (!_offset || !_size || !_type
+	    || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
+	{
 		return B_BAD_VALUE;
+	}
 	off_t offset;
 	off_t size;
 	char type[B_OS_NAME_LENGTH];
@@ -1408,7 +1411,7 @@ status_t
 _kern_set_partition_parameters(partition_id partitionID, int32 changeCounter,
 							   const char *_parameters, size_t parametersSize)
 {
-	if (!_parameters)
+	if (!_parameters || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 	char *parameters = NULL;
 	if (_parameters) {
@@ -1451,7 +1454,7 @@ _kern_set_partition_content_parameters(partition_id partitionID,
 									   const char *_parameters,
 									   size_t parametersSize)
 {
-	if (!_parameters)
+	if (!_parameters || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 	char *parameters = NULL;
 	if (_parameters) {
@@ -1493,7 +1496,7 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 						   const char *_diskSystemName, const char *_name,
 						   const char *_parameters, size_t parametersSize)
 {
-	if (!_diskSystemName || !_name)
+	if (!_diskSystemName || !_name || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 	char diskSystemName[B_OS_NAME_LENGTH];
 	char name[B_OS_NAME_LENGTH];
@@ -1578,7 +1581,7 @@ _kern_create_child_partition(partition_id partitionID, int32 changeCounter,
 							 const char *_parameters, size_t parametersSize,
 							 partition_id *_childID)
 {
-	if (!_type)
+	if (!_type || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 	char type[B_OS_NAME_LENGTH];
 	char *parameters = NULL;

@@ -59,6 +59,9 @@ struct user_disk_device_job_info {
 	char			description[256];
 };
 
+// Max size of parameter string buffers (including NULL terminator)
+#define B_DISK_DEVICE_MAX_PARAMETER_SIZE (32 * 1024)
+
 // iterating, retrieving device/partition data
 partition_id _kern_get_next_disk_device_id(int32 *cookie,
 										   size_t *neededSize = NULL);
