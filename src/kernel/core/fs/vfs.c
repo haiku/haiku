@@ -26,7 +26,6 @@
 #include <elf.h>
 #include <Errors.h>
 #include <kerrors.h>
-#include <atomic.h>
 #include <fd.h>
 #include <fs/node_monitor.h>
 
@@ -1311,7 +1310,7 @@ vfs_get_cache_ptr(void *vnode)
 int
 vfs_set_cache_ptr(void *vnode, void *cache)
 {
-	if (test_and_set((int32 *)&(((struct vnode *)vnode)->cache), (int32)cache, 0) == 0)
+	if (atomic_test_and_set((int32 *)&(((struct vnode *)vnode)->cache), (int32)cache, 0) == 0)
 		return 0;
 
 	return -1;
