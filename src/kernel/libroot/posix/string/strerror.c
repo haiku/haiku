@@ -7,7 +7,6 @@
 #include <Errors.h>
 #include <string.h>
 #include <stdio.h>
-#include <kerrors.h>
 
 
 static char *
@@ -27,11 +26,11 @@ error_description(int error)
 
 		case B_NO_MEMORY:
 			// ENOMEM
-			return "Cannot allocate memory";	// "No memory"
+			return "Out of memory";
 
 		case B_IO_ERROR:
 			// EIO
-			return "Input/Output error";	// "I/O Error"
+			return "I/O error";
 
 		case B_BAD_VALUE:
 			// EINVAL
@@ -48,15 +47,6 @@ error_description(int error)
 		case B_PERMISSION_DENIED:
 			// EACCES
 			return "Operation not permitted";	// "Permission denied"
-
-		case ERR_INVALID_BINARY:
-			return "Invalid Binary";
-
-		case ERR_INVALID_HANDLE:
-			return "Invalid ID Handle";
-
-		case ERR_NO_MORE_HANDLES:
-			return "No more handles";
 
 		case B_FILE_ERROR:
 			// EBADF
@@ -85,120 +75,36 @@ error_description(int error)
 		case EDOM:
 			return "Numerical argument out of range";	// "Domain Error"
 
-		case ERR_NOT_FOUND:
-			return "Not found";
-
-		case ERR_NOT_IMPLEMENTED_YET:
-			return "Not implemented yet";
-
 		/* Semaphore errors */
 		case B_BAD_SEM_ID:
-			return "Bad semaphore id";
+			return "Bad semaphore ID";
 
 		case B_NO_MORE_SEMS:
-			return "Semaphore out of slots";	// "No more semaphores"
-
-		case ERR_SEM_NOT_INTERRUPTABLE:
-			return "Semaphore not interruptable";
-
-		/* Tasker errors */
-		case ERR_TASK_GENERAL:
-			return "General Tasker error";
-
-		case ERR_TASK_PROC_DELETED:
-			return "Tasker process deleted";
+			return "No more semaphores";
 
 		/* VFS errors */
-		case ERR_VFS_GENERAL:
-			return "General VFS error";
-
-		case ERR_VFS_INVALID_FS:
-			return "VFS invalid filesystem";
-
-		case ERR_VFS_NOT_MOUNTPOINT:
-			return "VFS not a mount point";
-
-		case ERR_VFS_PATH_NOT_FOUND:
-			return "VFS path not found";
-
 		case ENOBUFS:
-			return "VFS insufficient buffer";	// "No buffer space available"
+			return "No buffer space available";
 
 		case B_READ_ONLY_DEVICE:
 			// EROFS:
-			return "VFS readonly filesystem";	// "Read-only file system"
+			return "Read-only file system";
 
 		case B_FILE_EXISTS:
 			// EEXIST
-			return "VFS already exists";	// "File or Directory already exists"
+			return "File or Directory already exists";
 
 		case B_BUSY:
 			// EBUSY
-			return "Device busy";	// "Device/File/Resource busy"
-
-		case ERR_VFS_FD_TABLE_FULL:
-			return "VFS file descriptor table full";
-
-		case ERR_VFS_CROSS_FS_RENAME:
-			return "VFS cross filesystem rename";
-
-		case ERR_VFS_DIR_NOT_EMPTY:
-			return "Directory not empty";
+			return "Device/File/Resource busy";
 
 		case B_NOT_A_DIRECTORY:
 			// ENOTDIR
 			return "Not a directory";
 
-		case ERR_VFS_WRONG_STREAM_TYPE:
-			return "VFS wrong stream type";
-
-		case ERR_VFS_ALREADY_MOUNTPOINT:
-			return "VFS already a mount point";
-
-		/* VM errors */
-		case ERR_VM_GENERAL:
-			return "General VM error";
-
-		case ERR_VM_INVALID_ASPACE:
-			return "VM invalid aspace";
-
-		case ERR_VM_INVALID_REGION:
-			return "VM invalid region";
-
-		case ERR_VM_BAD_ADDRESS:
-			return "VM bad address";
-
-		case ERR_VM_PF_FATAL:
-			return "VM PF fatal";
-
-		case ERR_VM_PF_BAD_ADDRESS:
-			return "VM PF bad address";
-
-		case ERR_VM_PF_BAD_PERM:
-			return "VM PF bad permissions";
-
-		case ERR_VM_PAGE_NOT_PRESENT:
-			return "VM page not present";
-
-		case ERR_VM_NO_REGION_SLOT:
-			return "VM no region slot";
-
-		case ERR_VM_WOULD_OVERCOMMIT:
-			return "VM would overcommit";
-
-		case ERR_VM_BAD_USER_MEMORY:
-			return "VM bad user memory";
-
-		/* Elf errors */
-		case ERR_ELF_GENERAL:
-			return "General ELF error";
-
-		case ERR_ELF_RESOLVING_SYMBOL:
-			return "ELF resolving symbol";
-
 		/* Ports errors */
 		case B_BAD_PORT_ID:
-			return "Port does not exist";	// "Bad port ID"
+			return "Bad port ID";
 
 		case B_NO_MORE_PORTS:
 			return "No more ports available";	// "No more ports"
