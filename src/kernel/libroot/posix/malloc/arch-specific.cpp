@@ -41,7 +41,7 @@ status_t release_sem(sem_id id);
 
 int hoardGetThreadID (void)
 {
-  return sys_get_current_thread_id();
+  return find_thread(NULL);
 }
 
 
