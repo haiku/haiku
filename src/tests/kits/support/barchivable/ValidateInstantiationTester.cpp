@@ -38,8 +38,8 @@ const char* gBogusClassName	= "BarFoo";
 void TValidateInstantiationTest::AllParamsInvalid()
 {
 	errno = B_OK;
-	assert(!validate_instantiation(NULL, NULL));
-	assert(errno == B_BAD_VALUE);
+	CPPUNIT_ASSERT(!validate_instantiation(NULL, NULL));
+	CPPUNIT_ASSERT(errno == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 /**
@@ -54,8 +54,8 @@ void TValidateInstantiationTest::ClassNameParamInvalid()
 {
 	errno = B_OK;
 	BMessage Archive;
-	assert(!validate_instantiation(&Archive, NULL));
-	assert(errno == B_MISMATCHED_VALUES);
+	CPPUNIT_ASSERT(!validate_instantiation(&Archive, NULL));
+	CPPUNIT_ASSERT(errno == B_MISMATCHED_VALUES);
 }
 //------------------------------------------------------------------------------
 /**
@@ -72,8 +72,8 @@ void TValidateInstantiationTest::ClassNameParamInvalid()
 void TValidateInstantiationTest::ArchiveParamInvalid()
 {
 	errno = B_OK;
-	assert(!validate_instantiation(NULL, gClassName));
-	assert(errno == B_BAD_VALUE);
+	CPPUNIT_ASSERT(!validate_instantiation(NULL, gClassName));
+	CPPUNIT_ASSERT(errno == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 /**
@@ -89,8 +89,8 @@ void TValidateInstantiationTest::ClassFieldEmpty()
 {
 	errno = B_OK;
 	BMessage Archive;
-	assert(!validate_instantiation(&Archive, gClassName));
-	assert(errno == B_MISMATCHED_VALUES);
+	CPPUNIT_ASSERT(!validate_instantiation(&Archive, gClassName));
+	CPPUNIT_ASSERT(errno == B_MISMATCHED_VALUES);
 }
 //------------------------------------------------------------------------------
 /**
@@ -108,8 +108,8 @@ void TValidateInstantiationTest::ClassFieldBogus()
 	errno = B_OK;
 	BMessage Archive;
 	Archive.AddString("class", gClassName);
-	assert(!validate_instantiation(&Archive, gBogusClassName));
-	assert(errno == B_MISMATCHED_VALUES);
+	CPPUNIT_ASSERT(!validate_instantiation(&Archive, gBogusClassName));
+	CPPUNIT_ASSERT(errno == B_MISMATCHED_VALUES);
 }
 //------------------------------------------------------------------------------
 /**
@@ -127,13 +127,13 @@ void TValidateInstantiationTest::AllValid()
 	errno = B_OK;
 	BMessage Archive;
 	Archive.AddString("class", gClassName);
-	assert(validate_instantiation(&Archive, gClassName));
-	assert(errno == B_OK);
+	CPPUNIT_ASSERT(validate_instantiation(&Archive, gClassName));
+	CPPUNIT_ASSERT(errno == B_OK);
 }
 //------------------------------------------------------------------------------
-Test* TValidateInstantiationTest::Suite()
+CppUnit::Test* TValidateInstantiationTest::Suite()
 {
-	TestSuite* SuiteOfTests = new TestSuite;
+	CppUnit::TestSuite* SuiteOfTests = new CppUnit::TestSuite;
 #if !defined(TEST_R5)
 	ADD_TEST(SuiteOfTests, TValidateInstantiationTest, AllParamsInvalid);
 #endif
@@ -155,4 +155,6 @@ Test* TValidateInstantiationTest::Suite()
  * $Id  $
  *
  */
+
+
 

@@ -13,7 +13,8 @@ BTestCase::BTestCase(std::string name)
 
 void
 BTestCase::tearDown() {
-	NextSubTestBlock();
+	if (fSubTestNum != 0)
+		NextSubTestBlock();
 }
 
 void

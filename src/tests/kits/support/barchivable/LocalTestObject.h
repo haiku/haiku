@@ -9,12 +9,8 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#include <be/app/Message.h>
-#ifdef SYSTEM_TEST
-#include <be/support/Archivable.h>
-#else
-#include "../../../../source/lib/support/headers/Archivable.h"
-#endif
+#include <Message.h>
+#include <Archivable.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -47,4 +43,5 @@ class TIOTest : public BArchivable
  * $Id  $
  *
  */
+
 

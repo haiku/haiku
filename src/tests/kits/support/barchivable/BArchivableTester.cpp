@@ -34,7 +34,7 @@
 void TBArchivableTestCase::TestPerform()
 {
 	BArchivable Archive;
-	assert(Archive.Perform(0, NULL) == B_ERROR);
+	CPPUNIT_ASSERT(Archive.Perform(0, NULL) == B_ERROR);
 }
 //------------------------------------------------------------------------------
 /**
@@ -47,7 +47,7 @@ void TBArchivableTestCase::TestPerform()
 void TBArchivableTestCase::InvalidArchiveShallow()
 {
 	BArchivable Archive;
-	assert(Archive.Archive(NULL, false) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(Archive.Archive(NULL, false) == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 /**
@@ -63,10 +63,10 @@ void TBArchivableTestCase::ValidArchiveShallow()
 {
 	BMessage Storage;
 	BArchivable Archive;
-	assert(Archive.Archive(&Storage, false) == B_OK);
+	CPPUNIT_ASSERT(Archive.Archive(&Storage, false) == B_OK);
 	const char* name;
-	assert(Storage.FindString("class", &name) == B_OK);
-	assert(strcmp(name, "BArchivable") == 0);
+	CPPUNIT_ASSERT(Storage.FindString("class", &name) == B_OK);
+	CPPUNIT_ASSERT(strcmp(name, "BArchivable") == 0);
 }
 //------------------------------------------------------------------------------
 /**
@@ -79,7 +79,7 @@ void TBArchivableTestCase::ValidArchiveShallow()
 void TBArchivableTestCase::InvalidArchiveDeep()
 {
 	BArchivable Archive;
-	assert(Archive.Archive(NULL, true) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(Archive.Archive(NULL, true) == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 /**
@@ -95,15 +95,15 @@ void TBArchivableTestCase::ValidArchiveDeep()
 {
 	BMessage Storage;
 	BArchivable Archive;
-	assert(Archive.Archive(&Storage, true) == B_OK);
+	CPPUNIT_ASSERT(Archive.Archive(&Storage, true) == B_OK);
 	const char* name;
-	assert(Storage.FindString("class", &name) == B_OK);
-	assert(strcmp(name, "BArchivable") == 0);
+	CPPUNIT_ASSERT(Storage.FindString("class", &name) == B_OK);
+	CPPUNIT_ASSERT(strcmp(name, "BArchivable") == 0);
 }
 //------------------------------------------------------------------------------
-Test* TBArchivableTestCase::Suite()
+CppUnit::Test* TBArchivableTestCase::Suite()
 {
-	TestSuite* SuiteOfTests = new TestSuite;
+	CppUnit::TestSuite* SuiteOfTests = new CppUnit::TestSuite;
 	ADD_TEST(SuiteOfTests, TBArchivableTestCase, TestPerform);
 #if !defined(TEST_R5)
 	ADD_TEST(SuiteOfTests, TBArchivableTestCase, InvalidArchiveShallow);
@@ -125,4 +125,6 @@ Test* TBArchivableTestCase::Suite()
  * $Id  $
  *
  */
+
+
 

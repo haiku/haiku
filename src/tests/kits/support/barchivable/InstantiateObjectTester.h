@@ -20,10 +20,10 @@
 // Globals ---------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-class TInstantiateObjectTester : public TestCase
+class TInstantiateObjectTester : public BTestCase
 {
 	public:
-		TInstantiateObjectTester(std::string name);
+		TInstantiateObjectTester(std::string name = "");
 
 		void Case1();
 		void Case2();
@@ -40,7 +40,7 @@ class TInstantiateObjectTester : public TestCase
 		void Case13();
 		void Case14();
 
-		static Test* Suite();
+		static CppUnit::Test* Suite();
 
 	private:
 		void		LoadAddon();
@@ -59,4 +59,5 @@ class TInstantiateObjectTester : public TestCase
  * $Id  $
  *
  */
+
 

@@ -19,10 +19,10 @@
 
 // Globals ---------------------------------------------------------------------
 
-class TBArchivableTestCase : public TestCase
+class TBArchivableTestCase : public BTestCase
 {
 	public:
-		TBArchivableTestCase(std::string name) : TestCase(name) {;}
+		TBArchivableTestCase(std::string name = "") : BTestCase(name) {;}
 
 		void TestPerform();
 		void InvalidArchiveShallow();
@@ -30,7 +30,7 @@ class TBArchivableTestCase : public TestCase
 		void InvalidArchiveDeep();
 		void ValidArchiveDeep();
 
-		static Test* Suite();
+		static CppUnit::Test* Suite();
 };
 
 
@@ -42,4 +42,5 @@ class TBArchivableTestCase : public TestCase
  * $Id  $
  *
  */
+
 

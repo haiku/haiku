@@ -1,5 +1,5 @@
 /*
-	$Id: AutolockLockerTest.h,v 1.1 2002/07/09 12:24:57 ejakowatz Exp $
+	$Id: AutolockLockerTest.h,v 1.2 2002/07/19 06:45:28 tylerdauwalder Exp $
 	
 	This file defines the class for performing all BAutolock tests on a
 	BLocker.
@@ -10,25 +10,28 @@
 #ifndef AutolockLockerTest_H
 #define AutolockLockerTest_H
 
+#include "ThreadedTestCase.h"
+#include <string>
 
-#include "ThreadedTestCaller.h"
-#include "TestCase.h"
+class BLocker;
+class CppUnit::Test;
 	
-template<class Autolock, class Locker> class AutolockLockerTest : public TestCase {
+class AutolockLockerTest : public BThreadedTestCase {
 	
 private:
-	typedef ThreadedTestCaller <AutolockLockerTest<Autolock, Locker> >
-		AutolockLockerTestCaller;
-		
-	Locker *theLocker;
+	BLocker *theLocker;
 	
 public:
-	static Test *suite(void);
+	static CppUnit::Test *suite(void);
 	void TestThread1(void);
 	void TestThread2(void);
 	void TestThread3(void);
 	AutolockLockerTest(std::string);
 	virtual ~AutolockLockerTest();
-	};
+};
 	
 #endif
+
+
+
+

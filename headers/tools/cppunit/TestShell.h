@@ -83,11 +83,15 @@ public:
 	static const char* GlobalTestDir() { return (fGlobalShell ? fGlobalShell->TestDir() : NULL); };
 
 
-protected:	
+protected:
+	typedef std::map<std::string, CppUnit::Test*> TestMap;
+	typedef std::map<std::string, BTestSuite*> SuiteMap;
+
 	VerbosityLevel fVerbosityLevel;
 	std::set<std::string> fTestsToRun;
-	std::map<std::string, CppUnit::Test*> fTests;
-	std::map<std::string, BTestSuite*> fSuites;
+	std::set<std::string> fSuitesToRun;
+	TestMap fTests;
+	SuiteMap fSuites;
 	std::set<std::string> fLibDirs;
 	CppUnit::TestResult fTestResults;
 	CppUnit::TestResultCollector fResultsCollector;

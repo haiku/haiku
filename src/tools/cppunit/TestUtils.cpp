@@ -2,6 +2,7 @@
 
 #include <TestUtils.h>
 #include <TestShell.h>
+#include <stdio.h>
 
 status_t DecodeResult(status_t result) {
 	if (!BTestShell::GlobalBeVerbose())
@@ -167,6 +168,12 @@ status_t DecodeResult(status_t result) {
 	cout << endl << "DecodeResult() -- " "0x" << hex << result << " (" << dec << result << ") == " << str << endl;
 	
 	return result;
+}
+
+std::string IntToStr(int i) {
+	char num[32];
+	sprintf(num, "%d", i);
+	return std::string(num);
 }
 
 void ExecCommand(const char *command) {

@@ -49,7 +49,7 @@
 void TFindInstantiationFuncTester::Case1()
 {
 	instantiation_func f = find_instantiation_func(NULL, NULL);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -62,7 +62,7 @@ void TFindInstantiationFuncTester::Case1()
 void TFindInstantiationFuncTester::Case2()
 {
 	instantiation_func f = find_instantiation_func(gInvalidClassName, NULL);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -75,7 +75,7 @@ void TFindInstantiationFuncTester::Case2()
 void TFindInstantiationFuncTester::Case3()
 {
 	instantiation_func f = find_instantiation_func(NULL, gInvalidSig);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -89,7 +89,7 @@ void TFindInstantiationFuncTester::Case4()
 {
 	instantiation_func f = find_instantiation_func(gInvalidClassName,
 												   gInvalidSig);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -103,12 +103,12 @@ void TFindInstantiationFuncTester::Case4()
 void TFindInstantiationFuncTester::Case5()
 {
 	instantiation_func f = find_instantiation_func(gLocalClassName, NULL);
-	assert(f != NULL);
+	CPPUNIT_ASSERT(f != NULL);
 
 	BMessage Archive;
 	Archive.AddString("class", gLocalClassName);
 	TIOTest* Test = dynamic_cast<TIOTest*>(f(&Archive));
-	assert(Test != NULL);
+	CPPUNIT_ASSERT(Test != NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -122,7 +122,7 @@ void TFindInstantiationFuncTester::Case5()
 void TFindInstantiationFuncTester::Case6()
 {
 	instantiation_func f = find_instantiation_func(gRemoteClassName, NULL);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -137,7 +137,7 @@ void TFindInstantiationFuncTester::Case7()
 {
 	instantiation_func f = find_instantiation_func(gLocalClassName,
 												   gInvalidSig);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -152,7 +152,7 @@ void TFindInstantiationFuncTester::Case8()
 {
 	instantiation_func f = find_instantiation_func(gRemoteClassName,
 												   gInvalidSig);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -169,7 +169,7 @@ void TFindInstantiationFuncTester::Case8()
 void TFindInstantiationFuncTester::Case9()
 {
 	instantiation_func f = find_instantiation_func(gLocalClassName, gLocalSig);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -186,7 +186,7 @@ void TFindInstantiationFuncTester::Case10()
 {
 	instantiation_func f = find_instantiation_func(gRemoteClassName,
 												   gRemoteSig);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -197,7 +197,7 @@ void TFindInstantiationFuncTester::Case10()
 void TFindInstantiationFuncTester::Case1M()
 {
 	instantiation_func f = find_instantiation_func((BMessage*)NULL);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -212,7 +212,7 @@ void TFindInstantiationFuncTester::Case2M()
 	BMessage Archive;
 	Archive.AddString("class", gInvalidClassName);
 	instantiation_func f = find_instantiation_func(&Archive);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -227,7 +227,7 @@ void TFindInstantiationFuncTester::Case3M()
 	BMessage Archive;
 	Archive.AddString("add_on", gInvalidSig);
 	instantiation_func f = find_instantiation_func(&Archive);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -243,7 +243,7 @@ void TFindInstantiationFuncTester::Case4M()
 	Archive.AddString("class", gInvalidClassName);
 	Archive.AddString("add_on", gInvalidSig);
 	instantiation_func f = find_instantiation_func(&Archive);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -260,10 +260,10 @@ void TFindInstantiationFuncTester::Case5M()
 	Archive.AddString("class", gLocalClassName);
 
 	instantiation_func f = find_instantiation_func(&Archive);
-	assert(f != NULL);
+	CPPUNIT_ASSERT(f != NULL);
 
 	TIOTest* Test = dynamic_cast<TIOTest*>(f(&Archive));
-	assert(Test != NULL);
+	CPPUNIT_ASSERT(Test != NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -279,7 +279,7 @@ void TFindInstantiationFuncTester::Case6M()
 	BMessage Archive;
 	Archive.AddString("class", gRemoteClassName);
 	instantiation_func f = find_instantiation_func(&Archive);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -296,7 +296,7 @@ void TFindInstantiationFuncTester::Case7M()
 	Archive.AddString("class", gLocalClassName);
 	Archive.AddString("add_on", gInvalidSig);
 	instantiation_func f = find_instantiation_func(&Archive);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -313,7 +313,7 @@ void TFindInstantiationFuncTester::Case8M()
 	Archive.AddString("class", gRemoteClassName);
 	Archive.AddString("add_on", gInvalidSig);
 	instantiation_func f = find_instantiation_func(&Archive);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -333,7 +333,7 @@ void TFindInstantiationFuncTester::Case9M()
 	Archive.AddString("class", gLocalClassName);
 	Archive.AddString("add_on", gLocalSig);
 	instantiation_func f = find_instantiation_func(&Archive);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
 /**
@@ -352,12 +352,12 @@ void TFindInstantiationFuncTester::Case10M()
 	Archive.AddString("class", gRemoteClassName);
 	Archive.AddString("add_on", gRemoteSig);
 	instantiation_func f = find_instantiation_func(&Archive);
-	assert(f == NULL);
+	CPPUNIT_ASSERT(f == NULL);
 }
 //------------------------------------------------------------------------------
-Test* TFindInstantiationFuncTester::Suite()
+CppUnit::Test* TFindInstantiationFuncTester::Suite()
 {
-	TestSuite* SuiteOfTests = new TestSuite;
+	CppUnit::TestSuite* SuiteOfTests = new CppUnit::TestSuite;
 
 	ADD_TEST(SuiteOfTests, TFindInstantiationFuncTester, Case1);
 	ADD_TEST(SuiteOfTests, TFindInstantiationFuncTester, Case2);
@@ -371,7 +371,7 @@ Test* TFindInstantiationFuncTester::Suite()
 	ADD_TEST(SuiteOfTests, TFindInstantiationFuncTester, Case10);	
 
 	// BMessage using versions
-#if !defined(SYSTEM_TEST)
+#if !defined(TEST_R5)
 	ADD_TEST(SuiteOfTests, TFindInstantiationFuncTester, Case1M);
 #endif
 	ADD_TEST(SuiteOfTests, TFindInstantiationFuncTester, Case2M);
@@ -394,4 +394,6 @@ Test* TFindInstantiationFuncTester::Suite()
  * $Id  $
  *
  */
+
+
 

@@ -19,10 +19,10 @@
 
 // Globals ---------------------------------------------------------------------
 
-class TFindInstantiationFuncTester : public TestCase
+class TFindInstantiationFuncTester : public BTestCase
 {
 	public:
-		TFindInstantiationFuncTester(std::string name) : TestCase(name) {;}
+		TFindInstantiationFuncTester(std::string name = "") : BTestCase(name) {;}
 
 		void Case1();
 		void Case2();
@@ -47,7 +47,7 @@ class TFindInstantiationFuncTester : public TestCase
 		void Case9M();
 		void Case10M();
 
-		static Test* Suite();
+		static CppUnit::Test* Suite();
 };
 
 #endif	//FINDINSTATIATIONFUNCTESTER_H
@@ -58,4 +58,5 @@ class TFindInstantiationFuncTester : public TestCase
  * $Id  $
  *
  */
+
 

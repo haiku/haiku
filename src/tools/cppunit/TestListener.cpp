@@ -27,7 +27,7 @@ void
 BTestListener::endTest( CppUnit::Test *test )  {
    	if (fOkay)
    		cout << "  + PASSED" << endl;
-   	else
-   		cout << "  - FAILED" << endl;
+//   	else
+//   		cout << "  - FAILED" << endl;
    	cout << endl;
 }	 

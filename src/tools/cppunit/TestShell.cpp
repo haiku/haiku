@@ -42,8 +42,8 @@ BTestShell::AddSuite(BTestSuite *suite) {
 		fSuites[suite->getName()] = suite;
 		
 		// Add its tests
-		const std::map<std::string, CppUnit::Test*> &map = suite->getTests();
-		for (std::map<std::string, CppUnit::Test*>::const_iterator i = map.begin();
+		const TestMap &map = suite->getTests();
+		for (TestMap::const_iterator i = map.begin();
 			   i != map.end();
 			      i++)
 			AddTest(i->first, i->second);
@@ -127,16 +127,39 @@ BTestShell::Run(int argc, char *argv[]) {
 		cout << "ERROR: No installed tests to run!" << endl;
 		return 0;
 		
-	} else if (fTestsToRun.empty()) {
+	} else if (fSuitesToRun.empty() && fTestsToRun.empty()) {
 	
 		// None specified, so run them all
-		std::map<std::string, CppUnit::Test*>::iterator i;
+		TestMap::iterator i;
 		for (i = fTests.begin(); i != fTests.end(); ++i)
 			suite.addTest( i->second );
 			
-	} else {	
-		// One or more specified, so only run those
+	} else {
 		std::set<std::string>::const_iterator i;
+		std::set<std::string> suitesToRemove;
+
+		// Add all the tests from any specified suites to the list of
+		// tests to run (since we use a set, this eliminates the concern
+		// of having duplicate entries).
+		for (i = fTestsToRun.begin(); i != fTestsToRun.end(); ++i) {
+			// See if it's a suite (since it may just be a single test)
+			if (fSuites.find(*i) != fSuites.end()) {
+				suitesToRemove.insert(*i);	// Note the suite name for later
+				const TestMap &tests = fSuites[*i]->getTests();
+				TestMap::const_iterator j;
+				for (j = tests.begin(); j != tests.end(); j++) {
+					fTestsToRun.insert( j->first );
+				}
+			}
+		}
+		
+		// Remove the names of all of the suites we discovered from the
+		// list of tests to run
+		for (i = suitesToRemove.begin(); i != suitesToRemove.end(); i++) {
+			fTestsToRun.erase(*i);
+		}
+	
+		// Everything still in fTestsToRun must then be an explicit test
 		for (i = fTestsToRun.begin(); i != fTestsToRun.end(); ++i) {
 			// Make sure it's a valid test
 			if (fTests.find(*i) != fTests.end()) {
@@ -184,27 +207,39 @@ BTestShell::PrintHelp() {
 
 void
 BTestShell::PrintValidArguments() {
-	cout << indent << "--help     Displays this help text plus some other garbage" << endl;
-	cout << indent << "--list     Lists the names of classes with installed tests" << endl;
-	cout << indent << "-v0        Sets verbosity level to 0 (concise summary only)" << endl;
-	cout << indent << "-v1        Sets verbosity level to 1 (complete summary only)" << endl;
-	cout << indent << "-v2        Sets verbosity level to 2 (*default* -- per-test results plus" << endl;
-	cout << indent << "           complete summary)" << endl;
-	cout << indent << "-v3        Sets verbosity level to 3 (per-test results and timing info" << endl;
-	cout << indent << "           plus complete summary)" << endl;
-	cout << indent << "CLASSNAME  Instructs the program to run the test for the given class; if" << endl;
-	cout << indent << "           no classes are specified, all tests are run" << endl;
-	cout << indent << "-lPATH     Adds PATH to the search path for dynamically loadable test" << endl;
-	cout << indent << "           libraries." << endl;
+	cout << indent << "--help       Displays this help text plus some other garbage" << endl;
+	cout << indent << "--list       Lists the names of classes with installed tests" << endl;
+	cout << indent << "-v0          Sets verbosity level to 0 (concise summary only)" << endl;
+	cout << indent << "-v1          Sets verbosity level to 1 (complete summary only)" << endl;
+	cout << indent << "-v2          Sets verbosity level to 2 (*default* -- per-test results plus" << endl;
+	cout << indent << "             complete summary)" << endl;
+	cout << indent << "-v3          Sets verbosity level to 3 (dynamic loading information, per-test " << endl;
+	cout << indent << "             results and timing info, plus complete summary)" << endl;
+	cout << indent << "NAME         Instructs the program to run the test for the given class or all" << endl;
+	cout << indent << "             the tests for the given suite. If some bonehead adds both a class" << endl;
+	cout << indent << "             and a suite with the same name, the suite will be run, not the class" << endl;
+	cout << indent << "             (unless the class is part of the suite with the same name :-). If no" << endl;
+	cout << indent << "             classes or suites are specified, all available tests are run" << endl;
+	cout << indent << "-lPATH       Adds PATH to the search path for dynamically loadable test" << endl;
+	cout << indent << "             libraries" << endl;
 }
 
 void
 BTestShell::PrintInstalledTests() {
+	// Print out the list of installed suites
+	cout << "------------------------------------------------------------------------------" << endl;
+	cout << "Available Suites:" << endl;
+	cout << "------------------------------------------------------------------------------" << endl;
+	SuiteMap::const_iterator j;			
+	for (j = fSuites.begin(); j != fSuites.end(); ++j)
+		cout << j->first << endl;
+	cout << endl;
+
 	// Print out the list of installed tests
 	cout << "------------------------------------------------------------------------------" << endl;
 	cout << "Available Tests:" << endl;
 	cout << "------------------------------------------------------------------------------" << endl;
-	std::map<std::string, CppUnit::Test*>::const_iterator i;			
+	TestMap::const_iterator i;			
 	for (i = fTests.begin(); i != fTests.end(); ++i)
 		cout << i->first << endl;
 	cout << endl;
@@ -250,8 +285,9 @@ BTestShell::ProcessArgument(std::string arg, int argc, char *argv[]) {
 	}
 	else if (arg == "-v3") {
 		fVerbosityLevel = v3;
-	}
-	else {
+	} else if (arg.length() >= 2 && arg[0] == '-' && arg[1] == 'l') {
+		fLibDirs.insert(arg.substr(2, arg.size()-2));		
+	} else {
 		fTestsToRun.insert(arg);
 	}
 	return true;
@@ -323,15 +359,26 @@ BTestShell::PrintResults() {
 
 void
 BTestShell::LoadDynamicSuites() {
+	if (Verbosity() >= v3) {
+		cout << "------------------------------------------------------------------------------" << endl;
+		cout << "Loading " << endl;
+		cout << "------------------------------------------------------------------------------" << endl;
+	}
+
 	std::set<std::string>::iterator i;
 	for (i = fLibDirs.begin(); i != fLibDirs.end(); i++) {
 		BDirectory libDir((*i).c_str());
+		if (Verbosity() >= v3) 
+			cout << "Checking " << *i << endl;
 		int count = LoadSuitesFrom(&libDir);
-		if (Verbosity() >= v3) {
-			cout << "Loaded " << count << " suite" << (count == 1 ? "" : "s");
-			cout << " from " << *i << endl;
+		if (Verbosity() >= v3) {			
+//			cout << "Loaded " << count << " suite" << (count == 1 ? "" : "s");
+//			cout << " from " << *i << endl;
 		}
 	}
+	
+	if (Verbosity() >= v3)
+		cout << endl;
 }
 
 void

@@ -51,9 +51,9 @@ UnitTesterShell::PrintDescription(int argc, char *argv[]) {
 void
 UnitTesterShell::PrintValidArguments() {
 	BTestShell::PrintValidArguments();
-	cout << indent << "-obos      Runs tests linked against our OpenBeOS libraries (*default*)" << endl;
-	cout << indent << "-r5        Runs tests linked against Be Inc.'s R5 libraries (instead" << endl;
-	cout << indent << "           of our libraries) for the sake of comparison." << endl;
+	cout << indent << "-obos        Runs tests linked against our OpenBeOS libraries (*default*)" << endl;
+	cout << indent << "-r5          Runs tests linked against Be Inc.'s R5 libraries (instead" << endl;
+	cout << indent << "             of our libraries) for the sake of comparison." << endl;
 }
 
 bool

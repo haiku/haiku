@@ -15,6 +15,9 @@
 // use it inline in tests if necessary.
 status_t DecodeResult(status_t result);
 
+// Returns a string version of the given integer
+std::string IntToStr(int i);
+
 // Calls system() with the concatenated string of command and parameter.
 void ExecCommand(const char *command, const char *parameter);
 

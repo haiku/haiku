@@ -7,15 +7,14 @@
 #define LOCALCOMMON_H
 
 // Standard Includes -----------------------------------------------------------
+#include <string>
 
 // System Includes -------------------------------------------------------------
-#ifdef TEST_R5
-#include <be/support/Archivable.h>
-#else
-#include "Archivable.h"
-#endif
+#include <Archivable.h>
 
 // Project Includes ------------------------------------------------------------
+#include <TestCase.h>
+#include <TestUtils.h>
 
 // Local Includes --------------------------------------------------------------
 #include "common.h"
@@ -40,4 +39,6 @@ extern const char* gValidSig;
  * $Id  $
  *
  */
+
+
 

@@ -14,6 +14,7 @@ public:
 	void TestFunc1();	// num += 10
 	void TestFunc2();	// num *= 2
 	void TestFunc3();	// num -= 5
+	void FailureFunc();	// Fails assertion
 protected:
 	BLocker *fLocker;
 	int fNum;

@@ -22,10 +22,10 @@
 #include <be/storage/Path.h>
 
 // Project Includes ------------------------------------------------------------
+#include <cppunit/Exception.h>
 
 // Local Includes --------------------------------------------------------------
-#include "framework/estring.h"
-#include "RemoteObjectDef/RemoteTestObject.h"
+#include "remoteobjectdef/RemoteTestObject.h"
 #include "InstantiateObjectTester.h"
 #include "LocalTestObject.h"
 
@@ -47,7 +47,7 @@ void FormatAndThrow(int line, const char* file, const char* msg, int err);
 
 //------------------------------------------------------------------------------
 TInstantiateObjectTester::TInstantiateObjectTester(string name)
-	:	TestCase(name), fAddonId(B_ERROR)
+	:	BTestCase(name), fAddonId(B_ERROR)
 {
 	;
 }
@@ -66,9 +66,9 @@ void TInstantiateObjectTester::Case1()
 	errno = B_OK;
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(NULL, &id);
-	assert(Test == NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_BAD_VALUE);
+	CPPUNIT_ASSERT(Test == NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 /**
@@ -86,9 +86,9 @@ void TInstantiateObjectTester::Case2()
 	BMessage Archive;
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
-	assert(Test == NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_OK);
+	CPPUNIT_ASSERT(Test == NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_OK);
 }
 //------------------------------------------------------------------------------
 
@@ -112,9 +112,9 @@ void TInstantiateObjectTester::Case3()
 	Archive.AddString("class", gInvalidClassName);
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
-	assert(Test == NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_BAD_VALUE);
+	CPPUNIT_ASSERT(Test == NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 /**
@@ -136,9 +136,9 @@ void TInstantiateObjectTester::Case4()
 	Archive.AddString("add_on", gInvalidSig);
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
-	assert(Test == NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	CPPUNIT_ASSERT(Test == NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_LAUNCH_FAILED_APP_NOT_FOUND);
 }
 //------------------------------------------------------------------------------
 /**
@@ -161,7 +161,7 @@ void TInstantiateObjectTester::Case5()
 	Archive.AddString("add_on", gValidSig);
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
-	assert(Test == NULL);
+	CPPUNIT_ASSERT(Test == NULL);
 	// The system implementation returns the image_id of the last addon searched
 	// Implies the addon is not unloaded.  How to verify this behaviour?  Should
 	// the addon be unloaded if it doesn't contain our function?  Addons do,
@@ -171,9 +171,9 @@ void TInstantiateObjectTester::Case5()
 	// runs after this case without explicitely unloaded the addon here, it
 	// fails because it depends on the addon image not being available within
 	// the team.
-	assert(id > 0);
+	CPPUNIT_ASSERT(id > 0);
 	unload_add_on(id);
-	assert(errno == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 
@@ -203,9 +203,9 @@ void TInstantiateObjectTester::Case6()
 	Archive.AddString("class", gLocalClassName);
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
-	assert(Test != NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_OK);
+	CPPUNIT_ASSERT(Test != NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_OK);
 }
 //------------------------------------------------------------------------------
 /**
@@ -231,9 +231,9 @@ void TInstantiateObjectTester::Case7()
 	image_id id = B_OK;
 	TRemoteTestObject* Test = (TRemoteTestObject*)instantiate_object(&Archive,
 																	 &id);
-	assert(Test != NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_OK);
+	CPPUNIT_ASSERT(Test != NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_OK);
 
 	UnloadAddon();
 }
@@ -257,9 +257,9 @@ void TInstantiateObjectTester::Case8()
 	image_id id = B_OK;
 	TRemoteTestObject* Test = (TRemoteTestObject*)instantiate_object(&Archive,
 																	 &id);
-	assert(Test == NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_BAD_VALUE);
+	CPPUNIT_ASSERT(Test == NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_BAD_VALUE);
 }
 //------------------------------------------------------------------------------
 /**
@@ -282,9 +282,9 @@ void TInstantiateObjectTester::Case9()
 	Archive.AddString("add_on", gInvalidSig);
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
-	assert(Test == NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	CPPUNIT_ASSERT(Test == NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_LAUNCH_FAILED_APP_NOT_FOUND);
 }
 //------------------------------------------------------------------------------
 /**
@@ -310,9 +310,9 @@ void TInstantiateObjectTester::Case10()
 	Archive.AddString("add_on", gInvalidSig);
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
-	assert(Test == NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	CPPUNIT_ASSERT(Test == NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_LAUNCH_FAILED_APP_NOT_FOUND);
 
 	UnloadAddon();
 }
@@ -337,9 +337,9 @@ void TInstantiateObjectTester::Case11()
 	Archive.AddString("add_on", gInvalidSig);
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
-	assert(Test == NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	CPPUNIT_ASSERT(Test == NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_LAUNCH_FAILED_APP_NOT_FOUND);
 }
 //------------------------------------------------------------------------------
 /**
@@ -367,9 +367,9 @@ void TInstantiateObjectTester::Case12()
 	Archive.AddString("add_on", GetLocalSignature().c_str());
 	image_id id = B_OK;
 	TIOTest* Test = (TIOTest*)instantiate_object(&Archive, &id);
-	assert(Test != NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_OK);
+	CPPUNIT_ASSERT(Test != NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_OK);
 }
 //------------------------------------------------------------------------------
 /**
@@ -395,9 +395,9 @@ void TInstantiateObjectTester::Case13()
 	Archive.AddString("add_on", gRemoteSig);
 	image_id id = B_OK;
 	TRemoteTestObject* Test = (TRemoteTestObject*)instantiate_object(&Archive, &id);
-	assert(Test != NULL);
-	assert(id == B_BAD_VALUE);
-	assert(errno == B_OK);
+	CPPUNIT_ASSERT(Test != NULL);
+	CPPUNIT_ASSERT(id == B_BAD_VALUE);
+	CPPUNIT_ASSERT(errno == B_OK);
 
 	UnloadAddon();
 }
@@ -423,15 +423,15 @@ void TInstantiateObjectTester::Case14()
 	Archive.AddString("add_on", gRemoteSig);
 	image_id id = B_OK;
 	TRemoteTestObject* Test = (TRemoteTestObject*)instantiate_object(&Archive, &id);
-	assert(Test != NULL);
-	assert(id > 0);
+	CPPUNIT_ASSERT(Test != NULL);
+	CPPUNIT_ASSERT(id > 0);
 	unload_add_on(id);
-	assert(errno == B_OK);
+	CPPUNIT_ASSERT(errno == B_OK);
 }
 //------------------------------------------------------------------------------
-Test* TInstantiateObjectTester::Suite()
+CppUnit::Test* TInstantiateObjectTester::Suite()
 {
-	TestSuite* SuiteOfTests = new TestSuite;
+	CppUnit::TestSuite* SuiteOfTests = new CppUnit::TestSuite;
 
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case1);
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case2);
@@ -529,16 +529,16 @@ std::string TInstantiateObjectTester::GetLocalSignature()
 //------------------------------------------------------------------------------
 void FormatAndThrow(int line, const char *file, const char *msg, int err)
 {
-	string s("line: ");
-	s += estring(line);
+	std::string s("line: ");
+	s += IntToStr(line);
 	s += " ";
 	s += file;
 	s += msg;
 	s += strerror(err);
 	s += "(";
-	s += estring(err);
+	s += IntToStr(err);
 	s += ")";
-	std::runtime_error re(s.c_str());
+	CppUnit::Exception re(s.c_str());
 	throw re;
 }
 //------------------------------------------------------------------------------
@@ -549,4 +549,5 @@ void FormatAndThrow(int line, const char *file, const char *msg, int err)
  * $Id  $
  *
  */
+
 

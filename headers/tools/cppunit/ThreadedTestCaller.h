@@ -176,8 +176,11 @@ BThreadedTestCaller<TestClass, ExpectedException>::run(CppUnit::TestResult *resu
 			// If we get this far, we actually managed to acquire the semaphore,
 			// so we should release it now.
 			release_sem_etc(fThreadSem, fThreads.size(), 0);
+
+			// Print out a newline for asthetics :-)
+			printf("\n");
+
 /*			
-			
 			
 			
 			// Wait for them all to finish, then clean up
@@ -254,7 +257,7 @@ BThreadedTestCaller<TestClass, ExpectedException>::tearDown() {
 template <class TestClass, class ExpectedException>
 std::string
 BThreadedTestCaller<TestClass, ExpectedException>::toString() const { 
-	return "BThreadedTestCaller for " + getName(); 
+	return std::string("BThreadedTestCaller for ") + getName(); 
 }
 
 #endif // _beos_threaded_test_caller_h_

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <kernel/OS.h>
+#include <TestUtils.h>
 
 ExampleTest::ExampleTest(std::string name)
 	: BThreadedTestCase(name)
@@ -31,6 +32,13 @@ ExampleTest::Suite() {
 	caller->addThread("Thread1", &ExampleTest::TestFunc1);
 	caller->addThread("Thread2", &ExampleTest::TestFunc1);
 	caller->addThread("Thread3", &ExampleTest::TestFunc1);
+	suite->addTest(caller);
+	
+	// And one that fails, if you're so inclined
+	caller = new BThreadedTestCaller<ExampleTest>("ExampleTests::MultiThreaded Failing Test");
+	caller->addThread("GoodThread1", &ExampleTest::TestFunc1);
+	caller->addThread("GoodThread2", &ExampleTest::TestFunc2);
+	caller->addThread("BadThread", &ExampleTest::FailureFunc);
 	suite->addTest(caller);
 	
 	// And some single threaded ones
@@ -79,5 +87,10 @@ ExampleTest::TestFunc3() {
 		snooze(sleeptime);
 //		Outputf("(3:%d)", i);
 	}
+}
+
+void
+ExampleTest::FailureFunc() {
+	CHK(true == false);
 }
 

@@ -1,5 +1,5 @@
 /*
-	$Id: AutolockLooperTest.h,v 1.1 2002/07/09 12:24:57 ejakowatz Exp $
+	$Id: AutolockLooperTest.h,v 1.2 2002/07/19 06:45:28 tylerdauwalder Exp $
 	
 	This file defines the class for performing all BAutolock tests on a
 	BLooper.
@@ -11,22 +11,26 @@
 #define AutolockLooperTest_H
 
 
-#include "ThreadedTestCaller.h"
-#include "TestCase.h"
+#include "ThreadedTestCase.h"
+#include <string>
 	
-template<class Autolock, class Looper> class AutolockLooperTest : public TestCase {
+class BLooper;
+class CppUnit::Test;
+
+class AutolockLooperTest : public BThreadedTestCase {
 	
 private:
-	typedef ThreadedTestCaller <AutolockLooperTest<Autolock, Looper> >
-		AutolockLooperTestCaller;
-		
-	Looper *theLooper;
+	BLooper *theLooper;
 	
 public:
 	static Test *suite(void);
 	void TestThread1(void);
 	AutolockLooperTest(std::string);
 	virtual ~AutolockLooperTest();
-	};
+};
 	
 #endif
+
+
+
+

@@ -20,10 +20,10 @@
 // Globals ---------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-class TValidateInstantiationTest : public TestCase
+class TValidateInstantiationTest : public BTestCase
 {
 	public:
-		TValidateInstantiationTest(std::string name) : TestCase(name) {;}
+		TValidateInstantiationTest(std::string name = "") : BTestCase(name) {;}
 
 		void AllParamsInvalid();
 		void ClassNameParamInvalid();
@@ -32,7 +32,7 @@ class TValidateInstantiationTest : public TestCase
 		void ClassFieldBogus();
 		void AllValid();
 
-		static Test* Suite();
+		static CppUnit::Test* Suite();
 };
 //------------------------------------------------------------------------------
 
@@ -45,4 +45,5 @@ class TValidateInstantiationTest : public TestCase
  * $Id  $
  *
  */
+
 
