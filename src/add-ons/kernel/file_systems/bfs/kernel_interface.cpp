@@ -199,14 +199,6 @@ bfs_sync(void *_ns)
 
 
 /**	Reads in the node from disk and creates an inode object from it.
- *	Has to be cautious if the node in question is currently under
- *	construction, in which case it waits for that action to be completed,
- *	and uses the inode object from the construction instead of creating
- *	a new one.
- *	ToDo: Must not be called without the volume lock being held. Actually,
- *	this might even happen with the BDirectory(node_ref *) constructor
- *	(at least I think so, I haven't tested it yet), so we should better
- *	test this. Fortunately, we can easily solve the issue with our kernel.
  */
 
 static status_t
@@ -221,49 +213,21 @@ bfs_read_vnode(void *_ns, vnode_id id, void **_node, bool reenter)
 	}
 
 	CachedBlock cached(volume, id);
-
 	bfs_inode *node = (bfs_inode *)cached.Block();
-	Inode *inode = NULL;
-	int32 tries = 0;
 
-restartIfBusy:
 	status_t status = node->InitCheck(volume);
-
-	if (status == B_BUSY) {
-		inode = (Inode *)node->etc;
-			// We have to use the "etc" field to get the inode object
-			// (the inode is currently being constructed)
-			// We would need to call something like get_vnode() again here
-			// to get rid of the "etc" field - which would be nice, especially
-			// for other file systems which don't have this messy field.
-
-		// let us wait a bit and try again later
-		if (tries++ < 200) {
-			// wait for one second at maximum
-			snooze(5000);
-			goto restartIfBusy;
-		}
-		FATAL(("inode is not becoming unbusy (id = %Ld)\n", id));
-		return status;
-	} else if (status < B_OK) {
+	if (status < B_OK) {
 		FATAL(("inode at %Ld is corrupt!\n", id));
 		return status;
 	}
 
-	// If the inode is currently being constructed, we already have an inode
-	// pointer (taken from the node's etc field).
-	// If not, we create a new one here
+	Inode *inode = new Inode(volume, id);
+	if (inode == NULL)
+		return B_NO_MEMORY;
 
-	if (inode == NULL) {
-		inode = new Inode(volume, id);
-		if (inode == NULL)
-			return B_NO_MEMORY;
-
-		status = inode->InitCheck(false);
-		if (status < B_OK)
-			delete inode;
-	} else
-		status = inode->InitCheck(false);
+	status = inode->InitCheck(false);
+	if (status < B_OK)
+		delete inode;
 
 	if (status == B_OK)
 		*_node = inode;
@@ -827,8 +791,8 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *pa
 		// we don't have to do that here...
 		status = link->WriteAt(transaction, 0, (const uint8 *)path, &length);
 	}
-	// ToDo: would be nice if Inode::Create() would let the INODE_NOT_READY
-	//	flag set until here, so that it can be accessed directly
+	// ToDo: would be nice if Inode::Create() would wait with publish_vnode()
+	//	until here, so that the link can be accessed directly
 
 	if (status == B_OK)
 		status = link->WriteBack(transaction);
