@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // Mouse input server device addon
-// Written by Stefano Ceccherini
+// Written by Jérôme Duval
 //
 // KeyboardInputDevice.cpp
 //
@@ -44,6 +44,8 @@
 	#define LOG_ERR(text...) fprintf(stderr, text)
 #endif
 
+#define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
+
 const static uint32 kSetLeds = 0x2711;
 const static uint32 kSetRepeatingKey = 0x2712;
 const static uint32 kSetNonRepeatingKey = 0x2713;
@@ -60,15 +62,15 @@ const static char *kKeyboardDevicesDirectoryUSB = "input/keyboard/usb";
 const uint32 at_keycode_map[] = {
 	0x1,	// Esc
 	0x12, 	// 1
-	0x13,
-	0x14,
-	0x15,
-	0x16,
-	0x17,
-	0x18,
-	0x19,
-	0x1a,
-	0x1b,
+	0x13,	// 2
+	0x14,	// 3
+	0x15,	// 4
+	0x16,	// 5
+	0x17,	// 6
+	0x18,	// 7
+	0x19,	// 8
+	0x1a,	// 9
+	0x1b,	// 0
 	0x1c,	// -
 	0x1d,	// =
 	0x1e,	// BKSP
@@ -147,207 +149,207 @@ const uint32 at_keycode_map[] = {
 	0x0c,	// F11
 	0x0d,	// F12
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x5b,   // KP Enter
-        0x60,   // Right Control
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x23,   // KP /
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x5f,   // Right Alt
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x20,   // Home
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x5b,   // KP Enter
+	0x60,   // Right Control
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x23,   // KP /
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x5f,   // Right Alt
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x20,   // Home
 	0x57,	// Up Arrow
-        0x21,   // Page Up
-        0x00,   // UNMAPPED
-        0x61,   // Left Arrow
-        0x00,   // UNMAPPED
-        0x63,   // Right Arrow
-        0x00,   // UNMAPPED
-        0x35,   // End
-        0x62,   // Down Arrow
-        0x36,   // Page Down
-        0x1f,   // Insert
-        0x34,   // Delete
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
-        0x00,   // UNMAPPED
+	0x21,   // Page Up
+	0x00,   // UNMAPPED
+	0x61,   // Left Arrow
+	0x00,   // UNMAPPED
+	0x63,   // Right Arrow
+	0x00,   // UNMAPPED
+	0x35,   // End
+	0x62,   // Down Arrow
+	0x36,   // Page Down
+	0x1f,   // Insert
+	0x34,   // Delete
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
+	0x00,   // UNMAPPED
 
 };
 
@@ -374,20 +376,20 @@ instantiate_input_device()
 
 KeyboardInputDevice::KeyboardInputDevice()
 {
-
+	
 #if DEBUG
 	if (sLogFile == NULL)
 		sLogFile = fopen("/var/log/keyboard_device_log.log", "a");
 #endif
-
+	CALLED();
+	
 	StartMonitoringDevice(kKeyboardDevicesDirectoryUSB);
-	LOG("%s\n", __PRETTY_FUNCTION__);
 }
 
 
 KeyboardInputDevice::~KeyboardInputDevice()
 {
-	LOG("%s\n", __PRETTY_FUNCTION__);
+	CALLED();
 	StopMonitoringDevice(kKeyboardDevicesDirectoryUSB);
 	
 #if DEBUG	
@@ -399,7 +401,7 @@ KeyboardInputDevice::~KeyboardInputDevice()
 status_t
 KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 {
-	LOG("%s\n", __PRETTY_FUNCTION__);
+	CALLED();
 	
 	keyboard_device *device = (keyboard_device *)cookie;
 
@@ -410,11 +412,10 @@ KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 			LOG_ERR("error when kSetKeyRepeatRate, fd:%li\n", device->fd);
 	
 	if (get_key_repeat_delay(&device->settings.key_repeat_delay) != B_OK)
-                LOG_ERR("error when get_key_repeat_delay\n");
-        else
-                if (ioctl(device->fd, kSetKeyRepeatDelay, &device->settings.key_repeat_delay)!=B_OK)
+		LOG_ERR("error when get_key_repeat_delay\n");
+	else
+		if (ioctl(device->fd, kSetKeyRepeatDelay, &device->settings.key_repeat_delay)!=B_OK)
 			LOG_ERR("error when kSetKeyRepeatDelay, fd:%li\n", device->fd);
-
 	return B_OK;
 }
 
@@ -422,7 +423,7 @@ KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 status_t
 KeyboardInputDevice::InitCheck()
 {
-	LOG("%s\n", __PRETTY_FUNCTION__);
+	CALLED();
 	RecursiveScan(kKeyboardDevicesDirectory);
 	
 	return B_OK;
@@ -432,7 +433,7 @@ KeyboardInputDevice::InitCheck()
 status_t
 KeyboardInputDevice::Start(const char *name, void *cookie)
 {
-	LOG("%s\n", __PRETTY_FUNCTION__);
+	CALLED();
 	keyboard_device *device = (keyboard_device *)cookie;
 	
 	char threadName[B_OS_NAME_LENGTH];
@@ -451,6 +452,7 @@ KeyboardInputDevice::Start(const char *name, void *cookie)
 status_t
 KeyboardInputDevice::Stop(const char *name, void *cookie)
 {
+	CALLED();
 	keyboard_device *device = (keyboard_device *)cookie;
 	
 	LOG("Stop(%s)\n", name);
@@ -469,6 +471,7 @@ status_t
 KeyboardInputDevice::Control(const char *name, void *cookie,
 						  uint32 command, BMessage *message)
 {
+	CALLED();
 	LOG("Control(%s, code: %lu)\n", name, command);
 
 	if (command == B_NODE_MONITOR)
@@ -484,7 +487,7 @@ KeyboardInputDevice::Control(const char *name, void *cookie,
 status_t 
 KeyboardInputDevice::HandleMonitor(BMessage *message)
 {
-	LOG("%s\n", __PRETTY_FUNCTION__);
+	CALLED();
 	int32 opcode = 0;
 	status_t status;
 	if ((status = message->FindInt32("opcode", &opcode)) < B_OK)
@@ -526,12 +529,13 @@ KeyboardInputDevice::HandleMonitor(BMessage *message)
 status_t
 KeyboardInputDevice::AddDevice(const char *path)
 {
-	LOG("%s\n", __PRETTY_FUNCTION__);
+	CALLED();
 	keyboard_device *device = new keyboard_device();
 	if (!device)
 		return B_NO_MEMORY;
 		
 	if ((device->fd = open(path, O_RDWR)) < B_OK) {
+		fprintf(stderr, "error when opening %s\n", path);
 		delete device;
 		return B_ERROR;
 	}
@@ -559,7 +563,7 @@ KeyboardInputDevice::AddDevice(const char *path)
 status_t
 KeyboardInputDevice::RemoveDevice(const char *path)
 {
-	LOG("%s\n", __PRETTY_FUNCTION__);
+	CALLED();
 	int32 i = 0;
 	keyboard_device *device = NULL;
 	while ((device = (keyboard_device *)fDevices.ItemAt(i)) != NULL) {
@@ -580,8 +584,17 @@ KeyboardInputDevice::RemoveDevice(const char *path)
 int32
 KeyboardInputDevice::DeviceWatcher(void *arg)
 {
+	CALLED();
 	keyboard_device *dev = (keyboard_device *)arg;
 	uint8 buffer[12];
+	uint32 currentModifiers = 0;
+	uint8 activeDeadKey = 0;
+	Keymap *keymap = &dev->owner->fKeymap;
+	uint32 lastKeyCode = 0;
+	uint32 repeatCount = 1;
+	uint8 states[16];
+	
+	memset(states, 0, sizeof(states));
 	
 	while (dev->active) {
 		LOG("%s\n", __PRETTY_FUNCTION__);
@@ -594,27 +607,92 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 
 			LOG("kGetNextKey : %Ld, %02x, %02x, %02lx\n", at_kbd->timestamp, at_kbd->scancode, at_kbd->is_keydown, keycode);
 
-			BMessage *msg = new BMessage;
-			msg->what = (at_kbd->is_keydown) ? B_KEY_DOWN : B_KEY_UP;
-			msg->AddInt64("when", at_kbd->timestamp);
+			if (at_kbd->is_keydown)
+				states[(keycode)>>3] |= (1 << (7 - ((keycode) & 0x7)));
+			else
+				states[(keycode)>>3] &= (!(1 << (7 - ((keycode) & 0x7))));
+
+			uint32 modifiers = keymap->Modifier(keycode);
+			if (modifiers) {
+				BMessage *msg = new BMessage;
+				msg->AddInt64("when", at_kbd->timestamp);
+				msg->what = B_MODIFIERS_CHANGED;
+				msg->AddInt32("be:old_modifiers", currentModifiers);
+				if (at_kbd->is_keydown)
+					currentModifiers |= modifiers;
+				else
+					currentModifiers &= !modifiers;
+				msg->AddInt32("modifiers", currentModifiers);
+				msg->AddData("states", B_UINT8_TYPE, states, 16);
+				if (dev->owner->EnqueueMessage(msg)!=B_OK)
+					delete msg;
+			}
 			
-			if (dev->owner->EnqueueMessage(msg)!=B_OK)
+			char *str = NULL, *str2 = NULL;
+			int32 numBytes = 0, numBytes2 = 0;
+			uint8 newDeadKey = 0;
+				
+			if (activeDeadKey == 0) {
+				newDeadKey = keymap->IsDeadKey(keycode, currentModifiers);				
+			}
+		
+			/*
+			// new behaviour
+			if (newDeadKey != 0) {
+				keymap->GetChars(keycode, currentModifiers, activeDeadKey, &str, &numBytes);
+				keymap->GetChars(keycode, 0, 0, &str2, &numBytes2);
+			}
+			
+			if (true) {	
+			*/
+			
+			// R5 like behaviour
+			if (newDeadKey == 0) {
+				keymap->GetChars(keycode, currentModifiers, activeDeadKey, &str, &numBytes);
+				keymap->GetChars(keycode, 0, 0, &str2, &numBytes2);
+			
+				BMessage *msg = new BMessage;
+				if (numBytes>0)
+					msg->what = (at_kbd->is_keydown) ? B_KEY_DOWN : B_KEY_UP;
+				else
+					msg->what = (at_kbd->is_keydown) ? B_UNMAPPED_KEY_DOWN : B_UNMAPPED_KEY_UP;
+				
+				msg->AddInt64("when", at_kbd->timestamp);
+				msg->AddInt32("key", keycode);
+				msg->AddInt32("modifiers", currentModifiers);
+				msg->AddData("states", B_UINT8_TYPE, states, 16);
+				if (numBytes>0) {
+					for (int i=0; i<numBytes; i++)
+						msg->AddInt8("byte", (int8)str[i]);
+					msg->AddString("bytes", str);
+				
+					if (numBytes2<=0) {
+						numBytes2 = 1;
+						str2 = str;
+					}
+					
+					if ((at_kbd->is_keydown) && (lastKeyCode == keycode)) {
+						repeatCount++;
+						msg->AddInt32("be:key_repeat", repeatCount);
+					} else
+						repeatCount = 1;
+				}
+				
+				if (numBytes2>0)
+					msg->AddInt32("raw_char", (uint32)((uint8)str2[0] & 0x7f));
+				
+				if (dev->owner->EnqueueMessage(msg)!=B_OK)
 				delete msg;
+			}
+			
+			if (!at_kbd->is_keydown && !modifiers) {
+				activeDeadKey = newDeadKey;
+			}
+			lastKeyCode = keycode;
 		} else {
 			LOG("kGetNextKey error 2\n");
 			snooze(100000);
 		}
-		
-		// be:key_repeat
-		// be:old_modifiers
-		// when
-		// raw_char
-		// key
-		// modifiers
-		// states
-		// byte
-		// bytes
-		    
 	}
 	
 	return 0;
@@ -624,6 +702,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 char *
 KeyboardInputDevice::GetShortName(const char *longName)
 {
+	CALLED();
 	BString string(longName);
 	BString name;
 	
@@ -642,6 +721,7 @@ KeyboardInputDevice::GetShortName(const char *longName)
 void
 KeyboardInputDevice::RecursiveScan(const char *directory)
 {
+	CALLED();
 	BEntry entry;
 	BDirectory dir(directory);
 	while (dir.GetNextEntry(&entry) == B_OK) {

@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // Keyboard input server device addon 
-// Written by Stefano Ceccherini, Jérôme Duval
+// Written by Jérôme Duval
 //
 // KeyboardInputDevice.h
 //

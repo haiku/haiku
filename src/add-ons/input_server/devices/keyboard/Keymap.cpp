@@ -108,6 +108,39 @@ Keymap::IsModifierKey(uint32 keyCode)
 }
 
 
+/* we need to know a modifier for a key
+*/
+uint32 
+Keymap::Modifier(uint32 keyCode)
+{
+	if (keyCode == fKeys.caps_key)
+		return B_CAPS_LOCK;
+	if (keyCode == fKeys.num_key)
+		return B_NUM_LOCK;
+	if (keyCode == fKeys.scroll_key)
+		return B_SCROLL_LOCK;
+	if (keyCode == fKeys.left_shift_key)
+		return B_LEFT_SHIFT_KEY | B_SHIFT_KEY;
+	if (keyCode == fKeys.right_shift_key)
+		return B_RIGHT_SHIFT_KEY | B_SHIFT_KEY;
+	if (keyCode == fKeys.left_command_key)
+		return B_LEFT_COMMAND_KEY | B_COMMAND_KEY;
+	if (keyCode == fKeys.right_command_key)
+		return B_RIGHT_COMMAND_KEY | B_COMMAND_KEY;
+	if (keyCode == fKeys.left_control_key)
+		return B_LEFT_CONTROL_KEY | B_CONTROL_KEY;
+	if (keyCode == fKeys.right_control_key)
+		return B_RIGHT_CONTROL_KEY | B_CONTROL_KEY;
+	if (keyCode == fKeys.left_option_key)
+		return B_LEFT_OPTION_KEY | B_OPTION_KEY;
+	if (keyCode == fKeys.right_option_key)
+		return B_RIGHT_OPTION_KEY | B_OPTION_KEY;
+	if (keyCode == fKeys.menu_key)
+		return B_MENU_KEY;
+	return 0;
+}
+
+
 // tell if a key is a dead key, needed for draw a dead key
 uint8
 Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
