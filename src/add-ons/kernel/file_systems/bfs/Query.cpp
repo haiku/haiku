@@ -1,12 +1,12 @@
 /* Query - query parsing and evaluation
-**
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** The pattern matching is roughly based on code originally written
-** by J. Kercheval, and on code written by Kenneth Almquist, though
-** it shares no code.
-**
-** This file may be used under the terms of the OpenBeOS License.
-*/
+ *
+ * The pattern matching is roughly based on code originally written
+ * by J. Kercheval, and on code written by Kenneth Almquist, though
+ * it shares no code.
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #include "Query.h"
@@ -798,8 +798,9 @@ status_t
 Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8 *key, size_t size)
 {
 	// get a pointer to the attribute in question
+	NodeGetter nodeGetter(inode->GetVolume());
 	union value value;
-	uint8 *buffer;
+	uint8 *buffer = (uint8 *)&value;
 	bool locked = false;
 
 	// first, check if we are matching for a live query and use that value
@@ -813,11 +814,13 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 		buffer = const_cast<uint8 *>(key);
 	} else if (!strcmp(fAttribute, "name")) {
 		// we need to lock before accessing Inode::Name()
+		nodeGetter.SetToNode(inode);
+
 		inode->SmallDataLock().Lock();
 		locked = true;
 
 		// if not, check for "fake" attributes, "name", "size", "last_modified",
-		buffer = (uint8 *)inode->Name();
+		buffer = (uint8 *)inode->Name(nodeGetter.Node());
 		if (buffer == NULL) {
 			inode->SmallDataLock().Unlock();
 			return B_ERROR;
@@ -825,19 +828,28 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 
 		type = B_STRING_TYPE;
 		size = strlen((const char *)buffer);
-	} else if (!strcmp(fAttribute,"size")) {
-		buffer = (uint8 *)&inode->Node()->data.size;
+	} else if (!strcmp(fAttribute, "size")) {
+#ifdef BFS_NATIVE_ENDIAN
+		buffer = (uint8 *)&inode->Node().data.size;
+#else
+		value.Int64 = inode->Size();
+#endif
 		type = B_INT64_TYPE;
-	} else if (!strcmp(fAttribute,"last_modified")) {
-		buffer = (uint8 *)&inode->Node()->last_modified_time;
+	} else if (!strcmp(fAttribute, "last_modified")) {
+#ifdef BFS_NATIVE_ENDIAN
+		buffer = (uint8 *)&inode->Node().last_modified_time;
+#else
+		value.Int64 = inode->Node().LastModifiedTime();
+#endif
 		type = B_INT64_TYPE;
 	} else {
 		// then for attributes in the small_data section, and finally for the
 		// real attributes
+		nodeGetter.SetToNode(inode);
 		Inode *attribute;
 
 		inode->SmallDataLock().Lock();
-		small_data *smallData = inode->FindSmallData(fAttribute);
+		small_data *smallData = inode->FindSmallData(nodeGetter.Node(), fAttribute);
 		if (smallData != NULL) {
 			buffer = smallData->Data();
 			type = smallData->type;
@@ -846,10 +858,11 @@ Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8
 		} else {
 			// needed to unlock the small_data section as fast as possible
 			inode->SmallDataLock().Unlock();
+			nodeGetter.Unset();
 
 			if (inode->GetAttribute(fAttribute, &attribute) == B_OK) {
 				buffer = (uint8 *)&value;
-				type = attribute->Node()->type;
+				type = attribute->Type();
 				size = attribute->Size();
 
 				if (size > INODE_FILE_NAME_LENGTH)
@@ -1096,14 +1109,7 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 			if (inode->GetName(dirent->d_name) < B_OK)
 				FATAL(("inode %Ld in query has no name!\n", inode->BlockNumber()));
 
-#ifdef KEEP_WRONG_DIRENT_RECLEN
-			// ToDo: The available file systems in BeOS apparently don't set the
-			// correct d_reclen - we are copying that behaviour if requested, but
-			// if it doesn't break compatibility, we will remove it.
-			dirent->d_reclen = strlen(dirent->d_name);
-#else
 			dirent->d_reclen = sizeof(struct dirent) + strlen(dirent->d_name);
-#endif
 		}
 
 		if (status == MATCH_OK)

@@ -1,10 +1,10 @@
+/* Query - query parsing and evaluation
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef QUERY_H
 #define QUERY_H
-/* Query - query parsing and evaluation
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include <SupportDefs.h>
