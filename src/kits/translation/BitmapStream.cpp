@@ -1,16 +1,13 @@
 /*****************************************************************************/
-//               File: BitmapStream.cpp
-//              Class: BBitmapStream
-//   Reimplemented by: Travis Smith, Michael Wilber, Translation Kit Team
-//   Reimplementation: 2002-04
+// Copyright (c) 2002-2005 Haiku Project
+//
+// Reimplemented by: Travis Smith, Michael Wilber, Translation Kit Team
 //
 // Description: BPositionIO based object to read/write bitmap format to/from
 //              a BBitmap object.
 //
 //              The BTranslationUtils class uses this object and makes it
 //              easy for users to load bitmaps.
-//
-// Copyright (c) 2002 OpenBeOS Project
 //
 // Original Version: Copyright 1998, Be Incorporated, All Rights Reserved.
 //                   Copyright 1995-1997, Jon Watte
@@ -145,14 +142,14 @@ BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 
 	if (pos < sizeof(TranslatorBitmap)) {
 		toRead = sizeof(TranslatorBitmap) - pos;
-		source = (reinterpret_cast<uint8 *> (fpBigEndianHeader)) + pos;
+		source = (reinterpret_cast<uint8 *>(fpBigEndianHeader)) + pos;
 	} else {
 		toRead = fSize - pos;
-		source = (reinterpret_cast<uint8 *> (fBitmap->Bits())) + pos -
+		source = (reinterpret_cast<uint8 *>(fBitmap->Bits())) + pos -
 			sizeof(TranslatorBitmap);
 	}
-	if (toRead > size)
-		toRead = size;
+	if (toRead > (ssize_t)size)
+		toRead = (ssize_t)size;
 
 	memcpy(buffer, source, toRead);
 	return toRead;
@@ -223,21 +220,22 @@ BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 			if (B_HOST_IS_LENDIAN)
 				SwapHeader(fpBigEndianHeader, &fHeader);
 							
-			if (fBitmap && ((fBitmap->Bounds() != fHeader.bounds) ||
-					(fBitmap->ColorSpace() != fHeader.colors) ||
-					(fBitmap->BytesPerRow() != fHeader.rowBytes))) {
+			if (fBitmap
+				&& (fBitmap->Bounds() != fHeader.bounds
+					|| fBitmap->ColorSpace() != fHeader.colors
+					|| (uint32)fBitmap->BytesPerRow() != fHeader.rowBytes)) {
 				if (!fDetached)
 					// if someone detached, we don't delete
 					delete fBitmap;
 				fBitmap = NULL;
 			}
 			if (!fBitmap) {
-				if ((fHeader.bounds.left > 0.0) || (fHeader.bounds.top > 0.0))
+				if (fHeader.bounds.left > 0.0 || fHeader.bounds.top > 0.0)
 					DEBUGGER("non-origin bounds!");
 				fBitmap = new BBitmap(fHeader.bounds, fHeader.colors);
 				if (!fBitmap)
 					return B_ERROR;
-				if (fBitmap->BytesPerRow() != fHeader.rowBytes)
+				if ((uint32)fBitmap->BytesPerRow() != fHeader.rowBytes)
 					return B_MISMATCHED_VALUES;
 			}
 			if (fBitmap)
