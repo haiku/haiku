@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -20,7 +20,8 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		TextViewSupportBuffer.h
-//	Author:			Marc Flerackers (mflerackers@androme.be)
+//	Authors			Marc Flerackers (mflerackers@androme.be)
+//					Stefano Ceccherini (burton666@libero.it)
 //	Description:	Template class used to implement the various BTextView
 //					buffer classes.
 //------------------------------------------------------------------------------
@@ -28,20 +29,12 @@
 #ifndef __TEXT_VIEW_SUPPORT_BUFFER__H__
 #define __TEXT_VIEW_SUPPORT_BUFFER__H__
 
-// Standard Includes -----------------------------------------------------------
 #include <cstdlib>
 #include <cstring>
 
-// System Includes -------------------------------------------------------------
+#include <OS.h>
 #include <SupportDefs.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 // _BTextViewSupportBuffer_ class ----------------------------------------------
 template <class T>
@@ -62,7 +55,8 @@ protected:
 		int32	fBufferCount;
 		T*		fBuffer;
 };
-//------------------------------------------------------------------------------
+
+
 template <class T>
 _BTextViewSupportBuffer_<T>::_BTextViewSupportBuffer_(int32 inExtraCount,
 													  int32 inCount)
@@ -73,15 +67,18 @@ _BTextViewSupportBuffer_<T>::_BTextViewSupportBuffer_(int32 inExtraCount,
 {
 	fBuffer = (T *)calloc(fExtraCount + fItemCount, sizeof(T));
 }
-//------------------------------------------------------------------------------
+
+
 template <class T>
 _BTextViewSupportBuffer_<T>::~_BTextViewSupportBuffer_()
 {
 	free(fBuffer);
 }
-//------------------------------------------------------------------------------
+
+
 template <class T>
-void _BTextViewSupportBuffer_<T>::InsertItemsAt(int32 inNumItems,
+void
+_BTextViewSupportBuffer_<T>::InsertItemsAt(int32 inNumItems,
 												int32 inAtIndex,
 												const T *inItem)
 {
@@ -96,6 +93,8 @@ void _BTextViewSupportBuffer_<T>::InsertItemsAt(int32 inNumItems,
 	if ((logSize + delta) >= fBufferCount) {
 		fBufferCount = logSize + delta + (fExtraCount * sizeof(T));
 		fBuffer = (T *)realloc(fBuffer, fBufferCount);
+		if (fBuffer == NULL)
+			debugger("InsertItemsAt(): reallocation failed");
 	}
 	
 	T *loc = fBuffer + inAtIndex;
@@ -104,7 +103,8 @@ void _BTextViewSupportBuffer_<T>::InsertItemsAt(int32 inNumItems,
 	
 	fItemCount += inNumItems;
 }
-//------------------------------------------------------------------------------
+
+
 template <class T>
 void
 _BTextViewSupportBuffer_<T>::RemoveItemsAt(int32 inNumItems,
@@ -126,24 +126,20 @@ _BTextViewSupportBuffer_<T>::RemoveItemsAt(int32 inNumItems,
 	if (extraSize > (fExtraCount * sizeof(T))) {
 		fBufferCount = (logSize - delta) + (fExtraCount * sizeof(T));
 		fBuffer = (T *)realloc(fBuffer, fBufferCount);
+		if (fBuffer == NULL)
+			debugger("RemoveItemsAt(): reallocation failed");
 	}
 	
 	fItemCount -= inNumItems;
 }
-//------------------------------------------------------------------------------
+
+
 template<class T>
 inline int32
 _BTextViewSupportBuffer_<T>::ItemCount() const
 {
 	return fItemCount;
 }
-//------------------------------------------------------------------------------
+
 
 #endif // __TEXT_VIEW_SUPPORT_BUFFER__H__
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
