@@ -657,32 +657,47 @@ StyledEditWindow::OpenFile(entry_ref *ref)
 
 void
 StyledEditWindow::RevertToSaved()
-{		//translationutils here as well
-		entry_ref ref;
-		const char *name;
+{
+	entry_ref ref;
+	const char *name;
+
+	int32 buttonIndex= 0; 
+	BAlert *revertAlert;
+	BString alertText;
+	alertText.SetTo("Revert to the last version of \"");
+	alertText<< Title();
+	alertText<<"\"? ";
+	revertAlert= new BAlert("revertAlert",alertText.String(), "Cancel", "Ok", 0,
+		B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+	revertAlert->SetShortcut(0, B_ESCAPE);
+	buttonIndex= revertAlert->Go();
+	
+	if (buttonIndex!=2) { 		// some sort of cancel, don't revert
+		return;
+	} 
 				
-		fSaveMessage->FindRef("directory", &ref);
-		fSaveMessage->FindString("name", &name);
-			
-		BDirectory dir(&ref);
-				
-	 	BFile file(&dir, name, B_READ_ONLY | B_CREATE_FILE);
-		fTextView->Reset();  			    //clear the textview...
-		fTextView->GetStyledText(&file); 	//and fill it from the file
+	fSaveMessage->FindRef("directory", &ref);
+	fSaveMessage->FindString("name", &name);
 		
-		// clear undo modes
-		fUndoItem->SetLabel("Can't Undo");
-		fUndoItem->SetEnabled(false);
-		fUndoFlag = false;
-		fCanUndo = false;
-		fRedoFlag = false;
-		fCanRedo = false;
-		// clear clean modes
-		fSaveItem->SetEnabled(false); 
-		fRevertItem->SetEnabled(false);
-		fUndoCleans = false;
-		fRedoCleans = false;
-		fClean = true;
+	BDirectory dir(&ref);
+			
+ 	BFile file(&dir, name, B_READ_ONLY | B_CREATE_FILE);
+	fTextView->Reset();  			    //clear the textview...
+	fTextView->GetStyledText(&file); 	//and fill it from the file
+	
+	// clear undo modes
+	fUndoItem->SetLabel("Can't Undo");
+	fUndoItem->SetEnabled(false);
+	fUndoFlag = false;
+	fCanUndo = false;
+	fRedoFlag = false;
+	fCanRedo = false;
+	// clear clean modes
+	fSaveItem->SetEnabled(false); 
+	fRevertItem->SetEnabled(false);
+	fUndoCleans = false;
+	fRedoCleans = false;
+	fClean = true;
 }/***StyledEditWindow::RevertToSaved()***/
 	
 status_t
