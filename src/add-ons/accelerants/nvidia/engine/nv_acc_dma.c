@@ -745,20 +745,12 @@ status_t nv_acc_init_dma()
 			bitm_depth = 0x00000003;
 		break;
 	case B_RGB15_LITTLE:
-		surf_depth = 0x00000004;
-		patt_depth = 0x00000001;
-		//fixme: needed for NV11, checkout the rest!
-		if (si->ps.card_arch < NV40A)
-			bitm_depth = 0x00000002;
-		else
-			bitm_depth = 0x00000001;
-		break;
 	case B_RGB16_LITTLE:
 		surf_depth = 0x00000004;
 		patt_depth = 0x00000001;
 		//fixme: needed for NV11, checkout the rest!
 		if (si->ps.card_arch < NV40A)
-			bitm_depth = 0x00000003;
+			bitm_depth = 0x00000003; /* sets bitmap input depth to broken 32-bit.. */
 		else
 			bitm_depth = 0x00000001;
 		break;
@@ -1118,9 +1110,12 @@ status_t nv_acc_setup_rectangle_dma(uint32 color)
 		switch(si->dm.space)
 		{
 		case B_RGB15_LITTLE:
+			/* unbelievable, isn't it? */
 			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-				(((color & 0x0000f800) >> 1) | ((color & 0x000007c0) >> 1) |
-				(color & 0x0000001f)); /* Color1A */
+				(((color & 0x00007800) << 8) |	/* (red b1-5: broken hardware) */
+				((color & 0x00000400) << 5) |	/* (red b0: broken hardware) */
+				((color & 0x000003e0) << 5) |	/* (green: broken hardware) */
+				((color & 0x0000001f) << 3)); /* Color1A */
 			break;
 		case B_RGB16_LITTLE:
 			si->engine.dma.cmdbuffer[si->engine.dma.current++] =

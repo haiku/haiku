@@ -294,6 +294,11 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 		/* calculate physical memory adress (for dma use) */
 		adress = (((uint32)((uint8*)si->framebuffer_pci)) + si->ps.memory_size);
+		/* don't touch the DMA acceleration engine command buffer if it exists */
+		/* note:
+		 * the buffer is 32kB in size. Keep a distance of another 32kB for safety. */
+		if (si->settings.dma_acc) adress -= (64 * 1024);
+
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
 			adress -= si->overlay.myBufInfo[cnt].size;
