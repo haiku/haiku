@@ -6,4 +6,4 @@ Addon <userland>memory_pool : userland generic :
 	memory_pool.c
 ;
 
-LinkSharedOSLibs <userland>memory_pool : <installed>stack_tester ;
+LinkSharedOSLibs <userland>memory_pool : <installed>new_stack_tester ;

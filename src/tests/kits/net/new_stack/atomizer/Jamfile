@@ -6,4 +6,4 @@ Addon <userland>atomizer : userland generic :
 	atomizer.c
 ;
 
-LinkSharedOSLibs <userland>atomizer : <installed>stack_tester ;
+LinkSharedOSLibs <userland>atomizer : <installed>new_stack_tester ;

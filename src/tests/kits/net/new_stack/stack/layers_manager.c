@@ -54,7 +54,7 @@ status_t start_layers_manager(void)
 	set_sem_owner(g_layers.lock, B_SYSTEM_TEAM);
 #endif
 
-	// Load all network/interfaces/* modules and let them
+	// Load all network/* modules and let them
 	// register any layer they may support by calling init()
 	module_list = open_module_list(NET_MODULES_ROOT);
 	if (module_list) {
@@ -68,12 +68,15 @@ status_t start_layers_manager(void)
 			if (!strlen(module_name))
 				continue;
 
+			if (strcmp(module_name, NET_STACK_MODULE_NAME) == 0)
+				continue;	// skip ourself! ;-)
+
 			dprintf("layers_manager: loading %s layer(s) module\n", module_name);
 			if (get_module(module_name, (module_info **) &nlmi) != B_OK)
 				continue;
 				
-			// this module may have been acquire more time by calling register_layer()
-			// or have B_KEEP_LOADED flag, so we don't care...
+			// this module may have been acquire more time if he called register_layer(),
+			// or have a B_KEEP_LOADED flag, so we don't care...
 			put_module(module_name);
 		};
 		close_module_list(module_list);
