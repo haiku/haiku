@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src add-ons kernel media audio ich ;
+
+UsePrivateHeaders media ;
+
+R5KernelAddon ich : kernel media audio :
+	ich.c
+;
