@@ -26,6 +26,7 @@ MenuItem::MenuItem(const char *label, Menu *subMenu)
 	fTarget(NULL),
 	fIsMarked(false),
 	fIsSelected(false),
+	fIsEnabled(true),
 	fType(MENU_ITEM_STANDARD),
 	fMenu(NULL),
 	fSubMenu(subMenu),
@@ -68,18 +69,12 @@ MenuItem::SetMarked(bool marked)
 }
 
 
-void
-MenuItem::Select(bool selected)
-{
-	if (fIsSelected == selected)
-		return;
+void MenuItem::Select(bool selected) { if (fIsSelected == selected) return;
 
 	if (selected && fMenu != NULL) {
 		// unselect previous item
-		MenuItem *selectedItem = fMenu->FindSelected();
-		if (selectedItem != NULL)
-			selectedItem->Select(false);
-	}
+		MenuItem *selectedItem = fMenu->FindSelected(); if (selectedItem !=
+				NULL) selectedItem->Select(false); }
 
 	fIsSelected = selected;
 
@@ -92,6 +87,19 @@ void
 MenuItem::SetType(menu_item_type type)
 {
 	fType = type;
+}
+
+
+void
+MenuItem::SetEnabled(bool enabled)
+{
+	if (fIsEnabled == enabled)
+		return;
+
+	fIsEnabled = enabled;
+
+	if (fMenu != NULL)
+		fMenu->Draw(this);
 }
 
 
@@ -302,6 +310,7 @@ add_boot_volume_menu(Directory *bootVolume)
 	Menu *menu = new Menu(CHOICE_MENU, "Select Boot Volume");
 	MenuItem *item;
 	void *cookie;
+	int32 count = 0;
 
 	if (gRoot->Open(&cookie, O_RDONLY) == B_OK) {
 		Directory *volume;
@@ -317,14 +326,27 @@ add_boot_volume_menu(Directory *bootVolume)
 					item->SetMarked(true);
 					item->Select(true);
 				}
+
+				count++;
 			}
 		}
 		gRoot->Close(cookie);
 	}
 
+	if (count == 0) {
+		// no boot volume found yet
+		menu->AddItem(item = new MenuItem("<No boot volume found>"));
+		item->SetType(MENU_ITEM_NO_CHOICE);
+		item->SetEnabled(false);
+	}
+
 	menu->AddSeparatorItem();
+
 	menu->AddItem(item = new MenuItem("Rescan volumes"));
+	item->SetHelpText("Please insert a Haiku CD-ROM or attach a USB disk - depending on your BIOS, you can then boot from them.");
 	item->SetType(MENU_ITEM_NO_CHOICE);
+	item->Select(true);
+
 	menu->AddItem(item = new MenuItem("Return to main menu"));
 	item->SetType(MENU_ITEM_NO_CHOICE);
 
@@ -350,6 +372,14 @@ add_safe_mode_menu()
 }
 
 
+static bool
+user_menu_reboot(Menu *menu, MenuItem *item)
+{
+	platform_exit();
+	return true;
+}
+
+
 status_t
 user_menu(Directory **_bootVolume)
 {
@@ -366,7 +396,16 @@ user_menu(Directory **_bootVolume)
 	platform_add_menus(menu);
 
 	menu->AddSeparatorItem();
+	if (*_bootVolume == NULL) {
+		menu->AddItem(item = new MenuItem("Reboot"));
+		item->SetTarget(user_menu_reboot);
+	}
+
 	menu->AddItem(item = new MenuItem("Continue booting"));
+	if (*_bootVolume == NULL) {
+		item->SetEnabled(false);
+		menu->ItemAt(0)->Select(true);
+	}
 
 	menu->Run();
 	return B_OK;
