@@ -51,6 +51,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Ov
 #include "MediaMisc.h"
 #include "MediaRosterEx.h"
 #include "SystemTimeSource.h"
+#include "MediaFilePlayer.h"
 
 //#define USER_ADDON_PATH "../add-ons/media"
 
@@ -643,6 +644,13 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) 
 	{
+		case '_TRU':
+		{
+			PlayMediaFile(msg->FindString("be:media_type"), msg->FindString("be:media_name"));
+			msg->SendReply(B_OK); // XXX don't know which reply is expected
+			return;
+		}
+		
 		case B_NODE_MONITOR:
 		{
 			switch (msg->FindInt32("opcode")) 
@@ -711,7 +719,7 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 
 int main()
 {
-	new MediaAddonServer("application/x-vnd.OpenBeOS-addon-host");
+	new MediaAddonServer(B_MEDIA_ADDON_SERVER_SIGNATURE);
 	be_app->Run();
 	return 0;
 }
