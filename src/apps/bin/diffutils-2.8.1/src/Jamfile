@@ -5,10 +5,28 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 BinCommand diff : 
-  	analyze.c context.c diff.c dir.c ed.c ifdef.c io.c normal.c side.c util.c version.c : libdiffutils.a ;
+  	analyze.c 
+  	context.c 
+  	diff.c 
+  	dir.c 
+  	ed.c 
+  	ifdef.c 
+  	io.c 
+  	normal.c 
+  	side.c 
+  	util.c 
+  	version.c 
+  	: libdiffutils.a 
+  	: diffutils.rdef ;
 
 BinCommand diff3 : 
-	diff3.c version.c : libdiffutils.a ;
-
+	diff3.c 
+	version.c 
+	: libdiffutils.a
+	: diffutils.rdef ;
+	
 BinCommand cmp : 
-	cmp.c version.c : libdiffutils.a ;
+	cmp.c 
+	version.c 
+	: libdiffutils.a
+	: diffutils.rdef ;
