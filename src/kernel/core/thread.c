@@ -446,29 +446,29 @@ static void
 _dump_thread_info(struct thread *t)
 {
 	dprintf("THREAD: %p\n", t);
-	dprintf("id:          0x%lx\n", t->id);
-	dprintf("name:        '%s'\n", t->name);
-	dprintf("all_next:    %p\nteam_next:  %p\nq_next:     %p\n",
+	dprintf("id:                 0x%lx\n", t->id);
+	dprintf("name:               \"%s\"\n", t->name);
+	dprintf("all_next:           %p\nteam_next:          %p\nq_next:             %p\n",
 		t->all_next, t->team_next, t->queue_next);
-	dprintf("priority:    0x%lx\n", t->priority);
-	dprintf("state:       %s\n", state_to_text(t, t->state));
-	dprintf("next_state:  %s\n", state_to_text(t, t->next_state));
-	dprintf("cpu:         %p ", t->cpu);
+	dprintf("priority:           %ld\n", t->priority);
+	dprintf("state:              %s\n", state_to_text(t, t->state));
+	dprintf("next_state:         %s\n", state_to_text(t, t->next_state));
+	dprintf("cpu:                %p ", t->cpu);
 	if (t->cpu)
 		dprintf("(%d)\n", t->cpu->info.cpu_num);
 	else
 		dprintf("\n");
-	dprintf("sig_pending:  0x%lx\n", t->sig_pending);
-	dprintf("in_kernel:    %d\n", t->in_kernel);
-	dprintf("sem.blocking: 0x%lx\n", t->sem.blocking);
-	dprintf("sem.count:    0x%lx\n", t->sem.count);
-	dprintf("sem.acquire_status: 0x%lx\n", t->sem.acquire_status);
-	dprintf("sem.flags:    0x%lx\n", t->sem.flags);
-	dprintf("fault_handler: %p\n", (void *)t->fault_handler);
-	dprintf("args:         %p %p\n", t->args1, t->args2);
-	dprintf("entry:        %p\n", (void *)t->entry);
-	dprintf("team:         %p\n", t->team);
-	dprintf("exit.sem:     0x%lx\n", t->exit.sem);
+	dprintf("sig_pending:        0x%lx\n", t->sig_pending);
+	dprintf("in_kernel:          %d\n", t->in_kernel);
+	dprintf("  sem.blocking:     0x%lx\n", t->sem.blocking);
+	dprintf("  sem.count:        0x%lx\n", t->sem.count);
+	dprintf("  sem.acquire_status: 0x%lx\n", t->sem.acquire_status);
+	dprintf("  sem.flags:        0x%lx\n", t->sem.flags);
+	dprintf("fault_handler:      %p\n", (void *)t->fault_handler);
+	dprintf("args:               %p %p\n", t->args1, t->args2);
+	dprintf("entry:              %p\n", (void *)t->entry);
+	dprintf("team:               %p, \"%s\"\n", t->team, t->team->name);
+	dprintf("exit.sem:           0x%lx\n", t->exit.sem);
 	dprintf("kernel_stack_area:  0x%lx\n", t->kernel_stack_area);
 	dprintf("kernel_stack_base:  %p\n", (void *)t->kernel_stack_base);
 	dprintf("user_stack_area:    0x%lx\n", t->user_stack_area);
@@ -513,7 +513,7 @@ dump_thread_info(int argc, char **argv)
 	// walk through the thread list, trying to match name or id
 	hash_open(sThreadHash, &i);
 	while ((t = hash_next(sThreadHash, &i)) != NULL) {
-		if ((t->name && strcmp(name, t->name) == 0) || t->id == id) {
+		if ((name != NULL && !strcmp(name, t->name)) || t->id == id) {
 			_dump_thread_info(t);
 			break;
 		}
