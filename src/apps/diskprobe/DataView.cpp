@@ -306,7 +306,7 @@ DataView::ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size
 void 
 DataView::Draw(BRect updateRect)
 {
-	if (fData == NULL)
+	if (fData == NULL || fFileSize == 0)
 		return;
 
 	// ToDo: take "updateRect" into account!
@@ -415,6 +415,9 @@ DataView::SelectionFrame(view_focus which, int32 start, int32 end)
 void
 DataView::DrawSelectionFrame(view_focus which)
 {
+	if (fFileSize == 0)
+		return;
+
 	bool drawBlock = false;
 	bool drawLastLine = false;
 	BRect block, lastLine;
@@ -529,6 +532,9 @@ DataView::DrawSelectionFrame(view_focus which)
 void
 DataView::DrawSelectionBlock(view_focus which)
 {
+	if (fFileSize == 0)
+		return;
+
 	// draw first line
 
 	SetDrawingMode(B_OP_INVERT);
@@ -586,14 +592,14 @@ DataView::SetSelection(int32 start, int32 end, view_focus focus)
 		end = temp;
 	}
 
+	if (start > (int32)fSizeInView - 1)
+		start = (int32)fSizeInView - 1;
 	if (start < 0)
 		start = 0;
-	else if (start > (int32)fSizeInView - 1)
-		start = (int32)fSizeInView - 1;
 
 	if (end > (int32)fSizeInView - 1)
 		end = (int32)fSizeInView - 1;
-	else if (end < 0)
+	if (end < 0)
 		end = 0;
 
 	if (fStart == start && fEnd == end) {
