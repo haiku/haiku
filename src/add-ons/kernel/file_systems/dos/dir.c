@@ -2,13 +2,13 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-
 #include <KernelExport.h> 
 
 #include <fsproto.h>
 #include <lock.h>
 #include <cache.h>
 
+#include <stdlib.h>
 #include <dirent.h>
 #include <stdio.h>
 #include <string.h>
@@ -347,8 +347,10 @@ static status_t findfile(nspace *vol, vnode *dir, const char *file,
 	   any other case-insensitive matches. If there are, the
 	   dups_exist flag is set to true. */
 	int		result = 0;
-	vnode_id	_vnid;
+	vnode_id	found_vnid = 0;
 	bool found_file = false;
+
+//	dprintf("findfile: %s in %Lx, case %d dups %d\n", file, dir->vnid, check_case, check_dups);
 
 	if (check_nspace_magic(vol, "findfile")) return EINVAL;
 	if (check_vnode_magic(dir, "findfile")) return EINVAL;
@@ -360,12 +362,11 @@ static status_t findfile(nspace *vol, vnode *dir, const char *file,
 
 	if ((strcmp(file,".") == 0) && (dir->vnid == vol->root_vnode.vnid)) {
 		found_file = true;
-		_vnid = dir->vnid;
+		found_vnid = dir->vnid;
 	} else if ((strcmp(file, "..") == 0) && (dir->vnid == vol->root_vnode.vnid)) {
 		found_file = true;
-		_vnid = dir->dir_vnid;
+		found_vnid = dir->dir_vnid;
 	} else {
-		char filename[512];
 		struct diri diri;
 
 		// XXX: do it in a smarter way
@@ -373,6 +374,9 @@ static status_t findfile(nspace *vol, vnode *dir, const char *file,
 
 		while (1)
 		{
+			char filename[512];
+			vnode_id	_vnid;
+
 			result = get_next_dirent(vol, dir, &diri, &_vnid, filename, 512);
 
 			if (result != B_NO_ERROR)
@@ -380,37 +384,41 @@ static status_t findfile(nspace *vol, vnode *dir, const char *file,
 
 			if(check_case) {
 				if (!found_file && !strcmp(filename, file)) {
-					result = B_OK;
 					found_file = true;
+					found_vnid = _vnid;
 				} else if(check_dups && !strcasecmp(filename, file)) {
 					*dups_exist = true;
 				}
 			} else {
 				if (!strcasecmp(filename, file)) {
-					result = B_OK;
 					if(check_dups && found_file) {
 						*dups_exist = true;
 					}
 					found_file = true;
+					found_vnid = _vnid;
 				}
 			}
 
-			if(found_file) {
-				if(!check_dups) {
-					break;
-				} else if(*dups_exist) {
-					break;
-				}
+			if(found_file && (!check_dups || (check_dups && *dups_exist))) {
+				break;
 			}
 		}
 		diri_free(&diri);
 	}
 	if (found_file) {
-		if (vnid) *vnid = _vnid;
-		if (node) result = get_vnode(vol->id, _vnid, (void **)node);
+		if (vnid) *vnid = found_vnid;
+		if (node) result = get_vnode(vol->id, found_vnid, (void **)node);
+		result = B_OK;
 	} else {
 		result = ENOENT;
 	}
+#if 0
+	dprintf("findfile: returning %d", result);
+	if(dups_exist)
+		dprintf(" dups_exist %d\n", *dups_exist);
+	else
+		dprintf("\n");
+#endif
 	return result;
 }
 
@@ -916,6 +924,7 @@ int dosfs_read_vnode(void *_vol, vnode_id vnid, char reenter, void **_node)
 	entry->cluster = info.cluster;
 	entry->mode = info.mode;
 	entry->st_size = info.size;
+	entry->dirty = false;
 	if (info.mode & FAT_SUBDIR) {
 		entry->st_size = count_clusters(vol,entry->cluster) * vol->sectors_per_cluster * vol->bytes_per_sector;
 	}

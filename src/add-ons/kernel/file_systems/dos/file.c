@@ -2,7 +2,6 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-
 #include <string.h>
 #include <sys/stat.h>
 
@@ -113,6 +112,12 @@ int dosfs_write_vnode(void *_vol, void *_node, char reenter)
 
 	DPRINTF(0, ("dosfs_write_vnode (vnode_id %Lx)\n", ((vnode *)_node)->vnid));
 	
+	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
+		LOCK_VOL(vol);
+		_dosfs_sync(vol);
+		UNLOCK_VOL(vol);
+	}
+
 	if (node != NULL) {
 #if TRACK_FILENAME
 		if (node->filename) free(node->filename);
@@ -229,6 +234,12 @@ int dosfs_wstat(void *_vol, void *_node, struct stat *st, long mask)
 	if (dirty) {
 		write_vnode_entry(vol, node);
 		notify_listener(B_STAT_CHANGED, vol->id, 0, 0, node->vnid, NULL);
+
+		if (vol->fs_flags & FS_FLAGS_OP_SYNC) {
+			// sync the filesystem
+			_dosfs_sync(vol);
+			node->dirty = false;
+		}
 	}
 
 	if (err != B_OK) DPRINTF(0, ("dosfs_wstat (%s)\n", strerror(err)));
@@ -537,6 +548,7 @@ int dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 		write_vnode_entry(vol, node);
 
 		DPRINTF(0, ("setting file size to %Lx (%lx clusters)\n", node->st_size, clusters));
+		node->dirty = true;
 	}
 
 	if (cluster1 == 0xffffffff) {
@@ -557,6 +569,9 @@ int dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 	}
 
 	ASSERT(iter.cluster == get_nth_fat_entry(vol, node->cluster, pos / vol->bytes_per_sector / vol->sectors_per_cluster));
+
+	if(*len > 0)
+		node->dirty = true;
 
 	// write partial first sector if necessary
 	if ((pos % vol->bytes_per_sector) != 0) {
@@ -654,6 +669,11 @@ int dosfs_close(void *_vol, void *_node, void *_cookie)
 	}
 
 	DPRINTF(0, ("dosfs_close (vnode id %Lx)\n", ((vnode *)_node)->vnid));
+
+	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
+		_dosfs_sync(vol);
+		node->dirty = false;
+	}
 
 	UNLOCK_VOL(vol);
 
@@ -788,17 +808,22 @@ int dosfs_create(void *_vol, void *_dir, const char *name, int omode,
 		// XXX: dangerous construct
 		if (find_vnid_in_vcache(vol, dummy.vnid) == B_OK) {
 			dummy.vnid = generate_unique_vnid(vol);
-			if ((result = add_to_vcache(vol, dummy.vnid, GENERATE_DIR_INDEX_VNID(dummy.dir_vnid, dummy.sindex))) < 0)
+			if ((result = add_to_vcache(vol, dummy.vnid, GENERATE_DIR_INDEX_VNID(dummy.dir_vnid, dummy.sindex))) < 0) {
 				// XXX: should remove entry on failure
+				if (vol->fs_flags & FS_FLAGS_OP_SYNC)
+					_dosfs_sync(vol);
 				goto bi;
+			}
 		}
-		
 		*vnid = dummy.vnid;
 		dummy.magic = ~VNODE_MAGIC;
 
 		result = get_vnode(vol->id, *vnid, (void **)&file);
-		if (result < B_OK)
+		if (result < B_OK) {
+			if (vol->fs_flags & FS_FLAGS_OP_SYNC)
+				_dosfs_sync(vol);
 			goto bi;
+		}
 	} else {
 		goto bi;
 	}
@@ -813,6 +838,9 @@ int dosfs_create(void *_vol, void *_dir, const char *name, int omode,
 	notify_listener(B_ENTRY_CREATED, vol->id, dir->vnid, 0, *vnid, name);
 
 	result = 0;
+
+	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
+		_dosfs_sync(vol);
 
 bi:	if (result != B_OK) free(cookie);
 
@@ -953,6 +981,9 @@ int dosfs_mkdir(void *_vol, void *_dir, const char *name, int perms)
 
 	result = B_OK;
 
+	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
+		_dosfs_sync(vol);
+
 	UNLOCK_VOL(vol);
 	return result;
 
@@ -960,6 +991,8 @@ bi5:free(buffer);
 bi4:dlist_remove(vol, dummy.vnid);
 bi3:if (IS_ARTIFICIAL_VNID(dummy.vnid)) remove_from_vcache(vol, dummy.vnid);
 bi2:clear_fat_chain(vol, dummy.cluster);
+	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
+		_dosfs_sync(vol);
 bi:	dummy.magic = ~VNODE_MAGIC;
 
 	UNLOCK_VOL(vol);
@@ -975,6 +1008,7 @@ int dosfs_rename(void *_vol, void *_odir, const char *oldname,
 	vnode *odir = (vnode *)_odir, *ndir = (vnode *)_ndir, *file, *file2;
 	uint32 ns, ne;
 	bool dups_exist;
+	bool dirty = false;
 
 	LOCK_VOL(vol);
 
@@ -1080,20 +1114,25 @@ int dosfs_rename(void *_vol, void *_odir, const char *oldname,
 		remove_vnode(vol->id, file2->vnid); // must be done in this order
 		put_vnode(vol->id, file2->vnid);
 
+		dirty = true;
+
 		// erase old directory entry
 		if ((result = erase_dir_entry(vol, file)) != B_OK) {
 			dprintf("dosfs_rename: error erasing old directory entry for %s (%s)\n", newname, strerror(result));
 			goto bi1;
 		}	
-	} else if (result == ENOENT && (!dups_exist || odir->vnid == ndir->vnid)) {
-		// there isn't an entry and there is no duplicates in the target dir or
-		// there isn't an entry and the target dir is the same as the source dir
+	} else if (result == ENOENT && (!dups_exist || (odir->vnid == ndir->vnid && !strcasecmp(oldname, newname)))) {
+		// there isn't an entry and there are no duplicates in the target dir or
+		// there isn't an entry and the target dir is the same as the source dir and
+		//   the source and target name are the same, case-insensitively
 
 		// erase old directory entry
 		if ((result = erase_dir_entry(vol, file)) != B_OK) {
 			dprintf("dosfs_rename: error erasing old directory entry for %s (%s)\n", newname, strerror(result));
 			goto bi1;
 		}
+
+		dirty = true;
 	
 		// create the new directory entry
 		if ((result = create_dir_entry(vol, ndir, file, newname, &ns, &ne)) != B_OK) {
@@ -1110,6 +1149,8 @@ int dosfs_rename(void *_vol, void *_odir, const char *oldname,
 
 	// shrink the directory (an error here is not disastrous)
 	compact_directory(vol, odir);
+
+	dirty = true;
 
 	// update vnode information
 	file->dir_vnid = ndir->vnid;
@@ -1173,9 +1214,14 @@ int dosfs_rename(void *_vol, void *_odir, const char *oldname,
 
 	result = 0;
 	
-bi2:if (result != B_OK) put_vnode(vol->id, file2->vnid);
-bi1:put_vnode(vol->id, file->vnid);
-bi:	UNLOCK_VOL(vol);
+bi2:
+	if (result != B_OK) put_vnode(vol->id, file2->vnid);
+bi1:
+	put_vnode(vol->id, file->vnid);
+bi:
+	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && dirty)
+		_dosfs_sync(vol);
+	UNLOCK_VOL(vol);
 	if (result != B_OK) DPRINTF(0, ("dosfs_rename (%s)\n", strerror(result)));
 	return result;
 }
@@ -1219,7 +1265,15 @@ int dosfs_remove_vnode(void *_vol, void *_node, char reenter)
 	node->magic = ~VNODE_MAGIC; // munge magic number to be safe
 	free(node);
 	
-	if (!reenter) UNLOCK_VOL(vol);
+	if (!reenter) {
+		if (vol->fs_flags & FS_FLAGS_OP_SYNC) {
+			// sync the entire filesystem,
+			// but only if we're not reentrant. Presumably the
+			// function that called this will sync.
+			_dosfs_sync(vol);
+		}
+		UNLOCK_VOL(vol);
+	}
 
 	return 0;
 }
@@ -1321,6 +1375,9 @@ static int do_unlink(void *_vol, void *_dir, const char *name, bool is_file)
 	remove_vnode(vol->id, file->vnid);
 
 	result = 0;
+	
+	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
+		_dosfs_sync(vol);
 
 bi1:put_vnode(vol->id, vnid);		// get 1 free
 bi:	UNLOCK_VOL(vol);

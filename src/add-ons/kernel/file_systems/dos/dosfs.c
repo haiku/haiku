@@ -2,7 +2,6 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -143,7 +142,7 @@ static int lock_removable_device(int fd, bool state)
 }
 
 static status_t mount_fat_disk(const char *path, nspace_id nsid,
-		const int flags, nspace** newVol)
+		const int flags, nspace** newVol, int fs_flags, int op_sync_mode)
 {
 	nspace		*vol = NULL;
 	uint8		buf[512];
@@ -159,6 +158,7 @@ static status_t mount_fat_disk(const char *path, nspace_id nsid,
 	
 	vol->magic = NSPACE_MAGIC;
 	vol->flags = B_FS_IS_PERSISTENT | B_FS_HAS_MIME;
+	vol->fs_flags = fs_flags;
 
 	// open read-only for now
 	if ((err = (vol->fd = open(path, O_RDONLY))) < 0) {
@@ -201,8 +201,25 @@ static status_t mount_fat_disk(const char *path, nspace_id nsid,
 			dprintf("dosfs: unable to open %s (%s)\n", path, strerror(err));
 			goto error0;
 		}
-		if (vol->flags & B_FS_IS_REMOVABLE)
+		if ((vol->flags & B_FS_IS_REMOVABLE) && (vol->fs_flags & FS_FLAGS_LOCK_DOOR))
 			lock_removable_device(vol->fd, true);
+	}
+
+	// see if we need to go into op sync mode
+	vol->fs_flags &= ~FS_FLAGS_OP_SYNC;
+	switch(op_sync_mode) {
+		case 1:
+			if((vol->flags & B_FS_IS_REMOVABLE) == 0) {
+				// we're not removable, so skip op_sync
+				break;
+			}
+		case 2:
+			dprintf("dosfs: mounted with op_sync enabled\n");
+			vol->fs_flags |= FS_FLAGS_OP_SYNC;
+			break;
+		case 0:
+		default:
+			;
 	}
 
 	// read in the boot sector
@@ -467,6 +484,7 @@ static status_t mount_fat_disk(const char *path, nspace_id nsid,
 	vol->root_vnode.mode = FAT_SUBDIR;
 	time(&(vol->root_vnode.st_time));
 	vol->root_vnode.mime = NULL;
+	vol->root_vnode.dirty = false;
 	dlist_add(vol, vol->root_vnode.vnid);
 
 	// find volume label (supercedes any label in the bpb)
@@ -502,7 +520,7 @@ error2:
 error1:
 	remove_cached_device_blocks(vol->fd, NO_WRITES);
 error:
-	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE))
+	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE) && (vol->fs_flags & FS_FLAGS_LOCK_DOOR))
 		lock_removable_device(vol->fd, false);
 error0:
 	close(vol->fd);
@@ -516,6 +534,8 @@ static int dosfs_mount(nspace_id nsid, const char *device, ulong flags, void *pa
 	int	result;
 	nspace	*vol;
 	void *handle;
+	int op_sync_mode;
+	int fs_flags = 0;
 
 	handle = load_driver_settings("dos");
 		debug_attr = strtoul(get_driver_parameter(handle, "debug_attr", "0", "0"), NULL, 0);
@@ -527,6 +547,18 @@ static int dosfs_mount(nspace_id nsid, const char *device, ulong flags, void *pa
 		debug_file = strtoul(get_driver_parameter(handle, "debug_file", "0", "0"), NULL, 0);
 		debug_iter = strtoul(get_driver_parameter(handle, "debug_iter", "0", "0"), NULL, 0);
 		debug_vcache = strtoul(get_driver_parameter(handle, "debug_vcache", "0", "0"), NULL, 0);
+	
+		op_sync_mode = strtoul(get_driver_parameter(handle, "op_sync_mode", "0", "0"), NULL, 0);
+		if (op_sync_mode < 0 || op_sync_mode > 2) {
+			op_sync_mode = 0;
+		}
+		if (strcasecmp(get_driver_parameter(handle, "lock_device", "true", "true"), "false") == 0) {
+			dprintf("dosfs: mounted with lock_device = false\n");
+		} else {
+			dprintf("dosfs: mounted with lock_device = true\n");
+			fs_flags |= FS_FLAGS_LOCK_DOOR;
+		}
+		
 	unload_driver_settings(handle);
 
 	/* parms and len are command line options; dosfs doesn't use any so
@@ -544,7 +576,7 @@ static int dosfs_mount(nspace_id nsid, const char *device, ulong flags, void *pa
 	}
 
 	// Try and mount volume as a FAT volume
-	if ((result = mount_fat_disk(device, nsid, flags, &vol)) == B_NO_ERROR) {
+	if ((result = mount_fat_disk(device, nsid, flags, &vol, fs_flags, op_sync_mode)) == B_NO_ERROR) {
 		char name[32];
 
 		if (check_nspace_magic(vol, "dosfs_mount")) return EINVAL;
@@ -643,7 +675,7 @@ static int dosfs_unmount(void *_vol)
 	dlist_uninit(vol);
 	uninit_vcache(vol);
 
-	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE))
+	if (!(vol->flags & B_FS_IS_READONLY) && (vol->flags & B_FS_IS_REMOVABLE) && (vol->fs_flags & FS_FLAGS_LOCK_DOOR))
 		lock_removable_device(vol->fd, false);
 	result = close(vol->fd);
 	free_lock(&(vol->vlock));
@@ -798,6 +830,9 @@ static int dosfs_wfsstat(void *_vol, struct fs_info * fss, long mask)
 			memcpy(vol->vol_label, name, 11);
 	}
 	
+	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
+		_dosfs_sync(vol);
+	
 bi:	UNLOCK_VOL(vol);
 
 	return result;
@@ -896,25 +931,29 @@ static int dosfs_ioctl(void *_vol, void *_node, void *cookie, int code,
 	return result;
 }
 
-static int dosfs_sync(void *_vol)
+int _dosfs_sync(nspace *vol)
 {
-	nspace *vol = (nspace *)_vol;
-	
-	LOCK_VOL(vol);
-
-	if (check_nspace_magic((nspace*)_vol, "dosfs_sync")) {
-		UNLOCK_VOL(vol);
+	if (check_nspace_magic(vol, "dosfs_sync"))
 		return EINVAL;
-	}
 	
-	DPRINTF(0, ("dosfs_sync called on volume %lx\n", vol->id));
-
 	update_fsinfo(vol);
 	flush_device(vol->fd, 0);
 
+	return 0;
+}
+
+static int dosfs_sync(void *_vol)
+{
+	nspace *vol = (nspace *)_vol;
+	int err;
+
+	DPRINTF(0, ("dosfs_sync called on volume %lx\n", vol->id));
+	
+	LOCK_VOL(vol);
+	err = _dosfs_sync(vol);
 	UNLOCK_VOL(vol);
 
-	return 0;
+	return err;
 }
 
 static int dosfs_fsync(void *vol, void *node)

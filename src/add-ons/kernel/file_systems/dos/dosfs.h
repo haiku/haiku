@@ -2,7 +2,6 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-
 #ifndef _DOSFS_H_
 #define _DOSFS_H_
 
@@ -101,6 +100,8 @@ typedef struct vnode
 
 	const char *mime;			// mime type (null if none)
 
+	bool		dirty;			// track if vnode had been written to
+
 #if TRACK_FILENAME
 	char		*filename;
 #endif
@@ -155,6 +156,8 @@ typedef struct _nspace
 	vnode_id beos_vnid;				// vnid of \BEOS directory
 	bool	respect_disk_image;
 
+	int		fs_flags;				// flags for this mount
+
 	lock	vlock;
 
 	// vcache state
@@ -171,6 +174,9 @@ typedef struct _nspace
 		vnode_id *vnid_list;
 	} dlist;
 } nspace;
+
+#define FS_FLAGS_OP_SYNC       0x1
+#define FS_FLAGS_LOCK_DOOR     0x2
 
 #define LOCK_VOL(vol) \
 	if (vol == NULL) { dprintf("null vol\n"); return EINVAL; } else LOCK((vol)->vlock)
@@ -199,5 +205,7 @@ int check_nspace_magic(struct _nspace *t, char *funcname);
 /* debug levels */
 extern int debug_attr, debug_dir, debug_dlist, debug_dosfs, debug_encodings,
 		debug_fat, debug_file, debug_iter, debug_vcache;
+
+int _dosfs_sync(nspace *vol);
 
 #endif
