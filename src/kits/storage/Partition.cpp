@@ -3,19 +3,24 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
+#include <errno.h>
 #include <new>
+#include <unistd.h>
+#include <sys/stat.h>
 
-#include <Partition.h>
+#include <syscalls.h>
 
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
 #include <DiskDeviceVisitor.h>
 #include <DiskSystem.h>
+#include <fs_volume.h>
 #include <Message.h>
+#include <Partition.h>
 #include <PartitioningInfo.h>
+#include <Path.h>
+#include <String.h>
 #include <Volume.h>
-
-#include "ddm_userland_interface.h"
 
 /*!	\class BPartition
 	\brief A BPartition object represent a partition and provides a lot of
@@ -366,15 +371,82 @@ BPartition::GetIcon(BBitmap *icon, icon_size which) const
 	The volume can only be mounted, if the partition contains a recognized
 	file system (\see ContainsFileSystem()) and it is not already mounted.
 
+	If no mount point is given, one will be created automatically under the
+	root directory (derived from the volume name). If one is given, the
+	directory must already exist.
+
+	\param mountPoint The directory where to mount the file system. May be
+		   \c NULL, in which case a mount point in the root directory will be
+		   created automatically.
 	\param mountFlags Currently only \c B_MOUNT_READ_ONLY is defined, which
 		   forces the volume to be mounted read-only.
 	\param parameters File system specific mount parameters.
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
 status_t
-BPartition::Mount(uint32 mountFlags, const char *parameters)
+BPartition::Mount(const char *mountPoint, uint32 mountFlags,
+	const char *parameters)
 {
-	return B_ERROR;	// not implemented
+	if (!fPartitionData || IsMounted())
+		return B_BAD_VALUE;
+
+	// get the partition path
+	BPath partitionPath;
+	status_t error = GetPath(&partitionPath);
+	if (error != B_OK)
+		return error;
+
+	// create a mount point, if none is given
+	bool deleteMountPoint = false;
+	BString mountPointPath;
+	if (!mountPoint) {
+		// get the volume name
+		const char *volumeName = ContentName();
+		if (volumeName || strlen(volumeName) == 0)
+			volumeName = Name();
+		if (!volumeName || strlen(volumeName) == 0)
+			volumeName = "unnamed volume";
+
+		// construct a path name from the volume name
+		// replace '/'s and prepend a '/'
+		mountPointPath = volumeName;
+		mountPointPath.ReplaceAll('/', '-');
+		mountPointPath.Insert("/", 0);
+
+		// make the name unique
+		BString basePath(mountPointPath);
+		int counter = 1;
+		while (true) {
+			BEntry entry;
+			error = entry.SetTo(mountPointPath.String());
+			if (error != B_OK)
+				return error;
+
+			if (!entry.Exists())
+				break;
+			mountPointPath = basePath;
+			mountPointPath << counter;
+			counter++;
+		}
+
+		mountPoint = mountPointPath.String();
+
+		// create the directory
+		if (mkdir(mountPoint, S_IRWXU | S_IRWXG | S_IRWXO) < 0)
+			return errno;
+
+		deleteMountPoint = true;
+	}
+
+	// mount the partition
+	error = fs_mount_volume(NULL, mountPoint, partitionPath.Path(), mountFlags,
+		parameters);
+
+	// delete the mount point on error, if we created it
+	if (error != B_OK && deleteMountPoint)
+		rmdir(mountPoint);
+
+	return error;
 }
 
 // Unmount
@@ -382,12 +454,26 @@ BPartition::Mount(uint32 mountFlags, const char *parameters)
 
 	The volume can of course only be unmounted, if it currently is mounted.
 
+	\param unmountFlags Currently only \c B_FORCE_UNMOUNT is defined, which
+		   forces the partition to be unmounted, even if there are still
+		   open FDs. Be careful using this flag -- you risk the user's data.
+
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
 status_t
-BPartition::Unmount()
+BPartition::Unmount(uint32 unmountFlags)
 {
-	return B_ERROR;	// not implemented
+	if (!fPartitionData || !IsMounted())
+		return B_BAD_VALUE;
+
+	// get the partition path
+	BPath partitionPath;
+	status_t error = GetPath(&partitionPath);
+	if (error != B_OK)
+		return error;
+
+	// unmount
+	return fs_unmount_volume(partitionPath.Path(), unmountFlags);
 }
 
 // Device
