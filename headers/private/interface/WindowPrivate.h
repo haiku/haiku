@@ -7,6 +7,8 @@
 #ifndef _WINDOW_PRIVATE_H
 #define _WINDOW_PRIVATE_H
 
+#include <Window.h>
+
 /* Private window looks */
 
 const window_look kDesktopWindowLook = window_look(4);
