@@ -2,6 +2,9 @@
 
 #include "Debug.h"
 
+#include <stdio.h>
+#include <string.h>
+
 #include <Application.h>
 #include <Message.h>
 #include <OS.h>
@@ -31,9 +34,11 @@ static const bigtime_t kRosterSanityEventInterval = 1000000LL;
 
 // constructor
 /*!	\brief Creates the registrar application class.
+	\param error Passed to the BApplication constructor for returning an
+		   error code.
 */
-Registrar::Registrar()
-		 : BApplication(kRegistrarSignature),
+Registrar::Registrar(status_t *error)
+		 : BApplication(kRegistrarSignature, error),
 		   fRoster(NULL),
 		   fClipboardHandler(NULL),
 		   fMIMEManager(NULL),
@@ -272,14 +277,25 @@ int
 main()
 {
 	FUNCTION_START();
+
 	// rename the main thread
 	rename_thread(find_thread(NULL), kRosterThreadName);
+
 	// create and run the registrar application
-	Registrar *app = new Registrar();
+	status_t error;
+	Registrar *app = new Registrar(&error);
+	if (error != B_OK) {
+		fprintf(stderr, "Failed to create the BApplication: %s\n",
+			strerror(error));
+		return 1;
+	}
+
 PRINT(("app->Run()...\n"));
 	app->Run();
+
 PRINT(("delete app...\n"));
 	delete app;
+
 	FUNCTION_END();
 	return 0;
 }

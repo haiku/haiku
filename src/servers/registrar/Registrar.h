@@ -41,7 +41,7 @@ namespace BPrivate {
 
 class Registrar : public BApplication {
 public:
-	Registrar();
+	Registrar(status_t *error);
 	virtual ~Registrar();
 
 	virtual void MessageReceived(BMessage *message);
