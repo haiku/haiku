@@ -1,10 +1,10 @@
 #include <unistd.h>
-#include <kernel/image.h>
-#include <kernel/OS.h>
+#include <image.h>
+#include <OS.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/select.h>
-#include <posix/errno.h>
+#include <errno.h>
 
 #include "net_stack_driver.h"
 

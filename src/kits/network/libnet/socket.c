@@ -10,9 +10,9 @@
 #include <iovec.h>
 #include <stdio.h>
 
-#include "sys/socket.h"
-#include "sys/sockio.h"
-#include "netinet/in.h"
+#include <sys/socket.h>
+#include <sys/sockio.h>
+#include <netinet/in.h>
 
 #include "net_stack_driver.h"
 

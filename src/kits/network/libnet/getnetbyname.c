@@ -31,9 +31,9 @@
  * SUCH DAMAGE.
  */
 
-#include <kernel/OS.h>
-#include "netinet/in.h"
-#include "netdb.h"
+#include <OS.h>
+#include <netinet/in.h>
+#include <netdb.h>
 #include <string.h>
 
 extern int _net_stayopen;

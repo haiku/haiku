@@ -67,17 +67,17 @@
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/time.h>
-#include "sys/socket.h"
+#include <sys/socket.h>
 #include <sys/uio.h>
-#include "netinet/in.h"
-#include "arpa/nameser.h"
-#include "arpa/inet.h"
-#include "sys/select.h"
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <arpa/inet.h>
+#include <sys/select.h>
 
 #include <stdio.h>
-#include "netdb.h"
+#include <netdb.h>
 #include <errno.h>
-#include "resolv.h"
+#include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>

@@ -31,8 +31,8 @@
  * SUCH DAMAGE.
  */
 
-#include "netinet/in.h"
-#include "netdb.h"
+#include <netinet/in.h>
+#include <netdb.h>
 #include <string.h>
 
 extern int _proto_stayopen;

@@ -77,14 +77,14 @@
 
 #include <sys/param.h>
 #include <sys/types.h>
-#include "sys/socket.h"
-#include "netinet/in.h"
-#include "arpa/inet.h"
-#include "arpa/nameser.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
 
 #include <ctype.h>
-#include "netdb.h"
-#include "resolv.h"
+#include <netdb.h>
+#include <resolv.h>
 #include <stdio.h>
 #include <time.h>
 

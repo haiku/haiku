@@ -58,9 +58,9 @@
  */
 
 #include <sys/types.h>
-#include "netinet/in.h"
+#include <netinet/in.h>
 #include <sys/time.h>
-#include "resolv.h"
+#include <resolv.h>
 
 #include <unistd.h>
 #include <stdlib.h>

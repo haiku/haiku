@@ -6,7 +6,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
-#include <kernel/OS.h>
+#include <OS.h>
 #include <iovec.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,13 +18,22 @@ static int32 h_errno_tls;
 /* These should probably be moved to a seperate file as they
  * are unique to the library as a whole...
  */
-
+/*
 void _init()
 {
 	h_errno_tls = tls_allocate();
 }
 
 void _fini()
+{
+}
+*/
+void initialize_before()
+{
+	h_errno_tls = tls_allocate();
+}
+
+void terminate_after()
 {
 }
 

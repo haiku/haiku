@@ -33,8 +33,8 @@
 
 #include <sys/types.h>
 #include <kernel/OS.h>
-#include "sys/socket.h"
-#include "net/if_dl.h"
+#include <sys/socket.h>
+#include <net/if_dl.h>
 #include <string.h>
 
 /* States*/

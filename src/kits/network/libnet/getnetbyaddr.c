@@ -32,8 +32,8 @@
  */
 
 #include <kernel/OS.h>
-#include "netinet/in.h"
-#include "netdb.h"
+#include <netinet/in.h>
+#include <netdb.h>
 
 extern int _net_stayopen;
 

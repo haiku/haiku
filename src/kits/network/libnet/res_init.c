@@ -55,19 +55,19 @@
 
 #include <sys/types.h>
 #include <sys/param.h>
-#include "sys/socket.h"
+#include <sys/socket.h>
 #include <sys/time.h>
-#include "netinet/in.h"
-#include "arpa/inet.h"
-#include "arpa/nameser.h"
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
 
 #include <stdio.h>
 #include <ctype.h>
-#include "resolv.h"
+#include <resolv.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include "netdb.h"
+#include <netdb.h>
 
 /*-------------------------------------- info about "sortlist" --------------
  * Marc Majka		1994/04/16

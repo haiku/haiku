@@ -52,12 +52,12 @@
  */
 
 #include <sys/param.h>
-#include "sys/socket.h"
-#include "netinet/in.h"
-#include "arpa/inet.h"
-#include "arpa/nameser.h"
-#include "netdb.h"
-#include "resolv.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <arpa/nameser.h>
+#include <netdb.h>
+#include <resolv.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <errno.h>

@@ -55,14 +55,13 @@
 
 #include <sys/types.h>
 #include <sys/param.h>
-#include "netinet/in.h"
-#include "arpa/nameser.h"
-#include "netdb.h" /* for MAXHOSTNAMELEN */
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <netdb.h> /* for MAXHOSTNAMELEN */
+#include <resolv.h>
 
 #include <stdio.h>
-#include "resolv.h"
 #include <ctype.h>
-
 #include <unistd.h>
 #include <string.h>
 
