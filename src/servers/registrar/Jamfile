@@ -6,7 +6,7 @@ UsePrivateHeaders storage ;
 
 AddResources obos_registrar : registrar.rdef ;
 
-Server obos_registrar :
+local registrar_sources = 
 	AppInfoList.cpp
 	ClipboardHandler.cpp
 	ClipboardTree.cpp
@@ -27,8 +27,22 @@ Server obos_registrar :
 	Watcher.cpp
 	WatchingService.cpp
 ;
-LinkSharedOSLibs obos_registrar :
+
+Server obos_registrar
+ 	:
+	$(registrar_sources)
+	:
 	<boot!home!config!lib>libopenbeos.so
 	stdc++.r4
 	be
+;
+
+Server registrar
+ 	:
+ 	# no sources; directly link against the compiled objects
+	:
+	[ FGristFiles $(registrar_sources:S=$(SUFOBJ)) ]
+	libroot.so	# Haiku libroot
+	libbe.so	# Haiku libbe
+	stdc++.r4
 ;
