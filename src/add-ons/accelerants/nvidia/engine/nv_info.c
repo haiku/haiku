@@ -469,6 +469,69 @@ static void detect_panels()
 	LOG(2,("INFO: End flatpanel registers dump.\n"));
 }
 
+void get_panel_modelines(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
+{
+	if (si->ps.tmds1_active)
+	{
+		/* horizontal timing */
+		p1->timing.h_display = (DACR(FP_HDISPEND) & 0x0000ffff) + 1;
+		p1->timing.h_sync_start = (DACR(FP_HSYNC_S) & 0x0000ffff) + 1;
+		p1->timing.h_sync_end = (DACR(FP_HSYNC_E) & 0x0000ffff) + 1;
+		p1->timing.h_total = (DACR(FP_HTOTAL) & 0x0000ffff) + 1;
+		/* vertical timing */
+		p1->timing.v_display = (DACR(FP_VDISPEND) & 0x0000ffff) + 1;
+		p1->timing.v_sync_start = (DACR(FP_VSYNC_S) & 0x0000ffff) + 1;
+		p1->timing.v_sync_end = (DACR(FP_VSYNC_E) & 0x0000ffff) + 1;
+		p1->timing.v_total = (DACR(FP_VTOTAL) & 0x0000ffff) + 1;
+		/* sync polarity */
+		p1->timing.flags = 0;
+		if (DACR(FP_TG_CTRL) & 0x00000001) p1->timing.flags |= B_POSITIVE_VSYNC;
+		if (DACR(FP_TG_CTRL) & 0x00000010) p1->timing.flags |= B_POSITIVE_HSYNC;
+		/* refreshrate */
+		p1->timing.pixel_clock = (p1->timing.h_total * p1->timing.v_total * 60) / 1000;
+		/* setup the rest */
+		p1->space = B_CMAP8;
+		p1->virtual_width = p1->timing.h_display;
+		p1->virtual_height = p1->timing.v_display;
+		p1->h_display_start = 0;
+		p1->v_display_start = 0;
+		p1->flags = 0;
+		*pan1 = TRUE;
+	}
+	else
+		*pan1 = FALSE;
+
+	if (si->ps.tmds2_active)
+	{
+		/* horizontal timing */
+		p2->timing.h_display = (DAC2R(FP_HDISPEND) & 0x0000ffff) + 1;
+		p2->timing.h_sync_start = (DAC2R(FP_HSYNC_S) & 0x0000ffff) + 1;
+		p2->timing.h_sync_end = (DAC2R(FP_HSYNC_E) & 0x0000ffff) + 1;
+		p2->timing.h_total = (DAC2R(FP_HTOTAL) & 0x0000ffff) + 1;
+		/* vertical timing */
+		p2->timing.v_display = (DAC2R(FP_VDISPEND) & 0x0000ffff) + 1;
+		p2->timing.v_sync_start = (DAC2R(FP_VSYNC_S) & 0x0000ffff) + 1;
+		p2->timing.v_sync_end = (DAC2R(FP_VSYNC_E) & 0x0000ffff) + 1;
+		p2->timing.v_total = (DAC2R(FP_VTOTAL) & 0x0000ffff) + 1;
+		/* sync polarity */
+		p2->timing.flags = 0;
+		if (DAC2R(FP_TG_CTRL) & 0x00000001) p2->timing.flags |= B_POSITIVE_VSYNC;
+		if (DAC2R(FP_TG_CTRL) & 0x00000010) p2->timing.flags |= B_POSITIVE_HSYNC;
+		/* refreshrate */
+		p2->timing.pixel_clock = (p2->timing.h_total * p2->timing.v_total * 60) / 1000;
+		/* setup the rest */
+		p2->space = B_CMAP8;
+		p2->virtual_width = p2->timing.h_display;
+		p2->virtual_height = p2->timing.v_display;
+		p2->h_display_start = 0;
+		p2->v_display_start = 0;
+		p2->flags = 0;
+		*pan2 = TRUE;
+	}
+	else
+		*pan2 = FALSE;
+}
+
 static void pinsnv4_fake(void)
 {
 	/* carefull not to take to high limits, and high should be >= 2x low. */
