@@ -7,6 +7,7 @@
 #include "console.h"
 #include "cpu.h"
 #include "mmu.h"
+#include "video.h"
 
 #include <SupportDefs.h>
 #include <boot/platform.h>
@@ -62,7 +63,7 @@ platform_start_kernel(void)
 		// or I don't see something important...
 
 	mmu_init_for_kernel();
-	//cpu_boot_other_cpus();
+	cpu_boot_other_cpus();
 
 	printf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
 
@@ -75,6 +76,8 @@ platform_start_kernel(void)
 		"pushl 	%1;	"					// this is the start address
 		"ret;		"					// jump.
 		: : "g" (args), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
+
+	panic("kernel returned!\n");
 }
 
 
@@ -87,15 +90,15 @@ _start(void)
 	asm("fninit");		// initialize floating point unit
 
 	clear_bss();
-
 	call_ctors();
 		// call C++ constructors before doing anything else
 
 	args.heap_size = HEAP_SIZE;
 
 	console_init();
-	//cpu_init();
+	cpu_init();
 	mmu_init();
+	video_init();
 
 	main(&args);
 }

@@ -7,6 +7,7 @@
 #include <SupportDefs.h>
 #include <string.h>
 #include <util/kernel_cpp.h>
+#include <boot/stage2.h>
 
 #include "console.h"
 
@@ -31,6 +32,9 @@ FILE *stdin, *stdout, *stderr;
 static void
 clear_screen()
 {
+	if (gKernelArgs.fb.enabled)
+		return;
+
 	for (uint32 i = 0; i < sScreenWidth * sScreenHeight; i++)
 		sScreenBase[i] = 0xf20;
 }
@@ -70,6 +74,9 @@ ssize_t
 Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
+
+	if (gKernelArgs.fb.enabled)
+		return bufferSize;
 
 	for (uint32 i = 0; i < bufferSize; i++) {
 		if (string[0] == '\n')

@@ -13,5 +13,10 @@ KernelMergeObject boot_platform_bios_ia32.o :
 	<$(SOURCE_GRIST)>console.cpp
 	<$(SOURCE_GRIST)>devices.cpp
 	<$(SOURCE_GRIST)>mmu.cpp
-	:
+	<$(SOURCE_GRIST)>cpu.cpp
+	<$(SOURCE_GRIST)>smp_boot.c
+	<$(SOURCE_GRIST)>smp_trampoline.S
+	<$(SOURCE_GRIST)>support.S
+	<$(SOURCE_GRIST)>video.cpp
+	: -fno-pic
 	;
