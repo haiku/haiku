@@ -631,7 +631,7 @@ BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size iconSize) const
 	if (error == B_OK) {
 		if (GetType(mimeString) != B_OK) {
 			struct stat stat;
-			error = fNode->GetStat(&stat) == B_OK;
+			error = fNode->GetStat(&stat);
 			if (error == B_OK) {
 				// no type available -- get the icon for the appropriate type (file/dir/etc.)
 				BMimeType type;
