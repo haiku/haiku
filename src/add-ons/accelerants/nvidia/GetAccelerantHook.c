@@ -4,7 +4,7 @@
 	
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-1/2005
+	Rudolf Cornelissen 10/2002-2/2005
 */
 
 #define MODULE_BIT 0x08000000
@@ -171,10 +171,21 @@ status_t check_overlay_capability(uint32 feature)
 		break;
 	}
 
-	/* all supported cards have a bes */
-	LOG(4, ("Overlay: Exporting hook %s.\n", msg));
-
-	return B_OK;
+	/* all supported cards have a bes, but... */
+	if ((si->ps.card_arch >= NV40A) &&
+		(si->ps.card_type != NV40) && (si->ps.card_type != NV45))
+	{
+		/* all NV40 architecture cards have a new HDTV capable bes except for
+		 * GeForce 6800's. Unfortunately we have no info about the new bes yet. */
+		LOG(4, ("Overlay: Not exporting hook %s.\n", msg));
+		return B_ERROR;
+	}
+	else
+	{
+		/* all other cards have a supported bes */
+		LOG(4, ("Overlay: Exporting hook %s.\n", msg));
+		return B_OK;
+	}
 }
 
 status_t check_acc_capability(uint32 feature)
