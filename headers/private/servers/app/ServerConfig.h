@@ -4,7 +4,7 @@
 // This is defined to place the server in test mode, which modifies certain things like
 // system keyboard shortcuts. Note that it is possible, though senseless, to place it in
 // regular mode and still use a display driver which depends on the R5 app_server
-#define TEST_MODE
+//#define TEST_MODE
 
 // The ViewDriver is a BView/BWindow combination. Plenty of functionality,
 // but dog-slow.
@@ -26,7 +26,8 @@
 #define HWDRIVER 3
 
 // Display driver to be used by the server.
-#define DISPLAYDRIVER VIEWDRIVER
+//#define DISPLAYDRIVER VIEWDRIVER
+#define DISPLAYDRIVER HWDRIVER
 
 // Uncomment this if the DisplayDriver should only rely on drawing functions implemented
 // in software even though hardware-accelerated functions are available
@@ -37,7 +38,7 @@
 
 // Define this if you want the display driver to emulate the input server.
 // Comment this out if DISPLAYDRIVER is defined as HWDRIVER.
-#define ENABLE_INPUT_SERVER_EMULATION
+//#define ENABLE_INPUT_SERVER_EMULATION
 
 // This is the application signature of our app_server when running as a
 // regular application. When running as the app_server, this is not used.

@@ -54,6 +54,7 @@ public:
 			prevState		= NULL;
 			clippPicture	= NULL;
 			clippInverse	= false;
+			fVisibleRegion	= NULL;
 		}
 	~LayerData(void)
 		{
@@ -117,6 +118,7 @@ public:
 	
 	ServerPicture	*clippPicture;
 	bool			clippInverse;
+	BRegion			*fVisibleRegion;
 };
 #endif
 
