@@ -6,7 +6,8 @@
 #include "Constants.h"
 
 RefreshSlider::RefreshSlider(BRect frame)
-	:BSlider(frame, "Screen", "Refresh Rate:", new BMessage(SLIDER_INVOKE_MSG), 450, gMaxRefresh * 10),
+	:BSlider(frame, "Screen", "Refresh Rate:", 
+		new BMessage(SLIDER_INVOKE_MSG), gMinRefresh * 10, gMaxRefresh * 10),
 	fStatus(new char[32])
 {	
 }

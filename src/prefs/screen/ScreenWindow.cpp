@@ -176,6 +176,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fResolutionMenu = new BPopUpMenu("", true, true);	
 	fColorsMenu = new BPopUpMenu("", true, true);
+	fRefreshMenu = new BPopUpMenu("", true, true);
 	
 	CheckUpdateDisplayModes();
 	
@@ -201,30 +202,11 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fColorsField->SetDivider(colorsWidth);
 	
-	controlsBox->AddChild(fColorsField);	
-	
-	// XXX: When we'll start to use OpenBeOS BScreen, we will be able to dynamically
-	// build this menu using the available refresh rates, without limiting ourself
-	// to 85 hz.
-	fRefreshMenu = new BPopUpMenu("", true, true);
-	char str[256];
-	refresh_rate_to_string(56,str);
-	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
-	refresh_rate_to_string(60,str);
-	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
-	refresh_rate_to_string(70,str);
-	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
-	refresh_rate_to_string(75,str);
-	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
-	refresh_rate_to_string(85,str);
-	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
-	refresh_rate_to_string(100,str);
-	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
+	controlsBox->AddChild(fColorsField);
 	
 	fOtherRefresh = new BMenuItem("Other...", new BMessage(POP_OTHER_REFRESH_MSG));
 	fRefreshMenu->AddItem(fOtherRefresh);
 	
-		
 	const char * refreshLabel = "Refresh Rate: ";
 	float refreshWidth = controlsBox->StringWidth(refreshLabel);
 	controlMenuRect.Set(88.0-refreshWidth, 86.0, 171.0, 104.0);
@@ -410,29 +392,35 @@ ScreenWindow::MessageReceived(BMessage* message)
 				(frame.top + 34.0), (frame.left + 509.0),
 				(frame.top + 169.0)), value);
 			fRefreshWindow->Show();
-			
-			BMenuItem *other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);
-			
-			BString string;
-			
-			string << other->Label();
-			
-			int32 point = string.FindFirst('z');
-			string.Truncate(point + 1);
-			
-			fRefreshMenu->Superitem()->SetLabel(string.String());
-			
 			break;
 		}
 		
 		case BUTTON_DEFAULTS_MSG:
-		{	
-			fResolutionMenu->ItemAt(0)->SetMarked(true);
-			fColorsMenu->FindItem("8 Bits/Pixel")->SetMarked(true);
-			fRefreshMenu->FindItem("60 Hz")->SetMarked(true);
-			
+		{
+			char str[256];
+			BMenuItem * item = 0;
+			display_mode mode;
+			mode.virtual_width = 640;
+			mode.virtual_height = 480;
+			mode_to_string(mode,str);
+			if ((item = fResolutionMenu->FindItem(str)) != NULL) {
+				item->SetMarked(true);
+			} else {
+				fResolutionMenu->ItemAt(0)->SetMarked(true);
+			}
+			colorspace_to_string(B_CMAP8,str);
+			if ((item = fColorsMenu->FindItem(str)) != NULL) {
+				item->SetMarked(true);
+			} else {
+				fColorsMenu->ItemAt(0)->SetMarked(true);
+			}
+			refresh_rate_to_string(60.0,str);
+			if ((item = fRefreshMenu->FindItem(str)) != NULL) {
+				item->SetMarked(true);
+			} else {
+				fRefreshMenu->ItemAt(0)->SetMarked(true);
+			}
 			CheckApplyEnabled();
-			
 			break;
 		}
 		
@@ -583,17 +571,30 @@ ScreenWindow::CheckUpdateDisplayModes()
 		if (!fColorsMenu->FindItem(colorSpace))
 			fColorsMenu->AddItem(new BMenuItem(colorSpace, new BMessage(POP_COLORS_MSG)));		
 	}
- 
-	/*XXX: BeOS's BScreen limits the refresh to 85 hz (or is it the nvidia driver?).
-	I hope that OpenBeOS BScreen will remove
-	this limitation. 
-	
+
+	// Add supported refresh rates to the menu
+	float min_refresh = 120, max_refresh = 0;
 	for (c = 0; c < fTotalModes; c++) {
-		display_mode *mode = &fSupportedModes[c];
-		int32 refresh = (mode->timing.pixel_clock * 1000) / (mode->timing.h_total * mode->timing.v_total);
-		printf("width %d, height %d, refresh %d\n", mode->virtual_width, mode->virtual_height, refresh);	
+		display_mode mode = fSupportedModes[c];
+		BScreen screen;
+		uint32 low_clock, high_clock;
+		screen.GetPixelClockLimits(&mode,&low_clock,&high_clock);
+		mode.timing.pixel_clock = low_clock;
+		min_refresh = min_c(min_refresh,get_refresh_rate(mode));
+		mode.timing.pixel_clock = high_clock;
+		max_refresh = max_c(max_refresh,get_refresh_rate(mode));
 	}
-*/
+	char refresh[128];
+	float refreshes[] = { 56.0, 60.0, 70.0, 75.0, 85.0, 100.0, 120.0, 140.0 } ;
+	for (uint i = 0 ; i < sizeof(refreshes)/sizeof(float) ; i++) {
+		if ((min_refresh <= refreshes[i]) && (refreshes[i] <= max_refresh)) {
+			refresh_rate_to_string(refreshes[i],refresh);
+			if (!fRefreshMenu->FindItem(refresh))
+				fRefreshMenu->AddItem(new BMenuItem(refresh, new BMessage(POP_REFRESH_MSG)));
+		}
+	}
+	fMinRefresh = min_refresh;
+	fMaxRefresh = max_refresh;
 }
 
 

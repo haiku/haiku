@@ -58,6 +58,8 @@ private:
 	display_mode *fSupportedModes;
 	uint32 fTotalModes;
 	
+	float fMinRefresh;
+	float fMaxRefresh;
 	float fCustomRefresh;
 	float fInitialRefreshN;
 };

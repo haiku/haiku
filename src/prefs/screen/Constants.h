@@ -25,6 +25,7 @@ static const uint32 MAKE_INITIAL_MSG = 'mkin';
 
 //Constants
 static const char kAppSignature[] = "application/x-vnd.Be-SCRN";
-static const int32 gMaxRefresh = 120; //This is the maximum selectable refresh
+static const int32 gMinRefresh = 45; //This is the minimum selectable refresh
+static const int32 gMaxRefresh = 140; //This is the maximum selectable refresh
 
 #endif //CONSTANTS_H
