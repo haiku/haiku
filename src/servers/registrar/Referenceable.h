@@ -1,16 +1,19 @@
-// Referencable.h
+/* 
+ * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef REFERENCABLE_H
 #define REFERENCABLE_H
 
 #include <SupportDefs.h>
 
-// Referencable
-class Referencable {
+// Referenceable
+class Referenceable {
 public:
-								Referencable(
+								Referenceable(
 									bool deleteWhenUnreferenced = false);
-	virtual						~Referencable();
+	virtual						~Referenceable();
 
 			void				AddReference();
 			bool				RemoveReference();	// returns true after last

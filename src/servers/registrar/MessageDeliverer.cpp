@@ -15,7 +15,7 @@
 #include <messaging.h>
 
 #include "MessageDeliverer.h"
-#include "Referencable.h"
+#include "Referenceable.h"
 
 // sDeliverer -- the singleton instance
 MessageDeliverer *MessageDeliverer::sDeliverer = NULL;
@@ -23,10 +23,10 @@ MessageDeliverer *MessageDeliverer::sDeliverer = NULL;
 static const bigtime_t kRetryDelay = 20000;	// 20 ms
 
 // Message
-class MessageDeliverer::Message : public Referencable {
+class MessageDeliverer::Message : public Referenceable {
 public:
 	Message(void *data, int32 dataSize)
-		: Referencable(true),
+		: Referenceable(true),
 		  fData(data),
 		  fDataSize(dataSize),
 		  fCreationTime(system_time()),

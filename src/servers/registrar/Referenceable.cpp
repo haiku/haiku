@@ -1,30 +1,33 @@
-// Referencable.cpp
+/* 
+ * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "Debug.h"
-#include "Referencable.h"
+#include "Referenceable.h"
 
 // constructor
-Referencable::Referencable(bool deleteWhenUnreferenced)
+Referenceable::Referenceable(bool deleteWhenUnreferenced)
 	: fReferenceCount(1),
 	  fDeleteWhenUnreferenced(deleteWhenUnreferenced)
 {
 }
 
 // destructor
-Referencable::~Referencable()
+Referenceable::~Referenceable()
 {
 }
 
 // AddReference
 void
-Referencable::AddReference()
+Referenceable::AddReference()
 {
 	atomic_add(&fReferenceCount, 1);
 }
 
 // RemoveReference
 bool
-Referencable::RemoveReference()
+Referenceable::RemoveReference()
 {
 	bool unreferenced = (atomic_add(&fReferenceCount, -1) == 1);
 	if (fDeleteWhenUnreferenced && unreferenced)
@@ -34,7 +37,7 @@ Referencable::RemoveReference()
 
 // CountReferences
 int32
-Referencable::CountReferences() const
+Referenceable::CountReferences() const
 {
 	return fReferenceCount;
 }

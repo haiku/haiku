@@ -23,7 +23,7 @@ local registrar_sources =
 	PriorityMessageQueue.cpp
 	RecentApps.cpp
 	RecentEntries.cpp
-	Referencable.cpp
+	Referenceable.cpp
 	Registrar.cpp
 	RosterAppInfo.cpp
 	RosterSettingsCharStream.cpp
