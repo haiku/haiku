@@ -138,10 +138,13 @@ mutex_lock(mutex *mutex)
 	if (!kernel_startup && !are_interrupts_enabled())
 		panic("mutex_lock: called with interrupts disabled for mutex %p, sem %#lx\n", mutex, mutex->sem);
 
-	if (me == mutex->holder)
-		panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
+	// ToDo: if acquire_sem() fails, we shouldn't panic - but we should definitely
+	//	change the mutex API to actually return the status code
+	if (acquire_sem(mutex->sem) == B_OK) {
+		if (me == mutex->holder)
+			panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
+	}
 
-	acquire_sem(mutex->sem);
 	mutex->holder = me;
 }
 
