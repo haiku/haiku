@@ -83,6 +83,7 @@ protected:
 		int32	fGapCount;			// gap count
 		char	*fScratchBuffer;	// for GetString
 		int32	fScratchSize;		// scratch size
+		bool	fPasswordMode;
 };
 //------------------------------------------------------------------------------
 inline int32 

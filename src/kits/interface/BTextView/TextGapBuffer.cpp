@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
+//	Copyright (c) 2001-2004, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -49,7 +49,8 @@ _BTextGapBuffer_::_BTextGapBuffer_()
 		fGapIndex(fItemCount),
 		fGapCount(fBufferCount - fGapIndex),
 		fScratchBuffer(NULL),
-		fScratchSize(0)
+		fScratchSize(0),
+		fPasswordMode(false)
 {
 	fBuffer = (char *)malloc(fExtraCount + fItemCount);
 	fScratchBuffer = (char*)malloc(0);
@@ -199,8 +200,8 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 numChars)
 		result = fBuffer + fromOffset;
 		if (!isStartBeforeGap)
 			result += fGapCount;
-	}
-	else {
+	
+	} else {
 		if (fScratchSize < numChars) {
 			fScratchBuffer = (char *)realloc(fScratchBuffer, numChars);
 			fScratchSize = numChars;
@@ -254,12 +255,13 @@ _BTextGapBuffer_::RealCharAt(int32 offset) const
 bool
 _BTextGapBuffer_::PasswordMode() const
 {
-	return false;
+	return fPasswordMode;
 }
 //------------------------------------------------------------------------------
 void
 _BTextGapBuffer_::SetPasswordMode(bool state)
 {
+	fPasswordMode = state;
 }
 /*
  * $Log $

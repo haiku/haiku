@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
+//	Copyright (c) 2001-2004, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		TextView.cpp
-//	Authors:		Hiroshi Lockheimer (TextView is based on his STEEngine)
+//	Authors:		Hiroshi Lockheimer (BTextView is based on his STEEngine)
 //					Marc Flerackers (mflerackers@androme.be)
 //					Stefano Ceccherini (burton666@libero.it)
 //	Description:	BTextView displays and manages styled text.
@@ -87,6 +87,7 @@ enum {
 	B_OTHER_CHARACTER
 } separatorCharacters;
 
+
 // _BTextTrackState_ class -----------------------------------------------------
 class _BTextTrackState_ {
 
@@ -103,7 +104,7 @@ public:
 
 // Globals ---------------------------------------------------------------------
 static property_info
-prop_list[] = {
+sPropertyList[] = {
 	{
 		"Selection",
 		{ B_GET_PROPERTY, 0 },
@@ -157,7 +158,7 @@ prop_list[] = {
 };
 
 
-// Initialized/finalized by init/fini_interface_kit ?
+// Initialized/finalized by init/fini_interface_kit
 _BWidthBuffer_* BTextView::sWidths = NULL;
 sem_id BTextView::sWidthSem = B_BAD_SEM_ID; 
 int32 BTextView::sWidthAtom = 0;
@@ -369,14 +370,16 @@ BTextView::Archive(BMessage *data, bool deep) const
 		data->AddData("_dis_ch", B_RAW_TYPE, fDisallowedChars->Items(),
 			fDisallowedChars->CountItems() * sizeof(int32));
 
-	ssize_t runSize = 0;
+	int32 runSize = 0;
 	text_run_array *runArray = RunArray(0, TextLength());
 	
-	void *flattened = FlattenRunArray(runArray, (int32*)&runSize);	
+	void *flattened = FlattenRunArray(runArray, &runSize);	
 	if (flattened != NULL) {
 		data->AddData("_runs", B_RAW_TYPE, flattened, runSize);	
 		free(flattened);
-	}
+	} else
+		err = B_NO_MEMORY;
+
 	free(runArray);
 	
 	return err;
@@ -762,7 +765,7 @@ BTextView::MessageReceived(BMessage *message)
 		case B_GET_PROPERTY:
 		case B_COUNT_PROPERTIES:
 		{
-			BPropertyInfo propInfo(prop_list);
+			BPropertyInfo propInfo(sPropertyList);
 			BMessage specifier;
 			const char *property;
 
@@ -826,7 +829,7 @@ BTextView::ResolveSpecifier(BMessage *message, int32 index,
 									  const char *property)
 {
 	CALLED();
-	BPropertyInfo propInfo(prop_list);
+	BPropertyInfo propInfo(sPropertyList);
 	BHandler *target = NULL;
 
 	switch (propInfo.FindMatch(message, 0, specifier, form, property)) {
@@ -865,7 +868,7 @@ BTextView::GetSupportedSuites(BMessage *data)
 	if (err != B_OK)
 		return err;
 	
-	BPropertyInfo prop_info(prop_list);
+	BPropertyInfo prop_info(sPropertyList);
 	err = data->AddFlat("messages", &prop_info);
 
 	if (err != B_OK)
@@ -1131,6 +1134,9 @@ void
 BTextView::GetText(int32 offset, int32 length, char *buffer) const
 {
 	CALLED();
+	if (buffer == NULL)
+		return;
+
 	int32 textLen = fText->Length();
 	if (offset < 0 || offset > (textLen - 1)) {
 		buffer[0] = '\0';
@@ -1466,7 +1472,7 @@ BTextView::GetFontAndColor(BFont *outFont, uint32 *outMode,
 	// TODO fill in outMode and outEqColor
 	fStyles->GetStyle(fSelStart, outFont, outColor);
 	
-	// XXX: This is a hack to make beshare work. 
+	// TODO: This is a hack to make beshare work. 
 	// We should use _BStyleBuffer_::ContinuousGetStyle() here.
 	*outMode = doSize;
 }
@@ -1509,20 +1515,20 @@ BTextView::RunArray(int32 startOffset, int32 endOffset,
 									int32 *outSize) const
 {
 	CALLED();
-	STEStyleRangePtr result = fStyles->GetStyleRange(startOffset, endOffset - 1);
+	STEStyleRangePtr styleRange = fStyles->GetStyleRange(startOffset, endOffset - 1);
 
-	if (result == NULL)
+	if (styleRange == NULL)
 		return NULL;
 
 	text_run_array *res = (text_run_array *)malloc(sizeof(int32) +
-		(sizeof(text_run) * result->count));
+		(sizeof(text_run) * styleRange->count));
 
-	res->count = result->count;
+	res->count = styleRange->count;
 
 	for (int32 i = 0; i < res->count; i++) {
-		res->runs[i].offset = result->runs[i].offset;
-		res->runs[i].font = &result->runs[i].style.font;
-		res->runs[i].color = result->runs[i].style.color;
+		res->runs[i].offset = styleRange->runs[i].offset;
+		res->runs[i].font = &styleRange->runs[i].style.font;
+		res->runs[i].color = styleRange->runs[i].style.color;
 	}
 
 	if (outSize != NULL)
@@ -1565,13 +1571,14 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		
 		result.y += height;
 		height = ascent + descent;
+
 	} else {
 		int32 offset = line->offset;
 		int32 length = inOffset - line->offset;
 		int32 numChars = length;
 		bool foundTab = false;		
 		do {
-			foundTab = fText->FindChar('\t', offset, &numChars);
+			foundTab = fText->FindChar(B_TAB, offset, &numChars);
 		
 			result.x += StyledWidth(offset, numChars);
 	
@@ -1648,7 +1655,7 @@ BTextView::OffsetAt(BPoint point) const
 		}
 		
 		// any more tabs?
-		foundTab = fText->FindChar('\t', offset, &numChars);
+		foundTab = fText->FindChar(B_TAB, offset, &numChars);
 		
 		delta = numChars / 2;
 		delta = (delta < 1) ? 1 : delta;
@@ -1716,7 +1723,7 @@ BTextView::OffsetAt(BPoint point) const
 
 		// special case: return the offset preceding any spaces that 
 		// aren't at the end of the buffer
-		if (offset != fText->Length() && (*fText)[offset - 1] == ' ')
+		if (offset != fText->Length() && (*fText)[offset - 1] == B_SPACE)
 			return --offset;
 	}
 	
@@ -2108,7 +2115,11 @@ void
 BTextView::SetColorSpace(color_space colors)
 {
 	CALLED();
-	fColorSpace = colors;
+	if (colors != fColorSpace && fOffscreen) {
+		fColorSpace = colors;
+		DeleteOffscreen();
+		NewOffscreen();
+	}
 }
 //------------------------------------------------------------------------------
 color_space
@@ -2188,7 +2199,6 @@ BTextView::AllAttached()
 {
 	CALLED();
 	BView::AllAttached();
-	printf("selstart %ld, selend %ld\n", fSelStart, fSelEnd);
 }
 //------------------------------------------------------------------------------
 void
@@ -2206,6 +2216,10 @@ BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
 		sizeof(flattened_text_run_array);
 
 	flattened_text_run_array *array = (flattened_text_run_array *)malloc(size);
+	if (array == NULL) {
+		*outSize = 0;
+		return NULL;
+	}
 
 	array->magic[0] = 0x41;
 	array->magic[1] = 0x6c;
@@ -2257,6 +2271,10 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 	int32 size = sizeof(text_run_array) + (array->count - 1) * sizeof(text_run);
 
 	text_run_array *run_array = (text_run_array *)malloc(size);
+	if (run_array == NULL) {
+		*outSize = 0;
+		return NULL;
+	}
 
 	run_array->count = array->count;
 
@@ -2596,7 +2614,7 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 		const char *text = Text();
 		
 		while (*(text + offset) != '\0' &&
-			*(text + offset) == '\t' || *(text + offset) == ' ')
+			*(text + offset) == B_TAB || *(text + offset) == B_SPACE)
 			offset++;
 
 		if (start != offset)
@@ -2832,13 +2850,13 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 			} else {
 				// include all trailing spaces and tabs,
 				// but not spaces after tabs
-				if (theChar != ' ' && theChar != '\t')
+				if (theChar != B_SPACE && theChar != B_TAB)
 					break;
 				else {
-					if (theChar == ' ' && foundTab)
+					if (theChar == B_SPACE && foundTab)
 						break;
 					else {
-						if (theChar == '\t')
+						if (theChar == B_TAB)
 							foundTab = true;
 					}
 				}
@@ -2853,7 +2871,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 			tabWidth = 0.0;
 		else {
 			int32 tabCount = 0;
-			for (int32 i = delta - 1; (*fText)[offset + i] == '\t'; i--)
+			for (int32 i = delta - 1; (*fText)[offset + i] == B_TAB; i--)
 				tabCount++;
 				
 			tabWidth = fTabWidth - fmod(strWidth, fTabWidth);
@@ -2867,8 +2885,8 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 			bool foundNewline = done;
 			done = true;
 			int32 pos = delta - 1;
-			if ((*fText)[offset + pos] != ' ' &&
-				(*fText)[offset + pos] != '\t' &&
+			if ((*fText)[offset + pos] != B_SPACE &&
+				(*fText)[offset + pos] != B_TAB &&
 				(*fText)[offset + pos] != '\n')
 				break;
 			
@@ -2876,8 +2894,8 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 			
 			for ( ; ((offset + pos) > offset); pos--) {
 				uchar theChar = (*fText)[offset + pos];
-				if (theChar != ' ' &&
-					theChar != '\t' &&
+				if (theChar != B_SPACE &&
+					theChar != B_TAB &&
 					theChar != '\n')
 					break;
 			}
@@ -2888,8 +2906,8 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 
 			if (!foundNewline) {
 				for ( ; (offset + delta) < limit; delta++) {
-					if ((*fText)[offset + delta] != ' ' &&
-						(*fText)[offset + delta] != '\t')
+					if ((*fText)[offset + delta] != B_SPACE &&
+						(*fText)[offset + delta] != B_TAB)
 						break;
 				}
 				if ( (offset + delta) < limit && 
@@ -3012,7 +3030,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 		startEraseLine++;
 		long startErase = startOffset;
 		if (startErase > line->offset) {
-			for ( ; ((*fText)[startErase] != ' ') && ((*fText)[startErase] != '\t'); startErase--) {
+			for ( ; ((*fText)[startErase] != B_SPACE) && ((*fText)[startErase] != B_TAB); startErase--) {
 				if (startErase <= line->offset)
 					break;	
 			}
@@ -3028,6 +3046,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 
 		eraseRect = clipRect;
 	}
+
 	for (long i = startLine; i <= endLine; i++) {
 		long length = (line + 1)->offset - line->offset;
 		// DrawString() chokes if you draw a newline
@@ -3063,10 +3082,10 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 					//if (style->underline)
 					//	startPenLoc = PenLocation();
 					
-					foundTab = fText->FindChar('\t', offset, &tabChars);
+					foundTab = fText->FindChar(B_TAB, offset, &tabChars);
 					if (foundTab) {
 						for (numTabs = 0; (tabChars + numTabs) < numChars; numTabs++) {
-							if ((*fText)[offset + tabChars + numTabs] != '\t')
+							if ((*fText)[offset + tabChars + numTabs] != B_TAB)
 								break;
 						}
 					}
@@ -3201,7 +3220,7 @@ void
 BTextView::InitiateDrag()
 {
 	CALLED();
-	BMessage *drag = new BMessage();
+	BMessage *drag = new BMessage(B_MIME_DATA);
 	BBitmap *dragBitmap = NULL;
 	BPoint bitmapPoint;
 	BHandler *dragHandler = NULL;
@@ -3228,6 +3247,12 @@ bool
 BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 {
 	CALLED();
+	
+	void *from = NULL;
+	inMessage->FindPointer("be:originator", &from);
+	
+	bool internalDrop = (from == this && fSelEnd != fSelStart);
+	
 	if (fActive)
 		SetViewCursor(B_CURSOR_I_BEAM);
 		
@@ -3238,12 +3263,7 @@ BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 	long dropOffset = OffsetAt(where);
 	if (dropOffset > TextLength())
 		dropOffset = TextLength();
-	
-	void *from = NULL;
-	inMessage->FindPointer("be:originator", &from);
-	
-	bool internalDrop = (from == this && fSelEnd != fSelStart);
-	
+			
 	// if this view initiated the drag, move instead of copy
 	if (internalDrop) {
 		// dropping onto itself?
@@ -3266,8 +3286,11 @@ BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 			fUndo = new _BDropUndoBuffer_(this, text, dataLen, runArray, runLen, dropOffset, internalDrop);
 		}
 		
-		if (internalDrop)
+		if (internalDrop) {
+			if (dropOffset > fSelEnd) 
+				dropOffset -= dataLen;
 			Delete();
+		}
 				
 		Insert(dropOffset, text, dataLen, runArray);
 	}
@@ -3571,8 +3594,10 @@ void
 BTextView::LockWidthBuffer()
 {
 	CALLED();
-	if (atomic_add(&sWidthAtom, 1) > 0)
-		acquire_sem(sWidthSem);
+	if (atomic_add(&sWidthAtom, 1) > 0) {
+		while (acquire_sem(sWidthSem) == B_INTERRUPTED)
+			;
+	}
 }
 //------------------------------------------------------------------------------
 void

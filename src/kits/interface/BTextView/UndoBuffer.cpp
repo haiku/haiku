@@ -38,6 +38,8 @@
 #include "UndoBuffer.h"
 
 
+// TODO: document properly this file
+
 //  ******** _BUndoBuffer_ *******
 _BUndoBuffer_::_BUndoBuffer_(BTextView *textView, undo_state state)
 	:
@@ -223,6 +225,9 @@ _BDropUndoBuffer_::_BDropUndoBuffer_(BTextView *textView, char const *text, int3
 		fDropRunArrayLength = runArrayLen;
 		memcpy(fDropRunArray, runArray, runArrayLen);
 	}
+
+	if (fInternalDrop && fDropLocation >= fEnd)
+		fDropLocation -= fDropTextLength;
 }
 
 
@@ -371,6 +376,7 @@ _BTypingUndoBuffer_::BackwardErase()
 void
 _BTypingUndoBuffer_::ForwardErase()
 {
+	// TODO: Cleanup
 	int32 start, end;
 
 	fTextView->GetSelection(&start, &end);
