@@ -67,17 +67,7 @@ public:
 protected:
 	void BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY);
 	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
-	//void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
-	//void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
-	//void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
-	void HLinePatternThick(int32 x1, int32 x2, int32 y);
-	void VLinePatternThick(int32 x, int32 y1, int32 y2);
-	void FillSolidRect(int32 left, int32 top, int32 right, int32 bottom);
-	void FillPatternRect(int32 left, int32 top, int32 right, int32 bottom);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
-	//void SetPixel(int x, int y, RGBColor col);
-	//void SetThickPixel(int x, int y, int thick, PatternHandler *pat);
-	void SetThickPatternPixel(int x, int y);
 	int OpenGraphicsDevice(int deviceNumber);
 	int GetModeFromResolution(int width, int height, int space);
 	int GetWidthFromMode(int mode);

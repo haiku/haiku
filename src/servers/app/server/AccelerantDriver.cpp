@@ -211,53 +211,27 @@ void AccelerantDriver::Shutdown(void)
 	\brief Draws a series of lines - optimized for speed
 	\param pts Array of BPoints pairs
 	\param numlines Number of lines to be drawn
-	\param pensize The thickness of the lines
-	\param colors Array of colors for each respective line
+	\param d the other 10 billion drawing options
 */
 void AccelerantDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,const DrawData *d)
 {
 	if(!d || !linedata)
 		return;
 	
-	int x1, y1, x2, y2, dx, dy;
-	int steps, k;
-	double xInc, yInc;
-	double x,y;
 	int i;
+	int x1, y1, x2, y2;
 	const LineArrayData *data;
 	
 	Lock();
-	fLineThickness = (int)d->pensize;
-	fDrawPattern.SetPattern((int8*)&B_SOLID_HIGH);
 	for (i=0; i<numlines; i++)
 	{
 		data=(const LineArrayData *)&(linedata[i]);
-		
-		//fDrawColor = colors[i];
-		fDrawPattern.SetColors(data->color,data->color);
 		
 		x1 = ROUND(data->pt1.x);
 		y1 = ROUND(data->pt1.y);
 		x2 = ROUND(data->pt2.x);
 		y2 = ROUND(data->pt2.y);
-		dx = x2-x1;
-		dy = y2-y1;
-		x = x1;
-		y = y1;
-		if ( abs(dx) > abs(dy) )
-			steps = abs(dx);
-		else
-			steps = abs(dy);
-		xInc = dx / (double) steps;
-		yInc = dy / (double) steps;
-	
-		SetThickPatternPixel(ROUND(x),ROUND(y));
-		for (k=0; k<steps; k++)
-		{
-			x += xInc;
-			y += yInc;
-			SetThickPatternPixel(ROUND(x),ROUND(y));
-		}
+		StrokePatternLine(x1,y1,x2,y2,d);
 	}
 	Unlock();
 }
@@ -445,508 +419,6 @@ bool AccelerantDriver::DumpToFile(const char *path)
 	\param y The y coordinate (guaranteed to be in bounds)
 	\param col The color to draw
 */
-/*
-void AccelerantDriver::SetPixel(int x, int y, RGBColor col)
-{
-	switch (mDisplayMode.space)
-	{
-		case B_CMAP8:
-		case B_GRAY8:
-			{
-				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row;
-				fb[x] = col.GetColor8();
-			} break;
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-		case B_RGB15_LITTLE:
-		case B_RGBA15_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
-				fb[x] = col.GetColor16();
-			} break;
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE:
-			{
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
-				rgb_color color = col.GetColor32();
-				fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-}
-*/
-
-/*!
-	\brief Draws a point using the display driver's specified thickness and pattern
-	\param x The x coordinate (not guaranteed to be in bounds)
-	\param y The y coordinate (not guaranteed to be in bounds)
-*/
-void AccelerantDriver::SetThickPatternPixel(int x, int y)
-{
-	int left, right, top, bottom;
-	left = x - fLineThickness/2;
-	right = x + fLineThickness/2;
-	top = y - fLineThickness/2;
-	bottom = y + fLineThickness/2;
-	switch (mDisplayMode.space)
-	{
-		case B_CMAP8:
-		case B_GRAY8:
-			{
-				int x,y;
-				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor8();;
-					fb += mFrameBufferConfig.bytes_per_row;
-				}
-			} break;
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-		case B_RGB15_LITTLE:
-		case B_RGBA15_LITTLE:
-			{
-				int x,y;
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor15();
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
-			{
-				int x,y;
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor16();
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE:
-			{
-				int x,y;
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
-				rgb_color color;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-					{
-						color = fDrawPattern.ColorAt(x,y).GetColor32();
-						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-					}
-					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-}
-
-/*!
-	\brief Draws a horizontal line
-	\param x1 The first x coordinate (guaranteed to be in bounds)
-	\param x2 The second x coordinate (guaranteed to be in bounds)
-	\param y The y coordinate (guaranteed to be in bounds)
-	\param pat The PatternHandler which detemines pixel colors
-*/
-/*
-void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
-{
-	int x;
-	if ( x1 > x2 )
-	{
-		x = x2;
-		x2 = x1;
-		x1 = x;
-	}
-	switch (mDisplayMode.space)
-	{
-		case B_CMAP8:
-		case B_GRAY8:
-			{
-				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row;
-				for (x=x1; x<=x2; x++)
-					fb[x] = pat->ColorAt(x,y).GetColor8();
-			} break;
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-		case B_RGB15_LITTLE:
-		case B_RGBA15_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
-				for (x=x1; x<=x2; x++)
-					fb[x] = pat->ColorAt(x,y).GetColor15();
-			} break;
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
-				for (x=x1; x<=x2; x++)
-					fb[x] = pat->ColorAt(x,y).GetColor16();
-			} break;
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE:
-			{
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
-				rgb_color color;
-				for (x=x1; x<=x2; x++)
-				{
-					color = pat->ColorAt(x,y).GetColor32();
-					fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-				}
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-}
-*/
-
-/*!
-	\brief Draws a horizontal line using the display driver's line thickness and pattern
-	\param x1 The first x coordinate (not guaranteed to be in bounds)
-	\param x2 The second x coordinate (not guaranteed to be in bounds)
-	\param y The y coordinate (not guaranteed to be in bounds)
-*/
-void AccelerantDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
-{
-	int x, y1, y2;
-
-	if ( x1 > x2 )
-	{
-		x = x2;
-		x2 = x1;
-		x1 = x;
-	}
-	y1 = y - fLineThickness/2;
-	y2 = y + fLineThickness/2;
-	switch (mDisplayMode.space)
-	{
-		case B_CMAP8:
-		case B_GRAY8:
-			{
-				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row;
-				for (y=y1; y<=y2; y++)
-				{
-					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor8();
-					fb += mFrameBufferConfig.bytes_per_row;
-				}
-			} break;
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-		case B_RGB15_LITTLE:
-		case B_RGBA15_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
-				for (y=y1; y<=y2; y++)
-				{
-					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor15();
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
-				for (y=y1; y<=y2; y++)
-				{
-					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor16();
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE:
-			{
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
-				rgb_color color;
-				for (y=y1; y<=y2; y++)
-				{
-					for (x=x1; x<=x2; x++)
-					{
-						color = fDrawPattern.ColorAt(x,y).GetColor32();
-						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-					}
-					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-}
-
-/*!
-	\brief Draws a vertical line using the display driver's line thickness and pattern
-	\param x The x coordinate
-	\param y1 The first y coordinate
-	\param y2 The second y coordinate
-*/
-void AccelerantDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
-{
-	int y, x1, x2;
-
-	if ( y1 > y2 )
-	{
-		y = y2;
-		y2 = y1;
-		y1 = y;
-	}
-	x1 = x - fLineThickness/2;
-	x2 = x + fLineThickness/2;
-	switch (mDisplayMode.space)
-	{
-		case B_CMAP8:
-		case B_GRAY8:
-			{
-				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row;
-				for (y=y1; y<=y2; y++)
-				{
-					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor8();
-					fb += mFrameBufferConfig.bytes_per_row;
-				}
-			} break;
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-		case B_RGB15_LITTLE:
-		case B_RGBA15_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
-				for (y=y1; y<=y2; y++)
-				{
-					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor15();
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
-				for (y=y1; y<=y2; y++)
-				{
-					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor16();
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE:
-			{
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row);
-				rgb_color color;
-				for (y=y1; y<=y2; y++)
-				{
-					for (x=x1; x<=x2; x++)
-					{
-						color = fDrawPattern.ColorAt(x,y).GetColor32();
-						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-					}
-					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-}
-
-void AccelerantDriver::FillSolidRect(int32 left, int32 top, int32 right, int32 bottom)
-{
-#ifndef DISABLE_HARDWARE_ACCELERATION
-	if ( accFillRect && AcquireEngine )
-	{
-		if ( AcquireEngine(0,0,NULL,&mEngineToken) == B_OK )
-		{
-			fill_rect_params fillParams;
-			uint32 fill_color=0;
-			fillParams.right = (uint16)right;
-			fillParams.left = (uint16)left;
-			fillParams.top = (uint16)top;
-			fillParams.bottom = (uint16)bottom;
-			switch (mDisplayMode.space)
-			{
-				case B_CMAP8:
-				case B_GRAY8:
-					fill_color = fDrawColor.GetColor8();
-					break;
-				case B_RGB15_BIG:
-				case B_RGBA15_BIG:
-				case B_RGB15_LITTLE:
-				case B_RGBA15_LITTLE:
-					fill_color = fDrawColor.GetColor15();
-					break;
-				case B_RGB16_BIG:
-				case B_RGB16_LITTLE:
-					fill_color = fDrawColor.GetColor16();
-					break;
-				case B_RGB32_BIG:
-				case B_RGBA32_BIG:
-				case B_RGB32_LITTLE:
-				case B_RGBA32_LITTLE:
-				{
-					rgb_color rgbcolor = fDrawColor.GetColor32();
-					fill_color = (rgbcolor.alpha << 24) | (rgbcolor.red << 16) | (rgbcolor.green << 8) | (rgbcolor.blue);
-				}
-					break;
-			}
-			accFillRect(mEngineToken, fill_color, &fillParams, 1);
-			if ( ReleaseEngine )
-				ReleaseEngine(mEngineToken,NULL);
-			Unlock();
-			return;
-		}
-	}
-#endif
-
-	switch (mDisplayMode.space)
-	{
-		case B_CMAP8:
-		case B_GRAY8:
-			{
-				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row;
-				uint8 color8 = fDrawColor.GetColor8();
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = color8;
-					fb += mFrameBufferConfig.bytes_per_row;
-				}
-			} break;
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-		case B_RGB15_LITTLE:
-		case B_RGBA15_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
-				uint16 color15 = fDrawColor.GetColor15();
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = color15;
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
-				uint16 color16 = fDrawColor.GetColor16();
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = color16;
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE:
-			{
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
-				rgb_color fill_color = fDrawColor.GetColor32();
-				uint32 color32 = (fill_color.alpha << 24) | (fill_color.red << 16) | (fill_color.green << 8) | (fill_color.blue);
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = color32;
-					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-}
-
-void AccelerantDriver::FillPatternRect(int32 left, int32 top, int32 right, int32 bottom)
-{
-	switch (mDisplayMode.space)
-	{
-		case B_CMAP8:
-		case B_GRAY8:
-			{
-				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row;
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor8();
-					fb += mFrameBufferConfig.bytes_per_row;
-				}
-			} break;
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-		case B_RGB15_LITTLE:
-		case B_RGBA15_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor15();
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB16_BIG:
-		case B_RGB16_LITTLE:
-			{
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
-				int x,y;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.ColorAt(x,y).GetColor16();
-					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		case B_RGB32_BIG:
-		case B_RGBA32_BIG:
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE:
-			{
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
-				int x,y;
-				rgb_color color;
-				for (y=top; y<=bottom; y++)
-				{
-					for (x=left; x<=right; x++)
-					{
-						color = fDrawPattern.ColorAt(x,y).GetColor32();
-						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-					}
-					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
-				}
-			} break;
-		default:
-			printf("Error: Unknown color space\n");
-	}
-}
 
 /*!
 	\brief Copies a bitmap to the screen
@@ -1525,14 +997,273 @@ void AccelerantDriver::Blit(const BRect &src, const BRect &dest, const DrawData 
 
 void AccelerantDriver::FillSolidRect(const BRect &rect, RGBColor &color)
 {
+	int32 left = (int32)rect.left;
+	int32 right = (int32)rect.right;
+	int32 top = (int32)rect.top;
+	int32 bottom = (int32)rect.bottom;
+#ifndef DISABLE_HARDWARE_ACCELERATION
+	if ( accFillRect && AcquireEngine )
+	{
+		if ( AcquireEngine(0,0,NULL,&mEngineToken) == B_OK )
+		{
+			fill_rect_params fillParams;
+			uint32 fill_color=0;
+			fillParams.right = (uint16)right;
+			fillParams.left = (uint16)left;
+			fillParams.top = (uint16)top;
+			fillParams.bottom = (uint16)bottom;
+			switch (mDisplayMode.space)
+			{
+				case B_CMAP8:
+				case B_GRAY8:
+					fill_color = color.GetColor8();
+					break;
+				case B_RGB15_BIG:
+				case B_RGBA15_BIG:
+				case B_RGB15_LITTLE:
+				case B_RGBA15_LITTLE:
+					fill_color = color.GetColor15();
+					break;
+				case B_RGB16_BIG:
+				case B_RGB16_LITTLE:
+					fill_color = color.GetColor16();
+					break;
+				case B_RGB32_BIG:
+				case B_RGBA32_BIG:
+				case B_RGB32_LITTLE:
+				case B_RGBA32_LITTLE:
+				{
+					rgb_color rgbcolor = color.GetColor32();
+					fill_color = (rgbcolor.alpha << 24) | (rgbcolor.red << 16) | (rgbcolor.green << 8) | (rgbcolor.blue);
+				}
+					break;
+			}
+			accFillRect(mEngineToken, fill_color, &fillParams, 1);
+			if ( ReleaseEngine )
+				ReleaseEngine(mEngineToken,NULL);
+			Unlock();
+			return;
+		}
+	}
+#endif
+
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+		case B_GRAY8:
+			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row;
+				uint8 color8 = color.GetColor8();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color8;
+					fb += mFrameBufferConfig.bytes_per_row;
+				}
+			} break;
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				uint16 color15 = color.GetColor15();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color15;
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				uint16 color16 = color.GetColor16();
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color16;
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				rgb_color fill_color = color.GetColor32();
+				uint32 color32 = (fill_color.alpha << 24) | (fill_color.red << 16) | (fill_color.green << 8) | (fill_color.blue);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = color32;
+					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
 }
 
 void AccelerantDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 {
+	int32 left = (int32)rect.left;
+	int32 right = (int32)rect.right;
+	int32 top = (int32)rect.top;
+	int32 bottom = (int32)rect.bottom;
+	PatternHandler drawPattern(d->patt);
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+		case B_GRAY8:
+			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row;
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = drawPattern.ColorAt(x,y).GetColor8();
+					fb += mFrameBufferConfig.bytes_per_row;
+				}
+			} break;
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = drawPattern.ColorAt(x,y).GetColor15();
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				int x,y;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+						fb[x] = drawPattern.ColorAt(x,y).GetColor16();
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				int x,y;
+				rgb_color color;
+				for (y=top; y<=bottom; y++)
+				{
+					for (x=left; x<=right; x++)
+					{
+						color = drawPattern.ColorAt(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+					}
+					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
 }
 
 void AccelerantDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
 {
+	int32 x1 = ROUND(start.x);
+	int32 y1 = ROUND(start.y);
+	int32 x2 = ROUND(end.x);
+	int32 y2 = ROUND(end.y);
+	int32 dx = x2 - x1;
+	int32 dy = y2 - y1;
+	int32 steps, k;
+	double xInc, yInc;
+	double x = x1;
+	double y = y1;
+
+	// TODO : Convert to Bresenham algorithm
+	if ( abs(dx) > abs(dy) )
+		steps = abs(dx);
+	else
+		steps = abs(dy);
+	xInc = dx / (double) steps;
+	yInc = dy / (double) steps;
+
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+		case B_GRAY8:
+			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer;
+				uint8 draw_color = color.GetColor8();
+				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
+				for (k=0; k<steps; k++)
+				{
+					x += xInc;
+					y += yInc;
+					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
+				}
+			} break;
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+				uint16 *fb = (uint16 *)mFrameBufferConfig.frame_buffer;
+				uint16 draw_color = color.GetColor15();
+				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
+				for (k=0; k<steps; k++)
+				{
+					x += xInc;
+					y += yInc;
+					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
+				}
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			{
+				uint16 *fb = (uint16 *)mFrameBufferConfig.frame_buffer;
+				uint16 draw_color = color.GetColor16();
+				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
+				for (k=0; k<steps; k++)
+				{
+					x += xInc;
+					y += yInc;
+					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
+				}
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)mFrameBufferConfig.frame_buffer;
+				rgb_color rgbcolor = color.GetColor32();
+				uint32 draw_color = (rgbcolor.alpha << 24) | (rgbcolor.red << 16) | (rgbcolor.green << 8) | (rgbcolor.blue);
+				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
+				for (k=0; k<steps; k++)
+				{
+					x += xInc;
+					y += yInc;
+					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
 }
 
 void AccelerantDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
@@ -1543,7 +1274,9 @@ void AccelerantDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2,
 	double xInc, yInc;
 	double x = x1;
 	double y = y1;
+	PatternHandler drawPattern(d->patt);
 
+	// TODO : Convert to Bresenham algorithm
 	if ( abs(dx) > abs(dy) )
 		steps = abs(dx);
 	else
@@ -1551,17 +1284,79 @@ void AccelerantDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2,
 	xInc = dx / (double) steps;
 	yInc = dy / (double) steps;
 
-	//(driver->*setPixel)(ROUND(x),ROUND(y));
-	for (k=0; k<steps; k++)
+	switch (mDisplayMode.space)
 	{
-		x += xInc;
-		y += yInc;
-		//(driver->*setPixel)(ROUND(x),ROUND(y));
+		case B_CMAP8:
+		case B_GRAY8:
+			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer;
+				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor8();
+				for (k=0; k<steps; k++)
+				{
+					x += xInc;
+					y += yInc;
+					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor8();
+				}
+			} break;
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+				uint16 *fb = (uint16 *)mFrameBufferConfig.frame_buffer;
+				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor15();
+				for (k=0; k<steps; k++)
+				{
+					x += xInc;
+					y += yInc;
+					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor15();
+				}
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			{
+				uint16 *fb = (uint16 *)mFrameBufferConfig.frame_buffer;
+				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor16();
+				for (k=0; k<steps; k++)
+				{
+					x += xInc;
+					y += yInc;
+					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor16();
+				}
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)mFrameBufferConfig.frame_buffer;
+				rgb_color color;
+				color = drawPattern.ColorAt((float)x,(float)y).GetColor32();
+				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+				for (k=0; k<steps; k++)
+				{
+					x += xInc;
+					y += yInc;
+					color = drawPattern.ColorAt((float)x,(float)y).GetColor32();
+					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
 	}
 }
 
 void AccelerantDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
 {
+	BPoint leftTop = rect.LeftTop();
+	BPoint rightTop = rect.RightTop();
+	BPoint leftBottom = rect.LeftBottom();
+	BPoint rightBottom = rect.RightBottom();
+
+	StrokeSolidLine(leftTop,rightTop,color);
+	StrokeSolidLine(leftTop,leftBottom,color);
+	StrokeSolidLine(rightTop,rightBottom,color);
+	StrokeSolidLine(leftBottom,rightBottom,color);
 }
 
 void AccelerantDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
