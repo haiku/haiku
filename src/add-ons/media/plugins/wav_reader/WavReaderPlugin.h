@@ -35,6 +35,7 @@ private:
 	int64			fDataStart;
 	int64			fDataSize;
 
+	int64			fFrameCount;
 	int32			fChannelCount;
 	int32			fFrameRate;
 	int				fBitsPerSample;

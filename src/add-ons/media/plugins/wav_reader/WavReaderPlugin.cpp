@@ -33,6 +33,8 @@ struct wavdata
 	int64 framecount;
 	bigtime_t duration;
 	
+	bool raw;
+	
 	media_format format;
 };
 
@@ -179,16 +181,21 @@ WavReader::Sniff(int32 *streamCount)
 		printf("WavReader::Sniff: Error, bits_per_sample = 0\n");
 		fBitsPerSample = 8;
 	}
-	fBlockAlign = UINT16(format.block_align);
-	int min_align = (fBitsPerSample * fChannelCount + 7) / 8;
-	if (fBlockAlign < min_align)
-		fBlockAlign = min_align;
+	fFrameCount = foundFact ? UINT32(fact.sample_length) : 0;
 	fFormatCode = UINT16(format.format_tag);
 	if (fFormatCode == 0xfffe && foundFmtExt)
 		fFormatCode = (format_ext.guid[1] << 8) | format_ext.guid[0];
 
+	fBlockAlign = UINT16(format.block_align);
+	int min_align = (fFormatCode == 0x0001) ? (fBitsPerSample * fChannelCount + 7) / 8 : 1;
+	if (fBlockAlign < min_align)
+		fBlockAlign = min_align;
+
+	TRACE("  fDataStart     %Ld\n", fDataStart);
+	TRACE("  fDataSize      %Ld\n", fDataSize);
 	TRACE("  fChannelCount  %ld\n", fChannelCount);
 	TRACE("  fFrameRate     %ld\n", fFrameRate);
+	TRACE("  fFrameCount    %Ld\n", fFrameCount);
 	TRACE("  fBitsPerSample %d\n", fBitsPerSample);
 	TRACE("  fBlockAlign    %d\n", fBlockAlign);
 	TRACE("  min_align      %d\n", min_align);
@@ -229,14 +236,16 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 	data->fps = fFrameRate;
 	data->buffersize = (BUFFER_SIZE / fBlockAlign) * fBlockAlign;
 	data->buffer = malloc(data->buffersize);
-	data->framecount = (8 * fDataSize) / data->bitsperframe;
+	data->framecount = fFrameCount ? fFrameCount : (8 * fDataSize) / data->bitsperframe;
 	data->duration = (data->framecount * 1000000LL) / data->fps;
+	data->raw = fFormatCode == 0x0001;
 
 	TRACE(" bitsperframe %ld\n", data->bitsperframe);
 	TRACE(" fps %ld\n", data->fps);
 	TRACE(" buffersize %ld\n", data->buffersize);
 	TRACE(" framecount %Ld\n", data->framecount);
 	TRACE(" duration %Ld\n", data->duration);
+	TRACE(" raw %d\n", data->raw);
 	
 	BMediaFormats formats;
 	if (fFormatCode == 0x0001) {
@@ -319,18 +328,27 @@ WavReader::Seek(void *cookie,
 	uint64 pos;
 
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
-		pos = (*frame * data->bitsperframe) / 8;
+		if (data->raw)
+			pos = (*frame * data->bitsperframe) / 8;
+		else
+			pos = (*frame * fDataSize) / data->framecount;
 		pos = (pos / fBlockAlign) * fBlockAlign; // round down to a block start
 		TRACE("WavReader::Seek to frame %Ld, pos %Ld\n", *frame, pos);
 	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
-		pos = (*time * data->fps * data->bitsperframe) / (1000000LL * 8);
+		if (data->raw)
+			pos = (*time * data->fps * data->bitsperframe) / (1000000LL * 8);
+		else
+			pos = (*time * fDataSize) / data->duration;
 		pos = (pos / fBlockAlign) * fBlockAlign; // round down to a block start
 		TRACE("WavReader::Seek to time %Ld, pos %Ld\n", *time, pos);
 	} else {
 		return B_ERROR;
 	}
 
-	*frame = (8 * pos) / data->bitsperframe;
+	if (data->raw)
+		*frame = (8 * pos) / data->bitsperframe;
+	else
+		*frame = (pos * data->framecount) / fDataSize;
 	*time = (*frame * 1000000LL) / data->fps;
 
 	TRACE("WavReader::Seek newtime %Ld\n", *time);
@@ -353,8 +371,20 @@ WavReader::GetNextChunk(void *cookie,
 {
 	wavdata *data = reinterpret_cast<wavdata *>(cookie);
 
-	mediaHeader->start_time = (((8 * data->position) / data->bitsperframe) * 1000000LL) / data->fps;
+	// XXX it might be much better to not return any start_time information for encoded formats here,
+	// XXX and instead use the last time returned from seek and count forward after decoding.
+	if (data->raw)
+		mediaHeader->start_time = (((8 * data->position) / data->bitsperframe) * 1000000LL) / data->fps;
+	else
+		mediaHeader->start_time = (data->position * data->duration) / fDataSize;
 	mediaHeader->file_pos = fDataStart + data->position;
+
+/*
+	printf("position   = %9Ld\n", data->position);
+	printf("fDataSize  = %9Ld\n", fDataSize);
+	printf("duration   = %9Ld\n", data->duration);
+	printf("start_time = %9Ld\n", mediaHeader->start_time);
+*/	
 
 	int64 maxreadsize = data->datasize - data->position;
 	int32 readsize = data->buffersize;
