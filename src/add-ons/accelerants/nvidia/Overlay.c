@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/2002-9/2004 */
+/* Written by Rudolf Cornelissen 05/2002-1/2005 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -205,6 +205,11 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		 * bitmap output or maybe single buffered overlay output if small bitmaps are used. */ 
 
 		adress = (((uint32)((uint8*)si->framebuffer)) + si->ps.memory_size);
+		/* don't touch the DMA acceleration engine command buffer if it exists */
+		/* note:
+		 * the buffer is 32kB in size. Keep a distance of another 32kB for safety. */
+		if (si->settings.dma_acc) adress -= (64 * 1024);
+
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
 			adress -= si->overlay.myBufInfo[cnt].size;

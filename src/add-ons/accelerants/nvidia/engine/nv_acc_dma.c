@@ -732,8 +732,6 @@ status_t nv_acc_init_dma()
 //	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[7]);
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[0]);
 
-	//fixme: overlay should stay outside the DMA buffer, also add a failsafe
-	//       space in between both functions as errors might hang the engine!
 	/*** Set pixel width ***/
 	switch(si->dm.space)
 	{
@@ -1120,11 +1118,6 @@ status_t nv_acc_setup_rectangle_dma(uint32 color)
 		switch(si->dm.space)
 		{
 		case B_RGB15_LITTLE:
-			/* fixme?
-			 * does the color provided by the system contain the alpha channel?
-			 * if it has one, it's on b5...
-			 * (if so, and we want to use it, modify this command to use 32-bit
-			 *  source colorspace for this mode's desktop colorspace.) */
 			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 				(((color & 0x0000f800) >> 1) | ((color & 0x000007c0) >> 1) |
 				(color & 0x0000001f)); /* Color1A */

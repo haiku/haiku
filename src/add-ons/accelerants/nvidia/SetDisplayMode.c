@@ -330,6 +330,10 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	//if overlay buffers are allocated subtract buffersize from mem_high;
 	//only allocate overlay buffers if 3D is not in use. (block overlay during 3D)
 	si->mem_high = si->ps.memory_size - 1;
+	/* don't touch the DMA acceleration engine command buffer if it exists */
+	/* note:
+	 * the buffer is 32kB in size. Keep a distance of another 32kB for safety. */
+	if (si->settings.dma_acc) si->mem_high -= (64 * 1024);
 	si->mem_high -= (MAXBUFFERS * 1024 * 1024 * 2); /* see overlay.c file */
 
 	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
