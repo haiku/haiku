@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src add-ons kernel network ppp shared libppp ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
+
+
+StaticLibrary ppp :
+	settings_tools.cpp
+	
+	PPPInterface.cpp
+	PPPManager.cpp
+;
