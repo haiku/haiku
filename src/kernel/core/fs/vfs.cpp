@@ -91,7 +91,7 @@ struct fs_mount {
 	char			*mount_point;
 	char			*device_name;
 	char			*fs_name;
-	recursive_lock	rlock;
+	recursive_lock	rlock;	// guards the vnodes list
 	struct vnode	*root_vnode;
 	struct vnode	*covers_vnode;
 	struct list		vnodes;
@@ -100,8 +100,40 @@ struct fs_mount {
 
 static mutex sFileSystemsMutex;
 
+/**	\brief Guards sMountsTable.
+
+	The holder is allowed to read access the sMountsTable. Write access
+	additionally requires the sMountOpMutex (which has to be locked before
+	acquiring sMountMutex). Manipulation of the fs_mount structures themselves
+	(and their destruction) requires different locks though.
+*/
 static mutex sMountMutex;
+
+/**	\brief Guards mount/unmount operations.
+
+	The fs_mount() and fs_unmount() hold the mutex during their whole operation.
+	That is locking the mutex ensures that no FS is mounted/unmounted. In
+	particular this means that
+	- sMountsTable will not be modified,
+	- the fields immutable after initialization of the fs_mount structures in
+	  sMountsTable will not be modified,
+	- vnode::covered_by of any vnode in sVnodeTable will not be modified,
+	
+	The thread trying to lock the mutex must not hold sVnodeMutex or
+	sMountMutex.
+*/
 static mutex sMountOpMutex;
+
+/**	\brief Guards sVnodeTable.
+
+	The holder is allowed to read/write access sVnodeTable and to
+	to any unbusy vnode in that table, save
+	to the immutable fields (device, id, private_node, mount) to which
+	only read-only access is allowed, and to the field covered_by, which is
+	guarded by sMountOpMutex.
+
+	The thread trying to lock the mutex must not hold sMountMutex.
+*/
 static mutex sVnodeMutex;
 
 #define VNODE_HASH_TABLE_SIZE 1024
@@ -491,7 +523,7 @@ create_new_vnode(struct vnode **_vnode, mount_id mountID, vnode_id vnodeID)
 	// add the vnode to the mount structure
 	mutex_lock(&sMountMutex);	
 	vnode->mount = find_mount(mountID);
-	if (!vnode->mount) {
+	if (!vnode->mount || vnode->mount->unmounting) {
 		mutex_unlock(&sMountMutex);
 		free(vnode);
 		return B_ENTRY_NOT_FOUND;
@@ -509,6 +541,18 @@ create_new_vnode(struct vnode **_vnode, mount_id mountID, vnode_id vnodeID)
 }
 
 
+/**	\brief Decrements the reference counter of the given vnode and deletes it,
+	if the counter dropped to 0.
+
+	The caller must, of course, own a reference to the vnode to call this
+	function.
+	The caller must not hold the sVnodeMutex or the sMountMutex.
+
+	\param vnode the vnode.
+	\param reenter \c true, if this function is called (indirectly) from within
+		   a file system.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
 static status_t
 dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 {
@@ -556,6 +600,13 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 }
 
 
+/**	\brief Increments the reference counter of the given vnode.
+
+	The caller must either already have a reference to the vnode or hold
+	the sVnodeMutex.
+
+	\param vnode the vnode.
+*/
 static void
 inc_vnode_ref_count(struct vnode *vnode)
 {
@@ -564,6 +615,16 @@ inc_vnode_ref_count(struct vnode *vnode)
 }
 
 
+/**	\brief Looks up a vnode by mount and node ID in the sVnodeTable.
+
+	The caller must hold the sVnodeMutex.
+
+	\param mountID the mount ID.
+	\param vnodeID the node ID.
+
+	\return The vnode structure, if it was found in the hash table, \c NULL
+			otherwise.
+*/
 static struct vnode *
 lookup_vnode(mount_id mountID, vnode_id vnodeID)
 {
@@ -576,6 +637,20 @@ lookup_vnode(mount_id mountID, vnode_id vnodeID)
 }
 
 
+/**	\brief Retrieves a vnode for a given mount ID, node ID pair.
+
+	If the node is not yet in memory, it will be loaded.
+
+	The caller must not hold the sVnodeMutex or the sMountMutex.
+
+	\param mountID the mount ID.
+	\param vnodeID the node ID.
+	\param _vnode Pointer to a vnode* variable into which the pointer to the
+		   retrieved vnode structure shall be written.
+	\param reenter \c true, if this function is called (indirectly) from within
+		   a file system.
+	\return \c B_OK, if everything when fine, an error code otherwise.
+*/
 static status_t
 get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 {
@@ -642,6 +717,15 @@ err:
 }
 
 
+/**	\brief Decrements the reference counter of the given vnode and deletes it,
+	if the counter dropped to 0.
+
+	The caller must, of course, own a reference to the vnode to call this
+	function.
+	The caller must not hold the sVnodeMutex or the sMountMutex.
+
+	\param vnode the vnode.
+*/
 static inline void
 put_vnode(struct vnode *vnode)
 {
@@ -850,12 +934,14 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		vnode = nextVnode;
 
 		// see if we hit a mount point
+		mutex_lock(&sMountOpMutex);
 		if (vnode->covered_by) {
 			nextVnode = vnode->covered_by;
 			inc_vnode_ref_count(nextVnode);
 			put_vnode(vnode);
 			vnode = nextVnode;
 		}
+		mutex_unlock(&sMountOpMutex);
 	}
 
 	*_vnode = vnode;
@@ -3471,7 +3557,8 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	if (err < 0)
 		goto err7;
 
-	// XXX may be a race here
+	// No race here, since fs_mount() is the only function changing
+	// covers_vnode (and holds sMountOpMutex at that time).
 	if (mount->covers_vnode)
 		mount->covers_vnode->covered_by = mount->root_vnode;
 
