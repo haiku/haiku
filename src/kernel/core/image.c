@@ -1,7 +1,7 @@
 /* User Runtime Loader support in the kernel
 ** 
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -184,9 +184,39 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t siz
 }
 
 
+#ifdef DEBUG
+static int
+dump_images_list(int argc, char **argv)
+{
+	struct team *team = thread_get_current_thread()->team;
+	struct image *image = NULL;
+
+	dprintf("Registered images of team 0x%lx\n", team->id);
+	dprintf("    ID text       size    data       size    name\n");
+
+	mutex_lock(&sImageMutex);
+
+	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
+		image_info *info = &image->info;
+
+		dprintf("%6ld %p %-7ld %p %-7ld %s\n", info->id, info->text, info->text_size,
+			info->data, info->data_size, info->name);
+	}
+
+	mutex_unlock(&sImageMutex);
+
+	return 0;
+}
+#endif
+
+
 status_t
 image_init(void)
 {
+#ifdef DEBUG
+	add_debugger_command("team_images", &dump_images_list, "Dump all registered images from the current team");
+#endif
+
 	return mutex_init(&sImageMutex, "image");
 }
 
