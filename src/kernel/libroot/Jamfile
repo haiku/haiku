@@ -31,26 +31,26 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) posix unistd ] ;
 
 KernelMergeObject kernel_posix.o :
 	# main
- 	<$(SOURCE_GRIST)>kerrno.c
- 	<$(SOURCE_GRIST)>dirent.c
- 	<$(SOURCE_GRIST)>poll.c
- 	<$(SOURCE_GRIST)>utime.c
+ 	kerrno.c
+ 	dirent.c
+ 	poll.c
+ 	utime.c
  	# locale
-	<$(SOURCE_GRIST)>ctype.c
+	ctype.c
 	# stdio
-	<$(SOURCE_GRIST)>kernel_vsprintf.c
+	kernel_vsprintf.c
 	# stdlib
-	<$(SOURCE_GRIST)>abs.c
-	<$(SOURCE_GRIST)>atoi.c
-	<$(SOURCE_GRIST)>bsearch.c
-	<$(SOURCE_GRIST)>merge.c
-	<$(SOURCE_GRIST)>qsort.c
-	<$(SOURCE_GRIST)>rand.c
-	<$(SOURCE_GRIST)>random.c
-	<$(SOURCE_GRIST)>strtol.c
-	<$(SOURCE_GRIST)>strtoll.c
-	<$(SOURCE_GRIST)>strtoul.c
-	<$(SOURCE_GRIST)>strtoull.c
+	abs.c
+	atoi.c
+	bsearch.c
+	merge.c
+	qsort.c
+	rand.c
+	random.c
+	strtol.c
+	strtoll.c
+	strtoul.c
+	strtoull.c
 	# sys
 	chmod.c
 	stat.c
@@ -59,25 +59,26 @@ KernelMergeObject kernel_posix.o :
 	gettimeofday.c
  	uio.c
 	# time
-	<$(SOURCE_GRIST)>time.c
+	time.c
 	# unistd
-	<$(SOURCE_GRIST)>access.c
-	<$(SOURCE_GRIST)>chown.c
-	<$(SOURCE_GRIST)>close.c
-	<$(SOURCE_GRIST)>conf.c
-	<$(SOURCE_GRIST)>directory.c
-	<$(SOURCE_GRIST)>dup.c
-	<$(SOURCE_GRIST)>fcntl.c
-	<$(SOURCE_GRIST)>hostname.c
-	<$(SOURCE_GRIST)>ioctl.c
-	<$(SOURCE_GRIST)>link.c
-	<$(SOURCE_GRIST)>lseek.c
-	<$(SOURCE_GRIST)>mount.c
-	<$(SOURCE_GRIST)>open.c
-	<$(SOURCE_GRIST)>read.c
-	<$(SOURCE_GRIST)>truncate.c
-	<$(SOURCE_GRIST)>usergroup.c
-	<$(SOURCE_GRIST)>write.c
+	access.c
+	chown.c
+	close.c
+	conf.c
+	directory.c
+	dup.c
+	fcntl.c
+	hostname.c
+	ioctl.c
+	link.c
+	lseek.c
+	mount.c
+	open.c
+	read.c
+	sync.c
+	truncate.c
+	usergroup.c
+	write.c
 	# string
 	memchr.c
 	memcmp.c
