@@ -623,7 +623,10 @@ UdfBuilder::Build()
 	// Build the rest of the image
 	if (!error) {
 		_PrintUpdate(VERBOSITY_LOW, "Building image");
-		error = _ProcessDirectory(_RootDirectory(), "/", rootNode, true);		
+		struct stat rootStats;
+		error = _RootDirectory().GetStat(&rootStats);
+		if (!error)
+			error = _ProcessDirectory(_RootDirectory(), "/", rootStats, rootNode, true);		
 	}
 
 	if (!error)
@@ -775,7 +778,7 @@ UdfBuilder::_PrintUpdate(VerbosityLevel level, const char *formatString, ...) co
 
 /*! \brief Processes the given directory and its children.
 
-	\param directory The directory to process.
+	\param entry The directory to process.
 	\param path Pathname of the directory with respect to the fileset
 	            in construction.
 	\param node Output parameter into which the icb address and dataspace
@@ -785,13 +788,14 @@ UdfBuilder::_PrintUpdate(VerbosityLevel level, const char *formatString, ...) co
 	                       a special unique id assigned to it.
 */
 status_t
-UdfBuilder::_ProcessDirectory(BEntry &_directory, const char *path, node_data &node, bool isRootDirectory)
+UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats,
+                              node_data &node, bool isRootDirectory)
 {
 	DEBUG_INIT_ETC("UdfBuilder", ("path: `%s'", path));
-	status_t error = _directory.InitCheck() == B_OK && path ? B_OK : B_BAD_VALUE;	
+	status_t error = entry.InitCheck() == B_OK && path ? B_OK : B_BAD_VALUE;	
 	if (!error) {
-		_PrintUpdate(VERBOSITY_MEDIUM, "Adding directory `%s'", path);
-		BDirectory directory(&_directory);
+		_PrintUpdate(VERBOSITY_MEDIUM, "Initializing directory `%s'", path);
+		BDirectory directory(&entry);
 		error = directory.InitCheck();
 		if (!error) {
 
@@ -800,34 +804,30 @@ UdfBuilder::_ProcessDirectory(BEntry &_directory, const char *path, node_data &n
 
 			_PrintUpdate(VERBOSITY_HIGH, "Gathering statistics");
 
-			// Stat the file. We'll use this info later.
-			struct stat stats;
-			error = directory.GetStat(&stats);
-
 			// Figure out how many file identifier characters we have
 			// for each filesystem
-			BEntry entry;
 			uint32 entries = 0;
 			uint32 udfChars = 0;
 			//uint32 isoChars = 0;
 			while (error == B_OK) {
-				error = directory.GetNextEntry(&entry);
+				BEntry childEntry;
+				error = directory.GetNextEntry(&childEntry);
 				if (error == B_ENTRY_NOT_FOUND) {
 					error = B_OK;
 					break;
 				}
 				if (!error)
-					error = entry.InitCheck();
+					error = childEntry.InitCheck();
 				if (!error) {
-					BPath path;
-					error = entry.GetPath(&path);
+					BPath childPath;
+					error = childEntry.GetPath(&childPath);
 					if (!error)
-						error = path.InitCheck();
+						error = childPath.InitCheck();
 					if (!error) {
-						_PrintUpdate(VERBOSITY_HIGH, "found child: `%s'", path.Leaf());
+						_PrintUpdate(VERBOSITY_HIGH, "found child: `%s'", childPath.Leaf());
 						entries++;
 						// Determine udf char count
-						Udf::String name(path.Leaf());
+						Udf::String name(childPath.Leaf());
 						uint32 udfLength = name.Cs0Length();
 						udfChars += maxUdfIdLength >= udfLength
 						            ? udfLength : maxUdfIdLength;
@@ -837,7 +837,8 @@ UdfBuilder::_ProcessDirectory(BEntry &_directory, const char *path, node_data &n
 				}
 			}
 			
-			uint32 udfDataLength = sizeof(Udf::file_id_descriptor) * entries + udfChars;
+			uint32 udfDataLength = sizeof(Udf::file_id_descriptor) * (entries+1) + udfChars;
+				// Include parent directory entry in data length calculation
 			uint32 udfAllocationDescriptorsLength = node.udfData.size()
 			                                        * sizeof(Udf::long_address);
 			
@@ -891,14 +892,72 @@ UdfBuilder::_ProcessDirectory(BEntry &_directory, const char *path, node_data &n
 			// Process attributes
 			uint16 attributeCount = 0; 
 			
-			// Process children
+			// Write iso parent directory
 			
-				// Process child
+			// Write udf parent directory
+			if (!error && _DoUdf()) {
+				Udf::file_id_descriptor parent;
+				parent.set_version_number(1);
+				// Clear characteristics to false, then set
+				// those that need to be true
+				parent.set_characteristics(0);
+				parent.set_is_directory(true);
+				parent.set_is_parent(true);
+				parent.set_id_length(0);
+				parent.icb() = icbAddress;
+				parent.set_implementation_use_length(0);
+			}
+			
+			// Process children
+			if (!error)
+				error = directory.Rewind();
+			while (error == B_OK) {
+				BEntry childEntry;
+				error = directory.GetNextEntry(&childEntry);
+				if (error == B_ENTRY_NOT_FOUND) {
+					error = B_OK;
+					break;
+				}
+				if (!error)
+					error = childEntry.InitCheck();
+				if (!error) {
+					BPath childPath;
+					error = childEntry.GetPath(&childPath);
+					if (!error)
+						error = childPath.InitCheck();
+					struct stat childStats;
+					if (!error)
+						error = childEntry.GetStat(&childStats);
+					if (!error) {
+						node_data childNode;
+						std::string childImagePath(path);
+						childImagePath += (childImagePath[childImagePath.length()-1] == '/'
+						                  ? "" : "/");
+						childImagePath += childPath.Leaf();
+						// Process child
+						if (S_ISREG(childStats.st_mode)) {
+							// Regular file
+						} else if (S_ISDIR(childStats.st_mode)) {
+							// Directory							
+							error = _ProcessDirectory(childEntry, childImagePath.c_str(),
+							                          childStats, childNode);
+						} else if (S_ISLNK(childStats.st_mode)) {
+							// Symlink
+							error = B_ERROR;
+							_PrintError("No symlink support yet; found symlink: `%s'",
+							            childPath.Path());
+						}
 				
-				// Write iso direntry
+						// Write iso direntry
+						
+						// Write udf fid
+						
+					}
+				}
+			}
 				
-				// Write udf fid
-				
+			_PrintUpdate(VERBOSITY_MEDIUM, "Finalizing directory `%s'", path);
+			
 			// Build udf icb
 			Udf::extended_file_icb_entry icb;
 			if (!error) {
@@ -931,7 +990,7 @@ UdfBuilder::_ProcessDirectory(BEntry &_directory, const char *path, node_data &n
 				icb.set_logical_blocks_recorded(0);
 				icb.access_date_and_time() = Udf::timestamp(stats.st_atime);
 				icb.modification_date_and_time() = Udf::timestamp(stats.st_mtime);
-				icb.creation_date_and_time() = Udf::timestamp(stats.st_ctime);
+				icb.creation_date_and_time() = Udf::timestamp(stats.st_crtime);
 				icb.attribute_date_and_time() = icb.creation_date_and_time();
 				icb.set_checkpoint(1);
 				icb.set_reserved(0);
