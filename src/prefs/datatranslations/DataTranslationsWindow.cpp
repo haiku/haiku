@@ -123,8 +123,9 @@ void DataTranslationsWindow::BuildView()
 	
 	dButton = new BButton(r, "STD", "Info. . .", new BMessage(BUTTON_MSG));
 
-	fBox = new BBox(all, "All_Window");
-	fBox->SetBorder(B_NO_BORDER);
+	fBox = new BBox(all, "All_Window", B_FOLLOW_ALL_SIDES,
+						B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
+						B_PLAIN_BORDER);
 
     r.Set( 10, 10, 120, 288);  // List View
         
