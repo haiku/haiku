@@ -30,6 +30,8 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
+#include <Application.h>
+#include <PortLink.h>
 
 // Project Includes ------------------------------------------------------------
 #include <AppServerLink.h>
@@ -45,10 +47,12 @@ namespace BPrivate {
 //------------------------------------------------------------------------------
 BAppServerLink::BAppServerLink()
 {
+	portlink=new PortLink(be_app->fServerFrom);
 }
 //------------------------------------------------------------------------------
 BAppServerLink::~BAppServerLink()
 {
+	delete portlink;
 }
 //------------------------------------------------------------------------------
 void BAppServerLink::Init()
