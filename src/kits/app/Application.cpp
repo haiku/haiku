@@ -616,38 +616,80 @@ BResources* BApplication::AppResources()
 	
 	return _app_resources;
 }
-//------------------------------------------------------------------------------
+
+
 void
-BApplication::DispatchMessage(BMessage* message, BHandler* handler)
+BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 {
+	if (handler != this) {
+		// it's not ours to dispatch
+		BLooper::DispatchMessage(message, handler);
+		return;
+	}
+
 	switch (message->what) {
 		case B_ARGV_RECEIVED:
 			do_argv(message);
 			break;
 
 		case B_REFS_RECEIVED:
+		{
+			// this adds the refs that are part of this message to the recent
+			// lists, but only folders and documents are handled here
+			entry_ref ref;
+			int32 i = 0;
+			while (message->FindRef("refs", i++, &ref) == B_OK) {
+				BEntry entry(&ref, true);
+				if (entry.InitCheck() != B_OK)
+					continue;
+
+				if (entry.IsDirectory())
+					BRoster().AddToRecentFolders(&ref);
+				else {
+					// filter out applications, we only want to have documents
+					// in the recent files list
+					BNode node(&entry);
+					BNodeInfo info(&node);
+
+					char mimeType[B_MIME_TYPE_LENGTH];
+					if (info.GetType(mimeType) != B_OK
+						|| strcasecmp(mimeType, B_APP_MIME_TYPE))
+						BRoster().AddToRecentDocuments(&ref);
+				}
+			}
+
 			RefsReceived(message);
 			break;
+		}
 
 		case B_READY_TO_RUN:
-			ReadyToRun();
+			if (!fReadyToRunCalled)
+				ReadyToRun();
 			fReadyToRunCalled = true;
 			break;
-		
+
 		case B_ABOUT_REQUESTED:
 			AboutRequested();
 			break;
-		
+
+		case B_PULSE:
+			Pulse();
+			break;
+
 		// TODO: Handle these as well
+
+		case _SHOW_DRAG_HANDLES_:
+		case B_APP_ACTIVATED:
+		case B_QUIT_REQUESTED:
+			puts("not yet handled message:");
+			message->PrintToStream();
+			break;
+
 		/*
 		// These two are handled by BTextView, don't know if also
 		// by other classes
 		case _DISPOSE_DRAG_: 
 		case _PING_:
-		
-		case _SHOW_DRAG_HANDLES_:
-		case B_QUIT_REQUESTED:
-			
 			break;
 		*/
 		default:
@@ -655,13 +697,17 @@ BApplication::DispatchMessage(BMessage* message, BHandler* handler)
 			break;
 	}
 }
-//------------------------------------------------------------------------------
-void BApplication::SetPulseRate(bigtime_t rate)
+
+
+void
+BApplication::SetPulseRate(bigtime_t rate)
 {
 	fPulseRate = rate;
 }
-//------------------------------------------------------------------------------
-status_t BApplication::GetSupportedSuites(BMessage* data)
+
+
+status_t
+BApplication::GetSupportedSuites(BMessage *data)
 {
 	status_t err = B_OK;
 	if (!data)
