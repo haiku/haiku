@@ -5,18 +5,18 @@
 #ifndef OBOS_NET_STACK_ATTRIBUTE_H
 #define OBOS_NET_STACK_ATTRIBUTE_H
 
+#include <SupportDefs.h>
 #include <iovec.h>
 
-#include <SupportDefs.h>
+#include "net_stack.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct net_attribute
-{
+typedef struct net_attribute {
 	struct net_attribute *next;
-	const void *id;
+	string_token id;
 	uint32 type;
 	uint32 size;
 	union {
@@ -31,10 +31,10 @@ typedef struct net_attribute
 	} u;
 } net_attribute;
 
-extern const void *	 	register_attribute_id(const char *name);	
-extern net_attribute *	new_attribute(net_attribute **in_list, const void *id);
+
+extern net_attribute *	new_attribute(net_attribute **in_list, string_token id);
 extern status_t		  	delete_attribute(net_attribute *attribut, net_attribute **from_list);
-extern net_attribute * 	find_attribute(net_attribute *list, const void *id, int *type, void **value, size_t *size);
+extern net_attribute * 	find_attribute(net_attribute *list, string_token id, int *type, void **value, size_t *size);
 
 #ifdef __cplusplus
 }

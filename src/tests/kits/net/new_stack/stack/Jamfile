@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src tests kits net new_stack stack ;
+
+UseHeaders [ FDirName $(OBOS_TOP) src tests kits net new_stack headers ] ;
+
+Addon <userland>stack : userland network_v2 :	
+	stack.c
+	attribute.c
+	layers_manager.c 
+	buffer.c
+	timer.c
+	dump.c
+;
+
+LinkSharedOSLibs <userland>stack : <installed>stack_tester be ;

@@ -13,8 +13,8 @@
 extern "C" {
 #endif
 
-extern status_t 	start_buffers_service();
-extern status_t 	stop_buffers_service();
+extern status_t 	start_buffers_service(void);
+extern status_t 	stop_buffers_service(void);
 
 // Network buffer(s)
 extern net_buffer * 	new_buffer(void);

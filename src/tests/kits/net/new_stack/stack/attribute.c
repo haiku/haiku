@@ -8,7 +8,6 @@
 
 #include "net_stack.h"
 #include "memory_pool.h"
-#include "atomizer.h"
 #include "attribute.h"
 
 #define DPRINTF printf
@@ -18,33 +17,12 @@
 static memory_pool *g_attributes_pool = NULL;
 extern memory_pool_module_info *g_memory_pool;
 
-#define DEFAULT_ATOMIZER (const void *) (-1)
-atomizer_module_info *g_atomizer = NULL;
 
 // Privates prototypes
 // -------------------
 
 // LET'S GO FOR IMPLEMENTATION
 // ------------------------------------
-
-const void * register_attribute_id(const char *name)
-{
-	status_t status;
-
-	if (g_atomizer == NULL) {
-		status = get_module(B_ATOMIZER_MODULE_NAME, (module_info **) &g_atomizer);
-		if (status != B_OK) {
-			dprintf("register_attribute_id(%s): Can't load " B_ATOMIZER_MODULE_NAME " module!\n", name);
-			g_atomizer = (atomizer_module_info *) -1;
-		};
-	};
-
-	if (g_atomizer == (atomizer_module_info *) -1)
-		return NULL;
-
-	return g_atomizer->atomize(DEFAULT_ATOMIZER, name, true);
-}
-
 
 net_attribute * new_attribute(net_attribute **in_list, const void *id)
 {
@@ -122,11 +100,25 @@ net_attribute * find_attribute(net_attribute *list, const void *id, int *type,
 			if (size) 	*size = attr->size;
 			if (value) {
 				switch (attr->type & NET_ATTRIBUTE_TYPE_MASK) {
-				case NET_ATTRIBUTE_BOOL: 	*value = &attr->u.boolean; break;
-				case NET_ATTRIBUTE_BYTE:	*value = &attr->u.byte; break;
-				case NET_ATTRIBUTE_INT16:	*value = &attr->u.word; break;
-				case NET_ATTRIBUTE_INT32:	*value = &attr->u.dword; break;
-				case NET_ATTRIBUTE_INT64:	*value = &attr->u.ddword; break;
+				case NET_ATTRIBUTE_BOOL:
+					*value = &attr->u.boolean;
+					break;
+					
+				case NET_ATTRIBUTE_BYTE:
+					*value = &attr->u.byte;
+					break;
+					
+				case NET_ATTRIBUTE_INT16:
+					*value = &attr->u.word;
+					break;
+					
+				case NET_ATTRIBUTE_INT32:
+					*value = &attr->u.dword;
+					break;
+					
+				case NET_ATTRIBUTE_INT64:
+					*value = &attr->u.ddword;
+					break;
 				
 				case NET_ATTRIBUTE_DATA:
 				case NET_ATTRIBUTE_STRING:
@@ -134,7 +126,7 @@ net_attribute * find_attribute(net_attribute *list, const void *id, int *type,
 					break;
 					
 				case NET_ATTRIBUTE_POINTER:
-					*value = attr->u.vec[0].iov_base;
+					*value = attr->u.ptr;
 					break;
 					
 				case NET_ATTRIBUTE_IOVEC:

@@ -21,8 +21,8 @@
 extern "C" {
 #endif
 
-extern status_t		start_timers_service();
-extern status_t		stop_timers_service();
+extern status_t		start_timers_service(void);
+extern status_t		stop_timers_service(void);
 
 extern net_timer *	new_net_timer(void);
 extern status_t 	delete_net_timer(net_timer *nt);

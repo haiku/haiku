@@ -13,6 +13,7 @@
 #include <OS.h>
 
 #include "net_stack.h"
+#include "timer.h"
 
 struct net_timer {
 	struct net_timer	*next;
@@ -40,7 +41,7 @@ static int32 timers_thread(void *data);
 
 
 // --------------------------------------------------
-status_t start_timers_service()
+status_t start_timers_service(void)
 {
 	memset(&g_timers, 0, sizeof(g_timers));
 
@@ -68,7 +69,7 @@ status_t start_timers_service()
 
 
 // --------------------------------------------------
-status_t stop_timers_service()
+status_t stop_timers_service(void)
 {
 	net_timer *nt, *next;
 	int32 tries = 20;

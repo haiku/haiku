@@ -13,6 +13,7 @@
 #include "memory_pool.h"
 #include "layers_manager.h"
 #include "buffer.h"
+#include "stack.h"	// for string_{to|for}_token()
 
 struct layers_list {
 	struct net_layer	*first;
@@ -30,17 +31,18 @@ static status_t		delete_layer(net_layer *layer);
 
 extern memory_pool_module_info *g_memory_pool;
 
-char joker_type[] = "*";
-
+string_token  g_joker_token = 0;
 
 //	#pragma mark [Start/Stop functions]
 
 
 // --------------------------------------------------
-status_t start_layers_manager()
+status_t start_layers_manager(void)
 {
 	void 		*module_list;
 	net_layer 	*layer;
+
+	g_joker_token = string_to_token("*");
 
 	g_layers.first = NULL;
 	
@@ -54,7 +56,7 @@ status_t start_layers_manager()
 
 	// Load all network/interfaces/* modules and let them
 	// register any layer they may support by calling init()
-	module_list = open_module_list(NET_LAYER_MODULES_ROOT);
+	module_list = open_module_list(NET_MODULES_ROOT);
 	if (module_list) {
 		size_t sz;
 		char module_name[256];
@@ -92,7 +94,7 @@ status_t start_layers_manager()
 }
 
 // --------------------------------------------------
-status_t stop_layers_manager()
+status_t stop_layers_manager(void)
 {
 	net_layer *layer, *next;
 	const char *module_name;
@@ -160,7 +162,8 @@ status_t register_layer(const char *name, const char *type, int priority,
 	
 	release_sem(g_layers.lock);
 		
-	dprintf("layers_manager: '%s' layer, registering %s/%s type\n", layer->name, layer->type, layer->sub_type);
+	dprintf("layers_manager: '%s' layer, registering %s/%s type\n", layer->name, 
+		string_for_token(layer->type), string_for_token(layer->sub_type));
 	
 	if (_layer)
 		*_layer = layer;
@@ -274,7 +277,7 @@ status_t find_layer_attribute(net_layer *layer, const void *id, int *type,
 
 
 // --------------------------------------------------
-status_t send_up(net_layer *layer, net_buffer *buffer)
+status_t send_layers_up(net_layer *layer, net_buffer *buffer)
 {
 	net_layer *above;
 	status_t status;
@@ -291,7 +294,7 @@ status_t send_up(net_layer *layer, net_buffer *buffer)
 	// TODO: lookup thru a previoulsy (at each layer [un]registration time) built list of
 	// "above" layers of caller layer.
 
-	// dprintf("layers_manager: send_up(): layer %s (%s/%s), searching a matching upper layer...\n",
+	// dprintf("layers_manager: send_layers_up(): layer %s (%x/%x), searching a matching upper layer...\n",
 	//	layer->name, layer->type, layer->sub_type);
 
 	// HACK: today, we lookup thru ALL :-( registered layers.
@@ -299,21 +302,21 @@ status_t send_up(net_layer *layer, net_buffer *buffer)
 	// it never change until layers list change herself...
 	above = g_layers.first;
 	while (above) {
-		// dprintf("layers_manager: send_up: Matching against layer %s (%s/%s) ?\n",
+		// dprintf("layers_manager: send_layers_up: Matching against layer %s (%x/%x) ?\n",
 		// 	above->name, above->type, above->sub_type);
 		
 		if ( above->module->process_input &&
-			 (strcmp(above->type, joker_type) == 0 ||
-			 (strcmp(above->type, layer->sub_type) == 0)) ) {
+			 ( (above->type == g_joker_token) || (above->type == layer->sub_type) ) ) {
 /*
-			dprintf("layers_manager: send_up: handing buffer from %s/%s (%s) to %s/%s (%s)...\n",
+			dprintf("layers_manager: send_layers_up: handing buffer from %x/%x (%s) to %x/%x (%s)...\n",
 					layer->type, layer->sub_type, layer->name,
 					above->type, above->sub_type, above->name);
 */		
 			release_sem(g_layers.lock);
 			status = above->module->process_input(above, buffer);
 			if (status == B_OK) {
-				atomic_add(&above->use_count, 1);								
+				atomic_add(&above->use_count, 1);
+				// TODO: resort this layer with previous one, if required.								
 				return status;
 			};
 
@@ -329,7 +332,7 @@ status_t send_up(net_layer *layer, net_buffer *buffer)
 
 
 // --------------------------------------------------
-status_t send_down(net_layer *layer, net_buffer *buffer)
+status_t send_layers_down(net_layer *layer, net_buffer *buffer)
 {
 	net_layer *below;
 	status_t status;
@@ -385,12 +388,12 @@ static net_layer * new_layer(const char *name, const char *type, int priority,
 		
 		tmp = strdup(type);
 		t = strtok_r(tmp, "/", &n);
-		layer->type = (t ? strdup(t) : joker_type);
+		layer->type = (t ? string_to_token(t) : g_joker_token);
 		t =  strtok_r(NULL, " ", &n);
-		layer->sub_type = (t ? strdup(t) : joker_type);
+		layer->sub_type = (t ? string_to_token(t) : g_joker_token);
 		free(tmp);
 	} else
-		layer->type = layer->sub_type = NULL;
+		layer->type = layer->sub_type = 0;
 
 
 	layer->priority = priority; 
@@ -416,10 +419,6 @@ static status_t delete_layer(net_layer *layer)
 		
 	if (layer->name)
 		free(layer->name);
-	if (layer->type && layer->type != joker_type)
-		free(layer->type);
-	if (layer->sub_type && layer->type != joker_type)
-		free(layer->sub_type);
 
 	if (layer->layers_above)
 		free(layer->layers_above);

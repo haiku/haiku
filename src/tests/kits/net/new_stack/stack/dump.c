@@ -3,6 +3,8 @@
 #include <drivers/module.h>
 #include <drivers/KernelExport.h>
 
+#include "dump.h"
+
 // --------------------------------------------------
 void dump_memory
 	(

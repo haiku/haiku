@@ -10,7 +10,9 @@
 
 #include "net_stack.h"
 #include "memory_pool.h"
+#include "atomizer.h"
 
+#include "stack.h"
 #include "attribute.h"
 #include "layers_manager.h"
 #include "buffer.h"
@@ -18,6 +20,8 @@
 #include "dump.h"
 
 memory_pool_module_info *g_memory_pool = NULL;
+atomizer_module_info *g_atomizer = NULL;
+#define DEFAULT_ATOMIZER (const void *) (-1)
 
 static bool g_started = false;
 
@@ -62,6 +66,45 @@ static status_t stop(void)
 }
 
 
+string_token string_to_token(const char *name)
+{
+	status_t status;
+
+	if (g_atomizer == NULL) {
+		status = get_module(B_ATOMIZER_MODULE_NAME, (module_info **) &g_atomizer);
+		if (status != B_OK) {
+			dprintf("string_to_token(%s): Can't load " B_ATOMIZER_MODULE_NAME " module!\n", name);
+			g_atomizer = (atomizer_module_info *) -1;
+		};
+	};
+
+	if (g_atomizer == (atomizer_module_info *) -1)
+		return NULL;
+
+	return g_atomizer->atomize(DEFAULT_ATOMIZER, name, true);
+}
+
+
+const char * string_for_token(string_token token)
+{
+	status_t status;
+
+	if (g_atomizer == NULL) {
+		status = get_module(B_ATOMIZER_MODULE_NAME, (module_info **) &g_atomizer);
+		if (status != B_OK) {
+			dprintf("string_for_token(%x): Can't load " B_ATOMIZER_MODULE_NAME " module!\n", (int) token);
+			g_atomizer = (atomizer_module_info *) -1;
+		};
+	};
+
+	if (g_atomizer == (atomizer_module_info *) -1)
+		return NULL;
+
+	return g_atomizer->string_for_token(DEFAULT_ATOMIZER, token);
+}
+
+
+
 // #pragma mark -
 
 struct net_stack_module_info nsmi = {
@@ -75,8 +118,9 @@ struct net_stack_module_info nsmi = {
 	start,
 	stop,
 
-	// Attributs IDs
-	register_attribute_id,
+	// String tokens
+	string_to_token,
+	string_for_token,
 	
 	// Layers handling
 	register_layer,
@@ -86,8 +130,8 @@ struct net_stack_module_info nsmi = {
 	remove_layer_attribute,
 	find_layer_attribute,
 	
-	send_up,
-	send_down,
+	send_layers_up,
+	send_layers_down,
 	
 	// net_buffer support
 	new_buffer,

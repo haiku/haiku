@@ -13,8 +13,7 @@
 #include "buffer.h"
 #include "attribute.h"
 
-typedef struct net_buffer_chunk
-{
+typedef struct net_buffer_chunk {
 	struct net_buffer_chunk	*next;
 	struct net_buffer_chunk *next_data;
 	uint32					ref_count;		// this data is referenced by 'ref_count' net_buffer_chunk(s)
@@ -35,8 +34,7 @@ struct net_buffer {
 	net_attribute 			*attributes;  // buffer attributes
 };
 
-struct net_buffer_queue
-{
+struct net_buffer_queue {
   benaphore  		lock;
   sem_id        	sync;
   volatile int32  	waiting;
@@ -291,7 +289,7 @@ net_buffer * split_buffer(net_buffer *buffer, uint32 offset)
 }
 
 // --------------------------------------------------
-status_t concatenate_buffers(net_buffer *begin_buffer, net_buffer *end_buffer)
+status_t merge_buffers(net_buffer *begin_buffer, net_buffer *end_buffer)
 {
 	return B_ERROR;
 }
@@ -563,9 +561,9 @@ status_t add_buffer_attribute(net_buffer *buffer, const void *id, int type, ...)
 	if (type & FROM_BUFFER) {
 		va_list args;
 		net_buffer_chunk *chunk;
-		int offset;
-		uint32	offset_in_chunk;
-		int size;
+		uint32 offset;
+		uint32 offset_in_chunk;
+		uint32 size;
 		uint8 *ptr;
 			
 		type = (type & NET_ATTRIBUTE_FLAGS_MASK);

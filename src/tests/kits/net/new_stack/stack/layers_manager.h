@@ -11,8 +11,8 @@
 extern "C" {
 #endif
 
-extern status_t		start_layers_manager();
-extern status_t		stop_layers_manager();
+extern status_t		start_layers_manager(void);
+extern status_t		stop_layers_manager(void);
 
 extern status_t 	register_layer(const char *name, const char *type, int priority,
 					net_layer_module_info *module, void *cookie, net_layer **layer);
@@ -24,8 +24,8 @@ extern status_t 	remove_layer_attribute(net_layer *layer, const void *id);
 extern status_t 	find_layer_attribute(net_layer *layer, const void *id,
 						int *type, void **attribute, size_t *size);
 
-extern status_t 	send_up(net_layer *me, struct net_buffer *buffer);
-extern status_t 	send_down(net_layer *me, struct net_buffer *buffer);
+extern status_t 	send_layers_up(net_layer *me, struct net_buffer *buffer);
+extern status_t 	send_layers_down(net_layer *me, struct net_buffer *buffer);
 
 
 #ifdef __cplusplus
