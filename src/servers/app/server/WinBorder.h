@@ -52,6 +52,10 @@ public:
 
 	virtual	void RebuildFullRegion(void);
 
+	virtual bool IsHidden() const;
+	void ServerHide();
+	void ServerUnhide();
+
 	void MouseDown(PortMessage *msg, bool sendMessage);
 	void MouseMoved(PortMessage *msg);
 	void MouseUp(PortMessage *msg);
@@ -89,6 +93,7 @@ protected:
 	int32 fKeyModifiers;
 	BPoint fLastMousePosition;
 
+	bool fServerHidden;
 	WinBorder *fMainWinBorder;
 	bool fIsMoving;
 	bool fIsResizing;

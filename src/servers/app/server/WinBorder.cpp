@@ -90,6 +90,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 
 	fMouseButtons	= 0;
 	fKeyModifiers	= 0;
+	fServerHidden	= false;
 	fMainWinBorder	= NULL;
 	fDecorator		= NULL;
 	fTopLayer		= NULL;
@@ -410,6 +411,21 @@ void WinBorder::ResizeBy(float x, float y)
 	Layer::ResizeBy(x,y);
 }
 
+bool WinBorder::IsHidden() const{
+	if (fServerHidden)
+		return true;
+
+	return Layer::IsHidden();
+}
+
+void WinBorder::ServerHide(){
+	fServerHidden = true;
+}
+
+void WinBorder::ServerUnhide(){
+	fServerHidden = false;
+}
+
 bool WinBorder::HasPoint(const BPoint& pt) const
 {
 	return fFullVisible.Contains(pt);
@@ -479,7 +495,7 @@ void WinBorder::AddToSubsetOf(WinBorder* main)
 	{
 		// if the main window is hidden also hide this one.
 		if(main->IsHidden())
-			fHidden = true;
+			Hide();//fHidden = true;
 
 		// add to main window's subset
 		main->Window()->fWinFMWList.AddItem(this);
@@ -587,7 +603,7 @@ void WinBorder::PrintToStream()
 	if (fLevel == B_NORMAL_FEEL)
 		printf("\t%s", "B_NORMAL_WINDOW_FEEL");
 
-	printf("\t%s\n", fHidden?"hidden" : "not hidden");
+	printf("\t%s\n", IsHidden()"hidden" : "not hidden");
 }
 
 void WinBorder::UpdateColors(void)

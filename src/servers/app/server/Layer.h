@@ -80,7 +80,7 @@ public:
 	
 	virtual	void Show(bool invalidate=true);
 	virtual	void Hide(bool invalidate=true);
-	bool IsHidden(void) const;
+	virtual bool IsHidden(void) const;
 	
 	BRect Bounds(void) const;
 	BRect Frame(void) const;

@@ -1174,7 +1174,7 @@ void Layer::PrintToStream(void)
 	
 	printf("Frame: (%f, %f, %f, %f)", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
 	printf("Token: %ld\n",fViewToken);
-	printf("Hidden - direct: %s\n", fHidden?"true":"false");
+	printf("Hidden - direct: %s\n", IsHidden()?"true":"false");
 	printf("Hidden - indirect: %s\n", IsHidden()?"true":"false");
 	printf("ResizingMode: %lx\n", fResizeMode);
 	printf("Flags: %lx\n", fFlags);
