@@ -99,15 +99,15 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 		bytesRead = node->ReadAttr("wrap",0,0,&wrap,sizeof(wrap));
 		if (bytesRead > 0) {
 			SetWordWrap(wrap);
-		}
-		if (wrap == false) {
-			BRect textRect;
-			textRect = Bounds();
-			textRect.OffsetTo(B_ORIGIN);
-			textRect.InsetBy(TEXT_INSET,TEXT_INSET);
-				// the width comes from stylededit R5. TODO: find a better way
-			textRect.SetRightBottom(BPoint(1500.0,textRect.RightBottom().y));
-			SetTextRect(textRect);
+			if (wrap == false) {
+				BRect textRect;
+				textRect = Bounds();
+				textRect.OffsetTo(B_ORIGIN);
+				textRect.InsetBy(TEXT_INSET,TEXT_INSET);
+					// the width comes from stylededit R5. TODO: find a better way
+				textRect.SetRightBottom(BPoint(1500.0,textRect.RightBottom().y));
+				SetTextRect(textRect);
+			}
 		}
 	}
 	if (fEncoding != 0) {
