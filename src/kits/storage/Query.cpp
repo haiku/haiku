@@ -630,15 +630,18 @@ BQuery::GetNextDirents(struct dirent *buf, size_t length, int32 count)
 // Rewind
 /*!	\brief Rewinds the entry list back to the first entry.
 
-	Not implemented for BQuery.
+	Unlike R5 Haiku implements this method for BQuery.
 
 	\return
-	- \c B_ERROR
+	- \c B_OK on success,
+	- \c B_FILE_ERROR, if Fetch() has not yet been called.
 */
 status_t
 BQuery::Rewind()
 {
-	return B_ERROR;
+	if (!_HasFetched())
+		return B_FILE_ERROR;
+	return _kern_rewind_dir(fQueryFd);
 }
 
 // CountEntries
