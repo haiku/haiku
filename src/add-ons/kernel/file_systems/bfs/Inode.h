@@ -71,8 +71,6 @@ class CachedBlock {
 		off_t BlockNumber() const { return fBlockNumber; }
 		uint32 BlockSize() const { return fVolume->BlockSize(); }
 		uint32 BlockShift() const { return fVolume->BlockShift(); }
-		
-		void KDumpMe();
 
 	private:
 		CachedBlock(const CachedBlock &);
@@ -179,13 +177,12 @@ class Inode : public CachedBlock {
 		off_t OldSize() { return fOldSize; }
 		off_t OldLastModified() { return fOldLastModified; }
 
-		void KDumpMe();
-
 	private:
 		Inode(const Inode &);
 		Inode &operator=(const Inode &);
 			// no implementation
 
+		friend void dump_inode(Inode &inode);
 		friend AttributeIterator;
 		friend InodeAllocator;
 
@@ -379,15 +376,6 @@ CachedBlock::WriteBack(Transaction *transaction)
 	return transaction->WriteBlocks(fBlockNumber, fBlock);
 }
 
-inline void
-CachedBlock::KDumpMe()
-{
-	kprintf("CachedBlock {\n");
-	kprintf("fVolume = 0x%08lx\n", (uint32)fVolume);
-	kprintf("fBlockNumber = 0x%16Lx\n", fBlockNumber);
-	kprintf("fBlock = 0x%08lx\n", (uint32)fBlock);
-	kprintf("}\n");
-}
 
 /**	Converts the "omode", the open flags given to bfs_open(), into
  *	access modes, e.g. since O_RDONLY requires read access to the

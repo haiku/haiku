@@ -6,11 +6,12 @@
 
 
 #include "Debug.h"
-#include "cpp.h"
 #include "Inode.h"
 #include "BPlusTree.h"
 #include "Stream.h"
 #include "Index.h"
+
+#include <kernel_cpp.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -178,9 +179,9 @@ Inode::Inode(Volume *volume, vnode_id id, bool empty, uint8 reenter)
 	fTree(NULL),
 	fLock()
 {
-#ifdef DEBUG
-	kprintf("Inode::Inode(0x%08lx, %Ld, %s, %s) @ 0x%08lx\n", (uint32)volume, id, empty?"t":"f", reenter?"t":"f", (uint32)this);
-#endif
+	PRINT(("Inode::Inode(%p, %Ld, %s, %s) @ %p\n",
+		volume, id, empty ? "empty" : "not-empty", reenter ? "reenter":"not-reenter", this));
+
 	Initialize();
 }
 
@@ -190,18 +191,16 @@ Inode::Inode(CachedBlock *cached)
 	fTree(NULL),
 	fLock()
 {
-#ifdef DEBUG
-	kprintf("Inode::Inode(0x%08lx) @ 0x%08lx\n", (uint32)cached, (uint32)this);
-#endif
+	PRINT(("Inode::Inode(%p) @ %p\n", cached, this));
+
 	Initialize();
 }
 
 
 Inode::~Inode()
 {
-#ifdef DEBUG
-	kprintf("Inode::~Inode() @ 0x%08lx\n", (uint32)this);
-#endif
+	PRINT(("Inode::~Inode() @ %p\n", this));
+
 	delete fTree;
 }
 
@@ -2054,19 +2053,6 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 		put_vnode(volume->ID(), inode->ID());
 
 	return B_OK;
-}
-
-void
-Inode::KDumpMe()
-{
-	kprintf("Inode {\n");
-	CachedBlock::KDumpMe();
-	kprintf("fTree = 0x%08lx\n", (uint32)fTree);
-	kprintf("fAttributes = 0x%08lx\n", (uint32)fAttributes);
-	kprintf("fLock {}\n");
-	kprintf("fOldSize = 0x%16Lx\n", fOldSize);
-	kprintf("fOldLastModified = 0x%16Lx\n", fOldLastModified);
-	kprintf("}\n");
 }
 
 
