@@ -45,6 +45,16 @@ int32 DisplayDriver::GetMode(void)
 	return buffer_mode;
 }
 
+float DisplayDriver::StringWidth(const char *string, int32 length, LayerData *d)
+{
+	return 0.0;
+}
+
+float DisplayDriver::StringHeight(const char *string, int32 length, LayerData *d)
+{
+	return 0.0;
+}
+
 bool DisplayDriver::DumpToFile(const char *path)
 {
 	return false;

@@ -98,6 +98,8 @@ public:
 	virtual void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat);
 	virtual void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
 	virtual void SetMode(int32 mode);
+	virtual float StringWidth(const char *string, int32 length, LayerData *d);
+	virtual float StringHeight(const char *string, int32 length, LayerData *d);
 	virtual bool DumpToFile(const char *path);
 
 	uint8 GetDepth(void);

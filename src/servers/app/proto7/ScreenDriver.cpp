@@ -1590,12 +1590,131 @@ void ScreenDriver::InvertRect(BRect r)
 	Unlock();
 }
 
-void ScreenDriver::DrawChar(char c, BPoint pt, LayerData *d)
+
+float ScreenDriver::StringWidth(const char *string, int32 length, LayerData *d)
 {
-	char st[2];
-	st[0]=c;
-	st[1]='\0';
-	DrawString(st,1,pt,d);
+	if(!string || !d || !d->font)
+		return 0.0;
+	Lock();
+
+	ServerFont *font=d->font;
+	FontStyle *style=font->Style();
+
+	if(!style)
+		return 0.0;
+
+	FT_Face face;
+	FT_GlyphSlot slot;
+	FT_UInt glyph_index, previous=0;
+	FT_Vector pen,delta;
+	int16 error=0;
+	int32 strlength,i;
+	float returnval;
+
+	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	if(error)
+	{
+		printf("Couldn't create face object\n");
+		return 0.0;
+	}
+
+	slot=face->glyph;
+
+	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
+	
+	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
+	if(error)
+	{
+		printf("Couldn't set character size - error 0x%x\n",error);
+		return 0.0;
+	}
+
+	// set the pen position in 26.6 cartesian space coordinates
+	pen.x=0;
+	
+	slot=face->glyph;
+	
+	strlength=strlen(string);
+	if(length<strlength)
+		strlength=length;
+
+	for(i=0;i<strlength;i++)
+	{
+		// get kerning and move pen
+		if(use_kerning && previous && glyph_index)
+		{
+			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
+			pen.x+=delta.x;
+		}
+
+		error=FT_Load_Char(face,string[i],FT_LOAD_MONOCHROME);
+
+		// increment pen position
+		pen.x+=slot->advance.x;
+		previous=glyph_index;
+	}
+	Unlock();
+
+	FT_Done_Face(face);
+
+	returnval=pen.x>>6;
+	return returnval;
+}
+
+float ScreenDriver::StringHeight(const char *string, int32 length, LayerData *d)
+{
+	if(!string || !d || !d->font)
+		return 0.0;
+	Lock();
+
+	ServerFont *font=d->font;
+	FontStyle *style=font->Style();
+
+	if(!style)
+		return 0.0;
+
+	FT_Face face;
+	FT_GlyphSlot slot;
+	int16 error=0;
+	int32 strlength,i;
+	float returnval=0.0,ascent=0.0,descent=0.0;
+
+	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	if(error)
+	{
+		printf("Couldn't create face object\n");
+		return 0.0;
+	}
+
+	slot=face->glyph;
+	
+	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
+	if(error)
+	{
+		printf("Couldn't set character size - error 0x%x\n",error);
+		return 0.0;
+	}
+
+	slot=face->glyph;
+	
+	strlength=strlen(string);
+	if(length<strlength)
+		strlength=length;
+
+	for(i=0;i<strlength;i++)
+	{
+		FT_Load_Char(face,string[i],FT_LOAD_RENDER);
+		if(slot->metrics.horiBearingY<slot->metrics.height)
+			descent=MAX((slot->metrics.height-slot->metrics.horiBearingY)>>6,descent);
+		else
+			ascent=MAX(slot->bitmap.rows,ascent);
+	}
+	Unlock();
+
+	FT_Done_Face(face);
+
+	returnval=ascent+descent;
+	return returnval;
 }
 
 void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL)

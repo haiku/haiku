@@ -53,7 +53,6 @@ public:
 //	virtual void CopyBits(BRect src, BRect dest);
 	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest);
 //	virtual void DrawPicture(SPicture *pic, BPoint pt);
-	virtual void DrawChar(char c, BPoint pt, LayerData *d);
 	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
 
 //	virtual void FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
@@ -83,6 +82,8 @@ public:
 	virtual void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat);
 //	virtual void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
 	virtual void SetMode(int32 mode);
+	float StringWidth(const char *string, int32 length, LayerData *d);
+	float StringHeight(const char *string, int32 length, LayerData *d);
 //	virtual bool DumpToFile(const char *path);
 protected:
 	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);

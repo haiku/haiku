@@ -101,6 +101,8 @@ public:
 //	void StrokeShape(SShape *sh, LayerData *d, int8 *pat);
 	void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat);
 	void SetMode(int32 mode);
+	float StringWidth(const char *string, int32 length, LayerData *d);
+	float StringHeight(const char *string, int32 length, LayerData *d);
 //	bool DumpToFile(const char *path);
 	VDWindow *screenwin;
 protected:
