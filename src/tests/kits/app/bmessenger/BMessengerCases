@@ -180,5 +180,61 @@ bool operator!=(const BMessenger &a, const BMessenger &b)
 included in == cases
 
 bool operator<(const BMessenger &a, const BMessenger &b)
-TODO
+case 1:	set fields of a and b manually =>
+		should return whatever the reference implementation returns.
+
+status_t SendMessage(uint32 command, BHandler *replyTo) const
+case 1:	this is uninitialized, replyTo is NULL =>
+		should return B_BAD_PORT_ID.
+case 2:	this is uninitialized, replyTo points to a valid handler  =>
+		should return B_BAD_PORT_ID.
+case 3:	this is initialized to a local target with preferred handler,
+		replyTo is NULL =>
+		should deliver the message and return B_OK.
+case 4:	this is initialized to a local target with preferred handler,
+		replyTo points to a valid handler =>
+		should deliver the message and return B_OK, a reply should be posted
+		to the reply handler.
+case 5:	this is initialized to a local target with specific handler,
+		replyTo is NULL =>
+		should deliver the message and return B_OK.
+case 6:	this is initialized to a local target with specific handler,
+		replyTo points to a valid handler =>
+		should deliver the message and return B_OK, a reply should be posted
+		to the reply handler.
+TODO: remote targets...
+
+status_t SendMessage(BMessage *message, BHandler *replyTo,
+					 bigtime_t timeout) const
+case 1:	message is NULL, replyTo is NULL, timeout is B_INFINITE_TIMEOUT =>
+		should return B_BAD_VALUE.
+other cases similar to those of SendMessage(uint32, BHandler *). Each one with
+a timeout of B_INFINITE_TIMEOUT, 0 and some ms. For the last two
+timeouts in failure cases B_WOULD_BLOCK/B_TIMED_OUT should be returned.
+
+status_t SendMessage(BMessage *message, BMessenger replyTo,
+					 bigtime_t timeout) const
+cases similar to those of SendMessage(BMessage *, BHandler *, bigtime_t).
+An invalid replyTo messenger causes the same behavior as a NULL handler.
+
+status_t SendMessage(uint32 command, BMessage *reply) const
+case 1:	this is uninitialized, reply is NULL =>
+		should return B_BAD_PORT_ID or B_BAD_VALUE.
+case 2:	this is uninitialized, replyTo points to a valid message  =>
+		should return B_BAD_PORT_ID.
+case 3:	this is initialized to a local target with preferred handler,
+		reply is NULL =>
+		should return B_BAD_VALUE.
+case 4:	this is initialized to a local target with preferred handler,
+		reply points to a valid message =>
+		should deliver the message, wait for a reply and return B_OK,
+		reply should contain the reply.
+
+status_t SendMessage(BMessage *message, BMessage *reply,
+					 bigtime_t deliveryTimeout,
+					 bigtime_t replyTimeout) const
+cases similar to those of SendMessage(uint32, BMessage *). deliveryTimeout and
+replyTimeout are B_INFINITE_TIMEOUT, 0 or some ms. In timeout cases
+B_WOULD_BLOCK/B_TIMED_OUT should be returned.
+
 

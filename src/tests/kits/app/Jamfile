@@ -16,6 +16,11 @@ CommonTestLib libapptest.so
 		LockTargetWithTimeoutTester.cpp
 		MessengerAssignmentTester.cpp
 		MessengerComparissonTester.cpp
+		SendMessageTester.cpp
+		SMInvoker.cpp
+		SMLooper.cpp
+		SMReplyTarget.cpp
+		SMTarget.cpp
 		TargetTester.cpp
 		
 	: <boot!home!config!lib>libopenbeos.so
