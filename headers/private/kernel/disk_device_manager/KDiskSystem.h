@@ -85,7 +85,7 @@ public:
 									const char *parameters);
 	virtual bool ValidateCreateChild(KPartition *partition, off_t *start,
 									 off_t *size, const char *type,
-									 const char *parameters);
+									 const char *parameters, int32 *index);
 	virtual int32 CountPartitionableSpaces(KPartition *partition);
 	virtual status_t GetPartitionableSpaces(KPartition *partition,
 											partitionable_space_data *buffer,
@@ -96,6 +96,12 @@ public:
 										  char *type);
 	virtual status_t GetTypeForContentType(const char *contentType,
 										   char *type);
+
+	// Shadow partition modification
+	// Device must be write locked.
+
+	virtual status_t ShadowPartitionChanged(KPartition *partition,
+											uint32 operation);
 
 	// Writing
 	// Device should not be locked.

@@ -347,6 +347,9 @@ static partition_module_info intel_partition_map_module = {
 	NULL,								// get_next_supported_type
 	NULL,								// get_type_for_content_type
 
+	// shadow partition modification
+	NULL,								// shadow_changed
+
 	// writing
 	NULL,								// repair
 	NULL,								// resize
@@ -426,6 +429,9 @@ static partition_module_info intel_extended_partition_module = {
 	NULL,								// get_partitionable_spaces
 	NULL,								// get_next_supported_type
 	NULL,								// get_type_for_content_type
+
+	// shadow partition modification
+	NULL,								// shadow_changed
 
 	// writing
 	NULL,								// repair

@@ -286,6 +286,9 @@ static fs_module_info bfs_module = {
 	NULL,								// validate_set_content_parameters
 	NULL,								// validate_initialize
 
+	// shadow partition modification
+	NULL,								// shadow_changed
+
 	// writing
 	NULL,								// defragment
 	NULL,								// repair

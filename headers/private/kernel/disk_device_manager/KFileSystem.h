@@ -49,6 +49,11 @@ public:
 	virtual bool ValidateInitialize(KPartition *partition, char *name,
 									const char *parameters);
 
+	// Shadow partition modification
+
+	virtual status_t ShadowPartitionChanged(KPartition *partition,
+											uint32 operation);
+
 	// Writing
 
 	virtual status_t Defragment(KPartition *partition, KDiskDeviceJob *job);

@@ -389,7 +389,7 @@ KDiskSystem::ValidateInitialize(KPartition *partition, char *name,
 bool
 KDiskSystem::ValidateCreateChild(KPartition *partition, off_t *start,
 								 off_t *size, const char *type,
-								 const char *parameters)
+								 const char *parameters, int32 *index)
 {
 	// to be implemented by derived classes
 	return false;
@@ -417,6 +417,14 @@ KDiskSystem::GetPartitionableSpaces(KPartition *partition,
 status_t
 KDiskSystem::GetNextSupportedType(KPartition *partition, int32 *cookie,
 								  char *type)
+{
+	// to be implemented by derived classes
+	return B_ENTRY_NOT_FOUND;
+}
+
+// ShadowPartitionChanged
+status_t
+KDiskSystem::ShadowPartitionChanged(KPartition *partition, uint32 operation)
 {
 	// to be implemented by derived classes
 	return B_ENTRY_NOT_FOUND;

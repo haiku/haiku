@@ -386,13 +386,17 @@ KPartitioningSystem::ValidateInitialize(KPartition *partition, char *name,
 bool
 KPartitioningSystem::ValidateCreateChild(KPartition *partition, off_t *start,
 										 off_t *size, const char *type,
-										 const char *parameters)
+										 const char *parameters, int32 *index)
 {
+	int32 _index = 0;
+	if (!index)
+		index = &_index;
 	return (partition && start && size && type
 			&& partition->DiskSystem() == this && fModule
 			&& fModule->validate_create_child
 			&& fModule->validate_create_child(partition->PartitionData(),
-											  start, size, type, parameters));
+											  start, size, type, parameters,
+											  index));
 }
 
 // CountPartitionableSpaces
@@ -453,6 +457,22 @@ KPartitioningSystem::GetTypeForContentType(const char *contentType, char *type)
 	if (!fModule->get_type_for_content_type)
 		return B_ENTRY_NOT_FOUND;
 	return fModule->get_type_for_content_type(contentType, type);
+}
+
+// ShadowPartitionChanged
+status_t
+KPartitioningSystem::ShadowPartitionChanged(KPartition *partition,
+											uint32 operation)
+{
+	if (!partition)
+		return B_BAD_VALUE;
+	if (!fModule)
+		return B_ERROR;
+	// If not implemented, we assume, that the partitioning system doesn't
+	// have to make any additional changes.
+	if (!fModule->shadow_changed)
+		return B_OK;
+	return fModule->shadow_changed(partition->PartitionData(), operation);
 }
 
 // Repair

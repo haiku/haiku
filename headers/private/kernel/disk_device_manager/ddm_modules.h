@@ -71,8 +71,8 @@ typedef bool (*partition_validate_set_content_parameters)(
 typedef bool (*partition_validate_initialize)(partition_data *partition,
 	char *name, const char *parameters);
 typedef bool (*partition_validate_create_child)(partition_data *partition,
-	off_t *start, off_t *size, const char *type,
-	const char *parameters);
+	off_t *start, off_t *size, const char *type, const char *parameters,
+	int32 *index);
 typedef status_t (*partition_get_partitionable_spaces)(
 	partition_data *partition, partitionable_space_data *buffer, int32 count,
 	int32 *actualCount);
@@ -82,6 +82,11 @@ typedef status_t (*partition_get_next_supported_type)(
 	partition_data *partition, int32 *cookie, char *type);
 typedef status_t (*partition_get_type_for_content_type)(
 	const char *contentType, char *type);
+
+// shadow partition modification
+// (device is write locked)
+typedef status_t (*partition_shadow_changed)(partition_data *partition,
+	uint32 operation);
 
 // writing
 // (device is NOT locked)
@@ -161,6 +166,9 @@ typedef struct partition_module_info {
 	partition_get_next_supported_type			get_next_supported_type;
 	partition_get_type_for_content_type			get_type_for_content_type;
 
+	// shadow partition modification
+	partition_shadow_changed					shadow_changed;
+
 	// writing
 	partition_repair							repair;
 	partition_resize							resize;
@@ -214,6 +222,11 @@ typedef bool (*fs_validate_set_content_parameters)(partition_data *partition,
 typedef bool (*fs_validate_initialize)(partition_data *partition, char *name,
 	const char *parameters);
 
+// shadow partition modification
+// (device is write locked)
+typedef status_t (*fs_shadow_changed)(partition_data *partition,
+	uint32 operation);
+
 // writing
 // (the device is NOT locked)
 typedef status_t (*fs_defragment)(int fd, partition_id partition,
@@ -260,6 +273,9 @@ typedef struct fs_module_info {
 	fs_validate_set_content_parameters
 			validate_set_content_parameters;
 	fs_validate_initialize						validate_initialize;
+
+	// shadow partition modification
+	fs_shadow_changed							shadow_changed;
 
 	// writing
 	fs_defragment								defragment;

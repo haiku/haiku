@@ -235,6 +235,21 @@ KFileSystem::ValidateInitialize(KPartition *partition, char *name,
 											parameters));
 }
 
+// ShadowPartitionChanged
+status_t
+KFileSystem::ShadowPartitionChanged(KPartition *partition, uint32 operation)
+{
+	if (!partition)
+		return B_BAD_VALUE;
+	if (!fModule)
+		return B_ERROR;
+	// If not implemented, we assume, that the file system doesn't have to
+	// make any additional changes.
+	if (!fModule->shadow_changed)
+		return B_OK;
+	return fModule->shadow_changed(partition->PartitionData(), operation);
+}
+
 // Defragment
 status_t
 KFileSystem::Defragment(KPartition *partition, KDiskDeviceJob *job)
