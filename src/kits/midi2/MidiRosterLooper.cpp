@@ -1,9 +1,5 @@
-/**
- * @file MidiRosterLooper.cpp
- *
- * Implementation of the BMidiRosterLooper class.
- *
- * @author Matthijs Hollemans
+/*
+ * Copyright (c) 2002-2003 Matthijs Hollemans
  */
 
 #include "debug.h"

@@ -1,9 +1,5 @@
-/**
- * @file MidiProducer.cpp
- *
- * Implementation of the BMidiProducer class.
- *
- * @author Matthijs Hollemans
+/*
+ * Copyright (c) 2002-2003 Matthijs Hollemans
  */
 
 #include "debug.h"

@@ -1,9 +1,5 @@
-/**
- * @file MidiLocalProducer.cpp
- *
- * Implementation of the BMidiLocalProducer class.
- *
- * @author Matthijs Hollemans
+/*
+ * Copyright (c) 2002-2003 Matthijs Hollemans
  */
 
 #include "debug.h"

@@ -1,9 +1,5 @@
-/**
- * @file MidiRoster.cpp
- *
- * Implementation of the BMidiRoster class.
- *
- * @author Matthijs Hollemans
+/*
+ * Copyright (c) 2002-2003 Matthijs Hollemans
  */
 
 #include "debug.h"
@@ -18,22 +14,20 @@
 // For backwards compatibility's sake, we export those symbols 
 // as well, even though we do not use them for anything.
 
-/** Not used. For backwards compatibility only. */
+// Not used. For backwards compatibility only.
 int32 midi_debug_level = 0;
 
-/** Not used. For backwards compatibility only. */
+// Not used. For backwards compatibility only.
 int32 midi_dispatcher_priority = B_REAL_TIME_PRIORITY;
 
 //------------------------------------------------------------------------------
 
-/** 
- * The one and only BMidiRoster instance, which is created
- * the first time the client app calls MidiRoster(). It is
- * destroyed by the BMidiRosterKiller when the app quits.
- */
+// The one and only BMidiRoster instance, which is created
+// the first time the client app calls MidiRoster(). It is
+// destroyed by the BMidiRosterKiller when the app quits.
 static BMidiRoster* roster = NULL;
 
-/** Destroys the BMidiRoster instance when the app quits. */
+// Destroys the BMidiRoster instance when the app quits.
 static class BMidiRosterKiller
 {
 public:

@@ -1,9 +1,5 @@
-/**
- * @file MidiEndpoint.cpp
- *
- * Implementation of the BMidiEndpoint class.
- *
- * @author Matthijs Hollemans
+/*
+ * Copyright (c) 2002-2003 Matthijs Hollemans
  */
 
 #include "debug.h"

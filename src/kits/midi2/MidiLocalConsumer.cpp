@@ -1,9 +1,5 @@
-/**
- * @file MidiLocalConsumer.cpp
- *
- * Implementation of the BMidiLocalConsumer class.
- *
- * @author Matthijs Hollemans
+/*
+ * Copyright (c) 2002-2003 Matthijs Hollemans
  */
 
 #include "debug.h"
