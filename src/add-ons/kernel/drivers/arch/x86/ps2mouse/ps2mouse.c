@@ -124,21 +124,21 @@ static status_t
 mouse_open(const char *name, uint32 flags, void **cookie)
 {
 	*cookie = NULL;
-	return 0;
+	return B_OK;
 }
 
 
 static status_t 
 mouse_close(void * cookie)
 {
-	return 0;
+	return B_OK;
 }
 
 
-static status_t 
+static status_t
 mouse_freecookie(void * cookie)
 {
-	return 0;
+	return B_OK;
 }
 
 
@@ -150,23 +150,23 @@ mouse_freecookie(void * cookie)
  *	len, buffer size, must be at least the size of the data packet
  */
 
-static ssize_t 
+static status_t
 mouse_read(void *cookie, off_t pos, void *buf, size_t *len)
 {
-   // inform interrupt handler that data is being waited for
-   in_read = true;
+	// inform interrupt handler that data is being waited for
+	in_read = true;
 
-   // wait until there is data to read
-	if(acquire_sem_etc(mouse_sem, 1, B_CAN_INTERRUPT, 0) ==
-	   EINTR) {
-		return 0;
-	} // if
+	// wait until there is data to read
+	if (acquire_sem_etc(mouse_sem, 1, B_CAN_INTERRUPT, 0) == B_INTERRUPTED) {
+		*len = 0;
+		return B_OK;
+	}
 
 	// verify user's buffer is of the right size
-	if(*len < PACKET_SIZE) {
+	if (*len < PACKET_SIZE) {
 		*len = 0;
 		/* XXX - should return an error here */
-		return 0;
+		return B_OK;
 	}
 
 	// copy data to user's buffer
@@ -175,11 +175,11 @@ mouse_read(void *cookie, off_t pos, void *buf, size_t *len)
 	((char*)buf)[2] = md_read.delta_y;
 
 	*len = PACKET_SIZE;
-	return 0;
+	return B_OK;
 }
 
 
-static ssize_t 
+static status_t 
 mouse_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
 	*len = 0;

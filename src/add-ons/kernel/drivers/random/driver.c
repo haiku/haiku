@@ -33,8 +33,8 @@ static const char *sRandomNames[] = {
 };
 
 static status_t random_open(const char *name, uint32 flags, void **cookie);
-static ssize_t random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes);
-static ssize_t random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes);
+static status_t random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes);
+static status_t random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes);
 static status_t random_control(void *cookie, uint32 op, void *arg, size_t length);
 static status_t random_close(void *cookie);
 static status_t random_free(void *cookie);
@@ -353,6 +353,7 @@ publish_devices(void)
 	return sRandomNames;
 }
 
+
 device_hooks *
 find_device(const char* name)
 {
@@ -388,7 +389,7 @@ random_open(const char *name, uint32 flags, void **cookie)
 }
 
 
-static ssize_t
+static status_t
 random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 {
 	int32 *buffer = (int32 *)_buffer;
@@ -413,11 +414,12 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 		buffer8[(i*4) + j] = chrand8(sRandomEnv);
 
 	release_sem(sRandomSem);
+
 	return B_OK;
 }
 
 
-static ssize_t 
+static status_t 
 random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes)
 {
 	return B_OK;
