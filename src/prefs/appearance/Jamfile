@@ -2,6 +2,6 @@ SubDir OBOS_TOP src prefs appearance ;
 
 AddResources Appearance : Appearance.rsrc ;
 
-Preference Appearance : APRMain.cpp APRView.cpp APRWindow.cpp Decorator.cpp DecView.cpp DisplayDriver.cpp PortLink.cpp PreviewDriver.cpp RGBColor.cpp SPoint.cpp SRect.cpp ;
+Preference Appearance : APRMain.cpp APRView.cpp APRWindow.cpp Decorator.cpp DecView.cpp DisplayDriver.cpp PortLink.cpp PreviewDriver.cpp RGBColor.cpp SPoint.cpp SRect.cpp ColorWell.cpp ;
 
 LinkSharedOSLibs Appearance : be ;
