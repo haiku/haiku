@@ -76,9 +76,22 @@ int vmInterface::createArea(char *AreaName,int pageCount,void **address, address
 
 void vmInterface::freeArea(int Area)
 	{
+	printf ("vmInterface::freeArea: begin\n");
 	area *oldArea=getAM()->findArea(Area);	
-	getAM()->removeArea(oldArea);
-	delete oldArea;
+	printf ("vmInterface::freeArea: found area %x\n",oldArea);
+	if (oldArea)
+		{
+		printf ("vmInterface::freeArea: removing area %x from linked list\n",oldArea);
+		areaManager *foo=getAM();
+		printf ("vmInterface::freeArea: areaManager =  %x \n",foo);
+		foo->removeArea(oldArea);
+		printf ("vmInterface::freeArea: deleting area %x \n",oldArea);
+		oldArea->freeArea();
+		printf ("vmInterface::freeArea: freeArea complete \n");
+		delete oldArea;
+		}
+	else
+		printf ("vmInterface::freeArea: unable to find requested area\n");
 	}
 
 status_t vmInterface::getAreaInfo(int Area,area_info *dest)

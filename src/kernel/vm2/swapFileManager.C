@@ -36,3 +36,9 @@ vnode swapFileManager::findNode(void)
 	tmp.valid=false;
 	return tmp;
 	}
+
+void swapFileManager::freeVNode(vnode v)
+	{
+	printf ("swapFileManager::freeNode: Freeing a new node for you, Master\n");
+	// Should put this one on the free list, someday
+	}

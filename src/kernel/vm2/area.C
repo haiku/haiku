@@ -79,14 +79,22 @@ status_t area::createArea(char *name, int pageCount,void **address, addressSpec 
 
 void area::freeArea(void)
 	{
+	printf ("area::freeArea: starting \n");
+
 	manager->lock();
-	for (struct node *cur=vpages.rock;cur;cur=cur->next)
+	vpages.dump();
+	for (struct node *cur=vpages.rock;cur;)
 		{
+		printf ("area::freeArea: wasting a page: %x\n",cur);
 		vpage *page=(vpage *)cur;
 		page->flush();
+		printf ("area::freeArea: flushed a page \n");
+		cur=cur->next;
 		delete page; // Probably need to add a destructor
 		}
+	printf ("area::freeArea: unlocking \n");
 	manager->unlock();
+	printf ("area::freeArea: ending \n");
 	}
 
 status_t area::getInfo(area_info *dest)

@@ -19,7 +19,8 @@ unsigned char readByte(unsigned int offset )
 
 int main(int argc,char **argv)
 {
-	vm.createArea("Mine",2,(void **)(&addr));
+	int area1,area2;
+	area1=vm.createArea("Mine",2,(void **)(&addr));
 	writeByte(0,99);
 	readByte(0);
 	printf ("\n\n\n\n\n");
@@ -31,8 +32,8 @@ int main(int argc,char **argv)
 	for (int i=0;i<8192;i++)
 		if (i%256!=readByte(i))
 				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(i));
-	snooze(10000000);
-	vm.createArea("Mine",2,(void **)(&addr));
+	snooze(5000000);
+	area2=vm.createArea("Mine2",2,(void **)(&addr));
 	writeByte(0,99);
 	readByte(0);
 	printf ("\n\n\n\n\n");
@@ -44,7 +45,26 @@ int main(int argc,char **argv)
 	for (int i=0;i<8192;i++)
 		if (i%256!=readByte(i))
 				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(i));
-	snooze(2000000);
+	snooze(500000);
+	printf ("Freeing area1\n");
+	vm.freeArea(area1);
+	printf ("Freeing area2\n");
+	vm.freeArea(area2);
+	printf ("Done Freeing area2\n");
+	snooze(20000000);
 
+	printf ("Creating a new area\n");
+	area1=vm.createArea("Mine",2,(void **)(&addr));
+	writeByte(0,99);
+	readByte(0);
+	printf ("\n\n\n\n\n");
+	writeByte(4097,99);
+	readByte(4097);
+	printf ("\n\n\n\n\n");
+	for (int i=0;i<8192;i++)
+		writeByte(i,i%256);
+	for (int i=0;i<8192;i++)
+		if (i%256!=readByte(i))
+				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(i));
 	return 0;
 }

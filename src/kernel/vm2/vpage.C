@@ -39,6 +39,14 @@ vpage::vpage(unsigned long start,vnode backing, page *physMem,protectType prot,p
 		physPage=physMem;
 	}
 
+vpage::~vpage(void)
+	{
+	if (physPage) // I doubt that this is always true. Probably need to check for sharing...
+		pageMan.freePage(physPage);
+	if (backingNode.fd) 
+		swapMan.freeVNode(backingNode);
+	}
+
 void vpage::setProtection(protectType prot)
 	{
 	protection=prot;

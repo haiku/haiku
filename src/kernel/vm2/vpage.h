@@ -21,6 +21,7 @@ class vpage : public node
 									// If we are read only, it is read only. 
 									// If we are read/write, both pages are copy on write
 		vpage(unsigned long  start,vnode backing, page *physMem,protectType prot,pageState state); // backing and/or physMem can be NULL/0.
+		~vpage(void);
 		void setProtection(protectType prot);
 		protectType getProtection(void) {return protection;}
 		void *getStartAddress(void) {return (void *)start_address;}

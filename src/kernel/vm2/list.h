@@ -22,14 +22,14 @@ class list {
 		//int count(void) {printf ("list::count: About to return %d\n",nodeCount);return nodeCount;}
 		int count(void) {return nodeCount;}
 		void *next(void) {nodeCount--;node *n=rock;if (rock) rock=rock->next;return n;} 
-		void remove(void *in)
+		void remove(node *toNuke)
 			{
-			struct node *toNuke=(node *)in;
-			for (struct node *cur=rock;cur;cur=cur->next)
+			bool done=false;
+			for (struct node *cur=rock;!done && cur->next;cur=cur->next)
 				if (cur->next==toNuke)
 					{
 					cur->next=toNuke->next;
-					cur=NULL; // To bust out of the loop...
+					done=true;
 					}
 			}
 		void dump(void)
