@@ -88,6 +88,7 @@ const char *kTypesField						= "types";
 const char *kGenericFileType	= "application/octet-stream";
 const char *kDirectoryType		= "application/x-vnd.Be-directory";
 const char *kSymlinkType		= "application/x-vnd.Be-symlink";
+const char *kMetaMimeType		= "application/x-vnd.Be-meta-mime";
 
 // Error codes
 const status_t kMimeGuessFailureError	= B_ERRORS_END+1;
