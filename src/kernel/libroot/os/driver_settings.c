@@ -1,12 +1,49 @@
-/* driver_settings - implements the driver settings API
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * This file may be used under the terms of the MIT License.
+ */
 
+/** \brief Implements the driver settings API
+ *	This file is used by three different components with different needs:
+ *	  1) the boot loader
+ *		Buffers a list of settings files to move over to the kernel - the
+ *		actual buffering is located in the boot loader directly, though.
+ *		Creates driver_settings structures out of those on demand only.
+ *	  2) the kernel
+ *		Maintains a list of settings so that no disk access is required
+ *		for known settings (such as those passed over from the boot
+ *		loader).
+ *	  3) libroot.so
+ *		Exports the parser to userland applications, so that they can
+ *		easily make use of driver_settings styled files.
+ *
+ *	The file has to be recompiled for every component separately, so that
+ *	it properly exports the required functionality (which is specified by
+ *	_BOOT_MODE for the boot loader, and _KERNEL_MODE for the kernel).
+ */
+
+#ifndef KERNEL_OS_MAIN
+// ToDo: our build system is broken and compiles libroot.so stuff using kernel
+//	build rules - we use this mechanism to make sure we only get what we want.
+//	This can be removed once the build system works as it should.
+#	undef _KERNEL_MODE
+#endif
 
 #include <OS.h>
-#include <driver_settings.h>
+#include <drivers/driver_settings.h>
+
+#ifdef _KERNEL_MODE
+#	include <KernelExport.h>
+#	include <util/list.h>
+#	include <lock.h>
+#	include <kdriver_settings.h>
+#	include <int.h>
+#	include <boot/kernel_args.h>
+#endif
+#ifdef _BOOT_MODE
+#	include <boot/kernel_args.h>
+#	include <boot/stage2.h>
+#endif
 
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +51,7 @@
 #include <fcntl.h>
 #include <ctype.h>
 
-
+// ToDo: these should be retrieved via find_directory()
 #define SETTINGS_DIRECTORY "/boot/home/config/settings/kernel/drivers/"
 #define SETTINGS_MAGIC		'DrvS'
 
@@ -28,10 +65,14 @@
 
 
 typedef struct settings_handle {
-	void	*first_buffer;
-	int32	magic;
-	struct	driver_settings settings;
-	char	*text;
+#ifdef _KERNEL_MODE
+	list_link	link;
+	char		name[B_OS_NAME_LENGTH];
+	int32		ref_count;
+#endif
+	int32		magic;
+	struct		driver_settings settings;
+	char		*text;
 } settings_handle;
 
 
@@ -40,6 +81,12 @@ enum assignment_mode {
 	ALLOW_ASSIGNMENT,
 	IGNORE_ASSIGNMENT
 };
+
+
+#ifdef _KERNEL_MODE
+static struct list sHandles;
+static mutex sLock;
+#endif
 
 //	Functions not part of the public API
 
@@ -333,13 +380,39 @@ free_settings(settings_handle *handle)
 
 	free(handle->settings.parameters);
 
+#ifndef _BOOT_MODE
+	// in the boot loader we either don't care (because the heap is dumped anyway)
+	// or must not free the text if we want to pass the buffer over to the kernel
 	free(handle->text);
+#endif
 	free(handle);
 }
 
 
+static void *
+new_settings(char *buffer)
+{
+	settings_handle *handle = malloc(sizeof(settings_handle));
+	if (handle == NULL)
+		return NULL;
+
+	handle->magic = SETTINGS_MAGIC;
+	handle->text = buffer;
+
+#ifdef _KERNEL_MODE
+	strlcpy(handle->name, driverName, sizeof(handle->name));
+#endif
+
+	if (parse_settings(handle) == B_OK)
+		return handle;
+
+	free(handle);
+	return NULL;
+}
+
+
 static settings_handle *
-load_driver_settings_from_file(int file)
+load_driver_settings_from_file(int file, const char *driverName)
 {
 	struct stat stat;
 
@@ -355,19 +428,19 @@ load_driver_settings_from_file(int file)
 	if (stat.st_size > B_OK && stat.st_size < MAX_SETTINGS_SIZE) {
 		char *text = (char *)malloc(stat.st_size + 1);
 		if (text != NULL && read(file, text, stat.st_size) == stat.st_size) {
-			settings_handle *handle = malloc(sizeof(settings_handle));
+			settings_handle *handle;
+
+			text[stat.st_size] = '\0';
+				// make sure the string is null terminated
+				// to avoid misbehaviour
+
+			handle = new_settings(text);
 			if (handle != NULL) {
-				text[stat.st_size] = '\0';
-
-				handle->magic = SETTINGS_MAGIC;
-				handle->text = text;
-
-				if (parse_settings(handle) == B_OK) {
-					return handle;
-				}
-
-				free(handle);
+				// everything went fine!
+				return handle;
 			}
+
+			free(handle);
 		}
 		// "text" might be NULL here, but that's allowed
 		free(text);
@@ -528,6 +601,68 @@ put_parameter(char **_buffer, size_t *_bufferSize, struct driver_parameter *para
 
 
 //	#pragma mark -
+//	Kernel only functions
+
+
+#ifdef _KERNEL_MODE
+static settings_handle *
+find_driver_settings(const char *name)
+{
+	settings_handle *handle = NULL;
+
+	ASSERT_LOCKED_MUTEX(&sLock);
+
+	while ((handle = list_get_next_item(&sHandles, handle)) != NULL) {
+		if (!strcmp(handle->name, name))
+			return handle;
+	}
+
+	return NULL;
+}
+
+
+status_t
+driver_settings_init(kernel_args *args)
+{
+	struct driver_settings_file *settings = args->driver_settings;
+
+	// Move the preloaded driver settings over to the kernel
+
+	list_init(&sHandles);
+	
+	while (settings != NULL) {
+		settings_handle *handle = malloc(sizeof(settings_handle));
+		if (handle == NULL)
+			return B_NO_MEMORY;
+
+		if (settings->size != 0) {
+			handle->text = malloc(settings->size);
+			if (handle->text == NULL)
+				return B_NO_MEMORY;
+
+			memcpy(handle->text, settings->buffer, settings->size);
+		} else
+			handle->text = NULL;
+
+		strlcpy(handle->name, settings->name, sizeof(handle->name));
+		handle->magic = 0;
+		list_add_item(&sHandles, handle);
+
+		settings = settings->next;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+driver_settings_init_post_sem(kernel_args *args)
+{
+	return mutex_init(&sLock, "driver settings");
+}
+#endif
+
+//	#pragma mark -
 //	The public API implementation
 
 
@@ -537,7 +672,20 @@ unload_driver_settings(void *handle)
 	if (!check_handle(handle))
 		return B_BAD_VALUE;
 
-	free_settings(handle);
+#ifdef _KERNEL_MODE
+	mutex_lock(&sLock);
+	// ToDo: as soon as "/boot" is accessible, we should start throwing away settings
+#if 0
+	if (--handle->ref_count == 0) {
+		list_remove_link(&handle->link);
+	} else
+#endif
+		handle = NULL;
+	mutex_unlock(&sLock);
+#endif
+
+	if (handle != NULL)
+		free_settings(handle);
 	return B_OK;
 }
 
@@ -550,6 +698,45 @@ load_driver_settings(const char *driverName)
 	
 	if (driverName == NULL)
 		return NULL;
+
+#ifdef _KERNEL_MODE
+	// see if we already have these settings loaded
+	mutex_lock(&sLock);
+	handle = find_driver_settings(driverName);
+	if (handle != NULL) {
+		handle->ref_count++;
+
+		// we got it, now let's see if it already has been parsed
+		if (handle->magic != SETTINGS_MAGIC) {
+			handle->magic = SETTINGS_MAGIC;
+			if (parse_settings(handle) != B_OK) {
+				// no valid settings, let's cut down its memory requirements
+				free(handle->text);
+				handle->text = NULL;
+				handle = NULL;
+			}
+		}
+		mutex_unlock(&sLock);
+		return handle;
+	}
+
+	// we are allowed to call the driver settings pretty early in the boot process
+	if (kernel_startup)
+		return NULL;
+#endif	// _KERNEL_MODE
+#ifdef _BOOT_MODE
+	// see if we already have these settings loaded
+	{
+		struct driver_settings_file *settings = gKernelArgs.driver_settings;
+		while (settings != NULL) {
+			if (!strcmp(settings->name, driverName)) {
+				// we have it
+				return new_settings(settings->buffer);
+			}
+			settings = settings->next;
+		}
+	}
+#endif
 
 	// open the settings from the standardized location
 	{
@@ -564,7 +751,13 @@ load_driver_settings(const char *driverName)
 	if (file < B_OK)
 		return NULL;
 
-	handle = load_driver_settings_from_file(file);
+	handle = load_driver_settings_from_file(file, driverName);
+
+#ifdef _KERNEL_MODE
+	if (handle != NULL)
+		list_add_item(&sHandles, handle);
+	mutex_unlock(&sLock);
+#endif
 
 	close(file);
 	return (void *)handle;
