@@ -258,6 +258,11 @@ panic(const char *fmt, ...)
 	va_list args;
 	char temp[128];
 	int state;
+	
+	// XXX by setting kernel_startup = true, we disable
+	// XXX the interrupt check in semaphore code etc.
+	// XXX should be renamed?
+	kernel_startup = true;
 
 	dbg_set_serial_debug(true);
 
