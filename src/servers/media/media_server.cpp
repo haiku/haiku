@@ -11,8 +11,6 @@
 #include "NodeManager.h"
 #include "AppManager.h"
 #include "media_server.h"
-#define DEBUG 1
-#include <Debug.h>
 #include "debug.h"
 
 /*
@@ -107,7 +105,7 @@ ServerApp::ServerApp()
 
 ServerApp::~ServerApp()
 {
-	printf("####ServerApp::~ServerApp()\n");
+	TRACE("ServerApp::~ServerApp()\n");
 	delete gNotificationManager;
 	delete gBufferManager;
 	delete gAppManager;
@@ -121,7 +119,7 @@ ServerApp::~ServerApp()
 bool
 ServerApp::QuitRequested()
 {
-	printf("####ServerApp::QuitRequested()\n");
+	TRACE("ServerApp::QuitRequested()\n");
 	gAppManager->TerminateAddonServer();
 	return true;
 }
@@ -130,7 +128,7 @@ void
 ServerApp::HandleMessage(int32 code, void *data, size_t size)
 {
 	status_t rv;
-	printf("ServerApp::HandleMessage %#lx\n", code);
+	INFO("ServerApp::HandleMessage %#lx\n", code);
 	switch (code) {
 		case SERVER_REGISTER_ADDONSERVER:
 		{
@@ -212,7 +210,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				size = ((reply.count * sizeof(live_node_info)) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 				reply.area = create_area("get live nodes", reinterpret_cast<void **>(&start_addr), B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 				if (reply.area < B_OK) {
-					TRACE("SERVER_GET_LIVE_NODES: failed to create area, %#lx\n", reply.area);
+					FATAL("SERVER_GET_LIVE_NODES: failed to create area, %#lx\n", reply.area);
 					reply.count = 0;
 					rv = B_ERROR;
 				} else {
@@ -273,7 +271,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				area_id clone;
 				clone = clone_area("media_inputs clone", reinterpret_cast<void **>(&inputs), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
 				if (clone < B_OK) {
-					TRACE("SERVER_PUBLISH_INPUTS: failed to clone area, %#lx\n", clone);
+					FATAL("SERVER_PUBLISH_INPUTS: failed to clone area, %#lx\n", clone);
 					rv = B_ERROR;
 				} else {
 					rv = gNodeManager->PublishInputs(request->node, inputs, request->count);
@@ -295,7 +293,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				area_id clone;
 				clone = clone_area("media_outputs clone", reinterpret_cast<void **>(&outputs), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
 				if (clone < B_OK) {
-					TRACE("SERVER_PUBLISH_OUTPUTS: failed to clone area, %#lx\n", clone);
+					FATAL("SERVER_PUBLISH_OUTPUTS: failed to clone area, %#lx\n", clone);
 					rv = B_ERROR;
 				} else {
 					rv = gNodeManager->PublishOutputs(request->node, outputs, request->count);
@@ -340,7 +338,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			server_get_instances_for_reply reply;
 			rv = gNodeManager->GetInstances(reply.node_id, &reply.count, min_c(request->maxcount, MAX_NODE_ID), request->addon_id, request->addon_flavor_id);
 			if (reply.count == MAX_NODE_ID && request->maxcount > MAX_NODE_ID) { // XXX might be fixed by using an area
-				TRACE("SERVER_GET_INSTANCES_FOR: WARNING! returning possibly truncated list of node id's\n");
+				FATAL("SERVER_GET_INSTANCES_FOR: WARNING! returning possibly truncated list of node id's\n");
 			}
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;

@@ -6,6 +6,16 @@ template<class key, class value> class Map
 public:
 	Map() : count(0) {}
 	
+	Map(const Map<key, value> &other)
+	{
+		printf("template<class key, class value> class Map copy constructor\n");
+		count = other.count;
+		for (int i = 0; i < count; i++) {
+			list[i].v = other.list[i].v;
+			list[i].k = other.list[i].k;
+		}
+	}
+
 	bool Insert(const key &k, const value &v)
 	{
 		value temp;
@@ -68,6 +78,11 @@ public:
 				return true;
 			}
 		return false;
+	}
+
+	bool IsEmpty()
+	{
+		return count == 0;
 	}
 
 private:

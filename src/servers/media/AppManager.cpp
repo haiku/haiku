@@ -3,8 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
  
-#define DEBUG 1
- 
 #include <OS.h>
 #include <Application.h>
 #include <Roster.h>
@@ -13,7 +11,7 @@
 #include <Messenger.h>
 #include <Autolock.h>
 #include <stdio.h>
-#include <Debug.h>
+#include "debug.h"
 #include "AppManager.h"
 #include "NodeManager.h"
 #include "BufferManager.h"
@@ -49,7 +47,7 @@ bool AppManager::HasTeam(team_id team)
 status_t AppManager::RegisterTeam(team_id team, BMessenger messenger)
 {
 	BAutolock lock(fLocker);
-	printf("AppManager::RegisterTeam %ld\n", team);
+	TRACE("AppManager::RegisterTeam %ld\n", team);
 	if (HasTeam(team))
 		return B_ERROR;
 	App app;
@@ -63,7 +61,7 @@ status_t AppManager::UnregisterTeam(team_id team)
 	bool is_removed;
 	bool is_addon_server;
 	
-	printf("AppManager::UnregisterTeam %ld\n", team);
+	TRACE("AppManager::UnregisterTeam %ld\n", team);
 	
 	fLocker->Lock();
 	is_removed = fAppMap->Remove(team);
@@ -90,12 +88,12 @@ void AppManager::RestartAddonServer()
 		restart_tries = 0;
 	}
 	if (restart_tries < 5) {
-		printf("AppManager: Restarting media_addon_server...\n");
+		FATAL("AppManager: Restarting media_addon_server...\n");
 		// XXX fixme. We should wait until it is *really* gone
 		snooze(5000000);
 		StartAddonServer();
 	} else {
-		printf("AppManager: media_addon_server crashed too often, not restarted\n");
+		FATAL("AppManager: media_addon_server crashed too often, not restarted\n");
 	}
 }
 
@@ -176,7 +174,7 @@ void AppManager::CleanupTeam(team_id team)
 {
 	ASSERT(false == fLocker->IsLocked());
 
-	printf("AppManager: cleaning up team %ld\n", team);
+	TRACE("AppManager: cleaning up team %ld\n", team);
 
 	gNodeManager->CleanupTeam(team);
 	gBufferManager->CleanupTeam(team);
@@ -187,7 +185,7 @@ void AppManager::CleanupAddonServer()
 {
 	ASSERT(false == fLocker->IsLocked());
 
-	printf("AppManager: cleaning up media_addon_server\n");
+	TRACE("AppManager: cleaning up media_addon_server\n");
 
 }
 

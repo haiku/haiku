@@ -98,7 +98,7 @@ BControllable::HandleMessage(int32 message,
 							 const void *data,
 							 size_t size)
 {
-	TRACE("BControllable::HandleMessage %#lx, node %ld\n", message, ID());
+	INFO("BControllable::HandleMessage %#lx, node %ld\n", message, ID());
 
 	return B_ERROR;
 }

@@ -80,7 +80,7 @@ BBufferGroup::BBufferGroup(size_t size,
 
 	// don't allow all placement parameter values
 	if (placement != B_ANY_ADDRESS && placement != B_ANY_KERNEL_ADDRESS) {
-		TRACE("placement != B_ANY_ADDRESS && placement != B_ANY_KERNEL_ADDRESS (0x%08lx)\n",placement);
+		FATAL("BBufferGroup: placement != B_ANY_ADDRESS && placement != B_ANY_KERNEL_ADDRESS (0x%08lx)\n",placement);
 		placement = B_ANY_ADDRESS;
 	}
 	
@@ -92,7 +92,7 @@ BBufferGroup::BBufferGroup(size_t size,
 
 	buffer_area = create_area("some buffers area", &start_addr,placement,area_size,lock,B_READ_AREA | B_WRITE_AREA);
 	if (buffer_area < B_OK) {
-		TRACE("failed to allocate %ld bytes area\n",area_size);
+		FATAL("BBufferGroup: failed to allocate %ld bytes area\n",area_size);
 		fInitError = (status_t)buffer_area;
 		return;
 	}
@@ -106,13 +106,13 @@ BBufferGroup::BBufferGroup(size_t size,
 		buffer = new BBuffer(bci);
 		if (0 == buffer->Data()) {
 			// BBuffer::Data() will return 0 if an error occured
-			TRACE("error while creating buffer\n");
+			FATAL("BBufferGroup: error while creating buffer\n");
 			delete buffer;
 			fInitError = B_ERROR;
 			break;
 		}
 		if (B_OK != fBufferList->AddBuffer(fReclaimSem,buffer)) {
-			TRACE("error when adding buffer\n");
+			FATAL("BBufferGroup: error when adding buffer\n");
 			delete buffer;
 			fInitError = B_ERROR;
 			break;
@@ -154,13 +154,13 @@ BBufferGroup::BBufferGroup(int32 count,
 		buffer = new BBuffer(bci);
 		if (0 == buffer->Data()) {
 			// BBuffer::Data() will return 0 if an error occured
-			TRACE("error while creating buffer\n");
+			FATAL("BBufferGroup(2): error while creating buffer\n");
 			delete buffer;
 			fInitError = B_ERROR;
 			break;
 		}
 		if (B_OK != fBufferList->AddBuffer(fReclaimSem,buffer)) {
-			TRACE("error when adding buffer\n");
+			FATAL("BBufferGroup(2): error when adding buffer\n");
 			delete buffer;
 			fInitError = B_ERROR;
 			break;
@@ -201,12 +201,12 @@ BBufferGroup::AddBuffer(const buffer_clone_info &info,
 	buffer = new BBuffer(info);
 	if (0 == buffer->Data()) {
 		// BBuffer::Data() will return 0 if an error occured
-		TRACE("error while creating buffer\n");
+		FATAL("BBufferGroup::AddBuffer: error while creating buffer\n");
 		delete buffer;
 		return B_ERROR;
 	}
 	if (B_OK != fBufferList->AddBuffer(fReclaimSem,buffer)) {
-		TRACE("error when adding buffer\n");
+		FATAL("BBufferGroup::AddBuffer:  error when adding buffer\n");
 		delete buffer;
 		fInitError = B_ERROR;
 		return B_ERROR;

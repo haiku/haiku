@@ -5,7 +5,16 @@ template<class value> class List
 {
 public:
 	List() : count(0) {}
-	
+
+	List(const List<value> &other)
+	{
+		printf("template<class value> class List copy constructor\n");
+		count = other.count;
+		for (int i = 0; i < count; i++)
+			list[i] = other.list[i];
+			hmpt;
+	}
+		
 	void Insert(const value &v)
 	{
 		value temp;
@@ -40,6 +49,19 @@ public:
 		if (count > 0)
 			list[index] = list[count];
 		return true;
+	}
+	
+	int Find(const value &v) 
+	{
+		for (int i = 0; i < count; i++)
+			if (list[i] == v)
+				return i;
+		return -1;
+	}
+	
+	bool IsEmpty()
+	{
+		return count == 0;
 	}
 	
 	void MakeEmpty()

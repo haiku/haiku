@@ -241,7 +241,7 @@ _shared_buffer_list::RequestBufferInOtherGroups(sem_id group_reclaim_sem, media_
 				continue;
 
 			if (info[i].reclaimed == false) {
-				TRACE("Error, BBuffer 0x%08x, id = 0x%08x not reclaimed while requesting\n",(int)info[i].buffer,(int)id);
+				FATAL("_shared_buffer_list: Error, BBuffer 0x%08x, id = 0x%08x not reclaimed while requesting\n",(int)info[i].buffer,(int)id);
 				continue;
 			}
 			
@@ -268,7 +268,7 @@ _shared_buffer_list::RecycleBuffer(BBuffer *buffer)
 		if (info[i].id == id) {
 			reclaimed_count++;
 			if (info[i].reclaimed) {
-				TRACE("Error, BBuffer 0x%08x, id = 0x%08x already reclaimed\n",(int)buffer,(int)id);
+				FATAL("_shared_buffer_list: Error, BBuffer 0x%08x, id = 0x%08x already reclaimed\n",(int)buffer,(int)id);
 				continue;
 			}
 			info[i].reclaimed = true;
@@ -279,7 +279,7 @@ _shared_buffer_list::RecycleBuffer(BBuffer *buffer)
 		return B_ERROR;
 	
 	if (reclaimed_count == 0) {
-		TRACE("Error, BBuffer 0x%08x, id = 0x%08x NOT reclaimed\n",(int)buffer,(int)id);
+		FATAL("shared_buffer_list: Error, BBuffer 0x%08x, id = 0x%08x NOT reclaimed\n",(int)buffer,(int)id);
 		return B_ERROR;
 	}
 

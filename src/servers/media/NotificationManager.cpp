@@ -7,7 +7,6 @@
 #include <Message.h>
 #include <Messenger.h>
 #include <MediaNode.h>
-#include <Debug.h>
 #include "debug.h"
 #include "NodeManager.h"
 #include "DataExchange.h"
@@ -205,16 +204,21 @@ NotificationManager::CleanupTeam(team_id team)
 	TRACE("NotificationManager::CleanupTeam team %ld\n", team);
 	fLocker->Lock();
 
+	int debugcount = 0;
 	Notification n;
 	for (int32 index = 0; fNotificationList->GetAt(index, &n); index++) {
 		if (n.team == team) {
 			if (fNotificationList->Remove(index)) {
+				debugcount++;
 				index--;
 			} else {
 				ASSERT(false);
 			}
 		}
 	}
+	
+	if (debugcount != 0)
+		FATAL("NotificationManager::CleanupTeam: removed  %d notifications for team %ld\n", debugcount, team);
 
 	fLocker->Unlock();
 }

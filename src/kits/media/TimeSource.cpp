@@ -126,7 +126,7 @@ BTimeSource::HandleMessage(int32 message,
 						   const void *data,
 						   size_t size)
 {
-	TRACE("BTimeSource::HandleMessage %#lx, node %ld\n", message, fNodeID);
+	INFO("BTimeSource::HandleMessage %#lx, node %ld\n", message, fNodeID);
 	
 	switch (message) {
 		case TIMESOURCE_OP:

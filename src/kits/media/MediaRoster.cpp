@@ -11,8 +11,6 @@
 #include <OS.h>
 #include <String.h>
 #include <TimeSource.h>
-#define	DEBUG 3
-#include <Debug.h>
 #include "debug.h"
 #include "TStack.h"
 #include "PortPool.h"
@@ -114,7 +112,7 @@ GetAllOutputs(const media_node & node, Stack<media_output> *stack)
 			break;
 		cookie = reply.cookie;
 		if (!stack->Push(reply.output)) {
-			TRACE("GetAllOutputs: stack->Push failed\n");
+			FATAL("GetAllOutputs: stack->Push failed\n");
 			result = B_ERROR;
 		}
 	}
@@ -144,7 +142,7 @@ GetAllInputs(const media_node & node, Stack<media_input> *stack)
 			break;
 		cookie = reply.cookie;
 		if (!stack->Push(reply.input)) {
-			TRACE("GetAllInputs: stack->Push failed\n");
+			FATAL("GetAllInputs: stack->Push failed\n");
 			result = B_ERROR;
 		}
 	}
@@ -177,7 +175,7 @@ PublishOutputs(const media_node & node, Stack<media_output> *stack)
 		size = ((count * sizeof(media_output)) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 		request.area = create_area("publish outputs", &start_addr, B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (request.area < B_OK) {
-			TRACE("PublishOutputs: failed to create area, %#lx\n", request.area);
+			FATAL("PublishOutputs: failed to create area, %#lx\n", request.area);
 			return (status_t)request.area;
 		}
 		outputs = static_cast<media_output *>(start_addr);
@@ -221,7 +219,7 @@ PublishInputs(const media_node & node, Stack<media_input> *stack)
 		size = ((count * sizeof(media_input)) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 		request.area = create_area("publish inputs", &start_addr, B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (request.area < B_OK) {
-			TRACE("PublishInputs: failed to create area, %#lx\n", request.area);
+			FATAL("PublishInputs: failed to create area, %#lx\n", request.area);
 			return (status_t)request.area;
 		}
 		inputs = static_cast<media_input *>(start_addr);
@@ -465,11 +463,11 @@ BMediaRoster::Connect(const media_source & from,
 	if (io_format == NULL || out_output == NULL || out_input == NULL)
 		return B_BAD_VALUE;
 	if (from == media_source::null) {
-		TRACE("BMediaRoster::Connect: media_source invalid\n");
+		FATAL("BMediaRoster::Connect: media_source invalid\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 	if (to == media_destination::null) {
-		TRACE("BMediaRoster::Connect: media_destination invalid\n");
+		FATAL("BMediaRoster::Connect: media_destination invalid\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
 
@@ -482,7 +480,7 @@ BMediaRoster::Connect(const media_source & from,
 	request1.format = *io_format;
 	rv = QueryPort(from.port, PRODUCER_FORMAT_PROPOSAL, &request1, sizeof(request1), &reply1, sizeof(reply1));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::FormatProposal, status = %#lx\n",rv);
+		FATAL("BMediaRoster::Connect: aborted after BBufferProducer::FormatProposal, status = %#lx\n",rv);
 		return rv;
 	}
 	// reply1.format now contains the format proposed by the producer
@@ -495,7 +493,7 @@ BMediaRoster::Connect(const media_source & from,
 	request2.format = reply1.format;
 	rv = QueryPort(to.port, CONSUMER_ACCEPT_FORMAT, &request2, sizeof(request2), &reply2, sizeof(reply2));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::Connect: aborted after BBufferConsumer::AcceptFormat, status = %#lx\n",rv);
+		FATAL("BMediaRoster::Connect: aborted after BBufferConsumer::AcceptFormat, status = %#lx\n",rv);
 		return rv;
 	}
 	// reply2.format now contains the format accepted by the consumer
@@ -510,7 +508,7 @@ BMediaRoster::Connect(const media_source & from,
 	strcpy(request3.name, "XXX some default name"); // XXX fix this
 	rv = QueryPort(from.port, PRODUCER_PREPARE_TO_CONNECT, &request3, sizeof(request3), &reply3, sizeof(reply3));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::PrepareToConnect, status = %#lx\n",rv);
+		FATAL("BMediaRoster::Connect: aborted after BBufferProducer::PrepareToConnect, status = %#lx\n",rv);
 		return rv;
 	}
 	// reply3.format is still our pretty media format
@@ -527,7 +525,7 @@ BMediaRoster::Connect(const media_source & from,
 	request4.with_format = reply3.format;
 	con_status = QueryPort(to.port, CONSUMER_CONNECTED, &request4, sizeof(request4), &reply4, sizeof(reply4));
 	if (con_status != B_OK) {
-		TRACE("BMediaRoster::Connect: aborting after BBufferConsumer::Connected, status = %#lx\n",con_status);
+		FATAL("BMediaRoster::Connect: aborting after BBufferConsumer::Connected, status = %#lx\n",con_status);
 		// we do NOT return here!
 	}
 	// con_status contains the status code to be supplied to BBufferProducer::Connect's status argument
@@ -544,11 +542,11 @@ BMediaRoster::Connect(const media_source & from,
 	strcpy(request5.name, reply4.input.name);
 	rv = QueryPort(reply4.input.source.port, PRODUCER_CONNECT, &request5, sizeof(request5), &reply5, sizeof(reply5));
 	if (con_status != B_OK) {
-		TRACE("BMediaRoster::Connect: aborted\n");
+		FATAL("BMediaRoster::Connect: aborted\n");
 		return con_status;
 	}
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::Connect, status = %#lx\n",rv);
+		FATAL("BMediaRoster::Connect: aborted after BBufferProducer::Connect, status = %#lx\n",rv);
 		return rv;
 	}
 	// reply5.name contains the name assigned to the connection by the producer
@@ -601,19 +599,19 @@ BMediaRoster::Disconnect(media_node_id source_nodeid,
 {
 	CALLED();
 	if (source_nodeid <= 0) {
-		TRACE("BMediaRoster::Disconnect: source media_node_id invalid\n");
+		FATAL("BMediaRoster::Disconnect: source media_node_id invalid\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 	if (destination_nodeid <= 0) {
-		TRACE("BMediaRoster::Disconnect: source media_node_id invalid\n");
+		FATAL("BMediaRoster::Disconnect: source media_node_id invalid\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
 	if (source == media_source::null) {
-		TRACE("BMediaRoster::Disconnect: media_source invalid\n");
+		FATAL("BMediaRoster::Disconnect: media_source invalid\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
 	if (destination == media_destination::null) {
-		TRACE("BMediaRoster::Disconnect: media_destination invalid\n");
+		FATAL("BMediaRoster::Disconnect: media_destination invalid\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
 
@@ -643,12 +641,12 @@ BMediaRoster::Disconnect(media_node_id source_nodeid,
 		if (B_OK == GetAllOutputs(sourcenode , &outstack))
 			PublishOutputs(sourcenode , &outstack);
 		ReleaseNode(sourcenode);
-	} else TRACE("BMediaRoster::Disconnect: source GetNodeFor failed\n");
+	} else FATAL("BMediaRoster::Disconnect: source GetNodeFor failed\n");
 	if (B_OK == GetNodeFor(destination_nodeid, &destnode)) {
 		if (B_OK == GetAllInputs(destnode , &instack))
 			PublishInputs(destnode, &instack);
 		ReleaseNode(destnode);
-	} else TRACE("BMediaRoster::Disconnect: dest GetNodeFor failed\n");
+	} else FATAL("BMediaRoster::Disconnect: dest GetNodeFor failed\n");
 	
 
 	// send a notification
@@ -918,7 +916,7 @@ BMediaRoster::GetLiveNodes(live_node_info * out_live_nodes,
 
 	rv = QueryServer(SERVER_GET_LIVE_NODES, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::GetLiveNodes failed\n");
+		FATAL("BMediaRoster::GetLiveNodes failed\n");
 		*io_total_count = 0;
 		return rv;
 	}
@@ -929,7 +927,7 @@ BMediaRoster::GetLiveNodes(live_node_info * out_live_nodes,
 
 		clone = clone_area("live_node_info clone", reinterpret_cast<void **>(&live_info), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, reply.area);
 		if (clone < B_OK) {
-			TRACE("BMediaRoster::GetLiveNodes failed to clone area, %#lx\n", clone);
+			FATAL("BMediaRoster::GetLiveNodes failed to clone area, %#lx\n", clone);
 			delete_area(reply.area);
 			*io_total_count = 0;
 			return B_ERROR;
@@ -1181,7 +1179,7 @@ BMediaRoster::StartWatching(const BMessenger & where)
 {
 	CALLED();
 	if (!where.IsValid()) {
-		TRACE("BMediaRoster::StartWatching: messenger invalid!\n");
+		FATAL("BMediaRoster::StartWatching: messenger invalid!\n");
 		return B_BAD_VALUE;
 	}
 	return BPrivate::media::notifications::Register(where, media_node::null, B_MEDIA_WILDCARD);
@@ -1194,11 +1192,11 @@ BMediaRoster::StartWatching(const BMessenger & where,
 {
 	CALLED();
 	if (!where.IsValid()) {
-		TRACE("BMediaRoster::StartWatching: messenger invalid!\n");
+		FATAL("BMediaRoster::StartWatching: messenger invalid!\n");
 		return B_BAD_VALUE;
 	}
 	if (false == BPrivate::media::notifications::IsValidNotificationRequest(false, notificationType)) {
-		TRACE("BMediaRoster::StartWatching: notificationType invalid!\n");
+		FATAL("BMediaRoster::StartWatching: notificationType invalid!\n");
 		return B_BAD_VALUE;
 	}
 	return BPrivate::media::notifications::Register(where, media_node::null, notificationType);
@@ -1212,15 +1210,15 @@ BMediaRoster::StartWatching(const BMessenger & where,
 {
 	CALLED();
 	if (!where.IsValid()) {
-		TRACE("BMediaRoster::StartWatching: messenger invalid!\n");
+		FATAL("BMediaRoster::StartWatching: messenger invalid!\n");
 		return B_BAD_VALUE;
 	}
 	if (node.node <= 0) {
-		TRACE("BMediaRoster::StartWatching: node invalid!\n");
+		FATAL("BMediaRoster::StartWatching: node invalid!\n");
 		return B_MEDIA_BAD_NODE;
 	}
 	if (false == BPrivate::media::notifications::IsValidNotificationRequest(true, notificationType)) {
-		TRACE("BMediaRoster::StartWatching: notificationType invalid!\n");
+		FATAL("BMediaRoster::StartWatching: notificationType invalid!\n");
 		return B_BAD_VALUE;
 	}
 	return BPrivate::media::notifications::Register(where, node, notificationType);
@@ -1243,7 +1241,7 @@ BMediaRoster::StopWatching(const BMessenger & where,
 	CALLED();
 	// messenger may already be invalid, so we don't check this
 	if (false == BPrivate::media::notifications::IsValidNotificationRequest(false, notificationType)) {
-		TRACE("BMediaRoster::StopWatching: notificationType invalid!\n");
+		FATAL("BMediaRoster::StopWatching: notificationType invalid!\n");
 		return B_BAD_VALUE;
 	}
 	return BPrivate::media::notifications::Unregister(where, media_node::null, notificationType);
@@ -1258,11 +1256,11 @@ BMediaRoster::StopWatching(const BMessenger & where,
 	CALLED();
 	// messenger may already be invalid, so we don't check this
 	if (node.node <= 0) {
-		TRACE("BMediaRoster::StopWatching: node invalid!\n");
+		FATAL("BMediaRoster::StopWatching: node invalid!\n");
 		return B_MEDIA_BAD_NODE;
 	}
 	if (false == BPrivate::media::notifications::IsValidNotificationRequest(true, notificationType)) {
-		TRACE("BMediaRoster::StopWatching: notificationType invalid!\n");
+		FATAL("BMediaRoster::StopWatching: notificationType invalid!\n");
 		return B_BAD_VALUE;
 	}
 	return BPrivate::media::notifications::Unregister(where, node, notificationType);
@@ -1299,7 +1297,7 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 	
 	rv = QueryServer(SERVER_REGISTER_NODE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::RegisterNode: failed to register node %s (error %#lx)\n", node->Name(), rv);
+		FATAL("BMediaRoster::RegisterNode: failed to register node %s (error %#lx)\n", node->Name(), rv);
 		return rv;
 	}
 	
@@ -1349,11 +1347,11 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 		return B_BAD_VALUE;
 	
 	if (node->fRefCount != 0) {
-		TRACE("BMediaRoster::UnregisterNode: Warning node name '%s' has local reference count of %ld\n", node->Name(), node->fRefCount);
+		FATAL("BMediaRoster::UnregisterNode: Warning node name '%s' has local reference count of %ld\n", node->Name(), node->fRefCount);
 		// no return here, we continue and unregister!
 	}
 	if (node->ID() == -2) {
-		TRACE("BMediaRoster::UnregisterNode: Warning node name '%s' already unregistered\n", node->Name());
+		FATAL("BMediaRoster::UnregisterNode: Warning node name '%s' already unregistered\n", node->Name());
 		return B_OK;
 	}
 		
@@ -1369,7 +1367,7 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 
 	rv = QueryServer(SERVER_UNREGISTER_NODE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::UnregisterNode: failed to unregister node name '%s' (error %#lx)\n", node->Name(), rv);
+		FATAL("BMediaRoster::UnregisterNode: failed to unregister node name '%s' (error %#lx)\n", node->Name(), rv);
 		return rv;
 	}
 	
@@ -1856,7 +1854,7 @@ BMediaRoster::NodeIDFor(port_id source_or_destination_port)
 	
 	rv = QueryServer(SERVER_NODE_ID_FOR, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::NodeIDFor: failed (error %#lx)\n", rv);
+		FATAL("BMediaRoster::NodeIDFor: failed (error %#lx)\n", rv);
 		return -1;
 	}
 	
@@ -1886,7 +1884,7 @@ BMediaRoster::GetInstancesFor(media_addon_id addon,
 
 	rv = QueryServer(SERVER_GET_INSTANCES_FOR, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::GetLiveNodes failed\n");
+		FATAL("BMediaRoster::GetLiveNodes failed\n");
 		return rv;
 	}
 

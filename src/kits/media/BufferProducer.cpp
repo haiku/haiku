@@ -6,7 +6,6 @@
 #include <BufferProducer.h>
 #include <BufferGroup.h>
 #include <Buffer.h>
-#define DEBUG 3
 #include "debug.h"
 #include "DataExchange.h"
 
@@ -102,7 +101,7 @@ BBufferProducer::HandleMessage(int32 message,
 							   const void *data,
 							   size_t size)
 {
-	TRACE("BBufferProducer::HandleMessage %#lx, node %ld\n", message, fNodeID);
+	INFO("BBufferProducer::HandleMessage %#lx, node %ld\n", message, fNodeID);
 	status_t rv;
 	switch (message) {
 

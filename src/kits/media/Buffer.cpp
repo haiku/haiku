@@ -217,7 +217,7 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 
 	fArea = clone_area("a cloned BBuffer", &fData, B_ANY_ADDRESS,B_READ_AREA | B_WRITE_AREA,id);
 	if (fArea <= B_OK) {
-		TRACE("buffer cloning failed\n");
+		FATAL("BBuffer::BBuffer: buffer cloning failed\n");
 		fData = 0;
 		return;
 	}

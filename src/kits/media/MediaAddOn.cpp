@@ -6,7 +6,6 @@
 #include <MediaAddOn.h>
 #include <string.h>
 #include <malloc.h>
-#define DEBUG 3
 #include "debug.h"
 #include "DataExchange.h"
 

@@ -10,8 +10,6 @@
 #include <Path.h>
 #include <Directory.h>
 #include <Looper.h>
-#define DEBUG 1
-#include <Debug.h>
 #include "debug.h"
 #include "TMap.h"
 #include "ServerInterface.h"
@@ -99,7 +97,7 @@ MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 			BMediaAddOn *addon;
 			addon = _DormantNodeManager->GetAddon(command->addonid);
 			if (!addon) {
-				printf("rescan flavors: Can't find a addon object for id %d\n",(int)command->addonid);
+				FATAL("rescan flavors: Can't find a addon object for id %d\n",(int)command->addonid);
 				break;
 			}
 			ScanAddOnFlavors(addon);
@@ -108,7 +106,7 @@ MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 		}
 
 		default:
-			printf("media_addon_server: received unknown message code %#08lx\n",code);
+			FATAL("media_addon_server: received unknown message code %#08lx\n",code);
 	}
 }
 
@@ -137,7 +135,7 @@ MediaAddonServer::ReadyToRun()
 	request.team = BPrivate::media::team;
 	result = QueryServer(SERVER_REGISTER_ADDONSERVER, &request, sizeof(request), &reply, sizeof(reply));
 	if (result != B_OK) {
-		printf("Communication with server failed. Terminating.\n");
+		FATAL("Communication with server failed. Terminating.\n");
 		PostMessage(B_QUIT_REQUESTED);
 		return;
 	}
@@ -173,11 +171,11 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	ASSERT(addon);
 	ASSERT(addon->AddonID() > 0);
 	
-	printf("MediaAddonServer::ScanAddOnFlavors: id %ld\n",addon->AddonID());
+	TRACE("MediaAddonServer::ScanAddOnFlavors: id %ld\n",addon->AddonID());
 	
 	port = find_port("media_server port");
 	if (port <= B_OK) {
-		printf("couldn't find media_server port\n");
+		FATAL("couldn't find media_server port\n");
 		return;
 	}
 	
@@ -192,18 +190,20 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	newflavorcount = addon->CountFlavors();
 	*flavorcount = newflavorcount;
 	
-	printf("%ld old flavors, %ld new flavors\n", oldflavorcount, newflavorcount);
+	TRACE("%ld old flavors, %ld new flavors\n", oldflavorcount, newflavorcount);
 
 	// during the first update (i == 0), the server removes old dormant_flavor_infos
 	for (int i = 0; i < newflavorcount; i++) {
 		const flavor_info *info;
-		printf("flavor %d:\n",i);
+		TRACE("flavor %d:\n",i);
 		if (B_OK != addon->GetFlavorAt(i, &info)) {
-			printf("failed!\n");
+			FATAL("MediaAddonServer::ScanAddOnFlavors GetFlavorAt failed for index %d!\n", i);
 			continue;
 		}
 		
-		DumpFlavorInfo(info);
+		#if DEBUG >= 3
+		  DumpFlavorInfo(info);
+		#endif
 		
 		dormant_flavor_info dfi;
 		dfi = *info;
@@ -231,7 +231,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 
 		rv = write_port(port, SERVER_REGISTER_DORMANT_NODE, msg, msgsize);
 		if (rv != B_OK) {
-			printf("MediaAddonServer::ScanAddOnFlavors: couldn't register dormant node\n");
+			FATAL("MediaAddonServer::ScanAddOnFlavors: couldn't register dormant node\n");
 		}
 
 		free(msg);
@@ -246,25 +246,25 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 void 
 MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 {
-	printf("\n\nMediaAddonServer::AddOnAdded: path %s\n",path);
+	TRACE("\n\nMediaAddonServer::AddOnAdded: path %s\n",path);
 
 	BMediaAddOn *addon;
 	media_addon_id id;
 
 	id = _DormantNodeManager->RegisterAddon(path);
 	if (id <= 0) {
-		printf("MediaAddonServer::AddOnAdded: failed to register add-on\n");
+		FATAL("MediaAddonServer::AddOnAdded: failed to register add-on %s\n", path);
 		return;
 	}
 	
 	addon = _DormantNodeManager->GetAddon(id);
 	if (addon == NULL) {
-		printf("MediaAddonServer::AddOnAdded: failed to get add-on\n");
+		FATAL("MediaAddonServer::AddOnAdded: failed to get add-on %s\n", path);
 		_DormantNodeManager->UnregisterAddon(id);
 		return;
 	}
 
-	printf("MediaAddonServer::AddOnAdded: loading finished, id %d\n",(int)id);
+	TRACE("MediaAddonServer::AddOnAdded: loading finished, id %d\n",(int)id);
 
 	filemap->Insert(file_node, id);
 	flavorcountmap->Insert(id, 0);
@@ -272,7 +272,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 	ScanAddOnFlavors(addon);
 	
 	if (addon->WantsAutoStart())
-		printf("#### WantsAutoStart!\n");
+		TRACE("#### WantsAutoStart!\n");
 
 /*
  * the mixer (which we can't load because of unresolved symbols)
@@ -327,7 +327,7 @@ MediaAddonServer::AddOnRemoved(ino_t file_node)
 {	
 	media_addon_id id;
 	if (!filemap->Get(file_node,&id)) {
-		printf("MediaAddonServer::AddOnRemoved: inode %Ld removed, but no media add-on found\n",file_node);
+		FATAL("MediaAddonServer::AddOnRemoved: inode %Ld removed, but no media add-on found\n", file_node);
 		return;
 	}
 	filemap->Remove(file_node);
@@ -425,7 +425,7 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 			break;
 		}
 	}
-	printf("Unhandled message:\n");
+	printf("MediaAddonServer: Unhandled message:\n");
 	msg->PrintToStream();
 }
 

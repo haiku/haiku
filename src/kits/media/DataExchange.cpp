@@ -60,7 +60,7 @@ status_t SendToServer(BMessage *msg)
 	status_t rv;
 	rv = MediaServerMessenger->SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
 	if (rv != B_OK)
-		TRACE("SendToServer: SendMessage failed\n");
+		FATAL("SendToServer: SendMessage failed\n");
 	return rv;
 }
 
@@ -70,7 +70,7 @@ status_t QueryServer(BMessage *request, BMessage *reply)
 	status_t rv;
 	rv = MediaServerMessenger->SendMessage(request, reply, TIMEOUT, TIMEOUT);
 	if (rv != B_OK)
-		TRACE("QueryServer: SendMessage failed\n");
+		FATAL("QueryServer: SendMessage failed\n");
 	return rv;
 }
 
@@ -106,7 +106,7 @@ status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size
 	status_t rv;
 	rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
 	if (rv != B_OK)
-		TRACE("SendToPort: write_port failed, port %ld, error %#lx (%s)\n", sendport, rv, strerror(rv));
+		FATAL("SendToPort: write_port failed, port %ld, error %#lx (%s)\n", sendport, rv, strerror(rv));
 	return B_OK;
 }
 
@@ -120,7 +120,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 
 	rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
 	if (rv != B_OK) {
-		TRACE("QueryPort: write_port failed, port %ld, error %#lx (%s)\n", requestport, rv, strerror(rv));
+		FATAL("QueryPort: write_port failed, port %ld, error %#lx (%s)\n", requestport, rv, strerror(rv));
 		_PortPool->PutPort(request->reply_port);
 		return rv;
 	}
@@ -129,7 +129,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 	_PortPool->PutPort(request->reply_port);
 
 	if (rv < B_OK)
-		TRACE("QueryPort: read_port failed, port %ld, error %#lx (%s)\n", request->reply_port, rv, strerror(rv));
+		FATAL("QueryPort: read_port failed, port %ld, error %#lx (%s)\n", request->reply_port, rv, strerror(rv));
 	
 	return (rv < B_OK) ? rv : reply->result;
 }

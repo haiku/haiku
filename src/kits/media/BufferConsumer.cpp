@@ -8,7 +8,6 @@
 #include <BufferGroup.h>
 #include <Buffer.h>
 #include <malloc.h>
-#define DEBUG 3
 #include "debug.h"
 #include "DataExchange.h"
 #include "BufferIdCache.h"
@@ -328,7 +327,7 @@ BBufferConsumer::HandleMessage(int32 message,
 							   const void *data,
 							   size_t size)
 {
-	TRACE("BBufferConsumer::HandleMessage %#lx, node %ld\n", message, ID());
+	INFO("BBufferConsumer::HandleMessage %#lx, node %ld\n", message, ID());
 	status_t rv;
 	switch (message) {
 		case CONSUMER_ACCEPT_FORMAT:

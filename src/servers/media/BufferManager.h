@@ -4,6 +4,9 @@
  */
 struct _shared_buffer_list;
 
+#include <TMap.h>
+#include <TList.h>
+
 class BufferManager
 {
 public:
@@ -25,25 +28,20 @@ public:
 	void 		PrintToStream();
 
 private:
-	struct _team_list 
+	struct buffer_info
 	{
-		struct _team_list *next;
-		team_id team;
-	};
-	struct _buffer_list
-	{
-		struct _buffer_list *next;
 		media_buffer_id id;
 		area_id area;
 		size_t offset;
 		size_t size;
 		int32 flags;
-		_team_list *teams;
+		List<team_id> teams;
 	};
+	
 	_shared_buffer_list *	fSharedBufferList;
-	area_id					fAreaId;
-	_buffer_list *			fBufferList;
-	BLocker *				fLocker;
+	area_id					fSharedBufferListId;
 	media_buffer_id			fNextBufferId;
+	BLocker *				fLocker;
+	Map<media_buffer_id, buffer_info> *fBufferInfoMap;
 };
 

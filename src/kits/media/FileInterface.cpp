@@ -4,7 +4,6 @@
  *  DESCR: 
  ***********************************************************************/
 #include <FileInterface.h>
-#define DEBUG 3
 #include "debug.h"
 
 /*************************************************************
@@ -40,7 +39,7 @@ BFileInterface::HandleMessage(int32 message,
 							  const void *data,
 							  size_t size)
 {
-	TRACE("BFileInterface::HandleMessage %#lx, node %ld\n", message, ID());
+	INFO("BFileInterface::HandleMessage %#lx, node %ld\n", message, ID());
 
 	return B_OK;
 }

@@ -10,8 +10,6 @@
 #include <Messenger.h>
 #include <MediaDefs.h>
 #include <MediaAddOn.h>
-#define DEBUG 3
-#include <Debug.h>
 #include "debug.h"
 #include "NodeManager.h"
 
@@ -69,15 +67,15 @@ NodeManager::UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team
 	TRACE("NodeManager::UnregisterNode enter: node %ld, team %ld\n", nodeid, team);
 	b = fRegisteredNodeMap->GetPointer(nodeid, &rn);
 	if (!b) {
-		TRACE("!!! NodeManager::UnregisterNode: Error: couldn't finde node %ld (team %ld)\n", nodeid, team);
+		FATAL("!!! NodeManager::UnregisterNode: Error: couldn't finde node %ld (team %ld)\n", nodeid, team);
 		return B_ERROR;
 	}
 	if (rn->team != team) {
-		TRACE("!!! NodeManager::UnregisterNode: Error: team %ld tried to unregister node %ld, but it was instantiated by team %ld\n", team, nodeid, rn->team);
+		FATAL("!!! NodeManager::UnregisterNode: Error: team %ld tried to unregister node %ld, but it was instantiated by team %ld\n", team, nodeid, rn->team);
 		return B_ERROR;
 	}
 	if (rn->globalrefcount != 1) {
-		TRACE("!!! NodeManager::UnregisterNode: Error: node %ld, team %ld, globalrefcount %ld\n", nodeid, team, rn->globalrefcount);
+		FATAL("!!! NodeManager::UnregisterNode: Error: node %ld, team %ld, globalrefcount %ld\n", nodeid, team, rn->globalrefcount);
 		//return B_ERROR;
 	}
 	*addon_id = rn->addon_id;
@@ -97,7 +95,7 @@ NodeManager::IncrementGlobalRefCount(media_node_id nodeid, team_id team)
 	TRACE("NodeManager::IncrementGlobalRefCount enter: node %ld, team %ld\n", nodeid, team);
 	b = fRegisteredNodeMap->GetPointer(nodeid, &rn);
 	if (!b) {
-		TRACE("!!! NodeManager::IncrementGlobalRefCount: Error: node %ld not found\n", nodeid);
+		FATAL("!!! NodeManager::IncrementGlobalRefCount: Error: node %ld not found\n", nodeid);
 		return B_ERROR;
 	}
 	int32 *count;
@@ -126,13 +124,13 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 	TRACE("NodeManager::DecrementGlobalRefCount enter: node %ld, team %ld\n", nodeid, team);
 	b = fRegisteredNodeMap->GetPointer(nodeid, &rn);
 	if (!b) {
-		TRACE("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld not found\n", nodeid);
+		FATAL("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld not found\n", nodeid);
 		return B_ERROR;
 	}
 	int32 *count;
 	b = rn->teamrefcount.GetPointer(team, &count);
 	if (!b) {
-		TRACE("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld has no team %ld references\n", nodeid, team);
+		FATAL("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld has no team %ld references\n", nodeid, team);
 		return B_ERROR;
 	}
 	*count -= 1;
@@ -156,13 +154,13 @@ NodeManager::GetCloneForId(media_node *node, media_node_id nodeid, team_id team)
 	TRACE("NodeManager::GetCloneForId enter: node %ld team %ld\n", nodeid, team);
 
 	if (B_OK != IncrementGlobalRefCount(nodeid, team)) {
-		TRACE("!!! NodeManager::GetCloneForId: Error: couldn't increment ref count, node %ld team %ld\n", nodeid, team);
+		FATAL("!!! NodeManager::GetCloneForId: Error: couldn't increment ref count, node %ld team %ld\n", nodeid, team);
 		return B_ERROR;
 	}
 
 	b = fRegisteredNodeMap->GetPointer(nodeid, &rn);
 	if (!b) {
-		TRACE("!!! NodeManager::GetCloneForId: Error: node %ld not found\n", nodeid);
+		FATAL("!!! NodeManager::GetCloneForId: Error: node %ld not found\n", nodeid);
 		return B_ERROR;
 	}
 
@@ -179,7 +177,7 @@ status_t
 NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_type type, team_id team)
 {
 	BAutolock lock(fLocker);
-	TRACE("!!! NodeManager::GetClone not implemented\n");
+	FATAL("!!! NodeManager::GetClone not implemented\n");
 	*node = media_node::null;
 	return B_ERROR;
 }
@@ -191,7 +189,7 @@ NodeManager::ReleaseNode(const media_node &node, team_id team)
 	BAutolock lock(fLocker);
 	TRACE("NodeManager::ReleaseNode enter: node %ld team %ld\n", node.node, team);
 	if (B_OK != DecrementGlobalRefCount(node.node, team)) {
-		TRACE("!!! NodeManager::ReleaseNode: Error: couldn't decrement node %ld team %ld ref count\n", node.node, team);
+		FATAL("!!! NodeManager::ReleaseNode: Error: couldn't decrement node %ld team %ld ref count\n", node.node, team);
 	}
 	TRACE("NodeManager::ReleaseNode leave: node %ld team %ld\n", node.node, team);
 	return B_OK;
@@ -206,7 +204,7 @@ NodeManager::PublishInputs(const media_node &node, const media_input *inputs, in
 	bool b;
 	b = fRegisteredNodeMap->GetPointer(node.node, &rn);
 	if (!b) {
-		TRACE("!!! NodeManager::PublishInputs: Error: node %ld not found\n", node.node);
+		FATAL("!!! NodeManager::PublishInputs: Error: node %ld not found\n", node.node);
 		return B_ERROR;
 	}
 	rn->inputlist.MakeEmpty();
@@ -224,7 +222,7 @@ NodeManager::PublishOutputs(const media_node &node, const media_output *outputs,
 	bool b;
 	b = fRegisteredNodeMap->GetPointer(node.node, &rn);
 	if (!b) {
-		TRACE("!!! NodeManager::PublishOutputs: Error: node %ld not found\n", node.node);
+		FATAL("!!! NodeManager::PublishOutputs: Error: node %ld not found\n", node.node);
 		return B_ERROR;
 	}
 	rn->outputlist.MakeEmpty();
@@ -262,7 +260,7 @@ NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
 			}
 		}
 	}
-	TRACE("!!! NodeManager::FindNodeId failed, port %ld\n", port);
+	FATAL("!!! NodeManager::FindNodeId failed, port %ld\n", port);
 	return B_ERROR;
 }
 
@@ -283,7 +281,7 @@ NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
 			return B_OK;
 		}
 	}
-	TRACE("!!! NodeManager::GetLiveNodeInfo failed, node %ld\n", node.node);
+	FATAL("!!! NodeManager::GetLiveNodeInfo failed, node %ld\n", node.node);
 	return B_ERROR;
 }
 
@@ -387,7 +385,7 @@ NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &
 			return B_OK;
 		}
 	}
-	TRACE("!!! NodeManager::GetDormantNodeInfo failed, node %ld\n", node.node);
+	FATAL("!!! NodeManager::GetDormantNodeInfo failed, node %ld\n", node.node);
 	return B_ERROR;
 }
 
@@ -527,4 +525,5 @@ void
 NodeManager::CleanupTeam(team_id team)
 {
 	BAutolock lock(fLocker);
+	FATAL("NodeManager::CleanupTeam: should cleanup team %ld\n", team);
 }

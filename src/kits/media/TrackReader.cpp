@@ -63,7 +63,7 @@ BTrackReader::BTrackReader(BFile *file, media_raw_audio_format const &format) :
 	
 	int count = fMediaFile->CountTracks();
 	if (count == 0) {
-		TRACE("no tracks in file\n");
+		FATAL("BTrackReader: no tracks in file\n");
 		return;
 	}
 
@@ -84,7 +84,7 @@ BTrackReader::BTrackReader(BFile *file, media_raw_audio_format const &format) :
 		fMediaFile->ReleaseTrack(track);
 	}
 	if (audiotrack == 0) {
-		TRACE("no audio track in file\n");
+		FATAL("BTrackReader: no audio track in file\n");
 		return;
 	}
 	
@@ -135,7 +135,7 @@ BTrackReader::SetToTrack(BMediaTrack *track)
 	}
 
 	//we have failed
-	TRACE("BTrackReader::SetToTrack failed\n");
+	FATAL("BTrackReader::SetToTrack failed\n");
 }
 
 BTrackReader::~BTrackReader()
