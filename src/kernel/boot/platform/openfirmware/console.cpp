@@ -22,7 +22,6 @@ class ConsoleHandle : public Handle {
 
 static ConsoleHandle sInput, sOutput;
 FILE *stdin, *stdout, *stderr;
-int gChosen;
 
 
 ConsoleHandle::ConsoleHandle()
@@ -53,10 +52,6 @@ ConsoleHandle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t buffe
 status_t
 console_init(void)
 {
-	gChosen = of_finddevice("/chosen");
-	if (gChosen == OF_FAILED)
-		return B_ERROR;
-
 	int input, output;
 	if (of_getprop(gChosen, "stdin", &input, sizeof(int)) == OF_FAILED)
 		return B_ERROR;
