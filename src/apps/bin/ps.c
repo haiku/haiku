@@ -32,8 +32,7 @@ int main(int argc, char **argv)
 	system_info sysinfo;
 	char *string_to_match; // match this in team name
 
-	if (argc == 2)
-		string_to_match = argv[1];
+	string_to_match = (argc == 2) ? argv[1] : NULL;
 	puts("");
 	puts(PS_HEADER);
 	puts(PS_SEP);
