@@ -35,16 +35,17 @@ dprintf("DEV: looking at directory %s\n", *ptr);
 		fd = sys_open(*ptr, STREAM_TYPE_DIR, 0);
 		if(fd >= 0) {
 			ssize_t len;
-			char buf[SYS_MAX_NAME_LEN];
+			char buf[SYS_MAX_NAME_LEN + sizeof(struct dirent) + 1];
+			struct dirent *dirent = (struct dirent *)buf;
 
-			while((len = sys_read(fd, buf, 0, sizeof(buf))) > 0) {
-				dprintf("loading '%s' dev module\n", buf);
-				dev_load_dev_module(buf, *ptr);
+			while ((len = sys_read_dir(fd, dirent, sizeof(buf), 1)) > 0) {
+				dprintf("loading '%s' dev module\n", dirent->d_name);
+				dev_load_dev_module(dirent->d_name, *ptr);
 			}
 			sys_close(fd);
 		}
 	}
-	
+
 	return 0;
 }
 
