@@ -28,6 +28,7 @@ status_t vm_init_post_sem(struct kernel_args *args);
 status_t vm_init_post_thread(struct kernel_args *args);
 status_t vm_aspace_init(void);
 status_t vm_aspace_init_post_sem(void);
+void vm_free_kernel_args(kernel_args *args);
 void vm_free_unused_boot_loader_range(addr_t start, addr_t end);
 
 void vm_delete_aspace(vm_address_space *aspace);
