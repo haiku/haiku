@@ -71,6 +71,7 @@ extern status_t notify_select_event(struct selectsync *sync, uint32 ref, uint8 e
 /* calls needed by the VM for paging */
 int vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode);
 status_t vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode);
+status_t vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode);
 int vfs_put_vnode_ptr(void *vnode);
 void vfs_vnode_acquire_ref(void *vnode);
 void vfs_vnode_release_ref(void *vnode);
