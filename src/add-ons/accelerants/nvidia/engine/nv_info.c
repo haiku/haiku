@@ -21,6 +21,7 @@ static void getstrap_arch_nv10_20_30(void);
 static status_t pins2_read(uint8 *rom, uint32 offset);
 static status_t pins3_6_read(uint8 *rom, uint32 offset);
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size, uint16 ram_tab);
+static status_t coldstart_card_516_up(uint8* rom, uint16 init, uint16 ram_tab);
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
@@ -125,7 +126,7 @@ static status_t pins2_read(uint8 *rom, uint32 offset)
 	char* product_name = &(rom[(rom[offset + 42] + (rom[offset + 43] * 256))]);
 	char* product_rev  = &(rom[(rom[offset + 44] + (rom[offset + 45] * 256))]);
 
-	LOG(8,("INFO: init_1 $%04x, init_2 $%04x, size $%04x\n", init1, init2, init_size));
+	LOG(8,("INFO: cmdlist 1: $%04x, 2: $%04x, max. size $%04x\n", init1, init2, init_size));
 	LOG(8,("INFO: signon msg:\n%s\n", signon_msg));
 	LOG(8,("INFO: vendor name: %s\n", vendor_name));
 	LOG(8,("INFO: product name: %s\n", product_name));
@@ -146,34 +147,48 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 	char* product_name = &(rom[(rom[offset + 48] + (rom[offset + 49] * 256))]);
 	char* product_rev  = &(rom[(rom[offset + 50] + (rom[offset + 51] * 256))]);
 
-	LOG(8,("INFO: init_1 $%04x, init_2 $%04x, size $%04x\n", init1, init2, init_size));
+	LOG(8,("INFO: pre PINS 5.16 cmdlist 1: $%04x, 2: $%04x, max. size $%04x\n", init1, init2, init_size));
 	LOG(8,("INFO: signon msg:\n%s\n", signon_msg));
 	LOG(8,("INFO: vendor name: %s\n", vendor_name));
 	LOG(8,("INFO: product name: %s\n", product_name));
 	LOG(8,("INFO: product rev: %s\n", product_rev));
 
-	/* pins 5.16 and higher only contain PLL VCO range info */
+	//fixme: extract RAM and core speeds from startscripts..
+	//fixme: add 'parsing scripts while not actually executing' as warmstart method,
+	//       instead of not parsing at all: this will update the driver's speeds
+	//       as below, while logging the scripts as well (for our learning pleasure :)
+
+	/* pins 5.16 and higher is more extensive, and works differently from before */
 	if (((rom[offset + 5]) >= 5) && ((rom[offset + 6]) >= 0x10))
 	{
+		/* get PLL VCO range info */
 		uint32 fvco_max = *((uint32*)(&(rom[offset + 67])));
 		uint32 fvco_min = *((uint32*)(&(rom[offset + 71])));
 
 		LOG(8,("INFO: PLL VCO range is %dkHz - %dkHz\n", fvco_min, fvco_max));
 
 		/* modify presets to reflect card capability */
-//		si->ps.min_video_vco = fvco_min / 1000;
-//		si->ps.max_video_vco = fvco_max / 1000;
+		//fixme: setup and modify PLL code...
+		//si->ps.min_system_vco = fvco_min / 1000;
+		//si->ps.max_system_vco = fvco_max / 1000;
+		//si->ps.min_pixel_vco = fvco_min / 1000;
+		//si->ps.max_pixel_vco = fvco_max / 1000;
+		//si->ps.min_video_vco = fvco_min / 1000;
+		//si->ps.max_video_vco = fvco_max / 1000;
 
-		/* only pins 5 contains this info */
-		//fixme: not finished..
-/*		if ((rom[offset + 5]) == 5)
-		{
-			uint16 IOFlagConditionTablePointer =
-				rom[offset + 85] + (rom[offset + 86] * 256);
-		}
-*/	}
-
-	return coldstart_card(rom, init1, init2, init_size, ram_tab);
+		/* pins 5.16 and up have a more extensive command list table, and have more
+		 * commands to choose from as well. */
+		//fixme: how about pins 6???
+		init1 = rom[offset + 75] + (rom[offset + 76] * 256);
+		LOG(8,("INFO: PINS 5.16 and later cmdlist pointer: $%04x\n", init1));
+		return coldstart_card_516_up(rom, init1, ram_tab);
+	}
+	else
+	{
+		/* pre 'pins 5.16' still uses the 'old' method in which the command list
+		 * table always has two entries. */
+		return coldstart_card(rom, init1, init2, init_size, ram_tab);
+	}
 }
 
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size, uint16 ram_tab)
@@ -224,6 +239,87 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 			if (exec_type1_script(rom, init1, &size, ram_tab) != B_OK) result = B_ERROR;
 		if (init2 && (result == B_OK))
 			if (exec_type1_script(rom, init2, &size, ram_tab) != B_OK) result = B_ERROR;
+
+		/* now enable ROM shadow or the card will remain shut-off! */
+		NV_REG32(0x00001800 + NVCFG_ROMSHADOW) |= 0x00000001;
+
+		//temporary: should be called from setmode probably..
+		nv_crtc_setup_fifo();
+	}
+	else
+	{
+		result = B_ERROR;
+	}
+
+	if (result != B_OK)
+		LOG(8,("INFO: coldstart failed.\n"));
+	else
+		LOG(8,("INFO: coldstart execution completed OK.\n"));
+
+	return result;
+}
+
+static status_t coldstart_card_516_up(uint8* rom, uint16 init, uint16 ram_tab)
+{
+	status_t result = B_OK;
+	uint16 adress;
+
+	LOG(8,("INFO: executing coldstart...\n"));
+
+	/* select colormode CRTC registers base adresses */
+	NV_REG8(NV8_MISCW) = 0xcb;
+
+	/* unknown.. */
+	NV_REG8(NV8_VSE2) = 0x01;
+
+	/* enable access to primary head */
+	set_crtc_owner(0);
+	/* unlock head's registers for R/W access */
+	CRTCW(LOCK, 0x57);
+	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+	/* disable RMA as it's not used */
+	/* (RMA is the cmd register for the 32bit port in the GPU to access 32bit registers
+	 *  and framebuffer via legacy ISA I/O space.) */
+	CRTCW(RMA, 0x00);
+
+	if (si->ps.secondary_head)
+	{
+		/* enable access to secondary head */
+		set_crtc_owner(1);
+		/* unlock head's registers for R/W access */
+		CRTC2W(LOCK, 0x57);
+		CRTC2W(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+	}
+
+	/* turn off both displays and the hardcursors (also disables transfers) */
+	nv_crtc_dpms(false, false, false);
+	nv_crtc_cursor_hide();
+	if (si->ps.secondary_head)
+	{
+		nv_crtc2_dpms(false, false, false);
+		nv_crtc2_cursor_hide();
+	}
+
+	/* execute all BIOS coldstart script(s) */
+	if (init)
+	{
+		//fixme: setup new parser instead of misusing the old one...
+		int16 size = 32767;
+		
+		adress = *((uint16*)(&(rom[init])));
+		if (!adress)
+		{
+			LOG(8,("INFO: no cmdlist found!\n"));
+			result = B_ERROR;
+		}
+
+		while (adress && (result == B_OK))
+		{
+			result = exec_type1_script(rom, adress, &size, ram_tab);
+			/* next command script, please */
+			init += 2;
+			adress = *((uint16*)(&(rom[init])));
+		}
 
 		/* now enable ROM shadow or the card will remain shut-off! */
 		NV_REG32(0x00001800 + NVCFG_ROMSHADOW) |= 0x00000001;
