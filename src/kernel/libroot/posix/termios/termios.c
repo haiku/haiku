@@ -75,3 +75,36 @@ tcsendbreak(int fd, int duration)
 	return 0;
 }
 
+
+
+/*
+ * The following four "speed control" functions are not supported
+ * in the BeOS. But the interface is still part of the Posix
+ * terminal IO specification, so they are implemented here as
+ * stub functions for basic compliance.
+ */
+
+speed_t
+cfgetispeed(const struct termios *term)
+{
+	return (speed_t)0;
+}
+
+int
+cfsetispeed( struct termios *term, speed_t speed)
+{
+	return 0;
+}
+
+speed_t
+cfgetospeed(const struct termios *term)
+{
+	return (speed_t)0;
+}
+
+int
+cfsetospeed( struct termios *term, speed_t speed)
+{
+	return 0;
+}
+
