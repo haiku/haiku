@@ -1658,7 +1658,7 @@ vm_area_for(aspace_id aid, addr_t address)
 		if (area->id == RESERVED_REGION_ID)
 			continue;
 
-		if (address >= area->base && address <= area->base + area->size) {
+		if (address >= area->base && address < area->base + area->size) {
 			id = area->id;
 			break;
 		}
