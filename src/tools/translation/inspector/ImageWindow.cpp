@@ -44,8 +44,8 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	// Setup menu bar
 	BRect rctbar(0, 0, 100, 10);
 	BMenuBar *pbar = new BMenuBar(rctbar, "MenuBar");
-	BMenu *pmnufile = new BMenu("File");
 	
+	BMenu *pmnufile = new BMenu("File");
 	BMenuItem *pitmopen = new BMenuItem("Open...",
 		new BMessage(M_OPEN_IMAGE), 'O', 0);
 		
@@ -60,6 +60,15 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	pmnufile->AddSeparatorItem();
 	pmnufile->AddItem(pitmquit);
 	pbar->AddItem(pmnufile);
+	
+	BMenu *pmnuwindow = new BMenu("Window");
+	BMenuItem *pitminfo = new BMenuItem("Info",
+		new BMessage(M_INFO_WINDOW), 'I', 0);
+	pitminfo->SetTarget(be_app);
+	
+	pmnuwindow->AddItem(pitminfo);
+	pbar->AddItem(pmnuwindow);		
+	
 	AddChild(pbar);
 	
 	// Setup image view
@@ -74,7 +83,8 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	
 	// Setup file open panel
 	fpopenPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this),
-		(const entry_ref*)NULL, 0L, false, new BMessage(M_OPEN_FILE_PANEL), NULL, false, true);
+		(const entry_ref *)NULL, 0L, false, new BMessage(M_OPEN_FILE_PANEL),
+		NULL, false, true);
 		
 	SetSizeLimits(200, 10000, 150, 10000);
 }

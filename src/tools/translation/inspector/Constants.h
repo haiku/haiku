@@ -32,14 +32,14 @@
 #define MESSAGES_H
 
 // BMessage 'what' values
-
 #define M_OPEN_IMAGE				'opim'
 #define M_SAVE_IMAGE				'saim'
 #define M_OPEN_FILE_PANEL			'ofpl'
+#define M_INFO_WINDOW				'infw'
+#define M_INFO_WINDOW_QUIT			'infq'
 
 
 // String constants
-
 #define APP_SIG				"application/x-vnd.OBOS-Inspector"
 #define IMAGEWINDOW_TITLE	"Inspector"
 

@@ -38,10 +38,32 @@
 InspectorApp::InspectorApp()
 	: BApplication(APP_SIG)
 {
+	fpinfowin = NULL;
+	
 	// Show application window
 	BRect rect(100, 100, 500, 400);
 	ImageWindow *pwin = new ImageWindow(rect, IMAGEWINDOW_TITLE);
 	pwin->Show();
+}
+
+void
+InspectorApp::MessageReceived(BMessage *pmsg)
+{
+	switch (pmsg->what) {
+		case M_INFO_WINDOW:
+			if (!fpinfowin)
+				fpinfowin = new InfoWindow(
+					BRect(50, 50, 150, 150), "Info Win");
+			break;
+			
+		case M_INFO_WINDOW_QUIT:
+			fpinfowin = NULL;
+			break;
+			
+		default:
+			BApplication::MessageReceived(pmsg);
+			break;
+	}
 }
 
 void

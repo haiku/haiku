@@ -1,11 +1,11 @@
 /*****************************************************************************/
-// ImageWindow
+// InfoWindow
 // Written by Michael Wilber, OBOS Translation Kit Team
 //
-// ImageWindow.h
+// InfoWindow.h
 //
-// BWindow class for displaying an image.  Uses ImageView class for its
-// view. 
+// BWindow class for displaying information about the currently open
+// document 
 //
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -29,23 +29,22 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef IMAGEWINDOW_H
-#define IMAGEWINDOW_H
+#ifndef INFOWINDOW_H
+#define INFOWINDOW_H
 
 #include <Window.h>
-#include <FilePanel.h>
-#include "ImageView.h"
+#include <TextView.h>
 
-class ImageWindow : public BWindow {
+class InfoWindow : public BWindow {
 public:
-	ImageWindow(BRect rect, const char *name);
-	~ImageWindow();
+	InfoWindow(BRect rect, const char *name);
+	~InfoWindow();
+	void FrameResized(float width, float height);
 	void MessageReceived(BMessage *pmsg);
-	bool QuitRequested();
+	void Quit();
 	
 private:
-	BFilePanel *fpopenPanel;
-	ImageView *fpimageView;
+	BTextView *fptextView;
 };
 
-#endif // #ifndef IMAGEWINDOW_H
+#endif // #ifndef INFOWINDOW_H

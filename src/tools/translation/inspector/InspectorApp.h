@@ -33,12 +33,17 @@
 #ifndef INSPECTORAPP_H
 #define INSPECTORAPP_H
 
+#include "InfoWindow.h"
 #include <Application.h>
 
 class InspectorApp : public BApplication {
 public:
 	InspectorApp();
+	void MessageReceived(BMessage *pmsg);
 	void RefsReceived(BMessage *pmsg);
+	
+private:
+	InfoWindow *fpinfowin;
 };
 
 #endif // #ifndef INSPECTORAPP_H
