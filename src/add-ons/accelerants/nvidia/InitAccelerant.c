@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-5/2004.
+	Rudolf Cornelissen 10/2002-6/2004.
 */
 
 #define MODULE_BIT 0x00800000
@@ -177,12 +177,13 @@ status_t INIT_ACCELERANT(int the_fd) {
 	/* bail out if something failed */
 	if (result != B_OK) goto error1;
 
-	/* initialise various cursor stuff*/
+	/* initialise various cursor stuff */
 	head1_cursor_init();
 	if (si->ps.secondary_head) head2_cursor_init();
 
 	/* ensure cursor state */
-	SHOW_CURSOR(false);
+	head1_cursor_hide();
+	if (si->ps.secondary_head) head2_cursor_hide();
 
 	/* a winner! */
 	result = B_OK;

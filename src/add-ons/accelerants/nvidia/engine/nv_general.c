@@ -823,9 +823,16 @@ return nv_general_bios_to_powergraphics();
 
 	/*power up the PLLs,LUT,DAC*/
 	LOG(2,("INIT: PLL/LUT/DAC powerup\n"));
-	/* turn off both displays and the hardcursor (also disables transfers) */
+
+	/* turn off both displays and the hardcursors (also disables transfers) */
 	head1_dpms(false, false, false);
 	head1_cursor_hide();
+	if (si->ps.secondary_head)
+	{
+		head2_dpms(false, false, false);
+		head2_cursor_hide();
+	}
+
 	/* G200 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
 	 * (this would create electrical shortcuts,
 	 * resulting in extra chip heat and distortions visible on screen */
@@ -898,7 +905,7 @@ return nv_general_bios_to_powergraphics();
 //	VGAW_I(CRTC,0x11,0);
 
 	/* turn on display one */
-	head1_dpms(true , true, true);
+	head1_dpms(true, true, true);
 
 	return B_OK;
 }
