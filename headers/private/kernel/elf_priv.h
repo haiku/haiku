@@ -6,6 +6,7 @@
 #define _KERNEL_ELF_PRIV_H
 
 #include <elf32.h>
+#include <image.h>
 
 
 struct elf_region {
