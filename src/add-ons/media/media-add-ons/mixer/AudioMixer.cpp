@@ -59,6 +59,8 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 	fDefaultFormat.u.raw_audio.channel_mask = 0;
 	fDefaultFormat.u.raw_audio.valid_bits = 0;
 	fDefaultFormat.u.raw_audio.matrix_mask = 0;
+	
+	ApplySettings();
 }
 
 AudioMixer::~AudioMixer()
@@ -78,6 +80,14 @@ AudioMixer::~AudioMixer()
 	delete fBufferGroup;
 	
 	DEBUG_ONLY(fCore = 0; fBufferGroup = 0; fWeb = 0);
+}
+
+void
+AudioMixer::ApplySettings()
+{
+	fCore->Lock();
+	fCore->SetOutputAttenuation(fCore->Settings()->AttenuateOutput() ? 0.708 : 1.0);
+	fCore->Unlock();
 }
 
 void
@@ -984,7 +994,53 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 	TRACE("GetParameterValue: id 0x%08x, ioSize %ld\n", id, *ioSize);
 	int param = PARAM(id);
 	fCore->Lock();
-	if (param == 0) {
+	if (PARAM_IS_ETC(id)) {
+		switch (ETC(id)) {
+			case 10:	// Attenuate mixer output by 3dB
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->AttenuateOutput();
+				break;
+			case 20:	// Use non linear gain sliders
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->NonLinearGainSlider();
+				break;
+			case 30:	// Display balance control for stereo connections
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->UseBalanceControl();
+				break;
+			case 40:	// Allow output channel remapping
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->AllowOutputChannelRemapping();
+				break;
+			case 50:	// Allow input channel remapping
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->AllowInputChannelRemapping();
+				break;
+			case 60:	// Input gain controls
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->InputGainControls();
+				break;
+			case 70:	// Resampling algorithm
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->ResamplingAlgorithm();
+				break;
+			case 80:	// Refuse output format changes
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->RefuseOutputFormatChange();
+				break;
+			case 90:	// Refuse input format changes
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->RefuseInputFormatChange();
+				break;
+			case 100:	// Display performance profiling data
+				*ioSize = sizeof(int32);
+				static_cast<int32 *>(value)[0] = fCore->Settings()->DisplayProfilingData();
+				break;
+			default:
+				ERROR("unhandled ETC 0x%08lx\n", id);
+				break;
+		}
+	} else if (param == 0) {
 		MixerOutput *output = fCore->Output();
 		if (!output || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_SRC_ENABLE(id) && !PARAM_IS_SRC_GAIN(id)))
 			goto err;
@@ -1060,7 +1116,74 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 	bool update = false;
 	int param = PARAM(id);
 	fCore->Lock();
-	if (param == 0) {
+	if (PARAM_IS_ETC(id)) {
+		switch (ETC(id)) {
+			case 10:	// Attenuate mixer output by 3dB
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetAttenuateOutput(static_cast<const int32 *>(value)[0]);
+				// this value is special (see MixerCore.h) and we need to notify the core
+				fCore->SetOutputAttenuation((static_cast<const int32 *>(value)[0]) ? 0.708 : 1.0);
+				break;
+			case 20:	// Use non linear gain sliders
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetNonLinearGainSlider(static_cast<const int32 *>(value)[0]);
+				update = true; // XXX should use BroadcastChangedParameter()
+				break;
+			case 30:	// Display balance control for stereo connections
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetUseBalanceControl(static_cast<const int32 *>(value)[0]);
+				update = true;
+				break;
+			case 40:	// Allow output channel remapping
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetAllowOutputChannelRemapping(static_cast<const int32 *>(value)[0]);
+				update = true;
+				break;
+			case 50:	// Allow input channel remapping
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetAllowInputChannelRemapping(static_cast<const int32 *>(value)[0]);
+				update = true;
+				break;
+			case 60:	// Input gain controls represent
+						// (0, "Physical input channels")
+						// (1, "Virtual output channels")
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetInputGainControls(static_cast<const int32 *>(value)[0]);
+				update = true; // XXX should use BroadcastChangedParameter()
+				break;
+			case 70:	// Resampling algorithm
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetResamplingAlgorithm(static_cast<const int32 *>(value)[0]);
+				// XXX tell the core to change the algorithm
+				break;
+			case 80:	// Refuse output format changes
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetRefuseOutputFormatChange(static_cast<const int32 *>(value)[0]);
+				break;
+			case 90:	// Refuse input format changes
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetRefuseInputFormatChange(static_cast<const int32 *>(value)[0]);
+				break;
+			case 100:	// Display performance profiling data
+				if (size != sizeof(int32))
+					goto err;
+				fCore->Settings()->SetDisplayProfilingData(static_cast<const int32 *>(value)[0]);
+				// XXX tell the core to display it
+				break;
+			default:
+				ERROR("unhandled ETC 0x%08lx\n", id);
+				break;
+		}
+	} else if (param == 0) {
 		MixerOutput *output = fCore->Output();
 		if (!output || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_SRC_ENABLE(id) && !PARAM_IS_SRC_GAIN(id)))
 			goto err;
@@ -1186,48 +1309,50 @@ AudioMixer::UpdateParameterWeb()
 									   ->SetChannelCount(in->GetMixerChannelCount()); 
 		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
 	}
+	
+	if (fCore->Settings()->AllowOutputChannelRemapping()) {
+		top = web->MakeGroup("Output Mapping"); // top level group
+		outputchannels = top->MakeGroup("");
+		outputchannels->MakeNullParameter(PARAM_STR4(0), B_MEDIA_RAW_AUDIO, "Output Channel Sources", B_GENERIC);
 
-	top = web->MakeGroup("Output Mapping"); // top level group
-	outputchannels = top->MakeGroup("");
-	outputchannels->MakeNullParameter(PARAM_STR4(0), B_MEDIA_RAW_AUDIO, "Output Channel Sources", B_GENERIC);
-
-	group = outputchannels->MakeGroup("");
-	group->MakeNullParameter(PARAM_STR5(0), B_MEDIA_RAW_AUDIO, "Master Output", B_GENERIC); 
-	group = group->MakeGroup("");
-	if (!out) {
-		group->MakeNullParameter(PARAM_STR6(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
-	} else {
-		for (int chan = 0; chan < out->GetOutputChannelCount(); chan++) {
-			subgroup = group->MakeGroup("");
-			subgroup->MakeNullParameter(PARAM_SRC_STR(0, chan), B_MEDIA_RAW_AUDIO,
-										StringForChannelType(buf, out->GetOutputChannelType(chan)), B_GENERIC);
-			for (int src = 0; src < MAX_CHANNEL_TYPES; src++) {
-				subsubgroup = subgroup->MakeGroup("");
-				subsubgroup->MakeDiscreteParameter(PARAM_SRC_ENABLE(0, chan, src), B_MEDIA_RAW_AUDIO, "", B_ENABLE); 
-				subsubgroup->MakeContinuousParameter(PARAM_SRC_GAIN(0, chan, src), B_MEDIA_RAW_AUDIO,
-													 StringForChannelType(buf, src), B_GAIN, "%", 0.0, 100.0, 0.1);
+		group = outputchannels->MakeGroup("");
+		group->MakeNullParameter(PARAM_STR5(0), B_MEDIA_RAW_AUDIO, "Master Output", B_GENERIC); 
+		group = group->MakeGroup("");
+		if (!out) {
+			group->MakeNullParameter(PARAM_STR6(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
+		} else {
+			for (int chan = 0; chan < out->GetOutputChannelCount(); chan++) {
+				subgroup = group->MakeGroup("");
+				subgroup->MakeNullParameter(PARAM_SRC_STR(0, chan), B_MEDIA_RAW_AUDIO,
+											StringForChannelType(buf, out->GetOutputChannelType(chan)), B_GENERIC);
+				for (int src = 0; src < MAX_CHANNEL_TYPES; src++) {
+					subsubgroup = subgroup->MakeGroup("");
+					subsubgroup->MakeDiscreteParameter(PARAM_SRC_ENABLE(0, chan, src), B_MEDIA_RAW_AUDIO, "", B_ENABLE); 
+					subsubgroup->MakeContinuousParameter(PARAM_SRC_GAIN(0, chan, src), B_MEDIA_RAW_AUDIO,
+														 StringForChannelType(buf, src), B_GAIN, "%", 0.0, 100.0, 0.1);
+				}
 			}
-				
 		}
 	}
-	
-	top = web->MakeGroup("Input Mapping"); // top level group
-	inputchannels = top->MakeGroup("");
-	inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
-
-	for (int i = 0; (in = fCore->Input(i)); i++) {
-		group = inputchannels->MakeGroup("");
-		group->MakeNullParameter(PARAM_STR4(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_GENERIC); 
-		group = group->MakeGroup("");
-
-		for (int chan = 0; chan < in->GetInputChannelCount(); chan++) {
-			subgroup = group->MakeGroup("");
-			subgroup->MakeNullParameter(PARAM_DST_STR(in->ID(), chan), B_MEDIA_RAW_AUDIO,
-										StringForChannelType(buf, in->GetInputChannelType(chan)), B_GENERIC);
-			for (int dst = 0; dst < MAX_CHANNEL_TYPES; dst++) {
-				subgroup->MakeDiscreteParameter(PARAM_DST_ENABLE(in->ID(), chan, dst), B_MEDIA_RAW_AUDIO, StringForChannelType(buf, dst), B_ENABLE); 
-			}
 				
+	if (fCore->Settings()->AllowInputChannelRemapping()) {
+		top = web->MakeGroup("Input Mapping"); // top level group
+		inputchannels = top->MakeGroup("");
+		inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
+
+		for (int i = 0; (in = fCore->Input(i)); i++) {
+			group = inputchannels->MakeGroup("");
+			group->MakeNullParameter(PARAM_STR4(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_GENERIC); 
+			group = group->MakeGroup("");
+
+			for (int chan = 0; chan < in->GetInputChannelCount(); chan++) {
+				subgroup = group->MakeGroup("");
+				subgroup->MakeNullParameter(PARAM_DST_STR(in->ID(), chan), B_MEDIA_RAW_AUDIO,
+											StringForChannelType(buf, in->GetInputChannelType(chan)), B_GENERIC);
+				for (int dst = 0; dst < MAX_CHANNEL_TYPES; dst++) {
+					subgroup->MakeDiscreteParameter(PARAM_DST_ENABLE(in->ID(), chan, dst), B_MEDIA_RAW_AUDIO, StringForChannelType(buf, dst), B_ENABLE); 
+				}
+			}
 		}
 	}
 
@@ -1247,10 +1372,11 @@ AudioMixer::UpdateParameterWeb()
 
 	dp = group->MakeDiscreteParameter(PARAM_ETC(70), B_MEDIA_RAW_AUDIO, "Resampling algorithm", B_INPUT_MUX);
 	dp->AddItem(0, "Drop/repeat samples");
+/*
 	dp->AddItem(1, "Drop/repeat samples (template based)");
 	dp->AddItem(2, "Linear interpolation");
 	dp->AddItem(3, "17th order filtering");
-
+*/
 	group->MakeDiscreteParameter(PARAM_ETC(80), B_MEDIA_RAW_AUDIO, "Refuse output format changes", B_ENABLE);
 	group->MakeDiscreteParameter(PARAM_ETC(90), B_MEDIA_RAW_AUDIO, "Refuse input format changes", B_ENABLE);
 	group->MakeDiscreteParameter(PARAM_ETC(100), B_MEDIA_RAW_AUDIO, "Display performance profiling data", B_ENABLE);

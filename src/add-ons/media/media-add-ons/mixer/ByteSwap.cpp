@@ -41,7 +41,7 @@ do_nothing(void *buffer, size_t bytecount)
 {
 }
 
-#ifdef __INTEL__
+#if __INTEL__
 
 // optimized for IA32 platform
 

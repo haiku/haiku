@@ -51,16 +51,20 @@ MixerCore::MixerCore(AudioMixer *node)
 	fMixBufferChannelCount(0),
  	fDoubleRateMixing(DOUBLE_RATE_MIXING),
  	fDownstreamLatency(1),
+ 	fSettings(new MixerSettings),
  	fNode(node),
 	fBufferGroup(0),
 	fTimeSource(0),
 	fMixThread(-1),
-	fMixThreadWaitSem(-1)
+	fMixThreadWaitSem(-1),
+	fOutputGain(1.0)
 {
 }
 
 MixerCore::~MixerCore()
 {
+	delete fSettings;
+
 	delete fLocker;
 	delete fInputs;
 
@@ -81,6 +85,19 @@ MixerCore::~MixerCore()
 	}
 	
 	delete fMixBufferChannelTypes;
+}
+
+MixerSettings *
+MixerCore::Settings()
+{
+	return fSettings;
+}
+
+void
+MixerCore::SetOutputAttenuation(float gain)
+{
+	ASSERT_LOCKED();
+	fOutputGain = gain;
 }
 
 bool
@@ -542,7 +559,7 @@ MixerCore::MixThread()
 										reinterpret_cast<char *>(buf->Data()) + (i * bytes_per_sample(fOutput->MediaOutput().format.u.raw_audio)),
 										bytes_per_frame(fOutput->MediaOutput().format.u.raw_audio),
 										frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio),
-										fOutput->GetOutputChannelGain(i));
+										fOutputGain * fOutput->GetOutputChannelGain(i));
 			}
 			PRINT(4, "send buffer, inframes %ld, outframes %ld\n", fMixBufferFrameCount, frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio));
 			

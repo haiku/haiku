@@ -2,6 +2,7 @@
 #define _MIXER_CORE_H
 
 #include <Locker.h>
+#include "MixerSettings.h"
 
 class AudioMixer;
 class MixerInput;
@@ -20,6 +21,13 @@ class MixerCore
 public:
 	MixerCore(AudioMixer *node);
 	~MixerCore();
+	
+	MixerSettings *Settings();
+
+	// To avoid calling Settings()->AttenuateOutput() for every outgoing
+	// buffer, this setting is cached in fOutputGain and must be set by
+	// the audio mixer node using SetOutputAttenuation()
+	void SetOutputAttenuation(float gain);
 	
 	bool AddInput(const media_input &input);
 	bool AddOutput(const media_output &output);
@@ -80,11 +88,14 @@ private:
 	
 	friend class MixerInput; // XXX debug only
 	
-	AudioMixer *fNode;
-	BBufferGroup *fBufferGroup;
-	BTimeSource	*fTimeSource;
+	MixerSettings	*fSettings;
+	AudioMixer		*fNode;
+	BBufferGroup	*fBufferGroup;
+	BTimeSource		*fTimeSource;
 	thread_id	fMixThread;
 	sem_id		fMixThreadWaitSem;
+	
+	float		fOutputGain;
 };
 
 

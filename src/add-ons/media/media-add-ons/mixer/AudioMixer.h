@@ -41,6 +41,9 @@ class AudioMixer :
 		void				DisableNodeStop();
 		
 	// AudioMixer support
+	
+		void				ApplySettings();
+
 					
 		void				UpdateParameterWeb();
 		
