@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -32,7 +32,7 @@ ConsoleHandle::ConsoleHandle()
 
 
 ssize_t
-ConsoleHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+ConsoleHandle::ReadAt(void */*cookie*/, off_t /*pos*/, void *buffer, size_t bufferSize)
 {
 	// don't seek in character devices
 	return of_read(fHandle, buffer, bufferSize);
@@ -40,10 +40,37 @@ ConsoleHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 
 ssize_t
-ConsoleHandle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer, size_t bufferSize)
 {
-	// don't seek in character devices
-	return of_write(fHandle, buffer, bufferSize);
+	const char *string = (const char *)buffer;
+
+	// be nice to our audience and replace single "\n" with "\r\n"
+
+	while (bufferSize > 0) {
+		bool newLine = false;
+		size_t length = 0;
+
+		for (; length < bufferSize; length++) {
+			if (string[length] == '\r')
+				length += 2;
+			else if (string[length] == '\n')
+				break;
+		}
+
+		if (length > bufferSize)
+			length = bufferSize;
+
+		of_write(fHandle, string, length);
+
+		if (newLine) {
+			of_write(fHandle, "\r\n", 2);
+			string++;
+			bufferSize--;
+		}
+
+		string += length;
+		bufferSize -= length;
+	}
 }
 
 
