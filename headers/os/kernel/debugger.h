@@ -187,6 +187,7 @@ typedef struct {
 
 typedef struct {
 	status_t	error;			// B_OK, if writing went fine
+	int32		size;			// the number of bytes actually written
 } debug_nub_write_memory_reply;
 
 // B_DEBUG_MESSAGE_SET_TEAM_FLAGS
