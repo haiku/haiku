@@ -316,31 +316,44 @@ disk_scanner_get_nth_partition_info(int deviceFD,
 		partitionInfo->info.logical_block_size = blockSize;
 		partitionInfo->info.session = sessionInfo->index;
 		partitionInfo->info.partition = partitionIndex;
-		// read the first block of the session and get the partition module
-		if (!partitionModule) {
+		// Read the first block of the session and get the partition module.
+		if (!(sessionInfo->flags & B_DATA_SESSION)) {
+			// Don't that, if the session is an audio session.
+			// Fall through and return a virtual partition, if partition 0
+			// is requested.
+			if (partitionInfo->info.partition != 0)
+				error = B_ENTRY_NOT_FOUND;
+		} else if (!partitionModule) {
 			error = read_block(deviceFD, sessionOffset, blockSize, &block);
+TRACE(("  check: %s\n", strerror(error)));
 			if (error == B_OK) {
 				error = get_partition_module_block(deviceFD, sessionInfo,
 												   block, &partitionModule);
+TRACE(("  check: %s\n", strerror(error)));
 				if (error == B_ENTRY_NOT_FOUND
 					&& partitionInfo->info.partition == 0) {
-					// no matching partition module found: return a virtual
-					// partition info
-					partitionInfo->info.offset = sessionOffset;
-					partitionInfo->info.size = sessionSize;
-					partitionInfo->flags = B_VIRTUAL_PARTITION;
-					partitionInfo->partition_name[0] = '\0';
-					partitionInfo->partition_type[0] = '\0';
-					partitionInfo->partition_code = 0xeb;	// doesn't matter
+					// No matching partition module found, and first partition
+					// requested: Just set the error to B_OK: below a virtual
+					// partition info will be returned.
 					error = B_OK;
 				}
 			}
 		}
 		// get the info
-		if (error == B_OK && partitionModule) {
-			error = partitionModule->get_nth_info(deviceFD, sessionInfo,
-				block, partitionIndex, partitionInfo);
+		if (error == B_OK) {
+			if (partitionModule) {
+				error = partitionModule->get_nth_info(deviceFD, sessionInfo,
+					block, partitionIndex, partitionInfo);
+			} else {
+				// no partition module: return a virtual partition info
+				partitionInfo->info.offset = sessionOffset;
+				partitionInfo->info.size = sessionSize;
+				partitionInfo->flags = B_VIRTUAL_PARTITION;
+				partitionInfo->partition_name[0] = '\0';
+				partitionInfo->partition_type[0] = '\0';
+			}
 		}
+TRACE(("  check: %s\n", strerror(error)));
 		// set results / cleanup
 		if (error == B_OK && partitionMapName) {
 			// return partition module identifier
