@@ -212,7 +212,6 @@ void VDView::MouseUp(BPoint pt)
 
 void VDView::MessageReceived(BMessage *msg)
 {
-printf("message received\n");
 	switch(msg->what)
 	{
 #ifdef ENABLE_INPUT_SERVER_EMULATION
@@ -658,9 +657,25 @@ void ViewDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 printf("ViewDriver:: CopyRegion not completely tested\n");
 #endif
 
-	
 	screenwin->Lock();
 	framebuffer->Lock();
+
+	// Check for cases where the region is only 1 rectangle and call CopyBits in
+	// such a case. While in this particular case CopyBits is not HW-accelerated, 
+	// other DisplayDriver derivatives, like AccelerantDriver, can take advantage of
+	// such things, cutting speed significantly in such cases
+	if(src->CountRects()==1)
+	{
+		BRect srect(src->RectAt(0)),drect(src->RectAt(0).OffsetToCopy(lefttop));
+		drawview->CopyBits(srect,drect);
+		drawview->Sync();
+		screenwin->view->Invalidate(srect);
+		screenwin->view->Invalidate(drect);
+		framebuffer->Unlock();
+		screenwin->Unlock();
+		return;
+	}
+	
 
 	// Check for overlap
 	bool overlap=false;
@@ -675,9 +690,11 @@ printf("ViewDriver:: CopyRegion not completely tested\n");
 
 	if(TestRectIntersection(regframe,src->Frame()) && src->CountRects()>1)
 		overlap=true;
-	
+
 	if(overlap)
 	{
+printf("Overlap\n");
+
 		// If overlap, get the inverse of the region passed to us and save the
 		// inverse region's frame
 		inverse=src->Frame();
@@ -1064,9 +1081,6 @@ void ViewDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, 
 		drawview->SetHighColor(col);
 		drawview->StrokeLine(pt1,pt2,B_SOLID_HIGH);
 		
-		
-		printf("\tLine (%.1f,%.1f)-(%.1f,%.1f) in color (%d,%d,%d)\n",pt1.x,pt1.y,pt2.x,pt2.y,
-			col.red,col.green,col.blue);
 	}
 	drawview->Sync();
 	screenwin->view->Invalidate();

@@ -398,17 +398,20 @@ void Layer::Invalidate(BRegion& region)
 	All children of the layer also receive this call, so only 1 Invalidate call is 
 	needed to set a section as invalid on the screen.
 */
-void Layer::Invalidate(BRect rect)
+void Layer::Invalidate(const BRect &rect)
 {
 	// Make our own section dirty and pass it on to any children, if necessary....
 	// YES, WE ARE SHARING DIRT! Mudpies anyone? :D
-	if(TestRectIntersection(Frame(),rect))
+	if(TestRectIntersection(Bounds(),rect))
 	{
 		// Clip the rectangle to the _visible region of the layer
 		if(TestRegionIntersection(_visible,rect))
 		{
 			BRegion reg(*_visible);
-			IntersectRegionWith(&reg,rect);
+			BRegion rectreg(rect);
+			
+//			IntersectRegionWith(&reg,rect);
+			reg.IntersectWith(&rectreg);
 			if(reg.CountRects()>0)
 			{
 				_is_dirty=true;

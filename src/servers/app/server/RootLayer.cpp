@@ -35,6 +35,9 @@
 
 #include <stdio.h>
 
+//#define DISPLAYDRIVER_TEST_HACK
+//#define DEBUG_ROOTLAYER
+
 /*!
 	\brief Sets up internal variables needed by the RootLayer
 	\param rect Frame of the root layer
@@ -78,9 +81,12 @@ void RootLayer::RequestDraw(void)
 	// Redraw the base
 	if(_invalid)
 	{
+		#ifdef DEBUG_ROOTLAYER
 		printf("ROOTLAYER: ");
 		_invalid->PrintToStream();
 		printf("===========\n");
+		#endif
+		
 		for(int32 i=0; _invalid->CountRects();i++)
 		{
 			if(_invalid->RectAt(i).IsValid())
@@ -101,6 +107,7 @@ void RootLayer::RequestDraw(void)
 	}
 
 	_is_dirty=false;
+
 #ifdef DISPLAYDRIVER_TEST_HACK
 	int8 pattern[8];
 	int8 pattern2[8];

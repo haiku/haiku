@@ -39,9 +39,12 @@
 
 // TODO: Document this file completely
 
-#define DEBUG_WINBORDER
+// Toggle general function call output
+//#define DEBUG_WINBORDER
+
+// toggle
 //#define DEBUG_WINBORDER_MOUSE
-#define DEBUG_WINBORDER_CLICK
+//#define DEBUG_WINBORDER_CLICK
 
 #ifdef DEBUG_WINBORDER
 #include <stdio.h>
@@ -84,7 +87,9 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	_mbuttons=0;
 	_kmodifiers=0;
 	_win=win;
-
+	if(_win)
+		_frame=_win->_frame;
+	_clientframe=_frame;
 	_mousepos.Set(0,0);
 	_update=false;
 
@@ -93,15 +98,15 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	_vresizewin=false;
 	_driver=GetGfxDriver(ActiveScreen());
 	_decorator=new_decorator(r,name,look,feel,flags,GetGfxDriver(ActiveScreen()));
-		// WinBorder must also include the right/left/top/bottom Decorator'
-		//   rects - given by _decorator::GetBorderRect() - to be able to draw the borders
-	_frame		= _decorator->GetBorderRect();
-	_visible->Set( _frame );
-	_visible->Include( _decorator->GetTabRect() );
-	_full->Set( _frame );
-	_full->Include( _decorator->GetTabRect() );
-	_invalid->Set( _frame );
-	_invalid->Include( _decorator->GetTabRect() );
+
+	// We need to do this because GetFootprint is supposed to generate a new BRegion.
+	// I suppose the call probably ought to be void GetFootprint(BRegion *recipient), but we can
+	// change that later.
+	
+	if(_visible)
+		delete _visible;
+	_visible=_decorator->GetFootprint();
+	*_full=*_visible;
 
 	_decorator->SetDriver(_driver);
 	_decorator->SetTitle(name);
@@ -147,43 +152,48 @@ void WinBorder::MouseDown(int8 *buffer)
 	{
 		case CLICK_MOVETOBACK:
 		{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("Click: MoveToBack\n");
-#endif
+			#ifdef DEBUG_WINBORDER_CLICK
+			printf("Click: MoveToBack\n");
+			#endif
+
 			MakeTopChild();
 			break;
 		}
 		case CLICK_MOVETOFRONT:
 		{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("Click: MoveToFront\n");
-#endif
+			#ifdef DEBUG_WINBORDER_CLICK
+			printf("Click: MoveToFront\n");
+			#endif
+
 			MakeBottomChild();
 			break;
 		}
 		case CLICK_CLOSE:
 		{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("Click: Close\n");
-#endif
+			#ifdef DEBUG_WINBORDER_CLICK
+			printf("Click: Close\n");
+			#endif
+
 			_decorator->SetClose(true);
 			_decorator->DrawClose();
 			break;
 		}
 		case CLICK_ZOOM:
 		{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("Click: Zoom\n");
-#endif
+			#ifdef DEBUG_WINBORDER_CLICK
+			printf("Click: Zoom\n");
+			#endif
+
 			_decorator->SetZoom(true);
 			_decorator->DrawZoom();
 			break;
 		}
 		case CLICK_MINIMIZE:
 		{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("Click: Minimize\n");
-#endif
+			#ifdef DEBUG_WINBORDER_CLICK
+			printf("Click: Minimize\n");
+			#endif
+
 			_decorator->SetMinimize(true);
 			_decorator->DrawMinimize();
 			break;
@@ -192,27 +202,30 @@ printf("Click: Minimize\n");
 		{
 			if(buttons==B_PRIMARY_MOUSE_BUTTON)
 			{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("Click: Drag\n");
-#endif
+				#ifdef DEBUG_WINBORDER_CLICK
+				printf("Click: Drag\n");
+				#endif
+
 				MakeBottomChild();
 				set_is_moving_window(true);
 			}
 
 			if(buttons==B_SECONDARY_MOUSE_BUTTON)
 			{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("Click: MoveToBack\n");
-#endif
+				#ifdef DEBUG_WINBORDER_CLICK
+				printf("Click: MoveToBack\n");
+				#endif
+
 				MakeTopChild();
 			}
 			break;
 		}
 		case CLICK_SLIDETAB:
 		{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("Click: Slide Tab\n");
-#endif
+			#ifdef DEBUG_WINBORDER_CLICK
+			printf("Click: Slide Tab\n");
+			#endif
+
 			set_is_sliding_tab(true);
 			break;
 		}
@@ -220,9 +233,10 @@ printf("Click: Slide Tab\n");
 		{
 			if(buttons==B_PRIMARY_MOUSE_BUTTON)
 			{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("Click: Resize\n");
-#endif
+				#ifdef DEBUG_WINBORDER_CLICK
+				printf("Click: Resize\n");
+				#endif
+
 				set_is_resizing_window(true);
 			}
 			break;
@@ -273,9 +287,10 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 	if(is_sliding_tab())
 	{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("ClickMove: Slide Tab\n");
-#endif
+		#ifdef DEBUG_WINBORDER_CLICK
+		printf("ClickMove: Slide Tab\n");
+		#endif
+
 		float dx=pt.x-_mousepos.x;
 		float dy=pt.y-_mousepos.y;		
 
@@ -295,40 +310,67 @@ printf("ClickMove: Slide Tab\n");
 
 	if(is_moving_window())
 	{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("ClickMove: Drag\n");
-#endif
-//debugger("");
+		// We are moving the window. Because speed is of the essence, we need to handle a lot
+		// of stuff which we might otherwise not need to.
+
+		#ifdef DEBUG_WINBORDER_CLICK
+		printf("ClickMove: Drag\n");
+		#endif
+		
+		// 1) Get deltas
 		float dx=pt.x-_mousepos.x,
 			dy=pt.y-_mousepos.y;
+
 		if(buttons!=0 && (dx!=0 || dy!=0))
 		{
-			BRect oldmoveframe=_win->_frame;
-			_clientframe.OffsetBy(pt);
+			// 2) Offset necessary data members
+			_clientframe.OffsetBy(dx,dy);
 
 			_win->Lock();
 			_win->_frame.OffsetBy(dx,dy);
 			_win->Unlock();
 
 			lock_layers();
+
+			// Move the window decorator's footprint and remove the area occupied
+			// by the new location so we know what areas to invalidate.
+			
+			// The original location
 			BRegion *reg=_decorator->GetFootprint();
-		// TODO: we get an error here!!! - this method is untested
-		// TODO: we really need to enable this method to avoid lots of drawings.
-			//_driver->CopyRegion(reg,_win->_frame.LeftTop());
+			
+			// The new location
+			BRegion reg2(*reg);
+			reg2.OffsetBy((int32)dx, (int32)dy);
+
+			MoveBy(dx,dy);
+			_decorator->MoveBy(BPoint(dx, dy));
+
+			// 3) quickly move the window
+			_driver->CopyRegion(reg,reg2.Frame().LeftTop());
+
+			// 4) Invalidate only the areas which we can't redraw directly
+			for(int32 i=0; i<reg2.CountRects();i++)
+				reg->Exclude(reg2.RectAt(i));
+			
+			// TODO: DW's notes to self
+			// As of right now, dragging the window is extremely slow despite the use
+			// of CopyRegion. The reason is because of the redraw taken. When Invalidate() is
+			// called the RootLayer invalidates things properly for itself, but the area which
+			// should be invalidated for the first of the two windows in my test case is not
+			// made dirty, so the entire first window is redrawn with RequestDraw being 
+			// restructured as it is. Additionally, the second window is redrawn for the same reason
+			// when in fact it shouldn't be redrawn at all.
+			
+			// Solution:
+			// Figure out what the exact usage of Layer::Invalidate() should be (parent coordinates,
+			//  layer's coordinates, etc) and set things right. Secondly, nuke the invalid region
+			// in this call so that when RequestDraw is called, this WinBorder doesn't redraw itself
+			
 			_parent->Invalidate(*reg);
 			
-			_decorator->MoveBy(BPoint(dx, dy));
-			MoveBy(dx,dy);
-
-				// ADI: what do those do???
-			BRegion reg2(oldmoveframe);			
-			reg->OffsetBy((int32)dx, (int32)dy);
-			reg2.Exclude(reg);
-			
 			_parent->RebuildRegions();
-			printf("WinBorder: calling parent = %s::RequestDraw()\n", _parent->_name->String());			
 			_parent->RequestDraw();
-
+			
 			delete reg;
 			unlock_layers();
 		}
@@ -337,13 +379,14 @@ printf("ClickMove: Drag\n");
 
 	if(is_resizing_window())
 	{
-#ifdef DEBUG_WINBORDER_CLICK
-printf("ClickMove: Resize\n");
-#endif
+		#ifdef DEBUG_WINBORDER_CLICK
+		printf("ClickMove: Resize\n");
+		#endif
+
 		float dx=pt.x-_mousepos.x,
 			dy=pt.y-_mousepos.y;
 		if(buttons!=0 && (dx!=0 || dy!=0))
-		{
+ 		{
 			_clientframe.right+=dx;
 			_clientframe.bottom+=dy;
 	
@@ -378,9 +421,6 @@ void WinBorder::MouseUp(int8 *buffer)
 	int32 modifiers=*((int32*)index);
 	BPoint pt(x,y);
 	
-#ifdef DEBUG_WINBORDER_MOUSE
-printf("WinBorder %s: MouseUp unimplemented\n",_title->String());
-#endif
 
 	_mbuttons=0;
 	_kmodifiers=modifiers;
@@ -399,6 +439,9 @@ printf("WinBorder %s: MouseUp unimplemented\n",_title->String());
 			_decorator->DrawClose();
 			
 			// call close window stuff here
+			#ifdef DEBUG_WINBORDER_MOUSE
+			printf("WinBorder %s: MouseUp:CLICK_CLOSE unimplemented\n",_title->String());
+			#endif
 			
 			break;
 		}
@@ -408,6 +451,9 @@ printf("WinBorder %s: MouseUp unimplemented\n",_title->String());
 			_decorator->DrawZoom();
 			
 			// call zoom stuff here
+			#ifdef DEBUG_WINBORDER_MOUSE
+			printf("WinBorder %s: MouseUp:CLICK_ZOOM unimplemented\n",_title->String());
+			#endif
 			
 			break;
 		}
@@ -417,6 +463,9 @@ printf("WinBorder %s: MouseUp unimplemented\n",_title->String());
 			_decorator->DrawMinimize();
 			
 			// call minimize stuff here
+			#ifdef DEBUG_WINBORDER_MOUSE
+			printf("WinBorder %s: MouseUp:CLICK_MINIMIZE unimplemented\n",_title->String());
+			#endif
 			
 		}
 		default:
@@ -438,10 +487,11 @@ void WinBorder::SetFocus(const bool &active)
 
 void WinBorder::RequestDraw(const BRect &r)
 {
-#ifdef DEBUG_WINBORDER
-printf("WinBorder %s: RequestDraw(BRect)\n",_title->String());
-PrintToStream();
-#endif
+	#ifdef DEBUG_WINBORDER
+	printf("WinBorder %s: RequestDraw(BRect)\n",_title->String());
+	PrintToStream();
+	#endif
+
 	_decorator->Draw(r);
 	delete _invalid;
 	_invalid = NULL;
@@ -449,13 +499,21 @@ PrintToStream();
 
 void WinBorder::RequestDraw(void)
 {
-#ifdef DEBUG_WINBORDER
-printf("WinBorder %s::RequestDraw()\n",_title->String());
-PrintToStream();
-#endif
-	_decorator->Draw();
-	delete _invalid;
-	_invalid = NULL;
+	#ifdef DEBUG_WINBORDER
+	printf("WinBorder %s::RequestDraw()\n",_title->String());
+	PrintToStream();
+	#endif
+	
+	if(_invalid)
+	{
+		for(int32 i=0;i<_invalid->CountRects();i++)
+			_decorator->Draw(_invalid->RectAt(i));
+		
+		delete _invalid;
+		_invalid = NULL;
+	}
+	else
+		_decorator->Draw();
 }
 /*
 void WinBorder::MoveBy(BPoint pt)
@@ -476,28 +534,28 @@ void WinBorder::ResizeBy(float x, float y)
 */
 void WinBorder::UpdateColors(void)
 {
-#ifdef DEBUG_WINBORDER
-printf("WinBorder %s: UpdateColors\n",_title->String());
-#endif
+	#ifdef DEBUG_WINBORDER
+	printf("WinBorder %s: UpdateColors\n",_title->String());
+	#endif
 }
 
 void WinBorder::UpdateDecorator(void)
 {
-#ifdef DEBUG_WINBORDER
-printf("WinBorder %s: UpdateDecorator\n",_title->String());
-#endif
+	#ifdef DEBUG_WINBORDER
+	printf("WinBorder %s: UpdateDecorator\n",_title->String());
+	#endif
 }
 
 void WinBorder::UpdateFont(void)
 {
-#ifdef DEBUG_WINBORDER
-printf("WinBorder %s: UpdateFont\n",_title->String());
-#endif
+	#ifdef DEBUG_WINBORDER
+	printf("WinBorder %s: UpdateFont\n",_title->String());
+	#endif
 }
 
 void WinBorder::UpdateScreen(void)
 {
-#ifdef DEBUG_WINBORDER
-printf("WinBorder %s: UpdateScreen\n",_title->String());
-#endif
+	#ifdef DEBUG_WINBORDER
+	printf("WinBorder %s: UpdateScreen\n",_title->String());
+	#endif
 }

@@ -63,9 +63,7 @@ protected:
 	BString *_title;
 	Decorator *_decorator;
 	int32 _flags;
-		// !!! HERE we do have a problem... _frame is also defined in Layer.h
-//	BRect _frame, _clientframe;
-	BRect		_clientframe;
+	BRect _clientframe;
 	int32 _mbuttons,_kmodifiers;
 	BPoint _mousepos;
 	bool _update;

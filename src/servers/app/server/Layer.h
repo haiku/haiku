@@ -72,7 +72,7 @@ public:
 	const char *GetName(void) { return (_name)?_name->String():NULL; }
 	LayerData *GetLayerData(void) { return _layerdata; }
 	
-	void Invalidate(BRect rect);
+	void Invalidate(const BRect &rect);
 	void Invalidate(BRegion& region);
 	void RebuildRegions(bool include_children=true);
 	virtual void RequestDraw(const BRect &r);

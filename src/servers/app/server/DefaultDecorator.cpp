@@ -58,78 +58,82 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 	framecolors[3].SetColor(136,136,136);
 	framecolors[4].SetColor(96,96,96);
 
+	// Set appropriate colors based on the current focus value. In this case, each decorator
+	// defaults to not having the focus.
 	_SetFocus();
-
+	
+	// Do initial decorator setup
 	_DoLayout();
 	
 	// This flag is used to determine whether or not we're moving the tab
 	slidetab=false;
 
-//	tab_highcol=_colors->window_tab;
-//	tab_lowcol=_colors->window_tab;
-
-#ifdef DEBUG_DECORATOR
-printf("DefaultDecorator:\n");
-printf("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom);
-#endif
+	#ifdef DEBUG_DECORATOR
+	printf("DefaultDecorator:\n");
+	printf("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom);
+	#endif
 }
 
 DefaultDecorator::~DefaultDecorator(void)
 {
-#ifdef DEBUG_DECORATOR
-printf("DefaultDecorator: ~DefaultDecorator()\n");
-#endif
+	#ifdef DEBUG_DECORATOR
+	printf("DefaultDecorator: ~DefaultDecorator()\n");
+	#endif
+
 	delete [] framecolors;
 }
 
 click_type DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
-#ifdef DEBUG_DECORATOR
-printf("DefaultDecorator: Clicked\n");
-printf("\tPoint: (%.1f,%.1f)\n",pt.x,pt.y);
-printf("\tButtons:\n");
-if(buttons==0)
-	printf("\t\tNone\n");
-else
-{
-	if(buttons & B_PRIMARY_MOUSE_BUTTON)
-		printf("\t\tPrimary\n");
-	if(buttons & B_SECONDARY_MOUSE_BUTTON)
-		printf("\t\tSecondary\n");
-	if(buttons & B_TERTIARY_MOUSE_BUTTON)
-		printf("\t\tTertiary\n");
-}
-printf("\tModifiers:\n");
-if(modifiers==0)
-	printf("\t\tNone\n");
-else
-{
-	if(modifiers & B_CAPS_LOCK)
-		printf("\t\tCaps Lock\n");
-	if(modifiers & B_NUM_LOCK)
-		printf("\t\tNum Lock\n");
-	if(modifiers & B_SCROLL_LOCK)
-		printf("\t\tScroll Lock\n");
-	if(modifiers & B_LEFT_COMMAND_KEY)
-		printf("\t\t Left Command\n");
-	if(modifiers & B_RIGHT_COMMAND_KEY)
-		printf("\t\t Right Command\n");
-	if(modifiers & B_LEFT_CONTROL_KEY)
-		printf("\t\tLeft Control\n");
-	if(modifiers & B_RIGHT_CONTROL_KEY)
-		printf("\t\tRight Control\n");
-	if(modifiers & B_LEFT_OPTION_KEY)
-		printf("\t\tLeft Option\n");
-	if(modifiers & B_RIGHT_OPTION_KEY)
-		printf("\t\tRight Option\n");
-	if(modifiers & B_LEFT_SHIFT_KEY)
-		printf("\t\tLeft Shift\n");
-	if(modifiers & B_RIGHT_SHIFT_KEY)
-		printf("\t\tRight Shift\n");
-	if(modifiers & B_MENU_KEY)
-		printf("\t\tMenu\n");
-}
-#endif
+	#ifdef DEBUG_DECORATOR
+	printf("DefaultDecorator: Clicked\n");
+	printf("\tPoint: (%.1f,%.1f)\n",pt.x,pt.y);
+	printf("\tButtons:\n");
+	if(buttons==0)
+		printf("\t\tNone\n");
+	else
+	{
+		if(buttons & B_PRIMARY_MOUSE_BUTTON)
+			printf("\t\tPrimary\n");
+		if(buttons & B_SECONDARY_MOUSE_BUTTON)
+			printf("\t\tSecondary\n");
+		if(buttons & B_TERTIARY_MOUSE_BUTTON)
+			printf("\t\tTertiary\n");
+	}
+	printf("\tModifiers:\n");
+	if(modifiers==0)
+		printf("\t\tNone\n");
+	else
+	{
+		if(modifiers & B_CAPS_LOCK)
+			printf("\t\tCaps Lock\n");
+		if(modifiers & B_NUM_LOCK)
+			printf("\t\tNum Lock\n");
+		if(modifiers & B_SCROLL_LOCK)
+			printf("\t\tScroll Lock\n");
+		if(modifiers & B_LEFT_COMMAND_KEY)
+			printf("\t\t Left Command\n");
+		if(modifiers & B_RIGHT_COMMAND_KEY)
+			printf("\t\t Right Command\n");
+		if(modifiers & B_LEFT_CONTROL_KEY)
+			printf("\t\tLeft Control\n");
+		if(modifiers & B_RIGHT_CONTROL_KEY)
+			printf("\t\tRight Control\n");
+		if(modifiers & B_LEFT_OPTION_KEY)
+			printf("\t\tLeft Option\n");
+		if(modifiers & B_RIGHT_OPTION_KEY)
+			printf("\t\tRight Option\n");
+		if(modifiers & B_LEFT_SHIFT_KEY)
+			printf("\t\tLeft Shift\n");
+		if(modifiers & B_RIGHT_SHIFT_KEY)
+			printf("\t\tRight Shift\n");
+		if(modifiers & B_MENU_KEY)
+			printf("\t\tMenu\n");
+	}
+	#endif
+	
+	// In checking for hit test stuff, we start with the smallest rectangles the user might
+	// be clicking on and gradually work our way out into larger rectangles.
 	if(_closerect.Contains(pt))
 		return CLICK_CLOSE;
 
@@ -143,8 +147,6 @@ else
 	if(_tabrect.Contains(pt))
 	{
 		// Here's part of our window management stuff
-//		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
-//			return CLICK_MOVETOFRONT;
 		if(buttons==B_SECONDARY_MOUSE_BUTTON)
 			return CLICK_MOVETOBACK;
 		return CLICK_DRAG;
@@ -168,10 +170,10 @@ else
 
 void DefaultDecorator::_DoLayout(void)
 {
-//debugger("");
-#ifdef DEBUG_DECORATOR
-printf("DefaultDecorator: Do Layout\n");
-#endif
+	#ifdef DEBUG_DECORATOR
+	printf("DefaultDecorator: Do Layout\n");
+	#endif
+
 	// Here we determine the size of every rectangle that we use
 	// internally when we are given the size of the client rectangle.
 
@@ -185,6 +187,7 @@ printf("DefaultDecorator: Do Layout\n");
 		// and there *are* apps which do this
 //			borderwidth=3;
 //			break;
+
 		case B_BORDERED_WINDOW_LOOK:
 		case B_TITLED_WINDOW_LOOK:
 		case B_DOCUMENT_WINDOW_LOOK:
@@ -194,21 +197,17 @@ printf("DefaultDecorator: Do Layout\n");
 			borderwidth = 0;
 	}
 	
-	// Current version simply makes everything fit inside the rect
-	// instead of building around it. This will change.
-
-	// IT did :-)
-		// distance from one item of the tab bar to another. In this case the text and close/zoom rects
+	// distance from one item of the tab bar to another. In this case the text and close/zoom rects
 	textoffset = (_look==B_FLOATING_WINDOW_LOOK) ? 7 : 10;
 	
-		// calculate or tab rect
+	// calculate our tab rect
 	_tabrect.Set( 	_frame.left - borderwidth,
 					_frame.top - borderwidth - 19.0,
 					((_frame.right - _frame.left) < 35.0 ?
 							_frame.left + 35.0 : _frame.right) + borderwidth,
 					_frame.top - (borderwidth-1) );
 
-		// make it text width sensitive
+	// make it text width sensitive
 	if(strlen(GetTitle())>1)
 	{
 		if(_driver)
@@ -216,10 +215,10 @@ printf("DefaultDecorator: Do Layout\n");
 		else
 			titlepixelwidth=10;
 		
-		int32	tabLength	= 	14 + // _closerect width
+		int32	tabLength	= 	int32(14 + // _closerect width
 								textoffset + titlepixelwidth + textoffset +
 								14 + // _zoomrect width
-								8; // margins
+								8); // margins
 		int32	tabWidth	= (int32)_tabrect.Width();
 		if ( tabLength < tabWidth )
 			_tabrect.right	= _tabrect.left + tabLength;
@@ -227,7 +226,7 @@ printf("DefaultDecorator: Do Layout\n");
 	else
 		_tabrect.right		= _tabrect.left + _tabrect.Width()/2;
 
-		// calculate left/top/right/bottom borders
+	// calculate left/top/right/bottom borders
 	if ( borderwidth != 0 ){
 		_borderrect		= _frame.InsetByCopy( -borderwidth, -borderwidth );
 		leftborder.Set( _borderrect.left, _frame.top - borderwidth,
@@ -240,7 +239,7 @@ printf("DefaultDecorator: Do Layout\n");
 						  _borderrect.right, _borderrect.bottom );
 	}
 	else{
-			// no border ... (?) useful when displaying windows that are just images
+		// no border ... (?) useful when displaying windows that are just images
 		_borderrect	= _frame;
 		leftborder.Set( 0.0, 0.0, -1.0, -1.0 );
 		rightborder.Set( 0.0, 0.0, -1.0, -1.0 );
@@ -248,89 +247,31 @@ printf("DefaultDecorator: Do Layout\n");
 		bottomborder.Set( 0.0, 0.0, -1.0, -1.0 );						
 	}
 
-		// calculate resize rect
+	// calculate resize rect
 	_resizerect.Set(	_borderrect.right - 19.0, _borderrect.bottom - 19.0,
 						_borderrect.right, _borderrect.bottom);
 
-		// format tab rect for a floating window - make te rect smaller
+	// format tab rect for a floating window - make the rect smaller
 	if ( _look == B_FLOATING_WINDOW_LOOK ){
 		_tabrect.InsetBy( 0, 2 );
 		_tabrect.OffsetBy( 0, 2 );
 	}	
 
-		// calulate close rect based on the tab rectangle
+	// calulate close rect based on the tab rectangle
 	_closerect.Set(	_tabrect.left + 4.0, _tabrect.top + 4.0,
 					_tabrect.left + 4.0 + 13.0, _tabrect.top + 4.0 + 13.0 );
 					
-		// calulate zoom rect based on the tab rectangle
+	// calulate zoom rect based on the tab rectangle
 	_zoomrect.Set(  _tabrect.right - 4.0 - 13.0, _tabrect.top + 4.0,
 					_tabrect.right - 4.0, _tabrect.top + 4.0 + 13.0 );
 
-		// fromat close and zoom rects for a floating window - make rectangles smaller
+	// format close and zoom rects for a floating window - make rectangles smaller
 	if ( _look == B_FLOATING_WINDOW_LOOK ){
 		_closerect.InsetBy( 1, 1 );
 		_zoomrect.InsetBy( 1, 1 );
 		_closerect.OffsetBy( 0, -2 );
 		_zoomrect.OffsetBy( 0, -2 );
 	}
-// Old version...
-/*	
-	_tabrect=_frame;
-	_resizerect=_frame;
-	_borderrect=_frame;
-	_closerect=_frame;
-	
-
-	textoffset=(_look==B_FLOATING_WINDOW_LOOK)?5:7;
-
-	_closerect.left+=(_look==B_FLOATING_WINDOW_LOOK)?2:4;
-	_closerect.top+=(_look==B_FLOATING_WINDOW_LOOK)?6:4;
-	_closerect.right=_closerect.left+10;
-	_closerect.bottom=_closerect.top+10;
-	
-	
-	_borderrect.top+=19;
-
-	if(borderwidth)
-	{
-		// Set up the border rectangles to handle the window's frame
-		rightborder=leftborder=topborder=bottomborder=_borderrect;
-		
-		// We want the rectangles to intersect because of the beveled intersections, so all
-		// that is necessary is to set the short dimension of each side
-		leftborder.right=leftborder.left+borderwidth;
-		rightborder.left=rightborder.right-borderwidth;
-		topborder.bottom=topborder.top+borderwidth;
-		bottomborder.top=bottomborder.bottom-borderwidth;
-	}
-	
-	_resizerect.top=_resizerect.bottom-18;
-	_resizerect.left=_resizerect.right-18;
-	
-	_tabrect.bottom=_tabrect.top+18;
-	if(strlen(GetTitle())>1)
-	{
-		if(_driver)
-			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_layerdata);
-		else
-			titlepixelwidth=10;
-		
-		if(_closerect.right+textoffset+titlepixelwidth+35< _frame.Width()-1)
-			_tabrect.right=_tabrect.left+titlepixelwidth;
-	}
-	else
-		_tabrect.right=_tabrect.left+_tabrect.Width()/2;
-
-	if(_look==B_FLOATING_WINDOW_LOOK)
-		_tabrect.top+=4;
-
-	_zoomrect=_tabrect;
-	_zoomrect.top+=(_look==B_FLOATING_WINDOW_LOOK)?2:4;
-	_zoomrect.right-=4;
-	_zoomrect.bottom-=4;
-	_zoomrect.left=_zoomrect.right-10;
-	_zoomrect.bottom=_zoomrect.top+10;
-*/	
 }
 
 void DefaultDecorator::MoveBy(float x, float y)
@@ -340,9 +281,10 @@ void DefaultDecorator::MoveBy(float x, float y)
 
 void DefaultDecorator::MoveBy(BPoint pt)
 {
-#ifdef DEBUG_DECORATOR
-printf("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
-#endif
+	#ifdef DEBUG_DECORATOR
+	printf("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
+	#endif
+
 	// Move all internal rectangles the appropriate amount
 	_frame.OffsetBy(pt);
 	_closerect.OffsetBy(pt);
@@ -355,15 +297,14 @@ printf("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
 	rightborder.OffsetBy(pt);
 	topborder.OffsetBy(pt);
 	bottomborder.OffsetBy(pt);
-
-//	Draw( _borderrect );	
 }
 
 BRegion * DefaultDecorator::GetFootprint(void)
 {
-#ifdef DEBUG_DECORATOR
-printf("DefaultDecorator: Get Footprint\n");
-#endif
+	#ifdef DEBUG_DECORATOR
+	printf("DefaultDecorator: Get Footprint\n");
+	#endif
+
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
@@ -380,7 +321,10 @@ BRect DefaultDecorator::SlideTab(float dx, float dy=0){
 
 void DefaultDecorator::_DrawTitle(BRect r)
 {
-printf("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
+	#ifdef DEBUG_DECORATOR
+	printf("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
+	#endif
+
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
 	_layerdata.highcolor=_colors->window_tab_text;
@@ -395,8 +339,15 @@ printf("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
 		titlestr+="...";
 		titlecount+=2;
 	}
+	
+	// The text position needs tweaked when working as a floating window because the closerect placement
+	// is a little different. If it isn't moved, title placement looks really funky
+	if(_look==B_FLOATING_WINDOW_LOOK)
 	_driver->DrawString(titlestr.String(),titlecount,
-		BPoint(_closerect.right+textoffset,_closerect.bottom-1),&_layerdata);
+		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_layerdata);
+	else	
+	_driver->DrawString(titlestr.String(),titlecount,
+		BPoint(_closerect.right+textoffset,_closerect.bottom),&_layerdata);
 }
 
 void DefaultDecorator::_SetFocus(void)
@@ -404,40 +355,30 @@ void DefaultDecorator::_SetFocus(void)
 	// SetFocus() performs necessary duties for color swapping and
 	// other things when a window is deactivated or activated.
 	
+	// Removed Adi's short-term color hack and replaced with a more palatable substitute for the old, 
+	// dark colors
 	if(GetFocus())
 	{
-// ADI: a temporary hack - the colors were TOO dark
-//		button_highcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-//		button_lowcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_2_TINT));
-		button_highcol.SetColor( RGBColor( 255, 255, 0 ) );
-		button_lowcol.SetColor( RGBColor( 234, 181, 0) );
+		button_highcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_1_TINT));
 		textcol=_colors->window_tab_text;
 	}
 	else
 	{
-// ADI: a temporary hack - the colors were TOO dark
-//		button_highcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-//		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_2_TINT));
-		button_highcol.SetColor( RGBColor(234, 181, 0) );
-		button_lowcol.SetColor( RGBColor( 255, 255, 0 ) );
+		button_highcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_LIGHTEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_1_TINT));
 		textcol=_colors->inactive_window_tab_text;
 	}
 }
 
 void DefaultDecorator::Draw(BRect update)
 {
-#ifdef DEBUG_DECORATOR
-printf("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom);
-#endif
+	#ifdef DEBUG_DECORATOR
+	printf("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom);
+	#endif
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
 
-	// Draw the top view's client area - just a hack :)
-	_layerdata.highcolor=_colors->document_background;
-/*
-	if(_borderrect.Intersects(update))
-		_driver->FillRect(_borderrect & update,&_layerdata,pat_solidhigh);
-*/	
 	_DrawFrame(update);
 	_DrawTab(update);
 }
@@ -447,19 +388,16 @@ void DefaultDecorator::Draw(void)
 	// Easy way to draw everything - no worries about drawing only certain
 	// things
 
-	// Draw the top view's client area - just a hack :)
-//	_layerdata.highcolor=_colors->document_background;
-
-//	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
-
 	_DrawFrame(_borderrect);
-
 	_DrawTab(_tabrect);
 }
 
 void DefaultDecorator::_DrawZoom(BRect r)
 {
-printf("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
+	#ifdef DEBUG_DECORATOR
+	printf("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
+	#endif
+
 	// If this has been implemented, then the decorator has a Zoom button
 	// which should be drawn based on the state of the member zoomstate
 	BRect zr( r );
@@ -476,14 +414,20 @@ printf("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
 
 void DefaultDecorator::_DrawClose(BRect r)
 {
-printf("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
+	#ifdef DEBUG_DECORATOR
+	printf("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
+	#endif
+
 	// Just like DrawZoom, but for a close button
 	DrawBlendedRect( r, GetClose());
 }
 
 void DefaultDecorator::_DrawTab(BRect r)
 {
-printf("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
+	#ifdef DEBUG_DECORATOR
+	printf("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
+	#endif
+	
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
