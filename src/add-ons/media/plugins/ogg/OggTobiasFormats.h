@@ -12,6 +12,7 @@
 
 
 // video
+
 static media_format_description
 tobias_video_description()
 {
@@ -39,7 +40,30 @@ tobias_video_encoded_media_format()
 
 // audio
 
-// TODO: add these
+static media_format_description
+tobias_audio_description()
+{
+	media_format_description description;
+	description.family = B_WAV_FORMAT_FAMILY;
+	return description;
+}
+
+
+static void
+init_tobias_media_raw_audio_format(media_raw_audio_format * output)
+{
+}
+
+
+static media_format
+tobias_audio_encoded_media_format()
+{
+	media_format format;
+	format.type = B_MEDIA_ENCODED_AUDIO;
+	init_tobias_media_raw_audio_format(&format.u.encoded_audio.output);
+	return format;
+}
+
 
 // text
 
