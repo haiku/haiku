@@ -31,13 +31,12 @@ mode_t perms [9] = {
 static void
 display_l(const char *path, const char *filename, struct stat *stat)
 {
-	const char *type;
 	char perm[11];
-	int i;
+	uint32 i;
 	memset(perm, '-', 10);
 	perm[10] = '\0';
-	
-	for (i=0; i < sizeof(perms) / sizeof(mode_t); i++) {
+
+	for (i = 0; i < sizeof(perms) / sizeof(mode_t); i++) {
 		if (stat->st_mode & perms[i]) {
 			switch(i % 3) {
 				case 0:
@@ -116,7 +115,6 @@ main(int argc, char *argv[])
 	}
 
 	if (S_ISDIR(st.st_mode)) {
-		char buf[1024];
 		DIR *thedir = opendir(arg);
 		
 		if (!thedir) {
