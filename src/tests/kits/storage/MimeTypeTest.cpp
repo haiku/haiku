@@ -100,7 +100,8 @@ static bool operator!=(BBitmap &bmp1, BBitmap &bmp2);
 static bool operator==(BMessage &msg1, BMessage &msg2);
 static bool operator!=(BMessage &msg1, BMessage &msg2);
 static void fill_bitmap(BBitmap &bmp, char value);
-//static void dump_bitmap(BBitmap &bmp, char *name = "bmp");
+static void dump_bitmap(BBitmap &bmp, char *name = "bmp");
+static status_t reduce_color_depth(BBitmap &src32, BBitmap &dest8);
 //static void dump_ref(entry_ref *ref, char* name = "ref");
 static void to_lower(const char *str, std::string &result);
 static std::string to_lower(const char *str);
@@ -334,15 +335,35 @@ fill_bitmap(BBitmap &bmp, char value) {
 //	printf("\n");
 }
 	
+// Fills the bitmap data with the given character
+void
+fill_bitmap32(BBitmap &bmp, char r, char g, char b, char a) {
+	if (bmp.ColorSpace() == B_RGB32 || bmp.ColorSpace() == B_RGBA32) {
+		char *data = (char*)bmp.Bits();
+		for (int i = 0; i+3 < bmp.BitsLength(); data += 4, i+= 4) {
+			data[0] = b;
+			data[1] = g;
+			data[2] = r;
+			data[3] = a;
+//			printf("(%d,%d,%d,%d)", data[2], data[1], data[0], data[3]);
+		}
+//		printf("\n");
+	}
+}
+	
 // Dumps the size, colorspace, and first data byte
 // of the bitmap to stdout
-/*void
+void
 dump_bitmap(BBitmap &bmp, char *name = "bmp") {
 	printf("%s == (%ldx%ld, ", name, bmp.Bounds().IntegerWidth()+1,
 		bmp.Bounds().IntegerHeight()+1);
 	switch (bmp.ColorSpace()) {
 		case B_CMAP8:
 			printf("B_CMAP8");
+			break;
+				
+		case B_RGB32:
+			printf("B_RGB32");
 			break;
 				
 		case B_RGBA32:
@@ -353,8 +374,40 @@ dump_bitmap(BBitmap &bmp, char *name = "bmp") {
 			printf("%x", bmp.ColorSpace());
 			break;		
 	}
-	printf(", %d)\n", *(char*)bmp.Bits());
-}*/
+	printf(", %d, [", *(char*)bmp.Bits());
+	char *data = (char*)bmp.Bits();
+	for (int i = 0; i < bmp.BitsLength() && i < 20; data++, i++)
+		printf("%d,", *data);
+	printf("]\n");
+}
+
+// Uses BBitmap::SetBits() to convert the B_RGB32 bitmap in src32
+// to a B_CMAP8 bitmap in dest8
+status_t
+reduce_color_depth(BBitmap &src32, BBitmap &dest8)
+{
+	status_t err = (src32.ColorSpace() == B_RGB32
+				      && dest8.ColorSpace() == B_CMAP8
+				        && src32.InitCheck() == B_OK
+				          && dest8.InitCheck() == B_OK
+					        && src32.Bounds() == dest8.Bounds())
+					          ? B_OK
+					            : B_BAD_VALUE;
+	if (!err) {
+		// Set each pixel individually, since SetBits() for B_RGB32 takes
+		// 24-bit rgb pixel data...
+		char *data = (char*)src32.Bits();
+		for (uint32 i = 0; i*4+3 < src32.BitsLength(); data += 4, i++) {
+			char rgb[3];
+			rgb[0] = data[2];	// red
+			rgb[1] = data[1];	// green
+			rgb[2] = data[0];	// blue
+			dest8.SetBits(rgb, 3, i, B_RGB32);
+		}
+	}
+	return err;
+}
+
 	
 // IconHelper and IconForTypeHelper:
 // Adapter(?) classes needed to reuse icon tests among {Get,Set}Icon() and {Get,Set}IconForType()
@@ -571,7 +624,12 @@ MimeTypeTest::AppHintTest() {
 		CHK(mime.GetAppHint(NULL) != B_OK);		// R5 == B_BAD_VALUE
 		CHK(!mime.IsInstalled());
 		CHK(mime.SetAppHint(NULL) != B_OK);		// Installs, R5 == B_ENTRY_NOT_FOUND
+												// OBOS == B_BAD_VALUE, doesn't install
+#if TEST_R5
 		CHK(mime.IsInstalled());
+#else
+		CHK(!mime.IsInstalled());
+#endif
 		CHK(mime.GetAppHint(NULL) != B_OK);		// R5 == B_BAD_VALUE
 		CHK(mime.SetAppHint(NULL) != B_OK);		// R5 == B_ENTRY_NOT_FOUND
 	}
@@ -1203,15 +1261,28 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		CHK(helper.GetIcon(mime, NULL) != B_OK);	// R5 == B_BAD_VALUE
 		CHK(!mime.IsInstalled());
 		CHK(helper.SetIcon(mime, NULL) != B_OK);	// R5 == Installs, B_ENTRY_NOT_FOUND
+												// OBOS == B_BAD_VALUE, doesn't install
+#if TEST_R5
 		CHK(mime.IsInstalled());
+#else
+		CHK(!mime.IsInstalled());
+#endif
 		CHK(helper.GetIcon(mime, bmp) != B_OK);	// R5 == B_ENTRY_NOT_FOUND
 		// Installed
 		CHK(helper.GetIcon(mime, NULL) != B_OK);	// R5 == B_BAD_VALUE
 		CHK(helper.SetIcon(mime, helper.Bitmap1()) == B_OK);
 		CHK(helper.GetIcon(mime, bmp) == B_OK);
 		CHK(*bmp == *helper.Bitmap1());
+#if TEST_R5
 		CHK(helper.SetIcon(mime, NULL) == B_OK);
+#else
+		CHK(helper.SetIcon(mime, NULL) == B_BAD_VALUE);
+#endif
+#if TEST_R5
 		CHK(helper.GetIcon(mime, bmp) != B_OK);	// R5 == B_ENTRY_NOT_FOUND
+#else
+		CHK(helper.GetIcon(mime, bmp) == B_OK);	// OBOS == Still installed from above
+#endif
 	}
 	// Invalid Bitmap Size (small -- 10x10)
 	NextSubTest();
@@ -1281,20 +1352,26 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 			CHK(mime.Install() == B_OK);
 		CHK(mime.IsInstalled());
 		// Init Test Bitmap
-		BBitmap testBmp(helper.BitmapBounds(), B_RGBA32);
+		BBitmap testBmp(helper.BitmapBounds(), B_RGB32);
 		// Test Set()
 #if !TEST_R5
-		fill_bitmap(testBmp, 4);
+//		fill_bitmap(testBmp, 4);
+		fill_bitmap32(testBmp, 10, 20, 30, 40);				// Fill our 32-bit bitmap
+		BBitmap testBmp8(helper.BitmapBounds(), B_CMAP8);	// Create an 8-bit bitmap the same size
+//		dump_bitmap(testBmp8);
+		reduce_color_depth(testBmp, testBmp8);				// Make it an 8-bit version of the 32-bit bitmap
+//		dump_bitmap(testBmp8);
 		CHK(testBmp != *helper.Bitmap1());
-		CHK(RES(helper.SetIcon(mime, helper.Bitmap1())) == B_OK);
-		CHK(RES(helper.GetIcon(mime, bmp)) == B_OK);
+		CHK(helper.SetIcon(mime, helper.Bitmap1()) == B_OK);
+		CHK(helper.GetIcon(mime, bmp) == B_OK);
 		CHK(*bmp == *helper.Bitmap1());
-		CHK(RES(helper.SetIcon(mime, &testBmp)) == B_OK);
+		CHK(helper.SetIcon(mime, &testBmp) == B_OK);
 			// R5 == B_OK, despite being invalid color depth; however, icon is not actually set,
 			// and any subsequent call to GetIcon() will cause the application to crash...
-		CHK(RES(helper.GetIcon(mime, bmp)) == B_OK);	// R5 == CRASH!
-		CHK(*bmp == *helper.Bitmap1());
-		CHK(*bmp != testBmp);
+		CHK(helper.GetIcon(mime, bmp) == B_OK);	// R5 == CRASH!, OBOS == Damn right I can handle that shit
+		CHK(*bmp != *helper.Bitmap1());
+		CHK(*bmp != testBmp);				// Shouldn't match, since SetIcon() reduces to B_CMAP8
+		CHK(*bmp == testBmp8);				// *Should* match, since it's the result of a similar reduction
 #endif
 		// Test Get()
 #if TEST_R5
@@ -1778,7 +1855,12 @@ MimeTypeTest::PreferredAppTest() {
 		CHK(mime.GetPreferredApp(NULL) != B_OK);		// R5 == B_ENTRY_NOT_FOUND
 		CHK(!mime.IsInstalled());
 		CHK(mime.SetPreferredApp(NULL) != B_OK);		// R5 == Installs (but doesn't set), B_ENTRY_NOT_FOUND
+														// OBOS == B_BAD_VALUE, doesn't install
+#if TEST_R5
 		CHK(mime.IsInstalled());
+#else
+		CHK(!mime.IsInstalled());
+#endif
 		CHK(mime.GetPreferredApp(str) == B_ENTRY_NOT_FOUND);
 	}
 	// Installed type, NULL params
