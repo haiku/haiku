@@ -86,6 +86,13 @@ platform_start_kernel(void)
 }
 
 
+void
+platform_exit(void)
+{
+	of_exit();
+}
+
+
 uint32
 platform_boot_options(void)
 {
