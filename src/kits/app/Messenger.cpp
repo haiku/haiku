@@ -43,6 +43,7 @@
 #include <Messenger.h>
 #include <OS.h>
 #include <Roster.h>
+#include <TokenSpace.h>
 
 // Project Includes ------------------------------------------------------------
 #include <AppMisc.h>
@@ -71,7 +72,7 @@ enum {
 */
 BMessenger::BMessenger()
 		  : fPort(-1),
-			fHandlerToken(-1),
+			fHandlerToken(B_NULL_TOKEN),
 			fTeam(-1),
 			fPreferredTarget(false)
 {
@@ -94,7 +95,7 @@ BMessenger::BMessenger()
 */
 BMessenger::BMessenger(const char *signature, team_id team, status_t *result)
 		  : fPort(-1),
-			fHandlerToken(-1),
+			fHandlerToken(B_NULL_TOKEN),
 			fTeam(-1),
 			fPreferredTarget(false)
 {
@@ -119,7 +120,7 @@ BMessenger::BMessenger(const char *signature, team_id team, status_t *result)
 BMessenger::BMessenger(const BHandler *handler, const BLooper *looper,
 					   status_t *result)
 		  : fPort(-1),
-			fHandlerToken(-1),
+			fHandlerToken(B_NULL_TOKEN),
 			fTeam(-1),
 			fPreferredTarget(false)
 {
@@ -141,7 +142,8 @@ BMessenger::BMessenger(const BHandler *handler, const BLooper *looper,
 			BObjectLocker<BLooperList> locker(gLooperList);
 			if (locker.IsLocked() && gLooperList.IsLooperValid(looper)) {
 				fPort = looper->fMsgPort;
-				fHandlerToken = (handler ? _get_object_token_(handler) : -1);
+				fHandlerToken = (handler
+					? _get_object_token_(handler) : B_PREFERRED_TOKEN);
 				fPreferredTarget = !handler;
 				fTeam = looper->Team();
 			} else
@@ -508,7 +510,7 @@ BMessenger::SetTo(team_id team, port_id port, int32 token, bool preferred)
 {
 	fTeam = team;
 	fPort = port;
-	fHandlerToken = token;
+	fHandlerToken = (preferred ? B_PREFERRED_TOKEN : token);
 	fPreferredTarget = preferred;
 }
 
@@ -562,7 +564,7 @@ BMessenger::InitData(const char *signature, team_id team, status_t *result)
 	if (error == B_OK) {
 		fTeam = team;
 		fPort = info.port;
-		fHandlerToken = 0;
+		fHandlerToken = B_PREFERRED_TOKEN;
 		fPreferredTarget = true;
 	}
 	// return the error
