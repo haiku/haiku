@@ -11,6 +11,7 @@
 #include <boot/platform.h>
 #include <boot/vfs.h>
 #include <boot/stdio.h>
+#include <boot/stage2.h>
 #include <util/kernel_cpp.h>
 
 #include <string.h>
@@ -223,4 +224,16 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 
 	return B_OK;
 }
+
+status_t 
+platform_register_boot_device(Node *device)
+{
+	disk_identifier &disk = gKernelArgs.boot_disk.identifier;
+
+	disk.bus_type = UNKNOWN_BUS;
+	disk.device_type = UNKNOWN_DEVICE;
+	disk.device.unknown.size = device->Size();
+
+	return B_OK;
+}		
 
