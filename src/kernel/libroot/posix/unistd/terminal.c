@@ -33,7 +33,7 @@ char *
 ctermid(char *s)
 {
 	static char defaultBuffer[L_ctermid];
-	char *name = ttyname(1);
+	char *name = ttyname(STDOUT_FILENO);
 		// we assume that stdout is our controlling terminal...
 
 	if (s == NULL)
