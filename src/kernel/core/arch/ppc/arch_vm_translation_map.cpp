@@ -1,7 +1,10 @@
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <KernelExport.h>
@@ -35,9 +38,29 @@ spinlock asid_bitmap_lock;
 	(((map)->arch_data->asid_base << ASID_SHIFT) + ((vaddr) / 0x10000000))
 
 // vm_translation object stuff
-typedef struct vm_translation_map_arch_info_struct {
+typedef struct vm_translation_map_arch_info {
 	int asid_base; // shift left by ASID_SHIFT to get the base asid to use
 } vm_translation_map_arch_info;
+
+
+void 
+ppc_translation_map_change_asid(vm_translation_map *map)
+{
+// this code depends on the kernel being at 0x80000000, fix if we change that
+#if KERNEL_BASE != 0x80000000
+#error fix me
+#endif
+	int asid_base = map->arch_data->asid_base;
+
+	asm("mtsr	0,%0" : : "g"(asid_base));
+	asm("mtsr	1,%0" : : "g"(asid_base + 1));
+	asm("mtsr	2,%0" : : "g"(asid_base + 2));
+	asm("mtsr	3,%0" : : "g"(asid_base + 3));
+	asm("mtsr	4,%0" : : "g"(asid_base + 4));
+	asm("mtsr	5,%0" : : "g"(asid_base + 5));
+	asm("mtsr	6,%0" : : "g"(asid_base + 6));
+	asm("mtsr	7,%0" : : "g"(asid_base + 7));
+}
 
 
 static status_t
@@ -331,25 +354,40 @@ static vm_translation_map_ops tmap_ops = {
 };
 
 
-int 
-vm_translation_map_create(vm_translation_map *new_map, bool kernel)
+//  #pragma mark -
+//  VM API
+
+
+status_t
+arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 {
 	// initialize the new object
-	new_map->ops = &tmap_ops;
-	new_map->map_count = 0;
-	if (recursive_lock_init(&new_map->lock, "map lock") < B_OK)
-		return B_NO_MEMORY;
+	map->ops = &tmap_ops;
+	map->map_count = 0;
 
-	new_map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
-	if (new_map->arch_data == NULL)
+	if (!kernel) {
+		// During the boot process, there are no semaphores available at this
+		// point, so we only try to create the translation map lock if we're
+		// initialize a user translation map.
+		// vm_translation_map_init_kernel_map_post_sem() is used to complete
+		// the kernel translation map.
+		if (recursive_lock_init(&map->lock, "translation map") < B_OK)
+			return map->lock.sem;
+	}
+
+	map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
+	if (map->arch_data == NULL) {
+		if (!kernel)
+			recursive_lock_destroy(&map->lock);
 		return B_NO_MEMORY;
+	}
 
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&asid_bitmap_lock);
 
 	// allocate a ASID base for this one
 	if (kernel) {
-		new_map->arch_data->asid_base = 0; // set up by the bootloader
+		map->arch_data->asid_base = 0; // set up by the bootloader
 		asid_bitmap[0] |= 0x1;
 	} else {
 		int i = 0;
@@ -368,18 +406,28 @@ vm_translation_map_create(vm_translation_map *new_map, bool kernel)
 		}
 		if (i >= MAX_ASIDS)
 			panic("vm_translation_map_create: out of ASIDs\n");
-		new_map->arch_data->asid_base = i;
+		map->arch_data->asid_base = i;
 	}
 
 	release_spinlock(&asid_bitmap_lock);
 	restore_interrupts(state);
 
-	return 0;
+	return B_OK;
 }
 
 
-int 
-vm_translation_map_module_init(kernel_args *args)
+status_t
+arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
+{
+	if (recursive_lock_init(&map->lock, "translation map") < B_OK)
+		return map->lock.sem;
+
+	return B_OK;
+}
+
+
+status_t
+arch_vm_translation_map_init(kernel_args *args)
 {
 	sPageTable = (page_table_entry_group *)args->arch_args.page_table.start;
 	sPageTableSize = args->arch_args.page_table.size;
@@ -389,14 +437,15 @@ vm_translation_map_module_init(kernel_args *args)
 }
 
 
-void 
-vm_translation_map_module_init_post_sem(kernel_args *ka)
+status_t
+arch_vm_translation_map_init_post_sem(kernel_args *args)
 {
+	return B_OK;
 }
 
 
-int 
-vm_translation_map_module_init2(kernel_args *ka)
+status_t
+arch_vm_translation_map_init_post_area(kernel_args *args)
 {
 	// create a region to cover the page table
 	sPageTableRegion = vm_create_anonymous_region(vm_get_kernel_aspace_id(), 
@@ -457,7 +506,7 @@ vm_translation_map_module_init2(kernel_args *ka)
  */
 
 status_t
-vm_translation_map_quick_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, 
+arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, 
 	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
 {
 	uint32 virtualSegmentID = get_sr((void *)virtualAddress) & 0xffffff;
@@ -491,31 +540,11 @@ vm_translation_map_quick_map(kernel_args *ka, addr_t virtualAddress, addr_t phys
 
 // XXX currently assumes this translation map is active
 
-int 
-vm_translation_map_quick_query(addr_t va, addr_t *out_physical)
+status_t 
+arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
 {
 	//PANIC_UNIMPLEMENTED();
 	panic("vm_translation_map_quick_query(): not yet implemented\n");
-	return 0;
-}
-
-
-void 
-ppc_translation_map_change_asid(vm_translation_map *map)
-{
-// this code depends on the kernel being at 0x80000000, fix if we change that
-#if KERNEL_BASE != 0x80000000
-#error fix me
-#endif
-	int asid_base = map->arch_data->asid_base;
-
-	asm("mtsr	0,%0" :: "g"(asid_base));
-	asm("mtsr	1,%0" :: "g"(asid_base+1));
-	asm("mtsr	2,%0" :: "g"(asid_base+2));
-	asm("mtsr	3,%0" :: "g"(asid_base+3));
-	asm("mtsr	4,%0" :: "g"(asid_base+4));
-	asm("mtsr	5,%0" :: "g"(asid_base+5));
-	asm("mtsr	6,%0" :: "g"(asid_base+6));
-	asm("mtsr	7,%0" :: "g"(asid_base+7));
+	return B_OK;
 }
 

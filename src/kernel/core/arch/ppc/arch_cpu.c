@@ -1,7 +1,10 @@
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <KernelExport.h>
@@ -9,24 +12,24 @@
 #include <boot/kernel_args.h>
 
 
-int 
-arch_cpu_preboot_init(kernel_args *ka)
+status_t 
+arch_cpu_preboot_init(kernel_args *args)
 {
-	return 0;
+	return B_OK;
 }
 
 
-int 
-arch_cpu_init(kernel_args *ka)
+status_t
+arch_cpu_init(kernel_args *args)
 {
-	return 0;
+	return B_OK;
 }
 
 
-int 
-arch_cpu_init2(kernel_args *ka)
+status_t
+arch_cpu_init_post_vm(kernel_args *args)
 {
-	return 0;
+	return B_OK;
 }
 
 #define CACHELINE 32
@@ -121,13 +124,13 @@ system_time(void)
 #endif
 
 
-int
-arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr *fault_handler)
+status_t
+arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *fault_handler)
 {
 	char *tmp = (char *)to;
 	char *s = (char *)from;
 
-	*fault_handler = (addr)&&error;
+	*fault_handler = (addr_t)&&error;
 
 	while (size--)
 		*tmp++ = *s++;
@@ -151,12 +154,12 @@ error:
  *	\return strlen(\a from).
  */
 
-int
-arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr *faultHandler)
+ssize_t
+arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHandler)
 {
 	int from_length = 0;
 
-	*faultHandler = (addr)&&error;
+	*faultHandler = (addr_t)&&error;
 
 	if (size > 0) {
 		to[--size] = '\0';
@@ -179,12 +182,12 @@ error:
 }
 
 
-int
-arch_cpu_user_memset(void *s, char c, size_t count, addr *fault_handler)
+status_t
+arch_cpu_user_memset(void *s, char c, size_t count, addr_t *fault_handler)
 {
 	char *xs = (char *)s;
 
-	*fault_handler = (addr)&&error;
+	*fault_handler = (addr_t)&&error;
 
 	while (count--)
 		*xs++ = c;

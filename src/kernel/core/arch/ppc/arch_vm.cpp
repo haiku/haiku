@@ -1,7 +1,10 @@
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <kernel.h>
@@ -11,15 +14,15 @@
 #include <arch_mmu.h>
 
 
-int 
-arch_vm_init(kernel_args *ka)
+status_t 
+arch_vm_init(kernel_args *args)
 {
-	return 0;
+	return B_OK;
 }
 
 
-int 
-arch_vm_init2(kernel_args *ka)
+status_t
+arch_vm_init2(kernel_args *args)
 {
 //	int bats[8];
 //	int i;
@@ -76,27 +79,24 @@ arch_vm_init2(kernel_args *ka)
 	bats[0] = bats[1] = 0;
 	setdbats(bats);
 #endif
-	return 0;
+	return B_OK;
 }
 
 
-int 
-arch_vm_init_existing_maps(kernel_args *ka)
+status_t
+arch_vm_init_post_area(kernel_args *args)
 {
-	void *temp = (void *)ka->fb.mapping.start;
-
-	// create a region for the framebuffer
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "framebuffer", &temp, B_EXACT_ADDRESS,
-		ka->fb.mapping.size, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
-	return B_NO_ERROR;
+	return B_OK;
 }
 
 
-int 
-arch_vm_init_endvm(kernel_args *ka)
+status_t
+arch_vm_init_end(kernel_args *args)
 {
-	return B_NO_ERROR;
+	// throw away anything in the kernel_args.pgtable[] that's not yet mapped
+	//vm_free_unused_boot_loader_range(KERNEL_BASE, 0x400000 * args->arch_args.num_pgtables);
+
+	return B_OK;
 }
 
 

@@ -1,7 +1,10 @@
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <boot/kernel_args.h>
@@ -150,23 +153,23 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 }
 
 
-int 
-arch_int_init(kernel_args *ka)
+status_t 
+arch_int_init(kernel_args *args)
 {
-	return 0;
+	return B_OK;
 }
 
 
-int 
-arch_int_init2(kernel_args *ka)
+status_t
+arch_int_init_post_vm(kernel_args *args)
 {
 	region_id exception_region;
 	void *handlers;
 
 	// create a region to map the irq vector code into (physical address 0x0)
-	handlers = (void *)ka->arch_args.exception_handlers.start;
+	handlers = (void *)args->arch_args.exception_handlers.start;
 	exception_region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "exception_handlers",
-		&handlers, B_EXACT_ADDRESS, ka->arch_args.exception_handlers.size, 
+		&handlers, B_EXACT_ADDRESS, args->arch_args.exception_handlers.size, 
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (exception_region < 0)
 		panic("arch_int_init2: could not create exception handler region\n");
@@ -174,9 +177,9 @@ arch_int_init2(kernel_args *ka)
 	dprintf("exception handlers at %p\n", handlers);
 
 	// copy the handlers into this area
-	memcpy(handlers, &__irqvec_start, ka->arch_args.exception_handlers.size);
+	memcpy(handlers, &__irqvec_start, args->arch_args.exception_handlers.size);
 	arch_cpu_sync_icache(0, 0x1000);
 
-	return 0;
+	return B_OK;
 }
 

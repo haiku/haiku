@@ -1,7 +1,10 @@
-/* 
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <kernel.h>
@@ -11,24 +14,31 @@
 #include <string.h>
 
 
-int
-arch_team_init_team_struct(struct team *team, bool kernel)
+status_t
+arch_thread_init(struct kernel_args *args)
 {
-	return 0;
+	return B_OK;
 }
 
 
-int
+status_t
+arch_team_init_team_struct(struct team *team, bool kernel)
+{
+	return B_OK;
+}
+
+
+status_t
 arch_thread_init_thread_struct(struct thread *t)
 {
 	// set up an initial state (stack & fpu)
 	memset(&t->arch_info, 0, sizeof(t->arch_info));
 
-	return 0;
+	return B_OK;
 }
 
 
-int
+status_t
 arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
@@ -45,7 +55,7 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (
 	// save this stack position
 	t->arch_info.sp = (void *)kstack_top;
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -81,9 +91,9 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 	asm("mtear  %0" :: "g"(t_to->kernel_stack_base + KSTACK_SIZE - 8));
 
     // switch the asids if we need to
-	if (t_to->team->_aspace_id >= 0) {
+	if (t_to->team->aspace != NULL) {
 		// the target thread has is user space
-		if (t_from->team->_aspace_id != t_to->team->_aspace_id) {
+		if (t_from->team != t_to->team) {
 			// switching to a new address space
 			ppc_translation_map_change_asid(&t_to->team->aspace->translation_map);
 		}
@@ -103,7 +113,7 @@ arch_thread_dump_info(void *info)
 
 
 void
-arch_thread_enter_uspace(struct thread *thread, addr entry, void *arg1, void *arg2)
+arch_thread_enter_uspace(struct thread *thread, addr_t entry, void *arg1, void *arg2)
 {
 	panic("arch_thread_enter_uspace(): not yet implemented\n");
 }
@@ -128,4 +138,28 @@ arch_check_syscall_restart(struct thread *thread)
 {
 }
 
+
+/**	Saves everything needed to restore the frame in the child fork in the
+ *	arch_fork_arg structure to be passed to arch_restore_fork_frame().
+ *	Also makes sure to return the right value.
+ */
+
+void
+arch_store_fork_frame(struct arch_fork_arg *arg)
+{
+}
+
+
+/** Restores the frame from a forked team as specified by the provided
+ *	arch_fork_arg structure.
+ *	Needs to be called from within the child team, ie. instead of
+ *	arch_thread_enter_uspace() as thread "starter".
+ *	This function does not return to the caller, but will enter userland
+ *	in the child team at the same position where the parent team left of.
+ */
+
+void
+arch_restore_fork_frame(struct arch_fork_arg *arg)
+{
+}
 

@@ -1,7 +1,10 @@
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <kernel.h>
@@ -210,34 +213,18 @@ arch_dbg_putchar(char c)
 #endif
 
 
-int 
-arch_dbg_con_init(kernel_args *ka)
+void
+arch_dbg_con_early_boot_message(const char *string)
 {
-#if FRAMEBUFFER_DBG_CONSOLE
-	framebuffer = (unsigned char *)ka->fb.mapping.start;
-	screen_size_x = ka->fb.x_size;
-	screen_size_y = ka->fb.y_size;
-
-	back_color = 0x0;
-	draw_color = 0xff;
-	char_x = 0;
-	char_y = ka->cons_line;
-	screen_depth = ka->fb.bit_depth;
-
-	num_cols = screen_size_x / CHAR_WIDTH;
-	num_rows = screen_size_y / CHAR_HEIGHT;
-
-#endif
-
-	return B_NO_ERROR;
+	// this function will only be called in fatal situations
 }
 
 
-int 
-arch_dbg_con_init2(kernel_args *ka)
+status_t
+arch_dbg_con_init(kernel_args *args)
 {
-#if 0
 #if FRAMEBUFFER_DBG_CONSOLE
+#if 0
 	region_id fb_region;
 	void *new_framebuffer;
 
@@ -249,38 +236,50 @@ arch_dbg_con_init2(kernel_args *ka)
 	dprintf("framebuffer now at %p, phys addr 0x%x\n", new_framebuffer, ka->fb.phys_addr.start);
 
 	dprintf("compare %d\n", memcmp(framebuffer, new_framebuffer, ka->fb.phys_addr.size));
+#endif
+
+	// ToDo: this has to be mapped before it can be used!
+	framebuffer = (unsigned char *)args->frame_buffer.physical_buffer.start;
+
+	screen_size_x = args->frame_buffer.width;
+	screen_size_y = args->frame_buffer.height;
+
+	back_color = 0x0;
+	draw_color = 0xff;
+	char_x = 0;
+	char_y = args->cons_line;
+	screen_depth = args->frame_buffer.depth;
+
+	num_cols = screen_size_x / CHAR_WIDTH;
+	num_rows = screen_size_y / CHAR_HEIGHT;
 
 #endif
-#endif
+
 	return B_NO_ERROR;
 }
 
-char arch_dbg_con_read()
+
+char 
+arch_dbg_con_read()
 {
-	for(;;);
+	for (;;);
 	return 0;
 }
 
-char arch_dbg_con_putch(const char c)
+
+char 
+arch_dbg_con_putch(const char c)
 {
 	return c;
 }
 
-void arch_dbg_con_puts(const char *str)
+
+void 
+arch_dbg_con_puts(const char *str)
 {
-	while(*str) {
+	while (*str) {
 		arch_dbg_putchar(*str);
 		str++;
 	}
-}
-
-ssize_t arch_dbg_con_write(const void *buf, ssize_t len)
-{
-	ssize_t i;
-
-	for(i = 0; i < len; i++)
-		arch_dbg_putchar(((char *)buf)[i]);
-
-	return 0;
 }
 
