@@ -68,7 +68,7 @@ UserDataWriter::Unset()
 
 // AllocateData
 void *
-UserDataWriter::AllocateData(size_t size, size_t align = 1)
+UserDataWriter::AllocateData(size_t size, size_t align)
 {
 	// handles size == 0 gracefully
 	// get a properly aligned offset

@@ -336,7 +336,7 @@ KDiskDevice::ShadowOwner() const
 void
 KDiskDevice::WriteUserData(UserDataWriter &writer, bool shadow)
 {
-	KPartition *partition = (shadow ? ShadowPartition() : this);
+	KPartition *partition = shadow ? ShadowPartition() : static_cast<KPartition *>(this);
 	if (!partition)
 		partition = this;
 	user_disk_device_data *data
