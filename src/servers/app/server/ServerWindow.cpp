@@ -379,6 +379,10 @@ bool ServerWindow::IsHidden(void)
 
 void ServerWindow::Minimize(bool status)
 {
+	// This function doesn't need much -- check to make sure that we should and
+	// send the message to the client. According to the BeBook, the BWindow hook function
+	// does all the heavy lifting for us. :)
+	
 	bool sendMessages = false;
 
 	if (status)
@@ -400,14 +404,12 @@ void ServerWindow::Minimize(bool status)
 	
 	if (sendMessages)
 	{
-		BMessage		msg;
-		msg.what		= B_MINIMIZE;
+		BMessage msg;
+		msg.what = B_MINIMIZE;
 		msg.AddInt64("when", real_time_clock_usecs());
 		msg.AddBool("minimize", status);
 	
 		SendMessageToClient(&msg);
-		
-		// TODO: Do we need to notify Tracker? The Deskbar? If so, how?
 	}
 }
 
@@ -2248,6 +2250,17 @@ int32 ServerWindow::MonitorWin(void *data)
 				delete win;
 				break;
 			}
+			// TODO: This message is never received.... why?
+/*			case AS_QUIT_APP:
+			{
+				// We receive this _only_ when the server is shutting down. The app_server
+				// is not asking the app to quit - it's *telling* it to quit because
+				// in just a short time, the server itself is going to disappear.
+				
+				BMessage msg(_QUIT_);
+				win->SendMessageToClient(&msg);
+			}
+*/
 			case B_QUIT_REQUESTED:
 			{
 				STRACE(("ServerWindow %s received Quit request\n",win->Title()));

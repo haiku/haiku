@@ -222,6 +222,14 @@ void WinBorder::MouseDown(PortMessage *msg)
 				STRACE_CLICK(("===> DEC_ZOOM\n"));
 				break;
 			}
+			case DEC_MINIMIZE:
+			{
+				fIsMinimizing = true;
+				fDecorator->SetMinimize(true);
+				fDecorator->DrawMinimize();
+				STRACE_CLICK(("===> DEC_MINIMIZE\n"));
+				break;
+			}
 			case DEC_RESIZE:
 			{
 				fIsResizing = true;
@@ -342,6 +350,7 @@ void WinBorder::MouseUp(PortMessage *msg)
 		fIsZooming	= false;
 		fDecorator->SetZoom(false);
 		fDecorator->DrawZoom();
+		Window()->Zoom();
 		return;
 	}
 	if (fIsClosing)
@@ -349,6 +358,7 @@ void WinBorder::MouseUp(PortMessage *msg)
 		fIsClosing	= false;
 		fDecorator->SetClose(false);
 		fDecorator->DrawClose();
+		Window()->Quit();
 		return;
 	}
 	if(fIsMinimizing)
@@ -356,6 +366,7 @@ void WinBorder::MouseUp(PortMessage *msg)
 		fIsMinimizing = false;
 		fDecorator->SetMinimize(false);
 		fDecorator->DrawMinimize();
+		Window()->Minimize(true);
 		return;
 	}
 }
