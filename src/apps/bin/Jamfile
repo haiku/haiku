@@ -23,6 +23,10 @@ StdBinCommands
 	catattr.cpp
 	roster.cpp
 	: be stdc++.r4 ;
+	
+StdBinCommands
+	mail.cpp
+	: be /boot/beos/system/lib/libmail.so ;
 
 StdBinCommands
 	chop.c
@@ -50,10 +54,6 @@ SubInclude OBOS_TOP src apps bin chkbfs ;
 SubInclude OBOS_TOP src apps bin listdev ;
 SubInclude OBOS_TOP src apps bin mkdos ;
 SubInclude OBOS_TOP src apps bin pc ;
-SubInclude OBOS_TOP src apps bin sed ;
-
-# RCS commands
-SubInclude OBOS_TOP src apps bin rcs ;
 
 # Network command line tools
 SubInclude OBOS_TOP src apps bin arp ;
@@ -66,4 +66,3 @@ SubInclude OBOS_TOP src apps bin traceroute ;
 # Compression command line tools
 SubInclude OBOS_TOP src apps bin unzip ;
 SubInclude OBOS_TOP src apps bin zip ;
-SubInclude OBOS_TOP src apps bin gzip ;
