@@ -106,7 +106,7 @@ elf_load_image(int fd, preloaded_image *image)
 		region->size = ROUNDUP(programHeaders[i].p_memsz + (programHeaders[i].p_vaddr % B_PAGE_SIZE), PAGE_SIZE);
 		region->delta = -region->start;
 
-		TRACE(("segment %d: start = %p, size = %lu, delta = %ld\n", i,
+		TRACE(("segment %d: start = %p, size = %lu, delta = %lx\n", i,
 			region->start, region->size, region->delta));
 	}
 
