@@ -1,0 +1,10 @@
+libc {
+  GLIBC_2.1 {
+    # i*
+    iconv_open; iconv; iconv_close;
+  }
+  GLIBC_PRIVATE {
+    # functions shared with iconv program
+    __gconv_get_alias_db; __gconv_get_modules_db; __gconv_get_cache;
+  }
+}
