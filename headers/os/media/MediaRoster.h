@@ -11,7 +11,6 @@
 #if !defined(_MEDIA_ROSTER_H)
 #define _MEDIA_ROSTER_H
 
-#include <map>
 #include <MediaDefs.h>
 #include <MediaNode.h>
 #include <config_manager.h>
