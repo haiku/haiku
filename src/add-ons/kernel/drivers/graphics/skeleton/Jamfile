@@ -1,0 +1,29 @@
+SubDir OBOS_TOP src add-ons kernel drivers graphics skeleton ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics skeleton ] ;
+
+R5KernelAddon skel.driver : kernel drivers bin :
+	driver.c
+;
+
+Package haiku-skeleton-cvs :
+	README.html UPDATE.html ;
+Package openbeos-skeleton-cvs :
+	skel.driver : 
+	boot home config add-ons kernel drivers bin ;
+Package haiku-skeleton-cvs :
+	<kernel!drivers!dev!graphics>skel.driver :
+	boot home config add-ons kernel drivers dev graphics ;
+Package haiku-skeleton-cvs :
+	skel.settings :
+	boot home config settings kernel drivers ;
+
+# Link to kernel/drivers/dev/graphics
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
+	local instDriver = <kernel!drivers!dev!graphics>skel.driver ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : skel.driver ;
+}
+
