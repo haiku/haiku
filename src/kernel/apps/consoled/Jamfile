@@ -3,5 +3,5 @@ SubDir OBOS_TOP src kernel apps consoled ;
 UsePrivateHeaders kernel ;
 
 App consoled :
-	main.c
-	: libroot.so ;
+	consoled.cpp
+	: libroot.so libbe.so ;
