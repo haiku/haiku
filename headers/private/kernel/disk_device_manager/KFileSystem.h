@@ -40,6 +40,7 @@ public:
 	virtual bool SupportsSettingContentName(KPartition *partition,
 											bool *whileMounted);
 	virtual bool SupportsInitializing(KPartition *partition);
+	virtual bool IsSubSystemFor(KPartition *partition);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
 	virtual bool ValidateMove(KPartition *partition, off_t *start);

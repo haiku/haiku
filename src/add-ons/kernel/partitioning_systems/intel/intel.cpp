@@ -319,6 +319,7 @@ static partition_module_info intel_partition_map_module = {
 	NULL,								// supports_deleting_child_partition
 	NULL,								// supports_initializing_partition
 	NULL,							// supports_initializing_child_partition
+	NULL,								// is_sub_system_for
 
 	NULL,								// validate_resize_partition
 	NULL,								// validate_resize_child_partition
@@ -395,6 +396,7 @@ static partition_module_info intel_extended_partition_module = {
 	NULL,								// supports_deleting_child_partition
 	NULL,								// supports_initializing_partition
 	NULL,							// supports_initializing_child_partition
+	NULL,								// is_sub_system_for
 
 	NULL,								// validate_resize_partition
 	NULL,								// validate_resize_child_partition

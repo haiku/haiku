@@ -277,6 +277,7 @@ static fs_module_info bfs_module = {
 	NULL,								// supports_moving_partition
 	NULL,								// supports_setting_content_name
 	NULL,								// supports_initializing_partition
+	NULL,								// is_sub_system_for
 
 	NULL,								// validate_resize_partition
 	NULL,								// validate_move_partition

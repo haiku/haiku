@@ -150,6 +150,14 @@ KFileSystem::SupportsInitializing(KPartition *partition)
 	return false;
 }
 
+// IsSubSystemFor
+bool
+KFileSystem::IsSubSystemFor(KPartition *partition)
+{
+	// to be implemented
+	return false;
+}
+
 // ValidateResize
 bool
 KFileSystem::ValidateResize(KPartition *partition, off_t *size)

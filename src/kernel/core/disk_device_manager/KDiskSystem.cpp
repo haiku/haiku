@@ -271,6 +271,14 @@ KDiskSystem::SupportsInitializingChild(KPartition *child,
 	return false;
 }
 
+// IsSubSystemFor
+bool
+KDiskSystem::IsSubSystemFor(KPartition *partition)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
 // ValidateResize
 bool
 KDiskSystem::ValidateResize(KPartition *partition, off_t *size)

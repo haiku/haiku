@@ -44,6 +44,7 @@ public:
 	virtual bool SupportsInitializing(KPartition *partition);
 	virtual bool SupportsInitializingChild(KPartition *child,
 										   const char *diskSystem);
+	virtual bool IsSubSystemFor(KPartition *partition);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
 	virtual bool ValidateResizeChild(KPartition *partition, off_t *size);

@@ -47,6 +47,7 @@ typedef bool (*partition_supports_initializing_partition)(
 	partition_data *partition);
 typedef bool (*partition_supports_initializing_child_partition)(
 	partition_data *partition, const char *system);
+typedef bool (*partition_is_sub_system_for)(partition_data *partition);
 
 typedef bool (*partition_validate_resize_partition)(partition_data *partition,
 	off_t *size);
@@ -75,10 +76,10 @@ typedef bool (*partition_get_partitionable_spaces)(partition_data *partition,
 	partitionable_space_data *spaces, int32 count, int32 *actualCount);
 	// When not implemented, a standard algorithm is used.
 
-typedef bool (*partition_get_next_supported_type)(partition_data *partition,
-	int32 *cookie, char *type);
-typedef bool (*partition_get_type_for_content_type)(partition_data *partition,
-	const char *contentType, char *type);
+typedef status_t (*partition_get_next_supported_type)(
+	partition_data *partition, int32 *cookie, char *type);
+typedef status_t (*partition_get_type_for_content_type)(
+	partition_data *partition, const char *contentType, char *type);
 
 // writing
 // (device is NOT locked)
@@ -142,6 +143,7 @@ typedef struct partition_module_info {
 			supports_initializing_partition;
 	partition_supports_initializing_child_partition
 			supports_initializing_child_partition;
+	partition_is_sub_system_for					is_sub_system_for;
 
 	partition_validate_resize_partition			validate_resize_partition;
 	partition_validate_resize_child_partition
@@ -205,6 +207,7 @@ typedef bool (*fs_supports_moving_partition)(partition_data *partition,
 typedef bool (*fs_supports_setting_content_name)(partition_data *partition,
 	bool *whileMounted);
 typedef bool (*fs_supports_initializing_partition)(partition_data *partition);
+typedef bool (*fs_is_sub_system_for)(partition_data *partition);
 
 typedef bool (*fs_validate_resize_partition)(partition_data *partition,
 	off_t *size);
@@ -255,6 +258,7 @@ typedef struct fs_module_info {
 	fs_supports_setting_content_name			supports_setting_content_name;
 	fs_supports_initializing_partition
 			supports_initializing_partition;
+	fs_is_sub_system_for						is_sub_system_for;
 
 	fs_validate_resize_partition				validate_resize_partition;
 	fs_validate_move_partition					validate_move_partition;

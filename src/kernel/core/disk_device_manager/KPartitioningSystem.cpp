@@ -205,6 +205,14 @@ KPartitioningSystem::SupportsInitializingChild(KPartition *child,
 	return false;
 }
 
+// IsSubSystemFor
+bool
+KPartitioningSystem::IsSubSystemFor(KPartition *partition)
+{
+	// to be implemented
+	return false;
+}
+
 // ValidateResize
 bool
 KPartitioningSystem::ValidateResize(KPartition *partition, off_t *size)
