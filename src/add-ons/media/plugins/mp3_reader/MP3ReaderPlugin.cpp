@@ -517,10 +517,6 @@ mp3Reader::GetFrameLength(void *header)
 	
 	int mpeg_version_index = (h[1] >> 3) & 0x03;
 	int layer_index = (h[1] >> 1) & 0x03;
-	int no_crc = (h[1] & 0x01);
-	/* VBR files seem to use CRC in info frames, probably to make the
-	 * decoder discard them with a wrong CRC...
-	 */
 	int bitrate_index = (h[2] >> 4) & 0x0f;
 	int sampling_rate_index = (h[2] >> 2) & 0x03;
 	int padding = (h[2] >> 1) & 0x01;
@@ -541,7 +537,7 @@ mp3Reader::GetFrameLength(void *header)
 	TRACE("%s %s, %s crc, bit rate %d, sampling rate %d, padding %d, frame length %d\n",
 		mpeg_version_index == 0 ? "mpeg 2.5" : (mpeg_version_index == 2 ? "mpeg 2" : "mpeg 1"),
 		layer_index == 3 ? "layer 1" : (layer_index == 2 ? "layer 2" : "layer 3"),
-		no_crc ? "no" : "has",
+		(h[1] & 0x01) ? "no" : "has",
 		bitrate, samplingrate, padding, length);
 	
 	return length;
