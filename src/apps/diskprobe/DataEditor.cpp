@@ -8,8 +8,10 @@
 
 #include <Autolock.h>
 #include <NodeMonitor.h>
+#include <Drivers.h>
 
 #include <string.h>
+#include <unistd.h>
 
 
 class DataChange {
@@ -203,11 +205,31 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 	fFile.GetStat(&stat);
 	fIsDevice = (stat.st_mode & (S_IFBLK | S_IFCHR)) != 0;
 
-	// ToDo: add support for devices and attributes!
-	status = fFile.GetSize(&fSize);
-	if (status < B_OK) {
-		fFile.Unset();
-		return status;
+	fBlockSize = 512;
+
+	if (fIsDevice) {
+		// ToDo: is there any other possibility to issue a ioctl() from a BFile?
+		device_geometry geometry;
+		int device = fFile.Dup();
+		if (device < 0 || ioctl(device, B_GET_GEOMETRY, &geometry) < 0) {
+			if (device >= 0)
+				close(device);
+			fFile.Unset();
+			return B_ERROR;
+		}
+		close(device);
+
+		fSize = geometry.head_count * geometry.cylinder_count * geometry.sectors_per_track;
+		fBlockSize = geometry.bytes_per_sector;
+	} else if (IsAttribute()) {
+		// ToDo: add support for attributes!
+		fSize = 0;
+	} else {
+		status = fFile.GetSize(&fSize);
+		if (status < B_OK) {
+			fFile.Unset();
+			return status;
+		}
 	}
 
 	if (attribute != NULL)
@@ -216,7 +238,6 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		fAttribute = NULL;
 
 	fView = NULL;
-	fBlockSize = 512;
 	fRealViewOffset = 0;
 	fViewOffset = 0;
 	fRealViewSize = fViewSize = fBlockSize;
