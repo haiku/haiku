@@ -1232,25 +1232,25 @@ BParameterGroup &BParameterGroup::operator=(const BParameterGroup &clone)
 */
 
 
+/** Creates an uninitialized parameter of the specified type.
+ *	Unlike the BParameterGroup::MakeXXXParameter() type of methods, this
+ *	method does not add the parameter to this group automatically.
+ */
+
 BParameter *
 BParameterGroup::MakeControl(int32 type)
 {
 	CALLED();
 
-	/*NOTE:
-	  Creates a new parameter for addition within this with a type defined by
-	  the passed 'type' parameter,
-	  BUT DOES NOT ADD THE CREATED PARAMETER TO THE INTERNAL LIST OF PARAMETERS
-	*/
 	switch (type) {
 		case BParameter::B_NULL_PARAMETER:
-			return new BNullParameter(-1, B_MEDIA_UNKNOWN_TYPE, mWeb, "nullParameter", B_GENERIC);
+			return new BNullParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL);
 
 		case BParameter::B_DISCRETE_PARAMETER:
-			return new BDiscreteParameter(-1, B_MEDIA_UNKNOWN_TYPE, mWeb, "discreteParameter", B_GENERIC);
+			return new BDiscreteParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL);
 
 		case BParameter::B_CONTINUOUS_PARAMETER:
-			return new BContinuousParameter(-1, B_MEDIA_UNKNOWN_TYPE, mWeb, "continuousParameter", B_GENERIC,"",0,100,1);
+			return new BContinuousParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL, NULL, 0, 0, 0);
 
 		default:
 			ERROR("BParameterGroup::MakeControl unknown type %ld\n", type);
@@ -1743,6 +1743,9 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 
 	// read the list of inputs
 
+	// it will directly add the pointers in the flattened message to the list;
+	// these will be fixed to point to the real inputs/outputs later in FixRefs()
+
 	int32 count = read_from_buffer_swap32<int32>(&buffer, mSwapDetected);	
 
 	if (mInputs == NULL)
@@ -1751,7 +1754,7 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 		mInputs->MakeEmpty();
 
 	for (int32 i = 0; i < count; i++) {
-		AddInput(read_from_buffer_swap32<BParameter * const>(&buffer, mSwapDetected));
+		mInputs->AddItem(read_from_buffer_swap32<BParameter * const>(&buffer, mSwapDetected));
 	}
 
 	// read the list of outputs
@@ -1764,7 +1767,7 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 		mOutputs->MakeEmpty();
 
 	for (int32 i = 0; i < count; i++) {
-		AddOutput(read_from_buffer_swap32<BParameter * const>(&buffer, mSwapDetected));
+		mOutputs->AddItem(read_from_buffer_swap32<BParameter * const>(&buffer, mSwapDetected));
 	}
 
 	mMediaType = read_from_buffer_swap32<media_type>(&buffer, mSwapDetected);
