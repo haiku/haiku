@@ -299,10 +299,10 @@ status_t BPropertyInfo::Unflatten(type_code code, const void *buffer,
 
 		// Main chunks
 		for (int32 pi = 0; pi < fPropCount; pi++) {
-			fPropInfo[pi].name = strdup(static_cast<char *>(buffer) + flatData.Position());
+			fPropInfo[pi].name = strdup(static_cast<const char*>(buffer) + flatData.Position());
 			flatData.Seek(strlen(fPropInfo[pi].name) + 1, SEEK_CUR);
 			
-			fPropInfo[pi].usage = strdup(static_cast<char *>(buffer) + flatData.Position());
+			fPropInfo[pi].usage = strdup(static_cast<const char *>(buffer) + flatData.Position());
 			flatData.Seek(strlen(fPropInfo[pi].usage) + 1, SEEK_CUR);
 
 			flatData.Read(&fPropInfo[pi].extra_data, sizeof(fPropInfo[pi].extra_data));
@@ -345,7 +345,7 @@ status_t BPropertyInfo::Unflatten(type_code code, const void *buffer,
 				for (int32 j = 0; tmpInt != 0; j++) {
 					flatData.Seek(-sizeof(tmpInt), SEEK_CUR);
 					fPropInfo[pi].ctypes[i].pairs[j].name =
-									strdup(static_cast<char *>(buffer) + flatData.Position());
+									strdup(static_cast<const char *>(buffer) + flatData.Position());
 					flatData.Seek(strlen(fPropInfo[pi].ctypes[i].pairs[j].name) + 1, SEEK_CUR);
 									
 					flatData.Read(&fPropInfo[pi].ctypes[i].pairs[j].type,
@@ -375,10 +375,10 @@ status_t BPropertyInfo::Unflatten(type_code code, const void *buffer,
 			flatData.Read(&fValueInfo[vi].kind, sizeof(fValueInfo[vi].kind));
 			flatData.Read(&fValueInfo[vi].value, sizeof(fValueInfo[vi].value));
 
-			fValueInfo[vi].name = strdup(static_cast<char *>(buffer) + flatData.Position());
+			fValueInfo[vi].name = strdup(static_cast<const char *>(buffer) + flatData.Position());
 			flatData.Seek(strlen(fValueInfo[vi].name) + 1, SEEK_CUR);
 			
-			fValueInfo[vi].usage = strdup(static_cast<char *>(buffer) + flatData.Position());
+			fValueInfo[vi].usage = strdup(static_cast<const char *>(buffer) + flatData.Position());
 			flatData.Seek(strlen(fValueInfo[vi].usage) + 1, SEEK_CUR);
 			
 			flatData.Read(&fValueInfo[vi].extra_data, sizeof(fValueInfo[vi].extra_data));
