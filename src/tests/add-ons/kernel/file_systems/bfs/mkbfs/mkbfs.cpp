@@ -1,11 +1,12 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "Volume.h"
 
+#include "boot_block.h"
 #include "compat.h"
 #include "kprotos.h"
 
@@ -34,10 +35,10 @@ struct nspace {
 	fsystem             *fs;
 	vnlist              vnodes;
 	void                *data;
-	vnode *             root;
-	vnode *             mount;
-	nspace *            prev;
-	nspace *            next;
+	vnode				*root;
+	vnode				*mount;
+	nspace				*prev;
+	nspace				*next;
 	char                shutdown;
 };
 
@@ -156,6 +157,27 @@ main(int argc, char **argv)
 	}
 
 	shutdown_block_cache();
+	
+	// make the disk image bootable
+
+	int device = open(deviceName, O_RDWR);
+	if (device < 0) {
+		fprintf(stderr, "%s: Could not make image bootable: %s\n", programName, strerror(errno));
+		return -1;
+	}
+
+	// change BIOS drive and partition offset
+	// ToDo: for now, this will only work for images only
+
+	sBootBlockData1[kBIOSDriveOffset] = 0x80;
+		// for now, this should be replaced by the real thing
+	uint32 *offset = (uint32 *)&sBootBlockData1[kPartitionDataOffset];
+	*offset = 0;
+
+	write_pos(device, 0, sBootBlockData1, kBootBlockData1Size);
+	write_pos(device, kBootBlockData2Offset, sBootBlockData2, kBootBlockData2Size);
+
+	close(device);
 	sync();
 
 	return 0;
