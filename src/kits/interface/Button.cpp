@@ -98,14 +98,20 @@ void BButton::Draw(BRect updateRect)
 	{
 		float x = (bounds.right - StringWidth(Label())) / 2.0f;
 		float y = bounds.top + ((bounds.Height() - fh.ascent - fh.descent) / 2.0f) + fh.ascent + fh.descent + 1;
-
-		if (IsFocus())
+		
+		bool bDrawFocusLine = IsFocus() && Window()->IsActive();
+		if (bDrawFocusLine)
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 		else
 			SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 				B_LIGHTEN_1_TINT));
 
+		// Blue Line
 		StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
+		if (bDrawFocusLine)		
+			SetHighColor(255, 255, 255);
+		// White Line
+		StrokeLine(BPoint(x, y + 1), BPoint(x + StringWidth(Label()), y + 1));
 
 		return;
 	}
@@ -203,12 +209,15 @@ void BButton::Draw(BRect updateRect)
 
 		DrawString(Label(), BPoint(x, y));
 		
-		// Focus
-		if (IsFocus())
+		if (IsFocus() && Window()->IsActive())
 		{
+			// Draw focus line
 			y += fh.descent;
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 			StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
+			SetHighColor(255, 255, 255);
+			StrokeLine(BPoint(x, y + 1), BPoint(x + StringWidth(Label()), y + 1));
+			
 		}
 	}
 	else
@@ -270,6 +279,7 @@ void BButton::Draw(BRect updateRect)
 		DrawString(Label(), BPoint(x, y));
 	}
 }
+
 //------------------------------------------------------------------------------
 void BButton::MouseDown(BPoint point)
 {
