@@ -18,13 +18,13 @@ typedef struct elf_region {
 } elf_region;
 
 struct elf_image_info {
-	struct elf_image_info *next;
+	struct elf_image_info *next;	// next image in the hash
 	char		*name;
 	image_id	id;
 	int32		ref_count;
 	void		*vnode;
-	elf_region	regions[2]; // describes the text and data regions
-	addr_t		dynamic_ptr; // pointer to the dynamic section
+	elf_region	regions[2];			// describes the text and data regions
+	addr_t		dynamic_ptr;		// pointer to the dynamic section
 	struct elf_linked_image *linked_images;
 
 	struct Elf32_Ehdr *eheader;
