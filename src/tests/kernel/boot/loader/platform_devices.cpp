@@ -71,7 +71,9 @@ status_t
 platform_get_boot_devices(struct stage2_args *args, struct list *list)
 {
 	add_device("/boot/home/test-file-device", list);
-	recursive_add_device("/dev/disk", list);
+	recursive_add_device("/dev/disk/ide", list);
+	recursive_add_device("/dev/disk/scsi", list);
+	recursive_add_device("/dev/disk/virtual", list);
 
 	return B_OK;
 }
