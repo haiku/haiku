@@ -93,7 +93,10 @@ status_t nv_acc_init()
 	/* cache1 DMA instance adress = none (b0-15);
 	 * instance being b4-19 with baseadress NV_PRAMIN_CTX_0 (0x00700000). */
 	/* note:
-	 * should point to a DMA definition in CTX register space (which is sort of RAM) */
+	 * should point to a DMA definition in CTX register space (which is sort of RAM).
+	 * This define tells the engine where the DMA cmd buffer is and what it's size is;
+	 * inside that cmd buffer you'll find the engine handles for the FIFO channels,
+	 * followed by actual issued engine commands. */
 	ACCW(PF_CACH1_DMAI, 0x00000000);
 
 	/* cache0 push0 access disabled */
@@ -205,7 +208,8 @@ status_t nv_acc_init()
 	/* note:
 	 * CTX determines which HT handles point to what engine commands.
 	 * (CTX registers are actually a sort of RAM space.) */
-	/* (setup a DMA define 'set') */
+	/* setup a DMA define for use by command defines below.
+	 * (would currently be used by CTX 'sets' 0x6 upto/including 0xe: 3D stuff.) */
 	ACCW(PR_CTX0_R, 0x00003000); /* DMA page table present and of linear type;
 								  * DMA target node is NVM (non-volatile memory?)
 								  * (instead of doing PCI or AGP transfers) */

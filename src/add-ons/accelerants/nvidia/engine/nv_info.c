@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-12/2004
+   Rudolf Cornelissen 7/2003-1/2005
 */
 
 #define MODULE_BIT 0x00002000
@@ -2801,22 +2801,17 @@ static void pinsnv20_arch_fake(void)
 static void pinsnv30_arch_fake(void)
 {
 	/* determine PLL type */
-	LOG(8,("INFO: NV30 architecture chip, PIXPLLC2 DAC1 = $%08x, DAC2 = $%08x\n",
-		DACR(PIXPLLC2), DAC2R(PIXPLLC2)));
-	switch (si->ps.card_type)
+	if ((si->ps.card_type == NV31) ||
+		(si->ps.card_type == NV36) ||
+		(si->ps.card_type >= NV40))
 	{
-	case NV31:
-	case NV36:
-	/* fixme? could be all >= NV40 cards have extended PLL's... (these 2 are confirmed) */
-	case NV40:
-	case NV43:
 		/* we have a extended PLL */
 		si->ps.ext_pll = true;
-		break;
-	default:
+	}
+	else
+	{
 		/* we have a standard PLL */
 		si->ps.ext_pll = false;
-		break;
 	}
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 350;
