@@ -1,0 +1,107 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<HTML>
+<HEAD>
+<TITLE>BMemoryIO Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BMemoryIO Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BMemoryIO interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BMemoryIO Interface</A></LI>
+<LI><A HREF="#usecases">BMemoryIO Use Cases</A></LI>
+<LI><A HREF="#implement">BMemoryIO Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BMemoryIO Interface:</H2>
+
+<P>The BMemoryIO class represent a buffer of dynamically allocated memory. You assign the 
+buffer to a BMemoryIO object on construction.  The best source of information for the BMemoryIO interface
+can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Support%20Kit/MemoryIO.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BMemoryIO Use Cases:</H2>
+
+<P>The following use cases cover the BMemoryIO functionality:</P>
+
+<OL>
+
+<LI><P><B>Construction 1:</B> A BMemoryIO can be created by specifying a void pointer
+and a ssize_t option.  These options are used to determine the buffer to assign to the BMemoryIO object and its
+size. No check is done to determine if the buffer is valid or if it contains at least the number of byte specified.</P></LI>
+
+<LI><P><B>Construction 2:</B> As the one above, but the buffer is specified with a const void pointer.
+The BMemoryIO object becomes read only, and every subsequent Write(), WriteAt() and SetSize() calls will
+return B_NOT_ALLOWED.</P></LI>
+
+<LI><P><B>Destruction:</B> The BMemoryIO destructor does nothing. It's up to the caller the responsibility
+to free the buffer assigned on construction.</P></LI>
+
+<LI><P><B>Reading 1:</B> When ReadAt() is called, the BMemoryIO returns the number of bytes read from the specified
+position. ReadAt() takes three arguments: the position where to begin the read operation, the buffer where to put the read data,
+and the number of bytes to read. This function does not read outside of the buffer.
+If the specified position is invalid (i.e. outside bounds) this function returns 0. If the read operation
+begins at a valid position, but the sum of position and bytes to read is bigger than the max size (specified on construction), BMemoryIO
+returns just the available data.</P></LI>
+
+<LI><P><B>Reading 2.</B> BMemoryIO inherits the Read() function from BPositionIO. This function read the specified amount
+of data from the current position, and put it into the specified buffer, then it moves the I/O index forward of the number of read bytes.
+This function behaves like the above. </P></LI>
+
+<LI><P><B>Writing 1:</B> When WriteAt() is called, BMemoryIO returns the number of bytes written to the specified position.
+WriteAt() takes three arguments: the position where to begin the write operation, the buffer from which to read the data to write, and the
+number of bytes to write. If the BMemoryIO object was constructed with the const constructor, this function returns B_NOT_ALLOWED.
+This function does not write outside of the buffer bounds. If the specified position is invalid (i.e. outside bounds) this function returns 0. If the write operation begins at a valid position, but the sum of position and bytes to write is bigger than the max size (specified on construction), BMemoryIO
+returns just the amount of data which can be written.
+If the BMemoryIO object has been shrunk (see the Size Change case), and the write operation is outside the current bounds (but inside the
+bounds specified on construction) this function re-enlarge it to accomodate the data.</P></LI>
+
+<LI><P><B>Writing 2.</B> BMemoryIO inherits the Write() function from BPositionIO. This function write the specified amount
+of data to the current position of the BMemoryIO object, reading from the specified buffer, then it moves the I/O index forward
+of the number of read bytes.
+This function behaves like the above. </P></LI>
+
+<LI><P><B>Size Changes:</B> The SetSize() member function enlarges or shrink the amount of data which can be read/write.
+If the BMemoryIO object was constructed with the const constructor, this function always returns B_NOT_ALLOWED.
+Any SetSize call with a size parameter bigger than the size specified on construction will fail and return B_ERROR. Shrinking the buffer
+is always possible, and the function returns B_OK. Negative values are not allowed, and the function returns B_ERROR.
+</P></LI>
+
+<LI><P><B>Seeking.</B> Seek() sets the position in the data buffer where the Read() and Write() functions (inherited from 
+BPositionIO) begin reading and writing. How the position argument is understood depends on the mode flag. There are three possible modes: 
+	<UL>
+	<LI><P>
+	SEEK_SET. The position passed is an offset from the beginning of allocated memory; in other 
+	words, the current position is set to position. For this mode, position should be a positive 
+	value, but the BMemoryIO object doesn't do any checking, so it is possible to seek to a negative position
+	(but any consequent Read() or Write() calls will fail).
+	 </P></LI>
+	 <LI><P>
+	SEEK_CUR. The position argument is an offset from the current position; the value of the 
+	argument is added to the current position.  </P></LI>
+	<LI><P>
+	SEEK_END. The position argument is an offset from the end of the buffer for a BMemoryIO 
+	object. Positive values seek beyond the end of the buffer or data; negative 
+	values seek backwards into the data.  </P></LI>
+	</UL>
+Seek() Always return the new position.
+</P></LI>
+
+<LI><P><B>Position:</B> The Position() call always return the current position.</P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BMemoryIO Implementation:</H2>
+
+<P>The implementation of the BMessageFilter is simple.  It consist in implementing memory read/write on a buffer
+with an index.</P>
+
+</BODY>
+</HTML>
