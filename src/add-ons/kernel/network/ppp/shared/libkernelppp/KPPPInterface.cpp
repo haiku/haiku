@@ -312,6 +312,18 @@ PPPInterface::SetMRU(uint32 MRU)
 }
 
 
+uint32
+PPPInterface::PacketOverhead() const
+{
+	uint32 overhead = fHeaderLength + 2;
+	
+	if(Device())
+		overhead += Device()->Overhead();
+	
+	return overhead;
+}
+
+
 status_t
 PPPInterface::Control(uint32 op, void *data, size_t length)
 {
@@ -1177,7 +1189,7 @@ PPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	
 	// make sure that protocol is allowed to send and everything is up
 	if(!Device()->IsUp() || !protocol || !protocol->IsEnabled()
-			|| !IsProtocolAllowed(*protocol)){
+			|| !IsProtocolAllowed(*protocol)) {
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -1248,6 +1260,7 @@ PPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 	// Find handler and let it parse the packet.
 	// The handler does need not be up because if we are a server
 	// the handler might be upped by this packet.
+	// If authenticating we only allow authentication phase protocols.
 	PPPProtocol *protocol = ProtocolFor(protocolNumber);
 	for(; protocol;
 			protocol = protocol->NextProtocol() ?

@@ -56,7 +56,10 @@ class PPPStateMachine {
 		bool SendEchoRequest();
 		bool SendDiscardRequest();
 		
-		// public events
+		// public events:
+		// NOTE: Local/PeerAuthenticationAccepted/Denied MUST be called before
+		// Up(Failed)/DownEvent in order to allow changing the configuration of
+		// the next phase's protocols before they are brought up.
 		void LocalAuthenticationRequested();
 		void LocalAuthenticationAccepted(const char *name);
 		void LocalAuthenticationDenied(const char *name);
@@ -143,8 +146,8 @@ class PPPStateMachine {
 		PPPInterface& fInterface;
 		PPPLCP& fLCP;
 		
-		ppp_phase fPhase;
 		ppp_state fState;
+		ppp_phase fPhase;
 		
 		vint32 fID;
 		uint32 fMagicNumber;
@@ -153,14 +156,14 @@ class PPPStateMachine {
 			fPeerAuthenticationStatus;
 		char *fLocalAuthenticationName, *fPeerAuthenticationName;
 		
-		BLocker fLock;
-		
 		// counters and timers
 		int32 fMaxRequest, fMaxTerminate, fMaxNak;
 		int32 fRequestCounter, fTerminateCounter, fNakCounter;
 		uint8 fRequestID, fTerminateID, fEchoID;
 			// the ID we used for the last configure/terminate/echo request
 		bigtime_t fNextTimeout;
+		
+		BLocker fLock;
 };
 
 

@@ -32,8 +32,8 @@
 PPPStateMachine::PPPStateMachine(PPPInterface& interface)
 	: fInterface(interface),
 	fLCP(interface.LCP()),
-	fPhase(PPP_DOWN_PHASE),
 	fState(PPP_INITIAL_STATE),
+	fPhase(PPP_DOWN_PHASE),
 	fID(system_time() & 0xFF),
 	fMagicNumber(0),
 	fLocalAuthenticationStatus(PPP_NOT_AUTHENTICATED),
@@ -143,6 +143,7 @@ PPPStateMachine::Reconfigure()
 	
 	NewState(PPP_REQ_SENT_STATE);
 	NewPhase(PPP_ESTABLISHMENT_PHASE);
+		// indicates to handlers that we are reconfiguring
 	
 	DownProtocols();
 	ResetLCPHandlers();
@@ -726,8 +727,10 @@ PPPStateMachine::OpenEvent()
 	LockerHelper locker(fLock);
 	
 	// reset all handlers
-	DownProtocols();
-	ResetLCPHandlers();
+	if(Phase() != PPP_ESTABLISHED_PHASE) {
+		DownProtocols();
+		ResetLCPHandlers();
+	}
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -960,7 +963,6 @@ PPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 		break;
 		
 		case PPP_OPENED_STATE:
-			// tld,scr,sca/8
 			NewState(PPP_ACK_SENT_STATE);
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
 				// indicates to handlers that we are reconfiguring
@@ -1492,7 +1494,6 @@ PPPStateMachine::TimerEvent()
 		default:
 			;
 	}
-	
 }
 
 
@@ -1572,11 +1573,13 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 		}
 	}
 	
-	if(nak.CountItems() > 0)
+	if(nak.CountItems() > 0) {
 		RCRBadEvent(nak.ToMbuf(Interface().MRU(), LCP().AdditionalOverhead()), NULL);
-	else if(reject.CountItems() > 0)
+		m_freem(packet);
+	} else if(reject.CountItems() > 0) {
 		RCRBadEvent(NULL, reject.ToMbuf(Interface().MRU(), LCP().AdditionalOverhead()));
-	else
+		m_freem(packet);
+	} else
 		RCRGoodEvent(packet);
 }
 
@@ -1732,9 +1735,6 @@ PPPStateMachine::InitializeRestartCount()
 	fRequestCounter = fMaxRequest;
 	fTerminateCounter = fMaxTerminate;
 	fNakCounter = fMaxNak;
-	
-	LockerHelper locker(fLock);
-	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
 }
 
 
@@ -1744,9 +1744,6 @@ PPPStateMachine::ZeroRestartCount()
 	fRequestCounter = 0;
 	fTerminateCounter = 0;
 	fNakCounter = 0;
-	
-	LockerHelper locker(fLock);
-	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
 }
 
 
@@ -1884,9 +1881,9 @@ PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 		
 		ack = mtod(reply, ppp_lcp_packet*);
 		ack->id = NextID();
-	}
+	} else
+		ack = mtod(reply, ppp_lcp_packet*);
 	
-	ack = mtod(reply, ppp_lcp_packet*);
 	ack->code = PPP_TERMINATE_ACK;
 	ack->length = htons(4);
 	
@@ -1915,15 +1912,14 @@ PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocolNumber, uint
 	M_PREPEND(packet, length);
 		// add some space for the header
 	
-	int32 adjust = 0;
-		// adjust packet size by this value if packet is too big
+	// adjust packet if too big
+	int32 adjust = Interface().MRU();
 	if(packet->m_flags & M_PKTHDR) {
-		if((uint32) packet->m_pkthdr.len > Interface().MRU())
-			adjust = Interface().MRU() - packet->m_pkthdr.len;
-	} else if(packet->m_len > Interface().MRU())
-		adjust = Interface().MRU() - packet->m_len;
+		adjust -= packet->m_pkthdr.len;
+	} else
+		adjust -= packet->m_len;
 	
-	if(adjust != 0)
+	if(adjust < 0)
 		m_adj(packet, adjust);
 	
 	ppp_lcp_packet *reject = mtod(packet, ppp_lcp_packet*);
@@ -1994,6 +1990,9 @@ PPPStateMachine::BringProtocolsUp()
 uint32
 PPPStateMachine::BringPhaseUp()
 {
+	// Servers do not need to bring all protocols up.
+	// The client specifies which protocols he wants to go up.
+	
 	LockerHelper locker(fLock);
 	
 	// check for phase change
@@ -2004,13 +2003,22 @@ PPPStateMachine::BringPhaseUp()
 	PPPProtocol *protocol = Interface().FirstProtocol();
 	for(; protocol; protocol = protocol->NextProtocol()) {
 		if(protocol->IsEnabled() && protocol->ActivationPhase() == Phase()) {
-			if(protocol->IsUpRequested()) {
+			if(protocol->IsGoingUp() && Interface().Mode() == PPP_CLIENT_MODE)
 				++count;
+			else if(protocol->IsDown() && protocol->IsUpRequested()) {
+				if(Interface().Mode() == PPP_CLIENT_MODE)
+					++count;
+				
 				protocol->Up();
-			} else if(protocol->IsGoingUp())
-				++count;
+			}
 		}
 	}
+	
+	// We only wait until authentication is complete.
+	if(Interface().Mode() == PPP_SERVER_MODE
+			&& (LocalAuthenticationStatus() == PPP_AUTHENTICATING
+			|| PeerAuthenticationStatus() == PPP_AUTHENTICATING))
+		++count;
 	
 	return count;
 }

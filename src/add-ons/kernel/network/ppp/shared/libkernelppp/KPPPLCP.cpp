@@ -202,7 +202,7 @@ PPPLCP::Down()
 
 
 status_t
-PPPLCP::Send(struct mbuf *packet, uint16 protocolNumber)
+PPPLCP::Send(struct mbuf *packet, uint16 protocolNumber = PPP_LCP_PROTOCOL)
 {
 	if(Target())
 		return Target()->Send(packet, PPP_LCP_PROTOCOL);
@@ -226,9 +226,6 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 	int32 length = packet->m_len;
 	if(packet->m_flags & M_PKTHDR)
 		length = packet->m_pkthdr.len;
-#if DEBUG
-	printf("LCP::Recv: len=%ld;datalen=%d\n", length, ntohs(data->length));
-#endif
 	length -= ntohs(data->length);
 	if(length)
 		m_adj(packet, -length);

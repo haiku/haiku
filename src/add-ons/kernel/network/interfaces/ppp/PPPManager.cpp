@@ -200,7 +200,10 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 		if(!protocol->IsEnabled() || protocol->AddressFamily() != dst->sa_family)
 			continue;
 		
-		result = protocol->Send(buf, protocol->ProtocolNumber());
+		if(protocol->Flags() & PPP_INCLUDES_NCP)
+			result = protocol->Send(buf, protocol->ProtocolNumber() & 0x7FFF);
+		else
+			result = protocol->Send(buf, protocol->ProtocolNumber());
 		if(result == PPP_UNHANDLED)
 			continue;
 		

@@ -172,7 +172,8 @@ std_ops(int32 op, ...)
 			if(get_module(NET_CORE_MODULE_NAME, (module_info**)&core) != B_OK)
 				return B_ERROR;
 			
-			if(get_module(NET_ETHERNET_MODULE_NAME, (module_info**)&ethernet) != B_OK) {
+			if(get_module(NET_ETHERNET_MODULE_NAME,
+					(module_info**) &ethernet) != B_OK) {
 				put_module(NET_CORE_MODULE_NAME);
 				return B_ERROR;
 			}

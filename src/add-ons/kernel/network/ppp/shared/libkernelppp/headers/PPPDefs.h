@@ -92,13 +92,9 @@ enum {
 	PPP_ALWAYS_ALLOWED = 0x01,
 		// protocol may send/receive in Phase() >= PPP_ESTABLISHMENT_PHASE,
 		// but only LCP is allowed in State() != PPP_OPENED_STATE!
-	PPP_NEEDS_DOWN = 0x02,
-		// protocol needs a Down() in addition to a Reset() to
-		// terminate the connection properly (losing the connection
-		// still results in a Reset() only)
-	PPP_NOT_IMPORTANT = 0x04,
+	PPP_NOT_IMPORTANT = 0x02,
 		// if this protocol fails to go up we do not disconnect
-	PPP_INCLUDES_NCP = 0x08
+	PPP_INCLUDES_NCP = 0x04,
 		// This protocol includes the corresponding NCP protocol (e.g.: IPCP + IP).
 		// All protocol values will also be checked against Protocol() & 0x7FFF.
 };

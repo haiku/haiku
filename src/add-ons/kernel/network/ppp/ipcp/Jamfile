@@ -1,0 +1,24 @@
+SubDir OBOS_TOP src add-ons kernel network ppp ipcp ;
+
+# for kernel_cpp.h and BLocker
+UsePrivateHeaders net ;
+UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
+
+
+R5KernelAddon ipcp : kernel network ppp :
+	ipcp.cpp
+	Protocol.cpp
+	inet_addr.c
+;
+
+SEARCH on [ FGristFiles inet_addr.c ] = [ FDirName $(OBOS_TOP) src kits network libnet ] ;
+
+LinkSharedOSLibs ipcp : libkernelppp.a ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/home/config/add-ons/kernel/network/ppp
+	: ipcp ;

@@ -88,6 +88,8 @@ class PPPInterface : public PPPLayer {
 		uint32 InterfaceMTU() const
 			{ return fInterfaceMTU; }
 				// this is the MRU including protocol overhead
+		uint32 PacketOverhead() const;
+			// including device and encapsulator headers
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		
