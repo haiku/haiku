@@ -159,18 +159,18 @@ private:
 				const BChannelControl &);
 		BChannelControl & operator=( /* unimplemented */
 				const BChannelControl &);
-virtual	status_t _Reserverd_ChannelControl_0(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_1(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_2(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_3(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_4(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_5(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_6(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_7(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_8(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_9(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_10(void *, ...);
-virtual	status_t _Reserverd_ChannelControl_11(void *, ...);
+virtual	void _Reserverd_ChannelControl_0(void *, ...);
+virtual	void _Reserverd_ChannelControl_1(void *, ...);
+virtual	void _Reserverd_ChannelControl_2(void *, ...);
+virtual	void _Reserverd_ChannelControl_3(void *, ...);
+virtual	void _Reserverd_ChannelControl_4(void *, ...);
+virtual	void _Reserverd_ChannelControl_5(void *, ...);
+virtual	void _Reserverd_ChannelControl_6(void *, ...);
+virtual	void _Reserverd_ChannelControl_7(void *, ...);
+virtual	void _Reserverd_ChannelControl_8(void *, ...);
+virtual	void _Reserverd_ChannelControl_9(void *, ...);
+virtual	void _Reserverd_ChannelControl_10(void *, ...);
+virtual	void _Reserverd_ChannelControl_11(void *, ...);
 
 protected:
 
