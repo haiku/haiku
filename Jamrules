@@ -1,3 +1,32 @@
+# Vanilla Jam compatibility
+if ! $(INVOCATION_SUBDIR_SET) {
+
+	rule FIsPrefix
+	{
+		# FIsPrefix <a> : <b> ;
+		# Returns true, if list <a> is a prefix (a proper one or equal) of
+		# list <b>, an empty list otherwise.
+		local a = $(1) ;
+		local b = $(2) ;
+		while $(a) && $(a[1]) = $(b[1]) {
+			a = $(a[2-]) ;
+			b = $(b[2-]) ;
+		}
+	
+		if $(a) {
+			return ;
+		} else {
+			return true ;
+		}
+	}
+
+	rule LocalClean { Clean $(1) : $(2) ; }
+
+	rule LocalDepends { Depends $(1) : $(2) ; }
+
+} # vanilla Jam compatibility
+
+
 # Include BuildConfig
 {
 	local buildConfig = [ GLOB $(OBOS_TOP) : BuildConfig ] ;
@@ -43,12 +72,23 @@ if $(WARNINGS) {
 	C++FLAGS += "-Wpointer-arith -Wcast-align -Wsign-compare" ;
 }
 
+# We might later want to introduce debug levels or handle the whole issue
+# differently. For now there's only on or off.
+#
+if $(DEBUG) {
+	OPTIM ?= -O0 ;
+	CCFLAGS += -g ;
+	C++FLAGS += -g ;
+	LINKFLAGS += -g ;
+} else {
+	OPTIM ?= -O2 ;
+}
+
 KERNEL_CCFLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc" ;
 KERNEL_CCFLAGS += "-fno-builtin -D$(OBOS_TARGET_DEFINE) " ;
 KERNEL_CCFLAGS += "-DBOCHS_E9_HACK=$(BOCHS_E9_HACK) " ;
 
 AR = ar r ;
-OPTIM = -O2 ;
 
 # If no OBOS_OBJECT_TARGET is not defined yet, use our default directory and
 # include our "OBOS_TARGET" as subdirectory in there (to prevent different
@@ -226,8 +266,8 @@ rule UnitTest
 	MakeLocateObjects $(sources) ;
 	Main $(target) : $(sources) ;
 	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(dest) ] ;
-	DEPENDS $(target) : libcppunit.so ;
-	DEPENDS obostests : $(target) ;
+	Depends $(target) : libcppunit.so ;
+	Depends obostests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
 	UsePublicObjectHeaders $(sources) : $(headerDirs) ;
 	ObjectDefines $(sources) : TEST_OBOS ;
@@ -271,12 +311,12 @@ rule R5UnitTest
 	{
 		local object = [ R5ObjectNames $(source) ] ;
 		Object $(object) : $(source) ;
-		Depends obj : $(object) ;
+		LocalDepends obj : $(object) ;
 	}
 
 	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(dest) ] ;
-	DEPENDS $(target) : libcppunit.so ;
-	DEPENDS r5tests : $(target) ;
+	Depends $(target) : libcppunit.so ;
+	Depends r5tests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
 	ObjectDefines $(objects) : TEST_R5 ;
 
@@ -322,7 +362,7 @@ rule SimpleTest
 	MakeLocateObjects $(sources) ;
 	Main $(target) : $(sources) ;
 	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(relPath) ] ;
-	DEPENDS obostests : $(target) ;
+	Depends obostests : $(target) ;
 	LinkSharedOSLibs $(target) : $(libraries) ;
 	ObjectDefines $(sources) : TEST_OBOS ;
 
@@ -347,7 +387,8 @@ rule Addon
 	targetdir = [ FDirName $(OBOS_ADDON_DIR) $(2) ] ;
 
 	MakeLocate $(1) : $(targetdir) ;
-	LINKFLAGS on $(1) += -nostart -Xlinker -soname=\"$(1)\" ;
+	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ]
+						-nostart -Xlinker -soname=\"$(1)\" ;
 }
 
 rule R5KernelAddon
@@ -360,7 +401,7 @@ rule R5KernelAddon
 	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
 	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic
 								-fno-exceptions -fno-rtti ;
-	LINKFLAGS on $(1) += -nostdlib ;
+	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
 	LinkSharedOSLibs $(1) : /boot/develop/lib/x86/_KERNEL_ ;
 }
 
@@ -402,7 +443,8 @@ rule SharedLibrary
 	MakeLocateObjects $(2) ;
 	Main $(_lib) : $(2) ;
 	MakeLocate $(_lib) : $(OBOS_SHLIB_DIR) ;
-	LINKFLAGS on $(_lib) += -nostart -Xlinker -soname=\"$(_lib)\" ;
+	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
+						   -nostart -Xlinker -soname=\"$(_lib)\" ;
 }
 
 rule LinkSharedOSLibs
@@ -427,10 +469,10 @@ rule LinkSharedOSLibs
 			}
 		}
 		if $(isfile) {
-			NEEDLIBS on $(1) += $(i) ;
-			DEPENDS $(1) : $(i) ;
+			NEEDLIBS on $(1) = [ on $(1) return $(NEEDLIBS) ] $(i) ;
+			Depends $(1) : $(i) ;
 		} else {
-			LINKLIBS on $(1) += -l$(i) ;
+			LINKLIBS on $(1) = [ on $(1) return $(LINKLIBS) ] -l$(i) ;
 		}
 	}
 }
@@ -654,7 +696,7 @@ rule SymLink
 	# <source> is the exact link contents. No binding is done.
 	LINKCONTENTS on $(1) = $(2) ;
 	SymLink1 $(1) ;
-	DEPENDS all : $(target) ;
+	LocalDepends all : $(target) ;
 }
 
 actions SymLink1
@@ -682,7 +724,7 @@ rule RelSymLink
 	SymLink $(target)
 		: [ FRelPath $(targetDirComponents) : $(sourceComponents) ] ;
 	NOUPDATE $(target);
-	DEPENDS $(target) : $(source) ;
+	Depends $(target) : $(source) ;
 }
 
 #-------------------------------------------------------------------------------
@@ -725,7 +767,7 @@ rule XRes
 	# XRes <target> : <resource files>
 	if $(2)
 	{
-		DEPENDS $(1) : $(2) ;
+		Depends $(1) : $(2) ;
 		XRes1 $(1) : $(2) ;
 	}
 }
@@ -776,8 +818,8 @@ actions MimeSet
 
 rule assemble
 {
-	DEPENDS $(1) : $(2) ;
-	Clean clean : $(1) ;
+	Depends $(1) : $(2) ;
+	LocalClean clean : $(1) ;
 }
 
 actions assemble
@@ -801,7 +843,7 @@ rule ObjectReference
 	local ref = $(1) ;
 	local source = $(2) ;
 	if $(ref) != $(source) {
-		DEPENDS $(ref) : $(source) ;
+		Depends $(ref) : $(source) ;
 		on $(ref) LOCATE = [ on $(source) return $(LOCATE) ] ;
 	}
 }
@@ -885,8 +927,8 @@ rule KernelLd
 	LINKLIBS on $(1) =  ;
 
 	# Show that we depend on the libraries we need
-	Clean clean : $(1) ;
-	Depends all : $(1) ;
+	LocalClean clean : $(1) ;
+	LocalDepends all : $(1) ;
 	Depends $(1) : $(2) ;
 
 	if $(6) {
@@ -929,8 +971,8 @@ rule KernelStaticLibraryObjects
 	SetupKernel $(2) ;
 
 	# Show that we depend on the libraries we need
-	Clean clean : $(1) ;
-	Depends all : $(1) ;
+	LocalClean clean : $(1) ;
+	LocalDepends all : $(1) ;
 	Depends $(1) : $(2) ;
 
 	MakeLocate $(1) : $(LOCATE_TARGET) ;
@@ -966,11 +1008,11 @@ rule WriteKernelConfig
 {
 	# usage: WriteKernelConfig <target> ;
 
-	Depends files : $(1) ;
+	LocalDepends files : $(1) ;
 	
 	MakeLocate $(1) : $(OBOS_OBJECT_TARGET) ;
 	
-	Clean clean : $(1) ;
+	LocalClean clean : $(1) ;
 }
 
 actions WriteKernelConfig bind SECTION_FILES
@@ -1015,9 +1057,9 @@ rule BuildKernel
 	local configFile = $(2) ;
 	local bootmaker = bootmaker ;
 	
-	Depends all : $(kernel) ;
+	LocalDepends all : $(kernel) ;
 	Depends $(kernel) : $(configFile) $(bootmaker) ;
-	Clean clean : $(kernel) ;
+	LocalClean clean : $(kernel) ;
 	MakeLocate $(kernel) : $(LOCATE_TARGET) ;
 
 	BOOT_MAKER on $(kernel) = $(bootmaker) ;
@@ -1039,9 +1081,9 @@ rule KernelFloppyImage
 	local bootblock = $(3) ;
 	local makeflop = makeflop ;
 
-	Depends all : $(floppy) ;
+	LocalDepends all : $(floppy) ;
 	Depends $(floppy) : $(kernel) $(bootblock) $(makeflop) ;
-	Clean clean : $(floppy) ;
+	LocalClean clean : $(floppy) ;
 	MakeLocate $(floppy) : $(OBOS_OBJECT_TARGET) ;
 
 	BOOT_BLOCK on $(floppy) = $(bootblock) ;
