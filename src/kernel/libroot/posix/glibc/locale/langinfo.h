@@ -23,11 +23,11 @@
 /* Get the type definition.  */
 #include <nl_types.h>
 
+#include <misc/sys/cdefs.h>
 #include <bits/locale.h>	/* Define the __LC_* category names.  */
 
-
 __BEGIN_DECLS
-
+struct TTTE;
 /* Construct an `nl_item' value for `nl_langinfo' from a locale category
    (LC_*) and an item index within the category.  Some code may depend on
    the item values within a category increasing monotonically with the
@@ -38,6 +38,7 @@ __BEGIN_DECLS
 #define _NL_ITEM_CATEGORY(item)		((int) (item) >> 16)
 #define _NL_ITEM_INDEX(item)		((int) (item) & 0xffff)
 
+struct TTTE;
 
 /* Enumeration of locale items that can be queried with `nl_langinfo'.  */
 enum
