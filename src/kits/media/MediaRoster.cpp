@@ -74,6 +74,22 @@ using namespace BPrivate::media;
 // DefaultDeleter will delete the BMediaRoster object in it's destructor.
 DefaultDeleter _deleter;
 
+BMediaRosterEx::BMediaRosterEx(status_t * out_error)
+	: BMediaRoster()
+{
+	status_t rv;
+	// register this application with the media server
+	server_register_app_request request;
+	server_register_app_reply reply;
+	request.team = team;
+	request.messenger = BMessenger(NULL, this);
+	rv = QueryServer(SERVER_REGISTER_APP, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK) {
+		if (out_error)
+			*out_error = B_MEDIA_SYSTEM_FAILURE;
+	}
+}
+
 status_t
 BMediaRosterEx::SaveNodeConfiguration(BMediaNode *node)
 {
@@ -1846,12 +1862,17 @@ BMediaRoster::Roster(status_t* out_error)
 	static BLocker locker("BMediaRoster::Roster locker");
 	locker.Lock();
 	if (_sDefault == NULL) {
-		_sDefault = new BMediaRosterEx();
-		if (out_error != NULL)
-			*out_error = B_OK;
-	} else {
-		if (out_error != NULL)
-			*out_error = B_OK;
+		status_t err = B_OK;
+		_sDefault = new BMediaRosterEx(&err);
+		if (err != B_OK) {
+			if(out_error)
+				*out_error = err;
+			if (_sDefault) {
+				_sDefault->Lock();
+				_sDefault->Quit();
+			}
+			_sDefault = NULL;
+		}
 	}
 	locker.Unlock();
 	return _sDefault;
@@ -2849,13 +2870,6 @@ BMediaRoster::BMediaRoster() :
 	
 	// start the looper
 	Run();
-	
-	// register this application with the media server
-	server_register_app_request request;
-	server_register_app_reply reply;
-	request.team = team;
-	request.messenger = BMessenger(NULL, this);
-	QueryServer(SERVER_REGISTER_APP, &request, sizeof(request), &reply, sizeof(reply));
 }
 
 
