@@ -2695,11 +2695,33 @@ BMediaRoster::AudioBufferSizeFor(int32 channel_count,
 								 float frame_rate,
 								 bus_type bus_kind)
 {
-	UNIMPLEMENTED();
-	int size = 4096;
-	int framesize = (sample_format & 0xf) * channel_count;
-	size = (size / framesize) * framesize;
-	return size;
+	bigtime_t buffer_duration;
+	ssize_t buffer_size;
+
+	system_info info;
+	get_system_info(&info);
+	
+	if (info.cpu_clock_speed > 2000000000)
+		buffer_duration = 2500;
+	else if (info.cpu_clock_speed > 1000000000)
+		buffer_duration = 5000;
+	else if (info.cpu_clock_speed > 600000000)
+		buffer_duration = 10000;
+	else if (info.cpu_clock_speed > 200000000)
+		buffer_duration = 20000;
+	else if (info.cpu_clock_speed > 100000000)
+		buffer_duration = 30000;
+	else
+		buffer_duration = 50000;
+		
+	if ((bus_kind == B_ISA_BUS || bus_kind == B_PCMCIA_BUS) && buffer_duration < 25000)
+		buffer_duration = 25000;
+		
+	buffer_size = (sample_format & 0xf) * channel_count * (ssize_t)((frame_rate * buffer_duration) / 1000000.0);
+
+	printf("Suggested buffer duration %Ld, size %ld\n", buffer_duration, buffer_size);	
+
+	return buffer_size;
 }
 
 								 
