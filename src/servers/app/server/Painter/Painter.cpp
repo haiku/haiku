@@ -1,6 +1,7 @@
 // Painter.cpp
 
 #include <stdio.h>
+#include <string.h>
 
 #include <Bitmap.h>
 #include <Region.h>
@@ -15,6 +16,7 @@
 #include <agg_span_interpolator_linear.h>
 
 #include "AGGTextRenderer.h"
+#include "DrawingMode.h"
 #include "DrawingModeFactory.h"
 #include "FontManager.h"
 #include "PatternHandler.h"
@@ -92,7 +94,8 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 		fPixelFormat = new pixfmt(*fBuffer, fPatternHandler);
 		fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
 																		  fAlphaSrcMode,
-																		  fAlphaFncMode));
+																		  fAlphaFncMode,
+																		  false));
 
 		fBaseRenderer = new renderer_base(*fPixelFormat);
 
@@ -101,30 +104,14 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 rgb_color color = fPatternHandler->HighColor().GetColor32();
 #if ALIASED_DRAWING
 		fOutlineRenderer = new outline_renderer_type(*fBaseRenderer);
-
-		fOutlineRenderer->line_color(agg::rgba(color.red / 255.0,
-											   color.green / 255.0,
-											   color.blue / 255.0));
-
 		fOutlineRasterizer = new outline_rasterizer_type(*fOutlineRenderer);
 #else
-		float width = fPenSize;
-		_Transform(&width);
-		agg::line_profile_aa prof;
-        prof.width(width);
-
-		fOutlineRenderer = new outline_renderer_type(*fBaseRenderer, prof);
-        fOutlineRenderer->color(agg::rgba(color.red / 255.0,
-										  color.green / 255.0,
-										  color.blue / 255.0));
-
-
+		fOutlineRenderer = new outline_renderer_type(*fBaseRenderer, fLineProfile);
 		fOutlineRasterizer = new outline_rasterizer_type(*fOutlineRenderer);
 
 		// attach our line profile to the renderer, it keeps a pointer
 		fOutlineRenderer->profile(fLineProfile);
 #endif
-
 		// the renderer used for filling paths
 		fRenderer = new renderer_type(*fBaseRenderer);
 		fRasterizer = new rasterizer_type();
@@ -134,15 +121,11 @@ rgb_color color = fPatternHandler->HighColor().GetColor32();
 		fRasterizer->gamma(agg::gamma_threshold(0.5));
 #endif
 
-        fRenderer->color(agg::rgba(color.red / 255.0,
-								   color.green / 255.0,
-								   color.blue / 255.0));
-
 		// These are renderers needed for drawing text
 		fFontRendererSolid = new font_renderer_solid_type(*fBaseRenderer);
-
 		fFontRendererBin = new font_renderer_bin_type(*fBaseRenderer);
 
+		_SetRendererColor(fPatternHandler->HighColor().GetColor32());
 		_RebuildClipping();
 	}
 }
@@ -176,30 +159,6 @@ void
 Painter::SetHighColor(const rgb_color& color)
 {
 	fPatternHandler->SetHighColor(color);
-
-	if (fOutlineRenderer)
-#if ALIASED_DRAWING
-		fOutlineRenderer->line_color(agg::rgba(color.red / 255.0,
-										color.green / 255.0,
-										color.blue / 255.0));
-#else
-		fOutlineRenderer->color(agg::rgba(color.red / 255.0,
-								   color.green / 255.0,
-								   color.blue / 255.0));
-#endif
-	if (fRenderer)
-		fRenderer->color(agg::rgba(color.red / 255.0,
-								   color.green / 255.0,
-								   color.blue / 255.0));
-	if (fFontRendererSolid)
-		fFontRendererSolid->color(agg::rgba(color.red / 255.0,
-											color.green / 255.0,
-											color.blue / 255.0));
-	if (fFontRendererBin)
-		fFontRendererBin->color(agg::rgba(color.red / 255.0,
-										  color.green / 255.0,
-										  color.blue / 255.0));
-
 }
 
 // SetLowColor
@@ -978,6 +937,7 @@ void
 Painter::_StrokePath(VertexSource& path, const pattern& p) const
 {
 	fPatternHandler->SetPattern(p);
+//	_SetPattern(p);
 
 #if ALIASED_DRAWING
 	float width = fPenSize;
@@ -1002,7 +962,69 @@ void
 Painter::_FillPath(VertexSource& path, const pattern& p) const
 {
 	fPatternHandler->SetPattern(p);
+//	_SetPattern(p);
 
 	fRasterizer->add_path(path);
 	agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
+}
+
+// _SetPattern
+void
+Painter::_SetPattern(const pattern& p) const
+{
+	if (memcmp(&p, fPatternHandler->GetR5Pattern(), sizeof(pattern)) != 0) {
+//	if ((uint64)p != (uint64)*fPatternHandler->GetR5Pattern()) {
+printf("Painter::_SetPattern()\n");
+		fPatternHandler->SetPattern(p);
+		agg::DrawingMode* mode = NULL;
+		if (memcmp(&p, &B_SOLID_HIGH, sizeof(pattern)) == 0) {
+			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
+			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
+													  fAlphaSrcMode,
+													  fAlphaFncMode,
+													  true);
+		} else if (memcmp(&p, &B_SOLID_LOW, sizeof(pattern)) == 0) {
+			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
+			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
+													  fAlphaSrcMode,
+													  fAlphaFncMode,
+													  true);
+		} else {
+			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
+													  fAlphaSrcMode,
+													  fAlphaFncMode,
+													  false);
+		}
+		fPixelFormat->set_drawing_mode(mode);
+	}
+}
+
+// _SetRendererColor
+void
+Painter::_SetRendererColor(const rgb_color& color) const
+{
+
+	if (fOutlineRenderer)
+#if ALIASED_DRAWING
+		fOutlineRenderer->line_color(agg::rgba(color.red / 255.0,
+											   color.green / 255.0,
+											   color.blue / 255.0));
+#else
+		fOutlineRenderer->color(agg::rgba(color.red / 255.0,
+										  color.green / 255.0,
+										  color.blue / 255.0));
+#endif
+	if (fRenderer)
+		fRenderer->color(agg::rgba(color.red / 255.0,
+								   color.green / 255.0,
+								   color.blue / 255.0));
+	if (fFontRendererSolid)
+		fFontRendererSolid->color(agg::rgba(color.red / 255.0,
+											color.green / 255.0,
+											color.blue / 255.0));
+	if (fFontRendererBin)
+		fFontRendererBin->color(agg::rgba(color.red / 255.0,
+										  color.green / 255.0,
+										  color.blue / 255.0));
+
 }

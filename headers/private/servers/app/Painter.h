@@ -223,6 +223,9 @@ class Painter {
 			void				_FillPath(VertexSource& path,
 										  const pattern& p) const;
 
+			void				_SetPattern(const pattern& p) const;
+			void				_SetRendererColor(const rgb_color& color) const;
+
 	agg::rendering_buffer*		fBuffer;
 
 	// AGG rendering and rasterization classes
