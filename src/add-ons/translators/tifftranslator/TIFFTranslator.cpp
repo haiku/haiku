@@ -108,6 +108,19 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 		return NULL;
 }
 
+TiffDetails::TiffDetails()
+{
+	memset(this, 0, sizeof(TiffDetails));
+}
+
+TiffDetails::~TiffDetails()
+{
+	delete[] pstripOffsets;
+	delete[] pstripByteCounts;
+	
+	memset(this, 0, sizeof(TiffDetails));
+}
+
 // ---------------------------------------------------------------
 // Constructor
 //
@@ -367,9 +380,6 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 status_t
 check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 {
-	TiffDetails dtls;
-	memset(&dtls, 0, sizeof(TiffDetails));
-	
 	try {
 		// Extra Samples are not yet supported
 		if (ifd.HasField(TAG_EXTRA_SAMPLES))
@@ -396,22 +406,22 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 			return B_NO_TRANSLATOR;
 			
 		// Copy fields useful to TIFFTranslator
-		dtls.width			= ifd.GetUint(TAG_IMAGE_WIDTH);
-		dtls.height			= ifd.GetUint(TAG_IMAGE_HEIGHT);
-		dtls.interpretation	= ifd.GetUint(TAG_PHOTO_INTERPRETATION);
+		uint32 width			= ifd.GetUint(TAG_IMAGE_WIDTH);
+		uint32 height			= ifd.GetUint(TAG_IMAGE_HEIGHT);
+		uint16 interpretation	= ifd.GetUint(TAG_PHOTO_INTERPRETATION);
 		
+		uint32 compression;
 		if (!ifd.HasField(TAG_COMPRESSION))
-			dtls.compression = COMPRESSION_NONE;
+			compression = COMPRESSION_NONE;
 		else
-			dtls.compression = ifd.GetUint(TAG_COMPRESSION);
-		if (dtls.compression != COMPRESSION_NONE &&
-			dtls.compression != COMPRESSION_HUFFMAN &&
-			dtls.compression != COMPRESSION_PACKBITS)
+			compression = ifd.GetUint(TAG_COMPRESSION);
+		if (compression != COMPRESSION_NONE &&
+			compression != COMPRESSION_HUFFMAN &&
+			compression != COMPRESSION_PACKBITS)
 			return B_NO_TRANSLATOR;
 		
-		// Currently, only some 
-		// bilevel, RGB or CMYK images are supported
-		switch (dtls.interpretation) {
+		uint16 imageType;
+		switch (interpretation) {
 			// Bilevel images
 			case PHOTO_WHITEZERO:
 			case PHOTO_BLACKZERO:
@@ -424,7 +434,34 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 					ifd.GetUint(TAG_BITS_PER_SAMPLE) != 1)
 					return B_NO_TRANSLATOR;
 					
-				dtls.imageType = TIFF_BILEVEL;
+				imageType = TIFF_BILEVEL;
+				break;
+				
+			// Palette color images
+			case PHOTO_PALETTE:
+				// default value for samples per pixel is 1
+				// if samples per pixel is other than 1, 
+				// it is not valid for this image type
+				if (ifd.HasField(TAG_SAMPLES_PER_PIXEL) &&
+					ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 1)
+					return B_NO_TRANSLATOR;
+				
+				// bits per sample must be present and
+				// can only be 4 or 8
+				if (ifd.GetUint(TAG_BITS_PER_SAMPLE) != 4 &&
+					ifd.GetUint(TAG_BITS_PER_SAMPLE) != 8)
+					return B_NO_TRANSLATOR;
+				
+				// even though other compression types are
+				// supported for other TIFF types,
+				// packbits and uncompressed are the only
+				// compression types supported for palette
+				// images
+				if (compression != COMPRESSION_NONE &&
+					compression != COMPRESSION_PACKBITS)
+					return B_NO_TRANSLATOR;
+			
+				imageType = TIFF_PALETTE;
 				break;
 				
 			case PHOTO_RGB:
@@ -436,7 +473,7 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 					ifd.GetUint(TAG_BITS_PER_SAMPLE, 3) != 8)
 					return B_NO_TRANSLATOR;
 				
-				dtls.imageType = TIFF_RGB;
+				imageType = TIFF_RGB;
 				break;
 				
 			case PHOTO_SEPARATED:
@@ -455,45 +492,44 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 					ifd.GetUint(TAG_BITS_PER_SAMPLE, 4) != 8)
 					return B_NO_TRANSLATOR;
 				
-				dtls.imageType = TIFF_CMYK;
-					break;
+				imageType = TIFF_CMYK;
+				break;
 					
 			default:
 				return B_NO_TRANSLATOR;
 		}
 		
+		uint32 rowsPerStrip, stripsPerImage;
 		if (!ifd.HasField(TAG_ROWS_PER_STRIP))
-			dtls.rowsPerStrip = DEFAULT_ROWS_PER_STRIP;
+			rowsPerStrip = DEFAULT_ROWS_PER_STRIP;
 		else
-			dtls.rowsPerStrip = ifd.GetUint(TAG_ROWS_PER_STRIP);
-		dtls.stripsPerImage =
-			(dtls.height + dtls.rowsPerStrip - 1) / dtls.rowsPerStrip;
+			rowsPerStrip = ifd.GetUint(TAG_ROWS_PER_STRIP);
+		stripsPerImage = (height + rowsPerStrip - 1) / rowsPerStrip;
 			
-		if (ifd.GetCount(TAG_STRIP_OFFSETS) != dtls.stripsPerImage ||
-			ifd.GetCount(TAG_STRIP_BYTE_COUNTS) != dtls.stripsPerImage)
+		if (ifd.GetCount(TAG_STRIP_OFFSETS) != stripsPerImage ||
+			ifd.GetCount(TAG_STRIP_BYTE_COUNTS) != stripsPerImage)
 			return B_NO_TRANSLATOR;
 		
 		printf("width: %d\nheight: %d\ncompression: %d\ninterpretation: %d\n",
-			dtls.width, dtls.height, dtls.compression,
-			dtls.interpretation);
+			width, height, compression, interpretation);
 		
-		// return read in details if output 
-		// pointer is supplied
+		// return read in details if output pointer is supplied
 		if (pdetails) {
-			ifd.GetUintArray(TAG_STRIP_OFFSETS, &dtls.pstripOffsets);
-			ifd.GetUintArray(TAG_STRIP_BYTE_COUNTS, &dtls.pstripByteCounts);
+			pdetails->width				= width;
+			pdetails->height			= height;
+			pdetails->compression		= compression;
+			pdetails->rowsPerStrip		= rowsPerStrip;
+			pdetails->stripsPerImage	= stripsPerImage;
+			pdetails->interpretation	= interpretation;
+			pdetails->imageType			= imageType;
 			
-			memcpy(pdetails, &dtls, sizeof(TiffDetails));
+			ifd.GetUintArray(TAG_STRIP_OFFSETS, &pdetails->pstripOffsets);
+			ifd.GetUintArray(TAG_STRIP_BYTE_COUNTS, &pdetails->pstripByteCounts);
 		}
 			
 	} catch (TiffIfdException) {
 	
 		printf("-- Caught TiffIfdException --\n");
-				
-		delete[] dtls.pstripOffsets;
-		dtls.pstripOffsets = NULL;
-		delete[] dtls.pstripByteCounts;
-		dtls.pstripByteCounts = NULL;
 
 		return B_NO_TRANSLATOR;
 	}
@@ -968,11 +1004,6 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 		inbuffer = NULL;
 		delete[] outbuffer;
 		outbuffer = NULL;
-		
-		delete[] details.pstripOffsets;
-		details.pstripOffsets = NULL;
-		delete[] details.pstripByteCounts;
-		details.pstripByteCounts = NULL;
 		
 		return B_OK;
 		
