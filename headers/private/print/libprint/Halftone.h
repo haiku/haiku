@@ -55,7 +55,7 @@ public:
 		kHighValueMeansBlack,
 		kLowValueMeansBlack,
 	};
-	Halftone(color_space cs, double gamma = 1.4, DitherType dither_type = kTypeFloydSteinberg);
+	Halftone(color_space cs, double gamma = 1.4, double min = 0.0, DitherType dither_type = kTypeFloydSteinberg);
 	~Halftone();
 	void setPlanes(Planes planes);
 	void setBlackValue(BlackValue blackValue);
@@ -70,7 +70,7 @@ protected:
 	void setGrayFunction(PFN_gray gray);
 	void setGrayFunction(GrayFunction grayFunction);
 
-	void createGammaTable(double gamma);
+	void createGammaTable(double gamma, double min);
 	void initElements(int x, int y, uchar *elements);
 	uint getDensity(ColorRGB32 c) const;
 	uchar convertUsingBlackValue(uchar byte) const;

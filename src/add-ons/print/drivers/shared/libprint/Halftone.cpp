@@ -43,7 +43,7 @@ static uint channel_blue(ColorRGB32 c)
 	return c.little.blue;	
 }
 
-Halftone::Halftone(color_space cs, double gamma, DitherType dither_type)
+Halftone::Halftone(color_space cs, double gamma, double min, DitherType dither_type)
 {
 	fPixelDepth = color_space2pixel_depth(cs);
 	fGray       = gray;
@@ -52,7 +52,7 @@ Halftone::Halftone(color_space cs, double gamma, DitherType dither_type)
 	
 	initFloydSteinberg();
 	
-	createGammaTable(gamma);
+	createGammaTable(gamma, min);
 	
 	if (dither_type == kTypeFloydSteinberg) {
 		fDither = &Halftone::ditherFloydSteinberg;
@@ -105,12 +105,14 @@ void Halftone::setBlackValue(BlackValue blackValue)
 	fBlackValue = blackValue;
 }
 
-void Halftone::createGammaTable(double gamma)
+void Halftone::createGammaTable(double gamma, double min)
 {
-//	gamma = 1.0f / gamma;
 	uint *g = fGammaTable;
+	const double kScalingFactor = 255.0 - min;
 	for (int i = 0; i < kGammaTableSize; i++) {
-		*g++ = (uint)(pow((double)i / 255.0, gamma) * 256.0);
+		const double kGammaCorrectedValue = pow((double)i / 255.0, gamma);
+		const double kTranslatedValue = min + kGammaCorrectedValue * kScalingFactor;
+		*g++ = (uint)(kTranslatedValue);
 	}
 }
 
@@ -295,7 +297,8 @@ int Halftone::ditherFloydSteinberg(uchar *dst, const uchar* a_src, int x, int y,
 	}
 
 	int* error_table = &fErrorTables[fCurrentPlane][1];
-	int current_error = 0, error;
+	int current_error = error_table[0], error;
+	error_table[0] = 0;
 	const ColorRGB32 *src = (const ColorRGB32 *)a_src;
 	uchar cur = 0; // cleared bit means white, set bit means black
 	for (int x = 0; x < width; x ++, src ++) {
@@ -309,10 +312,13 @@ int Halftone::ditherFloydSteinberg(uchar *dst, const uchar* a_src, int x, int y,
 			error = density - 255;
 		}
 		
-		// distribute error
+		// distribute error using this pattern:
+		//        0 X 7 (current_error)
+		// (left) 3 5 1 (right)
+		//       (middle)
 		int* right = &error_table[x+1];
-		current_error = *right + 7 * error;
-		*right = error;
+		current_error = (*right) + 7 * error;
+		*right = 1 * error;
 		
 		int* middle = right - 1;
 		*middle += 5 * error;
