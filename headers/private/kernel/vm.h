@@ -64,6 +64,10 @@ region_id find_region_by_name(const char *);
 region_id find_region_by_address (addr);
 int vm_resize_region (aspace_id, region_id, size_t);
 
+// to protect code regions with interrupts turned on
+void permit_page_faults(void);
+void forbid_page_faults(void);
+
 // XXX remove later
 void vm_test(void);
 
