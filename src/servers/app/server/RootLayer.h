@@ -72,6 +72,8 @@ public:
 	
 	void AddWinBorder(WinBorder *winBorder);
 	void RemoveWinBorder(WinBorder *winBorder);
+	void HideWinBorder(WinBorder* winBorder);
+	void ShowWinBorder(WinBorder* winBorder);
 	WinBorder* WinBorderAt(const BPoint& pt);
 	void ChangeWorkspacesFor(WinBorder *winBorder, uint32 newWorkspaces);
 	bool SetFrontWinBorder(WinBorder *winBorder);
@@ -108,6 +110,12 @@ public:
 
 	CursorManager& GetCursorManager() { return fCursorManager; }
 
+	// Other methods
+	bool Lock() { return fAllRegionsLock.Lock(); }
+	void Unlock() { fAllRegionsLock.Unlock(); }
+	bool IsLocked() { return fAllRegionsLock.IsLocked(); }
+	void RunThread();
+
 	// Debug methods
 	void PrintToStream(void);
 	
@@ -118,10 +126,15 @@ public:
 	BLocker fMainLock;
 
 private:
+
+			void			show_winBorder(WinBorder* winBorder);
+			void			hide_winBorder(WinBorder* winBorder);
+
 	Desktop *fDesktop;
 	BMessage *fDragMessage;
 	WinBorder *fMouseTarget;
 	CursorManager fCursorManager;
+	BLocker		fAllRegionsLock;
 
 	thread_id fThreadID;
 	port_id fListenPort;
