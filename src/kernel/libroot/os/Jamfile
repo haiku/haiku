@@ -15,6 +15,7 @@ KernelMergeObject os_main.o :
 	image.c
 	parsedate.cpp
 	port.c
+	scheduler.c
 	sem.c
 	system_info.c
 	team.c
