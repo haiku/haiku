@@ -64,8 +64,8 @@ class NetworkSetupWindow : public BWindow
 		BButton 	*fApplyNowButton;
 
 		BBox 		*fPanel;
-		BView 		*fShowView;
-		BRect 		fShowRect;
+		BView 		*fAddonView;
+		BRect		fMinAddonViewRect;
 };
 
 #endif // ifdef NETWORKSETUPWINDOW_H

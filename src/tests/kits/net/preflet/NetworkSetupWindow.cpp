@@ -19,7 +19,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 				B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	BMenu 		*menu;
-	BBox 		*box, *group, *line;
+	BBox 		*box, *line;	// *group
 	BButton		*button;
 	BCheckBox 	*check;
 	BRect		r;
@@ -61,41 +61,6 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	box->AddChild(button);
 	
 	fManageProfilesButton = button;
-
-/*	
-	r.left += w/2 + H_MARGIN;
-
-	button = new BButton(r, "new_profile", NEW_PROFILE_LABEL,
-					new BMessage(NEW_PROFILE_MSG),
-					B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	box->AddChild(button);
-	
-	fNewProfileButton = button;
-
-	r.left += w + SMALL_MARGIN;
-	button = new BButton(r, "copy_profile", COPY_PROFILE_LABEL,
-					new BMessage(COPY_PROFILE_MSG),
-					B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	box->AddChild(button);
-
-	fCopyProfileButton = button;
-		
-	r.left += w + SMALL_MARGIN;
-	button = new BButton(r, "delete_profile", DELETE_PROFILE_LABEL,
-					new BMessage(DELETE_PROFILE_MSG),
-					B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	box->AddChild(button);
-
-	fDeleteProfileButton = button;
-
-	r.left = H_MARGIN;
-*/
 	r.top += h + V_MARGIN;
 
 	// ---- Separator line between Profiles section and Settings section
@@ -186,8 +151,10 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 						B_PLAIN_BORDER);
 	box->AddChild(fPanel);
 
-	fShowRect = fPanel->Bounds();
-	fShowView = NULL;
+	fAddonView = NULL;
+
+	ResizeTo(fMinAddonViewRect.Width() + 2 * H_MARGIN, fMinAddonViewRect.Height());
+	SetSizeLimits(Bounds().Width(), 20000, Bounds().Height(), 20000);	
 }
 
 
@@ -252,32 +219,16 @@ void NetworkSetupWindow::MessageReceived
 	}
 	
 	case SHOW_MSG: {
-		BYAddon *by;
-		NetworkSetupAddOn *addon;
-
-		if (fShowView)
-			fShowView->RemoveSelf();
+		if (fAddonView)
+			fAddonView->RemoveSelf();
 		
-		fShowView = NULL;
-		
-		by = NULL;
-		addon = NULL;
-		if (msg->FindPointer("addon", (void **) &addon) != B_OK) {
-			if (msg->FindPointer("byaddon", (void **) &by) != B_OK) 
+		fAddonView = NULL;
+		if (msg->FindPointer("addon_view", (void **) &fAddonView) != B_OK)
 				break;
-		};
-		
-		fShowRect = fPanel->Bounds();
-		if (addon)
-			fShowView = addon->CreateView(&fShowRect);
-		else
-			fShowView = by->CreateView(&fShowRect);
-		if (fShowView) {
-			fPanel->AddChild(fShowView);
-			// fShowView->SetViewColor((rand() % 256), (rand() % 256), (rand() % 256));
-			fShowView->ResizeTo(fPanel->Bounds().Width(), fPanel->Bounds().Height());
-		};
-		
+
+		fPanel->AddChild(fAddonView);
+		fAddonView->ResizeTo(fPanel->Bounds().Width(), fPanel->Bounds().Height());
+		fAddonView->SetViewColor((rand() % 256), (rand() % 256), (rand() % 256));
 		break;
 	}
 
@@ -343,7 +294,7 @@ void NetworkSetupWindow::BuildProfilesMenu
 		item = menu->FindItem(current_profile);
 		if (item) {
 			BString label;
-			bool is_default = (strcmp(current_profile, "default") == 0);
+			// bool is_default = (strcmp(current_profile, "default") == 0);
 
 			label << item->Label();
 			label << " (current)";
@@ -383,12 +334,14 @@ void NetworkSetupWindow::BuildShowMenu
 	BEntry entry;
 	char * search_paths;
 	char * search_path;
-	char * next_path_token; 
+	char * next_path_token;
 
 	search_paths = getenv("ADDON_PATH");
 	if (!search_paths)
 		// Nowhere to search addons!!!
 		return;
+
+	fMinAddonViewRect.Set(0, 0, 200, 200);
 		
 	search_paths = strdup(search_paths);
 	search_path = strtok_r(search_paths, ":", &next_path_token);
@@ -443,9 +396,14 @@ void NetworkSetupWindow::BuildShowMenu
 				while ((addon = get_nth_addon(addon_id, n)) != NULL) {
 					BMessage *msg = new BMessage(msg_what);
 					
+					BRect r(0, 0, 0, 0);
+					BView * addon_view = addon->CreateView(&r);
+					fMinAddonViewRect = fMinAddonViewRect | r;
+					
 					msg->AddInt32("image_id", addon_id);
 					msg->AddString("addon_path", addon_path.Path());
 					msg->AddPointer("addon", addon);
+					msg->AddPointer("addon_view", addon_view);
 					menu->AddItem(new BMenuItem(addon->Name(), msg));
 					n++;
 				}
@@ -458,10 +416,16 @@ void NetworkSetupWindow::BuildShowMenu
 				BYAddon *addon;
 
 				addon = by_instantiate();
+
+				BRect r(0, 0, 0, 0);
+				BView * addon_view = addon->CreateView(&r);
+				fMinAddonViewRect = fMinAddonViewRect | r;
+					
 				BMessage *msg = new BMessage(msg_what);
 				msg->AddInt32("image_id", addon_id);
 				msg->AddString("addon_path", addon_path.Path());
 				msg->AddPointer("byaddon", addon);
+				msg->AddPointer("addon_view", addon_view);
 				menu->AddItem(new BMenuItem(addon->Name(), msg));
 				continue;
 			};

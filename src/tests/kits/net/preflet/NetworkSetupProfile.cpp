@@ -73,20 +73,9 @@ status_t NetworkSetupProfile::SetName(const char *name)
 }
 
 
-void NetworkSetupProfile::Unset()
-{
-}
-
-
 bool NetworkSetupProfile::Exists()
 {
 	return root->Exists();
-}
-
-
-status_t NetworkSetupProfile::Create()
-{
-	return B_ERROR;
 }
 
 
@@ -102,13 +91,28 @@ bool NetworkSetupProfile::IsDefault()
 }
 
 
-bool NetworkSetupProfile::IsActive()
+bool NetworkSetupProfile::IsCurrent()
 {
-	return is_active;
+	return is_current;
 }
 
 
-status_t NetworkSetupProfile::MakeActive()
+status_t NetworkSetupProfile::MakeCurrent()
 {
 	return B_ERROR;
 }
+
+// #pragma mark -
+
+
+NetworkSetupProfile * NetworkSetupProfile::Default()
+{
+	return NULL;
+}
+
+
+NetworkSetupProfile * NetworkSetupProfile::Current()
+{
+	return NULL;
+}
+

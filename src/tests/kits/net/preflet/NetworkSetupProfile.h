@@ -4,37 +4,41 @@
 #include <StorageKit.h>
 
 class NetworkSetupProfile {
-	public:
-		NetworkSetupProfile();
-		NetworkSetupProfile(const char *path);
-		NetworkSetupProfile(const entry_ref *ref);
-		NetworkSetupProfile(BEntry *entry);
-		virtual ~NetworkSetupProfile();
+public:
+						NetworkSetupProfile();
+						NetworkSetupProfile(const char *path);
+						NetworkSetupProfile(const entry_ref *ref);
+						NetworkSetupProfile(BEntry *entry);
+
+virtual 				~NetworkSetupProfile();
 		
-		status_t	SetTo(const char *path);
-		status_t	SetTo(const entry_ref *ref);
-		status_t	SetTo(BEntry *entry);
+		status_t		SetTo(const char *path);
+		status_t		SetTo(const entry_ref *ref);
+		status_t		SetTo(BEntry *entry);
 		
-		void		Unset();
-		
-		bool		Exists();
+		bool			Exists();
 		
 		const char *	Name();
 		status_t		SetName(const char *name);
-
-		status_t	Create();
-		status_t	Delete();
 		
-		virtual bool		IsDefault();
-		virtual bool		IsActive();
-		virtual status_t	MakeActive();
+		
+		bool			IsDefault();
+		bool			IsCurrent();
 
-	private:
+		status_t		MakeCurrent();
+		status_t		Delete();
+
+static	NetworkSetupProfile *	Default();
+static	NetworkSetupProfile *	Current();
+
+private:
 		BEntry *		root;
 		BPath *			path;
 		bool			is_default;
-		bool			is_active;
+		bool			is_current;
 		const char *	name;
+
+static	BDirectory *	profiles_root;
 };
 
 
