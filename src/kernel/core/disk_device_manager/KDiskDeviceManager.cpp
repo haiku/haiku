@@ -1,4 +1,8 @@
-// KDiskDeviceManager.cpp
+/* 
+** Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+*/
+
 
 #include <KernelExport.h>
 #include <util/kernel_cpp.h>
@@ -33,23 +37,16 @@
 #define DBG(x) x
 #define OUT dprintf
 
+
 // directories for partitioning and file system modules
-static const char *kPartitioningSystemPrefix	= "partitioning_systems";
-static const char *kFileSystemPrefix			= "file_systems";
+static const char *kPartitioningSystemPrefix = "partitioning_systems";
+static const char *kFileSystemPrefix = "file_systems";
+static const char *kFileSystemDiskDeviceSuffix = "/disk_device/v1";
 
 
 // singleton instance
 KDiskDeviceManager *KDiskDeviceManager::sDefaultManager = NULL;
 
-
-// is_active_job_status
-static
-bool
-is_active_job_status(uint32 status)
-{
-	return (status == B_DISK_DEVICE_JOB_SCHEDULED
-			|| status == B_DISK_DEVICE_JOB_IN_PROGRESS);
-}
 
 // GetPartitionID
 struct GetPartitionID {
@@ -108,7 +105,34 @@ struct KDiskDeviceManager::JobMap : VectorMap<disk_job_id, KDiskDeviceJob*,
 struct KDiskDeviceManager::JobQueueVector : Vector<KDiskDeviceJobQueue*> {};
 	
 
-// constructor
+static bool
+is_active_job_status(uint32 status)
+{
+	return (status == B_DISK_DEVICE_JOB_SCHEDULED
+			|| status == B_DISK_DEVICE_JOB_IN_PROGRESS);
+}
+
+
+static bool
+is_fs_disk_device(const char *module)
+{
+	size_t prefixLength = strlen(kFileSystemPrefix);
+	if (strncmp(module, kFileSystemPrefix, prefixLength))
+		return false;
+
+	size_t suffixLength = strlen(kFileSystemDiskDeviceSuffix);
+	size_t length = strlen(module);
+
+	if (length <= suffixLength + prefixLength)
+		return false;
+
+	return !strcmp(module + length - suffixLength, kFileSystemDiskDeviceSuffix);
+}
+
+
+//	#pragma mark -
+
+
 KDiskDeviceManager::KDiskDeviceManager()
 	: fLock("disk device manager"),
 	  fDevices(new(nothrow) DeviceMap),
@@ -121,33 +145,34 @@ KDiskDeviceManager::KDiskDeviceManager()
 {
 	if (InitCheck() != B_OK)
 		return;
-	// add partitioning systems
-	if (void *list = open_module_list(kPartitioningSystemPrefix)) {
-		char moduleName[B_PATH_NAME_LENGTH];
-		for (size_t bufferSize = sizeof(moduleName);
-			 read_next_module_name(list, moduleName, &bufferSize) == B_OK;
-			 bufferSize = sizeof(moduleName)) {
-DBG(OUT("partitioning system: %s\n", moduleName));
-			_AddPartitioningSystem(moduleName);
+
+	// We are in early boot mode, so open_module_list() won't find what
+	// we're looking for; we need to use get_next_loaded_module_name()
+	// instead.
+
+	uint32 cookie = 0;
+	size_t partitioningPrefixLength = strlen(kPartitioningSystemPrefix);
+
+	while (true) {
+		char name[B_PATH_NAME_LENGTH];
+		size_t nameLength = sizeof(name);
+		if (get_next_loaded_module_name(&cookie, name, &nameLength) != B_OK)
+			break;
+
+		if (!strncmp(name, kPartitioningSystemPrefix, partitioningPrefixLength)) {
+			DBG(OUT("partitioning system: %s\n", name));
+			_AddPartitioningSystem(name);
+		} else if (is_fs_disk_device(name)) {
+			DBG(OUT("file system: %s\n", name));
+			_AddFileSystem(name);
 		}
-		close_module_list(list);
 	}
-	// add file systems
-	if (void *list = open_module_list(kFileSystemPrefix)) {
-		char moduleName[B_PATH_NAME_LENGTH];
-		for (size_t bufferSize = sizeof(moduleName);
-			 read_next_module_name(list, moduleName, &bufferSize) == B_OK;
-			 bufferSize = sizeof(moduleName)) {
-DBG(OUT("file system: %s\n", moduleName));
-			_AddFileSystem(moduleName);
-		}
-		close_module_list(list);
-	}
-DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
+
+	DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
 	// TODO: Watch the disk systems and the relevant directories.
 }
 
-// destructor
+
 KDiskDeviceManager::~KDiskDeviceManager()
 {
 	// TODO: terminate and remove all jobs
