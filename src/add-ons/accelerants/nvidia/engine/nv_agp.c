@@ -52,6 +52,8 @@ status_t nv_agp_setup(void)
 		reg = (NV_REG32(NV32_NVSTRAPINFO2) & ~0x00000800);
 		/* enable strapinfo overwrite */
 		NV_REG32(NV32_NVSTRAPINFO2) = (reg | 0x80000000);
+		/* reread cards AGP capabilities */
+		ai_card.config.agp_stat = PCI_CFGR(adress + 4);
 
 		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
 	}
