@@ -8,6 +8,10 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 
+#if __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 typedef uint32 socklen_t;
 
 /* These are the address/protocol families we'll be using... */
@@ -251,6 +255,10 @@ int     getsockopt(int, int, int, void *, size_t *);
 int     getpeername(int, struct sockaddr *, int *);
 int     getsockname(int, struct sockaddr *, int *);
 #endif /* _KERNEL_MODE */
+
+#if __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* _SYS_SOCKET_H */
 
