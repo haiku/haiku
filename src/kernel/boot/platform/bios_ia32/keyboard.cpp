@@ -54,7 +54,6 @@ check_for_boot_keys(void)
 	uint32 options = 0;
 
 	while ((key.ax = check_for_key()) != 0) {
-		dprintf("pressed %lx\n", key.ax);
 		switch (key.code.ascii) {
 			case ' ':
 				options |= BOOT_OPTION_MENU;
@@ -70,7 +69,6 @@ check_for_boot_keys(void)
 	}
 
 	dprintf("options = %ld\n", options);
-	panic("\n");
 	return options;
 }
 
