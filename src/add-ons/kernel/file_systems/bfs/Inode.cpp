@@ -20,8 +20,9 @@ class InodeAllocator {
 		InodeAllocator(Transaction *transaction);
 		~InodeAllocator();
 
-		status_t New(block_run *parentRun,mode_t mode,block_run &run,Inode **inode);
-		void Keep();
+		status_t New(block_run *parentRun, mode_t mode, block_run &run, Inode **_inode);
+		status_t CreateTree();
+		status_t Keep();
 
 	private:
 		Transaction *fTransaction;
@@ -40,19 +41,24 @@ InodeAllocator::InodeAllocator(Transaction *transaction)
 
 InodeAllocator::~InodeAllocator()
 {
+	if (fTransaction != NULL) {
+		if (fInode != NULL) {
+			fInode->Node()->flags &= ~INODE_IN_USE;
+			fInode->Free(fTransaction);			
+		} else
+			fTransaction->GetVolume()->Free(fTransaction, fRun);
+	}
+
 	delete fInode;
-	
-	if (fTransaction)
-		fTransaction->GetVolume()->Free(fTransaction,fRun);
 }
 
 
 status_t 
-InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run, Inode **inode)
+InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run, Inode **_inode)
 {
 	Volume *volume = fTransaction->GetVolume();
 
-	status_t status = volume->AllocateForInode(fTransaction,parentRun,mode,fRun);
+	status_t status = volume->AllocateForInode(fTransaction, parentRun, mode, fRun);
 	if (status < B_OK) {
 		// don't free the space in the destructor, because
 		// the allocation failed
@@ -61,28 +67,76 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run, Inode **i
 	}
 
 	run = fRun;
-	fInode = new Inode(volume,volume->ToVnode(run),true);
+	fInode = new Inode(volume, volume->ToVnode(run), true);
 	if (fInode == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
-	*inode = fInode;
+	// initialize the on-disk bfs_inode structure 
+
+	bfs_inode *node = fInode->Node();
+
+	node->magic1 = INODE_MAGIC1;
+	node->inode_num = run;
+	node->mode = mode;
+	node->flags = INODE_IN_USE | INODE_NOT_READY;
+		// INODE_NOT_READY prevents the inode from being opened - it is
+		// cleared in InodeAllocator::Keep()
+
+	node->create_time = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
+	node->last_modified_time = node->create_time | (volume->GetUniqueID() & INODE_TIME_MASK);
+		// we use Volume::GetUniqueID() to avoid having too many duplicates in the
+		// last_modified index
+
+	node->inode_size = volume->InodeSize();
+
+	*_inode = fInode;
 	return B_OK;
 }
 
 
-void
+status_t
+InodeAllocator::CreateTree()
+{
+	Volume *volume = fTransaction->GetVolume();
+
+	// force S_STR_INDEX to be set, if no type is set
+	if ((fInode->Mode() & S_INDEX_TYPES) == 0)
+		fInode->Node()->mode |= S_STR_INDEX;
+
+	BPlusTree *tree = fInode->fTree = new BPlusTree(fTransaction, fInode);
+	if (tree == NULL || tree->InitCheck() < B_OK)
+		return B_ERROR;
+
+	if (fInode->IsRegularNode()) {
+		if (tree->Insert(fTransaction, ".", fInode->ID()) < B_OK
+			|| tree->Insert(fTransaction, "..", volume->ToVnode(fInode->Parent())) < B_OK)
+			return B_ERROR;
+	}
+	return B_OK;
+}
+
+
+status_t
 InodeAllocator::Keep()
 {
+	ASSERT(fInode != NULL && fTransaction != NULL);
+
+	Volume *volume = fTransaction->GetVolume();
+	fInode->Node()->flags &= ~INODE_NOT_READY;
+	status_t status = fInode->WriteBack(fTransaction);
+
 	fTransaction = NULL;
 	fInode = NULL;
+
+	return status;
 }
 
 
 //	#pragma mark -
 
 
-Inode::Inode(Volume *volume,vnode_id id,bool empty,uint8 reenter)
-	: CachedBlock(volume,volume->VnodeToBlock(id),empty),
+Inode::Inode(Volume *volume, vnode_id id, bool empty, uint8 reenter)
+	: CachedBlock(volume, volume->VnodeToBlock(id), empty),
 	fTree(NULL),
 	fLock("bfs inode")
 {
@@ -121,10 +175,13 @@ Inode::InitCheck()
 		|| Node()->attributes.allocation_group > fVolume->AllocationGroups()
 		|| Node()->attributes.allocation_group < 0
 		|| Node()->attributes.start > (1L << fVolume->AllocationGroupShift())) {
-		FATAL(("inode at block %Ld corrupt!\n",fBlockNumber));
+		FATAL(("inode at block %Ld corrupt!\n", fBlockNumber));
 		RETURN_ERROR(B_BAD_DATA);
 	}
-	
+
+	if (Flags() & INODE_NOT_READY)
+		return B_BUSY;
+
 	// ToDo: Add some tests to check the integrity of the other stuff here,
 	// especially for the data_stream!
 
@@ -545,7 +602,7 @@ Inode::SetName(Transaction *transaction,const char *name)
  */
 
 status_t
-Inode::ReadAttribute(const char *name,int32 type,off_t pos,uint8 *buffer,size_t *_length)
+Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer, size_t *_length)
 {
 	if (pos < 0)
 		pos = 0;
@@ -564,7 +621,7 @@ Inode::ReadAttribute(const char *name,int32 type,off_t pos,uint8 *buffer,size_t 
 			if (length + pos > smallData->data_size)
 				length = smallData->data_size - pos;
 	
-			memcpy(buffer,smallData->Data() + pos,length);
+			memcpy(buffer, smallData->Data() + pos, length);
 			*_length = length;
 			return B_OK;
 		}
@@ -572,10 +629,10 @@ Inode::ReadAttribute(const char *name,int32 type,off_t pos,uint8 *buffer,size_t 
 
 	// search in the attribute directory
 	Inode *attribute;
-	status_t status = GetAttribute(name,&attribute);
+	status_t status = GetAttribute(name, &attribute);
 	if (status == B_OK) {
 		if (attribute->Lock().Lock() == B_OK) {
-			status = attribute->ReadAt(pos,(uint8 *)buffer,_length);
+			status = attribute->ReadAt(pos, (uint8 *)buffer, _length);
 			attribute->Lock().Unlock();
 		} else
 			status = B_ERROR;
@@ -731,16 +788,16 @@ Inode::RemoveAttribute(Transaction *transaction,const char *name)
 
 
 status_t
-Inode::GetAttribute(const char *name,Inode **attribute)
+Inode::GetAttribute(const char *name, Inode **attribute)
 {
 	// does this inode even have attributes?
 	if (Attributes().IsZero())
 		return B_ENTRY_NOT_FOUND;
 
-	Vnode vnode(fVolume,Attributes());
+	Vnode vnode(fVolume, Attributes());
 	Inode *attributes;
 	if (vnode.Get(&attributes) < B_OK) {
-		FATAL(("get_vnode() failed in Inode::GetAttribute(name = \"%s\")\n",name));
+		FATAL(("get_vnode() failed in Inode::GetAttribute(name = \"%s\")\n", name));
 		return B_ERROR;
 	}
 
@@ -748,8 +805,16 @@ Inode::GetAttribute(const char *name,Inode **attribute)
 	status_t status = attributes->GetTree(&tree);
 	if (status == B_OK) {
 		vnode_id id;
-		if ((status = tree->Find((uint8 *)name,(uint16)strlen(name),&id)) == B_OK)
-			return get_vnode(fVolume->ID(),id,(void **)attribute);
+		if ((status = tree->Find((uint8 *)name, (uint16)strlen(name), &id)) == B_OK) {
+			Vnode vnode(fVolume, id);
+			// Check if the attribute is really an attribute
+			if (vnode.Get(attribute) < B_OK
+				|| !(*attribute)->IsAttribute())
+				return B_ERROR;
+
+			vnode.Keep();
+			return B_OK;
+		}
 	}
 	return status;
 }
@@ -1510,6 +1575,37 @@ Inode::Trim(Transaction *transaction)
 }
 
 
+status_t
+Inode::Free(Transaction *transaction)
+{
+	// Perhaps there should be an implementation of Inode::ShrinkStream() that
+	// just frees the data_stream, but doesn't change the inode (since it is
+	// freed anyway) - that would make an undelete command possible
+	status_t status = SetFileSize(transaction, 0);
+	if (status < B_OK)
+		return status;
+
+	// Free all attributes, and remove their indices
+	{
+		// We have to limit the scope of AttributeIterator, so that its
+		// destructor is not called after the inode is deleted
+		AttributeIterator iterator(this);
+
+		char name[B_FILE_NAME_LENGTH];
+		uint32 type;
+		size_t length;
+		vnode_id id;
+		while ((status = iterator.GetNext(name, &length, &type, &id)) == B_OK)
+			RemoveAttribute(transaction, name);
+	}
+
+	if (WriteBack(transaction) < B_OK)
+		return B_ERROR;
+
+	return fVolume->Free(transaction, BlockRun());
+}
+
+
 status_t 
 Inode::Sync()
 {
@@ -1642,7 +1738,7 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 	if (remove_vnode(fVolume->ID(), id) != B_OK)
 		return B_ERROR;
 
-	if (tree->Remove(transaction,(uint8 *)name, (uint16)strlen(name), id) < B_OK) {
+	if (tree->Remove(transaction, name, id) < B_OK) {
 		unremove_vnode(fVolume->ID(), id);
 		RETURN_ERROR(B_ERROR);
 	}
@@ -1754,50 +1850,48 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 	if (status < B_OK)
 		return status;
 
-	// initialize the on-disk bfs_inode structure 
+	// Initialize the parts of the bfs_inode structure that
+	// InodeAllocator::New() hasn't touched yet
 
 	bfs_inode *node = inode->Node();
 
-	node->magic1 = INODE_MAGIC1;
-	node->inode_num = run;
 	node->parent = parentRun;
 
 	node->uid = geteuid();
 	node->gid = parent ? parent->Node()->gid : getegid();
 		// the group ID is inherited from the parent, if available
-	node->mode = mode;
-	node->flags = INODE_IN_USE;
+
 	node->type = type;
-
-	node->create_time = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
-	node->last_modified_time = node->create_time | (volume->GetUniqueID() & INODE_TIME_MASK);
-		// we use Volume::GetUniqueID() to avoid having too many duplicates in the
-		// last_modified index
-
-	node->inode_size = volume->InodeSize();
 
 	// only add the name to regular files, directories, or symlinks
 	// don't add it to attributes, or indices
 	if (tree && inode->IsRegularNode() && inode->SetName(transaction, name) < B_OK)
 		return B_ERROR;
 
-	// initialize b+tree if it's a directory (and add "." & ".." if it's
+	// Initialize b+tree if it's a directory (and add "." & ".." if it's
 	// a standard directory for files - not for attributes or indices)
 	if (inode->IsContainer()) {
-		// force S_STR_INDEX to be set, if no type is set
-		if ((mode & S_INDEX_TYPES) == 0)
-			node->mode |= S_STR_INDEX;
-
-		BPlusTree *tree = inode->fTree = new BPlusTree(transaction, inode);
-		if (tree == NULL || tree->InitCheck() < B_OK)
-			return B_ERROR;
-
-		if (inode->IsRegularNode()) {
-			if (tree->Insert(transaction, ".", inode->BlockNumber()) < B_OK
-				|| tree->Insert(transaction, "..", volume->ToBlock(inode->Parent())) < B_OK)
-				return B_ERROR;
-		}
+		status = allocator.CreateTree();
+		if (status < B_OK)
+			return status;
 	}
+
+	// Add a link to the inode from the parent, depending on its type
+	// (the INODE_NOT_READY flag is set, so it is safe to make the inode
+	// accessable to the file system here)
+	if (tree) {
+		status = tree->Insert(transaction, name, inode->ID());
+	} else if (parent && (mode & S_ATTR_DIR) != 0) {
+		parent->Attributes() = run;
+		status = parent->WriteBack(transaction);
+	}
+
+	// Note, we only care if the inode could be made accessable for the
+	// two cases above; the root node or the indices root node must
+	// handle this case on their own (or other cases where "parent" is
+	// NULL)
+	if (status < B_OK)
+		RETURN_ERROR(status);		
 
 	// update the main indices (name, size & last_modified)
 
@@ -1805,8 +1899,17 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 	if (inode->IsRegularNode()) {
 		// the name index only contains regular files
 		status = index.InsertName(transaction, name, inode);
-		if (status < B_OK && status != B_BAD_INDEX)
+		if (status < B_OK && status != B_BAD_INDEX) {
+			// We have to remove the node from the parent at this point,
+			// because the InodeAllocator destructor can't handle this
+			// case (and if it fails, we can't do anything about it...)
+			if (tree)
+				tree->Remove(transaction, name, inode->ID());
+			else
+				parent->Node()->attributes.SetTo(0, 0, 0);
+
 			return status;
+		}
 	}
 
 	inode->UpdateOldLastModified();
@@ -1820,24 +1923,15 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 		index.InsertLastModified(transaction, inode);
 	}
 
-	if ((status = inode->WriteBack(transaction)) < B_OK)
-		return status;
-
-	if (new_vnode(volume->ID(), inode->ID(), inode) != B_OK)
-		return B_ERROR;
-
-	// add a link to the inode from the parent, depending on its type
-	if (tree && tree->Insert(transaction, name, volume->ToBlock(run)) < B_OK) {
-		put_vnode(volume->ID(), inode->ID());
-		RETURN_ERROR(B_ERROR);
-	} else if (parent && mode & S_ATTR_DIR) {
-		parent->Attributes() = run;
-		parent->WriteBack(transaction);
+	if (new_vnode(volume->ID(), inode->ID(), inode) != B_OK) {
+		// this is a really fatal error, and we can't recover from that
+		DIE(("new_vnode() failed for inode!"));
 	}
 
-	// everything worked well, so we want to keep the inode
+	// Everything worked well until this point, we have a fully
+	// initialized inode, and we want to keep it
 	allocator.Keep();
-
+	
 	if (_id != NULL)
 		*_id = inode->ID();
 	if (_inode != NULL)
