@@ -313,7 +313,7 @@ udf_mount(nspace_id nsid, const char *name, ulong flags, void *parms,
 		err = volume ? B_OK : B_NO_MEMORY;
 	}
 	if (!err) {
-		err = volume->Mount(deviceName, deviceOffset, deviceSize, flags, 2048);
+		err = volume->Mount(deviceName, deviceOffset, deviceSize, 2048, flags);
 	}
 		
 	if (!err) {
