@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src kernel libroot os ;
+
+KernelObjects
+	<$(SOURCE_GRIST)>area.c
+	<$(SOURCE_GRIST)>debug.c
+	<$(SOURCE_GRIST)>port.c
+	<$(SOURCE_GRIST)>sem.c
+	<$(SOURCE_GRIST)>systeminfo.c
+	<$(SOURCE_GRIST)>team.c
+	<$(SOURCE_GRIST)>thread.c
+	<$(SOURCE_GRIST)>time.c
+	:
+	-fPIC -DPIC
+	;
+
+SubInclude OBOS_TOP src kernel libroot os arch ;
