@@ -27,12 +27,12 @@ class BScrollView : public BView {
 		virtual void		Draw(BRect updateRect);
 		virtual void		AttachedToWindow();
 
-		BScrollBar			*ScrollBar(orientation posture);
+		BScrollBar			*ScrollBar(orientation posture) const;
 
 		virtual void		SetBorder(border_style border);
 		border_style		Border() const;
 
-		virtual void		SetBorderHighlighted(bool state);
+		virtual status_t	SetBorderHighlighted(bool state);
 		bool				IsBorderHighlighted() const;
 
 		void				SetTarget(BView *target);
