@@ -15,6 +15,7 @@ KernelMergeObject posix_unistd.o :
 	<$(SOURCE_GRIST)>lseek.c
 	<$(SOURCE_GRIST)>mount.c
 	<$(SOURCE_GRIST)>open.c
+	<$(SOURCE_GRIST)>pipe.c
 	<$(SOURCE_GRIST)>read.c
 	<$(SOURCE_GRIST)>sleep.c
 	<$(SOURCE_GRIST)>terminal.c
