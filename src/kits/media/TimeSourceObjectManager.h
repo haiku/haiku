@@ -6,4 +6,30 @@
 #ifndef _TIME_SOURCE_OBJECT_MANAGER_H_
 #define _TIME_SOURCE_OBJECT_MANAGER_H_
 
+#include "TMap.h"
+
+namespace BPrivate {
+namespace media {
+
+class TimeSourceObjectManager
+{
+public:
+	TimeSourceObjectManager();
+	~TimeSourceObjectManager();
+
+	BTimeSource *GetTimeSource(const media_node &node);
+	void ObjectDeleted(BTimeSource *timesource);
+
+private:
+	Map<media_node_id,BTimeSource *> *fMap;
+	BLocker *fLock;
+	BTimeSource *fSystemTimeSource;
+	media_node_id fSystemTimeSourceID;
+};
+
+}; // namespace media
+}; // namespace BPrivate
+
+extern BPrivate::media::TimeSourceObjectManager *_TimeSourceObjectManager;
+
 #endif

@@ -18,6 +18,7 @@
 
 class _BSlaveNodeStorageP;
 struct _time_transmit_buf;
+namespace BPrivate { namespace media { class TimeSourceObject; class SystemTimeSourceObject; } }
 
 
 class BTimeSource :
@@ -100,6 +101,8 @@ private:
 	friend class BMediaNode;
 	friend class BMediaRoster;
 	friend class _ServerApp;
+	friend class BPrivate::media::TimeSourceObject;
+	friend class BPrivate::media::SystemTimeSourceObject;
 
 		BTimeSource(		/* private unimplemented */
 				const BTimeSource & clone);

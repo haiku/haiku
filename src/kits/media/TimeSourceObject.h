@@ -16,19 +16,38 @@ namespace BPrivate { namespace media {
 class TimeSourceObject : public BTimeSource
 {
 public:
-	TimeSourceObject(const media_node &node);
+	TimeSourceObject(media_node_id id);
 	
 	virtual	status_t SnoozeUntil(
 				bigtime_t performance_time,
 				bigtime_t with_latency = 0,
 				bool retry_signals = false);
+
 protected:
 	virtual	status_t TimeSourceOp(
 				const time_source_op_info & op,
 				void * _reserved);
 
-virtual	BMediaAddOn* AddOn(
+	virtual	BMediaAddOn* AddOn(
 				int32 * internal_id) const;
+
+	// override from BMediaNode				
+	virtual status_t DeleteHook(BMediaNode * node);
+};
+
+class SystemTimeSourceObject : public TimeSourceObject
+{
+public:
+	SystemTimeSourceObject(media_node_id id);
+
+	virtual	status_t SnoozeUntil(
+				bigtime_t performance_time,
+				bigtime_t with_latency = 0,
+				bool retry_signals = false);
+
+protected:
+	// override from BMediaNode				
+	virtual status_t DeleteHook(BMediaNode * node);
 
 };
 

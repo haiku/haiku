@@ -14,11 +14,11 @@
 #include "debug.h"
 #include "TList.h"
 #include "PortPool.h"
-#include "SystemTimeSource.h"
 #include "ServerInterface.h"
 #include "DataExchange.h"
 #include "DormantNodeManager.h"
 #include "Notifications.h"
+#include "TimeSourceObjectManager.h"
 
 namespace BPrivate { namespace media {
 	extern team_id team;
@@ -437,17 +437,15 @@ BMediaRoster::ReleaseNode(const media_node & node)
 BTimeSource *
 BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 {
-	BROKEN();
+	CALLED();
 
 	printf("BMediaRoster::MakeTimeSourceFor enter, node %ld, port %ld, kind %#lx\n", for_node.node, for_node.port, for_node.kind);
 	
-	static BTimeSource *source = 0;
-	if (source == 0)
-		source = new _SysTimeSource();
+	BTimeSource *source = _TimeSourceObjectManager->GetTimeSource(for_node);
 
 	printf("BMediaRoster::MakeTimeSourceFor leave, node %ld, port %ld, kind %#lx\n", source->Node().node, source->Node().port, source->Node().kind);
 
-	return dynamic_cast<BTimeSource *>(source->Acquire());
+	return source;
 }
 
 

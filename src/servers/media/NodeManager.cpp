@@ -208,7 +208,7 @@ NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_
 	}
 	ASSERT(id == node->node);
 
-	FATAL("NodeManager::GetClone leave: node id %ld, node port %ld, node kind %Ld\n", node->node, node->port, node->kind);
+	FATAL("NodeManager::GetClone leave: node id %ld, node port %ld, node kind %#lx\n", node->node, node->port, node->kind);
 
 	return B_OK;
 }
@@ -700,7 +700,7 @@ get_node_type(node_type t)
 		CASE(AUDIO_OUTPUT_EX)
 		CASE(TIME_SOURCE)
 		CASE(SYSTEM_TIME_SOURCE)
-		default: "unknown";
+		default: return "unknown";
 	}
 };
 

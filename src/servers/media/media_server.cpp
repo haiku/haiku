@@ -14,10 +14,6 @@
 #include "media_server.h"
 #include "debug.h"
 
-#include "/boot/home/develop/openbeos/current/src/kits/media/SystemTimeSource.h"
-#include <MediaRoster.h>
-#include <MediaNode.h>
-
 /*
  *
  * An implementation of a new media_server for the OpenBeOS MediaKit
@@ -152,21 +148,14 @@ void
 ServerApp::StartSystemTimeSource()
 {
 	printf("StartSystemTimeSource enter\n");
-	media_node node;
 	status_t rv;
-	BTimeSource *source;
 
 	printf("StartSystemTimeSource creating object\n");
 
-	source = new _SysTimeSource;
-
-	printf("StartSystemTimeSource registering\n");
-
-	BMediaRoster::Roster()->RegisterNode(source);
-
-	printf("StartSystemTimeSource getting Node()\n");
-
-	node = source->Node();
+	// register a dummy node 
+	media_node node;
+	rv = gNodeManager->RegisterNode(&node.node, -1, 0, "Fake System Time Source", B_TIME_SOURCE, -1, -1);	
+	ASSERT(rv == B_OK);
 
 	printf("StartSystemTimeSource setting as default\n");
 	

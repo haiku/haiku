@@ -22,11 +22,13 @@ DefaultManager::~DefaultManager()
 status_t
 DefaultManager::LoadState()
 {
+	return B_OK;
 }
 
 status_t
 DefaultManager::SaveState()
 {
+	return B_OK;
 }
 
 status_t
@@ -40,7 +42,7 @@ DefaultManager::Set(node_type type, const media_node *node, const dormant_node_i
 		case AUDIO_OUTPUT:
 		case AUDIO_OUTPUT_EX:
 		case TIME_SOURCE:
-			return B_OK;
+			return B_ERROR;
 		
 		case SYSTEM_TIME_SOURCE: //called by the media_server's ServerApp::StartSystemTimeSource()
 		{
@@ -68,10 +70,10 @@ DefaultManager::Get(media_node_id *nodeid, char *input_name, int32 *input_id, no
 		case AUDIO_MIXER:
 		case AUDIO_OUTPUT:
 		case AUDIO_OUTPUT_EX:
-		case TIME_SOURCE:
-			*nodeid = -1;
-			return B_OK;
+			*nodeid = -999;
+			return B_ERROR;
 
+		case TIME_SOURCE:
 		case SYSTEM_TIME_SOURCE:
 			*nodeid = fSystemTimeSource;
 			return B_OK;
@@ -87,6 +89,7 @@ DefaultManager::Get(media_node_id *nodeid, char *input_name, int32 *input_id, no
 status_t
 DefaultManager::Rescan()
 {
+	return B_OK;
 }
 
 void

@@ -111,7 +111,7 @@ struct media_node_attribute
 };
 
 
-namespace BPrivate { namespace media { class TimeSourceObject; } }
+namespace BPrivate { namespace media { class TimeSourceObject; class SystemTimeSourceObject; } }
 
 
 class BMediaNode
@@ -256,6 +256,7 @@ private:
 	friend class MNodeManager;
 	friend class BBufferProducer;	//	for getting _mNodeID
 	friend class BPrivate::media::TimeSourceObject;
+	friend class BPrivate::media::SystemTimeSourceObject;
 
 		// Deprecated in 4.1
 		int32 IncrementChangeTag();

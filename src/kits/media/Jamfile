@@ -47,7 +47,6 @@ SharedLibrary media :
 	DormantNodeManager.cpp
 	Notifications.cpp
 	PortPool.cpp
-	SystemTimeSource.cpp
 	SharedBufferList.cpp
 	TrackReader.cpp
 	TimedEventQueuePrivate.cpp

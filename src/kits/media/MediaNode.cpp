@@ -13,7 +13,6 @@
 #include <string.h>
 #include "debug.h"
 #include "DataExchange.h"
-#include "SystemTimeSource.h"
 #include "ServerInterface.h"
 #include "Notifications.h"
 
@@ -101,10 +100,12 @@ BMediaNode::~BMediaNode()
 	
 	// BeBook: UnregisterNode() unregisters a node from the Media Server. It's called automatically 
 	// BeBook: by the BMediaNode destructor, but it might be convenient to call it sometime before 
-	// BeBook: you delete your node instance, depending on your implementation and circumstances. 
-	(BMediaRoster::Roster())->UnregisterNode(this);
+	// BeBook: you delete your node instance, depending on your implementation and circumstances.
+	// ATT! We do not unregister TimeSourceObject nodes (identified by fControlPort == -999666)
+	if (fControlPort != -999666)  // must match value in TimeSourceObject::TimeSourceObject()
+		(BMediaRoster::Roster())->UnregisterNode(this);
 	
-	if (fControlPort != -1)
+	if (fControlPort > 0)
 		delete_port(fControlPort);
 	if (fTimeSource)
 		fTimeSource->Release();
