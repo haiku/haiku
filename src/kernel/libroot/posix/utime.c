@@ -30,7 +30,7 @@ utime(const char *path, const struct utimbuf *times)
 	} else
 		stat.st_atime = stat.st_mtime = time(NULL);
 
-	status = sys_write_path_stat(path, false, &stat, FS_WRITE_STAT_MTIME | FS_WRITE_STAT_ATIME);
+	status = sys_write_path_stat(path, true, &stat, FS_WRITE_STAT_MTIME | FS_WRITE_STAT_ATIME);
 
 	RETURN_AND_SET_ERRNO(status);
 }
