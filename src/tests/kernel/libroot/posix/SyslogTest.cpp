@@ -42,8 +42,13 @@ main(int argc, char **argv)
 	syslog(LOG_WARNING, "thread/perror warning (visible in stderr as well)");
 	syslog(LOG_CRIT, "thread/perror critical condition (hidden)");
 
-	openlog(NULL, LOG_CONS, LOG_DAEMON);
+	openlog(NULL, LOG_CONS | LOG_PID, LOG_DAEMON);
 	syslog(LOG_WARNING, "thread/cons warning (visible in stderr only when there is no syslog_daemon)");
 
+	setlogmask(LOG_EMERG);
+	closelog();
+		// this should inherit the team log context on next logging entry
+
+	syslog(LOG_ALERT, "now what are we doing here? (visible)");
 	return 0;
 }
