@@ -5,6 +5,8 @@
  * @author Jerome Leveque
  */
 
+#include <MidiRoster.h>
+
 #include "debug.h"
 #include "MidiEndpoint.h"
 
