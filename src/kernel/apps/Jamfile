@@ -36,7 +36,6 @@ SubInclude OBOS_TOP src kernel apps hostname ;
 SubInclude OBOS_TOP src kernel apps ls ;
 SubInclude OBOS_TOP src kernel apps symlink ;
 SubInclude OBOS_TOP src kernel apps ps ;
-SubInclude OBOS_TOP src kernel apps rld ;
 SubInclude OBOS_TOP src kernel apps shell ;
 SubInclude OBOS_TOP src kernel apps envtest ;
 #SubInclude OBOS_TOP src kernel apps sockettest ;

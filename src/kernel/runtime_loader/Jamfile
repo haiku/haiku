@@ -1,0 +1,62 @@
+SubDir OBOS_TOP src kernel runtime_loader ;
+
+KernelObjects 
+	rld.c
+	rld0.c
+	rldexport.c
+	rldelf.c
+	rldheap.c
+	rldaux.c
+	: -fpic ;
+
+KernelStaticLibraryObjects librld.a :
+	# needed for rld.so only
+	<src!kernel!libroot!os>syscalls.o
+	<src!kernel!libroot!os>sem.o
+	<src!kernel!libroot!os!arch!$(OBOS_ARCH)>atomic.o
+
+	<src!kernel!libroot!posix>errno.o
+
+ 	<src!kernel!libroot!posix!glibc!ctype>ctype-info.o
+	<src!kernel!libroot!posix!glibc!locale>C-ctype.o
+	<src!kernel!libroot!posix!glibc!locale>C_name.o
+  	<src!kernel!libroot>kernel_vsprintf.o
+  	<src!kernel!libroot!posix!unistd>open.o
+
+	<src!kernel!libroot!posix!string>memchr.o
+	<src!kernel!libroot!posix!string>memcmp.o
+	<src!kernel!libroot!posix!string>memcpy.o
+	<src!kernel!libroot!posix!string>memmove.o
+	<src!kernel!libroot!posix!string>memset.o
+	<src!kernel!libroot!posix!string>strcasecmp.o
+	<src!kernel!libroot!posix!string>strcat.o
+	<src!kernel!libroot!posix!string>strchr.o
+	<src!kernel!libroot!posix!string>strcmp.o
+	<src!kernel!libroot!posix!string>strcpy.o
+	<src!kernel!libroot!posix!string>strcspn.o
+	<src!kernel!libroot!posix!string>strdup.o
+	<src!kernel!libroot!posix!string>strerror.o
+	<src!kernel!libroot!posix!string>strlcat.o
+	<src!kernel!libroot!posix!string>strlcpy.o
+	<src!kernel!libroot!posix!string>strlen.o
+	<src!kernel!libroot!posix!string>strncmp.o
+	<src!kernel!libroot!posix!string>strnlen.o
+	<src!kernel!libroot!posix!string>strpbrk.o
+	<src!kernel!libroot!posix!string>strrchr.o
+	<src!kernel!libroot!posix!string>strspn.o
+	<src!kernel!libroot!posix!string>strstr.o
+	;
+
+KernelLd rld.so :
+	<$(SOURCE_GRIST)>rld0.o
+	<$(SOURCE_GRIST)>rld.o
+	<$(SOURCE_GRIST)>rldelf.o
+	<$(SOURCE_GRIST)>rldexport.o
+	<$(SOURCE_GRIST)>rldheap.o
+	<$(SOURCE_GRIST)>rldaux.o
+	librld.a
+	: $(SUBDIR)/arch/$(OBOS_ARCH)/rld.ld
+	:
+	:
+	: beos/system/lib/rld.so
+	;

@@ -254,7 +254,7 @@ done
 
 cd $sourceDir/objects/${arch}.R1/kernel/
 $scd ${sPrefix}$sourceDir/objects/${arch}.R1/kernel/
-$cp ${sPrefix}rld.so ${sPrefix}libroot.so $targetDir/beos/system/lib/
+$cp ${sPrefix}runtime_loader/rld.so ${sPrefix}libroot.so $targetDir/beos/system/lib/
 
 
 # servers

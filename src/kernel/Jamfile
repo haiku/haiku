@@ -184,59 +184,6 @@ KernelLd init :
 	: beos/bin/init
 	;
 
-KernelStaticLibraryObjects librld.a :
-	# needed for rld.so only
-	<$(SOURCE_GRIST)!libroot!os>syscalls.o
-	<$(SOURCE_GRIST)!libroot!os>sem.o
-	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
-
-	<$(SOURCE_GRIST)!libroot!posix>errno.o
-
- 	<$(SOURCE_GRIST)!libroot!posix!glibc!ctype>ctype-info.o
-	<$(SOURCE_GRIST)!libroot!posix!glibc!locale>C-ctype.o
-	<$(SOURCE_GRIST)!libroot!posix!glibc!locale>C_name.o
-  	<$(SOURCE_GRIST)!libroot>kernel_vsprintf.o
-  	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
-
-	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
-	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
-	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
-	<$(SOURCE_GRIST)!libroot!posix!string>memmove.o
-	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strcasecmp.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strcat.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strchr.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strcmp.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strcpy.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strcspn.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strdup.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strerror.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strlcat.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strlen.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strncmp.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strpbrk.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strrchr.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strspn.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strstr.o
-	<$(SOURCE_GRIST)!libroot!posix!string>strtok.o
-	;
-
-KernelLd rld.so :
-	<$(SOURCE_GRIST)!apps!rld>rld0.o
-	<$(SOURCE_GRIST)!apps!rld>rld.o
-	<$(SOURCE_GRIST)!apps!rld>rldelf.o
-	<$(SOURCE_GRIST)!apps!rld>rldexport.o
-	<$(SOURCE_GRIST)!apps!rld>rldheap.o
-	<$(SOURCE_GRIST)!apps!rld>rldaux.o
-	librld.a
-	: $(SUBDIR)/apps/rld/arch/$(OBOS_ARCH)/rld.ld
-	:
-	:
-	: beos/system/lib/rld.so
-	;
-
 KernelLd kernel_false :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>false_main.o
@@ -456,3 +403,4 @@ SubInclude OBOS_TOP src kernel boot ;
 SubInclude OBOS_TOP src kernel core ;
 SubInclude OBOS_TOP src kernel glue ;
 SubInclude OBOS_TOP src kernel libroot ;
+SubInclude OBOS_TOP src kernel runtime_loader ;
