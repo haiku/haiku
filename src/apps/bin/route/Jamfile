@@ -2,7 +2,7 @@ SubDir OBOS_TOP src apps bin route ;
 
 UsePrivateHeaders net ;
 
-BinCommand route :
+BinCommand <bin>route :
 	keywords.c
 	route.c
 	show.c
@@ -11,9 +11,9 @@ BinCommand route :
 # Installation -- in the test directory for the time being
 OBOSInstall install-networking
 	: [ FDirName $(OBOS_TEST_DIR) kits net ]
-	: route ;
+	: <installed>route ;
 
 Package openbeos-networkingkit-cvs :
-	route :
+	<installed>route :
 #	boot home config bin ;
 	boot home Desktop openbeos-networkingkit ;
