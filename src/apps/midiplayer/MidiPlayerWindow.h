@@ -65,10 +65,15 @@ private:
 	void LoadSettings();
 	void SaveSettings();
 
-	void LoadFile(entry_ref* ref);
-	void Play();
-	void Stop(bool changeButton);
-	
+	static int32 _LoadThread(void* data);
+	int32 LoadThread();
+
+	static int32 _StopThread(void* data);
+	int32 StopThread();
+
+	void StartSynth();
+	void StopSynth();
+
 	void OnPlayStop();
 	void OnShowScope();
 	void OnReverb(reverb_mode mode);
@@ -94,6 +99,8 @@ private:
 	float windowX;
 	float windowY;
 	BMidiSynthFile synth;
+	entry_ref ref;
+	thread_id threadId;
 };
 
 #endif // MIDI_PLAYER_WINDOW_H

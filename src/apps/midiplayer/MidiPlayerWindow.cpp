@@ -20,7 +20,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdio.h>
 #include <StorageKit.h>
 
 #include "MidiPlayerApp.h"
@@ -42,7 +41,8 @@ MidiPlayerWindow::MidiPlayerWindow()
 	volume = 75;
 	windowX = -1;
 	windowY = -1;
-
+	threadId = -1;
+	
 	CreateViews();
 	LoadSettings();
 	InitControls();
@@ -52,15 +52,23 @@ MidiPlayerWindow::MidiPlayerWindow()
 
 MidiPlayerWindow::~MidiPlayerWindow()
 {
-	Stop(false);
+	StopSynth();
 }
 
 //------------------------------------------------------------------------------
 
 bool MidiPlayerWindow::QuitRequested()
 {
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return true;
+	// There is a race condition when you quit MidiPlayer while we're still
+	// fading out, because fading happens in a separate thread. In this odd
+	// case, we simply won't let the user quit the app :-)
+
+	if (threadId == -1)
+	{
+		be_app->PostMessage(B_QUIT_REQUESTED);
+		return true;
+	}
+	return false;
 }
 
 //------------------------------------------------------------------------------
@@ -338,62 +346,109 @@ void MidiPlayerWindow::SaveSettings()
 
 //------------------------------------------------------------------------------
 
-void MidiPlayerWindow::LoadFile(entry_ref* ref)
+int32 MidiPlayerWindow::_LoadThread(void* data)
 {
-	if (playing)
-	{
-		Stop(false);
-	}
-
-	synth.UnloadFile();
-	
-	if (synth.LoadFile(ref) == B_OK)
-	{
-		// Ideally, we would call SetVolume() in InitControls(), 
-		// but for some reason that doesn't work; BMidiSynthFile
-		// will use the default volume instead. So we do it here.
-		synth.SetVolume(volume / 100.0f);
-
-		playButton->SetEnabled(true);
-		scopeView->SetHaveFile(true);
-	}
-	else
-	{
-		(new BAlert(
-			NULL, "Could not load song", "Okay", NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
-
-		playButton->SetEnabled(false);
-		scopeView->SetHaveFile(false);
-	}
-	
-	Play();
+	return ((MidiPlayerWindow*) data)->LoadThread();
 }
 
 //------------------------------------------------------------------------------
 
-void MidiPlayerWindow::Play()
+int32 MidiPlayerWindow::LoadThread()
 {
+	// We do this in a separate fire-and-forget thread, just in case a song
+	// was already playing. The call to StopSynth() will block, and we need
+	// to keep the window's looper free for repainting the ScopeView during
+	// the fade out. The R5 MidiPlayer does that too and it looks neat.
+
+	if (playing)
+	{
+		StopSynth();
+	}
+
+	synth.UnloadFile();
+	
+	if (synth.LoadFile(&ref) == B_OK)
+	{
+		// Ideally, we would call SetVolume() in InitControls(), 
+		// but for some reason that doesn't work: BMidiSynthFile
+		// will use the default volume instead. So we do it here.
+		synth.SetVolume(volume / 100.0f);
+
+		Lock();
+		playButton->SetEnabled(true);
+		playButton->SetLabel("Stop");
+		scopeView->SetHaveFile(true);
+		scopeView->Invalidate();
+		Unlock();
+
+		StartSynth();
+	}
+	else
+	{
+		Lock();
+		playButton->SetEnabled(false);
+		playButton->SetLabel("Play");
+		scopeView->SetHaveFile(false);
+		scopeView->Invalidate();
+		Unlock();
+
+		(new BAlert(
+			NULL, "Could not load song", "Okay", NULL, NULL,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+	}
+
+	threadId = -1;
+	return 0;
+}
+
+//------------------------------------------------------------------------------
+
+int32 MidiPlayerWindow::_StopThread(void* data)
+{
+	return ((MidiPlayerWindow*) data)->StopThread();
+}
+
+//------------------------------------------------------------------------------
+
+int32 MidiPlayerWindow::StopThread()
+{
+	Lock();
+	playButton->SetEnabled(false);
+	Unlock();
+	
+	StopSynth();
+	
+	Lock();
+	playButton->SetEnabled(true);
+	playButton->SetLabel("Play");
+	Unlock();
+
+	threadId = -1;
+	return 0;
+}
+
+//------------------------------------------------------------------------------
+
+void MidiPlayerWindow::StartSynth()
+{
+	// When playback of the song ends, we don't automatically go back into
+	// "stopped" mode. It is possible to do this with synth.SetFileHook(),
+	// but that made the code kinda messy (with all the threads and stuff). 
+	// Note: SetFileHook(NULL) crashes the softsynth. In any case, should 
+	// we ever add this in, remember to call SetFileHook() *after* Start()
+	// or it won't work.
+
 	synth.Start();
-	playButton->SetLabel("Stop");
 	playing = true;
 }
 
 //------------------------------------------------------------------------------
 
-void MidiPlayerWindow::Stop(bool changeButton)
+void MidiPlayerWindow::StopSynth()
 {
-	if (changeButton)
+	if (!synth.IsFinished())
 	{
-		playButton->SetEnabled(false);
-	}
-		
-	synth.Fade();
-	
-	if (changeButton)
-	{
-		playButton->SetEnabled(true);
-		playButton->SetLabel("Play");
+		synth.Fade();
 	}
 
 	playing = false;
@@ -405,11 +460,15 @@ void MidiPlayerWindow::OnPlayStop()
 {
 	if (playing)
 	{
-		Stop(true);
+		threadId = spawn_thread(
+			_StopThread, "StopThread", B_NORMAL_PRIORITY, this);
+
+		resume_thread(threadId);
 	}
 	else
 	{
-		Play();
+		StartSynth();
+		playButton->SetLabel("Stop");
 	}
 }
 
@@ -419,6 +478,7 @@ void MidiPlayerWindow::OnShowScope()
 {
 	scopeEnabled = !scopeEnabled;
 	scopeView->SetEnabled(scopeEnabled);
+	scopeView->Invalidate();
 	SaveSettings();
 }
 
@@ -444,10 +504,12 @@ void MidiPlayerWindow::OnVolume()
 
 void MidiPlayerWindow::OnDrop(BMessage* msg)
 {
-	entry_ref ref;
 	if (msg->FindRef("refs", &ref) == B_OK)
 	{
-		LoadFile(&ref);
+		threadId = spawn_thread(
+			_LoadThread, "LoadThread", B_NORMAL_PRIORITY, this);
+			
+		resume_thread(threadId);
 	}
 }
 

@@ -32,15 +32,31 @@ public:
 	ScopeView();
 	virtual ~ScopeView();
 
+	virtual void AttachedToWindow();
+	virtual void DetachedFromWindow();
+	virtual void Draw(BRect updateRect);
+
 	void SetEnabled(bool flag);
 	void SetHaveFile(bool flag);
 
 private:
 
 	typedef BView super;
+
+	static int32 _Thread(void* data);
+	int32 Thread();
 	
+	void DrawNoFile();
+	void DrawDisabled();
+	void DrawPlaying();
+	
+	bool finished;
 	bool enabled;
 	bool haveFile;
+	int32 sampleCount;
+	int16* leftSamples;
+	int16* rightSamples;
+	thread_id threadId;
 };
 
 #endif // SCOPE_VIEW_H
