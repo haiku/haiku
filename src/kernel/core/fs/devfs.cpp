@@ -446,9 +446,38 @@ create_new_driver_info(device_hooks *ops)
 
 
 static status_t
-get_node_for_path(const char *path, struct devfs_vnode **_node)
+get_node_for_path(struct devfs *fs, const char *path, struct devfs_vnode **_node)
 {
-	return vfs_get_fs_node_from_path(sDeviceFileSystem->id, path, true, (void **)_node);
+	return vfs_get_fs_node_from_path(fs->id, path, true, (void **)_node);
+}
+
+
+static status_t
+unpublish_node(struct devfs *fs, const char *path, int type)
+{
+	devfs_vnode *node;
+	status_t status = get_node_for_path(fs, path, &node);
+	if (status != B_OK)
+		return status;
+
+	if ((type & S_IFMT) != type) {
+		status = B_BAD_TYPE;
+		goto err1;
+	}
+
+	mutex_lock(&fs->lock);
+
+	status = devfs_remove_from_dir(node->parent, node);
+	if (status < B_OK)
+		goto err2;
+
+	status = remove_vnode(fs->id, node->id);
+
+err2:
+	mutex_unlock(&fs->lock);
+err1:
+	put_vnode(fs->id, node->id);
+	return status;
 }
 
 
@@ -1232,48 +1261,6 @@ devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos, 
 
 
 static status_t
-devfs_unlink(fs_volume _fs, fs_vnode _dir, const char *name)
-{
-	struct devfs *fs = (struct devfs *)_fs;
-	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
-	struct devfs_vnode *vnode;
-	status_t status = B_NO_ERROR;
-
-	mutex_lock(&fs->lock);
-
-	vnode = devfs_find_in_dir(dir, name);
-	if (!vnode) {
-		status = B_ENTRY_NOT_FOUND;
-		goto err;
-	}
-	
-	// you can unlink partitions only
-	if (!S_ISCHR(vnode->stream.type) || !vnode->stream.u.dev.part_map) {
-		status = EROFS;
-		goto err;
-	}
-
-	status = devfs_remove_from_dir(vnode->parent, vnode);
-	if (status < B_OK)
-		goto err;
-
-	status = remove_vnode(fs->id, vnode->id);
-
-err:
-	mutex_unlock(&fs->lock);
-
-	return status;
-}
-
-
-static status_t
-devfs_rename(fs_volume _fs, fs_vnode _olddir, const char *oldname, fs_vnode _newdir, const char *newname)
-{
-	return EROFS;
-}
-
-
-static status_t
 devfs_read_stat(fs_volume _fs, fs_vnode _vnode, struct stat *stat)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
@@ -1404,8 +1391,8 @@ file_system_info gDeviceFileSystem = {
 	NULL,	// write_link
 	NULL,	// symlink
 	NULL,	// link
-	&devfs_unlink,
-	&devfs_rename,
+	NULL,	// unlink
+	NULL,	// rename
 
 	NULL,	// access
 	&devfs_read_stat,
@@ -1601,8 +1588,7 @@ pnp_driver_info gDeviceForDriversModule = {
 extern "C" status_t
 devfs_unpublish_file_device(const char *path)
 {
-	dprintf("unpublish file device: %s\n", path);
-	return B_ERROR;
+	return unpublish_node(sDeviceFileSystem, path, S_IFLNK);
 }
 
 
@@ -1636,8 +1622,7 @@ out:
 extern "C" status_t
 devfs_unpublish_partition(const char *path)
 {
-	dprintf("unpublish partition: %s\n", path);
-	return B_ERROR;
+	return unpublish_node(sDeviceFileSystem, path, S_IFCHR);
 }
 
 
@@ -1659,7 +1644,7 @@ devfs_publish_partition(const char *path, const partition_info *info)
 		return B_BAD_VALUE;
 
 	devfs_vnode *device;
-	status_t status = get_node_for_path(info->device, &device);
+	status_t status = get_node_for_path(sDeviceFileSystem, info->device, &device);
 	if (status != B_OK)
 		return status;
 
