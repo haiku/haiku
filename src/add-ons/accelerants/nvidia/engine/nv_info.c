@@ -225,6 +225,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 {
 	status_t result = B_OK;
 	int16 size = init_size;
+	uint32 agp_mode;
 
 	LOG(8,("INFO: now executing coldstart...\n"));
 
@@ -266,6 +267,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	/* note:
 	 * this _must_ be done _after_ the screens where shut-off as no
 	 * (memory) transactions may be in progress during this command. */
+	agp_mode = CFGR(AGPCMD);
 	CFGW(AGPCMD, 0x00000000);
 
 	/* execute BIOS coldstart script(s) */
@@ -275,6 +277,9 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 			if (exec_type1_script(rom, init1, &size, ram_tab) != B_OK) result = B_ERROR;
 		if (init2 && (result == B_OK))
 			if (exec_type1_script(rom, init2, &size, ram_tab) != B_OK) result = B_ERROR;
+
+		/* reset bus mode to wat it was before */
+		CFGW(AGPCMD, agp_mode);
 
 		/* now enable ROM shadow or the card will remain shut-off! */
 		CFGW(ROMSHADOW, (CFGR(ROMSHADOW) |= 0x00000001));
@@ -299,6 +304,7 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 {
 	status_t result = B_OK;
 	uint16 adress;
+	uint32 agp_mode;
 
 	LOG(8,("INFO: now executing coldstart...\n"));
 
@@ -348,6 +354,7 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 	/* note:
 	 * this _must_ be done _after_ the screens where shut-off as no
 	 * (memory) transactions may be in progress during this command. */
+	agp_mode = CFGR(AGPCMD);
 	CFGW(AGPCMD, 0x00000000);
 
 	/* execute all BIOS coldstart script(s) */
@@ -371,6 +378,9 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 			index += 2;
 			adress = *((uint16*)(&(rom[index])));
 		}
+
+		/* reset bus mode to wat it was before */
+		CFGW(AGPCMD, agp_mode);
 
 		/* now enable ROM shadow or the card will remain shut-off! */
 		CFGW(ROMSHADOW, (CFGR(ROMSHADOW) |= 0x00000001));
