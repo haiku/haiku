@@ -43,15 +43,11 @@ AppInfoList::~AppInfoList()
 
 // AddInfo
 bool
-AppInfoList::AddInfo(RosterAppInfo *info, int32 index)
+AppInfoList::AddInfo(RosterAppInfo *info)
 {
 	bool result = false;
-	if (info) {
-		if (index < 0)
-			result = fInfos.AddItem(info);
-		else
-			result = fInfos.AddItem(info, index);
-	}
+	if (info)
+		result = fInfos.AddItem(info);
 	return result;
 }
 

@@ -39,7 +39,7 @@ public:
 	AppInfoList();
 	virtual ~AppInfoList();
 
-	bool AddInfo(RosterAppInfo *info, int32 index = -1);
+	bool AddInfo(RosterAppInfo *info);
 
 	RosterAppInfo *RemoveInfo(int32 index);
 	bool RemoveInfo(RosterAppInfo *info);
