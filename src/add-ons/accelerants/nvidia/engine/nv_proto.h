@@ -26,19 +26,9 @@ void i2c_maven_write(unsigned char address, unsigned char data);
 status_t i2c_init(void);
 status_t i2c_maven_probe(void);
 
-
 /*card info functions*/
 status_t parse_pins(void);
-status_t pins5_read(uint8 *pins, uint8 length);
 void fake_pins(void);
-void pinsnv4_fake(void);
-void pinsnv5_nv5m64_fake(void);
-void pinsnv6_fake(void);
-void pinsnv10_arch_fake(void);
-void pinsnv20_arch_fake(void);
-void pinsnv30_arch_fake(void);
-void getstrap_arch_nv4(void);
-void getstrap_arch_nv10_20(void);
 void dump_pins(void);
 
 /*DAC functions*/
