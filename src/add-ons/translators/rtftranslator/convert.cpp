@@ -52,7 +52,7 @@ AppServerConnection::~AppServerConnection()
 
 
 static size_t
-get_text_for_command(RTFCommand *command, char *text, size_t size)
+get_text_for_command(RTF::Command *command, char *text, size_t size)
 {
 	const char *name = command->Name();
 
@@ -89,23 +89,23 @@ get_style(BList &runs, text_run *run, int32 offset)
 
 
 static text_run_array *
-get_text_run_array(RTFHeader &header)
+get_text_run_array(RTF::Header &header)
 {
 	// collect styles
 
-	RTFIterator iterator(header, RTF_TEXT);
+	RTF::Iterator iterator(header, RTF::TEXT_DESTINATION);
 	text_run *current = NULL;
 	int32 offset = 0;
 	BList runs;
 
 	while (iterator.HasNext()) {
-		RTFElement *element = iterator.Next();
-		if (RTFText *text = dynamic_cast<RTFText *>(element)) {
-			offset += text->TextLength();
+		RTF::Element *element = iterator.Next();
+		if (RTF::Text *text = dynamic_cast<RTF::Text *>(element)) {
+			offset += text->Length();
 			continue;
 		}
 
-		RTFCommand *command = dynamic_cast<RTFCommand *>(element);
+		RTF::Command *command = dynamic_cast<RTF::Command *>(element);
 		if (command == NULL)
 			continue;
 
@@ -149,20 +149,20 @@ get_text_run_array(RTFHeader &header)
 
 
 status_t
-write_plain_text(RTFHeader &header, BDataIO &target)
+write_plain_text(RTF::Header &header, BDataIO &target)
 {
-	RTFIterator iterator(header, RTF_TEXT);
+	RTF::Iterator iterator(header, RTF::TEXT_DESTINATION);
 
 	while (iterator.HasNext()) {
-		RTFElement *element = iterator.Next();
+		RTF::Element *element = iterator.Next();
 		char buffer[1024];
 		const char *string = NULL;
 		size_t size = 0;
 
-		if (RTFText *text = dynamic_cast<RTFText *>(element)) {
-			string = text->Text();
-			size = text->TextLength();
-		} else if (RTFCommand *command = dynamic_cast<RTFCommand *>(element)) {
+		if (RTF::Text *text = dynamic_cast<RTF::Text *>(element)) {
+			string = text->String();
+			size = text->Length();
+		} else if (RTF::Command *command = dynamic_cast<RTF::Command *>(element)) {
 			size = get_text_for_command(command, buffer, sizeof(buffer));
 			if (size != 0)
 				string = buffer;
@@ -186,18 +186,18 @@ write_plain_text(RTFHeader &header, BDataIO &target)
 
 
 status_t
-convert_to_stxt(RTFHeader &header, BDataIO &target)
+convert_to_stxt(RTF::Header &header, BDataIO &target)
 {
 	// count text bytes
 
 	size_t textSize = 0;
 
-	RTFIterator iterator(header, RTF_TEXT);
+	RTF::Iterator iterator(header, RTF::TEXT_DESTINATION);
 	while (iterator.HasNext()) {
-		RTFElement *element = iterator.Next();
-		if (RTFText *text = dynamic_cast<RTFText *>(element)) {
-			textSize += text->TextLength();
-		} else if (RTFCommand *command = dynamic_cast<RTFCommand *>(element)) {
+		RTF::Element *element = iterator.Next();
+		if (RTF::Text *text = dynamic_cast<RTF::Text *>(element)) {
+			textSize += text->Length();
+		} else if (RTF::Command *command = dynamic_cast<RTF::Command *>(element)) {
 			textSize += get_text_for_command(command, NULL, 0);
 		}
 	}
@@ -294,7 +294,7 @@ convert_to_stxt(RTFHeader &header, BDataIO &target)
 
 
 status_t
-convert_to_plain_text(RTFHeader &header, BPositionIO &target)
+convert_to_plain_text(RTF::Header &header, BPositionIO &target)
 {
 	// put out main text
 

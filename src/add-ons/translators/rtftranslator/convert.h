@@ -10,7 +10,7 @@
 #include <DataIO.h>
 
 
-extern status_t convert_to_stxt(RTFHeader &header, BDataIO &target);
-extern status_t convert_to_plain_text(RTFHeader &header, BPositionIO &target);
+extern status_t convert_to_stxt(RTF::Header &header, BDataIO &target);
+extern status_t convert_to_plain_text(RTF::Header &header, BPositionIO &target);
 
 #endif	/* CONVERT_H */

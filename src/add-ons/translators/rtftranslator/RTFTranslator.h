@@ -15,7 +15,6 @@
 #include <File.h>
 #include <ByteOrder.h>
 #include <fs_attr.h>
-#include "BaseTranslator.h"
 
 
 #define RTF_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VER(1, 0, 0)

@@ -120,7 +120,9 @@ RTFTranslator::Identify(BPositionIO *stream,
 	if (outType != B_TRANSLATOR_TEXT && outType != B_STYLED_TEXT_FORMAT)
 		return B_NO_TRANSLATOR;
 
-	status_t status = RTFHeader::Identify(*stream);
+	RTF::Parser parser(*stream);
+
+	status_t status = parser.Identify();
 	if (status != B_OK)
 		return B_NO_TRANSLATOR;
 
@@ -149,8 +151,10 @@ RTFTranslator::Translate(BPositionIO *source,
 	if (outType != B_TRANSLATOR_TEXT && outType != B_STYLED_TEXT_FORMAT)
 		return B_NO_TRANSLATOR;
 
-	RTFHeader header;
-	status_t status = RTFHeader::Parse(*source, header);
+	RTF::Parser parser(*source);
+
+	RTF::Header header;
+	status_t status = parser.Parse(header);
 	if (status != B_OK)
 		return status;
 
