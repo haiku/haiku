@@ -9,8 +9,8 @@
 
 
 struct timeval {
-	time_t		tv_sec;
-	suseconds_t	tv_usec;
+	time_t		tv_sec;		/* seconds */
+	suseconds_t	tv_usec;	/* microseconds */
 };
 
 #include <sys/select.h>

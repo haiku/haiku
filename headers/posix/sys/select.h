@@ -47,10 +47,10 @@ typedef struct fd_set {
 extern "C" {
 #endif
 
-extern int pselect(int nbits, struct fd_set *rbits, struct fd_set *wbits, struct fd_set *ebits,
-			const struct timespec *timeout, const sigset_t *sigMask);
-extern int select(int nbits, struct fd_set *rbits, struct fd_set *wbits, 
-			struct fd_set *ebits, struct timeval *timeout);
+extern int pselect(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
+			struct fd_set *errorBits, const struct timespec *timeout, const sigset_t *sigMask);
+extern int select(int numBits, struct fd_set *readBits, struct fd_set *writeBits, 
+			struct fd_set *errorBits, struct timeval *timeout);
 
 #ifdef __cplusplus
 }
