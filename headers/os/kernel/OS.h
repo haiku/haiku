@@ -386,7 +386,7 @@ typedef enum cpu_types {
 	B_CPU_PPC_686						= 13,
 
 	/* Intel */
-	B_CPU_INTEL_X86						= 0x1000,
+	B_CPU_INTEL_x86						= 0x1000,
 	B_CPU_INTEL_PENTIUM					= 0x1051,
 	B_CPU_INTEL_PENTIUM75,
 	B_CPU_INTEL_PENTIUM_486_OVERDRIVE,
@@ -401,77 +401,82 @@ typedef enum cpu_types {
 	B_CPU_INTEL_CELERON					= 0x1066,
 	B_CPU_INTEL_PENTIUM_III				= 0x1067,
 	B_CPU_INTEL_PENTIUM_III_MODEL_8		= 0x1068,
-#ifdef OBOS_CPU_TYPES
 	B_CPU_INTEL_PENTIUM_M				= 0x1069,
 	B_CPU_INTEL_PENTIUM_III_MODEL_11 	= 0x106b,
 	B_CPU_INTEL_PENTIUM_IV				= 0x10f0,
-	B_CPU_INTEL_PENTIUM_IV_MODEL1,
-	B_CPU_INTEL_PENTIUM_IV_MODEL2,
-	B_CPU_INTEL_PENTIUM_IV_XEON 		= 0x0F27,
-#endif
+	B_CPU_INTEL_PENTIUM_IV_MODEL_1,
+	B_CPU_INTEL_PENTIUM_IV_MODEL_2,
+	B_CPU_INTEL_PENTIUM_IV_XEON 		= 0x0f27,
 
 	/* AMD */
-	B_CPU_AMD_X86						= 0x1100,
-	B_CPU_AMD_K5_MODEL0					= 0x1150,
-	B_CPU_AMD_K5_MODEL1,
-	B_CPU_AMD_K5_MODEL2,
-	B_CPU_AMD_K5_MODEL3,
-	B_CPU_AMD_K6_MODEL6					= 0x1156,
-	B_CPU_AMD_K6_MODEL7					= 0x1157,
-	B_CPU_AMD_K6_MODEL8					= 0x1158,
+	B_CPU_AMD_x86						= 0x1100,
+	B_CPU_AMD_K5_MODEL_0				= 0x1150,
+	B_CPU_AMD_K5_MODEL_1,
+	B_CPU_AMD_K5_MODEL_2,
+	B_CPU_AMD_K5_MODEL_3,
+	B_CPU_AMD_K6_MODEL_6				= 0x1156,
+	B_CPU_AMD_K6_MODEL_7				= 0x1157,
+	B_CPU_AMD_K6_MODEL_8				= 0x1158,
 	B_CPU_AMD_K6_2						= 0x1158,
-	B_CPU_AMD_K6_MODEL9					= 0x1159,
+	B_CPU_AMD_K6_MODEL_9				= 0x1159,
 	B_CPU_AMD_K6_III					= 0x1159,
-#ifdef OBOS_CPU_TYPES
-	B_CPU_AMD_K6_III_MODEL2				= 0x115D,
-#endif
+	B_CPU_AMD_K6_III_MODEL_2			= 0x115d,
 
-	B_CPU_AMD_ATHLON_MODEL1				= 0x1161,
-#ifdef OBOS_CPU_TYPES
-	B_CPU_AMD_ATHLON_MODEL2 			= 0x1162,
+	B_CPU_AMD_ATHLON_MODEL_1			= 0x1161,
+	B_CPU_AMD_ATHLON_MODEL_2			= 0x1162,
 		
 	B_CPU_AMD_DURON 					= 0x1163,	
 	
 	B_CPU_AMD_ATHLON_THUNDERBIRD		= 0x1164,
 	B_CPU_AMD_ATHLON_XP 				= 0x1166,
-	B_CPU_AMD_ATHLON_XP_MODEL2,
-	B_CPU_AMD_ATHLON_XP_MODEL3,
-	B_CPU_AMD_ATHLON_XP_MODEL_BARTON        = 0x116A,
+	B_CPU_AMD_ATHLON_XP_MODEL_2,
+	B_CPU_AMD_ATHLON_XP_MODEL_3,
+	B_CPU_AMD_ATHLON_XP_MODEL_BARTON	= 0x116a,
 
-	/* According to "Revision guide for AMD Athlon 64 
-	and AMD Opteron Processors" (25759.pdf) */
+	/* According to "Revision guide for AMD Athlon 64
+	 * and AMD Opteron Processors" (25759.pdf)
+	 */
+	B_CPU_AMD_ATHLON_64                 = 0x11f4,
+	B_CPU_AMD_OPTERON					= 0x11f5,
+	B_CPU_AMD_ATHLON_64_FX				= B_CPU_AMD_OPTERON,
+	B_CPU_AMD_ATHLON_64_MODEL_2			= 0x11f7,
+	B_CPU_AMD_ATHLON_64_MODEL_3,
+	B_CPU_AMD_ATHLON_64_MODEL_4			= 0x11fb,
+	B_CPU_AMD_ATHLON_64_MODEL_5,
+	B_CPU_AMD_ATHLON_64_MODEL_6			= 0x11fe,
+	B_CPU_AMD_ATHLON_64_MODEL_7,
 
-	B_CPU_AMD_ATHLON_64                 = 0x11F4,
-	B_CPU_AMD_OPTERON,
-	B_CPU_AMD_ATHLON_64_MODEL2          = 0x11F7,
-	B_CPU_AMD_ATHLON_64_MODEL3,
-	B_CPU_AMD_ATHLON_64_MODEL4          = 0x11FB,
-	B_CPU_AMD_ATHLON_64_MODEL5,
-	B_CPU_AMD_ATHLON_64_MODEL6          = 0x11FE,
-	B_CPU_AMD_ATHLON_64_MODEL7,
-#endif
-	
-	/* VIA */
-	B_CPU_CYRIX_X86						= 0x1200,
+	/* VIA/Cyrix */
+	B_CPU_CYRIX_x86						= 0x1200,
+	B_CPU_VIA_CYRIX_x86					= 0x1200,
 	B_CPU_CYRIX_GXm						= 0x1254,
 	B_CPU_CYRIX_6x86MX					= 0x1260,
 
-	/* others */
-	B_CPU_IDT_X86						= 0x1300,
+	/* VIA/IDT */
+	B_CPU_IDT_x86						= 0x1300,
+	B_CPU_VIA_IDT_x86					= 0x1300,
 	B_CPU_IDT_WINCHIP_C6				= 0x1354,
 	B_CPU_IDT_WINCHIP_2					= 0x1358,
+	B_CPU_IDT_WINCHIP_3,
+	B_CPU_VIA_EDEN						= 0x1367,
+	B_CPU_VIA_EDEN_EZRA_T				= 0x1368,
 
-	B_CPU_RISE_X86						= 0x1400,
+	/* Transmeta */
+	B_CPU_TRANSMETA_x86					= 0x1600,
+	B_CPU_TRANSMETA_CRUSOE				= 0x1654,
+
+	/* Rise */
+	B_CPU_RISE_x86						= 0x1400,
 	B_CPU_RISE_mP6						= 0x1450,
 
-#ifdef OBOS_CPU_TYPES
-	B_CPU_NATIONAL_X86					= 0x1500,
+	/* National Semiconductor */
+	B_CPU_NATIONAL_x86					= 0x1500,
 	B_CPU_NATIONAL_GEODE_GX1			= 0x1554,
-#endif
+	B_CPU_NATIONAL_GEODE_GX2,
 
 	/* For compatibility */
 	B_CPU_AMD_29K						= 14,
-	B_CPU_X86,
+	B_CPU_x86,
 	B_CPU_MC6502,
 	B_CPU_Z80,
 	B_CPU_ALPHA,
@@ -483,25 +488,28 @@ typedef enum cpu_types {
 	B_CPU_SPARC,
 } cpu_type;
 
-#define B_CPU_X86_VENDOR_MASK	0x1F00
+#define B_CPU_x86_VENDOR_MASK	0xff00
 
 #ifdef __INTEL__
 typedef union {
 	struct {
 		uint32	max_eax;
-		char	vendorid[12];
+		char	vendor_id[12];
 	} eax_0;
 
 	struct {
-		uint32	stepping	: 4;
-		uint32	model		: 4;
-		uint32	family		: 4;
-		uint32	type		: 2;
-		uint32	reserved_0	: 18;
-		
-		uint32	reserved_1;
-		uint32	features; 
+		uint32	stepping		: 4;
+		uint32	model			: 4;
+		uint32	family			: 4;
+		uint32	type			: 2;
+		uint32	reserved_0		: 2;
+		uint32	extended_model	: 4;
+		uint32	extended_family	: 8;
+		uint32	reserved_1		: 4;
+
 		uint32	reserved_2;
+		uint32	features; 
+		uint32	reserved_3;
 	} eax_1;
 
 	struct {
@@ -525,7 +533,7 @@ typedef union {
 	} regs; 
 } cpuid_info;
 
-extern status_t get_cpuid(cpuid_info* info, uint32 eax_register, uint32 cpu_num);
+extern status_t get_cpuid(cpuid_info *info, uint32 eaxRegister, uint32 cpuNum);
 #endif
 
 
@@ -580,14 +588,14 @@ typedef struct {
 	char			kernel_name[B_FILE_NAME_LENGTH];		/* name of kernel */
 	char			kernel_build_date[B_OS_NAME_LENGTH];	/* date kernel built */
 	char			kernel_build_time[B_OS_NAME_LENGTH];	/* time kernel built */
-	int64			kernel_version;             /* version of this kernel */
+	int64			kernel_version;             			/* version of this kernel */
 
-	bigtime_t		_busy_wait_time;			/* reserved for Be */
+	bigtime_t		_busy_wait_time;			/* reserved for whatever */
 	int32			pad[4];   	               	/* just in case... */
 } system_info;
 
 /* system private, use macro instead */
-extern status_t _get_system_info (system_info *returned_info, size_t size);
+extern status_t _get_system_info(system_info *returned_info, size_t size);
 
 #define get_system_info(info) \
 			_get_system_info((info), sizeof(*(info)))
