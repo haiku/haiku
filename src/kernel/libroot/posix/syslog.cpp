@@ -16,14 +16,16 @@
 
 struct syslog_context {
 	char	ident[B_OS_NAME_LENGTH];
-	int32	mask;
+	int16	mask;
+	int16	facility;
 	int32	options;
 };
 
 static syslog_context sTeamContext = {
 	"",
 	-1,
-	0
+	LOG_USER,
+	LOG_CONS
 };
 static int32 sThreadContextSlot = -1;
 
@@ -96,13 +98,14 @@ get_context()
  */
 
 static void
-send_syslog_message(syslog_context *context, int options, const char *text, va_list args)
+send_syslog_message(syslog_context *context, int priority, const char *text, va_list args)
 {
+	int options = context->options;
+
 	// do we have to do anything?
-	if ((context->mask & LOG_MASK(SYSLOG_PRIORITY(options))) == 0)
+	if ((context->mask & LOG_MASK(SYSLOG_PRIORITY(priority))) == 0)
 		return;
 
-	options |= context->options;
 	port_id port = find_port(SYSLOG_PORT_NAME);
 
 	if ((options & LOG_PERROR) != 0
@@ -127,6 +130,7 @@ send_syslog_message(syslog_context *context, int options, const char *text, va_l
 	message.from = find_thread(NULL);
 	message.when = real_time_clock();
 	message.options = options;
+	message.priority = priority | context->facility;
 	strcpy(message.ident, context->ident);
 
 	int length = vsnprintf(message.message, sizeof(buffer) - sizeof(syslog_message), text, args);
@@ -154,7 +158,8 @@ openlog_team(const char *ident, int options, int facility)
 	if (ident != NULL)
 		strcpy(sTeamContext.ident, ident);
 
-	sTeamContext.options = facility | options;
+	sTeamContext.options = options;
+	sTeamContext.facility = SYSLOG_FACILITY(facility);
 }
 
 
@@ -200,7 +205,8 @@ openlog_thread(const char *ident, int options, int facility)
 	if (ident)
 		strcpy(context->ident, ident);
 
-	context->options = options | facility;
+	context->options = options;
+	context->facility = SYSLOG_FACILITY(facility);
 }
 
 
