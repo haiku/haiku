@@ -12,9 +12,8 @@ extern "C" {
 #include <SupportDefs.h>
 
 typedef int32  region_id;
-typedef int32  aspace_id;
-typedef uint32 addr;
 	// ToDo: to be faded out
+typedef int32  aspace_id;
 
 #ifdef __cplusplus
 }

@@ -28,8 +28,8 @@ typedef struct device {
 	uint32 device_id;
 
 	uint32 irq;
-	addr base[MAX_DEV_IO_RANGES];
-	addr size[MAX_DEV_IO_RANGES];
+	addr_t base[MAX_DEV_IO_RANGES];
+	addr_t size[MAX_DEV_IO_RANGES];
 
 	char dev_path[256];
 } device;

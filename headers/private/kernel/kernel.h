@@ -16,16 +16,16 @@
 	((addr_t)(x) >= KERNEL_BASE && (addr_t)(x) <= KERNEL_TOP)
 
 /** Size of the kernel stack */
-#define KSTACK_SIZE	(PAGE_SIZE * 2)
+#define KSTACK_SIZE	(B_PAGE_SIZE * 2)
 
 /** Size of the stack given to teams in user space */
-#define MAIN_THREAD_STACK_SIZE	(16 * PAGE_SIZE)	// 64 kB
+#define MAIN_THREAD_STACK_SIZE	(16 * B_PAGE_SIZE)	// 64 kB
 	// BeOS: (16 * 1024 * 1024)	// 16 MB
-#define STACK_SIZE				(16 * PAGE_SIZE)
+#define STACK_SIZE				(16 * B_PAGE_SIZE)
 	// BeOS: (256 * 1024)		// 256 kB
 
 /** Size of the environmental variables space for a process */
-#define ENV_SIZE	(PAGE_SIZE * 8)
+#define ENV_SIZE	(B_PAGE_SIZE * 8)
 
 
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))

@@ -70,22 +70,22 @@ clear_segment_descriptor(struct segment_descriptor *desc)
 
 
 static inline void
-set_segment_descriptor_base(struct segment_descriptor *desc, addr base)
+set_segment_descriptor_base(struct segment_descriptor *desc, addr_t base)
 {
-	desc->base_00_15 = (addr)base & 0xffff;	// base is 32 bits long
-	desc->base_23_16 = ((addr)base >> 16) & 0xff;
-	desc->base_31_24 = ((addr)base >> 24) & 0xff;
+	desc->base_00_15 = (addr_t)base & 0xffff;	// base is 32 bits long
+	desc->base_23_16 = ((addr_t)base >> 16) & 0xff;
+	desc->base_31_24 = ((addr_t)base >> 24) & 0xff;
 }
 
 
 static inline void
-set_segment_descriptor(struct segment_descriptor *desc, addr base, uint32 limit,
+set_segment_descriptor(struct segment_descriptor *desc, addr_t base, uint32 limit,
 	uint8 type, uint8 privilegeLevel)
 {
 	set_segment_descriptor_base(desc, base);
 
-	desc->limit_00_15 = (addr)limit & 0x0ffff;	// limit is 20 bits long
-	desc->limit_19_16 = ((addr)limit >> 16) & 0xf;
+	desc->limit_00_15 = (addr_t)limit & 0x0ffff;	// limit is 20 bits long
+	desc->limit_19_16 = ((addr_t)limit >> 16) & 0xf;
 
 	desc->type = type;
 	desc->desc_type = DT_CODE_DATA_SEGMENT;
@@ -101,12 +101,12 @@ set_segment_descriptor(struct segment_descriptor *desc, addr base, uint32 limit,
 
 
 static inline void
-set_tss_descriptor(struct segment_descriptor *desc, addr base, uint32 limit)
+set_tss_descriptor(struct segment_descriptor *desc, addr_t base, uint32 limit)
 {
 	// the TSS descriptor has a special layout different from the standard descriptor
 	set_segment_descriptor_base(desc, base);
 
-	desc->limit_00_15 = (addr)limit & 0x0ffff;
+	desc->limit_00_15 = (addr_t)limit & 0x0ffff;
 	desc->limit_19_16 = 0;
 
 	desc->type = DT_TSS;

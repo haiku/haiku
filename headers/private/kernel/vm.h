@@ -31,7 +31,7 @@ status_t vm_aspace_init_post_sem(void);
 void vm_free_unused_boot_loader_range(addr_t start, addr_t end);
 
 void vm_delete_aspace(vm_address_space *aspace);
-status_t vm_create_aspace(const char *name, addr base, addr size, bool kernel, vm_address_space **_aspace);
+status_t vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel, vm_address_space **_aspace);
 status_t vm_delete_areas(struct vm_address_space *aspace);
 vm_address_space *vm_get_kernel_aspace(void);
 aspace_id vm_get_kernel_aspace_id(void);
@@ -52,12 +52,12 @@ status_t delete_area_etc(struct team *team, area_id area);
 status_t vm_unreserve_address_range(aspace_id aid, void *address, addr_t size);
 status_t vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size);
 region_id vm_create_anonymous_region(aspace_id aid, const char *name, void **address, int addr_type,
-	addr size, int wiring, int lock);
+	addr_t size, int wiring, int lock);
 region_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, int addr_type,
-	addr size, int lock, addr phys_addr);
+	addr_t size, int lock, addr_t phys_addr);
 region_id vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
-	addr size, int lock, int mapping, const char *path, off_t offset);
-region_id vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, addr size);
+	addr_t size, int lock, int mapping, const char *path, off_t offset);
+region_id vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, addr_t size);
 area_id vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32 addressSpec,
 			uint32 protection, area_id sourceID);
 region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
@@ -66,15 +66,15 @@ status_t vm_delete_region(aspace_id aid, region_id id);
 region_id vm_find_region_by_name(aspace_id aid, const char *name);
 status_t vm_create_vnode_cache(void *vnode, void **_cache);
 
-status_t vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr);
-status_t vm_get_physical_page(addr paddr, addr *vaddr, int flags);
-status_t vm_put_physical_page(addr vaddr);
+status_t vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr);
+status_t vm_get_physical_page(addr_t paddr, addr_t *vaddr, int flags);
+status_t vm_put_physical_page(addr_t vaddr);
 
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);
 status_t _user_delete_area(area_id area);
 region_id _user_vm_map_file(const char *uname, void **uaddress, int addr_type,
-			addr size, int lock, int mapping, const char *upath, off_t offset);
+			addr_t size, int lock, int mapping, const char *upath, off_t offset);
 area_id _user_area_for(void *address);
 area_id _user_find_area(const char *name);
 status_t _user_get_area_info(area_id area, area_info *info);
@@ -83,10 +83,6 @@ status_t _user_resize_area(area_id area, size_t newSize);
 status_t _user_set_area_protection(area_id area, uint32 newProtection);
 area_id _user_clone_area(const char *name, void **_address, uint32 addressSpec, 
 			uint32 protection, area_id sourceArea);
-
-region_id find_region_by_name(const char *);
-region_id find_region_by_address (addr);
-int vm_resize_region (aspace_id, region_id, size_t);
 
 // to protect code regions with interrupts turned on
 void permit_page_faults(void);
