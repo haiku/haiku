@@ -5,6 +5,40 @@
 #ifndef _KERNEL_KHASH_H
 #define _KERNEL_KHASH_H
 
+#include <pools.h>
+
+typedef struct hash_entry			hash_entry;
+typedef struct new_hash_table		new_hash_table;
+typedef struct hash_index			hash_index;
+
+struct hash_entry {
+	hash_entry      *next;
+	int              hash;
+	const void      *key;
+	ssize_t          klen;
+	const void      *val;
+};
+
+struct hash_index {
+	new_hash_table	*nh;
+	hash_entry	    *this_idx;
+	hash_entry      *next;
+	int		         index;
+};
+
+struct new_hash_table {
+	hash_entry	   **array;
+	hash_index	     iterator;
+	int		         count;	
+	int		         max;
+	struct pool_ctl	*pool;
+};
+
+new_hash_table *hash_make(void);
+void           *hash_get(new_hash_table *, const void *, ssize_t);
+void            hash_set(new_hash_table *, const void *, ssize_t , const void *);
+
+
 struct hash_iterator {
 	void *ptr;
 	int bucket;
