@@ -53,18 +53,12 @@ class NetworkSetupWindow : public BWindow
 		void BuildProfilesMenu(BMenu *menu, int32 msg);
 		void BuildShowMenu(BMenu *menu, int32 msg);
 	
-		BMenuField 	*fProfilesMenu;
-		BMenuField 	*fShowMenu;
-		BButton 	*fManageProfilesButton;
-		// BButton		*fNewProfileButton;
-		// BButton		*fCopyProfileButton;
-		// BButton		*fDeleteProfileButton;
-		BButton 	*fHelpButton;
-		BButton 	*fRevertButton;
-		BButton 	*fApplyNowButton;
+		BButton *	fHelpButton;
+		BButton *	fRevertButton;
+		BButton *	fApplyNowButton;
 
-		BBox 		*fPanel;
-		BView 		*fAddonView;
+		BBox *		fPanel;
+		BView *		fAddonView;
 		BRect		fMinAddonViewRect;
 };
 
