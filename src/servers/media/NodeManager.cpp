@@ -19,8 +19,8 @@ NodeManager::NodeManager() :
 {
 	fLocker = new BLocker("node manager locker");
 	fDormantFlavorList = new List<dormant_flavor_info>;
-	fAddonPathMap = new Map<media_addon_id,entry_ref>;
-	fRegisteredNodeMap = new Map<media_node_id,registered_node>;
+	fAddonPathMap = new Map<media_addon_id, entry_ref>;
+	fRegisteredNodeMap = new Map<media_node_id, registered_node>;
 }
 
 
@@ -65,7 +65,7 @@ NodeManager::UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team
 	bool b;
 	registered_node *rn;
 	TRACE("NodeManager::UnregisterNode enter: node %ld, team %ld\n", nodeid, team);
-	b = fRegisteredNodeMap->GetPointer(nodeid, &rn);
+	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
 		FATAL("!!! NodeManager::UnregisterNode: Error: couldn't finde node %ld (team %ld)\n", nodeid, team);
 		return B_ERROR;
@@ -93,14 +93,14 @@ NodeManager::IncrementGlobalRefCount(media_node_id nodeid, team_id team)
 	registered_node *rn;
 	bool b;
 	TRACE("NodeManager::IncrementGlobalRefCount enter: node %ld, team %ld\n", nodeid, team);
-	b = fRegisteredNodeMap->GetPointer(nodeid, &rn);
+	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
 		FATAL("!!! NodeManager::IncrementGlobalRefCount: Error: node %ld not found\n", nodeid);
 		return B_ERROR;
 	}
 	int32 *count;
 	int32 debug_count;
-	b = rn->teamrefcount.GetPointer(team, &count);
+	b = rn->teamrefcount.Get(team, &count);
 	if (b) {
 		*count += 1;
 		debug_count = *count;
@@ -122,13 +122,13 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 	registered_node *rn;
 	bool b;
 	TRACE("NodeManager::DecrementGlobalRefCount enter: node %ld, team %ld\n", nodeid, team);
-	b = fRegisteredNodeMap->GetPointer(nodeid, &rn);
+	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
 		FATAL("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld not found\n", nodeid);
 		return B_ERROR;
 	}
 	int32 *count;
-	b = rn->teamrefcount.GetPointer(team, &count);
+	b = rn->teamrefcount.Get(team, &count);
 	if (!b) {
 		FATAL("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld has no team %ld references\n", nodeid, team);
 		return B_ERROR;
@@ -158,7 +158,7 @@ NodeManager::GetCloneForId(media_node *node, media_node_id nodeid, team_id team)
 		return B_ERROR;
 	}
 
-	b = fRegisteredNodeMap->GetPointer(nodeid, &rn);
+	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
 		FATAL("!!! NodeManager::GetCloneForId: Error: node %ld not found\n", nodeid);
 		return B_ERROR;
@@ -202,7 +202,7 @@ NodeManager::PublishInputs(const media_node &node, const media_input *inputs, in
 	BAutolock lock(fLocker);
 	registered_node *rn;
 	bool b;
-	b = fRegisteredNodeMap->GetPointer(node.node, &rn);
+	b = fRegisteredNodeMap->Get(node.node, &rn);
 	if (!b) {
 		FATAL("!!! NodeManager::PublishInputs: Error: node %ld not found\n", node.node);
 		return B_ERROR;
@@ -220,7 +220,7 @@ NodeManager::PublishOutputs(const media_node &node, const media_output *outputs,
 	BAutolock lock(fLocker);
 	registered_node *rn;
 	bool b;
-	b = fRegisteredNodeMap->GetPointer(node.node, &rn);
+	b = fRegisteredNodeMap->Get(node.node, &rn);
 	if (!b) {
 		FATAL("!!! NodeManager::PublishOutputs: Error: node %ld not found\n", node.node);
 		return B_ERROR;
@@ -237,14 +237,14 @@ NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
 {
 	BAutolock lock(fLocker);
 	registered_node *rn;
-	for (int32 i = 0; fRegisteredNodeMap->GetPointerAt(i, &rn); i++) {
+	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		if (rn->port == port) {
 			*nodeid = rn->nodeid;
 			TRACE("NodeManager::FindNodeId found port %ld, node %ld\n", port, *nodeid);
 			return B_OK;
 		}
 		media_output *output;
-		for (int32 j = 0; rn->outputlist.GetPointerAt(j, &output); j++) {
+		for (rn->outputlist.Rewind(); rn->outputlist.GetNext(&output); ) {
 			if (output->source.port == port || output->destination.port == port) {
 				*nodeid = rn->nodeid;
 				TRACE("NodeManager::FindNodeId found output port %ld, node %ld\n", port, *nodeid);
@@ -252,7 +252,7 @@ NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
 			}
 		}
 		media_input *input;
-		for (int32 j = 0; rn->inputlist.GetPointerAt(j, &input); j++) {
+		for (rn->inputlist.Rewind(); rn->inputlist.GetNext(&input); ) {
 			if (input->source.port == port || input->destination.port == port) {
 				*nodeid = rn->nodeid;
 				TRACE("NodeManager::FindNodeId found input port %ld, node %ld\n", port, *nodeid);
@@ -270,7 +270,7 @@ NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
 {
 	BAutolock lock(fLocker);
 	registered_node *rn;
-	for (int32 i = 0; fRegisteredNodeMap->GetPointerAt(i, &rn); i++) {
+	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		if (rn->nodeid == node.node) {
 			ASSERT(node.port == rn->port);
 			ASSERT(node.kind == rn->kinds);
@@ -292,7 +292,7 @@ NodeManager::GetInstances(media_node_id *node_ids, int32* count, int32 maxcount,
 	BAutolock lock(fLocker);
 	registered_node *rn;
 	*count = 0;
-	for (int32 i = 0; (maxcount > 0) &&  fRegisteredNodeMap->GetPointerAt(i, &rn); i++) {
+	for (fRegisteredNodeMap->Rewind(); (maxcount > 0) &&  fRegisteredNodeMap->GetNext(&rn); ) {
 		if (rn->addon_id == addon_id && rn->addon_flavor_id == addon_flavor_id) {
 			node_ids[*count] = rn->nodeid;
 			*count += 1;
@@ -321,7 +321,7 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 	} else
 		namelen = 0;
 
-	for (int32 index = 0; (maxcount > 0) && fRegisteredNodeMap->GetPointerAt(index, &rn); index++) {
+	for (fRegisteredNodeMap->Rewind(); (maxcount > 0) && fRegisteredNodeMap->GetNext(&rn); ) {
 		if ((rn->kinds & require_kinds) != require_kinds)
 			continue;
 		if (namelen) {
@@ -331,7 +331,7 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 		if (inputformat) {
 			bool hasit = false;
 			media_input *input;
-			for (int32 j = 0; rn->inputlist.GetPointerAt(j, &input); j++) {
+			for (rn->inputlist.Rewind(); rn->inputlist.GetNext(&input); ) {
 				if (format_is_compatible(*inputformat, input->format)) {
 					hasit = true;
 					break;
@@ -343,7 +343,7 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 		if (outputformat) {
 			bool hasit = false;
 			media_output *output;
-			for (int32 j = 0; rn->outputlist.GetPointerAt(j, &output); j++) {
+			for (rn->outputlist.Rewind(); rn->outputlist.GetNext(&output); ) {
 				if (format_is_compatible(*outputformat, output->format)) {
 					hasit = true;
 					break;
@@ -374,7 +374,7 @@ NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &
 	BAutolock lock(fLocker);
 	// XXX not sure if this is correct
 	registered_node *rn;
-	for (int32 i = 0; fRegisteredNodeMap->GetPointerAt(i, &rn); i++) {
+	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		if (rn->nodeid == node.node) {
 			ASSERT(node.port == rn->port);
 			ASSERT(node.kind == rn->kinds);
@@ -398,8 +398,9 @@ NodeManager::GetLiveNodes(BMessage *msg)
 {
 	BAutolock lock(fLocker);
 	registered_node *rn;
-	for (int32 i = 0; fRegisteredNodeMap->GetPointerAt(i, &rn); i++)
+	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		msg->AddInt32("media_node_id", rn->nodeid);
+	}
 	return B_OK;
 }
 
@@ -441,7 +442,14 @@ status_t
 NodeManager::GetAddonRef(entry_ref *ref, media_addon_id id)
 {
 	BAutolock lock(fLocker);
-	return fAddonPathMap->Get(id, ref) ? B_OK : B_ERROR;
+	entry_ref *tempref;
+
+	if (fAddonPathMap->Get(id, &tempref)) {
+		*ref = *tempref;
+		return B_OK;
+	}
+	
+	return B_ERROR;
 }
 
 status_t 
@@ -455,8 +463,7 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 {
 	BAutolock lock(fLocker);
 	int32 maxcount;
-	int32 index;
-	dormant_flavor_info dfi;
+	dormant_flavor_info *dfi;
 	int namelen;
 
 	// determine the count of byte to compare when checking for a name with(out) wildcard
@@ -471,19 +478,19 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 
 	maxcount = *io_count;	
 	*io_count = 0;
-	for (index = 0; (*io_count < maxcount) && fDormantFlavorList->GetAt(index, &dfi); index++) {
-		if ((dfi.kinds & require_kinds) != require_kinds)
+	for (fDormantFlavorList->Rewind(); (*io_count < maxcount) && fDormantFlavorList->GetNext(&dfi); ) {
+		if ((dfi->kinds & require_kinds) != require_kinds)
 			continue;
-		if ((dfi.kinds & deny_kinds) != 0)
+		if ((dfi->kinds & deny_kinds) != 0)
 			continue;
 		if (namelen) {
-			if (0 != memcmp(name, dfi.name, namelen))
+			if (0 != memcmp(name, dfi->name, namelen))
 				continue;
 		}
 		if (has_input) {
 			bool hasit = false;
-			for (int32 i = 0; i < dfi.in_format_count; i++)
-				if (format_is_compatible(*has_input, dfi.in_formats[i])) {
+			for (int32 i = 0; i < dfi->in_format_count; i++)
+				if (format_is_compatible(*has_input, dfi->in_formats[i])) {
 					hasit = true;
 					break;
 				}
@@ -492,8 +499,8 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 		}
 		if (has_output) {
 			bool hasit = false;
-			for (int32 i = 0; i < dfi.out_format_count; i++)
-				if (format_is_compatible(*has_output, dfi.out_formats[i])) {
+			for (int32 i = 0; i < dfi->out_format_count; i++)
+				if (format_is_compatible(*has_output, dfi->out_formats[i])) {
 					hasit = true;
 					break;
 				}
@@ -501,7 +508,7 @@ NodeManager::GetDormantNodes(dormant_node_info * out_info,
 				continue;
 		}
 		
-		out_info[*io_count] = dfi.node_info;
+		out_info[*io_count] = dfi->node_info;
 		*io_count += 1;
 	}
 
@@ -514,9 +521,12 @@ NodeManager::GetDormantFlavorInfoFor(media_addon_id addon,
 									 dormant_flavor_info *outFlavor)
 {
 	BAutolock lock(fLocker);
-	for (int32 index = 0; fDormantFlavorList->GetAt(index, outFlavor); index++) {
-		if (outFlavor->node_info.addon == addon && outFlavor->node_info.flavor_id == flavor_id)
+	dormant_flavor_info *flavor;
+	for (fDormantFlavorList->Rewind(); fDormantFlavorList->GetNext(&flavor); ) {
+		if (flavor->node_info.addon == addon && flavor->node_info.flavor_id == flavor_id) {
+			*outFlavor = *flavor;
 			return B_OK;
+		}
 	}
 	return B_ERROR;
 }

@@ -40,16 +40,17 @@ AppManager::~AppManager()
 bool AppManager::HasTeam(team_id team)
 {
 	BAutolock lock(fLocker);
-	App app;
-	return fAppMap->Get(team, &app);
+	return fAppMap->Has(team);
 }
 
 status_t AppManager::RegisterTeam(team_id team, BMessenger messenger)
 {
 	BAutolock lock(fLocker);
 	TRACE("AppManager::RegisterTeam %ld\n", team);
-	if (HasTeam(team))
+	if (HasTeam(team)) {
+		FATAL("Erorr: AppManager::RegisterTeam: team %ld already registered\n", team);
 		return B_ERROR;
+	}
 	App app;
 	app.team = team;
 	app.messenger = messenger;
@@ -140,7 +141,7 @@ void AppManager::BigBrother()
 	do {
 		if (!fLocker->Lock())
 			break;
-		for (int32 i = 0; fAppMap->GetPointerAt(i, &app); i++) {
+		for (fAppMap->Rewind(); fAppMap->GetNext(&app); ) {
 			reply.what = 0;
 			status = app->messenger.SendMessage(&msg, &reply, 5000000, 2000000);
 			if (status != B_OK || reply.what != 'PONG') {
