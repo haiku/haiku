@@ -9,8 +9,12 @@
  content="BPicture specifications for OpenBeOS">
 </head>
 <body>
-<span style="font-weight: bold; text-decoration: underline;">Picture
-data</span><br>
+<span style="font-weight: bold; text-decoration: underline;"></span>Author:
+Marc Flerackers<br>
+Revision: 1.4<br>
+<span style="font-weight: bold; text-decoration: underline;"></span><span
+ style="font-weight: bold; text-decoration: underline;"><br>
+Picture data</span><br>
 <br>
 The data of a BPicture is composed of instructions.<br>
 <br>
@@ -185,7 +189,7 @@ float deltay<br>
       <td valign="top">0x0110 </td>
       <td valign="top">DrawPixels<br>
       </td>
-      <td valign="top">52 + pixel data size<br>
+      <td valign="top">56 + pixel data size<br>
       </td>
       <td valign="top">BRect src<br>
 BRect dest<br>
@@ -194,6 +198,7 @@ int32 height<br>
 int32 bytesPerRow<br>
 int32 pixelFormat<br>
 int32 flags<br>
+int32 length of pixel data<br>
 pixel data<br>
       </td>
     </tr>
@@ -512,17 +517,19 @@ There are a few undocumented instructions:<br>
       <td valign="top">SetFontBPP </td>
       <td valign="top">4<br>
       </td>
-      <td valign="top"> int32 bpp </td>
+      <td valign="top"> int32 bpp (default 8)<br>
+      </td>
     </tr>
   </tbody>
 </table>
 <br>
-Also, not all instructions where checked yet. The SetClippingRects and
-DrawPixels data has still to be documented.<br>
+Not all instructions where checked yet. The SetClippingRects has still
+to be documented.<br>
 <br>
-Regarding DrawPicture and ClipToPicture, it seems the pictures to draw
-are not inside the flattened data, instead they are stored as messages
-in the BMessage in a field called "piclib".<br>
+DrawPicture and ClipToPicture have an index to the sub-picture. In
+flattened data, these sub-pictures are stored in front of the main
+picture data, when archived to a BMessage, the sub-pictures are
+contained in a field called "piclib".<br>
 <br>
 <span style="font-weight: bold; text-decoration: underline;">Shape data</span><br>
 <br>
