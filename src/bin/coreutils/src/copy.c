@@ -47,9 +47,7 @@
 #include "xreadlink.h"
 
 #if __BEOS__
-#	define bool bool_t
 #	include <fs_attr.h>
-#	undef bool
 #endif
 
 #define DO_CHOWN(Chown, File, New_uid, New_gid)				\
