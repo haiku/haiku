@@ -246,15 +246,15 @@ MediaWindow::InitMedia(bool first)
 	}
 	
 	void *listItem;
-	while(listItem = mListView->RemoveItem((int32)0))
+	while((listItem = mListView->RemoveItem((int32)0)))
 		delete listItem;
-	while(listItem = mAudioOutputs.RemoveItem((int32)0))
+	while((listItem = mAudioOutputs.RemoveItem((int32)0)))
 		delete listItem;
-	while(listItem = mAudioInputs.RemoveItem((int32)0))
+	while((listItem = mAudioInputs.RemoveItem((int32)0)))
 		delete listItem;
-	while(listItem = mVideoOutputs.RemoveItem((int32)0))
+	while((listItem = mVideoOutputs.RemoveItem((int32)0)))
 		delete listItem;
-	while(listItem = mVideoInputs.RemoveItem((int32)0))
+	while((listItem = mVideoInputs.RemoveItem((int32)0)))
 		delete listItem;
 		
 	MediaListItem    *item, *mixer, *audio, *video;
@@ -262,6 +262,8 @@ MediaWindow::InitMedia(bool first)
 	// Grab Media Info
 	FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_OUTPUT, mAudioOutputs);
 	FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_INPUT, mAudioInputs);
+	FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_OUTPUT, mAudioOutputs);
+	FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_INPUT, mAudioInputs);
 	FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_OUTPUT, mVideoOutputs);
 	FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_INPUT, mVideoInputs);
 	FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_OUTPUT, mVideoOutputs);
@@ -638,7 +640,7 @@ MediaWindow::UpdateProgress(int stage, const char * message, void * cookie)
 {
 	MediaAlert *alert = static_cast<MediaAlert*>(cookie);
 	PRINT(("stage : %i\n", stage));
-	char *string; 
+	char *string = "Unknown stage"; 
 	switch(stage) {
 		case 10:
 			string = "Stopping Media Server...";
