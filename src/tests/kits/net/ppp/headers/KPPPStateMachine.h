@@ -1,23 +1,23 @@
-#ifndef _K_PPP_FINITE_STATE_MACHINE__H
-#define _K_PPP_FINITE_STATE_MACHINE__H
+#ifndef _K_PPP_STATE_MACHINE__H
+#define _K_PPP_STATE_MACHINE__H
 
 #include "KPPPLCP.h"
 
 #include "Locker.h"
 
 
-class PPPFiniteStateMachine {
+class PPPStateMachine {
 		friend class PPPInterface;
 		friend class PPPLCP;
 
 	private:
 		// may only be constructed/destructed by PPPInterface
-		PPPFiniteStateMachine(PPPInterface& interface);
-		~PPPFiniteStateMachine();
+		PPPStateMachine(PPPInterface& interface);
+		~PPPStateMachine();
 		
 		// copies are not allowed!
-		PPPFiniteStateMachine(const PPPFiniteStateMachine& copy);
-		PPPFiniteStateMachine& operator= (const PPPFiniteStateMachine& copy);
+		PPPStateMachine(const PPPStateMachine& copy);
+		PPPStateMachine& operator= (const PPPStateMachine& copy);
 
 	public:
 		PPPInterface *Interface() const
@@ -50,6 +50,22 @@ class PPPFiniteStateMachine {
 		PPP_AUTHENTICATION_STATUS PeerAuthenticationStatus() const
 			{ return fPeerAuthenticationStatus; }
 		
+		// sub-interface events
+		void UpFailedEvent(PPPInterface *interface);
+		void UpEvent(PPPInterface *interface);
+		void DownEvent(PPPInterface *interface);
+		
+		// protocol events
+		void UpFailedEvent(PPPProtocol *protocol);
+		void UpEvent(PPPProtocol *protocol);
+		void DownEvent(PPPProtocol *protocol);
+		
+		// encapsulator events
+		void UpFailedEvent(PPPEncapsulator *encapsulator);
+		void UpEvent(PPPEncapsulator *encapsulator);
+		void DownEvent(PPPEncapsulator *encapsulator);
+		
+		// device events
 		bool TLSNotify();
 		bool TLFNotify();
 		void UpFailedEvent();
@@ -62,7 +78,7 @@ class PPPFiniteStateMachine {
 		void LeaveConstructionPhase();
 		void EnterDestructionPhase();
 		
-		// private FiniteStateMachine methods
+		// private StateMachine methods
 		void NewState(PPP_STATE next);
 		
 		// private events
@@ -119,6 +135,8 @@ class PPPFiniteStateMachine {
 		// counters and timers
 		int32 fMaxRequest, fMaxTerminate, fMaxNak;
 		int32 fRequestCounter, fTerminateCounter, fNakCounter;
+		uint8 fRequestID, fTerminateID;
+			// the ID we used for the last configure/terminate request
 		bigtime_t fTimeout;
 			// last time we sent a packet
 };

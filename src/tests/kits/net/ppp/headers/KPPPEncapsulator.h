@@ -14,10 +14,6 @@ class PPPEncapsulator {
 		
 		virtual status_t InitCheck() const = 0;
 		
-		void SetEnabled(bool enabled = true);
-		bool IsEnabled() const
-			{ return fEnabled; }
-		
 		const char *Name() const
 			{ return fName; }
 		
@@ -38,6 +34,14 @@ class PPPEncapsulator {
 				// negative values and values > 0xFF are ignored
 		int32 Flags() const
 			{ return fFlags; }
+		
+		void SetEnabled(bool enabled = true);
+		bool IsEnabled() const
+			{ return fEnabled; }
+		
+		void SetUpRequested(bool requested = true);
+		bool IsUpRequested() const
+			{ return fUpRequested; }
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		
@@ -62,7 +66,9 @@ class PPPEncapsulator {
 			// call the interface's SendToDevice function
 
 	protected:
-		void SetUp(bool isUp);
+		void UpFailedEvent();
+		void UpEvent();
+		void DownEvent();
 			// report up/down events
 
 	protected:
@@ -78,8 +84,9 @@ class PPPEncapsulator {
 		
 		PPPEncapsulator *fNext;
 		
-		bool fIsUp;
 		bool fEnabled;
+		bool fUpRequested;
+		bool fIsUp;
 }:
 
 

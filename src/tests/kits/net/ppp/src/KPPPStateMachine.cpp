@@ -1,31 +1,25 @@
-#include "KPPPFiniteStateMachine.h"
+#include "KPPPStateMachine.h"
 
 
-// TODO:
-// - add support for multilink interfaces
-//   (LCP packets may be received over MP encapsulators
-//   so we should return the reply using the same encapsulator)
-// - add Up(Failed)/DownEvent for child interfaces + protocols + encapsulators
-
-PPPFiniteStateMachine::PPPFiniteStateMachine(PPPInterface& interface)
+PPPStateMachine::PPPStateMachine(PPPInterface& interface)
 	: fInterface(&interface), fPhase(PPP_DOWN_PHASE),
 	fState(PPP_INITIAL_STATE), fID(system_time() & 0xFF),
 	fAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fPeerAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fAuthenticatorIndex(-1), fPeerAuthenticatorIndex(-1),
 	fMaxTerminate(2), fMaxConfigure(10), fMaxNak(5),
-	fTimeout(0)
+	fRequestID(0), fTerminateID(0), fTimeout(0)
 {
 }
 
 
-PPPFiniteStateMachine::~PPPFiniteStateMachine()
+PPPStateMachine::~PPPStateMachine()
 {
 }
 
 
 uint8
-PPPFiniteStateMachine::NextID()
+PPPStateMachine::NextID()
 {
 	return (uint8) atomic_add(&fID, 1);
 }
@@ -34,7 +28,7 @@ PPPFiniteStateMachine::NextID()
 // remember: NewState() must always be called _after_ IllegalEvent()
 // because IllegalEvent() also looks at the current state.
 void
-PPPFiniteStateMachine::NewState(PPP_STATE next)
+PPPStateMachine::NewState(PPP_STATE next)
 {
 //	if(State() == PPP_OPENED_STATE)
 //		ResetOptionHandlers();
@@ -45,58 +39,112 @@ PPPFiniteStateMachine::NewState(PPP_STATE next)
 
 // authentication events
 void
-PPPFiniteStateMachine::AuthenticationRequested()
+PPPStateMachine::AuthenticationRequested()
 {
 	// IMPLEMENT ME!
 }
 
 
 void
-PPPFiniteStateMachine::AuthenticationAccepted(const char *name)
+PPPStateMachine::AuthenticationAccepted(const char *name)
 {
 	// IMPLEMENT ME!
 }
 
 
 void
-PPPFiniteStateMachine::AuthenticationDenied(const char *name)
+PPPStateMachine::AuthenticationDenied(const char *name)
 {
 	// IMPLEMENT ME!
 }
 
 
 const char*
-PPPFiniteStateMachine::AuthenticationName() const
+PPPStateMachine::AuthenticationName() const
 {
 	// IMPLEMENT ME!
 }
 
 
 void
-PPPFiniteStateMachine::PeerAuthenticationRequested()
+PPPStateMachine::PeerAuthenticationRequested()
 {
 	// IMPLEMENT ME!
 }
 
 
 void
-PPPFiniteStateMachine::PeerAuthenticationAccepted(const char *name)
+PPPStateMachine::PeerAuthenticationAccepted(const char *name)
 {
 	// IMPLEMENT ME!
 }
 
 
 void
-PPPFiniteStateMachine::PeerAuthenticationDenied(const char *name)
+PPPStateMachine::PeerAuthenticationDenied(const char *name)
 {
 	// IMPLEMENT ME!
 }
 
 
 const char*
-PPPFiniteStateMachine::PeerAuthenticationName() const
+PPPStateMachine::PeerAuthenticationName() const
 {
 	// IMPLEMENT ME!
+}
+
+
+void
+PPPStateMachine::UpFailedEvent(PPPInterface *interface)
+{
+}
+
+
+void
+PPPStateMachine::UpEvent(PPPInterface *interface)
+{
+}
+
+
+void
+PPPStateMachine::DownEvent(PPPInterface *interface)
+{
+}
+
+
+void
+PPPStateMachine::UpFailedEvent(PPPProtocol *protocol)
+{
+}
+
+
+void
+PPPStateMachine::UpEvent(PPPProtocol *protocol)
+{
+}
+
+
+void
+PPPStateMachine::DownEvent(PPPProtocol *protocol)
+{
+}
+
+
+void
+PPPStateMachine::UpFailedEvent(PPPEncapsulator *encapsulator)
+{
+}
+
+
+void
+PPPStateMachine::UpEvent(PPPEncapsulator *encapsulator)
+{
+}
+
+
+void
+PPPStateMachine::DownEvent(PPPEncapsulator *encapsulator)
+{
 }
 
 
@@ -106,7 +154,7 @@ PPPFiniteStateMachine::PeerAuthenticationName() const
 // The return value says if we are waiting for an UpEvent(). If false is
 // returned the device should immediately abort its attempt to connect.
 bool
-PPPFiniteStateMachine::TLSNotify()
+PPPStateMachine::TLSNotify()
 {
 	LockerHelper locker(fLock);
 	
@@ -126,7 +174,7 @@ PPPFiniteStateMachine::TLSNotify()
 // If false is returned we want to stay connected, though we called
 // Device::Down().
 bool
-PPPFiniteStateMachine::TLFNotify()
+PPPStateMachine::TLFNotify()
 {
 	LockerHelper locker(fLock);
 	
@@ -144,7 +192,7 @@ PPPFiniteStateMachine::TLFNotify()
 
 
 void
-PPPFiniteStateMachine::UpFailedEvent()
+PPPStateMachine::UpFailedEvent()
 {
 	LockerHelper locker(fLock);
 	
@@ -172,7 +220,7 @@ PPPFiniteStateMachine::UpFailedEvent()
 
 
 void
-PPPFiniteStateMachine::UpEvent()
+PPPStateMachine::UpEvent()
 {
 	// This call is public, thus, it might not only be called by the device.
 	// We must recognize these attempts to fool us and handle them correctly.
@@ -224,7 +272,7 @@ PPPFiniteStateMachine::UpEvent()
 
 
 void
-PPPFiniteStateMachine::DownEvent()
+PPPStateMachine::DownEvent()
 {
 	LockerHelper locker(fLock);
 	
@@ -300,7 +348,7 @@ PPPFiniteStateMachine::DownEvent()
 
 // private events
 void
-PPPFiniteStateMachine::OpenEvent()
+PPPStateMachine::OpenEvent()
 {
 	LockerHelper locker(fLock);
 	
@@ -331,7 +379,7 @@ PPPFiniteStateMachine::OpenEvent()
 
 
 void
-PPPFiniteStateMachine::CloseEvent()
+PPPStateMachine::CloseEvent()
 {
 	LockerHelper locker(fLock);
 	
@@ -378,7 +426,7 @@ PPPFiniteStateMachine::CloseEvent()
 
 // timeout (restart counters are > 0)
 void
-PPPFiniteStateMachine::TOGoodEvent()
+PPPStateMachine::TOGoodEvent()
 {
 	LockerHelper locker(fLock);
 	
@@ -406,7 +454,7 @@ PPPFiniteStateMachine::TOGoodEvent()
 
 // timeout (restart counters are <= 0)
 void
-PPPFiniteStateMachine::TOBadEvent()
+PPPStateMachine::TOBadEvent()
 {
 	LockerHelper locker(fLock);
 	
@@ -436,9 +484,12 @@ PPPFiniteStateMachine::TOBadEvent()
 
 // receive configure request (acceptable request)
 void
-PPPFiniteStateMachine::RCRGoodEvent(mbuf *packet)
+PPPStateMachine::RCRGoodEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
+	
+	if(fRequestID == mtod(packet, lcp_packet*)->id)
+		fRequestID -= 128;
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -485,9 +536,13 @@ PPPFiniteStateMachine::RCRGoodEvent(mbuf *packet)
 
 // receive configure request (unacceptable request)
 void
-PPPFiniteStateMachine::RCRBadEvent(mbuf *nak, mbuf *reject)
+PPPStateMachine::RCRBadEvent(mbuf *nak, mbuf *reject)
 {
 	LockerHelper locker(fLock);
+	
+	// we should not use the same ID as the peer
+	if(fRequestID == mtod(packet, lcp_packet*)->id)
+		fRequestID -= 128;
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -530,9 +585,17 @@ PPPFiniteStateMachine::RCRBadEvent(mbuf *nak, mbuf *reject)
 
 // receive configure ack
 void
-PPPFiniteStateMachine::RCAEvent(mbuf *packet)
+PPPStateMachine::RCAEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
+	
+	if(fRequestID != mtod(packet, lcp_packet*)->id) {
+		// this packet is not a reply to our request
+		
+		// TODO:
+		// log this event
+		return;
+	}
 	
 	PPPOptionHandler *handler;
 	PPPConfigurePacket ack(packet);
@@ -584,9 +647,17 @@ PPPFiniteStateMachine::RCAEvent(mbuf *packet)
 
 // receive configure nak/reject
 void
-PPPFiniteStateMachine::RCNEvent(mbuf *packet)
+PPPStateMachine::RCNEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
+	
+	if(fRequestID != mtod(packet, lcp_packet*)->id) {
+		// this packet is not a reply to our request
+		
+		// TODO:
+		// log this event
+		return;
+	}
 	
 	PPPOptionHandler *handler;
 	PPPConfigurePacket nak_reject(packet);
@@ -635,9 +706,13 @@ PPPFiniteStateMachine::RCNEvent(mbuf *packet)
 
 // receive terminate request
 void
-PPPFiniteStateMachine::RTREvent(mbuf *packet)
+PPPStateMachine::RTREvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
+	
+	// we should not use the same ID as the peer
+	if(fTerminateID == mtod(packet, lcp_packet*)->id)
+		fTerminateID -= 128;
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -669,9 +744,17 @@ PPPFiniteStateMachine::RTREvent(mbuf *packet)
 
 // receive terminate ack
 void
-PPPFiniteStateMachine::RTAEvent(mbuf *packet)
+PPPStateMachine::RTAEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
+	
+	if(fTerminateID != mtod(packet, lcp_packet*)->id) {
+		// this packet is not a reply to our request
+		
+		// TODO:
+		// log this event
+		return;
+	}
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -707,7 +790,7 @@ PPPFiniteStateMachine::RTAEvent(mbuf *packet)
 
 // receive unknown code
 void
-PPPFiniteStateMachine::RUCEvent(mbuf *packet, uint16 protocol)
+PPPStateMachine::RUCEvent(mbuf *packet, uint16 protocol)
 {
 	LockerHelper locker(fLock);
 	
@@ -726,7 +809,7 @@ PPPFiniteStateMachine::RUCEvent(mbuf *packet, uint16 protocol)
 
 // receive code/protocol reject (acceptable such as IPX reject)
 void
-PPPFiniteStateMachine::RXJGoodEvent(mbuf *packet)
+PPPStateMachine::RXJGoodEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
@@ -745,7 +828,7 @@ PPPFiniteStateMachine::RXJGoodEvent(mbuf *packet)
 
 // receive code/protocol reject (catastrophic such as LCP reject)
 void
-PPPFiniteStateMachine::RXJBadEvent(mbuf *packet)
+PPPStateMachine::RXJBadEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
@@ -787,7 +870,7 @@ PPPFiniteStateMachine::RXJBadEvent(mbuf *packet)
 
 // receive echo request/reply, discard request
 void
-PPPFiniteStateMachine::RXREvent(mbuf *packet)
+PPPStateMachine::RXREvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
@@ -809,11 +892,29 @@ PPPFiniteStateMachine::RXREvent(mbuf *packet)
 
 // general events (for Good/Bad events)
 void
-PPPFiniteStateMachine::TimerEvent()
+PPPStateMachine::TimerEvent()
 {
-	// TODO:
-	// check which counter expired
-	// call TOGood/TOBad
+	LockerHelper locker(fLock);
+	
+	switch(State()) {
+		case PPP_CLOSING_STATE:
+		case PPP_STOPPTING_STATE:
+			if(fTerminateCounter <= 0)
+				TOBadEvent();
+			else
+				TOGoodEvent();
+		break;
+		
+		case PPP_REQ_SENT_STATE:
+		case PPP_ACK_RCVD_STATE:
+		case PPP_ACK_SENT_STATE:
+			if(fConfigureCounter <= 0)
+				TOBadEvent();
+			else
+				TOGoodEvent();
+		break;
+	}
+	
 }
 
 
@@ -821,7 +922,7 @@ PPPFiniteStateMachine::TimerEvent()
 // Here we get a configure-request packet from LCP and aks all OptionHandlers
 // if its values are acceptable. From here we call our Good/Bad counterparts.
 void
-PPPFiniteStateMachine::RCREvent(mbuf *packet)
+PPPStateMachine::RCREvent(mbuf *packet)
 {
 	PPPConfigurePacket request(packet), nak(PPP_CONFIGURE_NAK),
 		reject(PPP_CONFIGURE_REJECT);
@@ -874,7 +975,7 @@ PPPFiniteStateMachine::RCREvent(mbuf *packet)
 // LCP received a code-reject packet and we look if it is acceptable.
 // From here we call our Good/Bad counterparts.
 void
-PPPFiniteStateMachine::RXJEvent(mbuf *packet)
+PPPStateMachine::RXJEvent(mbuf *packet)
 {
 	lcp_packet *reject mtod(packet, lcp_packet*);
 	
@@ -916,7 +1017,7 @@ PPPFiniteStateMachine::RXJEvent(mbuf *packet)
 
 // actions (all private)
 void
-PPPFiniteStateMachine::IllegalEvent(PPP_EVENT event)
+PPPStateMachine::IllegalEvent(PPP_EVENT event)
 {
 	// TODO:
 	// update error statistics
@@ -924,7 +1025,7 @@ PPPFiniteStateMachine::IllegalEvent(PPP_EVENT event)
 
 
 void
-PPPFiniteStateMachine::ThisLayerUp()
+PPPStateMachine::ThisLayerUp()
 {
 	// TODO:
 	// bring all P/Es up
@@ -935,7 +1036,7 @@ PPPFiniteStateMachine::ThisLayerUp()
 
 
 void
-PPPFiniteStateMachine::ThisLayerDown()
+PPPStateMachine::ThisLayerDown()
 {
 	// TODO:
 	// DownProtocols();
@@ -948,7 +1049,7 @@ PPPFiniteStateMachine::ThisLayerDown()
 
 
 void
-PPPFiniteStateMachine::ThisLayerStarted()
+PPPStateMachine::ThisLayerStarted()
 {
 	if(Interface()->Device())
 		Interface()->Device()->Up();
@@ -956,7 +1057,7 @@ PPPFiniteStateMachine::ThisLayerStarted()
 
 
 void
-PPPFiniteStateMachine::ThisLayerFinished()
+PPPStateMachine::ThisLayerFinished()
 {
 	// TODO:
 	// ResetProtocols();
@@ -968,7 +1069,7 @@ PPPFiniteStateMachine::ThisLayerFinished()
 
 
 void
-PPPFiniteStateMachine::InitializeRestartCount()
+PPPStateMachine::InitializeRestartCount()
 {
 	fConfigureCounter = fMaxConfigure;
 	fTerminateCounter = fMaxTerminate;
@@ -980,7 +1081,7 @@ PPPFiniteStateMachine::InitializeRestartCount()
 
 
 void
-PPPFiniteStateMachine::ZeroRestartCount()
+PPPStateMachine::ZeroRestartCount()
 {
 	fConfigureCounter = 0;
 	fTerminateCounter = 0;
@@ -992,17 +1093,13 @@ PPPFiniteStateMachine::ZeroRestartCount()
 
 
 void
-PPPFiniteStateMachine::SendConfigureRequest()
+PPPStateMachine::SendConfigureRequest()
 {
-	if(fConfigureCounter == 0) {
-		CloseEvent();
-		return;
-	}
-	
 	--fConfigureCounter;
 	
 	PPPConfigurePacket request(PPP_CONFIGURE_REQUEST);
 	request.SetID(NextID());
+	fConfigureID = request.ID();
 	
 	for(int32 i = 0; i < LCP().CountOptionHandlers(); i++) {
 		// add all items
@@ -1019,7 +1116,7 @@ PPPFiniteStateMachine::SendConfigureRequest()
 
 
 void
-PPPFiniteStateMachine::SendConfigureAck(mbuf *packet)
+PPPStateMachine::SendConfigureAck(mbuf *packet)
 {
 	mtod(packet, lcp_packet*)->code = PPP_CONFIGURE_ACK;
 	PPPConfigurePacket ack(packet);
@@ -1032,7 +1129,7 @@ PPPFiniteStateMachine::SendConfigureAck(mbuf *packet)
 
 
 void
-PPPFiniteStateMachine::SendConfigureNak(mbuf *packet)
+PPPStateMachine::SendConfigureNak(mbuf *packet)
 {
 	lcp_packet *nak = mtod(packet, lcp_packet*);
 	if(nak->code == PPP_CONFIGURE_NAK) {
@@ -1048,24 +1145,55 @@ PPPFiniteStateMachine::SendConfigureNak(mbuf *packet)
 
 
 void
-PPPFiniteStateMachine::SendTerminateRequest()
+PPPStateMachine::SendTerminateRequest()
 {
+	mbuf *m = m_gethdr(MT_DATA);
+	if(!request)
+		return;
+	
+	--fTerminateCounter;
+	
+	// reserve some space for other protocols
+	m->m_data += PPP_PROTOCOL_OVERHEAD;
+	if(LCP().Encapsulator())
+		m->m_data += LCP().Encapsulator()->Overhead();
+	if(Interface()->Device())
+		m->m_data += Interface()->Device()->Overhead();
+	
+	lcp_packet *request = mtod(m, lcp_packet*);
+	request->code = PPP_TERMINATE_REQUEST;
+	request->id = fTerminateID = NextID();
+	request->length = 4;
+	
+	LCP().Send(m);
 }
 
 
 void
-PPPFiniteStateMachine::SendTerminateAck(mbuf *request)
+PPPStateMachine::SendTerminateAck(mbuf *request)
 {
+	lcp_packet *ack = mtod(request, lcp_packet*);
+	reply->code = PPP_TERMINATE_ACK;
+		// the request becomes an ack
+	
+	LCP().Send(request);
 }
 
 
 void
-PPPFiniteStateMachine::SendCodeReject(mbuf *packet, uint16 protocol)
+PPPStateMachine::SendCodeReject(mbuf *packet, uint16 protocol)
 {
+	// TODO:
+	// add the packet to the reject and truncate it if needed
 }
 
 
 void
-PPPFiniteStateMachine::SendEchoReply(mbuf *request)
+PPPStateMachine::SendEchoReply(mbuf *request)
 {
+	lcp_packet *reply = mtod(request, lcp_packet*);
+	reply->code = PPP_ECHO_REPLY;
+		// the request becomes a reply
+	
+	LCP().Send(request);
 }

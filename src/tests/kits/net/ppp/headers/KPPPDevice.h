@@ -6,13 +6,16 @@
 
 class PPPDevice {
 	public:
-		PPPDevice(const char *fName, PPPInterface *interface, driver_parameter *settings);
+		PPPDevice(const char *fName, uint32 overhead, PPPInterface *interface, driver_parameter *settings);
 		virtual ~PPPDevice();
 		
 		virtual status_t InitCheck() const = 0;
 		
 		const char *Name() const
 			{ return fName; }
+		
+		uint32 Overhead() const
+			{ return fOverhead; }
 		
 		PPPInterface *Interface() const
 			{ return fInterface; }
@@ -24,8 +27,6 @@ class PPPDevice {
 		virtual bool SetMTU(uint32 mtu) = 0;
 		uint32 MTU() const
 			{ return fMTU; }
-		virtual bool LockMTU();
-		virtual bool UnlockMTU();
 		virtual uint32 PreferredMTU() const = 0;
 		
 		virtual void Up() = 0;
@@ -66,11 +67,11 @@ class PPPDevice {
 
 	private:
 		char *fName;
+		uint32 fOverhead;
 		PPPInterface *fInterface;
 		driver_parameter *fSettings;
 		
 		uint32 fMTU;
-		int32 fMTULock;
 };
 
 

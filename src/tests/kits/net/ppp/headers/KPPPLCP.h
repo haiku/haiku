@@ -25,8 +25,8 @@ class PPPLCP : public PPPProtocol {
 		PPPLCP& operator= (const PPPLCP& copy);
 
 	public:
-		PPPFiniteStateMachine& FiniteStateMachine() const
-			{ return Interface()->FiniteStateMachine(); }
+		PPPStateMachine& StateMachine() const
+			{ return Interface()->StateMachine(); }
 		
 		bool AddOptionHandler(PPPOptionHandler *handler);
 		bool RemoveOptionHandler(PPPOptionHandler *handler);

@@ -2,9 +2,6 @@
 
 
 // TODO:
-// - add support for multilink interfaces
-//   (LCP packets may be received over MP encapsulators
-//   so we should return the reply using the same encapsulator)
 // - add LCP extension handlers
 
 
@@ -27,7 +24,7 @@ PPPLCP::AddOptionHandler(PPPOptionHandler *handler)
 	if(!handler)
 		return false
 	
-	LockerHelper locker(FiniteStateMachine().Locker());
+	LockerHelper locker(StateMachine().Locker());
 	
 	if(Phase() != PPP_DOWN_PHASE)
 		return false;
@@ -40,7 +37,7 @@ PPPLCP::AddOptionHandler(PPPOptionHandler *handler)
 bool
 PPPLCP::RemoveOptionHandler(PPPOptionHandler *handler)
 {
-	LockerHelper locker(FiniteStateMachine().Locker());
+	LockerHelper locker(StateMachine().Locker());
 	
 	if(Phase() != PPP_DOWN_PHASE)
 		return false;

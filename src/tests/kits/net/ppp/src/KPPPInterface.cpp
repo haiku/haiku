@@ -25,9 +25,9 @@
 
 PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NULL)
 	: fSettings(dup_driver_settings(settings)),
-	FiniteStateMachine(*this), LCP(*this), fIfnet(NULL), fLinkMTU(1500),
+	StateMachine(*this), LCP(*this), fIfnet(NULL), fLinkMTU(1500),
 	fAccessing(0), fChildrenCount(0), fDevice(NULL), fFirstEncapsulator(NULL),
-	fGeneralLock(FiniteStateMachine().Locker())
+	fGeneralLock(StateMachine().Locker())
 {
 	// are we a multilink subinterface?
 	if(parent && parent->IsMultilink()) {
@@ -725,7 +725,7 @@ PPPInterface::Receive(mbuf *packet, uint16 protocol)
 		m_free(packet);
 		return PPP_DISCARDED;
 	else {
-		FiniteStateMachine()->RUCEvent(packet, protocol);
+		StateMachine()->RUCEvent(packet, protocol);
 		return PPP_REJECTED;
 	}
 }

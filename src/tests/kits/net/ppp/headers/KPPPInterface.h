@@ -5,7 +5,7 @@
 
 #include "KPPPDefs.h"
 
-#include "KPPPFiniteStateMachine.h"
+#include "KPPPStateMachine.h"
 #include "KPPPLCP.h"
 
 #include "List.h"
@@ -32,8 +32,8 @@ class PPPInterface {
 		driver_settings* Settings()
 			{ return fSettings; }
 		
-		PPPFiniteStateMachine& FiniteStateMachine() const
-			{ return fFiniteStateMachine; }
+		PPPStateMachine& StateMachine() const
+			{ return fStateMachine; }
 		PPPLCP& LCP() const
 			{ return fLCP; }
 		
@@ -93,9 +93,9 @@ class PPPInterface {
 			{ return fMode; }
 			// client or server mode?
 		PPP_STATE State() const
-			{ return FiniteStateMachine().State(); }
+			{ return StateMachine().State(); }
 		PPP_PHASE Phase() const
-			{ return FiniteStateMachine().Phase(); }
+			{ return StateMachine().Phase(); }
 		
 		bool Up();
 			// in server mode Up() listens for an incoming connection
@@ -131,7 +131,7 @@ class PPPInterface {
 
 	private:
 		driver_parameter *fSettings;
-		PPPFiniteStateMachine fFiniteStateMachine;
+		PPPStateMachine fStateMachine;
 		PPPLCP fLCP;
 		ifnet *fIfnet;
 		
