@@ -3354,8 +3354,9 @@ BTextView::RecalLineBreaks(int32 *startLine, int32 *endLine)
 										 &descent, &width);
 
 		// we want to advance at least by one character
-		if (toOffset == fromOffset && fromOffset < textLength)
-			toOffset = NextInitialByte(toOffset);
+		int32 nextOffset = NextInitialByte(fromOffset);
+		if (toOffset < nextOffset && fromOffset < textLength)
+			toOffset = nextOffset;
 		
 		// set the ascent of this line
 		curLine->ascent = ascent;
@@ -3573,7 +3574,8 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 		strWidth = 0.0;
 		
 		for (offset = fromOffset; offset < limit; offset++) {
-			strWidth += StyledWidth(offset, 1, &ascent, &descent);
+			int32 nextInitial = NextInitialByte(offset);
+			strWidth += StyledWidth(offset, nextInitial - offset, &ascent, &descent);
 			
 			if (strWidth >= *ioWidth)
 				break;
@@ -3614,7 +3616,7 @@ BTextView::StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 		maxAscent = max_c(ascent, maxAscent);
 		maxDescent = max_c(descent, maxDescent);
 		
-		// Use _BWidthBuffer_ if possible
+		// Use _BWidthBuffer_ if possible (TODO: reenable this when it's fixed)
 		if (false && (sWidths != NULL)) {
 			LockWidthBuffer();
 			result += sWidths->StringWidth(*fText, fromOffset, numChars, font);
