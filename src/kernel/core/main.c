@@ -148,11 +148,17 @@ main2(void *unused)
 	TRACE(("start of main2: initializing devices\n"));
 
 	/* bootstrap all the filesystems */
-	TRACE(("Bootstrap all filesystems\n"));
-	vfs_bootstrap_all_filesystems();
+	TRACE(("Bootstrap file systems\n"));
+	vfs_bootstrap_file_systems();
 
 	TRACE(("Init modules\n"));
 	module_init(&ka);
+
+	// ToDo: device manager starts here, bus_init()/dev_init() won't be necessary anymore,
+	//	but instead, the hardware and drivers are rescanned then.
+
+	TRACE(("Mount boot file system\n"));
+	vfs_mount_boot_file_system();
 
 	TRACE(("Init busses\n"));
 	bus_init(&ka);
@@ -189,8 +195,8 @@ main2(void *unused)
 	// start the init process
 	{
 		team_id pid;
-		pid = team_create_team("/boot/bin/init", "init", NULL, 0, NULL, 0, 5);
-		
+		pid = team_create_team("/boot/bin/init", "init", NULL, 0, NULL, 0, B_NORMAL_PRIORITY);
+
 		TRACE(("Init started\n"));
 		if (pid < 0)
 			kprintf("error starting 'init' error = %ld \n", pid);
