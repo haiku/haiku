@@ -17,7 +17,8 @@
 	// this file can also be included from assembler as well
 	// (and is in arch_interrupts.S)
 
-#define TSS_BASE_SEGMENT 5
+#define DOUBLE_FAULT_TSS_SEGMENT 5
+#define TSS_BASE_SEGMENT 6
 #define TLS_BASE_SEGMENT (TSS_BASE_SEGMENT + smp_get_num_cpus())
 
 
@@ -56,6 +57,7 @@ enum descriptor_types {
 	DT_DATA_EXPANSION_DOWN = 0x4,
 
 	DT_TSS = 9,
+		/* non busy, 32 bit */
 
 	// descriptor types
 	DT_SYSTEM_SEGMENT = 0,

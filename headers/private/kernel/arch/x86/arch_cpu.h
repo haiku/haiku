@@ -99,9 +99,13 @@ void i386_frstor(void *fpu_state);
 void i386_fxrstor(void *fpu_state);
 void i386_fsave_swap(void *old_fpu_state, void *new_fpu_state);
 void i386_fxsave_swap(void *old_fpu_state, void *new_fpu_state);
+void x86_set_task_gate(int32 n, int32 segment);
 
 #define read_ebp(value) \
 	__asm__("movl	%%ebp,%0" : "=r" (value))
+
+#define read_cr3(value) \
+	__asm__("movl	%%cr3,%0" : "=r" (value))
 
 #define read_dr3(value) \
 	__asm__("movl	%%dr3,%0" : "=r" (value))
