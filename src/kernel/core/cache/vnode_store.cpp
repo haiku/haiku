@@ -46,7 +46,7 @@ store_read(struct vm_store *_store, off_t offset, const iovec *vecs, size_t coun
 	vnode_store *store = (vnode_store *)_store;
 	size_t bytesUntouched = *_numBytes;
 
-	status_t status = vfs_read_pages(store->vnode, offset, vecs, count, _numBytes);
+	status_t status = vfs_read_pages(store->vnode, NULL, offset, vecs, count, _numBytes);
 
 	bytesUntouched -= *_numBytes;
 
@@ -73,7 +73,7 @@ static status_t
 store_write(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	vnode_store *store = (vnode_store *)_store;
-	return vfs_write_pages(store->vnode, offset, vecs, count, _numBytes);
+	return vfs_write_pages(store->vnode, NULL, offset, vecs, count, _numBytes);
 }
 
 
