@@ -14,6 +14,8 @@
 #define _BIG_ENDIAN 1
 #define _LITTLE_ENDIAN 0
 
+#define FUNCTION_CALL_PARAMETER_ALIGNMENT_TYPE	uint64
+
 #define ATOMIC64_FUNCS_ARE_SYSCALLS 1
 
 struct iframe {
