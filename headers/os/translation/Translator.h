@@ -1,8 +1,8 @@
 /*****************************************************************************/
 //               File: Translator.h
 //              Class: BTranslator
-//   Reimplimented by: Michael Wilber, Translation Kit Team
-//   Reimplimentation: 2002-06-15
+//   Reimplemented by: Michael Wilber, Translation Kit Team
+//   Reimplementation: 2002-06-15
 //
 // Description: This file contains the BTranslator class, the base class for
 //              all translators that don't use the BeOS R4/R4.5 add-on method.

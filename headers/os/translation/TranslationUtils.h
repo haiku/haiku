@@ -1,8 +1,8 @@
 /*****************************************************************************/
 //               File: TranslationUtils.h
 //              Class: BTranslationUtils
-//   Reimplimented by: Michael Wilber, Translation Kit Team
-//   Reimplimentation: 2002-04
+//   Reimplemented by: Michael Wilber, Translation Kit Team
+//   Reimplementation: 2002-04
 //
 // Description: Utility functions for the Translation Kit
 //

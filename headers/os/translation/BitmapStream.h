@@ -1,8 +1,8 @@
 /*****************************************************************************/
 //               File: BitmapStream.h
 //              Class: BBitmapStream
-//   Reimplimented by: Travis Smith, Michael Wilber, Translation Kit Team
-//   Reimplimentation: 2002-04
+//   Reimplemented by: Travis Smith, Michael Wilber, Translation Kit Team
+//   Reimplementation: 2002-04
 //
 // Description: BPositionIO based object to read/write bitmap format to/from
 //              a BBitmap object.

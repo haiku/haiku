@@ -1,8 +1,8 @@
 /*****************************************************************************/
 //               File: TranslatorRoster.h
 //              Class: BTranslatorRoster
-//   Reimplimented by: Michael Wilber, Translation Kit Team
-//   Reimplimentation: 2002-06-11
+//   Reimplemented by: Michael Wilber, Translation Kit Team
+//   Reimplementation: 2002-06-11
 //
 // Description: This class is the guts of the translation kit, it makes the
 //              whole thing happen. It bridges the applications using this
