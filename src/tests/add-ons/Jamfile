@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src tests add-ons ;
 
 SubInclude OBOS_TOP src tests add-ons kernel ;
+SubInclude OBOS_TOP src tests add-ons media ;
 SubInclude OBOS_TOP src tests add-ons print ;
 SubInclude OBOS_TOP src tests add-ons translators ;
