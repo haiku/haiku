@@ -35,10 +35,17 @@ enum application_state {
 	APP_STATE_REGISTERED,
 };
 
+
 struct RosterAppInfo : app_info {
 	application_state	state;
+	uint32				token;
+		// token is meaningful only if state is APP_STATE_PRE_REGISTERED and
+		// team is -1.
+	bigtime_t			registration_time;	// time of first addition
 
 	RosterAppInfo();
+	void Init(thread_id thread, team_id team, port_id port, uint32 flags,
+			  const entry_ref *ref, const char *signature);
 };
 
 #endif	// ROSTER_APP_INFO_H

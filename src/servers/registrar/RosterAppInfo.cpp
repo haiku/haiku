@@ -24,12 +24,33 @@
 //	Description:	An extended app_info.
 //------------------------------------------------------------------------------
 
+#include <string.h>
+
 #include "RosterAppInfo.h"
 
 // constructor
 RosterAppInfo::RosterAppInfo()
 			 : app_info(),
-			   state(APP_STATE_INVALID)
+			   state(APP_STATE_INVALID),
+			   token(0),
+			   registration_time(0)
 {
+}
+
+// Init
+void
+RosterAppInfo::Init(thread_id thread, team_id team, port_id port, uint32 flags,
+					const entry_ref *ref, const char *signature)
+{
+	this->thread = thread;
+	this->team = team;
+	this->port = port;
+	this->flags = flags;
+	this->ref = *ref;
+	if (signature) {
+		strncpy(this->signature, signature, B_MIME_TYPE_LENGTH - 1);
+		this->signature[B_MIME_TYPE_LENGTH - 1] = '\0';
+	} else
+		this->signature[0] = '\0';
 }
 
