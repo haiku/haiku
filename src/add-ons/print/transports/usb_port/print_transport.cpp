@@ -45,26 +45,29 @@
 
 #include "PrintTransportAddOn.h"
 
-class UsbPort : public BDataIO {	
-	public:
-		UsbPort(BDirectory* printer, BMessage* msg);
-		~UsbPort();
+class UsbPort : public BDataIO 
+{	
+public:
+	UsbPort(BDirectory *printer, BMessage *msg);
+	~UsbPort();
 
-		bool InitCheck() { return fFile > -1; }
+	status_t InitCheck() { return fFile > -1 ? B_OK : B_ERROR; };
 
-		ssize_t Read(void* buffer, size_t size);
-		ssize_t Write(const void* buffer, size_t size);
+	ssize_t Read(void *buffer, size_t size);
+	ssize_t Write(const void *buffer, size_t size);
 
-	private:
-		int fFile;
+private:
+	int fFile;
 };
 
 
 // Implementation of transport add-on interface
 
-BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg) {
-	UsbPort* transport = new UsbPort(printer, msg);
-	if (transport->InitCheck())
+BDataIO * 
+instanciate_transport(BDirectory *printer, BMessage *msg) 
+{
+	UsbPort * transport = new UsbPort(printer, msg);
+	if (transport->InitCheck() == B_OK)
 		return transport;
 	
 	delete transport; 
@@ -74,7 +77,7 @@ BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg) {
 
 // Implementation of UsbPort
 
-UsbPort::UsbPort(BDirectory* printer, BMessage *msg) 
+UsbPort::UsbPort(BDirectory *printer, BMessage *msg) 
 	: fFile(-1)
 {
 	char device_id[USB_PRINTER_DEVICE_ID_LENGTH + 1];
@@ -137,14 +140,14 @@ UsbPort::~UsbPort()
 
 
 ssize_t
-UsbPort::Read(void* buffer, size_t size)
+UsbPort::Read(void *buffer, size_t size)
 {
 	return read(fFile, buffer, size);
 }
 
 
 ssize_t
-UsbPort::Write(const void* buffer, size_t size)
+UsbPort::Write(const void *buffer, size_t size)
 {
 	return write(fFile, buffer, size);
 }
