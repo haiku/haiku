@@ -177,6 +177,8 @@ KernelStaticLibraryObjects librld.a :
   	<$(SOURCE_GRIST)!libroot>kernel_vsprintf.o
   	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
 
+  	<$(SOURCE_GRIST)!libroot!posix!stdlib>env.o
+
 	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
