@@ -96,73 +96,49 @@ status_t _kern_get_next_disk_system_info(int32 *cookie,
 										 user_disk_system_info *info);
 status_t _kern_find_disk_system(const char *name, user_disk_system_info *info);
 
-bool _kern_supports_defragmenting_partition(disk_system_id diskSystemID,
-											partition_id partitionID,
+bool _kern_supports_defragmenting_partition(partition_id partitionID,
 											bool *whileMounted);
-bool _kern_supports_repairing_partition(disk_system_id diskSystemID,
-										partition_id partitionID,
+bool _kern_supports_repairing_partition(partition_id partitionID,
 										bool checkOnly, bool *whileMounted);
-bool _kern_supports_resizing_partition(disk_system_id diskSystemID,
-									   partition_id partitionID,
+bool _kern_supports_resizing_partition(partition_id partitionID,
+									   bool *canResizeContents,
 									   bool *whileMounted);
-bool _kern_supports_resizing_child_partition(disk_system_id diskSystemID,
-											 partition_id partitionID);
-bool _kern_supports_moving_partition(disk_system_id diskSystemID,
-									 partition_id partitionID,
+bool _kern_supports_moving_partition(partition_id partitionID,
+									 partition_id *buffer, size_t bufferSize,
 									 bool *whileMounted);
-bool _kern_supports_moving_child_partition(disk_system_id diskSystemID,
-										   partition_id partitionID);
-bool _kern_supports_setting_partition_name(disk_system_id diskSystemID,
-										   partition_id partitionID);
-bool _kern_supports_setting_partition_content_name(disk_system_id diskSystemID,
-												   partition_id partitionID,
+bool _kern_supports_setting_partition_name(partition_id partitionID);
+bool _kern_supports_setting_partition_content_name(partition_id partitionID,
 												   bool *whileMounted);
-bool _kern_supports_setting_partition_type(disk_system_id diskSystemID,
-										   partition_id partitionID);
-bool _kern_supports_creating_child_partition(disk_system_id diskSystemID,
-											 partition_id partitionID);
-bool _kern_supports_deleting_child_partition(disk_system_id diskSystemID,
-											 partition_id partitionID);
-bool _kern_supports_initializing_partition(disk_system_id diskSystemID,
-										   partition_id partitionID);
-bool _kern_supports_initializing_child_partition(disk_system_id diskSystemID,
-												 partition_id partitionID,
-												 const char *childSystem);
+bool _kern_supports_setting_partition_type(partition_id partitionID);
+bool _kern_supports_setting_partition_parameters(partition_id partitionID);
+bool _kern_supports_setting_partition_content_parameters(
+	partition_id partitionID, bool *whileMounted);
+bool _kern_supports_initializing_partition(partition_id partitionID,
+										   const char *diskSystemName);
+bool _kern_supports_creating_child_partition(partition_id partitionID);
+bool _kern_supports_deleting_child_partition(partition_id partitionID);
 bool _kern_is_sub_disk_system_for(disk_system_id diskSystemID,
 								  partition_id partitionID);
 
-status_t _kern_validate_resize_partition(disk_system_id diskSystemID,
-										 partition_id partitionID,
-										 off_t *size);
-status_t _kern_validate_resize_child_partition(disk_system_id diskSystemID,
-											   partition_id partitionID,
-											   off_t *size);
-status_t _kern_validate_move_partition(disk_system_id diskSystemID,
-									   partition_id partitionID,
-									   off_t *offset);
-status_t _kern_validate_move_child_partition(disk_system_id diskSystemID,
-											 partition_id partitionID,
-											 off_t *offset);
-status_t _kern_validate_set_partition_name(disk_system_id diskSystemID,
-										   partition_id partitionID,
+status_t _kern_validate_resize_partition(partition_id partitionID,
+										 off_t *size, bool resizeContents);
+status_t _kern_validate_move_partition(partition_id partitionID,
+									   off_t *newOffset, bool force);
+status_t _kern_validate_set_partition_name(partition_id partitionID,
 										   char *name);
-status_t _kern_validate_set_partition_content_name(disk_system_id diskSystemID,
-												   partition_id partitionID,
+status_t _kern_validate_set_partition_content_name(partition_id partitionID,
 												   char *name);
-status_t _kern_validate_set_partition_type(disk_system_id diskSystemID,
-										   partition_id partitionID,
+status_t _kern_validate_set_partition_type(partition_id partitionID,
 										   const char *type);
-status_t _kern_validate_initialize_partition(disk_system_id diskSystemID,
-											 partition_id partitionID,
+status_t _kern_validate_initialize_partition(partition_id partitionID,
+											 const char *diskSystemName,
 											 char *name,
 											 const char *parameters);
-status_t _kern_validate_create_child_partition(disk_system_id diskSystemID,
-											   partition_id partitionID,
+status_t _kern_validate_create_child_partition(partition_id partitionID,
 											   off_t *offset, off_t *size,
 											   const char *type,
 											   const char *parameters);
-status_t _kern_get_next_supported_partition_type(disk_system_id diskSystemID,
-												 partition_id partitionID,
+status_t _kern_get_next_supported_partition_type(partition_id partitionID,
 												 int32 *cookie, char *type);
 status_t _kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
 												   const char *contentType,
