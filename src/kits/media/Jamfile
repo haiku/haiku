@@ -68,6 +68,11 @@ SharedLibrary media :
 	OldMediaModule.cpp
 	OldSoundFile.cpp
 	OldSubscriber.cpp
+	
+	# Codec Plugin API
+	MediaPlugin.cpp
+	ReaderPlugin.cpp
+	DecoderPlugin.cpp
 ;
 
 LinkSharedOSLibs libmedia.so :

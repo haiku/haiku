@@ -869,6 +869,8 @@ print_pir_table(struct pir_table *tbl)
  *	once we've scanned the bus on the other side of the bridge. See the URL
  *	above for information on why this is done.
  */
+ 
+ /* All PCI buses located behind a PCI-PCI bridge must reside between the seondary bus number and the subordinate bus number (inclusive). */
 
 static void
 pci_bridge(uint8 bus, uint8 dev, uint8 func)

@@ -116,7 +116,7 @@ MixerInput::GetMixerChannelInfo(int mixer_channel, int64 framepos, bigtime_t tim
 	if (!fEnabled)
 		return false;
 
-#if 0
+#if 1
 	if (time < (fLastDataAvailableTime - duration_for_frames(fMixBufferFrameRate, fMixBufferFrameCount))
 		|| (time + duration_for_frames(fMixBufferFrameRate, debugMixBufferFrames)) >= fLastDataAvailableTime)
 		ERROR("MixerInput::GetMixerChannelInfo: reading wrong data, have %Ld to %Ld, reading from %Ld to %Ld\n",
