@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -28,7 +28,8 @@ MenuItem::MenuItem(const char *label, Menu *subMenu)
 	fIsSelected(false),
 	fType(MENU_ITEM_STANDARD),
 	fMenu(NULL),
-	fSubMenu(subMenu)
+	fSubMenu(subMenu),
+	fData(NULL)
 {
 }
 
@@ -39,14 +40,14 @@ MenuItem::~MenuItem()
 }
 
 
-void 
+void
 MenuItem::SetTarget(menu_item_hook target)
 {
 	fTarget = target;
 }
 
 
-void 
+void
 MenuItem::SetMarked(bool marked)
 {
 	if (fIsMarked == marked)
@@ -66,7 +67,7 @@ MenuItem::SetMarked(bool marked)
 }
 
 
-void 
+void
 MenuItem::Select(bool selected)
 {
 	if (fIsSelected == selected)
@@ -86,10 +87,17 @@ MenuItem::Select(bool selected)
 }
 
 
-void 
+void
 MenuItem::SetType(menu_item_type type)
 {
 	fType = type;
+}
+
+
+void
+MenuItem::SetData(void *data)
+{
+	fData = data;
 }
 
 
@@ -266,6 +274,7 @@ Menu::Draw(MenuItem *item)
 void
 Menu::Run()
 {
+	platform_run_menu(this);
 }
 
 
@@ -342,7 +351,7 @@ user_menu(Directory **_bootVolume)
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new MenuItem("Continue booting"));
 
-	platform_run_menu(menu);
+	menu->Run();
 	return B_OK;
 }
 
