@@ -5,6 +5,7 @@ INTERFACE_KIT_SOURCE =
 	Box.cpp
 	Button.cpp
 	ChannelControl.cpp
+	ChannelSlider.cpp
 	CheckBox.cpp
 	ClientFontList.cpp
 	ColorUtils.cc
