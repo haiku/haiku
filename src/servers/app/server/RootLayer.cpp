@@ -7,7 +7,7 @@
 #include "RootLayer.h"
 #include "Layer.h"
 #include "Workspace.h"
-#include "Screen.h"
+#include "ServerScreen.h"
 #include "WinBorder.h"
 #include "ServerWindow.h"
 #include "ServerApp.h"

@@ -4,7 +4,7 @@
 
 #include "Desktop.h"
 #include "RootLayer.h"
-#include "Screen.h"
+#include "ServerScreen.h"
 #include "Layer.h"
 #include "PortMessage.h"
 #include "DisplayDriver.h"
