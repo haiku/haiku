@@ -564,17 +564,18 @@ create_new_vnode(struct vnode **_vnode, mount_id mountID, vnode_id vnodeID)
 
 
 /**	\brief Decrements the reference counter of the given vnode and deletes it,
-	if the counter dropped to 0.
+ *	if the counter dropped to 0.
+ *
+ *	The caller must, of course, own a reference to the vnode to call this
+ *	function.
+ *	The caller must not hold the sVnodeMutex or the sMountMutex.
+ *
+ *	\param vnode the vnode.
+ *	\param reenter \c true, if this function is called (indirectly) from within
+ *		   a file system.
+ *	\return \c B_OK, if everything went fine, an error code otherwise.
+ */
 
-	The caller must, of course, own a reference to the vnode to call this
-	function.
-	The caller must not hold the sVnodeMutex or the sMountMutex.
-
-	\param vnode the vnode.
-	\param reenter \c true, if this function is called (indirectly) from within
-		   a file system.
-	\return \c B_OK, if everything went fine, an error code otherwise.
-*/
 static status_t
 dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 {
@@ -595,15 +596,20 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 
 		mutex_unlock(&sVnodeMutex);
 
-		/* if we have a vm_cache attached, remove it */
+		// write back any changes in this vnode's cache (if present)
 		if (vnode->cache)
-			vm_cache_release_ref((vm_cache_ref *)vnode->cache);
-		vnode->cache = NULL;
-		
+			vm_cache_write_modified((vm_cache_ref *)vnode->cache);
+
 		if (vnode->delete_me)
 			FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
 		else
 			FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+
+		// if we have a vm_cache attached, remove it
+		if (vnode->cache)
+			vm_cache_release_ref((vm_cache_ref *)vnode->cache);
+
+		vnode->cache = NULL;
 
 		remove_vnode_from_mount_list(vnode, vnode->mount);
 
@@ -1781,34 +1787,36 @@ err:
 
 
 /**	\brief Normalizes a given path.
+ *
+ *	The path must refer to an existing or non-existing entry in an existing
+ *	directory, that is chopping off the leaf component the remaining path must
+ *	refer to an existing directory.
+ *
+ *	The returned will be canonical in that it will be absolute, will not
+ *	contain any "." or ".." components or duplicate occurrences of '/'s,
+ *	and none of the directory components will by symbolic links.
+ *
+ *	Any two paths referring to the same entry, will result in the same
+ *	normalized path (well, that is pretty much the definition of `normalized',
+ *	isn't it :-).
+ *
+ *	\param path The path to be normalized.
+ *	\param buffer The buffer into which the normalized path will be written.
+ *	\param bufferSize The size of \a buffer.
+ *	\param kernel \c true, if the IO context of the kernel shall be used,
+ *		   otherwise that of the team this thread belongs to. Only relevant,
+ *		   if the path is relative (to get the CWD).
+ *	\return \c B_OK if everything went fine, another error code otherwise.
+ */
 
-	The path must refer to an existing or non-existing entry in an existing
-	directory, that is chopping off the leaf component the remaining path must
-	refer to an existing directory.
-
-	The returned will be canonical in that it will be absolute, will not
-	contain any "." or ".." components or duplicate occurrences of '/'s,
-	and none of the directory components will by symbolic links.
-
-	Any two paths referring to the same entry, will result in the same
-	normalized path (well, that is pretty much the definition of `normalized',
-	isn't it :-).
-
-	\param path The path to be normalized.
-	\param buffer The buffer into which the normalized path will be written.
-	\param bufferSize The size of \a buffer.
-	\param kernel \c true, if the IO context of the kernel shall be used,
-		   otherwise that of the team this thread belongs to. Only relevant,
-		   if the path is relative (to get the CWD).
-	\return \c B_OK if everything went fine, another error code otherwise.
-*/
 status_t
 vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	bool kernel)
 {
 	if (!path || !buffer || bufferSize < 1)
 		return B_BAD_VALUE;
-PRINT(("vfs_normalize_path(`%s')\n", path));
+
+	PRINT(("vfs_normalize_path(`%s')\n", path));
 
 	// copy the supplied path to the stack, so it can be modified
 	char mutablePath[B_PATH_NAME_LENGTH + 1];
@@ -1819,30 +1827,28 @@ PRINT(("vfs_normalize_path(`%s')\n", path));
 	struct vnode *dirNode;
 	char leaf[B_FILE_NAME_LENGTH];
 	status_t error = path_to_dir_vnode(mutablePath, &dirNode, leaf, kernel);
-	if (error != B_OK)
-{
-PRINT(("vfs_normalize_path(): failed to get dir vnode: %s\n", strerror(error)));
+	if (error != B_OK) {
+		PRINT(("vfs_normalize_path(): failed to get dir vnode: %s\n", strerror(error)));
 		return error;
-}
+	}
+
 	// if the leaf is "." or "..", we directly get the correct directory
 	// vnode and ignore the leaf later
 	bool isDir = (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0);
 	if (isDir)
 		error = vnode_path_to_vnode(dirNode, leaf, false, 0, &dirNode, NULL);
-	if (error != B_OK)
-{
-PRINT(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n", strerror(error)));
+	if (error != B_OK) {
+		PRINT(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n", strerror(error)));
 		return error;
-}
+	}
 
 	// get the directory path
 	error = dir_vnode_to_path(dirNode, buffer, bufferSize);
 	put_vnode(dirNode);
-	if (error < B_OK)
-{
-PRINT(("vfs_normalize_path(): failed to get dir path: %s\n", strerror(error)));
+	if (error < B_OK) {
+		PRINT(("vfs_normalize_path(): failed to get dir path: %s\n", strerror(error)));
 		return error;
-}
+	}
 
 	// append the leaf name
 	if (!isDir) {
@@ -1854,7 +1860,7 @@ PRINT(("vfs_normalize_path(): failed to get dir path: %s\n", strerror(error)));
 		}
 	}
 
-PRINT(("vfs_normalize_path() -> `%s'\n", buffer));
+	PRINT(("vfs_normalize_path() -> `%s'\n", buffer));
 	return B_OK;
 }
 
@@ -2435,6 +2441,9 @@ open_attr_dir_vnode(struct vnode *vnode, bool kernel)
 {
 	fs_cookie cookie;
 	int status;
+
+	if (FS_CALL(vnode, open_attr_dir) == NULL)
+		return EOPNOTSUPP;
 
 	status = FS_CALL(vnode, open_attr_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
 	if (status < 0)
@@ -4629,7 +4638,7 @@ _kern_write_link(const char *path, const char *toPath)
 	of the directory (!) identified by \a fd.
 
 	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. Must not be \c NULL.
+	\param toPath The absolute or relative path. Must not be \c NULL.
 	\param mode The access permissions the new symlink shall have.
 	\return \c B_OK, if the symlink has been created successfully, another
 			error code otherwise.
@@ -5484,7 +5493,7 @@ _user_create_symlink(int fd, const char *userPath, const char *userToPath,
 	char path[B_PATH_NAME_LENGTH + 1];
 	char toPath[B_PATH_NAME_LENGTH + 1];
 	status_t status;
-	
+
 	if (!IS_USER_ADDRESS(userPath)
 		|| !IS_USER_ADDRESS(userToPath))
 		return B_BAD_ADDRESS;
