@@ -289,10 +289,14 @@ ServerApp *ServerWindow::GetApp(void)
 //! Shows the window's WinBorder
 void ServerWindow::Show(void)
 {
+	if(!_winborder->IsHidden())
+		return;
+
 STRACE(("ServerWindow %s: Show\n",_title->String()));
 	if(_winborder)
 	{
-		RootLayer	*rl		= _winborder->GetRootLayer();
+		RootLayer	*rl = _winborder->GetRootLayer();
+		int32		wksCount;
 
 		desktop->fGeneralLock.Lock();
 printf("ServerWindow(%s)::Show() - General lock acquired\n", _winborder->GetName());
@@ -300,8 +304,16 @@ printf("ServerWindow(%s)::Show() - General lock acquired\n", _winborder->GetName
 printf("ServerWindow(%s)::Show() - Main lock acquired\n", _winborder->GetName());
 
 		_winborder->Show();
+		
+		if ((_feel == B_FLOATING_SUBSET_WINDOW_FEEL || _feel == B_MODAL_SUBSET_WINDOW_FEEL)
+			 && _winborder->MainWinBorder() == NULL)
+		{
+			// This window hasn't been added to a normal window subset,
+			//	so don't call placement or redrawing methods!
+			goto goOut;
+		}
 
-		int32		wksCount= rl->WorkspaceCount();
+		wksCount	= rl->WorkspaceCount();
 		for(int32 i = 0; i < wksCount; i++){
 			if (fWorkspaces & (0x00000001UL << i)){
 				Workspace		*ws = rl->WorkspaceAt(i+1);
@@ -309,6 +321,9 @@ printf("ServerWindow(%s)::Show() - Main lock acquired\n", _winborder->GetName())
 				ws->SetFocusLayer(_winborder);
 			}
 		}
+
+		goOut:
+
 		rl->fMainLock.Unlock();
 printf("ServerWindow(%s)::Show() - Main lock released\n", _winborder->GetName());
 		desktop->fGeneralLock.Unlock();
@@ -319,6 +334,9 @@ printf("ServerWindow(%s)::Show() - General lock released\n", _winborder->GetName
 //! Hides the window's WinBorder
 void ServerWindow::Hide(void)
 {
+	if(_winborder->IsHidden())
+		return;
+
 STRACE(("ServerWindow %s: Hide\n",_title->String()));
 	if(_winborder){
 		RootLayer	*rl		= _winborder->GetRootLayer();

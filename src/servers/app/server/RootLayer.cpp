@@ -153,6 +153,9 @@ Layer* RootLayer::VirtualBottomChild() const{
 }
 //---------------------------------------------------------------------------
 void RootLayer::AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks){
+	if (!(fMainLock.IsLocked()))
+		debugger("RootLayer::AddWinBorderToWorkspaces - fMainLock has to be locked!\n");
+
 	if (wks == B_CURRENT_WORKSPACE){
 		ActiveWorkspace()->AddLayerPtr(winBorder);
 		return;

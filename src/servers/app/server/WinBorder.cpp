@@ -737,23 +737,16 @@ void WinBorder::AddToSubsetOf(WinBorder* main){
 printf("WinBorder(%s)::AddToSubsetOf() - General lock acquired\n", GetName());
 			rl->fMainLock.Lock();
 printf("WinBorder(%s)::AddToSubsetOf() - Main lock acquired\n", GetName());
+
 			for(int32 i = 0; i < rl->WorkspaceCount(); i++){
 				Workspace	*ws = rl->WorkspaceAt(i+1);
-				if(ws->FrontLayer() == main){
-printf("\n@\n@\n");
-ws->PrintToStream();
+				if(ws->FrontLayer() == main)
 					ws->AddLayerPtr(this);
-					if(rl->ActiveWorkspace() == ws && !IsHidden()){
-							ws->Invalidate();
-printf("\n#\n#\n");
-ws->PrintToStream();
-printf("\n#\n#\n");
-					}
-				}
 			}
-		rl->fMainLock.Unlock();
+
+			rl->fMainLock.Unlock();
 printf("WinBorder(%s)::AddToSubsetOf() - Main lock released\n", GetName());
-		desktop->fGeneralLock.Unlock();
+			desktop->fGeneralLock.Unlock();
 printf("WinBorder(%s)::AddToSubsetOf() - General lock released\n", GetName());
 		}
 	}

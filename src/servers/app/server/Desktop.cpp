@@ -231,7 +231,8 @@ void Desktop::SetFrontWinBorder(WinBorder* winBorder){
 // TODO: implement
 }
 //---------------------------------------------------------------------------
-void Desktop::SetFoocusWinBorder(WinBorder* winBorder){
+// TODO: remove shortly?
+void Desktop::SetFoooocusWinBorder(WinBorder* winBorder){
 	if (FocusWinBorder() == winBorder && (winBorder && !winBorder->IsHidden()))
 		return;
 
@@ -312,9 +313,7 @@ void Desktop::MouseEventHandler(PortMessage *msg){
 				rl->fMainLock.Lock();
 
 				ws->SearchAndSetNewFront(target);
-// NOTE: !!! Be VERY careful about this method !!!!
-				SetFoocusWinBorder(target);
-				//ws->SetFocusLayer(target);
+				ws->SetFocusLayer(target);
 
 				rl->fMainLock.Unlock();
 				fGeneralLock.Unlock();

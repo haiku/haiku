@@ -61,12 +61,13 @@ public:
 			void				SearchAndSetNewFront(WinBorder* preferred);
 			void				SearchAndSetNewFocus(WinBorder* preferred);
 
+			ListData*			HasItem(ListData* item);
+			ListData*			HasItem(WinBorder* layer);
+
 private:
 
 			void				InsertItem(ListData* item, ListData* before);
 			void				RemoveItem(ListData* item);
-			ListData*			HasItem(ListData* item);
-			ListData*			HasItem(WinBorder* layer);
 
 			ListData*			FindPlace(ListData* pref);
 

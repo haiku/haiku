@@ -83,12 +83,14 @@ bool Workspace::AddLayerPtr(WinBorder* layer){
 	opLock.Unlock();
 
 STRACE(("\n*AddLayerPtr(%s) -", layer->GetName()));
-		// do a *smart* search and set the new 'front'
-	SearchAndSetNewFront(layer);
-		// do a *smart* search and set the new 'focus'
-	//SearchAndSetNewFocus(layer); // - it WILL be called!
-		// this also does a redraw
-	SetFocusLayer(layer);
+
+		// this may happen in case of subset windows.
+	if(!(layer->IsHidden())){
+			// do a *smart* search and set the new 'front'
+		SearchAndSetNewFront(layer);
+			// do a *smart* search and set the new 'focus' + a redraw
+		SetFocusLayer(layer);
+	}
 	
 	return true;
 }
@@ -162,13 +164,33 @@ printf("Layer %s NOT found in Workspace No %ld\n", layer->GetName(), ID());
 //---------------------------------------------------------------------------
 WinBorder* Workspace::SetFocusLayer(WinBorder* layer){
 STRACE(("\n@Workspace(%ld)::SetFOCUSLayer( %s )\n", ID(), layer? layer->GetName(): "NULL"));
-	
-	SearchAndSetNewFocus(layer);
-STRACESTREAM();
-// TODO: there had to be a Invalidate() vresion witch takes a BRegion parameter
-	Invalidate();
 
-	return fFocusItem? fFocusItem->layerPtr : NULL;
+	if(!(desktop->fGeneralLock.IsLocked()))
+		debugger("Workspace::SetFocusLayer - desktop->fGeneralLock must be LOCKED!\n");
+
+	WinBorder		*previousFocus = FocusLayer();
+
+	SearchAndSetNewFocus(layer);
+
+	if (previousFocus != FocusLayer()){
+		if (previousFocus)
+			previousFocus->SetFocus(false);
+
+		if (FocusLayer()){
+			FocusLayer()->SetFocus(true);
+		}
+
+// TODO: there had to be a Invalidate() vresion witch takes a BRegion parameter
+		Invalidate();
+	}
+	else{
+		// Do nothing!
+	}
+
+STRACESTREAM();
+STRACE(("\n#Workspace(%ld)::SetFOCUSLayer( %s ) ENDED\n", ID(), layer? layer->GetName(): "NULL"));
+
+	return FocusLayer();
 }
 //---------------------------------------------------------------------------
 WinBorder* Workspace::FocusLayer() const{
@@ -177,6 +199,10 @@ WinBorder* Workspace::FocusLayer() const{
 //---------------------------------------------------------------------------
 WinBorder* Workspace::SetFrontLayer(WinBorder* layer){
 STRACE(("\n@Workspace(%ld)::SetFrontLayer( %s )\n", ID(), layer? layer->GetName(): "NULL"));
+
+	if(!(desktop->fGeneralLock.IsLocked()))
+		debugger("Workspace::SetFRONTLayer - desktop->fGeneralLock must be LOCKED!\n");
+
 	SearchAndSetNewFront(layer);
 STRACESTREAM();
 // TODO: there had to be a Invalidate() vresion witch takes a BRegion parameter

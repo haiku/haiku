@@ -41,7 +41,7 @@ public:
 			void				RemoveWinBorder(WinBorder* winBorder);
 			bool				HasWinBorder(WinBorder* winBorder);
 			void				SetFrontWinBorder(WinBorder* winBorder);
-			void				SetFoocusWinBorder(WinBorder* winBorder);
+			void				SetFoooocusWinBorder(WinBorder* winBorder);
 			WinBorder*			FrontWinBorder(void) const;
 			WinBorder*			FocusWinBorder(void) const;
 
