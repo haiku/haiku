@@ -1,3 +1,35 @@
+/*
+ * Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files or portions
+ * thereof (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software,
+ * and to permit persons to whom the Software is furnished to do so, subject
+ * to the following conditions:
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ *  * Redistributions in binary form must reproduce the above copyright notice
+ *    in the  binary, as well as this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with
+ *    the distribution.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
+/* to comply with the license above, do not remove the following line */
+static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>";
+
 #include <Application.h>
 #include <stdio.h>
 #include <Messenger.h>
@@ -19,16 +51,6 @@
  *
  * An implementation of a new media_server for the OpenBeOS MediaKit
  * Started by Marcus Overhagen <marcus@overhagen.de> on 2001-10-25
- * 
- * Communication with the OpenBeOS libmedia.so is done using BMessages 
- * sent to the server application, handled in XXX()
- * functions. A simple BMessage reply is beeing send back.
- *
- *
- * function names and class structure is loosely
- * based on information acquired using:
- * nm --demangle /boot/beos/system/servers/media_server | grep Server | sort 
- * nm --demangle /boot/beos/system/servers/media_server | grep Manager | sort
  *
  */
 
@@ -568,59 +590,3 @@ int main()
 	delete be_app;
 	return 0;
 }
-
-
-/*
-0001e260 T MBufferManager::MBufferManager(void)
-0001e47c T MBufferManager::~MBufferManager(void)
-0001e540 T MBufferManager::PrintToStream(void)
-0001e6fc T MBufferManager::RecycleBuffersWithOwner(long, long)
-0001ea00 T MBufferManager::RegisterBuffer(long, buffer_clone_info const *, long *, media_source const &)
-0001f090 T MBufferManager::AcquireBuffer(long, long, media_source)
-0001f28c T MBufferManager::ReleaseBuffer(long, long, bool, BMessage *, char const *)
-0001fd0c T MBufferManager::PurgeTeamBufferGroups(long)
-0001fdf0 T MBufferManager::RegisterBufferGroup(BMessage *, char const *, long)
-0002007c T MBufferManager::_RemoveGroupFromClaimants(long, long, void *)
-00020158 T MBufferManager::UnregisterBufferGroup(BMessage *, char const *, long)
-0002028c T MBufferManager::_UnregisterBufferGroup(long, long)
-000206f4 T MBufferManager::AddBuffersTo(BMessage *, char const *)
-00020cd0 T MBufferManager::ReclaimBuffers(long const *, long, long, long)
-00020f7c T MBufferManager::CleanupPurgedBufferGroup(long, long, long, void *, bool, BMessage &)
-00021080 T MBufferManager::LoadState(void)
-0002108c T MBufferManager::SaveState(void)
-
-000210a0 T MDefaultManager::MDefaultManager(void)
-0002123c T MDefaultManager::~MDefaultManager(void)
-000212f4 T MDefaultManager::SaveState(void)
-0002172c T MDefaultManager::LoadState(void)
-00021de0 T MDefaultManager::SetDefault(long, BMessage &)
-00022058 T MDefaultManager::SetRunningDefault(long, media_node const &)
-000221a8 T MDefaultManager::RemoveRunningDefault(media_node const &)
-000226ec T MDefaultManager::SetRealtimeFlags(unsigned long)
-00022720 T MDefaultManager::GetRealtimeFlags(void)
-00022730 T MDefaultManager::GetRunningDefault(long, media_node &)
-000227d0 T MDefaultManager::RemoveDefault(long)
-00022830 T MDefaultManager::GetDefault(long, BMessage &)
-00022890 T MNotifierManager::MNotifierManager(void)
-00022a5c T MNotifierManager::~MNotifierManager(void)
-00022b20 T MNotifierManager::RegisterNotifier(long, BMessenger, media_node const *)
-00022f50 T MNotifierManager::UnregisterNotifier(long, BMessenger, media_node const *)
-00023f00 T MNotifierManager::BroadcastMessage(BMessage *, long long)
-0002426c T MNotifierManager::regen_node_list(media_node const &)
-000249b4 T MNotifierManager::get_node_messenger(media_node const &, get_messenger_a *)
-00024a90 T MNotifierManager::HandleBroadcastError(BMessage *, BMessenger &, long, long long)
-00024b34 T MNotifierManager::LoadState(void)
-00024b40 T MNotifierManager::SaveState(void)
-00024c5c T MMediaFilesManager::MMediaFilesManager(void)
-00024dec T MMediaFilesManager::~MMediaFilesManager(void)
-00024ea4 T MMediaFilesManager::SaveState(void)
-00025b70 T MMediaFilesManager::LoadState(void)
-00026668 T MMediaFilesManager::create_default_settings(void)
-00027130 T MMediaFilesManager::GetTypes(BMessage &, BMessage &)
-000271f8 T MMediaFilesManager::GetItems(BMessage &, BMessage &)
-000274f0 T MMediaFilesManager::SetItem(BMessage &, BMessage &)
-00027bc0 T MMediaFilesManager::ClearItem(BMessage &, BMessage &)
-000288f4 T MMediaFilesManager::RemoveItem(BMessage &, BMessage &)
-00028f0c T MMediaFilesManager::AddType(BMessage &, BMessage &) 
-*/
-
