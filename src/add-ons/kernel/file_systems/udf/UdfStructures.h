@@ -128,10 +128,10 @@ public:
 		t.bits.type = type;
 		set_type_and_timezone(t.type_and_timezone);
 	}
-	void set_timezone(int16 timezone) {
+	void set_timezone(int16 tz) {
 		type_and_timezone_accessor t;
 		t.type_and_timezone = type_and_timezone();
-		t.bits.timezone = timezone;
+		t.bits.timezone = tz;
 		set_type_and_timezone(t.type_and_timezone);
 	}
 	void set_year(uint16 year) { _year = B_HOST_TO_LENDIAN_INT16(year); }
@@ -242,6 +242,7 @@ extern const entity_id kMetadataPartitionMapId;
 extern const entity_id kSparablePartitionMapId;
 extern const entity_id kVirtualPartitionMapId;
 extern const entity_id kImplementationId;
+extern const entity_id kPartitionContentsId;
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 2
@@ -855,6 +856,9 @@ public:
 	const array<uint8, 128>& implementation_use() const { return _implementation_use; }
 	array<uint8, 128>& implementation_use() { return _implementation_use; }
 	
+	const array<uint8, 156>& reserved() const { return _reserved; }
+	array<uint8, 156>& reserved() { return _reserved; }
+	
 	// Set functions
 	void set_vds_number(uint32 number) { _vds_number = B_HOST_TO_LENDIAN_INT32(number); }
 	void set_partition_flags(uint16 flags) { _partition_flags = B_HOST_TO_LENDIAN_INT16(flags); }
@@ -864,7 +868,7 @@ public:
 		f.bits.allocated = allocated;
 		set_partition_flags(f.partition_flags);
 	}
-
+	void set_partition_number(uint16 number) { _partition_number = B_HOST_TO_LENDIAN_INT16(number); }
 	void set_access_type(uint32 type) { _access_type = B_HOST_TO_LENDIAN_INT32(type); }
 	void set_start(uint32 start) { _start = B_HOST_TO_LENDIAN_INT32(start); }
 	void set_length(uint32 length) { _length = B_HOST_TO_LENDIAN_INT32(length); }
@@ -893,16 +897,16 @@ private:
 	uint32 _length;
 	entity_id _implementation_id;
 	array<uint8, 128> _implementation_use;
-	uint8 _reserved[156];
+	array<uint8, 156> _reserved;
 } __attribute__((packed));
 
 
 enum partition_access_type {
-	PAT_UNSPECIFIED,
-	PAT_READ_ONLY,
-	PAT_WRITE_ONCE,
-	PAT_REWRITABLE,
-	PAT_OVERWRITABLE,
+	ACCESS_UNSPECIFIED,
+	ACCESS_READ_ONLY,
+	ACCESS_WRITE_ONCE,
+	ACCESS_REWRITABLE,
+	ACCESS_OVERWRITABLE,
 };
 
 
