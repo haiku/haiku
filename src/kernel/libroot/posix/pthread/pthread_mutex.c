@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <pthread.h>
@@ -118,7 +118,9 @@ mutex_unlock(pthread_mutex *mutex)
 	}
 
 	if (!mutex->attr.process_shared || atomic_add(&mutex->count, -1) > 1)
-		release_sem(mutex->sem);
+		return release_sem(mutex->sem);
+
+	return B_OK;
 }
 
 
