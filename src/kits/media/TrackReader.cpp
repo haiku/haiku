@@ -109,22 +109,31 @@ BTrackReader::SetToTrack(BMediaTrack *track)
 	memset(&fmt,0,sizeof(fmt)); //wildcard
 	memcpy(&fmt.u.raw_audio,&fFormat,sizeof(fFormat));
 	fmt.type = B_MEDIA_RAW_AUDIO;
-
 	//try to find a output format
 	if (B_OK == track->DecodedFormat(&fmt)) {
 		memcpy(&fFormat,&fmt.u.raw_audio,sizeof(fFormat));
 		fMediaTrack = track;
 		return;
 	}
-	
+
 	//try again
-	fmt.u.raw_audio.buffer_size = 0;
+	fmt.u.raw_audio.buffer_size = 2 * 4096;
+	fmt.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 	if (B_OK == track->DecodedFormat(&fmt)) {
 		memcpy(&fFormat,&fmt.u.raw_audio,sizeof(fFormat));
 		fMediaTrack = track;
 		return;
 	}
-	
+
+	//try again
+	fmt.u.raw_audio.buffer_size = 4096;
+	fmt.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
+	if (B_OK == track->DecodedFormat(&fmt)) {
+		memcpy(&fFormat,&fmt.u.raw_audio,sizeof(fFormat));
+		fMediaTrack = track;
+		return;
+	}
+
 	//we have failed
 	TRACE("BTrackReader::SetToTrack failed\n");
 }
