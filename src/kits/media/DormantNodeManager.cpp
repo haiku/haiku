@@ -160,7 +160,7 @@ DormantNodeManager::PutAddon(media_addon_id id)
 		UnloadAddon(addon, image);
 }
 
-
+// For use by media_addon_server only
 media_addon_id
 DormantNodeManager::RegisterAddon(const char *path)
 {
@@ -203,7 +203,7 @@ DormantNodeManager::RegisterAddon(const char *path)
 	return reply.addonid;
 }
 
-
+// For use by media_addon_server only
 void
 DormantNodeManager::UnregisterAddon(media_addon_id id)
 {
@@ -284,7 +284,7 @@ DormantNodeManager::LoadAddon(BMediaAddOn **newaddon, image_id *newimage, const 
 	*newaddon = addon;
 	*newimage = image;
 	
-	// we are a friend class of BMediaAddOn and initilize these member variables
+	// we are a friend class of BMediaAddOn and initialize these member variables
 	addon->fAddon = id;
 	addon->fImage = image;
 

@@ -1524,7 +1524,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 {
 	CALLED();
 	if ((flags & (B_FLAVOR_IS_GLOBAL | B_FLAVOR_IS_LOCAL)) == 0) {
-		printf("Error: BMediaRoster::InstantiateDormantNode called without flags\n");
+		FATAL("Error: BMediaRoster::InstantiateDormantNode called without valid flags\n");
 		return B_BAD_VALUE;
 	}
 	if (out_node == 0)
@@ -1559,7 +1559,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	}
 
 // XXX SOMETHING IS VERY WRONG HERE
-	printf("Error: BMediaRoster::InstantiateDormantNode addon_id %d, flavor_id %d, flags %#08lx\n", (int)in_info.addon, (int)in_info.flavor_id, flags);
+	FATAL("Error: BMediaRoster::InstantiateDormantNode addon_id %d, flavor_id %d, flags %#08lx\n", (int)in_info.addon, (int)in_info.flavor_id, flags);
 
 	return B_ERROR;
 }
@@ -1590,7 +1590,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	status_t rv;
 	addon = _DormantNodeManager->GetAddon(in_info.addon);
 	if (!addon) {
-		printf("BMediaRoster::InstantiateDormantNode: GetAddon failed\n");
+		FATAL("BMediaRoster::InstantiateDormantNode: GetAddon failed\n");
 		return B_ERROR;
 	}
 	flavor_info temp; // XXX fix this!
@@ -1599,13 +1599,13 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	temp.internal_id = in_info.flavor_id;
 	node = addon->InstantiateNodeFor(&temp, &config, &out_error);
 	if (!node) {
-		printf("BMediaRoster::InstantiateDormantNode: InstantiateNodeFor failed\n");
+		FATAL("BMediaRoster::InstantiateDormantNode: InstantiateNodeFor failed\n");
 		_DormantNodeManager->PutAddon(in_info.addon);
 		return B_ERROR;
 	}
 	rv = RegisterNode(node);
 	if (rv != B_OK) {
-		printf("BMediaRoster::InstantiateDormantNode: RegisterNode failed\n");
+		FATAL("BMediaRoster::InstantiateDormantNode: RegisterNode failed\n");
 		delete node;
 		_DormantNodeManager->PutAddon(in_info.addon);
 		return B_ERROR;
