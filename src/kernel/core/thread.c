@@ -274,7 +274,8 @@ _create_kernel_thread_kentry(void)
 
 
 static thread_id
-create_thread(const char *name, team_id teamID, thread_func entry, void *args1, void *args2, int32 priority, bool kernel)
+create_thread(const char *name, team_id teamID, thread_entry_func entry,
+	void *args1, void *args2, int32 priority, bool kernel)
 {
 	struct thread *t;
 	struct team *team;
@@ -1084,7 +1085,7 @@ thread_per_cpu_init(int32 cpu_num)
 thread_id
 spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority, void *arg, team_id team)
 {
-	return create_thread(name, team, function, arg, NULL, priority, true);
+	return create_thread(name, team, (thread_entry_func)function, arg, NULL, priority, true);
 }
 
 
@@ -1563,7 +1564,8 @@ resume_thread(thread_id id)
 thread_id
 spawn_kernel_thread(thread_func function, const char *name, int32 priority, void *arg)
 {
-	return create_thread(name, team_get_kernel_team()->id, function, arg, NULL, priority, true);
+	return create_thread(name, team_get_kernel_team()->id, (thread_entry_func)function,
+				arg, NULL, priority, true);
 }
 
 
@@ -1657,7 +1659,7 @@ _user_set_thread_priority(thread_id thread, int32 newPriority)
 
 
 thread_id
-_user_spawn_thread(thread_func entry, const char *userName, int32 priority, void *data1, void *data2)
+_user_spawn_thread(int32 (*entry)(thread_func, void *), const char *userName, int32 priority, void *data1, void *data2)
 {
 	char name[B_OS_NAME_LENGTH];
 
