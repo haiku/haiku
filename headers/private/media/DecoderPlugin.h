@@ -1,4 +1,5 @@
 #include <MediaTrack.h>
+#include <MediaFormats.h>
 #include "MediaPlugin.h"
 
 namespace BPrivate { namespace media {
@@ -9,13 +10,13 @@ public:
 						Decoder();
 	virtual				~Decoder();
 	
-						// Sniff get's called with the data from Reader::GetStreamInfo
-	virtual status_t	Sniff(media_format *format, void **infoBuffer, int32 *infoSize) = 0;
+						// Setup get's called with the info data from Reader::GetStreamInfo
+	virtual status_t	Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
+							  const void *infoBuffer, int32 infoSize) = 0;
 	
-	virtual status_t	GetOutputFormat(media_format *format) = 0;
-
 	virtual status_t	Seek(media_seek_type seekTo,
-							 int64 *frame, bigtime_t *time) = 0;
+							 int64 seekFrame, int64 *frame,
+							 bigtime_t seekTime, bigtime_t *time) = 0;
 							 
 	virtual status_t	Decode(void *buffer, int64 *frameCount,
 							   media_header *mediaHeader, media_decode_info *info) = 0;
@@ -32,12 +33,14 @@ private:
 class DecoderPlugin : public MediaPlugin
 {
 public:
-	virtual Decoder *NewDecoder() = 0;
-};
+	DecoderPlugin();
 
-MediaPlugin *instantiate_plugin();
+	virtual Decoder *NewDecoder() = 0;
+	
+	status_t PublishDecoder(const char *short_name, const char *pretty_name, const media_format_description &fmt_desc, media_type fmt_type);
+	status_t PublishDecoder(const char *short_name, const char *pretty_name, const media_format &fmt);
+};
 
 } } // namespace BPrivate::media
 
 using namespace BPrivate::media;
-

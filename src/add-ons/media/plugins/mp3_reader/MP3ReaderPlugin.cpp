@@ -80,8 +80,11 @@ struct mp3data
 	char *	chunkBuffer;
 
 	int64	duration;	// usec
+	
+	int32	framesPerFrame; // PCM frames in each mpeg frame
 	int64	frameCount; // PCM frames
 	int32	frameRate;
+	int64	framePosition;
 	
 	media_format format;
 };
@@ -193,6 +196,9 @@ mp3Reader::AllocateCookie(int32 streamNumber, void **cookie)
 
 	TRACE("mp3Reader::AllocateCookie: frameRate %ld, frameCount %Ld, duration %.6f\n",
 		data->frameRate, data->frameCount, data->duration / 1000000.0);
+		
+	data->framePosition = 0;
+	data->framesPerFrame = frame_sample_count_table[layer_index];
 
 	BMediaFormats formats;
 	media_format_description description;
@@ -314,6 +320,9 @@ mp3Reader::GetNextChunk(void *cookie,
 	if (maxbytes < 4)
 		return B_ERROR;
 
+	mediaHeader->start_time = (data->framePosition * 1000000) / data->frameCount;
+	mediaHeader->file_pos = data->position;
+
 	if (4 != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer, 4)) {
 		TRACE("mp3Reader::GetNextChunk: unexpected read error\n");
 		return B_ERROR;
@@ -336,6 +345,8 @@ mp3Reader::GetNextChunk(void *cookie,
 		return B_ERROR;
 	}
 	data->position += size;
+	
+	data->framePosition += data->framesPerFrame;
 		
 	*chunkBuffer = data->chunkBuffer;
 	*chunkSize = size + 4;

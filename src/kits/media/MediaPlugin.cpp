@@ -8,3 +8,7 @@ MediaPlugin::~MediaPlugin()
 {
 }
 
+status_t
+MediaPlugin::RegisterPlugin()
+{
+}

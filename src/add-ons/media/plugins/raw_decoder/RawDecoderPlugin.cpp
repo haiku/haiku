@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <DataIO.h>
 #include "RawDecoderPlugin.h"
 
@@ -9,36 +10,29 @@
   #define TRACE ((void)0)
 #endif
 
-RawDecoder::RawDecoder()
-{
-}
-
-RawDecoder::~RawDecoder()
-{
-}
-
 
 status_t
-RawDecoder::Sniff(media_format *format, void **infoBuffer, int32 *infoSize)
+RawDecoder::Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
+				  const void *infoBuffer, int32 infoSize)
 {
-	if (format->type != B_MEDIA_RAW_AUDIO)
+	if (ioEncodedFormat->type != B_MEDIA_RAW_AUDIO && ioEncodedFormat->type != B_MEDIA_RAW_VIDEO)
 		return B_ERROR;
 		
-	fFormat = *format;
+	if (ioEncodedFormat->type == B_MEDIA_RAW_VIDEO)
+		fFrameSize = ioEncodedFormat->u.raw_video.display.line_count * ioEncodedFormat->u.raw_video.display.bytes_per_row;
+	else
+		fFrameSize = (ioEncodedFormat->u.raw_audio.format & 0xf) * ioEncodedFormat->u.raw_audio.channel_count;
+
+	*ioDecodedFormat = *ioEncodedFormat;
+
 	return B_OK;
 }
 
-	
-status_t
-RawDecoder::GetOutputFormat(media_format *format)
-{
-	*format = fFormat;
-	return B_OK;
-}
 
 status_t
 RawDecoder::Seek(media_seek_type seekTo,
-				 int64 *frame, bigtime_t *time)
+				 int64 seekFrame, int64 *frame,
+				 bigtime_t seekTime, bigtime_t *time)
 {
 	return B_OK;
 }
@@ -48,6 +42,14 @@ status_t
 RawDecoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info)
 {
+	void *chunkBuffer;
+	int32 chunkSize;
+	if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, mediaHeader))
+		return B_ERROR;
+	
+	memcpy(buffer, chunkBuffer, chunkSize);
+	*frameCount = chunkSize / fFrameSize;
+
 	return B_OK;
 }
 
@@ -58,6 +60,17 @@ RawDecoderPlugin::NewDecoder()
 	return new RawDecoder;
 }
 
+status_t
+RawDecoderPlugin::RegisterPlugin()
+{
+	media_format fmt;
+	memset(&fmt, 0, sizeof(fmt));
+	fmt.type = B_MEDIA_RAW_AUDIO;
+	PublishDecoder("raw audio", "RAW audio decoder", fmt);
+	fmt.type = B_MEDIA_RAW_VIDEO;
+	PublishDecoder("raw video", "RAW video decoder", fmt);
+	return B_OK;
+}
 
 MediaPlugin *instantiate_plugin()
 {
