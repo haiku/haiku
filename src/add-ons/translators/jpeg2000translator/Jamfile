@@ -11,6 +11,8 @@ CCFLAGS += -DEXCLUDE_MIF_SUPPORT
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) libjasper ] ;
 
+SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
+
 Translator JPEG2000Translator :
 
 	# JPEG2000Translator
