@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-10 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-11 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -409,20 +409,41 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	 * (Note: Don't mix this up with CRTC timing contraints! Those are
 	 *        multiples of 8 for horizontal, 1 for vertical timing.)
 	 *
-	 * CRTC pitch constraints are the same for all Neomagic cards */
-	switch (target->space)
+	 * CRTC pitch constraints are 'officially' the same for all Neomagic cards */
+	switch (si->ps.card_type)
 	{
-		case B_CMAP8: crtc_mask = 0x07; depth =  8; break;
-		case B_RGB15: crtc_mask = 0x03; depth = 16; break;
-		case B_RGB16: crtc_mask = 0x03; depth = 16; break;
-		case B_RGB24: crtc_mask = 0x07; depth = 24; break; 
-		default:
-			LOG(8,("INIT: unsupported colorspace: 0x%08x\n", target->space));
-			return B_ERROR;
+	case NM2070:
+		switch (target->space)
+		{
+			case B_CMAP8: crtc_mask = 0x07; depth =  8; break;
+			/* Note for NM2070 only:
+			 * The following depths have bandwidth trouble (pixel noise) with the
+			 * 'official' crtc_masks (used as defaults below). Masks of 0x1f are
+			 * needed (confirmed 15 and 16 bit spaces) to prevent this from occuring. */
+			//fixme: doublecheck for NM2090 and NM2093: correct code if needed!
+			case B_RGB15: crtc_mask = 0x1f; depth = 16; break;
+			case B_RGB16: crtc_mask = 0x1f; depth = 16; break;
+			case B_RGB24: crtc_mask = 0x1f; depth = 24; break; 
+			default:
+				LOG(8,("INIT: unsupported colorspace: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+		break;
+	default:
+		switch (target->space)
+		{
+			case B_CMAP8: crtc_mask = 0x07; depth =  8; break;
+			case B_RGB15: crtc_mask = 0x03; depth = 16; break;
+			case B_RGB16: crtc_mask = 0x03; depth = 16; break;
+			case B_RGB24: crtc_mask = 0x07; depth = 24; break; 
+			default:
+				LOG(8,("INIT: unsupported colorspace: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+		break;
 	}
 
-	/* check if we can setup this mode with acceleration:
-	 * constraints are same for all cards */
+	/* check if we can setup this mode with acceleration: */
 	*acc_mode = true;
 
 	switch (si->ps.card_type)
@@ -439,12 +460,21 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	}
 
 	/* virtual_width */
-	if (target->virtual_width > 1600) *acc_mode = false;
+	if (si->ps.card_type == NM2070)
+	{
+		/* confirmed NM2070 */
+		if (target->virtual_width > 1024) *acc_mode = false;
+	}
+	else
+	{
+		/* confirmed for all cards */
+		if (target->virtual_width > 1600) *acc_mode = false;
+	}
 
 	/* virtual_height */
 	if (si->ps.card_type < NM2200)
 	{
-		/* confirmed NM2097 and NM2160 */
+		/* confirmed NM2070, NM2097 and NM2160 */
 		if (target->virtual_height > 1024) *acc_mode = false;
 	}
 	else
@@ -483,66 +513,89 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
 	 * it was confined above, so we can finally calculate safely if we need slopspace
 	 * for this mode... */
-	/* note:
-	 * we prefer unaccelerated modes above accelerated ones if not enough RAM exists
-	 * and the mode can be closer matched to the requested one if unaccelerated. */
 	if (*acc_mode)
 	{
-		uint32 mem_avail, bytes_X_height;
+		if (si->ps.card_type == NM2070)
+		{
+			uint32 acc_mask = 0;
 
-		/* calculate amount of available memory */
-		mem_avail = (si->ps.memory_size * 1024);
-		if (si->settings.hardcursor) mem_avail -= si->ps.curmem_size;
-		/* helper */
-		bytes_X_height = (depth >> 3) * target->virtual_height;
-
-		/* Accelerated modes work with a table, there are very few fixed settings.. */
-		if (target->virtual_width == 640) video_pitch = 640;
-		else
-			if (target->virtual_width <= 800)
+			/* determine pixel multiple based on 2D engine constraints */
+			switch (target->space)
 			{
-				if (((800 * bytes_X_height) > mem_avail) &&
-					(target->virtual_width < (800 - crtc_mask)))
-					*acc_mode = false;
-				else
-					video_pitch = 800;
+				case B_CMAP8: acc_mask = 0x07; break;
+				/* Note:
+				 * The following depths have actual acc_masks of 0x03. 0x1f is used
+				 * because on lower acc_masks bandwidth trouble arises (pixel noise). */
+				//fixme: doublecheck for NM2090 and NM2093: correct code if needed!
+				case B_RGB15: acc_mask = 0x1f; break;
+				case B_RGB16: acc_mask = 0x1f; break;
 			}
+			video_pitch = ((target->virtual_width + acc_mask) & ~acc_mask);
+		}
+		else
+		{
+			/* Note:
+			 * We prefer unaccelerated modes above accelerated ones here if not enough
+			 * RAM exists and the mode can be closer matched to the requested one if
+			 * unaccelerated. We do this because of the large amount of slopspace
+			 * sometimes needed here to keep a mode accelerated. */
+
+			uint32 mem_avail, bytes_X_height;
+
+			/* calculate amount of available memory */
+			mem_avail = (si->ps.memory_size * 1024);
+			if (si->settings.hardcursor) mem_avail -= si->ps.curmem_size;
+			/* helper */
+			bytes_X_height = (depth >> 3) * target->virtual_height;
+
+			/* Accelerated modes work with a table, there are very few fixed settings.. */
+			if (target->virtual_width == 640) video_pitch = 640;
 			else
-				if (target->virtual_width <= 1024)
+				if (target->virtual_width <= 800)
 				{
-					if (((1024 * bytes_X_height) > mem_avail) &&
-						(target->virtual_width < (1024 - crtc_mask)))
+					if (((800 * bytes_X_height) > mem_avail) &&
+						(target->virtual_width < (800 - crtc_mask)))
 						*acc_mode = false;
 					else
-						video_pitch = 1024;
+						video_pitch = 800;
 				}
 				else
-					if (target->virtual_width <= 1152)
+					if (target->virtual_width <= 1024)
 					{
-						if (((1152 * bytes_X_height) > mem_avail) &&
-							(target->virtual_width < (1152 - crtc_mask)))
+						if (((1024 * bytes_X_height) > mem_avail) &&
+							(target->virtual_width < (1024 - crtc_mask)))
 							*acc_mode = false;
 						else
-							video_pitch = 1152;
+							video_pitch = 1024;
 					}
 					else
-						if (target->virtual_width <= 1280)
+						if (target->virtual_width <= 1152)
 						{
-							if (((1280 * bytes_X_height) > mem_avail) &&
-								(target->virtual_width < (1280 - crtc_mask)))
+							if (((1152 * bytes_X_height) > mem_avail) &&
+								(target->virtual_width < (1152 - crtc_mask)))
 								*acc_mode = false;
 							else
-								video_pitch = 1280;
+								video_pitch = 1152;
 						}
 						else
-							if (target->virtual_width <= 1600)
+							if (target->virtual_width <= 1280)
 							{
-								if (((1600 * bytes_X_height) > mem_avail) &&
-									(target->virtual_width < (1600 - crtc_mask)))
+								if (((1280 * bytes_X_height) > mem_avail) &&
+									(target->virtual_width < (1280 - crtc_mask)))
 									*acc_mode = false;
 								else
-									video_pitch = 1600;
+									video_pitch = 1280;
 							}
+							else
+								if (target->virtual_width <= 1600)
+								{
+									if (((1600 * bytes_X_height) > mem_avail) &&
+										(target->virtual_width < (1600 - crtc_mask)))
+										*acc_mode = false;
+									else
+										video_pitch = 1600;
+								}
+		}
 	}
 	if (!*acc_mode)
 		video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
