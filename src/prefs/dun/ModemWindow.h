@@ -34,12 +34,16 @@ private:
    
    BTextView *tvRedial;
    BTextView *tvTimesBusySignal;
+   BTextView *tvUse;
    BTextView *tvReadLogPath;
    BTextView *tvWriteLogPath;
    
    BCheckBox *chkMakeConnection;
    BCheckBox *chkShowTerminal;
    BCheckBox *chkLogAll;
+   
+   BRadioButton *rbTone;
+   BRadioButton *rbPulse;
 };
 
 #endif
