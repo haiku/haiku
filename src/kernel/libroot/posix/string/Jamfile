@@ -10,6 +10,7 @@ KernelMergeObject posix_string.o :
 	<$(SOURCE_GRIST)>strcasestr.c
 	<$(SOURCE_GRIST)>strcat.c
 	<$(SOURCE_GRIST)>strchr.c
+	<$(SOURCE_GRIST)>strchrnul.c
 	<$(SOURCE_GRIST)>strcmp.c
 	<$(SOURCE_GRIST)>strcpy.c
 	<$(SOURCE_GRIST)>strcspn.c
