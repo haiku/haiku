@@ -338,7 +338,7 @@ error reply fields:
 broadcast a message (BRoster::Broadcast())
 
 target:		roster
-message:	B_REG_ACTIVATE_APP
+message:	B_REG_BROADCAST
 			"team":			B_INT32_TYPE
 			"message":		B_MESSAGE_TYPE
 			"reply_target":	B_MESSENGER_TYPE
@@ -347,9 +347,51 @@ on error:	- B_NO_REPLY (fatal)
 			- standard error
 
 message fields:
-- "team": The requesting team.
+- "team": The requesting team (team_id).
 - "message": The message to be broadcast.
 - "reply_target": The reply target for the message.
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - ...
+
+-----------------------------------------------------------------------
+
+start roster watching (BRoster::StartWatching())
+
+target:		roster
+message:	B_REG_START_WATCHING
+			"target":	B_MESSENGER_TYPE
+			"events":	B_INT32_TYPE
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "target": The target the event messages shall be sent to.
+- "events": Specifies the events the caller is interested in (uint32).
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - ...
+
+-----------------------------------------------------------------------
+
+stop roster watching (BRoster::StopWatching())
+
+target:		roster
+message:	B_REG_STOP_WATCHING
+			"target":	B_MESSENGER_TYPE
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "target": The target that shall not longer receive any event messages.
 
 error reply fields:
 - "error":
