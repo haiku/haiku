@@ -101,44 +101,6 @@ static status_t handle_reply(port_id   reply_port,
 static status_t convert_message(const KMessage *fromMessage,
 	BMessage *toMessage);
 
-//------------------------------------------------------------------------------
-extern "C" {
-void _msg_cache_cleanup_()
-{
-	delete BMessage::sMsgCache;
-	BMessage::sMsgCache = NULL;
-}
-//------------------------------------------------------------------------------
-int _init_message_()
-{
-	BMessage::sReplyPorts[0] = create_port(1, "tmp_rport0");
-	BMessage::sReplyPorts[1] = create_port(1, "tmp_rport1");
-	BMessage::sReplyPorts[2] = create_port(1, "tmp_rport2");
-
-	BMessage::sReplyPortInUse[0] = 0;
-	BMessage::sReplyPortInUse[1] = 0;
-	BMessage::sReplyPortInUse[2] = 0;
-	return 0;
-}
-//------------------------------------------------------------------------------
-int _delete_message_()
-{
-	delete_port(BMessage::sReplyPorts[0]);
-	BMessage::sReplyPorts[0] = -1;
-	delete_port(BMessage::sReplyPorts[1]);
-	BMessage::sReplyPorts[1] = -1;
-	delete_port(BMessage::sReplyPorts[2]);
-	BMessage::sReplyPorts[2] = -1;
-	return 0;
-}
-}	// extern "C"
-//------------------------------------------------------------------------------
-BMessage *_reconstruct_msg_(uint32,uint32,uint32)
-{
-	return NULL;
-}
-//------------------------------------------------------------------------------
-
 void BMessage::_ReservedMessage1() {}
 void BMessage::_ReservedMessage2() {}
 void BMessage::_ReservedMessage3() {}
@@ -1973,6 +1935,39 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	} while (error == B_INTERRUPTED);
 
 	return error;
+}
+
+
+void
+BMessage::_StaticCacheCleanup()
+{
+	delete sMsgCache;
+	sMsgCache = NULL;
+}
+
+
+void
+BMessage::_StaticInit()
+{
+	sReplyPorts[0] = create_port(1, "tmp_rport0");
+	sReplyPorts[1] = create_port(1, "tmp_rport1");
+	sReplyPorts[2] = create_port(1, "tmp_rport2");
+
+	sReplyPortInUse[0] = 0;
+	sReplyPortInUse[1] = 0;
+	sReplyPortInUse[2] = 0;
+}
+
+
+void
+BMessage::_StaticCleanup()
+{
+	delete_port(sReplyPorts[0]);
+	sReplyPorts[0] = -1;
+	delete_port(sReplyPorts[1]);
+	sReplyPorts[1] = -1;
+	delete_port(sReplyPorts[2]);
+	sReplyPorts[2] = -1;
 }
 
 

@@ -301,8 +301,6 @@ friend class	BMessenger;
 friend class	BApplication;
 friend class	Private;
 
-friend			void		_msg_cache_cleanup_();
-friend			BMessage 	*_reconstruct_msg_(uint32,uint32,uint32);
 friend inline	void		_set_message_target_(BMessage *, int32, bool);
 friend inline	void		_set_message_reply_(BMessage *, BMessenger);
 friend inline	int32		_get_message_target_(BMessage *);
@@ -362,13 +360,15 @@ static	status_t	_SendFlattenedMessage(void *data, int32 size,
 						port_id port, int32 token, bool preferred,
 						bigtime_t timeout);
 
+static	void		_StaticInit();
+static	void		_StaticCleanup();
+static	void		_StaticCacheCleanup();
+
 		enum		{ sNumReplyPorts = 3 };
 static	port_id		sReplyPorts[sNumReplyPorts];
 static	long		sReplyPortInUse[sNumReplyPorts];
 static	int32		sGetCachedReplyPort();
 
-friend	int _init_message_();
-friend	int _delete_message_();
 static	BBlockCache	*sMsgCache;
 
 		struct dyn_array {

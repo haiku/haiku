@@ -6,24 +6,9 @@
 #ifndef MESSAGEPRIVATE_H
 #define MESSAGEPRIVATE_H
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <Message.h>
 #include <Messenger.h>
 #include <MessengerPrivate.h>
-
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
-extern "C" void		_msg_cache_cleanup_();
-extern "C" int		_init_message_();
-extern "C" int		_delete_message_();
 
 class BMessage::Private
 {
@@ -36,6 +21,7 @@ class BMessage::Private
 			fMessage->fTarget = token;
 			fMessage->fPreferred = preferred;
 		}
+
 		inline void SetReply(BMessenger messenger)
 		{
 			BMessenger::Private mp(messenger);
@@ -44,10 +30,12 @@ class BMessage::Private
 			fMessage->fReplyTo.team = mp.Team();
 			fMessage->fReplyTo.preferred = mp.IsPreferredTarget();
 		}
+
 		inline int32 GetTarget()
 		{
 			return fMessage->fTarget;
 		}
+
 		inline bool UsePreferredTarget()
 		{
 			return fMessage->fPreferred;
@@ -58,6 +46,21 @@ class BMessage::Private
 		{
 			return BMessage::_SendFlattenedMessage(data, size, port, token,
 				preferred, timeout);
+		}
+
+		static inline void StaticInit()
+		{
+			BMessage::_StaticInit();
+		}
+
+		static inline void StaticCleanup()
+		{
+			BMessage::_StaticCleanup();
+		}
+
+		static inline void StaticCacheCleanup()
+		{
+			BMessage::_StaticCacheCleanup();
 		}
 
 	private:
