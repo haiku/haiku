@@ -189,7 +189,7 @@ arch_dbg_con_init_settings(kernel_args *args)
 	if (handle != NULL) {
 		const char *value;
 
-#ifdef BOCHS_DEBUG_HACK
+#if BOCHS_DEBUG_HACK
 		sBochsOutput = get_driver_boolean_parameter(handle, "bochs_debug_output", false, false);
 #endif
 		value = get_driver_parameter(handle, "serial_debug_port", NULL, NULL);
