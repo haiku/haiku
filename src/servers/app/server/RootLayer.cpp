@@ -890,6 +890,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				click_type		action;
 				bool			invalidate;
 				bool			sendMessage = true;
+				WinBorder		*exFocus = FocusWinBorder();
 
 				action			= target->TellWhat(evt);
 
@@ -900,9 +901,23 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				
 				if (invalidate)
 				{
+					WinBorder		*focus = FocusWinBorder();
+					if (exFocus && exFocus != focus && exFocus->fDecorator)
+						exFocus->fDecorator->SetFocus(false);
+					if (focus && exFocus != focus && focus->fDecorator)
+						focus->fDecorator->SetFocus(true);
+					
 					BRegion		reg(target->fFull);
 					reg.Include(&target->fTopLayer->fFull);
 					invalidate_layer(this, reg);
+					if (exFocus && FocusWinBorder() != exFocus)
+					{
+						reg.MakeEmpty();
+						reg.Include(&exFocus->fVisible);
+						// TODO: this line is a hack, decorator is drawn twice.
+						reg.Include(&focus->fVisible);
+						redraw_layer(this, reg);
+					}
 
 					if (!(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
 						sendMessage = false;
