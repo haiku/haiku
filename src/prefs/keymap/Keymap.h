@@ -24,7 +24,8 @@ class Keymap
 public:
 	status_t Load(entry_ref &ref);
 	void DumpKeymap();
-	void GetChars(int32 keyCode, uint32 modifiers, char **chars);
+	void GetChars(uint32 keyCode, uint32 modifiers, char **chars, int32 *numBytes);
+	bool IsModifierKey(uint32 keyCode);
 private:
 	char *fChars;
 	key_map fKeys;

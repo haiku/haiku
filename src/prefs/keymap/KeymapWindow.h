@@ -39,7 +39,10 @@ public:
 	void KeyDown(const char* bytes, int32 numBytes);
 	void KeyUp(const char* bytes, int32 numBytes);
 	void MessageReceived(BMessage *msg);
-	void SetFontFamily(const font_family family) {fCurrentFont.SetFamilyAndStyle(family, NULL); };
+	void SetFontFamily(const font_family family);
+	void MouseDown(BPoint point);
+	void MouseUp(BPoint point);
+	void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
 private:	
 	key_info fOldKeyInfo;
 	BRect fKeysRect[128];
@@ -70,7 +73,6 @@ protected:
 
 	BMenuBar			*AddMenuBar();
 	void				AddMaps(BView *placeholderView);
-	//KeymapListItem* 	ItemFromEntry( BEntry *entry );
 	void				UseKeymap();
 	
 	void FillSystemMaps();

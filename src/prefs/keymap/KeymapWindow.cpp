@@ -725,6 +725,7 @@ MapView::AttachedToWindow()
 {
 	SetEventMask(B_KEYBOARD_EVENTS, B_NO_POINTER_HISTORY);
 	fTextView->SetViewColor(255,255,255);
+	fTextView->SetStylable(true);
 	BView::AttachedToWindow();
 }
 
@@ -1157,7 +1158,8 @@ MapView::DrawKey(int32 keyCode)
 	}
 	
 	char *str;
-	fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, &str);
+	int32 numBytes;
+	fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, &str, &numBytes);
 	if (str) {
 		bool hasGlyphs;
 		fCurrentFont.GetHasGlyphs(str, 1, &hasGlyphs);
@@ -1223,13 +1225,29 @@ MapView::MessageReceived(BMessage *msg)
 									DrawKey(keyCode);
 								}
 														
+						} 
+					
+					if (keyCode<0) 
+						for (int8 i=0; i<16; i++) {
+							uint8 stbits = states[i];
+							for (int8 j=7; stbits; j--,stbits>>=1)
+								if (stbits & 1) {
+									keyCode = i*8 + j;
+									if (!fCurrentMap->IsModifierKey(keyCode)) {
+										i = 16;
+										break;
+									}
+								}			
 						}
-					if (Window()->IsActive() && keyCode >= 0 
+					
+					if (Window()->IsActive() 
 						&& msg->what == B_KEY_DOWN) {
 						fTextView->MakeFocus();
 						char *str;
-						fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, &str);
-						fTextView->FakeKeyDown(str, 1);
+						int32 numBytes;
+						fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, &str, &numBytes);
+						if (numBytes>0)
+							fTextView->FakeKeyDown(str, numBytes);
 					}
 				}											
 			}
@@ -1255,3 +1273,29 @@ MapView::KeyUp(const char* bytes, int32 numBytes)
 {
 	MessageReceived(Window()->CurrentMessage());
 }
+
+
+void
+MapView::MouseDown(BPoint point)
+{
+	
+}
+
+void
+MapView::MouseUp(BPoint point)
+{
+
+}
+
+void
+MapView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
+{
+
+}
+
+void 
+MapView::SetFontFamily(const font_family family) 
+{
+	fCurrentFont.SetFamilyAndStyle(family, NULL); 
+	fTextView->SetFont(&fCurrentFont);
+};

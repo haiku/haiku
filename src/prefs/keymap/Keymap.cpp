@@ -52,7 +52,7 @@ print_key( char *chars, int32 offset )
 
 
 void 
-Keymap::GetChars(int32 keyCode, uint32 modifiers, char **chars) 
+Keymap::GetChars(uint32 keyCode, uint32 modifiers, char **chars, int32 *numBytes) 
 {
 	int32 offset = 0;
 	switch (modifiers & 0xff) {
@@ -67,9 +67,9 @@ Keymap::GetChars(int32 keyCode, uint32 modifiers, char **chars)
 		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
 	}
 
-	int size = fChars[offset++];
+	*numBytes = fChars[offset++];
 	
-	switch( size ) {
+	switch( *numBytes ) {
 	case 0:
 		// Not mapped
 		*chars = NULL; 
@@ -77,9 +77,9 @@ Keymap::GetChars(int32 keyCode, uint32 modifiers, char **chars)
 	default:
 		// 1-, 2-, 3-, or 4-byte UTF-8 character 
 		{ 
-			char *str = *chars = new char[size + 1]; 
-			strncpy(str, &(fChars[offset]), size );
-			str[size] = 0; 
+			char *str = *chars = new char[*numBytes + 1]; 
+			strncpy(str, &(fChars[offset]), *numBytes );
+			str[*numBytes] = 0; 
 		} 
 		break; 
 	}
@@ -139,4 +139,23 @@ Keymap::Load(entry_ref &ref)
 	file.Read(fChars, chars_size);
 	
 	return B_OK;
+}
+
+
+bool 
+Keymap::IsModifierKey(uint32 keyCode)
+{
+	if ((keyCode == fKeys.caps_key)
+		|| (keyCode == fKeys.num_key)
+		|| (keyCode == fKeys.left_shift_key)
+		|| (keyCode == fKeys.right_shift_key)
+		|| (keyCode == fKeys.left_command_key)
+		|| (keyCode == fKeys.right_command_key)
+		|| (keyCode == fKeys.left_control_key)
+		|| (keyCode == fKeys.right_control_key)
+		|| (keyCode == fKeys.left_option_key)
+		|| (keyCode == fKeys.right_option_key)
+		|| (keyCode == fKeys.menu_key))
+			return true;
+	return false;
 }
