@@ -36,6 +36,7 @@
 #include <InterfaceDefs.h>
 #include <DataIO.h>
 #include <ByteOrder.h>
+#include "TGATranslatorSettings.h"
 
 #define TGA_TRANSLATOR_VERSION 100
 #define TGA_IN_QUALITY 1.0
@@ -166,10 +167,16 @@ public:
 		// it translates the data in inSource to outDestination
 		// using the format outType
 		
+	virtual status_t GetConfigurationMessage(BMessage *ioExtension);
+		// write the current state of the translator into
+		// the supplied BMessage object
+		
 	virtual status_t MakeConfigurationView(BMessage *ioExtension,
 		BView **outView, BRect *outExtent);
 		// creates and returns the view for displaying information
 		// about this translator
+		
+	TGATranslatorSettings *AcquireSettings();
 
 protected:
 	virtual ~TGATranslator();
@@ -178,6 +185,8 @@ protected:
 		// the user
 		
 private:
+	TGATranslatorSettings *fpsettings;
+
 	char fName[30];
 	char fInfo[100];
 };
