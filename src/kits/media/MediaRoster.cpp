@@ -1429,8 +1429,35 @@ status_t
 BMediaRoster::SetTimeSourceFor(media_node_id node,
 							   media_node_id time_source)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (node <= 0 || time_source <= 0)
+		return B_BAD_VALUE;
+	
+	media_node clone;
+	status_t rv, result;
+	
+	rv = GetNodeFor(node, &clone);
+	if (rv != B_OK) {
+		FATAL("BMediaRoster::SetTimeSourceFor, GetNodeFor failed, node id %ld\n", node);
+		return B_ERROR;
+	}
+	
+	result = B_OK;
+	node_set_timesource_command cmd;
+	cmd.timesource_id = time_source;
+	rv = SendToPort(clone.port, NODE_SET_TIMESOURCE, &cmd, sizeof(cmd));	
+	if (rv != B_OK) {
+		FATAL("BMediaRoster::SetTimeSourceFor, sending NODE_SET_TIMESOURCE failed, node id %ld\n", node);
+		result = B_ERROR;
+	}
+
+	rv = ReleaseNode(clone);
+	if (rv != B_OK) {
+		FATAL("BMediaRoster::SetTimeSourceFor, ReleaseNode failed, node id %ld\n", node);
+		result = B_ERROR;
+	}
+
+	return result;
 }
 
 
@@ -1704,20 +1731,21 @@ BMediaRoster::GetLatencyFor(const media_node & producer,
 							bigtime_t * out_latency)
 {
 	UNIMPLEMENTED();
-	*out_latency = 0;
-	return B_ERROR;
+	*out_latency = 25000;
+	return B_OK;
 }
 
 
 status_t 
 BMediaRoster::GetInitialLatencyFor(const media_node & producer,
 								   bigtime_t * out_latency,
-								   uint32 * out_flags)
+								   uint32 * out_flags /* = NULL */)
 {
 	UNIMPLEMENTED();
-	*out_latency = 0;
-	*out_flags = 0;
-	return B_ERROR;
+	*out_latency = 10000;
+	if (out_flags)
+		*out_flags = 0;
+	return B_OK;
 }
 
 
@@ -1726,8 +1754,8 @@ BMediaRoster::GetStartLatencyFor(const media_node & time_source,
 								 bigtime_t * out_latency)
 {
 	UNIMPLEMENTED();
-	*out_latency = 0;
-	return B_ERROR;
+	*out_latency = 5000;
+	return B_OK;
 }
 
 
