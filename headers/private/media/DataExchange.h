@@ -23,6 +23,7 @@ struct command_data;
 
 // BMessage based data exchange with the media_server
 status_t SendToServer(BMessage *msg);
+status_t QueryServer(BMessage &request, BMessage &reply);
 
 // Raw data based data exchange with the media_server
 status_t SendToServer(int32 msgcode, command_data *msg, int size);
@@ -64,12 +65,12 @@ using namespace BPrivate::media::dataexchange;
 
 // BMessage based server communication
 enum {
-
 	// BMediaRoster notification service
 	MEDIA_SERVER_REQUEST_NOTIFICATIONS = 1000,
 	MEDIA_SERVER_CANCEL_NOTIFICATIONS,
-	MEDIA_SERVER_SEND_NOTIFICATIONS
+	MEDIA_SERVER_SEND_NOTIFICATIONS,
 
+	MEDIA_SERVER_GET_FORMATS,
 };
 
 // Raw port based communication
