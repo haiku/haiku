@@ -14,6 +14,9 @@
 
 #define DECODE_BUFFER_SIZE	(32 * 1024)
 
+// reference:
+// http://www.mp3-tech.org/programmer/frame_header.html
+
 inline size_t
 AudioBufferSize(const media_raw_audio_format &raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
 {
@@ -73,6 +76,7 @@ mp3Decoder::mp3Decoder()
 	fChannelCount = 0;
 	fOutputBufferSize = 0;
 	fNeedSync = false;
+	fDecodingError = false;
 }
 
 
@@ -158,6 +162,7 @@ mp3Decoder::Seek(uint32 seekTo,
 	InitMP3(&fMpgLibPrivate);
 	fResidualBytes = 0;
 	fNeedSync = true;
+	fDecodingError = false;
 	return B_OK;
 }
 
@@ -170,6 +175,9 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
 	int32	out_bytes = 0;
+	
+	if (fDecodingError)
+		return B_ERROR;
 	
 	mediaHeader->start_time = fStartTime;
 	//TRACE("mp3Decoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
@@ -191,8 +199,10 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 		}
 		
 		last_err = DecodeNextChunk();
-		if (last_err != B_OK)
+		if (last_err != B_OK) {
+			fDecodingError = true;
 			break;
+		}
 	}
 
 	*frameCount = out_bytes / fFrameSize;

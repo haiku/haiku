@@ -40,6 +40,7 @@ private:
 	int				fChannelCount;
 	int				fOutputBufferSize;
 	bool			fNeedSync;
+	bool			fDecodingError;
 };
 
 

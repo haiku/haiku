@@ -58,8 +58,8 @@ int decode_header(struct frame *fr,unsigned long newhead)
     
     fr->lay = 4-((newhead>>17)&3);
     if( ((newhead>>10)&0x3) == 0x3) {
-      fprintf(stderr,"Stream error\n");
-      exit(1);
+      fprintf(stderr,"Stream error, reserved sampling rate\n");
+      return 0;
     }
     if(fr->mpeg25) {
       fr->sampling_frequency = 6 + ((newhead>>10)&0x3);
@@ -84,8 +84,8 @@ int decode_header(struct frame *fr,unsigned long newhead)
 
     if(!fr->bitrate_index)
     {
-      fprintf(stderr,"Free format not supported.\n");
-      return (0);
+      fprintf(stderr, "Stream error, free format bitrate index not supported\n");
+      return 0;
     }
 
     switch(fr->lay)
@@ -126,7 +126,7 @@ int decode_header(struct frame *fr,unsigned long newhead)
           fr->framesize = fr->framesize + fr->padding - 4;
         break; 
       default:
-        fprintf(stderr,"Sorry, unknown layer type.\n"); 
+        fprintf(stderr,"Stream error, unknown layer type.\n"); 
         return (0);
     }
     return 1;

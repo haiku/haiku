@@ -94,14 +94,19 @@ static int read_buf_byte(struct mpstr *mp)
 
 	int pos;
 
+	if(!mp->tail) {
+		fprintf(stderr,"Fatal error!\n");
+		return 0;
+	}
+
 	pos = mp->tail->pos;
 	while(pos >= mp->tail->size) {
 		remove_buf(mp);
-		pos = mp->tail->pos;
 		if(!mp->tail) {
 			fprintf(stderr,"Fatal error!\n");
-			exit(1);
+			return 0;
 		}
+		pos = mp->tail->pos;
 	}
 
 	b = mp->tail->pnt[pos];
@@ -149,7 +154,8 @@ int decodeMP3(struct mpstr *mp,char *in,int isize,char *out,
 			return MP3_NEED_MORE;
 		}
 		read_head(mp);
-		decode_header(&mp->fr,mp->header);
+		if (decode_header(&mp->fr,mp->header) == 0)
+			return MP3_ERR;
 		mp->framesize = mp->fr.framesize;
 	}
 
