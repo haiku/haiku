@@ -12,7 +12,7 @@
 #include <string.h>
 
 
-extern uint16 gBootDriveID;
+extern uint8 gBootDriveID;
 
 // int 0x13 definitions
 #define BIOS_GET_DRIVE_PARAMETERS		0x0800
@@ -191,6 +191,7 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 {
 	if (get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
 		// ToDo: old style CHS support
+		printf("%d requires CHS support - not yet implemented...\n", driveID);
 		fBlockSize = 512;
 		fSize = 0;
 		fLBA = false;
@@ -258,7 +259,7 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 		} else {
 	chs_read:
-			// Left to be done!
+			// ToDo: Left to be done!
 			return B_ERROR;
 		}
 
