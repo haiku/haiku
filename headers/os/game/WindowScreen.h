@@ -78,9 +78,8 @@ virtual void        Show();
 		bool        CanControlFrameBuffer();
 		status_t    SetFrameBuffer(int32 width, int32 height);
 		status_t    MoveDisplayArea(int32 x, int32 y);
-/* IOBase will not be support in future compatibility version of WindowScreen. Its
-   features should be replaced by other functions of the new API. */
-		void        *IOBase();
+
+		void        *IOBase(); // Not supported anymore. It always returns NULL
 		
 		rgb_color           *ColorList();
 		frame_buffer_info   *FrameBufferInfo();
