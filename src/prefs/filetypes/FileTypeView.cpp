@@ -30,7 +30,7 @@ FileTypeView::SetPreferredApplication(const char * preferredApplication)
 }
 
 bool
-FileTypeView::Clean()
+FileTypeView::IsClean() const
 {
 	if (fFileType.Compare(GetFileType()) != 0) {
 		return false;
@@ -42,14 +42,14 @@ FileTypeView::Clean()
 }
 
 const char *
-FileTypeView::GetFileType()
+FileTypeView::GetFileType() const
 {
 	// return from UI
 	return "";
 }
 
 const char *
-FileTypeView::GetPreferredApplication()
+FileTypeView::GetPreferredApplication() const
 {
 	// return from UI
 	return "";

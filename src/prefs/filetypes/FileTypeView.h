@@ -15,7 +15,7 @@ public:
 	void SetFileType(const char * fileType);
 	void SetPreferredApplication(const char * preferredApplication);
 
-	bool Clean() const;
+	bool IsClean() const;
 	const char * GetFileType() const;
 	const char * GetPreferredApplication() const;
 private:

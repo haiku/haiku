@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src prefs filetypes ;
+
+AddResources FileTypes :
+	FileTypes.rdef FileTypes.icons.rdef FileTypes.version.rdef
+	;
+
+Preference FileTypes :
+	main.cpp
+	FileTypesApp.cpp
+	FileTypesView.cpp
+	FileTypesWindow.cpp
+	FileTypeView.cpp
+	FileTypeWindow.cpp
+	;
+
+LinkSharedOSLibs FileTypes : be ;

@@ -1,4 +1,7 @@
+#include <Alert.h>
 #include <Debug.h>
+#include <Entry.h>
+#include <Node.h>
 
 #include <FileTypeView.h>
 #include <FileTypeWindow.h>
@@ -115,9 +118,9 @@ FileTypeWindow::SetEntries(BEntryList entries)
 	
 	BString title = SummarizeEntries();
 	title.Append(" File Type");
-	SetTitle(title);
+	SetTitle(strdup(title.String()));
 	
-	if (fEntries->Rewind() != B_OK) {
+	if (fEntries.Rewind() != B_OK) {
 		return;
 	}
 	BString * fileType = 0;
@@ -141,7 +144,7 @@ FileTypeWindow::SetEntries(BEntryList entries)
 			if (fileType == 0) {
 				fileType = new BString(string);
 			} else if (fileType->Compare(string) != 0) {
-				fileType.SetTo("");
+				fileType->SetTo("");
 				if (preferredApplication && (preferredApplication->Length() == 0)) {
 					break; // stop now, don't waste time checking the rest
 				}
@@ -153,30 +156,34 @@ FileTypeWindow::SetEntries(BEntryList entries)
 			if (preferredApplication == 0) {
 				preferredApplication = new BString(string);
 			} else if (preferredApplication->Compare(string) != 0) {
-				preferredApplication.SetTo("");
+				preferredApplication->SetTo("");
 				if (fileType && (fileType->Length() == 0)) {
 					break; // stop now, don't waste time checking the rest
 				}
 			}
 		}
 	}
-	fView->SetFileType(fileType.String());
-	fView->SetPreferredApplication(preferredApplication.String());
-	delete fileType;
-	delete preferredApplication;
+	if (fileType != 0) {
+		fView->SetFileType(fileType->String());
+		delete fileType;
+	}
+	if (preferredApplication != 0) {
+		fView->SetPreferredApplication(preferredApplication->String());
+		delete preferredApplication;
+	}
 }
 
 const char *
 FileTypeWindow::SummarizeEntries()
 {
-	if (fEntries->Rewind() != B_OK) {
+	if (fEntries.Rewind() != B_OK) {
 		return "<error>";
 	}
 	const char * result = "";
 	dirent dent;
-	if (fEntries->GetNextDirents(&dent,sizeof(dirent),1) != 0) {
+	if (fEntries.GetNextDirents(&dent,sizeof(dirent),1) != 0) {
 		result = strdup(dent.d_name);
-		if (fEntries->GetNextDirents(&dent,sizeof(dirent),1) != 0) {
+		if (fEntries.GetNextDirents(&dent,sizeof(dirent),1) != 0) {
 			result = "[Multiple Files]";
 		}
 	}
