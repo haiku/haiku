@@ -2862,5 +2862,4 @@ FT_END_HEADER
 
 #endif /* __FREETYPE_H__ */
 
-
 /* END */
