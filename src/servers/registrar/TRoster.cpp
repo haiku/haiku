@@ -115,6 +115,7 @@ TRoster::HandleAddApplication(BMessage *request)
 	if (request->FindBool("full_registration", &fullReg) != B_OK)
 		fullReg = false;
 PRINT(("team: %ld, signature: %s\n", team, signature));
+PRINT(("full registration: %d\n", fullReg));
 	// check the parameters
 	team_id otherTeam = -1;
 	uint32 launchFlags = flags & B_LAUNCH_MASK;
@@ -177,6 +178,7 @@ PRINT(("added ref: %ld, %lld, %s\n", info->ref.device, info->ref.directory, info
 			else {
 				token = info->token = _NextToken();
 				addingSuccess = fEarlyPreRegisteredApps.AddInfo(info);
+PRINT(("added to early pre-regs, token: %lu\n", token));
 			}
 			if (!addingSuccess)
 				SET_ERROR(error, B_NO_MEMORY);
@@ -275,6 +277,8 @@ TRoster::HandleIsAppPreRegistered(BMessage *request)
 		SET_ERROR(error, B_BAD_VALUE);
 	if (request->FindInt32("team", &team) != B_OK)
 		team = -1;
+PRINT(("team: %ld\n", team));
+PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 	// check the parameters
 	// entry_ref
 	if (error == B_OK & !BEntry(&ref).Exists())
@@ -282,23 +286,26 @@ TRoster::HandleIsAppPreRegistered(BMessage *request)
 	// team
 	if (error == B_OK && team < 0)
 		SET_ERROR(error, B_BAD_VALUE);
-	// loop the information up
+	// look up the information
 	RosterAppInfo *info = NULL;
 	if (error == B_OK) {
 		if ((info = fRegisteredApps.InfoFor(team)) != NULL) {
+PRINT(("found team in fRegisteredApps\n"));
 			_ReplyToIAPRRequest(request, info);
 		} else if ((info = fEarlyPreRegisteredApps.InfoFor(&ref)) != NULL) {
+PRINT(("found ref in fEarlyRegisteredApps\n"));
 			// pre-registered and has no team ID assigned yet -- queue the
 			// request
 			be_app->DetachCurrentMessage();
 			IAPRRequest queuedRequest = { ref, team, request };
 			fIAPRRequests[team] = queuedRequest;
+		} else {
+PRINT(("didn't find team or ref\n"));
+			// team not registered, ref not early pre-registered
+			_ReplyToIAPRRequest(request, NULL);
 		}
-	}
-	// reply to the request
-	if (error == B_OK)
-		_ReplyToIAPRRequest(request, info);
-	else {
+	} else {
+		// reply to the request on error
 		BMessage reply(B_REG_ERROR);
 		reply.AddInt32("error", error);
 		request->SendReply(&reply);
@@ -403,6 +410,7 @@ TRoster::HandleSetThreadAndTeam(BMessage *request)
 	// team
 	if (error == B_OK && team < 0)
 		SET_ERROR(error, B_BAD_VALUE);
+PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
 	// update the app_info
 	if (error == B_OK) {
 		RosterAppInfo *info = fEarlyPreRegisteredApps.InfoForToken(token);
@@ -477,33 +485,34 @@ TRoster::HandleGetAppInfo(BMessage *request)
 		hasRef = false;
 	if (request->FindString("signature", &signature) != B_OK)
 		hasSignature = false;
-	// check the parameters
-	// If neither of those has been supplied, the active application info is
-	// requested. We simple set the team ID.
-	if (error == B_OK && !hasTeam && !hasRef && !hasSignature) {
-	}
+if (hasTeam)
+PRINT(("team: %ld\n", team));
+if (hasRef)
+PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
+if (hasSignature)
+PRINT(("signature: %s\n", signature));
 	// get the info
 	RosterAppInfo *info = NULL;
 	if (error == B_OK) {
 		if (hasTeam) {
 			info = fRegisteredApps.InfoFor(team);
 			if (info == NULL)
-				error = B_BAD_TEAM_ID;
+				SET_ERROR(error, B_BAD_TEAM_ID);
 		} else if (hasRef) {
 			info = fRegisteredApps.InfoFor(&ref);
 			if (info == NULL)
-				error = B_ERROR;
+				SET_ERROR(error, B_ERROR);
 		} else if (hasSignature) {
 			info = fRegisteredApps.InfoFor(signature);
 			if (info == NULL)
-				error = B_ERROR;
+				SET_ERROR(error, B_ERROR);
 		} else {
 			// If neither of those has been supplied, the active application
 			// info is requested.
 			if (fActiveApp)
 				info = fActiveApp;
 			else
-				error = B_ERROR;
+				SET_ERROR(error, B_ERROR);
 		}
 	}
 	// reply to the request
@@ -816,6 +825,7 @@ TRoster::_ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info)
 	// send reply
 	BMessage reply(B_REG_SUCCESS);
 	reply.AddBool("pre-registered", preRegistered);
+PRINT(("_ReplyToIAPRRequest(): pre-registered: %d\n", preRegistered));
 	if (preRegistered)
 		_AddMessageAppInfo(&reply, info);
 	request->SendReply(&reply);
