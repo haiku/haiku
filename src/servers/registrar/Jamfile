@@ -10,6 +10,7 @@ Server obos_registrar :
 	MIMEManager.cpp
 	Registrar.cpp
 	RosterAppInfo.cpp
+	ThreadManager.cpp
 	TRoster.cpp
 ;
 LinkSharedOSLibs obos_registrar :
