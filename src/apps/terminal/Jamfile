@@ -5,11 +5,10 @@ SubDir OBOS_TOP src apps terminal ;
 #	;
 
 App Terminal :
+	ToggleScrollView.cpp
+	TerminalTextView.cpp
+	TerminalWindow.cpp
 	TerminalApp.cpp
-	TerminalView.cpp
-	TerminalWindow.cpp ;
-#	ColorMenuItem.cpp
-#	FindWindow.cpp
-#	ReplaceWindow.cpp
+	;
 
 LinkSharedOSLibs Terminal : be stdc++.r4 translation tracker ;

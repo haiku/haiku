@@ -17,8 +17,9 @@
 #include <TranslationUtils.h>
 #include <Window.h>
 #include "Constants.h"
+#include "ToggleScrollView.h"
 #include "TerminalApp.h"
-#include "TerminalView.h"
+#include "TerminalTextView.h"
 #include "TerminalWindow.h"
 
 TerminalWindow::TerminalWindow(BPoint topLeft, int32 id)
@@ -96,18 +97,16 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	viewFrame = Bounds();
 	
 	viewFrame.top = fMenuBar->Bounds().Height()+1;
-	viewFrame.right -=  B_V_SCROLL_BAR_WIDTH;
 	viewFrame.left = 0;
-	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
 	
 	textBounds = viewFrame;
 	textBounds.OffsetTo(B_ORIGIN);
 	textBounds.InsetBy(TEXT_INSET, TEXT_INSET);
-	
-	fTextView = new TerminalView(viewFrame, textBounds, this);
+
+	fTextView = new TerminalTextView(viewFrame, textBounds, this);
 	fTextView->SetStylable(true);
 	
-	fScrollView = new BScrollView("scrollview", fTextView, B_FOLLOW_ALL, 0, false, true, B_PLAIN_BORDER);
+	fScrollView = new ToggleScrollView("scrollview", fTextView, 0, false, true, B_PLAIN_BORDER);
 	AddChild(fScrollView);
 	fTextView->MakeFocus(true);	
 

@@ -9,7 +9,8 @@
 #include <TextView.h>
 #include <Window.h>
 
-class TerminalView;
+class ToggleScrollView;
+class TerminalTextView;
 
 class TerminalWindow
 	: public BWindow
@@ -62,8 +63,8 @@ private:
 	BMenuItem		*fSaveAsSettingsFile;
 	
 	// Main views
-	TerminalView    *fTextView;
-	BScrollView		*fScrollView;
+	TerminalTextView*fTextView;
+	ToggleScrollView*fScrollView;
 	
 	// File panels
 	BFilePanel		*fLogToFilePanel;
