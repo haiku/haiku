@@ -68,7 +68,7 @@ void II_step_one(struct mpstr *mp, unsigned int *bit_alloc,int *scale,struct fra
     int sblimit2 = fr->II_sblimit<<stereo;
     struct al_table *alloc1 = fr->alloc;
     int i;
-    static unsigned int scfsi_buf[64];
+    unsigned int scfsi_buf[64];
     unsigned int *scfsi,*bita;
     int sc,step;
 
