@@ -131,7 +131,7 @@ spawn_shell (int row, int col, const char *command, const char *coding)
   
   int master = 0;
   int slave;
-  struct termio tio;
+  struct termios tio;
   struct winsize ws;
   
   handshake_t handshake;

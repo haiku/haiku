@@ -1617,7 +1617,7 @@ void
 TermView::KeyDown (const char *bytes, int32 numBytes)
 {
   char c;
-  struct termio tio;
+  struct termios tio;
   int32 key, mod;
 
   uchar dstbuf[1024];
