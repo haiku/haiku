@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-10/2004
+	Rudolf Cornelissen 9/2002-1/2005
 */
 
 #define MODULE_BIT 0x00400000
@@ -114,7 +114,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	float pix_clock_found, target_aspect;
 	uint8 m,n,p, bpp;
 	status_t result;
-	uint32 max_vclk, row_bytes, pointer_reservation;
+	uint32 max_vclk, row_bytes, mem_reservation;
 	bool acc_mode;
 	double target_refresh = ((double)target->timing.pixel_clock * 1000.0) /
 			(
@@ -381,15 +381,17 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		LOG(4, ("PROPOSEMODE: WARNING: pixelclock deviates too much\n"));
 	}
 
+	mem_reservation = 0;
 	/* checkout space needed for hardcursor (if any) */
-	pointer_reservation = 0;
-	if (si->settings.hardcursor) pointer_reservation = 2048;
+	if (si->settings.hardcursor) mem_reservation = 2048;
+	/* checkout space needed for DMA (if active) */
+	if (si->settings.dma_acc) mem_reservation += 65536;
 	/* memory requirement for frame buffer */
 	if ((row_bytes * target->virtual_height) >
-		(si->ps.memory_size - pointer_reservation))
+		(si->ps.memory_size - mem_reservation))
 	{
 		target->virtual_height = 
-			(si->ps.memory_size - pointer_reservation) / row_bytes;
+			(si->ps.memory_size - mem_reservation) / row_bytes;
 	}
 	if (target->virtual_height < target->timing.v_display) 
 	{
@@ -456,7 +458,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		{
 		case DUALHEAD_ON:
 		case DUALHEAD_SWITCH:
-			if (((si->ps.memory_size - pointer_reservation) >=
+			if (((si->ps.memory_size - mem_reservation) >=
 					(row_bytes * target->virtual_height)) &&
 			 	((uint16)(row_bytes / bpp) >= (target->timing.h_display * 2)))
 			{
@@ -464,14 +466,14 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 			}
 			break;
 		case DUALHEAD_CLONE:
-			if ((si->ps.memory_size - pointer_reservation) >=
+			if ((si->ps.memory_size - mem_reservation) >=
 					(row_bytes * target->virtual_height))
 			{
 				target->flags |= DUALHEAD_CAPABLE;
 			}
 			break;
 		case DUALHEAD_OFF:
-			if ((si->ps.memory_size - pointer_reservation) >=
+			if ((si->ps.memory_size - mem_reservation) >=
 					(row_bytes * target->virtual_height * 2))
 			{
 				target->flags |= DUALHEAD_CAPABLE;
