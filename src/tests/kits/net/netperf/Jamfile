@@ -12,7 +12,7 @@ SimpleTest netperf :
 	nettest_xti.c
 	nettest_ipv6.c
 	nettest_dns.c
-	: net
+	: socket bind
 ;
 
 SimpleTest netserver : 
@@ -25,7 +25,7 @@ SimpleTest netserver :
 	nettest_xti.c
 	nettest_ipv6.c
 	nettest_dns.c
-	: net
+	: socket bind
 ;
 
 OBOSInstall install_netperf_scripts : [ FDirName $(OBOS_TEST_DIR) kits net netperf ] :
