@@ -30,6 +30,15 @@ ProbeWindow::MessageReceived(BMessage *message)
 			if (BView *view = FindView("dataView"))
 				view->MessageReceived(message);
 			break;
+
+		case B_SIMPLE_DATA:
+		{
+			BMessage refsReceived(*message);
+			refsReceived.what = B_REFS_RECEIVED;
+			be_app_messenger.SendMessage(&refsReceived);
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 	}
