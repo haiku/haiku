@@ -1,10 +1,23 @@
 SubDir OBOS_TOP src add-ons kernel disk_scanner fs ;
 
 UsePrivateHeaders $(DOT) ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName storage ] ;
 
-R5KernelAddon bfs : kernel disk_scanner fs :
+# For now build a userland version only.
+Addon <file_system>bfs : userland file_systems :
 	bfs.c
 ;
+
+LinkSharedOSLibs <file_system>bfs :
+	libkernelland_emu.so
+	libdisk_device_manager.so
+;
+
+
+#R5KernelAddon bfs : kernel disk_scanner fs :
+#	bfs.c
+#;
 
 #R5KernelAddon iso9660 : kernel disk_scanner fs :
 #	iso9660.cpp

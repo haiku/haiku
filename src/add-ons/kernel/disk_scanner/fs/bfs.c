@@ -12,21 +12,23 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <disk_scanner.h>
-#include <fs_info.h>
+#include <ddm_modules.h>
+#include <DiskDeviceTypes.h>
 #include <KernelExport.h>
-#include <disk_scanner/fs.h>
 
-#define BFS_FS_MODULE_NAME "disk_scanner/fs/bfs/v1"
+// B_PLAIN_C_ERROR:
+//static const char *kBFSModuleName = "file_systems/bfs/v1";
+#define kBFSModuleName "file_systems/bfs/v1"
+
 const char *kModuleDebugName = "fs/bfs";
 
 #define TRACE(x) ;
 //#define TRACE(x) dprintf x
 
 // prototypes
-static bool bfs_fs_identify(int deviceFD,
-	struct extended_partition_info *partitionInfo, float *priority,
-	fs_get_buffer get_buffer, struct fs_buffer_cache *cache);
+//static bool bfs_fs_identify(int deviceFD,
+//	struct extended_partition_info *partitionInfo, float *priority,
+//	fs_get_buffer get_buffer, struct fs_buffer_cache *cache);
 
 //----------------------------------------------------------------------
 // Stolen from src/add-ons/kernel/file_systems/bfs/bfs.h
@@ -130,6 +132,8 @@ divide_roundup(int64 num,int32 divisor)
 //----------------------------------------------------------------------
 // End stolen BFS code
 //----------------------------------------------------------------------
+
+#if 0
 
 // std_ops
 static
@@ -235,4 +239,182 @@ _EXPORT fs_module_info *modules[] =
 	NULL
 };
 
+#endif	// 0
+
+
+// module
+static status_t bfs_std_ops(int32 op, ...);
+
+// scanning
+static float bfs_identify_partition(int fd, partition_data *partition,
+		void **cookie);
+static status_t bfs_scan_partition(int fd, partition_data *partition,
+		void *cookie);
+static void bfs_free_identify_partition_cookie(partition_data *partition,
+		void *cookie);
+static void bfs_free_partition_content_cookie(partition_data *partition);
+
+static fs_module_info bfs_module = {
+	{
+		kBFSModuleName,
+		0,
+		bfs_std_ops
+	},
+// B_PLAIN_C_ERROR:
+//	kPartitionTypeBFS,					// pretty_name
+	"BFS Filesystem",					// pretty_name
+
+	// scanning
+	bfs_identify_partition,				// identify_partition
+	bfs_scan_partition,					// scan_partition
+	bfs_free_identify_partition_cookie,	// free_identify_partition_cookie
+	bfs_free_partition_content_cookie,	// free_partition_content_cookie
+
+	// querying
+	NULL,								// supports_defragmenting_partition
+	NULL,								// supports_reparing_partition
+	NULL,								// supports_resizing_partition
+	NULL,								// supports_moving_partition
+	NULL,								// supports_parent_system
+	NULL,								// validate_resize_partition
+	NULL,								// validate_move_partition
+	NULL,								// validate_initialize_partition
+	NULL,
+								// validate_set_partition_content_parameters
+
+	// writing
+	NULL,								// defragment_partition
+	NULL,								// repair_partition
+	NULL,								// resize_partition
+	NULL,								// move_partition
+	NULL,								// initialize_partition
+	NULL,								// set_partition_content_parameters
+};
+
+
+#ifdef __cplusplus
+extern "C"
+#endif
+fs_module_info *modules[];
+_EXPORT fs_module_info *modules[] =
+{
+	&bfs_module,
+	NULL
+};
+
+
+// read_super_block
+static
+status_t 
+read_super_block(int fd, disk_super_block **_superBlock)
+{
+	status_t error = B_OK;
+	ssize_t bytesRead;
+	// allocate space for the super block
+	disk_super_block *superBlock
+		= (disk_super_block*)malloc(sizeof(disk_super_block));
+	if (!superBlock)
+		return B_NO_MEMORY;
+	// read and check the super block
+	bytesRead = read_pos(fd, 512, superBlock, sizeof(disk_super_block));
+	if (bytesRead < 0) {
+		error = bytesRead;
+	} else if (bytesRead != sizeof(disk_super_block)
+		|| superBlock->magic1 != (int32)SUPER_BLOCK_MAGIC1
+		|| superBlock->magic2 != (int32)SUPER_BLOCK_MAGIC2
+		|| superBlock->magic3 != (int32)SUPER_BLOCK_MAGIC3
+		|| (int32)superBlock->block_size != superBlock->inode_size
+		|| superBlock->fs_byte_order != SUPER_BLOCK_FS_LENDIAN
+		|| (1UL << superBlock->block_shift) != superBlock->block_size
+		|| superBlock->num_ags < 1
+		|| superBlock->ag_shift < 1
+		|| superBlock->blocks_per_ag < 1
+		|| superBlock->num_blocks < 10
+		|| superBlock->num_ags != divide_roundup(superBlock->num_blocks,
+												 1L << superBlock->ag_shift)) {
+		error = B_ERROR;
+	}
+	// set result / cleanup on failure
+	if (error == B_OK)
+		*_superBlock = superBlock;
+	else if (superBlock)
+		free(superBlock);
+	return error;
+}
+
+// bfs_std_ops
+static
+status_t
+bfs_std_ops(int32 op, ...)
+{
+	TRACE(("bfs: bfs_std_ops(0x%lx)\n", op));
+	switch(op) {
+		case B_MODULE_INIT:
+		case B_MODULE_UNINIT:
+			return B_OK;
+	}
+	return B_ERROR;
+}
+
+// bfs_identify_partition
+static
+float
+bfs_identify_partition(int fd, partition_data *partition, void **cookie)
+{
+	disk_super_block *superBlock = NULL;
+	// check parameters
+	if (fd < 0 || !partition || !cookie)
+		return -1;
+	TRACE(("bfs: bfs_identify_partition(%d, %ld: %lld, %lld, %ld)\n", fd,
+		   partition->id, partition->offset, partition->size,
+		   partition->block_size));
+	// read super block
+	if (read_super_block(fd, &superBlock) != B_OK)
+		return -1;
+	*cookie = superBlock;
+	return 0.5;
+}
+
+// pm_scan_partition
+static
+status_t
+bfs_scan_partition(int fd, partition_data *partition, void *cookie)
+{
+	disk_super_block *superBlock = NULL;
+	// check parameters
+	if (fd < 0 || !partition || !cookie)
+		return B_ERROR;
+	TRACE(("bfs: bfs_scan_partition(%d, %ld: %lld, %lld, %ld)\n", fd,
+		   partition->id, partition->offset, partition->size,
+		   partition->block_size));
+	superBlock = (disk_super_block*)cookie;
+	// fill in the partition_data structure
+	partition->block_size = superBlock->block_size;
+	partition->content_name = strdup(superBlock->name);
+	partition->content_type = strdup(kPartitionTypeBFS);
+	// (no content_parameters, content_cookie ?)
+	// free the super block
+	free(superBlock);
+	if (!partition->content_name || !partition->content_type)
+		return B_NO_MEMORY;
+	return B_OK;
+}
+
+// pm_free_identify_partition_cookie
+static
+void
+bfs_free_identify_partition_cookie(partition_data *partition, void *cookie)
+{
+	if (cookie)
+		free(cookie);
+}
+
+// pm_free_partition_content_cookie
+static
+void
+bfs_free_partition_content_cookie(partition_data *partition)
+{
+	if (partition)
+		partition->content_cookie = NULL;
+}
 
