@@ -68,17 +68,19 @@ int vfs_setrlimit(int resource, const struct rlimit * rlp);
 //	or similar places.
 extern status_t notify_select_event(struct selectsync *sync, uint32 ref, uint8 event);
 
-/* calls needed by the VM for paging */
+/* calls needed by the VM for paging and by the file cache */
 int vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode);
 status_t vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode);
 status_t vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode);
 int vfs_put_vnode_ptr(void *vnode);
 void vfs_vnode_acquire_ref(void *vnode);
 void vfs_vnode_release_ref(void *vnode);
-bool vfs_can_page(void *vnode);
-status_t vfs_read_pages(void *vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
-status_t vfs_write_pages(void *vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
+status_t vfs_get_cookie_from_fd(int fd, void **_cookie);
+bool vfs_can_page(void *vnode, void *cookie);
+status_t vfs_read_pages(void *vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
+status_t vfs_write_pages(void *vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
 status_t vfs_get_vnode_cache(void *vnode, void **_cache);
+status_t vfs_get_file_map( void *_vnode, off_t offset, size_t size, struct file_io_vec *vecs, size_t *_count);
 
 /* special module convenience call */
 status_t vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer, size_t bufferSize);
