@@ -462,7 +462,7 @@ static status_t mount_fat_disk(const char *path, nspace_id nsid,
 			if (free_count < vol->total_clusters) 
 				vol->free_clusters = free_count;
 			else {
-				dprintf("free cluster count from fsinfo block invalid %x\n",free_count);
+				dprintf("free cluster count from fsinfo block invalid %lx\n", free_count);
 				err = -1;
 			}
 			if (last_allocated < vol->total_clusters) 
