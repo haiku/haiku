@@ -24,7 +24,7 @@ resource app_signature "application/x-vnd.obos.showimage";
    0000000E = ARGV_ONLY + BACKGROUND APP + EXCLUSIVE LAUNCH
    */
 
-resource app_flags 0x00000001;
+resource app_flags 0x00000000;
 
 /* BEOS:FILE_TYPES :
    "types" = "text/plain",
