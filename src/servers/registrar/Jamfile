@@ -18,9 +18,11 @@ Server obos_registrar :
 	EventMaskWatcher.cpp
 	EventQueue.cpp
 	MessageEvent.cpp
+	MessageHandler.cpp
 	MessageRunnerManager.cpp
 	MIMEManager.cpp
 	NodeMonitoring.cpp
+	PriorityMessageQueue.cpp
 	RDiskDevice.cpp
 	RDiskDeviceList.cpp
 	RecentApps.cpp
