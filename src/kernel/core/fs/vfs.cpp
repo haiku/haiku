@@ -16,6 +16,8 @@
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
 #include <disk_device_manager/KDiskDeviceUtils.h>
+#include <disk_device_manager/KDiskSystem.h>
+#include <KPath.h>
 #include <syscalls.h>
 #include <boot/kernel_args.h>
 #include <vfs.h>
@@ -96,6 +98,7 @@ struct fs_mount {
 	KPartition		*partition;
 	struct list		vnodes;
 	bool			unmounting;
+	bool			owns_file_device;
 };
 
 // RecursiveLockLocking
@@ -751,6 +754,36 @@ put_vnode(struct vnode *vnode)
 }
 
 
+/**	\brief Resolves a mount point vnode to the volume root vnode it is covered
+		   by.
+
+	Given an arbitrary vnode, the function checks, whether the node is covered
+	by the root of a volume. If it is the function obtains a reference to the
+	volume root node and returns it.
+
+	\param vnode The vnode in question.
+	\return The volume root vnode the vnode cover is covered by, if it is
+			indeed a mount point, or \c NULL otherwise.
+*/
+static
+struct vnode*
+resolve_mount_point_to_volume_root(struct vnode *vnode)
+{
+	if (!vnode)
+		return NULL;
+
+	struct vnode *volumeRoot = NULL;
+
+	recursive_lock_lock(&sMountOpLock);
+	if (vnode->covered_by) {
+		volumeRoot = vnode->covered_by;
+		inc_vnode_ref_count(volumeRoot);
+	}
+	recursive_lock_unlock(&sMountOpLock);
+
+	return volumeRoot;
+}
+
 /**	\brief Resolves a volume root vnode to the underlying mount point vnode.
 
 	Given an arbitrary vnode, the function checks, whether the node is the
@@ -771,8 +804,9 @@ resolve_volume_root_to_mount_point(struct vnode *vnode)
 	struct vnode *mountPoint = NULL;
 
 	recursive_lock_lock(&sMountOpLock);
-	if (vnode->covered_by) {
-		mountPoint = vnode->covered_by;
+	struct fs_mount *mount = vnode->mount;
+	if (vnode == mount->root_vnode && mount->covers_vnode) {
+		mountPoint = mount->covers_vnode;
 		inc_vnode_ref_count(mountPoint);
 	}
 	recursive_lock_unlock(&sMountOpLock);
@@ -812,14 +846,19 @@ get_dir_path_and_leaf(char *path, char *filename)
 			return B_NAME_TOO_LONG;
 		strcpy(path, ".");
 	} else {
-		// replace the filename portion of the path with a '.'
-		if (strlcpy(filename, ++p, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
-			return B_NAME_TOO_LONG;
-
-		if (p[0] != '\0'){
-			p[0] = '.';
-			p[1] = '\0';
+		p++;
+		if (*p == '\0') {
+			// special case: the path ends in '/'
+			strcpy(filename, ".");
+		} else {
+			// normal leaf: replace the leaf portion of the path with a '.'
+			if (strlcpy(filename, p, B_FILE_NAME_LENGTH)
+				>= B_FILE_NAME_LENGTH) {
+				return B_NAME_TOO_LONG;
+			}
 		}
+		p[0] = '.';
+		p[1] = '\0';
 	}
 	return B_OK;
 }
@@ -983,7 +1022,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		vnode = nextVnode;
 
 		// see if we hit a mount point
-		struct vnode *mountPoint = resolve_volume_root_to_mount_point(vnode);
+		struct vnode *mountPoint = resolve_mount_point_to_volume_root(vnode);
 		if (mountPoint) {
 			put_vnode(vnode);
 			vnode = mountPoint;
@@ -1149,7 +1188,7 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 static status_t
 dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 {
-	FUNCTION(("dir_vnode_to_path(%p, %p, %lu\n)", vnode, buffer, bufferSize));
+	FUNCTION(("dir_vnode_to_path(%p, %p, %lu)\n", vnode, buffer, bufferSize));
 
 	/* this implementation is currently bound to SYS_MAX_PATH_LEN */
 	char path[SYS_MAX_PATH_LEN];
@@ -1202,7 +1241,10 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		if (mountPoint) {
 			put_vnode(parentVnode);
 			parentVnode = mountPoint;
+			parentID = parentVnode->id;
 		}
+
+		bool hitRoot = (parentVnode == vnode);
 
 		// Does the file system support getting the name of a vnode?
 		// If so, get it here...
@@ -1229,7 +1271,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 			goto out;
 		}
 
-		if (parentID == id) {
+		if (hitRoot) {
 			// we have reached "/", which means we have constructed the full
 			// path
 			break;
@@ -1734,6 +1776,85 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 err:
 	put_vnode(dir);
 	return status;
+}
+
+
+/**	\brief Normalizes a given path.
+
+	The path must refer to an existing or non-existing entry in an existing
+	directory, that is chopping off the leaf component the remaining path must
+	refer to an existing directory.
+
+	The returned will be canonical in that it will be absolute, will not
+	contain any "." or ".." components or duplicate occurrences of '/'s,
+	and none of the directory components will by symbolic links.
+
+	Any two paths referring to the same entry, will result in the same
+	normalized path (well, that is pretty much the definition of `normalized',
+	isn't it :-).
+
+	\param path The path to be normalized.
+	\param buffer The buffer into which the normalized path will be written.
+	\param bufferSize The size of \a buffer.
+	\param kernel \c true, if the IO context of the kernel shall be used,
+		   otherwise that of the team this thread belongs to. Only relevant,
+		   if the path is relative (to get the CWD).
+	\return \c B_OK if everything went fine, another error code otherwise.
+*/
+status_t
+vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
+	bool kernel)
+{
+	if (!path || !buffer || bufferSize < 1)
+		return B_BAD_VALUE;
+PRINT(("vfs_normalize_path(`%s')\n", path));
+
+	// copy the supplied path to the stack, so it can be modified
+	char mutablePath[B_PATH_NAME_LENGTH + 1];
+	if (strlcpy(mutablePath, path, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH)
+		return B_NAME_TOO_LONG;
+
+	// get the dir vnode and the leaf name
+	struct vnode *dirNode;
+	char leaf[B_FILE_NAME_LENGTH];
+	status_t error = path_to_dir_vnode(mutablePath, &dirNode, leaf, kernel);
+	if (error != B_OK)
+{
+PRINT(("vfs_normalize_path(): failed to get dir vnode: %s\n", strerror(error)));
+		return error;
+}
+	// if the leaf is "." or "..", we directly get the correct directory
+	// vnode and ignore the leaf later
+	bool isDir = (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0);
+	if (isDir)
+		error = vnode_path_to_vnode(dirNode, leaf, false, 0, &dirNode, NULL);
+	if (error != B_OK)
+{
+PRINT(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n", strerror(error)));
+		return error;
+}
+
+	// get the directory path
+	error = dir_vnode_to_path(dirNode, buffer, bufferSize);
+	put_vnode(dirNode);
+	if (error < B_OK)
+{
+PRINT(("vfs_normalize_path(): failed to get dir path: %s\n", strerror(error)));
+		return error;
+}
+
+	// append the leaf name
+	if (!isDir) {
+		// insert a directory separator only if this is not the file system root
+		if ((strcmp(buffer, "/") != 0
+			 && strlcat(buffer, "/", bufferSize) >= bufferSize)
+			|| strlcat(buffer, leaf, bufferSize) >= bufferSize) {
+			return B_NAME_TOO_LONG;
+		}
+	}
+
+PRINT(("vfs_normalize_path() -> `%s'\n", buffer));
+	return B_OK;
 }
 
 
@@ -3650,25 +3771,61 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 
 	// The path is always safe, we just have to make sure that fsName is
 	// almost valid - we can't make any assumptions about args, though.
-// TODO: fsName == NULL is OK, if device refers to a partition. Then the DDM
-// will know, what FS to use.
-	if (fsName == NULL || fsName[0] == '\0')
+	// A NULL fsName is OK, if a device was given and the FS is not virtual.
+	// We'll get it from the DDM later.
+	if (fsName == NULL) {
+		if (!device || flags & B_MOUNT_VIRTUAL_DEVICE)
+			return B_BAD_VALUE;
+	} else if (fsName[0] == '\0')
 		return B_BAD_VALUE;
 
 	RecursiveLocker mountOpLocker(sMountOpLock);
+
+	// Helper to delete a newly created file device on failure.
+	// Not exactly beautiful, but helps to keep the code below cleaner.
+	struct FileDeviceDeleter {
+		FileDeviceDeleter() : id(-1) {}
+		~FileDeviceDeleter()
+		{
+			KDiskDeviceManager::Default()->DeleteFileDevice(id);
+		}
+
+		partition_id id;
+	} fileDeviceDeleter;
 
 	// If the file system is not a "virtual" one, the device argument should
 	// point to a real file/device (if given at all).
 	// get the partition
 	KDiskDeviceManager* ddm = KDiskDeviceManager::Default();
 	KPartition* partition = NULL;
+	bool newlyCreatedFileDevice = false;
 	if (!(flags & B_MOUNT_VIRTUAL_DEVICE) && device) {
+		// normalize the device path
+		KPath normalizedDevice;
+		err = normalizedDevice.SetTo(device, true);
+		if (err != B_OK)
+			return err;
+
 		// get a corresponding partition from the DDM
-		partition = ddm->RegisterPartition(device, true);
-			// TODO: Normalize the path!
-			// TODO: Support for mounting images!
+		partition = ddm->RegisterPartition(normalizedDevice.Path(), true);
+
 		if (!partition) {
-			PRINT(("fs_mount(): Partition `%s' not found.\n", device));
+			// Partition not found: This either means, the user supplied
+			// an invalid path, or the path refers to an image file. We try
+			// to let the DDM create a file device for the path.
+			partition_id deviceID = ddm->CreateFileDevice(
+				normalizedDevice.Path(), &newlyCreatedFileDevice);
+			if (deviceID >= 0) {
+				partition = ddm->RegisterPartition(deviceID, true);
+				if (newlyCreatedFileDevice)
+					fileDeviceDeleter.id = deviceID;
+// TODO: We must wait here, until the partition scan job is done.
+			}
+		}
+
+		if (!partition) {
+			PRINT(("fs_mount(): Partition `%s' not found.\n",
+				normalizedDevice.Path()));
 			return B_ENTRY_NOT_FOUND;
 		}
 	}
@@ -3688,11 +3845,32 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	}
 	DeviceWriteLocker writeLocker(diskDevice, true);
 
-	// make sure, that the partition is not busy
 	if (partition) {
+		// make sure, that the partition is not busy
 		if (partition->IsBusy() || partition->IsDescendantBusy()) {
 			PRINT(("fs_mount(): Partition is busy.\n"));
 			return B_BUSY;
+		}
+
+		// if no FS name had been supplied, we get it from the partition
+		if (!fsName) {
+			KDiskSystem *diskSystem = partition->DiskSystem();
+			if (!diskSystem) {
+				PRINT(("fs_mount(): No FS name was given, and the DDM didn't "
+					"recognize it.\n"));
+				return B_BAD_VALUE;
+			}
+
+			if (!diskSystem->IsFileSystem()) {
+				PRINT(("fs_mount(): No FS name was given, and the DDM found a "
+					"partitioning system.\n"));
+				return B_BAD_VALUE;
+			}
+
+			// The disk system name will not change, and the KDiskSystem
+			// object will not go away while the disk device is locked (and
+			// the partition has a reference to it), so this is safe.
+			fsName = diskSystem->Name();
 		}
 	}
 
@@ -3722,8 +3900,9 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		goto err4;
 
 	mount->id = sNextMountID++;
-	mount->unmounting = false;
 	mount->partition = NULL;
+	mount->unmounting = false;
+	mount->owns_file_device = false;
 
 	mutex_lock(&sMountMutex);
 
@@ -3802,6 +3981,8 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		// keep a partition reference as long as the partition is mounted
 		partitionRegistrar.Detach();
 		mount->partition = partition;
+		mount->owns_file_device = newlyCreatedFileDevice;
+		fileDeviceDeleter.id = -1;
 	}
 
 	return B_OK;
@@ -3933,13 +4114,16 @@ fs_unmount(char *path, bool kernel)
 	// release the file system
 	put_file_system(mount->fs);
 
+	// dereference the partition
+	if (partition) {
+		if (mount->owns_file_device)
+			KDiskDeviceManager::Default()->DeleteFileDevice(partition->ID());
+		partition->Unregister();
+	}
+
 	free(mount->device_name);
 	free(mount->fs_name);
 	free(mount);
-
-	// dereference the partition
-	if (partition)
-		partition->Unregister();
 
 	return 0;
 }

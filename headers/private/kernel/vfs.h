@@ -81,6 +81,10 @@ status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kern
 /* special module convenience call */
 status_t vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer, size_t bufferSize);
 
+/* service call for whoever needs a normalized path */
+status_t vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
+			bool kernel);
+
 /* calls the syscall dispatcher should use for user file I/O */
 status_t _user_mount(const char *path, const char *device, const char *fs_name,
 			uint32 flags, void *args);
