@@ -53,16 +53,42 @@
 #include "LayerData.h"
 #include "PNGDump.h"
 
-#define DEBUG_DRIVER_MODULE
+//#define DEBUG_DRIVER_ALL
+
+#ifdef DEBUG_DRIVER_ALL
+#	include <stdio.h>
+#	define ATRACE(x) printf x
+#	define STRACE(x) printf x
+#	define DTRACE(x) printf x
+#else
+#	define ATRACE(x) ;
+#endif
+
+
+//#define DEBUG_DRIVER_MODULE
 
 #ifdef DEBUG_DRIVER_MODULE
 #	include <stdio.h>
 #	define STRACE(x) printf x
 #else
-#	define STRACE(x) ;
+#	ifndef STRACE
+#		define STRACE(x) ;
+#	endif
+#endif
+
+//#define DEBUG_DRIVER_THREAD
+
+#ifdef DEBUG_DRIVER_THREAD
+#	include <stdio.h>
+#	define DTRACE(x) printf x
+#else
+#	ifndef DTRACE
+#		define DTRACE(x) ;
+#	endif
 #endif
 
 extern RGBColor workspace_default_color;
+
 
 /* ---------------------------------------------------------------------------------------
 	DW's NOTES:
@@ -78,22 +104,40 @@ extern RGBColor workspace_default_color;
 
 DirectDriver::DirectDriver(void)
 {
+	ATRACE(("DirectDriver::DirectDriver\n"));
+	
 	screenwin=NULL;
+	
+	ATRACE(("\tCreating framebuffer bitmap\n"));
 	framebuffer=new BBitmap(BRect(0,0,639,479),B_RGB32,true);
+	
+	ATRACE(("\tCreating child view for framebuffer\n"));
 	drawview=new BView(framebuffer->Bounds(),"drawview",0,0);
 	framebuffer->AddChild(drawview);
 
 	BScreen screen;
 	screen.GetMode(&fCurrentScreenMode);
+	ATRACE(("\tCurrent Mode:%u x %u\n",fCurrentScreenMode.virtual_width,fCurrentScreenMode.virtual_height));
 	
 	// We'll save this so that if we change the bit depth of the screen, we
 	// can change it back when the driver is shut down.
 	fSavedScreenMode=fCurrentScreenMode;
+
+#ifdef ENABLE_INPUT_SERVER_EMULATION
+	port_id serverInputPort = create_port(200, SERVER_INPUT_PORT);
+	if (serverInputPort == B_NO_MORE_PORTS)
+	{
+		debugger("DirectDriver: out of ports\n");
+		return;
+	}
+#endif
 }
 
 DirectDriver::~DirectDriver(void)
 {
+	ATRACE(("DirectDriver::~DirectDriver\n"));
 	Lock();
+	ATRACE(("\tDeleting the framebuffer\n"));
 	delete framebuffer;
 	screenwin->framebuffer=NULL;
 	Unlock();
@@ -101,12 +145,19 @@ DirectDriver::~DirectDriver(void)
 
 bool DirectDriver::Initialize(void)
 {
+	ATRACE(("DirectDriver::Initialize\n"));
 	screenwin=new DDWindow(640,480,B_RGB32,this);
+	while(find_thread("drawing_thread")==B_NAME_NOT_FOUND)
+	{
+		ATRACE(("\tWaiting for the drawing thread to spawn\n"));
+		snooze(100);
+	}
 	return true;
 }
 
 void DirectDriver::Shutdown(void)
 {
+	ATRACE(("DirectDriver::Shutdown\n"));
 	screenwin->PostMessage(B_QUIT_REQUESTED);
 
 	if(fSavedScreenMode.space!=fCurrentScreenMode.space)
@@ -115,6 +166,7 @@ void DirectDriver::Shutdown(void)
 
 void DirectDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d)
 {
+	STRACE(("DirectDriver::DrawBitmap\n"));
 	if(!bmp || !d)
 	{
 		printf("CopyBitmap returned - not init or NULL bitmap\n");
@@ -142,6 +194,7 @@ void DirectDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &
 
 void DirectDriver::InvertRect(const BRect &r)
 {
+	STRACE(("DirectDriver::InvertRect\n"));
 	// Shamelessly stolen from AccelerantDriver.cpp
 	
 	Lock();
@@ -237,6 +290,7 @@ void DirectDriver::InvertRect(const BRect &r)
 
 void DirectDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *linedata, const DrawData *d)
 {
+	STRACE(("DirectDriver::StrokeLineArray\n"));
 	if( !numlines || !linedata || !d)
 		return;
 	
@@ -263,6 +317,7 @@ void DirectDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *l
 
 void DirectDriver::SetMode(const display_mode &mode)
 {
+	STRACE(("DirectDriver::SetMode(%u x %u)\n",mode.virtual_width,mode.virtual_height));
 	Lock();
 	
 	// Supports all modes all modes >= 640x480 and < supported resolutions in 
@@ -333,13 +388,20 @@ void DirectDriver::SetMode(const display_mode &mode)
 	framebuffer=new BBitmap(BRect(0,0,mode.virtual_width-1, mode.virtual_height-1),(color_space)mode.space,true);
 	drawview=new BView(framebuffer->Bounds(),"drawview",0,0);
 	framebuffer->AddChild(drawview);
-
+	
 	screenwin=new DDWindow(mode.virtual_width, mode.virtual_height,(color_space)mode.space,this);
+	while(find_thread("drawing_thread")==B_NAME_NOT_FOUND)
+	{
+		STRACE(("\tSetMode::Waiting for the drawing thread to spawn\n"));
+		snooze(100);
+	}
+	
 	Unlock();
 }
 
 bool DirectDriver::DumpToFile(const char *path)
 {
+	STRACE(("DirectDriver::DumpToFile\n"));
 	Lock();
 	SaveToPNG(path,framebuffer->Bounds(),framebuffer->ColorSpace(), 
 			framebuffer->Bits(),framebuffer->BitsLength(),framebuffer->BytesPerRow());
@@ -350,24 +412,30 @@ bool DirectDriver::DumpToFile(const char *path)
 
 status_t DirectDriver::SetDPMSMode(const uint32 &state)
 {
+	STRACE(("DirectDriver::SetDPMSMode\n"));
+	
 	// This is a hack, but should do enough to be ok for our purposes
 	return BScreen().SetDPMS(state);
 }
 
 uint32 DirectDriver::DPMSMode(void) const
 {
+	STRACE(("DirectDriver::DPMSMode\n"));
 	// This is a hack, but should do enough to be ok for our purposes
 	return BScreen().DPMSState();
 }
 
 uint32 DirectDriver::DPMSCapabilities(void) const
 {
+	STRACE(("DirectDriver::DPMSCapabilities\n"));
+	
 	// This is a hack, but should do enough to be ok for our purposes
 	return BScreen().DPMSCapabilites();
 }
 
 status_t DirectDriver::GetDeviceInfo(accelerant_device_info *info)
 {
+	STRACE(("DirectDriver::GetDeviceInfo\n"));
 	if(!info)
 		return B_ERROR;
 	
@@ -380,6 +448,7 @@ status_t DirectDriver::GetDeviceInfo(accelerant_device_info *info)
 
 status_t DirectDriver::GetModeList(display_mode **mode_list, uint32 *count)
 {
+	STRACE(("DirectDriver::GetModeList\n"));
 	if(!mode_list || !count)
 		return B_ERROR;
 	
@@ -392,6 +461,7 @@ status_t DirectDriver::GetModeList(display_mode **mode_list, uint32 *count)
 
 status_t DirectDriver::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
 {
+	STRACE(("DirectDriver::GetPixelClockLimits\n"));
 	if(!mode || !low || !high)
 		return B_ERROR;
 	
@@ -404,6 +474,7 @@ status_t DirectDriver::GetPixelClockLimits(display_mode *mode, uint32 *low, uint
 
 status_t DirectDriver::GetTimingConstraints(display_timing_constraints *dtc)
 {
+	STRACE(("DirectDriver::GetTimingConstraints\n"));
 	if(!dtc)
 		return B_ERROR;
 	
@@ -416,6 +487,7 @@ status_t DirectDriver::GetTimingConstraints(display_timing_constraints *dtc)
 
 status_t DirectDriver::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
 {
+	STRACE(("DirectDriver::ProposeMode UNIMPLEMENTED\n"));
 	// This could get sticky here. Theoretically, we should support the subset of modes
 	// which the hardware can display and is not fullscreen unless the mode is 640x480 and
 	// the current screen mode is also 640x480.
@@ -427,12 +499,14 @@ status_t DirectDriver::ProposeMode(display_mode *candidate, const display_mode *
 
 status_t DirectDriver::WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT)
 {
+	STRACE(("DirectDriver::WaitForRetrace\n"));
 	// There shouldn't be a need for a Lock call on this one...
 	return BScreen().WaitForRetrace(timeout);
 }
 
 void DirectDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 {
+	STRACE(("DirectDriver::FillSolidRect\n"));
 	Lock();
 	framebuffer->Lock();
 	drawview->SetHighColor(color.GetColor32());
@@ -445,6 +519,7 @@ void DirectDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 
 void DirectDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 {
+	STRACE(("DirectDriver::FillPatternRect\n"));
 	if(!d)
 		return;
 	
@@ -461,6 +536,7 @@ void DirectDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 
 void DirectDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
 {
+	STRACE(("DirectDriver::StrokeSolidRect\n"));
 	Lock();
 	framebuffer->Lock();
 	drawview->SetHighColor(color.GetColor32());
@@ -473,6 +549,7 @@ void DirectDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
 
 void DirectDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color)
 {
+	STRACE(("DirectDriver::StrokeSolidLine\n"));
 	Lock();
 	framebuffer->Lock();
 	drawview->SetHighColor(color.GetColor32());
@@ -485,6 +562,7 @@ void DirectDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const
 
 void DirectDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
 {
+	STRACE(("DirectDriver::StrokePatternLine\n"));
 	if(!d)
 		return;
 	
@@ -501,9 +579,13 @@ void DirectDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, con
 
 void DirectDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source,const BRect &dest, const DrawData *d)
 {
-	if(!bitmap || !d)
+	if(!bitmap)
 	{
-		printf("CopyBitmap returned - not init or NULL bitmap\n");
+		STRACE(("DirectDriver::CopyBitmap returned - NULL bitmap\n"));
+}
+	if(!d)
+	{
+		STRACE(("DirectDriver::CopyBitmap returned - NULL DrawData\n"));
 		return;
 	}
 	
@@ -531,6 +613,7 @@ void DirectDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source,const BR
 
 void DirectDriver::SetDrawData(const DrawData *d, bool set_font_data)
 {
+	STRACE(("DirectDriver::SetDrawData\n"));
 	if(!d)
 		return;
 
@@ -570,6 +653,7 @@ void DirectDriver::SetDrawData(const DrawData *d, bool set_font_data)
 
 void DirectDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 {
+	STRACE(("DirectDriver::CopyToBitmap\n"));
 	if(!destbmp)
 	{
 		printf("CopyToBitmap returned - not init or NULL bitmap\n");
@@ -657,6 +741,7 @@ void DirectDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 
 void DirectDriver::ConstrainClippingRegion(BRegion *reg)
 {
+	STRACE(("DirectDriver::ConstrainClippingRegion\n"));
 	Lock();
 	framebuffer->Lock();
 
@@ -783,10 +868,10 @@ DDView::DDView(BRect bounds)
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
 #ifdef ENABLE_INPUT_SERVER_EMULATION
-	port_id		serverInputPort = create_port(200, SERVER_INPUT_PORT);
-	if (serverInputPort == B_NO_MORE_PORTS)
+	port_id serverInputPort = find_port(SERVER_INPUT_PORT);
+	if (serverInputPort<0)
 	{
-		debugger("ViewDriver: out of ports\n");
+		debugger("DirectDriver:DDView couldn't find input port\n");
 		return;
 	}
 	serverlink.SetSendPort(serverInputPort);
@@ -800,6 +885,7 @@ DDView::DDView(BRect bounds)
 
 void DDView::MouseDown(BPoint pt)
 {
+#ifdef ENABLE_INPUT_SERVER_EMULATION
 	// Attach data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
@@ -807,17 +893,16 @@ void DDView::MouseDown(BPoint pt)
 	// 4) int32 - modifier keys down
 	// 5) int32 - buttons down
 	// 6) int32 - clicks
-#ifdef ENABLE_INPUT_SERVER_EMULATION
-	BPoint p;
-
-	uint32 buttons,
-		mod=modifiers(),
-		clicks=1;		// can't get the # of clicks without a *lot* of extra work :(
-
+	
+	uint32 buttons,	mod, clicks=1;
 	int64 time=(int64)real_time_clock();
-
-	GetMouse(&p,&buttons);
-
+	
+	BMessage *msg=Window()->CurrentMessage();
+	msg->FindPoint("where",&pt);
+	msg->FindInt32("modifiers",(int32*)&mod);	
+	msg->FindInt32("buttons",(int32*)&buttons);
+	msg->FindInt32("clicks",(int32*)&clicks);
+	
 	serverlink.StartMessage(B_MOUSE_DOWN);
 	serverlink.Attach(&time, sizeof(int64));
 	serverlink.Attach(&pt.x,sizeof(float));
@@ -831,12 +916,12 @@ void DDView::MouseDown(BPoint pt)
 
 void DDView::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
+#ifdef ENABLE_INPUT_SERVER_EMULATION
 	// Attach data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
 	// 3) float - y coordinate of mouse click
 	// 4) int32 - buttons down
-#ifdef ENABLE_INPUT_SERVER_EMULATION
 	BPoint p;
 	uint32 buttons;
 	int64 time=(int64)real_time_clock();
@@ -853,12 +938,12 @@ void DDView::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 
 void DDView::MouseUp(BPoint pt)
 {
+#ifdef ENABLE_INPUT_SERVER_EMULATION
 	// Attach data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
 	// 3) float - y coordinate of mouse click
 	// 4) int32 - modifier keys down
-#ifdef ENABLE_INPUT_SERVER_EMULATION
 	BPoint p;
 
 	uint32 buttons,
@@ -903,7 +988,7 @@ void DDView::MessageReceived(BMessage *msg)
 }
 
 DDWindow::DDWindow(uint16 width, uint16 height, color_space space, DirectDriver *owner)
-: BDirectWindow(BRect(0,0,width-1,height-1), "Haiku, Inc. App Server",B_TITLED_WINDOW,
+: BDirectWindow(BRect(0,0,width-1,height-1), "Haiku App Server",B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_MOVABLE)
 {
 	AddChild(new DDView(Bounds()));
@@ -929,7 +1014,6 @@ DDWindow::DDWindow(uint16 width, uint16 height, color_space space, DirectDriver 
 		screensize.bottom=(int32)sframe.bottom;
 		
 		MoveTo( (int32)(sframe.Width()-width)/2, (int32)(sframe.Height()-height)/2 );
-		
 	}
 	else
 	{
@@ -1001,17 +1085,57 @@ bool DDWindow::QuitRequested(void)
 {
 	port_id serverport=find_port(SERVER_PORT_NAME);
 
-	if(serverport!=B_NAME_NOT_FOUND)
-		write_port(serverport,B_QUIT_REQUESTED,NULL,0);
+	if(serverport>=0)
+	{
+		BPortLink link(serverport);
+		link.StartMessage(B_QUIT_REQUESTED);
+		link.Flush();
+	}
+	else
+		printf("ERROR: couldn't find the app_server's main port!");
 	
 	return true;
 }
 
+void DDWindow::WindowActivated(bool active)
+{
+	// This is just to hide the regular system cursor so we can see our own
+
+	if(active)
+		be_app->HideCursor();
+	else
+		be_app->ShowCursor();
+}
+
 int32 DDWindow::DrawingThread(void *data)
 {
+	ATRACE(("DrawingThread started\n"));
+	
 	DDWindow *w;
 	w=(DDWindow *)data;
-
+	
+	bool wait_for_good_mode=true;
+	while(wait_for_good_mode)
+	{
+		switch(w->fFormat)
+		{
+			case B_RGB32:
+			case B_RGBA32:
+			case B_RGB32_BIG:
+			case B_RGBA32_BIG:
+			case B_GRAY8:
+			case B_CMAP8:
+			{
+				DTRACE(("\tFound a good mode. Exiting wait loop\n"));
+				wait_for_good_mode=false;
+				break;
+			}
+			default:
+				DTRACE(("\tWaiting for a good mode\n"));
+				break;
+		}
+	}
+			
 	switch(w->fFormat)
 	{
 		case B_RGB32:
@@ -1019,21 +1143,27 @@ int32 DDWindow::DrawingThread(void *data)
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
 		{
+			DTRACE(("\tEntering while loop\n"));
 			while(!w->fConnectionDisabled)
 			{
+				DTRACE(("\tacquiring window lock\n"));
 				w->locker.Lock();
 				if(w->fConnected)
 				{
+					DTRACE(("\tcheck to see if window is dirty\n"));
 					if(w->fDirty)
 					{
+						DTRACE(("\twindow is dirty\n"));
 						int32 y,bytes_to_copy,height;
 						uint8 *srcbits, *destbits;
 						clipping_rect *clip;
 						uint32 i;
 						int32 winleft=(int32)w->Frame().left,wintop=(int32)w->Frame().top;
 						
+						DTRACE(("\tClipping rectangles to copy: %lu\n",w->fNumClipRects)); 
 						for(i=0; i<w->fNumClipRects; i++)
 						{
+							DTRACE(("\tcopying clipping rectangle %lu\n",i)); 
 							clip=&(w->fClipList[i]);
 							bytes_to_copy=((clip->right-clip->left)+1)<<2;
 							height=(clip->bottom-clip->top)+1;
@@ -1056,12 +1186,18 @@ int32 DDWindow::DrawingThread(void *data)
 						}
 						w->fDirty=false;
 					}
+					else
+						DTRACE(("\tWindow is not dirty\n"));
 
 					if(!w->fConnected)
+					{
+						DTRACE(("\twindow is no longer connected. Exiting draw case\n"));
 						break;
+					}
 
 					// This will be true if the driver has changed the contents of
 					// the framebuffer bitmap
+					DTRACE(("\tFramebuffer bitmap has %ld invalid regions\n",w->rectpipe.CountRects()));
 					while(w->rectpipe.HasRects())
 					{
 						clipping_rect rect;
@@ -1069,26 +1205,29 @@ int32 DDWindow::DrawingThread(void *data)
 						uint8 *srcbits, *destbits;
 						
 						w->rectpipe.GetRect(&rect);
+						
 						bytes_to_copy=((rect.right-rect.left)+1)<<2;
 						height=(rect.bottom-rect.top)+1;
 						
-						destbits=w->fBits+ (rect.top*w->fRowBytes)+
-												(rect.left<<2);
+						destbits=w->fBits+ ( (rect.top+(int32)w->Frame().top)*w->fRowBytes)+
+												( (rect.left+(int32)w->Frame().left)<<2);
 
 						srcbits=(uint8*)w->framebuffer->Bits()+
 								(rect.top*w->framebuffer->BytesPerRow())+
 								(rect.left<<2);
 						y=0;
-
+						
+						DTRACE(("Copying data from bitmap to screen\n"));
 						while(y<height)
 						{
-//							memcpy(destbits, srcbits,bytes_to_copy);
+							memcpy(destbits, srcbits,bytes_to_copy);
 							y++;
 							destbits+=w->fRowBytes;
 							srcbits+=w->framebuffer->BytesPerRow();
 						}
 					}
 				}
+				DTRACE(("\tReleasing window lock\n"));
 				w->locker.Unlock();
 				snooze(16000);
 			}

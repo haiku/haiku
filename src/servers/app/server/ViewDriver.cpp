@@ -178,12 +178,12 @@ void VDView::MouseDown(BPoint pt)
 
 void VDView::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
+#ifdef ENABLE_INPUT_SERVER_EMULATION
 	// Attach data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
 	// 3) float - y coordinate of mouse click
 	// 4) int32 - buttons down
-#ifdef ENABLE_INPUT_SERVER_EMULATION
 	BPoint p;
 	uint32 buttons;
 	int64 time=(int64)real_time_clock();
@@ -200,12 +200,12 @@ void VDView::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 
 void VDView::MouseUp(BPoint pt)
 {
+#ifdef ENABLE_INPUT_SERVER_EMULATION
 	// Attach data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
 	// 3) float - y coordinate of mouse click
 	// 4) int32 - modifier keys down
-#ifdef ENABLE_INPUT_SERVER_EMULATION
 	BPoint p;
 
 	uint32 buttons,

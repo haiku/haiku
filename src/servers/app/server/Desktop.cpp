@@ -74,55 +74,41 @@ Desktop::~Desktop(void)
 
 void Desktop::Init(void)
 {
-	DisplayDriver	*driver = NULL;
-	int32 driverCount = 0;
-	bool initDrivers = true;
-
-	while(initDrivers)
+	DisplayDriver *driver=NULL;
+	
+	switch(DISPLAYDRIVER)
 	{
-
-		if(DISPLAYDRIVER == HWDRIVER)
+		case HWDRIVER:
 		{
 			// If we're using the AccelerantDriver for rendering, eventually we will loop through
 			// drivers until one can't initialize in order to support multiple monitors. For now,
 			// we'll just load one and be done with it.
-			driver = new AccelerantDriver();
+			
+			bool initDrivers = true;
+			while(initDrivers)
+			{
+				driver = new AccelerantDriver();
+				AddDriver(driver);
+			}
 		}
-		else if(DISPLAYDRIVER == DIRECTDRIVER)
+		case DIRECTDRIVER:
 		{
-			// Eventually, it would be nice to do away with ViewDriver and replace it with
-			// one which uses a double-buffered BDirectWindow as a rendering context
+			// It would be nice to have this for the default testing driver. Someday....
 			driver = new DirectDriver();
+			AddDriver(driver);
+			break;
 		}
-		else
+		default:
 		{
-			// Eventually, it would be nice to do away with ViewDriver and replace it with
-			// one which uses a double-buffered BDirectWindow as a rendering context
+			// It would be nice to not ever need this again....
 			driver = new ViewDriver();
-		}
-
-		if(driver->Initialize())
-		{
-			driverCount++;
-
-			Screen		*sc = new Screen(driver, BPoint(640, 480), B_RGB32, driverCount);
-
-			// TODO: be careful, of screen initialization - monitor may not support 640x480
-			fScreenList.AddItem(sc);
-
-			if ( (DISPLAYDRIVER != HWDRIVER) && (driverCount == 1) )
-				initDrivers	= false;
-		}
-		else
-		{
-			driver->Shutdown();
-			delete	driver;
-			driver	= NULL;
-			initDrivers	= false;
+			AddDriver(driver);
+			break;
 		}
 	}
 
-	if (driverCount < 1){
+	if(fScreenList.CountItems()<1)
+	{
 		delete this;
 		return;
 	}
@@ -130,6 +116,21 @@ void Desktop::Init(void)
 	InitMode();
 
 	SetActiveRootLayerByIndex(0);
+}
+
+void Desktop::AddDriver(DisplayDriver *driver)
+{
+	if(driver->Initialize())
+	{
+		// TODO: be careful of screen initialization - monitor may not support 640x480
+		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB32, fScreenList.CountItems()+1);
+		fScreenList.AddItem(sc);
+	}
+	else
+	{
+		driver->Shutdown();
+		delete driver;
+	}
 }
 
 void Desktop::InitMode(void)

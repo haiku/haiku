@@ -49,10 +49,10 @@
 #include "DisplayDriver.h"
 #include "ServerProtocol.h"
 
-//#define DEBUG_ROOTLAYER
+#define DEBUG_ROOTLAYER
 
 #ifdef DEBUG_ROOTLAYER
-	#define STRACE(a) printf(a)
+	#define STRACE(a) printf a
 #else
 	#define STRACE(a) /* nothing */
 #endif
@@ -93,7 +93,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fListenPort = find_port(SERVER_INPUT_PORT);
 	if (fListenPort == B_NAME_NOT_FOUND)
 		return;
-
+	
 	// Spawn our working thread
 	fThreadID = spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
 }
@@ -142,9 +142,10 @@ int32 RootLayer::WorkingThread(void *data)
 	oneRootLayer->invalidate_layer(oneRootLayer, oneRootLayer->Bounds());
 	oneRootLayer->Unlock();
 	
+	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->GetName(), oneRootLayer->fListenPort));
 	for(;;)
 	{
-		STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->GetName(), oneRootLayer->fListenPort));
+printf("Getting a message from the queue\n");
 		err = messageQueue.GetNextReply(&code);
 
 		oneRootLayer->Lock();
@@ -162,8 +163,8 @@ int32 RootLayer::WorkingThread(void *data)
 			// them onto the window which is currently under the cursor.
 			case B_MOUSE_DOWN:
 			case B_MOUSE_UP:
-			case B_MOUSE_WHEEL_CHANGED:
 			case B_MOUSE_MOVED:
+			case B_MOUSE_WHEEL_CHANGED:
 				oneRootLayer->MouseEventHandler(code, messageQueue);
 				break;
 
@@ -232,7 +233,7 @@ int32 RootLayer::WorkingThread(void *data)
 				break;
 			}
 			default:
-				STRACE(("RootLayer(%s)::WorkingThread received unexpected code %lx\n",oneRootLayer->GetName(), oneRootLayer->code));
+				STRACE(("RootLayer(%s)::WorkingThread received unexpected code %lx\n",oneRootLayer->GetName(), code));
 				break;
 		}
 
@@ -268,6 +269,7 @@ status_t RootLayer::EnqueueMessage(BPortLink &message)
 {
 	message.SetSendPort(fListenPort);
 	message.Flush();
+	return B_OK;
 }
 
 void RootLayer::GoRedraw(const Layer *layer, const BRegion &region)

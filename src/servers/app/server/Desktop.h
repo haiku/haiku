@@ -94,6 +94,8 @@ public:
 	BList fWinBorderList;
 	
 private:
+	void AddDriver(DisplayDriver *driver);
+	
 	BList fRootLayerList;
 	RootLayer *fActiveRootLayer;
 

@@ -58,6 +58,7 @@ public:
 	void PutRect(const clipping_rect &rect);
 	bool GetRect(clipping_rect *rect);
 	bool HasRects(void);
+	int32 CountRects(void) const { return list.CountItems(); }
 protected:
 	BList list;
 	BLocker lock;
@@ -84,6 +85,7 @@ public:
 
 	virtual bool QuitRequested(void);
 	virtual void DirectConnected(direct_buffer_info *info);
+	virtual void WindowActivated(bool active);
 	static int32 DrawingThread(void *data);
 	
 	uint8 *fBits;
