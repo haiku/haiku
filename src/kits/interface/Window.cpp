@@ -928,9 +928,10 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindRect("_rect", &updateRect);
 			msg->FindInt32("_token",&token);
 			
-			view=findView(top_view,token);
-			if(view)
-				DoUpdate(top_view, updateRect);
+			fLink->StartMessage(AS_BEGIN_UPDATE);
+			DoUpdate(top_view, updateRect);
+			fLink->StartMessage(AS_END_UPDATE);
+			fLink->Flush();
 			break;
 		}
 		case B_VIEW_MOVED:
@@ -3162,7 +3163,6 @@ void BWindow::DoUpdate(BView* aView, BRect& area)
  		area.left, area.top, area.right, area.bottom));
  
  	aView->check_lock();
- 	fLink->StartMessage(AS_BEGIN_UPDATE);
  			
  	if (aView->Flags() & B_WILL_DRAW)
  		aView->Draw( area );
@@ -3174,9 +3174,6 @@ void BWindow::DoUpdate(BView* aView, BRect& area)
  		aView->SetHighColor(c);
  	}
  
- 	aView->check_lock();
- 	fLink->StartMessage(AS_END_UPDATE);
-	
 	BView *child;
 	if ( (child = aView->first_child) )
 	{
@@ -3192,7 +3189,6 @@ void BWindow::DoUpdate(BView* aView, BRect& area)
 			child 		= child->next_sibling; 
 		}
 	}
-	fLink->Flush();
 }
 
 //------------------------------------------------------------------------------
