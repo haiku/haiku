@@ -58,6 +58,7 @@ KernelLd kernel :
 	kernel_device_manager.o
 	kernel_disk_device_manager.o
 	kernel_util.o
+	kernel_messaging.o
 
 	lib$(OBOS_ARCH).a
 	libdrivers.a
@@ -83,6 +84,7 @@ KernelLd kernel.so :
 	kernel_device_manager.o
 	kernel_disk_device_manager.o
 	kernel_util.o
+	kernel_messaging.o
 
 	lib$(OBOS_ARCH).a
 	libdrivers.a
