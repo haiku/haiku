@@ -28,6 +28,7 @@
 #include <bus.h>
 #include <kmodule.h>
 #include <int.h>
+#include <real_time_clock.h>
 #include <kernel_daemon.h>
 
 #include <string.h>
@@ -83,6 +84,7 @@ _start(kernel_args *oldka, int cpu_num)
 
 		faults_init(&ka);
 		smp_init(&ka);
+		rtc_init(&ka);
 		timer_init(&ka);
 
 		arch_cpu_init2(&ka);

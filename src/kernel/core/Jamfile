@@ -20,7 +20,8 @@ KernelMergeObject kernel_core.o :
 	<$(SOURCE_GRIST)>module.c 
 #	<$(SOURCE_GRIST)>pools.c 
 	<$(SOURCE_GRIST)>port.c 
-	<$(SOURCE_GRIST)>queue.c 
+	<$(SOURCE_GRIST)>queue.c
+	<$(SOURCE_GRIST)>real_time_clock.c
 	<$(SOURCE_GRIST)>scheduler.c 
 	<$(SOURCE_GRIST)>sem.c
 	<$(SOURCE_GRIST)>signal.c
