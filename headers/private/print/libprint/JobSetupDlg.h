@@ -21,6 +21,7 @@ class JobData;
 class PrinterData;
 class PrinterCap;
 class HalftoneView;
+class PagesView;
 
 class JobSetupView : public BView {
 public:
@@ -51,6 +52,7 @@ private:
 	BRadioButton     *fAll;
 	BCheckBox        *fCollate;
 	BCheckBox        *fReverse;
+	PagesView        *fPages;
 	BPopUpMenu       *fPaperFeed;
 	BCheckBox        *fDuplex;
 	BPopUpMenu       *fNup;
