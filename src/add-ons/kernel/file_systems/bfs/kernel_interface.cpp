@@ -683,7 +683,7 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 
 	bfs_inode &node = inode->Node();
 
-	if (mask & FS_WRITE_STAT_SIZE) {
+	if (mask & B_STAT_SIZE) {
 		// Since WSTAT_SIZE is the only thing that can fail directly, we
 		// do it first, so that the inode state will still be consistent
 		// with the on-disk version
@@ -702,23 +702,23 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 				Index index(volume);
 				index.UpdateSize(transaction, inode);
 
-				if ((mask & FS_WRITE_STAT_MTIME) == 0)
+				if ((mask & B_STAT_MODIFICATION_TIME) == 0)
 					index.UpdateLastModified(transaction, inode);
 			}
 		}
 	}
 
-	if (mask & FS_WRITE_STAT_MODE) {
+	if (mask & B_STAT_MODE) {
 		PRINT(("original mode = %ld, stat->st_mode = %d\n", node.Mode(), stat->st_mode));
 		node.mode = HOST_ENDIAN_TO_BFS_INT32(node.Mode() & ~S_IUMSK | stat->st_mode & S_IUMSK);
 	}
 
-	if (mask & FS_WRITE_STAT_UID)
+	if (mask & B_STAT_UID)
 		node.uid = HOST_ENDIAN_TO_BFS_INT32(stat->st_uid);
-	if (mask & FS_WRITE_STAT_GID)
+	if (mask & B_STAT_GID)
 		node.gid = HOST_ENDIAN_TO_BFS_INT32(stat->st_gid);
 
-	if (mask & FS_WRITE_STAT_MTIME) {
+	if (mask & B_STAT_MODIFICATION_TIME) {
 		if (!inode->IsDeleted()) {
 			// Index::UpdateLastModified() will set the new time in the inode
 			Index index(volume);
@@ -726,14 +726,14 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 				(bigtime_t)stat->st_mtime << INODE_TIME_SHIFT);
 		}
 	}
-	if (mask & FS_WRITE_STAT_CRTIME) {
+	if (mask & B_STAT_CREATION_TIME) {
 		node.create_time = HOST_ENDIAN_TO_BFS_INT64((bigtime_t)stat->st_crtime << INODE_TIME_SHIFT);
 	}
 
 	if ((status = inode->WriteBack(transaction)) == B_OK)
 		transaction.Done();
 
-	notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
+	notify_stat_changed(volume->ID(), inode->ID(), mask);
 
 	return status;
 }
@@ -780,7 +780,7 @@ bfs_create(void *_ns, void *_directory, const char *name, int openMode, int mode
 		// register the cookie
 		*_cookie = cookie;
 
-		notify_listener(B_ENTRY_CREATED, volume->ID(), directory->ID(), 0, *vnodeID, name);
+		notify_entry_created(volume->ID(), directory->ID(), name, *vnodeID);
 	} else
 		free(cookie);
 
@@ -839,7 +839,7 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *pa
 	if (status == B_OK) {
 		transaction.Done();
 
-		notify_listener(B_ENTRY_CREATED, volume->ID(), directory->ID(), 0, id, name);
+		notify_entry_created(volume->ID(), directory->ID(), name, id);
 	}
 
 	return status;
@@ -883,7 +883,7 @@ bfs_unlink(void *_ns, void *_directory, const char *name)
 	if ((status = directory->Remove(transaction, name, &id)) == B_OK) {
 		transaction.Done();
 
-		notify_listener(B_ENTRY_REMOVED, volume->ID(), directory->ID(), 0, id, NULL);
+		notify_entry_removed(volume->ID(), directory->ID(), name, id);
 	}
 	return status;
 }
@@ -986,7 +986,7 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 		if (status < B_OK)
 			return status;
 
-		notify_listener(B_ENTRY_REMOVED, volume->ID(), newDirectory->ID(), 0, clobber, NULL);
+		notify_entry_removed(volume->ID(), newDirectory->ID(), newName, clobber);
 
 		status = newTree->Insert(transaction, (const uint8 *)newName, strlen(newName), id);
 	}
@@ -1027,8 +1027,8 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			if (status == B_OK) {
 				transaction.Done();
 
-				notify_listener(B_ENTRY_MOVED, volume->ID(), oldDirectory->ID(),
-					newDirectory->ID(), id, newName);
+				notify_entry_moved(volume->ID(), oldDirectory->ID(), oldName,
+					newDirectory->ID(), newName, id);
 				return B_OK;
 			}
 			// If we get here, something has gone wrong already!
@@ -1188,7 +1188,8 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 		// ToDo: should we better test for a change in the last_modified time only?
 		if (!inode->IsDeleted() && cookie->last_size != inode->Size()
 			&& system_time() > cookie->last_notification + INODE_NOTIFICATION_INTERVAL) {
-			notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
+			notify_stat_changed(volume->ID(), inode->ID(),
+				B_STAT_MODIFICATION_TIME | B_STAT_SIZE);
 			cookie->last_size = inode->Size();
 			cookie->last_notification = system_time();
 		}
@@ -1243,7 +1244,7 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 
 		Transaction transaction(volume, inode->BlockNumber());
 		status_t status = B_OK;
-		bool changed = false;
+		bool changedSize = false, changedTime = false;
 		Index index(volume);
 
 		if (needsTrimming) {
@@ -1253,11 +1254,11 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		}
 		if (needsTrimming || inode->OldSize() != inode->Size()) {
 			index.UpdateSize(transaction, inode);
-			changed = true;
+			changedSize = true;
 		}
 		if (inode->OldLastModified() != inode->LastModified()) {
 			index.UpdateLastModified(transaction, inode, inode->LastModified());
-			changed = true;
+			changedTime = true;
 
 			// updating the index doesn't write back the inode
 			inode->WriteBack(transaction);
@@ -1266,8 +1267,10 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		if (status == B_OK)
 			transaction.Done();
 
-		if (changed)
-			notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
+		if (changedSize || changedTime) {
+			notify_stat_changed(volume->ID(), inode->ID(),
+				(changedTime ? B_STAT_MODIFICATION_TIME : 0) | (changedSize ? B_STAT_SIZE : 0));
+		}
 	}
 
 	if (inode->Flags() & INODE_CHKBFS_RUNNING) {
@@ -1368,7 +1371,7 @@ bfs_create_dir(void *_ns, void *_directory, const char *name, int mode, vnode_id
 		put_vnode(volume->ID(), id);
 		transaction.Done();
 
-		notify_listener(B_ENTRY_CREATED, volume->ID(), directory->ID(), 0, id, name);
+		notify_entry_created(volume->ID(), directory->ID(), name, id);
 	}
 
 	return status;
@@ -1396,7 +1399,7 @@ bfs_remove_dir(void *_ns, void *_directory, const char *name)
 	if (status == B_OK) {
 		transaction.Done();
 
-		notify_listener(B_ENTRY_REMOVED, volume->ID(), directory->ID(), 0, id, NULL);
+		notify_entry_removed(volume->ID(), directory->ID(), name, id);
 	}
 
 	return status;
@@ -1666,7 +1669,9 @@ bfs_write_attr(fs_volume _fs, fs_vnode _file, fs_cookie _cookie, off_t pos,
 	if (status == B_OK) {
 		transaction.Done();
 
-		notify_listener(B_ATTR_CHANGED, volume->ID(), 0, 0, inode->ID(), cookie->name);
+		notify_attribute_changed(volume->ID(), inode->ID(), cookie->name, B_ATTR_CHANGED);
+			// ToDo: B_ATTR_CREATED is not yet taken into account
+			// (we don't know what Attribute::Write() does exactly)
 	}
 
 	return status;
@@ -1731,7 +1736,7 @@ bfs_remove_attr(fs_volume _fs, fs_vnode _node, const char *name)
 	if (status == B_OK) {
 		transaction.Done();
 
-		notify_listener(B_ATTR_CHANGED, volume->ID(), 0, 0, inode->ID(), name);
+		notify_attribute_changed(volume->ID(), inode->ID(), name, B_ATTR_REMOVED);
 	}
 
 	RETURN_ERROR(status);
