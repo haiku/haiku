@@ -305,7 +305,7 @@ rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 	}
 
 	// create the root vnode
-	vnode = rootfs_create_vnode(fs, "", STREAM_TYPE_DIR);
+	vnode = rootfs_create_vnode(fs, ".", STREAM_TYPE_DIR);
 	if (vnode == NULL) {
 		err = B_NO_MEMORY;
 		goto err3;
