@@ -409,9 +409,14 @@ BDirectory::FindEntry(const char *path, BEntry *entry, bool traverse) const
 	at any level contain the entry referred to by the supplied path name.
 	Only entries that match the node flavor specified by \a nodeFlags are
 	considered.
-	If the BDirectory is not properly initialized, the method returns \c true,
-	if the entry exists and its kind does match. A non-absolute path is
-	considered relative to the current directory.
+	If the BDirectory is not properly initialized, the method returns \c false.
+	A non-absolute path is considered relative to the current directory.
+
+	\note R5's implementation always returns \c true given an absolute path or 
+	an unitialized directory. This implementation is not compatible with that
+	behavior. Instead it converts the path into a BEntry and passes it to the
+	other version of Contains().
+
 	\param path the entry's path name. May be relative to this directory or
 		   absolute.
 	\param nodeFlags Any of the following:
@@ -421,26 +426,25 @@ BDirectory::FindEntry(const char *path, BEntry *entry, bool traverse) const
 		   - \c B_ANY_NODE: The entry may be of any kind.
 	\return
 	- \c true, if the entry exists, its kind does match \nodeFlags and the
-	  BDirectory is either not properly initialized or it does contain the
-	  entry at any level,
+	  BDirectory is properly initialized and does contain the entry at any
+	  level,
 	- \c false, otherwise
 */
 bool
 BDirectory::Contains(const char *path, int32 nodeFlags) const
 {
-	bool result = true;
-	if (path) {
-		BEntry entry;
-		if (InitCheck() == B_OK && !BPrivate::Storage::is_absolute_path(path))
-			entry.SetTo(this, path);
-		else
-			entry.SetTo(path);
-		result = Contains(&entry, nodeFlags);
-	} else {
-		// R5 behavior
-		result = (InitCheck() == B_OK);
-	}
-	return result;
+	// check initialization and parameters
+	if (InitCheck() != B_OK)
+		return false;
+	if (!path)
+		return true;	// mimic R5 behavior
+	// turn the path into a BEntry and let the other version do the work
+	BEntry entry;
+	if (BPrivate::Storage::is_absolute_path(path))
+		entry.SetTo(path);
+	else
+		entry.SetTo(this, path);
+	return Contains(&entry, nodeFlags);
 }
 
 // Contains

@@ -807,10 +807,14 @@ DirectoryTest::ContainsTest()
 	CPPUNIT_ASSERT( dir.Contains(existingSub) == true );
 	dir.Unset();
 	// existing entry, uninitialized BDirectory
-	// R5 returns true!
 	NextSubTest();
 	CPPUNIT_ASSERT( dir.InitCheck() == B_NO_INIT );
+// R5 returns true!
+#if TEST_R5
 	CPPUNIT_ASSERT( dir.Contains(existing) == true );
+#else
+	CPPUNIT_ASSERT( dir.Contains(existing) == false );
+#endif
 	dir.Unset();
 	// non-existing entry, uninitialized BDirectory
 	NextSubTest();
@@ -821,7 +825,12 @@ DirectoryTest::ContainsTest()
 	NextSubTest();
 	CPPUNIT_ASSERT( dir.SetTo(nonExisting) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( dir.InitCheck() == B_ENTRY_NOT_FOUND );
+// R5 returns true!
+#if TEST_R5
 	CPPUNIT_ASSERT( dir.Contains(existing) == true );
+#else
+	CPPUNIT_ASSERT( dir.Contains(existing) == false );
+#endif
 	dir.Unset();
 	// non-existing entry, badly initialized BDirectory
 	NextSubTest();
