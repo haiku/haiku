@@ -1,6 +1,7 @@
 INTERFACE_KIT_SOURCE =
 	Alert.cpp
 	Bitmap.cpp
+	BMCPrivate.cpp
 	Box.cpp
 	Button.cpp
 	CheckBox.cpp
@@ -11,12 +12,17 @@ INTERFACE_KIT_SOURCE =
 	Font.cpp
 	Globals.cpp
 	Input.cpp
+	Menu.cpp
+	MenuBar.cpp
+	MenuField.cpp
+	MenuItem.cpp
 	OptionControl.cpp
 	OptionPopUp.cpp
 	Picture.cpp
 	PictureButton.cpp
 	Point.cpp
 	Polygon.cpp
+	PopUpMenu.cpp
 	PrivateScreen.cpp
 	RadioButton.cpp
 	Rect.cpp
@@ -25,6 +31,7 @@ INTERFACE_KIT_SOURCE =
 	Screen.cpp
 	ScrollBar.cpp
 	ScrollView.cpp
+	Shape.cpp
 	StatusBar.cpp
 	StringView.cpp
 	TextControl.cpp
