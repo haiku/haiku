@@ -428,6 +428,8 @@ status_t
 OggSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
              media_header *mediaHeader)
 {
+	mediaHeader->start_time = fCurrentTime;
+	mediaHeader->file_pos = fPosition;
 	status_t result = GetPacket(&fChunkPacket);
 	if (result != B_OK) {
 		TRACE("OggSeekable::GetNextChunk failed: GetPacket = %s\n", strerror(result));
@@ -435,6 +437,8 @@ OggSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 	}
 	*chunkBuffer = &fChunkPacket;
 	*chunkSize = sizeof(fChunkPacket);
+	fCurrentFrame++;
+	fCurrentTime = (bigtime_t)((fCurrentFrame * 1000000LL) / fFrameRate);
 	return B_OK;
 }
 

@@ -266,6 +266,7 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 			TRACE("SpeexDecoder::Decode: GetNextChunk failed\n");
 			return status;
 		}
+		fStartTime = mh.start_time;
 		speex_bits_read_from(&fBits, (char*)chunkBuffer, chunkSize);
 		for (int frame = 0 ; frame < fHeader->frames_per_packet ; frame++) {
 			int ret = speex_decode(fDecoderState, &fBits, out_buffer);
@@ -293,7 +294,7 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 
 done:	
 	uint samples = ((uint8*)out_buffer - (uint8*)buffer) / fFrameSize;
-	fStartTime += (1000000LL * samples) / fHeader->rate;
+	//fStartTime += (1000000LL * samples) / fHeader->rate;
 	//TRACE("SpeexDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
 

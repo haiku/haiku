@@ -194,6 +194,7 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				TRACE("VorbisDecoder::Decode: chunk not ogg_packet-sized\n");
 				return B_ERROR;
 			}
+			fStartTime = mh.start_time;
 			ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
 			if (vorbis_synthesis(&fBlock,packet)==0) {
 				vorbis_synthesis_blockin(&fDspState,&fBlock);
@@ -226,7 +227,7 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 		// report back how many samples we consumed
 		vorbis_synthesis_read(&fDspState,samples);
 		
-		fStartTime += (1000000LL * samples) / fInfo.rate;
+		//fStartTime += (1000000LL * samples) / fInfo.rate;
 		//TRACE("VorbisDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 	}
 	

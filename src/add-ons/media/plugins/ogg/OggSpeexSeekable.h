@@ -6,6 +6,8 @@
 namespace BPrivate { namespace media {
 
 class OggSpeexSeekable : public OggSeekable {
+private:
+	typedef OggSeekable inherited;
 public:
 	static bool	IsValidHeader(const ogg_packet & packet);
 public:
