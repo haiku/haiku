@@ -108,16 +108,16 @@ Handle::GetName(char *nameBuffer, size_t bufferSize) const
 off_t 
 Handle::Size() const
 {
-	// ToDo: fix this!
-	return 1024LL * 1024 * 1024 * 1024;
-		// 1024 GB
-/*	struct stat stat;
-	if (fstat(fHandle, &stat) == B_OK)
+	struct stat stat;
+	if (fstat(fHandle, &stat) == B_OK) {
+		if (stat.st_size == 0) {
+			// ToDo: fix this!
+			return 1024LL * 1024 * 1024 * 1024;
+				// 1024 GB
+		}
 		return stat.st_size;
-
-	// stat apparently doesn't work with devices
+	}
 
 	return 0LL;
-*/
 }
 
