@@ -24,6 +24,12 @@ oggReader::oggReader()
 oggReader::~oggReader()
 {
 	TRACE("oggReader::~oggReader\n");
+	ogg_stream_map::iterator i = fStreams.begin();
+	while (i != fStreams.end()) {
+		ogg_stream_map::iterator j = i;
+		i++;
+		delete j->second;
+	}
 	ogg_sync_clear(&fSync);
 }
 
@@ -38,8 +44,7 @@ status_t
 oggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 {
 	TRACE("oggReader::GetPage\n");
-	ogg_sync_pageout(&fSync,page); // clear the buffer
-	int result = 0; 
+	int result = ogg_sync_pageout(&fSync,page); // first read leftovers
 	while (result == 0) {
 		char * buffer = ogg_sync_buffer(&fSync,read_size);
 		ssize_t bytes = Source()->Read(buffer,read_size);
@@ -76,28 +81,28 @@ oggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 			return B_ERROR;
 #endif
 		}
-		ogg_stream_state stream;
-		fStreams[serialno] = stream;
-		if (ogg_stream_init(&fStreams[serialno],serialno) != 0) {
+		ogg_stream_state * stream = new ogg_stream_state;
+		if (ogg_stream_init(stream,serialno) != 0) {
 			TRACE("oggReader::GetPage: ogg_stream_init failed?: error\n");
 			return B_ERROR;
 		}
+		fStreams[serialno] = stream;
 	} else if (ogg_page_bos(page) > 0) {
 		TRACE("oggReader::GetPage: bos packet with duplicate serialno\n");
 #ifdef STRICT_OGG
 		return B_ERROR;
 #else
-		if (ogg_stream_destroy(&fStreams[serialno]) != 0) {
+		if (ogg_stream_clear(fStreams[serialno]) != 0) {
 			TRACE("oggReader::GetPage: ogg_stream_destroy failed?: error\n");
 			return B_ERROR;
 		}
-		if (ogg_stream_init(&fStreams[serialno],serialno) != 0) {
+		if (ogg_stream_init(fStreams[serialno],serialno) != 0) {
 			TRACE("oggReader::GetPage: ogg_stream_init failed?: error\n");
 			return B_ERROR;
 		}
 #endif
 	}
-	if (ogg_stream_pagein(&fStreams[serialno],page) != 0) {
+	if (ogg_stream_pagein(fStreams[serialno],page) != 0) {
 		TRACE("oggReader::Sniff: ogg_stream_pagein: failed: error\n");
 		return B_ERROR;
 	}
@@ -137,14 +142,17 @@ oggReader::Sniff(int32 *streamCount)
 
 	while (ogg_page_bos(&page) > 0) {
 		int serialno = ogg_page_serialno(&page);
-		ogg_stream_state * stream = &fStreams[serialno];
+		ogg_stream_state * stream = fStreams[serialno];
 		ogg_packet packet;
-		fInitialHeaderPackets[serialno] = packet;
-		if (ogg_stream_packetout(stream,&fInitialHeaderPackets[serialno]) != 1) {
+		if (ogg_stream_packetout(stream,&packet) != 1) {
 #ifdef STRICT_OGG
 			return B_ERROR;
 #endif STRICT_OGG
 		}
+		unsigned char * buffer = new unsigned char[packet.bytes];
+		fInitialHeaderPackets[serialno] = packet;
+		memcpy(buffer,packet.packet,packet.bytes);
+		fInitialHeaderPackets[serialno].packet = buffer;
 		if (GetPage(&page,4096,short_page) != B_OK) {
 			return B_ERROR;
 		}
@@ -185,7 +193,7 @@ oggReader::AllocateCookie(int32 streamNumber, void **cookie)
 		streamNumber--;
 	}
 	// store the cookie
-	*cookie = (void*)(&i->second);
+	*cookie = (void*)(i->second);
 	return B_OK;
 }
 
@@ -203,13 +211,13 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 						 media_format *format, void **infoBuffer, int32 *infoSize)
 {
 	TRACE("oggReader::GetStreamInfo\n");
-	debugger("oggReader::GetStreamInfo");
 	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	memset(format, 0, sizeof(*format));
 	*frameCount = -1; // don't know
 	*duration = -1; // don't know
-	*infoBuffer = (void*)fInitialHeaderPackets[stream->serialno].packet;
-	*infoSize = (int32)fInitialHeaderPackets[stream->serialno].bytes;
+	ogg_packet * packet = &fInitialHeaderPackets[stream->serialno];
+	*infoBuffer = (void*)packet;
+	*infoSize = sizeof(ogg_packet);
 	return B_OK;
 }
 
@@ -249,13 +257,11 @@ oggReader::GetNextChunk(void *cookie,
 			}
 		} while (ogg_page_serialno(&page) != stream->serialno);
 	}
-	if (fPackets.find(stream->serialno) == fPackets.end()) {
-		ogg_packet packet;
-		fPackets[stream->serialno] = packet;
-	}
-	if (ogg_stream_packetout(stream,&fPackets[stream->serialno]) != 1) {
+	ogg_packet packet;
+	if (ogg_stream_packetout(stream,&packet) != 1) {
 		return B_ERROR;
 	}
+	fPackets[stream->serialno] = packet;
 	*chunkBuffer = (void*)&fPackets[stream->serialno];
 	*chunkSize = sizeof(ogg_packet);
 

@@ -17,6 +17,7 @@
 
 vorbisDecoder::vorbisDecoder()
 {
+	TRACE("vorbisDecoder::vorbisDecoder\n");
 	vorbis_info_init(&fInfo);
 	vorbis_comment_init(&fComment);
 
@@ -32,6 +33,8 @@ vorbisDecoder::vorbisDecoder()
 
 vorbisDecoder::~vorbisDecoder()
 {
+	debugger("vorbisDecoder::~vorbisDecoder");
+	TRACE("vorbisDecoder::~vorbisDecoder\n");
 	delete [] fDecodeBuffer;
 }
 
@@ -40,6 +43,8 @@ status_t
 vorbisDecoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
+	debugger("vorbisDecoder::Setup");
+	TRACE("vorbisDecoder::Setup\n");
 	if ((ioEncodedFormat->type != B_MEDIA_UNKNOWN_TYPE)
 	    && (ioEncodedFormat->type != B_MEDIA_ENCODED_AUDIO)) {
 		TRACE("vorbisDecoder::Setup not called with audio/unknown stream: not vorbis");
@@ -49,13 +54,13 @@ vorbisDecoder::Setup(media_format *ioEncodedFormat,
 		TRACE("vorbisDecoder::Setup not called with ogg_packet info: not vorbis");
 		return B_ERROR;
 	}
+	ogg_packet * packet = (ogg_packet*)infoBuffer;
 	// parse header packet
-	if (vorbis_synthesis_headerin(&fInfo,&fComment,(ogg_packet*)infoBuffer) != 0) {
+	if (vorbis_synthesis_headerin(&fInfo,&fComment,packet) != 0) {
 		TRACE("vorbisDecoder::Setup: vorbis_synthesis_headerin failed: not vorbis header");
 		return B_ERROR;
 	}
 	// get comment packet
-	ogg_packet * packet;
 	int32 size;
 	media_header mh;
 	if (GetNextChunk((void**)&packet, &size, &mh) != B_OK) {
@@ -91,6 +96,8 @@ size_t get_audio_buffer_size(const media_raw_audio_format & raf) {
 status_t
 vorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 {
+	debugger("vorbisDecoder::NegotiateOutputFormat");
+	TRACE("vorbisDecoder::NegotiateOutputFormat\n");
 	// BeBook says: The codec will find and return in ioFormat its best matching format
 	// => This means, we never return an error, and always change the format values
 	//    that we don't support to something more applicable
@@ -122,6 +129,7 @@ vorbisDecoder::Seek(uint32 seekTo,
 				 bigtime_t seekTime, bigtime_t *time)
 {
 	debugger("vorbisDecoder::Seek");
+	TRACE("vorbisDecoder::Seek\n");
 	fResidualBytes = 0;
 	return B_OK;
 }
@@ -131,6 +139,8 @@ status_t
 vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
+	debugger("vorbisDecoder::Decode");
+	TRACE("vorbisDecoder::Decode\n");
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
 	
@@ -165,6 +175,8 @@ vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 status_t
 vorbisDecoder::DecodeNextChunk()
 {
+	debugger("vorbisDecoder::DecodeNextChunk");
+	TRACE("vorbisDecoder::DecodeNextChunk\n");
 	void *chunkBuffer;
 	int32 chunkSize;
 	media_header mh;

@@ -7,7 +7,7 @@
 
 namespace BPrivate { namespace media {
 
-typedef std::map<int,ogg_stream_state> ogg_stream_map;
+typedef std::map<int,ogg_stream_state*> ogg_stream_map;
 typedef std::map<int,ogg_packet> ogg_packet_map;
 
 class oggReader : public Reader
