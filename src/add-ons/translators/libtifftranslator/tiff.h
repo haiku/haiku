@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiff.h,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiff.h,v 1.2 2003/07/31 23:09:27 mwilber Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -26,6 +26,12 @@
 
 #ifndef _TIFF_
 #define	_TIFF_
+
+#include <SupportDefs.h>
+	// Use Be's typedefs for [u]int# instead of having libtiff define them.
+	// This resolves the problem of Be's types being redefined by libtiff
+	// without breaking or making mass changes to libtiff.
+
 /*
  * Tag Image File Format (TIFF)
  *
@@ -41,52 +47,6 @@
 
 #define	TIFF_BIGENDIAN		0x4d4d
 #define	TIFF_LITTLEENDIAN	0x4949
-
-/*
- * The so called TIFF types conflict with definitions from inttypes.h 
- * included from sys/types.h on AIX (at least using VisualAge compiler). 
- * We try to work around this by detecting this case.  Defining 
- * _TIFF_DATA_TYPEDEFS_ short circuits the later definitions in tiff.h, and
- * we will in the holes not provided for by inttypes.h. 
- *
- * See http://bugzilla.remotesensing.org/show_bug.cgi?id=39
- */
-#if defined(_H_INTTYPES) && defined(_ALL_SOURCE) && defined(USING_VISUALAGE)
-
-#define _TIFF_DATA_TYPEDEFS_
-typedef unsigned char uint8;
-typedef unsigned short uint16;
-typedef unsigned int uint32;
-
-#endif
-
-/*
- * Intrinsic data types required by the file format:
- *
- * 8-bit quantities	int8/uint8
- * 16-bit quantities	int16/uint16
- * 32-bit quantities	int32/uint32
- * strings		unsigned char*
- */
-#ifndef _TIFF_DATA_TYPEDEFS_
-#define _TIFF_DATA_TYPEDEFS_
-
-#ifdef __STDC__
-typedef	signed char int8;	/* NB: non-ANSI compilers may not grok */
-#else
-typedef	char int8;
-#endif
-typedef	unsigned char uint8;
-typedef	short int16;
-typedef	unsigned short uint16;	/* sizeof (uint16) must == 2 */
-#if defined(__alpha) || (defined(_MIPS_SZLONG) && _MIPS_SZLONG == 64) || defined(__LP64__) || defined(__arch64__)
-typedef	int int32;
-typedef	unsigned int uint32;	/* sizeof (uint32) must == 4 */
-#else
-typedef	long int32;
-typedef	unsigned long uint32;	/* sizeof (uint32) must == 4 */
-#endif
-#endif /* _TIFF_DATA_TYPEDEFS_ */
 
 /*	For TIFFReassignTagToIgnore */
 enum TIFFIgnoreSense /* IGNORE tag table */
