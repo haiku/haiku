@@ -18,13 +18,18 @@ public:
 virtual			~BSession();
 		void	SetSendPort( port_id port );
 		void	SetRecvPort( port_id port );
+		bool	DropInputBuffer();
 
 		char*		ReadString();
 		status_t	ReadBool( bool *b );
 		status_t	ReadInt8( int8 *i );
+		status_t	ReadUInt8( uint8 *i );		
 		status_t	ReadInt16( int16 *i );
+		status_t	ReadUInt16( uint16 *i );		
 		status_t	ReadInt32( int32 *i );
+		status_t	ReadUInt32( uint32 *i );		
 		status_t	ReadInt64( int64 *i );
+		status_t	ReadUInt64( uint64 *i );		
 		status_t	ReadFloat( float *f );
 		status_t	ReadFloatFromInt( float *f );
 		status_t	ReadDouble( double *d );
