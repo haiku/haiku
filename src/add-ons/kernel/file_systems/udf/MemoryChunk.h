@@ -10,7 +10,7 @@
 
 #include <malloc.h>
 
-#include "cpp.h"
+#include "kernel_cpp.h"
 
 namespace Udf {
 

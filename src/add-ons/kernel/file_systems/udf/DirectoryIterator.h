@@ -18,7 +18,7 @@ extern "C" {
 	#include <fsproto.h>
 }
 
-#include "cpp.h"
+#include "kernel_cpp.h"
 #include "UdfDebug.h"
 
 namespace Udf {

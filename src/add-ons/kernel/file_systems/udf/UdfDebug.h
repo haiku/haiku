@@ -40,7 +40,7 @@
 #	endif
 #endif
 
-#include "cpp.h"
+#include "kernel_cpp.h"
 
 class DebugHelper;
 

@@ -12,7 +12,7 @@
 */
 
 #include "UdfDebug.h"
-#include "cpp.h"
+#include "kernel_cpp.h"
 
 #include <Drivers.h>
 #include <ctype.h>

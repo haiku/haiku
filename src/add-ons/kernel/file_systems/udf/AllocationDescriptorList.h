@@ -10,7 +10,7 @@
 /*! \file AllocationDescriptorList.h
 */
 
-#include "cpp.h"
+#include "kernel_cpp.h"
 #include "UdfDebug.h"
 
 #include "DiskStructures.h"

@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-#include "cpp.h"
+#include "kernel_cpp.h"
 
 #include "Array.h"
 #include "UdfDebug.h"

@@ -12,7 +12,7 @@
 #include <ByteOrder.h>
 #include <SupportDefs.h>
 
-#include "cpp.h"
+#include "kernel_cpp.h"
 #include "UdfDebug.h"
 
 #include "Array.h"

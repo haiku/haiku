@@ -23,10 +23,11 @@ oldOPTIM = $(OPTIM) ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
 }
 
-UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+UsePrivateHeaders [ FDirName kernel util ] ;	# For all the UDF source files
 
 R5KernelAddon udf : [ FDirName kernel file_systems udf ] :
-	cpp.cpp
+	kernel_cpp.cpp
 	udf.cpp
 
 	CS0String.cpp
@@ -38,6 +39,11 @@ R5KernelAddon udf : [ FDirName kernel file_systems udf ] :
 	Utils.cpp
 	Volume.cpp
 ;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp 
+	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+
 
 rule InstallUDF
 {
