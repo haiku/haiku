@@ -33,7 +33,6 @@
  *	@(#)mathimpl.h	8.1 (Berkeley) 6/4/93
  */
 
-#include <cdefs.h>
 #include <math.h>
 
 #if defined(vax)||defined(tahoe)
