@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src prefs sounds ;
 
+SubDirC++Flags -fmultiple-symbol-spaces ;
+
 AddResources Sounds : Sounds.rdef ;
 
 Preference Sounds : 

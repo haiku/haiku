@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src prefs keyboard ;
 
+SubDirC++Flags -fmultiple-symbol-spaces ;
+
 UsePrivateHeaders input ;
 
 AddResources Keyboard : Keyboard.rdef ;
