@@ -26,9 +26,8 @@
 // ToDo: handles file names suboptimally - it has all file names
 //	in a singly linked list, no hash lookups or whatever.
 
-#define PIPEFS_TRACE 0
-
-#if PIPEFS_TRACE
+#define TRACE_PIPEFS
+#ifdef TRACE_PIPEFS
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x)
@@ -140,12 +139,12 @@ class Inode {
 		benaphore	*RequestLock() { return &fRequestLock; }
 		DoublyLinked::List<ReadRequest> &Requests() { return fRequests; }
 
-		status_t	WriteBufferToChain(const void *buffer, size_t *_bufferSize, bool nonBlocking);
+		status_t	WriteBufferToChain(const void **_buffer, size_t *_bytesLeft, bool nonBlocking);
 //		status_t	ReadBufferFromChain(void *buffer, size_t *_bufferSize);
 		size_t		BytesInChain() const { return cbuf_get_length(fBufferChain); }
 
 		void		MayReleaseWriter();
-		void		FillPendingRequests(const void *buffer, size_t *_bytesLeft);
+		void		FillPendingRequests(const void **_buffer, size_t *_bytesLeft);
 		void 		FillPendingRequests();
 		status_t	AddRequest(ReadRequest &request);
 		status_t	RemoveRequest(ReadRequest &request);
@@ -493,12 +492,24 @@ Inode::InitCheck()
  */
 
 status_t
-Inode::WriteBufferToChain(const void *buffer, size_t *_bufferSize, bool nonBlocking)
+Inode::WriteBufferToChain(const void **_buffer, size_t *_bytesLeft, bool nonBlocking)
 {
-	size_t bufferSize = *_bufferSize;
+	const void *buffer = *_buffer;
+	size_t bufferSize = *_bytesLeft;
 
-	status_t status = acquire_sem_etc(fWriteLock, 1,
-		( nonBlocking ? B_TIMEOUT : 0 ) | B_CAN_INTERRUPT, 0);
+	// if this is a blocking call, we need to make sure that data can
+	// still come in and we don't block the whole inode data transfer
+	// to prevent deadlocks from happening
+
+	if (!nonBlocking)
+		benaphore_unlock(&fRequestLock);
+
+	status_t status = acquire_sem_etc(fWriteLock, 1, (nonBlocking ? B_TIMEOUT : 0)
+						| B_CAN_INTERRUPT, 0);
+
+	if (!nonBlocking)
+		benaphore_lock(&fRequestLock);
+
 	if (status != B_OK)
 		return status;
 
@@ -528,7 +539,8 @@ Inode::WriteBufferToChain(const void *buffer, size_t *_bufferSize, bool nonBlock
 	chain = cbuf_merge_chains(fBufferChain, chain);
 
 	fBufferChain = chain;
-	*_bufferSize = bufferSize;
+	*_buffer = (const void *)((addr_t)buffer + bufferSize);
+	*_bytesLeft -= bufferSize;
 
 	MayReleaseWriter();
 
@@ -543,6 +555,12 @@ Inode::MayReleaseWriter()
 		release_sem(fWriteLock);
 }
 
+
+/**	This functions fills pending requests out of the buffer chain.
+ *	It either stops when there are no more requests to satisfy, or
+ *	the buffer chain is empty, whatever comes first.
+ *	You must hold the request lock when calling this function.
+ */
 
 void
 Inode::FillPendingRequests()
@@ -562,8 +580,13 @@ Inode::FillPendingRequests()
 }
 
 
+/** This function feeds the pending read requests using the provided
+ *	buffer.
+ *	You must hold the request lock when calling this function.
+ */
+
 void
-Inode::FillPendingRequests(const void *buffer, size_t *_bytesLeft)
+Inode::FillPendingRequests(const void **_buffer, size_t *_bytesLeft)
 {
 	team_id team = team_get_current_team_id();
 
@@ -574,7 +597,7 @@ Inode::FillPendingRequests(const void *buffer, size_t *_bytesLeft)
 		size_t bytesRead;
 		if (request->PutBufferChain(fBufferChain, &bytesRead, false) != B_OK)
 			continue;
-		
+
 		MayReleaseWriter();
 
 		if (request->SpaceLeft() > 0
@@ -585,7 +608,7 @@ Inode::FillPendingRequests(const void *buffer, size_t *_bytesLeft)
 			//	remapping copy on write or a direct copy.
 
 			// place our data into that buffer
-			request->PutBuffer(&buffer, _bytesLeft);
+			request->PutBuffer(_buffer, _bytesLeft);
 		}
 	}
 }
@@ -641,7 +664,7 @@ int32
 Inode::HashNextOffset()
 {
 	Inode *inode;
-	return (addr)&inode->fHashNext - (addr)inode;
+	return (addr_t)&inode->fHashNext - (addr_t)inode;
 }
 
 
@@ -695,7 +718,7 @@ status_t
 ReadRequest::Wait(bool nonBlocking)
 {
 	TRACE(("pipefs: request@%p waits for data (%sblocking), thread 0x%lx\n", this, nonBlocking ? "non" : "", find_thread(NULL)));
-	return acquire_sem_etc(fLock, 1, ( nonBlocking ? B_TIMEOUT : 0 ) | B_CAN_INTERRUPT, 0);
+	return acquire_sem_etc(fLock, 1, (nonBlocking ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
 }
 
 
@@ -751,11 +774,11 @@ ReadRequest::PutBufferChain(cbuf *bufferChain, size_t *_bytesRead, bool releaseP
  */
 
 status_t
-ReadRequest::PutBuffer(const void **_buffer, size_t *_bufferSize)
+ReadRequest::PutBuffer(const void **_buffer, size_t *_bytesLeft)
 {
-	TRACE(("pipefs: ReadRequest::PutBuffer(buffer = %p, size = %lu)\n", *_buffer, *_bufferSize));
+	TRACE(("pipefs: ReadRequest::PutBuffer(buffer = %p, size = %lu)\n", *_buffer, *_bytesLeft));
 
-	size_t bytes = *_bufferSize;
+	size_t bytes = *_bytesLeft;
 	if (bytes > SpaceLeft())
 		bytes = SpaceLeft();
 
@@ -768,9 +791,9 @@ ReadRequest::PutBuffer(const void **_buffer, size_t *_bufferSize)
 
 	fBytesRead += bytes;
 	*_buffer = (void *)(source + bytes);
-	*_bufferSize -= bytes;
-	release_sem(fLock);
+	*_bytesLeft -= bytes;
 
+	release_sem(fLock);
 	return B_OK;
 }
 
@@ -896,7 +919,7 @@ pipefs_get_vnode(fs_volume _volume, vnode_id id, fs_vnode *_inode, bool reenter)
 static status_t
 pipefs_put_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
 {
-#if TRACE_PIPEFS
+#ifdef TRACE_PIPEFS
 	Inode *inode = (Inode *)_node;
 	TRACE(("pipefs_putvnode: entry on vnode 0x%Lx, r %d\n", inode->ID(), reenter));
 #endif
@@ -940,7 +963,7 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, 
 	Volume *volume = (Volume *)_volume;
 
 	TRACE(("pipefs_create(): dir = %p, name = '%s', perms = %d, &id = %p\n",
-		_dir, name, perms, _newVnodeID));
+		_dir, name, mode, _newVnodeID));
 
 	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
 	if (cookie == NULL)
@@ -1075,7 +1098,7 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/
 	benaphore_lock(inode->RequestLock());
 
 	size_t bytesLeft = *_length;
-	inode->FillPendingRequests(buffer, &bytesLeft);	
+	inode->FillPendingRequests(&buffer, &bytesLeft);	
 
 	status_t status;
 
@@ -1083,7 +1106,7 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/
 		// we could not place all our data in pending requests, so
 		// have to put them into a temporary buffer
 
-		status = inode->WriteBufferToChain(buffer, &bytesLeft, (cookie->open_mode & O_NONBLOCK) != 0);
+		status = inode->WriteBufferToChain(&buffer, &bytesLeft, (cookie->open_mode & O_NONBLOCK) != 0);
 		if (status == B_OK) {
 			inode->FillPendingRequests();
 			*_length -= bytesLeft;
