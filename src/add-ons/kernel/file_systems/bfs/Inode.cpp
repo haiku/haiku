@@ -2081,7 +2081,7 @@ Inode::Remove(Transaction &transaction, const char *name, off_t *_id, bool isDir
 
 status_t 
 Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 mode,
-	int omode, uint32 type, off_t *_id, Inode **_inode)
+	int openMode, uint32 type, off_t *_id, Inode **_inode)
 {
 	FUNCTION();
 
@@ -2101,8 +2101,8 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 		// does the file already exist?
 		off_t offset;
 		if (tree->Find((uint8 *)name, (uint16)strlen(name), &offset) == B_OK) {
-			// return if the file should be a directory or opened in exclusive mode
-			if (mode & S_DIRECTORY || omode & O_EXCL)
+			// return if the file should be a directory/link or opened in exclusive mode
+			if (S_ISDIR(mode) || S_ISLNK(mode) || openMode & O_EXCL)
 				return B_FILE_EXISTS;
 
 			Vnode vnode(volume, offset);
@@ -2117,13 +2117,12 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 			if (inode->IsDirectory())
 				return B_IS_A_DIRECTORY;
 
-			// if it is a mounted device or the VM file, we don't allow to delete it
-			// while it is open and in use
-			if (inode->Flags() & INODE_NO_CACHE)
+			// we want to open the file, so we should have the rights to do so
+			if (inode->CheckPermissions(openModeToAccess(openMode)) != B_OK)
 				return B_NOT_ALLOWED;
 
-			// if omode & O_TRUNC, truncate the existing file
-			if (omode & O_TRUNC) {
+			if (openMode & O_TRUNC) {
+				// truncate the existing file
 				WriteLocked locked(inode->Lock());
 
 				status_t status = inode->SetFileSize(transaction, 0);
