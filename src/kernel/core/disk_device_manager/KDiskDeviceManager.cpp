@@ -30,10 +30,6 @@
 #define DBG(x) x
 #define OUT printf
 
-// TODO: Remove when not longer needed.
-using BPrivate::DiskDevice::KDiskDeviceJob;
-using BPrivate::DiskDevice::KDiskDeviceJobQueue;
-
 // directories for partitioning and file system modules
 static const char *kPartitioningSystemPrefix	= "partitioning_systems";
 static const char *kFileSystemPrefix			= "file_systems";
