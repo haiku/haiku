@@ -686,7 +686,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 {
 	if (cl == NULL && code != AS_LAYER_CREATE_ROOT)
 	{
-		printf("ServerWindow %s received unexpected code - message offset %lx before top_view attached.\n",fTitle.String(), code - SERVER_TRUE);
+		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n",fTitle.String(), code - SERVER_TRUE);
 		return;
 	}
 	
@@ -808,7 +808,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 		case AS_LAYER_CREATE_ROOT:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE_ROOT: Layer name: %s\n", fTitle.String(), cl->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE_ROOT\n", fTitle.String()));
+			
 			// Start receiving top_view data -- pass NULL as the parent view.
 			// This should be the *only* place where this happens.
 			if (cl != NULL)

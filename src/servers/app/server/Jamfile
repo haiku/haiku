@@ -78,6 +78,6 @@ LINKFLAGS on app_server += -lbe ;
 
 LinkSharedOSLibs app_server : root game translation libz.so libpng.so libappserver.so
 							   <boot!home!config!lib>libopenbeos.so 
-							   <boot!home!config!lib>libfreetype.so ;
+							   libfreetype.so ;
 
 SubInclude OBOS_TOP src servers app server fonts ;
