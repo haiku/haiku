@@ -529,6 +529,8 @@ status_t b57_read(void *cookie,off_t pos,void *data,size_t *numBytes) {
 	
 	if (pUmDevice->block)
 		acquire_sem(pUmDevice->packet_release_sem);
+	else
+		acquire_sem_etc(pUmDevice->packet_release_sem,1,B_RELATIVE_TIMEOUT,0); // Decrement the receive sem anyway, but don't block
 	
 	cpu = disable_interrupts();
 	acquire_spinlock(&pUmDevice->lock);
