@@ -3,8 +3,7 @@
 #include "OpenDMLParser.h"
 #include "avi.h"
 
-#define TRACE_THIS 1
-#if TRACE_THIS
+#if 1
   #define TRACE printf
 #else
   #define TRACE(a...)

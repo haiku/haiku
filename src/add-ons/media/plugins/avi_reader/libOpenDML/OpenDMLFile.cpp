@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include "OpenDMLFile.h"
 
-#define TRACE printf
+#if 0
+  #define TRACE printf
+#else
+  #define TRACE(a...)
+#endif
 
 #define INDEX_CHUNK_SIZE 32768
 
@@ -324,7 +328,7 @@ OpenDMLFile::AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, b
 			 
 		if (real_stream_index == stream_index) {		
 
-			TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, chunk_id "FOURCC_FORMAT" (0x%08x), flags 0x%x, offset %lu, length %lu\n",
+			TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, chunk_id "FOURCC_FORMAT" (0x%08x), flags 0x%08x, offset %lu, length %lu\n",
 				 stream_index, FOURCC_PARAM(entry->chunk_id), entry->chunk_id, entry->flags, entry->chunk_offset, entry->chunk_length);
 
 			*keyframe = entry->flags & AVIIF_KEYFRAME;
