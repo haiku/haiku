@@ -36,46 +36,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef _EM_H_DEFINED_
 #define _EM_H_DEFINED_
 
-
-#include <sys/param.h>
-#include <sys/systm.h>
-#include <sys/mbuf.h>
-#include <sys/protosw.h>
-#include <sys/socket.h>
-#include <sys/malloc.h>
-#include <sys/kernel.h>
-#include <sys/sockio.h>
-
-#include <net/if.h>
-#include <net/if_arp.h>
-#include <net/ethernet.h>
-#include <net/if_dl.h>
-#include <net/if_media.h>
-
-#include <net/bpf.h>
-#include <net/if_types.h>
-#include <net/if_vlan_var.h>
-
-#include <netinet/in_systm.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <netinet/udp.h>
-
-#include <sys/bus.h>
-#include <machine/bus.h>
-#include <sys/rman.h>
-#include <machine/resource.h>
-#include <vm/vm.h>
-#include <vm/pmap.h>
-#include <machine/clock.h>
-#include <pci/pcivar.h>
-#include <pci/pcireg.h>
-#include <sys/proc.h>
-#include <sys/sysctl.h>
-#include "opt_bdg.h"
-
-#include <dev/em/if_em_hw.h>
+#include "if_em_osdep.h"
+#include "if_em_hw.h"
+#include "if_compat.h"
 
 /* Tunables */
 
@@ -234,19 +197,19 @@ POSSIBILITY OF SUCH DAMAGE.
 #define ETHER_ALIGN                     2
 
 /* Defines for printing debug information */
-#define DEBUG_INIT  0
-#define DEBUG_IOCTL 0
-#define DEBUG_HW    0
+#define DEBUG_INIT  1
+#define DEBUG_IOCTL 1
+#define DEBUG_HW    1
 
-#define INIT_DEBUGOUT(S)            if (DEBUG_INIT)  printf(S "\n")
-#define INIT_DEBUGOUT1(S, A)        if (DEBUG_INIT)  printf(S "\n", A)
-#define INIT_DEBUGOUT2(S, A, B)     if (DEBUG_INIT)  printf(S "\n", A, B)
-#define IOCTL_DEBUGOUT(S)           if (DEBUG_IOCTL) printf(S "\n")
-#define IOCTL_DEBUGOUT1(S, A)       if (DEBUG_IOCTL) printf(S "\n", A)
-#define IOCTL_DEBUGOUT2(S, A, B)    if (DEBUG_IOCTL) printf(S "\n", A, B)
-#define HW_DEBUGOUT(S)              if (DEBUG_HW) printf(S "\n")
-#define HW_DEBUGOUT1(S, A)          if (DEBUG_HW) printf(S "\n", A)
-#define HW_DEBUGOUT2(S, A, B)       if (DEBUG_HW) printf(S "\n", A, B)
+#define INIT_DEBUGOUT(S)            if (DEBUG_INIT)  printf("ipro1000: " S "\n")
+#define INIT_DEBUGOUT1(S, A)        if (DEBUG_INIT)  printf("ipro1000: " S "\n", A)
+#define INIT_DEBUGOUT2(S, A, B)     if (DEBUG_INIT)  printf("ipro1000: " S "\n", A, B)
+#define IOCTL_DEBUGOUT(S)           if (DEBUG_IOCTL) printf("ipro1000: " S "\n")
+#define IOCTL_DEBUGOUT1(S, A)       if (DEBUG_IOCTL) printf("ipro1000: " S "\n", A)
+#define IOCTL_DEBUGOUT2(S, A, B)    if (DEBUG_IOCTL) printf("ipro1000: " S "\n", A, B)
+#define HW_DEBUGOUT(S)              if (DEBUG_HW) printf("ipro1000: " S "\n")
+#define HW_DEBUGOUT1(S, A)          if (DEBUG_HW) printf("ipro1000: " S "\n", A)
+#define HW_DEBUGOUT2(S, A, B)       if (DEBUG_HW) printf("ipro1000: " S "\n", A, B)
 
 
 /* Supported RX Buffer Sizes */
@@ -254,27 +217,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define EM_RXBUFFER_4096        4096
 #define EM_RXBUFFER_8192        8192
 #define EM_RXBUFFER_16384      16384
-
-
-#ifdef __alpha__
-	#undef vtophys
-	#define vtophys(va)     alpha_XXX_dmamap((vm_offset_t)(va))
-#endif /* __alpha__ */
-
-/* ******************************************************************************
- * vendor_info_array
- *
- * This array contains the list of Subvendor/Subdevice IDs on which the driver
- * should load.
- *
- * ******************************************************************************/
-typedef struct _em_vendor_info_t {
-	unsigned int vendor_id;
-	unsigned int device_id;
-	unsigned int subvendor_id;
-	unsigned int subdevice_id;
-	unsigned int index;
-} em_vendor_info_t;
 
 
 struct em_buffer {
@@ -311,8 +253,6 @@ typedef struct _DESCRIPTOR_PAIR
 /* Our adapter structure */
 struct adapter {
 	struct arpcom   interface_data;
-	struct adapter *next;
-	struct adapter *prev;
 	struct em_hw    hw;
 
 	/* FreeBSD operating-system-specific structures */

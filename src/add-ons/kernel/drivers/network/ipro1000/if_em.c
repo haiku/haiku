@@ -33,94 +33,21 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /*$FreeBSD: /repoman/r/ncvs/src/sys/dev/em/if_em.c,v 1.2.2.19 2004/04/22 22:03:26 ru Exp $*/
 
-#include <dev/em/if_em.h>
+#include "if_em.h"
 
 
 
 /*********************************************************************
  *  Set this to one to display debug statistics                                                   
  *********************************************************************/
-int             em_display_debug_stats = 0;
-
-/*********************************************************************
- *  Linked list of board private structures for all NICs found
- *********************************************************************/
-
-struct adapter *em_adapter_list = NULL;
-
-
-/*********************************************************************
- *  Driver version
- *********************************************************************/
-
-char em_driver_version[] = "1.7.25";
-
-
-/*********************************************************************
- *  PCI Device ID Table
- *
- *  Used by probe to select devices to load on
- *  Last field stores an index into em_strings
- *  Last entry must be all 0s
- *
- *  { Vendor ID, Device ID, SubVendor ID, SubDevice ID, String Index }
- *********************************************************************/
-
-static em_vendor_info_t em_vendor_info_array[] =
-{
-        /* Intel(R) PRO/1000 Network Connection */
-        { 0x8086, 0x1000, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1001, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1004, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1008, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1009, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x100C, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x100D, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x100E, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x100F, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1010, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1011, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1012, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1013, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1014, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1015, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1016, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1017, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1018, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1019, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x101A, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x101D, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x101E, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1026, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1027, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1028, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1075, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1076, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1077, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1078, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x1079, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x107A, PCI_ANY_ID, PCI_ANY_ID, 0},
-        { 0x8086, 0x107B, PCI_ANY_ID, PCI_ANY_ID, 0},
-        /* required last entry */
-        { 0, 0, 0, 0, 0}
-};
-
-/*********************************************************************
- *  Table of branding strings for all supported NICs.
- *********************************************************************/
-
-static char *em_strings[] = {
-	"Intel(R) PRO/1000 Network Connection"
-};
+int             em_display_debug_stats = 1;
 
 /*********************************************************************
  *  Function prototypes            
  *********************************************************************/
-static int  em_probe(device_t);
-static int  em_attach(device_t);
-static int  em_detach(device_t);
-static int  em_shutdown(device_t);
-static void em_intr(void *);
+int  em_attach(device_t);
+int  em_detach(device_t);
+static int32 em_intr(void *);
 static void em_start(struct ifnet *);
 static int  em_ioctl(struct ifnet *, u_long, caddr_t);
 static void em_watchdog(struct ifnet *);
@@ -181,26 +108,6 @@ static void em_add_int_delay_sysctl(struct adapter *, const char *,
                                     int, int); 
 
 /*********************************************************************
- *  FreeBSD Device Interface Entry Points                    
- *********************************************************************/
-
-static device_method_t em_methods[] = {
-	/* Device interface */
-	DEVMETHOD(device_probe, em_probe),
-	DEVMETHOD(device_attach, em_attach),
-	DEVMETHOD(device_detach, em_detach),
-	DEVMETHOD(device_shutdown, em_shutdown),
-	{0, 0}
-};
-
-static driver_t em_driver = {
-	"em", em_methods, sizeof(struct adapter ),
-};
-
-static devclass_t em_devclass;
-DRIVER_MODULE(if_em, pci, em_driver, em_devclass, 0, 0);
-
-/*********************************************************************
  *  Tunable default values.
  *********************************************************************/
 
@@ -229,57 +136,6 @@ SYSCTL_INT(_hw, OID_AUTO, em_rx_ans_int_delay, CTLFLAG_RD, &em_rx_abs_int_delay_
 	   0,
            "Receive absolute interrupt delay");
 */
-/*********************************************************************
- *  Device identification routine
- *
- *  em_probe determines if the driver should be loaded on
- *  adapter based on PCI vendor/device id of the adapter.
- *
- *  return 0 on success, positive on failure
- *********************************************************************/
-
-static int
-em_probe(device_t dev)
-{
-	em_vendor_info_t *ent;
-
-	u_int16_t       pci_vendor_id = 0;
-	u_int16_t       pci_device_id = 0;
-	u_int16_t       pci_subvendor_id = 0;
-	u_int16_t       pci_subdevice_id = 0;
-	char            adapter_name[60];
-
-	INIT_DEBUGOUT("em_probe: begin");
-
-	pci_vendor_id = pci_get_vendor(dev);
-	if (pci_vendor_id != EM_VENDOR_ID)
-		return(ENXIO);
-
-	pci_device_id = pci_get_device(dev);
-	pci_subvendor_id = pci_get_subvendor(dev);
-	pci_subdevice_id = pci_get_subdevice(dev);
-
-	ent = em_vendor_info_array;
-	while (ent->vendor_id != 0) {
-		if ((pci_vendor_id == ent->vendor_id) &&
-		    (pci_device_id == ent->device_id) &&
-
-		    ((pci_subvendor_id == ent->subvendor_id) ||
-		     (ent->subvendor_id == PCI_ANY_ID)) &&
-
-		    ((pci_subdevice_id == ent->subdevice_id) ||
-		     (ent->subdevice_id == PCI_ANY_ID))) {
-			sprintf(adapter_name, "%s, Version - %s", 
-				em_strings[ent->index], 
-				em_driver_version);
-			device_set_desc_copy(dev, adapter_name);
-			return(0);
-		}
-		ent++;
-	}
-
-	return(ENXIO);
-}
 
 /*********************************************************************
  *  Device initialization routine
@@ -291,7 +147,7 @@ em_probe(device_t dev)
  *  return 0 on success, positive on failure
  *********************************************************************/
 
-static int
+int
 em_attach(device_t dev)
 {
 	struct adapter * adapter;
@@ -312,11 +168,6 @@ em_attach(device_t dev)
 	adapter->dev = dev;
 	adapter->osdep.dev = dev;
 	adapter->unit = device_get_unit(dev);
-
-	if (em_adapter_list != NULL)
-		em_adapter_list->prev = adapter;
-	adapter->next = em_adapter_list;
-	em_adapter_list = adapter;
 
 	/* SYSCTL stuff */
         sysctl_ctx_init(&adapter->sysctl_ctx);
@@ -534,7 +385,7 @@ err_sysctl:
  *  return 0 on success, positive on failure
  *********************************************************************/
 
-static int
+int
 em_detach(device_t dev)
 {
 	struct adapter * adapter = device_get_softc(dev);
@@ -575,14 +426,6 @@ em_detach(device_t dev)
 		adapter->rx_desc_base = NULL;
 	}
 
-	/* Remove from the adapter list */
-	if (em_adapter_list == adapter)
-		em_adapter_list = adapter->next;
-	if (adapter->next != NULL)
-		adapter->next->prev = adapter->prev;
-	if (adapter->prev != NULL)
-		adapter->prev->next = adapter->next;
-
 	ifp->if_flags &= ~(IFF_RUNNING | IFF_OACTIVE);
 	ifp->if_timer = 0;
 
@@ -590,20 +433,6 @@ em_detach(device_t dev)
 	sysctl_ctx_free(&adapter->sysctl_ctx);
 
 	splx(s);
-	return(0);
-}
-
-/*********************************************************************
- *
- *  Shutdown entry point
- *
- **********************************************************************/ 
-
-static int
-em_shutdown(device_t dev)
-{
-	struct adapter *adapter = device_get_softc(dev);
-	em_stop(adapter);
 	return(0);
 }
 
@@ -920,7 +749,7 @@ em_poll(struct ifnet *ifp, enum poll_cmd cmd, int count)
  *  Interrupt Service routine  
  *
  **********************************************************************/
-static void
+static int32
 em_intr(void *arg)
 {
         u_int32_t       loop_cnt = EM_MAX_INTR;
@@ -932,19 +761,19 @@ em_intr(void *arg)
 
 #ifdef DEVICE_POLLING
         if (ifp->if_ipending & IFF_POLLING)
-                return;
+                return B_UNHANDLED_INTERRUPT;
 
 	if ((ifp->if_capenable & IFCAP_POLLING) &&
 	    ether_poll_register(em_poll, ifp)) {
                 em_disable_intr(adapter);
                 em_poll(ifp, 0, 1);
-                return;
+                return B_UNHANDLED_INTERRUPT;
         }
 #endif /* DEVICE_POLLING */
 	
 	reg_icr = E1000_READ_REG(&adapter->hw, ICR);
 	if (!reg_icr) {
-		return;
+		return B_UNHANDLED_INTERRUPT;
 	}
 
 	/* Link status change */
@@ -969,7 +798,7 @@ em_intr(void *arg)
         if (ifp->if_flags & IFF_RUNNING && ifp->if_snd.ifq_head != NULL)
                 em_start(ifp);
 
-        return;
+        return B_HANDLED_INTERRUPT;
 }
 
 
@@ -1640,13 +1469,18 @@ em_allocate_pci_resources(struct adapter * adapter)
 		       adapter->unit);
 		return(ENXIO);
 	}
-	adapter->osdep.mem_bus_space_tag = 
-	rman_get_bustag(adapter->res_memory);
-	adapter->osdep.mem_bus_space_handle = 
-	rman_get_bushandle(adapter->res_memory);
-	adapter->hw.hw_addr = (uint8_t *)&adapter->osdep.mem_bus_space_handle;
+	
+	dev->regAddr = adapter->res_memory;
 
 	if (adapter->hw.mac_type > em_82543) {
+		/* Enable IO space access, added for BeOS */
+		if (!(adapter->hw.pci_cmd_word & PCIM_CMD_IOEN)) {
+			printf("em%d: IO Access bit was not set!\n", 
+			       adapter->unit);
+			adapter->hw.pci_cmd_word |= PCIM_CMD_IOEN;
+			pci_write_config(dev, PCIR_COMMAND, adapter->hw.pci_cmd_word, 2);
+		}
+	
 		/* Figure our where our IO BAR is ? */
 		rid = EM_MMBA;
 		for (i = 0; i < 5; i++) {
@@ -1681,7 +1515,7 @@ em_allocate_pci_resources(struct adapter * adapter)
 		return(ENXIO);
 	}
 	if (bus_setup_intr(dev, adapter->res_interrupt, INTR_TYPE_NET,
-			   (void (*)(void *)) em_intr, adapter,
+			   em_intr, adapter,
 			   &adapter->int_handler_tag)) {
 		printf("em%d: Error registering interrupt handler!\n", 
 		       adapter->unit);
@@ -2122,22 +1956,22 @@ em_transmit_checksum_setup(struct adapter * adapter,
 
 	TXD->lower_setup.ip_fields.ipcss = ETHER_HDR_LEN;
 	TXD->lower_setup.ip_fields.ipcso = 
-		ETHER_HDR_LEN + offsetof(struct ip, ip_sum);
+		ETHER_HDR_LEN + OFFSETOF_IPHDR_SUM;
 	TXD->lower_setup.ip_fields.ipcse = 
-		ETHER_HDR_LEN + sizeof(struct ip) - 1;
+		ETHER_HDR_LEN + IP_HEADER_SIZE - 1;
 
 	TXD->upper_setup.tcp_fields.tucss = 
-		ETHER_HDR_LEN + sizeof(struct ip);
+		ETHER_HDR_LEN + IP_HEADER_SIZE;
 	TXD->upper_setup.tcp_fields.tucse = 0;
 
 	if (adapter->active_checksum_context == OFFLOAD_TCP_IP) {
 		TXD->upper_setup.tcp_fields.tucso = 
-			ETHER_HDR_LEN + sizeof(struct ip) + 
-			offsetof(struct tcphdr, th_sum);
+			ETHER_HDR_LEN + IP_HEADER_SIZE + 
+			OFFSETOF_TCPHDR_SUM;
 	} else if (adapter->active_checksum_context == OFFLOAD_UDP_IP) {
 		TXD->upper_setup.tcp_fields.tucso = 
-			ETHER_HDR_LEN + sizeof(struct ip) + 
-			offsetof(struct udphdr, uh_sum);
+			ETHER_HDR_LEN + IP_HEADER_SIZE + 
+			OFFSETOF_UDPHDR_SUM;
 	}
 
 	TXD->tcp_seg_setup.data = 0;
@@ -3004,6 +2838,8 @@ em_print_hw_stats(struct adapter *adapter)
 	return;
 }
 
+#if 0
+
 static int
 em_sysctl_debug_info(SYSCTL_HANDLER_ARGS)
 {
@@ -3092,6 +2928,8 @@ em_sysctl_int_delay(SYSCTL_HANDLER_ARGS)
         splx(s);
         return 0;
 }
+
+#endif
 
 static void
 em_add_int_delay_sysctl(struct adapter *adapter, const char *name,
