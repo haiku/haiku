@@ -511,17 +511,36 @@ remove_vnode_from_mount_list(struct vnode *vnode, struct fs_mount *mount)
 }
 
 
-static struct vnode *
-create_new_vnode(void)
+static status_t
+create_new_vnode(struct vnode **_vnode, mount_id mountID, vnode_id vnodeID)
 {
-	struct vnode *vnode;
-
-	vnode = (struct vnode *)malloc(sizeof(struct vnode));
+	struct vnode *vnode = (struct vnode *)malloc(sizeof(struct vnode));
 	if (vnode == NULL)
-		return NULL;
+		return B_NO_MEMORY;
 
+	// initialize basic values
 	memset(vnode, 0, sizeof(struct vnode));
-	return vnode;
+	vnode->device = mountID;
+	vnode->id = vnodeID;
+
+	// add the vnode to the mount structure
+	mutex_lock(&sMountMutex);	
+	vnode->mount = find_mount(mountID);
+	if (!vnode->mount) {
+		mutex_unlock(&sMountMutex);
+		free(vnode);
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	hash_insert(sVnodeTable, vnode);
+	add_vnode_to_mount_list(vnode, vnode->mount);
+
+	mutex_unlock(&sMountMutex);
+
+	vnode->ref_count = 1;
+	*_vnode = vnode;
+
+	return B_OK;
 }
 
 
@@ -595,67 +614,48 @@ lookup_vnode(mount_id mountID, vnode_id vnodeID)
 static status_t
 get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 {
-	struct vnode *vnode;
-	int err;
-
 	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID, _vnode));
 
 	mutex_lock(&sVnodeMutex);
 
-	while (true) {
-		vnode = lookup_vnode(mountID, vnodeID);
-		if (vnode && vnode->busy) {
-			// ToDo: this is an endless loop if the vnode is not
-			//	becoming unbusy anymore (for whatever reason)
-			mutex_unlock(&sVnodeMutex);
-			snooze(10000); // 10 ms
-			mutex_lock(&sVnodeMutex);
-			continue;
-		}
-		break;
+restart:
+	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
+	if (vnode && vnode->busy) {
+		// ToDo: this is an endless loop if the vnode is not
+		//	becoming unbusy anymore (for whatever reason)
+		mutex_unlock(&sVnodeMutex);
+		snooze(10000); // 10 ms
+		mutex_lock(&sVnodeMutex);
+		goto restart;
 	}
 
 	PRINT(("get_vnode: tried to lookup vnode, got %p\n", vnode));
+
+	status_t status;
 
 	if (vnode) {
 		inc_vnode_ref_count(vnode);
 	} else {
 		// we need to create a new vnode and read it in
-		vnode = create_new_vnode();
-		if (!vnode) {
-			err = B_NO_MEMORY;
+		status = create_new_vnode(&vnode, mountID, vnodeID);
+		if (status < B_OK)
 			goto err;
-		}
-		vnode->device = mountID;
-		vnode->id = vnodeID;
 
-		mutex_lock(&sMountMutex);	
-
-		vnode->mount = find_mount(mountID);
-		if (!vnode->mount) {
-			mutex_unlock(&sMountMutex);
-			err = B_ENTRY_NOT_FOUND;
-			goto err;
-		}
 		vnode->busy = true;
-		hash_insert(sVnodeTable, vnode);
 		mutex_unlock(&sVnodeMutex);
 
-		add_vnode_to_mount_list(vnode, vnode->mount);
-		mutex_unlock(&sMountMutex);
-
-		err = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
-		if (err < 0 || vnode->private_node == NULL) {
+		status = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
+		if (status < B_OK || vnode->private_node == NULL) {
 			remove_vnode_from_mount_list(vnode, vnode->mount);
-			if (vnode->private_node == NULL)
-				err = B_BAD_VALUE;
+			if (status == B_NO_ERROR)
+				status = B_BAD_VALUE;
 		}
 		mutex_lock(&sVnodeMutex);
-		if (err < 0)
+
+		if (status < B_OK)
 			goto err1;
 
 		vnode->busy = false;
-		vnode->ref_count = 1;
 	}
 
 	mutex_unlock(&sVnodeMutex);
@@ -667,12 +667,13 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 
 err1:
 	hash_remove(sVnodeTable, vnode);
+	remove_vnode_from_mount_list(vnode, vnode->mount);
 err:
 	mutex_unlock(&sVnodeMutex);
 	if (vnode)
 		free(vnode);
 
-	return err;
+	return status;
 }
 
 
@@ -1226,9 +1227,6 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 status_t
 vfs_new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 {
-	struct vnode *vnode;
-	status_t status = B_OK;
-
 	if (privateNode == NULL)
 		return B_BAD_VALUE;
 
@@ -1240,38 +1238,15 @@ vfs_new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 	// ToDo: the R5 implementation obviously checks for a different cookie
 	//	and doesn't panic if they are equal
 
-	vnode = lookup_vnode(mountID, vnodeID);
+	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
 	if (vnode != NULL)
 		panic("vnode %ld:%Ld already exists (node = %p, vnode->node = %p)!", mountID, vnodeID, privateNode, vnode->private_node);
 
-	vnode = create_new_vnode();
-	if (!vnode) {
-		status = B_NO_MEMORY;
-		goto err;
-	}
+	status_t status = create_new_vnode(&vnode, mountID, vnodeID);
+	if (status == B_OK)
+		vnode->private_node = privateNode;
 
-	vnode->device = mountID;
-	vnode->id = vnodeID;
-	vnode->private_node = privateNode;
-
-	// add the vnode to the mount structure
-	mutex_lock(&sMountMutex);	
-	vnode->mount = find_mount(mountID);
-	if (!vnode->mount) {
-		mutex_unlock(&sMountMutex);
-		status = B_ENTRY_NOT_FOUND;
-		goto err;
-	}
-	hash_insert(sVnodeTable, vnode);
-
-	add_vnode_to_mount_list(vnode, vnode->mount);
-	mutex_unlock(&sMountMutex);
-
-	vnode->ref_count = 1;
-
-err:	
 	mutex_unlock(&sVnodeMutex);
-
 	return status;
 }
 
