@@ -347,22 +347,24 @@ void BStatusBar::SetBarHeight(float height)
 //------------------------------------------------------------------------------
 void BStatusBar::SetText (const char *string)
 {
+	// SetText frees the previous text and replaces it with a copy of the
+	// string that's passed. The string can be NULL.
 	if (fText)
 		free(fText);
 
-	if (string)
-		fText = strdup(string);
+	fText = string ? strdup(string) : NULL;
 
 	Invalidate();
 }
 //------------------------------------------------------------------------------
 void BStatusBar::SetTrailingText(const char *string)
 {
+	// SetTrailingText frees the previous text and replaces it with a copy of the
+	// string that's passed. The string can be NULL.
 	if (fTrailingText)
 		free(fTrailingText);
 
-	if (string)
-		fTrailingText = strdup(string);
+	fTrailingText = string ? strdup(string) : NULL;
 
 	Invalidate();
 }
@@ -381,40 +383,54 @@ void BStatusBar::Update(float delta, const char *text, const char *trailingText)
 	if (fCurrent > fMax)
 		fCurrent = fMax;
 
-	if (fText)
-		free(fText);
-	
+	// Passing NULL for the text or trailingText argument retains the previous
+	// text or trailing text string.
 	if (text)
-		fText = strdup(text);
+	{
+		if (fText)
+			free(fText);
 
-	if (fTrailingText)
-		free(fTrailingText);
+		fText = strdup(text);
+	}
 
 	if (trailingText)
+	{
+		if (fTrailingText)
+			free(fTrailingText);
+
 		fTrailingText = strdup(trailingText);
+	}
 
 	Invalidate();
 }
 //------------------------------------------------------------------------------
 void BStatusBar::Reset(const char *label, const char *trailingLabel)
 {
+	// Reset replaces the label and trailing label with copies of the
+	// strings passed as arguments. If either argument is NULL, the
+	// label or trailing label will be deleted and erased.
 	if (fLabel)
 		free(fLabel);
 
-	if (label)
-		fLabel = strdup(label);
+	fLabel = label ? strdup(label) : NULL;
 
 	if (fTrailingLabel)
 		free(fTrailingLabel);
 
-	if (trailingLabel)
-		fTrailingLabel = strdup(trailingLabel);
+	fTrailingLabel = trailingLabel ? strdup(trailingLabel) : NULL;
 
+	// Reset deletes and erases any text or trailing text
 	if (fText)
+	{
 		free(fText);
+		fText = NULL;
+	}
 
 	if (fTrailingText)
+	{
 		free(fTrailingText);
+		fTrailingText = NULL;
+	}
 
 	fCurrent = 0.0f;
 	fMax = 100.0f;
