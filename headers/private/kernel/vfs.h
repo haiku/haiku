@@ -72,8 +72,8 @@ struct fs_calls {
 	int (*fs_open)(fs_cookie fs, fs_vnode v, int oflags, file_cookie *_cookie);
 	int (*fs_close)(fs_cookie fs, fs_vnode v, file_cookie cookie);
 	int (*fs_free_cookie)(fs_cookie fs, fs_vnode v, file_cookie cookie);
-	ssize_t (*fs_read)(fs_cookie fs, fs_vnode v, file_cookie cookie, void *buffer, off_t pos, size_t *length);
-	ssize_t (*fs_write)(fs_cookie fs, fs_vnode v, file_cookie cookie, const void *buffer, off_t pos, size_t *length);
+	ssize_t (*fs_read)(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, void *buffer, size_t *length);
+	ssize_t (*fs_write)(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, const void *buffer, size_t *length);
 	off_t (*fs_seek)(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, int seekType);
 
 	/* directory operations */
@@ -196,8 +196,8 @@ int user_getcwd(char *buf, size_t size);
 int user_setcwd(const char* path);
 
 /* fd kernel prototypes (implementation located in fd.c) */
-extern ssize_t sys_read(int fd, void *buf, off_t pos, size_t len);
-extern ssize_t sys_write(int fd, const void *buf, off_t pos, size_t len);
+extern ssize_t sys_read(int fd, off_t pos, void *buffer, size_t bufferSize);
+extern ssize_t sys_write(int fd, off_t pos, const void *buffer, size_t bufferSize);
 extern int sys_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t sys_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t sys_rewind_dir(int fd);
@@ -206,8 +206,8 @@ extern int sys_dup(int fd);
 extern int sys_dup2(int ofd, int nfd);
 
 /* fd user prototypes (implementation located in fd.c)  */
-extern ssize_t user_read(int fd, void *buf, off_t pos, size_t len);
-extern ssize_t user_write(int fd, const void *buf, off_t pos, size_t len);
+extern ssize_t user_read(int fd, off_t pos, void *buffer, size_t bufferSize);
+extern ssize_t user_write(int fd, off_t pos, const void *buffer, size_t bufferSize);
 extern int user_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t user_rewind_dir(int fd);
