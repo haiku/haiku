@@ -989,7 +989,7 @@ port_test()
 	write_port(test_p1, 3, &testdata, sizeof(testdata));
 
 	dprintf("porttest: waiting on spawned thread\n");
-	thread_wait_on_thread(t, NULL);
+	wait_for_thread(t, NULL);
 
 	dprintf("porttest: close p1\n");
 	close_port(test_p2);
