@@ -73,7 +73,6 @@ void
 MethodMenuItem::DrawContent()
 {
 	BMenu *menu = Menu();
-	BRect frame(Frame());
 	BPoint contLoc = ContentLocation();
 
 	menu->SetDrawingMode(B_OP_OVER);

@@ -278,7 +278,7 @@ AddOnManager::RegisterAddOns()
 		"input_server/filters",
 		"input_server/methods"
 	};
-	fHandler = new IAHandler(this);
+	fHandler = new IAHandler();
 	fAddOnMonitor = new AddOnMonitor(fHandler);
 
 	node_ref nref;
