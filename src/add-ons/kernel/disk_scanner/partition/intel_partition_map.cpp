@@ -9,6 +9,7 @@
 */
 
 #include <new.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -58,6 +59,7 @@ static const struct partition_type kPartitionTypes[] = {
 };
 
 // partition_type_string
+static
 const char *
 partition_type_string(uint8 type)
 {
@@ -67,7 +69,19 @@ partition_type_string(uint8 type)
 		if (type == kPartitionTypes[i].type)
 			return kPartitionTypes[i].name;
 	}
-	return "unknown";
+	return NULL;
+}
+
+// get_partition_type_string
+void
+get_partition_type_string(uint8 type, char *buffer)
+{
+	if (buffer) {
+		if (const char *str = partition_type_string(type))
+			strcpy(buffer, str);
+		else
+			sprintf(buffer, "Unrecognized Type 0x%x", type);
+	}
 }
 
 

@@ -153,6 +153,7 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 	status_t error = B_OK;
 	int32 partitionCount = 0;
 	while (error == B_OK) {
+		// check for cycles
 		if (++partitionCount > kMaxLogicalPartitionCount) {
 			TRACE(("intel: _ParseExtended(): Maximal number of logical "
 				   "partitions for extended partition reached. Cycle?\n"));
@@ -162,9 +163,16 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 		if (error == B_OK)
 			error = _ReadPTS(offset);
 		// check the signature
-		if (error == B_OK && fPTS->signature != kPartitionTableSectorSignature) {
+		if (error == B_OK
+			&& fPTS->signature != kPartitionTableSectorSignature) {
 			TRACE(("intel: _ParseExtended(): invalid PTS signature\n"));
 			error = B_BAD_DATA;
+		}
+		// ignore the PTS, if any error occured till now
+		if (error != B_OK) {
+			TRACE(("intel: _ParseExtended(): ignoring this PTS\n"));
+			error = B_OK;
+			break;
 		}
 		// examine the table
 		LogicalPartition extended;
@@ -333,8 +341,7 @@ intel_get_nth_info(int deviceFD, const session_info *sessionInfo,
 					partitionInfo->flags = 0;
 			}
 			partitionInfo->partition_name[0] = '\0';
-			strcpy(partitionInfo->partition_type,
-				   partition->TypeString());
+			partition->GetTypeString(partitionInfo->partition_type);
 			partitionInfo->partition_code = partition->Type();
 		} else
 			error = B_ENTRY_NOT_FOUND;

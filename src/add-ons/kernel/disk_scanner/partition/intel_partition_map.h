@@ -29,7 +29,7 @@ is_extended_type(uint8 type)
 	return (type == 0x05 || type == 0x0f || type == 0x85);
 }
 
-const char *partition_type_string(uint8 type);
+void get_partition_type_string(uint8 type, char *buffer);
 
 // chs
 struct chs {
@@ -82,7 +82,8 @@ public:
 	off_t Size() const		{ return fSize; }
 	uint8 Type() const		{ return fType; }
 	bool Active() const		{ return fActive; }
-	const char *TypeString() const { return partition_type_string(fType); }
+	void GetTypeString(char *buffer) const
+		{ get_partition_type_string(fType, buffer); }
 
 	void SetPTSOffset(off_t offset)	{ fPTSOffset = offset; }
 	void SetOffset(off_t offset)	{ fOffset = offset; }
