@@ -11,6 +11,14 @@
 #include <module.h>
 
 
+// temporary/optional cache syscall API
+#define CACHE_SYSCALLS "cache"
+
+#define CACHE_CLEAR			1	// takes no parameters
+#define CACHE_SET_MODULE	2	// gets the module name as parameter
+
+#define CACHE_MODULES_NAME	"file_cache"
+
 struct cache_module_info {
 	module_info	info;
 
