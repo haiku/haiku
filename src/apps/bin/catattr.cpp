@@ -7,16 +7,17 @@
  */
 
 
-#include <TypeConstants.h>
 #include <Mime.h>
+#include <TypeConstants.h>
 
 #include <fs_attr.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 #include <ctype.h>
 #include <errno.h>
+#include <malloc.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 
 
 /** Used to present the characters in the raw data view */
@@ -84,16 +85,21 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 	if (size > 64 * 1024)
 		size = 64 * 1024;
 
-	char* buffer = new char[size];
+	char* buffer = (char*)malloc(size);
+	if (!buffer) {
+		fprintf(stderr, "Could not allocate read buffer!\n");
+		return B_NO_MEMORY;
+	}
+
 	ssize_t bytesRead = fs_read_attr(fd, attribute, info.type, 0, buffer, size);
 	if (bytesRead < 0) {
-		delete[] buffer;
+		free(buffer);
 		return errno;
 	}
 
 	if (bytesRead != size) {
 		fprintf(stderr, "Could only read %ld bytes from attribute!\n", bytesRead);
-		delete[] buffer;
+		free(buffer);
 		return B_ERROR;
 	}
 
@@ -125,7 +131,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 				break;
 			}
 		}
-		delete[] buffer;
+		free(buffer);
 		if (written > 0)
 			written = B_OK;
 		return written;
@@ -177,7 +183,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 			break;
 	}
 
-	delete[] buffer;
+	free(buffer);
 	return B_OK;
 }
 
