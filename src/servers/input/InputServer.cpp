@@ -31,7 +31,6 @@
 
 
 #include <stdio.h>
-#include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -40,6 +39,7 @@
 #include <Message.h>
 #include <Path.h>
 #include <String.h>
+#include <OS.h>
 
 #include "InputServer.h"
 #include "InputServerTypes.h"
@@ -74,6 +74,10 @@ BLocker InputServer::gInputMethodListLocker;
 
 DeviceManager InputServer::gDeviceManager;
 
+#if DEBUG == 2
+FILE *InputServer::sLogFile = NULL;
+#endif
+
 /*
  *
  */
@@ -94,6 +98,11 @@ int main()
 InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	sSafeMode(false)
 {
+#if DEBUG == 2
+	if (sLogFile == NULL)
+		sLogFile = fopen("/var/log/input_server.log", "a");
+#endif
+
 	CALLED();
 	void *pointer=NULL;
 	
@@ -111,6 +120,20 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	
 	fAddOnManager = new AddOnManager(SafeMode());
 	fAddOnManager->LoadState();
+
+	if (has_data(find_thread(NULL))) {
+		PRINT(("HasData == YES\n")); 
+		uint32 buffer[2];
+		memset(buffer, 0, sizeof(buffer));
+		int32 code = receive_data(&fAppThreadId, buffer, sizeof(buffer));
+		PRINT(("tid : %ld, code :%ld\n", fAppThreadId, code));
+		for (int32 i=0; i<2; i++) {
+			PRINT(("data : %lx\n", buffer[i]));
+		}
+		fCursorSem = buffer[0];
+		fAppArea = buffer[1];
+		
+	}
 }
 
 /*
@@ -121,6 +144,9 @@ InputServer::~InputServer(void)
 {
 	CALLED();
 	delete fAddOnManager;
+#if DEBUG == 2
+	fclose(sLogFile);
+#endif
 }
 
 
@@ -137,7 +163,6 @@ InputServer::ArgvReceived(int32 argc, char** argv)
 			// :TODO: Shutdown and restart the InputServer.
 			printf("InputServer::ArgvReceived - Restarting ...\n");
 			status_t   quit_status;
-			//BMessenger msgr = BMessenger("application/x-vnd.OpenBeOS-input_server", -1, &quit_status);
 			BMessenger msgr = BMessenger(INPUTSERVER_SIGNATURE, -1, &quit_status);
 			if (B_OK == quit_status) {
 				BMessage   msg  = BMessage(B_QUIT_REQUESTED);
@@ -312,6 +337,8 @@ InputServer::MessageReceived(BMessage *message)
 	
 	BMessage reply;
 	status_t status = B_OK;
+
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what>>24, message->what>>16, message->what>>8, message->what));
 	
 	switch(message->what)
 	{
@@ -416,7 +443,7 @@ InputServer::MessageReceived(BMessage *message)
 		default:
 		{
 			PRINT(("Default message ... \n"));
-			PRINT_OBJECT(*message);
+			//PRINT_OBJECT(*message);
 			BMessenger app_server("application/x-vnd.Be-APPS", -1, NULL);
 			if (app_server.IsValid()) {
 				//app_server->SendMessage(message);
@@ -630,9 +657,6 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 	
 	ASSERT(outbound == message);
 		
-	fMousePos.x = 200;
-	fMousePos.y = 200;
-
 	int32 xValue, yValue;
     
     message->FindInt32("x",xValue);
@@ -1079,7 +1103,7 @@ InputServer::DispatchEvents(BList *eventList)
 	
 	CacheEvents(eventList);
 
-	if (fEventsCache.CountItems()>50) {
+	if (fEventsCache.CountItems()>5) {
 
 		BMessage *event;
 		
@@ -1105,11 +1129,7 @@ InputServer::DispatchEvent(BMessage *message)
 	// variables
 	int32 xValue, 
 		  yValue;
-    uint32 buttons = 0;
     
-    message->FindInt32("x",xValue);
-    PRINT(("[DispatchEvent] x = %lu:\n", xValue));
-	
 	port_id pid = find_port(SERVER_INPUT_PORT);
 
 	// BPortLink is incompatible with R5 one
@@ -1118,18 +1138,21 @@ InputServer::DispatchEvent(BMessage *message)
 	BPortLink *appsvrlink = new BPortLink(pid);
    	switch(message->what){
    		case B_MOUSE_MOVED:{
-    		// get point and button from msg
-    		if((message->FindInt32(X_VALUE,&xValue) == B_OK) && (message->FindInt32(Y_VALUE,&yValue) == B_OK)){
+			uint32 buttons;
+			BPoint pt;
+    			message->FindPoint("where",&pt);
+		// get point and button from msg
+    		//if((message->FindInt32(X_VALUE,&xValue) == B_OK) && (message->FindInt32(Y_VALUE,&yValue) == B_OK)){
     			int64 time=(int64)real_time_clock();
     			appsvrlink->StartMessage(B_MOUSE_MOVED);
     			appsvrlink->Attach(&time,sizeof(int64));
-    			appsvrlink->Attach((float)xValue);
-    			appsvrlink->Attach((float)yValue);
+    			appsvrlink->Attach(&pt.x,sizeof(float));
+                        appsvrlink->Attach(&pt.y,sizeof(float));
     			message->FindInt32("buttons",buttons);
-    			appsvrlink->Attach(&buttons,sizeof(int32));
+    			appsvrlink->Attach(&buttons,sizeof(uint32));
     			appsvrlink->Flush();
-    			PRINT(("B_MOUSE_MOVED: x = %lu: y = %lu: time = %llu: buttons = %lu\n",xValue,yValue,time,buttons));
-    			}
+    			PRINT(("B_MOUSE_MOVED: x = %lu: y = %lu: time = %llu: buttons = %lu\n",pt.x,pt.y,time,buttons));
+    		//	}
     		break;
     		}
     	case B_MOUSE_DOWN:{

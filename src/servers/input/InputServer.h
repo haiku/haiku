@@ -31,6 +31,7 @@
 
 // BeAPI Headers
 #include <Application.h>
+#include <Debug.h>
 #include <InputServerDevice.h>
 #include <InputServerFilter.h>
 #include <InputServerMethod.h>
@@ -44,7 +45,6 @@
 #include <unistd.h>
 #include <Locker.h>
 
-#include <Debug.h>
 #include <FindDirectory.h>
 #include <InterfaceDefs.h>
 #include <Message.h>
@@ -52,14 +52,6 @@
 #include <SupportDefs.h>
 
 #define INPUTSERVER_SIGNATURE "application/x-vnd.OBOS-input_server"
-
-#if DEBUG>=1
-	#define EXIT()		printf("EXIT %s\n", __PRETTY_FUNCTION__)
-	#define CALLED()	printf("CALLED %s\n", __PRETTY_FUNCTION__)
-#else
-	#define EXIT()		((void)0)
-	#define CALLED()	((void)0)
-#endif
 
 class BPortLink;
 
@@ -215,7 +207,31 @@ private:
 	BList			fEventsCache;
 	
 	//fMouseState;
+
+	sem_id 		fCursorSem;
+	area_id		fAppArea;
+	area_id		fCloneArea;
+	void		*fAppBuffer;
+	thread_id 	fAppThreadId;
+#if DEBUG == 2
+public:
+	static FILE *sLogFile;
+#endif
 };
 
+#if DEBUG>=1
+#if DEBUG == 2
+	#undef PRINT
+        inline void _iprint(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
+                fputs(buf, InputServer::sLogFile); fflush(InputServer::sLogFile); }
+	#define PRINT(x)	_iprint x
+#endif
+
+        #define EXIT()          PRINT(("EXIT %s\n", __PRETTY_FUNCTION__))
+        #define CALLED()        PRINT(("CALLED %s\n", __PRETTY_FUNCTION__))
+#else
+        #define EXIT()          ((void)0)
+        #define CALLED()        ((void)0)
+#endif
 
 #endif

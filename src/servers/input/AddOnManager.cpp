@@ -253,7 +253,7 @@ AddOnManager::RegisterAddOns()
 	const directory_which directories[] = {
 		B_USER_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
-//		B_BEOS_ADDONS_DIRECTORY
+		B_BEOS_ADDONS_DIRECTORY
 	};
 	const char subDirectories[][24] = {
 		"input_server/devices",
