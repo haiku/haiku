@@ -220,7 +220,7 @@ void PCL6Driver::jobStart()
 					 "@PJL SET RESOLUTION=%d\n"
 	                 "@PJL ENTER LANGUAGE=PCLXL\n"
 	                 ") HP-PCL XL;1;1;"
-	                 "Comment Copyright (c) 2003 OBOS\n",
+	                 "Comment Copyright (c) 2003, 2004 Haiku\n",
 	                 getJobData()->getXres());
 	// PCL6 begin
 	fStream = HP_NewStream(16 * 1024, this);
@@ -230,8 +230,11 @@ void PCL6Driver::jobStart()
 
 bool PCL6Driver::startPage(int)
 {
-	// XXX orientation
-	HP_BeginPage_3(fStream, HP_ePortraitOrientation, mediaSize(getJobData()->getPaper()), HP_eAutoSelect);
+	HP_UByte orientation = HP_ePortraitOrientation;
+	if (getJobData()->getOrientation() == JobData::kLandscape) {
+		orientation = HP_eLandscapeOrientation;
+	}
+	HP_BeginPage_3(fStream, orientation, mediaSize(getJobData()->getPaper()), HP_eAutoSelect);
 	// PageOrigin from Windows NT printer driver
 	int x = 142 * getJobData()->getXres() / 600;
 	int y = 100 * getJobData()->getYres() / 600;
