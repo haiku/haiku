@@ -10,6 +10,9 @@
 #include <errno.h>
 
 
+extern thread_id __main_thread_id;
+
+
 // ToDo: implement the process ID functions for real!
 
 
@@ -23,7 +26,8 @@ getpgrp(void)
 pid_t 
 getpid(void)
 {
-	return 0;
+	// this one returns the ID of the main thread
+	return __main_thread_id;
 }
 
 
