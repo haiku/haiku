@@ -42,6 +42,11 @@ MediaReader::~MediaReader(void)
 	if (inputFile != 0) {
 		delete inputFile;
 	}
+	if (bufferGroup != 0) {
+		BBufferGroup * group = bufferGroup;
+		bufferGroup = 0;
+		delete group;
+	}	
 }
 
 MediaReader::MediaReader(
@@ -305,6 +310,11 @@ status_t MediaReader::GetNextFileFormat(
 {
 	fprintf(stderr,"MediaReader::GetNextFileFormat\n");
 	// let's not crash even if they are stupid
+	if (out_format == 0) {
+		// no place to write!
+		fprintf(stderr,"<- B_BAD_VALUE\n");
+		return B_BAD_VALUE;
+	}
 	if (cookie != 0) {
 		// it's valid but they already got our 1 file format
 		if (*cookie != 0) {
@@ -313,11 +323,6 @@ status_t MediaReader::GetNextFileFormat(
 		}
 		// so next time they won't get the same format again
 		*cookie = 1;
-	}
-	if (out_format == 0) {
-		// no place to write!
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
 	}
 	*out_format = GetFileFormat();
 	return B_OK;
@@ -721,9 +726,11 @@ void MediaReader::Disconnect(
 	if ((where == output.destination) && (what == output.source)) {
 		output.destination = media_destination::null;
 		ResetFormat(&output.format);
-		BBufferGroup * group = bufferGroup;
-		bufferGroup = 0;
-		delete group;
+		if (bufferGroup != 0) {
+			BBufferGroup * group = bufferGroup;
+			bufferGroup = 0;
+			delete group;
+		}	
 	}
 }
 
@@ -1184,7 +1191,7 @@ status_t MediaReader::GetFlavor(
 	static flavor_info flavorInfo;
 	flavorInfo.name = "MediaReader";
 	flavorInfo.info =
-	     "A MediaReader node reads a file and produces a multistream.\n";
+	     "A MediaReader node reads a file and produces a multistream.";
 	flavorInfo.kinds = B_FILE_INTERFACE | B_BUFFER_PRODUCER | B_CONTROLLABLE;
 	flavorInfo.flavor_flags = B_FLAVOR_IS_LOCAL;
 	flavorInfo.possible_count = INT_MAX;

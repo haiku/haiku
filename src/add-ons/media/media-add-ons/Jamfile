@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src add-ons media media-add-ons ;
 
 SubInclude OBOS_TOP src add-ons media media-add-ons reader ;
+SubInclude OBOS_TOP src add-ons media media-add-ons writer ;
 SubInclude OBOS_TOP src add-ons media media-add-ons legacy ;
 SubInclude OBOS_TOP src add-ons media media-add-ons mixer ;
