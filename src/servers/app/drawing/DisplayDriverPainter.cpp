@@ -1065,12 +1065,15 @@ DisplayDriverPainter::Unlock()
 void
 DisplayDriverPainter::SetMode(const display_mode &mode)
 {
-	if (Lock() && fGraphicsCard->SetMode(mode) >= B_OK) {
-		fPainter->AttachToBuffer(fGraphicsCard->BackBuffer());
-		DisplayDriver::SetMode(mode);
+	if (Lock()) {
+		if (fGraphicsCard->SetMode(mode) >= B_OK) {
+			fPainter->AttachToBuffer(fGraphicsCard->BackBuffer());
+			DisplayDriver::SetMode(mode);
+		} else {
+			fprintf(stderr, "DisplayDriverPainter::SetMode() - unsupported "
+				"mode!\n");
+		}
 		Unlock();
-	} else {
-		fprintf(stderr, "DisplayDriverPainter::SetMode() - unsupported mode!\n");
 	}
 }
 
