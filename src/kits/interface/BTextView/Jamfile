@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src kits interface BTextView ;
+
+UsePrivateHeaders interface ;
+
+StaticLibrary haiku :
+	LineBuffer.cpp
+	StyleBuffer.cpp
+	TextGapBuffer.cpp
+	TextView.cpp
+	UndoBuffer.cpp
+	WidthBuffer.cpp
+	: STATIC_LIBRARY_DIR
+	;
