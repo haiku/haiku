@@ -231,7 +231,9 @@ static char console_putch(const char c)
  	return c;
 }
 
-static void tab(void)
+
+static
+void tab(void)
 {
 	console.x = (console.x + TAB_SIZE) & ~TAB_MASK;
 	if (console.x >= console.columns) {
@@ -240,44 +242,54 @@ static void tab(void)
 	}
 }
 
-static int console_open(const char *name, uint32 flags, void **cookie)
+
+static status_t
+console_open(const char *name, uint32 flags, void **cookie)
 {
-	return 0;
+	return B_OK;
 }
 
-static int console_freecookie(void * cookie)
+
+static status_t
+console_freecookie(void * cookie)
 {
-	return 0;
+	return B_OK;
 }
 
-static int console_seek(void * cookie, off_t pos, int st)
+
+static status_t console_seek(void * cookie, off_t pos, int st)
 {
 //	dprintf("console_seek: entry\n");
 
 	return EPERM;
 }
 
-static int console_close(void * cookie)
+
+static status_t
+console_close(void * cookie)
 {
 //	dprintf("console_close: entry\n");
 
-	return 0;
+	return B_OK;
 }
 
-static ssize_t console_read(void * cookie, off_t pos, void *buf, 
-                            size_t *len)
+
+static
+ssize_t console_read(void * cookie, off_t pos, void *buffer, size_t *len)
 {
-	return sys_read(console.keyboard_fd, 0, buf, *len);
+	return sys_read(console.keyboard_fd, 0, buffer, *len);
 }
 
-static ssize_t _console_write(const void *buf, size_t *len)
+
+static ssize_t
+_console_write(const void *buf, size_t *len)
 {
 	size_t i;
 	const char *c;
 
-	for(i=0; i < *len; i++) {
+	for (i = 0; i < *len; i++) {
 		c = &((const char *)buf)[i];
-		switch(*c) {
+		switch (*c) {
 			case '\n':
 				cr();
 				lf();
@@ -300,8 +312,9 @@ static ssize_t _console_write(const void *buf, size_t *len)
 	return 0;
 }
 
-static ssize_t console_write(void * cookie, off_t pos, 
-                             const void *buf, size_t *len)
+
+static ssize_t
+console_write(void * cookie, off_t pos, const void *buffer, size_t *len)
 {
 	ssize_t err;
 
@@ -309,7 +322,7 @@ static ssize_t console_write(void * cookie, off_t pos,
 
 	mutex_lock(&console.lock);
 
-	err = _console_write(buf, len);
+	err = _console_write(buffer, len);
 //	update_cursor(x, y);
 	repaint();
 
@@ -318,23 +331,26 @@ static ssize_t console_write(void * cookie, off_t pos,
 	return err;
 }
 
-static int console_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+
+static status_t
+console_ioctl(void *cookie, uint32 op, void *buffer, size_t len)
 {
 	int err;
-	size_t wlen;
 	
-	switch(op) {
-		case CONSOLE_OP_WRITEXY: {
+	switch (op) {
+		case CONSOLE_OP_WRITEXY:
+		{
+			size_t wlen;
 			int x,y;
 			mutex_lock(&console.lock);
 
-			x = ((int *)buf)[0];
-			y = ((int *)buf)[1];
+			x = ((int *)buffer)[0];
+			y = ((int *)buffer)[1];
 
 			save_cur();
 //			gotoxy(x, y);
 			wlen = len - 2 * sizeof(int);
-			if(_console_write(((char *)buf) + 2*sizeof(int), &wlen) == 0)
+			if (_console_write(((char *)buffer) + 2 * sizeof(int), &wlen) == B_OK)
 				err = 0; // we're okay
 			else
 				err = EIO;
@@ -349,6 +365,7 @@ static int console_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 	return err;
 }
 
+
 device_hooks fb_console_hooks = {
 	&console_open,
 	&console_close,
@@ -362,9 +379,11 @@ device_hooks fb_console_hooks = {
 //	NULL
 };
 
-int fb_console_dev_init(kernel_args *ka)
+
+int
+fb_console_dev_init(kernel_args *ka)
 {
-	if(ka->fb.enabled) {
+	if (ka->fb.enabled) {
 		int i;
 
 		dprintf("fb_console_dev_init: framebuffer found at 0x%lx, x %d, y %d, bit depth %d\n",
