@@ -45,8 +45,9 @@ KernelMergeObject kernel_core.o :
 	: -fno-pic
 	;
 
-# We need to specify the dependency on the generated syscalls file explicitly.
-Includes [ FGristFiles syscalls.c ] : <syscalls>syscall_dispatcher.h ;
+# We need to specify the dependency on the generated syscalls files explicitly.
+Includes [ FGristFiles syscalls.c ]
+	: <syscalls>syscall_dispatcher.h <syscalls>syscall_table.h ;
 
 KernelLd linkhack.so :
 	<$(SOURCE_GRIST)>linkhack.o
