@@ -167,13 +167,15 @@ class Inode : public CachedBlock {
 		status_t CheckPermissions(int accessMode) const;
 
 		// small_data access methods
-		status_t MakeSpaceForSmallData(Transaction *transaction,const char *name, int32 length);
-		status_t RemoveSmallData(Transaction *transaction,const char *name);
-		status_t AddSmallData(Transaction *transaction,const char *name,uint32 type,const uint8 *data,size_t length,bool force = false);
-		status_t GetNextSmallData(small_data **smallData) const;
+		status_t MakeSpaceForSmallData(Transaction *transaction, const char *name, int32 length);
+		status_t RemoveSmallData(Transaction *transaction, const char *name);
+		status_t AddSmallData(Transaction *transaction, const char *name, uint32 type,
+					const uint8 *data, size_t length, bool force = false);
+		status_t GetNextSmallData(small_data **_smallData) const;
 		small_data *FindSmallData(const char *name) const;
 		const char *Name() const;
-		status_t SetName(Transaction *transaction,const char *name);
+		status_t GetName(char *buffer) const;
+		status_t SetName(Transaction *transaction, const char *name);
 
 		// high-level attribute methods
 		status_t ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer, size_t *_length);
@@ -181,31 +183,33 @@ class Inode : public CachedBlock {
 		status_t RemoveAttribute(Transaction *transaction, const char *name);
 
 		// attribute methods
-		status_t GetAttribute(const char *name,Inode **attribute);
+		status_t GetAttribute(const char *name, Inode **attribute);
 		void ReleaseAttribute(Inode *attribute);
-		status_t CreateAttribute(Transaction *transaction,const char *name,uint32 type,Inode **attribute);
+		status_t CreateAttribute(Transaction *transaction, const char *name, uint32 type, Inode **attribute);
 
 		// for directories only:
 		status_t GetTree(BPlusTree **);
 		bool IsEmpty();
 
 		// manipulating the data stream
-		status_t FindBlockRun(off_t pos,block_run &run,off_t &offset);
+		status_t FindBlockRun(off_t pos, block_run &run, off_t &offset);
 
-		status_t ReadAt(off_t pos,uint8 *buffer,size_t *length);
-		status_t WriteAt(Transaction *transaction,off_t pos,const uint8 *buffer,size_t *length);
-		status_t FillGapWithZeros(off_t oldSize,off_t newSize);
+		status_t ReadAt(off_t pos, uint8 *buffer, size_t *length);
+		status_t WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer, size_t *length);
+		status_t FillGapWithZeros(off_t oldSize, off_t newSize);
 
-		status_t SetFileSize(Transaction *transaction,off_t size);
-		status_t Append(Transaction *transaction,off_t bytes);
+		status_t SetFileSize(Transaction *transaction, off_t size);
+		status_t Append(Transaction *transaction, off_t bytes);
 		status_t Trim(Transaction *transaction);
 
 		status_t Free(Transaction *transaction);
 		status_t Sync();
 
 		// create/remove inodes
-		status_t Remove(Transaction *transaction,const char *name,off_t *_id = NULL,bool isDirectory = false);
-		static status_t Create(Transaction *transaction,Inode *parent,const char *name,int32 mode,int omode,uint32 type,off_t *_id = NULL,Inode **_inode = NULL);
+		status_t Remove(Transaction *transaction, const char *name, off_t *_id = NULL,
+					bool isDirectory = false);
+		static status_t Create(Transaction *transaction, Inode *parent, const char *name,
+					int32 mode, int omode, uint32 type, off_t *_id = NULL, Inode **_inode = NULL);
 
 		// index maintaining helper
 		void UpdateOldSize() { fOldSize = Size(); }

@@ -254,6 +254,8 @@ Inode::RemoveIterator(AttributeIterator *iterator)
 status_t
 Inode::MakeSpaceForSmallData(Transaction *transaction, const char *name, int32 bytes)
 {
+	ASSERT(fSmallDataLock.IsLocked());
+
 	while (bytes > 0) {
 		small_data *item = Node()->small_data_start, *max = NULL;
 		int32 index = 0, maxIndex = 0;
@@ -315,6 +317,8 @@ Inode::MakeSpaceForSmallData(Transaction *transaction, const char *name, int32 b
 status_t 
 Inode::RemoveSmallData(small_data *item, int32 index)
 {
+	ASSERT(fSmallDataLock.IsLocked());
+
 	small_data *next = item->Next();
 	if (!next->IsLast(Node())) {
 		// find the last attribute
@@ -524,12 +528,14 @@ Inode::AddSmallData(Transaction *transaction, const char *name, uint32 type,
  */
 
 status_t
-Inode::GetNextSmallData(small_data **smallData) const
+Inode::GetNextSmallData(small_data **_smallData) const
 {
 	if (!Node())
 		RETURN_ERROR(B_ERROR);
 
-	small_data *data = *smallData;
+	ASSERT(fSmallDataLock.IsLocked());
+
+	small_data *data = *_smallData;
 
 	// begin from the start?
 	if (data == NULL)
@@ -541,7 +547,7 @@ Inode::GetNextSmallData(small_data **smallData) const
 	if (data->IsLast(Node()))
 		return B_ENTRY_NOT_FOUND;
 
-	*smallData = data;
+	*_smallData = data;
 
 	return B_OK;
 }
@@ -555,6 +561,8 @@ Inode::GetNextSmallData(small_data **smallData) const
 small_data *
 Inode::FindSmallData(const char *name) const
 {
+	ASSERT(fSmallDataLock.IsLocked());
+
 	small_data *smallData = NULL;
 	while (GetNextSmallData(&smallData) == B_OK) {
 		if (!strcmp(smallData->Name(), name))
@@ -564,10 +572,15 @@ Inode::FindSmallData(const char *name) const
 }
 
 
+/** Returns a pointer to the node's name if present in the small data
+ *	section, NULL otherwise.
+ *	You need to hold the fSmallDataLock when you call this method
+ */
+
 const char *
 Inode::Name() const
 {
-	SimpleLocker locker(fSmallDataLock);
+	ASSERT(fSmallDataLock.IsLocked());
 
 	small_data *smallData = NULL;
 	while (GetNextSmallData(&smallData) == B_OK) {
@@ -575,6 +588,24 @@ Inode::Name() const
 			return (const char *)smallData->Data();
 	}
 	return NULL;
+}
+
+
+/** Copies the node's name into the provided buffer.
+ *	The buffer must be B_FILE_NAME_LENGTH bytes large.
+ */
+
+status_t
+Inode::GetName(char *buffer) const
+{
+	SimpleLocker locker(fSmallDataLock);
+
+	const char *name = Name();
+	if (name == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	strlcpy(buffer, name, B_FILE_NAME_LENGTH);
+	return B_OK;
 }
 
 
