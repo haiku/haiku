@@ -795,7 +795,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			// every page, which should allocate them
 			addr_t va;
 			// XXX remove
-			for (va = region->base; va < region->base + region->size; va += PAGE_SIZE) {
+			for (va = region->base; va < region->base + region->size; va += B_PAGE_SIZE) {
 //				dprintf("mapping wired pages: region 0x%x, cache_ref 0x%x 0x%x\n", region, cache_ref, region->cache_ref);
 				vm_soft_fault(va, false, false);
 			}
@@ -813,15 +813,18 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			int err;
 			off_t offset = 0;
 
+			if (!kernel_startup)
+				panic("ALREADY_WIRED flag used outside kernel startup\n");
+
 			mutex_lock(&cache_ref->lock);
 			(*aspace->translation_map.ops->lock)(&aspace->translation_map);
-			for (va = region->base; va < region->base + region->size; va += PAGE_SIZE, offset += PAGE_SIZE) {
+			for (va = region->base; va < region->base + region->size; va += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
 				err = (*aspace->translation_map.ops->query)(&aspace->translation_map, va, &pa, &flags);
 				if (err < 0) {
 //					dprintf("vm_create_anonymous_region: error looking up mapping for va 0x%x\n", va);
 					continue;
 				}
-				page = vm_lookup_page(pa / PAGE_SIZE);
+				page = vm_lookup_page(pa / B_PAGE_SIZE);
 				if (page == NULL) {
 //					dprintf("vm_create_anonymous_region: error looking up vm_page structure for pa 0x%x\n", pa);
 					continue;
@@ -900,7 +903,7 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 
 	// if the physical address is somewhat inside a page,
 	// move the actual region down to align on a page boundary
-	map_offset = phys_addr % PAGE_SIZE;
+	map_offset = phys_addr % B_PAGE_SIZE;
 	size += map_offset;
 	phys_addr -= map_offset;
 
@@ -1747,6 +1750,74 @@ vm_thread_dump_max_commit(void *unused)
 
 
 static void
+unmap_and_free_physical_pages(vm_translation_map *map, addr_t start, addr_t end)
+{
+	// free all physical pages behind the specified range
+
+	while (start < end) {
+		addr_t physicalAddress;
+		uint32 flags;
+
+		if (map->ops->query(map, start, &physicalAddress, &flags) == B_OK) {
+			vm_page *page = vm_lookup_page(start / B_PAGE_SIZE);
+			if (page != NULL)
+				vm_page_set_state(page, PAGE_STATE_FREE);
+		}
+
+		start += B_PAGE_SIZE;
+	}
+
+	// unmap the memory
+	map->ops->unmap(map, start, end - 1);
+}
+
+
+void
+vm_free_unused_boot_loader_range(addr_t start, addr_t size)
+{
+	vm_translation_map *map = &kernel_aspace->translation_map;
+	addr_t end = start + size;
+	addr_t lastEnd = start;
+	vm_region *area;
+
+	dprintf("free kernel args: asked to free %p - %p\n", (void *)start, (void *)end);
+
+	// The areas are sorted in virtual address space order, so
+	// we just have to find the holes between them that fall
+	// into the region we should dispose
+
+	map->ops->lock(map);
+
+	for (area = kernel_aspace->virtual_map.region_list; area; area = area->aspace_next) {
+		addr_t areaStart = area->base;
+		addr_t areaEnd = areaStart + area->size;
+
+		if (areaEnd >= end) {
+			// we are done, the areas are already beyond of what we have to free
+			lastEnd = end;
+			break;
+		}
+
+		if (areaStart > lastEnd) {
+			// this is something we can free
+			dprintf("free kernel args: get rid of %p - %p\n", (void *)lastEnd, (void *)areaStart);
+			unmap_and_free_physical_pages(map, lastEnd, areaStart);
+		}
+
+		lastEnd = areaEnd;
+	}
+
+	if (lastEnd < end) {
+		// we can also get rid of some space at the end of the region
+		dprintf("free kernel args: also remove %p - %p\n", (void *)lastEnd, (void *)end);
+		unmap_and_free_physical_pages(map, lastEnd, end);
+	}
+
+	map->ops->unlock(map);
+}
+
+
+static void
 create_preloaded_image_areas(struct preloaded_image *image)
 {
 	char name[B_OS_NAME_LENGTH];
@@ -1767,19 +1838,66 @@ create_preloaded_image_areas(struct preloaded_image *image)
 
 	memcpy(name, fileName, length);
 	strcpy(name + length, "_text");
-	address = (void *)ROUNDOWN(image->text_region.start, PAGE_SIZE);
+	address = (void *)ROUNDOWN(image->text_region.start, B_PAGE_SIZE);
 	image->text_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, B_EXACT_ADDRESS,
 		PAGE_ALIGN(image->text_region.size), B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	strcpy(name + length, "_data");
-	address = (void *)ROUNDOWN(image->data_region.start, PAGE_SIZE);
+	address = (void *)ROUNDOWN(image->data_region.start, B_PAGE_SIZE);
 	image->data_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, B_EXACT_ADDRESS,
 		PAGE_ALIGN(image->data_region.size), B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 }
 
 
+static void
+allocate_kernel_args(kernel_args *args)
+{
+	uint32 i;
+
+	TRACE(("allocate_kernel_args()\n"));
+
+	for (i = 0; i < args->num_virtual_allocated_ranges; i++) {
+		void *address = (void *)args->virtual_allocated_range[i].start;
+		create_area("kernel args", &address, B_EXACT_ADDRESS, args->virtual_allocated_range[i].size,
+			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	}
+}
+
+
+static void
+unreserve_boot_loader_ranges(kernel_args *args)
+{
+	uint32 i;
+
+	TRACE(("unreserve_boot_loader_ranges()\n"));
+
+	for (i = 0; i < args->num_virtual_allocated_ranges; i++) {
+		vm_unreserve_address_range(vm_get_kernel_aspace_id(),
+			(void *)args->virtual_allocated_range[i].start,
+			args->virtual_allocated_range[i].size);
+	}
+}
+
+
+static void
+reserve_boot_loader_ranges(kernel_args *args)
+{
+	uint32 i;
+
+	TRACE(("reserve_boot_loader_ranges()\n"));
+
+	for (i = 0; i < args->num_virtual_allocated_ranges; i++) {
+		void *address = (void *)args->virtual_allocated_range[i].start;
+		status_t status = vm_reserve_address_range(vm_get_kernel_aspace_id(), &address,
+			B_EXACT_ADDRESS, args->virtual_allocated_range[i].size);
+		if (status < B_OK)
+			panic("could not reserve boot loader ranges\n");
+	}
+}
+
+
 status_t
-vm_init(kernel_args *ka)
+vm_init(kernel_args *args)
 {
 	int err = 0;
 	unsigned int i;
@@ -1788,8 +1906,8 @@ vm_init(kernel_args *ka)
 	void *address;
 
 	TRACE(("vm_init: entry\n"));
-	err = vm_translation_map_module_init(ka);
-	err = arch_vm_init(ka);
+	err = arch_vm_translation_map_init(args);
+	err = arch_vm_init(args);
 
 	// initialize some globals
 	next_region_id = 0;
@@ -1798,15 +1916,15 @@ vm_init(kernel_args *ka)
 	max_commit_lock = 0;
 
 	// map in the new heap and initialize it
-	heap_base = vm_alloc_from_ka_struct(ka, HEAP_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	heap_base = vm_alloc_from_kernel_args(args, HEAP_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	TRACE(("heap at 0x%lx\n", heap_base));
 	heap_init(heap_base);
 
 	// initialize the free page list and physical page mapper
-	vm_page_init(ka);
+	vm_page_init(args);
 
 	// initialize the hash table that stores the pages mapped to caches
-	vm_cache_init(ka);
+	vm_cache_init(args);
 
 	{
 		vm_region *region;
@@ -1817,43 +1935,47 @@ vm_init(kernel_args *ka)
 	}
 
 	vm_aspace_init();
+	reserve_boot_loader_ranges(args);
 
 	// do any further initialization that the architecture dependant layers may need now
-	vm_translation_map_module_init2(ka);
-	arch_vm_init2(ka);
-	vm_page_init2(ka);
+	arch_vm_translation_map_init_post_area(args);
+	arch_vm_init_post_area(args);
+	vm_page_init_post_area(args);
 
 	// allocate regions to represent stuff that already exists
 
-	address = (void *)ROUNDOWN(heap_base, PAGE_SIZE);
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_heap", &address, B_EXACT_ADDRESS,
-		HEAP_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	address = (void *)ROUNDOWN(heap_base, B_PAGE_SIZE);
+	create_area("kernel heap", &address, B_EXACT_ADDRESS, HEAP_SIZE,
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	ka->kernel_image.name = "kernel";
+	allocate_kernel_args(args);
+
+	args->kernel_image.name = "kernel";
 		// the lazy boot loader currently doesn't set the kernel's name...
-	create_preloaded_image_areas(&ka->kernel_image);
+	create_preloaded_image_areas(&args->kernel_image);
 
 	// allocate areas for preloaded images
-	for (image = ka->preloaded_images; image != NULL; image = image->next) {
+	for (image = args->preloaded_images; image != NULL; image = image->next) {
 		create_preloaded_image_areas(image);
 	}
 
 	// allocate kernel stacks
-	for (i = 0; i < ka->num_cpus; i++) {
+	for (i = 0; i < args->num_cpus; i++) {
 		char temp[64];
 
 		sprintf(temp, "idle_thread%d_kstack", i);
-		address = (void *)ka->cpu_kstack[i].start;
+		address = (void *)args->cpu_kstack[i].start;
 		vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp, &address, B_EXACT_ADDRESS,
-			ka->cpu_kstack[i].size, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			args->cpu_kstack[i].size, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
 	{
 		void *null;
 		vm_map_physical_memory(vm_get_kernel_aspace_id(), "bootdir", &null, B_ANY_KERNEL_ADDRESS,
-			ka->bootdir_addr.size, B_KERNEL_READ_AREA, ka->bootdir_addr.start);
+			args->bootdir_addr.size, B_KERNEL_READ_AREA, args->bootdir_addr.start);
 	}
 
-	arch_vm_init_endvm(ka);
+	arch_vm_init_end(args);
+	unreserve_boot_loader_ranges(args);
 
 	// add some debugger commands
 	add_debugger_command("regions", &dump_region_list, "Dump a list of all regions");
@@ -1872,14 +1994,14 @@ vm_init(kernel_args *ka)
 
 
 status_t
-vm_init_postsem(kernel_args *ka)
+vm_init_post_sem(kernel_args *args)
 {
 	vm_region *region;
 
 	// fill in all of the semaphores that were not allocated before
 	// since we're still single threaded and only the kernel address space exists,
 	// it isn't that hard to find all of the ones we need to create
-	vm_translation_map_module_init_post_sem(ka);
+	arch_vm_translation_map_init_post_sem(args);
 	vm_aspace_init_post_sem();
 	recursive_lock_init(&kernel_aspace->translation_map.lock, "vm translation rlock");
 
@@ -1890,14 +2012,14 @@ vm_init_postsem(kernel_args *ka)
 
 	region_hash_sem = create_sem(WRITE_COUNT, "region_hash_sem");
 
-	return heap_init_postsem(ka);
+	return heap_init_postsem(args);
 }
 
 
 status_t
-vm_init_postthread(kernel_args *ka)
+vm_init_post_thread(kernel_args *args)
 {
-	vm_page_init_postthread(ka);
+	vm_page_init_post_thread(args);
 
 	{
 		thread_id thread = spawn_kernel_thread(&vm_thread_dump_max_commit, "max_commit_thread", B_NORMAL_PRIORITY, NULL);
@@ -1982,7 +2104,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	TRACE(("vm_soft_fault: thid 0x%lx address 0x%lx, isWrite %d, isUser %d\n",
 		thread_get_current_thread_id(), originalAddress, isWrite, isUser));
 
-	address = ROUNDOWN(originalAddress, PAGE_SIZE);
+	address = ROUNDOWN(originalAddress, B_PAGE_SIZE);
 
 	if (IS_KERNEL_ADDRESS(address)) {
 		aspace = vm_get_kernel_aspace();
@@ -2101,7 +2223,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 			mutex_unlock(&cache_ref->lock);
 
 			page = vm_page_allocate_page(PAGE_STATE_FREE);
-			aspace->translation_map.ops->get_physical_page(page->ppn * PAGE_SIZE, (addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
+			aspace->translation_map.ops->get_physical_page(page->ppn * B_PAGE_SIZE, (addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
 			// ToDo: handle errors here
 			err = cache_ref->cache->store->ops->read(cache_ref->cache->store, cache_offset, &vec, 1, &bytesRead);
 			aspace->translation_map.ops->put_physical_page((addr_t)vec.iov_base);
@@ -2236,7 +2358,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		atomic_add(&page->ref_count, 1);
 		(*aspace->translation_map.ops->lock)(&aspace->translation_map);
 		(*aspace->translation_map.ops->map)(&aspace->translation_map, address,
-			page->ppn * PAGE_SIZE, new_lock);
+			page->ppn * B_PAGE_SIZE, new_lock);
 		(*aspace->translation_map.ops->unlock)(&aspace->translation_map);
 	}
 
