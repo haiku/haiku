@@ -322,8 +322,62 @@ status_t nv_acc_init()
 	}
 
 	/*** PGRAPH ***/
-	if (si->ps.card_arch != NV04A)
+	switch (si->ps.card_arch)
 	{
+	case NV40A:
+		/* set resetstate for most function blocks */
+		ACCW(DEBUG0, 0x0003ffff);//?
+		/* init some function blocks */
+		ACCW(DEBUG1, 0x401287c0);
+		ACCW(DEBUG2, 0x24f82ad9);//?
+		ACCW(DEBUG3, 0x60de8051);
+		/* end resetstate for the function blocks */
+		ACCW(DEBUG0, 0x00000000);//?
+		/* disable specific functions, but enable SETUP_SPARE2 register */
+		ACCW(NV10_DEBUG4, 0x00008000);
+		/* set limit_viol_pix_adress(?): more likely something unknown.. */
+		ACCW(NV4X_WHAT2, 0x00be3c5f);
+		/* unknown.. */
+		switch (si->ps.card_type)
+		{
+		case NV40:
+			ACCW(NV40_WHAT0, 0x83280fff);
+			ACCW(NV40_WHAT1, 0x000000a0);
+			ACCW(NV40_WHAT2, 0x0078e366);
+			ACCW(NV40_WHAT3, 0x0000014c);
+			break;
+		case NV41:
+			ACCW(NV40P_WHAT0, 0x83280eff);
+			ACCW(NV40P_WHAT1, 0x000000a0);
+			ACCW(NV40P_WHAT2, 0x007596ff);
+			ACCW(NV40P_WHAT3, 0x00000108);
+			break;
+		case NV43:
+			ACCW(NV40P_WHAT0, 0x83280eff);
+			ACCW(NV40P_WHAT1, 0x000000a0);
+			ACCW(NV40P_WHAT2, 0x0072cb77);
+			ACCW(NV40P_WHAT3, 0x00000108);
+			break;
+		case NV45: //fixme, checkout: this is cardID 0x016x at least!
+			ACCW(NV40P_WHAT0, 0x83280eff);
+			ACCW(NV40P_WHAT1, 0x000000a0);
+			ACCW(NV45_WHAT2, 0x00000000);
+			ACCW(NV45_WHAT3, 0x00000000);
+			break;
+		default:
+			ACCW(NV40P_WHAT0, 0x83280eff);
+			ACCW(NV40P_WHAT1, 0x000000a0);
+			break;
+		}
+		break;
+	case NV04A:
+		/* init some function blocks */
+		ACCW(DEBUG0, 0x1231c001);
+		ACCW(DEBUG1, 0x72111101);
+		ACCW(DEBUG2, 0x11d5f071);
+		ACCW(DEBUG3, 0x10d4ff31);
+		break;
+	default:
 		/* set resetstate for most function blocks */
 		ACCW(DEBUG0, 0x0003ffff);
 		/* init some function blocks */
@@ -334,14 +388,7 @@ status_t nv_acc_init()
 		ACCW(DEBUG0, 0x00000000);
 		/* disable specific functions */
 		ACCW(NV10_DEBUG4, 0);
-	}
-	else
-	{
-		/* init some function blocks */
-		ACCW(DEBUG0, 0x1231c001);
-		ACCW(DEBUG1, 0x72111101);
-		ACCW(DEBUG2, 0x11d5f071);
-		ACCW(DEBUG3, 0x10d4ff31);
+		break;
 	}
 
 	/* reset all cache sets */
@@ -702,8 +749,16 @@ status_t nv_acc_init()
 		/* tile 3: */
 		ACCW(NV10_TIL3AD, ACCR(NV10_FBTIL3AD));
 		ACCW(NV10_TIL3ED, ACCR(NV10_FBTIL3ED));
-		ACCW(NV10_TIL3PT, ACCR(NV10_FBTIL3PT));
-		ACCW(NV10_TIL3ST, ACCR(NV10_FBTIL3ST));
+		if (si->ps.card_arch >= NV40A)
+		{
+			ACCW(NV10_TIL3PT, 0x2ffff800);
+			ACCW(NV10_TIL3ST, 0x00006000);
+		}
+		else
+		{
+			ACCW(NV10_TIL3PT, ACCR(NV10_FBTIL3PT));
+			ACCW(NV10_TIL3ST, ACCR(NV10_FBTIL3ST));
+		}
 		/* tile 4: */
 		ACCW(NV10_TIL4AD, ACCR(NV10_FBTIL4AD));
 		ACCW(NV10_TIL4ED, ACCR(NV10_FBTIL4ED));
@@ -724,6 +779,13 @@ status_t nv_acc_init()
 		ACCW(NV10_TIL7ED, ACCR(NV10_FBTIL7ED));
 		ACCW(NV10_TIL7PT, ACCR(NV10_FBTIL7PT));
 		ACCW(NV10_TIL7ST, ACCR(NV10_FBTIL7ST));
+
+		/* unknown.. */
+		if (si->ps.card_arch >= NV40A)
+		{
+			ACCW(NV4X_WHAT1, 0x01000000);
+			ACCW(NV4X_WHAT0, 0x00001200);
+		}
 
 		/* setup (clear) pipe */
 		/* set eyetype to local, lightning is off */
