@@ -42,7 +42,9 @@ MidiPlayerWindow::MidiPlayerWindow()
 	windowX = -1;
 	windowY = -1;
 	threadId = -1;
-	
+
+	be_synth->SetSamplingRate(44100);
+
 	CreateViews();
 	LoadSettings();
 	InitControls();
