@@ -84,13 +84,19 @@ if $(WARNINGS) {
 	C++FLAGS += -Wpointer-arith -Wcast-align -Wsign-compare ;
 }
 
+KERNEL_CCFLAGS ?= -Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc ;
+KERNEL_CCFLAGS += -fno-builtin -D$(OBOS_TARGET_DEFINE) ;
+KERNEL_CCFLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
+
+
 # We might later want to introduce debug levels or handle the whole issue
 # differently. For now there's only on or off.
 #
 if $(DEBUG) {
 	OPTIM ?= -O0 ;
-	CCFLAGS += -g ;
-	C++FLAGS += -g ;
+	CCFLAGS += -g -DDEBUG=$(DEBUG) ;
+	C++FLAGS += -g -DDEBUG=$(DEBUG)  ;
+	KERNEL_CCFLAGS += -g -DDEBUG=$(DEBUG) ;
 	LINKFLAGS += -g ;
 } else {
 	OPTIM ?= -O2 ;
@@ -98,10 +104,6 @@ if $(DEBUG) {
 #
 # To disable for the tests OPTIM and DEBUG are overridden, set the environment
 # variable NO_TEST_DEBUG.
-
-KERNEL_CCFLAGS ?= -Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc ;
-KERNEL_CCFLAGS += -fno-builtin -D$(OBOS_TARGET_DEFINE) ;
-KERNEL_CCFLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) ;
 
 # Instructs the Library rule to not make its object files temporary.
 # This is need as some objects are used in a static library and for an
