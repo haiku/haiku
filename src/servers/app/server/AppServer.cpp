@@ -496,7 +496,7 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			release_sem(fAppListLock);
 
 			BPortLink replylink(app_port);
-			replylink.StartMessage(AS_SET_SERVER_PORT);
+			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<int32>(newapp->fMessagePort);
 			replylink.Flush();
 
