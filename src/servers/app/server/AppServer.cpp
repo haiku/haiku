@@ -107,7 +107,7 @@ AppServer::AppServer(void)
 
 	// Used for testing purposes
 
-	// TODO: Uncomment when actually put to use. Commented out for speed
+	// TODO: Re-enable scanning of all font directories when server is actually put to use
 	fontserver->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
 //	fontserver->ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
 //	fontserver->ScanDirectory("/boot/home/config/fonts/ttfonts/");

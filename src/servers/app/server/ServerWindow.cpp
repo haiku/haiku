@@ -341,7 +341,7 @@ void ServerWindow::Hide(void)
 				if (ws->FocusLayer() == fWinBorder)
 					ws->SearchAndSetNewFocus(fWinBorder);
 				else{
-					// TODO: RootLayer class should take care of this. (or Desktop)
+					// TODO: RootLayer or Desktop class should take care of invalidating
 //					ws->Invalidate();
 				}
 			}
@@ -520,8 +520,8 @@ void ServerWindow::SetLayerFontState(Layer *layer)
 	{
 		uint32		fontID;
 		fSession->Read<int32>((int32*)&fontID);
-		// TODO: implement later. Currently there is no SetFamAndStyle(uint32)
-		//   in ServerFont class. DW, could you add one?
+		
+		// TODO: Implement. ServerFont::SetFamilyAndStyle(uint32) is needed
 		//layer->fLayerData->font->
 	}
 
@@ -706,7 +706,7 @@ void ServerWindow::DispatchMessage(int32 code)
 				cl->fDriver->DrawBitmap(&region, sbmp, src, dst, cl->fLayerData);
 			}
 			
-			// TODO: Adi -- shouldn't this sync with the client?
+			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
@@ -753,7 +753,7 @@ void ServerWindow::DispatchMessage(int32 code)
 				cl->fDriver->DrawBitmap(&region, sbmp, srcRect, dstRect, cl->fLayerData);
 			}
 			
-			// TODO: Adi -- shouldn't this sync with the client?
+			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
@@ -886,7 +886,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			vc = ld->viewcolor.GetColor32();
 			patt = ld->patt.GetInt64();
 			
-			// TODO: DW implement such a method in ServerFont class!
+			// TODO: Implement when ServerFont::SetfamilyAndStyle(int32) exists
 			fSession->StartMessage(SERVER_TRUE);
 			
 			// Attach font state
@@ -952,8 +952,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			fSession->Read<float>(&newWidth);
 			fSession->Read<float>(&newHeight);
 			
-			// TODO: check for minimum allowed. WinBorder should provide such
-			// a method, based on its decorator.
+			// TODO: Check for minimum size allowed. Need WinBorder::GetSizeLimits
 			
 			cl->ResizeBy(newWidth, newHeight);
 			
@@ -1033,10 +1032,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 lineCap, lineJoin;
 
-			// TODO: DW: Shouldn't we lock before modifying certain memebers?
-			// Redraw code might use an updated value instead of one for which
-			// it was called. e.g.: different lineCap or lineJoin. Strange results
-			// would appear.
+			// TODO: Look into locking scheme relating to Layers and modifying redraw-related members
 
 			fSession->Read<int8>(&lineCap);
 			fSession->Read<int8>(&lineJoin);
@@ -1251,7 +1247,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			
-			// TODO: watch out for the coordinate system
+			// TODO: Watch out for the coordinate system in AS_LAYER_CLIP_TO_PICTURE
 			int32 pictureToken;
 			BPoint where;
 			
@@ -1283,7 +1279,7 @@ void ServerWindow::DispatchMessage(int32 code)
 				{
 					//cl->clipToPicture	= sp;
 					
-					// TODO: increase that picture's reference count.(~ allocate a picture)
+					// TODO: Increase that picture's reference count.(~ allocate a picture)
 					break;
 				}
 			}
@@ -1326,7 +1322,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			
-			// TODO: watch out for the coordinate system
+			// TODO: Watch out for the coordinate system in AS_LAYER_CLIP_TO_INVERSE_PICTURE
 			int32 pictureToken;
 			BPoint where;
 			
@@ -1346,7 +1342,7 @@ void ServerWindow::DispatchMessage(int32 code)
 				{
 					//cl->clipToPicture	= sp;
 					
-					// TODO: increase that picture's reference count.(~ allocate a picture)
+					// TODO: Increase that picture's reference count.(~ allocate a picture)
 					break;
 				}
 			}
@@ -1365,14 +1361,17 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_CLIP_REGION:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			
 			// if this Layer is hidden, it is clear that its visible region is void.
-			if (cl->IsHidden()){
+			if (cl->IsHidden())
+			{
 				fSession->StartMessage(SERVER_TRUE);
 				fSession->Attach<int32>(0L);
 				fSession->Flush();
 			}
-			else{
-				// TODO: watch out for the coordinate system
+			else
+			{
+				// TODO: Watch out for the coordinate system in AS_LAYER_GET_CLIP_REGION
 				BRegion reg;
 				LayerData *ld;
 				int32 noOfRects;
@@ -1401,7 +1400,8 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_SET_CLIP_REGION:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			// TODO: watch out for the coordinate system
+			
+			// TODO: Watch out for the coordinate system in AS_LAYER_SET_CLIP_REGION
 			int32 noOfRects;
 			BRect r;
 			
@@ -1432,7 +1432,8 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_INVAL_RECT:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			// TODO: watch out for the coordinate system
+			
+			// TODO: Watch out for the coordinate system in AS_LAYER_INVAL_RECT
 			BRect		invalRect;
 			
 			fSession->Read<BRect>(&invalRect);
@@ -1444,7 +1445,8 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_INVAL_REGION:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			// TODO: watch out for the coordinate system
+			
+			// TODO: Watch out for the coordinate system AS_LAYER_INVAL_REGION
 			BRegion invalReg;
 			int32 noOfRects;
 			BRect rect;
@@ -1479,7 +1481,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			// Received when a window deletes its internal top view
 			
-			// TODO: Implement
+			// TODO: Implement AS_LAYER_DELETE_ROOT
 			STRACE(("ServerWindow %s: Message Delete_Layer_Root unimplemented\n",fTitle.String()));
 			break;
 		}
@@ -1497,31 +1499,31 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_SEND_BEHIND:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_SEND_BEHIND
 			STRACE(("ServerWindow %s: Message  Send_Behind unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_ENABLE_UPDATES:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_ENABLE_UPDATES
 			STRACE(("ServerWindow %s: Message Enable_Updates unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_DISABLE_UPDATES:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_DISABLE_UPDATES
 			STRACE(("ServerWindow %s: Message Disable_Updates unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_NEEDS_UPDATE:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_NEEDS_UPDATE
 			STRACE(("ServerWindow %s: Message Needs_Update unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_WINDOW_TITLE:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_WINDOW_TITLE
 			STRACE(("ServerWindow %s: Message Set_Title unimplemented\n",fTitle.String()));
 			break;
 		}
@@ -1575,43 +1577,43 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_SET_LOOK:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_SET_LOOK
 			STRACE(("ServerWindow %s: Message Set_Look unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_FLAGS:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_SET_FLAGS
 			STRACE(("ServerWindow %s: Message Set_Flags unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_FEEL:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_SET_FEEL
 			STRACE(("ServerWindow %s: Message Set_Feel unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_ALIGNMENT:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_SET_ALIGNMENT
 			STRACE(("ServerWindow %s: Message Set_Alignment unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_GET_ALIGNMENT:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_GET_ALIGNMENT
 			STRACE(("ServerWindow %s: Message Get_Alignment unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_GET_WORKSPACES:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_GET_WORKSPACES
 			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_WORKSPACES:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_SET_WORKSPACES
 			STRACE(("ServerWindow %s: Message Set_Workspaces unimplemented\n",fTitle.String()));
 			break;
 		}
@@ -1662,19 +1664,19 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case B_MINIMIZE:
 		{
-			// TODO: Implement
+			// TODO: Implement B_MINIMIZE
 			STRACE(("ServerWindow %s: Message Minimize unimplemented\n",fTitle.String()));
 			break;
 		}
 		case B_WINDOW_ACTIVATED:
 		{
-			// TODO: Implement
+			// TODO: Implement B_WINDOW_ACTIVATED
 			STRACE(("ServerWindow %s: Message Window_Activated unimplemented\n",fTitle.String()));
 			break;
 		}
 		case B_ZOOM:
 		{
-			// TODO: Implement
+			// TODO: Implement B_ZOOM
 			STRACE(("ServerWindow %s: Message Zoom unimplemented\n",fTitle.String()));
 			break;
 		}
@@ -1708,7 +1710,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 	if (IsHidden())
 		return;
 		
-	// TODO: fix!
+	// TODO: fix sibling-related clipping calculations in DispatchGraphicsMessage
 /*	WindowClipRegion.Set(fWinBorder->Frame());
 	sibling = fWinBorder->UpperSibling();
 	while (sibling)
@@ -1717,6 +1719,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		sibling = sibling->UpperSibling();
 	}
 */
+
 	if (!WindowClipRegion.Frame().IsValid())
 		return;
 	
@@ -1728,7 +1731,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		code = read_from_buffer<int32>(&msgbuffer);
 		view_token = read_from_buffer<int32>(&msgbuffer);
 		
-		//TODO: fix!
+		//TODO: fix code to find a layer based on a view token in DispatchGraphicsMessage
 		layer = NULL;//fWorkspace->GetRoot()->FindLayer(view_token);
 		
 		if (layer)
@@ -1808,7 +1811,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_STROKE_ARC:
 			{
-				// TODO:: Add clipping
+				// TODO: Add clipping to AS_STROKE_ARC
 				if (sizeRemaining >= AS_STROKE_ARC_MSG_SIZE)
 				{
 					float left, top, right, bottom, angle, span;
@@ -1835,7 +1838,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_STROKE_BEZIER:
 			{
-				// TODO:: Add clipping
+				// TODO: Add clipping to AS_STROKE_BEZIER
 				if (sizeRemaining >= AS_STROKE_BEZIER_MSG_SIZE)
 				{
 					BPoint *pts;
@@ -1862,7 +1865,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_STROKE_ELLIPSE:
 			{
-				// TODO:: Add clipping
+				// TODO: Add clipping AS_STROKE_ELLIPSE
 				if (sizeRemaining >= AS_STROKE_ELLIPSE_MSG_SIZE)
 				{
 					float left, top, right, bottom;
@@ -1886,7 +1889,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_STROKE_LINE:
 			{
-				// TODO:: Add clipping
+				// TODO: Add clipping TO AS_STROKE_LINE
 				if (sizeRemaining >= AS_STROKE_LINE_MSG_SIZE)
 				{
 					float x1, y1, x2, y2;
@@ -1911,17 +1914,17 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_STROKE_LINEARRAY:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_STROKE_LINEARRAY
 				break;
 			}
 			case AS_STROKE_POLYGON:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_STROKE_POLYGON
 				break;
 			}
 			case AS_STROKE_RECT:
 			{
-				// TODO:: Add clipping
+				// TODO: Add clipping TO AS_STROKE_RECT
 				if (sizeRemaining >= AS_STROKE_RECT_MSG_SIZE)
 				{
 					float left, top, right, bottom;
@@ -1945,7 +1948,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_STROKE_ROUNDRECT:
 			{
-				// TODO:: Add clipping
+				// TODO: Add clipping AS_STROKE_ROUNDRECT
 				if (sizeRemaining >= AS_STROKE_ROUNDRECT_MSG_SIZE)
 				{
 					float left, top, right, bottom, xrad, yrad;
@@ -1971,12 +1974,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_STROKE_SHAPE:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_STROKE_SHAPE
 				break;
 			}
 			case AS_STROKE_TRIANGLE:
 			{
-				// TODO:: Add clipping
+				// TODO:: Add clipping to AS_STROKE_TRIANGLE
 				if (sizeRemaining >= AS_STROKE_TRIANGLE_MSG_SIZE)
 				{
 					BPoint *pts;
@@ -2009,7 +2012,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_FILL_ARC:
 			{
-				// TODO:: Add clipping
+				// TODO:: Add clipping to AS_FILL_ARC
 				if (sizeRemaining >= AS_FILL_ARC_MSG_SIZE)
 				{
 					float left, top, right, bottom, angle, span;
@@ -2035,7 +2038,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_FILL_BEZIER:
 			{
-				// TODO:: Add clipping
+				// TODO:: Add clipping to AS_FILL_BEZIER
 				if (sizeRemaining >= AS_FILL_BEZIER_MSG_SIZE)
 				{
 					BPoint *pts;
@@ -2062,7 +2065,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_FILL_ELLIPSE:
 			{
-				// TODO:: Add clipping
+				// TODO:: Add clipping to AS_FILL_ELLIPSE
 				if (sizeRemaining >= AS_FILL_ELLIPSE_MSG_SIZE)
 				{
 					float left, top, right, bottom;
@@ -2086,7 +2089,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_FILL_POLYGON:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_FILL_POLYGON
 				break;
 			}
 			case AS_FILL_RECT:
@@ -2123,12 +2126,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_FILL_REGION:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_FILL_REGION
 				break;
 			}
 			case AS_FILL_ROUNDRECT:
 			{
-				// TODO: Add clipping
+				// TODO: Add clipping to AS_FILL_ROUNDRECT
 				if (sizeRemaining >= AS_FILL_ROUNDRECT_MSG_SIZE)
 				{
 					float left, top, right, bottom, xrad, yrad;
@@ -2154,12 +2157,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_FILL_SHAPE:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_FILL_SHAPE
 				break;
 			}
 			case AS_FILL_TRIANGLE:
 			{
-				// TODO:: Add clipping
+				// TODO: Add clipping to AS_FILL_TRIANGLE
 				if (sizeRemaining >= AS_FILL_TRIANGLE_MSG_SIZE)
 				{
 					BPoint *pts;
@@ -2192,32 +2195,32 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_MOVEPENBY:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_MOVEPENBY
 				break;
 			}
 			case AS_MOVEPENTO:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_MOVEPENTO
 				break;
 			}
 			case AS_SETPENSIZE:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_SETPENSIZE
 				break;
 			}
 			case AS_DRAW_STRING:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_DRAW_STRING
 				break;
 			}
 			case AS_SET_FONT:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_SET_FONT
 				break;
 			}
 			case AS_SET_FONT_SIZE:
 			{
-				// TODO: Implement
+				// TODO: Implement AS_SET_FONT_SIZE
 				break;
 			}
 			default:

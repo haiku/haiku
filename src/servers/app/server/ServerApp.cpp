@@ -559,28 +559,30 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 		}
 		case AS_CREATE_PICTURE:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_CREATE_PICTURE
 			STRACE(("ServerApp %s: Create Picture unimplemented\n",fSignature.String()));
 
 			break;
 		}
 		case AS_DELETE_PICTURE:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_DELETE_PICTURE
 			STRACE(("ServerApp %s: Delete Picture unimplemented\n",fSignature.String()));
 
 			break;
 		}
 		case AS_CLONE_PICTURE:
 		{
-			// TODO: Implement
+			// TODO: Implement AS_CLONE_PICTURE
 			STRACE(("ServerApp %s: Clone Picture unimplemented\n",fSignature.String()));
 
 			break;
 		}
 		case AS_DOWNLOAD_PICTURE:
 		{
-			// TODO; Implement
+			// TODO; Implement AS_DOWNLOAD_PICTURE
+			
+			// What is this particular function call for, anyway?
 			STRACE(("ServerApp %s: Download Picture unimplemented\n",fSignature.String()));
 
 			break;

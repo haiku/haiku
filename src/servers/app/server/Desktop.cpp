@@ -113,11 +113,10 @@ void Desktop::Init(void)
 
 			Screen		*sc = new Screen(driver, BPoint(640, 480), B_RGB32, driverCount);
 
-			// TODO: be careful, it may fail to initialize! - Monitor may not support 640x480
+			// TODO: be careful, of screen initialization - monitor may not support 640x480
 			fScreenList.AddItem(sc);
 
-			// TODO: remove this when you have a real Driver.
-			if (driverCount == 1)
+			if ( (DISPLAYDRIVER != HWDRIVER) && (driverCount == 1) )
 				initDrivers	= false;
 		}
 		else
@@ -196,9 +195,7 @@ void Desktop::SetActiveRootLayer(RootLayer* rl)
 
 	fActiveRootLayer	= rl;
 	
-// TODO:
-// hide the mouse in the old ActiveRootLayer
-// show the mouse in new ActiveRootLayer
+	// TODO: hide mouse in the old ActiveRootLayer & show it in the new ActiveRootLayer
 	fActiveRootLayer->FullInvalidate(fActiveRootLayer->Bounds());
 }
 
@@ -356,7 +353,7 @@ printf("Focus: %s\n", ws->FocusLayer()->GetName());
 
 					// may be or may be empty.
 					
-					// TODO: what if modal of floating windows are in front of us?
+					// TODO: B_MOUSE_DOWN: what if modal of floating windows are in front of us?
 					invalidRegion.Include(&(activeFocus->fFull));
 					invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
 					activeFocus->fParent->RebuildAndForceRedraw(invalidRegion, activeFocus);
@@ -487,7 +484,7 @@ printf("2Focus: %s\n", ws->FocusLayer()->GetName());
 			msg.Read<float>(&evt.wheel_delta_y);
 			msg.Read<int32>(&evt.modifiers);
 
-			// TODO: Pass this on to the client ServerWindow
+			// TODO: B_MOUSE_WHEEL_CHANGED - Pass this on to the client ServerWindow
 			break;
 		}
 		default:
@@ -542,7 +539,7 @@ void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 						if(modifiers & (B_LEFT_COMMAND_KEY |
 							B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY))
 						{
-							// TODO: Set to Safe Mode here. (DisplayDriver API change)
+							// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
 							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
 							break;
 						}
@@ -553,7 +550,7 @@ void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 				{
 					STRACE(("Set Workspace %ld\n",scancode-1));
 					
-					//TODO: change		
+					//TODO: SetWorkspace in KeyboardEventHandler
 					//SetWorkspace(scancode-2);
 					break;
 				}	
@@ -600,7 +597,7 @@ void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 					{
 						if(modifiers & (B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY | B_LEFT_OPTION_KEY))
 						{
-							// TODO: Set to Safe Mode here. (DisplayDriver API change)
+							// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
 							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
 							break;
 						}
@@ -608,7 +605,7 @@ void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 					if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
 					{
 						STRACE(("Set Workspace %ld\n",scancode-1));
-						//TODO: resolve			
+						//TODO: SetWorkspace in KeyboardEventHandler
 						//SetWorkspace(scancode-2);
 						break;
 					}	
@@ -653,7 +650,7 @@ void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 
-			// TODO: Pass on to client window with the focus
+			// TODO: Pass on key down message to client window with the focus
 			break;
 		}
 		case B_KEY_UP:
@@ -720,7 +717,7 @@ void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 			
-			// TODO: Pass on to client window with the focus
+			// TODO: Pass on key up message to client window with the focus
 			break;
 		}
 		case B_UNMAPPED_KEY_DOWN:
@@ -747,7 +744,8 @@ void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 			#ifdef DEBUG_KEYHANDLING
 			printf("Unmapped Key Down: 0x%lx\n", scancode);
 			#endif
-			// TODO: Pass on to client window with the focus
+			
+			// TODO: Pass on unmapped key down message to client window with the focus
 			break;
 		}
 		case B_UNMAPPED_KEY_UP:
@@ -775,7 +773,7 @@ void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 			printf("Unmapped Key Up: 0x%lx\n", scancode);
 			#endif
 
-			// TODO: Pass on to client window with the focus
+			// TODO: Pass on unmapped key up message to client window with the focus
 			break;
 		}
 		case B_MODIFIERS_CHANGED:
@@ -803,7 +801,7 @@ void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 			printf("Modifiers Changed\n");
 			#endif
 
-			// TODO: Pass on to client window with the focus
+			// TODO: Pass on modifier change message to client window with the focus
 			break;
 		}
 		default:

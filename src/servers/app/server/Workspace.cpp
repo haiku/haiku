@@ -73,7 +73,7 @@ Workspace::Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor)
 	fVirtualWidth=-1;
 	fVirtualHeight=-1;
 	
-	// TODO: find out more about good default values and init the structure to them
+	// TODO: find out more about good default values for display timing and init the structure to them
 	fDisplayTiming.pixel_clock=0;
 	fDisplayTiming.h_display=0;
 	fDisplayTiming.h_sync_start=0;
@@ -1071,7 +1071,8 @@ void Workspace::SearchAndSetNewFront(WinBorder *preferred)
 	if(fFrontItem != newFrontItem)
 	{
 		fFrontItem = newFrontItem;
-		// TODO: call a method like... WinBorder::MakeFront(true);
+		
+		// TODO: call a method something like WinBorder::MakeFront(true);
 	}
 
 	STRACE(("#WS(%ld)::SASNF(%s) ENDED! Workspace data...", ID(), preferred? preferred->GetName(): "NULL"));
@@ -1154,8 +1155,8 @@ void Workspace::SearchAndSetNewFocus(WinBorder *preferred)
 	
 	if(item != fFocusItem)
 	{
-		// TODO: item->ColorTabInGrey & send message to client
-		// TODO: item->ColorTabInYellow & send message to client
+		// TODO: redraw old item in inactive colors & send message to client
+		// TODO: redraw new item in active colors & send message to client
 		// TODO: Rebuild & Redraw.
 		fFocusItem		= item;
 	}
@@ -1360,14 +1361,14 @@ RGBColor Workspace::BGColor(void) const
 */
 void Workspace::GetSettings(const BMessage &msg)
 {
-	// TODO: Implement
+	// TODO: Implement GetSettings
 }
 
 //----------------------------------------------------------------------------------
 //! Sets workspace settings to defaults
 void Workspace::GetDefaultSettings(void)
 {
-	// TODO: Implement
+	// TODO: Implement GetDefaultSettings
 }
 
 //----------------------------------------------------------------------------------
@@ -1390,7 +1391,7 @@ void Workspace::GetDefaultSettings(void)
 */
 void Workspace::PutSettings(BMessage *msg, const int32 &index) const
 {
-	// TODO: Implement
+	// TODO: Implement PutSettings
 }
 
 //----------------------------------------------------------------------------------
@@ -1401,7 +1402,7 @@ void Workspace::PutSettings(BMessage *msg, const int32 &index) const
 */
 void Workspace::PutDefaultSettings(BMessage *msg, const int32 &index)
 {
-	// TODO: Implement
+	// TODO: Implement PutDefaultSettings
 }
 
 //----------------------------------------------------------------------------------
