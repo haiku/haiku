@@ -1,6 +1,6 @@
 /* File System volume functions
 **
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 #ifndef _FS_VOLUME_H
 #define	_FS_VOLUME_H
@@ -20,12 +20,9 @@
 extern "C" {
 #endif
 
-extern status_t	fs_mount_volume(const char *filesystem, const char *where,
-					const char *device, uint32 flags, const char *parameters);
+extern status_t	fs_mount_volume(const char *where, const char *device,
+					const char *filesystem, uint32 flags, const char *parameters);
 extern status_t	fs_unmount_volume(const char *path, uint32 flags);
-
-extern status_t fs_initialize_volume(const char *filesystem, const char *volumeName,
-					const char *device, uint32 flags, const char *parameters);
 
 #ifdef  __cplusplus
 }
