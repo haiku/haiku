@@ -74,13 +74,5 @@ StaticLibrary builtins :
 	suspend.def test.def times.def trap.def type.def ulimit.def umask.def
 	wait.def getopts.def shopt.def printf.def getopt.c bashgetopt.c complete.def
 	builtins.c
-#	alias.c bind.c 
-#	break.c builtin.c cd.c colon.c command.c
-#	common.c declare.c echo.c enable.c eval.c evalfile.c
-#	evalstring.c exec.c
-#	exit.c fc.c fg_bg.c hash.c help.c history.c jobs.c kill.c let.c
-#	pushd.c read.c return.c set.c setattr.c shift.c source.c
-#	suspend.c test.c times.c trap.c type.c ulimit.c umask.c
-#	wait.c getopts.c shopt.c printf.c getopt.c bashgetopt.c complete.c
 ;
 
