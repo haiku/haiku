@@ -18,6 +18,7 @@ struct arch_thread {
 	struct farcall interrupt_stack;
 
 	// used to track interrupts on this thread
+	struct iframe *current_iframe;
 	struct iframe *iframes[IFRAME_TRACE_DEPTH];
 	int iframe_ptr;
 

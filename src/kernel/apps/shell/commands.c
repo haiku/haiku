@@ -6,6 +6,7 @@
 #include <syscalls.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
@@ -21,6 +22,7 @@ struct command cmds[] = {
 	{"cat", &cmd_cat},
 	{"cd", &cmd_cd},
 	{"pwd", &cmd_pwd},
+	{"kill", &cmd_kill},
 	{"help", &cmd_help},
 	{NULL, NULL}
 };
@@ -185,6 +187,20 @@ int cmd_stat(int argc, char *argv[])
 	return 0;
 }
 
+int cmd_kill(int argc, char *argv[])
+{
+	int rc;
+	
+	if (argc < 3) {
+		printf("not enough arguments to kill\n");
+		return 0;
+	}
+	rc = sys_kill(atoi(argv[2]), atoi(argv[1]));
+	if (rc)
+		printf("kill failed\n");
+	return 0;
+}
+
 int cmd_help(int argc, char *argv[])
 {
 	printf("command list:\n\n");
@@ -198,6 +214,7 @@ int cmd_help(int argc, char *argv[])
 	printf("cat <file> : dumps the file to stdout\n");
 	printf("mount <path> <device> <fsname> : tries to mount <device> at <path>\n");
 	printf("unmount <path> : tries to unmount at <path>\n");
+	printf("kill <sig> <tid> : sends signal <sig> to thread <tid>\n");
 
 	return 0;
 }

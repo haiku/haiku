@@ -15,6 +15,9 @@ extern "C" {
 void i386_push_iframe(struct thread *t, struct iframe *frame);
 void i386_pop_iframe(struct thread *t);
 
+void i386_return_from_signal();
+void i386_end_return_from_signal();
+
 
 static
 inline struct thread *

@@ -401,9 +401,9 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 
 		TRACE_BLOCK(("acquire_sem_etc(id = %ld): block name = %s, thread = %p, name = %s\n", id, gSems[slot].name, t, t->name));
 
-		// do a quick check to see if the thread has any pending kill signals
+		// do a quick check to see if the thread has any pending signals
 		// this should catch most of the cases where the thread had a signal
-		if ((flags & B_CAN_INTERRUPT) && (t->pending_signals & SIG_KILL)) {
+		if ((flags & B_CAN_INTERRUPT) && t->sig_pending) {
 			gSems[slot].count += count;
 			status = B_INTERRUPTED;
 			goto err;
@@ -436,9 +436,9 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 
 		RELEASE_SEM_LOCK(gSems[slot]);
 		GRAB_THREAD_LOCK();
-		// check again to see if a kill signal is pending.
+		// check again to see if a signal is pending.
 		// it may have been delivered while setting up the sem, though it's pretty unlikely
-		if ((flags & B_CAN_INTERRUPT) && (t->pending_signals & SIG_KILL)) {
+		if ((flags & B_CAN_INTERRUPT) && t->sig_pending) {
 			struct thread_queue wakeup_queue;
 			// ok, so a tiny race happened where a signal was delivered to this thread while
 			// it was setting up the sem. We can only be sure a signal wasn't delivered
@@ -768,6 +768,8 @@ sem_interrupt_thread(struct thread *t)
 	if ((t->sem_flags & B_CAN_INTERRUPT) == 0)
 		return ERR_SEM_NOT_INTERRUPTABLE;
 
+	t->next_state = B_THREAD_READY;
+	
 	slot = t->sem_blocking % MAX_SEMS;
 
 	GRAB_SEM_LOCK(gSems[slot]);

@@ -18,6 +18,10 @@ void arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void 
 //struct thread *arch_thread_get_current_thread(void);
 //void arch_thread_set_current_thread(struct thread *t);
 
+void arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig_mask);
+int64 arch_restore_signal_frame(void);
+void arch_check_syscall_restart(struct thread *t);
+
 // for any inline overrides
 #include <arch_thread.h>
 

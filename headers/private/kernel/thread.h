@@ -11,12 +11,17 @@ extern "C" {
 
 #include <thread_types.h>
 #include <arch/thread.h>
+#include <signal.h>
 
 // Uncomment the line below to compile the single-queue scheduler
 //#define NEW_SCHEDULER
 
 void resched(void);
 void start_scheduler(void);
+
+#define BLOCKABLE_SIGS	(~((1L << (SIGKILL - 1)) | (1L << (SIGSTOP - 1))))
+
+void handle_signals(struct thread *t, int state);
 
 void thread_enqueue(struct thread *t, struct thread_queue *q);
 struct thread *thread_lookat_queue(struct thread_queue *q);
@@ -45,9 +50,7 @@ int thread_kill_thread_nowait(thread_id id);
 #define thread_get_current_thread arch_thread_get_current_thread
 
 struct thread *thread_get_thread_struct(thread_id id);
-#ifdef NEW_SCHEDULER
 struct thread *thread_get_thread_struct_locked(thread_id id);
-#endif /* NEW_SCHEDULER */
 
 static thread_id thread_get_current_thread_id(void);
 static inline thread_id
@@ -97,6 +100,8 @@ int user_setrlimit(int resource, const struct rlimit * rlp);
 
 int user_setenv(const char *name, const char *value, int overwrite);
 int user_getenv(const char *name, char **value);
+
+int user_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 
 #if 1
 // XXX remove later

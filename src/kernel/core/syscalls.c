@@ -6,6 +6,7 @@
 
 #include <kernel.h>
 #include <ksyscalls.h>
+#include <syscalls.h>
 #include <int.h>
 #include <arch/int.h>
 #include <debug.h>
@@ -384,6 +385,15 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			break;
 		case SYSCALL_GET_NEXT_TEAM_INFO:
 			*call_ret = user_get_next_team_info((int32 *)arg0, (team_info *)arg1);
+			break;
+		case SYSCALL_RETURN_FROM_SIGNAL:
+			*call_ret = arch_restore_signal_frame();
+			break;
+		case SYSCALL_KILL:
+			*call_ret = sys_kill((pid_t)arg0, (int)arg1);
+			break;
+		case SYSCALL_SIGACTION:
+			*call_ret = user_sigaction((int)arg0, (const struct sigaction *)arg1, (struct sigaction *)arg2);
 			break;
 		default:
 			*call_ret = -1;

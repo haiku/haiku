@@ -101,6 +101,30 @@ FUNCTION(arch_cpu_global_TLB_invalidate):
 	movl	%eax,%cr3
 	ret
 
+/* void i386_fsave(void *fpu_state); */
+FUNCTION(i386_fsave):
+	movl	4(%esp), %eax
+	fsave	(%eax)
+	ret
+
+/* void i386_fxsave(void *fpu_state); */
+FUNCTION(i386_fxsave):
+	movl	4(%esp), %eax
+	fxsave	(%eax)
+	ret
+
+/* void i386_frstor(void *fpu_state); */
+FUNCTION(i386_frstor):
+	movl	4(%esp), %eax
+	frstor	(%eax)
+	ret
+
+/* void i386_fxrstor(void *fpu_state); */
+FUNCTION(i386_fxrstor):
+	movl	4(%esp), %eax
+	fxrstor	(%eax)
+	ret
+
 /* void i386_fsave_swap(void *old_fpu_state, void *new_fpu_state); */
 FUNCTION(i386_fsave_swap):
 	movl	4(%esp),%eax

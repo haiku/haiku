@@ -113,6 +113,7 @@ KernelLd kernel
 	<$(SOURCE_GRIST)!core>queue.o 
 	<$(SOURCE_GRIST)!core>scheduler.o
 	<$(SOURCE_GRIST)!core>sem.o 
+	<$(SOURCE_GRIST)!core>signal.o 
 	<$(SOURCE_GRIST)!core>smp.o
 	<$(SOURCE_GRIST)!core>syscalls.o 
 	<$(SOURCE_GRIST)!core>sysctl.o
@@ -159,6 +160,7 @@ KernelLd kernel.so
 	<$(SOURCE_GRIST)!core>queue.o 
 	<$(SOURCE_GRIST)!core>scheduler.o
 	<$(SOURCE_GRIST)!core>sem.o 
+	<$(SOURCE_GRIST)!core>signal.o 
 	<$(SOURCE_GRIST)!core>smp.o
 	<$(SOURCE_GRIST)!core>syscalls.o 
 	<$(SOURCE_GRIST)!core>sysctl.o
@@ -574,6 +576,18 @@ KernelLd fibo :
 	:
 	:
 	bin/fibo
+	;
+
+KernelLd sig_test :
+	libglue2.o
+	<$(SOURCE_GRIST)!apps>sig_test.o
+	libroot.so
+	:
+	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
+	:
+	:
+	:
+	bin/sig_test
 	;
 
 KernelLd fortune :

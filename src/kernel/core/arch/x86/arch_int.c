@@ -165,8 +165,10 @@ i386_handle_trap(struct iframe frame)
 	int ret = B_HANDLED_INTERRUPT;
 	struct thread *thread = thread_get_current_thread();
 
-	if (thread)
+	if (thread) {
 		i386_push_iframe(thread, &frame);
+		thread->arch_info.current_iframe = &frame;
+	}
 
 //	if(frame.vector != 0x20)
 //		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
@@ -249,7 +251,7 @@ i386_handle_trap(struct iframe frame)
 			}
 			break;
 	}
-
+	
 	if (ret == B_INVOKE_SCHEDULER) {
 		int state = disable_interrupts();
 		GRAB_THREAD_LOCK();
@@ -261,6 +263,7 @@ i386_handle_trap(struct iframe frame)
 	if (frame.cs == USER_CODE_SEG || frame.vector == 99) {
 		thread_atkernel_exit();
 	}
+	
 //	dprintf("0x%x cpu %d!\n", thread_get_current_thread_id(), smp_get_current_cpu());
 
 	if (thread)

@@ -95,6 +95,8 @@ struct iframe {
 	unsigned int edx;
 	unsigned int ecx;
 	unsigned int eax;
+	unsigned int orig_eax;
+	unsigned int orig_edx;
 	unsigned int vector;
 	unsigned int error_code;
 	unsigned int eip;
@@ -112,6 +114,10 @@ void i386_enter_uspace(addr entry, void *args, addr ustack_top);
 void i386_set_kstack(addr kstack);
 void i386_switch_stack_and_call(addr stack, void (*func)(void *), void *arg);
 void i386_swap_pgdir(addr new_pgdir);
+void i386_fsave(void *fpu_state);
+void i386_fxsave(void *fpu_state);
+void i386_frstor(void *fpu_state);
+void i386_fxrstor(void *fpu_state);
 void i386_fsave_swap(void *old_fpu_state, void *new_fpu_state);
 void i386_fxsave_swap(void *old_fpu_state, void *new_fpu_state);
 

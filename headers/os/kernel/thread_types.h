@@ -21,6 +21,7 @@ extern "C" {
 #include <cbuf.h>
 #include <vm.h>
 #include <smp.h>
+#include <signal.h>
 #include <arch/thread_struct.h>
 
 extern spinlock_t thread_spinlock;
@@ -101,7 +102,11 @@ struct thread {
 	int state;
 	int next_state;
 	union cpu_ent *cpu;
-	int pending_signals;
+	
+	sigset_t sig_pending;
+	sigset_t sig_block_mask;
+	struct sigaction sig_action[32];
+	
 	bool in_kernel;
 	sem_id sem_blocking;
 	int sem_count;

@@ -150,3 +150,8 @@ SYSCALL6(sys_sysctl, 71)
 SYSCALL3(sys_setenv, 79)
 SYSCALL2(sys_getenv, 80)
 
+/* Signal handling calls */
+SYSCALL0(sys_return_from_signal, 103)
+SYSCALL2(sys_kill, 104)
+SYSCALL3(sys_sigaction, 105)
+

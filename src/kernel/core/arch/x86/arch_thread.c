@@ -10,8 +10,11 @@
 #include <memheap.h>
 #include <thread.h>
 #include <arch/thread.h>
+#include <arch_cpu.h>
 #include <int.h>
 #include <string.h>
+#include <Errors.h>
+#include <signal.h>
 
 
 // from arch_interrupts.S
@@ -192,5 +195,117 @@ arch_thread_enter_uspace(addr entry, void *args, addr ustack_top)
 	i386_set_kstack(thread_get_current_thread()->kernel_stack_base + KSTACK_SIZE);
 
 	i386_enter_uspace(entry, args, ustack_top - 4);
+}
+
+
+void
+arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig_mask)
+{
+	struct iframe *frame = t->arch_info.current_iframe;
+	uint32 *stack = (uint32 *)frame->user_esp;
+	uint32 *code;
+	uint32 *fpu_state;
+	
+	if (frame->orig_eax >= 0) {
+		// we're coming from a syscall
+		switch (frame->eax) {
+			case ERESTARTNOHAND:
+				frame->eax = EINTR;
+				break;
+			case EINTR:
+			case ERESTARTSYS:
+				if (!(sa->sa_flags & SA_RESTART)) {
+					frame->eax = EINTR;
+					break;
+				}
+				/* fallthrough */
+			case ERESTARTNOINTR:
+				dprintf("### restarting syscall %d after signal %d\n", frame->orig_eax, sig);
+				frame->eax = frame->orig_eax;
+				frame->edx = frame->orig_edx;
+				frame->eip -= 2;
+				break;
+		}
+	}
+	
+	stack -= 192;
+	code = stack + 25;
+	fpu_state = stack + 64;
+	
+	stack[0] = (uint32)code;	// return address when sa_handler done
+	stack[1] = sig;				// only argument to sa_handler
+	stack[2] = frame->gs;
+	stack[3] = frame->fs;
+	stack[4] = frame->es;
+	stack[5] = frame->ds;
+	stack[6] = frame->edi;
+	stack[7] = frame->esi;
+	stack[8] = frame->ebp;
+	stack[9] = frame->esp;
+	stack[10] = frame->ebx;
+	stack[11] = frame->edx;
+	stack[12] = frame->ecx;
+	stack[13] = frame->eax;
+	stack[18] = frame->eip;
+	stack[19] = frame->cs;
+	stack[20] = frame->flags;
+	stack[21] = frame->user_esp;
+	stack[22] = frame->user_ss;
+	stack[23] = sig_mask;
+	stack[24] = (uint32)fpu_state;
+	
+	i386_fsave(fpu_state);
+	
+	memcpy(code, i386_return_from_signal, (i386_end_return_from_signal - i386_return_from_signal));
+	
+	frame->user_esp = (uint32)stack;
+	frame->eip = (uint32)sa->sa_handler;
+}
+
+
+int64
+arch_restore_signal_frame(void)
+{
+	struct thread *t = thread_get_current_thread();
+	struct iframe *frame;
+	uint32 fpu_state;
+	
+	dprintf("### arch_restore_signal_frame: entry\n");
+	
+	frame = t->arch_info.current_iframe;
+	t->sig_block_mask = *((sigset_t *)((void *)frame->user_esp + sizeof(struct iframe))) & BLOCKABLE_SIGS;
+	fpu_state = *((uint32 *)((void *)frame->user_esp + sizeof(struct iframe) + sizeof(uint32)));
+	
+	memcpy((void *)frame, (void *)frame->user_esp, sizeof(struct iframe));
+	
+	i386_frstor((void *)fpu_state);
+	
+	dprintf("### arch_restore_signal_frame: exit\n");
+	
+	frame->orig_eax = -1;	/* disable syscall checks */
+	
+	return (int64)frame->eax | ((int64)frame->edx << 32);
+}
+
+
+void
+arch_check_syscall_restart(struct thread *t)
+{
+	struct iframe *frame = t->arch_info.current_iframe;
+	
+	dprintf("### arch_check_syscall_restart: entry\n");
+	if (frame->orig_eax >= 0) {
+		dprintf("### arch_check_syscall_restart: coming from a syscall\n");
+		if ((frame->eax == ERESTARTNOHAND) ||
+				(frame->eax == EINTR) ||
+				(frame->eax == ERESTARTSYS) ||
+				(frame->eax == ERESTARTNOINTR)) {
+			dprintf("### arch_check_syscall_restart: syscall restart needed\n");
+			frame->eax = frame->orig_eax;
+			frame->edx = frame->orig_edx;
+			frame->eip -= 2;
+		}
+	}
+	dprintf("### arch_check_syscall_restart: exit\n");
 }
 

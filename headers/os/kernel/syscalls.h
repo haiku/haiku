@@ -60,6 +60,9 @@ status_t sys_get_next_thread_info(team_id team, int32 *cookie, thread_info *info
 status_t sys_get_team_info(team_id id, team_info *info);
 status_t sys_get_next_team_info(int32 *cookie, team_info *info);
 
+int sys_kill(pid_t pid, int sig);
+int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+
 region_id sys_vm_create_anonymous_region(const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);
 region_id sys_vm_clone_region(const char *name, void **address, int addr_type,

@@ -1,4 +1,4 @@
-/* Threading and team information */
+/* Threading routines */
 
 /*
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -75,11 +75,8 @@ static struct thread_queue run_q[(B_MAX_PRIORITY / 2) + 1] = { { NULL, NULL }, }
 struct thread_queue dead_q;
 
 static void thread_entry(void);
-#ifndef NEW_SCHEDULER
-static struct thread *thread_get_thread_struct_locked(thread_id id);
-#endif /* not NEW_SCHEDULER */
 static void thread_kthread_exit(void);
-static void deliver_signal(struct thread *t, int signal);
+//static void deliver_signal(struct thread *t, int signal);
 
 
 // insert a thread onto the tail of a queue
@@ -266,11 +263,13 @@ create_thread_struct(const char *name)
 	t->q_next = NULL;
 	t->priority = -1;
 	t->args = NULL;
-	t->pending_signals = SIG_NONE;
+	t->sig_pending = 0;
+	t->sig_block_mask = 0;
+	memset(t->sig_action, 0, 32 * sizeof(struct sigaction));
 	t->in_kernel = true;
 	t->user_time = 0;
 	t->kernel_time = 0;
-	t->last_time = 0;		
+	t->last_time = 0;
 
 	sprintf(temp, "thread_0x%lx_retcode_sem", t->id);
 	t->return_code_sem = create_sem(0, temp);
@@ -326,7 +325,9 @@ _create_user_thread_kentry(void)
 	t = thread_get_current_thread();
 
 	// a signal may have been delivered here
-	thread_atkernel_exit();
+//	thread_atkernel_exit();
+	t->last_time = system_time();
+	t->in_kernel = false;
 
 	// jump to the entry point in user space
 	arch_thread_enter_uspace((addr)t->entry, t->args, t->user_stack_base + STACK_SIZE);
@@ -343,7 +344,9 @@ _create_kernel_thread_kentry(void)
 	struct thread *t;
 
 	t = thread_get_current_thread();
-
+	
+	t->last_time = system_time();
+	
 	// call the entry function with the appropriate args
 	func = (void *)t->entry;
 
@@ -466,69 +469,21 @@ thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *arg
 int
 thread_suspend_thread(thread_id id)
 {
-	int state;
-	struct thread *t;
-	int retval;
-	bool global_resched = false;
-
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	t = thread_get_current_thread();
-	if (t->id != id) {
-		t = thread_get_thread_struct_locked(id);
-	}
-
-	if (t != NULL) {
-		if (t->team == team_get_kernel_team()) {
-			// no way
-			retval = EPERM;
-		} else if (t->in_kernel == true) {
-			t->pending_signals |= SIG_SUSPEND;
-			retval = B_NO_ERROR;
-		} else {
-			t->next_state = B_THREAD_SUSPENDED;
-			global_resched = true;
-			retval = B_NO_ERROR;
-		}
-	} else
-		retval = ERR_INVALID_HANDLE;
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	if (global_resched)
+	int rv;
+	
+	rv = send_signal_etc(id, SIGSTOP, B_DO_NOT_RESCHEDULE);
+	if (rv == B_OK)
 		smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
-
-	return retval;
+	return rv;
 }
 
 
 int
 thread_resume_thread(thread_id id)
 {
-	int state;
-	struct thread *t;
-	int retval;
-
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	t = thread_get_thread_struct_locked(id);
-	if (t != NULL && t->state == B_THREAD_SUSPENDED) {
-		t->state = B_THREAD_READY;
-		t->next_state = B_THREAD_READY;
-
-		thread_enqueue_run_q(t);
-		retval = B_NO_ERROR;
-	} else
-		retval = ERR_INVALID_HANDLE;
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	return retval;
+	return send_signal_etc(id, SIGCONT, B_DO_NOT_RESCHEDULE);
 }
+
 
 #ifndef NEW_SCHEDULER
 status_t
@@ -614,7 +569,7 @@ _dump_thread_info(struct thread *t)
 		dprintf("(%d)\n", t->cpu->info.cpu_num);
 	else
 		dprintf("\n");
-	dprintf("pending_signals:  0x%x\n", t->pending_signals);
+	dprintf("sig_pending:  0x%lx\n", t->sig_pending);
 	dprintf("in_kernel:   %d\n", t->in_kernel);
 	dprintf("sem_blocking:0x%lx\n", t->sem_blocking);
 	dprintf("sem_count:   0x%x\n", t->sem_count);
@@ -1072,13 +1027,7 @@ thread_exit(int retcode)
 			}
 			RELEASE_TEAM_LOCK();
 			restore_interrupts(state);
-#if 0
-			// Now wait for all of the threads to die
-			// XXX block on a semaphore
-			while((volatile int)p->num_threads > 0) {
-				snooze(10000); // 10 ms
-			}
-#endif
+			// wait until all threads in team are dead.
 			acquire_sem_etc(p->death_sem, p->num_threads, 0, 0);
 			delete_sem(p->death_sem);
 		}
@@ -1125,55 +1074,25 @@ thread_exit(int retcode)
 }
 
 
-static int
-_thread_kill_thread(thread_id id, bool wait_on)
-{
-	int state;
-	struct thread *t;
-	int rc;
-
-//	dprintf("_thread_kill_thread: id %d, wait_on %d\n", id, wait_on);
-
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	t = thread_get_thread_struct_locked(id);
-	if (t != NULL) {
-		if (t->team == team_get_kernel_team()) {
-			// can't touch this
-			rc = EPERM;
-		} else {
-			deliver_signal(t, SIG_KILL);
-			rc = B_NO_ERROR;
-			if (t->id == thread_get_current_thread()->id)
-				wait_on = false; // can't wait on ourself
-		}
-	} else
-		rc = ERR_INVALID_HANDLE;
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-	if (rc < 0)
-		return rc;
-
-	if (wait_on)
-		thread_wait_on_thread(id, NULL);
-
-	return rc;
-}
-
-
 int
 thread_kill_thread(thread_id id)
 {
-	return _thread_kill_thread(id, true);
+	int rv;
+	
+	rv = send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+	if (rv < 0)
+		return rv;
+	if (id != thread_get_current_thread()->id)
+		thread_wait_on_thread(id, NULL);
+	
+	return rv;
 }
 
 
 int
 thread_kill_thread_nowait(thread_id id)
 {
-	return _thread_kill_thread(id, false);
+	return send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -1192,6 +1111,10 @@ thread_wait_on_thread(thread_id id, int *retcode)
 	struct thread *t;
 	int rc;
 
+	rc = send_signal_etc(id, SIGCONT, 0);
+	if (rc != B_OK)
+		return rc;
+	
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
@@ -1199,7 +1122,7 @@ thread_wait_on_thread(thread_id id, int *retcode)
 	if (t != NULL) {
 		sem = t->return_code_sem;
 	} else {
-		sem = ERR_INVALID_HANDLE;
+		sem = B_BAD_THREAD_ID;
 	}
 
 	RELEASE_THREAD_LOCK();
@@ -1244,72 +1167,15 @@ thread_get_thread_struct(thread_id id)
 	return t;
 }
 
-#ifndef NEW_SCHEDULER
-static struct thread *thread_get_thread_struct_locked(thread_id id)
-#else /* NEW_SCHEDULER */
-struct thread *thread_get_thread_struct_locked(thread_id id)
-#endif /* NEW_SCHEDULER */
+
+struct thread *
+thread_get_thread_struct_locked(thread_id id)
 {
 	struct thread_key key;
 
 	key.id = id;
 
 	return hash_lookup(thread_hash, &key);
-}
-
-
-// sets the pending signal flag on a thread and possibly does some work to wake it up, etc.
-// expects the thread lock to be held
-
-static void
-deliver_signal(struct thread *t, int signal)
-{
-//	dprintf("deliver_signal: thread %p (%d), signal %d\n", t, t->id, signal);
-	switch (signal) {
-		case SIG_KILL:
-			t->pending_signals |= SIG_KILL;
-			switch (t->state) {
-				case B_THREAD_SUSPENDED:
-					t->state = B_THREAD_READY;
-					t->next_state = B_THREAD_READY;
-
-					thread_enqueue_run_q(t);
-					break;
-				case B_THREAD_WAITING:
-					sem_interrupt_thread(t);
-					break;
-				default:
-					;
-			}
-			break;
-		default:
-			t->pending_signals |= signal;
-	}
-}
-
-
-// expects the thread lock to be held
-
-static void
-_check_for_thread_sigs(struct thread *t, int state)
-{
-	if (t->pending_signals == SIG_NONE)
-		return;
-
-	if (t->pending_signals & SIG_KILL) {
-		t->pending_signals &= ~SIG_KILL;
-
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
-		thread_exit(0);
-		// never gets to here
-	}
-	if (t->pending_signals & SIG_SUSPEND) {
-		t->pending_signals &= ~SIG_SUSPEND;
-		t->next_state = B_THREAD_SUSPENDED;
-		// XXX will probably want to delay this
-		resched();
-	}
 }
 
 
@@ -1333,13 +1199,8 @@ thread_atkernel_entry(void)
 	t->user_time += now - t->last_time;
 	t->last_time = now;
 
-	GRAB_THREAD_LOCK();
-
 	t->in_kernel = true;
 
-	_check_for_thread_sigs(t, state);
-
-	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 }
 
@@ -1360,7 +1221,7 @@ thread_atkernel_exit(void)
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	_check_for_thread_sigs(t, state);
+	handle_signals(t, state);
 
 	t->in_kernel = false;
 

@@ -15,6 +15,8 @@
 .align 8; \
 name: \
 	pushl	$vector; \
+	pushl	$-1; \
+	pushl	$-1; \
 	jmp		int_bottom
 
 #define TRAP(name, vector) \
@@ -23,6 +25,8 @@ name: \
 name: \
 	pushl	$0; \
 	pushl	$vector; \
+	pushl	%edx; \
+	pushl	%eax; \
 	jmp		int_bottom
 
 TRAP(trap0, 0)
@@ -92,7 +96,7 @@ int_bottom:
 	pop		%es
 	pop		%ds
 	popa
-	addl	$8,%esp
+	addl	$16,%esp
 	iret
 
 	// custom stack -> copy registers to kernel stack and switch there
@@ -102,22 +106,22 @@ int_bottom:
 	addl	_interrupt_stack_offset,%edx
 	lss		(%edx),%esp
 	movl	%ebx,%ds
-	subl	$84,%esp
+	subl	$92,%esp
 	movl	%esp,%edi
-	movl	$19,%ecx
+	movl	$21,%ecx
 	rep		movsl
 	movl	%eax,%ds
-	subl	$76,%esi
+	subl	$84,%esi
 	movl	%esi,(%edi)  // save custom stack address
 	movl	%ebx,4(%edi)
 	call	i386_handle_trap
-	lss		76(%esp),%esp  // reload custom stack address
+	lss		84(%esp),%esp  // reload custom stack address
 	pop		%gs
 	pop		%fs
 	pop		%es
 	pop		%ds
 	popa
-	addl	$8,%esp
+	addl	$16,%esp
 	iret
 
 _interrupt_stack_offset:
@@ -151,3 +155,13 @@ FUNCTION(i386_stack_switch):
 	pushl	%ecx
 	popf
 	jmp		*%edx
+
+FUNCTION(i386_return_from_signal):
+	popl	%eax		// flush the only signal handler parameter
+	movl	$103, %eax	// This syscall will restore the cpu context to the
+	movl	$0, %ecx	// one existing before calling the signal handler
+	lea		4(%esp), %edx
+	int		$99
+	ret
+FUNCTION(i386_end_return_from_signal):
+	

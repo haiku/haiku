@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src kernel apps ;
 
-KernelObjects false_main.c fibo_main.c init.c true_main.c ;
+KernelObjects false_main.c fibo_main.c init.c true_main.c sig_test.c ;
 
 SubInclude OBOS_TOP src kernel apps cpuinfo ;
 SubInclude OBOS_TOP src kernel apps echo ;
