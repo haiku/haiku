@@ -1587,35 +1587,31 @@ translate_from_bmppal_to_bits(BPositionIO *inSource,
 
 
 // ---------------------------------------------------------------
-// bmp_memset
+// pixelcpy
 //
-// Copies data from setto into dest for len bytes. If len <= 4,
-// memcpy is used because memset doesn't seem to do anything if
-// len is less than or equal to 4. When len > 4, memset is used
-// to copy setto over and over into dest.
+// Copies count 32-bit pixels with a color value of pixel to dest.
 //
 // Preconditions:
 //
-// Parameters:	dest,	where data will be written
+// Parameters:	dest,	where the pixel data will be copied to
 //
-//				setto,	the data to copy to dest
+//				pixel,	the 32-bit color value to copy to dest
+//						count times
 //
-//				len,	the amount of bytes to copy to
-//						dest, if more than 4,
-//						the 4 bytes that is setto is 
-//						copied to dest over and over
+//				count,	the number of times pixel is copied to
+//						dest
 //
 // Postconditions:
 //
-// Returns: whatever memcpy and memset return
+// Returns:
 // ---------------------------------------------------------------
-void *
-bmp_memset(void *dest, int setto, size_t len)
+void
+pixelcpy(uint8 *dest, uint32 pixel, uint32 count)
 {
-	if (len <= 4)
-		return memcpy(dest, &setto, len);
-	else
-		return memset(dest, setto, len);
+	for (uint32 i = 0; i < count; i++) {
+		memcpy(dest, &pixel, 4);
+		dest += 4;
+	}
 }
 
 // ---------------------------------------------------------------
@@ -1716,8 +1712,8 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 					// if there are columns remaing on this
 					// line, set them to the color at index zero
 					if (bmppixcol < msheader.width)
-						bmp_memset(bitsRowData + (bmppixcol * 4), defaultcolor,
-							(msheader.width - bmppixcol) * 4);
+						pixelcpy(bitsRowData + (bmppixcol * 4),
+							defaultcolor, msheader.width - bmppixcol);
 					outDestination->Write(bitsRowData, bitsRowBytes);
 					bmppixcol = 0;
 					bmppixrow++;
@@ -1738,8 +1734,8 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 					}
 					
 					while (bmppixrow < msheader.height) {
-						bmp_memset(bitsRowData + (bmppixcol * 4), defaultcolor,
-							(msheader.width - bmppixcol) * 4);
+						pixelcpy(bitsRowData + (bmppixcol * 4), defaultcolor,
+							msheader.width - bmppixcol);
 						outDestination->Write(bitsRowData, bitsRowBytes);
 						bmppixcol = 0;
 						bmppixrow++;
@@ -1776,8 +1772,8 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 					// set all pixels to the first entry in
 					// the palette, for the number of rows skipped
 					while (dy > 0) {
-						bmp_memset(bitsRowData + (bmppixcol * 4), defaultcolor,
-							(msheader.width - bmppixcol) * 4);
+						pixelcpy(bitsRowData + (bmppixcol * 4), defaultcolor,
+							msheader.width - bmppixcol);
 						outDestination->Write(bitsRowData, bitsRowBytes);
 						bmppixcol = 0;
 						bmppixrow++;
@@ -1786,8 +1782,8 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 					}
 								
 					if (bmppixcol < (uint32) lastcol + dx) {
-						bmp_memset(bitsRowData + (bmppixcol * 4), defaultcolor,
-							(dx + lastcol - bmppixcol) * 4);
+						pixelcpy(bitsRowData + (bmppixcol * 4), defaultcolor,
+							dx + lastcol - bmppixcol);
 						bmppixcol = dx + lastcol;
 					}
 					
