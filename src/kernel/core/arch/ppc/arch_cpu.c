@@ -122,24 +122,41 @@ error:
 	return B_BAD_ADDRESS;
 }
 
+/*!	\brief Copies at most (\a size - 1) characters from the string in \a from to
+	the string in \a to, NULL-terminating the result.
 
+	\param to Pointer to the destination C-string.
+	\param from Pointer to the source C-string.
+	\param size Size in bytes of the string buffer pointed to by \a to.
+	
+	\return strlen(\a from).
+*/
 int
 arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr *faultHandler)
 {
+	int from_length = 0;
+
 	*faultHandler = (addr)&&error;
 
-	to[--size] = '\0';
-	while (size-- && (*to++ = *from++) != '\0')
-		;
+	if (size > 0) {
+		to[--size] = '\0';
+		// copy 
+		for ( ; size; size--, from_length++, to++, from++) {
+			if ((*to = *from) == '\0')
+				break;
+		}
+	}
+	// count any leftover from chars
+	while (*from++ != '\0')
+		from_length++;
 
 	*faultHandler = 0;
-	return 0;
+	return from_length;
 
 error:
 	*faultHandler = 0;
 	return B_BAD_ADDRESS;
 }
-
 
 int
 arch_cpu_user_memset(void *s, char c, size_t count, addr *faultHandler)
