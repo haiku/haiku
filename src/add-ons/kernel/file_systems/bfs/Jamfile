@@ -21,6 +21,9 @@ oldOPTIM = $(OPTIM) ;
 	# report itself as "bfs" instead of "obfs"
 	if $(BFS_REPLACEMENT) {
 		defines += BFS_REPLACEMENT ;
+		bfsAddOnName = bfs ;
+	} else {
+		bfsAddOnName = obfs ;
 	}	
 
 	if $(DEBUG) = 0 {
@@ -35,7 +38,7 @@ oldOPTIM = $(OPTIM) ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
 
-R5KernelAddon obfs : [ FDirName kernel file_systems bfs ] :
+R5KernelAddon $(bfsAddOnName) : [ FDirName kernel file_systems ] :
 	BlockAllocator.cpp
 	BPlusTree.cpp
 	kernel_cpp.cpp
