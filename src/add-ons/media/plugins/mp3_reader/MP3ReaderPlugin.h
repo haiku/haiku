@@ -43,6 +43,7 @@ private:
 	int			GetFraunhoferVbrLength(uint8 *header);
 	int			GetLameVbrLength(uint8 *header);
 	int			GetId3v2Length(uint8 *header);
+	int			GetInfoCbrLength(uint8 *header);
 	
 	bool		FindData();
 	

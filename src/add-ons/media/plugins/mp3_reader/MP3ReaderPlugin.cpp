@@ -295,6 +295,12 @@ mp3Reader::ParseFile()
 				goto skip_header;
 			}
 
+			hdr_length = GetInfoCbrLength(&buf[pos]);
+			if (hdr_length > 0) {
+				TRACE("mp3ReaderPlugin::ParseFile found a Info CBR header of %d bytes at position %Ld\n", hdr_length, offset + pos);
+				goto skip_header;
+			}
+			
 			hdr_length = GetFraunhoferVbrLength(&buf[pos]);
 			if (hdr_length > 0) {
 				TRACE("mp3ReaderPlugin::ParseFile found a Fraunhofer VBR header of %d bytes at position %Ld\n", hdr_length, offset + pos);
@@ -374,7 +380,7 @@ mp3Reader::ParseFile()
 			continue;
 		if (0 == memcmp(&buf[pos], "LYRICSBEGIN", 11)) {
 			TRACE("mp3ReaderPlugin::ParseFile found a Lyrics header at position %Ld\n", offset + pos);
-			fDataSize = fDataStart - offset + pos;
+			fDataSize = offset + pos + fDataStart;
 		}
 	}
 	
@@ -398,11 +404,31 @@ mp3Reader::GetXingVbrLength(uint8 *header)
 	else	 // mpeg2
 		xing_header = (h_mode != 3) ? (header + 21) : (header + 13);
 
-	// note: in CBR files, there is an 'Info' tag of the same format
 	if (xing_header[0] != 'X') return -1;
 	if (xing_header[1] != 'i') return -1;
 	if (xing_header[2] != 'n') return -1;
 	if (xing_header[3] != 'g') return -1;
+
+	return GetFrameLength(header);
+}
+
+int
+mp3Reader::GetInfoCbrLength(uint8 *header)
+{
+	int h_id	= (header[1] >> 3) & 1;
+	int h_mode	= (header[3] >> 6) & 3;
+	uint8 *info_header;
+	
+	// determine offset of header
+	if(h_id) // mpeg1
+		info_header = (h_mode != 3) ? (header + 36) : (header + 21);
+	else	 // mpeg2
+		info_header = (h_mode != 3) ? (header + 21) : (header + 13);
+
+	if (info_header[0] != 'I') return -1;
+	if (info_header[1] != 'n') return -1;
+	if (info_header[2] != 'f') return -1;
+	if (info_header[3] != 'o') return -1;
 
 	return GetFrameLength(header);
 }
