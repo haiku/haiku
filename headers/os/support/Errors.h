@@ -180,6 +180,7 @@ enum {
 #define ENOTSOCK		(B_POSIX_ERROR_BASE + 44)
 #define EHOSTDOWN		(B_POSIX_ERROR_BASE + 45)
 
+/*---- POSIX errors that can be mapped to BeOS error codes ----*/
 #define ENOMEM			B_NO_MEMORY
 #define EACCES			B_PERMISSION_DENIED
 #define EINTR			B_INTERRUPTED
@@ -205,6 +206,14 @@ enum {
 #define ELOOP			B_LINK_LIMIT
 #define ENOEXEC			B_NOT_AN_EXECUTABLE
 #define EPIPE			B_BUSTED_PIPE
+
+/*---- new error codes that can be mapped to POSIX errors ----*/
+#define	B_BUFFER_OVERFLOW	EOVERFLOW
+#define	B_NOT_SUPPORTED		EOPNOTSUPP
+#define B_TOO_MANY_ARGS		E2BIG
+#define	B_FILE_TOO_LARGE	EFBIG
+#define B_RESULT_TOO_LARGE	ERANGE
+#define	B_DEVICE_NOT_FOUND	ENODEV
 
 /*-------------------------------------------------------------*/
 /*----- Media Kit Errors --------------------------------------*/
