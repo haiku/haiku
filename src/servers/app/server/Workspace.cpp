@@ -691,6 +691,10 @@ STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 			// and modal windows contains our window.
 			if (fFrontItem && fFrontItem->layerPtr->Level() == B_NORMAL)
 			{
+				// if this winBorder is the focus it is already the first among floating app windows.
+				if (fFocusItem && fFocusItem->layerPtr == winBorder)
+					break;
+
 				ListData		*itemThis = NULL;
 				// remove from B_NORMAL's list.
 				if (fFrontItem->layerPtr->fFMWList.RemoveItem(winBorder))
