@@ -1,7 +1,7 @@
 /*
  * multiaudio replacement media addon for BeOS
  *
- * Copyright (c) 2002, Jerome Duval (jerome.duval@free.fr)
+ * Copyright (c) 2002, 2003, Jerome Duval (jerome.duval@free.fr)
  *
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -32,7 +32,7 @@
 
 #define MAX_CONTROLS	128
 #define MAX_CHANNELS	32
-#define NB_BUFFERS		2
+#define NB_BUFFERS		32
 
 class MultiAudioDevice
 {
@@ -70,15 +70,10 @@ public:
 	
 	multi_mix_control_info 	MMCI;
 	multi_mix_control		MMC[MAX_CONTROLS];
-	
-	/*int32					*fPlay[NB_BUFFERS][MAX_CHANNELS];
-	int32					*fRecord[NB_BUFFERS][MAX_CHANNELS];*/
-	
-	buffer_desc		play_buffer_list0[MAX_CHANNELS];
-	buffer_desc		play_buffer_list1[MAX_CHANNELS];
+		
+	buffer_desc		play_buffer_list[NB_BUFFERS * MAX_CHANNELS];
+	buffer_desc		record_buffer_list[NB_BUFFERS * MAX_CHANNELS];
 	buffer_desc 	*play_buffer_desc[NB_BUFFERS];
-	buffer_desc		record_buffer_list0[MAX_CHANNELS];
-	buffer_desc		record_buffer_list1[MAX_CHANNELS];
 	buffer_desc 	*record_buffer_desc[NB_BUFFERS];
 
 private:

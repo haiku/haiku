@@ -1,7 +1,7 @@
 /*
  * multiaudio replacement media addon for BeOS
  *
- * Copyright (c) 2002, Jerome Duval (jerome.duval@free.fr)
+ * Copyright (c) 2002, 2003, Jerome Duval (jerome.duval@free.fr)
  *
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -254,9 +254,9 @@ status_t MultiAudioDevice::InitDriver()
 	// Set the sample rate
 	//
 	MFI.info_size = sizeof(MFI);
-	MFI.output.rate = select_multiaudio_rate(MD.output_rates);	//B_SR_48000;
+	MFI.output.rate = select_multiaudio_rate(MD.output_rates);
 	MFI.output.cvsr = 0;
-	MFI.output.format = select_multiaudio_format(MD.output_formats);	//B_FMT_16BIT;
+	MFI.output.format = select_multiaudio_format(MD.output_formats);
 	MFI.input.rate = MFI.output.rate;
 	MFI.input.cvsr = MFI.output.cvsr;
 	MFI.input.format = MFI.output.format;
@@ -270,10 +270,10 @@ status_t MultiAudioDevice::InitDriver()
 	//
 	// Get the buffers
 	//
-	play_buffer_desc[0] = play_buffer_list0;
-	play_buffer_desc[1] = play_buffer_list1;
-	record_buffer_desc[0] = record_buffer_list0;
-	record_buffer_desc[1] = record_buffer_list1;
+	for (i = 0; i < NB_BUFFERS; i++) {
+		play_buffer_desc[i] = &play_buffer_list[i * MAX_CHANNELS];
+		record_buffer_desc[i] = &record_buffer_list[i * MAX_CHANNELS];
+	}
 	MBL.info_size = sizeof(MBL);
 	MBL.request_playback_buffer_size = 0;           //use the default......
 	MBL.request_playback_buffers = NB_BUFFERS;
@@ -282,7 +282,8 @@ status_t MultiAudioDevice::InitDriver()
 	MBL.request_record_buffer_size = 0;           //use the default......
 	MBL.request_record_buffers = NB_BUFFERS;
 	MBL.request_record_channels = num_inputs;
-	MBL.record_buffers = (buffer_desc **) record_buffer_desc;		
+	MBL.record_buffers = (buffer_desc **) record_buffer_desc;
+			
 	rval = DRIVER_GET_BUFFERS(&MBL, 0);
 
 	if (B_OK != rval)
@@ -292,34 +293,21 @@ status_t MultiAudioDevice::InitDriver()
 	}
 	
 	for (i = 0; i < MBL.return_playback_buffers; i++)
-	{
-		for (int j=0; j < MBL.return_playback_channels; j++)
-		{
-			//fPlay[i][j] = (int32 *) MBL.playback_buffers[i][j].base;
+		for (int j=0; j < MBL.return_playback_channels; j++) {
 			PRINT(("MBL.playback_buffers[%d][%d].base: %p\n",
 				i,j,MBL.playback_buffers[i][j].base));
 			PRINT(("MBL.playback_buffers[%d][%d].stride: %i\n",
 				i,j,MBL.playback_buffers[i][j].stride));
 		}
-		//memset(MBL.playback_buffers[i][0].base, 0, MBL.return_playback_buffer_size * 4 /*samps to bytes*/);
-		//PRINT(("Play buffers[%d] size : %li zeroed\n",i, MBL.return_playback_buffer_size * 4));
-	}
 	
 	for (i = 0; i < MBL.return_record_buffers; i++)
-	{
-		for (int j=0; j < MBL.return_record_channels; j++)
-		{
-			/*fRecord[i][j] = (int32 *) MBL.record_buffers[i][j].base;
-			PRINT(("Record buffers[%d][%d]: %p\n",i,j,fRecord[i][j]));*/
+		for (int j=0; j < MBL.return_record_channels; j++) {
 			PRINT(("MBL.record_buffers[%d][%d].base: %p\n",
 				i,j,MBL.record_buffers[i][j].base));
 			PRINT(("MBL.record_buffers[%d][%d].stride: %i\n",
 				i,j,MBL.record_buffers[i][j].stride));
 		}
-		//memset(MBL.record_buffers[i][0].base, 0, MBL.return_record_buffer_size * 4 /*samps to bytes*/);
-		//PRINT(("Record buffers[%d] size : %li zeroed\n",i, MBL.return_record_buffer_size * 4));
-	}
-	
+		
 	MMCI.info_size = sizeof(MMCI);
 	MMCI.control_count = MAX_CONTROLS;
 	MMCI.controls = MMC;

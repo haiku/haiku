@@ -143,7 +143,9 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn *addon, char* name, MultiAudioDevice 
 						* (fPreferredFormat.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
 						* fPreferredFormat.u.raw_audio.channel_count;
 	
-	PRINT_OBJECT(*config);
+	if(config) {
+		PRINT_OBJECT(*config);
+	}
 		
 	fInitCheckStatus = B_OK;
 }
@@ -1499,7 +1501,7 @@ MultiAudioNode::RunThread()
 				&& (input->fInput.source != media_source::null 
 				|| input->fChannelId == 0)) {
 				
-				//PRINT(("playback_buffer_cycle ok input : %i\n", i));
+				//PRINT(("playback_buffer_cycle ok input : %i %d\n", i, MBI.playback_buffer_cycle));
 				
 				input->fBufferCycle = (MBI.playback_buffer_cycle - 1 
 					+ fDevice->MBL.return_playback_buffers) % fDevice->MBL.return_playback_buffers;
@@ -1769,7 +1771,7 @@ MultiAudioNode::StartThread()
 		return B_OK;
 	
 	//allocate buffer free semaphore
-	fBuffer_free = create_sem( NB_BUFFERS - 1, "multi_audio out buffer free" );
+	fBuffer_free = create_sem( fDevice->MBL.return_playback_buffers - 1, "multi_audio out buffer free" );
 	
 	if ( fBuffer_free < B_OK ) {
 		return B_ERROR;
@@ -1878,6 +1880,9 @@ MultiAudioNode::GetConfigurationFor(BMessage * into_message)
 	size_t size = 128;
 	bigtime_t last_change;
 	status_t err;
+	
+	if(!into_message)
+		return B_BAD_VALUE;
 	
 	buffer = malloc(size);
 	
