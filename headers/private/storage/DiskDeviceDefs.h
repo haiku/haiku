@@ -148,6 +148,14 @@ enum {
 	B_DISK_DEVICE_JOB_CAN_PAUSE				= 0x08,
 };
 
+// string length constants, all of which include the NULL terminator
+#define B_DISK_DEVICE_TYPE_LENGTH B_FILE_NAME_LENGTH
+#define B_DISK_DEVICE_NAME_LENGTH B_FILE_NAME_LENGTH
+#define B_DISK_SYSTEM_NAME_LENGTH B_PATH_NAME_LENGTH
+
+// max size of parameter string buffers, including NULL terminator
+#define B_DISK_DEVICE_MAX_PARAMETER_SIZE (32 * 1024)
+
 #ifdef __cplusplus
 }
 #endif
