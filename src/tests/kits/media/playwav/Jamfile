@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src tests kits media playwav ;
+
+UsePrivateHeaders media ;
+
+SimpleTest playwav
+	: playwav.cpp
+	: media be root
+;
