@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------
 
 #include "Protocol.h"
+#include "IPCP.h"
 #include <KPPPConfigurePacket.h>
 #include <KPPPInterface.h>
 #include <settings_tools.h>
@@ -18,7 +19,7 @@
 #include <sys/sockio.h>
 
 
-#define PPP_STATE_MACHINE_TIMEOUT			3000000
+#define IPCP_STATE_MACHINE_TIMEOUT			3000000
 	// 3 seconds
 
 
@@ -94,8 +95,10 @@ IPCP::ProfileChanged()
 	// "Local" and "Peer" describe each side's settings
 	const driver_parameter *profile
 		= Interface().Profile().SettingsFor("protocol", "ipcp");
-	ParseSideRequests(get_parameter_with_name("Local", profile), PPP_LOCAL_SIDE);
-	ParseSideRequests(get_parameter_with_name("Peer", profile), PPP_PEER_SIDE);
+	ParseSideRequests(get_parameter_with_name(IPCP_LOCAL_SIDE_KEY, profile),
+		PPP_LOCAL_SIDE);
+	ParseSideRequests(get_parameter_with_name(IPCP_PEER_SIDE_KEY, profile),
+		PPP_PEER_SIDE);
 }
 
 
@@ -347,15 +350,16 @@ IPCP::ParseSideRequests(const driver_parameter *requests, ppp_side side)
 				continue;
 		}
 		
-		if(!strcasecmp(requests->parameters[index].name, "Address"))
+		if(!strcasecmp(requests->parameters[index].name, IPCP_IP_ADDRESS_KEY))
 			selectedRequests->address = address;
-		else if(!strcasecmp(requests->parameters[index].name, "Netmask"))
+		else if(!strcasecmp(requests->parameters[index].name, IPCP_NETMASK_KEY))
 			selectedRequests->netmask = address;
-		else if(!strcasecmp(requests->parameters[index].name, "PrimaryDNS")) {
+		else if(!strcasecmp(requests->parameters[index].name, IPCP_PRIMARY_DNS_KEY)) {
 			selectedRequests->primaryDNS = address;
 			if(side == PPP_LOCAL_SIDE)
 				fRequestPrimaryDNS = true;
-		} else if(!strcasecmp(requests->parameters[index].name, "SecondaryDNS")) {
+		} else if(!strcasecmp(requests->parameters[index].name,
+				IPCP_SECONDARY_DNS_KEY)) {
 			selectedRequests->secondaryDNS = address;
 			if(side == PPP_LOCAL_SIDE)
 				fRequestSecondaryDNS = true;
@@ -1190,7 +1194,7 @@ IPCP::SendConfigureRequest()
 	
 	LockerHelper locker(fLock);
 	--fRequestCounter;
-	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
+	fNextTimeout = system_time() + IPCP_STATE_MACHINE_TIMEOUT;
 	locker.UnlockNow();
 	
 	KPPPConfigurePacket request(PPP_CONFIGURE_REQUEST);
@@ -1339,7 +1343,7 @@ IPCP::SendTerminateRequest()
 	
 	LockerHelper locker(fLock);
 	--fTerminateCounter;
-	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
+	fNextTimeout = system_time() + IPCP_STATE_MACHINE_TIMEOUT;
 	locker.UnlockNow();
 	
 	struct mbuf *packet = m_gethdr(MT_DATA);
