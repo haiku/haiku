@@ -1,5 +1,9 @@
 #ifndef _PTHREAD_PRIVATE_H_
 #define _PTHREAD_PRIVATE_H_
+/* 
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
 
 #include <OS.h>
 
