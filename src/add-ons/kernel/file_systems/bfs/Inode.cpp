@@ -1965,7 +1965,12 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 
 	bfs_inode *node = inode->Node();
 
-	node->parent = parentRun;
+	if (parent == NULL) {
+		// we set the parent to itself in this case
+		// (only happens for the root and indices node)
+		node->parent = run;
+	} else
+		node->parent = parentRun;
 
 	node->uid = HOST_ENDIAN_TO_BFS_INT32(geteuid());
 	node->gid = HOST_ENDIAN_TO_BFS_INT32(parent ? parent->Node()->gid : getegid());
@@ -2035,8 +2040,9 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 		index.InsertLastModified(transaction, inode);
 	}
 
-	if (new_vnode(volume->ID(), inode->ID(), inode) != B_OK) {
+	if ((status = new_vnode(volume->ID(), inode->ID(), inode)) != B_OK) {
 		// this is a really fatal error, and we can't recover from that
+		FATAL(("new_vnode() failed with: %s\n", strerror(status)));
 		DIE(("new_vnode() failed for inode!"));
 	}
 
