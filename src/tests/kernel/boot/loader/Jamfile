@@ -60,6 +60,7 @@ SimpleTest BootLoaderTest :
 	platform_debug.cpp
 	platform_devices.cpp
 	platform_heap.cpp
+	platform_menu.cpp
 	platform_misc.cpp
 	platform_mmu.cpp
 	Handle.cpp

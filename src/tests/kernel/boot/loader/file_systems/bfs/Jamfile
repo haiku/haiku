@@ -10,6 +10,7 @@ ObjectsDefines
 	bfs.cpp
 	Directory.cpp
 	File.cpp
+	Link.cpp
 	Stream.cpp
 	BPlusTree.cpp
 	:
@@ -21,6 +22,7 @@ KernelStaticLibrary boottest_bfs.a :
 	bfs.cpp
 	Directory.cpp
 	File.cpp
+	Link.cpp
 	Stream.cpp
 	BPlusTree.cpp
 	;
@@ -28,6 +30,6 @@ KernelStaticLibrary boottest_bfs.a :
 # Tell Jam where to find the sources
 
 SEARCH on [ FGristFiles
-		bfs.cpp Directory.cpp File.cpp Stream.cpp BPlusTree.cpp
+		bfs.cpp Directory.cpp File.cpp Link.cpp Stream.cpp BPlusTree.cpp
 	] = [ FDirName $(OBOS_TOP) src kernel boot loader file_systems bfs ] ;
 
