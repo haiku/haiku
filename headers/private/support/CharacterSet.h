@@ -23,7 +23,11 @@ class BCharacterSet {
      * provides for aliases.
      **/
 public:
-    /**
+	/**
+     * @brief default constructor, for stack allocated character set objects
+     **/
+    BCharacterSet();
+	/**
      * @brief constructor, for internal use only
      **/
     BCharacterSet(uint32 id, uint32 MIBenum, const char * print_name,
