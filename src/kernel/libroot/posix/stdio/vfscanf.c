@@ -150,7 +150,7 @@ literal:
 			flags |= SUPPRESS;
 			goto again;
 		case 'L':
-			flags |= LONGDBL;
+			flags |= LONGDBL | QUAD;
 			goto again;
 		case 'h':
 			flags |= SHORT;
