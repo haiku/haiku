@@ -66,8 +66,8 @@ struct bplustree_node {
 	inline bool IsLeaf() const;
 
 	void Initialize();
-	uint8 CountDuplicates(off_t offset,bool isFragment) const;
-	off_t DuplicateAt(off_t offset,bool isFragment,int8 index) const;
+	uint8 CountDuplicates(off_t offset, bool isFragment) const;
+	off_t DuplicateAt(off_t offset, bool isFragment, int8 index) const;
 	int32 FragmentsUsed(uint32 nodeSize);
 	inline duplicate_array *FragmentAt(int8 index);
 	inline duplicate_array *DuplicateArray();
@@ -124,7 +124,7 @@ class CachedNode {
 		{
 		}
 
-		CachedNode(BPlusTree *tree,off_t offset,bool check = true)
+		CachedNode(BPlusTree *tree, off_t offset, bool check = true)
 			:
 			fTree(tree),
 			fNode(NULL),
@@ -138,12 +138,12 @@ class CachedNode {
 			Unset();
 		}
 
-		bplustree_node *SetTo(off_t offset,bool check = true);
+		bplustree_node *SetTo(off_t offset, bool check = true);
 		bplustree_header *SetToHeader();
 		void Unset();
 
 		status_t Free(Transaction *transaction, off_t offset);
-		status_t Allocate(Transaction *transaction,bplustree_node **node,off_t *offset);
+		status_t Allocate(Transaction *transaction, bplustree_node **node, off_t *offset);
 		status_t WriteBack(Transaction *transaction);
 
 		bplustree_node *Node() const { return fNode; }
@@ -167,7 +167,7 @@ class BPlusTree {
 		BPlusTree();
 		~BPlusTree();
 
-		status_t	SetTo(Transaction *transaction,Inode *stream,int32 nodeSize = BPLUSTREE_NODE_SIZE);
+		status_t	SetTo(Transaction *transaction, Inode *stream, int32 nodeSize = BPLUSTREE_NODE_SIZE);
 		status_t	SetTo(Inode *stream);
 		status_t	SetStream(Inode *stream);
 
@@ -177,6 +177,7 @@ class BPlusTree {
 		status_t	Remove(Transaction *transaction, const uint8 *key, uint16 keyLength, off_t value);
 		status_t	Insert(Transaction *transaction, const uint8 *key, uint16 keyLength, off_t value);
 
+		status_t	Remove(Transaction *transaction, const char *key, off_t value);
 		status_t	Insert(Transaction *transaction, const char *key, off_t value);
 		status_t	Insert(Transaction *transaction, int32 key, off_t value);
 		status_t	Insert(Transaction *transaction, uint32 key, off_t value);
@@ -197,18 +198,26 @@ class BPlusTree {
 			// no implementation
 
 		int32		CompareKeys(const void *key1, int keylength1, const void *key2, int keylength2);
-		status_t	FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uint16 *index = NULL, off_t *next = NULL);
+		status_t	FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength,
+						uint16 *index = NULL, off_t *next = NULL);
 		status_t	SeekDown(Stack<node_and_key> &stack, const uint8 *key, uint16 keyLength);
 
-		status_t	FindFreeDuplicateFragment(bplustree_node *node, CachedNode *cached, off_t *_offset, bplustree_node **_fragment,uint32 *_index);
-		status_t	InsertDuplicate(Transaction *transaction,CachedNode *cached,bplustree_node *node,uint16 index,off_t value);
-		void		InsertKey(bplustree_node *node, uint16 index, uint8 *key, uint16 keyLength, off_t value);
-		status_t	SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *other, off_t otherOffset, uint16 *_keyIndex, uint8 *key, uint16 *_keyLength, off_t *_value);
+		status_t	FindFreeDuplicateFragment(bplustree_node *node, CachedNode *cached,
+						off_t *_offset, bplustree_node **_fragment, uint32 *_index);
+		status_t	InsertDuplicate(Transaction *transaction, CachedNode *cached,
+						bplustree_node *node, uint16 index, off_t value);
+		void		InsertKey(bplustree_node *node, uint16 index, uint8 *key, uint16 keyLength,
+						off_t value);
+		status_t	SplitNode(bplustree_node *node, off_t nodeOffset, bplustree_node *other,
+						off_t otherOffset, uint16 *_keyIndex, uint8 *key, uint16 *_keyLength,
+						off_t *_value);
 
-		status_t	RemoveDuplicate(Transaction *transaction,bplustree_node *node,CachedNode *cached,uint16 keyIndex, off_t value);
+		status_t	RemoveDuplicate(Transaction *transaction, bplustree_node *node,
+						CachedNode *cached, uint16 keyIndex, off_t value);
 		void		RemoveKey(bplustree_node *node, uint16 index);
 
-		void		UpdateIterators(off_t offset,off_t nextOffset,uint16 keyIndex,uint16 splitAt,int8 change);
+		void		UpdateIterators(off_t offset, off_t nextOffset, uint16 keyIndex,
+						uint16 splitAt, int8 change);
 		void		AddIterator(TreeIterator *iterator);
 		void		RemoveIterator(TreeIterator *iterator);
 
@@ -229,7 +238,8 @@ class BPlusTree {
 
 //***** helper classes/functions *****
 
-extern int32 compareKeys(type_code type,const void *key1, int keyLength1, const void *key2, int keyLength2);
+extern int32 compareKeys(type_code type, const void *key1, int keyLength1,
+				const void *key2, int keyLength2);
 
 class TreeIterator {
 	public:
@@ -237,12 +247,15 @@ class TreeIterator {
 		~TreeIterator();
 
 		status_t	Goto(int8 to);
-		status_t	Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxLength, off_t *value,uint16 *duplicate = NULL);
+		status_t	Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxLength,
+						off_t *value, uint16 *duplicate = NULL);
 		status_t	Find(const uint8 *key, uint16 keyLength);
 
 		status_t	Rewind();
-		status_t	GetNextEntry(void *key,uint16 *keyLength,uint16 maxLength,off_t *value,uint16 *duplicate = NULL);
-		status_t	GetPreviousEntry(void *key,uint16 *keyLength,uint16 maxLength,off_t *value,uint16 *duplicate = NULL);
+		status_t	GetNextEntry(void *key, uint16 *keyLength, uint16 maxLength,
+						off_t *value, uint16 *duplicate = NULL);
+		status_t	GetPreviousEntry(void *key, uint16 *keyLength, uint16 maxLength,
+						off_t *value, uint16 *duplicate = NULL);
 		void		SkipDuplicates();
 
 #ifdef DEBUG
@@ -262,7 +275,7 @@ class TreeIterator {
 		friend Chain<TreeIterator>;
 		friend BPlusTree;
 
-		void Update(off_t offset,off_t nextOffset,uint16 keyIndex,uint16 splitAt,int8 change);
+		void Update(off_t offset, off_t nextOffset, uint16 keyIndex, uint16 splitAt, int8 change);
 		void Stop();
 		TreeIterator *fNext;
 };
@@ -270,59 +283,67 @@ class TreeIterator {
 // BPlusTree's inline functions (most of them may not be needed)
 
 inline status_t
-BPlusTree::Insert(Transaction *transaction,const char *key,off_t value)
+BPlusTree::Remove(Transaction *transaction, const char *key, off_t value)
 {
 	if (fHeader->data_type != BPLUSTREE_STRING_TYPE)
 		return B_BAD_TYPE;
-	return Insert(transaction,(uint8 *)key, strlen(key), value);
+	return Remove(transaction, (uint8 *)key, strlen(key), value);
 }
 
 inline status_t
-BPlusTree::Insert(Transaction *transaction,int32 key, off_t value)
+BPlusTree::Insert(Transaction *transaction, const char *key, off_t value)
+{
+	if (fHeader->data_type != BPLUSTREE_STRING_TYPE)
+		return B_BAD_TYPE;
+	return Insert(transaction, (uint8 *)key, strlen(key), value);
+}
+
+inline status_t
+BPlusTree::Insert(Transaction *transaction, int32 key, off_t value)
 {
 	if (fHeader->data_type != BPLUSTREE_INT32_TYPE)
 		return B_BAD_TYPE;
-	return Insert(transaction,(uint8 *)&key, sizeof(key), value);
+	return Insert(transaction, (uint8 *)&key, sizeof(key), value);
 }
 
 inline status_t
-BPlusTree::Insert(Transaction *transaction,uint32 key, off_t value)
+BPlusTree::Insert(Transaction *transaction, uint32 key, off_t value)
 {
 	if (fHeader->data_type != BPLUSTREE_UINT32_TYPE)
 		return B_BAD_TYPE;
-	return Insert(transaction,(uint8 *)&key, sizeof(key), value);
+	return Insert(transaction, (uint8 *)&key, sizeof(key), value);
 }
 
 inline status_t
-BPlusTree::Insert(Transaction *transaction,int64 key, off_t value)
+BPlusTree::Insert(Transaction *transaction, int64 key, off_t value)
 {
 	if (fHeader->data_type != BPLUSTREE_INT64_TYPE)
 		return B_BAD_TYPE;
-	return Insert(transaction,(uint8 *)&key, sizeof(key), value);
+	return Insert(transaction, (uint8 *)&key, sizeof(key), value);
 }
 
 inline status_t
-BPlusTree::Insert(Transaction *transaction,uint64 key, off_t value)
+BPlusTree::Insert(Transaction *transaction, uint64 key, off_t value)
 {
 	if (fHeader->data_type != BPLUSTREE_UINT64_TYPE)
 		return B_BAD_TYPE;
-	return Insert(transaction,(uint8 *)&key, sizeof(key), value);
+	return Insert(transaction, (uint8 *)&key, sizeof(key), value);
 }
 
 inline status_t
-BPlusTree::Insert(Transaction *transaction,float key, off_t value)
+BPlusTree::Insert(Transaction *transaction, float key, off_t value)
 {
 	if (fHeader->data_type != BPLUSTREE_FLOAT_TYPE)
 		return B_BAD_TYPE;
-	return Insert(transaction,(uint8 *)&key, sizeof(key), value);
+	return Insert(transaction, (uint8 *)&key, sizeof(key), value);
 }
 
 inline status_t
-BPlusTree::Insert(Transaction *transaction,double key, off_t value)
+BPlusTree::Insert(Transaction *transaction, double key, off_t value)
 {
 	if (fHeader->data_type != BPLUSTREE_DOUBLE_TYPE)
 		return B_BAD_TYPE;
-	return Insert(transaction,(uint8 *)&key, sizeof(key), value);
+	return Insert(transaction, (uint8 *)&key, sizeof(key), value);
 }
 
 
@@ -336,15 +357,17 @@ TreeIterator::Rewind()
 }
 
 inline status_t
-TreeIterator::GetNextEntry(void *key,uint16 *keyLength,uint16 maxLength,off_t *value,uint16 *duplicate)
+TreeIterator::GetNextEntry(void *key, uint16 *keyLength, uint16 maxLength,
+	off_t *value, uint16 *duplicate)
 {
-	return Traverse(BPLUSTREE_FORWARD,key,keyLength,maxLength,value,duplicate);
+	return Traverse(BPLUSTREE_FORWARD, key, keyLength, maxLength, value, duplicate);
 }
 
 inline status_t
-TreeIterator::GetPreviousEntry(void *key,uint16 *keyLength,uint16 maxLength,off_t *value,uint16 *duplicate)
+TreeIterator::GetPreviousEntry(void *key, uint16 *keyLength, uint16 maxLength,
+	off_t *value, uint16 *duplicate)
 {
-	return Traverse(BPLUSTREE_BACKWARD,key,keyLength,maxLength,value,duplicate);
+	return Traverse(BPLUSTREE_BACKWARD, key, keyLength, maxLength, value, duplicate);
 }
 
 /************************ bplustree_header inline functions ************************/
@@ -414,7 +437,7 @@ bplustree_node::LinkType(off_t link)
 }
 
 inline off_t
-bplustree_node::MakeLink(uint8 type,off_t link,uint32 fragmentIndex)
+bplustree_node::MakeLink(uint8 type, off_t link, uint32 fragmentIndex)
 {
 	return ((off_t)type << 62) | (link & 0x3ffffffffffffc00LL) | (fragmentIndex & 0x3ff);
 }
