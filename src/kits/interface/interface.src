@@ -16,6 +16,8 @@ INTERFACE_KIT_SOURCE =
 	GraphicsDefs.cpp
 	Input.cpp
 	InterfaceDefs.cpp
+	ListItem.cpp
+	ListView.cpp
 	Menu.cpp
 	MenuBar.cpp
 	MenuField.cpp
