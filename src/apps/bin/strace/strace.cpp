@@ -239,17 +239,18 @@ set_thread_debugging_flags(port_id nubPort, thread_id thread, int32 flags)
 	}
 }
 
-// run_thread
+// continue_thread
 static
 void
-run_thread(port_id nubPort, thread_id thread)
+continue_thread(port_id nubPort, thread_id thread)
 {
-	debug_nub_run_thread message;
+	debug_nub_continue_thread message;
 	message.thread = thread;
 	message.handle_event = B_THREAD_DEBUG_HANDLE_EVENT;
+	message.single_step = false;
 
 	while (true) {
-		status_t error = write_port(nubPort, B_DEBUG_MESSAGE_RUN_THREAD,
+		status_t error = write_port(nubPort, B_DEBUG_MESSAGE_CONTINUE_THREAD,
 			&message, sizeof(message));
 		if (error == B_OK)
 			return;
@@ -517,18 +518,19 @@ main(int argc, const char *const *argv)
 				break;
 			}
 
-			case B_DEBUGGER_MESSAGE_THREAD_STOPPED:
+			case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
+			case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
+			case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
+			case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
+			case B_DEBUGGER_MESSAGE_SINGLE_STEP:
 			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 			case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
+			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
 			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
 			case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
-				break;
-
-			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
-				// nothing to do: a thread was deleted
 				break;
 
 			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
@@ -539,7 +541,7 @@ main(int argc, const char *const *argv)
 		// tell the thread to continue (only when there is a thread and the
 		// message was synchronous)
 		if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
-			run_thread(message.origin.nub_port, message.origin.thread);
+			continue_thread(message.origin.nub_port, message.origin.thread);
 	}
 	
 	return 0;

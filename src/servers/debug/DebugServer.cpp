@@ -35,14 +35,14 @@ public:
 	{
 	}
 
-	void SetCode(int32 code)						{ fCode = code; }
-	int32 Code() const								{ return fCode; }
+	void SetCode(debug_debugger_message code)		{ fCode = code; }
+	debug_debugger_message Code() const				{ return fCode; }
 
 	debug_debugger_message_data &Data()				{ return fData; }
 	const debug_debugger_message_data &Data() const	{ return fData; }
 
 private:
-	int32						fCode;
+	debug_debugger_message		fCode;
 	debug_debugger_message_data	fData;
 };
 
@@ -156,15 +156,21 @@ ThreadDebugHandler::HandleMessage(DebugMessage *message)
 
 	// get some user-readable message
 	char buffer[512];
-	if (message->Code() == B_DEBUGGER_MESSAGE_THREAD_STOPPED) {
-		get_debug_why_stopped_string(message->Data().thread_stopped.why, buffer,
-			sizeof(buffer));
-	} else if (message->Code() == B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED) {
-		get_debug_exception_string(message->Data().exception_occurred.exception,
-			buffer, sizeof(buffer));
-	} else {
-		// We shouldn't be here.
-		sprintf(buffer, "Debug messages %ld", (int32)message->Code());
+	switch (message->Code()) {
+		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
+			get_debug_exception_string(
+				message->Data().exception_occurred.exception, buffer,
+				sizeof(buffer));
+			break;
+		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
+			// TODO: Display the debugger message!
+		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
+		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
+		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
+		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
+		default:
+			get_debug_message_string(message->Code(), buffer, sizeof(buffer));
+			break;
 	}
 
 	// TODO: This would be the point to pop up an asynchronous alert.
@@ -232,8 +238,12 @@ TeamDebugHandler::HandleMessage(DebugMessage *message)
 	thread_id thread = message->Data().origin.thread;
 
 	switch (message->Code()) {
-		case B_DEBUGGER_MESSAGE_THREAD_STOPPED:
+		case B_DEBUGGER_MESSAGE_THREAD_DEBUGGED:
+		case B_DEBUGGER_MESSAGE_DEBUGGER_CALL:
 		case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
+		case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
+		case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
+		case B_DEBUGGER_MESSAGE_SINGLE_STEP:
 		{
 			fNubPort = message->Data().origin.nub_port;
 
@@ -253,10 +263,6 @@ TeamDebugHandler::HandleMessage(DebugMessage *message)
 		case B_DEBUGGER_MESSAGE_TEAM_DELETED:
 			return true;
 
-		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
-			// a thread is gone: nothing to do
-			break;
-
 		case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 			// A signal doesn't usually trigger the debugger.
 			// Just let the thread continue and see what happens next.
@@ -264,6 +270,7 @@ TeamDebugHandler::HandleMessage(DebugMessage *message)
 		case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
+		case B_DEBUGGER_MESSAGE_THREAD_DELETED:
 		case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
 		case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
 			fNubPort = message->Data().origin.nub_port;
@@ -292,12 +299,13 @@ TeamDebugHandler::KillTeam()
 void
 TeamDebugHandler::_ContinueThread(thread_id thread)
 {
-	debug_nub_run_thread message;
+	debug_nub_continue_thread message;
 	message.thread = thread;
 	message.handle_event = B_THREAD_DEBUG_HANDLE_EVENT;
+	message.single_step = false;
 
 	while (true) {
-		status_t error = write_port(fNubPort, B_DEBUG_MESSAGE_RUN_THREAD,
+		status_t error = write_port(fNubPort, B_DEBUG_MESSAGE_CONTINUE_THREAD,
 			&message, sizeof(message));
 		if (error == B_OK)
 			return;
@@ -452,7 +460,7 @@ DebugServer::_Listener()
 			exit(1);
 		}
 
-		message->SetCode(code);
+		message->SetCode((debug_debugger_message)code);
 
 		// queue the message and send notify the app
 		Lock();
