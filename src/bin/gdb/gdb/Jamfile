@@ -1,0 +1,336 @@
+SubDir OBOS_TOP src bin gdb gdb ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) bfd ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;
+SubDirHdrs [ FDirName [ FCurrentObjectsDir ] $(DOTDOT) bfd ] ;
+	# generated bfd headers
+SubDirHdrs [ FDirName $(OBOS_TOP) src bin gawk intl ] ;
+	# Use gawk's libintl for the time being.
+	# TODO: Put a current version of intl ot src/libs and build a static lib
+	# all interested apps can link against.
+
+SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR=\\\"/boot/beos/etc/locale\\\"
+	-DMI_OUT=1 ;
+
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) cli ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) mi ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) signals ] ;
+
+# architecture specific sources
+local gdbHaikuArchTargetSources ;
+local gdbHaikuArchNativeSources ;
+local gdbProcessorName ;
+if $(OBOS_ARCH) = x86 {
+	gdbHaikuArchTargetSources = i386-tdep.c i386-haiku-tdep.c i387-tdep.c ;
+	gdbHaikuArchNativeSources = i386-haiku-nat.c ;
+	gdbProcessorName = i386 ;
+} else if $(OBOS_ARCH) = ppc {
+	# TODO: Not yet implemented!
+	gdbProcessorName = ppc ;
+} # else: architecture not supported by Haiku
+
+local gdbBaseSources =
+	ada-exp.c
+	ada-lang.c
+	ada-typeprint.c
+	ada-valprint.c
+	annotate.c
+	arch-utils.c
+	auxv.c
+	ax-gdb.c
+	ax-general.c
+	bcache.c
+	bfd-target.c
+	block.c
+	blockframe.c
+	breakpoint.c
+	buildsym.c
+	c-exp.c
+	c-lang.c
+	c-typeprint.c
+	c-valprint.c
+	charset.c
+	cli-out.c
+	coff-pe-read.c
+	coffread.c
+	complaints.c
+	completer.c
+	copying.c
+	corefile.c
+	cp-abi.c
+	cp-namespace.c
+	cp-support.c
+	cp-valprint.c
+	dbxread.c
+	dcache.c
+	demangle.c
+	dictionary.c
+	disasm.c
+	doublest.c
+	dummy-frame.c
+	dwarf2-frame.c
+	dwarf2read.c
+	dwarf2expr.c
+	dwarf2loc.c
+	dwarfread.c
+	elfread.c
+	environ.c
+	eval.c
+	event-loop.c
+	event-top.c
+	exec.c
+	expprint.c
+	f-exp.c
+	f-lang.c
+	f-typeprint.c
+	f-valprint.c
+	findvar.c
+	frame.c
+	frame-base.c
+	frame-unwind.c
+	gdb-events.c
+	gdbarch.c
+	gdbtypes.c
+	gnu-v2-abi.c
+	gnu-v3-abi.c
+	hpacc-abi.c
+	inf-child.c
+	inf-loop.c
+	infcall.c
+	infcmd.c
+	inflow.c
+	infrun.c
+	interps.c
+	kod.c
+	kod-cisco.c
+	jv-exp.c
+	jv-lang.c
+	jv-valprint.c
+	jv-typeprint.c
+	language.c
+	linespec.c
+	m2-exp.c
+	m2-lang.c
+	m2-typeprint.c
+	m2-valprint.c
+	macrocmd.c
+	macroexp.c
+	macroscope.c
+	macrotab.c
+	main.c
+	maint.c
+	mdebugread.c
+	mem-break.c
+	memattr.c
+	minsyms.c
+	mipsread.c
+	nlmread.c
+	objc-exp.c
+	objc-lang.c
+	objfiles.c
+	observer.c
+	osabi.c
+	p-exp.c
+	p-lang.c
+	p-typeprint.c
+	p-valprint.c
+	parse.c
+	printcmd.c
+	regcache.c
+	reggroups.c
+	regset.c
+	remote.c
+	remote-utils.c
+	remote-fileio.c
+	scm-exp.c
+	scm-lang.c
+	scm-valprint.c
+	sentinel-frame.c
+	ser-pipe.c
+	ser-tcp.c
+	ser-unix.c
+	serial.c
+	signals.c
+	source.c
+	stabsread.c
+	stack.c
+	std-regs.c
+	symfile.c
+	symmisc.c
+	symtab.c
+	target.c
+	thread.c
+	top.c
+	tracepoint.c
+	trad-frame.c
+	tramp-frame.c
+	typeprint.c
+	ui-file.c
+	ui-out.c
+	user-regs.c
+	utils.c
+	valarith.c
+	valops.c
+	valprint.c
+	values.c
+	varobj.c
+	wrapper.c
+;
+
+local gdbGeneratedSources =
+	init.c
+	version.c
+;
+
+local gdbHostSources =
+	cli-cmds.c
+	cli-decode.c
+	cli-dump.c
+	cli-interp.c
+	cli-logging.c
+	cli-script.c
+	cli-setshow.c
+	cli-utils.c
+
+	mi-cmd-break.c
+	mi-cmd-disas.c
+	mi-cmd-env.c
+	mi-cmd-file.c
+	mi-cmd-stack.c
+	mi-cmd-var.c
+	mi-cmds.c
+	mi-console.c
+	mi-getopt.c
+	mi-interp.c
+	mi-main.c
+	mi-out.c
+	mi-parse.c
+	mi-symbol-cmds.c
+;
+
+local gdbHaikuTargetSources =
+	haiku-tdep.c
+	solib.c
+	solib-haiku.c
+	symfile-mem.c
+;
+
+local gdbHaikuNativeSources =
+	haiku-nat.c
+	inf-child.c
+	fork-child.c
+;
+
+local gdbAllLibSources =
+	$(gdbBaseSources)
+	$(gdbGeneratedSources)
+	$(gdbHostSources)
+	$(gdbHaikuTargetSources)
+	$(gdbHaikuNativeSources)
+	$(gdbHaikuArchTargetSources)
+	$(gdbHaikuArchNativeSources)
+;
+
+local gdbAllSources =
+	$(gdbAllLibSources)
+	gdb.c
+;
+
+# build the static library
+StaticLibrary gdb :
+	$(gdbAllLibSources)
+
+	: [ FCurrentObjectsDir ]
+;
+
+# build the executable
+BinCommand gdb : gdb.c :
+	libgdb.a
+	<gdb>libbfd.a
+	<gdb>libiberty.a
+	<gdb>libopcodes.a
+	<gdb>libreadline.a
+	<gawk>libintl.a	# use gawk's libintl for the time being
+
+	libtermcap.a
+
+	libroot.so
+	libbind.so
+	libsocket.so
+;
+
+# build ADA lexer
+{
+	local source = [ FGristFiles ada-lex.l ] ;
+	local target = [ FGristFiles ada-lex.c ] ;
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
+	Lex $(target) : $(source) ;
+	Includes [ FGristFiles add-exp.c ] : $(target) ;
+}
+
+# generate source files/headers
+
+rule GDBCopyConfigFiles
+{
+	# GDBCopyConfigFiles <header names> ;
+	local sources = $(1:G=$(SOURCE_GRIST:E)!config) ;
+
+	local source ;
+	for source in $(1) {
+		local target = [ FGristFiles $(source) ] ;
+		File $(target) : $(source) ;
+		SEARCH on $(source) = [ FDirName $(SUBDIR) config-$(OBOS_ARCH) ] ;
+		MakeLocate $(target) : $(LOCATE_SOURCE) ;
+	}
+}
+
+rule GDBCopyHaikuConfigHeader
+{
+	# GDBCopyHaikuConfigHeader <target name> : <source name> ;
+	local target = [ FGristFiles $(1) ] ;
+	local source = [ FGristFiles $(2) ] ;
+
+	File $(target) : $(source) ;
+	SEARCH on $(source) = [ FDirName $(SUBDIR) config $(gdbProcessorName) ] ;
+	MakeLocate $(target) : $(LOCATE_SOURCE) ;
+}
+
+local gdbHeadersToCopy =
+	config.h
+	observer.h
+	observer.inc
+;
+
+local gdbSourcesToCopy =
+	init.c
+	version.c
+;
+
+GDBCopyConfigFiles $(gdbHeadersToCopy) $(gdbSourcesToCopy) ;
+GDBCopyHaikuConfigHeader nm.h : nm-haiku.h ;
+GDBCopyHaikuConfigHeader tm.h : tm-haiku.h ;
+
+
+# Make a pseudo-target for all generated headers and make all object files
+# depend on them.
+
+local gdbGeneratedHeaders = [ FGristFiles $(gdbHeadersToCopy) nm.h tm.h ] ;
+
+Depends gdb-gdb-generated-headers : $(gdbGeneratedHeaders) ;
+NotFile gdb-gdb-generated-headers ;
+
+Depends [ FGristFiles $(gdbAllSources:S=$(SUFOBJ)) ]
+	 : gdb-gdb-generated-headers ;
+
+# Make all objects depend on the generated bfd headers (otherwise they will
+# not be generated in the first place).
+Depends [ FGristFiles $(gdbAllSources:S=$(SUFOBJ)) ]
+	 : gdb-bfd-generated-headers  ;
+
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
