@@ -24,6 +24,8 @@ extern "C" {
 #include "cpp.h"
 #include "UdfDebug.h"
 
+#include "DiskStructures.h"
+
 namespace UDF {
 
 class Volume {
@@ -44,7 +46,7 @@ public:
 	off_t Length() const { return fLength; }
 	
 	uint32 BlockSize() const { return fBlockSize; }
-	off_t RelativeAddressForBlock(off_t block) { return StartAddress() + block * BlockSize(); }
+	off_t AddressForRelativeBlock(off_t block) { return StartAddress() + block * BlockSize(); }
 	off_t RelativeAddress(off_t address) { return StartAddress() + address; }
 	
 	
@@ -64,7 +66,7 @@ private:
 	// Called by Mount(), either directly or indirectly
 	status_t _Identify();
 	status_t _WalkVolumeRecognitionSequence();
-	status_t _WalkVolumeDescriptorSequence(off_t start);
+	status_t _WalkVolumeDescriptorSequence(extent_address extent);
 		
 private:
 	nspace_id fID;

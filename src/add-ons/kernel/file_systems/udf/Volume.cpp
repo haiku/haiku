@@ -9,7 +9,6 @@
 #include "Volume.h"
 
 #include "Block.h"
-#include "DiskStructures.h"
 
 using namespace UDF;
 
@@ -41,7 +40,8 @@ status_t
 Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
               uint32 flags, uint32 blockSize)
 {
-	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS);
+	DEBUG_INIT_ETC(CF_PUBLIC | CF_VOLUME_OPS, "Volume",
+		("devName = `%s'", deviceName));
 	if (!deviceName)
 		RETURN_ERROR(B_BAD_VALUE);
 	if (_InitStatus() == B_INITIALIZED)
@@ -95,7 +95,7 @@ Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
 status_t
 Volume::_Identify()
 {
-	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS);
+	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS, "Volume");
 	
 	status_t err = _InitStatus() == B_DEVICE_INITIALIZED ? B_OK : B_BAD_VALUE;
 
@@ -112,21 +112,66 @@ Volume::_Identify()
 		                                                    Length(),
 		                                                    512,
 		                                                  };
-	
-		// Found an avds, so try the main sequence first, then
-		// the reserve sequence if the main one fails.
-		
-		// Both failed, so try another avds
-		
+		bool found_vds = false;
+		                                                  
+		for (int32 i = 0; i < avds_location_count; i++) {
+			off_t block = avds_locations[i];
+			off_t address = AddressForRelativeBlock(block);
+			Block<anchor_volume_descriptor_pointer> anchor(BlockSize());
+			status_t anchorErr = anchor.InitCheck();
+			if (!anchorErr) {
+				ssize_t bytesRead = read_pos(fDevice, address, anchor.Data(), BlockSize());
+				anchorErr = bytesRead == (ssize_t)BlockSize() ? B_OK : B_IO_ERROR;
+				if (anchorErr) {
+					PRINT(("block %lld: read_pos(pos:%lld, len:%ld) failed with error 0x%lx\n",
+					       block, address, BlockSize(), bytesRead));
+				}
+			}
+			if (!anchorErr) {
+				anchor.Data()->tag().dump();
+				anchorErr = anchor.Data()->tag().init_check(block);
+				if (anchorErr) {
+					PRINT(("block %lld: invalid anchor\n", block));
+				} else {
+					PRINT(("block %lld: valid anchor\n", block));
+				}
+			}
+			if (!anchorErr) {
+				// Found an avds, so try the main sequence first, then
+				// the reserve sequence if the main one fails.
+				anchorErr = _WalkVolumeDescriptorSequence(anchor.Data()->main_vds());
+				if (anchorErr)
+					anchorErr = _WalkVolumeDescriptorSequence(anchor.Data()->reserve_vds());		
+					
+				
+			}
+			if (!anchorErr) {
+				PRINT(("block %lld: found valid vds\n", avds_locations[i]));
+				found_vds = true;
+				break;
+			} //else {
+				// Both failed, so loop around and try another avds
+//				PRINT(("block %lld: vds search failed\n", avds_locations[i]));
+//			}
+		}
+		err = found_vds ? B_OK : B_ERROR;		
 	}		
 	
 	RETURN(err);
 }
 
+/*! \brief Walks the iso9660/ecma-167 volume recognition sequence, returning
+	\c B_OK if the presence of a UDF filesystem on this volume is likely.
+	
+	\return \c B_OK: An ECMA-167 vsd was found, or at least one extended area
+	                 vsd was found and no ECMA-168 vsds were found.
+	\return "error code": Only iso9660 vsds were found, an ECMA-168 vsd was
+	                      found (but no ECMA-167 vsd), or an error occurred.
+*/
 status_t
 Volume::_WalkVolumeRecognitionSequence()
 {
-	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS);
+	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS, "Volume");
 	// vrs starts at block 16. Each volume structure descriptor (vsd)
 	// should be one block long. We're expecting to find 0 or more iso9660
 	// vsd's followed by some ECMA-167 vsd's.
@@ -140,7 +185,7 @@ Volume::_WalkVolumeRecognitionSequence()
 		bool foundBoot = false;
 		for (uint32 block = 16; true; block++) {
 	    	PRINT(("block %ld: ", block))
-			off_t address = RelativeAddressForBlock(block);
+			off_t address = AddressForRelativeBlock(block);
 			ssize_t bytesRead = read_pos(fDevice, address, descriptor.Data(), BlockSize());
 			if (bytesRead == (ssize_t)BlockSize())
 		    {
@@ -187,9 +232,35 @@ Volume::_WalkVolumeRecognitionSequence()
 }
 
 status_t
-Volume::_WalkVolumeDescriptorSequence(off_t start)
+Volume::_WalkVolumeDescriptorSequence(extent_address extent)
 {
-	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS);
+	DEBUG_INIT_ETC(CF_PRIVATE | CF_VOLUME_OPS, "Volume", ("loc:%ld, len:%ld",
+	           extent.location(), extent.length()));
+	uint32 count = extent.length()/BlockSize();
+	for (uint32 i = 0; i < count; i++)
+	{
+		off_t block = extent.location()+i;
+		off_t address = AddressForRelativeBlock(block);
+		Block<descriptor_tag> tag(BlockSize());
+		status_t err = tag.InitCheck();
+		if (!err) {
+			ssize_t bytesRead = read_pos(fDevice, address, tag.Data(), BlockSize());
+			err = bytesRead == (ssize_t)BlockSize() ? B_OK : B_IO_ERROR;
+			if (err) {
+				PRINT(("block %lld: read_pos(pos:%lld, len:%ld) failed with error 0x%lx\n",
+				       block, address, BlockSize(), bytesRead));
+			}
+		}
+		if (!err) {
+			PRINT(("descriptor #%ld (block %lld):\n", i, block));
+			if (tag.Data()->id() == 1) {
+				primary_vd *vd = (primary_vd*)tag.Data();
+				vd->dump();
+			} else {
+				tag.Data()->dump();
+			}
+		}
+	}
 	
 	RETURN(B_ERROR);
 }
