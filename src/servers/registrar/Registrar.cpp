@@ -128,6 +128,9 @@ Registrar::ReadyToRun()
 	// create MIME manager
 	fMIMEManager = new MIMEManager;
 	fMIMEManager->Run();
+	// init the global be_roster
+	BPrivate::init_registrar_roster(be_app_messenger,
+									BMessenger(NULL, fMIMEManager));
 	FUNCTION_END();
 }
 
@@ -141,6 +144,24 @@ Registrar::QuitRequested()
 	FUNCTION_START();
 	// The final registrar must not quit. At least not that easily. ;-)
 	return BApplication::QuitRequested();
+}
+
+// init_registrar_roster
+/*!	\brief Initializes the global \a be_roster.
+
+	While this is done automagically for all other applications while libbe
+	initialization, the registrar needs to help out a bit.
+
+	\param mainMessenger A BMessenger targeting the registrar application.
+	\param mimeMessenger A BMessenger targeting the MIME manager.
+*/
+void
+BPrivate::init_registrar_roster(BMessenger mainMessenger,
+								BMessenger mimeMessenger)
+{
+	BRoster *roster = const_cast<BRoster*>(be_roster);
+	roster->fMess = mainMessenger;
+	roster->fMimeMess = mimeMessenger;
 }
 
 

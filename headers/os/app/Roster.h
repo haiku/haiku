@@ -45,6 +45,11 @@ extern "C" int	_delete_roster_();
 status_t _send_to_roster_(BMessage *message, BMessage *reply, bool mime);
 bool _is_valid_roster_mess_(bool mime);
 
+namespace BPrivate {
+	void init_registrar_roster(BMessenger mainMessenger,
+							   BMessenger mimeMessenger);
+}
+
 /*-------------------------------------------------------------*/
 /* --------- app_info Struct and Values ------------------------ */
 
@@ -155,6 +160,7 @@ private:
 	friend status_t BMimeType::StopWatching(BMessenger);
 	friend status_t BClipboard::StartWatching(BMessenger);
 	friend status_t BClipboard::StopWatching(BMessenger);
+	friend void BPrivate::init_registrar_roster(BMessenger, BMessenger);
 
 	enum mtarget {
 		MAIN_MESSENGER,
