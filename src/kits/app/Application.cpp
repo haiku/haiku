@@ -57,6 +57,10 @@
 
 // Local Defines ---------------------------------------------------------------
 
+// Uncomment this to run without the registrar - used only for app_server development!
+//#define RUN_WITHOUT_REGISTRAR
+
+
 // Globals ---------------------------------------------------------------------
 BApplication*	be_app = NULL;
 BMessenger		be_app_messenger;
@@ -658,12 +662,14 @@ void BApplication::InitData(const char* signature, status_t* error)
 			}
 		}
 	}
+#ifndef RUN_WITHOUT_REGISTRAR
 	// check whether be_roster is valid
 	if (fInitError == B_OK && !isRegistrar
 		&& !BRoster::Private().IsMessengerValid(false)) {
 		printf("FATAL: be_roster is not valid. Is the registrar running?\n");
 		fInitError = B_NO_INIT;
 	}
+
 	// check whether or not we are pre-registered
 	bool preRegistered = false;
 	app_info appInfo;
@@ -732,6 +738,43 @@ void BApplication::InitData(const char* signature, status_t* error)
 			fInitError = B_ERROR;
 		}
 	}
+#endif	// ifdef RUN_WITHOUT_REGISTRAR
+
+	// Notify app_server that we exist
+	fServerFrom=find_port(SERVER_PORT_NAME);
+	if(fServerFrom!=B_NAME_NOT_FOUND)
+	{
+		// Create the port so that the app_server knows where to send messages
+		fServerTo=create_port(100,"a<fServerTo");
+		if(fServerTo!=B_BAD_VALUE || fServerTo!=B_NO_MORE_PORTS)
+		{
+			// AS_CREATE_APP:
+	
+			// Attach data:
+			// 1) port_id - receiver port of a regular app
+			// 2) char * - signature of the regular app
+			PortLink::ReplyData replydata;
+			
+			PortLink *link=new PortLink(fServerFrom);
+			link->SetOpCode(AS_CREATE_APP);
+			link->Attach((int32)fServerTo);
+			link->Attach((char*)signature,strlen(signature));
+			status_t replyerr=link->FlushWithReply(&replydata);
+			if(replyerr==B_OK)
+			{
+				// Reply code: AS_CREATE_APP
+				// Reply data:
+				//	1) port_id server-side application port (fServerFrom value)
+				fServerFrom=*((port_id*)replydata.buffer);
+			}
+			else
+				fInitError=replyerr;
+			
+		}
+		else
+			fInitError=fServerTo;
+	}
+	
 	// init be_app and be_app_messenger
 	if (fInitError == B_OK) {
 		be_app = this;
