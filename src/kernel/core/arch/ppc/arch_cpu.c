@@ -4,7 +4,7 @@
 */
 
 
-#include <kernel.h>
+#include <KernelExport.h>
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
 
@@ -45,15 +45,16 @@ arch_cpu_sync_icache(void *address, size_t len)
 	do {
 		asm volatile ("dcbst 0,%0" :: "r"(p));
 		p += CACHELINE;
-	} while((l -= CACHELINE) > 0);
+	} while ((l -= CACHELINE) > 0);
 	asm volatile ("sync");
+
 	p = (char *)address - off;
 	do {
 		asm volatile ("icbi 0,%0" :: "r"(p));
 		p += CACHELINE;
-	} while((len -= CACHELINE) > 0);
+	} while ((len -= CACHELINE) > 0);
 	asm volatile ("sync");
-	asm volatile ("isync");
+	isync();
 }
 
 
@@ -61,11 +62,11 @@ void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
 	asm volatile("sync");
-	while(start < end) {
+	while (start < end) {
 		asm volatile("tlbie %0" :: "r" (start));
 		asm volatile("eieio");
 		asm volatile("sync");
-		start += PAGE_SIZE;
+		start += B_PAGE_SIZE;
 	}
 	asm volatile("tlbsync");
 	asm volatile("sync");
@@ -78,7 +79,7 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 	int i;
 
 	asm volatile("sync");
-	for(i = 0; i < num_pages; i++) {
+	for (i = 0; i < num_pages; i++) {
 		asm volatile("tlbie %0" :: "r" (pages[i]));
 		asm volatile("eieio");
 		asm volatile("sync");
@@ -91,15 +92,18 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 void 
 arch_cpu_global_TLB_invalidate(void)
 {
+	addr_t address = 0;
 	unsigned long i;
 
 	asm volatile("sync");
-	for(i=0; i< 0x40000; i += 0x1000) {
-		asm volatile("tlbie %0" :: "r" (i));
-		asm volatile("eieio");
+	for (i = 0; i < 0x100000; i++) {
+		asm volatile("tlbie %0" :: "r" (address));
+		eieio();
 		asm volatile("sync");
+
+		address += B_PAGE_SIZE;
 	}
-	asm volatile("tlbsync");
+	tlbsync();
 	asm volatile("sync");
 }
 
