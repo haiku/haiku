@@ -1,10 +1,10 @@
 /***********************************************************************
- * AUTHOR: Marcus Overhagen
+ * AUTHOR: Marcus Overhagen, Jérôme Duval
  *   FILE: SoundPlayer.cpp
  *  DESCR: 
  ***********************************************************************/
 #include <TimeSource.h>
-#include <SoundPlayer.h>
+#include "SoundPlayer.h"
 #include <MediaRoster.h>
 #include <math.h>
 
@@ -78,9 +78,37 @@ BSoundPlayer::BSoundPlayer(const media_node & toNode,
 BSoundPlayer::~BSoundPlayer()
 {
 	CALLED();
-	if (_m_node)
-		_m_node->Release();
-	delete _m_node;
+	if (_m_node) {
+		BMediaRoster *roster = BMediaRoster::Roster();
+		if (!roster) {
+			TRACE("BSoundPlayer::~BSoundPlayer: Couldn't get BMediaRoster\n");
+		} else {
+			status_t err;
+
+			// Ordinarily we'd stop *all* of the nodes in the chain at this point.  However,
+			// one of the nodes is the System Mixer, and stopping the Mixer is a Bad Idea (tm).
+			// So, we just disconnect from it, and release our references to the nodes that
+			// we're using.  We *are* supposed to do that even for global nodes like the Mixer.
+			Stop(true, false);
+			
+			err = roster->Disconnect(m_input.node.node, m_input.source, 
+				m_output.node.node, m_output.destination);
+			if (err) {
+				fprintf(stderr, "* Error disconnecting nodes:  %ld (%s)\n", err, strerror(err));
+			}
+			
+			err = roster->ReleaseNode(m_input.node);
+			if (err) {
+				fprintf(stderr, "* Error releasing input node:  %ld (%s)\n", err, strerror(err));
+			}
+			
+			err = roster->ReleaseNode(m_output.node);
+			if (err) {
+				fprintf(stderr, "* Error releasing output node:  %ld (%s)\n", err, strerror(err));
+			}
+			_m_node = NULL;
+		}
+	}
 	delete [] _m_buf;
 }
 
@@ -117,9 +145,25 @@ BSoundPlayer::Start()
 	
 	if (!_m_node)
 		return B_ERROR;
+		
+	BMediaRoster *roster = BMediaRoster::Roster();
+	if (!roster) {
+		TRACE("BSoundPlayer::Start: Couldn't get BMediaRoster\n");
+		return B_ERROR;
+	}
 	
-	_m_node->Start();
-	return B_OK;
+	BTimeSource *timeSource = roster->MakeTimeSourceFor(_m_node->Node());
+	
+	// make sure we give the producer enough time to run buffers through
+			// the node chain, otherwise it'll start up already late
+	bigtime_t latency = 0;
+	status_t err = roster->GetLatencyFor(_m_node->Node(), &latency);
+
+	err = roster->StartNode(_m_node->Node(), timeSource->Now() + latency);
+	
+	timeSource->Release();
+	
+	return err;
 }
 
 
@@ -131,8 +175,15 @@ BSoundPlayer::Stop(bool block,
 
 	if (!_m_node)
 		return;
+		
+	BMediaRoster *roster = BMediaRoster::Roster();
+	if (!roster) {
+		TRACE("BSoundPlayer::Stop: Couldn't get BMediaRoster\n");
+		return;
+	}
+	
+	roster->StopNode(_m_node->Node(), 0, true);
 
-	_m_node->Stop();
 }
 
 BSoundPlayer::BufferPlayerFunc
@@ -200,10 +251,8 @@ BSoundPlayer::CurrentTime()
 	CALLED();
 	if (!_m_node)
 		return system_time();
-#if 0 /* we don't have a media roster, or real media nodes yet */
-	return _m_node->TimeSource()->Now(); /* either this one is wrong */
-#endif
-	return system_time();
+
+	return _m_node->TimeSource()->Now();
 }
 
 
@@ -213,19 +262,29 @@ BSoundPlayer::PerformanceTime()
 	CALLED();
 	if (!_m_node)
 		return (bigtime_t) B_ERROR;
-#if 0 /* we don't have a media roster, or real media nodes yet */
-	return _m_node->TimeSource()->Now(); /* or this one is wrong */
-#endif
-	return system_time();
+
+	return _m_node->TimeSource()->Now();
 }
 
 
 status_t
 BSoundPlayer::Preroll()
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return B_OK;
+	BMediaRoster *roster = BMediaRoster::Roster();
+	if (!roster) {
+		TRACE("BSoundPlayer::Preroll: Couldn't get BMediaRoster\n");
+		return B_ERROR;
+	}
+	
+	status_t err = roster->PrerollNode(m_output.node);
+	
+	if(err != B_OK) {
+		fprintf(stderr, "Error while PrerollNode:  %ld (%s)\n", err, strerror(err));
+	}
+	
+	return err;
 }
 
 
@@ -342,8 +401,22 @@ BSoundPlayer::GetVolumeInfo(media_node *out_node,
 bigtime_t
 BSoundPlayer::Latency()
 {
-	BROKEN();
-	return 50000;
+	CALLED();
+		
+	BMediaRoster *roster = BMediaRoster::Roster();
+	if (!roster) {
+		TRACE("BSoundPlayer::Latency: Couldn't get BMediaRoster\n");
+		return 0;
+	}
+	
+	bigtime_t latency = 0;
+	status_t err = roster->GetLatencyFor(m_output.node, &latency);
+	
+	if(err != B_OK) {
+		fprintf(stderr, "Error while GetLatencyFor:  %ld (%s)\n", err, strerror(err));
+	}
+	
+	return latency;
 }
 
 
@@ -423,10 +496,7 @@ BSoundPlayer::Init(
 	_m_waiting = NULL;
 	_PlayBuffer = PlayBuffer;
 	_Notifier = Notifier;
-	//_m_lock;
 	_m_volume = 0.0f;
-	//m_input;
-	//m_output;
 	_m_mix_buffer = 0;
 	_m_mix_buffer_size = 0;
 	_m_cookie = cookie;
@@ -440,11 +510,16 @@ BSoundPlayer::Init(
 
 	_m_node = 0;
 
-#if 0 /* we don't have a media roster, or real media nodes yet */
-	status_t status; 
-	BMediaRoster *roster;
-	media_node outnode;
-	roster = BMediaRoster::Roster();
+	status_t err; 
+	media_node outputNode;
+	media_output _output;
+	media_input _input;
+	int32 inputCount, outputCount;
+	media_format tryFormat;
+	media_multi_audio_format fmt;
+	media_node timeSource;
+
+	BMediaRoster *roster = BMediaRoster::Roster();
 	if (!roster) {
 		TRACE("BSoundPlayer::Init: Couldn't get BMediaRoster\n");
 		return;
@@ -453,17 +528,14 @@ BSoundPlayer::Init(
 	//connect our producer node either to the 
 	//system mixer or to the supplied out node
 	if (!node) {
-		status = roster->GetAudioMixer(&outnode);
-		if (status != B_OK) {
+		err = roster->GetAudioMixer(&outputNode);
+		if (err != B_OK) {
 			TRACE("BSoundPlayer::Init: Couldn't GetAudioMixer\n");
-			SetInitError(status);
-			return;
+			goto the_end;
 		}
-		node = &outnode;
+		node = &outputNode;
 	}
-#endif
-
-	media_multi_audio_format fmt;
+	
 	memcpy(&fmt,format,sizeof(fmt));
 	
 	if (fmt.frame_rate == media_multi_audio_format::wildcard.frame_rate)
@@ -485,29 +557,54 @@ BSoundPlayer::Init(
 	_m_bufsize = fmt.buffer_size;
 	_m_buf = new char[_m_bufsize];
 	_m_node = new _SoundPlayNode(name,&fmt,this);
-
-
-/*
-	m_input = ;
-	m_output = ;
-
 	
-tryFormat = fileAudioOutput.format; 
-   err = roster->Connect(fileAudioOutput.source, audioInput.destination, 
-               &tryFormat, &m_output, &m_input); 
-
-
- err = roster->GetStartLatencyFor(timeSourceNode, &startTime); 
-   startTime += b_timesource->PerformanceTimeFor(BTimeSource::RealTime() 
-               + 1000000 / 50); 
-    
-   err = roster->StartNode(mediaFileNode, startTime); 
-   err = roster->StartNode(codecNode, startTime); 
-   err = roster->StartNode(videoNode, startTime); 
-
-*/	
+	err = roster->RegisterNode(_m_node);
+	if(err != B_OK) {
+		TRACE("BSoundPlayer::Init: Couldn't RegisterNode\n");
+		goto the_end;
+	}
 	
-	SetInitError(B_OK);
+	// set the producer's time source to be the "default" time source, which
+	// the Mixer uses too.
+	
+	roster->GetTimeSource(&timeSource);
+	roster->SetTimeSourceFor(_m_node->Node().node, timeSource.node);
+	
+	if(!input) {
+		err = roster->GetFreeInputsFor(*node, &_input, 1, 
+			&inputCount, B_MEDIA_RAW_AUDIO);
+		if(err != B_OK) {
+			TRACE("BSoundPlayer::Init: Couldn't GetFreeInputsFor\n");
+			goto the_end;
+		}
+	} else {
+		_input = *input;
+	}
+	err = roster->GetFreeOutputsFor(_m_node->Node(), &_output, 1, &outputCount, B_MEDIA_RAW_AUDIO);
+	if(err != B_OK) {
+		TRACE("BSoundPlayer::Init: Couldn't GetFreeOutputsFor\n");
+		goto the_end;
+	}
+		
+	//tryFormat.type = B_MEDIA_RAW_AUDIO;
+	//tryformat.fileAudioOutput.format;
+	tryFormat = _output.format;
+	err = roster->Connect(_output.source, _input.destination, &tryFormat, &m_output, &m_input);
+	if(err != B_OK) {
+		TRACE("BSoundPlayer::Init: Couldn't Connect\n");
+		goto the_end;
+	}
+	
+	// Set an appropriate run mode for the producer
+	err = roster->SetRunModeNode(_m_node->Node(), BMediaNode::B_INCREASE_LATENCY);
+	if(err != B_OK) {
+		TRACE("BSoundPlayer::Init: Couldn't SetRunModeNode\n");
+		goto the_end;
+	}
+	
+the_end:
+	TRACE("BSoundPlayer::Init: %s\n", strerror(err));
+	SetInitError(err);
 }
 
 /* virtual */ void
