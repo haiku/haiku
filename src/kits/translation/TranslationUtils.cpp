@@ -31,6 +31,7 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 #include <Application.h>
+#include <Roster.h>
 #include <Bitmap.h>
 #include <BitmapStream.h>
 #include <File.h>
@@ -41,6 +42,8 @@
 #include <TranslatorFormats.h>
 #include <TranslatorRoster.h>
 #include <TranslationUtils.h>
+#include <Entry.h>
+#include <Path.h>
 
 // ---------------------------------------------------------------
 // Constructor
@@ -254,7 +257,28 @@ BTranslationUtils::GetBitmap(uint32 type, const char *kName,
 BBitmap *
 BTranslationUtils::GetBitmapFile(const char *kName, BTranslatorRoster *roster)
 {
-	BFile bitmapFile(kName, B_READ_ONLY);
+	if (!be_app || !kName || kName[0] == '\0')
+		return NULL;
+		
+	BPath path;
+	if (kName[0] != '/') {
+		// If kName is a relative path, use the path of the application's
+		// executable as the base for the relative path
+		app_info info;
+		if (be_app->GetAppInfo(&info) != B_OK)
+			return NULL;
+		BEntry appRef(&info.ref);
+		if (path.SetTo(&appRef) != B_OK)
+			return NULL;
+		if (path.GetParent(&path) != B_OK)
+			return NULL;
+		if (path.Append(kName) != B_OK)
+			return NULL;
+
+	} else if (path.SetTo(kName) != B_OK)
+		return NULL;
+		
+	BFile bitmapFile(path.Path(), B_READ_ONLY);
 	if (bitmapFile.InitCheck() != B_OK)
 		return NULL;
 
