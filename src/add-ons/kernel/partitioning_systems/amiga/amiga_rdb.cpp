@@ -212,7 +212,7 @@ amiga_rdb_free_identify_partition_cookie(partition_data *partition, void *_cooki
 
 
 #ifndef _BOOT_MODE
-static partition_module_info amiga_rdb_partition_module = {
+static partition_module_info gAmigaPartitionModule = {
 #else
 partition_module_info gAmigaPartitionModule = {
 #endif
@@ -235,7 +235,7 @@ partition_module_info gAmigaPartitionModule = {
 
 #ifndef _BOOT_MODE
 partition_module_info *modules[] = {
-	&amiga_rdb_partition_module,
+	&gAmigaPartitionModule,
 	NULL
 };
 #endif
