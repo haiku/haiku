@@ -12,31 +12,40 @@
 
 DiscoveryPacket::DiscoveryPacket(uint8 code, uint16 sessionID = 0x0000)
 	: fCode(code),
-	fSessionID(sessionID)
+	fSessionID(sessionID),
+	fInitStatus(B_OK)
 {
 }
 
 
-DiscoveryPacket::DiscoveryPacket(struct mbuf *packet)
+DiscoveryPacket::DiscoveryPacket(struct mbuf *packet, uint32 start = 0)
 {
 	// decode packet
-	pppoe_header *header = mtod(packet, pppoe_header*);
+	uint8 *data = mtod(packet, uint8*);
+	data += start;
+	pppoe_header *header = (pppoe_header*) data;
 	
 	SetCode(header->code);
 	
-	if(ntohs(header->length) < 4)
+	uint16 length = ntohs(header->length);
+	
+	if(length > packet->m_len - PPPoE_HEADER_SIZE - start) {
+		fInitStatus = B_ERROR;
 		return;
 			// there are no tags (or one corrupted tag)
+	}
 	
 	int32 position = 0;
 	pppoe_tag *tag;
 	
-	while(position <= ntohs(header->length) - 4) {
+	while(position <= length - 4) {
 		tag = (pppoe_tag*) (header->data + position);
 		position += ntohs(tag->length) + 4;
 		
 		AddTag(ntohs(tag->type), ntohs(tag->length), tag->data);
 	}
+	
+	fInitStatus = B_OK;
 }
 
 
@@ -110,15 +119,13 @@ DiscoveryPacket::TagWithType(uint16 type) const
 
 
 struct mbuf*
-DiscoveryPacket::ToMbuf(uint32 reserve = 0)
+DiscoveryPacket::ToMbuf(uint32 MTU, uint32 reserve = ETHER_HDR_LEN)
 {
 	struct mbuf *packet = m_gethdr(MT_DATA);
 	packet->m_data += reserve;
 	
 	pppoe_header *header = mtod(packet, pppoe_header*);
 	
-	memset(header, 0, sizeof(header));
-	header->ethernetHeader.ether_type = ETHERTYPE_PPPOEDISC;
 	header->version = PPPoE_VERSION;
 	header->type = PPPoE_TYPE;
 	header->code = Code();
@@ -131,7 +138,7 @@ DiscoveryPacket::ToMbuf(uint32 reserve = 0)
 		tag = TagAt(index);
 		
 		// make sure we have enough space left
-		if(1494 - length < tag->length) {
+		if(MTU - length < tag->length) {
 			m_freem(packet);
 			return NULL;
 		}
@@ -145,7 +152,7 @@ DiscoveryPacket::ToMbuf(uint32 reserve = 0)
 	}
 	
 	header->length = htons(length);
-	packet->m_len = length;
+	packet->m_pkthdr.len = packet->m_len = length + PPPoE_HEADER_SIZE;
 	
 	return packet;
 }

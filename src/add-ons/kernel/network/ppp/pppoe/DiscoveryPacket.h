@@ -45,8 +45,11 @@ typedef struct pppoe_tag {
 class DiscoveryPacket {
 	public:
 		DiscoveryPacket(uint8 code, uint16 sessionID = 0x0000);
-		DiscoveryPacket(struct mbuf *packet);
+		DiscoveryPacket(struct mbuf *packet, uint32 start = 0);
 		~DiscoveryPacket();
+		
+		status_t InitCheck() const
+			{ return fInitStatus; }
 		
 		void SetCode(uint8 code)
 			{ fCode = code; }
@@ -65,13 +68,14 @@ class DiscoveryPacket {
 		pppoe_tag *TagAt(int32 index) const;
 		pppoe_tag *TagWithType(uint16 type) const;
 		
-		struct mbuf *ToMbuf(uint32 reserve = 0);
+		struct mbuf *ToMbuf(uint32 MTU, uint32 reserve = ETHER_HDR_LEN);
 			// the user is responsible for freeing the mbuf
 
 	private:
 		uint8 fCode;
 		uint16 fSessionID;
 		List<pppoe_tag*> fTags;
+		status_t fInitStatus;
 };
 
 

@@ -11,7 +11,7 @@
 #include <OS.h>
 
 
-#define PPP_REPORT_TIMEOUT			10
+#define PPP_REPORT_TIMEOUT			100
 
 #define PPP_REPORT_DATA_LIMIT		128
 	// how much optional data can be added to the report

@@ -175,10 +175,13 @@ PPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
 uint32
 PPPLCP::AdditionalOverhead() const
 {
-	uint32 overhead = 0;
+	uint32 overhead = Interface().Overhead();
 	
 	if(Target())
 		overhead += Target()->Overhead();
+	
+	if(Interface().Device())
+		overhead += Interface().Device()->Overhead();
 	
 	return overhead;
 }
@@ -219,17 +222,21 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 	
 	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
 	
-	// adjust length (remove padding)
+	// remove padding
 	int32 length = packet->m_len;
 	if(packet->m_flags & M_PKTHDR)
 		length = packet->m_pkthdr.len;
-	if(length - ntohs(data->length) != 0)
-		m_adj(packet, length);
+#if DEBUG
+	printf("LCP::Recv: len=%ld;datalen=%d\n", length, ntohs(data->length));
+#endif
+	length -= ntohs(data->length);
+	if(length)
+		m_adj(packet, -length);
 	
 	struct mbuf *copy = m_gethdr(MT_DATA);
 	if(copy) {
 		copy->m_data += AdditionalOverhead();
-		copy->m_len = packet->m_len;
+		copy->m_pkthdr.len = copy->m_len = packet->m_len;
 		memcpy(copy->m_data, packet->m_data, copy->m_len);
 	}
 	

@@ -10,6 +10,14 @@
 
 #include <KPPPUtils.h>
 
+#ifdef _KERNEL_MODE
+	#include <KernelExport.h>
+	#define spawn_thread spawn_kernel_thread
+	#define printf dprintf
+#else
+	#include <cstdio>
+#endif
+
 
 PPPReportManager::PPPReportManager(BLocker& lock)
 	: fLock(lock)
@@ -79,6 +87,11 @@ PPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
 bool
 PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 length)
 {
+#if DEBUG
+	printf("PPPReportManager: Report(type=%d code=%ld length=%ld)\n",
+		type, code, length);
+#endif
+	
 	if(length > PPP_REPORT_DATA_LIMIT)
 		return false;
 	
@@ -112,6 +125,11 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 		result = send_data_with_timeout(request->thread, PPP_REPORT_CODE, &report,
 			sizeof(report), PPP_REPORT_TIMEOUT);
 		
+#if DEBUG
+	if(result == B_TIMED_OUT)
+		printf("PPPReportManager::Report(): timed out sending\n");
+#endif
+		
 		if(result == B_BAD_THREAD_ID || result == B_NO_MEMORY) {
 			fReportRequests.RemoveItem(request);
 			--index;
@@ -139,6 +157,10 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 				
 				if(result == B_OK && code != B_OK)
 					acceptable = false;
+#if DEBUG
+				if(result == B_TIMED_OUT)
+					printf("PPPReportManager::Report(): reply timed out\n");
+#endif
 			}
 		}
 		
@@ -147,6 +169,10 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 			--index;
 		}
 	}
+	
+#if DEBUG
+	printf("PPPReportManager::Report(): returning: %s\n", acceptable?"true":"false");
+#endif
 	
 	return acceptable;
 }

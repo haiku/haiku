@@ -12,6 +12,7 @@
 
 #include <netinet/in.h>
 
+
 #define AUTHENTICATION_TYPE				0x3
 #define AUTHENTICATOR_TYPE_STRING		"Authenticator"
 
@@ -159,14 +160,13 @@ _PPPAuthenticationHandler::ParseAck(const PPPConfigurePacket& ack)
 	authentication_item *item =
 		(authentication_item*) ack.ItemWithType(AUTHENTICATION_TYPE);
 	
-	if(!fPeerAuthenticator)
-		return B_ERROR;
-			// could not find the authenticator
-	
 	if(!item) {
 		if(fPeerAuthenticator)
 			return B_ERROR;
 				// the ack does not contain our request
+		else
+			return B_OK;
+				// no authentication needed
 	} else if(!fPeerAuthenticator
 			|| ntohs(item->protocolNumber) != fPeerAuthenticator->ProtocolNumber())
 		return B_ERROR;

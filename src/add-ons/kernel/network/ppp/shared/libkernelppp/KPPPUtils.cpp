@@ -34,9 +34,11 @@ status_t
 send_data_with_timeout(thread_id thread, int32 code, void *buffer,
 	size_t buffer_size, uint32 timeout)
 {
-	for(uint32 tries = 0; tries < timeout; tries++) {
+	for(uint32 tries = 0; tries < timeout; tries += 5) {
 		if(has_data(thread))
-			snooze(1000);
+			snooze(5000);
+		else
+			break;
 	}
 	
 	if(!has_data(thread))
@@ -50,11 +52,11 @@ status_t
 receive_data_with_timeout(thread_id *sender, int32 *code, void *buffer,
 	size_t buffer_size, uint32 timeout)
 {
-	for(uint32 tries = 0; tries < timeout; tries++) {
-		if(!has_data(find_thread(NULL))) {
-			snooze(1000);
-			continue;
-		}
+	for(uint32 tries = 0; tries < timeout; tries += 5) {
+		if(!has_data(find_thread(NULL)))
+			snooze(5000);
+		else
+			break;
 	}
 	
 	if(has_data(find_thread(NULL))) {

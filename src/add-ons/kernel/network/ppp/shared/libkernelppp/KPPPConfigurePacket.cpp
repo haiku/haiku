@@ -12,7 +12,8 @@
 
 
 PPPConfigurePacket::PPPConfigurePacket(uint8 code)
-	: fCode(code)
+	: fCode(code),
+	fID(0)
 {
 }
 
@@ -22,20 +23,26 @@ PPPConfigurePacket::PPPConfigurePacket(struct mbuf *packet)
 	// decode packet
 	ppp_lcp_packet *header = mtod(packet, ppp_lcp_packet*);
 	
+	SetID(header->id);
 	if(!SetCode(header->code))
 		return;
 	
-	if(header->length < 4)
+	uint16 length = ntohs(header->length);
+	
+	if(length < 6 || length > packet->m_len)
 		return;
 			// there are no items (or one corrupted item)
 	
 	int32 position = 0;
 	ppp_configure_item *item;
 	
-	while(position <= header->length - 4) {
+	while(position < length - 4) {
 		item = (ppp_configure_item*) (header->data + position);
-		position += item->length;
+		if(item->length < 2)
+			return;
+				// found a corrupted item
 		
+		position += item->length;
 		AddItem(item);
 	}
 }
@@ -64,7 +71,7 @@ PPPConfigurePacket::SetCode(uint8 code)
 bool
 PPPConfigurePacket::AddItem(const ppp_configure_item *item, int32 index = -1)
 {
-	if(item->length < 2)
+	if(!item || item->length < 2)
 		return false;
 	
 	ppp_configure_item *add = (ppp_configure_item*) malloc(item->length);
@@ -125,7 +132,7 @@ PPPConfigurePacket::ItemWithType(uint8 type) const
 
 
 struct mbuf*
-PPPConfigurePacket::ToMbuf(uint32 reserve = 0)
+PPPConfigurePacket::ToMbuf(uint32 MRU, uint32 reserve = 0)
 {
 	struct mbuf *packet = m_gethdr(MT_DATA);
 	packet->m_data += reserve;
@@ -133,15 +140,16 @@ PPPConfigurePacket::ToMbuf(uint32 reserve = 0)
 	ppp_lcp_packet *header = mtod(packet, ppp_lcp_packet*);
 	
 	header->code = Code();
+	header->id = ID();
 	
-	uint8 length = 0;
+	uint16 length = 0;
 	ppp_configure_item *item;
 	
 	for(int32 index = 0; index < CountItems(); index++) {
 		item = ItemAt(index);
 		
 		// make sure we have enough space left
-		if(0xFF - length < item->length) {
+		if(MRU - length < item->length) {
 			m_freem(packet);
 			return NULL;
 		}
@@ -150,8 +158,9 @@ PPPConfigurePacket::ToMbuf(uint32 reserve = 0)
 		length += item->length;
 	}
 	
-	header->length = length + 2;
-	packet->m_len = header->length;
+	length += 4;
+	header->length = htons(length);
+	packet->m_pkthdr.len = packet->m_len = length;
 	
 	return packet;
 }

@@ -65,6 +65,7 @@ class PPPoEDevice : public PPPDevice {
 		uint32 fHostUniq;
 		char *fACName, *fServiceName;
 		
+		uint32 fAttempts;
 		bigtime_t fNextTimeout;
 		pppoe_state fState;
 		

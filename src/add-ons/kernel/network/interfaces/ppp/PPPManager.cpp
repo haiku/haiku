@@ -23,7 +23,7 @@
 #endif
 
 
-static const char ppp_if_name_base[] = "ppp";
+static const char ppp_if_name_base[] =	"ppp";
 
 
 static
@@ -51,6 +51,7 @@ bring_interface_up(interface_entry *entry)
 }
 
 
+#if DOWN_AS_THREAD
 static
 status_t
 interface_down_thread(void *data)
@@ -62,15 +63,21 @@ interface_down_thread(void *data)
 	
 	return B_OK;
 }
+#endif
 
 
 static
 status_t
 bring_interface_down(interface_entry *entry)
 {
+#if DOWN_AS_THREAD
 	thread_id downThread = spawn_thread(interface_down_thread,
 		"PPPManager: down_thread", B_NORMAL_PRIORITY, entry);
-	resume_thread(downThread);
+	resume_thread(downThread); */
+#else
+	entry->interface->Down();
+	--entry->accessing;
+#endif
 	
 	return B_OK;
 }
@@ -219,6 +226,7 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 	if(!entry || entry->deleting)
 		return B_ERROR;
 	
+	int32 status = B_OK;
 	++entry->accessing;
 	locker.UnlockNow();
 	
@@ -235,11 +243,11 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 		break;
 		
 		default:
-			return entry->interface->StackControl(cmd, data);
+			status = entry->interface->StackControl(cmd, data);
 	}
 	
 	--entry->accessing;
-	return B_OK;
+	return status;
 }
 
 
@@ -300,6 +308,7 @@ PPPManager::DeleteInterface(interface_id ID)
 	LockerHelper locker(fLock);
 	
 	interface_entry *entry = EntryFor(ID);
+	entry->interface->Down();
 	if(entry)
 		entry->deleting = true;
 }
@@ -430,8 +439,10 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			LockerHelper locker(fLock);
 			
 			interface_entry *entry = EntryFor(*(interface_id*)data);
-			if(!entry)
+			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
+			
+			++entry->accessing;
 			
 			return bring_interface_up(entry);
 		} break;
@@ -443,8 +454,10 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			LockerHelper locker(fLock);
 			
 			interface_entry *entry = EntryFor(*(interface_id*)data);
-			if(!entry)
+			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
+			
+			++entry->accessing;
 			
 			return bring_interface_down(entry);
 		} break;
@@ -457,7 +470,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			
 			ppp_control_info *control = (ppp_control_info*) data;
 			interface_entry *entry = EntryFor(control->index);
-			if(!entry)
+			if(!entry || entry->deleting)
 				return B_BAD_INDEX;
 			
 			return entry->interface->Control(control->op, control->data,
@@ -711,7 +724,7 @@ PPPManager::DeleterThreadEvent()
 			continue;
 		}
 		
-		if(entry->deleting && entry->accessing == 0) {
+		if(entry->deleting && entry->accessing <= 0) {
 			delete entry->interface;
 			delete entry;
 			fEntries.RemoveItem(index);

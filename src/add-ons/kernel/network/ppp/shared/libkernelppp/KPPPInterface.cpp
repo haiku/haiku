@@ -64,7 +64,7 @@ status_t call_close_event_thread(void *data);
 
 PPPInterface::PPPInterface(uint32 ID, const driver_settings *settings,
 		PPPInterface *parent = NULL)
-	: PPPLayer("PPPInterface", PPP_INTERFACE_LEVEL),
+	: PPPLayer("PPPInterface", PPP_INTERFACE_LEVEL, 2),
 	fID(ID),
 	fSettings(dup_driver_settings(settings)),
 	fIfnet(NULL),
@@ -104,19 +104,25 @@ PPPInterface::PPPInterface(uint32 ID, const driver_settings *settings,
 	// MRU
 	_PPPMRUHandler *mruHandler =
 		new _PPPMRUHandler(*this);
-	if(!LCP().AddOptionHandler(mruHandler) || mruHandler->InitCheck() != B_OK)
+	if(!LCP().AddOptionHandler(mruHandler) || mruHandler->InitCheck() != B_OK) {
+		printf("PPPInterface: Could not add MRU handler!\n");
 		delete mruHandler;
+	}
 	// authentication
 	_PPPAuthenticationHandler *authenticationHandler =
 		new _PPPAuthenticationHandler(*this);
 	if(!LCP().AddOptionHandler(authenticationHandler)
-			|| authenticationHandler->InitCheck() != B_OK)
+			|| authenticationHandler->InitCheck() != B_OK) {
+		printf("PPPInterface: Could not add authentication handler!\n");
 		delete authenticationHandler;
+	}
 	// PFC
 	_PPPPFCHandler *pfcHandler =
 		new _PPPPFCHandler(fLocalPFCState, fPeerPFCState, *this);
-	if(!LCP().AddOptionHandler(pfcHandler) || pfcHandler->InitCheck() != B_OK)
+	if(!LCP().AddOptionHandler(pfcHandler) || pfcHandler->InitCheck() != B_OK) {
+		printf("PPPInterface: Could not add PFC handler!\n");
 		delete pfcHandler;
+	}
 	
 	// set up dial delays
 	fDialRetryDelay = 3000;
@@ -269,10 +275,6 @@ PPPInterface::Delete()
 status_t
 PPPInterface::InitCheck() const
 {
-#if DEBUG
-	printf("PPPInterface: InitCheck(): 0x%lX\n", fInitStatus);
-#endif
-	
 	if(fInitStatus != B_OK)
 		return fInitStatus;
 	
@@ -610,10 +612,6 @@ PPPInterface::CountProtocols() const
 	for(; protocol; protocol = protocol->NextProtocol())
 		++count;
 	
-#if DEBUG
-	printf("PPPInterface: CountProtocols(): %ld\n", count);
-#endif
-	
 	return count;
 }
 
@@ -621,10 +619,6 @@ PPPInterface::CountProtocols() const
 PPPProtocol*
 PPPInterface::ProtocolAt(int32 index) const
 {
-#if DEBUG
-	printf("PPPInterface: ProtocolAt(%ld)\n", index);
-#endif
-	
 	PPPProtocol *protocol = FirstProtocol();
 	
 	int32 currentIndex = 0;
@@ -638,10 +632,6 @@ PPPInterface::ProtocolAt(int32 index) const
 PPPProtocol*
 PPPInterface::ProtocolFor(uint16 protocolNumber, PPPProtocol *start = NULL) const
 {
-#if DEBUG
-	printf("PPPInterface: ProtocolFor(0x%X)\n", protocolNumber);
-#endif
-	
 	PPPProtocol *current = start ? start : FirstProtocol();
 	
 	for(; current; current = current->NextProtocol()) {
@@ -838,33 +828,16 @@ PPPInterface::Up()
 			// is waiting for new reports)
 	
 	while(true) {
-		if(IsUp()) {
-			// lock needs timeout because destructor could have locked the interface
-			while(!fLock.LockWithTimeout(100000) != B_NO_ERROR)
-				if(fDeleteCounter > 0)
-					return true;
-			
-			if(me == fUpThread) {
-				fDialRetry = 0;
-				fUpThread = -1;
-			}
-			
-			ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
-			fLock.Unlock();
-			
-			return true;
-		}
-		
 		// A wrong code usually happens when the redial thread gets notified
 		// of a Down() request. In that case a report will follow soon, so
 		// this can be ignored.
 		if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
 			continue;
 		
-#if DEBUG
-		printf("PPPInterface::Up(): Report: Type = %ld Code = %ld\n", report.type,
-			report.code);
-#endif
+//#if DEBUG
+//		printf("PPPInterface::Up(): Report: Type = %ld Code = %ld\n", report.type,
+//			report.code);
+//#endif
 		
 		if(IsUp()) {
 			if(me == fUpThread) {
@@ -947,19 +920,27 @@ PPPInterface::Up()
 			// I am the thread for the real task
 			if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
 				if(fDialRetry >= fDialRetriesLimit) {
+#if DEBUG
+					printf("PPPInterface::Up(): DEVICE_UP_FAILED: >=maxretries!\n");
+#endif
 					fDialRetry = 0;
 					fUpThread = -1;
 					
-					if(!DoesDialOnDemand()
-							&& report.code != PPP_REPORT_DOWN_SUCCESSFUL)
+					if(!DoesDialOnDemand())
 						Delete();
 					
 					PPP_REPLY(sender, B_OK);
 					ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 					return false;
 				} else {
+#if DEBUG
+					printf("PPPInterface::Up(): DEVICE_UP_FAILED: <maxretries\n");
+#endif
 					++fDialRetry;
 					PPP_REPLY(sender, B_OK);
+#if DEBUG
+					printf("PPPInterface::Up(): DEVICE_UP_FAILED: replied\n");
+#endif
 					Redial(DialRetryDelay());
 					continue;
 				}
@@ -977,8 +958,7 @@ PPPInterface::Up()
 					PPP_REPLY(sender, B_OK);
 					ReportManager().DisableReports(PPP_CONNECTION_REPORT, me);
 					
-					if(!DoesDialOnDemand()
-							&& report.code != PPP_REPORT_DOWN_SUCCESSFUL)
+					if(!DoesDialOnDemand())
 						Delete();
 					
 					return false;
@@ -1180,14 +1160,8 @@ PPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 		return B_ERROR;
 	}
 	
-	// test whether are going down
-	if(Phase() == PPP_TERMINATION_PHASE) {
-		m_freem(packet);
-		return B_ERROR;
-	}
-	
 	// go up if DialOnDemand enabled and we are down
-	if(DoesDialOnDemand()
+	if(protocolNumber != PPP_LCP_PROTOCOL && DoesDialOnDemand()
 			&& (Phase() == PPP_DOWN_PHASE
 				|| Phase() == PPP_ESTABLISHMENT_PHASE)
 			&& !Up()) {
@@ -1229,8 +1203,6 @@ PPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 		*header = protocolNumber;
 	}
 	
-	fIdleSince = real_time_clock();
-	
 	// pass to device/children
 	if(!IsMultilink() || Parent()) {
 		// check if packet is too big for device
@@ -1254,11 +1226,13 @@ status_t
 PPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 #if DEBUG
-		printf("PPPInterface: Receive(0x%X)\n", protocolNumber);
+	printf("PPPInterface: Receive(0x%X)\n", protocolNumber);
 #endif
 	
 	if(!packet)
 		return B_ERROR;
+	
+	fIdleSince = real_time_clock();
 	
 	int32 result = PPP_REJECTED;
 		// assume we have no handler
@@ -1334,23 +1308,17 @@ PPPInterface::ReceiveFromDevice(struct mbuf *packet)
 void
 PPPInterface::Pulse()
 {
-	if(fDeleteCounter > 0)
-		return;
-			// we have no pulse when we are dead ;)
-	
-	// check our idle time and disconnect if needed
-	if(fDisconnectAfterIdleSince > 0 && fIdleSince != 0
-			&& fIdleSince - real_time_clock() >= fDisconnectAfterIdleSince) {
-		StateMachine().CloseEvent();
-		return;
-	}
-	
 	if(Device())
 		Device()->Pulse();
 	
 	PPPProtocol *protocol = FirstProtocol();
 	for(; protocol; protocol = protocol->NextProtocol())
 		protocol->Pulse();
+	
+	// check our idle time and disconnect if needed
+	if(fDisconnectAfterIdleSince > 0 && fIdleSince != 0
+			&& fIdleSince - real_time_clock() >= fDisconnectAfterIdleSince)
+		StateMachine().CloseEvent();
 }
 
 
@@ -1590,12 +1558,9 @@ redial_thread(void *data)
 // ----------------------------------
 // Function: interface_deleter_thread
 // ----------------------------------
-// The destructor is private, so this thread function cannot delete our interface.
-// To solve this problem we create a 'fake' class PPPManager (friend of PPPInterface)
-// which is only defined here (the real class is defined in the ppp interface module).
-class PPPManager {
+class PPPInterfaceAccess {
 	public:
-		PPPManager() {}
+		PPPInterfaceAccess() {}
 		
 		void Delete(PPPInterface *interface)
 			{ delete interface; }
@@ -1623,8 +1588,8 @@ class PPPManager {
 status_t
 interface_deleter_thread(void *data)
 {
-	PPPManager manager;
-	manager.Delete((PPPInterface*) data);
+	PPPInterfaceAccess access;
+	access.Delete((PPPInterface*) data);
 	
 	return B_OK;
 }
@@ -1633,8 +1598,8 @@ interface_deleter_thread(void *data)
 status_t
 call_open_event_thread(void *data)
 {
-	PPPManager manager;
-	manager.CallOpenEvent((PPPInterface*) data);
+	PPPInterfaceAccess access;
+	access.CallOpenEvent((PPPInterface*) data);
 	
 	return B_OK;
 }
@@ -1643,8 +1608,8 @@ call_open_event_thread(void *data)
 status_t
 call_close_event_thread(void *data)
 {
-	PPPManager manager;
-	manager.CallCloseEvent((PPPInterface*) data);
+	PPPInterfaceAccess access;
+	access.CallCloseEvent((PPPInterface*) data);
 	
 	return B_OK;
 }

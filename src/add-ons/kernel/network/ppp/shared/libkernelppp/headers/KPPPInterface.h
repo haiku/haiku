@@ -36,6 +36,7 @@ struct ppp_module_info;
 class PPPInterface : public PPPLayer {
 		friend class PPPStateMachine;
 		friend class PPPManager;
+		friend class PPPInterfaceAccess;
 
 	private:
 		// copies are not allowed!

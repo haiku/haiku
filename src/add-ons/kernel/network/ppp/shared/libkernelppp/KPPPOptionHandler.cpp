@@ -12,7 +12,8 @@
 
 PPPOptionHandler::PPPOptionHandler(const char *name, uint8 type,
 		PPPInterface& interface, driver_parameter *settings)
-	: fType(type),
+	: fInitStatus(B_OK),
+	fType(type),
 	fInterface(interface),
 	fSettings(settings),
 	fEnabled(true)

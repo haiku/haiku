@@ -48,7 +48,7 @@ class PPPConfigurePacket {
 		ppp_configure_item *ItemAt(int32 index) const;
 		ppp_configure_item *ItemWithType(uint8 type) const;
 		
-		struct mbuf *ToMbuf(uint32 reserve = 0);
+		struct mbuf *ToMbuf(uint32 MRU, uint32 reserve = 0);
 			// the user is responsible for freeing the mbuf
 
 	private:

@@ -35,10 +35,6 @@ class PPPProtocol : public PPPLayer {
 		ppp_phase ActivationPhase() const
 			{ return fActivationPhase; }
 		
-		uint32 Overhead() const
-			{ return fOverhead; }
-				// only useful for encapsulation protocols
-		
 		uint16 ProtocolNumber() const
 			{ return fProtocolNumber; }
 		int32 AddressFamily() const
@@ -103,7 +99,6 @@ class PPPProtocol : public PPPLayer {
 		void DownEvent();
 
 	protected:
-		uint32 fOverhead;
 		ppp_side fSide;
 
 	private:

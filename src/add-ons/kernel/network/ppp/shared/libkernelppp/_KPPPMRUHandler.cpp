@@ -12,6 +12,7 @@
 
 #include <netinet/in.h>
 
+
 #define MRU_TYPE				0x1
 
 typedef struct mru_item {
@@ -115,7 +116,7 @@ ParseRequestedItem(mru_item *item, PPPInterface& interface)
 	if(item) {
 		if(item->length != 4)
 			return B_ERROR;
-				// the request had a corrupted item
+				// the request has a corrupted item
 		
 		MRU = ntohs(item->MRU);
 	}

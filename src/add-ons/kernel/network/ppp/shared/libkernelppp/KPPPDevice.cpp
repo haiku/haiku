@@ -13,9 +13,9 @@
 #include <PPPControl.h>
 
 
-PPPDevice::PPPDevice(const char *name, PPPInterface& interface,
+PPPDevice::PPPDevice(const char *name, uint32 overhead, PPPInterface& interface,
 		driver_parameter *settings)
-	: PPPLayer(name, PPP_DEVICE_LEVEL),
+	: PPPLayer(name, PPP_DEVICE_LEVEL, overhead),
 	fMTU(1500),
 	fInterface(interface),
 	fSettings(settings),

@@ -21,7 +21,7 @@ class PPPDevice : public PPPLayer {
 
 	protected:
 		// PPPDevice must be subclassed
-		PPPDevice(const char *name, PPPInterface& interface,
+		PPPDevice(const char *name, uint32 overhead, PPPInterface& interface,
 			driver_parameter *settings);
 
 	public:

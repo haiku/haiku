@@ -17,7 +17,16 @@
 #include <core_funcs.h>
 
 
+#ifdef _KERNEL_MODE
+	#define spawn_thread spawn_kernel_thread
+	#define printf dprintf
+#elif DEBUG
+	#include <cstdio>
+#endif
+
+
 #define PPP_STATE_MACHINE_TIMEOUT			3000000
+	// 3 seconds
 
 
 PPPStateMachine::PPPStateMachine(PPPInterface& interface)
@@ -61,6 +70,10 @@ PPPStateMachine::NextID()
 void
 PPPStateMachine::NewState(ppp_state next)
 {
+#if DEBUG
+	printf("PPPSM: NewState(%d) state=%d\n", next, State());
+#endif
+	
 	// maybe we do not need the timer anymore
 	if(next < PPP_CLOSING_STATE || next == PPP_OPENED_STATE)
 		fNextTimeout = 0;
@@ -75,6 +88,11 @@ PPPStateMachine::NewState(ppp_state next)
 void
 PPPStateMachine::NewPhase(ppp_phase next)
 {
+#if DEBUG
+	if(next <= PPP_ESTABLISHMENT_PHASE || next == PPP_ESTABLISHED_PHASE)
+		printf("PPPSM: NewPhase(%d) phase=%d\n", next, Phase());
+#endif
+	
 	// there is nothing after established phase and nothing before down phase
 	if(next > PPP_ESTABLISHED_PHASE)
 		next = PPP_ESTABLISHED_PHASE;
@@ -113,6 +131,11 @@ PPPStateMachine::NewPhase(ppp_phase next)
 bool
 PPPStateMachine::Reconfigure()
 {
+#if DEBUG
+	printf("PPPSM: Reconfigure() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	if(State() < PPP_REQ_SENT_STATE)
@@ -133,6 +156,11 @@ PPPStateMachine::Reconfigure()
 bool
 PPPStateMachine::SendEchoRequest()
 {
+#if DEBUG
+	printf("PPPSM: SendEchoRequest() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	if(State() != PPP_OPENED_STATE)
 		return false;
 	
@@ -141,7 +169,7 @@ PPPStateMachine::SendEchoRequest()
 		return false;
 	
 	packet->m_data += LCP().AdditionalOverhead();
-	packet->m_len = 8;
+	packet->m_pkthdr.len = packet->m_len = 8;
 		// echo requests are at least eight bytes long
 	
 	ppp_lcp_packet *request = mtod(packet, ppp_lcp_packet*);
@@ -158,6 +186,11 @@ PPPStateMachine::SendEchoRequest()
 bool
 PPPStateMachine::SendDiscardRequest()
 {
+#if DEBUG
+	printf("PPPSM: SendDiscardRequest() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	if(State() != PPP_OPENED_STATE)
 		return false;
 	
@@ -166,7 +199,7 @@ PPPStateMachine::SendDiscardRequest()
 		return false;
 	
 	packet->m_data += LCP().AdditionalOverhead();
-	packet->m_len = 8;
+	packet->m_pkthdr.len = packet->m_len = 8;
 		// discard requests are at least eight bytes long
 	
 	ppp_lcp_packet *request = mtod(packet, ppp_lcp_packet*);
@@ -183,6 +216,11 @@ PPPStateMachine::SendDiscardRequest()
 void
 PPPStateMachine::LocalAuthenticationRequested()
 {
+#if DEBUG
+	printf("PPPSM: LocalAuthenticationRequested() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	fLocalAuthenticationStatus = PPP_AUTHENTICATING;
@@ -194,11 +232,19 @@ PPPStateMachine::LocalAuthenticationRequested()
 void
 PPPStateMachine::LocalAuthenticationAccepted(const char *name)
 {
+#if DEBUG
+	printf("PPPSM: LocalAuthenticationAccepted() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	fLocalAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
 	free(fLocalAuthenticationName);
-	fLocalAuthenticationName = strdup(name);
+	if(name)
+		fLocalAuthenticationName = strdup(name);
+	else
+		fLocalAuthenticationName = NULL;
 	
 	Interface().Report(PPP_CONNECTION_REPORT,
 		PPP_REPORT_LOCAL_AUTHENTICATION_SUCCESSFUL, NULL, 0);
@@ -208,17 +254,30 @@ PPPStateMachine::LocalAuthenticationAccepted(const char *name)
 void
 PPPStateMachine::LocalAuthenticationDenied(const char *name)
 {
+#if DEBUG
+	printf("PPPSM: LocalAuthenticationDenied() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	fLocalAuthenticationStatus = PPP_AUTHENTICATION_FAILED;
 	free(fLocalAuthenticationName);
-	fLocalAuthenticationName = strdup(name);
+	if(name)
+		fLocalAuthenticationName = strdup(name);
+	else
+		fLocalAuthenticationName = NULL;
 }
 
 
 void
 PPPStateMachine::PeerAuthenticationRequested()
 {
+#if DEBUG
+	printf("PPPSM: PeerAuthenticationRequested() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	fPeerAuthenticationStatus = PPP_AUTHENTICATING;
@@ -230,11 +289,19 @@ PPPStateMachine::PeerAuthenticationRequested()
 void
 PPPStateMachine::PeerAuthenticationAccepted(const char *name)
 {
+#if DEBUG
+	printf("PPPSM: PeerAuthenticationAccepted() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	fPeerAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
 	free(fPeerAuthenticationName);
-	fPeerAuthenticationName = strdup(name);
+	if(name)
+		fPeerAuthenticationName = strdup(name);
+	else
+		fPeerAuthenticationName = NULL;
 	
 	Interface().Report(PPP_CONNECTION_REPORT,
 		PPP_REPORT_PEER_AUTHENTICATION_SUCCESSFUL, NULL, 0);
@@ -244,11 +311,19 @@ PPPStateMachine::PeerAuthenticationAccepted(const char *name)
 void
 PPPStateMachine::PeerAuthenticationDenied(const char *name)
 {
+#if DEBUG
+	printf("PPPSM: PeerAuthenticationDenied() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	fPeerAuthenticationStatus = PPP_AUTHENTICATION_FAILED;
 	free(fPeerAuthenticationName);
-	fPeerAuthenticationName = strdup(name);
+	if(name)
+		fPeerAuthenticationName = strdup(name);
+	else
+		fPeerAuthenticationName = NULL;
 	
 	CloseEvent();
 }
@@ -257,6 +332,11 @@ PPPStateMachine::PeerAuthenticationDenied(const char *name)
 void
 PPPStateMachine::UpFailedEvent(PPPInterface& interface)
 {
+#if DEBUG
+	printf("PPPSM: UpFailedEvent(interface) state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	// TODO:
 	// log that an interface did not go up
 }
@@ -265,6 +345,11 @@ PPPStateMachine::UpFailedEvent(PPPInterface& interface)
 void
 PPPStateMachine::UpEvent(PPPInterface& interface)
 {
+#if DEBUG
+	printf("PPPSM: UpEvent(interface) state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	if(Phase() <= PPP_TERMINATION_PHASE) {
@@ -290,6 +375,11 @@ PPPStateMachine::UpEvent(PPPInterface& interface)
 void
 PPPStateMachine::DownEvent(PPPInterface& interface)
 {
+#if DEBUG
+	printf("PPPSM: DownEvent(interface) state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	uint32 MRU = 0;
@@ -331,6 +421,11 @@ PPPStateMachine::DownEvent(PPPInterface& interface)
 void
 PPPStateMachine::UpFailedEvent(PPPProtocol *protocol)
 {
+#if DEBUG
+	printf("PPPSM: UpFailedEvent(protocol) state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	if((protocol->Flags() & PPP_NOT_IMPORTANT) == 0) {
 		if(Interface().Mode() == PPP_CLIENT_MODE) {
 			// pretend we lost connection
@@ -351,6 +446,11 @@ PPPStateMachine::UpFailedEvent(PPPProtocol *protocol)
 void
 PPPStateMachine::UpEvent(PPPProtocol *protocol)
 {
+#if DEBUG
+	printf("PPPSM: UpEvent(protocol) state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	if(Phase() >= PPP_ESTABLISHMENT_PHASE)
@@ -361,6 +461,10 @@ PPPStateMachine::UpEvent(PPPProtocol *protocol)
 void
 PPPStateMachine::DownEvent(PPPProtocol *protocol)
 {
+#if DEBUG
+	printf("PPPSM: DownEvent(protocol) state=%d phase=%d\n",
+		State(), Phase());
+#endif
 }
 
 
@@ -372,6 +476,11 @@ PPPStateMachine::DownEvent(PPPProtocol *protocol)
 bool
 PPPStateMachine::TLSNotify()
 {
+#if DEBUG
+	printf("PPPSM: TLSNotify() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	if(State() == PPP_STARTING_STATE) {
@@ -392,10 +501,15 @@ PPPStateMachine::TLSNotify()
 bool
 PPPStateMachine::TLFNotify()
 {
+#if DEBUG
+	printf("PPPSM: TLFNotify() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
-	// from now on no packets may be sent to the device
-	NewPhase(PPP_DOWN_PHASE);
+	NewPhase(PPP_TERMINATION_PHASE);
+		// tell DownEvent() that it may create a connection-lost-report
 	
 	return true;
 }
@@ -404,29 +518,28 @@ PPPStateMachine::TLFNotify()
 void
 PPPStateMachine::UpFailedEvent()
 {
+#if DEBUG
+	printf("PPPSM: UpFailedEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	switch(State()) {
 		case PPP_STARTING_STATE:
-			// TLSNotify() sets establishment phase
-			if(Phase() != PPP_ESTABLISHMENT_PHASE) {
-				// there must be a BUG in the device add-on or someone is trying to
-				// fool us (UpEvent() is public) as we did not request the device
-				// to go up
-				IllegalEvent(PPP_UP_FAILED_EVENT);
-				NewState(PPP_INITIAL_STATE);
-				break;
-			}
-			
+#if DEBUG
+			printf("PPPSM::UpFailedEvent(): Reporting...\n");
+#endif
 			Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_DEVICE_UP_FAILED,
 				NULL, 0);
-			
 			if(Interface().Parent())
 				Interface().Parent()->StateMachine().UpFailedEvent(Interface());
 			
 			NewPhase(PPP_DOWN_PHASE);
 				// tell DownEvent() that it should not create a connection-lost-report
-			
+#if DEBUG
+			printf("PPPSM::UpFailedEvent(): Calling DownEvent()\n");
+#endif
 			DownEvent();
 		break;
 		
@@ -439,6 +552,11 @@ PPPStateMachine::UpFailedEvent()
 void
 PPPStateMachine::UpEvent()
 {
+#if DEBUG
+	printf("PPPSM: UpEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	// This call is public, thus, it might not only be called by the device.
 	// We must recognize these attempts to fool us and handle them correctly.
 	
@@ -499,6 +617,11 @@ PPPStateMachine::UpEvent()
 void
 PPPStateMachine::DownEvent()
 {
+#if DEBUG
+	printf("PPPSM: DownEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	if(Interface().Device() && Interface().Device()->IsUp())
@@ -511,6 +634,11 @@ PPPStateMachine::DownEvent()
 	Interface().fIdleSince = 0;
 	
 	switch(State()) {
+		// XXX: this does not belong to the standard, but may happen in our
+		// implementation
+		case PPP_STARTING_STATE:
+		break;
+		
 		case PPP_CLOSED_STATE:
 		case PPP_CLOSING_STATE:
 			NewState(PPP_INITIAL_STATE);
@@ -590,7 +718,16 @@ PPPStateMachine::DownEvent()
 void
 PPPStateMachine::OpenEvent()
 {
+#if DEBUG
+	printf("PPPSM: OpenEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
+	
+	// reset all handlers
+	DownProtocols();
+	ResetLCPHandlers();
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -644,6 +781,11 @@ PPPStateMachine::OpenEvent()
 void
 PPPStateMachine::CloseEvent()
 {
+#if DEBUG
+	printf("PPPSM: CloseEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	if(Interface().IsMultilink() && !Interface().Parent()) {
@@ -708,6 +850,11 @@ PPPStateMachine::CloseEvent()
 void
 PPPStateMachine::TOGoodEvent()
 {
+#if DEBUG
+	printf("PPPSM: TOGoodEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	switch(State()) {
@@ -736,6 +883,11 @@ PPPStateMachine::TOGoodEvent()
 void
 PPPStateMachine::TOBadEvent()
 {
+#if DEBUG
+	printf("PPPSM: TOBadEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	switch(State()) {
@@ -766,6 +918,11 @@ PPPStateMachine::TOBadEvent()
 void
 PPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: RCRGoodEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	switch(State()) {
@@ -823,6 +980,11 @@ PPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 void
 PPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 {
+#if DEBUG
+	printf("PPPSM: RCRBadEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	switch(State()) {
@@ -879,6 +1041,11 @@ PPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 void
 PPPStateMachine::RCAEvent(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: RCAEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	if(fRequestID != mtod(packet, ppp_lcp_packet*)->id) {
@@ -954,6 +1121,11 @@ PPPStateMachine::RCAEvent(struct mbuf *packet)
 void
 PPPStateMachine::RCNEvent(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: RCNEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	if(fRequestID != mtod(packet, ppp_lcp_packet*)->id) {
@@ -1032,6 +1204,11 @@ PPPStateMachine::RCNEvent(struct mbuf *packet)
 void
 PPPStateMachine::RTREvent(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: RTREvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	// we should not use the same ID as the peer
@@ -1080,6 +1257,11 @@ PPPStateMachine::RTREvent(struct mbuf *packet)
 void
 PPPStateMachine::RTAEvent(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: RTAEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	if(fTerminateID != mtod(packet, ppp_lcp_packet*)->id) {
@@ -1135,6 +1317,11 @@ void
 PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocolNumber,
 	uint8 code = PPP_PROTOCOL_REJECT)
 {
+#if DEBUG
+	printf("PPPSM: RUCEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	switch(State()) {
@@ -1155,6 +1342,11 @@ PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocolNumber,
 void
 PPPStateMachine::RXJGoodEvent(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: RXJGoodEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	// This method does not m_freem(packet) because the acceptable rejects are
 	// also passed to the parent. RXJEvent() will m_freem(packet) when needed.
 	LockerHelper locker(fLock);
@@ -1179,6 +1371,11 @@ PPPStateMachine::RXJGoodEvent(struct mbuf *packet)
 void
 PPPStateMachine::RXJBadEvent(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: RXJBadEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	switch(State()) {
@@ -1227,6 +1424,11 @@ PPPStateMachine::RXJBadEvent(struct mbuf *packet)
 void
 PPPStateMachine::RXREvent(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: RXREvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	ppp_lcp_packet *echo = mtod(packet, ppp_lcp_packet*);
 	
 	if(echo->code == PPP_ECHO_REPLY && echo->id != fEchoID) {
@@ -1258,6 +1460,11 @@ PPPStateMachine::RXREvent(struct mbuf *packet)
 void
 PPPStateMachine::TimerEvent()
 {
+#if DEBUG
+	if(fNextTimeout != 0)
+		printf("PPPSM: TimerEvent()\n");
+#endif
+	
 	LockerHelper locker(fLock);
 	if(fNextTimeout == 0 || fNextTimeout > system_time())
 		return;
@@ -1295,8 +1502,14 @@ PPPStateMachine::TimerEvent()
 void
 PPPStateMachine::RCREvent(struct mbuf *packet)
 {
-	PPPConfigurePacket request(packet), nak(PPP_CONFIGURE_NAK),
-		reject(PPP_CONFIGURE_REJECT);
+#if DEBUG
+	printf("PPPSM: RCREvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
+	PPPConfigurePacket request(packet);
+	PPPConfigurePacket nak(PPP_CONFIGURE_NAK);
+	PPPConfigurePacket reject(PPP_CONFIGURE_REJECT);
 	
 	// we should not use the same id as the peer
 	if(fID == mtod(packet, ppp_lcp_packet*)->id)
@@ -1313,11 +1526,15 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 		optionHandler = LCP().OptionHandlerFor(request.ItemAt(index)->type);
 		
 		if(!optionHandler || !optionHandler->IsEnabled()) {
+			printf("PPPSM::RCREvent(): unknown type:%d\n", request.ItemAt(index)->type);
 			// unhandled items should be added to the reject
 			reject.AddItem(request.ItemAt(index));
 			continue;
 		}
 		
+#if DEBUG
+		printf("PPPSM::RCREvent(): OH=%s\n", optionHandler->Name());
+#endif
 		result = optionHandler->ParseRequest(request, index, nak, reject);
 		
 		if(result == PPP_UNHANDLED) {
@@ -1327,6 +1544,7 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 		} else if(result != B_OK) {
 			// the request contains a value that has been sent more than
 			// once or the value is corrupted
+			printf("PPPSM::RCREvent(): OptionHandler returned parse error!\n");
 			m_freem(packet);
 			CloseEvent();
 			return;
@@ -1345,6 +1563,7 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 				if(result != B_OK) {
 					// the request contains a value that has been sent more than
 					// once or the value is corrupted
+					printf("PPPSM::RCREvent(): OptionHandler returned append error!\n");
 					m_freem(packet);
 					CloseEvent();
 					return;
@@ -1354,9 +1573,9 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 	}
 	
 	if(nak.CountItems() > 0)
-		RCRBadEvent(nak.ToMbuf(LCP().AdditionalOverhead()), NULL);
+		RCRBadEvent(nak.ToMbuf(Interface().MRU(), LCP().AdditionalOverhead()), NULL);
 	else if(reject.CountItems() > 0)
-		RCRBadEvent(NULL, reject.ToMbuf(LCP().AdditionalOverhead()));
+		RCRBadEvent(NULL, reject.ToMbuf(Interface().MRU(), LCP().AdditionalOverhead()));
 	else
 		RCRGoodEvent(packet);
 }
@@ -1368,6 +1587,11 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 void
 PPPStateMachine::RXJEvent(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: RXJEvent() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	ppp_lcp_packet *reject = mtod(packet, ppp_lcp_packet*);
 	
 	if(reject->code == PPP_CODE_REJECT) {
@@ -1433,12 +1657,19 @@ PPPStateMachine::IllegalEvent(ppp_event event)
 {
 	// TODO:
 	// update error statistics
+	printf("PPPSM: IllegalEvent(event=%d) state=%d phase=%d\n",
+		event, State(), Phase());
 }
 
 
 void
 PPPStateMachine::ThisLayerUp()
 {
+#if DEBUG
+	printf("PPPSM: ThisLayerUp() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	LockerHelper locker(fLock);
 	
 	// We begin with authentication phase and wait until each phase is done.
@@ -1459,6 +1690,11 @@ PPPStateMachine::ThisLayerUp()
 void
 PPPStateMachine::ThisLayerDown()
 {
+#if DEBUG
+	printf("PPPSM: ThisLayerDown() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	// PPPProtocol::Down() should block if needed.
 	DownProtocols();
 }
@@ -1467,6 +1703,11 @@ PPPStateMachine::ThisLayerDown()
 void
 PPPStateMachine::ThisLayerStarted()
 {
+#if DEBUG
+	printf("PPPSM: ThisLayerStarted() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	if(Interface().Device() && !Interface().Device()->Up())
 		Interface().Device()->UpFailedEvent();
 }
@@ -1475,6 +1716,11 @@ PPPStateMachine::ThisLayerStarted()
 void
 PPPStateMachine::ThisLayerFinished()
 {
+#if DEBUG
+	printf("PPPSM: ThisLayerFinished() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	if(Interface().Device())
 		Interface().Device()->Down();
 }
@@ -1507,7 +1753,15 @@ PPPStateMachine::ZeroRestartCount()
 bool
 PPPStateMachine::SendConfigureRequest()
 {
+#if DEBUG
+	printf("PPPSM: SendConfigureRequest() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
+	LockerHelper locker(fLock);
 	--fRequestCounter;
+	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
+	locker.UnlockNow();
 	
 	PPPConfigurePacket request(PPP_CONFIGURE_REQUEST);
 	request.SetID(NextID());
@@ -1521,13 +1775,19 @@ PPPStateMachine::SendConfigureRequest()
 		}
 	}
 	
-	return LCP().Send(request.ToMbuf(LCP().AdditionalOverhead())) == B_OK;
+	return LCP().Send(request.ToMbuf(Interface().MRU(),
+		LCP().AdditionalOverhead())) == B_OK;
 }
 
 
 bool
 PPPStateMachine::SendConfigureAck(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: SendConfigureAck() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	if(!packet)
 		return false;
 	
@@ -1550,6 +1810,11 @@ PPPStateMachine::SendConfigureAck(struct mbuf *packet)
 bool
 PPPStateMachine::SendConfigureNak(struct mbuf *packet)
 {
+#if DEBUG
+	printf("PPPSM: SendConfigureNak() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	if(!packet)
 		return false;
 	
@@ -1569,29 +1834,42 @@ PPPStateMachine::SendConfigureNak(struct mbuf *packet)
 bool
 PPPStateMachine::SendTerminateRequest()
 {
-	struct mbuf *m = m_gethdr(MT_DATA);
-	if(!m)
+#if DEBUG
+	printf("PPPSM: SendTerminateRequest() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
+	LockerHelper locker(fLock);
+	--fTerminateCounter;
+	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
+	locker.UnlockNow();
+	
+	struct mbuf *packet = m_gethdr(MT_DATA);
+	if(!packet)
 		return false;
 	
-	--fTerminateCounter;
-	
-	m->m_len = 4;
+	packet->m_pkthdr.len = packet->m_len = 4;
 	
 	// reserve some space for other protocols
-	m->m_data += LCP().AdditionalOverhead();
+	packet->m_data += LCP().AdditionalOverhead();
 	
-	ppp_lcp_packet *request = mtod(m, ppp_lcp_packet*);
+	ppp_lcp_packet *request = mtod(packet, ppp_lcp_packet*);
 	request->code = PPP_TERMINATE_REQUEST;
 	request->id = fTerminateID = NextID();
 	request->length = htons(4);
 	
-	return LCP().Send(m) == B_OK;
+	return LCP().Send(packet) == B_OK;
 }
 
 
 bool
 PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 {
+#if DEBUG
+	printf("PPPSM: SendTerminateAck() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	struct mbuf *reply = request;
 	
 	ppp_lcp_packet *ack;
@@ -1602,7 +1880,7 @@ PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 			return false;
 		
 		reply->m_data += LCP().AdditionalOverhead();
-		reply->m_len = 4;
+		reply->m_pkthdr.len = reply->m_len = 4;
 		
 		ack = mtod(reply, ppp_lcp_packet*);
 		ack->id = NextID();
@@ -1619,6 +1897,11 @@ PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 bool
 PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocolNumber, uint8 code)
 {
+#if DEBUG
+	printf("PPPSM: SendCodeReject(protocolNumber=%d;code=%d) state=%d phase=%d\n",
+		protocolNumber, code, State(), Phase());
+#endif
+	
 	if(!packet)
 		return false;
 	
@@ -1662,6 +1945,11 @@ PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocolNumber, uint
 bool
 PPPStateMachine::SendEchoReply(struct mbuf *request)
 {
+#if DEBUG
+	printf("PPPSM: SendEchoReply() state=%d phase=%d\n",
+		State(), Phase());
+#endif
+	
 	if(!request)
 		return false;
 	
@@ -1671,7 +1959,6 @@ PPPStateMachine::SendEchoReply(struct mbuf *request)
 	
 	if(request->m_flags & M_PKTHDR)
 		request->m_pkthdr.len = 8;
-	
 	request->m_len = 8;
 	
 	memcpy(reply->data, &fMagicNumber, sizeof(fMagicNumber));

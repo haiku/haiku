@@ -14,7 +14,7 @@
 class PPPLayer {
 	protected:
 		// PPPLayer must be subclassed
-		PPPLayer(const char *name, ppp_level level);
+		PPPLayer(const char *name, ppp_level level, uint32 overhead);
 
 	public:
 		virtual ~PPPLayer();
@@ -26,6 +26,8 @@ class PPPLayer {
 		ppp_level Level() const
 			{ return fLevel; }
 				// should be PPP_PROTOCOL_LEVEL if not encapsulator
+		uint32 Overhead() const
+			{ return fOverhead; }
 		
 		void SetNext(PPPLayer *next)
 			{ fNext = next; }
@@ -47,6 +49,7 @@ class PPPLayer {
 
 	protected:
 		status_t fInitStatus;
+		uint32 fOverhead;
 
 	private:
 		char *fName;

@@ -18,7 +18,7 @@ PPPProtocol::PPPProtocol(const char *name, ppp_phase activationPhase,
 		uint32 overhead, PPPInterface& interface,
 		driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
 		const char *type = NULL, PPPOptionHandler *optionHandler = NULL)
-	: PPPLayer(name, level),
+	: PPPLayer(name, level, overhead),
 	fActivationPhase(activationPhase),
 	fProtocolNumber(protocolNumber),
 	fAddressFamily(addressFamily),

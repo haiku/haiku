@@ -16,8 +16,9 @@
 #endif
 
 
-PPPLayer::PPPLayer(const char *name, ppp_level level)
+PPPLayer::PPPLayer(const char *name, ppp_level level, uint32 overhead)
 	: fInitStatus(B_OK),
+	fOverhead(overhead),
 	fLevel(level),
 	fNext(NULL)
 {

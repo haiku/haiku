@@ -35,13 +35,37 @@ static int32 host_uniq = 0;
 status_t std_ops(int32 op, ...);
 
 static BLocker lock;
-static List<PPPoEDevice*> devices;
+static List<PPPoEDevice*> *devices;
 
 
 uint32
 NewHostUniq()
 {
 	return (uint32) atomic_add(&host_uniq, 1);
+}
+
+
+void
+add_device(PPPoEDevice *device)
+{
+#if DEBUG
+	printf("PPPoE: add_device()\n");
+#endif
+	
+	LockerHelper locker(lock);
+	devices->AddItem(device);
+}
+
+
+void
+remove_device(PPPoEDevice *device)
+{
+#if DEBUG
+	printf("PPPoE: remove_device()\n");
+#endif
+	
+	LockerHelper locker(lock);
+	devices->RemoveItem(device);
 }
 
 
@@ -52,27 +76,43 @@ pppoe_input(struct mbuf *packet)
 	if(!packet)
 		return;
 	
+#if DEBUG
+//	dump_packet(packet);
+#endif
+	
 	ifnet *sourceIfnet = packet->m_pkthdr.rcvif;
-	pppoe_header *header = mtod(packet, pppoe_header*);
+	complete_pppoe_header *header = mtod(packet, complete_pppoe_header*);
 	PPPoEDevice *device;
 	
 	LockerHelper locker(lock);
 	
-	for(int32 index = 0; index < devices.CountItems(); index++) {
-		device = devices.ItemAt(index);
+	for(int32 index = 0; index < devices->CountItems(); index++) {
+		device = devices->ItemAt(index);
 		
 		if(device && device->EthernetIfnet() == sourceIfnet) {
 			if(header->ethernetHeader.ether_type == ETHERTYPE_PPPOE
-					&& header->sessionID == device->SessionID()) {
+					&& header->pppoeHeader.sessionID == device->SessionID()) {
+#if DEBUG
+				printf("PPPoE: session packet\n");
+#endif
 				device->Receive(packet);
 				return;
-			} else if(header->ethernetHeader.ether_type == ETHERTYPE_PPPOE
-					&& header->code != PADI && header->code != PADR
+			} else if(header->ethernetHeader.ether_type == ETHERTYPE_PPPOEDISC
+					&& header->pppoeHeader.code != PADI
+					&& header->pppoeHeader.code != PADR
 					&& !device->IsDown()) {
-				DiscoveryPacket discovery(packet);
+#if DEBUG
+				printf("PPPoE: discovery packet\n");
+#endif
+				DiscoveryPacket discovery(packet, ETHER_HDR_LEN);
+				if(discovery.InitCheck() != B_OK) {
+					printf("PPPoE: received corrupted discovery packet!\n");
+					return;
+				}
+				
 				pppoe_tag *tag = discovery.TagWithType(HOST_UNIQ);
-				if(tag && tag->length == 4
-						&& *((uint32*)tag->data) == device->HostUniq()) {
+				if(header->pppoeHeader.code == PADT || (tag && tag->length == 4
+						&& *((uint32*)tag->data) == device->HostUniq())) {
 					device->Receive(packet);
 					return;
 				}
@@ -96,21 +136,16 @@ add_to(PPPInterface& mainInterface, PPPInterface *subInterface,
 	PPPoEDevice *device;
 	bool success;
 	if(subInterface) {
-#if DEBUG
-		printf("PPPoE: add_to(): Adding to subInterface\n");
-#endif
 		device = new PPPoEDevice(*subInterface, settings);
 		success = subInterface->SetDevice(device);
 	} else {
-#if DEBUG
-		printf("PPPoE: add_to(): Adding to mainInterface\n");
-#endif
 		device = new PPPoEDevice(mainInterface, settings);
 		success = mainInterface.SetDevice(device);
 	}
 	
 #if DEBUG
-	printf("PPPoE: add_to(): %s\n", success && device && device->InitCheck() == B_OK ? "OK" : "ERROR");
+	printf("PPPoE: add_to(): %s\n",
+		success && device && device->InitCheck() == B_OK ? "OK" : "ERROR");
 #endif
 	
 	return success && device && device->InitCheck() == B_OK;
@@ -142,6 +177,8 @@ std_ops(int32 op, ...)
 				return B_ERROR;
 			}
 			
+			devices = new List<PPPoEDevice*>;
+			
 			ethernet->set_pppoe_receiver(pppoe_input);
 			
 #if DEBUG
@@ -150,6 +187,7 @@ std_ops(int32 op, ...)
 		return B_OK;
 		
 		case B_MODULE_UNINIT:
+			delete devices;
 			ethernet->unset_pppoe_receiver();
 #if DEBUG
 			printf("PPPoE: Unregistered PPPoE receiver.\n");
