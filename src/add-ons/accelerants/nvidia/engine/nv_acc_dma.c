@@ -79,7 +79,7 @@ status_t nv_acc_wait_idle_dma()
 status_t nv_acc_init_dma()
 {
 	uint16 cnt;
-	uint32 surf_depth, cmd_depth;
+	uint32 surf_depth, patt_depth, bitm_depth;
 	/* reset the engine DMA stalls counter */
 	err = 0;
 
@@ -395,6 +395,9 @@ status_t nv_acc_init_dma()
 		ACCW(BLIMIT1, (si->ps.memory_size - 1));
 
 		/* pattern shape value = 8x8, 2 color */
+		//fixme: setting this here means that we don't need to provide the acc
+		//commands with it. But have other architectures this pre-programmed
+		//explicitly??? I don't think so!
 		ACCW(PAT_SHP, 0x00000000);
 		/* Pgraph Beta AND value (fraction) b23-30 */
 		ACCW(BETA_AND_VAL, 0xffffffff);
@@ -735,17 +738,36 @@ status_t nv_acc_init_dma()
 	{
 	case B_CMAP8:
 		surf_depth = 0x00000001;
-		cmd_depth = 0x00000003;
+		patt_depth = 0x00000003;
+		//fixme: needed for NV11, checkout the rest!
+		if (si->ps.card_arch < NV40A)
+			bitm_depth = 0x00000001;
+		else
+			bitm_depth = 0x00000003;
 		break;
 	case B_RGB15_LITTLE:
+		surf_depth = 0x00000004;
+		patt_depth = 0x00000001;
+		//fixme: needed for NV11, checkout the rest!
+		if (si->ps.card_arch < NV40A)
+			bitm_depth = 0x00000002;
+		else
+			bitm_depth = 0x00000001;
+		break;
 	case B_RGB16_LITTLE:
 		surf_depth = 0x00000004;
-		cmd_depth = 0x00000001;
+		patt_depth = 0x00000001;
+		//fixme: needed for NV11, checkout the rest!
+		if (si->ps.card_arch < NV40A)
+			bitm_depth = 0x00000003;
+		else
+			bitm_depth = 0x00000001;
 		break;
 	case B_RGB32_LITTLE:
 	case B_RGBA32_LITTLE:
 		surf_depth = 0x00000006;
-		cmd_depth = 0x00000003;
+		patt_depth = 0x00000003;
+		bitm_depth = 0x00000003;
 		break;
 	default:
 		LOG(8,("ACC_DMA: init, invalid bit depth\n"));
@@ -770,13 +792,13 @@ status_t nv_acc_init_dma()
 	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* set pattern colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLORFORMAT, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = patt_depth; /* SetColorFormat */
 
 	/* wait for room in fifo for bitmap colordepth setup cmd if needed */
 	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* set bitmap colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_SETCOLORFORMAT, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = bitm_depth; /* SetColorFormat */
 
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 	nv_start_dma();
@@ -1080,7 +1102,31 @@ status_t nv_acc_setup_rectangle_dma(uint32 color)
 	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* now setup color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
+	//fixme: needed for NV11, checkout the rest!
+	if (si->ps.card_arch < NV40A)
+		switch(si->dm.space)
+		{
+		case B_RGB15_LITTLE:
+			/* fixme?
+			 * does the color provided by the system contain the alpha channel?
+			 * if it has one, it's on b5...
+			 * (if so, and we want to use it, modify this command to use 32-bit
+			 *  source colorspace for this mode's desktop colorspace.) */
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				(((color & 0x0000f800) >> 1) | ((color & 0x000007c0) >> 1) |
+				(color & 0x0000001f)); /* Color1A */
+			break;
+		case B_RGB16_LITTLE:
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				(((color & 0x0000f800) << 8) | ((color & 0x000007e0) << 5) |
+				((color & 0x0000001f) << 3)); /* Color1A */
+			break;
+		default:
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
+			break;
+		}
+	else
+		si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
 
 	return B_OK;
 }
