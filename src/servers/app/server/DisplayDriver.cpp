@@ -121,7 +121,7 @@ void DisplayDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerDa
 	performed by the driver itself.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 */
-void DisplayDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
+void DisplayDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta)
 {
 }
 
@@ -392,7 +392,7 @@ void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
 */
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
 {
 }
 

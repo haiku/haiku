@@ -123,7 +123,7 @@ public:
 	const char *GetPath(void);
 	int16 ConvertToUnicode(uint16 c);
 protected:
-	friend FontFamily;
+	friend class FontFamily;
 	FontFamily *family;
 	uint16 glyphcount, charmapcount;
 	BString *name, *path;

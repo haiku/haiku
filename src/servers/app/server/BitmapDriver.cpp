@@ -695,19 +695,19 @@ void BitmapDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 	if ( useQuad1 || 
 	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,d->highcolor);
 	if ( useQuad2 || 
 	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,d->highcolor);
 	if ( useQuad3 || 
 	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,d->highcolor);
 	if ( useQuad4 || 
 	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,d->highcolor);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -726,19 +726,19 @@ void BitmapDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 		if ( useQuad1 || 
 		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+			SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,d->highcolor);
 		if ( useQuad2 || 
 		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+			SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,d->highcolor);
 		if ( useQuad3 || 
 		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+			SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,d->highcolor);
 		if ( useQuad4 || 
 		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+			SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,d->highcolor);
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -758,19 +758,19 @@ void BitmapDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 		if ( useQuad1 || 
 		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+			SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,d->highcolor);
 		if ( useQuad2 || 
 		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+			SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,d->highcolor);
 		if ( useQuad3 || 
 		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+			SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,d->highcolor);
 		if ( useQuad4 || 
 		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+			SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,d->highcolor);
 	}
 }
 
@@ -824,7 +824,7 @@ void BitmapDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 		x = ROUND(X);
 		y = ROUND(Y);
 		if ( (x!=lastx) || (y!=lasty) )
-			SetThickPixel(x,y,d->pensize,d->highcolor);
+			SetThickPixel(x,y,ROUND(d->pensize),d->highcolor);
 		lastx = x;
 		lasty = y;
 
@@ -1008,7 +1008,7 @@ void BitmapDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
 */
-void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
+void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
 {
 	_Lock();
 	if(_target)
@@ -1246,7 +1246,7 @@ void BitmapDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor color)
 // This function is intended to eventually take care of most of the heavy lifting for
 // DrawBitmap in 32-bit mode, with others coming later. Right now, it is *just* used for
 // the 
-void BitmapDriver::BlitBitmap(ServerBitmap *sourcebmp,BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY)
+void BitmapDriver::BlitBitmap(ServerBitmap *sourcebmp,BRect sourcerect, BRect destrect, drawing_mode mode)
 {
 	// Another internal function called from other functions.
 	
@@ -1644,7 +1644,7 @@ float BitmapDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	performed by the driver itself.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 */
-void BitmapDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL)
+void BitmapDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
 {
 	if(!string || !d || !d->font)
 		return;
@@ -1989,7 +1989,7 @@ void BitmapDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 	}
 }
 
-rgb_color BitmapDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true)
+rgb_color BitmapDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high)
 {
 	rgb_color returncolor={0,0,0,0};
 	int16 value;

@@ -89,7 +89,7 @@ public:
 	int32 Token(void) { return _token; }
 	
 protected:
-	friend BitmapManager;
+	friend class BitmapManager;
 	
 	//! Internal function used by the BitmapManager.
 	void _SetArea(area_id ID) { _area=ID; }

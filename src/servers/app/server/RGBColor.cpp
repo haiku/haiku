@@ -52,7 +52,7 @@ RGBColor::RGBColor(uint8 r, uint8 g, uint8 b, uint8 a)
 	\param blue blue
 	\param alpha alpha, defaults to 255
 */
-RGBColor::RGBColor(int r, int g, int b, int a=255)
+RGBColor::RGBColor(int r, int g, int b, int a)
 {
 	SetColor(r,g,b,a);
 }
@@ -137,7 +137,7 @@ rgb_color RGBColor::GetColor32(void)
 	\param blue blue
 	\param alpha alpha, defaults to 255
 */
-void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
+void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a)
 {
 	color32.red=r;
 	color32.green=g;
@@ -152,7 +152,7 @@ void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
 	\param blue blue
 	\param alpha alpha, defaults to 255
 */
-void RGBColor::SetColor(int r, int g, int b, int a=255)
+void RGBColor::SetColor(int r, int g, int b, int a)
 {
 	color32.red=(uint8)r;
 	color32.green=(uint8)g;

@@ -132,7 +132,7 @@ int16 FontStyle::ConvertToUnicode(uint16 c)
 	\param shear shear (slant) in degrees. 45 <= shear <= 135. 90 is vertical
 	\return The new ServerFont object
 */
-ServerFont *FontStyle::Instantiate(float size, float rotation=0.0, float shear=90.0)
+ServerFont *FontStyle::Instantiate(float size, float rotation, float shear)
 {
 	ServerFont *f=new ServerFont(this, size, rotation, shear);
 	instances->AddItem(f);

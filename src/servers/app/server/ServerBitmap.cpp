@@ -37,7 +37,7 @@
 	\param screen Screen assigned to the bitmap.
 */
 ServerBitmap::ServerBitmap(BRect rect,color_space space, int32 flags,
-		int32 bytesperline=-1, screen_id screen=B_MAIN_SCREEN_ID)
+		int32 bytesperline, screen_id screen)
 {
 	_initialized=false;
 
@@ -127,7 +127,7 @@ void ServerBitmap::_FreeBuffer(void)
 	\param space Color space for the bitmap.
 	\param bytesperline Number of bytes per row.
 */
-void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline=-1)
+void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 {
 	// Big convoluted mess just to handle every color space and dword align
 	// the buffer	

@@ -62,7 +62,7 @@ public:
 	void Invalidate(const BRect &r);
 	graphics_card_info gcinfo;
 protected:
-	friend ScreenDriver;
+	friend class ScreenDriver;
 	
 	bool is_connected;
 	PortLink *serverlink;

@@ -35,6 +35,8 @@
 #include <graphic_driver.h>
 #include <malloc.h>
 #include <dirent.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 #define RUN_UNDER_R5
 
@@ -210,7 +212,7 @@ bool AccelerantDriver::Initialize(void)
 	accelerant_image = -1;
 	for (i=0; i<3; i++)
 	{
-		if (find_directory (dirs[i], -1, false, path, PATH_MAX) != B_OK)
+		if ( find_directory(dirs[i], -1, false, path, PATH_MAX) != B_OK )
 			continue;
 		strcat(path,"/accelerants/");
 		strcat(path,signature);
@@ -344,7 +346,7 @@ void AccelerantDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, Laye
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 	\param delta Extra character padding
 */
-void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL)
+void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
 {
 	if(!string || !d || !d->font)
 		return;
@@ -586,13 +588,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 	}
 
 	if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-		HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 	if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-		HLine(CLIP_X(xc),CLIP_X(xc-x),yc-y,&pattern);
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
 	if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-		HLine(CLIP_X(xc),CLIP_X(xc-x),yc+y,&pattern);
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
 	if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-		HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 	if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
 		StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
@@ -621,13 +623,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 		}
 
 		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-			HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-			HLine(CLIP_X(xc),CLIP_X(xc-x),yc-y,&pattern);
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
 		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-			HLine(CLIP_X(xc),CLIP_X(xc-x),yc+y,&pattern);
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
 		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-			HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 		if ( !shortspan )
 		{
 			if ( startQuad == 1 )
@@ -637,13 +639,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( x <= startx )
 					{
 						if ( CHECK_X(xc) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 					}
 					else
 					{
 						xclip = ROUND(y*startx/(double)starty);
 						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
-							HLine(CLIP_X(xc),CLIP_X(xc+xclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -655,7 +657,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					{
 						xclip = ROUND(y*startx/(double)starty);
 						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc-xclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -666,13 +668,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( x <= startx )
 					{
 						if ( CHECK_X(xc-x) || CHECK_X(xc) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
 					}
 					else
 					{
 						xclip = ROUND(y*startx/(double)starty);
 						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
-							HLine(CLIP_X(xc-xclip),CLIP_X(xc),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -684,7 +686,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					{
 						xclip = ROUND(y*startx/(double)starty);
 						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc+xclip),CLIP_X(xc+x),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -697,7 +699,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					{
 						xclip = ROUND(y*endx/(double)endy);
 						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc+xclip),CLIP_X(xc+x),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -708,13 +710,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( x <= endx )
 					{
 						if ( CHECK_X(xc-x) || CHECK_X(xc) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
 					}
 					else
 					{
 						xclip = ROUND(y*endx/(double)endy);
 						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
-							HLine(CLIP_X(xc-xclip),CLIP_X(xc),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -726,7 +728,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					{
 						xclip = ROUND(y*endx/(double)endy);
 						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc-xclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -737,13 +739,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( x <= endx )
 					{
 						if ( CHECK_X(xc) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 					}
 					else
 					{
 						xclip = ROUND(y*endx/(double)endy);
 						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
-							HLine(CLIP_X(xc),CLIP_X(xc+xclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -759,12 +761,12 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( (x <= startx) && (x >= endx) )
 					{
 						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc+endclip),CLIP_X(xc+x),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 					}
 					else
 					{
 						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
-							HLine(CLIP_X(xc+endclip),CLIP_X(xc+startclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+startclip)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -775,12 +777,12 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( (x <= startx) && (x >= endx) )
 					{
 						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc-startclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
 					}
 					else
 					{
 						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
-							HLine(CLIP_X(xc-endclip),CLIP_X(xc-startclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-endclip)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -791,12 +793,12 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( (x <= startx) && (x >= endx) )
 					{
 						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc-endclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
 					}
 					else
 					{
 						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
-							HLine(CLIP_X(xc-startclip),CLIP_X(xc-endclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-startclip)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -807,12 +809,12 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( (x <= startx) && (x >= endx) )
 					{
 						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc+startclip),CLIP_X(xc+x),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 					}
 					else
 					{
 						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
-							HLine(CLIP_X(xc+startclip),CLIP_X(xc+endclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+endclip)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -834,13 +836,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 		}
 
 		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-			HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-			HLine(CLIP_X(xc),CLIP_X(xc-x),yc-y,&pattern);
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
 		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
-			HLine(CLIP_X(xc),CLIP_X(xc-x),yc+y,&pattern);
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
 		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
-			HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 		if ( !shortspan )
 		{
 			if ( startQuad == 1 )
@@ -850,13 +852,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( x <= startx )
 					{
 						if ( CHECK_X(xc) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 					}
 					else
 					{
 						xclip = ROUND(y*startx/(double)starty);
 						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
-							HLine(CLIP_X(xc),CLIP_X(xc+xclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -868,7 +870,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					{
 						xclip = ROUND(y*startx/(double)starty);
 						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc-xclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -879,13 +881,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( x <= startx )
 					{
 						if ( CHECK_X(xc-x) || CHECK_X(xc) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
 					}
 					else
 					{
 						xclip = ROUND(y*startx/(double)starty);
 						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
-							HLine(CLIP_X(xc-xclip),CLIP_X(xc),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -897,7 +899,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					{
 						xclip = ROUND(y*startx/(double)starty);
 						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc+xclip),CLIP_X(xc+x),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -910,7 +912,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					{
 						xclip = ROUND(y*endx/(double)endy);
 						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc+xclip),CLIP_X(xc+x),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -921,13 +923,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( x <= endx )
 					{
 						if ( CHECK_X(xc-x) || CHECK_X(xc) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
 					}
 					else
 					{
 						xclip = ROUND(y*endx/(double)endy);
 						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
-							HLine(CLIP_X(xc-xclip),CLIP_X(xc),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -939,7 +941,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					{
 						xclip = ROUND(y*endx/(double)endy);
 						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc-xclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -950,13 +952,13 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( x <= endx )
 					{
 						if ( CHECK_X(xc) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 					}
 					else
 					{
 						xclip = ROUND(y*endx/(double)endy);
 						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
-							HLine(CLIP_X(xc),CLIP_X(xc+xclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -972,12 +974,12 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( (x <= startx) && (x >= endx) )
 					{
 						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc+endclip),CLIP_X(xc+x),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 					}
 					else
 					{
 						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
-							HLine(CLIP_X(xc+endclip),CLIP_X(xc+startclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+startclip)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -988,12 +990,12 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( (x <= startx) && (x >= endx) )
 					{
 						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc-startclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
 					}
 					else
 					{
 						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
-							HLine(CLIP_X(xc-endclip),CLIP_X(xc-startclip),yc-y,&pattern);
+							HLine(ROUND(CLIP_X(xc-endclip)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
 					}
 				}
 			}
@@ -1004,12 +1006,12 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( (x <= startx) && (x >= endx) )
 					{
 						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
-							HLine(CLIP_X(xc-x),CLIP_X(xc-endclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
 					}
 					else
 					{
 						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
-							HLine(CLIP_X(xc-startclip),CLIP_X(xc-endclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc-startclip)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -1020,12 +1022,12 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 					if ( (x <= startx) && (x >= endx) )
 					{
 						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
-							HLine(CLIP_X(xc+startclip),CLIP_X(xc+x),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 					}
 					else
 					{
 						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
-							HLine(CLIP_X(xc+startclip),CLIP_X(xc+endclip),yc+y,&pattern);
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+endclip)),ROUND(yc+y),&pattern);
 					}
 				}
 			}
@@ -1149,9 +1151,9 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 	if ( CHECK_X(xc) )
 	{
 		if ( CHECK_Y(yc-y) )
-			SetPixel(xc,yc-y,pattern.GetColor(xc,yc-y));
+			SetPixel(ROUND(xc),ROUND(yc-y),pattern.GetColor(xc,yc-y));
 		if ( CHECK_Y(yc+y) )
-			SetPixel(xc,yc+y,pattern.GetColor(xc,yc+y));
+			SetPixel(ROUND(xc),ROUND(yc+y),pattern.GetColor(xc,yc+y));
 	}
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
@@ -1171,9 +1173,9 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
 		{
 			if ( CHECK_Y(yc-y) )
-	                	HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc-y,&pattern);
+	                	HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 			if ( CHECK_Y(yc+y) )
-		                HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc+y,&pattern);
+		                HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 		}
 	}
 
@@ -1194,9 +1196,9 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
 		{
 			if ( CHECK_Y(yc-y) )
-	                	HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc-y,&pattern);
+	                	HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
 			if ( CHECK_Y(yc+y) )
-		                HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc+y,&pattern);
+		                HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 		}
 	}
 	_Unlock();
@@ -1515,11 +1517,11 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 	{
 		arc_x = xrad*sqrt(1-i*i/yrad2);
 		if ( CHECK_Y(r.top+yrad-i) )
-			HLine(CLIP_X(r.left+xrad-arc_x), CLIP_X(r.right-xrad+arc_x),
-				r.top+yrad-i, &pattern);
+			HLine(ROUND(CLIP_X(r.left+xrad-arc_x)), ROUND(CLIP_X(r.right-xrad+arc_x)),
+				ROUND(r.top+yrad-i), &pattern);
 		if ( CHECK_Y(r.bottom-yrad+i) )
-			HLine(CLIP_X(r.left+xrad-arc_x), CLIP_X(r.right-xrad+arc_x),
-				r.bottom-yrad+i, &pattern);
+			HLine(ROUND(CLIP_X(r.left+xrad-arc_x)), ROUND(CLIP_X(r.right-xrad+arc_x)),
+				ROUND(r.bottom-yrad+i), &pattern);
 	}
 	FillRect(BRect(CLIP_X(r.left),CLIP_Y(r.top+yrad),
 			CLIP_X(r.right),CLIP_Y(r.bottom-yrad)), d, pat);
@@ -1595,7 +1597,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		start.x=MIN(first.x,MIN(second.x,third.x));
 		end.x=MAX(first.x,MAX(second.x,third.x));
 		if ( CHECK_Y(start.y) && (CHECK_X(start.x) || CHECK_X(end.x)) )
-			HLine(CLIP_X(start.x), CLIP_X(end.x), start.y, &pattern);
+			HLine(ROUND(CLIP_X(start.x)), ROUND(CLIP_X(end.x)), ROUND(start.y), &pattern);
 		_Unlock();
 		return;
 	}
@@ -1609,10 +1611,10 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		AccLineCalc lineB(second, third);
 		
 		if ( CHECK_Y(first.y) && (CHECK_X(first.x) || CHECK_X(second.x)) )
-			HLine(CLIP_X(first.x), CLIP_X(second.x), first.y, &pattern);
+			HLine(ROUND(CLIP_X(first.x)), ROUND(CLIP_X(second.x)), ROUND(first.y), &pattern);
 		for(i=(int32)first.y+1; i<=third.y; i++)
 			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
+				HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
 		_Unlock();
 		return;
 	}
@@ -1624,10 +1626,10 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		AccLineCalc lineB(first, third);
 		
 		if ( CHECK_Y(second.y) && (CHECK_X(second.x) || CHECK_X(third.x)) )
-			HLine(CLIP_X(second.x), CLIP_X(third.x), second.y, &pattern);
+			HLine(ROUND(CLIP_X(second.x)), ROUND(CLIP_X(third.x)), ROUND(second.y), &pattern);
 		for(i=(int32)first.y; i<third.y; i++)
 			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
+				HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
 		_Unlock();
 		return;
 	}
@@ -1639,11 +1641,11 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 	
 	for(i=(int32)first.y; i<(int32)second.y; i++)
 		if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-			HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
+			HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
 
 	for(i=(int32)second.y; i<=third.y; i++)
 		if ( CHECK_Y(i) && (CHECK_X(lineC.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-			HLine(CLIP_X(lineC.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
+			HLine(ROUND(CLIP_X(lineC.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
 		
 	_Unlock();
 }
@@ -2002,19 +2004,19 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 	if ( useQuad1 || 
 	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(xc+x,yc-y,thick,&pattern);
+		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
 	if ( useQuad2 || 
 	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(xc-x,yc-y,thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
 	if ( useQuad3 || 
 	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(xc-x,yc+y,thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
 	if ( useQuad4 || 
 	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(xc+x,yc+y,thick,&pattern);
+		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -2033,19 +2035,19 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 		if ( useQuad1 || 
 		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc-y,thick,&pattern);
+			SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
 		if ( useQuad2 || 
 		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,&pattern);
+			SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
 		if ( useQuad3 || 
 		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,&pattern);
+			SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
 		if ( useQuad4 || 
 		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,&pattern);
+			SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -2065,19 +2067,19 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 		if ( useQuad1 || 
 		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc-y,thick,&pattern);
+			SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
 		if ( useQuad2 || 
 		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,&pattern);
+			SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
 		if ( useQuad3 || 
 		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,&pattern);
+			SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
 		if ( useQuad4 || 
 		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,&pattern);
+			SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
 	}
 	_Unlock();
 }
@@ -2136,7 +2138,7 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 		y = ROUND(Y);
                 /* SetThickPixel does bounds checking, so we don't have to worry about it */
 		if ( (x!=lastx) || (y!=lasty) )
-			SetThickPixel(x,y,d->pensize,&pattern);
+			SetThickPixel(x,y,ROUND(d->pensize),&pattern);
 		lastx = x;
 		lasty = y;
 
@@ -2183,10 +2185,10 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 
         /* SetThickPixel does bounds checking, so we don't have to worry about it */
 
-	SetThickPixel(xc+x,yc-y,thick,&pattern);
-	SetThickPixel(xc-x,yc-y,thick,&pattern);
-	SetThickPixel(xc-x,yc+y,thick,&pattern);
-	SetThickPixel(xc+x,yc+y,thick,&pattern);
+	SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+	SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+	SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+	SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -2202,10 +2204,10 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 			p += Ry2 + px - py;
 		}
 
-		SetThickPixel(xc+x,yc-y,thick,&pattern);
-		SetThickPixel(xc-x,yc-y,thick,&pattern);
-		SetThickPixel(xc-x,yc+y,thick,&pattern);
-		SetThickPixel(xc+x,yc+y,thick,&pattern);
+		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -2222,10 +2224,10 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 			p += Rx2 - py +px;
 		}
 
-		SetThickPixel(xc+x,yc-y,thick,&pattern);
-		SetThickPixel(xc-x,yc-y,thick,&pattern);
-		SetThickPixel(xc-x,yc+y,thick,&pattern);
-		SetThickPixel(xc+x,yc+y,thick,&pattern);
+		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
 	}
 	_Unlock();
 }
@@ -2289,7 +2291,7 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
 */
-void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
+void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
 {
 	/* Bounds checking is handled by StrokeLine and the functions it uses */
 	_Lock();
@@ -2314,9 +2316,9 @@ void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 
-	HLineThick(r.left, r.right, r.top, thick, &pattern);
+	HLineThick(ROUND(r.left), ROUND(r.right), ROUND(r.top), thick, &pattern);
 	StrokeLine(r.RightTop(), r.RightBottom(), d, pat);
-	HLineThick(r.right, r.left, r.bottom, thick, &pattern);
+	HLineThick(ROUND(r.right), ROUND(r.left), ROUND(r.bottom), thick, &pattern);
 	StrokeLine(r.LeftTop(), r.LeftBottom(), d, pat);
 	_Unlock();
 }
@@ -2351,13 +2353,13 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 	bTop = vTop + yrad;
 	bBottom = vBottom - yrad;
 	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, d, pat);
-	HLineThick(hRight, hLeft, r.top, thick, &pattern);
+	HLineThick(ROUND(hRight), ROUND(hLeft), ROUND(r.top), thick, &pattern);
 	
 	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, d, pat);
 	StrokeLine(BPoint(r.left,vTop),BPoint(r.left,vBottom),d,pat);
 
 	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, d, pat);
-	HLineThick(hLeft, hRight, r.bottom, thick, &pattern);
+	HLineThick(ROUND(hLeft), ROUND(hRight), ROUND(r.bottom), thick, &pattern);
 
 	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d, pat);
 	StrokeLine(BPoint(r.right,vBottom),BPoint(r.right,vTop),d,pat);
@@ -2947,7 +2949,7 @@ void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, Patt
 	\param mode The drawing mode to use when blitting the bitmap
 	The bitmap and the screen must have the same color depth, or this will do nothing.
 */
-void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY)
+void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode)
 {
 	/* TODO: Need to check for hardware support for this. */
 	if(!sourcebmp)

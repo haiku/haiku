@@ -69,8 +69,8 @@ public:
 	
 	void PostMessage(int32 code, size_t size=0, int8 *buffer=NULL);
 protected:
-	friend AppServer;
-	friend ServerWindow;
+	friend class AppServer;
+	friend class ServerWindow;
 	void _DispatchMessage(int32 code, int8 *buffer);
 	ServerBitmap *_FindBitmap(int32 token);
 

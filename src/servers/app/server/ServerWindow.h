@@ -98,8 +98,8 @@ public:
 	//! Returns the window's title
 	const char *Title(void) { return _title->String(); }
 protected:	
-	friend ServerApp;
-	friend WinBorder;
+	friend class ServerApp;
+	friend class WinBorder;
 	friend class Screen;
 	
 	BString *_title;

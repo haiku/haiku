@@ -129,7 +129,7 @@ printf("Layer: %s: ~Layer()\n",_name->String());
 	\param before Add the child in front of this layer
 	\param rebuild Flag to fully rebuild all visibility regions
 */
-void Layer::AddChild(Layer *layer, Layer *before=NULL, bool rebuild)
+void Layer::AddChild(Layer *layer, Layer *before, bool rebuild)
 {
 #ifdef DEBUG_LAYER
 printf("Layer: %s: Add Child (%s, %s, %s) - Incomplete\n",_name->String(),layer?layer->_name->String():"NULL",
@@ -272,7 +272,7 @@ printf("Layer: %s: RemoveSelf(%s)\n",_name->String(),rebuild?"rebuild":"no rebui
 	which has no children, i.e. a layer that is at the top of its 'branch' in
 	the layer tree
 */
-Layer *Layer::GetChildAt(BPoint pt, bool recursive=false)
+Layer *Layer::GetChildAt(BPoint pt, bool recursive)
 {
 #ifdef DEBUG_LAYER
 printf("Layer: %s: Get Child At (%.1f,%.1f)\n",_name->String(),pt.x,pt.y);
@@ -731,7 +731,7 @@ printf("Layer: %s: Rezize By (%.1f,%.1f) - Incomplete\n",_name->String(),x,y);
 	\brief Rebuilds visibility regions
 	\param include_children Flag to rebuild all children and subchildren
 */
-void Layer::RebuildRegions(bool include_children=true)
+void Layer::RebuildRegions(bool include_children)
 {
 #ifdef DEBUG_LAYER
 printf("Layer: %s: Rebuild Regions (%s)\n",_name->String(),include_children?"include children":

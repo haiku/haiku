@@ -66,6 +66,7 @@ public:
 	Layer *GetChildAt(BPoint pt, bool recursive=false);
 	PortLink *GetLink(void);
 	const char *GetName(void) { return (_name)?_name->String():NULL; }
+	LayerData *GetLayerData(void) { return _layerdata; }
 	
 	void Invalidate(BRect rect);
 	void Invalidate(BRegion region);
@@ -101,8 +102,8 @@ public:
 	void PruneTree(void);
 
 protected:
-	friend RootLayer;
-	friend WinBorder;
+	friend class RootLayer;
+	friend class WinBorder;
 
 	
 	BRect _frame;

@@ -63,7 +63,7 @@ SDWIN_SETCURSOR,
 
 //TODO: Remove the need for these
 int64 patsolidhigh64=0xFFFFFFFFLL;
-int8 *patsolidhigh=(int8*)patsolidhigh64;
+int8 *patsolidhigh=(int8*)&patsolidhigh64;
 
 extern RGBColor workspace_default_color;
 
@@ -775,7 +775,7 @@ printf("ScreenDriver:: StrokeLineArray unimplemented\n");
 #endif
 }
 
-void ScreenDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
+void ScreenDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
 {
 	if(!pat || !ptlist)
 		return;
@@ -851,7 +851,7 @@ void ScreenDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 
 }
 
-void ScreenDriver::SetLayerData(LayerData *d, bool set_font_data=false)
+void ScreenDriver::SetLayerData(LayerData *d, bool set_font_data)
 {
 	if(!d)
 		return;
@@ -1004,7 +1004,7 @@ float ScreenDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	return returnval;
 }
 
-void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL)
+void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
 {
 	if(!string || !d || !d->font)
 		return;
@@ -1345,7 +1345,7 @@ void ScreenDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 	}
 }
 
-rgb_color ScreenDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true)
+rgb_color ScreenDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high)
 {
 	rgb_color returncolor={0,0,0,0};
 	int16 value;

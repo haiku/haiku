@@ -184,7 +184,7 @@ printf("Desktop: ShutdownDesktop\n");
 	the workspace at the list's end. Note that it is possible to insert a workspace 
 	in the list simply by specifying an index. 
 */
-void AddWorkspace(int32 index=-1)
+void AddWorkspace(int32 index)
 {
 #ifdef DEBUG_DESKTOP
 printf("Desktop: AddWorkspace(%ld)\n",index+1);
@@ -405,7 +405,7 @@ DisplayDriver *GetGfxDriver(screen_id screen)
 	
 	Because of the lack of outside multimonitor support, the screen ID is ignored for now.
 */
-status_t SetSpace(int32 index, int32 res, screen_id screen, bool stick=true)
+status_t SetSpace(int32 index, int32 res, screen_id screen, bool stick)
 {
 #ifdef DEBUG_DESKTOP
 printf("Desktop: SetSpace(%ld,%ld,%s,%ld)\n",index+1,res,

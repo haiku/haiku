@@ -26,6 +26,7 @@
 //------------------------------------------------------------------------------
 #include <AppDefs.h>
 #include <Entry.h>
+#include <PortMessage.h>
 #include "AppServer.h"
 #include "ColorSet.h"
 #include "Desktop.h"

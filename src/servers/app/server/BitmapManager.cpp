@@ -113,7 +113,7 @@ BitmapManager::~BitmapManager(void)
 	\return A new ServerBitmap or NULL if unable to allocate one.
 */
 ServerBitmap * BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
-	int32 bytes_per_row=-1, screen_id screen=B_MAIN_SCREEN_ID)
+	int32 bytes_per_row, screen_id screen)
 {
 	acquire_sem(lock);
 	ServerBitmap *bmp=new ServerBitmap(bounds, space, flags, bytes_per_row);

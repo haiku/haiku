@@ -59,7 +59,7 @@ public:
 	//! Returns the cursor's ID
 	int32 ID(void) { return _token; }
 private:
-	friend CursorManager;
+	friend class CursorManager;
 	
 	BPoint _hotspot;
 	char *_app_signature;

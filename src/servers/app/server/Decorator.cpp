@@ -329,7 +329,7 @@ void Decorator::MoveBy(BPoint pt)
 	necessarily reflect _tabrect offset by the amount given - few people want to 
 	slide a tab right off the window - that would be a Bad Thing (TM).
 */
-BRect Decorator::SlideTab(float dx, float dy=0)
+BRect Decorator::SlideTab(float dx, float dy)
 {
 	return BRect(0,0,0,0);
 }

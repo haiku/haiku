@@ -66,7 +66,7 @@ public:
 	BRect BoundingBox(void);
 	void Height(font_height *fh);
 protected:
-	friend FontStyle;
+	friend class FontStyle;
 	FontStyle *fstyle;
 	font_height fheight;
 	edge_info fedges;

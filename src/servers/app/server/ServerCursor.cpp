@@ -36,7 +36,7 @@
 	\param bytesperline Bytes per row for the cursor. See ServerBitmap::ServerBitmap()
 	
 */
-ServerCursor::ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hotspot, int32 bytesperrow=-1, screen_id screen=B_MAIN_SCREEN_ID)
+ServerCursor::ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hotspot, int32 bytesperrow, screen_id screen)
  : ServerBitmap(r,cspace,flags,bytesperrow,screen)
 {
 	_hotspot=hotspot;

@@ -967,7 +967,7 @@ printf("ViewDriver:: StrokeLineArray unimplemented\n");
 #endif
 }
 
-void ViewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
+void ViewDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
 {
 	if(!pat || !ptlist)
 		return;
@@ -1043,7 +1043,7 @@ void ViewDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 
 }
 
-void ViewDriver::SetLayerData(LayerData *d, bool set_font_data=false)
+void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 {
 	if(!d)
 		return;
@@ -1196,7 +1196,7 @@ float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	return returnval;
 }
 
-void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL)
+void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
 {
 	if(!string || !d || !d->font)
 		return;
@@ -1537,7 +1537,7 @@ void ViewDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 	}
 }
 
-rgb_color ViewDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true)
+rgb_color ViewDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high)
 {
 	rgb_color returncolor={0,0,0,0};
 	int16 value;
