@@ -10,9 +10,11 @@
 #include <NodeMonitor.h>
 #include <Drivers.h>
 #include <fs_attr.h>
+#include <fs_info.h>
 
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 
 #ifdef TRACE
@@ -381,7 +383,34 @@ DataEditor::SetTo(entry_ref &ref, const char *attribute)
 status_t 
 DataEditor::SetTo(BEntry &entry, const char *attribute)
 {
-	status_t status = fFile.SetTo(&entry, B_READ_WRITE);
+	struct stat stat;
+	stat.st_mode = 0;
+
+	status_t status = entry.GetStat(&stat);
+	if (status < B_OK)
+		return status;
+
+	bool isFileSystem = false;
+
+	if (entry.IsDirectory()) {
+		// we redirect directories to their volumes
+		fs_info info;
+		if (fs_stat_dev(stat.st_dev, &info) != 0)
+			return errno;
+
+		status = entry.SetTo(info.device_name);
+		if (status < B_OK)
+			return status;
+
+		entry.GetStat(&stat);
+
+		fBlockSize = info.block_size;
+		if (fBlockSize > 0 && fBlockSize <= 65536)
+			isFileSystem = true;
+	} else
+		fBlockSize = 512;
+
+	status = fFile.SetTo(&entry, B_READ_WRITE);
 	if (status < B_OK) {
 		// try to open read only
 		status = fFile.SetTo(&entry, B_READ_ONLY);
@@ -393,18 +422,12 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 
 	entry.GetRef(&fRef);
 
-	struct stat stat;
-	stat.st_mode = 0;
-
-	fFile.GetStat(&stat);
-	fIsDevice = (stat.st_mode & (S_IFBLK | S_IFCHR)) != 0;
+	fIsDevice = S_ISBLK(stat.st_mode) || S_ISCHR(stat.st_mode);
 
 	if (attribute != NULL)
 		fAttribute = strdup(attribute);
 	else
 		fAttribute = NULL;
-
-	fBlockSize = 512;
 
 	if (IsAttribute()) {
 		attr_info info;
@@ -417,7 +440,6 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		fSize = info.size;
 		fType = info.type;
 	} else if (fIsDevice) {
-		// ToDo: is there any other possibility to issue a ioctl() from a BFile?
 		device_geometry geometry;
 		int device = fFile.Dup();
 		if (device < 0 || ioctl(device, B_GET_GEOMETRY, &geometry) < 0) {
@@ -430,7 +452,9 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 
 		fSize = 1LL * geometry.head_count * geometry.cylinder_count
 			* geometry.sectors_per_track * geometry.bytes_per_sector;
-		fBlockSize = geometry.bytes_per_sector;
+
+		if (!isFileSystem)
+			fBlockSize = geometry.bytes_per_sector;
 	} else {
 		status = fFile.GetSize(&fSize);
 		if (status < B_OK) {
