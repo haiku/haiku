@@ -138,9 +138,9 @@ PrintPNGInfo(const char *path)
 		png_get_IHDR(ppng, pinfo, &width, &height, &bit_depth, &color_type,
 			&interlace_type, &compression_type, &filter_type);
 
-		printf("                   width: %u\n", width);
-		printf("                  height: %u\n", height);
-		printf("               row bytes: %u\n", pinfo->rowbytes);
+		printf("                   width: %lu\n", width);
+		printf("                  height: %lu\n", height);
+		printf("               row bytes: %lu\n", pinfo->rowbytes);
 		printf("bit depth (bits/channel): %d\n", bit_depth);
 		printf("                channels: %d\n", pinfo->channels);
 		printf("pixel depth (bits/pixel): %d\n", pinfo->pixel_depth);

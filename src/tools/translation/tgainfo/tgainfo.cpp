@@ -185,7 +185,7 @@ print_tga_info(BFile &file)
 	printf("     width: %d\n", imagespec.width);
 	printf("    height: %d\n", imagespec.height);
 	printf("     depth: %d\n", imagespec.depth);
-	printf("descriptor: 0x%.2lx\n", imagespec.descriptor);
+	printf("descriptor: 0x%.2x\n", imagespec.descriptor);
 		printf("\talpha (attr): %d\n",
 			imagespec.descriptor & TGA_DESC_ALPHABITS);
 		printf("\t      origin: %d (%s %s)\n",
@@ -209,8 +209,8 @@ print_tga_info(BFile &file)
 				devoffset = tga_uint32(tgafooter, 4);
 			
 				printf("\nTGA Footer:\n");
-				printf("extension offset: 0x%.8lx (%d)\n", extoffset, extoffset);
-				printf("developer offset: 0x%.8lx (%d)\n", devoffset, devoffset);
+				printf("extension offset: 0x%.8lx (%ld)\n", extoffset, extoffset);
+				printf("developer offset: 0x%.8lx (%ld)\n", devoffset, devoffset);
 				printf("signature: %s\n", tgafooter + 8);
 				
 				if (extoffset) {
@@ -236,7 +236,7 @@ print_tga_info(BFile &file)
 						for (int32 i = 0; i < 4; i++) {
 							memset(strbuffer, 0, LINE_LEN);
 							strcpy(strbuffer, extbuf + 43 + (i * 81));
-							printf("\tline %d: \"%s\"\n", i + 1, strbuffer);
+							printf("\tline %ld: \"%s\"\n", i + 1, strbuffer);
 						}
 
 						printf("date/time (yyyy-mm-dd hh:mm:ss): %.4d-%.2d-%.2d %.2d:%.2d:%.2d\n",
@@ -273,11 +273,11 @@ print_tga_info(BFile &file)
 						printf("gamma value: %d / %d\n",
 							tga_uint16(extbuf, 478), tga_uint16(extbuf, 480));
 						
-						printf("color correction offset: 0x%.8lx (%d)\n",
+						printf("color correction offset: 0x%.8lx (%ld)\n",
 							tga_uint32(extbuf, 482), tga_uint32(extbuf, 482));
-						printf("postage stamp offset: 0x%.8lx (%d)\n",
+						printf("postage stamp offset: 0x%.8lx (%ld)\n",
 							tga_uint32(extbuf, 486), tga_uint32(extbuf, 486));
-						printf("scan line offset: 0x%.8lx (%d)\n",
+						printf("scan line offset: 0x%.8lx (%ld)\n",
 							tga_uint32(extbuf, 490), tga_uint32(extbuf, 490));
 						
 						const char *strattrtype = NULL;

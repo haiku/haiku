@@ -97,10 +97,10 @@ print_bmp_info(BFile &file)
 		12, B_SWAP_LENDIAN_TO_HOST);
 		
 	printf("\nFile Header:\n");
-	printf("      magic: 0x%.4lx (should be: 0x424d)\n", fh.magic);
-	printf("  file size: 0x%.8lx (%u)\n", fh.fileSize, fh.fileSize);
-	printf("   reserved: 0x%.8lx (should be: 0x%.8lx)\n", fh.reserved, 0);
-	printf("data offset: 0x%.8lx (%u) (should be: >= 54 for MS format "
+	printf("      magic: 0x%.4x (should be: 0x424d)\n", fh.magic);
+	printf("  file size: 0x%.8lx (%lu)\n", fh.fileSize, fh.fileSize);
+	printf("   reserved: 0x%.8lx (should be: 0x%.8x)\n", fh.reserved, 0);
+	printf("data offset: 0x%.8lx (%lu) (should be: >= 54 for MS format "
 		"and >= 26 for OS/2 format)\n", fh.dataOffset, fh.dataOffset);
 		
 	uint32 headersize = 0;
@@ -124,21 +124,21 @@ print_bmp_info(BFile &file)
 			B_SWAP_LENDIAN_TO_HOST);
 			
 		printf("\nMS Info Header:\n");
-		printf("     header size: 0x%.8lx (%u) (should be: 40)\n", msh.size, msh.size);
-		printf("           width: %u\n", msh.width);
-		printf("          height: %u\n", msh.height);
+		printf("     header size: 0x%.8lx (%lu) (should be: 40)\n", msh.size, msh.size);
+		printf("           width: %lu\n", msh.width);
+		printf("          height: %lu\n", msh.height);
 		printf("          planes: %u (should be: 1)\n", msh.planes);
 		printf("  bits per pixel: %u (should be: 1,4,8,16,24 or 32)\n", msh.bitsperpixel);
-		printf("     compression: %s (%u)\n",
+		printf("     compression: %s (%lu)\n",
 			((msh.compression == BMP_NO_COMPRESS) ? ("none") :
 				((msh.compression == BMP_RLE8_COMPRESS) ? ("RLE 8") :
 				((msh.compression == BMP_RLE4_COMPRESS) ? ("RLE 4") :
 				("unknown")))), msh.compression);
-		printf("      image size: 0x%.8lx (%u)\n", msh.imagesize, msh.imagesize);
-		printf("  x pixels/meter: %u\n", msh.xpixperm);
-		printf("  y pixels/meter: %u\n", msh.ypixperm);
-		printf("     colors used: %u\n", msh.colorsused);
-		printf("colors important: %u\n", msh.colorsimportant);
+		printf("      image size: 0x%.8lx (%lu)\n", msh.imagesize, msh.imagesize);
+		printf("  x pixels/meter: %lu\n", msh.xpixperm);
+		printf("  y pixels/meter: %lu\n", msh.ypixperm);
+		printf("     colors used: %lu\n", msh.colorsused);
+		printf("colors important: %lu\n", msh.colorsimportant);
 
 	} else if (headersize == sizeof(OS2InfoHeader)) {
 		// OS/2 format
@@ -155,7 +155,7 @@ print_bmp_info(BFile &file)
 			B_SWAP_LENDIAN_TO_HOST);
 			
 		printf("\nOS/2 Info Header:\n");
-		printf("   header size: 0x%.8lx (%u) (should be: 12)\n", os2.size, os2.size);
+		printf("   header size: 0x%.8lx (%lu) (should be: 12)\n", os2.size, os2.size);
 		printf("         width: %u\n", os2.width);
 		printf("        height: %u\n", os2.height);
 		printf("        planes: %u (should be: 1)\n", os2.planes);
@@ -163,7 +163,7 @@ print_bmp_info(BFile &file)
 			os2.bitsperpixel);
 
 	} else
-		printf("Error: info header size (%u) does not match MS or OS/2 "
+		printf("Error: info header size (%lu) does not match MS or OS/2 "
 			"info header size\n", headersize);
 }
 
