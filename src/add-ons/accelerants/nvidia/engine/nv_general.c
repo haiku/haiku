@@ -1336,9 +1336,9 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	 *
 	 * (Note: Don't mix this up with CRTC timing contraints! Those are
 	 *        multiples of 8 for horizontal, 1 for vertical timing.) */
-	switch (si->ps.card_arch)
+	switch (si->ps.card_type)
 	{
-	case NV04A:
+	case NV04:
 		/* confirmed for:
 		 * TNT1 always;
 		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
@@ -1433,9 +1433,9 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	}
 
 	/* set virtual_width limit for unaccelerated modes */
-	switch (si->ps.card_arch)
+	switch (si->ps.card_type)
 	{
-	case NV04A:
+	case NV04:
 		/* confirmed for:
 		 * TNT1 always;
 		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
