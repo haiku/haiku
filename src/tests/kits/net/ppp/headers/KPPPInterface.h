@@ -105,10 +105,10 @@ class PPPInterface {
 		bool Down();
 		bool IsUp() const;
 		
-		void EnableReports(PPP_REPORT_TYPE type, port_id port,
+		void EnableReports(PPP_REPORT_TYPE type, thread_id thread,
 				int32 flags = PPP_NO_REPORT_FLAGS);
-		void DisableReports(PPP_REPORT_TYPE type, port_id port);
-		bool DoesReport(PPP_REPORT_TYPE type, port_id port);
+		void DisableReports(PPP_REPORT_TYPE type, thread_id thread);
+		bool DoesReport(PPP_REPORT_TYPE type, thread_id thread);
 		bool Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length);
 			// returns false if reply was bad (or an error occured)
 		
@@ -157,8 +157,6 @@ class PPPInterface {
 		List<PPPProtocol*> fProtocols;
 		List<ppp_module_info*> fModules;
 		List<ppp_report_request> fReportRequests;
-		
-		port_id fPort;
 		
 		BLocker& fLock;
 };

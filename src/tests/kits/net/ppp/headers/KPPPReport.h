@@ -32,7 +32,6 @@ enum PPP_CONNECTION_REPORT_CODES {
 };
 
 typedef struct ppp_report_packet {
-	port_id port;
 	int32 type;
 	int32 code;
 	uint8 len;
@@ -44,7 +43,7 @@ typedef struct ppp_report_packet {
 //***********
 // private
 //***********
-#define PPP_REPORT_TIMEOUT				10000
+#define PPP_REPORT_TIMEOUT				10
 
 typedef struct ppp_report_request {
 	port_id port;

@@ -32,8 +32,6 @@ PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NUL
 	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &fManager) != B_OK)
 		fManager = NULL;
 	
-	fPort = create_port(0, "PPP: reply port");
-	
 	// are we a multilink subinterface?
 	if(parent && parent->IsMultilink()) {
 		fParent = parent;
@@ -94,7 +92,6 @@ PPPInterface::~PPPInterface()
 	// put all modules (in fModules)
 	
 	put_module((module_info**) &fManager);
-	delete_port(fPort);
 }
 
 
@@ -108,7 +105,7 @@ PPPInterface::Delete()
 status_t
 PPPInterface::InitCheck() const
 {
-	if(!fSettings || !fManager || fPort < 0)
+	if(!fSettings || !fManager)
 		return B_ERROR;
 	
 	// sub-interfaces should have a device
@@ -513,14 +510,14 @@ PPPInterface::IsUp() const
 
 
 void
-PPPInterface::EnableReports(PPP_REPORT_TYPE type, port_id port,
+PPPInterface::EnableReports(PPP_REPORT_TYPE type, thread_id thread,
 	int32 flags = PPP_NO_REPORT_FLAGS)
 {
 	LockerHelper locker(fLock);
 	
 	ppp_report_request request;
 	request.type = type;
-	request.port = port;
+	request.thread = thread;
 	request.flags = flags;
 	
 	fReportRequests.AddItem(request);
@@ -528,14 +525,14 @@ PPPInterface::EnableReports(PPP_REPORT_TYPE type, port_id port,
 
 
 void
-PPPInterface::DisableReports(PPP_REPORT_TYPE type, port_id port)
+PPPInterface::DisableReports(PPP_REPORT_TYPE type, thread_id thread)
 {
 	LockerHelper locker(fLock);
 	
 	for(int32 i = 0; i < fReportRequests.CountItems(); i++) {
 		ppp_report_request& request = fReportRequests.ItemAt(i);
 		
-		if(request.port != port)
+		if(request.thread != thread)
 			continue;
 		
 		if(report.type == type)
@@ -545,14 +542,14 @@ PPPInterface::DisableReports(PPP_REPORT_TYPE type, port_id port)
 
 
 bool
-PPPInterface::DoesReport(PPP_REPORT_TYPE type, port_id port)
+PPPInterface::DoesReport(PPP_REPORT_TYPE type, thread_id thread)
 {
 	LockerHelper locker(fLock);
 	
 	for(int32 i = 0; i < fReportRequests.CountItems(); i++) {
 		ppp_report_request& request = fReportRequests.ItemAt(i);
 		
-		if(request.port == port && request.type == type)
+		if(request.thread == thread && request.type == type)
 			return true;
 	}
 	
@@ -563,7 +560,7 @@ PPPInterface::DoesReport(PPP_REPORT_TYPE type, port_id port)
 bool
 PPPInterface::Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
 {
-	if(length > PPP_REPORT_DATA_LIMIT || fPort < 0)
+	if(length > PPP_REPORT_DATA_LIMIT)
 		return false;
 	
 	if(fReportRequests.CountItems() == 0)
@@ -575,10 +572,10 @@ PPPInterface::Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
 	LockerHelper locker(fLock);
 	
 	int32 code, query, result;
-	bool successful = true;
+	thread_id sender;
+	bool acceptable = true;
 	
 	report_packet report;
-	report.port = fPort;
 	report.type = type;
 	report.code = code;
 	report.length = length;
@@ -587,18 +584,18 @@ PPPInterface::Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
 	for(int32 index = 0; index < fReportRequests.CountItems(); index++) {
 		ppp_report_request& request = fReportRequests.ItemAt(index);
 		
-		result = write_port_etc(request.port, PPP_REPORT_CODE, &report,
-			sizeof(report), B_TIMEOUT, PPP_REPORT_TIMEOUT);
+		result = send_data_with_timeout(request.port, PPP_REPORT_CODE, &report,
+			sizeof(report), PPP_REPORT_TIMEOUT);
 		
-		if(result == B_BAD_PORT_ID) {
+		if(result == B_BAD_THREAD_ID || result == B_NO_MEMORY) {
 			fReportRequests.RemoveItem(request);
 			--index;
 			continue;
 		} else if(result == B_OK) {
 			if(request.flags & PPP_WAIT_FOR_REPLY) {
-				result = read_port_etc(fPort, &code, NULL, 0,
-					B_TIMEOUT, PPP_REPORT_TIMEOUT);
-				if(result == 0 && code != B_OK)
+				result = receive_data_with_timeout(fPort, &code, NULL, 0,
+					PPP_REPORT_TIMEOUT);
+				if(result == B_OK && code != B_OK)
 					successful = false;
 			}
 		}
@@ -609,7 +606,7 @@ PPPInterface::Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
 		}
 	}
 	
-	return successful;
+	return acceptable;
 }
 
 
