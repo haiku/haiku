@@ -1,8 +1,12 @@
 /*
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
+#include <SupportDefs.h>
 #include <KernelExport.h>
 #include <Drivers.h>
 #include <device_manager.h>
@@ -722,7 +726,7 @@ devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 		if (pos > part_map->size)
 			return 0;
 
-		*_length = min(*_length, part_map->size - pos);
+		*_length = min_c(*_length, part_map->size - pos);
 		pos += part_map->offset;
 	}
 
@@ -751,7 +755,7 @@ devfs_write(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 			if (pos > part_map->size)
 				return 0;
 
-			*_length = min(*_length, part_map->size - pos);
+			*_length = min_c(*_length, part_map->size - pos);
 			pos += part_map->offset;
 		}
 
@@ -1327,7 +1331,7 @@ pnp_driver_info gDeviceForDriversModule = {
 //	#pragma mark -
 
 
-status_t
+extern "C" status_t
 devfs_unpublish_partition(const char *path)
 {
 	dprintf("unpublish partition: %s\n", path);
@@ -1335,7 +1339,7 @@ devfs_unpublish_partition(const char *path)
 }
 
 
-status_t
+extern "C" status_t
 devfs_publish_partition(const char *path, const partition_info *info)
 {
 	if (info == NULL)
@@ -1346,7 +1350,7 @@ devfs_publish_partition(const char *path, const partition_info *info)
 }
 
 
-status_t
+extern "C" status_t
 devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 {
 	int err = 0;
