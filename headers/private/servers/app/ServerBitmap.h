@@ -90,7 +90,8 @@ public:
 	
 protected:
 	friend class BitmapManager;
-	
+	friend class PicturePlayer;
+
 	//! Internal function used by the BitmapManager.
 	void _SetArea(area_id ID) { _area=ID; }
 	
