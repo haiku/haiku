@@ -265,7 +265,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
                 
         if (port <= 0)
 		#ifdef USESSL
-			port = use_ssl ? 25 : 465;
+			port = use_ssl ? 465 : 25;
 		#else
 			port = 25;
 		#endif
