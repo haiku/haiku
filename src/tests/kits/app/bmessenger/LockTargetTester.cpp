@@ -232,16 +232,16 @@ Test* LockTargetTester::Suite()
 
 	TestSuite* testSuite = new TestSuite;
 
-	ADD_TEST(testSuite, LockTargetTester, LockTargetTest1);
-	ADD_TEST(testSuite, LockTargetTester, LockTargetTest2);
-	ADD_TEST(testSuite, LockTargetTester, LockTargetTest3);
+	ADD_TEST4(BMessenger, testSuite, LockTargetTester, LockTargetTest1);
+	ADD_TEST4(BMessenger, testSuite, LockTargetTester, LockTargetTest2);
+	ADD_TEST4(BMessenger, testSuite, LockTargetTester, LockTargetTest3);
 	// test4
 	LockTargetTester *test4
 		= new LockTargetTester("LockTargetTest4");
 	test4->fLooper = new BLooper;
 	test4->fLooper->Run();
 	// test4 test caller
-	TC *caller4 = new TC("LockTargetTest4", test4);
+	TC *caller4 = new TC("BMessenger::LockTargetTest4", test4);
 	caller4->addThread("A", &LockTargetTester::LockTargetTest4A);
 	caller4->addThread("B", &LockTargetTester::LockTargetTest4B);
 	testSuite->addTest(caller4);	
@@ -258,14 +258,15 @@ Test* LockTargetTester::Suite()
 	} else
 		printf("ERROR: Can't init LockTargetTester test5!\n");
 	// test5 test caller
-	TC *caller5 = new TC("LockTargetTest5", test5);
+	TC *caller5 = new TC("BMessenger::LockTargetTest5", test5);
 	caller5->addThread("A", &LockTargetTester::LockTargetTest5A);
 	caller5->addThread("B", &LockTargetTester::LockTargetTest5B);
 	testSuite->addTest(caller5);	
 	// tests 6-7
-	ADD_TEST(testSuite, LockTargetTester, LockTargetTest6);
-	ADD_TEST(testSuite, LockTargetTester, LockTargetTest7);
+	ADD_TEST4(BMessenger, testSuite, LockTargetTester, LockTargetTest6);
+	ADD_TEST4(BMessenger, testSuite, LockTargetTester, LockTargetTest7);
 
 	return testSuite;
 }
+
 

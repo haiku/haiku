@@ -1,14 +1,47 @@
 SubDir OBOS_TOP src tests kits app ;
 
 # Let Jam know where to find some of our source files
-#SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
-#SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
-#SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessenger ] ;
 
 CommonTestLib libapptest.so
 	: AppKitTestAddon.cpp
 
+		# BHandler
+		HandlerTest.cpp
+		AddFilterTest.cpp
+		BHandlerTester.cpp
+		IsWatchedTest.cpp
+		LockLooperTest.cpp
+		LockLooperTestCommon.cpp
+		LockLooperWithTimeoutTest.cpp
+		HandlerLooperTest.cpp
+		NextHandlerTest.cpp
+		RemoveFilterTest.cpp
+		SetFilterListTest.cpp
+		SetNextHandlerTest.cpp
+		UnlockLooperTest.cpp
+
+		# BLooper
+		LooperTest.cpp
+		AddHandlerTest.cpp
+		CountHandlersTest.cpp
+		HandlerAtTest.cpp
+		IndexOfTest.cpp
+		IsMessageWaitingTest.cpp
+		RemoveHandlerTest.cpp       		
+
+		# BMessageQueue
+		MessageQueueTest.cpp
+		AddMessageTest1.cpp
+		AddMessageTest2.cpp
+		ConcurrencyTest1.cpp
+		ConcurrencyTest2.cpp
+		FindMessageTest1.cpp
+		MessageQueueTestCase.cpp
+		
 		# BMessenger
 		MessengerTest.cpp
 		BMessengerTester.cpp
@@ -30,7 +63,7 @@ CommonTestLib libapptest.so
 	: app support
 ;
 
-SubInclude OBOS_TOP src tests kits app bhandler ;
-SubInclude OBOS_TOP src tests kits app blooper ;
+#SubInclude OBOS_TOP src tests kits app bhandler ;
+#SubInclude OBOS_TOP src tests kits app blooper ;
 #SubInclude OBOS_TOP src tests kits app bmessageQueue ;
-SubInclude OBOS_TOP src tests kits app bmessenger ;
+#SubInclude OBOS_TOP src tests kits app bmessenger ;

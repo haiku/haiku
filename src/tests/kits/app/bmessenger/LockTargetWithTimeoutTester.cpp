@@ -310,11 +310,11 @@ Test* LockTargetWithTimeoutTester::Suite()
 
 	TestSuite* testSuite = new TestSuite;
 
-	ADD_TEST(testSuite, LockTargetWithTimeoutTester,
+	ADD_TEST4(BMessenger, testSuite, LockTargetWithTimeoutTester,
 			 LockTargetWithTimeoutTest1);
-	ADD_TEST(testSuite, LockTargetWithTimeoutTester,
+	ADD_TEST4(BMessenger, testSuite, LockTargetWithTimeoutTester,
 			 LockTargetWithTimeoutTest2);
-	ADD_TEST(testSuite, LockTargetWithTimeoutTester,
+	ADD_TEST4(BMessenger, testSuite, LockTargetWithTimeoutTester,
 			 LockTargetWithTimeoutTest3);
 	// test4
 	LockTargetWithTimeoutTester *test4
@@ -322,7 +322,7 @@ Test* LockTargetWithTimeoutTester::Suite()
 	test4->fLooper = new BLooper;
 	test4->fLooper->Run();
 	// test4 test caller
-	TC *caller4 = new TC("LockTargetWithTimeoutTest4", test4);
+	TC *caller4 = new TC("BMessenger::LockTargetWithTimeoutTest4", test4);
 	caller4->addThread("A",
 		&LockTargetWithTimeoutTester::LockTargetWithTimeoutTest4A);
 	caller4->addThread("B",
@@ -334,7 +334,7 @@ Test* LockTargetWithTimeoutTester::Suite()
 	test5->fLooper = new BLooper;
 	test5->fLooper->Run();
 	// test5 test caller
-	TC *caller5 = new TC("LockTargetWithTimeoutTest5", test5);
+	TC *caller5 = new TC("BMessenger::LockTargetWithTimeoutTest5", test5);
 	caller5->addThread("A",
 		&LockTargetWithTimeoutTester::LockTargetWithTimeoutTest5A);
 	caller5->addThread("B",
@@ -353,7 +353,7 @@ Test* LockTargetWithTimeoutTester::Suite()
 	} else
 		printf("ERROR: Can't init LockTargetWithTimeoutTester test6!\n");
 	// test6 test caller
-	TC *caller6 = new TC("LockTargetWithTimeoutTest6", test6);
+	TC *caller6 = new TC("BMessenger::LockTargetWithTimeoutTest6", test6);
 	caller6->addThread("A",
 		&LockTargetWithTimeoutTester::LockTargetWithTimeoutTest6A);
 	caller6->addThread("B",
@@ -372,18 +372,19 @@ Test* LockTargetWithTimeoutTester::Suite()
 	} else
 		printf("ERROR: Can't init LockTargetWithTimeoutTester test7!\n");
 	// test7 test caller
-	TC *caller7 = new TC("LockTargetWithTimeoutTest7", test7);
+	TC *caller7 = new TC("BMessenger::LockTargetWithTimeoutTest7", test7);
 	caller7->addThread("A",
 		&LockTargetWithTimeoutTester::LockTargetWithTimeoutTest7A);
 	caller7->addThread("B",
 		&LockTargetWithTimeoutTester::LockTargetWithTimeoutTest7B);
 	testSuite->addTest(caller7);	
 	// tests 8-9
-	ADD_TEST(testSuite, LockTargetWithTimeoutTester,
+	ADD_TEST4(BMessenger, testSuite, LockTargetWithTimeoutTester,
 			 LockTargetWithTimeoutTest8);
-	ADD_TEST(testSuite, LockTargetWithTimeoutTester,
+	ADD_TEST4(BMessenger, testSuite, LockTargetWithTimeoutTester,
 			 LockTargetWithTimeoutTest9);
 
 	return testSuite;
 }
+
 

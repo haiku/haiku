@@ -438,6 +438,10 @@ CppUnit::Test* TInstantiateObjectTester::Suite()
 {
 	CppUnit::TestSuite* SuiteOfTests = new CppUnit::TestSuite;
 
+//	SuiteOfTests->addTest(
+//		new CppUnit::TestCaller<TInstantiateObjectTester>("BArchivable::instantiate_object() Test",
+//			&TInstantiateObjectTester::RunTests));
+
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case1);
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case2);
 	ADD_TEST(SuiteOfTests, TInstantiateObjectTester, Case3);
@@ -543,6 +547,38 @@ void FormatAndThrow(int line, const char *file, const char *msg, int err)
 	throw re;
 }
 //------------------------------------------------------------------------------
+
+void
+TInstantiateObjectTester::RunTests() {
+	NextSubTest();
+	Case1();
+	NextSubTest();
+	Case2();
+	NextSubTest();
+	Case3();
+	NextSubTest();
+	Case4();
+	NextSubTest();
+	Case5();
+	NextSubTest();
+	Case6();
+	NextSubTest();
+	Case7();
+	NextSubTest();
+	Case8();
+	NextSubTest();
+	Case9();
+	NextSubTest();
+	Case10();
+	NextSubTest();
+	Case11();
+	NextSubTest();
+	Case12();
+	NextSubTest();
+	Case13();
+	NextSubTest();
+	Case14();
+}
 
 /*
  * $Log $

@@ -1,39 +1,45 @@
 //------------------------------------------------------------------------------
-//	LockLooperTestCommon.cpp
+//	LooperTest.h
 //
 //------------------------------------------------------------------------------
+
+#ifndef LOOPERTEST_H
+#define LOOPERTEST_H
 
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#include <be/app/Looper.h>
+#if defined(TEST_R5)
+#include <be/app/Handler.h>
+#else
+#include <Handler.h>
+#endif
 
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
-#include "LockLooperTestCommon.h"
+#include "../common.h"
 
 // Local Defines ---------------------------------------------------------------
 
 // Globals ---------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-int32 LockLooperThreadFunc(void* data)
+class TLooperTest : public TestCase
 {
-	TLockLooperInfo* info = (TLockLooperInfo*)data;
+	public:
+		TLooperTest() {;}
+		TLooperTest(std::string name) : TestCase(name) {;}
 
-	// Forces the test to encounter a pre-locked looper
-	info->LockLooper();
+		void LooperTest1();
+		void LooperTest2();
 
-	// Let the test proceed (finding the locked looper)
-	info->UnlockTest();
+		static Test* Suite();
 
-	// Wait until the thread is dead
-	info->LockThread();
+	private:
+		BHandler	fHandler;
+};
 
-	return 0;
-}
-//------------------------------------------------------------------------------
+#endif	//LOOPERTEST_H
 
 /*
  * $Log $
@@ -41,5 +47,4 @@ int32 LockLooperThreadFunc(void* data)
  * $Id  $
  *
  */
-
 

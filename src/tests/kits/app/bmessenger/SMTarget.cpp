@@ -215,3 +215,4 @@ RemoteSMTarget::_GetReply(int32 expectedCode, void *buffer, size_t size)
 // ID
 int32 RemoteSMTarget::fID = 0;
 
+

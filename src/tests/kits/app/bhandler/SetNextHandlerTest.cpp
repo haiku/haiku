@@ -291,18 +291,18 @@ Test* TSetNextHandlerTest::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite("BHandler::SetNextHandler");
 
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler0);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler1);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler2);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler3);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler4);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler5);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler6);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler7);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler8);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler9);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler10);
-	ADD_TEST(SuiteOfTests, TSetNextHandlerTest, SetNextHandler11);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler0);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler1);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler2);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler3);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler4);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler5);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler6);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler7);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler8);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler9);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler10);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetNextHandlerTest, SetNextHandler11);
 
 	return SuiteOfTests;
 }
@@ -314,4 +314,5 @@ Test* TSetNextHandlerTest::Suite()
  * $Id  $
  *
  */
+
 

@@ -51,8 +51,8 @@ Test* TIsWatchedTest::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite("BHandler::IsWatched");
 
-	ADD_TEST(SuiteOfTests, TIsWatchedTest, IsWatched1);
-	ADD_TEST(SuiteOfTests, TIsWatchedTest, IsWatched2);
+	ADD_TEST4(BHandler, SuiteOfTests, TIsWatchedTest, IsWatched1);
+	ADD_TEST4(BHandler, SuiteOfTests, TIsWatchedTest, IsWatched2);
 
 	return SuiteOfTests;
 }
@@ -64,4 +64,5 @@ Test* TIsWatchedTest::Suite()
  * $Id  $
  *
  */
+
 

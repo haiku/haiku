@@ -39,6 +39,8 @@ class TInstantiateObjectTester : public BTestCase
 		void Case12();
 		void Case13();
 		void Case14();
+		
+		void RunTests();
 
 		static CppUnit::Test* Suite();
 

@@ -140,13 +140,13 @@ Test* TRemoveFilterTest::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite("BHandler::RemoveFilter");
 
-	ADD_TEST(SuiteOfTests, TRemoveFilterTest, RemoveFilter1);
-	ADD_TEST(SuiteOfTests, TRemoveFilterTest, RemoveFilter2);
-	ADD_TEST(SuiteOfTests, TRemoveFilterTest, RemoveFilter3);
-	ADD_TEST(SuiteOfTests, TRemoveFilterTest, RemoveFilter4);
-	ADD_TEST(SuiteOfTests, TRemoveFilterTest, RemoveFilter5);
-	ADD_TEST(SuiteOfTests, TRemoveFilterTest, RemoveFilter6);
-	ADD_TEST(SuiteOfTests, TRemoveFilterTest, RemoveFilter7);
+	ADD_TEST4(BHandler, SuiteOfTests, TRemoveFilterTest, RemoveFilter1);
+	ADD_TEST4(BHandler, SuiteOfTests, TRemoveFilterTest, RemoveFilter2);
+	ADD_TEST4(BHandler, SuiteOfTests, TRemoveFilterTest, RemoveFilter3);
+	ADD_TEST4(BHandler, SuiteOfTests, TRemoveFilterTest, RemoveFilter4);
+	ADD_TEST4(BHandler, SuiteOfTests, TRemoveFilterTest, RemoveFilter5);
+	ADD_TEST4(BHandler, SuiteOfTests, TRemoveFilterTest, RemoveFilter6);
+	ADD_TEST4(BHandler, SuiteOfTests, TRemoveFilterTest, RemoveFilter7);
 
 	return SuiteOfTests;
 }
@@ -158,4 +158,5 @@ Test* TRemoveFilterTest::Suite()
  * $Id  $
  *
  */
+
 

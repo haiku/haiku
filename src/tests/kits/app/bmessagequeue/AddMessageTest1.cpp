@@ -1,5 +1,5 @@
 /*
-	$Id: AddMessageTest1.cpp,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: AddMessageTest1.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
 	
 	This file implements the first test for the OpenBeOS BMessageQueue code.
 	It tests the Construction, Destruction, Add Message 1, Count Messages,
@@ -17,50 +17,50 @@
 	*/
 
 
+#include "ThreadedTestCaller.h"
 #include "AddMessageTest1.h"
 #include <Message.h>
 #include <MessageQueue.h>
-#include "MessageQueue.h"
 
 
 /*
- *  Method:  AddMessageTest1<MessageQueue>::AddMessageTest1()
+ *  Method:  AddMessageTest1::AddMessageTest1()
  *   Descr:  This is the constructor for this class.
  */
 		
-template<class MessageQueue>
-	AddMessageTest1<MessageQueue>::AddMessageTest1(std::string name) :
-		MessageQueueTestCase<MessageQueue>(name)
+
+	AddMessageTest1::AddMessageTest1(std::string name) :
+		MessageQueueTestCase(name)
 {
 	}
 
 
 /*
- *  Method:  AddMessageTest1<MessageQueue>::~AddMessageTest1()
+ *  Method:  AddMessageTest1::~AddMessageTest1()
  *   Descr:  This is the destructor for this class.
  */
  
-template<class MessageQueue>
-	AddMessageTest1<MessageQueue>::~AddMessageTest1()
+
+	AddMessageTest1::~AddMessageTest1()
 {
 	}
 	
 	
 /*
- *  Method:  AddMessageTest1<MessageQueue>::setUp()
+ *  Method:  AddMessageTest1::setUp()
  *   Descr:  This member function is called just prior to running the test.
  *           It resets the destructor count for testMessageClass.
  */
 
-template<class MessageQueue>
-	void AddMessageTest1<MessageQueue>::setUp(void)
+
+	void AddMessageTest1::setUp(void)
 {
 	testMessageClass::messageDestructorCount = 0;
 	}
 
 
 /*
- *  Method:  AddMessageTest1<MessageQueue>::PerformTest()
+ *  Method:  AddMessageTest1::PerformTest()
  *   Descr:  This member function performs this test.  It adds
  *           10000 messages to the message queue and confirms that
  *           the queue contains the right messages.  Then it confirms
@@ -68,46 +68,51 @@ template<class MessageQueue>
  *           queue is deleted.
  */	
 
-template<class MessageQueue>
-	void AddMessageTest1<MessageQueue>::PerformTest(void)
+
+	void AddMessageTest1::PerformTest(void)
 {
 	assert(theMessageQueue->IsEmpty());
 	assert(theMessageQueue->CountMessages() == 0);
 	
 	int i;
 	for(i = 0; i < 10000; i++) {
+		if (i % (10000 / 10) == 0)
+			NextSubTest();
 		BMessage *theMessage = new testMessageClass(i);
 		AddMessage(theMessage);
 		assert(!theMessageQueue->IsEmpty());
 		assert(theMessageQueue->CountMessages() == i + 1);
 	}
 
+	NextSubTest();
 	CheckQueueAgainstList();
 	
 	assert(testMessageClass::messageDestructorCount == 0);
 	delete theMessageQueue;
 	theMessageQueue = NULL;
+	NextSubTest();
 	assert(testMessageClass::messageDestructorCount == 10000);
 }
 
 
 /*
- *  Method:  AddMessageTest1<Locker>::suite()
+ *  Method:  AddMessageTest1::suite()
  *   Descr:  This static member function returns a test caller for performing 
  *           all combinations of "AddMessageTest1".  The test
  *           is created as a ThreadedTestCase (typedef'd as
  *           AddMessageTest1Caller) with only one thread.
  */
 
-template<class MessageQueue> Test *AddMessageTest1<MessageQueue>::suite(void)
+ Test *AddMessageTest1::suite(void)
 {	
-	AddMessageTest1<MessageQueue> *theTest = new AddMessageTest1<MessageQueue>("");
-	AddMessageTest1Caller *testCaller = new AddMessageTest1Caller("", theTest);
-	testCaller->addThread(":Thread1", &AddMessageTest1<MessageQueue>::PerformTest);
+	typedef BThreadedTestCaller<AddMessageTest1>
+		AddMessageTest1Caller;
+
+	AddMessageTest1 *theTest = new AddMessageTest1("");
+	AddMessageTest1Caller *testCaller = new AddMessageTest1Caller("BMessageQueue::Add Message Test #1", theTest);
+	testCaller->addThread("A", &AddMessageTest1::PerformTest);
 				
 	return(testCaller);
 	}
  
 
-template class AddMessageTest1<BMessageQueue>;
-template class AddMessageTest1<OpenBeOS::BMessageQueue>;

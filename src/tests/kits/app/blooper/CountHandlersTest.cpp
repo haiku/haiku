@@ -61,8 +61,8 @@ TestSuite* TCountHandlersTest::Suite()
 {
 	TestSuite* suite = new TestSuite("BLooper::CountHandlers()");
 
-	ADD_TEST(suite, TCountHandlersTest, CountHandlersTest1);
-	ADD_TEST(suite, TCountHandlersTest, CountHandlersTest2);
+	ADD_TEST4(BLooper, suite, TCountHandlersTest, CountHandlersTest1);
+	ADD_TEST4(BLooper, suite, TCountHandlersTest, CountHandlersTest2);
 
 	return suite;
 }
@@ -74,4 +74,5 @@ TestSuite* TCountHandlersTest::Suite()
  * $Id  $
  *
  */
+
 

@@ -1,5 +1,5 @@
 /*
-	$Id: AddMessageTest1.h,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: AddMessageTest1.h,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
 	
 	This file defines a class for performing one test of BMessageQueue
 	functionality.
@@ -12,16 +12,13 @@
 
 
 #include "MessageQueueTestCase.h"
-#include "Test.h"
-#include "ThreadedTestCaller.h"
+#include "../common.h"
 
 	
-template<class MessageQueue> class AddMessageTest1 :
-	public MessageQueueTestCase<MessageQueue> {
+ class AddMessageTest1 :
+	public MessageQueueTestCase {
 	
 private:
-	typedef ThreadedTestCaller <AddMessageTest1<MessageQueue> >
-		AddMessageTest1Caller;
 	
 public:
 	static Test *suite(void);
@@ -32,3 +29,9 @@ public:
 	};
 	
 #endif
+
+
+
+
+
+

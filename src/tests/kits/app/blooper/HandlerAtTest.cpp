@@ -85,10 +85,10 @@ TestSuite* THandlerAtTest::Suite()
 {
 	TestSuite* suite = new TestSuite("BLooper::HandlerAt(int32)");
 
-	ADD_TEST(suite, THandlerAtTest, HandlerAtTest1);
-	ADD_TEST(suite, THandlerAtTest, HandlerAtTest2);
-	ADD_TEST(suite, THandlerAtTest, HandlerAtTest3);
-	ADD_TEST(suite, THandlerAtTest, HandlerAtTest4);
+	ADD_TEST4(BLooper, suite, THandlerAtTest, HandlerAtTest1);
+	ADD_TEST4(BLooper, suite, THandlerAtTest, HandlerAtTest2);
+	ADD_TEST4(BLooper, suite, THandlerAtTest, HandlerAtTest3);
+	ADD_TEST4(BLooper, suite, THandlerAtTest, HandlerAtTest4);
 
 	return suite;
 }
@@ -100,4 +100,5 @@ TestSuite* THandlerAtTest::Suite()
  * $Id  $
  *
  */
+
 

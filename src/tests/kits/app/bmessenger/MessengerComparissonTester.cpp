@@ -307,11 +307,12 @@ Test* MessengerComparissonTester::Suite()
 
 	TestSuite* testSuite = new TestSuite;
 
-	ADD_TEST(testSuite, MessengerComparissonTester, ComparissonTest1);
-	ADD_TEST(testSuite, MessengerComparissonTester, ComparissonTest2);
-	ADD_TEST(testSuite, MessengerComparissonTester, ComparissonTest3);
-	ADD_TEST(testSuite, MessengerComparissonTester, LessTest1);
+	ADD_TEST4(BMessenger, testSuite, MessengerComparissonTester, ComparissonTest1);
+	ADD_TEST4(BMessenger, testSuite, MessengerComparissonTester, ComparissonTest2);
+	ADD_TEST4(BMessenger, testSuite, MessengerComparissonTester, ComparissonTest3);
+	ADD_TEST4(BMessenger, testSuite, MessengerComparissonTester, LessTest1);
 
 	return testSuite;
 }
+
 

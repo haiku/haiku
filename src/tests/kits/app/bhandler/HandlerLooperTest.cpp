@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	NextHandlerTest.cpp
+//	LooperTest.cpp
 //
 //------------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
-#include "NextHandlerTest.h"
+#include "HandlerLooperTest.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -19,35 +19,36 @@
 
 //------------------------------------------------------------------------------
 /**
-	NextHandler()
-	@case		Default constructed BHandler
-	@results	Returns NULL
+	Looper()
+	@case		Not added to a BLooper
+	@results		Returns NULL
  */
-void TNextHandlerTest::NextHandler1()
+void TLooperTest::LooperTest1()
 {
-	BHandler Handler;
-	CPPUNIT_ASSERT(Handler.NextHandler() == NULL);
+	CPPUNIT_ASSERT(fHandler.Looper() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
-	NextHandler();
-	@case		Default constructed BHandler added to BLooper
-	@results	Returns parent BLooper
+	Looper()
+	@case		Add to a BLooper, then remove
+	@results	Returns the added-to BLooper; when removed, returns NULL
  */
-void TNextHandlerTest::NextHandler2()
+void TLooperTest::LooperTest2()
 {
-	BHandler Handler;
 	BLooper Looper;
-	Looper.AddHandler(&Handler);
-	CPPUNIT_ASSERT(Handler.NextHandler() == &Looper);
+	Looper.AddHandler(&fHandler);
+	CPPUNIT_ASSERT(fHandler.Looper() == &Looper);
+
+	CPPUNIT_ASSERT(Looper.RemoveHandler(&fHandler));
+	CPPUNIT_ASSERT(fHandler.Looper() == NULL);
 }
 //------------------------------------------------------------------------------
-Test* TNextHandlerTest::Suite()
+Test* TLooperTest::Suite()
 {
-	TestSuite* SuiteOfTests = new TestSuite("BHandler::NextHandler");
+	TestSuite* SuiteOfTests = new TestSuite("BHandler::Looper");
 
-	ADD_TEST4(BHandler, SuiteOfTests, TNextHandlerTest, NextHandler1);
-	ADD_TEST4(BHandler, SuiteOfTests, TNextHandlerTest, NextHandler2);
+	ADD_TEST4(BHandler, SuiteOfTests, TLooperTest, LooperTest1);
+	ADD_TEST4(BHandler, SuiteOfTests, TLooperTest, LooperTest2);
 
 	return SuiteOfTests;
 }

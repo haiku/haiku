@@ -1,5 +1,5 @@
 /*
-	$Id: ConcurrencyTest1.cpp,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: ConcurrencyTest1.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
 	
 	This file implements a test class for testing BMessageQueue functionality.
 	It tests use cases Destruction, Add Message 1, Add Message 3, Remove Message 1,
@@ -30,11 +30,12 @@
 	*/
 
 
+#include "ThreadedTestCaller.h"
 #include "ConcurrencyTest1.h"
 #include "ThreadedTestCaller.h"
 #include "TestSuite.h"
 #include <MessageQueue.h>
-#include "MessageQueue.h"
+#include <Autolock.h>
 
 
 // This constant indicates how many messages to add to the queue.
@@ -48,36 +49,36 @@ const int numAddMessagesPerRemove = 5;
 
 
 /*
- *  Method:  ConcurrencyTest1<MessageQueue>::ConcurrencyTest1()
+ *  Method:  ConcurrencyTest1::ConcurrencyTest1()
  *   Descr:  This is the constructor for this test.
  */
 		
-template<class MessageQueue>
-	ConcurrencyTest1<MessageQueue>::ConcurrencyTest1(std::string name, bool listFlag) :
-		MessageQueueTestCase<MessageQueue>(name), useList(listFlag)
+
+	ConcurrencyTest1::ConcurrencyTest1(std::string name, bool listFlag) :
+		MessageQueueTestCase(name), useList(listFlag)
 {
 	}
 
 
 /*
- *  Method:  ConcurrencyTest1<MessageQueue>::~ConcurrencyTest1()
+ *  Method:  ConcurrencyTest1::~ConcurrencyTest1()
  *   Descr:  This is the destructor for this test.
  */
 
-template<class MessageQueue>
-	ConcurrencyTest1<MessageQueue>::~ConcurrencyTest1()
+
+	ConcurrencyTest1::~ConcurrencyTest1()
 {
 	}
 
 
 /*
- *  Method:  ConcurrencyTest1<MessageQueue>::setUp()
+ *  Method:  ConcurrencyTest1::setUp()
  *   Descr:  This member function prepares the enviroment for test execution.
  *           It resets the message destructor count and puts "numAddMessages"
  *           messages on the queue.
  */	
 
-template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::setUp(void)
+ void ConcurrencyTest1::setUp(void)
 {
 	testMessageClass::messageDestructorCount = 0;
 
@@ -94,7 +95,7 @@ template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::setUp(void)
 
 
 /*
- *  Method:  ConcurrencyTest1<MessageQueue>::TestThread1()
+ *  Method:  ConcurrencyTest1::TestThread1()
  *   Descr:  This member function is one of the three threads for performing
  *           this test.  It waits until the other two threads complete and
  *           then checks the state of the message queue.  If the list is
@@ -103,8 +104,9 @@ template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::setUp(void)
  *           are all deleted when the message queue is destructed.
  */
 
-template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::TestThread1(void)
+ void ConcurrencyTest1::TestThread1(void)
 {
+	NextSubTest();
 	snooze(1000000);
 	thread2Lock.Lock();
 	thread3Lock.Lock();
@@ -116,30 +118,32 @@ template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::TestThread1(vo
 	int numMessages = (2*numAddMessages) -
 						(numAddMessages / numAddMessagesPerRemove) -
 						numNextMessages;
-	assert(numMessages == theMessageQueue->CountMessages());
-	assert(testMessageClass::messageDestructorCount == 0);
+	CPPUNIT_ASSERT(numMessages == theMessageQueue->CountMessages());
+	CPPUNIT_ASSERT(testMessageClass::messageDestructorCount == 0);
 	
 	delete theMessageQueue;
 	theMessageQueue = NULL;
-	assert(testMessageClass::messageDestructorCount == numMessages);
+	CPPUNIT_ASSERT(testMessageClass::messageDestructorCount == numMessages);
 }
 
 
 /*
- *  Method:  ConcurrencyTest1<MessageQueue>::TestThread2()
+ *  Method:  ConcurrencyTest1::TestThread2()
  *   Descr:  This member function is one of the three threads for performing
  *           this test.  It performs NextMessage() numNextMessages times on
  *           the queue.  It confirms that it always receives a message from
  *           the queue.
  */
 
-template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::TestThread2(void)
+ void ConcurrencyTest1::TestThread2(void)
 {
-	thread2Lock.Lock();
-	SafetyLock<BLocker> mySafetyLock(&thread2Lock);
+	BAutolock mySafetyLock(&thread2Lock);
 	
 	int i;
 	for(i = 0; i < numNextMessages; i++) {
+		if (i % (numNextMessages / 10) == 0)
+			NextSubTest();
+			
 		snooze(5000);
 		BMessage *theMessage;
 		if (useList) {
@@ -147,28 +151,30 @@ template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::TestThread2(vo
 		} else {
 			theMessage = theMessageQueue->NextMessage();
 		}
-		assert(theMessage != NULL);
+		CPPUNIT_ASSERT(theMessage != NULL);
 	}
 }
 
 
 /*
- *  Method:  ConcurrencyTest1<MessageQueue>::TestThread3()
+ *  Method:  ConcurrencyTest1::TestThread3()
  *   Descr:  This member function is one of the three threads for performing
  *           this test.  It adds numAddMessages messages to the queue.  For
  *           every numAddMessagesPerRemove messages it adds, one message
  *           is removed.
  */
 
-template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::TestThread3(void)
+ void ConcurrencyTest1::TestThread3(void)
 {
-	thread3Lock.Lock();
-	SafetyLock<BLocker> mySafetyLock(&thread3Lock);
+	BAutolock mySafetyLock(&thread3Lock);
 	
 	int i;
 	BList messagesToRemove;
 	
 	for (i=0; i < numAddMessages; i++) {
+		if (i % (numAddMessages / 10) == 0)
+			NextSubTest();
+	
 		BMessage *theMessage = new testMessageClass(i);
 		if (useList) {
 			AddMessage(theMessage);
@@ -188,7 +194,7 @@ template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::TestThread3(vo
 
 
 /*
- *  Method:  ConcurrencyTest1<MessageQueue>::suite()
+ *  Method:  ConcurrencyTest1::suite()
  *   Descr:  This static member function returns a test suite for performing 
  *           all combinations of "ConcurrencyTest1".  The test suite contains
  *           two instances of the test.  One is performed with a list,
@@ -197,21 +203,23 @@ template<class MessageQueue> void ConcurrencyTest1<MessageQueue>::TestThread3(vo
  *           ConcurrencyTest1Caller) with three independent threads.
  */
 
-template<class MessageQueue> Test *ConcurrencyTest1<MessageQueue>::suite(void)
+ Test *ConcurrencyTest1::suite(void)
 {	
+	typedef BThreadedTestCaller<ConcurrencyTest1>
+		ConcurrencyTest1Caller;
 	TestSuite *testSuite = new TestSuite("ConcurrencyTest1");
 	
-	ConcurrencyTest1<MessageQueue> *theTest = new ConcurrencyTest1<MessageQueue>("WithList", true);
-	ConcurrencyTest1Caller *threadedTest1 = new ConcurrencyTest1Caller("", theTest);
-	threadedTest1->addThread(":Thread1", &ConcurrencyTest1<MessageQueue>::TestThread1);
-	threadedTest1->addThread(":Thread2", &ConcurrencyTest1<MessageQueue>::TestThread2);
-	threadedTest1->addThread(":Thread3", &ConcurrencyTest1<MessageQueue>::TestThread3);
+	ConcurrencyTest1 *theTest = new ConcurrencyTest1("WithList", true);
+	ConcurrencyTest1Caller *threadedTest1 = new ConcurrencyTest1Caller("BMessageQueue::Concurrency Test #1 (with list)", theTest);
+	threadedTest1->addThread("A", &ConcurrencyTest1::TestThread1);
+	threadedTest1->addThread("B", &ConcurrencyTest1::TestThread2);
+	threadedTest1->addThread("C", &ConcurrencyTest1::TestThread3);
 							 		
-	theTest = new ConcurrencyTest1<MessageQueue>("WithoutList", false);
-	ConcurrencyTest1Caller *threadedTest2 = new ConcurrencyTest1Caller("", theTest);
-	threadedTest2->addThread(":Thread1", &ConcurrencyTest1<MessageQueue>::TestThread1);
-	threadedTest2->addThread(":Thread2", &ConcurrencyTest1<MessageQueue>::TestThread2);
-	threadedTest2->addThread(":Thread3", &ConcurrencyTest1<MessageQueue>::TestThread3);
+	theTest = new ConcurrencyTest1("WithoutList", false);
+	ConcurrencyTest1Caller *threadedTest2 = new ConcurrencyTest1Caller("BMessageQueue::Concurrency Test #1 (without list)", theTest);
+	threadedTest2->addThread("A", &ConcurrencyTest1::TestThread1);
+	threadedTest2->addThread("B", &ConcurrencyTest1::TestThread2);
+	threadedTest2->addThread("C", &ConcurrencyTest1::TestThread3);
 									 		
 	testSuite->addTest(threadedTest1);	
 	testSuite->addTest(threadedTest2);
@@ -219,5 +227,4 @@ template<class MessageQueue> Test *ConcurrencyTest1<MessageQueue>::suite(void)
 	}
 	
 	
-template class ConcurrencyTest1<BMessageQueue>;
-template class ConcurrencyTest1<OpenBeOS::BMessageQueue>;
+

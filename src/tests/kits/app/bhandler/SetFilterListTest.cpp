@@ -126,11 +126,11 @@ Test* TSetFilterListTest::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite("BHandler::SetFilterList");
 
-	ADD_TEST(SuiteOfTests, TSetFilterListTest, SetFilterList1);
-	ADD_TEST(SuiteOfTests, TSetFilterListTest, SetFilterList2);
-	ADD_TEST(SuiteOfTests, TSetFilterListTest, SetFilterList3);
-	ADD_TEST(SuiteOfTests, TSetFilterListTest, SetFilterList4);
-	ADD_TEST(SuiteOfTests, TSetFilterListTest, SetFilterList5);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetFilterListTest, SetFilterList1);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetFilterListTest, SetFilterList2);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetFilterListTest, SetFilterList3);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetFilterListTest, SetFilterList4);
+	ADD_TEST4(BHandler, SuiteOfTests, TSetFilterListTest, SetFilterList5);
 
 	return SuiteOfTests;
 }
@@ -142,4 +142,5 @@ Test* TSetFilterListTest::Suite()
  * $Id  $
  *
  */
+
 

@@ -160,10 +160,11 @@ Test* MessengerAssignmentTester::Suite()
 
 	TestSuite* testSuite = new TestSuite;
 
-	ADD_TEST(testSuite, MessengerAssignmentTester, AssignmentTest1);
-	ADD_TEST(testSuite, MessengerAssignmentTester, AssignmentTest2);
-	ADD_TEST(testSuite, MessengerAssignmentTester, AssignmentTest3);
+	ADD_TEST4(BMessenger, testSuite, MessengerAssignmentTester, AssignmentTest1);
+	ADD_TEST4(BMessenger, testSuite, MessengerAssignmentTester, AssignmentTest2);
+	ADD_TEST4(BMessenger, testSuite, MessengerAssignmentTester, AssignmentTest3);
 
 	return testSuite;
 }
+
 

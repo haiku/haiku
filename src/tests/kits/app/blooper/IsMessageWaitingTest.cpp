@@ -170,13 +170,13 @@ Test* TIsMessageWaitingTest::Suite()
 {
 	TestSuite* suite = new TestSuite("BLooper::IsMessageWaiting()");
 
-	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting1);
-	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting2);
-	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting3);
-	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting4);
+	ADD_TEST4(BLooper, suite, TIsMessageWaitingTest, IsMessageWaiting1);
+	ADD_TEST4(BLooper, suite, TIsMessageWaitingTest, IsMessageWaiting2);
+	ADD_TEST4(BLooper, suite, TIsMessageWaitingTest, IsMessageWaiting3);
+	ADD_TEST4(BLooper, suite, TIsMessageWaitingTest, IsMessageWaiting4);
 
 	// See note for test
-//	ADD_TEST(suite, TIsMessageWaitingTest, IsMessageWaiting5);
+//	ADD_TEST4(BLooper, suite, TIsMessageWaitingTest, IsMessageWaiting5);
 
 	return suite;
 }
@@ -188,4 +188,5 @@ Test* TIsMessageWaitingTest::Suite()
  * $Id  $
  *
  */
+
 

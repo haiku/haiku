@@ -297,27 +297,27 @@ Test* TBHandlerTester::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
 
-	ADD_TEST(SuiteOfTests, TBHandlerTester, BHandler1);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, BHandler2);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, BHandler3);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, BHandler4);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, BHandler5);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, BHandler1);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, BHandler2);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, BHandler3);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, BHandler4);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, BHandler5);
 
-	ADD_TEST(SuiteOfTests, TBHandlerTester, Archive1);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, Archive2);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, Archive3);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, Archive4);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, Archive1);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, Archive2);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, Archive3);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, Archive4);
 
-	ADD_TEST(SuiteOfTests, TBHandlerTester, Instantiate1);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, Instantiate2);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, Instantiate3);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, Instantiate1);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, Instantiate2);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, Instantiate3);
 
-	ADD_TEST(SuiteOfTests, TBHandlerTester, SetName1);
-	ADD_TEST(SuiteOfTests, TBHandlerTester, SetName2);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, SetName1);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, SetName2);
 
-	ADD_TEST(SuiteOfTests, TBHandlerTester, Perform1);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, Perform1);
 
-	ADD_TEST(SuiteOfTests, TBHandlerTester, FilterList1);
+	ADD_TEST4(BHandler, SuiteOfTests, TBHandlerTester, FilterList1);
 
 	return SuiteOfTests;
 }
@@ -329,4 +329,6 @@ Test* TBHandlerTester::Suite()
  * $Id  $
  *
  */
+
+
 

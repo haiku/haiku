@@ -1,5 +1,5 @@
 /*
-	$Id: AddMessageTest2.cpp,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: AddMessageTest2.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
 	
 	This file implements the second test for the OpenBeOS BMessageQueue code.
 	It tests the Add Message 2 use case.  It does so by doing the following:
@@ -12,6 +12,7 @@
 	*/
 
 
+#include "ThreadedTestCaller.h"
 #include "AddMessageTest2.h"
 #include <Message.h>
 #include <MessageQueue.h>
@@ -19,30 +20,30 @@
 
 
 /*
- *  Method:  AddMessageTest2<MessageQueue>::AddMessageTest2()
+ *  Method:  AddMessageTest2::AddMessageTest2()
  *   Descr:  This is the constructor for this class.
  */
 		
-template<class MessageQueue>
-	AddMessageTest2<MessageQueue>::AddMessageTest2(std::string name) :
-					MessageQueueTestCase<MessageQueue>(name)
+
+	AddMessageTest2::AddMessageTest2(std::string name) :
+					MessageQueueTestCase(name)
 {
 	}
 
 
 /*
- *  Method:  AddMessageTest2<MessageQueue>::~AddMessageTest2()
+ *  Method:  AddMessageTest2::~AddMessageTest2()
  *   Descr:  This is the destructor for this class.
  */
 
-template<class MessageQueue>
-	AddMessageTest2<MessageQueue>::~AddMessageTest2()
+
+	AddMessageTest2::~AddMessageTest2()
 {
 	}
 
 
 /*
- *  Method:  AddMessageTest2<MessageQueue>::PerformTest()
+ *  Method:  AddMessageTest2::PerformTest()
  *   Descr:  This member function performs this test.  It adds
  *           4 messages to the message queue and confirms that
  *           the queue contains the right messages.  Then it re-adds
@@ -51,9 +52,10 @@ template<class MessageQueue>
  *           checks each element on the queue one by one.
  */
 
-template<class MessageQueue>
-	void AddMessageTest2<MessageQueue>::PerformTest(void)
+
+	void AddMessageTest2::PerformTest(void)
 {
+	NextSubTest();
 	BMessage *firstMessage = new BMessage(1);
 	BMessage *secondMessage = new BMessage(2);
 	BMessage *thirdMessage = new BMessage(3);
@@ -64,6 +66,7 @@ template<class MessageQueue>
 	AddMessage(thirdMessage);
 	AddMessage(fourthMessage);
 	
+	NextSubTest();
 	CheckQueueAgainstList();
 	
 	AddMessage(secondMessage);
@@ -75,36 +78,37 @@ template<class MessageQueue>
 	try {
 		CheckQueueAgainstList();
 	}
-	catch (CppUnitException e) {
+	catch (CppUnit::Exception e) {
 		exceptionRaised = true;
 	}
-	assert(exceptionRaised);
+	CPPUNIT_ASSERT(exceptionRaised);
 	
-	assert(theMessageQueue->FindMessage((int32)0) == firstMessage);
-	assert(theMessageQueue->FindMessage((int32)1) == secondMessage);
-	assert(theMessageQueue->FindMessage((int32)2) == NULL);
-	assert(theMessageQueue->FindMessage((int32)3) == NULL);
-	assert(theMessageQueue->FindMessage((int32)4) == NULL);
+	NextSubTest();
+	CPPUNIT_ASSERT(theMessageQueue->FindMessage((int32)0) == firstMessage);
+	CPPUNIT_ASSERT(theMessageQueue->FindMessage((int32)1) == secondMessage);
+	CPPUNIT_ASSERT(theMessageQueue->FindMessage((int32)2) == NULL);
+	CPPUNIT_ASSERT(theMessageQueue->FindMessage((int32)3) == NULL);
+	CPPUNIT_ASSERT(theMessageQueue->FindMessage((int32)4) == NULL);
 }
 
 
 /*
- *  Method:  AddMessageTest2<Locker>::suite()
+ *  Method:  AddMessageTest2::suite()
  *   Descr:  This static member function returns a test caller for performing 
  *           all combinations of "AddMessageTest2".  The test
  *           is created as a ThreadedTestCase (typedef'd as
  *           AddMessageTest2Caller) with only one thread.
  */
 
-template<class MessageQueue> Test *AddMessageTest2<MessageQueue>::suite(void)
+ Test *AddMessageTest2::suite(void)
 {	
-	AddMessageTest2<MessageQueue> *theTest = new AddMessageTest2<MessageQueue>("");
-	AddMessageTest2Caller *testCaller = new AddMessageTest2Caller("", theTest);
-	testCaller->addThread(":Thread1", &AddMessageTest2<MessageQueue>::PerformTest);
+	typedef BThreadedTestCaller<AddMessageTest2>
+		AddMessageTest2Caller;
+	AddMessageTest2 *theTest = new AddMessageTest2("");
+	AddMessageTest2Caller *testCaller = new AddMessageTest2Caller("BMessageQueue::Add Message Test #2", theTest);
+	testCaller->addThread("A", &AddMessageTest2::PerformTest);
 				
 	return(testCaller);
 	}
 	
 
-template class AddMessageTest2<BMessageQueue>;
-template class AddMessageTest2<OpenBeOS::BMessageQueue>;

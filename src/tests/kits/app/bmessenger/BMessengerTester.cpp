@@ -316,18 +316,19 @@ Test* TBMessengerTester::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
 
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger1);
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger2);
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger3);
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger4);
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger5);
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger6);
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger7);
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger8);
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger9);
-	ADD_TEST(SuiteOfTests, TBMessengerTester, BMessenger10);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger1);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger2);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger3);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger4);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger5);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger6);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger7);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger8);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger9);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger10);
 
 	return SuiteOfTests;
 }
+
 
 

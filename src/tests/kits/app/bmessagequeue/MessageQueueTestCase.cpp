@@ -1,5 +1,5 @@
 /*
-	$Id: MessageQueueTestCase.cpp,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: MessageQueueTestCase.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
 	
 	This file implements a base class for testing BMessageQueue functionality.
 	
@@ -14,32 +14,32 @@
 int testMessageClass::messageDestructorCount = 0;
 
 		
-template<class MessageQueue>
-	MessageQueueTestCase<MessageQueue>::MessageQueueTestCase(
-		std::string name) : TestCase(name),
-							theMessageQueue(new MessageQueue)
+
+	MessageQueueTestCase::MessageQueueTestCase(
+		std::string name) : BThreadedTestCase(name),
+							theMessageQueue(new BMessageQueue())
 {
 	}
 
 
-template<class MessageQueue>
-	MessageQueueTestCase<MessageQueue>::~MessageQueueTestCase()
+
+	MessageQueueTestCase::~MessageQueueTestCase()
 {
 	delete theMessageQueue;
 	theMessageQueue = NULL;
 	}
 	
 	
-template<class MessageQueue>
-	void MessageQueueTestCase<MessageQueue>::CheckQueueAgainstList(void)
+
+	void MessageQueueTestCase::CheckQueueAgainstList(void)
 {
-	SafetyLock<MessageQueue> theSafetyLock(theMessageQueue);
+	SafetyLock theSafetyLock(theMessageQueue);
 	
 	if (theMessageQueue->Lock()) {
-		assert(theMessageQueue->CountMessages() == messageList.CountItems());
+		CPPUNIT_ASSERT(theMessageQueue->CountMessages() == messageList.CountItems());
 		int i;
 		for (i = 0; i < theMessageQueue->CountMessages(); i++) {
-			assert(theMessageQueue->FindMessage((int32)i) ==
+			CPPUNIT_ASSERT(theMessageQueue->FindMessage((int32)i) ==
 					messageList.ItemAt(i));
 		}
 		theMessageQueue->Unlock();
@@ -47,8 +47,8 @@ template<class MessageQueue>
 }
 
 
-template<class MessageQueue>
-	void MessageQueueTestCase<MessageQueue>::AddMessage(BMessage *message)
+
+	void MessageQueueTestCase::AddMessage(BMessage *message)
 {
 	if (theMessageQueue->Lock()) {
 		theMessageQueue->AddMessage(message);
@@ -57,8 +57,8 @@ template<class MessageQueue>
 	}
 }
 	
-template<class MessageQueue>
-	void MessageQueueTestCase<MessageQueue>::RemoveMessage(BMessage *message)
+
+	void MessageQueueTestCase::RemoveMessage(BMessage *message)
 {
 	if (theMessageQueue->Lock()) {
 		theMessageQueue->RemoveMessage(message);
@@ -67,23 +67,23 @@ template<class MessageQueue>
 	}
 }
 	
-template<class MessageQueue>
-	BMessage *MessageQueueTestCase<MessageQueue>::NextMessage(void)
+
+	BMessage *MessageQueueTestCase::NextMessage(void)
 {
-	SafetyLock<MessageQueue> theSafetyLock(theMessageQueue);
+	SafetyLock theSafetyLock(theMessageQueue);
 		
 	BMessage *result = NULL;
 	if (theMessageQueue->Lock()) {
 		result = theMessageQueue->NextMessage();
-		assert(result == messageList.RemoveItem((int32)0));
+		CPPUNIT_ASSERT(result == messageList.RemoveItem((int32)0));
 		theMessageQueue->Unlock();
 	}
 	return(result);
 }
 
 
-template<class MessageQueue>
-	BMessage *MessageQueueTestCase<MessageQueue>::FindMessage(uint32 what, int index)
+
+	BMessage *MessageQueueTestCase::FindMessage(uint32 what, int index)
 {
 	int listCount = messageList.CountItems();
 	int i;
@@ -102,5 +102,4 @@ template<class MessageQueue>
 }
 	
 
-template class MessageQueueTestCase<BMessageQueue>;
-template class MessageQueueTestCase<OpenBeOS::BMessageQueue>;
+

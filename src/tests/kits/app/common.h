@@ -31,6 +31,10 @@
 	(suitename)->addTest(new TestCaller<classname>((#funcname),	\
 						 &classname::funcname));
 
+#define ADD_TEST4(classbeingtested, suitename, classname, funcname)				\
+	(suitename)->addTest(new TestCaller<classname>((#classbeingtested "::" #funcname),	\
+						 &classname::funcname));
+
 #define CHECK_ERRNO														\
 	cout << endl << "errno == \"" << strerror(errno) << "\" (" << errno	\
 		 << ") in " << __PRETTY_FUNCTION__ << endl

@@ -104,11 +104,11 @@ Test* TRemoveHandlerTest::Suite()
 {
 	TestSuite* suite = new TestSuite("BLooper::RemoveHandler(BHandler* handler)");
 
-	ADD_TEST(suite, TRemoveHandlerTest, RemoveHandler1);
-	ADD_TEST(suite, TRemoveHandlerTest, RemoveHandler2);
-	ADD_TEST(suite, TRemoveHandlerTest, RemoveHandler3);
-	ADD_TEST(suite, TRemoveHandlerTest, RemoveHandler4);
-	ADD_TEST(suite, TRemoveHandlerTest, RemoveHandler5);
+	ADD_TEST4(BLooper, suite, TRemoveHandlerTest, RemoveHandler1);
+	ADD_TEST4(BLooper, suite, TRemoveHandlerTest, RemoveHandler2);
+	ADD_TEST4(BLooper, suite, TRemoveHandlerTest, RemoveHandler3);
+	ADD_TEST4(BLooper, suite, TRemoveHandlerTest, RemoveHandler4);
+	ADD_TEST4(BLooper, suite, TRemoveHandlerTest, RemoveHandler5);
 
 	return suite;
 }
@@ -120,4 +120,5 @@ Test* TRemoveHandlerTest::Suite()
  * $Id  $
  *
  */
+
 

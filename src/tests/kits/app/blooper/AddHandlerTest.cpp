@@ -64,8 +64,8 @@ TestSuite* TAddHandlerTest::Suite()
 {
 	TestSuite* suite = new TestSuite("BLooper::AddHandler(BHandler*)");
 
-	ADD_TEST(suite, TAddHandlerTest, AddHandlerTest1);
-	ADD_TEST(suite, TAddHandlerTest, AddHandlerTest2);
+	ADD_TEST4(BLooper, suite, TAddHandlerTest, AddHandlerTest1);
+	ADD_TEST4(BLooper, suite, TAddHandlerTest, AddHandlerTest2);
 
 	return suite;
 }
@@ -77,4 +77,5 @@ TestSuite* TAddHandlerTest::Suite()
  * $Id  $
  *
  */
+
 

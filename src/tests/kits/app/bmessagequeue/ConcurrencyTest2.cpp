@@ -1,5 +1,5 @@
 /*
-	$Id: ConcurrencyTest2.cpp,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: ConcurrencyTest2.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
 	
 	This file implements a test class for testing BMessageQueue functionality.
 	It tests use cases Destruction, Add Message 3, Remove Message 2,
@@ -22,11 +22,9 @@
 	*/
 
 
-#include "ConcurrencyTest2.h"
 #include "ThreadedTestCaller.h"
-#include "TestSuite.h"
+#include "ConcurrencyTest2.h"
 #include <MessageQueue.h>
-#include "MessageQueue.h"
 
 
 // This constant indicates the number of messages to add to the queue.
@@ -37,38 +35,38 @@ bigtime_t SNOOZE_TIME = 100000;
 
 
 /*
- *  Method:  ConcurrencyTest2<MessageQueue>::ConcurrencyTest2()
+ *  Method:  ConcurrencyTest2::ConcurrencyTest2()
  *   Descr:  This is the constructor for this test.
  */
 		
-template<class MessageQueue>
-	ConcurrencyTest2<MessageQueue>::ConcurrencyTest2(std::string name, bool unlockFlag) :
-		MessageQueueTestCase<MessageQueue>(name), unlockTest(unlockFlag)
+
+	ConcurrencyTest2::ConcurrencyTest2(std::string name, bool unlockFlag) :
+		MessageQueueTestCase(name), unlockTest(unlockFlag)
 {
 	}
 
 
 /*
- *  Method:  ConcurrencyTest2<MessageQueue>::~ConcurrencyTest2()
+ *  Method:  ConcurrencyTest2::~ConcurrencyTest2()
  *   Descr:  This is the destructor for this test.
  */
 
-template<class MessageQueue>
-	ConcurrencyTest2<MessageQueue>::~ConcurrencyTest2()
+
+	ConcurrencyTest2::~ConcurrencyTest2()
 {
 	}
 
 
 /*
- *  Method:  ConcurrencyTest2<MessageQueue>::setUp()
+ *  Method:  ConcurrencyTest2::setUp()
  *   Descr:  This member functions sets the environment for the test.
  *           it sets the lock flag and resets the message destructor
  *           count.  Finally, it adds numAddMessages messages to the
  *           queue.
  */
 
-template<class MessageQueue>
-	void ConcurrencyTest2<MessageQueue>::setUp(void)
+
+	void ConcurrencyTest2::setUp(void)
 {
 	isLocked = false;
 	testMessageClass::messageDestructorCount = 0;
@@ -84,15 +82,15 @@ template<class MessageQueue>
 
 
 /*
- *  Method:  ConcurrencyTest2<MessageQueue>::TestThread1()
+ *  Method:  ConcurrencyTest2::TestThread1()
  *   Descr:  This member function is one thread within the test.  It
  *           acquires the lock on the queue and then sleeps for a while.
  *           When it wakes up, it releases the lock on the queue by
  *           either doing an Unlock() or deleting the queue.
  */
 
-template<class MessageQueue>
-	void ConcurrencyTest2<MessageQueue>::TestThread1(void)
+
+	void ConcurrencyTest2::TestThread1(void)
 {
 	theMessageQueue->Lock();
 	isLocked = true;
@@ -103,7 +101,7 @@ template<class MessageQueue>
 	if (unlockTest) {
 		theMessageQueue->Unlock();
 	} else {
-		MessageQueue *tmpMessageQueue = theMessageQueue;
+		BMessageQueue *tmpMessageQueue = theMessageQueue;
 		theMessageQueue = NULL;
 		delete tmpMessageQueue;
 	}	
@@ -111,7 +109,7 @@ template<class MessageQueue>
 
 
 /*
- *  Method:  ConcurrencyTest2<MessageQueue>::TestThread2()
+ *  Method:  ConcurrencyTest2::TestThread2()
  *   Descr:  This member function is one thread within the test.  It
  *           snoozes for a short time so that TestThread1() will grab
  *           the lock.  If this is the delete test, this thread
@@ -120,10 +118,10 @@ template<class MessageQueue>
  *           the queue.  The result of NextMessage() is checked finally.
  */
 
-template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread2(void)
+ void ConcurrencyTest2::TestThread2(void)
 {
 	snooze(SNOOZE_TIME/10);
-	assert(isLocked);
+	CPPUNIT_ASSERT(isLocked);
 	if (!unlockTest) {
 		// Be's implementation can cause a segv when NextMessage() is in
 		// progress when a delete occurs.  The OpenBeOS implementation
@@ -131,11 +129,11 @@ template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread2(vo
 		return;
 	}
 	BMessage *theMessage = theMessageQueue->NextMessage();
-	assert(!isLocked);
+	CPPUNIT_ASSERT(!isLocked);
 
 	if (unlockTest) {
-		assert(theMessage != NULL);
-		assert(theMessage->what == 0);
+		CPPUNIT_ASSERT(theMessage != NULL);
+		CPPUNIT_ASSERT(theMessage->what == 0);
 	} else {
 		// The following test passes for the OpenBeOS implementation but
 		// fails for the Be implementation.  If the BMessageQueue is deleted
@@ -146,13 +144,13 @@ template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread2(vo
 		// deleted.  The OpenBeOS implementation will not emulate the Be
 		// implementation since I consider it a bug.
 		//
-		// assert(theMessage==NULL);
+		// CPPUNIT_ASSERT(theMessage==NULL);
 	}
 }
 
 
 /*
- *  Method:  ConcurrencyTest2<MessageQueue>::TestThread3()
+ *  Method:  ConcurrencyTest2::TestThread3()
  *   Descr:  This member function is one thread within the test.  It
  *           snoozes for a short time so that TestThread1() will grab
  *           the lock.  If this is the delete test, this thread
@@ -161,10 +159,10 @@ template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread2(vo
  *           on the queue.  The state of the queue is checked finally.
  */
 
-template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread3(void)
+ void ConcurrencyTest2::TestThread3(void)
 {
 	snooze(SNOOZE_TIME/10);
-	assert(isLocked);
+	CPPUNIT_ASSERT(isLocked);
 	if (!unlockTest) {
 		// Be's implementation causes a segv when RemoveMessage() is in
 		// progress when a delete occurs.  The OpenBeOS implementation
@@ -172,15 +170,15 @@ template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread3(vo
 		return;
 	}
 	theMessageQueue->RemoveMessage(removeMessage);
-	assert(!isLocked);
+	CPPUNIT_ASSERT(!isLocked);
 	if (unlockTest) {
-		assert(theMessageQueue->FindMessage(removeMessage->what, 0) == NULL);
+		CPPUNIT_ASSERT(theMessageQueue->FindMessage(removeMessage->what, 0) == NULL);
 	}
 }
 
 
 /*
- *  Method:  ConcurrencyTest2<MessageQueue>::TestThread1()
+ *  Method:  ConcurrencyTest2::TestThread1()
  *   Descr:  This member function is one thread within the test.  It
  *           snoozes for a short time so that TestThread1() will grab
  *           the lock.  If this is the delete test, this thread
@@ -189,10 +187,10 @@ template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread3(vo
  *           the queue.  The state of the queue is checked finally.
  */
 
-template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread4(void)
+ void ConcurrencyTest2::TestThread4(void)
 {
 	snooze(SNOOZE_TIME/10);
-	assert(isLocked);
+	CPPUNIT_ASSERT(isLocked);
 	if (!unlockTest) {
 		// Be's implementation can cause a segv when AddMessage() is in
 		// progress when a delete occurs.  The OpenBeOS implementation
@@ -200,15 +198,15 @@ template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread4(vo
 		return;
 	}
 	theMessageQueue->AddMessage(new testMessageClass(numAddMessages));
-	assert(!isLocked);
+	CPPUNIT_ASSERT(!isLocked);
 	if (unlockTest) {
-		assert(theMessageQueue->FindMessage(numAddMessages, 0) != NULL);
+		CPPUNIT_ASSERT(theMessageQueue->FindMessage(numAddMessages, 0) != NULL);
 	}
 }
 
 
 /*
- *  Method:  ConcurrencyTest2<MessageQueue>::TestThread1()
+ *  Method:  ConcurrencyTest2::TestThread1()
  *   Descr:  This member function is one thread within the test.  It
  *           snoozes for a short time so that TestThread1() will grab
  *           the lock.  The thread blocks attempting to acquire the
@@ -217,25 +215,25 @@ template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread4(vo
  *           acquisition.
  */
 
-template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread5(void)
+ void ConcurrencyTest2::TestThread5(void)
 {
-	SafetyLock<MessageQueue> mySafetyLock(theMessageQueue);
+	SafetyLock mySafetyLock(theMessageQueue);
 	
 	snooze(SNOOZE_TIME/10);
-	assert(isLocked);
+	CPPUNIT_ASSERT(isLocked);
 	bool result = theMessageQueue->Lock();
-	assert(!isLocked);
+	CPPUNIT_ASSERT(!isLocked);
 	if (unlockTest) {
-		assert(result);
+		CPPUNIT_ASSERT(result);
 		theMessageQueue->Unlock();
 	} else {
-		assert(!result);
+		CPPUNIT_ASSERT(!result);
 	}
 }
 
 
 /*
- *  Method:  ConcurrencyTest2<MessageQueue>::suite()
+ *  Method:  ConcurrencyTest2::suite()
  *   Descr:  This static member function returns a test suite for performing 
  *           all combinations of "ConcurrencyTest2".  The test suite contains
  *           two instances of the test.  One is performed with an unlock,
@@ -244,25 +242,28 @@ template<class MessageQueue> void ConcurrencyTest2<MessageQueue>::TestThread5(vo
  *           ConcurrencyTest2Caller) with five independent threads.
  */
 
-template<class MessageQueue> Test *ConcurrencyTest2<MessageQueue>::suite(void)
+ Test *ConcurrencyTest2::suite(void)
 {	
+	typedef BThreadedTestCaller<ConcurrencyTest2>
+		ConcurrencyTest2Caller;
+
 	TestSuite *testSuite = new TestSuite("ConcurrencyTest2");
 	
-	ConcurrencyTest2<MessageQueue> *theTest = new ConcurrencyTest2<MessageQueue>("WithUnlock", true);
-	ConcurrencyTest2Caller *threadedTest1 = new ConcurrencyTest2Caller("", theTest);
-	threadedTest1->addThread(":Thread1", &ConcurrencyTest2<MessageQueue>::TestThread1);
-	threadedTest1->addThread(":Thread2", &ConcurrencyTest2<MessageQueue>::TestThread2);
-	threadedTest1->addThread(":Thread3", &ConcurrencyTest2<MessageQueue>::TestThread3);
-	threadedTest1->addThread(":Thread3", &ConcurrencyTest2<MessageQueue>::TestThread4);
-	threadedTest1->addThread(":Thread3", &ConcurrencyTest2<MessageQueue>::TestThread5);
+	ConcurrencyTest2 *theTest = new ConcurrencyTest2("WithUnlock", true);
+	ConcurrencyTest2Caller *threadedTest1 = new ConcurrencyTest2Caller("BMessageQueue::Concurrency Test #2 (with unlock)", theTest);
+	threadedTest1->addThread("A", &ConcurrencyTest2::TestThread1);
+	threadedTest1->addThread("B", &ConcurrencyTest2::TestThread2);
+	threadedTest1->addThread("C", &ConcurrencyTest2::TestThread3);
+	threadedTest1->addThread("D", &ConcurrencyTest2::TestThread4);
+	threadedTest1->addThread("E", &ConcurrencyTest2::TestThread5);
 							 		
-	theTest = new ConcurrencyTest2<MessageQueue>("WithDelete", false);
-	ConcurrencyTest2Caller *threadedTest2 = new ConcurrencyTest2Caller("", theTest);
-	threadedTest2->addThread(":Thread1", &ConcurrencyTest2<MessageQueue>::TestThread1);
-	threadedTest2->addThread(":Thread2", &ConcurrencyTest2<MessageQueue>::TestThread2);
-	threadedTest2->addThread(":Thread3", &ConcurrencyTest2<MessageQueue>::TestThread3);
-	threadedTest2->addThread(":Thread3", &ConcurrencyTest2<MessageQueue>::TestThread4);
-	threadedTest2->addThread(":Thread3", &ConcurrencyTest2<MessageQueue>::TestThread5);
+	theTest = new ConcurrencyTest2("WithDelete", false);
+	ConcurrencyTest2Caller *threadedTest2 = new ConcurrencyTest2Caller("BMessageQueue::Concurrency Test #2 (with delete)", theTest);
+	threadedTest2->addThread("A", &ConcurrencyTest2::TestThread1);
+	threadedTest2->addThread("B", &ConcurrencyTest2::TestThread2);
+	threadedTest2->addThread("C", &ConcurrencyTest2::TestThread3);
+	threadedTest2->addThread("D", &ConcurrencyTest2::TestThread4);
+	threadedTest2->addThread("E", &ConcurrencyTest2::TestThread5);
 									 		
 	testSuite->addTest(threadedTest1);	
 	testSuite->addTest(threadedTest2);
@@ -270,5 +271,4 @@ template<class MessageQueue> Test *ConcurrencyTest2<MessageQueue>::suite(void)
 	}
 
 
-template class ConcurrencyTest2<BMessageQueue>;
-template class ConcurrencyTest2<OpenBeOS::BMessageQueue>;
+

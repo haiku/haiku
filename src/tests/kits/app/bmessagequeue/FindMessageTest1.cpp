@@ -1,5 +1,5 @@
 /*
-	$Id: FindMessageTest1.cpp,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: FindMessageTest1.cpp,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
 	
 	This file implements the second test for the OpenBeOS BMessageQueue code.
 	It tests the Add Message 1 and Find Message 2 use cases.  It does so by
@@ -17,6 +17,7 @@
 	*/
 
 
+#include "ThreadedTestCaller.h"
 #include "FindMessageTest1.h"
 #include <Message.h>
 #include <MessageQueue.h>
@@ -33,30 +34,30 @@ const int numPerWhatCode = 50;
 
 
 /*
- *  Method:  FindMessageTest1<MessageQueue>::FindMessageTest1()
+ *  Method:  FindMessageTest1::FindMessageTest1()
  *   Descr:  This is the constructor for this test class.
  */
 		
-template<class MessageQueue>
-	FindMessageTest1<MessageQueue>::FindMessageTest1(std::string name) :
-		MessageQueueTestCase<MessageQueue>(name)
+
+	FindMessageTest1::FindMessageTest1(std::string name) :
+		MessageQueueTestCase(name)
 {
 	}
 
 
 /*
- *  Method:  FindMessageTest1<MessageQueue>::~FindMessageTest1()
+ *  Method:  FindMessageTest1::~FindMessageTest1()
  *   Descr:  This is the destructor for this test class.
  */
 
-template<class MessageQueue>
-	FindMessageTest1<MessageQueue>::~FindMessageTest1()
+
+	FindMessageTest1::~FindMessageTest1()
 {
 	}
 
 
 /*
- *  Method:  FindMessageTest1<MessageQueue>::PerformTest()
+ *  Method:  FindMessageTest1::PerformTest()
  *   Descr:  This is the member function for executing the test.
  *           It adds numPerWhatCode*numWhatCodes messages to the
  *           queue.  Then, it uses FindMessage() to search for
@@ -64,8 +65,8 @@ template<class MessageQueue>
  *           checks that the queue and list return the same result.
  */	
 
-template<class MessageQueue>
-	void FindMessageTest1<MessageQueue>::PerformTest(void)
+
+	void FindMessageTest1::PerformTest(void)
 {
 	int whatCode;
 	int i;
@@ -73,42 +74,49 @@ template<class MessageQueue>
 	BMessage *listMessage;
 	
 	for (i = 0; i < numPerWhatCode; i++) {
+		if (i % (numPerWhatCode / 10) == 0)
+			NextSubTest();
+	
 		for (whatCode = 1; whatCode <= numWhatCodes; whatCode++) {
 			AddMessage(new testMessageClass(whatCode));
 		}
 	}
 	
 	for (whatCode = 0; whatCode <= numWhatCodes + 1; whatCode++) {
+		if (i % (numWhatCodes / 10) == 0)
+			NextSubTest();
+
 		int index = 0;
 		while ((theMessage = theMessageQueue->FindMessage(whatCode,
 														   index)) != NULL) {
 			listMessage = FindMessage(whatCode, index);
-			assert(listMessage == theMessage);
+			CPPUNIT_ASSERT(listMessage == theMessage);
 			index++;
 		}
 		listMessage = FindMessage(whatCode, index);
-		assert(listMessage == theMessage);
+		CPPUNIT_ASSERT(listMessage == theMessage);
 	}
 }
 
 
 /*
- *  Method:  FindMessageTest1<Locker>::suite()
+ *  Method:  FindMessageTest1::suite()
  *   Descr:  This static member function returns a test caller for performing 
  *           all combinations of "FindMessageTest1".  The test
  *           is created as a ThreadedTestCase (typedef'd as
  *           FindMessageTest1Caller) with only one thread.
  */
 
-template<class MessageQueue> Test *FindMessageTest1<MessageQueue>::suite(void)
+ Test *FindMessageTest1::suite(void)
 {	
-	FindMessageTest1<MessageQueue> *theTest = new FindMessageTest1<MessageQueue>("");
-	FindMessageTest1Caller *testCaller = new FindMessageTest1Caller("", theTest);
-	testCaller->addThread(":Thread1", &FindMessageTest1<MessageQueue>::PerformTest);
+	typedef BThreadedTestCaller<FindMessageTest1>
+		FindMessageTest1Caller;
+
+	FindMessageTest1 *theTest = new FindMessageTest1("");
+	FindMessageTest1Caller *testCaller = new FindMessageTest1Caller("BMessageQueue::Find Message Test", theTest);
+	testCaller->addThread("A", &FindMessageTest1::PerformTest);
 				
 	return(testCaller);
 	}
 
 
-template class FindMessageTest1<BMessageQueue>;
-template class FindMessageTest1<OpenBeOS::BMessageQueue>;

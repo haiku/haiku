@@ -94,10 +94,10 @@ Test* TAddFilterTest::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite("BHandler::AddFilter");
 
-	ADD_TEST(SuiteOfTests, TAddFilterTest, AddFilter1);
-	ADD_TEST(SuiteOfTests, TAddFilterTest, AddFilter2);
-	ADD_TEST(SuiteOfTests, TAddFilterTest, AddFilter3);
-	ADD_TEST(SuiteOfTests, TAddFilterTest, AddFilter4);
+	ADD_TEST4(BHandler, SuiteOfTests, TAddFilterTest, AddFilter1);
+	ADD_TEST4(BHandler, SuiteOfTests, TAddFilterTest, AddFilter2);
+	ADD_TEST4(BHandler, SuiteOfTests, TAddFilterTest, AddFilter3);
+	ADD_TEST4(BHandler, SuiteOfTests, TAddFilterTest, AddFilter4);
 
 	return SuiteOfTests;
 }
@@ -109,4 +109,5 @@ Test* TAddFilterTest::Suite()
  * $Id  $
  *
  */
+
 

@@ -403,8 +403,9 @@ Test* SendMessageTester::Suite()
 
 	TestSuite* testSuite = new TestSuite;
 
-	ADD_TEST(testSuite, SendMessageTester, SendMessageTest1);
+	ADD_TEST4(BMessenger, testSuite, SendMessageTester, SendMessageTest1);
 
 	return testSuite;
 }
+
 

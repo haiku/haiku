@@ -182,18 +182,19 @@ Test* TargetTester::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
 
-	ADD_TEST(SuiteOfTests, TargetTester, IsTargetLocalTest1);
-	ADD_TEST(SuiteOfTests, TargetTester, IsTargetLocalTest2);
-	ADD_TEST(SuiteOfTests, TargetTester, IsTargetLocalTest3);
-	ADD_TEST(SuiteOfTests, TargetTester, IsTargetLocalTest4);
-	ADD_TEST(SuiteOfTests, TargetTester, IsTargetLocalTest5);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, IsTargetLocalTest1);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, IsTargetLocalTest2);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, IsTargetLocalTest3);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, IsTargetLocalTest4);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, IsTargetLocalTest5);
 
-	ADD_TEST(SuiteOfTests, TargetTester, TargetTest1);
-	ADD_TEST(SuiteOfTests, TargetTester, TargetTest2);
-	ADD_TEST(SuiteOfTests, TargetTester, TargetTest3);
-	ADD_TEST(SuiteOfTests, TargetTester, TargetTest4);
-	ADD_TEST(SuiteOfTests, TargetTester, TargetTest5);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, TargetTest1);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, TargetTest2);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, TargetTest3);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, TargetTest4);
+	ADD_TEST4(BMessenger, SuiteOfTests, TargetTester, TargetTest5);
 
 	return SuiteOfTests;
 }
+
 

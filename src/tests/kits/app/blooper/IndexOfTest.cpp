@@ -161,12 +161,12 @@ TestSuite* TIndexOfTest::Suite()
 {
 	TestSuite* suite = new TestSuite("BLooper::IndexOf(BHandler*)");
 
-	ADD_TEST(suite, TIndexOfTest, IndexOfTest1);
-	ADD_TEST(suite, TIndexOfTest, IndexOfTest2);
-	ADD_TEST(suite, TIndexOfTest, IndexOfTest3);
-	ADD_TEST(suite, TIndexOfTest, IndexOfTest4);
-	ADD_TEST(suite, TIndexOfTest, IndexOfTest5);
-	ADD_TEST(suite, TIndexOfTest, IndexOfTest6);
+	ADD_TEST4(BLooper, suite, TIndexOfTest, IndexOfTest1);
+	ADD_TEST4(BLooper, suite, TIndexOfTest, IndexOfTest2);
+	ADD_TEST4(BLooper, suite, TIndexOfTest, IndexOfTest3);
+	ADD_TEST4(BLooper, suite, TIndexOfTest, IndexOfTest4);
+	ADD_TEST4(BLooper, suite, TIndexOfTest, IndexOfTest5);
+	ADD_TEST4(BLooper, suite, TIndexOfTest, IndexOfTest6);
 
 	return suite;
 }
@@ -178,4 +178,5 @@ TestSuite* TIndexOfTest::Suite()
  * $Id  $
  *
  */
+
 

@@ -1,5 +1,5 @@
 /*
-	$Id: MessageQueueTestCase.h,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: MessageQueueTestCase.h,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
 	
 	This file defines a set of classes for testing BMessageQueue
 	functionality.
@@ -14,7 +14,8 @@
 #include <List.h>
 #include <Locker.h>
 #include <Message.h>
-#include "TestCase.h"
+#include <MessageQueue.h>
+#include "ThreadedTestCase.h"
 
 
 //
@@ -25,18 +26,18 @@
 // could be deadlocks if one thread in a test has a failure while holding
 // the lock.  It should be used like so:
 //
-// template<class MessageQueue> void myTestClass<MessageQueue>::myTestFunc(void)
+//  void myTestClass::myTestFunc(void)
 // {
-//   SafetyLock<MessageQueue> mySafetyLock(theMessageQueue);
+//   SafetyLock mySafetyLock(theMessageQueue);
 //   ...perform tests without worrying about holding the lock on assert...
 //
 
-template<class MessageQueue> class SafetyLock {
+ class SafetyLock {
 private:
-	MessageQueue *theMessageQueue;
+	BMessageQueue *theMessageQueue;
 	
 public:
-	SafetyLock(MessageQueue *aMessageQueue) {theMessageQueue = aMessageQueue;}
+	SafetyLock(BMessageQueue *aMessageQueue) {theMessageQueue = aMessageQueue;}
 	virtual ~SafetyLock() {if (theMessageQueue != NULL) theMessageQueue->Unlock(); };
 	};
 
@@ -56,13 +57,13 @@ public:
 };
 
 	
-template<class MessageQueue> class MessageQueueTestCase : public TestCase {
+ class MessageQueueTestCase : public BThreadedTestCase {
 	
 private:
 	BList messageList;
 
 protected:
-	MessageQueue *theMessageQueue;
+	BMessageQueue *theMessageQueue;
 	
 	void AddMessage(BMessage *message);
 	void RemoveMessage(BMessage *message);
@@ -77,3 +78,6 @@ public:
 	};
 	
 #endif
+
+
+

@@ -1,5 +1,5 @@
 /*
-	$Id: ConcurrencyTest2.h,v 1.1 2002/07/09 12:24:56 ejakowatz Exp $
+	$Id: ConcurrencyTest2.h,v 1.2 2002/07/22 09:28:00 tylerdauwalder Exp $
 	
 	This file defines a classes for performing one test of BMessageQueue
 	functionality.
@@ -7,21 +7,18 @@
 	*/
 
 
-#ifndef ConcurrencyTest2_H
-#define ConcurrencyTest2_H
+#ifndef _ConcurrencyTest2_H
+#define _ConcurrencyTest2_H
 
 
 #include "MessageQueueTestCase.h"
-#include "Test.h"
-#include "ThreadedTestCaller.h"
+#include "../common.h"
 
 	
-template<class MessageQueue> class ConcurrencyTest2 :
-	public MessageQueueTestCase<MessageQueue> {
+ class ConcurrencyTest2 :
+	public MessageQueueTestCase {
 	
 private:
-	typedef ThreadedTestCaller<ConcurrencyTest2<MessageQueue> >
-		ConcurrencyTest2Caller;
 		
 	bool unlockTest;
 	bool isLocked;
@@ -40,3 +37,7 @@ public:
 	};
 	
 #endif
+
+
+
+

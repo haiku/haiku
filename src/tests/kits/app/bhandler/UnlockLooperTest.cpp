@@ -76,9 +76,9 @@ Test* TUnlockLooperTest::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite("BHandler::UnlockLooper");
 
-	ADD_TEST(SuiteOfTests, TUnlockLooperTest, UnlockLooper1);
-	ADD_TEST(SuiteOfTests, TUnlockLooperTest, UnlockLooper2);
-	ADD_TEST(SuiteOfTests, TUnlockLooperTest, UnlockLooper3);
+	ADD_TEST4(BHandler, SuiteOfTests, TUnlockLooperTest, UnlockLooper1);
+	ADD_TEST4(BHandler, SuiteOfTests, TUnlockLooperTest, UnlockLooper2);
+	ADD_TEST4(BHandler, SuiteOfTests, TUnlockLooperTest, UnlockLooper3);
 
 	return SuiteOfTests;
 }
@@ -90,4 +90,5 @@ Test* TUnlockLooperTest::Suite()
  * $Id  $
  *
  */
+
 

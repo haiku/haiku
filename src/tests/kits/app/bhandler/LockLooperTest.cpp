@@ -91,10 +91,10 @@ Test* TLockLooperTest::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite("BHandler::LockLooper");
 
-	ADD_TEST(SuiteOfTests, TLockLooperTest, LockLooper1);
-	ADD_TEST(SuiteOfTests, TLockLooperTest, LockLooper2);
-	ADD_TEST(SuiteOfTests, TLockLooperTest, LockLooper3);
-//	ADD_TEST(SuiteOfTests, TLockLooperTest, LockLooper4);
+	ADD_TEST4(BHandler, SuiteOfTests, TLockLooperTest, LockLooper1);
+	ADD_TEST4(BHandler, SuiteOfTests, TLockLooperTest, LockLooper2);
+	ADD_TEST4(BHandler, SuiteOfTests, TLockLooperTest, LockLooper3);
+//	ADD_TEST4(BHandler, SuiteOfTests, TLockLooperTest, LockLooper4);
 
 	return SuiteOfTests;
 }
@@ -106,4 +106,5 @@ Test* TLockLooperTest::Suite()
  * $Id  $
  *
  */
+
 

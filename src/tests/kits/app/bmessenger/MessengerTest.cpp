@@ -21,3 +21,4 @@ CppUnit::Test* MessengerTestSuite()
 
 	return testSuite;
 }
+

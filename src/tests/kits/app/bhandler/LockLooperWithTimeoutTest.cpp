@@ -95,10 +95,10 @@ Test* TLockLooperWithTimeoutTest::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite("BHandler::LockLooperWithTimeout");
 
-	ADD_TEST(SuiteOfTests, TLockLooperWithTimeoutTest, LockLooperWithTimeout1);
-	ADD_TEST(SuiteOfTests, TLockLooperWithTimeoutTest, LockLooperWithTimeout2);
-	ADD_TEST(SuiteOfTests, TLockLooperWithTimeoutTest, LockLooperWithTimeout3);
-//	ADD_TEST(SuiteOfTests, TLockLooperWithTimeoutTest, LockLooperWithTimeout4);
+	ADD_TEST4(BHandler, SuiteOfTests, TLockLooperWithTimeoutTest, LockLooperWithTimeout1);
+	ADD_TEST4(BHandler, SuiteOfTests, TLockLooperWithTimeoutTest, LockLooperWithTimeout2);
+	ADD_TEST4(BHandler, SuiteOfTests, TLockLooperWithTimeoutTest, LockLooperWithTimeout3);
+//	ADD_TEST4(BHandler, SuiteOfTests, TLockLooperWithTimeoutTest, LockLooperWithTimeout4);
 
 	return SuiteOfTests;
 }
@@ -110,4 +110,5 @@ Test* TLockLooperWithTimeoutTest::Suite()
  * $Id  $
  *
  */
+
 
