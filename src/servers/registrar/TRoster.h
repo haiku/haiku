@@ -103,7 +103,11 @@ private:
 	void _ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info);
 
 	void _HandleGetRecentEntries(BMessage *request);
-
+	
+	status_t _LoadRosterSettings(const char *path = NULL);
+	status_t _SaveRosterSettings(const char *path = NULL);
+	static const char *kDefaultRosterSettingsFile;
+	
 private:
 	AppInfoList		fRegisteredApps;
 	AppInfoList		fEarlyPreRegisteredApps;

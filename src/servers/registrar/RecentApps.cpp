@@ -37,8 +37,6 @@
 #include <Roster.h>
 #include <storage_support.h>
 
-#include <stdio.h>
-
 #define DBG(x) (x)
 //#define DBG(x)
 #define OUT printf
@@ -189,6 +187,45 @@ RecentApps::Clear()
 	return B_OK;	
 }
 
+// Print
+/*! \brief Dumps the the current list of apps to stdout.
+*/
+status_t
+RecentApps::Print()
+{
+	std::list<std::string>::iterator item;
+	int counter = 1;
+	for (item = fAppList.begin();
+	       item != fAppList.end();
+	         item++)
+	{
+		printf("%d: '%s'\n", counter++, item->c_str());
+	}
+}
+
+// Save
+/*! \brief Outputs a textual representation of the current recent
+	apps list to the given file stream.
+
+*/
+status_t
+RecentApps::Save(FILE* file)
+{
+	status_t error = file ? B_OK : B_BAD_VALUE;
+	if (!error) {
+		fprintf(file, "# Recent applications\n");
+		std::list<std::string>::iterator item;
+		for (item = fAppList.begin();
+		       item != fAppList.end();
+		         item++)
+		{
+			fprintf(file, "RecentApp %s\n", item->c_str());
+		}
+		fprintf(file, "\n");
+	}
+	return error;
+}
+
 // GetRefForApp
 /*! \brief Fetches an \c entry_ref for the application with the
 	given signature.
@@ -211,18 +248,3 @@ RecentApps::GetRefForApp(const char *appSig, entry_ref *result)
 	return err;	
 }
 
-// Print
-/*! \brief Dumps the the current list of apps to stdout.
-*/
-status_t
-RecentApps::Print()
-{
-	std::list<std::string>::iterator item;
-	int counter = 1;
-	for (item = fAppList.begin();
-	       item != fAppList.end();
-	         item++)
-	{
-		printf("%d: '%s'\n", counter++, item->c_str());
-	}
-}

@@ -30,12 +30,25 @@
 #ifndef RECENT_ENTRIES_H
 #define RECENT_ENTRIES_H
 
+#include <Entry.h>
 #include <SupportDefs.h>
 
 #include <list>
+#include <stdio.h>
+#include <string>
 
-struct entry_ref;
-struct recent_entry;
+namespace BPrivate {
+	class TRoster;
+}
+
+struct recent_entry {
+	recent_entry(const entry_ref *ref, const char *appSig, uint32 index);	
+	entry_ref ref;
+	std::string sig;
+	uint32 index;
+private:
+	recent_entry();
+};
 
 class RecentEntries {
 public:
@@ -47,7 +60,10 @@ public:
 	             const char *appSig, BMessage *result);
 	status_t Clear();
 	status_t Print();
+	status_t Save(FILE* file, const char *description, const char *tag);
 private:
+	friend class BPrivate::TRoster;
+
 	static status_t GetTypeForRef(const entry_ref *ref, char *result);
 	
 	std::list<recent_entry*> fEntryList;

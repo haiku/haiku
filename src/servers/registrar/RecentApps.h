@@ -33,7 +33,12 @@
 #include <SupportDefs.h>
 
 #include <list>
+#include <stdio.h>
 #include <string>
+
+namespace BPrivate {
+	class TRoster;
+}
 
 struct entry_ref;
 
@@ -47,7 +52,11 @@ public:
 	status_t Get(int32 maxCount, BMessage *list);
 	status_t Clear();
 	status_t Print();
+	status_t Save(FILE* file);
 private:
+	friend class BPrivate::TRoster;
+		// For loading from disk
+
 	static status_t GetRefForApp(const char *appSig, entry_ref *result);	
 
 	std::list<std::string> fAppList;

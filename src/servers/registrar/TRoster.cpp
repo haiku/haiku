@@ -31,11 +31,26 @@
 #include <AppMisc.h>
 #include <storage_support.h>
 
+#include <errno.h>
+#include <stdio.h>
+
 #include "Debug.h"
 #include "RegistrarDefs.h"
 #include "RosterAppInfo.h"
+#include "RosterSettingsCharStream.h"
 #include "TRoster.h"
 #include "EventMaskWatcher.h"
+
+//------------------------------------------------------------------------------
+// Private local function declarations
+//------------------------------------------------------------------------------
+
+static bool larger_index(const recent_entry *entry1, const recent_entry *entry2);
+
+
+//------------------------------------------------------------------------------
+// TRoster 
+//------------------------------------------------------------------------------
 
 /*!
 	\class TRoster
@@ -66,6 +81,9 @@
 //! The maximal period of time an app may be early pre-registered (60 s).
 const bigtime_t kMaximalEarlyPreRegistrationPeriod = 60000000LL;
 
+const char *TRoster::kDefaultRosterSettingsFile =
+	"/boot/home/config/settings/Roster/OpenBeOSRosterSettings";
+
 // constructor
 /*!	\brief Creates a new roster.
 
@@ -77,8 +95,12 @@ TRoster::TRoster()
 		 fIAPRRequests(),
 		 fActiveApp(NULL),
 		 fWatchingService(),
+		 fRecentApps(),
+		 fRecentDocuments(),
+		 fRecentFolders(),
 		 fLastToken(0)
 {
+	_LoadRosterSettings();
 }
 
 // destructor
@@ -1301,4 +1323,213 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 
 	FUNCTION_END();
 } 
+
+status_t
+TRoster::_LoadRosterSettings(const char *path)
+{
+	const char *settingsPath = path ? path : kDefaultRosterSettingsFile;
+
+	RosterSettingsCharStream stream;	
+	status_t error;
+	BFile file;
+
+	error = file.SetTo(settingsPath, B_READ_ONLY);
+	off_t size;
+	if (!error)
+		error = file.GetSize(&size);
+	char *data;
+	if (!error) {
+		data = new(nothrow) char[size];
+		error = data ? B_OK : B_NO_MEMORY;
+	}
+	if (!error) {
+		ssize_t bytes = file.Read(data, size);
+		error = bytes < 0 ? bytes : (bytes == size ? B_OK : B_FILE_ERROR);
+	}
+	if (!error) 
+		error = stream.SetTo(std::string(data));
+	if (!error) {	
+		// Clear the current lists as
+		// we'll be manually building them up
+		fRecentDocuments.Clear();
+		fRecentFolders.Clear();
+		fRecentApps.Clear();
+		
+		// Now we just walk through the file and read in the info
+		while (true) {
+			status_t streamError;
+			char str[B_PATH_NAME_LENGTH];
+			
+	
+			// (RecentDoc | RecentFolder | RecentApp)
+			streamError = stream.GetString(str);
+			if (!streamError) {
+				enum EntryType {
+					etDoc,
+					etFolder,
+					etApp,
+					etSomethingIsAmiss,
+				} type;
+			
+				if (strcmp(str, "RecentDoc") == 0) {
+					type = etDoc;
+				} else if (strcmp(str, "RecentFolder") == 0) {			
+					type = etFolder;
+				} else if (strcmp(str, "RecentApp") == 0) {
+					type = etApp;
+				} else {
+					type = etSomethingIsAmiss;
+				}
+				
+				switch (type) {
+					case etDoc:
+					case etFolder:
+					{
+						// For curing laziness
+						std::list<recent_entry*> *list = (type == etDoc)
+						                                 ? &fRecentDocuments.fEntryList
+						                                 : &fRecentFolders.fEntryList;
+						
+						char path[B_PATH_NAME_LENGTH];
+						char app[B_PATH_NAME_LENGTH];
+						char rank[B_PATH_NAME_LENGTH];
+						entry_ref ref;
+						uint32 index = 0;
+		
+						// Convert the given path to an entry ref
+						streamError = stream.GetString(path);
+						if (!streamError) 
+							streamError = get_ref_for_path(path, &ref);
+							
+						// Add a new entry to the list for each application
+						// signature and rank we find
+						while (!streamError) {
+							if (!streamError)
+								streamError = stream.GetString(app);
+							if (!streamError) {
+								BPrivate::Storage::to_lower(app);
+								streamError = stream.GetString(rank);
+							}
+							if (!streamError) {
+								index = strtoul(rank, NULL, 10);
+								if (index == ULONG_MAX)
+									streamError = errno;
+							}
+							recent_entry *entry = NULL;
+							if (!streamError) {
+								entry = new(nothrow) recent_entry(&ref, app, index);
+								streamError = entry ? B_OK : B_NO_MEMORY;
+							}
+							if (!streamError) {
+								printf("pushing entry, leaf == '%s', app == '%s', index == %ld\n",
+								       entry->ref.name, entry->sig.c_str(), entry->index);
+								
+								list->push_back(entry);
+							}
+						}
+						
+						if (streamError) {
+							printf("entry error 0x%lx\n", streamError);
+							if (streamError != RosterSettingsCharStream::kEndOfLine
+							    && streamError != RosterSettingsCharStream::kEndOfStream)
+							stream.SkipLine();
+						}
+					
+						break;
+					}
+					
+				
+					case etApp:
+					{
+						char app[B_PATH_NAME_LENGTH];
+						streamError = stream.GetString(app);
+						if (!streamError) {
+							BPrivate::Storage::to_lower(app);
+							fRecentApps.fAppList.push_back(app);
+						} else
+							stream.SkipLine();
+						break;
+					}
+					
+					default:
+						// Something was amiss; skip to the next line
+						stream.SkipLine();
+						break;
+				}
+			
+			}
+		
+			if (streamError == RosterSettingsCharStream::kEndOfStream)
+				break;
+		}
+	
+		// Now we must sort our lists of documents and folders by the
+		// indicies we read for each entry (largest index first)
+		fRecentDocuments.fEntryList.sort(larger_index);
+		fRecentFolders.fEntryList.sort(larger_index);
+	
+		printf("----------------------------------------------------------------------\n");
+		fRecentDocuments.Print();
+		printf("----------------------------------------------------------------------\n");
+		fRecentFolders.Print();
+		printf("----------------------------------------------------------------------\n");
+		fRecentApps.Print();
+		printf("----------------------------------------------------------------------\n");
+	}
+	if (error)
+		D(PRINT(("WARNING: TRoster::_LoadRosterSettings(): error loading roster settings "
+		         "from '%s', 0x%lx\n", settingsPath, error)));		         
+	return error;
+}
+
+status_t
+TRoster::_SaveRosterSettings(const char *path)
+{
+	const char *settingsPath = path ? path : kDefaultRosterSettingsFile;
+
+	status_t error;
+	FILE* file;
+	
+	file = fopen(settingsPath, "w+");
+	error = file ? B_OK : errno;
+	if (!error) {
+		status_t saveError;
+		saveError = fRecentDocuments.Save(file, "Recent documents", "RecentDoc");
+		if (saveError)
+			D(PRINT(("TRoster::_SaveRosterSettings(): recent documents save failed "
+			         "with error 0x%lx\n", saveError)));
+		saveError = fRecentFolders.Save(file, "Recent folders", "RecentFolder");
+		if (saveError)
+			D(PRINT(("TRoster::_SaveRosterSettings(): recent folders save failed "
+			         "with error 0x%lx\n", saveError)));
+		saveError = fRecentApps.Save(file);
+		if (saveError)
+			D(PRINT(("TRoster::_SaveRosterSettings(): recent folders save failed "
+			         "with error 0x%lx\n", saveError)));
+		fclose(file);
+	}
+	
+	return error;
+}
+
+
+//------------------------------------------------------------------------------
+// Private local functions
+//------------------------------------------------------------------------------
+
+/*! \brief Returns true if entry1's index is larger than entry2's index.
+
+	Also returns true if either entry is \c NULL.
+	
+	Used for sorting the recent entry lists loaded from disk into the
+	proper order.
+*/
+bool
+larger_index(const recent_entry *entry1, const recent_entry *entry2)
+{
+	if (entry1 && entry2)
+		return entry1->index > entry2->index;
+	else
+		return true;
+}
 

@@ -32,6 +32,7 @@
 #include <AppFileInfo.h>
 #include <Entry.h>
 #include <File.h>
+#include <kernel_interface.h>	// From the Storage Kit
 #include <Message.h>
 #include <Mime.h>
 #include <Roster.h>
@@ -39,8 +40,7 @@
 #include <storage_support.h>
 
 #include <new>
-#include <stdio.h>
-#include <string>
+#include <map>
 
 #define DBG(x) (x)
 //#define DBG(x)
@@ -50,20 +50,22 @@
 // recent_entry
 //------------------------------------------------------------------------------
 
-/*! \brief An recent entry and the corresponding signature of the application
-	that launched/used/opened/viewed/whatevered it.
-*/
-struct recent_entry {
-	recent_entry(const entry_ref *ref, const char *appSig);	
-	entry_ref ref;
-	std::string sig;
-private:
-	recent_entry();
-};
+/*!	\struct recent_entry
 
-recent_entry::recent_entry(const entry_ref *ref, const char *appSig)
+	\brief A recent entry, the corresponding signature of the application
+	that launched/used/opened/viewed/whatevered it, and an index used for
+	keeping track of orderings when loading/storing the recent entries list
+	from/to disk.
+	
+*/
+
+/*! \brief Creates a new recent_entry object.
+*/
+recent_entry::recent_entry(const entry_ref *ref, const char *appSig,
+                           uint32 index)
 	: ref(ref ? *ref : entry_ref())
 	, sig(appSig)
+	, index(index)
 {	
 }
 
@@ -136,7 +138,7 @@ RecentEntries::Add(const entry_ref *ref, const char *appSig)
 		}
 		
 		// Add this entry to the front of the list
-		recent_entry *entry = new(nothrow) recent_entry(ref, appSig);
+		recent_entry *entry = new(nothrow) recent_entry(ref, appSig, 0);
 		error = entry ? B_OK : B_NO_MEMORY;
 		if (!error)
 			fEntryList.push_front(entry);	
@@ -229,13 +231,95 @@ RecentEntries::Print()
 	       item != fEntryList.end();
 	         item++)
 	{
-		printf("%d: device == '%ld', dir == '%lld', name == '%s', app == '%s'\n",
+		printf("%d: device == '%ld', dir == '%lld', name == '%s', app == '%s', index == %ld\n",
 		       counter++, (*item)->ref.device, (*item)->ref.directory, (*item)->ref.name,
-		       (*item)->sig.c_str());
+		       (*item)->sig.c_str(), (*item)->index);
 	}
 }
 
-// RecentEntries
+// Save
+status_t
+RecentEntries::Save(FILE* file, const char *description, const char *tag)
+{
+	status_t error = file ? B_OK : B_BAD_VALUE;
+	if (!error) {
+		fprintf(file, "# %s\n", description);
+
+		/*	In order to write our entries out in the format used by the
+			Roster settings file, we need to collect all the signatures
+			for each entry in one place, while at the same time updating
+			the index values for each entry/sig pair to reflect the current
+			ordering of the list. I believe this is the data structure
+			R5 actually maintains all the time, as their indices do not
+			change over time (whereas ours will). If our implementation
+			proves to be slower that R5, we may want to consider using
+			the data structure pervasively.
+		*/			
+		std::map<entry_ref, std::list<recent_entry*> > map;
+		uint32 count = fEntryList.size();
+		
+		for (std::list<recent_entry*>::iterator item = fEntryList.begin();
+		       item != fEntryList.end();
+		         count--, item++)
+		{
+			recent_entry *entry = *item;
+			if (entry) {
+				entry->index = count;
+				map[entry->ref].push_back(entry);				
+			} else {
+				DBG(OUT("WARNING: RecentEntries::Save(): The entry %ld entries "
+				        "from the front of fEntryList was found to be NULL\n",
+				        fEntryList.size() - count));
+			}			
+		}
+		
+		for (std::map<entry_ref, std::list<recent_entry*> >::iterator mapItem
+		     = map.begin();
+		       mapItem != map.end();
+		         mapItem++)
+		{
+			// We're going to need to properly escape the path name we
+			// get, which will at absolute worst double the length of
+			// the string.
+			char path[B_PATH_NAME_LENGTH];
+			char escapedPath[B_PATH_NAME_LENGTH*2];
+			status_t outputError = BPrivate::Storage::entry_ref_to_path(&mapItem->first,
+			                       path, B_PATH_NAME_LENGTH);
+			if (!outputError) {
+				BPrivate::Storage::escape_path(path, escapedPath);
+				fprintf(file, "%s %s", tag, escapedPath);
+				std::list<recent_entry*> &list = mapItem->second;
+				int32 i = 0;
+				for (std::list<recent_entry*>::iterator item = list.begin();
+				       item != list.end();
+				         i++, item++)
+				{
+					recent_entry *entry = *item;
+					if (entry) 
+						fprintf(file, " \"%s\" %ld", entry->sig.c_str(), entry->index);
+					else {
+						DBG(OUT("WARNING: RecentEntries::Save(): The entry %ld entries "
+						        "from the front of the compiled recent_entry* list for the "
+						        "entry ref (%ld, %lld, '%s') was found to be NULL\n",
+						        i, mapItem->first.device, mapItem->first.directory,
+						        mapItem->first.name));
+					}
+				}
+				fprintf(file, "\n");
+			} else {
+				DBG(OUT("WARNING: RecentEntries::Save(): entry_ref_to_path() failed on "
+				        "the entry_ref (%ld, %lld, '%s') with error 0x%lx\n",
+				        mapItem->first.device, mapItem->first.directory,
+				        mapItem->first.name, outputError));
+			}
+		}
+		fprintf(file, "\n");
+	}
+	return error;
+}
+
+
+// GetTypeForRef
 /*! \brief Fetches the file type of the given file.
 
 	If the file has no type, an empty string is returned. The file

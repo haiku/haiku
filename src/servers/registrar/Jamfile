@@ -18,6 +18,7 @@ Server obos_registrar :
 	RecentEntries.cpp
 	Registrar.cpp
 	RosterAppInfo.cpp
+	RosterSettingsCharStream.cpp
 	TRoster.cpp
 	Watcher.cpp
 	WatchingService.cpp
