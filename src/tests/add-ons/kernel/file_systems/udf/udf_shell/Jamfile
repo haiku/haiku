@@ -3,6 +3,8 @@ SubDir OBOS_TOP src tests add-ons kernel file_systems udf udf_shell ;
 SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems udf ;
 
+UsePrivateHeaders [ FDirName kernel util ] ;
+
 {
 	local defines = [ FDefines USER ] ; # DEBUG _NO_INLINE_ASM
 	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
@@ -15,14 +17,16 @@ SimpleTest udf_shell
 	sysdep.c hexdump.c argv.c 
 
 	cpp.cpp vfs_interface.cpp
-	CS0String.cpp DiskStructures.cpp Icb.cpp PartitionMap.cpp UdfDebug.cpp Volume.cpp 
+	CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
+	PartitionMap.cpp UdfDebug.cpp Utils.cpp Volume.cpp 
 	:
 	;
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
 		cpp.cpp vfs_interface.cpp 
-		CS0String.cpp DiskStructures.cpp Icb.cpp PartitionMap.cpp UdfDebug.cpp Volume.cpp 
+		CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
+		PartitionMap.cpp UdfDebug.cpp Utils.cpp Volume.cpp 
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
 
 SEARCH on [ FGristFiles
