@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.06-14, Rudolf)</h1></p>
+<p><h1>head (0.06-15, Rudolf)</h1></p>
 <ul>
 	<li>Updated modelist to include one more suggested mode for 800x600 resolution: Done by Andrew Bachmann;
 	<li>CRTC timing restriction checking updated: Modelists exported adhere to every cards max. CRTC capability now: the oldest cards support upto and including 1024x1000, while the newest cards support upto and including 1280x1024 resolution;
@@ -21,7 +21,8 @@
 	<li>Updated pixelPLL restrictions for NM2070 so external output refresh is OK;
 	<li>Added fixed sync polarity programming if flatpanel in use: needed to make sure centering actually works;
 	<li>Disabling centering if external only monitor mode is active: fixes some trouble on NM2070 and maybe others;
-	<li>Added panel modeline programming for NM2070 cards: fixes hardcursor trouble on panel!
+	<li>Added panel modeline programming for NM2070 cards: fixes hardcursor trouble on panel;
+	<li>Added pixelprecise panning for virtualscreens in all modes.
 </ul>
 Note:<br>
 Acceleration engine benchmarked and tested for errors with BeRoMeter V1.2.6.
