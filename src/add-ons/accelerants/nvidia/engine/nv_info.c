@@ -39,7 +39,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab);
 static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec);
 static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* exec);
-static void log_pll(uint32 reg);
+static void log_pll(uint32 reg, uint32 freq);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
 static void	setup_ram_config_nv10_up(uint8* rom);
 static void	setup_ram_config_nv28(uint8* rom);
@@ -441,7 +441,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				nv_dac_sys_pll_find(((float)data2), &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
 			}
-			log_pll(reg);
+			log_pll(reg, data2);
 			break;
 		case 0x5a:
 			*size -= 7;
@@ -744,7 +744,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				nv_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
 			}
-			log_pll(reg);
+			log_pll(reg, (data / 100));
 			break;
 		case 0x7a:
 			*size -= 9;
@@ -776,7 +776,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 	return result;
 }
 
-static void log_pll(uint32 reg)
+static void log_pll(uint32 reg, uint32 freq)
 {
 	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
 		LOG(8,("INFO: ---WARNING: check/update PLL programming script code!!!\n"));
@@ -784,9 +784,13 @@ static void log_pll(uint32 reg)
 	{
 	case NV32_MEMPLL:
 		LOG(8,("INFO: ---Memory PLL accessed.\n"));
+		/* update the card's specs */
+		si->ps.std_memory_clock = freq;
 		break;
 	case NV32_COREPLL:
 		LOG(8,("INFO: ---Core PLL accessed.\n"));
+		/* update the card's specs */
+		si->ps.std_engine_clock = freq;
 		break;
 	case NVDAC_PIXPLLC:
 		LOG(8,("INFO: ---DAC1 PLL accessed.\n"));
@@ -1056,16 +1060,16 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				uint8 m, n, p;
 				nv_dac_sys_pll_find((data2 / 100.0), &calced_clk, &m, &n, &p, 0);
 				/* programming the PLL needs to be done in steps! (confirmed NV28) */
-				data2 = NV_REG32(reg2);
-				NV_REG32(reg2) = ((data2 & 0xffff0000) | (n << 8) | m);
-				data2 = NV_REG32(reg2);
+				data = NV_REG32(reg2);
+				NV_REG32(reg2) = ((data & 0xffff0000) | (n << 8) | m);
+				data = NV_REG32(reg2);
 				NV_REG32(reg2) = ((p << 16) | (n << 8) | m);
 //fixme?
 				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
 //				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
 //					DACW(PIXPLLC2, 0x80000401);
 			}
-			log_pll(reg2);
+			log_pll(reg2, (data2 / 100));
 			*adress += size32;
 			break;
 		case 0x37: /* new */
@@ -1579,16 +1583,16 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				uint8 m, n, p;
 				nv_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
 				/* programming the PLL needs to be done in steps! (confirmed NV28) */
-				data = NV_REG32(reg);
-				NV_REG32(reg) = ((data & 0xffff0000) | (n << 8) | m);
-				data = NV_REG32(reg);
+				data2 = NV_REG32(reg);
+				NV_REG32(reg) = ((data2 & 0xffff0000) | (n << 8) | m);
+				data2 = NV_REG32(reg);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
 //fixme?
 				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
 //				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
 //					DACW(PIXPLLC2, 0x80000401);
 			}
-			log_pll(reg);
+			log_pll(reg, (data / 100));
 			break;
 		case 0x7a: /* identical to type1 */
 			*size -= 9;
