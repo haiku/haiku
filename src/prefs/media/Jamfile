@@ -11,4 +11,4 @@ Preference Media :
 	MediaListItem.cpp
 	MediaAlert.cpp ;
 
-LinkSharedOSLibs Media : be media ;
+LinkSharedOSLibs Media : media be ;
