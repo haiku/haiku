@@ -22,6 +22,7 @@ MallocBufferLengthTest::PerformTest(void)
 	size_t size;
 	size_t bufLen;
 	status_t error;
+	off_t offset;
 	char writeBuf[11] = "0123456789";
 	
 	NextSubTest();
@@ -39,6 +40,22 @@ MallocBufferLengthTest::PerformTest(void)
 	bufLen = mem.BufferLength();
 	CPPUNIT_ASSERT(bufLen == 0);
 	CPPUNIT_ASSERT(error == B_OK);
+	
+	//This is for the BResource crashing bug
+	NextSubTest();
+	error = mem.SetSize(200);
+	bufLen = mem.BufferLength();
+	offset = mem.Seek(0, SEEK_END);
+	CPPUNIT_ASSERT(bufLen == 200);
+	CPPUNIT_ASSERT(error == B_OK);
+	CPPUNIT_ASSERT(offset == 200);	
+	
+	NextSubTest();
+	offset = mem.Seek(0, SEEK_END);
+	error = mem.SetSize(100);
+	bufLen = mem.BufferLength();
+	CPPUNIT_ASSERT(bufLen == 100);
+	CPPUNIT_ASSERT(mem.Position() == offset);
 }
 
 
