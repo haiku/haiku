@@ -25,6 +25,15 @@
 #	include "tracker.h"
 #endif
 
+#define TRACE_KERNEL 0
+#if TRACE_KERNEL
+#	define FUNCTION() puts(__FUNCTION__)
+#	define TRACE(x...) printf(x)
+#else
+#	define FUNCTION()
+#	define TRACE(x...)
+#endif
+
 #include <sys/stat.h>
 
 #define     OMODE_MASK      (O_RDONLY | O_WRONLY | O_RDWR)
@@ -1597,12 +1606,13 @@ error1:
  */
 
 int
-sys_rstat(bool kernel, int fd, const char *path, struct my_stat *st,
-          bool eatlink)
+sys_rstat(bool kernel, int fd, const char *path, struct my_stat *st, bool eatlink)
 {
     int         err;
     vnode       *vn;
     op_rstat    *op;
+
+	FUNCTION();
 
     err = get_file_fd(kernel, fd, path, eatlink, &vn);
     if (err)
@@ -1719,7 +1729,8 @@ sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
         for(ans=nshead; ans; ans=ans->next)
             if ((ans->dev == dev) && (ans->ino == ino)) {
                 UNLOCK(vnlock);
-printf("KERNEL: trying to mount %s twice (already mounted as %s)\n", device, ans->fs->name);
+				printf("KERNEL: trying to mount %s twice (already mounted as %s)\n",
+					device, ans->fs->name);
                 err = ENODEV;
                 goto error4;
             }
@@ -1901,7 +1912,7 @@ sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong f
 	fsystem	*fs;
 	vnode	*root;
 
-	printf("sys_open_query() -- start\n");
+	TRACE("sys_open_query() -- start\n");
 	err = get_file_fd(TRUE, fd, path, TRUE, &root);
 	if (err)
 		return err;
@@ -1916,7 +1927,7 @@ sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong f
 		return EPERM;
 	}
 	err = (*fs->ops.open_query)(ns->data, query, flags, port, token, cookie);
-	printf("sys_open_query() -- end: %d\n",err);
+	TRACE("sys_open_query() -- end: %d\n",err);
 	dec_vnode(root, FALSE);
 
 	return err;
@@ -2132,6 +2143,8 @@ parse_path(vnode *bvn, char **pstart, char *path, int eatsymlink, vnode **vnp)
     vnode_id        vnid;
     vnode           *vn;
 
+	TRACE("parse_path(path = %s)\n", path);
+
     if (!path) {
         *vnp = bvn;
         return 0;
@@ -2249,8 +2262,10 @@ parse_path(vnode *bvn, char **pstart, char *path, int eatsymlink, vnode **vnp)
         bvn = vn;
     }
 
-    if (!err)
+    if (!err) {
+    	TRACE("parse_path() got vnode %Ld\n", bvn->vnid);
         *vnp = bvn;
+    }
 
     return err;
 }
@@ -2315,7 +2330,7 @@ restart:
 		// out if needed.
 
 		if (vn->busy) {
-			printf("new_vnode(): vnode exists and is busy!\n");
+			TRACE("new_vnode(): vnode exists and is busy!\n");
 			UNLOCK(vnlock);
 			snooze(5000);
 			LOCK(vnlock);
@@ -2429,6 +2444,8 @@ is_vnode_removed(nspace_id nsid, vnode_id vnid)
 static void
 inc_vnode(vnode *vn)
 {
+	TRACE("inc_vnode(id = %Ld)\n", vn->vnid);
+
     LOCK(vnlock);
     vn->rcnt++;
     UNLOCK(vnlock);
@@ -2441,6 +2458,7 @@ dec_vnode(vnode *vn, char r)
 
     LOCK(vnlock);
     vn->rcnt--;
+	TRACE("dec_vnode(): id = %Ld, rcnt = %d (after decreasing)\n", vn->vnid, vn->rcnt);
     if (vn->rcnt == 0) {
         if (vn->remove) {
             vn->busy = TRUE;
