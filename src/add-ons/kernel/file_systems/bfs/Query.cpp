@@ -10,7 +10,6 @@
 
 
 #include "Query.h"
-#include "cpp.h"
 #include "bfs.h"
 #include "Debug.h"
 #include "Stack.h"
@@ -19,6 +18,7 @@
 #include "BPlusTree.h"
 #include "Index.h"
 
+#include <kernel_cpp.h>
 #include <SupportDefs.h>
 #include <TypeConstants.h>
 #include <AppDefs.h>

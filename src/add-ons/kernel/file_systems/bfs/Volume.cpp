@@ -6,12 +6,12 @@
 
 
 #include "Debug.h"
-#include "cpp.h"
 #include "Volume.h"
 #include "Journal.h"
 #include "Inode.h"
 #include "Query.h"
 
+#include <kernel_cpp.h>
 #include <KernelExport.h>
 #include <fs_volume.h>
 

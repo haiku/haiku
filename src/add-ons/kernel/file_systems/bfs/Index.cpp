@@ -6,12 +6,12 @@
 
 
 #include "Debug.h"
-#include "cpp.h"
 #include "Index.h"
 #include "Volume.h"
 #include "Inode.h"
 #include "BPlusTree.h"
 
+#include <kernel_cpp.h>
 #include <TypeConstants.h>
 
 // B_MIME_STRING_TYPE is defined in storage/Mime.h, but we
@@ -185,7 +185,9 @@ Index::Create(Transaction *transaction, const char *name, uint32 type)
 			mode = S_DOUBLE_INDEX;
 			break;
 		case B_STRING_TYPE:
-		case B_MIME_STRING_TYPE: // XXX Note Index::Type() will always return B_STRING_TYPE.  
+		case B_MIME_STRING_TYPE:
+			// B_MIME_STRING_TYPE is the only supported non-standard type, but
+			// will be handled like a B_STRING_TYPE internally
 			mode = S_STR_INDEX;
 			break;
 		default:

@@ -24,10 +24,12 @@ oldOPTIM = $(OPTIM) ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
 }
 
+UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
+
 R5KernelAddon obfs : [ FDirName kernel file_systems bfs ] :
 	BlockAllocator.cpp
 	BPlusTree.cpp
-	cpp.cpp
+	kernel_cpp.cpp
 	Debug.cpp
 	Index.cpp
 	Inode.cpp
@@ -37,7 +39,13 @@ R5KernelAddon obfs : [ FDirName kernel file_systems bfs ] :
 	Utility.cpp
 	Volume.cpp
 	BufferPool.cpp
-;
+	;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp 
+	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+
+#-----------------------------------------------------
 
 rule InstallBFS
 {

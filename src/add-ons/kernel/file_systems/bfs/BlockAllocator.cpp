@@ -5,7 +5,6 @@
 */
 
 
-#include "cpp.h"
 #include "Debug.h"
 #include "BlockAllocator.h"
 #include "Volume.h"
@@ -14,7 +13,8 @@
 #include "Stack.h"
 #include "bfs_control.h"
 
-#include <malloc.h>
+#include <kernel_cpp.h>
+#include <stdlib.h>
 
 #ifdef USER
 #	define spawn_kernel_thread spawn_thread
