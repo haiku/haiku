@@ -4,6 +4,7 @@ INTERFACE_KIT_SOURCE =
 	BMCPrivate.cpp
 	Box.cpp
 	Button.cpp
+	ChannelControl.cpp
 	CheckBox.cpp
 	ClientFontList.cpp
 	ColorUtils.cc
