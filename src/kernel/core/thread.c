@@ -151,7 +151,7 @@ create_thread_struct(const char *name)
 	if (t == NULL) {
 		t = (struct thread *)malloc(sizeof(struct thread));
 		if (t == NULL)
-			goto err;
+			return NULL;
 	}
 
 	strlcpy(t->name, name, B_OS_NAME_LENGTH);
@@ -185,20 +185,20 @@ create_thread_struct(const char *name)
 
 	sprintf(temp, "thread_0x%lx_retcode_sem", t->id);
 	t->return_code_sem = create_sem(0, temp);
-	if (t->return_code_sem < 0)
+	if (t->return_code_sem < B_OK)
 		goto err1;
 
-	sprintf(temp, "%s data write sem", t->name);
+	sprintf(temp, "%s send", t->name);
 	t->msg.write_sem = create_sem(1, temp);
-	if (t->msg.write_sem < 0)
+	if (t->msg.write_sem < B_OK)
 		goto err2;
 
-	sprintf(temp, "%s data read sem", t->name);
+	sprintf(temp, "%s receive", t->name);
 	t->msg.read_sem = create_sem(0, temp);
-	if (t->msg.read_sem < 0)
+	if (t->msg.read_sem < B_OK)
 		goto err3;
 
-	if (arch_thread_init_thread_struct(t) < 0)
+	if (arch_thread_init_thread_struct(t) < B_OK)
 		goto err4;
 
 	return t;
@@ -210,28 +210,27 @@ err3:
 err2:
 	delete_sem_etc(t->return_code_sem, -1, false);
 err1:
+	// ToDo: put them in the dead queue instead?
 	free(t);
-err:
 	return NULL;
 }
 
 
 static void
-delete_thread_struct(struct thread *t)
+delete_thread_struct(struct thread *thread)
 {
-	if (t->return_code_sem >= 0)
-		delete_sem_etc(t->return_code_sem, -1, false);
-	if (t->msg.write_sem >= 0)
-		delete_sem_etc(t->msg.write_sem, -1, false);
-	if (t->msg.read_sem >= 0)
-		delete_sem_etc(t->msg.read_sem, -1, false);
-	free(t);
+	delete_sem_etc(thread->return_code_sem, -1, false);
+	delete_sem_etc(thread->msg.write_sem, -1, false);
+	delete_sem_etc(thread->msg.read_sem, -1, false);
+
+	// ToDo: put them in the dead queue instead?
+	free(thread);
 }
 
 
 /** Initializes the thread and jumps to its userspace entry point.
  *	This function is called at creation time of every user thread,
- *	but not for the team's main threads.
+ *	but not for a team's main thread.
  */
 
 static int
@@ -240,12 +239,12 @@ _create_user_thread_kentry(void)
 	struct thread *thread = thread_get_current_thread();
 
 	// a signal may have been delivered here
+	// ToDo: this looks broken
 //	thread_atkernel_exit();
 	// start tracking kernel & user time
 	thread->last_time = system_time();
 	thread->last_time_type = KERNEL_TIME;
 	thread->in_kernel = false;
-
 	// jump to the entry point in user space
 	arch_thread_enter_uspace(thread, (addr_t)thread->entry, thread->args1, thread->args2);
 
@@ -280,19 +279,31 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 	struct thread *t;
 	struct team *team;
 	cpu_status state;
-	char stack_name[64];
+	char stack_name[B_OS_NAME_LENGTH];
+	status_t status;
 	bool abort = false;
-	addr_t mainThreadStackBase = USER_STACK_REGION + USER_STACK_REGION_SIZE;
 
 	t = create_thread_struct(name);
 	if (t == NULL)
-		return ENOMEM;
+		return B_NO_MEMORY;
 
 	t->priority = priority == -1 ? B_NORMAL_PRIORITY : priority;
-	// ToDo: revisit this one - the thread might go to early to B_THREAD_SUSPENDED
-//	t->state = THREAD_STATE_BIRTH;
-	t->state = B_THREAD_SUSPENDED;	// Is this right?
+	// ToDo: this could be dangerous in case someone calls resume_thread() on us
+	t->state = B_THREAD_SUSPENDED;
 	t->next_state = B_THREAD_SUSPENDED;
+
+	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_kstack", name, t->id);
+	t->kernel_stack_region_id = create_area(stack_name, (void **)&t->kernel_stack_base,
+		B_ANY_KERNEL_ADDRESS, KSTACK_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
+	if (t->kernel_stack_region_id < 0) {
+		// we're not yet part of a team, so we can just bail out
+		dprintf("create_thread: error creating kernel stack!\n");
+
+		status = t->kernel_stack_region_id;
+		delete_thread_struct(t);
+		return status;
+	}
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -309,9 +320,6 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 	else
 		abort = true;
 
-	if (!kernel && team->main_thread)
-		mainThreadStackBase = team->main_thread->user_stack_base;
-
 	RELEASE_TEAM_LOCK();
 	if (abort) {
 		GRAB_THREAD_LOCK();
@@ -320,20 +328,15 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 	}
 	restore_interrupts(state);
 	if (abort) {
+		delete_area(t->kernel_stack_region_id);
 		delete_thread_struct(t);
 		return B_BAD_TEAM_ID;
 	}
 
-	sprintf(stack_name, "%s_kstack", name);
-	t->kernel_stack_region_id = create_area(stack_name, (void **)&t->kernel_stack_base,
-		B_ANY_KERNEL_ADDRESS, KSTACK_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-
-	if (t->kernel_stack_region_id < 0)
-		panic("_create_thread: error creating kernel stack!\n");
-
 	t->args1 = args1;
 	t->args2 = args2;
 	t->entry = entry;
+	status = t->id;
 
 	if (kernel) {
 		// this sets up an initial kthread stack that runs the entry
@@ -344,32 +347,23 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 	} else {
 		// create user stack
 
-		// ToDo: make this better. For now just keep trying to create a stack
-		//		until we find a spot.
-		//		-> implement B_BASE_ADDRESS for create_area() and use that one!
-		//		(we can then also eliminate the mainThreadStackBase variable)
-
-		// ToDo: should we move the stack creation to _create_user_thread_kentry()?
-
 		// the stack will be between USER_STACK_REGION and the main thread stack area
 		// (the user stack of the main thread is created in team_create_team())
 		t->user_stack_base = USER_STACK_REGION;
 
-		while (t->user_stack_base < mainThreadStackBase) {
-			sprintf(stack_name, "%s_stack%ld", team->name, t->id);
-			t->user_stack_region_id = create_area_etc(team, stack_name,
-				(void **)&t->user_stack_base, B_EXACT_ADDRESS,
+		snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_stack", name, t->id);
+		t->user_stack_region_id = create_area_etc(team, stack_name,
+				(void **)&t->user_stack_base, B_BASE_ADDRESS,
 				STACK_SIZE + TLS_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-			if (t->user_stack_region_id >= 0)
-				break;
-
-			t->user_stack_base += STACK_SIZE + TLS_SIZE;
+		if (t->user_stack_region_id < 0) {
+			// great, we have a fully running thread without a stack
+			dprintf("create_thread: unable to create user stack!\n");
+			status = t->user_stack_region_id;
+			kill_thread(t->id);
+		} else {
+			// now that the TLS area is allocated, initialize TLS
+			arch_thread_init_tls(t);
 		}
-		if (t->user_stack_region_id < 0)
-			panic("_create_thread: unable to create user stack!\n");
-
-		// now that the TLS area is allocated, initialize TLS
-		arch_thread_init_tls(t);
 
 		// copy the user entry over to the args field in the thread struct
 		// the function this will call will immediately switch the thread into
@@ -377,9 +371,7 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 		arch_thread_init_kthread_stack(t, &_create_user_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
 	}
 
-	t->state = B_THREAD_SUSPENDED;
-
-	return t->id;
+	return status;
 }
 
 
@@ -609,7 +601,7 @@ get_death_stack(uint32 *_stack)
 static void
 put_death_stack_and_reschedule(uint32 index)
 {
-	TRACE(("put_death_stack...: passed %d\n", index));
+	TRACE(("put_death_stack...: passed %lu\n", index));
 
 	if (index >= sNumDeathStacks)
 		panic("put_death_stack: passed invalid stack index %d\n", index);
@@ -890,20 +882,25 @@ void
 thread_atkernel_exit(void)
 {
 	cpu_status state;
-	int global_resched;
 	struct thread *t;
 	bigtime_t now;
 
 	TRACE(("thread_atkernel_exit: entry\n"));
+
+	// ToDo: this may be broken (when it is called, and what exactly should it do...)
 
 	t = thread_get_current_thread();
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	global_resched = handle_signals(t, state);
+	if (handle_signals(t, state))
+		scheduler_reschedule();
+	// was: smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 
 	t->in_kernel = false;
+
+	RELEASE_THREAD_LOCK();
 
 	// track kernel time
 	now = system_time();
@@ -911,11 +908,7 @@ thread_atkernel_exit(void)
 	t->last_time = now;
 	t->last_time_type = USER_TIME;
 
-	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
-
-	if (global_resched)
-		smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 }
 
 
@@ -1099,11 +1092,23 @@ spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority, 
 //	public kernel exported functions
 
 
+void
+exit_thread(status_t returnValue)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	thread->return_code = returnValue;
+	thread->return_flags = THREAD_RETURN_EXIT;
+
+	send_signal_etc(thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+}
+
+
 status_t
 kill_thread(thread_id id)
 {
 	status_t status = send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
-	if (status < 0)
+	if (status < B_OK)
 		return status;
 
 	if (id != thread_get_current_thread()->id)
@@ -1603,14 +1608,9 @@ setrlimit(int resource, const struct rlimit * rlp)
 
 
 void
-_user_exit_thread(status_t return_value)
+_user_exit_thread(status_t returnValue)
 {
-	struct thread *thread = thread_get_current_thread();
-
-	thread->return_code = return_value;
-	thread->return_flags = THREAD_RETURN_EXIT;
-
-	send_signal_etc(thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+	exit_thread(returnValue);
 }
 
 
