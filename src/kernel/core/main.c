@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -29,6 +29,7 @@
 #include <cpu.h>
 #include <devs.h>
 #include <bus.h>
+#include <kdriver_settings.h>
 #include <kmodule.h>
 #include <int.h>
 #include <team.h>
@@ -101,9 +102,12 @@ _start(kernel_args *oldka, int cpu_num)
 			// the boot loader allocated region is not used anymore
 
 		// now we can use the heap and create areas
+		TRACE(("init driver_settings\n"));
+		driver_settings_init(&ka);
 		debug_init_post_vm(&ka);
 		int_init_post_vm(&ka);
 		cpu_init_post_vm(&ka);
+		TRACE(("init system info\n"));
 		system_info_init(&ka);
 
 		TRACE(("init faults\n"));
@@ -121,6 +125,8 @@ _start(kernel_args *oldka, int cpu_num)
 		// now we can create and use semaphores
 		TRACE(("init VM semaphores\n"));
 		vm_init_post_sem(&ka);
+		TRACE(("init driver_settings\n"));
+		driver_settings_init_post_sem(&ka);
 		TRACE(("init generic syscall\n"));
 		generic_syscall_init();
 		TRACE(("init cbuf\n"));
