@@ -50,7 +50,7 @@
 // Project Includes ------------------------------------------------------------
 #include <LooperList.h>
 #include <ObjectLocker.h>
-#include <PortLink.h>
+#include <AppServerLink.h>
 #include <ServerProtocol.h>
 
 // Local Includes --------------------------------------------------------------
@@ -374,36 +374,35 @@ BHandler* BApplication::ResolveSpecifier(BMessage* msg, int32 index,
 //------------------------------------------------------------------------------
 void BApplication::ShowCursor()
 {
-	// Because we're just sending an opcode, we can skip the PortLink and simply
-	// call write_port top the server communications port.
-	write_port(fServerTo,AS_SHOW_CURSOR,NULL,0);
+	// Because we're just sending an opcode, we can skip the BSession and fake the protocol
+	int32 foo=AS_SHOW_CURSOR;
+	write_port(fServerTo,AS_SERVER_SESSION,&foo,sizeof(int32));
 }
 //------------------------------------------------------------------------------
 void BApplication::HideCursor()
 {
-	// Because we're just sending an opcode, we can skip the PortLink and simply
-	// call write_port top the server communications port.
-	write_port(fServerTo,AS_HIDE_CURSOR,NULL,0);
+	// Because we're just sending an opcode, we can skip the BSession and fake the protocol
+	int32 foo=AS_HIDE_CURSOR;
+	write_port(fServerTo,AS_SERVER_SESSION,&foo,sizeof(int32));
 }
 //------------------------------------------------------------------------------
 void BApplication::ObscureCursor()
 {
-	PortLink *link=new PortLink(fServerTo);
-	link->SetOpCode(AS_OBSCURE_CURSOR);
-	link->Flush();
-	delete link;
+	// Because we're just sending an opcode, we can skip the BSession and fake the protocol
+	int32 foo=AS_OBSCURE_CURSOR;
+	write_port(fServerTo,AS_SERVER_SESSION,&foo,sizeof(int32));
 }
 //------------------------------------------------------------------------------
 bool BApplication::IsCursorHidden() const
 {
-	PortLink::ReplyData data;
+	int32 replycode;
 	
-	PortLink *link=new PortLink(fServerTo);
-	link->SetOpCode(AS_QUERY_CURSOR_HIDDEN);
-	link->FlushWithReply(&data);
-	delete link;
-	
-	return (data.code==SERVER_TRUE)?true:false;
+	BPrivate::BAppServerLink link;
+	link.WriteInt32(AS_QUERY_CURSOR_HIDDEN);
+	link.WriteInt32(link.GetRecvPort());
+	link.Sync();
+	link.ReadInt32(&replycode);
+	return (replycode==SERVER_TRUE)?true:false;
 }
 //------------------------------------------------------------------------------
 void BApplication::SetCursor(const void* cursor)
@@ -417,13 +416,19 @@ void BApplication::SetCursor(const void* cursor)
 //------------------------------------------------------------------------------
 void BApplication::SetCursor(const BCursor* cursor, bool sync)
 {
-	// TODO: add sync support - working on updating FlushWithReply --DW
-	PortLink *link=new PortLink(fServerTo);
-	link->SetOpCode(AS_SET_CURSOR_BCURSOR);
-	link->Attach<bool>(sync);
-	link->Attach<int32>(cursor->m_serverToken);
-	link->Flush();
-	delete link;
+	BPrivate::BAppServerLink link;
+	link.WriteInt32(AS_SET_CURSOR_BCURSOR);
+	link.WriteBool(sync);
+	link.WriteInt32(cursor->m_serverToken);
+	if(sync)
+		link.WriteInt32(link.GetRecvPort());
+	link.Sync();
+
+	if(sync)
+	{
+		int32 foo;
+		link.ReadInt32(&foo);
+	}
 }
 //------------------------------------------------------------------------------
 int32 BApplication::CountWindows() const
@@ -753,24 +758,23 @@ void BApplication::InitData(const char* signature, status_t* error)
 			// Attach data:
 			// 1) port_id - receiver port of a regular app
 			// 2) char * - signature of the regular app
-			PortLink::ReplyData replydata;
+			port_id srcv=create_port(100,"BApp reply port");
+			BSession session(srcv,fServerTo);
+			session.WriteInt32(AS_CREATE_APP);
+			session.WriteInt32(fServerTo);
+			session.WriteInt32(_get_object_token_(this));
+			session.WriteData(signature,strlen(signature)+1);
+			session.Sync();
 			
-			PortLink *link=new PortLink(fServerFrom);
-			link->SetOpCode(AS_CREATE_APP);
-			link->Attach<int32>((int32)fServerTo);
-			link->Attach<int32>(_get_object_token_(this));
-			link->Attach((char*)signature,strlen(signature)+1);
-			status_t replyerr=link->FlushWithReply(&replydata);
-			if(replyerr==B_OK)
-			{
-				// Reply code: AS_CREATE_APP
-				// Reply data:
-				//	1) port_id server-side application port (fServerFrom value)
-				fServerFrom=*((port_id*)replydata.buffer);
-			}
-			else
-				fInitError=replyerr;
-			delete link;
+			port_id serverapp_port;
+			session.ReadInt32(&serverapp_port);
+			
+			// Reply code: AS_CREATE_APP
+			// Reply data:
+			//	1) port_id server-side application port (fServerFrom value)
+			fServerFrom=serverapp_port;
+			
+			delete_port(srcv);
 		}
 		else
 			fInitError=fServerTo;
@@ -800,19 +804,17 @@ void BApplication::InitData(const char* signature, status_t* error)
 //------------------------------------------------------------------------------
 void BApplication::BeginRectTracking(BRect r, bool trackWhole)
 {
-	PortLink *link=new PortLink(fServerTo);
-	link->SetOpCode(AS_BEGIN_RECT_TRACKING);
-	link->Attach<BRect>(r);
-	link->Attach<int32>(trackWhole);
-	link->Flush();
-	delete link;
+	BPrivate::BAppServerLink link;
+	link.WriteInt32(AS_BEGIN_RECT_TRACKING);
+	link.WriteRect(r);
+	link.WriteInt32(trackWhole);
+	link.Sync();
 }
 //------------------------------------------------------------------------------
 void BApplication::EndRectTracking()
 {
-	// Because we're just sending an opcode, we can skip the PortLink and simply
-	// call write_port top the server communications port.
-	write_port(fServerTo,AS_END_RECT_TRACKING,NULL,0);
+	int32 foo=AS_END_RECT_TRACKING;
+	write_port(fServerTo,AS_SERVER_SESSION,&foo,sizeof(int32));
 }
 //------------------------------------------------------------------------------
 void BApplication::get_scs()
@@ -840,15 +842,6 @@ void* BApplication::global_ro_offs_to_ptr(uint32 offset)
 //------------------------------------------------------------------------------
 void BApplication::connect_to_app_server()
 {
-	// TODO: implement. Working on updated FlushWithReply -- DW
-	//	1) get the app_server's main message port - find_port on SERVER_PORT_NAME
-	//	2) create a portlink pointed at the server
-	//	3) attach application's "inbox" port
-	//	4) attach length of signature
-	//	5) attach signature
-	//	6) set opcode to AS_CREATE_APP, Flush(), and wait for reply
-	//	7) receive from the server the message with the buffer being a port_id *.
-	//	8) set fServerTo to the value of the returned port_id
 }
 //------------------------------------------------------------------------------
 void BApplication::send_drag(BMessage* msg, int32 vs_token, BPoint offset, BRect drag_rect, BHandler* reply_to)
