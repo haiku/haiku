@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 #ifndef ROOT_FILE_SYSTEM_H
@@ -7,6 +7,9 @@
 
 
 #include <boot/vfs.h>
+#include <boot/partitions.h>
+
+using namespace boot;
 
 
 class RootFileSystem : public Directory {
@@ -24,14 +27,17 @@ class RootFileSystem : public Directory {
 		virtual status_t Rewind(void *cookie);
 		virtual bool IsEmpty();
 
-		status_t AddVolume(Directory *volume);
+		status_t AddVolume(Directory *volume, Partition *partition);
 		status_t AddLink(const char *name, Directory *target);
+
+		status_t GetPartitionFor(Directory *volume, Partition **_partition);
 
 	private:
 		struct entry {
 			DoublyLinked::Link	link;
 			const char	*name;
 			Directory	*root;
+			Partition	*partition;
 		};
 		typedef DoublyLinked::Iterator<entry, &entry::link> EntryIterator;
 		typedef DoublyLinked::List<entry, &entry::link> EntryList;

@@ -129,7 +129,7 @@ RootFileSystem::IsEmpty()
 
 
 status_t 
-RootFileSystem::AddVolume(Directory *volume)
+RootFileSystem::AddVolume(Directory *volume, Partition *partition)
 {
 	struct entry *entry = new RootFileSystem::entry();
 	if (entry == NULL)
@@ -138,6 +138,7 @@ RootFileSystem::AddVolume(Directory *volume)
 	volume->Acquire();
 	entry->name = NULL;
 	entry->root = volume;
+	entry->partition = partition;
 
 	fList.Add(entry);
 
@@ -159,5 +160,22 @@ RootFileSystem::AddLink(const char *name, Directory *target)
 	fLinks.Add(entry);
 
 	return B_OK;
+}
+
+
+status_t 
+RootFileSystem::GetPartitionFor(Directory *volume, Partition **_partition)
+{
+	EntryIterator iterator = fList.Iterator();
+	struct entry *entry;
+
+	while ((entry = iterator.Next()) != NULL) {
+		if (entry->root == volume) {
+			*_partition = entry->partition;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
