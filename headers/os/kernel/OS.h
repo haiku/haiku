@@ -145,8 +145,12 @@ typedef struct sem_info {
 /* semaphore flags */
 enum {
 	B_CAN_INTERRUPT		= 1,	/* acquisition of the semaphore can be interrupted (system use only) */
-	B_DO_NOT_RESCHEDULE	= 2,	/* thread is not rescheduled after release_sem_etc() */
 	B_CHECK_PERMISSION	= 4,	/* ownership will be checked (system use only) */
+
+	/* release_sem_etc() only flags */
+	B_DO_NOT_RESCHEDULE	= 2,	/* thread is not rescheduled */
+	B_RELEASE_ALL		= 8,	/* all waiting threads will be woken up, count will be zeroed */
+	B_RELEASE_IF_WAITING_ONLY = 16,	/* release count only if there are any threads waiting */
 };
 
 extern sem_id	create_sem(int32 count, const char *name);
