@@ -56,7 +56,9 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	
 	cursorset=new CursorSet("Default");
 	
-/*	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
+/*
+	// Code disabled -- cursor set management belongs in another app
+	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
 
 	settings_menu=new BMenu("Settings");
 	settings_menu->AddItem(new BMenuItem("Save Cursor Set",new BMessage(SAVE_CURSORSET),'S'));
@@ -78,11 +80,14 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	BRect wellrect(0,0,20,20);
 	wellrect.OffsetTo(10,25);
 	wellrect.right=wellrect.left+50;
-//	cursorset_label=new BStringView(wellrect,"cursorset_label","Cursor Set: ");
-//	AddChild(cursorset_label);
-//	cursorset_label->ResizeToPreferred();
-//	cursorset_name="<untitled>";
-
+	
+/*
+	// Code disabled -- cursor set management belongs in another app
+	cursorset_label=new BStringView(wellrect,"cursorset_label","Cursor Set: ");
+	AddChild(cursorset_label);
+	cursorset_label->ResizeToPreferred();
+	cursorset_name="<untitled>";
+*/
 
 	// Set up list of cursor attributes
 	BRect cvrect;
@@ -145,7 +150,6 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	BEntry entry(COLOR_SET_DIR);
 	entry_ref ref;
 	entry.GetRef(&ref);
-//	savepanel=new BFilePanel(B_SAVE_PANEL, NULL,&ref, 0, false);
 
 	attribute=B_PANEL_BACKGROUND_COLOR;
 	attrstring="Background";
@@ -155,7 +159,6 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 CurView::~CurView(void)
 {
-//	delete savepanel;
 	delete cursorset;
 }
 
@@ -166,11 +169,8 @@ void CurView::AllAttached(void)
 	apply->SetTarget(this);
 	defaults->SetTarget(this);
 	revert->SetTarget(this);
-//	settings_menu->SetTargetForItems(this);
-//	cursorset_menu->SetTargetForItems(this);
 	bmpview->SetTarget(this);
 	BMessenger msgr(this);
-//	savepanel->SetTarget(msgr);
 }
 
 void CurView::MessageReceived(BMessage *msg)
@@ -207,6 +207,7 @@ void CurView::MessageReceived(BMessage *msg)
 }
 
 /*
+// Code disabled -- cursor set management belongs in another app
 BMenu *CurView::LoadCursorSets(void)
 {
 #ifdef DEBUG_CURSORSET
@@ -376,12 +377,7 @@ printf("Couldn't open file %s for read\n",path.String());
 #endif
 		SetDefaults();
 		SaveSettings();
-		return;
 	}
-
-//	settings.FindString("name",&cursorset_name);
-//	SetCursorSetName(cursorset_name.String());
-//	prev_set_name=cursorset_name;
 	return;
 }
 

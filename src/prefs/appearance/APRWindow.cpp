@@ -61,11 +61,12 @@ APRWindow::APRWindow(BRect frame)
 	colors->Hide();
 
 	// TODO: Finish CurView
-	listview->AddItem(new BStringItem("Cursors"));
+/*	listview->AddItem(new BStringItem("Cursors"));
 	cursors=new CurView(r,"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
 	topview->AddChild(cursors);
 	viewlist.AddItem(cursors);
 	cursors->Hide();
+*/
 
 	listview->AddItem(new BStringItem("Decorators"));
 	decorators=new DecView(r,"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
@@ -91,7 +92,7 @@ APRWindow::APRWindow(BRect frame)
 //	viewlist.AddItem(menuview);
 //	menuview->Hide();
 
-	listview->Select(0);
+	listview->Select(1);
 }
 
 bool APRWindow::QuitRequested()

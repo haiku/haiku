@@ -69,7 +69,9 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	currentset=new ColorSet;
 	prevset=NULL;
 	
-/*	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
+/*
+	// This disabled code block is being saved for a color set app
+	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
 
 	settings_menu=new BMenu("Settings");
 	settings_menu->AddItem(new BMenuItem("Save Color Set",new BMessage(SAVE_COLORSET),'S'));
@@ -90,7 +92,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 */
 
 	// Set up list of color attributes
-	BRect rect(10,10,200,100);
+	BRect rect(10,10,200,175);
 	attrlist=new BListView(rect,"AttributeList");
 	
 	scrollview=new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |
@@ -169,7 +171,6 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	BEntry entry(COLOR_SET_DIR);
 	entry_ref ref;
 	entry.GetRef(&ref);
-//	savepanel=new BFilePanel(B_SAVE_PANEL, NULL, &ref, 0, false);
 
 	attribute=B_PANEL_BACKGROUND_COLOR;
 	attrstring="Panel Background";
@@ -178,7 +179,6 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 APRView::~APRView(void)
 {
-//	delete savepanel;
 	if(currentset)
 		delete currentset;
 	if(prevset)
@@ -193,12 +193,9 @@ void APRView::AllAttached(void)
 	apply->SetTarget(this);
 	defaults->SetTarget(this);
 	revert->SetTarget(this);
-//	settings_menu->SetTargetForItems(this);
-//	colorset_menu->SetTargetForItems(this);
 	colorwell->SetTarget(this);
 
 	BMessenger msgr(this);
-//	savepanel->SetTarget(msgr);
 	picker->SetValue(currentset->StringToColor(attrstring.String()).GetColor32());
 }
 
@@ -218,7 +215,10 @@ void APRView::MessageReceived(BMessage *msg)
 
 	switch(msg->what)
 	{
-/*		case DELETE_COLORSET:
+/*
+	// More code being saved for a color set app
+
+		case DELETE_COLORSET:
 		{
 			// We can't delete the Default set
 			if(currentset->name.Compare("Default")==0)
@@ -289,7 +289,10 @@ void APRView::MessageReceived(BMessage *msg)
 			SaveColorSet(name);
 			break;
 		}
-*/		case UPDATE_COLOR:
+
+	// end disabled colorset code
+*/
+		case UPDATE_COLOR:
 		{
 			// Received from the color picker when its color changes
 			if(!prevset)
@@ -344,7 +347,7 @@ void APRView::MessageReceived(BMessage *msg)
 			NotifyServer();
 			break;
 		}
-/*		case TRY_SETTINGS:
+		case TRY_SETTINGS:
 		{
 			// Tell server to apply settings here without saving them.
 			// Theoretically, the user can set this temporarily and keep it
@@ -352,7 +355,7 @@ void APRView::MessageReceived(BMessage *msg)
 			NotifyServer();
 			break;
 		}
-*/		case REVERT_SETTINGS:
+		case REVERT_SETTINGS:
 		{
 			delete currentset;
 			currentset=prevset;
@@ -399,6 +402,10 @@ void APRView::MessageReceived(BMessage *msg)
 }
 
 /*
+
+// This section is commented out because Appearance doesn't manage color sets. That
+// task is better left to another application.
+
 BMenu *APRView::LoadColorSets(void)
 {
 	STRACE(("Loading color sets from disk\n"));
@@ -532,6 +539,7 @@ void APRView::LoadColorSet(const BString &name)
 }
 
 /*
+// More code being saved for a color set app
 void APRView::SaveColorSet(const BString &name)
 {
 
@@ -577,6 +585,7 @@ void APRView::SaveColorSet(const BString &name)
 		SaveSettings();
 }
 
+// More code being saved for a color set app
 void APRView::SetColorSetName(const char *name)
 {
 	if(!name)
@@ -612,8 +621,7 @@ void APRView::LoadSettings(void)
 	// Load the current GUI color settings from disk. This is done instead of
 	// getting them from the server at this point for testing purposes.
 
-/*	TODO: Uncomment the following disabled code when the app_server will handle the message
-
+#ifndef RUN_WITHOUT_APP_SERVER
 	// Query the server for the current settings
 	port_id port=find_port(SERVER_PORT_NAME);
 	if(port!=B_NAME_NOT_FOUND)
@@ -629,7 +637,7 @@ void APRView::LoadSettings(void)
 	}
 	else
 	{
-*/
+#endif
 		STRACE(("Loading settings from disk\n"));
 		
 		BDirectory dir,newdir;
@@ -661,9 +669,12 @@ void APRView::LoadSettings(void)
 		}
 
 		currentset->ConvertFromMessage(&settings);
-//	}
+
+#ifndef RUN_WITHOUT_APP_SERVER
+	}
 
 //	SetColorSetName(currentset->name.String());
+#endif
 	
 	UpdateControlsFromAttr(attrstring.String());
 	
@@ -678,11 +689,11 @@ void APRView::SetDefaults(void)
 	currentset->name.SetTo("Default");
 
 	currentset->SetToDefaults();
-//	SetColorSetName("Default");
 }
 
 void APRView::NotifyServer(void)
 {
+#ifndef RUN_WITHOUT_APP_SERVER
 	// Send a message to the app_server with the settings which we have.
 
 	port_id port=find_port(SERVER_PORT_NAME);
@@ -700,6 +711,7 @@ void APRView::NotifyServer(void)
 	// We also need to send the message to the window so that the Decorators tab updates itself
 	if(Window())
 		Window()->PostMessage(SET_UI_COLORS);
+#endif
 }
 
 void APRView::UpdateControlsFromAttr(const char *string)

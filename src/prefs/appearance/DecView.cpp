@@ -119,7 +119,6 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 			decorator->SetDriver(driver);
 			decorator->SetTitle(path.String());
 			decorator->SetColors(colorset);
-			decorator->Draw();
 		}
 	}
 }
@@ -137,6 +136,14 @@ void DecView::AllAttached(void)
 	declist->SetTarget(this);
 	apply->SetTarget(this);
 	LoadSettings();
+	
+	BRegion clip;
+	if(decorator)
+	{
+		decorator->GetFootprint(&clip);
+		driver->View()->ConstrainClippingRegion(&clip);
+		decorator->Draw();
+	}
 }
 
 void DecView::MessageReceived(BMessage *msg)
@@ -176,6 +183,10 @@ void DecView::MessageReceived(BMessage *msg)
 				decorator->SetFocus(true);
 				decorator->SetTitle(path.String());
 				decorator->SetColors(colorset);
+				
+				BRegion clip;
+				decorator->GetFootprint(&clip);
+				driver->View()->ConstrainClippingRegion(&clip);
 				decorator->Draw();
 			}
 			break;
