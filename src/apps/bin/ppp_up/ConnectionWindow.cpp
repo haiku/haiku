@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2004-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,8 +11,8 @@
 
 ConnectionWindow::ConnectionWindow(BRect frame, const char *name, ppp_interface_id id,
 		thread_id replyThread)
-	: BWindow(frame, "", B_MODAL_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+	: BWindow(frame, "", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE,
+		B_ALL_WORKSPACES)
 {
 	BString title("Connecting to ");
 	title << "\"" << name << "\"...";

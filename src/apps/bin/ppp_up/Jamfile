@@ -10,8 +10,11 @@ AddResources ppp_up : ppp_up.rdef ;
 BinCommand ppp_up :
 	ConnectionView.cpp
 	ConnectionWindow.cpp
+	PPPDeskbarReplicant.cpp
 	PPPUpAddon.cpp
 	PPPUpApplication.cpp
+	StatusView.cpp
+	StatusWindow.cpp
 ;
 
 LinkSharedOSLibs ppp_up : libptpnet.a libppp.a be ;

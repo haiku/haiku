@@ -33,6 +33,7 @@ static const char *kLabelName = "Username: ";
 static const char *kLabelPassword = "Password: ";
 static const char *kLabelConnect = "Connect";
 static const char *kLabelCancel = "Cancel";
+static const char *kLabelAuthentication = "Authentication";
 
 // connection status strings
 static const char *kTextConnecting = "Connecting...";
@@ -78,20 +79,16 @@ ConnectionView::ConnectionView(BRect rect, const char *name, ppp_interface_id id
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	BRect rect = Bounds();
+	rect = Bounds();
 	rect.InsetBy(5, 5);
 	rect.bottom = rect.top
 		+ 25 // space for topmost control
 		+ 3 * 20 // size of controls
 		+ 3 * 5; // space beween controls and bottom of box
 	BBox *authenticationBox = new BBox(rect, "Authentication");
+	authenticationBox->SetLabel(kLabelAuthentication);
 	rect = authenticationBox->Bounds();
-	rect.InsetBy(10, 5);
-	rect.top = 25;
-	BView *authenticationView = new BView(rect, "authenticationView",
-		B_FOLLOW_NONE, 0);
-	authenticationView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	rect = authenticationView->Bounds();
+	rect.InsetBy(10, 20);
 	rect.bottom = rect.top + 20;
 	fUsername = new BTextControl(rect, "username", kLabelName, NULL, NULL);
 	rect.top = rect.bottom + 5;
@@ -109,10 +106,9 @@ ConnectionView::ConnectionView(BRect rect, const char *name, ppp_interface_id id
 	rect.bottom = rect.top + 20;
 	fSavePassword = new BCheckBox(rect, "SavePassword", kLabelSavePassword, NULL);
 	
-	authenticationView->AddChild(fUsername);
-	authenticationView->AddChild(fPassword);
-	authenticationView->AddChild(fSavePassword);
-	authenticationBox->AddChild(authenticationView);
+	authenticationBox->AddChild(fUsername);
+	authenticationBox->AddChild(fPassword);
+	authenticationBox->AddChild(fSavePassword);
 	AddChild(authenticationBox);
 	
 	rect = authenticationBox->Frame();

@@ -1,9 +1,10 @@
 /*
- * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Copyright 2004-2005, Waldemar Kornewald <Waldemar.Kornewald@web.de>
  * Distributed under the terms of the MIT License.
  */
 
-#include <Application.h>
+#include "PPPUpApplication.h"
+
 #include <Window.h>
 
 #include "DialUpView.h"
@@ -11,40 +12,8 @@
 #include <KPPPUtils.h>
 #include <PPPReportDefs.h>
 
-
-static const char *kSignature = "application/x-vnd.haiku.ppp_up";
-
-extern "C" _EXPORT BView *instantiate_deskbar_item();
-
-
-class PPPUpApplication : public BApplication {
-	public:
-		PPPUpApplication(const char *name, ppp_interface_id id,
-			thread_id replyThread);
-		
-		virtual void ReadyToRun();
-		
-		const char *Name() const
-			{ return fName; }
-		ppp_interface_id ID() const
-			{ return fID; }
-		thread_id ReplyThread() const
-			{ return fReplyThread; }
-
-	private:
-		const char *fName;
-		ppp_interface_id fID;
-		thread_id fReplyThread;
-		ConnectionWindow *fWindow;
-};
-
-
-BView*
-instantiate_deskbar_item()
-{
-	// TODO: implement me!
-	return NULL;
-}
+#include <Deskbar.h>
+#include "PPPDeskbarReplicant.h"
 
 
 static
@@ -95,7 +64,6 @@ report_thread(void *data)
 		}
 		
 		if(report.code == PPP_REPORT_GOING_UP) {
-			// TODO:
 			// create connection window (it will send the reply for us) (DONE?)
 			BRect rect(150, 50, 450, 435);
 			if(!window) {
@@ -107,12 +75,13 @@ report_thread(void *data)
 			// wait for reply from window and forward it to the kernel
 			thread_id tmp;
 			PPP_REPLY(sender, receive_data(&tmp, NULL, 0));
-
-//			PPP_REPLY(sender, B_OK);
-				// TODO: remove this when finished with above
 		} else {
-			if(report.code == PPP_REPORT_UP_SUCCESSFUL)
-				; // TODO: add deskbar replicant
+			if(report.code == PPP_REPORT_UP_SUCCESSFUL) {
+				// add deskbar replicant (DONE?)
+				PPPDeskbarReplicant *replicant = new PPPDeskbarReplicant(id);
+				BDeskbar().AddItem(replicant);
+				delete replicant;
+			}
 			
 			PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
 		}
@@ -144,7 +113,7 @@ main(int argc, const char *argv[])
 
 PPPUpApplication::PPPUpApplication(const char *name, ppp_interface_id id,
 		thread_id replyThread)
-	: BApplication(kSignature),
+	: BApplication(APP_SIGNATURE),
 	fName(name),
 	fID(id),
 	fReplyThread(replyThread)
