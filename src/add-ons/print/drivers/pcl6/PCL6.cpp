@@ -211,7 +211,7 @@ void PCL6Driver::jobStart()
 {
 	// PJL header
 	writeSpoolString("\033%%-12345X@PJL JOB\n"
-	                 "PJL ENTER LANGUAGE=PCLXL\n"
+	                 "@PJL ENTER LANGUAGE=PCLXL\n"
 	                 ") HP-PCL XL;1;1;"
 	                 "Comment Copyright (c) 2003 OBOS\n");
 	// PCL6 begin
