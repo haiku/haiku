@@ -207,7 +207,7 @@ void BeDecorator::_DoLayout(void)
 	if(strlen(GetTitle())>1)
 	{
 		if(_driver)
-			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_layerdata);
+			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_drawdata);
 		else
 			titlepixelwidth=10;
 		
@@ -330,8 +330,8 @@ void BeDecorator::_DrawTitle(BRect r)
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
-	_layerdata.highcolor=_colors->window_tab_text;
-	_layerdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+	_drawdata.highcolor=_colors->window_tab_text;
+	_drawdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
 
 	int32 titlecount=_ClipTitle((_zoomrect.left-textoffset)-(_closerect.right+textoffset));
 	BString titlestr( GetTitle() );
@@ -347,10 +347,10 @@ void BeDecorator::_DrawTitle(BRect r)
 	// is a little different. If it isn't moved, title placement looks really funky
 	if(_look==B_FLOATING_WINDOW_LOOK)
 	_driver->DrawString(titlestr.String(),titlecount,
-		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_layerdata);
+		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_drawdata);
 	else	
 	_driver->DrawString(titlestr.String(),titlecount,
-		BPoint(_closerect.right+textoffset,_closerect.bottom),&_layerdata);
+		BPoint(_closerect.right+textoffset,_closerect.bottom),&_drawdata);
 }
 
 void BeDecorator::_SetFocus(void)
@@ -459,7 +459,7 @@ void BeDecorator::DrawBlendedRect(BRect r, bool down)
 	int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
 	
 	RGBColor temprgbcol;
-	rgb_color tmpcol,halfcol, startcol, endcol;
+	rgb_color halfcol, startcol, endcol;
 	float rstep,gstep,bstep,i;
 
 	int steps=(w<h)?w:h;
@@ -498,8 +498,8 @@ void BeDecorator::DrawBlendedRect(BRect r, bool down)
 			BPoint(r.left+i,r.top+steps),temprgbcol);
 	}
 
-//	_layerdata.highcolor=startcol;
-//	_driver->FillRect(r,&_layerdata,pat_solidhigh);
+//	_drawdata.highcolor=startcol;
+//	_driver->FillRect(r,&_drawdata,pat_solidhigh);
 	_driver->StrokeRect(r,framecolors[3]);
 }
 
@@ -510,8 +510,8 @@ void BeDecorator::_DrawFrame(BRect invalid)
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	
 	#ifdef USE_VIEW_FILL_HACK
-	_layerdata.highcolor = RGBColor(192,192,192 );	
-	_driver->FillRect(_frame,_layerdata.highcolor);
+	_drawdata.highcolor = RGBColor(192,192,192 );	
+	_driver->FillRect(_frame,_drawdata.highcolor);
 	#endif
 
 	if(!borderwidth)
@@ -780,7 +780,7 @@ void BeDecorator::_DrawFrame(BRect invalid)
 		}
 	}
 
-	_driver->StrokeLineArray(points,numlines,&_layerdata,colors);
+	_driver->StrokeLineArray(points,numlines,&_drawdata,colors);
 	
 	delete rightindices;
 	delete leftindices;
@@ -837,30 +837,30 @@ void BeDecorator::_DrawFrame(BRect invalid)
 			_driver->Lock();
 			for(i=0;i<=steps; i++)
 			{
-				_layerdata.highcolor.SetColor(uint8(startcol.red-(i*rstep)),
+				_drawdata.highcolor.SetColor(uint8(startcol.red-(i*rstep)),
 					uint8(startcol.green-(i*gstep)),
 					uint8(startcol.blue-(i*bstep)));
 				
 				_driver->StrokeLine(BPoint(r.left,r.top+i),
-					BPoint(r.left+i,r.top),_layerdata.highcolor);
+					BPoint(r.left+i,r.top),_drawdata.highcolor);
 		
-				_layerdata.highcolor.SetColor(uint8(halfcol.red-(i*rstep)),
+				_drawdata.highcolor.SetColor(uint8(halfcol.red-(i*rstep)),
 					uint8(halfcol.green-(i*gstep)),
 					uint8(halfcol.blue-(i*bstep)));
 				_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-					BPoint(r.left+i,r.top+steps),_layerdata.highcolor);			
+					BPoint(r.left+i,r.top+steps),_drawdata.highcolor);			
 			}
 			_driver->Unlock();
-//			_layerdata.highcolor=framecolors[4];
-//			_driver->StrokeRect(r,&_layerdata,pat_solidhigh);
+//			_drawdata.highcolor=framecolors[4];
+//			_driver->StrokeRect(r,&_drawdata,pat_solidhigh);
 		}
 		else
 		{
-			_layerdata.highcolor=framecolors[4];
+			_drawdata.highcolor=framecolors[4];
 			_driver->StrokeLine(BPoint(r.right,r.top),BPoint(r.right-3,r.top),
-				_layerdata.highcolor);
+				_drawdata.highcolor);
 			_driver->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.left,r.bottom-3),
-				_layerdata.highcolor);
+				_drawdata.highcolor);
 		}
 	}
 }
