@@ -52,7 +52,8 @@ public:
 	int32 CountTuned(void);
 	font_file_format FileFormat(void);
 	
-	void SetFamilyAndStyle(const uint32 &fontID);
+	status_t SetFamilyAndStyle(const uint16 &familyID,const uint16 &styleID);
+	status_t SetFamilyAndStyle(const uint32 &fontID);
 	void SetDirection(const font_direction &dir) { fDirection=dir; }
 	void SetEdges(const edge_info &info) { fEdges=info; }
 	void SetEncoding(uint32 encoding) { fEncoding=encoding; }
