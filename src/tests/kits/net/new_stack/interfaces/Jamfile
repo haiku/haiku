@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src tests kits net new_stack interfaces ;
+
+SubInclude OBOS_TOP src tests kits net new_stack interfaces ether_drivers ;
+SubInclude OBOS_TOP src tests kits net new_stack interfaces loopback ;
+# SubInclude OBOS_TOP src tests kits net new_stack interfaces dialup ;

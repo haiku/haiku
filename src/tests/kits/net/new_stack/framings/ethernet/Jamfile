@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src tests kits net new_stack framings ethernet ;
+
+UseHeaders [ FDirName $(OBOS_TOP) src tests kits net new_stack headers ] ;
+
+Addon <v2>ethernet_frame : userland network_v2 framings  :	
+	ethernet_frame.c
+;
+
+LinkSharedOSLibs <v2>ethernet_frame : <installed>new_stack_tester be ;

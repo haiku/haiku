@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src tests kits net new_stack interfaces ether_drivers ;
+
+UseHeaders [ FDirName $(OBOS_TOP) src tests kits net new_stack headers ] ;
+
+Addon <v2>ether_drivers : userland network_v2 interfaces :	
+	ether_drivers.c
+;
+
+LinkSharedOSLibs <v2>ether_drivers : <installed>new_stack_tester be ;
