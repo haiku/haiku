@@ -115,8 +115,8 @@ valid_rect(clipping_rect rect)
 static inline bool
 rects_intersect(clipping_rect rectA, clipping_rect rectB)
 {
-	// TODO: should we skip that check and let the caller do this
-	// kind of work ?
+	// We behave like BRect::Intersects() does:
+	// we return false if one of the two rects is not valid
 	if (!valid_rect(rectA) || !valid_rect(rectB))
 		return false;
 
