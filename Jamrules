@@ -777,6 +777,7 @@ rule UseHeaders
 
 rule UseCppUnitHeaders
 {
+	SetupIncludes ; #serious hack
 	SubDirHdrs [ FDirName $(OBOS_TOP) headers tools cppunit ] ;
 }
 
