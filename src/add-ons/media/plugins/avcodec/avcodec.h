@@ -81,6 +81,7 @@ class avCodec : public Decoder
 		bigtime_t	fStartTime;
 		int32		fOutputFrameCount;
 		float		fOutputFrameRate;
+		int			fOutputFrameSize; // sample size * channel count
 		
 		char *		fChunkBuffer;
 		int32		fChunkBufferOffset;

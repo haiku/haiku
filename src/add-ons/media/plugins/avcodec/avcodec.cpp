@@ -243,7 +243,8 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		PRINT(("audio: bit_rate = %d, sample_rate = %d, chans = %d\n", ffc->bit_rate, ffc->sample_rate, ffc->channels));
 
 		fStartTime = 0;
-		fOutputFrameCount = outputAudioFormat.buffer_size / (2 * outputAudioFormat.channel_count);
+		fOutputFrameSize = 2 * outputAudioFormat.channel_count;
+		fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
 		fOutputFrameRate = outputAudioFormat.frame_rate;
 		fChunkBuffer = 0;
 		fChunkBufferOffset = 0;
@@ -349,11 +350,11 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 			}
 		
 			if (fOutputBufferSize > 0) {
-				int32 frames = min_c(fOutputFrameCount - *out_frameCount, fOutputBufferSize / 4);
-				memcpy(output_buffer, fOutputBuffer + fOutputBufferOffset, frames * 4);
-				fOutputBufferOffset += frames * 4;
-				fOutputBufferSize -= frames * 4;
-				output_buffer += frames * 4;
+				int32 frames = min_c(fOutputFrameCount - *out_frameCount, fOutputBufferSize / fOutputFrameSize);
+				memcpy(output_buffer, fOutputBuffer + fOutputBufferOffset, frames * fOutputFrameSize);
+				fOutputBufferOffset += frames * fOutputFrameSize;
+				fOutputBufferSize -= frames * fOutputFrameSize;
+				output_buffer += frames * fOutputFrameSize;
 				*out_frameCount += frames;
 				fStartTime += (bigtime_t)((1000000LL * frames) / fOutputFrameRate);
 				continue;
