@@ -3167,11 +3167,10 @@ int AccelerantDriver::OpenGraphicsDevice(int deviceNumber)
 		if ( current_card_fd >= 0 )
 			count++;
 	}
-	if ( (count < deviceNumber) && (current_card_fd >= 0) )
+	if ( count < deviceNumber )
 	{
 		if ( deviceNumber == 1 )
 		{
-			close(current_card_fd);
 			sprintf(path,"/dev/graphics/stub");
 			current_card_fd = open(path,B_READ_WRITE);
 		}

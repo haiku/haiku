@@ -52,6 +52,7 @@ Server app_server :
 	# Font Classes
 
 	# Display Classes
+	Clipper.cpp
 	AccelerantDriver.cpp
 	ScreenDriver.cpp
 	ViewDriver.cpp
