@@ -41,8 +41,10 @@
 #include <RegionSupport.h>
 
 // Constants --------------------------------------------------------------------
-const int32 kMaxPoints = 1024;
-const int32 kMaxVerticalExtent = 0x10000000;
+static const int32 kMaxPoints = 1024;
+static const int32 kMaxVerticalExtent = 0x10000000;
+static const int32 kMaxPositive = 0x7ffffffd;
+static const int32 kMaxNegative = 0x80000003;
 
 
 #define TRACE_REGION 0
@@ -67,10 +69,10 @@ BRegion::Support::ZeroRegion(BRegion *region)
 	CALLED();
 	
 	region->count = 0;
-	region->bound.left = 0x7ffffffd;
-	region->bound.top = 0x7ffffffd;
-	region->bound.right = 0x80000003;
-	region->bound.bottom = 0x80000003;
+	region->bound.left = kMaxPositive;
+	region->bound.top = kMaxPositive;
+	region->bound.right = kMaxNegative;
+	region->bound.bottom = kMaxNegative;
 }
 
 
@@ -794,11 +796,34 @@ BRegion::Support::SubRegionComplex(BRegion *first, BRegion *second, BRegion *des
 }
 
 
+/*! \brief Converts the empty spaces between rectangles to rectangles,
+	and the rectangles to empty spaces.
+
+	Watch out!!! We write 1 element more than count, so be sure that the passed
+	arrays have the needed space
+*/
+static void
+InvertRectangles(long *lefts, long *rights, long count)
+{
+	long tmpLeft, tmpRight = kMaxNegative;
+	
+	for (int i = 0; i <= count; i++) {	
+		tmpLeft = lefts[i] - 1;
+		
+		lefts[i] = (i == 0) ? kMaxNegative : tmpRight;
+		tmpRight = rights[i] + 1;
+		
+		rights[i] = (i == count) ? kMaxPositive : tmpLeft;				
+	}	
+}
+
+
 void
 BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, long *indexA, long *indexB)
 {
 	CALLED();
 	
+	// TODO: review heap management 
 	int32 stackLeftsA[kMaxPoints / 2];
 	int32 stackLeftsB[kMaxPoints / 2];
 	int32 stackRightsA[kMaxPoints / 2];
@@ -836,8 +861,7 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 	}
 
 	// Store left and right points to the appropriate array
-	for (x = i1; x < first->count; x++) {
-		
+	for (x = i1; x < first->count; x++) {		
 		// Look if this rect can be used next time we are called, 
 		// thus correctly maintaining the "index" parameters.
 		if (first->data[x].bottom >= top && *indexA == -1)
@@ -850,12 +874,6 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 		} else if (first->data[x].top > bottom)
 			break;	
 	}
-	
-	if (*indexA == -1)
-		*indexA = i1;
-	
-	if (foundA > 1)
-		SortTrans(leftsA, rightsA, foundA);
 					
 	for (x = i2; x < second->count; x++) {
 		if (second->data[x].bottom >= top && *indexB == -1)
@@ -869,83 +887,42 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 			break;
 	}
 	
+	if (*indexA == -1)
+		*indexA = i1;
 	if (*indexB == -1)
 		*indexB = i2;
-		
+	
+	if (foundA > 1)
+		SortTrans(leftsA, rightsA, foundA);
+	
 	if (foundB > 1)
 		SortTrans(leftsB, rightsB, foundB);
-
+	
 	// No minuend's rect, just add all the subtraend's rects.
-	if (foundA == 0)
+	if (foundA == 0) {
 		for (x = 0; x < foundB; x++) {
 			clipping_rect rect = { leftsB[x], top, rightsB[x], bottom };
 			dest->_AddRect(rect);
 		}
-	else if (foundB > 0) {
-		long f = 0, s = 0;
+	} else if (foundB > 0) {
 		
-		clipping_rect minuendRect;
-		minuendRect.top = top;
-		minuendRect.bottom = bottom;
-		minuendRect.left = 0x80000003;
+		InvertRectangles(leftsA, rightsA, foundA);
 		
-		clipping_rect subRect;
-		subRect.top = top;
-		subRect.bottom = bottom;
-			
-		// We take the empty spaces between the minuend rects, and intersect
-		// these with the subtraend rects. We then add their intersection
-		// to the destination region.
-		do {			
-			subRect.left = leftsB[s];
-			subRect.right = rightsB[s];	
-			
-			if (f != 0)
-				minuendRect.left = rightsA[f - 1] + 1;
-			
-			minuendRect.right = leftsA[f] - 1;
+		clipping_rect A, B;
+		A.top = B.top = top;
+		A.bottom = B.bottom = bottom;
+		
+		for (long f = 0; f <= foundA; f++) {
+			for (long s = 0; s < foundB; s++) {
+				A.left = leftsA[f];
+				A.right = rightsA[f];
 				
-			if (leftsB[s] > minuendRect.right) {
-				if (++f > foundA)
-					break;
-				else
-					continue;			
+				B.left = leftsB[s];
+				B.right = rightsB[s];
+				if (rects_intersect(A, B))
+					dest->_AddRect(sect_rect(A, B));
 			}
-			
-			clipping_rect intersection = sect_rect(minuendRect, subRect);
-			
-			if (valid_rect(intersection))
-				dest->_AddRect(intersection);
-		
-			if (rightsB[s] < minuendRect.left)
-				s++;
-					
-			if (s >= foundB)
-				break;
-			
-			f++;
-							
-		} while (f < foundA);
-		
-		// Last rect: we take the right coordinate of the last minuend rect
-		// as left coordinate of the rect to intersect, and the maximum possible
-		// value as the right coordinate.  
-		minuendRect.left = rightsA[foundA - 1] + 1;
-		minuendRect.right = 0x7ffffffd;
-		
-		// Skip the subtraend rects that could never intersect.
-		while (s < foundB && rightsB[s] < minuendRect.left)
-			s++;
-		
-		for (long c = s; c < foundB; c++) {
-			subRect.left = leftsB[c];
-			subRect.right = rightsB[c];
-			
-			clipping_rect intersection = sect_rect(minuendRect, subRect);
-			
-			if (valid_rect(intersection))
-				dest->_AddRect(intersection);
-		}	
+		}
 	}
 
 	if (allocatedBuffer) {

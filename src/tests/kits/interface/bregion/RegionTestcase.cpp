@@ -1,5 +1,5 @@
 /*
-	$Id: RegionTestcase.cpp,v 1.2 2004/03/31 06:53:40 jackburton Exp $
+	$Id: RegionTestcase.cpp,v 1.3 2004/05/12 06:37:18 jackburton Exp $
 	
 	This file implements a base class for all tests of the OpenBeOS
 	BRegion code.
@@ -21,10 +21,9 @@
 RegionTestcase::RegionTestcase(std::string name) :
 	TestCase(name)
 {
-	const int numTestRegions = 8;
 	const int numRectsPerRegion = 3;
 	
-	float theRegions[numTestRegions][numRectsPerRegion][4] = 
+	float theRegions[][numRectsPerRegion][4] = 
 		{
 			{
 				{10.0, 10.0, 50.0, 50.0},
@@ -67,8 +66,23 @@ RegionTestcase::RegionTestcase(std::string name) :
 				{15.0, 25.0, 75.0, 80.0},
 				{30.0, 15.0, 80.0, 45.0},
 				{60.0, 20.0, 95.0, 225.0}
+			},
+			// These two regions were added to test our implementation
+			// against the "Pahtz matrix test" (see interface kit
+			// mailing list archives (April 2004) for more info)
+			{
+				{0.0, 50.0, 47.0, 50.0},
+				{99.0, 50.0, 399.0, 50.0},
+				{-100.0, -20.0, 100.0, -20.0}
+			},
+			{
+				{0.0, 50.0, 47.0, 50.0},
+				{100.0, 50.0, 399.0, 50.0},
+				{-100.0, -20.0, 100.0, -20.0}
 			}
 		};
+	
+	const int numTestRegions = sizeof(theRegions) / sizeof(theRegions[0]);
 		
 	listOfRegions.AddItem(new BRegion);
 	for(int regionNum = 0; regionNum < numTestRegions; regionNum++) {
