@@ -34,6 +34,7 @@
 #include "InputServerDevice.h"
 #include "InputServerFilter.h"
 #include "InputServerMethod.h"
+#include "AddOnManager.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -177,6 +178,7 @@ private:
 	// added this to communicate via portlink
 	
 	BPortLink *serverlink;
+	AddOnManager *fAddOnManager;
 	
 	//fMouseState;
 };

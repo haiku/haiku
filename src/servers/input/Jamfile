@@ -12,6 +12,8 @@ Server input_server :
 	InputServerFilter.cpp
 	InputServerMethod.cpp
 
+	AddOnManager.cpp
+
 	# storage
 	AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp

@@ -33,14 +33,13 @@
 
 
 #include <stdio.h>
-
-#include <InputServer.h>
-#include <Path.h>
-#include <Directory.h>
-#include <FindDirectory.h>
-#include <Entry.h>
-#include <Locker.h>
 #include <Debug.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <Locker.h>
+#include <Message.h>
+#include <Path.h>
 #include <String.h>
 
 #if DEBUG>=1
@@ -51,10 +50,10 @@
 	#define CALLED()	((void)0)
 #endif
 
+#include "InputServer.h"
 #include "InputServerDeviceListEntry.h"
 #include "InputServerFilterListEntry.h"
 #include "InputServerMethodListEntry.h"
-#include <Message.h>
 #include "InputServerTypes.h"
 
 // include app_server headers for communication
@@ -109,9 +108,12 @@ InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_serv
 
 	InitTestDevice();
 	
+	fAddOnManager = new AddOnManager();
+	fAddOnManager->LoadState();
+	
 //	InitDevices();
-	InitFilters();
-	InitMethods();
+//	InitFilters();
+//	InitMethods();
 }
 
 /*
@@ -121,6 +123,8 @@ InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_serv
 InputServer::~InputServer(void)
 {
 	CALLED();
+	fAddOnManager->SaveState();
+	delete fAddOnManager;
 }
 
 
