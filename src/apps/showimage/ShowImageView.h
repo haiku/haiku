@@ -63,7 +63,8 @@ public:
 	
 private:
 	void ConstrainToImage(BPoint &point);
-	void DrawInvertBox(BRect &rect);
+	void DrawSelectionBox(BRect &rect);
+	void ClearSelectionBox(BRect &rect);
 	
 	entry_ref fcurrentRef;
 	int32 fdocumentIndex;

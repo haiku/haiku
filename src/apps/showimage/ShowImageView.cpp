@@ -38,13 +38,22 @@
 #include <TranslatorRoster.h>
 #include <BitmapStream.h>
 #include <Rect.h>
+#include <SupportDefs.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageView.h"
 
+#ifndef min
+#define min(a,b) ((a)>(b)?(b):(a))
+#endif
+#ifndef max
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+
 #define BORDER_WIDTH 16
 #define BORDER_HEIGHT 16
 #define PEN_SIZE 1.0f
+const rgb_color kborderColor = { 0, 0, 0, 255 };
 
 ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	uint32 flags)
@@ -56,7 +65,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fbhasSelection = false;
 	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetHighColor(0, 0, 0);
+	SetHighColor(kborderColor);
 	SetPenSize(PEN_SIZE);
 }
 
@@ -119,9 +128,9 @@ ShowImageView::SetImage(const entry_ref *pref)
 	msgr.SendMessage(&msg);
 	
 	SetViewBitmap(fpbitmap, fpbitmap->Bounds(),
-		BRect(BORDER_WIDTH - PEN_SIZE, BORDER_HEIGHT - PEN_SIZE,
-			fpbitmap->Bounds().Width() + BORDER_WIDTH + PEN_SIZE,
-			fpbitmap->Bounds().Height() + BORDER_HEIGHT + PEN_SIZE),
+		BRect(BORDER_WIDTH, BORDER_HEIGHT,
+			fpbitmap->Bounds().Width() + BORDER_WIDTH,
+			fpbitmap->Bounds().Height() + BORDER_HEIGHT),
 		B_FOLLOW_TOP | B_FOLLOW_LEFT, 0
 	);
 
@@ -153,17 +162,31 @@ ShowImageView::Draw(BRect updateRect)
 				fpbitmap->Bounds().Height() + BORDER_HEIGHT + PEN_SIZE));
 				
 		if (fbhasSelection)
-			DrawInvertBox(fselectionRect);
+			DrawSelectionBox(fselectionRect);
 	}
 }
 
 void
-ShowImageView::DrawInvertBox(BRect &rect)
+ShowImageView::DrawSelectionBox(BRect &rect)
 {
-	drawing_mode oldmode = DrawingMode();
-	SetDrawingMode(B_OP_INVERT);
-	StrokeRect(rect);
-	SetDrawingMode(oldmode);
+	// TODO: Make my own pattern to mimic the
+	// marching ants in Be's ShowImage?
+	
+	StrokeRect(rect, B_MIXED_COLORS);
+	Sync();
+}
+
+void
+ShowImageView::ClearSelectionBox(BRect &rect)
+{
+	BRect bitmapRect = rect;
+	if (!bitmapRect.IsValid())
+		printf("Invalid Rect\n");
+		
+	bitmapRect.OffsetBy(-(BORDER_WIDTH), -(BORDER_HEIGHT));	
+	DrawBitmapAsync(fpbitmap, bitmapRect, rect);
+		// don't draw the bitmap immediately, more drawing
+		// almost always comes after this function is used
 }
 
 void
@@ -191,7 +214,7 @@ ShowImageView::MouseDown(BPoint point)
 	// inside an existing selection and starts a drag operation
 	
 	if (fbhasSelection)
-		DrawInvertBox(fselectionRect);
+		ClearSelectionBox(fselectionRect);
 	
 	fbhasSelection = false;
 	
@@ -205,7 +228,6 @@ ShowImageView::MouseDown(BPoint point)
 	firstPoint = point;
 	ConstrainToImage(firstPoint);
 	secondPoint = firstPoint;
-		// just to be safe
 	
 	BRect curSel, lastSel;
 
@@ -218,13 +240,19 @@ ShowImageView::MouseDown(BPoint point)
 	// has been made.
 	while (buttons) {
 		ConstrainToImage(secondPoint);
-		curSel = BRect(firstPoint, secondPoint);
+		
+		// make a BRect that passes IsValid()
+		curSel.left = min(firstPoint.x, secondPoint.x);
+		curSel.top = min(firstPoint.y, secondPoint.y);
+		curSel.right = max(firstPoint.x, secondPoint.x);
+		curSel.bottom = max(firstPoint.y, secondPoint.y);
+
 		if (!bfirst && curSel != lastSel)
-			DrawInvertBox(lastSel);
+			ClearSelectionBox(lastSel);
 		if (curSel != lastSel)
-			DrawInvertBox(curSel);
+			DrawSelectionBox(curSel);
 				
-		snooze(20 * 1000);
+		snooze(25 * 1000);
 		lastSel = curSel;
 		GetMouse(&secondPoint, &buttons);
 		bfirst = false;
