@@ -204,6 +204,7 @@ UdfBuilder::Build()
 	Udf::partition_descriptor partition;
 	Udf::unallocated_space_descriptor freespace;
 	Udf::logical_volume_descriptor logical;
+	Udf::implementation_use_descriptor implementationUse;
 	Udf::long_address filesetAddress;
 	Udf::extent_address filesetExtent;
 	Udf::extent_address integrityExtent;
@@ -644,6 +645,69 @@ UdfBuilder::Build()
 			}		
 		}
 		
+		// write implementation use descriptor
+		if (!error) {
+			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing implementation use descriptor");
+			// build implementationUse descriptor
+	 		vdsNumber++;
+			implementationUse.set_vds_number(vdsNumber);
+			implementationUse.implementation_id() = Udf::kLogicalVolumeInfoId;
+			Udf::logical_volume_info &info = implementationUse.info();
+			info.character_set() = Udf::kCs0CharacterSet;
+			Udf::DString logicalVolumeId(_UdfVolumeName(),
+			                           	 info.logical_volume_id().size());
+			memcpy(info.logical_volume_id().data, logicalVolumeId.String(),
+			       info.logical_volume_id().size());
+			Udf::DString info1("Logical Volume Info #1",
+			                   info.logical_volume_info_1().size());
+			memcpy(info.logical_volume_info_1().data, info1.String(),
+			       info.logical_volume_info_1().size());
+			Udf::DString info2("Logical Volume Info #2",
+			                   info.logical_volume_info_2().size());
+			memcpy(info.logical_volume_info_2().data, info2.String(),
+			       info.logical_volume_info_2().size());
+			Udf::DString info3("Logical Volume Info #3",
+			                   info.logical_volume_info_3().size());
+			memcpy(info.logical_volume_info_3().data, info3.String(),
+			       info.logical_volume_info_3().size());
+			info.implementation_id() = Udf::kImplementationId;
+			memset(info.implementation_use().data, 0, info.implementation_use().size());
+			implementationUse.tag().set_id(Udf::TAGID_IMPLEMENTATION_USE_VOLUME_DESCRIPTOR);
+			implementationUse.tag().set_version(3);
+			implementationUse.tag().set_serial_number(0);
+				// note that the checksums haven't been set yet, since the
+				// location is dependent on which sequence (primary or reserve)
+				// the descriptor is currently being written to. Thus we have to
+				// recalculate the checksums for each sequence.
+			DUMP(implementationUse);
+			// write implementationUse descriptor to primary vds
+			implementationUse.tag().set_location(primaryVdsExtent.location()+vdsNumber);
+			implementationUse.tag().set_checksums(implementationUse);
+			ssize_t bytes = _OutputFile().WriteAt(implementationUse.tag().location() << _BlockShift(),
+			                              &implementationUse, sizeof(implementationUse));
+			error = check_size_error(bytes, sizeof(implementationUse));                              
+			if (!error && bytes < ssize_t(_BlockSize())) {
+				ssize_t bytesLeft = _BlockSize() - bytes;
+				bytes = _OutputFile().ZeroAt((implementationUse.tag().location() << _BlockShift())
+				                             + bytes, bytesLeft);
+				error = check_size_error(bytes, bytesLeft);			                             
+			}
+			// write implementationUse descriptor to reserve vds				                             
+			if (!error) {
+				implementationUse.tag().set_location(reserveVdsExtent.location()+vdsNumber);
+				implementationUse.tag().set_checksums(implementationUse);
+				ssize_t bytes = _OutputFile().WriteAt(implementationUse.tag().location() << _BlockShift(),
+	        			                              &implementationUse, sizeof(implementationUse));
+				error = check_size_error(bytes, sizeof(implementationUse));                              
+				if (!error && bytes < ssize_t(_BlockSize())) {
+					ssize_t bytesLeft = _BlockSize() - bytes;
+					bytes = _OutputFile().ZeroAt((implementationUse.tag().location() << _BlockShift())
+					                             + bytes, bytesLeft);
+					error = check_size_error(bytes, bytesLeft);			                             
+				}
+			}
+		}
+
 		// write terminating descriptor
 		if (!error) {
 	 		vdsNumber++;
@@ -1232,9 +1296,10 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 						} else if (S_ISLNK(childStats.st_mode)) {
 							// Symlink
 							// For now, skip it
-							_PrintWarning("No symlink support yet; skipping symlink: `%s'",
+							_PrintError("No symlink support yet; please remove the following symlink and try again: `%s'",
 							              childImagePath.c_str());
-							continue;
+							error = B_ERROR;
+							break;
 						}
 				
 						// Write iso direntry
