@@ -143,4 +143,11 @@ typedef struct fs_ops {
 extern fs_ops	fs_entry;
 extern int32	api_version;
 
+/* file system add-ons only prototypes */
+extern status_t notify_listener(int op, mount_id device, vnode_id parentNode,
+					vnode_id toParentNode, vnode_id node, const char *name);
+extern status_t send_notification(port_id port, long token, ulong what, long op,
+					mount_id device, mount_id toDevice, vnode_id parentNode,
+					vnode_id toParentNode, vnode_id node, const char *name);
+
 #endif	/* _FS_INTERFACE_H */
