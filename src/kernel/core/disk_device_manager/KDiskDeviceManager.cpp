@@ -532,23 +532,32 @@ KDiskDeviceManager::WriteLockPartition(partition_id id)
 
 // CreateFileDevice
 partition_id
-KDiskDeviceManager::CreateFileDevice(const char *filePath)
+KDiskDeviceManager::CreateFileDevice(const char *filePath, bool *newlyCreated)
 {
-// ToDo!
-	return B_ERROR;
-#if 0
 	if (!filePath)
 		return B_BAD_VALUE;
-	status_t error = B_ERROR;
+
+	// normalize the file path
+	KPath normalizedFilePath;
+	status_t error = normalizedFilePath.SetTo(filePath, true);
+	if (error != B_OK)
+		return error;
+	filePath = normalizedFilePath.Path();
+
 	KFileDiskDevice *device = NULL;
 	if (ManagerLocker locker = this) {
 		// check, if the device does already exist
-		if (FindFileDevice(filePath))
-			return B_FILE_EXISTS;
+		if ((device = FindFileDevice(filePath))) {
+			if (newlyCreated)
+				*newlyCreated = false;
+			return device->ID();
+		}
+
 		// allocate a KFileDiskDevice
 		device = new(nothrow) KFileDiskDevice;
 		if (!device)
 			return B_NO_MEMORY;
+
 		// initialize and add the device
 		error = device->SetTo(filePath);
 		// Note: Here we are allowed to lock a device although already having
@@ -558,23 +567,27 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath)
 			error = B_ERROR;
 		if (error == B_OK && !_AddDevice(device))
 			error = B_NO_MEMORY;
+
 		// scan device
 		if (error == B_OK) {
 			_ScanPartition(device);
+
+			if (newlyCreated)
+				*newlyCreated = true;
 			return device->ID();
 		}
+
 		// cleanup on failure
 		delete device;
-	}
+	} else
+		error = B_ERROR;
 	return error;
-#endif
 }
 
 // DeleteFileDevice
 status_t
 KDiskDeviceManager::DeleteFileDevice(const char *filePath)
 {
-#if 0
 	if (KFileDiskDevice *device = RegisterFileDevice(filePath)) {
 		PartitionRegistrar _(device, true);
 		if (DeviceWriteLocker locker = device) {
@@ -582,7 +595,6 @@ KDiskDeviceManager::DeleteFileDevice(const char *filePath)
 				return B_OK;
 		}
 	}
-#endif
 	return B_ERROR;
 }
 

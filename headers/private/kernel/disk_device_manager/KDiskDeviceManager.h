@@ -60,7 +60,8 @@ public:
 		// Both the device and the partition is also registered and must be
 		// unregistered by the caller.
 
-	partition_id CreateFileDevice(const char *filePath);
+	partition_id CreateFileDevice(const char *filePath,
+		bool *newlyCreated = NULL);
 	status_t DeleteFileDevice(const char *filePath);
 	status_t DeleteFileDevice(partition_id id);
 
