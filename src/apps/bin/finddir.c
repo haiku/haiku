@@ -1,6 +1,7 @@
 /*
  * finddir.c - 
  * (c) 2002, Sebastian Nozzi <sebnozzi@gmx.net>
+ * 08/24/2004 - Francois Revol - added -l option.
  */
 
 #include <FindDirectory.h>
@@ -58,16 +59,41 @@ directoryType directoryTypes[] = {
 	KEYVALUE_PAIR(B_USER_LIB_DIRECTORY),
 	KEYVALUE_PAIR(B_USER_SETTINGS_DIRECTORY),
 	KEYVALUE_PAIR(B_USER_DESKBAR_DIRECTORY),
+	/* some more */
+	KEYVALUE_PAIR(B_BEOS_MEDIA_NODES_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_SOUNDS_DIRECTORY),
+	KEYVALUE_PAIR(B_BEOS_TRANSLATORS_DIRECTORY),
+	KEYVALUE_PAIR(B_COMMON_MEDIA_NODES_DIRECTORY),
+	KEYVALUE_PAIR(B_COMMON_SOUNDS_DIRECTORY),
+	KEYVALUE_PAIR(B_COMMON_TRANSLATORS_DIRECTORY),
+	KEYVALUE_PAIR(B_USER_MEDIA_NODES_DIRECTORY),
+	KEYVALUE_PAIR(B_USER_PRINTERS_DIRECTORY),
+	KEYVALUE_PAIR(B_USER_SOUNDS_DIRECTORY),
+	KEYVALUE_PAIR(B_USER_TRANSLATORS_DIRECTORY),
+	KEYVALUE_PAIR(B_UTILITIES_DIRECTORY),
+#ifdef B_BEOS_VERSION_DANO
+	/* Dano specific */
+	KEYVALUE_PAIR(B_ROOT_DIRECTORY),
+#endif /* B_BEOS_VERSION_DANO */
 	{NULL,B_USER_DESKBAR_DIRECTORY}
 };
 
-bool retrieveDirValue( directoryType *list, const char *key, directory_which *value_out )
+void listDirectoryWhich(void)
+{
+	int i;
+	
+	for (i = 0; directoryTypes[i].key; i++) {
+		printf("%s\n", directoryTypes[i].key);
+	}
+}
+
+bool retrieveDirValue(directoryType *list, const char *key, directory_which *value_out)
 {
 	unsigned i = 0;
 	
-	while( list[i].key != NULL )
+	while (list[i].key != NULL)
 	{
-		if( strcmp( list[i].key, key ) == 0 )
+		if (strcmp(list[i].key, key) == 0)
 		{
 			*value_out = list[i].value;
 			return true;
@@ -79,9 +105,11 @@ bool retrieveDirValue( directoryType *list, const char *key, directory_which *va
 	return false;
 }
 
-void usageMsg(){
-	printf("usage:  /bin/finddir [ -v volume ] directory_which\n" );
-	printf("\t-v <file>   use the specified volume for directory\n" );
+void usageMsg()
+{
+	printf("usage:  /bin/finddir -l | [ -v volume ] directory_which\n");
+	printf("\t-l\t    list valid which constants to use\n");
+	printf("\t-v <file>   use the specified volume for directory\n");
 	printf("\t\t    constants that are volume-specific.\n");
 	printf("\t\t    <file> can be any file on that volume.\n");
 	printf("\t\t    defaults to the boot volume.\n");
@@ -108,19 +136,23 @@ int main(int argc, char *argv[])
 	dirType = B_BEOS_DIRECTORY; /* so that it compiles */
 	
 	/* By default use boot volume*/
-	volume = dev_for_path( "/boot" );
+	volume = dev_for_path("/boot");
 	
-	if( argc <= 1 ){
+	if (argc <= 1) {
 		status = ARGUMENT_MISSING;
 	} else {
-		if( strcmp(argv[1], "-v") == 0 ){
-			if( argc >= 3 ){
+		if (strcmp(argv[1], "-l") == 0 ) {
+			listDirectoryWhich();
+			return 0;
+		}
+		if (strcmp(argv[1], "-v") == 0 ) {
+			if (argc >= 3) {
 				dev_t temp_volume;
 				/* get volume from second arg */
-				temp_volume = dev_for_path( argv[2] );
+				temp_volume = dev_for_path(argv[2]);
 				
 				/* Keep default value in case of error */
-				if( temp_volume >= 0 )
+				if (temp_volume >= 0)
 					volume = temp_volume;
 				
 				/* two arguments were used for volume */
@@ -132,10 +164,10 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	if( status == NO_ERRORS && argc > directoryArgNr ){
+	if (status == NO_ERRORS && argc > directoryArgNr) {
 		/* get directory constant from next argument */
 
-		if( retrieveDirValue( directoryTypes, argv[directoryArgNr], &dirType ) == false ){
+		if (retrieveDirValue(directoryTypes, argv[directoryArgNr], &dirType) == false) {
 			status = WRONG_DIR_TYPE;
 		}
 		
@@ -145,16 +177,16 @@ int main(int argc, char *argv[])
 	
 	/* Do the actual directoy finding */
 	
-	if( status == NO_ERRORS ){
+	if (status == NO_ERRORS) {
 		/* Question: would B_PATH_NAME_LENGTH alone have been enough? */
 		char buffer[B_PATH_NAME_LENGTH+B_FILE_NAME_LENGTH];
 		status_t result;
 		
-		result = find_directory( dirType, volume, /*create it*/ false, buffer, sizeof(buffer) );
+		result = find_directory (dirType, volume, /*create it*/ false, buffer, sizeof(buffer));
 		
-		if( result == B_OK ){
-			printf( "%s\n", buffer );
-		}else{
+		if (result == B_OK) {
+			printf("%s\n", buffer);
+		} else {
 			/* else what? */
 			/* this can not happen! */
 			printf("Serious internal error; contact support\n");
@@ -163,15 +195,16 @@ int main(int argc, char *argv[])
 
 	/* Error messages and return code setting */
 
-	if( status == WRONG_DIR_TYPE )	{
-		printf("%s: unrecognized directory_which constant \'%s\'\n", argv[0], argv[directoryArgNr] );
+	if (status == WRONG_DIR_TYPE) {
+		printf("%s: unrecognized directory_which constant \'%s\'\n", argv[0], argv[directoryArgNr]);
 		returnCode = 252;
 	}
 
-	if( status == ARGUMENT_MISSING ){
+	if (status == ARGUMENT_MISSING) {
 		usageMsg();
 		returnCode = 255;
 	}
 	
 	return returnCode;
 }
+

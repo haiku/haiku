@@ -412,6 +412,7 @@ static void dump_system_info(system_info *info)
 	dump_cpu(info);
 	dump_mem(info);
 	dump_sem(info);
+	dump_ports(info);
 	dump_thread(info);
 	dump_team(info);
 }
