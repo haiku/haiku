@@ -8,6 +8,8 @@
 
 #include "KDiskSystem.h"
 
+struct fs_module_info;
+
 namespace BPrivate {
 namespace DiskDevice {
 
@@ -15,6 +17,8 @@ class KFileSystem : public KDiskSystem {
 public:
 	KFileSystem(const char *name);
 	virtual ~KFileSystem();
+
+	virtual status_t Init();
 
 	virtual bool IsFileSystem() const;
 
@@ -60,6 +64,9 @@ public:
 protected:
 	virtual status_t LoadModule();
 	virtual void UnloadModule();
+
+private:
+	fs_module_info	*fModule;
 };
 
 } // namespace DiskDevice
