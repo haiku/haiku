@@ -1052,14 +1052,19 @@ void nv_acc_assert_fifo_dma(void)
 /*
 	note:
 	moved acceleration 'top-level' routines to be integrated in the engine:
-	it is costly to call the engine for every single function within a loop!!
-	(BeRoMeter 1.2.6 benchmarked: P4 3.2Ghz increased 15%, ...)
+	it is costly to call the engine for every single function within a loop!
+	(measured with BeRoMeter 1.2.6: upto 15% speed increase on all CPU's.)
+
+	note also:
+	splitting up each command list into sublists (see routines below) prevents
+	a lot more nested calls, further increasing the speed with upto 70%.
 */
 
 /* screen to screen blit - i.e. move windows around and scroll within them. */
 void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count)
 {
 	uint32 i = 0;
+	uint16 subcnt;
 
 	/*** init acc engine for blit function ***/
 	/* ROP registers (Raster OPeration):
@@ -1072,25 +1077,34 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 	/*** do each blit ***/
 	/* Note:
 	 * blit-copy direction is determined inside nvidia hardware: no setup needed */
-	while (count--)
+	while (count)
 	{
-		/* instruct engine what to blit:
-		 * wait for room in fifo for blit cmd if needed. */
-		if (nv_acc_fifofree_dma(4) != B_OK) return;
-		/* now setup blit (writing 4 32bit words) */
-		nv_acc_cmd_dma(NV_IMAGE_BLIT, NV_IMAGE_BLIT_SOURCEORG, 3);
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(((list[i].src_top) << 16) | (list[i].src_left)); /* SourceOrg */
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(((list[i].dest_top) << 16) | (list[i].dest_left)); /* DestOrg */
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			((((list[i].height) + 1) << 16) | ((list[i].width) + 1)); /* HeightWidth */
+		/* break up the list in sublists to minimize calls, while making sure long
+		 * lists still get executed without trouble */
+		subcnt = 32;
+		if (count < 32) subcnt = count;
+		count -= subcnt;
+
+		/* wait for room in fifo for blit cmd if needed. */
+		if (nv_acc_fifofree_dma(4 * subcnt) != B_OK) return;
+
+		while (subcnt--)
+		{
+			/* now setup blit (writing 4 32bit words) */
+			nv_acc_cmd_dma(NV_IMAGE_BLIT, NV_IMAGE_BLIT_SOURCEORG, 3);
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				(((list[i].src_top) << 16) | (list[i].src_left)); /* SourceOrg */
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				(((list[i].dest_top) << 16) | (list[i].dest_left)); /* DestOrg */
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				((((list[i].height) + 1) << 16) | ((list[i].width) + 1)); /* HeightWidth */
+
+			i++;
+		}
 
 		/* tell the engine to fetch the commands in the DMA buffer that where not
 		 * executed before. */
 		nv_start_dma();
-
-		i++;
 	}
 }
 
@@ -1098,6 +1112,7 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 void FILL_RECTANGLE_DMA(engine_token *et, uint32 colorIndex, fill_rect_params *list, uint32 count)
 {
 	uint32 i = 0;
+	uint16 subcnt;
 
 	/*** init acc engine for fill function ***/
 	/* ROP registers (Raster OPeration):
@@ -1111,24 +1126,33 @@ void FILL_RECTANGLE_DMA(engine_token *et, uint32 colorIndex, fill_rect_params *l
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = colorIndex; /* Color1A */
 
 	/*** draw each rectangle ***/
-	while (count--)
+	while (count)
 	{
-		/* instruct engine what to fill:
-		 * wait for room in fifo for bitmap cmd if needed. */
-		if (nv_acc_fifofree_dma(3) != B_OK) return;
-		/* now setup fill (writing 3 32bit words) */
-		nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(((list[i].left) << 16) | ((list[i].top) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(((((list[i].right)+1) - (list[i].left)) << 16) |
-			(((list[i].bottom-list[i].top)+1) & 0x0000ffff)); /* Unclipped Rect 0 WidthHeight */
+		/* break up the list in sublists to minimize calls, while making sure long
+		 * lists still get executed without trouble */
+		subcnt = 32;
+		if (count < 32) subcnt = count;
+		count -= subcnt;
+
+		/* wait for room in fifo for bitmap cmd if needed. */
+		if (nv_acc_fifofree_dma(3 * subcnt) != B_OK) return;
+
+		while (subcnt--)
+		{
+			/* now setup fill (writing 3 32bit words) */
+			nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				(((list[i].left) << 16) | ((list[i].top) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				(((((list[i].right)+1) - (list[i].left)) << 16) |
+				(((list[i].bottom-list[i].top)+1) & 0x0000ffff)); /* Unclipped Rect 0 WidthHeight */
+
+			i++;
+		}
 
 		/* tell the engine to fetch the commands in the DMA buffer that where not
 		 * executed before. */
 		nv_start_dma();
-
-		i++;
 	}
 }
 
@@ -1136,6 +1160,7 @@ void FILL_RECTANGLE_DMA(engine_token *et, uint32 colorIndex, fill_rect_params *l
 void FILL_SPAN_DMA(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count)
 {
 	uint32 i = 0;
+	uint16 subcnt;
 
 	/*** init acc engine for fill function ***/
 	/* ROP registers (Raster OPeration):
@@ -1149,23 +1174,32 @@ void FILL_SPAN_DMA(engine_token *et, uint32 colorIndex, uint16 *list, uint32 cou
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = colorIndex; /* Color1A */
 
 	/*** draw each span ***/
-	while (count--)
+	while (count)
 	{
-		/* instruct engine what to fill:
-		 * wait for room in fifo for bitmap cmd if needed. */
-		if (nv_acc_fifofree_dma(3) != B_OK) return;
-		/* now setup fill (writing 3 32bit words) */
-		nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(((list[i+1]) << 16) | ((list[i]) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			((((list[i+2]+1) - (list[i+1])) << 16) | 0x00000001); /* Unclipped Rect 0 WidthHeight */
+		/* break up the list in sublists to minimize calls, while making sure long
+		 * lists still get executed without trouble */
+		subcnt = 32;
+		if (count < 32) subcnt = count;
+		count -= subcnt;
+
+		/* wait for room in fifo for bitmap cmd if needed. */
+		if (nv_acc_fifofree_dma(3 * subcnt) != B_OK) return;
+
+		while (subcnt--)
+		{
+			/* now setup fill (writing 3 32bit words) */
+			nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				(((list[i+1]) << 16) | ((list[i]) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				((((list[i+2]+1) - (list[i+1])) << 16) | 0x00000001); /* Unclipped Rect 0 WidthHeight */
+
+			i+=3;
+		}
 
 		/* tell the engine to fetch the commands in the DMA buffer that where not
 		 * executed before. */
 		nv_start_dma();
-
-		i+=3;
 	}
 }
 
@@ -1173,6 +1207,7 @@ void FILL_SPAN_DMA(engine_token *et, uint32 colorIndex, uint16 *list, uint32 cou
 void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count)
 {
 	uint32 i = 0;
+	uint16 subcnt;
 
 	/*** init acc engine for invert function ***/
 	/* ROP registers (Raster OPeration):
@@ -1186,23 +1221,32 @@ void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* Color1A */
 
 	/*** invert each rectangle ***/
-	while (count--)
+	while (count)
 	{
-		/* instruct engine what to fill:
-		 * wait for room in fifo for bitmap cmd if needed. */
-		if (nv_acc_fifofree_dma(3) != B_OK) return;
-		/* now setup fill (writing 3 32bit words) */
-		nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(((list[i].left) << 16) | ((list[i].top) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-			(((((list[i].right)+1) - (list[i].left)) << 16) |
-			(((list[i].bottom-list[i].top)+1) & 0x0000ffff)); /* Unclipped Rect 0 WidthHeight */
+		/* break up the list in sublists to minimize calls, while making sure long
+		 * lists still get executed without trouble */
+		subcnt = 32;
+		if (count < 32) subcnt = count;
+		count -= subcnt;
+
+		/* wait for room in fifo for bitmap cmd if needed. */
+		if (nv_acc_fifofree_dma(3 * subcnt) != B_OK) return;
+
+		while (subcnt--)
+		{
+			/* now setup fill (writing 3 32bit words) */
+			nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				(((list[i].left) << 16) | ((list[i].top) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+				(((((list[i].right)+1) - (list[i].left)) << 16) |
+				(((list[i].bottom-list[i].top)+1) & 0x0000ffff)); /* Unclipped Rect 0 WidthHeight */
+
+			i++;
+		}
 
 		/* tell the engine to fetch the commands in the DMA buffer that where not
 		 * executed before. */
 		nv_start_dma();
-
-		i++;
 	}
 }

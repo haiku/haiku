@@ -9,8 +9,8 @@
 /*
 	note:
 	moved DMA acceleration 'top-level' routines to be integrated in the engine:
-	it is costly to call the engine for every single function within a loop!!
-	(BeRoMeter 1.2.6 benchmarked: P4 3.2Ghz increased 15%, ...)
+	it is costly to call the engine for every single function within a loop!
+	(measured with BeRoMeter 1.2.6: upto 15% speed increase on all CPU's.)
 	Leaving PIO acceleration as it is for now, for the purpose of benchmarking :-)
 
 	note also:
