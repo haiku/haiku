@@ -47,7 +47,7 @@ public:
 	void NotifyWatchers(BMessage *message, WatcherFilter *filter = NULL);
 
 private:
-	typedef map<BMessenger,Watcher*> watcher_map;
+	typedef std::map<BMessenger,Watcher*> watcher_map;
 
 private:
 	watcher_map	fWatchers;

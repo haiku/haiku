@@ -24,8 +24,8 @@
 //	Description:	Manages the registrar side "shadows" of BMessageRunners.
 //------------------------------------------------------------------------------
 
-#include <algobase.h>
-#include <new.h>
+#include <algorithm>
+#include <new>
 
 #include <Autolock.h>
 #include <Message.h>

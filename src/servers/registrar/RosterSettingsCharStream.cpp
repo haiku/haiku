@@ -5,6 +5,14 @@
 
 #include <stdio.h>
 
+const status_t RosterSettingsCharStream::kEndOfLine;
+const status_t RosterSettingsCharStream::kEndOfStream;
+const status_t RosterSettingsCharStream::kInvalidEscape;
+const status_t RosterSettingsCharStream::kUnterminatedQuotedString;
+const status_t RosterSettingsCharStream::kComment;
+const status_t RosterSettingsCharStream::kUnexpectedState;
+const status_t RosterSettingsCharStream::kStringTooLong;
+
 using namespace BPrivate::Storage::Sniffer;
 
 //------------------------------------------------------------------------------

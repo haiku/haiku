@@ -29,6 +29,8 @@
 #include "Watcher.h"
 #include "WatchingService.h"
 
+using namespace std;
+
 /*!	\class WatchingService
 	\brief Features everything needed to provide a watching service.
 

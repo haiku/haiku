@@ -42,6 +42,8 @@
 #include <new>
 #include <map>
 
+using namespace std;
+
 #define DBG(x) (x)
 //#define DBG(x)
 #define OUT printf
