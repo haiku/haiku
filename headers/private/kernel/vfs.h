@@ -64,10 +64,6 @@ struct rlimit;
 int vfs_getrlimit(int resource, struct rlimit * rlp);
 int vfs_setrlimit(int resource, const struct rlimit * rlp);
 
-// ToDo: for now; this prototype should be in os/drivers/Drivers.h
-//	or similar places.
-extern status_t notify_select_event(struct selectsync *sync, uint32 ref, uint8 event);
-
 /* calls needed by the VM for paging and by the file cache */
 int vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode);
 status_t vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode);
