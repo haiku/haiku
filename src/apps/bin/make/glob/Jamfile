@@ -4,7 +4,7 @@ SubDirCcFlags -DHAVE_CONFIG_H ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-StaticLibrary glob : 
+StaticLibrary <make>glob : 
 	fnmatch.c
 	glob.c 
 ;

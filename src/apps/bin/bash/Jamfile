@@ -62,7 +62,8 @@ BinCommand sh :
 	unwind_prot.c bashline.c bracecomp.c error.c
 	list.c stringlib.c locale.c findcmd.c redir.c
 	pcomplete.c pcomplib.c syntax.c xmalloc.c test.c sig.c
-	: libreadline.a libglob.a libbuiltins.a libtilde.a libsh.a libtermcap.a 
+	: libreadline.a <bash>libglob.a libbuiltins.a libtilde.a libsh.a
+	  libtermcap.a 
 	: bash.rdef ;
 
 # trap.c includes signames.h

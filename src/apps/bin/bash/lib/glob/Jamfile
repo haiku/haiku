@@ -5,7 +5,7 @@ SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;
 
-StaticLibrary glob : 
+StaticLibrary <bash>glob : 
 	glob.c 
 	strmatch.c 
 	smatch.c 
