@@ -187,14 +187,6 @@ struct bfs_inode {
 	small_data	small_data_start[0];
 #endif
 	
-	inline small_data *SmallDataStart() const {
-		#if __MWERKS__
-			return (small_data *)(&pad[4] /* last item in pad + sizeof(int32) */);
-		#else
-			return small_data_start;
-		#endif
-	}
-	
 	int32 Magic1() const { return BFS_ENDIAN_TO_HOST_INT32(magic1); }
 	int32 UserID() const { return BFS_ENDIAN_TO_HOST_INT32(uid); }
 	int32 GroupID() const { return BFS_ENDIAN_TO_HOST_INT32(gid); }
@@ -204,6 +196,8 @@ struct bfs_inode {
 	int32 InodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(inode_size); }
 	bigtime_t LastModifiedTime() const { return BFS_ENDIAN_TO_HOST_INT64(last_modified_time); }
 	bigtime_t CreateTime() const { return BFS_ENDIAN_TO_HOST_INT64(create_time); }
+
+	inline small_data *SmallDataStart();
 
 	status_t InitCheck(Volume *volume);
 		// defined in Inode.cpp
@@ -379,6 +373,21 @@ small_data::IsLast(const bfs_inode *inode) const
 	// the block, we would touch invalid memory (although that can't cause wrong
 	// results)
 	return (uint32)this > (uint32)inode + inode->InodeSize() - sizeof(small_data) || name_size == 0;
+}
+
+
+/************************ bfs_inode inline functions ************************/
+//	#pragma mark -
+
+
+inline small_data *
+bfs_inode::SmallDataStart()
+{
+#if __MWERKS__
+	return (small_data *)(&pad[4] /* last item in pad + sizeof(int32) */);
+#else
+	return small_data_start;
+#endif
 }
 
 
