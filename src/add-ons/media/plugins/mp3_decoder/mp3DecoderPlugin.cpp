@@ -387,6 +387,8 @@ mp3DecoderPlugin::GetSupportedFormats(media_format ** formats, size_t * count)
 	media_format format;
 	format.type = B_MEDIA_ENCODED_AUDIO;
 	format.u.encoded_audio = media_encoded_audio_format::wildcard;
+	format.u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_SHORT;
+	format.u.encoded_audio.output.byte_order = B_MEDIA_HOST_ENDIAN;
 
 	BMediaFormats mediaFormats;
 	status_t result = mediaFormats.InitCheck();
