@@ -11,14 +11,15 @@
 /*! \file vfs_interface.cpp
 */
 
-#include "Debug.h"
+#include "UdfDebug.h"
 #include "cpp.h"
 
+#include <Drivers.h>
+#include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
-
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 // BeOS vnode layer stuff
 #include <KernelExport.h>
@@ -34,6 +35,7 @@ extern "C" {
 #	define dprintf printf
 #endif
 
+#include "Volume.h"
 
 extern "C" {
 	// general/volume stuff
@@ -215,26 +217,69 @@ int32 api_version = B_CUR_FS_API_VERSION;
 // General/volume functions
 //----------------------------------------------------------------------
 
+/*! \brief mount
+
+	\todo I'm using the B_GET_GEOMETRY ioctl() to find out where the end of the
+	      partition is. This won't work for handling multi-session semantics correctly.
+	      To support them correctly in R5 I need either:
+	      - A way to get the proper info (best)
+	      - To ignore trying to find anchor volume descriptor pointers at
+	        locations N-256 and N. (acceptable, perhaps, but not really correct)
+	      Either way we should address this problem properly for OBOS::R1.
+	\todo Looks like B_GET_GEOMETRY doesn't work on non-device files (i.e.
+	      disk images), so I need to use stat or something else for those
+	      instances.
+*/
 int
 udf_mount(nspace_id nsid, const char *deviceName, ulong flags, void *parms,
 		size_t parmsLength, void **volumeCookie, vnode_id *rootID)
 {
-	FUNCTION();
+	DEBUG_INIT();
 
-	if (rootID)
-		*rootID = 0;
-	if (volumeCookie)
-		*volumeCookie = new char[1];
-	dprintf("new_vnode(root) = %d\n", new_vnode(nsid, *rootID, (void*)23));
+	status_t err = B_OK;
+	off_t deviceSize = 0;	// in blocks
+	UDF::Volume *volume = NULL;
+	device_geometry geometry;
 
-	return B_OK;	
+	// Open the device (read only should be fine), get its geometry,
+	// and calculate its length. 
+	int device = open(deviceName, O_RDONLY);
+	err = device < B_OK ? device : B_OK;
+	if (!err) {
+		if (ioctl(device, B_GET_GEOMETRY, &geometry) == 0) {
+			deviceSize = (off_t)geometry.sectors_per_track
+				* geometry.cylinder_count * geometry.head_count;
+		} else {
+			err = errno;
+		}
+	}
+	
+	// Create and mount the volume
+	if (!err) {
+		volume = new UDF::Volume(nsid);
+		err = volume ? B_OK : B_NO_MEMORY;
+	}
+	if (!err) {
+		err = volume->Mount(deviceName, 0, deviceSize, flags, 2048);
+	}
+		
+	if (!err) {
+		if (rootID)
+			*rootID = 0;	// todo: get the real root id once it's implemented
+		if (volumeCookie)
+			*volumeCookie = volume;
+		// todo: ditch this
+		dprintf("new_vnode(root) = %d\n", new_vnode(nsid, *rootID, (void*)23));
+	}
+
+	RETURN(err);	
 }
 
 
 int
 udf_unmount(void *ns)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_OK;	
 }
 
@@ -242,7 +287,7 @@ udf_unmount(void *ns)
 int
 udf_read_fs_stat(void *ns, struct fs_info *info)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -250,7 +295,7 @@ udf_read_fs_stat(void *ns, struct fs_info *info)
 int
 udf_write_fs_stat(void *ns, struct fs_info *info, long mask)
 {
-	FUNCTION_START(("mask = %ld\n",mask));
+	// FUNCTION_START(("mask = %ld\n",mask));
 	return B_ERROR;
 }
 
@@ -258,7 +303,7 @@ udf_write_fs_stat(void *ns, struct fs_info *info, long mask)
 int 
 udf_initialize(const char *deviceName, void *parms, size_t parmsLength)
 {
-	FUNCTION_START(("deviceName = %s, parameter len = %ld\n", deviceName, parmsLength));
+	// FUNCTION_START(("deviceName = %s, parameter len = %ld\n", deviceName, parmsLength));
 	return B_ERROR;
 }
 
@@ -266,7 +311,7 @@ udf_initialize(const char *deviceName, void *parms, size_t parmsLength)
 int 
 udf_sync(void *ns)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_OK;
 }
 
@@ -275,7 +320,7 @@ int
 udf_read_vnode(void *ns, vnode_id id, char reenter, void **node)
 {
 	dprintf("read_vnode\n");
-	FUNCTION_START(("vnode_id = %lld\n", id));
+	// FUNCTION_START(("vnode_id = %lld\n", id));
 
 	if (id == 1) {
 		*node = (void*)0;
@@ -288,7 +333,7 @@ udf_read_vnode(void *ns, vnode_id id, char reenter, void **node)
 int
 udf_release_vnode(void *ns, void *node, char reenter)
 {
-	FUNCTION_START(("node = %p\n",node));
+	// FUNCTION_START(("node = %p\n",node));
 	return B_ERROR;
 }
 
@@ -296,7 +341,7 @@ udf_release_vnode(void *ns, void *node, char reenter)
 int 
 udf_remove_vnode(void *ns, void *node, char reenter)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -304,7 +349,7 @@ udf_remove_vnode(void *ns, void *node, char reenter)
 int
 udf_wake_vnode(void *ns, void *node)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -312,7 +357,7 @@ udf_wake_vnode(void *ns, void *node)
 int
 udf_suspend_vnode(void *ns, void *node)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -320,7 +365,7 @@ udf_suspend_vnode(void *ns, void *node)
 int
 udf_walk(void *ns, void *dir, const char *filename, char **resolvedPath, vnode_id *vnodeID)
 {
-	FUNCTION_START(("dir = %p, filename = `%s'\n", dir, filename));
+	// FUNCTION_START(("dir = %p, filename = `%s'\n", dir, filename));
 	return B_ERROR;
 }
 
@@ -328,7 +373,7 @@ udf_walk(void *ns, void *dir, const char *filename, char **resolvedPath, vnode_i
 int 
 udf_ioctl(void *ns, void *node, void *cookie, int cmd, void *buffer, size_t bufferLength)
 {
-	FUNCTION_START(("node = %p, cmd = %d, buf = %p, len = %ld\n", node, cmd, buffer, bufferLength));
+	// FUNCTION_START(("node = %p, cmd = %d, buf = %p, len = %ld\n", node, cmd, buffer, bufferLength));
 	return B_ERROR;
 }
 
@@ -336,7 +381,7 @@ udf_ioctl(void *ns, void *node, void *cookie, int cmd, void *buffer, size_t buff
 int 
 udf_setflags(void *ns, void *node, void *cookie, int flags)
 {
-	FUNCTION_START(("node = %p, flags = %d", node, flags));
+	// FUNCTION_START(("node = %p, flags = %d", node, flags));
 	return B_ERROR;
 }
 
@@ -344,7 +389,7 @@ udf_setflags(void *ns, void *node, void *cookie, int flags)
 int 
 udf_select(void *ns, void *node, void *cookie, uint8 event, uint32 ref, selectsync *sync)
 {
-	FUNCTION_START(("event = %d, ref = %lu, sync = %p\n", event, ref, sync));
+	// FUNCTION_START(("event = %d, ref = %lu, sync = %p\n", event, ref, sync));
 	return B_ERROR;
 }
 
@@ -352,7 +397,7 @@ udf_select(void *ns, void *node, void *cookie, uint8 event, uint32 ref, selectsy
 int 
 udf_deselect(void *ns, void *node, void *cookie, uint8 event, selectsync *sync)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -360,7 +405,7 @@ udf_deselect(void *ns, void *node, void *cookie, uint8 event, selectsync *sync)
 int 
 udf_fsync(void *_ns, void *_node)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -368,7 +413,7 @@ udf_fsync(void *_ns, void *_node)
 int
 udf_read_stat(void *ns, void *node, struct stat *st)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -376,7 +421,7 @@ udf_read_stat(void *ns, void *node, struct stat *st)
 int 
 udf_write_stat(void *ns, void *node, struct stat *stat, long mask)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -390,7 +435,7 @@ int
 udf_create(void *ns, void *dir, const char *name, int omode, int mode,
 	vnode_id *newID, void **newNode)
 {
-	FUNCTION_START(("name = \"%s\", perms = %d, omode = %d\n", name, mode, omode));
+	// FUNCTION_START(("name = \"%s\", perms = %d, omode = %d\n", name, mode, omode));
 	return B_ERROR;
 }
 
@@ -398,7 +443,7 @@ udf_create(void *ns, void *dir, const char *name, int omode, int mode,
 int 
 udf_symlink(void *ns, void *dir, const char *name, const char *path)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -406,7 +451,7 @@ udf_symlink(void *ns, void *dir, const char *name, const char *path)
 int 
 udf_link(void *ns, void *dir, const char *name, void *node)
 {
-	FUNCTION_START(("name = \"%s\"\n", name));
+	// FUNCTION_START(("name = \"%s\"\n", name));
 	return B_ERROR;
 }
 
@@ -414,7 +459,7 @@ udf_link(void *ns, void *dir, const char *name, void *node)
 int 
 udf_unlink(void *ns, void *dir, const char *name)
 {
-	FUNCTION_START(("name = \"%s\"\n",name));
+	// FUNCTION_START(("name = \"%s\"\n",name));
 	return B_ERROR;
 }
 
@@ -422,21 +467,21 @@ udf_unlink(void *ns, void *dir, const char *name)
 int 
 udf_rename(void *ns, void *oldDir, const char *oldName, void *newDir, const char *newName)
 {
-	FUNCTION_START(("oldDir = %p, oldName = \"%s\", newDir = %p, newName = \"%s\"\n", oldDir, oldName, newDir, newName));
+	// FUNCTION_START(("oldDir = %p, oldName = \"%s\", newDir = %p, newName = \"%s\"\n", oldDir, oldName, newDir, newName));
 	return B_ERROR;
 }
 
 int
 udf_open(void *_ns, void *_node, int omode, void **_cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
 int
 udf_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer, size_t *_length)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -444,7 +489,7 @@ udf_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer, size_t 
 int 
 udf_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, size_t *_length)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -452,7 +497,7 @@ udf_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 int
 udf_close(void *_ns, void *_node, void *_cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -460,7 +505,7 @@ udf_close(void *_ns, void *_node, void *_cookie)
 int
 udf_free_cookie(void *_ns, void *_node, void *_cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -468,7 +513,7 @@ udf_free_cookie(void *_ns, void *_node, void *_cookie)
 int
 udf_access(void *_ns, void *_node, int accessMode)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -476,7 +521,7 @@ udf_access(void *_ns, void *_node, int accessMode)
 int
 udf_read_link(void *_ns, void *_node, char *buffer, size_t *bufferSize)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -489,7 +534,7 @@ udf_read_link(void *_ns, void *_node, char *buffer, size_t *bufferSize)
 int 
 udf_mkdir(void *ns, void *dir, const char *name, int mode)
 {
-	FUNCTION_START(("name = \"%s\", perms = %d\n", name, mode));
+	// FUNCTION_START(("name = \"%s\", perms = %d\n", name, mode));
 	return B_ERROR;
 }
 
@@ -497,7 +542,7 @@ udf_mkdir(void *ns, void *dir, const char *name, int mode)
 int 
 udf_rmdir(void *ns, void *dir, const char *name)
 {
-	FUNCTION_START(("name = \"%s\"\n", name));
+	// FUNCTION_START(("name = \"%s\"\n", name));
 	return B_ERROR;
 }
 
@@ -505,7 +550,7 @@ udf_rmdir(void *ns, void *dir, const char *name)
 int
 udf_open_dir(void *ns, void *node, void **cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -514,7 +559,7 @@ int
 udf_read_dir(void *ns, void *node, void *cookie, long *num, 
 	struct dirent *dirent, size_t bufferSize)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -522,7 +567,7 @@ udf_read_dir(void *ns, void *node, void *cookie, long *num,
 int
 udf_rewind_dir(void *ns, void *node, void *cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -530,7 +575,7 @@ udf_rewind_dir(void *ns, void *node, void *cookie)
 int		
 udf_close_dir(void *ns, void *node, void *cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -538,7 +583,7 @@ udf_close_dir(void *ns, void *node, void *cookie)
 int
 udf_free_dir_cookie(void *ns, void *node, void *cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -551,7 +596,7 @@ udf_free_dir_cookie(void *ns, void *node, void *cookie)
 int 
 udf_open_attrdir(void *ns, void *node, void **cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -559,7 +604,7 @@ udf_open_attrdir(void *ns, void *node, void **cookie)
 int
 udf_close_attrdir(void *ns, void *node, void *cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -567,7 +612,7 @@ udf_close_attrdir(void *ns, void *node, void *cookie)
 int
 udf_free_attrdir_cookie(void *ns, void *node, void *_cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -575,7 +620,7 @@ udf_free_attrdir_cookie(void *ns, void *node, void *_cookie)
 int
 udf_rewind_attrdir(void *_ns, void *_node, void *_cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -583,7 +628,7 @@ udf_rewind_attrdir(void *_ns, void *_node, void *_cookie)
 int 
 udf_read_attrdir(void *_ns, void *node, void *_cookie, long *num, struct dirent *dirent, size_t bufsize)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -591,7 +636,7 @@ udf_read_attrdir(void *_ns, void *node, void *_cookie, long *num, struct dirent 
 int
 udf_remove_attr(void *_ns, void *_node, const char *name)
 {
-	FUNCTION_START(("name = \"%s\"\n",name));
+	// FUNCTION_START(("name = \"%s\"\n",name));
 	return B_ERROR;
 }
 
@@ -599,7 +644,7 @@ udf_remove_attr(void *_ns, void *_node, const char *name)
 int
 udf_rename_attr(void *ns, void *node, const char *oldname, const char *newname)
 {
-	FUNCTION_START(("name = \"%s\",to = \"%s\"\n", oldname, newname));
+	// FUNCTION_START(("name = \"%s\",to = \"%s\"\n", oldname, newname));
 	return B_ERROR;
 }
 
@@ -607,7 +652,7 @@ udf_rename_attr(void *ns, void *node, const char *oldname, const char *newname)
 int
 udf_stat_attr(void *ns, void *_node, const char *name, struct attr_info *attrInfo)
 {
-	FUNCTION_START(("name = \"%s\"\n",name));
+	// FUNCTION_START(("name = \"%s\"\n",name));
 	return B_ERROR;
 }
 
@@ -616,7 +661,7 @@ int
 udf_write_attr(void *_ns, void *_node, const char *name, int type, const void *buffer,
 	size_t *_length, off_t pos)
 {
-	FUNCTION_START(("name = \"%s\"\n",name));
+	// FUNCTION_START(("name = \"%s\"\n",name));
 	return B_ERROR;
 }
 
@@ -625,7 +670,7 @@ int
 udf_read_attr(void *_ns, void *_node, const char *name, int type, void *buffer,
 	size_t *_length, off_t pos)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -638,7 +683,7 @@ udf_read_attr(void *_ns, void *_node, const char *name, int type, void *buffer,
 int 
 udf_open_indexdir(void *_ns, void **_cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -646,7 +691,7 @@ udf_open_indexdir(void *_ns, void **_cookie)
 int 
 udf_close_indexdir(void *_ns, void *_cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -654,7 +699,7 @@ udf_close_indexdir(void *_ns, void *_cookie)
 int 
 udf_free_indexdir_cookie(void *_ns, void *_node, void *_cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -662,7 +707,7 @@ udf_free_indexdir_cookie(void *_ns, void *_node, void *_cookie)
 int 
 udf_rewind_indexdir(void *_ns, void *_cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -670,7 +715,7 @@ udf_rewind_indexdir(void *_ns, void *_cookie)
 int 
 udf_read_indexdir(void *_ns, void *_cookie, long *num, struct dirent *dirent, size_t bufferSize)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -678,7 +723,7 @@ udf_read_indexdir(void *_ns, void *_cookie, long *num, struct dirent *dirent, si
 int 
 udf_create_index(void *_ns, const char *name, int type, int flags)
 {
-	FUNCTION_START(("name = \"%s\", type = %d, flags = %d\n", name, type, flags));
+	// FUNCTION_START(("name = \"%s\", type = %d, flags = %d\n", name, type, flags));
 	return B_ERROR;
 }
 
@@ -686,7 +731,7 @@ udf_create_index(void *_ns, const char *name, int type, int flags)
 int 
 udf_remove_index(void *_ns, const char *name)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -694,7 +739,7 @@ udf_remove_index(void *_ns, const char *name)
 int 
 udf_rename_index(void *ns, const char *oldname, const char *newname)
 {
-	FUNCTION_START(("from = %s, to = %s\n", oldname, newname));
+	// FUNCTION_START(("from = %s, to = %s\n", oldname, newname));
 	return B_ERROR;
 }
 
@@ -702,7 +747,7 @@ udf_rename_index(void *ns, const char *oldname, const char *newname)
 int 
 udf_stat_index(void *_ns, const char *name, struct index_info *indexInfo)
 {
-	FUNCTION_START(("name = %s\n",name));
+	// FUNCTION_START(("name = %s\n",name));
 	return B_ERROR;
 }
 
@@ -714,7 +759,7 @@ int
 udf_open_query(void *_ns, const char *queryString, ulong flags, port_id port,
 	long token, void **cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -722,7 +767,7 @@ udf_open_query(void *_ns, const char *queryString, ulong flags, port_id port,
 int
 udf_close_query(void *ns, void *cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -730,7 +775,7 @@ udf_close_query(void *ns, void *cookie)
 int
 udf_free_query_cookie(void *ns, void *node, void *cookie)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
@@ -738,7 +783,7 @@ udf_free_query_cookie(void *ns, void *node, void *cookie)
 int
 udf_read_query(void *ns, void *cookie, long *num, struct dirent *dirent, size_t bufferSize)
 {
-	FUNCTION();
+	DEBUG_INIT();
 	return B_ERROR;
 }
 
