@@ -1,0 +1,28 @@
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
+//---------------------------------------------------------------------
+#ifndef _UDF_RECOGNITION_H
+#define _UDF_RECOGNITION_H
+
+/*! \file Recognition.h
+*/
+
+#include "DiskStructures.h"
+#include "UdfDebug.h"
+
+namespace Udf {
+
+status_t udf_recognize(int device, off_t offset, off_t length,
+					   uint32 blockSize, uint32 &blockShift,
+                       udf_logical_descriptor &logicalVolumeDescriptor,
+                       udf_partition_descriptor partitionDescriptors[],
+                       uint8 &partitionDescriptorCount);
+status_t udf_recognize(int device, off_t offset, off_t length,
+					   uint32 blockSize, uint32 &blockShift);
+
+}	// namespace Udf
+
+#endif	// _UDF_RECOGNITION_H
