@@ -187,7 +187,8 @@ struct core_module_info core_info = {
 	socket_getsockopt,
 	socket_getpeername,
 	socket_getsockname,
-	socket_set_event_callback
+	socket_set_event_callback,
+	socket_shutdown
 };
 
 static int32 if_thread(void *data)

@@ -102,7 +102,7 @@ typedef struct {
 
 	sem_id		selecters_lock;	// protect the selecters linked-list
 	selecter * 	selecters;	// the select()'ers lists (thread-aware) 
-} net_stack_cookie;
+} net_server_cookie;
 
 
 //*****************************************************/
@@ -110,16 +110,16 @@ typedef struct {
 //*****************************************************/
 
 /* device hooks */
-static status_t net_stack_open(const char * name, uint32 flags, void ** cookie);
-static status_t net_stack_close(void * cookie);
-static status_t net_stack_free_cookie(void * cookie);
-static status_t net_stack_control(void * cookie, uint32 msg,void * data, size_t datalen);
-static status_t net_stack_read(void * cookie, off_t pos, void * data, size_t * datalen);
-static status_t net_stack_write(void * cookie, off_t pos, const void * data, size_t * datalen);
-static status_t net_stack_select(void *cookie, uint8 event, uint32 ref, selectsync *sync);
-static status_t net_stack_deselect(void *cookie, uint8 event, selectsync *sync);
-// static status_t net_stack_readv(void * cookie, off_t pos, const iovec * vec, size_t count, size_t * len);
-// static status_t net_stack_writev(void * cookie, off_t pos, const iovec * vec, size_t count, size_t * len);
+static status_t net_server_open(const char * name, uint32 flags, void ** cookie);
+static status_t net_server_close(void * cookie);
+static status_t net_server_free_cookie(void * cookie);
+static status_t net_server_control(void * cookie, uint32 msg,void * data, size_t datalen);
+static status_t net_server_read(void * cookie, off_t pos, void * data, size_t * datalen);
+static status_t net_server_write(void * cookie, off_t pos, const void * data, size_t * datalen);
+static status_t net_server_select(void *cookie, uint8 event, uint32 ref, selectsync *sync);
+static status_t net_server_deselect(void *cookie, uint8 event, selectsync *sync);
+// static status_t net_server_readv(void * cookie, off_t pos, const iovec * vec, size_t count, size_t * len);
+// static status_t net_server_writev(void * cookie, off_t pos, const iovec * vec, size_t count, size_t * len);
 
 /* select() support */
 static int32 socket_event_listener(void * data);
@@ -128,30 +128,33 @@ static void r5_notify_select_event(selectsync *sync, uint32 ref);
 
 /* command queue */
 static status_t init_connection(void **cookie);
-static void shutdown_connection(net_stack_cookie *nsc);
-static net_command *get_command(net_stack_cookie *nsc, int32 *index);
-static status_t execute_command(net_stack_cookie *nsc, int32 op, void *data, uint32 length);
+static void shutdown_connection(net_server_cookie *nsc);
+static net_command *get_command(net_server_cookie *nsc, int32 *index);
+static status_t execute_command(net_server_cookie *nsc, int32 op, void *data, uint32 length);
 
 /*
  * Global variables
  * ----------------
  */
 
+#define NET_SERVER_DRIVER_DEV	"net/server"
+#define NET_SERVER_DRIVER_PATH	"/dev/" ## NET_SERVER_DRIVER_DEV
+
 const char * g_device_names_list[] = {
         "net/server",
         NULL
 };
 
-device_hooks g_net_stack_driver_hooks =
+device_hooks g_net_server_driver_hooks =
 {
-	net_stack_open,			/* -> open entry point */
-	net_stack_close,		/* -> close entry point */
-	net_stack_free_cookie,	/* -> free entry point */
-	net_stack_control,		/* -> control entry point */
-	net_stack_read,			/* -> read entry point */
-	net_stack_write,		/* -> write entry point */
-	net_stack_select,		/* -> select entry point */
-	net_stack_deselect,		/* -> deselect entry point */
+	net_server_open,		/* -> open entry point */
+	net_server_close,		/* -> close entry point */
+	net_server_free_cookie,	/* -> free entry point */
+	net_server_control,		/* -> control entry point */
+	net_server_read,		/* -> read entry point */
+	net_server_write,		/* -> write entry point */
+	net_server_select,		/* -> select entry point */
+	net_server_deselect,	/* -> deselect entry point */
 	NULL,               	/* -> readv entry pint */
 	NULL                	/* -> writev entry point */
 };
@@ -230,7 +233,7 @@ _EXPORT device_hooks *
 find_device(const char *deviceName)
 {
 	FUNCTION();
-	return &g_net_stack_driver_hooks;
+	return &g_net_server_driver_hooks;
 }
 
 
@@ -241,9 +244,9 @@ find_device(const char *deviceName)
 
 
 static status_t
-net_stack_open(const char *name, uint32 flags, void ** cookie)
+net_server_open(const char *name, uint32 flags, void **cookie)
 {
-	net_stack_cookie * nsc;
+	net_server_cookie *nsc;
 
 	status_t status = init_connection(cookie);
 	if (status < B_OK)
@@ -253,16 +256,16 @@ net_stack_open(const char *name, uint32 flags, void ** cookie)
 
 	status = execute_command(nsc, NET_STACK_OPEN, &flags, sizeof(uint32));
 	if (status < B_OK)
-		net_stack_free_cookie(nsc);
+		net_server_free_cookie(nsc);
 
 	return status;
 }
 
 
 static status_t
-net_stack_close(void *cookie)
+net_server_close(void *cookie)
 {
-	net_stack_cookie * nsc = (net_stack_cookie *) cookie;
+	net_server_cookie *nsc = cookie;
 	if (nsc == NULL)
 		return B_BAD_VALUE;
 
@@ -275,9 +278,9 @@ net_stack_close(void *cookie)
 
 
 static status_t
-net_stack_free_cookie(void *cookie)
+net_server_free_cookie(void *cookie)
 {
-	net_stack_cookie * nsc = (net_stack_cookie *) cookie;
+	net_server_cookie *nsc = cookie;
 	if (nsc == NULL)
 		return B_BAD_VALUE;
 
@@ -287,9 +290,10 @@ net_stack_free_cookie(void *cookie)
 
 
 static status_t
-net_stack_control(void *cookie, uint32 op, void *data, size_t length)
+net_server_control(void *cookie, uint32 op, void *data, size_t length)
 {
-	net_stack_cookie * nsc = (net_stack_cookie *) cookie;
+	net_server_cookie *nsc = cookie;
+	struct stack_driver_args *args = data;
 
 	//FUNCTION_START(("cookie = %p, op = %lx, data = %p, length = %ld\n", cookie, op, data, length));
 
@@ -297,19 +301,16 @@ net_stack_control(void *cookie, uint32 op, void *data, size_t length)
 		return B_BAD_VALUE;
 
 	switch (op) {
-		case NET_STACK_SELECT: {
-			struct select_args *args = (struct select_args *) data;
-			
+		case NET_STACK_SELECT:
 			// if we get this call via ioctl() we are obviously called from an
 			// R5 compatible libnet: we are using the r5 kernel select() call,
 			// So, we can't use the kernel notify_select_event(), but our own implementation!
 			g_nse = r5_notify_select_event;
-			return net_stack_select(cookie, (args->ref & 0x0F), args->ref, args->sync);
-		}
-		case NET_STACK_DESELECT: {
-			struct select_args * args = (struct select_args *) data;
-			return net_stack_deselect(cookie, (args->ref & 0x0F), args->sync);
-		}
+			return net_server_select(cookie, (args->u.select.ref & 0x0F), args->u.select.ref, args->u.select.sync);
+
+		case NET_STACK_DESELECT:
+			return net_server_deselect(cookie, (args->u.select.ref & 0x0F), args->u.select.sync);
+
 		default:
 			return execute_command(nsc, op, data, -1);
 	};
@@ -317,15 +318,15 @@ net_stack_control(void *cookie, uint32 op, void *data, size_t length)
 
 
 static status_t
-net_stack_read(void *cookie, off_t pos, void *buffer, size_t *length)
+net_server_read(void *cookie, off_t pos, void *buffer, size_t *length)
 {
-	net_stack_cookie * nsc = (net_stack_cookie *) cookie;
-	struct data_xfer_args args;
+	net_server_cookie *nsc = cookie;
+	struct stack_driver_args args;
 	int status;
 
 	memset(&args, 0, sizeof(args));
-	args.data = buffer;
-	args.datalen = *length;
+	args.u.transfer.data = buffer;
+	args.u.transfer.datalen = *length;
 
 	status = execute_command(nsc, NET_STACK_RECV, &args, sizeof(args));
 	if (status > 0) {
@@ -337,15 +338,15 @@ net_stack_read(void *cookie, off_t pos, void *buffer, size_t *length)
 
 
 static status_t
-net_stack_write(void *cookie, off_t pos, const void *buffer, size_t *length)
+net_server_write(void *cookie, off_t pos, const void *buffer, size_t *length)
 {
-	net_stack_cookie * nsc = (net_stack_cookie *) cookie;
-	struct data_xfer_args args;
+	net_server_cookie *nsc = cookie;
+	struct stack_driver_args args;
 	int status;
 	
 	memset(&args, 0, sizeof(args));
-	args.data = (void *) buffer;
-	args.datalen = *length;
+	args.u.transfer.data = (void *) buffer;
+	args.u.transfer.datalen = *length;
 	
 	status = execute_command(nsc, NET_STACK_SEND, &args, sizeof(args));
 	if (status > 0) {
@@ -357,11 +358,11 @@ net_stack_write(void *cookie, off_t pos, const void *buffer, size_t *length)
 
 
 static status_t
-net_stack_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
+net_server_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 {
-	net_stack_cookie * nsc = (net_stack_cookie *) cookie;
+	net_server_cookie *nsc = cookie;
 	struct notify_socket_event_args args;
-	selecter * s;
+	selecter *s;
 	status_t status;
 
 	FUNCTION_START(("cookie = %p, event = %d,  ref = %lx, sync =%p\n", cookie, event, ref, sync));
@@ -400,11 +401,11 @@ net_stack_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 
 
 static status_t
-net_stack_deselect(void *cookie, uint8 event, selectsync *sync)
+net_server_deselect(void *cookie, uint8 event, selectsync *sync)
 {
-	net_stack_cookie *nsc = (net_stack_cookie *) cookie;
-	selecter * previous;
-	selecter * s;
+	net_server_cookie *nsc = cookie;
+	selecter *previous;
+	selecter *s;
 	thread_id current_thread;
 	status_t status;
 
@@ -476,7 +477,7 @@ net_stack_deselect(void *cookie, uint8 event, selectsync *sync)
 	Okay, I should stop watch this movie *now*.
 */
 
-static int32 socket_event_listener(void * data)
+static int32 socket_event_listener(void *data)
 {
 	struct socket_event_data sed;
 	int32 msg;
@@ -495,10 +496,10 @@ static int32 socket_event_listener(void * data)
 }
 
 
-static void on_socket_event(void * socket, uint32 event, void * cookie)
+static void on_socket_event(void *socket, uint32 event, void *cookie)
 {
-	net_stack_cookie * nsc = (net_stack_cookie *) cookie;
-	selecter * s;
+	net_server_cookie *nsc = cookie;
+	selecter *s;
 
 	if (!nsc)
 		return;
@@ -529,10 +530,10 @@ static void on_socket_event(void * socket, uint32 event, void * cookie)
 	So, here is our own notify_select_event() implementation, the driver-side pair
 	of the our libnet.so select() implementation...
 */
-static void r5_notify_select_event(selectsync * sync, uint32 ref)
+static void r5_notify_select_event(selectsync *sync, uint32 ref)
 {
 	area_id	area;
-	struct r5_selectsync *	rss;
+	struct r5_selectsync *rss;
 	int fd;
 
 	FUNCTION_START(("sync = %p, ref = %lx\n", sync, ref));
@@ -589,7 +590,7 @@ error:
 
 
 static net_command *
-get_command(net_stack_cookie *nsc, int32 *index)
+get_command(net_server_cookie *nsc, int32 *index)
 {
 	int32 i, count = 0;
 	net_command *command;
@@ -632,77 +633,60 @@ get_area_from_address(net_area_info *info, void *data)
 static void
 set_command_areas(net_command *command)
 {
-	void *data = command->data;
-	if (data == NULL)
+	struct stack_driver_args *args = (void *) command->data;
+
+	if (args == NULL)
 		return;
 
-	if (get_area_from_address(&command->area[0],data) < B_OK)
+	if (get_area_from_address(&command->area[0], args) < B_OK)
 		return;
 
 	switch (command->op) {
 		case NET_STACK_GETSOCKOPT:
 		case NET_STACK_SETSOCKOPT:
-		{
-			struct sockopt_args *sockopt = (struct sockopt_args *)data;
-
-			get_area_from_address(&command->area[1],sockopt->optval);
+			get_area_from_address(&command->area[1], args->u.sockopt.optval);
 			break;
-		}
 
 		case NET_STACK_CONNECT:
 		case NET_STACK_BIND:
 		case NET_STACK_GETSOCKNAME:
 		case NET_STACK_GETPEERNAME:
-		{
-			struct sockaddr_args *args = (struct sockaddr_args *)data;
-			
-			get_area_from_address(&command->area[1],args->addr);
+			get_area_from_address(&command->area[1], args->u.sockaddr.addr);
 			break;
-		}
 
 		case NET_STACK_RECV:
 		case NET_STACK_SEND:
-		{
-			struct data_xfer_args *args = (struct data_xfer_args *)data;
-			get_area_from_address(&command->area[1],args->data);
-			get_area_from_address(&command->area[2],args->addr);
+			get_area_from_address(&command->area[1], args->u.transfer.data);
+			get_area_from_address(&command->area[2], args->u.transfer.addr);
 			break;
-		}
+
 		case NET_STACK_RECVFROM:
-		case NET_STACK_SENDTO:
-		{
-			struct msghdr *mh = (struct msghdr *)data;
+		case NET_STACK_SENDTO: {
+			struct msghdr *mh = (void *) args;
 			get_area_from_address(&command->area[1],mh->msg_name);
 			get_area_from_address(&command->area[2],mh->msg_iov);
 			get_area_from_address(&command->area[3],mh->msg_control);
 			break;
 		}
 
-		case NET_STACK_ACCEPT:
-		{
-			struct accept_args *args = (struct accept_args *)data;
-			/* accept_args.cookie is always in the address space of the server */
-			get_area_from_address(&command->area[1],args->addr);
-			break;
-		}
-		
+		case NET_STACK_ACCEPT: 
+			/* accept_args.cookie is always in the address space of the server */ 
+			get_area_from_address(&command->area[1], args->u.accept.addr); 
+			break; 
+                
 		case NET_STACK_SYSCTL:
-		{
-			struct sysctl_args *sysctl = (struct sysctl_args *)data;
-
-			get_area_from_address(&command->area[1],sysctl->name);
-			get_area_from_address(&command->area[2],sysctl->oldp);
-			get_area_from_address(&command->area[3],sysctl->oldlenp);
-			get_area_from_address(&command->area[4],sysctl->newp);
+			get_area_from_address(&command->area[1], args->u.sysctl.name);
+			get_area_from_address(&command->area[2], args->u.sysctl.oldp);
+			get_area_from_address(&command->area[3], args->u.sysctl.oldlenp);
+			get_area_from_address(&command->area[4], args->u.sysctl.newp);
 			break;
-		}
 
 /*
 	TODO/FIXME: phoudoin: where are these opcodes defined!?!
 		case OSIOCGIFCONF:
 		case SIOCGIFCONF:
 		{
-			struct ifconf *ifc = (struct ifconf *)data;
+			struct ifconf *ifc = data;
 
 			get_area_from_address(&command->area[1],ifc->ifc_buf);
 			break;
@@ -713,7 +697,7 @@ set_command_areas(net_command *command)
 
 
 static status_t
-execute_command(net_stack_cookie *nsc, int32 op, void *data, uint32 length)
+execute_command(net_server_cookie *nsc, int32 op, void *data, uint32 length)
 {
 	uint32 command_index;
 	net_command *command = get_command(nsc, (long *) &command_index);
@@ -769,7 +753,7 @@ init_connection(void **cookie)
 	ssize_t bytes;
 	int32 msg;
 
-	net_stack_cookie * nsc = (net_stack_cookie *) malloc(sizeof(net_stack_cookie));
+	net_server_cookie *nsc = (net_server_cookie *) malloc(sizeof(net_server_cookie));
 	if (nsc == NULL)
 		return B_NO_MEMORY;
 
@@ -849,9 +833,9 @@ init_connection(void **cookie)
 
 
 static void
-shutdown_connection(net_stack_cookie *nsc)
+shutdown_connection(net_server_cookie *nsc)
 {
-	selecter * s;
+	selecter *s;
 
 	delete_area(nsc->area);
 	delete_port(nsc->local_port);

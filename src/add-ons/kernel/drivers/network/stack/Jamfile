@@ -16,11 +16,11 @@ R5KernelAddon net_server_driver : kernel drivers bin :
 #	;
 
 # b) Kernelland stack version:
-#
+
 R5KernelAddon net_stack_driver : kernel drivers bin :
 	net_stack_driver.c
 ;
-#
+
 # For OpenBeOS we should be building the kernel stack driver objects this way.
 #KernelObjects
 #	net_stack_driver.c

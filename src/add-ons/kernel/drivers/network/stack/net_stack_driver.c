@@ -366,55 +366,46 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 				// TODO: This is where the open flags need to be addressed
 				return err;
 			}
-			case NET_STACK_ASSOCIATE_SOCKET:
-				nsc->socket = args->u.associate.socket;
+			case NET_STACK_GET_COOKIE: {
+				/* this is needed by accept() call, allowing libnet.so accept() to pass back
+				 * in NET_STACK_ACCEPT opcode the cookie (aka the net_stack_cookie!)
+				 * of the filedescriptor to use for the new accepted socket
+				 */
+				
+				*((void **) data) = cookie;
 				return B_OK;
+			}
 		};
 	} else {
 		switch (op) {
 			case NET_STACK_CONNECT:
 				return core->socket_connect(nsc->socket, (caddr_t) args->u.sockaddr.addr, args->u.sockaddr.addrlen);
 
+			case NET_STACK_SHUTDOWN:
+				return core->socket_shutdown(nsc->socket, args->u.integer);
+
 			case NET_STACK_BIND:
 				return core->socket_bind(nsc->socket, (caddr_t) args->u.sockaddr.addr, args->u.sockaddr.addrlen);
 	
 			case NET_STACK_LISTEN:
 				// backlog to set
-				return core->socket_listen(nsc->socket, args->u.integer.value);
+				return core->socket_listen(nsc->socket, args->u.integer);
 
 			case NET_STACK_ACCEPT: {
-				int fd;
-				struct socket *s;
-				struct associate_socket_args associate;
-				
-				err = core->socket_accept(nsc->socket, &s, (void *) args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
-				if (err < 0)
-					return err;
-				
-				// Okay, we have a new socket, but it should be a file descriptor too: 	
-				fd = open(NET_STACK_DRIVER_PATH, O_RDWR);
-				if (fd < 0) {
-					core->socket_close(s);
-					return fd;
-				};
-				
-				associate.socket = s;
-				err = ioctl(fd, NET_STACK_ASSOCIATE_SOCKET, &associate, sizeof(associate));
-				if (err < 0) {
-					core->socket_close(s);
-					close(fd);
-					return err;
-				};
-				
-				return fd;
+				/* args->u.accept.cookie == net_stack_cookie of the already opened fd
+				 * in libnet.so accept() call to bind to newly accepted socket
+				 */
+				 
+				net_stack_cookie *ansc = args->u.accept.cookie;
+				return core->socket_accept(nsc->socket, &ansc->socket, (void *)args->u.accept.addr, &args->u.accept.addrlen);
 			}
 			case NET_STACK_SEND:
 				// TODO: flags gets ignored here...
-				return net_stack_write(cookie, 0, args->u.xfer.data, &args->u.xfer.datalen);
+				return net_stack_write(cookie, 0, args->u.transfer.data, &args->u.transfer.datalen);
 
 			case NET_STACK_RECV:
 				// TODO: flags gets ignored here...
-				return net_stack_read(cookie, 0, args->u.xfer.data, &args->u.xfer.datalen);
+				return net_stack_read(cookie, 0, args->u.transfer.data, &args->u.transfer.datalen);
 
 			case NET_STACK_RECVFROM: {
 				struct msghdr * mh = (struct msghdr *) data;
@@ -454,7 +445,7 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 	
 			case NET_STACK_GETPEERNAME:
 				return core->socket_getpeername(nsc->socket, args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
-
+				
 			case B_SET_BLOCKING_IO:
 				nsc->open_flags &= ~O_NONBLOCK;
 				return B_OK;
