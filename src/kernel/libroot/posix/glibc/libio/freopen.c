@@ -27,9 +27,41 @@
 
 #include "libioP.h"
 #include "stdio.h"
-#include <stdlib.h>
 
 #include <shlib-compat.h>
+
+FILE*
+freopen (filename, mode, fp)
+     const char* filename;
+     const char* mode;
+     FILE* fp;
+{
+  FILE *result;
+  CHECK_FILE (fp, NULL);
+  if (!(fp->_flags & _IO_IS_FILEBUF))
+    return NULL;
+  _IO_cleanup_region_start ((void (*) __P ((void *))) _IO_funlockfile, fp);
+  _IO_flockfile (fp);
+#if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_1)
+  if (&_IO_stdin_used == NULL)
+    /* If the shared C library is used by the application binary which
+       was linked against the older version of libio, we just use the
+       older one even for internal use to avoid trouble since a pointer
+       to the old libio may be passed into shared C library and wind
+       up here. */
+    result = _IO_old_freopen (filename, mode, fp);
+  else
+#endif
+    result = _IO_freopen (filename, mode, fp);
+  if (result != NULL)
+    /* unbound stream orientation */
+    result->_mode = 0;
+  _IO_funlockfile (fp);
+  _IO_cleanup_region_end (0);
+  return result;
+}
+
+#if 0
 #include <fd_to_filename.h>
 
 FILE*
@@ -87,3 +119,4 @@ freopen (filename, mode, fp)
   _IO_cleanup_region_end (0);
   return result;
 }
+#endif

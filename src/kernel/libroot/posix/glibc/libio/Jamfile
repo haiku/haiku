@@ -25,7 +25,7 @@ KernelMergeObject posix_gnu_libio.o :
 	<$(SOURCE_GRIST)>flockfile.c
 	<$(SOURCE_GRIST)>fputc.c
 	<$(SOURCE_GRIST)>fputc_u.c
-#	<$(SOURCE_GRIST)>freopen.c
+	<$(SOURCE_GRIST)>freopen.c
 	<$(SOURCE_GRIST)>fseek.c
 	<$(SOURCE_GRIST)>fseeko.c
 	<$(SOURCE_GRIST)>ftello.c
