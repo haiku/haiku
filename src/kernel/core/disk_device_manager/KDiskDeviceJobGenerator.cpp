@@ -45,6 +45,7 @@ KDiskDeviceJobGenerator::~KDiskDeviceJobGenerator()
 {
 	delete[] fMoveInfos;
 	delete[] fPartitionIDs;
+	delete fJobQueue;
 }
 
 // JobFactory
@@ -66,6 +67,15 @@ KDiskDeviceJobQueue *
 KDiskDeviceJobGenerator::JobQueue() const
 {
 	return fJobQueue;
+}
+
+// DetachJobQueue
+KDiskDeviceJobQueue *
+KDiskDeviceJobGenerator::DetachJobQueue()
+{
+	KDiskDeviceJobQueue *jobQueue = fJobQueue;
+	fJobQueue = NULL;
+	return jobQueue;
 }
 
 // GenerateJobs

@@ -27,6 +27,8 @@ public:
 	KDiskDevice *Device() const;
 	KDiskDeviceJobQueue *JobQueue() const;
 
+	KDiskDeviceJobQueue *DetachJobQueue();
+
 	status_t GenerateJobs();
 
 private:

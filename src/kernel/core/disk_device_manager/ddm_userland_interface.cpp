@@ -1230,7 +1230,9 @@ _kern_commit_disk_device_modifications(partition_id deviceID, port_id port,
 			// add the jobs to the manager
 			if (ManagerLocker locker2 = manager) {
 				error = manager->AddJobQueue(generator.JobQueue());
-				if (error != B_OK)
+				if (error == B_OK)
+					generator.DetachJobQueue();
+				else
 					return error;
 			} else
 				return B_ERROR;
