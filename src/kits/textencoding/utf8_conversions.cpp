@@ -39,6 +39,11 @@ convert_encoding(const char * from, const char * to,
 	do {
 		size_t nonReversibleConversions = iconv(conversion,inputBuffer,&inputLeft,&dst,&outputLeft);
 		if (nonReversibleConversions == (size_t)-1) {
+			if (errno == E2BIG) {
+				// Not enough room in the output buffer for the next converted character
+				// This is not a "real" error, we just quit out.
+				break;
+			}
 			switch (errno) {
 			case EILSEQ: // unable to generate a corresponding character
 				{
@@ -70,9 +75,6 @@ convert_encoding(const char * from, const char * to,
 				// we just eat bad bytes, as part of robustness/best-effort
 				inputBuffer++;
 				inputLeft--;
-				break;
-			case E2BIG:
-				// not enough room in the output buffer for the next converted character
 				break;
 			default:
 				// unknown error, completely bail
