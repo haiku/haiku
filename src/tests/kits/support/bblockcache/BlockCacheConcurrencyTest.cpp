@@ -1,5 +1,5 @@
 /*
-	$Id: BlockCacheConcurrencyTest.cpp,v 1.1 2003/09/07 11:53:03 bonefish Exp $
+	$Id: BlockCacheConcurrencyTest.cpp,v 1.2 2004/11/21 18:37:49 shatty Exp $
 	
 	This file tests BBlockCache from multiple threads to ensure there are
 	no concurrency problems.
@@ -170,7 +170,7 @@
 	if (isMallocTest) {
 		free(thePtr);
 	} else {
-		delete[] thePtr;
+		delete[] (uint8*)thePtr;
 	}
 }
 
