@@ -125,7 +125,7 @@ DevicesWindow::~DevicesWindow()
 {
 	void *item;
 	while ((item = fList.RemoveItem((int32)0)))
-		delete item;
+		delete (DevicesInfo*)item;
 	uninit_cm_wrapper();
 }
 // ---------------------------------------------------------------------------------------------------------- //

@@ -13,6 +13,7 @@ class FileTypesApp
 public:
 					FileTypesApp();
 	virtual void 	MessageReceived(BMessage *message);
+	virtual	void	ArgvReceived(int32 argc, char ** argv) { BApplication::ArgvReceived(argc, argv); }
 	virtual	void	ArgvReceived(int32 argc, const char *argv[], const char * cwd);
 	virtual void	RefsReceived(BMessage *message);
 	virtual void	ReadyToRun();
