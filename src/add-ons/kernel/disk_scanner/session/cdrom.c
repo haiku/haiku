@@ -27,8 +27,8 @@
 #include <scsi.h>
 #include <disk_scanner/session.h>
 
-//#define DBG(y) (y)
-#define DBG(y)
+#define DBG(y) (y)
+//#define DBG(y)
 
 #define TRACE(x) DBG(dprintf x)
 
@@ -351,6 +351,8 @@ cdrom_session_identify(int deviceFD, off_t deviceSize, int32 blockSize)
 }
 
 // cdrom_session_get_nth_info
+/*! \todo Check that read_toc buffer was large enough on success
+*/
 static
 status_t
 cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
@@ -360,9 +362,9 @@ cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
 	uchar data[2048];
 	int32 session = index+1;
 	
-	bool found_track = false;
-	bool found_start = false;
-	bool found_end = false;
+//	bool found_track = false;
+//	bool found_start = false;
+//	bool found_end = false;
 
 	off_t start_lba = 0;
 	off_t end_lba = 0;
@@ -372,11 +374,11 @@ cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
 
 	// Attempt to read the table of contents, first in lba mode, then in msf mode
 	if (!error) {
-		error = read_table_of_contents(deviceFD, index+1, data, 2048, false);
+		error = read_table_of_contents(deviceFD, 1, data, 2048, false);
 	}	
 	if (error) {
 		TRACE(("%s: lba read_toc failed, trying msf instead\n", kModuleDebugName));
-		error = read_table_of_contents(deviceFD, index+1, data, 2048, true);
+		error = read_table_of_contents(deviceFD, 1, data, 2048, true);
 	}
 		
 	// Interpret the data returned, if successful
@@ -384,7 +386,6 @@ cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
 		cdrom_table_of_contents_header *header;
 		cdrom_full_table_of_contents_entry *entries;
 		int i, count;
-		int first_track = session;
 
 		header = (cdrom_table_of_contents_header*)data;
 		entries = (cdrom_full_table_of_contents_entry*)(data+4);
@@ -393,45 +394,145 @@ cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
 		count = (header->length-2) / sizeof(cdrom_full_table_of_contents_entry);
 		
 		// Check for a valid session index
-		if (session < header->first || session > header->last)
+		if (session < 1 || session > 99)
 			error = B_ENTRY_NOT_FOUND;
 		
 		// Extract the data of interest
 		if (!error) {			
-			for (i = 0; i < count; i++) {
-				switch (entries[i].point) {
-					case 0xa0:
-						// PMin holds first track in session
-						if (entries[i].session == session) {
-							first_track = entries[i].pminutes;
-							found_track = true;
-						}
-						break;
-					case 0xa2:
-						// PMSF holds end of session
-						if (entries[i].session == session) {
-							end_lba = msf_to_lba(make_msf_address(entries[i].pminutes,
-							          entries[i].pseconds, entries[i].pframes));
-							found_end = true;
-						}						            
-						break;
-	
-					default:
-						if (entries[i].session == session && entries[i].point == first_track) {
-							if (!found_track) {
-								TRACE(("WARNING: %s: No \"first track in session\" info found; "
-								       "using session as first track number\n", kModuleDebugName));
+			uint32 current_session = 0;		// The number given the current session
+			uint32 current_toc_session = 0;	// The number given the current "session"
+			uint first_track = 0;			// Track # of first track in "session"
+			uint last_track = 0;			// Track # of last track in "session"
+			off_t lead_out_lba;				// The address of the end of the current "session"
+			enum {
+				cdromStart,
+				cdromFoundFirstTrack,
+				cdromFoundLastTrack,
+				cdromFoundLeadOut,
+				cdromNeedEndLBA,
+				cdromFinished,
+				cdromError,
+			} state = cdromStart;
+			
+			for (i = 0; i < count && state != cdromError && state != cdromFinished; i++) {
+				// We're only interested in positional info for data tracks
+				if ((entries[i].control == 0x04 || entries[i].control == 0x06)
+				    	// 0x04 == data track, digital copy prohibited
+						// 0x06 == data track, digital copy allowed
+				    && entries[i].adr == 0x01)
+						// 0x01 == positional information
+				{
+					switch (entries[i].point) {
+						// first track number (in pmin)
+						case 0xa0:	
+							if (entries[i].session == current_toc_session+1) {
+								current_toc_session++;
+								first_track = entries[i].pminutes;
+								state = cdromFoundFirstTrack;
+							} else {
+								// something screwy
+								state = cdromError;
+								TRACE(("%s: Point 0xA0 found in state %d\n",
+								       kModuleDebugName, state));
 							}
-							// PMSF holds start of session
-							start_lba = msf_to_lba(make_msf_address(entries[i].pminutes,
-							          entries[i].pseconds, entries[i].pframes));
-							found_start = true;
-						}
-						break;
+							break;
+
+						// last track number (in pmin)
+						case 0xa1:	
+							if (entries[i].session == current_toc_session
+							    && state == cdromFoundFirstTrack)
+							{
+								last_track = entries[i].pminutes;
+								state = cdromFoundLastTrack;
+							} else {
+								// something screwy
+								state = cdromError;
+								TRACE(("%s: Point 0xA1 found in state %d\n",
+								       kModuleDebugName, state));
+							}
+							break;
+
+						// start position of lead-out (in pmsf)
+						case 0xa2:
+							if (entries[i].session == current_toc_session
+							    && state == cdromFoundLastTrack)
+							{
+								lead_out_lba = msf_to_lba(make_msf_address(
+								                          entries[i].pminutes,
+								                          entries[i].pseconds,
+								                          entries[i].pframes));
+								state = cdromFoundLeadOut;
+							} else {
+								// something screwy
+								state = cdromError;
+								TRACE(("%s: Point 0xA2 found in state %d\n",
+								       kModuleDebugName, state));
+							}						            
+							break;
+								
+						default:
+							// start position of track (in pmsf)
+							if (1 <= entries[i].point && entries[i].point <= 99
+									// valid track number
+							    && entries[i].session == current_toc_session)
+							{
+								switch (state) {
+									case cdromFoundLeadOut:
+										current_session++;
+										if ((int)current_session == session) {
+											// This is the session we're interested in
+											start_lba = msf_to_lba(make_msf_address(
+											                       entries[i].pminutes,
+										                           entries[i].pseconds,
+										                           entries[i].pframes));
+											if (entries[i].point == last_track) {
+												// Hooray! This the last track in the "session", so
+												// we already know the end_lba
+												end_lba = lead_out_lba;
+												state = cdromFinished;
+											} else {
+												// Damn, we have to look up the start of the next
+												// track still...
+												state = cdromNeedEndLBA;
+											}
+										}
+										break;
+										
+									case cdromNeedEndLBA:
+										end_lba = msf_to_lba(make_msf_address(
+										                     entries[i].pminutes,
+									                         entries[i].pseconds,
+									                         entries[i].pframes));
+										state = cdromFinished;
+										break;
+										
+									default:
+										// something screwy
+										state = cdromError;
+										TRACE(("%s: Session of interest found in state %d\n",
+										       kModuleDebugName, state));
+										break;
+								}
+								
+							} else {
+								// something screwy
+								state = cdromError;
+								if (entries[i].session == current_toc_session) {
+									TRACE(("%s: New session encountered with track information; "
+									       " session == %d, previous session == %d, track == %d\n",
+									       kModuleDebugName, entries[i].session, current_toc_session,
+									       entries[i].point));
+								} else {
+									TRACE(("%s: Invalid track encountered: %d\n", kModuleDebugName,
+										   entries[i].point));
+								}
+							}						            
+							break;
+					}
 				}
 			}			
 			
-			if (found_start && found_end) {
+			if (state == cdromFinished) {
 				TRACE(("%s: found session #%ld info\n", kModuleDebugName, session));
 				sessionInfo->offset = start_lba * blockSize;
 				sessionInfo->size = (end_lba - start_lba) * blockSize;
@@ -439,10 +540,8 @@ cdrom_session_get_nth_info(int deviceFD, int32 index, off_t deviceSize,
 				sessionInfo->index = index;
 				sessionInfo->flags = B_DATA_SESSION;	// possibly B_AUDIO_SESSION for audio tracks?
 			} else {
-				TRACE(("%s: error in table of contents data: %s\n", kModuleDebugName,
-				        (found_start ? (found_end ? "(can't happen)" : "session end not found")
-				                     : (found_end ? "session start not found" 
-				                                  : "no session info found"))));
+				TRACE(("%s: error reading table of contents, ended up in state %d\n",
+				       kModuleDebugName, state));
 				error = B_ENTRY_NOT_FOUND;
 			}
 		}
