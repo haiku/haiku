@@ -4,6 +4,10 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
+KernelAddon amiga_rdb : kernel partitioning_systems :
+	amiga_rdb.cpp
+	;
+
 # For now build a userland version only.
 Addon <partitioning_system>amiga_rdb : userland partitioning_systems :
 	amiga_rdb.cpp
