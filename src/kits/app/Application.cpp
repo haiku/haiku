@@ -51,12 +51,12 @@
 #include <Window.h>
 
 // Project Includes ------------------------------------------------------------
+#include <AppServerLink.h>
 #include <LooperList.h>
 #include <ObjectLocker.h>
-#include <AppServerLink.h>
-#include <ServerProtocol.h>
 #include <PortLink.h>
 #include <PrivateScreen.h>
+#include <ServerProtocol.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -69,6 +69,8 @@ BMessenger		be_app_messenger;
 BResources*	BApplication::_app_resources = NULL;
 BLocker		BApplication::_app_resources_lock("_app_resources_lock");
 
+
+// This isn't static because it's used by PrivateScreen.cpp
 BPrivateScreen *gPrivateScreen = NULL;
 
 property_info gApplicationPropInfo[] =
@@ -180,9 +182,6 @@ class BMenuWindow : public BWindow
 #define DBG(x)
 #define OUT	printf
 
-enum {
-	NOT_IMPLEMENTED	= B_ERROR
-};
 
 // prototypes of helper functions
 static const char* looper_name_for(const char *signature);
@@ -266,6 +265,8 @@ BApplication::~BApplication()
 }
 //------------------------------------------------------------------------------
 BApplication::BApplication(BMessage* data)
+			// Note: BeOS calls the private BLooper(int32, port_id, const char *)
+			// constructor here, test if it's needed
 			: BLooper(looper_name_for(NULL)),
 			  fAppName(NULL),
 			  fServerFrom(-1),
@@ -278,6 +279,15 @@ BApplication::BApplication(BMessage* data)
 			  fInitError(B_NO_INIT),
 			  fReadyToRunCalled(false)
 {
+	const char *signature = NULL;	
+	data->FindString("mime_sig", &signature);
+	
+	InitData(signature, NULL);
+
+	bigtime_t pulseRate;
+	if (data->FindInt64("_pulse", &pulseRate) == B_OK)
+		SetPulseRate(pulseRate);
+
 }
 //------------------------------------------------------------------------------
 BArchivable* BApplication::Instantiate(BMessage* data)
@@ -288,9 +298,25 @@ BArchivable* BApplication::Instantiate(BMessage* data)
 	return NULL;	
 }
 //------------------------------------------------------------------------------
-status_t BApplication::Archive(BMessage* data, bool deep) const
+status_t
+BApplication::Archive(BMessage* data, bool deep) const
 {
-	return NOT_IMPLEMENTED;
+	status_t status = BLooper::Archive(data, deep);
+	if (status < B_OK)
+		return status;
+
+	app_info info;
+	status = GetAppInfo(&info);
+	if (status < B_OK)
+		return status;
+
+	status = data->AddString("mime_sig", info.signature);
+	if (status < B_OK)
+		return status;
+	
+	status = data->AddInt64("_pulse", fPulseRate);
+
+	return status;
 }
 //------------------------------------------------------------------------------
 status_t BApplication::InitCheck() const
@@ -676,7 +702,7 @@ status_t BApplication::GetSupportedSuites(BMessage* data)
 //------------------------------------------------------------------------------
 status_t BApplication::Perform(perform_code d, void* arg)
 {
-	return NOT_IMPLEMENTED;
+	return BLooper::Perform(d, arg);
 }
 //------------------------------------------------------------------------------
 BApplication::BApplication(uint32 signature)
@@ -1105,7 +1131,7 @@ BWindow* BApplication::window_at(uint32 index, bool incl_menus) const
 //------------------------------------------------------------------------------
 status_t BApplication::get_window_list(BList* list, bool incl_menus) const
 {
-	return NOT_IMPLEMENTED;
+	return B_ERROR;
 }
 //------------------------------------------------------------------------------
 int32 BApplication::async_quit_entry(void* data)
