@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <boot/platform.h>
@@ -12,6 +12,14 @@
 
 extern "C" int boot_main(struct stage2_args *args);
 extern struct kernel_args gKernelArgs;
+
+
+void
+platform_exit(void)
+{
+	puts("*** exit ***\n");
+	exit(-1);
+}
 
 
 void

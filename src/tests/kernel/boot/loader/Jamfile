@@ -48,10 +48,9 @@ ObjectsDefines
 	defines = [ FDefines $(defines) ] ;
 
 	if $(OS) = "LINUX" {
-	#	SubDirC++Flags -include /usr/include/stdio.h ;
 	} else {
-	#	SubDirC++Flags -include /boot/develop/headers/posix/stdio.h ;
-		SubDirC++Flags $(defines) -DHAVE_READ_POS=1 -fcheck-memory-usage -D_NO_INLINE_ASM ;
+		#SubDirC++Flags $(defines) -DHAVE_READ_POS=1 -fcheck-memory-usage -D_NO_INLINE_ASM ;
+		SubDirC++Flags $(defines) -DHAVE_READ_POS=1 -D_NO_INLINE_ASM ;
 	}
 }
 
@@ -81,6 +80,7 @@ SimpleTest BootLoaderTest :
 	apple.cpp
 	intel.cpp
 	PartitionMap.cpp
+	PartitionMapParser.cpp
 
 	# utility functions - Dano has a strlcpy() function in libroot.so, while R5 has not
 	list.c
@@ -112,7 +112,7 @@ SEARCH on [ FGristFiles amiga_rdb.cpp ]
 SEARCH on [ FGristFiles apple.cpp ]
 	= [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems apple ] ;
 
-SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp ]
+SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
 	= [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems intel ] ;
 
 
