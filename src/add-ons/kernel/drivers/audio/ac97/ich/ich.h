@@ -33,7 +33,7 @@
 #define VERSION "Version 1.5, Copyright (c) 2002 Marcus Overhagen, compiled on " ## __DATE__ ## " " ## __TIME__ 
 #define DRIVER_NAME "ich_ac97"
 
-#define BUFFER_SIZE		2048
+#define BUFFER_SIZE		4096
 #define BUFFER_COUNT	2
 #define BUFFER_FRAMES_COUNT (BUFFER_SIZE / 4)
 

@@ -35,6 +35,7 @@
 #include "debug.h"
 #include "ich.h"
 #include "util.h"
+#include "config.h"
 
 /*
  *
@@ -105,10 +106,16 @@ static status_t get_description(multi_description *data)
 		memcpy(data->channels,&chans,sizeof(chans));
 	}
 
-	data->output_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
-	data->input_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 44100)) {
+		data->output_rates = B_SR_44100;
+		data->input_rates = B_SR_44100;
+		data->max_cvsr_rate = 44100;
+	} else {
+		data->output_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
+		data->input_rates = B_SR_48000;// | B_SR_44100 | B_SR_CVSR;
+		data->max_cvsr_rate = 48000;
+	}
 	data->min_cvsr_rate = 0;
-	data->max_cvsr_rate = 48000;
 
 	data->output_formats = B_FMT_16BIT;
 	data->input_formats = B_FMT_16BIT;
@@ -143,11 +150,18 @@ static status_t get_global_format(multi_format_info *data)
 	data->output_latency = 0;
 	data->input_latency = 0;
 	data->timecode_kind = 0;
-	data->input.rate = B_SR_48000;
-	data->input.cvsr = 48000;
+	if (ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 44100)) {
+		data->input.rate = B_SR_44100;
+		data->input.cvsr = 44100;
+		data->output.rate = B_SR_44100;
+		data->output.cvsr = 44100;
+	} else {
+		data->input.rate = B_SR_48000;
+		data->input.cvsr = 48000;
+		data->output.rate = B_SR_48000;
+		data->output.cvsr = 48000;
+	}
 	data->input.format = B_FMT_16BIT;
-	data->output.rate = B_SR_48000;
-	data->output.cvsr = 48000;
 	data->output.format = B_FMT_16BIT;
 	return B_OK;
 }

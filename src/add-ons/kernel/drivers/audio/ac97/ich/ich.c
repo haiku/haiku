@@ -335,6 +335,122 @@ dump_hardware_regs()
 	LOG(("PO ICH_REG_X_CR = %#x\n",ich_reg_read_8(ICH_REG_X_CR + ICH_REG_PO_BASE)));
 }
 
+uint16
+ac97_reg_read(void *cookie, uint8 reg)
+{
+	return ich_codec_read(config->codecoffset + reg);
+}
+
+void
+ac97_reg_write(void *cookie, uint8 reg, uint16 value)
+{
+	ich_codec_write(config->codecoffset + reg, value);
+}
+
+uint32
+ich_clock_get()
+{
+	uint32 civ1, civ2, picb;
+	uint32 startframe;
+	uint32 stopframe;
+	uint32 rate;
+	bigtime_t starttime;
+	bigtime_t stoptime;
+
+	do {
+		civ1 = ich_reg_read_8 (ICH_REG_PO_BASE + ICH_REG_X_CIV);
+		picb = ich_reg_read_16(ICH_REG_PO_BASE + (config->swap_reg ? ICH_REG_X_SR : ICH_REG_X_PICB));
+		civ2 = ich_reg_read_8 (ICH_REG_PO_BASE + ICH_REG_X_CIV);
+	} while (civ1 != civ2);
+	starttime = system_time();
+	startframe = (civ1 * (BUFFER_SIZE / 4));
+	if (picb < (BUFFER_SIZE / 4))
+		startframe += (BUFFER_SIZE / 4) - picb;
+		
+	snooze(100000);
+	do {
+		civ1 = ich_reg_read_8 (ICH_REG_PO_BASE + ICH_REG_X_CIV);
+		picb = ich_reg_read_16(ICH_REG_PO_BASE + (config->swap_reg ? ICH_REG_X_SR : ICH_REG_X_PICB));
+		civ2 = ich_reg_read_8 (ICH_REG_PO_BASE + ICH_REG_X_CIV);
+	} while (civ1 != civ2);
+	stoptime = system_time();
+	stopframe = (civ1 * (BUFFER_SIZE / 4));
+	if (picb < (BUFFER_SIZE / 4))
+		stopframe += (BUFFER_SIZE / 4) - picb;
+
+	if (stopframe < startframe)
+		stopframe += ICH_BD_COUNT * (BUFFER_SIZE / 4);
+
+	rate = (1000000LL * (stopframe - startframe)) / (stoptime - starttime);
+	return rate;
+}
+
+void
+ich_clock_calibrate()
+{
+	int i, j;
+	#define RATES 20
+	uint32 rates[RATES];
+	uint32 rate;
+
+	if (!ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 48000)) {
+		LOG(("ich_clock_calibrate: can't set default clock rate\n"));
+		return;
+	}
+
+	if (!chan_po->running)
+		start_chan(chan_po);
+
+	for (i = 0; i < RATES; i++)
+		rates[i] = ich_clock_get();
+
+//	for (i = 0; i < RATES; i++)
+//		LOG(("ich_clock_calibrate: rate %ld\n", rates[i]));
+//	LOG(("ich_clock_calibrate: =========\n"));
+	
+	for (i = 0; i < RATES; i++) {
+		for (j = 0; j < (RATES - 1); j++) {
+			if (rates[j] > rates[j + 1]) {
+				uint32 temp = rates[j];
+				rates[j] = rates[j + 1];
+				rates[j + 1] = temp;
+			}
+		}
+	}
+
+	for (i = 0; i < RATES; i++)
+		LOG(("ich_clock_calibrate: rate %ld\n", rates[i]));
+
+	rate = 0;
+	for (i = 3; i < (RATES - 3); i++)
+		rate += rates[i];
+	rate /= (RATES - 6);
+
+	LOG(("ich_clock_calibrate: finished, rate %ld\n", rate));
+
+	if (rate > (44100 - 300) && rate < (44100 + 300)) {
+		ac97_set_clock(config->ac97, 44100);
+		LOG(("ich_clock_calibrate: setting clock 44100\n"));
+	} else if (rate > (48000 - 300) && rate < (48000 + 300)) {
+		ac97_set_clock(config->ac97, 48000);
+		LOG(("ich_clock_calibrate: setting clock 48000\n"));
+	} else if (rate > (41194 - 300) && rate < (41194 + 300)) {
+		ac97_set_clock(config->ac97, 41194);
+		LOG(("ich_clock_calibrate: setting clock 41194\n"));
+	} else if (rate > (55930 - 300) && rate < (55930 + 300)) {
+		ac97_set_clock(config->ac97, 55930);
+		LOG(("ich_clock_calibrate: setting clock 55930\n"));
+	}
+
+	if (	!ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 44100)
+		&&	!ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 48000)) {
+		LOG(("ich_clock_calibrate: setting rates doesn't work with clock %d\n", config->ac97->clock));
+		LOG(("ich_clock_calibrate: reset clock\n"));
+		ac97_set_clock(config->ac97, 48000);
+		ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 48000);
+	}
+}
+
 status_t
 init_driver(void)
 {
@@ -514,18 +630,6 @@ init_driver(void)
 	chan_po->regbase = ICH_REG_PO_BASE;
 	chan_mc->regbase = ICH_REG_MC_BASE;
 
-	/* reset the codec */	
-	LOG(("codec reset\n"));
-	ich_codec_write(config->codecoffset + 0x00, 0x0000);
-	snooze(50000); // 50 ms
-
-	ac97_init();
-	ac97_amp_enable(true);
-
-	LOG(("codec vendor id      = %#08x\n",ac97_get_vendor_id()));
-	LOG(("codec descripton     = %s\n",ac97_get_vendor_id_description()));
-	LOG(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement()));
-
 	/* reset all channels */
 	reset_chan(chan_pi);
 	reset_chan(chan_po);
@@ -535,7 +639,13 @@ init_driver(void)
 	init_chan(chan_pi);
 	init_chan(chan_po);
 	init_chan(chan_mc);
-	
+
+	ac97_attach(&config->ac97, ac97_reg_read, ac97_reg_write, NULL);
+
+	LOG(("codec vendor id      = %#08x\n", config->ac97->codec_id));
+	LOG(("codec descripton     = %s\n", config->ac97->codec_info));
+	LOG(("codec 3d enhancement = %s\n", config->ac97->codec_3d_stereo_enhancement));
+
 	/* first test if interrupts are working, on some Laptops they don't work :-( */
 	if (config->irq != 0 && false == interrupt_test()) {
 		LOG(("interrupt not working, using a kernel thread for polling\n"));
@@ -550,41 +660,33 @@ init_driver(void)
 		resume_thread(int_thread_id);
 	}
 	
-	LOG(("codec master output = %#04x\n",ich_codec_read(config->codecoffset + 0x02)));
-	LOG(("codec aux output    = %#04x\n",ich_codec_read(config->codecoffset + 0x04)));
-	LOG(("codec mono output   = %#04x\n",ich_codec_read(config->codecoffset + 0x06)));
-	LOG(("codec pcm output    = %#04x\n",ich_codec_read(config->codecoffset + 0x18)));
+	/* calibrate the clock */
+	ich_clock_calibrate();
+	
+	LOG(("codec master output = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x02)));
+	LOG(("codec aux output    = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x04)));
+	LOG(("codec mono output   = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x06)));
+	LOG(("codec cd            = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x12)));
+	LOG(("codec pcm           = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x18)));
 
 	LOG(("writing codec registers\n"));
 	/* enable master output */
-	ich_codec_write(config->codecoffset + 0x02, 0x0000);
+	ac97_reg_update(config->ac97, 0x02, 0x0000);
 	/* enable aux output */
-	ich_codec_write(config->codecoffset + 0x04, 0x0000);
+	ac97_reg_update(config->ac97, 0x04, 0x0000);
 	/* enable mono output */
-	ich_codec_write(config->codecoffset + 0x06, 0x0000);
-	/* enable pcm output */
-	ich_codec_write(config->codecoffset + 0x18, 0x0404);
+	ac97_reg_update(config->ac97, 0x06, 0x0000);
+	
+	/* enable cd */
+	ac97_reg_update(config->ac97, 0x12, 0x0808);
+	/* enable pcm */
+	ac97_reg_update(config->ac97, 0x18, 0x0808);
 
-	LOG(("codec master output = %#04x\n",ich_codec_read(config->codecoffset + 0x02)));
-	LOG(("codec aux output    = %#04x\n",ich_codec_read(config->codecoffset + 0x04)));
-	LOG(("codec mono output   = %#04x\n",ich_codec_read(config->codecoffset + 0x06)));
-	LOG(("codec pcm output    = %#04x\n",ich_codec_read(config->codecoffset + 0x18)));
-
-#if 0
-	/* enable pcm input */
-	ich_codec_write(config->codecoffset + 0x10, 0x0000);
-
-	/* enable mic input */
-	/* ich_codec_write(config->codecoffset + 0x0E, 0x0000); */
-
-	/* select pcm input record */
-	ich_codec_write(config->codecoffset + 0x1A, 4 | (4 << 8));
-	/* enable PCM record */
-	ich_codec_write(config->codecoffset + 0x1C, 0x0000);
-
-	/* enable mic record */
-	/* ich_codec_write(config->codecoffset + 0x1E, 0x0000); */
-#endif
+	LOG(("codec master output = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x02)));
+	LOG(("codec aux output    = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x04)));
+	LOG(("codec mono output   = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x06)));
+	LOG(("codec cd            = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x12)));
+	LOG(("codec pcm           = %#04x\n", ac97_reg_uncached_read(config->ac97, 0x18)));
 
 	LOG(("init_driver finished!\n"));
 	return B_OK;
@@ -610,6 +712,8 @@ uninit_driver(void)
 		reset_chan(chan_mc);
 
 	snooze(50000);
+	
+	ac97_detach(config->ac97);
 	
 	/* remove the interrupt handler or thread */
 	if (config->irq != 0) {

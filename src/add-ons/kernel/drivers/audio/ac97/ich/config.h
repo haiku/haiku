@@ -28,6 +28,8 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#include "ac97.h"
+
 typedef struct
 {
 	const char *name;
@@ -44,6 +46,7 @@ typedef struct
 	area_id area_mmbar; // ich4
 	area_id area_mbbar; // ich4
 	uint32	codecoffset;
+	ac97_dev *ac97;
 } device_config;
 
 extern device_config *config;

@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <MediaDefs.h>
 #include "ac97.h"
-#include "config.h"
 
 //#define DEBUG 1
 
@@ -76,16 +75,7 @@ const char * stereo_enhancement_technique[] =
 	"Unknown (31)"
 };
 
-typedef void (* codec_init)(void);
-typedef void (* codec_amp_enable)(bool);
-
-typedef struct codec_ops_tag
-{
-	codec_init init;
-	codec_amp_enable amp_enable;
-} codec_ops;
-
-typedef struct codec_table_tag
+typedef struct
 {
 	uint32 id;
 	uint32 mask;
@@ -93,15 +83,17 @@ typedef struct codec_table_tag
 	const char *info;
 } codec_table;
 
-void default_init(void);
-void ad1886_init(void);
+void default_init(ac97_dev *dev);
+void ad1886_init(ac97_dev *dev);
 
-void default_amp_enable(bool);
-void cs4299_amp_enable(bool);
+void default_amp_enable(ac97_dev *dev, bool onoff);
+void cs4299_amp_enable(ac97_dev *dev, bool onoff);
 
-codec_ops default_ops = { default_init, default_amp_enable };
-codec_ops ad1886_ops = { ad1886_init, default_amp_enable };
-codec_ops cs4299_ops = { default_init, cs4299_amp_enable };
+bool default_reg_is_valid(ac97_dev *dev, uint8 reg);
+
+codec_ops default_ops = { default_init, default_amp_enable, default_reg_is_valid };
+codec_ops ad1886_ops = { ad1886_init, default_amp_enable, default_reg_is_valid };
+codec_ops cs4299_ops = { default_init, cs4299_amp_enable, default_reg_is_valid };
 
 codec_table codecs[] = 
 {
@@ -186,113 +178,215 @@ find_codec_table(uint32 codecid)
 	return codec;
 }
 
-const char *
-ac97_get_3d_stereo_enhancement()
+void
+ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write, void *cookie)
 {
-	uint16 data;
-	data = ich_codec_read(AC97_RESET);
-	data = (data >> 10) & 31;
-	return stereo_enhancement_technique[data];
-}
+	int reg;
+	ac97_dev *dev;
+	codec_table *codec;
+	
+	*_dev = dev = (ac97_dev *) malloc(sizeof(ac97_dev));
+	dev->cookie = cookie;
+	dev->reg_read = reg_read;
+	dev->reg_write = reg_write;
+	dev->codec_id = (reg_read(cookie, AC97_VENDOR_ID1) << 16) | reg_read(cookie, AC97_VENDOR_ID2);
+	codec = find_codec_table(dev->codec_id);
+	dev->codec_info = codec->info;
+	dev->init = codec->ops->init;
+	dev->amp_enable = codec->ops->amp_enable;
+	dev->reg_is_valid = codec->ops->reg_is_valid;
+	dev->clock = 48000; /* default clock on non-broken motherboards */
 
-const char *
-ac97_get_vendor_id_description()
-{
-	uint32 id = ac97_get_vendor_id();
-	codec_table *codec = find_codec_table(id);
-	char f = (id >> 24) & 0xff;
-	char s = (id >> 16) & 0xff;
-	char t = (id >>  8) & 0xff;
-	if (f == 0) f = '?';
-	if (s == 0) s = '?';
-	if (t == 0) t = '?';
-	LOG(("codec %c%c%c %u\n",f,s,t,id & 0xff));
-	LOG(("info: %s\n",codec->info));
-	return codec->info;
-}
+	/* setup register cache */
+	for (reg = 0; reg <= 0x7e; reg += 2)
+		dev->reg_cache[reg] = ac97_reg_uncached_read(dev, reg);
 
-uint32
-ac97_get_vendor_id()
-{
-	uint16 data1;
-	uint16 data2;
-	data1 = ich_codec_read(AC97_VENDOR_ID1);
-	data2 = ich_codec_read(AC97_VENDOR_ID2);
-	return (((uint32)data1) << 16) | data2;
+	/* reset the codec */	
+	LOG(("codec reset\n"));
+	ac97_reg_uncached_write(dev, AC97_RESET, 0x0000);
+	snooze(50000); // 50 ms
+
+	dev->init(dev);
+	dev->amp_enable(dev, true);
+	
+	ac97_reg_update_bits(dev, 0x2a, 1, 1); // enable VRA
+
+	dev->codec_3d_stereo_enhancement = stereo_enhancement_technique[(ac97_reg_cached_read(dev, AC97_RESET) >> 10) & 31];
 }
 
 void
-ac97_amp_enable(bool yesno)
+ac97_detach(ac97_dev *dev)
 {
-	codec_table *codec;
-	LOG(("ac97_amp_enable\n"));
-	codec = find_codec_table(ac97_get_vendor_id());
-	codec->ops->amp_enable(yesno);
+	free(dev);
 }
 
 void
-ac97_init()
+ac97_suspend(ac97_dev *dev)
 {
-	codec_table *codec;
-	LOG(("ac97_init\n"));
-	codec = find_codec_table(ac97_get_vendor_id());
-	codec->ops->init();
+	dev->amp_enable(dev, false);
 }
 
-void default_init(void)
+void
+ac97_resume(ac97_dev *dev)
+{
+	dev->amp_enable(dev, true);
+}
+
+void
+ac97_reg_cached_write(ac97_dev *dev, uint8 reg, uint16 value)
+{
+	if (!dev->reg_is_valid(dev, reg))
+		return;
+	dev->reg_write(dev->cookie, reg, value);
+	dev->reg_cache[reg] = value;
+}
+
+uint16
+ac97_reg_cached_read(ac97_dev *dev, uint8 reg)
+{
+	if (!dev->reg_is_valid(dev, reg))
+		return 0;
+	return dev->reg_cache[reg];
+}
+
+void
+ac97_reg_uncached_write(ac97_dev *dev, uint8 reg, uint16 value)
+{
+	if (!dev->reg_is_valid(dev, reg))
+		return;
+	dev->reg_write(dev->cookie, reg, value);
+}
+
+uint16
+ac97_reg_uncached_read(ac97_dev *dev, uint8 reg)
+{
+	if (!dev->reg_is_valid(dev, reg))
+		return 0;
+	return dev->reg_read(dev->cookie, reg);
+}
+
+bool
+ac97_reg_update(ac97_dev *dev, uint8 reg, uint16 value)
+{
+	if (!dev->reg_is_valid(dev, reg))
+		return false;
+	if (ac97_reg_cached_read(dev, reg) == value)
+		return false;
+	ac97_reg_cached_write(dev, reg, value);
+	return true;
+}
+
+bool
+ac97_reg_update_bits(ac97_dev *dev, uint8 reg, uint16 mask, uint16 value)
+{
+	uint16 old;
+	if (!dev->reg_is_valid(dev, reg))
+		return false;
+	old = ac97_reg_cached_read(dev, reg);
+	value &= mask;
+	value |= (old & ~mask);
+	if (old == value)
+		return false;
+	ac97_reg_cached_write(dev, reg, value);
+	return true;
+}
+
+bool
+ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
+{
+	uint32 value;
+	uint32 old;
+	value = (rate * dev->clock) / 48000;
+	LOG(("ac97_set_rate: clock = %d, rate = %d, value = %d\n",dev->clock, rate, value));
+
+	if (value > 0xffff)
+		return false;
+	old = ac97_reg_cached_read(dev, reg);
+	ac97_reg_cached_write(dev, reg, value);
+	if (value != ac97_reg_uncached_read(dev, reg)) {
+		LOG(("ac97_set_rate failed, new rate %d\n", ac97_reg_uncached_read(dev, reg)));
+		ac97_reg_cached_write(dev, reg, old);
+		return false;
+	}
+	LOG(("ac97_set_rate done\n"));
+	return true;
+}
+
+void
+ac97_set_clock(ac97_dev *dev, uint32 clock)
+{
+	LOG(("ac97_set_clock: clock = %d\n", clock));
+	dev->clock = clock;
+}
+
+
+
+/*************************************************
+ */
+
+bool
+default_reg_is_valid(ac97_dev *dev, uint8 reg)
+{
+	if (reg & 1)	return false;
+	if (reg > 0x7e)	return false;
+	return true;
+}
+
+void default_init(ac97_dev *dev)
 {
 	LOG(("default_init\n"));
 }
 
-void ad1886_init(void)
-{
-	LOG(("ad1886_init\n"));
-
-	LOG(("===\n"));
-	LOG(("codecoffset = %d\n",config->codecoffset));
-	LOG(("0x26 = %#04x\n",ich_codec_read(config->codecoffset + 0x26)));
-	LOG(("0x2A = %#04x\n",ich_codec_read(config->codecoffset + 0x2A)));
-	LOG(("0x3A = %#04x\n",ich_codec_read(config->codecoffset + 0x3A)));
-	LOG(("0x72 = %#04x\n",ich_codec_read(config->codecoffset + 0x72)));
-	LOG(("0x74 = %#04x\n",ich_codec_read(config->codecoffset + 0x74)));
-	LOG(("0x76 = %#04x\n",ich_codec_read(config->codecoffset + 0x76)));
-
-//	ich_codec_write(config->codecoffset + 0x72, 0x0010); // enable software jack sense
-//	ich_codec_write(config->codecoffset + 0x72, 0x0110); // disable hardware line muting
-
-	ich_codec_write(config->codecoffset + 0x72, 0x0230);
-
-	LOG(("===\n"));
-	LOG(("0x26 = %#04x\n",ich_codec_read(config->codecoffset + 0x26)));
-	LOG(("0x2A = %#04x\n",ich_codec_read(config->codecoffset + 0x2A)));
-	LOG(("0x3A = %#04x\n",ich_codec_read(config->codecoffset + 0x3A)));
-	LOG(("0x72 = %#04x\n",ich_codec_read(config->codecoffset + 0x72)));
-	LOG(("0x74 = %#04x\n",ich_codec_read(config->codecoffset + 0x74)));
-	LOG(("0x76 = %#04x\n",ich_codec_read(config->codecoffset + 0x76)));
-
-	LOG(("===\n"));
-}
-
-void default_amp_enable(bool yesno)
+void default_amp_enable(ac97_dev *dev, bool yesno)
 {
 	LOG(("default_amp_enable\n"));
-	LOG(("powerdown register was = %#04x\n",ich_codec_read(config->codecoffset + AC97_POWERDOWN)));
+	LOG(("powerdown register was = %#04x\n", ac97_reg_uncached_read(dev, AC97_POWERDOWN)));
 	#if REVERSE_EAMP_POLARITY
 		yesno = !yesno;
 		LOG(("using reverse eamp polarity\n"));
 	#endif
 	if (yesno)
-		ich_codec_write(config->codecoffset + AC97_POWERDOWN, ich_codec_read(AC97_POWERDOWN) & ~0x8000); /* switch on (low active) */
+		ac97_reg_cached_write(dev, AC97_POWERDOWN, ac97_reg_uncached_read(dev, AC97_POWERDOWN) & ~0x8000); /* switch on (low active) */
 	else
-		ich_codec_write(config->codecoffset + AC97_POWERDOWN, ich_codec_read(AC97_POWERDOWN) | 0x8000); /* switch off */
-	LOG(("powerdown register is = %#04x\n",ich_codec_read(config->codecoffset + AC97_POWERDOWN)));
+		ac97_reg_cached_write(dev, AC97_POWERDOWN, ac97_reg_uncached_read(dev, AC97_POWERDOWN) | 0x8000); /* switch off */
+	LOG(("powerdown register is = %#04x\n", ac97_reg_uncached_read(dev, AC97_POWERDOWN)));
 }
 
-void cs4299_amp_enable(bool yesno)
+
+
+void ad1886_init(ac97_dev *dev)
+{
+	LOG(("ad1886_init\n"));
+
+	LOG(("===\n"));
+	LOG(("0x26 = %#04x\n", ac97_reg_uncached_read(dev, 0x26)));
+	LOG(("0x2A = %#04x\n", ac97_reg_uncached_read(dev, 0x2A)));
+	LOG(("0x3A = %#04x\n", ac97_reg_uncached_read(dev, 0x3A)));
+	LOG(("0x72 = %#04x\n", ac97_reg_uncached_read(dev, 0x72)));
+	LOG(("0x74 = %#04x\n", ac97_reg_uncached_read(dev, 0x74)));
+	LOG(("0x76 = %#04x\n", ac97_reg_uncached_read(dev, 0x76)));
+
+//	ich_codec_write(config->codecoffset + 0x72, 0x0010); // enable software jack sense
+//	ich_codec_write(config->codecoffset + 0x72, 0x0110); // disable hardware line muting
+
+	ac97_reg_cached_write(dev, 0x72, 0x0230);
+
+	LOG(("===\n"));
+	LOG(("0x26 = %#04x\n", ac97_reg_uncached_read(dev, 0x26)));
+	LOG(("0x2A = %#04x\n", ac97_reg_uncached_read(dev, 0x2A)));
+	LOG(("0x3A = %#04x\n", ac97_reg_uncached_read(dev, 0x3A)));
+	LOG(("0x72 = %#04x\n", ac97_reg_uncached_read(dev, 0x72)));
+	LOG(("0x74 = %#04x\n", ac97_reg_uncached_read(dev, 0x74)));
+	LOG(("0x76 = %#04x\n", ac97_reg_uncached_read(dev, 0x76)));
+
+	LOG(("===\n"));
+}
+
+void cs4299_amp_enable(ac97_dev *dev, bool yesno)
 {
 	LOG(("cs4299_amp_enable\n"));
 	if (yesno)
-		ich_codec_write(config->codecoffset + 0x68, 0x8004);
+		ac97_reg_cached_write(dev, 0x68, 0x8004);
 	else
-		ich_codec_write(config->codecoffset + 0x68, 0);
+		ac97_reg_cached_write(dev, 0x68, 0);
 }
