@@ -37,11 +37,13 @@ class AttributeIterator;
 
 
 enum inode_type {
-	S_DIRECTORY	= S_IFDIR,
-	S_FILE		= S_IFREG,
-	S_SYMLINK	= S_IFLNK,
+	S_DIRECTORY		= S_IFDIR,
+	S_FILE			= S_IFREG,
+	S_SYMLINK		= S_IFLNK,
 
-	S_REGULAR	= (S_DIRECTORY | S_FILE | S_SYMLINK),
+	S_REGULAR		= (S_DIRECTORY | S_FILE | S_SYMLINK),
+	S_INDEX_TYPES	= (S_STR_INDEX | S_INT_INDEX | S_UINT_INDEX | S_LONG_LONG_INDEX
+						| S_ULONG_LONG_INDEX | S_FLOAT_INDEX | S_DOUBLE_INDEX)
 };
 
 
@@ -137,12 +139,14 @@ class Inode : public CachedBlock {
 
 		mode_t Mode() const { return Node()->mode; }
 		int32 Flags() const { return Node()->flags; }
-		bool IsDirectory() const { return Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR); }
+		bool IsContainer() const { return Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR); }
 			// note, that this test will also be true for S_IFBLK (not that it's used in the fs :)
+		bool IsDirectory() const { return (Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR)) == S_DIRECTORY; }
 		bool IsIndex() const { return (Mode() & (S_INDEX_DIR | 0777)) == S_INDEX_DIR; }
 			// that's a stupid check, but AFAIK the only possible method...
 
 		bool IsAttribute() const { return Mode() & S_ATTR; }
+		bool IsFile() const { return Mode() & S_IFREG; }
 		bool IsRegularNode() const { return (Mode() & (S_ATTR_DIR | S_INDEX_DIR | S_ATTR)) == 0; }
 			// a regular node in the standard namespace (i.e. not an index or attribute)
 		bool IsSymLink() const { return S_ISLNK(Mode()); }
