@@ -315,10 +315,10 @@ user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *userE
 	if (numfds < 0)
 		return B_BAD_VALUE;
 
-	if ((userReadSet != NULL && !CHECK_USER_ADDRESS(userReadSet))
-		|| (userWriteSet != NULL && !CHECK_USER_ADDRESS(userWriteSet))
-		|| (userErrorSet != NULL && !CHECK_USER_ADDRESS(userErrorSet))
-		|| (userSigMask != NULL && !CHECK_USER_ADDRESS(userSigMask)))
+	if ((userReadSet != NULL && !IS_USER_ADDRESS(userReadSet))
+		|| (userWriteSet != NULL && !IS_USER_ADDRESS(userWriteSet))
+		|| (userErrorSet != NULL && !IS_USER_ADDRESS(userErrorSet))
+		|| (userSigMask != NULL && !IS_USER_ADDRESS(userSigMask)))
 		return B_BAD_ADDRESS;
 
 	// copy parameters
@@ -390,7 +390,7 @@ user_poll(struct pollfd *userfds, int numfds, bigtime_t timeout)
 	if (numfds < 0)
 		return B_BAD_VALUE;
 
-	if (userfds == NULL || !CHECK_USER_ADDRESS(userfds))
+	if (userfds == NULL || !IS_USER_ADDRESS(userfds))
 		return B_BAD_ADDRESS;
 
 	// copy parameters

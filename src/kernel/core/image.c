@@ -214,7 +214,7 @@ user_register_image(image_info *userInfo, size_t size)
 	if (size != sizeof(image_info))
 		return B_BAD_VALUE;
 
-	if (!CHECK_USER_ADDRESS(userInfo)
+	if (!IS_USER_ADDRESS(userInfo)
 		|| user_memcpy(&info, userInfo, size) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -231,7 +231,7 @@ user_get_image_info(image_id id, image_info *userInfo, size_t size)
 	if (size != sizeof(image_info))
 		return B_BAD_VALUE;
 
-	if (!CHECK_USER_ADDRESS(userInfo))
+	if (!IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
 
 	status = _get_image_info(id, &info, size);
@@ -252,7 +252,7 @@ user_get_next_image_info(team_id team, int32 *_cookie, image_info *userInfo, siz
 	if (size != sizeof(image_info))
 		return B_BAD_VALUE;
 
-	if (!CHECK_USER_ADDRESS(userInfo) || !CHECK_USER_ADDRESS(_cookie))
+	if (!IS_USER_ADDRESS(userInfo) || !IS_USER_ADDRESS(_cookie))
 		return B_BAD_ADDRESS;
 
 	status = _get_next_image_info(team, _cookie, &info, size);

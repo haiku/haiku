@@ -1,6 +1,11 @@
 /* Threading routines */
 
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+/*
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -1574,8 +1579,8 @@ user_spawn_thread(thread_func entry, const char *userName, int32 priority, void 
 {
 	char name[SYS_MAX_OS_NAME_LEN];
 
-	if (!CHECK_USER_ADDRESS(entry) || entry == NULL
-		|| !CHECK_USER_ADDRESS(userName)
+	if (!IS_USER_ADDRESS(entry) || entry == NULL
+		|| !IS_USER_ADDRESS(userName)
 		|| user_strlcpy(name, userName, SYS_MAX_OS_NAME_LEN) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -1596,7 +1601,7 @@ user_get_thread_info(thread_id id, thread_info *userInfo)
 	thread_info info;
 	status_t status;
 
-	if (!CHECK_USER_ADDRESS(userInfo))
+	if (!IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
 
 	status = _get_thread_info(id, &info, sizeof(thread_info));
@@ -1615,7 +1620,7 @@ user_get_next_thread_info(team_id team, int32 *userCookie, thread_info *userInfo
 	thread_info info;
 	int32 cookie;
 
-	if (!CHECK_USER_ADDRESS(userCookie) || !CHECK_USER_ADDRESS(userInfo)
+	if (!IS_USER_ADDRESS(userCookie) || !IS_USER_ADDRESS(userInfo)
 		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -1637,7 +1642,7 @@ user_wait_for_thread(thread_id id, status_t *userReturnCode)
 	status_t returnCode;
 	status_t status;
 
-	if (!CHECK_USER_ADDRESS(userReturnCode))
+	if (!IS_USER_ADDRESS(userReturnCode))
 		return B_BAD_ADDRESS;
 
 	status = wait_for_thread(id, &returnCode);
@@ -1659,7 +1664,7 @@ user_has_data(thread_id thread)
 status_t
 user_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 {
-	if (!CHECK_USER_ADDRESS(buffer))
+	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
 	return send_data(thread, code, buffer, bufferSize);
@@ -1673,8 +1678,8 @@ user_receive_data(thread_id *userSender, void *buffer, size_t bufferSize)
 	thread_id sender;
 	status_t code;
 
-	if (!CHECK_USER_ADDRESS(userSender)
-		|| !CHECK_USER_ADDRESS(buffer))
+	if (!IS_USER_ADDRESS(userSender)
+		|| !IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
 	code = receive_data(&sender, buffer, bufferSize);
@@ -1687,6 +1692,9 @@ user_receive_data(thread_id *userSender, void *buffer, size_t bufferSize)
 }
 
 
+// ToDo: the following two functions don't belong here
+
+
 int
 user_getrlimit(int resource, struct rlimit *urlp)
 {
@@ -1696,7 +1704,7 @@ user_getrlimit(int resource, struct rlimit *urlp)
 	if (urlp == NULL)
 		return EINVAL;
 
-	if (!CHECK_USER_ADDRESS(urlp))
+	if (!IS_USER_ADDRESS(urlp))
 		return B_BAD_ADDRESS;
 
 	ret = getrlimit(resource, &rl);
@@ -1714,21 +1722,17 @@ user_getrlimit(int resource, struct rlimit *urlp)
 
 
 int
-user_setrlimit(int resource, const struct rlimit *urlp)
+user_setrlimit(int resource, const struct rlimit *userResourceLimit)
 {
-	struct rlimit rl;
-	int err;
+	struct rlimit resourceLimit;
 
-	if (urlp == NULL)
+	if (userResourceLimit == NULL)
 		return EINVAL;
 
-	if (!CHECK_USER_ADDRESS(urlp))
+	if (!IS_USER_ADDRESS(userResourceLimit)
+		|| user_memcpy(&resourceLimit, userResourceLimit, sizeof(struct rlimit)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	err = user_memcpy(&rl, urlp, sizeof(struct rlimit));
-	if (err < 0)
-		return err;
-
-	return setrlimit(resource, &rl);
+	return setrlimit(resource, &resourceLimit);
 }
 

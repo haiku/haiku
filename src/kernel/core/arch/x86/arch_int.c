@@ -1,4 +1,9 @@
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+/*
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -192,9 +197,9 @@ i386_handle_trap(struct iframe frame)
 
 			asm("movl %%cr2, %0" : "=r" (cr2));
 
-			// if the interrupts were disabled, and we are not running the kernel startup
-			// the page fault was not allowed to happen and we must panic
-			if (0 == (frame.flags & 0x200) && !kernel_startup) {
+			if ((frame.flags & 0x200) == 0 && !kernel_startup) {
+				// if the interrupts were disabled, and we are not running the kernel startup
+				// the page fault was not allowed to happen and we must panic
 				panic("page fault, but interrupts were disabled. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
 			} else if (thread != NULL && thread->page_faults_allowed < 1)
 				panic("page fault not allowed at this place. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);

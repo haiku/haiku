@@ -311,7 +311,7 @@ user_read(int fd, off_t pos, void *buffer, size_t length)
 	ssize_t retval;
 
 	/* This is a user_function, so abort if we have a kernel address */
-	if (!CHECK_USER_ADDRESS(buffer))
+	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
 	descriptor = get_fd(get_current_io_context(false), fd);

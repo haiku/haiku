@@ -1,6 +1,11 @@
 /* Team functions */
 
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+/*
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -838,7 +843,7 @@ user_wait_for_team(team_id id, status_t *_userReturnCode)
 	status_t returnCode;
 	status_t status;
 
-	if (!CHECK_USER_ADDRESS(_userReturnCode))
+	if (!IS_USER_ADDRESS(_userReturnCode))
 		return B_BAD_ADDRESS;
 
 	status = wait_for_team(id, &returnCode);
@@ -863,8 +868,8 @@ user_team_create_team(const char *userPath, const char *userName,
 
 	TRACE(("user_team_create_team: argc = %d\n", argCount));
 
-	if (!CHECK_USER_ADDRESS(userPath)
-		|| !CHECK_USER_ADDRESS(userName))
+	if (!IS_USER_ADDRESS(userPath)
+		|| !IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
 
 	rc = user_copy_strings_array(userArgs, argCount, &args);
@@ -899,7 +904,7 @@ user_get_team_info(team_id id, team_info *userInfo)
 	status_t status;
 	team_info info;
 
-	if (!CHECK_USER_ADDRESS(userInfo))
+	if (!IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;	
 
 	status = _get_team_info(id, &info, sizeof(team_info));
@@ -919,8 +924,8 @@ user_get_next_team_info(int32 *userCookie, team_info *userInfo)
 	team_info info;
 	int32 cookie;
 
-	if (!CHECK_USER_ADDRESS(userCookie)
-		|| !CHECK_USER_ADDRESS(userInfo)
+	if (!IS_USER_ADDRESS(userCookie)
+		|| !IS_USER_ADDRESS(userInfo)
 		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -943,8 +948,8 @@ user_getenv(const char *userName, char **_userValue)
 	char *value;
 	int rc;
 
-	if (!CHECK_USER_ADDRESS(userName)
-		|| !CHECK_USER_ADDRESS(_userValue)
+	if (!IS_USER_ADDRESS(userName)
+		|| !IS_USER_ADDRESS(_userValue)
 		|| user_strlcpy(name, userName, SYS_THREAD_STRING_LENGTH_MAX) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -965,8 +970,8 @@ user_setenv(const char *userName, const char *userValue, int overwrite)
 	char name[SYS_THREAD_STRING_LENGTH_MAX];
 	char value[SYS_THREAD_STRING_LENGTH_MAX];
 
-	if (!CHECK_USER_ADDRESS(userName)
-		|| !CHECK_USER_ADDRESS(userValue)
+	if (!IS_USER_ADDRESS(userName)
+		|| !IS_USER_ADDRESS(userValue)
 		|| user_strlcpy(name, userName, SYS_THREAD_STRING_LENGTH_MAX) < B_OK
 		|| user_strlcpy(value, userValue, SYS_THREAD_STRING_LENGTH_MAX) < B_OK)
 		return B_BAD_ADDRESS;

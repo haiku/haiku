@@ -2462,7 +2462,7 @@ _user_get_area_info(area_id area, area_info *userInfo)
 	area_info info;
 	status_t status;
 
-	if (!CHECK_USER_ADDRESS(userInfo))
+	if (!IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
 
 	status = get_area_info(area, &info);
@@ -2508,8 +2508,8 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 	void *address;
 	area_id clonedArea;
 
-	if (!CHECK_USER_ADDRESS(userName)
-		|| !CHECK_USER_ADDRESS(userAddress)
+	if (!IS_USER_ADDRESS(userName)
+		|| !IS_USER_ADDRESS(userAddress)
 		|| user_strlcpy(name, userName, sizeof(name)) < B_OK
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
@@ -2544,8 +2544,8 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 	if (protection & B_KERNEL_PROTECTION)
 		return B_BAD_VALUE;
 
-	if (!CHECK_USER_ADDRESS(userName)
-		|| !CHECK_USER_ADDRESS(userAddress)
+	if (!IS_USER_ADDRESS(userName)
+		|| !IS_USER_ADDRESS(userAddress)
 		|| user_strlcpy(name, userName, sizeof(name)) < B_OK
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;

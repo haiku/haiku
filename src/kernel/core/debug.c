@@ -1,6 +1,11 @@
 /* This file contains the debugger */
 
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+/*
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -531,7 +536,7 @@ _user_debug_output(const char *userString)
 	if (!sSerialDebugEnabled)
 		return;
 
-	if (!CHECK_USER_ADDRESS(userString)
+	if (!IS_USER_ADDRESS(userString)
 		|| user_strlcpy(string, userString, sizeof(string)) < B_OK)
 		return;
 
