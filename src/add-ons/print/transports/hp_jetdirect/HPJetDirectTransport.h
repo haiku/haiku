@@ -41,7 +41,7 @@ class HPJetDirectPort : public BDataIO {
 		HPJetDirectPort(BDirectory* printer, BMessage* msg);
 		~HPJetDirectPort();
 
-		bool Ready() { return fReady; }
+		status_t InitCheck() { return fReady; }
 
 		ssize_t Read(void* buffer, size_t size);
 		ssize_t Write(const void* buffer, size_t size);
@@ -50,7 +50,7 @@ class HPJetDirectPort : public BDataIO {
 		char fHost[256];
 		uint16 fPort;		// default is 9100
 		BNetEndpoint *fEndpoint;
-		bool fReady;
+		status_t fReady;
 };
 
 #endif

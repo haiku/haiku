@@ -55,7 +55,7 @@ extern "C" _EXPORT BDataIO * init_transport(BMessage *msg)
 		if (printer.InitCheck() == B_OK) {
 			HPJetDirectPort * transport = new HPJetDirectPort(&printer, msg);
 
-			if (transport->Ready()) {
+			if (transport->InitCheck() == B_OK) {
 				g_transport = transport;
 				if (msg)
 					msg->what = 'okok';
