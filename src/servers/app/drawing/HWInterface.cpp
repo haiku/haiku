@@ -19,7 +19,8 @@ HWInterface::HWInterface()
 	  fCursor(NULL),
 	  fCursorVisible(true),
 	  fCursorLocation(0.5, 0.5),
-	  fUpdateExecutor(new UpdateQueue(this))
+//	  fUpdateExecutor(new UpdateQueue(this))
+	  fUpdateExecutor(NULL)
 {
 }
 
