@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -156,7 +156,7 @@ RootFileSystem::AddLink(const char *name, Directory *target)
 	entry->name = name;
 	entry->root = target;
 
-	fList.Add(entry);
+	fLinks.Add(entry);
 
 	return B_OK;
 }
