@@ -44,8 +44,9 @@ StdBinCommands
 
 StdBinCommands
 	top.c
-	: /boot/develop/lib/x86/libtermcap.a ;
-
+	tput.c
+	: libtermcap.a ;
+	
 StdBinCommands
 	mail.cpp
 	: be /boot/beos/system/lib/libmail.so ;
@@ -70,7 +71,6 @@ StdBinCommands
 	rescan.c
 	rmattr.cpp
 	sysinfo.c
-#	tput.c	
 	unchop.c
 	unmount.c
 	waitfor.c
