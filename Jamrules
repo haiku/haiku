@@ -910,10 +910,10 @@ rule Link
 	# Note: RESFILES must be set before invocation.
 	MODE on $(<) = $(EXEMODE) ;
 	on $(1) XRes $(1) : $(RESFILES) ;
-	SetVersion $(1) ;
 	Chmod $(<) ;
 	SetType $(1) ;
 	MimeSet $(1) ;
+	SetVersion $(1) ;
 }
 
 actions Link bind NEEDLIBS
