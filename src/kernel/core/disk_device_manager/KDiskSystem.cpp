@@ -30,11 +30,11 @@ KDiskSystem::Init()
 }
 
 // SetID
-void
+/*void
 KDiskSystem::SetID(disk_system_id id)
 {
 	fID = id;
-}
+}*/
 
 // ID
 disk_system_id
@@ -194,6 +194,14 @@ KDiskSystem::SupportsMovingChild(KPartition *child)
 	return false;
 }
 
+// SupportsCreatingChild
+bool
+KDiskSystem::SupportsCreatingChild(KPartition *child)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
 // SupportsParentSystem
 bool
 KDiskSystem::SupportsParentSystem(KDiskSystem *system)
@@ -218,17 +226,17 @@ KDiskSystem::ValidateResize(KPartition *partition, off_t *size)
 	return false;
 }
 
-// ValidateMove
+// ValidateResizeChild
 bool
-KDiskSystem::ValidateMove(KPartition *partition, off_t *start)
+KDiskSystem::ValidateResizeChild(KPartition *partition, off_t *size)
 {
 	// to be implemented by derived classes
 	return false;
 }
 
-// ValidateResizeChild
+// ValidateMove
 bool
-KDiskSystem::ValidateResizeChild(KPartition *partition, off_t *size)
+KDiskSystem::ValidateMove(KPartition *partition, off_t *start)
 {
 	// to be implemented by derived classes
 	return false;
@@ -245,7 +253,8 @@ KDiskSystem::ValidateMoveChild(KPartition *partition, off_t *start)
 // ValidateCreateChild
 bool
 KDiskSystem::ValidateCreateChild(KPartition *partition, off_t *start,
-								 off_t *size, const char *parameters)
+								 off_t *size, const char *type,
+								 const char *parameters)
 {
 	// to be implemented by derived classes
 	return false;
@@ -347,8 +356,9 @@ KDiskSystem::MoveChild(KPartition *child, off_t offset, KDiskDeviceJob *job)
 // CreateChild
 status_t
 KDiskSystem::CreateChild(KPartition *partition, off_t offset, off_t size,
-						 const char *parameters, KDiskDeviceJob *job,
-						 KPartition **child, partition_id childID)
+						 const char *type, const char *parameters,
+						 KDiskDeviceJob *job, KPartition **child,
+						 partition_id childID)
 {
 	// to be implemented by derived classes
 	return B_ERROR;

@@ -18,7 +18,7 @@ public:
 
 	virtual status_t Init();
 
-	void SetID(disk_system_id id);
+//	void SetID(disk_system_id id);
 	disk_system_id ID() const;
 	const char *Name() const;
 	virtual const char *PrettyName();
@@ -51,15 +51,17 @@ public:
 	virtual bool SupportsResizingChild(KPartition *child);
 	virtual bool SupportsMoving(KPartition *partition, bool *whileMounted);
 	virtual bool SupportsMovingChild(KPartition *child);
+	virtual bool SupportsCreatingChild(KPartition *partition);
 	virtual bool SupportsParentSystem(KDiskSystem *system);
 	virtual bool SupportsChildSystem(KDiskSystem *system);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
-	virtual bool ValidateMove(KPartition *partition, off_t *start);
 	virtual bool ValidateResizeChild(KPartition *partition, off_t *size);
+	virtual bool ValidateMove(KPartition *partition, off_t *start);
 	virtual bool ValidateMoveChild(KPartition *partition, off_t *start);
 	virtual bool ValidateCreateChild(KPartition *partition, off_t *start,
-									 off_t *size, const char *parameters);
+									 off_t *size, const char *type,
+									 const char *parameters);
 	virtual bool ValidateInitialize(KPartition *partition,
 									const char *parameters);
 	virtual bool ValidateSetParameters(KPartition *partition,
@@ -87,8 +89,8 @@ public:
 	virtual status_t MoveChild(KPartition *child, off_t offset,
 							   KDiskDeviceJob *job);
 	virtual status_t CreateChild(KPartition *partition, off_t offset,
-								 off_t size, const char *parameters,
-								 KDiskDeviceJob *job,
+								 off_t size, const char *type,
+								 const char *parameters, KDiskDeviceJob *job,
 								 KPartition **child = NULL,
 								 partition_id childID = -1);
 	virtual status_t DeleteChild(KPartition *child, KDiskDeviceJob *job);

@@ -40,7 +40,7 @@ KPartitioningSystem::Init()
 bool
 KPartitioningSystem::IsFileSystem() const
 {
-	return true;
+	return false;
 }
 
 // Identify
@@ -106,7 +106,7 @@ bool
 KPartitioningSystem::SupportsRepairing(KPartition *partition, bool checkOnly,
 									   bool *whileMounted)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	if (whileMounted)
 		*whileMounted = false;
 	return false;
@@ -117,7 +117,7 @@ bool
 KPartitioningSystem::SupportsResizing(KPartition *partition,
 									  bool *whileMounted)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	if (whileMounted)
 		*whileMounted = false;
 	return false;
@@ -127,7 +127,7 @@ KPartitioningSystem::SupportsResizing(KPartition *partition,
 bool
 KPartitioningSystem::SupportsResizingChild(KPartition *child)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -135,7 +135,7 @@ KPartitioningSystem::SupportsResizingChild(KPartition *child)
 bool
 KPartitioningSystem::SupportsMoving(KPartition *partition, bool *whileMounted)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -143,7 +143,15 @@ KPartitioningSystem::SupportsMoving(KPartition *partition, bool *whileMounted)
 bool
 KPartitioningSystem::SupportsMovingChild(KPartition *child)
 {
-	// to be implemented by derived classes
+	// to be implemented
+	return false;
+}
+
+// SupportsCreatingChild
+bool
+KPartitioningSystem::SupportsCreatingChild(KPartition *child)
+{
+	// to be implemented
 	return false;
 }
 
@@ -151,7 +159,7 @@ KPartitioningSystem::SupportsMovingChild(KPartition *child)
 bool
 KPartitioningSystem::SupportsParentSystem(KDiskSystem *system)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -159,7 +167,7 @@ KPartitioningSystem::SupportsParentSystem(KDiskSystem *system)
 bool
 KPartitioningSystem::SupportsChildSystem(KDiskSystem *system)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -167,15 +175,7 @@ KPartitioningSystem::SupportsChildSystem(KDiskSystem *system)
 bool
 KPartitioningSystem::ValidateResize(KPartition *partition, off_t *size)
 {
-	// to be implemented by derived classes
-	return false;
-}
-
-// ValidateMove
-bool
-KPartitioningSystem::ValidateMove(KPartition *partition, off_t *start)
-{
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -183,7 +183,15 @@ KPartitioningSystem::ValidateMove(KPartition *partition, off_t *start)
 bool
 KPartitioningSystem::ValidateResizeChild(KPartition *partition, off_t *size)
 {
-	// to be implemented by derived classes
+	// to be implemented
+	return false;
+}
+
+// ValidateMove
+bool
+KPartitioningSystem::ValidateMove(KPartition *partition, off_t *start)
+{
+	// to be implemented
 	return false;
 }
 
@@ -191,16 +199,17 @@ KPartitioningSystem::ValidateResizeChild(KPartition *partition, off_t *size)
 bool
 KPartitioningSystem::ValidateMoveChild(KPartition *partition, off_t *start)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
 // ValidateCreateChild
 bool
 KPartitioningSystem::ValidateCreateChild(KPartition *partition, off_t *start,
-										 off_t *size, const char *parameters)
+										 off_t *size, const char *type,
+										 const char *parameters)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -209,7 +218,7 @@ bool
 KPartitioningSystem::ValidateInitialize(KPartition *partition,
 										const char *parameters)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -218,7 +227,7 @@ bool
 KPartitioningSystem::ValidateSetParameters(KPartition *partition,
 										   const char *parameters)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -227,7 +236,7 @@ bool
 KPartitioningSystem::ValidateSetContentParameters(KPartition *child,
 												  const char *parameters)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -235,7 +244,7 @@ KPartitioningSystem::ValidateSetContentParameters(KPartition *child,
 int32
 KPartitioningSystem::CountPartitionableSpaces(KPartition *partition)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return 0;
 }
 
@@ -245,7 +254,7 @@ KPartitioningSystem::GetPartitionableSpaces(KPartition *partition,
 											partitionable_space_data *spaces,
 											int32 count, int32 *actualCount)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return false;
 }
 
@@ -254,7 +263,7 @@ status_t
 KPartitioningSystem::Repair(KPartition *partition, bool checkOnly,
 							KDiskDeviceJob *job)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
@@ -263,7 +272,7 @@ status_t
 KPartitioningSystem::Resize(KPartition *partition, off_t size,
 							KDiskDeviceJob *job)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
@@ -272,7 +281,7 @@ status_t
 KPartitioningSystem::ResizeChild(KPartition *child, off_t size,
 								 KDiskDeviceJob *job)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
@@ -281,7 +290,7 @@ status_t
 KPartitioningSystem::Move(KPartition *partition, off_t offset,
 						  KDiskDeviceJob *job)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
@@ -290,18 +299,18 @@ status_t
 KPartitioningSystem::MoveChild(KPartition *child, off_t offset,
 							   KDiskDeviceJob *job)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
 // CreateChild
 status_t
 KPartitioningSystem::CreateChild(KPartition *partition, off_t offset,
-								 off_t size, const char *parameters,
-								 KDiskDeviceJob *job, KPartition **child,
-								 partition_id childID)
+								 off_t size, const char *type,
+								 const char *parameters, KDiskDeviceJob *job,
+								 KPartition **child, partition_id childID)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
@@ -309,7 +318,7 @@ KPartitioningSystem::CreateChild(KPartition *partition, off_t offset,
 status_t
 KPartitioningSystem::DeleteChild(KPartition *child, KDiskDeviceJob *job)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
@@ -318,7 +327,7 @@ status_t
 KPartitioningSystem::Initialize(KPartition *partition, const char *parameters,
 								KDiskDeviceJob *job)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
@@ -327,7 +336,7 @@ status_t
 KPartitioningSystem::SetParameters(KPartition *partition,
 								   const char *parameters, KDiskDeviceJob *job)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
@@ -337,7 +346,7 @@ KPartitioningSystem::SetContentParameters(KPartition *partition,
 										  const char *parameters,
 										  KDiskDeviceJob *job)
 {
-	// to be implemented by derived classes
+	// to be implemented
 	return B_ERROR;
 }
 
