@@ -141,6 +141,10 @@ _EXPORT int getpassword(char * pwd, size_t length)
 	return strlen(pwd);
 }
 
+// TODO: This is not a good solution. The complete compat.c should not be
+// included in a libnet.so for Haiku, but if left out, _h_errnop is missing
+// when linking.
+#ifndef __HAIKU__
 
 struct utsname {
 	char sysname[32];
@@ -162,3 +166,5 @@ _EXPORT int uname(struct utsname *name)
 	strcpy(name->machine, "BePC");
 	return B_OK;
 }
+
+#endif	// !defined(__HAIKU__)
