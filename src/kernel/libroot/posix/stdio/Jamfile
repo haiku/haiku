@@ -1,6 +1,9 @@
 SubDir OBOS_TOP src kernel libroot posix stdio ;
 
-# KernelMergeObject posix_stdio.o :
+KernelMergeObject posix_stdio.o :
+	<$(SOURCE_GRIST)>remove.c
+	<$(SOURCE_GRIST)>rename.c
+# The other files are superseded by the glibc libio/stdio stuff
 # 	<$(SOURCE_GRIST)>fclose.c
 # 	<$(SOURCE_GRIST)>feof.c
 #  	<$(SOURCE_GRIST)>fflush.c
@@ -45,9 +48,9 @@ SubDir OBOS_TOP src kernel libroot posix stdio ;
 #  	<$(SOURCE_GRIST)>vsprintf.c
 # 	<$(SOURCE_GRIST)>wbuf.c
 # 	<$(SOURCE_GRIST)>wsetup.c
-# 	:
-# 	-fPIC -DPIC
-# 	;
+ 	:
+ 	-fPIC -DPIC
+ 	;
 
 KernelMergeObject kernel_posix_stdio.o :
 	<$(SOURCE_GRIST)>kernel_vsprintf.c
