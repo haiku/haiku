@@ -36,9 +36,9 @@
 #include <View.h>
 #include <stdio.h>
 // Project Includes -----------------------------------------------------------
-#include "ServerProtocol.h" // "" due to lack of grokking jam
+#include <ServerProtocol.h>
 #include <PropertyInfo.h> // Need this for GetSupportedSuites
-#include "PortLink.h"
+#include <PortLink.h>
 // Local Includes ---------------------------------------------------------------
 /**********************************************
  * 	Public BWindow
