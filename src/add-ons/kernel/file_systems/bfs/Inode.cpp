@@ -1734,6 +1734,12 @@ Inode::Sync()
 status_t
 Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDirectory)
 {
+	thread_info info;
+	if (get_thread_info(find_thread(NULL), &info) == B_OK) {
+		dprintf("stack base = %p, stack end = %p, size = %ld\n", info.stack_base, info.stack_end, (uint32)info.stack_end - (uint32)info.stack_base);
+	} else
+		dprintf("get_thread_info() failed\n");
+
 	BPlusTree *tree;
 	if (GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
@@ -1775,10 +1781,13 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 	}
 
 	// remove_vnode() allows the inode to be accessed until the last put_vnode()
-	if (remove_vnode(fVolume->ID(), id) != B_OK)
+	if (remove_vnode(fVolume->ID(), id) != B_OK) {
+		dprintf("remove_vnode() failed!!!\n");
 		return B_ERROR;
+	}
 
 	if (tree->Remove(transaction, name, id) < B_OK) {
+		dprintf("tree->Remove() failed!!!\n");
 		unremove_vnode(fVolume->ID(), id);
 		RETURN_ERROR(B_ERROR);
 	}
@@ -1803,8 +1812,10 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 		index.RemoveLastModified(transaction, inode);
 	}
 
-	if (inode->WriteBack(transaction) < B_OK)
+	if (inode->WriteBack(transaction) < B_OK) {
+		dprintf("inode->WriteBack() failed!!!\n");
 		return B_ERROR;
+	}
 
 	return B_OK;
 }
@@ -1874,7 +1885,7 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 				*_inode = inode;
 
 			// only keep the vnode in memory if the _id or _inode pointer is provided
-			if (_id == NULL && _inode == NULL)
+			if (_id != NULL || _inode != NULL)
 				vnode.Keep();
 
 			return B_OK;
