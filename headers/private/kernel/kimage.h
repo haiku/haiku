@@ -20,6 +20,8 @@ extern status_t image_init(void);
 // user-space exported calls
 extern status_t _user_unregister_image(image_id id);
 extern image_id _user_register_image(image_info *userInfo, size_t size);
+extern void		_user_image_relocated(image_id id);
+extern void		_user_loading_app_failed(status_t error);
 extern status_t _user_get_next_image_info(team_id team, int32 *_cookie,
 					image_info *userInfo, size_t size);
 extern status_t _user_get_image_info(image_id id, image_info *userInfo, size_t size);
