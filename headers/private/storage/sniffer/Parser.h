@@ -10,6 +10,7 @@
 #define _SNIFFER_PARSER_H
 
 #include <SupportDefs.h>
+#include <sniffer/CharStream.h>
 #include <sniffer/Err.h>
 #include <sniffer/Range.h>
 #include <sniffer/Rule.h>
@@ -38,35 +39,6 @@ status_t parse(const char *rule, Rule *result, BString *parseError = NULL);
 //------------------------------------------------------------------------------
 // Classes used internally by the parser
 //------------------------------------------------------------------------------
-
-//! Manages a stream of characters
-/*! CharStream is used by the scanner portion of the parser, which is implemented
-	in TokenStream::SetTo().
-*/
-class CharStream {
-public:
-	CharStream(const std::string &string);
-	CharStream();
-	~CharStream();
-	
-	status_t SetTo(const std::string &string);
-	void Unset();
-	status_t InitCheck() const;
-	bool IsEmpty() const;
-	size_t Pos() const;
-	const std::string& String() const;
-	
-	char Get();
-	void Unget();
-
-private:
-	std::string fString;
-	size_t fPos;
-	status_t fCStatus;
-	
-	CharStream(const CharStream &ref);
-	CharStream& operator=(const CharStream &ref);
-};
 
 //! Types of tokens
 typedef enum TokenType {
