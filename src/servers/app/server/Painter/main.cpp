@@ -71,10 +71,12 @@ fprintf(stdout, "done\n");
 	float angle = 40.0;
 	float span = 230.0;
 	const char* string = "The Quick Brown Fox...";
-	BPoint stringLocation(50.0, 200.0);
+	const char* string2 = "jumps!";
+	BPoint stringLocation(10.0, 220.0);
+	BPoint stringLocation2(30.0 / 2.5, 105.0 / 2.5);
 	BFont font(be_plain_font);
-	font.SetSize(20.0);
-	font.SetRotation(15.0);
+	font.SetSize(12.0);
+	font.SetRotation(8.0);
 //	font.SetFamilyAndStyle(1);
 
 	BBitmap* testBitmap = new BBitmap(BRect(20, 5, 72, 46), 0, B_RGB32);
@@ -117,7 +119,7 @@ fprintf(stdout, "done\n");
 	uint32 width = buffer->Width();
 	uint32 height = buffer->Height();
 
-	painter.ConstrainClipping(clip);
+//	painter.ConstrainClipping(clip);
 	painter.SetScale(scale);
 //	painter.SetPenSize(penSize);
 	painter.SetOrigin(origin);
@@ -170,6 +172,24 @@ bigtime_t painterNow = system_time();
 	painter.SetHighColor(0, 20, 80, 255);
 	painter.SetDrawingMode(B_OP_OVER);
 	painter.DrawString(string, stringLocation);
+	painter.DrawString(string2);
+	painter.StrokeLine(bounds.RightTop());
+
+//	painter.SetScale(2.5);
+	painter.DrawString("H", stringLocation2);
+	painter.DrawString("e");
+	painter.DrawString("l");
+	painter.DrawString("l");
+	painter.DrawString("o");
+	painter.DrawString(" ");
+	painter.DrawString("N");
+	painter.DrawString("u");
+	painter.DrawString("r");
+	painter.DrawString("s");
+	painter.DrawString("e");
+	painter.DrawString("!");
+//	painter.SetHighColor(0, 60, 240);
+//	painter.DrawString("Hello Nurse!", stringLocation2);
 
 	// bitmap drawing
 //	painter.SetScale(0.5);
@@ -186,7 +206,7 @@ printf("Painter: %lld µsecs\n", painterNow);
 	bitmap->Lock();
 	bitmap->AddChild(view);
 
-	view->ConstrainClippingRegion(&clip);
+//	view->ConstrainClippingRegion(&clip);
 	view->SetScale(scale);
 //	view->SetPenSize(penSize);
 	view->SetOrigin(origin);
@@ -240,6 +260,24 @@ bigtime_t viewNow = system_time();
 	view->SetHighColor(0, 20, 80, 255);
 	view->SetDrawingMode(B_OP_OVER);
 	view->DrawString(string, stringLocation);
+	view->DrawString(string2);
+	view->StrokeLine(bounds.RightTop());
+
+//	view->SetScale(2.5);
+	view->DrawString("H", stringLocation2);
+	view->DrawString("e");
+	view->DrawString("l");
+	view->DrawString("l");
+	view->DrawString("o");
+	view->DrawString(" ");
+	view->DrawString("N");
+	view->DrawString("u");
+	view->DrawString("r");
+	view->DrawString("s");
+	view->DrawString("e");
+	view->DrawString("!");
+//	view->SetHighColor(0, 60, 240);
+//	view->DrawString("Hello Nurse!", stringLocation2);
 
 	// bitmap drawing
 //	view->SetScale(0.5);
