@@ -87,15 +87,15 @@ BString::CountChars() const
 {
 	int32 count = 0;
 	char *ptr = _privateData;
-
-	while (*ptr++)
+	
+	if (ptr == NULL)
+		return 0;
+		
+	while (*ptr)
 	{
-		count++;
-
-		// Jump to next UTF8 character
-		// for (; (*ptr & 0xc0) == 0x80; ptr++);
 		// ejaesler: BGA's nifty function
 		ptr += utf8_char_len(*ptr);
+		count++;
 	}
 
 	return count;
@@ -1462,7 +1462,7 @@ BString::_Init(const char* str, int32 len)
 	ASSERT(str != NULL);
 	ASSERT(_privateData == NULL);
 
-	_privateData = malloc(len + sizeof(int32) + 1);	
+	_privateData = (char*)malloc(len + sizeof(int32) + 1);	
 	_privateData += sizeof(int32);
 	
 	memcpy(_privateData, str, len);
@@ -1502,7 +1502,7 @@ BString::_GrowBy(int32 size)
 	int32 curLen = Length(); 	
 	ASSERT(curLen + size >= 0);
 	
-	if (_privateData != NULL) {
+	if (_privateData != NULL)
 		_privateData -= sizeof(int32);
 		
 	_privateData = (char*)realloc(_privateData, 
