@@ -454,6 +454,9 @@ private:
 	};
 	
 public:
+	long_address(uint16 partition = 0, uint32 block = 0, uint32 length = 0,
+	             uint8 type = 0);
+
 	void dump() const;
 
 	uint8 type() const {
@@ -969,8 +972,8 @@ struct logical_volume_descriptor {
 	const array<uint8, 16>& logical_volume_contents_use() const { return _logical_volume_contents_use; }
 	array<uint8, 16>& logical_volume_contents_use() { return _logical_volume_contents_use; }
 
-	const long_address& file_set_address() const { return _file_set_address; }
-	long_address& file_set_address() { return _file_set_address; }
+	const long_address& file_set_address() const { return *reinterpret_cast<const long_address*>(&_logical_volume_contents_use); }
+	long_address& file_set_address() { return *reinterpret_cast<long_address*>(&_logical_volume_contents_use); }
 
 	uint32 map_table_length() const { return B_LENDIAN_TO_HOST_INT32(_map_table_length); }
 	uint32 partition_map_count() const { return B_LENDIAN_TO_HOST_INT32(_partition_map_count); }
@@ -1014,13 +1017,10 @@ private:
 	*/
 	entity_id _domain_id;
 	
-	union {
-		/*! \brief For UDF, shall contain a \c long_address which identifies
-			the location of the logical volume's first file set.
-		*/
-		array<uint8, 16> _logical_volume_contents_use;
-		long_address _file_set_address;
-	};
+	/*! \brief For UDF, shall contain a \c long_address which identifies
+		the location of the logical volume's first file set.
+	*/
+	array<uint8, 16> _logical_volume_contents_use;
 
 	uint32 _map_table_length;
 	uint32 _partition_map_count;
@@ -1346,6 +1346,9 @@ struct file_set_descriptor {
 	const array<char, 128>& logical_volume_id() const { return _logical_volume_id; }
 	array<char, 128>& logical_volume_id() { return _logical_volume_id; }
 
+	const charspec& file_set_id_character_set() const { return _file_set_id_character_set; }
+	charspec& file_set_id_character_set() { return _file_set_id_character_set; }
+
 	const array<char, 32>& file_set_id() const { return _file_set_id; }
 	array<char, 32>& file_set_id() { return _file_set_id; }
 
@@ -1354,9 +1357,6 @@ struct file_set_descriptor {
 
 	const array<char, 32>& abstract_file_id() const { return _abstract_file_id; }
 	array<char, 32>& abstract_file_id() { return _abstract_file_id; }
-
-	const charspec& file_set_charspec() const { return _file_set_charspec; }
-	charspec& file_set_charspec() { return _file_set_charspec; }
 
 	const long_address& root_directory_icb() const { return _root_directory_icb; }
 	long_address& root_directory_icb() { return _root_directory_icb; }
@@ -1369,6 +1369,9 @@ struct file_set_descriptor {
 
 	const long_address& system_stream_directory_icb() const { return _system_stream_directory_icb; }
 	long_address& system_stream_directory_icb() { return _system_stream_directory_icb; }
+
+	const array<uint8, 32>& reserved() const { return _reserved; }
+	array<uint8, 32>& reserved() { return _reserved; }
 
 	// Set functions
 	void set_interchange_level(uint16 level) { _interchange_level = B_HOST_TO_LENDIAN_INT16(level); }
@@ -1388,7 +1391,7 @@ private:
 	uint32 _file_set_descriptor_number;
 	charspec _logical_volume_id_character_set;	//!< To be set to kCSOCharspec
 	array<char, 128> _logical_volume_id;
-	charspec _file_set_charspec;
+	charspec _file_set_id_character_set;
 	array<char, 32> _file_set_id;
 	array<char, 32> _copyright_file_id;
 	array<char, 32> _abstract_file_id;
@@ -1396,7 +1399,7 @@ private:
 	entity_id _domain_id;	
 	long_address _next_extent;
 	long_address _system_stream_directory_icb;
-	uint8 _reserved[32];
+	array<uint8, 32> _reserved;
 } __attribute__((packed));
 
 

@@ -421,6 +421,15 @@ logical_block_address::dump() const
 	PRINT(("partition: %d\n", partition()));
 }
 
+long_address::long_address(uint16 partition, uint32 block, uint32 length,
+	                       uint8 type)
+{
+	set_partition(partition);
+	set_block(block);
+	set_length(length);
+	set_type(type);
+}
+	                       
 void
 long_address::dump() const
 {
@@ -787,8 +796,8 @@ file_set_descriptor::dump() const
 	DUMP(logical_volume_id_character_set());
 	PRINT(("logical_volume_id:\n"));
 	DUMP(logical_volume_id());
-	PRINT(("file_set_charspec:\n"));
-	DUMP(file_set_charspec());
+	PRINT(("file_set_id_character_set:\n"));
+	DUMP(file_set_id_character_set());
 	PRINT(("file_set_id:\n"));
 	DUMP(file_set_id());
 	PRINT(("copyright_file_id:\n"));
