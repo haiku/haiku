@@ -272,6 +272,70 @@ get_tls_handle()
 }
 #endif
 
+/*! \brief Helper class for initializing the debugging output
+	file.
+	
+	Note that this hummer isn't threadsafe, but it doesn't really
+	matter for our concerns, since the worst it'll result in is
+	a dangling file descriptor, and that would be in the case of
+	two or more volumes being mounted almost simultaneously...
+	not too big of a worry.
+*/
+class DebugOutputFile {
+public:
+	DebugOutputFile(const char *filename = NULL) 
+		: fFile(-1)
+	{
+		Init(filename);
+	}
+	
+	~DebugOutputFile() {
+		if (fFile >= 0)
+			close(fFile);
+	}
+	
+	void Init(const char *filename) {
+		if (fFile < 0 && filename)
+			fFile = open(filename, O_RDWR | O_CREAT | O_TRUNC);
+	}
+	
+	int File() const { return fFile; }
+private:
+	int fFile;
+};
+
+DebugOutputFile out;
+
+/*!	\brief It doesn't appear that the constructor for the global
+	\c out variable is called when built as an R5 filesystem add-on,
+	so this function needs to be called in udf_mount to let the
+	magic happen.
+*/
+void initialize_debugger(const char *filename)
+{
+	out.Init(filename);
+}
+
+// dbg_printf, stolen from Ingo's ReiserFS::Debug.cpp.
+void
+dbg_printf(const char *format,...)
+{
+#if DEBUG_TO_FILE
+	char buffer[1024];
+	va_list args;
+	va_start(args, format);
+	// no vsnprintf() on PPC and in kernel
+	#if defined(__INTEL__) && USER
+		vsnprintf(buffer, sizeof(buffer) - 1, format, args);
+	#else
+		vsprintf(buffer, format, args);
+	#endif
+	va_end(args);
+	buffer[sizeof(buffer) - 1] = '\0';
+	write(out.File(), buffer, strlen(buffer));
+#endif
+}
+
 //----------------------------------------------------------------------
 // DebugHelper
 //----------------------------------------------------------------------

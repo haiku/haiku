@@ -4,6 +4,7 @@
 //
 //  UDF version copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //  Initial version copyright (c) 2002 Axel Dörfler, axeld@pinc-software.de
+//	dbg_printf() function copyright (c) 2003 Ingo Weinhold, bonefish@cs.tu-berlin.edu
 //----------------------------------------------------------------------
 #ifndef UDF_DEBUG_H
 #define UDF_DEBUG_H
@@ -19,13 +20,24 @@
 #ifdef DEBUG
 #	include <string.h>
 #endif
+#include <unistd.h>
 
-#ifdef USER
+#define DEBUG_TO_FILE 0
+
+#if DEBUG_TO_FILE
 #	include <stdio.h>
-#	define __out printf
+#	include <fcntl.h>
+#	define __out dbg_printf		
+	void dbg_printf(const char *format,...);
+	void initialize_debugger(const char *filename);
 #else
-#	include <null.h>
-#	define __out dprintf
+#	ifdef USER
+#		include <stdio.h>
+#		define __out printf
+#	else
+#		include <null.h>
+#		define __out dprintf
+#	endif
 #endif
 
 #include "cpp.h"
@@ -119,6 +131,12 @@ private:
 // DEBUG-dependent macros
 //----------------------------------------------------------------------
 #ifdef DEBUG
+	#if DEBUG_TO_FILE
+		#define INITIALIZE_DEBUGGING_OUTPUT_FILE(filename) initialize_debugger(filename);
+	#else
+		#define INITIALIZE_DEBUGGING_OUTPUT_FILE(filename) ;
+	#endif
+	
 	#define DEBUG_INIT_SILENT(categoryFlags, className)	\
 		DebugHelper _debugHelper((categoryFlags), className, 2);			
 
@@ -243,6 +261,7 @@ private:
 	#define DBG(x) x ;
 	
 #else	// ifdef DEBUG
+	#define INITIALIZE_DEBUGGING_OUTPUT_FILE(filename) ;
 	#define DEBUG_INIT_SILENT(categoryFlags, className)	;
 	#define DEBUG_INIT(categoryFlags, className) ;
 	#define DEBUG_INIT_ETC(categoryFlags, className, arguments) ;
