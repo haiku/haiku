@@ -1,5 +1,5 @@
-#ifndef __CLIPRECT_INLINE_HELPERS_H
-#define __CLIPRECT_INLINE_HELPERS_H
+#ifndef __CLIPPING_H
+#define __CLIPPING_H
 
 static inline clipping_rect
 union_rect(clipping_rect r1, clipping_rect r2)
@@ -76,9 +76,9 @@ point_in(clipping_rect rect, BPoint pt)
 static inline bool
 valid_rect(clipping_rect rect)
 {
-	if (rect.left < rect.right && rect.top < rect.bottom)
+	if (rect.left <= rect.right && rect.top <= rect.bottom)
 		return true;
 	return false;
 }
 
-#endif // __CLIPRECT_INLINE_HELPERS_H
+#endif // __CLIPPING_H
