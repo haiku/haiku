@@ -12,3 +12,5 @@ LinkSharedOSLibs libdevice.so :
 	be
 ;
 
+MakeLocate <develop>libdevice.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libdevice.so : libdevice.so ;
