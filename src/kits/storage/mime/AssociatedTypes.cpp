@@ -102,15 +102,13 @@ AssociatedTypes::GuessMimeType(const char *filename, BString *result)
 		err = BuildAssociatedTypesTable();
 	if (!err) {
 		// Extract the extension from the file
-		uint i = strlen(filename);
-		while (i-1 >= 0 && filename[i-1] != '.')
-			i--;
+		const char *rawExtension = strrchr(filename, '.');
 		
 		// If there was an extension, grab it and look up its associated
 		// type(s). Otherwise, the best guess we can offer is
 		// "application/octect-stream"
-		if (i > 0) {
-			std::string extension = PrepExtension(&(filename[i]));
+		if (rawExtension && rawExtension[1] != '\0') {
+			std::string extension = PrepExtension(rawExtension + 1);
 			
 			/*! \todo I'm just grabbing the first item in the set here. Should we perhaps
 				do something different?
