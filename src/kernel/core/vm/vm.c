@@ -1804,7 +1804,7 @@ int vm_init_postsem(kernel_args *ka)
 	// it isn't that hard to find all of the ones we need to create
 	vm_translation_map_module_init_post_sem(ka);
 	kernel_aspace->virtual_map.sem = create_sem(WRITE_COUNT, "kernel_aspacelock");
-	recursive_lock_create(&kernel_aspace->translation_map.lock);
+	recursive_lock_init(&kernel_aspace->translation_map.lock, "vm translation rlock");
 
 	for (region = kernel_aspace->virtual_map.region_list; region; region = region->aspace_next) {
 		if (region->cache_ref->lock.sem < 0)
