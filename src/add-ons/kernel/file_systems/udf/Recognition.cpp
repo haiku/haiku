@@ -379,7 +379,6 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 					} else {
 						logicalVolumeDescriptor = *logical;
 						foundLogicalVolumeDescriptor = true;
-						DUMP(logicalVolumeDescriptor);
 					}
 					break;
 				}
