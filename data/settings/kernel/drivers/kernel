@@ -9,3 +9,6 @@
 	# Activates Bochs debug output if enabled in the kernel
 	# (available on x86 as a build option only)
 
+#qemu_single_step_hack true
+	# Activates a hack that allows single-stepping under qemu
+	# to work.
