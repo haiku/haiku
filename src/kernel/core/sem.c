@@ -429,7 +429,6 @@ status_t
 switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	uint32 flags, bigtime_t timeout)
 {
-	// ToDo: add support for B_CHECK_PERMISSION
 	int slot = id % sMaxSems;
 	int state;
 	status_t status = B_OK;
@@ -449,10 +448,19 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 
 	state = disable_interrupts();
 	GRAB_SEM_LOCK(sSems[slot]);
-	
+
 	if (sSems[slot].id != id) {
 		TRACE(("acquire_sem_etc: bad sem_id %ld\n", id));
 		status = B_BAD_SEM_ID;
+		goto err;
+	}
+
+	// ToDo: the B_CHECK_PERMISSION flag should be made private, as it
+	//	doesn't have any use outside the kernel
+	if ((flags & B_CHECK_PERMISSION) != 0
+		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
+		dprintf("thread %ld tried to acquire kernel semaphore.\n", thread_get_current_thread()->id);
+		status = B_NOT_ALLOWED;
 		goto err;
 	}
 
@@ -574,7 +582,6 @@ release_sem(sem_id id)
 status_t
 release_sem_etc(sem_id id, int32 count, uint32 flags)
 {
-	// ToDo: add support for B_CHECK_PERMISSION
 	struct thread_queue releaseQueue;
 	int32 slot = id % sMaxSems;
 	cpu_status state;
@@ -593,6 +600,15 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	if (sSems[slot].id != id) {
 		TRACE(("sem_release_etc: invalid sem_id %ld\n", id));
 		status = B_BAD_SEM_ID;
+		goto err;
+	}
+
+	// ToDo: the B_CHECK_PERMISSION flag should be made private, as it
+	//	doesn't have any use outside the kernel
+	if ((flags & B_CHECK_PERMISSION) != 0
+		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
+		dprintf("thread %ld tried to release kernel semaphore.\n", thread_get_current_thread()->id);
+		status = B_NOT_ALLOWED;
 		goto err;
 	}
 
