@@ -7,9 +7,15 @@
 #include <stdio.h>
 #include <string.h>
 
+//#define DEBUG
+
 #include "debug.h"
 #include "device.h"
 #include "driver.h"
+
+#define INFO1 "rtl8169: Realtek RTL8169 Family Driver. Version 1.0"
+#define INFO2 "rtl8169: Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>"
+#define INFO3 "rtl8169: All rights reserved. Build " __DATE__ " "__TIME__
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -18,12 +24,26 @@ pci_module_info *gPci;
 char* gDevNameList[MAX_CARDS + 1];
 pci_info *gDevList[MAX_CARDS];
 
-
 status_t
 init_hardware(void)
 {
-	LOG("rtl8169: init_hardware()\n");
-	return B_OK;
+	pci_module_info *pci;
+	pci_info info;
+	status_t res;
+	int i;
+
+	TRACE("init_hardware()\n");
+
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci) < B_OK)
+		return B_ERROR;
+	for (res = B_ERROR, i = 0; pci->get_nth_pci_info(i, &info) == B_OK; i++) {
+		if (info.vendor_id == 0x10ec && info.device_id == 0x8169) {
+			res = B_OK;
+			break;
+		}
+	}
+	put_module(B_PCI_MODULE_NAME);
+	return res;
 }
 
 
@@ -33,8 +53,10 @@ init_driver(void)
 	struct pci_info *item;
 	int index;
 	int cards;
-
-	LOG("rtl8169: init_driver()\n");
+	
+	dprintf(INFO1"\n");
+	dprintf(INFO2"\n");
+	dprintf(INFO3"\n");
 	
 #ifdef DEBUG	
 	set_dprintf_enabled(true);
@@ -59,10 +81,12 @@ init_driver(void)
 			item = (pci_info *)malloc(sizeof(pci_info));
 			if (!item)
 				return B_OK; // already found 1 card, but out of memory
+			if (cards == MAX_CARDS)
+				break;
 		}
 	}
 	
-	LOG("rtl8169: found %d cards\n", cards);
+	TRACE("found %d cards\n", cards);
 
 	free(item);
 	
@@ -80,7 +104,7 @@ uninit_driver(void)
 {
 	int32 i;
 
-	LOG("rtl8169: uninit_driver()\n");
+	TRACE("uninit_driver()\n");
 	
 	for (i = 0; gDevNameList[i] != NULL; i++) {
 		free(gDevList[i]);
