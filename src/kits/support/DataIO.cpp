@@ -20,7 +20,8 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		DataIO.cpp
-//	Author(s):		Jack Burton (burton666@libero.it)
+//	Author(s):		Stefano Ceccherini (burton666@libero.it)
+//					The Storage Team
 //	Description:	Pure virtual BDataIO and BPositioIO classes provide
 //					the protocol for Read()/Write()/Seek().
 //
@@ -29,7 +30,10 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
-#include <cstdio>
+#include <algobase.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 // System Includes -------------------------------------------------------------
 #include <DataIO.h>
@@ -214,16 +218,15 @@ BMemoryIO::~BMemoryIO()
 ssize_t
 BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
 {
-	ssize_t result = size;
-	
-	if (pos < 0 || pos >= fLen)
-		result = 0;
-	else if (pos + size >= fLen)
-		result = fLen - pos;
-	
-	memcpy(buffer, fBuf + pos, result);
-	
-	return result;
+	if (buffer == NULL)
+		return B_BAD_VALUE;
+		
+	ssize_t sizeRead = 0;
+	if (pos >= 0 && pos < fLen) {
+		sizeRead = min((off_t)size, fLen - pos);
+		memcpy(buffer, fBuf + pos, sizeRead);
+	}
+	return sizeRead;
 }
 
 
@@ -233,20 +236,19 @@ BMemoryIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	if (fReadOnly)
 		return B_NOT_ALLOWED;
 	
-	ssize_t result = size;	
+	if (buffer == NULL)
+		return B_BAD_VALUE;
+		
+	ssize_t sizeWritten = 0;	
+	if (pos >= 0 && pos < fPhys) {
+		sizeWritten = min((off_t)size, fPhys - pos);
+		memcpy(fBuf + pos, buffer, sizeWritten);
+	}
 	
-	if (pos < 0 || pos >= fPhys)
-		result = 0;
-	else if (pos + size >= fPhys)
-		result = fPhys - pos;
-	
-	if (pos + result > fLen)
-		fLen = pos + result;
-					
-	if (result > 0)
-		memcpy(fBuf + pos, buffer, result);
-	
-	return result;
+	if (pos + sizeWritten > fLen)
+		fLen = pos + sizeWritten;
+						
+	return sizeWritten;
 }
 
 
@@ -283,11 +285,8 @@ BMemoryIO::SetSize(off_t size)
 	if (fReadOnly)
 		return B_NOT_ALLOWED;
 	
-	status_t err;
-	
-	if (size < 0 || size > fPhys)
-		err = B_ERROR;
-	else {
+	status_t err = B_ERROR;	
+	if (size >= 0 && size <= fPhys) {	
 		err = B_OK;
 		fLen = size;
 	}
@@ -316,10 +315,183 @@ void
 BMemoryIO::_ReservedMemoryIO2(){}
 
 
+// *** BMallocIO ***
+// constructor
+BMallocIO::BMallocIO()
+		 : fBlockSize(256),
+		   fMallocSize(0),
+		   fLength(0),
+		   fData(NULL),
+		   fPosition(0)
+{
+}
+
+
+// destructor
+BMallocIO::~BMallocIO()
+{
+	if (fData)
+		free(fData);
+}
+
+
+// ReadAt
+ssize_t
+BMallocIO::ReadAt(off_t pos, void *buffer, size_t size)
+{
+	if (buffer == NULL)
+		return B_BAD_VALUE;
+	
+	ssize_t sizeRead = 0;
+	if (pos >= 0 && pos < fLength) {
+		sizeRead = min((off_t)size, fLength - pos);
+		memcpy(buffer, fData + pos, sizeRead);
+	}
+	return sizeRead;
+}
+
+
+// WriteAt
+ssize_t
+BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
+{
+	if (buffer == NULL)
+		return B_BAD_VALUE;
+		
+	size_t newSize = max(pos + size, (off_t)fLength);
+	status_t error = _Resize(newSize);	
+	if (error == B_OK)
+		memcpy(fData + pos, buffer, size);
+	return (error != B_OK ? error : size);
+}
+
+
+// Seek
+off_t
+BMallocIO::Seek(off_t position, uint32 seekMode)
+{
+	switch (seekMode) {
+		case SEEK_SET:
+			fPosition = position;
+			break;
+		case SEEK_END:
+			fPosition = fLength + position;
+			break;
+		case SEEK_CUR:
+			fPosition += position;
+			break;
+		default:
+			break;
+	}
+	return fPosition;
+}
+
+
+// Position
+off_t
+BMallocIO::Position() const
+{
+	return fPosition;
+}
+
+
+// SetSize
+status_t
+BMallocIO::SetSize(off_t size)
+{
+	status_t error = (size >= 0 ? B_OK : B_BAD_VALUE );
+	if (error == B_OK)
+		error = _Resize(size);
+	return error;
+}
+
+
+// SetBlockSize
+void
+BMallocIO::SetBlockSize(size_t blockSize)
+{
+	if (blockSize == 0)
+		blockSize = 1;
+	if (blockSize != fBlockSize) {
+		fBlockSize = blockSize;
+		_Resize(fLength);
+	}
+}
+
+
+// Buffer
+const void *
+BMallocIO::Buffer() const
+{
+	return fData;
+}
+
+
+// BufferLength
+size_t
+BMallocIO::BufferLength() const
+{
+	return fLength;
+}
+
+
+// _Resize
+status_t
+BMallocIO::_Resize(off_t size)
+{
+	status_t error = (size >= 0 ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		if (size == 0) {
+			// size == 0, free the memory
+			free(fData);
+			fData = NULL;
+		} else {
+			// size != 0, see, if necessary to resize
+			size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
+			if (newSize != fMallocSize) {
+				// we need to resize
+				if (char *newData = (char*)realloc(fData, newSize)) {
+					// set the new area to 0
+					if (fMallocSize < newSize) {
+						memset(newData + fMallocSize, 0,
+							   newSize - fMallocSize);
+					}
+					fData = newData;
+					fMallocSize = newSize;
+				} else	// couldn't alloc the memory
+					error = B_NO_MEMORY;
+			}
+		}
+	}
+	if (error == B_OK)
+		fLength = size;
+	return error;
+}
+
+
+// FBC
+void BMallocIO::_ReservedMallocIO1() {}
+void BMallocIO::_ReservedMallocIO2() {}
+
+// copy constructor
+BMallocIO::BMallocIO(const BMallocIO &)
+{
+	// copying not allowed...
+}
+
+
+// assignment operator
+BMallocIO &
+BMallocIO::operator=(const BMallocIO &)
+{
+	// copying not allowed...
+	return *this;
+}
+
+
 /*
  * $Log $
  *
  * $Id  $
  *
  */
-
