@@ -218,3 +218,5 @@
 
 /* Define if you have the intl library (-lintl).  */
 /* #undef HAVE_LIBINTL */
+
+#include "../intl/libgettext.h"
