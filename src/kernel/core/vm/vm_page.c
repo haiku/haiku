@@ -3,6 +3,9 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+#include <KernelExport.h>
+#include <OS.h>
+
 #include <kernel.h>
 #include <arch/cpu.h>
 #include <vm.h>
@@ -10,12 +13,6 @@
 #include <vm_page.h>
 #include <vm_cache.h>
 #include <arch/vm_translation_map.h>
-#include <debug.h>
-#include <int.h>
-#include <thread.h>
-#include <smp.h>
-#include <OS.h>
-#include <Errors.h>
 #include <boot/kernel_args.h>
 
 #include <string.h>
@@ -35,7 +32,7 @@ static page_queue page_modified_queue;
 static page_queue page_active_queue;
 
 static vm_page *all_pages;
-static addr physical_page_offset;
+static addr_t physical_page_offset;
 static unsigned int num_pages;
 
 static spinlock page_lock;
@@ -47,7 +44,7 @@ static int dump_page_queue(int argc, char **argv);
 static int dump_page_stats(int argc, char **argv);
 static int dump_free_page_table(int argc, char **argv);
 static int vm_page_set_state_nolock(vm_page *page, int page_state);
-static void clear_page(addr pa);
+static void clear_page(addr_t pa);
 static int32 page_scrubber(void *);
 
 
@@ -168,12 +165,12 @@ static int pageout_daemon()
 		/* write the page out to it's backing store */
 		vecs->num = 1;
 		vecs->total_len = PAGE_SIZE;
-		vm_get_physical_page(page->ppn * PAGE_SIZE, (addr *)&vecs->vec[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
+		vm_get_physical_page(page->ppn * PAGE_SIZE, (addr_t *)&vecs->vec[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
 		vecs->vec[0].iov_len = PAGE_SIZE;
 
 		err = page->cache_ref->cache->store->ops->write(page->cache_ref->cache->store, page->offset, vecs);
 
-		vm_put_physical_page((addr)vecs->vec[0].iov_base);
+		vm_put_physical_page((addr_t)vecs->vec[0].iov_base);
 
 		state = disable_interrupts();
 		acquire_spinlock(&page_lock);
@@ -345,9 +342,9 @@ page_scrubber(void *unused)
 	return 0;
 }
 
-static void clear_page(addr pa)
+static void clear_page(addr_t pa)
 {
-	addr va;
+	addr_t va;
 
 //	dprintf("clear_page: clearing page 0x%x\n", pa);
 
@@ -358,15 +355,15 @@ static void clear_page(addr pa)
 	vm_put_physical_page(va);
 }
 
-int vm_mark_page_inuse(addr page)
+int vm_mark_page_inuse(addr_t page)
 {
 	return vm_mark_page_range_inuse(page, 1);
 }
 
-int vm_mark_page_range_inuse(addr start_page, addr len)
+int vm_mark_page_range_inuse(addr_t start_page, addr_t len)
 {
 	vm_page *page;
-	addr i;
+	addr_t i;
 	int state;
 
 	// XXX remove
@@ -411,7 +408,7 @@ int vm_mark_page_range_inuse(addr start_page, addr len)
 	return i;
 }
 
-vm_page *vm_page_allocate_specific_page(addr page_num, int page_state)
+vm_page *vm_page_allocate_specific_page(addr_t page_num, int page_state)
 {
 	vm_page *p;
 	int old_page_state = PAGE_STATE_BUSY;
@@ -509,7 +506,7 @@ vm_page *vm_page_allocate_page(int page_state)
 	return p;
 }
 
-vm_page *vm_page_allocate_page_run(int page_state, addr len)
+vm_page *vm_page_allocate_page_run(int page_state, addr_t len)
 {
 	unsigned int start;
 	unsigned int i;
@@ -554,7 +551,7 @@ vm_page *vm_page_allocate_page_run(int page_state, addr len)
 	return first_page;
 }
 
-vm_page *vm_lookup_page(addr page_num)
+vm_page *vm_lookup_page(addr_t page_num)
 {
 	if(page_num < physical_page_offset)
 		return NULL;
@@ -631,12 +628,12 @@ int vm_page_set_state(vm_page *page, int page_state)
 	return err;
 }
 
-addr vm_page_num_pages()
+addr_t vm_page_num_pages()
 {
 	return num_pages;
 }
 
-addr vm_page_num_free_pages()
+addr_t vm_page_num_free_pages()
 {
 	return page_free_queue.count + page_clear_queue.count;
 }
@@ -700,7 +697,7 @@ dump_page_queue(int argc, char **argv)
 static int dump_page_stats(int argc, char **argv)
 {
 	unsigned int page_types[8];
-	addr i;
+	addr_t i;
 
 	memset(page_types, 0, sizeof(page_types));
 
@@ -771,10 +768,13 @@ static int dump_free_page_table(int argc, char **argv)
 	return 0;
 }
 #endif
-static addr vm_alloc_vspace_from_ka_struct(kernel_args *ka, unsigned int size)
+
+
+static addr_t
+vm_alloc_vspace_from_ka_struct(kernel_args *ka, unsigned int size)
 {
-	addr spot = 0;
-	unsigned int i;
+	addr_t spot = 0;
+	uint32 i;
 	int last_valloc_entry = 0;
 
 	size = PAGE_ALIGN(size);
@@ -815,7 +815,8 @@ out:
 }
 
 // XXX horrible brute-force method of determining if the page can be allocated
-static bool is_page_in_phys_range(kernel_args *ka, addr paddr)
+static bool
+is_page_in_phys_range(kernel_args *ka, addr_t paddr)
 {
 	unsigned int i;
 
@@ -829,12 +830,14 @@ static bool is_page_in_phys_range(kernel_args *ka, addr paddr)
 	return false;
 }
 
-static addr vm_alloc_ppage_from_kernel_struct(kernel_args *ka)
+
+static addr_t
+vm_alloc_ppage_from_kernel_struct(kernel_args *ka)
 {
-	unsigned int i;
+	uint32 i;
 
 	for (i = 0; i < ka->num_physical_allocated_ranges; i++) {
-		addr next_page;
+		addr_t next_page;
 
 		next_page = ka->physical_allocated_range[i].start + ka->physical_allocated_range[i].size;
 		// see if the page after the next allocated paddr run can be allocated
@@ -854,25 +857,25 @@ static addr vm_alloc_ppage_from_kernel_struct(kernel_args *ka)
 	return 0;	// could not allocate a block
 }
 
-addr vm_alloc_from_ka_struct(kernel_args *ka, unsigned int size, int lock)
+
+addr_t
+vm_alloc_from_ka_struct(kernel_args *ka, unsigned int size, int lock)
 {
-	addr vspot;
-	addr pspot;
-	unsigned int i;
-//	int curr_phys_alloc_range = 0;
+	addr_t vspot, pspot;
+	uint32 i;
 
 	// find the vaddr to allocate at
 	vspot = vm_alloc_vspace_from_ka_struct(ka, size);
-//	dprintf("alloc_from_ka_struct: vaddr 0x%x\n", vspot);
+	//dprintf("alloc_from_ka_struct: vaddr 0x%lx\n", vspot);
 
 	// map the pages
-	for(i=0; i<PAGE_ALIGN(size)/PAGE_SIZE; i++) {
+	for (i = 0; i < PAGE_ALIGN(size) / B_PAGE_SIZE; i++) {
 		pspot = vm_alloc_ppage_from_kernel_struct(ka);
-//		dprintf("alloc_from_ka_struct: paddr 0x%x\n", pspot);
-		if(pspot == 0)
+		//dprintf("alloc_from_ka_struct: paddr 0x%lx\n", pspot);
+		if (pspot == 0)
 			panic("error allocating page from ka_struct!\n");
-		vm_translation_map_quick_map(ka, vspot + i*PAGE_SIZE, pspot * PAGE_SIZE, lock, &vm_alloc_ppage_from_kernel_struct);
-//		pmap_map_page(pspot, vspot + i*PAGE_SIZE, lock);
+		vm_translation_map_quick_map(ka, vspot + i*PAGE_SIZE,
+			pspot * PAGE_SIZE, lock, &vm_alloc_ppage_from_kernel_struct);
 	}
 
 	return vspot;
