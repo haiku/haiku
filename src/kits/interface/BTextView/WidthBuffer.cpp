@@ -80,7 +80,7 @@ _BWidthBuffer_::_BWidthBuffer_()
 _BWidthBuffer_::~_BWidthBuffer_()
 {
 	for (int32 x = 0; x < fItemCount; x++)
-		delete[] fBuffer[x].widths;
+		delete[] (hashed_escapement*)fBuffer[x].widths;
 }
 
 
