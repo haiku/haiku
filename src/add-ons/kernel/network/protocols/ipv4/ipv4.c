@@ -3,7 +3,7 @@
  */
 
 #ifndef _KERNEL_MODE
-#include <stdio.h>
+	#include <stdio.h>
 #endif
 #include <unistd.h>
 #include <kernel/OS.h>
@@ -27,12 +27,8 @@
 #include "ipv4_module.h"
 #include "icmp_module.h"
 
-#ifdef _KERNEL_MODE
 #include <KernelExport.h>
-static status_t ipv4_ops(int32 op, ...);
-#else
-#define ipv4_ops NULL
-#endif	/* _KERNEL_MODE */
+static status_t std_ops(int32 op, ...);
 
 #define INA struct in_ifaddr *
 #define SA  struct sockaddr *
@@ -46,9 +42,6 @@ static uint16 ip_id = 0;
 static sem_id id_lock = -1;
 static struct in_ifaddr *ip_ifaddr = NULL;
 static struct icmp_module_info *icmp = NULL;
-#ifndef _KERNEL_MODE
-static image_id icmpid = -1;
-#endif
 static struct ipq ipq;
 static net_timer_id timerid;
 
@@ -1157,7 +1150,7 @@ static void ipv4_init(void)
 
 struct protosw my_proto = {
 	"IPv4",
-	IPV4_MODULE_PATH,
+	NET_IPV4_MODULE_NAME,
 	0,
 	NULL,
 	IPPROTO_IP,
@@ -1185,30 +1178,8 @@ static int ipv4_module_init(void *cpp)
 	add_domain(NULL, AF_INET);
 	add_protocol(&my_proto, AF_INET);
 
-#ifndef _KERNEL_MODE
-	if (!icmp) {
-		char path[PATH_MAX];
-		getcwd(path, PATH_MAX);
-		strcat(path, "/" ICMP_MODULE_PATH);
-
-		icmpid = load_add_on(path);
-		if (icmpid > 0) {
-			status_t rv = get_image_symbol(icmpid, "protocol_info",
-								B_SYMBOL_TYPE_DATA, (void**)&icmp);
-			if (rv < 0) {
-				printf("Failed to get access to IPv4 information!\n");
-				return -1;
-			}
-		} else { 
-			printf("Failed to load the IPv4 module...\n");
-			return -1;
-		}
-		icmp->set_core(cpp);
-	}
-#else
 	if (!icmp)
-		get_module(ICMP_MODULE_PATH, (module_info**)&icmp);
-#endif
+		get_module(NET_ICMP_MODULE_NAME, (module_info **) &icmp);
 
 	return 0;
 }
@@ -1222,28 +1193,17 @@ static int ipv4_module_stop(void)
 	return 0;
 }
 
-#ifndef _KERNEL_MODE
-void set_core(struct core_module_info *cp)
-{
-	core = cp;
-}
-#endif
-
-_EXPORT struct ipv4_module_info protocol_info = {
+struct ipv4_module_info protocol_info = {
 	{
 		{
-			IPV4_MODULE_PATH,
+			NET_IPV4_MODULE_NAME,
 			0,
-			ipv4_ops
+			std_ops
 		},
 		ipv4_module_init, 
 		ipv4_module_stop
 	},
 
-#ifndef _KERNEL_MODE
-	set_core,
-#endif
-	
 	ipv4_output,
 	get_ip_id,
 	ipv4_ctloutput,
@@ -1252,18 +1212,21 @@ _EXPORT struct ipv4_module_info protocol_info = {
 	ip_srcroute
 };
 
-#ifdef _KERNEL_MODE
-static status_t ipv4_ops(int32 op, ...)
+// #pragma mark -
+
+_EXPORT status_t std_ops(int32 op, ...) 
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			get_module(CORE_MODULE_PATH, (module_info**)&core);
+			get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
 			if (!core)
 				return B_ERROR;
 			load_driver_symbols("ipv4");
 			return B_OK;
+			
 		case B_MODULE_UNINIT:
 			return B_OK;
+			
 		default:
 			return B_ERROR;
 	}
@@ -1272,7 +1235,7 @@ static status_t ipv4_ops(int32 op, ...)
 
 
 _EXPORT module_info *modules[] = {
-	(module_info*) &protocol_info,
+	(module_info *) &protocol_info,
 	NULL
 };		
-#endif
+

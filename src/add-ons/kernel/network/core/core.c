@@ -12,10 +12,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef _KERNEL_MODE
 #include <Drivers.h>
 #include <module.h>
 #include <KernelExport.h>
+
+#ifdef _KERNEL_MODE
 #define spawn_thread spawn_kernel_thread
 #endif
 
@@ -25,7 +26,6 @@
 #include "sys/socket.h"
 #include "sys/socketvar.h"
 #include "net/if.h"	/* for ifnet definition */
-//#include "net_server/net_server.h"
 #include "protocols.h"
 #include "net_module.h"
 #include "net_timer.h"
@@ -60,11 +60,8 @@ static int init_done = 0;
 
 /* Forward prototypes... */
 /* Private for this file */
-#ifdef _KERNEL_MODE
-static status_t core_std_ops(int32 op, ...);
-#else
-#define core_std_ops NULL
-#endif
+status_t std_ops(int32 op, ...);
+
 static int start_stack(void);
 static int stop_stack(void);
 static void add_protosw(struct protosw *[], int layer);
@@ -73,11 +70,11 @@ static struct net_module *module_list = NULL;
 int net_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
                void *newp, size_t newlen);
 
-_EXPORT struct core_module_info core_info = {
+struct core_module_info core_info = {
 	{
-		CORE_MODULE_PATH,
+		NET_CORE_MODULE_NAME,
 		B_KEEP_LOADED,
-		core_std_ops
+		std_ops
 	},
 
 	start_stack,
@@ -659,7 +656,7 @@ static void domain_init(void)
  * NB these don't have any additional functions so we just use the
  * system defined module_info structures
  */
-#ifdef _KERNEL_MODE
+
 static void find_protocol_modules(void)
 {
 	void *ml = open_module_list(NETWORK_PROTOCOLS);
@@ -746,7 +743,12 @@ static void find_interface_modules(void)
 	close_module_list(ml);
 }
 
-#else
+/* TODO: userland modules support is now moved in
+    src/servers/net/userland_modules.cpp
+    These two hacks are no more needed, should be removed soon...
+*/  
+
+#if 0
 
 static void _find_interface_modules(char *dirpath)
 {
@@ -987,11 +989,7 @@ static int stop_stack(void)
 	printf("trying to unload modules\n");
 	nm = module_list;
 	do {
-#ifdef _KERNEL_MODE
 		put_module(nm->name);
-#else
-		unload_add_on(nm->iid);
-#endif
 		onm = nm;
 		nm = nm->next;
 		onm->next = NULL;
@@ -1014,13 +1012,16 @@ static int stop_stack(void)
 	return 0;
 }
 
-#ifdef _KERNEL_MODE
-static status_t core_std_ops(int32 op, ...) 
+// #pragma mark -
+
+_EXPORT status_t std_ops(int32 op, ...) 
 {
 	switch(op) {
 		case B_MODULE_INIT:
+			printf("core: B_MODULE_INIT\n");
 			load_driver_symbols("core");
 			break;
+
 		case B_MODULE_UNINIT:
 			// the stack is keeping loaded, so don't stop it
 			printf("core: B_MODULE_UNINIT\n");
@@ -1037,6 +1038,3 @@ _EXPORT module_info *modules[] = {
 	NULL
 };
 
-#else
-_EXPORT module_info *modules = (module_info *)&core_info;
-#endif

@@ -19,13 +19,8 @@
 #include "raw_module.h"
 #include "ipv4_module.h"
 
-#ifdef _KERNEL_MODE
 #include <KernelExport.h>
-static status_t raw_ops(int32 op, ...);
-#else	/* _KERNEL_MODE */
-#define raw_ops NULL
-static image_id ipid;
-#endif
+status_t std_ops(int32 op, ...);
 
 static struct core_module_info *core = NULL;
 static struct ipv4_module_info *ipm = NULL;
@@ -262,17 +257,13 @@ int rip_ctloutput(int op, struct socket *so, int level,
 			break;
 		/* XXX - Add other options here */
 	}
-#ifdef _KERNEL_MODE
+
 	return ipm->ctloutput(op, so, level, optnum, m);
-#else
-/* XXX - get this working for app...? */
-	return 0;
-#endif
 }
 	
 static struct protosw my_protocol = {
 	"Raw IP module",
-	RAW_MODULE_PATH,
+	NET_RAW_MODULE_NAME,
 	SOCK_RAW,
 	NULL,
 	0,
@@ -299,42 +290,15 @@ static int raw_module_init(void *cpp)
 	add_domain(NULL, AF_INET);
 	add_protocol(&my_protocol, AF_INET);
 
-#ifndef _KERNEL_MODE
-	if (!ipm) {
-		char path[PATH_MAX];
-		getcwd(path, PATH_MAX);
-		strcat(path, "/" IPV4_MODULE_PATH);
-
-		ipid = load_add_on(path);
-		if (ipid > 0) {
-			status_t rv = get_image_symbol(ipid, "protocol_info",
-								B_SYMBOL_TYPE_DATA, (void**)&ipm);
-			if (rv < 0) {
-				printf("Failed to get access to IPv4 information!\n");
-				return -1;
-			}
-			ipm->set_core(cpp);
-		} else { 
-			printf("Failed to load the IPv4 module...%ld [%s]\n", 
-			       ipid, strerror(ipid));
-			return -1;
-		}
-	}
-#else
 	if (!ipm)
-		get_module(IPV4_MODULE_PATH, (module_info**)&ipm);
-#endif
+		get_module(NET_IPV4_MODULE_NAME, (module_info**) &ipm);
 
 	return 0;	
 }
 
 static int raw_module_stop(void)
 {
-#ifndef _KERNEL_MODE
-	unload_add_on(ipid);
-#else
-	put_module(IPV4_MODULE_PATH);
-#endif
+	put_module(NET_IPV4_MODULE_NAME);
 
 	remove_protocol(&my_protocol);
 	remove_domain(AF_INET);
@@ -342,12 +306,12 @@ static int raw_module_stop(void)
 	return 0;
 }
 
-_EXPORT struct raw_module_info protocol_info = {
+struct raw_module_info protocol_info = {
 	{
 		{
-			RAW_MODULE_PATH,
+			NET_RAW_MODULE_NAME,
 			0,
-			raw_ops
+			std_ops
 		},
 		raw_module_init,
 		raw_module_stop
@@ -355,17 +319,20 @@ _EXPORT struct raw_module_info protocol_info = {
 	&rip_input
 };
 
-#ifdef _KERNEL_MODE
-static status_t raw_ops(int32 op, ...)
+// #pragma mark -
+
+_EXPORT status_t std_ops(int32 op, ...) 
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			get_module(CORE_MODULE_PATH, (module_info**)&core);
+			get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
 			if (!core)
 				return B_ERROR;
 			return B_OK;
+			
 		case B_MODULE_UNINIT:
 			break;
+			
 		default:
 			return B_ERROR;
 	}
@@ -373,8 +340,6 @@ static status_t raw_ops(int32 op, ...)
 }
 
 _EXPORT module_info *modules[] = {
-	(module_info*)&protocol_info,
+	(module_info *) &protocol_info,
 	NULL
 };
-
-#endif

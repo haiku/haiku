@@ -19,15 +19,10 @@
 #include "net_module.h"
 #include "core_funcs.h"
 
-#ifdef _KERNEL_MODE
 #include <KernelExport.h>
 #define printf dprintf
-#define LOOP_MODULE_PATH "network/interfaces/loopback"
-#else
-#define LOOP_MODULE_PATH "interfaces/loopback"
-#endif
 
-static status_t std_ops(int32 op, ...);
+status_t std_ops(int32 op, ...);
 
 static struct core_module_info *core = NULL;
 
@@ -144,9 +139,9 @@ static int loopback_module_init(void *cpp)
 	return 0;
 }
 
-_EXPORT struct kernel_net_module_info device_info = {
+struct kernel_net_module_info device_info = {
 	{
-		LOOP_MODULE_PATH,
+		"network/interfaces/loopback",
 		0,
 		std_ops
 	},
@@ -154,11 +149,13 @@ _EXPORT struct kernel_net_module_info device_info = {
 	NULL,
 };
 
-static status_t std_ops(int32 op, ...)
+// #pragma mark -
+
+_EXPORT status_t std_ops(int32 op, ...) 
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			get_module(CORE_MODULE_PATH, (module_info **)&core);
+			get_module(NET_CORE_MODULE_NAME, (module_info **)&core);
 			if (!core)
 				return B_ERROR;
 			return B_OK;
@@ -174,6 +171,4 @@ _EXPORT module_info *modules[] = {
 	(module_info*) &device_info,
 	NULL
 };
-
-
 

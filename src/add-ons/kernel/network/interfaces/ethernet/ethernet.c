@@ -26,19 +26,15 @@
 #include "core_funcs.h"
 #include "net_timer.h"
 
-#define ETHERNET_MODULE_PATH	"network/interfaces/ethernet"
+#include <KernelExport.h>
+#define spawn_thread spawn_kernel_thread
+#define printf dprintf
 
-#ifdef _KERNEL_MODE
-	#include <KernelExport.h>
-	#define spawn_thread spawn_kernel_thread
-	#define printf dprintf
+/* forward prototypes */
+int ether_dev_start(ifnet *dev);
+int ether_dev_stop (ifnet *dev);
 
-	/* forward prototypes */
-	int ether_dev_start(ifnet *dev);
-	int ether_dev_stop (ifnet *dev);
-#endif
-
-static int32 std_ops(int32 op, ...);
+status_t std_ops(int32 op, ...);
 
 /* Local variables */
 static struct protosw *proto[IPPROTO_MAX];
@@ -903,9 +899,9 @@ static int ether_stop()
 	return 0;
 }
 
-_EXPORT struct kernel_net_module_info device_info = {
+struct kernel_net_module_info device_info = {
 	{
-		ETHERNET_MODULE_PATH,
+		"network/interfaces/ethernet",
 		0,
 		std_ops
 	},
@@ -914,20 +910,21 @@ _EXPORT struct kernel_net_module_info device_info = {
 	ether_stop
 };
 
+// #pragma mark -
 
-static int32 std_ops(int32 op, ...)
+_EXPORT status_t std_ops(int32 op, ...) 
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			get_module(CORE_MODULE_PATH, (module_info**)&core);
+			get_module(NET_CORE_MODULE_NAME, (module_info**)&core);
 			if (!core)
 				return B_ERROR;
-#ifdef _KERNEL_MODE
 			load_driver_symbols("ethernet");
-#endif
 			return B_OK;
+
 		case B_MODULE_UNINIT:
 			return B_OK;
+
 		default:
 			return B_ERROR;
 	}

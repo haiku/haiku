@@ -1,9 +1,9 @@
 /* icmp.c
  */
  
-#ifndef _KERNEL
-#include <stdio.h>
-#include <string.h>
+#ifndef _KERNEL_MODE
+	#include <stdio.h>
+	#include <string.h>
 #endif
 
 #include "net_misc.h"
@@ -25,12 +25,8 @@
 #include "icmp_module.h"
 #include "ipv4_module.h"
 
-#ifdef _KERNEL_MODE
 #include <KernelExport.h>
-static status_t icmp_ops(int32 op, ...);
-#else
-#define icmp_ops NULL
-#endif
+status_t std_ops(int32 op, ...);
 
 /* private variables */
 static struct core_module_info *core = NULL;
@@ -38,9 +34,6 @@ static struct raw_module_info *raw = NULL;
 static struct protosw* proto[IPPROTO_MAX];
 static struct in_ifaddr *ic_ifaddr = NULL;
 static struct ipv4_module_info *ipm = NULL;
-#ifndef _KERNEL_MODE
-static image_id ipid = -1;
-#endif
 
 struct icmpstat icmpstat;
 
@@ -382,16 +375,14 @@ static void icmp_init(void)
 
 	memset(proto, 0, sizeof(struct protosw *) * IPPROTO_MAX);
 	add_protosw(proto, NET_LAYER2);
-#ifdef _KERNEL
 	if (!raw)
-		get_module(RAW_MODULE_PATH, (module_info**)&raw);
-#endif
+		get_module(NET_RAW_MODULE_NAME, (module_info**)&raw);
 	ic_ifaddr = get_primary_addr();
 }
 
 struct protosw my_proto = {
 	"ICMP (v4)",
-	ICMP_MODULE_PATH,
+	NET_ICMP_MODULE_NAME,
 	0,
 	NULL,
 	IPPROTO_ICMP,
@@ -420,30 +411,8 @@ static int icmp_protocol_init(void *cpp)
 	add_domain(NULL, AF_INET);
 	add_protocol(&my_proto, AF_INET);
 
-#ifndef _KERNEL_MODE
-	if (!ipm) {
-		char path[PATH_MAX];
-		getcwd(path, PATH_MAX);
-		strcat(path, "/" IPV4_MODULE_PATH);
-
-		ipid = load_add_on(path);
-		if (ipid > 0) {
-			status_t rv = get_image_symbol(ipid, "protocol_info",
-								B_SYMBOL_TYPE_DATA, (void**)&ipm);
-			if (rv < 0) {
-				printf("Failed to get access to IPv4 information!\n");
-				return -1;
-			}
-		} else { 
-			printf("Failed to load the IPv4 module...\n");
-			return -1;
-		}
-		ipm->set_core(cpp);
-	}
-#else
 	if (!ipm)
-		get_module(IPV4_MODULE_PATH, (module_info**)&ipm);
-#endif
+		get_module(NET_IPV4_MODULE_NAME, (module_info**)&ipm);
 
 	return 0;
 }
@@ -455,42 +424,36 @@ static int icmp_protocol_stop(void)
 	return 0;
 }
 
-#ifndef _KERNEL_MODE
-void set_core(struct core_module_info *cp)
-{
-	core = cp;
-}
-#endif
-
-_EXPORT struct icmp_module_info protocol_info = {
+struct icmp_module_info protocol_info = {
 	{
 		{
-			ICMP_MODULE_PATH,
+			NET_ICMP_MODULE_NAME,
 			0,
-			icmp_ops
+			std_ops
 		},
 		icmp_protocol_init,
 		icmp_protocol_stop
 	},
-#ifndef _KERNEL_MODE
-	set_core,
-#endif
+
 	icmp_error
 };
 
-#ifdef _KERNEL_MODE
-static status_t icmp_ops(int32 op, ...)
+// #pragma mark -
+
+_EXPORT status_t std_ops(int32 op, ...) 
 {
 	switch(op) {
 		case B_MODULE_INIT:
 			if (!core)
-				get_module(CORE_MODULE_PATH, (module_info**)&core);
+				get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
 			if (!core)
 				return B_ERROR;
 			load_driver_symbols("icmp");
 			return B_OK;
+
 		case B_MODULE_UNINIT:
 			break;
+
 		default:
 			return B_ERROR;
 	}
@@ -498,8 +461,7 @@ static status_t icmp_ops(int32 op, ...)
 }
 
 _EXPORT module_info *modules[] = {
-	(module_info *)&protocol_info,
+	(module_info *) &protocol_info,
 	NULL
 };
-#endif
 

@@ -24,14 +24,9 @@
 #include "core_funcs.h"
 #include "icmp_module.h"
 
-#ifdef _KERNEL_MODE
 #include <KernelExport.h>
-static status_t udp_ops(int32 op, ...);
-#define UDP_MODULE_PATH		"network/protocol/udp"
-#else	/* _KERNEL */
-#define udp_ops NULL
-#define UDP_MODULE_PATH	    "modules/protocol/udp"
-#endif
+status_t std_ops(int32 op, ...);
+#define NET_UDP_MODULE_NAME		"network/protocols/udp"
 
 /* Private variables */
 static struct core_module_info *core = NULL;
@@ -42,9 +37,6 @@ static struct udpstat udpstat;
 static uint32 udp_sendspace;	/* size of send buffer */
 static uint32 udp_recvspace;	/* size of recieve buffer */
 static struct icmp_module_info *icmp = NULL;
-#ifndef _KERNEL_MODE
-static image_id icmpid = -1;
-#endif
 
 static struct in_addr zeroin_addr = {0};
 
@@ -354,7 +346,7 @@ void udp_init(void)
 
 static struct protosw my_proto = {
 	"UDP Module",
-	UDP_MODULE_PATH,
+	NET_UDP_MODULE_NAME,
 	SOCK_DGRAM,
 	NULL,
 	IPPROTO_UDP,
@@ -380,30 +372,8 @@ static int udp_module_init(void *cpp)
 	add_domain(NULL, AF_INET);
 	add_protocol(&my_proto, AF_INET);
 
-#ifndef _KERNEL_MODE
-	if (!icmp) {
-		char path[PATH_MAX];
-		getcwd(path, PATH_MAX);
-		strcat(path, "/" ICMP_MODULE_PATH);
-
-		icmpid = load_add_on(path);
-		if (icmpid > 0) {
-			status_t rv = get_image_symbol(icmpid, "protocol_info",
-								B_SYMBOL_TYPE_DATA, (void**)&icmp);
-			if (rv < 0) {
-				printf("Failed to get access to IPv4 information!\n");
-				return -1;
-			}
-		} else { 
-			printf("Failed to load the IPv4 module...\n");
-			return -1;
-		}
-		icmp->set_core(cpp);
-	}
-#else
 	if (!icmp)
-		get_module(ICMP_MODULE_PATH, (module_info**)&icmp);
-#endif
+		get_module(NET_ICMP_MODULE_NAME, (module_info **) &icmp);
 
 	return 0;
 }
@@ -415,27 +385,30 @@ static int udp_module_stop(void)
 	return 0;
 }
 
-_EXPORT struct kernel_net_module_info protocol_info = {
+struct kernel_net_module_info protocol_info = {
 	{
-		UDP_MODULE_PATH,
+		NET_UDP_MODULE_NAME,
 		B_KEEP_LOADED,
-		udp_ops
+		std_ops
 	},
 	udp_module_init,
 	udp_module_stop
 };
 
-#ifdef _KERNEL_MODE
-static status_t udp_ops(int32 op, ...)
+// #pragma mark -
+
+_EXPORT status_t std_ops(int32 op, ...) 
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			get_module(CORE_MODULE_PATH, (module_info**)&core);
+			get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
 			if (!core)
 				return B_ERROR; 
 			return B_OK;
+			
 		case B_MODULE_UNINIT:
 			break;
+			
 		default:
 			return B_ERROR;
 	}
@@ -443,7 +416,6 @@ static status_t udp_ops(int32 op, ...)
 }
 
 _EXPORT module_info *modules[] = {
-	(module_info *)&protocol_info,
+	(module_info *) &protocol_info,
 	NULL
 };
-#endif
