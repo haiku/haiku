@@ -716,8 +716,7 @@ thread_exit(void)
 		(int)t->return_code));
 
 	// boost our priority to get this over with
-	t->priority = B_FIRST_REAL_TIME_PRIORITY;
-		// ToDo: is it really that urgent?
+	t->priority = B_URGENT_DISPLAY_PRIORITY;
 
 	// shutdown the thread messaging
 
