@@ -147,25 +147,59 @@ KPartitioningSystem::SupportsMovingChild(KPartition *child)
 	return false;
 }
 
+// SupportsSettingName
+bool
+KPartitioningSystem::SupportsSettingName(KPartition *partition)
+{
+	// to be implemented
+	return false;
+}
+
+// SupportsSettingContentName
+bool
+KPartitioningSystem::SupportsSettingContentName(KPartition *partition,
+												bool *whileMounted)
+{
+	// to be implemented
+	return false;
+}
+
+// SupportsSettingType
+bool
+KPartitioningSystem::SupportsSettingType(KPartition *partition)
+{
+	// to be implemented
+	return false;
+}
+
 // SupportsCreatingChild
 bool
-KPartitioningSystem::SupportsCreatingChild(KPartition *child)
+KPartitioningSystem::SupportsCreatingChild(KPartition *partition)
 {
 	// to be implemented
 	return false;
 }
 
-// SupportsParentSystem
+// SupportsDeletingChild
 bool
-KPartitioningSystem::SupportsParentSystem(KDiskSystem *system)
+KPartitioningSystem::SupportsDeletingChild(KPartition *child)
 {
 	// to be implemented
 	return false;
 }
 
-// SupportsChildSystem
+// SupportsInitializing
 bool
-KPartitioningSystem::SupportsChildSystem(KDiskSystem *system)
+KPartitioningSystem::SupportsInitializing(KPartition *partition)
+{
+	// to be implemented
+	return false;
+}
+
+// SupportsInitializingChild
+bool
+KPartitioningSystem::SupportsInitializingChild(KPartition *child,
+											   const char *diskSystem)
 {
 	// to be implemented
 	return false;
@@ -198,6 +232,30 @@ KPartitioningSystem::ValidateMove(KPartition *partition, off_t *start)
 // ValidateMoveChild
 bool
 KPartitioningSystem::ValidateMoveChild(KPartition *partition, off_t *start)
+{
+	// to be implemented
+	return false;
+}
+
+// ValidateSetName
+bool
+KPartitioningSystem::ValidateSetName(KPartition *partition, char *name)
+{
+	// to be implemented
+	return false;
+}
+
+// ValidateSetContentName
+bool
+KPartitioningSystem::ValidateSetContentName(KPartition *partition, char *name)
+{
+	// to be implemented
+	return false;
+}
+
+// ValidateSetType
+bool
+KPartitioningSystem::ValidateSetType(KPartition *partition, const char *type)
 {
 	// to be implemented
 	return false;
@@ -258,6 +316,23 @@ KPartitioningSystem::GetPartitionableSpaces(KPartition *partition,
 	return false;
 }
 
+// GetNextSupportedType
+status_t
+KPartitioningSystem::GetNextSupportedType(KPartition *partition, int32 *cookie,
+										  char *type)
+{
+	// to be implemented
+	return B_ERROR;
+}
+
+// GetTypeForContentType
+status_t
+KPartitioningSystem::GetTypeForContentType(const char *contentType, char *type)
+{
+	// to be implemented
+	return B_ERROR;
+}
+
 // Repair
 status_t
 KPartitioningSystem::Repair(KPartition *partition, bool checkOnly,
@@ -298,6 +373,33 @@ KPartitioningSystem::Move(KPartition *partition, off_t offset,
 status_t
 KPartitioningSystem::MoveChild(KPartition *child, off_t offset,
 							   KDiskDeviceJob *job)
+{
+	// to be implemented
+	return B_ERROR;
+}
+
+// SetName
+status_t
+KPartitioningSystem::SetName(KPartition *partition, char *name,
+							 KDiskDeviceJob *job)
+{
+	// to be implemented
+	return B_ERROR;
+}
+
+// SetContentName
+status_t
+KPartitioningSystem::SetContentName(KPartition *partition, char *name,
+									KDiskDeviceJob *job)
+{
+	// to be implemented
+	return B_ERROR;
+}
+
+// SetType
+status_t
+KPartitioningSystem::SetType(KPartition *partition, char *type,
+							 KDiskDeviceJob *job)
 {
 	// to be implemented
 	return B_ERROR;

@@ -55,14 +55,23 @@ public:
 	virtual bool SupportsResizingChild(KPartition *child);
 	virtual bool SupportsMoving(KPartition *partition, bool *whileMounted);
 	virtual bool SupportsMovingChild(KPartition *child);
+	virtual bool SupportsSettingName(KPartition *partition);
+	virtual bool SupportsSettingContentName(KPartition *partition,
+											bool *whileMounted);
+	virtual bool SupportsSettingType(KPartition *partition);
 	virtual bool SupportsCreatingChild(KPartition *partition);
-	virtual bool SupportsParentSystem(KDiskSystem *system);
-	virtual bool SupportsChildSystem(KDiskSystem *system);
+	virtual bool SupportsDeletingChild(KPartition *child);
+	virtual bool SupportsInitializing(KPartition *partition);
+	virtual bool SupportsInitializingChild(KPartition *child,
+										   const char *diskSystem);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
 	virtual bool ValidateResizeChild(KPartition *partition, off_t *size);
 	virtual bool ValidateMove(KPartition *partition, off_t *start);
 	virtual bool ValidateMoveChild(KPartition *partition, off_t *start);
+	virtual bool ValidateSetName(KPartition *partition, char *name);
+	virtual bool ValidateSetContentName(KPartition *partition, char *name);
+	virtual bool ValidateSetType(KPartition *partition, const char *type);
 	virtual bool ValidateCreateChild(KPartition *partition, off_t *start,
 									 off_t *size, const char *type,
 									 const char *parameters);
@@ -78,6 +87,11 @@ public:
 										int32 count,
 										int32 *actualCount = NULL);
 
+	virtual status_t GetNextSupportedType(KPartition *partition, int32 *cookie,
+										  char *type);
+	virtual status_t GetTypeForContentType(const char *contentType,
+										   char *type);
+
 	// Writing
 	// Device should not be locked.
 
@@ -92,6 +106,12 @@ public:
 						  KDiskDeviceJob *job);
 	virtual status_t MoveChild(KPartition *child, off_t offset,
 							   KDiskDeviceJob *job);
+	virtual status_t SetName(KPartition *partition, char *name,
+							 KDiskDeviceJob *job);
+	virtual status_t SetContentName(KPartition *partition, char *name,
+									KDiskDeviceJob *job);
+	virtual status_t SetType(KPartition *partition, char *type,
+							 KDiskDeviceJob *job);
 	virtual status_t CreateChild(KPartition *partition, off_t offset,
 								 off_t size, const char *type,
 								 const char *parameters, KDiskDeviceJob *job,

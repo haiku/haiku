@@ -133,9 +133,18 @@ KFileSystem::SupportsMoving(KPartition *partition, bool *whileMounted)
 	return false;
 }
 
-// SupportsParentSystem
+// SupportsSettingContentName
 bool
-KFileSystem::SupportsParentSystem(KDiskSystem *system)
+KFileSystem::SupportsSettingContentName(KPartition *partition,
+										bool *whileMounted)
+{
+	// to be implemented
+	return false;
+}
+
+// SupportsInitializing
+bool
+KFileSystem::SupportsInitializing(KPartition *partition)
 {
 	// to be implemented
 	return false;
@@ -152,6 +161,14 @@ KFileSystem::ValidateResize(KPartition *partition, off_t *size)
 // ValidateMove
 bool
 KFileSystem::ValidateMove(KPartition *partition, off_t *start)
+{
+	// to be implemented
+	return false;
+}
+
+// ValidateSetContentName
+bool
+KFileSystem::ValidateSetContentName(KPartition *partition, char *name)
 {
 	// to be implemented
 	return false;
@@ -201,6 +218,15 @@ KFileSystem::Resize(KPartition *partition, off_t size, KDiskDeviceJob *job)
 // Move
 status_t
 KFileSystem::Move(KPartition *partition, off_t offset, KDiskDeviceJob *job)
+{
+	// to be implemented
+	return B_ERROR;
+}
+
+// SetContentName
+status_t
+KFileSystem::SetContentName(KPartition *partition, char *name,
+							KDiskDeviceJob *job)
 {
 	// to be implemented
 	return B_ERROR;

@@ -213,25 +213,59 @@ KDiskSystem::SupportsMovingChild(KPartition *child)
 	return false;
 }
 
+// SupportsSettingName
+bool
+KDiskSystem::SupportsSettingName(KPartition *partition)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
+// SupportsSettingContentName
+bool
+KDiskSystem::SupportsSettingContentName(KPartition *partition,
+										bool *whileMounted)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
+// SupportsSettingType
+bool
+KDiskSystem::SupportsSettingType(KPartition *partition)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
 // SupportsCreatingChild
 bool
-KDiskSystem::SupportsCreatingChild(KPartition *child)
+KDiskSystem::SupportsCreatingChild(KPartition *parent)
 {
 	// to be implemented by derived classes
 	return false;
 }
 
-// SupportsParentSystem
+// SupportsDeletingChild
 bool
-KDiskSystem::SupportsParentSystem(KDiskSystem *system)
+KDiskSystem::SupportsDeletingChild(KPartition *child)
 {
 	// to be implemented by derived classes
 	return false;
 }
 
-// SupportsChildSystem
+// SupportsInitializing
 bool
-KDiskSystem::SupportsChildSystem(KDiskSystem *system)
+KDiskSystem::SupportsInitializing(KPartition *partition)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
+// SupportsInitializingChild
+bool
+KDiskSystem::SupportsInitializingChild(KPartition *child,
+									   const char *diskSystem)
 {
 	// to be implemented by derived classes
 	return false;
@@ -264,6 +298,30 @@ KDiskSystem::ValidateMove(KPartition *partition, off_t *start)
 // ValidateMoveChild
 bool
 KDiskSystem::ValidateMoveChild(KPartition *partition, off_t *start)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
+// ValidateSetName
+bool
+KDiskSystem::ValidateSetName(KPartition *partition, char *name)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
+// ValidateSetContentName
+bool
+KDiskSystem::ValidateSetContentName(KPartition *partition, char *name)
+{
+	// to be implemented by derived classes
+	return false;
+}
+
+// ValidateSetType
+bool
+KDiskSystem::ValidateSetType(KPartition *partition, const char *type)
 {
 	// to be implemented by derived classes
 	return false;
@@ -323,6 +381,23 @@ KDiskSystem::GetPartitionableSpaces(KPartition *partition,
 	return false;
 }
 
+// GetNextSupportedType
+status_t
+KDiskSystem::GetNextSupportedType(KPartition *partition, int32 *cookie,
+								  char *type)
+{
+	// to be implemented by derived classes
+	return B_ENTRY_NOT_FOUND;
+}
+
+// GetTypeForContentType
+status_t
+KDiskSystem::GetTypeForContentType(const char *contentType, char *type)
+{
+	// to be implemented by derived classes
+	return B_ENTRY_NOT_FOUND;
+}
+
 // Defragment
 status_t
 KDiskSystem::Defragment(KPartition *partition, KDiskDeviceJob *job)
@@ -367,6 +442,31 @@ KDiskSystem::Move(KPartition *partition, off_t offset, KDiskDeviceJob *job)
 // MoveChild
 status_t
 KDiskSystem::MoveChild(KPartition *child, off_t offset, KDiskDeviceJob *job)
+{
+	// to be implemented by derived classes
+	return B_ERROR;
+}
+
+// SetName
+status_t
+KDiskSystem::SetName(KPartition *partition, char *name, KDiskDeviceJob *job)
+{
+	// to be implemented by derived classes
+	return B_ERROR;
+}
+
+// SetContentName
+status_t
+KDiskSystem::SetContentName(KPartition *partition, char *name,
+							KDiskDeviceJob *job)
+{
+	// to be implemented by derived classes
+	return B_ERROR;
+}
+
+// SetType
+status_t
+KDiskSystem::SetType(KPartition *partition, char *type, KDiskDeviceJob *job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;

@@ -37,10 +37,13 @@ public:
 								   bool *whileMounted);
 	virtual bool SupportsResizing(KPartition *partition, bool *whileMounted);
 	virtual bool SupportsMoving(KPartition *partition, bool *whileMounted);
-	virtual bool SupportsParentSystem(KDiskSystem *system);
+	virtual bool SupportsSettingContentName(KPartition *partition,
+											bool *whileMounted);
+	virtual bool SupportsInitializing(KPartition *partition);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
 	virtual bool ValidateMove(KPartition *partition, off_t *start);
+	virtual bool ValidateSetContentName(KPartition *partition, char *name);
 	virtual bool ValidateInitialize(KPartition *partition,
 									const char *parameters);
 	virtual bool ValidateSetContentParameters(KPartition *child,
@@ -55,6 +58,8 @@ public:
 							KDiskDeviceJob *job);
 	virtual status_t Move(KPartition *partition, off_t offset,
 						  KDiskDeviceJob *job);
+	virtual status_t SetContentName(KPartition *partition, char *name,
+									KDiskDeviceJob *job);
 	virtual status_t Initialize(KPartition *partition, const char *parameters,
 								KDiskDeviceJob *job);
 	virtual status_t SetContentParameters(KPartition *partition,
