@@ -52,6 +52,7 @@ StdBinCommands
 	clipboard.cpp
 	df.cpp
 	draggers.cpp
+	dstcheck.cpp
 #	factor.cpp
 	ffm.cpp
 	iroster.cpp
