@@ -22,6 +22,32 @@ invert rectangle
 blit
 */
 
+/*
+	nVidia hardware info:
+	There's now enough information in here to make it possible to setup acceleration
+	in a much more flexible way than is currently done.
+	We should be able to do FIFO assignment setup changes on-the-fly now, using
+	all the engine-command-handles that are pre-defined on any FIFO channel.
+	(check channel to be emptied, then re-assign to new command, then use: etc.)
+	
+	Maybe we can even setup new additional handles to previously unused engine
+	commands now, and there might even be a chance DMA can be setup(?).
+
+	In order to use dynamically assigned FIFO channels, we need to re-setup issuing
+	engine commands. Instead of the fixed-register defines now used on the FIFO
+	channels, we should create struct-defines that describe an engine command, and
+	create struct pointers that will be set to the current FIFO channel that command
+	is assigned to.
+	Filling out the members of such a struct is in fact programming the engine for a
+	command then.
+	(Look at XFree86's opensource nvidia driver for some examples of struct defines:
+	 note however that dynamic use of the channels and structs isn't setup there
+	 either... Still need to checkout the utahGLX opensource nvidia 3D driver better
+	 to see how much of this setup (if any) is used there...)
+
+	Our options seem to get better at least! :-)
+*/
+
 status_t nv_acc_wait_idle()
 {
 	/* wait until engine completely idle */
@@ -107,50 +133,74 @@ status_t nv_acc_init()
 	ACCW(PF_CACHES, 0x00000001);
 
 	/*** PRAMIN ***/
-	/* RAMHT space (hash-table(?)) */
+	/* RAMHT space (hash-table(?)) SETUP FIFO HANDLES */
 	/* note:
 	 * 'instance' tells you where the engine command is stored in 'PR_CTXx_x' sets
 	 * below: instance being b4-19 with baseadress NV_PRAMIN_CTX_0 (0x00700000).
 	 * That command is linked to the handle noted here. This handle is then used to
 	 * tell the FIFO to which engine command it is connected! */
 	/* (first set) */
+	/* cmd NV1_IMAGE_FROM_CPU (not used?) */
 	ACCW(HT_HANDL_00, 0x80000010); /* 32bit handle */
 	ACCW(HT_VALUE_00, 0x80011145); /* instance $1145, engine = acc engine, CHID = $00 */
+	/* cmd NV_IMAGE_BLIT */
 	ACCW(HT_HANDL_01, 0x80000011); /* 32bit handle */
 	ACCW(HT_VALUE_01, 0x80011146); /* instance $1146, engine = acc engine, CHID = $00 */
+	/* cmd NV3_GDI_RECTANGLE_TEXT */
 	ACCW(HT_HANDL_02, 0x80000012); /* 32bit handle */
 	ACCW(HT_VALUE_02, 0x80011147); /* instance $1147, engine = acc engine, CHID = $00 */
+	/* cmd NV_RENDER_D3D0_TRIANGLE_ZETA (not used?) */
 	ACCW(HT_HANDL_03, 0x80000013); /* 32bit handle */
 	ACCW(HT_VALUE_03, 0x80011148); /* instance $1148, engine = acc engine, CHID = $00 */
+	/* cmd NV4_ or NV10_DX5_TEXTURE_TRIANGLE (should be identical) */
 	ACCW(HT_HANDL_04, 0x80000014); /* 32bit handle */
 	ACCW(HT_VALUE_04, 0x80011149); /* instance $1149, engine = acc engine, CHID = $00 */
+	/* cmd NV4_ or NV10_DX6_MULTI_TEXTURE_TRIANGLE (not used) (should be identical) */
 	ACCW(HT_HANDL_05, 0x80000015); /* 32bit handle */
 	ACCW(HT_VALUE_05, 0x8001114a); /* instance $114a, engine = acc engine, CHID = $00 */
+	/* cmd ... (not used) (identical) */
 	ACCW(HT_HANDL_06, 0x80000016); /* 32bit handle */
 	if (si->ps.card_arch != NV04A)
+	{
+		/* ... cmd NV1_RENDER_SOLID_LIN */
 		ACCW(HT_VALUE_06, 0x80011150); /* instance $1150, engine = acc engine, CHID = $00 */
+	}
 	else
+	{
+		/* ... cmd NV1_RENDER_SOLID_LIN */
 		ACCW(HT_VALUE_06, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
+	}
 	/* (second set) */
+	/* cmd NV_ROP5_SOLID */
 	ACCW(HT_HANDL_10, 0x80000000); /* 32bit handle */
 	ACCW(HT_VALUE_10, 0x80011142); /* instance $1142, engine = acc engine, CHID = $00 */
+	/* cmd NV_IMAGE_BLACK_RECTANGLE */
 	ACCW(HT_HANDL_11, 0x80000001); /* 32bit handle */
 	ACCW(HT_VALUE_11, 0x80011143); /* instance $1143, engine = acc engine, CHID = $00 */
+	/* cmd NV_IMAGE_PATTERN */
 	ACCW(HT_HANDL_12, 0x80000002); /* 32bit handle */
 	ACCW(HT_VALUE_12, 0x80011144); /* instance $1144, engine = acc engine, CHID = $00 */
+	/* cmd NV3_SURFACE_0 (not used) */
 	ACCW(HT_HANDL_13, 0x80000003); /* 32bit handle */
 	ACCW(HT_VALUE_13, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
+	/* cmd NV3_SURFACE_1 (not used) */
 	ACCW(HT_HANDL_14, 0x80000004); /* 32bit handle */
 	ACCW(HT_VALUE_14, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
+	/* cmd NV3_SURFACE_2 (not used) */
 	ACCW(HT_HANDL_15, 0x80000005); /* 32bit handle */
 	ACCW(HT_VALUE_15, 0x8001114d); /* instance $114d, engine = acc engine, CHID = $00 */
+	/* cmd NV3_SURFACE_3 (not used) */
 	ACCW(HT_HANDL_16, 0x80000006); /* 32bit handle */
 	ACCW(HT_VALUE_16, 0x8001114e); /* instance $114e, engine = acc engine, CHID = $00 */
+	/* cmd NV10_CONTEXT_SURFACES_ARGB_ZS (not used) */
+	/* note:
+	 * why not setup NV4_CONTEXT_SURFACES_ARGB_ZS 'D' as well?? incompatible?? */
 	if (si->ps.card_arch != NV04A)
 	{
 		ACCW(HT_HANDL_17, 0x80000007); /* 32bit handle */
 		ACCW(HT_VALUE_17, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
 	}
+
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
 	/* note:
 	 * CTX determines which FIFO channels point to what engine commands. */
@@ -731,13 +781,21 @@ status_t nv_acc_init()
 	 * probably depending on some other setup, there are 8 or 32 FIFO channels
 	 * available. Assuming the current setup only has 8 channels because the 'rest'
 	 * isn't setup here... */
+	/* CH0: cmd NV_ROP5_SOLID */
 	ACCW(FIFO_00800000, 0x80000000); /* Raster OPeration */
+	/* CH1: cmd NV_IMAGE_BLACK_RECTANGLE */
 	ACCW(FIFO_00802000, 0x80000001); /* Clip */
+	/* CH2: cmd NV_IMAGE_PATTERN */
 	ACCW(FIFO_00804000, 0x80000002); /* Pattern */
+	/* CH3: cmd NV1_IMAGE_FROM_CPU */
 	ACCW(FIFO_00806000, 0x80000010); /* Pixmap (not used or 3D only?) */
+	/* CH4: cmd NV_IMAGE_BLIT */
 	ACCW(FIFO_00808000, 0x80000011); /* Blit */
+	/* CH5: cmd NV3_GDI_RECTANGLE_TEXT */
 	ACCW(FIFO_0080a000, 0x80000012); /* Bitmap */
+	/* CH6: cmd NV1_RENDER_SOLID_LIN */
 	ACCW(FIFO_0080c000, 0x80000016); /* Line (not used or 3D only?) */
+	/* CH7: cmd NV4_ or NV10_DX5_TEXTURE_TRIANGLE (should be identical) */
 	ACCW(FIFO_0080e000, 0x80000014); /* Textured Triangle (3D only) */
 
 	/* do first actual acceleration engine command:
