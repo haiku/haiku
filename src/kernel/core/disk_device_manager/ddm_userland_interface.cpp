@@ -9,6 +9,8 @@
 #include <KDiskSystem.h>
 #include <KFileDiskDevice.h>
 #include <KShadowPartition.h>
+#include <malloc.h>
+#include <vm.h>
 
 #include "KDiskDeviceJobGenerator.h"
 #include "UserDataWriter.h"
@@ -457,14 +459,16 @@ validate_delete_child_partition(KPartition *partition, int32 changeCounter)
 
 // _kern_get_next_disk_device_id
 partition_id
-_kern_get_next_disk_device_id(int32 *cookie, size_t *neededSize)
+_kern_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 {
-	if (!cookie)
+	if (!_cookie)
 		return B_BAD_VALUE;
+	int32 cookie = *_cookie;
+	
 	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the next device
-	if (KDiskDevice *device = manager->RegisterNextDevice(cookie)) {
+	if (KDiskDevice *device = manager->RegisterNextDevice(&cookie)) {
 		PartitionRegistrar _(device, true);
 		id = device->ID();
 		if (neededSize) {
@@ -473,19 +477,26 @@ _kern_get_next_disk_device_id(int32 *cookie, size_t *neededSize)
 				UserDataWriter writer;
 				device->WriteUserData(writer, false);
 				*neededSize = writer.AllocatedSize();
-			} else
-				return B_ERROR;
+			} else {
+				id = B_ERROR;
+			}
 		}
 	}
+	*_cookie = cookie;
 	return id;
 }
 
 // _kern_find_disk_device
 partition_id
-_kern_find_disk_device(const char *filename, size_t *neededSize)
+_kern_find_disk_device(const char *_filename, size_t *neededSize)
 {
-	if (!filename)
+	if (!_filename)
 		return B_BAD_VALUE;
+
+	char filename[SYS_MAX_PATH_LEN+1];
+	if (user_strlcpy(filename, _filename, SYS_MAX_PATH_LEN) >= SYS_MAX_PATH_LEN) 		
+		return B_NAME_TOO_LONG;
+	
 	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// find the device
@@ -507,10 +518,15 @@ _kern_find_disk_device(const char *filename, size_t *neededSize)
 
 // _kern_find_partition
 partition_id
-_kern_find_partition(const char *filename, size_t *neededSize)
+_kern_find_partition(const char *_filename, size_t *neededSize)
 {
-	if (!filename)
+	if (!_filename)
 		return B_BAD_VALUE;
+
+	char filename[SYS_MAX_PATH_LEN+1];
+	if (user_strlcpy(filename, _filename, SYS_MAX_PATH_LEN) >= SYS_MAX_PATH_LEN) 		
+		return B_NAME_TOO_LONG;
+
 	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// find the partition
@@ -538,11 +554,20 @@ _kern_find_partition(const char *filename, size_t *neededSize)
 // _kern_get_disk_device_data
 status_t
 _kern_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
-						   user_disk_device_data *buffer, size_t bufferSize,
+						   user_disk_device_data *_buffer, size_t bufferSize,
 						   size_t *neededSize)
 {
-	if (!buffer && bufferSize > 0)
+	if (!_buffer && bufferSize > 0)
 		return B_BAD_VALUE;
+
+	// copy in
+	user_disk_device_data *buffer = bufferSize > 0
+	                                ? reinterpret_cast<user_disk_device_data*>(malloc(bufferSize))
+	                                : NULL;
+	if (buffer)
+		user_memcpy(buffer, _buffer, bufferSize);
+		
+	status_t result = B_OK;	
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the device
 	if (KDiskDevice *device = manager->RegisterDevice(id, deviceOnly)) {
@@ -553,47 +578,76 @@ _kern_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
 			device->WriteUserData(writer, shadow);
 			if (neededSize)
 				*neededSize = writer.AllocatedSize();
-			if (writer.AllocatedSize() <= bufferSize)
-				return B_OK;
-			return B_BUFFER_OVERFLOW;
+			if (writer.AllocatedSize() > bufferSize)
+				result = B_BUFFER_OVERFLOW;
 		}
+	} else {
+		result = B_ENTRY_NOT_FOUND;
 	}
-	return B_ENTRY_NOT_FOUND;
+
+	// copy out
+	if (result == B_OK && buffer)
+		user_memcpy(_buffer, buffer, bufferSize);
+	free(buffer);
+	
+	return result;
 }
 
 // _kern_get_partitionable_spaces
 status_t
 _kern_get_partitionable_spaces(partition_id partitionID, int32 changeCounter,
-							   partitionable_space_data *buffer,
-							   int32 count, int32 *actualCount)
+							   partitionable_space_data *_buffer,
+							   int32 count, int32 *_actualCount)
 {
-	if (!buffer && count > 0)
-		return B_BAD_VALUE;
+	if (!_buffer && count > 0)
+		return B_BAD_VALUE;	
+	// copy in
+	int32 bufferSize = count * sizeof(partitionable_space_data);
+	partitionable_space_data *buffer = count > 0
+	                                   ? reinterpret_cast<partitionable_space_data*>(malloc(bufferSize))
+	                                   : NULL;
+	if (buffer)
+		user_memcpy(buffer, _buffer, bufferSize);	
+	status_t error = B_OK;
 	// get the partition
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return B_ENTRY_NOT_FOUND;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter))
-		return B_BAD_VALUE;
-	// get the disk system
-	KDiskSystem *diskSystem = partition->DiskSystem();
-	if (!diskSystem)
-		return B_ENTRY_NOT_FOUND;
-	// get the info
-	return diskSystem->GetPartitionableSpaces(partition, buffer, count,
-											  actualCount);
+	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	if (!error) {
+		PartitionRegistrar registrar1(partition, true);
+		PartitionRegistrar registrar2(partition->Device(), true);
+		DeviceReadLocker locker(partition->Device(), true);
+		error = check_shadow_partition(partition, changeCounter) ? B_OK : B_BAD_VALUE;
+		if (!error) {
+			// get the disk system
+			KDiskSystem *diskSystem = partition->DiskSystem();
+			error = diskSystem ? B_OK : B_ENTRY_NOT_FOUND;
+			if (!error) {
+				// get the info
+				int32 actualCount;
+				error = diskSystem->GetPartitionableSpaces(partition, buffer,
+				                                           count, &actualCount);
+				if (!error && _actualCount)
+					*_actualCount = actualCount;
+			}
+		}
+	}	
+	// copy out
+	if (!error && buffer)
+		user_memcpy(_buffer, buffer, bufferSize);
+	free(buffer);	
+	return error;
 }
 
 // _kern_register_file_device
 partition_id
-_kern_register_file_device(const char *filename)
+_kern_register_file_device(const char *_filename)
 {
-	if (!filename)
+	if (!_filename)
 		return B_BAD_VALUE;
+	char filename[B_PATH_NAME_LENGTH];
+	if (user_strlcpy(filename, _filename, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH)
+		return B_NAME_TOO_LONG;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KFileDiskDevice *device = manager->FindFileDevice(filename))
@@ -605,27 +659,34 @@ _kern_register_file_device(const char *filename)
 
 // _kern_unregister_file_device
 status_t
-_kern_unregister_file_device(partition_id deviceID, const char *filename)
+_kern_unregister_file_device(partition_id deviceID, const char *_filename)
 {
-	if (deviceID < 0 && !filename)
-		return B_BAD_VALUE;
+	if (deviceID < 0 && !_filename)
+		return B_BAD_VALUE;	
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	if (deviceID >= 0)
+	if (deviceID >= 0) {
 		return manager->DeleteFileDevice(deviceID);
-	return manager->DeleteFileDevice(filename);
+	} else {
+		char filename[B_PATH_NAME_LENGTH];
+		if (user_strlcpy(filename, _filename, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH)
+			return B_NAME_TOO_LONG;
+		return manager->DeleteFileDevice(filename);
+	}
 }
 
 // _kern_get_disk_system_info
 status_t
-_kern_get_disk_system_info(disk_system_id id, user_disk_system_info *info)
+_kern_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
 {
-	if (!info)
+	if (!_info)
 		return B_BAD_VALUE;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KDiskSystem *diskSystem = manager->FindDiskSystem(id)) {
 			DiskSystemLoader _(diskSystem, true);
-			diskSystem->GetInfo(info);
+			user_disk_system_info info;
+			diskSystem->GetInfo(&info);
+			user_memcpy(_info, &info, sizeof(info));
 			return B_OK;
 		}
 	}
@@ -634,32 +695,42 @@ _kern_get_disk_system_info(disk_system_id id, user_disk_system_info *info)
 
 // _kern_get_next_disk_system_info
 status_t
-_kern_get_next_disk_system_info(int32 *cookie, user_disk_system_info *info)
+_kern_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
 {
-	if (!cookie || !info)
+	if (!_cookie || !_info)
 		return B_BAD_VALUE;
+	int32 cookie = *_cookie;
+	status_t result = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		if (KDiskSystem *diskSystem = manager->NextDiskSystem(cookie)) {
+		if (KDiskSystem *diskSystem = manager->NextDiskSystem(&cookie)) {
 			DiskSystemLoader _(diskSystem, true);
-			diskSystem->GetInfo(info);
-			return B_OK;
+			user_disk_system_info info;
+			diskSystem->GetInfo(&info);
+			user_memcpy(_info, &info, sizeof(info));
+			result = B_OK;
 		}
 	}
-	return B_ENTRY_NOT_FOUND;
+	*_cookie = cookie;
+	return result;
 }
 
 // _kern_find_disk_system
 status_t
-_kern_find_disk_system(const char *name, user_disk_system_info *info)
+_kern_find_disk_system(const char *_name, user_disk_system_info *_info)
 {
-	if (!name || !info)
+	if (!_name || !_info)
 		return B_BAD_VALUE;
+	char name[B_OS_NAME_LENGTH];
+	if (user_strlcpy(name, _name, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
+		return B_NAME_TOO_LONG;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KDiskSystem *diskSystem = manager->FindDiskSystem(name)) {
 			DiskSystemLoader _(diskSystem, true);
-			diskSystem->GetInfo(info);
+			user_disk_system_info info;
+			diskSystem->GetInfo(&info);
+			user_memcpy(_info, &info, sizeof(info));
 			return B_OK;
 		}
 	}
@@ -669,7 +740,7 @@ _kern_find_disk_system(const char *name, user_disk_system_info *info)
 // _kern_supports_defragmenting_partition
 bool
 _kern_supports_defragmenting_partition(partition_id partitionID,
-									   int32 changeCounter, bool *whileMounted)
+									   int32 changeCounter, bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -679,15 +750,19 @@ _kern_supports_defragmenting_partition(partition_id partitionID,
 	PartitionRegistrar registrar1(partition, true);
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceReadLocker locker(partition->Device(), true);
-	return (validate_defragment_partition(partition, changeCounter,
-										   whileMounted) == B_OK);
+	bool whileMounted;
+	bool result = validate_defragment_partition(partition, changeCounter,
+										        &whileMounted) == B_OK;
+	if (result && _whileMounted)
+		*_whileMounted = whileMounted;
+	return result;										   
 }
 
 // _kern_supports_repairing_partition
 bool
 _kern_supports_repairing_partition(partition_id partitionID,
 								   int32 changeCounter, bool checkOnly,
-								   bool *whileMounted)
+								   bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -697,15 +772,19 @@ _kern_supports_repairing_partition(partition_id partitionID,
 	PartitionRegistrar registrar1(partition, true);
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceReadLocker locker(partition->Device(), true);
-	return (validate_repair_partition(partition, changeCounter, checkOnly,
-									  whileMounted) == B_OK);
+	bool whileMounted;
+	bool result = validate_repair_partition(partition, changeCounter, checkOnly,
+									        &whileMounted) == B_OK;
+	if (result && _whileMounted)
+		*_whileMounted = whileMounted;
+	return result;										   
 }
 
 // _kern_supports_resizing_partition
 bool
 _kern_supports_resizing_partition(partition_id partitionID,
 								  int32 changeCounter, bool *canResizeContents,
-								  bool *whileMounted)
+								  bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -733,8 +812,11 @@ _kern_supports_resizing_partition(partition_id partitionID,
 	// get the child disk system
 	KDiskSystem *childDiskSystem = partition->DiskSystem();
 	if (canResizeContents) {
+		bool whileMounted;
 		*canResizeContents = (childDiskSystem
-			&& childDiskSystem->SupportsResizing(partition, whileMounted));
+			&& childDiskSystem->SupportsResizing(partition, &whileMounted));
+		if (_whileMounted)
+			*_whileMounted = whileMounted;
 	}
 // TODO: Currently we report that we cannot resize the contents, if the
 // partition's disk system is unknown. I found this more logical. It doesn't
@@ -742,6 +824,7 @@ _kern_supports_resizing_partition(partition_id partitionID,
 	return result;
 }
 
+// ToDo: Add parameter security
 // _kern_supports_moving_partition
 bool
 _kern_supports_moving_partition(partition_id partitionID, int32 changeCounter,
@@ -817,7 +900,7 @@ _kern_supports_setting_partition_name(partition_id partitionID,
 bool
 _kern_supports_setting_partition_content_name(partition_id partitionID,
 											  int32 changeCounter,
-											  bool *whileMounted)
+											  bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -836,7 +919,11 @@ _kern_supports_setting_partition_content_name(partition_id partitionID,
 	if (!diskSystem)
 		return false;
 	// get the info
-	return diskSystem->SupportsSettingContentName(partition, whileMounted);
+	bool whileMounted;
+	bool result = diskSystem->SupportsSettingContentName(partition, &whileMounted);
+	if (result && _whileMounted)
+		*_whileMounted = whileMounted;
+	return result;
 }
 
 // _kern_supports_setting_partition_type
@@ -901,7 +988,7 @@ _kern_supports_setting_partition_parameters(partition_id partitionID,
 bool
 _kern_supports_setting_partition_content_parameters(partition_id partitionID,
 													int32 changeCounter,
-													bool *whileMounted)
+													bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -920,16 +1007,24 @@ _kern_supports_setting_partition_content_parameters(partition_id partitionID,
 	if (!diskSystem)
 		return false;
 	// get the info
-	return diskSystem->SupportsSettingContentParameters(partition,
-														whileMounted);
+	bool whileMounted;
+	bool result = diskSystem->SupportsSettingContentParameters(partition,
+														       &whileMounted);
+	if (result && _whileMounted)
+		*_whileMounted = whileMounted;
 }
 
 // _kern_supports_initializing_partition
 bool
 _kern_supports_initializing_partition(partition_id partitionID,
 									  int32 changeCounter,
-									  const char *diskSystemName)
+									  const char *_diskSystemName)
 {
+	if (_diskSystemName)
+		return false;
+	char diskSystemName[B_OS_NAME_LENGTH];
+	if (user_strlcpy(diskSystemName, _diskSystemName, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
+		return false;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -1019,10 +1114,11 @@ _kern_is_sub_disk_system_for(disk_system_id diskSystemID,
 // _kern_validate_resize_partition
 status_t
 _kern_validate_resize_partition(partition_id partitionID, int32 changeCounter,
-								off_t *size)
+								off_t *_size)
 {
-	if (!size)
+	if (!_size)
 		return B_BAD_VALUE;
+	off_t size = *_size;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -1031,7 +1127,10 @@ _kern_validate_resize_partition(partition_id partitionID, int32 changeCounter,
 	PartitionRegistrar registrar1(partition, true);
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceReadLocker locker(partition->Device(), true);
-	return validate_resize_partition(partition, changeCounter, size);
+	bool result = validate_resize_partition(partition, changeCounter, &size);
+	if (result)
+		*_size = size;
+	return result;								        
 }
 
 // _kern_validate_move_partition
