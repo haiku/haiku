@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "Handle.h"
@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 
 #ifndef HAVE_READ_POS
@@ -37,8 +38,10 @@ Handle::Handle(const char *path)
 	fPath(NULL)
 {
 	fHandle = open(path, O_RDONLY);
-	if (fHandle < B_OK)
+	if (fHandle < B_OK) {
+		fHandle = errno;
 		return;
+	}
 
 	fPath = strdup(path);
 }
