@@ -15,16 +15,6 @@
 static bigtime_t sBootTime;
 
 
-void
-rtc_set_system_time(uint32 current_time)
-{
-	uint64 useconds;
-
-	useconds = (uint64)current_time * 1000000;
-	sBootTime = useconds - system_time();
-}
-
-
 /** Write the system time to CMOS. */
 
 static void
@@ -93,5 +83,27 @@ rtc_init(kernel_args *ka)
 	rtc_hw_to_system();
 
 	return B_OK;
+}
+
+
+//	#pragma mark -
+//	public kernel API
+
+
+void
+set_real_time_clock(uint32 currentTime)
+{
+	sBootTime = currentTime * 1000000LL - system_time();
+}
+
+
+//	#pragma mark -
+//	public userland API
+
+
+void
+_user_set_real_time_clock(uint32 time)
+{
+	set_real_time_clock(time);
 }
 
