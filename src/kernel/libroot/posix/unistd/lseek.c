@@ -10,5 +10,5 @@
 off_t
 lseek(int fd, off_t pos, int whence)
 {
-	return sys_seek(fd, pos, whence);
+	return _kern_seek(fd, pos, whence);
 }

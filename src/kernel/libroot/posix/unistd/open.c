@@ -1,4 +1,7 @@
 /* 
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001, Manuel J. Petit. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -14,7 +17,7 @@
 int
 creat(const char *path, mode_t mode)
 {
-	int status = sys_create(path, O_CREAT | O_TRUNC | O_WRONLY, mode);
+	int status = _kern_create(path, O_CREAT | O_TRUNC | O_WRONLY, mode);
 	
 	if (status < 0) {
 		errno = status;
@@ -36,9 +39,9 @@ open(const char *path, int oflags, ...)
 	va_end(args);
 
 	if (oflags & O_CREAT)
-		status = sys_create(path, oflags, perms);
+		status = _kern_create(path, oflags, perms);
 	else
-		status = sys_open(path, oflags);
+		status = _kern_open(path, oflags);
 
 	if (status < 0) {
 		errno = status;

@@ -31,7 +31,7 @@ ioctl(int fd, ulong cmd, ...)
 	size = va_arg(args, size_t);
 	va_end(args);
 
-	status = sys_ioctl(fd, cmd, argument, size);
+	status = _kern_ioctl(fd, cmd, argument, size);
 
 	RETURN_AND_SET_ERRNO(status)
 }

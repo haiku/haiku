@@ -7,7 +7,6 @@ KernelMergeObject posix_unistd.o :
 	<$(SOURCE_GRIST)>conf.c
 	<$(SOURCE_GRIST)>directory.c
 	<$(SOURCE_GRIST)>dup.c
-	<$(SOURCE_GRIST)>dup2.c
 	<$(SOURCE_GRIST)>fcntl.c
 	<$(SOURCE_GRIST)>getopt.c
 	<$(SOURCE_GRIST)>hostname.c
@@ -37,7 +36,6 @@ MergeObjectFromObjects kernel_posix_unistd.o :
 	<$(SOURCE_GRIST)>conf.o
 	<$(SOURCE_GRIST)>directory.o
 	<$(SOURCE_GRIST)>dup.o
-	<$(SOURCE_GRIST)>dup2.o
 	<$(SOURCE_GRIST)>fcntl.o
 	<$(SOURCE_GRIST)>hostname.o
 	<$(SOURCE_GRIST)>ioctl.o

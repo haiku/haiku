@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -20,7 +20,7 @@
 ssize_t
 readlink(const char *path, char *buffer, size_t bufferSize)
 {
-	int status = sys_read_link(path, buffer, bufferSize);
+	int status = _kern_read_link(path, buffer, bufferSize);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -29,7 +29,7 @@ readlink(const char *path, char *buffer, size_t bufferSize)
 int
 symlink(const char *path, const char *toPath)
 {
-	int status = sys_create_symlink(path, toPath, 0);
+	int status = _kern_create_symlink(path, toPath, 0);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -38,7 +38,7 @@ symlink(const char *path, const char *toPath)
 int
 unlink(const char *path)
 {
-	int status = sys_unlink(path);
+	int status = _kern_unlink(path);
 	
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -47,7 +47,7 @@ unlink(const char *path)
 int
 link(const char *path, const char *toPath)
 {
-	int status = sys_create_link(path, toPath);
+	int status = _kern_create_link(path, toPath);
 
 	RETURN_AND_SET_ERRNO(status);
 }

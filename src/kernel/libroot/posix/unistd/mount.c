@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -21,7 +21,7 @@ int
 mount(const char *filesystem, const char *where, const char *device, ulong flags, void *parms, int len)
 {
 	// ToDo: consider parsing "parms" string in userland
-	int status = sys_mount(where, device, filesystem/*, flags*/, parms);
+	int status = _kern_mount(where, device, filesystem/*, flags*/, parms);
 
 	(void)len;
 
@@ -32,8 +32,8 @@ mount(const char *filesystem, const char *where, const char *device, ulong flags
 int 
 unmount(const char *path)
 {
-	int status = sys_unmount(path);
-	
+	int status = _kern_unmount(path);
+
 	RETURN_AND_SET_ERRNO(status);
 }
 

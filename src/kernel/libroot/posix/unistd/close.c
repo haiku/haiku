@@ -3,14 +3,16 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <unistd.h>
 #include <syscalls.h>
 #include <errno.h>
 
-int close(int fd)
-{
-	int retval = sys_close(fd);
 
+int
+close(int fd)
+{
+	int retval = _kern_close(fd);
 	if (retval < 0) {
 		errno = retval;
 		retval = -1;

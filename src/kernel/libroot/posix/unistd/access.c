@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -20,7 +20,7 @@
 int
 access(const char *path, int accessMode)
 {
-	status_t status = sys_access(path, accessMode);
+	status_t status = _kern_access(path, accessMode);
 
 	RETURN_AND_SET_ERRNO(status);
 }
