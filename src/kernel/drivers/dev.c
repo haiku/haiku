@@ -195,8 +195,8 @@ error:
 
 
 /* This is no longer part of the public kernel API, so we just export the symbol */
-int load_driver_symbols(const char *driver_name);
-int
+status_t load_driver_symbols(const char *driver_name);
+status_t
 load_driver_symbols(const char *driver_name)
 {
 	// This will be globally done for the whole kernel via the settings file.
