@@ -1,0 +1,61 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<HTML>
+<HEAD>
+<TITLE>BString Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BString Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BString interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BString Interface</A></LI>
+<LI><A HREF="#usecases">BString Use Cases</A></LI>
+<LI><A HREF="#implement">BString Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BString Interface:</H2>
+
+<P>The BString is as string allocation and manipulation class. The object allocates and deallocates
+memory for you so the buffer will always be "big enough" to contain the data.
+BString provides a number of charachter search, comparison, and manipulation functions in 
+a variety of flavors. The best source of information about the BString class can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Support%20Kit/String.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BString Use Cases:</H2>
+
+<P>The following use cases cover the BString functionality:</P>
+
+<OL>
+
+<LI><P><B>Construction 1:</B> A BString can be created with an empty constructor.
+This way the created BString is empty.</P></LI>
+
+<LI><P><B>Construction 2:</B> You can create a BString object with a const char pointer as 
+parameter. After the construction, the BString object contains a copy of the string pointed
+by the const char pointer.</P></LI>
+
+<LI><P><B>Construction 3:</B> BString can be created using a copy constructor.
+The parameter is another BString. After the construction, your BString will contain a 
+copy of the other BString.</P></LI>
+
+<LI><P><B>Construction 4:</B> You can create a BString object with a const char pointer as 
+parameter and an int32 parameter, which specifies the maximum bytes BString will consider.
+After the construction, the BString object contains a maximum of bytes (specified by the int32
+parameter) of the string pointed by the pointer.</P></LI>
+
+<LI><P><B>Destruction:</B> The BString destructor frees the allocated memory.</P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BString Implementation:</H2>
+
+
+</BODY>
+</HTML>
