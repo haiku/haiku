@@ -305,8 +305,8 @@ _get_format_for_description(media_format *out_format, const media_format_descrip
 	
 	request.description = in_desc;
 	
-	if (B_OK != QueryServer(SERVER_GET_FORMAT_FOR_DESCRIPTION, &request, sizeof(request), &reply, sizeof(reply)))
-		return B_ERROR;
+//	if (B_OK != QueryServer(SERVER_GET_FORMAT_FOR_DESCRIPTION, &request, sizeof(request), &reply, sizeof(reply)))
+//		return B_ERROR;
 		
 	*out_format = reply.format;
 	return B_OK;
@@ -320,8 +320,8 @@ _get_meta_description_for_format(media_format_description *out_desc, const media
 	
 	request.format = in_format;
 	
-	if (B_OK != QueryServer(SERVER_GET_META_DESCRIPTION_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply)))
-		return B_ERROR;
+//	if (B_OK != QueryServer(SERVER_GET_META_DESCRIPTION_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply)))
+//		return B_ERROR;
 		
 	*out_desc = reply.description;
 	return B_OK;

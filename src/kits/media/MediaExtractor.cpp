@@ -1,10 +1,12 @@
 #include "MediaExtractor.h"
 #include "PluginManager.h"
+#include "debug.h"
 #include <stdio.h>
 #include <string.h>
 
 MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
 {
+	CALLED();
 	fSource = source;
 	fStreamInfo = 0;
 	fStreamCount = 0;
@@ -47,13 +49,27 @@ MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
 			fStreamInfo[i].status = B_ERROR;
 			printf("MediaExtractor::MediaExtractor: GetStreamInfo for stream %ld failed\n", i);
 		}
+		
+		char sz[1024];
+		string_for_format(fStreamInfo[i].encodedFormat, sz, sizeof(sz));
+		printf("MediaExtractor::MediaExtractor: stream %d has format %s\n", i, sz);
+		fStreamInfo[i].encodedFormat.type = B_MEDIA_ENCODED_AUDIO;
+		fStreamInfo[i].encodedFormat.u.encoded_audio.encoding = (enum media_encoded_audio_format::audio_encoding) 1;
+		fStreamInfo[i].encodedFormat.u.encoded_audio.bit_rate = 128000;
+		fStreamInfo[i].encodedFormat.u.encoded_audio.frame_size = 3000;
+		fStreamInfo[i].encodedFormat.u.encoded_audio.output.frame_rate = 44100;
+		fStreamInfo[i].encodedFormat.u.encoded_audio.output.channel_count = 2;
+		fStreamInfo[i].encodedFormat.u.encoded_audio.output.format = 2;
+		fStreamInfo[i].encodedFormat.u.encoded_audio.output.byte_order = B_MEDIA_LITTLE_ENDIAN;
+		fStreamInfo[i].encodedFormat.u.encoded_audio.output.buffer_size = 8 * 1024;
+		string_for_format(fStreamInfo[i].encodedFormat, sz, sizeof(sz));
+		printf("MediaExtractor::MediaExtractor: stream %d has new format %s\n", i, sz);
 	}
-
-	
 }
 
 MediaExtractor::~MediaExtractor()
 {
+	CALLED();
 	// free all stream cookies
 	for (int32 i = 0; i < fStreamCount; i++) {
 		if (fStreamInfo[i].cookie)
@@ -70,18 +86,21 @@ MediaExtractor::~MediaExtractor()
 status_t
 MediaExtractor::InitCheck()
 {
+	CALLED();
 	return fErr;
 }
 
 void
 MediaExtractor::GetFileFormatInfo(media_file_format *mfi) const
 {
+	CALLED();
 	*mfi = fMff;
 }
 
 int32
 MediaExtractor::StreamCount()
 {
+	CALLED();
 	return fStreamCount;
 }
 
@@ -94,6 +113,7 @@ MediaExtractor::EncodedFormat(int32 stream)
 int64
 MediaExtractor::CountFrames(int32 stream) const
 {
+	CALLED();
 	int64 frameCount;
 	bigtime_t duration;
 	media_format format;
@@ -108,6 +128,7 @@ MediaExtractor::CountFrames(int32 stream) const
 bigtime_t
 MediaExtractor::Duration(int32 stream) const
 {
+	CALLED();
 	int64 frameCount;
 	bigtime_t duration;
 	media_format format;
@@ -135,12 +156,14 @@ status_t
 MediaExtractor::Seek(int32 stream, uint32 seekTo,
 					 int64 *frame, bigtime_t *time)
 {
+	CALLED();
 	status_t result;
 	result = fReader->Seek(fStreamInfo[stream].cookie, seekTo, frame, time);
 	if (result != B_OK)
 		return result;
 	
 	// clear buffered chunks
+	return B_OK;
 }
 
 status_t
@@ -148,6 +171,7 @@ MediaExtractor::GetNextChunk(int32 stream,
 							 void **chunkBuffer, int32 *chunkSize,
 							 media_header *mediaHeader)
 {
+	CALLED();
 	// get buffered chunk
 	
 	// XXX this should be done in a different thread, and double buffered for each stream
@@ -157,6 +181,7 @@ MediaExtractor::GetNextChunk(int32 stream,
 status_t
 MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info *mci)
 {
+	CALLED();
 	if (fStreamInfo[stream].status != B_OK) {
 		printf("MediaExtractor::CreateDecoder can't create decoder for stream %ld\n", stream);
 		return B_ERROR;

@@ -1,4 +1,5 @@
 #include "DecoderPlugin.h"
+#include "PluginManager.h"
 #include <MediaFormats.h>
 #include <stdio.h>
 #include <string.h>
@@ -35,18 +36,5 @@ DecoderPlugin::PublishDecoder(const char *meta_description,
 							  const char *pretty_name,
 							  const char *default_mapping /* = 0 */)
 {
-/*
-	media_format fmt;
-	memset(&fmt, 0, sizeof(fmt));
-	fmt.type = fmt_type;
-	BMediaFormats formats;
-	if (B_OK != formats.MakeFormatFor(&fmt_desc, 1, &fmt))
-		return B_ERROR;
-
-	char s[1024];
-	string_for_format(fmt, s, sizeof(s));
-	printf("DecoderPlugin::PublishDecoder: short_name \"%s\", pretty_name \"%s\", format %s\n",
-		short_name, pretty_name, s);
-*/
-	return B_OK;
+	return _PublishDecoder(this, meta_description, short_name, pretty_name, default_mapping);
 }

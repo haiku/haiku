@@ -54,7 +54,7 @@ BMediaTrack::EncodedFormat(media_format *out_format) const
 		return B_NO_INIT;
 
 	out_format = fExtractor->EncodedFormat(fStream);
-
+printf("encoded format\n");
 	return B_OK;
 }
 

@@ -137,6 +137,7 @@ BMediaFile::ReleaseTrack(BMediaTrack *track)
 			return B_OK;
 		}
 	}
+	printf("BMediaFile::ReleaseTrack track %p not found\n", track);
 	return B_ERROR;
 }
 
