@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 /*
@@ -17,7 +17,7 @@
 #include <string.h>
 
 
-#define TRACE_SYNC
+//#define TRACE_SYNC
 #ifdef TRACE_SYNC
 #	define TRACE(x) dprintf x
 #else
