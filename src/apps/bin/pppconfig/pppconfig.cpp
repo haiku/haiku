@@ -1,9 +1,9 @@
-//----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
-//---------------------------------------------------------------------
+//  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
 
 #include <cstdio>
 #include <cstdlib>
@@ -83,7 +83,7 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 	}
 	
 	int32 count;
-	interface_id *interfaces = manager.Interfaces(&count, filter);
+	ppp_interface_id *interfaces = manager.Interfaces(&count, filter);
 	
 	if(!interfaces) {
 		fprintf(stderr, "Error: Could not get interfaces information!\n");
@@ -296,7 +296,7 @@ delete_interface(const char *name)
 		return -1;
 	}
 	
-	interface_id interface;
+	ppp_interface_id interface;
 	
 	if(!strncmp(name, "ppp", 3) && strlen(name) > 3 && isdigit(name[3]))
 		interface = manager.InterfaceWithUnit(atoi(name + 3));
