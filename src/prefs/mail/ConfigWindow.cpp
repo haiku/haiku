@@ -49,7 +49,7 @@ const char *kEMail = "bemaildaemon-talk@bug-br.org.br";
 const char *kMailto = "mailto:bemaildaemon-talk@bug-br.org.br";
 const char *kBugsitePretty = "Bug-Tracker at SourceForge.net";
 const char *kBugsite = "http://sourceforge.net/tracker/?func=add&group_id=26926&atid=388726";
-const char *kWebsite = "http://www.bug-br.org.br/zoidberg/";
+const char *kWebsite = "http://www.haiku-os.org";
 const rgb_color kLinkColor = {40,40,180};
 
 
@@ -153,7 +153,7 @@ class AboutTextView : public BTextView
 
 			char s[512];
 			sprintf(s,	"Mail Daemon Replacement\n\n"
-						"by Dr. Zoidberg Enterprises. All rights reserved.\n\n"
+						"by Haiku, Inc. All rights reserved.\n\n"
 						"Version %ld.%ld.%ld %s\n\n"
 						"See LICENSE file included in the installation package for more information.\n\n\n\n"
 						"You can contact us at:\n"
