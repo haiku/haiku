@@ -43,7 +43,7 @@ _IMPEXP_BE const color_map *system_colors()
 	// TODO: Implement
 }
 
-_IMPEXP_BE status_t set_screen_space(int32 index, uint32 res, bool stick = true)
+_IMPEXP_BE status_t set_screen_space(int32 index, uint32 res, bool stick)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
 	link->SetOpCode(AS_SET_SCREEN_MODE);

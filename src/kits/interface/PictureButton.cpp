@@ -45,9 +45,9 @@ BPictureButton::BPictureButton (BRect frame,
 								BPicture *off,
 								BPicture *on,
 								BMessage *message, 
-								uint32 behavior = B_ONE_STATE_BUTTON,
-								uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP, 
-								uint32 flgs = B_WILL_DRAW | B_NAVIGABLE)
+								uint32 behavior,
+								uint32 resizeMask, 
+								uint32 flgs)
 	: BControl (frame, name, "", message, resizeMask, flgs), fOutlined (false),
 	  fBehavior (behavior)
 {

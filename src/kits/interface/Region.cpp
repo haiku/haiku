@@ -28,6 +28,7 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <cstdlib>
+#include <string.h>
 
 // System Includes -------------------------------------------------------------
 #include <Debug.h>

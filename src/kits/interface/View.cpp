@@ -406,7 +406,7 @@ float BView::PenSize() const
 {
 }
 
-void BView::SetViewCursor(const BCursor *cursor, bool sync=true)
+void BView::SetViewCursor(const BCursor *cursor, bool sync)
 {
 }
 
@@ -418,11 +418,11 @@ rgb_color BView::ViewColor() const
 {
 }
 
-void BView::SetViewBitmap(const BBitmap *bitmap,BRect srcRect, BRect dstRect,uint32 followFlags=B_FOLLOW_TOP|B_FOLLOW_LEFT,uint32 options=B_TILE_BITMAP)
+void BView::SetViewBitmap(const BBitmap *bitmap,BRect srcRect, BRect dstRect,uint32 followFlags,uint32 options)
 {
 }
 
-void BView::SetViewBitmap(const BBitmap *bitmap,uint32 followFlags=B_FOLLOW_TOP|B_FOLLOW_LEFT,uint32 options=B_TILE_BITMAP)
+void BView::SetViewBitmap(const BBitmap *bitmap,uint32 followFlags,uint32 options)
 {
 }
 
@@ -430,11 +430,11 @@ void BView::ClearViewBitmap()
 {
 }
 
-status_t BView::SetViewOverlay(const BBitmap *overlay,BRect srcRect, BRect dstRect,rgb_color *colorKey,uint32 followFlags=B_FOLLOW_TOP|B_FOLLOW_LEFT,uint32 options=0)
+status_t BView::SetViewOverlay(const BBitmap *overlay,BRect srcRect, BRect dstRect,rgb_color *colorKey,uint32 followFlags,uint32 options)
 {
 }
 
-status_t BView::SetViewOverlay(const BBitmap *overlay, rgb_color *colorKey,uint32 followFlags=B_FOLLOW_TOP|B_FOLLOW_LEFT,uint32 options=0)
+status_t BView::SetViewOverlay(const BBitmap *overlay, rgb_color *colorKey,uint32 followFlags,uint32 options)
 {
 }
 
@@ -458,7 +458,7 @@ rgb_color BView::LowColor() const
 {
 }
 
-void BView::SetLineMode(cap_mode lineCap,join_mode lineJoin,float miterLimit=B_DEFAULT_MITER_LIMIT)
+void BView::SetLineMode(cap_mode lineCap,join_mode lineJoin,float miterLimit)
 {
 }
 
@@ -790,7 +790,7 @@ void BView::DrawPictureAsync(const char *filename, long offset, BPoint where)
 {
 }
 
-status_t BView::SetEventMask(uint32 mask, uint32 options=0)
+status_t BView::SetEventMask(uint32 mask, uint32 options)
 {
 }
 
@@ -798,7 +798,7 @@ uint32 BView::EventMask()
 {
 }
 
-status_t BView::SetMouseEventMask(uint32 mask, uint32 options=0)
+status_t BView::SetMouseEventMask(uint32 mask, uint32 options)
 {
 }
 

@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
-#include <algobase.h>
+#include <algorithm>
 
 // System Includes -------------------------------------------------------------
 #include <Application.h>
@@ -48,6 +48,8 @@
 #include "moreUTF8.h"
 // Local Defines ---------------------------------------------------------------
 
+using std::min;
+using std::max;
 // _BTextTrackState_ class -----------------------------------------------------
 class _BTextTrackState_ {
 

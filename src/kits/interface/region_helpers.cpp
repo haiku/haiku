@@ -1,3 +1,4 @@
+#include <string.h>
 #include <Debug.h>
 #include <Region.h>
 

@@ -28,6 +28,7 @@
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // System Includes -------------------------------------------------------------
 #include <Picture.h>
@@ -194,7 +195,7 @@ BPicture::BPicture(BMessage *archive)
 
 	// What with the sub pictures?
 	for (i = 0; i < extent->fPictures.CountItems(); i++)
-		delete extent->fPictures.ItemAt(i);
+		delete (BPicture *)extent->fPictures.ItemAt(i);
 	extent->fPictures.MakeEmpty();
 }
 //------------------------------------------------------------------------------
@@ -224,7 +225,7 @@ BPicture::~BPicture()
 	}
 
 	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
-		delete extent->fPictures.ItemAt(i);
+		delete (BPicture *)extent->fPictures.ItemAt(i);
 	extent->fPictures.MakeEmpty();
 
 	free(extent);
@@ -572,7 +573,7 @@ void BPicture::usurp(BPicture *lameDuck)
 	}
 
 	for (int32 i = 0; i < extent->fPictures.CountItems(); i++)
-		delete extent->fPictures.ItemAt(i);
+		delete (BPicture *)extent->fPictures.ItemAt(i);
 	extent->fPictures.MakeEmpty();
 
 	free(extent);
