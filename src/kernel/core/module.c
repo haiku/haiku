@@ -507,9 +507,14 @@ static module *
 search_module(const char *name)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
-	int i;
+	uint32 i;
 
 	TRACE(("search_module(%s)\n", name));
+
+	// ToDo: this could take parts of the module name to check there for
+	//		the module first, since module names are usually path/name/version
+	//		anyway.
+	//		It might even be the convention to do so on BeOS! Please check!
 
 	for (i = 0; i < NUM_MODULE_PATHS; i++) {
 		if (modules_disable_user_addons && i >= USER_MODULE_PATHS)
@@ -869,7 +874,7 @@ open_module_list(const char *prefix)
 {
 	char path[SYS_MAX_PATH_LEN];
 	module_iterator *iterator;
-	int i;
+	uint32 i;
 
 	TRACE(("open_module_list(prefix = %s)\n", prefix));
 
