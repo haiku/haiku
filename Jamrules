@@ -508,7 +508,13 @@ rule SimpleTest
 
 rule Addon
 {
-	# Addon <name> : <relpath> : <sources> ;	
+	# Addon <name> : <relpath> : <sources> : <is executable> ;
+	# <name>: Name of the add-on.
+	# <relpath>: Path where the add-on shall live relative to the add-on dir.
+	# <sources>: Source files.
+	# <is executable>: true, if the target shall be executable as well
+
+	local isExecutable = $(4) ;
 	
 #	SetupIncludes ;
 	SetupObjectsDir ;
@@ -519,8 +525,12 @@ rule Addon
 	targetdir = [ FDirName $(OBOS_ADDON_DIR) $(2) ] ;
 
 	MakeLocate $(1) : $(targetdir) ;
-	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ]
-						-nostart -Xlinker -soname=\"$(1)\" ;
+
+	local linkFlags = -Xlinker -soname=\"$(1)\" ;
+	if $(isExecutable) != true {
+		linkFlags = -nostart $(linkFlags) ;
+	}
+	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] $(linkFlags) ;
 }
 
 rule R5KernelAddon
