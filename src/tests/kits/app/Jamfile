@@ -84,6 +84,7 @@ CommonTestLib libapptest.so
 
 		# BRoster
 		RosterTest.cpp
+		FindAppTester.cpp
 		GetAppInfoTester.cpp
 		GetAppListTester.cpp
 		IsRunningTester.cpp
