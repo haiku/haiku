@@ -6,6 +6,10 @@
 #include <sys/uio.h>
 #include <SupportDefs.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ---
 	these hooks are how the kernel accesses the device
 --- */
@@ -231,5 +235,8 @@ typedef struct {
 } device_icon;
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _DRIVERS_DRIVERS_H */
