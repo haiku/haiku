@@ -31,8 +31,7 @@
 extern FTC_Manager ftmanager;
 
 /*!
-	\fn FontStyle(const char *filepath, FT_Face face)
-	\brief FontStyle Constructor
+	\brief Constructor
 	\param path to a font file
 	\param face FreeType handle for the font file after it is loaded - for its info only
 */
@@ -55,8 +54,7 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 }
 
 /*!
-	\fn ~FontStyle(void)
-	\brief FontStyle Destructor
+	\brief Destructor
 	
 	Frees all data allocated on the heap. All child ServerFonts are marked as having
 	a NULL style so that each ServerFont knows that it is running on borrowed time. 
@@ -86,7 +84,6 @@ FontStyle::~FontStyle(void)
 }
 
 /*!
-	\fn const char *FontStyle::Name(void)
 	\brief Returns the name of the style as a string
 	\return The style's name
 */
@@ -96,7 +93,6 @@ const char *FontStyle::Name(void)
 }
 
 /*!
-	\fn FT_Face FontStyle::GetFace(void)
 	\brief Returns a handle to the style in question, straight from FreeType's cache
 	\return FreeType face handle or NULL if there was an internal error
 */
@@ -107,7 +103,6 @@ FT_Face FontStyle::GetFace(void)
 }
 
 /*!
-	\fn const char *FontStyle::GetPath(void)
 	\brief Returns the path to the style's font file 
 	\return The style's font file path
 */
@@ -117,7 +112,6 @@ const char *FontStyle::GetPath(void)
 }
 
 /*!
-	\fn int16 FontStyle::ConvertToUnicode(uint16 c)
 	\brief Converts an ASCII character to Unicode for the style
 	\param An ASCII character
 	\return A Unicode value for the character
@@ -132,7 +126,6 @@ int16 FontStyle::ConvertToUnicode(uint16 c)
 }
 
 /*!
-	\fn ServerFont *FontStyle::Instantiate(float size, float rotation=0.0, float shear=90.0)
 	\brief Creates a new ServerFont object for the style, given size, shear, and rotation.
 	\param character size in points
 	\param rotation in degrees
@@ -147,7 +140,6 @@ ServerFont *FontStyle::Instantiate(float size, float rotation=0.0, float shear=9
 }
 
 /*!
-	\fn FontFamily(const char *namestr)
 	\brief Constructor
 	\param Name of the family
 */
@@ -158,7 +150,6 @@ FontFamily::FontFamily(const char *namestr)
 }
 
 /*!
-	\fn ~FontFamily(void)
 	\brief Destructor
 	
 	Deletes all child styles. Note that a FontFamily should not be deleted unless
@@ -181,7 +172,6 @@ FontFamily::~FontFamily(void)
 }
 
 /*!
-	\fn const char *FontFamily::Name(void)
 	\brief Returns the name of the family
 	\return The family's name
 */
@@ -191,7 +181,6 @@ const char *FontFamily::Name(void)
 }
 
 /*!
-	\fn void FontFamily::AddStyle(const char *path,FT_Face face)
 	\brief Adds the style to the family
 	\param full path to the style's font file
 	\param FreeType face handle used to obtain info about the font
@@ -220,7 +209,6 @@ void FontFamily::AddStyle(const char *path,FT_Face face)
 }
 
 /*!
-	\fn void FontFamily::RemoveStyle(const char *style)
 	\brief Removes a style from the family and deletes it
 	\param Name of the style to be removed from the family
 */
@@ -247,7 +235,6 @@ void FontFamily::RemoveStyle(const char *style)
 }
 
 /*!
-	\fn int32 FontFamily::CountStyles(void)
 	\brief Returns the number of styles in the family
 	\return The number of styles in the family
 */
@@ -257,7 +244,6 @@ int32 FontFamily::CountStyles(void)
 }
 
 /*!
-	\fn bool FontFamily::HasStyle(const char *style)
 	\brief Determines whether the style belongs to the family
 	\param Name of the style being checked
 	\return True if it belongs, false if not
@@ -278,7 +264,6 @@ bool FontFamily::HasStyle(const char *style)
 }
 
 /*! 
-	\fn const char *FontFamily::GetStyle(int32 index)
 	\brief Returns the name of a style in the family
 	\param list index of the style to be found
 	\return name of the style or NULL if the index is not valid
@@ -292,7 +277,6 @@ const char *FontFamily::GetStyle(int32 index)
 }
 
 /*!
-	\fn FontStyle *FontFamily::GetStyle(const char *style)
 	\brief Get the FontStyle object for the name given
 	\param Name of the style to be obtained
 	\return The FontStyle object or NULL if none was found.

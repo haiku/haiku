@@ -30,6 +30,15 @@
 #include <Point.h>
 #include "ServerBitmap.h"
 
+/*!
+	\class ServerCursor ServerCursor.h
+	\brief Class to handle all cursor capabilities for the system
+	
+	Although descended from ServerBitmaps, ServerCursors are not handled by
+	the BitmapManager - they are allocated like any other object. Unlike BeOS 
+	R5, cursors can be any size or color space, and this class accomodates and
+	expands the R5 API.
+*/
 class ServerCursor : public ServerBitmap
 {
 public:

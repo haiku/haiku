@@ -29,7 +29,6 @@
 
 
 /*! 
-	\fn ServerFont(FontStyle *style, float size, float rotation, float shear, uint16 flags, uint8 spacing)
 	\brief Constructor
 	\param Style object to which the ServerFont belongs
 	\param Character size in points
@@ -57,7 +56,6 @@ ServerFont::ServerFont(FontStyle *style, float size, float rotation, float shear
 }
 
 /*! 
-	\fn ServerFont(FontStyle *style, float size, float rotation, float shear, uint16 flags, uint8 spacing)
 	\brief Copy Constructor
 	\param ServerFont to copy
 */
@@ -79,10 +77,7 @@ ServerFont::ServerFont(const ServerFont &font)
 }
 
 /*! 
-	\fn ServerFont(FontStyle *style, float size, float rotation, float shear, uint16 flags, uint8 spacing)
-	\brief Destructor
-	
-	Removes itself as a dependency of its owning style.
+	\brief Removes itself as a dependency of its owning style.
 */
 ServerFont::~ServerFont(void)
 {
@@ -91,7 +86,6 @@ ServerFont::~ServerFont(void)
 }
 
 /*! 
-	\fn int32 ServerFont::CountTuned(void)
 	\brief Returns the number of strikes in the font
 	\return The number of strikes in the font
 */
@@ -104,7 +98,6 @@ int32 ServerFont::CountTuned(void)
 }
 
 /*! 
-	\fn font_file_format ServerFont::FileFormat(void)
 	\brief Returns the file format of the font. Currently unimplemented.
 	\return B_TRUETYPE_WINDOWS
 */
@@ -115,7 +108,6 @@ font_file_format ServerFont::FileFormat(void)
 }
 
 /*! 
-	\fn BRect ServerFont::BoundingBox(void)
 	\brief Returns a BRect which encloses the entire font
 	\return A BRect which encloses the entire font
 */
@@ -125,7 +117,6 @@ BRect ServerFont::BoundingBox(void)
 }
 
 /*! 
-	\fn void ServerFont::Height(font_height *fh)
 	\brief Obtains the height values for characters in the font in its current state
 	\param pointer to a font_height object to receive the values for the font
 */
