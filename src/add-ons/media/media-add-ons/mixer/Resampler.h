@@ -4,7 +4,7 @@
  * Released under terms of the MIT license.
  *
  * A simple resampling class for the audio mixer.
- * You pick the conversation function on object creation,
+ * You pick the conversion function on object creation,
  * and then call the Resample() function, specifying data pointer,
  * offset (in bytes) to the next sample, and count of samples for
  * both source and destination.
