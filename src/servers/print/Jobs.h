@@ -41,35 +41,39 @@
 #include <StorageDefs.h>
 
 enum JobStatus {
-	kWaiting,
-	kProcessing,
-	kFailed,
-	kUnknown,
+	kWaiting,     // to be processed
+	kProcessing,  // processed by a printer add-on
+	kFailed,      // failed to process the job file
+	kUnknown,     // other
 };
 
 class Printer;
 
 class Job : public Object {
 private:
-	BHandler* fHandler;
-	BString fName;
-	node_ref fNode;
-	entry_ref fEntry;
-	JobStatus fStatus;
-	long fTime;
-	Printer* fPrinter;
-
+	BHandler* fHandler;   // the handler that watches the node of the job file
+	BString fName;        // the name of the job file
+	long fTime;           // the time encoded in the file name
+	node_ref fNode;       // the node of the job file
+	entry_ref fEntry;     // the entry of the job file
+	JobStatus fStatus;    // the status of the job file
+	bool fValid;          // is this a valid job file?
+	Printer* fPrinter;    // the printer that processes this job
+	
 	void UpdateStatus(const char* status);
 	void UpdateStatusAttribute(const char* status);
+	bool HasAttribute(BNode* node, const char* name);
+	bool IsValidJobFile();
 
 public:
 	Job(const BEntry& entry, BHandler* handler);
 
 	status_t InitCheck() const        { return fTime >= 0 ? B_OK : B_ERROR; }
-
+	
 	// accessors
 	const BString& Name() const       { return fName; }
 	JobStatus Status() const          { return fStatus; }	
+	bool IsValid() const              { return fValid; }
 	long Time() const                 { return fTime; }
 	const node_ref& NodeRef() const   { return fNode; }
 	const entry_ref& EntryRef() const { return fEntry; }

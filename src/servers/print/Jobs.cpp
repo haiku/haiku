@@ -39,6 +39,7 @@
 #include <string.h>
 
 // BeOS
+#include <be/kernel/fs_attr.h>
 #include <Application.h>
 #include <Autolock.h>
 #include <Node.h>
@@ -50,46 +51,42 @@ Job::Job(const BEntry& job, BHandler* handler)
 	: fHandler(handler)
 	, fTime(-1)
 	, fStatus(kUnknown)
+	, fValid(false)
 	, fPrinter(NULL)
 {
 	// store light weight versions of BEntry and BNode
 	job.GetRef(&fEntry);
 	job.GetNodeRef(&fNode);
 
+	fValid = IsValidJobFile();
+	
 	BNode node(&job);
 	if (node.InitCheck() != B_OK) return;
 
-	BNodeInfo info(&node);
-	char mimeType[256];
 	BString status;
-
-		// Is job a spool file?
-	if (info.InitCheck() == B_OK /*&& 
-	    info.GetType(mimeType) == B_OK &&
-	    strcmp(mimeType, PSRV_SPOOL_FILETYPE) == 0 &&
-	    node.ReadAttr(PSRV_SPOOL_ATTR_STATUS, B_STRING_TYPE, 0, status, sizeof(status))*/) {
-		if (node.ReadAttrString(PSRV_SPOOL_ATTR_STATUS, &status) != B_OK) {
-			status = "";
-		}
-			// read status attribute
-	    UpdateStatus(status.String());
-	    	// Now get file name and creation time from file name
-	    fTime = 0;
-	    BEntry entry(job);
-	    char name[B_FILE_NAME_LENGTH];
-	    if (entry.InitCheck() == B_OK && entry.GetName(name) == B_OK) {
-	    	fName = name;
-	    		// search for last '@' in file name
-			char* p = NULL, *c = name;
-			while ((c = strchr(c, '@')) != NULL) {
-				p = c; c ++;
-			}
-				// and get time from file name
-			fTime = atoi(p+1);
-	    }
-	    	// start watching if everything is ok
-		StartNodeWatching();
+		// read status attribute
+	if (node.ReadAttrString(PSRV_SPOOL_ATTR_STATUS, &status) != B_OK) {
+		status = "";
 	}
+    UpdateStatus(status.String());
+    
+    	// Now get file name and creation time from file name
+    fTime = 0;
+    BEntry entry(job);
+    char name[B_FILE_NAME_LENGTH];
+    if (entry.InitCheck() == B_OK && entry.GetName(name) == B_OK) {
+    	fName = name;
+    		// search for last '@' in file name
+		char* p = NULL, *c = name;
+		while ((c = strchr(c, '@')) != NULL) {
+			p = c; c ++;
+		}
+			// and get time from file name
+		fTime = atoi(p+1);
+    }
+    
+    	// start watching the node
+	StartNodeWatching();
 }
 
 // conversion from string representation of status to JobStatus constant
@@ -108,6 +105,32 @@ void Job::UpdateStatusAttribute(const char* status) {
 	}
 }
 
+
+bool Job::HasAttribute(BNode* n, const char* name) {
+	attr_info info;
+	return n->GetAttrInfo(name, &info) == B_OK;
+}
+
+
+bool Job::IsValidJobFile() {
+	BNode node(&fEntry);
+	if (node.InitCheck() != B_OK) return false;
+
+	BNodeInfo info(&node);
+	char mimeType[256];
+
+		// Is job a spool file?
+	return (info.InitCheck() == B_OK && 
+	    info.GetType(mimeType) == B_OK &&
+	    strcmp(mimeType, PSRV_SPOOL_FILETYPE) == 0) &&
+	    HasAttribute(&node, PSRV_SPOOL_ATTR_MIMETYPE) &&
+	    HasAttribute(&node, PSRV_SPOOL_ATTR_PAGECOUNT) &&
+	    HasAttribute(&node, PSRV_SPOOL_ATTR_DESCRIPTION) &&
+	    HasAttribute(&node, PSRV_SPOOL_ATTR_PRINTER) &&
+	    HasAttribute(&node, PSRV_SPOOL_ATTR_STATUS); 
+}
+
+
 // Set status of object and optionally write to attribute of node
 void Job::SetStatus(JobStatus s, bool writeToNode) {
 	fStatus = s; 
@@ -122,6 +145,7 @@ void Job::SetStatus(JobStatus s, bool writeToNode) {
 
 // Synchronize file attribute with member variable
 void Job::UpdateAttribute() {
+	fValid = fValid || IsValidJobFile();	
 	BNode node(&fEntry);
 	BString status;
 	if (node.InitCheck() == B_OK &&
@@ -155,7 +179,7 @@ bool Folder::AddJob(BEntry& entry) {
 	Job* job = new Job(entry, this);
 	if (job->InitCheck() == B_OK) {
 		fJobs.AddItem(job);
-		if (job->IsWaiting()) NotifyPrinter();
+		if (job->IsValid() && job->IsWaiting()) NotifyPrinter();
 		return true;
 	} else {
 		job->Release();
@@ -203,7 +227,7 @@ void Folder::AttributeChanged(BMessage* msg) {
 		Job* job = Find(node);
 		if (job) {
 			job->UpdateAttribute();
-			if (job->IsWaiting()) NotifyPrinter();
+			if (job->IsValid() && job->IsWaiting()) NotifyPrinter();
 		}
 	}
 }
@@ -298,7 +322,9 @@ void Folder::MessageReceived(BMessage* msg) {
 Job* Folder::GetNextJob() {
 	for (int i = 0; i < fJobs.CountItems(); i ++) {
 		Job* job = fJobs.ItemAt(i);
-		if (job->IsWaiting()) {
+		if (job->IsValid() && job->IsWaiting()) {
+			/*fJobs.RemoveItem(job);
+			job->StopNodeWatching();*/
 			job->Acquire(); return job;
 		}
 	}

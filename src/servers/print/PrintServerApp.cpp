@@ -281,6 +281,9 @@ status_t PrintServerApp::SetupPrinterList()
 void
 PrintServerApp::MessageReceived(BMessage* msg)
 {
+	fprintf(stdout, "PrintServerApp\n");
+	msg->PrintToStream();
+	fflush(stdout);
 	switch(msg->what) {
 		case PSRV_GET_ACTIVE_PRINTER:
 		case PSRV_MAKE_PRINTER_ACTIVE_QUIETLY:
