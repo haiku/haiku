@@ -28,12 +28,12 @@
 struct smp_msg {
 	struct smp_msg *next;
 	int            message;
-	unsigned long   data;
-	unsigned long   data2;
-	unsigned long   data3;
+	unsigned long  data;
+	unsigned long  data2;
+	unsigned long  data3;
 	void           *data_ptr;
 	int            flags;
-	int            ref_count;
+	int32          ref_count;
 	volatile bool  done;
 	unsigned int   proc_bitmap;
 	int            lock;
@@ -60,34 +60,39 @@ static int smp_num_cpus = 1;
 
 static int smp_process_pending_ici(int curr_cpu);
 
-void acquire_spinlock(spinlock_t *lock)
+void
+acquire_spinlock(spinlock_t *lock)
 {
-	if(smp_num_cpus > 1) {
+	if (smp_num_cpus > 1) {
 		int curr_cpu = smp_get_current_cpu();
-		if(are_interrupts_enabled())
+		if (are_interrupts_enabled())
 			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
-		while(1) {
-			while(*lock != 0)
+		while (1) {
+			while (*lock != 0)
 				smp_process_pending_ici(curr_cpu);
-			if(atomic_set(lock, 1) == 0)
+			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
 	}
 }
 
-static void acquire_spinlock_nocheck(spinlock_t *lock)
+
+static void
+acquire_spinlock_nocheck(spinlock_t *lock)
 {
-	if(smp_num_cpus > 1) {
-		while(1) {
+	if (smp_num_cpus > 1) {
+		while (1) {
 			while(*lock != 0)
 				;
-			if(atomic_set(lock, 1) == 0)
+			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
 	}
 }
 
-void release_spinlock(spinlock_t *lock)
+
+void
+release_spinlock(spinlock_t *lock)
 {
 	*lock = 0;
 }
@@ -172,7 +177,9 @@ static struct smp_msg *smp_check_for_message(int curr_cpu, int *source_mailbox)
 	return msg;
 }
 
-static void smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mailbox)
+
+static void
+smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mailbox)
 {
 	int old_refcount;
 
