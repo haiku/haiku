@@ -125,7 +125,8 @@ MMediaFilesManager::LoadState()
 	        entry_ref ref;
 	        if(len>1) {
 	        	BEntry entry(val);
-	        	entry.GetRef(&ref);
+	        	if(entry.Exists())
+	        		entry.GetRef(&ref);
 	        }
 	        SetRefFor(str, key, ref, false);
 	        
