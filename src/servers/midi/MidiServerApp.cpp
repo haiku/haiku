@@ -1,9 +1,5 @@
-/**
- * @file MidiServerApp.cpp
- *
- * Implementation of the MidiServerApp class.
- *
- * @author Matthijs Hollemans
+/*
+ * Copyright (c) 2002-2003 Matthijs Hollemans
  */
 
 #include <Alert.h>

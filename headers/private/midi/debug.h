@@ -1,9 +1,7 @@
-/**
- * @file debug.h
- *
+/*
  * Debug macros for the Midi Kit
  *
- * @author Matthijs Hollemans
+ * Copyright (c) 2002-2003 Matthijs Hollemans
  */
 
 #ifndef MIDI_DEBUG_H
