@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2004 Matthijs Hollemans
+ * Copyright (c) 2004-2005 Matthijs Hollemans
  * Copyright (c) 2003 Jerome Leveque
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
@@ -21,12 +21,16 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <MidiRoster.h>
+#include <MidiConsumer.h>
+#include <MidiProducer.h>
 #include <FindDirectory.h>
 #include <Path.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "debug.h"
+#include "MidiGlue.h"   // for MAKE_BIGTIME
 #include "SoftSynth.h"
 
 using namespace BPrivate;
@@ -45,13 +49,29 @@ BSoftSynth::BSoftSynth()
 	reverbEnabled = true;
 	reverbMode = B_REVERB_BALLROOM;
 	volumeScale = 1.0;
+
+	Init();
 }
 
 //------------------------------------------------------------------------------
 
 BSoftSynth::~BSoftSynth()
 {
+	// Note: it is possible that we don't get deleted. When BSynth is
+	// created, it is assigned to the global variable be_synth. While
+	// BSynth is alive, it keeps a copy of BSoftSynth around too. Not
+	// a big deal, but the Midi Kit will complain (on stdout) that we 
+	// didn't release our endpoints.
+
 	Unload();
+	Done();
+}
+
+//------------------------------------------------------------------------------
+
+bool BSoftSynth::InitCheck(void) const
+{
+	return initCheck;
 }
 
 //------------------------------------------------------------------------------
@@ -90,14 +110,10 @@ status_t BSoftSynth::SetDefaultInstrumentsFile()
 status_t BSoftSynth::SetInstrumentsFile(const char* path)
 {
 	if (path == NULL)
-	{
 		return B_BAD_VALUE;
-	}
 	
 	if (IsLoaded())
-	{
 		Unload();
-	}
 	
 	instrumentsFile = strdup(path);
 	return B_OK;
@@ -298,8 +314,12 @@ void BSoftSynth::Resume(void)
 void BSoftSynth::NoteOff(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SprayNoteOff(
+			channel - 1, note, velocity, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -307,8 +327,11 @@ void BSoftSynth::NoteOff(
 void BSoftSynth::NoteOn(
 	uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SprayNoteOn(channel - 1, note, velocity, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -316,8 +339,12 @@ void BSoftSynth::NoteOn(
 void BSoftSynth::KeyPressure(
 	uchar channel, uchar note, uchar pressure, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SprayKeyPressure(
+			channel - 1, note, pressure, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -325,8 +352,12 @@ void BSoftSynth::KeyPressure(
 void BSoftSynth::ControlChange(
 	uchar channel, uchar controlNumber, uchar controlValue, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SprayControlChange(
+			channel - 1, controlNumber, controlValue, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -334,32 +365,46 @@ void BSoftSynth::ControlChange(
 void BSoftSynth::ProgramChange(
 	uchar channel, uchar programNumber, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SprayProgramChange(
+			channel - 1, programNumber, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
 
 void BSoftSynth::ChannelPressure(uchar channel, uchar pressure, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SprayChannelPressure(
+			channel - 1, pressure, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
 
 void BSoftSynth::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SprayPitchBend(channel - 1, lsb, msb, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
 
 void BSoftSynth::SystemExclusive(void* data, size_t length, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SpraySystemExclusive(data, length, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -367,32 +412,104 @@ void BSoftSynth::SystemExclusive(void* data, size_t length, uint32 time)
 void BSoftSynth::SystemCommon(
 	uchar status, uchar data1, uchar data2, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SpraySystemCommon(status, data1, data2, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
 
 void BSoftSynth::SystemRealTime(uchar status, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SpraySystemRealTime(status, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
 
 void BSoftSynth::TempoChange(int32 beatsPerMinute, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+		producer->SprayTempoChange(beatsPerMinute, MAKE_BIGTIME(time));
+	}
 }
 
 //------------------------------------------------------------------------------
 
 void BSoftSynth::AllNotesOff(bool justChannel, uint32 time)
 {
-	snooze_until(time * (bigtime_t) 1000, B_SYSTEM_TIMEBASE);
-	UNIMPLEMENTED
+	if (InitCheck())
+	{
+		snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+
+		// from BMidi::AllNotesOff
+		for (uchar channel = 1; channel <= 16; ++channel)
+		{
+			producer->SprayControlChange(channel, B_ALL_NOTES_OFF, 0, time);
+	
+			if (!justChannel)
+			{
+				for (uchar note = 0; note <= 0x7F; ++note)
+				{
+					producer->SprayNoteOff(channel, note, 0, time);
+				}
+			}
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+
+void BSoftSynth::Init()
+{
+	initCheck = false;
+
+	producer = new BMidiLocalProducer("TiMidity feeder");
+
+	int32 id = 0;
+	while ((consumer = BMidiRoster::NextConsumer(&id)) != NULL)
+	{
+		if (strcmp(consumer->Name(), "TiMidity input") == 0)
+			break;
+		
+		consumer->Release();
+	}	
+
+	if (consumer == NULL)
+	{
+		fprintf(stderr, "[midi] TiMidity consumer not found\n");
+		return;
+	}
+
+	if (producer->Connect(consumer) != B_OK)
+	{
+		fprintf(stderr, "[midi] Could not connect to TiMidity\n");
+		return;
+	}
+
+	initCheck = true;
+}
+
+//------------------------------------------------------------------------------
+
+void BSoftSynth::Done()
+{
+	if (consumer != NULL)
+	{
+		producer->Disconnect(consumer);
+		consumer->Release();
+		consumer = NULL;
+	}
+	
+	producer->Release();
+	producer = NULL;
 }
 
 //------------------------------------------------------------------------------
