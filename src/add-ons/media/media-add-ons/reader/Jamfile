@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src add-ons media media-add-ons reader ;
+SubDir OBOS_TOP src add-ons media media-add-ons writer ;
 
 UsePrivateHeaders media ;
 
-Addon reader.media_addon : media :
-	MediaReader.cpp
-	MediaReaderAddOn.cpp
+Addon writer.media_addon : media :
+	MediaWriter.cpp
+	MediaWriterAddOn.cpp
 ;
 
-LinkSharedOSLibs reader.media_addon : be media ;
+LinkSharedOSLibs writer.media_addon : be media ;
