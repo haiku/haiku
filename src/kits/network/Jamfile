@@ -1,4 +1,6 @@
 SubDir OBOS_TOP src kits network ;
 
+SubInclude OBOS_TOP src kits network libbind ;
 SubInclude OBOS_TOP src kits network libnet ;
 SubInclude OBOS_TOP src kits network libnetapi ;
+SubInclude OBOS_TOP src kits network libsocket ;
