@@ -24,6 +24,10 @@ extern void dprintf(const char *format, ...);
 extern void platform_release_heap(struct stage2_args *args, void *base);
 extern status_t platform_init_heap(struct stage2_args *args, void **_base, void **_top);
 
+/* MMU/memory functions */
+extern status_t platform_allocate_region(void **_virtualAddress, size_t size, uint8 protection);
+extern status_t platform_free_region(void *address, size_t size);
+
 /* misc functions */
 extern bool platform_user_menu_requested(void);
 

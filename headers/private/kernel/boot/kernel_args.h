@@ -17,6 +17,8 @@ typedef struct address_range {
 #include <platform_kernel_args.h>
 #include <arch_kernel_args.h>
 
+struct preloaded_image;
+
 typedef struct kernel_args {
 	uint32		cons_line;
 	char		*str;
@@ -24,6 +26,8 @@ typedef struct kernel_args {
 	addr_range	kernel_seg0_addr;
 	addr_range	kernel_seg1_addr;
 	addr_range	kernel_dynamic_section_addr;
+
+	struct preloaded_image *preloaded_images;
 
 	uint32		num_physical_memory_ranges;
 	addr_range	physical_memory_range[MAX_PHYSICAL_MEMORY_RANGE];
