@@ -28,11 +28,11 @@
 
 /*!
 	\brief Constructor
-	\param Size of the cursor
-	\param Color space of the cursor
-	\param ServerBitmap flags. See Bitmap.h.
-	\param Hotspot of the cursor
-	\param Bytes per row for the cursor. See ServerBitmap::ServerBitmap()
+	\param r Size of the cursor
+	\param cspace Color space of the cursor
+	\param flags ServerBitmap flags. See Bitmap.h.
+	\param hotspot Hotspot of the cursor
+	\param bytesperline Bytes per row for the cursor. See ServerBitmap::ServerBitmap()
 	
 */
 ServerCursor::ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hotspot, int32 bytesperrow=-1, screen_id screen=B_MAIN_SCREEN_ID)
@@ -46,7 +46,7 @@ ServerCursor::ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hots
 
 /*!
 	\brief Constructor
-	\param pointer to 68-byte cursor data array. See BeBook entry for BCursor for details
+	\param data pointer to 68-byte cursor data array. See BeBook entry for BCursor for details
 */
 ServerCursor::ServerCursor(int8 *data)
  : ServerBitmap(BRect(0,0,15,15),B_RGBA32,0,64)
@@ -104,7 +104,7 @@ ServerCursor::ServerCursor(int8 *data)
 
 /*!
 	\brief Copy constructor
-	\param cursor to copy
+	\param cursor cursor to copy
 */
 ServerCursor::ServerCursor(const ServerCursor *cursor)
  : ServerBitmap(cursor)
@@ -128,7 +128,7 @@ ServerCursor::~ServerCursor(void)
 
 /*!
 	\brief Sets the cursor's hotspot
-	\param New location of hotspot, constrained to the cursor's boundaries.
+	\param pt New location of hotspot, constrained to the cursor's boundaries.
 */
 void ServerCursor::SetHotSpot(BPoint pt)
 {

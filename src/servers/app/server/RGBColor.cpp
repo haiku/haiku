@@ -35,10 +35,10 @@
 
 /*!
 	\brief Create an RGBColor from specified values
-	\param red
-	\param green
-	\param blue
-	\param alpha, defaults to 255
+	\param red red
+	\param green green
+	\param blue blue
+	\param alpha alpha, defaults to 255
 */
 RGBColor::RGBColor(uint8 r, uint8 g, uint8 b, uint8 a)
 {
@@ -47,10 +47,10 @@ RGBColor::RGBColor(uint8 r, uint8 g, uint8 b, uint8 a)
 
 /*!
 	\brief Create an RGBColor from specified values
-	\param red
-	\param green
-	\param blue
-	\param alpha, defaults to 255
+	\param red red
+	\param green green
+	\param blue blue
+	\param alpha alpha, defaults to 255
 */
 RGBColor::RGBColor(int r, int g, int b, int a=255)
 {
@@ -59,7 +59,7 @@ RGBColor::RGBColor(int r, int g, int b, int a=255)
 
 /*!
 	\brief Create an RGBColor from an rgb_color
-	\param color to initialize from
+	\param col color to initialize from
 */
 RGBColor::RGBColor(const rgb_color &col)
 {
@@ -68,7 +68,7 @@ RGBColor::RGBColor(const rgb_color &col)
 
 /*!
 	\brief Create an RGBColor from a 16-bit RGBA color
-	\param color to initialize from
+	\param col color to initialize from
 */
 RGBColor::RGBColor(uint16 col)
 {
@@ -77,7 +77,7 @@ RGBColor::RGBColor(uint16 col)
 
 /*!
 	\brief Create an RGBColor from an index color
-	\param color to initialize from
+	\param col color to initialize from
 */
 RGBColor::RGBColor(uint8 col)
 {
@@ -86,7 +86,7 @@ RGBColor::RGBColor(uint8 col)
 
 /*!
 	\brief Copy Contructor
-	\param color to initialize from
+	\param col color to initialize from
 */
 RGBColor::RGBColor(const RGBColor &col)
 {
@@ -132,10 +132,10 @@ rgb_color RGBColor::GetColor32(void)
 
 /*!
 	\brief Set the object to specified values
-	\param red
-	\param green
-	\param blue
-	\param alpha, defaults to 255
+	\param red red
+	\param green green
+	\param blue blue
+	\param alpha alpha, defaults to 255
 */
 void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
 {
@@ -147,10 +147,10 @@ void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
 
 /*!
 	\brief Set the object to specified values
-	\param red
-	\param green
-	\param blue
-	\param alpha, defaults to 255
+	\param red red
+	\param green green
+	\param blue blue
+	\param alpha alpha, defaults to 255
 */
 void RGBColor::SetColor(int r, int g, int b, int a=255)
 {
@@ -162,7 +162,7 @@ void RGBColor::SetColor(int r, int g, int b, int a=255)
 
 /*!
 	\brief Set the object to specified value
-	\param color to copy
+	\param col16 color to copy
 */
 void RGBColor::SetColor(uint16 col16)
 {
@@ -173,7 +173,7 @@ void RGBColor::SetColor(uint16 col16)
 
 /*!
 	\brief Set the object to specified index in the palette
-	\param color to copy
+	\param col8 color to copy
 */
 void RGBColor::SetColor(uint8 col8)
 {
@@ -184,7 +184,7 @@ void RGBColor::SetColor(uint8 col8)
 
 /*!
 	\brief Set the object to specified color
-	\param color to copy
+	\param color color to copy
 */
 void RGBColor::SetColor(const rgb_color &color)
 {
@@ -195,7 +195,7 @@ void RGBColor::SetColor(const rgb_color &color)
 
 /*!
 	\brief Set the object to specified color
-	\param color to copy
+	\param col color to copy
 */
 void RGBColor::SetColor(const RGBColor &col)
 {
@@ -206,7 +206,7 @@ void RGBColor::SetColor(const RGBColor &col)
 
 /*!
 	\brief Set the object to specified color
-	\param color to copy
+	\param col color to copy
 */
 RGBColor & RGBColor::operator=(const RGBColor &col)
 {
@@ -218,7 +218,7 @@ RGBColor & RGBColor::operator=(const RGBColor &col)
 
 /*!
 	\brief Set the object to specified color
-	\param color to copy
+	\param col color to copy
 */
 RGBColor & RGBColor::operator=(const rgb_color &col)
 {
@@ -233,8 +233,8 @@ RGBColor & RGBColor::operator=(const rgb_color &col)
 	\brief Returns a color blended between the object's value and 
 	another color.
 	
-	\param The other color to be blended with.
-	\param A weighted percentage of the second color to use. 0 <= value <= 1.0
+	\param color The other color to be blended with.
+	\param position A weighted percentage of the second color to use. 0 <= value <= 1.0
 	\return The blended color
 	
 	If the position passed to this function is invalid, the starting

@@ -28,13 +28,13 @@
 
 /*!
 	\brief Constructor called by the BitmapManager (only).
-	\param Size of the bitmap.
-	\param Color space of the bitmap
-	\param Various bitmap flags to tweak the bitmap as defined in Bitmap.h
-	\param Number of bytes in each row. -1 implies the default value. Any value less
-	than the the default will less than the default will be overridden, but any value
+	\param rect Size of the bitmap.
+	\param space Color space of the bitmap
+	\param flags Various bitmap flags to tweak the bitmap as defined in Bitmap.h
+	\param bytesperline Number of bytes in each row. -1 implies the default value. Any
+	value less than the the default will less than the default will be overridden, but any value
 	greater than the default will result in the number of bytes specified.
-	\param Screen assigned to the bitmap.
+	\param screen Screen assigned to the bitmap.
 */
 ServerBitmap::ServerBitmap(BRect rect,color_space space, int32 flags,
 		int32 bytesperline=-1, screen_id screen=B_MAIN_SCREEN_ID)
@@ -97,8 +97,8 @@ uint32 ServerBitmap::BitsLength(void)
 /*!
 	\brief Internal function used to translate color space values to appropriate internal
 	values. 
-	\param Color space for the bitmap.
-	\param Number of bytes per row.
+	\param space Color space for the bitmap.
+	\param bytesperline Number of bytes per row.
 */
 void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline=-1)
 {

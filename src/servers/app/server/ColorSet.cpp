@@ -8,7 +8,7 @@ ColorSet::ColorSet(void)
 
 /*!
 	\brief Copy constructor which does a massive number of assignments
-	\param Color set to copy from
+	\param cs Color set to copy from
 */
 ColorSet::ColorSet(const ColorSet &cs)
 {
@@ -41,8 +41,8 @@ ColorSet::ColorSet(const ColorSet &cs)
 
 /*!
 	\brief Overloaded assignment operator which does a massive number of assignments
-	\param Color set to copy from
-	\param The new values assigned to the color set
+	\param cs Color set to copy from
+	\return The new values assigned to the color set
 */
 ColorSet & ColorSet::operator=(const ColorSet &cs)
 {
@@ -53,7 +53,7 @@ ColorSet & ColorSet::operator=(const ColorSet &cs)
 /*!
 	\brief Copy function which handles assignments, 
 		and, yes, *IT EVEN MAKES french fries!!*
-	\param Color set to copy from
+	\param cs Color set to copy from
 */
 void ColorSet::SetColors(const ColorSet &cs)
 {

@@ -32,7 +32,7 @@ extern FTC_Manager ftmanager;
 
 /*!
 	\brief Constructor
-	\param path to a font file
+	\param filepath path to a font file
 	\param face FreeType handle for the font file after it is loaded - for its info only
 */
 FontStyle::FontStyle(const char *filepath, FT_Face face)
@@ -113,7 +113,7 @@ const char *FontStyle::GetPath(void)
 
 /*!
 	\brief Converts an ASCII character to Unicode for the style
-	\param An ASCII character
+	\param c An ASCII character
 	\return A Unicode value for the character
 */
 int16 FontStyle::ConvertToUnicode(uint16 c)
@@ -127,9 +127,9 @@ int16 FontStyle::ConvertToUnicode(uint16 c)
 
 /*!
 	\brief Creates a new ServerFont object for the style, given size, shear, and rotation.
-	\param character size in points
-	\param rotation in degrees
-	\param shear (slant) in degrees. 45 <= shear <= 135. 90 is vertical
+	\param size character size in points
+	\param rotation rotation in degrees
+	\param shear shear (slant) in degrees. 45 <= shear <= 135. 90 is vertical
 	\return The new ServerFont object
 */
 ServerFont *FontStyle::Instantiate(float size, float rotation=0.0, float shear=90.0)
@@ -141,7 +141,7 @@ ServerFont *FontStyle::Instantiate(float size, float rotation=0.0, float shear=9
 
 /*!
 	\brief Constructor
-	\param Name of the family
+	\param namestr Name of the family
 */
 FontFamily::FontFamily(const char *namestr)
 {
@@ -182,8 +182,8 @@ const char *FontFamily::Name(void)
 
 /*!
 	\brief Adds the style to the family
-	\param full path to the style's font file
-	\param FreeType face handle used to obtain info about the font
+	\param path full path to the style's font file
+	\param face FreeType face handle used to obtain info about the font
 */
 void FontFamily::AddStyle(const char *path,FT_Face face)
 {
@@ -210,7 +210,7 @@ void FontFamily::AddStyle(const char *path,FT_Face face)
 
 /*!
 	\brief Removes a style from the family and deletes it
-	\param Name of the style to be removed from the family
+	\param style Name of the style to be removed from the family
 */
 void FontFamily::RemoveStyle(const char *style)
 {
@@ -245,7 +245,7 @@ int32 FontFamily::CountStyles(void)
 
 /*!
 	\brief Determines whether the style belongs to the family
-	\param Name of the style being checked
+	\param style Name of the style being checked
 	\return True if it belongs, false if not
 */
 bool FontFamily::HasStyle(const char *style)
@@ -265,7 +265,7 @@ bool FontFamily::HasStyle(const char *style)
 
 /*! 
 	\brief Returns the name of a style in the family
-	\param list index of the style to be found
+	\param index list index of the style to be found
 	\return name of the style or NULL if the index is not valid
 */
 const char *FontFamily::GetStyle(int32 index)
@@ -278,7 +278,7 @@ const char *FontFamily::GetStyle(int32 index)
 
 /*!
 	\brief Get the FontStyle object for the name given
-	\param Name of the style to be obtained
+	\param style Name of the style to be obtained
 	\return The FontStyle object or NULL if none was found.
 	
 	The object returned belongs to the family and must not be deleted.

@@ -38,8 +38,8 @@
 rgb_color system_palette[256];
 
 /*!
-	\brief Takes a 256-element rgb_color array and places the BeOS System
-		palette in it.
+	\brief Takes a palette array and places the BeOS System	palette in it.
+	\param palette 256-element rgb_color array
 */
 void GenerateSystemPalette(rgb_color *palette)
 {

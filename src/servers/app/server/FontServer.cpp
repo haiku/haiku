@@ -41,6 +41,9 @@ FTC_Manager ftmanager;
 FT_Library ftlib;
 FontServer *fontserver;
 
+/*!
+	\brief Access function to request a face via the FreeType font cache
+*/
 static FT_Error face_requester(FTC_FaceID face_id, FT_Library library,
 	FT_Pointer request_data, FT_Face *aface)
 { 
@@ -48,7 +51,7 @@ static FT_Error face_requester(FTC_FaceID face_id, FT_Library library,
 	return FT_New_Face(ftlib,face->file_path.String(),face->face_index,aface); 
 } 
 
-
+//! Does basic set up so that directories can be scanned
 FontServer::FontServer(void)
 {
 	lock=create_sem(1,"fontserver_lock");
@@ -71,6 +74,7 @@ FontServer::FontServer(void)
 	fixed=NULL;
 }
 
+//! Frees items allocated in the constructor and shuts down FreeType
 FontServer::~FontServer(void)
 {
 	delete_sem(lock);
@@ -79,16 +83,22 @@ FontServer::~FontServer(void)
 	FT_Done_FreeType(ftlib);
 }
 
+//! Locks access to the font server
 void FontServer::Lock(void)
 {
 	acquire_sem(lock);
 }
 
+//! Unlocks access to the font server
 void FontServer::Unlock(void)
 {
 	release_sem(lock);
 }
 
+/*!
+	\brief Counts the number of font families available
+	\return The number of unique font families currently available
+*/
 int32 FontServer::CountFamilies(void)
 {
 	if(init)
@@ -96,6 +106,11 @@ int32 FontServer::CountFamilies(void)
 	return 0;
 }
 
+/*!
+	\brief Counts the number of styles available in a font family
+	\param family Name of the font family to scan
+	\return The number of font styles currently available for the font family
+*/
 int32 FontServer::CountStyles(const char *family)
 {
 	FontFamily *f=_FindFamily(family);
@@ -106,6 +121,10 @@ int32 FontServer::CountStyles(const char *family)
 	return 0;
 }
 
+/*!
+	\brief Removes a font family from the font list
+	\param family The family to remove
+*/
 void FontServer::RemoveFamily(const char *family)
 {
 	FontFamily *f=_FindFamily(family);
@@ -116,6 +135,13 @@ void FontServer::RemoveFamily(const char *family)
 	}
 }
 
+/*!
+	\brief Protected function which locates a FontFamily object
+	\param name The family to find
+	\return Pointer to the specified family or NULL if not found.
+	
+	Do NOT delete the FontFamily returned by this function.
+*/
 FontFamily *FontServer::_FindFamily(const char *name)
 {
 	if(!init)
@@ -131,15 +157,26 @@ FontFamily *FontServer::_FindFamily(const char *name)
 	return NULL;
 }
 
+/*!
+	\brief Scan a folder for all valid fonts
+	\param fontspath Path of the folder to scan.
+	\return 
+	- \c B_OK				Success
+	- \c B_NAME_TOO_LONG	The path specified is too long
+	- \c B_ENTRY_NOT_FOUND	The path does not exist
+	- \c B_LINK_LIMIT		A cyclic loop was detected in the file system
+	- \c B_BAD_VALUE		Invalid input specified
+	- \c B_NO_MEMORY		Insufficient memory to open the folder for reading
+	- \c B_BUSY				A busy node could not be accessed
+	- \c B_FILE_ERROR		An invalid file prevented the operation.
+	- \c B_NO_MORE_FDS		All file descriptors are in use (too many open files). 
+*/
 status_t FontServer::ScanDirectory(const char *fontspath)
 {
 	// This bad boy does all the real work. It loads each entry in the
 	// directory. If a valid font file, it adds both the family and the style.
 	// Both family and style are stored internally as BStrings. Once everything
 
-#ifdef DEBUG_SCANDIR
-printf("FontServer::ScanDirectory(%s)\n",fontspath);
-#endif
 	BDirectory dir;
 	BEntry entry;
 	BPath path;
@@ -150,7 +187,6 @@ printf("FontServer::ScanDirectory(%s)\n",fontspath);
     FT_Error error;
     FT_CharMap charmap;
     FontFamily *family;
-//	int32 familycount;
 
 	stat=dir.SetTo(fontspath);
 	if(stat!=B_OK)
@@ -208,6 +244,12 @@ printf("FontServer::ScanDirectory(%s)\n",fontspath);
 	return B_OK;
 }
 
+/*!
+	\brief Finds and returns the first valid charmap in a font
+	
+	\param face Font handle obtained from FT_Load_Face()
+	\return An FT_CharMap or NULL if unsuccessful
+*/
 FT_CharMap FontServer::_GetSupportedCharmap(const FT_Face &face)
 {
 	int32 i;
@@ -248,20 +290,19 @@ FT_CharMap FontServer::_GetSupportedCharmap(const FT_Face &face)
 
 }
 
-/*
-This saves all family names and styles to the file 
-/boot/home/config/app_server/fontlist as a flattened BMessage
+/*!
+	\brief This saves all family names and styles to the file specified in
+	ServerConfig.h as SERVER_FONT_LIST as a flattened BMessage.
 
-This operation is not done very often because the access to disk adds a significant 
-performance hit.
+	This operation is not done very often because the access to disk adds a significant 
+	performance hit.
 
-The format for storage consists of two things: an array of strings with the name 'family'
-and a number of small string arrays which have the name of the font family. These are
-the style lists. 
+	The format for storage consists of two things: an array of strings with the name 'family'
+	and a number of small string arrays which have the name of the font family. These are
+	the style lists. 
 
-Additionally, any fonts which have bitmap strikes contained in them or any fonts which
-are fixed-width are named in the arrays 'tuned' and 'fixed'
-
+	Additionally, any fonts which have bitmap strikes contained in them or any fonts which
+	are fixed-width are named in the arrays 'tuned' and 'fixed'.
 */
 void FontServer::SaveList(void)
 {
@@ -322,6 +363,12 @@ void FontServer::SaveList(void)
 		fontmsg.Flatten(&file);
 }
 
+/*!
+	\brief Retrieves the FontStyle object
+	\param family The font's family
+	\param face The font's style
+	\return The FontStyle having those attributes or NULL if not available
+*/
 FontStyle *FontServer::GetStyle(font_family family, font_style face)
 {
 	FontFamily *ffam=_FindFamily(family);
@@ -334,6 +381,12 @@ FontStyle *FontServer::GetStyle(font_family family, font_style face)
 	return NULL;
 }
 
+/*!
+	\brief Returns the current object used for the regular style
+	\return A ServerFont pointer which is the plain font.
+	
+	Do NOT delete this object. If you access it, make a copy of it.
+*/
 ServerFont *FontServer::GetSystemPlain(void)
 {
 	if(plain)
@@ -344,6 +397,12 @@ ServerFont *FontServer::GetSystemPlain(void)
 	return NULL;
 }
 
+/*!
+	\brief Returns the current object used for the bold style
+	\return A ServerFont pointer which is the bold font.
+	
+	Do NOT delete this object. If you access it, make a copy of it.
+*/
 ServerFont *FontServer::GetSystemBold(void)
 {
 	if(bold)
@@ -354,6 +413,12 @@ ServerFont *FontServer::GetSystemBold(void)
 	return NULL;
 }
 
+/*!
+	\brief Returns the current object used for the fixed style
+	\return A ServerFont pointer which is the fixed font.
+	
+	Do NOT delete this object. If you access it, make a copy of it.
+*/
 ServerFont *FontServer::GetSystemFixed(void)
 {
 	if(fixed)
@@ -364,6 +429,14 @@ ServerFont *FontServer::GetSystemFixed(void)
 	return NULL;
 }
 
+/*!
+	\brief Sets the system's plain font to the specified family and style
+	\param family Name of the font's family
+	\param style Name of the style desired
+	\param size Size desired
+	\return true if successful, false if not.
+	
+*/
 bool FontServer::SetSystemPlain(const char *family, const char *style, float size)
 {
 	FontFamily *fam=_FindFamily(family);

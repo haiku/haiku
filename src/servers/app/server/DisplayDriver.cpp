@@ -83,8 +83,8 @@ void DisplayDriver::Shutdown(void)
 
 /*!
 	\brief Called for all BView::CopyBits calls
-	\param Source rectangle.
-	\param Destination rectangle.
+	\param src Source rectangle.
+	\param dest Destination rectangle.
 	
 	Bounds checking must be done in this call. If the destination is not the same size 
 	as the source, the source should be scaled to fit.
@@ -95,11 +95,11 @@ void DisplayDriver::CopyBits(BRect src, BRect dest)
 
 /*!
 	\brief Called for all BView::DrawBitmap calls
-	\param Bitmap to be drawn. It will always be non-NULL and valid. The color 
+	\param bmp Bitmap to be drawn. It will always be non-NULL and valid. The color 
 	space is not guaranteed to match.
-	\param Source rectangle
-	\param Destination rectangle. Source will be scaled to fit if not the same size.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param src Source rectangle
+	\param dest Destination rectangle. Source will be scaled to fit if not the same size.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 	
 	Bounds checking must be done in this call.
 */
@@ -109,14 +109,14 @@ void DisplayDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerDa
 
 /*!
 	\brief Utilizes the font engine to draw a string to the frame buffer
-	\param String to be drawn. Always non-NULL.
-	\param Number of characters in the string to draw. Always greater than 0. If greater
+	\param string String to be drawn. Always non-NULL.
+	\param length Number of characters in the string to draw. Always greater than 0. If greater
 	than the number of characters in the string, draw the entire string.
-	\param Point at which the baseline starts. Characters are to be drawn 1 pixel above
+	\param pt Point at which the baseline starts. Characters are to be drawn 1 pixel above
 	this for backwards compatibility. While the point itself is guaranteed to be inside
 	the frame buffers coordinate range, the clipping of each individual glyph must be
 	performed by the driver itself.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 */
 void DisplayDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
 {
@@ -124,11 +124,11 @@ void DisplayDriver::DrawString(const char *string, int32 length, BPoint pt, Laye
 
 /*!
 	\brief Called for all BView::FillArc calls
-	\param Rectangle enclosing the entire arc
-	\param Starting angle for the arc in degrees
-	\param Span of the arc in degrees. Ending angle = angle+span.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r Rectangle enclosing the entire arc
+	\param angle Starting angle for the arc in degrees
+	\param span Span of the arc in degrees. Ending angle = angle+span.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
@@ -139,10 +139,10 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8
 
 /*!
 	\brief Called for all BView::FillBezier calls.
-	\param 4-element array of BPoints in the order of start, end, and then the two control
+	\param pts 4-element array of BPoints in the order of start, end, and then the two control
 	points. 
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call.
 */
@@ -152,9 +152,9 @@ void DisplayDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 
 /*!
 	\brief Called for all BView::FillEllipse calls
-	\param BRect enclosing the ellipse to be drawn.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r BRect enclosing the ellipse to be drawn.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the ellipse may end up
 	being clipped.
@@ -165,11 +165,11 @@ void DisplayDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 
 /*!
 	\brief Called for all BView::FillPolygon calls
-	\param Array of BPoints defining the polygon.
-	\param Number of points in the BPoint array.
-	\param Rectangle which contains the polygon
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param ptlist Array of BPoints defining the polygon.
+	\param numpts Number of points in the BPoint array.
+	\param rect Rectangle which contains the polygon
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
@@ -180,9 +180,9 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerD
 
 /*!
 	\brief Called for all BView::FillRect calls
-	\param BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 */
 void DisplayDriver::FillRect(BRect r, LayerData *d, int8 *pat)
@@ -191,10 +191,11 @@ void DisplayDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 
 /*!
 	\brief Called for all BView::FillRoundRect calls
-	\param X radius of the corner arcs
-	\param Y radius of the corner arcs
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r The rectangle itself
+	\param xrad X radius of the corner arcs
+	\param yrad Y radius of the corner arcs
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the roundrect may end 
 	up being clipped.
@@ -209,11 +210,11 @@ void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d,
 
 /*!
 	\brief Called for all BView::FillTriangle calls
-	\param Array of 3 BPoints. Always non-NULL.
-	\param BRect enclosing the triangle. While it will definitely enclose the triangle,
+	\param pts Array of 3 BPoints. Always non-NULL.
+	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
 	it may not be within the frame buffer's bounds.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the triangle may end 
 	up being clipped.
@@ -265,7 +266,7 @@ void DisplayDriver::MoveCursorTo(float x, float y)
 
 /*!
 	\brief Inverts the colors in the rectangle.
-	\param Rectangle of the area to be inverted. Guaranteed to be within bounds.
+	\param r Rectangle of the area to be inverted. Guaranteed to be within bounds.
 */
 void DisplayDriver::InvertRect(BRect r)
 {
@@ -300,7 +301,7 @@ void DisplayDriver::ObscureCursor(void)
 
 /*!
 	\brief Changes the cursor.
-	\param The new cursor. Guaranteed to be non-NULL.
+	\param cursor The new cursor. Guaranteed to be non-NULL.
 	
 	The driver does not take ownership of the given cursor. Subclasses should make
 	a copy of the cursor passed to it. The default version of this function hides the
@@ -324,11 +325,11 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 
 /*!
 	\brief Called for all BView::StrokeArc calls
-	\param Rectangle enclosing the entire arc
-	\param Starting angle for the arc in degrees
-	\param Span of the arc in degrees. Ending angle = angle+span.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r Rectangle enclosing the entire arc
+	\param angle Starting angle for the arc in degrees
+	\param span Span of the arc in degrees. Ending angle = angle+span.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
@@ -338,10 +339,10 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 
 /*!
 	\brief Called for all BView::StrokeBezier calls.
-	\param 4-element array of BPoints in the order of start, end, and then the two control
+	\param pts 4-element array of BPoints in the order of start, end, and then the two control
 	points. 
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call.
 */
@@ -351,9 +352,9 @@ void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 
 /*!
 	\brief Called for all BView::StrokeEllipse calls
-	\param BRect enclosing the ellipse to be drawn.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r BRect enclosing the ellipse to be drawn.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the ellipse may end up
 	being clipped.
@@ -364,10 +365,10 @@ void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 
 /*!
 	\brief Draws a line. Really.
-	\param Starting point
-	\param Ending point
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param start Starting point
+	\param end Ending point
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 	
 	The endpoints themselves are guaranteed to be in bounds, but clipping for lines with
 	a thickness greater than 1 will need to be done.
@@ -378,11 +379,11 @@ void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat
 
 /*!
 	\brief Called for all BView::StrokePolygon calls
-	\param Array of BPoints defining the polygon.
-	\param Number of points in the BPoint array.
-	\param Rectangle which contains the polygon
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param ptlist Array of BPoints defining the polygon.
+	\param numpts Number of points in the BPoint array.
+	\param rect Rectangle which contains the polygon
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
@@ -393,9 +394,9 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, Laye
 
 /*!
 	\brief Called for all BView::StrokeRect calls
-	\param BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 */
 void DisplayDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
@@ -404,10 +405,11 @@ void DisplayDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 
 /*!
 	\brief Called for all BView::StrokeRoundRect calls
-	\param X radius of the corner arcs
-	\param Y radius of the corner arcs
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r The rect itself
+	\param xrad X radius of the corner arcs
+	\param yrad Y radius of the corner arcs
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the roundrect may end 
 	up being clipped.
@@ -422,11 +424,11 @@ void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *
 
 /*!
 	\brief Called for all BView::StrokeTriangle calls
-	\param Array of 3 BPoints. Always non-NULL.
-	\param BRect enclosing the triangle. While it will definitely enclose the triangle,
+	\param pts Array of 3 BPoints. Always non-NULL.
+	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
 	it may not be within the frame buffer's bounds.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the triangle may end 
 	up being clipped.
@@ -437,10 +439,10 @@ void DisplayDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat
 
 /*!
 	\brief Draws a series of lines - optimized for speed
-	\param Array of BPoints pairs
-	\param Number of lines to be drawn
-	\param Array of colors for each respective line
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pts Array of BPoints pairs
+	\param numlines Number of lines to be drawn
+	\param colors Array of colors for each respective line
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 	
 	Data for this call is passed directly from userland - this call is responsible for all
 	checking. All lines are to be processed in the call using the same LayerData settings
@@ -452,7 +454,7 @@ void DisplayDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *color
 
 /*!
 	\brief Sets the screen mode to specified resolution and color depth.
-	\param constant as defined in GraphicsDefs.h
+	\param mode constant as defined in GraphicsDefs.h
 	
 	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
 	to update the state variables kept internally by the DisplayDriver class.
@@ -463,7 +465,7 @@ void DisplayDriver::SetMode(int32 mode)
 
 /*!
 	\brief Dumps the contents of the frame buffer to a file.
-	\param Path and leaf of the file to be created without an extension
+	\param path Path and leaf of the file to be created without an extension
 	\return False if unimplemented or unsuccessful. True if otherwise.
 	
 	Subclasses should add an extension based on what kind of file is saved
@@ -475,9 +477,9 @@ bool DisplayDriver::DumpToFile(const char *path)
 
 /*!
 	\brief Gets the width of a string in pixels
-	\param Source null-terminated string
-	\param Number of characters in the string
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param string Source null-terminated string
+	\param length Number of characters in the string
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 	\return Width of the string in pixels
 	
 	This corresponds to BView::StringWidth.
@@ -489,9 +491,9 @@ float DisplayDriver::StringWidth(const char *string, int32 length, LayerData *d)
 
 /*!
 	\brief Gets the height of a string in pixels
-	\param Source null-terminated string
-	\param Number of characters in the string
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param string Source null-terminated string
+	\param length Number of characters in the string
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 	\return Height of the string in pixels
 	
 	The height calculated in this function does not include any padding - just the
@@ -506,12 +508,12 @@ float DisplayDriver::StringHeight(const char *string, int32 length, LayerData *d
 
 /*!
 	\brief Retrieves the bounding box each character in the string
-	\param Source null-terminated string
-	\param Number of characters in the string
-	\param Metrics mode for either screen or printing
-	\param Optional glyph padding. This value may be NULL.
-	\param Array of BRect objects which will have at least count elements
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param string Source null-terminated string
+	\param count Number of characters in the string
+	\param mode Metrics mode for either screen or printing
+	\param delta Optional glyph padding. This value may be NULL.
+	\param rectarray Array of BRect objects which will have at least count elements
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 
 	See BFont::GetBoundingBoxes for more details on this function.
 */
@@ -522,14 +524,14 @@ void DisplayDriver::GetBoundingBoxes(const char *string, int32 count,
 
 /*!
 	\brief Retrieves the escapements for each character in the string
-	\param Source null-terminated string
-	\param Number of characters in the string
-	\param Optional glyph padding. This value may be NULL.
-	\param Array of escapement_delta objects which will have at least charcount elements
-	\param Actual offset values when iterating over the string. This array will also 
+	\param string Source null-terminated string
+	\param charcount Number of characters in the string
+	\param delta Optional glyph padding. This value may be NULL.
+	\param escapements Array of escapement_delta objects which will have at least charcount elements
+	\param offsets Actual offset values when iterating over the string. This array will also 
 		have at least charcount elements and the values placed therein will reflect 
 		the current kerning/spacing mode.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 	
 	See BFont::GetEscapements for more details on this function.
 */
@@ -540,10 +542,10 @@ void DisplayDriver::GetEscapements(const char *string, int32 charcount,
 
 /*!
 	\brief Retrieves the inset values of each glyph from its escapement values
-	\param Source null-terminated string
-	\param Number of characters in the string
-	\param Array of edge_info objects which will have at least charcount elements
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param string Source null-terminated string
+	\param charcount Number of characters in the string
+	\param edgearray Array of edge_info objects which will have at least charcount elements
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 
 	See BFont::GetEdges for more details on this function.
 */
@@ -553,9 +555,9 @@ void DisplayDriver::GetEdges(const char *string, int32 charcount, edge_info *edg
 
 /*!
 	\brief Determines whether a font contains a certain string of characters
-	\param Source null-terminated string
-	\param Number of characters in the string
-	\param Array of booleans which will have at least charcount elements
+	\param string Source null-terminated string
+	\param charcount Number of characters in the string
+	\param hasarray Array of booleans which will have at least charcount elements
 
 	See BFont::GetHasGlyphs for more details on this function.
 */
@@ -565,11 +567,11 @@ void DisplayDriver::GetHasGlyphs(const char *string, int32 charcount, bool *hasa
 
 /*!
 	\brief Truncates an array of strings to a certain width
-	\param Array of null-terminated strings
-	\param Number of strings passed to the function
-	\param Truncation mode
-	\param Maximum width for all strings
-	\param String array provided by the caller into which the truncated strings are
+	\param instrings Array of null-terminated strings
+	\param stringcount Number of strings passed to the function
+	\param mode Truncation mode
+	\param maxwidth Maximum width for all strings
+	\param outstrings String array provided by the caller into which the truncated strings are
 		to be placed.
 
 	See BFont::GetTruncatedStrings for more details on this function.
@@ -628,8 +630,8 @@ bool DisplayDriver::IsCursorObscured(bool state)
 
 /*!
 	\brief Locks the driver
-	\param Optional timeout specifier
-	\param True if the lock was successful, false if not.
+	\param timeout Optional timeout specifier
+	\return True if the lock was successful, false if not.
 	
 	The return value need only be checked if a timeout was specified. Each public
 	member function should lock the driver before doing anything else. Functions
@@ -652,7 +654,7 @@ void DisplayDriver::_Unlock(void)
 
 /*!
 	\brief Internal depth-setting function
-	\param Number of bits per pixel in use
+	\param d Number of bits per pixel in use
 	
 	_SetDepth must be called from within any implementation of SetMode
 */
@@ -663,7 +665,7 @@ void DisplayDriver::_SetDepth(uint8 d)
 
 /*!
 	\brief Internal height-setting function
-	\param Height of the frame buffer
+	\param h Height of the frame buffer
 	
 	_SetHeight must be called from within any implementation of SetMode
 */
@@ -674,7 +676,7 @@ void DisplayDriver::_SetHeight(uint16 h)
 
 /*!
 	\brief Internal width-setting function
-	\param Width of the frame buffer
+	\param w Width of the frame buffer
 	
 	_SetWidth must be called from within any implementation of SetMode
 */
@@ -685,7 +687,7 @@ void DisplayDriver::_SetWidth(uint16 w)
 
 /*!
 	\brief Internal mode-setting function.
-	\param Screen mode in use as defined in GraphicsDefs.h
+	\param m Screen mode in use as defined in GraphicsDefs.h
 	
 	_SetMode must be called from within any implementation of SetMode. Note that this
 	does not actually change the screen mode; it just updates the state variable used

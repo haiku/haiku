@@ -30,12 +30,12 @@
 
 /*! 
 	\brief Constructor
-	\param Style object to which the ServerFont belongs
-	\param Character size in points
-	\param Rotation in degrees
-	\param Shear (slant) in degrees. 45 <= shear <= 135
-	\param Style flags as defined in <Font.h>
-	\spacing String spacing flag as defined in <Font.h>
+	\param style Style object to which the ServerFont belongs
+	\param size Character size in points
+	\param rotation Rotation in degrees
+	\param shear Shear (slant) in degrees. 45 <= shear <= 135
+	\param flags Style flags as defined in <Font.h>
+	\param spacing String spacing flag as defined in <Font.h>
 */
 ServerFont::ServerFont(FontStyle *style, float size, float rotation, float shear,
 	uint16 flags, uint8 spacing)
@@ -57,7 +57,7 @@ ServerFont::ServerFont(FontStyle *style, float size, float rotation, float shear
 
 /*! 
 	\brief Copy Constructor
-	\param ServerFont to copy
+	\param font ServerFont to copy
 */
 ServerFont::ServerFont(const ServerFont &font)
 {
@@ -118,7 +118,7 @@ BRect ServerFont::BoundingBox(void)
 
 /*! 
 	\brief Obtains the height values for characters in the font in its current state
-	\param pointer to a font_height object to receive the values for the font
+	\param fh pointer to a font_height object to receive the values for the font
 */
 void ServerFont::Height(font_height *fh)
 {
