@@ -5,7 +5,8 @@
 
 #include <Handler.h>
 #include <Message.h>
-#include "ClipboardTree.h"
+
+class Clipboard;
 
 class ClipboardHandler : public BHandler {
 public:
@@ -13,8 +14,13 @@ public:
 	virtual ~ClipboardHandler();
 
 	virtual void MessageReceived(BMessage *message);
+
 private:
-	ClipboardTree fClipboardTree;
+	Clipboard *_GetClipboard(const char *name);
+
+	struct ClipboardMap;
+
+	ClipboardMap	*fClipboards;
 };
 
 #endif	// CLIPBOARD_HANDLER_H

@@ -1,27 +1,27 @@
 // ClipboardHandler.cpp
 
+#include <map>
+#include <string>
+
 #include <Message.h>
 #include <RegistrarDefs.h>
 
+#include "Clipboard.h"
 #include "ClipboardHandler.h"
-
-// bonefish: TODO: Cleanup/reimplement! The ClipboardTree doesn't need to be a
-// tree at all. Strip it off fLeftChild, fRightChild, and fCount and we have a
-// server-side clipboard representation. Simply use a name->clipboard map to
-// manage the clipboards. The clipboard count (which doesn't work at the
-// moment) will be the size of the map.
-
 
 /*!
 	\class ClipboardHandler
 	\brief Handles all clipboard related requests.
 */
 
+struct ClipboardHandler::ClipboardMap : map<string, Clipboard*> {};
+
 // constructor
 /*!	\brief Creates and initializes a ClipboardHandler.
 */
 ClipboardHandler::ClipboardHandler()
-				: BHandler()
+				: BHandler(),
+				  fClipboards(new ClipboardMap)
 {
 }
 
@@ -30,6 +30,11 @@ ClipboardHandler::ClipboardHandler()
 */
 ClipboardHandler::~ClipboardHandler()
 {
+	for (ClipboardMap::iterator it = fClipboards->begin();
+		 it != fClipboards->end();
+		 ++it) {
+		delete it->second;
+	}
 }
 
 // MessageReceived
@@ -40,143 +45,147 @@ ClipboardHandler::~ClipboardHandler()
 void
 ClipboardHandler::MessageReceived(BMessage *message)
 {
-	BString name;
+	const char *name;
 	BMessage reply;
 	switch (message->what) {
 		case B_REG_ADD_CLIPBOARD:
 		{
-	  		if ( message->FindString("name",&name) != B_OK )
-			{
-				reply.AddInt32("result",B_BAD_VALUE);
-			}
-			else
-			{
-				fClipboardTree.AddNode(name);
-				reply.AddInt32("result",B_OK);
-			}
+			status_t result = B_BAD_VALUE;
+
+	  		if (message->FindString("name", &name) == B_OK) {
+	  			if (_GetClipboard(name))
+	  				result = B_OK;
+	  		}
+
 			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", result);
 			message->SendReply(&reply);
+		  	break;
 		}
-	  	break;
+
 		case B_REG_GET_CLIPBOARD_COUNT:
 		{
-	  		if ( message->FindString("name",&name) != B_OK )
-			{
-				reply.AddInt32("result",B_BAD_VALUE);
-			}
-			else
-			{
-				ClipboardTree *node = fClipboardTree.GetNode(name);
-				if ( node )
-				{
-					reply.AddInt32("count",(uint32)(node->GetCount()));
-					reply.AddInt32("result",B_OK);
-				}
-				else
-					reply.AddInt32("result",B_BAD_VALUE);
-			}
+			status_t result = B_BAD_VALUE;
+
+	  		if (message->FindString("name", &name) == B_OK) {
+	  			if (Clipboard *clipboard = _GetClipboard(name)) {
+					reply.AddInt32("count", clipboard->Count());
+	  				result = B_OK;
+	  			}
+	  		}
+
+			reply.AddInt32("result", result);
 			reply.what = B_REG_RESULT;
 			message->SendReply(&reply);
+		  	break;
 		}
-	  	break;
+
 		case B_REG_CLIPBOARD_START_WATCHING:
 		{
+			status_t result = B_BAD_VALUE;
+
 			BMessenger target;
-	  		if ( (message->FindString("name",&name) != B_OK) ||
-			     (message->FindMessenger("target",&target) != B_OK) )
-			{
-				reply.AddInt32("result",B_BAD_VALUE);
-			}
-			else
-			{
-				ClipboardTree *node = fClipboardTree.GetNode(name);
-				if ( node && node->AddWatcher(&target) )
-					reply.AddInt32("result",B_OK);
-				else
-					reply.AddInt32("result",B_BAD_VALUE);
-			}
+	  		if (message->FindString("name", &name) == B_OK
+	  			&& message->FindMessenger("target", &target) == B_OK) {
+	  			Clipboard *clipboard = _GetClipboard(name);
+	  			if (clipboard && clipboard->AddWatcher(target))
+	  				result = B_OK;
+	  		}
+
 			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", result);
 			message->SendReply(&reply);
+		  	break;
 		}
-	  	break;
+
 		case B_REG_CLIPBOARD_STOP_WATCHING:
 		{
+			status_t result = B_BAD_VALUE;
+
 			BMessenger target;
-	  		if ( (message->FindString("name",&name) != B_OK) ||
-			     (message->FindMessenger("target",&target) != B_OK) )
-			{
-				reply.AddInt32("result",B_BAD_VALUE);
-			}
-			else
-			{
-				ClipboardTree *node = fClipboardTree.GetNode(name);
-				if ( node && node->RemoveWatcher(&target) )
-					reply.AddInt32("result",B_OK);
-				else
-					reply.AddInt32("result",B_BAD_VALUE);
-			}
+	  		if (message->FindString("name", &name) == B_OK
+	  			&& message->FindMessenger("target", &target) == B_OK) {
+	  			Clipboard *clipboard = _GetClipboard(name);
+	  			if (clipboard && clipboard->RemoveWatcher(target))
+	  				result = B_OK;
+	  		}
+
 			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", result);
 			message->SendReply(&reply);
+		  	break;
 		}
-	  	break;
+
 		case B_REG_DOWNLOAD_CLIPBOARD:
 		{
-	  		if ( message->FindString("name",&name) != B_OK )
-			{
-				reply.AddInt32("result",B_BAD_VALUE);
-			}
-			else
-			{
-				ClipboardTree *node = fClipboardTree.GetNode(name);
-				if ( node )
-				{
-					reply.AddMessage("data",node->GetData());
-					reply.AddMessenger("data source",*node->GetDataSource());
-					reply.AddInt32("count",(uint32)(node->GetCount()));
-					reply.AddInt32("result",B_OK);
-				}
-				else
-					reply.AddInt32("result",B_BAD_VALUE);
-			}
+			status_t result = B_BAD_VALUE;
+
+	  		if (message->FindString("name", &name) == B_OK) {
+	  			Clipboard *clipboard = _GetClipboard(name);
+	  			if (clipboard) {
+					reply.AddMessage("data", clipboard->Data());
+					reply.AddMessenger("data source", clipboard->DataSource());
+					reply.AddInt32("count", clipboard->Count());
+	  				result = B_OK;
+	  			}
+	  		}
+
 			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", result);
 			message->SendReply(&reply);
+		  	break;
 		}
-	  	break;
+
 		case B_REG_UPLOAD_CLIPBOARD:
 		{
+			status_t result = B_BAD_VALUE;
+
 			BMessage data;
-			BMessenger dataSource;
-			ClipboardTree *node = NULL;
-	  		if ( (message->FindString("name",&name) != B_OK) ||
-			     (message->FindMessage("data",&data) != B_OK) ||
-			     (message->FindMessenger("data source",&dataSource) != B_OK) )
-			{
-				reply.AddInt32("result",B_BAD_VALUE);
-			}
-			else
-			{
-				node = fClipboardTree.GetNode(name);
-				if ( node )
-				{
-					node->SetData(&data);
-					node->SetDataSource(&dataSource);
-					reply.AddInt32("count",(uint32)(node->IncrementCount()));
-					reply.AddInt32("result",B_OK);
-				}
-				else
-					reply.AddInt32("result",B_BAD_VALUE);
-			}
+			BMessenger source;
+	  		if (message->FindString("name", &name) == B_OK
+	  			&& message->FindMessenger("data source", &source) == B_OK
+	  			&& message->FindMessage("data", &data) == B_OK) {
+	  			Clipboard *clipboard = _GetClipboard(name);
+	  			if (clipboard) {
+	  				clipboard->SetData(&data, source);
+					reply.AddInt32("count", clipboard->Count());
+	  				result = B_OK;
+	  			}
+	  		}
+
 			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", result);
 			message->SendReply(&reply);
-			if ( node )
-			  node->NotifyWatchers();
+		  	break;
 		}
-	  	break;
+
 		default:
 			BHandler::MessageReceived(message);
 			break;
 	}
 }
 
+/*!	\brief Gets the clipboard with the specified name, or adds it, if not yet
+		   existent.
 
+	\param name The name of the clipboard to be returned.
+	\return The clipboard with the respective name.
+*/
+Clipboard*
+ClipboardHandler::_GetClipboard(const char *name)
+{
+	if (!name)
+		name = "system";
+
+	Clipboard *clipboard = NULL;
+	ClipboardMap::iterator it = fClipboards->find(name);
+	if (it != fClipboards->end()) {
+		clipboard = it->second;
+	} else {
+		clipboard = new Clipboard(name);
+		(*fClipboards)[name] = clipboard;
+	}
+
+	return clipboard;
+}
 
