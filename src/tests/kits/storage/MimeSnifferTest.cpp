@@ -1087,7 +1087,7 @@ MimeSnifferTest::ParserTest() {
 void dumpStr(const std::string &string, const char *label = NULL) {
 	if (label)
 		printf("%s: ", label);
-	for (int i = 0; i < string.length(); i++)
+	for (uint i = 0; i < string.length(); i++)
 		printf("%x ", string[i]);
 	printf("\n");
 }
