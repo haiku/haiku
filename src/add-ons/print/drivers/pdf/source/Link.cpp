@@ -383,7 +383,6 @@ void TextLine::Flush() {
 	}	 
 
 	const char* c = line.String();
-//	fprintf(fWriter->fLog, "==== TextLine\n\t\t'%s'\n", c);
 
 	if (!fWriter->MakesPDF()) {
 		if (fWriter->fCreateXRefs) fWriter->RecordDests(c);
