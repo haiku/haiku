@@ -77,7 +77,7 @@ struct list_t
 };
 
 // Used by the parser to pass around resource IDs.
-struct id_t
+struct res_id_t
 {
 	bool has_id;
 	bool has_name;

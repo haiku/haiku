@@ -60,7 +60,7 @@ typedef type_tab_t::iterator type_iter_t;
 
 static type_tab_t type_table;  // symbol table for data types
 
-static void add_user_type(id_t, type_code, char*, list_t);
+static void add_user_type(res_id_t, type_code, char*, list_t);
 
 typedef std::map<char*, define_t, ident_compare_t> define_tab_t;
 typedef define_tab_t::iterator define_iter_t;
@@ -95,7 +95,7 @@ static data_t cast(type_t, data_t);
 static data_t unary_expr(data_t, char);
 static data_t binary_expr(data_t, data_t, char);
 
-static void add_resource(id_t, type_code, data_t);
+static void add_resource(res_id_t, type_code, data_t);
 
 //------------------------------------------------------------------------------
 %}
@@ -109,7 +109,7 @@ static void add_resource(id_t, type_code, data_t);
 	double f;
 	char* I;
 	type_code t;
-	id_t id;
+	res_id_t id;
 	data_t d;
 	list_t l;
 	field_t F;
@@ -550,7 +550,7 @@ static void add_builtin_type(type_code code, char* name)
 
 //------------------------------------------------------------------------------
 
-void add_user_type(id_t id, type_code code, char* name, list_t list)
+void add_user_type(res_id_t id, type_code code, char* name, list_t list)
 {
 	if (type_table.find(name) != type_table.end())
 	{
@@ -1390,7 +1390,7 @@ data_t binary_expr(data_t data1, data_t data2, char oper)
 
 //------------------------------------------------------------------------------
 
-void add_resource(id_t id, type_code code, data_t data)
+void add_resource(res_id_t id, type_code code, data_t data)
 {
 	if (!id.has_id)
 	{
