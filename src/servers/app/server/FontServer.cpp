@@ -32,9 +32,9 @@
 #include <Message.h>
 #include <String.h>
 
-#include "FontServer.h"
-#include "FontFamily.h"
-#include "ServerFont.h"
+#include <FontServer.h>
+#include <FontFamily.h>
+#include <ServerFont.h>
 #include "ServerConfig.h"
 
 extern FTC_Manager ftmanager; 
