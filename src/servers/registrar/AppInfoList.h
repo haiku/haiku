@@ -30,6 +30,8 @@
 #include <List.h>
 #include <OS.h>
 
+class entry_ref;
+
 class RosterAppInfo;
 
 class AppInfoList {
@@ -45,10 +47,14 @@ public:
 	int32 IndexOf(RosterAppInfo *info) const;
 	int32 IndexOf(const char *signature) const;
 	int32 IndexOf(team_id team) const;
+	int32 IndexOf(const entry_ref *ref) const;
+	int32 IndexOfToken(uint32 token) const;
 
 	RosterAppInfo *InfoAt(int32 index) const;
 	RosterAppInfo *InfoFor(const char *signature) const;
 	RosterAppInfo *InfoFor(team_id team) const;
+	RosterAppInfo *InfoFor(const entry_ref *ref) const;
+	RosterAppInfo *InfoForToken(uint32 token) const;
 
 	int32 CountInfos() const;
 

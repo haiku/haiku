@@ -98,6 +98,28 @@ AppInfoList::IndexOf(team_id team) const
 	return -1;
 }
 
+// IndexOf
+int32
+AppInfoList::IndexOf(const entry_ref *ref) const
+{
+	for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++) {
+		if (info->ref == *ref)
+			return i;
+	}
+	return -1;
+}
+
+// IndexOfToken
+int32
+AppInfoList::IndexOfToken(uint32 token) const
+{
+	for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++) {
+		if (info->token == token)
+			return i;
+	}
+	return -1;
+}
+
 // InfoAt
 RosterAppInfo *
 AppInfoList::InfoAt(int32 index) const
@@ -117,6 +139,20 @@ RosterAppInfo *
 AppInfoList::InfoFor(team_id team) const
 {
 	return InfoAt(IndexOf(team));
+}
+
+// InfoFor
+RosterAppInfo *
+AppInfoList::InfoFor(const entry_ref *ref) const
+{
+	return InfoAt(IndexOf(ref));
+}
+
+// InfoForToken
+RosterAppInfo *
+AppInfoList::InfoForToken(uint32 token) const
+{
+	return InfoAt(IndexOfToken(token));
 }
 
 // CountInfos
