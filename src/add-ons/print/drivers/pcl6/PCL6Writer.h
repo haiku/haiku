@@ -10,6 +10,12 @@
 
 class PCL6Driver;
 
+
+class PCL6WriterStream {
+public:
+	virtual void write(const uint8 *data, uint32 size) = 0;
+};
+
 class PCL6Writer {
 public:
 	// DO NOT change this enumerations the order is important!!!
@@ -130,13 +136,23 @@ public:
 		kTrue
 	};
 	
-	PCL6Writer(PCL6Driver* driver, uint32 bufferSize = 16 * 1024);
+	enum ProtocolClass {
+		kProtocolClass1_1,
+		kProtocolClass2_0,
+		kProtocolClass2_1,
+		kProtocolClass3_0,
+	};
+	
+	PCL6Writer(PCL6WriterStream* stream, uint32 bufferSize = 16 * 1024);
 	virtual ~PCL6Writer();
 	
 	// these methods throw TransportException if data could not
 	// be written
 	void Flush();
 	
+	void PJLHeader(ProtocolClass protocolClass, int dpi, const char *comment = NULL);
+	void PJLFooter();
+
 	void BeginSession(uint16 xres, uint16 yres, UnitOfMeasure unitOfMeasure, ErrorReporting errorReporting);
 	void EndSession();
 	
@@ -330,11 +346,12 @@ private:
 		kBinaryLowByteFirst
 	};
 
+	void AppendString(const char* string);
 	void AppendOperator(Operator op);
 	void AppendAttribute(Attribute attr);
 	void AppendDataTag(DataTag tag);
 	
-	PCL6Driver  *fDriver; // the driver used for writing the generated PCL6 data
+	PCL6WriterStream *fStream; // the stream used for writing the generated PCL6 data
 	uint8       *fBuffer; // the buffer
 	uint32       fSize;   // the size of the buffer
 	uint32       fIndex;  // the index of the next byte to be written

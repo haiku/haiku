@@ -13,12 +13,12 @@
 
 class Halftone;
 
-class PCL6Driver : public GraphicsDriver 
+class PCL6Driver : public GraphicsDriver, public PCL6WriterStream 
 {
 public:
 	PCL6Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap);
 
-	void writeData(const uint8 *data, uint32 size);
+	void write(const uint8 *data, uint32 size);
 
 protected:
 	virtual bool startDoc();
@@ -28,6 +28,7 @@ protected:
 	virtual bool endDoc(bool success);
 
 private:
+	bool supportsDeltaRowCompression();
 	PCL6Writer::MediaSize mediaSize(JobData::Paper paper);
 	PCL6Writer::MediaSource mediaSource(JobData::PaperSource source);
 	void move(int x, int y);
