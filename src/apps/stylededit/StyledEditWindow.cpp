@@ -925,10 +925,24 @@ StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSens)
 	int32	oldstart;
 	
 	BString viewText(fTextView->Text());
+	if (caseSens)
+		viewText.ReplaceAll(findIt.String(),replaceWith.String());
+	else
+		viewText.IReplaceAll(findIt.String(),replaceWith.String());
+	
 	int32 textStart, textFinish;
 	fTextView->GetSelection(&textStart, &textFinish);
 
-	// we search backwards because we are disturbing everything after the point we insert
+	fTextView->SetText(viewText.String());
+
+	if (viewText.Length() < textStart) 
+		textStart = viewText.Length();
+	if (viewText.Length() < textFinish) 
+		textFinish = viewText.Length();
+		
+	fTextView->Select(textStart,textFinish);
+	fTextView->ScrollToSelection();
+/*	// we search backwards because we are disturbing everything after the point we insert
 	start = viewText.Length();
 	while (start > 0) {
 		oldstart = start;
@@ -944,7 +958,7 @@ StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSens)
 		} else {
 			start--; // we prefer not to get stuck
 		}
-	} 
+	} */
 	
 }/***StyledEditWindow::ReplaceAll()***/
 
