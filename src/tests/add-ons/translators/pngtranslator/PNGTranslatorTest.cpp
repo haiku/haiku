@@ -16,6 +16,7 @@
 #include <Message.h>
 #include <View.h>
 #include <Rect.h>
+#include <String.h>
 #include <File.h>
 #include <DataIO.h>
 #include <Errors.h>
@@ -36,6 +37,9 @@
 #define BBT_IN_CAPABILITY 0.6
 #define BBT_OUT_QUALITY 0.5
 #define BBT_OUT_CAPABILITY 0.4
+
+// Test Images Directory
+#define IMAGES_DIR "/boot/home/resources/png/"
 
 // Suite
 CppUnit::Test *
@@ -97,11 +101,15 @@ IdentifyTests(PNGTranslatorTest *ptest, BTranslatorRoster *proster,
 	translator_info ti;
 	printf(" [%d] ", (int) bbits);
 	
+	BString fullpath;
+	
 	for (int32 i = 0; i < len; i++) {
 		ptest->NextSubTest();
 		BFile file;
-		printf(" [%s] ", paths[i]);
-		CPPUNIT_ASSERT(file.SetTo(paths[i], B_READ_ONLY) == B_OK);
+		fullpath = IMAGES_DIR;
+		fullpath += paths[i];
+		printf(" [%s] ", fullpath.String());
+		CPPUNIT_ASSERT(file.SetTo(fullpath.String(), B_READ_ONLY) == B_OK);
 
 		// Identify (output: B_TRANSLATOR_ANY_TYPE)
 		ptest->NextSubTest();
@@ -167,7 +175,7 @@ PNGTranslatorTest::IdentifyTest()
 	// Identify (bad PNG signature)
 	NextSubTest();
 	memset(&ti, 0, sizeof(translator_info));
-	BFile badsig1("/boot/home/resources/png/xlfn0g04.png", B_READ_ONLY);
+	BFile badsig1(IMAGES_DIR "xlfn0g04.png", B_READ_ONLY);
 	CPPUNIT_ASSERT(badsig1.InitCheck() == B_OK);
 	result = proster->Identify(&badsig1, NULL, &ti);
 	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
@@ -176,7 +184,7 @@ PNGTranslatorTest::IdentifyTest()
 	// Identify (bad PNG signature)
 	NextSubTest();
 	memset(&ti, 0, sizeof(translator_info));
-	BFile badsig2("/boot/home/resources/png/xcrn0g04.png", B_READ_ONLY);
+	BFile badsig2(IMAGES_DIR "/xcrn0g04.png", B_READ_ONLY);
 	CPPUNIT_ASSERT(badsig2.InitCheck() == B_OK);
 	result = proster->Identify(&badsig2, NULL, &ti);
 	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
@@ -184,23 +192,27 @@ PNGTranslatorTest::IdentifyTest()
 	
 	// Identify (successfully identify the following files)
 	const char * aBitsPaths[] = {
-		"/boot/home/resources/png/beer.bits",
-		"/boot/home/resources/png/blocks.bits"
+		"beer.bits",
+		"blocks.bits"
 	};
 	const char * aPNGPaths[] = {
-		"/boot/home/resources/png/basi0g16.png",
-		"/boot/home/resources/png/basi4a08.png",
-		"/boot/home/resources/png/basn0g08.png",
-		"/boot/home/resources/png/basi4a16.png",
-		"/boot/home/resources/png/tp1n3p08.png",
-		"/boot/home/resources/png/tp0n2c08.png",
-		"/boot/home/resources/png/tbgn2c16.png",
-		"/boot/home/resources/png/s39i3p04.png",
-		"/boot/home/resources/png/basi6a08.png",
-		"/boot/home/resources/png/basi6a16.png",
-		"/boot/home/resources/png/basn6a08.png",
-		"/boot/home/resources/png/basi3p01.png",
-		"/boot/home/resources/png/basn3p02.png"
+		"basi0g01.png",
+		"basi0g02.png",
+		"basn0g01.png",
+		"basn0g04.png",
+		"basi0g16.png",
+		"basi4a08.png",
+		"basn0g08.png",
+		"basi4a16.png",
+		"tp1n3p08.png",
+		"tp0n2c08.png",
+		"tbgn2c16.png",
+		"s39i3p04.png",
+		"basi6a08.png",
+		"basi6a16.png",
+		"basn6a08.png",
+		"basi3p01.png",
+		"basn3p02.png"
 	};
 
 	IdentifyTests(this, proster, aPNGPaths,
@@ -223,14 +235,19 @@ void
 TranslateTests(PNGTranslatorTest *ptest, BTranslatorRoster *proster,
 	const TranslatePaths *paths, int32 len)
 {
+	BString png_fpath, bits_fpath;
+	
 	// Perform translations on every file in the array
 	for (int32 i = 0; i < len; i++) {
 		// Setup input files	
 		ptest->NextSubTest();
+		png_fpath = bits_fpath = IMAGES_DIR;
+		png_fpath += paths[i].pngPath;
+		bits_fpath += paths[i].bitsPath;
 		BFile png_file, bits_file;
-		CPPUNIT_ASSERT(png_file.SetTo(paths[i].pngPath, B_READ_ONLY) == B_OK);
-		CPPUNIT_ASSERT(bits_file.SetTo(paths[i].bitsPath, B_READ_ONLY) == B_OK);
-		printf(" [%s] ", paths[i].pngPath);
+		CPPUNIT_ASSERT(png_file.SetTo(png_fpath.String(), B_READ_ONLY) == B_OK);
+		CPPUNIT_ASSERT(bits_file.SetTo(bits_fpath.String(), B_READ_ONLY) == B_OK);
+		printf(" [%s] ", png_fpath.String());
 		
 		BMallocIO mallio, dmallio;
 		
@@ -328,7 +345,7 @@ PNGTranslatorTest::TranslateTest()
 	
 	// Translate (bad PNG signature)
 	NextSubTest();
-	BFile badsig1("/boot/home/resources/png/xlfn0g04.png", B_READ_ONLY);
+	BFile badsig1(IMAGES_DIR "xlfn0g04.png", B_READ_ONLY);
 	CPPUNIT_ASSERT(badsig1.InitCheck() == B_OK);
 	result = proster->Translate(&badsig1, NULL, NULL, &output,
 		B_TRANSLATOR_ANY_TYPE);
@@ -338,7 +355,7 @@ PNGTranslatorTest::TranslateTest()
 	
 	// Translate (bad PNG signature)
 	NextSubTest();
-	BFile badsig2("/boot/home/resources/png/xcrn0g04.png", B_READ_ONLY);
+	BFile badsig2(IMAGES_DIR "xcrn0g04.png", B_READ_ONLY);
 	CPPUNIT_ASSERT(badsig2.InitCheck() == B_OK);
 	result = proster->Translate(&badsig2, NULL, NULL, &output,
 		B_TRANSLATOR_ANY_TYPE);
@@ -348,7 +365,7 @@ PNGTranslatorTest::TranslateTest()
 
 	// Translate (bad width)
 	NextSubTest();
-	BFile badw("/boot/home/resources/png/x00n0g01.png", B_READ_ONLY);
+	BFile badw(IMAGES_DIR "x00n0g01.png", B_READ_ONLY);
 	CPPUNIT_ASSERT(badw.InitCheck() == B_OK);
 	result = proster->Translate(&badw, NULL, NULL, &output,
 		B_TRANSLATOR_ANY_TYPE);
@@ -356,52 +373,25 @@ PNGTranslatorTest::TranslateTest()
 	CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
 	CPPUNIT_ASSERT(filesize == 0);
 	
-	// Translate (unsupported grayscale images)
-	const char *noSupport[] = {
-		"/boot/home/resources/png/basn0g04.png",
-		"/boot/home/resources/png/basi0g02.png",
-		"/boot/home/resources/png/basi0g01.png",
-		"/boot/home/resources/png/basn0g01.png"
-	};
-	BFile nsFile;
-	for (int32 i = 0; i < sizeof(noSupport) / sizeof(const char *); i++) {
-		NextSubTest();
-		CPPUNIT_ASSERT(nsFile.SetTo(noSupport[i], B_READ_ONLY) == B_OK);
-		result = proster->Translate(&nsFile, NULL, NULL, &output,
-			B_TRANSLATOR_ANY_TYPE);
-		CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
-		CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
-		CPPUNIT_ASSERT(filesize == 0);		
-	}
-	
 	// Translate PNG images to bits
 	const TranslatePaths aPaths[] = {
-		{ "/boot/home/resources/png/basi0g16.png",
-			"/boot/home/resources/png/basi0g16.bits" },
-		{ "/boot/home/resources/png/basi4a08.png",
-			"/boot/home/resources/png/basi4a08.bits" },
-		{ "/boot/home/resources/png/basn0g08.png",
-			"/boot/home/resources/png/basn0g08.bits" },
-		{ "/boot/home/resources/png/basi4a16.png",
-			"/boot/home/resources/png/basi4a16.bits" },
-		{ "/boot/home/resources/png/tp1n3p08.png",
-			"/boot/home/resources/png/tp1n3p08.bits" },
-		{ "/boot/home/resources/png/tp0n2c08.png",
-			"/boot/home/resources/png/tp0n2c08.bits" },
-		{ "/boot/home/resources/png/tbgn2c16.png",
-			"/boot/home/resources/png/tbgn2c16.bits" },
-		{ "/boot/home/resources/png/s39i3p04.png",
-			"/boot/home/resources/png/s39i3p04.bits" },
-		{ "/boot/home/resources/png/basi6a08.png",
-			"/boot/home/resources/png/basi6a08.bits" },
-		{ "/boot/home/resources/png/basi6a16.png",
-			"/boot/home/resources/png/basi6a16.bits" },
-		{ "/boot/home/resources/png/basn6a08.png",
-			"/boot/home/resources/png/basn6a08.bits" },
-		{ "/boot/home/resources/png/basi3p01.png",
-			"/boot/home/resources/png/basi3p01.bits" },
-		{ "/boot/home/resources/png/basn3p02.png",
-			"/boot/home/resources/png/basn3p02.bits" }
+		{ "basi0g01.png", "basi0g01.bits" },
+		{ "basi0g02.png", "basi0g02.bits" },
+		{ "basn0g01.png", "basn0g01.bits" },
+		{ "basn0g04.png", "basn0g04.bits" },
+		{ "basi0g16.png", "basi0g16.bits" },
+		{ "basi4a08.png", "basi4a08.bits" },
+		{ "basn0g08.png", "basn0g08.bits" },
+		{ "basi4a16.png", "basi4a16.bits" },
+		{ "tp1n3p08.png", "tp1n3p08.bits" },
+		{ "tp0n2c08.png", "tp0n2c08.bits" },
+		{ "tbgn2c16.png", "tbgn2c16.bits" },
+		{ "s39i3p04.png", "s39i3p04.bits" },
+		{ "basi6a08.png", "basi6a08.bits" },
+		{ "basi6a16.png", "basi6a16.bits" },
+		{ "basn6a08.png", "basn6a08.bits" },
+		{ "basi3p01.png", "basi3p01.bits" },
+		{ "basn3p02.png", "basn3p02.bits" }
 	};
 	
 	TranslateTests(this, proster, aPaths,
