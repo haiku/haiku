@@ -82,7 +82,7 @@ typedef	struct
 	uint32 size;
 } int_buf_info;
 
-typedef struct settings {  // apsed, see comments in nv.settings
+typedef struct settings {  // apsed, see comments in skel.settings
 	// for driver
 	char   accelerant[B_FILE_NAME_LENGTH];
 	bool   dumprom;
@@ -284,7 +284,7 @@ typedef struct {
 	/* mirror of the ROM (copied in driver, because may not be mapped permanently) */
 	uint8 rom_mirror[65536];
 
-	/* some configuration settings from ~/config/settings/kernel/drivers/nv.settings if exists */
+	/* some configuration settings from ~/config/settings/kernel/drivers/skel.settings if exists */
 	settings settings;
 
 	struct
@@ -311,26 +311,26 @@ typedef struct {
 	uint32	offset;		/* Offset to read/write */
 	uint32	size;		/* Number of bytes to transfer */
 	uint32	value;		/* The value read or written */
-} nv_get_set_pci;
+} eng_get_set_pci;
 
 /* Set some boolean condition (like enabling or disabling interrupts) */
 typedef struct {
 	uint32	magic;		/* magic number to make sure the caller groks us */
 	bool	do_it;		/* state to set */
-} nv_set_bool_state;
+} eng_set_bool_state;
 
 /* Retrieve the area_id of the kernel/accelerant shared info */
 typedef struct {
 	uint32	magic;		/* magic number to make sure the caller groks us */
 	area_id	shared_info_area;	/* area_id containing the shared information */
-} nv_get_private_data;
+} eng_get_private_data;
 
 /* Retrieve the device name.  Usefull for when we have a file handle, but want
 to know the device name (like when we are cloning the accelerant) */
 typedef struct {
 	uint32	magic;		/* magic number to make sure the caller groks us */
 	char	*name;		/* The name of the device, less the /dev root */
-} nv_device_name;
+} eng_device_name;
 
 /* Retrieve an AGP device interface if there. Usefull to find the AGP speed scheme
 used (pre 3.x or 3.x) */
@@ -340,14 +340,14 @@ typedef struct {
 	uint8		index;	/* device index in list of devices found */
 	bool		exist;	/* we got AGP device info */
 	agp_info	agpi;	/* AGP interface info of a device */
-} nv_nth_agp_info;
+} eng_nth_agp_info;
 
 /* Execute an AGP command */
 typedef struct {
 	uint32		magic;	/* magic number to make sure the caller groks us */
 	bool		agp_bus;/* indicates if we have access to the AGP busmanager */
 	uint32		cmd;	/* actual command to execute */
-} nv_cmd_agp;
+} eng_cmd_agp;
 
 /* Read or write a value in ISA I/O space */
 typedef struct {
@@ -355,7 +355,7 @@ typedef struct {
 	uint16	adress;		/* Offset to read/write */
 	uint8	size;		/* Number of bytes to transfer */
 	uint16	data;		/* The value read or written */
-} nv_in_out_isa;
+} eng_in_out_isa;
 
 enum {
 	
