@@ -17,5 +17,5 @@ CommonUnitTest BHandlerTester
 	: kits app
 	: libopenbeos.so be stdc++.r4
 	: be stdc++.r4
-	: app support
+	: [ FDirName os app ] [ FDirName os support ]
 ;
