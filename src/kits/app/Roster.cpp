@@ -36,6 +36,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <fs_info.h>
+#include <image.h>
 #include <List.h>
 #include <Mime.h>
 #include <Node.h>
@@ -86,6 +87,128 @@ app_info::app_info()
 */
 app_info::~app_info()
 {
+}
+
+
+/*-------------------------------------------------------------*/
+/* --------- BRoster::ArgVector class------------------------- */
+
+class BRoster::ArgVector {
+public:
+	ArgVector();
+	~ArgVector();
+	status_t Init(int argc, const char *const *args, const entry_ref *appRef,
+				  const entry_ref *docRef);
+	void Unset();
+	inline int Count() const { return fArgc; }
+	inline const char *const *Args() const { return fArgs; }
+private:
+	int			fArgc;
+	const char	**fArgs;
+	BPath		fAppPath;
+	BPath		fDocPath;
+};
+
+// constructor
+/*!	\brief Creates an uninitialized ArgVector.
+*/
+BRoster::ArgVector::ArgVector()
+	: fArgc(0),
+	  fArgs(NULL),
+	  fAppPath(),
+	  fDocPath()
+{
+}
+
+// destructor
+/*!	\brief Frees all resources associated with the ArgVector.
+*/
+BRoster::ArgVector::~ArgVector()
+{
+	Unset();
+}
+
+// Init
+/*!	\brief Initilizes the object according to the supplied parameters.
+
+	If the initialization succeeds, the methods Count() and Args() grant
+	access to the argument count and vector created by this methods.
+	\note The returned vector is valid only as long as the elements of the
+	supplied \a args (if any) are valid and this object is not destroyed.
+	This object retains ownership of the vector returned by Args().
+	In case of error, the value returned by Args() is invalid (or \c NULL).
+
+	The argument vector is created as follows: First element is the path
+	of the entry \a appRef refers to, then follow all elements of \a args
+	and then, if \a args has at least one element and \a docRef can be
+	resolved to a path, the path of the entry \a docRef refers to. That is,
+	if no or an empty \a args vector is supplied, the resulting argument
+	vector contains only one element, the path associated with \a appRef.
+
+	\param argc Specifies the number of elements \a args contains.
+	\param args Argument vector. May be \c NULL.
+	\param appRef entry_ref referring to the entry whose path shall be the
+		   first element of the resulting argument vector.
+	\param docRef entry_ref referring to the entry whose path shall be the
+		   last element of the resulting argument vector. May be \c NULL.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a appRef.
+	- \c B_ENTRY_NOT_FOUND or other file system error codes: \a appRef could
+	  not be resolved to a path.
+	- \c B_NO_MEMORY: Not enough memory to allocate for this operation.
+*/
+status_t
+BRoster::ArgVector::Init(int argc, const char *const *args,
+						 const entry_ref *appRef, const entry_ref *docRef)
+{
+	// unset old values
+	Unset();
+	status_t error = (appRef ? B_OK : B_BAD_VALUE);
+	// get app path
+	if (error == B_OK)
+		error = fAppPath.SetTo(appRef);
+	// determine number of arguments
+	bool hasDocArg = false;
+	if (error == B_OK) {
+		fArgc = 1;
+		if (argc > 0 && args) {
+			fArgc += argc;
+			if (docRef && fDocPath.SetTo(docRef) == B_OK) {
+				fArgc++;
+				hasDocArg = true;
+			}
+		}
+		fArgs = new(nothrow) const char*[fArgc + 1];	// + 1 for term. NULL
+		if (!fArgs)
+			error = B_NO_MEMORY;
+	}
+	// init vector
+	if (error == B_OK) {
+		fArgs[0] = fAppPath.Path();
+		if (argc > 0 && args) {
+			for (int i = 0; i < argc; i++)
+				fArgs[i + 1] = args[i];
+			if (hasDocArg)
+				fArgs[fArgc - 1] = fDocPath.Path();
+		}
+		// NULL terminate (e.g. required by load_image())
+		fArgs[fArgc] = NULL;
+	}
+	return error;
+}
+
+// Unset
+/*!	\brief Uninitializes the object.
+*/
+void
+BRoster::ArgVector::Unset()
+{
+	fArgc = 0;
+	delete[] fArgs;
+	fArgs = NULL;
+	fAppPath.Unset();
+	fDocPath.Unset();
 }
 
 
@@ -549,10 +672,18 @@ BRoster::ActivateApp(team_id team) const
 	- other error codes
 */
 status_t
-BRoster::Launch(const char *mimeType, BMessage *initialMesssage,
+BRoster::Launch(const char *mimeType, BMessage *initialMessage,
 				team_id *appTeam) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (mimeType ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		BList messageList;
+		if (initialMessage)
+			messageList.AddItem(initialMessage);
+		error = xLaunchAppPrivate(mimeType, NULL, &messageList, 0, NULL,
+								  appTeam);
+	}
+	return error;
 }
 
 // Launch
@@ -588,7 +719,12 @@ status_t
 BRoster::Launch(const char *mimeType, BList *messageList,
 				team_id *appTeam) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (mimeType ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		error = xLaunchAppPrivate(mimeType, NULL, messageList, 0, NULL,
+								  appTeam);
+	}
+	return error;
 }
 
 // Launch
@@ -625,7 +761,10 @@ status_t
 BRoster::Launch(const char *mimeType, int argc, char **args,
 				team_id *appTeam) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (mimeType ? B_OK : B_BAD_VALUE);
+	if (error == B_OK)
+		error = xLaunchAppPrivate(mimeType, NULL, NULL, argc, args, appTeam);
+	return error;
 }
 
 // Launch
@@ -669,9 +808,16 @@ BRoster::Launch(const char *mimeType, int argc, char **args,
 */
 status_t
 BRoster::Launch(const entry_ref *ref, const BMessage *initialMessage,
-				team_id *app_team) const
+				team_id *appTeam) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (ref ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		BList messageList;
+		if (initialMessage)
+			messageList.AddItem(const_cast<BMessage*>(initialMessage));
+		error = xLaunchAppPrivate(NULL, ref, &messageList, 0, NULL, appTeam);
+	}
+	return error;
 }
 
 // Launch
@@ -714,7 +860,10 @@ status_t
 BRoster::Launch(const entry_ref *ref, const BList *messageList,
 				team_id *appTeam) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (ref ? B_OK : B_BAD_VALUE);
+	if (error == B_OK)
+		error = xLaunchAppPrivate(NULL, ref, messageList, 0, NULL, appTeam);
+	return error;
 }
 
 // Launch
@@ -761,7 +910,10 @@ status_t
 BRoster::Launch(const entry_ref *ref, int argc, const char * const *args,
 				team_id *appTeam) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (ref ? B_OK : B_BAD_VALUE);
+	if (error == B_OK)
+		error = xLaunchAppPrivate(NULL, ref, NULL, argc, args, appTeam);
+	return error;
 }
 
 
@@ -901,7 +1053,7 @@ BRoster::AddApplication(const char *mimeSig, const entry_ref *ref,
 		if (reply.what == B_REG_SUCCESS) {
 			if (!fullReg && team < 0) {
 				uint32 token;
-				if (request.FindInt32("token", (int32)&token) == B_OK) {
+				if (reply.FindInt32("token", (int32*)&token) == B_OK) {
 					if (pToken)
 						*pToken = token;
 				} else
@@ -1042,7 +1194,7 @@ BRoster::IsAppPreRegistered(const entry_ref *ref, team_id team,
 	bool isPreRegistered = false;
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
-			if (request.FindBool("pre-registered", isPreRegistered) != B_OK)
+			if (reply.FindBool("pre-registered", &isPreRegistered) != B_OK)
 				error = B_ERROR;
 			if (error == B_OK && isPreRegistered && info)
 				error = find_message_app_info(&reply, info);
@@ -1116,12 +1268,163 @@ BRoster::RemoveApp(team_id team) const
 }
 
 // xLaunchAppPrivate
+/*!	\brief Launches the application associated with the supplied MIME type or
+		   the entry referred to by the supplied entry_ref.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	At least one of \a mimeType or \a ref must not be \c NULL. If \a mimeType
+	is supplied, \a ref is ignored for finding the application.
+
+	If \a ref does refer to an application executable, that application is
+	launched. Otherwise the respective application is searched and launched,
+	and \a ref is sent to it in a \c B_REFS_RECEIVED message, unless other
+	arguments are passed via \a argc and \a args -- then the entry_ref is
+	converted into a path (C-string) and added to the argument vector.
+
+	\a messageList contains messages to be sent to the application
+	"on launch", i.e. before ReadyToRun() is invoked on the BApplication
+	object. The caller retains ownership of the supplied BList and the
+	contained BMessages. In case the method fails with \c B_ALREADY_RUNNING
+	the messages are delivered to the already running instance. The same
+	applies to the \c B_REFS_RECEIVED message.
+
+	The supplied \a argc and \a args are (if containing at least one argument)
+	put into a \c B_ARGV_RECEIVED message and sent to the launched application
+	"on launch". The caller retains ownership of the supplied \a args.
+	In case the method fails with \c B_ALREADY_RUNNING the message is
+	delivered to the already running instance. The same applies to the
+	\c B_REFS_RECEIVED message, if no arguments are supplied via \a argc and
+	\args.
+
+	\param mimeType MIME type for which the application shall be launched.
+		   May be \c NULL.
+	\param ref entry_ref referring to the file for which an application shall
+		   be launched. May be \c NULL.
+	\param messageList Optional list of messages to be sent to the application
+		   "on launch". May be \c NULL.
+	\param argc Specifies the number of elements in \a args.
+	\param args An array of C-strings to be sent as B_ARGV_RECEIVED messaged
+		   to the launched application.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a mimeType and \a ref.
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	  with its supertype (if the supplied isn't a supertype itself) a
+	  preferred application is associated.
+	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
+	  its preferred application could not be found.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	  application is in trash.
+	- \c B_LAUNCH_FAILED_EXECUTABLE: The found application is not executable.
+	- other error codes
+*/
 status_t
-BRoster::xLaunchAppPrivate(const char *mimeSig, const entry_ref *ref,
-						   BList* msgList, int cargs, char **args,
-						   team_id *appTeam) const
+BRoster::xLaunchAppPrivate(const char *mimeType, const entry_ref *ref,
+						   const BList *messageList, int argc,
+						   const char *const *args, team_id *appTeam) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+DBG(OUT("BRoster::xLaunchAppPrivate()"));
+	status_t error = (mimeType || ref ? B_OK : B_BAD_VALUE);
+	// find the app
+	entry_ref appRef;
+	char signature[B_MIME_TYPE_LENGTH];
+	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
+	bool wasDocument = true;
+	if (error == B_OK) {
+		error = resolve_app(mimeType, ref, &appRef, signature, &appFlags,
+						 &wasDocument);
+	}
+DBG(OUT("  find app: %s (%lx)\n", strerror(error), error));
+	// build an argument vector
+	ArgVector argVector;
+	if (error == B_OK) {
+		error = argVector.Init(argc, args, &appRef,
+							   (wasDocument ? ref : NULL));
+	}
+DBG(OUT("  build argv: %s (%lx)\n", strerror(error), error));
+	// pre-register the app
+	app_info appInfo;
+	bool alreadyRunning = false;
+	uint32 appToken = 0;
+	team_id otherTeam = -1;
+	uint32 otherAppFlags = B_REG_DEFAULT_APP_FLAGS;
+	if (error == B_OK && !alreadyRunning) {
+		error = AddApplication(signature, &appRef, appFlags, -1, -1, -1, false,
+							   &appToken, &otherTeam);
+		if (error == B_ALREADY_RUNNING) {
+DBG(OUT("  already running\n"));
+			alreadyRunning = true;
+			error = B_OK;
+			// get the app flags for the running application
+			if (GetRunningAppInfo(otherTeam, &appInfo) == B_OK)
+				otherAppFlags = appInfo.flags;
+		}
+	}
+DBG(OUT("  pre-register: %s (%lx)\n", strerror(error), error));
+	// launch the app
+	team_id team = -1;
+	if (error == B_OK && !alreadyRunning) {
+DBG(OUT("  token: %lu\n", appToken));
+		// load the app image
+		thread_id appThread = load_image(argVector.Count(),
+										 const_cast<const char**>(
+										 	argVector.Args()),
+										 const_cast<const char**>(environ));
+		// get the app team
+		if (appThread >= 0) {
+			thread_info threadInfo;
+			error = get_thread_info(appThread, &threadInfo);
+			if (error == B_OK)
+				team = threadInfo.team;
+		} else if (appThread == B_NOT_AN_EXECUTABLE) {
+			error = B_LAUNCH_FAILED_EXECUTABLE;
+		} else
+			error = appThread;
+DBG(OUT("  load image: %s (%lx)\n", strerror(error), error));
+		// finish the registration
+		if (error == B_OK)
+			error = SetThreadAndTeam(appToken, appThread, team);
+DBG(OUT("  set thread and team: %s (%lx)\n", strerror(error), error));
+		// resume the launched team
+		if (error == B_OK)
+			error = resume_thread(appThread);
+DBG(OUT("  resume thread: %s (%lx)\n", strerror(error), error));
+		// on error: kill the launched team and unregister the app
+		if (error != B_OK) {
+			if (appThread >= 0)
+				kill_thread(appThread);
+			RemovePreRegApp(appToken);
+		}
+	}
+	// send "on launch" messages
+	if (error == B_OK) {
+		// the messages go to the launched team or to the already running one
+		team_id targetTeam = (alreadyRunning ? otherTeam : team);
+		// If the target app is B_ARGV_ONLY almost no messages are sent to it.
+		// More precisely, the launched app gets at least B_ARGV_RECEIVED and
+		// B_READY_TO_RUN, an already running app gets nothing.
+		bool argvOnly = (appFlags & B_ARGV_ONLY)
+			|| (alreadyRunning && (otherAppFlags & B_ARGV_ONLY));
+		const BList *_messageList = (argvOnly ? NULL : messageList);
+		// don't send ref, if it refers to the app or is included in the
+		// argument vector
+		const entry_ref *_ref = (argvOnly || !wasDocument
+								 || argVector.Count() > 1 ? NULL : ref);
+		if (!(argvOnly && alreadyRunning)) {
+			send_to_running(targetTeam, argVector.Count(), argVector.Args(),
+							_messageList, _ref, !alreadyRunning);
+		}
+	}
+	// set return values
+	if (error == B_OK && alreadyRunning)
+		error = B_ALREADY_RUNNING;
+	if (appTeam)
+		*appTeam = (error == B_OK ? team : -1);
+DBG(OUT("BRoster::xLaunchAppPrivate() done: %s (%lx)\n", strerror(error), error));
+	return error;
 }
 
 // UpdateActiveApp
@@ -1439,42 +1742,73 @@ BRoster::sniff_file(const entry_ref *file, BNodeInfo *nodeInfo,
 	return error;
 }
 
-// is_wildcard
-bool
-BRoster::is_wildcard(const char *sig) const
-{
-	return false; // not implemented
-}
-
-// get_unique_supporting_app
-status_t
-BRoster::get_unique_supporting_app(const BMessage *apps, char *outSig) const
-{
-	return NOT_IMPLEMENTED; // not implemented
-}
-
-// get_random_supporting_app
-status_t
-BRoster::get_random_supporting_app(const BMessage *apps, char *outSig) const
-{
-	return NOT_IMPLEMENTED; // not implemented
-}
-
-// build_arg_vector
-char **
-BRoster::build_arg_vector(char **args, int *pargs, const entry_ref *appRef,
-						  const entry_ref *docRef) const
-{
-	return NULL; // not implemented
-}
-
 // send_to_running
+/*!	\brief Sends messages to a running team.
+
+	In particular those messages are \c B_ARGV_RECEIVED, \c B_REFS_RECEIVED,
+	\c B_READY_TO_RUN and other, arbitrary, ones.
+
+	If \a messageList is not \c NULL or empty, those messages are sent first,
+	then follow \c B_ARGV_RECEIVED, \c B_REFS_RECEIVED and finally
+	\c B_READ_TO_RUN.
+	
+	\c B_ARGV_RECEIVED is sent only, if \a args is not \c NULL and contains
+	more than one element. \c B_REFS_RECEIVED is sent only, if \a ref is not
+	\c NULL.
+
+	The ownership of all supplied objects retains to the caller.
+
+	\param team The team ID of the target application.
+	\param argc Number of elements in \a args.
+	\param args Argument vector to be sent to the target. May be \c NULL.
+	\param messageList List of BMessages to be sent to the target. May be
+		   \c NULL or empty.
+	\param ref entry_ref to be sent to the target. May be \c NULL.
+	\param readyToRun \c true, if a \c B_READY_TO_RUN message shall be sent,
+		   \c false otherwise.
+	\return
+	- \c B_OK: Everything went fine.
+	- an error code otherwise
+*/
 status_t
-BRoster::send_to_running(team_id team, const entry_ref *appRef, int cargs,
-						 char **args, const BList *msgList,
-						 const entry_ref *ref) const
+BRoster::send_to_running(team_id team, int argc, const char *const *args,
+						 const BList *messageList, const entry_ref *ref,
+						 bool readyToRun) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = B_OK;
+	// Construct a messenger to the app: We can't use the public constructor,
+	// since the target application may be B_ARGV_ONLY.
+	app_info info;
+	error = GetRunningAppInfo(team, &info);
+	if (error == B_OK) {
+		BMessenger messenger(team, info.port, 0, true);
+		// send messages from the list
+		if (messageList) {
+			for (int32 i = 0;
+				 BMessage *message = (BMessage*)messageList->ItemAt(i);
+				 i++) {
+				messenger.SendMessage(message);
+			}
+		}
+		// send B_ARGV_RECEIVED
+		if (args && argc > 1) {
+			BMessage message(B_ARGV_RECEIVED);
+			message.AddInt32("argc", argc);
+			for (int32 i = 0; i < argc; i++)
+				message.AddString("argv", args[i]);
+			messenger.SendMessage(&message);
+		}
+		// send B_REFS_RECEIVED
+		if (ref) {
+			BMessage message(B_REFS_RECEIVED);
+			message.AddRef("refs", ref);
+			messenger.SendMessage(&message);
+		}
+		// send B_READY_TO_RUN
+		if (readyToRun)
+			messenger.SendMessage(B_READY_TO_RUN);
+	}
+	return error;
 }
 
 // InitMessengers
