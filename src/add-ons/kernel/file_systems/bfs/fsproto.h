@@ -6,7 +6,6 @@
 #ifndef _FSPROTO_H
 #define _FSPROTO_H
 
-#include <sys/dirent.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>
@@ -14,6 +13,7 @@
 #include <iovec.h>
 
 #include <OS.h>
+#include <NodeMonitor.h>
 #include <fs_attr.h>
 #include <fs_info.h>
 #include <BeBuild.h>
@@ -35,20 +35,6 @@ typedef ino_t		vnode_id;
 #define		WSTAT_CRTIME	0x0040
 
 #define		WFSSTAT_NAME	0x0001
-
-#define		B_ENTRY_CREATED		1
-#define		B_ENTRY_REMOVED		2
-#define		B_ENTRY_MOVED		3
-#define		B_STAT_CHANGED		4
-#define		B_ATTR_CHANGED		5
-#define		B_DEVICE_MOUNTED	6
-#define		B_DEVICE_UNMOUNTED	7
-
-#define		B_STOP_WATCHING     0x0000
-#define		B_WATCH_NAME		0x0001
-#define		B_WATCH_STAT		0x0002
-#define		B_WATCH_ATTR		0x0004
-#define		B_WATCH_DIRECTORY	0x0008
 
 #define		SELECT_READ			1
 #define		SELECT_WRITE		2
@@ -238,25 +224,22 @@ typedef struct vnode_ops {
 	op_suspend_vnode		(*suspend_vnode);
 } vnode_ops;
 
-extern _IMPEXP_KERNEL int	new_path(const char *path, char **copy);
-extern _IMPEXP_KERNEL void	free_path(char *p);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-extern _IMPEXP_KERNEL int	notify_listener(int op, nspace_id nsid,
-									vnode_id vnida,	vnode_id vnidb,
-									vnode_id vnidc, const char *name);
-extern _IMPEXP_KERNEL void	notify_select_event(selectsync *sync, uint32 ref);
-extern _IMPEXP_KERNEL int	send_notification(port_id port, long token,
-									ulong what, long op, nspace_id nsida,
-									nspace_id nsidb, vnode_id vnida,
-									vnode_id vnidb, vnode_id vnidc,
-									const char *name);
-extern _IMPEXP_KERNEL int	get_vnode(nspace_id nsid, vnode_id vnid, void **data);
-extern _IMPEXP_KERNEL int	put_vnode(nspace_id nsid, vnode_id vnid);
-extern _IMPEXP_KERNEL int	new_vnode(nspace_id nsid, vnode_id vnid, void *data);
-extern _IMPEXP_KERNEL int	remove_vnode(nspace_id nsid, vnode_id vnid);
-extern _IMPEXP_KERNEL int	unremove_vnode(nspace_id nsid, vnode_id vnid);
-extern _IMPEXP_KERNEL int	is_vnode_removed(nspace_id nsid, vnode_id vnid);
+extern _IMPEXP_KERNEL int		new_path(const char *path, char **copy);
+extern _IMPEXP_KERNEL void		free_path(char *p);
 
+extern _IMPEXP_KERNEL void		notify_select_event(selectsync *sync, uint32 ref);
+extern _IMPEXP_KERNEL status_t	is_vnode_removed(nspace_id nsid, vnode_id vnid);
+
+// The missing prototypes can be found in the fs_interface.h file.
+// That part of the VFS is still compatible with BeOS :)
+
+#ifdef __cplusplus
+}
+#endif
 
 extern _EXPORT vnode_ops	fs_entry;
 extern _EXPORT int32		api_version;
