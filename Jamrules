@@ -2009,14 +2009,14 @@ rule FT2_LinkLibrary
 
 rule Copy
 {
-	LocalDepends $(<) : $(>) ;
+	Depends $(<) : $(>) ;
 	SEARCH on $(>) = $(SEARCH_SOURCE) ;
 }
 
 actions Copy
 {
 	cp -dp $(>) $(<) ;
-    if [ -f $(>) ] ; then copyattr $(>) $(<) ; fi ;
+	if [ -f $(>) ] ; then copyattr $(>) $(<) ; fi ;
 }
 
 rule Packages
@@ -2133,7 +2133,7 @@ rule PackageInstallZip
 actions together PackageInstallZip
 {
 	cd $(1:P) ;
-	zip -rq $(1:BS) boot ;
+	zip -rqy $(1:BS) boot ;
 }
 
 rule LinkInstallZip
