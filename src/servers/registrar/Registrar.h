@@ -30,6 +30,7 @@
 
 class ClipboardHandler;
 class EventQueue;
+class MessageEvent;
 class MessageRunnerManager;
 class MIMEManager;
 
@@ -46,12 +47,17 @@ public:
 	virtual void ReadyToRun();
 	virtual bool QuitRequested();
 
+	EventQueue *GetEventQueue() const;
+
+	static Registrar *App();
+
 private:
 	BPrivate::TRoster		*fRoster;
 	ClipboardHandler		*fClipboardHandler;
 	MIMEManager				*fMIMEManager;
 	EventQueue				*fEventQueue;
 	MessageRunnerManager	*fMessageRunnerManager;
+	MessageEvent			*fSanityEvent;
 };
 
 #endif	// REGISTRAR_H

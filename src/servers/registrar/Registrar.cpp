@@ -9,12 +9,11 @@
 
 #include "ClipboardHandler.h"
 #include "EventQueue.h"
+#include "MessageEvent.h"
 #include "MessageRunnerManager.h"
 #include "MIMEManager.h"
 #include "Registrar.h"
 #include "TRoster.h"
-
-static const char *kEventQueueName = "timer_thread";
 
 /*!
 	\class Registrar
@@ -22,6 +21,12 @@ static const char *kEventQueueName = "timer_thread";
 
 	Glues the registrar services together and dispatches the roster messages.
 */
+
+//! Name of the event queue.
+static const char *kEventQueueName = "timer_thread";
+
+//! Time interval between two roster sanity checks (1 s).
+static const bigtime_t kRosterSanityEventInterval = 1000000LL;
 
 // constructor
 /*!	\brief Creates the registrar application class.
@@ -32,7 +37,8 @@ Registrar::Registrar()
 		   fClipboardHandler(NULL),
 		   fMIMEManager(NULL),
 		   fEventQueue(NULL),
-		   fMessageRunnerManager(NULL)
+		   fMessageRunnerManager(NULL),
+		   fSanityEvent(NULL)
 {
 	FUNCTION_START();
 }
@@ -50,11 +56,15 @@ Registrar::~Registrar()
 	fEventQueue->Die();
 	delete fMessageRunnerManager;
 	delete fEventQueue;
+	delete fSanityEvent;
 	fMIMEManager->Lock();
 	fMIMEManager->Quit();
 	RemoveHandler(fClipboardHandler);
 	delete fClipboardHandler;
 	delete fRoster;
+	// Invalidate the global be_roster, so that the BApplication destructor
+	// won't dead-lock when sending a message to itself.
+	BPrivate::init_registrar_roster(BMessenger(), BMessenger());
 	FUNCTION_END();
 }
 
@@ -66,7 +76,7 @@ Registrar::~Registrar()
 void
 Registrar::MessageReceived(BMessage *message)
 {
-	FUNCTION_START();
+//	FUNCTION_START();
 	switch (message->what) {
 		// general requests
 		case B_REG_GET_MIME_MESSENGER:
@@ -131,11 +141,17 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_GET_MESSAGE_RUNNER_INFO:
 			fMessageRunnerManager->HandleGetRunnerInfo(message);
 			break;
+		// internal messages
+		case B_REG_ROSTER_SANITY_EVENT:
+			fRoster->CheckSanity();
+			fSanityEvent->SetTime(system_time() + kRosterSanityEventInterval);
+			fEventQueue->AddEvent(fSanityEvent);
+			break;
 		default:
 			BApplication::MessageReceived(message);
 			break;
 	}
-	FUNCTION_END();
+//	FUNCTION_END();
 }
 
 // ReadyToRun
@@ -161,6 +177,11 @@ Registrar::ReadyToRun()
 	// init the global be_roster
 	BPrivate::init_registrar_roster(be_app_messenger,
 									BMessenger(NULL, fMIMEManager));
+	// create and schedule the sanity message event
+	fSanityEvent = new MessageEvent(system_time() + kRosterSanityEventInterval,
+									this, B_REG_ROSTER_SANITY_EVENT);
+	fSanityEvent->SetAutoDelete(false);
+	fEventQueue->AddEvent(fSanityEvent);
 	FUNCTION_END();
 }
 
@@ -175,6 +196,27 @@ Registrar::QuitRequested()
 	// The final registrar must not quit. At least not that easily. ;-)
 	return BApplication::QuitRequested();
 }
+
+// GetEventQueue
+/*!	\brief Returns the registrar's event queue.
+	\return The registrar's event queue.
+*/
+EventQueue*
+Registrar::GetEventQueue() const
+{
+	return fEventQueue;
+}
+
+// App
+/*!	\brief Returns the Registrar application object.
+	\return The Registrar application object.
+*/
+Registrar*
+Registrar::App()
+{
+	return dynamic_cast<Registrar*>(be_app);
+}
+
 
 // init_registrar_roster
 /*!	\brief Initializes the global \a be_roster.
