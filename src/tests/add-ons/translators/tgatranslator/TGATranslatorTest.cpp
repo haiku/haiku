@@ -35,6 +35,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <image.h>
+#include <Application.h>
 #include <Translator.h>
 #include <TranslatorFormats.h>
 #include <TranslatorRoster.h>
@@ -362,6 +363,9 @@ TranslateTests(TGATranslatorTest *ptest, BTranslatorRoster *proster,
 void
 TGATranslatorTest::TranslateTest()
 {
+	BApplication
+		app("application/x-vnd.OpenBeOS-TGATranslatorTest");
+		
 	// Init
 	NextSubTest();
 	status_t result = B_ERROR;
