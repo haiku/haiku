@@ -9,6 +9,15 @@
 #include <SupportDefs.h>
 
 
+typedef struct {
+	void	*function;		// pointer to the syscall function
+	int		parameter_size;	// summed up parameter size
+} syscall_info;
+
+extern const int kSyscallCount;
+extern const syscall_info kSyscallInfos[];
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
