@@ -471,21 +471,6 @@ ServerWindow* Layer::SearchForServerWindow()
 	return fServerWin;
 }
 
-void Layer::RebuildAndForceRedraw(const BRegion& reg, Layer *target)
-{
-	STRACE(("Layer(%s)::RebuildAndForceRedraw():\n", GetName()));
-	BPoint pt(0,0);
-
-	StartRebuildRegions(reg, NULL, B_LAYER_NONE, pt);
-
-	if (target)
-		fRootLayer->fRedrawReg.Include(&(target->fFullVisible));
-
-	Redraw(fRootLayer->fRedrawReg);
-
-	EmptyGlobals();
-}
-
 void Layer::FullInvalidate(const BRect &rect)
 {
 	FullInvalidate( BRegion(rect) );
