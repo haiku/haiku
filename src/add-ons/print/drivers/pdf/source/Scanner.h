@@ -1,6 +1,6 @@
 /*
 
-Cross References.
+Scanner.
 
 Copyright (c) 2002 OpenBeOS. 
 
