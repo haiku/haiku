@@ -18,12 +18,6 @@ else
 	exit -1
 fi
 
-#Sometimes the OpenSSL installer is dumb and doesn't create the requisite symlinks
-if test ! -e ~/config/lib/libssl.so && test -e ~/config/lib/libssl.so.0.9.7; then
-	ln -s ~/config/lib/libssl.so.0.9.7 ~/config/lib/libssl.so
-	ln -s ~/config/lib/libcrypto.so.0.9.7 ~/config/lib/libcrypto.so
-fi
-
 if [ -n "$TTY" ]
 then
     quit "application/x-vnd.Be-POST"
@@ -62,6 +56,12 @@ else
         fi
         $terminal -t "installer" /bin/sh "$0"
     fi
+fi
+
+#Sometimes the OpenSSL installer is dumb and doesn't create the requisite symlinks
+if test ! -e ~/config/lib/libssl.so && test -e ~/config/lib/libssl.so.0.9.7; then
+	ln -s ~/config/lib/libssl.so.0.9.7 ~/config/lib/libssl.so
+	ln -s ~/config/lib/libcrypto.so.0.9.7 ~/config/lib/libcrypto.so
 fi
 
 # Launch prefs if this is a new install of MDR
