@@ -9,7 +9,6 @@ Addon Canon\ LIPS4\ Compatible : print :
 	Lips4Entry.cpp
 	Lips4.cpp
 	Lips4Cap.cpp
-	PackBits.cpp
 ;
 
 LinkSharedOSLibs Canon\ LIPS4\ Compatible : be stdc++.r4 libprint.a ;
