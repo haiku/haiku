@@ -12,6 +12,7 @@
 #include <DiskDevicePrivate.h>
 #include <DiskDeviceRoster.h>
 //#include <DiskScannerAddOn.h>
+#include <DiskSystem.h>
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Message.h>
@@ -44,7 +45,8 @@ static const int32 kAddOnDirCount
 	The object is ready to be used after construction.
 */
 BDiskDeviceRoster::BDiskDeviceRoster()
-	: fCookie(0)//,
+	: fDeviceCookie(0),
+	  fDiskSystemCookie(0)
 //	  fPartitionAddOnDir(NULL),
 //	  fFSAddOnDir(NULL),
 //	  fPartitionAddOnDirIndex(0),
@@ -79,7 +81,8 @@ BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 	if (!device)
 		return B_BAD_VALUE;
 	size_t neededSize = 0;
-	partition_id id = _kern_get_next_disk_device_id(&fCookie, &neededSize);
+	partition_id id = _kern_get_next_disk_device_id(&fDeviceCookie,
+													&neededSize);
 	if (id < 0)
 		return id;
 	return device->_SetTo(id, neededSize);
@@ -92,7 +95,7 @@ BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 status_t
 BDiskDeviceRoster::RewindDevices()
 {
-	fCookie = 0;
+	fDeviceCookie = 0;
 	return B_OK;
 }
 
@@ -100,16 +103,22 @@ BDiskDeviceRoster::RewindDevices()
 status_t
 BDiskDeviceRoster::GetNextDiskSystem(BDiskSystem *system)
 {
-	// not implemented
-	return B_ERROR;
+	if (!system)
+		return B_BAD_VALUE;
+	user_disk_system_info info;
+	status_t error = _kern_get_next_disk_system_info(&fDiskSystemCookie,
+													 &info);
+	if (error == B_OK)
+		error = system->_SetTo(&info);
+	return error;
 }
 
 // RewindDiskSystems
 status_t
 BDiskDeviceRoster::RewindDiskSystems()
 {
-	// not implemented
-	return B_ERROR;
+	fDiskSystemCookie = 0;
+	return B_OK;
 }
 
 // GetNextActiveJob
@@ -171,13 +180,13 @@ BDiskDeviceRoster::VisitEachDevice(BDiskDeviceVisitor *visitor,
 {
 	bool terminatedEarly = false;
 	if (visitor) {
-		int32 oldCookie = fCookie;
-		fCookie = 0;
+		int32 oldCookie = fDeviceCookie;
+		fDeviceCookie = 0;
 		BDiskDevice deviceOnStack;
 		BDiskDevice *useDevice = (device ? device : &deviceOnStack);
 		while (!terminatedEarly && GetNextDevice(useDevice) == B_OK)
 			terminatedEarly = visitor->Visit(useDevice);
-		fCookie = oldCookie;
+		fDeviceCookie = oldCookie;
 		if (!terminatedEarly)
 			useDevice->Unset();
 	}
@@ -208,8 +217,8 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 {
 	bool terminatedEarly = false;
 	if (visitor) {
-		int32 oldCookie = fCookie;
-		fCookie = 0;
+		int32 oldCookie = fDeviceCookie;
+		fDeviceCookie = 0;
 		BDiskDevice deviceOnStack;
 		BDiskDevice *useDevice = (device ? device : &deviceOnStack);
 		BPartition *foundPartition = NULL;
@@ -217,7 +226,7 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 			foundPartition = useDevice->VisitEachDescendant(visitor);
 			// TODO: That probably not correct. VisitEachDescendant()
 			// should also invoke Visit(BDiskDevice*).
-		fCookie = oldCookie;
+		fDeviceCookie = oldCookie;
 		if (!terminatedEarly)
 			useDevice->Unset();
 		else if (device && partition)
@@ -243,12 +252,12 @@ BDiskDeviceRoster::VisitAll(BDiskDeviceVisitor *visitor)
 {
 	bool terminatedEarly = false;
 	if (visitor) {
-		int32 oldCookie = fCookie;
-		fCookie = 0;
+		int32 oldCookie = fDeviceCookie;
+		fDeviceCookie = 0;
 		BDiskDevice device;
 		while (!terminatedEarly && GetNextDevice(&device) == B_OK)
 			terminatedEarly = device.VisitEachDescendant(visitor);
-		fCookie = oldCookie;
+		fDeviceCookie = oldCookie;
 	}
 	return terminatedEarly;
 }

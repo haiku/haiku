@@ -163,7 +163,8 @@ private:
 										BDiskScannerPartitionAddOn **addOn);
 #endif	// 0
 private:
-	int32		fCookie;
+	int32		fDeviceCookie;
+	int32		fDiskSystemCookie;
 //	BDirectory	*fPartitionAddOnDir;
 //	BDirectory	*fFSAddOnDir;
 //	int32		fPartitionAddOnDirIndex;
