@@ -88,6 +88,37 @@
 #define NMCRTCX_MODECTL		0x17
 #define NMCRTCX_LINECOMP	0x18
 /* NeoMagic specific registers: */
+#define NMCRTCX_PANEL_0x40	0x40
+#define NMCRTCX_PANEL_0x41	0x41
+#define NMCRTCX_PANEL_0x42	0x42
+#define NMCRTCX_PANEL_0x43	0x43
+#define NMCRTCX_PANEL_0x44	0x44
+#define NMCRTCX_PANEL_0x45	0x45
+#define NMCRTCX_PANEL_0x46	0x46
+#define NMCRTCX_PANEL_0x47	0x47
+#define NMCRTCX_PANEL_0x48	0x48
+#define NMCRTCX_PANEL_0x49	0x49
+#define NMCRTCX_PANEL_0x4a	0x4a
+#define NMCRTCX_PANEL_0x4b	0x4b
+#define NMCRTCX_PANEL_0x4c	0x4c
+#define NMCRTCX_PANEL_0x4d	0x4d
+#define NMCRTCX_PANEL_0x4e	0x4e
+#define NMCRTCX_PANEL_0x4f	0x4f
+#define NMCRTCX_PANEL_0x50	0x50 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x51	0x51 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x52	0x52 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x53	0x53 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x54	0x54 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x55	0x55 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x56	0x56 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x57	0x57 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x58	0x58 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x59	0x59 /* >= NM2090 */
+#define NMCRTCX_PANEL_0x60	0x60 /* >= NM2097(?) */
+#define NMCRTCX_PANEL_0x61	0x61 /* >= NM2097(?) */
+#define NMCRTCX_PANEL_0x62	0x62 /* >= NM2097(?) */
+#define NMCRTCX_PANEL_0x63	0x63 /* >= NM2097(?) */
+#define NMCRTCX_PANEL_0x64	0x64 /* >= NM2097(?) */
 #define NMCRTCX_VEXT		0x70 /* >= NM2200 */
 
 /* neomagic ISA SEQUENCER indexed registers */
