@@ -453,7 +453,7 @@ net_server_deselect(void *cookie, uint8 event, selectsync *sync)
 		memset(&args, 0, sizeof(args));
 		args.notify_port = -1;	// stop notifying
 		args.cookie = cookie;	// for sanity check
-		status = execute_command(nsc, NET_STACK_NOTIFY_SOCKET_EVENT, NULL, -1);
+		status = execute_command(nsc, NET_STACK_NOTIFY_SOCKET_EVENT, &args, sizeof(args));
 	};
 
 	// unlock the selecters list
