@@ -117,7 +117,7 @@ AppServer::AppServer(void)
 	// Load the GUI colors here and set the global set to the values contained therein. If this
 	// is not possible, set colors to the defaults
 	if(!LoadGUIColors(&gui_colorset))
-		SetDefaultGUIColors(&gui_colorset);
+		gui_colorset.SetToDefaults();
 
 	InitDecorators();
 		
@@ -349,11 +349,17 @@ void AppServer::MainLoop(void)
 				case B_QUIT_REQUESTED:
 				case AS_UPDATED_CLIENT_FONTLIST:
 				case AS_QUERY_FONTS_CHANGED:
+				case AS_SET_UI_COLORS:
+				case AS_GET_UI_COLOR:
+				case AS_SET_DECORATOR:
+				case AS_GET_DECORATOR:
+				case AS_R5_SET_DECORATOR:
 					DispatchMessage(&pmsg);
 					break;
 				default:
 				{
-					printf("Server::MainLoop received unexpected code %ld\n",pmsg.Code());
+					printf("Server::MainLoop received unexpected code %ld(offset %ld)\n",
+							pmsg.Code(),pmsg.Code()-SERVER_TRUE);
 					break;
 				}
 			}
@@ -588,6 +594,37 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			write_port(replyport, (needs_update)?SERVER_TRUE:SERVER_FALSE, NULL,0);
 			break;
 		}
+		case AS_SET_UI_COLORS:
+		{
+			// TODO: Unpack the colors and set the color set to such
+			printf("AppServer::AS_SET_UI_COLORS unimplemented\n");
+			break;
+		}
+		case AS_GET_UI_COLOR:
+		{
+			// TODO: get a partiular UI color and return it to the sender
+			printf("AppServer::AS_GET_UI_COLOR unimplemented\n");
+			break;
+		}
+		case AS_SET_DECORATOR:
+		{
+			// TODO: set up window decorator notification stuff here
+			printf("AppServer::AS_SET_DECORATOR unimplemented\n");
+			break;
+		}
+		case AS_GET_DECORATOR:
+		{
+			// TODO: get window decorator and return it to the sender
+			printf("AppServer::AS_GET_DECORATOR unimplemented\n");
+			break;
+		}
+		case AS_R5_SET_DECORATOR:
+		{
+			// TODO: Implement. This will translate the codes to names of the
+			// decorators and perform the same actions as AS_SET_DECORATOR
+			printf("AppServer::AS_R5_SET_DECORATOR unimplemented\n");
+			break;
+		}
 		case AS_GET_SCREEN_MODE:
 		{
 			// Synchronous message call to get the stats on the current screen mode
@@ -701,7 +738,7 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			int32 scancode=*((int32*)index); index+=sizeof(int32) * 3;
 			int32 modifiers=*((int32*)index); index+=sizeof(int32) + (sizeof(int8) * 3);
 			int8 stringlength=*index; index+=stringlength;
-STRACE(("Key Down: 0x%lx\n",scancode));
+			STRACE(("Key Down: 0x%lx\n",scancode));
 			if(DISPLAYDRIVER == HWDRIVER)
 			{
 				// Check for workspace change or safe video mode
@@ -713,7 +750,7 @@ STRACE(("Key Down: 0x%lx\n",scancode));
 							B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY))
 						{
 							// TODO: Set to Safe Mode here. (DisplayDriver API change)
-STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
 							break;
 						}
 					}
@@ -721,7 +758,7 @@ STRACE(("Safe Video Mode invoked - code unimplemented\n"));
 			
 				if(modifiers & B_CONTROL_KEY)
 				{
-STRACE(("Set Workspace %ld\n",scancode-1));
+					STRACE(("Set Workspace %ld\n",scancode-1));
 					SetWorkspace(scancode-2);
 					break;
 				}	
@@ -769,13 +806,13 @@ STRACE(("Set Workspace %ld\n",scancode-1));
 						if(modifiers & (B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY | B_LEFT_OPTION_KEY))
 						{
 							// TODO: Set to Safe Mode here. (DisplayDriver API change)
-STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
 							break;
 						}
 					}
 					if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
 					{
-STRACE(("Set Workspace %ld\n",scancode-1));
+						STRACE(("Set Workspace %ld\n",scancode-1));
 						SetWorkspace(scancode-2);
 						break;
 					}	
@@ -784,7 +821,7 @@ STRACE(("Set Workspace %ld\n",scancode-1));
 				//Tab
 				if(scancode==0x26 && (modifiers & B_SHIFT_KEY))
 				{
-STRACE(("Twitcher\n"));
+					STRACE(("Twitcher\n"));
 					ServerApp *deskbar=FindApp("application/x-vnd.Be-TSKB");
 					if(deskbar)
 					{
@@ -840,7 +877,7 @@ STRACE(("Twitcher\n"));
 			int32 scancode=*((int32*)index); index+=sizeof(int32) * 3;
 			int32 modifiers=*((int32*)index); index+=sizeof(int8) * 3;
 			int8 stringlength=*index; index+=stringlength + sizeof(int8);
-STRACE(("Key Up: 0x%lx\n",scancode));
+			STRACE(("Key Up: 0x%lx\n",scancode));
 			
 			if(DISPLAYDRIVER==HWDRIVER)
 			{
