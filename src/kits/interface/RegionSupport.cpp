@@ -54,6 +54,8 @@ const int32 kMaxVerticalExtent = 0x10000000;
  	#define CALLED()
 #endif
 
+using namespace std;
+
 
 /*!	\brief zeroes the given region, setting its rect count to 0,
 	and invalidating its bound rectangle.
