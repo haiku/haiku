@@ -7,6 +7,7 @@
 #include <KernelExport.h>
 #endif
 
+#include "core_private.h"
 #include <sys/socket.h>
 #include <net_socket.h>
 #include <pools.h>

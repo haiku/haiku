@@ -308,11 +308,4 @@ void dump_freelist(void);
 /* XXX - add me! */
 
 
-struct pool_ctl *mbpool;
-struct pool_ctl *clpool;
-
-int     max_hdr;		/* largest link+protocol header */
-int	max_linkhdr;		/* largest link level header */
-int 	max_protohdr;		/* largest protocol header */
-
 #endif /* OBOS_MBUF_H */

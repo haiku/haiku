@@ -15,6 +15,12 @@
 #	define start_rx_thread	   core->start_rx_thread
 #	define start_tx_thread	   core->start_tx_thread
 
+#	define get_max_hdr         core->get_max_hdr
+#	define set_max_linkhdr     core->set_max_linkhdr
+#	define get_max_linkhdr     core->get_max_linkhdr
+#	define set_max_protohdr    core->set_max_protohdr
+#	define get_max_protohdr    core->get_max_protohdr
+
 #   define net_add_timer       core->net_add_timer
 #   define net_remove_timer    core->net_remove_timer
 

@@ -19,6 +19,15 @@
 
 #define MBUF_ALLOCSIZE		4096
 
+
+struct pool_ctl *mbpool;
+struct pool_ctl *clpool;
+
+int max_hdr = 0;		/* largest link+protocol header */
+int max_linkhdr = 0;	/* largest link level header */
+int max_protohdr = 0;	/* largest protocol header */
+
+
 void dump_freelist(void)
 {
 	pool_debug_walk(mbpool);
@@ -31,7 +40,6 @@ void mbinit(void)
 		pool_init(&mbpool, sizeof(struct mbuf));
 	if (!clpool)
 		pool_init(&clpool, MCLBYTES);
-	/* XXX - move me to the protocol init routines! */
 	max_linkhdr = 14;
 	max_protohdr = 40;
 	max_hdr = max_linkhdr + max_protohdr;

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include "core_private.h"
 #include "sys/socket.h"
 #include "sys/socketvar.h"
 #include "sys/sockio.h"

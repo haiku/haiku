@@ -17,6 +17,7 @@
 
 #include <driver_settings.h>
 
+#include "core_private.h"
 #include "core_module.h"
 #include "sys/socket.h"
 #include "sys/socketvar.h"
@@ -63,6 +64,12 @@ static int stop_stack(void);
 static void add_protosw(struct protosw *[], int layer);
 static struct net_module *module_list = NULL;
 
+static int get_max_hdr(void);
+static void set_max_linkhdr(int maxLinkHdr);
+static int get_max_linkhdr(void);
+static void set_max_protohdr(int maxProtoHdr);
+static int get_max_protohdr(void);
+
 /* Wider scoped prototypes */
 int net_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
                void *newp, size_t newlen);
@@ -86,6 +93,12 @@ struct core_module_info core_info = {
 	add_protosw,
 	start_rx_thread,
 	start_tx_thread,
+	
+	get_max_hdr,
+	set_max_linkhdr,
+	get_max_linkhdr,
+	set_max_protohdr,
+	get_max_protohdr,
 	
 	net_add_timer,
 	net_remove_timer,
@@ -334,6 +347,33 @@ void start_tx_thread(struct ifnet *dev)
 		return;
 	}
 	resume_thread(dev->tx_thread);
+}
+
+static int get_max_hdr(void)
+{
+	return max_hdr;
+}
+
+static void set_max_linkhdr(int maxLinkHdr)
+{
+	max_linkhdr = maxLinkHdr;
+	max_hdr = max_linkhdr + max_protohdr;
+}
+
+static int get_max_linkhdr(void)
+{
+	return max_linkhdr;
+}
+
+static void set_max_protohdr(int maxProtoHdr)
+{
+	max_protohdr = maxProtoHdr;
+	max_hdr = max_linkhdr + max_protohdr;
+}
+
+static int get_max_protohdr(void)
+{
+	return max_protohdr;
 }
 
 void net_server_add_device(struct ifnet *ifn)

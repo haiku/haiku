@@ -26,6 +26,13 @@ struct core_module_info {
 	void (*start_rx_thread)(struct ifnet *dev);
 	void (*start_tx_thread)(struct ifnet *dev);
 
+	// functions for the 'max_xxx' values
+	int (*get_max_hdr)(void);
+	void (*set_max_linkhdr)(int maxLinkHdr);
+	int (*get_max_linkhdr)(void);
+	void (*set_max_protohdr)(int maxProtoHdr);
+	int (*get_max_protohdr)(void);
+	
 	/* timer functions */
 	net_timer_id (*net_add_timer)(net_timer_hook ,void *,
 	                              bigtime_t);
