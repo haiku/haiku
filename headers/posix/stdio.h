@@ -148,6 +148,7 @@ extern int		vfscanf(FILE *stream, char const *format, va_list ap);
 
 /* misc */
 extern char		*ctermid(char *controllingTerminal);
+extern char		*cuserid(char *s);
 
 /* temporary files */
 extern char		*tempnam(char *path, char *prefix);
