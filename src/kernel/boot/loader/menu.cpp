@@ -33,11 +33,16 @@ MenuItem::MenuItem(const char *label, Menu *subMenu)
 	fData(NULL),
 	fHelpText(NULL)
 {
+	if (subMenu != NULL)
+		subMenu->fSuperItem = this;
 }
 
 
 MenuItem::~MenuItem()
 {
+	if (fSubMenu != NULL)
+		fSubMenu->fSuperItem = NULL;
+
 	free(const_cast<char *>(fLabel));
 }
 
@@ -139,7 +144,8 @@ Menu::Menu(menu_type type, const char *title)
 	fTitle(title),
 	fCount(0),
 	fIsHidden(true),
-	fType(type)
+	fType(type),
+	fSuperItem(NULL)
 {
 }
 
@@ -195,6 +201,21 @@ int32
 Menu::CountItems() const
 {
 	return fCount;
+}
+
+
+MenuItem *
+Menu::FindItem(const char *label)
+{
+	MenuItemIterator iterator = ItemIterator();
+	MenuItem *item;
+
+	while ((item = iterator.Next()) != NULL) {
+		if (item->Label() != NULL && !strcmp(item->Label(), label))
+			return item;
+	}
+
+	return NULL;
 }
 
 
@@ -304,6 +325,24 @@ Menu::Run()
 //	#pragma mark -
 
 
+static bool
+user_menu_boot_volume(Menu *menu, MenuItem *item)
+{
+	Menu *super = menu->Supermenu();
+	if (super == NULL) {
+		// huh?
+		return true;
+	}
+
+	MenuItem *bootItem = super->ItemAt(super->CountItems() - 1);
+	bootItem->SetEnabled(true);
+	bootItem->Select(true);
+	bootItem->SetData(item->Data());
+
+	return true;
+}
+
+
 static Menu *
 add_boot_volume_menu(Directory *bootVolume)
 {
@@ -322,6 +361,9 @@ add_boot_volume_menu(Directory *bootVolume)
 			char name[B_FILE_NAME_LENGTH];
 			if (volume->GetName(name, sizeof(name)) == B_OK) {
 				menu->AddItem(item = new MenuItem(name));
+				item->SetTarget(user_menu_boot_volume);
+				item->SetData(volume);
+
 				if (volume == bootVolume) {
 					item->SetMarked(true);
 					item->Select(true);
@@ -343,7 +385,7 @@ add_boot_volume_menu(Directory *bootVolume)
 	menu->AddSeparatorItem();
 
 	menu->AddItem(item = new MenuItem("Rescan volumes"));
-	item->SetHelpText("Please insert a Haiku CD-ROM or attach a USB disk - depending on your BIOS, you can then boot from them.");
+	item->SetHelpText("Please insert a Haiku CD-ROM or attach a USB disk - depending on your system, you can then boot from them.");
 	item->SetType(MENU_ITEM_NO_CHOICE);
 	item->Select(true);
 
@@ -408,6 +450,11 @@ user_menu(Directory **_bootVolume)
 	}
 
 	menu->Run();
+
+	// See if a new boot device has been selected, and propagate that back
+	if (item->Data() != NULL)
+		*_bootVolume = (Directory *)item->Data();
+
 	return B_OK;
 }
 
