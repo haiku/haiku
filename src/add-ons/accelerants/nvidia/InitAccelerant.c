@@ -260,8 +260,8 @@ status_t CLONE_ACCELERANT(void *data) {
 	/* call the shared initialization code */
 	result = init_common(fd);
 
-	/* setup CRTC functions access */
-	setup_virtualized_crtcs(si->crtc_switch_mode);
+	/* setup CRTC and DAC functions access */
+	setup_virtualized_heads(si->crtc_switch_mode);
 
 	/* bail out if the common initialization failed */
 	if (result != B_OK) goto error1;

@@ -278,7 +278,7 @@ typedef struct {
 		int_buf_info myBufInfo[MAXBUFFERS];	/* extra info on scaler input buffers */
 		overlay_token myToken;				/* scaler is free/in use */
 		benaphore lock;						/* for creating buffers and aquiring overlay unit routines */
-		uint8 crtc;							/* location of overlay unit */
+		bool crtc;							/* location of overlay unit */
 	} overlay;
 
 } shared_info;

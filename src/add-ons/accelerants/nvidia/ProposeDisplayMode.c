@@ -244,7 +244,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	/* Now find the nearest valid pixelclock we actually can setup for the target mode,
 	 * this also makes sure we don't generate more pixel bandwidth than the device can handle */
 	/* calculate settings, but do not actually test anything (that costs too much time!) */
-	result = nv_dac_pix_pll_find(*target,&pix_clock_found,&m,&n,&p,0);
+	result = head1_pix_pll_find(*target,&pix_clock_found,&m,&n,&p,0);
 	/* update the target mode */
 	target->timing.pixel_clock = (pix_clock_found * 1000);	
 

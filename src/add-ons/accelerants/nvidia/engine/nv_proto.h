@@ -1,7 +1,7 @@
 /*general card functions*/
 status_t nv_general_powerup(void);
 status_t nv_set_cas_latency(void);
-void setup_virtualized_crtcs(bool);
+void setup_virtualized_heads(bool);
 status_t nv_general_output_select(bool);
 status_t nv_general_wait_retrace(void);
 status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode);
@@ -109,7 +109,7 @@ status_t nv_acc_wait_idle(void);
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
-status_t nv_bes_to_crtc(uint8 crtc);
+status_t nv_bes_to_crtc(bool crtc);
 status_t nv_bes_init(void);
 status_t nv_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);

@@ -246,6 +246,17 @@ void fake_pins(void)
 	/* find out the BIOS preprogrammed panel use status... */
 	detect_panels();
 
+	/* if no panel, but one analog monitor is detected, and it's on the secondary
+	 * head on dualhead cards, we use that head as primary head */
+	if (si->ps.secondary_head && !si->ps.tmds1_active && !si->ps.tmds2_active)
+	{
+		if (nv_dac2_crt_connected() && !nv_dac_crt_connected())
+		{
+			LOG(2,("INFO: CRTC2 has a monitor only: defaulting to CRTC2 use\n"));
+			si->ps.crtc2_prim = true;
+		}
+	}
+
 	/* select other CRTC for primary head use if specified by user in settings file */
 	if (si->ps.secondary_head && si->settings.switchhead)
 	{

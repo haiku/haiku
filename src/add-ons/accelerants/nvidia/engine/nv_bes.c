@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-2/2004 */
+/* Written by Rudolf Cornelissen 05/2002-4/2004 */
 
 #define MODULE_BIT 0x00000200
 
@@ -8,7 +8,7 @@
 //fixme: implement: (used for virtual screens!)
 //void move_overlay(uint16 hdisp_start, uint16 vdisp_start);
 
-status_t nv_bes_to_crtc(uint8 crtc)
+status_t nv_bes_to_crtc(bool crtc)
 {
 	if (si->ps.secondary_head)
 	{
@@ -18,7 +18,7 @@ status_t nv_bes_to_crtc(uint8 crtc)
 			/* switch overlay engine to CRTC2 */
 			NV_REG32(NV32_FUNCSEL) &= ~0x00001000;
 			NV_REG32(NV32_2FUNCSEL) |= 0x00001000;
-			si->overlay.crtc = 1;
+			si->overlay.crtc = !si->crtc_switch_mode;
 		}
 		else
 		{
@@ -26,7 +26,7 @@ status_t nv_bes_to_crtc(uint8 crtc)
 			/* switch overlay engine to CRTC1 */
 			NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
 			NV_REG32(NV32_FUNCSEL) |= 0x00001000;
-			si->overlay.crtc = 0;
+			si->overlay.crtc = si->crtc_switch_mode;
 		}
 		return B_OK;
 	}

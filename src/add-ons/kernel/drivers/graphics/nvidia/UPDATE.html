@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.10-13), (Rudolf)</h1></p>
+<p><h1>head (0.10-14), (Rudolf)</h1></p>
 <ul>
 	<li>Implemented laptop internal flatpanel presence and native resolution detection;
 	<li>Implemented external DVI flatpanel(s) presence and native resolution detection;
@@ -20,10 +20,14 @@
 	<li>Added flatpanel DPMS support for both heads via powerup/powerdown of LVDS and TMDS transmitters;
 	<li>Added panel(s) native mode(s) to the modelist exported by the driver. You can now set it (them) by just selecting it from the Screenprefs app, <strong>except</strong> if you use the native R5 one. Use Dualhead setup instead (for example): the extra mode(s) will be at the bottom of the list;
 	<li>Removed a bug in the panel detection code and added a bit more logging;
-	<li>Implemented virtualized CRTC1 and CRTC2 access: when one flatpanel is found on a card that panel is primary output now; dualhead switch mode is operational with flatpanels now; and the user has the option to select the primary output via nv.settings now (via the new 'switchhead' option).
+	<li>Implemented virtualized CRTC1/DAC1 and CRTC2/DAC2 access: when one flatpanel is found on a card that panel is always primary output now;
+	<li>Dualhead switch mode is operational with flatpanels now (via the virtualized setup);
+	<li>The user has the option to select the primary output via nv.settings now (via the new 'switchhead' option);
+	<li>Modified analog type monitor detection to work the same as for digital panels (detect on bootup only);
+	<li>Added dualhead switch mode for NV11 (works via virtualized head access implemented now);
+	<li>Modified dualhead switch mode for all other cards to work via the virtualized head access also;
+	<li>Modified overlay to work correctly with the virtualized setup.
 </ul>
-WARNING:<br>
-Driver 0.10-13 has yet to be actually tested and updated to correct bugs!!
 <p><h1>nv_driver 0.09, (Rudolf)</h1></p>
 <ul>
 	<li>Fixed NV11 trouble with repeating screen(s) on the right side of the monitor;

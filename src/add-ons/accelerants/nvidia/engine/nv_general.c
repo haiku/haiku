@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-13 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-14 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -690,7 +690,7 @@ status_t nv_set_cas_latency()
 	return result;
 }
 
-void setup_virtualized_crtcs(bool cross)
+void setup_virtualized_heads(bool cross)
 {
 	if (cross)
 	{
@@ -707,6 +707,11 @@ void setup_virtualized_crtcs(bool cross)
 		head1_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
 		head1_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
 
+		head1_mode				= (dac_mode)				nv_dac2_mode;
+		head1_palette			= (dac_palette)				nv_dac2_palette;
+		head1_set_pix_pll		= (dac_set_pix_pll)			nv_dac2_set_pix_pll;
+		head1_pix_pll_find		= (dac_pix_pll_find)		nv_dac2_pix_pll_find;
+
 		head2_validate_timing	= (crtc_validate_timing)	nv_crtc_validate_timing;
 		head2_set_timing		= (crtc_set_timing)			nv_crtc_set_timing;
 		head2_depth				= (crtc_depth)				nv_crtc_depth;
@@ -719,6 +724,11 @@ void setup_virtualized_crtcs(bool cross)
 		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc_cursor_hide;
 		head2_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
 		head2_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
+
+		head2_mode				= (dac_mode)				nv_dac_mode;
+		head2_palette			= (dac_palette)				nv_dac_palette;
+		head2_set_pix_pll		= (dac_set_pix_pll)			nv_dac_set_pix_pll;
+		head2_pix_pll_find		= (dac_pix_pll_find)		nv_dac_pix_pll_find;
 	}
 	else
 	{
@@ -735,6 +745,11 @@ void setup_virtualized_crtcs(bool cross)
 		head1_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
 		head1_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
 
+		head1_mode				= (dac_mode)				nv_dac_mode;
+		head1_palette			= (dac_palette)				nv_dac_palette;
+		head1_set_pix_pll		= (dac_set_pix_pll)			nv_dac_set_pix_pll;
+		head1_pix_pll_find		= (dac_pix_pll_find)		nv_dac_pix_pll_find;
+
 		head2_validate_timing	= (crtc_validate_timing)	nv_crtc2_validate_timing;
 		head2_set_timing		= (crtc_set_timing)			nv_crtc2_set_timing;
 		head2_depth				= (crtc_depth)				nv_crtc2_depth;
@@ -747,6 +762,11 @@ void setup_virtualized_crtcs(bool cross)
 		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc2_cursor_hide;
 		head2_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
 		head2_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
+
+		head2_mode				= (dac_mode)				nv_dac2_mode;
+		head2_palette			= (dac_palette)				nv_dac2_palette;
+		head2_set_pix_pll		= (dac_set_pix_pll)			nv_dac2_set_pix_pll;
+		head2_pix_pll_find		= (dac_pix_pll_find)		nv_dac2_pix_pll_find;
 	}
 }
 
@@ -764,8 +784,8 @@ static status_t nvxx_general_powerup()
 	/* log the PINS struct settings */
 	dump_pins();
 
-	/* setup CRTC functions access: determined in parse_pins/fake_pins */
-	setup_virtualized_crtcs(si->ps.crtc2_prim);
+	/* setup CRTC and DAC functions access: determined in parse_pins/fake_pins */
+	setup_virtualized_heads(si->ps.crtc2_prim);
 
 	/* if the user doesn't want a coldstart OR the BIOS pins info could not be found warmstart */
 //temp:
@@ -861,7 +881,8 @@ status_t nv_general_output_select(bool cross)
 	{
 		/* NV11 cards can't switch heads; we lack info to switch heads via outputs
 		 * if flatpanels are used */
-		if ((si->ps.card_type != NV11) && !si->ps.tmds1_active && !si->ps.tmds2_active)
+		//fixme: nolonger used: will be removed later on.
+		if (0)//(si->ps.card_type != NV11) && !si->ps.tmds1_active && !si->ps.tmds2_active)
 		{
 			if (cross)
 			{
@@ -913,8 +934,8 @@ status_t nv_general_output_select(bool cross)
 				LOG(4,("INIT: switching CRTC use to be straight-through\n"));
 				si->crtc_switch_mode = si->ps.crtc2_prim;
 			}
-			/* update CRTC functions access */
-			setup_virtualized_crtcs(si->crtc_switch_mode);
+			/* update CRTC and DAC functions access */
+			setup_virtualized_heads(si->crtc_switch_mode);
 		}
 		return B_OK;
 	}
@@ -979,7 +1000,7 @@ status_t nv_general_bios_to_powergraphics()
 		NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
 		NV_REG32(NV32_FUNCSEL) |= 0x00001000;
 	}
-	si->overlay.crtc = 0;
+	si->overlay.crtc = false;
 
 	/* enable 'enhanced' mode on primary head: */
 	/* enable access to primary head */

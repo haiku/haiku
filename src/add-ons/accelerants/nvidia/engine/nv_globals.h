@@ -23,6 +23,11 @@ typedef status_t (*crtc_cursor_hide)(void);
 typedef status_t (*crtc_cursor_define)(uint8*, uint8*);
 typedef status_t (*crtc_cursor_position)(uint16, uint16);
 
+typedef status_t (*dac_mode)(int, float);
+typedef status_t (*dac_palette)(uint8[256], uint8[256], uint8[256]);
+typedef status_t (*dac_set_pix_pll)(display_mode);
+typedef status_t (*dac_pix_pll_find)(display_mode, float*, uint8*, uint8*, uint8*, uint8);
+
 crtc_validate_timing 	head1_validate_timing;
 crtc_set_timing 		head1_set_timing;
 crtc_depth				head1_depth;
@@ -48,3 +53,13 @@ crtc_cursor_show		head2_cursor_show;
 crtc_cursor_hide		head2_cursor_hide;
 crtc_cursor_define		head2_cursor_define;
 crtc_cursor_position	head2_cursor_position;
+
+dac_mode				head1_mode;
+dac_palette				head1_palette;
+dac_set_pix_pll			head1_set_pix_pll;
+dac_pix_pll_find		head1_pix_pll_find;
+
+dac_mode				head2_mode;
+dac_palette				head2_palette;
+dac_set_pix_pll			head2_set_pix_pll;
+dac_pix_pll_find		head2_pix_pll_find;

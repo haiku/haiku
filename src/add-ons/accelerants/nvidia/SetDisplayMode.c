@@ -52,7 +52,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	status_t result;
 	uint32 startadd,startadd_right;
 	bool display, h, v;
-	bool crt1, crt2, cross;
+//	bool crt1, crt2, cross;
 
 	/* Adjust mode to valid one and fail if invalid */
 	target /*= bounds*/ = *mode_to_set;
@@ -109,16 +109,43 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			LOG(1,("SETMODE: blocking TVout: no TVout cable connected!\n"));
 		}
 
+		/* detect which connectors have a CRT connected */
+		//fixme: 'hot-plugging' for analog monitors removed: remove code as well;
+		//or make it work with digital panels connected as well.
+//		crt1 = nv_dac_crt_connected();
+//		crt2 = nv_dac2_crt_connected();
+		/* connect outputs 'straight-through' */
+//		if (crt1)
+//		{
+			/* connector1 is used as primary output */
+//			cross = false;
+//		}
+//		else
+//		{
+//			if (crt2)
+				/* connector2 is used as primary output */
+//				cross = true;
+//			else
+				/* no CRT detected: assume connector1 is used as primary output */
+//				cross = false;
+//		}
+		/* set output connectors assignment if possible */
+		if ((target.flags & DUALHEAD_BITS) == DUALHEAD_SWITCH)
+			/* invert output assignment in switch mode */
+			nv_general_output_select(true);
+		else
+			nv_general_output_select(false);
+
 		/* set the pixel clock PLL(s) */
 		LOG(8,("SETMODE: target clock %dkHz\n",target.timing.pixel_clock));
-		if (nv_dac_set_pix_pll(target) == B_ERROR)
+		if (head1_set_pix_pll(target) == B_ERROR)
 			LOG(8,("SETMODE: error setting pixel clock (internal DAC)\n"));
 
 		/* we do not need to set the pixelclock here for a head that's in TVout mode */
 		if (!(target2.flags & TV_BITS))
 		{
 			LOG(8,("SETMODE: target2 clock %dkHz\n",target2.timing.pixel_clock));
-			if (nv_dac2_set_pix_pll(target2) == B_ERROR)
+			if (head2_set_pix_pll(target2) == B_ERROR)
 				LOG(8,("SETMODE: error setting pixel clock (DAC2)\n"));
 		}
 
@@ -127,22 +154,22 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		{
 		case B_CMAP8:
 			colour_depth1 =  8;
-			nv_dac_mode(BPP8, 1.0);
+			head1_mode(BPP8, 1.0);
 			head1_depth(BPP8);
 			break;
 		case B_RGB15_LITTLE:
 			colour_depth1 = 16;
-			nv_dac_mode(BPP15, 1.0);
+			head1_mode(BPP15, 1.0);
 			head1_depth(BPP15);
 			break;
 		case B_RGB16_LITTLE:
 			colour_depth1 = 16;
-			nv_dac_mode(BPP16, 1.0);
+			head1_mode(BPP16, 1.0);
 			head1_depth(BPP16);
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth1 = 32;
-			nv_dac_mode(BPP32, 1.0);
+			head1_mode(BPP32, 1.0);
 			head1_depth(BPP32);
 			break;
 		}
@@ -151,22 +178,22 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		{
 		case B_CMAP8:
 			colour_depth2 =  8;
-			nv_dac2_mode(BPP8, 1.0);
+			head2_mode(BPP8, 1.0);
 			head2_depth(BPP8);
 			break;
 		case B_RGB15_LITTLE:
 			colour_depth2 = 16;
-			nv_dac2_mode(BPP15, 1.0);
+			head2_mode(BPP15, 1.0);
 			head2_depth(BPP15);
 			break;
 		case B_RGB16_LITTLE:
 			colour_depth2 = 16;
-			nv_dac2_mode(BPP16, 1.0);
+			head2_mode(BPP16, 1.0);
 			head2_depth(BPP16);
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth2 = 32;
-			nv_dac2_mode(BPP32, 1.0);
+			head2_mode(BPP32, 1.0);
 			head2_depth(BPP32);
 			break;
 		}
@@ -184,31 +211,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 		/*work out where the "right" screen starts*/
 		startadd_right = startadd + (target.timing.h_display * (colour_depth1 >> 3));
-
-		/* detect which connectors have a CRT connected */
-		crt1 = nv_dac_crt_connected();
-		crt2 = nv_dac2_crt_connected();
-		/* connect outputs 'straight-through' */
-		if (crt1)
-		{
-			/* connector1 is used as primary output */
-			cross = false;
-		}
-		else
-		{
-			if (crt2)
-				/* connector2 is used as primary output */
-				cross = true;
-			else
-				/* no CRT detected: assume connector1 is used as primary output */
-				cross = false;
-		}
-		/* set output connectors assignment if possible */
-		if ((target.flags & DUALHEAD_BITS) == DUALHEAD_SWITCH)
-			/* invert output assignment in switch mode */
-			nv_general_output_select(!cross);
-		else
-			nv_general_output_select(cross);
 
 		/* Tell card what memory to display */
 		switch (target.flags & DUALHEAD_BITS)
@@ -236,7 +238,34 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	{
 		status_t status;
 		int colour_mode = BPP32;
-		
+
+		/* connect output */
+		if (si->ps.secondary_head)
+		{
+			/* detect which connectors have a CRT connected */
+			//fixme: 'hot-plugging' for analog monitors removed: remove code as well;
+			//or make it work with digital panels connected as well.
+//			crt1 = nv_dac_crt_connected();
+//			crt2 = nv_dac2_crt_connected();
+			/* connect outputs 'straight-through' */
+//			if (crt1)
+//			{
+				/* connector1 is used as primary output */
+//				cross = false;
+//			}
+//			else
+//			{
+//				if (crt2)
+					/* connector2 is used as primary output */
+//					cross = true;
+//				else
+					/* no CRT detected: assume connector1 is used as primary output */
+//					cross = false;
+//			}
+			/* set output connectors assignment if possible */
+			nv_general_output_select(false);
+		}
+
 		switch(target.space)
 		{
 		case B_CMAP8:        colour_depth1 =  8; colour_mode = BPP8;  break;
@@ -249,7 +278,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* set the pixel clock PLL */
-		status = nv_dac_set_pix_pll(target);
+		status = head1_set_pix_pll(target);
 
 		if (status==B_ERROR)
 			LOG(8,("CRTC: error setting pixel clock (internal DAC)\n"));
@@ -258,7 +287,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* first set the colordepth */
 		head1_depth(colour_mode);
 		/* then(!) program the PAL (<8bit colordepth does not support 8bit PAL) */
-		nv_dac_mode(colour_mode,1.0);
+		head1_mode(colour_mode,1.0);
 
 		/* set the display pitch */
 		head1_set_display_pitch();
@@ -268,31 +297,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 		/* set the timing */
 		head1_set_timing(target);
-
-		/* connect output */
-		if (si->ps.secondary_head)
-		{
-			/* detect which connectors have a CRT connected */
-			crt1 = nv_dac_crt_connected();
-			crt2 = nv_dac2_crt_connected();
-			/* connect outputs 'straight-through' */
-			if (crt1)
-			{
-				/* connector1 is used as primary output */
-				cross = false;
-			}
-			else
-			{
-				if (crt2)
-					/* connector2 is used as primary output */
-					cross = true;
-				else
-					/* no CRT detected: assume connector1 is used as primary output */
-					cross = false;
-			}
-			/* set output connectors assignment if possible */
-			nv_general_output_select(cross);
-		}
 
 		//fixme: shut-off the videoPLL if it exists...
 	}
@@ -427,8 +431,8 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 		b[i]=*color_data++;
 		i++;	
 	}
-	nv_dac_palette(r,g,b);
-	if (si->dm.flags & DUALHEAD_BITS) nv_dac2_palette(r,g,b);
+	head1_palette(r,g,b);
+	if (si->dm.flags & DUALHEAD_BITS) head2_palette(r,g,b);
 }
 
 /* Put the display into one of the Display Power Management modes. */
