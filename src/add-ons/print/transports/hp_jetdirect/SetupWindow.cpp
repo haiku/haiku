@@ -99,7 +99,7 @@ void SetupView::AttachedToWindow()
 
 	/* queue name box */
 
-	queue = new BTextControl(QUEUE_RECT, "", QUEUE_TEXT, "", NULL);
+	queue = new BTextControl(QUEUE_RECT, "", QUEUE_TEXT, "9100", NULL);	// 9100 is default HP JetDirect port number
 	AddChild(queue);
 	queue->SetDivider(width);
 
