@@ -1,5 +1,8 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers ;
 
 SubInclude OBOS_TOP src add-ons kernel bus_managers config_manager ;
+SubInclude OBOS_TOP src add-ons kernel bus_managers ide ;
+SubInclude OBOS_TOP src add-ons kernel bus_managers isa ;
 SubInclude OBOS_TOP src add-ons kernel bus_managers pci ;
+SubInclude OBOS_TOP src add-ons kernel bus_managers scsi ;
 SubInclude OBOS_TOP src add-ons kernel bus_managers usb ;
