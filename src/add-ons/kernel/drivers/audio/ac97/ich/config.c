@@ -90,6 +90,9 @@ status_t probe_device(void)
 		} else if (pciinfo->vendor_id == 0x8086 && pciinfo->device_id == 0x24C5) { /* verified */
 			config->name = "Intel 82801DB (ICH4)";
 			config->type = TYPE_ICH4;
+		} else if (pciinfo->vendor_id == 0x8086 && pciinfo->device_id == 0x24D5) { /* verified */
+			config->name = "Intel 82801EB (ICH5), Intel 82801ER (ICH5R)";
+			config->type = TYPE_ICH4; // ICH5 works like ICH4
 		} else if (pciinfo->vendor_id == 0x1039 && pciinfo->device_id == 0x7012) { /* verified */
 			config->name = "SiS SI7012";
 			config->type = TYPE_SIS7012;

@@ -27,6 +27,7 @@
  */
 #include <OS.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <MediaDefs.h>
 #include "ac97.h"
 #include "debug.h"
@@ -437,11 +438,11 @@ ac97_detect_capabilities(ac97_dev *dev)
 		dev->capabilities |= CAP_LFE_DAC;
 	if (val & EXID_AMAP)
 		dev->capabilities |= CAP_AMAP;
-	if (val & (EXID_REV0 | EXID_REV1) == 0)
+	if ((val & (EXID_REV0 | EXID_REV1)) == 0)
 		dev->capabilities |= CAP_REV21;
-	if (val & (EXID_REV0 | EXID_REV1) == EXID_REV0)
+	if ((val & (EXID_REV0 | EXID_REV1)) == EXID_REV0)
 		dev->capabilities |= CAP_REV22;
-	if (val & (EXID_REV0 | EXID_REV1) == EXID_REV1)
+	if ((val & (EXID_REV0 | EXID_REV1)) == EXID_REV1)
 		dev->capabilities |= CAP_REV23;
 		
 	ac97_detect_rates(dev);
