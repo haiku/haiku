@@ -57,8 +57,8 @@ putenv(const char *string)
 		errno = EINVAL;
 		return -1;
 	}
-	
-	strlcpy(name, string, value - string);
+
+	strlcpy(name, string, value + 1 - string);
 	value++;
 
 	return setenv(name, value, true);
