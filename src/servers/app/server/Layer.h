@@ -134,7 +134,7 @@ protected:
 			
 			DisplayDriver		*fDriver;
 			LayerData			*_layerdata;
-			RGBColor			fBackColor;
+//			RGBColor			fBackColor;
 
 			RootLayer*			fRootLayer;
 };
