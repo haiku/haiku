@@ -7,8 +7,6 @@
 
 #include <View.h>
 
-class OffscreenView;
-
 class ShowImageView : public BView
 {
 public:
@@ -23,20 +21,11 @@ public:
 	virtual void FrameResized(float width, float height);	
 	virtual void MessageReceived(BMessage* message);
 	
-	virtual void MouseDown( BPoint point );
-	virtual void MouseUp( BPoint point );
-	virtual void MouseMoved( BPoint point, uint32 transit, const BMessage *message );
-	virtual void Pulse(void);
-	
 	void FixupScrollBars();
 	
 	BMenuBar* 	pBar;	
 	
 private:
-	bool 		Selecting, Selected, PointOn;
-	
-	BRect       SelectedRect, LastPoint, PointRecOn;
-	BPoint 		IniPoint, EndPoint;
 	
 	BBitmap* 	m_pBitmap;
 };
