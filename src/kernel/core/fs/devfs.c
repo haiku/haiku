@@ -14,7 +14,7 @@
 #include <vm.h>
 #include <Errors.h>
 #include <kerrors.h>
-#include <drivers.h>
+#include <Drivers.h>
 #include <sys/stat.h>
 
 #include <arch/cpu.h>
