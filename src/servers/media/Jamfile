@@ -22,9 +22,10 @@ Server media_server :
 	AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp
+	
+	: be libmedia.so
 ;
-LinkSharedOSLibs media_server : be libmedia.so ;
 
 SEARCH on [ FGristFiles AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp
-	NodeMonitorHandler.cpp ] += [ FDirName $(SUBDIR) .. .. kits storage ] ;
+	NodeMonitorHandler.cpp ] += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;
