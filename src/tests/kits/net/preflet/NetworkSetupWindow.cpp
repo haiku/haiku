@@ -26,6 +26,7 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	BCheckBox 	*check;
 	BRect		r;
 	float		x, w, h;
+	float		size, min_size = 360;
 
 	// TODO: cleanup this mess!
 
@@ -59,6 +60,8 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	menu_field->ResizeToPreferred();
 	menu_field->GetPreferredSize(&w, &h);
 
+	size = w;
+
 	button = new BButton(r, "manage_profiles", MANAGE_PROFILES_LABEL,
 					new BMessage(MANAGE_PROFILES_MSG),
 					B_FOLLOW_TOP | B_FOLLOW_RIGHT);
@@ -66,6 +69,10 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	button->ResizeToPreferred();
 	button->MoveTo(r.right - w, r.top);
 	top_box->AddChild(button);
+	
+	size += SMALL_MARGIN + w;
+	
+	min_size = max_c(min_size, (H_MARGIN + size + H_MARGIN));
 	
 	r.top += h + V_MARGIN;
 
@@ -90,6 +97,9 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	menu_field->ResizeToPreferred();
 	menu_field->GetPreferredSize(&w, &h);
 	r.top += h+1 + V_MARGIN;
+	
+	min_size = max_c(min_size, (H_MARGIN + w + H_MARGIN));
+	
 
 	r = fMinAddonViewRect.OffsetByCopy(H_MARGIN, r.top);
 	fPanel = new BBox(r, "showview_box", B_FOLLOW_NONE,
@@ -118,6 +128,8 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	check->SetValue(B_CONTROL_ON);
 	check->MoveTo(H_MARGIN, r.top);
 	bottom_box->AddChild(check);
+	
+	size = w;
 
 	button = new BButton(r, "apply_now", APPLY_NOW_LABEL,
 					new BMessage(APPLY_NOW_MSG),
@@ -130,6 +142,8 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	fApplyNowButton = button;
 	
+	size += SMALL_MARGIN + w;
+	
 	button = new BButton(r, "revert", REVERT_LABEL,
 					new BMessage(REVERT_MSG),
 					B_FOLLOW_TOP | B_FOLLOW_RIGHT);
@@ -140,22 +154,29 @@ NetworkSetupWindow::NetworkSetupWindow(const char *title)
 
 	fRevertButton = button;
 	fRevertButton->SetEnabled(false);
+
+	size += SMALL_MARGIN + w;
+
+	min_size = max_c(min_size, (H_MARGIN + size + H_MARGIN));
 	
 	r.bottom = r.top + h;
 	r.InsetBy(-H_MARGIN, -V_MARGIN);
-	bottom_box->ResizeTo(Bounds().Width(), r.Height());
 	
-	// Set default/minimal window size
+	bottom_box->ResizeTo(Bounds().Width(), r.Height());
+
+	// Resize window to enclose top and bottom boxes
 	ResizeTo(Bounds().Width(), bottom_box->Frame().bottom);
-	SetSizeLimits(Bounds().Width(), 20000, Bounds().Height(), 20000);	
 	
 	// Enable boxes resizing modes
 	top_box->SetResizingMode(B_FOLLOW_ALL);
 	fPanel->SetResizingMode(B_FOLLOW_ALL);
 	bottom_box->SetResizingMode(B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
+
+	// Set default/minimal window size
+	ResizeTo(min_size, Bounds().Height());
+	SetSizeLimits(min_size, 20000, Bounds().Height(), 20000);	
 	
 	fAddonView = NULL;
-
 }
 
 
@@ -359,7 +380,8 @@ void NetworkSetupWindow::BuildShowMenu
 			path.Append(search_path + 3);
 		} else {
 			path.SetTo(search_path);
-			path.Append("boneyard");
+			path.Append("network_setup");
+			// path.Append("boneyard");
 		};
 
 		search_path = strtok_r(NULL, ":", &next_path_token);

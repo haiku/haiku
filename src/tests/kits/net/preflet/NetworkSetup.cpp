@@ -4,8 +4,8 @@
 
 #include "NetworkSetupWindow.h"
 
-#define SOFTWARE_EDITOR			"obos"
-#define SOFTWARE_NAME			"Network Setup"
+#define SOFTWARE_EDITOR			"Haiku"
+#define SOFTWARE_NAME			"Network Settings"
 #define SOFTWARE_VERSION_LABEL	"0.1.0 alpha"
 
 const char * APPLICATION_SIGNATURE = "application/x-vnd." SOFTWARE_EDITOR "-" SOFTWARE_NAME;
