@@ -208,7 +208,7 @@ Painter::SetScale(float scale)
 	_RebuildClipping();
 }
 
-// SetScale
+// SetPenSize
 void
 Painter::SetPenSize(float size)
 {
@@ -451,9 +451,6 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius,
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
 	rect.radius(xRadius, yRadius);
 
-//	agg::conv_curve<agg::rounded_rect> path(rect);
-
-//	_StrokePath(path, p);
 	_StrokePath(rect, p);
 }
 
@@ -480,9 +477,7 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius,
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
 	rect.radius(xRadius, yRadius);
 
-	agg::conv_curve<agg::rounded_rect> path(rect);
-
-	_FillPath(path, p);
+	_FillPath(rect, p);
 }
 									
 // StrokeEllipse

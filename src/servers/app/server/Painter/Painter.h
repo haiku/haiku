@@ -218,12 +218,6 @@ class Painter {
 
 	agg::rendering_buffer*		fBuffer;
 
-// Man könnte das alles vielleicht wieder schneller machen,
-// wenn man für jeden blending_mode einen eigenen Renderer
-// mit eignenem entsprechenden Pixelformat vorhält.
-// Dann könnten für B_SOLID_HIGH und jegliche andere const pattern&
-// getrennt zwei Versionen von jedem blending_mode existieren.
-
 	// AGG rendering and rasterization classes
 	pixfmt*						fPixelFormat;
 	renderer_base*				fBaseRenderer;
