@@ -18,6 +18,7 @@ StringCountCharTest::~StringCountCharTest()
 void 
 StringCountCharTest::PerformTest(void)
 {
+	//CountChars()
 	NextSubTest();
 	BString string("Something"B_UTF8_ELLIPSIS);
 	CPPUNIT_ASSERT(string.CountChars() == 10);

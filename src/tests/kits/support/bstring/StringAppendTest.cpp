@@ -19,6 +19,7 @@ StringAppendTest::PerformTest(void)
 {
 	BString *str1, *str2;
 	
+	//+=(BString&)
 	NextSubTest();
 	str1 = new BString("BASE");
 	str2 = new BString("APPENDED");
@@ -27,6 +28,7 @@ StringAppendTest::PerformTest(void)
 	delete str1;
 	delete str2;
 	
+	//+=(const char *)
 	NextSubTest();
 	str1 = new BString("Base");
 	*str1 += "APPENDED";
@@ -39,6 +41,7 @@ StringAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "APPENDEDTONOTHING") == 0);
 	delete str1;
 	
+	//char pointer is NULL
 	NextSubTest();
 	char *tmp = NULL;
 	str1 = new BString("Base");
@@ -46,12 +49,14 @@ StringAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "Base") == 0);
 	delete str1;
 	
+	//+=(char)
 	NextSubTest();
 	str1 = new BString("Base");
 	*str1 += 'C';
 	CPPUNIT_ASSERT(strcmp(str1->String(), "BaseC") == 0);
 	delete str1;
-
+	
+	//Append(BString&)
 	NextSubTest();
 	str1 = new BString("BASE");
 	str2 = new BString("APPENDED");
@@ -60,6 +65,7 @@ StringAppendTest::PerformTest(void)
 	delete str1;
 	delete str2;
 	
+	//Append(const char*)
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append("APPENDED");
@@ -72,12 +78,14 @@ StringAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "APPENDEDTONOTHING") == 0);
 	delete str1;
 	
+	//char ptr is NULL
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append(tmp);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "Base") == 0);
 	delete str1;
 	
+	//Append(BString&, int32)
 	NextSubTest();
 	str1 = new BString("BASE");
 	str2 = new BString("APPENDED");
@@ -86,6 +94,7 @@ StringAppendTest::PerformTest(void)
 	delete str1;
 	delete str2;
 	
+	//Append(const char*, int32)
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append("APPENDED", 40);
@@ -93,12 +102,14 @@ StringAppendTest::PerformTest(void)
 	CPPUNIT_ASSERT(str1->Length() == strlen("BaseAPPENDED"));
 	delete str1;
 	
+	//char ptr is NULL
 	NextSubTest();
 	str1 = new BString("BLABLA");
 	str1->Append(tmp, 2);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "BLABLA") == 0);
 	delete str1;
 	
+	//Append(char, int32)
 	NextSubTest();
 	str1 = new BString("Base");
 	str1->Append('C', 5);

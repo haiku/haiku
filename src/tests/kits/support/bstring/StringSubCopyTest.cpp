@@ -20,6 +20,7 @@ StringSubCopyTest::PerformTest(void)
 {
 	BString *string1, *string2;
 	
+	//CopyInto(BString&, int32, int32)
 	NextSubTest();
 	string1 = new BString;
 	string2 = new BString("Something");
@@ -28,6 +29,7 @@ StringSubCopyTest::PerformTest(void)
 	delete string1;
 	delete string2;
 	
+	//CopyInto(const char*, int32, int32)
 	NextSubTest();
 	char tmp[10];
 	memset(tmp, 0, 10);

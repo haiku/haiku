@@ -18,6 +18,7 @@ StringAssignTest::~StringAssignTest()
 void 
 StringAssignTest::PerformTest(void)
 {
+	//=(BString&)
 	NextSubTest();
 	BString string;
 	BString string2("Something");
@@ -25,12 +26,14 @@ StringAssignTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string.String(), string2.String()) == 0);
 	CPPUNIT_ASSERT(strcmp(string.String(), "Something") == 0);
 	
+	//=(const char*)
 	NextSubTest();
 	BString *str = new BString();
 	*str = "Something Else";
 	CPPUNIT_ASSERT(strcmp(str->String(), "Something Else") == 0);
 	delete str;
 	
+	//char ptr is NULL
 	NextSubTest();
 	char *s = NULL;
 	str = new BString;
@@ -38,6 +41,7 @@ StringAssignTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str->String(), "") == 0);
 	delete str;
 	
+	//SetTo(const char *) (NULL)
 	NextSubTest();
 	str = new BString;
 	str->SetTo(s);
@@ -50,12 +54,14 @@ StringAssignTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str->String(), "BLA") == 0);
 	delete str;
 	
+	//SetTo(BString&)
 	NextSubTest();
 	str = new BString;
 	str->SetTo(string);
 	CPPUNIT_ASSERT(strcmp(str->String(), string.String()) == 0);
 	delete str;
 	
+	//SetTo(char, int32)
 	NextSubTest();
 	str = new BString;
 	str->SetTo('C', 10);
@@ -68,12 +74,14 @@ StringAssignTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str->String(), "") == 0);
 	delete str;
 	
+	//SetTo(const char*, int32)
 	NextSubTest();
 	str = new BString;
 	str->SetTo("ABC", 10);
 	CPPUNIT_ASSERT(strcmp(str->String(), "ABC") == 0);
 	delete str;
 	
+	//Adopt(BString&)
 	NextSubTest();
 	const char *oldString2 = string2.String();
 	str = new BString;
