@@ -64,6 +64,9 @@ DBG(OUT("file system: %s\n", moduleName));
 // destructor
 KDiskDeviceManager::~KDiskDeviceManager()
 {
+	// unpublish all partitions (only needed for testing)
+	for (int32 i = 0; KPartition *partition = fPartitions.ItemAt(i); i++)
+		partition->UnpublishDevice();
 }
 
 // InitCheck
@@ -548,6 +551,10 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 char partitionPath[B_PATH_NAME_LENGTH];
 partition->GetPath(partitionPath);
 DBG(OUT("KDiskDeviceManager::_ScanPartition(%s)\n", partitionPath));
+	// publish the partition
+	status_t error = partition->PublishDevice();
+	if (error != B_OK)
+		return error;
 	// find the disk system that returns the best priority for this partition
 	float bestPriority = -1;
 	KDiskSystem *bestDiskSystem = NULL;
@@ -575,7 +582,6 @@ DBG(OUT("  returned: %f\n", priority));
 		}
 	}
 	// now, if we have found a disk system, let it scan the partition
-	status_t error = B_OK;
 	if (bestDiskSystem) {
 DBG(OUT("  scanning with: %s\n", bestDiskSystem->Name()));
 		error = bestDiskSystem->Scan(partition, bestCookie);
