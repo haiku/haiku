@@ -26,6 +26,8 @@ private:
 	BRect topLeft,topRight,bottomLeft,bottomRight;
 	ScreenSaverPrefs pref;
 	thread_id watcher;
+	char frameNum; // Used so that we don't update the screen coord's so often
+				// Ideally, we would get a message when the screen changes. R5 doesn't do this.
 
 	void UpdateRectangles(void);
 	void Cornered(arrowDirection pos);

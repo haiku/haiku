@@ -1,5 +1,6 @@
 #include "OS.h"
 #include "Roster.h"
+#include "Screen.h"
 #include "Application.h"
 #include "SSInputFilter.h"
 
@@ -19,7 +20,7 @@ int32 threadFunc (void *data) {
 	return B_OK; // Should never get here...
 }
 
-SSISFilter::SSISFilter() : enabled(false) {
+SSISFilter::SSISFilter() : current(CENTER),enabled(false),frameNum(0) {
 	pref.LoadSettings();	
 	blank=pref.GetBlankCorner();
 	keep=pref.GetNeverBlankCorner();
@@ -29,7 +30,7 @@ SSISFilter::SSISFilter() : enabled(false) {
 }
 
 void SSISFilter::Invoke(void) {
-	if (current==keep)
+	if ((current==keep) || enabled)
 		return; // If mouse is in this corner, never invoke.
 	be_roster->Launch("application/x-vnd.OBOS-ScreenSaverApp");
 	enabled=true;
@@ -42,16 +43,17 @@ void SSISFilter::Banish(void) {
 }
 
 void SSISFilter::CheckTime(void) {
-	if ((rtc=real_time_clock())>=lastEventTime+blankTime) 
+	if ((rtc=real_time_clock())>=lastEventTime+blankTime)  
 		Invoke();
-	snoozeTime=(enabled)?blankTime:lastEventTime+blankTime-rtc;
+	// If the screen saver is on OR it was time to come on but it didn't (corner), snooze for blankTime
+	// Otherwise, there was an event in the middle of the last snooze, so snooze for the remainder
+	snoozeTime=(enabled || (lastEventTime+blankTime<=rtc))?blankTime:lastEventTime+blankTime-rtc;
 }
 
 
 void SSISFilter::UpdateRectangles(void) {
-	BRegion region;
-	GetScreenRegion(&region);
-	BRect frame=region.Frame();
+	BScreen screen;
+	BRect frame=screen.Frame();
 
 	topLeft.Set(frame.left,frame.top,frame.left+CORNER_SIZE,frame.top+CORNER_SIZE);
 	topRight.Set(frame.right-CORNER_SIZE,frame.top,frame.right,frame.top+CORNER_SIZE);
@@ -67,11 +69,11 @@ void SSISFilter::Cornered(arrowDirection pos) {
 
 filter_result SSISFilter::Filter(BMessage *msg,BList *outList) {
 	lastEventTime=real_time_clock();
-	if (msg->what==B_SCREEN_CHANGED)
-		UpdateRectangles();
-	else if (msg->what==B_MOUSE_MOVED) {
+	if (msg->what==B_MOUSE_MOVED) {
 		BPoint pos;
 		msg->FindPoint("where",&pos);
+		if ((frameNum++ % 32)==0) // Every so many frames, update
+			UpdateRectangles();
 		if (topLeft.Contains(pos)) 
 			Cornered(UPLEFT);
 		else if (topRight.Contains(pos)) 
@@ -81,11 +83,11 @@ filter_result SSISFilter::Filter(BMessage *msg,BList *outList) {
 		else if (bottomRight.Contains(pos)) 
 			Cornered(DOWNRIGHT);
 		else {
-			Cornered(NONE);
+			Cornered(CENTER);
 			Banish();
 			}
 		}
-	else
+	else 
 		Banish();
 }
 
