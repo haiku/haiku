@@ -48,7 +48,7 @@ static module_info *sBuiltInModules[] = {
 	NULL
 };
 
-#define TRACE_MODULE
+//#define TRACE_MODULE
 #ifdef TRACE_MODULE
 #	define TRACE(x) dprintf x
 #else
@@ -493,6 +493,9 @@ recurse_directory(const char *path, const char *searchedName)
 			status = errno == 0 ? B_ENTRY_NOT_FOUND : errno;
 			goto exit;
 		}
+
+		if (!strcmp(dirent->d_name, ".") || !strcmp(dirent->d_name, ".."))
+			continue;
 
 		size = strlen(path) + strlen(dirent->d_name) + 2;	
 		newPath = (char *)malloc(size);
@@ -1273,20 +1276,19 @@ get_module(const char *path, module_info **_info)
 			module->module_image->keep_loaded = true;
 	}
 
-	inc_module_ref_count(module);
-
 	// The state will be adjusted by the call to init_module
 	// if we have just loaded the file
-	if (module->ref_count == 1)
+	if (module->ref_count == 0)
 		status = init_module(module);
 	else
 		status = B_OK;
 
-	recursive_lock_unlock(&sModulesLock);
-
-	if (status == B_OK)
+	if (status == B_OK) {
+		inc_module_ref_count(module);
 		*_info = module->info;
+	}
 
+	recursive_lock_unlock(&sModulesLock);
 	return status;
 
 err:
