@@ -32,6 +32,8 @@ status_t entry_ref_flatten(char* buffer, size_t* size, const entry_ref* ref);
 status_t entry_ref_unflatten(entry_ref* ref, const char* buffer, size_t size);
 status_t entry_ref_swap(char* buffer, size_t size);
 
+size_t calc_padding(size_t size, size_t boundary);
+
 }	// namespace BPrivate
 
 //------------------------------------------------------------------------------

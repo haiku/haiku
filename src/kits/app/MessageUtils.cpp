@@ -138,6 +138,16 @@ status_t entry_ref_swap(char* buffer, size_t size)
 	return B_OK;
 }
 //------------------------------------------------------------------------------
+size_t calc_padding(size_t size, size_t boundary)
+{
+	size_t pad = size % boundary;
+	if (pad)
+	{
+		pad = boundary - pad;
+	}
+	return pad;
+}
+//------------------------------------------------------------------------------
 
 }	// namespace BPrivate
 
