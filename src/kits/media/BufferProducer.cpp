@@ -119,7 +119,6 @@ BBufferProducer::GetLatency(bigtime_t *out_lantency)
 	*out_lantency = 0;
 	cookie = 0;
 	while (B_OK == GetNextOutput(&cookie, &output)) {
-		cookie++;
 		
 		if (output.destination == media_destination::null)
 			continue;
