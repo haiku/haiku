@@ -365,6 +365,7 @@ struct keyboard_device {
 	thread_id device_watcher;
 	kb_settings settings;
 	bool active;
+	bool isAT;
 };
 
 extern "C"
@@ -548,6 +549,9 @@ KeyboardInputDevice::AddDevice(const char *path)
 	device->device_ref.type = B_KEYBOARD_DEVICE;
 	device->device_ref.cookie = device;
 	device->owner = this;
+	device->isAT = false;
+	if (strstr(device->path, "keyboard/at") != NULL)
+		device->isAT = true;
 		
 	input_device_ref *devices[2];
 	devices[0] = &device->device_ref;
@@ -587,7 +591,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 {
 	CALLED();
 	keyboard_device *dev = (keyboard_device *)arg;
-	uint8 buffer[12];
+	uint8 buffer[16];
 	uint32 currentModifiers = 0;
 	uint8 activeDeadKey = 0;
 	Keymap *keymap = &dev->owner->fKeymap;
@@ -601,19 +605,35 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 		LOG("%s\n", __PRETTY_FUNCTION__);
 		
 		if (ioctl(dev->fd, kGetNextKey, &buffer) == B_OK) {
-			at_kbd_io *at_kbd = (at_kbd_io *)buffer;
 			uint32 keycode = 0;
-			if (at_kbd->scancode>0)
-				keycode = at_keycode_map[at_kbd->scancode-1];	
+			bool is_keydown = false;
+			bigtime_t timestamp = 0;
+			
+			LOG("kGetNextKey :");
+			if (dev->isAT) {
+				at_kbd_io *at_kbd = (at_kbd_io *)buffer;
+				if (at_kbd->scancode>0)
+					keycode = at_keycode_map[at_kbd->scancode-1];
+				is_keydown = at_kbd->is_keydown;
+				timestamp = at_kbd->timestamp;
+				LOG(" %02x", at_kbd->scancode);
+			} else {
+				raw_key_info *raw_kbd = (raw_key_info *)buffer;
+				is_keydown = raw_kbd->is_keydown;
+				keycode = raw_kbd->be_keycode;
+			}
+			
+			if (keycode == 0)
+				continue;
 
-			LOG("kGetNextKey : %Ld, %02x, %02x, %02lx, %02x\n", at_kbd->timestamp, at_kbd->scancode, at_kbd->is_keydown, keycode, at_kbd->scancode & 0x80);
-
-			if (at_kbd->is_keydown)
+			LOG(" %Ld, %02x, %02lx\n", timestamp, is_keydown, keycode);
+			
+			if (is_keydown)
 				states[(keycode)>>3] |= (1 << (7 - (keycode & 0x7)));
 			else
 				states[(keycode)>>3] &= (!(1 << (7 - (keycode & 0x7))));
 				
-			if (at_kbd->is_keydown
+			if (is_keydown
 				&& (keycode == 0x34) // DELETE KEY
 				&& (states[0x5c >> 3] & (1 << (7 - (0x5c & 0x7))))
 				&& (states[0x5d >> 3] & (1 << (7 - (0x5d & 0x7))))) {
@@ -621,15 +641,13 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				// show the team monitor
 				// argh we don't have one !
 				
-				// cancel timer	: TODO this should be done by the team monitor
-				if (ioctl(dev->fd, kCancelTimer, NULL)!=B_OK)
-					LOG_ERR("kCancelTimer : NOT OK\n");
-				else
+				// cancel timer only for R5
+				if (ioctl(dev->fd, kCancelTimer, NULL) == B_OK)
 					LOG("kCancelTimer : OK\n");
 			}
 			
-			if (at_kbd->is_keydown
-				&& (keycode == 0x68)) { // MENU KEY
+			if (is_keydown
+				&& (keycode == 0x68)) { // MENU KEY for OpenTracker 5.2.0+
 				
 				BMessenger("application/x-vnd.Be-TSKB").SendMessage('BeMn');
 			}
@@ -637,13 +655,13 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			uint32 modifiers = keymap->Modifier(keycode);
 			if (modifiers 
 				&& ( !(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) 
-					|| at_kbd->is_keydown)) {
+					|| is_keydown)) {
 				BMessage *msg = new BMessage;
-				msg->AddInt64("when", at_kbd->timestamp);
+				msg->AddInt64("when", timestamp);
 				msg->what = B_MODIFIERS_CHANGED;
 				msg->AddInt32("be:old_modifiers", currentModifiers);
-				if ((at_kbd->is_keydown && !(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)))
-					|| (at_kbd->is_keydown && !(currentModifiers & modifiers)))
+				if ((is_keydown && !(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)))
+					|| (is_keydown && !(currentModifiers & modifiers)))
 					currentModifiers |= modifiers;
 				else
 					currentModifiers &= !modifiers;
@@ -662,7 +680,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			}
 		
 			
-			// new behaviour
+			// new dead key behaviour
 			/*if (newDeadKey == 0) {
 				keymap->GetChars(keycode, currentModifiers, activeDeadKey, &str, &numBytes);
 				keymap->GetChars(keycode, 0, 0, &str2, &numBytes2);
@@ -671,18 +689,18 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			if (true) {	
 			*/
 			
-			// R5 like behaviour
+			// R5-like dead key behaviour
 			if (newDeadKey == 0) {
 				keymap->GetChars(keycode, currentModifiers, activeDeadKey, &str, &numBytes);
 				keymap->GetChars(keycode, 0, 0, &str2, &numBytes2);
 			
 				BMessage *msg = new BMessage;
 				if (numBytes>0)
-					msg->what = (at_kbd->is_keydown) ? B_KEY_DOWN : B_KEY_UP;
+					msg->what = is_keydown ? B_KEY_DOWN : B_KEY_UP;
 				else
-					msg->what = (at_kbd->is_keydown) ? B_UNMAPPED_KEY_DOWN : B_UNMAPPED_KEY_UP;
+					msg->what = is_keydown ? B_UNMAPPED_KEY_DOWN : B_UNMAPPED_KEY_UP;
 				
-				msg->AddInt64("when", at_kbd->timestamp);
+				msg->AddInt64("when", timestamp);
 				msg->AddInt32("key", keycode);
 				msg->AddInt32("modifiers", currentModifiers);
 				msg->AddData("states", B_UINT8_TYPE, states, 16);
@@ -696,7 +714,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 						str2 = str;
 					}
 					
-					if ((at_kbd->is_keydown) && (lastKeyCode == keycode)) {
+					if (is_keydown && (lastKeyCode == keycode)) {
 						repeatCount++;
 						msg->AddInt32("be:key_repeat", repeatCount);
 					} else
@@ -710,7 +728,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				delete msg;
 			}
 			
-			if (!at_kbd->is_keydown && !modifiers) {
+			if (!is_keydown && !modifiers) {
 				activeDeadKey = newDeadKey;
 			}
 			lastKeyCode = keycode;
