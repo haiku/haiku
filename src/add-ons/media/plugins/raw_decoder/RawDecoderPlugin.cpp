@@ -7,8 +7,8 @@
 #include "RawDecoderPlugin.h"
 #include "AudioConversion.h"
 
-#define TRACE_THIS 0
-#if TRACE_THIS
+#define TRACE_DECODER
+#ifdef TRACE_DECODER
   #define TRACE printf
 #else
   #define TRACE(a...)
@@ -98,10 +98,11 @@ RawDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	// BeBook says: The codec will find and return in ioFormat its best matching format
 	// => This means, we never return an error, and always change the format values
 	//    that we don't support to something more applicable
-	if (ioDecodedFormat->type == B_MEDIA_RAW_VIDEO)
+	if (fInputFormat.type == B_MEDIA_RAW_VIDEO)
 		return NegotiateVideoOutputFormat(ioDecodedFormat);
-	if (ioDecodedFormat->type == B_MEDIA_RAW_AUDIO)
+	if (fInputFormat.type == B_MEDIA_RAW_AUDIO)
 		return NegotiateAudioOutputFormat(ioDecodedFormat);
+	debugger("RawDecoder::NegotiateOutputFormat: wrong encoded format type");
 	return B_ERROR;
 }
 
@@ -159,9 +160,10 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 			break;
 	}
 
-	fFrameRate = (int32) ioDecodedFormat->u.raw_audio.frame_rate;
 	ioDecodedFormat->u.raw_audio.frame_rate = fInputFormat.u.raw_audio.frame_rate;
 	ioDecodedFormat->u.raw_audio.channel_count = fInputFormat.u.raw_audio.channel_count;
+
+	fFrameRate = (int32) ioDecodedFormat->u.raw_audio.frame_rate;
 
 	fOutputSampleSize = (ioDecodedFormat->u.raw_audio.format & B_AUDIO_FORMAT_SIZE_MASK);
 	fOutputFrameSize = fOutputSampleSize * ioDecodedFormat->u.raw_audio.channel_count;
@@ -412,6 +414,9 @@ RawDecoder::NegotiateAudioOutputFormat(media_format *ioDecodedFormat)
 
 	string_for_format(*ioDecodedFormat, s, sizeof(s));
 	TRACE("RawDecoder::NegotiateAudioOutputFormat leave: %s\n", s);
+	
+	if (ioDecodedFormat->type == 0)
+		debugger("RawDecoder::NegotiateAudioOutputFormat ioDecodedFormat->type == 0");
 /*
 	TRACE("fFrameRate              %ld\n", fFrameRate);
 	TRACE("fInputFrameSize         %ld\n", fInputFrameSize);
