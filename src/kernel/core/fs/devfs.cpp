@@ -588,6 +588,40 @@ out:
 }
 
 
+/** Construct complete device name (as used for device_open()).
+ *	This is safe to use only when the device is in use (and therefore
+ *	cannot be unpublished during the iteration).
+ */
+
+static void
+get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size)
+{
+	struct devfs_vnode *leaf = vnode;
+	size_t offset = 0;
+
+	// count levels
+
+	for (; vnode->parent && vnode->parent != vnode; vnode = vnode->parent) {
+		offset += strlen(vnode->name) + 1;
+	}
+
+	// construct full path name
+	
+	for (vnode = leaf; vnode->parent && vnode->parent != vnode; vnode = vnode->parent) {
+		size_t length = strlen(vnode->name);
+		size_t start = offset - length - 1;
+
+		if (size >= offset) {
+			strcpy(buffer + start, vnode->name);
+			if (vnode != leaf)
+				buffer[offset - 1] = '/';
+		}
+
+		offset = start;	
+	}
+}
+
+
 //	#pragma mark -
 
 
@@ -830,7 +864,10 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 				vnode->stream.u.dev.node->parent->cookie, openMode,
 				&cookie->u.dev.dcookie);
 		} else {
-			status = vnode->stream.u.dev.ops->open(vnode->name, openMode,
+			char buffer[B_FILE_NAME_LENGTH];
+			get_device_name(vnode, buffer, sizeof(buffer));
+
+			status = vnode->stream.u.dev.ops->open(buffer, openMode,
 				&cookie->u.dev.dcookie);
 		}
 	}
@@ -1219,6 +1256,27 @@ devfs_read_stat(fs_volume _fs, fs_vnode _vnode, struct stat *stat)
 	stat->st_atime = time(NULL);
 	stat->st_mtime = stat->st_ctime = vnode->modification_time;
 	stat->st_crtime = vnode->creation_time;
+
+	// ToDo: this only works for partitions right now - if we should decide
+	//	to keep this feature, we should have a better solution
+	if (S_ISCHR(vnode->stream.type)) {
+		//device_geometry geometry;
+
+		// if it's a real block device, then let's report a useful size
+		if (vnode->stream.u.dev.part_map != NULL) {
+			stat->st_size = vnode->stream.u.dev.part_map->size;
+#if 0
+		} else if (vnode->stream.u.dev.info->control(cookie->u.dev.dcookie,
+					B_GET_GEOMETRY, &geometry, sizeof(struct device_geometry)) >= B_OK) {
+			stat->st_size = 1LL * geometry.head_count * geometry.cylinder_count
+				* geometry.sectors_per_track * geometry.bytes_per_sector;
+#endif
+		}
+
+		// is this a real block device? then let's have it reported like that
+		if (stat->st_size != 0)
+			stat->st_mode = S_IFBLK | (vnode->stream.type & S_IUMSK);
+	}
 
 	return B_OK;
 }
