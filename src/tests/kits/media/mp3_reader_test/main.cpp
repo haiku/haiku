@@ -138,3 +138,8 @@ err:
 	return 0;
 }
 
+status_t
+_get_format_for_description(media_format *out_format, const media_format_description &in_desc)
+{
+	return B_OK;
+}
