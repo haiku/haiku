@@ -1,0 +1,74 @@
+ICH AC97 driver
+==========
+
+This is a AC97 sound driver for certain chipsets.
+
+It does provide sound playback, but not recording.
+
+The driver is known to work with the following chipsets:
+	Intel ICH, ICH1, ICH2, ICH3, ICH4,
+	NVIDIA nForce (MCP), NVIDIA nForce 2 (MCP2)
+	and SIS 7012.
+
+The driver may work with the following chipsets:
+	AMD 8111, AMD 768.
+
+VIA and SIS 7018 chipsets are not supported.
+
+Author: Marcus Overhagen.
+Email: marcus@overhagen.de
+
+If your Computer Crashes
+================
+
+If your computer crashes, you may want to remove the driver. 
+
+Reboot and hold down the space bar during booting. 
+Select "select save mode options", press enter.
+Select "Disable user add-ons", press enter to activate it
+Select "Return to main menu", press enter.
+Select "Continue booting", press enter
+Remove the driver file, using the uninstall.sh script.
+Reboot 
+
+How to Use
+========
+
+Run the install.sh script to install the driver.
+
+Open Media Preferences.
+Make sure Realtime audio is enabled.
+Restart the Media Services.
+After restart is completed:
+	select "AC97 (ICH)" as default Audio Output.
+	select "None In" as default Audio Input.
+Restart Media Services.
+
+Disclaimer
+=======
+
+Use at your own risk!
+
+If the Driver Doesn't Work
+================
+
+If the driver doesn't work, you may need to alter some
+settings in your computer's BIOS.
+1) If there is a BIOS option to select the operating system, 
+select "Other". Do not select "Windows98 / Windows 2000".
+2) If there is a BIOS option called "PnP OS installed" select "No"
+or "Disabled". Do not select "Yes" or "Enabled".
+3) If there is a BIOS option called "AC97 audio" select "Auto"
+or "Enabled". Do not select "Disabled".
+4) If there is a BIOS option to assign an IRQ to "INT2" or "PINB",
+make sure it is set to "Auto" or a free IRQ. Do not use "none".
+5) It may also help to enable a "AC97 modem" option.
+
+6) If you can't get it working, send me an email.
+I will send you a version that has debugging support included.
+After you get it, install it. Then send me a second email. 
+Make sure that you attach the file ich_ac97.log that is created
+in your home directory every time the driver is loaded. It
+includes important debug information, like the kind of codec used.
+Include the name of your motherboard and it's chipset, a URL
+to the board on it's manufactor's website would be nice.
