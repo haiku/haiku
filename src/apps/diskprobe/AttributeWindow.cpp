@@ -261,7 +261,8 @@ AttributeWindow::MessageReceived(BMessage *message)
 bool 
 AttributeWindow::QuitRequested()
 {
-	fTypeEditorView->CommitChanges();
+	if (fTypeEditorView != NULL)
+		fTypeEditorView->CommitChanges();
 
 	bool quit = fProbeView->QuitRequested();
 	if (!quit)
