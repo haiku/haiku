@@ -2,20 +2,30 @@ SubDir OBOS_TOP src apps stylededit ;
 
 UsePrivateHeaders textencoding ;
 
-AddResources StyledEdit :
-	StyledEdit.rdef StyledEdit.icons.rdef StyledEdit.version.rdef
+local styled_edit_rsrc =
+	[ FGristFiles StyledEdit.rsrc ]
+	;
+ResComp $(styled_edit_rsrc) :
+	[ FGristFiles StyledEdit.rdef StyledEdit.icons.rdef StyledEdit.version.rdef ]
 	;
 
-App StyledEdit :
+local styled_edit_files = 
 	ColorMenuItem.cpp
 	FindWindow.cpp
 	ReplaceWindow.cpp
 	StyledEditApp.cpp
 	StyledEditView.cpp
 	StyledEditWindow.cpp
+	;
+
+Objects $(styled_edit_files) ;
+
+App StyledEdit :
+	[ FGristFiles $(styled_edit_files:S=$(SUFOBJ)) ]
 	# OBOS String
 	String.cpp
 	string_helper.cpp
+	: : $(styled_edit_rsrc)
 	;
 
 SEARCH on <src!apps!stylededit>String.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
@@ -23,18 +33,9 @@ SEARCH on <src!apps!stylededit>string_helper.cpp += [ FDirName $(OBOS_TOP) src k
 
 LinkSharedOSLibs StyledEdit : be translation tracker libtextencoding.so ;
 
-AddResources StyledEdit† :
-	StyledEdit.rdef StyledEdit.icons.rdef StyledEdit.version.rdef
-	;
-
 App StyledEdit† :
-	ColorMenuItem.cpp
-	FindWindow.cpp
-	ReplaceWindow.cpp
-	StyledEditApp.cpp
-	StyledEditView.cpp
-	StyledEditWindow.cpp
-	: libhaiku.a
+	[ FGristFiles $(styled_edit_files:S=$(SUFOBJ)) ]
+	: libhaiku.a : $(styled_edit_rsrc)
 	;
 
 LinkSharedOSLibs StyledEdit† : be translation tracker libtextencoding.so ;
