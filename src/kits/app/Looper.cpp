@@ -595,7 +595,7 @@ DBG(OUT("  ... done: %lx\n", err));
 		int32 temp;
 		do
 		{
-DBG(OUT("  wait_for_thread()...\n"));
+DBG(OUT("  wait_for_thread(%lx)...\n", tid));
 			err = wait_for_thread(tid, &temp);
 		} while (err == B_INTERRUPTED);
 	}
@@ -1191,6 +1191,7 @@ DBG(OUT("LOOPER: looper locked\n"));
 		delete obj;
 	}
 
+DBG(OUT("LOOPER: _task0_() done: thread %ld\n", find_thread(NULL)));
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -1591,8 +1592,9 @@ void BLooper::UnlockFully()
 	// Nobody owns the lock now
 	fOwner = -1;
 	// There is now one less thread holding a lock on this looper
-	long atomicCount = atomic_add(&fAtomicCount, -1);
-	if (atomicCount > 0)
+// bonefish: Currently _Lock() always acquires the semaphore.
+/*	long atomicCount = */atomic_add(&fAtomicCount, -1);
+//	if (atomicCount > 0)
 	{
 		release_sem(fLockSem);
 	}
