@@ -5,19 +5,19 @@ StdBinCommands
 	beep.cpp
 	clipboard.cpp
 	df.cpp
+	iroster.cpp
 	isvolume.cpp
-	lsindex.cpp
-	yes.cpp
-	version.cpp
 	listattr.cpp
+	lsindex.cpp
 	setversion.cpp
 	shutdown.cpp
-	iroster.cpp
+	version.cpp
+	yes.cpp
 	: be ;
 
 StdBinCommands
-	roster.cpp
 	catattr.cpp
+	roster.cpp
 	: be stdc++.r4 ;
 
 StdBinCommands
