@@ -123,8 +123,8 @@ public:
 	virtual status_t		Perform(perform_code d, void *arg);
 
 private:
-	virtual void 		       	_ReservedDirectWindow1();
-	virtual void        		_ReservedDirectWindow2();
+	virtual	void			task_looper();
+	virtual BMessage		*ConvertToMessage(void *raw, int32 code);
 
 public:
 	// BDirectWindow API
@@ -139,10 +139,10 @@ private:
 	
 	typedef	BWindow					inherited;
 
-	virtual void        			_ReservedDirectWindow3();
-	virtual void        			_ReservedDirectWindow4();	
-	virtual void				_ReservedDirectWindow5();
-	virtual void				_ReservedDirectWindow6();
+	virtual void 		       	_ReservedDirectWindow1();
+	virtual void        		_ReservedDirectWindow2();
+	virtual void        		_ReservedDirectWindow3();
+	virtual void        		_ReservedDirectWindow4();	
 
 							BDirectWindow();
 							BDirectWindow(BDirectWindow &);

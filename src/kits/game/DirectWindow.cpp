@@ -263,12 +263,17 @@ BDirectWindow::Perform(perform_code d,
 }
 
 
-//BMessage *
-//BDirectWindow::ConvertToMessage(void *raw,
-//								int32 code)
-//{
-//	return NULL;
-//}
+void
+BDirectWindow::task_looper()
+{
+	BWindow::task_looper();
+}
+
+BMessage *
+BDirectWindow::ConvertToMessage(void *raw, int32 code)
+{
+	return BWindow::ConvertToMessage(raw, code);
+}
 
 
 void
@@ -326,18 +331,6 @@ BDirectWindow::_ReservedDirectWindow3()
 
 void
 BDirectWindow::_ReservedDirectWindow4()
-{
-}
-
-
-void
-BDirectWindow::_ReservedDirectWindow5()
-{
-}
-
-
-void
-BDirectWindow::_ReservedDirectWindow6()
 {
 }
 
