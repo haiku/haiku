@@ -352,6 +352,23 @@ TEnclosuresView::Focus(bool focus)
 }
 
 
+static void recursive_attachment_search(TEnclosuresView *us,BMailContainer *mail) {
+	if (mail == NULL)
+		return;
+	for (int32 i = 0; i < mail->CountComponents(); i++)
+	{
+		BMailComponent *component = mail->GetComponent(i);
+		if (component->ComponentType() == B_MAIL_MULTIPART_CONTAINER)
+			recursive_attachment_search(us,dynamic_cast<BMIMEMultipartMailContainer *>(component));			
+
+		BMailAttachment *attachment = dynamic_cast<BMailAttachment *>(component);
+		if (attachment == NULL)
+			continue;
+
+		us->fList->AddItem(new TListItem(component));
+	}
+}
+
 void 
 TEnclosuresView::AddEnclosuresFromMail(BEmailMessage *mail)
 {
@@ -360,7 +377,10 @@ TEnclosuresView::AddEnclosuresFromMail(BEmailMessage *mail)
 		BMailComponent *component = mail->GetComponent(i);
 		if (component == mail->Body())
 			continue;
-
+		
+		if (component->ComponentType() == B_MAIL_MULTIPART_CONTAINER)
+			recursive_attachment_search(this,dynamic_cast<BMIMEMultipartMailContainer *>(component));
+		
 		BMailAttachment *attachment = dynamic_cast<BMailAttachment *>(component);
 		if (attachment == NULL)
 			continue;

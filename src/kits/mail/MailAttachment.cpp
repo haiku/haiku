@@ -340,6 +340,7 @@ void BSimpleMailAttachment::ParseNow() {
 }
 
 status_t BSimpleMailAttachment::RenderToRFC822(BPositionIO *render_to) {
+	ParseNow();
 	BMailComponent::RenderToRFC822(render_to);
 	//---------Massive memory squandering!---ALERT!----------
 	//	now with error checks, dumb :-) -- axeld.

@@ -241,7 +241,7 @@ TMailApp::AboutRequested()
 	(new BAlert("",
 		"BeMail\nBy Robert Polic\n\n"
 		"Enhanced by Axel Dörfler and the Dr. Zoidberg crew\n\n"
-		"Mail.cpp $Revision: 1.1 $\n"
+		"Mail.cpp $Revision: 1.2 $\n"
 		"Compiled on " __DATE__ " at " __TIME__ ".",
 		"Close"))->Go();
 }
@@ -2875,14 +2875,19 @@ class HorizontalLine : public BView {
 void
 TMailWindow::Print()
 {
+	BPrintJob print(Title());
+	
 	if (!print_settings)
 	{
-		PrintSetup();
-		if (!print_settings)
-			return;
+		if (print.Settings()) {
+			print_settings = print.Settings();
+		} else {
+			PrintSetup();
+			if (!print_settings)
+				return;
+		}
 	}
 
-	BPrintJob print(Title());
 	print.SetSettings(new BMessage(*print_settings));
 
 	if (print.ConfigJob() == B_NO_ERROR)

@@ -427,6 +427,9 @@ void BTextMailComponent::Quote(const char *message, const char *quote_style) {
 
 status_t BTextMailComponent::GetDecodedData(BPositionIO *data) {
 	ParseRaw();
+	
+	if (data == NULL)
+		return B_IO_ERROR;
 
 	BMimeType type;
 	ssize_t written;

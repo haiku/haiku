@@ -168,7 +168,6 @@ BEmailMessage::ReplyMessage(mail_reply_to_mode replyTo, bool accountFromMail, co
 	return to_return;
 }
 
-
 BEmailMessage *
 BEmailMessage::ForwardMessage(bool accountFromMail, bool includeAttachments)
 {
@@ -195,25 +194,23 @@ BEmailMessage::ForwardMessage(bool accountFromMail, bool includeAttachments)
 	if (includeAttachments) {
 		for (int32 i = 0; i < CountComponents(); i++) {
 			BMailComponent *cmpt = GetComponent(i);
-			if (cmpt == _text_body)
+			if (cmpt == _text_body || cmpt == NULL)
 				continue;
-
+			
 			//---I am ashamed to have the written the code between here and the next comment
-			cmpt->GetDecodedData(NULL);
 			// ... and you still managed to get it wrong ;-)), axeld.
 			// we should really move this stuff into copy constructors
 			// or something like that
-
+			
 			BMallocIO io;
 			cmpt->RenderToRFC822(&io);
 			BMailComponent *clone = cmpt->WhatIsThis();
 			io.Seek(0, SEEK_SET);
 			clone->SetToRFC822(&io, io.BufferLength(), true);
 			message->AddComponent(clone);
-		//---
+			//---
 		}
 	}
-
 	if (accountFromMail)
 		message->SendViaAccountFrom(this);
 
