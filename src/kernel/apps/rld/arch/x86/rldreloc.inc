@@ -74,7 +74,7 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 #endif
 			default:
 				printf("unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info));
-				return ERR_NOT_ALLOWED;
+				return B_NOT_ALLOWED;
 		}
 
 		*P = final_val;

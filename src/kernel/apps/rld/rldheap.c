@@ -3,39 +3,27 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <string.h>
 #include <syscalls.h>
 #include "rld_priv.h"
 
 
-
-char const * const names[]=
-{
-	"I'm too sexy!",
-	"BEWARE OF THE DUCK!",
-	"B_DONT_DO_THAT",
-	"I need a girlfriend!",
-	"assert(C++--!=C)",
-	"5038 RIP Nov. 2001",
-	"1.e4 e5 2.Nf3 Nc6 3.Bb5",
-	"Press any key..."
-};
 #define RLD_SCRATCH_SIZE 65536
 #define RLD_PROGRAM_BASE 0x00200000	/* keep in sync with app ldscript */
 
 
-
-static region_id  rld_region;
-static region_id  rld_region_2;
-static char      *rld_base;
-static char      *rld_base_2;
-static char      *rld_ptr;
+static region_id rld_region;
+static region_id rld_region_2;
+static char *rld_base;
+static char *rld_base_2;
+static char *rld_ptr;
 
 
 void
 rldheap_init(void)
 {
-	rld_region = _kern_create_area((char *)names[sys_get_current_team_id() % (sizeof(names) / sizeof(names[0]))],
+	rld_region = _kern_create_area("rld scratch",
 		(void **)&rld_base, B_ANY_ADDRESS, RLD_SCRATCH_SIZE,
 		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 

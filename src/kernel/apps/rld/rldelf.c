@@ -1,19 +1,28 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+/*
 ** Copyright 2002, Manuel J. Petit. All rights reserved.
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <string.h>
-#include <stdio.h>
-#include <Errors.h>
-#include <kerrors.h>
+#ifdef _KERNEL_MODE
+#	undef _KERNEL_MODE
+#endif
+
+#include <OS.h>
+
 #include <elf32.h>
 #include <user_runtime.h>
 #include <syscalls.h>
 #include <arch/cpu.h>
 #include <sem.h>
+
+#include <string.h>
+#include <stdio.h>
 
 #include "rld_priv.h"
 
@@ -23,10 +32,9 @@
 //	sure that B_ADD_ON_IMAGE is set correctly
 // ToDo: implement search paths $LIBRARY_PATH, $ADDON_PATH
 
-#define	PAGE_SIZE 4096
-#define	PAGE_MASK ((PAGE_SIZE)-1)
-#define	PAGE_OFFS(y) ((y)&(PAGE_MASK))
-#define	PAGE_BASE(y) ((y)&~(PAGE_MASK))
+#define	PAGE_MASK (B_PAGE_SIZE - 1)
+#define	PAGE_OFFS(y) ((y) & (PAGE_MASK))
+#define	PAGE_BASE(y) ((y) & ~(PAGE_MASK))
 
 /* david - added '_' to avoid macro's in kernel.h */
 #define	_ROUNDOWN(x,y) ((x)&~((y)-1))
@@ -130,7 +138,7 @@ static struct uspace_program_args const *gProgramArgs;
 #define	FATAL(x,y...) \
 	if (x) { \
 		printf("rld.so: " y); \
-		sys_exit(0); \
+		_kern_exit(0); \
 	}
 
 
@@ -147,7 +155,7 @@ rld_unlock()
 static void
 rld_lock()
 {
-	thread_id self = sys_get_current_thread_id();
+	thread_id self = find_thread(NULL);
 	if (self != rld_sem_owner) {
 		acquire_sem(rld_sem);
 		rld_sem_owner = self;
@@ -243,21 +251,21 @@ static status_t
 parse_elf_header(struct Elf32_Ehdr *eheader, int32 *_pheaderSize, int32 *_sheaderSize)
 {
 	if (memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
-		return ERR_INVALID_BINARY;
+		return B_NOT_AN_EXECUTABLE;
 
 	if (eheader->e_ident[4] != ELFCLASS32)
-		return ERR_INVALID_BINARY;
+		return B_NOT_AN_EXECUTABLE;
 
 	if (eheader->e_phoff == 0)
-		return ERR_INVALID_BINARY;
+		return B_NOT_AN_EXECUTABLE;
 
 	if (eheader->e_phentsize < sizeof(struct Elf32_Phdr))
-		return ERR_INVALID_BINARY;
+		return B_NOT_AN_EXECUTABLE;
 
 	*_pheaderSize = eheader->e_phentsize * eheader->e_phnum;
 	*_sheaderSize = eheader->e_shentsize * eheader->e_shnum;
 
-	return *_pheaderSize > 0 && *_sheaderSize > 0 ? B_OK : ERR_INVALID_BINARY;
+	return *_pheaderSize > 0 && *_sheaderSize > 0 ? B_OK : B_NOT_AN_EXECUTABLE;
 }
 
 
@@ -377,9 +385,9 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 					 */
 					image->regions[regcount].start = pheader->p_vaddr;
 					image->regions[regcount].size = pheader->p_memsz;
-					image->regions[regcount].vmstart = _ROUNDOWN(pheader->p_vaddr, PAGE_SIZE);
+					image->regions[regcount].vmstart = _ROUNDOWN(pheader->p_vaddr, B_PAGE_SIZE);
 					image->regions[regcount].vmsize = _ROUNDUP(pheader->p_memsz +
-						(pheader->p_vaddr % PAGE_SIZE), PAGE_SIZE);
+						(pheader->p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
 					image->regions[regcount].fdstart = pheader->p_offset;
 					image->regions[regcount].fdsize = pheader->p_filesz;
 					image->regions[regcount].delta = 0;
@@ -400,9 +408,9 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 
 					image->regions[regcount].start = pheader->p_vaddr;
 					image->regions[regcount].size = pheader->p_filesz;
-					image->regions[regcount].vmstart = _ROUNDOWN(pheader->p_vaddr, PAGE_SIZE);
+					image->regions[regcount].vmstart = _ROUNDOWN(pheader->p_vaddr, B_PAGE_SIZE);
 					image->regions[regcount].vmsize = _ROUNDUP (pheader->p_filesz +
-						(pheader->p_vaddr % PAGE_SIZE), PAGE_SIZE);
+						(pheader->p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
 					image->regions[regcount].fdstart = pheader->p_offset;
 					image->regions[regcount].fdsize = pheader->p_filesz;
 					image->regions[regcount].delta = 0;
@@ -420,7 +428,9 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 						image->regions[regcount].start = pheader->p_vaddr;
 						image->regions[regcount].size = pheader->p_memsz - pheader->p_filesz;
 						image->regions[regcount].vmstart = image->regions[regcount-1].vmstart + image->regions[regcount-1].vmsize;
-						image->regions[regcount].vmsize = _ROUNDUP (pheader->p_memsz + (pheader->p_vaddr % PAGE_SIZE), PAGE_SIZE) - image->regions[regcount-1].vmsize;
+						image->regions[regcount].vmsize = _ROUNDUP(pheader->p_memsz
+								+ (pheader->p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE)
+							- image->regions[regcount-1].vmsize;
 						image->regions[regcount].fdstart = 0;
 						image->regions[regcount].fdsize = 0;
 						image->regions[regcount].delta = 0;
@@ -536,7 +546,7 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 				LOCK_RW,
 				REGION_PRIVATE_MAP,
 				path,
-				_ROUNDOWN(image->regions[i].fdstart, PAGE_SIZE));
+				_ROUNDOWN(image->regions[i].fdstart, B_PAGE_SIZE));
 
 			if (image->regions[i].id < 0)
 				goto error;
@@ -722,20 +732,20 @@ resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr *sym_addr)
 			sym2 = find_symbol_in_loaded_images(&shimg, symname);
 			if (!sym2) {
 				printf("elf_resolve_symbol: could not resolve symbol '%s'\n", symname);
-				return ERR_ELF_RESOLVING_SYMBOL;
+				return B_MISSING_SYMBOL;
 			}
 
 			// make sure they're the same type
 			if (ELF32_ST_TYPE(sym->st_info) != STT_NOTYPE
 				&& ELF32_ST_TYPE(sym->st_info) != ELF32_ST_TYPE(sym2->st_info)) {
 				printf("elf_resolve_symbol: found symbol '%s' in shared image but wrong type\n", symname);
-				return ERR_ELF_RESOLVING_SYMBOL;
+				return B_MISSING_SYMBOL;
 			}
 
 			if (ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL
 				&& ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
 				printf("elf_resolve_symbol: found symbol '%s' but not exported\n", symname);
-				return ERR_ELF_RESOLVING_SYMBOL;
+				return B_MISSING_SYMBOL;
 			}
 
 			*sym_addr = sym2->st_value + shimg->regions[0].delta;
@@ -746,9 +756,9 @@ resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr *sym_addr)
 			return B_NO_ERROR;
 
 		case SHN_COMMON:
-			// XXX finish this
+			// ToDo: finish this
 			printf("elf_resolve_symbol: COMMON symbol, finish me!\n");
-			return ERR_NOT_IMPLEMENTED_YET;
+			return B_ERROR; //ERR_NOT_IMPLEMENTED_YET;
 
 		default:
 			// standard symbol
