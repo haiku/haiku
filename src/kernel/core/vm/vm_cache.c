@@ -289,6 +289,11 @@ vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 }
 
 
+/**	This function updates the size field of the vm_cache structure.
+ *	If needed, it will free up all pages that don't belong to the cache anymore.
+ *	The vm_cache_ref lock must be held when you call it.
+ */
+
 status_t
 vm_cache_resize(vm_cache_ref *cacheRef, size_t newSize)
 {
@@ -298,8 +303,6 @@ vm_cache_resize(vm_cache_ref *cacheRef, size_t newSize)
 	// ToDo: only cache's with an anonymous memory store should be resizable!
 	if (!cache->temporary)
 		return B_NOT_ALLOWED;
-
-	mutex_lock(&cacheRef->lock);
 
 	oldSize = cache->virtual_size;
 	if (newSize < oldSize) {
@@ -318,8 +321,6 @@ vm_cache_resize(vm_cache_ref *cacheRef, size_t newSize)
 	}
 
 	cache->virtual_size = newSize;
-	mutex_unlock(&cacheRef->lock);
-
 	vm_increase_max_commit(oldSize - newSize);
 
 	return B_OK;
