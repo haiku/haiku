@@ -121,7 +121,6 @@ InodeAllocator::Keep()
 {
 	ASSERT(fInode != NULL && fTransaction != NULL);
 
-	Volume *volume = fTransaction->GetVolume();
 	fInode->Node()->flags &= ~INODE_NOT_READY;
 	status_t status = fInode->WriteBack(fTransaction);
 
@@ -165,14 +164,14 @@ Inode::InitCheck()
 		|| !(Node()->flags & INODE_IN_USE)
 		|| Node()->inode_num.length != 1
 		// matches inode size?
-		|| Node()->inode_size != fVolume->InodeSize()
+		|| (uint32)Node()->inode_size != fVolume->InodeSize()
 		// parent resides on disk?
-		|| Node()->parent.allocation_group > fVolume->AllocationGroups()
+		|| Node()->parent.allocation_group > int32(fVolume->AllocationGroups())
 		|| Node()->parent.allocation_group < 0
 		|| Node()->parent.start > (1L << fVolume->AllocationGroupShift())
 		|| Node()->parent.length != 1
 		// attributes, too?
-		|| Node()->attributes.allocation_group > fVolume->AllocationGroups()
+		|| Node()->attributes.allocation_group > int32(fVolume->AllocationGroups())
 		|| Node()->attributes.allocation_group < 0
 		|| Node()->attributes.start > (1L << fVolume->AllocationGroupShift())) {
 		FATAL(("inode at block %Ld corrupt!\n", fBlockNumber));
@@ -207,9 +206,9 @@ Inode::CheckPermissions(int accessMode) const
 
 	// shift mode bits, to check directly against accessMode
 	mode_t mode = Mode();
-	if (user == Node()->uid)
+	if (user == (uid_t)Node()->uid)
 		mode >>= 6;
-	else if (group == Node()->gid)
+	else if (group == (gid_t)Node()->gid)
 		mode >>= 3;
 
 	if (accessMode & ~(mode & S_IRWXO))
@@ -270,11 +269,11 @@ Inode::MakeSpaceForSmallData(Transaction *transaction, const char *name, int32 b
 			}
 
 			// remove the first one large enough to free the needed amount of bytes
-			if (bytes < item->Size())
+			if (bytes < (int32)item->Size())
 				break;
 		}
 
-		if (item->IsLast(Node()) || item->Size() < bytes)
+		if (item->IsLast(Node()) || (int32)item->Size() < bytes)
 			return B_ERROR;
 
 		bytes -= max->Size();
@@ -697,7 +696,8 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 	bool hasIndex = index.SetTo(name) == B_OK;
 
 	Inode *attribute = NULL;
-	status_t status;
+	status_t status = B_OK;
+
 	if (GetAttribute(name, &attribute) < B_OK) {
 		// save the old attribute data
 		if (hasIndex) {
@@ -1208,7 +1208,7 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 		if (data->size <= data->max_indirect_range || !data->max_indirect_range) {
 			CachedBlock cached(fVolume);
 			block_run *runs = NULL;
-			int32 free = 0;
+			uint32 free = 0;
 			off_t block;
 
 			// if there is no indirect block yet, create one
@@ -1226,7 +1226,7 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 
 				// search first empty entry
 				int32 i = 0;
-				for (;i < data->indirect.length;i++) {
+				for (; i < data->indirect.length; i++) {
 					if ((runs = (block_run *)cached.SetTo(block + i)) == NULL)
 						return B_IO_ERROR;
 
@@ -1411,7 +1411,7 @@ status_t
 Inode::FreeStaticStreamArray(Transaction *transaction, int32 level, block_run run,
 	off_t size, off_t offset, off_t &max)
 {
-	int32 indirectSize;
+	int32 indirectSize = 0;
 	if (level == 0)
 		indirectSize = (1L << (INDIRECT_BLOCKS_SHIFT + fVolume->BlockShift()))
 			* (fVolume->BlockSize() / sizeof(block_run));
@@ -2094,7 +2094,6 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type, vnode_id 
 		}
 	}
 
-	block_run run;
 	uint16 length;
 	vnode_id id;
 	status_t status = fIterator->GetNextEntry(name, &length, B_FILE_NAME_LENGTH, &id);
