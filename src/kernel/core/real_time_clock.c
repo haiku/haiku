@@ -79,14 +79,20 @@ rtc_debug(int argc, char **argv)
 status_t
 rtc_init(kernel_args *ka)
 {
+	void *clonedRealTimeData;
 	area_id area = create_area("real time data", (void **)&sRealTimeData, B_ANY_KERNEL_ADDRESS,
 		PAGE_ALIGN(sizeof(struct real_time_data)), B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (area < B_OK) {
-		panic("rtc_init: error creating rtc region\n");
+		panic("rtc_init: error creating real time data area\n");
 		return area;
 	}
-	// ToDo: clone this area for userland read-only access
+
+	if (clone_area("real time data userland", &clonedRealTimeData, B_CLONE_ADDRESS, 
+		B_READ_AREA, area) < B_OK) {
+		dprintf("rtc_init: error creating real time data userland area\n");
+		// we don't panic because it's not kernel critical
+	}
 
 	rtc_hw_to_system();
 
