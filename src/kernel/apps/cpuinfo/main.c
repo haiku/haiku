@@ -8,19 +8,20 @@
 
 
 
-
+extern char *__progname;
 static cpuid_info CPU_Data;
 
 
 void
 usage()
 {
-	printf("usage: cpuinfo [-option]\n\n"
-	       "Prints information about your CPU.\n"
-	       "  -i   CPU identification\n"
-	       "  -f   supported processor features\n"
-	       "  -t   TLB and cache info\n"
-	       "  -d   dump registers from CPUID calls\n");
+	printf("usage: %s [-option]\n\n"
+		"Prints information about your CPU.\n"
+		"  -i   CPU identification\n"
+		"  -f   supported processor features\n"
+		"  -t   TLB and cache info\n"
+		"  -d   dump registers from CPUID calls\n", __progname);
+
 	exit(0);
 }
 
@@ -106,13 +107,13 @@ opt_identify(cpuid_info *info, int vendor_tag)
 	// gosh, these CPU manufacturers have really outdone
 	// themselves on creating cutesy vendorID strings, no?
 	// (that was sarcasm, btw...)
-	
+
 	char vendorID[12+1] = {0};
-	
+
 	// the 'vendorid' field of the info struct is not null terminated,
 	// so it is copied into a properly terminated local string buffer
 	memcpy(vendorID, info->eax_0.vendorid, 12);
-	printf("%12s '%s'\n",  "Vendor ID:", vendorID);
+	printf("%12s '%s'\n", "Vendor ID:", vendorID);
 	
 	switch (vendor_tag) {
 		case 'uneG':  // "GenuineIntel"
@@ -324,8 +325,8 @@ Intel_features(cpuid_info *info)
 
 
 void
-insert (int *a, int elem, int max_index)
-	{
+insert(int *a, int elem, int max_index)
+{
 	// inserts a new element into an ordered integer array
 	// using (what else) the trusty old binary search algorithm...
 	// assumes the array has sufficient space to do this
@@ -354,7 +355,7 @@ insert (int *a, int elem, int max_index)
 	
 	// insert the new guy
 	a[lo] = elem;
-	}
+}
 
 
 void
@@ -403,7 +404,6 @@ Intel_TLB_cache(cpuid_info *info)
 	while (n < tabsize)
 		indexOf[tab[n++].descriptor] = i++;
 
-	
 	// pass loop: insert relevant table indexes into the slot array
 	i = 0;
 	for (pass = 0; ; ++pass) {
@@ -438,7 +438,6 @@ Intel_TLB_cache(cpuid_info *info)
 					insert(slot, indexOf[db], i++);
 	}
 
-
 	// reset slot index for output loop
 	i = 0;
 	
@@ -470,30 +469,97 @@ Intel_TLB_cache(cpuid_info *info)
 }
 
 
-
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // AMD specs
+
+// Brennan says: I'm just digging around and trying to find AMD documentation
+// on product signatures and CPU types...not easy to find. This is a dirty hack
+// until I can find proper docs...
+
+static const char *
+AMD_brand_string(int family, int model, int processor_signature)
+{
+	int sig = processor_signature;
+	
+	switch (family) {
+		//K5 and K6 models
+		case 0x5: 
+			if(model >= 0x0 && model <= 0x3) {
+				return "AMD K5";
+			}
+			else if(model == 0x8){
+				return "AMD K6-2";
+			}
+			else if(model == 0x9) {
+				return "AMD K6-III";
+			}
+			else {
+				return "AMD K6";
+			}
+		//Athlon and Duron models, very general
+		case 0x6:
+			//Hack.  I own one, so I know this is the processor signature!
+			if(sig == 1634) {
+				return "AMD Mobile Athlon";
+			}
+			else if(model == 0x1 || model == 0x2 || model == 0x4) {
+				return "AMD Athlon";
+			}
+			else if(model == 0x3 ||model == 0x7) {
+				return "AMD Duron";
+			}
+			else if(model == 0x6){
+				return "AMD Duron/AMD Athlon XP/AMD Athlon MP";
+			}
+		case 0xf: 
+			if(model == 0x5) {
+				return "AMD Athlon 64";
+			}
+			if(model == 0x6) {
+				return "AMD Opteron";
+			}
+			//This is the new 266FSB Duron model
+			else if(model == 0x8) {
+				return "AMD Duron (266 FSB)";
+			}
+		default:
+			return "Unknown AMD Processor";
+	}
+}
 
 
 void
 AMD_identify(cpuid_info *info)
 {
-	printf("Sorry! Info about AMD cpu's not implemented yet :(\n");
+	int type, family, model, sig;
+	const char *id_string;
+	
+	get_cpuid(info, 1, 0);
+	type   = info->eax_1.type;
+	family = info->eax_1.family;
+	model  = info->eax_1.model;
+	sig = info->regs.eax;
+	
+	id_string = AMD_brand_string(family, model, sig);
+	
+	printf("%s, Model: %d\n", id_string, model);
+	printf("Family: %d\n", family);
+	printf("Signature: %d\n", sig);
+	
 }
 
 
 void
 AMD_features(cpuid_info *info)
 {
-	printf("Sorry! Info about AMD cpu's not implemented yet :(\n");
+	printf("Sorry! Info about AMD CPU's not implemented yet :(\n");
 }
 
 
 void
 AMD_TLB_cache(cpuid_info *info)
 {
-	printf("Sorry! Info about AMD cpu's not implemented yet :(\n");
+	printf("Sorry! Info about AMD CPU's not implemented yet :(\n");
 }
 
 
@@ -506,21 +572,21 @@ AMD_TLB_cache(cpuid_info *info)
 void
 Cyrix_identify(cpuid_info *info)
 {
-	printf("Sorry! Info about Cyrix cpu's not implemented yet :(\n");
+	printf("Sorry! Info about Cyrix CPU's not implemented yet :(\n");
 }
 
 
 void
 Cyrix_features(cpuid_info *info)
 {
-	printf("Sorry! Info about Cyrix cpu's not implemented yet :(\n");
+	printf("Sorry! Info about Cyrix CPU's not implemented yet :(\n");
 }
 
 
 void
 Cyrix_TLB_cache(cpuid_info *info)
 {
-	printf("Sorry! Info about Cyrix cpu's not implemented yet :(\n");
+	printf("Sorry! Info about Cyrix CPU's not implemented yet :(\n");
 }
 
 
