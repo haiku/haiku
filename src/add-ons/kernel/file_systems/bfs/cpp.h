@@ -22,31 +22,38 @@
 //	- easier to maintain
 
 
-inline void *operator new(size_t size, const nothrow_t&) throw()
+inline void *
+operator new(size_t size, const nothrow_t&) throw()
 {
 	return malloc(size);
 } 
 
-inline void *operator new[](size_t size, const nothrow_t&) throw()
+
+inline void *
+operator new[](size_t size, const nothrow_t&) throw()
 {
 	return malloc(size);
 }
  
-inline void operator delete(void *ptr)
+
+inline void
+operator delete(void *ptr)
 {
 	free(ptr);
 } 
 
-inline void operator delete[](void *ptr)
+
+inline void
+operator delete[](void *ptr)
 {
 	free(ptr);
 }
 
-// now we're using virtuals
+// we're using virtuals
 extern "C" void __pure_virtual();
 
-extern nothrow_t _dontthrow;
-#define new new (_dontthrow)
+// we are only using the nothrow-version of new
+#define new new (nothrow)
 
 
 #endif	/* CPP_H */

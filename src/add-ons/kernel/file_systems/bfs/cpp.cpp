@@ -8,9 +8,8 @@
 #include "cpp.h"
 
 
-nothrow_t _dontthrow;
-
-extern "C" void __pure_virtual()
+extern "C" void
+__pure_virtual()
 {
 	//printf("pure virtual function call");
 }
