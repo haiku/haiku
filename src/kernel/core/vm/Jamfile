@@ -8,7 +8,6 @@ KernelMergeObject kernel_vm.o :
 	vm_store_anonymous_noswap.c
 	vm_store_device.c
 	vm_store_null.c
-	vm_store_vnode.c
 	vm_tests.c
 
 	: -fno-pic -Wno-unused -D_KERNEL_MODE=1
