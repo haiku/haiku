@@ -156,7 +156,7 @@ status_t nv_acc_init()
 	ACCW(PF_CACHES, 0x00000001);
 
 	/*** PRAMIN ***/
-	/* RAMHT space (hash-table(?)) SETUP FIFO HANDLES */
+	/* RAMHT space (hash-table) SETUP FIFO HANDLES */
 	/* note:
 	 * 'instance' tells you where the engine command is stored in 'PR_CTXx_x' sets
 	 * below: instance being b4-19 with baseadress NV_PRAMIN_CTX_0 (0x00700000).
@@ -164,6 +164,7 @@ status_t nv_acc_init()
 	 * tell the FIFO to which engine command it is connected!
 	 * (CTX registers are actually a sort of RAM space.) */
 	/* (first set) */
+	//fixme: for NV40 and above the handle values need to be different..
 	ACCW(HT_HANDL_00, NV1_IMAGE_FROM_CPU); /* 32bit handle (not used?) */
 	ACCW(HT_VALUE_00, 0x80011145); /* instance $1145, engine = acc engine, CHID = $00 */
 
@@ -233,6 +234,8 @@ status_t nv_acc_init()
 	ACCW(PR_CTX2_R, 0x00000002); /* DMA access type is READ_AND_WRITE */
 	ACCW(PR_CTX3_R, 0x00000002); /* unknown (looks like this is rubbish/not needed?) */
 	/* setup set '0' for cmd NV_ROP5_SOLID */
+	//fixme: for NV40 and up each set takes up 8 32-bit words instead of just 4..
+	//note: setting the colorspaces the way we do needs to be updated as well for this.
 	ACCW(PR_CTX0_0, 0x01008043); /* NVclass $043, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_0, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_0, 0x00000000); /* method traps disabled */
@@ -863,6 +866,9 @@ status_t nv_acc_init()
 		ACCW(NV10_PIPEADR, 0x00000040);
 		ACCW(NV10_PIPEDAT, 0x00000000);
 
+		//fixme:
+		//this 'set' seems to hang the NV43 engine if executed:
+		//status remains 'busy' forever in this case.
 		ACCW(NV10_PIPEADR, 0x00000800);
 		for (cnt = 0; cnt < (16 * 16); cnt++) ACCW(NV10_PIPEDAT, 0x00000000);
 
