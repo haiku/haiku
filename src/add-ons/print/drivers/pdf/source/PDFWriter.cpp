@@ -634,7 +634,6 @@ PDFWriter::CreatePattern()
 void
 PDFWriter::SetPattern() 
 {
-#if PATTERN_SUPPORT
 	REPORT(kDebug, fPage, "SetPattern (bitmap version)");
 	if (MakesPattern()) {
 		if (FindPattern() == -1) CreatePattern();
@@ -647,19 +646,6 @@ PDFWriter::SetPattern()
 			REPORT(kError, fPage, "pattern missing!");
 		}
 	}
-#else
-	REPORT(kDebug, fPage, "SetPattern (color version)");
-	if (IsSame(fState->pattern0, B_MIXED_COLORS)) {
-		rgb_color mixed;  // approximate mixed colors
-		mixed.red    = (fState->foregroundColor.red + fState->backgroundColor.red) / 2;
-		mixed.green  = (fState->foregroundColor.green + fState->backgroundColor.green) / 2;
-		mixed.blue   = (fState->foregroundColor.blue + fState->backgroundColor.blue) / 2;
-		mixed.alpha  = (fState->foregroundColor.alpha + fState->backgroundColor.alpha) / 2;
-		SetColor(mixed);
-	} else {
-		SetColor(fState->foregroundColor);
-	}
-#endif
 }
 
 

@@ -309,13 +309,9 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 			kFill   = false
 		};
 
-#if PATTERN_SUPPORT
 		inline bool MakesPattern()  { return Pass() == 0; }
 		inline bool MakesPDF()      { return Pass() == 1; }
-#else
-		inline bool MakesPattern()  { return false; }
-		inline bool MakesPDF()      { return true; }
-#endif
+
 		inline bool IsDrawing() const  { return fMode == kDrawingMode; }
 		inline bool IsClipping() const { return fMode == kClippingMode; }
 
