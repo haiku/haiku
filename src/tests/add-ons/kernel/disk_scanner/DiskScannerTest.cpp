@@ -24,16 +24,20 @@ status_t
 get_nth_session_info(int deviceFD, int32 index, session_info *sessionInfo)
 {
 	status_t error = (sessionInfo ? B_OK : B_BAD_VALUE);
-	disk_scanner_module_info *disk_scanner = NULL;
-	// get the partition scanner module
-	if (error == B_OK)
-		error = get_module(DISK_SCANNER_MODULE_NAME, (module_info**)&disk_scanner);
+	disk_scanner_module_info *diskScanner = NULL;
+	// get the disk scanner module
+	if (error == B_OK) {
+		error = get_module(DISK_SCANNER_MODULE_NAME,
+						   (module_info**)&diskScanner);
+	}
 	// get the session info
-	if (error == B_OK)
-		error = disk_scanner->get_nth_session_info(deviceFD, index, sessionInfo);
+	if (error == B_OK) {
+		error = diskScanner->get_nth_session_info(deviceFD, index,
+												  sessionInfo, NULL);
+	}
 	// put the partition scanner module
-	if (disk_scanner)
-		put_module(disk_scanner->module.name);
+	if (diskScanner)
+		put_module(diskScanner->module.name);
 	return error;
 }
 
@@ -59,14 +63,14 @@ get_nth_partition_info(int deviceFD, int32 sessionIndex, int32 partitionIndex,
 	status_t error = (partitionInfo ? B_OK : B_BAD_VALUE);
 	session_info sessionInfo;
 	disk_scanner_module_info *diskScanner = NULL;
-	// get the partition scanner module
+	// get the disk scanner module
 	if (error == B_OK)
 		error = get_module(DISK_SCANNER_MODULE_NAME,
 						   (module_info**)&diskScanner);
 	// get the session info
 	if (error == B_OK) {
 		error = diskScanner->get_nth_session_info(deviceFD, sessionIndex,
-												  &sessionInfo);
+												  &sessionInfo, NULL);
 	}
 	// get the partition info
 	if (error == B_OK) {
@@ -78,9 +82,13 @@ get_nth_partition_info(int deviceFD, int32 sessionIndex, int32 partitionIndex,
 // The user can this info via B_GET_PARTITION_INFO. We could get the dir
 // of the raw device and construct the partition device name with session and
 // partition ID.
+// Update: No, we can neither get the name of the raw device nor of the
+// directory it lives in. We only have a FD and I see no way to get a path
+// from it. Since deviceFD might represent an image file, we can't even get
+// the its path by recursively searching the /dev/disk directory.
 partitionInfo->info.device[0] = '\0';
 		error = diskScanner->get_nth_partition_info(deviceFD, &sessionInfo,
-			partitionIndex, partitionInfo);
+			partitionIndex, partitionInfo, NULL);
 	}
 	// get the FS info
 	if (error == B_OK) {
@@ -99,6 +107,10 @@ partitionInfo->info.device[0] = '\0';
 			partitionInfo->mounted_at[0] = '\0';
 		}
 // NOTE: Where do we get mounted_at from?
+// Update: Actually, it looks, like it is really hard. We could traverse the
+// list of mounted devices, build for each one the raw device path from its
+// partition device path, check, if the raw device is the same one as deviceFD.
+// Then, with the path of the raw device we have more options.
 	}
 	// put the partition scanner module
 	if (diskScanner)
