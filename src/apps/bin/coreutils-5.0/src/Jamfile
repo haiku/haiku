@@ -72,7 +72,7 @@ StdBinCommands
 	wc.c
 	whoami.c
 	yes.c
-	: root libfetish.a ;
+	: libfetish.a : coreutils.rdef ;
 
 # stat.c
 # chroot.c
@@ -86,30 +86,28 @@ StdBinCommands
 
 
 BinCommand ls : 
-	ls.c ls-dir.c : libfetish.a ;
+	ls.c ls-dir.c : libfetish.a : coreutils.rdef ;
 
 BinCommand rm : 
-	rm.c remove.c : libfetish.a ;
+	rm.c remove.c : libfetish.a : coreutils.rdef ;
 
 BinCommand chgroup : 
-	chgrp.c chown-core.c : libfetish.a ;
+	chgrp.c chown-core.c : libfetish.a : coreutils.rdef ;
 
 BinCommand chmod : 
-	chmod.c chown-core.c : libfetish.a ;
+	chmod.c chown-core.c : libfetish.a : coreutils.rdef ;
 
 BinCommand cp : 
-	cp.c copy.c cp-hash.c : libfetish.a ;
+	cp.c copy.c cp-hash.c : libfetish.a : coreutils.rdef ;
 
 BinCommand md5sum : 
-	md5sum.c md5.c : libfetish.a ;
+	md5sum.c md5.c : libfetish.a : coreutils.rdef ;
 
 BinCommand mv : 
-	mv.c copy.c cp-hash.c remove.c : libfetish.a ;
+	mv.c copy.c cp-hash.c remove.c : libfetish.a : coreutils.rdef ;
 
 BinCommand sha1sum : 
-	md5sum.c sha1sum.c : libfetish.a ;
+	md5sum.c sha1sum.c : libfetish.a : coreutils.rdef ;
 
 BinCommand vdir : 
-	ls.c ls-vdir.c : libfetish.a ;
-
-
+	ls.c ls-vdir.c : libfetish.a : coreutils.rdef ;
