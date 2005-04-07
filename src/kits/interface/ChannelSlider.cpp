@@ -432,8 +432,8 @@ BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed
 	BPoint leftTop;
 	BPoint bottomRight;
 	if (Vertical()) {
-		leftTop.Set(area.left + hCenter, area.top);
-		bottomRight.Set(leftTop.x , area.top + ThumbRangeFor(channel));
+		leftTop.Set(area.left + hCenter, area.top + vCenter);
+		bottomRight.Set(leftTop.x , leftTop.y + ThumbRangeFor(channel));
 	} else {
 		leftTop.Set(area.left, area.top + vCenter);
 		bottomRight.Set(area.left + ThumbRangeFor(channel), leftTop.y);
@@ -631,7 +631,7 @@ void
 BChannelSlider::DrawThumbs()
 {
 	BRect first = ThumbFrameFor(0);
-	BRect last = ThumbFrameFor(CountChannels());
+	BRect last = ThumbFrameFor(CountChannels() - 1);
 		
 	if (fBacking == NULL) {
 		BRect bitmapFrame;
@@ -647,6 +647,7 @@ BChannelSlider::DrawThumbs()
 			bitmapFrame.right = last.right + ThumbRangeFor(0);
 		}
 		
+		bitmapFrame.InsetBy(-3, -3);
 		bitmapFrame.OffsetTo(B_ORIGIN);
 	
 		fBacking = new BBitmap(bitmapFrame, BScreen(Window()).ColorSpace(), true, false);
@@ -659,26 +660,31 @@ BChannelSlider::DrawThumbs()
 		}			
 	}
 	
-	if (fBacking->Lock()) {
-		fBackingView->FillRect(fBackingView->Bounds(), B_SOLID_LOW);
-		for (int32 i = 0; i < CountChannels(); i++)
-			DrawChannel(fBackingView, i, ThumbFrameFor(i), fMinpoint != 0); 
+	BPoint drawHere;
+	drawHere.x = (Bounds().Width() - fBacking->Bounds().Width()) / 2;
+	drawHere.y = (Bounds().Height() - fBacking->Bounds().Height()) / 2 ;
 		
+	if (fBacking->Lock()) {
+		// Clear the view's background
+		fBackingView->FillRect(fBackingView->Bounds(), B_SOLID_LOW);
+		for (int32 channel = 0; channel < CountChannels(); channel++) {
+			BRect channelArea = ThumbFrameFor(channel);
+			// TODO: HACK!!! What am I missing ?
+			// Why do I need this to draw the channel in the correct location ?
+			channelArea.OffsetBy(3, -21);	
+			DrawChannel(fBackingView, channel, channelArea, fMinpoint != 0); 
+		}
 		fBackingView->Sync();
 		fBacking->Unlock();
 	}
-	
-	BPoint drawHere;
-	drawHere.x = (Bounds().Width() - fBacking->Bounds().Width()) / 2;
-	drawHere.y = (Bounds().Height() - fBacking->Bounds().Height()) / 2;
-	
+		
 	fClickDelta = drawHere;
 	
+	// TODO: Look at the above comment
+	fClickDelta.y -= 21;
+	fClickDelta.x += 3;
+	
 	DrawBitmapAsync(fBacking, drawHere);
-#if 1		
-	SetHighColor(125, 125, 125, 0);
-	StrokeRect(fBacking->Bounds().OffsetToCopy(drawHere));
-#endif	
 }
 
 
