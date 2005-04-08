@@ -68,6 +68,11 @@ SimpleTest ScrollViewTest :
 	: be
 	;
 
+SimpleTest ChannelSliderTest :
+	ChannelSliderTest.cpp
+	: be
+	;
+
 SEARCH on [ FGristFiles
 		ScrollView.cpp
 	] = [ FDirName $(OBOS_TOP) src kits interface ] ;
