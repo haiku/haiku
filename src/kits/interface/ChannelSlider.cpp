@@ -234,11 +234,8 @@ BChannelSlider::Draw(BRect updateRect)
 	BRect bounds(Bounds());
 	float labelWidth = StringWidth(Label());
 	
-	MovePenTo((bounds.Width() - labelWidth) / 2, 10);
-	DrawString(Label());
-	
-	Sync();
-	// TODO: Respect label limits !!!	
+	DrawString(Label(), BPoint((bounds.Width() - labelWidth) / 2, fBaseLine));
+	Sync();	
 }
 
 
