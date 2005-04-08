@@ -452,15 +452,12 @@ BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed
 void
 BChannelSlider::DrawGroove(BView *into, int32 channel, BPoint topLeft, BPoint bottomRight)
 {
-	// TODO: Draw the real thing
 	ASSERT(into != NULL);
 	BRect rect(topLeft, bottomRight);
 	
-	if (Vertical())
-		rect.InsetBy(-1, 0);
-	else
-		rect.InsetBy(0, -1);
-			
+	DrawThumbFrame(fBackingView, rect.InsetByCopy(-2.5, -2.5));		
+	
+	rect.InsetBy(-0.5, -0.5);
 	into->FillRect(rect, B_SOLID_HIGH); 
 }
 
@@ -662,7 +659,7 @@ BChannelSlider::DrawThumbs()
 	
 	BPoint drawHere;
 	drawHere.x = (Bounds().Width() - fBacking->Bounds().Width()) / 2;
-	drawHere.y = (Bounds().Height() - fBacking->Bounds().Height()) / 2 ;
+	drawHere.y = (Bounds().Height() - fBacking->Bounds().Height()) / 2;
 		
 	if (fBacking->Lock()) {
 		// Clear the view's background
@@ -689,8 +686,20 @@ BChannelSlider::DrawThumbs()
 
 
 void
-BChannelSlider::DrawThumbFrame(BView *where, const BRect &area)
+BChannelSlider::DrawThumbFrame(BView *into, const BRect &area)
 {
+	rgb_color oldColor = into->HighColor();
+	
+	into->SetHighColor(255, 255, 255);
+	into->StrokeRect(area);
+	into->SetHighColor(tint_color(into->ViewColor(), B_DARKEN_1_TINT));
+	into->StrokeLine(area.LeftTop(), BPoint(area.right, area.top));
+	into->StrokeLine(area.LeftTop(), BPoint(area.left, area.bottom - 1));
+	into->SetHighColor(tint_color(into->ViewColor(), B_DARKEN_2_TINT));
+	into->StrokeLine(BPoint(area.left + 1, area.top + 1), BPoint(area.right - 1, area.top + 1));
+	into->StrokeLine(BPoint(area.left + 1, area.top + 1), BPoint(area.left + 1, area.bottom - 2));
+	
+	into->SetHighColor(oldColor);
 }
 
 
