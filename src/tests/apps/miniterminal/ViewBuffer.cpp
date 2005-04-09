@@ -12,7 +12,7 @@
 #include "ViewBuffer.h"
 
 #define CHAR_WIDTH	7
-#define CHAR_HEIGHT	12
+#define CHAR_HEIGHT	13
 
 // Palette is (black and white are swapt like in normal BeOS Terminal)
 //	0 - black,

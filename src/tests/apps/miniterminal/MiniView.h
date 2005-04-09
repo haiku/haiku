@@ -14,6 +14,8 @@ virtual						~MiniView();
 		void				Start();
 		status_t			OpenTTY();
 		status_t			SpawnThreads();
+
+virtual	void				FrameResized(float width, float height);
 virtual	void				KeyDown(const char *bytes, int32 numBytes);
 
 private:
@@ -24,6 +26,7 @@ static	filter_result		MessageFilter(BMessage *message, BHandler **target, BMessa
 		Console				*fConsole;
 		int					fMasterFD;
 		int					fSlaveFD;
+		thread_id			fShellExecutor;
 		thread_id			fShellProcess;
 		thread_id			fConsoleWriter;
 };

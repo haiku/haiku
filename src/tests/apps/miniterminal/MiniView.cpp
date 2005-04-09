@@ -74,6 +74,9 @@ MiniView::MiniView(BRect frame)
 
 MiniView::~MiniView()
 {
+	kill_thread(fConsoleWriter);
+	kill_thread(fShellExecutor);
+	kill_thread(fShellProcess);
 }
 
 void
@@ -90,9 +93,9 @@ MiniView::Start()
 	setsid();
 	
 	// move our stdin and stdout to the console
-	/*dup2(fSlaveFD, 0);
+	dup2(fSlaveFD, 0);
 	dup2(fSlaveFD, 1);
-	dup2(fSlaveFD, 2);*/
+	dup2(fSlaveFD, 2);
 	
 	if (SpawnThreads() != B_OK)
 		TRACE(("error in SpawnThreads\n"));
@@ -183,11 +186,18 @@ MiniView::OpenTTY()
 					// set terminal interface
 					tcsetattr(fSlaveFD, TCSANOW, &tio);
 					
-					// set window size (currently disabled)
-					/*ws.ws_row = rows;
+					// set window size
+					winsize ws;
+					int32 rows, cols;
+					GetSize(&cols, &rows);
+					ws.ws_row = rows;
 					ws.ws_col = cols;
-
-					ioctl(con->tty_slave_fd, TIOCSWINSZ, &ws);*/
+					if (LockLooper()) {
+						ws.ws_xpixel = Bounds().IntegerWidth();
+						ws.ws_ypixel = Bounds().IntegerHeight();
+						UnlockLooper();
+					}
+					ioctl(fSlaveFD, TIOCSWINSZ, &ws);
 				}
 				break;
 			}
@@ -207,6 +217,22 @@ MiniView::OpenTTY()
 }
 
 void
+MiniView::FrameResized(float width, float height)
+{
+	ViewBuffer::FrameResized(width, height);
+	
+	winsize ws;
+	int32 rows, cols;
+	GetSize(&cols, &rows);
+	ws.ws_row = rows;
+	ws.ws_col = cols;
+	ws.ws_xpixel = (uint16)width;
+	ws.ws_ypixel = (uint16)height;
+	ioctl(fSlaveFD, TIOCSWINSZ, &ws);
+}
+
+
+void
 MiniView::KeyDown(const char *bytes, int32 numBytes)
 {
 	// TODO: add interrupt char handling
@@ -218,16 +244,16 @@ MiniView::KeyDown(const char *bytes, int32 numBytes)
 		} else {
 			switch (bytes[0]) {
 				case B_LEFT_ARROW:
-					write(fMasterFD, LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE));
+					write(fMasterFD, LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE) - 1);
 					break;
 				case B_RIGHT_ARROW:
-					write(fMasterFD, RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE));
+					write(fMasterFD, RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE) - 1);
 					break;
 				case B_UP_ARROW:
-					write(fMasterFD, UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE));
+					write(fMasterFD, UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE) - 1);
 					break;
 				case B_DOWN_ARROW:
-					write(fMasterFD, DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE));
+					write(fMasterFD, DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE) - 1);
 					break;
 				default:
 					write(fMasterFD, bytes, numBytes);
@@ -245,13 +271,13 @@ MiniView::SpawnThreads()
 		return B_ERROR;
 	TRACE(("console writer thread is: %d\n", fConsoleWriter));
 	
-	fShellProcess = spawn_thread(&MiniView::ExecuteShell, "shell process", B_URGENT_DISPLAY_PRIORITY, this);
-	if (fShellProcess < 0)
+	fShellExecutor = spawn_thread(&MiniView::ExecuteShell, "shell process", B_URGENT_DISPLAY_PRIORITY, this);
+	if (fShellExecutor < 0)
 		return B_ERROR;
 	TRACE(("shell process thread is: %d\n", fShellProcess));
 	
 	resume_thread(fConsoleWriter);
-	resume_thread(fShellProcess);
+	resume_thread(fShellExecutor);
 	return B_OK;
 }
 
@@ -292,11 +318,11 @@ MiniView::ExecuteShell(void *arg)
 		dup2(view->fSlaveFD, 1);
 		dup2(view->fSlaveFD, 2);
 		
-		thread_id shell = load_image(2, argv, (const char **)environ);
-		setpgid(shell, 0);
+		view->fShellProcess = load_image(2, argv, (const char **)environ);
+		setpgid(view->fShellProcess, 0);
 		
 		status_t return_code;
-		wait_for_thread(shell, &return_code);
+		wait_for_thread(view->fShellProcess, &return_code);
 		
 		dup2(saved_stdin, 0);
 		dup2(saved_stdout, 1);
