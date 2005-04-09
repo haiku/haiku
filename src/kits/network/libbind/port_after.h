@@ -9,17 +9,19 @@
 #include <sys/bitypes.h>
 #endif
 
-// OpenBeOS does not have these error codes
+// Haiku does not have these error codes
 #define ETOOMANYREFS B_ERROR
 
-// OpenBeOS fd_set has 'bits' instead of 'fds_bits'
+// Haiku fd_set has 'bits' instead of 'fds_bits'
 #define fds_bits bits
 
-// OpenBeOS does have pselect, but as long as we compile for BeOS we turn this on
+// Haiku does have pselect, turn this on only when we're not compiling Haiku
+#ifndef __HAIKU__
 #define NEED_PSELECT 1
 #define pselect isc__pselect
+#endif
 
-// OpenBeOS has problems with datagram sockets
+// Haiku has problems with datagram sockets
 // #define CANNOT_CONNECT_DGRAM 1
 
 #define HAVE_SA_LEN 1

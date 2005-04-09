@@ -7,8 +7,10 @@ UsePrivateHeaders net ;
 	# Default libs include BeOS R5 libnet.so, something we don't want here!
 	LINKFLAGS on libnet.so = [ on libnet.so return $(LINKFLAGS) ] -nodefaultlibs ;
 	
-	local defines = BUILDING_R5_LIBNET ;
-	if $(BONE_VERSION) {
+	local defines ;
+	if ( $(TARGET_PLATFORM) = r5 ) {
+		defines += BUILDING_R5_LIBNET ;
+	} else if ( $(TARGET_PLATFORM) = bone ) {
 		defines += BONE_VERSION ;
 	}
 	defines = [ FDefines $(defines) ] ;
@@ -18,10 +20,22 @@ UsePrivateHeaders net ;
 
 Depends libnet.so : install_network_etc_files ;
 
+if ( $(TARGET_PLATFORM) = r5 ) {
+	PLATFORM_SOURCES =
+		socket.c
+		select.c 
+		poll.c
+		;
+	PLATFORM_LIBS = ;
+} else {
+	# under Haiku and BONE we don't need the above
+	# because they are in libsocket.so or libroot.so
+	PLATFORM_SOURCES = ;
+	PLATFORM_LIBS = libsocket.so ;
+}
+
 SharedLibrary net :
-	socket.c
-	select.c 
-	poll.c
+	$(PLATFORM_SOURCES)
 	compat.c
 	arc4random.c
 	base64.c
@@ -59,7 +73,7 @@ SharedLibrary net :
 	res_send.c
 	sethostent.c
 
-	: libroot.so
+	: libroot.so $(PLATFORM_LIBS)
 ;
 
 OBOSInstall install_network_etc_files : [ FDirName $(OBOS_ETC_DIR) ] :

@@ -177,4 +177,4 @@ error:
 	return n;
 }
 
-#endif
+#endif // !BONE_VERSION

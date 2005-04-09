@@ -28,6 +28,12 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) resolv ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 }
+	
+if ( $(TARGET_PLATFORM) = haiku ) {
+	PLATFORM_LIBS = libroot.so libbe.so ;
+} else {
+	PLATFORM_LIBS = root be ;
+}
 
 SharedLibrary "bind" :
 	# dst
@@ -176,8 +182,7 @@ SharedLibrary "bind" :
 ;
 
 LinkSharedOSLibs libbind.so :
-	root 
-	be # BeOS defines syslog in libbe.so
+	$(PLATFORM_LIBS)
 	libsocket.so 
 	libnet.so # for gethostname()
 ;

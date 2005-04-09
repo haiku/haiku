@@ -1,8 +1,8 @@
 #include <unistd.h>
 #include <fcntl.h>
-#include "sys/select.h"
+#include <sys/select.h>
 
-#include "poll.h"
+#include <poll.h>
 
 // -------------------------------
 int poll(struct pollfd *fds, nfds_t numfds, int timeout)
@@ -58,4 +58,3 @@ int poll(struct pollfd *fds, nfds_t numfds, int timeout)
 
 	return rc;
 }
-

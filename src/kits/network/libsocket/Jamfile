@@ -5,9 +5,11 @@ UsePrivateHeaders net ;
 {
 	# Default libs include BeOS R5 libnet.so, something we don't want here!
 	LINKFLAGS on libsocket.so = [ on libsocket.so return $(LINKFLAGS) ] -nodefaultlibs ;
-
+	
 	local defines ;
-	if $(BONE_VERSION) {
+	if ( $(TARGET_PLATFORM) = r5 ) {
+		defines += BUILDING_R5_LIBNET ;
+	} else if ( $(TARGET_PLATFORM) = bone ) {
 		defines += BONE_VERSION ;
 	}
 	defines = [ FDefines $(defines) ] ;
@@ -15,10 +17,19 @@ UsePrivateHeaders net ;
 	SubDirC++Flags $(defines) ;
 }
 
+if ( $(TARGET_PLATFORM) = bone ) {
+	PLATFORM_SOURCES =
+		select.c 
+		;
+} else {
+	# under Haiku we don't need the above
+	# because it's in libroot.so
+	PLATFORM_SOURCES = ;
+}
+
 SharedLibrary socket : 
 	socket.c
-	select.c 
-
+	$(PLATFORM_SOURCES)
 	: root
 ;
 

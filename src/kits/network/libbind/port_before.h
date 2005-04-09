@@ -19,7 +19,7 @@ struct timezone;        /* silence warning */
 
 #undef BSD_COMP
 
-// OpenBeOS pthread support
+// Haiku pthread support
 #define DO_PTHREADS 1
 #include <pthread_emu.h>
 

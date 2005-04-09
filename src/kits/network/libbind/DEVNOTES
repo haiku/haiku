@@ -1,19 +1,18 @@
-BIND 9.2.3 ported to OpenBeOS
+BIND 9.2.3 ported to Haiku
 
-This file contains important information for developers who want to port BIND to OpenBeOS.
+This file contains important information for developers who want to port BIND to Haiku.
 I created config.h, port_before.h, and port_after.h with the BIND configure script and fixed some mistakes that the script made.
 
 Our private folder are:
-	headers (some headers are not defined in OpenBeOS)
-	src (functions that are not part of OpenBeOS, e.g.: strsep)
+	headers (some headers are not defined in Haiku)
+	src (functions that are not part of Haiku, e.g.: strsep)
 
 Porting issues:
 	BIND wants to include sys/un.h and utmp.h. We do not have these, so I put empty headers into the private headers folder.
 	
 	strsep() is not defined although we #define NEED_STRSEP in port_after.h. I put it in our private src folder.
 	
-	OpenBeOS defines pselect(), but we turned NEEDS_PSELECT in port_after.h on because it is not present in BeOS.
-	As long as we do not have a working kernel this should be #define'd. When we can do a real OpenBeOS port we should #undef it again.
+	Haiku defines pselect(), we turn on NEEDS_PSELECT in port_after.h only if we compile for BeOS.
 
 Added sources for compatibility:
 	src/res_resultcodes.c: BONE's host command wants _res_resultcodes to be defined

@@ -63,7 +63,7 @@ gai_strerror(int ecode) {
 
 #ifdef DO_PTHREADS
         if (!once) {
-				// OpenBeOS compatibility: this is a function call, thus it must be
+				// Haiku compatibility: this is a function call, thus it must be
 				// initialized here and not at when allocating 'lock'
 				lock = PTHREAD_MUTEX_INITIALIZER;
                 
