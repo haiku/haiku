@@ -12,6 +12,7 @@
 #include <cbuf.h>
 #include <vfs.h>
 #include <vfs_select.h>
+#include <select_sync_pool.h>
 #include <debug.h>
 #include <khash.h>
 #include <lock.h>
@@ -161,7 +162,7 @@ class Inode {
 		int32		ReaderCount() const { return fReaderCount; }
 		int32		WriterCount() const { return fWriterCount; }
 
-		status_t	Select(uint16 events, uint32 ref, selectsync *sync);
+		status_t	Select(uint8 event, uint32 ref, selectsync *sync);
 		status_t	Deselect(uint8 event, selectsync *sync);
 
 		static int32 HashNextOffset();
@@ -189,9 +190,7 @@ class Inode {
 		int32		fReaderCount;
 		int32		fWriterCount;
 
-		select_sync	*fSelectSync;
-		uint16		fSelectEvents;
-		uint32		fSelectRef;
+		select_sync_pool	*fSelectSyncPool;
 };
 
 
@@ -463,9 +462,7 @@ Inode::Inode(Volume *volume, Inode *parent, const char *name, int32 type)
 	fBufferChain(NULL),
 	fReaderCount(0),
 	fWriterCount(0),
-	fSelectSync(NULL),
-	fSelectEvents(0),
-	fSelectRef(0)
+	fSelectSyncPool(NULL)
 {
 	fName = strdup(name);
 	if (fName == NULL)
@@ -578,10 +575,8 @@ void
 Inode::MayReleaseWriter()
 {
 	if (BytesInChain() < PIPEFS_MAX_BUFFER_SIZE) {
-		if (fSelectSync && fSelectEvents & SELECT_FLAG(B_SELECT_WRITE)) {
-			fSelectSync->set[fSelectRef].events |= SELECT_FLAG(B_SELECT_WRITE);
-			notify_select_event((selectsync *)fSelectSync, fSelectRef, B_SELECT_WRITE);
-		}
+		if (fSelectSyncPool)
+			notify_select_event_pool(fSelectSyncPool, B_SELECT_WRITE);
 		
 		release_sem(fWriteLock);
 	}
@@ -618,10 +613,8 @@ Inode::FillPendingRequests()
 		MayReleaseWriter();
 	}
 	
-	if (fSelectSync && fSelectEvents & SELECT_FLAG(B_SELECT_READ)) {
-		fSelectSync->set[fSelectRef].events |= SELECT_FLAG(B_SELECT_READ);
-		notify_select_event((selectsync *)fSelectSync, fSelectRef, B_SELECT_READ);
-	}
+	if (fSelectSyncPool)
+		notify_select_event_pool(fSelectSyncPool, B_SELECT_READ);
 }
 
 
@@ -784,28 +777,14 @@ Inode::compare_func(void *_node, const void *_key)
 
 
 status_t
-Inode::Select(uint16 events, uint32 ref, selectsync *_sync)
+Inode::Select(uint8 event, uint32 ref, selectsync *sync)
 {
-	// TODO: What about multiple selects?
-	fSelectSync = (select_sync *)_sync;
-	if (!fSelectSync)
+	if (add_select_sync_pool_entry(&fSelectSyncPool, sync, ref, event) != B_OK)
 		return B_ERROR;
 	
-	fSelectEvents = events;
-	fSelectRef = ref;
-	
-	uint8 event = 0;
-	if (events & SELECT_FLAG(B_SELECT_READ) && BytesInChain() > 0) {
-		fSelectSync->set[fSelectRef].events |= SELECT_FLAG(B_SELECT_READ);
-		event = B_SELECT_READ;
-	}
-	if (events & SELECT_FLAG(B_SELECT_WRITE) && BytesInChain() < PIPEFS_MAX_BUFFER_SIZE) {
-		fSelectSync->set[fSelectRef].events |= SELECT_FLAG(B_SELECT_WRITE);
-		event = B_SELECT_WRITE;
-	}
-	
-	if (event != 0)
-		return notify_select_event((selectsync *)fSelectSync, fSelectRef, event);
+	if ((event == B_SELECT_READ && BytesInChain() > 0)
+		|| (event == B_SELECT_WRITE && BytesInChain() < PIPEFS_MAX_BUFFER_SIZE))
+		return notify_select_event(sync, ref, event);
 	
 	return B_OK;
 }
@@ -814,10 +793,7 @@ Inode::Select(uint16 events, uint32 ref, selectsync *_sync)
 status_t
 Inode::Deselect(uint8 event, selectsync *sync)
 {
-	// TODO: What about multiple selects?
-	fSelectSync = NULL;
-	fSelectEvents = 0;
-	fSelectRef = 0;
+	remove_select_sync_pool_entry(&fSelectSyncPool, sync, event);
 	return B_OK;
 }
 
