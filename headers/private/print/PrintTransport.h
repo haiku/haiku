@@ -58,4 +58,4 @@ private:
 	void       (*fExitProc)(void);		
 };
 
-#endif PRINT_TRANSPORT_H
+#endif // PRINT_TRANSPORT_H
