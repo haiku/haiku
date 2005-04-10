@@ -1,0 +1,23 @@
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef SMP_H
+#define SMP_H
+
+
+#include <SupportDefs.h>
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void smp_init(void);
+extern void smp_boot_other_cpus(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif	/* SMP_H */

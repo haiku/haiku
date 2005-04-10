@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -7,8 +7,7 @@
 */
 
 
-// ToDo: this should be integrated better with the rest of the loader!
-
+#include "smp.h"
 #include "mmu.h"
 
 #include <KernelExport.h>
@@ -22,15 +21,12 @@
 // ToDo: SMP is temporarily disabled!
 #define NO_SMP 1
 
-//#define TRACE_SMP
+#define TRACE_SMP
 #ifdef TRACE_SMP
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
-
-#define ADDR_MASK 0xfffff000
-#define DEFAULT_PAGE_FLAGS (1 | 2) // present/rw
 
 struct gdt_idt_descr {
 	uint16 a;
@@ -40,7 +36,6 @@ struct gdt_idt_descr {
 
 extern void execute_n_instructions(int count);
 
-extern void smp_boot(void);
 extern void smp_trampoline(void);
 extern void smp_trampoline_end(void);
 
@@ -50,37 +45,6 @@ static uint32 mp_mem_virt = 0;
 static struct mp_flt_struct *mp_flt_ptr = NULL;
 
 static int smp_get_current_cpu(void);
-
-
-static uint32
-map_page(uint32 paddr, uint32 vaddr)
-{
-	uint32 *pentry;
-	uint32 *pgdir = (uint32 *)(gKernelArgs.arch_args.page_hole + (4*1024*1024-B_PAGE_SIZE));
-
-	// check to see if a page table exists for this range
-	if (pgdir[vaddr / B_PAGE_SIZE / 1024] == 0) {
-		unsigned int pgtable;
-		// we need to allocate a pgtable
-		pgtable = gKernelArgs.physical_allocated_range[0].start + gKernelArgs.physical_allocated_range[0].size;
-		gKernelArgs.physical_allocated_range[0].size += B_PAGE_SIZE;
-		gKernelArgs.arch_args.pgtables[gKernelArgs.arch_args.num_pgtables++] = pgtable;
-
-		// put it in the pgdir
-		pgdir[vaddr / B_PAGE_SIZE / 1024] = (pgtable & ADDR_MASK) | DEFAULT_PAGE_FLAGS;
-
-		// zero it out in it's new mapping
-		memset((uint32 *)((uint32 *)gKernelArgs.arch_args.page_hole + (vaddr / B_PAGE_SIZE / 1024) * B_PAGE_SIZE), 0, B_PAGE_SIZE);
-	}
-	// now, fill in the pentry
-	pentry = (uint32 *)((uint32 *)gKernelArgs.arch_args.page_hole + vaddr / B_PAGE_SIZE);
-
-	*pentry = (paddr & ADDR_MASK) | DEFAULT_PAGE_FLAGS;
-
-	asm volatile("invlpg (%0)" : : "r" (vaddr));
-
-	return 0;
-}
 
 
 static uint32
@@ -112,6 +76,16 @@ mp_phys_to_virt(void *ptr)
 }
 
 
+static int
+smp_get_current_cpu(void)
+{
+	if (gKernelArgs.arch_args.apic == NULL)
+		return 0;
+
+	return gKernelArgs.arch_args.cpu_os_id[(apic_read(APIC_ID) & 0xffffffff) >> 24];
+}
+
+
 static uint32 *
 smp_probe(uint32 base, uint32 limit)
 {
@@ -138,7 +112,7 @@ smp_do_config(void)
 	struct mp_ext_pe *pe;
 	struct mp_ext_ioapic *io;
 	struct mp_ext_bus *bus;
-#if TRACE_SMP
+#ifdef TRACE_SMP
 	const char *cpu_family[] = { "", "", "", "", "Intel 486",
 		"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
 #endif
@@ -234,6 +208,11 @@ smp_find_mp_config(void)
 {
 	int i;
 
+#if NO_SMP
+	if (0)
+		return gKernelArgs.num_cpus = 1;
+#endif
+
 	// XXX for now, assume the memory is identity mapped by the 1st stage
 	for (i = 0; smp_scan_spots[i].len > 0; i++) {
 		mp_flt_ptr = (struct mp_flt_struct *)smp_probe(smp_scan_spots[i].start,
@@ -241,11 +220,8 @@ smp_find_mp_config(void)
 		if (mp_flt_ptr != NULL)
 			break;
 	}
-#if NO_SMP
-	if (0) {
-#else
+
 	if (mp_flt_ptr != NULL) {
-#endif
 		mp_mem_phys = smp_scan_spots[i].start;
 		mp_mem_virt = smp_scan_spots[i].start;
 
@@ -274,10 +250,9 @@ smp_find_mp_config(void)
 			smp_do_config();
 		}
 		return gKernelArgs.num_cpus;
-	} else {
-		gKernelArgs.num_cpus = 1;
-		return 1;
 	}
+
+	return gKernelArgs.num_cpus = 1;
 }
 
 
@@ -295,7 +270,7 @@ smp_cpu_ready(void)
 	struct gdt_idt_descr idt_descr;
 	struct gdt_idt_descr gdt_descr;
 
-	TRACE(("smp_cpu_ready: entry cpu %ld\n", curr_cpu));
+	//TRACE(("smp_cpu_ready: entry cpu %ld\n", curr_cpu));
 
 	// Important.  Make sure supervisor threads can fault on read only pages...
 	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
@@ -328,12 +303,51 @@ smp_cpu_ready(void)
 }
 
 
-static int
-smp_boot_all_cpus(void)
+static void
+calculate_apic_timer_conversion_factor(void)
+{
+	int64 t1, t2;
+	uint32 config;
+	uint32 count;
+
+	// setup the timer
+	config = apic_read(APIC_LVTT);
+	config = (config & ~APIC_LVTT_MASK) + APIC_LVTT_M; // timer masked, vector 0
+	apic_write(APIC_LVTT, config);
+
+	config = (apic_read(APIC_TDCR) & ~0x0000000f) + 0xb; // divide clock by one
+	apic_write(APIC_TDCR, config);
+
+	t1 = system_time();
+	apic_write(APIC_ICRT, 0xffffffff); // start the counter
+
+	execute_n_instructions(128*20000);
+
+	count = apic_read(APIC_CCRT);
+	t2 = system_time();
+
+	count = 0xffffffff - count;
+
+	gKernelArgs.arch_args.apic_time_cv_factor = (uint32)((1000000.0/(t2 - t1)) * count);
+
+	TRACE(("APIC ticks/sec = %ld\n", gKernelArgs.arch_args.apic_time_cv_factor));
+}
+
+
+//	#pragma mark -
+
+
+void
+smp_boot_other_cpus(void)
 {
 	uint32 trampoline_code;
 	uint32 trampoline_stack;
 	uint32 i;
+
+	if (gKernelArgs.num_cpus < 2)
+		return;
+
+	TRACE(("trampolining other cpus\n"));
 
 	// XXX assume low 1 meg is identity mapped by the 1st stage bootloader
 	// and nothing important is in 0x9e000 & 0x9f000
@@ -342,8 +356,6 @@ smp_boot_all_cpus(void)
 	// (these have to be < 1M physical)
 	trampoline_code = 0x9f000; 	// 640kB - 4096 == 0x9f000
 	trampoline_stack = 0x9e000; // 640kB - 8192 == 0x9e000
-	map_page(0x9f000, 0x9f000);
-	map_page(0x9e000, 0x9e000);
 
 	// copy the trampoline code over
 	memcpy((char *)trampoline_code, &smp_trampoline,
@@ -357,10 +369,6 @@ smp_boot_all_cpus(void)
 		uint32 config;
 		uint32 num_startups;
 		uint32 j;
-
-		// create a final stack the trampoline code will put the ap processor on
-		gKernelArgs.cpu_kstack[i].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
-		gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE;
 
 		// set this stack up
 		final_stack = (uint32 *)gKernelArgs.cpu_kstack[i].start;
@@ -437,47 +445,16 @@ smp_boot_all_cpus(void)
 		}
 	}
 
-	return 0;
-}
-
-
-static void
-calculate_apic_timer_conversion_factor(void)
-{
-	int64 t1, t2;
-	uint32 config;
-	uint32 count;
-
-	// setup the timer
-	config = apic_read(APIC_LVTT);
-	config = (config & ~APIC_LVTT_MASK) + APIC_LVTT_M; // timer masked, vector 0
-	apic_write(APIC_LVTT, config);
-
-	config = (apic_read(APIC_TDCR) & ~0x0000000f) + 0xb; // divide clock by one
-	apic_write(APIC_TDCR, config);
-
-	t1 = system_time();
-	apic_write(APIC_ICRT, 0xffffffff); // start the counter
-
-	execute_n_instructions(128*20000);
-
-	count = apic_read(APIC_CCRT);
-	t2 = system_time();
-
-	count = 0xffffffff - count;
-
-	gKernelArgs.arch_args.apic_time_cv_factor = (uint32)((1000000.0/(t2 - t1)) * count);
-
-	TRACE(("APIC ticks/sec = %ld\n", gKernelArgs.arch_args.apic_time_cv_factor));
+	TRACE(("done trampolining\n"));
 }
 
 
 void
-smp_boot(void)
+smp_init(void)
 {
-//	dprintf("smp_boot: entry\n");
-
 	if (smp_find_mp_config() > 1) {
+		uint32 i;
+
 		TRACE(("smp_boot: had found > 1 cpus\n"));
 		TRACE(("post config:\n"));
 		TRACE(("num_cpus = %ld\n", gKernelArgs.num_cpus));
@@ -485,13 +462,10 @@ smp_boot(void)
 		TRACE(("ioapic_phys = %p\n", (void *)gKernelArgs.arch_args.ioapic_phys));
 
 		// map in the apic & ioapic
-		map_page(gKernelArgs.arch_args.apic_phys, gKernelArgs.virtual_allocated_range[0].start + gKernelArgs.virtual_allocated_range[0].size);
-		gKernelArgs.arch_args.apic = (uint32 *)(gKernelArgs.virtual_allocated_range[0].start + gKernelArgs.virtual_allocated_range[0].size);
-		gKernelArgs.virtual_allocated_range[0].size += B_PAGE_SIZE;
-
-		map_page(gKernelArgs.arch_args.ioapic_phys, gKernelArgs.virtual_allocated_range[0].start + gKernelArgs.virtual_allocated_range[0].size);
-		gKernelArgs.arch_args.ioapic = (uint32 *)(gKernelArgs.virtual_allocated_range[0].start + gKernelArgs.virtual_allocated_range[0].size);
-		gKernelArgs.virtual_allocated_range[0].size += B_PAGE_SIZE;
+		gKernelArgs.arch_args.apic = (uint32 *)mmu_map_physical_memory(
+			gKernelArgs.arch_args.apic_phys, B_PAGE_SIZE, kDefaultPageFlags);
+		gKernelArgs.arch_args.ioapic = (uint32 *)mmu_map_physical_memory(
+			gKernelArgs.arch_args.ioapic_phys, B_PAGE_SIZE, kDefaultPageFlags);
 
 		TRACE(("apic = %p\n", gKernelArgs.arch_args.apic));
 		TRACE(("ioapic = %p\n", gKernelArgs.arch_args.ioapic));
@@ -499,20 +473,12 @@ smp_boot(void)
 		// calculate how fast the apic timer is
 		calculate_apic_timer_conversion_factor();
 
-		TRACE(("trampolining other cpus\n"));
-		smp_boot_all_cpus();
-		TRACE(("done trampolining\n"));
+		for (i = 1; i < gKernelArgs.num_cpus; i++) {
+			// create a final stack the trampoline code will put the ap processor on
+			gKernelArgs.cpu_kstack[i].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
+			gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE;
+		}
 	}
-
-	TRACE(("smp_boot: exit\n"));
 }
 
 
-static int
-smp_get_current_cpu(void)
-{
-	if (gKernelArgs.arch_args.apic == NULL)
-		return 0;
-
-	return gKernelArgs.arch_args.cpu_os_id[(apic_read(APIC_ID) & 0xffffffff) >> 24];
-}

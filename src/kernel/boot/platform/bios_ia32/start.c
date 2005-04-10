@@ -1,13 +1,14 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "serial.h"
 #include "console.h"
 #include "cpu.h"
 #include "mmu.h"
+#include "smp.h"
 #include "keyboard.h"
 #include "bios.h"
 
@@ -74,7 +75,7 @@ platform_start_kernel(void)
 	addr_t stackTop = gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
 	mmu_init_for_kernel();
-	cpu_boot_other_cpus();
+	smp_boot_other_cpus();
 
 	dprintf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
 
@@ -127,6 +128,7 @@ _start(void)
 	if (sBootOptions & BOOT_OPTION_DEBUG_OUTPUT)
 		serial_enable();
 
+	smp_init();
 	main(&args);
 }
 

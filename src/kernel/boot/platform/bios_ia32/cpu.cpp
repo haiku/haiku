@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * calculate_cpu_conversion_factor() was written by Travis Geiselbrecht and
@@ -21,14 +21,13 @@
 
 
 //#define TRACE_CPU
-#ifdef TRACE_SMP
+#ifdef TRACE_CPU
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
 
 
-extern "C" void smp_boot(void);
 extern "C" uint64 rdtsc();
 
 uint32 gTimeConversionFactor;
@@ -229,13 +228,6 @@ spin(bigtime_t microseconds)
 
 	while((system_time() - time) < microseconds)
 		;
-}
-
-
-extern "C" void
-cpu_boot_other_cpus()
-{
-	smp_boot();
 }
 
 
