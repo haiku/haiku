@@ -1572,14 +1572,28 @@ cl->fBoundsLeftTop.PrintToStream();
 		}
 		case AS_GET_WORKSPACES:
 		{
-			// TODO: Implement AS_GET_WORKSPACES
 			STRACE(("ServerWindow %s: Message Get_Workspaces unimplemented\n",fTitle.String()));
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Attach<uint32>(fWorkspaces);
+			fMsgSender->Flush();
 			break;
 		}
 		case AS_SET_WORKSPACES:
 		{
 			// TODO: Implement AS_SET_WORKSPACES
 			STRACE(("ServerWindow %s: Message Set_Workspaces unimplemented\n",fTitle.String()));
+			uint32		exWorkspaces = fWorkspaces;
+			// set is immediate. however, on screen, that will take a bit longer
+			// as RootLayer thread is responsible for showing/hidding the window
+			// from workspaces
+			link.Read<uint32>(&fWorkspaces);
+
+			BPortLink	msg(-1, -1);
+			msg.StartMessage(AS_ROOTLAYER_WINBORDER_SET_WORKSPACES);
+			msg.Attach<WinBorder*>(fWinBorder);
+			msg.Attach<uint32>(exWorkspaces);
+			msg.Attach<uint32>(fWorkspaces);
+			fWinBorder->GetRootLayer()->EnqueueMessage(msg);
 			break;
 		}
 		case AS_WINDOW_RESIZE:

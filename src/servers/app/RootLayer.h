@@ -70,7 +70,9 @@ public:
 
 			void				HideWinBorder(WinBorder* winBorder);
 			void				ShowWinBorder(WinBorder* winBorder);
-			void				SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex);
+			void				SetWinBorderWorskpaces(WinBorder *winBorder,
+										uint32 oldWksIndex,
+										uint32 newWksIndex);
 			WinBorder*			WinBorderAt(const BPoint& pt) const;
 	inline	WinBorder*			FocusWinBorder() const { return fWorkspace[fActiveWksIndex]->Focus(); }
 	inline	WinBorder*			FrontWinBorder() const { return fWorkspace[fActiveWksIndex]->Front(); }
@@ -140,13 +142,15 @@ friend class Desktop;
 			void				hide_winBorder(WinBorder* winBorder);
 
 			bool				get_workspace_windows();
-			void 				draw_window_tab(WinBorder *exFocus, WinBorder *focus);
+			void 				draw_window_tab(WinBorder *exFocus);
 			void				empty_visible_regions(Layer *layer);
 
 			void				invalidate_layer(Layer *layer, const BRegion &region);
 			void				redraw_layer(Layer *layer, const BRegion &region);
 
 			void				winborder_activation(WinBorder* exActive);
+
+			void				show_final_scene(WinBorder *exFocus, WinBorder *exActive);
 
 			// Input related methods
 			void				MouseEventHandler(int32 code, BPortLink& link);

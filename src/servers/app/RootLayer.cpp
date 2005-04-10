@@ -279,6 +279,17 @@ int32 RootLayer::WorkingThread(void *data)
 				desktop->RemoveWinBorderFromSubset(winBorder, fromWinBorder);
 				break;
 			}
+			case AS_ROOTLAYER_WINBORDER_SET_WORKSPACES:
+			{
+				WinBorder	*winBorder = NULL;
+				uint32		oldWks = 0, newWks = 0;
+
+				messageQueue.Read<WinBorder*>(&winBorder);
+				messageQueue.Read<uint32>(&oldWks);
+				messageQueue.Read<uint32>(&newWks);
+				oneRootLayer->SetWinBorderWorskpaces(winBorder, oldWks, newWks);
+				break;
+			}
 			default:
 				STRACE(("RootLayer(%s)::WorkingThread received unexpected code %lx\n",oneRootLayer->GetName(), code));
 				break;
@@ -463,7 +474,8 @@ void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 
 	bool		invalidate	= false;
 	bool		invalid;
-	WinBorder	*exFocus = FocusWinBorder();
+	WinBorder	*exFocus	= FocusWinBorder();
+	WinBorder	*exActive	= ActiveWinBorder();
 
 	// we try to add WinBorders to all workspaces. If they are not needed, nothing will be done.
 	// If they are needed, Workspace automaticaly allocates space and inserts them.
@@ -479,15 +491,7 @@ void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 	}
 
 	if (invalidate)
-	{
-		get_workspace_windows();
-
-		// TODO: should it be improved by calling with region of hidden windows
-		//       plus the full regions of new windows???
-		invalidate_layer(this, fFull);
-
-		draw_window_tab(exFocus, FocusWinBorder());
-	}
+		show_final_scene(exFocus, exActive);
 }
 
 void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder)
@@ -502,6 +506,7 @@ void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBo
 	bool		invalidate	= false;
 	bool		invalid;
 	WinBorder	*exFocus = FocusWinBorder();
+	WinBorder	*exActive	= ActiveWinBorder();
 
 	// we try to remove from all workspaces. If winBorder is not in there, nothing will be done.
 	for (int32 i = 0; i < fWsCount; i++)
@@ -516,15 +521,7 @@ void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBo
 	}
 
 	if (invalidate)
-	{
-		get_workspace_windows();
-
-		// TODO: should it be improved by calling with region of hidden windows
-		//       plus the full regions of new windows???
-		invalidate_layer(this, fFull);
-
-		draw_window_tab(exFocus, FocusWinBorder());
-	}
+		show_final_scene(exFocus, exActive);
 }
 
 
@@ -559,8 +556,7 @@ void RootLayer::SetActiveWorkspace(int32 index)
 
 	desktop->Unlock();
 
-	WinBorder	*exFocus = FocusWinBorder();
-	int32		exIndex = ActiveWorkspaceIndex();
+	int32		exIndex		= ActiveWorkspaceIndex();
 
 	{
 		int32		ptrCount;
@@ -621,8 +617,8 @@ void RootLayer::SetActiveWorkspace(int32 index)
 			// As we surely know this windows is visible, we simply set fHidden to true and then
 			// change it back when adding winBorder to the current workspace.
 			movingWinBorder->fHidden = true;
-			WorkspaceAt(exIndex)->HideWinBorder(movingWinBorder);
-			WorkspaceAt(exIndex)->RemoveWinBorder(movingWinBorder);
+			fWorkspace[exIndex]->HideWinBorder(movingWinBorder);
+			fWorkspace[exIndex]->RemoveWinBorder(movingWinBorder);
 
 			movingWinBorder->Window()->QuietlySetWorkspaces(movingWinBorder->Window()->Workspaces() & ~(0x00000001 << exIndex));
 
@@ -646,35 +642,21 @@ void RootLayer::SetActiveWorkspace(int32 index)
 		fMovingWindow = false;
 		fResizingWindow	= false;
 	}
-
-	if (exFocus != FocusWinBorder())
-	{
-		if (exFocus)
-		{
-			BMessage	activateMsg(B_WINDOW_ACTIVATED);
-			activateMsg.AddBool("active", false);
-			exFocus->Window()->SendMessageToClient(&activateMsg);
-
-		}
-		if (FocusWinBorder())
-		{
-			BMessage	activateMsg(B_WINDOW_ACTIVATED);
-			activateMsg.AddBool("active", true);
-			FocusWinBorder()->Window()->SendMessageToClient(&activateMsg);
-		}
-	}
 }
 
-void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex)
+void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint32 newWksIndex)
 {
 	// you *cannot* set workspaces index for a window other than a normal one!
 	// Note: See ServerWindow class.
 	if (winBorder->Window()->Feel() != B_NORMAL_WINDOW_FEEL)
 		return;
 
-	bool invalidate = false;
-	bool invalid;
-	uint32		oldWksIndex = winBorder->Window()->Workspaces();
+// TODO: What if we're moving this very same window!?
+
+	bool		invalidate	= false;
+	bool		invalid;
+	WinBorder	*exFocus	= FocusWinBorder();
+	WinBorder	*exActive	= ActiveWinBorder();
 
 	for (int32 i = 0; i < 32; i++)
 	{
@@ -682,15 +664,15 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex)
 		{
 			invalid = false;
 
-			if (oldWksIndex & (0x00000001UL << i) &&
-				!(newWksIndex & (0x00000001UL << i)))
+			if (fWorkspace[i]->HasWinBorder(winBorder)
+				&& !(newWksIndex & (0x00000001UL << i)))
 			{
 				if (!winBorder->IsHidden())
 				{
 					// a little trick to force Workspace to properly pick the next front.
-					winBorder->Hide();
+					winBorder->fHidden = true;
 					invalid = fWorkspace[i]->HideWinBorder(winBorder);
-					winBorder->Show();
+					winBorder->fHidden = false;
 				}
 				fWorkspace[i]->RemoveWinBorder(winBorder);
 			}
@@ -705,7 +687,7 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex)
 			else
 			{
 				// do nothing. winBorder was, and it's still is a member of this workspace
-				// OR, winBorder wasn't and it not be in this workspace
+				// OR, winBorder wasn't and it will not be in this workspace
 			}
 
 			if (fActiveWksIndex == i)
@@ -714,7 +696,7 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex)
 	}
 
 	if (invalidate)
-		; // RootLayer::Invalidate(winBorder's full visible)
+		show_final_scene(exFocus, exActive);
 }
 
 void RootLayer::SetWorkspaceCount(int32 wksCount)
@@ -985,16 +967,8 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			// This is because internaly it calls Workspace::ShowWinBorder() and this imposes
 			// a small penalty, but we can live with that; it make Workspace code a lot more clear/clean.
 
-			if (invalidate && get_workspace_windows())
-			{
-				// TODO: should it be improved by calling with region of hidden windows
-				//       plus the full regions of new windows???
-				invalidate_layer(this, fFull);
-			}
-
-			draw_window_tab(exFocus, FocusWinBorder());
-
-			winborder_activation(exActive);
+			if (invalidate)
+				show_final_scene(exFocus, exActive);
 
 			if (action == DEC_DRAG)
 			{
@@ -1081,7 +1055,8 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			}
 			else
 			{
-				if (fLastMouseMoved && fLastMouseMoved->fOwner && fLastMouseMoved->fOwner == FocusWinBorder())
+				// NOTE: focus may be NULL
+				if (fLastMouseMoved->fOwner && fLastMouseMoved->fOwner == FocusWinBorder())
 				{
 					// send B_MOUSE_UP for regular Layers/BViews
 					BMessage upmsg(B_MOUSE_UP);
@@ -1410,23 +1385,15 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					if (scancode - 1 > 0 && scancode -1 <= fWsCount
 						&& scancode - 2 != fActiveWksIndex)
 					{
-						WinBorder		*exFocus = FocusWinBorder();
+						WinBorder		*exFocus	= FocusWinBorder();
+						WinBorder		*exActive	= ActiveWinBorder();
 
 						SetActiveWorkspace(scancode-2);
 
-						get_workspace_windows();
-
-						invalidate_layer(this, fFull);
-
-						draw_window_tab(exFocus, FocusWinBorder());
+						show_final_scene(exFocus, exActive);
 
 // TODO: lock ServerWindows here! Don't forget, you need to add/remove Layers
 // from within RootLayer's thread!!!
-						// reset fLastMouseMoved as it may point to a Layer which
-						// may not be in this workspace.
-						fLastMouseMoved = LayerAt(fLastMousePossition);
-						if (fLastMouseMoved == NULL)
-							debugger("RootLayer::KeyboardEventHandler: 'fLastMouseMoved' can't be null.\n");
 					}
 					if (string)
 						free(string);
@@ -1769,17 +1736,7 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 	}
 
 	if (invalidate)
-	{
-		get_workspace_windows();
-
-		// TODO: should it be improved by calling with region of hidden windows
-		//       plus the full regions of new windows???
-		invalidate_layer(this, fFull);
-
-		draw_window_tab(exFocus, FocusWinBorder());
-
-		winborder_activation(exActive);
-	}
+		show_final_scene(exFocus, exActive);
 }
 
 void RootLayer::hide_winBorder(WinBorder *winBorder)
@@ -1803,17 +1760,7 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 	}
 
 	if (invalidate)
-	{
-		get_workspace_windows();
-
-		// TODO: should it be improved by calling with region of hidden windows
-		//       plus the full regions of new windows???
-		invalidate_layer(this, fFull);
-
-		draw_window_tab(exFocus, FocusWinBorder());
-
-		winborder_activation(exActive);
-	}
+		show_final_scene(exFocus, exActive);
 }
 
 bool RootLayer::get_workspace_windows()
@@ -1872,8 +1819,9 @@ bool RootLayer::get_workspace_windows()
 	return aChange;
 }
 
-void RootLayer::draw_window_tab(WinBorder *exFocus, WinBorder *focus)
+void RootLayer::draw_window_tab(WinBorder *exFocus)
 {
+	WinBorder *focus = FocusWinBorder();
 	if (exFocus || focus)
 	{
 		if (exFocus && exFocus != focus && exFocus->fDecorator)
@@ -1926,4 +1874,30 @@ void RootLayer::winborder_activation(WinBorder* exActive)
 		msg.AddBool("active", true);
 		FrontWinBorder()->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 	}
+}
+
+inline
+void RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
+{
+	if(get_workspace_windows())
+	{
+		// TODO: should it be improved by calling with region of hidden windows
+		//       plus the full regions of new windows???
+		invalidate_layer(this, fFull);
+	}
+
+	draw_window_tab(exFocus);
+
+	winborder_activation(exActive);
+
+// TODO: MoveEventHandler::B_MOUSE_DOWN may not need this. Investigate.
+// TODO: B_ENTERD_VIEW, B_EXITED_VIEW, B_INSIDE_VIEW, B_OUTSIDE_VIEW are sent only
+// when the mouse is moved. What about when adding or removing a window that contains
+// fLastMouseMoved, shouldn't the next fLastMouseMoved Layer get a B_MOUSE_MOVE at
+// the same mouse position with B_ENTERD_VIEW??? Same when changing workspaces!!!
+// INVESTIGATE, INVESTIGATE, INVESTIGATE!!!
+// NOTE: the following 3 lines are here for safety reasons!
+	fLastMouseMoved = LayerAt(fLastMousePossition);
+	if (fLastMouseMoved == NULL)
+		debugger("RootLayer::KeyboardEventHandler: 'fLastMouseMoved' can't be null.\n");
 }
