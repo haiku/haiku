@@ -1444,7 +1444,6 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n",fTitle.String()));
 			Show();
-printf("Adi: %s shown\n", fTitle.String());
 			break;
 		}
 		case AS_HIDE_WINDOW:

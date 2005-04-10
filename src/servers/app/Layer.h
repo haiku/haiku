@@ -154,7 +154,6 @@ protected:
 	friend class RootLayer;
 	friend class WinBorder;
 	friend class ServerWindow;
-	friend class Workspace;
 
 			void				move_layer(float x, float y);
 			void				resize_layer(float x, float y);

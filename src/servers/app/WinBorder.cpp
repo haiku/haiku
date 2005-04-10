@@ -245,7 +245,6 @@ void WinBorder::MouseUp(click_type action)
 		fIsZooming	= false;
 		fDecorator->SetZoom(false);
 		fDecorator->DrawZoom();
-		
 		if(action==DEC_ZOOM)
 			Window()->Zoom();
 		return;
