@@ -73,9 +73,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fWinBorderIndex	= 0;
 	fWsCount		= 0;
 	fActiveWksIndex	= 0;
-	memset(&fWorkspace[0], 0, sizeof(Workspace*)*32);
-	SetWorkspaceCount(workspaceCount);
-	SetActiveWorkspace(0L);
 
 	fMovingWindow		= false;
 	fResizingWindow		= false;
@@ -92,6 +89,14 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fRows = 0;
 	fColumns = 0;
 
+
+	// easy way to identify this class.
+	fClassID = AS_ROOTLAYER_CLASS;
+	fHidden	= false;
+
+	memset(&fWorkspace[0], 0, sizeof(Workspace*)*32);
+	SetWorkspaceCount(workspaceCount);
+
 	// TODO: this should eventually be replaced by a method to convert the monitor
 	// number to an index in the name, i.e. workspace_settings_1 for screen #1
 	ReadWorkspaceData(WORKSPACE_DATA_LIST);
@@ -101,9 +106,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fScreenYResolution = 0;
 	fColorSpace = B_RGB32;
 
-	// easy way to identify this class.
-	fClassID = AS_ROOTLAYER_CLASS;
-	fHidden	= false;
+	SetActiveWorkspace(0L);
 
 	// Spawn our working thread
 //	fThreadID = spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
@@ -556,12 +559,8 @@ void RootLayer::SetActiveWorkspace(int32 index)
 
 	desktop->Unlock();
 
-	if (ActiveWorkspace()->Focus())
-	{
-		BMessage	activateMsg(B_WINDOW_ACTIVATED);
-		activateMsg.AddBool("active", false);
-//		ActiveWorkspace()->Focus()->layerPtr->Window()->SendMsgToClient(&msg);
-	}
+	WinBorder	*exFocus = FocusWinBorder();
+	int32		exIndex = ActiveWorkspaceIndex();
 
 	{
 		int32		ptrCount;
@@ -603,16 +602,67 @@ void RootLayer::SetActiveWorkspace(int32 index)
 		}
 	}
 
-	if (ActiveWorkspace()->Focus())
+	if (fMovingWindow && fEventMaskLayer)
 	{
-		BMessage	activateMsg(B_WINDOW_ACTIVATED);
-		activateMsg.AddBool("active", true);
-//		ActiveWorkspace()->Focus()->layerPtr->Window()->SendMsgToClient(&msg);
+		WinBorder	*movingWinBorder = (WinBorder*)fEventMaskLayer;
+
+		movingWinBorder->MouseUp(DEC_NONE);
+
+		// NOTE: DO NOT reset these 2 members! We still want to move our window in the new workspace
+		//fEventMaskLayer	= NULL;
+		//fMovingWindow = false;
+		fResizingWindow	= false;
+
+		// only normal windows can change workspaces
+		if (movingWinBorder->Window()->Feel() == B_NORMAL_WINDOW_FEEL
+			&& !ActiveWorkspace()->HasWinBorder(movingWinBorder))
+		{
+			// Workspace class expects a window to be hidden when it's about to be removed.
+			// As we surely know this windows is visible, we simply set fHidden to true and then
+			// change it back when adding winBorder to the current workspace.
+			movingWinBorder->fHidden = true;
+			WorkspaceAt(exIndex)->HideWinBorder(movingWinBorder);
+			WorkspaceAt(exIndex)->RemoveWinBorder(movingWinBorder);
+
+			movingWinBorder->Window()->QuietlySetWorkspaces(movingWinBorder->Window()->Workspaces() & ~(0x00000001 << exIndex));
+
+			movingWinBorder->fHidden = false;
+			ActiveWorkspace()->AddWinBorder(movingWinBorder);
+			ActiveWorkspace()->ShowWinBorder(movingWinBorder);
+
+			movingWinBorder->Window()->QuietlySetWorkspaces(movingWinBorder->Window()->Workspaces() | (0x00000001 << exIndex));
+		}
+	}
+	else if (fEventMaskLayer)
+	{
+		// is this a WinBorder object?
+		if (!fEventMaskLayer->fOwner)
+		{
+			// this WinBorder captured the mouse for a reason. allow it to finish its task.
+			((WinBorder*)fEventMaskLayer)->MouseUp(DEC_NONE);
+		}
+
+		fEventMaskLayer	= NULL;
+		fMovingWindow = false;
+		fResizingWindow	= false;
 	}
 
-// TODO: if the user is holding/moving a window, *IF* the window *is not*
-//       in future active workspace, remove from curent one and place in
-//       future active workspace.
+	if (exFocus != FocusWinBorder())
+	{
+		if (exFocus)
+		{
+			BMessage	activateMsg(B_WINDOW_ACTIVATED);
+			activateMsg.AddBool("active", false);
+			exFocus->Window()->SendMessageToClient(&activateMsg);
+
+		}
+		if (FocusWinBorder())
+		{
+			BMessage	activateMsg(B_WINDOW_ACTIVATED);
+			activateMsg.AddBool("active", true);
+			FocusWinBorder()->Window()->SendMessageToClient(&activateMsg);
+		}
+	}
 }
 
 void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex)
@@ -1031,7 +1081,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			}
 			else
 			{
-				if (fLastMouseMoved->fOwner && fLastMouseMoved->fOwner == FocusWinBorder())
+				if (fLastMouseMoved && fLastMouseMoved->fOwner && fLastMouseMoved->fOwner == FocusWinBorder())
 				{
 					// send B_MOUSE_UP for regular Layers/BViews
 					BMessage upmsg(B_MOUSE_UP);
@@ -1369,6 +1419,14 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 						invalidate_layer(this, fFull);
 
 						draw_window_tab(exFocus, FocusWinBorder());
+
+// TODO: lock ServerWindows here! Don't forget, you need to add/remove Layers
+// from within RootLayer's thread!!!
+						// reset fLastMouseMoved as it may point to a Layer which
+						// may not be in this workspace.
+						fLastMouseMoved = LayerAt(fLastMousePossition);
+						if (fLastMouseMoved == NULL)
+							debugger("RootLayer::KeyboardEventHandler: 'fLastMouseMoved' can't be null.\n");
 					}
 					if (string)
 						free(string);
