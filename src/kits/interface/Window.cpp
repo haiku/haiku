@@ -1868,14 +1868,16 @@ status_t BWindow::GetWindowAlignment(window_alignment* mode,
 
 uint32 BWindow::Workspaces() const
 {
-	uint32					workspaces;
+	int32		rCode;
+	uint32		workspaces;
 
 	const_cast<BWindow*>(this)->Lock();
 	fLink->StartMessage( AS_GET_WORKSPACES );
 	fLink->Flush();
-	fLink->GetNextReply( (int32*)&workspaces );
+	fLink->GetNextReply(&rCode);
+	fLink->Read<uint32>(&workspaces);
 	const_cast<BWindow*>(this)->Unlock();
-	
+// TODO: shouldn't we cache?
 	return workspaces;
 }
 
@@ -1883,10 +1885,13 @@ uint32 BWindow::Workspaces() const
 
 void BWindow::SetWorkspaces(uint32 workspaces)
 {
+// TODO: don't forget about Tracker's background window.
+	if (fFeel != B_NORMAL_WINDOW_FEEL)
+		return;
 
 	Lock();
-	fLink->StartMessage( AS_SET_WORKSPACES );
-	fLink->Attach<int32>( (int32)workspaces );
+	fLink->StartMessage(AS_SET_WORKSPACES);
+	fLink->Attach<uint32>(workspaces);
 	fLink->Flush();
 	Unlock();
 }
