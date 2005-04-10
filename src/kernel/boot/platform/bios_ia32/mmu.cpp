@@ -57,7 +57,6 @@ struct extended_memory {
 	uint32 type;
 };
 
-static const uint32 kDefaultPageFlags = 0x03;		// present, R/W
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
 

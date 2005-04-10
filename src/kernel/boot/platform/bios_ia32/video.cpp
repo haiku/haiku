@@ -479,7 +479,7 @@ fallback:
 	if (lastBase == 0) {
 		// the graphics memory has not been mapped yet!
 		sFrameBuffer = mmu_map_physical_memory(gKernelArgs.frame_buffer.physical_buffer.start,
-							gKernelArgs.frame_buffer.physical_buffer.size, 0x03);
+							gKernelArgs.frame_buffer.physical_buffer.size, kDefaultPageFlags);
 	}
 
 	// clear the video memory

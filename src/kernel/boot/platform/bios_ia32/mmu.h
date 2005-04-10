@@ -1,13 +1,16 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef MMU_H
 #define MMU_H
 
 
 #include <SupportDefs.h>
 
+
+// For use with mmu_map_physical_memory()
+static const uint32 kDefaultPageFlags = 0x3;	// present, R/W
 
 #ifdef __cplusplus
 extern "C" {
