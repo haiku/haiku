@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -103,5 +103,12 @@ arch_vm_init_end(kernel_args *args)
 void 
 arch_vm_aspace_swap(vm_address_space *aspace)
 {
+}
+
+
+bool
+arch_vm_supports_protection(uint32 protection)
+{
+	return true;
 }
 
