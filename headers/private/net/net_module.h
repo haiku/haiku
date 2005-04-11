@@ -17,7 +17,11 @@
 
 #include <module.h>
 
+#ifndef __HAIKU__
 #define NETWORK_MODULES_ROOT	"obos_network/"
+#else
+#define NETWORK_MODULES_ROOT	"network/"
+#endif
 
 struct kernel_net_module_info {
 	module_info info;
