@@ -9,7 +9,7 @@ UsePrivateHeaders net ;
 		SubDirC++Flags $(defines) ;
 		PLATFORM_LIBS = ;
 	} else {
-		PLATFORM_LIBS = libsocket.so ;
+		PLATFORM_LIBS = libsocket.so libbind.so ;
 	}
 }
 

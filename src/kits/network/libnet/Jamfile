@@ -7,11 +7,18 @@ UsePrivateHeaders net ;
 	# Default libs include BeOS R5 libnet.so, something we don't want here!
 	LINKFLAGS on libnet.so = [ on libnet.so return $(LINKFLAGS) ] -nodefaultlibs ;
 	
+	# actually we are always BUILDING_R5_LIBNET, as this means we get unprefixed
+	# versions of inet_* functions in libnet.so, which is how it should be in any case
+	# BONE versions of the inet_* functions are prefixed with __ in <arpa/inet.h> and
+	# implemented in libbind.so as are ours.
 	local defines ;
 	if ( $(TARGET_PLATFORM) = r5 ) {
 		defines += BUILDING_R5_LIBNET ;
 	} else if ( $(TARGET_PLATFORM) = bone ) {
 		defines += BONE_VERSION ;
+		defines += BUILDING_R5_LIBNET ;
+	} else if ( $(TARGET_PLATFORM) = haiku ) {
+		defines += BUILDING_R5_LIBNET ;
 	}
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
@@ -22,7 +29,6 @@ Depends libnet.so : install_network_etc_files ;
 
 if ( $(TARGET_PLATFORM) = r5 ) {
 	PLATFORM_SOURCES =
-		socket.c
 		select.c 
 		poll.c
 		;
@@ -36,6 +42,7 @@ if ( $(TARGET_PLATFORM) = r5 ) {
 
 SharedLibrary net :
 	$(PLATFORM_SOURCES)
+	socket.c
 	compat.c
 	arc4random.c
 	base64.c
