@@ -2,8 +2,8 @@ SubDir OBOS_TOP src tests kits support barchivable remoteobjectdef ;
 
 # Add the libraries' resource files. If this sort of thing is needed
 # anywhere else, we ought to make it into a real rule.
-AddResources libsupporttest_RemoteTestObject.so : Resource.rsrc ;
-AddResources libsupporttest_RemoteTestObject_r5.so : Resource.rsrc ;
+AddResources libsupporttest_RemoteTestObject.so : RemoteTestObject.rdef ;
+AddResources libsupporttest_RemoteTestObject_r5.so : RemoteTestObject.rdef ;
 
 CommonTestLib libsupporttest_RemoteTestObject.so
 	: RemoteTestObject.cpp
@@ -11,5 +11,5 @@ CommonTestLib libsupporttest_RemoteTestObject.so
 	: be stdc++.r4
 	:
 	: support
-	: Resource.rsrc
+	: RemoteTestObject.rdef
 ;
