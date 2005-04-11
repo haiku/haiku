@@ -2,7 +2,7 @@ SubDir OBOS_TOP src tests add-ons print pdf bezierbounds ;
 
 SubDirHdrs $(OBOS_TOP) src add-ons print drivers pdf source ;
 
-AddResources BezierBounds : BBApp.rsrc ;
+AddResources BezierBounds : BBApp.rdef ;
 
 local sources =
 	BBApp.cpp

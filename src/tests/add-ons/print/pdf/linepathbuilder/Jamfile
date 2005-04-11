@@ -2,7 +2,7 @@ SubDir OBOS_TOP src tests add-ons print pdf linepathbuilder ;
 
 SubDirHdrs $(OBOS_TOP) src add-ons print drivers pdf source ;
 
-AddResources LinePathBuilder : LinePathBuilder.rsrc ;
+AddResources LinePathBuilder : LinePathBuilder.rdef ;
 
 local sources =
 	LPBApp.cpp
