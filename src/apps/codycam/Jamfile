@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps codycam ;
 
-AddResources CodyCam : codycam.rsrc ;
+AddResources CodyCam : CodyCam.rdef ;
 
 App CodyCam :
 	CodyCam.cpp

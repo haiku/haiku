@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps people ;
 
-AddResources People : People.rsrc ;
+AddResources People : People.rdef ;
 
 App People : main.cpp
 	PeopleApp.cpp

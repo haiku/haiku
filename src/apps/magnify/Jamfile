@@ -1,5 +1,5 @@
 SubDir OBOS_TOP src apps magnify ;
 
-AddResources Magnify : Magnify.rsrc ;
+AddResources Magnify : Magnify.rdef ;
 App Magnify : main.cpp ;
 LinkSharedOSLibs Magnify : be tracker game ;

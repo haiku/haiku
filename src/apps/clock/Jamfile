@@ -1,5 +1,5 @@
 SubDir OBOS_TOP src apps clock ;
 
-AddResources Clock : Clock.rsrc ;
+AddResources Clock : Clock.rdef ;
 App Clock : cl_view.cpp cl_wind.cpp clock.cpp ;
 LinkSharedOSLibs Clock : be ;
