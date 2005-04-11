@@ -17,6 +17,7 @@ KernelMergeObject posix_math.o :
 	exp.c
 	exp__E.c
 	expm1.c
+	floatmath.c
 	floor.c
 	floorf.c
 	fmod.c
