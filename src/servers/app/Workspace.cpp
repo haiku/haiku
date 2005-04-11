@@ -556,7 +556,7 @@ STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 					fPool.ReleaseMemory(toast);
 				}
 				else
-					break;
+					item	= item->lowerItem;
 			}
 
 			returnValue = true;

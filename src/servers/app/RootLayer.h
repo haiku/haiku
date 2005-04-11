@@ -88,7 +88,7 @@ public:
 	inline	Workspace*			WorkspaceAt(int32 index) const { return fWorkspace[index]; }
 	inline	Workspace*			ActiveWorkspace() const { return fWorkspace[fActiveWksIndex]; }
 	inline	int32				ActiveWorkspaceIndex() const { return fActiveWksIndex; }
-			void				SetActiveWorkspace(int32 index);
+			bool				SetActiveWorkspace(int32 index);
 
 			void				ReadWorkspaceData(const char *path);
 			void				SaveWorkspaceData(const char *path);

@@ -72,7 +72,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fWinBorderCount	= 0;
 	fWinBorderIndex	= 0;
 	fWsCount		= 0;
-	fActiveWksIndex	= 0;
 
 	fMovingWindow		= false;
 	fResizingWindow		= false;
@@ -99,14 +98,16 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 
 	// TODO: this should eventually be replaced by a method to convert the monitor
 	// number to an index in the name, i.e. workspace_settings_1 for screen #1
-	ReadWorkspaceData(WORKSPACE_DATA_LIST);
+//	ReadWorkspaceData(WORKSPACE_DATA_LIST);
 
 	// TODO: read these 3 from a configuration file.
 	fScreenXResolution = 0;
 	fScreenYResolution = 0;
 	fColorSpace = B_RGB32;
 
-	SetActiveWorkspace(0L);
+	// init the first, default workspace
+	fActiveWksIndex		= 0;
+	fWorkspace[fActiveWksIndex] = new Workspace(fActiveWksIndex, 0xFF00FF00, RGBColor());
 
 	// Spawn our working thread
 //	fThreadID = spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
@@ -526,17 +527,22 @@ void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBo
 
 
 // NOTE: This must be called by RootLayer's thread!!!!
-void RootLayer::SetActiveWorkspace(int32 index)
+bool RootLayer::SetActiveWorkspace(int32 index)
 {
 	STRACE(("RootLayer(%s)::SetActiveWorkspace(%ld)\n", GetName(), index));
-	// we need to lock the window list here so no other window can be created 
-	desktop->Lock();
+
+	// nice try!
+	if (index >= fWsCount || index == fActiveWksIndex || index < 0)
+		return false;
 
 	// if fWorkspace[index] object does not exist, create and add allowed WinBorders
 	if (!fWorkspace[index])
 	{
 		// TODO: we NEED datas from a file!!!
 		fWorkspace[index] = new Workspace(index, 0xFF00FF00, RGBColor());
+
+		// we need to lock the window list here so no other window can be created 
+		desktop->Lock();
 
 		const BList&	windowList = desktop->WindowList();
 
@@ -552,52 +558,41 @@ void RootLayer::SetActiveWorkspace(int32 index)
 					fWorkspace[index]->ShowWinBorder(ptrWin[i]);
 			}
 		}
-	}
 
-	desktop->Unlock();
+		desktop->Unlock();
+	}
 
 	int32		exIndex		= ActiveWorkspaceIndex();
 
 	{
-		int32		ptrCount;
-		WinBorder	**ptrWin = NULL;
 		BMessage	activatedMsg(B_WORKSPACE_ACTIVATED);
 		activatedMsg.AddInt32("workspace", fActiveWksIndex);
 		activatedMsg.AddBool("active", false);
 
-		ActiveWorkspace()->GetWinBorderList((void**&)ptrWin, &ptrCount);
-		if (ptrWin)
+		for (int32 i = 0; i < fWinBorderCount; i++)
 		{
-			for (int32 i = 0; i < ptrCount; i++)
-			{
-				//ptrWin[i]->Window()->SendMsgToClient(&activatedMsg);
-			}
-		
-			delete ptrWin;
+//printf("Sending 'false' to %s.\n", fWinBorderList[i]->GetName());
+			fWinBorderList[i]->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
 		}
 	}
 
 	fActiveWksIndex		= index;
 
+// TODO: HERE!!!
+
+/*
 	{
-		int32		ptrCount;
-		WinBorder	**ptrWin = NULL;
 		BMessage	activatedMsg(B_WORKSPACE_ACTIVATED);
 		activatedMsg.AddInt32("workspace", fActiveWksIndex);
 		activatedMsg.AddBool("active", true);
 
-		ActiveWorkspace()->GetWinBorderList((void**&)ptrWin, &ptrCount);
-		if (ptrWin)
+		for (int32 i = 0; i < fWinBorderCount; i++)
 		{
-			for (int32 i = 0; i < ptrCount; i++)
-			{
-				//ptrWin[i]->Window()->SendMsgToClient(&activatedMsg);
-			}
-		
-			delete ptrWin;
+printf("Sending 'true' to %s.\n", fWinBorderList[i]->GetName());
+			fWinBorderList[i]->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
 		}
 	}
-
+*/
 	if (fMovingWindow && fEventMaskLayer)
 	{
 		WinBorder	*movingWinBorder = (WinBorder*)fEventMaskLayer;
@@ -642,6 +637,8 @@ void RootLayer::SetActiveWorkspace(int32 index)
 		fMovingWindow = false;
 		fResizingWindow	= false;
 	}
+	// workspace changed
+	return true;
 }
 
 void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex, uint32 newWksIndex)
@@ -650,8 +647,6 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex,
 	// Note: See ServerWindow class.
 	if (winBorder->Window()->Feel() != B_NORMAL_WINDOW_FEEL)
 		return;
-
-// TODO: What if we're moving this very same window!?
 
 	bool		invalidate	= false;
 	bool		invalid;
@@ -692,6 +687,23 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex,
 
 			if (fActiveWksIndex == i)
 				invalidate = invalid;
+		}
+	}
+
+	if (fEventMaskLayer)
+	{
+		WinBorder	*wb	= fEventMaskLayer->fOwner?
+							fEventMaskLayer->fOwner:
+							(WinBorder*)fEventMaskLayer;
+		if (!fWorkspace[fActiveWksIndex]->HasWinBorder(wb))
+		{
+			if (wb == fEventMaskLayer)
+			{
+				fMovingWindow	= false;
+				fResizingWindow	= false;
+				wb->MouseUp(DEC_NONE);
+			}
+			fEventMaskLayer	= NULL;
 		}
 	}
 
@@ -1335,7 +1347,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				//{
 					WinBorder *exActive = ActiveWinBorder();
 					WinBorder *exFocus = FocusWinBorder();
-					if (ActiveWorkspace()->MoveToBack(exFocus))
+					if (ActiveWorkspace()->MoveToBack(exActive))
 						show_final_scene(exFocus, exActive);
 					
 					//printf("Send Twitcher message key to Deskbar - unimplmemented\n");
@@ -1386,20 +1398,11 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
 				{
 					STRACE(("Set Workspace %ld\n",scancode-1));
-					//TODO: SetWorkspace in KeyboardEventHandler
-					if (scancode - 1 > 0 && scancode -1 <= fWsCount
-						&& scancode - 2 != fActiveWksIndex)
-					{
-						WinBorder		*exFocus	= FocusWinBorder();
-						WinBorder		*exActive	= ActiveWinBorder();
+					WinBorder		*exFocus	= FocusWinBorder();
+					WinBorder		*exActive	= ActiveWinBorder();
 
-						SetActiveWorkspace(scancode-2);
-
+					if (SetActiveWorkspace(scancode-2))
 						show_final_scene(exFocus, exActive);
-
-// TODO: lock ServerWindows here! Don't forget, you need to add/remove Layers
-// from within RootLayer's thread!!!
-					}
 					if (string)
 						free(string);
 					break;
@@ -1415,7 +1418,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				//{
 					WinBorder *exActive = ActiveWinBorder();
 					WinBorder *exFocus = FocusWinBorder();
-					if (ActiveWorkspace()->MoveToBack(exFocus))
+					if (ActiveWorkspace()->MoveToBack(exActive))
 						show_final_scene(exFocus, exActive);
 					
 					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
