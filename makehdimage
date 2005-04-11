@@ -117,22 +117,43 @@ BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 BEOS_SYSTEM_SERVERS="registrar debug_server syslog_daemon media_server \
 	media_addon_server input_server app_server fake_app_server"
 
+BEOS_NETWORK_CORE="core"
+BEOS_NETWORK_INTERFACES="ethernet loopback ppp"
+BEOS_NETWORK_PROTOCOLS="icmp ipv4 raw route tcp udp"
+
 BEOS_ADD_ONS_ACCELERANTS="radeon.accelerant nv.accelerant mga.accelerant nm.accelerant"
 BEOS_ADD_ONS_TRANSLATORS="STXTTranslator RTF-Translator"
 BEOS_ADD_ONS_MEDIA="mixer.media_addon legacy.media_addon multi_audio.media_addon"
 BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard"
+BEOS_ADD_ONS_DRIVERS_MISC="config_manager blkman fast_log ide_adapter locked_pool \
+	scsi_periph intel keyboard scsi_dsk scsi_cd dprintf null zero random ps2_hid <driver>tty \
+	console <driver>config vga_text"
+BEOS_ADD_ONS_DRIVERS_GRAPHICS="radeon.driver nv.driver nm.driver mga.driver"
+BEOS_ADD_ONS_DRIVERS_NET="bcm440x bcm570x ipro1000 rtl8139 rtl8169 sis900 \
+	via-rhine wb840 net_stack_driver"
+BEOS_ADD_ONS_BUSMASTERS="pci isa ide scsi ide_isa"
+BEOS_ADD_ONS_FILESYSTEMS="bfs"
 
 echo "Building executables and libraries..."
 
 jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader config_manager \
-	pci isa ide scsi ide_isa bfs blkman fast_log ide_adapter locked_pool \
-	scsi_periph intel keyboard scsi_dsk scsi_cd \
 	rld.so kernel_fortune consoled \
-	$BEOS_BIN $BEOS_APPS $BEOS_SYSTEM_LIB $BEOS_SYSTEM_SERVERS $BEOS_ADD_ONS_ACCELERANTS \
-	$BEOS_ADD_ONS_TRANSLATORS $BEOS_ADD_ONS_MEDIA $BEOS_ADD_ONS_INPUT_DEVICES \
-	libnet.so dprintf null zero random ps2_hid \<driver\>tty console \
-	\<driver\>config vga_text timezone_files keymap_files radeon.driver \
-	nv.driver nm.driver mga.driver \
+	$BEOS_BIN \
+	$BEOS_APPS \
+	$BEOS_SYSTEM_LIB \
+	$BEOS_SYSTEM_SERVERS \
+	$BEOS_NETWORK_CORE \
+	$BEOS_NETWORK_INTERFACES \
+	$BEOS_NETWORK_PROTOCOLS \
+	$BEOS_ADD_ONS_DRIVERS_MISC \
+	$BEOS_ADD_ONS_DRIVERS_GRAPHICS \
+	$BEOS_ADD_ONS_DRIVERS_NET \
+	$BEOS_ADD_ONS_BUSMASTERS \
+	$BEOS_ADD_ONS_FILESYSTEMS \
+	$BEOS_ADD_ONS_ACCELERANTS \
+	$BEOS_ADD_ONS_TRANSLATORS \
+	$BEOS_ADD_ONS_MEDIA \
+	$BEOS_ADD_ONS_INPUT_DEVICES \
 	bfs_shell fs_shell_command \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
 
@@ -191,9 +212,14 @@ $mkdir -p beos/system/add-ons/kernel/drivers/dev/disk/scsi
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/graphics
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/input
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/misc
+$mkdir -p beos/system/add-ons/kernel/drivers/dev/net_stack
+$mkdir -p beos/system/add-ons/kernel/drivers/dev/net
 $mkdir -p beos/system/add-ons/kernel/file_systems
 $mkdir -p beos/system/add-ons/kernel/console
 $mkdir -p beos/system/add-ons/kernel/generic
+$mkdir -p beos/system/add-ons/kernel/network
+$mkdir -p beos/system/add-ons/kernel/network/interfaces
+$mkdir -p beos/system/add-ons/kernel/network/protocols
 $mkdir -p beos/system/add-ons/kernel/partitioning_systems
 $mkdir -p beos/system/add-ons/Translators
 $mkdir -p beos/system/add-ons/accelerants
@@ -242,7 +268,13 @@ done
 
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
 $scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
-for f in ps2_hid radeon.driver nv.driver mga.driver nm.driver; do
+for f in $BEOS_ADD_ONS_DRIVERS_GRAPHICS; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
+done
+for f in $BEOS_ADD_ONS_DRIVERS_NET; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
+done
+for f in ps2_hid; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
@@ -307,7 +339,8 @@ echo "Installing scripts and data files..."
 cd $sourceDir
 $scd ${sPrefix}$sourceDir
 $cp ${sPrefix}data/system/boot/Bootscript \
-	${sPrefix}data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
+	${sPrefix}data/system/boot/SetupEnvironment \
+	${sPrefix}data/system/boot/Netscript $targetDir/beos/system/boot/
 $cp ${sPrefix}data/etc/profile ${sPrefix}data/etc/termcap $targetDir/beos/etc/
 $cp ${sPrefix}src/tests/kernel/boot_floppy/fortune/fortunes $targetDir/beos/etc/
 $cp -r ${sPrefix}distro/${arch}.R1/beos/etc $targetDir/beos/
@@ -338,7 +371,6 @@ for f in drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
 	$ln -fs /boot/beos/system/add-ons/kernel/drivers/bin/$(basename $f) .
 done
 
-
 # driver links
 echo "Creating driver links..."
 $cd $targetDir/beos/system/add-ons/kernel
@@ -348,7 +380,11 @@ for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/misc/config drivers/dev/input/ps2_hid \
 		drivers/dev/console drivers/dev/graphics/radeon.driver \
 		drivers/dev/graphics/nv.driver drivers/dev/graphics/mga.driver \
-		drivers/dev/graphics/nm.driver; do
+		drivers/dev/graphics/nm.driver drivers/dev/net/bcm440x \
+		drivers/dev/net/bcm570x drivers/dev/net/ipro1000 \
+		drivers/dev/net/rtl8139 drivers/dev/net/rtl8169 \
+		drivers/dev/net/sis900 drivers/dev/net/via-rhine \
+		drivers/dev/net/wb840 drivers/dev/net_stack/net_stack_driver; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
 	linkName=bin/$(basename $f)
 	while [ $relName != . ]; do
@@ -384,6 +420,22 @@ cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/devices/
 $cd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/devices/
 for f in keyboard; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/input_server/devices/
+done
+
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/network
+for f in $BEOS_NETWORK_CORE; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network
+done
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/interfaces
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/network/interfaces
+for f in $BEOS_NETWORK_INTERFACES; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/interfaces
+done
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/protocols
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/network/protocols
+for f in $BEOS_NETWORK_PROTOCOLS; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/protocols
 done
 
 # install fonts
