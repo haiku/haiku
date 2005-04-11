@@ -334,8 +334,8 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		// being. The color space conversion is handled in CopyBackToFront()
 		
 		delete fBackBuffer;
-		fBackBuffer = new MallocBuffer(fDisplayMode.virtual_width - 1,
-									   fDisplayMode.virtual_height - 1);
+		fBackBuffer = new MallocBuffer(fDisplayMode.virtual_width,
+									   fDisplayMode.virtual_height);
 		
 		status_t ret = fBackBuffer->InitCheck();
 		if (ret < B_OK) {
