@@ -31,4 +31,5 @@ APP_KIT_SOURCE =
 	RosterPrivate.cpp
 	ServerMemIO.cpp
 	TokenSpace.cpp
+	TypeConstants.cpp
 ;
