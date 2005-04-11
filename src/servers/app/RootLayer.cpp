@@ -1298,7 +1298,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			
 			STRACE(("Key Down: 0x%lx\n",scancode));
 			
-#if DISPLAYDRIVER == HWDRIVER
+#if !TEST_MODE
 			// Check for workspace change or safe video mode
 			if(scancode>0x01 && scancode<0x0e)
 			{
@@ -1333,7 +1333,12 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
 				//if(deskbar)
 				//{
-					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+					WinBorder *exActive = ActiveWinBorder();
+					WinBorder *exFocus = FocusWinBorder();
+					if (ActiveWorkspace()->MoveToBack(exFocus))
+						show_final_scene(exFocus, exActive);
+					
+					//printf("Send Twitcher message key to Deskbar - unimplmemented\n");
 					if (string)
 						free(string);
 					break;
@@ -1408,6 +1413,11 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
 				//if(deskbar)
 				//{
+					WinBorder *exActive = ActiveWinBorder();
+					WinBorder *exFocus = FocusWinBorder();
+					if (ActiveWorkspace()->MoveToBack(exFocus))
+						show_final_scene(exFocus, exActive);
+					
 					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
 					if (string)
 						free(string);
