@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons print drivers canon_lips lips4 ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ; 
 
-AddResources Canon\ LIPS4\ Compatible : Lips4.rsrc ;
+AddResources Canon\ LIPS4\ Compatible : Lips4.rdef ;
 
 Addon Canon\ LIPS4\ Compatible : Print :
 	Lips4Entry.cpp

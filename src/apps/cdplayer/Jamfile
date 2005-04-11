@@ -1,5 +1,5 @@
 SubDir OBOS_TOP src apps cdplayer ;
 
-AddResources CDPlayer : CDPlayer.rsrc ;
+AddResources CDPlayer : CDPlayer.rdef ;
 App CDPlayer : CDPlayer.cpp CDPlayerWindow.cpp CDPlayerView.cpp ;
 LinkSharedOSLibs CDPlayer : be ;

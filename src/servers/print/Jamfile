@@ -9,7 +9,7 @@ UsePrivateHeaders shared interface print ;
 AddResources
 	print_server
 	:
-	PrintServer.FileTypes.rsrc
+	PrintServer.FileTypes.rdef
 	;
 
 Server 
