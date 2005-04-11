@@ -1081,7 +1081,35 @@ DisplayDriverPainter::SetMode(const display_mode &mode)
 bool
 DisplayDriverPainter::DumpToFile(const char *path)
 {
-	return false;
+#if 0
+	// TODO: find out why this does not work
+	SaveToPNG(	path,
+				BRect(0, 0, fDisplayMode.virtual_width - 1, fDisplayMode.virtual_height - 1),
+				(color_space)fDisplayMode.space,
+				mFrameBufferConfig.frame_buffer,
+				fDisplayMode.virtual_height * mFrameBufferConfig.bytes_per_row,
+				mFrameBufferConfig.bytes_per_row);*/
+#else
+	// TODO: remove this when SaveToPNG works properly
+	
+	// this does dump each line at a time to ensure that everything
+	// gets written even if we crash somewhere.
+	// it's a bit overkill, but works for now.
+	FILE *output = fopen(path, "w");
+	if (!output)
+		return false;
+	
+	RenderingBuffer *back_buffer = fGraphicsCard->BackBuffer();
+	uint32 row = back_buffer->BytesPerRow() / 4;
+	for (int i = 0; i < fDisplayMode.virtual_height; i++) {
+		fwrite((uint32 *)back_buffer->Bits() + i * row, 4, row, output);
+		sync();
+	}
+	fclose(output);
+	sync();
+#endif
+	
+	return true;
 }
 
 // DumpToBitmap
