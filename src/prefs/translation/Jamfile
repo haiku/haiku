@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs translation ;
 
-AddResources DataTranslations2 : DataTranslations.FileTypes.rsrc ;
+AddResources DataTranslations2 : DataTranslations.FileTypes.rdef ;
 
 Preference DataTranslations2 :
 	LView.cpp

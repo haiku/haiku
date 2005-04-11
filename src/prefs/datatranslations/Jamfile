@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs datatranslations ;
 
-AddResources DataTranslations : DataTranslations.rsrc ;
+AddResources DataTranslations : DataTranslations.rdef ;
 
 Preference DataTranslations :
 	DataTranslations.cpp

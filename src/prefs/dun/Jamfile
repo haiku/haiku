@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs dun ;
 
-AddResources DialUpNetworking : DUN.rsrc ;
+AddResources DialUpNetworking : DUN.rdef ;
 
 Preference DialUpNetworking :
 	DUN.cpp

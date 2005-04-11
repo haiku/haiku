@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs drivesetup ;
 
-AddResources DriveSetup : <$(SOURCE_GRIST)>Resource.rsrc ;
+AddResources DriveSetup : DriveSetup.rdef ;
 
 Preference DriveSetup : main.cpp MainWindow.cpp PosSettings.cpp ;
 

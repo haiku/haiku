@@ -2,7 +2,7 @@ SubDir OBOS_TOP src prefs screensaver ;
 
 UsePrivateHeaders screen_saver ;
 
-AddResources ScreenSaver : ScreenSaver.rsrc ;
+AddResources ScreenSaver : ScreenSaver.rdef ;
 
 local sources =
 	ScreenSaverPrefsApp.cpp

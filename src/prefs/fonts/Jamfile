@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs fonts ;
 
-AddResources Fonts : <$(SOURCE_GRIST)>Resource.rsrc ;
+AddResources Fonts : Fonts.rdef ;
 
 Preference Fonts :
 	ButtonView.cpp

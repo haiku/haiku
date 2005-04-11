@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs workspaces ;
 
-AddResources Workspaces : Workspaces.rsrc ;
+AddResources Workspaces : Workspaces.rdef ;
 
 Preference Workspaces : Workspaces.cpp ;
 

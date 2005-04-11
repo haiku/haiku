@@ -2,7 +2,7 @@ SubDir OBOS_TOP src prefs print ;
 
 UsePrivateHeaders interface shared print ;
 
-AddResources Printers : Printers.FileTypes.rsrc ;
+AddResources Printers : Printers.FileTypes.rdef ;
 
 Preference Printers :
 	AddPrinterDialog.cpp
