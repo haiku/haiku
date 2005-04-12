@@ -717,6 +717,8 @@ init_module(module *module)
 static inline int
 uninit_module(module *module)
 {
+	TRACE(("uninit_module(%s)\n", module->name));
+
 	switch (module->state) {
 		case MODULE_QUERIED:
 		case MODULE_LOADED:
@@ -1400,14 +1402,16 @@ put_module(const char *path)
 		recursive_lock_unlock(&sModulesLock);
 		return B_BAD_VALUE;
 	}
-	dec_module_ref_count(module);
+	
+	if ((module->flags & B_KEEP_LOADED) == 0) {
+		dec_module_ref_count(module);
 
-	// ToDo: not sure if this should ever be called for keep_loaded modules...
-	if (module->ref_count == 0)
-		uninit_module(module);
+		if (module->ref_count == 0)
+			uninit_module(module);
 
-	if ((module->flags & B_BUILT_IN_MODULE) == 0)
-		put_module_image(module->module_image);
+		if ((module->flags & B_BUILT_IN_MODULE) == 0)
+			put_module_image(module->module_image);
+	}
 
 	recursive_lock_unlock(&sModulesLock);
 	return B_OK;
