@@ -293,25 +293,50 @@ Painter::SetFont(const ServerFont& font)
 
 // StrokeLine
 BRect
-Painter::StrokeLine(BPoint a, BPoint b, const pattern& p)
+Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 {
+	// this happens independent of wether we actually draw something
+	context->penlocation = b;
+	// NOTE: penlocation should be converted to the local
+	// coordinate of the view for which we draw here, after
+	// we have been used. Updating it could also be done somewhere
+	// else in the app_server code, but DrawString() needs to
+	// do this as well, and it is probably hard to calculate
+	// the correct location outside of AGGTextRenderer...
+
 	_Transform(&a);
 	_Transform(&b);
 
+	SetPenSize(context->pensize);
+	float penSize = _Transform(fPenSize);
+
 	BRect touched(a, b);
 
+	// This is supposed to stop right here if we can see
+	// that we're definitaly outside the clipping reagion.
+	// It is not really correct, but fast and only triggers
+	// unnecessary calculation in a few edge cases
+	touched.InsetBy(-(penSize - 1), -(penSize - 1));
+	if (!touched.Intersects(fClippingRegion->Frame())) {
+		touched.Set(0.0, 0.0, -1.0, -1.0);
+		return touched;
+	}
+
+	SetHighColor(context->highcolor.GetColor32());
+	SetLowColor(context->lowcolor.GetColor32());
+	SetDrawingMode(context->draw_mode);
+	SetBlendingMode(context->alphaSrcMode, context->alphaFncMode);
+	fPatternHandler->SetPattern(context->patt);
+
 	// first, try an optimized version
-	float penSize = _Transform(fPenSize);
 	if (penSize == 1.0 &&
 		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
 		pattern pat = *fPatternHandler->GetR5Pattern();
 		if (pat == B_SOLID_HIGH &&
 			StraightLine(a, b, fPatternHandler->HighColor().GetColor32())) {
-			SetPenLocation(b);
 			return _Clipped(touched);
 		} else if (pat == B_SOLID_LOW &&
 			StraightLine(a, b, fPatternHandler->LowColor().GetColor32())) {
-			SetPenLocation(b);
 			return _Clipped(touched);
 		}
 	}
@@ -320,19 +345,17 @@ Painter::StrokeLine(BPoint a, BPoint b, const pattern& p)
 	path.move_to(a.x, a.y);
 	path.line_to(b.x, b.y);
 
-	touched = _StrokePath(path, p);
-
-	SetPenLocation(b);
+	touched = _StrokePath(path, *fPatternHandler->GetR5Pattern());
 
 	return _Clipped(touched);
 }
 
 // StrokeLine
 BRect
-Painter::StrokeLine(BPoint b, const pattern& p)
+Painter::StrokeLine(BPoint b, DrawData* context)
 {
 	// TODO: move this function elsewhere
-	return StrokeLine(fPenLocation, b);
+	return StrokeLine(context->penlocation, context);
 }
 
 // StraightLine
