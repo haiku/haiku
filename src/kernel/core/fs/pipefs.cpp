@@ -619,7 +619,10 @@ Inode::FillPendingRequests()
 
 
 /** This function feeds the pending read requests using the provided
- *	buffer.
+ *	buffer directly. It will also make sure that bytes in the buffer
+ *	chain are served first.
+ *	It only does something as long as the first request in the queue
+ *	shares the same team context as the caller (write context).
  *	You must hold the request lock when calling this function.
  */
 
@@ -633,15 +636,18 @@ Inode::FillPendingRequests(const void **_buffer, size_t *_bytesLeft)
 	ReadRequest *request;
 	RequestList::Iterator iterator = fRequests.GetIterator();
 	while (*_bytesLeft != 0 && (request = iterator.Next()) != NULL) {
-		// try to fill this request
+		// Note that we leave this loop not to mess up the request queue
+		if (request->Team() != team)
+			break;
+
+		// try to fill this request from the buffer chain first
 		size_t bytesRead;
 		if (request->PutBufferChain(fBufferChain, &bytesRead, false) != B_OK)
 			continue;
 
 		MayReleaseWriter();
 
-		if (request->SpaceLeft() > 0
-			&& (team == B_SYSTEM_TEAM || request->Team() == team)) {
+		if (request->SpaceLeft() > 0) {
 			// ToDo: This is something where we can optimize the buffer
 			//	hand-shaking considerably: we should have a function
 			//	that copies the data to another address space - either
@@ -852,6 +858,8 @@ ReadRequest::SetQueued(bool queued)
 
 /** Reads the contents of the buffer chain to the specified
  *	buffer, if any.
+ *	This function must only be called in the team context that initiated
+ *	the read request.
  */
 
 status_t
@@ -902,7 +910,8 @@ ReadRequest::PutBufferChain(cbuf *bufferChain, size_t *_bytesRead, bool releaseP
 
 
 /** Copies the specified buffer into the request. This function currently
- *	only works for the local address space.
+ *	only works for the local address space (both, sender and receiver must
+ *	be in the same address space).
  */
 
 status_t
