@@ -246,6 +246,8 @@ InputServer::InitKeyboardMouseStates(void)
 	// fMousePos is then set to the center of the screen.
 
 	fFrame = fScreen.Frame();
+	if (fFrame == BRect(0,0,0,0))
+		fFrame = BRect(0,0,800,600);
 	fMousePos = BPoint(fFrame.right/2, fFrame.bottom/2);
 	
 	if (LoadKeymap()!=B_OK)
