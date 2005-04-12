@@ -773,7 +773,8 @@ namespace agg
     //------------------------------------------------------------------------
     bool font_engine_freetype_base::prepare_glyph(unsigned glyph_code)
     {
-        bool flip = false;
+//        bool flip = false;
+        bool flip = true;
 
 
         m_glyph_index = FT_Get_Char_Index(m_cur_face, glyph_code);
