@@ -1646,7 +1646,7 @@ void DisplayDriverImpl::StrokeLine(const BPoint &start, const BPoint &end, const
 	\param end Ending point
 	\param d The relevant drawing data for this line
 */
-void DisplayDriverImpl::StrokeLine(const BPoint &start, const BPoint &end, const DrawData *d)
+void DisplayDriverImpl::StrokeLine(const BPoint &start, const BPoint &end, DrawData *d)
 {
 	Lock();
 	
@@ -1759,7 +1759,7 @@ void DisplayDriverImpl::StrokePoint(const BPoint& pt, const RGBColor &color)
 	Invalidate(BRect(pt,pt));
 }
 
-void DisplayDriverImpl::StrokePoint(const BPoint& pt, const DrawData *d)
+void DisplayDriverImpl::StrokePoint(const BPoint& pt, DrawData *d)
 {
 	StrokeLine(pt, pt, d);
 	Invalidate(BRect(pt,pt));
