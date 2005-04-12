@@ -52,6 +52,7 @@ LinkSharedOSLibs libmail.so :
 	tracker
 	stdc++.r4
 	$(NETWORK_LIBS)
+	$(SELECT_UNAME_ETC_LIB)
 ;
 
 MakeLocate <develop>libmail.so : $(OBOS_STLIB_DIR) ;
