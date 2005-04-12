@@ -333,14 +333,18 @@ void BRemoteMailStorageProtocol::SyncMailbox(const char *mailbox) {
 		if (snoodle.ReadAttr("MAIL:chain",B_INT32_TYPE,0,&chain,sizeof(chain)) < B_OK)
 			append = true;
 		if (chain != runner->Chain()->ID()) {
-			int32 pending_chain(-1), flags(0);
-			snoodle.ReadAttr("MAIL:pending_chain",B_INT32_TYPE,0,&chain,sizeof(chain));
+			uint32 pendingChain(~0UL), flags(0);
+			snoodle.ReadAttr("MAIL:pending_chain",B_INT32_TYPE,0,&pendingChain,sizeof(chain));
 			snoodle.ReadAttr("MAIL:flags",B_INT32_TYPE,0,&flags,sizeof(flags));
-		
-			if ((pending_chain == runner->Chain()->ID()) && (BMailChain(chain).ChainDirection() == outbound) && (flags & B_MAIL_PENDING))
-				continue; //--- Ignore this message, recode the chain attribute at the next SyncMailbox()
-				
-			if (pending_chain == runner->Chain()->ID()) {
+
+			if (pendingChain == runner->Chain()->ID()
+				&& BMailChain(chain).ChainDirection() == outbound
+				&& (flags & B_MAIL_PENDING) != 0) {
+				// Ignore this message, recode the chain attribute at the next SyncMailbox()
+				continue;
+			}
+	
+			if (pendingChain == runner->Chain()->ID()) {
 				chain = runner->Chain()->ID();
 				snoodle.WriteAttr("MAIL:chain",B_INT32_TYPE,0,&chain,sizeof(chain));
 				append = false;
