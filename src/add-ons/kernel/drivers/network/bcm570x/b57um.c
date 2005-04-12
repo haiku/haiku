@@ -574,8 +574,8 @@ b57_read(void *cookie,off_t pos,void *data,size_t *numBytes)
 	if (pUmDevice->block)
 		acquire_sem(pUmDevice->packet_release_sem);
 	else {
-		// ToDo: this looks severly broken
-		// Decrement the receive sem anyway, but don't block
+		/* Decrement the receive sem anyway, but don't block
+		   this is a horrible hack, but it works. */
 		acquire_sem_etc(pUmDevice->packet_release_sem, 1, B_RELATIVE_TIMEOUT, 0);
 	}
 
@@ -834,8 +834,7 @@ MM_AllocateSharedMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
 	dev = (struct be_b57_dev *)(pDevice);
 	area_desc = dev->lockmem_list[dev->lockmem_list_num++] = create_area("broadcom_shared_mem",
 		&pvirt, B_ANY_KERNEL_ADDRESS, ROUND_UP_TO_PAGE(BlockSize),
-		/*B_CONTIGUOUS | B_FULL_LOCK*/ B_LOMEM, 0);
-	// ToDo: B_LOMEM???
+		B_CONTIGUOUS | B_FULL_LOCK, 0);
 
 	if (area_desc < B_OK)
 		return LM_STATUS_FAILURE;
