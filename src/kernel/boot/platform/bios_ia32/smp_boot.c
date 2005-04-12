@@ -209,7 +209,7 @@ smp_find_mp_config(void)
 	int i;
 
 #if NO_SMP
-	if (0)
+	if (1)
 		return gKernelArgs.num_cpus = 1;
 #endif
 
