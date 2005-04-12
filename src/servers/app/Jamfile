@@ -22,20 +22,21 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 	SubDirC++Flags $(defines) ;
 	
 	VIEW_DRIVER_SOURCES =
-#		AccelerantBuffer.cpp
-		AccelerantDriver.cpp
-#		AccelerantHWInterface.cpp
-#		DisplayDriverPainter.cpp
-#		HWInterface.cpp
-#		UpdateQueue.cpp
+		AccelerantBuffer.cpp
+#		AccelerantDriver.cpp
+		AccelerantHWInterface.cpp
+		DisplayDriverPainter.cpp
+		HWInterface.cpp
+		MallocBuffer.cpp
+		UpdateQueue.cpp
 		;
 } else {
 	VIEW_DRIVER_SOURCES =
 		fake_input_server.cpp
-		AccelerantDriver.cpp
-		BitmapDriver.cpp
-		ViewDriver.cpp
-		DirectDriver.cpp
+#		AccelerantDriver.cpp
+#		BitmapDriver.cpp
+#		ViewDriver.cpp
+#		DirectDriver.cpp
 		# We'll just remove this from the build for a little while...
 		#ScreenDriver.cpp
 		# Painter based DisplayDriver Classes
@@ -77,7 +78,7 @@ SharedLibrary appserver :
 	PatternHandler.cpp
 	PixelRenderer.cpp
 	DisplayDriver.cpp
-	DisplayDriverImpl.cpp
+	#DisplayDriverImpl.cpp
 	DisplaySupport.cpp
 ;
 
@@ -118,8 +119,8 @@ if $(TARGET_PLATFORM) = haiku {
 
 	LinkSharedOSLibs app_server :
 		libroot.so libtranslation.so libz.so libpng.so libbe.so
-		libappserver.so libfreetype.so libtextencoding.so ;
-#		libagg.a libpainter.a ;
+		libappserver.so libpainter.a libagg.a libfreetype.so
+		libtextencoding.so ;
 
 } else {
 	# link as test application under R5
