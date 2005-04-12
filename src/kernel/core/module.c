@@ -1376,7 +1376,8 @@ get_module(const char *path, module_info **_info)
 	if (status == B_OK) {
 		inc_module_ref_count(module);
 		*_info = module->info;
-	}
+	} else if ((module->flags & B_BUILT_IN_MODULE) == 0)
+		put_module_image(module->module_image);
 
 	recursive_lock_unlock(&sModulesLock);
 	return status;
@@ -1408,10 +1409,10 @@ put_module(const char *path)
 
 		if (module->ref_count == 0)
 			uninit_module(module);
-
-		if ((module->flags & B_BUILT_IN_MODULE) == 0)
-			put_module_image(module->module_image);
 	}
+
+	if ((module->flags & B_BUILT_IN_MODULE) == 0)
+		put_module_image(module->module_image);
 
 	recursive_lock_unlock(&sModulesLock);
 	return B_OK;
