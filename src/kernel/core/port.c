@@ -520,7 +520,7 @@ close_port(port_id id)
 	if (sPorts[slot].id != id) {
 		RELEASE_PORT_LOCK(sPorts[slot]);
 		restore_interrupts(state);
-		dprintf("close_port: invalid port_id %ld\n", id);
+		TRACE(("close_port: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
 
@@ -890,7 +890,7 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	if (sPorts[slot].id != id) {
 		RELEASE_PORT_LOCK(sPorts[slot]);
 		restore_interrupts(state);
-		dprintf("read_port_etc: invalid port_id %ld\n", id);
+		TRACE(("read_port_etc: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
 	// store sem_id in local variable
