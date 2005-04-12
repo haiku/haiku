@@ -107,7 +107,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	tee md5sum catattr query lsindex mkindex roster listimage \
 	quit open translate setvolume waitfor uname iroster keymap \
 	strace rmdir error ifconfig ping traceroute arp pppconfig \
-	ppp_up gdb"
+	ppp_up gdb tail"
 
 BEOS_APPS="MiniTerminal"
 
@@ -127,7 +127,7 @@ BEOS_ADD_ONS_ACCELERANTS="radeon.accelerant nv.accelerant mga.accelerant \
 	nm.accelerant vesa.accelerant"
 BEOS_ADD_ONS_TRANSLATORS="STXTTranslator RTF-Translator"
 BEOS_ADD_ONS_MEDIA="mixer.media_addon legacy.media_addon multi_audio.media_addon"
-BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard"
+BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard <input>mouse"
 BEOS_ADD_ONS_DRIVERS_MISC="config_manager blkman fast_log ide_adapter locked_pool \
 	scsi_periph intel keyboard scsi_dsk scsi_cd dprintf null zero random ps2_hid <driver>tty \
 	console <driver>config vga_text"
@@ -183,7 +183,6 @@ else
 	mkindex="$fsShellCommand mkindex"
 fi
 
-
 # create the image and the directory structure
 
 if [ ! $alreadyMounted ]; then
@@ -230,6 +229,7 @@ $mkdir -p beos/system/add-ons/Translators
 $mkdir -p beos/system/add-ons/accelerants
 $mkdir -p beos/system/add-ons/media
 $mkdir -p beos/system/add-ons/input_server/devices
+$mkdir -p beos/system/add-ons/input_server/filters
 $mkdir -p beos/system/boot
 $mkdir -p beos/system/lib
 $mkdir -p beos/system/servers
@@ -421,10 +421,10 @@ for f in $BEOS_ADD_ONS_MEDIA; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/media/
 done
 
-cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/devices/
-$cd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/devices/
-for f in keyboard; do
-	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/input_server/devices/
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/
+$cd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/
+for f in devices/keyboard devices/mouse; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/input_server/$(dirname $f)/
 done
 
 # network add-ons
