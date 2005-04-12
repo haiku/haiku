@@ -22,6 +22,38 @@ class RenderingBuffer;
 class ServerBitmap;
 class ServerFont;
 
+// TODO: API transition:
+// * all functions should return BRect of pixels touched by an operation
+// * most all functions should take a DrawData* context parameter instead
+//   of the current pattern argument, that way, each function can
+//	 decide for itself, which pieces of information in DrawData it
+//   needs
+// * there would be no "scale" and "origin" within Painter, all
+//   coordinates are expected in screen coordinates, all other data
+//   passed in the DrawData is assumed to be already properly
+//   converted (scaled and offset by origin, converted to screen),
+//   this is important for a views graphics state local clipping (as
+//   added by the user) and also font size and so on. For a correct
+//   handling of a views scale and origin, see the original Painter
+//   implementation at src/tests/servers/app/Painter
+// * Painter should use a custom agg::renderer_mclip, which takes
+//   a BRegion pointer. The current conversion from BRegion to
+//   agg::renderer_mclip is quite expensive (arround 190 usecs on
+//   my machine, which is almost the time it takes for the actual
+//   drawing which comes after it...
+// * Painter itself should be made thread safe. Because no
+//   ServerWindow is supposed to draw outside of its clipping region,
+//   there is actually no reason to lock the DisplayDriver. Multiple
+//   threads drawing in the frame buffer at the same time is actually
+//   only bad if their drawing could overlap, but this is already
+//   prevented by the clipping regions (access to those need to be
+//   locked).
+//   Making Painter thread safe could introduce some overhead, since
+//   some of the current members of Painter would need to be created
+//   on the stack... I'll have to see about that... On multiple CPU
+//   machines though, there would be quite an improvement. In two
+//   years from now, most systems will be at least dual CPU
+
 class Painter {
  public:
 								Painter();
@@ -66,10 +98,10 @@ class Painter {
 								// lines
 			BRect				StrokeLine(		BPoint a,
 												BPoint b,
-												const pattern& p = B_SOLID_HIGH);
+												DrawData* context);
 
 			BRect				StrokeLine(		BPoint b,
-												const pattern& p = B_SOLID_HIGH);
+												DrawData* context);
 
 			// return true if the line was either vertical or horizontal
 			// draws a solid one pixel wide line of color c, no blending
