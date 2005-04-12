@@ -265,7 +265,7 @@ load_module_image(const char *path, module_image **_moduleImage)
 
 	image = load_kernel_add_on(path);
 	if (image < 0) {
-		dprintf("load_module_image failed: %s\n", strerror(image));
+		dprintf("load_module_image(%s) failed: %s\n", path, strerror(image));
 		return image;
 	}
 
