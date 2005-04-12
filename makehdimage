@@ -123,7 +123,8 @@ BEOS_NETWORK_INTERFACES="ethernet loopback ppp"
 BEOS_NETWORK_PPP="ipcp modem pap pppoe"
 BEOS_NETWORK_PROTOCOLS="icmp ipv4 raw route tcp udp"
 
-BEOS_ADD_ONS_ACCELERANTS="radeon.accelerant nv.accelerant mga.accelerant nm.accelerant"
+BEOS_ADD_ONS_ACCELERANTS="radeon.accelerant nv.accelerant mga.accelerant \
+	nm.accelerant vesa.accelerant"
 BEOS_ADD_ONS_TRANSLATORS="STXTTranslator RTF-Translator"
 BEOS_ADD_ONS_MEDIA="mixer.media_addon legacy.media_addon multi_audio.media_addon"
 BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard"
@@ -131,8 +132,8 @@ BEOS_ADD_ONS_DRIVERS_MISC="config_manager blkman fast_log ide_adapter locked_poo
 	scsi_periph intel keyboard scsi_dsk scsi_cd dprintf null zero random ps2_hid <driver>tty \
 	console <driver>config vga_text"
 BEOS_ADD_ONS_DRIVERS_GRAPHICS="radeon.driver nv.driver nm.driver mga.driver"
-BEOS_ADD_ONS_DRIVERS_NET="bcm440x bcm570x ipro1000 rtl8139 rtl8169 sis900 \
-	via-rhine wb840 net_stack_driver"
+BEOS_ADD_ONS_DRIVERS_NET="ipro1000 rtl8139 rtl8169 sis900 \
+	via-rhine wb840 net_stack_driver"	# bcm440x bcm570x (only available with GPLd add-ons)
 BEOS_ADD_ONS_BUSMASTERS="pci isa ide scsi ide_isa"
 BEOS_ADD_ONS_FILESYSTEMS="bfs"
 
@@ -426,23 +427,27 @@ for f in keyboard; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/input_server/devices/
 done
 
+# network add-ons
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/network
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network
 for f in $BEOS_NETWORK_CORE; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network
 done
+
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/interfaces
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/network/interfaces
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/interfaces
 for f in $BEOS_NETWORK_INTERFACES; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/interfaces
 done
+
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/ppp
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/network/ppp
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/ppp
 for f in $BEOS_NETWORK_PPP; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/ppp
 done
+
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/protocols
-$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/network/protocols
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/obos_network/protocols
 for f in $BEOS_NETWORK_PROTOCOLS; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/network/protocols
 done
