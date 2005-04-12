@@ -187,6 +187,8 @@ ps2_packet_to_movement(uint8 packet[], mouse_movement *pos)
 		pos->timestamp = currentTime;
 		pos->wheel_ydelta = (int)wheel_ydelta;
 		pos->wheel_xdelta = (int)wheel_xdelta;
+
+		TRACE(("xdelta: %d, ydelta: %d, buttons %x, clicks: %d, timestamp %Ld\n", xDelta, yDelta, buttons, sClickCount, currentTime));
 	}
 }
 
@@ -230,7 +232,7 @@ static int32
 handle_mouse_interrupt(void* data)
 {
 	int8 read;
-	TRACE(("mouse interrupt occurred!!!\n"));
+	//TRACE(("mouse interrupt occurred!!!\n"));
 	
 	read = gIsa->read_io_8(PS2_PORT_CTRL);
 	
@@ -240,7 +242,8 @@ handle_mouse_interrupt(void* data)
 	}
 	
 	read = read_data_byte();
-	cbuf_memcpy_to_chain(sMouseChain, 0, &read, sizeof(read));
+	TRACE(("mouse interrupt : byte %x\n", read));
+	cbuf_memcpy_to_chain(sMouseChain, sSync, &read, sizeof(read));
 	
 	if (sSync == 0 && !(read & 8)) {
 		TRACE(("mouse resynched, bad data\n"));
