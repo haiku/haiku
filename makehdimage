@@ -107,7 +107,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	tee md5sum catattr query lsindex mkindex roster listimage \
 	quit open translate setvolume waitfor uname iroster keymap \
 	strace rmdir error ifconfig ping traceroute arp pppconfig \
-	ppp_up"
+	ppp_up gdb"
 
 BEOS_APPS="MiniTerminal"
 
