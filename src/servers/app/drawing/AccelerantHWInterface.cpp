@@ -288,6 +288,10 @@ AccelerantHWInterface::Shutdown()
 status_t
 AccelerantHWInterface::SetMode(const display_mode &mode)
 {
+	// TODO: There are places this function can fail,
+	// maybe it needs to roll back changes in case of an
+	// error.
+
 	// prevent from doing the unnecessary
 	if (fModeCount > 0 && fBackBuffer && fFrontBuffer
 		&& fDisplayMode.virtual_width == mode.virtual_width
