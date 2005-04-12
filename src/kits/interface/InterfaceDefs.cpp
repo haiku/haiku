@@ -632,7 +632,9 @@ _init_interface_kit_()
 	status_t status = load_menu_settings(BMenu::sMenuInfo);
 
 	// TODO: fill the other static members
-		
+
+	_init_global_fonts();
+
 	return status;
 }
 
