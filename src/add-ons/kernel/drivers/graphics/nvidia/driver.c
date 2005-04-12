@@ -36,6 +36,11 @@
 
 #define MAX_DEVICES	  8
 
+#ifndef __HAIKU__
+#	undef B_USER_CLONEABLE_AREA
+#	define B_USER_CLONEABLE_AREA 0
+#endif
+
 #define DEVICE_FORMAT "%04X_%04X_%02X%02X%02X" // apsed
 
 /* Tell the kernel what revision of the driver API we support */
@@ -584,9 +589,9 @@ static status_t map_device(device_info *di)
 		(void *) di->pcii.u.h0.base_registers_pci[registers],
 		di->pcii.u.h0.base_register_sizes[registers],
 		B_ANY_KERNEL_ADDRESS,
- 		(si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
+		B_USER_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
 		(void **)&(di->regs));
- 	si->clone_bugfix_regs = (uint32 *) di->regs;
+	si->clone_bugfix_regs = (uint32 *) di->regs;
 		
 	/* if mapping registers to vmem failed then pass on error */
 	if (si->regs_area < 0) return si->regs_area;
@@ -680,7 +685,7 @@ static status_t map_device(device_info *di)
 		(void *) di->pcii.u.h0.base_registers_pci[frame_buffer],
 		di->pcii.u.h0.base_register_sizes[frame_buffer],
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
-		B_READ_AREA + B_WRITE_AREA,
+		B_READ_AREA | B_WRITE_AREA,
 		&(si->framebuffer));
 
 	/*if failed with write combining try again without*/
@@ -857,7 +862,9 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 	/* create this area with NO user-space read or write permissions, to prevent accidental dammage */
-	di->shared_area = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS, ((sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK, 0);
+	di->shared_area = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS,
+		((sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK,
+		B_USER_CLONEABLE_AREA);
 	if (di->shared_area < 0) {
 		/* return the error */
 		result = di->shared_area;
