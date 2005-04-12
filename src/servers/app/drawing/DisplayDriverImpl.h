@@ -188,14 +188,14 @@ class DisplayDriverImpl : public DisplayDriver {
 
 	virtual	void				StrokeLine(		const BPoint &start,
 												const BPoint &end,
-												const DrawData *d);
+												DrawData *d);
 
 	// this version used by Decorator
 	virtual	void				StrokePoint(	const BPoint &pt,
 												const RGBColor &color);
 
 	virtual	void				StrokePoint(	const BPoint &pt,
-												const DrawData *d);
+												DrawData *d);
 
 	virtual	void				StrokePolygon(	BPoint *ptlist,
 												int32 numpts,

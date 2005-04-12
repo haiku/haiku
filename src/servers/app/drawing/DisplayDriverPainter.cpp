@@ -702,15 +702,18 @@ DisplayDriverPainter::StrokeEllipse(const BRect &r, const DrawData *d)
 }
 
 // StrokeLine
+//
+// * this function is only used by Decorators
+// * it assumes a one pixel wide line
 void
 DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
 	if (Lock()) {
 		if (!fPainter->StraightLine(start, end, color.GetColor32())) {
-			DrawData d;
-			d.highcolor = color;
-			d.draw_mode = B_OP_COPY;
-			StrokeLine(start, end, &d);
+			DrawData context;
+			context.highcolor = color;
+			context.draw_mode = B_OP_COPY;
+			StrokeLine(start, end, &context);
 		} else {
 			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(start, end)));
 		}
@@ -720,22 +723,18 @@ DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const R
 
 // StrokeLine
 void
-DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const DrawData *d)
+DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, DrawData* context)
 {
 	if (Lock()) {
-
-		fPainter->SetDrawData(d);
-		BRect touched = fPainter->StrokeLine(start, end);
-
+		BRect touched = fPainter->StrokeLine(start, end, context);
 		fGraphicsCard->Invalidate(touched);
-
 		Unlock();
 	}
 }
 
-// used by decorator
-//
 // StrokePoint
+//
+// * this function is only used by Decorators
 void
 DisplayDriverPainter::StrokePoint(const BPoint& pt, const RGBColor &color)
 {
@@ -744,9 +743,9 @@ DisplayDriverPainter::StrokePoint(const BPoint& pt, const RGBColor &color)
 
 // StrokePoint
 void
-DisplayDriverPainter::StrokePoint(const BPoint& pt, const DrawData *d)
+DisplayDriverPainter::StrokePoint(const BPoint& pt, DrawData *context)
 {
-	StrokeLine(pt, pt, d);
+	StrokeLine(pt, pt, context);
 }
 
 // StrokePolygon
@@ -1129,20 +1128,18 @@ DisplayDriverPainter::StrokeLineArray(const int32 &numlines,
 		return;
 	
 	if (Lock()) {
-		DrawData d;
-		d.draw_mode = B_OP_COPY;
+		DrawData context;
+		context.draw_mode = B_OP_COPY;
 		const LineArrayData *data;
 		
 		data = (const LineArrayData *)&(linedata[0]);
-		d.highcolor = data->color;
-		fPainter->SetDrawData(&d);
-		BRect touched = fPainter->StrokeLine(data->pt1, data->pt2);
+		context.highcolor = data->color;
+		BRect touched = fPainter->StrokeLine(data->pt1, data->pt2, &context);
 		
 		for (int32 i = 1; i < numlines; i++) {
 			data = (const LineArrayData *)&(linedata[i]);
-			d.highcolor = data->color;
-			fPainter->SetDrawData(&d);
-			touched = touched | fPainter->StrokeLine(data->pt1, data->pt2);
+			context.highcolor = data->color;
+			touched = touched | fPainter->StrokeLine(data->pt1, data->pt2, &context);
 		}
 		
 		fGraphicsCard->Invalidate(touched);
