@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "Application.h"
-#include "TextControl.h"
+#include "Button.h"
 #include "View.h"
 #include "Window.h"
 
@@ -19,9 +19,14 @@ class HelloView : public BView {
 //				printf("HelloView::Draw()\n");
 //				updateRect.PrintToStream();
 
-//						SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-//						FillRect(updateRect);
+						SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+						FillRect(updateRect);
 						BRect r(Bounds());
+// this fixes the font redrawing (text getting thicker)
+// and it proves my theory that the Drawing here
+// should be clipped to the update region as it was
+// when the invalidation was triggered
+//FillRect(r);
 //				r.PrintToStream();
 
 						const char* message = "Hello World!";
@@ -46,12 +51,13 @@ show_window(BRect frame, const char* name)
 	BView* view = new HelloView(window->Bounds(), "test", B_FOLLOW_ALL,
 								B_WILL_DRAW/* | B_FULL_UPDATE_ON_RESIZE*/);
 
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+//	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	window->AddChild(view);
-/*	BRect b(view->Bounds());
-	b.InsetBy(10.0, 20.0);
-	BTextControl* control = new BTextControl(b, "tc", "Text", "Enter Text Here", NULL);
-	view->AddChild(control);*/
+	BRect b(view->Bounds());
+	b.InsetBy(20.0, 40.0);
+	b.OffsetTo(5.0, 5.0);
+	BButton* control = new BButton(b, "button", "Label", NULL);
+	view->AddChild(control);
 
 	window->Show();
 }
