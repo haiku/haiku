@@ -87,36 +87,41 @@ static int dump_team_info(int argc, char **argv);
 
 
 static void
-_dump_team_info(struct team *p)
+_dump_team_info(struct team *team)
 {
-	dprintf("TEAM: %p\n", p);
-	dprintf("id:          0x%lx\n", p->id);
-	dprintf("name:        '%s'\n", p->name);
-	dprintf("next:        %p\n", p->next);
-	dprintf("parent:      %p\n", p->parent);
-	dprintf("children:    %p\n", p->children);
-	dprintf("num_threads: %d\n", p->num_threads);
-	dprintf("state:       %d\n", p->state);
-	dprintf("pending_signals: 0x%x\n", p->pending_signals);
-	dprintf("io_context:  %p\n", p->io_context);
-//	dprintf("path:        '%s'\n", p->path);
-	dprintf("aspace:      %p (id = %ld)\n", p->aspace, p->aspace->id);
-	dprintf("kaspace:     %p\n", p->kaspace);
-	dprintf("main_thread: %p\n", p->main_thread);
-	dprintf("thread_list: %p\n", p->thread_list);
+	dprintf("TEAM: %p\n", team);
+	dprintf("id:          0x%lx\n", team->id);
+	dprintf("name:        '%s'\n", team->name);
+	dprintf("next:        %p\n", team->next);
+	dprintf("parent:      %p\n", team->parent);
+	dprintf("children:    %p\n", team->children);
+	dprintf("num_threads: %d\n", team->num_threads);
+	dprintf("state:       %d\n", team->state);
+	dprintf("pending_signals: 0x%x\n", team->pending_signals);
+	dprintf("io_context:  %p\n", team->io_context);
+//	dprintf("path:        '%s'\n", team->path);
+	dprintf("aspace:      %p (id = %ld)\n", team->aspace, team->aspace->id);
+	dprintf("kaspace:     %p\n", team->kaspace);
+	dprintf("main_thread: %p\n", team->main_thread);
+	dprintf("thread_list: %p\n", team->thread_list);
 }
 
 
 static int
 dump_team_info(int argc, char **argv)
 {
-	struct team *p;
-	int id = -1;
+	struct team *team;
+	team_id id = -1;
 	unsigned long num;
 	struct hash_iterator i;
 
 	if (argc < 2) {
-		dprintf("team: not enough arguments\n");
+		// just list the existing teams
+		hash_open(team_hash, &i);
+		while ((team = hash_next(team_hash, &i)) != NULL) {
+			dprintf("%p %5lx %s\n", team, team->id, team->name);
+		}
+		hash_close(team_hash, &i, false);
 		return 0;
 	}
 
@@ -125,7 +130,7 @@ dump_team_info(int argc, char **argv)
 		num = strtoul(argv[1], NULL, 16);
 		if (num > vm_get_kernel_aspace()->virtual_map.base) {
 			// XXX semi-hack
-			_dump_team_info((struct team*)num);
+			_dump_team_info((struct team *)num);
 			return 0;
 		} else {
 			id = num;
@@ -134,9 +139,9 @@ dump_team_info(int argc, char **argv)
 
 	// walk through the thread list, trying to match name or id
 	hash_open(team_hash, &i);
-	while ((p = hash_next(team_hash, &i)) != NULL) {
-		if ((p->name && strcmp(argv[1], p->name) == 0) || p->id == id) {
-			_dump_team_info(p);
+	while ((team = hash_next(team_hash, &i)) != NULL) {
+		if ((team->name && strcmp(argv[1], team->name) == 0) || team->id == id) {
+			_dump_team_info(team);
 			break;
 		}
 	}
