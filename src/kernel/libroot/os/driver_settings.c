@@ -37,7 +37,7 @@
 #	include <util/list.h>
 #	include <lock.h>
 #	include <kdriver_settings.h>
-#	include <int.h>
+#	include <kernel.h>
 #	include <boot/kernel_args.h>
 #endif
 #ifdef _BOOT_MODE

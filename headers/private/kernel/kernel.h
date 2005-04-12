@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -23,7 +23,7 @@
 //#define DEBUG_KERNEL_STACKS
 	// Note, debugging kernel stacks doesn't really work yet. Since the
 	// interrupt will also try to use the stack on a page fault, all
-	// you get is a reboot.
+	// you get is a double fault.
 	// At least, you then know that the stack overflows in this case :)
 
 /** Size of the kernel stack */
@@ -50,6 +50,10 @@
 #define CHECK_BIT(a, b) ((a) & (1 << (b)))
 #define SET_BIT(a, b) ((a) | (1 << (b)))
 #define CLEAR_BIT(a, b) ((a) & (~(1 << (b))))
+
+/* during kernel startup, interrupts are disabled (among other things) */
+extern bool kernel_startup;
+
 
 #ifdef __cplusplus
 extern "C" {

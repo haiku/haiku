@@ -1,21 +1,22 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_INT_H
 #define _KERNEL_INT_H
 
-#include <KernelExport.h>
 
+#include <KernelExport.h>
 #include <arch/int.h>
 
 struct kernel_args;
 
+
 /* adds the handler but don't change whether or not the interrupt is currently enabled */
 #define B_NO_ENABLE_COUNTER	1
-
-/* during kernel startup, interrupts are disabled */
-extern bool kernel_startup;
 
 
 #ifdef __cplusplus
@@ -25,8 +26,8 @@ extern "C" {
 status_t int_init(struct kernel_args *args);
 status_t int_init_post_vm(struct kernel_args *args);
 int int_io_interrupt_handler(int vector);
-long install_interrupt_handler(long, interrupt_handler,	void *);
-long remove_interrupt_handler (long, interrupt_handler,	void *);
+status_t install_interrupt_handler(long vector, interrupt_handler, void *data);
+status_t remove_interrupt_handler(long vector, interrupt_handler, void *data);
 
 static inline void
 enable_interrupts(void)

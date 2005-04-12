@@ -1,13 +1,18 @@
-/* Mutex and recursive_lock code */
+/*
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
-/* 
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/* Mutex and recursive_lock code */
 
 
 #include <OS.h>
+
 #include <lock.h>
+#include <kernel.h>
 #include <int.h>
 #include <debug.h>
 #include <thread.h>

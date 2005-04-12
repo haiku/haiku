@@ -34,8 +34,9 @@ struct io_vector {
 
 static struct io_vector *io_vectors = NULL;
 
+
 cpu_status
-disable_interrupts()
+disable_interrupts(void)
 {
 	return arch_int_disable_interrupts();
 }
@@ -82,11 +83,11 @@ int_init_post_vm(kernel_args *args)
  *	arch_int_enable_io_interrupt() as it only works for IRQ values
  */
 
-long
+status_t
 install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 {
 	struct io_handler *io = NULL; 
-	int state;
+	cpu_status state;
 
 	if (vector < 0 || vector >= NUM_IO_VECTORS)
 		return B_BAD_VALUE;
@@ -98,7 +99,7 @@ install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	 */
 	io = (struct io_handler *)malloc(sizeof(struct io_handler));
 	if (io == NULL)
-		return ENOMEM;
+		return B_NO_MEMORY;
 
 	io->func = handler;
 	io->data = data;
@@ -113,7 +114,7 @@ install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	release_spinlock(&io_vectors[vector].vector_lock);
 	restore_interrupts(state);
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -124,11 +125,12 @@ install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 long
 install_io_interrupt_handler(long irq, interrupt_handler handler, void *data, ulong flags)
 {
+	// ToDo: this is x86 specific
 	long vector = irq + 0x20;
-	long rv = install_interrupt_handler(vector, handler, data);
 
-	if (rv != 0)
-		return rv;
+	status_t status = install_interrupt_handler(vector, handler, data);
+	if (status != B_OK)
+		return status;
 
 	/* If we were passed the bit-flag B_NO_ENABLE_COUNTER then
 	 * we're being asked to not alter whether the interrupt is set
@@ -137,7 +139,7 @@ install_io_interrupt_handler(long irq, interrupt_handler handler, void *data, ul
 	if ((flags & B_NO_ENABLE_COUNTER) == 0)
 		arch_int_enable_io_interrupt(irq);
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -145,11 +147,11 @@ install_io_interrupt_handler(long irq, interrupt_handler handler, void *data, ul
  *	Read the notes for install_interrupt_handler!
  */
 
-long
+status_t
 remove_interrupt_handler(long vector, interrupt_handler handler, void *data)
 {
 	struct io_handler *io = NULL;
-	long status = EINVAL;
+	status_t status = B_BAD_VALUE;
 	int state;
 
 	if (vector < 0 || vector >= NUM_IO_VECTORS)
@@ -194,16 +196,15 @@ long
 remove_io_interrupt_handler(long irq, interrupt_handler handler, void *data)
 {
 	long vector = irq + 0x20;
-	long rv = remove_interrupt_handler(vector, handler, data);
-
-	if (rv < 0)
-		return rv;
+	status_t status = remove_interrupt_handler(vector, handler, data);
+	if (status < B_OK)
+		return status;
 
 	/* Check if we need to disable interrupts... */
 	if (io_vectors[vector].handler_list.next != &io_vectors[vector].handler_list)
 		arch_int_disable_io_interrupt(irq);
 
-	return 0; 
+	return B_OK;
 } 
 
 
