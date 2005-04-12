@@ -101,6 +101,7 @@ HWInterface::GetCursorPosition()
 }
 
 // Invalidate
+// * the object needs to be already locked!
 status_t
 HWInterface::Invalidate(const BRect& frame)
 {
@@ -138,20 +139,20 @@ HWInterface::CopyBackToFront(const BRect& frame)
 		uint8* src = (uint8*)backBuffer->Bits();
 
 		// convert to integer coordinates
-		int32 x = (int32)floorf(area.left);
-		int32 y = (int32)floorf(area.top);
+		int32 left = (int32)floorf(area.left);
+		int32 top = (int32)floorf(area.top);
 		int32 right = (int32)ceilf(area.right);
 		int32 bottom = (int32)ceilf(area.bottom);
 
 		// offset to left top pixel in source buffer (always B_RGBA32)
-		src += y * srcBPR + x * 4;
+		src += top * srcBPR + left * 4;
 
-		_CopyToFront(src, srcBPR, x, y, right, bottom);
-
+		_CopyToFront(src, srcBPR, left, top, right, bottom);
 		_DrawCursor(area);
-	}
 
-	return B_OK;
+		return B_OK;
+	}
+	return B_BAD_VALUE;
 }
 
 
@@ -253,6 +254,10 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 			break;
 		}
 		case B_CMAP8: {
+// TODO: make this work on Haiku, the problem is only
+// the rgb_color->index mapping, there is an implementation
+// in Bitmap.cpp, maybe it needs to be moved to a public
+// place...
 #ifndef __HAIKU__
 			// offset to left top pixel in dest buffer
 			dst += y * dstBPR + x;
