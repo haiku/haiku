@@ -16,7 +16,7 @@
 // constructor
 TextRenderer::TextRenderer()
 	: fPtSize(12.0),
-	  fHinted(false),
+	  fHinted(true),
 	  fAntialias(true),
 	  fKerning(true),
 	  fOpacity(255),
@@ -28,7 +28,7 @@ TextRenderer::TextRenderer()
 
 TextRenderer::TextRenderer(BMessage* archive)
 	: fPtSize(12.0),
-	  fHinted(false),
+	  fHinted(true),
 	  fAntialias(true),
 	  fKerning(true),
 	  fOpacity(255),
@@ -76,7 +76,7 @@ TextRenderer::TextRenderer(BMessage* archive)
 // constructor
 TextRenderer::TextRenderer(const TextRenderer& from)
 	: fPtSize(12.0),
-	  fHinted(false),
+	  fHinted(true),
 	  fAntialias(true),
 	  fKerning(true),
 	  fOpacity(255),

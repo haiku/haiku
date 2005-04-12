@@ -31,6 +31,8 @@
 
 #include "AGGTextRenderer.h"
 
+#define FLIP_Y false
+
 // rect_to_int
 inline void
 rect_to_int(BRect r,
@@ -53,7 +55,7 @@ AGGTextRenderer::AGGTextRenderer()
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
-	fFontEngine.flip_y(true);
+	fFontEngine.flip_y(FLIP_Y);
 }
 
 AGGTextRenderer::AGGTextRenderer(BMessage* archive)
@@ -66,7 +68,7 @@ AGGTextRenderer::AGGTextRenderer(BMessage* archive)
 //printf("AGGTextRenderer::AGGTextRenderer(BMessage*)\n");
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
-	fFontEngine.flip_y(true);
+	fFontEngine.flip_y(FLIP_Y);
 }
 
 // constructor
@@ -79,7 +81,7 @@ AGGTextRenderer::AGGTextRenderer(const AGGTextRenderer& from)
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
-	fFontEngine.flip_y(true);
+	fFontEngine.flip_y(FLIP_Y);
 }
 
 // destructor
@@ -193,7 +195,7 @@ AGGTextRenderer::RenderString(const char* string,
 							  bool dryRun,
 							  BPoint* nextCharPos)
 {
-	fFontEngine.hinting(false);
+	fFontEngine.hinting(fHinted);
 	fFontEngine.height((int32)(fPtSize));
 	fFontEngine.width((int32)(fPtSize));
 
