@@ -54,7 +54,7 @@
 #include <SupportDefs.h>
 
 
-#define USE_R5_STYLE_COMM
+//#define USE_R5_STYLE_COMM
 	// define this when R5 input_server communication should be used
 
 #define INPUTSERVER_SIGNATURE "application/x-vnd.Be-input_server"
