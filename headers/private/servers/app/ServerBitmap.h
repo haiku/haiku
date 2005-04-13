@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -41,13 +41,16 @@ class BitmapManager;
 	managed by the BitmapManager class. It is also the base class for 
 	all cursors. Every BBitmap has a shadow ServerBitmap object.
 */
-class ServerBitmap
-{
-public:
-	ServerBitmap(BRect rect,color_space space, int32 flags,
-		int32 bytesperline=-1, screen_id screen=B_MAIN_SCREEN_ID);
-	ServerBitmap(const ServerBitmap *bmp);
-	~ServerBitmap(void);
+class ServerBitmap {
+ public:
+							ServerBitmap(BRect rect,
+										 color_space space,
+										 int32 flags,
+										 int32 bytesperline = -1,
+										 screen_id screen = B_MAIN_SCREEN_ID);
+							ServerBitmap(const ServerBitmap* bmp);
+
+	virtual					~ServerBitmap();
 
 	/*!
 		\brief Returns the area in which the buffer resides
@@ -55,92 +58,111 @@ public:
 		- \c B_ERROR if the buffer is not allocated in an area
 		- area_id for the buffer
 	*/
-	area_id Area(void) const { return fArea; }
+	inline	area_id			Area() const
+								{ return fArea; }
 	
 	// Returns the offset of the bitmap in its area
-	int32 AreaOffset(void) { return fOffset; }
+	inline	int32			AreaOffset() const
+								{ return fOffset; }
 	
 	//! Returns the bitmap's buffer
-	uint8 *Bits(void) const { return fBuffer; }
-	uint32 BitsLength(void) const;
+	inline	uint8*			Bits() const
+								{ return fBuffer; }
 
-	//! Returns the size of the bitmap
-	BRect Bounds() const { return BRect(0,0,fWidth-1,fHeight-1); };
+	inline	uint32			BitsLength() const;
+
+	inline	BRect			Bounds() const
+								{ return BRect(0, 0, fWidth - 1, fHeight - 1); }
 	
 	//! Returns the number of bytes in each row, including padding
-	int32 BytesPerRow(void) const { return fBytesPerRow; };
+	inline	int32			BytesPerRow() const
+								{ return fBytesPerRow; }
 	
-	//! Returns the pixel color depth
-	uint8 BitsPerPixel(void) const { return fBitsPerPixel; } 
+	inline	uint8			BitsPerPixel() const
+								{ return fBitsPerPixel } 
 	
-	//! Returns the color space of the bitmap
-	color_space ColorSpace(void) const { return fSpace; }
+	inline	color_space		ColorSpace() const
+								{ return fSpace; }
 	
-	//! Returns the width of the bitmap
-	int32 Width(void) const { return fWidth; }
+	inline	int32			Width() const
+								{ return fWidth; }
 	
-	//! Returns the height of the bitmap
-	int32 Height(void) const { return fHeight; }
+	inline	int32			Height() const
+								{ return fHeight; }
 
-	//! Returns whether the bitmap is valid
-	bool InitCheck(void) const { return fInitialized; }
+	inline	bool			InitCheck() const
+								{ return fInitialized; }
 
 	//! Returns the identifier token for the bitmap
-	int32 Token(void) const { return fToken; }
+	inline	int32			Token() const
+								{ return fToken; }
 	
 	//! Does a shallow copy of the bitmap passed to it
-	void ShallowCopy(const ServerBitmap *from)
-	{
-		if(!from)
-			return;
-		
-		fInitialized=from->fInitialized;
-		fArea=from->fArea;
-		fBuffer=from->fBuffer;
-		fWidth=from->fWidth;
-		fHeight=from->fHeight;
-		fBytesPerRow=from->fBytesPerRow;
-		fSpace=from->fSpace;
-		fFlags=from->fFlags;
-		fBitsPerPixel=from->fBitsPerPixel;
-		fToken=from->fToken;
-		fOffset=from->fOffset;
-	}
+	inline	void			ShallowCopy(const ServerBitmap *from);
 	
 protected:
 	friend class BitmapManager;
 	friend class PicturePlayer;
 
-	//! Internal function used by the BitmapManager.
-	void _SetArea(area_id ID) { fArea=ID; }
+	//! used by the BitmapManager
+	inline	void			_SetArea(area_id ID)
+								{ fArea=ID; }
 	
-	//! Internal function used by the BitmapManager.
-	void _SetBuffer(void *ptr) { fBuffer=(uint8*)ptr; }
-	void _AllocateBuffer(void);
-	void _FreeBuffer(void);
+	//! used by the BitmapManager
+	inline	void			_SetBuffer(void *ptr)
+								{ fBuffer=(uint8*)ptr; }
+
+			void			_AllocateBuffer();
+			void			_FreeBuffer();
 	
-	void _HandleSpace(color_space space, int32 bytesperline=-1);
+			void			_HandleSpace(color_space space,
+										 int32 bytesperline = -1);
 
-	bool fInitialized;
-	area_id fArea;
-	uint8 *fBuffer;
-
-	int32 fWidth,fHeight;
-	int32 fBytesPerRow;
-	color_space fSpace;
-	int32 fFlags;
-	int fBitsPerPixel;
-	int32 fToken;
-	int32 fOffset;
+			bool			fInitialized;
+			area_id			fArea;
+			uint8*			fBuffer;
+		
+			int32			fWidth;
+			int32			fHeight;
+			int32			fBytesPerRow;
+			color_space		fSpace;
+			int32			fFlags;
+			int				fBitsPerPixel;
+			int32			fToken;
+			int32			fOffset;
 };
 
-class UtilityBitmap : public ServerBitmap
+class UtilityBitmap : public ServerBitmap {
+ public:
+							UtilityBitmap(BRect rect,
+										  color_space space,
+										  int32 flags,
+										  int32 bytesperline = -1,
+										  screen_id screen = B_MAIN_SCREEN_ID);
+							UtilityBitmap(const ServerBitmap* bmp);
+
+	virtual					~UtilityBitmap();
+};
+
+// ShallowCopy
+void
+ServerBitmap::ShallowCopy(const ServerBitmap* from)
 {
-public:
-	UtilityBitmap(BRect rect,color_space space, int32 flags,
-		int32 bytesperline=-1, screen_id screen=B_MAIN_SCREEN_ID);
-	UtilityBitmap(const ServerBitmap *bmp);
-	~UtilityBitmap(void);
-};
+	if (!from)
+		return;
+	
+	fInitialized	= from->fInitialized;
+	fArea			= from->fArea;
+	fBuffer			= from->fBuffer;
+	fWidth			= from->fWidth;
+	fHeight			= from->fHeight;
+	fBytesPerRow	= from->fBytesPerRow;
+	fSpace			= from->fSpace;
+	fFlags			= from->fFlags;
+	fBitsPerPixel	= from->fBitsPerPixel;
+	fToken			= from->fToken;
+	fOffset			= from->fOffset;
+}
 
-#endif
+
+#endif // _SERVER_BITMAP_H_
