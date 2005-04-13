@@ -210,6 +210,7 @@ start_console(struct console *con)
 				} else {
 					// set default mode
 					struct termios termios;
+					struct winsize size;
 
 					if (tcgetattr(con->tty_slave_fd, &termios) == 0) {
 						termios.c_iflag = ICRNL;
@@ -217,6 +218,11 @@ start_console(struct console *con)
 						termios.c_lflag = ISIG | ICANON | ECHO | ECHOE | ECHONL;
 
 						tcsetattr(con->tty_slave_fd, TCSANOW, &termios);
+					}
+
+					if (ioctl(con->console_fd, TIOCGWINSZ, &size, sizeof(struct winsize)) == 0) {
+						// we got the window size from the console
+						ioctl(con->tty_slave_fd, TIOCSWINSZ, &size, sizeof(struct winsize));
 					}
 				}
 				break;

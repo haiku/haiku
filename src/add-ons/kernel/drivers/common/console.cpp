@@ -15,6 +15,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <termios.h>
 
 
 #define DEVICE_NAME "console"
@@ -705,6 +706,16 @@ console_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 static status_t
 console_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
+	struct console_desc *console = (struct console_desc *)cookie;
+
+	if (op == TIOCGWINSZ) {
+		struct winsize size;
+		size.ws_xpixel = size.ws_col = console->columns;
+		size.ws_ypixel = size.ws_row = console->lines;
+
+		return user_memcpy(buffer, &size, sizeof(struct winsize));
+	}
+
 	return B_BAD_VALUE;
 }
 
