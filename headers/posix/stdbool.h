@@ -8,9 +8,10 @@
 #ifndef __bool_true_false_are_defined
 
 #ifndef __cplusplus
-//typedef enum { false = 0, true = 1 } _Bool;
-	// ToDo: this would change the bool size compared to standard BeOS
+#	if __GNUC__ < 3
+// sizeof(_Bool) == 1 must be true for BeOS compatibility
 typedef unsigned char _Bool;
+#	endif
 #	define bool _Bool
 #	define true 1
 #	define false 0
