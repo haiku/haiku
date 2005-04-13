@@ -79,14 +79,16 @@ class ServerBitmap {
 								{ return fBytesPerRow; }
 	
 	inline	uint8			BitsPerPixel() const
-								{ return fBitsPerPixel } 
+								{ return fBitsPerPixel; } 
 	
 	inline	color_space		ColorSpace() const
 								{ return fSpace; }
 	
+	//! Returns the bitmap's width in pixels per row
 	inline	int32			Width() const
 								{ return fWidth; }
 	
+	//! Returns the bitmap's row count
 	inline	int32			Height() const
 								{ return fHeight; }
 
