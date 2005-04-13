@@ -12,12 +12,10 @@ KernelLd ps2mouse :
 	<$(SOURCE_GRIST)>ps2mouse.o
 	kernel.so
 	:
-	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
+	$(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/add-on.ld
 	:
 	-Bdynamic -shared
 	:
-	:
-	drivers/dev/ps2mouse
 	; 
 
 if $(COMPILE_FOR_R5) {
