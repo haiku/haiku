@@ -75,6 +75,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 
 	fMovingWindow		= false;
 	fResizingWindow		= false;
+	fHaveWinBorderList	= false;
 	fLastMouseMoved		= this;
 	fViewAction			= B_ENTERED_VIEW;
 	fEventMaskLayer		= NULL;
@@ -566,33 +567,16 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 
 	{
 		BMessage	activatedMsg(B_WORKSPACE_ACTIVATED);
+		activatedMsg.AddInt64("when", real_time_clock_usecs());
 		activatedMsg.AddInt32("workspace", fActiveWksIndex);
 		activatedMsg.AddBool("active", false);
 
 		for (int32 i = 0; i < fWinBorderCount; i++)
-		{
-//printf("Sending 'false' to %s.\n", fWinBorderList[i]->GetName());
 			fWinBorderList[i]->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
-		}
 	}
 
 	fActiveWksIndex		= index;
 
-// TODO: HERE!!!
-
-/*
-	{
-		BMessage	activatedMsg(B_WORKSPACE_ACTIVATED);
-		activatedMsg.AddInt32("workspace", fActiveWksIndex);
-		activatedMsg.AddBool("active", true);
-
-		for (int32 i = 0; i < fWinBorderCount; i++)
-		{
-printf("Sending 'true' to %s.\n", fWinBorderList[i]->GetName());
-			fWinBorderList[i]->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
-		}
-	}
-*/
 	if (fMovingWindow && fEventMaskLayer)
 	{
 		WinBorder	*movingWinBorder = (WinBorder*)fEventMaskLayer;
@@ -615,13 +599,20 @@ printf("Sending 'true' to %s.\n", fWinBorderList[i]->GetName());
 			fWorkspace[exIndex]->HideWinBorder(movingWinBorder);
 			fWorkspace[exIndex]->RemoveWinBorder(movingWinBorder);
 
-			movingWinBorder->Window()->QuietlySetWorkspaces(movingWinBorder->Window()->Workspaces() & ~(0x00000001 << exIndex));
-
 			movingWinBorder->fHidden = false;
 			ActiveWorkspace()->AddWinBorder(movingWinBorder);
 			ActiveWorkspace()->ShowWinBorder(movingWinBorder);
 
-			movingWinBorder->Window()->QuietlySetWorkspaces(movingWinBorder->Window()->Workspaces() | (0x00000001 << exIndex));
+			// TODO: can you call SetWinBorderWorskpaces() instead of this?
+			uint32		wks = movingWinBorder->Window()->Workspaces();
+			BMessage	changedMsg(B_WORKSPACES_CHANGED);
+			changedMsg.AddInt64("when", real_time_clock_usecs());
+			changedMsg.AddInt32("old", wks);
+			wks			&= ~(0x00000001 << exIndex);
+			wks			|= (0x00000001 << fActiveWksIndex);
+			changedMsg.AddInt32("new", wks);
+			movingWinBorder->Window()->QuietlySetWorkspaces(wks);
+			movingWinBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
 		}
 	}
 	else if (fEventMaskLayer)
@@ -637,6 +628,20 @@ printf("Sending 'true' to %s.\n", fWinBorderList[i]->GetName());
 		fMovingWindow = false;
 		fResizingWindow	= false;
 	}
+
+	fHaveWinBorderList = true;
+	get_workspace_windows();
+
+	{
+		BMessage	activatedMsg(B_WORKSPACE_ACTIVATED);
+		activatedMsg.AddInt64("when", real_time_clock_usecs());
+		activatedMsg.AddInt32("workspace", fActiveWksIndex);
+		activatedMsg.AddBool("active", true);
+
+		for (int32 i = 0; i < fWinBorderCount; i++)
+			fWinBorderList[i]->Window()->SendMessageToClient(&activatedMsg, B_NULL_TOKEN, false);
+	}
+
 	// workspace changed
 	return true;
 }
@@ -706,6 +711,12 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex,
 			fEventMaskLayer	= NULL;
 		}
 	}
+
+	BMessage	changedMsg(B_WORKSPACES_CHANGED);
+	changedMsg.AddInt64("when", real_time_clock_usecs());
+	changedMsg.AddInt32("old", oldWksIndex);
+	changedMsg.AddInt32("new", newWksIndex);
+	winBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
 
 	if (invalidate)
 		show_final_scene(exFocus, exActive);
@@ -1800,24 +1811,23 @@ bool RootLayer::get_workspace_windows()
 	fWinBorderIndex	= 0;
 
 	// to determine if there was a change in window hierarchy 
-	if (exCount != fWinBorderCount)
+	if (exCount != fWinBorderCount || memcmp(fWinBorderList, fWinBorderList2, fWinBorderCount) != 0)
 		aChange = true;
 
-	// clear visible and full visible regions for windows no more visible.
-	for (int32 i = 0; i < exCount; i++)
+	if (aChange)
 	{
-		// to determine if there was a change in window hierarchy
-		if (!aChange && fWinBorderList2[i] != fWinBorderList[i])
-			aChange = true;
+		// clear visible and full visible regions for windows not visible anymore.
+		for (int32 i = 0; i < exCount; i++)
+		{
+			present	= false;
 
-		present	= false;
+			for (int32 j = 0; j < fWinBorderCount; j++)
+				if (fWinBorderList2[i] == fWinBorderList[j])
+					present = true;
 
-		for (int32 j = 0; j < fWinBorderCount; j++)
-			if (fWinBorderList2[i] == fWinBorderList[j])
-				present = true;
-
-		if (!present)
-			empty_visible_regions(fWinBorderList2[i]);
+			if (!present)
+				empty_visible_regions(fWinBorderList2[i]);
+		}
 	}
 
 	// enlarge 2nd buffer also
@@ -1892,7 +1902,7 @@ void RootLayer::winborder_activation(WinBorder* exActive)
 inline
 void RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 {
-	if(get_workspace_windows())
+	if(fHaveWinBorderList || get_workspace_windows())
 	{
 		// TODO: should it be improved by calling with region of hidden windows
 		//       plus the full regions of new windows???

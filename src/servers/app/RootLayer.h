@@ -177,6 +177,7 @@ friend class Desktop;
 			BPoint				fLastMousePossition;
 			bool				fMovingWindow;
 			bool				fResizingWindow;
+			bool				fHaveWinBorderList;
 	
 			int32				fActiveWksIndex;
 			int32				fWsCount;
