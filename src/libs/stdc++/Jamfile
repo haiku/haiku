@@ -11,13 +11,13 @@ C++FLAGS = ;
 # but this doesn't work yet, as the libio we are using here and the one 
 # contained in our libroot are different versions.
 HDRS = 
-	[ FDirName $(OBOS_TOP) src kernel libroot posix glibc libio ]
-	[ FDirName $(OBOS_TOP) src kernel libroot posix glibc stdlib ] 
-	[ FDirName $(OBOS_TOP) src kernel libroot posix glibc stdio-common ] 
-	[ FDirName $(OBOS_TOP) src kernel libroot posix glibc include ] 
-	[ FDirName $(OBOS_TOP) src kernel libroot posix glibc include arch x86 ] 
+	[ FDirName $(OBOS_TOP) src system libroot posix glibc libio ]
+	[ FDirName $(OBOS_TOP) src system libroot posix glibc stdlib ] 
+	[ FDirName $(OBOS_TOP) src system libroot posix glibc stdio-common ] 
+	[ FDirName $(OBOS_TOP) src system libroot posix glibc include ] 
+	[ FDirName $(OBOS_TOP) src system libroot posix glibc include arch x86 ] 
 	[ FDirName $(OBOS_TOP) headers cpp ] 
-	[ FDirName $(OBOS_TOP) src kernel libroot posix glibc ] 
+	[ FDirName $(OBOS_TOP) src system libroot posix glibc ] 
 	[ FDirName $(OBOS_TOP) headers posix ] 
 	[ FDirName $(OBOS_TOP) headers os ] 
 	[ FDirName $(OBOS_TOP) headers os kernel ] 
