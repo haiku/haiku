@@ -11,12 +11,7 @@
 // Forward declaration
 struct sockaddr; 
 
-#ifndef __HAIKU__
 #define NET_STACK_DRIVER_DEV	"net/stack"
-#else
-#define NET_STACK_DRIVER_DEV	"net_stack/stack"
-#endif
-
 #define NET_STACK_DRIVER_PATH	"/dev/" ## NET_STACK_DRIVER_DEV
 
 enum {

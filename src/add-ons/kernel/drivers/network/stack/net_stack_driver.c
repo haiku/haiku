@@ -188,25 +188,26 @@ _EXPORT status_t init_hardware(void)
 }
 
 
-
 /* init_driver()
  * called every time we're loaded.
  */
 _EXPORT status_t init_driver(void)
 {
-	int rv = 0;
-
-	rv = get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
-	if (rv < 0) {
-		TRACE((LOGID ERR "init_driver: Argh, can't load " NET_CORE_MODULE_NAME " module: %d\n", rv));
-		return rv;
+	// only get the core module if we don't have it loaded already
+	if (!core) {
+		int rv = 0;
+		rv = get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
+		if (rv < 0) {
+			TRACE((LOGID ERR "init_driver: Argh, can't load " NET_CORE_MODULE_NAME " module: %d\n", rv));
+			return rv;
+		}
+		
+		TRACE((LOGID "init_driver: built %s %s, core = %p\n", __DATE__, __TIME__, core));
+		
+		// start the network stack!
+		core->start();
 	}
 	
-	TRACE((LOGID "init_driver: built %s %s, core = %p\n", __DATE__, __TIME__, core));
-
-	// start the network stack!
-	core->start();
-
 	return B_OK;
 }
 
@@ -225,6 +226,7 @@ _EXPORT void uninit_driver(void)
 		core->stop();
 #endif
 		put_module(NET_CORE_MODULE_NAME);
+		core = NULL;
 	};
 }
 

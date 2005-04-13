@@ -215,7 +215,6 @@ $mkdir -p beos/system/add-ons/kernel/drivers/dev/disk/scsi
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/graphics
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/input
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/misc
-$mkdir -p beos/system/add-ons/kernel/drivers/dev/net_stack
 $mkdir -p beos/system/add-ons/kernel/drivers/dev/net
 $mkdir -p beos/system/add-ons/kernel/file_systems
 $mkdir -p beos/system/add-ons/kernel/console
@@ -389,7 +388,7 @@ for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/net/bcm570x drivers/dev/net/ipro1000 \
 		drivers/dev/net/rtl8139 drivers/dev/net/rtl8169 \
 		drivers/dev/net/sis900 drivers/dev/net/via-rhine \
-		drivers/dev/net/wb840 drivers/dev/net_stack/net_stack_driver; do
+		drivers/dev/net/wb840 drivers/dev/net/net_stack_driver; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
 	linkName=bin/$(basename $f)
 	while [ $relName != . ]; do
