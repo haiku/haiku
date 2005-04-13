@@ -1904,6 +1904,8 @@ void RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 {
 	if(fHaveWinBorderList || get_workspace_windows())
 	{
+		// next call should call get_workspace_windows()
+		fHaveWinBorderList = false;
 		// TODO: should it be improved by calling with region of hidden windows
 		//       plus the full regions of new windows???
 		invalidate_layer(this, fFull);
