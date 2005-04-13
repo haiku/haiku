@@ -226,7 +226,7 @@
 #define HAVE_MEMORY_H 1
 
 /* Define HAVE_OSPEED if your termcap library has the ospeed variable. */
-//#define HAVE_OSPEED 1
+#define HAVE_OSPEED 1
 
 /* PCRE (Perl-compatible regular expression) library */
 /* #undef HAVE_PCRE */
@@ -262,7 +262,7 @@
 #define HAVE_STAT 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdio.h> header file. */
 #define HAVE_STDIO_H 1
@@ -307,13 +307,13 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <termcap.h> header file. */
-//#define HAVE_TERMCAP_H 1
+#define HAVE_TERMCAP_H 1
 
 /* Define HAVE_TERMIOS_FUNCS if you have tcgetattr/tcsetattr. */
-//#define HAVE_TERMIOS_FUNCS 1
+#define HAVE_TERMIOS_FUNCS 1
 
 /* Define to 1 if you have the <termios.h> header file. */
-//#define HAVE_TERMIOS_H 1
+#define HAVE_TERMIOS_H 1
 
 /* Define to 1 if you have the <termio.h> header file. */
 /* #undef HAVE_TERMIO_H */
