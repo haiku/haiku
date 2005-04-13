@@ -136,6 +136,7 @@ BEOS_ADD_ONS_DRIVERS_NET="ipro1000 rtl8139 rtl8169 sis900 \
 	via-rhine wb840 net_stack_driver"	# bcm440x bcm570x (only available with GPLd add-ons)
 BEOS_ADD_ONS_BUSMASTERS="pci isa ide scsi ide_isa"
 BEOS_ADD_ONS_FILESYSTEMS="bfs"
+BEOS_DATA_FILES="timezone_files keymap_files"
 
 echo "Building executables and libraries..."
 
@@ -158,6 +159,7 @@ jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader config_manage
 	$BEOS_ADD_ONS_TRANSLATORS \
 	$BEOS_ADD_ONS_MEDIA \
 	$BEOS_ADD_ONS_INPUT_DEVICES \
+	$BEOS_DATA_FILES \
 	bfs_shell fs_shell_command \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
 
