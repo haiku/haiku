@@ -151,14 +151,14 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 
 	*_cookie = NULL;
 
-	return install_io_interrupt_handler(1, &handle_keyboard_interrupt, NULL, 0);
+	return install_io_interrupt_handler(INT_PS2_KEYBOARD, &handle_keyboard_interrupt, NULL, 0);
 }
 
 
 status_t 
 keyboard_close(void *cookie)
 {
-	remove_io_interrupt_handler(1, &handle_keyboard_interrupt, NULL);
+	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &handle_keyboard_interrupt, NULL);
 
 	delete_packet_buffer(sKeyBuffer);
 	delete_sem(sKeyboardSem);
