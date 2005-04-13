@@ -21,6 +21,7 @@
 //#define USE_INPUT_SERVER
 	// define this if consoled should use the input_server to
 	// get to its keyboard input
+	// be sure to define USE_R5_STYLE_COMM in InputServer.h when USE_INPUT_SERVER is defined
 
 #ifdef USE_INPUT_SERVER
 #	include <Message.h>
