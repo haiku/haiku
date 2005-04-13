@@ -8,18 +8,18 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
+
 #include <Drivers.h>
 #include <string.h>
 
 #include "common.h"
+
 
 #define DEVICE_MOUSE_NAME		"input/mouse/ps2/0"
 #define DEVICE_KEYBOARD_NAME	"input/keyboard/at/0"
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 isa_module_info *gIsa = NULL;
-int32 gMouseOpenMask;
-int32 gKeyboardOpenMask;
 
 device_hooks
 keyboard_hooks = {
@@ -58,7 +58,7 @@ mouse_hooks = {
  *	port is still busy.
  */
 
-bool 
+bool
 wait_write_ctrl(void)
 {
 	int8 read;
@@ -68,7 +68,7 @@ wait_write_ctrl(void)
 		read = gIsa->read_io_8(PS2_PORT_CTRL);
 		spin(100);
 	} while ((read & (PS2_IBUF_FULL | PS2_OBUF_FULL)) && tries-- > 0);
-		
+
 	return tries > 0;
 }
 
@@ -77,7 +77,7 @@ wait_write_ctrl(void)
  *	the "Input buffer full" bit will be set to 0.
  */
 
-bool 
+bool
 wait_write_data(void)
 {
 	int8 read;
@@ -87,7 +87,7 @@ wait_write_data(void)
 		read = gIsa->read_io_8(PS2_PORT_CTRL);
 		spin(100);
 	} while ((read & PS2_IBUF_FULL) && tries-- > 0);
-		
+
 	return tries > 0;
 }
 
@@ -96,7 +96,7 @@ wait_write_data(void)
  *	"Output buffer full" bit will be set to 1.
  */
 
-bool 
+bool
 wait_read_data(void)
 {
 	int8 read;
@@ -106,25 +106,25 @@ wait_read_data(void)
 		read = gIsa->read_io_8(PS2_PORT_CTRL);
 		spin(100);
 	} while (!(read & PS2_OBUF_FULL) && tries-- > 0);
-			
+
 	return tries > 0;
 }
 
 /** Get the ps2 command byte.	
  */
 
-int8 
+int8
 get_command_byte(void)
 {
 	int8 read = 0;
-		
+
 	TRACE(("set_command_byte()\n"));
 	if (wait_write_ctrl()) {
 		gIsa->write_io_8(PS2_PORT_CTRL, PS2_CTRL_READ_CMD);
 		if (wait_read_data())
 			read = gIsa->read_io_8(PS2_PORT_DATA);
 	}
-	
+
 	return read;
 }
 
@@ -134,7 +134,7 @@ get_command_byte(void)
  *	unsigned char, byte to write
  */
 
-void 
+void
 set_command_byte(unsigned char cmd)
 {
 	TRACE(("set_command_byte()\n"));
@@ -173,23 +173,25 @@ read_data_byte(void)
  *	unsigned char, byte to write
  */
 
-void 
+void
 write_aux_byte(unsigned char cmd)
 {
 	TRACE(("write_aux_byte()\n"));
 	if (wait_write_ctrl()) {
 		gIsa->write_io_8(PS2_PORT_CTRL, PS2_CTRL_WRITE_AUX);
-		
+
 		if (wait_write_data())
 			gIsa->write_io_8(PS2_PORT_DATA, cmd);
 	}
 }
 
 
-// driver stuff
+//	#pragma mark -
+//	driver interface
 
-status_t 
-init_hardware()
+
+status_t
+init_hardware(void)
 {
 	return B_OK;
 }
@@ -222,26 +224,23 @@ find_device(const char *name)
 }
 
 
-status_t 
-init_driver()
+status_t
+init_driver(void)
 {
 	status_t status;
-	
+
 	status = get_module(B_ISA_MODULE_NAME, (module_info **)&gIsa);
 	if (status < B_OK) {
 		TRACE(("Failed getting isa module: %s\n", strerror(status)));	
 		return status;
 	}
-		
-	gMouseOpenMask = 0;
-	gKeyboardOpenMask = 0;
-	
+
 	return B_OK;
 }
 
 
-void 
-uninit_driver()
+void
+uninit_driver(void)
 {
 	put_module(B_ISA_MODULE_NAME);	
 }

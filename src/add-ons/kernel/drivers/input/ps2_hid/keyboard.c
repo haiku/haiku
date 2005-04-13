@@ -2,28 +2,23 @@
  * Copyright 2004-2005 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
- * keyboard.c:
  * PS/2 keyboard device driver
+ *
  * Authors (in chronological order):
  *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
-// TODO: Uncomment locking code 
-// We probably need to lock to avoid misbehaving on SMP machines,
-// although the kb_mouse replacement driver never locks.
 
 #include "common.h"
-#ifdef COMPILE_FOR_R5
-#include "cbuf_adapter.h"
-#else
-#include "cbuf.h"
-#endif
+#include "kb_mouse_driver.h"
+#include "packet_buffer.h"
 
 #include <string.h>
-//#include <lock.h>
 
-#include "kb_mouse_driver.h"
 
+#define KEY_BUFFER_SIZE 100
+	// we will buffer 100 key strokes before we start dropping them
 
 enum {
 	LED_SCROLL 	= 1,
@@ -31,15 +26,14 @@ enum {
 	LED_CAPS	= 4
 } leds_status;
 
-
 enum {
 	PS2_SET_LEDS = 0xed
 } commands;
 
 
+static int32 sKeyboardOpenMask;
 static sem_id sKeyboardSem;
-//static mutex keyboard_read_mutex;
-static cbuf *keyboard_buf;
+static struct packet_buffer *sKeyBuffer;
 static bool sIsExtended = false;
 
 
@@ -53,7 +47,7 @@ set_leds(led_info *ledInfo)
 		leds |= LED_NUM;
 	if (ledInfo->caps_lock)
 		leds |= LED_CAPS;
-		
+
 	wait_write_data();
 	gIsa->write_io_8(PS2_PORT_DATA, PS2_SET_LEDS);
 	wait_write_data();
@@ -67,7 +61,7 @@ handle_keyboard_interrupt(void *data)
 	// TODO: Handle braindead "pause" key special case
 	at_kbd_io keyInfo;
 	unsigned char read, scancode;
-		
+
 	read = gIsa->read_io_8(PS2_PORT_DATA);
 	TRACE(("handle_keyboard_interrupt: read = 0x%x\n", read));
 
@@ -76,9 +70,9 @@ handle_keyboard_interrupt(void *data)
 		TRACE(("Extended key\n"));
 		return B_HANDLED_INTERRUPT;
 	} 
-		
+
 	scancode = read;
-	
+
 	TRACE(("scancode: %x\n", scancode));
 
 	// For now, F12 enters the kernel debugger
@@ -92,67 +86,72 @@ handle_keyboard_interrupt(void *data)
 	} else
 		keyInfo.is_keydown = true;
 
-	if (sIsExtended)
+	if (sIsExtended) {
 		scancode |= 0x80;
-	
+		sIsExtended = false;
+	}
+
 	keyInfo.timestamp = system_time();
 	keyInfo.scancode = scancode;
+
+	while (packet_buffer_write(sKeyBuffer, (uint8 *)&keyInfo, sizeof(keyInfo)) == 0) {
+		// if there is no space left in the buffer, we start dropping old key strokes
+		packet_buffer_flush(sKeyBuffer, sizeof(keyInfo));
+	}
 	
-	// TODO: Check return value
-	cbuf_memcpy_to_chain(keyboard_buf, 0, (void *)&keyInfo, sizeof(keyInfo));
 	release_sem_etc(sKeyboardSem, 1, B_DO_NOT_RESCHEDULE);
-	
-	sIsExtended = false;
-		
+
 	return B_INVOKE_SCHEDULER;
 }
 
 
 static status_t
-read_keyboard_packet(at_kbd_io *buffer)
+read_keyboard_packet(at_kbd_io *userBuffer)
 {
-	status_t status;
-	status = acquire_sem_etc(sKeyboardSem, 1, B_CAN_INTERRUPT, 0);
+	at_kbd_io packet;
+
+	status_t status = acquire_sem_etc(sKeyboardSem, 1, B_CAN_INTERRUPT, 0);
 	if (status < B_OK)
 		return status;
-	
-	status = cbuf_memcpy_from_chain((void *)buffer, keyboard_buf, 0, sizeof(at_kbd_io));
-	if (status < B_OK)
-		TRACE(("read_keyboard_packet(): error reading packet: %s\n", strerror(status)));
 
-	TRACE(("scancode: %x, keydown: %s\n", buffer->scancode, buffer->is_keydown ? "true" : "false"));
-	return status;
+	if (packet_buffer_read(sKeyBuffer, (uint8 *)&packet, sizeof(at_kbd_io)) == 0) {
+		TRACE(("read_keyboard_packet(): error reading packet: %s\n", strerror(status)));
+		return B_ERROR;
+	}
+
+	TRACE(("scancode: %x, keydown: %s\n", packet.scancode, packet.is_keydown ? "true" : "false"));
+
+	return user_memcpy(userBuffer, &packet, sizeof(at_kbd_io));
 }
 
 
+//	#pragma mark -
+
+
 status_t 
-keyboard_open(const char *name, uint32 flags, void **cookie)
+keyboard_open(const char *name, uint32 flags, void **_cookie)
 {
-	status_t status;
-	
 	TRACE(("keyboard open()\n"));
-	if (atomic_or(&gKeyboardOpenMask, 1) != 0)
+
+	if (atomic_or(&sKeyboardOpenMask, 1) != 0)
 		return B_BUSY;
 
 	sKeyboardSem = create_sem(0, "keyboard_sem");
 	if (sKeyboardSem < 0) {
-		atomic_and(&gKeyboardOpenMask, 0);
-		status = sKeyboardSem;
-		return status;
+		atomic_and(&sKeyboardOpenMask, 0);
+		return sKeyboardSem;
 	}
-	
-	//if (mutex_init(&keyboard_read_mutex, "keyboard_read_mutex") < 0)
-	//	panic("could not create keyboard read mutex!\n");
 
-	keyboard_buf = cbuf_get_chain(1024);
-	if (keyboard_buf == NULL)
-		panic("could not create keyboard cbuf chain!\n");
+	sKeyBuffer = create_packet_buffer(KEY_BUFFER_SIZE * sizeof(at_kbd_io));
+	if (sKeyBuffer == NULL) {
+		panic("could not create keyboard packet buffer!\n");
+		atomic_and(&sKeyboardOpenMask, 0);
+		return B_NO_MEMORY;
+	}
 
-	status = install_io_interrupt_handler(1, &handle_keyboard_interrupt, NULL, 0);
-	
-	*cookie = NULL;
-	
-	return status;
+	*_cookie = NULL;
+
+	return install_io_interrupt_handler(1, &handle_keyboard_interrupt, NULL, 0);
 }
 
 
@@ -161,12 +160,11 @@ keyboard_close(void *cookie)
 {
 	remove_io_interrupt_handler(1, &handle_keyboard_interrupt, NULL);
 
-	cbuf_free_chain(keyboard_buf);
+	delete_packet_buffer(sKeyBuffer);
 	delete_sem(sKeyboardSem);
-	//mutex_destroy(&keyboard_read_mutex);
-	
-	atomic_and(&gKeyboardOpenMask, 0);
-	
+
+	atomic_and(&sKeyboardOpenMask, 0);
+
 	return B_OK;
 }
 
@@ -188,30 +186,39 @@ keyboard_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 
 
 status_t 
-keyboard_write(void *cookie, off_t pos, const void *buf,  size_t *len)
+keyboard_write(void *cookie, off_t pos, const void *buffer,  size_t *_length)
 {
 	TRACE(("keyboard write()\n"));
-	*len = 0;
+	*_length = 0;
 	return B_NOT_ALLOWED;
 }
 
 
 status_t 
-keyboard_ioctl(void *cookie, uint32 op, void *buf, size_t len)
+keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	TRACE(("keyboard ioctl()\n"));
 	switch (op) {
 		case KB_READ:
 			TRACE(("KB_READ\n"));
-			return read_keyboard_packet((at_kbd_io *)buf);
+			return read_keyboard_packet((at_kbd_io *)buffer);
+
 		case KB_SET_LEDS:
-			set_leds((led_info *)buf);
+		{
+			led_info info;
+			if (user_memcpy(&info, buffer, sizeof(led_info)) < B_OK)
+				return B_BAD_ADDRESS;
+
 			TRACE(("KB_SET_LEDS\n"));
+			set_leds(&info);
 			return B_OK;
+		}
+
 		case KB_SET_KEY_REPEATING:
 		case KB_SET_KEY_NONREPEATING:
 			TRACE(("ioctl 0x%x not implemented yet, returning B_OK\n", op));
 			return B_OK;
+
 		default:
 			TRACE(("invalid ioctl 0x%x\n", op));
 			return EINVAL;

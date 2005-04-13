@@ -1,59 +1,22 @@
 /*
- * Copyright 2004 Haiku, Inc.
- * Distributed under the terms of the Haiku License.
+ * Copyright 2004-2005 Haiku, Inc.
+ * Distributed under the terms of the MIT License.
  *
- * common.h:
  * PS/2 hid device driver
+ *
  * Authors (in chronological order):
  *		Elad Lahav (elad@eldarshany.com)
  *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
  */
+#ifndef __PS2_COMMON_H
+#define __PS2_COMMON_H
 
-/*
- * A PS/2 mouse is connected to the IBM 8042 controller, and gets its
- * name from the IBM PS/2 personal computer, which was the first to
- * use this device. All resources are shared between the keyboard, and
- * the mouse, referred to as the "Auxiliary Device".
- * I/O:
- * ~~~
- * The controller has 3 I/O registers:
- * 1. Status (input), mapped to port 64h
- * 2. Control (output), mapped to port 64h
- * 3. Data (input/output), mapped to port 60h
- * Data:
- * ~~~~
- * Since a mouse is an input only device, data can only be read, and
- * not written. A packet read from the mouse data port is composed of
- * three bytes:
- * byte 0: status byte, where
- * - bit 0: Y overflow (1 = true)
- * - bit 1: X overflow (1 = true)
- * - bit 2: MSB of Y offset
- * - bit 3: MSB of X offset
- * - bit 4: Syncronization bit (always 1)
- * - bit 5: Middle button (1 = down)
- * - bit 6: Right button (1 = down)
- * - bit 7: Left button (1 = down)
- * byte 1: X position change, since last probed (-127 to +127)
- * byte 2: Y position change, since last probed (-127 to +127)
- * Interrupts:
- * ~~~~~~~~~~
- * The PS/2 mouse device is connected to interrupt 12, which means that
- * it uses the second interrupt controller (handles INT8 to INT15). In
- * order for this interrupt to be enabled, both the 5th interrupt of
- * the second controller AND the 3rd interrupt of the first controller
- * (cascade mode) should be unmasked.
- * The controller uses 3 consecutive interrupts to inform the computer
- * that it has new data. On the first the data register holds the status
- * byte, on the second the X offset, and on the 3rd the Y offset.
- */
-
-#ifndef __PS2COMMON_H
-#define __PS2COMMON_H
 
 #include <ISA.h>
 #include <KernelExport.h>
 #include <OS.h>
+
 
 /////////////////////////////////////////////////////////////////////////
 // definitions
@@ -101,9 +64,6 @@
 #define INT_PS2_MOUSE            0x0C
 #define INT_PS2_KEYBOARD		 0x01
 
-// other stuff
-#define MOUSE_HISTORY_SIZE		 256
-
 // mouse device IDs
 #define PS2_DEV_ID_STANDARD		 0
 #define PS2_DEV_ID_INTELLIMOUSE	 3
@@ -115,15 +75,13 @@
 
 // debug defines
 #ifdef DEBUG
-	#define TRACE(x) dprintf x
+#	define TRACE(x) dprintf x
 #else
-	#define TRACE(x)
+#	define TRACE(x) ;
 #endif
 
 // global variables
 extern isa_module_info *gIsa;
-extern int32 gMouseOpenMask;
-extern int32 gKeyboardOpenMask;
 
 // prototypes
 bool wait_write_ctrl(void);
@@ -149,4 +107,4 @@ extern status_t mouse_read(void *cookie, off_t pos, void *buf, size_t *len);
 extern status_t mouse_write(void * cookie, off_t pos, const void *buf, size_t *len);
 extern status_t mouse_ioctl(void *cookie, uint32 op, void *buf, size_t len);
 
-#endif /* __PS2COMMON_H */
+#endif /* __PS2_COMMON_H */

@@ -16,6 +16,7 @@ KernelAddon ps2_hid : kernel drivers bin :
 	common.c
 	keyboard.c
 	mouse.c
+	packet_buffer.cpp
 ;
 }
 
