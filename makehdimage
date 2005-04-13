@@ -386,8 +386,7 @@ for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/misc/config drivers/dev/input/ps2_hid \
 		drivers/dev/console drivers/dev/graphics/radeon.driver \
 		drivers/dev/graphics/nv.driver drivers/dev/graphics/mga.driver \
-		drivers/dev/graphics/nm.driver drivers/dev/net/bcm440x \
-		drivers/dev/net/bcm570x drivers/dev/net/ipro1000 \
+		drivers/dev/graphics/nm.driver drivers/dev/net/ipro1000 \
 		drivers/dev/net/rtl8139 drivers/dev/net/rtl8169 \
 		drivers/dev/net/sis900 drivers/dev/net/via-rhine \
 		drivers/dev/net/wb840 drivers/dev/net/net_stack_driver; do
