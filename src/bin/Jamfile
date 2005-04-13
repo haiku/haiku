@@ -32,10 +32,10 @@ StdBinCommands
 	rescan.c
 	rmattr.cpp
 	safemode.c
-	sleep.cpp
 	sysinfo.c
 	unchop.c
 	unmount.c
+	uptime.cpp
 	waitfor.c
 #	whoami.c
 	: libroot.so ;
