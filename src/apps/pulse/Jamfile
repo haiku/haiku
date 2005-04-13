@@ -30,5 +30,5 @@ if $(HAIKU_COMPATIBLE) {
 
 SEARCH on [ FGristFiles
                 strlcpy.c
-        ] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
+        ] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 

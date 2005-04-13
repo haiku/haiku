@@ -46,11 +46,11 @@ SEARCH on [ FGristFiles
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp
-	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles
 		strlcat.c
-	] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
+	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 
 SEARCH on [ FGristFiles
 		rootfs.c initfs.c kernel.c cache.c sl.c stub.c sysdep.c hexdump.c argv.c
