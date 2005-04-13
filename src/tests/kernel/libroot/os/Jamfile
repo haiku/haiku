@@ -17,4 +17,4 @@ SimpleTest FindDirectoryTest
 SEARCH on [ FGristFiles
 		driver_settings.c
 		parsedate.cpp
-	] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+	] = [ FDirName $(OBOS_TOP) src system libroot os ] ;

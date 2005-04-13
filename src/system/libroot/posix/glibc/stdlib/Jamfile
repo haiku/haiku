@@ -1,6 +1,6 @@
-SubDir OBOS_TOP src kernel libroot posix glibc stdlib ;
+SubDir OBOS_TOP src system libroot posix glibc stdlib ;
 
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include arch $(OBOS_ARCH) ;
 
 KernelMergeObject posix_gnu_stdlib.o :
 	fpioconst.c

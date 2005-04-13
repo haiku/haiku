@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel core arch ppc ;
+SubDir OBOS_TOP src system kernel arch ppc ;
 
 KernelStaticLibrary libppc :
 	arch_atomic.c

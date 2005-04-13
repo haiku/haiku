@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel vm2 tests ;
+SubDir OBOS_TOP src system vm2 tests ;
 
 UseHeaders .. ;
 BinCommand vmTest  : test.C : root be libvm.so ; 

@@ -15,6 +15,6 @@ SimpleTest flock_test
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
 		syslog.cpp
-	] = [ FDirName $(OBOS_TOP) src kernel libroot posix ] ;
+	] = [ FDirName $(OBOS_TOP) src system libroot posix ] ;
 
 SubInclude OBOS_TOP src tests kernel libroot posix bonnie ;

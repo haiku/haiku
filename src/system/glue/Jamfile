@@ -1,8 +1,8 @@
-SubDir OBOS_TOP src kernel glue ;
+SubDir OBOS_TOP src system glue ;
 
 KernelObjects
 	init_term_dyn.c
 	start_dyn.c
 	;
 
-SubInclude OBOS_TOP src kernel glue arch ;
+SubInclude OBOS_TOP src system glue arch ;

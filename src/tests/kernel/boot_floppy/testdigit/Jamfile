@@ -1,3 +1,3 @@
-SubDir OBOS_TOP src kernel apps testdigit ;
+SubDir OBOS_TOP src system apps testdigit ;
 
 KernelObjects <$(SOURCE_GRIST)>main.c : -fpic -Wno-unused ;

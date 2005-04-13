@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix ;
+SubDir OBOS_TOP src system libroot posix ;
 
 UsePrivateHeaders [ FDirName syslog_daemon ] ;
 
@@ -19,18 +19,18 @@ KernelMergeObject posix_main.o :
  	: -fPIC -DPIC
 	;
 
-SubInclude OBOS_TOP src kernel libroot posix arch ;
+SubInclude OBOS_TOP src system libroot posix arch ;
 
-SubInclude OBOS_TOP src kernel libroot posix locale ;
-SubInclude OBOS_TOP src kernel libroot posix malloc ;
-SubInclude OBOS_TOP src kernel libroot posix math ;
-SubInclude OBOS_TOP src kernel libroot posix pthread ;
-SubInclude OBOS_TOP src kernel libroot posix signal ;
-SubInclude OBOS_TOP src kernel libroot posix stdio ;
-SubInclude OBOS_TOP src kernel libroot posix stdlib ;
-SubInclude OBOS_TOP src kernel libroot posix string ;
-SubInclude OBOS_TOP src kernel libroot posix sys ;
-SubInclude OBOS_TOP src kernel libroot posix time ;
-SubInclude OBOS_TOP src kernel libroot posix unistd ;
+SubInclude OBOS_TOP src system libroot posix locale ;
+SubInclude OBOS_TOP src system libroot posix malloc ;
+SubInclude OBOS_TOP src system libroot posix math ;
+SubInclude OBOS_TOP src system libroot posix pthread ;
+SubInclude OBOS_TOP src system libroot posix signal ;
+SubInclude OBOS_TOP src system libroot posix stdio ;
+SubInclude OBOS_TOP src system libroot posix stdlib ;
+SubInclude OBOS_TOP src system libroot posix string ;
+SubInclude OBOS_TOP src system libroot posix sys ;
+SubInclude OBOS_TOP src system libroot posix time ;
+SubInclude OBOS_TOP src system libroot posix unistd ;
 
-SubInclude OBOS_TOP src kernel libroot posix glibc ;
+SubInclude OBOS_TOP src system libroot posix glibc ;

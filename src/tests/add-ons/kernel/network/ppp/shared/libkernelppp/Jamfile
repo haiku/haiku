@@ -32,5 +32,5 @@ StaticLibrary <userland>kernelppp :
 	driver_settings.c
 ;
 
-SEARCH on [ FGristFiles strlcat.c ] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
-SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+SEARCH on [ FGristFiles strlcat.c ] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src system libroot os ] ;

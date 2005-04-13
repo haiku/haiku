@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix glibc regex ;
+SubDir OBOS_TOP src system libroot posix glibc regex ;
 
 SubDirHdrs $(OBOS_TOP) headers ;
 

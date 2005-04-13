@@ -11,7 +11,7 @@ KernelLd cpuinfo :
 	<$(SOURCE_GRIST)>main.o
 	libroot.so
 	:
-	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	$(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	:

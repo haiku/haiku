@@ -1,8 +1,8 @@
 SubDir OBOS_TOP src tests kernel core disk_device_manager ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core disk_device_manager jobs ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core fs ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system kernel disk_device_manager jobs ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system kernel disk_device_manager ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system kernel fs ] ;
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
 	# DiskDeviceTypes.cpp
 
@@ -16,7 +16,7 @@ UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders storage ;
 UsePrivateHeaders kernel ;
-UseHeaders [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src system kernel disk_device_manager ] ;
 
 # As long as we compile for R5 userland, we define the following macros.
 SubDirCcFlags	[ FDefines USER R5_MEMORY_LAYOUT ] ;

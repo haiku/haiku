@@ -1,10 +1,10 @@
-SubDir OBOS_TOP src kernel libroot posix glibc extensions ;
+SubDir OBOS_TOP src system libroot posix glibc extensions ;
 
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc libio ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc locale ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc ;
 
 KernelMergeObject posix_gnu_ext.o :
 	getopt.c

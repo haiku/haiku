@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel glue arch ppc ;
+SubDir OBOS_TOP src system glue arch ppc ;
 
 KernelObjects
 	crti.S

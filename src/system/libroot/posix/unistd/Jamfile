@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix unistd ;
+SubDir OBOS_TOP src system libroot posix unistd ;
 
 KernelMergeObject posix_unistd.o :
 	access.c

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot os arch ppc ;
+SubDir OBOS_TOP src system libroot os arch ppc ;
 
 KernelMergeObject os_arch_$(OBOS_ARCH).o :
 	<$(SOURCE_GRIST)>atomic.S

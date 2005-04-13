@@ -1,7 +1,7 @@
-SubDir OBOS_TOP src kernel core arch x86 ;
+SubDir OBOS_TOP src system kernel arch x86 ;
 
 # for syscall_numbers.h
-SubDirHdrs [ FObjectsDir src kernel core ] ;
+SubDirHdrs [ FObjectsDir src system kernel ] ;
 
 KernelStaticLibrary libx86 :
 	arch_cpu.c

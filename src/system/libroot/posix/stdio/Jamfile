@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix stdio ;
+SubDir OBOS_TOP src system libroot posix stdio ;
 
 KernelMergeObject posix_stdio.o :
 	<$(SOURCE_GRIST)>remove.c

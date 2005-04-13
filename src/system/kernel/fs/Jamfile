@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel core fs ;
+SubDir OBOS_TOP src system kernel fs ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel fs ] ;

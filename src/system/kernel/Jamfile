@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel core ;
+SubDir OBOS_TOP src system kernel ;
 
 local buildSources = ;
 if $(OS) != BEOS {
@@ -58,12 +58,12 @@ KernelLd linkhack.so :
 	-shared -Bdynamic
 	;
 
-SubInclude OBOS_TOP src kernel core arch ;
-SubInclude OBOS_TOP src kernel core cache ;
-SubInclude OBOS_TOP src kernel core device_manager ;
-SubInclude OBOS_TOP src kernel core debug ;
-SubInclude OBOS_TOP src kernel core disk_device_manager ;
-SubInclude OBOS_TOP src kernel core fs ;
-SubInclude OBOS_TOP src kernel core messaging ;
-SubInclude OBOS_TOP src kernel core util ;
-SubInclude OBOS_TOP src kernel core vm ;
+SubInclude OBOS_TOP src system kernel arch ;
+SubInclude OBOS_TOP src system kernel cache ;
+SubInclude OBOS_TOP src system kernel device_manager ;
+SubInclude OBOS_TOP src system kernel debug ;
+SubInclude OBOS_TOP src system kernel disk_device_manager ;
+SubInclude OBOS_TOP src system kernel fs ;
+SubInclude OBOS_TOP src system kernel messaging ;
+SubInclude OBOS_TOP src system kernel util ;
+SubInclude OBOS_TOP src system kernel vm ;

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel core vm ;
+SubDir OBOS_TOP src system kernel vm ;
 
 KernelMergeObject kernel_vm.o :
 	vm.c

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel core disk_device_manager ;
+SubDir OBOS_TOP src system kernel disk_device_manager ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) jobs ] ;
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;

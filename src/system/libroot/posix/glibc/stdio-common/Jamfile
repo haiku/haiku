@@ -1,13 +1,13 @@
-SubDir OBOS_TOP src kernel libroot posix glibc stdio-common ;
+SubDir OBOS_TOP src system libroot posix glibc stdio-common ;
 
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
 
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc stdio-common ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc libio ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc include ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc stdio-common ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc locale ;
+SubDirHdrs $(OBOS_TOP) src system libroot posix glibc ;
 
 # ToDo: for now, all wide character functions are disabled
 

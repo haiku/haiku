@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot os ;
+SubDir OBOS_TOP src system libroot os ;
 
 SubDirHdrs [ FCurrentObjectsDir ] ;
 
@@ -30,4 +30,4 @@ KernelMergeObject os_main.o :
 # We need to specify the dependency on the generated syscalls file explicitly.
 Depends [ FGristFiles syscalls.o ] : <syscalls>syscalls.S.inc ;
 
-SubInclude OBOS_TOP src kernel libroot os arch ;
+SubInclude OBOS_TOP src system libroot os arch ;

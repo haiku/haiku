@@ -1,1 +1,1 @@
-SubInclude OBOS_TOP src kernel glue arch $(OBOS_ARCH) ;
+SubInclude OBOS_TOP src system glue arch $(OBOS_ARCH) ;

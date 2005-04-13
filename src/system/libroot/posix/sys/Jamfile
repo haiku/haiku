@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix sys ;
+SubDir OBOS_TOP src system libroot posix sys ;
 
 KernelMergeObject posix_sys.o :
 	chmod.c

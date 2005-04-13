@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix math arch x86 ;
+SubDir OBOS_TOP src system libroot posix math arch x86 ;
 
 KernelMergeObject posix_math_arch_$(OBOS_ARCH).o :
 	<$(SOURCE_GRIST)>fabs.S

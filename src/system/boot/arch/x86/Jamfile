@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel boot arch x86 ;
+SubDir OBOS_TOP src system boot arch x86 ;
 
 KernelMergeObject boot_arch_stage2.o :
 	<$(SOURCE_GRIST)>stage2.c 

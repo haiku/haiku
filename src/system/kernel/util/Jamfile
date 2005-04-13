@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel core util ;
+SubDir OBOS_TOP src system kernel util ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;
 

@@ -54,4 +54,4 @@ SEARCH on [ FGristFiles
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp
-	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;

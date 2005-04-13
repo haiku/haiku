@@ -5,7 +5,7 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 UsePrivateHeaders [ FDirName shared ] ;
 SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src kernel boot loader ;
+SubDirHdrs $(OBOS_TOP) src system boot loader ;
 
 # we need to redefine certain calls in the boot loader so that
 # they will really be used instead of their POSIX counterparts
@@ -102,20 +102,20 @@ SimpleTest BootLoaderTest :
 # Tell Jam where to find the utility sources
 
 SEARCH on [ FGristFiles list.c ]
-	= [ FDirName $(OBOS_TOP) src kernel core util ] ;
+	= [ FDirName $(OBOS_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles strlcat.c strlcpy.c ]
-	= [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
+	= [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 
 SEARCH on [ FGristFiles driver_settings.c ]
-	= [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+	= [ FDirName $(OBOS_TOP) src system libroot os ] ;
 
 SEARCH on [ FGristFiles 
 		main.cpp vfs.cpp partitions.cpp
 		heap.cpp RootFileSystem.cpp
 		elf.cpp menu.cpp loader.cpp
 		kernel_args.cpp load_driver_settings.cpp
-	] = [ FDirName $(OBOS_TOP) src kernel boot loader ] ;
+	] = [ FDirName $(OBOS_TOP) src system boot loader ] ;
 
 # partitioning system modules
 

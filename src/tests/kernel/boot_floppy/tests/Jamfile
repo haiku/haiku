@@ -13,7 +13,7 @@ KernelLd thread_test :
 	<$(SOURCE_GRIST)>thread_test.o
 	libroot.so
 	:
-	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	$(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	:
@@ -25,7 +25,7 @@ KernelLd fops_test :
 	<$(SOURCE_GRIST)>fops_test.o
 	libroot.so
 	:
-	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	$(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	:
@@ -37,7 +37,7 @@ KernelLd random_test :
 	<$(SOURCE_GRIST)>random_test.o
 	libroot.so
 	:
-	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	$(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	:

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix signal ;
+SubDir OBOS_TOP src system libroot posix signal ;
 
 KernelMergeObject posix_signal.o :
 	kill.c

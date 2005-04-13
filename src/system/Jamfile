@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel ;
+SubDir OBOS_TOP src system ;
 
 KernelLd boot_loader :
 	boot_platform_$(OBOS_BOOT_PLATFORM).o
@@ -181,8 +181,8 @@ BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
 Depends kernel.so : kernel ;
 	# kernel.so will be rebuilt with the kernel
 
-SubInclude OBOS_TOP src kernel boot ;
-SubInclude OBOS_TOP src kernel core ;
-SubInclude OBOS_TOP src kernel glue ;
-SubInclude OBOS_TOP src kernel libroot ;
-SubInclude OBOS_TOP src kernel runtime_loader ;
+SubInclude OBOS_TOP src system boot ;
+SubInclude OBOS_TOP src system kernel ;
+SubInclude OBOS_TOP src system glue ;
+SubInclude OBOS_TOP src system libroot ;
+SubInclude OBOS_TOP src system runtime_loader ;

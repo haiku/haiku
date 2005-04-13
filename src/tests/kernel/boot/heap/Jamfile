@@ -27,5 +27,5 @@ BuildPlatformTest heapTest :
 # Tell Jam where to find the utility sources
 SEARCH on [ FGristFiles 
 		heap.cpp
-	] = [ FDirName $(OBOS_TOP) src kernel boot loader ] ;
+	] = [ FDirName $(OBOS_TOP) src system boot loader ] ;
 

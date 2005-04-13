@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel boot platform openfirmware ;
+SubDir OBOS_TOP src system boot platform openfirmware ;
 
 SubDirC++Flags -fno-rtti ;
 
@@ -18,6 +18,6 @@ KernelMergeObject boot_platform_openfirmware.o :
 	;
 
 SEARCH on [ FGristFiles crt0.S ]
-    = [ FDirName $(OBOS_TOP) src kernel boot arch $(OBOS_ARCH) ] ;
+    = [ FDirName $(OBOS_TOP) src system boot arch $(OBOS_ARCH) ] ;
 
-SubInclude OBOS_TOP src kernel boot platform openfirmware arch ;
+SubInclude OBOS_TOP src system boot platform openfirmware arch ;

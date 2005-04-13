@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel core device_manager ;
+SubDir OBOS_TOP src system kernel device_manager ;
 
 UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;

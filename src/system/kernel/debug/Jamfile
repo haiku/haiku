@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel core debug ;
+SubDir OBOS_TOP src system kernel debug ;
 
 UsePrivateHeaders [ FDirName kernel debug ] ;
 

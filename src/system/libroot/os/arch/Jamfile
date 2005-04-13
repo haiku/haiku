@@ -1,1 +1,1 @@
-SubInclude OBOS_TOP src kernel libroot os arch $(OBOS_ARCH) ;
+SubInclude OBOS_TOP src system libroot os arch $(OBOS_ARCH) ;

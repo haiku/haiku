@@ -4,7 +4,7 @@ SubDir OBOS_TOP src tests add-ons kernel disk_scanner ;
 #
 # the test app
 #
-#SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+#SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system libroot os ] ;
 #SimpleTest DiskScannerTest : DiskScannerTest.cpp
 #	: <boot!home!config!lib>libkernelland_emu.so be stdc++.r4 ;
 #LOCATE on <installed>DiskScannerTest = [ on DiskScannerTest return $(LOCATE) ] ;

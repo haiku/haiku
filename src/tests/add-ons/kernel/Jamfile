@@ -18,15 +18,15 @@ AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
 
 SEARCH on [ FGristFiles 
 		strlcpy.c
-	] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
+	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 
 SEARCH on [ FGristFiles 
 		lock.c
-	] = [ FDirName $(OBOS_TOP) src kernel core ] ;
+	] = [ FDirName $(OBOS_TOP) src system kernel ] ;
 
 SEARCH on [ FGristFiles
 		list.c
-	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
 
 # SubInclude OBOS_TOP src tests add-ons kernel disk_scanner ;
 SubInclude OBOS_TOP src tests add-ons kernel drivers ;

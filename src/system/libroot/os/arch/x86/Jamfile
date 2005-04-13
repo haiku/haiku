@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot os arch x86 ;
+SubDir OBOS_TOP src system libroot os arch x86 ;
 
 KernelMergeObject os_arch_$(OBOS_ARCH).o :
 	atomic.S

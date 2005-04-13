@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel core cache ;
+SubDir OBOS_TOP src system kernel cache ;
 
 KernelMergeObject kernel_cache.o :
 	block_cache.cpp

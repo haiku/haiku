@@ -23,7 +23,7 @@ KernelLd init :
 	libglue2.o
 	<$(SOURCE_GRIST)>init.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/init
@@ -33,7 +33,7 @@ KernelLd kernel_false :
 	libglue2.o
 	<$(SOURCE_GRIST)>false_main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/false
@@ -43,7 +43,7 @@ KernelLd kernel_true :
 	libglue2.o
 	<$(SOURCE_GRIST)>true_main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/true
@@ -53,7 +53,7 @@ KernelLd fibo :
 	libglue2.o
 	<$(SOURCE_GRIST)>fibo_main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/fibo
@@ -63,7 +63,7 @@ KernelLd sig_test :
 	libglue2.o
 	<$(SOURCE_GRIST)>sig_test.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/sig_test
@@ -73,7 +73,7 @@ KernelLd monitor_test :
 	libglue2.o
 	<$(SOURCE_GRIST)>monitor_test.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/monitor_test
@@ -83,7 +83,7 @@ KernelLd kernel_fortune :
 	libglue2.o
 	<$(SOURCE_GRIST)!fortune>main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/fortune
@@ -95,7 +95,7 @@ KernelLd kernel_ls :
 	libglue2.o
 	<$(SOURCE_GRIST)!ls>main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/ls
@@ -105,7 +105,7 @@ KernelLd kernel_ln :
 	libglue2.o
 	<$(SOURCE_GRIST)!symlink>main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/symlink
@@ -115,7 +115,7 @@ KernelLd boot_floppy_consoled :
 	libglue2.o
 	<src!tests!kernel!consoled>consoled.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/consoled
@@ -134,7 +134,7 @@ KernelLd obos_shell :
 	<$(SOURCE_GRIST)!shell>statements.o
 	<$(SOURCE_GRIST)!shell>shell_history.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/sh
@@ -144,7 +144,7 @@ KernelLd kernel_testapp :
 	libglue2.o
 	<$(SOURCE_GRIST)!testapp>main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/testapp
@@ -154,7 +154,7 @@ KernelLd tls_test :
 	libglue2.o
 	<$(SOURCE_GRIST)>tls_test.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/tls_test
@@ -164,7 +164,7 @@ KernelLd pipe_test :
 	libglue2.o
 	<$(SOURCE_GRIST)>pipe_test.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/pipe_test
@@ -174,7 +174,7 @@ KernelLd fork_test :
 	libglue2.o
 	<$(SOURCE_GRIST)>fork_test.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/fork_test
@@ -199,7 +199,7 @@ KernelLd kernel_ps :
 	libglue2.o
 	<$(SOURCE_GRIST)!ps>main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/ps
@@ -209,7 +209,7 @@ KernelLd kernel_echo :
 	libglue2.o
 	<$(SOURCE_GRIST)!echo>main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/echo
@@ -219,13 +219,16 @@ KernelLd kernel_uname :
 	libglue2.o
 	<$(SOURCE_GRIST)!uname>main.o
 	libroot.so
-	: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/app.ld
+	: $(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	: beos/bin/uname
 	;
 
-KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(OBOS_TOP)/src/kernel/boot/arch/$(OBOS_ARCH)/bootblock.bin ;
+KernelFloppyImage $(OBOS_FLOPPY)
+	: $(OBOS_KERNEL)
+	: $(OBOS_TOP)/src/system/boot/arch/$(OBOS_ARCH)/bootblock.bin
+	;
 
 Depends $(OBOS_FLOPPY) : tty ;
 Depends $(OBOS_FLOPPY) : console ;

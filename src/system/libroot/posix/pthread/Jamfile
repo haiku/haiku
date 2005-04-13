@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix pthread ;
+SubDir OBOS_TOP src system libroot posix pthread ;
 
 UsePrivateHeaders libroot ;
 

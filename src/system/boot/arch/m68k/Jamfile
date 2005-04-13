@@ -1,2 +1,2 @@
-SubDir OBOS_TOP src kernel boot arch m68k ;
+SubDir OBOS_TOP src system boot arch m68k ;
 

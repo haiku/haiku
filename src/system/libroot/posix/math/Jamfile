@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix math ;
+SubDir OBOS_TOP src system libroot posix math ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) glibc ] ;
 
@@ -41,4 +41,4 @@ KernelMergeObject posix_math.o :
 	-fPIC -DPIC
 	;
 
-SubInclude OBOS_TOP src kernel libroot posix math arch ;  
+SubInclude OBOS_TOP src system libroot posix math arch ;  

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel boot platform bios_ia32 ;
+SubDir OBOS_TOP src system boot platform bios_ia32 ;
 
 SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM) ;
 

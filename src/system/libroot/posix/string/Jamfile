@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kernel libroot posix string ;
+SubDir OBOS_TOP src system libroot posix string ;
 
 KernelMergeObject posix_string.o :
 	bcmp.c
