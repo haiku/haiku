@@ -12,7 +12,7 @@ KernelLd
 	<$(SOURCE_GRIST)>config_manager.o
 	kernel.so
 	:
-	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
+	$(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/add-on.ld
 	:
 	-Bdynamic -shared
 	:

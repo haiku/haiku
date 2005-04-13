@@ -50,7 +50,7 @@ KernelLd stage2 :
 	: bootstrap
 	;
 
-KernelLd kernel :
+KernelLd kernel_$(OBOS_ARCH) :
 	kernel_core.o
 	kernel_fs.o
 	kernel_vm.o
@@ -178,6 +178,8 @@ KernelLd libglue2.o :	# libglue2.o is used for executables
 WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
 BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
 
+NotFile kernel ;
+Depends kernel : kernel_$(OBOS_ARCH) ;
 Depends kernel.so : kernel ;
 	# kernel.so will be rebuilt with the kernel
 

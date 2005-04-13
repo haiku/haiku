@@ -97,10 +97,10 @@ Includes <boot!home!config!lib>libopenbeos.so
 
 SEARCH on [ FGristFiles
 		strlcat.c strlcpy.c
-	] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
+	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]
-	= [ FDirName $(OBOS_TOP) src kernel core messaging ] ;
+	= [ FDirName $(OBOS_TOP) src system kernel messaging ] ;
 
 SubInclude OBOS_TOP src kits app ;
 SubInclude OBOS_TOP src kits debug ;

@@ -13,7 +13,7 @@ KernelAddon pci : kernel bus_managers :
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
-	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+	] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
 
 # pci_info.cpp currently needs pcihdr.h so we make its path available
 ObjectHdrs [ FGristFiles pci_info$(SUFOBJ) ]

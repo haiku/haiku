@@ -36,5 +36,5 @@ R5KernelStaticLibrary kernelppp :
 	_KPPPPFCHandler.cpp
 ;
 
-SEARCH on [ FGristFiles kernel_cpp.cpp ] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
-SEARCH on [ FGristFiles Locker.cpp ] = [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
+SEARCH on [ FGristFiles kernel_cpp.cpp ] = [ FDirName $(OBOS_TOP) src system kernel util ] ;
+SEARCH on [ FGristFiles Locker.cpp ] = [ FDirName $(OBOS_TOP) src system kernel disk_device_manager ] ;

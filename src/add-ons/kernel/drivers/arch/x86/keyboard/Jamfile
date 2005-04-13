@@ -16,7 +16,7 @@ KernelLd keyboard :
 	<$(SOURCE_GRIST)>keyboard.o
 	kernel.so
 	:
-	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
+	$(OBOS_TOP)/src/system/ldscripts/$(OBOS_ARCH)/add-on.ld
 	:
 	-Bdynamic -shared
 	:

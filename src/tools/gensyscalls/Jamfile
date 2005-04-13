@@ -42,10 +42,10 @@ UseArchObjectHeaders gensyscalls.cpp : $(OBOS_ARCH) ;
 # generate the output files
 
 # place them where there are needed
-MakeLocate <syscalls>syscalls.S.inc : [ FObjectsDir src kernel libroot os ] ;
-MakeLocate <syscalls>syscall_dispatcher.h : [ FObjectsDir src kernel core ] ;
-MakeLocate <syscalls>syscall_numbers.h : [ FObjectsDir src kernel core ] ;
-MakeLocate <syscalls>syscall_table.h : [ FObjectsDir src kernel core ] ;
+MakeLocate <syscalls>syscalls.S.inc : [ FObjectsDir src system libroot os ] ;
+MakeLocate <syscalls>syscall_dispatcher.h : [ FObjectsDir src system kernel ] ;
+MakeLocate <syscalls>syscall_numbers.h : [ FObjectsDir src system kernel ] ;
+MakeLocate <syscalls>syscall_table.h : [ FObjectsDir src system kernel ] ;
 MakeLocate <syscalls>strace_syscalls.h : [ FObjectsDir src bin strace ] ;
 
 Depends <dir>objects/x86.R1/kernel/core : <dir>objects/x86.R1/kernel ;

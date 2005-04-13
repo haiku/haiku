@@ -10,6 +10,7 @@ Server syslog_daemon :
 	listener_output.cpp
 
 	# that's for a successful build on R5
+	# ToDo: this can be removed for the Haiku build
 	strlcpy.c
 	;
 
@@ -17,4 +18,4 @@ LinkSharedOSLibs syslog_daemon : be ;
 
 SEARCH on [ FGristFiles
 		strlcpy.c
-	] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
+	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;

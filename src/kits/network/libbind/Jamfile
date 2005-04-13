@@ -4,8 +4,8 @@ UsePrivateHeaders net ;
 UseHeaders [ FDirName $(SUBDIR) headers ] ;
 
 # our libroot contains functions that are missing in BeOS (e.g.: strlcat)
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot posix pthread ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system libroot posix pthread ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
 
 # private sources for this port
 SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
@@ -168,6 +168,7 @@ SharedLibrary "bind" :
 	res_update.c
 	
 	# functions from our libroot
+	# ToDo: these can be removed for the Haiku build
 	pthread_mutex.c
 	pthread_mutexattr.c
 	strlcat.c

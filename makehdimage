@@ -291,7 +291,7 @@ done
 
 # kernel
 echo "Installing kernel..."
-$cp ${sPrefix}$sourceDir/objects/${arch}.R1/kernel/kernel $targetDir/beos/system/kernel_${arch}
+$cp ${sPrefix}$sourceDir/objects/${arch}.R1/system/kernel_${arch} $targetDir/beos/system/
 
 
 # libs
@@ -302,8 +302,8 @@ for f in $BEOS_SYSTEM_LIB; do
 	$cp ${sPrefix}$f $targetDir/beos/system/lib/
 done
 
-cd $sourceDir/objects/${arch}.R1/kernel/
-$scd ${sPrefix}$sourceDir/objects/${arch}.R1/kernel/
+cd $sourceDir/objects/${arch}.R1/system/
+$scd ${sPrefix}$sourceDir/objects/${arch}.R1/system/
 $cp ${sPrefix}runtime_loader/rld.so ${sPrefix}libroot.so $targetDir/beos/system/lib/
 
 
@@ -358,11 +358,11 @@ $cp ${sPrefix}distro/${arch}.R1/beos/etc/Keymap/US-International \
 
 # boot loader
 echo "Installing boot loader..."
-cd $sourceDir/objects/${arch}.R1/kernel/
+cd $sourceDir/objects/${arch}.R1/system/
 rm -f zbeos
 objcopy -O binary boot_loader zbeos
 $cd $targetDir/beos/system
-$cp ${sPrefix}$sourceDir/objects/${arch}.R1/kernel/zbeos .
+$cp ${sPrefix}$sourceDir/objects/${arch}.R1/system/zbeos .
 
 
 # boot module links

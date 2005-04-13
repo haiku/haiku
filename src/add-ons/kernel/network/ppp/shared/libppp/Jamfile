@@ -18,7 +18,7 @@ StaticLibrary ppp :
 	PPPManager.cpp
 ;
 
-SEARCH on [ FGristFiles strlcat.c ] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
-SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+SEARCH on [ FGristFiles strlcat.c ] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;
+SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src system libroot os ] ;
 SEARCH on [ FGristFiles settings_tools.cpp ] = [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 SEARCH on [ FGristFiles KPPPUtils.cpp ] = [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
