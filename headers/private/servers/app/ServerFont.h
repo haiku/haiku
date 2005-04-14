@@ -39,6 +39,12 @@ public:
 			uint16 flags=0, uint8 spacing=B_CHAR_SPACING);
 	ServerFont(const ServerFont &font);
 	~ServerFont(void);
+
+	// TODO: make more advanced...
+	status_t InitCheck() const
+				{ return fStyle ? B_OK : B_NO_INIT; }
+
+
 	font_direction Direction(void) const { return fDirection; }
 	uint32 Encoding(void) const { return fEncoding; }
 	edge_info Edges(void) const { return fEdges; }

@@ -57,6 +57,10 @@ ServerFont::ServerFont(FontStyle *style, float size, float rotation, float shear
 		fStyle->AddDependent();
 }
 
+// TODO: fStyle should not be NULL. There should be another FontStyle
+// constructor, that initializes without actually interfacing with
+// freetype, so that a ServerFont can be guaranteed to be "valid".
+
 ServerFont::ServerFont(void)
 {
 	fStyle=NULL;
