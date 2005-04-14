@@ -143,6 +143,12 @@ class UtilityBitmap : public ServerBitmap {
 										  screen_id screen = B_MAIN_SCREEN_ID);
 							UtilityBitmap(const ServerBitmap* bmp);
 
+							UtilityBitmap(const uint8* alreadyPaddedData,
+										  uint32 width,
+										  uint32 height,
+										  color_space format);
+
+
 	virtual					~UtilityBitmap();
 };
 

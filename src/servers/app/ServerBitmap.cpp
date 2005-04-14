@@ -36,54 +36,56 @@
 	greater than the default will result in the number of bytes specified.
 	\param screen Screen assigned to the bitmap.
 */
-ServerBitmap::ServerBitmap(BRect rect,color_space space, int32 flags,
-		int32 bytesperline, screen_id screen)
+ServerBitmap::ServerBitmap(BRect rect, color_space space,
+						   int32 flags, int32 bytesPerLine,
+						   screen_id screen)
+	: fInitialized(false),
+	  fArea(B_ERROR),
+	  fBuffer(NULL),
+	  // WARNING: '1' is added to the width and height.
+	  // Same is done in FBBitmap subclass, so if you
+	  // modify here make sure to do the same under
+	  // FBBitmap::SetSize(...)
+	  fWidth(rect.IntegerWidth() + 1),
+	  fHeight(rect.IntegerHeight() + 1),
+	  fBytesPerRow(0),
+	  fSpace(space),
+	  fFlags(flags),
+	  fBitsPerPixel(0)
+	  // TODO: what about fToken and fOffset ?!?
+	  
 {
-	fInitialized=false;
-
-	// WARNING: '1' is added to the width and height. Same is done in FBBitmap
-	// subclass, so if you modify here make sure to do the same under FBBitmap::SetSize(...)
-	fWidth=rect.IntegerWidth()+1;
-	fHeight=rect.IntegerHeight()+1;
-	fSpace=space;
-	fArea=B_ERROR;
-	fBuffer=NULL;
-	fFlags=flags;
-
-	_HandleSpace(space, bytesperline);
+	_HandleSpace(space, bytesPerLine);
 }
 
 //! Copy constructor does not copy the buffer.
-ServerBitmap::ServerBitmap(const ServerBitmap *bmp)
+ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
+	: fInitialized(false),
+	  fArea(B_ERROR),
+	  fBuffer(NULL)
+	  // TODO: what about fToken and fOffset ?!?
 {
-	fInitialized=false;
-	fArea=B_ERROR;
-	fBuffer=NULL;
-
-	if(bmp)
-	{
-		fWidth=bmp->fWidth;
-		fHeight=bmp->fHeight;
-		fBytesPerRow=bmp->fBytesPerRow;
-		fSpace=bmp->fSpace;
-		fFlags=bmp->fFlags;
-		fBitsPerPixel=bmp->fBitsPerPixel;
-	}
-	else
-	{
-		fWidth=0;
-		fHeight=0;
-		fBytesPerRow=0;
-		fSpace=B_NO_COLOR_SPACE;
-		fFlags=0;
-		fBitsPerPixel=0;
+	if (bmp) {
+		fWidth			= bmp->fWidth;
+		fHeight			= bmp->fHeight;
+		fBytesPerRow	= bmp->fBytesPerRow;
+		fSpace			= bmp->fSpace;
+		fFlags			= bmp->fFlags;
+		fBitsPerPixel	= bmp->fBitsPerPixel;
+	} else {
+		fWidth			= 0;
+		fHeight			= 0;
+		fBytesPerRow	= 0;
+		fSpace			= B_NO_COLOR_SPACE;
+		fFlags			= 0;
+		fBitsPerPixel	= 0;
 	}
 }
 
 /*!
 	\brief Empty. Defined for subclasses.
 */
-ServerBitmap::~ServerBitmap(void)
+ServerBitmap::~ServerBitmap()
 {
 }
 
@@ -91,9 +93,10 @@ ServerBitmap::~ServerBitmap(void)
 	\brief Gets the number of bytes occupied by the bitmap, including padding bytes.
 	\return The number of bytes occupied by the bitmap, including padding.
 */
-uint32 ServerBitmap::BitsLength(void) const
+uint32
+ServerBitmap::BitsLength(void) const
 {
-	return (uint32)(fBytesPerRow*fHeight);
+	return (uint32)(fBytesPerRow * fHeight);
 }
 
 /*! 
@@ -102,11 +105,14 @@ uint32 ServerBitmap::BitsLength(void) const
 	Subclasses should call this so the buffer can automagically
 	be allocated on the heap.
 */
-void ServerBitmap::_AllocateBuffer(void)
+void
+ServerBitmap::_AllocateBuffer(void)
 {
-	if(fBuffer!=NULL)
+	uint32 length = BitsLength();
+	if (length > 0) {
 		delete fBuffer;
-	fBuffer=new uint8[BitsLength()];
+		fBuffer = new uint8[length];
+	}
 }
 
 /*!
@@ -114,29 +120,27 @@ void ServerBitmap::_AllocateBuffer(void)
 	
 	Subclasses should call this to free the internal buffer.
 */
-void ServerBitmap::_FreeBuffer(void)
+void
+ServerBitmap::_FreeBuffer(void)
 {
-	if(fBuffer!=NULL)
-	{
-		delete fBuffer;
-		fBuffer=NULL;
-	}
+	delete fBuffer;
+	fBuffer = NULL;
 }
 
 /*!
 	\brief Internal function used to translate color space values to appropriate internal
 	values. 
 	\param space Color space for the bitmap.
-	\param bytesperline Number of bytes per row.
+	\param bytesPerRow Number of bytes per row to be used as an override.
 */
-void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
+void
+ServerBitmap::_HandleSpace(color_space space, int32 bytesPerRow)
 {
-	// Big convoluted mess just to handle every color space and dword align
-	// the buffer	
-	switch(space)
-	{
-		// Buffer is dword-aligned, so nothing need be done
-		// aside from allocate the memory
+	// calculate the minimum bytes per row
+	// set fBitsPerPixel
+	int32 minBPR = 0;
+	switch(space) {
+		// 32-bit
 		case B_RGB32:
 		case B_RGBA32:
 		case B_RGB32_BIG:
@@ -154,8 +158,11 @@ void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 		case B_CMY32:
 		case B_CMYA32:
 		case B_CMYK32:
+			minBPR = fWidth * 4;
+			fBitsPerPixel = 32;
+			break;
 
-		// 24-bit = 32-bit with extra 8 bits ignored
+		// 24-bit
 		case B_RGB24_BIG:
 		case B_RGB24:
 		case B_LAB24:
@@ -164,64 +171,14 @@ void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 		case B_HSV24:
 		case B_HLS24:
 		case B_CMY24:
-		{
-			if(bytesperline<(fWidth*4))
-				fBytesPerRow=fWidth*4;
-			else
-				fBytesPerRow=bytesperline;
-			fBitsPerPixel=32;
+		// TODO: These last two are calculated
+		// (width + 3) / 4 * 12
+		// in Bitmap.cpp, I don't understand why though.
+		case B_YCbCr444:
+		case B_YUV444:
+			minBPR = fWidth * 3;
+			fBitsPerPixel = 24;
 			break;
-		}
-		// Calculate size and dword-align
-
-		// 1-bit
-		case B_GRAY1:
-		{
-			int32 numbytes=fWidth>>3;
-			if((fWidth % 8) != 0)
-				numbytes++;
-			if(bytesperline<numbytes)
-			{
-				for(int8 i=0;i<4;i++)
-				{
-					if( (numbytes+i)%4==0)
-					{
-						fBytesPerRow=numbytes+i;
-						break;
-					}
-				}
-			}
-			else
-				fBytesPerRow=bytesperline;
-			fBitsPerPixel=1;
-		}		
-
-		// 8-bit
-		case B_CMAP8:
-		case B_GRAY8:
-		case B_YUV411:
-		case B_YUV420:
-		case B_YCbCr422:
-		case B_YCbCr411:
-		case B_YCbCr420:
-		case B_YUV422:
-		{
-			if(bytesperline<fWidth)
-			{
-				for(int8 i=0;i<4;i++)
-				{
-					if( (fWidth+i)%4==0)
-					{
-						fBytesPerRow=fWidth+i;
-						break;
-					}
-				}
-			}
-			else
-				fBytesPerRow=bytesperline;
-			fBitsPerPixel=8;
-			break;
-		}
 
 		// 16-bit
 		case B_YUV9:
@@ -232,43 +189,80 @@ void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 		case B_RGB16_BIG:
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
-		case B_YCbCr444:
-		case B_YUV444:
-		{
-			if(bytesperline<fWidth*2)
-			{
-				if( (fWidth*2) % 4 !=0)
-					fBytesPerRow=(fWidth+1)*2;
-				else
-					fBytesPerRow=fWidth*2;
-			}
-			else
-				fBytesPerRow=bytesperline;
-			fBitsPerPixel=16;
+			minBPR = fWidth * 2;
+			fBitsPerPixel = 16;
 			break;
-		}
+
+		case B_YCbCr422:
+		case B_YUV422:
+			minBPR = (fWidth + 3) / 4 * 8;
+			fBitsPerPixel = 16;
+			break;
+
+		// 8-bit
+		case B_CMAP8:
+		case B_GRAY8:
+			minBPR = fWidth;
+			fBitsPerPixel = 8;
+			break;
+
+		// 1-bit
+		case B_GRAY1:
+			minBPR = (fWidth + 7) / 8;
+			fBitsPerPixel = 1;
+			break;
+
+		// TODO: ??? get a clue what these mean
+		case B_YCbCr411:
+		case B_YUV411:
+		case B_YUV420:
+		case B_YCbCr420:
+			minBPR = (fWidth + 3) / 4 * 6;
+			fBitsPerPixel = 0;
+			break;
+
 		case B_NO_COLOR_SPACE:
-			fBitsPerPixel=0;
+		default:
+			fBitsPerPixel = 0;
 			break;
+	}
+	if (minBPR > 0 || bytesPerRow > 0) {
+		// add the padding or use the provided bytesPerRow if sufficient
+		if (bytesPerRow >= minBPR) {
+			fBytesPerRow = bytesPerRow;
+		} else {
+			fBytesPerRow = ((minBPR + 3) / 4) * 4;
+		}
 	}
 }
 
-UtilityBitmap::UtilityBitmap(BRect rect,color_space space, int32 flags,
-	int32 bytesperline, screen_id screen)
-: ServerBitmap(rect,space,flags,bytesperline,screen)
+UtilityBitmap::UtilityBitmap(BRect rect, color_space space,
+							 int32 flags, int32 bytesperline,
+							 screen_id screen)
+	: ServerBitmap(rect, space, flags, bytesperline, screen)
 {
 	_AllocateBuffer();
 }
 
-UtilityBitmap::UtilityBitmap(const ServerBitmap *bmp)
-: ServerBitmap(bmp)
+UtilityBitmap::UtilityBitmap(const ServerBitmap* bmp)
+	: ServerBitmap(bmp)
 {
 	_AllocateBuffer();
-	if(bmp->Bits())
-		memcpy(Bits(),bmp->Bits(),bmp->BitsLength());
+	if (bmp->Bits())
+		memcpy(Bits(), bmp->Bits(), bmp->BitsLength());
 }
 
-UtilityBitmap::~UtilityBitmap(void)
+UtilityBitmap::UtilityBitmap(const uint8* alreadyPaddedData,
+							 uint32 width, uint32 height,
+							 color_space format)
+	: ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0)
+{
+	_AllocateBuffer();
+	if (Bits())
+		memcpy(Bits(), alreadyPaddedData, BitsLength());
+}
+
+UtilityBitmap::~UtilityBitmap()
 {
 	_FreeBuffer();
 }
