@@ -21,6 +21,7 @@
 //
 //	File Name:		ServerCursor.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Glorified ServerBitmap used for cursor work.
 //  
 //------------------------------------------------------------------------------
@@ -35,98 +36,121 @@
 	\param bytesperline Bytes per row for the cursor. See ServerBitmap::ServerBitmap()
 	
 */
-ServerCursor::ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hotspot, int32 bytesperrow, screen_id screen)
- : ServerBitmap(r,cspace,flags,bytesperrow,screen)
+ServerCursor::ServerCursor(BRect r, color_space format,
+						   int32 flags, BPoint hotspot,
+						   int32 bytesPerRow,
+						   screen_id screen)
+	: ServerBitmap(r, format, flags, bytesPerRow, screen),
+	  fHotSpot(hotspot),
+	  fOwningTeam(-1)
 {
-	fHotSpot=hotspot;
 	fHotSpot.ConstrainTo(Bounds());
-	fOwningTeam=-1;
-
 	_AllocateBuffer();
 }
 
 /*!
 	\brief Constructor
-	\param data pointer to 68-byte cursor data array. See BeBook entry for BCursor for details
+	\param data Pointer to 68-byte cursor data array. See BeBook entry for BCursor for details
 */
-ServerCursor::ServerCursor(int8 *data)
- : ServerBitmap(BRect(0,0,15,15),B_RGBA32,0)
+ServerCursor::ServerCursor(const int8* data)
+	: ServerBitmap(BRect(0, 0, 15, 15), B_RGBA32, 0),
+	  fHotSpot(0, 0),
+	  fOwningTeam(-1)
 {
 	// 68-byte array used in R5 for holding cursors.
 	// This API has serious problems and should be deprecated(but supported) in R2
 
 	// Now that we have all the setup, we're going to map (for now) the cursor
 	// to RGBA32. Eventually, there will be support for 16 and 8-bit depths
-	if(data)
-	{	
-		fInitialized=true;
-		fOwningTeam=-1;
-		uint32 black=0xFF000000,
-			white=0xFFFFFFFF,
-			*bmppos;
-		uint16	*cursorpos, *maskpos,cursorflip, maskflip,
-				cursorval, maskval,powval;
-		uint8 	i,j;
-	
-		cursorpos=(uint16*)(data+4);
-		maskpos=(uint16*)(data+36);
-		fHotSpot.Set(data[3],data[2]);
-		
+	if (data) {	
 		_AllocateBuffer();
-		
+		uint8* buffer = Bits();
+		if (!buffer)
+			return;
+
+		fInitialized = true;
+		uint32 black = 0xFF000000;
+		uint32 white = 0xFFFFFFFF;
+
+		uint16* cursorpos = (uint16*)(data + 4);
+		uint16* maskpos = (uint16*)(data + 36);
+		fHotSpot.Set(data[3], data[2]);
+				
+		uint32* bmppos;
+		uint16 cursorflip;
+		uint16 maskflip;
+		uint16 cursorval;
+		uint16 maskval;
+		uint16 powval;
+	
 		// for each row in the cursor data
-		for(j=0;j<16;j++)
-		{
-			bmppos=(uint32*)(fBuffer+ (j*BytesPerRow()) );
+		for (int32 j = 0; j < 16; j++) {
+			bmppos = (uint32*)(buffer + (j * BytesPerRow()));
 	
 			// On intel, our bytes end up swapped, so we must swap them back
-			cursorflip=(cursorpos[j] & 0xFF) << 8;
+			cursorflip = (cursorpos[j] & 0xFF) << 8;
 			cursorflip |= (cursorpos[j] & 0xFF00) >> 8;
 			
-			maskflip=(maskpos[j] & 0xFF) << 8;
+			maskflip = (maskpos[j] & 0xFF) << 8;
 			maskflip |= (maskpos[j] & 0xFF00) >> 8;
 	
 			// for each column in each row of cursor data
-			for(i=0;i<16;i++)
-			{
+			for (int32 i = 0; i < 16; i++) {
 				// Get the values and dump them to the bitmap
-				powval=1 << (15-i);
-				cursorval=cursorflip & powval;
-				maskval=maskflip & powval;
-				bmppos[i]=((cursorval!=0)?black:white) & ((maskval>0)?0xFFFFFFFF:0x00FFFFFF);
+				powval = 1 << (15 - i);
+				cursorval = cursorflip & powval;
+				maskval = maskflip & powval;
+				bmppos[i] = ((cursorval != 0) ? black : white) &
+							((maskval > 0) ? 0xFFFFFFFF : 0x00FFFFFF);
 			}
 		}
+	} else {
+		fWidth = 0;
+		fHeight = 0;
+		fBytesPerRow = 0;
+		fSpace = B_NO_COLOR_SPACE;
 	}
-	else
-	{
-		fWidth=0;
-		fHeight=0;
-		fBytesPerRow=0;
-		fSpace=B_NO_COLOR_SPACE;
-	}
+}
+
+/*!
+	\brief Constructor
+	\param data Pointer to bitmap data in memory, the padding bytes should be contained when format less than 32 bpp.
+*/
+ServerCursor::ServerCursor(const uint8* alreadyPaddedData,
+						   uint32 width, uint32 height,
+						   color_space format)
+	: ServerBitmap(BRect(0, 0, width - 1, height - 1), format, 0),
+	  fHotSpot(0, 0),
+	  fOwningTeam(-1)
+{	
+	_AllocateBuffer();
+	if (Bits())
+		memcpy(Bits(), alreadyPaddedData, BitsLength());
 }
 
 /*!
 	\brief Copy constructor
 	\param cursor cursor to copy
 */
-ServerCursor::ServerCursor(const ServerCursor *cursor)
- : ServerBitmap(cursor)
+ServerCursor::ServerCursor(const ServerCursor* cursor)
+	: ServerBitmap(cursor),
+	  fHotSpot(0, 0),
+	  fOwningTeam(-1)
 {
+	// TODO: Hm. I don't move this into the if clause,
+	// because it might break code elsewhere.
 	_AllocateBuffer();
-	fInitialized=true;
-	fOwningTeam=-1;
 
-	if(cursor)
-	{	
-		if(cursor->fBuffer)
-			memcpy(fBuffer, cursor->fBuffer, BitsLength());
-		fHotSpot=cursor->fHotSpot;
+	if (cursor) {	
+		fInitialized = true;
+		if (Bits() && cursor->Bits())
+			memcpy(Bits(), cursor->Bits(), BitsLength());
+		fHotSpot = cursor->fHotSpot;
 	}
 }
 
 //!	Frees the heap space allocated for the cursor's image data
-ServerCursor::~ServerCursor(void)
+ServerCursor::~ServerCursor()
 {
 	_FreeBuffer();
 }
@@ -135,13 +159,16 @@ ServerCursor::~ServerCursor(void)
 	\brief Sets the cursor's hotspot
 	\param pt New location of hotspot, constrained to the cursor's boundaries.
 */
-void ServerCursor::SetHotSpot(BPoint pt)
+void
+ServerCursor::SetHotSpot(BPoint pt)
 {
-	fHotSpot=pt;
+	fHotSpot = pt;
 	fHotSpot.ConstrainTo(Bounds());
 }
 
-void ServerCursor::SetAppSignature(const char *signature)
+// SetAppSignature
+void
+ServerCursor::SetAppSignature(const char* signature)
 {
-	fAppSignature.SetTo( (signature)?signature:"" );
+	fAppSignature.SetTo((signature) ? signature : "");
 }
