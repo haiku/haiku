@@ -1267,10 +1267,25 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<float>(&evt.wheel_delta_x);
 			msg.Read<float>(&evt.wheel_delta_y);
 
-			if (FocusWinBorder())
+			if (fLastMouseMoved != this)
 			{
-				BPoint		cursorPos = GetDisplayDriver()->GetCursorPosition();
-				FocusWinBorder()->MouseWheel(evt, cursorPos);
+				if (fLastMouseMoved->fOwner) // is a Layer object not a WinBorder one
+				{
+					if (fLastMouseMoved->fOwner->fTopLayer != fLastMouseMoved) // must not be the top_view's counterpart
+					{
+						BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
+						wheelmsg.AddInt64("when", evt.when);
+						wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
+						wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
+
+						fLastMouseMoved->Window()->SendMessageToClient(&wheelmsg, fLastMouseMoved->fViewToken, false);
+					}
+				}
+				else
+				{
+					// TODO: WinBorder::MouseWheel() should dissapear or get other params!
+					// ((WinBorder*)fLastMouseMoved)->MouseWheel(...)
+				}
 			}
 			break;
 		}
@@ -1609,7 +1624,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					keymsg.AddInt32("modifiers", modifiers);
 					keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
 					
-					win->SendMessageToClient(&keymsg);
+					win->SendMessageToClient(&keymsg, B_NULL_TOKEN, true);
 				}
 			}
 			
@@ -1645,7 +1660,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					keymsg.AddInt32("modifiers", modifiers);
 					keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
 					
-					win->SendMessageToClient(&keymsg);
+					win->SendMessageToClient(&keymsg, B_NULL_TOKEN, true);
 				}
 			}
 			
@@ -1679,7 +1694,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					keymsg.AddInt32("be:old_modifiers", oldmodifiers);
 					keymsg.AddData("states", B_UINT8_TYPE, keystates, sizeof(int8) * 16);
 					
-					win->SendMessageToClient(&keymsg);
+					win->SendMessageToClient(&keymsg, B_NULL_TOKEN, true);
 				}
 			}
 

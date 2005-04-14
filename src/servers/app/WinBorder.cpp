@@ -271,22 +271,8 @@ void WinBorder::MouseUp(click_type action)
 
 void WinBorder::MouseWheel(PointerEvent& evt, BPoint& ptWhere)
 {
-	if (fTopLayer->fFullVisible.Contains(ptWhere))
-	{
-		Window()->Lock();
-		// TODO: you can improve performance by doing this search client-side!
-		Layer	*target = LayerAt(evt.where);
-		if (target && target != fTopLayer)
-		{
-			BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
-			wheelmsg.AddInt64("when",evt.when);
-			wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
-			wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
-
-			Window()->SendMessageToClient(&wheelmsg);
-		}
-		Window()->Unlock();
-	}
+	// what should decorator do with mouse wheel message.
+	// maybe decorator should have some hook functions for mouse messages.
 }
 
 //! Sets the decorator focus to active or inactive colors
