@@ -18,7 +18,7 @@ HWInterface::HWInterface()
 	: BLocker("hw interface lock"),
 	  fCursor(NULL),
 	  fCursorVisible(true),
-	  fCursorLocation(0.5, 0.5),
+	  fCursorLocation(0, 0),
 //	  fUpdateExecutor(new UpdateQueue(this))
 	  fUpdateExecutor(NULL)
 {
