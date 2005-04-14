@@ -113,38 +113,41 @@ AppServer::AppServer(void)
 //	fontserver->ScanDirectory("/boot/home/config/fonts/psfonts/");
 	fontserver->SaveList();
 
-	if(!fontserver->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,
-								   DEFAULT_PLAIN_FONT_STYLE,
-								   DEFAULT_PLAIN_FONT_SIZE) ||
-	   !fontserver->SetSystemPlain(FALLBACK_PLAIN_FONT_FAMILY,
-								   DEFAULT_PLAIN_FONT_STYLE,
-								   DEFAULT_PLAIN_FONT_SIZE)) {
-		printf("Couldn't set plain to %s, %s %d pt\n",
+	if (!fontserver->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,
+									DEFAULT_PLAIN_FONT_STYLE,
+									DEFAULT_PLAIN_FONT_SIZE) &&
+		!fontserver->SetSystemPlain(FALLBACK_PLAIN_FONT_FAMILY,
+									DEFAULT_PLAIN_FONT_STYLE,
+									DEFAULT_PLAIN_FONT_SIZE)) {
+		printf("Couldn't set plain to %s (fallback: %s), %s %d pt\n",
 				DEFAULT_PLAIN_FONT_FAMILY,
+				FALLBACK_PLAIN_FONT_FAMILY,
 				DEFAULT_PLAIN_FONT_STYLE,
 				DEFAULT_PLAIN_FONT_SIZE);
 	}
 
-	if(!fontserver->SetSystemBold(DEFAULT_BOLD_FONT_FAMILY,
-								  DEFAULT_BOLD_FONT_STYLE,
-								  DEFAULT_BOLD_FONT_SIZE) ||
-	   !fontserver->SetSystemBold(FALLBACK_BOLD_FONT_FAMILY,
-								  DEFAULT_BOLD_FONT_STYLE,
-								  DEFAULT_BOLD_FONT_SIZE)) {
-		printf("Couldn't set bold to %s, %s %d pt\n",
+	if (!fontserver->SetSystemBold(DEFAULT_BOLD_FONT_FAMILY,
+								   DEFAULT_BOLD_FONT_STYLE,
+								   DEFAULT_BOLD_FONT_SIZE) &&
+		!fontserver->SetSystemBold(FALLBACK_BOLD_FONT_FAMILY,
+								   DEFAULT_BOLD_FONT_STYLE,
+								   DEFAULT_BOLD_FONT_SIZE)) {
+		printf("Couldn't set bold to %s (fallback: %s), %s %d pt\n",
 				DEFAULT_BOLD_FONT_FAMILY,
+				FALLBACK_BOLD_FONT_FAMILY,
 				DEFAULT_BOLD_FONT_STYLE,
 				DEFAULT_BOLD_FONT_SIZE);
 	}
 
-	if(!fontserver->SetSystemFixed(DEFAULT_FIXED_FONT_FAMILY,
-								   DEFAULT_FIXED_FONT_STYLE,
-								   DEFAULT_FIXED_FONT_SIZE) ||
-	   !fontserver->SetSystemFixed(FALLBACK_FIXED_FONT_FAMILY,
-								   DEFAULT_FIXED_FONT_STYLE,
-								   DEFAULT_FIXED_FONT_SIZE)) {
-		printf("Couldn't set fixed to %s, %s %d pt\n",
+	if (!fontserver->SetSystemFixed(DEFAULT_FIXED_FONT_FAMILY,
+									DEFAULT_FIXED_FONT_STYLE,
+									DEFAULT_FIXED_FONT_SIZE) &&
+		!fontserver->SetSystemFixed(FALLBACK_FIXED_FONT_FAMILY,
+									DEFAULT_FIXED_FONT_STYLE,
+									DEFAULT_FIXED_FONT_SIZE)) {
+		printf("Couldn't set fixed to %s (fallback: %s), %s %d pt\n",
 				DEFAULT_FIXED_FONT_FAMILY,
+				FALLBACK_FIXED_FONT_FAMILY,
 				DEFAULT_FIXED_FONT_STYLE,
 				DEFAULT_FIXED_FONT_SIZE);
 	}
@@ -645,7 +648,7 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 		}
 		case B_QUIT_REQUESTED:
 		{
-#if DISPLAYDRIVER != HWDRIVER
+#if TEST_MODE
 			// Attached Data:
 			// none
 			
