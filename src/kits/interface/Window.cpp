@@ -818,35 +818,17 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			break;
 		}
 		case B_UNMAPPED_KEY_DOWN:
-		{
-			if (fFocus)
-				fFocus->MessageReceived( msg );
-			else
-				BLooper::DispatchMessage(msg, target);
-			break;
-		}
 		case B_UNMAPPED_KEY_UP:
-		{
-			if (fFocus)
-				fFocus->MessageReceived( msg );
-			else
-				BLooper::DispatchMessage(msg, target);
-			break;
-		}
 		case B_MODIFIERS_CHANGED:
 		{
 			if (fFocus)
 				fFocus->MessageReceived( msg );
-			else
-				BLooper::DispatchMessage(msg, target);
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED:
 		{
 			if (fFocus)
 				fFocus->MessageReceived( msg );
-			else
-				BLooper::DispatchMessage(msg, target);
 			break;
 		}
 		case B_MOUSE_DOWN:
