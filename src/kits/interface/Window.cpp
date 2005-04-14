@@ -797,6 +797,7 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			msg->FindInt32( "raw_char", &raw_char );
 			msg->FindString( "bytes", &string );
 
+// TODO: USE target !!!!
 			if ( !handleKeyDown( string[0], (uint32)modifiers) )
 			{
 				if(fFocus)
@@ -812,6 +813,7 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 	
 			msg->FindString( "bytes", &string );
 
+// TODO: USE target !!!!
 			if(fFocus)
 				fFocus->KeyUp( string, strlen(string) );
 
@@ -821,14 +823,14 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case B_UNMAPPED_KEY_UP:
 		case B_MODIFIERS_CHANGED:
 		{
-			if (fFocus)
-				fFocus->MessageReceived( msg );
+			if (target != this && target != top_view)
+				target->MessageReceived( msg );
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			if (fFocus)
-				fFocus->MessageReceived( msg );
+			if (target != this && target != top_view)
+				target->MessageReceived( msg );
 			break;
 		}
 		case B_MOUSE_DOWN:
