@@ -67,7 +67,7 @@ Painter::Painter()
 	  fTextRenderer(new AGGTextRenderer()),
 	  fLastFamilyAndStyle(0)
 {
-	if (fontserver)
+	if (fontserver && fontserver->GetSystemPlain())
 		fFont = *fontserver->GetSystemPlain();
 	
 	_UpdateFont();
@@ -1105,6 +1105,11 @@ Painter::_RebuildClipping()
 void
 Painter::_UpdateFont()
 {
+	// TODO: temporary work arround until ServerFont
+	// is guaranteed to be valid.
+	if (fFont.InitCheck() < B_OK)
+		return;
+
 	if (fLastFamilyAndStyle != fFont.GetFamilyAndStyle()) {
 		fLastFamilyAndStyle = fFont.GetFamilyAndStyle();
 		
