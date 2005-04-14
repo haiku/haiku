@@ -75,7 +75,7 @@ KernelLd kernel_$(OBOS_ARCH) :
 	:
 	: kernel
 	;
-LINKLIBS on kernel += $(KERNEL_C++_SUPPORT_LIBS) ;
+LINKLIBS on kernel_$(OBOS_ARCH) += $(KERNEL_C++_SUPPORT_LIBS) ;
 
 KernelLd kernel.so :
 	kernel_core.o
