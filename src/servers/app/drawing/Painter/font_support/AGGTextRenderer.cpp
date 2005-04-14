@@ -4,11 +4,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <FontServer.h>
 #include <Bitmap.h>
 #include <ByteOrder.h>
 #include <Entry.h>
+#include <FontServer.h>
 #include <Message.h>
+#include <ServerFont.h>
 #include <UTF8.h>
 
 #include <agg_basics.h>
@@ -115,6 +116,7 @@ AGGTextRenderer::Archive(BMessage* into, bool deep) const
 bool
 AGGTextRenderer::SetFont(const ServerFont &font)
 {
+//printf("AGGTextRenderer::SetFont(%s, %s)\n", font.GetFamily(), font.GetStyle());
 	if (fFontEngine.load_font(font, agg::glyph_ren_native_gray8)) {			
 //	if (fFontEngine.load_font(font, agg::glyph_ren_outline)) {
 		return TextRenderer::SetFont(font);
@@ -195,6 +197,8 @@ AGGTextRenderer::RenderString(const char* string,
 							  bool dryRun,
 							  BPoint* nextCharPos)
 {
+//printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
+
 	fFontEngine.hinting(fHinted);
 	fFontEngine.height((int32)(fPtSize));
 	fFontEngine.width((int32)(fPtSize));
@@ -262,13 +266,11 @@ AGGTextRenderer::RenderString(const char* string,
 
 			if (glyph) {
 
-				if (fKerning) {
+				if (i > 0 && fKerning) {
 					fFontManager.add_kerning(&advanceX, &advanceY);
 				}
 
-				x += fAdvanceScale * advanceX;
-				if (advanceX > 0.0 && fAdvanceScale > 1.0)
-					x += (fAdvanceScale - 1.0) * fFontEngine.height();
+				x += advanceX;
 				y += advanceY;
 
 				// calculate bounds
@@ -280,6 +282,7 @@ AGGTextRenderer::RenderString(const char* string,
 					// we cannot use the transformation pipeline
 					double transformedX = x + transformOffset.x;
 					double transformedY = y + transformOffset.y;
+//printf("x: %f, y: %f\n", transformedX, transformedY);
 					fFontManager.init_embedded_adaptors(glyph,
 														transformedX,
 														transformedY);
@@ -335,11 +338,13 @@ AGGTextRenderer::RenderString(const char* string,
 					bounds = bounds.IsValid() ? bounds | glyphBounds : glyphBounds;
 
 				// increment pen position
-				advanceX = fHinted ? floorf(glyph->advance_x + 0.5) : glyph->advance_x;
-				advanceY = fHinted ? floorf(glyph->advance_y + 0.5) : glyph->advance_y;
+				advanceX = glyph->advance_x;
+				advanceY = glyph->advance_y;
 			}
 			++p;
 		}
+		// put pen location behind rendered text
+		// (at the baseline of the virtual next glyph)
 		if (nextCharPos) {
 			x += fAdvanceScale * advanceX;
 			if (advanceX > 0.0 && fAdvanceScale > 1.0)
