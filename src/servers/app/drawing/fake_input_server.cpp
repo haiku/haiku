@@ -70,11 +70,11 @@ send_mouse_moved(BPortLink* serverLink, BPoint pt,
 	serverLink->Attach(&time,sizeof(int64));
 	serverLink->Attach(&pt.x,sizeof(float));
 	serverLink->Attach(&pt.y,sizeof(float));
-	serverLink->Attach(&buttons,sizeof(int32));
+	serverLink->Attach(&buttons,sizeof(uint32));
 	serverLink->Flush();
 }
 
-// send_mouse_moved
+// send_mouse_up
 void
 send_mouse_up(BPortLink* serverLink, BPoint pt,
 			  BMessage* currentMessage)
