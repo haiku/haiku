@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "CursorData.h"
+#include "HaikuSystemCursor.h"
 #include "ServerCursor.h"
 
 #include "DisplayDriver.h"
@@ -64,7 +65,15 @@ DisplayDriver::~DisplayDriver()
 bool
 DisplayDriver::Initialize()
 {
-	SetCursor(new ServerCursor(default_cursor_data));
+//	SetCursor(new ServerCursor(default_cursor_data));
+	// TODO: some temporary goofing arround
+	ServerCursor* cursor = new ServerCursor(kHaikuCursorBits,
+										    kHaikuCursorWidth,
+										    kHaikuCursorHeight,
+										    kHaikuCursorFormat);
+	// we just happen to know
+	cursor->SetHotSpot(BPoint(1, 0));
+	SetCursor(cursor);
 	return true;
 }
 
