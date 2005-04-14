@@ -7,6 +7,7 @@ SubInclude OBOS_TOP src tools gensyscalls ;
 SubInclude OBOS_TOP src tools hey ;
 SubInclude OBOS_TOP src tools rc ;
 SubInclude OBOS_TOP src tools resattr ;
+SubInclude OBOS_TOP src tools rman ;
 SubInclude OBOS_TOP src tools translation ;
 SubInclude OBOS_TOP src tools unflatten ;
 

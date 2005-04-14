@@ -1,0 +1,25 @@
+gcksum crc   length name
+----------   ------ ----
+719617051 139770 rman.c
+3816320114 2260 README-rman.txt
+696804442 4302 Makefile
+2527388467 11935 rman.1
+2005445684 13618 site/rman.html
+1619945447 6260 CHANGES
+3825874035 4647 contrib/README-contrib
+953283015 911 contrib/authried.txt
+641079878 13609 contrib/bennett.txt
+1827405570 1220 contrib/gzip.patch
+4230791356 250 contrib/hman.cgi
+1743159239 359 contrib/hman.ksh
+2919099478 8005 contrib/hman.pl
+1821945783 4978 contrib/http-rman.c
+3091246851 661 contrib/http-rman.html
+2646244070 350 contrib/lewis.pl
+2860919314 2049 contrib/man2html
+1315989744 6596 contrib/rman.pl
+3466647040 7531 contrib/rman_html_split
+75383086 2482 contrib/rman_html_split.1
+2032677288 150 contrib/sco-wrapper.sh
+884546947 3806 contrib/sutter.txt
+3112317992 5086 contrib/youki.pl

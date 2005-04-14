@@ -1,0 +1,118 @@
+1993
+ 1 Apr	as bs2tk posted to comp.lang.tcl (126 lines)
+ 2	bullets, change bars, copyright symbol
+ 5	boldface, other SGI nicks
+ 7	skip unrecognized escape codes
+10	small caps
+13	underscores considered uppercase so show up in default small caps font
+	screen out Ultrix junk (code getting pretty tangled now)
+14	until Tk text has better tab support, replace tabs by spaces until get to next tab stop (for Ultrix); -t gives tabstop spacing
+20	Solaris support (Larry Tsui)
+ 3 Jun	section subheading parsing (Per-Erik Martin)
+28	hyphenated man pages in SEE ALSO show up correctly in Links (Mike Steele)
+13 Jul	under FILES, fully qualified path names are added to Links, but this taken out immediately because not useful
+14	option to keep changebars on right (Warren Jessop)
+ 5 Aug	search for header, footer dynamically--no need to edit or search large list of patterns
+11	-m kicks in man page formatting beyond nroff backspace kludges
+27	handle double digit numbers better by trying again relative to end of line
+19 Sep	-T gives Tk extras (otherwise ASCII only)
+	-H gives headers only (implies -T off)
+10 Oct	-r reverse compiles to [tn]roff source (as Geoff Collyer's nam and fontch, but leveraging existing analysis so only addition of ~60 lines)  (The code is device-driver obscure now--obfuscated C contest next.)
+13	header and footer optionally available at bottom in Tk view (Marty Leisner)
+19	"reflected" odd and even page headers&footers zapped
+20	keep count of sections and subsections, using smaller font for larger numbers
+ 1 Nov	reverse compiles to Ensemble, except for character ranges
+ 4	started rman rewrite for cleaner support of multiple output targets, including: plain ascii, headers only, TkMan, [nt]roff, Ensemble, SGML, HTML
+ 5	line filtering separated from other logic despite greater sophistication, RosettaMan faster than bs2tk (!)
+28 Dec	man page reference recognition (Michael Harrison)
+
+
+1994
+ 1 Jan	identify descriptive lists by comparing scnt2 with s_avg
+ 3	tail-end table of contents in HTML documents
+ 5	-f <filter> and LaTeX output mode
+24	proof-of-concept RTF output mode
+26	handle man pages that don't have a header on the first page
+28	parse "handwritten" man pages
+22 Feb	alpha version released
+ 6 Mar	various bug fixes
+10	beta version released
+13 Jun	fixed surious generation on <DL>'s (the existence of which pointed out by David Sibley)
+22 Jul	table recognition experiment.  works reasonably well, except for tables with centered headers
+ 3 Aug	allow for off-by-one (and -two) in identification of header and footer
+	fixed problem with recurrent/leftover text with OSF/1 bold bullets (yeesh)
+12 Sep	2.0gamma released
+13	check for *third* header, possibly centered, possibly after blank lines (Charles Anderson)
+	fixed tag ranges for lines following blank lines (just \n) of pages with global indentation (Owen Rees)
+19	fixed two small problems with LaTeX (^ => \^, \bullet => $\bullet$) (Neal Becker)
+24	simple check for erroneously being fed roff source
+26	deal with bold +- as in ksh (ugh)
+30	2.0delta released
+ 9 Oct	special check for OSF to guard against section head interpreted as footer
+ 8 Nov	Perl pod output format (result still needs work, but not much)
+ 7 Dec	2.0epsilon released (last one before final 2.0)
+22	Happy Winter Solstice!  2.0 released
+	deprecated gets() replaced (Robert Withrow)
+25	TkMan module's $w.show => $t, saving about 9% in generated characters
+
+
+1995
+ 1 Jan	experiment with TkMan output to take advantage of my hack to Tk text (i.e., $t insert end "text" => $t insert end "text1" tag1 "text2" tag2 ...); results => output size reduced about 25%, time reduced about 12-15%
+25 Mar	back to old mark command for Tk module
+8 May	hyphens in SEE ALSO section would confuse link-finder, so re-linebreak if necessary(!) (Greg Earle & Uri Guttman)
+ 4 Aug	put formats and options into tables (inspired by Steve Maguire's Writing Solid Code)
+19	-V accepts colon-separated list of valid volume names (Dag Nygren)
+22	MIME output format that's usable in Emacs 19.29 (just three hours at hacking HTML module) (Neal Becker)
+ 9 Sep	nits in HTML and better Solaris code snippets (Drazen Kacar)
+13 Nov	Macintosh port by Matthias Neeracher <neeri@iis.ee.ethz.ch>
+18 Dec	adapted to LaTeX2e, null manRef yields italicized man ref (H. Palme)
+28	allow long option names (Larry Schwimmer)
+
+
+1996
+22 Jan	fixed problem with hyphenation supression and tabs in man page--sheesh! (H. Palme)
+23 May	split TkMan format into Tk and TkMan (which calls Tk)
+25	in TkMan format, initial spaces converted to tabs
+24 Sep	experiment with formatting from source's macros, for better transcription short of full nroff interpreter
+27	commented out Ensemble output format, which nobody used
+ 2 Oct	>4000 lines
+11
+ 8 Nov  release 3.0 alpha.  source code parsing works well for Solaris, SunOS, HP-UX; in generating HTML
+25	recognize URLs (Mic Campanel)
+
+
+1997
+19 Mar	bug fixes, more special characters (roff expert Larry Jones)
+ 8 Aug  renamed to PolyglotMan
+ 4 Nov	TkMan module: Rebus and NoteMark identification for paragraph lengths and command line options taken over from Tcl (still have search, highlight in Tcl, necessarily) (Chad Loder)
+	>5000 lines, or nearly 40X the lines of code of version 1.0 (which just supported TkMan)
+
+
+1998
+20 Mar	automatic detection of Tcl/Tk source (within automatic detection of source; already had within formatted)
+	centralize casifying SH and SS for formatted and source
+	group exception table by category
+17 Apr	in source translation, pass along comment lines too
+20	incorporate (RCS) versioning diff's, for HTML
+
+
+2000
+22 Jun  eliminate last of encumbered code, release as Open Source
+	release version 3.0.9
+
+
+2002
+24 Aug  used in Apple's OS X 10.2 (Jaguar) to convert manual pages for display in Project Builder
+
+
+2003
+28 Mar  updated for groff 1.18's new escape codes
+	remove Ensemble output format, which is obsolete
+	remove Texinfo output format, which is not useful
+	HTML tags in lowercase
+	released version 3.1
+ 5 Jun  applied Aaron Hawley's patches for DocBook XML
+ 6 Jul  assume HTML browsers support full set of entity references
+	discontinue support for Mac OS 9 and earlier (compiles out of the box on OS X)
+25	tags well nested for troff source input (at last!)
+26	release version 3.2
