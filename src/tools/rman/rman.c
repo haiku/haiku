@@ -17,6 +17,11 @@ static char cvsid[] = "$Header: /Users/phelps/cvs/prj/RosettaMan/rman.c,v 1.154 
 	renamed PolyglotMan due to lawsuit by Rosetta, Inc. August 8, 1997
 */
 
+#define VOLLIST "1:2:3:4:5:6:7:8:9:o:l:n:p"
+#define MANTITLEPRINTF "%s(%s) manual page"
+#define MANREFPRINTF "%s.%s.html"
+#define POLYGLOTMANVERSION "3.2"
+
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
