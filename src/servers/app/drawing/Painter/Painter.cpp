@@ -61,6 +61,7 @@ Painter::Painter()
 //	  fAlphaSrcMode(B_CONSTANT_ALPHA),
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
 	  fPenLocation(0.0, 0.0),
+	  fDrawingModeFactory(new DrawingModeFactory()),
 	  fPatternHandler(new PatternHandler()),
 	  fTextRenderer(new AGGTextRenderer()),
 	  fLastFamilyAndStyle(0)
@@ -78,6 +79,7 @@ Painter::~Painter()
 	_MakeEmpty();
 
 	delete fClippingRegion;
+	delete fDrawingModeFactory;
 	delete fPatternHandler;
 	delete fTextRenderer;
 }
@@ -99,10 +101,10 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 						buffer->BytesPerRow());
 
 		fPixelFormat = new pixfmt(*fBuffer, fPatternHandler);
-		fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
-																		  fAlphaSrcMode,
-																		  fAlphaFncMode,
-																		  false));
+		fPixelFormat->set_drawing_mode(fDrawingModeFactory->DrawingModeFor(fDrawingMode,
+																		   fAlphaSrcMode,
+																		   fAlphaFncMode,
+																		   false));
 
 		fBaseRenderer = new renderer_base(*fPixelFormat);
 		// attach our clipping region to the renderer, it keeps a pointer
@@ -1035,21 +1037,21 @@ Painter::_UpdateDrawingMode()
 		pattern p = *fPatternHandler->GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
-			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
-													  fAlphaSrcMode,
-													  fAlphaFncMode,
-													  true);
+			mode = fDrawingModeFactory->DrawingModeFor(fDrawingMode,
+													   fAlphaSrcMode,
+													   fAlphaFncMode,
+													   true);
 		} else if (p == B_SOLID_LOW) {
 			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
-			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
-													  fAlphaSrcMode,
-													  fAlphaFncMode,
-													  true);
+			mode = fDrawingModeFactory->DrawingModeFor(fDrawingMode,
+													   fAlphaSrcMode,
+													   fAlphaFncMode,
+													   true);
 		} else {
-			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
-													  fAlphaSrcMode,
-													  fAlphaFncMode,
-													  false);
+			mode = fDrawingModeFactory->DrawingModeFor(fDrawingMode,
+													   fAlphaSrcMode,
+													   fAlphaFncMode,
+													   false);
 		}
 		fPixelFormat->set_drawing_mode(mode);
 	}

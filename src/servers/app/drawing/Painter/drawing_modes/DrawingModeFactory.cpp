@@ -20,6 +20,46 @@
 
 #include "DrawingModeFactory.h"
 
+// constructor
+DrawingModeFactory::DrawingModeFactory()
+	: fDrawingModeBGRA32Over(new DrawingModeBGRA32Over()),
+	  fDrawingModeBGRA32Erase(new DrawingModeBGRA32Erase()),
+	  fDrawingModeBGRA32Invert(new DrawingModeBGRA32Invert()),
+	  fDrawingModeBGRA32Select(new DrawingModeBGRA32Select()),
+	  fDrawingModeBGRA32CopySolid(new DrawingModeBGRA32CopySolid()),
+	  fDrawingModeBGRA32Copy(new DrawingModeBGRA32Copy()),
+	  fDrawingModeBGRA32Add(new DrawingModeBGRA32Add()),
+	  fDrawingModeBGRA32Subtract(new DrawingModeBGRA32Subtract()),
+	  fDrawingModeBGRA32Blend(new DrawingModeBGRA32Blend()),
+	  fDrawingModeBGRA32Min(new DrawingModeBGRA32Min()),
+	  fDrawingModeBGRA32Max(new DrawingModeBGRA32Max()),
+	  fDrawingModeBGRA32AlphaCO(new DrawingModeBGRA32AlphaCO()),
+	  fDrawingModeBGRA32AlphaCC(new DrawingModeBGRA32AlphaCC()),
+	  fDrawingModeBGRA32AlphaPO(new DrawingModeBGRA32AlphaPO()),
+	  fDrawingModeBGRA32AlphaPC(new DrawingModeBGRA32AlphaPC())
+{
+}
+
+// destructor
+DrawingModeFactory::~DrawingModeFactory()
+{
+	delete fDrawingModeBGRA32Over;
+	delete fDrawingModeBGRA32Erase;
+	delete fDrawingModeBGRA32Invert;
+	delete fDrawingModeBGRA32Select;
+	delete fDrawingModeBGRA32CopySolid;
+	delete fDrawingModeBGRA32Copy;
+	delete fDrawingModeBGRA32Add;
+	delete fDrawingModeBGRA32Subtract;
+	delete fDrawingModeBGRA32Blend;
+	delete fDrawingModeBGRA32Min;
+	delete fDrawingModeBGRA32Max;
+	delete fDrawingModeBGRA32AlphaCO;
+	delete fDrawingModeBGRA32AlphaCC;
+	delete fDrawingModeBGRA32AlphaPO;
+	delete fDrawingModeBGRA32AlphaPC;
+}
+
 // DrawingModeFor
 DrawingMode*
 DrawingModeFactory::DrawingModeFor(drawing_mode mode,
@@ -31,40 +71,40 @@ DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 		// these drawing modes discard source pixels
 		// which have the current low color
 		case B_OP_OVER:
-			return new DrawingModeBGRA32Over();
+			return fDrawingModeBGRA32Over;
 			break;
 		case B_OP_ERASE:
-			return new DrawingModeBGRA32Erase();
+			return fDrawingModeBGRA32Erase;
 			break;
 		case B_OP_INVERT:
-			return new DrawingModeBGRA32Invert();
+			return fDrawingModeBGRA32Invert;
 			break;
 		case B_OP_SELECT:
-			return new DrawingModeBGRA32Select();
+			return fDrawingModeBGRA32Select;
 			break;
 
 		// in these drawing modes, the current high
 		// and low color are treated equally
 		case B_OP_COPY:
 			if (solid) {
-				return new DrawingModeBGRA32CopySolid();
+				return fDrawingModeBGRA32CopySolid;
 			} else
-				return new DrawingModeBGRA32Copy();
+				return fDrawingModeBGRA32Copy;
 			break;
 		case B_OP_ADD:
-			return new DrawingModeBGRA32Add();
+			return fDrawingModeBGRA32Add;
 			break;
 		case B_OP_SUBTRACT:
-			return new DrawingModeBGRA32Subtract();
+			return fDrawingModeBGRA32Subtract;
 			break;
 		case B_OP_BLEND:
-			return new DrawingModeBGRA32Blend();
+			return fDrawingModeBGRA32Blend;
 			break;
 		case B_OP_MIN:
-			return new DrawingModeBGRA32Min();
+			return fDrawingModeBGRA32Min;
 			break;
 		case B_OP_MAX:
-			return new DrawingModeBGRA32Max();
+			return fDrawingModeBGRA32Max;
 			break;
 
 		// this drawing mode is the only one considering
@@ -78,22 +118,22 @@ DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 		case B_OP_ALPHA:
 			if (alphaSrcMode == B_CONSTANT_ALPHA) {
 				if (alphaFncMode == B_ALPHA_OVERLAY) {
-					return new DrawingModeBGRA32AlphaCO();
+					return fDrawingModeBGRA32AlphaCO;
 				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
-					return new DrawingModeBGRA32AlphaCC();
+					return fDrawingModeBGRA32AlphaCC;
 				}
 			} else if (alphaSrcMode == B_PIXEL_ALPHA){
 				if (alphaFncMode == B_ALPHA_OVERLAY) {
-					return new DrawingModeBGRA32AlphaPO();
+					return fDrawingModeBGRA32AlphaPO;
 				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
-					return new DrawingModeBGRA32AlphaPC();
+					return fDrawingModeBGRA32AlphaPC;
 				}
 			}
 			break;
 
 		default:
 fprintf(stderr, "DrawingModeFactory::DrawingModeFor() - drawing_mode not implemented\n");
-			return new DrawingModeBGRA32Copy();
+			return fDrawingModeBGRA32Copy;
 	}
 	return NULL;
 }

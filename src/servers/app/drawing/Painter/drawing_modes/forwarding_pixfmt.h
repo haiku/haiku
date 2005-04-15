@@ -30,15 +30,12 @@ class forwarding_pixel_format {
 
 	~forwarding_pixel_format()
 	{
-		delete fDrawingMode;
 	}
 
 	// set_drawing_mode
 	void set_drawing_mode(DrawingMode* mode)
 	{
 		if (fDrawingMode != mode) {
-			// delete old DrawingMode
-			delete fDrawingMode;
 			// attach new DrawingMode
 			fDrawingMode = mode;
 			if (fDrawingMode) {

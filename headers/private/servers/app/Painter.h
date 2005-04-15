@@ -17,6 +17,7 @@ class AGGTextRenderer;
 class BBitmap;
 class BRegion;
 class DrawData;
+class DrawingModeFactory;
 class PatternHandler;
 class RenderingBuffer;
 class ServerBitmap;
@@ -291,6 +292,8 @@ class Painter {
 	source_alpha				fAlphaSrcMode;
 	alpha_function				fAlphaFncMode;
 	BPoint						fPenLocation;
+
+	DrawingModeFactory*			fDrawingModeFactory;
 	PatternHandler*				fPatternHandler;
 
 	ServerFont					fFont;
