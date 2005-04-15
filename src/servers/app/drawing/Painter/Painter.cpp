@@ -152,8 +152,6 @@ void
 Painter::SetDrawData(const DrawData* data)
 {
 	// for now...
-	SetHighColor(data->highcolor.GetColor32());
-	SetLowColor(data->lowcolor.GetColor32());
 	SetPenSize(data->pensize);
 	SetPenLocation(data->penlocation);
 	SetFont(data->font);
@@ -174,6 +172,9 @@ Painter::SetDrawData(const DrawData* data)
 
 	if (updateDrawingMode)
 		_UpdateDrawingMode();
+
+	SetHighColor(data->highcolor.GetColor32());
+	SetLowColor(data->lowcolor.GetColor32());
 }
 
 // #pragma mark -
@@ -201,6 +202,8 @@ void
 Painter::SetHighColor(const rgb_color& color)
 {
 	fPatternHandler->SetHighColor(color);
+	if (*(fPatternHandler->GetR5Pattern()) == B_SOLID_HIGH)
+		_SetRendererColor(color);
 }
 
 // SetLowColor
@@ -208,6 +211,8 @@ void
 Painter::SetLowColor(const rgb_color& color)
 {
 	fPatternHandler->SetLowColor(color);;
+	if (*(fPatternHandler->GetR5Pattern()) == B_SOLID_LOW)
+		_SetRendererColor(color);
 }
 
 // SetPenSize
@@ -335,7 +340,7 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 			return _Clipped(touched);
 		}
 	}
-
+//printf("StrokeLine((%.2f, %.2f)->(%.2f, %.2f)) -> AGG version\n", a.x, a.y, b.x, b.y);
 	// do the pixel center offset here
 	a.x += 0.5;
 	a.y += 0.5;
@@ -1036,12 +1041,14 @@ Painter::_UpdateDrawingMode()
 		DrawingMode* mode = NULL;
 		pattern p = *fPatternHandler->GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
+// TODO: fix me! is already set in SetHighColor()
 			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
 			mode = fDrawingModeFactory->DrawingModeFor(fDrawingMode,
 													   fAlphaSrcMode,
 													   fAlphaFncMode,
 													   true);
 		} else if (p == B_SOLID_LOW) {
+// TODO: fix me! is already set in SetLowColor()
 			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
 			mode = fDrawingModeFactory->DrawingModeFor(fDrawingMode,
 													   fAlphaSrcMode,
