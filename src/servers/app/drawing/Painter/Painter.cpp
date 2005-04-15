@@ -1018,7 +1018,7 @@ void
 Painter::_UpdateDrawingMode()
 {
 	if (fPixelFormat) {
-		DrawingMode* mode = NULL;
+/*		DrawingMode* mode = NULL;
 		pattern p = *fPatternHandler->GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
@@ -1038,7 +1038,11 @@ Painter::_UpdateDrawingMode()
 													  fAlphaFncMode,
 													  false);
 		}
-		fPixelFormat->set_drawing_mode(mode);
+		fPixelFormat->set_drawing_mode(mode);*/
+		fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
+													  fAlphaSrcMode,
+													  fAlphaFncMode,
+													  false));
 	}
 		
 }
