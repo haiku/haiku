@@ -6,4 +6,5 @@ UseHeaders [ FDirName os interface ] ;
 SimpleTest Window :
 	main.cpp
 	: libopenbeos.so ;
+#	: libbe.so ;
 

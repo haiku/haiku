@@ -11,32 +11,63 @@ class HelloView : public BView {
  public:
 					HelloView(BRect frame, const char* name,
 							  uint32 resizeFlags, uint32 flags)
-						: BView(frame, name, resizeFlags, flags)
-					{ }
+						: BView(frame, name, resizeFlags, flags),
+						  fTracking(false),
+						  fTrackingStart(-1.0, -1.0),
+						  fLastMousePos(-1.0, -1.0)
+					{
+// TODO: Find bug: this influences StringWidth(), but the font is not used
+//						SetFontSize(9);
+					}
 
 	virtual	void	Draw(BRect updateRect)
 					{
-//				printf("HelloView::Draw()\n");
-//				updateRect.PrintToStream();
-
 						SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 						FillRect(updateRect);
 						BRect r(Bounds());
-// this fixes the font redrawing (text getting thicker)
-// and it proves my theory that the Drawing here
-// should be clipped to the update region as it was
-// when the invalidation was triggered
-//FillRect(r);
-//				r.PrintToStream();
 
-						const char* message = "Hello World!";
+						SetHighColor(255, 0, 0, 128);
+
+						const char* message = "Click and drag";
 						float width = StringWidth(message);
 						BPoint p(r.left + r.Width() / 2.0 - width / 2.0,
 								 r.top + r.Height() / 2.0);
 
-						SetHighColor(255, 0, 0, 128);
 						DrawString(message, p);
+
+						message = "to draw a line!";
+						width = StringWidth(message);
+						p. x = r.left + r.Width() / 2.0 - width / 2.0;
+						p.y += 20;
+
+						DrawString(message, p);
+
+						SetHighColor(255, 255, 255, 128);
+						StrokeLine(fTrackingStart, fLastMousePos);
 					}
+
+	virtual	void	MouseDown(BPoint where)
+					{
+						fTracking = true;
+						fTrackingStart = fLastMousePos = where;
+						Invalidate();
+					}
+
+	virtual	void	MouseUp(BPoint where)
+					{
+						fTracking = false;
+					}
+	virtual	void	MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
+					{
+						if (fTracking) {
+							fLastMousePos = where;
+							Invalidate();
+						}
+					}
+ private:
+			bool	fTracking;
+			BPoint	fTrackingStart;
+			BPoint	fLastMousePos;
 };
 
 
@@ -51,7 +82,6 @@ show_window(BRect frame, const char* name)
 	BView* view = new HelloView(window->Bounds(), "test", B_FOLLOW_ALL,
 								B_WILL_DRAW/* | B_FULL_UPDATE_ON_RESIZE*/);
 
-//	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	window->AddChild(view);
 	BRect b(view->Bounds());
 	b.InsetBy(20.0, 40.0);
