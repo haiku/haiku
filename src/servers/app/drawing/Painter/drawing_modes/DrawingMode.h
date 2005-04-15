@@ -75,6 +75,11 @@ class DrawingMode {
 	{
 	}
 
+	// destructor
+	virtual ~DrawingMode()
+	{
+	}
+
 	// set_rendering_buffer
 	void set_rendering_buffer(agg::rendering_buffer* buffer)
 	{
