@@ -107,6 +107,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 																		  false));
 
 		fBaseRenderer = new renderer_base(*fPixelFormat);
+		fBaseRenderer->set_clipping_region(fClippingRegion);
 
 		// These are the AGG renderes and rasterizes which
 		// will be used for stroking paths
@@ -135,7 +136,7 @@ rgb_color color = fPatternHandler->HighColor().GetColor32();
 		fFontRendererBin = new font_renderer_bin_type(*fBaseRenderer);
 
 		_SetRendererColor(fPatternHandler->HighColor().GetColor32());
-		_RebuildClipping();
+//		_RebuildClipping();
 	}
 }
 
@@ -176,11 +177,14 @@ Painter::ConstrainClipping(const BRegion& region)
 	// never constrained, there is *no* clipping.
 	// This is of course different from having
 	// an *empty* clipping region.
-	if (!fClippingRegion)
+	if (!fClippingRegion) {
 		fClippingRegion = new BRegion(region);
-	else
+		// attach the base renderer to our clipping region
+		if (fBaseRenderer)
+			fBaseRenderer->set_clipping_region(fClippingRegion);
+	} else
 		*fClippingRegion = region;
-	_RebuildClipping();
+//	_RebuildClipping();
 }
 
 // SetHighColor
@@ -203,7 +207,7 @@ Painter::SetScale(float scale)
 {
 	if (fScale != scale) {
 		fScale = scale;
-		_RebuildClipping();
+//		_RebuildClipping();
 		_UpdateLineWidth();
 	}
 }
@@ -229,7 +233,7 @@ Painter::SetOrigin(const BPoint& origin)
 	// I don't know yet what actually happens if you still
 	// try to call SetOrigin() from within BView::Draw()
 	fOrigin = origin;
-	_RebuildClipping();
+//	_RebuildClipping();
 }
 
 // SetDrawingMode
@@ -310,12 +314,14 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 	SetPenSize(context->pensize);
 	float penSize = _Transform(fPenSize);
 
-	BRect touched(a, b);
+	BRect touched(min_c(a.x, b.x), min_c(a.y, b.y),
+				  max_c(a.x, b.x), max_c(a.y, b.y));
 
 	// This is supposed to stop right here if we can see
 	// that we're definitaly outside the clipping reagion.
-	// It is not really correct, but fast and only triggers
-	// unnecessary calculation in a few edge cases
+	// Extending by penSize like that is not really correct, 
+	// but fast and only triggers unnecessary calculation
+	// in a few edge cases
 	touched.InsetBy(-(penSize - 1), -(penSize - 1));
 	if (!touched.Intersects(fClippingRegion->Frame())) {
 		touched.Set(0.0, 0.0, -1.0, -1.0);
@@ -1061,7 +1067,7 @@ Painter::_Clipped(const BRect& rect) const
 }
 
 // #pragma mark -
-
+/*
 // _RebuildClipping
 void
 Painter::_RebuildClipping()
@@ -1099,7 +1105,7 @@ Painter::_RebuildClipping()
 			}
 		}
 	}
-}
+}*/
 
 // _UpdateFont
 void

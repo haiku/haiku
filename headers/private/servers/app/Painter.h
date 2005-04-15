@@ -255,7 +255,7 @@ class Painter {
 			BRect				_Transform(const BRect& rect) const;
 			BRect				_Clipped(const BRect& rect) const;
 
-			void				_RebuildClipping();
+//			void				_RebuildClipping();
 
 			void				_UpdateFont();
 			void				_UpdateLineWidth();
