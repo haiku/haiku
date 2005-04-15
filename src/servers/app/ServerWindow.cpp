@@ -1389,7 +1389,7 @@ cl->fBoundsLeftTop.PrintToStream();
 			BRect converted(cl->ConvertToTop(invalRect.LeftTop()),
 							cl->ConvertToTop(invalRect.RightBottom()));
 
-			myRootLayer->GoRedraw(cl, BRegion(converted));
+			myRootLayer->GoRedraw(fWinBorder, BRegion(converted));
 			break;
 		}
 		case AS_LAYER_INVAL_REGION:
