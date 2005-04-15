@@ -37,7 +37,7 @@ class HelloView : public BView {
 
 						message = "to draw a line!";
 						width = StringWidth(message);
-						p. x = r.left + r.Width() / 2.0 - width / 2.0;
+						p.x = r.left + r.Width() / 2.0 - width / 2.0;
 						p.y += 20;
 
 						DrawString(message, p);
