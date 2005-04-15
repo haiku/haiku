@@ -33,7 +33,7 @@ class ServerFont;
 //   there is actually no reason to lock the DisplayDriver. Multiple
 //   threads drawing in the frame buffer at the same time is actually
 //   only bad if their drawing could overlap, but this is already
-//   prevented by the clipping regions (access to those need to be
+//   prevented by the clipping regions (access to those needs to be
 //   locked).
 //   Making Painter thread safe could introduce some overhead, since
 //   some of the current members of Painter would need to be created
@@ -224,6 +224,7 @@ class Painter {
 			void				_UpdateFont();
 			void				_UpdateLineWidth();
 			void				_UpdateDrawingMode();
+			void				_SetRendererColor(const rgb_color& color) const;
 
 								// drawing functions stroke/fill
 			BRect				_DrawTriangle(	BPoint pt1,
@@ -261,8 +262,6 @@ class Painter {
 			BRect				_StrokePath(VertexSource& path) const;
 			template<class VertexSource>
 			BRect				_FillPath(VertexSource& path) const;
-
-			void				_SetRendererColor(const rgb_color& color) const;
 
 	agg::rendering_buffer*		fBuffer;
 
