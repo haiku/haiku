@@ -279,8 +279,10 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 	// do this as well, and it is probably hard to calculate
 	// the correct location outside of AGGTextRenderer...
 
-	_Transform(&a);
-	_Transform(&b);
+	// "false" means not to do the pixel center offset,
+	// because it would mess up our optimized versions
+	_Transform(&a, false);
+	_Transform(&b, false);
 
 	SetPenSize(context->pensize);
 
@@ -316,6 +318,12 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 			return _Clipped(touched);
 		}
 	}
+
+	// do the pixel center offset here
+	a.x += 0.5;
+	a.y += 0.5;
+	b.x += 0.5;
+	b.y += 0.5;
 
 	agg::path_storage path;
 	path.move_to(a.x, a.y);
