@@ -340,7 +340,6 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 			return _Clipped(touched);
 		}
 	}
-//printf("StrokeLine((%.2f, %.2f)->(%.2f, %.2f)) -> AGG version\n", a.x, a.y, b.x, b.y);
 	// do the pixel center offset here
 	a.x += 0.5;
 	a.y += 0.5;
@@ -529,8 +528,9 @@ Painter::FillShape(/*const */BShape* shape) const
 BRect
 Painter::StrokeRect(const BRect& r) const
 {
-	BPoint a(r.left, r.top);
-	BPoint b(r.right, r.bottom);
+	// support invalid rects
+	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
+	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
 	_Transform(&a);
 	_Transform(&b);
 
@@ -579,8 +579,9 @@ Painter::StrokeRect(const BRect& r, const rgb_color& c) const
 BRect
 Painter::FillRect(const BRect& r) const
 {
-	BPoint a(r.left, r.top);
-	BPoint b(r.right, r.bottom);
+	// support invalid rects
+	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
+	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
 	_Transform(&a, false);
 	_Transform(&b, false);
 
@@ -990,8 +991,8 @@ BRect
 Painter::_Clipped(const BRect& rect) const
 {
 	if (rect.IsValid() && fClippingRegion)
-		return rect & fClippingRegion->Frame();
-	return rect;
+		return BRect(rect & fClippingRegion->Frame());
+	return BRect(rect);
 }
 
 // _UpdateFont

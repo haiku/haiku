@@ -547,10 +547,13 @@ DisplayDriverPainter::FillRect(const BRect &r, const RGBColor &color)
 {
 	if (Lock()) {
 
-		fPainter->SetHighColor(color);
-		BRect touched = fPainter->FillRect(r);
+		fPainter->FillRect(r, color.GetColor32());
+		BRect touched(min_c(r.left, r.right),
+					  min_c(r.top, r.bottom),
+					  max_c(r.left, r.right),
+					  max_c(r.top, r.bottom));
 
-		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->Invalidate(fPainter->ClipRect(touched));
 
 		Unlock();
 	}
@@ -712,7 +715,11 @@ DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const R
 			context.draw_mode = B_OP_COPY;
 			StrokeLine(start, end, &context);
 		} else {
-			fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(start, end)));
+			BRect touched(min_c(start.x, end.x),
+						  min_c(start.y, end.y),
+						  max_c(start.x, end.x),
+						  max_c(start.y, end.y));
+			fGraphicsCard->Invalidate(fPainter->ClipRect(touched));
 		}
 		Unlock();
 	}
@@ -769,16 +776,22 @@ void
 DisplayDriverPainter::StrokeRect(const BRect &r, const RGBColor &color)
 {
 	if (Lock()) {
-		fPainter->StrokeRect(r, color.GetColor32());
+		// support invalid rects
+		BRect vr(min_c(r.left, r.right),
+				 min_c(r.top, r.bottom),
+				 max_c(r.left, r.right),
+				 max_c(r.top, r.bottom));
 
-		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top,
-														   r.right, r.top)));
-		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top + 1,
-														   r.left, r.bottom - 1)));
-		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.right, r.top + 1,
-														   r.right, r.bottom - 1)));
-		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.bottom,
-														   r.right, r.bottom)));
+		fPainter->StrokeRect(vr, color.GetColor32());
+
+		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(vr.left, vr.top,
+														   vr.right, vr.top)));
+		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(vr.left, vr.top + 1,
+														   vr.left, vr.bottom - 1)));
+		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(vr.right, vr.top + 1,
+														   vr.right, vr.bottom - 1)));
+		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(vr.left, vr.bottom,
+														   vr.right, vr.bottom)));
 
 		Unlock();
 	}
