@@ -6,7 +6,7 @@
 #include <agg_rasterizer_outline.h>
 #include <agg_rasterizer_outline_aa.h>
 #include <agg_rasterizer_scanline_aa.h>
-#include <agg_renderer_mclip.h>
+//#include <agg_renderer_mclip.h>
 #include <agg_renderer_outline_aa.h>
 #include <agg_renderer_primitives.h>
 #include <agg_renderer_scanline.h>
@@ -15,6 +15,8 @@
 #include <agg_scanline_u.h>
 #include <agg_rendering_buffer.h>
 
+#include "agg_renderer_region.h"
+
 //#include "_for_reference_.h"
 #include "forwarding_pixfmt.h"
 
@@ -22,7 +24,7 @@
 
 //	typedef agg::pixfmt_bgra32									pixfmt;
 	typedef forwarding_pixel_format<agg::order_bgra32>			pixfmt;
-	typedef agg::renderer_mclip<pixfmt>							renderer_base;
+	typedef agg::renderer_region<pixfmt>						renderer_base;
 
 #if ALIASED_DRAWING
 	typedef agg::renderer_primitives<renderer_base>				outline_renderer_type;
