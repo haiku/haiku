@@ -70,6 +70,7 @@ class ServerBitmap {
 								{ return fBuffer; }
 
 	inline	uint32			BitsLength() const;
+								{ return (uint32)(fBytesPerRow * fHeight); }
 
 	inline	BRect			Bounds() const
 								{ return BRect(0, 0, fWidth - 1, fHeight - 1); }

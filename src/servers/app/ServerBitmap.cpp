@@ -89,16 +89,6 @@ ServerBitmap::~ServerBitmap()
 {
 }
 
-/*!
-	\brief Gets the number of bytes occupied by the bitmap, including padding bytes.
-	\return The number of bytes occupied by the bitmap, including padding.
-*/
-uint32
-ServerBitmap::BitsLength(void) const
-{
-	return (uint32)(fBytesPerRow * fHeight);
-}
-
 /*! 
 	\brief Internal function used by subclasses
 	
