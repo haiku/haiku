@@ -241,7 +241,7 @@ AGGTextRenderer::RenderString(const char* string,
 
 		for (int32 i = 0; i < dstLength / 2; i++) {
 
-			// line break
+/*			// line break (not supported by R5)
 			if (*p == '\n') {
 				y0 += LineOffset();
 				x = 0.0;
@@ -250,8 +250,7 @@ AGGTextRenderer::RenderString(const char* string,
 				advanceY = 0.0;
 				++p;
 				continue;
-			}
-
+			}*/
 
 			const agg::glyph_cache* glyph = fFontManager.glyph(*p);
 
