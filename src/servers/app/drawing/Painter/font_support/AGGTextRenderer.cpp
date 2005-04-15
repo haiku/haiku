@@ -17,8 +17,7 @@
 #include <agg_conv_segmentator.h>
 #include <agg_conv_transform.h>
 //#include <agg_rendering_buffer.h>
-#include <agg_scanline_u.h>
-#include <agg_scanline_bin.h>
+//#include <agg_scanline_bin.h>
 //#include <agg_renderer_mclip.h>
 //#include <agg_renderer_scanline.h>
 //#include <agg_renderer_primitives.h>
@@ -205,21 +204,13 @@ AGGTextRenderer::RenderString(const char* string,
 
 	BRect bounds(0.0, 0.0, -1.0, -1.0);
 
-	typedef agg::conv_curve<font_manager_type::path_adaptor_type>			conv_font_curve_type;
-//	typedef agg::conv_segmentator<conv_font_curve_type>						conv_font_segm_type;
-//	typedef agg::conv_transform<conv_font_segm_type, agg::trans_affine>		conv_font_trans_type;
+	fCurves.approximation_scale(transform.scale());
+
+	// use a transformation behind the curves
+	// (only if glyph->data_type == agg::glyph_data_outline)
+	// in the pipeline for the rasterizer
 	typedef agg::conv_transform<conv_font_curve_type, agg::trans_affine>	conv_font_trans_type;
-	
-	agg::scanline_u8 sl;
-	agg::rasterizer_scanline_aa<> ras;
-
-
-	conv_font_curve_type fcurves(fFontManager.path_adaptor());
-	fcurves.approximation_scale(transform.scale());
-//	conv_font_segm_type  fsegm(fcurves);
-//	conv_font_trans_type ftrans(fsegm, transform);
-	conv_font_trans_type ftrans(fcurves, transform);
-
+	conv_font_trans_type ftrans(fCurves, transform);
 
 	int32 srcLength = min_c(length, strlen(string));
 	int32 dstLength = srcLength * 4;
@@ -282,7 +273,6 @@ AGGTextRenderer::RenderString(const char* string,
 					// we cannot use the transformation pipeline
 					double transformedX = x + transformOffset.x;
 					double transformedY = y + transformOffset.y;
-//printf("x: %f, y: %f\n", transformedX, transformedY);
 					fFontManager.init_embedded_adaptors(glyph,
 														transformedX,
 														transformedY);
@@ -294,7 +284,7 @@ AGGTextRenderer::RenderString(const char* string,
 
 				// render glyph and update touched area
 				if (!dryRun && clippingFrame.Intersects(glyphBounds)) {
-					switch(glyph->data_type) {
+					switch (glyph->data_type) {
 						case agg::glyph_data_mono:
 							agg::render_scanlines(fFontManager.mono_adaptor(), 
 												  fFontManager.mono_scanline(), 
@@ -308,7 +298,7 @@ AGGTextRenderer::RenderString(const char* string,
 							break;
 		
 						case agg::glyph_data_outline:
-							ras.reset();
+							fRasterizer.reset();
 		// NOTE: this function can be easily extended to handle
 		// conversion to contours, to that's why there is a lot of
 		// commented out code, I leave here because I think it
@@ -318,16 +308,16 @@ AGGTextRenderer::RenderString(const char* string,
 							// For the sake of efficiency skip the
 							// contour converter if the weight is about zero.
 							//-----------------------
-	//							ras.add_path(fCurves);
-								ras.add_path(ftrans);
+	//							fRasterizer.add_path(fCurves);
+								fRasterizer.add_path(ftrans);
 	/*						} else {
-	//							ras.add_path(fContour);
-								ras.add_path(ftrans);
+	//							fRasterizer.add_path(fContour);
+								fRasterizer.add_path(ftrans);
 							}*/
 							if (fAntialias) {
-								agg::render_scanlines(ras, sl, *solidRenderer);
+								agg::render_scanlines(fRasterizer, fScanline, *solidRenderer);
 							} else {
-								agg::render_scanlines(ras, sl, *binRenderer);
+								agg::render_scanlines(fRasterizer, fScanline, *binRenderer);
 							}
 							break;
 						default:
@@ -346,12 +336,8 @@ AGGTextRenderer::RenderString(const char* string,
 		// put pen location behind rendered text
 		// (at the baseline of the virtual next glyph)
 		if (nextCharPos) {
-			x += fAdvanceScale * advanceX;
-			if (advanceX > 0.0 && fAdvanceScale > 1.0)
-				x += (fAdvanceScale - 1.0) * fFontEngine.height();
-			y += advanceY;
-			nextCharPos->x = x;
-			nextCharPos->y = y;
+			nextCharPos->x = x + advanceX;
+			nextCharPos->y = y + advanceY;
 		}
 	} else {
 		fprintf(stderr, "UTF8 -> Unicode conversion failed: %s\n", strerror(ret));

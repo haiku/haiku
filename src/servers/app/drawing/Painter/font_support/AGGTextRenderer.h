@@ -5,6 +5,7 @@
 
 #include <agg_conv_curve.h>
 #include <agg_conv_contour.h>
+#include <agg_scanline_u.h>
 
 #include "agg_font_freetype.h"
 #include "defines.h"
@@ -44,17 +45,19 @@ class AGGTextRenderer : public TextRenderer {
 
 	typedef agg::font_engine_freetype_int32				font_engine_type;
 	typedef agg::font_cache_manager<font_engine_type>	font_manager_type;
+	typedef agg::conv_curve<font_manager_type::path_adaptor_type>
+														conv_font_curve_type;
+	typedef agg::conv_contour<conv_font_curve_type>		conv_font_contour_type;
 
-			font_engine_type	fFontEngine;
-			font_manager_type	fFontManager;
+	font_engine_type			fFontEngine;
+	font_manager_type			fFontManager;
 
 	// Pipeline to process the vectors glyph paths (curves + contour)
-	agg::conv_curve<font_manager_type::path_adaptor_type>
-								fCurves;
-	agg::conv_contour<agg::conv_curve<font_manager_type::path_adaptor_type> >
-								fContour;
+	conv_font_curve_type		fCurves;
+	conv_font_contour_type		fContour;
 
-			BRect				fBounds;
+	agg::scanline_u8			fScanline;
+	agg::rasterizer_scanline_aa<>	fRasterizer;;
 };
 
 #endif // AGG_TEXT_RENDERER_H
