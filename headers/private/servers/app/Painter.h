@@ -26,7 +26,8 @@ class ServerFont;
 // * most all functions should take a DrawData* context parameter instead
 //   of the current pattern argument, that way, each function can
 //	 decide for itself, which pieces of information in DrawData it
-//   needs
+//   needs -> well I'm not so sure about this, there could also
+//   be a DrawData member in Painter fGraphicsState or something...
 // * Painter itself should be made thread safe. Because no
 //   ServerWindow is supposed to draw outside of its clipping region,
 //   there is actually no reason to lock the DisplayDriver. Multiple
@@ -66,6 +67,8 @@ class Painter {
 			void				SetDrawingMode(drawing_mode mode);
 			void				SetBlendingMode(source_alpha alphaSrcMode,
 												alpha_function alphaFncMode);
+			void				SetPattern(const pattern& p);
+
 			void				SetPenLocation(const BPoint& location);
 			void				SetFont(const BFont& font);
 			void				SetFont(const ServerFont& font);
@@ -220,6 +223,7 @@ class Painter {
 
 			void				_UpdateFont();
 			void				_UpdateLineWidth();
+			void				_UpdateDrawingMode();
 
 								// drawing functions stroke/fill
 			BRect				_DrawTriangle(	BPoint pt1,
@@ -258,7 +262,6 @@ class Painter {
 			template<class VertexSource>
 			BRect				_FillPath(VertexSource& path) const;
 
-			void				_SetPattern(const pattern& p) const;
 			void				_SetRendererColor(const rgb_color& color) const;
 
 	agg::rendering_buffer*		fBuffer;

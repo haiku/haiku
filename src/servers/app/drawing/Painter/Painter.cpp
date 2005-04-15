@@ -153,14 +153,25 @@ Painter::SetDrawData(const DrawData* data)
 	SetHighColor(data->highcolor.GetColor32());
 	SetLowColor(data->lowcolor.GetColor32());
 	SetPenSize(data->pensize);
-	SetDrawingMode(data->draw_mode);
-	SetBlendingMode(data->alphaSrcMode, data->alphaFncMode);
 	SetPenLocation(data->penlocation);
 	SetFont(data->font);
 //	if (data->clipReg) {
 //		ConstrainClipping(*data->clipReg);
 //	}
+	// any of these conditions means we need to use a different drawing
+	// mode instance
+	bool updateDrawingMode = !(data->patt == fPatternHandler->GetPattern()) ||
+		data->draw_mode != fDrawingMode ||
+		(data->draw_mode == B_OP_ALPHA && (data->alphaSrcMode != fAlphaSrcMode ||
+										   data->alphaFncMode != fAlphaFncMode));
+
+	fDrawingMode = data->draw_mode;
+	fAlphaSrcMode = data->alphaSrcMode;
+	fAlphaFncMode = data->alphaFncMode;
 	fPatternHandler->SetPattern(data->patt);
+
+	if (updateDrawingMode)
+		_UpdateDrawingMode();
 }
 
 // #pragma mark -
@@ -213,11 +224,7 @@ Painter::SetDrawingMode(drawing_mode mode)
 {
 	if (fDrawingMode != mode) {
 		fDrawingMode = mode;
-		if (fPixelFormat) {
-			fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
-																			  fAlphaSrcMode,
-																			  fAlphaFncMode));
-		}
+		_UpdateDrawingMode();
 	}
 }
 
@@ -228,11 +235,18 @@ Painter::SetBlendingMode(source_alpha alphaSrcMode, alpha_function alphaFncMode)
 	if (fAlphaSrcMode != alphaSrcMode || fAlphaFncMode != alphaFncMode) {
 		fAlphaSrcMode = alphaSrcMode;
 		fAlphaFncMode = alphaFncMode;
-		if (fDrawingMode == B_OP_ALPHA && fPixelFormat) {
-			fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
-																			  fAlphaSrcMode,
-																			  fAlphaFncMode));
-		}
+		if (fDrawingMode == B_OP_ALPHA)
+			_UpdateDrawingMode();
+	}
+}
+
+// SetPattern
+void
+Painter::SetPattern(const pattern& p)
+{
+	if (!(p == *fPatternHandler->GetR5Pattern())) {
+		fPatternHandler->SetPattern(p);
+		_UpdateDrawingMode();
 	}
 }
 
@@ -999,6 +1013,36 @@ Painter::_UpdateLineWidth()
 	fLineProfile.width(fPenSize);	
 }
 
+// _UpdateDrawingMode
+void
+Painter::_UpdateDrawingMode()
+{
+	if (fPixelFormat) {
+		DrawingMode* mode = NULL;
+		pattern p = *fPatternHandler->GetR5Pattern();
+		if (p == B_SOLID_HIGH) {
+			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
+			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
+													  fAlphaSrcMode,
+													  fAlphaFncMode,
+													  true);
+		} else if (p == B_SOLID_LOW) {
+			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
+			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
+													  fAlphaSrcMode,
+													  fAlphaFncMode,
+													  true);
+		} else {
+			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
+													  fAlphaSrcMode,
+													  fAlphaFncMode,
+													  false);
+		}
+		fPixelFormat->set_drawing_mode(mode);
+	}
+		
+}
+
 // #pragma mark -
 
 // _DrawTriangle
@@ -1280,39 +1324,6 @@ Painter::_FillPath(VertexSource& path) const
 	agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
 
 	return _Clipped(_BoundingBox(path));
-}
-
-// _SetPattern
-void
-Painter::_SetPattern(const pattern& p) const
-{
-// TODO: currently unused, purpose is to construct
-// special drawing mode instances that work on solid patterns
-// currently, there is only such a thing for B_OP_COPY
-	if (!(p == *fPatternHandler->GetR5Pattern())) {
-printf("Painter::_SetPattern()\n");
-		fPatternHandler->SetPattern(p);
-		DrawingMode* mode = NULL;
-		if (p == B_SOLID_HIGH) {
-			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
-			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
-													  fAlphaSrcMode,
-													  fAlphaFncMode,
-													  true);
-		} else if (p == B_SOLID_LOW) {
-			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
-			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
-													  fAlphaSrcMode,
-													  fAlphaFncMode,
-													  true);
-		} else {
-			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
-													  fAlphaSrcMode,
-													  fAlphaFncMode,
-													  false);
-		}
-		fPixelFormat->set_drawing_mode(mode);
-	}
 }
 
 // _SetRendererColor

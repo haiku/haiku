@@ -66,6 +66,10 @@ class Pattern {
 
 			Pattern&			operator=(const pattern &from)
 									{ memcpy(&fPattern.type64, &from, sizeof(pattern)); return *this; }
+
+			bool				operator==(const Pattern& other) const
+									{ return fPattern.type64 == other.fPattern.type64; }
+
  private:
 
 	typedef union
@@ -128,6 +132,8 @@ class PatternHandler {
 
 			const pattern*		GetR5Pattern(void) const
 									{ return (const pattern*)fPattern.GetInt8(); }
+			const Pattern&		GetPattern(void) const
+									{ return fPattern; }
  private:
 			Pattern				fPattern;
 			RGBColor			fHighColor;
