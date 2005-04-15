@@ -47,7 +47,6 @@ DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 		// and low color are treated equally
 		case B_OP_COPY:
 			if (solid) {
-printf("DrawingModeBGRA32CopySolid()\n");
 				return new DrawingModeBGRA32CopySolid();
 			} else
 				return new DrawingModeBGRA32Copy();

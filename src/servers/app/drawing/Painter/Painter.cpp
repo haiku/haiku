@@ -314,11 +314,12 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 		return touched;
 	}
 
-	SetHighColor(context->highcolor.GetColor32());
-	SetLowColor(context->lowcolor.GetColor32());
-	SetDrawingMode(context->draw_mode);
-	SetBlendingMode(context->alphaSrcMode, context->alphaFncMode);
-	fPatternHandler->SetPattern(context->patt);
+//	SetHighColor(context->highcolor.GetColor32());
+//	SetLowColor(context->lowcolor.GetColor32());
+//	SetDrawingMode(context->draw_mode);
+//	SetBlendingMode(context->alphaSrcMode, context->alphaFncMode);
+//	fPatternHandler->SetPattern(context->patt);
+	SetDrawData(context);
 
 	// first, try an optimized version
 	if (fPenSize == 1.0 &&
@@ -779,7 +780,8 @@ Painter::DrawString(const char* utf8String, uint32 length,
 					BPoint baseLine, const escapement_delta* delta)
 {
 	BRect bounds(0.0, 0.0, -1.0, -1.0);
-	fPatternHandler->SetPattern(B_SOLID_HIGH);
+
+	SetPattern(B_SOLID_HIGH);
 
 	if (fBuffer) {
 
@@ -1017,8 +1019,19 @@ Painter::_UpdateLineWidth()
 void
 Painter::_UpdateDrawingMode()
 {
+	// The AGG renderers have their own color setting, however
+	// almost all drawing mode classes ignore the color given
+	// by the AGG renderer and use the colors from the PatternHandler
+	// instead. If we have a B_SOLID_* pattern, we can actually use
+	// the color in the renderer and special versions of drawing modes
+	// that don't use PatternHandler and are more efficient. This
+	// has been implemented for B_OP_COPY as of now, the last parameter
+	// to DrawingModeFor() is a flag if a special "solid" drawing mode
+	// should be used if available. In this case, _SetRendererColor()
+	// has to be called so that all internal colors in the renderes
+	// are up to date for use by the solid drawing mode version.
 	if (fPixelFormat) {
-/*		DrawingMode* mode = NULL;
+		DrawingMode* mode = NULL;
 		pattern p = *fPatternHandler->GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
@@ -1038,13 +1051,39 @@ Painter::_UpdateDrawingMode()
 													  fAlphaFncMode,
 													  false);
 		}
-		fPixelFormat->set_drawing_mode(mode);*/
-		fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
-													  fAlphaSrcMode,
-													  fAlphaFncMode,
-													  false));
+		fPixelFormat->set_drawing_mode(mode);
 	}
 		
+}
+
+// _SetRendererColor
+void
+Painter::_SetRendererColor(const rgb_color& color) const
+{
+
+	if (fOutlineRenderer)
+#if ALIASED_DRAWING
+		fOutlineRenderer->line_color(agg::rgba(color.red / 255.0,
+											   color.green / 255.0,
+											   color.blue / 255.0));
+#else
+		fOutlineRenderer->color(agg::rgba(color.red / 255.0,
+										  color.green / 255.0,
+										  color.blue / 255.0));
+#endif
+	if (fRenderer)
+		fRenderer->color(agg::rgba(color.red / 255.0,
+								   color.green / 255.0,
+								   color.blue / 255.0));
+	if (fFontRendererSolid)
+		fFontRendererSolid->color(agg::rgba(color.red / 255.0,
+											color.green / 255.0,
+											color.blue / 255.0));
+	if (fFontRendererBin)
+		fFontRendererBin->color(agg::rgba(color.red / 255.0,
+										  color.green / 255.0,
+										  color.blue / 255.0));
+
 }
 
 // #pragma mark -
@@ -1330,32 +1369,3 @@ Painter::_FillPath(VertexSource& path) const
 	return _Clipped(_BoundingBox(path));
 }
 
-// _SetRendererColor
-void
-Painter::_SetRendererColor(const rgb_color& color) const
-{
-
-	if (fOutlineRenderer)
-#if ALIASED_DRAWING
-		fOutlineRenderer->line_color(agg::rgba(color.red / 255.0,
-											   color.green / 255.0,
-											   color.blue / 255.0));
-#else
-		fOutlineRenderer->color(agg::rgba(color.red / 255.0,
-										  color.green / 255.0,
-										  color.blue / 255.0));
-#endif
-	if (fRenderer)
-		fRenderer->color(agg::rgba(color.red / 255.0,
-								   color.green / 255.0,
-								   color.blue / 255.0));
-	if (fFontRendererSolid)
-		fFontRendererSolid->color(agg::rgba(color.red / 255.0,
-											color.green / 255.0,
-											color.blue / 255.0));
-	if (fFontRendererBin)
-		fFontRendererBin->color(agg::rgba(color.red / 255.0,
-										  color.green / 255.0,
-										  color.blue / 255.0));
-
-}
