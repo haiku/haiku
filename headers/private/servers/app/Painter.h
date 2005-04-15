@@ -76,9 +76,7 @@ class Painter {
 	inline	void				SetLowColor(const RGBColor& color)
 									{ SetLowColor(color.GetColor32()); }
 
-			void				SetScale(float scale);
 			void				SetPenSize(float size);
-			void				SetOrigin(const BPoint& origin);
 			void				SetDrawingMode(drawing_mode mode);
 			void				SetBlendingMode(source_alpha alphaSrcMode,
 												alpha_function alphaFncMode);
@@ -249,10 +247,6 @@ class Painter {
 										   bool centerOffset = true) const;
 			BPoint				_Transform(const BPoint& point,
 										   bool centerOffset = true) const;
-			void				_Transform(float* width) const;
-			float				_Transform(const float& width) const;
-			void				_Transform(BRect* rect) const;
-			BRect				_Transform(const BRect& rect) const;
 			BRect				_Clipped(const BRect& rect) const;
 
 //			void				_RebuildClipping();
@@ -329,9 +323,7 @@ class Painter {
 	// does not concern rendering
 	bool						fSubpixelPrecise;
 
-	float						fScale;
 	float						fPenSize;
-	BPoint						fOrigin;
 	BRegion*					fClippingRegion; // NULL indicates no clipping at all
 	drawing_mode				fDrawingMode;
 	source_alpha				fAlphaSrcMode;

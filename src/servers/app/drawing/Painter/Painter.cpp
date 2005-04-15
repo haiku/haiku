@@ -54,9 +54,7 @@ Painter::Painter()
 	  fFontRendererBin(NULL),
 	  fLineProfile(),
 	  fSubpixelPrecise(false),
-	  fScale(1.0),
 	  fPenSize(1.0),
-	  fOrigin(0.0, 0.0),
 	  fClippingRegion(NULL),
 	  fDrawingMode(B_OP_COPY),
 	  fAlphaSrcMode(B_PIXEL_ALPHA),
@@ -154,9 +152,7 @@ Painter::SetDrawData(const DrawData* data)
 	// for now...
 	SetHighColor(data->highcolor.GetColor32());
 	SetLowColor(data->lowcolor.GetColor32());
-	SetScale(data->scale);
 	SetPenSize(data->pensize);
-//	fOrigin = data->coordOrigin;
 	SetDrawingMode(data->draw_mode);
 	SetBlendingMode(data->alphaSrcMode, data->alphaFncMode);
 	SetPenLocation(data->penlocation);
@@ -201,17 +197,6 @@ Painter::SetLowColor(const rgb_color& color)
 	fPatternHandler->SetLowColor(color);;
 }
 
-// SetScale
-void
-Painter::SetScale(float scale)
-{
-	if (fScale != scale) {
-		fScale = scale;
-//		_RebuildClipping();
-		_UpdateLineWidth();
-	}
-}
-
 // SetPenSize
 void
 Painter::SetPenSize(float size)
@@ -220,20 +205,6 @@ Painter::SetPenSize(float size)
 		fPenSize = size;
 		_UpdateLineWidth();
 	}
-}
-
-// SetOrigin
-void
-Painter::SetOrigin(const BPoint& origin)
-{
-	// NOTE: The BeBook says that the coordinate system
-	// of a view cannot be changed during an update, because
-	// it would mess up the clipping, and this is indeed
-	// what would happen in this implementation as well.
-	// I don't know yet what actually happens if you still
-	// try to call SetOrigin() from within BView::Draw()
-	fOrigin = origin;
-//	_RebuildClipping();
 }
 
 // SetDrawingMode
@@ -312,7 +283,6 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 	_Transform(&b);
 
 	SetPenSize(context->pensize);
-	float penSize = _Transform(fPenSize);
 
 	BRect touched(min_c(a.x, b.x), min_c(a.y, b.y),
 				  max_c(a.x, b.x), max_c(a.y, b.y));
@@ -322,7 +292,7 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 	// Extending by penSize like that is not really correct, 
 	// but fast and only triggers unnecessary calculation
 	// in a few edge cases
-	touched.InsetBy(-(penSize - 1), -(penSize - 1));
+	touched.InsetBy(-(fPenSize - 1), -(fPenSize - 1));
 	if (!touched.Intersects(fClippingRegion->Frame())) {
 		touched.Set(0.0, 0.0, -1.0, -1.0);
 		return touched;
@@ -335,7 +305,7 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 	fPatternHandler->SetPattern(context->patt);
 
 	// first, try an optimized version
-	if (penSize == 1.0 &&
+	if (fPenSize == 1.0 &&
 		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
 		pattern pat = *fPatternHandler->GetR5Pattern();
 		if (pat == B_SOLID_HIGH &&
@@ -361,7 +331,7 @@ BRect
 Painter::StrokeLine(BPoint b, DrawData* context)
 {
 	// TODO: move this function elsewhere
-	return StrokeLine(context->penlocation, context);
+	return StrokeLine(context->penlocation, b, context);
 }
 
 // StraightLine
@@ -535,8 +505,7 @@ Painter::StrokeRect(const BRect& r, const pattern& p) const
 	_Transform(&b);
 
 	// first, try an optimized version
-	float penSize = _Transform(fPenSize);
-	if (penSize == 1.0 &&
+	if (fPenSize == 1.0 &&
 		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
 // TODO: fix me
 //		pattern p = *fPatternHandler->GetR5Pattern();
@@ -660,9 +629,6 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius,
 	_Transform(&lt);
 	_Transform(&rb);
 
-	_Transform(&xRadius);
-	_Transform(&yRadius);
-
 	agg::rounded_rect rect;
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
 	rect.radius(xRadius, yRadius);
@@ -685,9 +651,6 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius,
 	// to the bottom-right (.9999, .9999) corner of pixels
 	rb.x += 1.0;
 	rb.y += 1.0;
-
-	_Transform(&xRadius);
-	_Transform(&yRadius);
 
 	agg::rounded_rect rect;
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
@@ -718,8 +681,6 @@ Painter::StrokeArc(BPoint center, float xRadius, float yRadius,
 				   float angle, float span, const pattern& p) const
 {
 	_Transform(&center);
-	_Transform(&xRadius);
-	_Transform(&yRadius);
 
 	double angleRad = (angle * PI) / 180.0;
 	double spanRad = (span * PI) / 180.0;
@@ -737,8 +698,6 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 				 float angle, float span, const pattern& p) const
 {
 	_Transform(&center);
-	_Transform(&xRadius);
-	_Transform(&yRadius);
 
 	double angleRad = (angle * PI) / 180.0;
 	double spanRad = (span * PI) / 180.0;
@@ -812,12 +771,10 @@ Painter::DrawString(const char* utf8String, uint32 length,
 //		transform.ShearBy(B_ORIGIN, fFont.Shear(), 0.0);
 		transform.RotateBy(B_ORIGIN, -fFont.Rotation());
 		transform.TranslateBy(baseLine);
-		transform.ScaleBy(B_ORIGIN, fScale, fScale);
-		transform.TranslateBy(fOrigin);
 
 		BRect clippingFrame;
 		if (fClippingRegion)
-			clippingFrame = _Transform(fClippingRegion->Frame());
+			clippingFrame = fClippingRegion->Frame();
 
 		bounds = fTextRenderer->RenderString(utf8String,
 											 length,
@@ -827,11 +784,6 @@ Painter::DrawString(const char* utf8String, uint32 length,
 											 clippingFrame,
 											 false,
 											 &fPenLocation);
-		// pen location is not transformed in quite the same way,
-		// or transformations would add up
-		transform.Reset();
-		transform.RotateBy(B_ORIGIN, -fFont.Rotation());
-		transform.TranslateBy(baseLine);
 		transform.Transform(&fPenLocation);
 	}
 	return _Clipped(bounds);
@@ -919,9 +871,7 @@ Painter::InvertRect(const BRect& r) const
 	// implementation only for B_RGB32 at the moment
 	int32 count = region.CountRects();
 	for (int32 i = 0; i < count; i++) {
-		BRect r = region.RectAt(i);
-		_Transform(&r);
-		_InvertRect32(r);
+		_InvertRect32(region.RectAt(i));
 	}
 }
 
@@ -982,16 +932,12 @@ Painter::_MakeEmpty()
 void
 Painter::_Transform(BPoint* point, bool centerOffset) const
 {
-	*point += fOrigin;
 	// rounding
 	if (!fSubpixelPrecise) {
 		// TODO: validate usage of floor() for values < 0
 		point->x = floorf(point->x);
 		point->y = floorf(point->y);
 	}
-	// apply the scale
-	point->x *= fScale;
-	point->y *= fScale;
 	// this code is supposed to move coordinates to the center of pixels,
 	// as AGG considers (0,0) to be the "upper left corner" of a pixel,
 	// but BViews are less strict on those details
@@ -1010,59 +956,12 @@ Painter::_Transform(const BPoint& point, bool centerOffset) const
 	return ret;
 }
 
-// _Transform
-void
-Painter::_Transform(float* width) const
-{
-	*width *= fScale;
-	if (*width < 1)
-		*width = 1;
-}
-
-// _Transform
-float
-Painter::_Transform(const float& width) const
-{
-	float w = width * fScale;
-	if (w < 1)
-		w = 1;
-	return w;
-}
-
-// _Transform
-void
-Painter::_Transform(BRect* rect) const
-{
-	// TODO integrate this function more
-	rect->right++;
-	rect->bottom++;
-	rect->left += fOrigin.x;
-	rect->top += fOrigin.y;
-	rect->right += fOrigin.x;
-	rect->bottom += fOrigin.y;
-	rect->left *= fScale;
-	rect->top *= fScale;
-	rect->right *= fScale;
-	rect->bottom *= fScale;
-	rect->right--;
-	rect->bottom--;
-}
-
-// _Transform
-BRect
-Painter::_Transform(const BRect& rect) const
-{
-	BRect ret = rect;
-	_Transform(&ret);
-	return ret;
-}
-
 // _Clipped
 BRect
 Painter::_Clipped(const BRect& rect) const
 {
 	if (rect.IsValid() && fClippingRegion)
-		return rect & _Transform(fClippingRegion->Frame());
+		return rect & fClippingRegion->Frame();
 	return rect;
 }
 
@@ -1132,10 +1031,7 @@ Painter::_UpdateFont()
 void
 Painter::_UpdateLineWidth()
 {
-	float width = fPenSize;
-	_Transform(&width);
-
-	fLineProfile.width(width);	
+	fLineProfile.width(fPenSize);	
 }
 
 // #pragma mark -
@@ -1173,13 +1069,8 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 	// might even be necessary to treat Fill and Stroke
 	// differently, as with Fill-/StrokeRect().
 	_Transform(&center);
-	_Transform(&xRadius);
-	_Transform(&yRadius);
 
-	float width = fPenSize;
-	_Transform(&width);
-
-	int32 divisions = (int32)max_c(12, ((xRadius + yRadius) * PI) / 2 * (int32)width);
+	int32 divisions = (int32)max_c(12, ((xRadius + yRadius) * PI) / 2 * (int32)fPenSize);
 
 	agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
 
@@ -1197,9 +1088,6 @@ Painter::_DrawShape(/*const */BShape* shape, const pattern& p, bool fill) const
 	agg::path_storage path;
 	ShapeConverter converter(&path);
 
-	// account for our view coordinate system
-	converter.ScaleBy(B_ORIGIN, fScale, fScale);
-	converter.TranslateBy(fOrigin);
 	// offset locations to center of pixels
 	converter.TranslateBy(BPoint(0.5, 0.5));
 
@@ -1329,14 +1217,10 @@ typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_t
 
 		agg::trans_affine srcMatrix;
 //		srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left, -actualBitmapRect.top);
-		srcMatrix *= agg::trans_affine_scaling(fScale, fScale);
-		srcMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
 
 		agg::trans_affine imgMatrix;
 		imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
 		imgMatrix *= agg::trans_affine_translation(xOffset, yOffset);
-		imgMatrix *= agg::trans_affine_scaling(fScale, fScale);
-		imgMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
 		imgMatrix.invert();
 		
 		span_alloc_type sa;
@@ -1411,11 +1295,9 @@ Painter::_StrokePath(VertexSource& path, const pattern& p) const
 //	_SetPattern(p);
 
 #if ALIASED_DRAWING
-	float width = fPenSize;
-	_Transform(&width);
-	if (width > 1.0) {
+	if (fPenSize > 1.0) {
 		agg::conv_stroke<VertexSource> stroke(path);
-		stroke.width(width);
+		stroke.width(fPenSize);
 
 		fRasterizer->add_path(stroke);
 		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
