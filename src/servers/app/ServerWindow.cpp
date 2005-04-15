@@ -1382,13 +1382,14 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			
-			// TODO: Watch out for the coordinate system in AS_LAYER_INVAL_RECT
+			// TODO: handle transformation (origin and scale) prior to converting to top
 			BRect		invalRect;
 			
 			link.Read<BRect>(&invalRect);
+			BRect converted(cl->ConvertToTop(invalRect.LeftTop()),
+							cl->ConvertToTop(invalRect.RightBottom()));
 
-			myRootLayer->GoRedraw(cl, BRegion(invalRect));			
-			
+			myRootLayer->GoRedraw(cl, BRegion(converted));
 			break;
 		}
 		case AS_LAYER_INVAL_REGION:
