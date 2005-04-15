@@ -4,6 +4,7 @@
 
 #include "Application.h"
 #include "Button.h"
+#include "CheckBox.h"
 #include "View.h"
 #include "Window.h"
 
@@ -86,8 +87,13 @@ show_window(BRect frame, const char* name)
 	BRect b(view->Bounds());
 	b.InsetBy(20.0, 40.0);
 	b.OffsetTo(5.0, 5.0);
-	BButton* control = new BButton(b, "button", "Label", NULL);
+	BButton* control = new BButton(b, "button", "Button", NULL);
 	view->AddChild(control);
+
+	b.bottom = b.top + 20.0;
+	b.OffsetTo(5.0, view->Bounds().bottom - (b.Height() + 5.0));
+	BCheckBox* checkBox = new BCheckBox(b, "check box", "CheckBox", NULL);
+	view->AddChild(checkBox);
 
 	window->Show();
 }
