@@ -105,6 +105,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 																		  false));
 
 		fBaseRenderer = new renderer_base(*fPixelFormat);
+		// attach our clipping region to the renderer, it keeps a pointer
 		fBaseRenderer->set_clipping_region(fClippingRegion);
 
 		// These are the AGG renderes and rasterizes which
@@ -134,7 +135,6 @@ rgb_color color = fPatternHandler->HighColor().GetColor32();
 		fFontRendererBin = new font_renderer_bin_type(*fBaseRenderer);
 
 		_SetRendererColor(fPatternHandler->HighColor().GetColor32());
-//		_RebuildClipping();
 	}
 }
 
@@ -175,12 +175,12 @@ Painter::ConstrainClipping(const BRegion& region)
 	// an *empty* clipping region.
 	if (!fClippingRegion) {
 		fClippingRegion = new BRegion(region);
-		// attach the base renderer to our clipping region
+		// attach the base renderer to our clipping region,
+		// it keeps a pointer
 		if (fBaseRenderer)
 			fBaseRenderer->set_clipping_region(fClippingRegion);
 	} else
 		*fClippingRegion = region;
-//	_RebuildClipping();
 }
 
 // SetHighColor
@@ -408,37 +408,37 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 // #pragma mark -
 
 // StrokeTriangle
-void
+BRect
 Painter::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 {
-	_DrawTriangle(pt1, pt2, pt3, false);
+	return _DrawTriangle(pt1, pt2, pt3, false);
 }
 
 // FillTriangle
-void
+BRect
 Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 {
-	_DrawTriangle(pt1, pt2, pt3, true);
+	return _DrawTriangle(pt1, pt2, pt3, true);
 }
 
 // StrokePolygon
-void
+BRect
 Painter::StrokePolygon(const BPoint* ptArray, int32 numPts,
 					   bool closed) const
 {
-	_DrawPolygon(ptArray, numPts, closed, false);
+	return _DrawPolygon(ptArray, numPts, closed, false);
 }
 
 // FillPolygon
-void
+BRect
 Painter::FillPolygon(const BPoint* ptArray, int32 numPts,
 					   bool closed) const
 {
-	_DrawPolygon(ptArray, numPts, closed, true);
+	return _DrawPolygon(ptArray, numPts, closed, true);
 }
 
 // StrokeBezier
-void
+BRect
 Painter::StrokeBezier(const BPoint* controlPoints) const
 {
 	agg::path_storage curve;
@@ -460,11 +460,11 @@ Painter::StrokeBezier(const BPoint* controlPoints) const
 
 	agg::conv_curve<agg::path_storage> path(curve);
 
-	_StrokePath(path);
+	return _StrokePath(path);
 }
 
 // FillBezier
-void
+BRect
 Painter::FillBezier(const BPoint* controlPoints) const
 {
 	agg::path_storage curve;
@@ -486,21 +486,21 @@ Painter::FillBezier(const BPoint* controlPoints) const
 
 	agg::conv_curve<agg::path_storage> path(curve);
 
-	_FillPath(path);
+	return _FillPath(path);
 }
 
 // StrokeShape
-void
+BRect
 Painter::StrokeShape(/*const */BShape* shape) const
 {
-	_DrawShape(shape, false);
+	return _DrawShape(shape, false);
 }
 
 // FillShape
-void
+BRect
 Painter::FillShape(/*const */BShape* shape) const
 {
-	_DrawShape(shape, true);
+	return _DrawShape(shape, true);
 }
 
 // StrokeRect
@@ -627,7 +627,7 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 }
 
 // StrokeRoundRect
-void
+BRect
 Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 {
 	BPoint lt(r.left, r.top);
@@ -639,11 +639,11 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
 	rect.radius(xRadius, yRadius);
 
-	_StrokePath(rect);
+	return _StrokePath(rect);
 }
 
 // FillRoundRect
-void
+BRect
 Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 {
 	BPoint lt(r.left, r.top);
@@ -661,25 +661,25 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
 	rect.radius(xRadius, yRadius);
 
-	_FillPath(rect);
+	return _FillPath(rect);
 }
 									
 // StrokeEllipse
-void
+BRect
 Painter::StrokeEllipse(BPoint center, float xRadius, float yRadius) const
 {
-	_DrawEllipse(center, xRadius, yRadius, false);
+	return _DrawEllipse(center, xRadius, yRadius, false);
 }
 
 // FillEllipse
-void
+BRect
 Painter::FillEllipse(BPoint center, float xRadius, float yRadius) const
 {
-	_DrawEllipse(center, xRadius, yRadius, true);
+	return _DrawEllipse(center, xRadius, yRadius, true);
 }
 
 // StrokeArc
-void
+BRect
 Painter::StrokeArc(BPoint center, float xRadius, float yRadius,
 				   float angle, float span) const
 {
@@ -692,11 +692,11 @@ Painter::StrokeArc(BPoint center, float xRadius, float yRadius,
 
 	agg::conv_curve<agg::bezier_arc> path(arc);
 
-	_StrokePath(path);
+	return _StrokePath(path);
 }
 
 // FillArc
-void
+BRect
 Painter::FillArc(BPoint center, float xRadius, float yRadius,
 				 float angle, float span) const
 {
@@ -726,7 +726,7 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 
 	path.close_polygon();
 
-	_FillPath(path);
+	return _FillPath(path);
 }
 
 // #pragma mark -
@@ -853,18 +853,20 @@ Painter::DrawBitmap(const ServerBitmap* bitmap,
 // #pragma mark -
 
 // FillRegion
-void
+BRect
 Painter::FillRegion(const BRegion* region) const
 {
 	BRegion copy(*region);
 	int32 count = copy.CountRects();
-	for (int32 i = 0; i < count; i++) {
-		FillRect(copy.RectAt(i));
+	BRect touched = FillRect(copy.RectAt(0));
+	for (int32 i = 1; i < count; i++) {
+		touched = touched | FillRect(copy.RectAt(i));
 	}
+	return touched;
 }
 
 // InvertRect
-void
+BRect
 Painter::InvertRect(const BRect& r) const
 {
 	BRegion region(r);
@@ -876,6 +878,7 @@ Painter::InvertRect(const BRect& r) const
 	for (int32 i = 0; i < count; i++) {
 		_InvertRect32(region.RectAt(i));
 	}
+	return _Clipped(r);
 }
 
 // BoundingBox
@@ -968,47 +971,6 @@ Painter::_Clipped(const BRect& rect) const
 	return rect;
 }
 
-// #pragma mark -
-/*
-// _RebuildClipping
-void
-Painter::_RebuildClipping()
-{
-	if (fBaseRenderer) {
-		fBaseRenderer->reset_clipping(!fClippingRegion);
-		if (fClippingRegion) {
-			int32 count = fClippingRegion->CountRects();
-			for (int32 i = 0; i < count; i++) {
-				BRect r = fClippingRegion->RectAt(i);
-				// NOTE: The rounding here appears to give somewhat
-				// different results compared to Be's implementation,
-				// though I was unable to figure out the difference
-				BPoint lt(r.LeftTop());
-				BPoint rb(r.RightBottom());
-				// offset to bottom right corner of pixel before transformation
-				rb += BPoint(1.0, 1.0);
-				// apply transformation
-				lt += fOrigin;
-				lt.x *= fScale;
-				lt.y *= fScale;
-				rb += fOrigin;
-				rb.x *= fScale;
-				rb.y *= fScale;
-				// undo offset to bottom right corner after transformation
-				rb -= BPoint(1.0, 1.0);
-//				fBaseRenderer->add_clip_box(floorf(lt.x),
-//											floorf(lt.y),
-//											ceilf(rb.x),
-//											ceilf(rb.y));
-				fBaseRenderer->add_clip_box(roundf(lt.x),
-											roundf(lt.y),
-											roundf(rb.x),
-											roundf(rb.y));
-			}
-		}
-	}
-}*/
-
 // _UpdateFont
 void
 Painter::_UpdateFont()
@@ -1040,7 +1002,7 @@ Painter::_UpdateLineWidth()
 // #pragma mark -
 
 // _DrawTriangle
-inline void
+inline BRect
 Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill) const
 {
 	_Transform(&pt1);
@@ -1056,13 +1018,13 @@ Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill) const
 	path.close_polygon();
 
 	if (fill)
-		_FillPath(path);
+		return _FillPath(path);
 	else
-		_StrokePath(path);
+		return _StrokePath(path);
 }
 
 // _DrawEllipse
-inline void
+inline BRect
 Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 					  bool fill) const
 {
@@ -1077,13 +1039,13 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 	agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
 
 	if (fill)
-		_FillPath(path);
+		return _FillPath(path);
 	else
-		_StrokePath(path);
+		return _StrokePath(path);
 }
 
 // _DrawShape
-inline void
+inline BRect
 Painter::_DrawShape(/*const */BShape* shape, bool fill) const
 {
 	// TODO: untested
@@ -1096,13 +1058,13 @@ Painter::_DrawShape(/*const */BShape* shape, bool fill) const
 	converter.Iterate(shape);
 
 	if (fill)
-		_FillPath(path);
+		return _FillPath(path);
 	else
-		_StrokePath(path);
+		return _StrokePath(path);
 }
 
 // _DrawPolygon
-inline void
+inline BRect
 Painter::_DrawPolygon(const BPoint* ptArray, int32 numPts,
 					  bool closed, bool fill) const
 {
@@ -1122,10 +1084,11 @@ Painter::_DrawPolygon(const BPoint* ptArray, int32 numPts,
 			path.close_polygon();
 
 		if (fill)
-			_FillPath(path);
+			return _FillPath(path);
 		else
-			_StrokePath(path);
+			return _StrokePath(path);
 	}
+	return BRect(0.0, 0.0, -1.0, -1.0);
 }
 
 // _DrawBitmap

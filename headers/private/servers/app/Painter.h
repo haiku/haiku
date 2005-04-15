@@ -23,24 +23,10 @@ class ServerBitmap;
 class ServerFont;
 
 // TODO: API transition:
-// * all functions should return BRect of pixels touched by an operation
 // * most all functions should take a DrawData* context parameter instead
 //   of the current pattern argument, that way, each function can
 //	 decide for itself, which pieces of information in DrawData it
 //   needs
-// * there would be no "scale" and "origin" within Painter, all
-//   coordinates are expected in screen coordinates, all other data
-//   passed in the DrawData is assumed to be already properly
-//   converted (scaled and offset by origin, converted to screen),
-//   this is important for a views graphics state local clipping (as
-//   added by the user) and also font size and so on. For a correct
-//   handling of a views scale and origin, see the original Painter
-//   implementation at src/tests/servers/app/Painter
-// * Painter should use a custom agg::renderer_mclip, which takes
-//   a BRegion pointer. The current conversion from BRegion to
-//   agg::renderer_mclip is quite expensive (arround 190 usecs on
-//   my machine, which is almost the time it takes for the actual
-//   drawing which comes after it...
 // * Painter itself should be made thread safe. Because no
 //   ServerWindow is supposed to draw outside of its clipping region,
 //   there is actually no reason to lock the DisplayDriver. Multiple
@@ -108,32 +94,32 @@ class Painter {
 												const rgb_color& c) const;
 
 								// triangles
-			void				StrokeTriangle(	BPoint pt1,
+			BRect				StrokeTriangle(	BPoint pt1,
 												BPoint pt2,
 												BPoint pt3) const;
 
-			void				FillTriangle(	BPoint pt1,
+			BRect				FillTriangle(	BPoint pt1,
 												BPoint pt2,
 												BPoint pt3) const;
 
 								// polygons
-			void				StrokePolygon(	const BPoint* ptArray,
+			BRect				StrokePolygon(	const BPoint* ptArray,
 												int32 numPts,
 											    bool  closed = true) const;
 
-			void				FillPolygon(	const BPoint* ptArray,
+			BRect				FillPolygon(	const BPoint* ptArray,
 												int32 numPts,
 											    bool  closed = true) const;
 
 								// bezier curves
-			void				StrokeBezier(	const BPoint* controlPoints) const;
+			BRect				StrokeBezier(	const BPoint* controlPoints) const;
 
-			void				FillBezier(		const BPoint* controlPoints) const;
+			BRect				FillBezier(		const BPoint* controlPoints) const;
 	
 								// shapes
-			void				StrokeShape(	/*const */BShape* shape) const;
+			BRect				StrokeShape(	/*const */BShape* shape) const;
 
-			void				FillShape(		/*const */BShape* shape) const;
+			BRect				FillShape(		/*const */BShape* shape) const;
 
 
 								// rects
@@ -150,31 +136,31 @@ class Painter {
 												const rgb_color& c) const;
 
 								// round rects
-			void				StrokeRoundRect(const BRect& r,
+			BRect				StrokeRoundRect(const BRect& r,
 												float xRadius,
 												float yRadius) const;
 
-			void				FillRoundRect(	const BRect& r,
+			BRect				FillRoundRect(	const BRect& r,
 												float xRadius,
 												float yRadius) const;
 
 								// ellipses
-			void				StrokeEllipse(	BPoint center,
+			BRect				StrokeEllipse(	BPoint center,
 												float xRadius,
 												float yRadius) const;
 
-			void				FillEllipse(	BPoint center,
+			BRect				FillEllipse(	BPoint center,
 												float xRadius,
 												float yRadius) const;
 
 								// arcs
-			void				StrokeArc(		BPoint center,
+			BRect				StrokeArc(		BPoint center,
 												float xRadius,
 												float yRadius,
 												float angle,
 												float span) const;
 
-			void				FillArc(		BPoint center,
+			BRect				FillArc(		BPoint center,
 												float xRadius,
 												float yRadius,
 												float angle,
@@ -212,9 +198,9 @@ class Painter {
 												BRect viewRect) const;
 
 								// some convenience stuff
-			void				FillRegion(		const BRegion* region) const;
+			BRect				FillRegion(		const BRegion* region) const;
 
-			void				InvertRect(		const BRect& r) const;
+			BRect				InvertRect(		const BRect& r) const;
 
 			BRect				BoundingBox(	const char* utf8String,
 												uint32 length,
@@ -232,23 +218,21 @@ class Painter {
 										   bool centerOffset = true) const;
 			BRect				_Clipped(const BRect& rect) const;
 
-//			void				_RebuildClipping();
-
 			void				_UpdateFont();
 			void				_UpdateLineWidth();
 
 								// drawing functions stroke/fill
-			void				_DrawTriangle(	BPoint pt1,
+			BRect				_DrawTriangle(	BPoint pt1,
 												BPoint pt2,
 												BPoint pt3,
 												bool fill) const;
-			void				_DrawEllipse(	BPoint center,
+			BRect				_DrawEllipse(	BPoint center,
 												float xRadius,
 												float yRadius,
 												bool fill) const;
-			void				_DrawShape(		/*const */BShape* shape,
+			BRect				_DrawShape(		/*const */BShape* shape,
 												bool fill) const;
-			void				_DrawPolygon(	const BPoint* ptArray,
+			BRect				_DrawPolygon(	const BPoint* ptArray,
 												int32 numPts,
 											    bool  closed,
 												bool fill) const;

@@ -144,8 +144,8 @@ DisplayDriverPainter::InvertRect(const BRect &r)
 {
 	if (Lock()) {
 
-		fPainter->InvertRect(r);
-		fGraphicsCard->Invalidate(r);
+		BRect touched = fPainter->InvertRect(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -480,9 +480,9 @@ DisplayDriverPainter::FillArc(const BRect &r, const float &angle,
 		BPoint center(r.left + xRadius,
 					  r.top + yRadius);
 
-		fPainter->FillArc(center, xRadius, yRadius, angle, span);
+		BRect touched = fPainter->FillArc(center, xRadius, yRadius, angle, span);
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -496,9 +496,9 @@ DisplayDriverPainter::FillBezier(BPoint *pts, const DrawData *d)
 
 		fPainter->SetDrawData(d);
 
-		fPainter->FillBezier(pts);
+		BRect touched = fPainter->FillBezier(pts);
 
-		// TODO: Invalidate
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -517,9 +517,9 @@ DisplayDriverPainter::FillEllipse(const BRect &r, const DrawData *d)
 		BPoint center(r.left + xRadius,
 					  r.top + yRadius);
 
-		fPainter->FillEllipse(center, xRadius, yRadius);
+		BRect touched = fPainter->FillEllipse(center, xRadius, yRadius);
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -533,9 +533,9 @@ DisplayDriverPainter::FillPolygon(BPoint *ptlist, int32 numpts,
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
-		fPainter->FillPolygon(ptlist, numpts);
+		BRect touched = fPainter->FillPolygon(ptlist, numpts);
 
-		fGraphicsCard->Invalidate(bounds);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -579,16 +579,14 @@ DisplayDriverPainter::FillRegion(BRegion& r, const DrawData *d)
 
 		fPainter->SetDrawData(d);
 
-		BRect invalid = r.RectAt(0);
-		fPainter->FillRect(invalid);
+		BRect touched = fPainter->FillRect(r.RectAt(0));
 
 		int32 count = r.CountRects();
 		for (int32 i = 1; i < count; i++) {
-			fPainter->FillRect(r.RectAt(i));
-			invalid = invalid | r.RectAt(i);
+			touched = touched | fPainter->FillRect(r.RectAt(i));
 		}
 
-		fGraphicsCard->Invalidate(invalid);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -603,9 +601,9 @@ DisplayDriverPainter::FillRoundRect(const BRect &r,
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
-		fPainter->FillRoundRect(r, xrad, yrad);
+		BRect touched = fPainter->FillRoundRect(r, xrad, yrad);
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -634,9 +632,9 @@ DisplayDriverPainter::FillTriangle(BPoint *pts, const BRect &bounds,
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
-		fPainter->FillTriangle(pts[0], pts[1], pts[2]);
+		BRect touched = fPainter->FillTriangle(pts[0], pts[1], pts[2]);
 
-		fGraphicsCard->Invalidate(bounds);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -656,9 +654,9 @@ DisplayDriverPainter::StrokeArc(const BRect &r, const float &angle,
 		BPoint center(r.left + xRadius,
 					  r.top + yRadius);
 
-		fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
+		BRect touched = fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -671,10 +669,9 @@ DisplayDriverPainter::StrokeBezier(BPoint *pts, const DrawData *d)
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
+		BRect touched = fPainter->StrokeBezier(pts);
 
-		fPainter->StrokeBezier(pts);
-
-		// TODO: Invalidate
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -693,9 +690,9 @@ DisplayDriverPainter::StrokeEllipse(const BRect &r, const DrawData *d)
 		BPoint center(r.left + xRadius,
 					  r.top + yRadius);
 
-		fPainter->StrokeEllipse(center, xRadius, yRadius);
+		BRect touched = fPainter->StrokeEllipse(center, xRadius, yRadius);
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -757,9 +754,9 @@ DisplayDriverPainter::StrokePolygon(BPoint *ptlist, int32 numpts,
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
-		fPainter->StrokePolygon(ptlist, numpts, closed);
+		BRect touched = fPainter->StrokePolygon(ptlist, numpts, closed);
 
-		fGraphicsCard->Invalidate(bounds);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -774,10 +771,14 @@ DisplayDriverPainter::StrokeRect(const BRect &r, const RGBColor &color)
 	if (Lock()) {
 		fPainter->StrokeRect(r, color.GetColor32());
 
-		fGraphicsCard->Invalidate(BRect(r.left, r.top, r.right, r.top));
-		fGraphicsCard->Invalidate(BRect(r.left, r.top + 1, r.left, r.bottom - 1));
-		fGraphicsCard->Invalidate(BRect(r.right, r.top + 1, r.right, r.bottom - 1));
-		fGraphicsCard->Invalidate(BRect(r.left, r.bottom, r.right, r.bottom));
+		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top,
+														   r.right, r.top)));
+		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.top + 1,
+														   r.left, r.bottom - 1)));
+		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.right, r.top + 1,
+														   r.right, r.bottom - 1)));
+		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(r.left, r.bottom,
+														   r.right, r.bottom)));
 
 		Unlock();
 	}
@@ -806,14 +807,14 @@ DisplayDriverPainter::StrokeRegion(BRegion& r, const DrawData *d)
 
 		fPainter->SetDrawData(d);
 
-		BRect invalid = fPainter->StrokeRect(r.RectAt(0));
+		BRect touched = fPainter->StrokeRect(r.RectAt(0));
 
 		int32 count = r.CountRects();
 		for (int32 i = 1; i < count; i++) {
-			invalid = invalid | fPainter->StrokeRect(r.RectAt(i));
+			touched = touched | fPainter->StrokeRect(r.RectAt(i));
 		}
 
-		fGraphicsCard->Invalidate(invalid);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -827,9 +828,9 @@ DisplayDriverPainter::StrokeRoundRect(const BRect &r, const float &xrad,
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
-		fPainter->StrokeRoundRect(r, xrad, yrad);
+		BRect touched = fPainter->StrokeRoundRect(r, xrad, yrad);
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -857,9 +858,9 @@ DisplayDriverPainter::StrokeTriangle(BPoint *pts, const BRect &bounds,
 	if (Lock()) {
 
 		fPainter->SetDrawData(d);
-		fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
+		BRect touched = fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
 
-		fGraphicsCard->Invalidate(bounds);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
@@ -889,8 +890,8 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 
 		fPainter->SetDrawData(d);
 
-		BRect boundingBox = fPainter->DrawString(string, length, pt);
-		fGraphicsCard->Invalidate(boundingBox);
+		BRect touched = fPainter->DrawString(string, length, pt);
+		fGraphicsCard->Invalidate(touched);
 
 		Unlock();
 	}
