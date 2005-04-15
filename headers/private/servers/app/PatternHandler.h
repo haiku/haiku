@@ -70,6 +70,9 @@ class Pattern {
 			bool				operator==(const Pattern& other) const
 									{ return fPattern.type64 == other.fPattern.type64; }
 
+			bool				operator==(const pattern& other) const
+									{ return fPattern.type64 == *(uint64*)other.data; }
+
  private:
 
 	typedef union
@@ -129,6 +132,8 @@ class PatternHandler {
 
 			bool				IsHighColor(const BPoint& pt) const;
 	inline	bool				IsHighColor(int x, int y) const;
+	inline	bool				IsSolid() const
+									{ return fPattern == B_SOLID_HIGH || fPattern == B_SOLID_LOW; }
 
 			const pattern*		GetR5Pattern(void) const
 									{ return (const pattern*)fPattern.GetInt8(); }
