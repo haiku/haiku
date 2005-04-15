@@ -110,50 +110,40 @@ class Painter {
 								// triangles
 			void				StrokeTriangle(	BPoint pt1,
 												BPoint pt2,
-												BPoint pt3,
-												const pattern& p = B_SOLID_HIGH) const;
+												BPoint pt3) const;
 
 			void				FillTriangle(	BPoint pt1,
 												BPoint pt2,
-												BPoint pt3,
-												const pattern& p = B_SOLID_HIGH) const;
+												BPoint pt3) const;
 
 								// polygons
 			void				StrokePolygon(	const BPoint* ptArray,
 												int32 numPts,
-											    bool  closed = true,
-												const pattern& p = B_SOLID_HIGH) const;
+											    bool  closed = true) const;
 
 			void				FillPolygon(	const BPoint* ptArray,
 												int32 numPts,
-											    bool  closed = true,
-												const pattern& p = B_SOLID_HIGH) const;
+											    bool  closed = true) const;
 
 								// bezier curves
-			void				StrokeBezier(	const BPoint* controlPoints,
-												const pattern& p = B_SOLID_HIGH) const;
+			void				StrokeBezier(	const BPoint* controlPoints) const;
 
-			void				FillBezier(		const BPoint* controlPoints,
-												const pattern& p = B_SOLID_HIGH) const;
+			void				FillBezier(		const BPoint* controlPoints) const;
 	
 								// shapes
-			void				StrokeShape(	/*const */BShape* shape,
-												const pattern& p = B_SOLID_HIGH) const;
+			void				StrokeShape(	/*const */BShape* shape) const;
 
-			void				FillShape(		/*const */BShape* shape,
-												const pattern& p = B_SOLID_HIGH) const;
+			void				FillShape(		/*const */BShape* shape) const;
 
 
 								// rects
-			BRect				StrokeRect(		const BRect& r,
-												const pattern& p = B_SOLID_HIGH) const;
+			BRect				StrokeRect(		const BRect& r) const;
 
 			// strokes a one pixel wide solid rect, no blending
 			void				StrokeRect(		const BRect& r,
 												const rgb_color& c) const;
 
-			BRect				FillRect(		const BRect& r,
-												const pattern& p = B_SOLID_HIGH) const;
+			BRect				FillRect(		const BRect& r) const;
 
 			// fills a solid rect with color c, no blending
 			void				FillRect(		const BRect& r,
@@ -162,39 +152,33 @@ class Painter {
 								// round rects
 			void				StrokeRoundRect(const BRect& r,
 												float xRadius,
-												float yRadius,
-												const pattern& p = B_SOLID_HIGH) const;
+												float yRadius) const;
 
 			void				FillRoundRect(	const BRect& r,
 												float xRadius,
-												float yRadius,
-												const pattern& p = B_SOLID_HIGH) const;
+												float yRadius) const;
 
 								// ellipses
 			void				StrokeEllipse(	BPoint center,
 												float xRadius,
-												float yRadius,
-												const pattern& p = B_SOLID_HIGH) const;
+												float yRadius) const;
 
 			void				FillEllipse(	BPoint center,
 												float xRadius,
-												float yRadius,
-												const pattern& p = B_SOLID_HIGH) const;
+												float yRadius) const;
 
 								// arcs
 			void				StrokeArc(		BPoint center,
 												float xRadius,
 												float yRadius,
 												float angle,
-												float span,
-												const pattern& p = B_SOLID_HIGH) const;
+												float span) const;
 
 			void				FillArc(		BPoint center,
 												float xRadius,
 												float yRadius,
 												float angle,
-												float span,
-												const pattern& p = B_SOLID_HIGH) const;
+												float span) const;
 
 								// strings
 			BRect				DrawChar(		char aChar);
@@ -228,8 +212,7 @@ class Painter {
 												BRect viewRect) const;
 
 								// some convenience stuff
-			void				FillRegion(		const BRegion* region,
-												const pattern& p = B_SOLID_HIGH) const;
+			void				FillRegion(		const BRegion* region) const;
 
 			void				InvertRect(		const BRect& r) const;
 
@@ -258,20 +241,16 @@ class Painter {
 			void				_DrawTriangle(	BPoint pt1,
 												BPoint pt2,
 												BPoint pt3,
-												const pattern& p,
 												bool fill) const;
 			void				_DrawEllipse(	BPoint center,
 												float xRadius,
 												float yRadius,
-												const pattern& p,
 												bool fill) const;
 			void				_DrawShape(		/*const */BShape* shape,
-												const pattern& p,
 												bool fill) const;
 			void				_DrawPolygon(	const BPoint* ptArray,
 												int32 numPts,
 											    bool  closed,
-												const pattern& p,
 												bool fill) const;
 
 			void				_DrawBitmap(	const agg::rendering_buffer& srcBuffer,
@@ -291,12 +270,9 @@ class Painter {
 			BRect				_BoundingBox(VertexSource& path) const;
 
 			template<class VertexSource>
-			BRect				_StrokePath(VertexSource& path,
-											const pattern& p) const;
+			BRect				_StrokePath(VertexSource& path) const;
 			template<class VertexSource>
-			BRect				_FillPath(VertexSource& path,
-
-										  const pattern& p) const;
+			BRect				_FillPath(VertexSource& path) const;
 
 			void				_SetPattern(const pattern& p) const;
 			void				_SetRendererColor(const rgb_color& color) const;

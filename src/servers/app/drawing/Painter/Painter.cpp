@@ -321,7 +321,7 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 	path.move_to(a.x, a.y);
 	path.line_to(b.x, b.y);
 
-	touched = _StrokePath(path, *fPatternHandler->GetR5Pattern());
+	touched = _StrokePath(path);
 
 	return _Clipped(touched);
 }
@@ -401,37 +401,37 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 
 // StrokeTriangle
 void
-Painter::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3, const pattern& p) const
+Painter::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 {
-	_DrawTriangle(pt1, pt2, pt3, p, false);
+	_DrawTriangle(pt1, pt2, pt3, false);
 }
 
 // FillTriangle
 void
-Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3, const pattern& p) const
+Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3) const
 {
-	_DrawTriangle(pt1, pt2, pt3, p, true);
+	_DrawTriangle(pt1, pt2, pt3, true);
 }
 
 // StrokePolygon
 void
 Painter::StrokePolygon(const BPoint* ptArray, int32 numPts,
-					   bool closed, const pattern& p) const
+					   bool closed) const
 {
-	_DrawPolygon(ptArray, numPts, closed, p, false);
+	_DrawPolygon(ptArray, numPts, closed, false);
 }
 
 // FillPolygon
 void
 Painter::FillPolygon(const BPoint* ptArray, int32 numPts,
-					   bool closed, const pattern& p) const
+					   bool closed) const
 {
-	_DrawPolygon(ptArray, numPts, closed, p, true);
+	_DrawPolygon(ptArray, numPts, closed, true);
 }
 
 // StrokeBezier
 void
-Painter::StrokeBezier(const BPoint* controlPoints, const pattern& p) const
+Painter::StrokeBezier(const BPoint* controlPoints) const
 {
 	agg::path_storage curve;
 
@@ -452,12 +452,12 @@ Painter::StrokeBezier(const BPoint* controlPoints, const pattern& p) const
 
 	agg::conv_curve<agg::path_storage> path(curve);
 
-	_StrokePath(path, p);
+	_StrokePath(path);
 }
 
 // FillBezier
 void
-Painter::FillBezier(const BPoint* controlPoints, const pattern& p) const
+Painter::FillBezier(const BPoint* controlPoints) const
 {
 	agg::path_storage curve;
 
@@ -478,26 +478,26 @@ Painter::FillBezier(const BPoint* controlPoints, const pattern& p) const
 
 	agg::conv_curve<agg::path_storage> path(curve);
 
-	_FillPath(path, p);
+	_FillPath(path);
 }
 
 // StrokeShape
 void
-Painter::StrokeShape(/*const */BShape* shape, const pattern& p) const
+Painter::StrokeShape(/*const */BShape* shape) const
 {
-	_DrawShape(shape, p, false);
+	_DrawShape(shape, false);
 }
 
 // FillShape
 void
-Painter::FillShape(/*const */BShape* shape, const pattern& p) const
+Painter::FillShape(/*const */BShape* shape) const
 {
-	_DrawShape(shape, p, true);
+	_DrawShape(shape, true);
 }
 
 // StrokeRect
 BRect
-Painter::StrokeRect(const BRect& r, const pattern& p) const
+Painter::StrokeRect(const BRect& r) const
 {
 	BPoint a(r.left, r.top);
 	BPoint b(r.right, r.bottom);
@@ -507,8 +507,7 @@ Painter::StrokeRect(const BRect& r, const pattern& p) const
 	// first, try an optimized version
 	if (fPenSize == 1.0 &&
 		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
-// TODO: fix me
-//		pattern p = *fPatternHandler->GetR5Pattern();
+		pattern p = *fPatternHandler->GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
 			StrokeRect(rect,
@@ -529,7 +528,7 @@ Painter::StrokeRect(const BRect& r, const pattern& p) const
 	path.line_to(a.x, b.y);
 	path.close_polygon();
 
-	return _StrokePath(path, p);
+	return _StrokePath(path);
 }
 
 // StrokeRect
@@ -548,7 +547,7 @@ Painter::StrokeRect(const BRect& r, const rgb_color& c) const
 
 // FillRect
 BRect
-Painter::FillRect(const BRect& r, const pattern& p) const
+Painter::FillRect(const BRect& r) const
 {
 	BPoint a(r.left, r.top);
 	BPoint b(r.right, r.bottom);
@@ -557,12 +556,12 @@ Painter::FillRect(const BRect& r, const pattern& p) const
 
 	// first, try an optimized version
 	if (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER) {
-		pattern pat = *fPatternHandler->GetR5Pattern();
-		if (pat == B_SOLID_HIGH) {
+		pattern p = *fPatternHandler->GetR5Pattern();
+		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
 			FillRect(rect, fPatternHandler->HighColor().GetColor32());
 			return _Clipped(rect);
-		} else if (pat == B_SOLID_LOW) {
+		} else if (p == B_SOLID_LOW) {
 			BRect rect(a, b);
 			FillRect(rect, fPatternHandler->LowColor().GetColor32());
 			return _Clipped(rect);
@@ -582,7 +581,7 @@ Painter::FillRect(const BRect& r, const pattern& p) const
 	path.line_to(a.x, b.y);
 	path.close_polygon();
 
-	return _FillPath(path, p);
+	return _FillPath(path);
 }
 
 // FillRect
@@ -621,8 +620,7 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 
 // StrokeRoundRect
 void
-Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius,
-						 const pattern& p) const
+Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 {
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
@@ -633,13 +631,12 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius,
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
 	rect.radius(xRadius, yRadius);
 
-	_StrokePath(rect, p);
+	_StrokePath(rect);
 }
 
 // FillRoundRect
 void
-Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius,
-					   const pattern& p) const
+Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 {
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
@@ -656,29 +653,27 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius,
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
 	rect.radius(xRadius, yRadius);
 
-	_FillPath(rect, p);
+	_FillPath(rect);
 }
 									
 // StrokeEllipse
 void
-Painter::StrokeEllipse(BPoint center, float xRadius, float yRadius,
-					   const pattern& p) const
+Painter::StrokeEllipse(BPoint center, float xRadius, float yRadius) const
 {
-	_DrawEllipse(center, xRadius, yRadius, p, false);
+	_DrawEllipse(center, xRadius, yRadius, false);
 }
 
 // FillEllipse
 void
-Painter::FillEllipse(BPoint center, float xRadius, float yRadius,
-					 const pattern& p) const
+Painter::FillEllipse(BPoint center, float xRadius, float yRadius) const
 {
-	_DrawEllipse(center, xRadius, yRadius, p, true);
+	_DrawEllipse(center, xRadius, yRadius, true);
 }
 
 // StrokeArc
 void
 Painter::StrokeArc(BPoint center, float xRadius, float yRadius,
-				   float angle, float span, const pattern& p) const
+				   float angle, float span) const
 {
 	_Transform(&center);
 
@@ -689,13 +684,13 @@ Painter::StrokeArc(BPoint center, float xRadius, float yRadius,
 
 	agg::conv_curve<agg::bezier_arc> path(arc);
 
-	_StrokePath(path, p);
+	_StrokePath(path);
 }
 
 // FillArc
 void
 Painter::FillArc(BPoint center, float xRadius, float yRadius,
-				 float angle, float span, const pattern& p) const
+				 float angle, float span) const
 {
 	_Transform(&center);
 
@@ -723,7 +718,7 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 
 	path.close_polygon();
 
-	_FillPath(path, p);
+	_FillPath(path);
 }
 
 // #pragma mark -
@@ -851,12 +846,12 @@ Painter::DrawBitmap(const ServerBitmap* bitmap,
 
 // FillRegion
 void
-Painter::FillRegion(const BRegion* region, const pattern& p = B_SOLID_HIGH) const
+Painter::FillRegion(const BRegion* region) const
 {
 	BRegion copy(*region);
 	int32 count = copy.CountRects();
 	for (int32 i = 0; i < count; i++) {
-		FillRect(copy.RectAt(i), p);
+		FillRect(copy.RectAt(i));
 	}
 }
 
@@ -885,10 +880,10 @@ Painter::BoundingBox(const char* utf8String, uint32 length,
 
 	BRect dummy;
 	return fTextRenderer->RenderString(utf8String,
-									length,
-									fFontRendererSolid,
-									fFontRendererBin,
-									transform, dummy, true);
+									   length,
+									   fFontRendererSolid,
+									   fFontRendererBin,
+									   transform, dummy, true);
 }
 
 // #pragma mark -
@@ -1038,8 +1033,7 @@ Painter::_UpdateLineWidth()
 
 // _DrawTriangle
 inline void
-Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
-					   const pattern& p, bool fill) const
+Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill) const
 {
 	_Transform(&pt1);
 	_Transform(&pt2);
@@ -1054,15 +1048,15 @@ Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 	path.close_polygon();
 
 	if (fill)
-		_FillPath(path, p);
+		_FillPath(path);
 	else
-		_StrokePath(path, p);
+		_StrokePath(path);
 }
 
 // _DrawEllipse
 inline void
 Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
-					  const pattern& p, bool fill) const
+					  bool fill) const
 {
 	// TODO: I think the conversion and the offset of
 	// pixel centers might not be correct here, and it
@@ -1075,14 +1069,14 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 	agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
 
 	if (fill)
-		_FillPath(path, p);
+		_FillPath(path);
 	else
-		_StrokePath(path, p);
+		_StrokePath(path);
 }
 
 // _DrawShape
 inline void
-Painter::_DrawShape(/*const */BShape* shape, const pattern& p, bool fill) const
+Painter::_DrawShape(/*const */BShape* shape, bool fill) const
 {
 	// TODO: untested
 	agg::path_storage path;
@@ -1094,15 +1088,15 @@ Painter::_DrawShape(/*const */BShape* shape, const pattern& p, bool fill) const
 	converter.Iterate(shape);
 
 	if (fill)
-		_FillPath(path, p);
+		_FillPath(path);
 	else
-		_StrokePath(path, p);
+		_StrokePath(path);
 }
 
 // _DrawPolygon
 inline void
 Painter::_DrawPolygon(const BPoint* ptArray, int32 numPts,
-					  bool closed, const pattern& p, bool fill) const
+					  bool closed, bool fill) const
 {
 	if (numPts > 0) {
 
@@ -1120,9 +1114,9 @@ Painter::_DrawPolygon(const BPoint* ptArray, int32 numPts,
 			path.close_polygon();
 
 		if (fill)
-			_FillPath(path, p);
+			_FillPath(path);
 		else
-			_StrokePath(path, p);
+			_StrokePath(path);
 	}
 }
 
@@ -1287,13 +1281,8 @@ Painter::_BoundingBox(VertexSource& path) const
 // _StrokePath
 template<class VertexSource>
 BRect
-Painter::_StrokePath(VertexSource& path, const pattern& p) const
+Painter::_StrokePath(VertexSource& path) const
 {
-// We're now used by app_server and SetDrawData() was called prior to
-// this and it means the pattern is already set
-//	fPatternHandler->SetPattern(p);
-//	_SetPattern(p);
-
 #if ALIASED_DRAWING
 	if (fPenSize > 1.0) {
 		agg::conv_stroke<VertexSource> stroke(path);
@@ -1314,13 +1303,8 @@ Painter::_StrokePath(VertexSource& path, const pattern& p) const
 // _FillPath
 template<class VertexSource>
 BRect
-Painter::_FillPath(VertexSource& path, const pattern& p) const
+Painter::_FillPath(VertexSource& path) const
 {
-// We're now used by app_server and SetDrawData() was called prior to
-// this and it means the pattern is already set
-//	fPatternHandler->SetPattern(p);
-//	_SetPattern(p);
-
 	fRasterizer->add_path(path);
 	agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
 
@@ -1331,6 +1315,9 @@ Painter::_FillPath(VertexSource& path, const pattern& p) const
 void
 Painter::_SetPattern(const pattern& p) const
 {
+// TODO: currently unused, purpose is to construct
+// special drawing mode instances that work on solid patterns
+// currently, there is only such a thing for B_OP_COPY
 	if (!(p == *fPatternHandler->GetR5Pattern())) {
 printf("Painter::_SetPattern()\n");
 		fPatternHandler->SetPattern(p);
