@@ -68,69 +68,91 @@ class PointerEvent
 class WinBorder : public Layer
 {
 public:
-	WinBorder(const BRect &r, const char *name, const int32 look,const int32 feel, 
-			const int32 flags, ServerWindow *win, DisplayDriver *driver);
-	virtual	~WinBorder(void);
+								WinBorder(	const BRect &r,
+											const char *name,
+											const uint32 wlook,
+											const uint32 wfeel, 
+											const uint32 wflags,
+											const uint32 wwksindex,
+											ServerWindow *win,
+											DisplayDriver *driver);
+	virtual						~WinBorder(void);
 	
-	virtual	void Draw(const BRect &r);
+	virtual	void				Draw(const BRect &r);
 	
-	virtual	void MoveBy(float x, float y);
-	virtual	void ResizeBy(float x, float y);
+	virtual	void				MoveBy(float x, float y);
+	virtual	void				ResizeBy(float x, float y);
 
-	virtual	void RebuildFullRegion(void);
+	virtual	void				RebuildFullRegion(void);
 
-	void SetSizeLimits(float minwidth, float maxwidth, float minheight, float maxheight);
+			void				SetSizeLimits(	float minwidth,
+												float maxwidth,
+												float minheight,
+												float maxheight);
 
-	click_type TellWhat(PointerEvent& evt) const;
-	void MouseDown(click_type action);
-	void MouseMoved(click_type action);
-	void MouseUp(click_type action);
-	void MouseWheel(PointerEvent& evt, BPoint& ptWhere);
+			click_type			TellWhat(PointerEvent& evt) const;
+			void				MouseDown(click_type action);
+			void				MouseMoved(click_type action);
+			void				MouseUp(click_type action);
 	
-	void UpdateColors(void);
-	void UpdateDecorator(void);
-	void UpdateFont(void);
-	void UpdateScreen(void);
+			void				UpdateColors(void);
+			void				UpdateDecorator(void);
+			void				UpdateFont(void);
+			void				UpdateScreen(void);
 	
-	virtual bool HasClient(void) { return false; }
-	Decorator *GetDecorator(void) const { return fDecorator; }
+	virtual bool				HasClient(void) { return false; }
+	inline	Decorator*			GetDecorator(void) const { return fDecorator; }
 
-	void HighlightDecorator(const bool &active);
+	inline	int32				Look(void) const { return fLook; }
+	inline	int32				Feel(void) const { return fFeel; }
+	inline	uint32				WindowFlags(void) const { return fWindowFlags; }
+	inline	uint32				Workspaces(void) const { return fWorkspaces; }
+
+			void				HighlightDecorator(const bool &active);
 	
-	bool HasPoint(const BPoint &pt) const;
-	
-	FMWList		fFMWList;
+			bool				HasPoint(const BPoint &pt) const;
+
+	inline	void				QuietlySetWorkspaces(uint32 wks) { fWorkspaces = wks; }	
+
+			FMWList				fFMWList;
 
 private:
-	void SetLevel();
+			void				SetLevel();
 
 protected:
 	friend class Layer;
 	friend class ServerWindow;
 	friend class RootLayer;
 
-	Decorator *fDecorator;
-	Layer *fTopLayer;
+			Decorator*			fDecorator;
+			Layer*				fTopLayer;
 
-	BRegion	 zUpdateReg;
-	BRegion	 yUpdateReg;
-	BRegion  fUpdateReg;
+			BRegion				zUpdateReg;
+			BRegion				yUpdateReg;
+			BRegion				fUpdateReg;
 
-	int32 fMouseButtons;
-	int32 fKeyModifiers;
-	BPoint fLastMousePosition;
+			int32				fMouseButtons;
+			int32				fKeyModifiers;
+			BPoint				fLastMousePosition;
 
-	bool fIsClosing;
-	bool fIsMinimizing;
-	bool fIsZooming;
+			bool				fIsClosing;
+			bool				fIsMinimizing;
+			bool				fIsZooming;
 
-	bool fInUpdate;
-	bool fRequestSent;
+			bool				fInUpdate;
+			bool				fRequestSent;
 
-	float fMinWidth, fMaxWidth;
-	float fMinHeight, fMaxHeight;
+			int32				fLook;
+			int32				fFeel;
+			int32				fWindowFlags;
+			uint32				fWorkspaces;
 
-int cnt; // for debugging
+			float				fMinWidth,
+								fMaxWidth;
+			float				fMinHeight,
+								fMaxHeight;
+
+			int cnt; // for debugging
 };
 
 #endif

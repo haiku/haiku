@@ -66,74 +66,60 @@ class Layer;
 class ServerWindow
 {
 public:
-	ServerWindow(BRect rect, const char *string, uint32 wlook, uint32 wfeel, uint32 wflags,
-			ServerApp *winapp, port_id winport,	port_id looperPort,	port_id replyport,
-			uint32 index,int32 handlerID);
-	virtual ~ServerWindow(void);
+								ServerWindow(	const char *string,
+												ServerApp *winapp,
+												port_id winport,
+												port_id looperPort,
+												int32 handlerID);
+	virtual						~ServerWindow(void);
 	
-	void Init();
+			void				Init(	BRect frame,
+										uint32 wlook, uint32 wfeel, uint32 wflags,
+										uint32 wwksindex);
 
-	// ServerWindow must be locked for these ones.	
-	void ReplaceDecorator(void);
-	void Quit(void);
-	void Show(void);
-	void Hide(void);
+			void				ReplaceDecorator(void);
+			void				Show(void);
+			void				Hide(void);
 
-	// methods for sending various messages to client.
-	bool IsHidden(void) const;
-	void Minimize(bool status);
-	void Zoom(void);
-	void WorkspaceActivated(int32 workspace, bool active);
-	void WorkspacesChanged(int32 oldone,int32 newone);
-	void WindowActivated(bool active);
-	void ScreenModeChanged(const BRect frame, const color_space cspace);
+			status_t			Lock(void);
+			void				Unlock(void);
+			bool				IsLocked(void) const;
+
+			// methods for sending various messages to client.
+			void				Quit(void);
+			void				Minimize(bool status);
+			void				Zoom(void);
+			void				ScreenModeChanged(const BRect frame, const color_space cspace);
 	
-	status_t Lock(void);
-	void Unlock(void);
-	bool IsLocked(void) const;
+			// util methods.	
+			void				SendMessageToClient(const BMessage* msg,
+													int32 target = B_NULL_TOKEN,
+													bool usePreferred = false) const;
+
+			// to who we belong. who do we own. our title.
+	inline	ServerApp*			App(void) const { return fServerApp; }
+	inline	const WinBorder*	GetWinBorder(void) const { return fWinBorder; }
+	inline	const char*			Title(void) const { return fName; }
+
+			// related thread/team_id(s).
+	inline	team_id				ClientTeamID(void) const { return fClientTeamID; }
+	inline	thread_id			ThreadID(void) const { return fMonitorThreadID;}
+
+			// server "private" - try not to use.
+	inline	int32				ClientToken(void) const { return fHandlerToken; }
 	
-	//! Returns the index of the workspaces to which it belongs
-	int32 GetWorkspaceIndex(void) { return fWorkspaces; }
-
-	// util methods.	
-	Layer *FindLayer(const Layer *start, int32 token) const;
-	void SendMessageToClient(const BMessage* msg,
-							 int32 target = B_NULL_TOKEN,
-							 bool usePreferred = false) const;
-
-	// a few, not that important methods returning some internal settings.	
-	int32 Look(void) const { return fLook; }
-	int32 Feel(void) const { return fFeel; }
-	uint32 Flags(void) const { return fFlags; }
-	uint32 Workspaces(void) const { return fWorkspaces; }
-
-	// to who we belong. who do we own. our title.
-	ServerApp *App(void) const { return fServerApp; }
-	const WinBorder *GetWinBorder(void) const { return fWinBorder; }
-	const char *Title(void) const { return fTitle.String(); }
-
-	// related thread/team_id(s).
-	team_id ClientTeamID(void) const { return fClientTeamID; }
-	thread_id ThreadID(void) const { return fMonitorThreadID;}
-
-	// server "private" - try not to use.
-	void QuietlySetWorkspaces(uint32 wks) { fWorkspaces = wks; }
-	void QuietlySetFeel(int32 feel) { fFeel = feel; }
-	int32 ClientToken(void) const { return fHandlerToken; }
-	
-	FMWList fWinFMWList;
+			FMWList fWinFMWList;
 
 private:
-	// methods for retrieving and creating a tree strcture of Layers.
-	Layer *CreateLayerTree(Layer *localRoot, LinkMsgReader &link);
-	void SetLayerState(Layer *layer, LinkMsgReader &link);
-	void SetLayerFontState(Layer *layer, LinkMsgReader &link);
+			// methods for retrieving and creating a tree strcture of Layers.
+			Layer*				CreateLayerTree(Layer *localRoot, LinkMsgReader &link);
+			void				SetLayerState(Layer *layer, LinkMsgReader &link);
+			void				SetLayerFontState(Layer *layer, LinkMsgReader &link);
 
-	// message handle methods.
-	void DispatchMessage(int32 code, LinkMsgReader &link);
-	void DispatchGraphicsMessage(int32 code, LinkMsgReader &link);
-	static int32 MonitorWin(void *data);
-
+			// message handle methods.
+			void				DispatchMessage(int32 code, LinkMsgReader &link);
+			void				DispatchGraphicsMessage(int32 code, LinkMsgReader &link);
+	static	int32				MonitorWin(void *data);
 
 protected:	
 	friend class ServerApp;
@@ -141,32 +127,27 @@ protected:
 	friend class Screen; 
 	friend class Layer;
 	
-	BString fTitle;
-	int32 fLook;
-	int32 fFeel;
-	int32 fFlags;
-	uint32 fWorkspaces;
+			char				fName[50];
 	
-	ServerApp *fServerApp;
-	WinBorder *fWinBorder;
+			ServerApp*			fServerApp;
+			WinBorder*			fWinBorder;
 	
-	team_id fClientTeamID;
-	thread_id fMonitorThreadID;
+			team_id				fClientTeamID;
+			thread_id			fMonitorThreadID;
 	
-	port_id fMessagePort;
-	port_id fClientWinPort;
-	port_id fClientLooperPort;
+			port_id				fMessagePort;
+			port_id				fClientWinPort;
+			port_id				fClientLooperPort;
 	
-	BLocker fLocker;
-	BRect fFrame;
-	uint32 fToken;
-	int32 fHandlerToken;
-	
-	LinkMsgReader *fMsgReader;
-	LinkMsgSender *fMsgSender;
+			LinkMsgReader*		fMsgReader;
+			LinkMsgSender*		fMsgSender;
 
-	// cl is short for currentLayer. We'll use it a lot, that's why it's short :-)
-	Layer *cl;
+			BLocker				fLocker;
+
+			int32				fHandlerToken;
+
+			// cl is short for currentLayer. We'll use it a lot, that's why it's short :-)
+			Layer*				cl;
 };
 
 #endif

@@ -77,9 +77,19 @@ TokenHandler border_token_handler;
 bool gMouseDown = false;
 
 
-WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const int32 feel,
-		const int32 flags, ServerWindow *win, DisplayDriver *driver)
-	: Layer(r, name, B_NULL_TOKEN, B_FOLLOW_NONE, flags, driver)
+WinBorder::WinBorder(	const BRect &r,
+						const char *name,
+						const uint32 wlook,
+						const uint32 wfeel,
+						const uint32 wflags,
+						const uint32 wwksindex,
+						ServerWindow *win,
+						DisplayDriver *driver)
+	: Layer(r, name, B_NULL_TOKEN, B_FOLLOW_NONE, 0UL, driver),
+	fLook(wlook),
+	fFeel(wfeel),
+	fWindowFlags(wflags),
+	fWorkspaces(wwksindex)
 {
 	// unlike BViews, windows start off as hidden
 	fHidden			= true;
@@ -100,11 +110,33 @@ cnt = 0; // for debugging
 	fIsMinimizing	= false;
 	fIsZooming		= false;
 
+	// floating and modal windows must appear in every workspace where
+	// their main window is present. Thus their wksIndex will be set to
+	// '0x0' and they will be made visible when needed.
+	switch (fFeel)
+	{
+		case B_MODAL_APP_WINDOW_FEEL:
+		case B_MODAL_SUBSET_WINDOW_FEEL:
+		case B_FLOATING_APP_WINDOW_FEEL:
+		case B_FLOATING_SUBSET_WINDOW_FEEL:
+			fWorkspaces = 0x0UL;
+			break;
+		case B_MODAL_ALL_WINDOW_FEEL:
+		case B_FLOATING_ALL_WINDOW_FEEL:
+		case B_SYSTEM_LAST:
+		case B_SYSTEM_FIRST:
+			fWorkspaces = 0xffffffffUL;
+			break;
+		case B_NORMAL_WINDOW_FEEL:
+			if (fWorkspaces == 0x0UL)
+				;
+	}
+
 	fLastMousePosition.Set(-1,-1);
 	SetLevel();
 
-	if (feel!= B_NO_BORDER_WINDOW_LOOK)
-		fDecorator = new_decorator(r, name, look, feel, flags, fDriver);
+	if (fFeel != B_NO_BORDER_WINDOW_LOOK)
+		fDecorator = new_decorator(r, name, fLook, fFeel, fWindowFlags, fDriver);
 
 	RebuildFullRegion();
 
@@ -269,12 +301,6 @@ void WinBorder::MouseUp(click_type action)
 	}
 }
 
-void WinBorder::MouseWheel(PointerEvent& evt, BPoint& ptWhere)
-{
-	// what should decorator do with mouse wheel message.
-	// maybe decorator should have some hook functions for mouse messages.
-}
-
 //! Sets the decorator focus to active or inactive colors
 void WinBorder::HighlightDecorator(const bool &active)
 {
@@ -378,7 +404,7 @@ void WinBorder::UpdateScreen(void)
 //--------------------- P R I V A T E -------------------
 void WinBorder::SetLevel()
 {
-	switch(fServerWin->Feel())
+	switch(fFeel)
 	{
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
 		case B_FLOATING_APP_WINDOW_FEEL:

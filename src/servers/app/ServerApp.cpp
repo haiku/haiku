@@ -341,7 +341,6 @@ int32 ServerApp::MonitorApp(void *data)
 				port_id	sendPort = -1;
 				port_id looperPort = -1;
 				char *title = NULL;
-				port_id replyport = -1;
 			
 				msgqueue.Read<BRect>(&frame);
 				msgqueue.Read<uint32>(&look);
@@ -357,9 +356,8 @@ int32 ServerApp::MonitorApp(void *data)
 
 				// ServerWindow constructor will reply with port_id of a newly created port
 				ServerWindow *sw = NULL;
-				sw = new ServerWindow(frame, title, look, feel, flags, app,
-							sendPort, looperPort, replyport, wkspaces, token);
-				sw->Init();
+				sw = new ServerWindow(title, app, sendPort, looperPort, token);
+				sw->Init(frame, look, feel, flags, wkspaces);
 
 				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 						app->fSignature.String(),title,frame.left,frame.top,frame.right,frame.bottom));

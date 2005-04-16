@@ -406,10 +406,10 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 	}
 
 	// Subset modals also need to have a main window before appearing in workspace list.
-	int32 feel = winBorder->Window()->Feel();
+	int32 feel = winBorder->Feel();
 	if (feel != B_FLOATING_SUBSET_WINDOW_FEEL && feel != B_MODAL_SUBSET_WINDOW_FEEL)
 	{
-		uint32		wks = winBorder->Window()->Workspaces();
+		uint32		wks = winBorder->Workspaces();
 
 		// add to current workspace
 		if (wks == 0)
@@ -461,7 +461,7 @@ void RootLayer::RemoveWinBorder(WinBorder* winBorder)
 void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 {
 	// SUBSET windows _must_ have their workspaceIndex set to 0x0
-	if (winBorder->Window()->Workspaces() != 0UL)
+	if (winBorder->Workspaces() != 0UL)
 	{
 		debugger("SUBSET windows _must_ have their workspaceIndex set to 0x0\n");
 		return;
@@ -552,7 +552,7 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 
 		for (int32 i = 0; i < ptrCount; i++)
 		{
-			if (ptrWin[i]->Window()->Workspaces() & (0x00000001UL << index))
+			if (ptrWin[i]->Workspaces() & (0x00000001UL << index))
 			{
 				fWorkspace[index]->AddWinBorder(ptrWin[i]);
 				if (!ptrWin[i]->IsHidden())
@@ -589,7 +589,7 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 		fResizingWindow	= false;
 
 		// only normal windows can change workspaces
-		if (movingWinBorder->Window()->Feel() == B_NORMAL_WINDOW_FEEL
+		if (movingWinBorder->Feel() == B_NORMAL_WINDOW_FEEL
 			&& !ActiveWorkspace()->HasWinBorder(movingWinBorder))
 		{
 			// Workspace class expects a window to be hidden when it's about to be removed.
@@ -604,14 +604,14 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 			ActiveWorkspace()->ShowWinBorder(movingWinBorder);
 
 			// TODO: can you call SetWinBorderWorskpaces() instead of this?
-			uint32		wks = movingWinBorder->Window()->Workspaces();
+			uint32		wks = movingWinBorder->Workspaces();
 			BMessage	changedMsg(B_WORKSPACES_CHANGED);
 			changedMsg.AddInt64("when", real_time_clock_usecs());
 			changedMsg.AddInt32("old", wks);
 			wks			&= ~(0x00000001 << exIndex);
 			wks			|= (0x00000001 << fActiveWksIndex);
 			changedMsg.AddInt32("new", wks);
-			movingWinBorder->Window()->QuietlySetWorkspaces(wks);
+			movingWinBorder->QuietlySetWorkspaces(wks);
 			movingWinBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
 		}
 	}
@@ -650,7 +650,7 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex,
 {
 	// you *cannot* set workspaces index for a window other than a normal one!
 	// Note: See ServerWindow class.
-	if (winBorder->Window()->Feel() != B_NORMAL_WINDOW_FEEL)
+	if (winBorder->Feel() != B_NORMAL_WINDOW_FEEL)
 		return;
 
 	bool		invalidate	= false;
@@ -716,6 +716,7 @@ void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 oldWksIndex,
 	changedMsg.AddInt64("when", real_time_clock_usecs());
 	changedMsg.AddInt32("old", oldWksIndex);
 	changedMsg.AddInt32("new", newWksIndex);
+	winBorder->QuietlySetWorkspaces(newWksIndex);
 	winBorder->Window()->SendMessageToClient(&changedMsg, B_NULL_TOKEN, false);
 
 	if (invalidate)
@@ -1012,7 +1013,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				if (target != FocusWinBorder())
 					sendMessage = false;
 				else if (exFocus != FocusWinBorder()
-						 && !(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
+						 && !(target->WindowFlags() & B_WILL_ACCEPT_FIRST_CLICK))
 					sendMessage = false;
 
 				if (sendMessage && fLastMouseMoved != target->fTopLayer)

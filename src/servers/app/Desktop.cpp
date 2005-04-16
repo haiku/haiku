@@ -253,7 +253,7 @@ void Desktop::AddWinBorder(WinBorder *winBorder)
 	// R2: how to determine the RootLayer to which this window should be added???
 	// for now, use ActiveRootLayer() because we only have one instance.
 
-	int32 feel = winBorder->Window()->Feel();
+	int32 feel = winBorder->Feel();
 
 	// we are ServerApp thread, we need to lock RootLayer here.
 	ActiveRootLayer()->Lock();
@@ -287,7 +287,7 @@ void Desktop::AddWinBorder(WinBorder *winBorder)
 		{
 			wb		= (WinBorder*)fWinBorderList.ItemAt(i);
 			if (wb->App()->ClientTeamID() == winBorder->App()->ClientTeamID()
-				&& wb->Window()->Feel() == feelToLookFor)
+				&& wb->Feel() == feelToLookFor)
 				// R2: RootLayer comparison is needed.
 			{
 				feel == B_NORMAL_WINDOW_FEEL ?
@@ -326,7 +326,7 @@ void Desktop::RemoveWinBorder(WinBorder *winBorder)
 	// remove from main WinBorder list.
 	if (fWinBorderList.RemoveItem(winBorder))
 	{
-		int32		feel = winBorder->Window()->Feel();
+		int32		feel = winBorder->Feel();
 
 		// floating app/subset and modal_subset windows require special atention because
 		// they are/may_be added to the list of a lot normal windows.
@@ -341,7 +341,7 @@ void Desktop::RemoveWinBorder(WinBorder *winBorder)
 			{
 				wb		= (WinBorder*)fWinBorderList.ItemAt(i);
 
-				if (wb->Window()->Feel() == B_NORMAL_WINDOW_FEEL
+				if (wb->Feel() == B_NORMAL_WINDOW_FEEL
 					&& wb->App()->ClientTeamID() == winBorder->App()->ClientTeamID())
 					// R2: RootLayer comparison is needed. We'll see.
 				{
@@ -389,9 +389,9 @@ void Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
 		return;
 	}
 
-	if (	(winBorder->Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL
-			|| winBorder->Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
-		&&	toWinBorder->Window()->Feel() == B_NORMAL_WINDOW_FEEL
+	if (	(winBorder->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL
+			|| winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
+		&&	toWinBorder->Feel() == B_NORMAL_WINDOW_FEEL
 		&&  toWinBorder->App()->ClientTeamID() == winBorder->App()->ClientTeamID()
 		&& !toWinBorder->fFMWList.HasItem(winBorder))
 	{
@@ -431,7 +431,7 @@ void Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWin
 	// remove WinBorder from workspace, if needed - some other windows may still have it in their subset
 	ActiveRootLayer()->RemoveSubsetWinBorder(winBorder, fromWinBorder);
 
-	if (fromWinBorder->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
+	if (fromWinBorder->Feel() == B_NORMAL_WINDOW_FEEL)
 	{
 		//remove from this normal_window's subset.
 		fromWinBorder->fFMWList.RemoveItem(winBorder);

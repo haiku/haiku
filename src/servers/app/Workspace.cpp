@@ -284,7 +284,7 @@ STRACE(("\nWks(%ld)::MoveToFront ~%s~ \n", fID, newFront?newFront->GetName():"NU
 		// BUT it does not have focus.
 		ListData	*newFocusItem = HasItem(newFront);
 		if (newFocusItem && fFocusItem != newFocusItem
-			&& !(newFront->Window()->Flags() & B_AVOID_FOCUS))
+			&& !(newFront->WindowFlags() & B_AVOID_FOCUS))
 		{
 			fFocusItem = newFocusItem;
 		}
@@ -605,7 +605,7 @@ STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 
 		while(cursor)
 		{
-			if (!cursor->layerPtr->IsHidden() && !(cursor->layerPtr->Window()->Flags() & B_AVOID_FOCUS))
+			if (!cursor->layerPtr->IsHidden() && !(cursor->layerPtr->WindowFlags() & B_AVOID_FOCUS))
 				break;
 			else
 				cursor = cursor->upperItem;
@@ -906,7 +906,7 @@ STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 		fFocusItem		= NULL;
 		while(cursor)
 		{
-			if (!cursor->layerPtr->IsHidden() && !(cursor->layerPtr->Window()->Flags() & B_AVOID_FOCUS))
+			if (!cursor->layerPtr->IsHidden() && !(cursor->layerPtr->WindowFlags() & B_AVOID_FOCUS))
 			{
 				if (cursor->layerPtr->Level() == B_FLOATING_APP || cursor->layerPtr->Level() == B_FLOATING_ALL)
 				{
@@ -1025,23 +1025,23 @@ void Workspace::PrintToStream() const
 	{
 		WinBorder		*wb = (WinBorder*)item->layerPtr;
 		printf("\tName: %s\t%s", wb->GetName(), wb->IsHidden()?"Hidden\t": "Visible\t");
-		if(wb->Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
+		if(wb->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_SUBSET_WINDOW_FEEL");
-		if(wb->Window()->Feel() == B_FLOATING_APP_WINDOW_FEEL)
+		if(wb->Feel() == B_FLOATING_APP_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_APP_WINDOW_FEEL");
-		if(wb->Window()->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
+		if(wb->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_ALL_WINDOW_FEEL");
-		if(wb->Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
+		if(wb->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
 			printf("\t%s\n", "B_MODAL_SUBSET_WINDOW_FEEL");
-		if(wb->Window()->Feel() == B_MODAL_APP_WINDOW_FEEL)
+		if(wb->Feel() == B_MODAL_APP_WINDOW_FEEL)
 			printf("\t%s\n", "B_MODAL_APP_WINDOW_FEEL");
-		if(wb->Window()->Feel() == B_MODAL_ALL_WINDOW_FEEL)
+		if(wb->Feel() == B_MODAL_ALL_WINDOW_FEEL)
 			printf("\t%s\n", "B_MODAL_ALL_WINDOW_FEEL");
-		if(wb->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
+		if(wb->Feel() == B_NORMAL_WINDOW_FEEL)
 			printf("\t%s\n", "B_NORMAL_WINDOW_FEEL");
-		if(wb->Window()->Feel() == B_SYSTEM_LAST)
+		if(wb->Feel() == B_SYSTEM_LAST)
 			printf("\t%s\n", "B_SYSTEM_LAST");
-		if(wb->Window()->Feel() >= B_SYSTEM_FIRST)
+		if(wb->Feel() >= B_SYSTEM_FIRST)
 			printf("\t%s\n", "B_SYSTEM_FIRST");
 			
 	}
@@ -1224,7 +1224,7 @@ bool Workspace::placeToBack(ListData *newLast)
 					ListData	*cursor = newLast->upperItem;
 					while ( cursor
 						 	&& ( cursor->layerPtr->IsHidden()
-						 		 || cursor->layerPtr->Window()->Flags() & B_AVOID_FOCUS)
+						 		 || cursor->layerPtr->WindowFlags() & B_AVOID_FOCUS)
 						 	&& cursor->layerPtr->Level() == level)
 					{
 						cursor	= cursor->upperItem;
@@ -1534,7 +1534,7 @@ ListData* Workspace::findNextFront() const
 		if (!item->layerPtr->IsHidden()
 			&& item->layerPtr->Level() != B_FLOATING_ALL
 			&& item->layerPtr->Level() != B_FLOATING_APP
-			&& !(item->layerPtr->Window()->Flags() & B_AVOID_FRONT))
+			&& !(item->layerPtr->WindowFlags() & B_AVOID_FRONT))
 		{
 			return item;
 		}

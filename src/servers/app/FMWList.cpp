@@ -45,14 +45,14 @@ void FMWList::AddWinBorder(void *item)
 	if(HasItem(item))
 		return;
 
-	int32 feelItem = ((WinBorder*)item)->Window()->Feel();;
+	int32 feelItem = ((WinBorder*)item)->Feel();;
 	int32 feelTemp = 0;
 	int32 location = 0;
 
 	for(int32 i=0; i<CountItems(); i++)
 	{
 		location	= i + 1;
-		feelTemp	= ((WinBorder*)ItemAt(i))->Window()->Feel();
+		feelTemp	= ((WinBorder*)ItemAt(i))->Feel();
 		
 		// in short: if 'item' is a floating window
 		if(	(feelItem == B_FLOATING_SUBSET_WINDOW_FEEL ||
@@ -77,7 +77,7 @@ void FMWList::AddFMWList(FMWList *list)
 	int32 i=0;
 	for(i=0; i<CountItems(); i++)
 	{
-		int32 feel = ((WinBorder*)ItemAt(i))->Window()->Feel();
+		int32 feel = ((WinBorder*)ItemAt(i))->Feel();
 		if(feel == B_MODAL_SUBSET_WINDOW_FEEL ||
 			feel == B_MODAL_APP_WINDOW_FEEL ||
 			feel == B_MODAL_ALL_WINDOW_FEEL)
@@ -90,7 +90,7 @@ void FMWList::AddFMWList(FMWList *list)
 	for(j=0; j<list->CountItems(); j++)
 	{
 		void *item = list->ItemAt(j);
-		int32 feel = ((WinBorder*)item)->Window()->Feel();
+		int32 feel = ((WinBorder*)item)->Feel();
 		if(feel == B_MODAL_SUBSET_WINDOW_FEEL ||
 			feel == B_MODAL_APP_WINDOW_FEEL ||
 			feel == B_MODAL_ALL_WINDOW_FEEL)
@@ -115,26 +115,26 @@ void FMWList::PrintToStream() const
 		
 		printf("\t%s", wb->GetName());
 		
-		if (wb->Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
+		if (wb->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_SUBSET_WINDOW_FEEL");
 
-		if (wb->Window()->Feel() == B_FLOATING_APP_WINDOW_FEEL)
+		if (wb->Feel() == B_FLOATING_APP_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_APP_WINDOW_FEEL");
 
-		if (wb->Window()->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
+		if (wb->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_ALL_WINDOW_FEEL");
 
-		if (wb->Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
+		if (wb->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
 			printf("\t%s\n", "B_MODAL_SUBSET_WINDOW_FEEL");
 
-		if (wb->Window()->Feel() == B_MODAL_APP_WINDOW_FEEL)
+		if (wb->Feel() == B_MODAL_APP_WINDOW_FEEL)
 			printf("\t%s\n", "B_MODAL_APP_WINDOW_FEEL");
 
-		if (wb->Window()->Feel() == B_MODAL_ALL_WINDOW_FEEL)
+		if (wb->Feel() == B_MODAL_ALL_WINDOW_FEEL)
 			printf("\t%s\n", "B_MODAL_ALL_WINDOW_FEEL");
 
 		// this should NOT happen
-		if (wb->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
+		if (wb->Feel() == B_NORMAL_WINDOW_FEEL)
 			printf("\t%s\n", "B_NORMAL_WINDOW_FEEL");
 	}
 }
