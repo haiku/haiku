@@ -179,6 +179,11 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 		if ((err = send_data(appThreadId, 0, buffer, sizeof(buffer)))!=B_OK)
 			PRINTERR(("error when send_data %s\n", strerror(err)));
 	}
+#else
+	port_id input_port = find_port(SERVER_INPUT_PORT);
+	if (input_port == B_NAME_NOT_FOUND)
+		PRINTERR(("input_server couldn't find app_server's input port\n"));
+	fAppServerLink = new BPortLink(input_port);
 #endif // USE_R5_STYLE_COMM
 
 	InitKeyboardMouseStates();
@@ -1096,7 +1101,7 @@ status_t
 InputServer::EventLoop()
 {
 	CALLED();
-	fEventLooperPort = create_port(100, "obos_is_event_port");
+	fEventLooperPort = create_port(100, "haiku_is_event_port");
 	if(fEventLooperPort < 0) {
 		PRINTERR(("InputServer: create_port error: (0x%x) %s\n", fEventLooperPort, strerror(fEventLooperPort)));
 	} 
@@ -1191,22 +1196,24 @@ InputServer::DispatchEvent(BMessage *message)
 	}
 	
 #ifndef USE_R5_STYLE_COMM
-	port_id pid = find_port(SERVER_INPUT_PORT);
-
-	BPortLink *appsvrlink = new BPortLink(pid);
-   	switch(message->what){
-   		case B_MOUSE_MOVED:{
+	if (!fAppServerLink) {
+		debugger("InputServer::DispatchEvent(): app_server link not valid\n");
+		return false;
+	}
+	
+	switch(message->what){
+		case B_MOUSE_MOVED:{
 			uint32 buttons;
 			BPoint pt;
     			message->FindPoint("where",&pt);
     			int64 time=(int64)real_time_clock();
-    			appsvrlink->StartMessage(B_MOUSE_MOVED);
-    			appsvrlink->Attach(&time,sizeof(int64));
-    			appsvrlink->Attach(&pt.x,sizeof(float));
-                        appsvrlink->Attach(&pt.y,sizeof(float));
+    			fAppServerLink->StartMessage(B_MOUSE_MOVED);
+    			fAppServerLink->Attach(&time,sizeof(int64));
+    			fAppServerLink->Attach(&pt.x,sizeof(float));
+				fAppServerLink->Attach(&pt.y,sizeof(float));
     			message->FindInt32("buttons",buttons);
-    			appsvrlink->Attach(&buttons,sizeof(uint32));
-    			appsvrlink->Flush();
+    			fAppServerLink->Attach(&buttons,sizeof(uint32));
+    			fAppServerLink->Flush();
     			PRINT(("B_MOUSE_MOVED: x = %lu: y = %lu: time = %llu: buttons = %lu\n",pt.x,pt.y,time,buttons));
     		break;
     		}
@@ -1222,14 +1229,14 @@ InputServer::DispatchEvent(BMessage *message)
 					message->FindInt32("clicks",&clicks)!=B_OK)
 				break;
 		
-			appsvrlink->StartMessage(B_MOUSE_DOWN);
-			appsvrlink->Attach(&time, sizeof(int64));
-			appsvrlink->Attach(&pt.x,sizeof(float));
-			appsvrlink->Attach(&pt.y,sizeof(float));
-			appsvrlink->Attach(&mod, sizeof(uint32));
-			appsvrlink->Attach(&buttons, sizeof(uint32));
-			appsvrlink->Attach(&clicks, sizeof(uint32));
-			appsvrlink->Flush();
+			fAppServerLink->StartMessage(B_MOUSE_DOWN);
+			fAppServerLink->Attach(&time, sizeof(int64));
+			fAppServerLink->Attach(&pt.x,sizeof(float));
+			fAppServerLink->Attach(&pt.y,sizeof(float));
+			fAppServerLink->Attach(&mod, sizeof(uint32));
+			fAppServerLink->Attach(&buttons, sizeof(uint32));
+			fAppServerLink->Attach(&clicks, sizeof(uint32));
+			fAppServerLink->Flush();
     		break;
     		}
     	case B_MOUSE_UP:{
@@ -1241,12 +1248,12 @@ InputServer::DispatchEvent(BMessage *message)
 					message->FindInt32("modifiers",&mod)!=B_OK)
 				break;
 			
-			appsvrlink->StartMessage(B_MOUSE_UP);
-			appsvrlink->Attach(&time, sizeof(int64));
-			appsvrlink->Attach(&pt.x,sizeof(float));
-			appsvrlink->Attach(&pt.y,sizeof(float));
-			appsvrlink->Attach(&mod, sizeof(uint32));
-			appsvrlink->Flush();
+			fAppServerLink->StartMessage(B_MOUSE_UP);
+			fAppServerLink->Attach(&time, sizeof(int64));
+			fAppServerLink->Attach(&pt.x,sizeof(float));
+			fAppServerLink->Attach(&pt.y,sizeof(float));
+			fAppServerLink->Attach(&mod, sizeof(uint32));
+			fAppServerLink->Flush();
     		break;
     		}
     	case B_MOUSE_WHEEL_CHANGED:{
@@ -1255,11 +1262,11 @@ InputServer::DispatchEvent(BMessage *message)
 			message->FindFloat("be:wheel_delta_y",&y);
 			int64 time=real_time_clock();
 			
-			appsvrlink->StartMessage(B_MOUSE_WHEEL_CHANGED);
-			appsvrlink->Attach(&time,sizeof(int64));
-			appsvrlink->Attach(x);
-			appsvrlink->Attach(y);
-			appsvrlink->Flush();
+			fAppServerLink->StartMessage(B_MOUSE_WHEEL_CHANGED);
+			fAppServerLink->Attach(&time,sizeof(int64));
+			fAppServerLink->Attach(x);
+			fAppServerLink->Attach(y);
+			fAppServerLink->Flush();
 			break;
     		}
 		case B_KEY_DOWN:{
@@ -1280,16 +1287,16 @@ InputServer::DispatchEvent(BMessage *message)
 			message->FindString("bytes",&string);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->StartMessage(B_KEY_DOWN);
-			appsvrlink->Attach(&systime,sizeof(bigtime_t));
-			appsvrlink->Attach(scancode);
-			appsvrlink->Attach(asciicode);
-			appsvrlink->Attach(repeatcount);
-			appsvrlink->Attach(modifiers);
-			appsvrlink->Attach(utf8data,sizeof(int8)*3);
-			appsvrlink->AttachString(string.String());
-			appsvrlink->Attach(keyarray,sizeof(int8)*16);
-			appsvrlink->Flush();
+			fAppServerLink->StartMessage(B_KEY_DOWN);
+			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(scancode);
+			fAppServerLink->Attach(asciicode);
+			fAppServerLink->Attach(repeatcount);
+			fAppServerLink->Attach(modifiers);
+			fAppServerLink->Attach(utf8data,sizeof(int8)*3);
+			fAppServerLink->AttachString(string.String());
+			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
+			fAppServerLink->Flush();
 			break;
 		}
 		case B_KEY_UP:{
@@ -1309,15 +1316,15 @@ InputServer::DispatchEvent(BMessage *message)
 			message->FindString("bytes",&string);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->StartMessage(B_KEY_UP);
-			appsvrlink->Attach(&systime,sizeof(bigtime_t));
-			appsvrlink->Attach(scancode);
-			appsvrlink->Attach(asciicode);
-			appsvrlink->Attach(modifiers);
-			appsvrlink->Attach(utf8data,sizeof(int8)*3);
-			appsvrlink->AttachString(string.String());
-			appsvrlink->Attach(keyarray,sizeof(int8)*16);
-			appsvrlink->Flush();
+			fAppServerLink->StartMessage(B_KEY_UP);
+			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(scancode);
+			fAppServerLink->Attach(asciicode);
+			fAppServerLink->Attach(modifiers);
+			fAppServerLink->Attach(utf8data,sizeof(int8)*3);
+			fAppServerLink->AttachString(string.String());
+			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
+			fAppServerLink->Flush();
 			break;
 		}
 		case B_UNMAPPED_KEY_DOWN:{
@@ -1330,12 +1337,12 @@ InputServer::DispatchEvent(BMessage *message)
 			message->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->StartMessage(B_UNMAPPED_KEY_DOWN);
-			appsvrlink->Attach(&systime,sizeof(bigtime_t));
-			appsvrlink->Attach(scancode);
-			appsvrlink->Attach(modifiers);
-			appsvrlink->Attach(keyarray,sizeof(int8)*16);
-			appsvrlink->Flush();
+			fAppServerLink->StartMessage(B_UNMAPPED_KEY_DOWN);
+			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(scancode);
+			fAppServerLink->Attach(modifiers);
+			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
+			fAppServerLink->Flush();
 			break;
 		}
 		case B_UNMAPPED_KEY_UP:{
@@ -1348,12 +1355,12 @@ InputServer::DispatchEvent(BMessage *message)
 			message->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->StartMessage(B_UNMAPPED_KEY_UP);
-			appsvrlink->Attach(&systime,sizeof(bigtime_t));
-			appsvrlink->Attach(scancode);
-			appsvrlink->Attach(modifiers);
-			appsvrlink->Attach(keyarray,sizeof(int8)*16);
-			appsvrlink->Flush();
+			fAppServerLink->StartMessage(B_UNMAPPED_KEY_UP);
+			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(scancode);
+			fAppServerLink->Attach(modifiers);
+			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
+			fAppServerLink->Flush();
 			break;
 		}
 		case B_MODIFIERS_CHANGED:{
@@ -1367,21 +1374,20 @@ InputServer::DispatchEvent(BMessage *message)
 			message->FindInt32("be:old_modifiers",&oldmodifiers);
 			for(int8 i=0;i<15;i++)
 				message->FindInt8("states",i,&keyarray[i]);
-			appsvrlink->StartMessage(B_MODIFIERS_CHANGED);
-			appsvrlink->Attach(&systime,sizeof(bigtime_t));
-			appsvrlink->Attach(scancode);
-			appsvrlink->Attach(modifiers);
-			appsvrlink->Attach(oldmodifiers);
-			appsvrlink->Attach(keyarray,sizeof(int8)*16);
-			appsvrlink->Flush();
+			fAppServerLink->StartMessage(B_MODIFIERS_CHANGED);
+			fAppServerLink->Attach(&systime,sizeof(bigtime_t));
+			fAppServerLink->Attach(scancode);
+			fAppServerLink->Attach(modifiers);
+			fAppServerLink->Attach(oldmodifiers);
+			fAppServerLink->Attach(keyarray,sizeof(int8)*16);
+			fAppServerLink->Flush();
 			break;
 		}
    		default:
       		break;
    			
 		}
-	delete appsvrlink;
-
+	
 #else // USE_R5_STYLE_COMM
 
 	status_t  	err;

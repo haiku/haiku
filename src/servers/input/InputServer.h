@@ -236,9 +236,7 @@ private:
 
 #ifndef USE_R5_STYLE_COMM
 	// added this to communicate via portlink
-	
-	BPortLink 		*serverlink;
-	
+	BPortLink 		*fAppServerLink;
 #else
 
 	sem_id 		fCursorSem;
