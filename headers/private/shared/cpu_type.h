@@ -94,13 +94,16 @@ get_cpu_model_string(enum cpu_types type)
 		case B_CPU_INTEL_PENTIUM_III:
 		case B_CPU_INTEL_PENTIUM_III_MODEL_8:
 		case B_CPU_INTEL_PENTIUM_III_MODEL_11:
+		case B_CPU_INTEL_PENTIUM_III_XEON:
 			return "Pentium III";
 		case B_CPU_INTEL_PENTIUM_M:
+		case B_CPU_INTEL_PENTIUM_M_MODEL_13:
 			return "Pentium M";
 		case B_CPU_INTEL_PENTIUM_IV:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_1:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_2:
-		case B_CPU_INTEL_PENTIUM_IV_XEON:
+		case B_CPU_INTEL_PENTIUM_IV_MODEL_3:		
+		case B_CPU_INTEL_PENTIUM_IV_MODEL_4:
 			return "Pentium 4";
 
 		/* AMD */
@@ -115,26 +118,26 @@ get_cpu_model_string(enum cpu_types type)
 		case B_CPU_AMD_K6_2:
 			return "K6-2";
 		case B_CPU_AMD_K6_III:
-		case B_CPU_AMD_K6_III_MODEL_2:
+		case B_CPU_AMD_K6_III_MODEL_13:
 			return "K6-III";
 		case B_CPU_AMD_ATHLON_MODEL_1:
 		case B_CPU_AMD_ATHLON_MODEL_2:
 		case B_CPU_AMD_ATHLON_THUNDERBIRD:
 			return "Athlon";
 		case B_CPU_AMD_ATHLON_XP:
-		case B_CPU_AMD_ATHLON_XP_MODEL_2:
-		case B_CPU_AMD_ATHLON_XP_MODEL_3:
-		case B_CPU_AMD_ATHLON_XP_MODEL_BARTON:
+		case B_CPU_AMD_ATHLON_XP_MODEL_7:
+		case B_CPU_AMD_ATHLON_XP_MODEL_8:
+		case B_CPU_AMD_ATHLON_XP_MODEL_10:
 			return "Athlon XP";
 		case B_CPU_AMD_DURON:
 			return "Duron";
-		case B_CPU_AMD_ATHLON_64:
-		case B_CPU_AMD_ATHLON_64_MODEL_2:
-		case B_CPU_AMD_ATHLON_64_MODEL_3:
 		case B_CPU_AMD_ATHLON_64_MODEL_4:
-		case B_CPU_AMD_ATHLON_64_MODEL_5:
-		case B_CPU_AMD_ATHLON_64_MODEL_6:
 		case B_CPU_AMD_ATHLON_64_MODEL_7:
+		case B_CPU_AMD_ATHLON_64_MODEL_8:
+		case B_CPU_AMD_ATHLON_64_MODEL_11:
+		case B_CPU_AMD_ATHLON_64_MODEL_12:
+		case B_CPU_AMD_ATHLON_64_MODEL_14:
+		case B_CPU_AMD_ATHLON_64_MODEL_15:
 			return "Athlon 64";
 		case B_CPU_AMD_OPTERON:
 			return "Opteron";
