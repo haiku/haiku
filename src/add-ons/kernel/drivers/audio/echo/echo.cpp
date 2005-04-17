@@ -140,7 +140,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	status = stream->card->pEG->CloseAudio(&close_params);
 	if(status!=ECHOSTATUS_OK && status!=ECHOSTATUS_CHANNEL_NOT_OPEN) {
 		PRINT(("echo_stream_set_audioparms : CloseAudio failed\n"));
-		PRINT(("  status: %s \n", pStatusStrs[status]));
+		PRINT((" status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 	
@@ -153,7 +153,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	status = stream->card->pEG->OpenAudio(&open_params, &stream->pipe);
 	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : OpenAudio failed\n"));
-		PRINT(("  status: %s \n", pStatusStrs[status]));
+		PRINT((" status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
 
@@ -276,14 +276,16 @@ void
 echo_stream_start(echo_stream *stream, void (*inth) (void *), void *inthparam)
 {
 	LOG(("echo_stream_start\n"));
+	ECHOSTATUS status;
 	
 	stream->inth = inth;
 	stream->inthparam = inthparam;
 		
 	stream->state |= ECHO_STATE_STARTED;
 
-	if(stream->card->pEG->Start(stream->pipe)!=ECHOSTATUS_OK) {
-		PRINT(("echo_stream_start : Could not start the pipe\n"));
+	status = stream->card->pEG->Start(stream->pipe);
+	if (status!=ECHOSTATUS_OK) {
+		PRINT(("echo_stream_start : Could not start the pipe %s\n", pStatusStrs[status]));
 	}	
 }
 
@@ -291,11 +293,13 @@ void
 echo_stream_halt(echo_stream *stream)
 {
 	LOG(("echo_stream_halt\n"));
+	ECHOSTATUS status;
 			
 	stream->state &= ~ECHO_STATE_STARTED;
 	
-	if(stream->card->pEG->Stop(stream->pipe)!=ECHOSTATUS_OK) {
-		PRINT(("echo_stream_halt : Could not stop the pipe\n"));
+	status = stream->card->pEG->Stop(stream->pipe);
+	if (status!=ECHOSTATUS_OK) {
+		PRINT(("echo_stream_halt : Could not stop the pipe %s\n", pStatusStrs[status]));
 	}	
 }
 
@@ -324,7 +328,7 @@ echo_stream_new(echo_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	stream->trigblk = 0;
 	stream->blkmod = 0;
 	
-	stream->pipe = card->pEG->MakePipeIndex(0, (use == ECHO_USE_RECORD));
+	stream->pipe = -1;
 	
 	stream->frames_count = 0;
 	stream->real_time = 0;

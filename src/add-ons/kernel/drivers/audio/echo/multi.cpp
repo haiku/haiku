@@ -54,15 +54,26 @@ static void
 echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float *values) {
 
 	echo_dev *dev = (echo_dev*) card;
-	MIXER_FUNCTION function;
-	INT32 size;
-	function.Channel = channel;
-	function.iFunction = type == B_MIX_GAIN ? MXF_GET_LEVEL : MXF_GET_MUTE;
-	dev->pEG->ProcessMixerFunction(&function, size);
+	MIXER_MULTI_FUNCTION multi_function[2];
+	PMIXER_FUNCTION function = multi_function[0].MixerFunction;
+	INT32 size = ComputeMixerMultiFunctionSize(2);
+	function[0].Channel = channel;
+	function[1].Channel = channel;
+	function[1].Channel.wChannel++;
+	function[0].iFunction = type == B_MIX_GAIN ? MXF_GET_LEVEL : MXF_GET_MUTE;
+	function[1].iFunction = type == B_MIX_GAIN ? MXF_GET_LEVEL : MXF_GET_MUTE;
 
-	if (function.RtnStatus == ECHOSTATUS_OK) {
-		values[0] = function.Data.iLevel;
-		PRINT(("echo_channel_get_mix iLevel: %d\n", function.Data.iLevel));
+	multi_function[0].iCount = 2;
+	dev->pEG->ProcessMixerMultiFunction(multi_function, size);
+
+	if (function[0].RtnStatus == ECHOSTATUS_OK) {
+		if (type == B_MIX_GAIN) {
+			values[0] = (float)function[0].Data.iLevel / 256;
+			values[1] = (float)function[1].Data.iLevel / 256;
+		} else {
+			values[0] = function[0].Data.bMuteOn ? 1.0 : 0.0;
+		}
+		PRINT(("echo_channel_get_mix iLevel: %d, %d, %d\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
 	}
 
 }
@@ -70,15 +81,29 @@ echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 static void	
 echo_channel_set_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float *values) {
 	echo_dev *dev = (echo_dev*) card;
-        MIXER_FUNCTION function;
-        INT32 size;
-        function.Channel = channel;
-	function.Data.iLevel = values[0];
-        function.iFunction = type == B_MIX_GAIN ? MXF_SET_LEVEL : MXF_SET_MUTE;
-        dev->pEG->ProcessMixerFunction(&function, size);
+	MIXER_MULTI_FUNCTION multi_function[2];
+	PMIXER_FUNCTION function = multi_function[0].MixerFunction;
+        INT32 size = ComputeMixerMultiFunctionSize(2);
+        function[0].Channel = channel;
+	function[1].Channel = channel;
+	function[1].Channel.wChannel++;
+	if (type == B_MIX_GAIN) {
+		function[0].Data.iLevel = (int)(values[0] * 256);
+        	function[0].iFunction = MXF_SET_LEVEL;
+		function[1].Data.iLevel = (int)(values[1] * 256);
+		function[1].iFunction = MXF_SET_LEVEL;
+	} else {
+		function[0].Data.bMuteOn = values[0] == 1.0;
+		function[0].iFunction = MXF_SET_MUTE;
+		function[1].Data.bMuteOn = values[0] == 1.0;
+		function[1].iFunction = MXF_SET_MUTE;
+	}
 
-        if (function.RtnStatus == ECHOSTATUS_OK) {
-                PRINT(("echo_channel_set_mix OK\n"));
+	multi_function[0].iCount = 2;
+        dev->pEG->ProcessMixerMultiFunction(multi_function, size);
+
+        if (function[0].RtnStatus == ECHOSTATUS_OK) {
+                PRINT(("echo_channel_set_mix OK: %d, %d, %d\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
         }
 
 }
@@ -113,7 +138,7 @@ echo_create_channel_control(multi_dev *multi, uint32 *index, int32 parent, int32
 	control.set = &echo_channel_set_mix;
 	control.mix_control.gain.min_gain = -128;
 	control.mix_control.gain.max_gain = 6;
-	control.mix_control.gain.granularity = 1;
+	control.mix_control.gain.granularity = 0.5;
 	
 	control.mix_control.id = MULTI_CONTROL_FIRSTID + i;
 	control.mix_control.flags = B_MULTI_MIX_ENABLE;
@@ -152,7 +177,7 @@ echo_create_controls_list(multi_dev *multi)
 	MIXER_AUDIO_CHANNEL channel;
 	channel.dwType = ECHO_BUS_OUT;
 	for (i=0; i < card->caps.wNumBussesOut / 2; i++) {
-		channel.wChannel = i;
+		channel.wChannel = i * 2;
 		parent2 = echo_create_group_control(multi, &index, parent, S_null, "Output");
 
 		echo_create_channel_control(multi, &index, parent2, 0, channel);
@@ -162,7 +187,7 @@ echo_create_controls_list(multi_dev *multi)
 
 	channel.dwType = ECHO_BUS_IN;
         for (i=0; i < card->caps.wNumBussesIn / 2; i++) {
-                channel.wChannel = i;
+                channel.wChannel = i * 2;
 
 		parent2 = echo_create_group_control(multi, &index, parent, S_null, "Input");
                   
@@ -615,7 +640,7 @@ echo_record_inth(void* inthparams)
 	stream->real_time = system_time();
 	stream->frames_count += BUFFER_FRAMES;
 	stream->buffer_cycle = (stream->trigblk 
-		+ stream->blkmod) % stream->blkmod;
+		+ stream->blkmod - 1) % stream->blkmod;
 	stream->update_needed = true;
 	release_spinlock(&slock);
 			
@@ -810,9 +835,11 @@ echo_open(const char *name, uint32 flags, void** cookie)
 		
 	LOG(("open() got card\n"));
 	
-	if(card->pstream !=NULL)
+	if (card->pstream != NULL)
 		return B_ERROR;
-	if(card->rstream !=NULL)
+	if (card->rstream != NULL)
+		return B_ERROR;
+	if (card->pstream2 != NULL)
 		return B_ERROR;
 			
 	*cookie = card;
@@ -821,18 +848,19 @@ echo_open(const char *name, uint32 flags, void** cookie)
 	LOG(("stream_new\n"));
 		
 	card->rstream = echo_stream_new(card, ECHO_USE_RECORD, BUFFER_FRAMES, BUFFER_COUNT);
+	card->pstream2= echo_stream_new(card, ECHO_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
 	card->pstream = echo_stream_new(card, ECHO_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
-	card->pstream2 = echo_stream_new(card, ECHO_USE_PLAY, BUFFER_FRAMES, BUFFER_COUNT);
 	
 	card->buffer_ready_sem = create_sem(0, "pbuffer ready");
 		
 	LOG(("stream_setaudio\n"));
 	
-	echo_stream_set_audioparms(card->pstream, 2, 16, 48000, 2);
-	echo_stream_set_audioparms(card->pstream2, 2, 16, 48000, 0);
+	echo_stream_set_audioparms(card->pstream, 2, 16, 48000, 0);
+	echo_stream_set_audioparms(card->pstream2, 2, 16, 48000, 2);
 	echo_stream_set_audioparms(card->rstream, 2, 16, 48000, 0);
 		
 	card->pstream->first_channel = 0;
+	card->pstream2->first_channel = 2;
 	card->rstream->first_channel = 4;
 	
 	echo_create_channels_list(&card->multi);
