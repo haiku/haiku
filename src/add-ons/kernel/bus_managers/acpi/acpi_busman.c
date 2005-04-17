@@ -2,6 +2,7 @@
 #include <KernelExport.h>
 #include <stdio.h>
 #include <malloc.h>
+#include <string.h>
 
 #include "acpi.h"
 #include "acpixf.h"
@@ -205,15 +206,22 @@ status_t get_device (const char *hid, uint32 index, char *result) {
 
 status_t get_device_hid (const char *path, char *hid) {
 	ACPI_HANDLE handle;
-	ACPI_DEVICE_INFO info;
+	ACPI_DEVICE_INFO *info;
+	ACPI_BUFFER info_buffer;
 	
 	if (AcpiGetHandle(NULL,path,&handle) != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 	
-	if (AcpiGetObjectInfo(handle,&info) != AE_OK)
+	info_buffer.Pointer = info = (ACPI_DEVICE_INFO *)malloc(sizeof(ACPI_DEVICE_INFO));
+	info_buffer.Length = sizeof(ACPI_DEVICE_INFO);
+	
+	if (AcpiGetObjectInfo(handle,&info_buffer) != AE_OK) {
+		free(info_buffer.Pointer);
 		return B_BAD_TYPE;
+	}
 		
-	strcpy(hid,info.HardwareId.Value);
+	strncpy(hid,info->HardwareId.Value,ACPI_DEVICE_ID_LENGTH);
+	hid[8] = '\0';
 	return B_OK;
 }
 
