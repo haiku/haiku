@@ -82,15 +82,10 @@ VDView::VDView(BRect bounds)
 	SetViewColor(B_TRANSPARENT_32_BIT);
 	viewbmp=new BBitmap(bounds,B_RGBA32,true);
 
-	// This link for sending mouse messages to the OBAppServer.
+	// This link for sending mouse messages to the Haiku app_server.
 	// This is only to take the place of the Input Server. 
-	port_id		serverInputPort = create_port(200, SERVER_INPUT_PORT);
-	if (serverInputPort == B_NO_MORE_PORTS)
-	{
-		debugger("ViewDriver: out of ports\n");
-		return;
-	}
-	serverlink = new BPortLink(serverInputPort);
+	port_id input_port = find_port(SERVER_INPUT_PORT);
+	serverlink = new BPortLink(input_port);
 
 	// Create a cursor which isn't just a box
 	cursor=new BBitmap(BRect(0,0,20,20),B_RGBA32,true);

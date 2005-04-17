@@ -69,12 +69,6 @@ AccelerantDriver::AccelerantDriver()
 	card_fd = -1;
 	accelerant_image = -1;
 	mode_list = NULL;
-	
-	// we need this under Haiku too, as it is where the input_server
-	// sends it's data to.
-	port_id serverInputPort = create_port(200, SERVER_INPUT_PORT);
-	if (serverInputPort == B_NO_MORE_PORTS)
-		debugger("AccelerantDriver: out of ports\n");
 }
 
 

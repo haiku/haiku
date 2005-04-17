@@ -57,6 +57,7 @@ private:
 	create_decorator	*make_decorator;
 	
 	port_id	fMessagePort;
+	port_id	fServerInputPort;
 	
 	image_id fDecoratorID;
 	

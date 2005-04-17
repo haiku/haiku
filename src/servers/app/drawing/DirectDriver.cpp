@@ -123,15 +123,6 @@ DirectDriver::DirectDriver()
 	// We'll save this so that if we change the bit depth of the screen, we
 	// can change it back when the driver is shut down.
 	fSavedScreenMode=fCurrentScreenMode;
-
-#ifdef ENABLE_INPUT_SERVER_EMULATION
-	port_id serverInputPort = create_port(200, SERVER_INPUT_PORT);
-	if (serverInputPort == B_NO_MORE_PORTS)
-	{
-		debugger("DirectDriver: out of ports\n");
-		return;
-	}
-#endif
 }
 
 DirectDriver::~DirectDriver()

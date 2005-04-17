@@ -91,8 +91,17 @@ AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE)
 AppServer::AppServer(void)
 #endif
 {
-	fMessagePort= create_port(200,SERVER_PORT_NAME);
-
+	fMessagePort= create_port(200, SERVER_PORT_NAME);
+	if (fMessagePort == B_NO_MORE_PORTS)
+		debugger("app_server could not create message port");
+	
+	// Create the input port. The input_server will send it's messages here.
+	// TODO: If we want multiple user support we would need an individual
+	// port for each user and do the following for each RootLayer.
+	fServerInputPort = create_port(200, SERVER_INPUT_PORT);
+	if (fServerInputPort == B_NO_MORE_PORTS)
+		debugger("app_server could not create input port");
+	
 	fAppList= new BList(0);
 	fQuittingServer= false;
 	make_decorator= NULL;
@@ -184,6 +193,20 @@ AppServer::AppServer(void)
 		resume_thread(fPicassoThreadID);
 
 	fDecoratorName="Default";
+	
+#if 0
+	// TODO: We are supposed to start the input_server, but it's a BApplication
+	// that depends on the registrar running, which is started after app_server
+	int32 arg_c = 1;
+	char **arg_v = (char **)malloc(sizeof(char *) * (arg_c + 1));
+	arg_v[0] = strdup("/system/servers/input_server");
+	arg_v[1] = NULL;
+	thread_id isThread = load_image(arg_c, (const char**)arg_v, (const char **)environ);
+	free(arg_v[0]);
+	
+	resume_thread(isThread);
+	setpgid(isThread, 0);
+#endif
 }
 
 /*!

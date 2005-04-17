@@ -146,12 +146,8 @@ CardView::CardView(BRect bounds)
 
 	// This link for sending mouse messages to the Haiku app_server.
 	// This is only to take the place of the input_server. 
-	port_id serverInputPort = create_port(200, SERVER_INPUT_PORT);
-	if (serverInputPort == B_NO_MORE_PORTS) {
-		debugger("ViewHWInterface: out of ports\n");
-		return;
-	}
-	fServerLink = new BPortLink(serverInputPort);
+	port_id input_port = find_port(SERVER_INPUT_PORT);
+	fServerLink = new BPortLink(input_port);
 }
 
 CardView::~CardView()
