@@ -35,8 +35,6 @@
 #include <Font.h>
 #include <Locker.h>
 
-#include "CursorHandler.h"
-
 class BPoint;
 class BRect;
 class BRegion;

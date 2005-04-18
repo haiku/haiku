@@ -48,6 +48,7 @@
 #include "TokenHandler.h"
 #include "Utils.h"
 #include "DisplayDriver.h"
+#include "ServerBitmap.h"
 #include "ServerPicture.h"
 #include "Workspace.h"
 #include "MessagePrivate.h"

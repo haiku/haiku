@@ -33,7 +33,6 @@
 
 #include "Layer.h"
 #include "FMWList.h"
-#include "CursorHandler.h"
 #include "CursorManager.h"
 #include "Workspace.h"
 

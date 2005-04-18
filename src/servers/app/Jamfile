@@ -51,10 +51,8 @@ SharedLibrary appserver :
 	CursorData.cpp
 	Decorator.cpp
 	FontFamily.cpp
-	GraphicsBuffer.cpp
 	IPoint.cpp
 	LayerData.cpp
-	RectUtils.cpp
 	RGBColor.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp

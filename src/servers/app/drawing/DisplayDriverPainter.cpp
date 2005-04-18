@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <algo.h>
 
+#include "LayerData.h"
 #include "Painter.h"
 #include "RenderingBuffer.h"
 
