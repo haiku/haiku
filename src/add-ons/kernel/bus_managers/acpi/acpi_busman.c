@@ -170,16 +170,18 @@ static ACPI_STATUS get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, 
 	ACPI_STATUS result;
 	ACPI_BUFFER buffer;
 	uint32 *counter = (uint32 *)(context);
-		
-	buffer.Length = 255;
-	buffer.Pointer = malloc(255);
 	
 	*return_val = NULL;
 	
 	if (counter[0] == counter[1]) {
+		buffer.Length = 254;
+		buffer.Pointer = malloc(255);
+		
 		result = AcpiGetName(object,ACPI_FULL_PATHNAME,&buffer);
-		if (result != AE_OK)
-			return result;
+		if (result != AE_OK) {
+			free(buffer.Pointer);
+			return AE_CTRL_TERMINATE;
+		}
 		
 		((char*)(buffer.Pointer))[buffer.Length] = '\0';
 		*return_val = buffer.Pointer;
@@ -193,7 +195,7 @@ static ACPI_STATUS get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, 
 status_t get_device (const char *hid, uint32 index, char *result) {
 	ACPI_STATUS status;
 	uint32 counter[2] = {index,0};
-	char *result2;
+	char *result2 = NULL;
 	
 	status = AcpiGetDevices((char *)hid,&get_device_by_hid_callback,counter,&result2);
 	if ((status != AE_OK) || (result2 == NULL))
