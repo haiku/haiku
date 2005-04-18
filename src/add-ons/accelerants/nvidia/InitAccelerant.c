@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-1/2005.
+	Rudolf Cornelissen 10/2002-4/2005.
 */
 
 #define MODULE_BIT 0x00800000
@@ -186,6 +186,10 @@ status_t INIT_ACCELERANT(int the_fd) {
 	/* ensure cursor state */
 	head1_cursor_hide();
 	if (si->ps.secondary_head) head2_cursor_hide();
+
+	/* make sure a possible 3D add-on will block rendering and re-initialize itself;
+	 * it will reset this flag when it's done. */
+	si->mode_changed = true;
 
 	/* a winner! */
 	result = B_OK;

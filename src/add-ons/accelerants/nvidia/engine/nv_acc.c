@@ -1,6 +1,6 @@
 /* NV Acceleration functions */
 /* Author:
-   Rudolf Cornelissen 8/2003-2/2005.
+   Rudolf Cornelissen 8/2003-4/2005.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -83,6 +83,11 @@ status_t nv_acc_wait_idle()
 status_t nv_acc_init()
 {
 	uint16 cnt;
+
+	/* a hanging engine only recovers from a complete power-down/power-up cycle */
+	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
+	snooze(1000);
+	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
 	/* setup PTIMER: */
 	//fixme? how about NV28 setup as just after coldstarting? (see nv_info.c)
@@ -221,7 +226,7 @@ status_t nv_acc_init()
 	else
 	{
 		/* (first set) */
-		ACCW(HT_HANDL_00, (0x80000000 | NV1_IMAGE_FROM_CPU)); /* 32bit handle (not used?) */
+		ACCW(HT_HANDL_00, (0x80000000 | NV1_IMAGE_FROM_CPU)); /* 32bit handle (not used) */
 		ACCW(HT_VALUE_00, 0x80011145); /* instance $1145, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
@@ -230,11 +235,12 @@ status_t nv_acc_init()
 		ACCW(HT_HANDL_02, (0x80000000 | NV3_GDI_RECTANGLE_TEXT)); /* 32bit handle */
 		ACCW(HT_VALUE_02, 0x80011147); /* instance $1147, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_03, (0x80000000 | NV_RENDER_D3D0_TRIANGLE_ZETA)); /* 32bit handle (not used?) */
+//outdated (pre-NV04):
+		ACCW(HT_HANDL_03, (0x80000000 | NV_RENDER_D3D0_TRIANGLE_ZETA)); /* 32bit handle (nolonger used) */
 		ACCW(HT_VALUE_03, 0x80011148); /* instance $1148, engine = acc engine, CHID = $00 */
 
 		/* NV4_ and NV10_DX5_TEXTURE_TRIANGLE should be identical */
-		ACCW(HT_HANDL_04, (0x80000000 | NV4_DX5_TEXTURE_TRIANGLE)); /* 32bit handle */
+		ACCW(HT_HANDL_04, (0x80000000 | NV4_DX5_TEXTURE_TRIANGLE)); /* 32bit handle (3D) */
 		ACCW(HT_VALUE_04, 0x80011149); /* instance $1149, engine = acc engine, CHID = $00 */
 
 		/* NV4_ and NV10_DX6_MULTI_TEXTURE_TRIANGLE should be identical */
@@ -242,10 +248,7 @@ status_t nv_acc_init()
 		ACCW(HT_VALUE_05, 0x8001114a); /* instance $114a, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_06, (0x80000000 | NV1_RENDER_SOLID_LIN)); /* 32bit handle (not used) */
-		if (si->ps.card_arch != NV04A)
-			ACCW(HT_VALUE_06, 0x80011150); /* instance $1150, engine = acc engine, CHID = $00 */
-		else
-			ACCW(HT_VALUE_06, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_06, 0x80011150); /* instance $1150, engine = acc engine, CHID = $00 */
 
 		/* (second set) */
 		ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
@@ -257,25 +260,24 @@ status_t nv_acc_init()
 		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
 		ACCW(HT_VALUE_12, 0x80011144); /* instance $1144, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_13, (0x80000000 | NV3_SURFACE_0)); /* 32bit handle (not used) */
+//fixme: replace with NV4/NV10_CONTEXT_SURFACES_2D
+		ACCW(HT_HANDL_13, (0x80000000 | NV3_SURFACE_0)); /* 32bit handle (3D) */
 		ACCW(HT_VALUE_13, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_14, (0x80000000 | NV3_SURFACE_1)); /* 32bit handle (not used) */
+//fixme: replace with NV4/NV10_CONTEXT_SURFACES_2D
+		ACCW(HT_HANDL_14, (0x80000000 | NV3_SURFACE_1)); /* 32bit handle (3D) */
 		ACCW(HT_VALUE_14, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_15, (0x80000000 | NV3_SURFACE_2)); /* 32bit handle (not used) */
+//outdated (pre-NV04):
+		ACCW(HT_HANDL_15, (0x80000000 | NV3_SURFACE_2)); /* 32bit handle (nolonger used) */
 		ACCW(HT_VALUE_15, 0x8001114d); /* instance $114d, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_16, (0x80000000 | NV3_SURFACE_3)); /* 32bit handle (not used) */
+//outdated (pre-NV04):
+		ACCW(HT_HANDL_16, (0x80000000 | NV3_SURFACE_3)); /* 32bit handle (nolonger used) */
 		ACCW(HT_VALUE_16, 0x8001114e); /* instance $114e, engine = acc engine, CHID = $00 */
 
-		/* fixme note:
-		 * why not setup NV4_CONTEXT_SURFACES_ARGB_ZS as well?? (they are compatible..) */
-		if (si->ps.card_arch != NV04A)
-		{
-			ACCW(HT_HANDL_17, (0x80000000 | NV10_CONTEXT_SURFACES_ARGB_ZS)); /* 32bit handle (3D only) */
-			ACCW(HT_VALUE_17, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
-		}
+		ACCW(HT_HANDL_17, (0x80000000 | NV4_CONTEXT_SURFACES_ARGB_ZS)); /* 32bit handle (3D) */
+		ACCW(HT_VALUE_17, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
 	}
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
@@ -359,7 +361,7 @@ status_t nv_acc_init()
 		ACCW(PR_CTX0_2, 0x01008018); /* NVclass $018, patchcfg ROP_AND, nv10+: little endian */
 		ACCW(PR_CTX2_2, 0x00000000); /* DMA0 and DMA1 instance invalid */
 		ACCW(PR_CTX3_2, 0x00000000); /* method traps disabled */
-		/* setup set '3' for cmd NV1_IMAGE_FROM_CPU (not used?) */
+		/* setup set '3' for cmd NV1_IMAGE_FROM_CPU (not used) */
 		ACCW(PR_CTX0_3, 0x01008021); /* NVclass $021, patchcfg ROP_AND, nv10+: little endian */
 		ACCW(PR_CTX2_3, 0x00000000); /* DMA0 and DMA1 instance invalid */
 		ACCW(PR_CTX3_3, 0x00000000); /* method traps disabled */
@@ -371,7 +373,7 @@ status_t nv_acc_init()
 		ACCW(PR_CTX0_5, 0x0100804b); /* NVclass $04b, patchcfg ROP_AND, nv10+: little endian */
 		ACCW(PR_CTX2_5, 0x00000000); /* DMA0 and DMA1 instance invalid */
 		ACCW(PR_CTX3_5, 0x00000000); /* method traps disabled */
-		/* setup set '6' for cmd NV_RENDER_D3D0_TRIANGLE_ZETA (not used?) */
+		/* setup set '6' for cmd NV_RENDER_D3D0_TRIANGLE_ZETA (nolonger used) */
 		ACCW(PR_CTX0_6, 0x0100a048); /* NVclass $048, patchcfg ROP_AND, userclip enable,
 									  * nv10+: little endian */
 		ACCW(PR_CTX1_6, 0x00000d01); /* format is A8RGB24, MSB mono */
@@ -409,48 +411,40 @@ status_t nv_acc_init()
 		ACCW(PR_CTX1_8, 0x00000d01); /* format is A8RGB24, MSB mono */
 		ACCW(PR_CTX2_8, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
-		/* setup set '9' for cmd NV3_SURFACE_0 (not used) */
+		/* setup set '9' for cmd NV3_SURFACE_0 */
 		ACCW(PR_CTX0_9, 0x00000058); /* NVclass $058, nv10+: little endian */
 		ACCW(PR_CTX2_9, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_9, 0x00000000); /* method traps disabled */
-		/* setup set 'A' for cmd NV3_SURFACE_1 (not used) */
+		/* setup set 'A' for cmd NV3_SURFACE_1 */
 		ACCW(PR_CTX0_A, 0x00000059); /* NVclass $059, nv10+: little endian */
 		ACCW(PR_CTX2_A, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_A, 0x00000000); /* method traps disabled */
-		/* setup set 'B' for cmd NV3_SURFACE_2 (not used) */
+		/* setup set 'B' for cmd NV3_SURFACE_2 (nolonger used) */
 		ACCW(PR_CTX0_B, 0x0000005a); /* NVclass $05a, nv10+: little endian */
 		ACCW(PR_CTX2_B, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_B, 0x00000000); /* method traps disabled */
-		/* setup set 'C' for cmd NV3_SURFACE_3 (not used) */
+		/* setup set 'C' for cmd NV3_SURFACE_3 (nolonger used) */
 		ACCW(PR_CTX0_C, 0x0000005b); /* NVclass $05b, nv10+: little endian */
 		ACCW(PR_CTX2_C, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_C, 0x00000000); /* method traps disabled */
-		/* fixme: notes for set 'D' and set 'E':
-		 * why not setup NV4_CONTEXT_SURFACES_ARGB_ZS for set 'D' as well??
-		 * NV1_RENDER_SOLID_LIN could be moved to set 'E'?? */
 		/* setup set 'D' ... */
 		if (si->ps.card_arch != NV04A)
 		{
-			/* ... for cmd NV10_CONTEXT_SURFACES_ARGB_ZS (not used) */
+			/* ... for cmd NV10_CONTEXT_SURFACES_ARGB_ZS */
 			ACCW(PR_CTX0_D, 0x00000093); /* NVclass $093, nv10+: little endian */
 		}
 		else
 		{
-			/* ... for cmd NV1_RENDER_SOLID_LIN (not used) */
-			ACCW(PR_CTX0_D, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
-										  * context surface0 valid */
+			/* ... for cmd NV04_CONTEXT_SURFACES_ARGB_ZS */
+			ACCW(PR_CTX0_D, 0x00000053); /* NVclass $053, nv10+: little endian */
 		}
 		ACCW(PR_CTX2_D, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_D, 0x00000000); /* method traps disabled */
-		/* setup set 'E' if needed ... */
-		if (si->ps.card_arch != NV04A)
-		{
-			/* ... for cmd NV1_RENDER_SOLID_LIN (not used) */
-			ACCW(PR_CTX0_E, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
-										  * context surface0 valid, nv10+: little endian */
-			ACCW(PR_CTX2_E, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-			ACCW(PR_CTX3_E, 0x00000000); /* method traps disabled */
-		}
+		/* setup set 'E' for cmd NV1_RENDER_SOLID_LIN (not used) */
+		ACCW(PR_CTX0_E, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
+									  * context surface0 valid, nv10+: little endian */
+		ACCW(PR_CTX2_E, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_E, 0x00000000); /* method traps disabled */
 	}
 
 	/*** PGRAPH ***/

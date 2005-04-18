@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-2/2005
+	Rudolf Cornelissen 11/2002-4/2005
 */
 
 #define MODULE_BIT 0x00200000
@@ -76,6 +76,10 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		target.flags &= ~TV_BITS;
 	}
 	LOG(1, ("SETMODE: (CONT.) validated command modeflags: $%08x\n", target.flags));
+
+	/* make sure a possible 3D add-on will block rendering and re-initialize itself;
+	 * it will reset this flag when it's done. */
+	si->mode_changed = true;
 
 	/* disable interrupts using the kernel driver */
 	interrupt_enable(false);
