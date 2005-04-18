@@ -221,6 +221,7 @@ status_t get_device_hid (const char *path, char *hid) {
 	}
 		
 	strncpy(hid,info->HardwareId.Value,ACPI_DEVICE_ID_LENGTH);
+	free(info_buffer.Pointer);
 	hid[8] = '\0';
 	return B_OK;
 }
