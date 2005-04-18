@@ -67,7 +67,7 @@ class HWInterface : public BLocker {
 
  protected:
 	// implement this in derived classes
-	virtual	void				_DrawCursor(BRect area) const = 0;
+	virtual	void				_DrawCursor(BRect area) const;
 
 	// does the actual transfer and handles color space conversion
 			void				_CopyToFront(uint8* src, uint32 srcBPR,

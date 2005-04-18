@@ -363,6 +363,11 @@ Painter::StrokeLine(BPoint b, DrawData* context)
 	return StrokeLine(context->penlocation, b, context);
 }
 
+typedef union {
+	uint32	data32;
+	int8	data[4];
+} color32;
+
 // StraightLine
 bool
 Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
@@ -376,6 +381,11 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 			dst += x * 4;
 			int32 y1 = (int32)min_c(a.y, b.y);
 			int32 y2 = (int32)max_c(a.y, b.y);
+			color32 color;
+			color.data[0] = c.blue;
+			color.data[1] = c.green;
+			color.data[2] = c.red;
+			color.data[3] = 255;
 			// draw a line, iterate over clipping boxes
 			fBaseRenderer->first_clip_box();
 			do {
@@ -385,9 +395,7 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 					int32 end = min_c(fBaseRenderer->ymax(), y2);
 					uint8* handle = dst + i * bpr;
 					for (; i <= end; i++) {
-						handle[0] = c.blue;
-						handle[1] = c.green;
-						handle[2] = c.red;
+						*(uint32*)handle = color.data32;
 						handle += bpr;
 					}
 				}
@@ -403,6 +411,11 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 			dst += y * bpr;
 			int32 x1 = (int32)min_c(a.x, b.x);
 			int32 x2 = (int32)max_c(a.x, b.x);
+			color32 color;
+			color.data[0] = c.blue;
+			color.data[1] = c.green;
+			color.data[2] = c.red;
+			color.data[3] = 255;
 			// draw a line, iterate over clipping boxes
 			fBaseRenderer->first_clip_box();
 			do {
@@ -412,9 +425,7 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 					int32 end = min_c(fBaseRenderer->xmax(), x2);
 					uint8* handle = dst + i * 4;
 					for (; i <= end; i++) {
-						handle[0] = c.blue;
-						handle[1] = c.green;
-						handle[2] = c.red;
+						*(uint32*)handle = color.data32;
 						handle += 4;
 					}
 				}
@@ -626,6 +637,12 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 		int32 top = (int32)r.top;
 		int32 right = (int32)r.right;
 		int32 bottom = (int32)r.bottom;
+		// get a 32 bit pixel ready with the color
+		color32 color;
+		color.data[0] = c.blue;
+		color.data[1] = c.green;
+		color.data[2] = c.red;
+		color.data[3] = 255;
 		// fill rects, iterate over clipping boxes
 		fBaseRenderer->first_clip_box();
 		do {
@@ -636,12 +653,9 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 				int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
 				uint8* offset = dst + x1 * 4;
 				for (; y1 <= y2; y1++) {
-					uint8* handle = offset + y1 * bpr;
+					uint32* handle = (uint32*)(offset + y1 * bpr);
 					for (int32 x = x1; x <= x2; x++) {
-						handle[0] = c.blue;
-						handle[1] = c.green;
-						handle[2] = c.red;
-						handle += 4;
+						*handle++ = color.data32;
 					}
 				}
 			}

@@ -19,8 +19,8 @@ HWInterface::HWInterface()
 	  fCursor(NULL),
 	  fCursorVisible(true),
 	  fCursorLocation(0, 0),
-//	  fUpdateExecutor(new UpdateQueue(this))
-	  fUpdateExecutor(NULL)
+	  fUpdateExecutor(new UpdateQueue(this))
+//	  fUpdateExecutor(NULL)
 {
 }
 
@@ -105,14 +105,18 @@ HWInterface::GetCursorPosition()
 status_t
 HWInterface::Invalidate(const BRect& frame)
 {
-	return CopyBackToFront(frame);;
+//	return CopyBackToFront(frame);
 
-// TODO: get this working, the locking in the DisplayDriverPainter needs
-// to be based on locking this object, which essentially means the access
-// to the back buffer is locked, or more precise the access to the invalid
-// region scheduled to be copied to the front buffer
-//	fUpdateExecutor->AddRect(frame);
-//	return B_OK;
+// TODO: the remaining problem is the immediate wake up of the
+// thread carrying out the updates, when I enable it, there
+// seems to be a deadlock, but I didn't figure it out yet.
+// Maybe the same bug is there without the wakeup, only, triggered
+// less often.... scarry, huh?
+	if (frame.IsValid()) {
+		fUpdateExecutor->AddRect(frame);
+		return B_OK;
+	}
+	return B_BAD_VALUE;
 }
 
 // CopyBackToFront
@@ -155,6 +159,155 @@ HWInterface::CopyBackToFront(const BRect& frame)
 	return B_BAD_VALUE;
 }
 
+// _DrawCursor
+// * default implementation, can be used as fallback or for
+//   software cursor
+void
+HWInterface::_DrawCursor(BRect area) const
+{
+	BRect cf = _CursorFrame();
+	RenderingBuffer* backBuffer = BackBuffer();
+	if (backBuffer && cf.IsValid() && area.Intersects(cf)) {
+		// clip to common area
+		area = area & cf;
+
+		int32 left = (int32)area.left;
+		int32 top = (int32)area.top;
+		int32 right = (int32)area.right;
+		int32 bottom = (int32)area.bottom;
+		int32 width = right - left + 1;
+		int32 height = bottom - top + 1;
+
+		// make a bitmap from the backbuffer
+		// that has the cursor blended on top of it
+
+		// blending buffer
+		uint8* buffer = new uint8[width * height * 4];
+
+		// offset into back buffer
+		uint8* src = (uint8*)backBuffer->Bits();
+		uint32 srcBPR = backBuffer->BytesPerRow();
+		src += top * srcBPR + left * 4;
+
+		// offset into cursor bitmap
+		uint8* crs = (uint8*)fCursor->Bits();
+		uint32 crsBPR = fCursor->BytesPerRow();
+		// since area is clipped to cf,
+		// the diff between top and cf.top is always positive,
+		// same for diff between left and cf.left
+		crs += (top - (int32)floorf(cf.top)) * crsBPR
+				+ (left - (int32)floorf(cf.left)) * 4;
+
+		uint8* dst = buffer;
+
+		// blending
+		for (int32 y = top; y <= bottom; y++) {
+			uint8* s = src;
+			uint8* c = crs;
+			uint8* d = dst;
+			for (int32 x = left; x <= right; x++) {
+				// assume backbuffer alpha = 255
+				// TODO: it appears alpha in cursor is upside down
+				uint8 a = 255 - c[3];
+				d[0] = (((s[0] - c[0]) * a) + (c[0] << 8)) >> 8;
+				d[1] = (((s[1] - c[1]) * a) + (c[1] << 8)) >> 8;
+				d[2] = (((s[2] - c[2]) * a) + (c[2] << 8)) >> 8;
+				d[3] = 255;
+				s += 4;
+				c += 4;
+				d += 4;
+			}
+			crs += crsBPR;
+			src += srcBPR;
+			dst += width * 4;
+		}
+
+		// copy result to front buffer
+		_CopyToFront(buffer, width * 4, left, top, right, bottom);
+
+		delete[] buffer;
+	}
+}
+
+/*
+// gfxcpy
+inline
+void
+gfxcpy(uint8* dst, uint8* src, int32 numBytes)
+{
+	uint64* d64 = (uint64*)dst;
+	uint64* s64 = (uint64*)src;
+	int32 numBytesBegin = numBytes;
+	while (numBytes >= 32) {
+		*d64++ = *s64++;
+		*d64++ = *s64++;
+		*d64++ = *s64++;
+		*d64++ = *s64++;
+		numBytes -= 32;
+	}
+	while (numBytes >= 16) {
+		*d64++ = *s64++;
+		*d64++ = *s64++;
+		numBytes -= 16;
+	}
+	while (numBytes >= 8) {
+		*d64++ = *s64++;
+		numBytes -= 8;
+	}
+	if (numBytes > 0) {
+		// update original pointers
+		dst += numBytesBegin - numBytes;
+		src += numBytesBegin - numBytes;
+		numBytesBegin = numBytes;
+	
+		uint32* d32 = (uint32*)dst;
+		uint32* s32 = (uint32*)src;
+		while (numBytes >= 4) {
+			*d32++ = *s32++;
+			numBytes -= 4;
+		}
+		// update original pointers
+		dst += numBytesBegin - numBytes;
+		src += numBytesBegin - numBytes;
+	
+		while (numBytes > 0) {
+			*dst++ = *src++;
+			numBytes--;
+		}
+	}
+}*/
+
+// gfxcpy32
+// * numBytes is expected to be a multiple of 4
+inline
+void
+gfxcpy32(uint8* dst, uint8* src, int32 numBytes)
+{
+	uint64* d64 = (uint64*)dst;
+	uint64* s64 = (uint64*)src;
+	int32 numBytesStart = numBytes;
+	while (numBytes >= 32) {
+		*d64++ = *s64++;
+		*d64++ = *s64++;
+		*d64++ = *s64++;
+		*d64++ = *s64++;
+		numBytes -= 32;
+	}
+	if (numBytes >= 16) {
+		*d64++ = *s64++;
+		*d64++ = *s64++;
+		numBytes -= 16;
+	}
+	if (numBytes >= 8) {
+		*d64++ = *s64++;
+		numBytes -= 8;
+	}
+	if (numBytes == 4) {
+		uint32* d32 = (uint32*)(dst + numBytesStart - numBytes);
+		uint32* s32 = (uint32*)(src + numBytesStart - numBytes);
+		*d32 = *s32;
+	}
+}
 
 // _CopyToFront
 //
@@ -183,7 +336,12 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 				dst += y * dstBPR + x * 4;
 				// copy
 				for (; y <= bottom; y++) {
+#ifndef __HAIKU__
 					memcpy(dst, src, bytes);
+#else
+					// bytes is guaranteed to be multiple of 4
+					gfxcpy32(dst, src, bytes);
+#endif // __HAIKU__
 					dst += dstBPR;
 					src += srcBPR;
 				}

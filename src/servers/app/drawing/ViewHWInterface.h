@@ -55,9 +55,6 @@ class ViewHWInterface : public HWInterface {
 
 	virtual	status_t			CopyBackToFront(const BRect& frame);
 
- protected:
-	virtual	void				_DrawCursor(BRect area) const;
-
  private:
 			BitmapBuffer*		fBackBuffer;
 			BitmapBuffer*		fFrontBuffer;

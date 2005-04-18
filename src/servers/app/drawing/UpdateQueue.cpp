@@ -53,8 +53,15 @@ UpdateQueue::AddRect(const BRect& rect)
 {
 //	Lock();
 //printf("UpdateQueue::AddRect()\n");
+	// NOTE: The access to fUpdateRegion
+	// is protected by the HWInterface lock.
+	// When trying to access the fUpdateRegion,
+	// our thread will first try to lock the
+	// HWInterface, while on the other hand
+	// HWInterface will always be locked when
+	// it calls AddRect().
 	fUpdateRegion.Include(rect);
-	_Reschedule();
+//	_Reschedule();
 //	Unlock();
 }
 
@@ -80,9 +87,7 @@ UpdateQueue::_ExecuteUpdates()
 				// execute updates
 				if (fInterface->LockWithTimeout(5000) >= B_OK) {
 					int32 count = fUpdateRegion.CountRects();
-//printf("%ld copy dirty region\n", find_thread(NULL));
 					if (count > 0) {
-printf("%ld rects\n", count);
 						for (int32 i = 0; i < count; i++) {
 							fInterface->CopyBackToFront(fUpdateRegion.RectAt(i));
 						}
@@ -96,7 +101,7 @@ printf("%ld rects\n", count);
 				break;
 			default:
 printf("other error: %s\n", strerror(err));
-running = false;
+//running = false;
 				snooze(20000);
 				break;
 		}
@@ -110,6 +115,11 @@ running = false;
 void
 UpdateQueue::_Reschedule()
 {
+	// TODO: _Reschedule() is supposed to cause the
+	// immediate wake up of the update thread, but
+	// the HWInterface is still locked when we get here.
+	// Somehow this causes a deadlock, but I don't
+	// see why yet...
 	if (fStatus == B_OK) {
 		release_sem(fThreadControl);
 	}
