@@ -31,6 +31,7 @@
 #include "AppServer.h"
 #include "Desktop.h"
 #include "DisplayDriver.h"
+#include "DisplayDriverPainter.h"
 #include "Globals.h"
 #include "Layer.h"
 #include "RootLayer.h"
@@ -40,17 +41,6 @@
 #include "ServerWindow.h"
 #include "WinBorder.h"
 #include "Workspace.h"
-
-#if DISPLAYDRIVER == HWDRIVER
-//	#include "AccelerantDriver.h"
-	#include "DisplayDriverPainter.h"
-#elif DISPLAYDRIVER == DIRECTDRIVER
-	#include "DirectDriver.h"
-#elif DISPLAYDRIVER == PAINTERDRIVER
-	#include "DisplayDriverPainter.h"
-#else
-	#include "ViewDriver.h"
-#endif
 
 //#define DEBUG_DESKTOP
 
@@ -87,34 +77,16 @@ Desktop::Init(void)
 {
 	DisplayDriver *driver = NULL;
 
-#if DISPLAYDRIVER == HWDRIVER
-	// If we're using the AccelerantDriver for rendering, eventually we will loop through
-	// drivers until one can't initialize in order to support multiple monitors. For now,
-	// we'll just load one and be done with it.
+	// Eventually we will loop through drivers until
+	// one can't initialize in order to support multiple monitors.
+	// For now, we'll just load one and be done with it.
 	
 	bool initDrivers = true;
 	while (initDrivers) {
-//		driver = new AccelerantDriver();
 		driver = new DisplayDriverPainter();
 		AddDriver(driver);
 		initDrivers = false;
 	}
-
-#elif DISPLAYDRIVER == DIRECTDRIVER
-	// It would be nice to have this for the default testing driver. Someday....
-	driver = new DirectDriver();
-	AddDriver(driver);
-
-#elif DISPLAYDRIVER == PAINTERDRIVER
-	// It would be nice to have this for the default testing driver. Someday....
-	driver = new DisplayDriverPainter();
-	AddDriver(driver);
-
-#else
-	// It would be nice to not ever need this again....
-	driver = new ViewDriver();
-	AddDriver(driver);
-#endif
 
 	if (fScreenList.CountItems() < 1) {
 		delete this;
@@ -137,7 +109,7 @@ Desktop::AddDriver(DisplayDriver *driver)
 //		Screen *sc = new Screen(driver, BPoint(640, 480), B_GRAY8, fScreenList.CountItems()+1);
 //		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB15, fScreenList.CountItems()+1);
 //		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB16, fScreenList.CountItems()+1);
-//		Screen *sc = new Screen(driver, BPoint(1024, 768), B_RGB32, fScreenList.CountItems()+1);
+//		Screen *sc = new Screen(driver, BPoint(800, 600), B_RGB32, fScreenList.CountItems()+1);
 		fScreenList.AddItem(sc);
 	} else {
 		driver->Shutdown();

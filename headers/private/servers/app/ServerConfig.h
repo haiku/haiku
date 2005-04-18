@@ -8,50 +8,16 @@
 	#define TEST_MODE 1
 #endif
 
-// The ViewDriver is a BView/BWindow combination. Plenty of functionality,
-// but dog-slow.
-#define VIEWDRIVER 0
-
-// The ScreenDriver utilizes a BWindowScreen to directly access the video
-// hardware.
-#define SCREENDRIVER 1
-
-// The SecondDriver allows the server to make use of a second video card while
-// still running as a regular BeOS application. You could say it's training
-// wheels for the HWDriver
-#define SECONDDRIVER 2
-
-// The HWDriver is the real thing - loads all the graphics hardware and 
-// literally takes over the system as the app_server is supposed to. This 
-// one can be used only when the app_server is running as *the* app_server
-// and not in testing mode like the other drivers are for.
-#define HWDRIVER 3
-
-
-#define DIRECTDRIVER 4
-
-// The Painter driver will be a complete app_server drawing backend based on
-// the Anti-Grain Geometry 2D graphics engine. The Painter class encapsulates
-// all AGG related functionality, while the DisplayDriverPainter class uses
-// a Painter object to implement all app_server required drawing functions.
-#define PAINTERDRIVER 5
-
-// Display driver to be used by the server.
-#ifndef DISPLAYDRIVER
-#	define DISPLAYDRIVER PAINTERDRIVER
-//#	define DISPLAYDRIVER VIEWDRIVER
-#endif
-
 // Uncomment this if the DisplayDriver should only rely on drawing functions implemented
 // in software even though hardware-accelerated functions are available
+// NOTE: everything is software right now (since DisplayDriverPainter)
 //#define DISABLE_HARDWARE_ACCELERATION
 
 // Define this for a quick hack to test some of the drawing functions
 //#define DISPLAYDRIVER_TEST_HACK
 
 // Define this if you want the display driver to emulate the input server.
-// Comment this out if DISPLAYDRIVER is defined as HWDRIVER.
-#if DISPLAYDRIVER != HWDRIVER
+#if TEST_MODE
 #	define ENABLE_INPUT_SERVER_EMULATION
 #endif
 

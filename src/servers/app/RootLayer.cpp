@@ -58,8 +58,6 @@
 	#define STRACE(a) /* nothing */
 #endif
 
-//#define DISPLAYDRIVER_TEST_HACK
-
 RootLayer::RootLayer(const char *name, int32 workspaceCount, 
 		Desktop *desktop, DisplayDriver *driver)
  : Layer(BRect(0,0,0,0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver)
@@ -1407,7 +1405,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					break;
 				}
 			}
-#else	// DISPLAYDRIVER != HWDRIVER
+#else	// TEST_MODE
 			// F12
 			if(scancode>0x1 && scancode<0xe)
 			{
@@ -1479,7 +1477,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					break;
 				}
 			}
-#endif	// DISPLAYDRIVER != HWDRIVER
+#endif	// !TEST_MODE
 			
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
@@ -1543,7 +1541,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 	
 			STRACE(("Key Up: 0x%lx\n",scancode));
 			
-#if DISPLAYDRIVER == HWDRIVER
+#if !TEST_MODE
 			// Tab key
 			if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
 			{
@@ -1554,7 +1552,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					break;
 				//}
 			}
-#else	// DISPLAYDRIVER != HWDRIVER
+#else	// TEST_MODE
 			if(scancode==0x26 && (modifiers & B_LEFT_SHIFT_KEY))
 			{
 				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");

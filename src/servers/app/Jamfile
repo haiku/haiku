@@ -16,14 +16,13 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing ] ;
 
 if ( $(TARGET_PLATFORM) = haiku ) {
 	# This overrides the definitions in private/servers/app/ServerConfig.h
-	defines = [ FDefines DISPLAYDRIVER=HWDRIVER TEST_MODE=0 ] ;
+	defines = [ FDefines TEST_MODE=0 ] ;
 
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 	
 	VIEW_DRIVER_SOURCES =
 		AccelerantBuffer.cpp
-#		AccelerantDriver.cpp
 		AccelerantHWInterface.cpp
 		DisplayDriverPainter.cpp
 		HWInterface.cpp
@@ -33,21 +32,14 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 } else {
 	VIEW_DRIVER_SOURCES =
 		fake_input_server.cpp
-#		AccelerantDriver.cpp
-#		BitmapDriver.cpp
-#		ViewDriver.cpp
-#		DirectDriver.cpp
-		# We'll just remove this from the build for a little while...
-		#ScreenDriver.cpp
-		# Painter based DisplayDriver Classes
 		BitmapBuffer.cpp
 		AccelerantBuffer.cpp
+		AccelerantHWInterface.cpp
 		DisplayDriverPainter.cpp
 		HWInterface.cpp
 		MallocBuffer.cpp
 		UpdateQueue.cpp
 		ViewHWInterface.cpp
-		AccelerantHWInterface.cpp
 		;
 }
 
@@ -57,7 +49,6 @@ SharedLibrary appserver :
 	BitmapManager.cpp
 	ColorSet.cpp
 	CursorData.cpp
-	CursorHandler.cpp
 	Decorator.cpp
 	FontFamily.cpp
 	GraphicsBuffer.cpp
@@ -76,10 +67,7 @@ SharedLibrary appserver :
 
 	# drawing
 	PatternHandler.cpp
-	PixelRenderer.cpp
 	DisplayDriver.cpp
-	#DisplayDriverImpl.cpp
-	DisplaySupport.cpp
 ;
 
 Server app_server :
@@ -99,7 +87,6 @@ Server app_server :
 	# DisplayDriver Classes
 	$(VIEW_DRIVER_SOURCES)
 
-	# Clipper.cpp
 	DefaultDecorator.cpp
 	Layer.cpp
 	RootLayer.cpp
