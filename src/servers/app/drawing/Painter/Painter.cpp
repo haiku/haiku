@@ -423,10 +423,9 @@ Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 					fBaseRenderer->ymax() >= y) {
 					int32 i = max_c(fBaseRenderer->xmin(), x1);
 					int32 end = min_c(fBaseRenderer->xmax(), x2);
-					uint8* handle = dst + i * 4;
+					uint32* handle = (uint32*)(dst + i * 4);
 					for (; i <= end; i++) {
-						*(uint32*)handle = color.data32;
-						handle += 4;
+						*handle++ = color.data32;
 					}
 				}
 			} while (fBaseRenderer->next_clip_box());

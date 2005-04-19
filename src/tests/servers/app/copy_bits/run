@@ -1,0 +1,5 @@
+#!/bin/sh
+
+../../../../../distro/x86.R1/beos/system/servers/app_server &
+sleep 1s
+../../../../../tests/servers/app/copy_bits/CopyBits

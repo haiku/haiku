@@ -524,13 +524,45 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		{
 			BRect src;
 			BRect dest;
-			
+
 			link.Read<BRect>(&src);
 			link.Read<BRect>(&dest);
-			
+
+			// NOTE: The correct behaviour is this:
+			// * The region that is copied is the
+			//   src rectangle, no matter if it fits
+			//   into the dest rectangle. It is copied
+			//   by the offset dest.LeftTop() - src.LeftTop()
+			// * The dest rectangle is used for invalidation:
+			//   Any area in the dest rectangle that could
+			//   not be copied from src (because either the
+			//   src rectangle was not big enough, or because there
+			//   were parts cut off by the current layer clipping),
+			//   are triggering BView::Draw() to be called
+			//   and for these parts only.
+			// TODO: The DisplayDriver::CopyBits() call needs
+			// to get a BRegion and an offset by which to copy
+			// all the rects in that region. The region is calculated as
+			// * The src rectangle minus the currect clipping of the layer
+			// * minus the part of the region that is outside the layer
+			//   when the region is translated by the offset!
+			// Then, an invalidation needs to be triggered for the
+			// following region: the dest rectangle minus the
+			// region we calculated in step one translated by the
+			// offset.
+			// By implementing it this way, we don't mix the update
+			// triggering with the actual graphical operation in
+			// DisplayDriver. I know that normally DisplayDriver takes
+			// care of the clipping, but this is different, because
+			// CopyBits() is the only drawing call that can trigger
+			// invalidation.
+			// TODO: In DisplayDriver, implement the described CopyBits()
+			// version. Also, the current implementation is wrong because it
+			// clips the source rectangle to the dest rectangle.
+
 			src = cl->ConvertToTop(src);
 			dest = cl->ConvertToTop(dest);
-			
+
 			cl->fDriver->CopyBits(src, dest, cl->fLayerData);
 			
 			break;
