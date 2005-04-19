@@ -214,10 +214,13 @@ typedef struct {
 		} dma;
 	} engine;
 
+	/* fixme:
+	 * the stuff below has to be extended and/or changed I guess:
+	 * for now only a single 3D 'clone' driver is supported. */
 	/* pointers to first and last free memory adress for 3D use: cardmem local offsets */
 	uint32 mem_low;
 	uint32 mem_high;
-	/* flag to inform 3D add-on to stop rendering and reinitialize */
+	/* flag to inform 3D add-on to stop rendering (set by 2D, reset by 3D drv) */
 	bool mode_changed;
 
   /* card info - information gathered from PINS (and other sources) */
