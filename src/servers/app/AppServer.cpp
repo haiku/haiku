@@ -86,10 +86,12 @@ ColorSet gui_colorset;
 	threads, loads user preferences for the UI and decorator, and allocates various locks.
 */
 #if TEST_MODE
-AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE)
+AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE),
 #else
-AppServer::AppServer(void)
+AppServer::AppServer(void) : 
 #endif
+	fCursorSem(-1),
+	fCursorArea(-1)
 {
 	fMessagePort= create_port(200, SERVER_PORT_NAME);
 	if (fMessagePort == B_NO_MORE_PORTS)
@@ -193,19 +195,11 @@ AppServer::AppServer(void)
 		resume_thread(fPicassoThreadID);
 
 	fDecoratorName="Default";
-	
+
 #if 0
-	// TODO: We are supposed to start the input_server, but it's a BApplication
-	// that depends on the registrar running, which is started after app_server
-	int32 arg_c = 1;
-	char **arg_v = (char **)malloc(sizeof(char *) * (arg_c + 1));
-	arg_v[0] = strdup("/system/servers/input_server");
-	arg_v[1] = NULL;
-	thread_id isThread = load_image(arg_c, (const char**)arg_v, (const char **)environ);
-	free(arg_v[0]);
-	
-	resume_thread(isThread);
-	setpgid(isThread, 0);
+	LaunchInputServer();
+
+	LaunchCursorThread();
 #endif
 }
 
@@ -239,6 +233,8 @@ AppServer::~AppServer(void)
 	// is deleted, who knows what will happen... These things will just return an
 	// error and fail if the threads have already exited.
 	kill_thread(fPicassoThreadID);
+	kill_thread(fCursorThreadID);
+	kill_thread(fISThreadID);
 
 	delete fontserver;
 	
@@ -274,6 +270,103 @@ int32 AppServer::PicassoThread(void *data)
 	}
 	return 0;
 }
+
+
+/*!
+	\brief Starts Input Server
+*/
+void
+AppServer::LaunchInputServer()
+{
+	// We are supposed to start the input_server, but it's a BApplication
+	// that depends on the registrar running, which is started after app_server
+	// so we wait on roster thread to launch the input server
+
+	fISThreadID = B_ERROR;
+
+	while (find_thread("_roster_thread_") != B_OK && !fQuittingServer) {
+		snooze(250000);
+	}
+
+	if (fQuittingServer)
+		return;
+
+	// we use an area for cursor data communication with input_server
+	// area id and sem id are sent to the input_server
+
+	if (fCursorArea < B_OK)	
+		fCursorArea = create_area("isCursor", (void**) &fCursorAddr, B_ANY_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (fCursorSem < B_OK)
+        	fCursorSem = create_sem(100, "isSem"); 
+
+	int32 arg_c = 1;
+	char **arg_v = (char **)malloc(sizeof(char *) * (arg_c + 1));
+	//arg_v[0] = strdup("/system/servers/input_server");
+	arg_v[0] = strdup("input_server");
+	arg_v[1] = NULL;
+	fISThreadID = load_image(arg_c, (const char**)arg_v, (const char **)environ);
+	free(arg_v[0]);
+
+	int32 tmpbuf[2] = {fCursorSem, fCursorArea};
+        int32 code = 0;
+        send_data(fISThreadID, code, (void *)tmpbuf, sizeof(tmpbuf));   
+
+	resume_thread(fISThreadID);
+	setpgid(fISThreadID, 0); 
+
+	// we receive 
+
+	thread_id sender;
+        code = receive_data(&sender, (void *)tmpbuf, sizeof(tmpbuf));
+        fISASPort = tmpbuf[0];
+        fISPort = tmpbuf[1];  
+
+	// if at any time, one of these ports is error prone, it might mean input_server is gone
+	// then relaunch input_server
+}
+
+
+/*!
+	\brief Starts the Cursor Thread
+*/
+void
+AppServer::LaunchCursorThread()
+{
+	// Spawn our cursor thread
+        fCursorThreadID = spawn_thread(CursorThread,"CursorThreadOfTheDeath", B_REAL_TIME_DISPLAY_PRIORITY - 1, this);
+	if (fCursorThreadID >= 0)
+                resume_thread(fCursorThreadID);
+
+}
+
+/*!
+	\brief The Cursor Thread task
+*/
+int32
+AppServer::CursorThread(void* data)
+{
+	AppServer *app = (AppServer *)data;
+
+	BPoint p;
+
+	do {
+
+		while (acquire_sem(app->fCursorSem) == B_OK) {
+
+       			p.x = *app->fCursorAddr & 0x7fff;
+			p.y = *app->fCursorAddr >> 15 & 0x7fff;
+
+			app->fDriver->MoveCursorTo(p.x, p.y);
+
+		}
+
+		snooze(100000);
+		
+	} while (!app->fQuittingServer);
+
+	return B_OK;
+}
+
 
 /*!
 	\brief The call that starts it all...

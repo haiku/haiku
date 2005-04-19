@@ -50,6 +50,10 @@ public:
 	ServerApp* FindApp(const char *sig);
 
 private:
+	void LaunchCursorThread();
+	void LaunchInputServer();
+	static int32 CursorThread(void *data);
+
 	friend	Decorator*	new_decorator(BRect rect, const char *title,
 				int32 wlook, int32 wfeel, int32 wflags, DisplayDriver *ddriver);
 
@@ -67,6 +71,15 @@ private:
 	
 	BList *fAppList;
 	thread_id fPicassoThreadID;
+
+	thread_id fISThreadID;
+	thread_id fCursorThreadID;
+	sem_id fCursorSem;
+	area_id	fCursorArea;
+	uint32 *fCursorAddr;
+
+	port_id fISASPort;
+	port_id fISPort;
 	
 	sem_id 	fActiveAppLock,
 			fAppListLock,
