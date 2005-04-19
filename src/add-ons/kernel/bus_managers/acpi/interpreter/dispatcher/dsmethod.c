@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: dsmethod - Parser/Interpreter interface - control method parsing
- *              $Revision: 1.1 $
+ *              $Revision: 103 $
  *
  *****************************************************************************/
 
@@ -549,7 +549,16 @@ AcpiDsRestartControlMethod (
              */
             WalkState->ReturnDesc = ReturnDesc;
         }
-        else
+
+        /*
+         * The following code is the
+         * optional support for a so-called "implicit return". Some AML code
+         * assumes that the last value of the method is "implicitly" returned
+         * to the caller. Just save the last result as the return value.
+         * NOTE: this is optional because the ASL language does not actually
+         * support this behavior.
+         */        
+        else if (!AcpiDsDoImplicitReturn (ReturnDesc, WalkState, FALSE))
         {
             /*
              * Delete the return value if it will not be used by the

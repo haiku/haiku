@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dsutils - Dispatcher utilities
- *              $Revision: 1.1 $
+ *              $Revision: 111 $
  *
  ******************************************************************************/
 
@@ -128,7 +128,123 @@
         ACPI_MODULE_NAME    ("dsutils")
 
 
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiDsClearImplicitReturn
+ *
+ * PARAMETERS:  WalkState           - Current State
+ *
+ * RETURN:      None.
+ *
+ * DESCRIPTION: Clear and remove a reference on an implicit return value.  Used
+ *              to delete "stale" return values (if enabled, the return value
+ *              from every operator is saved at least momentarily, in case the
+ *              parent method exits.)
+ *
+ ******************************************************************************/
+
+void
+AcpiDsClearImplicitReturn (
+    ACPI_WALK_STATE         *WalkState)
+{
+    ACPI_FUNCTION_NAME ("DsClearImplicitReturn");
+
+
+    /*
+     * Slack must be enabled for this feature
+     */
+    if (!AcpiGbl_EnableInterpreterSlack)
+    {
+        return;
+    }
+
+    if (WalkState->ImplicitReturnObj)
+    {
+        /*
+         * Delete any "stale" implicit return. However, in
+         * complex statements, the implicit return value can be
+         * bubbled up several levels.
+         */
+        ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
+            "Removing reference on stale implicit return obj %p\n",
+            WalkState->ImplicitReturnObj));
+
+        AcpiUtRemoveReference (WalkState->ImplicitReturnObj);
+        WalkState->ImplicitReturnObj = NULL;
+    }
+}
+
+
 #ifndef ACPI_NO_METHOD_EXECUTION
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiDsDoImplicitReturn
+ *
+ * PARAMETERS:  ReturnDesc          - The return value
+ *              WalkState           - Current State
+ *              AddReference        - True if a reference should be added to the
+ *                                    return object
+ *
+ * RETURN:      TRUE if implicit return enabled, FALSE otherwise
+ *
+ * DESCRIPTION: Implements the optional "implicit return".  We save the result
+ *              of every ASL operator and control method invocation in case the
+ *              parent method exit.  Before storing a new return value, we
+ *              delete the previous return value.
+ *
+ ******************************************************************************/
+
+BOOLEAN
+AcpiDsDoImplicitReturn (
+    ACPI_OPERAND_OBJECT     *ReturnDesc,
+    ACPI_WALK_STATE         *WalkState,
+    BOOLEAN                 AddReference)
+{
+    ACPI_FUNCTION_NAME ("DsDoImplicitReturn");
+
+
+    /*
+     * Slack must be enabled for this feature, and we must
+     * have a valid return object
+     */
+    if ((!AcpiGbl_EnableInterpreterSlack) ||
+        (!ReturnDesc))
+    {
+        return (FALSE);
+    }
+
+    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
+            "Result %p will be implicitly returned; Prev=%p\n",
+            ReturnDesc,
+            WalkState->ImplicitReturnObj));
+
+    /*
+     * Delete any "stale" implicit return value first. However, in
+     * complex statements, the implicit return value can be
+     * bubbled up several levels, so we don't clear the value if it
+     * is the same as the ReturnDesc.
+     */
+    if (WalkState->ImplicitReturnObj)
+    {
+        if (WalkState->ImplicitReturnObj == ReturnDesc)
+        {
+            return (TRUE);
+        }
+        AcpiDsClearImplicitReturn (WalkState);
+    }
+
+    /* Save the implicit return value, add a reference if requested */
+
+    WalkState->ImplicitReturnObj = ReturnDesc;
+    if (AddReference)
+    {
+        AcpiUtAddReference (ReturnDesc);
+    }
+
+    return (TRUE);
+}
+
 
 /*******************************************************************************
  *
@@ -150,7 +266,6 @@ AcpiDsIsResultUsed (
 {
     const ACPI_OPCODE_INFO  *ParentInfo;
 
-
     ACPI_FUNCTION_TRACE_PTR ("DsIsResultUsed", Op);
 
 
@@ -163,6 +278,19 @@ AcpiDsIsResultUsed (
     }
 
     /*
+     * We know that this operator is not a
+     * Return() operator (would not come here.) The following code is the
+     * optional support for a so-called "implicit return". Some AML code
+     * assumes that the last value of the method is "implicitly" returned
+     * to the caller. Just save the last result as the return value.
+     * NOTE: this is optional because the ASL language does not actually
+     * support this behavior.
+     */
+    AcpiDsDoImplicitReturn (WalkState->ResultObj, WalkState, TRUE);
+
+    /* 
+     * Now determine if the parent will use the result
+     *
      * If there is no parent, or the parent is a ScopeOp, we are executing
      * at the method level. An executing method typically has no parent, 
      * since each method is parsed separately.  A method invoked externally
@@ -171,30 +299,10 @@ AcpiDsIsResultUsed (
     if ((!Op->Common.Parent) ||
         (Op->Common.Parent->Common.AmlOpcode == AML_SCOPE_OP))
     {
-        /*
-         * If this is the last statement in the method, we know it is not a
-         * Return() operator (would not come here.) The following code is the
-         * optional support for a so-called "implicit return". Some AML code
-         * assumes that the last value of the method is "implicitly" returned
-         * to the caller. Just save the last result as the return value.
-         * NOTE: this is optional because the ASL language does not actually
-         * support this behavior.
-         */
-        if ((AcpiGbl_EnableInterpreterSlack) &&
-            (WalkState->ParserState.Aml >= WalkState->ParserState.AmlEnd))
-        {
-            ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
-                    "Result of [%s] will be implicitly returned\n",
-                    AcpiPsGetOpcodeName (Op->Common.AmlOpcode)));
-
-            /* Use the top of the result stack as the implicit return value */
-
-            WalkState->ReturnDesc = WalkState->Results->Results.ObjDesc[0];
-            return_VALUE (TRUE);
-        }
-
         /* No parent, the return value cannot possibly be used */
 
+        ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "At Method level, result of [%s] not used\n",
+                AcpiPsGetOpcodeName (Op->Common.AmlOpcode)));
         return_VALUE (FALSE);
     }
 
@@ -347,9 +455,8 @@ AcpiDsDeleteResultIfNotUsed (
 
     if (!AcpiDsIsResultUsed (Op, WalkState))
     {
-        /*
-         * Must pop the result stack (ObjDesc should be equal to ResultObj)
-         */
+        /* Must pop the result stack (ObjDesc should be equal to ResultObj) */
+
         Status = AcpiDsResultPop (&ObjDesc, WalkState);
         if (ACPI_SUCCESS (Status))
         {
@@ -426,9 +533,8 @@ AcpiDsClearOperands (
     ACPI_FUNCTION_TRACE_PTR ("DsClearOperands", WalkState);
 
 
-    /*
-     * Remove a reference on each operand on the stack
-     */
+    /* Remove a reference on each operand on the stack */
+
     for (i = 0; i < WalkState->NumOperands; i++)
     {
         /*
@@ -498,11 +604,7 @@ AcpiDsCreateOperand (
             return_ACPI_STATUS (Status);
         }
 
-        /*
-         * All prefixes have been handled, and the name is
-         * in NameString
-         */
-
+        /* All prefixes have been handled, and the name is in NameString */
 
         /*
          * Special handling for BufferField declarations.  This is a deferred
@@ -697,7 +799,8 @@ AcpiDsCreateOperand (
  *
  * FUNCTION:    AcpiDsCreateOperands
  *
- * PARAMETERS:  FirstArg            - First argument of a parser argument tree
+ * PARAMETERS:  WalkState           - Current state  
+ *              FirstArg            - First argument of a parser argument tree
  *
  * RETURN:      Status
  *

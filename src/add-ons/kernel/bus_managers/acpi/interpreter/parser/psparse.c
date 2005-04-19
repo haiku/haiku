@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: psparse - Parser top level AML parse routines
- *              $Revision: 1.1 $
+ *              $Revision: 148 $
  *
  *****************************************************************************/
 
@@ -1358,8 +1358,8 @@ AcpiPsParseAml (
 
         PreviousWalkState = WalkState;
 
-        ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "ReturnValue=%p, State=%p\n",
-            WalkState->ReturnDesc, WalkState));
+        ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "ReturnValue=%p, ImplicitValue=%p State=%p\n",
+            WalkState->ReturnDesc, WalkState->ImplicitReturnObj, WalkState));
 
         /* Check if we have restarted a preempted walk */
 
@@ -1373,8 +1373,22 @@ AcpiPsParseAml (
                  * If the method return value is not used by the parent,
                  * The object is deleted
                  */
-                Status = AcpiDsRestartControlMethod (WalkState,
-                            PreviousWalkState->ReturnDesc);
+                if (!PreviousWalkState->ReturnDesc)
+                {
+                    Status = AcpiDsRestartControlMethod (WalkState,
+                                PreviousWalkState->ImplicitReturnObj);
+                }
+                else
+                {
+                    /*
+                     * We have a valid return value, delete any implicit
+                     * return value.
+                     */
+                    AcpiDsClearImplicitReturn (PreviousWalkState);
+
+                    Status = AcpiDsRestartControlMethod (WalkState,
+                                PreviousWalkState->ReturnDesc);
+                }
                 if (ACPI_SUCCESS (Status))
                 {
                     WalkState->WalkType |= ACPI_WALK_METHOD_RESTART;
@@ -1394,13 +1408,31 @@ AcpiPsParseAml (
          */
         else if (PreviousWalkState->CallerReturnDesc)
         {
-            *(PreviousWalkState->CallerReturnDesc) = PreviousWalkState->ReturnDesc; /* NULL if no return value */
-        }
-        else if (PreviousWalkState->ReturnDesc)
-        {
-            /* Caller doesn't want it, must delete it */
+            if (PreviousWalkState->ImplicitReturnObj)
+            {
+                *(PreviousWalkState->CallerReturnDesc) = PreviousWalkState->ImplicitReturnObj;
+            }
+            else
+            {
+                 /* NULL if no return value */
 
-            AcpiUtRemoveReference (PreviousWalkState->ReturnDesc);
+                *(PreviousWalkState->CallerReturnDesc) = PreviousWalkState->ReturnDesc;
+            }
+        }
+        else
+        {
+            if (PreviousWalkState->ReturnDesc)
+            {
+                /* Caller doesn't want it, must delete it */
+
+                AcpiUtRemoveReference (PreviousWalkState->ReturnDesc);
+            }
+            if (PreviousWalkState->ImplicitReturnObj)
+            {
+                /* Caller doesn't want it, must delete it */
+
+                AcpiUtRemoveReference (PreviousWalkState->ImplicitReturnObj);
+            }
         }
 
         AcpiDsDeleteWalkState (PreviousWalkState);

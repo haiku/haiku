@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: rsaddr - Address resource descriptors (16/32/64)
- *              $Revision: 1.1 $
+ *              $Revision: 37 $
  *
  ******************************************************************************/
 
@@ -185,14 +185,14 @@ AcpiRsAddress16Resource (
     Buffer += 2;
     Temp8 = *Buffer;
 
-    /* Values 0-2 are valid */
+    /* Values 0-2 and 0xC0-0xFF are valid */
 
-    if (Temp8 > 2)
+    if ((Temp8 > 2) && (Temp8 < 0xC0))
     {
         return_ACPI_STATUS (AE_AML_INVALID_RESOURCE_TYPE);
     }
 
-    OutputStruct->Data.Address16.ResourceType = Temp8 & 0x03;
+    OutputStruct->Data.Address16.ResourceType = Temp8;
 
     /*
      * Get the General Flags (Byte4)
@@ -583,13 +583,14 @@ AcpiRsAddress32Resource (
     Buffer += 2;
     Temp8 = *Buffer;
 
-    /* Values 0-2 are valid */
-    if(Temp8 > 2)
+    /* Values 0-2 and 0xC0-0xFF are valid */
+
+    if ((Temp8 > 2) && (Temp8 < 0xC0))
     {
         return_ACPI_STATUS (AE_AML_INVALID_RESOURCE_TYPE);
     }
 
-    OutputStruct->Data.Address32.ResourceType = Temp8 & 0x03;
+    OutputStruct->Data.Address32.ResourceType = Temp8;
 
     /*
      * Get the General Flags (Byte4)
@@ -948,6 +949,7 @@ AcpiRsAddress64Resource (
     ACPI_RESOURCE           *OutputStruct = (void *) *OutputBuffer;
     UINT16                  Temp16;
     UINT8                   Temp8;
+    UINT8                   ResourceType;
     UINT8                   *TempPtr;
     ACPI_SIZE               StructSize;
     UINT32                  Index;
@@ -958,6 +960,7 @@ AcpiRsAddress64Resource (
 
     Buffer = ByteStreamBuffer;
     StructSize = ACPI_SIZEOF_RESOURCE (ACPI_RESOURCE_ADDRESS64);
+    ResourceType = *Buffer;
 
     /*
      * Point past the Descriptor to get the number of bytes consumed
@@ -981,14 +984,14 @@ AcpiRsAddress64Resource (
     Buffer += 2;
     Temp8 = *Buffer;
 
-    /* Values 0-2 are valid */
+    /* Values 0-2 and 0xC0-0xFF are valid */
 
-    if(Temp8 > 2)
+    if ((Temp8 > 2) && (Temp8 < 0xC0))
     {
         return_ACPI_STATUS (AE_AML_INVALID_RESOURCE_TYPE);
     }
 
-    OutputStruct->Data.Address64.ResourceType = Temp8 & 0x03;
+    OutputStruct->Data.Address64.ResourceType = Temp8;
 
     /*
      * Get the General Flags (Byte4)
@@ -1046,101 +1049,118 @@ AcpiRsAddress64Resource (
         }
     }
 
+    if (ResourceType == ACPI_RDESC_TYPE_EXTENDED_ADDRESS_SPACE)
+    {
+        /* Move past RevisionId and Reserved byte */
+
+        Buffer += 2;
+    }
+
     /*
-     * Get Granularity (Bytes 6-13)
+     * Get Granularity (Bytes 6-13) or (Bytes 8-15)
      */
     Buffer += 1;
     ACPI_MOVE_64_TO_64 (&OutputStruct->Data.Address64.Granularity, Buffer);
 
     /*
-     * Get MinAddressRange (Bytes 14-21)
+     * Get MinAddressRange (Bytes 14-21) or (Bytes 16-23)
      */
     Buffer += 8;
     ACPI_MOVE_64_TO_64 (&OutputStruct->Data.Address64.MinAddressRange, Buffer);
 
     /*
-     * Get MaxAddressRange (Bytes 22-29)
+     * Get MaxAddressRange (Bytes 22-29) or (Bytes 24-31)
      */
     Buffer += 8;
     ACPI_MOVE_64_TO_64 (&OutputStruct->Data.Address64.MaxAddressRange, Buffer);
 
     /*
-     * Get AddressTranslationOffset (Bytes 30-37)
+     * Get AddressTranslationOffset (Bytes 30-37) or (Bytes 32-39)
      */
     Buffer += 8;
     ACPI_MOVE_64_TO_64 (&OutputStruct->Data.Address64.AddressTranslationOffset, Buffer);
 
     /*
-     * Get AddressLength (Bytes 38-45)
+     * Get AddressLength (Bytes 38-45) or (Bytes 40-47)
      */
     Buffer += 8;
     ACPI_MOVE_64_TO_64 (&OutputStruct->Data.Address64.AddressLength, Buffer);
 
-    /*
-     * Resource Source Index (if present)
-     */
-    Buffer += 8;
+    OutputStruct->Data.Address64.ResourceSource.Index = 0x00;
+    OutputStruct->Data.Address64.ResourceSource.StringLength = 0;
+    OutputStruct->Data.Address64.ResourceSource.StringPtr = NULL;
 
-    /*
-     * This will leave us pointing to the Resource Source Index
-     * If it is present, then save it off and calculate the
-     * pointer to where the null terminated string goes:
-     * Each Interrupt takes 32-bits + the 5 bytes of the
-     * stream that are default.
-     *
-     * Note: Some resource descriptors will have an additional null, so
-     * we add 1 to the length.
-     */
-    if (*BytesConsumed > (46 + 1))
+    if (ResourceType == ACPI_RDESC_TYPE_EXTENDED_ADDRESS_SPACE)
     {
-        /* Dereference the Index */
+        /* Get TypeSpecificAttribute (Bytes 48-55) */
 
-        Temp8 = *Buffer;
-        OutputStruct->Data.Address64.ResourceSource.Index =
-                (UINT32) Temp8;
-
-        /* Point to the String */
-
-        Buffer += 1;
-
-        /* Point the String pointer to the end of this structure */
-
-        OutputStruct->Data.Address64.ResourceSource.StringPtr =
-                (char *)((UINT8 *)OutputStruct + StructSize);
-
-        TempPtr = (UINT8 *) OutputStruct->Data.Address64.ResourceSource.StringPtr;
-
-        /* Copy the string into the buffer */
-
-        Index = 0;
-        while (0x00 != *Buffer)
-        {
-            *TempPtr = *Buffer;
-
-            TempPtr += 1;
-            Buffer += 1;
-            Index += 1;
-        }
-
-        /*
-         * Add the terminating null
-         */
-        *TempPtr = 0x00;
-        OutputStruct->Data.Address64.ResourceSource.StringLength = Index + 1;
-
-        /*
-         * In order for the StructSize to fall on a 32-bit boundary,
-         * calculate the length of the string and expand the
-         * StructSize to the next 32-bit boundary.
-         */
-        Temp8 = (UINT8) (Index + 1);
-        StructSize += ACPI_ROUND_UP_TO_32BITS (Temp8);
+        Buffer += 8;
+        ACPI_MOVE_64_TO_64 (&OutputStruct->Data.Address64.TypeSpecificAttributes, Buffer);
     }
     else
     {
-        OutputStruct->Data.Address64.ResourceSource.Index = 0x00;
-        OutputStruct->Data.Address64.ResourceSource.StringLength = 0;
-        OutputStruct->Data.Address64.ResourceSource.StringPtr = NULL;
+        OutputStruct->Data.Address64.TypeSpecificAttributes = 0;
+
+        /*
+         * Resource Source Index (if present)
+         */
+        Buffer += 8;
+
+        /*
+         * This will leave us pointing to the Resource Source Index
+         * If it is present, then save it off and calculate the
+         * pointer to where the null terminated string goes:
+         * Each Interrupt takes 32-bits + the 5 bytes of the
+         * stream that are default.
+         *
+         * Note: Some resource descriptors will have an additional null, so
+         * we add 1 to the length.
+         */
+        if (*BytesConsumed > (46 + 1))
+        {
+            /* Dereference the Index */
+
+            Temp8 = *Buffer;
+            OutputStruct->Data.Address64.ResourceSource.Index =
+                    (UINT32) Temp8;
+
+            /* Point to the String */
+
+            Buffer += 1;
+
+            /* Point the String pointer to the end of this structure */
+
+            OutputStruct->Data.Address64.ResourceSource.StringPtr =
+                    (char *)((UINT8 *)OutputStruct + StructSize);
+
+            TempPtr = (UINT8 *) OutputStruct->Data.Address64.ResourceSource.StringPtr;
+
+            /* Copy the string into the buffer */
+
+            Index = 0;
+            while (0x00 != *Buffer)
+            {
+                *TempPtr = *Buffer;
+
+                TempPtr += 1;
+                Buffer += 1;
+                Index += 1;
+            }
+
+            /*
+             * Add the terminating null
+             */
+            *TempPtr = 0x00;
+            OutputStruct->Data.Address64.ResourceSource.StringLength = Index + 1;
+
+            /*
+             * In order for the StructSize to fall on a 32-bit boundary,
+             * calculate the length of the string and expand the
+             * StructSize to the next 32-bit boundary.
+             */
+            Temp8 = (UINT8) (Index + 1);
+            StructSize += ACPI_ROUND_UP_TO_32BITS (Temp8);
+        }
     }
 
     /*

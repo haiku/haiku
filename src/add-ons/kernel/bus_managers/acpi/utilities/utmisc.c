@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: utmisc - common utility procedures
- *              $Revision: 1.1 $
+ *              $Revision: 108 $
  *
  ******************************************************************************/
 
@@ -461,13 +461,18 @@ AcpiUtStrtoul64 (
     UINT32                  Base,
     ACPI_INTEGER            *RetInteger)
 {
-    UINT32                  ThisDigit;
+    UINT32                  ThisDigit = 0;
     ACPI_INTEGER            ReturnValue = 0;
     ACPI_INTEGER            Quotient;
 
 
     ACPI_FUNCTION_TRACE ("UtStroul64");
 
+
+    if ((!String) || !(*String))
+    {
+        goto ErrorExit;
+    }
 
     switch (Base)
     {
@@ -485,7 +490,7 @@ AcpiUtStrtoul64 (
 
     while (ACPI_IS_SPACE (*String) || *String == '\t')
     {
-        ++String;
+        String++;
     }
 
     /*
@@ -495,10 +500,10 @@ AcpiUtStrtoul64 (
     if (Base == 0)
     {
         if ((*String == '0') &&
-            (ACPI_TOLOWER (*(++String)) == 'x'))
+            (ACPI_TOLOWER (*(String + 1)) == 'x'))
         {
             Base = 16;
-            ++String;
+            String += 2;
         }
         else
         {
@@ -510,11 +515,11 @@ AcpiUtStrtoul64 (
      * For hexadecimal base, skip over the leading
      * 0 or 0x, if they are present.
      */
-    if (Base == 16 &&
-        *String == '0' &&
-        ACPI_TOLOWER (*(++String)) == 'x')
+    if ((Base == 16) &&
+        (*String == '0') &&
+        (ACPI_TOLOWER (*(String + 1)) == 'x'))
     {
-        String++;
+        String += 2;
     }
 
     /* Any string left? */
@@ -536,8 +541,15 @@ AcpiUtStrtoul64 (
         }
         else
         {
+            if (Base == 10)
+            {
+                /* Digit is out of range */
+
+                goto ErrorExit;
+            }
+
             ThisDigit = (UINT8) ACPI_TOUPPER (*String);
-            if (ACPI_IS_UPPER ((char) ThisDigit))
+            if (ACPI_IS_XDIGIT ((char) ThisDigit))
             {
                 /* Convert ASCII Hex char to value */
 
@@ -545,15 +557,12 @@ AcpiUtStrtoul64 (
             }
             else
             {
-                goto ErrorExit;
+                /*
+                 * We allow non-hex chars, just stop now, same as end-of-string.
+                 * See ACPI spec, string-to-integer conversion.
+                 */
+                break;
             }
-        }
-
-        /* Check to see if digit is out of range */
-
-        if (ThisDigit >= Base)
-        {
-            goto ErrorExit;
         }
 
         /* Divide the digit into the correct position */
@@ -567,8 +576,10 @@ AcpiUtStrtoul64 (
 
         ReturnValue *= Base;
         ReturnValue += ThisDigit;
-        ++String;
+        String++;
     }
+
+    /* All done, normal exit */
 
     *RetInteger = ReturnValue;
     return_ACPI_STATUS (AE_OK);

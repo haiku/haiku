@@ -2,7 +2,7 @@
  *
  * Module Name: tbxface - Public interfaces to the ACPI subsystem
  *                         ACPI table oriented interfaces
- *              $Revision: 1.1 $
+ *              $Revision: 65 $
  *
  *****************************************************************************/
 

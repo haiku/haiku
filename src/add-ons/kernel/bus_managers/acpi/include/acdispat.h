@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acdispat.h - dispatcher (parser to interpreter interface)
- *       $Revision: 1.1 $
+ *       $Revision: 61 $
  *
  *****************************************************************************/
 
@@ -442,6 +442,16 @@ AcpiDsCreateNode (
 
 
 /* dsutils - Parser/Interpreter interface utility routines */
+
+void
+AcpiDsClearImplicitReturn (
+    ACPI_WALK_STATE         *WalkState);
+
+BOOLEAN
+AcpiDsDoImplicitReturn (
+    ACPI_OPERAND_OBJECT     *ReturnDesc,
+    ACPI_WALK_STATE         *WalkState,
+    BOOLEAN                 AddReference);
 
 BOOLEAN
 AcpiDsIsResultUsed (

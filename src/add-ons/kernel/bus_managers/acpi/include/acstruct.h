@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acstruct.h - Internal structs
- *       $Revision: 1.1 $
+ *       $Revision: 30 $
  *
  *****************************************************************************/
 
@@ -167,6 +167,7 @@ typedef struct acpi_walk_state
     ACPI_GENERIC_STATE          *ControlState;                      /* List of control states (nested IFs) */
     struct acpi_namespace_node  *DeferredNode;                      /* Used when executing deferred opcodes */
     struct acpi_gpe_event_info  *GpeEventInfo;                      /* Info for GPE (_Lxx/_Exx methods only */
+    union acpi_operand_object   *ImplicitReturnObj;
     struct acpi_namespace_node  LocalVariables[ACPI_METHOD_NUM_LOCALS];     /* Control method locals */
     struct acpi_namespace_node  *MethodCallNode;                    /* Called method Node*/
     ACPI_PARSE_OBJECT           *MethodCallOp;                      /* MethodCall Op if running a method */

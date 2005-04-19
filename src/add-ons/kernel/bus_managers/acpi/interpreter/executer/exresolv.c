@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exresolv - AML Interpreter object resolution
- *              $Revision: 1.1 $
+ *              $Revision: 127 $
  *
  *****************************************************************************/
 
@@ -516,6 +516,13 @@ AcpiExResolveMultiple (
              * This could of course in turn be another reference object.
              */
             ObjDesc = *(ObjDesc->Reference.Where);
+            if (!ObjDesc)
+            {
+                /* NULL package elements are allowed */
+
+                Type = 0; /* Uninitialized */
+                goto Exit;
+            }
             break;
 
 

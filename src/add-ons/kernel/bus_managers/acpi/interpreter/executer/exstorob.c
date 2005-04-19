@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exstorob - AML Interpreter object store support, store to object
- *              $Revision: 1.1 $
+ *              $Revision: 55 $
  *
  *****************************************************************************/
 
@@ -140,7 +140,6 @@
 
 ACPI_STATUS
 AcpiExStoreBufferToBuffer (
-    ACPI_OBJECT_TYPE        OriginalSrcType,
     ACPI_OPERAND_OBJECT     *SourceDesc,
     ACPI_OPERAND_OBJECT     *TargetDesc)
 {
@@ -151,9 +150,8 @@ AcpiExStoreBufferToBuffer (
     ACPI_FUNCTION_TRACE_PTR ("ExStoreBufferToBuffer", SourceDesc);
 
 
-    /*
-     * We know that SourceDesc is a buffer by now
-     */
+    /* We know that SourceDesc is a buffer by now */
+
     Buffer = (UINT8 *) SourceDesc->Buffer.Pointer;
     Length = SourceDesc->Buffer.Length;
 
@@ -182,7 +180,17 @@ AcpiExStoreBufferToBuffer (
         ACPI_MEMSET (TargetDesc->Buffer.Pointer, 0, TargetDesc->Buffer.Length);
         ACPI_MEMCPY (TargetDesc->Buffer.Pointer, Buffer, Length);
 
+#ifdef ACPI_OBSOLETE_BEHAVIOR
         /*
+         * NOTE: ACPI versions up to 3.0 specified that the buffer must be
+         * truncated if the string is smaller than the buffer.  However, "other"
+         * implementations of ACPI never did this and thus became the defacto
+         * standard. ACPI 3.0A changes this behavior such that the buffer 
+         * is no longer truncated.
+         */
+
+        /*
+         * OBSOLETE BEHAVIOR:
          * If the original source was a string, we must truncate the buffer,
          * according to the ACPI spec.  Integer-to-Buffer and Buffer-to-Buffer
          * copy must not truncate the original buffer.
@@ -193,6 +201,7 @@ AcpiExStoreBufferToBuffer (
 
             TargetDesc->Buffer.Length = Length;
         }
+#endif
     }
     else
     {
@@ -238,9 +247,8 @@ AcpiExStoreStringToString (
     ACPI_FUNCTION_TRACE_PTR ("ExStoreStringToString", SourceDesc);
 
 
-    /*
-     * We know that SourceDesc is a string by now.
-     */
+    /* We know that SourceDesc is a string by now */
+
     Buffer = (UINT8 *) SourceDesc->String.Pointer;
     Length = SourceDesc->String.Length;
 
@@ -267,9 +275,8 @@ AcpiExStoreStringToString (
         if (TargetDesc->String.Pointer &&
            (!(TargetDesc->Common.Flags & AOPOBJ_STATIC_POINTER)))
         {
-            /*
-             * Only free if not a pointer into the DSDT
-             */
+            /* Only free if not a pointer into the DSDT */
+
             ACPI_MEM_FREE (TargetDesc->String.Pointer);
         }
 

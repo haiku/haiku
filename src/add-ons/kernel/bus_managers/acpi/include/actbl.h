@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: actbl.h - Table data structures defined in ACPI specification
- *       $Revision: 1.1 $
+ *       $Revision: 68 $
  *
  *****************************************************************************/
 
@@ -345,6 +345,8 @@ typedef struct madt_local_sapic
     UINT8                   LocalSapicEid;          /* SAPIC EID */
     UINT8                   Reserved [3];           /* Reserved - must be zero */
     LOCAL_APIC_FLAGS
+    UINT32                  ProcessorUID;           /* Numeric UID - ACPI 3.0 */
+    char                    ProcessorUIDString[1];  /* String UID  - ACPI 3.0 */
 
 } MADT_LOCAL_SAPIC;
 
@@ -357,7 +359,7 @@ typedef struct madt_interrupt_source
     UINT8                   ProcessorEid;           /* Processor EID */
     UINT8                   IoSapicVector;          /* Vector value for PMI interrupts */
     UINT32                  Interrupt;              /* Global system interrupt */
-    UINT32                  Reserved;               /* Reserved - must be zero */
+    UINT32                  Flags;                  /* Interrupt Source Flags */
 
 } MADT_INTERRUPT_SOURCE;
 

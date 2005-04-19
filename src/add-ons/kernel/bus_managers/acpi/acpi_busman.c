@@ -208,23 +208,35 @@ status_t get_device (const char *hid, uint32 index, char *result) {
 
 status_t get_device_hid (const char *path, char *hid) {
 	ACPI_HANDLE handle;
-	ACPI_DEVICE_INFO *info;
+	ACPI_OBJECT info;
 	ACPI_BUFFER info_buffer;
 	
 	if (AcpiGetHandle(NULL,path,&handle) != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 	
-	info_buffer.Pointer = info = (ACPI_DEVICE_INFO *)malloc(sizeof(ACPI_DEVICE_INFO));
-	info_buffer.Length = sizeof(ACPI_DEVICE_INFO);
+	info_buffer.Pointer = &info;
+	info_buffer.Length = sizeof(ACPI_OBJECT);
+	info.String.Pointer = hid;
+	info.String.Length = 9;
+	info.String.Type = ACPI_TYPE_STRING;
 	
-	if (AcpiGetObjectInfo(handle,&info_buffer) != AE_OK) {
-		free(info_buffer.Pointer);
+	if (AcpiEvaluateObject(handle,"_HID",NULL,&info_buffer) != AE_OK)
 		return B_BAD_TYPE;
+	
+	if (info.Type == ACPI_TYPE_INTEGER) {
+		uint32 EisaId = AcpiUtDwordByteSwap (info.Integer.Value);
+
+	    hid[0] = (char) ('@' + (((unsigned long) EisaId >> 26) & 0x1f));
+	    hid[1] = (char) ('@' + ((EisaId >> 21) & 0x1f));
+	    hid[2] = (char) ('@' + ((EisaId >> 16) & 0x1f));
+	    hid[3] = AcpiUtHexToAsciiChar ((ACPI_INTEGER) EisaId, 12);
+	    hid[4] = AcpiUtHexToAsciiChar ((ACPI_INTEGER) EisaId, 8);
+	    hid[5] = AcpiUtHexToAsciiChar ((ACPI_INTEGER) EisaId, 4);
+	    hid[6] = AcpiUtHexToAsciiChar ((ACPI_INTEGER) EisaId, 0);
+	    hid[7] = 0;
 	}
-		
-	strncpy(hid,info->HardwareId.Value,ACPI_DEVICE_ID_LENGTH);
-	free(info_buffer.Pointer);
-	hid[8] = '\0';
+	
+	hid[ACPI_DEVICE_ID_LENGTH] = '\0';
 	return B_OK;
 }
 

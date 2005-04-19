@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exmisc - ACPI AML (p-code) execution - specific opcodes
- *              $Revision: 1.1 $
+ *              $Revision: 129 $
  *
  *****************************************************************************/
 
@@ -173,6 +173,7 @@ AcpiExGetObjectReference (
         {
         case AML_LOCAL_OP:
         case AML_ARG_OP:
+        case AML_DEBUG_OP:
 
             /* The referenced object is the pseudo-node for the local/arg */
 
@@ -181,7 +182,7 @@ AcpiExGetObjectReference (
 
         default:
 
-            ACPI_REPORT_ERROR (("Unknown Reference subtype in get ref %X\n",
+            ACPI_REPORT_ERROR (("Unknown Reference opcode in GetReference %X\n",
                 ObjDesc->Reference.Opcode));
             return_ACPI_STATUS (AE_AML_INTERNAL);
         }
@@ -199,7 +200,7 @@ AcpiExGetObjectReference (
 
     default:
 
-        ACPI_REPORT_ERROR (("Invalid descriptor type in get ref: %X\n",
+        ACPI_REPORT_ERROR (("Invalid descriptor type in GetReference: %X\n",
                 ACPI_GET_DESCRIPTOR_TYPE (ObjDesc)));
         return_ACPI_STATUS (AE_TYPE);
     }

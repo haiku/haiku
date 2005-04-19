@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: aclocal.h - Internal data types used across the ACPI subsystem
- *       $Revision: 1.1 $
+ *       $Revision: 205 $
  *
  *****************************************************************************/
 
@@ -883,6 +883,7 @@ typedef struct acpi_bit_register_info
 #define ACPI_BITMASK_POWER_BUTTON_STATUS        0x0100
 #define ACPI_BITMASK_SLEEP_BUTTON_STATUS        0x0200
 #define ACPI_BITMASK_RT_CLOCK_STATUS            0x0400
+#define ACPI_BITMASK_PCIEXP_WAKE_STATUS         0x4000    /* ACPI 3.0 */
 #define ACPI_BITMASK_WAKE_STATUS                0x8000
 
 #define ACPI_BITMASK_ALL_FIXED_STATUS           (ACPI_BITMASK_TIMER_STATUS          | \
@@ -898,6 +899,7 @@ typedef struct acpi_bit_register_info
 #define ACPI_BITMASK_POWER_BUTTON_ENABLE        0x0100
 #define ACPI_BITMASK_SLEEP_BUTTON_ENABLE        0x0200
 #define ACPI_BITMASK_RT_CLOCK_ENABLE            0x0400
+#define ACPI_BITMASK_PCIEXP_WAKE_DISABLE        0x4000    /* ACPI 3.0 */
 
 #define ACPI_BITMASK_SCI_ENABLE                 0x0001
 #define ACPI_BITMASK_BUS_MASTER_RLD             0x0002
@@ -916,6 +918,7 @@ typedef struct acpi_bit_register_info
 #define ACPI_BITPOSITION_POWER_BUTTON_STATUS    0x08
 #define ACPI_BITPOSITION_SLEEP_BUTTON_STATUS    0x09
 #define ACPI_BITPOSITION_RT_CLOCK_STATUS        0x0A
+#define ACPI_BITPOSITION_PCIEXP_WAKE_STATUS     0x0E    /* ACPI 3.0 */
 #define ACPI_BITPOSITION_WAKE_STATUS            0x0F
 
 #define ACPI_BITPOSITION_TIMER_ENABLE           0x00
@@ -923,6 +926,7 @@ typedef struct acpi_bit_register_info
 #define ACPI_BITPOSITION_POWER_BUTTON_ENABLE    0x08
 #define ACPI_BITPOSITION_SLEEP_BUTTON_ENABLE    0x09
 #define ACPI_BITPOSITION_RT_CLOCK_ENABLE        0x0A
+#define ACPI_BITPOSITION_PCIEXP_WAKE_DISABLE    0x0E    /* ACPI 3.0 */
 
 #define ACPI_BITPOSITION_SCI_ENABLE             0x00
 #define ACPI_BITPOSITION_BUS_MASTER_RLD         0x01

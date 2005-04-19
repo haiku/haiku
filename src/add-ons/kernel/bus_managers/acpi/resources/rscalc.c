@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: rscalc - Calculate stream and list lengths
- *              $Revision: 1.1 $
+ *              $Revision: 54 $
  *
  ******************************************************************************/
 
@@ -457,6 +457,20 @@ AcpiRsGetListLength (
             BytesConsumed = 12;
 
             StructureSize = ACPI_SIZEOF_RESOURCE (ACPI_RESOURCE_FIXED_MEM32);
+            break;
+
+
+        case ACPI_RDESC_TYPE_EXTENDED_ADDRESS_SPACE:
+            /*
+             * 64-Bit Address Resource
+             */
+            Buffer = ByteStreamBuffer;
+
+            ++Buffer;
+            ACPI_MOVE_16_TO_16 (&Temp16, Buffer);
+
+            BytesConsumed = Temp16 + 3;
+            StructureSize = ACPI_SIZEOF_RESOURCE (ACPI_RESOURCE_ADDRESS64);
             break;
 
 

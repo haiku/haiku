@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utcopy - Internal to external object translation utilities
- *              $Revision: 1.1 $
+ *              $Revision: 117 $
  *
  *****************************************************************************/
 
@@ -750,7 +750,8 @@ AcpiUtCopySimpleObject (
 
             if (SourceDesc->Buffer.Length)
             {
-                DestDesc->Buffer.Pointer = ACPI_MEM_ALLOCATE (SourceDesc->Buffer.Length);
+                DestDesc->Buffer.Pointer =
+                    ACPI_MEM_ALLOCATE (SourceDesc->Buffer.Length);
                 if (!DestDesc->Buffer.Pointer)
                 {
                     return (AE_NO_MEMORY);
@@ -758,8 +759,9 @@ AcpiUtCopySimpleObject (
 
                 /* Copy the actual buffer data */
 
-                ACPI_MEMCPY (DestDesc->Buffer.Pointer, SourceDesc->Buffer.Pointer,
-                             SourceDesc->Buffer.Length);
+                ACPI_MEMCPY (DestDesc->Buffer.Pointer, 
+                        SourceDesc->Buffer.Pointer,
+                        SourceDesc->Buffer.Length);
             }
         }
         break;
@@ -775,7 +777,8 @@ AcpiUtCopySimpleObject (
         if ((SourceDesc->String.Pointer) &&
             (!(SourceDesc->Common.Flags & AOPOBJ_STATIC_POINTER)))
         {
-            DestDesc->String.Pointer = ACPI_MEM_ALLOCATE ((ACPI_SIZE) SourceDesc->String.Length + 1);
+            DestDesc->String.Pointer =
+                ACPI_MEM_ALLOCATE ((ACPI_SIZE) SourceDesc->String.Length + 1);
             if (!DestDesc->String.Pointer)
             {
                 return (AE_NO_MEMORY);
@@ -784,6 +787,14 @@ AcpiUtCopySimpleObject (
             ACPI_MEMCPY (DestDesc->String.Pointer, SourceDesc->String.Pointer,
                          (ACPI_SIZE) SourceDesc->String.Length + 1);
         }
+        break;
+
+    case ACPI_TYPE_LOCAL_REFERENCE:
+        /*
+         * We copied the reference object, so we now must add a reference
+         * to the object pointed to by the reference
+         */
+        AcpiUtAddReference (SourceDesc->Reference.Object);
         break;
 
     default:

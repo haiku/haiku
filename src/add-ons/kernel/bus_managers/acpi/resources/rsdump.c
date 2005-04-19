@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: rsdump - Functions to display the resource structures.
- *              $Revision: 1.1 $
+ *              $Revision: 41 $
  *
  ******************************************************************************/
 
@@ -656,7 +656,7 @@ AcpiRsDumpAddress16 (
             break;
         }
 
-        AcpiOsPrintf ("  Type Specific: %s Translation\n",
+        AcpiOsPrintf ("    Type Specific: %s Translation\n",
             ACPI_SPARSE_TRANSLATION ==
             Address16Data->Attribute.Io.TranslationAttribute ?
             "Sparse" : "Dense");
@@ -669,8 +669,8 @@ AcpiRsDumpAddress16 (
 
     default:
 
-        AcpiOsPrintf ("Invalid resource type. Exiting.\n");
-        return;
+        AcpiOsPrintf ("0x%2.2X\n", Address16Data->ResourceType);
+        break;
     }
 
     AcpiOsPrintf ("    Resource %s\n",
@@ -807,7 +807,7 @@ AcpiRsDumpAddress32 (
             break;
         }
 
-        AcpiOsPrintf ("  Type Specific: %s Translation\n",
+        AcpiOsPrintf ("    Type Specific: %s Translation\n",
             ACPI_SPARSE_TRANSLATION ==
             Address32Data->Attribute.Io.TranslationAttribute ?
             "Sparse" : "Dense");
@@ -820,8 +820,8 @@ AcpiRsDumpAddress32 (
 
     default:
 
-        AcpiOsPrintf ("    Invalid Resource Type..exiting.\n");
-        return;
+        AcpiOsPrintf ("    Resource Type: 0x%2.2X\n", Address32Data->ResourceType);
+        break;
     }
 
     AcpiOsPrintf ("    Resource %s\n",
@@ -958,7 +958,7 @@ AcpiRsDumpAddress64 (
             break;
         }
 
-        AcpiOsPrintf ("  Type Specific: %s Translation\n",
+        AcpiOsPrintf ("    Type Specific: %s Translation\n",
             ACPI_SPARSE_TRANSLATION ==
             Address64Data->Attribute.Io.TranslationAttribute ?
             "Sparse" : "Dense");
@@ -971,8 +971,8 @@ AcpiRsDumpAddress64 (
 
     default:
 
-        AcpiOsPrintf ("    Invalid Resource Type..exiting.\n");
-        return;
+        AcpiOsPrintf ("    Resource Type: 0x%2.2X\n", Address64Data->ResourceType);
+        break;
     }
 
     AcpiOsPrintf ("    Resource %s\n",
@@ -1006,7 +1006,10 @@ AcpiRsDumpAddress64 (
     AcpiOsPrintf ("    Address Length: %8.8X%8.8X\n",
                 ACPI_FORMAT_UINT64 (Address64Data->AddressLength));
 
-    if(0xFF != Address64Data->ResourceSource.Index)
+    AcpiOsPrintf ("    Type Specific Attributes: %8.8X%8.8X\n",
+                ACPI_FORMAT_UINT64 (Address64Data->TypeSpecificAttributes));
+
+    if (0xFF != Address64Data->ResourceSource.Index)
     {
         AcpiOsPrintf ("    Resource Source Index: %X\n",
                     Address64Data->ResourceSource.Index);

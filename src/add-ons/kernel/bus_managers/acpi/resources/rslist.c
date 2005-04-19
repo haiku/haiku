@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: rslist - Linked list utilities
- *              $Revision: 1.1 $
+ *              $Revision: 36 $
  *
  ******************************************************************************/
 
@@ -255,6 +255,7 @@ AcpiRsByteStreamToList (
 
 
         case ACPI_RDESC_TYPE_QWORD_ADDRESS_SPACE:
+        case ACPI_RDESC_TYPE_EXTENDED_ADDRESS_SPACE:
             /*
              * 64-Bit Address Resource
              */

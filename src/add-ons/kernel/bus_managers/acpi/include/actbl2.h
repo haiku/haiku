@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: actbl2.h - ACPI Specification Revision 2.0 Tables
- *       $Revision: 1.1 $
+ *       $Revision: 41 $
  *
  *****************************************************************************/
 
@@ -182,7 +182,7 @@ typedef struct facs_descriptor_rev2
 
 
 /*
- * ACPI 2.0 Generic Address Structure (GAS)
+ * ACPI 2.0+ Generic Address Structure (GAS)
  */
 typedef struct acpi_generic_address
 {
@@ -234,7 +234,7 @@ typedef struct acpi_generic_address
     UINT16                  IapcBootArch;       /* IA-PC Boot Architecture Flags. See Table 5-10 for description*/
 
 /*
- * ACPI 2.0 Fixed ACPI Description Table (FADT)
+ * ACPI 2.0+ Fixed ACPI Description Table (FADT)
  */
 typedef struct fadt_descriptor_rev2
 {
@@ -249,17 +249,25 @@ typedef struct fadt_descriptor_rev2
     UINT32_BIT              SleepButton : 1;    /* Sleep button is handled as a generic feature, or not present */
     UINT32_BIT              FixedRTC    : 1;    /* RTC wakeup stat not in fixed register space */
     UINT32_BIT              Rtcs4       : 1;    /* RTC wakeup stat not possible from S4 */
-    UINT32_BIT              TmrValExt   : 1;    /* Indicates tmr_val is 32 bits 0=24-bits*/
+    UINT32_BIT              TmrValExt   : 1;    /* Indicates tmr_val is 32 bits 0=24-bits */
     UINT32_BIT              DockCap     : 1;    /* Supports Docking */
-    UINT32_BIT              ResetRegSup : 1;    /* Indicates system supports system reset via the FADT RESET_REG*/
-    UINT32_BIT              SealedCase  : 1;    /* Indicates system has no internal expansion capabilities and case is sealed. */
-    UINT32_BIT              Headless    : 1;    /* Indicates system does not have local video capabilities or local input devices.*/
+    UINT32_BIT              ResetRegSup : 1;    /* Indicates system supports system reset via the FADT RESET_REG */
+    UINT32_BIT              SealedCase  : 1;    /* Indicates system has no internal expansion capabilities and case is sealed */
+    UINT32_BIT              Headless    : 1;    /* Indicates system does not have local video capabilities or local input devices */
     UINT32_BIT              CpuSwSleep  : 1;    /* Indicates to OSPM that a processor native instruction */
-                                                /* Must be executed after writing the SLP_TYPx register. */
-    UINT32_BIT              Reserved6   : 18;   /* Reserved - must be zero */
+                                                /* must be executed after writing the SLP_TYPx register */
+    /* ACPI 3.0 flag bits */
+
+    UINT32_BIT              PciExpWak                           : 1; /* System supports PCIEXP_WAKE (STS/EN) bits */
+    UINT32_BIT              UsePlatformClock                    : 1; /* OSPM should use platform-provided timer */
+    UINT32_BIT              S4RtcStsValid                       : 1; /* Contents of RTC_STS valid after S4 wake */
+    UINT32_BIT              RemotePowerOnCapable                : 1; /* System is compatible with remote power on */
+    UINT32_BIT              ForceApicClusterModel               : 1; /* All local APICs must use cluster model */
+    UINT32_BIT              ForceApicPhysicalDestinationMode    : 1; /* All local xAPICs must use physical dest mode */
+    UINT32_BIT              Reserved6                           : 12;/* Reserved - must be zero */
 
     ACPI_GENERIC_ADDRESS    ResetRegister;      /* Reset register address in GAS format */
-    UINT8                   ResetValue;         /* Value to write to the ResetRegister port to reset the system. */
+    UINT8                   ResetValue;         /* Value to write to the ResetRegister port to reset the system */
     UINT8                   Reserved7[3];       /* These three bytes must be zero */
     UINT64                  XFirmwareCtrl;      /* 64-bit physical address of FACS */
     UINT64                  XDsdt;              /* 64-bit physical address of DSDT */
@@ -275,7 +283,7 @@ typedef struct fadt_descriptor_rev2
 } FADT_DESCRIPTOR_REV2;
 
 
-/* "Downrevved" ACPI 2.0 FADT descriptor */
+/* "Down-revved" ACPI 2.0 FADT descriptor */
 
 typedef struct fadt_descriptor_rev2_minus
 {
@@ -290,7 +298,7 @@ typedef struct fadt_descriptor_rev2_minus
 } FADT_DESCRIPTOR_REV2_MINUS;
 
 
-/* Embedded Controller */
+/* ECDT - Embedded Controller Boot Resources Table */
 
 typedef struct ec_boot_resources
 {
@@ -302,6 +310,59 @@ typedef struct ec_boot_resources
     UINT8                   EcId[1];            /* Full namepath of the EC in the ACPI namespace */
 
 } EC_BOOT_RESOURCES;
+
+
+/* SRAT - System Resource Affinity Table */
+
+typedef struct static_resource_alloc
+{
+    UINT8                   Type;
+    UINT8                   Length;
+    UINT8                   ProximityDomainLo;
+    UINT8                   ApicId;
+    UINT32_BIT              Enabled         :1;
+    UINT32_BIT              Reserved3       :31;
+    UINT8                   LocalSapicEid;
+    UINT8                   ProximityDomainHi[3];
+    UINT32                  Reserved4;
+
+} STATIC_RESOURCE_ALLOC;
+
+typedef struct memory_affinity
+{
+    UINT8                   Type;
+    UINT8                   Length;
+    UINT32                  ProximityDomain;
+    UINT16                  Reserved3;
+    UINT64                  BaseAddress;
+    UINT64                  AddressLength;
+    UINT32                  Reserved4;
+    UINT32_BIT              Enabled         :1;
+    UINT32_BIT              HotPluggable    :1;
+    UINT32_BIT              NonVolatile     :1;
+    UINT32_BIT              Reserved5       :29;
+    UINT64                  Reserved6;
+
+} MEMORY_AFFINITY;
+
+typedef struct system_resource_affinity
+{
+    ACPI_TABLE_HEADER_DEF
+    UINT32                  Reserved1;          /* Must be value '1' */
+    UINT64                  Reserved2;
+
+} SYSTEM_RESOURCE_AFFINITY;
+
+
+/* SLIT - System Locality Distance Information Table */
+
+typedef struct system_locality_info
+{
+    ACPI_TABLE_HEADER_DEF
+    UINT64                  LocalityCount;
+    UINT8                   Entry[1][1];
+
+} SYSTEM_LOCALITY_INFO;
 
 
 #pragma pack()

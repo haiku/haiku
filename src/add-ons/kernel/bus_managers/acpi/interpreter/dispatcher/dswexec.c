@@ -2,7 +2,7 @@
  *
  * Module Name: dswexec - Dispatcher method execution callbacks;
  *                        dispatch to interpreter.
- *              $Revision: 1.1 $
+ *              $Revision: 117 $
  *
  *****************************************************************************/
 
@@ -166,6 +166,7 @@ AcpiDsGetPredicateValue (
 {
     ACPI_STATUS             Status = AE_OK;
     ACPI_OPERAND_OBJECT     *ObjDesc;
+    ACPI_OPERAND_OBJECT     *LocalObjDesc = NULL;
 
 
     ACPI_FUNCTION_TRACE_PTR ("DsGetPredicateValue", WalkState);
@@ -211,13 +212,19 @@ AcpiDsGetPredicateValue (
     }
 
     /*
-     * Result of predicate evaluation currently must
-     * be a number
+     * Result of predicate evaluation must be an Integer
+     * object. Implicitly convert the argument if necessary.
      */
-    if (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER)
+    Status = AcpiExConvertToInteger (ObjDesc, &LocalObjDesc, 16);
+    if (ACPI_FAILURE (Status))
+    {
+        goto Cleanup;
+    }
+
+    if (ACPI_GET_OBJECT_TYPE (LocalObjDesc) != ACPI_TYPE_INTEGER)
     {
         ACPI_DEBUG_PRINT ((ACPI_DB_ERROR,
-            "Bad predicate (not a number) ObjDesc=%p State=%p Type=%X\n",
+            "Bad predicate (not an integer) ObjDesc=%p State=%p Type=%X\n",
             ObjDesc, WalkState, ACPI_GET_OBJECT_TYPE (ObjDesc)));
 
         Status = AE_AML_OPERAND_TYPE;
@@ -226,13 +233,13 @@ AcpiDsGetPredicateValue (
 
     /* Truncate the predicate to 32-bits if necessary */
 
-    AcpiExTruncateFor32bitTable (ObjDesc);
+    AcpiExTruncateFor32bitTable (LocalObjDesc);
 
     /*
      * Save the result of the predicate evaluation on
      * the control stack
      */
-    if (ObjDesc->Integer.Value)
+    if (LocalObjDesc->Integer.Value)
     {
         WalkState->ControlState->Common.Value = TRUE;
     }
@@ -254,12 +261,16 @@ Cleanup:
 
      /* Break to debugger to display result */
 
-    ACPI_DEBUGGER_EXEC (AcpiDbDisplayResultObject (ObjDesc, WalkState));
+    ACPI_DEBUGGER_EXEC (AcpiDbDisplayResultObject (LocalObjDesc, WalkState));
 
     /*
      * Delete the predicate result object (we know that
      * we don't need it anymore)
      */
+    if (LocalObjDesc != ObjDesc)
+    {
+        AcpiUtRemoveReference (LocalObjDesc);
+    }
     AcpiUtRemoveReference (ObjDesc);
 
     WalkState->ControlState->Common.State = ACPI_CONTROL_NORMAL;
@@ -402,9 +413,10 @@ AcpiDsExecBeginOp (
     case AML_CLASS_EXECUTE:
     case AML_CLASS_CREATE:
 
-        /* most operators with arguments */
-        /* Start a new result/operand state */
-
+        /* 
+         * Most operators with arguments.
+         * Start a new result/operand state
+         */
         Status = AcpiDsResultStackPush (WalkState);
         break;
 
@@ -579,21 +591,45 @@ AcpiDsExecEndOp (
             /* 1 Operand, 0 ExternalResult, 0 InternalResult */
 
             Status = AcpiDsExecEndControlOp (WalkState, Op);
-            if (ACPI_FAILURE (Status))
-            {
-                break;
-            }
 
-            Status = AcpiDsResultStackPop (WalkState);
+            /* Make sure to properly pop the result stack */
+
+            if (ACPI_SUCCESS (Status))
+            {
+                Status = AcpiDsResultStackPop (WalkState);
+            }
+            else if (Status == AE_CTRL_PENDING)
+            {
+                Status = AcpiDsResultStackPop (WalkState);
+                if (ACPI_SUCCESS (Status))
+                {
+                    Status = AE_CTRL_PENDING;
+                }
+            }
             break;
 
 
         case AML_TYPE_METHOD_CALL:
 
+            /*
+             * If the method is referenced from within a package
+             * declaration, it is not a invocation of the method, just
+             * a reference to it.
+             */
+            if ((Op->Asl.Parent) &&
+               ((Op->Asl.Parent->Asl.AmlOpcode == AML_PACKAGE_OP) ||
+                (Op->Asl.Parent->Asl.AmlOpcode == AML_VAR_PACKAGE_OP)))
+            {
+                ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "Method Reference in a Package, Op=%p\n", Op));
+                Op->Common.Node = (ACPI_NAMESPACE_NODE *) Op->Asl.Value.Arg->Asl.Node->Object;
+                AcpiUtAddReference (Op->Asl.Value.Arg->Asl.Node->Object);
+                return_ACPI_STATUS (AE_OK);
+            }
+
             ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH, "Method invocation, Op=%p\n", Op));
 
             /*
-             * (AML_METHODCALL) Op->Value->Arg->Node contains
+             * (AML_METHODCALL) Op->Asl.Value.Arg->Asl.Node contains
              * the method Node pointer
              */
             /* NextOp points to the op that holds the method name */

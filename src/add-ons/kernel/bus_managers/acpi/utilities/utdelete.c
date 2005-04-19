@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: utdelete - object deletion and reference count utilities
- *              $Revision: 1.1 $
+ *              $Revision: 102 $
  *
  ******************************************************************************/
 
@@ -120,6 +120,7 @@
 #include "acinterp.h"
 #include "acnamesp.h"
 #include "acevents.h"
+#include "amlcode.h"
 
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("utdelete")
@@ -632,8 +633,25 @@ AcpiUtUpdateObjectReference (
             break;
 
 
-        case ACPI_TYPE_REGION:
         case ACPI_TYPE_LOCAL_REFERENCE:
+
+            /*
+             * The target of an Index (a package, string, or buffer) must track
+             * changes to the ref count of the index.
+             */
+            if (Object->Reference.Opcode == AML_INDEX_OP)
+            {
+                Status = AcpiUtCreateUpdateStateAndPush (
+                            Object->Reference.Object, Action, &StateList);
+                if (ACPI_FAILURE (Status))
+                {
+                    goto ErrorExit;
+                }
+            }
+            break;
+
+
+        case ACPI_TYPE_REGION:
         default:
 
             /* No subobjects */

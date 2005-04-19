@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acinterp.h - Interpreter subcomponent prototypes and defines
- *       $Revision: 1.1 $
+ *       $Revision: 158 $
  *
  *****************************************************************************/
 
@@ -689,7 +689,6 @@ AcpiExStoreObjectToObject (
 
 ACPI_STATUS
 AcpiExStoreBufferToBuffer (
-    ACPI_OBJECT_TYPE        OriginalSrcType,
     ACPI_OPERAND_OBJECT     *SourceDesc,
     ACPI_OPERAND_OBJECT     *TargetDesc);
 

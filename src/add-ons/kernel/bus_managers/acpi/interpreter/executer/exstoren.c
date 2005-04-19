@@ -3,7 +3,7 @@
  *
  * Module Name: exstoren - AML Interpreter object store support,
  *                        Store to Node (namespace object)
- *              $Revision: 1.1 $
+ *              $Revision: 62 $
  *
  *****************************************************************************/
 
@@ -285,7 +285,6 @@ AcpiExStoreObjectToObject (
 {
     ACPI_OPERAND_OBJECT     *ActualSrcDesc;
     ACPI_STATUS             Status = AE_OK;
-    ACPI_OBJECT_TYPE        OriginalSrcType;
 
 
     ACPI_FUNCTION_TRACE_PTR ("ExStoreObjectToObject", SourceDesc);
@@ -303,8 +302,7 @@ AcpiExStoreObjectToObject (
         return_ACPI_STATUS (Status);
     }
 
-    OriginalSrcType = ACPI_GET_OBJECT_TYPE (SourceDesc);
-    if (OriginalSrcType != ACPI_GET_OBJECT_TYPE (DestDesc))
+    if (ACPI_GET_OBJECT_TYPE (SourceDesc) != ACPI_GET_OBJECT_TYPE (DestDesc))
     {
         /*
          * The source type does not match the type of the destination.
@@ -359,8 +357,7 @@ AcpiExStoreObjectToObject (
          * Note: There is different store behavior depending on the original
          * source type
          */
-        Status = AcpiExStoreBufferToBuffer (OriginalSrcType, ActualSrcDesc, 
-                    DestDesc);
+        Status = AcpiExStoreBufferToBuffer (ActualSrcDesc, DestDesc);
         break;
 
     case ACPI_TYPE_PACKAGE:

@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: exoparg2 - AML execution - opcodes with 2 arguments
- *              $Revision: 1.1 $
+ *              $Revision: 131 $
  *
  *****************************************************************************/
 
@@ -539,6 +539,12 @@ AcpiExOpcode_2A_1T_1R (
             ReturnDesc->Reference.TargetType = ACPI_TYPE_BUFFER_FIELD;
             ReturnDesc->Reference.Object     = Operand[0];
         }
+
+        /*
+         * Add a reference to the target package/buffer/string for the life
+         * of the index.
+         */
+        AcpiUtAddReference (Operand[0]);
 
         /* Complete the Index reference object */
 
