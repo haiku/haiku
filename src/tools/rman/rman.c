@@ -1685,10 +1685,10 @@ XML(enum command cmd) {
 	   /* need to update this for enumerated and plain lists */
 	   case BEGINBULPAIR:	printf("<variablelist>\n"); break;
 	   case ENDBULPAIR:		printf("</variablelist>\n"); break;
-	   case BEGINBULLET:	printf("<term>"); break;
+	   case BEGINBULLET:	printf("<varlistentry><term>"); break;
 	   case ENDBULLET:		printf("</term>\n"); break;
 	   case BEGINBULTXT:	printf("<listitem>\n<para>"); break;
-	   case ENDBULTXT:		printf("\n</para></listitem>\n"); break;
+	   case ENDBULTXT:		printf("\n</para></listitem></varlistentry>\n"); break;
 
 	   case BEGINLINE:
 		/* remember, get BEGINBODY call at start of paragraph */
@@ -1726,7 +1726,7 @@ XML(enum command cmd) {
 	   case BEGINTABLEENTRY:		printf("<entry>"); break;
 	   case ENDTABLEENTRY:		printf("</entry>"); break;
 
-	   case BEGININDENT: case ENDINDENT:
+	   case BEGININDENT: case ENDINDENT: break;
 	   case FONTSIZE:
 		break;
 
