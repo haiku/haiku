@@ -348,65 +348,8 @@ void ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 	STRACE(("ServerWindow %s: SetLayerFontStateMessage for layer %s\n",
 			fName, layer->fName->String()));
 	// NOTE: no need to check for a lock. This is a private method.
-	uint16 mask;
 
-	link.Read<uint16>(&mask);
-			
-	if (mask & B_FONT_FAMILY_AND_STYLE)
-	{
-		uint32		fontID;
-		link.Read<int32>((int32*)&fontID);
-		layer->fLayerData->font.SetFamilyAndStyle(fontID);
-	}
-
-	if (mask & B_FONT_SIZE)
-	{
-		float size;
-		link.Read<float>(&size);
-		layer->fLayerData->font.SetSize(size);
-	}
-	
-	if (mask & B_FONT_SHEAR)
-	{
-		float shear;
-		link.Read<float>(&shear);
-		layer->fLayerData->font.SetShear(shear);
-	}
-
-	if (mask & B_FONT_ROTATION)
-	{
-		float rotation;
-		link.Read<float>(&rotation);
-		layer->fLayerData->font.SetRotation(rotation);
-	}
-
-	if (mask & B_FONT_SPACING)
-	{
-		uint8 spacing;
-		link.Read<uint8>(&spacing);
-		layer->fLayerData->font.SetSpacing(spacing);
-	}
-
-	if (mask & B_FONT_ENCODING)
-	{
-		uint8 encoding;
-		link.Read<uint8>((uint8*)&encoding);
-		layer->fLayerData->font.SetEncoding(encoding);
-	}
-
-	if (mask & B_FONT_FACE)
-	{
-		uint16 face;
-		link.Read<uint16>(&face);
-		layer->fLayerData->font.SetFace(face);
-	}
-
-	if (mask & B_FONT_FLAGS)
-	{
-		uint32 flags;
-		link.Read<uint32>(&flags);
-		layer->fLayerData->font.SetFlags(flags);
-	}
+	layer->fLayerData->ReadFontFromLink(link);
 }
 //------------------------------------------------------------------------------
 inline
@@ -415,55 +358,9 @@ void ServerWindow::SetLayerState(Layer *layer, LinkMsgReader &link)
 	STRACE(("ServerWindow %s: SetLayerState for layer %s\n",fName,
 			 layer->fName->String()));
 	// NOTE: no need to check for a lock. This is a private method.
-	rgb_color highColor, lowColor, viewColor;
-	pattern patt;
-	int32 clipRegRects;
 
-	link.Read<BPoint>(		&(layer->fLayerData->penlocation));
-	link.Read<float>(		&(layer->fLayerData->pensize));
-	link.Read(			&highColor, sizeof(rgb_color));
-	link.Read(			&lowColor, sizeof(rgb_color));
-	link.Read(			&viewColor, sizeof(rgb_color));
-	link.Read(			&patt, sizeof(pattern));
-	link.Read<int8>((int8*)	&(layer->fLayerData->draw_mode));
-	link.Read<BPoint>(		&(layer->fLayerData->coordOrigin));
-	link.Read<int8>((int8*)	&(layer->fLayerData->lineJoin));
-	link.Read<int8>((int8*)	&(layer->fLayerData->lineCap));
-	link.Read<float>(		&(layer->fLayerData->miterLimit));
-	link.Read<int8>((int8*)	&(layer->fLayerData->alphaSrcMode));
-	link.Read<int8>((int8*)	&(layer->fLayerData->alphaFncMode));
-	link.Read<float>(		&(layer->fLayerData->scale));
-	link.Read<bool>(			&(layer->fLayerData->fontAliasing));
-	link.Read<int32>(		&clipRegRects);
-
-	layer->fLayerData->patt.Set(*((uint64*)&patt));
-	layer->fLayerData->highcolor.SetColor(highColor);
-	layer->fLayerData->lowcolor.SetColor(lowColor);
-	layer->fLayerData->viewcolor.SetColor(viewColor);
-
-	if(clipRegRects != 0)
-	{
-		if(layer->fLayerData->clipReg == NULL)
-			layer->fLayerData->clipReg = new BRegion();
-		else
-			layer->fLayerData->clipReg->MakeEmpty();
-
-		BRect rect;
-				
-		for(int32 i = 0; i < clipRegRects; i++)
-		{
-			link.Read<BRect>(&rect);
-			layer->fLayerData->clipReg->Include(rect);
-		}
-	}
-	else
-	{
-		if (layer->fLayerData->clipReg)
-		{
-			delete layer->fLayerData->clipReg;
-			layer->fLayerData->clipReg = NULL;
-		}
-	}
+	layer->fLayerData->ReadFromLink(link);
+	// TODO: Rebuild clipping here?
 }
 //------------------------------------------------------------------------------
 inline
@@ -732,6 +629,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fName, cl->fName->String()));
 //			SetLayerState(cl);
 			SetLayerState(cl,link);
+			// TODO: should this be moved into SetLayerState?
+			// If it _always_ needs to be done afterwards, then yes!
 			cl->RebuildFullRegion();
 			break;
 		}
@@ -746,61 +645,16 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_GET_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fName, cl->fName->String()));
-			LayerData	*ld;
-			
-			// these 4 are here because of a compiler warning. Maybe he's right... :-)
-			rgb_color	hc, lc, vc; // high, low and view colors
-			uint64		patt;
-			
-			ld = cl->fLayerData; // now we write fewer characters. :-)
-			hc = ld->highcolor.GetColor32();
-			lc = ld->lowcolor.GetColor32();
-			vc = ld->viewcolor.GetColor32();
-			patt = ld->patt.GetInt64();
-			
-			// TODO: Implement when ServerFont::SetfamilyAndStyle(int32) exists
-			// TODO: Implement *what*? SetFamilyAndStyle exists. :)
+
 			fMsgSender->StartMessage(SERVER_TRUE);
-			
-			// Attach font state
-			fMsgSender->Attach<uint32>(ld->font.GetFamilyAndStyle());
-			fMsgSender->Attach<float>(ld->font.Size());
-			fMsgSender->Attach<float>(ld->font.Shear());
-			fMsgSender->Attach<float>(ld->font.Rotation());
-			fMsgSender->Attach<uint8>(ld->font.Spacing());
-			fMsgSender->Attach<uint8>(ld->font.Encoding());
-			fMsgSender->Attach<uint16>(ld->font.Face());
-			fMsgSender->Attach<uint32>(ld->font.Flags());
-			
-			// Attach view state
-			fMsgSender->Attach<BPoint>(ld->penlocation);
-			fMsgSender->Attach<float>(ld->pensize);
-			fMsgSender->Attach(&hc, sizeof(rgb_color));
-			fMsgSender->Attach(&lc, sizeof(rgb_color));
-			fMsgSender->Attach(&vc, sizeof(rgb_color));
-			fMsgSender->Attach<uint64>(patt);
-			fMsgSender->Attach<BPoint>(ld->coordOrigin);
-			fMsgSender->Attach<uint8>((uint8)(ld->draw_mode));
-			fMsgSender->Attach<uint8>((uint8)(ld->lineCap));
-			fMsgSender->Attach<uint8>((uint8)(ld->lineJoin));
-			fMsgSender->Attach<float>(ld->miterLimit);
-			fMsgSender->Attach<uint8>((uint8)(ld->alphaSrcMode));
-			fMsgSender->Attach<uint8>((uint8)(ld->alphaFncMode));
-			fMsgSender->Attach<float>(ld->scale);
-			fMsgSender->Attach<float>(ld->fontAliasing);
-			
-			int32 noOfRects = 0;
-			if (ld->clipReg)
-				noOfRects = ld->clipReg->CountRects();
-			
-			fMsgSender->Attach<int32>(noOfRects);
-			
-			for(int i = 0; i < noOfRects; i++)
-				fMsgSender->Attach<BRect>(ld->clipReg->RectAt(i));
-			
+
+			// attach state data
+			cl->fLayerData->WriteToLink(*fMsgSender);
+
 			fMsgSender->Attach<float>(cl->fFrame.left);
 			fMsgSender->Attach<float>(cl->fFrame.top);
 			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
+
 			fMsgSender->Flush();
 
 			break;
@@ -857,7 +711,7 @@ cl->fBoundsLeftTop.PrintToStream();
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 			
-			cl->fLayerData->coordOrigin.Set(x, y);
+			cl->fLayerData->SetOrigin(BPoint(x, y));
 
 			break;
 		}
@@ -865,7 +719,7 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",fName, cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<BPoint>(cl->fLayerData->coordOrigin);
+			fMsgSender->Attach<BPoint>(cl->fLayerData->Origin());
 			fMsgSender->Flush();
 
 			break;
@@ -912,15 +766,17 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fName, cl->fName->String()));
 			int8 lineCap, lineJoin;
+			float miterLimit;
 
 			// TODO: Look into locking scheme relating to Layers and modifying redraw-related members
 
 			link.Read<int8>(&lineCap);
 			link.Read<int8>(&lineJoin);
-			link.Read<float>(&(cl->fLayerData->miterLimit));
+			link.Read<float>(&miterLimit);
 			
-			cl->fLayerData->lineCap	= (cap_mode)lineCap;
-			cl->fLayerData->lineJoin = (join_mode)lineJoin;
+			cl->fLayerData->SetLineCapMode((cap_mode)lineCap);
+			cl->fLayerData->SetLineJoinMode((join_mode)lineJoin);
+			cl->fLayerData->SetMiterLimit(miterLimit);
 		
 			break;
 		}
@@ -928,9 +784,9 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fName, cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->lineCap));
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->lineJoin));
-			fMsgSender->Attach<float>(cl->fLayerData->miterLimit);
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->LineCapMode()));
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->LineJoinMode()));
+			fMsgSender->Attach<float>(cl->fLayerData->MiterLimit());
 			fMsgSender->Flush();
 		
 			break;
@@ -938,6 +794,7 @@ cl->fBoundsLeftTop.PrintToStream();
 		case AS_LAYER_PUSH_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fName, cl->fName->String()));
+			// TODO: refactor, put this in Layer
 			LayerData *ld = new LayerData();
 			ld->prevState = cl->fLayerData;
 			cl->fLayerData = ld;
@@ -954,7 +811,7 @@ cl->fBoundsLeftTop.PrintToStream();
 				DTRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", fName, cl->fName->String()));
 				break;
 			}
-			
+			// TODO: refactor, put this in Layer
 			LayerData		*ld = cl->fLayerData;
 			cl->fLayerData	= cl->fLayerData->prevState;
 			ld->prevState = NULL;
@@ -966,8 +823,12 @@ cl->fBoundsLeftTop.PrintToStream();
 		}
 		case AS_LAYER_SET_SCALE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fName, cl->fName->String()));		
-			link.Read<float>(&(cl->fLayerData->scale));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fName, cl->fName->String()));
+			float scale;
+			link.Read<float>(&scale);
+			// TODO: The BeBook says, if you call SetScale() it will be
+			// multiplied with the scale from all previous states on the stack
+			cl->fLayerData->SetScale(scale);
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
@@ -975,10 +836,14 @@ cl->fBoundsLeftTop.PrintToStream();
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n",fName, cl->fName->String()));		
 			LayerData		*ld = cl->fLayerData;
 
-			float			scale = ld->scale;
+			// TODO: And here, we're taking that into account, but not above
+			// -> refactor put scale into Layer, or better yet, when the
+			// state stack is within Layer, PushState() should multiply
+			// by the previous last states scale. Would fix the problem above too.
+			float			scale = ld->Scale();
 			
-			while((ld = ld->prevState))
-				scale		*= ld->scale;
+			while ((ld = ld->prevState))
+				scale *= ld->Scale();
 			
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<float>(scale);
@@ -994,7 +859,7 @@ cl->fBoundsLeftTop.PrintToStream();
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 
-			cl->fLayerData->penlocation.Set(x, y);
+			cl->fLayerData->SetPenLocation(BPoint(x, y));
 
 			break;
 		}
@@ -1002,7 +867,7 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fName, cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<BPoint>(cl->fLayerData->penlocation);
+			fMsgSender->Attach<BPoint>(cl->fLayerData->PenLocation());
 			fMsgSender->Flush();
 		
 			break;
@@ -1010,7 +875,9 @@ cl->fBoundsLeftTop.PrintToStream();
 		case AS_LAYER_SET_PEN_SIZE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fName, cl->fName->String()));
-			link.Read<float>(&(cl->fLayerData->pensize));
+			float penSize;
+			link.Read<float>(&penSize);
+			cl->fLayerData->SetPenSize(penSize);
 		
 			break;
 		}
@@ -1018,7 +885,7 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fName, cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<float>(cl->fLayerData->pensize);
+			fMsgSender->Attach<float>(cl->fLayerData->PenSize());
 			fMsgSender->Flush();
 		
 			break;
@@ -1030,8 +897,9 @@ cl->fBoundsLeftTop.PrintToStream();
 			
 			link.Read(&c, sizeof(rgb_color));
 			
-			cl->fLayerData->viewcolor.SetColor(c);
-			
+			cl->fLayerData->SetViewColor(RGBColor(c));
+
+			// TODO: this should not trigger redraw, no?!?
 			myRootLayer->GoRedraw(cl, cl->fVisible);
 			
 			break;
@@ -1041,9 +909,9 @@ cl->fBoundsLeftTop.PrintToStream();
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",fName, cl->fName->String()));
 			rgb_color highColor, lowColor, viewColor;
 			
-			highColor = cl->fLayerData->highcolor.GetColor32();
-			lowColor = cl->fLayerData->lowcolor.GetColor32();
-			viewColor = cl->fLayerData->viewcolor.GetColor32();
+			highColor = cl->fLayerData->HighColor().GetColor32();
+			lowColor = cl->fLayerData->LowColor().GetColor32();
+			viewColor = cl->fLayerData->ViewColor().GetColor32();
 			
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach(&highColor, sizeof(rgb_color));
@@ -1061,8 +929,8 @@ cl->fBoundsLeftTop.PrintToStream();
 			link.Read<int8>(&srcAlpha);
 			link.Read<int8>(&alphaFunc);
 			
-			cl->fLayerData->alphaSrcMode = (source_alpha)srcAlpha;
-			cl->fLayerData->alphaFncMode = (alpha_function)alphaFunc;
+			cl->fLayerData->SetBlendingMode((source_alpha)srcAlpha,
+											(alpha_function)alphaFunc);
 
 			break;
 		}
@@ -1070,8 +938,8 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fName, cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->alphaSrcMode));
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->alphaFncMode));
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->AlphaSrcMode()));
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->AlphaFncMode()));
 			fMsgSender->Flush();
 
 			break;
@@ -1083,7 +951,7 @@ cl->fBoundsLeftTop.PrintToStream();
 			
 			link.Read<int8>(&drawingMode);
 			
-			cl->fLayerData->draw_mode = (drawing_mode)drawingMode;
+			cl->fLayerData->SetDrawingMode((drawing_mode)drawingMode);
 			
 			break;
 		}
@@ -1091,7 +959,7 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fName, cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->draw_mode));
+			fMsgSender->Attach<int8>((int8)(cl->fLayerData->GetDrawingMode()));
 			fMsgSender->Flush();
 		
 			break;
@@ -1099,7 +967,9 @@ cl->fBoundsLeftTop.PrintToStream();
 		case AS_LAYER_PRINT_ALIASING:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fName, cl->fName->String()));
-			link.Read<bool>(&(cl->fLayerData->fontAliasing));
+			bool fontAliasing;
+			link.Read<bool>(&fontAliasing);
+			cl->fLayerData->SetFontAntiAliasing(!fontAliasing);
 			
 			break;
 		}
@@ -1176,6 +1046,7 @@ cl->fBoundsLeftTop.PrintToStream();
 			}
 			
 			// redraw if we previously had or if we have acquired a picture to clip to.
+			// TODO: Are you sure about triggering a redraw?
 			if (redraw)
 				myRootLayer->GoRedraw(cl, reg);
 
@@ -1242,13 +1113,16 @@ cl->fBoundsLeftTop.PrintToStream();
 				ld = cl->fLayerData;
 				reg = cl->ConvertFromParent(&(cl->fVisible));
 			
-				if(ld->clipReg)
-					reg.IntersectWith(ld->clipReg);
+				if (ld->ClippingRegion())
+					reg.IntersectWith(ld->ClippingRegion());
 			
-				while((ld = ld->prevState))
-				{
-					if(ld->clipReg)
-						reg.IntersectWith(ld->clipReg);
+				// TODO: This could also be done more reliably in the Layer,
+				// when the State stack is implemented there. There should be
+				// DrawData::fCulmulatedClippingRegion...
+				// TODO: the DrawData clipping region should be in local view coords.
+				while ((ld = ld->prevState)) {
+					if (ld->ClippingRegion())
+						reg.IntersectWith(ld->ClippingRegion());
 				}
 			
 				noOfRects = reg.CountRects();
@@ -1268,18 +1142,15 @@ cl->fBoundsLeftTop.PrintToStream();
 			int32 noOfRects;
 			BRect r;
 			
-			if(cl->fLayerData->clipReg)
-				cl->fLayerData->clipReg->MakeEmpty();
-			else
-				cl->fLayerData->clipReg = new BRegion();
-			
 			link.Read<int32>(&noOfRects);
-			
+
+			BRegion region;
 			for(int i = 0; i < noOfRects; i++)
 			{
 				link.Read<BRect>(&r);
-				cl->fLayerData->clipReg->Include(r);
+				region.Include(r);
 			}
+			cl->fLayerData->SetClippingRegion(region);
 
 			cl->RebuildFullRegion();
 			if (!(cl->IsHidden()))
@@ -1305,7 +1176,8 @@ cl->fBoundsLeftTop.PrintToStream();
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fName, cl->fName->String()));
 			
-			// TODO: Watch out for the coordinate system AS_LAYER_INVAL_REGION
+			// TODO: handle transformation (origin and scale) prior to converting to top
+			// TODO: Handle conversion to top
 			BRegion invalReg;
 			int32 noOfRects;
 			BRect rect;
@@ -1597,7 +1469,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			link.Read(&c, sizeof(rgb_color));
 			
-			cl->fLayerData->highcolor.SetColor(c);
+			cl->fLayerData->SetHighColor(RGBColor(c));
 
 			break;
 		}
@@ -1608,7 +1480,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			link.Read(&c, sizeof(rgb_color));
 			
-			cl->fLayerData->lowcolor.SetColor(c);
+			cl->fLayerData->SetLowColor(RGBColor(c));
 			
 			break;
 		}
@@ -1619,7 +1491,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			link.Read(&pat, sizeof(pattern));
 			
-			cl->fLayerData->patt = pat;
+			cl->fLayerData->SetPattern(Pattern(pat));
 			
 			break;
 		}	
@@ -1627,7 +1499,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE\n",fName));
 			
-			// TODO: Add clipping TO AS_STROKE_LINE
 			float x1, y1, x2, y2;
 			
 			link.Read<float>(&x1);
@@ -1639,12 +1510,17 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			{
 				BPoint p1(x1,y1);
 				BPoint p2(x2,y2);
-				desktop->GetDisplayDriver()->StrokeLine(cl->ConvertToTop(p1),cl->ConvertToTop(p2),
-						cl->fLayerData);
+				desktop->GetDisplayDriver()->StrokeLine(cl->ConvertToTop(p1),
+														cl->ConvertToTop(p2),
+														cl->fLayerData);
 				
 				// We update the pen here because many DisplayDriver calls which do not update the
 				// pen position actually call StrokeLine
-				cl->fLayerData->penlocation=p2;
+
+				// TODO: Decide where to put this, for example, it cannot be done
+				// for DrawString(), also there needs to be a decision, if penlocation
+				// is in View coordinates (I think it should be) or in screen coordinates.
+				cl->fLayerData->SetPenLocation(p2);
 			}
 			break;
 		}
@@ -1652,7 +1528,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_INVERT_RECT\n",fName));
 			
-			// TODO: Add clipping TO AS_INVERT_RECT
 			BRect rect;
 			link.Read<BRect>(&rect);
 			
@@ -1664,7 +1539,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_RECT\n",fName));
 			
-			// TODO: Add clipping TO AS_STROKE_RECT
 			float left, top, right, bottom;
 			link.Read<float>(&left);
 			link.Read<float>(&top);
@@ -1680,7 +1554,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_RECT\n",fName));
 			
-			// TODO: Add clipping TO AS_FILL_RECT
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (cl && cl->fLayerData)
@@ -1691,7 +1564,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_ARC\n",fName));
 			
-			// TODO: Add clipping to AS_STROKE_ARC
 			float angle, span;
 			BRect r;
 			
@@ -1706,7 +1578,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_ARC\n",fName));
 			
-			// TODO: Add clipping to AS_FILL_ARC
 			float angle, span;
 			BRect r;
 			
@@ -1721,7 +1592,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_BEZIER\n",fName));
 			
-			// TODO: Add clipping to AS_STROKE_BEZIER
 			BPoint *pts;
 			int i;
 			pts = new BPoint[4];
@@ -1743,7 +1613,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_BEZIER\n",fName));
 			
-			// TODO: Add clipping to AS_STROKE_BEZIER
 			BPoint *pts;
 			int i;
 			pts = new BPoint[4];
@@ -1765,7 +1634,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_ELLIPSE\n",fName));
 			
-			// TODO: Add clipping AS_STROKE_ELLIPSE
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (cl && cl->fLayerData)
@@ -1776,7 +1644,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE\n",fName));
 			
-			// TODO: Add clipping AS_STROKE_ELLIPSE
 			BRect rect;
 			link.Read<BRect>(&rect);
 			if (cl && cl->fLayerData)
@@ -1787,7 +1654,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_ROUNDRECT\n",fName));
 			
-			// TODO: Add clipping AS_STROKE_ROUNDRECT
 			BRect rect;
 			float xrad,yrad;
 			link.Read<BRect>(&rect);
@@ -1802,7 +1668,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT\n",fName));
 			
-			// TODO: Add clipping AS_STROKE_ROUNDRECT
 			BRect rect;
 			float xrad,yrad;
 			link.Read<BRect>(&rect);
@@ -1817,7 +1682,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_TRIANGLE\n",fName));
 			
-			// TODO:: Add clipping to AS_STROKE_TRIANGLE
 			BPoint pts[3];
 			BRect rect;
 			
@@ -1839,7 +1703,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE\n",fName));
 			
-			// TODO:: Add clipping to AS_FILL_TRIANGLE
 			BPoint pts[3];
 			BRect rect;
 			
@@ -1857,6 +1720,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			}
 			break;
 		}
+// TODO: get rid of all this code duplication!!
 		case AS_STROKE_POLYGON:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_POLYGON\n",fName));
@@ -2055,7 +1919,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 			if(cl && cl->fLayerData)
-				cl->fLayerData->penlocation.Set(x,y);
+				cl->fLayerData->SetPenLocation(BPoint(x, y));
 			
 			break;
 		}
@@ -2066,7 +1930,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			link.Read<float>(&size);
 			if(cl && cl->fLayerData)
-				cl->fLayerData->pensize=size;
+				cl->fLayerData->SetPenSize(size);
 			
 			break;
 		}
@@ -2074,6 +1938,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_SET_FONT\n",fName));
 			// TODO: Implement AS_SET_FONT?
+			// Confusing!! But it works already!
 			break;
 		}
 		case AS_SET_FONT_SIZE:

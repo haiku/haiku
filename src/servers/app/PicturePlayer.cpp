@@ -26,12 +26,17 @@
 //					Marc Flerackers' TPicture class
 //------------------------------------------------------------------------------
 
-#include "PicturePlayer.h"
+#include <stdio.h>
+
+#include <Region.h>
+
+#include "ServerBitmap.h"
+
+#include "DisplayDriver.h"
 #include "PictureProtocol.h"
 #include "Utils.h"
-#include "DisplayDriver.h"
-#include <ServerBitmap.h>
-#include <stdio.h>
+
+#include "PicturePlayer.h"
 
 PicturePlayer::PicturePlayer(DisplayDriver *d,void *data, int32 size)
  : fData(data, size)
@@ -133,6 +138,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 	fData.Seek(0,SEEK_SET);
 	off_t pos;
 	fldata=*d;
+	ServerFont dummyFont;
 	
 	while (fData.Position() < size)
 	{
@@ -145,8 +151,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			case B_PIC_MOVE_PEN_BY:
 			{
 				BPoint where = GetCoord();
-				fldata.penlocation.x+=where.x;
-				fldata.penlocation.y+=where.y;
+				fldata.SetPenLocation(fldata.PenLocation() + where);
 				break;
 			}
 			case B_PIC_STROKE_LINE:
@@ -230,10 +235,12 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				// TODO: The deltas given are escapements. They seem to be called deltax and deltay
 				// despite the fact that they are space and non-space escapements. Find out which is which when possible.
 				// My best guess is that deltax corresponds to escapement_delta.nonspace.
-				fldata.edelta.nonspace=deltax;
-				fldata.edelta.space=deltay;
+				escapement_delta delta;
+				delta.nonspace = deltax;
+				delta.space = deltay;
+				fldata.SetEscapementDelta(delta);
 				
-				fdriver->DrawString(string,len,fldata.penlocation,&fldata);
+				fdriver->DrawString(string, len, fldata.PenLocation(), &fldata);
 				delete string;
 				break;
 			}
@@ -349,44 +356,48 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			case B_PIC_SET_PEN_LOCATION:
 			{
 				BPoint pt = GetCoord();
-				fldata.penlocation=pt;
+				fldata.SetPenLocation(pt);
 				break;
 			}
 			case B_PIC_SET_DRAWING_MODE:
 			{
 				int16 mode = GetInt16();
-				fldata.draw_mode=(drawing_mode)mode;
+				fldata.SetDrawingMode((drawing_mode)mode);
 				break;
 			}
 			case B_PIC_SET_LINE_MODE:
 			{
-				GetData(&fldata.lineCap,sizeof(cap_mode));
-				GetData(&fldata.lineJoin,sizeof(join_mode));
-				fldata.miterLimit = GetFloat();
+				cap_mode lineCapMode;
+				join_mode lineJoinMode;
+				GetData(&lineCapMode, sizeof(cap_mode));
+				GetData(&lineJoinMode, sizeof(join_mode));
+				fldata.SetLineCapMode(lineCapMode);
+				fldata.SetLineJoinMode(lineJoinMode);
+				fldata.SetMiterLimit(GetFloat());
 				break;
 			}
 			case B_PIC_SET_PEN_SIZE:
 			{
 				float size = GetFloat();
-				fldata.pensize=size;
+				fldata.SetPenSize(size);
 				break;
 			}
 			case B_PIC_SET_SCALE:
 			{
 				float scale = GetFloat();
-				fldata.scale=scale;
+				fldata.SetScale(scale);
 				break;
 			}
 			case B_PIC_SET_FORE_COLOR:
 			{			
 				rgb_color color = GetColor();
-				fldata.highcolor=color;
+				fldata.SetHighColor(color);
 				break;
 			}
 			case B_PIC_SET_BACK_COLOR:
 			{			
 				rgb_color color = GetColor();
-				fldata.lowcolor=color;
+				fldata.SetLowColor(color);
 				break;
 			}
 			case B_PIC_SET_STIPLE_PATTERN:
@@ -405,8 +416,8 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			{
 				int16 alphaSrcMode = GetInt16();
 				int16 alphaFncMode = GetInt16();
-				fldata.alphaSrcMode = (source_alpha)alphaSrcMode;
-				fldata.alphaFncMode = (alpha_function)alphaFncMode;
+				fldata.SetBlendingMode((source_alpha)alphaSrcMode,
+									   (alpha_function)alphaFncMode);
 				break;
 			}
 			case B_PIC_SET_FONT_FAMILY:
@@ -433,37 +444,44 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			}
 			case B_PIC_SET_FONT_SPACING:
 			{
-				fldata.font.SetSpacing(GetInt32());
+				dummyFont.SetSpacing(GetInt32());
+				fldata.SetFont(dummyFont, B_FONT_SPACING);
 				break;
 			}
 			case B_PIC_SET_FONT_ENCODING:
 			{
-				fldata.font.SetEncoding(GetInt32());
+				dummyFont.SetEncoding(GetInt32());
+				fldata.SetFont(dummyFont, B_FONT_ENCODING);
 				break;
 			}
 			case B_PIC_SET_FONT_FLAGS:
 			{
-				fldata.font.SetFlags(GetInt32());
+				dummyFont.SetFlags(GetInt32());
+				fldata.SetFont(dummyFont, B_FONT_FLAGS);
 				break;
 			}
 			case B_PIC_SET_FONT_SIZE:
 			{
-				fldata.font.SetSize(GetFloat());
+				dummyFont.SetSize(GetFloat());
+				fldata.SetFont(dummyFont, B_FONT_SIZE);
 				break;
 			}
 			case B_PIC_SET_FONT_ROTATE:
 			{
-				fldata.font.SetRotation(GetFloat());
+				dummyFont.SetRotation(GetFloat());
+				fldata.SetFont(dummyFont, B_FONT_ROTATION);
 				break;
 			}
 			case B_PIC_SET_FONT_SHEAR:
 			{
-				fldata.font.SetShear(GetFloat());
+				dummyFont.SetShear(GetFloat());
+				fldata.SetFont(dummyFont, B_FONT_SHEAR);
 				break;
 			}
 			case B_PIC_SET_FONT_FACE:
 			{
-				fldata.font.SetFace(GetInt32());
+				dummyFont.SetFace(GetInt32());
+				fldata.SetFont(dummyFont, B_FONT_FACE);
 				break;
 			}
 			default:
@@ -485,7 +503,7 @@ void PicturePlayer::SetClippingRegion(BRect *rects, int32 numrects)
 	// Passing NULL or 0 rectangles to the function empties the clipping region. The clipping 
 	// region is also emptied if there is no union of all rectangles passed to the function.
 	
-	if(!rects || numrects)
+	if(!rects || numrects == 0)
 	{
 		delete clipreg;
 		clipreg=NULL;

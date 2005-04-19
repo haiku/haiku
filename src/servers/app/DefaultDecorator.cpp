@@ -24,18 +24,20 @@
 //	Description:	Fallback decorator for the app_server
 //  
 //------------------------------------------------------------------------------
+
+#include <stdio.h>
+
 #include <Rect.h>
-#include "DisplayDriver.h"
 #include <View.h>
-#include "LayerData.h"
+
 #include "ColorUtils.h"
-#include "DefaultDecorator.h"
+#include "DisplayDriver.h"
+#include "FontServer.h"
+#include "LayerData.h"
 #include "PatternHandler.h"
 #include "RGBColor.h"
-#include "RectUtils.h"
-#include <stdio.h>
-#include "FontServer.h"
 
+#include "DefaultDecorator.h"
 
 //#define USE_VIEW_FILL_HACK
 
@@ -53,11 +55,12 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 
 	taboffset=0;
 	titlepixelwidth=0;
-	
-	SetFont(fontserver->GetSystemBold());
-	_drawdata.font.SetSize(14);
-	_drawdata.font.SetFlags(B_FORCE_ANTIALIASING);
-	_drawdata.font.SetSpacing(B_STRING_SPACING);
+
+	ServerFont font(*fontserver->GetSystemBold());
+	font.SetSize(font.Size() * 1.1);
+	font.SetFlags(B_FORCE_ANTIALIASING);
+	font.SetSpacing(B_STRING_SPACING);
+	SetFont(&font);
 	
 	framecolors=new RGBColor[6];
 	framecolors[0].SetColor(152,152,152);
@@ -361,8 +364,8 @@ void DefaultDecorator::_DrawTitle(BRect r)
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
-	_drawdata.highcolor=_colors->window_tab_text;
-	_drawdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+	_drawdata.SetHighColor(_colors->window_tab_text);
+	_drawdata.SetLowColor(GetFocus() ? _colors->window_tab : _colors->inactive_window_tab);
 
 	int32 titlecount=_ClipTitle((_zoomrect.left-textoffset)-(_closerect.right+textoffset));
 	BString titlestr( GetTitle() );
@@ -551,8 +554,8 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 									 invalid.right, invalid.bottom));
 
 	#ifdef USE_VIEW_FILL_HACK
-		_drawdata.highcolor = RGBColor( 192, 192, 192 );	
-		_driver->FillRect(_frame,_drawdata.highcolor);
+		_drawdata.SetHighColor(RGBColor(192, 192, 192 ));	
+		_driver->FillRect(_frame, _drawdata.HighColor());
 	#endif
 
 	if(_look == B_NO_BORDER_WINDOW_LOOK)

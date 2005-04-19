@@ -1218,7 +1218,6 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			float size,width=0;
 			uint8 spacing;
 			port_id replyport;
-			DrawData drawdata;
 			
 			msg.ReadString(&string);
 			msg.Read<int32>(&length);
@@ -1229,22 +1228,27 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<port_id>(&replyport);
 			
 			replylink.SetSendPort(replyport);
-						
-			if(length>0 && drawdata.font.SetFamilyAndStyle(family,style)==B_OK &&
-				size>0 && string)
-			{
-				drawdata.font.SetSize(size);
-				drawdata.font.SetSpacing(spacing);
-				width=desktop->GetDisplayDriver()->StringWidth(string,length,&drawdata);
+
+			ServerFont font;
+
+			if (length > 0 && font.SetFamilyAndStyle(family, style) == B_OK &&
+				size > 0 && string) {
+
+				font.SetSize(size);
+				font.SetSpacing(spacing);
+
+				DrawData drawdata;
+				drawdata.SetFont(font);
+				// TODO: make a DisplayDriver::StringWidth() function that takes
+				// just a ServerFont
+				width = desktop->GetDisplayDriver()->StringWidth(string, length, &drawdata);
 				
 				replylink.StartMessage(SERVER_TRUE);
 				replylink.Attach<float>(width);
 				replylink.Flush();
 				
 				free(string);
-			}
-			else
-			{
+			} else {
 				replylink.StartMessage(SERVER_FALSE);
 				replylink.Flush();
 			}

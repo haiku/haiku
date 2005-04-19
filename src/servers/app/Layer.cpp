@@ -614,7 +614,7 @@ void Layer::Draw(const BRect &r)
 	r.PrintToStream();
 	#endif	
 	
-	fDriver->FillRect(r, fLayerData->viewcolor);
+	fDriver->FillRect(r, fLayerData->ViewColor());
 //	RGBColor c(rand()%255,rand()%255,rand()%255);
 //	fDriver->FillRect(r, c);
 	
@@ -736,8 +736,8 @@ void Layer::RebuildFullRegion(void)
 	do
 	{
 		// clip to user region
-		if(ld->clipReg)
-			fFull.IntersectWith( ld->clipReg );
+		if (const BRegion* userClipping = ld->ClippingRegion())
+			fFull.IntersectWith(userClipping);
 		
 	} while( (ld = ld->prevState) );
 	

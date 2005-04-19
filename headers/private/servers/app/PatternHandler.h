@@ -46,6 +46,9 @@ class Pattern {
 								Pattern(const Pattern& src)
 									{ fPattern.type64 = src.fPattern.type64; }
 
+								Pattern(const pattern& src)
+									{ fPattern.type64 = *(uint64*)src.data; }
+
 	inline	const int8*			GetInt8(void) const
 									{ return fPattern.type8; }
 

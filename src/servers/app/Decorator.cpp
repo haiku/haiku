@@ -180,7 +180,7 @@ void Decorator::SetFont(ServerFont *font)
 	if(!font)
 		return;
 
-	_drawdata.font		= *font;
+	_drawdata.SetFont(*font);
 }
 
 /*!

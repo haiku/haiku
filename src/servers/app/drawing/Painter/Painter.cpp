@@ -152,29 +152,29 @@ void
 Painter::SetDrawData(const DrawData* data)
 {
 	// for now...
-	SetPenSize(data->pensize);
-	SetPenLocation(data->penlocation);
-	SetFont(data->font);
+	SetPenSize(data->PenSize());
+	SetPenLocation(data->PenLocation());
+	SetFont(data->Font());
 //	if (data->clipReg) {
 //		ConstrainClipping(*data->clipReg);
 //	}
 	// any of these conditions means we need to use a different drawing
 	// mode instance
-	bool updateDrawingMode = !(data->patt == fPatternHandler->GetPattern()) ||
-		data->draw_mode != fDrawingMode ||
-		(data->draw_mode == B_OP_ALPHA && (data->alphaSrcMode != fAlphaSrcMode ||
-										   data->alphaFncMode != fAlphaFncMode));
+	bool updateDrawingMode = !(data->GetPattern() == fPatternHandler->GetPattern()) ||
+		data->GetDrawingMode() != fDrawingMode ||
+		(data->GetDrawingMode() == B_OP_ALPHA && (data->AlphaSrcMode() != fAlphaSrcMode ||
+												  data->AlphaFncMode() != fAlphaFncMode));
 
-	fDrawingMode = data->draw_mode;
-	fAlphaSrcMode = data->alphaSrcMode;
-	fAlphaFncMode = data->alphaFncMode;
-	fPatternHandler->SetPattern(data->patt);
+	fDrawingMode = data->GetDrawingMode();
+	fAlphaSrcMode = data->AlphaSrcMode();
+	fAlphaFncMode = data->AlphaFncMode();
+	fPatternHandler->SetPattern(data->GetPattern());
 
 	if (updateDrawingMode)
 		_UpdateDrawingMode();
 
-	SetHighColor(data->highcolor.GetColor32());
-	SetLowColor(data->lowcolor.GetColor32());
+	SetHighColor(data->HighColor().GetColor32());
+	SetLowColor(data->LowColor().GetColor32());
 }
 
 // #pragma mark -
@@ -292,7 +292,7 @@ BRect
 Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 {
 	// this happens independent of wether we actually draw something
-	context->penlocation = b;
+	context->SetPenLocation(b);
 	// NOTE: penlocation should be converted to the local
 	// coordinate of the view for which we draw here, after
 	// we have been used. Updating it could also be done somewhere
@@ -305,7 +305,7 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 	_Transform(&a, false);
 	_Transform(&b, false);
 
-	SetPenSize(context->pensize);
+	SetPenSize(context->PenSize());
 
 	BRect touched(min_c(a.x, b.x), min_c(a.y, b.y),
 				  max_c(a.x, b.x), max_c(a.y, b.y));
@@ -360,7 +360,7 @@ BRect
 Painter::StrokeLine(BPoint b, DrawData* context)
 {
 	// TODO: move this function elsewhere
-	return StrokeLine(context->penlocation, b, context);
+	return StrokeLine(context->PenLocation(), b, context);
 }
 
 typedef union {

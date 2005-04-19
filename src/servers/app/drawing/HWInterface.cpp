@@ -19,8 +19,8 @@ HWInterface::HWInterface()
 	  fCursor(NULL),
 	  fCursorVisible(true),
 	  fCursorLocation(0, 0),
-	  fUpdateExecutor(new UpdateQueue(this))
-//	  fUpdateExecutor(NULL)
+//	  fUpdateExecutor(new UpdateQueue(this))
+	  fUpdateExecutor(NULL)
 {
 }
 
@@ -105,18 +105,18 @@ HWInterface::GetCursorPosition()
 status_t
 HWInterface::Invalidate(const BRect& frame)
 {
-//	return CopyBackToFront(frame);
+	return CopyBackToFront(frame);
 
 // TODO: the remaining problem is the immediate wake up of the
 // thread carrying out the updates, when I enable it, there
 // seems to be a deadlock, but I didn't figure it out yet.
 // Maybe the same bug is there without the wakeup, only, triggered
 // less often.... scarry, huh?
-	if (frame.IsValid()) {
+/*	if (frame.IsValid()) {
 		fUpdateExecutor->AddRect(frame);
 		return B_OK;
 	}
-	return B_BAD_VALUE;
+	return B_BAD_VALUE;*/
 }
 
 // CopyBackToFront

@@ -712,8 +712,8 @@ DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const R
 	if (Lock()) {
 		if (!fPainter->StraightLine(start, end, color.GetColor32())) {
 			DrawData context;
-			context.highcolor = color;
-			context.draw_mode = B_OP_COPY;
+			context.SetHighColor(color);
+			context.SetDrawingMode(B_OP_COPY);
 			StrokeLine(start, end, &context);
 		} else {
 			BRect touched(min_c(start.x, end.x),
@@ -886,13 +886,13 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 								 const BPoint &pt, const RGBColor &color,
 								 escapement_delta *delta)
 {
-	// what - without any clipping?!?
 	DrawData d;
-	d.highcolor=color;
+	d.SetHighColor(color);
 	
-	if(delta)
-		d.edelta=*delta;
-	DrawString(string,length,pt,&d);
+	if (delta)
+		d.SetEscapementDelta(*delta);
+
+	DrawString(string, length, pt, &d);
 }
 
 // DrawString
@@ -1144,16 +1144,16 @@ DisplayDriverPainter::StrokeLineArray(const int32 &numlines,
 	
 	if (Lock()) {
 		DrawData context;
-		context.draw_mode = B_OP_COPY;
+		context.SetDrawingMode(B_OP_COPY);
 		const LineArrayData *data;
 		
 		data = (const LineArrayData *)&(linedata[0]);
-		context.highcolor = data->color;
+		context.SetHighColor(data->color);
 		BRect touched = fPainter->StrokeLine(data->pt1, data->pt2, &context);
 		
 		for (int32 i = 1; i < numlines; i++) {
 			data = (const LineArrayData *)&(linedata[i]);
-			context.highcolor = data->color;
+			context.SetHighColor(data->color);
 			touched = touched | fPainter->StrokeLine(data->pt1, data->pt2, &context);
 		}
 		
