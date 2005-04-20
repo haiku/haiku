@@ -102,6 +102,21 @@ typedef struct {
   int32		wheel_xdelta;
 } mouse_movement;
 
+typedef struct {
+  uint32	buttons;
+  float		xpos;
+  float		ypos;
+  bool		has_contact;
+  float		pressure;
+  int32		clicks;
+  bool		eraser;
+  bigtime_t	timestamp;
+  int32		wheel_ydelta;
+  int32		wheel_xdelta;
+  float		tilt_x;
+  float		tilt_y;
+} tablet_movement;
+
 #ifdef __cplusplus
 }
 #endif
