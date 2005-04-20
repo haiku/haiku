@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src add-ons input_server devices tablet ;
+
+UsePrivateHeaders input ;
+
+Addon <input>tablet : input_server/devices : 
+	TabletInputDevice.cpp 
+	: false 
+	: be <nogrist>input_server ;
+
+Package haiku-inputkit-cvs :
+        <input>tablet :
+        boot home config add-ons input_server devices ;
