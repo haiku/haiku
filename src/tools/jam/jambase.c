@@ -1075,7 +1075,7 @@ const char *jambase[] = {
 "}\n",
 "actions MkDir1\n",
 "{\n",
-"$(MKDIR) $(<)\n",
+"$(MKDIR) \"$(<)\"\n",
 "}\n",
 "actions together Ranlib\n",
 "{\n",

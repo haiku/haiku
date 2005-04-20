@@ -1869,7 +1869,7 @@ actions Link bind NEEDLIBS
 
 actions MkDir1
 {
-	$(MKDIR) $(<)
+	$(MKDIR) "$(<)"
 }
 
 actions together Ranlib
