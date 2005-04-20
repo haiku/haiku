@@ -398,6 +398,7 @@ ViewHWInterface::SetMode(const display_mode &mode)
 		// free and reallocate the bitmaps while the window is locked, 
 		// so that the view does not accidentally draw a freed bitmap
 		delete fBackBuffer;
+		fBackBuffer = NULL;
 		delete fFrontBuffer;
 
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the

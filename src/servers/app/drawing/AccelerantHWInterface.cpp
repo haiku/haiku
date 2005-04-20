@@ -331,6 +331,7 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		// being. The color space conversion is handled in CopyBackToFront()
 
 		delete fBackBuffer;
+		fBackBuffer = NULL;
 
 		// TODO: Above not true anymore for single buffered mode!!!
 		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
