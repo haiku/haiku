@@ -350,12 +350,9 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 				fBackBuffer = NULL;
 				return ret;
 			}
+			// clear out backbuffer, alpha is 255 this way
+			memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 		}
-		
-		// clear out backbuffer, alpha is 255 this way
-		// TODO: maybe this should handle different color spaces in different
-		//		 ways
-		memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 	}
 	
 	return B_OK;
