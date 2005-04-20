@@ -52,8 +52,9 @@ class ViewHWInterface : public HWInterface {
 	// frame buffer access
 	virtual	RenderingBuffer*	FrontBuffer() const;
 	virtual	RenderingBuffer*	BackBuffer() const;
+	virtual	bool				IsDoubleBuffered() const;
 
-	virtual	status_t			CopyBackToFront(const BRect& frame);
+	virtual	status_t			Invalidate(const BRect& frame);
 
  private:
 			BitmapBuffer*		fBackBuffer;

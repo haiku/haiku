@@ -21,7 +21,7 @@ class UpdateQueue;
 
 class HWInterface : public BLocker {
  public:
-								HWInterface();
+								HWInterface(bool doubleBuffered = true);
 	virtual						~HWInterface();
 
 	virtual	status_t			Initialize() = 0;
@@ -51,19 +51,21 @@ class HWInterface : public BLocker {
 	// cursor handling
 	virtual	void				SetCursor(ServerCursor* cursor);
 	virtual	void				SetCursorVisible(bool visible);
-	virtual	bool				IsCursorVisible();
+			bool				IsCursorVisible();
 	virtual	void				MoveCursorTo(const float& x,
 											 const float& y);
 			BPoint				GetCursorPosition();
 
 	// frame buffer access
+			RenderingBuffer*	DrawingBuffer() const;
 	virtual	RenderingBuffer*	FrontBuffer() const = 0;
 	virtual	RenderingBuffer*	BackBuffer() const = 0;
+	virtual	bool				IsDoubleBuffered() const;
 
 	// Invalidate is planned to be used for scheduling an area for updating
-			status_t			Invalidate(const BRect& frame);
+	virtual	status_t			Invalidate(const BRect& frame);
 	// while as CopyBackToFront() actually performs the operation
-	virtual	status_t			CopyBackToFront(const BRect& frame);
+			status_t			CopyBackToFront(const BRect& frame);
 
  protected:
 	// implement this in derived classes
@@ -79,6 +81,7 @@ class HWInterface : public BLocker {
 			ServerCursor*		fCursor;
 			bool				fCursorVisible;
 			BPoint				fCursorLocation;
+			bool				fDoubleBuffered;
 
  private:
 			UpdateQueue*		fUpdateExecutor;

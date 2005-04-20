@@ -96,7 +96,7 @@ DisplayDriverPainter::CopyBits(const BRect &src, const BRect &dst,
 	if (Lock()) {
 		// TODO: handle clipping to d->clipreg here?
 
-		RenderingBuffer* backBuffer = fGraphicsCard->BackBuffer();
+		RenderingBuffer* backBuffer = fGraphicsCard->DrawingBuffer();
 
 		BRect valid(0, 0, backBuffer->Width() - 1, backBuffer->Height() - 1);
 		if (valid.Intersects(src) && valid.Intersects(dst)) {
@@ -288,7 +288,7 @@ DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
 
 		BRect updateRect;
 
-		RenderingBuffer* backBuffer = fGraphicsCard->BackBuffer();
+		RenderingBuffer* backBuffer = fGraphicsCard->DrawingBuffer();
 
 		uint8* bits = (uint8*)backBuffer->Bits();
 		uint32 bpr = backBuffer->BytesPerRow();
@@ -355,7 +355,7 @@ printf("region: %ld, rect: %ld, offset(%ld, %ld)\n", i, j, xOffset, yOffset);
 		}
 
 */
-	RenderingBuffer* bmp = fGraphicsCard->BackBuffer();
+	RenderingBuffer* bmp = fGraphicsCard->DrawingBuffer();
 
 	uint32		bytesPerPixel	= bmp->BytesPerRow() / bmp->Width();
 	BList		rectList;
@@ -1081,7 +1081,7 @@ DisplayDriverPainter::SetMode(const display_mode &mode)
 {
 	if (Lock()) {
 		if (fGraphicsCard->SetMode(mode) >= B_OK) {
-			fPainter->AttachToBuffer(fGraphicsCard->BackBuffer());
+			fPainter->AttachToBuffer(fGraphicsCard->DrawingBuffer());
 			DisplayDriver::SetMode(mode);
 		} else {
 			fprintf(stderr, "DisplayDriverPainter::SetMode() - unsupported "
@@ -1113,10 +1113,10 @@ DisplayDriverPainter::DumpToFile(const char *path)
 	if (!output)
 		return false;
 	
-	RenderingBuffer *back_buffer = fGraphicsCard->BackBuffer();
-	uint32 row = back_buffer->BytesPerRow() / 4;
+	RenderingBuffer *backBuffer = fGraphicsCard->DrawingBuffer();
+	uint32 row = backBuffer->BytesPerRow() / 4;
 	for (int i = 0; i < fDisplayMode.virtual_height; i++) {
-		fwrite((uint32 *)back_buffer->Bits() + i * row, 4, row, output);
+		fwrite((uint32 *)backBuffer->Bits() + i * row, 4, row, output);
 		sync();
 	}
 	fclose(output);
@@ -1300,7 +1300,7 @@ void DisplayDriverPainter::ConstrainClippingRegion(BRegion *region)
 		if (!region) { 
 //			BRegion empty;
 //			fPainter->ConstrainClipping(empty);
-			if (RenderingBuffer* buffer = fGraphicsCard->BackBuffer()) {
+			if (RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer()) {
 				BRegion all;
 				all.Include(BRect(0, 0, buffer->Width() - 1,
 					buffer->Height() - 1));

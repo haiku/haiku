@@ -403,31 +403,46 @@ ViewHWInterface::SetMode(const display_mode &mode)
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
 		// being. The color space conversion is handled in CopyBackToFront()
-		BBitmap* backBitmap = new BBitmap(frame, 0, B_RGBA32);
-		BBitmap* frontBitmap = new BBitmap(frame, 0, (color_space)fDisplayMode.space);
 
-		fBackBuffer = new BitmapBuffer(backBitmap);
+		// TODO: Above not true anymore for single buffered mode!!!
+		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
+		// as intermediate solution...
+		bool doubleBuffered = HWInterface::IsDoubleBuffered();
+		if ((color_space)fDisplayMode.space != B_RGB32 &&
+			(color_space)fDisplayMode.space != B_RGBA32)
+			doubleBuffered = true;
+
+		BBitmap* frontBitmap = new BBitmap(frame, 0, (color_space)fDisplayMode.space);
 		fFrontBuffer = new BitmapBuffer(frontBitmap);
 
-		status_t err = fBackBuffer->InitCheck();
-		if (err < B_OK) {
-			delete fBackBuffer;
-			fBackBuffer = NULL;
-			ret = err;
-		}
-
-		err = fFrontBuffer->InitCheck();
+		status_t err = fFrontBuffer->InitCheck();
 		if (err < B_OK) {
 			delete fFrontBuffer;
 			fFrontBuffer = NULL;
 			ret = err;
 		}
 
+		if (err >= B_OK && doubleBuffered) {
+			// backbuffer is always B_RGBA32
+			// since we override IsDoubleBuffered(), the drawing buffer
+			// is in effect also always B_RGBA32.
+			BBitmap* backBitmap = new BBitmap(frame, 0, B_RGBA32);
+			fBackBuffer = new BitmapBuffer(backBitmap);
+	
+			err = fBackBuffer->InitCheck();
+			if (err < B_OK) {
+				delete fBackBuffer;
+				fBackBuffer = NULL;
+				ret = err;
+			}
+		}
+
 		if (ret >= B_OK) {
 			// clear out buffers, alpha is 255 this way
 			// TODO: maybe this should handle different color spaces in different ways
-			memset(backBitmap->Bits(), 255, backBitmap->BitsLength());
-			memset(frontBitmap->Bits(), 255, frontBitmap->BitsLength());
+			if (fBackBuffer)
+				memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
+			memset(fFrontBuffer->Bits(), 255, fFrontBuffer->BitsLength());
 	
 			// change the window size and update the bitmap used for drawing
 			fWindow->ResizeTo(frame.Width(), frame.Height());
@@ -600,13 +615,23 @@ ViewHWInterface::BackBuffer() const
 	return fBackBuffer;
 }
 
-// CopyBackToFront
-status_t
-ViewHWInterface::CopyBackToFront(const BRect& frame)
+// IsDoubleBuffered
+bool
+ViewHWInterface::IsDoubleBuffered() const
 {
-	status_t ret = HWInterface::CopyBackToFront(frame);
-// TODO: investigate why this function is called before SetMode() was called!
-	if (fWindow)
+	if (fFrontBuffer)
+		return fBackBuffer != NULL;
+
+	return HWInterface::IsDoubleBuffered();
+}
+
+// Invalidate
+status_t
+ViewHWInterface::Invalidate(const BRect& frame)
+{
+	status_t ret = HWInterface::Invalidate(frame);
+
+	if (ret >= B_OK && fWindow)
 		fWindow->Invalidate(frame);
 	return ret;
 }

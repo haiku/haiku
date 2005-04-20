@@ -14,11 +14,12 @@
 #include "HWInterface.h"
 
 // constructor
-HWInterface::HWInterface()
+HWInterface::HWInterface(bool doubleBuffered)
 	: BLocker("hw interface lock"),
 	  fCursor(NULL),
 	  fCursorVisible(true),
 	  fCursorLocation(0, 0),
+	  fDoubleBuffered(doubleBuffered),
 //	  fUpdateExecutor(new UpdateQueue(this))
 	  fUpdateExecutor(NULL)
 {
@@ -100,23 +101,44 @@ HWInterface::GetCursorPosition()
 	return location;
 }
 
+// DrawingBuffer
+RenderingBuffer*
+HWInterface::DrawingBuffer() const
+{
+	if (IsDoubleBuffered())
+		return BackBuffer();
+	return FrontBuffer();
+}
+
+// IsDoubleBuffered
+bool
+HWInterface::IsDoubleBuffered() const
+{
+	return fDoubleBuffered;
+}
+
 // Invalidate
 // * the object needs to be already locked!
 status_t
 HWInterface::Invalidate(const BRect& frame)
 {
-	return CopyBackToFront(frame);
+	if (IsDoubleBuffered()) {
+		return CopyBackToFront(frame);
 
 // TODO: the remaining problem is the immediate wake up of the
 // thread carrying out the updates, when I enable it, there
 // seems to be a deadlock, but I didn't figure it out yet.
 // Maybe the same bug is there without the wakeup, only, triggered
 // less often.... scarry, huh?
-/*	if (frame.IsValid()) {
-		fUpdateExecutor->AddRect(frame);
-		return B_OK;
+/*		if (frame.IsValid()) {
+			fUpdateExecutor->AddRect(frame);
+			return B_OK;
+		}
+		return B_BAD_VALUE;*/
+	} else {
+		_DrawCursor(frame);
 	}
-	return B_BAD_VALUE;*/
+	return B_OK;
 }
 
 // CopyBackToFront
@@ -162,12 +184,22 @@ HWInterface::CopyBackToFront(const BRect& frame)
 // _DrawCursor
 // * default implementation, can be used as fallback or for
 //   software cursor
+// * area is where we potentially draw the cursor, the cursor
+//   might be somewhere else, in which case this function does nothing
 void
 HWInterface::_DrawCursor(BRect area) const
 {
+	RenderingBuffer* backBuffer = DrawingBuffer();
+	if (!backBuffer)
+		return;
+
 	BRect cf = _CursorFrame();
-	RenderingBuffer* backBuffer = BackBuffer();
-	if (backBuffer && cf.IsValid() && area.Intersects(cf)) {
+
+	// make sure we don't copy out of bounds
+	BRect bufferClip(0.0, 0.0, backBuffer->Width() - 1, backBuffer->Height() - 1);
+	area = bufferClip & area;
+
+	if (cf.IsValid() && area.Intersects(cf)) {
 		// clip to common area
 		area = area & cf;
 

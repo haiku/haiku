@@ -329,23 +329,33 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
 		// being. The color space conversion is handled in CopyBackToFront()
-		
+
 		delete fBackBuffer;
-		fBackBuffer = new MallocBuffer(fDisplayMode.virtual_width,
-									   fDisplayMode.virtual_height);
+
+		// TODO: Above not true anymore for single buffered mode!!!
+		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
+		// as intermediate solution...
+		bool doubleBuffered = HWInterface::IsDoubleBuffered();
+		if ((color_space)fDisplayMode.space != B_RGB32 &&
+			(color_space)fDisplayMode.space != B_RGBA32)
+			doubleBuffered = true;
 		
-		status_t ret = fBackBuffer->InitCheck();
-		if (ret < B_OK) {
-			delete fBackBuffer;
-			fBackBuffer = NULL;
-			return ret;
+		if (doubleBuffered) {
+			fBackBuffer = new MallocBuffer(fDisplayMode.virtual_width,
+										   fDisplayMode.virtual_height);
+			
+			status_t ret = fBackBuffer->InitCheck();
+			if (ret < B_OK) {
+				delete fBackBuffer;
+				fBackBuffer = NULL;
+				return ret;
+			}
 		}
 		
 		// clear out backbuffer, alpha is 255 this way
 		// TODO: maybe this should handle different color spaces in different
 		//		 ways
-		memset(fBackBuffer->Bits(), 255,
-			   fBackBuffer->BytesPerRow() * fBackBuffer->Height());
+		memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 	}
 	
 	return B_OK;
@@ -454,6 +464,21 @@ AccelerantHWInterface::ProposeMode(display_mode *candidate, const display_mode *
 	return fAccProposeDisplayMode(candidate, &this_low, &this_high);
 }
 
+// WaitForRetrace
+status_t
+AccelerantHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
+{
+	accelerant_retrace_semaphore AccelerantRetraceSemaphore = (accelerant_retrace_semaphore)fAccelerantHook(B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
+	if (!AccelerantRetraceSemaphore)
+		return B_UNSUPPORTED;
+	
+	sem_id sem = AccelerantRetraceSemaphore();
+	if (sem < 0)
+		return B_ERROR;
+	
+	return acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
+}
+
 // SetDPMSMode
 status_t
 AccelerantHWInterface::SetDPMSMode(const uint32 &state)
@@ -484,19 +509,41 @@ AccelerantHWInterface::DPMSCapabilities() const
 	return fAccDPMSCapabilities();
 }
 
-// WaitForRetrace
-status_t
-AccelerantHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
+// SetCursor
+void
+AccelerantHWInterface::SetCursor(ServerCursor* cursor)
 {
-	accelerant_retrace_semaphore AccelerantRetraceSemaphore = (accelerant_retrace_semaphore)fAccelerantHook(B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
-	if (!AccelerantRetraceSemaphore)
-		return B_UNSUPPORTED;
-	
-	sem_id sem = AccelerantRetraceSemaphore();
-	if (sem < 0)
-		return B_ERROR;
-	
-	return acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
+	if (Lock()) {
+		HWInterface::SetCursor(cursor);
+		// TODO: implement setting the hard ware cursor
+		// NOTE: cursor should be always B_RGBA32
+		// NOTE: The HWInterface implementation should
+		// still be called, since it takes ownership of
+		// the cursor.
+		Unlock();
+	}
+}
+
+// SetCursorVisible
+void
+AccelerantHWInterface::SetCursorVisible(bool visible)
+{
+	if (Lock()) {
+		HWInterface::SetCursorVisible(visible);
+		// TODO: update graphics hardware
+		Unlock();
+	}
+}
+
+// MoveCursorTo
+void
+AccelerantHWInterface::MoveCursorTo(const float& x, const float& y)
+{
+	if (Lock()) {
+		HWInterface::MoveCursorTo(x, y);
+		// TODO: update graphics hardware
+		Unlock();
+	}
 }
 
 // FrontBuffer
@@ -526,5 +573,7 @@ AccelerantHWInterface::_DrawCursor(BRect area) const
 	// use the default implementation for now,
 	// until we have a hardware cursor
 	HWInterface::_DrawCursor(area);
+	// TODO: this would only be called, if we don't have
+	// a hardware cursor for some reason
 }
 

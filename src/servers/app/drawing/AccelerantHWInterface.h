@@ -49,6 +49,12 @@ virtual status_t				SetDPMSMode(const uint32 &state);
 virtual uint32					DPMSMode() const;
 virtual uint32					DPMSCapabilities() const;
 
+	// cursor handling
+virtual	void					SetCursor(ServerCursor* cursor);
+virtual	void					SetCursorVisible(bool visible);
+virtual	void					MoveCursorTo(const float& x,
+											 const float& y);
+
 	// frame buffer access
 virtual	RenderingBuffer			*FrontBuffer() const;
 virtual	RenderingBuffer			*BackBuffer() const;
