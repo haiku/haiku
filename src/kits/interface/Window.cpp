@@ -1702,25 +1702,24 @@ window_look	BWindow::Look() const
 
 status_t BWindow::SetFeel(window_feel feel)
 {
-	// TODO:	See what happens when a window that is part of a subset, changes its
-	// feel. Should it be removed from the subset?
-
-	int32		rCode;
-
+	if (!(	feel == B_NORMAL_WINDOW_FEEL
+			|| feel == B_MODAL_SUBSET_WINDOW_FEEL
+			|| feel == B_MODAL_APP_WINDOW_FEEL
+			|| feel == B_MODAL_ALL_WINDOW_FEEL
+			|| feel == B_FLOATING_SUBSET_WINDOW_FEEL
+			|| feel == B_FLOATING_APP_WINDOW_FEEL
+			|| feel == B_FLOATING_ALL_WINDOW_FEEL))
+		return B_ERROR;
+	
 	Lock();
 	fLink->StartMessage( AS_SET_FEEL );
 	fLink->Attach<int32>( (int32)feel );
 	fLink->Flush();
-	fLink->GetNextReply( &rCode );	
 	Unlock();
 	
-	if (rCode == SERVER_TRUE)
-	{
-		fFeel		= feel;
-		return B_OK;
-	}
+	fFeel		= feel;
 
-	return B_ERROR;
+	return B_OK;
 }
 
 //------------------------------------------------------------------------------
