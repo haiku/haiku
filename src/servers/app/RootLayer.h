@@ -119,6 +119,7 @@ public:
 			status_t			EnqueueMessage(BPortLink &message);
 			void				GoInvalidate(const Layer *layer, const BRegion &region);
 			void				GoRedraw(const Layer *layer, const BRegion &region);
+			void				GoChangeWinBorderFeel(const WinBorder *winBorder, int32 newFeel);
 
 			// Debug methods
 			void				PrintToStream(void);
@@ -139,6 +140,8 @@ friend class Desktop;
 
 			void				show_winBorder(WinBorder* winBorder);
 			void				hide_winBorder(WinBorder* winBorder);
+
+			void				change_winBorder_feel(WinBorder *winBorder, int32 newFeel);
 
 			bool				get_workspace_windows();
 			void 				draw_window_tab(WinBorder *exFocus);

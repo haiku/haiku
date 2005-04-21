@@ -419,6 +419,21 @@ void Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWin
 	Unlock();
 }
 
+void Desktop::SetWinBorderFeel(WinBorder *winBorder, uint32 feel)
+{
+	// NOTE: this method is called from RootLayer thread only
+
+	// we're playing with window list. lock first.
+	Lock();
+
+	RemoveWinBorder(winBorder);
+	winBorder->QuietlySetFeel(feel);
+	AddWinBorder(winBorder);
+
+	// unlock!
+	Unlock();
+}
+
 WinBorder* Desktop::FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID)
 {
 	WinBorder*		wb;

@@ -1368,8 +1368,10 @@ cl->fBoundsLeftTop.PrintToStream();
 		}
 		case AS_SET_FEEL:
 		{
-			// TODO: Implement AS_SET_FEEL
-			STRACE(("ServerWindow %s: Message Set_Feel unimplemented\n",fName));
+			STRACE(("ServerWindow %s: Message AS_SET_FEEL\n",fName));
+			int32		newFeel;
+			link.Read<int32>(&newFeel);
+			myRootLayer->GoChangeWinBorderFeel(fWinBorder, newFeel);
 			break;
 		}
 		case AS_SET_ALIGNMENT:

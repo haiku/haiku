@@ -105,6 +105,7 @@ public:
 
 	inline	int32				Look(void) const { return fLook; }
 	inline	int32				Feel(void) const { return fFeel; }
+	inline	int32				Level() const { return fLevel; }
 	inline	uint32				WindowFlags(void) const { return fWindowFlags; }
 	inline	uint32				Workspaces(void) const { return fWorkspaces; }
 
@@ -113,11 +114,9 @@ public:
 			bool				HasPoint(const BPoint &pt) const;
 
 	inline	void				QuietlySetWorkspaces(uint32 wks) { fWorkspaces = wks; }	
+			void				QuietlySetFeel(int32 feel);	
 
 			FMWList				fFMWList;
-
-private:
-			void				SetLevel();
 
 protected:
 	friend class Layer;
@@ -144,6 +143,7 @@ protected:
 
 			int32				fLook;
 			int32				fFeel;
+			int32				fLevel;
 			int32				fWindowFlags;
 			uint32				fWorkspaces;
 

@@ -87,7 +87,7 @@ WinBorder::WinBorder(	const BRect &r,
 						DisplayDriver *driver)
 	: Layer(r, name, B_NULL_TOKEN, B_FOLLOW_NONE, 0UL, driver),
 	fLook(wlook),
-	fFeel(wfeel),
+	fLevel(-100),
 	fWindowFlags(wflags),
 	fWorkspaces(wwksindex)
 {
@@ -110,30 +110,8 @@ cnt = 0; // for debugging
 	fIsMinimizing	= false;
 	fIsZooming		= false;
 
-	// floating and modal windows must appear in every workspace where
-	// their main window is present. Thus their wksIndex will be set to
-	// '0x0' and they will be made visible when needed.
-	switch (fFeel)
-	{
-		case B_MODAL_APP_WINDOW_FEEL:
-		case B_MODAL_SUBSET_WINDOW_FEEL:
-		case B_FLOATING_APP_WINDOW_FEEL:
-		case B_FLOATING_SUBSET_WINDOW_FEEL:
-			fWorkspaces = 0x0UL;
-			break;
-		case B_MODAL_ALL_WINDOW_FEEL:
-		case B_FLOATING_ALL_WINDOW_FEEL:
-		case B_SYSTEM_LAST:
-		case B_SYSTEM_FIRST:
-			fWorkspaces = 0xffffffffUL;
-			break;
-		case B_NORMAL_WINDOW_FEEL:
-			if (fWorkspaces == 0x0UL)
-				;
-	}
-
 	fLastMousePosition.Set(-1,-1);
-	SetLevel();
+	QuietlySetFeel(wfeel);
 
 	if (fFeel != B_NO_BORDER_WINDOW_LOOK)
 		fDecorator = new_decorator(r, name, fLook, fFeel, fWindowFlags, fDriver);
@@ -401,9 +379,10 @@ void WinBorder::UpdateScreen(void)
 	STRACE(("WinBorder %s: UpdateScreen unimplemented\n",GetName()));
 }
 
-//--------------------- P R I V A T E -------------------
-void WinBorder::SetLevel()
+void WinBorder::QuietlySetFeel(int32 feel)
 {
+	fFeel = feel;
+
 	switch(fFeel)
 	{
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
@@ -439,4 +418,26 @@ void WinBorder::SetLevel()
 		default:
 			fLevel	= B_NORMAL;
 	}
-}
+
+	// floating and modal windows must appear in every workspace where
+	// their main window is present. Thus their wksIndex will be set to
+	// '0x0' and they will be made visible when needed.
+	switch (fFeel)
+	{
+		case B_MODAL_APP_WINDOW_FEEL:
+		case B_MODAL_SUBSET_WINDOW_FEEL:
+		case B_FLOATING_APP_WINDOW_FEEL:
+		case B_FLOATING_SUBSET_WINDOW_FEEL:
+			fWorkspaces = 0x0UL;
+			break;
+		case B_MODAL_ALL_WINDOW_FEEL:
+		case B_FLOATING_ALL_WINDOW_FEEL:
+		case B_SYSTEM_LAST:
+		case B_SYSTEM_FIRST:
+			fWorkspaces = 0xffffffffUL;
+			break;
+		case B_NORMAL_WINDOW_FEEL:
+			if (fWorkspaces == 0x0UL)
+				;
+	}
+}	

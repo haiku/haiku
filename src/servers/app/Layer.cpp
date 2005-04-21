@@ -104,7 +104,6 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	fEventMask		= 0UL;
 	fEventOptions	= 0UL;
 	fIsTopLayer		= false;
-	fLevel			= -100;
 	
 	fViewToken		= token;
 	fServerWin		= NULL;

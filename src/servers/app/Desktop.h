@@ -67,6 +67,7 @@ public:
 	// Methods for layer(WinBorder) manipulation.
 	void AddWinBorder(WinBorder *winBorder);
 	void RemoveWinBorder(WinBorder *winBorder);
+	void SetWinBorderFeel(WinBorder *winBorder, uint32 feel);
 	void AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder);
 	void RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorder);
 

@@ -131,7 +131,6 @@ public:
 	ServerApp *App(void) const { return fServerWin? fServerWin->App(): NULL; }
 	virtual bool HasClient(void) { return true; }
 	bool IsServerLayer() const;
-	int32 Level() const { return fLevel; }
 	uint32 EventMask(void) const { return fEventMask; }
 	uint32 EventOptions(void) const { return fEventOptions; }
 
@@ -184,7 +183,6 @@ protected:
 	ServerWindow *fServerWin;
 	BString *fName;	
 	int32 fViewToken;
-	int32 fLevel;
 	uint32 fFlags;
 	uint32 fResizeMode;
 	uint32 fEventMask;

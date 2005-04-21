@@ -290,6 +290,16 @@ int32 RootLayer::WorkingThread(void *data)
 				oneRootLayer->SetWinBorderWorskpaces(winBorder, oldWks, newWks);
 				break;
 			}
+			case AS_ROOTLAYER_DO_CHANGE_WINBORDER_FEEL:
+			{
+				WinBorder	*winBorder = NULL;
+				int32		newFeel = 0;
+
+				messageQueue.Read<WinBorder*>(&winBorder);
+				messageQueue.Read<int32>(&newFeel);
+				oneRootLayer->change_winBorder_feel(winBorder, newFeel);
+				break;
+			}
 			default:
 				STRACE(("RootLayer(%s)::WorkingThread received unexpected code %lx\n",oneRootLayer->GetName(), code));
 				break;
@@ -347,7 +357,14 @@ void RootLayer::redraw_layer(Layer *layer, const BRegion &region)
 	layer->Invalidate(region);
 }
 
-
+void RootLayer::GoChangeWinBorderFeel(const WinBorder *winBorder, int32 newFeel)
+{
+	BPortLink	msg(fListenPort, -1);
+	msg.StartMessage(AS_ROOTLAYER_DO_CHANGE_WINBORDER_FEEL);
+	msg.Attach<const WinBorder*>(winBorder);
+	msg.Attach<int32>(newFeel);
+	msg.Flush();
+}
 
 void RootLayer::MoveBy(float x, float y)
 {
@@ -523,7 +540,6 @@ void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBo
 	if (invalidate)
 		show_final_scene(exFocus, exActive);
 }
-
 
 // NOTE: This must be called by RootLayer's thread!!!!
 bool RootLayer::SetActiveWorkspace(int32 index)
@@ -1799,6 +1815,45 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 
 	if (invalidate)
 		show_final_scene(exFocus, exActive);
+}
+
+void RootLayer::change_winBorder_feel(WinBorder *winBorder, int32 newFeel)
+{
+	bool	isVisible = false;
+	bool	wasVisibleInActiveWorkspace = false;
+
+	WinBorder	*exFocus	= FocusWinBorder();
+	WinBorder	*exActive	= ActiveWinBorder();
+
+	if (!winBorder->IsHidden())
+	{
+		isVisible = true;
+		wasVisibleInActiveWorkspace = ActiveWorkspace()->HasWinBorder(winBorder);
+		winBorder->Hide(false);
+	}
+
+	desktop->SetWinBorderFeel(winBorder, newFeel);
+
+	if (isVisible)
+	{
+		if (fEventMaskLayer)
+		{
+			WinBorder	*wb	= fEventMaskLayer->fOwner?
+								fEventMaskLayer->fOwner:
+								(WinBorder*)fEventMaskLayer;
+			if (wb == fEventMaskLayer)
+			{
+				fMovingWindow	= false;
+				fResizingWindow	= false;
+				wb->MouseUp(DEC_NONE);
+			}
+			fEventMaskLayer	= NULL;
+		}
+
+		winBorder->Show(false);
+		if (wasVisibleInActiveWorkspace || ActiveWorkspace()->HasWinBorder(winBorder))
+			show_final_scene(exFocus, exActive);
+	}
 }
 
 bool RootLayer::get_workspace_windows()
