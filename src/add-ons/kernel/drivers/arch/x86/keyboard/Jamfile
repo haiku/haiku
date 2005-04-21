@@ -24,10 +24,6 @@ KernelLd keyboard :
 	drivers/dev/keyboard
 	; 
 
-R5KernelAddon <driver>keyboard : kernel drivers bin :
-        atkeyboard.c
-;
-
 # Link to kernel/drivers/dev/input
 {
         local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev input ] ;
@@ -35,16 +31,4 @@ R5KernelAddon <driver>keyboard : kernel drivers bin :
         MakeLocate $(instDriver) : $(dir) ;
         RelSymLink $(instDriver) : <driver>keyboard ;
 }
-
-#Package haiku-inputkit-cvs
-#       :
-#       <driver>keyboard
-#       :
-#       boot home config add-ons kernel drivers bin ;
-
-#Package haiku-inputkit-cvs
-#       :
-#       <kernel!drivers!dev!input>keyboard
-#       :
-#       boot home config add-ons kernel drivers dev input ;
 
