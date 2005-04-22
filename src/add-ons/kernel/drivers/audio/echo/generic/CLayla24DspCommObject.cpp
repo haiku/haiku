@@ -7,25 +7,24 @@
 //
 // ----------------------------------------------------------------------------
 //
-//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//   All rights reserved
-//   www.echoaudio.com
-//   
-//   This file is part of Echo Digital Audio's generic driver library.
-//   
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
-//   
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//   
-//   You should have received a copy of the GNU General Public License
-//   along with this program; if not, write to the Free Software
-//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//   MA  02111-1307, USA.
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // ****************************************************************************
 
@@ -356,81 +355,41 @@ ECHOSTATUS CLayla24DspCommObject::SetDigitalMode
 	BYTE	byNewMode
 )
 {
-	DWORD		dwControlReg;
-
-	dwControlReg = GetControlRegister();
+	BOOL		AsicOk;
 	
 	//
-	// Clear the current digital mode
-	//
-	dwControlReg &= GML_DIGITAL_MODE_CLEAR_MASK;
-
-	//
-	// Tweak the control reg
+	// Change the ASIC
 	//
 	switch ( byNewMode )
 	{
-		default :
-			return ECHOSTATUS_DIGITAL_MODE_NOT_SUPPORTED;
-
-		case DIGITAL_MODE_SPDIF_OPTICAL :
-
-			dwControlReg |= GML_SPDIF_OPTICAL_MODE;
-
-			// fall through 
-		
 		case DIGITAL_MODE_SPDIF_RCA :
-			//
-			//	If the input clock is set to ADAT, set the 
-			// input clock to internal and the sample rate to 48 KHz
-			// 
-			if ( ECHO_CLOCK_ADAT == GetInputClock() )
-			{
-				m_pDspCommPage->dwSampleRate = SWAP( (DWORD) 48000 );
-				SetInputClock( ECHO_CLOCK_INTERNAL );
-			}
+		case DIGITAL_MODE_SPDIF_OPTICAL :
 			//
 			// If the currently loaded ASIC is the S/PDIF ASIC, switch
 			// to the ADAT ASIC
 			//
-			if ( !SwitchAsic( pbLayla24_2S_ASIC, sizeof( pbLayla24_2S_ASIC ) ) )
-				SetInputClock( ECHO_CLOCK_INTERNAL );
-
+			AsicOk = SwitchAsic( pbLayla24_2S_ASIC, sizeof( pbLayla24_2S_ASIC ) );
 			break;
 			
 		case DIGITAL_MODE_ADAT :
 			//
-			//	If the input clock is set to S/PDIF, set the 
-			// input clock to internal and the sample rate to 48 KHz
-			// 
-			if ( ECHO_CLOCK_SPDIF == GetInputClock() )
-			{
-				m_pDspCommPage->dwSampleRate = SWAP( (DWORD) 48000 );
-				SetInputClock( ECHO_CLOCK_INTERNAL );
-			}
-			//
 			// If the currently loaded ASIC is the S/PDIF ASIC, switch
 			// to the ADAT ASIC
 			//
-			if ( !SwitchAsic( pbLayla24_2A_ASIC, sizeof( pbLayla24_2A_ASIC ) ) )
-				return( ECHOSTATUS_ASIC_NOT_LOADED );
-
-			dwControlReg |= GML_ADAT_MODE;
-			dwControlReg &= ~GML_DOUBLE_SPEED_MODE;
+			AsicOk = SwitchAsic( pbLayla24_2A_ASIC, sizeof( pbLayla24_2A_ASIC ) );
 			break;	
+
+		default :
+			return ECHOSTATUS_DIGITAL_MODE_NOT_SUPPORTED;
 	}
+	
+	if (FALSE == AsicOk)
+		return ECHOSTATUS_ASIC_NOT_LOADED;
 
 	//
-	// Write the control reg
+	// Call the base class to tweak the input clock if necessary
 	//
-	WriteControlReg( dwControlReg, TRUE );
-
-	m_byDigitalMode = byNewMode;
-
-	ECHO_DEBUGPRINTF( ("CLayla24DspCommObject::SetDigitalMode to %ld\n",
-							(DWORD) m_byDigitalMode) );
-
-	return ECHOSTATUS_OK;
+	return CGMLDspCommObject::SetDigitalMode(byNewMode);
 
 }	// ECHOSTATUS CLaya24DspCommObject::SetDigitalMode
 
@@ -449,9 +408,12 @@ BOOL CLayla24DspCommObject::SwitchAsic
 	DWORD		dwAsicSize
 )
 {
+	BOOL rval;
+
 	//
 	//	Check to see if this is already loaded
 	// 
+	rval = TRUE;
 	if ( pbyAsicNeeded != m_pbyAsic )
 	{
 		BYTE	byMonitors[ MONITOR_ARRAY_SIZE ];
@@ -463,19 +425,17 @@ BOOL CLayla24DspCommObject::SwitchAsic
 		//
 		// Load the desired ASIC
 		//
-		if ( !CDspCommObject::LoadASIC( DSP_FNC_LOAD_LAYLA24_EXTERNAL_ASIC,
+		rval = CDspCommObject::LoadASIC(DSP_FNC_LOAD_LAYLA24_EXTERNAL_ASIC,
 												  pbyAsicNeeded,
-												  dwAsicSize ) )
+												  dwAsicSize );
+		if (FALSE != rval)
 		{
-			memmove( m_pDspCommPage->byMonitors, byMonitors, MONITOR_ARRAY_SIZE );
-			return FALSE;
+			m_pbyAsic = pbyAsicNeeded;	
 		}
-		m_pbyAsic = pbyAsicNeeded;	
 		memmove( m_pDspCommPage->byMonitors, byMonitors, MONITOR_ARRAY_SIZE );
-		
 	}
 	
-	return TRUE;
+	return rval;
 
 }	// BOOL CLayla24DspCommObject::SwitchAsic( DWORD dwMask96 )
 
@@ -607,6 +567,7 @@ ECHOSTATUS CLayla24DspCommObject::SetInputClock(WORD wClock)
 	return ECHOSTATUS_OK;
 
 }		// ECHOSTATUS CLayla24DspCommObject::SetInputClock()
+
 
 
 // **** Layla24DspCommObject.cpp ****

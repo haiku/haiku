@@ -7,25 +7,24 @@
 //
 // ----------------------------------------------------------------------------
 //
-//	  Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//	  All rights reserved
-//	  www.echoaudio.com
-//		
-//   This file is part of Echo Digital Audio's generic driver library.
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
 //
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
 //
-//	  This program is distributed in the hope that it will be useful,
-//	  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//	  GNU General Public License for more details.
-//	  
-//	  You should have received a copy of the GNU General Public License
-//	  along with this program; if not, write to the Free Software
-//	  Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//	  MA  02111-1307, USA.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // ****************************************************************************
 
@@ -299,12 +298,21 @@ ECHOSTATUS C3g::QueryAudioSampleRate
 	//
 	if ((dwSampleRate >= 32000) && (dwSampleRate <= 50000))
 		return ECHOSTATUS_OK;
-		
+
 	if (	(DIGITAL_MODE_ADAT != GetDigitalMode()) && 
 			(dwSampleRate > 50000) && 
 			(dwSampleRate <= 100000))
 		return ECHOSTATUS_OK;
 	
+	//
+	// Also allow 8 kHz for Gina3G
+	//
+	DWORD dwBoxType;
+	
+	GetDspCommObject()->Get3gBoxType(&dwBoxType,NULL);
+	if ((GINA3G == dwBoxType) && (8000 == dwSampleRate))
+		return ECHOSTATUS_OK;
+		
 	ECHO_DEBUGPRINTF(("C3g::QueryAudioSampleRate() - rate %ld invalid\n",dwSampleRate) );
 
 	return ECHOSTATUS_BAD_FORMAT;

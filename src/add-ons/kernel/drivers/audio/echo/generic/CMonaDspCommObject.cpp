@@ -7,25 +7,24 @@
 //
 // ----------------------------------------------------------------------------
 //
-//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//   All rights reserved
-//   www.echoaudio.com
-//   
-//   This file is part of Echo Digital Audio's generic driver library.
-//   
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
-//   
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//   
-//   You should have received a copy of the GNU General Public License
-//   along with this program; if not, write to the Free Software
-//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//   MA  02111-1307, USA.
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // ****************************************************************************
 
@@ -82,8 +81,7 @@ CMonaDspCommObject::CMonaDspCommObject
 	if ( DEVICE_ID_56361 == pOsSupport->GetDeviceId() )
 		m_pwDspCodeToLoad = pwMona361DSP;
 	else
-	
-	m_pwDspCodeToLoad = pwMonaDSP;
+		m_pwDspCodeToLoad = pwMonaDSP;
 
 	m_byDigitalMode = DIGITAL_MODE_SPDIF_RCA;
 }	// CMonaDspCommObject::CMonaDspCommObject( DWORD dwPhysRegBase )
@@ -242,7 +240,7 @@ ECHOSTATUS CMonaDspCommObject::SetInputClock(WORD wClock)
 {
 	BOOL			bSetRate;
 	BOOL			bWriteControlReg;
-	DWORD			dwControlReg, dwSampleRate;
+	DWORD			dwControlReg;
 
 	ECHO_DEBUGPRINTF( ("CMonaDspCommObject::SetInputClock: clock %d\n",wClock) );
 
@@ -252,7 +250,6 @@ ECHOSTATUS CMonaDspCommObject::SetInputClock(WORD wClock)
 	// Mask off the clock select bits
 	//
 	dwControlReg &= GML_CLOCK_CLEAR_MASK;
-	dwSampleRate = GetSampleRate();
 	
 	bSetRate = FALSE;
 	bWriteControlReg = TRUE;
@@ -262,14 +259,6 @@ ECHOSTATUS CMonaDspCommObject::SetInputClock(WORD wClock)
 		{
 			ECHO_DEBUGPRINTF( ( "\tSet Mona clock to INTERNAL\n" ) );
 	
-			// If the sample rate is out of range for some reason, set it
-			// to a reasonable value.  mattg
-			if ( ( dwSampleRate < 8000  ) ||
-			     ( dwSampleRate > 96000 ) )
-			{
-				dwSampleRate = 48000;
-			}
-
 			bSetRate = TRUE;
 			bWriteControlReg = FALSE;
 
@@ -546,84 +535,36 @@ ECHOSTATUS CMonaDspCommObject::SetDigitalMode
 	BYTE	byNewMode
 )
 {
-	DWORD		dwControlReg;
-	
 	ECHO_DEBUGPRINTF(("CMonaDspCommObject::SetDigitalMode %d\n",byNewMode));
 
-	dwControlReg = GetControlRegister();
 	//
-	// Clear the current digital mode
+	// If the new mode is ADAT mode, make sure that the single speed ASIC is loaded
 	//
-	dwControlReg &= GML_DIGITAL_MODE_CLEAR_MASK;
-
-	//
-	// Tweak the control reg
-	//
-	switch ( byNewMode )
-	{
-		default :
-			return ECHOSTATUS_DIGITAL_MODE_NOT_SUPPORTED;
+	BYTE *pbAsic96;
 	
-		case DIGITAL_MODE_SPDIF_OPTICAL :
-
-			dwControlReg |= GML_SPDIF_OPTICAL_MODE;
-
-			// fall through 
-		
-		case DIGITAL_MODE_SPDIF_RCA :
-		
-			//
-			//	If the input clock is set to ADAT, set the 
-			// input clock to internal and the sample rate to 48 KHz
-			// 
-			if ( ECHO_CLOCK_ADAT == GetInputClock() )
-			{
-				m_pDspCommPage->dwSampleRate = SWAP( (DWORD) 48000 );
-				SetInputClock( ECHO_CLOCK_INTERNAL );
-			}
-		
-			break;
-			
-		case DIGITAL_MODE_ADAT :
-		
-			//
-			//	If the input clock is set to S/PDIF, set the 
-			// input clock to internal and the sample rate to 48 KHz
-			// 
-			if ( ECHO_CLOCK_SPDIF == GetInputClock() )
-			{
-				m_pDspCommPage->dwSampleRate = SWAP( (DWORD) 48000 );
-				SetInputClock( ECHO_CLOCK_INTERNAL );
-			}
-		
-			//
-			// If the current ASIC is the 96KHz ASIC, switch
-			// the ASIC and set to 48 KHz
-			//
-			if ( ( DEVICE_ID_56361 == m_pOsSupport->GetDeviceId() && 
-						pbMona1ASIC96_361 == m_pbyAsic ) ||
-				  ( DEVICE_ID_56301 == m_pOsSupport->GetDeviceId() && 
-						pbMona1ASIC96 == m_pbyAsic ) )
-			{
-				SetSampleRate( 48000 );	
-			}
-
-			dwControlReg |= GML_ADAT_MODE;
-			dwControlReg &= ~GML_DOUBLE_SPEED_MODE;
-			break;	
+	if (DIGITAL_MODE_ADAT == byNewMode)
+	{
+		switch (m_pOsSupport->GetDeviceId())
+		{
+			case DEVICE_ID_56301 :
+				pbAsic96 = pbMona1ASIC96;
+				break;
+				
+			case DEVICE_ID_56361 :
+				pbAsic96 = pbMona1ASIC96_361;
+				break;
+				
+			default :				// should never happen, but it's good to cover all the bases
+				return ECHOSTATUS_BAD_CARDID;
+		}
+		if (pbAsic96 == m_pbyAsic)
+			SetSampleRate( 48000 );	
 	}
 	
 	//
-	// Write the control reg
+	// Call the base class to tweak the input clock if necessary
 	//
-	WriteControlReg( dwControlReg );
-
-	m_byDigitalMode = byNewMode;
-
-	ECHO_DEBUGPRINTF( ("CMonaDspCommObject::SetDigitalMode to %ld\n",
-							(DWORD) m_byDigitalMode) );
-
-	return ECHOSTATUS_OK;
+	return CGMLDspCommObject::SetDigitalMode(byNewMode);
 	
 }	// ECHOSTATUS CMonaDspCommObject::SetDigitalMode
 

@@ -7,25 +7,24 @@
 //
 // ----------------------------------------------------------------------------
 //
-//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//   All rights reserved
-//   www.echoaudio.com
-//   
-//   This file is part of Echo Digital Audio's generic driver library.
-//   
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
-//   
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//   
-//   You should have received a copy of the GNU General Public License
-//   along with this program; if not, write to the Free Software
-//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//   MA  02111-1307, USA.
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // ****************************************************************************
 
@@ -204,7 +203,8 @@ ECHOSTATUS C3gDco::SetInputClock(WORD wClock)
 			m_wInputClock = ECHO_CLOCK_INTERNAL;	// prevent recursion
 			
 			dwSampleRate = GetSampleRate();
-			if ((dwSampleRate < 32000) || (dwSampleRate > 100000))
+			if ((dwSampleRate != 8000) &&
+				((dwSampleRate < 32000) || (dwSampleRate > 100000)))
 				dwSampleRate = 48000;
 				
 			SetSampleRate(dwSampleRate);
@@ -290,6 +290,8 @@ DWORD C3gDco::SetSampleRate( DWORD dwNewSampleRate )
 {
 	DWORD dwControlReg,dwNewClock,dwBaseRate,dwFreqReg;
 	
+	ECHO_DEBUGPRINTF(("3G set sample rate to %ld\n",dwNewSampleRate));
+	
 	//
 	// Only set the clock for internal mode.  If the clock is not set to
 	// internal, try and re-set the input clock; this more transparently
@@ -343,7 +345,11 @@ DWORD C3gDco::SetSampleRate( DWORD dwNewSampleRate )
 		case 32000 :
 			dwNewClock = E3G_32KHZ;
 			break;
-		
+			
+		case 8000 :
+			dwNewClock = E3G_32KHZ | E3G_SRC_4X;
+			break;
+
 		default :
 			dwNewClock = E3G_CONTINUOUS_CLOCK;
 			if (dwNewSampleRate > 50000)
@@ -353,6 +359,8 @@ DWORD C3gDco::SetSampleRate( DWORD dwNewSampleRate )
 
 	dwControlReg |= dwNewClock;
 	SetSpdifBits(&dwControlReg,dwNewSampleRate);
+	
+	ECHO_DEBUGPRINTF(("\tdwNewClock 0x%lx  dwControlReg 0x%lx\n",dwNewClock,dwControlReg));
 
 	//
 	// Set up the frequency reg

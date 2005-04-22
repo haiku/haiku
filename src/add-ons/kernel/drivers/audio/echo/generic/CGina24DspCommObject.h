@@ -6,27 +6,24 @@
 //
 // ----------------------------------------------------------------------------
 //
-// ----------------------------------------------------------------------------
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
 //
-//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//   All rights reserved
-//   www.echoaudio.com
-//   
-//   This file is part of Echo Digital Audio's generic driver library.
-//   
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
-//   
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//   
-//   You should have received a copy of the GNU General Public License
-//   along with this program; if not, write to the Free Software
-//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//   MA  02111-1307, USA.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // ****************************************************************************
 
@@ -54,22 +51,6 @@ public:
 	//
 	virtual DWORD SetSampleRate()
 		{ return( SetSampleRate( GetSampleRate() ) ); }
-	//
-	//	Set digital mode
-	//
-	virtual ECHOSTATUS SetDigitalMode
-	(
-		BYTE	byNewMode
-	);
-	//
-	//	Get mask of all supported digital modes
-	//	(See ECHOCAPS_HAS_DIGITAL_MODE_??? defines in EchoGalsXface.h)
-	//
-	virtual DWORD GetDigitalModes()
-		{ return( ECHOCAPS_HAS_DIGITAL_MODE_SPDIF_RCA	  |
-					 ECHOCAPS_HAS_DIGITAL_MODE_SPDIF_OPTICAL |
-					 ECHOCAPS_HAS_DIGITAL_MODE_ADAT			  |
-					 ECHOCAPS_HAS_DIGITAL_MODE_SPDIF_CDROM	); }
 
 	//
 	//	Set input clock

@@ -1,0 +1,17 @@
+Echo Generic Driver
+Release B1
+
+B1 is very similar to B0, with the following changes:
+
+-The code is now licensed under the terms of the Lesser GNU Public License.
+
+-Fixed a minor bug in CDspCommObject::ReadMidi
+
+-Added support for 8 kHz sampling with Gina3G
+
+-Removed obsolete "AddBuffer" command from DSP comm object
+
+-Removed support for Gina24 CD-ROM S/PDIF mode
+
+-Rewrote and fixed some bugs in digital mode switching for Layla24/Gina24/Mona
+

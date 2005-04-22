@@ -12,25 +12,24 @@
 //
 //----------------------------------------------------------------------------
 //
-//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//   All rights reserved
-//   www.echoaudio.com
-//   
-//   This file is part of Echo Digital Audio's generic driver library.
-//   
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
-//   
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//   
-//   You should have received a copy of the GNU General Public License
-//   along with this program; if not, write to the Free Software
-//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//   MA  02111-1307, USA.
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 //********************************************************************************
 
@@ -69,8 +68,6 @@
 
 #define DSP_56361									// Some Echo24 cards use the 56361 DSP
 
-#define DIGITAL_INPUT_AUTO_MUTE_SUPPORT	// Gina24, Layla24, and Mona
-
 #define READ_DSP_TIMEOUT						100000L	// .1 second
 
 #define STEREO_BIG_ENDIAN32_SUPPORT
@@ -85,6 +82,7 @@
 #define MIN_MTC_1X_RATE							8000
 
 #endif // ECHO24_FAMILY
+
 
 
 //===========================================================================

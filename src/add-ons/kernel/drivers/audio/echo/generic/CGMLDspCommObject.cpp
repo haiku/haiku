@@ -6,25 +6,24 @@
 //
 // ----------------------------------------------------------------------------
 //
-//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//   All rights reserved
-//   www.echoaudio.com
-//   
-//   This file is part of Echo Digital Audio's generic driver library.
-//   
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
-//   
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//   
-//   You should have received a copy of the GNU General Public License
-//   along with this program; if not, write to the Free Software
-//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//   MA  02111-1307, USA.
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // ****************************************************************************
 
@@ -212,4 +211,86 @@ ECHOSTATUS CGMLDspCommObject::WriteControlReg
 	
 } // ECHOSTATUS CGMLDspCommObject::WriteControlReg( DWORD dwControlReg )
 
-// **** CGML24DspCommObject.cpp ****
+//===========================================================================
+//
+// SetDigitalMode
+// 
+//===========================================================================
+
+ECHOSTATUS CGMLDspCommObject::SetDigitalMode
+(
+	BYTE	byNewMode
+)
+{
+	WORD		wInvalidClock;
+	
+	//
+	// See if the current input clock doesn't match the new digital mode
+	//
+	switch (byNewMode)
+	{
+		case DIGITAL_MODE_SPDIF_RCA :
+		case DIGITAL_MODE_SPDIF_OPTICAL :
+			wInvalidClock = ECHO_CLOCK_ADAT;
+			break;
+			
+		case DIGITAL_MODE_ADAT :
+			wInvalidClock = ECHO_CLOCK_SPDIF;
+			break;
+			
+		default :
+			wInvalidClock = 0xffff;
+			break;
+	}
+
+	if (wInvalidClock == GetInputClock())
+	{
+		SetInputClock( ECHO_CLOCK_INTERNAL );
+		SetSampleRate( 48000 );
+	}
+
+	//
+	// Clear the current digital mode
+	//
+	DWORD dwControlReg;
+	
+	dwControlReg = GetControlRegister();
+	dwControlReg &= GML_DIGITAL_MODE_CLEAR_MASK;
+
+	//
+	// Tweak the control reg
+	//
+	switch ( byNewMode )
+	{
+		case DIGITAL_MODE_SPDIF_RCA :
+			break;
+			
+		case DIGITAL_MODE_SPDIF_OPTICAL :
+			dwControlReg |= GML_SPDIF_OPTICAL_MODE;
+			break;
+		
+		case DIGITAL_MODE_ADAT :
+			dwControlReg |= GML_ADAT_MODE;
+			dwControlReg &= ~GML_DOUBLE_SPEED_MODE;
+			break;	
+
+		default :
+			return ECHOSTATUS_DIGITAL_MODE_NOT_SUPPORTED;
+	}
+	
+	//
+	// Write the control reg
+	//
+	WriteControlReg( dwControlReg );
+
+	m_byDigitalMode = byNewMode;
+
+	ECHO_DEBUGPRINTF( ("CGMLDspCommObject::SetDigitalMode to %ld\n",
+							(DWORD) m_byDigitalMode) );
+
+	return ECHOSTATUS_OK;
+
+}	// ECHOSTATUS CGMLDspCommObject::SetDigitalMode
+
+
+// **** CGMLDspCommObject.cpp ****

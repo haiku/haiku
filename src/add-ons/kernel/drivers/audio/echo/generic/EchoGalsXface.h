@@ -8,27 +8,24 @@
 //
 // ----------------------------------------------------------------------------
 //
-// ----------------------------------------------------------------------------
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
 //
-//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//   All rights reserved
-//   www.echoaudio.com
-//   
-//   This file is part of Echo Digital Audio's generic driver library.
-//   
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
-//   
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//   
-//   You should have received a copy of the GNU General Public License
-//   along with this program; if not, write to the Free Software
-//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//   MA  02111-1307, USA.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // ****************************************************************************
 
@@ -265,7 +262,6 @@
 #define DIGITAL_MODE_SPDIF_RCA			0
 #define DIGITAL_MODE_SPDIF_OPTICAL		1
 #define DIGITAL_MODE_ADAT					2
-#define DIGITAL_MODE_SPDIF_CDROM			3
 
 //
 //	Digital mode capability masks
@@ -273,7 +269,6 @@
 #define ECHOCAPS_HAS_DIGITAL_MODE_SPDIF_RCA		(1<<DIGITAL_MODE_SPDIF_RCA)
 #define ECHOCAPS_HAS_DIGITAL_MODE_SPDIF_OPTICAL	(1<<DIGITAL_MODE_SPDIF_OPTICAL)
 #define ECHOCAPS_HAS_DIGITAL_MODE_ADAT				(1<<DIGITAL_MODE_ADAT)
-#define ECHOCAPS_HAS_DIGITAL_MODE_SPDIF_CDROM	(1<<DIGITAL_MODE_SPDIF_CDROM)
 
 
 //*****************************************************************************

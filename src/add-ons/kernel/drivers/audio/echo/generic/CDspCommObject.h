@@ -8,25 +8,24 @@
 //
 // ----------------------------------------------------------------------------
 //
-//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//   All rights reserved
-//   www.echoaudio.com
-//   
-//   This file is part of Echo Digital Audio's generic driver library.
-//   
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
-//   
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//   
-//   You should have received a copy of the GNU General Public License
-//   along with this program; if not, write to the Free Software
-//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//   MA  02111-1307, USA.
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // ****************************************************************************
 
@@ -449,7 +448,6 @@ SET_LAYLA24_FREQUENCY_REG command.
 #define GML_SPDIF_24_BIT			0x0800		// 1 == 24 bit, 0 == 20 bit
 #define GML_ADAT_MODE				0x1000		// 1 == ADAT mode, 0 == S/PDIF mode
 #define GML_SPDIF_OPTICAL_MODE	0x2000		// 1 == optical mode, 0 == RCA mode
-#define GML_SPDIF_CDROM_MODE		0x3000		// 1 == CDROM mode, 0 == RCA or optical mode
 #define GML_DOUBLE_SPEED_MODE		0x4000		// 1 == double speed, 0 == single speed			
 
 #define GML_DIGITAL_IN_AUTO_MUTE	0x800000
@@ -585,9 +583,9 @@ typedef struct
 	DWORD				dwStatusClocks;	 	// Current Input clock state					0xb6c	4
 
 	DWORD				dwExtBoxStatus;		// External box connected or not				0xb70 4
-	CChMaskDsp		cmdAddBuffer;			// Pipes. to add									0xb74	4
+	DWORD				dwUnused2;				// filler											0xb74	4
 	DWORD				dwMidiOutFreeCount;	// # of bytes free in MIDI output FIFO		0xb78	4
-	DWORD 			dwUnused2;				//                                        0xb7c	4
+	DWORD 			dwUnused3;				//                                        0xb7c	4
 	DWORD				dwControlReg;			// Mona, Gina24, Layla24 and 3G control 	0xb80 4
 	DWORD				dw3gFreqReg;			// 3G frequency register						0xb84	4
 	BYTE				byFiller[24];			// filler											0xb88

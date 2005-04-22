@@ -6,25 +6,24 @@
 //
 // ----------------------------------------------------------------------------
 //
-//   Copyright Echo Digital Audio Corporation (c) 1998 - 2004
-//   All rights reserved
-//   www.echoaudio.com
-//   
-//   This file is part of Echo Digital Audio's generic driver library.
-//   
-//   Echo Digital Audio's generic driver library is free software; 
-//   you can redistribute it and/or modify it under the terms of 
-//   the GNU General Public License as published by the Free Software Foundation.
-//   
-//   This program is distributed in the hope that it will be useful,
-//   but WITHOUT ANY WARRANTY; without even the implied warranty of
-//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//   GNU General Public License for more details.
-//   
-//   You should have received a copy of the GNU General Public License
-//   along with this program; if not, write to the Free Software
-//   Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
-//   MA  02111-1307, USA.
+// This file is part of Echo Digital Audio's generic driver library.
+// Copyright Echo Digital Audio Corporation (c) 1998 - 2005
+// All rights reserved
+// www.echoaudio.com
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // ****************************************************************************
 
@@ -1275,46 +1274,6 @@ ECHOSTATUS CDspCommObject::ResetTransport
 
 //===========================================================================
 //
-//	Calling AddBuffer tells the DSP to increment its internal buffer
-// count for a given pipe.
-//
-//===========================================================================
-
-ECHOSTATUS CDspCommObject::AddBuffer( WORD wPipeIndex )
-{
-	//
-	// Parameter check
-	//
-	if ( wPipeIndex >= GetNumPipes())
-	{
-		ECHO_DEBUGPRINTF( ("CDspCommObject::AddBuffer: Invalid pipe %d\n",
-								 wPipeIndex) );
-		return ECHOSTATUS_INVALID_CHANNEL;
-	}
-
-	//
-	// Wait for the last command
-	//
-	if ( !WaitForHandshake() )
-		return ECHOSTATUS_DSP_DEAD;
-		
-	//
-	// Write to the comm page
-	//
-	m_pDspCommPage->cmdAddBuffer.Clear();
-	m_pDspCommPage->cmdAddBuffer.SetIndexInMask( wPipeIndex );
-
-	//
-	// Clear the handshake and send the vector command
-	//
-	ClearHandshake();
-	return SendVector( DSP_VC_ADD_AUDIO_BUFFER );	
-	
-}	// ECHOSTATUS CDspCommObject::AddOutBuffer( WORD wPipeIndex )
-
-
-//===========================================================================
-//
 // This tells the DSP where to start reading the scatter-gather list
 // for a given pipe.
 //
@@ -2028,7 +1987,7 @@ ECHOSTATUS CDspCommObject::GetAudioMeters
 		
 		dwCh++;
 	}
-	
+
 	return ECHOSTATUS_OK;
 	
 } // GetAudioMeters
@@ -2217,7 +2176,7 @@ ECHOSTATUS CDspCommObject::ReadMidi
 	DWORD &	dwData				// Return data
 )
 {
-	if ( wIndex >= CP_MIDI_IN_BUFFER_SIZE - 1 )
+	if ( wIndex >= CP_MIDI_IN_BUFFER_SIZE )
 		return ECHOSTATUS_INVALID_INDEX;
 
 	//
