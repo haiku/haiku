@@ -425,7 +425,6 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 	if (feel != B_FLOATING_SUBSET_WINDOW_FEEL && feel != B_MODAL_SUBSET_WINDOW_FEEL)
 	{
 		uint32		wks = winBorder->Workspaces();
-
 		// add to current workspace
 		if (wks == 0)
 		{
@@ -1777,7 +1776,7 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 				// subset modals are a bit like floating windows, they are being added
 				// and removed from workspace when there's at least a normal window
 				// that uses them.
-				winBorder->Level() == B_MODAL_APP ||
+				winBorder->Feel() == B_MODAL_SUBSET_WINDOW_FEEL ||
 				// floating windows are inserted/removed on-the-fly so this window,
 				// although needed may not be in workspace's list.
 				winBorder->Level() == B_FLOATING_APP))

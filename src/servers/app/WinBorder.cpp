@@ -425,6 +425,7 @@ void WinBorder::QuietlySetFeel(int32 feel)
 	switch (fFeel)
 	{
 		case B_MODAL_APP_WINDOW_FEEL:
+			break;
 		case B_MODAL_SUBSET_WINDOW_FEEL:
 		case B_FLOATING_APP_WINDOW_FEEL:
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
@@ -437,7 +438,6 @@ void WinBorder::QuietlySetFeel(int32 feel)
 			fWorkspaces = 0xffffffffUL;
 			break;
 		case B_NORMAL_WINDOW_FEEL:
-			if (fWorkspaces == 0x0UL)
-				;
+			break;
 	}
 }	

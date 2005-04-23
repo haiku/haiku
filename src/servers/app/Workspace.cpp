@@ -21,7 +21,7 @@
 //
 //	File Name:		Workspace.cpp
 //	Author:			Adi Oanca <adioanca@cotty.iren.ro>
-//	Description:	Tracks workspaces
+//	Description:	Tracks windows inside one workspace
 //  
 //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //  Notes:			IMPORTANT WARNING
@@ -542,18 +542,36 @@ STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 			{
 				// if this modal subset is in our list ONLY (not in other visible normal window's one),
 				// then remove from Workspace's list.
-				if (item->layerPtr->Level() == B_MODAL_APP
-					&& winBorder->fFMWList.HasItem(item->layerPtr)
-					&& !searchFirstMainWindow(item->layerPtr))
+				if (item->layerPtr->Level() == B_MODAL_APP)
 				{
-					// if this modal subset has front state, make sure another window will get that status.
-					if (fFrontItem == item)
-						changeFront = true;
+					if(winBorder->fFMWList.HasItem(item->layerPtr))
+					{
+						if(!searchFirstMainWindow(item->layerPtr))
+						{
+							// if this modal subset has front state, make sure another window will get that status.
+							if (fFrontItem == item)
+								changeFront = true;
 
-					toast	= item;
-					item	= item->lowerItem;
-					RemoveItem(toast);
-					fPool.ReleaseMemory(toast);
+							toast	= item;
+							item	= item->lowerItem;
+							RemoveItem(toast);
+							fPool.ReleaseMemory(toast);
+						}
+					}
+					else if (!searchANormalWindow(item->layerPtr)
+							&& !(item->layerPtr->Workspaces() & (0x00000001 << fID)))
+					{
+						// if this modal subset has front state, make sure another window will get that status.
+						if (fFrontItem == item)
+							changeFront = true;
+
+						toast	= item;
+						item	= item->lowerItem;
+						RemoveItem(toast);
+						fPool.ReleaseMemory(toast);
+					}
+					else
+						item	= item->lowerItem;
 				}
 				else
 					item	= item->lowerItem;
@@ -1361,6 +1379,22 @@ bool Workspace::removeAndPlaceBefore(const WinBorder *wb, ListData *beforeItem)
 {
 	return removeAndPlaceBefore(HasItem(wb), beforeItem);
 }
+
+inline
+WinBorder* Workspace::searchANormalWindow(WinBorder *wb) const
+{
+	ListData	*listItem = fBottomItem;
+	while (listItem)
+	{
+		if (listItem->layerPtr->Level() == B_NORMAL && !listItem->layerPtr->IsHidden()
+			&& listItem->layerPtr->App()->ClientTeamID() == wb->App()->ClientTeamID())
+				return listItem->layerPtr;
+
+		listItem	= listItem->upperItem;
+	}
+	return NULL;
+}
+
 
 inline
 WinBorder* Workspace::searchFirstMainWindow(WinBorder *wb) const

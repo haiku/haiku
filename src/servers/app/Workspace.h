@@ -102,6 +102,7 @@ private:
 			bool				removeAndPlaceBefore(ListData *item, ListData *beforeItem);
 
 			WinBorder*			searchFirstMainWindow(WinBorder *wb) const;
+			WinBorder*			searchANormalWindow(WinBorder *wb) const;
 
 			bool				windowHasVisibleModals(const WinBorder *winBorder) const;
 			ListData*			putModalsInFront(ListData *item);
