@@ -187,11 +187,42 @@
 #define ACPI_USE_SYSTEM_CLIBRARY
 #define ACPI_USE_NATIVE_DIVIDE
 
-extern int      acpi_acquire_global_lock(uint32 *lock);
-extern int      acpi_release_global_lock(uint32 *lock);
+/* The following Global Lock code stolen from NetBSD
+   src/sys/arch/i386/include/acpi_func.h which in turn
+   was stolen from Intel's spec document */
 
-#define ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq) ((Acq) = acpi_acquire_global_lock(GLptr))
-#define ACPI_RELEASE_GLOBAL_LOCK(GLptr, Acq) ((Acq) = acpi_release_global_lock(GLptr))
+#define	ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq) \
+do { \
+	__asm __volatile( \
+	"1:	movl %1,%%eax		;" \
+	"	movl %%eax,%%edx	;" \
+	"	andl %2,%%edx		;" \
+	"	btsl $0x1,%%edx		;" \
+	"	adcl $0x0,%%edx		;" \
+	"	lock			;" \
+	"	cmpxchgl %%edx,%1	;" \
+	"	jnz 1b			;" \
+	"	andb $0x3,%%dl		;" \
+	"	cmpb $0x3,%%dl		;" \
+	"	sbbl %%eax,%%eax	;" \
+	: "=&a" (Acq), "+m" (*GLptr) \
+	: "i" (~1L) \
+	: "edx"); \
+} while (0)
+
+#define ACPI_RELEASE_GLOBAL_LOCK(GLptr, Acq) \
+do { \
+	__asm __volatile( \
+	"1:	movl %1,%%eax		;" \
+	"	andl %2,%%edx		;" \
+	"	lock			;" \
+	"	cmpxchgl %%edx,%1	;" \
+	"	jnz 1b			;" \
+	"	andl $0x1,%%eax		;" \
+	: "=&a" (Acq), "+m" (*GLptr) \
+	: "i" (~3L) \
+	: "edx"); \
+} while (0)
 
 
 /* Kernel doesn't have strupr, should be fixed. */

@@ -583,7 +583,7 @@ AcpiNsGetDeviceCallback (
     }
 
     /* Run _STA to determine if device is present */
-
+#if 0
     Status = AcpiUtExecute_STA (Node, &Flags);
     if (ACPI_FAILURE (Status))
     {
@@ -596,7 +596,7 @@ AcpiNsGetDeviceCallback (
 
         return (AE_CTRL_DEPTH);
     }
-
+#endif
     /* Filter based on device HID & CID */
 
     if (Info->Hid != NULL)
