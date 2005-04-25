@@ -650,6 +650,12 @@ echo_setup(echo_dev * card)
 
 	echo_dump_caps(card);
 
+#ifdef ECHO24_FAMILY
+	if (card->type == ECHO3G) {
+		strncpy(card->caps.szName, ((C3g*)card->pEG)->Get3gBoxName(), ECHO_MAXNAMELEN);
+	}
+#endif
+
 	status = card->pEG->OpenMixer(card->mixer);
 	if (status != ECHOSTATUS_OK)
 		return B_ERROR;
