@@ -785,15 +785,22 @@ KeyboardInputDevice::GetShortName(const char *longName)
 	CALLED();
 	BString string(longName);
 	BString name;
-	
+
 	int32 slash = string.FindLast("/");
 	string.CopyInto(name, slash + 1, string.Length() - slash);
 	int32 index = atoi(name.String()) + 1;
-	
+
 	int32 previousSlash = string.FindLast("/", slash);
-	string.CopyInto(name, previousSlash + 1, slash - previousSlash - 1); 
+	string.CopyInto(name, previousSlash + 1, slash - previousSlash - 1);
+
+	// some special handling so that we get "USB" and "AT" instead of "usb"/"at"
+	if (name.Length() < 4)
+		name.ToUpper();
+	else
+		name.Capitalize();
+
 	name << " Keyboard " << index;
-		
+
 	return strdup(name.String());
 }
 

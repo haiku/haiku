@@ -404,7 +404,8 @@ mouse_device::~mouse_device()
 void
 MouseInputDevice::RecursiveScan(const char *directory)
 {
-        CALLED();
+	CALLED();
+
 	bool found_ps2 = false;
 	BEntry entry;
 	BDirectory dir(directory);
@@ -414,9 +415,9 @@ MouseInputDevice::RecursiveScan(const char *directory)
 
 		char name[B_FILE_NAME_LENGTH];
 		entry.GetName(name);
-		if (strcmp(name, "ps2")==0)
+		if (strcmp(name, "ps2") == 0)
 			found_ps2 = true;
-		if (strcmp(name,"serial")==0 && found_ps2)
+		if (strcmp(name,"serial") == 0 && found_ps2)
 			continue;
 
 		if (entry.IsDirectory())
@@ -432,14 +433,20 @@ get_short_name(const char *longName)
 {
 	BString string(longName);
 	BString name;
-	
+
 	int32 slash = string.FindLast("/");
 	string.CopyInto(name, slash + 1, string.Length() - slash);
 	int32 index = atoi(name.String()) + 1;
-	
+
 	int32 previousSlash = string.FindLast("/", slash);
-	string.CopyInto(name, previousSlash + 1, slash - previousSlash - 1); 
+	string.CopyInto(name, previousSlash + 1, slash - previousSlash - 1);
+
+	if (name == "ps2")
+		name = "PS/2";
+	else
+		name.Capitalize();
+
 	name << " Mouse " << index;
-		
+
 	return strdup(name.String());
 }
