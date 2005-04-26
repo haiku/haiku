@@ -77,8 +77,11 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	}
 	LOG(1, ("SETMODE: (CONT.) validated command modeflags: $%08x\n", target.flags));
 
-	/* make sure a possible 3D add-on will block rendering and re-initialize itself;
-	 * it will reset this flag when it's done. */
+	/* make sure a possible 3D add-on will block rendering and re-initialize itself.
+	 * note: update in _this_ order only */
+	/* SET_DISPLAY_MODE will reset this flag when it's done. */
+	si->mode_changing = true;
+	/* the 3D add-on will reset this flag when it's done. */
 	si->mode_changed = true;
 
 	/* disable interrupts using the kernel driver */
@@ -361,6 +364,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	/* enable interrupts using the kernel driver */
 	interrupt_enable(true);
+
+	/* make sure a possible 3D add-on will re-initialize itself by signalling ready */
+	si->mode_changing = false;
 
 	/* optimize memory-access if needed */
 //	head1_mem_priority(colour_depth1);
