@@ -222,6 +222,9 @@ typedef struct {
 	uint32 mem_high;
 	/* flag to inform 3D add-on to stop rendering (set by 2D, reset by 3D drv) */
 	bool mode_changed;
+	/* flag to inform 3D add-on a mode-change is currently in progress
+	 * (set and reset by 2D drv) */
+	bool mode_changing;
 
   /* card info - information gathered from PINS (and other sources) */
 	enum
