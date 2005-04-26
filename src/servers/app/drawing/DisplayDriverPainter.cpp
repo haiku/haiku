@@ -26,6 +26,7 @@
 //------------------------------------------------------------------------------
 #include <stdio.h>
 #include <algo.h>
+#include <stack.h>
 
 #include "LayerData.h"
 #include "Painter.h"
@@ -45,11 +46,6 @@
 #endif
 
 #include "DisplayDriverPainter.h"
-
-// TODO: fix invalidation, what about pensize, scale, origin?
-// Painter calls could return the bounding box arround all
-// pixels touched by a drawing operation
-
 
 // constructor
 DisplayDriverPainter::DisplayDriverPainter()
@@ -88,55 +84,229 @@ DisplayDriverPainter::Shutdown()
 	DisplayDriver::Shutdown();
 }
 
-// CopyBits
+// CopyRegion() does a topological sort of the rects in the
+// region. The algorithm was suggested by Ingo Weinhold.
+// It compares each rect with each rect and builds a tree
+// of successors so we know the order in which they can be copied.
+// For example, let's suppose these rects are in a BRegion:
+//                        ************
+//                        *    B     *
+//                        ************
+//      *************
+//      *           *
+//      *     A     ****************
+//      *           **             *
+//      **************             *
+//                   *     C       *
+//                   *             *
+//                   *             *
+//                   ***************
+// When copying stuff from LEFT TO RIGHT, TOP TO BOTTOM, the
+// result of the sort will be C, A, B. For this direction, we search
+// for the rects that have no neighbors to their right and to their
+// bottom, These can be copied without drawing into the area of
+// rects yet to be copied. If you move from RIGHT TO LEFT, BOTTOM TO TOP,
+// you go look for the ones that have no neighbors to their top and left.
+//
+// Here I draw some rays to illustrate LEFT TO RIGHT, TOP TO BOTTOM:
+//                        ************
+//                        *    B     *
+//                        ************
+//      *************
+//      *           *
+//      *     A     ****************-----------------
+//      *           **             *
+//      **************             *
+//                   *     C       *
+//                   *             *
+//                   *             *
+//                   ***************
+//                   |
+//                   |
+//                   |
+//                   |
+// There are no rects in the area defined by the rays to the right
+// and bottom of rect C, so that's the one we want to copy first
+// (for positive x and y offsets).
+// Since A is to the left of C and B is to the top of C, The "node"
+// for C will point to the nodes of A and B as its "successors". Therefor,
+// A and B will have an "indegree" of 1 for C pointing to them. C will
+// have and "indegree" of 0, because there was no rect to which C
+// was to the left or top of. When comparing A and B, neither is left
+// or top from the other and in the sense that the algorithm cares about.
+
+// NOTE: comparisson of coordinates assumes that rects don't overlap
+// and don't share the actual edge either (as is the case in BRegions).
+
+struct node {
+			node()
+			{
+				pointers = NULL;
+			}
+			node(const BRect& r, int32 maxPointers)
+			{
+				init(r, maxPointers);
+			}
+			~node()
+			{
+				delete [] pointers;
+			}
+
+	void	init(const BRect& r, int32 maxPointers)
+			{
+				rect = r;
+				pointers = new node*[maxPointers];
+				in_degree = 0;
+				next_pointer = 0;
+			}
+
+	void	push(node* node)
+			{
+				pointers[next_pointer] = node;
+				next_pointer++;
+			}
+	node*	top()
+			{
+				return pointers[next_pointer];
+			}
+	node*	pop()
+			{
+				node* ret = top();
+				next_pointer--;
+				return ret;
+			}
+
+	BRect	rect;
+	int32	in_degree;
+	node**	pointers;
+	int32	next_pointer;
+};
+
+bool
+is_left_of(const BRect& a, const BRect& b)
+{
+	return (a.right < b.left);
+}
+bool
+is_above(const BRect& a, const BRect& b)
+{
+	return (a.bottom < b.top);
+}
+
+// CopyRegion
 void
-DisplayDriverPainter::CopyBits(const BRect &src, const BRect &dst,
-							   const DrawData *d)
+DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
+								 int32 xOffset, int32 yOffset)
 {
 	if (Lock()) {
-		// TODO: handle clipping to d->clipreg here?
+		int32 count = region->CountRects();
 
-		RenderingBuffer* backBuffer = fGraphicsCard->DrawingBuffer();
+		// TODO: make this step unnecessary
+		// (by using different stack impl inside node)
+		node nodes[count];
+		for (int32 i= 0; i < count; i++) {
+			nodes[i].init(region->RectAt(i), count);
+		}
 
-		BRect valid(0, 0, backBuffer->Width() - 1, backBuffer->Height() - 1);
-		if (valid.Intersects(src) && valid.Intersects(dst)) {
+		for (int32 i = 0; i < count; i++) {
+			BRect a = region->RectAt(i);
+			for (int32 k = i + 1; k < count; k++) {
+				BRect b = region->RectAt(k);
+				int cmp = 0;
+				// compare horizontally
+				if (xOffset > 0) {
+					if (is_left_of(a, b)) {
+						cmp -= 1;
+					} else if (is_left_of(b, a)) {
+						cmp += 1;
+					}
+				} else if (xOffset < 0) {
+					if (is_left_of(a, b)) {
+						cmp += 1;
+					} else if (is_left_of(b, a)) {
+						cmp -= 1;
+					}
+				}
+				// compare vertically
+				if (yOffset > 0) {
+					if (is_above(a, b)) {
+						cmp -= 1;	
+					} else if (is_above(b, a)) {
+						cmp += 1;
+					}
+				} else if (yOffset < 0) {
+					if (is_above(a, b)) {
+						cmp += 1;
+					} else if (is_above(b, a)) {
+						cmp -= 1;
+					}
+				}
+				// add appropriate node as successor
+				if (cmp > 0) {
+					nodes[i].push(&nodes[k]);
+					nodes[k].in_degree++;
+				} else if (cmp < 0) {
+					nodes[k].push(&nodes[i]);
+					nodes[i].in_degree++;
+				}
+			}
+		}
+		// put all nodes onto a stack that have an "indegree" count of zero
+		stack<node*> inDegreeZeroNodes;
+		for (int32 i = 0; i < count; i++) {
+			if (nodes[i].in_degree == 0) {
+				inDegreeZeroNodes.push(&nodes[i]);
+			}
+		}
+		// pop the rects from the stack, do the actual copy operation
+		// and decrease the "indegree" count of the other rects not
+		// currently on the stack and to which the current rect pointed
+		// to. If their "indegree" count reaches zero, put them onto the
+		// stack as well.
+		while (!inDegreeZeroNodes.empty()) {
+			node* n = inDegreeZeroNodes.top();
+			 inDegreeZeroNodes.pop();
 
-			// calculate offset before any clipping
-			int32 xOffset = (int32)(dst.left - src.left);
-			int32 yOffset = (int32)(dst.top - src.top);
+			BRect touched = _CopyRect(n->rect, xOffset, yOffset);
+			fGraphicsCard->Invalidate(touched);
 
-			// clip src and dest
-			BRect a = src & valid;
-			BRect b = dst & valid;
-			a = a & b.OffsetByCopy(BPoint(-xOffset, -yOffset));
-			b = b & a.OffsetByCopy(BPoint(xOffset, yOffset));
-	
-			uint8* bits = (uint8*)backBuffer->Bits();
-			uint32 bpr = backBuffer->BytesPerRow();
-	
-			uint32 width = a.IntegerWidth() + 1;
-			uint32 height = a.IntegerHeight() + 1;
-	
-			int32 left = (int32)a.left;
-			int32 top = (int32)a.top;
-	
-			// offset to left top of src rect
-			bits += top * bpr + left * 4;
-	
-			_MoveRect(bits, width, height, bpr, xOffset, yOffset);
-	
-			fGraphicsCard->Invalidate(dst);
+			for (int32 k = 0; k < n->next_pointer; k++) {
+				n->pointers[k]->in_degree--;
+				if (n->pointers[k]->in_degree == 0)
+					inDegreeZeroNodes.push(n->pointers[k]);
+			}
 		}
 
 		Unlock();
 	}
 }
 
-// CopyRegion
+// CopyRegionList
+//
+// * used to move windows arround on screen
+// TODO: Since the regions are passed to CopyRegion() one by one,
+// the case of different regions overlapping each other at source
+// and/or dest locations is not handled.
+// We also don't handle the case where multiple regions should have
+// been combined into one larger region (with effectively the same
+// rects), so that the sorting would compare them all at once. If
+// this turns out to be a problem, we can easily rewrite the function
+// here. In any case, to copy overlapping regions in app_server doesn't
+// make much sense to me.
 void
-DisplayDriverPainter::CopyRegion(BRegion *src, const BPoint &lefttop)
+DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
+									 int32 rCount, BRegion* clipReg)
 {
-printf("DisplayDriverPainter::CopyRegion()\n");
+	if (Lock()) {
+
+		for (int32 i = 0; i < rCount; i++) {
+			BRegion* region = (BRegion*)list->ItemAt(i);
+			BPoint* offset = (BPoint*)pList->ItemAt(i);
+			CopyRegion(region, (int32)offset->x, (int32)offset->y);
+		}
+
+		Unlock();
+	}
 }
 
 // InvertRect
@@ -172,299 +342,6 @@ DisplayDriverPainter::DrawBitmap(BRegion *region, ServerBitmap *bitmap,
 
 		Unlock();
 	}
-}
-
-/*
-inline int
-compare_left_right_top_bottom(BRect* a, BRect* b)
-{
-	if (b->right < a->left || b->bottom < a->top)
-		return 1;
-	else
-		return -1;
-	return 0;
-}
-
-inline int
-compare_right_left_top_bottom(BRect* a, BRect* b)
-{
-	if (b->right > a->left || b->bottom < a->top)
-		return 1;
-	else
-		return -1;
-	return 0;
-}
-
-inline int
-compare_left_right_bottom_top(BRect* a, BRect* b)
-{
-	if (b->right < a->left || b->bottom > a->top)
-		return 1;
-	else
-		return -1;
-	return 0;
-}
-
-inline int
-compare_right_left_bottom_top(BRect* a, BRect* b)
-{
-	if (b->right > a->left || b->bottom > a->top)
-		return 1;
-	else
-		return -1;
-	return 0;
-}
-*/
-
-// TODO: the commented out code is completely broken
-// what needs to be done is a topological sort of the rectangles
-// in a given BRegion.
-// For example, let's suppose these rects are in a BRegion:
-//                        ************
-//                        *    B     *
-//      *************     ************
-//      *           *
-//      *     A     ***************
-//      *           *             *
-//      *************             *
-//                  *     C       *
-//                  *             *
-//                  *             *
-//                  ***************
-// When moving stuff from LEFT TO RIGHT, TOP TO BOTTOM, the
-// result of the sort should be C, B, A, ie, you take an unsorted
-// list of rects, and you go look for the one that has no neighbors
-// to the right and to the bottom, that's the first one you want
-// to move. If you move from RIGHT TO LEFT, BOTTOM TO TOP, you
-// go look for the one that has no neighbors to the top and left.
-//
-// Here I draw some rays to illustrate LEFT TO RIGHT, TOP TO BOTTOM:
-//                        ************
-//                        *    B     *
-//      *************     ************
-//      *           *
-//      *     A     ***************-----------------
-//      *           *             *
-//      *************             *
-//                  *     C       *
-//                  *             *
-//                  *             *
-//                  ***************
-//                  |
-//                  |
-//                  |
-//                  |
-// There are no rects in the area defined by the rays to the right
-// and bottom of rect C, so that's the one we want to copy first
-// (for positive x and y offsets). If the sorting of rects can
-// be implemented, the speed-up of the CopyRegionList() function
-// will be about 300% (I tested that) with "in-place" copying.
-//
-// Of course, the usage of the funcion is completely obscure to me.
-// First of all, why is there a list of points? I checked and it
-// is indeed always the same point (the same offset used for all rects).
-// Second, if the Regions provided in the list somehow overlap, then
-// an in-place copy cannot be performed, so this all makes no sense.
-// However during my tests, the usage of the function
-// (from Layer::move_to() btw) was only with a *single* BRegion in
-// the list. Which makes most sense, but it doesn't make sense to pass
-// a BList then.
-
-// used to move windows arround on screen
-//
-// CopyRegionList
-void
-DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
-									 int32 rCount, BRegion* clipReg)
-{
-	if (!clipReg || !Lock())
-		return;
-/*
-// This is the same implementation as in DisplayDriverImpl for now
-
-// since we're not using painter.... this won't do much good, will it?
-//	fPainter->ConstrainClipping(*clipReg);
-//bigtime_t now = system_time();
-
-		BRect updateRect;
-
-		RenderingBuffer* backBuffer = fGraphicsCard->DrawingBuffer();
-
-		uint8* bits = (uint8*)backBuffer->Bits();
-		uint32 bpr = backBuffer->BytesPerRow();
-
-		// TODO: it's always the same point, no?
-		BPoint offset = *((BPoint*)pList->ItemAt(0));
-
-		// iterate over regions (and points)
-		for (int32 i = 0; i < rCount; i++) {
-			BRegion* region = (BRegion*)list->ItemAt(i);
-
-			// copy rects into a list
-			int32 rectCount = region->CountRects();
-			BList rects(rectCount);
-			for (int32 j = 0; j < rectCount; j++) {
-				BRect* r = new BRect(region->RectAt(j));
-				rects.AddItem((void*)r);
-			}
-			// sort the rects according to offset
-			BRect** first = (BRect**)rects.Items();
-			BRect** behindLast = (BRect**)rects.Items() + rects.CountItems();
-
-			int32 xOffset = (int32)offset.x;
-			int32 yOffset = (int32)offset.y;
-
-			if (xOffset >= 0) {
-				if (yOffset >= 0)
-					sort(first, behindLast, compare_left_right_top_bottom);
-				else
-					sort(first, behindLast, compare_left_right_bottom_top);
-			} else {
-				if (yOffset >= 0)
-					sort(first, behindLast, compare_right_left_top_bottom);
-				else
-					sort(first, behindLast, compare_right_left_bottom_top);
-			}
-
-
-			// iterate over rects in region
-			for (int32 j = 0; j < rectCount; j++) {
-				BRect* r = (BRect*)rects.ItemAt(j);
-
-				uint32 width = r->IntegerWidth() + 1;
-				uint32 height = r->IntegerHeight() + 1;
-
-				int32 left = (int32)r->left;
-				int32 top = (int32)r->top;
-
-// TODO: out of bounds checking!
-//				BPoint offset = *((BPoint*)pList->ItemAt(j % rCount));
-				// keep track of dirty rect
-				r->OffsetBy(offset);
-				updateRect = updateRect.IsValid() ? updateRect | *r : *r;
-
-printf("region: %ld, rect: %ld, offset(%ld, %ld)\n", i, j, xOffset, yOffset);
-
-				// offset to left top of src rect
-				uint8* src = bits + top * bpr + left * 4;
-
-				_MoveRect(src, width, height, bpr, xOffset, yOffset);
-
-				delete r;
-			}
-		}
-
-*/
-	RenderingBuffer* bmp = fGraphicsCard->DrawingBuffer();
-
-	uint32		bytesPerPixel	= bmp->BytesPerRow() / bmp->Width();
-	BList		rectList;
-	int32		i, k;
-	uint8		*bitmapBits = (uint8*)bmp->Bits();
-	int32		Bwidth		= bmp->Width();
-	int32		Bheight		= bmp->Height();
-
-	BRect updateRect;
-
-	for (k = 0; k < rCount; k++) {
-		BRegion* reg = (BRegion*)list->ItemAt(k);
-
-		int32 rectCount = reg->CountRects();
-		for(i=0; i < rectCount; i++) {
-			BRect		r		= reg->RectAt(i);
-			uint8		*rectCopy;
-			uint8		*srcAddress;
-			uint8		*destAddress;
-			int32		firstRow, lastRow;
-			int32		firstCol, lastCol;
-			int32		copyLength;
-			int32		copyRows;
-	
-			firstRow	= (int32)(r.top < 0? 0: r.top);
-			lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
-			firstCol	= (int32)(r.left < 0? 0: r.left);
-			lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
-			copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
-			copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
-	
-			rectCopy	= (uint8*)malloc(copyLength * copyRows * bytesPerPixel);
-	
-			srcAddress	= bitmapBits + (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
-			destAddress	= rectCopy;
-	
-			for (int32 j = 0; j < copyRows; j++) {
-				uint8		*destRowAddress	= destAddress + (j * copyLength * bytesPerPixel);
-				uint8		*srcRowAddress	= srcAddress + (j * Bwidth * bytesPerPixel);
-				memcpy(destRowAddress, srcRowAddress, copyLength * bytesPerPixel );
-			}
-		
-			rectList.AddItem(rectCopy);
-		}
-	}
-
-	int32 item = 0;
-	for(k = 0; k < rCount; k++) {
-		BRegion* reg = (BRegion*)list->ItemAt(k);
-	
-		int32 rectCount = reg->CountRects();
-		for(i=0; i < rectCount; i++)
-		{
-			BRect		r		= reg->RectAt(i);
-			uint8		*rectCopy;
-			uint8		*srcAddress;
-			uint8		*destAddress;
-			int32		firstRow, lastRow;
-			int32		firstCol, lastCol;
-			int32		copyLength, copyLength2;
-			int32		copyRows, copyRows2;
-	
-			firstRow	= (int32)(r.top < 0? 0: r.top);
-			lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
-			firstCol	= (int32)(r.left < 0? 0: r.left);
-			lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
-			copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
-			copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
-	
-			rectCopy	= (uint8*)rectList.ItemAt(item++);
-	
-			srcAddress	= rectCopy;
-	
-			r.Set(firstCol, firstRow, lastCol, lastRow);
-			r.OffsetBy( *((BPoint*)pList->ItemAt(k%rCount)) );
-
-			// keep track of invalid area
-			updateRect = updateRect.IsValid() ? updateRect | r : r;
-
-			firstRow	= (int32)(r.top < 0? 0: r.top);
-			lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
-			firstCol	= (int32)(r.left < 0? 0: r.left);
-			lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
-			copyLength2	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
-			copyRows2	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
-	
-			destAddress	= bitmapBits + (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
-	
-			int32		minLength	= copyLength < copyLength2? copyLength: copyLength2;
-			int32		minRows		= copyRows < copyRows2? copyRows: copyRows2;
-	
-			for (int32 j = 0; j < minRows; j++)
-			{
-				uint8		*destRowAddress	= destAddress + (j * Bwidth * bytesPerPixel);
-				uint8		*srcRowAddress	= srcAddress + (j * copyLength * bytesPerPixel);
-				memcpy(destRowAddress, srcRowAddress, minLength * bytesPerPixel );
-			}
-		}
-	}
-
-	int32 count = rectList.CountItems();
-	for (i = 0; i < count; i++) {
-		if (void* rectCopy = rectList.ItemAt(i))
-			free(rectCopy);
-	}
-
-	fGraphicsCard->Invalidate(updateRect);
-
-	Unlock();
 }
 
 // FillArc
@@ -1313,9 +1190,50 @@ void DisplayDriverPainter::ConstrainClippingRegion(BRegion *region)
 	}
 }
 
-// _MoveRect
+// _CopyRect
+BRect
+DisplayDriverPainter::_CopyRect(BRect src, int32 xOffset, int32 yOffset) const
+{
+	BRect dst;
+	RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
+	if (buffer) {
+
+		BRect clip(0, 0, buffer->Width() - 1, buffer->Height() - 1);
+
+		dst = src;
+		dst.OffsetBy(xOffset, yOffset);
+
+		if (clip.Intersects(src) && clip.Intersects(dst)) {
+
+			uint32 bpr = buffer->BytesPerRow();
+			uint8* bits = (uint8*)buffer->Bits();
+
+			// clip source rect
+			src = src & clip;
+			// clip dest rect
+			dst = dst & clip;
+			// move dest back over source and clip source to dest
+			dst.OffsetBy(-xOffset, -yOffset);
+			src = src & dst;
+
+			// calc offset in buffer
+			bits += (int32)src.left * 4 + (int32)src.top * bpr;
+
+			uint32 width = src.IntegerWidth() + 1;
+			uint32 height = src.IntegerHeight() + 1;
+
+			_CopyRect(bits, width, height, bpr, xOffset, yOffset);
+
+			// offset dest again, because it is return value
+			dst.OffsetBy(xOffset, yOffset);
+		}
+	}
+	return dst;
+}
+
+// _CopyRect
 void
-DisplayDriverPainter::_MoveRect(uint8* src, uint32 width, uint32 height,
+DisplayDriverPainter::_CopyRect(uint8* src, uint32 width, uint32 height,
 								uint32 bpr, int32 xOffset, int32 yOffset) const
 {
 	int32 xIncrement;
@@ -1324,7 +1242,7 @@ DisplayDriverPainter::_MoveRect(uint8* src, uint32 width, uint32 height,
 	if (xOffset > 0) {
 		// copy from right to left
 		xIncrement = -1;
-		src += width * 4;
+		src += (width - 1) * 4;
 	} else {
 		// copy from left to right
 		xIncrement = 1;
@@ -1333,7 +1251,7 @@ DisplayDriverPainter::_MoveRect(uint8* src, uint32 width, uint32 height,
 	if (yOffset > 0) {
 		// copy from bottom to top
 		yIncrement = -bpr;
-		src += height * bpr;
+		src += (height - 1) * bpr;
 	} else {
 		// copy from top to bottom
 		yIncrement = bpr;

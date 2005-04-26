@@ -90,7 +90,9 @@ Painter::~Painter()
 void
 Painter::AttachToBuffer(RenderingBuffer* buffer)
 {
-	if (buffer && buffer->InitCheck() >= B_OK) {
+	if (buffer && buffer->InitCheck() >= B_OK &&
+		// TODO: implement drawing on B_RGB24, B_RGB15, B_RGB16, B_CMAP8 and B_GRAY8 :-[
+		(buffer->ColorSpace() == B_RGBA32 || buffer->ColorSpace() == B_RGB32)) {
 		// clean up previous stuff
 		_MakeEmpty();
 
@@ -112,7 +114,6 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 
 		// These are the AGG renderes and rasterizes which
 		// will be used for stroking paths
-rgb_color color = fPatternHandler->HighColor().GetColor32();
 #if ALIASED_DRAWING
 		fOutlineRenderer = new outline_renderer_type(*fBaseRenderer);
 		fOutlineRasterizer = new outline_rasterizer_type(*fOutlineRenderer);

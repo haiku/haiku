@@ -46,12 +46,9 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual void				Shutdown();
 
 	// drawing functions
-	virtual	void				CopyBits(		const BRect &src,
-												const BRect &dest,
-												const DrawData *d);
-
-	virtual	void				CopyRegion(		BRegion *src,
-												const BPoint &lefttop);
+	virtual	void				CopyRegion(		/*const*/ BRegion* region,
+												int32 xOffset,
+												int32 yOffset);
 
 	virtual	void				CopyRegionList(	BList* list,
 												BList* pList,
@@ -281,7 +278,9 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual	void				ConstrainClippingRegion(BRegion *reg);
 
  private:
-			void				_MoveRect(uint8* bits,
+			BRect				_CopyRect(BRect r, int32 xOffset, int32 yOffset) const;
+
+			void				_CopyRect(uint8* bits,
 										  uint32 width, uint32 height, uint32 bpr,
 										  int32 xOffset, int32 yOffset) const;
 

@@ -115,12 +115,9 @@ class DisplayDriver {
 	virtual void				Shutdown();
 
 	// Graphics calls implemented in DisplayDriver
-	virtual	void				CopyBits(		const BRect &src,
-												const BRect &dest,
-												const DrawData *d) = 0;
-
-	virtual	void				CopyRegion(		BRegion *src,
-												const BPoint &lefttop) = 0;
+	virtual	void				CopyRegion(		/*const*/ BRegion* region,
+												int32 xOffset,
+												int32 yOffset) = 0;
 
 	virtual	void				CopyRegionList(	BList* list,
 												BList* pList,
