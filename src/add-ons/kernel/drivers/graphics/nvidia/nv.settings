@@ -32,6 +32,12 @@ pgm_panel	true			# if false don't program DVI and laptop panel pixelclocks (refr
 #log modules select:
 #logmask   0xxxxxxxx0	# highest 7 digits: bitmask to select individual modules to log.
 
+#log levels: (3D add-on adheres to this setup, 2D add-on still has to tuned)
+#logmask 0x00000001 # log rendering
+#logmask 0x00000002 # log state
+#logmask 0x00000004 # log experimental
+#logmask 0x00000008 # log errors
+
 #log modules:
 #logmask   0x00000100	# engine: agp
 #logmask   0x00000200	# engine: bes
