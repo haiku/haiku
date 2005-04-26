@@ -1,9 +1,10 @@
+/* Kernel driver for SiS 900 networking
+ *
+ * Copyright © 2001-2005 pinc Software. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ */
 #ifndef DRIVER_H
 #define DRIVER_H
-/* driver - kernel driver for SiS900 networking
-**
-** Copyright © 2001-2003 pinc Software. All Rights Reserved.
-*/
 
 
 // PCI Communications
@@ -21,7 +22,7 @@
 #else	/* MEMORY_MAPPED_PCI_ACCESS */
 #	define read8(address)   			(*((volatile uint8*)(address)))
 #	define read16(address)  			(*((volatile uint16*)(address)))
-#	define read32(address) 			(*((volatile uint32*)(address)))
+#	define read32(address) 				(*((volatile uint32*)(address)))
 #	define write8(address,data)  		(*((volatile uint8 *)(address))  = data)
 #	define write16(address,data) 		(*((volatile uint16 *)(address)) = (data))
 #	define write32(address,data) 		(*((volatile uint32 *)(address)) = (data))

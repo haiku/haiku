@@ -1,7 +1,8 @@
-/* sis900.c - SiS900 chip specific functions
-**
-** Copyright © 2001-2004 pinc Software. All Rights Reserved.
-*/
+/* SiS 900 chip specific functions
+ *
+ * Copyright © 2001-2005 pinc Software. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ */
 
 
 #include <OS.h>
@@ -39,32 +40,38 @@ int32 sis900_readMode(struct sis_info *info);
 #define	MII_HOME	0x0001
 #define MII_LAN		0x0002
 
-const static struct mii_chip_info
-{
-	const char *name;
-	uint16 id0,id1;
-	uint8  types;
-}
-gMIIChips[] = {
-	{"SiS 900 Internal MII PHY",		PHY_ID0_SiS900_INTERNAL,PHY_ID1_SiS900_INTERNAL,MII_LAN},
-	{"SiS 7014 Physical Layer Solution",0x0016, 0xf830, MII_LAN},
-	{"AMD 79C901 10BASE-T PHY", 		0x0000, 0x6B70, MII_LAN},
-	{"AMD 79C901 HomePNA PHY",			0x0000, 0x6B90, MII_HOME},
-	{"ICS 1893 LAN PHY",				PHY_ID0_ICS_1893,PHY_ID1_ICS_1893,MII_LAN},
-	{"NS 83851 PHY",					0x2000, 0x5C20, MII_LAN | MII_HOME},
-	{"Realtek RTL8201 PHY",				PHY_ID0_REALTEK_8201,PHY_ID1_REALTEK_8201,MII_LAN},
-	{NULL,0,0,0}
+const static struct mii_chip_info {
+	const char	*name;
+	uint16		id0, id1;
+	uint8		types;
+} gMIIChips[] = {
+	{"SiS 900 Internal MII PHY",
+		PHY_ID0_SiS900_INTERNAL, PHY_ID1_SiS900_INTERNAL, MII_LAN},
+	{"SiS 7014 Physical Layer Solution",
+		0x0016, 0xf830, MII_LAN},
+	{"AMD 79C901 10BASE-T PHY",
+		0x0000, 0x6B70, MII_LAN},
+	{"AMD 79C901 HomePNA PHY",
+		0x0000, 0x6B90, MII_HOME},
+	{"ICS 1893 LAN PHY",
+		PHY_ID0_ICS_1893, PHY_ID1_ICS_1893, MII_LAN},
+	{"NS 83851 PHY",
+		0x2000, 0x5C20, MII_LAN | MII_HOME},
+	{"Realtek RTL8201 PHY",
+		PHY_ID0_REALTEK_8201, PHY_ID1_REALTEK_8201, MII_LAN},
+	{NULL, 0, 0, 0}
 };
 
 
 /***************************** helper functions *****************************/
 
+
 static uint32
-physicalAddress(volatile void *address,uint32 length)
+physicalAddress(volatile void *address, uint32 length)
 {
 	physical_entry table;
 
-	get_memory_map((void *)address,length,&table,1);
+	get_memory_map((void *)address, length, &table, 1);
 	return (uint32)table.address;
 }
 
@@ -87,10 +94,8 @@ sis900_rxInterrupt(struct sis_info *info)
 	HACK(spin(10000));
 
 	// check for packet ownership
-	for (limit = info->rxFree; limit > 0; limit--)
-	{
-		if (!(info->rxDescriptor[info->rxInterruptIndex].status & SiS900_DESCR_OWN))
-		{
+	for (limit = info->rxFree; limit > 0; limit--) {
+		if (!(info->rxDescriptor[info->rxInterruptIndex].status & SiS900_DESCR_OWN)) {
 //			if (limit == info->rxFree)
 //			{
 				//dprintf("here!\n");
@@ -100,6 +105,7 @@ sis900_rxInterrupt(struct sis_info *info)
 			break;
 		}
 		//dprintf("received frame %d!\n",info->rxInterruptIndex);
+
 		releaseRxSem++;
 		info->rxInterruptIndex = (info->rxInterruptIndex + 1) & NUM_Rx_MASK;
 		info->rxFree--;
@@ -107,11 +113,10 @@ sis900_rxInterrupt(struct sis_info *info)
 	release_spinlock(&info->rxSpinlock);
 
 	// reenable rx queue
-	write32((uint32)info->registers + SiS900_MAC_COMMAND,SiS900_MAC_CMD_Rx_ENABLE);
+	write32(info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Rx_ENABLE);
 
-	if (releaseRxSem)
-	{
-		release_sem_etc(info->rxSem,releaseRxSem,B_DO_NOT_RESCHEDULE);
+	if (releaseRxSem) {
+		release_sem_etc(info->rxSem, releaseRxSem, B_DO_NOT_RESCHEDULE);
 		return B_INVOKE_SCHEDULER;
 	}
 
@@ -130,26 +135,24 @@ sis900_txInterrupt(struct sis_info *info)
 
 	HACK(spin(10000));
 
-//dprintf("here we are: sent = %d\n",info->txSent);
-	for (limit = info->txSent; limit > 0; limit--)
-	{
+	for (limit = info->txSent; limit > 0; limit--) {
 		status = info->txDescriptor[info->txInterruptIndex].status;
 
 //dprintf("txIntr: %d: mem = %lx : hardware = %lx\n",info->txInterruptIndex,
 //		physicalAddress(&info->txDescriptor[info->txInterruptIndex],sizeof(struct buffer_desc)),
-//		read32((uint32)info->registers + SiS900_MAC_Tx_DESCR));
+//		read32(info->registers + SiS900_MAC_Tx_DESCR));
 
 		/* Does the device generate extra interrupts? */
-		if (status & SiS900_DESCR_OWN)
-		{
-			struct buffer_desc *b = (void *)read32((uint32)info->registers + SiS900_MAC_Tx_DESCR);
+		if (status & SiS900_DESCR_OWN) {
+			struct buffer_desc *descriptor = (void *)read32(info->registers + SiS900_MAC_Tx_DESCR);
 			int16 that;
-			for (that = 0;that < NUM_Tx_DESCR && (void *)physicalAddress(&info->txDescriptor[that],sizeof(struct buffer_desc)) != b;that++);
-			if (that == NUM_Tx_DESCR)
-			{
-				//dprintf("not in ring!\n");
-				that = 0;
+			for (that = 0;
+				that < NUM_Tx_DESCR && (void *)physicalAddress(&info->txDescriptor[that],
+					sizeof(struct buffer_desc)) != descriptor; that++) {
 			}
+			if (that == NUM_Tx_DESCR)
+				that = 0;
+
 //dprintf("tx busy %d: %lx (hardware status %d = %lx)!\n",info->txInterruptIndex,status,that,info->txDescriptor[that].status);
 //			if (limit == info->txSent)
 //			{
@@ -160,11 +163,10 @@ sis900_txInterrupt(struct sis_info *info)
 			break;
 		}
 
-//dprintf("tx %d!\n",info->txInterruptIndex);
-		if (status & (SiS900_DESCR_Tx_ABORT | SiS900_DESCR_Tx_UNDERRUN |
-					  SiS900_DESCR_Tx_OOW_COLLISION))
+		if (status & (SiS900_DESCR_Tx_ABORT | SiS900_DESCR_Tx_UNDERRUN
+				| SiS900_DESCR_Tx_OOW_COLLISION)) {
 			dprintf("tx error: %lx\n", status);
-		else
+		} else
 			info->txDescriptor[info->txInterruptIndex].status = 0;
 
 		releaseTxSem++;	/* this many buffers are free */
@@ -176,12 +178,8 @@ sis900_txInterrupt(struct sis_info *info)
 	}
 	release_spinlock(&info->txSpinlock);
 
-	if (releaseTxSem)
-	{
-//		sem_info semInfo;
-		
-//		get_sem_info(info->txSem,&semInfo);
-		release_sem_etc(info->txSem,releaseTxSem,B_DO_NOT_RESCHEDULE);
+	if (releaseTxSem) {
+		release_sem_etc(info->txSem, releaseTxSem, B_DO_NOT_RESCHEDULE);
 		return B_INVOKE_SCHEDULER;
 	}
 
@@ -203,7 +201,7 @@ sis900_interrupt(void *data)
 
 	while (worklimit-- > 0) {
 		// reading the interrupt status register clears all interrupts
-		intr = read32((uint32)info->registers + SiS900_MAC_INTR_STATUS);
+		intr = read32(info->registers + SiS900_MAC_INTR_STATUS);
 		if (!intr)
 			break;
 
@@ -212,12 +210,12 @@ sis900_interrupt(void *data)
 		lastIntr[intrCounter] = intr;
 
 		// wake-up event interrupt
-		if (intr & SiS900_INTR_WAKEUP_EVENT)
-		{
-			TRACE(("wake-up event received: %ld\n", read32((uint32)info->registers + SiS900_MAC_WAKEUP_EVENT)));
+		if (intr & SiS900_INTR_WAKEUP_EVENT) {
+			TRACE(("wake-up event received: %ld\n",
+				read32(info->registers + SiS900_MAC_WAKEUP_EVENT)));
 
 			// clear PM event register
-			write32((uint32)info->registers + SiS900_MAC_WAKEUP_EVENT,
+			write32(info->registers + SiS900_MAC_WAKEUP_EVENT,
 				SiS900_WAKEUP_LINK_ON | SiS900_WAKEUP_LINK_LOSS);
 			handled = B_HANDLED_INTERRUPT;
 		}
@@ -243,28 +241,28 @@ sis900_interrupt(void *data)
 void
 sis900_disableInterrupts(struct sis_info *info)
 {
-	write32((uint32)info->registers + SiS900_MAC_INTR_MASK,0);
-	write32((uint32)info->registers + SiS900_MAC_INTR_ENABLE,0);
+	write32(info->registers + SiS900_MAC_INTR_MASK, 0);
+	write32(info->registers + SiS900_MAC_INTR_ENABLE, 0);
 }
 
 
 void
 sis900_enableInterrupts(struct sis_info *info)
 {
-	write32((uint32)info->registers + SiS900_MAC_INTR_ENABLE,0);
+	write32(info->registers + SiS900_MAC_INTR_ENABLE, 0);
 
 	// enable link detection
-	write32((uint32)info->registers + SiS900_MAC_WAKEUP_CONTROL,
+	write32(info->registers + SiS900_MAC_WAKEUP_CONTROL,
 		SiS900_WAKEUP_LINK_ON | SiS900_WAKEUP_LINK_LOSS);
 
 	// set interrupt mask
-	write32((uint32)info->registers + SiS900_MAC_INTR_MASK,
+	write32(info->registers + SiS900_MAC_INTR_MASK,
 		//SiS900_INTR_WAKEUP_EVENT |
 		SiS900_INTR_Tx_UNDERRUN | SiS900_INTR_Tx_ERROR | SiS900_INTR_Tx_IDLE | SiS900_INTR_Tx_OK |
 		SiS900_INTR_Rx_STATUS_OVERRUN | SiS900_INTR_Rx_OVERRUN |
 		SiS900_INTR_Rx_ERROR | SiS900_INTR_Rx_OK);
 
-	write32((uint32)info->registers + SiS900_MAC_INTR_ENABLE,1);
+	write32(info->registers + SiS900_MAC_INTR_ENABLE,1);
 }
 
 
@@ -340,9 +338,9 @@ sis900_initPHYs(struct sis_info *info)
 	for (phy = 0; phy < 32; phy++) {
 		struct mii_phy *mii;
 		uint16 status;
-		int i;
+		int32 i;
 
-		status = mdio_statusFromPHY(info,phy);
+		status = mdio_statusFromPHY(info, phy);
 		if (status == 0xffff || status == 0x0000)
 			// this MII is not accessable
 			continue;
@@ -352,14 +350,15 @@ sis900_initPHYs(struct sis_info *info)
 			return B_NO_MEMORY;
 
 		mii->address = phy;
-		mii->id0 = mdio_readFromPHY(info,phy,MII_PHY_ID0);
-		mii->id1 = mdio_readFromPHY(info,phy,MII_PHY_ID1);
+		mii->id0 = mdio_readFromPHY(info, phy, MII_PHY_ID0);
+		mii->id1 = mdio_readFromPHY(info, phy, MII_PHY_ID1);
 		mii->types = MII_HOME;
 		mii->next = info->firstPHY;
 		info->firstPHY = mii;
 
 		for (i = 0; gMIIChips[i].name; i++) {
-			if (gMIIChips[i].id0 != mii->id0 || gMIIChips[i].id1 != (mii->id1 & 0xfff0))
+			if (gMIIChips[i].id0 != mii->id0
+				|| gMIIChips[i].id1 != (mii->id1 & 0xfff0))
 				continue;
 
 			dprintf("Found MII PHY: %s\n", gMIIChips[i].name);
@@ -368,7 +367,7 @@ sis900_initPHYs(struct sis_info *info)
 			break;
 		}
 		if (gMIIChips[i].name == NULL)
-			dprintf("Unknown MII PHY transceiver: id = (%x, %x).\n",mii->id0,mii->id1);
+			dprintf("Unknown MII PHY transceiver: id = (%x, %x).\n", mii->id0, mii->id1);
 	}
 
 	if (info->firstPHY == NULL) {
@@ -384,7 +383,7 @@ sis900_initPHYs(struct sis_info *info)
 		if (sis900_resetPHY(info) & MII_STATUS_LINK) {
 			uint16 poll = MII_STATUS_LINK;
 			while (poll) {
-				poll ^= mdio_read(info,MII_STATUS) & poll;
+				poll ^= mdio_read(info, MII_STATUS) & poll;
 			}
 		}
 	}
@@ -401,7 +400,7 @@ sis900_initPHYs(struct sis_info *info)
 		mdio_write(info, MII_CONFIG2, 0xff00);
 		mdio_write(info, MII_MASK, 0xffc0);
 	}
-	
+
 	info->link = mdio_status(info) & MII_STATUS_LINK;
 
 	return B_OK;
@@ -427,7 +426,7 @@ sis900_selectPHY(struct sis_info *info)
 void
 sis900_setMode(struct sis_info *info, int32 mode)
 {
-	uint32 address = (uint32)info->registers + SiS900_MAC_CONFIG;
+	uint32 address = info->registers + SiS900_MAC_CONFIG;
 	uint32 txFlags = SiS900_Tx_AUTO_PADDING | SiS900_Tx_FILL_THRES;
 	uint32 rxFlags = 0;
 	int32 speed = mode & LINK_SPEED_MASK;
@@ -455,8 +454,8 @@ sis900_setMode(struct sis_info *info, int32 mode)
 		rxFlags |= SiS900_Rx_ACCEPT_Tx_PACKETS;
 	}
 
-	write32((uint32)info->registers + SiS900_MAC_Tx_CONFIG, txFlags);
-	write32((uint32)info->registers + SiS900_MAC_Rx_CONFIG, rxFlags);
+	write32(info->registers + SiS900_MAC_Tx_CONFIG, txFlags);
+	write32(info->registers + SiS900_MAC_Rx_CONFIG, rxFlags);
 }
 
 
@@ -536,7 +535,7 @@ sis900_autoNegotiate(struct sis_info *info)
 void
 sis900_checkMode(struct sis_info *info)
 {
-	uint32 address = (uint32)info->registers + SiS900_MAC_CONFIG;
+	uint32 address = info->registers + SiS900_MAC_CONFIG;
 
 	if (info->fixedMode != 0) {
 		TRACE((DEVICE_NAME ": link mode set via settings\n"));
@@ -575,7 +574,7 @@ sis900_getMACAddress(struct sis_info *info)
 	if (info->pciInfo->revision >= SiS900_REVISION_SiS96x) {
 		// SiS 962 & 963 are using a different method to access the EEPROM
 		// than the standard SiS 630
-		long eepromAccess = (long)info->registers + SiS900_MAC_EEPROM_ACCESS;
+		addr_t eepromAccess = info->registers + SiS900_MAC_EEPROM_ACCESS;
 		uint32 tries = 0;
 
 		write32(eepromAccess, SiS96x_EEPROM_CMD_REQ);
@@ -608,10 +607,10 @@ sis900_getMACAddress(struct sis_info *info)
 		int32 index;
 
 		for (index = 0; pci->get_nth_pci_info(index, &isa) == B_OK; index++) {
-			if (isa.vendor_id == VENDOR_ID_SiS && isa.device_id == DEVICE_ID_SiS_ISA_BRIDGE)
-			{
+			if (isa.vendor_id == VENDOR_ID_SiS
+				&& isa.device_id == DEVICE_ID_SiS_ISA_BRIDGE) {
 				uint8 reg,i;
-				uint32 registers = isa.u.h0.base_registers[0];
+				addr_t registers = isa.u.h0.base_registers[0];
 
 				reg = pci->read_pci_config(isa.bus,isa.device,isa.function,0x48,1);
 				pci->write_pci_config(isa.bus,isa.device,isa.function,0x48,1,reg | 0x40);
@@ -656,24 +655,21 @@ sis900_getMACAddress(struct sis_info *info)
 status_t
 sis900_reset(struct sis_info *info)
 {
-	uint32 address = (uint32)info->registers + SiS900_MAC_COMMAND;
+	addr_t address = info->registers + SiS900_MAC_COMMAND;
 	int16 tries = 1000;
 
 	TRACE(("sis900 reset\n"));
 
-	//write32((uint32)info->registers + SiS900_MAC_INTR_MASK, 0);
-	//write32((uint32)info->registers + SiS900_MAC_INTR_ENABLE, 0);
-
 	write32(address, SiS900_MAC_CMD_RESET);
 
-	write32((uint32)info->registers + SiS900_MAC_Rx_FILTER_CONTROL, SiS900_RxF_ENABLE |
+	write32(info->registers + SiS900_MAC_Rx_FILTER_CONTROL, SiS900_RxF_ENABLE |
 			SiS900_RxF_ACCEPT_ALL_BROADCAST | SiS900_RxF_ACCEPT_ALL_MULTICAST);
 
 	// wait until the chip leaves reset state
 	while ((read32(address) & SiS900_MAC_CMD_RESET) && tries-- > 0)
 		snooze(2);
 
-	write32((uint32)info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Tx_ENABLE);
+	write32(info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Tx_ENABLE);
 
 	return B_OK;
 }
@@ -682,7 +678,7 @@ sis900_reset(struct sis_info *info)
 void
 sis900_setPromiscuous(struct sis_info *info, bool on)
 {
-	long filterControl = (long)info->registers + SiS900_MAC_Rx_FILTER_CONTROL;
+	addr_t filterControl = info->registers + SiS900_MAC_Rx_FILTER_CONTROL;
 	int32 filter = read32(filterControl);
 
 	// accept all incoming packets (or not)
@@ -697,17 +693,18 @@ sis900_setPromiscuous(struct sis_info *info, bool on)
 void
 sis900_setRxFilter(struct sis_info *info)
 {
-	long filterControl = (long)info->registers + SiS900_MAC_Rx_FILTER_CONTROL;
-	long filterData = (long)info->registers + SiS900_MAC_Rx_FILTER_DATA;
-	int i;
+	addr_t filterControl = info->registers + SiS900_MAC_Rx_FILTER_CONTROL;
+	addr_t filterData = info->registers + SiS900_MAC_Rx_FILTER_DATA;
+	int32 i;
 
 	// set MAC address as receive filter
 	for (i = 0; i < 3; i++) {
 		write32(filterControl, i << SiS900_Rx_FILTER_ADDRESS_SHIFT);
 		write32(filterData, info->address.ebyte[i*2] | (info->address.ebyte[i*2 + 1] << 8));
 	}
-	write32(filterControl, SiS900_RxF_ENABLE |
-		SiS900_RxF_ACCEPT_ALL_BROADCAST | SiS900_RxF_ACCEPT_ALL_MULTICAST /*| SiS900_RxF_ACCEPT_ALL_ADDRESSES*/);
+	write32(filterControl, SiS900_RxF_ENABLE
+		| SiS900_RxF_ACCEPT_ALL_BROADCAST
+		| SiS900_RxF_ACCEPT_ALL_MULTICAST /*| SiS900_RxF_ACCEPT_ALL_ADDRESSES*/);
 }
 
 
@@ -725,10 +722,11 @@ sis900_createRings(struct sis_info *info)
 	uint16 i;
 		
 	// create transmit buffer area
-	if ((info->txArea = create_area("sis900 tx buffer", (void **)&info->txBuffer[0],
-									B_ANY_KERNEL_ADDRESS,
-									ROUND_TO_PAGE_SIZE(BUFFER_SIZE * NUM_Tx_DESCR),
-									B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA)) < B_OK)
+	info->txArea = create_area("sis900 tx buffer", (void **)&info->txBuffer[0],
+		B_ANY_KERNEL_ADDRESS,
+		ROUND_TO_PAGE_SIZE(BUFFER_SIZE * NUM_Tx_DESCR),
+		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (info->txArea < B_OK)
 		return info->txArea;
 
 	// initialize transmit buffer descriptors
@@ -747,11 +745,11 @@ sis900_createRings(struct sis_info *info)
 	}
 
 	// create receive buffer area
-	if ((info->rxArea = create_area("sis900 rx buffer", (void **)&info->rxBuffer[0],
-									B_ANY_KERNEL_ADDRESS,
-									ROUND_TO_PAGE_SIZE(BUFFER_SIZE * NUM_Rx_DESCR),
-									B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA)) < B_OK)
-	{
+	info->rxArea = create_area("sis900 rx buffer", (void **)&info->rxBuffer[0],
+		B_ANY_KERNEL_ADDRESS,
+		ROUND_TO_PAGE_SIZE(BUFFER_SIZE * NUM_Rx_DESCR),
+		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (info->rxArea < B_OK) {
 		delete_area(info->txArea);
 		return info->rxArea;
 	}
@@ -762,14 +760,17 @@ sis900_createRings(struct sis_info *info)
 
 	for (i = 0; i < NUM_Rx_DESCR; i++) {
 		info->rxDescriptor[i].status = MAX_FRAME_SIZE;
-		info->rxDescriptor[i].buffer = physicalAddress(info->rxBuffer[i],BUFFER_SIZE);
-		info->rxDescriptor[i].link = physicalAddress(&info->rxDescriptor[(i + 1) & NUM_Rx_MASK],sizeof(struct buffer_desc));
+		info->rxDescriptor[i].buffer = physicalAddress(info->rxBuffer[i], BUFFER_SIZE);
+		info->rxDescriptor[i].link = physicalAddress(&info->rxDescriptor[(i + 1) & NUM_Rx_MASK],
+			sizeof(struct buffer_desc));
 	}
 	info->rxFree = NUM_Rx_DESCR;
 
 	// set descriptor pointer registers
-	write32((uint32)info->registers + SiS900_MAC_Tx_DESCR,physicalAddress(&info->txDescriptor[0],sizeof(struct buffer_desc)));
-	write32((uint32)info->registers + SiS900_MAC_Rx_DESCR,physicalAddress(&info->rxDescriptor[0],sizeof(struct buffer_desc)));
+	write32(info->registers + SiS900_MAC_Tx_DESCR,
+		physicalAddress(&info->txDescriptor[0], sizeof(struct buffer_desc)));
+	write32(info->registers + SiS900_MAC_Rx_DESCR,
+		physicalAddress(&info->rxDescriptor[0], sizeof(struct buffer_desc)));
 
 	return B_OK;
 }

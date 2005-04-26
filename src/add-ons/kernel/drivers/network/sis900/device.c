@@ -1,7 +1,8 @@
-/* device.c - device hooks for SiS900 networking
-**
-** Copyright © 2001-2004 pinc Software. All Rights Reserved.
-*/
+/* Device hooks for SiS 900 networking
+ *
+ * Copyright © 2001-2005 pinc Software. All Rights Reserved.
+ */
+
 
 #include <OS.h>
 #include <KernelExport.h>
@@ -251,7 +252,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 	info->thisArea = area;
 	info->id = id;
 	info->pciInfo = pciInfo[id];
-	info->registers = (char *)pciInfo[id]->u.h0.base_registers[0];
+	info->registers = (addr_t)pciInfo[id]->u.h0.base_registers[0];
 
 	if (sis900_getMACAddress(info))
 		dprintf(DEVICE_NAME ": MAC address %02x:%02x:%02x:%02x:%02x:%02x\n",
@@ -279,7 +280,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 			sis900_createRings(info);
 
 			// enable receiver's state machine
-			write32((uint32)info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Rx_ENABLE);
+			write32(info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Rx_ENABLE);
 
 			// check link mode & add timer
 			sis900_checkMode(info);
@@ -313,7 +314,7 @@ device_close(void *data)
 	cancel_timer(&info->timer);
 
 	// disable the transmitter's and receiver's state machine
-	write32((uint32)info->registers + SiS900_MAC_COMMAND,
+	write32(info->registers + SiS900_MAC_COMMAND,
 		SiS900_MAC_CMD_Rx_DISABLE | SiS900_MAC_CMD_Tx_DISABLE);
 
 	// remove & disable interrupt
@@ -425,7 +426,7 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	if (atomic_or(&info->rxLock, 1))
 		return B_ERROR;
 
-	//TRACE(("current rx descr: %08x (last = %ld)\n", rxp = read32((uint32)info->registers + SiS900_MAC_Rx_DESCR), (info->rxLast+1) % NUM_Rx_DESCR));
+	//TRACE(("current rx descr: %08x (last = %ld)\n", rxp = read32(info->registers + SiS900_MAC_Rx_DESCR), (info->rxLast+1) % NUM_Rx_DESCR));
 
 	// block until data is available (if blocking is allowed)
 	if ((status = acquire_sem_etc(info->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_NO_ERROR) {
@@ -508,7 +509,7 @@ device_write(void *data, off_t pos, const void *buffer, size_t *_length)
 
 	// block until a free tx descriptor is available
 	if ((status = acquire_sem_etc(info->txSem, 1, B_TIMEOUT, ETHER_TRANSMIT_TIMEOUT)) < B_NO_ERROR) {
-		write32((uint32)info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Tx_ENABLE);
+		write32(info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Tx_ENABLE);
 		TRACE(("write: acquiring sem failed: %lx, %s\n", status, strerror(status)));
 		atomic_add(&info->txLock, -1);
 		return status;
@@ -536,11 +537,11 @@ device_write(void *data, off_t pos, const void *buffer, size_t *_length)
 
 #if 0
 		{
-			struct buffer_desc *b = (void *)read32((uint32)info->registers + SiS900_MAC_Tx_DESCR);
+			struct buffer_desc *b = (void *)read32(info->registers + SiS900_MAC_Tx_DESCR);
 			int16 that;
 
 			dprintf("\twrite: status %d = %lx, sent = %d\n", current, info->txDescriptor[current].status,info->txSent);
-			dprintf("write: %d: mem = %lx : hardware = %lx\n", current, physicalAddress(&info->txDescriptor[current],sizeof(struct buffer_desc)),read32((uint32)info->registers + SiS900_MAC_Tx_DESCR));
+			dprintf("write: %d: mem = %lx : hardware = %lx\n", current, physicalAddress(&info->txDescriptor[current],sizeof(struct buffer_desc)),read32(info->registers + SiS900_MAC_Tx_DESCR));
 
 			for (that = 0;that < NUM_Tx_DESCR && (void *)physicalAddress(&info->txDescriptor[that],sizeof(struct buffer_desc)) != b;that++);
 
@@ -556,7 +557,7 @@ device_write(void *data, off_t pos, const void *buffer, size_t *_length)
 	}
 
 	// enable transmit state machine
-	write32((uint32)info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Tx_ENABLE);
+	write32(info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Tx_ENABLE);
 
 #ifdef EXCESSIVE_DEBUG
 	acquire_sem(gIOLock);

@@ -1,12 +1,14 @@
+/* SiS 900 driver/chip specific definitions
+ *
+ * Copyright © 2001-2005 pinc Software. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ */
 #ifndef SIS900_H
 #define SIS900_H
-/* sis900.h - SiS 900 driver/chip specific definitions
-**
-** Copyright © 2001-2003 pinc Software. All Rights Reserved.
-*/
 
 
 #include "ether_driver.h"
+
 
 #define VENDOR_ID_SiS		0x1039
 #define DEVICE_ID_SiS900	0x900
@@ -31,9 +33,9 @@ enum SiS_revisions {
 /***************************** Buffer & Buffer Descriptors *****************************/
 
 struct buffer_desc {
-	uint32 link;
-	uint32 status;
-	uint32 buffer;
+	uint32	link;
+	uint32	status;
+	uint32	buffer;
 };
 
 enum SiS900_buffer_desc_bits {
@@ -81,44 +83,44 @@ enum SiS900_buffer_desc_bits {
 /***************************** Private Device Data *****************************/
 
 struct sis_info {
-	timer timer;
-	uint32 cookieMagic;
-	area_id thisArea;
-	uint32 id;
-	spinlock lock;
-	pci_info *pciInfo;
-	volatile unsigned char *registers;
-	ether_address_t address;
-	volatile int32 blockFlag;
+	timer			timer;
+	uint32			cookieMagic;
+	area_id			thisArea;
+	uint32			id;
+	spinlock		lock;
+	pci_info		*pciInfo;
+	volatile addr_t	registers;
+	ether_address_t	address;
+	volatile int32	blockFlag;
 
-	struct mii_phy *firstPHY;
-	struct mii_phy *currentPHY;
-	uint16 phy;
-	bool autoNegotiationComplete;
-	bool link;
-	uint16 fixedMode;
+	struct mii_phy	*firstPHY;
+	struct mii_phy	*currentPHY;
+	uint16			phy;
+	bool			autoNegotiationComplete;
+	bool			link;
+	uint16			fixedMode;
 
 	// receive data
 	volatile struct buffer_desc rxDescriptor[NUM_Rx_DESCR];
-	volatile char *rxBuffer[NUM_Rx_DESCR];
-	area_id rxArea;
-	sem_id rxSem;
-	spinlock rxSpinlock;
-	int32 rxLock;
-	int16 rxCurrent;
-	int16 rxInterruptIndex;
-	int16 rxFree;
+	volatile char	*rxBuffer[NUM_Rx_DESCR];
+	area_id			rxArea;
+	sem_id			rxSem;
+	spinlock		rxSpinlock;
+	int32			rxLock;
+	int16			rxCurrent;
+	int16			rxInterruptIndex;
+	int16			rxFree;
 
 	// transmit data
 	volatile struct buffer_desc txDescriptor[NUM_Tx_DESCR];
-	volatile char *txBuffer[NUM_Tx_DESCR];
-	area_id txArea;
-	sem_id txSem;
-	spinlock txSpinlock;
-	int32 txLock;
-	int16 txCurrent;
-	int16 txInterruptIndex;
-	int16 txSent;
+	volatile char	*txBuffer[NUM_Tx_DESCR];
+	area_id			txArea;
+	sem_id			txSem;
+	spinlock		txSpinlock;
+	int32			txLock;
+	int16			txCurrent;
+	int16			txInterruptIndex;
+	int16			txSent;
 };
 
 #define SiS_COOKIE_MAGIC 's900'

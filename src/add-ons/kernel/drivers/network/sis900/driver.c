@@ -1,7 +1,8 @@
-/* driver - kernel driver for SiS900 networking
-**
-** Copyright © 2001-2003 pinc Software. All Rights Reserved.
-*/
+/* Kernel driver for SiS 900 networking
+ *
+ * Copyright © 2001-2005 pinc Software. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ */
 
 
 #include <OS.h>
