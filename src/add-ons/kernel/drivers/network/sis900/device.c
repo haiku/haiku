@@ -282,7 +282,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 			// enable receiver's state machine
 			write32(info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Rx_ENABLE);
 
-			// check link mode & add timer
+			// check link mode & add timer (once every second)
 			sis900_checkMode(info);
 			add_timer(&info->timer, sis900_timer, 1000000LL, B_PERIODIC_TIMER);	
 
@@ -414,14 +414,14 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	uint32 check;
 	int16 current;
 
+	if (checkDeviceInfo(info = data) != B_OK) {
 #ifndef __HAIKU__
-	*_length = 0;
-		// net_server work-around; it obviously doesn't care about error conditions
-		// For Haiku, this can be removed
+		*_length = 0;
+			// net_server work-around; it obviously doesn't care about error conditions
+			// For Haiku, this can be removed
 #endif
-
-	if (checkDeviceInfo(info = data) != B_OK)
 		return B_BAD_VALUE;
+	}
 
 	blockFlag = info->blockFlag;
 
@@ -429,13 +429,20 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 		info->rxInterruptIndex, info->rxFree, info->rxCurrent, blockFlag));
 
 	// read is not reentrant
-	if (atomic_or(&info->rxLock, 1))
+	if (atomic_or(&info->rxLock, 1)) {
+#ifndef __HAIKU__
+		*_length = 0;
+#endif
 		return B_ERROR;
+	}
 
 	// block until data is available (if blocking is allowed)
 	if ((status = acquire_sem_etc(info->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_NO_ERROR) {
 		TRACE(("cannot acquire read sem: %lx, %s\n", status, strerror(status)));
 		atomic_and(&info->rxLock, 0);
+#ifndef __HAIKU__
+		*_length = 0;
+#endif
 		return status;
 	}
 
@@ -446,6 +453,9 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	if (!(check & SiS900_DESCR_OWN)) {	// the buffer is still in use!
 		TRACE(("ERROR: read: buffer %d still in use: %lx\n", current, status));
 		atomic_and(&info->rxLock, 0);
+#ifndef __HAIKU__
+		*_length = 0;
+#endif
 		return B_BUSY;
 	}
 
