@@ -313,13 +313,13 @@ device_close(void *data)
 	// cancel timer
 	cancel_timer(&info->timer);
 
-	// disable the transmitter's and receiver's state machine
-	write32(info->registers + SiS900_MAC_COMMAND,
-		SiS900_MAC_CMD_Rx_DISABLE | SiS900_MAC_CMD_Tx_DISABLE);
-
 	// remove & disable interrupt
 	sis900_disableInterrupts(info);
 	remove_io_interrupt_handler(info->pciInfo->u.h0.interrupt_line, sis900_interrupt, info);
+
+	// disable the transmitter's and receiver's state machine
+	write32(info->registers + SiS900_MAC_COMMAND,
+		SiS900_MAC_CMD_Rx_DISABLE | SiS900_MAC_CMD_Tx_DISABLE);
 
 	delete_sem(info->rxSem);
 	delete_sem(info->txSem);
@@ -379,8 +379,8 @@ device_ioctl(void *data, uint32 msg, void *buffer, size_t bufferLength)
 			return B_OK;
 	
 		case ETHER_NONBLOCK:
-			TRACE(("ioctl: non blocking ? %s\n", info->blockFlag ? "yes" : "no"));
 			info->blockFlag = *(int32 *)buffer ? B_TIMEOUT : 0;
+			TRACE(("ioctl: non blocking ? %s\n", info->blockFlag ? "yes" : "no"));
 			return B_NO_ERROR;
 	
 		case ETHER_ADDMULTI:
@@ -414,19 +414,23 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	uint32 check;
 	int16 current;
 
+#ifndef __HAIKU__
+	*_length = 0;
+		// net_server work-around; it obviously doesn't care about error conditions
+		// For Haiku, this can be removed
+#endif
+
 	if (checkDeviceInfo(info = data) != B_OK)
 		return B_BAD_VALUE;
 
-	//dprintf("read: rx: isr = %d, free = %d, current = %d\n",
-	//		info->rxInterruptIndex, info->rxFree, info->rxCurrent);
-
 	blockFlag = info->blockFlag;
+
+	TRACE(("read: rx: isr = %d, free = %d, current = %d, blockFlag = %lx\n",
+		info->rxInterruptIndex, info->rxFree, info->rxCurrent, blockFlag));
 
 	// read is not reentrant
 	if (atomic_or(&info->rxLock, 1))
 		return B_ERROR;
-
-	//TRACE(("current rx descr: %08x (last = %ld)\n", rxp = read32(info->registers + SiS900_MAC_Rx_DESCR), (info->rxLast+1) % NUM_Rx_DESCR));
 
 	// block until data is available (if blocking is allowed)
 	if ((status = acquire_sem_etc(info->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_NO_ERROR) {
