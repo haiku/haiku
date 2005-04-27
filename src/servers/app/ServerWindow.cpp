@@ -550,7 +550,6 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			_CopyBits(myRootLayer, cl, src, dst, xOffset, yOffset);
 
-			// TODO: notify the client, no?
 			cl->fLayerData->OffsetOrigin(BPoint(dh, dv));
 //cl->fBoundsLeftTop += BPoint(dh, dv);
 //cl->fFrame.OffsetBy(BPoint(-dh, -dv));
@@ -729,17 +728,12 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_GET_COORD:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fName, cl->fName->String()));
-printf("AS_LAYER_GET_COORD - Layer: %s\n", cl->GetName());
-cl->fFrame.PrintToStream();
-cl->BoundsOrigin().PrintToStream();
 			fMsgSender->StartMessage(SERVER_TRUE);
-			BPoint	pt(cl->ConvertFromParent(cl->fFrame.LeftTop()));
-			fMsgSender->Attach<float>(pt.x);
-			fMsgSender->Attach<float>(pt.y);
-//			fMsgSender->Attach<float>(cl->fFrame.left);
-//			fMsgSender->Attach<float>(cl->fFrame.top);
+			// our offset in the parent -> will be originX and originY in BView
+			fMsgSender->Attach<float>(cl->fFrame.left);
+			fMsgSender->Attach<float>(cl->fFrame.top);
+			// convert frame to bounds
 			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->BoundsOrigin()));
-//			fMsgSender->Attach<BRect>(cl->ConvertFromTop(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop)));
 			fMsgSender->Flush();
 
 			break;
