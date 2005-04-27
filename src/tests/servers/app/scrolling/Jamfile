@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src tests servers app scrolling ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+SimpleTest Scrolling :
+	main.cpp
+# for running natively under R5:
+#	: be ;
+# for running in the Haiku app_server under R5:
+	: libopenbeos.so ;
+# for running on Haiku:
+#	: libbe.so ;
+

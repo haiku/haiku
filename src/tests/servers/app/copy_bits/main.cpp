@@ -33,6 +33,8 @@ class TestView : public BView {
 									  frame.right, frame.bottom);
 						fSourceRect.InsetBy(10.0, 10.0);
 						fDestRect.InsetBy(10.0, 10.0);
+
+						SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 					}
 
 	virtual	void	MessageReceived(BMessage* message);
@@ -79,8 +81,9 @@ TestView::Draw(BRect updateRect)
 		fCopyBitsJustCalled = false;
 	}
 
-	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	FillRect(updateRect);
+	// background
+//	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+//	FillRect(updateRect);
 
 	BRect r(Bounds());
 
@@ -88,6 +91,7 @@ TestView::Draw(BRect updateRect)
 	float width = r.Width();
 	float height = r.Height();
 	int32 lineCount = 20;
+	SetPenSize(2.0);
 	for (int32 i = 0; i < lineCount; i++) {
 		SetHighColor(255, (255 / lineCount) * i, 255 - (255 / lineCount) * i);
 		StrokeLine(BPoint(r.left + (width / lineCount) * i, r.top),
@@ -95,28 +99,47 @@ TestView::Draw(BRect updateRect)
 		StrokeLine(BPoint(r.right - (width / lineCount) * i, r.bottom),
 				   BPoint(r.right, r.bottom - (height / lineCount) * i));
 	}
+	StrokeLine(BPoint(r.left, r.bottom), BPoint(r.right, r.top));
 
-	SetHighColor(255, 0, 0, 128);
-
-	const char* message = "Left-Click and drag";
-	width = StringWidth(message);
-	BPoint p(r.left + r.Width() / 2.0 - width / 2.0,
-			 r.top + r.Height() / 2.0);
-
-	DrawString(message, p);
-
-	message = "to draw source rect!";
-	width = StringWidth(message);
-	p.x = r.left + r.Width() / 2.0 - width / 2.0;
-	p.y += 20;
-
-	DrawString(message, p);
+	// source and dest rect
+	SetPenSize(1.0);
 
 	SetHighColor(0, 255, 0, 255);
 	StrokeRect(fSourceRect);
 
 	SetHighColor(0, 0, 255, 255);
 	StrokeRect(fDestRect);
+
+	// text
+	SetHighColor(128, 0, 50, 255);
+
+	const char* message = "Left-Click and drag";
+	width = StringWidth(message);
+	BPoint p(r.left + r.Width() / 2.0 - width / 2.0,
+			 r.top + r.Height() / 2.0 - 50.0);
+
+	DrawString(message, p);
+
+	message = "to set source rect!";
+	width = StringWidth(message);
+	p.x = r.left + r.Width() / 2.0 - width / 2.0;
+	p.y += 20;
+
+	DrawString(message, p);
+
+	message = "Right-Click and drag";
+	width = StringWidth(message);
+	p.x = r.left + r.Width() / 2.0 - width / 2.0;
+	p.y += 30.0;
+
+	DrawString(message, p);
+
+	message = "to set destination rect!";
+	width = StringWidth(message);
+	p.x = r.left + r.Width() / 2.0 - width / 2.0;
+	p.y += 20;
+
+	DrawString(message, p);
 }
 
 // MouseDown
