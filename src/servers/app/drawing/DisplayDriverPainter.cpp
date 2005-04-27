@@ -391,7 +391,7 @@ DisplayDriverPainter::FillEllipse(const BRect &r, const DrawData *d)
 		fPainter->SetDrawData(d);
 
 		float xRadius = r.Width() / 2.0;
-		float yRadius = r.Width() / 2.0;
+		float yRadius = r.Height() / 2.0;
 		BPoint center(r.left + xRadius,
 					  r.top + yRadius);
 
@@ -567,7 +567,7 @@ DisplayDriverPainter::StrokeEllipse(const BRect &r, const DrawData *d)
 		fPainter->SetDrawData(d);
 
 		float xRadius = r.Width() / 2.0;
-		float yRadius = r.Width() / 2.0;
+		float yRadius = r.Height() / 2.0;
 		BPoint center(r.left + xRadius,
 					  r.top + yRadius);
 

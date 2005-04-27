@@ -1379,7 +1379,11 @@ Painter::_StrokePath(VertexSource& path) const
 	fOutlineRasterizer->add_path(path);
 #endif
 
-	return _Clipped(_BoundingBox(path));
+	BRect touched = _BoundingBox(path);
+	float penSize = ceilf(fPenSize);
+	touched.InsetBy(-penSize, -penSize);
+
+	return _Clipped(touched);
 }
 
 // _FillPath
