@@ -165,9 +165,7 @@ BTextControl::TextView() const
 void
 BTextControl::SetModificationMessage(BMessage *message)
 {
-	if (fModificationMessage)
-		delete fModificationMessage;
-
+	delete fModificationMessage;
 	fModificationMessage = message;
 }
 
@@ -549,7 +547,7 @@ void
 BTextControl::WindowActivated(bool active)
 {
 	if (fText->IsFocus())
-		Draw(Bounds());
+		Invalidate();
 }
 
 

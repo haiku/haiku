@@ -151,11 +151,10 @@ BRegion::RectAt(int32 index)
 clipping_rect
 BRegion::RectAtInt(int32 index)
 {
-	clipping_rect rect = { 1, 1, 0, 0 };
-	
 	if (index >= 0 && index < count)
 		return data[index];
-	
+
+	clipping_rect rect = { 1, 1, 0, 0 };
 	return rect;
 }
 

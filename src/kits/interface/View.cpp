@@ -141,13 +141,6 @@ set_rgb_color(rgb_color &color, uint8 r, uint8 g,uint8 b, uint8 a)
 }
 
 
-static inline bool
-is_new_pattern(const pattern& p1, const pattern& p2)
-{
-	return memcmp(&p1, &p2, sizeof(pattern)) != 0;
-}
-
-
 //	#pragma mark -
 
 
@@ -686,9 +679,6 @@ BRect
 BView::Frame() const 
 {
 	check_lock_no_pick();
-
-	if (fState->flags & B_VIEW_COORD_BIT)
-		Bounds();
 
 	return Bounds().OffsetToCopy(originX, originY);
 }
@@ -1297,6 +1287,8 @@ BView::ScrollBy(float dh, float dv)
 		owner->fLink->StartMessage(AS_LAYER_SCROLL);
 		owner->fLink->Attach<float>(dh);
 		owner->fLink->Attach<float>(dv);
+
+		owner->fLink->Flush();
 
 		fState->flags |= B_VIEW_COORD_BIT;
 	}
@@ -2280,7 +2272,7 @@ BView::StrokeEllipse(BRect rect, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_STROKE_ELLIPSE);
@@ -2307,7 +2299,7 @@ BView::FillEllipse(BRect rect, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_FILL_ELLIPSE);
@@ -2333,7 +2325,7 @@ BView::StrokeArc(BRect rect, float startAngle, float arcAngle,
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_STROKE_ARC);
@@ -2361,7 +2353,7 @@ BView::FillArc(BRect rect, float startAngle, float arcAngle,
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_FILL_ARC);
@@ -2379,7 +2371,7 @@ BView::StrokeBezier(BPoint *controlPoints, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_STROKE_BEZIER);
@@ -2398,7 +2390,7 @@ BView::FillBezier(BPoint *controlPoints, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_FILL_BEZIER);
@@ -2437,7 +2429,7 @@ BView::StrokePolygon(const BPoint *ptArray, int32 numPts, BRect bounds,
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	BPolygon polygon(ptArray, numPts);
@@ -2465,7 +2457,7 @@ BView::FillPolygon(const BPolygon *polygon, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	if (polygon->fCount * sizeof(BPoint) < MAX_ATTACHMENT_SIZE) {
@@ -2511,7 +2503,7 @@ BView::StrokeRect(BRect rect, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_STROKE_RECT);
@@ -2527,7 +2519,7 @@ BView::FillRect(BRect rect, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_FILL_RECT);
@@ -2544,7 +2536,7 @@ BView::StrokeRoundRect(BRect rect, float xRadius, float yRadius,
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_STROKE_ROUNDRECT);
@@ -2563,7 +2555,7 @@ BView::FillRoundRect(BRect rect, float xRadius, float yRadius,
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_FILL_ROUNDRECT);
@@ -2581,7 +2573,7 @@ BView::FillRegion(BRegion *region, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	int32 count = region->CountRects();
@@ -2607,7 +2599,7 @@ BView::StrokeTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_STROKE_TRIANGLE);
@@ -2707,7 +2699,7 @@ BView::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_FILL_TRIANGLE);
@@ -2733,7 +2725,7 @@ BView::StrokeLine(BPoint pt0, BPoint pt1, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	owner->fLink->StartMessage(AS_STROKE_LINE);
@@ -2757,7 +2749,7 @@ BView::StrokeShape(BShape *shape, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	if ((sd->opCount * sizeof(uint32)) + (sd->ptCount * sizeof(BPoint)) < MAX_ATTACHMENT_SIZE) {
@@ -2785,7 +2777,7 @@ BView::FillShape(BShape *shape, pattern p)
 
 	check_lock();
 
-	if (is_new_pattern(fState->patt, p))
+	if (!(fState->patt == p))
 		SetPattern(p);
 
 	if ((sd->opCount * sizeof(uint32)) + (sd->ptCount * sizeof(BPoint)) < MAX_ATTACHMENT_SIZE) {

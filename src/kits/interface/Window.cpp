@@ -3146,7 +3146,7 @@ void BWindow::drawAllViews(BView* aView)
 void BWindow::DoUpdate(BView* aView, BRect& area)
 {
  
- 	STRACE(("info: BWindow::drawView() BRect(%f,%f,%f,%f) called.\n",
+ 	STRACE(("info: BWindow::DoUpdate() BRect(%f,%f,%f,%f) called.\n",
  		area.left, area.top, area.right, area.bottom));
  
  	aView->check_lock();
