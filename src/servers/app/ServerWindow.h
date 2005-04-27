@@ -48,6 +48,7 @@ class Decorator;
 class BPortLink;
 class WinBorder;
 class Workspace;
+class RootLayer;
 class Layer;
 
 #define AS_UPDATE_DECORATOR 'asud'
@@ -120,6 +121,13 @@ private:
 			void				DispatchMessage(int32 code, LinkMsgReader &link);
 			void				DispatchGraphicsMessage(int32 code, LinkMsgReader &link);
 	static	int32				MonitorWin(void *data);
+
+			// used by CopyBits and Scrolling
+			void				_CopyBits(RootLayer* rootLayer,
+										  Layer* layer,
+										  BRect& copy,
+										  BRect& dirty,
+										  int32 xOffset, int32 yOffset) const;
 
 protected:	
 	friend class ServerApp;

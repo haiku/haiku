@@ -121,6 +121,13 @@ DrawData::SetOrigin(const BPoint& origin)
 	fOrigin = origin;
 }
 
+// OffsetOrigin
+void
+DrawData::OffsetOrigin(const BPoint& offset)
+{
+	fOrigin += offset;
+}
+
 // SetScale
 void
 DrawData::SetScale(float scale)

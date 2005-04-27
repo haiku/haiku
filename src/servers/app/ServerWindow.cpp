@@ -520,21 +520,45 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			}
 			break;
 		}
+		case AS_LAYER_SCROLL:
+		{
+			printf("AS_LAYER_SCROLL\n");
+			float dh;
+			float dv;
+
+			link.Read<float>(&dh);
+			link.Read<float>(&dv);
+
+			// scroll visually by using the CopyBits() implementation
+			// this will also take care of invalidating previously invisible
+			// areas (areas scrolled into view)
+			BRect src = cl->Bounds();
+			BRect dst = src;
+			// NOTE: if we scroll down, the contents are moved *up*
+			dst.OffsetBy(-dh, -dv);
+
+			// TODO: Are origin and scale handled in this conversion?
+			src = cl->ConvertToTop(src);
+			dst = cl->ConvertToTop(dst);
+
+			int32 xOffset = (int32)(dst.left - src.left);
+			int32 yOffset = (int32)(dst.top - src.top);
+
+			// this little detail is where it differs from CopyBits()
+			// -> it will invalidate areas previously out of screen
+			dst = dst | src;
+
+			_CopyBits(myRootLayer, cl, src, dst, xOffset, yOffset);
+
+			// TODO: notify the client, no?
+			cl->fLayerData->OffsetOrigin(BPoint(dh, dv));
+//cl->fBoundsLeftTop += BPoint(dh, dv);
+//cl->fFrame.OffsetBy(BPoint(-dh, -dv));
+
+			break;
+		}
 		case AS_LAYER_COPY_BITS:
 		{
-			// NOTE: The correct behaviour is this:
-			// * The region that is copied is the
-			//   src rectangle, no matter if it fits
-			//   into the dst rectangle. It is copied
-			//   by the offset dst.LeftTop() - src.LeftTop()
-			// * The dst rectangle is used for invalidation:
-			//   Any area in the dst rectangle that could
-			//   not be copied from src (because either the
-			//   src rectangle was not big enough, or because there
-			//   were parts cut off by the current layer clipping),
-			//   are triggering BView::Draw() to be called
-			//   and for these parts only.
-
 			BRect src;
 			BRect dst;
 
@@ -544,34 +568,11 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			// TODO: Are origin and scale handled in this conversion?
 			src = cl->ConvertToTop(src);
 			dst = cl->ConvertToTop(dst);
-
+		
 			int32 xOffset = (int32)(dst.left - src.left);
 			int32 yOffset = (int32)(dst.top - src.top);
 
-			// the region that is going to be copied
-			BRegion copyRegion(src);
-			// apply the current clipping of the layer
-			copyRegion.IntersectWith(&cl->fVisible);
-
-			// offset the region to the destination
-			// and apply the current clipping there as well
-			copyRegion.OffsetBy(xOffset, yOffset);
-			copyRegion.IntersectWith(&cl->fVisible);
-
-			// the region at the destination that needs invalidation
-			BRegion invalidRegion(dst);
-			// exclude the region drawn by the copy operation
-			invalidRegion.Exclude(&copyRegion);
-			// apply the current clipping as well
-			invalidRegion.IntersectWith(&cl->fVisible);
-
-			// move the region back for the actual operation
-			copyRegion.OffsetBy(-xOffset, -yOffset);
-
-			cl->fDriver->CopyRegion(&copyRegion, xOffset, yOffset);
-
-			// trigger the redraw			
-			myRootLayer->GoRedraw(fWinBorder, invalidRegion);
+			_CopyBits(myRootLayer, cl, src, dst, xOffset, yOffset);
 
 			break;
 		}
@@ -693,7 +694,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			fMsgSender->Attach<float>(cl->fFrame.left);
 			fMsgSender->Attach<float>(cl->fFrame.top);
-			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
+			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->BoundsOrigin()));
 
 			fMsgSender->Flush();
 
@@ -728,16 +729,16 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_GET_COORD:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fName, cl->fName->String()));
-printf("Adi: %s\n", cl->GetName());
+printf("AS_LAYER_GET_COORD - Layer: %s\n", cl->GetName());
 cl->fFrame.PrintToStream();
-cl->fBoundsLeftTop.PrintToStream();
+cl->BoundsOrigin().PrintToStream();
 			fMsgSender->StartMessage(SERVER_TRUE);
 			BPoint	pt(cl->ConvertFromParent(cl->fFrame.LeftTop()));
 			fMsgSender->Attach<float>(pt.x);
 			fMsgSender->Attach<float>(pt.y);
 //			fMsgSender->Attach<float>(cl->fFrame.left);
 //			fMsgSender->Attach<float>(cl->fFrame.top);
-			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
+			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->BoundsOrigin()));
 //			fMsgSender->Attach<BRect>(cl->ConvertFromTop(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop)));
 			fMsgSender->Flush();
 
@@ -2158,6 +2159,53 @@ int32 ServerWindow::MonitorWin(void *data)
 	}
 	return err;
 }
+
+// _CopyBits
+void
+ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
+						BRect& src, BRect& dst,
+						int32 xOffset, int32 yOffset) const
+{
+	// NOTE: The correct behaviour is this:
+	// * The region that is copied is the
+	//   src rectangle, no matter if it fits
+	//   into the dst rectangle. It is copied
+	//   by the offset dst.LeftTop() - src.LeftTop()
+	// * The dst rectangle is used for invalidation:
+	//   Any area in the dst rectangle that could
+	//   not be copied from src (because either the
+	//   src rectangle was not big enough, or because there
+	//   were parts cut off by the current layer clipping),
+	//   are triggering BView::Draw() to be called
+	//   and for these parts only.
+
+	// the region that is going to be copied
+	BRegion copyRegion(src);
+	// apply the current clipping of the layer
+	copyRegion.IntersectWith(&layer->fVisible);
+
+	// offset the region to the destination
+	// and apply the current clipping there as well
+	copyRegion.OffsetBy(xOffset, yOffset);
+	copyRegion.IntersectWith(&layer->fVisible);
+
+	// the region at the destination that needs invalidation
+	BRegion invalidRegion(dst);
+	// exclude the region drawn by the copy operation
+	invalidRegion.Exclude(&copyRegion);
+	// apply the current clipping as well
+	invalidRegion.IntersectWith(&layer->fVisible);
+
+	// move the region back for the actual operation
+	copyRegion.OffsetBy(-xOffset, -yOffset);
+
+	layer->fDriver->CopyRegion(&copyRegion, xOffset, yOffset);
+
+	// trigger the redraw			
+	rootLayer->GoRedraw(fWinBorder, invalidRegion);
+}
+
+
 //------------------------------------------------------------------------------
 void ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
 {

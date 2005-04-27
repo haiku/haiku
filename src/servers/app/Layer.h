@@ -22,6 +22,7 @@
 //	File Name:		Layer.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
 //					Adi Oanca <adioanca@cotty.iren.com>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Class used for rendering to the frame buffer. One layer per 
 //					view on screen and also for window decorators
 //  
@@ -30,17 +31,17 @@
 #define _LAYER_H_
 
 #include <GraphicsDefs.h>
+#include <List.h>
+#include <Locker.h>
+#include <OS.h>
+#include <String.h>
 #include <Rect.h>
 #include <Region.h>
-#include <List.h>
-#include <String.h>
-#include <OS.h>
-#include <Locker.h>
-#include "ServerWindow.h"
-#include "RGBColor.h"
 
-enum
-{
+#include "RGBColor.h"
+#include "ServerWindow.h"
+
+enum {
 	B_LAYER_NONE		= 1,
 	B_LAYER_MOVE		= 2,
 	B_LAYER_SIMPLE_MOVE	= 3,
@@ -48,14 +49,12 @@ enum
 	B_LAYER_MASK_RESIZE	= 5,
 };
 
-enum
-{
+enum {
 	B_LAYER_CHILDREN_DEPENDANT = 0x1000U,
 };
 
 // easy way to determine class type
-enum
-{
+enum {
 	AS_LAYER_CLASS		= 1,
 	AS_WINBORDER_CLASS	= 2,
 	AS_ROOTLAYER_CLASS	= 3,
@@ -66,90 +65,128 @@ class RootLayer;
 class DisplayDriver;
 class LayerData;
 
-class Layer
-{
-public:
-	Layer(BRect frame, const char *name, int32 token, uint32 resize, 
-			uint32 flags, DisplayDriver *driver);
-	virtual ~Layer(void);
+class Layer {
+ public:
+								Layer(BRect frame, const char* name,
+									  int32 token, uint32 resize,
+									  uint32 flags, DisplayDriver* driver);
+	virtual						~Layer();
 
-	void AddChild(Layer *child, ServerWindow *serverWin);
-	void RemoveChild(Layer *child);
-	void RemoveSelf(void);
-	bool HasChild(Layer *layer);
-	RootLayer *GetRootLayer(void) const { return fRootLayer; }
-	
-	uint32 CountChildren(void) const;
-	Layer *FindLayer(const int32 token);
-	Layer *LayerAt(const BPoint &pt);
-	bool IsTopLayer(void) { return fIsTopLayer; }
-	
-	virtual	Layer *VirtualTopChild(void) const;
-	virtual	Layer *VirtualLowerSibling(void) const;
-	virtual	Layer *VirtualUpperSibling(void) const;
-	virtual	Layer *VirtualBottomChild(void) const;
-	
-	const char *GetName(void) const { return (fName)?fName->String():NULL; }
-	
-	virtual	void RebuildFullRegion(void);
-	void StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BPoint& pt);
-	void RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOffset);
-	uint32 ResizeOthers(float x, float y,  BPoint coords[], BPoint *ptOffset);
-	
-	void Redraw(const BRegion& reg, Layer *startFrom=NULL);
-	
-	void EmptyGlobals(void);
-	
-	virtual	void Draw(const BRect &r);
-	
-	void Show(bool invalidate=true);
-	void Hide(bool invalidate=true);
-	bool IsHidden(void) const;
-	
-	BRect Bounds(void) const;
-	BRect Frame(void) const;
-	
-	virtual	void MoveBy(float x, float y);
-	virtual	void ResizeBy(float x, float y);
-	
-	BRect ConvertToParent(BRect rect);
-	BRegion ConvertToParent(BRegion *reg);
-	BPoint ConvertFromParent(BPoint pt);
-	BRect ConvertFromParent(BRect rect);
-	BRegion ConvertFromParent(BRegion *reg);
-	
-	BPoint ConvertToTop(BPoint pt);
-	BRegion ConvertToTop(BRegion *reg);
-	BRect ConvertToTop(BRect rect);
+			void				AddChild(Layer* child, ServerWindow* serverWin);
+			void				RemoveChild(Layer* child);
+			void				RemoveSelf();
+			bool				HasChild(Layer* layer);
 
-	BPoint ConvertFromTop(BPoint pt);
-	BRegion ConvertFromTop(BRegion *reg);
-	BRect ConvertFromTop(BRect rect);
+			RootLayer*			GetRootLayer() const
+									{ return fRootLayer; }
 	
-	DisplayDriver *GetDisplayDriver(void) const { return fDriver; }
-	ServerWindow *Window(void) const { return fServerWin; }
-	ServerApp *App(void) const { return fServerWin? fServerWin->App(): NULL; }
-	virtual bool HasClient(void) { return true; }
-	bool IsServerLayer() const;
-	uint32 EventMask(void) const { return fEventMask; }
-	uint32 EventOptions(void) const { return fEventOptions; }
+			uint32				CountChildren() const;
+			Layer*				FindLayer(const int32 token);
+			Layer*				LayerAt(const BPoint &pt);
 
-	void PruneTree(void);
+	virtual	Layer*				VirtualTopChild() const;
+	virtual	Layer*				VirtualLowerSibling() const;
+	virtual	Layer*				VirtualUpperSibling() const;
+	virtual	Layer*				VirtualBottomChild() const;
 	
-	void PrintToStream(void);
-	void PrintNode(void);
-	void PrintTree(void);
+			const char*			GetName() const
+									{ return (fName) ? fName->String() : NULL; }
+	
+	virtual	void				RebuildFullRegion();
+			void				StartRebuildRegions(const BRegion& reg,
+													Layer* target,
+													uint32 action,
+													BPoint& pt);
+
+			void				RebuildRegions(const BRegion& reg,
+											   uint32 action,
+											   BPoint pt,
+											   BPoint ptOffset);
+
+			uint32				ResizeOthers(float x, float y,
+											 BPoint coords[],
+											 BPoint* ptOffset);
+	
+			void				Redraw(const BRegion& reg,
+									   Layer* startFrom = NULL);
+	
+	virtual	void				Draw(const BRect& r);
+	
+			void				EmptyGlobals();
+	
+			void				Show(bool invalidate = true);
+			void				Hide(bool invalidate = true);
+			bool				IsHidden() const;
+
+	// coordinate system	
+			BRect				Bounds() const;
+			BRect				Frame() const;
+	
+	virtual	void				MoveBy(float x, float y);
+	virtual	void				ResizeBy(float x, float y);
+
+			BPoint				BoundsOrigin() const; // BoundsFrameDiff()?
+
+			BPoint				ConvertToParent(BPoint pt);
+			BRect				ConvertToParent(BRect rect);
+			BRegion				ConvertToParent(BRegion* reg);
+
+			BPoint				ConvertFromParent(BPoint pt);
+			BRect				ConvertFromParent(BRect rect);
+			BRegion				ConvertFromParent(BRegion* reg);
+	
+			BPoint				ConvertToTop(BPoint pt);
+			BRect				ConvertToTop(BRect rect);
+			BRegion				ConvertToTop(BRegion* reg);
+
+			BPoint				ConvertFromTop(BPoint pt);
+			BRect				ConvertFromTop(BRect rect);
+			BRegion				ConvertFromTop(BRegion *reg);
+	
+
+			DisplayDriver*		GetDisplayDriver() const
+									{ return fDriver; }
+
+			ServerWindow*		Window() const
+									{ return fServerWin; }
+
+			ServerApp*			App() const
+									{ return fServerWin? fServerWin->App(): NULL; }
+
+	virtual	bool				HasClient()
+									{ return true; }
+//			bool				IsServerLayer() const;
+
+			uint32				EventMask() const
+									{ return fEventMask; }
+
+			uint32				EventOptions() const
+									{ return fEventOptions; }
+
+			void				PruneTree();
+	
+	// debugging
+			void				PrintToStream();
+			void				PrintNode();
+			void				PrintTree();
 	
 	// server "private" - should not be used
-	void SetRootLayer(RootLayer *rl){ fRootLayer = rl; }
-	void SetAsTopLayer(bool option) { fIsTopLayer = option; }
-	bool IsTopLayer() const { return fIsTopLayer; }
+			void				SetRootLayer(RootLayer* rl)
+									{ fRootLayer = rl; }
 
-	void UpdateStart();
-	void UpdateEnd();
-	BRegion* ClippingRegion() const { return fClipReg; }
+			void				SetAsTopLayer(bool option)
+									{ fIsTopLayer = option; }
 
-protected:
+			bool				IsTopLayer() const
+									{ return fIsTopLayer; }
+
+			void				UpdateStart();
+			void				UpdateEnd();
+
+			BRegion*			ClippingRegion() const
+									{ return fClipReg; }
+
+ protected:
 	friend class RootLayer;
 	friend class WinBorder;
 	friend class ServerWindow;
@@ -157,56 +194,57 @@ protected:
 			void				move_layer(float x, float y);
 			void				resize_layer(float x, float y);
 
-			void				FullInvalidate(const BRect &rect);
-			void				FullInvalidate(const BRegion &region);
-			void				Invalidate(const BRegion &region);
+			void				FullInvalidate(const BRect& rect);
+			void				FullInvalidate(const BRegion& region);
+			void				Invalidate(const BRegion& region);
 
-	BRect fFrame;
-	BPoint fBoundsLeftTop;
-	WinBorder *fOwner;
-	Layer *fParent;
-	Layer *fUpperSibling;
-	Layer *fLowerSibling;
-	Layer *fTopChild;
-	Layer *fBottomChild;
+			BRect				fFrame;
+//			BPoint				fBoundsLeftTop;
+			WinBorder*			fOwner;
+			Layer*				fParent;
+			Layer*				fUpperSibling;
+			Layer*				fLowerSibling;
+			Layer*				fTopChild;
+			Layer*				fBottomChild;
 	
-	mutable	Layer *fCurrent;
+	mutable	Layer*				fCurrent;
 	
-	BRegion fVisible;
-	BRegion	fFullVisible;
-	BRegion	fFull;
-	BRegion *fClipReg;
-	
-	BRegion *clipToPicture;
-	bool clipToPictureInverse;
-	
-	ServerWindow *fServerWin;
-	BString *fName;	
-	int32 fViewToken;
-	uint32 fFlags;
-	uint32 fResizeMode;
-	uint32 fEventMask;
-	uint32 fEventOptions;
-	bool fHidden;
-	bool fIsTopLayer;
-	uint16 fAdFlags;
-	int8 fClassID;
-	int8 fFrameAction;
-	
-	DisplayDriver *fDriver;
-	LayerData *fLayerData;
-	//RGBColor fBackColor;
-	
-	RootLayer *fRootLayer;
+			BRegion				fVisible;
+			BRegion				fFullVisible;
+			BRegion				fFull;
 
-private:
-	void RequestDraw(const BRegion &reg, Layer *startFrom);
-	ServerWindow *SearchForServerWindow(void);
+			BRegion*			fClipReg;
+	
+			BRegion*			clipToPicture;
+			bool				clipToPictureInverse;
+	
+			ServerWindow*		fServerWin;
+			BString*			fName;	
+			int32				fViewToken;
+			uint32				fFlags;
+			uint32				fResizeMode;
+			uint32				fEventMask;
+			uint32				fEventOptions;
+			bool				fHidden;
+			bool				fIsTopLayer;
+			uint16				fAdFlags;
+			int8				fClassID;
+			int8				fFrameAction;
+	
+			DisplayDriver*		fDriver;
+			LayerData*			fLayerData;
+	
+			RootLayer*			fRootLayer;
 
-	void SendUpdateMsg(BRegion &reg);
-	void SendViewMovedMsg(void);
-	void SendViewResizedMsg(void);
+ private:
+			void				RequestDraw(const BRegion& reg,
+											Layer* startFrom);
+			ServerWindow*		SearchForServerWindow();
+
+			void				SendUpdateMsg(BRegion& reg);
+			void				SendViewMovedMsg();
+			void				SendViewResizedMsg();
 
 };
 
-#endif
+#endif // _LAYER_H_

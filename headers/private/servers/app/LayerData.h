@@ -54,6 +54,7 @@ class DrawData {
 
 								// coordinate transformation
 			void				SetOrigin(const BPoint& origin);
+			void				OffsetOrigin(const BPoint& offset);
 	inline	const BPoint&		Origin() const
 									{ return fOrigin; }
 
