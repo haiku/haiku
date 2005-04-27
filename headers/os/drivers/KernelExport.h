@@ -1,7 +1,8 @@
 /* Kernel only exports for kernel add-ons
-** 
-** Distributed under the terms of the OpenBeOS License.
-*/
+ *
+ * Copyright 2005, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _KERNEL_EXPORT_H
 #define _KERNEL_EXPORT_H
 
@@ -15,6 +16,7 @@ extern "C" {
 #endif
 
 /*-------------------------------------------------------------*/
+/* interrupts and spinlocks */
 
 /* disable/restore interrupts on the current CPU */
 
@@ -36,16 +38,19 @@ extern void			release_spinlock(spinlock *lock);
 
 /* interrupt handling support for device drivers */
 
+typedef int32 (*interrupt_handler)(void *data);
+
 /* Values returned by interrupt handlers */
 #define B_UNHANDLED_INTERRUPT	0	/* pass to next handler */
 #define B_HANDLED_INTERRUPT		1	/* don't pass on */
 #define B_INVOKE_SCHEDULER		2	/* don't pass on; invoke the scheduler */
 
-typedef int32 (*interrupt_handler)(void *data);
+/* Flags that can be passed to install_io_interrupt_handler() */
+#define B_NO_ENABLE_COUNTER		1
 
-extern long 		install_io_interrupt_handler(long interrupt_number,
+extern status_t		install_io_interrupt_handler(long interrupt_number,
 						interrupt_handler handler, void *data, ulong flags);
-extern long 		remove_io_interrupt_handler(long interrupt_number,
+extern status_t		remove_io_interrupt_handler(long interrupt_number,
 						interrupt_handler handler, void	*data);
 
 

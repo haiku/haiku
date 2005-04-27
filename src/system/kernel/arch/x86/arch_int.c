@@ -20,11 +20,48 @@
 #include <arch/smp.h>
 #include <arch/user_debugger.h>
 
-#include <arch/x86/interrupts.h>
 #include <arch/x86/faults.h>
 #include <arch/x86/descriptors.h>
 
+#include "interrupts.h"
+
 #include <string.h>
+
+
+//#define TRACE_ARCH_INT
+#ifdef TRACE_ARCH_INT
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+// Definitions for the PIC 8259 controller
+// (this is not a complete list, only what we're actually using)
+
+#define PIC_MASTER_CONTROL		0x20
+#define PIC_MASTER_MASK			0x21
+#define PIC_SLAVE_CONTROL		0xa0
+#define PIC_SLAVE_MASK			0xa1
+#define PIC_MASTER_INIT1		PIC_MASTER_CONTROL
+#define PIC_MASTER_INIT2		PIC_MASTER_MASK
+#define PIC_MASTER_INIT3		PIC_MASTER_MASK
+#define PIC_MASTER_INIT4		PIC_MASTER_MASK
+#define PIC_SLAVE_INIT1			PIC_SLAVE_CONTROL
+#define PIC_SLAVE_INIT2			PIC_SLAVE_MASK
+#define PIC_SLAVE_INIT3			PIC_SLAVE_MASK
+#define PIC_SLAVE_INIT4			PIC_SLAVE_MASK
+
+#define PIC_INIT1				0x10
+#define PIC_INIT1_SEND_INIT4	0x01
+#define PIC_INIT3_IR2_IS_SLAVE	0x04
+#define PIC_INIT3_SLAVE_ID2		0x02
+#define PIC_INIT4_x86_MODE		0x01
+
+#define PIC_NON_SPECIFIC_EOI	0x20
+
+#define PIC_INT_BASE			0x20
+#define PIC_SLAVE_INT_BASE		0x28
+#define PIC_NUM_INTS			0x0f
 
 const char *kInterruptNames[] = {
 	/*  0 */ "Divide Error Exception",
@@ -57,18 +94,6 @@ typedef struct {
 static desc_table *idt = NULL;
 
 struct iframe_stack gBootFrameStack;
-
-
-static void
-interrupt_ack(int n)
-{
-	if (n >= 0x20 && n < 0x30) {
-		// 8239 controlled interrupt
-		if (n > 0x27)
-			out8(0x20, 0xa0);	// EOI to pic 2
-		out8(0x20, 0x20);	// EOI to pic 1
-	}
-}
 
 
 static void
@@ -107,30 +132,77 @@ x86_set_task_gate(int32 n, int32 segment)
 }
 
 
+/**	Sends a non-specified EOI (end of interrupt) notice to the PIC in
+ *	question (or both of them).
+ *	This clears the PIC interrupt in-service bit.
+ */
+
+static void
+pic_end_of_interrupt(int num)
+{
+	if (num >= PIC_INT_BASE && num <= PIC_INT_BASE + PIC_NUM_INTS) {
+		// PIC 8259 controlled interrupt
+		if (num >= PIC_SLAVE_INT_BASE)
+			out8(PIC_NON_SPECIFIC_EOI, PIC_SLAVE_CONTROL);
+
+		// we always need to acknowledge the master PIC
+		out8(PIC_NON_SPECIFIC_EOI, PIC_MASTER_CONTROL);
+	}
+}
+
+
+static void
+pic_init(void)
+{
+	// Start initialization sequence for the master and slave PICs
+	out8(PIC_INIT1 | PIC_INIT1_SEND_INIT4, PIC_MASTER_INIT1);
+	out8(PIC_INIT1 | PIC_INIT1_SEND_INIT4, PIC_SLAVE_INIT1);
+
+	// Set start of interrupts to 0x20 for master, 0x28 for slave
+	out8(PIC_INT_BASE, PIC_MASTER_INIT2);
+	out8(PIC_SLAVE_INT_BASE, PIC_SLAVE_INIT2);
+
+	// Specify cascading through interrupt 2
+	out8(PIC_INIT3_IR2_IS_SLAVE, PIC_MASTER_INIT3);
+	out8(PIC_INIT3_SLAVE_ID2, PIC_SLAVE_INIT3);
+
+	// Set both to operate in 8086 mode
+	out8(PIC_INIT4_x86_MODE, PIC_MASTER_INIT4);
+	out8(PIC_INIT4_x86_MODE, PIC_SLAVE_INIT4);
+
+	out8(0xfb, PIC_MASTER_MASK);	// Mask off all interrupts (except slave pic line IRQ 2).
+	out8(0xff, PIC_SLAVE_MASK); 	// Mask off interrupts on the slave.
+}
+
+
 void
 arch_int_enable_io_interrupt(int irq)
 {
-	if (irq < 0 || irq >= 0x10)
+	// interrupt is specified "normalized"
+	if (irq < 0 || irq > PIC_NUM_INTS)
 		return;
 
-	//dprintf("arch_int_enable_io_interrupt: irq %d\n", irq);
+	// enable PIC 8259 controlled interrupt
 
-	/* if this is a external interrupt via 8239, enable it here */
+	TRACE(("arch_int_enable_io_interrupt: irq %d\n", irq));
+
 	if (irq < 8)
-		out8(in8(0x21) & ~(1 << irq), 0x21);
+		out8(in8(PIC_MASTER_MASK) & ~(1 << irq), PIC_MASTER_MASK);
 	else
-		out8(in8(0xa1) & ~(1 << (irq - 8)), 0xa1);
+		out8(in8(PIC_SLAVE_MASK) & ~(1 << (irq - 8)), PIC_SLAVE_MASK);
 }
 
 
 void
 arch_int_disable_io_interrupt(int irq)
 {
-	/* never disable slave pic line IRQ 2 */
-	if (irq < 0 || irq >= 0x10 || irq == 2)
+	// interrupt is specified "normalized"
+	// never disable slave pic line IRQ 2
+	if (irq < 0 || irq > PIC_NUM_INTS || irq == 2)
 		return;
 
-	/* if this is a external interrupt via 8239, disable it here */
+	// disable PIC 8259 controlled interrupt
+
 	if (irq < 8)
 		out8(in8(0x21) | (1 << irq), 0x21);
 	else
@@ -282,9 +354,9 @@ i386_handle_trap(struct iframe frame)
 		}
 
 		default:
-			if (frame.vector >= 0x20) {
-				interrupt_ack(frame.vector); // ack the 8239 (if applicable)
-				ret = int_io_interrupt_handler(frame.vector);
+			if (frame.vector >= ARCH_INTERRUPT_BASE) {
+				pic_end_of_interrupt(frame.vector);
+				ret = int_io_interrupt_handler(frame.vector - ARCH_INTERRUPT_BASE);
 			} else {
 				panic("i386_handle_trap: unhandled trap 0x%x (%s) at ip 0x%x, thread 0x%x!\n",
 					frame.vector, kInterruptNames[frame.vector], frame.eip, thread ? thread->id : -1);
@@ -324,16 +396,7 @@ arch_int_init(kernel_args *args)
 	idt = (desc_table *)args->arch_args.vir_idt;
 
 	// setup the interrupt controller
-	out8(0x11, 0x20);	// Start initialization sequence for #1.
-	out8(0x11, 0xa0);	// ...and #2.
-	out8(0x20, 0x21);	// Set start of interrupts for #1 (0x20).
-	out8(0x28, 0xa1);	// Set start of interrupts for #2 (0x28).
-	out8(0x04, 0x21);	// Set #1 to be the master.
-	out8(0x02, 0xa1);	// Set #2 to be the slave.
-	out8(0x01, 0x21);	// Set both to operate in 8086 mode.
-	out8(0x01, 0xa1);
-	out8(0xfb, 0x21);	// Mask off all interrupts (except slave pic line IRQ 2).
-	out8(0xff, 0xa1); 	// Mask off interrupts on the slave.
+	pic_init();
 
 	set_intr_gate(0,  &trap0);
 	set_intr_gate(1,  &trap1);

@@ -15,10 +15,6 @@
 struct kernel_args;
 
 
-/* adds the handler but don't change whether or not the interrupt is currently enabled */
-#define B_NO_ENABLE_COUNTER	1
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,8 +22,8 @@ extern "C" {
 status_t int_init(struct kernel_args *args);
 status_t int_init_post_vm(struct kernel_args *args);
 int int_io_interrupt_handler(int vector);
-status_t install_interrupt_handler(long vector, interrupt_handler, void *data);
-status_t remove_interrupt_handler(long vector, interrupt_handler, void *data);
+
+bool interrupts_enabled(void);
 
 static inline void
 enable_interrupts(void)

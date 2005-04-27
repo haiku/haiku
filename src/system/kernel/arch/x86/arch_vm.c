@@ -16,7 +16,6 @@
 #include <arch/int.h>
 #include <arch/cpu.h>
 
-#include <arch/x86/interrupts.h>
 #include <arch/x86/bios.h>
 
 

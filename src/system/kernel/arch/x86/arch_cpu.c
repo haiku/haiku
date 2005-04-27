@@ -1,19 +1,20 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <arch/cpu.h>
 #include <vm.h>
 #include <smp.h>
 #include <arch/x86/selector.h>
-#include <arch/x86/interrupts.h>
 #include <tls.h>
 #include <boot/kernel_args.h>
+
+#include "interrupts.h"
 
 #include <string.h>
 #include <stdlib.h>

@@ -1,7 +1,11 @@
-/* 
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 
 #include <boot/stage2.h>
 #include <kernel.h>
@@ -16,23 +20,25 @@
 
 #include <arch/timer.h>
 
-#include <arch/x86/interrupts.h>
 #include <arch/x86/smp_priv.h>
 #include <arch/x86/timer.h>
 
-#define pit_clock_rate 1193180
-#define pit_max_timer_interval ((long long)0xffff * 1000000 / pit_clock_rate)
+#include "interrupts.h"
+
+
+#define PIT_CLOCK_RATE 1193180
+#define PIT_MAX_TIMER_INTERVAL ((long long)0xffff * 1000000 / PIT_CLOCK_RATE)
 
 
 static void
 set_isa_hardware_timer(long long relative_timeout)
 {
-	unsigned short next_event_clocks;
+	uint16 next_event_clocks;
 
 	if (relative_timeout <= 0)
 		next_event_clocks = 2;			
-	else if (relative_timeout < pit_max_timer_interval)
-		next_event_clocks = relative_timeout * pit_clock_rate / 1000000;
+	else if (relative_timeout < PIT_MAX_TIMER_INTERVAL)
+		next_event_clocks = relative_timeout * PIT_CLOCK_RATE / 1000000;
 	else
 		next_event_clocks = 0xffff;
 
@@ -84,10 +90,10 @@ arch_timer_clear_hardware_timer(void)
 
 
 int
-arch_init_timer(kernel_args *ka)
+arch_init_timer(kernel_args *args)
 {
-	dprintf("arch_init_timer: entry\n");
-	
+	//dprintf("arch_init_timer: entry\n");
+
 	install_io_interrupt_handler(0, &isa_timer_interrupt, NULL, 0);
 	clear_isa_hardware_timer();
 

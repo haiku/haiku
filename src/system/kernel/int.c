@@ -17,22 +17,29 @@
 #include <stdio.h>
 #include <malloc.h>
 
+//#define TRACE_INT
+#ifdef TRACE_INT
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
 
-#define NUM_IO_VECTORS 256
 
 struct io_handler {
 	struct io_handler	*next;
 	struct io_handler	*prev;
 	interrupt_handler	func;
 	void				*data;
+	bool				use_enable_counter;
 };
 
 struct io_vector {
 	struct io_handler	handler_list;
 	spinlock			vector_lock;
+	int32				enable_count;
 };
 
-static struct io_vector *io_vectors = NULL;
+static struct io_vector io_vectors[NUM_IO_VECTORS];
 
 
 cpu_status
@@ -46,6 +53,13 @@ void
 restore_interrupts(cpu_status status)
 {
 	arch_int_restore_interrupts(status);
+}
+
+
+bool
+interrupts_enabled(void)
+{
+	return arch_int_are_interrupts_enabled();
 }
 
 
@@ -63,13 +77,10 @@ int_init_post_vm(kernel_args *args)
 {
 	int i;
 
-	io_vectors = (struct io_vector *)malloc(sizeof(struct io_vector) * NUM_IO_VECTORS);
-	if (io_vectors == NULL)
-		panic("int_init_post_vm: could not create io vector table!\n");
-
 	/* initialize the vector list */
 	for (i = 0; i < NUM_IO_VECTORS; i++) {
 		io_vectors[i].vector_lock = 0;			/* initialize spinlock */
+		io_vectors[i].enable_count = 0;
 		initque(&io_vectors[i].handler_list);	/* initialize handler queue */
 	}
 
@@ -77,14 +88,12 @@ int_init_post_vm(kernel_args *args)
 }
 
 
-/**	This function is used internally to install a handler on the given vector.
- *	NB this does NOT take an IRQ, but a system interrupt value.
- *	As this is intended for system use this function does NOT call
- *	arch_int_enable_io_interrupt() as it only works for IRQ values
+/** Install a handler to be called when an interrupt is triggered
+ *	for the given interrupt number with \a data as the argument.
  */
 
 status_t
-install_interrupt_handler(long vector, interrupt_handler handler, void *data)
+install_io_interrupt_handler(long vector, interrupt_handler handler, void *data, ulong flags)
 {
 	struct io_handler *io = NULL; 
 	cpu_status state;
@@ -92,24 +101,27 @@ install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	if (vector < 0 || vector >= NUM_IO_VECTORS)
 		return B_BAD_VALUE;
 
-	/* find the chain of handlers for this irq.
-	 * NB there can be multiple handlers for the same IRQ, especially for
-	 * PCI drivers. Where we have multiple handlers we will call each in turn
-	 * until one returns a value other than B_UNHANDLED_INTERRUPT.
-	 */
 	io = (struct io_handler *)malloc(sizeof(struct io_handler));
 	if (io == NULL)
 		return B_NO_MEMORY;
 
 	io->func = handler;
 	io->data = data;
+	io->use_enable_counter = (flags & B_NO_ENABLE_COUNTER) == 0;
 
-	/* Disable the interrupts, get the spinlock for this irq only
-	 * and then insert the handler */
+	// Disable the interrupts, get the spinlock for this irq only
+	// and then insert the handler
 	state = disable_interrupts();
 	acquire_spinlock(&io_vectors[vector].vector_lock);
 
 	insque(io, &io_vectors[vector].handler_list);
+
+	// If B_NO_ENABLE_COUNTER is set, we're being asked to not alter
+	// whether the interrupt should be enabled or not
+	if (io->use_enable_counter) {
+		if (io_vectors[vector].enable_count++ == 0)
+			arch_int_enable_io_interrupt(vector);
+	}
 
 	release_spinlock(&io_vectors[vector].vector_lock);
 	restore_interrupts(state);
@@ -118,41 +130,14 @@ install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 }
 
 
-/** install a handler to be called when an interrupt is triggered
- *	for the given irq with data as the argument
- */
-
-long
-install_io_interrupt_handler(long irq, interrupt_handler handler, void *data, ulong flags)
-{
-	// ToDo: this is x86 specific
-	long vector = irq + 0x20;
-
-	status_t status = install_interrupt_handler(vector, handler, data);
-	if (status != B_OK)
-		return status;
-
-	/* If we were passed the bit-flag B_NO_ENABLE_COUNTER then
-	 * we're being asked to not alter whether the interrupt is set
-	 * regardless of setting.
-	 */
-	if ((flags & B_NO_ENABLE_COUNTER) == 0)
-		arch_int_enable_io_interrupt(irq);
-
-	return B_OK;
-}
-
-
-/**	Removes and interrupt handler.
- *	Read the notes for install_interrupt_handler!
- */
+/** Remove a previously installed interrupt handler */
 
 status_t
-remove_interrupt_handler(long vector, interrupt_handler handler, void *data)
+remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 {
-	struct io_handler *io = NULL;
 	status_t status = B_BAD_VALUE;
-	int state;
+	struct io_handler *io = NULL; 
+	cpu_status state;
 
 	if (vector < 0 || vector >= NUM_IO_VECTORS)
 		return B_BAD_VALUE;
@@ -171,40 +156,24 @@ remove_interrupt_handler(long vector, interrupt_handler handler, void *data)
 		/* we have to match both function and data */
 		if (io->func == handler && io->data == data) {
 			remque(io);
+
+			// Check if we need to disable the interrupt
+			if (io->use_enable_counter && --io_vectors[vector].enable_count == 0)
+				arch_int_disable_io_interrupt(vector);
+
 			status = B_OK;
 			break;
 		}
 	}
 
-	/* to finish we need to release our locks and return
-	 * the value rv
-	 */
 	release_spinlock(&io_vectors[vector].vector_lock);
 	restore_interrupts(state);
 
-	/* if the handler could be found and removed, we still have to free it */
+	// if the handler could be found and removed, we still have to free it
 	if (status == B_OK)
 		free(io);
 
 	return status;
-} 
-
-
-/** remove an interrupt handler previously inserted */
-
-long
-remove_io_interrupt_handler(long irq, interrupt_handler handler, void *data)
-{
-	long vector = irq + 0x20;
-	status_t status = remove_interrupt_handler(vector, handler, data);
-	if (status < B_OK)
-		return status;
-
-	/* Check if we need to disable interrupts... */
-	if (io_vectors[vector].handler_list.next != &io_vectors[vector].handler_list)
-		arch_int_disable_io_interrupt(irq);
-
-	return B_OK;
 } 
 
 

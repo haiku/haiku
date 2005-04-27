@@ -1,10 +1,11 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 
 #include <boot/kernel_args.h>
 #include <vm.h>
@@ -120,10 +121,11 @@ arch_smp_init(kernel_args *args)
 		// set up the local apic on the boot cpu
 		arch_smp_per_cpu_init(args, 0);
 
-		install_interrupt_handler(0xfb, &i386_timer_interrupt, NULL);
-		install_interrupt_handler(0xfd, &i386_ici_interrupt, NULL);
-		install_interrupt_handler(0xfe, &i386_smp_error_interrupt, NULL);
-		install_interrupt_handler(0xff, &i386_spurious_interrupt, NULL);
+		// I/O interrupts start at ARCH_INTERRUPT_BASE, so all interrupts are shifted
+		install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE, &i386_timer_interrupt, NULL, 0);
+		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &i386_ici_interrupt, NULL, 0);
+		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &i386_smp_error_interrupt, NULL, 0);
+		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &i386_spurious_interrupt, NULL, 0);
 	}
 	return B_OK;
 }

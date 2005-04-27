@@ -1,9 +1,17 @@
-/* 
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
-#ifndef _NEWOS_KERNEL_ARCH_I386_INTERRUPTS_H
-#define _NEWOS_KERNEL_ARCH_I386_INTERRUPTS_H
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+#ifndef _KERNEL_ARCH_x86_INTERRUPTS_H
+#define _KERNEL_ARCH_x86_INTERRUPTS_H
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void trap0();void trap1();void trap2();void trap3();void trap4();void trap5();
 void trap6();void trap7();void trap9();void trap10();void trap11();
@@ -17,5 +25,9 @@ void double_fault();	// int 8
 void trap99();
 
 void trap251();void trap252();void trap253();void trap254();void trap255();
+
+#ifdef __cplusplus
+}
 #endif
 
+#endif	/* _KERNEL_ARCH_x86_INTERRUPTS_H */
