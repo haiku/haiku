@@ -931,6 +931,7 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			if (view)
 			{
 				STRACE(("Calling BView(%s)::FrameMoved( %f, %f )\n", view->Name(), where.x, where.y));
+				// TODO: only if B_FRAME_EVENTS, no?
 				view->FrameMoved( where );
 			}
 			else
@@ -955,6 +956,7 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			view			= findView(top_view, token);
 			if (view){
 				STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", view->Name(), newWidth, newHeight));
+				// TODO: only if B_FRAME_EVENTS, no?
 				view->FrameResized( newWidth, newHeight );
 			}
 			else

@@ -414,6 +414,15 @@ BView::ConvertToParent(BPoint *pt) const
 
 	check_lock_no_pick();
 
+	// TODO: handle scale
+
+	BPoint origin = Origin();
+
+	// our local coordinate transformation
+	pt->x -= origin.x;
+	pt->y -= origin.y;
+
+	// our bounds location within the parent
 	pt->x += originX;
 	pt->y += originY;
 }
@@ -422,16 +431,9 @@ BView::ConvertToParent(BPoint *pt) const
 BPoint
 BView::ConvertToParent(BPoint pt) const
 {
-	if (!parent)
-		return pt;
+	ConvertToParent(&pt);
 
-	check_lock_no_pick();
-
-	BPoint p;
-	p.x = pt.x + originX;
-	p.y = pt.y + originY;
-
-	return p;
+	return pt;
 }
 
 
@@ -443,24 +445,25 @@ BView::ConvertFromParent(BPoint *pt) const
 
 	check_lock_no_pick();
 
+	// TODO: handle scale
+
+	BPoint origin = Origin();
+	// our bounds location within the parent
 	pt->x -= originX;
 	pt->y -= originY;
+
+	// our local coordinate transformation
+	pt->x += origin.x;
+	pt->y += origin.y;
 }
 
 
 BPoint
 BView::ConvertFromParent(BPoint pt) const
 {
-	if (!parent)
-		return pt;
+	ConvertFromParent(&pt);
 
-	check_lock_no_pick();
-
-	BPoint p;
-	p.x = pt.x - originX;
-	p.y = pt.y - originY;
-
-	return p;
+	return pt;
 }
 
 
@@ -472,6 +475,14 @@ BView::ConvertToParent(BRect *rect) const
 
 	check_lock_no_pick();
 
+	// TODO: handle scale
+
+	BPoint origin = Origin();
+
+	// our local coordinate transformation
+	rect->OffsetBy(-origin.x, -origin.y);
+
+	// our bounds location within the parent
 	rect->OffsetBy(originX, originY);
 }
 
@@ -479,12 +490,9 @@ BView::ConvertToParent(BRect *rect) const
 BRect
 BView::ConvertToParent(BRect rect) const
 {
-	if (!parent)
-		return rect;
+	ConvertToParent(&rect);
 
-	check_lock_no_pick();
-
-	return rect.OffsetByCopy(originX, originY);
+	return rect;
 }
 
 
@@ -496,19 +504,24 @@ BView::ConvertFromParent(BRect *rect) const
 
 	check_lock_no_pick();
 
+	// TODO: handle scale
+
+	BPoint origin = Origin();
+
+	// our bounds location within the parent
 	rect->OffsetBy(-originX, -originY);
+
+	// our local coordinate transformation
+	rect->OffsetBy(origin.x, origin.y);
 }
 
 
 BRect
 BView::ConvertFromParent(BRect rect) const
 {
-	if (!parent)
-		return rect;
+	ConvertFromParent(&rect);
 
-	check_lock_no_pick();
-
-	return rect.OffsetByCopy(-originX, -originY);
+	return rect;
 }
 
 
@@ -528,16 +541,9 @@ BView::ConvertToScreen(BPoint *pt) const
 BPoint
 BView::ConvertToScreen(BPoint pt) const
 {
-	if (!parent)
-		return pt;
+	ConvertToScreen(&pt);
 
-	do_owner_check_no_pick();
-
-	BPoint p;
-	p = ConvertToParent(pt);
-	p = parent->ConvertToScreen(p);
-
-	return p;
+	return pt;
 }
 
 
@@ -561,20 +567,9 @@ BView::ConvertFromScreen(BPoint *pt) const
 BPoint
 BView::ConvertFromScreen(BPoint pt) const
 {
-	if (!parent) {
-		if (owner)
-			return owner->ConvertFromScreen(pt);
+	ConvertFromScreen(&pt);
 
-		return pt;
-	}
-
-	do_owner_check_no_pick();
-
-	BPoint p;
-	p = ConvertFromParent(pt);
-	p = parent->ConvertFromScreen(p);
-
-	return p;
+	return pt;
 }
 
 
@@ -594,13 +589,8 @@ BView::ConvertToScreen(BRect *rect) const
 BRect
 BView::ConvertToScreen(BRect rect) const
 {
-	if (!parent)
-		return rect;
+	ConvertToScreen(&rect);
 
-	do_owner_check_no_pick();
-
-	rect = ConvertToParent(rect);
-	rect = parent->ConvertToScreen(rect);
 	return rect;
 }
 
@@ -621,13 +611,8 @@ BView::ConvertFromScreen(BRect *rect) const
 BRect
 BView::ConvertFromScreen(BRect rect) const
 {
-	if (!parent)
-		return rect;
+	ConvertFromScreen(&rect);
 
-	do_owner_check_no_pick();
-
-	rect = ConvertFromParent(rect);
-	rect = parent->ConvertFromScreen(rect);
 	return rect;
 }
 
@@ -773,9 +758,8 @@ BView::SetOrigin(BPoint pt)
 void
 BView::SetOrigin(float x, float y)
 {
-	// TODO: maybe app_server should do a redraw? - WRITE down into specs
-
-	if (x == originX && y == originY)
+	if (!(fState->flags & B_VIEW_ORIGIN_BIT) &&
+		x == fState->coordSysOrigin.x && y == fState->coordSysOrigin.y)
 		return;
 
 	if (do_owner_check()) {
@@ -786,6 +770,8 @@ BView::SetOrigin(float x, float y)
 
 	// invalidate this flag, to stay in sync with app_server
 	fState->flags |= B_VIEW_ORIGIN_BIT;
+// TODO: Bounds() is effected by SetOrigin() (?),
+// so should we set the COORD_BIT too?
 
 	// our local coord system origin has changed, so when archiving we'll add this too
 	fState->archivingFlags |= B_VIEW_ORIGIN_BIT;
@@ -793,7 +779,7 @@ BView::SetOrigin(float x, float y)
 
 
 BPoint
-BView::Origin(void) const
+BView::Origin() const
 {
 	if (fState->flags & B_VIEW_ORIGIN_BIT)  {
 		do_owner_check();
@@ -1291,6 +1277,7 @@ BView::ScrollBy(float dh, float dv)
 		owner->fLink->Flush();
 
 		fState->flags |= B_VIEW_COORD_BIT;
+		fState->flags |= B_VIEW_ORIGIN_BIT;
 	}
 
 	// we modify our bounds rectangle by dh/dv coord units hor/ver.
