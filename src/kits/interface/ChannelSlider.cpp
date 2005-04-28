@@ -1,10 +1,9 @@
 /* 
  * Copyright 2005, Haiku Inc. All Rights Reserved.
+ * Author: Stefano Ceccherini (burton666@libero.it)
  * Distributed under the terms of the MIT License.
  */
-
-// TODO: Currently it works correctly only with vertical sliders.
-
+ 
 #include <Bitmap.h>
 #include <ChannelSlider.h>
 #include <Debug.h>
@@ -255,54 +254,55 @@ BChannelSlider::MouseDown(BPoint where)
 			frame.OffsetBy(fClickDelta);
 			
 			float range = ThumbRangeFor(channel);
-			
 			if (Vertical()) {		
 				fMinpoint = frame.top + frame.Height() / 2;
 				frame.bottom += range;
 			} else {
-				fMinpoint = frame.Width();
+				// TODO: Fix this
 				frame.right += range;
+				fMinpoint = frame.Width();
 			}
-			
 			// Found. Now set the initial values
 			if (frame.Contains(where)) {
-				uint32 buttons = 0;
-				BMessage *currentMessage = Window()->CurrentMessage();
-				if (currentMessage != NULL)
-					currentMessage->FindInt32("buttons", (int32 *)&buttons);
-				
-				fAllChannels = (buttons & B_SECONDARY_MOUSE_BUTTON) == 0;
 				fCurrentChannel = channel;
-				
-				if (fInitialValues != NULL && fAllChannels) {
-					delete[] fInitialValues;
-					fInitialValues = NULL;
-				}
-				
-				if (fInitialValues == NULL)
-					fInitialValues = new int32[CountChannels()];
-				
-				if (fAllChannels) {
-					for (int32 i = 0; i < CountChannels(); i++)
-						fInitialValues[i] = ValueFor(i);
-				} else
-					fInitialValues[fCurrentChannel] = ValueFor(fCurrentChannel);								
-				
-				if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
-					if (!IsTracking()) {
-						SetTracking(true);
-						DrawThumbs();
-						Flush();	
-					}
-					
-					MouseMovedCommon(where, where);
-					SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
-				
-				} else {
-					debugger("BChannelSlider::MouseDown(): SYNCHRONOUS CONTROLS NOT YET SUPPORTED");
-				}
-						
 				break;
+			}	
+		}	
+		
+		if (fCurrentChannel != -1) {		
+			uint32 buttons = 0;
+			BMessage *currentMessage = Window()->CurrentMessage();
+			if (currentMessage != NULL)
+				currentMessage->FindInt32("buttons", (int32 *)&buttons);
+					
+			fAllChannels = (buttons & B_SECONDARY_MOUSE_BUTTON) == 0;
+					
+			if (fInitialValues != NULL && fAllChannels) {
+				delete[] fInitialValues;
+				fInitialValues = NULL;
+			}
+					
+			if (fInitialValues == NULL)
+				fInitialValues = new int32[CountChannels()];
+					
+			if (fAllChannels) {
+				for (int32 i = 0; i < CountChannels(); i++)
+					fInitialValues[i] = ValueFor(i);
+			} else
+				fInitialValues[fCurrentChannel] = ValueFor(fCurrentChannel);								
+			
+			if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
+				if (!IsTracking()) {
+					SetTracking(true);
+					DrawThumbs();
+					Flush();	
+				}
+				
+				MouseMovedCommon(where, where);
+				SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+					
+			} else {
+				debugger("BChannelSlider::MouseDown(): SYNCHRONOUS CONTROLS NOT YET SUPPORTED");
 			}
 		}
 	}
@@ -430,7 +430,7 @@ BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed
 	BPoint bottomRight;
 	if (Vertical()) {
 		leftTop.Set(area.left + hCenter, area.top + vCenter);
-		bottomRight.Set(leftTop.x , leftTop.y + ThumbRangeFor(channel));
+		bottomRight.Set(leftTop.x, leftTop.y + ThumbRangeFor(channel));
 	} else {
 		leftTop.Set(area.left, area.top + vCenter);
 		bottomRight.Set(area.left + ThumbRangeFor(channel), leftTop.y);
@@ -441,6 +441,8 @@ BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed
 	BPoint thumbLocation = leftTop;
 	if (Vertical())
 		thumbLocation.y += ThumbDeltaFor(channel);
+	else
+		thumbLocation.x += ThumbDeltaFor(channel);
 	
 	DrawThumb(into, channel, thumbLocation, pressed);
 }
@@ -594,7 +596,7 @@ BChannelSlider::FinishChange()
 	if (fInitialValues != NULL) {
 		if (fAllChannels) {
 			// TODO: Iterate through the list of channels, and invoke only
-			// for changed values
+			// for changed values ?
 			
 			InvokeChannel();
 			
@@ -623,30 +625,24 @@ BChannelSlider::UpdateFontDimens()
 
 void
 BChannelSlider::DrawThumbs()
-{
-	BRect first = ThumbFrameFor(0);
-	BRect last = ThumbFrameFor(CountChannels() - 1);
-		
+{	
 	if (fBacking == NULL) {
-		BRect bitmapFrame;
-		if (Vertical()) {
-			bitmapFrame.top = first.top - ThumbRangeFor(0);
-			bitmapFrame.bottom = last.bottom;
-			bitmapFrame.left = first.left;
-			bitmapFrame.right = last.right;
-		} else {
-			bitmapFrame.top = first.top;
-			bitmapFrame.bottom = last.bottom;
-			bitmapFrame.left = first.left;
-			bitmapFrame.right = last.right + ThumbRangeFor(0);
-		}
+		// This is the idea: we build a bitmap by taking the coordinates
+		// of the first and last thumb frames (top/left and bottom/right),
+		// and by enlarging this rectangle a bit (hence the "InsetBy(-3, -3)").
+		BRect first = ThumbFrameFor(0);
+		BRect last = ThumbFrameFor(CountChannels() - 1);
+		BRect bitmapFrame(first.LeftTop(), last.RightBottom());
 		
-		bitmapFrame.InsetBy(-3, -3);
-		bitmapFrame.OffsetTo(B_ORIGIN);
+		if (Vertical())
+			bitmapFrame.top -= ThumbRangeFor(0);
+		else
+			bitmapFrame.right += ThumbRangeFor(0);
 	
+		bitmapFrame.InsetBy(-3, -3);
 		fBacking = new BBitmap(bitmapFrame, BScreen(Window()).ColorSpace(), true, false);
 		if (fBacking->Lock()) {
-			fBackingView = new BView(bitmapFrame, "backing view", B_FOLLOW_NONE, B_WILL_DRAW);
+			fBackingView = new BView(bitmapFrame.OffsetToCopy(B_ORIGIN), "backing view", B_FOLLOW_NONE, B_WILL_DRAW);
 			fBacking->AddChild(fBackingView);
 			fBackingView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			fBackingView->SetLowColor(fBackingView->ViewColor());
@@ -661,24 +657,58 @@ BChannelSlider::DrawThumbs()
 	if (fBacking->Lock()) {
 		// Clear the view's background
 		fBackingView->FillRect(fBackingView->Bounds(), B_SOLID_LOW);
+		
+		BRect channelArea;
 		for (int32 channel = 0; channel < CountChannels(); channel++) {
-			BRect channelArea = ThumbFrameFor(channel);
-			// TODO: HACK!!! What am I missing ?
-			// Why do I need this to draw the channel in the correct location ?
-			channelArea.OffsetBy(3, -21);	
-			DrawChannel(fBackingView, channel, channelArea, fMinpoint != 0); 
+			channelArea = ThumbFrameFor(channel);
+			// TODO: This is (apparently) needed because ThumbFrameFor() doesn't
+			// take into account that the view we draw on is attached to an offscreen
+			// bitmap. Still this doesn't make much sense:
+			// could be that I'm simply missing something.
+			if (Vertical())
+				channelArea.OffsetBy(0, -channelArea.top);			
+			else
+				channelArea.OffsetBy(0, -channelArea.Height());
+			
+			bool pressed = fMinpoint != 0 && (channel == fCurrentChannel || fAllChannels);	
+			DrawChannel(fBackingView, channel, channelArea, pressed); 
 		}
+				
 		fBackingView->Sync();
 		fBacking->Unlock();
 	}
-		
-	fClickDelta = drawHere;
-	
-	// TODO: Look at the above comment
-	fClickDelta.y -= 21;
-	fClickDelta.x += 3;
 	
 	DrawBitmapAsync(fBacking, drawHere);
+	
+	// We also draw the channel value, unlike R5.
+	// TODO: just a prototype for now, it isn't so cool. 
+	// for Axel: Not sure if this is what you wanted, feel free to change this
+	if (fCurrentChannel != -1 && fMinpoint != 0) {
+		char valueString[64];
+		snprintf(valueString, 64, "%ld", ValueFor(fCurrentChannel));
+		BPoint stringPoint = drawHere;
+		float stringWidth = StringWidth("100");
+		stringPoint.x += (fBacking->Bounds().Width() - stringWidth) / 2;
+		stringPoint.y += fBacking->Bounds().Height() + fLineFeed;
+		BRect stringRect(stringPoint, stringPoint);
+		stringRect.right += stringWidth;
+		stringRect.top -= fLineFeed;
+		
+		SetHighColor(ViewColor());
+		stringRect.InsetBy(-5, -2);
+		FillRect(stringRect);
+		
+		SetHighColor(0, 0, 0);
+		DrawString(valueString, stringPoint);
+	}
+	
+	// fClickDelta is used in MouseMoved()
+	fClickDelta = drawHere;
+	
+	if (Vertical())
+		fClickDelta.y -= ThumbFrameFor(0).top;
+	else
+		fClickDelta.y -= ThumbFrameFor(0).Height();
 }
 
 
@@ -731,7 +761,7 @@ BChannelSlider::MouseMovedCommon(BPoint point, BPoint point2)
 		SetAllValue(value);
 	else
 		SetValueFor(fCurrentChannel, value);
-		
+	
 	InvokeNotifyChannel(ModificationMessage());
 	DrawThumbs();
 }
