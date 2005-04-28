@@ -26,25 +26,25 @@
 //	Description:	Global functions and variables for the Interface Kit
 //
 //------------------------------------------------------------------------------
-
-#include <AppServerLink.h>
 #include <InterfaceDefs.h>
-#include <ServerProtocol.h>
+#include <Menu.h>
+#include <Roster.h>
 #include <ScrollBar.h>
 #include <Screen.h>
-#include <Roster.h>
-#include <Menu.h>
-#include <stdlib.h>
 #include <TextView.h>
 
-#include <WidthBuffer.h>
+#include <stdlib.h>
 
 // Private definitions not placed in public headers
 extern "C" void _init_global_fonts();
 extern "C" status_t _fini_interface_kit_();
 
+#include <AppServerLink.h>
 #include <InputServerTypes.h>
 #include <input_globals.h>
+#include <ServerProtocol.h>
+#include <WidthBuffer.h>
+
 
 using namespace BPrivate;
 
@@ -629,11 +629,11 @@ _init_interface_kit_()
 	BTextView::sWidthAtom = 0;
 	BTextView::sWidths = new _BWidthBuffer_;
 	
+	_init_global_fonts();
+
 	status_t status = load_menu_settings(BMenu::sMenuInfo);
 
 	// TODO: fill the other static members
-
-	_init_global_fonts();
 
 	return status;
 }
