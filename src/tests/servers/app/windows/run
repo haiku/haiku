@@ -1,5 +1,5 @@
 #!/bin/sh
 
 ../../../../../distro/x86.R1/beos/system/servers/app_server &
-sleep 1s
+sleep 3s
 ../../../../../tests/servers/app/windows/Window
