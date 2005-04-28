@@ -121,6 +121,8 @@ public:
 			void				GoRedraw(const Layer *layer, const BRegion &region);
 			void				GoChangeWinBorderFeel(const WinBorder *winBorder, int32 newFeel);
 
+	virtual	void				Draw(const BRect &r);
+
 			// Debug methods
 			void				PrintToStream(void);
 			thread_id			LockingThread() { return fAllRegionsLock.LockingThread(); }

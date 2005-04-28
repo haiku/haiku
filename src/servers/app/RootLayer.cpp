@@ -51,6 +51,7 @@
 #include "Decorator.h"
 
 //#define DEBUG_ROOTLAYER
+#define APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
 
 #ifdef DEBUG_ROOTLAYER
 	#define STRACE(a) printf a
@@ -1445,6 +1446,17 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 						show_final_scene(exFocus, exActive);
 					if (string)
 						free(string);
+
+					#ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
+					{
+						// to draw the current Workspace index on screen.
+					BRegion	reg(fVisible);
+					fDriver->ConstrainClippingRegion(&reg);
+					Draw(reg.Frame());
+					fDriver->ConstrainClippingRegion(NULL);
+					}
+					#endif
+
 					break;
 				}	
 			}
@@ -1993,4 +2005,15 @@ void RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 	fLastMouseMoved = LayerAt(fLastMousePossition);
 	if (fLastMouseMoved == NULL)
 		debugger("RootLayer::KeyboardEventHandler: 'fLastMouseMoved' can't be null.\n");
+}
+
+void RootLayer::Draw(const BRect &r)
+{
+	fDriver->FillRect(r, fLayerData->ViewColor());
+#ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
+	char	string[30];
+	sprintf(string, "Workspace %ld", fActiveWksIndex+1);
+	fDriver->DrawString(string, strlen(string), BPoint(5,15),
+						fLayerData);
+#endif
 }
