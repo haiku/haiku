@@ -36,7 +36,19 @@ UsePrivateHeaders input ;
 UsePrivateHeaders interface ;
 UsePrivateHeaders storage ;
 
+
 SubDirC++Flags -DADD_ON_STABLE_SECONDS=1 ;	# for AddOnMonitorHandler.cpp
+if $(TARGET_PLATFORM) != haiku {
+	SubDirC++Flags -DCOMPILE_FOR_R5 ;
+	#APPSERVER_TEST_MODE = 1 ;
+	if $(APPSERVER_TEST_MODE) {
+		SubDirC++Flags -DAPPSERVER_TEST_MODE ;
+	} else {
+		SubDirC++Flags -DAPPSERVER_R5_COMM ;
+	}
+} else {
+	APPSERVER_TEST_MODE = 1 ;
+}
 
 Server input_server :
 	InputServer.cpp
@@ -64,11 +76,23 @@ Server input_server :
 	: stdc++.r4
 ;
 
-if $(COMPILE_FOR_R5) {
-	LinkSharedOSLibs input_server : be ;
+if $(TARGET_PLATFORM) = haiku {
+        # link for Haiku
+
+        LinkSharedOSLibs input_server :
+                libroot.so libbe.so ;
+
 } else {
-	LinkSharedOSLibs input_server : libroot.so libbe.so ;
+        # link as test application under R5
+
+        LinkSharedOSLibs input_server :
+                be ;
+	if $(APPSERVER_TEST_MODE) {
+		LinkSharedOSLibs input_server :
+                <boot!home!config!lib>libopenbeos.so ;
+	}
 }
+
 
 SEARCH on [ FGristFiles AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp

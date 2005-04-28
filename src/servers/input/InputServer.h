@@ -53,13 +53,18 @@
 #include <Screen.h>
 #include <SupportDefs.h>
 
+#define APPSERVER_PORTLINK_COMM
+//#define R5_CURSOR_COMM // define this when R5 cursor communication should be used
+// #define APPSERVER_R5_COMM // define this when R5 app_server communication should be used
 
-//#define USE_R5_STYLE_COMM
-	// define this when R5 input_server communication should be used
+#define INPUTSERVER_SIGNATURE "application/x-vnd.Be-input_server"	// use this when target should replace R5 input_server
 
-#define INPUTSERVER_SIGNATURE "application/x-vnd.Be-input_server"
+#ifdef APPSERVER_R5_COMM
+	#define R5_CURSOR_COMM
+	#undef APPSERVER_PORTLINK_COMM
+#endif
 
-#ifndef USE_R5_STYLE_COMM
+#ifdef APPSERVER_PORTLINK_COMM
 class BPortLink;
 #endif
 
@@ -234,16 +239,16 @@ private:
 	BottomlineWindow 	*fBLWindow;
 	bool			fIMAware;
 
-#ifndef USE_R5_STYLE_COMM
+#ifdef 	APPSERVER_PORTLINK_COMM
 	// added this to communicate via portlink
 	BPortLink 		*fAppServerLink;
-#else
-
+#endif
+#ifdef R5_CURSOR_COMM
 	sem_id 		fCursorSem;
 	port_id		fAsPort;
 	area_id		fCloneArea;
 	uint32		*fAppBuffer;
-#endif 
+#endif
 	
 #if DEBUG == 2
 public:

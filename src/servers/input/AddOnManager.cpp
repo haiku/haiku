@@ -73,10 +73,7 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 		return addon_image;
 	}
 	
-	BEntry parent;
-	entry.GetParent(&parent);
-	BPath parentPath(&parent);
-	BString pathString = parentPath.Path();
+	BString pathString = path.Path();
 	
 	if (pathString.FindFirst("input_server/devices")>0) {
 		BInputServerDevice *(*instantiate_func)();
@@ -157,6 +154,9 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 		
 		RegisterMethod(ism, ref, addon_image);
 	
+	} else {
+		PRINTERR(("AddOnManager::RegisterAddOn(): addon type not found for \"%s\" \n", path.Path()));
+		goto exit_error;
 	}
 	
 	return B_OK;
@@ -239,6 +239,9 @@ AddOnManager::UnregisterAddOn(BEntry &entry)
 void
 AddOnManager::RegisterAddOns()
 {
+	CALLED();
+	status_t err;
+
 	class IAHandler : public AddOnMonitorHandler {
 	private:
 		AddOnManager * fManager;
@@ -268,6 +271,17 @@ AddOnManager::RegisterAddOns()
 		}
 	};
 
+	fHandler = new IAHandler(this);
+	fAddOnMonitor = new AddOnMonitor(fHandler);
+
+#ifndef APPSERVER_TEST_MODE
+	err = fAddOnMonitor->InitCheck();
+        if (err != B_OK) {
+                PRINTERR(("AddOnManager::RegisterAddOns(): fAddOnMonitor->InitCheck() returned %s\n",
+                        strerror(err)));
+                return;
+        }
+
 	const directory_which directories[] = {
 		B_USER_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
@@ -278,8 +292,6 @@ AddOnManager::RegisterAddOns()
 		"input_server/filters",
 		"input_server/methods"
 	};
-	fHandler = new IAHandler(this);
-	fAddOnMonitor = new AddOnMonitor(fHandler);
 
 	node_ref nref;
 	BDirectory directory;
@@ -294,6 +306,10 @@ AddOnManager::RegisterAddOns()
 				fHandler->AddDirectory(&nref);
 			}
 		}
+#else
+	BEntry entry("/boot/home/svnhaiku/trunk/tests/servers/input/view_input_device/input_server/devices/ViewInputDevice");
+	RegisterAddOn(entry);
+#endif
 
 }
 

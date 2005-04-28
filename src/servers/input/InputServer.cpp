@@ -148,7 +148,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 
 	gDeviceManager.LoadState();
 
-#ifdef USE_R5_STYLE_COMM
+#ifdef R5_CURSOR_COMM
 	if (has_data(find_thread(NULL))) {
 		PRINT(("HasData == YES\n")); 
 		int32 buffer[2];
@@ -179,12 +179,13 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 		if ((err = send_data(appThreadId, 0, buffer, sizeof(buffer)))!=B_OK)
 			PRINTERR(("error when send_data %s\n", strerror(err)));
 	}
-#else
+#endif
+#ifdef APPSERVER_PORTLINK_COMM
 	port_id input_port = find_port(SERVER_INPUT_PORT);
 	if (input_port == B_NAME_NOT_FOUND)
 		PRINTERR(("input_server couldn't find app_server's input port\n"));
 	fAppServerLink = new BPortLink(input_port);
-#endif // USE_R5_STYLE_COMM
+#endif 
 
 	InitKeyboardMouseStates();
 
@@ -205,12 +206,12 @@ InputServer::~InputServer(void)
 	fAddOnManager->Lock();
 	fAddOnManager->Quit();
 	
-#ifdef USE_R5_STYLE_COMM
+#ifdef R5_CURSOR_COMM
 	delete_port(fAsPort);
 	fAsPort = -1;
 	fAppBuffer = NULL;
 	delete_area(fCloneArea);
-#endif // USE_R5_STYLE_COMM
+#endif // R5_CURSOR_COMM
 
 #if DEBUG == 2
 	fclose(sLogFile);
@@ -765,7 +766,7 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
    		case B_MOUSE_UP:
    		case FAST_MOUSE_MOVED:
    			// get point and button from msg
-    		if((outbound->FindInt32("x", &xValue) == B_OK) 
+    		if ((outbound->FindInt32("x", &xValue) == B_OK) 
     			&& (outbound->FindInt32("y", &yValue) == B_OK)) {
 				fMousePos.x += xValue;
 				fMousePos.y -= yValue;
@@ -776,9 +777,15 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 				outbound->AddInt32("modifiers", fKey_info.modifiers);
 				PRINT(("new position : %f, %f, %ld, %ld\n", fMousePos.x, fMousePos.y, xValue, yValue));
 	   		}
-
-#ifdef USE_R5_STYLE_COMM
-			if (fAppBuffer) {
+		else if (outbound->FindPoint("where", &fMousePos) == B_OK) {
+			outbound->RemoveName("where");
+			fMousePos.ConstrainTo(fFrame);
+			outbound->AddPoint("where", fMousePos);
+			outbound->AddInt32("modifiers", fKey_info.modifiers);
+			PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
+		}
+#ifdef R5_CURSOR_COMM
+		if (fAppBuffer) {
 				fAppBuffer[0] =
        		    	(0x3 << 30)
                		| ((uint32)fMousePos.x & 0x7fff) << 15
@@ -1195,7 +1202,7 @@ InputServer::DispatchEvent(BMessage *message)
 		}
 	}
 	
-#ifndef USE_R5_STYLE_COMM
+#ifdef APPSERVER_PORTLINK_COMM
 	if (!fAppServerLink) {
 		debugger("InputServer::DispatchEvent(): app_server link not valid\n");
 		return false;
@@ -1214,7 +1221,7 @@ InputServer::DispatchEvent(BMessage *message)
     			message->FindInt32("buttons",buttons);
     			fAppServerLink->Attach(&buttons,sizeof(uint32));
     			fAppServerLink->Flush();
-    			PRINT(("B_MOUSE_MOVED: x = %lu: y = %lu: time = %llu: buttons = %lu\n",pt.x,pt.y,time,buttons));
+    			PRINT(("B_MOUSE_MOVED: x = %f: y = %f: time = %llu: buttons = %lu\n",pt.x,pt.y,time,buttons));
     		break;
     		}
     	case B_MOUSE_DOWN:{
@@ -1388,7 +1395,7 @@ InputServer::DispatchEvent(BMessage *message)
    			
 		}
 	
-#else // USE_R5_STYLE_COMM
+#else // APPSERVER_PORTLINK_COMM
 
 	status_t  	err;
 	
@@ -1400,7 +1407,7 @@ InputServer::DispatchEvent(BMessage *message)
 	if (fAsPort>0)
 		write_port(fAsPort, 0, buffer, length);
 	
-#endif	// USE_R5_STYLE_COMM
+#endif	// APPSERVER_PORTLINK_COMM
 
     return true;
 }
