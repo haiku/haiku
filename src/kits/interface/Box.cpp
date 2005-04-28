@@ -45,7 +45,8 @@
 //------------------------------------------------------------------------------
 BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 		   border_style border)
-	:	BView(frame, name, resizingMode, flags)
+	:	BView(frame, name, resizingMode, flags),
+		fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -230,6 +231,8 @@ void BBox::FrameResized(float width, float height)
 {
 	BRect bounds(Bounds());
 
+	// TODO: only invalidate the part that really need redrawing!
+
 	fBounds.right = bounds.right;
 	fBounds.bottom = bounds.bottom;
 
@@ -321,7 +324,6 @@ void BBox::InitObject(BMessage *data)
 {
 	fLabel = NULL;
 	fBounds = Bounds();
-	fStyle = B_FANCY_BORDER;
 	fLabelView = NULL;
 
 	int32 flags = 0;
@@ -340,27 +342,51 @@ void BBox::InitObject(BMessage *data)
 //------------------------------------------------------------------------------
 void BBox::DrawPlain()
 {
-	BRect rect = fBounds;
+	BRect r = fBounds;
 
-	SetHighColor(tint_color(ViewColor(), B_LIGHTEN_MAX_TINT));
-	StrokeLine(BPoint(rect.left, rect.bottom), BPoint(rect.left, rect.top));
-	StrokeLine(BPoint(rect.left+1.0f, rect.top), BPoint(rect.right, rect.top));
-	SetHighColor(tint_color(ViewColor(), B_DARKEN_3_TINT));
-	StrokeLine(BPoint(rect.left+1.0f, rect.bottom), BPoint(rect.right, rect.bottom));
-	StrokeLine(BPoint(rect.right, rect.bottom), BPoint(rect.right, rect.top+1.0f));
+	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
+	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
+
+	BeginLineArray(4);
+		AddLine(BPoint(r.left, r.bottom),
+				BPoint(r.left, r.top), light);
+		AddLine(BPoint(r.left + 1.0f, r.top),
+				BPoint(r.right, r.top), light);
+		AddLine(BPoint(r.left + 1.0f, r.bottom),
+				BPoint(r.right, r.bottom), shadow);
+		AddLine(BPoint(r.right, r.bottom - 1.0f),
+				BPoint(r.right, r.top + 1.0f), shadow);
+	EndLineArray();
 }
 //------------------------------------------------------------------------------
 void BBox::DrawFancy()
 {
-	BRect rect = fBounds;
+	BRect r = fBounds;
 
-	SetHighColor(tint_color(ViewColor(), B_LIGHTEN_MAX_TINT));
-	rect.left++;
-	rect.top++;
-	StrokeRect(rect);
-	SetHighColor(tint_color(ViewColor(), B_DARKEN_3_TINT));
-	rect.OffsetBy(-1,-1);
-	StrokeRect(rect);
+	rgb_color light = tint_color(ViewColor(), B_LIGHTEN_MAX_TINT);
+	rgb_color shadow = tint_color(ViewColor(), B_DARKEN_3_TINT);
+
+	BeginLineArray(8);
+		AddLine(BPoint(r.left, r.bottom),
+				BPoint(r.left, r.top), shadow);
+		AddLine(BPoint(r.left + 1.0f, r.top),
+				BPoint(r.right, r.top), shadow);
+		AddLine(BPoint(r.left + 1.0f, r.bottom),
+				BPoint(r.right, r.bottom), light);
+		AddLine(BPoint(r.right, r.bottom - 1.0f),
+				BPoint(r.right, r.top + 1.0f), light);
+
+		r.InsetBy(1.0, 1.0);
+
+		AddLine(BPoint(r.left, r.bottom),
+				BPoint(r.left, r.top), light);
+		AddLine(BPoint(r.left + 1.0f, r.top),
+				BPoint(r.right, r.top), light);
+		AddLine(BPoint(r.left + 1.0f, r.bottom),
+				BPoint(r.right, r.bottom), shadow);
+		AddLine(BPoint(r.right, r.bottom - 1.0f),
+				BPoint(r.right, r.top + 1.0f), shadow);
+	EndLineArray();
 }
 //------------------------------------------------------------------------------
 void BBox::ClearAnyLabel()
