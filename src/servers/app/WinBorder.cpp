@@ -313,7 +313,36 @@ void WinBorder::MoveBy(float x, float y)
 	if(fDecorator)
 		fDecorator->MoveBy(x,y);
 
-	move_layer(x,y);
+// NOTE: I moved this here from Layer::move_layer()
+// Should this have any bad consequences I'm not aware of?
+zUpdateReg.OffsetBy(x, y);
+yUpdateReg.OffsetBy(x, y);
+fUpdateReg.OffsetBy(x, y);
+
+	if (IsHidden()) {
+// TODO: This is a work around for a design issue:
+// The actual movement of a layer is done during
+// the region rebuild. The mechanism is somewhat
+// complicated and scheduled for refractoring...
+// The problem here for hidden layers is that 
+// they seem *not* to be part of the layer tree.
+// I don't think this is wrong as such, but of
+// course the rebuilding of regions does not take
+// place then. I don't understand yet the consequences
+// for normal views, but this here fixes at least
+// BWindows being MoveTo()ed before they are Show()n.
+// In Layer::move_to, StartRebuildRegions() is called
+// on fParent. But the rest of the this layers tree
+// has not been added to fParent apperantly. So now
+// you ask why fParent is even valid? Me too.
+		fFrame.OffsetBy(x, y);
+		fFull.OffsetBy(x, y);
+		fTopLayer->move_layer(x, y);
+		// ...and here we get really hacky...
+		fTopLayer->fFrame.OffsetTo(0.0, 0.0);
+	} else {
+		move_layer(x, y);
+	}
 }
 
 //! Resizes the winborder with redraw

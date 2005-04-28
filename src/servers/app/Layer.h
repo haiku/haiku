@@ -199,6 +199,10 @@ class Layer {
 			void				Invalidate(const BRegion& region);
 
 			BRect				fFrame;
+// TODO: should be removed or reused in a similar fashion
+// to hold the accumulated origins from the graphics state stack.
+// The same needs to be done for "scale". (Keeping an accumulated
+// value.)
 //			BPoint				fBoundsLeftTop;
 			WinBorder*			fOwner;
 			Layer*				fParent;

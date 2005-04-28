@@ -559,11 +559,13 @@ Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOf
 	switch(action) {
 		case B_LAYER_NONE: {
 			RBTRACE(("1) Layer(%s): Action B_LAYER_NONE\n", GetName()));
+			STRACE(("1) Layer(%s): Action B_LAYER_NONE\n", GetName()));
 			oldRegion = fVisible;
 			break;
 		}
 		case B_LAYER_MOVE: {
 			RBTRACE(("1) Layer(%s): Action B_LAYER_MOVE\n", GetName()));
+			STRACE(("1) Layer(%s): Action B_LAYER_MOVE\n", GetName()));
 			oldRegion = fFullVisible;
 			fFrame.OffsetBy(pt.x, pt.y);
 			fFull.OffsetBy(pt.x, pt.y);
@@ -576,12 +578,14 @@ Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOf
 		}
 		case B_LAYER_SIMPLE_MOVE: {
 			RBTRACE(("1) Layer(%s): Action B_LAYER_SIMPLE_MOVE\n", GetName()));
+			STRACE(("1) Layer(%s): Action B_LAYER_SIMPLE_MOVE\n", GetName()));
 			fFull.OffsetBy(pt.x, pt.y);
 			
 			break;
 		}
 		case B_LAYER_RESIZE: {
 			RBTRACE(("1) Layer(%s): Action B_LAYER_RESIZE\n", GetName()));
+			STRACE(("1) Layer(%s): Action B_LAYER_RESIZE\n", GetName()));
 			oldRegion	= fVisible;
 			
 			fFrame.right	+= pt.x;
@@ -596,6 +600,7 @@ Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOf
 		}
 		case B_LAYER_MASK_RESIZE: {
 			RBTRACE(("1) Layer(%s): Action B_LAYER_MASK_RESIZE\n", GetName()));
+			STRACE(("1) Layer(%s): Action B_LAYER_MASK_RESIZE\n", GetName()));
 			oldRegion = fVisible;
 			
 			BPoint offset, rSize;
@@ -1265,20 +1270,23 @@ Layer::move_layer(float x, float y)
 {
 	fFrameAction = B_LAYER_ACTION_MOVE;
 
-	BPoint pt(x,y);	
-	BRect rect(fFull.Frame().OffsetByCopy(pt));
-	if (fClassID == AS_WINBORDER_CLASS) {
+/*	if (fClassID == AS_WINBORDER_CLASS) {
 		WinBorder	*wb = (WinBorder*)this;
 		wb->zUpdateReg.OffsetBy(x, y);
 		wb->yUpdateReg.OffsetBy(x, y);
 		wb->fUpdateReg.OffsetBy(x, y);
-	}
+	}*/
 	
+	BPoint pt(x, y);	
+	BRect rect(fFull.Frame().OffsetByCopy(pt));
+
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
+
 	fDriver->CopyRegionList(&fRootLayer->fCopyRegList,
 							&fRootLayer->fCopyList,
 							fRootLayer->fCopyRegList.CountItems(),
 							&fFullVisible);
+
 	fParent->Redraw(fRootLayer->fRedrawReg, this);
 	
 	EmptyGlobals();

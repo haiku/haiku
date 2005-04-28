@@ -1227,17 +1227,13 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				}
 			}
 
-			if (winBorderUnder)
-			{
-				BPoint		pt = evt.where;
-				pt			-= fLastMousePossition;
+			if (winBorderUnder) {
 
-				if (fMovingWindow)
-				{
-					if(winBorderUnder->fDecorator)
-						winBorderUnder->fDecorator->MoveBy(pt.x, pt.y);
+				BPoint delta = evt.where - fLastMousePossition;
 
-					winBorderUnder->move_layer(pt.x, pt.y);
+				if (fMovingWindow) {
+
+					winBorderUnder->MoveBy(delta.x, delta.y);
 
 					// I know the way we get BWindow's new location it's not nice :-),
 					// but I don't see another way. fTopLayer.Frame().LeftTop() does not change, ever.
@@ -1245,22 +1241,18 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 					BMessage	msg(B_WINDOW_MOVED);
 					msg.AddPoint("where", location);
 					winBorderUnder->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-				}
-				else if (fResizingWindow)
-				{
-					if(winBorderUnder->fDecorator)
-						winBorderUnder->fDecorator->ResizeBy(pt.x, pt.y);
 
-					winBorderUnder->resize_layer(pt.x, pt.y);
+				} else if (fResizingWindow) {
+
+					winBorderUnder->ResizeBy(delta.x, delta.y);
 
 					BRect		frame(winBorderUnder->fTopLayer->Frame());
 					BMessage	msg(B_WINDOW_RESIZED);
 					msg.AddInt32("width", frame.Width());
 					msg.AddInt32("height", frame.Height());
 					winBorderUnder->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
-				}
-				else
-				{
+
+				} else {
 					winBorderUnder->MouseMoved(winBorderUnder->TellWhat(evt));
 				}
 			}

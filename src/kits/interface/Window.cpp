@@ -1911,7 +1911,6 @@ void BWindow::MoveBy(float dx, float dy)
 
 void BWindow::MoveTo( BPoint point )
 {
-printf("BWindow::MoveTo(%.1f, %.1f)\n", point.x, point.y);
 	Lock();
 	
 	if (fFrame.left != point.x || fFrame.top != point.y) {
