@@ -82,8 +82,24 @@ static int sButtonsState;
 static int32 sPacketSize;
  
 
-/////////////////////////////////////////////////////////////////////////
-// mouse functions
+/** Writes a byte to the mouse device. Uses the control port to indicate
+ *	that the byte is sent to the auxiliary device (mouse), instead of the
+ *	keyboard.
+ */
+
+status_t
+ps2_write_aux_byte(uint8 data)
+{
+	TRACE(("ps2_write_aux_byte(data = %u)\n", data));
+
+	if (ps2_write_ctrl(PS2_CTRL_WRITE_AUX) == B_OK
+		&& ps2_write_data(data) == B_OK
+		&& ps2_read_data(&data) == B_OK)
+		return data == PS2_REPLY_ACK ? B_OK : B_TIMED_OUT;
+
+	return B_ERROR;
+}
+
 
 /*
 static status_t
@@ -102,46 +118,24 @@ ps2_reset_mouse()
 */
 
 
-/** Enables or disables mouse reporting for the ps2 port.
- */
-
-static status_t
-ps2_enable_mouse(bool enable)
-{
-	int32 tries = 2;
-	uint8 read;
-
-	do {
-		write_aux_byte(enable ? PS2_CMD_ENABLE_MOUSE : PS2_CMD_DISABLE_MOUSE);
-		read = read_data_byte();
-		if (read == PS2_RES_ACK)
-			break;
-		spin(100);
-	} while (read == PS2_RES_RESEND && tries-- > 0);
-
-	if (read != PS2_RES_ACK)
-		return B_ERROR;
-	
-	return B_OK;
-}
-
-
 /** Set sampling rate of the ps2 port.
  */
  
 static status_t
 ps2_set_sample_rate(uint32 rate)
 {
-	status_t status = B_ERROR;
+	int32 tries = 5;
 
-	write_aux_byte(PS2_CMD_SET_SAMPLE_RATE);
-	if (read_data_byte() == PS2_RES_ACK) {
-		write_aux_byte(rate);
-		if (read_data_byte() == PS2_RES_ACK)
-			status = B_OK;
+	while (--tries > 0) {
+		status_t status = ps2_write_aux_byte(PS2_CMD_SET_SAMPLE_RATE);
+		if (status == B_OK)
+			status = ps2_write_aux_byte(rate);
+
+		if (status == B_OK)
+			return B_OK;
 	}
 
-	return status;
+	return B_ERROR;
 }
 
 
@@ -187,7 +181,7 @@ ps2_packet_to_movement(uint8 packet[], mouse_movement *pos)
 		pos->wheel_ydelta = (int)wheel_ydelta;
 		pos->wheel_xdelta = (int)wheel_xdelta;
 
-		TRACE(("xdelta: %d, ydelta: %d, buttons %x, clicks: %d, timestamp %Ld\n",
+		TRACE(("xdelta: %d, ydelta: %d, buttons %x, clicks: %ld, timestamp %Ld\n",
 			xDelta, yDelta, buttons, sClickCount, currentTime));
 	}
 }
@@ -219,8 +213,25 @@ ps2_mouse_read(mouse_movement *userMovement)
 }
 
 
-/////////////////////////////////////////////////////////////////////////
-// interrupt
+/** Enables or disables mouse reporting for the PS/2 port.
+ */
+
+static status_t
+set_mouse_enabled(bool enable)
+{
+	int32 tries = 5;
+
+	while (true) {
+		if (ps2_write_aux_byte(enable ?
+				PS2_CMD_ENABLE_MOUSE : PS2_CMD_DISABLE_MOUSE) == B_OK)
+			return B_OK;
+
+		if (--tries <= 0)
+			break;
+	}
+
+	return B_ERROR;
+}
 
 
 /** Interrupt handler for the mouse device. Called whenever the I/O
@@ -239,7 +250,8 @@ handle_mouse_interrupt(void* data)
 		return B_UNHANDLED_INTERRUPT;
 	}
 
-	read = read_data_byte();
+	read = gIsa->read_io_8(PS2_PORT_DATA);
+
 	TRACE(("mouse interrupt : byte %x\n", read));
 	while (packet_buffer_write(sMouseBuffer, &read, sizeof(read)) == 0) {
 		// we start dropping packets when the buffer is full
@@ -264,6 +276,52 @@ handle_mouse_interrupt(void* data)
 
 
 //	#pragma mark -
+
+
+status_t
+probe_mouse(void)
+{
+	int8 deviceId = -1;
+
+	// get device id
+	if (ps2_write_aux_byte(PS2_CMD_GET_DEVICE_ID) == B_OK)
+		ps2_read_data(&deviceId);
+
+	TRACE(("probe_mouse(): device id: %2x\n", deviceId));		
+
+	if (deviceId == 0) {
+		int32 tries = 5;
+
+		while (--tries > 0) {
+			// try to switch to intellimouse mode
+			if (ps2_set_sample_rate(200) == B_OK
+				&& ps2_set_sample_rate(100) == B_OK
+				&& ps2_set_sample_rate(80) == B_OK) {
+				// get device id, again
+				if (ps2_write_aux_byte(PS2_CMD_GET_DEVICE_ID) == B_OK)
+					ps2_read_data(&deviceId);
+				break;
+			}
+		}
+	}
+
+	if (deviceId == PS2_DEV_ID_STANDARD) {
+		sPacketSize = PS2_PACKET_STANDARD;
+		TRACE(("Standard PS/2 mouse found\n"));
+	} else if (deviceId == PS2_DEV_ID_INTELLIMOUSE) {
+		sPacketSize = PS2_PACKET_INTELLIMOUSE;
+		TRACE(("Extended PS/2 mouse found\n"));
+	} else {
+		// Something's wrong. Better quit
+		dprintf("ps2_hid: No mouse found\n");
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
 //	Device functions
 
 
@@ -272,48 +330,27 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 {
 	status_t status;	
 	int8 commandByte;
-	int8 deviceId = -1;
 
 	TRACE(("mouse_open()\n"));	
 
 	if (atomic_or(&sOpenMask, 1) != 0)
 		return B_BUSY;
 
-	// get device id
-	write_aux_byte(PS2_CMD_GET_DEVICE_ID);
-	if (read_data_byte() == PS2_RES_ACK)
-		deviceId = read_data_byte();
+	acquire_sem(gDeviceOpenSemaphore);
 
-	TRACE(("init_driver: device id: %2x\n", deviceId));		
-	if (deviceId == 0) {
-		// try to switch to intellimouse mode
-		ps2_set_sample_rate(200);
-		ps2_set_sample_rate(100);
-		ps2_set_sample_rate(80);
-	}
+	status = probe_mouse();
+	if (status != B_OK)
+		goto err1;
 
-	// get device id, again
-	write_aux_byte(PS2_CMD_GET_DEVICE_ID);
-	if (read_data_byte() == PS2_RES_ACK)
-		deviceId = read_data_byte();
-
-	if (deviceId == PS2_DEV_ID_STANDARD) {
-		sPacketSize = PS2_PACKET_STANDARD;
-		TRACE(("Standard ps2 mouse found\n"));
-	} else if (deviceId == PS2_DEV_ID_INTELLIMOUSE) {
-		sPacketSize = PS2_PACKET_INTELLIMOUSE;
-		TRACE(("Extended ps2 mouse found\n"));
-	} else {
-		TRACE(("No mouse found\n"));
-		put_module(B_ISA_MODULE_NAME);
-		return B_ERROR;	// Something's wrong. Better quit
-	}
+	status = ps2_common_initialize();
+	if (status != B_OK)
+		goto err1;
 
 	sMouseBuffer = create_packet_buffer(MOUSE_HISTORY_SIZE * sPacketSize);
 	if (sMouseBuffer == NULL) {
 		TRACE(("can't allocate mouse actions buffer\n"));
-		put_module(B_ISA_MODULE_NAME);
-		return B_ERROR;
+		status = B_NO_MEMORY;
+		goto err2;
 	}
 
 	// create the mouse semaphore, used for synchronization between
@@ -321,30 +358,50 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	sMouseSem = create_sem(0, "ps2_mouse_sem");
 	if (sMouseSem < 0) {
 		TRACE(("failed creating PS/2 mouse semaphore!\n"));
-		delete_packet_buffer(sMouseBuffer);
-		put_module(B_ISA_MODULE_NAME);
-		return sMouseSem;
+		status = sMouseSem;
+		goto err3;
 	}
-
-	set_sem_owner(sMouseSem, B_SYSTEM_TEAM);
 
 	*_cookie = NULL;
 
-	commandByte = get_command_byte();
-	commandByte |= PS2_BITS_AUX_INTERRUPT;
+	commandByte = ps2_get_command_byte() | PS2_BITS_AUX_INTERRUPT;
 	commandByte &= ~PS2_BITS_MOUSE_DISABLED;
-	set_command_byte(commandByte);
 
-	status = ps2_enable_mouse(true);
+	status = ps2_set_command_byte(commandByte);
 	if (status < B_OK) {
-		TRACE(("mouse_open(): cannot enable PS/2 mouse\n"));	
-		return B_ERROR;
+		TRACE(("mouse_open(): sending command byte failed\n"));
+		goto err4;
 	}
 
-	TRACE(("mouse_open(): mouse succesfully enabled\n"));
+	status = set_mouse_enabled(true);
+	if (status < B_OK) {
+		TRACE(("mouse_open(): cannot enable PS/2 mouse\n"));	
+		goto err4;
+	}
 
-	// register interrupt handler
-	return install_io_interrupt_handler(INT_PS2_MOUSE, handle_mouse_interrupt, NULL, 0);
+	status = install_io_interrupt_handler(INT_PS2_MOUSE,
+		handle_mouse_interrupt, NULL, 0);
+	if (status < B_OK) {
+		TRACE(("mouse_open(): cannot install interrupt handler\n"));
+		goto err4;
+	}
+
+	release_sem(gDeviceOpenSemaphore);
+
+	TRACE(("mouse_open(): mouse succesfully enabled\n"));
+	return B_OK;
+
+err4:
+	delete_sem(sMouseSem);
+err3:
+	delete_packet_buffer(sMouseBuffer);
+err2:
+	ps2_common_uninitialize();
+err1:
+	atomic_and(&sOpenMask, 0);
+	release_sem(gDeviceOpenSemaphore);
+
+	return status;
 }
 
 
@@ -352,13 +409,15 @@ status_t
 mouse_close(void *cookie)
 {
 	TRACE(("mouse_close()\n"));
-	ps2_enable_mouse(false);
+
+	set_mouse_enabled(false);
 
 	delete_packet_buffer(sMouseBuffer);
 	delete_sem(sMouseSem);
 
 	remove_io_interrupt_handler(INT_PS2_MOUSE, handle_mouse_interrupt, NULL);
 
+	ps2_common_uninitialize();
 	atomic_and(&sOpenMask, 0);
 
 	return B_OK;

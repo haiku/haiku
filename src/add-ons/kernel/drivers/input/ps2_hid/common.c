@@ -6,6 +6,7 @@
  * PS/2 hid device driver
  * Authors (in chronological order):
  *		Stefano Ceccherini (burton666@libero.it)
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -19,10 +20,8 @@
 #define DEVICE_KEYBOARD_NAME	"input/keyboard/at/0"
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
-isa_module_info *gIsa = NULL;
 
-device_hooks
-keyboard_hooks = {
+static device_hooks sKeyboardDeviceHooks = {
 	keyboard_open,
 	keyboard_close,
 	keyboard_freecookie,
@@ -35,9 +34,7 @@ keyboard_hooks = {
 	NULL
 };
 
-
-device_hooks
-mouse_hooks = {
+static device_hooks sMouseDeviceHooks = {
 	mouse_open,
 	mouse_close,
 	mouse_freecookie,
@@ -51,6 +48,79 @@ mouse_hooks = {
 };
 
 
+isa_module_info *gIsa = NULL;
+sem_id gDeviceOpenSemaphore;
+
+static int32 sInitialized = 0;
+static uint8 sCommandByte = 0;
+static bool sKeyboardDetected = false;
+
+static sem_id sResultSemaphore;
+static sem_id sResultOwnerSemaphore;
+static uint8 *sResultBuffer;
+static int32 sResultBytes;
+
+
+/**	Wait until the specified status bits are cleared or set, depending on the
+ *	second parameter.
+ *	This currently busy waits, but should nonetheless be avoided in interrupt
+ *	handlers.
+ */
+
+static status_t
+wait_for_status(int32 bits, bool set)
+{
+	int8 read;
+	int32 tries = 100;
+
+	TRACE(("wait_write_ctrl(bits = %lx, %s)\n", bits, set ? "set" : "cleared"));
+
+	while (tries-- > 0) {
+		read = gIsa->read_io_8(PS2_PORT_CTRL);
+		if (((read & bits) != 0) == set)
+			return B_OK;
+
+		spin(100);
+	}
+
+	return B_ERROR;
+}
+
+
+static inline status_t
+wait_for_bits_cleared(int32 bits)
+{
+	return wait_for_status(bits, false);
+}
+
+
+static inline status_t
+wait_for_bits_set(int32 bits)
+{
+	return wait_for_status(bits, true);
+}
+
+
+/**	Reads the command byte from the 8042 controller.
+ *	Since the read goes through the data port, this function must not be
+ *	called when the keyboard driver is up and running.
+ */
+
+static status_t
+get_command_byte(uint8 *data)
+{
+	TRACE(("get_command_byte()\n"));
+
+	if (ps2_write_ctrl(PS2_CTRL_READ_CMD) == B_OK)
+		return ps2_read_data(data);
+
+	return B_ERROR;
+}
+
+
+//	#pragma mark -
+
+
 /** Wait until the control port is ready to be written. This requires that
  *	the "Input buffer full" and "Output buffer full" bits will both be set
  *	to 0. Returns true if the control port is ready to be written, false
@@ -58,131 +128,159 @@ mouse_hooks = {
  *	port is still busy.
  */
 
-bool
-wait_write_ctrl(void)
+status_t
+ps2_write_ctrl(uint8 data)
 {
-	int8 read;
-	int32 tries = 100;
-	TRACE(("wait_write_ctrl()\n"));
-	do {
-		read = gIsa->read_io_8(PS2_PORT_CTRL);
-		spin(100);
-	} while ((read & (PS2_IBUF_FULL | PS2_OBUF_FULL)) && tries-- > 0);
+	if (wait_for_bits_cleared(PS2_STATUS_INPUT_BUFFER_FULL | PS2_STATUS_OUTPUT_BUFFER_FULL) != B_OK)
+		return B_ERROR;
 
-	return tries > 0;
+	gIsa->write_io_8(PS2_PORT_CTRL, data);
+	return B_OK;
 }
 
 
-/** Wait until the data port is ready to be written. This requires that
- *	the "Input buffer full" bit will be set to 0.
+/** Wait until the data port is ready to be written, and then writes \a data to it.
  */
 
-bool
-wait_write_data(void)
+status_t
+ps2_write_data(uint8 data)
 {
-	int8 read;
-	int32 tries = 100;
-	TRACE(("wait_write_data()\n"));
-	do {
-		read = gIsa->read_io_8(PS2_PORT_CTRL);
-		spin(100);
-	} while ((read & PS2_IBUF_FULL) && tries-- > 0);
+	if (wait_for_bits_cleared(PS2_STATUS_INPUT_BUFFER_FULL) != B_OK)
+		return B_ERROR;
 
-	return tries > 0;
+	gIsa->write_io_8(PS2_PORT_DATA, data);
+	return B_OK;
 }
 
 
-/** Wait until the data port can be read from. This requires that the
- *	"Output buffer full" bit will be set to 1.
+/** Wait until the data port can be read from, and then transfers the byte read
+ *	to /a data.
  */
 
-bool
-wait_read_data(void)
+status_t
+ps2_read_data(uint8 *data)
 {
-	int8 read;
-	int32 tries = 100;
-	TRACE(("wait_read_data()\n"));
-	do {
-		read = gIsa->read_io_8(PS2_PORT_CTRL);
-		spin(100);
-	} while (!(read & PS2_OBUF_FULL) && tries-- > 0);
+	if (wait_for_bits_set(PS2_STATUS_OUTPUT_BUFFER_FULL) != B_OK)
+		return B_ERROR;
 
-	return tries > 0;
+	*data = gIsa->read_io_8(PS2_PORT_DATA);
+	TRACE(("ps2_read_data(): read %u\n", *data));
+	return B_OK;
 }
 
-/** Get the ps2 command byte.	
+
+/** Get the PS/2 command byte. This cannot fail, since we're using our buffered
+ *	data, read out in init_driver().
  */
 
-int8
-get_command_byte(void)
+uint8
+ps2_get_command_byte(void)
 {
-	int8 read = 0;
+	TRACE(("ps2_get_command_byte(): command byte = %x\n", sCommandByte));
 
-	TRACE(("set_command_byte()\n"));
-	if (wait_write_ctrl()) {
-		gIsa->write_io_8(PS2_PORT_CTRL, PS2_CTRL_READ_CMD);
-		if (wait_read_data())
-			read = gIsa->read_io_8(PS2_PORT_DATA);
-	}
-
-	return read;
+	return sCommandByte;
 }
 
 
 /** Set the ps2 command byte.
- *	Parameters:
- *	unsigned char, byte to write
  */
 
-void
-set_command_byte(unsigned char cmd)
+status_t
+ps2_set_command_byte(uint8 command)
 {
-	TRACE(("set_command_byte()\n"));
-	if (wait_write_ctrl()) {
-		gIsa->write_io_8(PS2_PORT_CTRL, PS2_CTRL_WRITE_CMD);
-		if (wait_write_data())
-			gIsa->write_io_8(PS2_PORT_DATA, cmd);
+	TRACE(("set_command_byte(command = %x)\n", command));
+
+	if (ps2_write_ctrl(PS2_CTRL_WRITE_CMD) == B_OK
+		&& ps2_write_data(command) == B_OK) {
+		sCommandByte = command;
+		return B_OK;
 	}
+
+	return B_ERROR;
 }
 
 
-/** Reads a single byte from the data port.
- *	Return value:
- *	unsigned char, byte read
- */
-
-uint8
-read_data_byte(void)
+bool
+ps2_handle_result(uint8 data)
 {
-	TRACE(("read_data_byte()\n"));
-	if (wait_read_data()) {
-		TRACE(("read_data_byte(): ok\n"));
-		return gIsa->read_io_8(PS2_PORT_DATA);
-	} 
-	
-	TRACE(("read_data_byte(): timeout\n"));
-	
-	return PS2_ERROR;
+	int32 bytesLeft;
+
+	if (sResultBuffer == NULL
+		|| (bytesLeft = atomic_add(&sResultBytes, -1)) <= 0)
+		return false;
+
+	*(sResultBuffer++) = data;
+	if (bytesLeft == 1)
+		release_sem_etc(sResultSemaphore, 1, B_DO_NOT_RESCHEDULE);
+	return true;
 }
 
 
-/** Writes a byte to the mouse device. Uses the control port to indicate
- *	that the byte is sent to the auxiliary device (mouse), instead of the
- *	keyboard.
- *	Parameters:
- *	unsigned char, byte to write
- */
+void
+ps2_claim_result(uint8 *buffer, size_t bytes)
+{
+	acquire_sem(sResultOwnerSemaphore);
+
+	sResultBuffer = buffer;
+	sResultBytes = bytes;
+}
+
 
 void
-write_aux_byte(unsigned char cmd)
+ps2_unclaim_result(void)
 {
-	TRACE(("write_aux_byte()\n"));
-	if (wait_write_ctrl()) {
-		gIsa->write_io_8(PS2_PORT_CTRL, PS2_CTRL_WRITE_AUX);
+	sResultBytes = 0;
+	sResultBuffer = NULL;
 
-		if (wait_write_data())
-			gIsa->write_io_8(PS2_PORT_DATA, cmd);
+	release_sem(sResultOwnerSemaphore);
+}
+
+
+status_t
+ps2_wait_for_result(void)
+{
+	status_t status = acquire_sem_etc(sResultSemaphore, 1, B_RELATIVE_TIMEOUT, 100000);
+		// 0.1 secs for now
+
+	ps2_unclaim_result();
+	return status;
+}
+
+
+void
+ps2_common_uninitialize(void)
+{
+	// do we still need the resources?
+	if (atomic_add(&sInitialized, -1) > 1)
+		return;
+
+	delete_sem(sResultSemaphore);
+	delete_sem(sResultOwnerSemaphore);
+}
+
+
+status_t
+ps2_common_initialize(void)
+{
+	if (atomic_add(&sInitialized, 1) > 0) {
+		// we're already initialized
+		return B_OK;
 	}
+
+	sResultSemaphore = create_sem(0, "ps/2 result");
+	if (sResultSemaphore < B_OK)
+		return sResultSemaphore;
+
+	sResultOwnerSemaphore = create_sem(1, "ps/2 result owner");
+	if (sResultOwnerSemaphore < B_OK) {
+		delete_sem(sResultSemaphore);
+		return sResultOwnerSemaphore;
+	}
+
+	sResultBytes = 0;
+	sResultBuffer = NULL;
+
+	return B_OK;
 }
 
 
@@ -197,18 +295,20 @@ init_hardware(void)
 }
 
 
-static const char *
-kDevices[] = {
-	DEVICE_KEYBOARD_NAME,
-	DEVICE_MOUSE_NAME, 
-	NULL
-};
-
-
 const char **
 publish_devices(void)
 {
-	return kDevices;
+	static char *kDevices[3];
+	
+	kDevices[0] = DEVICE_MOUSE_NAME;
+
+	if (sKeyboardDetected) {
+		kDevices[1] = DEVICE_KEYBOARD_NAME;
+		kDevices[2] = NULL;
+	} else
+		kDevices[1] = NULL;
+
+	return (const char **)kDevices;
 }
 
 
@@ -216,9 +316,9 @@ device_hooks *
 find_device(const char *name)
 {
 	if (!strcmp(name, DEVICE_MOUSE_NAME))
-		return &mouse_hooks;
+		return &sMouseDeviceHooks;
 	else if (!strcmp(name, DEVICE_KEYBOARD_NAME))
-		return &keyboard_hooks;
+		return &sKeyboardDeviceHooks;
 
 	return NULL;
 }
@@ -235,12 +335,31 @@ init_driver(void)
 		return status;
 	}
 
-	return B_OK;
+	// If there is no keyboard or mouse, we don't need to publish ourselves
+
+	if (probe_keyboard() == B_OK)
+		sKeyboardDetected = true;
+	else
+		dprintf("ps2_hid: no keyboard detected!\n");
+
+	if (!sKeyboardDetected && probe_mouse() != B_OK) {
+		put_module(B_ISA_MODULE_NAME);
+		return B_ERROR;
+	}
+
+	// A semaphore to synchronize open keyboard and mouse devices
+
+	gDeviceOpenSemaphore = create_sem(1, "ps/2 open");
+	if (gDeviceOpenSemaphore < B_OK)
+		return gDeviceOpenSemaphore;
+
+	return get_command_byte(&sCommandByte);
 }
 
 
 void
 uninit_driver(void)
 {
+	delete_sem(gDeviceOpenSemaphore);
 	put_module(B_ISA_MODULE_NAME);	
 }

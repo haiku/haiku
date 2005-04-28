@@ -19,59 +19,67 @@
 
 
 /////////////////////////////////////////////////////////////////////////
-// definitions
+// Interface definitions for the Intel 8042, 8741, or 8742 (PS/2)
 
 // I/O addresses
-#define PS2_PORT_DATA            0x60
-#define PS2_PORT_CTRL            0x64
+#define PS2_PORT_DATA					0x60
+#define PS2_PORT_CTRL					0x64
 
 // data port bits
-#define PS2_OBUF_FULL			 0x01
-#define PS2_IBUF_FULL			 0x02
-#define PS2_MOUSE_OBUF_FULL 	 0x20
-#define PS2_TIMEOUT				 0x40
+#define PS2_STATUS_OUTPUT_BUFFER_FULL	0x01
+#define PS2_STATUS_INPUT_BUFFER_FULL	0x02
+#define PS2_STATUS_MOUSE_DATA			0x20
+#define PS2_STATUS_TIMEOUT				0x40
 
 // control words
-#define PS2_CTRL_READ_CMD		 0x20
-#define PS2_CTRL_WRITE_CMD       0x60
-#define PS2_CTRL_WRITE_AUX       0xD4
-#define PS2_CTRL_MOUSE_DISABLE	 0xA7
-#define PS2_CTRL_MOUSE_ENABLE	 0xA8
-#define PS2_CTRL_MOUSE_TEST		 0xA9
+#define PS2_CTRL_READ_CMD				0x20
+#define PS2_CTRL_WRITE_CMD				0x60
+#define PS2_CTRL_WRITE_AUX				0xd4
+#define PS2_CTRL_MOUSE_DISABLE			0xa7
+#define PS2_CTRL_MOUSE_ENABLE			0xa8
+#define PS2_CTRL_MOUSE_TEST				0xa9
+#define PS2_CTRL_KEYBOARD_SELF_TEST		0xaa
+#define PS2_CTRL_KEYBOARD_ACTIVATE		0xae
+#define PS2_CTRL_KEYBOARD_DEACTIVATE	0xad
 
 // command bytes
-#define PS2_CMD_DEV_INIT         0x43
+#define PS2_CMD_DEV_INIT				0x43
 
 // command bits
-#define PS2_BITS_AUX_INTERRUPT	 0x02
-#define PS2_BITS_MOUSE_DISABLED	 0x20
+#define PS2_BITS_KEYBOARD_INTERRUPT		0x01
+#define PS2_BITS_AUX_INTERRUPT			0x02
+#define PS2_BITS_KEYBOARD_DISABLED		0x10
+#define PS2_BITS_MOUSE_DISABLED			0x20
+#define PS2_BITS_TRANSLATE_SCANCODES	0x40
 
 // data words
-#define PS2_CMD_TEST_PASSED		 0xAA
-#define PS2_CMD_GET_DEVICE_ID	 0xF2
-#define PS2_CMD_SET_SAMPLE_RATE	 0xF3
-#define PS2_CMD_ENABLE_MOUSE     0xF4
-#define PS2_CMD_DISABLE_MOUSE    0xF5
-#define PS2_CMD_RESET_MOUSE      0xFF
+#define PS2_CMD_TEST_PASSED				0xaa
+#define PS2_CMD_GET_DEVICE_ID			0xf2
+#define PS2_CMD_SET_SAMPLE_RATE			0xf3
+#define PS2_CMD_ENABLE_MOUSE			0xf4
+#define PS2_CMD_DISABLE_MOUSE			0xf5
+#define PS2_CMD_RESET_MOUSE				0xff
 
 // reply codes
-#define PS2_RES_TEST_PASSED		 0x55
-#define PS2_RES_ACK              0xFA
-#define PS2_RES_RESEND           0xFE
-#define PS2_ERROR				 0xFC
+#define PS2_REPLY_TEST_PASSED			0x55
+#define PS2_REPLY_ACK					0xfa
+#define PS2_REPLY_RESEND				0xfe
+#define PS2_REPLY_ERROR					0xfc
 
 // interrupts
-#define INT_PS2_MOUSE            0x0C
-#define INT_PS2_KEYBOARD		 0x01
+#define INT_PS2_MOUSE					0x0c
+#define INT_PS2_KEYBOARD				0x01
 
 // mouse device IDs
-#define PS2_DEV_ID_STANDARD		 0
-#define PS2_DEV_ID_INTELLIMOUSE	 3
+#define PS2_DEV_ID_STANDARD				0
+#define PS2_DEV_ID_INTELLIMOUSE			3
 
 // packet sizes
-#define PS2_PACKET_STANDARD		 3
-#define PS2_PACKET_INTELLIMOUSE	 4
-#define PS2_MAX_PACKET_SIZE		 4 // Should be equal to the biggest packet size
+#define PS2_PACKET_STANDARD				3
+#define PS2_PACKET_INTELLIMOUSE			4
+#define PS2_MAX_PACKET_SIZE				4
+	// Should be equal to the biggest packet size
+
 
 // debug defines
 #ifdef DEBUG
@@ -82,16 +90,28 @@
 
 // global variables
 extern isa_module_info *gIsa;
+extern sem_id gDeviceOpenSemaphore;
 
-// prototypes
-bool wait_write_ctrl(void);
-bool wait_write_data(void);
-bool wait_read_data(void);
-void write_aux_byte(unsigned char cmd);
-uint8 read_data_byte(void);
+// prototypes from common.c
+extern status_t ps2_write_ctrl(uint8 data);
+extern status_t ps2_write_data(uint8 data);
+extern status_t ps2_read_data(uint8 *data);
 
-int8 get_command_byte(void);
-void set_command_byte(unsigned char cmd);
+extern status_t ps2_write_aux_byte(uint8 data);
+extern uint8 ps2_get_command_byte(void);
+extern status_t ps2_set_command_byte(uint8 command);
+
+extern void ps2_claim_result(uint8 *buffer, size_t bytes);
+extern void ps2_unclaim_result(void);
+extern status_t ps2_wait_for_result(void);
+extern bool ps2_handle_result(uint8 data);
+
+extern void ps2_common_uninitialize(void);
+extern status_t ps2_common_initialize(void);
+
+// prototypes from keyboard.c & mouse.c
+extern status_t probe_keyboard(void);
+extern status_t probe_mouse(void);
 
 extern status_t keyboard_open(const char *name, uint32 flags, void **cookie);
 extern status_t keyboard_close(void *cookie);
