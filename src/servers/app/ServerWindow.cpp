@@ -706,8 +706,11 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			
 			link.Read<float>(&x);
 			link.Read<float>(&y);
-			
-			cl->MoveBy(x, y);
+
+			float offsetX = x - cl->fFrame.left;
+			float offsetY = y - cl->fFrame.top;
+
+			cl->MoveBy(offsetX, offsetY);
 			
 			break;
 		}
@@ -719,9 +722,12 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&newWidth);
 			link.Read<float>(&newHeight);
 			
-			// TODO: Check for minimum size allowed. Need WinBorder::GetSizeLimits
-			
-			cl->ResizeBy(newWidth, newHeight);
+			// TODO: If cl is a window, check for minimum size allowed.
+			// Need WinBorder::GetSizeLimits
+			float deltaWidth = newWidth - cl->fFrame.Width();
+			float deltaHeight = newHeight - cl->fFrame.Height();
+
+			cl->ResizeBy(deltaWidth, deltaHeight);
 			
 			break;
 		}

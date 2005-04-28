@@ -978,7 +978,7 @@ Layer::ResizeBy(float x, float y)
 	
 	if(!fParent)
 	{
-		printf("ERROR: in Layer::MoveBy()! - No parent!\n");
+		printf("ERROR: in Layer::ResizeBy()! - No parent!\n");
 		return;
 	}
 
