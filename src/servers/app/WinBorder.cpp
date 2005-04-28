@@ -309,7 +309,7 @@ void WinBorder::Draw(const BRect &r)
 //! Moves the winborder with redraw
 void WinBorder::MoveBy(float x, float y)
 {
-	STRACE(("WinBorder(%s)::MoveBy()\n", GetName()));
+	STRACE(("WinBorder(%s)::MoveBy(%.1f, %.1f) fDecorator: %p\n", GetName(), x, y, fDecorator));
 	if(fDecorator)
 		fDecorator->MoveBy(x,y);
 
@@ -320,6 +320,7 @@ void WinBorder::MoveBy(float x, float y)
 void WinBorder::ResizeBy(float x, float y)
 {
 	// TODO: account for size limits
+	// NOTE: size limits are also regarded in BWindow::ResizeXX()
 	
 	STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
 	if(fDecorator)

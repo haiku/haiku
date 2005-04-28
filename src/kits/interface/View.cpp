@@ -528,8 +528,12 @@ BView::ConvertFromParent(BRect rect) const
 void
 BView::ConvertToScreen(BPoint *pt) const
 {
-	if (!parent)
+	if (!parent) {
+		if (owner)
+			owner->ConvertToScreen(pt);
+
 		return;
+	}
 
 	do_owner_check_no_pick();
 
@@ -3323,6 +3327,13 @@ BView::ResizeBy(float deltaWidth, float deltaHeight)
 void
 BView::ResizeTo(float width, float height)
 {
+	// NOTE: I think this check makes sense, but I didn't
+	// test what R5 does.
+	if (width < 0.0)
+		width = 0.0;
+	if (height < 0.0)
+		height = 0.0;
+	
 	if (width == fBounds.Width() && height == fBounds.Height())
 		return;
 

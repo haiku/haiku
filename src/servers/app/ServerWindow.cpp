@@ -522,7 +522,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_SCROLL:
 		{
-			printf("AS_LAYER_SCROLL\n");
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SCROLL: Layer name: %s\n", fName, cl->fName->String()));
 			float dh;
 			float dv;
 
@@ -551,8 +551,6 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			_CopyBits(myRootLayer, cl, src, dst, xOffset, yOffset);
 
 			cl->fLayerData->OffsetOrigin(BPoint(dh, dv));
-//cl->fBoundsLeftTop += BPoint(dh, dv);
-//cl->fFrame.OffsetBy(BPoint(-dh, -dv));
 
 			break;
 		}
@@ -1420,12 +1418,13 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_WINDOW_RESIZE:
 		{
-			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE\n",fName));
 			float xResizeBy;
 			float yResizeBy;
 			
 			link.Read<float>(&xResizeBy);
 			link.Read<float>(&yResizeBy);
+
+			STRACE(("ServerWindow %s: Message AS_WINDOW_RESIZE %.1f, %.1f\n",fName, xResizeBy, yResizeBy));
 			
 			fWinBorder->ResizeBy(xResizeBy, yResizeBy);
 			
@@ -1433,12 +1432,13 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_WINDOW_MOVE:
 		{
-			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE\n",fName));
 			float xMoveBy;
 			float yMoveBy;
 			
 			link.Read<float>(&xMoveBy);
 			link.Read<float>(&yMoveBy);
+
+			STRACE(("ServerWindow %s: Message AS_WINDOW_MOVE: %.1f, %.1f\n",fName, xMoveBy, yMoveBy));
 
 			fWinBorder->MoveBy(xMoveBy, yMoveBy);
 

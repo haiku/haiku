@@ -1892,28 +1892,36 @@ BView* BWindow::LastMouseMovedView() const
 
 void BWindow::MoveBy(float dx, float dy)
 {
-	Lock();
-	fLink->StartMessage( AS_WINDOW_MOVE );
-	fLink->Attach<float>( dx );
-	fLink->Attach<float>( dy );
-	fLink->Flush();
-	Unlock();
+	if (dx != 0.0 || dy != 0.0) {
+
+		Lock();
+
+		fLink->StartMessage(AS_WINDOW_MOVE);
+		fLink->Attach<float>(dx);
+		fLink->Attach<float>(dy);
+		fLink->Flush();
+	
+		fFrame.OffsetBy(dx, dy);
+
+		Unlock();
+	}
 }
 
 //------------------------------------------------------------------------------
 
 void BWindow::MoveTo( BPoint point )
 {
-	
-	if (fFrame.left == point.x && fFrame.top == point.y)
-		return;
-	
-	fFrame.OffsetTo(point);
+printf("BWindow::MoveTo(%.1f, %.1f)\n", point.x, point.y);
 	Lock();
-	fLink->StartMessage( AS_WINDOW_MOVE );
-	fLink->Attach<float>( fFrame.left );
-	fLink->Attach<float>( fFrame.top );
-	fLink->Flush();
+	
+	if (fFrame.left != point.x || fFrame.top != point.y) {
+	
+		float xOffset = point.x - fFrame.left;
+		float yOffset = point.y - fFrame.top;
+	
+		MoveBy(xOffset, yOffset);
+	}
+
 	Unlock();
 }
 
@@ -1921,38 +1929,36 @@ void BWindow::MoveTo( BPoint point )
 
 void BWindow::MoveTo(float x, float y)
 {
-	MoveTo(BPoint(x,y));
+	MoveTo(BPoint(x, y));
 }
 
 //------------------------------------------------------------------------------
 
 void BWindow::ResizeBy(float dx, float dy)
 {
-
-	float		dxNew;
-	float		dyNew;
-	
-	// stay in minimum & maximum frame limits
-	dxNew		= (fFrame.Width() + dx) < fMinWindWidth ? fFrame.Width() - fMinWindWidth : dx;
-	if (dxNew == dx)
-		dxNew	= (fFrame.Width() + dx) > fMaxWindWidth ? fMaxWindWidth - fFrame.Width() : dx;
-
-	dyNew		= (fFrame.Height() + dy) < fMinWindHeight ? fFrame.Height() - fMinWindHeight : dy;
-	if (dyNew == dy)
-		dyNew	= (fFrame.Height() + dy) > fMaxWindHeight ? fMaxWindHeight - fFrame.Height() : dy;
-
-	if (dxNew == 0.0 && dyNew == 0.0)
-		return;
-	
-	fFrame.SetRightBottom( fFrame.RightBottom() + BPoint(dxNew, dyNew));
-	
 	Lock();
-	fLink->StartMessage( AS_WINDOW_RESIZE );
-	fLink->Attach<float>( fFrame.Width() );
-	fLink->Attach<float>( fFrame.Height() );
-	fLink->Flush();
+	// stay in minimum & maximum frame limits
+	if (fFrame.Width() + dx < fMinWindWidth)
+		dx = fMinWindWidth - fFrame.Width();
+	if (fFrame.Width() + dx > fMaxWindWidth)
+		dx = fMaxWindWidth - fFrame.Width();
+	if (fFrame.Height() + dy < fMinWindHeight)
+		dy = fMinWindHeight - fFrame.Height();
+	if (fFrame.Height() + dy > fMaxWindHeight)
+		dy = fMaxWindHeight - fFrame.Height();
+
+	if (dx != 0.0 || dy != 0.0) {
 	
-	top_view->ResizeBy(dxNew, dyNew);
+		fLink->StartMessage(AS_WINDOW_RESIZE);
+	//	fLink->Attach<float>( fFrame.Width() );
+	//	fLink->Attach<float>( fFrame.Height() );
+		fLink->Attach<float>(dx);
+		fLink->Attach<float>(dy);
+		fLink->Flush();
+		
+		fFrame.SetRightBottom( fFrame.RightBottom() + BPoint(dx, dy));
+		top_view->ResizeBy(dx, dy);
+	}
 	Unlock();
 }
 
@@ -1960,7 +1966,9 @@ void BWindow::ResizeBy(float dx, float dy)
 
 void BWindow::ResizeTo(float width, float height)
 {
+	Lock();
 	ResizeBy(width - fFrame.Width(), height - fFrame.Height());
+	Unlock();
 }
 
 //------------------------------------------------------------------------------
