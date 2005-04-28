@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src tests servers input view_input_device ;
+
+Addon ViewInputDevice : input_server devices : ViewInputDevice.cpp ;
+LinkSharedOSLibs ViewInputDevice : be <nogrist>input_server <boot!home!config!lib>libopenbeos.so ;
+
+MakeLocate ViewInputDevice : [ FDirName $(OBOS_TEST_DIR) servers input view_input_device input_server devices ] ;

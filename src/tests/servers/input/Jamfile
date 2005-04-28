@@ -6,3 +6,4 @@ SubInclude OBOS_TOP src tests servers input msgspy ;
 SubInclude OBOS_TOP src tests servers input portspy ;
 SubInclude OBOS_TOP src tests servers input prefs ;
 SubInclude OBOS_TOP src tests servers input replicant ;
+SubInclude OBOS_TOP src tests servers input view_input_device ;
