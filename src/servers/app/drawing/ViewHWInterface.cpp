@@ -91,6 +91,8 @@ string_for_color_space(color_space format)
 	return name;
 }
 
+//#define INPUTSERVER_TEST_MODE 1
+
 class CardView : public BView {
  public:
 								CardView(BRect bounds);
@@ -110,7 +112,10 @@ class CardView : public BView {
 	inline	BPortLink*			ServerLink() const
 									{ return fServerLink; }
 
+	void                                    ForwardMessage();
+
 private:
+			port_id			fInputPort;
 			BPortLink*			fServerLink;
 			const BBitmap*		fBitmap;
 };
@@ -144,10 +149,15 @@ CardView::CardView(BRect bounds)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
+#ifndef INPUTSERVER_TEST_MODE
 	// This link for sending mouse messages to the Haiku app_server.
 	// This is only to take the place of the input_server. 
 	port_id input_port = find_port(SERVER_INPUT_PORT);
 	fServerLink = new BPortLink(input_port);
+#else
+	fInputPort = create_port(100, "ViewInputDevice");
+#endif
+
 }
 
 CardView::~CardView()
@@ -174,12 +184,29 @@ CardView::Draw(BRect updateRect)
 // to the server's port. Being we're using a regular window, it would make little sense
 // to do anything else.
 
+void
+CardView::ForwardMessage()
+{
+	BMessage *message = Window()->CurrentMessage();
+	size_t length = message->FlattenedSize();
+	char stream[length];
+
+	if ( message->Flatten(stream, length) == B_OK) {
+		write_port(fInputPort, 0, stream, length);
+	}
+}
+
+
 // MouseDown
 void
 CardView::MouseDown(BPoint pt)
 {
 #ifdef ENABLE_INPUT_SERVER_EMULATION
+#ifndef INPUTSERVER_TEST_MODE
 	send_mouse_down(fServerLink, pt, Window()->CurrentMessage());
+#else
+	ForwardMessage();
+#endif
 #endif
 }
 
@@ -196,7 +223,11 @@ CardView::MouseMoved(BPoint pt, uint32 transit, const BMessage* dragMessage)
 	SetViewCursor(&cursor, true);
 
 #ifdef ENABLE_INPUT_SERVER_EMULATION
+#ifndef INPUTSERVER_TEST_MODE
 	send_mouse_moved(fServerLink, pt, Window()->CurrentMessage());
+#else
+	ForwardMessage();
+#endif
 #endif
 }
 
@@ -205,7 +236,11 @@ void
 CardView::MouseUp(BPoint pt)
 {
 #ifdef ENABLE_INPUT_SERVER_EMULATION
+#ifndef INPUTSERVER_TEST_MODE
 	send_mouse_up(fServerLink, pt, Window()->CurrentMessage());
+#else
+	ForwardMessage();
+#endif
 #endif
 }
 
@@ -275,7 +310,11 @@ STRACE("MSG_UPDATE\n");
 			break;
 		default:
 #ifdef ENABLE_INPUT_SERVER_EMULATION
+#ifndef INPUTSERVER_TEST_MODE
 			if (!handle_message(fView->ServerLink(), msg))
+#else
+			fView->ForwardMessage();
+#endif
 #endif
 				BWindow::MessageReceived(msg);
 			break;

@@ -19,7 +19,6 @@ class BitmapBuffer;
 class CardWindow;
 class UpdateQueue;
 
-
 class ViewHWInterface : public HWInterface {
  public:
 								ViewHWInterface();

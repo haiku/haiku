@@ -195,10 +195,7 @@ AppServer::AppServer(void) :
 		resume_thread(fPicassoThreadID);
 
 	fDecoratorName="Default";
-
 #if 0
-	LaunchInputServer();
-
 	LaunchCursorThread();
 #endif
 }
@@ -284,7 +281,7 @@ AppServer::LaunchInputServer()
 
 	fISThreadID = B_ERROR;
 
-	while (find_thread("_roster_thread_") != B_OK && !fQuittingServer) {
+	while (find_thread("_roster_thread_") == B_NAME_NOT_FOUND && !fQuittingServer) {
 		snooze(250000);
 	}
 
@@ -301,8 +298,11 @@ AppServer::LaunchInputServer()
 
 	int32 arg_c = 1;
 	char **arg_v = (char **)malloc(sizeof(char *) * (arg_c + 1));
-	//arg_v[0] = strdup("/system/servers/input_server");
-	arg_v[0] = strdup("input_server");
+#if TEST_MODE
+	arg_v[0] = strdup("/boot/home/svnhaiku/trunk/distro/x86.R1/beos/system/servers/input_server");
+#else
+	arg_v[0] = strdup("/system/servers/input_server");
+#endif
 	arg_v[1] = NULL;
 	fISThreadID = load_image(arg_c, (const char**)arg_v, (const char **)environ);
 	free(arg_v[0]);
@@ -348,6 +348,8 @@ AppServer::CursorThread(void* data)
 	AppServer *app = (AppServer *)data;
 
 	BPoint p;
+	
+	app->LaunchInputServer();
 
 	do {
 
@@ -356,7 +358,7 @@ AppServer::CursorThread(void* data)
        			p.x = *app->fCursorAddr & 0x7fff;
 			p.y = *app->fCursorAddr >> 15 & 0x7fff;
 
-			app->fDriver->MoveCursorTo(p.x, p.y);
+			desktop->GetDisplayDriver()->MoveCursorTo(p.x, p.y);
 
 		}
 
