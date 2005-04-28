@@ -2,11 +2,16 @@
 
 #include <stdio.h>
 
-#include "Application.h"
-#include "Button.h"
-#include "CheckBox.h"
-#include "View.h"
-#include "Window.h"
+#include <Application.h>
+#include <Box.h>
+#include <Button.h>
+#include <CheckBox.h>
+#include <Menu.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <TextControl.h>
+#include <View.h>
+#include <Window.h>
 
 class HelloView : public BView {
  public:
@@ -23,9 +28,25 @@ class HelloView : public BView {
 
 	virtual	void	Draw(BRect updateRect)
 					{
-						SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+						rgb_color bg = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+						SetHighColor(bg);
 						FillRect(updateRect);
 						BRect r(Bounds());
+
+						rgb_color shadow = tint_color(bg, B_DARKEN_2_TINT);
+						rgb_color light = tint_color(bg, B_LIGHTEN_MAX_TINT);
+
+						BeginLineArray(4);
+						AddLine(BPoint(r.left, r.top),
+								BPoint(r.right, r.top), shadow);
+						AddLine(BPoint(r.right, r.top + 1),
+								BPoint(r.right, r.bottom), light);
+						AddLine(BPoint(r.right - 1, r.bottom),
+								BPoint(r.left, r.bottom), light);
+						AddLine(BPoint(r.left, r.bottom - 1),
+								BPoint(r.left, r.top + 1), shadow);
+						EndLineArray();
 
 						SetHighColor(255, 0, 0, 128);
 
@@ -76,16 +97,37 @@ class HelloView : public BView {
 void
 show_window(BRect frame, const char* name)
 {
-	BWindow* window = new BWindow(frame, name,
+	BRect f(0,0, frame.Width(), frame.Height());
+	BWindow* window = new BWindow(f, name,
 								  B_TITLED_WINDOW,
 								  B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE);
 
-	BView* view = new HelloView(window->Bounds(), "test", B_FOLLOW_ALL,
-								B_WILL_DRAW/* | B_FULL_UPDATE_ON_RESIZE*/);
+	BRect b(window->Bounds());
 
-	window->AddChild(view);
-	BRect b(view->Bounds());
-	b.InsetBy(20.0, 40.0);
+	b.bottom = b.top + 8;
+	BMenuBar* menuBar = new BMenuBar(b, "menu bar");
+	window->AddChild(menuBar);
+
+	BMenu* menu = new BMenu("File");
+	menuBar->AddItem(menu);
+
+	BMenuItem* menuItem = new BMenuItem("Quit", NULL, 'Q');
+	menu->AddItem(menuItem);
+
+	b = window->Bounds();
+	b.top = menuBar->Bounds().bottom + 1;
+	BBox* bg = new BBox(b, "box", B_FOLLOW_ALL, B_WILL_DRAW, B_PLAIN_BORDER);
+
+	window->AddChild(bg);
+
+	b = bg->Bounds();
+	b.InsetBy(5.0, 5.0);
+	BView* view = new HelloView(b, "hello view", B_FOLLOW_ALL, B_WILL_DRAW);
+
+	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	bg->AddChild(view);
+
+	b.Set(0.0, 0.0, 80.0, 13.0);
 	b.OffsetTo(5.0, 5.0);
 	BButton* control = new BButton(b, "button", "Button", NULL);
 	view->AddChild(control);
@@ -95,6 +137,7 @@ show_window(BRect frame, const char* name)
 	BCheckBox* checkBox = new BCheckBox(b, "check box", "CheckBox", NULL);
 	view->AddChild(checkBox);
 
+	window->MoveTo(frame.left, frame.top);
 	window->Show();
 }
 
@@ -104,10 +147,10 @@ main(int argc, char** argv)
 {
 	BApplication* app = new BApplication("application/x.vnd-Haiku.windows_test");
 
-	BRect frame(50.0, 50.0, 200.0, 150.0);
+	BRect frame(50.0, 50.0, 200.0, 250.0);
 	show_window(frame, "Window #1");
 
-	frame.Set(80.0, 100.0, 250.0, 200.0);
+	frame.Set(80.0, 100.0, 350.0, 300.0);
 	show_window(frame, "Window #2");
 
 	app->Run();
