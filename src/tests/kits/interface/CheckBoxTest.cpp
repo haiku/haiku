@@ -85,12 +85,15 @@ Window::Window()
 
 	checkBox = new BCheckBox(rect.OffsetToCopy(15, 15), NULL, "Test 2", NULL);
 	view->AddChild(checkBox);
+	checkBox->SetViewColor(220, 170, 20);
 
 	rect.OffsetBy(0, 60);
 	BBox *box = new BBox(rect.InsetByCopy(-15, -15), NULL);
 	AddChild(box);
 
 	checkBox = new BCheckBox(rect.OffsetToCopy(15, 15), NULL, "Test 3", NULL);
+	checkBox->SetViewColor(220, 170, 20);
+		// is ignored...
 	box->AddChild(checkBox);
 
 	rect.OffsetBy(0, 60);
@@ -126,12 +129,15 @@ Window::Window()
 
 	checkBox = new HCheckBox(rect.OffsetToCopy(15, 15), NULL, "Test 2", NULL);
 	view->AddChild(checkBox);
+	checkBox->SetViewColor(220, 170, 20);
 
 	rect.OffsetBy(0, 60);
 	box = new BBox(rect.InsetByCopy(-15, -15), NULL);
 	AddChild(box);
 
 	checkBox = new HCheckBox(rect.OffsetToCopy(15, 15), NULL, "Test 3", NULL);
+	checkBox->SetViewColor(220, 170, 20);
+		// is ignored...
 	box->AddChild(checkBox);
 
 	rect.OffsetBy(0, 60);
