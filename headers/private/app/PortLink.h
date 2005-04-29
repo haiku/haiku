@@ -29,8 +29,6 @@
 #define _PORTLINK_H
 
 #include <OS.h>
-#include <LinkMsgReader.h>
-#include <LinkMsgSender.h>
 
 /*
 	Error checking rules: (for if you don't want to check every return code)
@@ -47,6 +45,8 @@
 
 */
 
+class LinkMsgReader;
+class LinkMsgSender;
 class BPortLink
 {
 public:
@@ -81,7 +81,7 @@ public:
 	status_t ReadShape(BShape *shape);
 	template <class T> status_t Read(T *data)
 	{
-		return fReader->Read(data,sizeof(T));
+		return Read(data,sizeof(T));
 	}
 	
 protected:
