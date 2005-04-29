@@ -57,6 +57,8 @@ sPropertyInfo[] = {
 };
 	
 
+const static float kPadding = 10.0;
+
 BChannelSlider::BChannelSlider(BRect area, const char *name, const char *label,
 	BMessage *model, int32 channels, uint32 resizeMode, uint32 flags)
 	: BChannelControl(area, name, label, model, channels, resizeMode, flags)
@@ -234,7 +236,6 @@ BChannelSlider::Draw(BRect updateRect)
 	float labelWidth = StringWidth(Label());
 	
 	DrawString(Label(), BPoint((bounds.Width() - labelWidth) / 2, fBaseLine));
-	Sync();	
 }
 
 
@@ -258,18 +259,19 @@ BChannelSlider::MouseDown(BPoint where)
 				fMinpoint = frame.top + frame.Height() / 2;
 				frame.bottom += range;
 			} else {
-				// TODO: Fix this
+				// TODO: Fix this, the clickzone isn't perfect
 				frame.right += range;
 				fMinpoint = frame.Width();
 			}
-			// Found. Now set the initial values
+			
+			// Click was on a slider.
 			if (frame.Contains(where)) {
 				fCurrentChannel = channel;
 				break;
 			}	
 		}	
 		
-		// Click wasn't on a slider.
+		// Click wasn't on a slider. Bail out.
 		if (fCurrentChannel == -1)
 			return;
 					
@@ -286,10 +288,10 @@ BChannelSlider::MouseDown(BPoint where)
 		}
 				
 		if (fInitialValues == NULL)
-			fInitialValues = new int32[CountChannels()];
+			fInitialValues = new int32[numChannels];
 				
 		if (fAllChannels) {
-			for (int32 i = 0; i < CountChannels(); i++)
+			for (int32 i = 0; i < numChannels; i++)
 				fInitialValues[i] = ValueFor(i);
 		} else
 			fInitialValues[fCurrentChannel] = ValueFor(fCurrentChannel);								
@@ -533,9 +535,9 @@ BChannelSlider::ThumbFrameFor(int32 channel)
 	if (thumb != NULL) {
 		frame = thumb->Bounds();
 		if (Vertical())
-			frame.OffsetBy(channel * frame.Width(), fLineFeed * 2);
+			frame.OffsetBy(channel * frame.Width(), fLineFeed + kPadding);
 		else
-			frame.OffsetBy(fLineFeed, fLineFeed + channel * frame.Height());
+			frame.OffsetBy(kPadding, fLineFeed + channel * frame.Height());
 	}
 	
 	return frame;	
@@ -568,9 +570,9 @@ BChannelSlider::ThumbRangeFor(int32 channel)
 	BRect bounds = Bounds();
 	BRect frame = ThumbFrameFor(channel);
 	if (Vertical())
-		range = bounds.Height() - frame.Height() - fLineFeed * 4;
+		range = bounds.Height() - frame.Height() - (kPadding + fLineFeed) * 2;
 	else
-		range = bounds.Width() - frame.Width() - fLineFeed * 2;
+		range = bounds.Width() - frame.Width() - kPadding * 2;
 	
 	return range; 
 }
@@ -661,14 +663,15 @@ BChannelSlider::DrawThumbs()
 	
 	BPoint drawHere;
 	drawHere.x = (Bounds().Width() - fBacking->Bounds().Width()) / 2;
-	drawHere.y = (Bounds().Height() - fBacking->Bounds().Height()) / 2;
+	drawHere.y = (Bounds().Height() - fBacking->Bounds().Height() + fLineFeed) / 2;
 		
 	if (fBacking->Lock()) {
 		// Clear the view's background
 		fBackingView->FillRect(fBackingView->Bounds(), B_SOLID_LOW);
 		
 		BRect channelArea;
-		for (int32 channel = 0; channel < CountChannels(); channel++) {
+		int32 channelCount = CountChannels();
+		for (int32 channel = 0; channel < channelCount; channel++) {
 			channelArea = ThumbFrameFor(channel);
 			// TODO: This is (apparently) needed because ThumbFrameFor() doesn't
 			// take into account that the view we draw on is attached to an offscreen
@@ -696,15 +699,15 @@ BChannelSlider::DrawThumbs()
 		char valueString[64];
 		snprintf(valueString, 64, "%ld", ValueFor(fCurrentChannel));
 		BPoint stringPoint = drawHere;
-		float stringWidth = StringWidth("100");
+		float stringWidth = StringWidth(valueString);
 		stringPoint.x += (fBacking->Bounds().Width() - stringWidth) / 2;
-		stringPoint.y += fBacking->Bounds().Height() + fLineFeed;
+		stringPoint.y += fBacking->Bounds().Height() + fBaseLine;
 		BRect stringRect(stringPoint, stringPoint);
-		stringRect.right += stringWidth;
+		stringRect.left -= 10;
+		stringRect.right += StringWidth("100");
 		stringRect.top -= fLineFeed;
-		
+				
 		SetHighColor(ViewColor());
-		stringRect.InsetBy(-5, -2);
 		FillRect(stringRect);
 		
 		SetHighColor(0, 0, 0);
@@ -714,6 +717,7 @@ BChannelSlider::DrawThumbs()
 	// fClickDelta is used in MouseMoved()
 	fClickDelta = drawHere;
 	
+	// TODO: See above
 	if (Vertical())
 		fClickDelta.y -= ThumbFrameFor(0).top;
 	else
