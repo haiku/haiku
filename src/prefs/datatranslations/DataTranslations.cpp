@@ -63,7 +63,6 @@ void DataTranslationsApplication::Install_Done()
 
 void DataTranslationsApplication::RefsReceived(BMessage *message)
 {
-
 	uint32 type; 
 	int32 count;
 	entry_ref ref;
@@ -71,27 +70,18 @@ void DataTranslationsApplication::RefsReceived(BMessage *message)
 	BString newfile;
 	
 	char e_name[B_FILE_NAME_LENGTH];
-	char mbuf[256];
-	
-	
+		
 	message->GetInfo("refs", &type, &count); 
-	if ( type != B_REF_TYPE ) return; 
+	if (type != B_REF_TYPE)
+		return; 
 	
-    
-    if ( message->FindRef("refs", &ref) == B_OK )
-    {
+    if (message->FindRef("refs", &ref) == B_OK) {
     	BEntry entry(&ref, true);
     	entry.GetName(e_name);
     	
-    	if ( entry.IsFile() && entry.GetPath(&path)==B_OK)
-    	{
-    		BNode      node (&entry); 
-	        BNodeInfo  info (&node); 
-	        info.GetType (mbuf);
-	        string.SetTo(mbuf);
-		
-			if (string.FindFirst("application/x-vnd.Be-elfexecutable") != B_ERROR )
-			{
+    	if (entry.IsFile() && entry.GetPath(&path) == B_OK) {
+    		BTranslatorRoster *roster = BTranslatorRoster::Default();
+			if (roster->AddTranslators(path.Path()) == B_OK) {
     			BDirectory dirt("/boot/home/config/add-ons/Translators/");
     			newfile.SetTo("/boot/home/config/add-ons/Translators/");
     			newfile << e_name; // Newfile with full path.

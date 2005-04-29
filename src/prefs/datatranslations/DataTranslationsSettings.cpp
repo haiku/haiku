@@ -39,8 +39,6 @@ DataTranslationsSettings::DataTranslationsSettings()
 	}
 	else
 		be_app->PostMessage(ERROR_DETECTED);
-		
-	fCorner.PrintToStream();
 }
 
 DataTranslationsSettings::~DataTranslationsSettings()
