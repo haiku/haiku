@@ -30,8 +30,11 @@
 #include <Region.h>
 #include <Shape.h>
 
-#include <ServerProtocol.h>
+
+#include <LinkMsgReader.h>
+#include <LinkMsgSender.h>
 #include <PortLink.h>
+#include <ServerProtocol.h>
 
 BPortLink::BPortLink(port_id send, port_id receive) :
 	fReader(new LinkMsgReader(receive)), fSender(new LinkMsgSender(send))
