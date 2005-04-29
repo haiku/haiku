@@ -157,7 +157,6 @@ AppServer::MainLoop(void)
 			case B_QUIT_REQUESTED:
 			case AS_CREATE_APP:
 			case AS_DELETE_APP:
-			case AS_GET_SCREEN_MODE:
 			case AS_UPDATED_CLIENT_FONTLIST:
 			case AS_QUERY_FONTS_CHANGED:
 			case AS_SET_UI_COLORS:
@@ -307,33 +306,7 @@ AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			replylink.Flush();
 			break;
 		}
-		case AS_GET_SCREEN_MODE:
-		{
-			// Synchronous message call to get the stats on the current screen mode
-			// in the app_server. Simply a hack in place for the Input Server until
-			// BScreens are done.
-			
-			// Attached Data:
-			// 1) port_id - port to reply to
-			
-			// Returned Data:
-			// 1) int32 width
-			// 2) int32 height
-			// 3) int depth
-			
-			display_mode dmode;
-			
-			port_id replyport=-1;
-			if(msg.Read<port_id>(&replyport)<B_OK)
-				break;
-			
-			BPortLink replylink(replyport);
-			replylink.StartMessage(AS_GET_SCREEN_MODE);
-			replylink.Attach<display_mode>(dmode);
-			replylink.Flush();
-			break;
-		}
-
+		
 		case AS_UPDATED_CLIENT_FONTLIST:
 		case AS_SET_UI_COLORS:
 		case AS_SET_DECORATOR:
