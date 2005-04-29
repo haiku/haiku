@@ -20,6 +20,7 @@ extern "C" {
 
 extern int handle_signals(struct thread *t, cpu_status *state);
 extern bool is_kill_signal_pending(void);
+extern int has_signals_pending(void *_thread);
 
 extern int sigaction_etc(thread_id threadID, int signal,
 			const struct sigaction *act, struct sigaction *oact);

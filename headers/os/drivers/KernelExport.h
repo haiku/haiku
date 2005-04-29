@@ -103,13 +103,6 @@ extern thread_id	spawn_kernel_thread(thread_func function, const char *threadNam
 /* signal functions */
 
 extern int			send_signal_etc(pid_t thread, uint sig, uint32 flags);
-extern int			has_signals_pending(void *_thread);
-
-
-/*-------------------------------------------------------------*/
-/* snooze functions */
-
-extern status_t		snooze_etc(bigtime_t usecs, int timebase, uint32 flags);
 
 
 /*-------------------------------------------------------------*/
