@@ -269,41 +269,49 @@ BChannelSlider::MouseDown(BPoint where)
 			}	
 		}	
 		
-		if (fCurrentChannel != -1) {		
-			uint32 buttons = 0;
-			BMessage *currentMessage = Window()->CurrentMessage();
-			if (currentMessage != NULL)
-				currentMessage->FindInt32("buttons", (int32 *)&buttons);
+		// Click wasn't on a slider.
+		if (fCurrentChannel == -1)
+			return;
 					
-			fAllChannels = (buttons & B_SECONDARY_MOUSE_BUTTON) == 0;
-					
-			if (fInitialValues != NULL && fAllChannels) {
-				delete[] fInitialValues;
-				fInitialValues = NULL;
-			}
-					
-			if (fInitialValues == NULL)
-				fInitialValues = new int32[CountChannels()];
-					
-			if (fAllChannels) {
-				for (int32 i = 0; i < CountChannels(); i++)
-					fInitialValues[i] = ValueFor(i);
-			} else
-				fInitialValues[fCurrentChannel] = ValueFor(fCurrentChannel);								
-			
-			if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
-				if (!IsTracking()) {
-					SetTracking(true);
-					DrawThumbs();
-					Flush();	
-				}
+		uint32 buttons = 0;
+		BMessage *currentMessage = Window()->CurrentMessage();
+		if (currentMessage != NULL)
+			currentMessage->FindInt32("buttons", (int32 *)&buttons);
 				
-				MouseMovedCommon(where, where);
-				SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
-					
-			} else {
-				debugger("BChannelSlider::MouseDown(): SYNCHRONOUS CONTROLS NOT YET SUPPORTED");
+		fAllChannels = (buttons & B_SECONDARY_MOUSE_BUTTON) == 0;
+				
+		if (fInitialValues != NULL && fAllChannels) {
+			delete[] fInitialValues;
+			fInitialValues = NULL;
+		}
+				
+		if (fInitialValues == NULL)
+			fInitialValues = new int32[CountChannels()];
+				
+		if (fAllChannels) {
+			for (int32 i = 0; i < CountChannels(); i++)
+				fInitialValues[i] = ValueFor(i);
+		} else
+			fInitialValues[fCurrentChannel] = ValueFor(fCurrentChannel);								
+		
+		if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
+			if (!IsTracking()) {
+				SetTracking(true);
+				DrawThumbs();
+				Flush();	
 			}
+			
+			MouseMovedCommon(where, B_ORIGIN);
+			SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);		
+		} else {
+			do {
+				snooze(30000);
+				GetMouse(&where, &buttons);
+				MouseMovedCommon(where, B_ORIGIN);
+			} while (buttons != 0);
+			FinishChange();
+			fCurrentChannel = -1;
+			fAllChannels = false;
 		}
 	}
 }
@@ -474,25 +482,26 @@ BChannelSlider::DrawThumb(BView *into, int32 channel, BPoint where, bool pressed
 	where.x -= bitmapBounds.right / 2;
 	where.y -= bitmapBounds.bottom / 2;
 	
-	into->DrawBitmapAsync(thumb, where);
-		
-	if (pressed) {
-		into->PushState();
+	into->PushState();
 	
+	into->SetDrawingMode(B_OP_OVER);
+	into->DrawBitmapAsync(thumb, where);
+	
+	if (pressed) {
 		into->SetDrawingMode(B_OP_ALPHA);
 		
 		rgb_color color = tint_color(into->ViewColor(), B_DARKEN_4_TINT);
 		color.alpha = 128;
-		into->SetHighColor(color);
+		into->SetHighColor(color);	
 		
-		BRect rect(where, where);
-		rect.right += bitmapBounds.right;
-		rect.bottom += bitmapBounds.bottom;
-		
-		into->FillRect(rect);
-
-		into->PopState();
+		BRect destRect(where, where);
+		destRect.right += bitmapBounds.right;
+		destRect.bottom += bitmapBounds.bottom;
+	
+		into->FillRect(destRect);
 	}
+	
+	into->PopState();
 }
 
 
