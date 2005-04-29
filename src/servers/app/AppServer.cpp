@@ -405,7 +405,9 @@ void AppServer::MainLoop(void)
 			case B_QUIT_REQUESTED:
 			case AS_CREATE_APP:
 			case AS_DELETE_APP:
-			case AS_GET_SCREEN_MODE:
+			//case AS_GET_SCREEN_MODE: // TODO: Leftover
+			case AS_SCREEN_GET_MODE:
+			case AS_SCREEN_SET_MODE:
 			case AS_UPDATED_CLIENT_FONTLIST:
 			case AS_QUERY_FONTS_CHANGED:
 			case AS_SET_UI_COLORS:
@@ -737,31 +739,30 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 
 			break;
 		}
-		case AS_GET_SCREEN_MODE:
+		case AS_SCREEN_GET_MODE:
 		{
-			// Synchronous message call to get the stats on the current screen mode
-			// in the app_server. Simply a hack in place for the Input Server until
-			// BScreens are done.
-			
-			// Attached Data:
-			// 1) port_id - port to reply to
-			
-			// Returned Data:
-			// 1) int32 width
-			// 2) int32 height
-			// 3) int depth
-			
-			display_mode dmode;
-			fDriver->GetMode(&dmode);
-			
-			port_id replyport=-1;
-			if(msg.Read<port_id>(&replyport)<B_OK)
+			port_id replyport = -1;
+			if (msg.Read<port_id>(&replyport) < B_OK)
 				break;
 			
+			screen_id id;
+			msg.Read<screen_id>(&id);
+			uint32 workspace;
+			msg.Read<uint32>(&workspace);
+			// TODO: the display_mode can be different between
+			// the various workspaces.
+			// We have the screen_id and the workspace number, with these
+			// we need to find the corresponding "driver", and call getmode on it
+			
+			display_mode mode;
+			fDriver->GetMode(&mode);
+			
 			BPortLink replylink(replyport);
-			replylink.StartMessage(AS_GET_SCREEN_MODE);
-			replylink.Attach<display_mode>(dmode);
+			replylink.StartMessage(AS_SCREEN_GET_MODE);
+			replylink.Attach<display_mode>(mode);
+			replylink.Attach<status_t>(B_OK);
 			replylink.Flush();
+			
 			break;
 		}
 		case B_QUIT_REQUESTED:
