@@ -127,9 +127,9 @@ AS_SET_SYSFONT_PLAIN,
 AS_SET_SYSFONT_BOLD,
 AS_SET_SYSFONT_FIXED,
 
-// This will be modified. Currently a kludge for the input server until
-// BScreens are implemented by the IK Taeam
-AS_GET_SCREEN_MODE,
+// Screen methods
+AS_SCREEN_GET_MODE,
+AS_SCREEN_SET_MODE,
 
 // Global function call defs
 AS_SET_UI_COLORS,
