@@ -28,11 +28,9 @@
 #include <Window.h>
 #include <stdlib.h>
 
+#include "AppServerLink.h"
 #include "PrivateScreen.h"
-
-// TODO: As you'll have seen, we sometimes include the screen_id to the app server
-// request, sometimes not. I think the screen_id is not needed if we send the workspace
-// index.
+#include "ServerProtocol.h"
 
 
 // TODO: We should define this somewhere else
@@ -105,7 +103,7 @@ BPrivateScreen::Frame()
 	// If something goes wrong, we just return this rectangle.
 	BRect rect(0, 0, 0, 0);
 	display_mode mode;
-	if (GetMode(B_ALL_WORKSPACES, &mode) == B_OK)
+	if (GetMode(B_CURRENT_WORKSPACE, &mode) == B_OK)
 		rect.Set(0, 0, (float)mode.virtual_width - 1, (float)mode.virtual_height - 1);
 		
 	return rect;
@@ -265,21 +263,20 @@ BPrivateScreen::GetModeList(display_mode **mode_list, uint32 *count)
 status_t
 BPrivateScreen::GetMode(uint32 workspace, display_mode *mode)
 {
-	// TODO: Implement
-	status_t status = B_ERROR;
-	/*
 	BAppServerLink link;
-	PortMessage reply;
-	display_mode currentMode;
-	link.SetOpCode(AS_GET_MODE);
+	link.StartMessage(AS_SCREEN_GET_MODE);
+	link.Attach<screen_id>(ID());
 	link.Attach<uint32>(workspace);
+	link.Flush();
 	
-	link.FlushWithReply(&reply);
-	reply.Read<display_mode>(&currentMode);
-	reply.Read<status_t>(&status);
+	display_mode currentMode;
+	link.Read<display_mode>(&currentMode);
+	
+	status_t status = B_ERROR;
+	link.Read<status_t>(&status);
 	if (status == B_OK && mode)
 		*mode = currentMode; 
-	*/
+	
 	return status;
 }
 
