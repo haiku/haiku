@@ -57,6 +57,11 @@ CommonTestLib libinterfacetest.so
 	: app support
 ;
 
+ObjectsDefines
+	CheckBox.cpp
+	: BCheckBox=HCheckBox
+	;
+
 SimpleTest ScrollViewTest_r5 :
 	ScrollViewTest.cpp
 	: be
@@ -73,8 +78,14 @@ SimpleTest ChannelSliderTest :
 	: be
 	;
 
+SimpleTest CheckBoxTest :
+	CheckBoxTest.cpp
+	CheckBox.cpp
+	: be
+	;
+
 SEARCH on [ FGristFiles
-		ScrollView.cpp
+		ScrollView.cpp CheckBox.cpp
 	] = [ FDirName $(OBOS_TOP) src kits interface ] ;
 
 SubInclude OBOS_TOP src tests kits interface bprintjob ;
