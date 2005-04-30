@@ -84,6 +84,11 @@ SimpleTest CheckBoxTest :
 	: be
 	;
 
+SimpleTest ScreenTest :
+	ScreenTest.cpp
+	: be
+	;
+
 SEARCH on [ FGristFiles
 		ScrollView.cpp CheckBox.cpp
 	] = [ FDirName $(OBOS_TOP) src kits interface ] ;
