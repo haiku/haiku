@@ -267,7 +267,12 @@ BPrivateScreen::GetMode(uint32 workspace, display_mode *mode)
 	link.StartMessage(AS_SCREEN_GET_MODE);
 	link.Attach<screen_id>(ID());
 	link.Attach<uint32>(workspace);
-	link.Flush();
+	
+	int32 code = SERVER_FALSE;
+	link.FlushWithReply(&code);
+	
+	if (code != SERVER_TRUE)
+		return B_ERROR;
 	
 	display_mode currentMode;
 	link.Read<display_mode>(&currentMode);
