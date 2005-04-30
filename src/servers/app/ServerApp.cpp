@@ -1823,6 +1823,37 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			break;
 		}
+		case AS_SCREEN_GET_MODE:
+		{
+			// Attached data
+			// 1) int32 port to reply to
+			// 2) screen_id
+			// 3) workspace index
+			screen_id id;
+			msg.Read<screen_id>(&id);
+			uint32 workspace;
+			msg.Read<uint32>(&workspace);
+			
+			// TODO: the display_mode can be different between
+			// the various screens.
+			// We have the screen_id and the workspace number, with these
+			// we need to find the corresponding "driver", and call getmode on it
+			display_mode mode;
+			desktop->GetDisplayDriver()->GetMode(&mode);
+			// actually this isn't still enough as different workspaces can
+			// have different display_modes
+			
+			int32 replyport;
+			msg.Read<int32>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<display_mode>(mode);
+			replylink.Attach<status_t>(B_OK);
+			replylink.Flush();
+			
+			break;
+		}
 		default:
 		{
 			STRACE(("ServerApp %s received unhandled message code offset %s\n",fSignature.String(),
