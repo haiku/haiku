@@ -195,6 +195,7 @@ AppServer::AppServer(void) :
 		resume_thread(fPicassoThreadID);
 
 	fDecoratorName="Default";
+
 #if 0
 	LaunchCursorThread();
 #endif
@@ -294,7 +295,7 @@ AppServer::LaunchInputServer()
 	if (fCursorArea < B_OK)	
 		fCursorArea = create_area("isCursor", (void**) &fCursorAddr, B_ANY_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (fCursorSem < B_OK)
-        	fCursorSem = create_sem(100, "isSem"); 
+        	fCursorSem = create_sem(0, "isSem"); 
 
 	int32 arg_c = 1;
 	char **arg_v = (char **)malloc(sizeof(char *) * (arg_c + 1));
@@ -355,11 +356,11 @@ AppServer::CursorThread(void* data)
 
 		while (acquire_sem(app->fCursorSem) == B_OK) {
 
-       			p.x = *app->fCursorAddr & 0x7fff;
-			p.y = *app->fCursorAddr >> 15 & 0x7fff;
+       			p.y = *app->fCursorAddr & 0x7fff;
+			p.x = *app->fCursorAddr >> 15 & 0x7fff;
 
 			desktop->GetDisplayDriver()->MoveCursorTo(p.x, p.y);
-
+			STRACE(("CursorThread : %f, %f\n", p.x, p.y));
 		}
 
 		snooze(100000);
