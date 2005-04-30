@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2002-2004, Haiku
+//	Copyright (c) 2002-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -90,7 +90,7 @@ color_space
 BPrivateScreen::ColorSpace()
 {
 	display_mode mode;
-	if (GetMode(B_ALL_WORKSPACES, &mode) == B_OK)
+	if (GetMode(B_CURRENT_WORKSPACE, &mode) == B_OK)
 		return (color_space)mode.space;
 		
 	return B_NO_COLOR_SPACE;
