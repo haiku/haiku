@@ -45,7 +45,7 @@ main(int argc, char **argv)
 		if (*arg != '-')
 			break;
 
-		if (!strcmp(arg, "f"))
+		if (!strcmp(++arg, "f"))
 			flags |= B_FORCE_UNMOUNT;
 		else
 			usage(programName);
