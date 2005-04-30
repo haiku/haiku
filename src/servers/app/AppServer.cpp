@@ -405,7 +405,6 @@ void AppServer::MainLoop(void)
 			case B_QUIT_REQUESTED:
 			case AS_CREATE_APP:
 			case AS_DELETE_APP:
-			//case AS_GET_SCREEN_MODE: // TODO: Leftover
 			case AS_SCREEN_GET_MODE:
 			case AS_SCREEN_SET_MODE:
 			case AS_UPDATED_CLIENT_FONTLIST:
@@ -749,13 +748,15 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			msg.Read<screen_id>(&id);
 			uint32 workspace;
 			msg.Read<uint32>(&workspace);
+			
 			// TODO: the display_mode can be different between
-			// the various workspaces.
+			// the various screens.
 			// We have the screen_id and the workspace number, with these
 			// we need to find the corresponding "driver", and call getmode on it
-			
 			display_mode mode;
-			fDriver->GetMode(&mode);
+			desktop->GetDisplayDriver()->GetMode(&mode);
+			// actually this isn't still enough as different workspaces can
+			// have different display_modes
 			
 			BPortLink replylink(replyport);
 			replylink.StartMessage(AS_SCREEN_GET_MODE);
