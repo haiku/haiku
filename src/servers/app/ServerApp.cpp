@@ -1854,6 +1854,40 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			break;
 		}
+		case AS_SCREEN_SET_MODE:
+		{
+			// Attached data
+			// 1) int32 port to reply to
+			// 2) screen_id
+			// 3) workspace index
+			// 4) display_mode to set
+			// 5) 'makedefault' boolean		
+			screen_id id;
+			msg.Read<screen_id>(&id);
+			
+			uint32 workspace;
+			msg.Read<uint32>(&workspace);
+			
+			display_mode mode;
+			msg.Read<display_mode>(&mode);
+			
+			bool makedefault = false;
+			msg.Read<bool>(&makedefault);
+			
+			// TODO: See above: workspaces support, etc.
+			// TODO: This should return something
+			desktop->GetDisplayDriver()->SetMode(mode);
+			
+			int32 replyport;
+			msg.Read<int32>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<status_t>(B_OK);
+			replylink.Flush();
+			break;
+		}
+		
 		default:
 		{
 			STRACE(("ServerApp %s received unhandled message code offset %s\n",fSignature.String(),
