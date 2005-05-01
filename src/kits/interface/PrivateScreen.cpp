@@ -24,8 +24,8 @@
 //	Description:	BPrivateScreen is the class which does the real work
 //					for the proxy class BScreen (it interacts with the app server).
 //------------------------------------------------------------------------------
-
 #include <Window.h>
+
 #include <stdlib.h>
 
 #include "AppServerLink.h"
@@ -263,6 +263,9 @@ BPrivateScreen::GetModeList(display_mode **mode_list, uint32 *count)
 status_t
 BPrivateScreen::GetMode(uint32 workspace, display_mode *mode)
 {
+	if (mode == NULL)
+		return B_BAD_VALUE;
+		
 	BAppServerLink link;
 	link.StartMessage(AS_SCREEN_GET_MODE);
 	link.Attach<screen_id>(ID());
@@ -289,18 +292,23 @@ BPrivateScreen::GetMode(uint32 workspace, display_mode *mode)
 status_t
 BPrivateScreen::SetMode(uint32 workspace, display_mode *mode, bool makeDefault)
 {
-	// TODO: Implement
-	status_t status = B_ERROR;
-	/*
+	if (mode == NULL)
+		return B_BAD_VALUE;
+		
 	BAppServerLink link;
-	PortMessage reply;
-	link.SetOpCode(AS_SET_MODE);
+	link.StartMessage(AS_SCREEN_SET_MODE);
+	link.Attach<screen_id>(ID());
 	link.Attach<uint32>(workspace);
 	link.Attach<display_mode>(*mode);
 	link.Attach<bool>(makeDefault);
-	link.FlushWithReply(&reply);
-	reply.Read<status_t>(&status);
-	*/
+	
+	int32 code = SERVER_FALSE;
+	link.FlushWithReply(&code);
+	
+	status_t status = B_ERROR;
+	if (code == SERVER_TRUE)
+		link.Read<status_t>(&status);
+	
 	return status;
 }
 
