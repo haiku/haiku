@@ -165,7 +165,7 @@ Keep this option set to <strong>force_pci false</strong>, unless the graphics ca
 You can select one of two methods for (2D) acceleration here: PIO mode and DMA mode. DMA mode works 4-10 times as fast as PIO mode on modern CPU's (beyond 2Ghz or so), and should still be 2-3 times as fast as PIO mode on slower CPU's (below 500Mhz).
 	<ul>
 		<li><strong>false:</strong><br>
-If the default setting does not work as expected, you can try falling back to PIO mode acceleration. Note however that PIO mode is currently not working on NV40 and higher GPU's (GeForce 6200, 6600 and 6800 like types). Also, chances are that this method of acceleration will be removed in future driverversions (so be sure to let me know if you are having trouble with DMA mode!).
+If the default setting does not work as expected, you can try falling back to PIO mode acceleration. Note however that PIO mode is currently not working on NV40 and higher GPU's (GeForce 6200, 6600 and 6800 like types). Also, chances are that this method of acceleration will be removed in future driverversions (so be sure to let me know if you are having trouble with DMA mode!). For 3D acceleration with the seperate 3D add-on you currently need to set PIO mode acceleration.
 		<li><strong>true:</strong> (default setting)<br>
 <strong>dma_acc true</strong> enables DMA cmd fetching by the GPU for (2D) acceleration instead of using the old PIO method (which directly programs acceleration commands inside the GPU). The DMA method works (much) faster than PIO mode depending on system CPU speed. Also the DMA method is the only method that works on NV40 and higher GPU's (GeForce 6200, 6600 and 6800 like types) currently.
 	</ul>
@@ -190,6 +190,6 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on February 22, 2005)</p>
+<p>(Page last updated on May 2, 2005)</p>
 </body>
 </html>

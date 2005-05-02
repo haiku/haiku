@@ -4,6 +4,11 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>nv_driver 0.43 (Rudolf)</h1></p>
+<ul>
+	<li>Updated 3D specific engine initialisation for PIO mode to make the 3D add-on work on pre-NV10 cards. It now works on NV04-NV18 (although NV18 is slow) if you select PIO mode acceleration;
+	<li>Added two shared_info 'flags' informing the 3D add-on about modeswitches when they happen.
+</ul>
 <p><h1>nv_driver 0.41 (Rudolf)</h1></p>
 <ul>
 	<li>Added new acceleration method using DMA command fetching. You can now choose beween (the old) PIO mode and (the new) DMA mode acceleration via a new switch in nv.settings (DMA mode is now the default). DMA acceleration is say 2-3 times as fast as PIO mode acceleration on systems with relative fast CPU's (above 2Ghz or so). On relative slow CPU's (500Mhz or lower) there is no speedgain left and both methods match about up.<br>
