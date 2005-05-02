@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src tests servers app textview ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+SimpleTest TextView :
+	main.cpp
+# for running natively under R5:
+#	: be ;
+# for running in the Haiku app_server under R5:
+	: libopenbeos.so ;
+# for running on Haiku:
+#	: libbe.so ;
+
