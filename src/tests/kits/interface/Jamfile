@@ -75,6 +75,8 @@ SimpleTest ScrollViewTest :
 
 SimpleTest ChannelSliderTest :
 	ChannelSliderTest.cpp
+	ChannelSlider.cpp
+	ChannelControl.cpp
 	: be
 	;
 
@@ -90,7 +92,7 @@ SimpleTest ScreenTest :
 	;
 
 SEARCH on [ FGristFiles
-		ScrollView.cpp CheckBox.cpp
+		ScrollView.cpp CheckBox.cpp ChannelSlider.cpp ChannelControl.cpp
 	] = [ FDirName $(OBOS_TOP) src kits interface ] ;
 
 SubInclude OBOS_TOP src tests kits interface bprintjob ;
