@@ -4448,7 +4448,7 @@ BTextView::CancelInputMethod()
 void
 BTextView::LockWidthBuffer()
 {
-	if (atomic_add(&sWidthAtom, -1) <= 0) {
+	if (atomic_add(&sWidthAtom, 1) > 0) {
 		while (acquire_sem(sWidthSem) == B_INTERRUPTED)
 			;
 	}
@@ -4460,6 +4460,6 @@ BTextView::LockWidthBuffer()
 void
 BTextView::UnlockWidthBuffer()
 {
-	if (atomic_add(&sWidthAtom, 1) < 0)
+	if (atomic_add(&sWidthAtom, -1) > 1)
 		release_sem(sWidthSem);
 }
