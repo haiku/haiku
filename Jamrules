@@ -123,9 +123,11 @@ switch $(TARGET_PLATFORM)
 }
 if $(BONE_COMPATIBLE) {
 	NETWORK_LIBS = libsocket.so libbind.so ;
+	NETAPI_LIB = libbnetapi.so ;
 	SELECT_UNAME_ETC_LIB = libroot.so ;
 } else {
 	NETWORK_LIBS = libnet.so ;
+	NETAPI_LIB = libnetapi.so ;
 	SELECT_UNAME_ETC_LIB = libnet.so ;
 }
 

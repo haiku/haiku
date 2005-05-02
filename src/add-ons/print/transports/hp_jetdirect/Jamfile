@@ -8,7 +8,7 @@ Addon HP\ JetDirect : Print transport :
 	SetupWindow.cpp
 ;
 
-LinkSharedOSLibs HP\ JetDirect : be $(NETWORK_LIBS) ;
+LinkSharedOSLibs HP\ JetDirect : be $(NETAPI_LIB) ;
 
 Package haiku-printingkit-cvs :
 	HP\ JetDirect :
