@@ -163,7 +163,7 @@ struct MountVisitor : public BDiskDeviceVisitor {
 			}
 		}
 
-		return true;
+		return false;
 	}
 
 	bool		silent;
@@ -198,17 +198,19 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 	{
 		// get name and type
 		const char *name = partition->ContentName();
-		if (name == NULL) {
+		if (name == NULL || name[0] == '\0') {
 			name = partition->Name();
-			if (name == NULL)
-				name = "<unknown>";
+			if (name == NULL || name[0] == '\0')
+				name = "<unnamed>";
 		}
 
 		BPath path;
-		partition->GetMountPoint(&path);
+		if (partition->IsMounted())
+			partition->GetMountPoint(&path);
 
-		printf("%-16s %-20s %s\n", name, partition->ContentType(), path.Path());
-		return true;
+		printf("%-16s %-20s %s\n",
+			name, partition->ContentType(), partition->IsMounted() ? path.Path() : "");
+		return false;
 	}
 
 	bool listMountablePartitions;
