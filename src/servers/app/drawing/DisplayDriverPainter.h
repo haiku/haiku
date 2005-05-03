@@ -45,6 +45,10 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual bool				Initialize();
 	virtual void				Shutdown();
 
+	// clipping for all drawing functions, passing a NULL region
+	// will remove any clipping (drawing allowed everywhere)
+	virtual	void				ConstrainClippingRegion(BRegion* region);
+
 	// drawing functions
 	virtual	void				CopyRegion(		/*const*/ BRegion* region,
 												int32 xOffset,
@@ -123,6 +127,10 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual	void				StrokeLine(		const BPoint &start,
 												const BPoint &end,
 												DrawData *d);
+
+	virtual void				StrokeLineArray(const int32 &numlines,
+												const LineArrayData *data,
+												const DrawData *d);
 
 	// this version used by Decorator
 	virtual	void				StrokePoint(	const BPoint &pt,
@@ -235,10 +243,6 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual bool				DumpToFile(const char *path);
 	virtual ServerBitmap*		DumpToBitmap();
 
-	virtual void				StrokeLineArray(const int32 &numlines,
-												const LineArrayData *data,
-												const DrawData *d);
-
 	virtual status_t			SetDPMSMode(const uint32 &state);
 	virtual uint32				DPMSMode();
 	virtual uint32				DPMSCapabilities();
@@ -257,25 +261,6 @@ class DisplayDriverPainter : public DisplayDriver {
 											const display_mode *high);
 
 	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT);
-
-
-	// needed by CursorHandler
-	virtual void				CopyBitmap(ServerBitmap *bitmap,
-										   const BRect &source,
-										   const BRect &dest,
-										   const DrawData *d);
-
-	virtual void				CopyToBitmap(ServerBitmap *target,
-											 const BRect &source);
-
-	// This is for drivers which are internally double buffered
-	// and calling this will cause the real framebuffer to be updated
-	// needed by CursorHandler, (Layer ?)
-	virtual void				Invalidate(const BRect &r);
-
-	// temporarily virtual - until clipping code is added in DisplayDriver
-	// needed by Layer
-	virtual	void				ConstrainClippingRegion(BRegion *reg);
 
  private:
 			BRect				_CopyRect(BRect r, int32 xOffset, int32 yOffset) const;
