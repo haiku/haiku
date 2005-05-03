@@ -1,14 +1,15 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
-
 #ifndef _DISK_DEVICE_LIST_H
 #define _DISK_DEVICE_LIST_H
+
 
 #include <DiskDeviceVisitor.h>
 #include <Handler.h>
 #include <ObjectList.h>
+
 
 class BDiskDevice;
 class BDiskDeviceRoster;
@@ -17,7 +18,7 @@ class BSession;
 
 class BDiskDeviceList : public BHandler {
 public:
-	BDiskDeviceList(bool useOwnLocker);
+	BDiskDeviceList(bool useOwnLocker = true);
 	virtual ~BDiskDeviceList();
 
 	virtual void MessageReceived(BMessage *message);
