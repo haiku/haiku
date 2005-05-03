@@ -483,7 +483,7 @@ Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BP
 {
 	STRACE(("Layer(%s)::StartRebuildRegions() START\n", GetName()));
 	RBTRACE(("\n\nLayer(%s)::StartRebuildRegions() START\n", GetName()));
-	if(!fParent)
+	if (!fParent)
 		fFullVisible = fFull;
 	
 	BRegion oldVisible = fVisible;
@@ -1304,7 +1304,7 @@ Layer::resize_layer(float x, float y)
 	BRect rect(fFull.Frame());
 	rect.right += x;
 	rect.bottom += y;
-	
+
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_RESIZE, pt);
 	
 	fDriver->CopyRegionList(&fRootLayer->fCopyRegList, &fRootLayer->fCopyList, fRootLayer->fCopyRegList.CountItems(), &fFullVisible);
