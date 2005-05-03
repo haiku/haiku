@@ -2209,19 +2209,21 @@ ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
 //------------------------------------------------------------------------------
 void ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
 {
-	ssize_t		size;
-	char		*buffer;
+	ssize_t size = msg->FlattenedSize();
+	char* buffer = new char[size];
 
-	size		= msg->FlattenedSize();
-	buffer		= new char[size];
+	if (msg->Flatten(buffer, size) == B_OK) {
+//		BMessage::Private::SendFlattenedMessage(buffer, size,
+//			fClientLooperPort, target, usePreferred, B_INFINITE_TIMEOUT);
+		status_t ret = BMessage::Private::SendFlattenedMessage(buffer, size,
+							fClientLooperPort, target, usePreferred, 100000);
+		if (ret < B_OK)
+			fprintf(stderr, "ServerWindow::SendMessageToClient(): %s\n", strerror(ret));
 
-	if (msg->Flatten(buffer, size) == B_OK)
-		BMessage::Private::SendFlattenedMessage(buffer, size,
-			fClientLooperPort, target, usePreferred, B_INFINITE_TIMEOUT);
-	else
+	} else
 		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fName);
 
-	delete [] buffer;
+	delete[] buffer;
 }
 //------------------------------------------------------------------------------
 
