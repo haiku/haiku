@@ -77,6 +77,8 @@ namespace agg
                 BRect cb = m_region->RectAt(0);
                 m_ren.clip_box_naked(cb.left, cb.top, cb.right, cb.bottom);
             }
+            else
+            	m_ren.clip_box_naked(0, 0, -1, -1);
         }
 
         //--------------------------------------------------------------------
