@@ -114,6 +114,9 @@ class DisplayDriver {
 	virtual bool				Initialize();
 	virtual void				Shutdown();
 
+	// clipping for all drawing functions
+	virtual	void				ConstrainClippingRegion(BRegion* region) = 0;
+
 	// Graphics calls implemented in DisplayDriver
 	virtual	void				CopyRegion(		/*const*/ BRegion* region,
 												int32 xOffset,
@@ -192,6 +195,10 @@ class DisplayDriver {
 	virtual	void				StrokeLine(		const BPoint &start,
 												const BPoint &end,
 												DrawData *d) = 0;
+
+	virtual void				StrokeLineArray(const int32 &numlines,
+												const LineArrayData *data,
+												const DrawData *d) = 0;
 
 	// this version used by Decorator
 	virtual	void				StrokePoint(	const BPoint &pt,
@@ -310,10 +317,6 @@ class DisplayDriver {
 	virtual bool				DumpToFile(const char *path) = 0;
 	virtual ServerBitmap*		DumpToBitmap() = 0;
 
-	virtual void				StrokeLineArray(const int32 &numlines,
-												const LineArrayData *data,
-												const DrawData *d) = 0;
-
 	virtual status_t			SetDPMSMode(const uint32 &state) = 0;
 	virtual uint32				DPMSMode() = 0;
 	virtual uint32				DPMSCapabilities() = 0;
@@ -332,25 +335,6 @@ class DisplayDriver {
 											const display_mode *high) = 0;
 
 	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
-
-
-	// needed by CursorHandler
-	virtual void				CopyBitmap(ServerBitmap *bitmap,
-										   const BRect &source,
-										   const BRect &dest,
-										   const DrawData *d) = 0;
-
-	virtual void				CopyToBitmap(ServerBitmap *target,
-											 const BRect &source) = 0;
-
-	// This is for drivers which are internally double buffered
-	// and calling this will cause the real framebuffer to be updated
-	// needed by CursorHandler, (Layer ?)
-	virtual void				Invalidate(const BRect &r) = 0;
-
-	// temporarily virtual - until clipping code is added in DisplayDriver
-	// needed by Layer
-	virtual	void				ConstrainClippingRegion(BRegion *reg) = 0;
 
  protected:
 			display_mode		fDisplayMode;
