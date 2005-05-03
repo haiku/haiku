@@ -1449,6 +1449,11 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 
 	// figure out if we need to start at root or at cwd
 	if (*path == '/') {
+		if (sRoot == NULL) {
+			// we're a bit early, aren't we?
+			return B_ERROR;
+		}
+
 		while (*++path == '/')
 			;
 		start = sRoot;
