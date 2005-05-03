@@ -287,7 +287,8 @@ class Painter {
 	bool						fSubpixelPrecise;
 
 	float						fPenSize;
-	BRegion*					fClippingRegion; // NULL indicates no clipping at all
+	BRegion*					fClippingRegion;
+	bool						fValidClipping;
 	drawing_mode				fDrawingMode;
 	source_alpha				fAlphaSrcMode;
 	alpha_function				fAlphaFncMode;

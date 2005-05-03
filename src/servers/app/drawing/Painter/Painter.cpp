@@ -40,6 +40,8 @@ roundf(float v)
 		return (int)floorf(v - 0.5);
 }
 
+#define CHECK_CLIPPING	if (!fValidClipping) return BRect(0,0, -1, -1);
+
 // constructor
 Painter::Painter()
 	: fBuffer(NULL),
@@ -55,7 +57,8 @@ Painter::Painter()
 	  fLineProfile(),
 	  fSubpixelPrecise(false),
 	  fPenSize(1.0),
-	  fClippingRegion(NULL),
+	  fClippingRegion(new BRegion()),
+	  fValidClipping(false),
 	  fDrawingMode(B_OP_COPY),
 	  fAlphaSrcMode(B_PIXEL_ALPHA),
 //	  fAlphaSrcMode(B_CONSTANT_ALPHA),
@@ -184,18 +187,8 @@ Painter::SetDrawData(const DrawData* data)
 void
 Painter::ConstrainClipping(const BRegion& region)
 {
-	// The idea is that if the clipping region was
-	// never constrained, there is *no* clipping.
-	// This is of course different from having
-	// an *empty* clipping region.
-	if (!fClippingRegion) {
-		fClippingRegion = new BRegion(region);
-		// attach the base renderer to our clipping region,
-		// it keeps a pointer
-		if (fBaseRenderer)
-			fBaseRenderer->set_clipping_region(fClippingRegion);
-	} else
-		*fClippingRegion = region;
+	*fClippingRegion = region;
+	fValidClipping = fClippingRegion->Frame().IsValid();
 }
 
 // SetHighColor
@@ -301,6 +294,8 @@ Painter::StrokeLine(BPoint a, BPoint b, DrawData* context)
 	// do this as well, and it is probably hard to calculate
 	// the correct location outside of AGGTextRenderer...
 
+	CHECK_CLIPPING
+
 	// "false" means not to do the pixel center offset,
 	// because it would mess up our optimized versions
 	_Transform(&a, false);
@@ -373,7 +368,7 @@ typedef union {
 bool
 Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 {
-	if (fBuffer) {
+	if (fBuffer && fValidClipping) {
 		if (a.x == b.x) {
 			// vertical
 			uint8* dst = fBuffer->row(0);
@@ -473,6 +468,8 @@ Painter::FillPolygon(const BPoint* ptArray, int32 numPts,
 BRect
 Painter::StrokeBezier(const BPoint* controlPoints) const
 {
+	CHECK_CLIPPING
+
 	agg::path_storage curve;
 
 	BPoint p1(controlPoints[0]);
@@ -499,6 +496,8 @@ Painter::StrokeBezier(const BPoint* controlPoints) const
 BRect
 Painter::FillBezier(const BPoint* controlPoints) const
 {
+	CHECK_CLIPPING
+
 	agg::path_storage curve;
 
 	BPoint p1(controlPoints[0]);
@@ -539,6 +538,8 @@ Painter::FillShape(/*const */BShape* shape) const
 BRect
 Painter::StrokeRect(const BRect& r) const
 {
+	CHECK_CLIPPING
+
 	// support invalid rects
 	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
 	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
@@ -590,6 +591,8 @@ Painter::StrokeRect(const BRect& r, const rgb_color& c) const
 BRect
 Painter::FillRect(const BRect& r) const
 {
+	CHECK_CLIPPING
+
 	// support invalid rects
 	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
 	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
@@ -630,7 +633,9 @@ Painter::FillRect(const BRect& r) const
 void
 Painter::FillRect(const BRect& r, const rgb_color& c) const
 {
-	if (fBuffer) {
+	if (fBuffer && fValidClipping) {
+//printf("Painter::FillRect(BRect(%.1f, %.1f, %.1f, %.1f))\n", r.left, r.top, r.right, r.bottom);
+//printf("   rgb_color(%d, %d, %d, %d)\n", c.red, c.green, c.blue, c.alpha);
 		uint8* dst = fBuffer->row(0);
 		uint32 bpr = fBuffer->stride();
 		int32 left = (int32)r.left;
@@ -667,6 +672,8 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 BRect
 Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 {
+	CHECK_CLIPPING
+
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
 	_Transform(&lt);
@@ -683,6 +690,8 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 BRect
 Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 {
+	CHECK_CLIPPING
+
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
 	_Transform(&lt, false);
@@ -720,6 +729,8 @@ BRect
 Painter::StrokeArc(BPoint center, float xRadius, float yRadius,
 				   float angle, float span) const
 {
+	CHECK_CLIPPING
+
 	_Transform(&center);
 
 	double angleRad = (angle * PI) / 180.0;
@@ -737,6 +748,8 @@ BRect
 Painter::FillArc(BPoint center, float xRadius, float yRadius,
 				 float angle, float span) const
 {
+	CHECK_CLIPPING
+
 	_Transform(&center);
 
 	double angleRad = (angle * PI) / 180.0;
@@ -801,6 +814,8 @@ BRect
 Painter::DrawString(const char* utf8String, uint32 length,
 					BPoint baseLine, const escapement_delta* delta)
 {
+	CHECK_CLIPPING
+
 	BRect bounds(0.0, 0.0, -1.0, -1.0);
 
 	SetPattern(B_SOLID_HIGH);
@@ -894,6 +909,8 @@ Painter::DrawBitmap(const ServerBitmap* bitmap,
 BRect
 Painter::FillRegion(const BRegion* region) const
 {
+	CHECK_CLIPPING
+
 	BRegion copy(*region);
 	int32 count = copy.CountRects();
 	BRect touched = FillRect(copy.RectAt(0));
@@ -907,6 +924,8 @@ Painter::FillRegion(const BRegion* region) const
 BRect
 Painter::InvertRect(const BRect& r) const
 {
+	CHECK_CLIPPING
+
 	BRegion region(r);
 	if (fClippingRegion) {
 		region.IntersectWith(fClippingRegion);
@@ -1004,8 +1023,9 @@ Painter::_Transform(const BPoint& point, bool centerOffset) const
 BRect
 Painter::_Clipped(const BRect& rect) const
 {
-	if (rect.IsValid() && fClippingRegion)
+	if (rect.IsValid()) {
 		return BRect(rect & fClippingRegion->Frame());
+	}
 	return BRect(rect);
 }
 
@@ -1116,6 +1136,8 @@ Painter::_SetRendererColor(const rgb_color& color) const
 inline BRect
 Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill) const
 {
+	CHECK_CLIPPING
+
 	_Transform(&pt1);
 	_Transform(&pt2);
 	_Transform(&pt3);
@@ -1139,6 +1161,8 @@ inline BRect
 Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 					  bool fill) const
 {
+	CHECK_CLIPPING
+
 	// TODO: I think the conversion and the offset of
 	// pixel centers might not be correct here, and it
 	// might even be necessary to treat Fill and Stroke
@@ -1159,6 +1183,8 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 inline BRect
 Painter::_DrawShape(/*const */BShape* shape, bool fill) const
 {
+	CHECK_CLIPPING
+
 	// TODO: untested
 	agg::path_storage path;
 	ShapeConverter converter(&path);
@@ -1179,6 +1205,8 @@ inline BRect
 Painter::_DrawPolygon(const BPoint* ptArray, int32 numPts,
 					  bool closed, bool fill) const
 {
+	CHECK_CLIPPING
+
 	if (numPts > 0) {
 
 		agg::path_storage path;
