@@ -563,6 +563,8 @@ BView::ConvertFromScreen(BPoint *pt) const
 
 	do_owner_check_no_pick();
 
+	// TODO: I could be wrong, but shouldn't these
+	// be swapped ?
 	ConvertFromParent(pt);
 	parent->ConvertFromScreen(pt);
 }
@@ -607,6 +609,7 @@ BView::ConvertFromScreen(BRect *rect) const
 
 	do_owner_check_no_pick();
 
+	// TODO: See above
 	ConvertFromParent(rect);
 	parent->ConvertFromScreen(rect);
 }
