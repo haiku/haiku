@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
 
 #include <errno.h>
@@ -399,7 +399,7 @@ BPartition::GetMountPoint(BPath *mountPoint) const
 	// partition not mounted
 	// get the volume name
 	const char *volumeName = ContentName();
-	if (volumeName || strlen(volumeName) == 0)
+	if (!volumeName || strlen(volumeName) == 0)
 		volumeName = Name();
 	if (!volumeName || strlen(volumeName) == 0)
 		volumeName = "unnamed volume";
