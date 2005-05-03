@@ -1,4 +1,8 @@
-// mountvolume.cpp
+/* 
+ * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #include <stdio.h>
 #include <string.h>
@@ -9,66 +13,71 @@
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
 #include <DiskDeviceRoster.h>
+#include <DiskDeviceTypes.h>
+#include <DiskDeviceList.h>
 #include <Partition.h>
+
+#include <Path.h>
+#include <fs_volume.h>
+
+extern const char *__progname;
+
 
 typedef set<string> StringSet;
 
 // usage
 static const char *kUsage =
-"%s <options> [ <volume name> ... ]\n"
-"Mounts the volume with name <volume name>, if given. Lists info about\n"
-"mounted and mountable volumes and mounts/unmounts volumes.\n"
-"\n"
-"The terminology is actually not quite correct: By volumes only partitions\n"
-"living on disk devices are meant.\n"
-"\n"
-"Options:\n"
-"[general]\n"
-"  -s                 - silent; don't print info about (un)mounting\n"
-"  -h, --help         - print this info text\n"
-"\n"
-"[mounting]\n"
-"  -all               - mount all mountable volumes\n"
-"  -allbfs            - mount all mountable BFS volumes\n"
-"  -allhfs            - mount all mountable HFS volumes\n"
-"  -alldos            - mount all mountable DOS volumes\n"
-"  -ro                - mount volumes read-only\n"
-"  -unmount <volume>  - unmount the volume with the name <volume>\n"
-"\n"
-"[info]\n"
-"  -p, -l             - list all mounted and mountable volumes\n"
-"  -lh                - list all existing volumes (incl. not-mountable ones)\n"
-"  -dd                - list all disk existing devices\n"
-"\n"
-"[obsolete]\n"
-"  -r                 - ignored\n"
-"  -publishall        - ignored\n"
-"  -publishbfs        - ignored\n"
-"  -publishhfs        - ignored\n"
-"  -publishdos        - ignored\n"
+	"%s <options> [ <volume name> ... ]\n"
+	"Mounts the volume with name <volume name>, if given. Lists info about\n"
+	"mounted and mountable volumes and mounts/unmounts volumes.\n"
+	"\n"
+	"The terminology is actually not quite correct: By volumes only partitions\n"
+	"living on disk devices are meant.\n"
+	"\n"
+	"Options:\n"
+	"[general]\n"
+	"  -s                 - silent; don't print info about (un)mounting\n"
+	"  -h, --help         - print this info text\n"
+	"\n"
+	"[mounting]\n"
+	"  -all               - mount all mountable volumes\n"
+	"  -allbfs            - mount all mountable BFS volumes\n"
+	"  -allhfs            - mount all mountable HFS volumes\n"
+	"  -alldos            - mount all mountable DOS volumes\n"
+	"  -ro                - mount volumes read-only\n"
+	"  -unmount <volume>  - unmount the volume with the name <volume>\n"
+	"\n"
+	"[info]\n"
+	"  -p, -l             - list all mounted and mountable volumes\n"
+	"  -lh                - list all existing volumes (incl. not-mountable ones)\n"
+	"  -dd                - list all disk existing devices\n"
+	"\n"
+	"[obsolete]\n"
+	"  -r                 - ignored\n"
+	"  -publishall        - ignored\n"
+	"  -publishbfs        - ignored\n"
+	"  -publishhfs        - ignored\n"
+	"  -publishdos        - ignored\n"
 ;
 
 // application name
-const char *kAppName = "mountvolume";
+const char *kAppName = __progname;
+
 
 // print_usage
 static
 void
-print_usage(const char *appName, bool error)
+print_usage(bool error)
 {
-	if (appName) {
-		if (const char *lastSlash = strrchr(appName, '/')
-			appName = lastSlash
-	} else
-		appName = kAppName;
-	fprintf((error ? stderr : stdout), kUsage, appName);
+	fprintf(error ? stderr : stdout, kUsage, kAppName);
 }
 
 // print_usage_and_exit
 static
-print_usage_and_exit(const char *appName, bool error)
+void
+print_usage_and_exit(bool error)
 {
-	print_usage(appName, error);
+	print_usage(error);
 	exit(error ? 0 : 1);
 }
 
@@ -86,7 +95,7 @@ struct MountVisitor : public BDiskDeviceVisitor {
 
 	virtual bool Visit(BDiskDevice *device)
 	{
-		Visit(device, 0);
+		return Visit(device, 0);
 	}
 
 	virtual bool Visit(BPartition *partition, int32 level)
@@ -101,21 +110,21 @@ struct MountVisitor : public BDiskDeviceVisitor {
 		bool mount = false;
 		if (name && toMount.find(name) != toMount.end()) {
 			toMount.erase(name);
-			if (!partition->IsMounted()
+			if (!partition->IsMounted())
 				mount = true;
 			else if (!silent)
 				fprintf(stderr, "Volume `%s' already mounted.\n", name);
 		} else if (mountAll) {
 			mount = true;
-		} else if (mountBFS && contentType
-			&& strcmp(contentType, kPartitionTypeBFS) == 0) {
+		} else if (mountBFS && type != NULL
+			&& strcmp(type, kPartitionTypeBFS) == 0) {
 			mount = true;
-		} else if (mountHFS && contentType
-			&& strcmp(contentType, kPartitionTypeHFS) == 0) {
+		} else if (mountHFS && type != NULL
+			&& strcmp(type, kPartitionTypeHFS) == 0) {
 			mount = true;
-		} else if (mountDOS && contentType
-			&& (strcmp(contentType, kPartitionTypeFAT12) == 0
-				|| strcmp(contentType, kPartitionTypeFAT32) == 0)) {
+		} else if (mountDOS && type != NULL
+			&& (strcmp(type, kPartitionTypeFAT12) == 0
+				|| strcmp(type, kPartitionTypeFAT32) == 0)) {
 			mount = true;
 		}
 
@@ -123,7 +132,7 @@ struct MountVisitor : public BDiskDeviceVisitor {
 		bool unmount = false;
 		if (name && toUnmount.find(name) != toUnmount.end()) {
 			toUnmount.erase(name);
-			if (!partition->IsMounted() {
+			if (!partition->IsMounted()) {
 				unmount = true;
 				mount = false;
 			} else if (!silent)
@@ -138,8 +147,8 @@ struct MountVisitor : public BDiskDeviceVisitor {
 				if (error == B_OK) {
 					printf("Volume `%s' mounted successfully.\n", name);
 				} else {
-					fprintf("Failed to mount volume `%s': %s\n", name,
-						strerror(error));
+					fprintf(stderr, "Failed to mount volume `%s': %s\n",
+						name, strerror(error));
 				}
 			}
 		} else if (unmount) {
@@ -148,11 +157,13 @@ struct MountVisitor : public BDiskDeviceVisitor {
 				if (error == B_OK) {
 					printf("Volume `%s' unmounted successfully.\n", name);
 				} else {
-					fprintf("Failed to unmount volume `%s': %s\n", name,
-						strerror(error));
+					fprintf(stderr, "Failed to unmount volume `%s': %s\n",
+						name, strerror(error));
 				}
 			}
 		}
+
+		return true;
 	}
 
 	bool		silent;
@@ -173,13 +184,31 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 	{
 	}
 
+	bool IsUsed()
+	{
+		return listMountablePartitions || listAllPartitions;
+	}
+
 	virtual bool Visit(BDiskDevice *device)
 	{
-		Visit(device, 0);
+		return Visit(device, 0);
 	}
 
 	virtual bool Visit(BPartition *partition, int32 level)
 	{
+		// get name and type
+		const char *name = partition->ContentName();
+		if (name == NULL) {
+			name = partition->Name();
+			if (name == NULL)
+				name = "<unknown>";
+		}
+
+		BPath path;
+		partition->GetMountPoint(&path);
+
+		printf("%-16s %-20s %s\n", name, partition->ContentType(), path.Path());
+		return true;
 	}
 
 	bool listMountablePartitions;
@@ -192,15 +221,15 @@ int
 main(int argc, char **argv)
 {
 	if (argc < 2)
-		print_usage_and_exit(argv[0], true);
+		print_usage_and_exit(true);
 
 	MountVisitor mountVisitor;
 	PrintPartitionsVisitor printPartitionsVisitor;
 	bool listAllDevices = false;
 
 	// parse arguments
-	int argi = 1;
-	while (argi < argc) {
+
+	for (int argi = 1; argi < argc; argi++) {
 		const char *arg = argv[argi];
 
 		if (arg[0] != '\0' && arg[0] != '-') {
@@ -208,21 +237,21 @@ main(int argc, char **argv)
 		} else if (strcmp(arg, "-s") == 0) {
 			mountVisitor.silent = true;
 		} else if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
-			print_usage_and_exit(argv[0], false);
+			print_usage_and_exit(false);
 		} else if (strcmp(arg, "-all") == 0) {
 			mountVisitor.mountAll = true;
 		} else if (strcmp(arg, "-allbfs") == 0) {
-			mountVisitor.mountAllBFS = true;
+			mountVisitor.mountBFS = true;
 		} else if (strcmp(arg, "-allhfs") == 0) {
-			mountVisitor.mountAllHFS = true;
+			mountVisitor.mountHFS = true;
 		} else if (strcmp(arg, "-alldos") == 0) {
-			mountVisitor.mountAllDOS = true;
+			mountVisitor.mountDOS = true;
 		} else if (strcmp(arg, "-ro") == 0) {
 			mountVisitor.readOnly = true;
 		} else if (strcmp(arg, "-unmount") == 0) {
 			argi++;
 			if (argi >= argc)
-				print_usage_and_exit(argv[0], true);
+				print_usage_and_exit(true);
 			mountVisitor.toUnmount.insert(argv[argi]);
 		} else if (strcmp(arg, "-p") == 0 || strcmp(arg, "-l") == 0) {
 			printPartitionsVisitor.listMountablePartitions = true;
@@ -236,7 +265,7 @@ main(int argc, char **argv)
 			|| strcmp(arg, "-publishdos") == 0) {
 			// obsolete: ignore
 		} else
-			print_usage_and_exit(argv[0], true);
+			print_usage_and_exit(true);
 	}
 
 	// get a disk device list
@@ -256,12 +285,14 @@ main(int argc, char **argv)
 		for (StringSet::iterator it = mountVisitor.toMount.begin();
 			 it != mountVisitor.toMount.end();
 			 it++) {
-			fprintf("Failed to mount volume `%s': Volume not found.\n", *it);
+			fprintf(stderr, "Failed to mount volume `%s': Volume not found.\n",
+				(*it).c_str());
 		}
 		for (StringSet::iterator it = mountVisitor.toUnmount.begin();
 			 it != mountVisitor.toUnmount.end();
 			 it++) {
-			fprintf("Failed to unmount volume `%s': Volume not found.\n", *it);
+			fprintf(stderr, "Failed to unmount volume `%s': Volume not found.\n",
+				(*it).c_str());
 		}
 	}
 
@@ -274,7 +305,20 @@ main(int argc, char **argv)
 	}
 
 	// print information
-//	if (//
+
+	if (listAllDevices) {
+		// TODO
+	}
+
+	if (printPartitionsVisitor.IsUsed()) {
+		puts("Volume           File System          Mounted At");
+		puts("----------------------------------------------------------");
+
+		if (printPartitionsVisitor.listAllPartitions)
+			deviceList.VisitEachPartition(&printPartitionsVisitor);
+		else
+			deviceList.VisitEachMountablePartition(&printPartitionsVisitor);
+	}
 
 	return 0;
 }

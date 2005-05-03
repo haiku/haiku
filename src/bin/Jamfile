@@ -2,6 +2,7 @@ SubDir OBOS_TOP src bin ;
 
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
 
 # standard commands that don't need any additional library
 StdBinCommands
@@ -69,7 +70,13 @@ StdBinCommands
 	shutdown.cpp
 	version.cpp
 #	yes.cpp
-	: libroot.so be ;
+	: libroot.so libbe.so ;
+
+# standard commands that need libbe.so, libstdc++.so
+StdBinCommands
+	mountvolume.cpp
+	: libroot.so libbe.so libstdc++.r4.so
+	;
 
 # standard commands that need libbe.so, libtranslation.so
 StdBinCommands
