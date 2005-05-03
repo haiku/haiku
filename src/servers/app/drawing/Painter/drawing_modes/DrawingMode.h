@@ -13,8 +13,9 @@ class PatternHandler;
 
 // BLEND
 //
-// this macro assumes source alpha in range 0..255 and
-// ignores dest alpha (is assumed to equal 255)
+// This macro assumes source alpha in range 0..255 and
+// ignores dest alpha (is assumed to equal 255).
+// TODO: We need the assignment of alpha only when drawing into bitmaps!
 #define BLEND(d1, d2, d3, da, s1, s2, s3, a) \
 { \
 	(d1) = (((((s1) - (d1)) * (a)) + ((d1) << 8)) >> 8); \
@@ -23,10 +24,26 @@ class PatternHandler;
 	(da) = max_c((da), (a)); \
 }
 
+// BLEND_FROM
+//
+// This macro assumes source alpha in range 0..255 and
+// ignores dest alpha (is assumed to equal 255).
+// It uses two colors for the blending (f and s) and writes
+// the result into a third color (d).
+// TODO: We need the assignment of alpha only when drawing into bitmaps!
+#define BLEND_FROM(d1, d2, d3, da, f1, f2, f3, s1, s2, s3, a) \
+{ \
+	(d1) = (((((s1) - (f1)) * (a)) + ((f1) << 8)) >> 8); \
+	(d2) = (((((s2) - (f2)) * (a)) + ((f2) << 8)) >> 8); \
+	(d3) = (((((s3) - (f3)) * (a)) + ((f3) << 8)) >> 8); \
+	(da) = max_c((da), (a)); \
+}
+
 // BLEND16
 //
-// this macro assumes source alpha in range 0..65025 and
-// ignores dest alpha (is assumed to equal 255)
+// This macro assumes source alpha in range 0..65025 and
+// ignores dest alpha (is assumed to equal 255).
+// TODO: We need the assignment of alpha only when drawing into bitmaps!
 #define BLEND16(d1, d2, d3, da, s1, s2, s3, a) \
 { \
 	(d1) = (((((s1) - (d1)) * (a)) + ((d1) << 16)) >> 16); \
@@ -37,8 +54,8 @@ class PatternHandler;
 
 // BLEND_COMPOSITE
 //
-// this macro assumes source alpha in range 0..255 and
-// composes the source color over a possibly semi-transparent background
+// This macro assumes source alpha in range 0..255 and
+// composes the source color over a possibly semi-transparent background.
 #define BLEND_COMPOSITE(d1, d2, d3, da, s1, s2, s3, a) \
 { \
 	if ((da) == 255) { \
@@ -57,8 +74,8 @@ class PatternHandler;
 
 // BLEND_COMPOSITE16
 //
-// this macro assumes source alpha in range 0..65025 and
-// composes the source color over a possibly semi-transparent background
+// This macro assumes source alpha in range 0..65025 and
+// composes the source color over a possibly semi-transparent background.
 // TODO: implement a faster version
 #define BLEND_COMPOSITE16(d1, d2, d3, da, s1, s2, s3, a) \
 { \

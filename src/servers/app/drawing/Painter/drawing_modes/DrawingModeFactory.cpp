@@ -86,9 +86,9 @@ DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 		// in these drawing modes, the current high
 		// and low color are treated equally
 		case B_OP_COPY:
-			if (solid) {
+			if (solid)
 				return fDrawingModeBGRA32CopySolid;
-			} else
+			else
 				return fDrawingModeBGRA32Copy;
 			break;
 		case B_OP_ADD:

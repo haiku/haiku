@@ -22,8 +22,10 @@ class DrawingModeCopySolid : public DrawingMode {
 			ASSIGN_COPY(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
 						c.r, c.g, c.b);
 		} else {
+			rgb_color l = fPatternHandler->LowColor().GetColor32();
 			BLEND_COPY(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
-					   c.r, c.g, c.b, cover);
+					   c.r, c.g, c.b, cover,
+					   l.red, l.green, l.blue);
 		}
 	}
 
@@ -47,9 +49,11 @@ class DrawingModeCopySolid : public DrawingMode {
 			} while(--len);
 		} else {
 			uint8* p = fBuffer->row(y) + (x << 2);
+			rgb_color l = fPatternHandler->LowColor().GetColor32();
 			do {
 				BLEND_COPY(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
-						   c.r, c.g, c.b, cover);
+						   c.r, c.g, c.b, cover,
+						   l.red, l.green, l.blue);
 				p += 4;
 			} while(--len);
 		}
@@ -67,6 +71,7 @@ printf("DrawingModeCopySolid::blend_vline()\n");
 								   const color_type& c, const uint8* covers)
 	{
 		uint8* p = fBuffer->row(y) + (x << 2);
+		rgb_color l = fPatternHandler->LowColor().GetColor32();
 		do {
 			if (*covers) {
 				if(*covers == 255) {
@@ -74,7 +79,8 @@ printf("DrawingModeCopySolid::blend_vline()\n");
 								c.r, c.g, c.b);
 				} else {
 					BLEND_COPY(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
-							   c.r, c.g, c.b, *covers);
+							   c.r, c.g, c.b, *covers,
+							   l.red, l.green, l.blue);
 				}
 			}
 			covers++;
@@ -89,6 +95,7 @@ printf("DrawingModeCopySolid::blend_vline()\n");
 								   const color_type& c, const uint8* covers)
 	{
 		uint8* p = fBuffer->row(y) + (x << 2);
+		rgb_color l = fPatternHandler->LowColor().GetColor32();
 		do {
 			if (*covers) {
 				if (*covers == 255) {
@@ -96,7 +103,8 @@ printf("DrawingModeCopySolid::blend_vline()\n");
 								c.r, c.g, c.b);
 				} else {
 					BLEND_COPY(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
-							   c.r, c.g, c.b, *covers);
+							   c.r, c.g, c.b, *covers,
+							   l.red, l.green, l.blue);
 				}
 			}
 			covers++;
@@ -112,6 +120,7 @@ printf("DrawingModeCopySolid::blend_vline()\n");
 								   uint8 cover)
 	{
 		uint8* p = fBuffer->row(y) + (x << 2);
+		rgb_color l = fPatternHandler->LowColor().GetColor32();
 		if (covers) {
 			// non-solid opacity
 			do {
@@ -121,7 +130,8 @@ printf("DrawingModeCopySolid::blend_vline()\n");
 									colors->r, colors->g, colors->b);
 					} else {
 						BLEND_COPY(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
-								   colors->r, colors->g, colors->b, *covers);
+								   colors->r, colors->g, colors->b, *covers,
+								   l.red, l.green, l.blue);
 					}
 				}
 				covers++;
@@ -141,7 +151,8 @@ printf("DrawingModeCopySolid::blend_vline()\n");
 			} else if (cover) {
 				do {
 					BLEND_COPY(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
-							   colors->r, colors->g, colors->b, cover);
+							   colors->r, colors->g, colors->b, cover,
+							   l.red, l.green, l.blue);
 					p += 4;
 					++colors;
 				} while(--len);
