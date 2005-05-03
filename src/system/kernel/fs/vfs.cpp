@@ -4701,7 +4701,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	// supply the partition (if any) with the mount cookie and mark it mounted
 	if (partition) {
 		partition->SetMountCookie(mount->cookie);
-		partition->AddFlags(B_PARTITION_MOUNTED);
+		partition->SetVolumeID(mount->id);
 
 		// keep a partition reference as long as the partition is mounted
 		partitionRegistrar.Detach();
