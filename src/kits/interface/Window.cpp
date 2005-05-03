@@ -2290,6 +2290,8 @@ void BWindow::task_looper()
 		{
 			//	Add to queue
 			fQueue->AddMessage(msg);
+		} else {
+			continue;
 		}
 		
 		//	Get message count from port
@@ -2383,11 +2385,8 @@ void BWindow::task_looper()
 			Unlock();
 
 			//	Delete the current message (fLastMessage)
-			if (fLastMessage)
-			{
-				delete fLastMessage;
-				fLastMessage = NULL;
-			}
+			delete fLastMessage;
+			fLastMessage = NULL;
 
 			//	Are any messages on the port?
 			if (port_count(fMsgPort) > 0)
