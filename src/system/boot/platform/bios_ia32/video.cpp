@@ -485,7 +485,7 @@ fallback:
 	// clear the video memory
 	// ToDo: this shouldn't be necessary on real hardware (and Bochs), but
 	//	at least booting with Qemu looks ugly when this is missing
-	//memset((void *)sFrameBuffer, 0, gKernelArgs.frame_buffer.physical_buffer.size);
+	memset((void *)sFrameBuffer, 0, gKernelArgs.frame_buffer.physical_buffer.size);
 
 	if (sMode != NULL) {
 		if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
