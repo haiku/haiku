@@ -84,6 +84,25 @@ DisplayDriverPainter::Shutdown()
 	DisplayDriver::Shutdown();
 }
 
+// ConstrainClippingRegion
+void DisplayDriverPainter::ConstrainClippingRegion(BRegion *region)
+{
+	if (Lock()) {
+		if (!region) {
+//			BRegion empty;
+//			fPainter->ConstrainClipping(empty);
+			if (RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer()) {
+				BRegion all;
+				all.Include(BRect(0, 0, buffer->Width() - 1, buffer->Height() - 1));
+				fPainter->ConstrainClipping(all);
+			}
+		} else {
+			fPainter->ConstrainClipping(*region);
+		}
+		Unlock();
+	}
+}
+
 // CopyRegion() does a topological sort of the rects in the
 // region. The algorithm was suggested by Ingo Weinhold.
 // It compares each rect with each rect and builds a tree
@@ -199,6 +218,8 @@ DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
 								 int32 xOffset, int32 yOffset)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor(fPainter->ClipRect(region->Frame()));
+
 		int32 count = region->CountRects();
 
 		// TODO: make this step unnecessary
@@ -276,6 +297,7 @@ DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
 					inDegreeZeroNodes.push(n->pointers[k]);
 			}
 		}
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -314,9 +336,12 @@ void
 DisplayDriverPainter::InvertRect(const BRect &r)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor(fPainter->ClipRect(r));
 
 		BRect touched = fPainter->InvertRect(r);
+
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -333,12 +358,14 @@ DisplayDriverPainter::DrawBitmap(BRegion *region, ServerBitmap *bitmap,
 		return;
 
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->ConstrainClipping(*region);
 		fPainter->SetDrawData(d);
 		fPainter->DrawBitmap(bitmap, source, dest);
 
 		fGraphicsCard->Invalidate(dest);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -350,6 +377,7 @@ DisplayDriverPainter::FillArc(const BRect &r, const float &angle,
 							  const float &span, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 
@@ -361,6 +389,7 @@ DisplayDriverPainter::FillArc(const BRect &r, const float &angle,
 		BRect touched = fPainter->FillArc(center, xRadius, yRadius, angle, span);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -371,12 +400,14 @@ void
 DisplayDriverPainter::FillBezier(BPoint *pts, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 
 		BRect touched = fPainter->FillBezier(pts);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -387,6 +418,7 @@ void
 DisplayDriverPainter::FillEllipse(const BRect &r, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 
@@ -398,6 +430,7 @@ DisplayDriverPainter::FillEllipse(const BRect &r, const DrawData *d)
 		BRect touched = fPainter->FillEllipse(center, xRadius, yRadius);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -409,11 +442,13 @@ DisplayDriverPainter::FillPolygon(BPoint *ptlist, int32 numpts,
 								  const BRect &bounds, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 		BRect touched = fPainter->FillPolygon(ptlist, numpts);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -424,14 +459,18 @@ void
 DisplayDriverPainter::FillRect(const BRect &r, const RGBColor &color)
 {
 	if (Lock()) {
+		BRect vr(min_c(r.left, r.right),
+				 min_c(r.top, r.bottom),
+				 max_c(r.left, r.right),
+				 max_c(r.top, r.bottom));
+		vr = fPainter->ClipRect(vr);
 
-		fPainter->FillRect(r, color.GetColor32());
-		BRect touched(min_c(r.left, r.right),
-					  min_c(r.top, r.bottom),
-					  max_c(r.left, r.right),
-					  max_c(r.top, r.bottom));
+		fGraphicsCard->HideSoftwareCursor(vr);
 
-		fGraphicsCard->Invalidate(fPainter->ClipRect(touched));
+		fPainter->FillRect(vr, color.GetColor32());
+
+		fGraphicsCard->Invalidate(vr);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -442,11 +481,19 @@ void
 DisplayDriverPainter::FillRect(const BRect &r, const DrawData *d)
 {
 	if (Lock()) {
+		BRect vr(min_c(r.left, r.right),
+				 min_c(r.top, r.bottom),
+				 max_c(r.left, r.right),
+				 max_c(r.top, r.bottom));
+		vr = fPainter->ClipRect(vr);
+
+		fGraphicsCard->HideSoftwareCursor(vr);
 
 		fPainter->SetDrawData(d);
-		BRect touched = fPainter->FillRect(r);
+		BRect touched = fPainter->FillRect(vr);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -458,6 +505,8 @@ DisplayDriverPainter::FillRegion(BRegion& r, const DrawData *d)
 {
 	if (Lock()) {
 
+		fGraphicsCard->HideSoftwareCursor(fPainter->ClipRect(r.Frame()));
+
 		fPainter->SetDrawData(d);
 
 		BRect touched = fPainter->FillRect(r.RectAt(0));
@@ -468,6 +517,7 @@ DisplayDriverPainter::FillRegion(BRegion& r, const DrawData *d)
 		}
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -480,11 +530,13 @@ DisplayDriverPainter::FillRoundRect(const BRect &r,
 									const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 		BRect touched = fPainter->FillRoundRect(r, xrad, yrad);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -511,11 +563,13 @@ DisplayDriverPainter::FillTriangle(BPoint *pts, const BRect &bounds,
 								   const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 		BRect touched = fPainter->FillTriangle(pts[0], pts[1], pts[2]);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -527,6 +581,7 @@ DisplayDriverPainter::StrokeArc(const BRect &r, const float &angle,
 								const float &span, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 
@@ -538,6 +593,7 @@ DisplayDriverPainter::StrokeArc(const BRect &r, const float &angle,
 		BRect touched = fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -548,11 +604,13 @@ void
 DisplayDriverPainter::StrokeBezier(BPoint *pts, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 		BRect touched = fPainter->StrokeBezier(pts);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -563,6 +621,7 @@ void
 DisplayDriverPainter::StrokeEllipse(const BRect &r, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 
@@ -574,6 +633,7 @@ DisplayDriverPainter::StrokeEllipse(const BRect &r, const DrawData *d)
 		BRect touched = fPainter->StrokeEllipse(center, xRadius, yRadius);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -587,18 +647,22 @@ void
 DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
 	if (Lock()) {
+		BRect touched(min_c(start.x, end.x),
+					  min_c(start.y, end.y),
+					  max_c(start.x, end.x),
+					  max_c(start.y, end.y));
+		touched = fPainter->ClipRect(touched);
+		fGraphicsCard->HideSoftwareCursor(touched);
+
 		if (!fPainter->StraightLine(start, end, color.GetColor32())) {
-			DrawData context;
+			static DrawData context;
 			context.SetHighColor(color);
-			context.SetDrawingMode(B_OP_COPY);
+			context.SetDrawingMode(B_OP_OVER);
 			StrokeLine(start, end, &context);
 		} else {
-			BRect touched(min_c(start.x, end.x),
-						  min_c(start.y, end.y),
-						  max_c(start.x, end.x),
-						  max_c(start.y, end.y));
-			fGraphicsCard->Invalidate(fPainter->ClipRect(touched));
+			fGraphicsCard->Invalidate(touched);
 		}
+		fGraphicsCard->ShowSoftwareCursor();
 		Unlock();
 	}
 }
@@ -608,8 +672,51 @@ void
 DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, DrawData* context)
 {
 	if (Lock()) {
-		BRect touched = fPainter->StrokeLine(start, end, context);
+		BRect touched(min_c(start.x, end.x),
+					  min_c(start.y, end.y),
+					  max_c(start.x, end.x),
+					  max_c(start.y, end.y));
+		touched = fPainter->ClipRect(touched);
+		fGraphicsCard->HideSoftwareCursor(touched);
+
+		touched = fPainter->StrokeLine(start, end, context);
+
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
+
+		Unlock();
+	}
+}
+
+// StrokeLineArray
+void
+DisplayDriverPainter::StrokeLineArray(const int32 &numlines,
+									  const LineArrayData *linedata,
+									  const DrawData *d)
+{
+	if(!d || !linedata || numlines <= 0)
+		return;
+	
+	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
+
+		DrawData context;
+		context.SetDrawingMode(B_OP_COPY);
+		const LineArrayData *data;
+		
+		data = (const LineArrayData *)&(linedata[0]);
+		context.SetHighColor(data->color);
+		BRect touched = fPainter->StrokeLine(data->pt1, data->pt2, &context);
+		
+		for (int32 i = 1; i < numlines; i++) {
+			data = (const LineArrayData *)&(linedata[i]);
+			context.SetHighColor(data->color);
+			touched = touched | fPainter->StrokeLine(data->pt1, data->pt2, &context);
+		}
+		
+		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
+
 		Unlock();
 	}
 }
@@ -637,11 +744,13 @@ DisplayDriverPainter::StrokePolygon(BPoint *ptlist, int32 numpts,
 									bool closed)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 		BRect touched = fPainter->StrokePolygon(ptlist, numpts, closed);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -654,6 +763,8 @@ void
 DisplayDriverPainter::StrokeRect(const BRect &r, const RGBColor &color)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
+
 		// support invalid rects
 		BRect vr(min_c(r.left, r.right),
 				 min_c(r.top, r.bottom),
@@ -662,14 +773,16 @@ DisplayDriverPainter::StrokeRect(const BRect &r, const RGBColor &color)
 
 		fPainter->StrokeRect(vr, color.GetColor32());
 
-		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(vr.left, vr.top,
+/*		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(vr.left, vr.top,
 														   vr.right, vr.top)));
 		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(vr.left, vr.top + 1,
 														   vr.left, vr.bottom - 1)));
 		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(vr.right, vr.top + 1,
 														   vr.right, vr.bottom - 1)));
 		fGraphicsCard->Invalidate(fPainter->ClipRect(BRect(vr.left, vr.bottom,
-														   vr.right, vr.bottom)));
+														   vr.right, vr.bottom)));*/
+		fGraphicsCard->Invalidate(fPainter->ClipRect(vr));
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -680,11 +793,13 @@ void
 DisplayDriverPainter::StrokeRect(const BRect &r, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 		BRect touched = fPainter->StrokeRect(r);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -695,6 +810,7 @@ void
 DisplayDriverPainter::StrokeRegion(BRegion& r, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 
@@ -706,6 +822,7 @@ DisplayDriverPainter::StrokeRegion(BRegion& r, const DrawData *d)
 		}
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -717,11 +834,13 @@ DisplayDriverPainter::StrokeRoundRect(const BRect &r, const float &xrad,
 									  const float &yrad, const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 		BRect touched = fPainter->StrokeRoundRect(r, xrad, yrad);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -747,11 +866,13 @@ DisplayDriverPainter::StrokeTriangle(BPoint *pts, const BRect &bounds,
 									 const DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 		BRect touched = fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
 
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -763,7 +884,7 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 								 const BPoint &pt, const RGBColor &color,
 								 escapement_delta *delta)
 {
-	DrawData d;
+	static DrawData d;
 	d.SetHighColor(color);
 	
 	if (delta)
@@ -778,11 +899,14 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 								 const BPoint &pt, DrawData *d)
 {
 	if (Lock()) {
+		fGraphicsCard->HideSoftwareCursor();
 
 		fPainter->SetDrawData(d);
 
 		BRect touched = fPainter->DrawString(string, length, pt);
+
 		fGraphicsCard->Invalidate(touched);
+		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -1010,35 +1134,6 @@ DisplayDriverPainter::DumpToBitmap()
 	return NULL;
 }
 
-// StrokeLineArray
-void
-DisplayDriverPainter::StrokeLineArray(const int32 &numlines,
-									  const LineArrayData *linedata,
-									  const DrawData *d)
-{
-	if(!d || !linedata || numlines <= 0)
-		return;
-	
-	if (Lock()) {
-		DrawData context;
-		context.SetDrawingMode(B_OP_COPY);
-		const LineArrayData *data;
-		
-		data = (const LineArrayData *)&(linedata[0]);
-		context.SetHighColor(data->color);
-		BRect touched = fPainter->StrokeLine(data->pt1, data->pt2, &context);
-		
-		for (int32 i = 1; i < numlines; i++) {
-			data = (const LineArrayData *)&(linedata[i]);
-			context.SetHighColor(data->color);
-			touched = touched | fPainter->StrokeLine(data->pt1, data->pt2, &context);
-		}
-		
-		fGraphicsCard->Invalidate(touched);
-		Unlock();
-	}
-}
-
 // SetDPMSMode
 status_t
 DisplayDriverPainter::SetDPMSMode(const uint32 &state)
@@ -1148,46 +1243,6 @@ DisplayDriverPainter::WaitForRetrace(bigtime_t timeout)
 		Unlock();
 	}
 	return ret;
-}
-
-// CopyBitmap
-void
-DisplayDriverPainter::CopyBitmap(ServerBitmap *bitmap,
-								 const BRect &source, const BRect &dest,
-								 const DrawData *d)
-{
-}
-
-// CopyToBitmap
-void DisplayDriverPainter::CopyToBitmap(ServerBitmap *target,
-										const BRect &source)
-{
-}
-
-// Invalidate
-void DisplayDriverPainter::Invalidate(const BRect &r)
-{
-	// nothing to be done here
-}
-
-// ConstrainClippingRegion
-void DisplayDriverPainter::ConstrainClippingRegion(BRegion *region)
-{
-	if (Lock()) {
-		if (!region) { 
-//			BRegion empty;
-//			fPainter->ConstrainClipping(empty);
-			if (RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer()) {
-				BRegion all;
-				all.Include(BRect(0, 0, buffer->Width() - 1,
-					buffer->Height() - 1));
-				fPainter->ConstrainClipping(all);
-			}
-		} else {
-			fPainter->ConstrainClipping(*region);
-		}
-		Unlock();
-	}
 }
 
 // _CopyRect

@@ -16,6 +16,8 @@
 // constructor
 HWInterface::HWInterface(bool doubleBuffered)
 	: BLocker("hw interface lock"),
+	  fCursorAreaBackup(NULL),
+	  fSoftwareCursorHidden(false),
 	  fCursor(NULL),
 	  fCursorVisible(true),
 	  fCursorLocation(0, 0),
@@ -28,6 +30,7 @@ HWInterface::HWInterface(bool doubleBuffered)
 // destructor
 HWInterface::~HWInterface()
 {
+	delete fCursorAreaBackup;
 	delete fCursor;
 	delete fUpdateExecutor;
 }
@@ -40,9 +43,17 @@ HWInterface::SetCursor(ServerCursor* cursor)
 		if (fCursor != cursor) {
 			BRect oldFrame = _CursorFrame();
 			delete fCursor;
+			delete fCursorAreaBackup;
 			fCursor = cursor;
 			Invalidate(oldFrame);
-			Invalidate(_CursorFrame());
+			BRect r = _CursorFrame();
+			if (fCursor && !IsDoubleBuffered()) {
+				fCursorAreaBackup = new buffer_clip(r.IntegerWidth() + 1,
+													r.IntegerHeight() + 1);
+				_DrawCursor(r);
+			} else
+				fCursorAreaBackup = NULL;
+			Invalidate(r);
 		}
 		Unlock();
 	}
@@ -82,6 +93,10 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 		if (p != fCursorLocation) {
 			BRect oldFrame = _CursorFrame();
 			fCursorLocation = p;
+			if (fCursorAreaBackup) {
+				_RestoreCursorArea(oldFrame);
+				_DrawCursor(_CursorFrame());
+			}
 			Invalidate(oldFrame);
 			Invalidate(_CursorFrame());
 		}
@@ -136,7 +151,7 @@ HWInterface::Invalidate(const BRect& frame)
 		}
 		return B_BAD_VALUE;*/
 	} else {
-		_DrawCursor(frame);
+//		_DrawCursor(frame);
 	}
 	return B_OK;
 }
@@ -180,6 +195,46 @@ HWInterface::CopyBackToFront(const BRect& frame)
 	}
 	return B_BAD_VALUE;
 }
+
+// HideSoftwareCursor
+void
+HWInterface::HideSoftwareCursor(const BRect& area)
+{
+	if (fCursorAreaBackup && !fSoftwareCursorHidden) {
+		BRect backupArea(fCursorAreaBackup->left,
+						 fCursorAreaBackup->top,
+						 fCursorAreaBackup->right,
+						 fCursorAreaBackup->bottom);
+		if (area.Intersects(backupArea)) {
+			_RestoreCursorArea(backupArea);
+			fSoftwareCursorHidden = true;
+		}
+	}
+}
+
+// HideSoftwareCursor
+void
+HWInterface::HideSoftwareCursor()
+{
+	if (fCursorAreaBackup && !fSoftwareCursorHidden) {
+		_RestoreCursorArea(BRect(fCursorAreaBackup->left,
+								 fCursorAreaBackup->top,
+								 fCursorAreaBackup->right,
+								 fCursorAreaBackup->bottom));
+		fSoftwareCursorHidden = true;
+	}
+}
+
+// ShowSoftwareCursor
+void
+HWInterface::ShowSoftwareCursor()
+{
+	if (fCursorAreaBackup && fSoftwareCursorHidden) {
+		_DrawCursor(_CursorFrame());
+		fSoftwareCursorHidden = false;
+	}
+}
+
 
 // _DrawCursor
 // * default implementation, can be used as fallback or for
@@ -232,26 +287,65 @@ HWInterface::_DrawCursor(BRect area) const
 
 		uint8* dst = buffer;
 
-		// blending
-		for (int32 y = top; y <= bottom; y++) {
-			uint8* s = src;
-			uint8* c = crs;
-			uint8* d = dst;
-			for (int32 x = left; x <= right; x++) {
-				// assume backbuffer alpha = 255
-				// TODO: it appears alpha in cursor is upside down
-				uint8 a = 255 - c[3];
-				d[0] = (((s[0] - c[0]) * a) + (c[0] << 8)) >> 8;
-				d[1] = (((s[1] - c[1]) * a) + (c[1] << 8)) >> 8;
-				d[2] = (((s[2] - c[2]) * a) + (c[2] << 8)) >> 8;
-				d[3] = 255;
-				s += 4;
-				c += 4;
-				d += 4;
+		if (fCursorAreaBackup) {
+			// remember which area the backup contains
+			fCursorAreaBackup->left = left;
+			fCursorAreaBackup->top = top;
+			fCursorAreaBackup->right = right;
+			fCursorAreaBackup->bottom = bottom;
+			uint8* bup = fCursorAreaBackup->buffer;
+			uint32 bupBPR = fCursorAreaBackup->bpr;
+			// blending and backup of drawing buffer
+			for (int32 y = top; y <= bottom; y++) {
+				uint8* s = src;
+				uint8* c = crs;
+				uint8* d = dst;
+				uint8* b = bup;
+				for (int32 x = left; x <= right; x++) {
+					// assumes backbuffer alpha = 255
+					// TODO: it appears alpha in cursor is upside down
+					uint8 a = 255 - c[3];
+					b[0] = s[0];
+					b[1] = s[1];
+					b[2] = s[2];
+					// TODO: unnecessary?
+					b[3] = 255;
+					d[0] = (((s[0] - c[0]) * a) + (c[0] << 8)) >> 8;
+					d[1] = (((s[1] - c[1]) * a) + (c[1] << 8)) >> 8;
+					d[2] = (((s[2] - c[2]) * a) + (c[2] << 8)) >> 8;
+					d[3] = 255;
+					s += 4;
+					c += 4;
+					d += 4;
+					b += 4;
+				}
+				crs += crsBPR;
+				src += srcBPR;
+				dst += width * 4;
+				bup += bupBPR;
 			}
-			crs += crsBPR;
-			src += srcBPR;
-			dst += width * 4;
+		} else {
+			// blending
+			for (int32 y = top; y <= bottom; y++) {
+				uint8* s = src;
+				uint8* c = crs;
+				uint8* d = dst;
+				for (int32 x = left; x <= right; x++) {
+					// assumes backbuffer alpha = 255
+					// TODO: it appears alpha in cursor is upside down
+					uint8 a = 255 - c[3];
+					d[0] = (((s[0] - c[0]) * a) + (c[0] << 8)) >> 8;
+					d[1] = (((s[1] - c[1]) * a) + (c[1] << 8)) >> 8;
+					d[2] = (((s[2] - c[2]) * a) + (c[2] << 8)) >> 8;
+					d[3] = 255;
+					s += 4;
+					c += 4;
+					d += 4;
+				}
+				crs += crsBPR;
+				src += srcBPR;
+				dst += width * 4;
+			}
 		}
 
 		// copy result to front buffer
@@ -513,6 +607,32 @@ HWInterface::_CursorFrame() const
 		frame.OffsetTo(fCursorLocation - fCursor->GetHotSpot());
 	}
 	return frame;
+}
+
+// _RestoreCursorArea
+void
+HWInterface::_RestoreCursorArea(const BRect& area) const
+{
+	if (fCursorAreaBackup) {
+
+		// clip backup area against "area"
+		int32 left = max_c((int32)area.left, fCursorAreaBackup->left);
+		int32 top = max_c((int32)area.top, fCursorAreaBackup->top);
+		int32 right = min_c((int32)area.right, fCursorAreaBackup->right);
+		int32 bottom = min_c((int32)area.bottom, fCursorAreaBackup->bottom);
+
+		if (left <= right && top <= bottom) {
+
+			uint8* src = fCursorAreaBackup->buffer;
+			if (fCursorAreaBackup->left < left)
+				src += left - fCursorAreaBackup->left;
+			if (fCursorAreaBackup->top < top)
+				src += (top - fCursorAreaBackup->top) * fCursorAreaBackup->bpr;
+
+			_CopyToFront(src, fCursorAreaBackup->bpr,
+						 left, top, right, bottom);
+		}
+	}
 }
 
 

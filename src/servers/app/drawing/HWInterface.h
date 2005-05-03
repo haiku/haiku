@@ -21,7 +21,7 @@ class UpdateQueue;
 
 class HWInterface : public BLocker {
  public:
-								HWInterface(bool doubleBuffered = true);
+								HWInterface(bool doubleBuffered = false);
 	virtual						~HWInterface();
 
 	virtual	status_t			Initialize() = 0;
@@ -67,6 +67,17 @@ class HWInterface : public BLocker {
 	// while as CopyBackToFront() actually performs the operation
 			status_t			CopyBackToFront(const BRect& frame);
 
+	// TODO: Just a quick and primitive way to get single buffered mode working.
+	// Later, the implementation should be smarter, right now, it will
+	// draw the cursor for almost every drawing operation.
+	// It seems to me, BeOS hides the cursor (in laymans words) before
+	// BView::Draw() is called, then, after all drawing commands that triggered
+	// have been caried out, it shows the cursor again. This approach would
+	// have the adventage of the code not cluttering/slowing down DisplayDriverPainter.
+			void				HideSoftwareCursor(const BRect& area);
+			void				HideSoftwareCursor();
+			void				ShowSoftwareCursor();
+
  protected:
 	// implement this in derived classes
 	virtual	void				_DrawCursor(BRect area) const;
@@ -77,6 +88,39 @@ class HWInterface : public BLocker {
 											 int32 right, int32 bottom) const;
 
 			BRect				_CursorFrame() const;
+			void				_RestoreCursorArea(const BRect& frame) const;
+
+			// If we draw the cursor somewhere in the drawing buffer,
+			// we need to backup its contents before drawing, so that
+			// we can restore that area when the cursor needs to be
+			// drawn somewhere else.
+			struct buffer_clip {
+								buffer_clip(int32 width, int32 height)
+								{
+									bpr = width * 4;
+									if (bpr > 0 && height > 0)
+										buffer = new uint8[bpr * height];
+									else
+										buffer = NULL;
+									left = 0;
+									top = 0;
+									right = -1;
+									bottom = -1;
+								}
+								~buffer_clip()
+								{
+									delete[] buffer;
+								}
+				uint8*			buffer;
+				int32			left;
+				int32			top;
+				int32			right;
+				int32			bottom;
+				int32			bpr;
+			};
+
+			buffer_clip*		fCursorAreaBackup;
+			bool				fSoftwareCursorHidden;
 
 			ServerCursor*		fCursor;
 			bool				fCursorVisible;
