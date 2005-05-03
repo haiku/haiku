@@ -48,14 +48,14 @@ tracker_loop(void *data)
 	// create global messaging port
 	
 	gTrackerPort = create_port(128, "fsh tracker port");
-	if (gTrackerPort < B_OK)
+	if (gTrackerPort < FS_OK)
 		return gTrackerPort;
 
 	while (true) {
 		update_message message;
 		int32 code;
 		status_t status = read_port(gTrackerPort, &code, &message, sizeof(message));
-		if (status < B_OK)
+		if (status < FS_OK)
 			continue;
 
 		if (code == FSH_KILL_TRACKER)
@@ -74,5 +74,5 @@ tracker_loop(void *data)
 	}
 
 	delete_port(gTrackerPort);
-	return B_OK;
+	return FS_OK;
 }
