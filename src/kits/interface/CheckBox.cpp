@@ -234,15 +234,17 @@ BCheckBox::MouseDown(BPoint point)
 		return;
 
 	fOutlined = true;
-	Draw(Bounds());
-	Flush();
 
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
+		Invalidate();
 		SetTracking(true);
 		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 	} else {
 		BRect bounds = Bounds();
 		uint32 buttons;
+
+		Draw(Bounds());
+		Flush();
 
 		do {
 			snooze(40000);
@@ -301,8 +303,7 @@ BCheckBox::MouseUp(BPoint point)
 
 	if (fOutlined != inside) {
 		fOutlined = inside;
-		Draw(Bounds());
-		Flush();
+		Invalidate();
 	}
 
 	if (fOutlined) {
@@ -310,8 +311,7 @@ BCheckBox::MouseUp(BPoint point)
 		SetValue(!Value());
 		Invoke();
 	} else {
-		Draw(Bounds());
-		Flush();
+		Invalidate();
 	}
 
 	SetTracking(false);
@@ -329,8 +329,7 @@ BCheckBox::MouseMoved(BPoint point, uint32 transit,
 
 	if (fOutlined != inside) {
 		fOutlined = inside;
-		Draw(Bounds());
-		Flush();
+		Invalidate();
 	}
 }
 
