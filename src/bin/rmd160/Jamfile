@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src bin rmd160 ;
+
+BinCommand rmd160 :
+	rmd160.c
+	main.c
+;

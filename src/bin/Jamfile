@@ -125,6 +125,7 @@ SubInclude OBOS_TOP src bin makeudfimage ;
 SubInclude OBOS_TOP src bin mkdos ;
 SubInclude OBOS_TOP src bin patch ;
 SubInclude OBOS_TOP src bin pc ;
+SubInclude OBOS_TOP src bin rmd160 ;
 SubInclude OBOS_TOP src bin sed ;
 SubInclude OBOS_TOP src bin sharutils ;
 SubInclude OBOS_TOP src bin strace ;
