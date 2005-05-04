@@ -189,6 +189,10 @@ class DisplayDriverPainter : public DisplayDriver {
 												int32 length,
 												const DrawData *d);
 
+	virtual	float				StringWidth(	const char *string,
+												int32 length,
+												const ServerFont &font);
+
 	virtual	float				StringHeight(	const char *string,
 												int32 length,
 												const DrawData *d);

@@ -927,6 +927,23 @@ DisplayDriverPainter::StringWidth(const char *string, int32 length,
 	return width;
 }
 
+// StringWidth
+float
+DisplayDriverPainter::StringWidth(const char *string, int32 length,
+								  const ServerFont &font)
+{
+	float width = 0.0;
+	if (Lock()) {
+		DrawData d;
+		d.SetFont(font);
+		fPainter->SetDrawData(&d);
+		BPoint dummy(0.0, 0.0);
+		width = fPainter->BoundingBox(string, length, dummy).Width();
+		Unlock();
+	}
+	return width;
+}
+
 // StringHeight
 float
 DisplayDriverPainter::StringHeight(const char *string, int32 length,

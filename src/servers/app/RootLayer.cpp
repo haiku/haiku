@@ -1094,7 +1094,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			else
 			{
 				// NOTE: focus may be NULL
-				if (fLastMouseMoved->fOwner && fLastMouseMoved->fOwner == FocusWinBorder())
+				if (fLastMouseMoved->Window() && fLastMouseMoved->fOwner == FocusWinBorder())
 				{
 					// send B_MOUSE_UP for regular Layers/BViews
 					BMessage upmsg(B_MOUSE_UP);
