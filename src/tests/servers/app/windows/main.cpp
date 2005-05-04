@@ -10,6 +10,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <TextControl.h>
+#include <TextView.h>
 #include <View.h>
 #include <Window.h>
 
@@ -24,18 +25,17 @@ class HelloView : public BView {
 					{
 // TODO: Find bug: this influences StringWidth(), but the font is not used
 //						SetFontSize(9);
+						rgb_color bg = ui_color(B_PANEL_BACKGROUND_COLOR);
+						SetViewColor(bg);
+						SetLowColor(bg);
 					}
 
 	virtual	void	Draw(BRect updateRect)
 					{
-						rgb_color bg = ui_color(B_PANEL_BACKGROUND_COLOR);
+						rgb_color shadow = tint_color(LowColor(), B_DARKEN_2_TINT);
+						rgb_color light = tint_color(LowColor(), B_LIGHTEN_MAX_TINT);
 
-						SetHighColor(bg);
-						FillRect(updateRect);
 						BRect r(Bounds());
-
-						rgb_color shadow = tint_color(bg, B_DARKEN_2_TINT);
-						rgb_color light = tint_color(bg, B_LIGHTEN_MAX_TINT);
 
 						BeginLineArray(4);
 						AddLine(BPoint(r.left, r.top),
@@ -97,7 +97,8 @@ class HelloView : public BView {
 void
 show_window(BRect frame, const char* name)
 {
-	BRect f(0,0, frame.Width(), frame.Height());
+//	BRect f(0, 0, frame.Width(), frame.Height());
+	BRect f(frame);
 	BWindow* window = new BWindow(f, name,
 								  B_TITLED_WINDOW,
 								  B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE);
@@ -127,17 +128,34 @@ show_window(BRect frame, const char* name)
 	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	bg->AddChild(view);
 
+	// button
 	b.Set(0.0, 0.0, 80.0, 13.0);
 	b.OffsetTo(5.0, 5.0);
-	BButton* control = new BButton(b, "button", "Button", NULL);
-	view->AddChild(control);
+	BButton* button = new BButton(b, "button", "Button", NULL);
+	view->AddChild(button);
+//button->MoveTo(5.0, 5.0);
 
-	b.bottom = b.top + 20.0;
-	b.OffsetTo(5.0, view->Bounds().bottom - (b.Height() + 5.0));
+	// text control
+	b.left = button->Frame().left;
+	b.top = button->Frame().bottom + 5.0;
+	b.bottom = b.top + 35.0;
+	b.right += 50.0;
+//	BTextControl* textControl = new BTextControl(b, "text control", "Text", "<enter text here>", NULL);
+	BRect textRect(b);
+	textRect.OffsetTo(0.0, 0.0);
+	BTextView* textControl = new BTextView(b, "text view", textRect,
+										   B_FOLLOW_ALL, B_WILL_DRAW);
+	view->AddChild(textControl);
+	textControl->SetText("This is a BTextView.");
+	textControl->MakeFocus(true);
+
+	// check box
+//	b.OffsetTo(5.0, view->Bounds().bottom - (b.Height() + 5.0));
 	BCheckBox* checkBox = new BCheckBox(b, "check box", "CheckBox", NULL);
 	view->AddChild(checkBox);
+checkBox->MoveTo(5.0, view->Bounds().bottom - (b.Height() + 10.0));
 
-	window->MoveTo(frame.left, frame.top);
+//	window->MoveTo(frame.left, frame.top);
 	window->Show();
 }
 

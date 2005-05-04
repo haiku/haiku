@@ -3,4 +3,5 @@ SubDir OBOS_TOP src tests servers app ;
 SubInclude OBOS_TOP src tests servers app copy_bits ;
 SubInclude OBOS_TOP src tests servers app painter ;
 SubInclude OBOS_TOP src tests servers app scrolling ;
+SubInclude OBOS_TOP src tests servers app textview ;
 SubInclude OBOS_TOP src tests servers app windows ;

@@ -54,6 +54,8 @@ void
 TestView::Draw(BRect updateRect)
 {
 	// ellipses
+// TODO: this should be unnecessary
+SetPenSize(1.0);
 	SetHighColor(200, 90, 0, 255);
 	StrokeEllipse(BPoint(80.0, 50.0), 70.0, 40.0);
 
@@ -92,6 +94,7 @@ TestView::MouseMoved(BPoint where, uint32 transit,
 					 const BMessage* dragMessage)
 {
 	if (fTracking) {
+printf("TestView::MouseMoved(%.1f, %.1f)\n", where.x, where.y);
 		BPoint offset = fLastMousePos - where;
 		ScrollBy(offset.x, offset.y);
 		fLastMousePos = where + offset;
