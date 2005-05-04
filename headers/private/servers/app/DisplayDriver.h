@@ -43,6 +43,7 @@ class DrawData;
 class RGBColor;
 class ServerBitmap;
 class ServerCursor;
+class ServerFont;
 
 /*!
 	\brief Data structure for passing cursor information to hardware drivers.
@@ -256,6 +257,10 @@ class DisplayDriver {
 	virtual	float				StringWidth(	const char *string,
 												int32 length,
 												const DrawData *d) = 0;
+
+	virtual	float				StringWidth(	const char *string,
+												int32 length,
+												const ServerFont &font) = 0;
 
 	virtual	float				StringHeight(	const char *string,
 												int32 length,
