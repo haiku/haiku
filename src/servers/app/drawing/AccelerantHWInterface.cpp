@@ -14,13 +14,7 @@
 
 #include <stdio.h>
 
-#include <Bitmap.h>
 #include <Cursor.h>
-#include <Locker.h>
-#include <Message.h>
-#include <MessageRunner.h>
-#include <Region.h>
-#include <Screen.h>
 
 #include <Accelerant.h>
 #include <graphic_driver.h>
@@ -30,11 +24,11 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "PortLink.h"
+//#include "PortLink.h"
+#include "RGBColor.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
 #include "ServerProtocol.h"
-#include "UpdateQueue.h"
 
 #include "AccelerantHWInterface.h"
 #include "AccelerantBuffer.h"
@@ -55,6 +49,7 @@ AccelerantHWInterface::AccelerantHWInterface()
 		fAccelerantImage(-1),
 		fAccelerantHook(NULL),
 		fEngineToken(NULL),
+		fSyncToken(),
 		
 		// required hooks
 		fAccAcquireEngine(NULL),
@@ -89,6 +84,11 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fDisplayMode.virtual_width = 640;
 	fDisplayMode.virtual_height = 480;
 	fDisplayMode.space = B_RGB32;
+
+	// NOTE: I have no clue what I'm doing here.
+//	fSyncToken.counter = 0;
+//	fSyncToken.engine_id = 0;
+	memset(&fSyncToken, 0, sizeof(sync_token));
 }
 
 // destructor
@@ -507,6 +507,104 @@ AccelerantHWInterface::DPMSCapabilities() const
 	return fAccDPMSCapabilities();
 }
 
+// AvailableHardwareAcceleration
+uint32
+AccelerantHWInterface::AvailableHWAcceleration() const
+{
+	uint32 flags = 0;
+
+	if (fAccScreenBlit)
+		flags |= HW_ACC_COPY_REGION;
+//	if (fAccFillRect)
+//		flags |= HW_ACC_FILL_REGION;
+//	if (fAccInvertRect)
+//		flags |= HW_ACC_INVERT_REGION;
+
+	return flags;
+}
+
+// CopyRegion
+void
+AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
+								  uint32 count, int32 xOffset, int32 yOffset)
+{
+	if (fAccScreenBlit && fAccAcquireEngine) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0, &fSyncToken, &fEngineToken) >= B_OK) {
+
+			// convert the rects
+			blit_params* params = new blit_params[count];
+			for (uint32 i = 0; i < count; i++) {
+				params[i].src_left = (uint16)sortedRectList[i].left;
+				params[i].src_top = (uint16)sortedRectList[i].top;
+
+				params[i].dest_left = (uint16)sortedRectList[i].left + xOffset;
+				params[i].dest_top = (uint16)sortedRectList[i].top + yOffset;
+
+				// NOTE: width and height are expressed as distance, not pixel count!
+				params[i].width = (uint16)(sortedRectList[i].right - sortedRectList[i].left);
+				params[i].height = (uint16)(sortedRectList[i].bottom - sortedRectList[i].top);
+			}
+
+			// go
+			fAccScreenBlit(fEngineToken, params, count);
+
+			// done
+			if (fAccReleaseEngine)
+				fAccReleaseEngine(fEngineToken, &fSyncToken);
+
+			delete[] params;
+		}
+	}
+}
+
+// FillRegion
+void
+AccelerantHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color)
+{
+	if (fAccFillRect && fAccAcquireEngine) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0, &fSyncToken, &fEngineToken) >= B_OK) {
+
+			// convert the region
+			uint32 count;
+			fill_rect_params* fillParams;
+			_RegionToRectParams(&region, &fillParams, &count);
+
+			// go
+			fAccFillRect(fEngineToken, _NativeColor(color), fillParams, count);
+
+			// done
+			if (fAccReleaseEngine)
+				fAccReleaseEngine(fEngineToken, &fSyncToken);
+
+			delete[] fillParams;
+		}
+	}
+}
+
+// InvertRegion
+void
+AccelerantHWInterface::InvertRegion(/*const*/ BRegion& region)
+{
+	if (fAccInvertRect && fAccAcquireEngine) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0, &fSyncToken, &fEngineToken) >= B_OK) {
+
+			// convert the region
+			uint32 count;
+			fill_rect_params* fillParams;
+			_RegionToRectParams(&region, &fillParams, &count);
+
+			// go
+			fAccInvertRect(fEngineToken, fillParams, count);
+
+			// done
+			if (fAccReleaseEngine)
+				fAccReleaseEngine(fEngineToken, &fSyncToken);
+
+			delete[] fillParams;
+		}
+	}
+}
+
 // SetCursor
 void
 AccelerantHWInterface::SetCursor(ServerCursor* cursor)
@@ -575,3 +673,56 @@ AccelerantHWInterface::_DrawCursor(BRect area) const
 	// a hardware cursor for some reason
 }
 
+// _RegionToRectParams
+void
+AccelerantHWInterface::_RegionToRectParams(/*const*/ BRegion* region,
+										   fill_rect_params** params,
+										   uint32* count) const
+{
+	*count = region->CountRects();
+	*params = new fill_rect_params[*count];
+
+	for (uint32 i = 0; i < *count; i++) {
+		clipping_rect r = region->RectAtInt(i);
+		(*params[i]).left = (uint16)r.left;
+		(*params[i]).top = (uint16)r.top;
+		(*params[i]).right = (uint16)r.right;
+		(*params[i]).bottom = (uint16)r.bottom;
+	}
+}
+
+// _NativeColor
+uint32
+AccelerantHWInterface::_NativeColor(const RGBColor& color) const
+{
+	// NOTE: This functions looks somehow suspicios to me.
+	// It assumes that all graphics cards have the same native endianess, no?
+	switch (fDisplayMode.space) {
+		case B_CMAP8:
+		case B_GRAY8:
+			return color.GetColor8();
+
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			return color.GetColor15();
+
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			return color.GetColor16();
+
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE: {
+			rgb_color c = color.GetColor32();
+			uint32 native = (c.alpha << 24) |
+							(c.red << 16) |
+							(c.green << 8) |
+							(c.blue);
+			return native;
+		}
+	}
+	return 0;
+}

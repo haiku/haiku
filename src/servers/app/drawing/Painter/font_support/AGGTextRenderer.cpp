@@ -1,6 +1,7 @@
 // AGGTextRenderer.cpp
 
 #include <math.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -44,6 +45,7 @@ rect_to_int(BRect r,
 	bottom = (int32)ceilf(r.bottom);
 }
 
+#define DEFAULT_UNI_CODE_BUFFER_SIZE	2048
 
 // constructor
 AGGTextRenderer::AGGTextRenderer()
@@ -51,7 +53,9 @@ AGGTextRenderer::AGGTextRenderer()
 	  fFontEngine(ftlib),
 	  fFontManager(fFontEngine),
 	  fCurves(fFontManager.path_adaptor()),
-	  fContour(fCurves)
+	  fContour(fCurves),
+	  fUnicodeBuffer((char*)malloc(DEFAULT_UNI_CODE_BUFFER_SIZE)),
+	  fUnicodeBufferSize(DEFAULT_UNI_CODE_BUFFER_SIZE)
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
@@ -63,7 +67,9 @@ AGGTextRenderer::AGGTextRenderer(BMessage* archive)
 	  fFontEngine(ftlib),
 	  fFontManager(fFontEngine),
 	  fCurves(fFontManager.path_adaptor()),
-	  fContour(fCurves)
+	  fContour(fCurves),
+	  fUnicodeBuffer((char*)malloc(DEFAULT_UNI_CODE_BUFFER_SIZE)),
+	  fUnicodeBufferSize(DEFAULT_UNI_CODE_BUFFER_SIZE)
 {
 //printf("AGGTextRenderer::AGGTextRenderer(BMessage*)\n");
 	fCurves.approximation_scale(2.0);
@@ -77,7 +83,9 @@ AGGTextRenderer::AGGTextRenderer(const AGGTextRenderer& from)
 	  fFontEngine(ftlib),
 	  fFontManager(fFontEngine),
 	  fCurves(fFontManager.path_adaptor()),
-	  fContour(fCurves)
+	  fContour(fCurves),
+	  fUnicodeBuffer((char*)malloc(DEFAULT_UNI_CODE_BUFFER_SIZE)),
+	  fUnicodeBufferSize(DEFAULT_UNI_CODE_BUFFER_SIZE)
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
@@ -88,6 +96,7 @@ AGGTextRenderer::AGGTextRenderer(const AGGTextRenderer& from)
 AGGTextRenderer::~AGGTextRenderer()
 {
 	Unset();
+	free(fUnicodeBuffer);
 }
 
 // SetTo
@@ -215,18 +224,21 @@ AGGTextRenderer::RenderString(const char* string,
 	int32 srcLength = min_c(length, strlen(string));
 	int32 dstLength = srcLength * 4;
 
-	char* buffer = new char[dstLength];
+	if (dstLength > fUnicodeBufferSize) {
+		fUnicodeBufferSize = dstLength;
+		fUnicodeBuffer = (char*)realloc((void*)fUnicodeBuffer, fUnicodeBufferSize);
+	}
 
 	int32 state = 0;
 	status_t ret;
 	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
 								 string, &srcLength,
-								 buffer, &dstLength,
+								 fUnicodeBuffer, &dstLength,
 								 &state, B_SUBSTITUTE)) >= B_OK
-		&& (ret = swap_data(B_INT16_TYPE, buffer, dstLength,
+		&& (ret = swap_data(B_INT16_TYPE, fUnicodeBuffer, dstLength,
 							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
 
-		uint16* p = (uint16*)buffer;
+		uint16* p = (uint16*)fUnicodeBuffer;
 
 		double x  = 0.0;
 		double y0 = 0.0;
@@ -299,7 +311,7 @@ AGGTextRenderer::RenderString(const char* string,
 						case agg::glyph_data_outline:
 							fRasterizer.reset();
 		// NOTE: this function can be easily extended to handle
-		// conversion to contours, to that's why there is a lot of
+		// conversion to contours, so that's why there is a lot of
 		// commented out code, I leave here because I think it
 		// will be needed again.
 		
@@ -341,7 +353,6 @@ AGGTextRenderer::RenderString(const char* string,
 	} else {
 		fprintf(stderr, "UTF8 -> Unicode conversion failed: %s\n", strerror(ret));
 	}
-	delete[] buffer;
 
 //	return transform.TransformBounds(bounds);
 	return bounds;

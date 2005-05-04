@@ -275,6 +275,7 @@ class DisplayDriverPainter : public DisplayDriver {
 
 			Painter*			fPainter;
 			HWInterface*		fGraphicsCard;
+			uint32				fAvailableHWAccleration;
 };
 
 #endif // _DISPLAY_DRIVER_PAINTER_H_

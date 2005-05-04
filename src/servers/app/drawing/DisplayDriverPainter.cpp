@@ -52,10 +52,11 @@ DisplayDriverPainter::DisplayDriverPainter()
 	: DisplayDriver(),
 	  fPainter(new Painter()),
 #if USE_ACCELERANT
-	  fGraphicsCard(new AccelerantHWInterface())
+	  fGraphicsCard(new AccelerantHWInterface()),
 #else
-	  fGraphicsCard(new ViewHWInterface())
+	  fGraphicsCard(new ViewHWInterface()),
 #endif
+	  fAvailableHWAccleration(0)
 {
 }
 
@@ -72,8 +73,10 @@ DisplayDriverPainter::Initialize()
 	status_t err = fGraphicsCard->Initialize();
 	if (err < B_OK)
 		fprintf(stderr, "HWInterface::Initialize() failed: %s\n", strerror(err));
-	if (err >= B_OK)
+	if (err >= B_OK) {
+		fAvailableHWAccleration = fGraphicsCard->AvailableHWAcceleration();
 		return DisplayDriver::Initialize();
+	}
 	return false;
 }
 
@@ -218,7 +221,7 @@ DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
 								 int32 xOffset, int32 yOffset)
 {
 	if (Lock()) {
-		fGraphicsCard->HideSoftwareCursor(fPainter->ClipRect(region->Frame()));
+		fGraphicsCard->HideSoftwareCursor(region->Frame());
 
 		int32 count = region->CountRects();
 
@@ -284,12 +287,30 @@ DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
 		// currently on the stack and to which the current rect pointed
 		// to. If their "indegree" count reaches zero, put them onto the
 		// stack as well.
+
+		clipping_rect* sortedRectList = NULL;
+		int32 nextSortedIndex = 0;
+
+		if (fAvailableHWAccleration & HW_ACC_COPY_REGION)
+			sortedRectList = new clipping_rect[count];
+
 		while (!inDegreeZeroNodes.empty()) {
 			node* n = inDegreeZeroNodes.top();
-			 inDegreeZeroNodes.pop();
+			inDegreeZeroNodes.pop();
 
-			BRect touched = _CopyRect(n->rect, xOffset, yOffset);
-			fGraphicsCard->Invalidate(touched);
+			// do the software implementation or add to sorted
+			// rect list for using the HW accelerated version
+			// later
+			if (sortedRectList) {
+				sortedRectList[nextSortedIndex].left	= (int32)n->rect.left;
+				sortedRectList[nextSortedIndex].top		= (int32)n->rect.top;
+				sortedRectList[nextSortedIndex].right	= (int32)n->rect.right;
+				sortedRectList[nextSortedIndex].bottom	= (int32)n->rect.bottom;
+				nextSortedIndex++;
+			} else {
+				BRect touched = _CopyRect(n->rect, xOffset, yOffset);
+				fGraphicsCard->Invalidate(touched);
+			}
 
 			for (int32 k = 0; k < n->next_pointer; k++) {
 				n->pointers[k]->in_degree--;
@@ -297,6 +318,13 @@ DisplayDriverPainter::CopyRegion(/*const*/ BRegion* region,
 					inDegreeZeroNodes.push(n->pointers[k]);
 			}
 		}
+
+		// trigger the HW accelerated version if is was available
+		if (sortedRectList)
+			fGraphicsCard->CopyRegion(sortedRectList, count, xOffset, yOffset);
+
+		delete[] sortedRectList;
+
 		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
@@ -456,7 +484,7 @@ DisplayDriverPainter::FillPolygon(BPoint *ptlist, int32 numpts,
 
 // FillRect
 void
-DisplayDriverPainter::FillRect(const BRect &r, const RGBColor &color)
+DisplayDriverPainter::FillRect(const BRect& r, const RGBColor& color)
 {
 	if (Lock()) {
 		BRect vr(min_c(r.left, r.right),
@@ -467,9 +495,17 @@ DisplayDriverPainter::FillRect(const BRect &r, const RGBColor &color)
 
 		fGraphicsCard->HideSoftwareCursor(vr);
 
-		fPainter->FillRect(vr, color.GetColor32());
+		// try hardware optimized version first
+		if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
+			BRegion region(vr);
+			region.IntersectWith(fPainter->ClippingRegion());
+			fGraphicsCard->FillRegion(region, color);
+		} else {
+			fPainter->FillRect(vr, color.GetColor32());
+	
+			fGraphicsCard->Invalidate(vr);
+		}
 
-		fGraphicsCard->Invalidate(vr);
 		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
@@ -489,10 +525,32 @@ DisplayDriverPainter::FillRect(const BRect &r, const DrawData *d)
 
 		fGraphicsCard->HideSoftwareCursor(vr);
 
-		fPainter->SetDrawData(d);
-		BRect touched = fPainter->FillRect(vr);
+		bool doInSoftware = true;
+		// try hardware optimized version first
+		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) &&
+			(d->GetDrawingMode() == B_OP_COPY ||
+			 d->GetDrawingMode() == B_OP_OVER)) {
 
-		fGraphicsCard->Invalidate(touched);
+			if (d->GetPattern() == B_SOLID_HIGH) {
+				BRegion region(vr);
+				region.IntersectWith(fPainter->ClippingRegion());
+				fGraphicsCard->FillRegion(region, d->HighColor());
+				doInSoftware = false;
+			} else if (d->GetPattern() == B_SOLID_LOW) {
+				BRegion region(vr);
+				region.IntersectWith(fPainter->ClippingRegion());
+				fGraphicsCard->FillRegion(region, d->LowColor());
+				doInSoftware = false;
+			}
+		}
+		if (doInSoftware) {
+
+			fPainter->SetDrawData(d);
+			BRect touched = fPainter->FillRect(vr);
+	
+			fGraphicsCard->Invalidate(touched);
+		}
+
 		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
@@ -507,16 +565,34 @@ DisplayDriverPainter::FillRegion(BRegion& r, const DrawData *d)
 
 		fGraphicsCard->HideSoftwareCursor(fPainter->ClipRect(r.Frame()));
 
-		fPainter->SetDrawData(d);
+		bool doInSoftware = true;
+		// try hardware optimized version first
+		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) &&
+			(d->GetDrawingMode() == B_OP_COPY ||
+			 d->GetDrawingMode() == B_OP_OVER)) {
 
-		BRect touched = fPainter->FillRect(r.RectAt(0));
+			if (d->GetPattern() == B_SOLID_HIGH) {
+				fGraphicsCard->FillRegion(r, d->HighColor());
+				doInSoftware = false;
+			} else if (d->GetPattern() == B_SOLID_LOW) {
+				fGraphicsCard->FillRegion(r, d->LowColor());
+				doInSoftware = false;
+			}
+		}
+		if (doInSoftware) {
 
-		int32 count = r.CountRects();
-		for (int32 i = 1; i < count; i++) {
-			touched = touched | fPainter->FillRect(r.RectAt(i));
+			fPainter->SetDrawData(d);
+	
+			BRect touched = fPainter->FillRect(r.RectAt(0));
+	
+			int32 count = r.CountRects();
+			for (int32 i = 1; i < count; i++) {
+				touched = touched | fPainter->FillRect(r.RectAt(i));
+			}
+	
+			fGraphicsCard->Invalidate(touched);
 		}
 
-		fGraphicsCard->Invalidate(touched);
 		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
@@ -899,11 +975,21 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 								 const BPoint &pt, DrawData *d)
 {
 	if (Lock()) {
-		fGraphicsCard->HideSoftwareCursor();
+//bigtime_t now = system_time();
+// TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
+// Cursiously, the actual DrawString after it is actually faster!?!
+// TODO: make the availability of the hardware cursor part of the 
+// HW acceleration flags and skip all calculations for HideSoftwareCursor
+// in case we don't need one.
+		BRect b = fPainter->BoundingBox(string, length, pt);
+//printf("bounding box '%s': %lld µs\n", string, system_time() - now);
+		fGraphicsCard->HideSoftwareCursor(b);
 
 		fPainter->SetDrawData(d);
 
+//now = system_time();
 		BRect touched = fPainter->DrawString(string, length, pt);
+//printf("drawing string: %lld µs\n", system_time() - now);
 
 		fGraphicsCard->Invalidate(touched);
 		fGraphicsCard->ShowSoftwareCursor();
@@ -920,7 +1006,7 @@ DisplayDriverPainter::StringWidth(const char *string, int32 length,
 	float width = 0.0;
 	if (Lock()) {
 		fPainter->SetDrawData(d);
-		BPoint dummy(0.0, 0.0);
+		static BPoint dummy(0.0, 0.0);
 		width = fPainter->BoundingBox(string, length, dummy).Width();
 		Unlock();
 	}
@@ -932,16 +1018,9 @@ float
 DisplayDriverPainter::StringWidth(const char *string, int32 length,
 								  const ServerFont &font)
 {
-	float width = 0.0;
-	if (Lock()) {
-		DrawData d;
-		d.SetFont(font);
-		fPainter->SetDrawData(&d);
-		BPoint dummy(0.0, 0.0);
-		width = fPainter->BoundingBox(string, length, dummy).Width();
-		Unlock();
-	}
-	return width;
+	static DrawData d;
+	d.SetFont(font);
+	return StringWidth(string, length, &d);
 }
 
 // StringHeight
@@ -952,7 +1031,7 @@ DisplayDriverPainter::StringHeight(const char *string, int32 length,
 	float height = 0.0;
 	if (Lock()) {
 		fPainter->SetDrawData(d);
-		BPoint dummy(0.0, 0.0);
+		static BPoint dummy(0.0, 0.0);
 		height = fPainter->BoundingBox(string, length, dummy).Height();
 		Unlock();
 	}

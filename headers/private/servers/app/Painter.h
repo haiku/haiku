@@ -52,6 +52,9 @@ class Painter {
 			void				DetachFromBuffer();
 
 			void				ConstrainClipping(const BRegion& region);
+			const BRegion*		ClippingRegion() const
+									{ return fClippingRegion; }
+
 			void				SetDrawData(const DrawData* data);
 
 								// object settings

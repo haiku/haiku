@@ -19,7 +19,6 @@
 
 class MallocBuffer;
 class AccelerantBuffer;
-class UpdateQueue;
 
 class AccelerantHWInterface : public HWInterface {
 public:
@@ -49,6 +48,16 @@ virtual status_t				SetDPMSMode(const uint32 &state);
 virtual uint32					DPMSMode() const;
 virtual uint32					DPMSCapabilities() const;
 
+	// query for available hardware accleration and perform it
+	virtual	uint32				AvailableHWAcceleration() const;
+
+	virtual	void				CopyRegion(const clipping_rect* sortedRectList,
+										   uint32 count,
+										   int32 xOffset, int32 yOffset);
+	virtual	void				FillRegion(/*const*/ BRegion& region,
+										   const RGBColor& color);
+	virtual	void				InvertRegion(/*const*/ BRegion& region);
+
 	// cursor handling
 virtual	void					SetCursor(ServerCursor* cursor);
 virtual	void					SetCursorVisible(bool visible);
@@ -67,11 +76,16 @@ private:
 		status_t				SetupDefaultHooks();
 		status_t				UpdateModeList();
 		status_t				UpdateFrameBufferConfig();
+		void					_RegionToRectParams(/*const*/ BRegion* region,
+													fill_rect_params** params,
+													uint32* count) const;
+		uint32					_NativeColor(const RGBColor& color) const;
 
 		int						fCardFD;
 		image_id				fAccelerantImage;
 		GetAccelerantHook		fAccelerantHook;
 		engine_token			*fEngineToken;
+		sync_token				fSyncToken;
 		
 		// required hooks - guaranteed to be valid
 		acquire_engine			fAccAcquireEngine;
@@ -107,8 +121,6 @@ private:
 
 
 		display_mode			fDisplayMode;
-
-		UpdateQueue				*fUpdateExecutor;
 };
 
 #endif // ACCELERANT_HW_INTERFACE_H

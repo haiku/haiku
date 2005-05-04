@@ -625,7 +625,7 @@ HWInterface::_RestoreCursorArea(const BRect& area) const
 
 			uint8* src = fCursorAreaBackup->buffer;
 			if (fCursorAreaBackup->left < left)
-				src += left - fCursorAreaBackup->left;
+				src += (left - fCursorAreaBackup->left) * 4;
 			if (fCursorAreaBackup->top < top)
 				src += (top - fCursorAreaBackup->top) * fCursorAreaBackup->bpr;
 

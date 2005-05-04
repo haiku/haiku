@@ -47,14 +47,14 @@ public:
 	RGBColor(uint16 col);
 	RGBColor(uint8 col);
 	RGBColor(const RGBColor &col);
-	RGBColor(void);
+	RGBColor();
 	
-	void PrintToStream(void) const;
+	void PrintToStream() const;
 	
-	uint8 GetColor8(void);
-	uint16 GetColor15(void);
-	uint16 GetColor16(void);
-	rgb_color GetColor32(void) const;
+	uint8 GetColor8() const;
+	uint16 GetColor15() const;
+	uint16 GetColor16() const;
+	rgb_color GetColor32() const;
 	
 	void SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255);
 	void SetColor(int r, int g, int b, int a=255);
@@ -71,10 +71,14 @@ public:
 	bool operator==(const RGBColor &col);
 protected:
 	rgb_color color32;
-	uint16 color16;
-	uint16 color15;
-	uint8 color8;
-	bool update8,update15,update16;
+
+	// caching
+	mutable uint16 color16;
+	mutable uint16 color15;
+	mutable uint8 color8;
+	mutable bool update8;
+	mutable bool update15;
+	mutable bool update16;
 };
 
 #endif

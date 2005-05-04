@@ -57,7 +57,10 @@ class AGGTextRenderer : public TextRenderer {
 	conv_font_contour_type		fContour;
 
 	agg::scanline_u8			fScanline;
-	agg::rasterizer_scanline_aa<>	fRasterizer;;
+	agg::rasterizer_scanline_aa<>	fRasterizer;
+
+	char*						fUnicodeBuffer;
+	int32						fUnicodeBufferSize;
 };
 
 #endif // AGG_TEXT_RENDERER_H

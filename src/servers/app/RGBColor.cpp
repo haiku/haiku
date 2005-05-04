@@ -100,7 +100,7 @@ RGBColor::RGBColor(const RGBColor &col)
 /*!
 	\brief Create an RGBColor with the values(0,0,0,0)
 */
-RGBColor::RGBColor(void)
+RGBColor::RGBColor()
 {
 	SetColor(0,0,0,0);
 	update8=update16=false;
@@ -110,7 +110,7 @@ RGBColor::RGBColor(void)
 	\brief Returns the color as the closest 8-bit color in the palette
 	\return The palette index for the current color
 */
-uint8 RGBColor::GetColor8(void)
+uint8 RGBColor::GetColor8() const
 {
 	if(update8)
 	{
@@ -125,7 +125,7 @@ uint8 RGBColor::GetColor8(void)
 	\brief Returns the color as the closest 15-bit color
 	\return 15-bit value of the current color plus 1-bit alpha
 */
-uint16 RGBColor::GetColor15(void)
+uint16 RGBColor::GetColor15() const
 {
 	if(update15)
 	{
@@ -140,7 +140,7 @@ uint16 RGBColor::GetColor15(void)
 	\brief Returns the color as the closest 16-bit color
 	\return 16-bit value of the current color
 */
-uint16 RGBColor::GetColor16(void)
+uint16 RGBColor::GetColor16() const
 {
 	if(update16)
 	{
@@ -155,7 +155,7 @@ uint16 RGBColor::GetColor16(void)
 	\brief Returns the color as a 32-bit color
 	\return current color, including alpha
 */
-rgb_color RGBColor::GetColor32(void) const
+rgb_color RGBColor::GetColor32() const
 {
 	return color32;
 }

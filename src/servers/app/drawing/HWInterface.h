@@ -13,11 +13,18 @@
 #include <GraphicsCard.h>
 #include <Locker.h>
 #include <OS.h>
-#include <Rect.h>
+#include <Region.h>
 
 class RenderingBuffer;
+class RGBColor;
 class ServerCursor;
 class UpdateQueue;
+
+enum {
+	HW_ACC_COPY_REGION					= 0x00000001,
+	HW_ACC_FILL_REGION					= 0x00000002,
+	HW_ACC_INVERT_REGION				= 0x00000004,
+};
 
 class HWInterface : public BLocker {
  public:
@@ -48,6 +55,18 @@ class HWInterface : public BLocker {
 	virtual uint32				DPMSMode() const = 0;
 	virtual uint32				DPMSCapabilities() const = 0;
 
+	// query for available hardware accleration and perform it
+	// (Initialize() must have been called already)
+	virtual	uint32				AvailableHWAcceleration() const
+									{ return 0; }
+
+	virtual	void				CopyRegion(const clipping_rect* sortedRectList,
+										   uint32 count,
+										   int32 xOffset, int32 yOffset) {}
+	virtual	void				FillRegion(/*const*/ BRegion& region,
+										   const RGBColor& color) {}
+	virtual	void				InvertRegion(/*const*/ BRegion& region) {}
+
 	// cursor handling
 	virtual	void				SetCursor(ServerCursor* cursor);
 	virtual	void				SetCursorVisible(bool visible);
@@ -70,10 +89,11 @@ class HWInterface : public BLocker {
 	// TODO: Just a quick and primitive way to get single buffered mode working.
 	// Later, the implementation should be smarter, right now, it will
 	// draw the cursor for almost every drawing operation.
-	// It seems to me, BeOS hides the cursor (in laymans words) before
-	// BView::Draw() is called, then, after all drawing commands that triggered
-	// have been caried out, it shows the cursor again. This approach would
-	// have the adventage of the code not cluttering/slowing down DisplayDriverPainter.
+	// It seems to me BeOS hides the cursor (in laymans words) before
+	// BView::Draw() is called (if the cursor is within that views clipping region),
+	// then, after all drawing commands that triggered have been caried out,
+	// it shows the cursor again. This approach would have the adventage of
+	// the code not cluttering/slowing down DisplayDriverPainter.
 			void				HideSoftwareCursor(const BRect& area);
 			void				HideSoftwareCursor();
 			void				ShowSoftwareCursor();

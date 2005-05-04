@@ -64,7 +64,7 @@
 # define DEFAULT_BOLD_FONT_FAMILY "Bitstream Vera Sans"
 # define FALLBACK_BOLD_FONT_FAMILY "Swis721 BT"
 # define DEFAULT_BOLD_FONT_STYLE "Bold"
-# define DEFAULT_BOLD_FONT_SIZE 12
+# define DEFAULT_BOLD_FONT_SIZE 11
 # define DEFAULT_FIXED_FONT_FAMILY "Bitstream Vera Sans Mono"
 # define FALLBACK_FIXED_FONT_FAMILY "Courier10 BT"
 # define DEFAULT_FIXED_FONT_STYLE "Roman"

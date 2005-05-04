@@ -946,7 +946,7 @@ Painter::BoundingBox(const char* utf8String, uint32 length,
 	Transformable transform;
 	transform.TranslateBy(baseLine);
 
-	BRect dummy;
+	static BRect dummy;
 	return fTextRenderer->RenderString(utf8String,
 									   length,
 									   fFontRendererSolid,

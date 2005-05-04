@@ -1280,6 +1280,12 @@ Layer::move_layer(float x, float y)
 	BPoint pt(x, y);	
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
 
+if (!fParent) {
+printf("no parent in Layer::move_layer() (%s)\n", GetName());
+fFrameAction = B_LAYER_ACTION_NONE;
+return;
+}
+
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
 
 	fDriver->CopyRegionList(&fRootLayer->fCopyRegList,
@@ -1291,7 +1297,7 @@ Layer::move_layer(float x, float y)
 	
 	EmptyGlobals();
 
-	fFrameAction = B_LAYER_ACTION_NONE;	
+	fFrameAction = B_LAYER_ACTION_NONE;
 }
 
 // resize_layer
@@ -1304,6 +1310,12 @@ Layer::resize_layer(float x, float y)
 	BRect rect(fFull.Frame());
 	rect.right += x;
 	rect.bottom += y;
+
+if (!fParent) {
+printf("no parent in Layer::resize_layer() (%s)\n", GetName());
+fFrameAction = B_LAYER_ACTION_NONE;
+return;
+}
 
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_RESIZE, pt);
 	
