@@ -1857,7 +1857,9 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 2) screen_id
 			// 3) workspace index
 			// 4) display_mode to set
-			// 5) 'makedefault' boolean		
+			// 5) 'makedefault' boolean
+			// TODO: See above: workspaces support, etc.
+		
 			screen_id id;
 			msg.Read<screen_id>(&id);
 			
@@ -1870,10 +1872,13 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			bool makedefault = false;
 			msg.Read<bool>(&makedefault);
 			
-			// TODO: See above: workspaces support, etc.
+			// TODO: Adi doesn't like this: see if
+			// messaging is better.
+			desktop->ActiveRootLayer()->Lock();
 			// TODO: This should return something
 			desktop->GetDisplayDriver()->SetMode(mode);
-			
+			desktop->ActiveRootLayer()->Unlock();
+		
 			int32 replyport;
 			msg.Read<int32>(&replyport);
 			
