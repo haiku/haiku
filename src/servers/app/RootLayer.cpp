@@ -177,14 +177,12 @@ int32 RootLayer::WorkingThread(void *data)
 	for(;;)
 	{
 		err = messageQueue.GetNextReply(&code);
-
-		oneRootLayer->Lock();
-
-		if(err < B_OK)
-		{
+		if(err < B_OK) {
 			STRACE(("WorkingThread: messageQueue.GetNextReply failed\n"));
 			continue;
 		}
+
+		oneRootLayer->Lock();
 		
 		switch(code)
 		{
