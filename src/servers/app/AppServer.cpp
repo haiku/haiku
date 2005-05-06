@@ -608,15 +608,6 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 					srvapp=(ServerApp *)fAppList->RemoveItem(i);
 					if(srvapp)
 					{
-						status_t		temp;
-						// TODO: This call never returns, thus screwing the
-						// app server completely: it's easy to test:
-						// run any test app which creates a window, quit
-						// the application clicking on the window's "close" button,
-						// and try to launch the application again. It won't start.
-						// Anyway, this should be moved to ~ServerApp() (which has already
-						// a "kill_thread()" call, btw).
-						wait_for_thread(srvapp_id, &temp);
 						delete srvapp;
 						srvapp= NULL;
 					}

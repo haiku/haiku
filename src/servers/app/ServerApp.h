@@ -79,7 +79,7 @@ public:
 	
 	FMWList fAppFMWList;
 const char * Title() const { return fSignature.String(); }
-protected:
+private:
 	friend class AppServer;
 	friend class ServerWindow;
 	
@@ -108,6 +108,8 @@ protected:
 	bool fIsActive;
 	int32 fHandlerToken;
 	AreaPool *fSharedMem;
+	
+	bool fQuitting;
 };
 
 #endif

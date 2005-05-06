@@ -85,6 +85,8 @@
 */
 ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
 		team_id clientTeamID, int32 handlerID, char *signature)
+		:
+		fQuitting(false)
 {
 	// it will be of *very* musch use in correct window order
 	fClientTeamID		= clientTeamID;
@@ -140,33 +142,23 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 ServerApp::~ServerApp(void)
 {
 	STRACE(("*ServerApp %s:~ServerApp()\n",fSignature.String()));
-	int32 i;
 	
-	ServerBitmap *tempbmp;
-	for(i=0;i<fBitmapList->CountItems();i++)
-	{
-		tempbmp=(ServerBitmap*)fBitmapList->ItemAt(i);
-		if(tempbmp)
-			delete tempbmp;
-	}
+	fQuitting = true;
+	
+	for (int32 i = 0; i< fBitmapList->CountItems(); i++)
+		delete static_cast<ServerBitmap *>(fBitmapList->ItemAt(i));
+	
 	fBitmapList->MakeEmpty();
 	delete fBitmapList;
 
-	ServerPicture *temppic;
-	for(i=0;i<fPictureList->CountItems();i++)
-	{
-		temppic=(ServerPicture*)fPictureList->ItemAt(i);
-		if(temppic)
-			delete temppic;
-	}
+	for (int32 i = 0; i < fPictureList->CountItems(); i++)
+		delete static_cast<ServerPicture *>(fPictureList->ItemAt(i));
+	
 	fPictureList->MakeEmpty();
 	delete fPictureList;
 
 	delete fMsgReader;
-	fMsgReader=NULL;
-	
 	delete fMsgSender;
-	fMsgSender=NULL;
 
 	// This shouldn't be necessary -- all cursors owned by the app
 	// should be cleaned up by RemoveAppCursors	
@@ -181,12 +173,21 @@ ServerApp::~ServerApp(void)
 	
 	STRACE(("#ServerApp %s:~ServerApp()\n",fSignature.String()));
 
+	// TODO: Is this the right place for this ?
+	// From what I've understood, this is the port created by
+	// the BApplication (?), but if I delete it in there, GetNextMessage()
+	// in the MonitorApp thread never returns. Cleanup.
+	delete_port(fMessagePort);
+	
 	// Kill the monitor thread if it exists
 	thread_info info;
-	if(get_thread_info(fMonitorThreadID,&info)==B_OK)
-		kill_thread(fMonitorThreadID);
+	status_t dummyStatus;
+	if (get_thread_info(fMonitorThreadID, &info) == B_OK)
+		wait_for_thread(fMonitorThreadID, &dummyStatus);
 	
 	delete fSharedMem;
+	
+	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", fSignature.String()));
 }
 
 /*!
@@ -196,7 +197,7 @@ ServerApp::~ServerApp(void)
 bool ServerApp::Run(void)
 {
 	// Unlike a BApplication, a ServerApp is *supposed* to return immediately
-	// when its Run() function is called.
+	// when its Run() function is called.	
 	fMonitorThreadID=spawn_thread(MonitorApp,fSignature.String(),B_NORMAL_PRIORITY,this);
 	if(fMonitorThreadID==B_NO_MORE_THREADS || fMonitorThreadID==B_NO_MEMORY)
 		return false;
@@ -304,17 +305,18 @@ int32 ServerApp::MonitorApp(void *data)
 	ServerApp *app = (ServerApp *)data;
 	LinkMsgReader msgqueue(app->fMessagePort);
 	
-	bool quitting = false;
 	int32 code;
 	status_t err = B_OK;
 	
-	while(!quitting)
+	while(!app->fQuitting)
 	{
 		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
 //		err = msgqueue.GetNextReply(&code);
 		err = msgqueue.GetNextMessage(&code);
-		if (err < B_OK)
+		if (err < B_OK) {
+			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
 			break;
+		}
 
 		switch(code)
 		{
@@ -390,13 +392,10 @@ int32 ServerApp::MonitorApp(void *data)
 			{
 				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->fSignature.String()));
 				// Our BApplication sent us this message when it quit.
-				// We need to ask the app_server to delete our monitor
-				// ADI: No! This is a bad solution. A thead should continue its
-				// execution until its exit point, and this can *very* easily be done
-				quitting=true;
-				// see... no need to ask the main thread to kill us.
-				// still... it will delete this ServerApp object.
-				port_id		serverport = find_port(SERVER_PORT_NAME);
+				// We need to ask the app_server to delete ourself.
+				app->fQuitting = true;
+				
+				port_id	serverport = find_port(SERVER_PORT_NAME);
 				if(serverport == B_NAME_NOT_FOUND){
 					printf("PANIC: ServerApp %s could not find the app_server port!\n",app->fSignature.String());
 					break;
