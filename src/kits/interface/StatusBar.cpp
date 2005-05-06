@@ -34,6 +34,8 @@
 BStatusBar::BStatusBar(BRect frame, const char *name, const char *label,
 					   const char *trailingLabel)
 	:	BView(frame, name, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW),
+		fLabel(NULL),
+		fTrailingLabel(NULL),
 		fText(NULL),
 		fTrailingText(NULL),
 		fMax(100.0f),
@@ -57,6 +59,8 @@ BStatusBar::BStatusBar(BRect frame, const char *name, const char *label,
 
 BStatusBar::BStatusBar(BMessage *archive)
 	:	BView(archive),
+		fLabel(NULL),
+		fTrailingLabel(NULL),
 		fTrailingWidth(-1.0f),
 		fEraseText(-1.0f),
 		fEraseTrailingText(-1.0f),
