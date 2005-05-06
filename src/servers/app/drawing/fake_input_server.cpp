@@ -132,7 +132,7 @@ handle_message(BPortLink* serverLink, BMessage* msg)
 			// 10) int8[16] state of all keys
 			bigtime_t systime;
 			int32 scancode, asciicode,repeatcount,modifiers;
-			int8 utf8data[4];
+			int8 utf8data[3];
 			BString string;
 			int8 keyarray[16];
 			
@@ -151,8 +151,6 @@ handle_message(BPortLink* serverLink, BMessage* msg)
 				utf8data[1]=0;
 			if(msg->FindInt8("byte",2,utf8data+2)!=B_OK)
 				utf8data[2]=0;
-			if(msg->FindInt8("byte",3,utf8data+3)!=B_OK)
-				utf8data[3]=0;
 			msg->FindString("bytes",&string);
 			for(int8 i=0;i<15;i++)
 				msg->FindInt8("states",i,&keyarray[i]);
@@ -193,10 +191,8 @@ handle_message(BPortLink* serverLink, BMessage* msg)
 			msg->FindInt8("byte",0,utf8data);
 			if(msg->FindInt8("byte",1,utf8data+1)!=B_OK)
 				utf8data[1]=0;
-			if(msg->FindInt8("byte",1,utf8data+2)!=B_OK)
+			if(msg->FindInt8("byte",2,utf8data+2)!=B_OK)
 				utf8data[2]=0;
-			if(msg->FindInt8("byte",1,utf8data+3)!=B_OK)
-				utf8data[3]=0;
 			msg->FindString("bytes",&string);
 			for(int8 i=0;i<15;i++)
 				msg->FindInt8("states",i,&keyarray[i]);
