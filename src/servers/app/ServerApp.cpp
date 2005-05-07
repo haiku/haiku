@@ -25,6 +25,8 @@
 //  
 //------------------------------------------------------------------------------
 #include <AppDefs.h>
+#include <LinkMsgReader.h>
+#include <LinkMsgSender.h>
 #include <List.h>
 #include <String.h>
 #include <PortLink.h>
@@ -1915,8 +1917,17 @@ ServerBitmap *ServerApp::FindBitmap(int32 token)
 	return NULL;
 }
 
-team_id ServerApp::ClientTeamID()
+
+team_id
+ServerApp::ClientTeamID() const
 {
 	return fClientTeamID;
+}
+
+
+thread_id
+ServerApp::MonitorThreadID() const
+{
+	return fMonitorThreadID;
 }
 

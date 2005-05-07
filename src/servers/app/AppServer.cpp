@@ -93,7 +93,7 @@ AppServer::AppServer(void) :
 	fCursorSem(-1),
 	fCursorArea(-1)
 {
-	fMessagePort= create_port(200, SERVER_PORT_NAME);
+	fMessagePort = create_port(200, SERVER_PORT_NAME);
 	if (fMessagePort == B_NO_MORE_PORTS)
 		debugger("app_server could not create message port");
 	
@@ -570,7 +570,7 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 
 			BPortLink replylink(app_port);
 			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<int32>(newapp->fMessagePort);
+			replylink.Attach<int32>(server_listen);
 			replylink.Flush();
 
 			// This is necessary because BPortLink::ReadString allocates memory
@@ -603,7 +603,7 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			{
 				srvapp=(ServerApp *)fAppList->ItemAt(i);
 
-				if(srvapp != NULL && srvapp->fMonitorThreadID== srvapp_id)
+				if(srvapp != NULL && srvapp->MonitorThreadID() == srvapp_id)
 				{
 					srvapp=(ServerApp *)fAppList->RemoveItem(i);
 					if(srvapp)
@@ -763,14 +763,14 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 				// thread_id. We will only wait so long, because then the app is probably crashed
 				// or hung. Seeing that being the case, we'll kill its BApp team and fake the
 				// quit message
-				if(get_thread_info(app->fMonitorThreadID, &tinfo)==B_OK)
+				if(get_thread_info(app->MonitorThreadID(), &tinfo)==B_OK)
 				{
 					bool killteam=true;
 					
 					for(int32 j=0; j<5; j++)
 					{
 						snooze(500000);	// wait half a second for it to quit
-						if(get_thread_info(app->fMonitorThreadID, &tinfo)!=B_OK)
+						if(get_thread_info(app->MonitorThreadID(), &tinfo)!=B_OK)
 						{
 							killteam=false;
 							break;
@@ -856,7 +856,7 @@ ServerApp *AppServer::FindApp(const char *sig)
 	for(int32 i=0; i<fAppList->CountItems();i++)
 	{
 		foundapp=(ServerApp*)fAppList->ItemAt(i);
-		if(foundapp && foundapp->fSignature==sig)
+		if(foundapp && foundapp->Title() == sig)
 		{
 			release_sem(fAppListLock);
 			return foundapp;

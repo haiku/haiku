@@ -30,32 +30,30 @@
 
 #include <OS.h>
 #include <String.h>
-#include <LinkMsgReader.h>
-#include <LinkMsgSender.h>
+
 #include "FMWList.h"
 
-class AppServer;
+class AreaPool;
 class BMessage;
 class BPortLink;
 class BList;
 class DisplayDriver;
+class LinkMsgReader;
+class LinkMsgSender;
 class ServerCursor;
 class ServerBitmap;
-class AreaPool;
 
 /*!
 	\class ServerApp ServerApp.h
 	\brief Counterpart to BApplication within the app_server
 */
-class ServerApp
-{
+class ServerApp {
 public:
 	ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
 		team_id clientTeamID, int32 handlerID, char *signature);
 	virtual						~ServerApp(void);
 	
 	bool Run(void);
-	static int32 MonitorApp(void *data);	
 	void Lock(void);
 	void Unlock(void);
 	bool IsLocked(void);
@@ -75,15 +73,19 @@ public:
 	void SetAppCursor(void);
 	ServerBitmap *FindBitmap(int32 token);
 	
-	team_id	ClientTeamID();
+	team_id	ClientTeamID() const;
+	thread_id MonitorThreadID() const;
 	
 	FMWList fAppFMWList;
-const char * Title() const { return fSignature.String(); }
+	
+	const char *Title() const { return fSignature.String(); }
+
 private:
-	friend class AppServer;
 	friend class ServerWindow;
 	
 	void DispatchMessage(int32 code, LinkMsgReader &link);
+	
+	static int32 MonitorApp(void *data);	
 	
 	port_id	fClientAppPort,
 			fMessagePort,
