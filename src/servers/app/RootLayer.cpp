@@ -1114,7 +1114,11 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			fResizingWindow	= false;
 
 			STRACE(("MOUSE UP: at (%f, %f)\n", evt.where.x, evt.where.y));
-
+			
+			// TODO: This is a quick fix to avoid the endless loop with windows created
+			// with the B_ASYNCHRONOUS_CONTROLS flag, but please someone have a look into this.
+			fButtons = 0;
+			
 			break;
 		}
 		case B_MOUSE_MOVED:
@@ -1141,6 +1145,11 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				debugger("RootLayer::MouseEventHandler: 'target' can't be null.\n");
 			WinBorder	*winBorderUnder = NULL;
 
+			// TODO: I think that windows created without the B_ASYNCHRONOUS_CONTROLS flag
+			// don't receive B_MOUSE_MOVED events after a B_MOUSE_DOWN. Test.
+			// This will need to be cleaned up as following the code flow
+			// is very hard.
+			
 			// fEventMaskLayer is always != this
 			if (fEventMaskLayer)
 			{
