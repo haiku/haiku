@@ -32,7 +32,6 @@
 #include "BeDecorator.h"
 #include "PatternHandler.h"
 #include "RGBColor.h"
-#include "RectUtils.h"
 #include <stdio.h>
 
 #define USE_VIEW_FILL_HACK
@@ -330,8 +329,8 @@ void BeDecorator::_DrawTitle(BRect r)
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
-	_drawdata.highcolor=_colors->window_tab_text;
-	_drawdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+	_drawdata.SetHighColor(_colors->window_tab_text);
+	_drawdata.SetLowColor((GetFocus())?_colors->window_tab:_colors->inactive_window_tab);
 
 	int32 titlecount=_ClipTitle((_zoomrect.left-textoffset)-(_closerect.right+textoffset));
 	BString titlestr( GetTitle() );
@@ -498,7 +497,7 @@ void BeDecorator::DrawBlendedRect(BRect r, bool down)
 			BPoint(r.left+i,r.top+steps),temprgbcol);
 	}
 
-//	_drawdata.highcolor=startcol;
+//	_drawdata.SetHighColor(startcol);
 //	_driver->FillRect(r,&_drawdata,pat_solidhigh);
 	_driver->StrokeRect(r,framecolors[3]);
 }
@@ -510,8 +509,8 @@ void BeDecorator::_DrawFrame(BRect invalid)
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	
 	#ifdef USE_VIEW_FILL_HACK
-	_drawdata.highcolor = RGBColor(192,192,192 );	
-	_driver->FillRect(_frame,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(192,192,192 ));
+	_driver->FillRect(_frame,_drawdata.HighColor());
 	#endif
 
 	if(!borderwidth)
@@ -566,7 +565,7 @@ void BeDecorator::_DrawFrame(BRect invalid)
 	BPoint start, end;
 	
 	// Right side
-	if(TestRectIntersection(rightborder,invalid))
+	if(rightborder.Intersects(invalid))
 	{
 		
 		// We may not have to redraw the entire width of the frame itself. Rare case, but
@@ -578,11 +577,11 @@ void BeDecorator::_DrawFrame(BRect invalid)
 		// calculations
 		r=(rightborder);
 		r.bottom=r.top+borderwidth;
-		topcorner=TestRectIntersection(invalid,r);
+		topcorner=invalid.Intersects(r);
 
 		r=rightborder;
 		r.top=r.bottom-borderwidth;
-		bottomcorner=TestRectIntersection(invalid,r);
+		bottomcorner=invalid.Intersects(r);
 		step=(borderwidth==5)?1:2;
 		colorindex=0;
 		
@@ -618,7 +617,7 @@ void BeDecorator::_DrawFrame(BRect invalid)
 	}
 
 	// Left side
-	if(TestRectIntersection(leftborder,invalid))
+	if(leftborder.Intersects(invalid))
 	{
 		
 		// We may not have to redraw the entire width of the frame itself. Rare case, but
@@ -630,11 +629,11 @@ void BeDecorator::_DrawFrame(BRect invalid)
 		// calculations
 		r=leftborder;
 		r.bottom=r.top+borderwidth;
-		topcorner=TestRectIntersection(invalid,r);
+		topcorner=invalid.Intersects(r);
 
 		r=leftborder;
 		r.top=r.bottom-borderwidth;
-		bottomcorner=TestRectIntersection(invalid,r);
+		bottomcorner=invalid.Intersects(r);
 		step=(borderwidth==5)?1:2;
 		colorindex=0;
 		
@@ -670,7 +669,7 @@ void BeDecorator::_DrawFrame(BRect invalid)
 	}
 
 	// Top side
-	if(TestRectIntersection(topborder,invalid))
+	if(topborder.Intersects(invalid))
 	{
 		
 		// We may not have to redraw the entire width of the frame itself. Rare case, but
@@ -683,13 +682,13 @@ void BeDecorator::_DrawFrame(BRect invalid)
 		r=topborder;
 		r.bottom=r.top+borderwidth;
 		r.right=r.left+borderwidth;
-		leftcorner=TestRectIntersection(invalid,r);
+		leftcorner=invalid.Intersects(r);
 
 		r=topborder;
 		r.top=r.bottom-borderwidth;
 		r.left=r.right-borderwidth;
 		
-		rightcorner=TestRectIntersection(invalid,r);
+		rightcorner=invalid.Intersects(r);
 		step=(borderwidth==5)?1:2;
 		colorindex=0;
 		
@@ -727,7 +726,7 @@ void BeDecorator::_DrawFrame(BRect invalid)
 	}
 
 	// Bottom side
-	if(TestRectIntersection(bottomborder,invalid))
+	if(bottomborder.Intersects(invalid))
 	{
 		
 		// We may not have to redraw the entire width of the frame itself. Rare case, but
@@ -740,13 +739,13 @@ void BeDecorator::_DrawFrame(BRect invalid)
 		r=bottomborder;
 		r.bottom=r.top+borderwidth;
 		r.right=r.left+borderwidth;
-		leftcorner=TestRectIntersection(invalid,r);
+		leftcorner=invalid.Intersects(r);
 
 		r=bottomborder;
 		r.top=r.bottom-borderwidth;
 		r.left=r.right-borderwidth;
 		
-		rightcorner=TestRectIntersection(invalid,r);
+		rightcorner=invalid.Intersects(r);
 		step=(borderwidth==5)?1:2;
 		colorindex=0;
 		
@@ -840,30 +839,30 @@ void BeDecorator::_DrawFrame(BRect invalid)
 			_driver->Lock();
 			for(i=0;i<=steps; i++)
 			{
-				_drawdata.highcolor.SetColor(uint8(startcol.red-(i*rstep)),
+				_drawdata.SetHighColor(RGBColor(uint8(startcol.red-(i*rstep)),
 					uint8(startcol.green-(i*gstep)),
-					uint8(startcol.blue-(i*bstep)));
+					uint8(startcol.blue-(i*bstep))));
 				
 				_driver->StrokeLine(BPoint(r.left,r.top+i),
-					BPoint(r.left+i,r.top),_drawdata.highcolor);
+					BPoint(r.left+i,r.top),_drawdata.HighColor());
 		
-				_drawdata.highcolor.SetColor(uint8(halfcol.red-(i*rstep)),
+				_drawdata.SetHighColor(RGBColor(uint8(halfcol.red-(i*rstep)),
 					uint8(halfcol.green-(i*gstep)),
-					uint8(halfcol.blue-(i*bstep)));
+					uint8(halfcol.blue-(i*bstep))));
 				_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-					BPoint(r.left+i,r.top+steps),_drawdata.highcolor);			
+					BPoint(r.left+i,r.top+steps),_drawdata.HighColor());			
 			}
 			_driver->Unlock();
-//			_drawdata.highcolor=framecolors[4];
+//			_drawdata.SetHighColor(framecolors[4]);
 //			_driver->StrokeRect(r,&_drawdata,pat_solidhigh);
 		}
 		else
 		{
-			_drawdata.highcolor=framecolors[4];
+			_drawdata.SetHighColor(framecolors[4]);
 			_driver->StrokeLine(BPoint(r.right,r.top),BPoint(r.right-3,r.top),
-				_drawdata.highcolor);
+				_drawdata.HighColor());
 			_driver->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.left,r.bottom-3),
-				_drawdata.highcolor);
+				_drawdata.HighColor());
 		}
 	}
 }

@@ -1,3 +1,4 @@
+#include <Point.h>
 #include "DisplayDriver.h"
 #include <View.h>
 #include "LayerData.h"
@@ -157,11 +158,11 @@ void MacDecorator::MoveBy(BPoint pt)
 void MacDecorator::_DrawTitle(BRect r)
 {
 	if(GetFocus())
-		_drawdata.highcolor=textcol;
+		_drawdata.SetHighColor(textcol);
 	else
-		_drawdata.highcolor=inactive_textcol;
+		_drawdata.SetHighColor(inactive_textcol);
 		
-	_drawdata.lowcolor=frame_midcol;
+	_drawdata.SetLowColor(frame_midcol);
 
 	int32 titlecount=_ClipTitle((_zoomrect.left-5)-(_closerect.right+5));
 	BString titlestr=GetTitle();
@@ -210,7 +211,7 @@ printf("MacDecorator::Draw()\n");
 
 	// Draw the top view's client area - just a hack :)
 //	RGBColor blue(100,100,255);
-//	_drawdata.highcolor=blue;
+//	_drawdata.SetHighColor(blue);
 
 	_driver->FillRect(_borderrect,_colors->document_background);
 	_driver->FillRect(_borderrect,_colors->document_background);
@@ -229,26 +230,26 @@ void MacDecorator::_DrawZoom(BRect r)
 	BPoint pt(r.LeftTop()),pt2(r.RightTop());
 	
 	pt2.x--;
-	_drawdata.highcolor.SetColor(136,136,136);
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(136,136,136));
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.y--;
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 	
 	pt=r.RightBottom();
 	pt2=r.RightTop();
 	pt2.y++;
-	_drawdata.highcolor.SetColor(255,255,255);
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(255,255,255));
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 
 	rect.InsetBy(1,1);
-	_drawdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(0,0,0));
+	_driver->StrokeRect(rect,_drawdata.HighColor());
 	
 	rect.InsetBy(1,1);
 	DrawBlendedRect(rect,down);
@@ -259,8 +260,8 @@ void MacDecorator::_DrawZoom(BRect r)
 	rect.left--;
 	rect.right++;
 	
-	_drawdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(0,0,0));
+	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),_drawdata.HighColor());
 }
 
 void MacDecorator::_DrawClose(BRect r)
@@ -273,26 +274,26 @@ void MacDecorator::_DrawClose(BRect r)
 	BPoint pt(r.LeftTop()),pt2(r.RightTop());
 	
 	pt2.x--;
-	_drawdata.highcolor.SetColor(136,136,136);
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(136,136,136));
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.y--;
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 	
 	pt=r.RightBottom();
 	pt2=r.RightTop();
 	pt2.y++;
-	_drawdata.highcolor.SetColor(255,255,255);
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(255,255,255));
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 
 	rect.InsetBy(1,1);
-	_drawdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(0,0,0));
+	_driver->StrokeRect(rect,_drawdata.HighColor());
 	
 	rect.InsetBy(1,1);
 	DrawBlendedRect(rect,down);
@@ -303,7 +304,7 @@ void MacDecorator::_DrawClose(BRect r)
 //	rect.left++;
 //	rect.right--;
 	
-//	_drawdata.highcolor.SetColor(0,0,0);
+//	_drawdata.SetHighColor(RGBColor(0,0,0));
 //	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_drawdata,pat_solidhigh);
 }
 
@@ -317,26 +318,26 @@ void MacDecorator::_DrawMinimize(BRect r)
 	BPoint pt(r.LeftTop()),pt2(r.RightTop());
 	
 	pt2.x--;
-	_drawdata.highcolor.SetColor(136,136,136);
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(136,136,136));
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.y--;
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 	
 	pt=r.RightBottom();
 	pt2=r.RightTop();
 	pt2.y++;
-	_drawdata.highcolor.SetColor(255,255,255);
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(255,255,255));
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 	
 	pt2=r.LeftBottom();
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+	_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 
 	rect.InsetBy(1,1);
-	_drawdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(0,0,0));
+	_driver->StrokeRect(rect,_drawdata.HighColor());
 	
 	rect.InsetBy(1,1);
 	DrawBlendedRect(rect,down);
@@ -347,8 +348,8 @@ void MacDecorator::_DrawMinimize(BRect r)
 	rect.bottom-=4;
 	rect.InsetBy(-2,0);
 	
-	_drawdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(0,0,0));
+	_driver->StrokeRect(rect,_drawdata.HighColor());
 }
 
 void MacDecorator::_DrawTab(BRect r)
@@ -358,12 +359,12 @@ void MacDecorator::_DrawTab(BRect r)
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
 		return;
 	
-//	_drawdata.highcolor=frame_lowcol;
-//	_driver->StrokeRect(_tabrect,_drawdata.highcolor);
+//	_drawdata.SetHighColor(frame_lowcol);
+//	_driver->StrokeRect(_tabrect,_drawdata.HighColor());
 
 //	UpdateTitle(layer->name->String());
 	BRect rect(_tabrect);
-	_drawdata.highcolor.SetColor(frame_midcol);
+	_drawdata.SetHighColor(RGBColor(frame_midcol));
 	_driver->FillRect(rect,frame_midcol);
 	
 	
@@ -387,20 +388,20 @@ void MacDecorator::_DrawTab(BRect r)
 
 			BPoint pt(_closerect.right+5,_closerect.top),
 				pt2(_tabrect.left+textoffset-5,_closerect.top);
-			_drawdata.highcolor.SetColor(frame_highcol);
+			_drawdata.SetHighColor(RGBColor(frame_highcol));
 			for(int32 i=0;i<6;i++)
 			{
-				_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+				_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 				pt.y+=2;
 				pt2.y+=2;
 			}
 			
 			pt.Set(_closerect.right+6,_closerect.top+1),
 				pt2.Set(_tabrect.left+textoffset-4,_closerect.top+1);
-			_drawdata.highcolor.SetColor(frame_lowcol);
+			_drawdata.SetHighColor(RGBColor(frame_lowcol));
 			for(int32 i=0;i<6;i++)
 			{
-				_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+				_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 				pt.y+=2;
 				pt2.y+=2;
 			}
@@ -411,19 +412,19 @@ void MacDecorator::_DrawTab(BRect r)
 				pt2.Set(_zoomrect.left-6,_zoomrect.top);
 			if(pt.x<pt2.x)
 			{
-				_drawdata.highcolor.SetColor(frame_highcol);
+				_drawdata.SetHighColor(RGBColor(frame_highcol));
 				for(int32 i=0;i<6;i++)
 				{
-					_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+					_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 					pt.y+=2;
 					pt2.y+=2;
 				}
 				pt.Set(_tabrect.left+textoffset+titlepixelwidth+7,_zoomrect.top+1),
 					pt2.Set(_zoomrect.left-5,_zoomrect.top+1);
-				_drawdata.highcolor.SetColor(frame_lowcol);
+				_drawdata.SetHighColor(frame_lowcol);
 				for(int32 i=0;i<6;i++)
 				{
-					_driver->StrokeLine(pt,pt2,_drawdata.highcolor);
+					_driver->StrokeLine(pt,pt2,_drawdata.HighColor());
 					pt.y+=2;
 					pt2.y+=2;
 				}
@@ -477,18 +478,18 @@ void MacDecorator::DrawBlendedRect(BRect r, bool down)
 		SetRGBColor(&tmpcol, uint8(startcol.red-(i*rstep)),
 			uint8(startcol.green-(i*gstep)),
 			uint8(startcol.blue-(i*bstep)));
-		_drawdata.highcolor=tmpcol;
+		_drawdata.SetHighColor(tmpcol);
 
 		_driver->StrokeLine(BPoint(rect.left,rect.top+i),
-			BPoint(rect.left+i,rect.top),_drawdata.highcolor);
+			BPoint(rect.left+i,rect.top),_drawdata.HighColor());
 
 		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
 			uint8(halfcol.blue-(i*bstep)) );
-		_drawdata.highcolor=tmpcol;
+		_drawdata.SetHighColor(tmpcol);
 
 		_driver->StrokeLine(BPoint(rect.left+steps,rect.top+i),
-			BPoint(rect.left+i,rect.top+steps),_drawdata.highcolor);
+			BPoint(rect.left+i,rect.top+steps),_drawdata.HighColor());
 
 	}
 }

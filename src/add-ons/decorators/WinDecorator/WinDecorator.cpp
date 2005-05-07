@@ -1,3 +1,4 @@
+#include <Point.h>
 #include "DisplayDriver.h"
 #include <View.h>
 #include "LayerData.h"
@@ -141,8 +142,8 @@ void WinDecorator::GetFootprint(BRegion *region)
 
 void WinDecorator::_DrawTitle(BRect r)
 {
-	_drawdata.highcolor=_colors->window_tab_text;
-	_drawdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+	_drawdata.SetHighColor(_colors->window_tab_text);
+	_drawdata.SetLowColor(GetFocus()?_colors->window_tab:_colors->inactive_window_tab);
 
 	int32 titlecount=_ClipTitle((_minimizerect.left-5)-(_tabrect.left+5));
 	BString titlestr=GetTitle();
@@ -184,7 +185,7 @@ printf("WinDecorator::Draw(): "); update.PrintToStream();
 #endif
 	// Draw the top view's client area - just a hack :)
 //	RGBColor blue(100,100,255);
-//	_drawdata.highcolor=blue;
+//	_drawdata.SetHighColor(blue);
 
 	_driver->FillRect(_borderrect,_colors->document_background);
 
@@ -203,7 +204,7 @@ printf("WinDecorator::Draw()\n");
 
 	// Draw the top view's client area - just a hack :)
 //	RGBColor blue(100,100,255);
-//	_drawdata.highcolor=blue;
+//	_drawdata.SetHighColor(blue);
 
 	_driver->FillRect(_borderrect,_colors->document_background);
 	_driver->FillRect(_borderrect,_colors->document_background);
@@ -227,10 +228,10 @@ void WinDecorator::_DrawZoom(BRect r)
 	if(GetZoom())
 		rect.OffsetBy(1,1);
 
-	_drawdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(0,0,0));
+	_driver->StrokeRect(rect,_drawdata.HighColor());
 	rect.InsetBy(1,1);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),_drawdata.highcolor);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),_drawdata.HighColor());
 	
 }
 
@@ -249,12 +250,12 @@ void WinDecorator::_DrawClose(BRect r)
 	if(GetClose())
 		rect.OffsetBy(1,1);
 
-	_drawdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),_drawdata.highcolor);
-	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(0,0,0));
+	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),_drawdata.HighColor());
+	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),_drawdata.HighColor());
 	rect.OffsetBy(1,0);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),_drawdata.highcolor);
-	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),_drawdata.highcolor);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),_drawdata.HighColor());
+	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),_drawdata.HighColor());
 }
 
 void WinDecorator::_DrawMinimize(BRect r)
@@ -262,13 +263,13 @@ void WinDecorator::_DrawMinimize(BRect r)
 	// Just like DrawZoom, but for a Minimize button
 	DrawBeveledRect(r,GetMinimize());
 
-	_drawdata.highcolor=textcol;
+	_drawdata.SetHighColor(textcol);
 	BRect rect(r.left+5,r.bottom-4,r.right-5,r.bottom-3);
 	if(GetMinimize())
 		rect.OffsetBy(1,1);
 	
-	_drawdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(0,0,0));
+	_driver->StrokeRect(rect,_drawdata.HighColor());
 }
 
 void WinDecorator::_DrawTab(BRect r)
@@ -316,7 +317,7 @@ void WinDecorator::DrawBeveledRect(BRect r, bool down)
 	BPoint pt;
 
 	// Top highlight
-	_drawdata.highcolor=higher;
+	_drawdata.SetHighColor(higher);
 	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),higher);
 
 	// Left highlight
@@ -367,8 +368,8 @@ void WinDecorator::_DrawFrame(BRect rect)
 
 	BRect r=_borderrect;
 	
-	_drawdata.highcolor.SetColor(255,0,0);
-	_driver->StrokeRect(r,_drawdata.highcolor);
+	_drawdata.SetHighColor(RGBColor(255,0,0));
+	_driver->StrokeRect(r,_drawdata.HighColor());
 	
 	BPoint pt;
 
