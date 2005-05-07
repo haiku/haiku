@@ -95,42 +95,38 @@ void PVView::Draw(BRect rect)
 
 PreviewDriver::PreviewDriver(void)
 {
-	view=new PVView(preview_bounds);
-	drawview=new BView(preview_bounds,"drawview",B_FOLLOW_ALL, 0);
+	fView=new PVView(preview_bounds);
+	fDrawView=new BView(preview_bounds,"drawview",B_FOLLOW_ALL, 0);
 }
 
 PreviewDriver::~PreviewDriver(void)
 {
-	delete view;
-	delete drawview;
+	delete fView;
+	delete fDrawView;
 }
 
 bool PreviewDriver::Initialize(void)
 {
-	view->viewbmp->Lock();
-	view->viewbmp->AddChild(drawview);
-	view->viewbmp->Unlock();
+	fView->viewbmp->Lock();
+	fView->viewbmp->AddChild(fDrawView);
+	fView->viewbmp->Unlock();
 	return true;
 }
 
 void PreviewDriver::Shutdown(void)
 {
-	view->viewbmp->Lock();
-	view->viewbmp->RemoveChild(drawview);
-	view->viewbmp->Unlock();
-}
-
-void PreviewDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d)
-{
+	fView->viewbmp->Lock();
+	fView->viewbmp->RemoveChild(fDrawView);
+	fView->viewbmp->Unlock();
 }
 
 void PreviewDriver::InvertRect(const BRect &r)
 {
-	view->viewbmp->Lock();
-	drawview->InvertRect(r);
-	drawview->Sync();
-	view->Invalidate(r);
-	view->viewbmp->Unlock();
+	fView->viewbmp->Lock();
+	fDrawView->InvertRect(r);
+	fDrawView->Sync();
+	fView->Invalidate(r);
+	fView->viewbmp->Unlock();
 }
 
 void PreviewDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,
@@ -139,113 +135,20 @@ void PreviewDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *
 	if(!linedata || !d)
 		return;
 	
-	view->viewbmp->Lock();
-	drawview->SetHighColor(d->highcolor.GetColor32());
-	drawview->SetLowColor(d->lowcolor.GetColor32());
-	drawview->SetPenSize(d->pensize);
-	drawview->BeginLineArray(numlines);
+	fView->viewbmp->Lock();
+	fDrawView->SetHighColor(d->HighColor().GetColor32());
+	fDrawView->SetLowColor(d->LowColor().GetColor32());
+	fDrawView->SetPenSize(d->PenSize());
+	fDrawView->BeginLineArray(numlines);
 	for(int32 i=0; i<numlines; i++)
 	{
 		const LineArrayData *data=&(linedata[i]);
-		drawview->AddLine(data->pt1,data->pt2,data->color);
+		fDrawView->AddLine(data->pt1,data->pt2,data->color);
 	}
-	drawview->EndLineArray();
-	drawview->Sync();
-	view->Invalidate();
-	view->viewbmp->Unlock();
-}
-
-void PreviewDriver::SetMode(const int32 &mode)
-{
-}
-
-void PreviewDriver::SetMode(const display_mode &mode)
-{
-}
-
-void PreviewDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
-{
-	view->viewbmp->Lock();
-	drawview->SetHighColor(color.GetColor32());
-	drawview->FillRect(rect);
-	drawview->Sync();
-	view->Invalidate(rect);
-	view->viewbmp->Unlock();
-}
-
-void PreviewDriver::FillPatternRect(const BRect &rect, const DrawData *d)
-{
-	if(!d)
-		return;
-	
-	view->viewbmp->Lock();
-	drawview->SetHighColor(d->highcolor.GetColor32());
-	drawview->SetLowColor(d->lowcolor.GetColor32());
-	drawview->FillRect(rect,*((pattern*)d->patt.GetInt8()));
-	drawview->Sync();
-	view->Invalidate(rect);
-	view->viewbmp->Unlock();
-}
-
-void PreviewDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color)
-{
-	BPoint start(x1,y1);
-	BPoint end(x2,y2);
-	
-	view->viewbmp->Lock();
-	drawview->SetHighColor(color.GetColor32());
-	drawview->StrokeLine(start,end);
-	drawview->Sync();
-	view->Invalidate(BRect(start,end));
-	view->viewbmp->Unlock();
-}
-
-void PreviewDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
-{
-	if(!d)
-		return;
-	
-	BPoint start(x1,y1);
-	BPoint end(x2,y2);
-
-	view->viewbmp->Lock();
-	drawview->SetHighColor(d->highcolor.GetColor32());
-	drawview->SetLowColor(d->lowcolor.GetColor32());
-	drawview->StrokeLine(start,end,*((pattern*)d->patt.GetInt8()));
-	drawview->Sync();
-	view->Invalidate(BRect(start,end));
-	view->viewbmp->Unlock();
-}
-
-void PreviewDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
-{
-	view->viewbmp->Lock();
-	drawview->SetHighColor(color.GetColor32());
-	drawview->StrokeRect(rect);
-	drawview->Sync();
-	view->Invalidate(rect);
-	view->viewbmp->Unlock();
-}
-
-bool PreviewDriver::AcquireBuffer(FBBitmap *bmp)
-{
-	if(!bmp)
-		return false;
-
-	view->viewbmp->Lock();
-	bmp->SetBuffer(view->viewbmp->Bits());
-	bmp->SetSpace(view->viewbmp->ColorSpace());
-	bmp->SetBytesPerRow(view->viewbmp->BytesPerRow());
-	bmp->SetSize(view->viewbmp->Bounds().IntegerWidth(),
-			view->viewbmp->Bounds().IntegerHeight());
-	bmp->SetBitsPerPixel(view->viewbmp->ColorSpace(),view->viewbmp->BytesPerRow());
-	
-	return true;
-}
-
-void PreviewDriver::ReleaseBuffer(void)
-{
-	view->viewbmp->Unlock();
+	fDrawView->EndLineArray();
+	fDrawView->Sync();
+	fView->Invalidate();
+	fView->viewbmp->Unlock();
 }
 
 bool PreviewDriver::Lock(bigtime_t timeout=B_INFINITE_TIMEOUT)
@@ -255,4 +158,83 @@ bool PreviewDriver::Lock(bigtime_t timeout=B_INFINITE_TIMEOUT)
 
 void PreviewDriver::Unlock(void)
 {
+}
+
+float
+PreviewDriver::StringWidth(const char *string, int32 length, const DrawData *d)
+{
+	SetDrawData(d,true);
+	fView->viewbmp->Lock();
+	float value=fDrawView->StringWidth(string,length);
+	fView->viewbmp->Unlock();
+	
+	return value;
+}
+
+float
+PreviewDriver::StringWidth(const char *string,int32 length, const ServerFont &font)
+{
+	DrawData d;
+	d.SetFont(font);
+	return StringWidth(string,length,&d);
+}
+
+void
+PreviewDriver::SetDrawData(const DrawData *d, bool set_font_data)
+{
+	if(!d)
+		return;
+	
+	fView->viewbmp->Lock();
+	
+	BRegion reg=*d->ClippingRegion();
+	fDrawView->ConstrainClippingRegion(&reg);
+	
+	fDrawView->SetPenSize(d->PenSize());
+	fDrawView->SetDrawingMode(d->GetDrawingMode());
+	
+	fDrawView->SetHighColor(d->HighColor().GetColor32());
+	fDrawView->SetLowColor(d->LowColor().GetColor32());
+	
+	fDrawView->SetScale(d->Scale());
+	fDrawView->MovePenTo(d->PenLocation());
+	
+	if(set_font_data)
+	{
+		BFont font;
+		const ServerFont *sf=&(d->Font());
+
+		if(!sf)
+			return;
+
+		font.SetFamilyAndStyle(sf->GetFamily(),sf->GetStyle());
+		font.SetFlags(sf->Flags());
+		font.SetEncoding(sf->Encoding());
+		font.SetSize(sf->Size());
+		font.SetRotation(sf->Rotation());
+		font.SetShear(sf->Shear());
+		font.SetSpacing(sf->Spacing());
+		fDrawView->SetFont(&font);
+	}
+	
+	fView->viewbmp->Unlock();
+}
+
+float
+PreviewDriver::StringHeight(const char *string,int32 length,
+							const DrawData *d)
+{
+	SetDrawData(d,true);
+	
+	fView->viewbmp->Lock();
+	
+	font_height fh;
+	
+	fDrawView->GetFontHeight(&fh);
+	
+	float value=fh.ascent+fh.descent+fh.leading;
+	
+	fView->viewbmp->Unlock();
+	
+	return value;
 }

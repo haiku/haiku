@@ -57,43 +57,256 @@ public:
 
 class PreviewDriver : public DisplayDriver
 {
-public:
-	PreviewDriver(void);
-	~PreviewDriver(void);
+ public:
+								PreviewDriver();
+	virtual						~PreviewDriver();
 
-	bool Initialize(void);		// Sets the driver
-	void Shutdown(void);		// You never know when you'll need this
+	// when implementing, be sure to call the inherited version
+	virtual bool				Initialize();
+	virtual void				Shutdown();
+
+	// clipping for all drawing functions
+	virtual	void				ConstrainClippingRegion(BRegion* region) {}
+
+	// Graphics calls implemented in DisplayDriver
+	virtual	void				CopyRegion(		/*const*/ BRegion* region,
+												int32 xOffset,
+												int32 yOffset) {}
+
+	virtual	void				CopyRegionList(	BList* list,
+												BList* pList,
+												int32 rCount,
+												BRegion* clipReg) {}
+
+	virtual void				InvertRect(		const BRect &r);
+
+	virtual	void				DrawBitmap(		BRegion *region,
+												ServerBitmap *bitmap,
+												const BRect &source,
+												const BRect &dest,
+												const DrawData *d) {}
+
+	virtual	void				FillArc(		const BRect &r,
+												const float &angle,
+												const float &span,
+												const DrawData *d) {}
+
+	virtual	void				FillBezier(		BPoint *pts,
+												const DrawData *d) {}
+
+	virtual	void				FillEllipse(	const BRect &r,
+												const DrawData *d) {}
+
+	virtual	void				FillPolygon(	BPoint *ptlist,
+												int32 numpts,
+												const BRect &bounds,
+												const DrawData *d) {}
+
+	virtual	void				FillRect(		const BRect &r,
+												const RGBColor &color) {}
+
+	virtual	void				FillRect(		const BRect &r,
+												const DrawData *d) {}
+
+	virtual	void				FillRegion(		BRegion &r,
+												const DrawData *d) {}
+
+	virtual	void				FillRoundRect(	const BRect &r,
+												const float &xrad,
+												const float &yrad,
+												const DrawData *d) {}
+
+	virtual	void				FillShape(		const BRect &bounds,
+												const int32 &opcount,
+												const int32 *oplist, 
+												const int32 &ptcount,
+												const BPoint *ptlist,
+												const DrawData *d) {}
+
+	virtual	void				FillTriangle(	BPoint *pts,
+												const BRect &bounds,
+												const DrawData *d) {}
+
+	virtual	void				StrokeArc(		const BRect &r,
+												const float &angle,
+												const float &span,
+												const DrawData *d) {}
+
+	virtual	void				StrokeBezier(	BPoint *pts,
+												const DrawData *d) {}
+
+	virtual	void				StrokeEllipse(	const BRect &r,
+												const DrawData *d) {}
+
+	// this version used by Decorator
+	virtual	void				StrokeLine(		const BPoint &start,
+												const BPoint &end,
+												const RGBColor &color) {}
+
+	virtual	void				StrokeLine(		const BPoint &start,
+												const BPoint &end,
+												DrawData *d) {}
+
+	virtual void				StrokeLineArray(const int32 &numlines,
+												const LineArrayData *data,
+												const DrawData *d);
+
+	// this version used by Decorator
+	virtual	void				StrokePoint(	const BPoint &pt,
+												const RGBColor &color) {}
+
+	virtual	void				StrokePoint(	const BPoint &pt,
+												DrawData *d) {}
+
+	virtual	void				StrokePolygon(	BPoint *ptlist,
+												int32 numpts,
+												const BRect &bounds,
+												const DrawData *d,
+												bool is_closed=true) {}
+
+	// this version used by Decorator
+	virtual	void				StrokeRect(		const BRect &r,
+												const RGBColor &color) {}
+
+	virtual	void				StrokeRect(		const BRect &r,
+												const DrawData *d) {}
+
+	virtual	void				StrokeRegion(	BRegion &r,
+												const DrawData *d) {}
+
+	virtual	void				StrokeRoundRect(const BRect &r,
+												const float &xrad,
+												const float &yrad,
+												const DrawData *d) {}
+
+	virtual	void				StrokeShape(	const BRect &bounds,
+												const int32 &opcount,
+												const int32 *oplist, 
+												const int32 &ptcount,
+												const BPoint *ptlist,
+												const DrawData *d) {}
+
+	virtual	void				StrokeTriangle(	BPoint *pts,
+												const BRect &bounds,
+												const DrawData *d) {}
+
+	// Font-related calls
 	
-	// Drawing functions
-	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
+	// DrawData is NOT const because this call updates the pen position in the passed DrawData
+	virtual	void				DrawString(		const char *string,
+												const int32 &length,
+												const BPoint &pt,
+												DrawData *d) {}
 
-	void InvertRect(const BRect &r);
+	virtual	void				DrawString(		const char *string,
+												const int32 &length,
+												const BPoint &pt,
+												const RGBColor &color,
+												escapement_delta *delta=NULL) {}
 
-	virtual void StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,const DrawData *d);
+	virtual	float				StringWidth(	const char *string,
+												int32 length,
+												const DrawData *d);
 
-	void SetMode(const int32 &mode);
-	void SetMode(const display_mode &mode);
+	virtual	float				StringWidth(	const char *string,
+												int32 length,
+												const ServerFont &font);
+
+	virtual	float				StringHeight(	const char *string,
+												int32 length,
+												const DrawData *d);
+
+	virtual	void				GetBoundingBoxes(const char *string,
+												 int32 count,
+												 font_metric_mode mode, 
+												 escapement_delta *delta,
+												 BRect *rectarray,
+												 const DrawData *d) {}
+
+	virtual	void				GetEscapements(	const char *string,
+												int32 charcount,
+												escapement_delta *delta, 
+												escapement_delta *escapements,
+												escapement_delta *offsets,
+												const DrawData *d) {}
+
+	virtual	void				GetEdges(		const char *string,
+												int32 charcount,
+												edge_info *edgearray,
+												const DrawData *d) {}
+
+	virtual	void				GetHasGlyphs(	const char *string,
+												int32 charcount,
+												bool *hasarray) {}
+
+	virtual	void				GetTruncatedStrings(const char **instrings,
+													const int32 &stringcount,
+													const uint32 &mode, 
+													const float &maxwidth,
+													char **outstrings) {}
 	
-	BView *View(void) { return (BView*)view; };
-	virtual bool Lock(bigtime_t timeout=B_INFINITE_TIMEOUT);
-	virtual void Unlock(void);
+	virtual	void				HideCursor() {}
+	virtual	bool				IsCursorHidden() { return false; }
+	virtual	void				MoveCursorTo(	const float &x,
+												const float &y) {}
+	virtual	void				ShowCursor() {}
+	virtual	void				ObscureCursor() {}
+	virtual	void				SetCursor(ServerCursor *cursor) {}
+	virtual	BPoint				GetCursorPosition() { return BPoint(0,0); }
+	virtual	bool				IsCursorObscured(bool state) { return false; }
+	
+	
+	// Virtual methods which need to be implemented by each subclass
 
-protected:
-	virtual void FillSolidRect(const BRect &rect, const RGBColor &color);
-	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
-	virtual void StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color);
-	virtual void StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d);
-	virtual void StrokeSolidRect(const BRect &rect, const RGBColor &color);
+	// These two will rarely be implemented by subclasses,
+	// but it still needs to be possible
+	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
+	virtual void				Unlock();
 
-	virtual bool AcquireBuffer(FBBitmap *bmp);
-	virtual void ReleaseBuffer(void);
+	// display mode access
+	virtual void				SetMode(const display_mode &mode) {}
+	virtual	void				GetMode(display_mode *mode) {}
+			const display_mode*	DisplayMode()
+									{ return &fDisplayMode; }
+	
+	virtual bool				DumpToFile(const char *path) { return false; }
+	virtual ServerBitmap*		DumpToBitmap() { return NULL; }
 
-	BBitmap *framebuffer;
-	BView *drawview;
+	virtual status_t			SetDPMSMode(const uint32 &state) { return B_ERROR; }
+	virtual uint32				DPMSMode() { return 0; }
+	virtual uint32				DPMSCapabilities() { return 0; }
+	virtual status_t			GetDeviceInfo(accelerant_device_info *info) { return B_ERROR; }
 
-	// Region used to track of invalid areas for the Begin/EndLineArray functions
-	BRegion laregion;
-	PVView *view;
+	virtual status_t			GetModeList(display_mode **mode_list,
+											uint32 *count) { return B_ERROR; }
+
+	virtual status_t			GetPixelClockLimits(display_mode *mode,
+													uint32 *low,
+													uint32 *high) { return B_ERROR; }
+
+	virtual status_t			GetTimingConstraints(display_timing_constraints *dtc) { return B_ERROR; }
+	virtual status_t			ProposeMode(display_mode *candidate,
+											const display_mode *low,
+											const display_mode *high) { return B_ERROR; }
+
+	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT) { return B_ERROR; }
+	
+			// This is only for the PreviewDriver
+			BView *				View(void) { return (BView*)fView; };
+
+ protected:
+			void				SetDrawData(const DrawData *d, 
+											bool set_font_data);
+			
+			display_mode		fDisplayMode;
+			
+			BBitmap 			*fFramebuffer;
+			BView 				*fDrawView;
+			
+			// Region used to track of invalid areas for the 
+			// Begin/EndLineArray functions
+			BRegion				fArrayRegion;
+			PVView 				*fView;
 };
 
 extern BRect preview_bounds;

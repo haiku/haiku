@@ -98,7 +98,7 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 
 
 	// Finish setup
-	ldata.highcolor.SetColor(51,102,160);
+	ldata.SetHighColor(RGBColor(51,102,160));
 	pat_solid_high=0xFFFFFFFFFFFFFFFFLL;
 	driver->FillRect(preview_bounds,&ldata);
 
