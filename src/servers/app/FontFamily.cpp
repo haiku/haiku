@@ -55,7 +55,8 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 	fID=0;
 	fHeight.ascent=face->ascender;
 	fHeight.descent=face->descender;
-	fHeight.leading=face->height;
+	// TODO: Fix this
+	fHeight.leading=/*face->height;*/ 0;
 	fHeight.units_per_em=face->units_per_EM;
 }
 
