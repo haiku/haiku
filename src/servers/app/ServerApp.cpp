@@ -1820,6 +1820,52 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			break;
 		}
+		case AS_GET_ESCAPEMENTS_AS_FLOATS:
+		{
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) float - point size
+			// 4) float - rotation
+			// 5) uint32 - flags
+			// 6) int32 - numChars
+			// 7) char - char
+			// 8) port_id - reply port
+			
+			// Returns:
+			// 1) float - escapement
+			// numChars times
+			
+			uint16 famid, styid;
+			uint32 flags;
+			float ptsize, rotation;
+			
+			msg.Read<uint16>(&famid);
+			msg.Read<uint16>(&styid);
+			msg.Read<float>(&ptsize);
+			msg.Read<float>(&rotation);
+			msg.Read<uint32>(&flags);
+			
+			int32 numChars;
+			msg.Read<int32>(&numChars);
+			
+			char charArray[numChars];			
+			BPoint offsetArray[numChars];
+			for (int32 i = 0; i < numChars; i++) {
+				msg.Read<char>(&charArray[i]);
+				msg.Read<BPoint>(&offsetArray[i]);
+			}
+			
+			port_id replyport;
+			msg.Read<port_id>(&replyport);
+			replylink.SetSendPort(replyport);
+			
+			// TODO: Implement AS_GET_ESCAPEMENTS_AS_FLOATS and the float version of ServerFont::GetEscapements()
+			replylink.StartMessage(SERVER_FALSE);
+			replylink.Flush();
+			
+			break;
+		}
 		case AS_SCREEN_GET_MODE:
 		{
 			// Attached data
