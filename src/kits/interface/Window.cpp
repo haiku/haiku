@@ -963,7 +963,12 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 				printf("***PANIC: BW: Can't find view with ID: %ld !***\n", token);
 	
 			break;
-		}		
+		}
+		
+		case _MENUS_DONE_:
+			MenusEnded();
+			break;
+			
 		default:
 		{
 			BLooper::DispatchMessage(msg, target); 
