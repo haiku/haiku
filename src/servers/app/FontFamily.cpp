@@ -53,14 +53,15 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 	fbounds.Set(0,0,0,0);
 	fFace=TranslateStyleToFace(face->style_name);
 	fID=0;
-	fHeight.ascent=face->ascender;
-	fHeight.descent=face->descender;
+	fHeight.ascent = face->ascender;
+	
+	// FT2's descent numbers are negative. Be's is positive
+	fHeight.descent = -face->descender;
 	
 	// FT2 doesn't provide a linegap, but according to the docs, we can
 	// calculate it because height = ascending + descending + leading
-	fHeight.leading=face->height-( face->ascender + (face->descender>0)?
-					face->descender : face->descender * -1);
-	fHeight.units_per_em=face->units_per_EM;
+	fHeight.leading = face->height - (fHeight.ascent + fHeight.descent);
+	fHeight.units_per_em = face->units_per_EM;
 }
 
 /*!
@@ -91,12 +92,9 @@ font_height FontStyle::GetHeight(const float &size)
 	
 	// font units are 26.6 format, so we get REALLY big numbers if
 	// we don't do some shifting.
-	fh.ascent=(fHeight.ascent * size) / fHeight.units_per_em;
-	
-	// FT2's descent numbers are negative. Be's is positive
-	fh.descent=(fHeight.descent * size * -1) / fHeight.units_per_em;
-	
-	fh.leading=(fHeight.leading * size) / fHeight.units_per_em;
+	fh.ascent = (fHeight.ascent * size) / fHeight.units_per_em;
+	fh.descent = (fHeight.descent * size) / fHeight.units_per_em;
+	fh.leading = (fHeight.leading * size) / fHeight.units_per_em;
 	return fh;
 }
 
