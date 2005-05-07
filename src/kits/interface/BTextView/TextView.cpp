@@ -68,7 +68,9 @@
 #endif
 
 
-#define USE_WIDTHBUFFER 1
+// TODO: WidthBuffer uses BFont::GetEscapements()
+// which isn't implemented yet
+#define USE_WIDTHBUFFER 0
 #define USE_DOUBLEBUFFERING 0
 
 
