@@ -77,10 +77,10 @@ TermApp::TermApp (void)
   BList teams; 
 
   be_roster->GetAppList(TERM_SIGNATURE, &teams); 
-  int window_num = teams.CountItems();
+  fWindowNumber = teams.CountItems();
 
-  int i = window_num / 16;
-  int j = window_num % 16;
+  int i = fWindowNumber / 16;
+  int j = fWindowNumber % 16;
   
   int k = (j * 16) + (i * 64) + 50;
   int l = (j * 16)  + 50;
@@ -406,7 +406,7 @@ TermApp::MakeTermWindow (BRect &frame)
 
   /* Create Window Object. */
 
-  fTermWindow = new TermWindow (frame);
+  fTermWindow = new TermWindow (frame, fWindowNumber);
 
   fTermWindow->Show ();
 
@@ -448,7 +448,7 @@ TermApp::SwitchTerm()
   int32 numTerms = teams.CountItems();
   if (numTerms <= 1 ) return; //Can't Switch !!
 
-  // Find posion of mine in app teams.
+  // Find position of mine in app teams.
   int32 i;
 
   for(i = 0; i < numTerms; i++){
@@ -459,7 +459,7 @@ TermApp::SwitchTerm()
     if(--i < 0) i = numTerms - 1;
   }while(IsMinimize(reinterpret_cast<team_id>(teams.ItemAt(i))));
 
-  // Activare switched terminal.
+  // Activate switched terminal.
   ActivateTermWindow(reinterpret_cast<team_id>(teams.ItemAt(i)));
 }
 ////////////////////////////////////////////////////////////////////////////

@@ -118,11 +118,11 @@ PrefDlg::SetupContent()
   // OK, Apply and Cancel button.
   //
 
-	fSaveAsFileButton = new BButton(BRect(50,215,150,20), "okbutton", "Save", new BMessage(MSG_SAVEAS_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
+	fSaveAsFileButton = new BButton(BRect(50,215,150,20), "savebutton", "Save to File", new BMessage(MSG_SAVEAS_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
 	top->AddChild(fSaveAsFileButton);
-	fRevertButton = new BButton(BRect(180,215,250,20), "applybutton", "Cancel", new BMessage(MSG_REVERT_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
+	fRevertButton = new BButton(BRect(180,215,250,20), "revertbutton", "Cancel", new BMessage(MSG_REVERT_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
 	top->AddChild(fRevertButton); 
-	fSaveButton = new BButton(BRect(260,215,330,20), "cancelbutton", "OK", new BMessage(MSG_SAVE_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
+	fSaveButton = new BButton(BRect(260,215,330,20), "okbutton", "OK", new BMessage(MSG_SAVE_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
 	top->AddChild(fSaveButton); 		 
 
 
@@ -154,12 +154,14 @@ PrefDlg::QuitRequested ()
   
   BAlert *alert = new BAlert("",
 			     "Save changes to this preference panel?",
-			     "Cancel", "Don't save",
+			     "Cancel", "Don't Save",
 			     "Save",
 			     B_WIDTH_AS_USUAL,
 			     B_OFFSET_SPACING,
 			     B_WARNING_ALERT); 
   alert->SetShortcut(0, B_ESCAPE); 
+  alert->SetShortcut(1, 'd'); 
+  alert->SetShortcut(2, 's'); 
   int32 button_index = alert->Go();
 
   switch (button_index) {
@@ -271,7 +273,7 @@ PrefDlg::MessageReceived(BMessage *msg)
   switch (msg->what) {  
   case MSG_SAVE_PRESSED:
     doSave();
-    Quit();
+    PostMessage(B_QUIT_REQUESTED);
     break;
 
   case MSG_SAVEAS_PRESSED:
@@ -280,6 +282,7 @@ PrefDlg::MessageReceived(BMessage *msg)
     
   case MSG_REVERT_PRESSED:
     doRevert();
+    PostMessage(B_QUIT_REQUESTED);
     break;
     
   case MSG_PREF_MODIFIED:

@@ -88,9 +88,11 @@ void SetCoding (int);
 // TermWindow Constructer
 //
 ////////////////////////////////////////////////////////////////////////////
-TermWindow::TermWindow( BRect frame)
+TermWindow::TermWindow( BRect frame, int32 windownumber)
   : BWindow (frame, NULL, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE)
 {
+  sprintf(gWindowName,"Terminal %ld",windownumber);
+  
   InitWindow();
   SetWindowTitle();
   fPrintSettings = NULL;
@@ -258,10 +260,10 @@ TermWindow::SetupMenu(void)
   fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
   fFilemenu->AddItem(new BMenuItem("Start New Terminal", new BMessage(MENU_NEW_TREM), 'N'));
   fFilemenu->AddSeparatorItem();
-  fFilemenu->AddItem(new BMenuItem("Preferences", new BMessage(MENU_PREF_OPEN)));
+  fFilemenu->AddItem(new BMenuItem("About Terminal...", new BMessage(MENU_SHOW_ABOUT)));
   fFilemenu->AddSeparatorItem();
-  fFilemenu->AddItem(new BMenuItem("Page Setup", new BMessage(MENU_PAGE_SETUP)));
-  fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),           'P'));
+  fFilemenu->AddItem(new BMenuItem("Page Setup...", new BMessage(MENU_PAGE_SETUP)));
+  fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
   fFilemenu->AddSeparatorItem();
   fFilemenu->AddItem(new BMenuItem("Quit", new BMessage(MENU_FILE_QUIT), 'Q'));
   fMenubar->AddItem(fFilemenu);
@@ -274,10 +276,14 @@ TermWindow::SetupMenu(void)
   fEditmenu->AddItem (new BMenuItem ("Paste", new BMessage (B_PASTE),'V'));
   fEditmenu->AddSeparatorItem ();
   fEditmenu->AddItem (new BMenuItem ("Select All", new BMessage (B_SELECT_ALL), 'A'));
-  fEditmenu->AddItem (new BMenuItem ("Clear All", new BMessage (MENU_CLEAR_ALL)));
+  fEditmenu->AddItem (new BMenuItem ("Clear All", new BMessage (MENU_CLEAR_ALL), 'L'));
+
+/*
+  // TODO: Implement Finding
   fEditmenu->AddSeparatorItem ();
   fEditmenu->AddItem (new BMenuItem ("Find", new BMessage (MENU_FIND_STRING),'F'));
-  fEditmenu->AddItem (new BMenuItem ("Find Again", new BMessage (MENU_FIND_AGAIN), '['));
+  fEditmenu->AddItem (new BMenuItem ("Find Again", new BMessage (MENU_FIND_AGAIN), ']'));
+*/
   fMenubar->AddItem (fEditmenu);
   
 
@@ -291,7 +297,10 @@ TermWindow::SetupMenu(void)
    	fWindowSizeMenu->AddItem(new BMenuItem("80x40", new BMessage(EIGHTYFORTY))); 
  	fWindowSizeMenu->AddItem(new BMenuItem("132x24", new BMessage(ONETHREETWOTWENTYFOUR))); 
  	fWindowSizeMenu->AddItem(new BMenuItem("132x25", new BMessage(ONETHREETWOTWENTYFIVE))); 
-  fNewFontMenu = new BMenu("Font");
+ 	
+ 	// Considering we have this in the preferences window, this menu is not
+ 	// needed and should not be shown if we are to not confuse the user
+/*  fNewFontMenu = new BMenu("Font");
 	fNewFontMenu->SetRadioMode(true);
 		int32 numFamilies1 = count_font_families();
 		for ( int32 i = 0; i < numFamilies1; i++ ) {
@@ -303,13 +312,16 @@ TermWindow::SetupMenu(void)
 			}
 		}
   fNewFontMenu->FindItem (gTermPref->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
+*/
+
   fEncodingmenu = new BMenu("Font Encoding");
   fEncodingmenu->SetRadioMode(true);
   MakeEncodingMenu(fEncodingmenu, gNowCoding, true);
-  fHelpmenu->AddItem(fEncodingmenu);
   fHelpmenu->AddItem(fWindowSizeMenu);  
-  fHelpmenu->AddItem(fNewFontMenu);
-  fHelpmenu->AddItem(new BMenuItem("About Terminal", new BMessage(MENU_SHOW_ABOUT)));
+  fHelpmenu->AddItem(fEncodingmenu);
+//  fHelpmenu->AddItem(fNewFontMenu);
+  fHelpmenu->AddSeparatorItem();
+  fHelpmenu->AddItem(new BMenuItem("Preferences", new BMessage(MENU_PREF_OPEN)));
   fMenubar->AddItem(fHelpmenu);
  
 
@@ -592,9 +604,7 @@ void
 TermWindow::SetWindowTitle (void)
 {
   char windowname[256];
-  sprintf(windowname, gWindowName
-
-);
+  sprintf(windowname, gWindowName);
   this->SetTitle (windowname);
 
 }
@@ -701,7 +711,7 @@ TermWindow::DoPageSetup()
 void
 TermWindow::DoPrint()
 {
-#if B_BEOS_VERSION < 0x0460
+//#if B_BEOS_VERSION < 0x0460
   BPrintJob job("Print"); 
 
   if((! fPrintSettings) && (DoPageSetup() != B_NO_ERROR)) {
@@ -709,7 +719,7 @@ TermWindow::DoPrint()
   return;
   }
   
-  job.SetSettings(new BMessage(fPrintSettings));
+  job.SetSettings(new BMessage(*fPrintSettings));
  
   BRect pageRect = job.PrintableRect();
   BRect curPageRect = pageRect;
@@ -732,12 +742,16 @@ TermWindow::DoPrint()
       job.SpoolPage();
     
       if(!job.CanContinue()){
-        (new BAlert("Cancel", "Print job cancelled", "OK"))->Go();
+      	  // It is likely that the only way that the job was cancelled is
+      	  // because the user hit 'Cancel' in the page setup window, in which
+      	  // case, the user does *not* need to be told that it was cancelled.
+      	  // He/she will simply expect that it was done.
+//        (new BAlert("Cancel", "Print job cancelled", "OK"))->Go();
         return;
       }
   }
 
   /* commit the job, send the spool file */
   job.CommitJob();
-#endif 
+//#endif 
 }

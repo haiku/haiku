@@ -1942,9 +1942,12 @@ TermView::DoCopy()
     be_clipboard->Unlock(); 
   }
 
-  if (!fMouseTracking) {
-    this->DeSelect ();
-  }
+	// Deselecting the current selection is not the behavior that
+	// R5's Terminal app displays. We want to mimic the behavior, so we will
+	// no longer do the deselection
+//  if (!fMouseTracking) {
+//    this->DeSelect ();
+//  }
   
 }
 ////////////////////////////////////////////////////////////////////////////

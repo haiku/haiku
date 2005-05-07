@@ -48,7 +48,7 @@ class FindDlg;
 class TermWindow : public BWindow
 {
 public:
-  TermWindow (BRect frame);
+  TermWindow (BRect frame, int32 windownumber=1);
   ~TermWindow ();
 
   void		Quit (void);
