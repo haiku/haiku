@@ -942,7 +942,33 @@ void
 BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
 	float escapementArray[]) const
 {
-	// TODO: implement
+	if(!charArray ||  numChars<1 || !escapementArray)
+		return;
+	
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_GET_ESCAPEMENTS_AS_FLOATS);
+	
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Attach<float>(fSize);
+	link.Attach<float>(fRotation);
+	link.Attach<uint32>(fFlags);
+	
+	link.Attach<int32>(numChars);
+	
+	// TODO: Support UTF8 characters
+	for(int32 i=0; i<numChars; i++)
+		link.Attach<char>(charArray[i]);
+	
+	link.FlushWithReply(&code);
+
+	if(code!=SERVER_TRUE)
+		return;
+	
+	for(int32 i=0; i<numChars; i++)
+		link.Read<float>(&escapementArray[i]);
 }
 
 
@@ -974,6 +1000,7 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	
 	link.Attach<int32>(numChars);
 	
+	// TODO: Support UTF8 characters
 	if(offsetArray)
 	{
 		for(int32 i=0; i<numChars; i++)
