@@ -55,8 +55,11 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 	fID=0;
 	fHeight.ascent=face->ascender;
 	fHeight.descent=face->descender;
-	// TODO: Fix this
-	fHeight.leading=/*face->height;*/ 0;
+	
+	// FT2 doesn't provide a linegap, but according to the docs, we can
+	// calculate it because height = ascending + descending + leading
+	fHeight.leading=face->height-( face->ascender + (face->descender>0)?
+					face->descender : face->descender * -1);
 	fHeight.units_per_em=face->units_per_EM;
 }
 
