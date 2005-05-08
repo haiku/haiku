@@ -92,6 +92,9 @@ font_height FontStyle::GetHeight(const float &size)
 	
 	// font units are 26.6 format, so we get REALLY big numbers if
 	// we don't do some shifting.
+	// TODO: As it looks like that the "units_per_em" don't change
+	// for the lifetime of FontStyle, can't we apply these
+	// conversions in the constructor and get rid of "units_per_em" ?
 	fh.ascent = (fHeight.ascent * size) / fHeight.units_per_em;
 	fh.descent = (fHeight.descent * size) / fHeight.units_per_em;
 	fh.leading = (fHeight.leading * size) / fHeight.units_per_em;
