@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -88,57 +88,57 @@
 ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
 		team_id clientTeamID, int32 handlerID, char *signature)
 		:
+		fClientAppPort(sendport),
+		fMessagePort(rcvport),
+		fClientLooperPort(clientLooperPort),
+		fSignature(signature),
+		fMonitorThreadID(-1),
+		fClientTeamID(clientTeamID),
+		fMsgReader(NULL),
+		fMsgSender(NULL),
+		fSWindowList(NULL),
+		fBitmapList(NULL),
+		fPictureList(NULL),
+		fAppCursor(NULL),
+		fLockSem(-1),
+		fCursorHidden(false),
+		fIsActive(false),
+		//fHandlerToken(handlerID),
+		fSharedMem(NULL),
 		fQuitting(false)
 {
-	// it will be of *very* musch use in correct window order
-	fClientTeamID		= clientTeamID;
-
-	// what to send a message to the client? Write a BMessage to this port.
-	fClientLooperPort	= clientLooperPort;
-
-	// need to copy the fSignature because the message buffer
-	// owns the copy which we are passed as a parameter.
-	fSignature=(signature)?signature:"application/x-vnd.NULL-application-signature";
+	if (fSignature == "")
+		fSignature = "application/x-vnd.NULL-application-signature";
 	
-	// token ID of the BApplication's BHandler object. Used for BMessage target specification
-	fHandlerToken=handlerID;
-
-	// fClientAppPort is the our BApplication's event port
-	fClientAppPort=sendport;
-
-	// fMessagePort is the port we receive messages from our BApplication
-	fMessagePort=rcvport;
-
 	fMsgReader = new LinkMsgReader(fMessagePort);
 	fMsgSender = new LinkMsgSender(fClientAppPort);
 
-	fSWindowList=new BList(0);
-	fBitmapList=new BList(0);
-	fPictureList=new BList(0);
-	fIsActive=false;
+	fSWindowList = new BList();
+	fBitmapList = new BList();
+	fPictureList = new BList();
 	
-	fSharedMem=new AreaPool;
+	fSharedMem = new AreaPool;
 
 	// although this isn't pretty, ATM we have only one RootLayer.
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
-	ServerCursor *defaultc=desktop->ActiveRootLayer()->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
+	ServerCursor *defaultCursor = 
+		desktop->ActiveRootLayer()->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
 	
-	fAppCursor=(defaultc)?new ServerCursor(defaultc):NULL;
-	fAppCursor->SetOwningTeam(fClientTeamID);
-	fLockSem=create_sem(1,"ServerApp sem");
-
-	// Does this even belong here any more? --DW
-//	_driver=desktop->GetDisplayDriver();
-
-	fCursorHidden=false;
+	if (defaultCursor) {
+		fAppCursor = new ServerCursor(defaultCursor);
+		fAppCursor->SetOwningTeam(fClientTeamID);
+	}
+	
+	fLockSem = create_sem(1, "ServerApp sem");
 
 	Run();
 
-	STRACE(("ServerApp %s:\n",fSignature.String()));
-	STRACE(("\tBApp port: %ld\n",fClientAppPort));
-	STRACE(("\tReceiver port: %ld\n",fMessagePort));
+	STRACE(("ServerApp %s:\n", fSignature.String()));
+	STRACE(("\tBApp port: %ld\n", fClientAppPort));
+	STRACE(("\tReceiver port: %ld\n", fMessagePort));
 }
+
 
 //! Does all necessary teardown for application
 ServerApp::~ServerApp(void)
@@ -181,11 +181,8 @@ ServerApp::~ServerApp(void)
 	// in the MonitorApp thread never returns. Cleanup.
 	delete_port(fMessagePort);
 	
-	// Kill the monitor thread if it exists
-	thread_info info;
 	status_t dummyStatus;
-	if (get_thread_info(fMonitorThreadID, &info) == B_OK)
-		wait_for_thread(fMonitorThreadID, &dummyStatus);
+	wait_for_thread(fMonitorThreadID, &dummyStatus);
 	
 	delete fSharedMem;
 	
@@ -196,15 +193,17 @@ ServerApp::~ServerApp(void)
 	\brief Starts the ServerApp monitoring for messages
 	\return false if the application couldn't start, true if everything went OK.
 */
-bool ServerApp::Run(void)
+bool
+ServerApp::Run(void)
 {
 	// Unlike a BApplication, a ServerApp is *supposed* to return immediately
 	// when its Run() function is called.	
-	fMonitorThreadID=spawn_thread(MonitorApp,fSignature.String(),B_NORMAL_PRIORITY,this);
-	if(fMonitorThreadID==B_NO_MORE_THREADS || fMonitorThreadID==B_NO_MEMORY)
+	fMonitorThreadID = spawn_thread(MonitorApp, fSignature.String(), B_NORMAL_PRIORITY, this);
+	if (fMonitorThreadID < B_OK)
 		return false;
 
 	resume_thread(fMonitorThreadID);
+		
 	return true;
 }
 
@@ -221,20 +220,19 @@ bool ServerApp::Run(void)
 	ports will be invalid. Thus, if get_port_info returns an error, we
 	tell the app_server to delete the respective ServerApp.
 */
-bool ServerApp::PingTarget(void)
+bool
+ServerApp::PingTarget(void)
 {
 	team_info tinfo;
-	if(get_team_info(fClientTeamID,&tinfo)==B_BAD_TEAM_ID)
-	{
-		port_id serverport=find_port(SERVER_PORT_NAME);
-		if(serverport==B_NAME_NOT_FOUND)
-		{
+	if (get_team_info(fClientTeamID,&tinfo) == B_BAD_TEAM_ID) {
+		port_id serverport = find_port(SERVER_PORT_NAME);
+		if (serverport == B_NAME_NOT_FOUND) {
 			printf("PANIC: ServerApp %s could not find the app_server port in PingTarget()!\n",fSignature.String());
 			return false;
 		}
 		fMsgSender->SetPort(serverport);
 		fMsgSender->StartMessage(AS_DELETE_APP);
-		fMsgSender->Attach(&fMonitorThreadID,sizeof(thread_id));
+		fMsgSender->Attach(&fMonitorThreadID, sizeof(thread_id));
 		fMsgSender->Flush();
 		return false;
 	}
@@ -245,7 +243,8 @@ bool ServerApp::PingTarget(void)
 	\brief Send a message to the ServerApp with no attachments
 	\param code ID code of the message to post
 */
-void ServerApp::PostMessage(int32 code)
+void
+ServerApp::PostMessage(int32 code)
 {
 	BPortLink link(fMessagePort);
 	link.StartMessage(code);
@@ -256,14 +255,12 @@ void ServerApp::PostMessage(int32 code)
 	\brief Send a message to the ServerApp's BApplication
 	\param msg The message to send
 */
-void ServerApp::SendMessageToClient(const BMessage *msg) const
+void
+ServerApp::SendMessageToClient(const BMessage *msg) const
 {
-	ssize_t size;
-	char *buffer;
-	
-	size=msg->FlattenedSize();
-	buffer=new char[size];
-	
+	ssize_t size = msg->FlattenedSize();
+	char *buffer = new char[size];
+		
 	if (msg->Flatten(buffer, size) == B_OK)
 		write_port(fClientLooperPort, msg->what, buffer, size);
 	else
@@ -279,19 +276,21 @@ void ServerApp::SendMessageToClient(const BMessage *msg) const
 	This changes an internal flag and also sets the current cursor to the one specified by
 	the application
 */
-void ServerApp::Activate(bool value)
+void
+ServerApp::Activate(bool value)
 {
-	fIsActive=value;
+	fIsActive = value;
 	SetAppCursor();
 }
  
 //! Sets the cursor to the application cursor, if any.
-void ServerApp::SetAppCursor(void)
+void
+ServerApp::SetAppCursor(void)
 {
 	// although this isn't pretty, ATM we have only one RootLayer.
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
-	if(fAppCursor)
+	if (fAppCursor)
 		desktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
 }
 
@@ -300,7 +299,8 @@ void ServerApp::SetAppCursor(void)
 	\param data Pointer to the thread's ServerApp object
 	\return Throwaway value - always 0
 */
-int32 ServerApp::MonitorApp(void *data)
+int32
+ServerApp::MonitorApp(void *data)
 {
 	// Message-dispatching loop for the ServerApp
 	
@@ -310,18 +310,15 @@ int32 ServerApp::MonitorApp(void *data)
 	int32 code;
 	status_t err = B_OK;
 	
-	while(!app->fQuitting)
-	{
+	while(!app->fQuitting) {
 		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
-//		err = msgqueue.GetNextReply(&code);
 		err = msgqueue.GetNextMessage(&code);
 		if (err < B_OK) {
 			STRACE(("ServerApp::MonitorApp(): GetNextMessage returned %s\n", strerror(err)));
 			break;
 		}
 
-		switch(code)
-		{
+		switch(code) {
 			case AS_CREATE_WINDOW:
 			{
 				// Create the ServerWindow to node monitor a new OBWindow
@@ -366,8 +363,7 @@ int32 ServerApp::MonitorApp(void *data)
 				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 						app->fSignature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
 			
-				if (title)
-					free(title);
+				free(title);
 
 				break;
 			}
@@ -395,10 +391,8 @@ int32 ServerApp::MonitorApp(void *data)
 				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->fSignature.String()));
 				// Our BApplication sent us this message when it quit.
 				// We need to ask the app_server to delete ourself.
-				app->fQuitting = true;
-				
 				port_id	serverport = find_port(SERVER_PORT_NAME);
-				if(serverport == B_NAME_NOT_FOUND){
+				if (serverport == B_NAME_NOT_FOUND){
 					printf("PANIC: ServerApp %s could not find the app_server port!\n",app->fSignature.String());
 					break;
 				}
@@ -418,7 +412,6 @@ int32 ServerApp::MonitorApp(void *data)
 
 	} // end for 
 
-	// clean exit.
 	return 0;
 }
 
@@ -431,13 +424,13 @@ int32 ServerApp::MonitorApp(void *data)
 	All attachments are placed in the buffer via a PortLink, so it will be a 
 	matter of casting and incrementing an index variable to access them.
 */
-void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
+void
+ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 {
 	LayerData ld;
 	BPortLink replylink;
 	
-	switch(code)
-	{
+	switch(code) {
 		case AS_UPDATE_COLORS:
 		{
 			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
@@ -493,13 +486,13 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<size_t>(&msgsize);
 			
 			// Part sanity check, part get base pointer :)
-			if(get_area_info(area,&ai)!=B_OK)
+			if (get_area_info(area, &ai) < B_OK)
 				break;
 			
-			msgpointer=(int8*)ai.address + offset;
+			msgpointer = (int8*)ai.address + offset;
 			
 			RAMLinkMsgReader mlink(msgpointer);
-			DispatchMessage(mlink.Code(),mlink);
+			DispatchMessage(mlink.Code(), mlink);
 			
 			// This is a very special case in the sense that when ServerMemIO is used for this 
 			// purpose, it will be set to NOT automatically free the memory which it had 
@@ -528,27 +521,26 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			// TODO: I wonder if ACQUIRE_SERVERMEM should have a minimum size requirement?
 
-			void *sharedmem=fSharedMem->GetBuffer(memsize);
+			void *sharedmem = fSharedMem->GetBuffer(memsize);
 			
 			replylink.SetSendPort(replyport);
-			if(memsize<1 || sharedmem==NULL)
-			{
+			if (memsize < 1 || sharedmem == NULL) {
 				replylink.StartMessage(SERVER_FALSE);
 				replylink.Flush();
 				break;
 			}
 			
-			area_id owningArea=area_for(sharedmem);
+			area_id owningArea = area_for(sharedmem);
 			area_info ai;
 			
-			if(owningArea==B_ERROR || get_area_info(owningArea,&ai)!=B_OK)
+			if (owningArea == B_ERROR || get_area_info(owningArea, &ai) < B_OK)
 			{
 				replylink.StartMessage(SERVER_FALSE);
 				replylink.Flush();
 				break;
 			}
 			
-			int32 areaoffset=((int32*)sharedmem)-((int32*)ai.address);
+			int32 areaoffset = ((int32*)sharedmem) - ((int32*)ai.address);
 			STRACE(("Successfully allocated shared memory of size %ld\n",memsize));
 			
 			replylink.StartMessage(SERVER_TRUE);
@@ -566,18 +558,17 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 2) int32 area offset
 			
 			area_id owningArea;
-			area_info ai;
 			int32 areaoffset;
-			void *sharedmem;
-			
+				
 			msg.Read<area_id>(&owningArea);
 			msg.Read<int32>(&areaoffset);
 			
-			if(owningArea<0 || get_area_info(owningArea,&ai)!=B_OK)
+			area_info areaInfo;
+			if (owningArea < 0 || get_area_info(owningArea, &areaInfo) != B_OK)
 				break;
 			
 			STRACE(("Successfully freed shared memory\n"));
-			sharedmem=((int32*)ai.address)+areaoffset;
+			void *sharedmem = ((int32*)areaInfo.address) + areaoffset;
 			
 			fSharedMem->ReleaseBuffer(sharedmem);
 			
@@ -589,9 +580,9 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 
 			ServerWindow *win;
 			
-			for(int32 i=0; i<fSWindowList->CountItems(); i++)
+			for(int32 i = 0; i < fSWindowList->CountItems(); i++)
 			{
-				win=(ServerWindow*)fSWindowList->ItemAt(i);
+				win = (ServerWindow*)fSWindowList->ItemAt(i);
 				win->Lock();
 				win->fWinBorder->UpdateDecorator();
 				win->Unlock();
@@ -631,22 +622,19 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<screen_id>(&s);
 			msg.Read<int32>(&replyport);
 			
-			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
+			ServerBitmap *sbmp = bitmapmanager->CreateBitmap(r, cs, f ,bpr, s);
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
 						fSignature.String(),r.left,r.top,r.right,r.bottom));
 
 			replylink.SetSendPort(replyport);
-			if(sbmp)
-			{
+			if(sbmp) {
 				fBitmapList->AddItem(sbmp);
 				replylink.StartMessage(SERVER_TRUE);
 				replylink.Attach<int32>(sbmp->Token());
 				replylink.Attach<int32>(sbmp->Area());
 				replylink.Attach<int32>(sbmp->AreaOffset());
-			}
-			else
-			{
+			} else {
 				// alternatively, if something went wrong, we reply with SERVER_FALSE
 				replylink.StartMessage(SERVER_FALSE);
 			}
@@ -673,16 +661,15 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			
 			ServerBitmap *sbmp=FindBitmap(bmp_id);
 			replylink.SetSendPort(replyport);
-			if(sbmp)
-			{
+			if(sbmp) {
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",fSignature.String(),bmp_id));
 
 				fBitmapList->RemoveItem(sbmp);
 				bitmapmanager->DeleteBitmap(sbmp);
 				replylink.StartMessage(SERVER_TRUE);
-			}
-			else
+			} else
 				replylink.StartMessage(SERVER_TRUE);
+			
 			replylink.Flush();	
 			break;
 		}
@@ -714,34 +701,6 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// What is this particular function call for, anyway?
 			STRACE(("ServerApp %s: Download Picture unimplemented\n",fSignature.String()));
 
-			break;
-		}
-		case AS_SET_SCREEN_MODE:
-		{
-			STRACE(("ServerApp %s: Set Screen Mode\n",fSignature.String()));
-
-			// Attached data
-			// 1) int32 workspace #
-			// 2) uint32 screen mode
-			// 3) bool make default
-			int32 index;
-			uint32 mode;
-			bool stick;
-			msg.Read<int32>(&index);
-			msg.Read<uint32>(&mode);
-			msg.Read<bool>(&stick);
-
-			RootLayer *root=desktop->ActiveRootLayer();
-			Workspace *workspace=root->WorkspaceAt(index);
-			
-			if(!workspace)
-			{
-				// apparently out of range or something, so we do nothing. :)
-				break;
-			}
-			
-			// TODO: Add mode-setting code to Workspace class
-			//workspace->SetMode(mode,stick);
 			break;
 		}
 		case AS_ACTIVATE_WORKSPACE:
@@ -1951,15 +1910,16 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 	\param token ID token of the bitmap to find
 	\return The bitmap having that ID or NULL if not found
 */
-ServerBitmap *ServerApp::FindBitmap(int32 token)
+ServerBitmap *
+ServerApp::FindBitmap(int32 token) const
 {
-	ServerBitmap *temp;
-	for(int32 i=0; i<fBitmapList->CountItems();i++)
-	{
-		temp=(ServerBitmap*)fBitmapList->ItemAt(i);
-		if(temp && temp->Token()==token)
-			return temp;
+	ServerBitmap *bitmap;
+	for (int32 i = 0; i < fBitmapList->CountItems(); i++) {
+		bitmap = static_cast<ServerBitmap *>(fBitmapList->ItemAt(i));
+		if (bitmap && bitmap->Token() == token)
+			return bitmap;
 	}
+	
 	return NULL;
 }
 

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -51,27 +51,30 @@ class ServerApp {
 public:
 	ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
 		team_id clientTeamID, int32 handlerID, char *signature);
-	virtual						~ServerApp(void);
+	virtual	~ServerApp(void);
 	
 	bool Run(void);
+	/*
+	TODO: These aren't even implemented...
 	void Lock(void);
 	void Unlock(void);
 	bool IsLocked(void);
-	
+	*/
 	/*!
 		\brief Determines whether the application is the active one
 		\return true if active, false if not.
 	*/
 	bool IsActive(void) const { return fIsActive; }
-	
 	void Activate(bool value);
+	
 	bool PingTarget(void);
 	
 	void PostMessage(int32 code);
-	
 	void SendMessageToClient( const BMessage* msg ) const;
+	
 	void SetAppCursor(void);
-	ServerBitmap *FindBitmap(int32 token);
+	
+	ServerBitmap *FindBitmap(int32 token) const;
 	
 	team_id	ClientTeamID() const;
 	thread_id MonitorThreadID() const;
@@ -87,15 +90,18 @@ private:
 	
 	static int32 MonitorApp(void *data);	
 	
-	port_id	fClientAppPort,
-			fMessagePort,
+	// our BApplication's event port
+	port_id	fClientAppPort;	
+	// port we receive messages from our BApplication
+	port_id	fMessagePort;
 			// TODO: find out why there is both the app port and the looper port. Do 
 			// we really need both?
-			fClientLooperPort;
+	// To send a message to the client, write a BMessage to this port
+	port_id	fClientLooperPort;
 	
 	BString fSignature;
-	thread_id fMonitorThreadID;
 	
+	thread_id fMonitorThreadID;
 	team_id fClientTeamID;
 	
 	LinkMsgReader *fMsgReader;
@@ -104,11 +110,19 @@ private:
 	BList *fSWindowList,
 		  *fBitmapList,
 		  *fPictureList;
+		  
 	ServerCursor *fAppCursor;
+	
 	sem_id fLockSem;
+	
 	bool fCursorHidden;
 	bool fIsActive;
-	int32 fHandlerToken;
+	
+	// token ID of the BApplication's BHandler object.
+	// Used for BMessage target specification
+	// TODO: Is it still needed ? We aren't using it.
+	//int32 fHandlerToken;
+	
 	AreaPool *fSharedMem;
 	
 	bool fQuitting;
