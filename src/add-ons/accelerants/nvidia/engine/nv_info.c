@@ -405,7 +405,7 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 }
 
 /* This routine is complete, and is used for pre-NV10 cards. It's tested on a Elsa
- * Erazor III with TNT2 (NV05) and on a no-name TNT2-M64. Both cards coldstart
+ * Erazor III with TNT2 (NV05) and on two no-name TNT2-M64's. All cards coldstart
  * perfectly. */
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab)
 {
@@ -903,7 +903,82 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 		LOG(8,("INFO: ---RAM width tested: access is OK.\n"));
 	}
 
-	//fixme?: do RAM size test
+	/* do RAM size test to confirm RAM size set to be correct */
+	ram_cfg = (NV_REG32(NV32_NV4STRAPINFO) & 0x00000003);
+	data = 0x4e563542;
+	/* first check for 32Mb... */
+	if (!ram_cfg)
+	{
+		/* write testpattern to just above the 16Mb boundary */
+		((uint32 *)si->framebuffer)[(16 * 1024 * 1024) >> 2] = data;
+		/* check if pattern reads back */
+		if (((uint32 *)si->framebuffer)[(16 * 1024 * 1024) >> 2] == data)
+		{
+			/* write second testpattern to base adress */
+			data = 0x4135564e;
+			((uint32 *)si->framebuffer)[0] = data;
+			if (((uint32 *)si->framebuffer)[0] == data)
+			{
+				LOG(8,("INFO: ---RAM size tested: size was set OK (32Mb).\n"));
+				return;
+			}
+		}
+		/* one of the two tests for 32Mb failed, we must have 16Mb */
+		ram_cfg = 0x00000003;
+		LOG(8,("INFO: ---RAM size tested: size is 16Mb, correcting settings.\n"));
+		NV_REG32(NV32_NV4STRAPINFO) =
+			 (((NV_REG32(NV32_NV4STRAPINFO)) & 0xfffffffc) | ram_cfg);
+		return;
+	}
+	/* ... now check for 16Mb... */
+	if (ram_cfg == 0x00000003)
+	{
+		/* increment testpattern */
+		data++;
+		/* write testpattern to just above the 8Mb boundary */
+		((uint32 *)si->framebuffer)[(8 * 1024 * 1024) >> 2] = data;
+		/* check if pattern reads back */
+		if (((uint32 *)si->framebuffer)[(8 * 1024 * 1024) >> 2] == data)
+		{
+			LOG(8,("INFO: ---RAM size tested: size was set OK (16Mb).\n"));
+			return;
+		}
+		else
+		{
+			/* assuming 8Mb: retesting below! */
+			ram_cfg = 0x00000002;
+			LOG(8,("INFO: ---RAM size tested: size is NOT 16Mb, testing for 8Mb...\n"));
+			NV_REG32(NV32_NV4STRAPINFO) =
+				 (((NV_REG32(NV32_NV4STRAPINFO)) & 0xfffffffc) | ram_cfg);
+		}
+	}
+	/* ... and now check for 8Mb! (ram_cfg will be 'pre'set to 4Mb or 8Mb here) */
+	{
+		/* increment testpattern (again) */
+		data++;
+		/* write testpattern to just above the 4Mb boundary */
+		((uint32 *)si->framebuffer)[(4 * 1024 * 1024) >> 2] = data;
+		/* check if pattern reads back */
+		if (((uint32 *)si->framebuffer)[(4 * 1024 * 1024) >> 2] == data)
+		{
+			/* we have 8Mb, make sure this is set. */
+			ram_cfg = 0x00000002;
+			LOG(8,("INFO: ---RAM size tested: size is 8Mb, setting 8Mb.\n"));
+			/* fixme? assuming this should be done here! */
+			NV_REG32(NV32_NV4STRAPINFO) =
+				 (((NV_REG32(NV32_NV4STRAPINFO)) & 0xfffffffc) | ram_cfg);
+			return;
+		}
+		else
+		{
+			/* we must have 4Mb, make sure this is set. */
+			ram_cfg = 0x00000001;
+			LOG(8,("INFO: ---RAM size tested: size is 4Mb, setting 4Mb.\n"));
+			NV_REG32(NV32_NV4STRAPINFO) =
+				 (((NV_REG32(NV32_NV4STRAPINFO)) & 0xfffffffc) | ram_cfg);
+			return;
+		}
+	}
 }
 
 /* this routine is used for NV10 and later */
