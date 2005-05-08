@@ -4,6 +4,13 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>head (Rudolf, svn version 0.44)</h1></p>
+<ul>
+<li>Added recognition for one more card: a GeForce 6200 PCIe (ID 0x014f);
+<li>Fixed long-standing trouble with NV15 cards (GeForce 2 Ti/GTS/pro/ultra, Quadro 2 pro), and maybe also for other singlehead cards. RAM access trouble is now fixed so the screen output nolonger distorts and engine hangs are gone. This error was 'introduced' in nVidia driver V0.10: V0.09 was the last previous version working correctly on these cards!<br>
+Note please that this fix was only possible thanks to someone donating a 'malfunctioning' card. So: thanks again Atilla!!<br>
+Note also: with 3D add-on alpha 1-final these NV15 cards are the fastest supported ones ;-)
+</ul>
 <p><h1>nv_driver 0.43 (Rudolf)</h1></p>
 <ul>
 	<li>Updated 3D specific engine initialisation for PIO mode to make the 3D add-on work on pre-NV10 cards. It now works on NV04-NV18 (although NV18 is slow) if you select PIO mode acceleration;
