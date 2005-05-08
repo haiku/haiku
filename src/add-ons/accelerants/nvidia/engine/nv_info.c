@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-2/2005
+   Rudolf Cornelissen 7/2003-5/2005
 */
 
 #define MODULE_BIT 0x00002000
@@ -160,8 +160,8 @@ static status_t pins3_5_read(uint8 *rom, uint32 offset)
 	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
 	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
 	uint16 init_size = rom[offset + 22] + (rom[offset + 23] * 256) + 1;
-	/* still confirm!! */
-	uint16 ram_tab = init1 - 0x0010;
+	/* confirmed on a TNT2-M64 with pins V5.1 */
+	uint16 ram_tab = rom[offset + 24] + (rom[offset + 25] * 256);
 	/* fixme: PPC BIOSes (might) return NULL pointers for messages here */
 	char* signon_msg   = &(rom[(rom[offset + 30] + (rom[offset + 31] * 256))]);
 	char* vendor_name  = &(rom[(rom[offset + 46] + (rom[offset + 47] * 256))]);
