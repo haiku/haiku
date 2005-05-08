@@ -23,8 +23,20 @@ bool nv_dac_crt_connected(void)
 
 	/* turn on DAC */
 	DACW(TSTCTRL, (DACR(TSTCTRL) & 0xfffeffff));
-	/* select primary head and turn off CRT (and DVI?) outputs */
-	DACW(OUTPUT, (output & 0x0000feee));
+	if (si->ps.secondary_head)
+	{
+		/* select primary CRTC (head) and turn off CRT (and DVI?) outputs */
+		DACW(OUTPUT, (output & 0x0000feee));
+	}
+	else
+	{
+		/* turn off CRT (and DVI?) outputs */
+		/* note:
+		 * Don't touch the CRTC (head) assignment bit, as that would have undefined
+		 * results. Confirmed NV15 cards getting into lasting RAM access trouble
+		 * otherwise!! (goes for both system gfx RAM access and CRTC/DAC RAM access.) */
+		DACW(OUTPUT, (output & 0x0000ffee));
+	}
 	/* wait for signal lines to stabilize */
 	snooze(1000);
 	/* re-enable CRT output */

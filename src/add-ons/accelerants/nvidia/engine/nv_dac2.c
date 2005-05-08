@@ -29,7 +29,7 @@ bool nv_dac2_crt_connected()
 
 	/* turn on DAC2 */
 	DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeffff));
-	/* select primary head and turn off CRT (and DVI?) outputs */
+	/* select primary CRTC (head) and turn off CRT (and DVI?) outputs */
 	DAC2W(OUTPUT, (output & 0x0000feee));
 	/* wait for signal lines to stabilize */
 	snooze(1000);
