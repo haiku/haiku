@@ -703,6 +703,33 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 
 			break;
 		}
+		case AS_SET_SCREEN_MODE: 	 
+		{ 	 
+			STRACE(("ServerApp %s: Set Screen Mode\n",fSignature.String())); 	 
+  	 
+			// Attached data 	 
+			// 1) int32 workspace # 	 
+			// 2) uint32 screen mode 	 
+			// 3) bool make default 	 
+			int32 index; 	 
+			uint32 mode; 	 
+			bool stick; 	 
+			msg.Read<int32>(&index); 	 
+			msg.Read<uint32>(&mode); 	 
+			msg.Read<bool>(&stick); 	 
+  	 
+			RootLayer *root=desktop->ActiveRootLayer(); 	 
+			Workspace *workspace=root->WorkspaceAt(index); 	 
+  	 
+			if (!workspace) { 	 
+				// apparently out of range or something, so we do nothing. :) 	 
+				break; 	 
+			} 	 
+  	 
+			// TODO: Add mode-setting code to Workspace class 	 
+			//workspace->SetMode(mode,stick); 	 
+			break; 	 
+		}
 		case AS_ACTIVATE_WORKSPACE:
 		{
 			STRACE(("ServerApp %s: Activate Workspace UNIMPLEMETED\n",fSignature.String()));
