@@ -43,11 +43,7 @@
 typedef enum {
         B_MIX_GAIN = 1 << 0,
         B_MIX_MUTE = 1 << 1,
-        B_MIX_MONO = 1 << 2,
-        B_MIX_STEREO = 1 << 3,
-        B_MIX_MUX = 1 << 4,
-        B_MIX_MICBOOST = 1 << 5,
-        B_MIX_RECORDMUX = 1 << 6
+        B_MIX_NOMINAL = 1 << 2
 } mixer_type; 
 
 static void	
@@ -60,8 +56,17 @@ echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 	function[0].Channel = channel;
 	function[1].Channel = channel;
 	function[1].Channel.wChannel++;
-	function[0].iFunction = type == B_MIX_GAIN ? MXF_GET_LEVEL : MXF_GET_MUTE;
-	function[1].iFunction = type == B_MIX_GAIN ? MXF_GET_LEVEL : MXF_GET_MUTE;
+	switch (type) {
+	case B_MIX_GAIN:
+		function[0].iFunction = function[0].iFunction = MXF_GET_LEVEL;
+		break;
+	case B_MIX_MUTE:
+		function[0].iFunction = function[0].iFunction = MXF_GET_MUTE;
+		break;
+	case B_MIX_NOMINAL:
+		function[0].iFunction = function[0].iFunction = MXF_GET_NOMINAL;
+		break;
+	}
 
 	multi_function[0].iCount = 2;
 	dev->pEG->ProcessMixerMultiFunction(multi_function, size);
@@ -70,8 +75,10 @@ echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 		if (type == B_MIX_GAIN) {
 			values[0] = (float)function[0].Data.iLevel / 256;
 			values[1] = (float)function[1].Data.iLevel / 256;
-		} else {
+		} else if (type == B_MIX_MUTE) {
 			values[0] = function[0].Data.bMuteOn ? 1.0 : 0.0;
+		} else {
+			values[0] = function[0].Data.iNominal == 4 ? 1.0 : 0.0;
 		}
 		PRINT(("echo_channel_get_mix iLevel: %d, %d, %d\n", function[0].Data.iLevel, channel.wChannel, channel.dwType));
 	}
@@ -92,11 +99,16 @@ echo_channel_set_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
         	function[0].iFunction = MXF_SET_LEVEL;
 		function[1].Data.iLevel = (int)(values[1] * 256);
 		function[1].iFunction = MXF_SET_LEVEL;
-	} else {
+	} else if (type == B_MIX_MUTE) {
 		function[0].Data.bMuteOn = values[0] == 1.0;
 		function[0].iFunction = MXF_SET_MUTE;
 		function[1].Data.bMuteOn = values[0] == 1.0;
 		function[1].iFunction = MXF_SET_MUTE;
+	} else {
+		function[0].Data.iNominal = values[0] == 1.0 ? 4 : -10;
+                function[0].iFunction = MXF_SET_NOMINAL;
+                function[1].Data.iNominal = values[0] == 1.0 ? 4 : -10;
+                function[1].iFunction = MXF_SET_NOMINAL;            
 	}
 
 	multi_function[0].iCount = 2;
@@ -127,7 +139,7 @@ echo_create_group_control(multi_dev *multi, uint32 *index, int32 parent,
 
 static void
 echo_create_channel_control(multi_dev *multi, uint32 *index, int32 parent, int32 string,
-	MIXER_AUDIO_CHANNEL channel) {
+	MIXER_AUDIO_CHANNEL channel, bool nominal) {
 	uint32 i = *index, id;
 	multi_mixer_control control;
 	
@@ -161,6 +173,18 @@ echo_create_channel_control(multi_dev *multi, uint32 *index, int32 parent, int32
 	control.mix_control.master = id;
 	multi->controls[i] = control;
 	i++;
+	
+	// nominal level (+4/-10)
+	if (nominal) {
+		control.mix_control.id = MULTI_CONTROL_FIRSTID + i;
+		control.mix_control.master = MULTI_CONTROL_MASTERID;
+		control.mix_control.flags = B_MULTI_MIX_ENABLE;
+		control.mix_control.string = S_null;
+		control.type = B_MIX_NOMINAL;
+		strcpy(control.mix_control.name, "+4dB");
+		multi->controls[i] = control;
+		i++;
+	}
 
 	*index = i;
 }
@@ -180,19 +204,21 @@ echo_create_controls_list(multi_dev *multi)
 		channel.wChannel = i * 2;
 		parent2 = echo_create_group_control(multi, &index, parent, S_null, "Output");
 
-		echo_create_channel_control(multi, &index, parent2, 0, channel);
+		echo_create_channel_control(multi, &index, parent2, 0, channel, 
+			card->caps.dwBusOutCaps[i*2] & ECHOCAPS_NOMINAL_LEVEL);
 	}
 	
 	parent = echo_create_group_control(multi, &index, 0, S_INPUT, NULL);
 
 	channel.dwType = ECHO_BUS_IN;
-        for (i=0; i < card->caps.wNumBussesIn / 2; i++) {
-                channel.wChannel = i * 2;
-
+	for (i=0; i < card->caps.wNumBussesIn / 2; i++) {
+		channel.wChannel = i * 2;
+		
 		parent2 = echo_create_group_control(multi, &index, parent, S_null, "Input");
-                  
-                echo_create_channel_control(multi, &index, parent2, 0, channel);
-        }
+		  
+		echo_create_channel_control(multi, &index, parent2, 0, channel, 
+			card->caps.dwBusInCaps[i*2] & ECHOCAPS_NOMINAL_LEVEL);
+	}
 
 	multi->control_count = index;
 	PRINT(("multi->control_count %u\n", multi->control_count));
