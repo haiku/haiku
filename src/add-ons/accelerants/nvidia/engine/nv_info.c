@@ -2038,13 +2038,12 @@ static status_t translate_ISA_PCI(uint32* reg)
 	return B_OK;
 }
 
-//fixme: move to crtc sourcefile, also setup for crtc2(?)
+/* doing general fail-safe default setup here */
 static status_t	nv_crtc_setup_fifo()
 {
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
-	//fixme: setup according to colordepth and RAM bus width...
 	/* set CRTC FIFO burst size to 256 */
 	CRTCW(FIFO, 0x03);
 

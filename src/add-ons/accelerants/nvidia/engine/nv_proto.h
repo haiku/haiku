@@ -60,6 +60,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 int maventv_init(display_mode target);
 
 /* CRTC1 functions */
+status_t nv_crtc_update_fifo(void);
 status_t nv_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt

@@ -1,11 +1,39 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-2/2005
+   Rudolf Cornelissen 11/2002-5/2005
 */
 
 #define MODULE_BIT 0x00040000
 
 #include "nv_std.h"
+
+/* doing general fail-safe default setup here */
+//fixme: this is a _very_ basic setup, and it's preliminary...
+status_t nv_crtc_update_fifo()
+{
+	/* we are only using this on coldstarted cards which really need this */
+	if ((si->settings.usebios) || (si->ps.card_arch != NV04A)) return B_OK;
+
+	/* enable access to primary head */
+	set_crtc_owner(0);
+
+	/* set CRTC FIFO burst size to 256 (is BIOS default) */
+	CRTCW(FIFO, 0x03);
+
+	/* set CRTC FIFO low watermark according to mode */
+	if ((si->dm.timing.h_display * si->dm.timing.v_display) > (1280 * 1024))
+	{
+		/* Instruct CRTC to fetch new data 'earlier' */
+		CRTCW(FIFO_LWM, 0x40);
+	}
+	else
+	{
+		/* BIOS default */
+		CRTCW(FIFO_LWM, 0x20);
+	}
+
+	return B_OK;
+}
 
 /* Adjust passed parameters to a valid mode line */
 status_t nv_crtc_validate_timing(
