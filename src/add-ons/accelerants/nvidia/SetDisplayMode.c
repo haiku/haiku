@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-4/2005
+	Rudolf Cornelissen 11/2002-5/2005
 */
 
 #define MODULE_BIT 0x00200000
@@ -311,6 +311,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* update driver's mode store */
 	si->dm = target;
 
+	/* update FIFO data fetching according to mode */
+	nv_crtc_update_fifo();
+
 	/* turn screen one on */
 	head1_dpms(display, h, v);
 	/* turn screen two on if a dualhead mode is active */
@@ -318,9 +321,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	/* set up acceleration for this mode */
 	/* note:
-	 * attempting DMA on NV40 and higher because without it I can't get it going ATM.
-	 * Later on this can become a nv.settings switch, and maybe later we can even
-	 * forget about non-DMA completely (depends on 3D acceleration attempts). */
+	 * Maybe later we can forget about non-DMA mode (depends on 3D acceleration
+	 * attempts). */
 	if (!si->settings.dma_acc)
 		nv_acc_init();
 	else

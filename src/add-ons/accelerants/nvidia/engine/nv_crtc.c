@@ -11,25 +11,72 @@
 //fixme: this is a _very_ basic setup, and it's preliminary...
 status_t nv_crtc_update_fifo()
 {
+	uint8 bytes_per_pixel = 1;
+	uint32 drain;
+
 	/* we are only using this on coldstarted cards which really need this */
-	if ((si->settings.usebios) || (si->ps.card_arch != NV04A)) return B_OK;
+	if ((si->settings.usebios) || (si->ps.card_type != NV05M64)) return B_OK;
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
-	/* set CRTC FIFO burst size to 256 (is BIOS default) */
-	CRTCW(FIFO, 0x03);
-
-	/* set CRTC FIFO low watermark according to mode */
-	if ((si->dm.timing.h_display * si->dm.timing.v_display) > (1280 * 1024))
+	/* set CRTC FIFO low watermark according to memory drain */
+	switch(si->dm.space)
 	{
+	case B_CMAP8:
+		bytes_per_pixel = 1;
+		break;
+	case B_RGB15_LITTLE:
+	case B_RGB16_LITTLE:
+		bytes_per_pixel = 2;
+		break;
+	case B_RGB24_LITTLE:
+		bytes_per_pixel = 3;
+		break;
+	case B_RGB32_LITTLE:
+		bytes_per_pixel = 4;
+		break;
+	}
+	/* fixme:
+	 * - I should probably include the refreshrate as well;
+	 * - and the memory clocking speed, core clocking speed, RAM buswidth.. */
+	drain = si->dm.timing.h_display * si->dm.timing.v_display * bytes_per_pixel;
+
+	/* Doesn't work for other than 32bit space (yet?) */
+	if (si->dm.space != B_RGB32_LITTLE)
+	{
+		/* BIOS defaults */
+		CRTCW(FIFO, 0x03);
+		CRTCW(FIFO_LWM, 0x20);
+		LOG(4,("CRTC: FIFO low-watermark set to $20, burst size 256 (BIOS defaults)\n"));
+		return B_OK;
+	}
+
+	if (drain > (((uint32)1280) * 1024 * 4))
+	{
+		/* set CRTC FIFO burst size for 'smaller' bursts */
+		CRTCW(FIFO, 0x01);
 		/* Instruct CRTC to fetch new data 'earlier' */
 		CRTCW(FIFO_LWM, 0x40);
+		LOG(4,("CRTC: FIFO low-watermark set to $40, burst size 64\n"));
 	}
 	else
 	{
-		/* BIOS default */
-		CRTCW(FIFO_LWM, 0x20);
+		if (drain > (((uint32)1024) * 768 * 4))
+		{
+			/* BIOS default */
+			CRTCW(FIFO, 0x02);
+			/* Instruct CRTC to fetch new data 'earlier' */
+			CRTCW(FIFO_LWM, 0x40);
+			LOG(4,("CRTC: FIFO low-watermark set to $40, burst size 128\n"));
+		}
+		else
+		{
+			/* BIOS defaults */
+			CRTCW(FIFO, 0x03);
+			CRTCW(FIFO_LWM, 0x20);
+			LOG(4,("CRTC: FIFO low-watermark set to $20, burst size 256 (BIOS defaults)\n"));
+		}
 	}
 
 	return B_OK;
