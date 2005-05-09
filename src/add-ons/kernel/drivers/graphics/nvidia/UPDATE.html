@@ -4,12 +4,15 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (Rudolf, svn version 0.44)</h1></p>
+<p><h1>nv_driver 0.45 (Rudolf)</h1></p>
 <ul>
 <li>Added recognition for one more card: a GeForce 6200 PCIe (ID 0x014f);
-<li>Fixed long-standing trouble with NV15 cards (GeForce 2 Ti/GTS/pro/ultra, Quadro 2 pro), and maybe also for other singlehead cards. RAM access trouble is now fixed so the screen output nolonger distorts and engine hangs are gone. This error was 'introduced' in nVidia driver V0.10: V0.09 was the last previous version working correctly on these cards!<br>
+<li>Fixed long-standing trouble with NV15 cards (GeForce 2 Ti/GTS/pro/ultra, Quadro 2 pro), and maybe also for other singlehead cards. RAM access trouble is now fixed so the screen output nolonger distorts and engine hangs are gone. This error was 'introduced' in nVidia driver V0.10: V0.09 was the last previous version working correctly on some of these cards!<br>
 Note please that this fix was only possible thanks to someone donating a 'malfunctioning' card. So: thanks again Atilla!!<br>
 Note also: with 3D add-on alpha 1-final these NV15 cards are the fastest supported ones ;-)
+<li>Fixed driver coldstart capability for pre-GeForce type cards using PINS V3-V5.15. Newer TNT2-M64 cards will now coldstart OK;
+<li>Added pre-PINS V5.16 coldstart RAM-size check and correction code. This feature was still lacking and possibly solves coldstart trouble on pre-GeForce type cards;
+<li>Added rudimentary CRTC1 FIFO watermark/burst-size programming for TNT2-M64 cards (if coldstarted). This minimizes output distortions on high resolutions. Note please that these distortions can't be completely removed: the RAM bandwidth these cards have is too limited: Bandwidth in increasing order: TNT2-M64, TNT1, TNT2 original, all GeForce types. With the TNT2-M64 watermark/burst-size programming in place it performs still less good than a TNT1 in this respect.
 </ul>
 <p><h1>nv_driver 0.43 (Rudolf)</h1></p>
 <ul>
