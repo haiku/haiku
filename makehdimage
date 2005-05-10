@@ -86,7 +86,7 @@ sourceDir=`pwd`
 	# we accept relative source directories as well
 
 if [ $alreadyMounted ]; then
-	echo "Building binaries and copy them to $targetDir"
+	echo "Building binaries and copying them to $targetDir"
 else
 	echo "Building $imageSize MB image at $imagePath..."
 fi
