@@ -48,17 +48,16 @@ TPeopleView::~TPeopleView(void)
 
 void TPeopleView::AttachedToWindow(void)
 {
+printf("TPeopleView::AttachedToWindow()\n");
 	char		*text;
 	float		offset;
 	BBox		*box;
 	BFont		font = *be_plain_font;
 	BMenuField	*field;
 	BRect		r;
-	rgb_color	c;
 	attr_info	info;
 
-	c.red = c.green = c.blue = VIEW_COLOR;
-	SetViewColor(c);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	r = Bounds();
 	r.InsetBy(-1, -1);

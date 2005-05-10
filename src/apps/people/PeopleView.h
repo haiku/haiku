@@ -73,8 +73,6 @@
 #define GROUP_WIDTH			300
 #define GROUP_TEXT			"Group"
 
-#define VIEW_COLOR			216
-
 class TTextControl;
 
 
