@@ -101,7 +101,7 @@ namespace agg
 
             glyph_cache* glyph = 
                 (glyph_cache*)m_allocator.allocate(sizeof(glyph_cache),
-                                                   sizeof(int8u*));
+                                                   sizeof(double));
 
             glyph->glyph_index = glyph_index;
             glyph->data        = m_allocator.allocate(data_size);
