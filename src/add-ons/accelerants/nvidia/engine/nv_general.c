@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-2/2005
+   Rudolf Cornelissen 10/2002-5/2005
 */
 
 #define MODULE_BIT 0x00008000
@@ -303,10 +303,10 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro FX 540 (NV43)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x014f10de: /* Nvidia GeForce 6200 TurboCache PCIe (128Mb) */
+	case 0x014f10de: /* Nvidia GeForce 6200 PCIe (128Mb) */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 TurboCache PCIe (128Mb) (NV44)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce 6200 PCIe (128Mb) (NV44)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x015010de: /* Nvidia GeForce2 GTS/Pro */
