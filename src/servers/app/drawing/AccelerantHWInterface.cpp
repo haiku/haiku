@@ -515,10 +515,10 @@ AccelerantHWInterface::AvailableHWAcceleration() const
 
 	if (fAccScreenBlit)
 		flags |= HW_ACC_COPY_REGION;
-//	if (fAccFillRect)
-//		flags |= HW_ACC_FILL_REGION;
-//	if (fAccInvertRect)
-//		flags |= HW_ACC_INVERT_REGION;
+	if (fAccFillRect)
+		flags |= HW_ACC_FILL_REGION;
+	if (fAccInvertRect)
+		flags |= HW_ACC_INVERT_REGION;
 
 	return flags;
 }
@@ -529,7 +529,8 @@ AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 								  uint32 count, int32 xOffset, int32 yOffset)
 {
 	if (fAccScreenBlit && fAccAcquireEngine) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0, &fSyncToken, &fEngineToken) >= B_OK) {
+//		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, NULL, &fEngineToken) >= B_OK) {
 
 			// convert the rects
 			blit_params* params = new blit_params[count];
@@ -550,7 +551,8 @@ AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 
 			// done
 			if (fAccReleaseEngine)
-				fAccReleaseEngine(fEngineToken, &fSyncToken);
+//				fAccReleaseEngine(fEngineToken, &fSyncToken);
+				fAccReleaseEngine(fEngineToken, NULL);
 
 			delete[] params;
 		}
@@ -562,7 +564,8 @@ void
 AccelerantHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color)
 {
 	if (fAccFillRect && fAccAcquireEngine) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0, &fSyncToken, &fEngineToken) >= B_OK) {
+//		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, NULL, &fEngineToken) >= B_OK) {
 
 			// convert the region
 			uint32 count;
@@ -574,7 +577,8 @@ AccelerantHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& col
 
 			// done
 			if (fAccReleaseEngine)
-				fAccReleaseEngine(fEngineToken, &fSyncToken);
+				fAccReleaseEngine(fEngineToken, NULL);
+//				fAccReleaseEngine(fEngineToken, &fSyncToken);
 
 			delete[] fillParams;
 		}
@@ -586,7 +590,8 @@ void
 AccelerantHWInterface::InvertRegion(/*const*/ BRegion& region)
 {
 	if (fAccInvertRect && fAccAcquireEngine) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0, &fSyncToken, &fEngineToken) >= B_OK) {
+//		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, NULL, &fEngineToken) >= B_OK) {
 
 			// convert the region
 			uint32 count;
@@ -598,7 +603,8 @@ AccelerantHWInterface::InvertRegion(/*const*/ BRegion& region)
 
 			// done
 			if (fAccReleaseEngine)
-				fAccReleaseEngine(fEngineToken, &fSyncToken);
+//				fAccReleaseEngine(fEngineToken, &fSyncToken);
+				fAccReleaseEngine(fEngineToken, NULL);
 
 			delete[] fillParams;
 		}
@@ -684,10 +690,10 @@ AccelerantHWInterface::_RegionToRectParams(/*const*/ BRegion* region,
 
 	for (uint32 i = 0; i < *count; i++) {
 		clipping_rect r = region->RectAtInt(i);
-		(*params[i]).left = (uint16)r.left;
-		(*params[i]).top = (uint16)r.top;
-		(*params[i]).right = (uint16)r.right;
-		(*params[i]).bottom = (uint16)r.bottom;
+		(*params)[i].left = (uint16)r.left;
+		(*params)[i].top = (uint16)r.top;
+		(*params)[i].right = (uint16)r.right;
+		(*params)[i].bottom = (uint16)r.bottom;
 	}
 }
 
