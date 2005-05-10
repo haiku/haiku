@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-12/2004.
+	Rudolf Cornelissen 3/2002-5/2005.
 */
 
 /* standard kernel driver stuff */
@@ -152,7 +152,7 @@ static uint16 nvidia_device_list[] = {
 	0x0146, /* Nvidia GeForce FX 6600 TE Go / 6200 TE Go */
 	0x0148, /* Nvidia GeForce FX 6600 Go */
 	0x014e, /* Nvidia Quadro FX 540 */
-	0x014f, /* Nvidia GeForce 6200 TurboCache PCIe (128Mb) */
+	0x014f, /* Nvidia GeForce 6200 PCIe (128Mb) */
 	0x0150, /* Nvidia GeForce2 GTS/Pro */
 	0x0151, /* Nvidia GeForce2 Ti DDR */
 	0x0152, /* Nvidia GeForce2 Ultra */
