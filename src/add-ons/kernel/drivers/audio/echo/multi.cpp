@@ -58,13 +58,13 @@ echo_channel_get_mix(void *card, MIXER_AUDIO_CHANNEL channel, int32 type, float 
 	function[1].Channel.wChannel++;
 	switch (type) {
 	case B_MIX_GAIN:
-		function[0].iFunction = function[0].iFunction = MXF_GET_LEVEL;
+		function[0].iFunction = function[1].iFunction = MXF_GET_LEVEL;
 		break;
 	case B_MIX_MUTE:
-		function[0].iFunction = function[0].iFunction = MXF_GET_MUTE;
+		function[0].iFunction = function[1].iFunction = MXF_GET_MUTE;
 		break;
 	case B_MIX_NOMINAL:
-		function[0].iFunction = function[0].iFunction = MXF_GET_NOMINAL;
+		function[0].iFunction = function[1].iFunction = MXF_GET_NOMINAL;
 		break;
 	}
 
