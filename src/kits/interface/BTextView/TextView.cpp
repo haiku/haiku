@@ -521,7 +521,13 @@ BTextView::MouseDown(BPoint where)
 	// no need to track the mouse if we can't select
 	if (!fSelectable)
 		return;
-		
+
+	// TODO: Honor window flags and skip this
+	// implementation even if we don't have an alternative
+	// asynchronous version, yet.
+	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS)
+		return;
+
 	// track the mouse while it's down
 	int32 start = 0;
 	int32 end = 0;
@@ -564,6 +570,9 @@ BTextView::MouseDown(BPoint where)
 		Select(start, end);
 		
 		// Should we scroll the view?
+		// TODO: the implementation is incorrect, as I think a BTextView
+		// scrolls regardless of the fact if it is targeted by scroll bars.
+		// Also: auto scrolling can be disabled, I think.
 		if (!Bounds().Contains(curMouse)) {	
 			float hDelta = 0;
 			float vDelta = 0;
