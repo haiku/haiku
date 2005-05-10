@@ -40,7 +40,7 @@ ObjectsDefines
 {
 	local defines =
 		_BOOT_MODE
-		BOOT_ARCH=\\\"intel\\\"
+		BOOT_ARCH=\\\"$(OBOS_ARCH)\\\"
 			# the boot loader test application will try to load the BeOS kernel
 			# from a supported partition/file system
 
