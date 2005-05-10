@@ -48,7 +48,6 @@ TPeopleView::~TPeopleView(void)
 
 void TPeopleView::AttachedToWindow(void)
 {
-printf("TPeopleView::AttachedToWindow()\n");
 	char		*text;
 	float		offset;
 	BBox		*box;
