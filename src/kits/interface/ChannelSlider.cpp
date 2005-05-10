@@ -700,9 +700,7 @@ BChannelSlider::DrawThumbs()
 						ThumbDeltaFor(fCurrentChannel));
 			else
 				valueRect.OffsetTo(ThumbDeltaFor(fCurrentChannel), ThumbFrameFor(fCurrentChannel).top - 10);
-			fBackingView->SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-			fBackingView->StrokeRect(valueRect.InsetByCopy(-0.5, -0.5));
-			fBackingView->SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
+			fBackingView->SetHighColor(255, 255, 172);
 			fBackingView->FillRect(valueRect);
 			fBackingView->SetHighColor(0, 0, 0);
 			valueRect.OffsetBy(1 , 9);
