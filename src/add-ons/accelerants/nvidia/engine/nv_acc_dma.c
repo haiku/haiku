@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-2/2005.
+   Rudolf Cornelissen 8/2003-5/2005.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver.
@@ -20,6 +20,7 @@ invert rectangle
 blit
 */
 
+static void nv_init_for_3D_dma(void);
 static void nv_start_dma(void);
 static status_t nv_acc_fifofree_dma(uint16 cmd_size);
 static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size);
@@ -166,25 +167,69 @@ status_t nv_acc_init_dma()
 	}
 	else
 	{
+//dma 3D test:
+		/* (first set) */
+//		ACCW(HT_HANDL_00, (0x80000000 | NV1_IMAGE_FROM_CPU)); /* 32bit handle (not used) */
+//		ACCW(HT_VALUE_00, 0x80011145); /* instance $1145, engine = acc engine, CHID = $00 */
+//end dma test.
+
 		/* (first set) */
 		ACCW(HT_HANDL_00, (0x80000000 | NV4_SURFACE)); /* 32bit handle */
-		ACCW(HT_VALUE_00, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_00, 0x80011151); /* instance $1151, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
-		ACCW(HT_VALUE_01, 0x80011148); /* instance $1148, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_01, 0x80011146); /* instance $1146, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_02, (0x80000000 | NV4_GDI_RECTANGLE_TEXT)); /* 32bit handle */
-		ACCW(HT_VALUE_02, 0x8001114a); /* instance $114a, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_02, 0x80011147); /* instance $1147, engine = acc engine, CHID = $00 */
+
+//dma 3D tst:
+//outdated (pre-NV04):
+		ACCW(HT_HANDL_03, (0x80000000 | NV_RENDER_D3D0_TRIANGLE_ZETA)); /* 32bit handle (nolonger used) */
+		ACCW(HT_VALUE_03, 0x80011148); /* instance $1148, engine = acc engine, CHID = $00 */
+
+		/* NV4_ and NV10_DX5_TEXTURE_TRIANGLE should be identical */
+		ACCW(HT_HANDL_04, (0x80000000 | NV4_DX5_TEXTURE_TRIANGLE)); /* 32bit handle (3D) */
+		ACCW(HT_VALUE_04, 0x80011149); /* instance $1149, engine = acc engine, CHID = $00 */
+
+		/* NV4_ and NV10_DX6_MULTI_TEXTURE_TRIANGLE should be identical */
+		ACCW(HT_HANDL_05, (0x80000000 | NV4_DX6_MULTI_TEXTURE_TRIANGLE)); /* 32bit handle (not used) */
+		ACCW(HT_VALUE_05, 0x8001114a); /* instance $114a, engine = acc engine, CHID = $00 */
+
+		ACCW(HT_HANDL_06, (0x80000000 | NV1_RENDER_SOLID_LIN)); /* 32bit handle (not used) */
+		ACCW(HT_VALUE_06, 0x80011150); /* instance $1150, engine = acc engine, CHID = $00 */
+//end dma tst.
 
 		/* (second set) */
 		ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
 		ACCW(HT_VALUE_10, 0x80011142); /* instance $1142, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_11, (0x80000000 | NV_IMAGE_BLACK_RECTANGLE)); /* 32bit handle */
-		ACCW(HT_VALUE_11, 0x80011144); /* instance $1144, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_11, 0x80011143); /* instance $1143, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
-		ACCW(HT_VALUE_12, 0x80011146); /* instance $1146, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_12, 0x80011144); /* instance $1144, engine = acc engine, CHID = $00 */
+
+//dma 3D test:
+//fixme: replace with NV4/NV10_CONTEXT_SURFACES_2D
+		ACCW(HT_HANDL_13, (0x80000000 | NV3_SURFACE_0)); /* 32bit handle (3D) */
+		ACCW(HT_VALUE_13, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
+
+//fixme: replace with NV4/NV10_CONTEXT_SURFACES_2D
+		ACCW(HT_HANDL_14, (0x80000000 | NV3_SURFACE_1)); /* 32bit handle (3D) */
+		ACCW(HT_VALUE_14, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
+
+//outdated (pre-NV04):
+		ACCW(HT_HANDL_15, (0x80000000 | NV3_SURFACE_2)); /* 32bit handle (nolonger used) */
+		ACCW(HT_VALUE_15, 0x8001114d); /* instance $114d, engine = acc engine, CHID = $00 */
+
+//outdated (pre-NV04):
+		ACCW(HT_HANDL_16, (0x80000000 | NV3_SURFACE_3)); /* 32bit handle (nolonger used) */
+		ACCW(HT_VALUE_16, 0x8001114e); /* instance $114e, engine = acc engine, CHID = $00 */
+
+		ACCW(HT_HANDL_17, (0x80000000 | NV4_CONTEXT_SURFACES_ARGB_ZS)); /* 32bit handle (3D) */
+		ACCW(HT_VALUE_17, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
+//end dma test.
 	}
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
@@ -277,46 +322,134 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX2_0, 0x00000000); /* DMA0 and DMA1 instance invalid */
 		ACCW(PR_CTX3_0, 0x00000000); /* method traps disabled */
 		/* setup set '1' for cmd NV_IMAGE_BLACK_RECTANGLE */
-		ACCW(PR_CTX0_2, 0x01008019); /* NVclass $019, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_2, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX0_1, 0x01008019); /* NVclass $019, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX1_1, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_1, 0x00000000); /* DMA0 and DMA1 instance invalid */
+		ACCW(PR_CTX3_1, 0x00000000); /* method traps disabled */
+		/* setup set '2' for cmd NV_IMAGE_PATTERN */
+		ACCW(PR_CTX0_2, 0x01008018); /* NVclass $018, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX1_2, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
 		ACCW(PR_CTX2_2, 0x00000000); /* DMA0 and DMA1 instance invalid */
 		ACCW(PR_CTX3_2, 0x00000000); /* method traps disabled */
-		/* setup set '2' for cmd NV_IMAGE_PATTERN */
-		ACCW(PR_CTX0_4, 0x01008018); /* NVclass $018, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_4, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
-		ACCW(PR_CTX2_4, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_4, 0x00000000); /* method traps disabled */
+//dma 3D test:
+		/* setup set '3' for cmd NV1_IMAGE_FROM_CPU (not used) */
+//		ACCW(PR_CTX0_3, 0x01008021); /* NVclass $021, patchcfg ROP_AND, nv10+: little endian */
+//		ACCW(PR_CTX1_3, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+//		ACCW(PR_CTX2_3, 0x00000000); /* DMA0 and DMA1 instance invalid */
+//		ACCW(PR_CTX3_3, 0x00000000); /* method traps disabled */
+//end dma test.
 		/* setup set '4' for cmd NV_IMAGE_BLIT */
-		ACCW(PR_CTX0_6, 0x0100805f); /* NVclass $05f, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_6, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_6, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
-		ACCW(PR_CTX3_6, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
+		ACCW(PR_CTX0_4, 0x0100805f); /* NVclass $05f, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX1_4, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_4, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
+		ACCW(PR_CTX3_4, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
 		/* setup set '5' for cmd NV4_GDI_RECTANGLE_TEXT */
-		ACCW(PR_CTX0_8, 0x0100804a); /* NVclass $04a, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_8, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
-		ACCW(PR_CTX2_8, 0x00000000); /* DMA0 and DMA1 instance invalid */
+		ACCW(PR_CTX0_5, 0x0100804a); /* NVclass $04a, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX1_5, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
+		ACCW(PR_CTX2_5, 0x00000000); /* DMA0 and DMA1 instance invalid */
+		ACCW(PR_CTX3_5, 0x00000000); /* method traps disabled */
+//dma 3D test:
+		/* setup set '6' for cmd NV_RENDER_D3D0_TRIANGLE_ZETA (nolonger used) */
+		ACCW(PR_CTX0_6, 0x0100a048); /* NVclass $048, patchcfg ROP_AND, userclip enable,
+									  * nv10+: little endian */
+		ACCW(PR_CTX1_6, 0x00000d01); /* format is A8RGB24, MSB mono */
+		ACCW(PR_CTX2_6, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_6, 0x00000000); /* method traps disabled */
+		/* setup set '7' ... */
+		if (si->ps.card_arch != NV04A)
+		{
+			/* ... for cmd NV10_DX5_TEXTURE_TRIANGLE */
+			ACCW(PR_CTX0_7, 0x0300a094); /* NVclass $094, patchcfg ROP_AND, userclip enable,
+										  * context surface0 valid, nv10+: little endian */
+		}
+		else
+		{
+			/* ... for cmd NV4_DX5_TEXTURE_TRIANGLE */
+			ACCW(PR_CTX0_7, 0x0300a054); /* NVclass $054, patchcfg ROP_AND, userclip enable,
+										  * context surface0 valid */
+		}
+		ACCW(PR_CTX1_7, 0x00000d01); /* format is A8RGB24, MSB mono */
+		ACCW(PR_CTX2_7, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_7, 0x00000000); /* method traps disabled */
+		/* setup set '8' ... */
+		if (si->ps.card_arch != NV04A)
+		{
+			/* ... for cmd NV10_DX6_MULTI_TEXTURE_TRIANGLE (not used) */
+			ACCW(PR_CTX0_8, 0x0300a095); /* NVclass $095, patchcfg ROP_AND, userclip enable,
+										  * context surface0 valid, nv10+: little endian */
+		}
+		else
+		{
+			/* ... for cmd NV4_DX6_MULTI_TEXTURE_TRIANGLE (not used) */
+			ACCW(PR_CTX0_8, 0x0300a055); /* NVclass $055, patchcfg ROP_AND, userclip enable,
+										  * context surface0 valid */
+		}
+		ACCW(PR_CTX1_8, 0x00000d01); /* format is A8RGB24, MSB mono */
+		ACCW(PR_CTX2_8, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
-		/* setup set '6' for ... */
+		/* setup set '9' for cmd NV3_SURFACE_0 */
+		ACCW(PR_CTX0_9, 0x00000058); /* NVclass $058, nv10+: little endian */
+		ACCW(PR_CTX1_9, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_9, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_9, 0x00000000); /* method traps disabled */
+		/* setup set 'A' for cmd NV3_SURFACE_1 */
+		ACCW(PR_CTX0_A, 0x00000059); /* NVclass $059, nv10+: little endian */
+		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_A, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_A, 0x00000000); /* method traps disabled */
+		/* setup set 'B' for cmd NV3_SURFACE_2 (nolonger used) */
+		ACCW(PR_CTX0_B, 0x0000005a); /* NVclass $05a, nv10+: little endian */
+		ACCW(PR_CTX1_B, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_B, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_B, 0x00000000); /* method traps disabled */
+		/* setup set 'C' for cmd NV3_SURFACE_3 (nolonger used) */
+		ACCW(PR_CTX0_C, 0x0000005b); /* NVclass $05b, nv10+: little endian */
+		ACCW(PR_CTX1_C, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_C, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_C, 0x00000000); /* method traps disabled */
+		/* setup set 'D' ... */
+		if (si->ps.card_arch != NV04A)
+		{
+			/* ... for cmd NV10_CONTEXT_SURFACES_ARGB_ZS */
+			ACCW(PR_CTX0_D, 0x00000093); /* NVclass $093, nv10+: little endian */
+		}
+		else
+		{
+			/* ... for cmd NV04_CONTEXT_SURFACES_ARGB_ZS */
+			ACCW(PR_CTX0_D, 0x00000053); /* NVclass $053, nv10+: little endian */
+		}
+		ACCW(PR_CTX1_D, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_D, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_D, 0x00000000); /* method traps disabled */
+		/* setup set 'E' for cmd NV1_RENDER_SOLID_LIN (not used) */
+		ACCW(PR_CTX0_E, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
+									  * context surface0 valid, nv10+: little endian */
+		ACCW(PR_CTX1_E, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_E, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+		ACCW(PR_CTX3_E, 0x00000000); /* method traps disabled */
+//end dma tst.
+
+		/* setup set 'F' for ... */
 		if(si->ps.card_arch >= NV10A)
 		{
 			/* ... cmd NV10_CONTEXT_SURFACES_2D */
-			ACCW(PR_CTX0_A, 0x01008062); /* NVclass $062, nv10+: little endian */
+			ACCW(PR_CTX0_F, 0x01008062); /* NVclass $062, nv10+: little endian */
 		}
 		else
 		{
 			/* ... cmd NV4_SURFACE */
-			ACCW(PR_CTX0_A, 0x01008042); /* NVclass $042, nv10+: little endian */
+			ACCW(PR_CTX0_F, 0x01008042); /* NVclass $042, nv10+: little endian */
 		}
-		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_A, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
-		ACCW(PR_CTX3_A, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
+		ACCW(PR_CTX1_F, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+		ACCW(PR_CTX2_F, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
+		ACCW(PR_CTX3_F, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
 		/* setup DMA set pointed at by PF_CACH1_DMAI */
-		ACCW(PR_CTX0_C, 0x00003002); /* DMA page table present and of linear type;
+		ACCW(PR_CTX0_10, 0x00003002); /* DMA page table present and of linear type;
 									  * DMA class is $002 (b0-11);
 									  * DMA target node is NVM (non-volatile memory?)
 									  * (instead of doing PCI or AGP transfers) */
-		ACCW(PR_CTX1_C, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
-		ACCW(PR_CTX2_C, (((si->ps.memory_size - 1) & 0xffff8000) | 0x00000002));
+		ACCW(PR_CTX1_10, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
+		ACCW(PR_CTX2_10, (((si->ps.memory_size - 1) & 0xffff8000) | 0x00000002));
 									 /* DMA access type is READ_AND_WRITE;
 									  * table is located at end of cardRAM (b12-31):
 									  * It's adress needs to be at a 4kb boundary! */
@@ -325,9 +458,9 @@ status_t nv_acc_init_dma()
 		if (si->ps.card_type == NV04)
 		{
 			/* DMA target node is PCI */
-			ACCW(PR_CTX0_C, 0x00023002);
+			ACCW(PR_CTX0_10, 0x00023002);
 			/* point at the DMA buffer via main system memory */
-			ACCW(PR_CTX2_C, (ACCR(PR_CTX2_C) +
+			ACCW(PR_CTX2_10, (ACCR(PR_CTX2_C) +
 				(((uint32)((uint8 *)(si->framebuffer_pci))) & 0xfffff000)));
 		}
 	}
@@ -627,7 +760,12 @@ status_t nv_acc_init_dma()
 	 * should point to a DMA definition in CTX register space (which is sort of RAM).
 	 * This define tells the engine where the DMA cmd buffer is and what it's size is.
 	 * Inside that cmd buffer you'll find the actual issued engine commands. */
-	ACCW(PF_CACH1_DMAI, 0x0000114e);
+//dma 3D test:
+	if (si->ps.card_arch >= NV40A)
+		ACCW(PF_CACH1_DMAI, 0x0000114e);
+	else
+		ACCW(PF_CACH1_DMAI, 0x00001152);
+//end dma test.
 	/* cache0 push0 access disabled */
 	ACCW(PF_CACH0_PSH0, 0x00000000);
 	/* cache0 pull0 access disabled */
@@ -677,6 +815,9 @@ status_t nv_acc_init_dma()
 	/* enable PFIFO caches reassign */
 	ACCW(PF_CACHES, 0x00000001);
 
+	/* setup 3D specifics */
+	nv_init_for_3D_dma();
+
 	/*** init acceleration engine command info ***/
 	/* set object handles */
 	/* note:
@@ -725,9 +866,16 @@ status_t nv_acc_init_dma()
 
 	/*** init FIFO via DMA command buffer. ***/
 	/* wait for room in fifo for new FIFO assigment cmds if needed: */
-//fixme if CH6 and CH7 are assigned..
-//	if (nv_acc_fifofree_dma(16) != B_OK) return B_ERROR;
-	if (nv_acc_fifofree_dma(12) != B_OK) return B_ERROR;
+//dma 3D test:
+	if (si->ps.card_arch >= NV40A)
+	{
+		if (nv_acc_fifofree_dma(12) != B_OK) return B_ERROR;
+	}
+	else
+	{
+		if (nv_acc_fifofree_dma(16) != B_OK) return B_ERROR;
+	}
+//end dma test.
 
 	/* program new FIFO assignments */
 	/* Raster OPeration: */
@@ -742,12 +890,15 @@ status_t nv_acc_init_dma()
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH4, si->engine.fifo.handle[4]);
 	/* Bitmap: */
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH5, si->engine.fifo.handle[5]);
-	/* Line: (not used or 3D only?) */
-//fixme..
-//	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH6, si->engine.fifo.handle[6]);
-	/* Textured Triangle: (3D only) */
-//fixme..
-//	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[7]);
+//dma 3D test:
+	if (si->ps.card_arch < NV40A)
+	{
+		/* Line: (not used or 3D only?) */
+		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH6, si->engine.fifo.handle[6]);
+		/* Textured Triangle: (3D only) */
+		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[7]);
+	}
+//end dma test.
 
 	/*** Set pixel width ***/
 	switch(si->dm.space)
@@ -813,6 +964,249 @@ status_t nv_acc_init_dma()
 	nv_start_dma();
 
 	return B_OK;
+}
+
+static void nv_init_for_3D_dma(void)
+{
+	/* setup PGRAPH unknown registers and modify (pre-cleared) pipe stuff for 3D use */
+	if (si->ps.card_arch >= NV10A)
+	{
+		/* setup unknown PGRAPH stuff */
+		ACCW(PGWHAT_00, 0x00000000);
+		ACCW(PGWHAT_01, 0x00000000);
+		ACCW(PGWHAT_02, 0x00000000);
+		ACCW(PGWHAT_03, 0x00000000);
+
+		ACCW(PGWHAT_04, 0x00001000);
+		ACCW(PGWHAT_05, 0x00001000);
+		ACCW(PGWHAT_06, 0x4003ff80);
+
+		ACCW(PGWHAT_07, 0x00000000);
+		ACCW(PGWHAT_08, 0x00000000);
+		ACCW(PGWHAT_09, 0x00000000);
+		ACCW(PGWHAT_0A, 0x00000000);
+		ACCW(PGWHAT_0B, 0x00000000);
+
+		ACCW(PGWHAT_0C, 0x00080008);
+		ACCW(PGWHAT_0D, 0x00080008);
+
+		ACCW(PGWHAT_0E, 0x00000000);
+		ACCW(PGWHAT_0F, 0x00000000);
+		ACCW(PGWHAT_10, 0x00000000);
+		ACCW(PGWHAT_11, 0x00000000);
+		ACCW(PGWHAT_12, 0x00000000);
+		ACCW(PGWHAT_13, 0x00000000);
+		ACCW(PGWHAT_14, 0x00000000);
+		ACCW(PGWHAT_15, 0x00000000);
+		ACCW(PGWHAT_16, 0x00000000);
+		ACCW(PGWHAT_17, 0x00000000);
+		ACCW(PGWHAT_18, 0x00000000);
+
+		ACCW(PGWHAT_19, 0x10000000);
+
+		ACCW(PGWHAT_1A, 0x00000000);
+		ACCW(PGWHAT_1B, 0x00000000);
+		ACCW(PGWHAT_1C, 0x00000000);
+		ACCW(PGWHAT_1D, 0x00000000);
+		ACCW(PGWHAT_1E, 0x00000000);
+		ACCW(PGWHAT_1F, 0x00000000);
+		ACCW(PGWHAT_20, 0x00000000);
+		ACCW(PGWHAT_21, 0x00000000);
+
+		ACCW(PGWHAT_22, 0x08000000);
+
+		ACCW(PGWHAT_23, 0x00000000);
+		ACCW(PGWHAT_24, 0x00000000);
+		ACCW(PGWHAT_25, 0x00000000);
+		ACCW(PGWHAT_26, 0x00000000);
+
+		ACCW(PGWHAT_27, 0x4b7fffff);
+
+		ACCW(PGWHAT_28, 0x00000000);
+		ACCW(PGWHAT_29, 0x00000000);
+		ACCW(PGWHAT_2A, 0x00000000);
+
+		/* setup window clipping */
+		/* b0-11 = min; b16-27 = max.
+		 * note:
+		 * probably two's complement values, so setting to max range here:
+		 * which would be -2048 upto/including +2047. */
+		/* horizontal */
+		ACCW(WINCLIP_H_0, 0x07ff0800);
+		ACCW(WINCLIP_H_1, 0x07ff0800);
+		ACCW(WINCLIP_H_2, 0x07ff0800);
+		ACCW(WINCLIP_H_3, 0x07ff0800);
+		ACCW(WINCLIP_H_4, 0x07ff0800);
+		ACCW(WINCLIP_H_5, 0x07ff0800);
+		ACCW(WINCLIP_H_6, 0x07ff0800);
+		ACCW(WINCLIP_H_7, 0x07ff0800);
+		/* vertical */
+		ACCW(WINCLIP_V_0, 0x07ff0800);
+		ACCW(WINCLIP_V_1, 0x07ff0800);
+		ACCW(WINCLIP_V_2, 0x07ff0800);
+		ACCW(WINCLIP_V_3, 0x07ff0800);
+		ACCW(WINCLIP_V_4, 0x07ff0800);
+		ACCW(WINCLIP_V_5, 0x07ff0800);
+		ACCW(WINCLIP_V_6, 0x07ff0800);
+		ACCW(WINCLIP_V_7, 0x07ff0800);
+
+		/* setup (initialize) pipe */
+		/* set eyetype to local, lightning etc. is off */
+//		ACCW(NV10_XFMOD0, 0x10000000);
+		/* disable all lights */
+//		ACCW(NV10_XFMOD1, 0x00000000);
+
+		/* note: upon writing data into the PIPEDAT register, the PIPEADR is
+		 * probably auto-incremented! */
+		/* (pipe adress = b2-16, pipe data = b0-31) */
+/*
+		ACCW(NV10_PIPEADR, 0x00006740);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x00006750);
+		ACCW(NV10_PIPEDAT, 0x40000000);
+		ACCW(NV10_PIPEDAT, 0x40000000);
+		ACCW(NV10_PIPEDAT, 0x40000000);
+		ACCW(NV10_PIPEDAT, 0x40000000);
+
+		ACCW(NV10_PIPEADR, 0x00006760);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006770);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006780);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x000067a0);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x00006ab0);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x00006ac0);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006c10);
+		ACCW(NV10_PIPEDAT, 0xbf800000);
+
+		ACCW(NV10_PIPEADR, 0x00007030);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007040);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007050);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007060);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007070);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007080);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007090);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x000070a0);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00006a80);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x00006aa0);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00000040);
+		ACCW(NV10_PIPEDAT, 0x00000005);
+
+		ACCW(NV10_PIPEADR, 0x00006400);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x4b7fffff);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006410);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006420);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006430);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x000064c0);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x477fffff);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x000064d0);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x000064e0);
+		ACCW(NV10_PIPEDAT, 0xc4fff000);
+		ACCW(NV10_PIPEDAT, 0xc4fff000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x000064f0);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+*/
+		/* turn lightning on */
+		ACCW(NV10_XFMOD0, 0x30000000);
+		/* set light 1 to infinite type, other lights remain off */
+		ACCW(NV10_XFMOD1, 0x00000004);
+
+		/* Z-buffer state is:
+		 * initialized, set to: 'fixed point' (integer?); Z-buffer; 16bits depth */
+		/* note:
+		 * other options possible are: floating point; 24bits depth; W-buffer(?) */
+		ACCW(GLOB_STAT_0, 0x10000000);
+		/* set DMA instance 2 and 3 to be invalid */
+		ACCW(GLOB_STAT_1, 0x00000000);
+	}
 }
 
 static void nv_start_dma(void)
