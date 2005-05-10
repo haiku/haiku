@@ -685,19 +685,42 @@ BChannelSlider::DrawThumbs()
 			bool pressed = fMinpoint != 0 && (channel == fCurrentChannel || fAllChannels);	
 			DrawChannel(fBackingView, channel, channelArea, pressed); 
 		}
-				
+		
+#if 1	
+		// This part draws the current value over the thumb.
+		// TODO: make it nicer. Simplify the code.
+		if (fCurrentChannel != -1 && fMinpoint != 0) {
+			char valueString[32];
+			snprintf(valueString, 32, "%ld", ValueFor(fCurrentChannel));
+			float width = fBackingView->StringWidth(valueString);
+			BRect valueRect(0, 0, width, 10);
+			rgb_color oldColor = fBackingView->HighColor();
+			if (Vertical())
+				valueRect.OffsetTo((ThumbFrameFor(fCurrentChannel).Width() - width) / 2 + fCurrentChannel * ThumbFrameFor(fCurrentChannel).Width(),
+						ThumbDeltaFor(fCurrentChannel));
+			else
+				valueRect.OffsetTo(ThumbDeltaFor(fCurrentChannel), ThumbFrameFor(fCurrentChannel).top - 10);
+			fBackingView->SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+			fBackingView->StrokeRect(valueRect.InsetByCopy(-0.5, -0.5));
+			fBackingView->SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
+			fBackingView->FillRect(valueRect);
+			fBackingView->SetHighColor(0, 0, 0);
+			valueRect.OffsetBy(1 , 9);
+			fBackingView->DrawString(valueString, valueRect.LeftTop());
+			fBackingView->SetHighColor(oldColor);	
+		}
+#endif		
 		fBackingView->Sync();
 		fBacking->Unlock();
 	}
 	
 	DrawBitmapAsync(fBacking, drawHere);
-	
-	// We also draw the channel value, unlike R5.
-	// TODO: just a prototype for now, it isn't so cool. 
-	// for Axel: Not sure if this is what you wanted, feel free to change this
+
+#if 0
+	// this part draws the value at the bottom of the sliders.
 	if (fCurrentChannel != -1 && fMinpoint != 0) {
-		char valueString[64];
-		snprintf(valueString, 64, "%ld", ValueFor(fCurrentChannel));
+		char valueString[32];
+		snprintf(valueString, 32, "%ld", ValueFor(fCurrentChannel));
 		BPoint stringPoint = drawHere;
 		float stringWidth = StringWidth(valueString);
 		stringPoint.x += (fBacking->Bounds().Width() - stringWidth) / 2;
@@ -713,7 +736,8 @@ BChannelSlider::DrawThumbs()
 		SetHighColor(0, 0, 0);
 		DrawString(valueString, stringPoint);
 	}
-	
+#endif
+
 	// fClickDelta is used in MouseMoved()
 	fClickDelta = drawHere;
 	
