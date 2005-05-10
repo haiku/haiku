@@ -1233,18 +1233,20 @@ void
 BView::MakeFocus(bool focusState)
 {
 	if (owner) {
-		// if a view is in focus
-		BView *focus = owner->CurrentFocus();
-		if (focus) {
-			owner->fFocus = NULL;
-			focus->MakeFocus(false);
-			owner->SetPreferredHandler(NULL);
-		}
-
-		// if we want to make this view the current focus view
+		// TODO: If this view has focus and focusState==false,
+		// will there really be no other view with focus? No
+		// cycling to the next one?
 		if (focusState) {
+			// if we want to make this view the current focus view
 			owner->fFocus = this;
 			owner->SetPreferredHandler(this);
+		} else {
+			// we want to unfocus this view, but only if it actually has focus
+			BView *focus = owner->CurrentFocus();
+			if (focus == this) {
+				owner->fFocus = NULL;
+				owner->SetPreferredHandler(NULL);
+			}
 		}
 	}
 }
