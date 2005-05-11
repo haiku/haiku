@@ -1169,6 +1169,13 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 {
 	do_owner_check();
 
+	// TODO: This doesn't look correct, and it's probably the
+	// reason for synchronous controls not working well.
+	// 1. We shouldn't return in case we find an _UPDATE_
+	//	message in the queue, as this leaves us without a mouse position.
+	// 2. we should check if we are calling this from the BWindow's thread or not.
+	// 3. We should maybe take care of more things as the window's loop is blocked.
+
 	if (checkMessageQueue) {
 		BMessageQueue *queue = Window()->MessageQueue();
 		BMessage *msg;
