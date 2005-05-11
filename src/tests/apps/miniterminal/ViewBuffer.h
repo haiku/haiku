@@ -23,6 +23,8 @@ virtual	void				FrameResized(float new_width, float new_height);
 		void				FillGlyph(int32 x, int32 y, int32 width, int32 height, uint8 glyph, uint8 attr);
 		void				RenderGlyph(int32 x, int32 y, uint8 glyph, uint8 attr);
 
+virtual	void				Draw(BRect updateRect);
+
 		void				DrawCursor(int32 x, int32 y);
 		void				MoveCursor(int32 x, int32 y);
 
@@ -30,8 +32,13 @@ virtual	void				FrameResized(float new_width, float new_height);
 		void				Clear(uint8 attr);
 
 private:
+		void				_RenderGlyph(int32 x, int32 y, const char* string, uint8 attr, bool fill = true);
+
 		int32				fColumns;
 		int32				fRows;
+
+		uint16*				fGlyphGrid;
+
 		resize_callback		fResizeCallback;
 		void				*fResizeCallbackData;
 		int32				fCursorX;
