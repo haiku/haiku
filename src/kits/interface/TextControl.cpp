@@ -39,20 +39,12 @@ BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 {
 	InitData(label, text);
 
-	BRect bounds(Bounds());
-	
-	font_height fh;
-	GetFontHeight(&fh);
-
-	float height = (float)ceil(fh.ascent + fh.descent + fh.leading);
 	float lineHeight = fText->LineHeight(0);
 
-	ResizeTo(bounds.Width(), height + 8);
+	ResizeTo(Bounds().Width(), lineHeight + 8);
 
-	BRect textBounds(fText->Bounds());
-
-	fText->ResizeTo(textBounds.Width(), lineHeight + 4);
-	fText->MoveBy(0, (bounds.Height() - height) / 2.0f);
+	fText->ResizeTo(fText->Bounds().Width(), lineHeight + 4);
+	fText->MoveTo(fText->Frame().left, 2.0f);
 }
 
 
@@ -618,13 +610,14 @@ BTextControl::InitData(const char *label, const char *initial_text,
 	if (data)
 		fText = static_cast<_BTextInput_ *>(FindView("_input_"));
 	else {
-		BRect frame(fDivider, bounds.top + 2.0f, bounds.right - 2.0f,
-			bounds.bottom - 2.0f);
+		BRect frame(fDivider, bounds.top + 2.0f,
+					bounds.right - 2.0f, bounds.bottom - 2.0f);
 		BRect textRect(frame.OffsetToCopy(0.0f, 0.0f));
+		textRect.InsetBy(2.0, 2.0);
 	
 		fText = new _BTextInput_(frame, textRect,
-			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS |
-			B_NAVIGABLE);
+								 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+								 B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 
 		AddChild(fText);
 		
