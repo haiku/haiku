@@ -42,7 +42,7 @@
 #include <string.h>
 
 
-#define TRACE_IO_RESOURCES
+//#define TRACE_IO_RESOURCES
 #ifdef TRACE_IO_RESOURCES
 #	define TRACE(x) dprintf x
 #else
@@ -58,7 +58,7 @@ static void unregister_colliding_node_range(io_resource_info *list,
 	io_resource_info *resource);
 
 
-// validate I/O resource data
+/** validate I/O resource data */
 
 static status_t
 validate_io_resource(io_resource *src)
@@ -85,12 +85,12 @@ validate_io_resource(io_resource *src)
 			return B_BAD_VALUE;
 	}
 
-	TRACE(("success!\n"));
+	TRACE(("  success!\n"));
 	return B_OK;
 }
 
 
-// allocate info structure for I/O resources
+/** Allocate info structure for I/O resources */
 
 static status_t
 alloc_io_resource_info(io_resource *src, io_resource_info **dest_out)
@@ -114,9 +114,10 @@ alloc_io_resource_info(io_resource *src, io_resource_info **dest_out)
 }
 
 
-// acquire I/O range;
-// returns B_WOULD_BLOCK on collision with temporary allocation
-// node_lock must be hold
+/**	Acquire I/O range; returns B_WOULD_BLOCK on collision with 
+ *	temporary allocation.
+ *	gNodeLock must be held
+ */
 
 static status_t
 acquire_range(io_resource_info **list, io_resource_info *resource)
@@ -134,11 +135,11 @@ acquire_range(io_resource_info **list, io_resource_info *resource)
 			&& cur->resource.base + length - 1 <= base + length - 1) {
 			device_node_info *owner = cur->owner;
 
-			TRACE(("collision\n"));
+			TRACE(("  collision\n"));
 
 			if (owner == NULL) {
 				// collision with temporary allocation - block ourself
-				TRACE(("collision with temporary allocation - retry later\n"));
+				TRACE(("  collision with temporary allocation - retry later\n"));
 
 				res = B_WOULD_BLOCK;
 				break;
@@ -147,13 +148,13 @@ acquire_range(io_resource_info **list, io_resource_info *resource)
 				if (owner->loading + owner->load_count > 0) {
 					// driver is already loaded - give up
 					// (driver may get loaded forever)
-					TRACE(("collision with loaded driver - giving up\n"));
+					TRACE(("  collision with loaded driver - giving up\n"));
 
 					res = B_BUSY;
 					break;
 				} else {
 					// driver is not loaded - block loading
-					TRACE(("collision with unloaded driver - block driver %p\n", owner));
+					TRACE(("  collision with unloaded driver - block driver %p\n", owner));
 
 					++owner->load_block_count;
 				}
@@ -163,7 +164,7 @@ acquire_range(io_resource_info **list, io_resource_info *resource)
 
 	if (cur != NULL) {
 		// collided with someone
-		TRACE(("Resource collision\n"));
+		TRACE(("  Resource collision\n"));
 
 		release_range(list, resource, cur);
 		return res;
@@ -175,7 +176,7 @@ acquire_range(io_resource_info **list, io_resource_info *resource)
 }
 
 
-// free I/O resource info
+/** Free I/O resource info */
 
 static void
 free_io_resource_info(io_resource_info *resource)
@@ -191,7 +192,7 @@ free_io_resource_info(io_resource_info *resource)
  *	appropriate resource list (i.e. mem/port/channel) plus
  *	all colliding resources (including ours) are marked blocked;
  *	returns B_WOULD_BLOCK on collision with temporary allocation;
- *	gNodeLock must be hold.
+ *	gNodeLock must be held.
  */
 
 static status_t
@@ -229,19 +230,20 @@ acquire_io_resource(io_resource *src, io_resource_handle *dest_out)
 
 	*dest_out = dest;
 
-	TRACE(("done\n"));
+	TRACE(("  done\n"));
 	return B_OK;
 
 err:
 	free_io_resource_info(dest);
 
-	TRACE(("failed: %s\n", strerror(res)));
+	TRACE(("  failed: %s\n", strerror(res)));
 	return res;
 }
 
 
-// release I/O resource
-// node_lock must be hold
+/**	Release I/O resource.
+ *	gNodeLock must be held
+ */
 
 static void
 release_io_resource(io_resource_info *resource)
@@ -264,11 +266,12 @@ release_io_resource(io_resource_info *resource)
 }
 
 
-// release I/O range, which can be I/O memory, ports and ISA DMA channels
-// up_to - up to but not including colliding range to be released
-//         (NULL for normal release, not-NULL if used during failed allocation)
-// blocked users get notified;
-// node_lock must be hold
+/**	Release I/O range, which can be I/O memory, ports and ISA DMA channels
+ *	up_to - up to but not including colliding range to be released
+ *	        (NULL for normal release, not-NULL if used during failed allocation)
+ *	blocked users get notified;
+ *	gNodeLock must be held
+ */
 
 static void
 release_range(io_resource_info **list, io_resource_info *resource, io_resource_info *up_to)
@@ -288,11 +291,11 @@ release_range(io_resource_info **list, io_resource_info *resource, io_resource_i
 		if (cur->resource.base >= base && cur->resource.base + length - 1 <= base + length - 1) {
 			device_node_info *owner = cur->owner;
 
-			TRACE(("unblock\n"));
+			TRACE(("  unblock\n"));
 
 			if (owner != NULL) {
 				// collision with driver - unblock it
-				TRACE(("collision with driver - unblock driver %p\n", owner));
+				TRACE(("  collision with driver - unblock driver %p\n", owner));
 
 				pnp_unblock_load(owner);
 			}
@@ -309,13 +312,16 @@ release_range(io_resource_info **list, io_resource_info *resource, io_resource_i
 }
 
 
-// wait until someone freed some resource or 
-// allocated some resource permanently;
-// node_lock must be hold
+/**	Wait until someone freed some resource or 
+ *	allocated some resource permanently.
+ *	gNodeLock must be held.
+ */
 
 static void
 wait_for_resources(void)
 {
+	TRACE(("wait_for_resources()\n"));
+	
 	++pnp_resource_wait_count;
 
 	// we have to release while waiting
@@ -323,15 +329,14 @@ wait_for_resources(void)
 	
 	acquire_sem(pnp_resource_wait_sem);
 	
-	TRACE(("retrying resource allocation"));
-	
 	benaphore_unlock(&gNodeLock);
 }
 
 
-// try to acquire list of resources.
-// returns B_WOULD_BLOCK on collision with temporary allocation
-// node_lock must be hold
+/**	Try to acquire list of resources.
+ *	returns B_WOULD_BLOCK on collision with temporary allocation.
+ *	gNodeLock must be held.
+ */
 
 static status_t
 try_acquire_io_resources(io_resource *resources, io_resource_handle *handles)
@@ -363,11 +368,12 @@ err:
 }
 
 
-// acquire I/O resources.
-// node_lock must be hold
+/**	Acquire I/O resources.
+ *	gNodeLock must be held.
+ */
 
-static
-status_t acquire_io_resources(io_resource *resources, io_resource_handle *handles)
+static status_t 
+acquire_io_resources(io_resource *resources, io_resource_handle *handles)
 {
 	// try allocation until we either got all resources or
 	// detected a collision with a loaded device node
@@ -386,14 +392,14 @@ status_t acquire_io_resources(io_resource *resources, io_resource_handle *handle
 			wait_for_resources();
 		} else {
 			// collided with loaded node - no point waiting for the node
-			TRACE(("Giving up because collision with loaded device node\n"));
+			TRACE(("acquire_io_resouces(): Collision with loaded device node\n"));
 			return res;
 		}
 	}
 }
 
 
-// unregister devices that collide with one of our I/O resources
+/** Unregister devices that collide with one of our I/O resources */
 
 static void
 unregister_colliding_nodes(const io_resource_handle *resources)
@@ -416,7 +422,7 @@ unregister_colliding_nodes(const io_resource_handle *resources)
 }
 
 
-/** unregister device nodes that collide with I/O resource */
+/** Unregister device nodes that collide with I/O resource */
 
 static void
 unregister_colliding_node_range(io_resource_info *list, io_resource_info *resource)
@@ -439,7 +445,7 @@ unregister_colliding_node_range(io_resource_info *list, io_resource_info *resour
 				if (owner == NULL)
 					panic("Transfer of I/O resources from temporary to device node collided with other temporary allocation");
 
-				TRACE(("Deleting colliding node %p\n", owner));
+				TRACE(("Deleting colliding device node %p\n", owner));
 
 				// make sure node still exists after we'll have released lock
 				++owner->ref_count;
@@ -462,8 +468,8 @@ unregister_colliding_node_range(io_resource_info *list, io_resource_info *resour
 }
 
 
-/**	unblock other temporary allocations so they can retry
- *	gNodeLock must be hold
+/**	Unblock other temporary allocations so they can retry.
+ *	gNodeLock must be held.
  */
 
 static void
@@ -481,8 +487,8 @@ unblock_temporary_allocation(void)
 //	#pragma mark -
 
 
-/**	transfer temporary I/O resources to device node;
- *	colliding devices are unregistered
+/**	Transfer temporary I/O resources to device node;
+ *	colliding devices are unregistered.
  */
 
 void
@@ -513,9 +519,9 @@ dm_assign_io_resources(device_node_info *node, const io_resource_handle *resourc
 }
 
 
-/**	release I/O resources of a device node and set list to NULL;
+/**	Release I/O resources of a device node and set list to NULL;
  *	users previously blocked by our resource alloction are notified;
- *	gNodeLock must be hold
+ *	gNodeLock must be held.
  */
 
 void
@@ -546,17 +552,17 @@ dm_release_node_resources(device_node_info *node)
 status_t
 dm_acquire_io_resources(io_resource *resources, io_resource_handle *handles)
 {
-	status_t res;
+	status_t status;
 
-	TRACE(("pnp_acquire_io_resources()\n"));
+	TRACE(("dm_acquire_io_resources()\n"));
 
 	benaphore_lock(&gNodeLock);
-	res = acquire_io_resources(resources, handles);
+	status = acquire_io_resources(resources, handles);
 	benaphore_unlock(&gNodeLock);
 
-	TRACE(("done (%s)", strerror(res)));
+	TRACE(("  done (%s)", strerror(status)));
 
-	return res;
+	return status;
 }
 
 
