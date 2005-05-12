@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel generic ; 
 
 SubInclude OBOS_TOP src add-ons kernel generic atomizer ;
-SubInclude OBOS_TOP src add-ons kernel generic blkman ;
+SubInclude OBOS_TOP src add-ons kernel generic block_io ;
 SubInclude OBOS_TOP src add-ons kernel generic fast_log ;
 SubInclude OBOS_TOP src add-ons kernel generic ide_adapter ;
 SubInclude OBOS_TOP src add-ons kernel generic locked_pool ;
