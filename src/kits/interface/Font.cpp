@@ -23,16 +23,20 @@
 //	Author:			DarkWyrm (bpmagic@columbus.rr.com)
 //	Description:	Class to manage font-handling capabilities
 //------------------------------------------------------------------------------
-#include <Rect.h>
 #include <stdio.h>
-#include <Font.h>
-#include <Message.h>
-#include <String.h>
-#include <Shape.h>
-#include <PortLink.h>
-#include <AppServerLink.h>
 #include <stdlib.h>
+
+#include <AppServerLink.h>
+#include <Message.h>
+#include <PortLink.h>
+#include <Rect.h>
 #include <ServerProtocol.h>
+#include <Shape.h>
+#include <String.h>
+
+#include <moreUTF8.h>
+
+#include <Font.h>
 
 //----------------------------------------------------------------------------------------
 //		Globals
@@ -942,9 +946,9 @@ void
 BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
 	float escapementArray[]) const
 {
-	if(!charArray ||  numChars<1 || !escapementArray)
+	if (!charArray ||  numChars<1 || !escapementArray)
 		return;
-	
+
 	int32 code;
 	BPrivate::BAppServerLink link;
 	
@@ -955,20 +959,25 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	link.Attach<float>(fSize);
 	link.Attach<float>(fRotation);
 	link.Attach<uint32>(fFlags);
+
+	link.Attach<float>(delta ? delta->nonspace : 0.0);
+	link.Attach<float>(delta ? delta->space : 0.0);
 	
+	// TODO: Should we not worry about the port capacity here?!?
 	link.Attach<int32>(numChars);
-	
-	// TODO: Support UTF8 characters
-	for(int32 i=0; i<numChars; i++)
-		link.Attach<char>(charArray[i]);
-	
+
+	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
+	link.Attach<int32>(bytesInBuffer);
+
+	link.Attach(charArray, bytesInBuffer);
+
+
 	link.FlushWithReply(&code);
 
-	if(code!=SERVER_TRUE)
+	if (code != SERVER_TRUE)
 		return;
-	
-	for(int32 i=0; i<numChars; i++)
-		link.Read<float>(&escapementArray[i]);
+
+	link.Read(escapementArray, numChars * sizeof(float));
 }
 
 

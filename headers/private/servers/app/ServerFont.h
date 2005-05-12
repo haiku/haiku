@@ -31,81 +31,128 @@
 #include <Font.h>
 #include "FontFamily.h"
 
-class ServerFont
-{
-public:
-	ServerFont(void);
-	ServerFont(FontStyle *style, float size=12.0, float frotation=0.0, float fshear=90.0,
-			uint16 flags=0, uint8 spacing=B_CHAR_SPACING);
-	ServerFont(const ServerFont &font);
-	~ServerFont(void);
+class ServerFont {
+ public:
+								ServerFont();
+								ServerFont(FontStyle* style,
+										   float size = 12.0,
+										   float fRotation = 0.0,
+										   float fShear = 90.0,
+										   uint16 flags = 0,
+										   uint8 spacing = B_CHAR_SPACING);
+								ServerFont(const ServerFont& font);
+	virtual						~ServerFont();
 
 	// TODO: make more advanced...
-	status_t InitCheck() const
-				{ return fStyle ? B_OK : B_NO_INIT; }
+			status_t			InitCheck() const
+									{ return fStyle ? B_OK : B_NO_INIT; }
 
 
-	font_direction Direction(void) const { return fDirection; }
-	uint32 Encoding(void) const { return fEncoding; }
-	edge_info Edges(void) const { return fEdges; }
-	uint32 Flags(void) const { return fFlags; }
-	uint32 Spacing(void) const { return fSpacing; }
-	float Shear(void) const { return fshear; }
-	float Rotation(void) const { return frotation; }
-	float Size(void) const { return fSize; }
-	uint16 Face(void) const { return fFace; }
-	uint32 CountGlyphs(void) { return fStyle->GlyphCount(); }
-	int32 CountTuned(void);
-	font_file_format FileFormat(void);
-	
-	status_t SetFamilyAndStyle(const uint16 &familyID,const uint16 &styleID);
-	status_t SetFamilyAndStyle(const uint32 &fontID);
-	void SetDirection(const font_direction &dir) { fDirection=dir; }
-	void SetEdges(const edge_info &info) { fEdges=info; }
-	void SetEncoding(uint32 encoding) { fEncoding=encoding; }
-	void SetFlags(const uint32 &value) { fFlags=value; }
-	void SetSpacing(const uint32 &value) { fSpacing=value; }
-	void SetShear(const float &value) { fshear=value; }
-	void SetSize(const float &value) { fSize=value; }
-	void SetRotation(const float &value) { frotation=value; }
-	void SetFace(const uint32 &value) { fFace=value; }
-	
-	bool IsFixedWidth(void) const { return fStyle->IsFixedWidth(); }
-	bool IsScalable(void) const { return fStyle->IsScalable(); }
-	bool HasKerning(void) const { return fStyle->HasKerning(); }
-	bool HasTuned(void) const { return fStyle->HasTuned(); }
-	int32 TunedCount(void) const { return fStyle->TunedCount(); }
-	uint16 GlyphCount(void) const { return fStyle->GlyphCount(); }
-	uint16 CharMapCount(void) const { return fStyle->CharMapCount(); }
-	BShape **GetGlyphShapes(const char charArray[], int32 numChars) const;
-	BPoint *GetEscapements(const char charArray[], int32 numChars,
-							BPoint offsetArray[]) const;
-	
-	FT_Face GetFTFace() const { return fStyle->GetFTFace(); };
-	
-	const char *GetStyle(void) const;
-	const char *GetFamily(void) const;
-	const char *GetPath(void) const { return fStyle->GetPath(); }
-	uint16 StyleID(void) const { return fStyle->GetID(); }
-	uint16 FamilyID(void) const { return fStyle->Family()->GetID(); }
-	uint32 GetFamilyAndStyle(void) const;
+			font_direction		Direction() const
+									{ return fDirection; }
+			uint32				Encoding() const
+									{ return fEncoding; }
+			edge_info			Edges() const
+									{ return fEdges; }
+			uint32				Flags() const
+									{ return fFlags; }
+			uint32				Spacing() const
+									{ return fSpacing; }
+			float				Shear() const
+									{ return fShear; }
+			float				Rotation() const
+									{ return fRotation; }
+			float				Size() const
+									{ return fSize; }
+			uint16				Face() const
+									{ return fFace; }
+			uint32				CountGlyphs()
+									{ return fStyle->GlyphCount(); }
+			int32				CountTuned();
 
-	BRect BoundingBox(void);
-	void Height(font_height *fh);
+			font_file_format	FileFormat();
+	
+			status_t			SetFamilyAndStyle(const uint16& familyID,
+												  const uint16& styleID);
+			status_t			SetFamilyAndStyle(const uint32& fontID);
 
-	ServerFont &operator=(const ServerFont& font);
+			void				SetDirection(const font_direction& dir)
+									{ fDirection = dir; }
+			void				SetEdges(const edge_info& info)
+									{ fEdges = info; }
+			void				SetEncoding(uint32 encoding)
+									{ fEncoding = encoding; }
+			void				SetFlags(const uint32& value)
+									{ fFlags = value; }
+			void				SetSpacing(const uint32& value)
+									{ fSpacing = value; }
+			void				SetShear(const float& value)
+									{ fShear = value; }
+			void				SetSize(const float& value)
+									{ fSize = value; }
+			void				SetRotation(const float& value)
+									{ fRotation = value; }
+			void				SetFace(const uint32& value)
+									{ fFace = value; }
+	
+			bool				IsFixedWidth() const
+									{ return fStyle->IsFixedWidth(); }
+			bool				IsScalable() const
+									{ return fStyle->IsScalable(); }
+			bool				HasKerning() const
+									{ return fStyle->HasKerning(); }
+			bool				HasTuned() const
+									{ return fStyle->HasTuned(); }
+			int32				TunedCount() const
+									{ return fStyle->TunedCount(); }
+			uint16				GlyphCount() const
+									{ return fStyle->GlyphCount(); }
+			uint16				CharMapCount() const
+									{ return fStyle->CharMapCount(); }
+			BShape**			GetGlyphShapes(const char charArray[],
+											   int32 numChars) const;
+
+			BPoint*				GetEscapements(const char charArray[],
+											   int32 numChars,
+											   BPoint offsetArray[]) const;
+			bool				GetEscapements(const char charArray[],
+											   int32 numChars,
+											   float widthArray[],
+											   escapement_delta delta) const;
+	
+			FT_Face				GetFTFace() const
+									{ return fStyle->GetFTFace(); };
+	
+			const char*			GetStyle() const;
+			const char*			GetFamily() const;
+			const char*			GetPath() const
+									{ return fStyle->GetPath(); }
+
+			uint16				StyleID() const
+									{ return fStyle->GetID(); }
+			uint16				FamilyID() const
+									{ return fStyle->Family()->GetID(); }
+			uint32				GetFamilyAndStyle() const;
+
+			BRect				BoundingBox();
+			void				Height(font_height* fh);
+
+			ServerFont			&operator=(const ServerFont& font);
 	
 protected:
 	friend class FontStyle;
-	FontStyle *fStyle;
-	edge_info fEdges;
-	float fSize, frotation, fshear;
-	BRect fBounds;
-	uint32 fFlags;
-	uint32 fSpacing;
-	uint16 fFace;
-	font_direction fDirection;
-	uint32 fEncoding;
+
+			FontStyle*			fStyle;
+			edge_info			fEdges;
+			float				fSize;
+			float				fRotation;
+			float				fShear;
+			BRect				fBounds;
+			uint32				fFlags;
+			uint32				fSpacing;
+			uint16				fFace;
+			font_direction		fDirection;
+			uint32				fEncoding;
 };
 
 #endif

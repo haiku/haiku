@@ -1805,13 +1805,18 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 3) float - point size
 			// 4) float - rotation
 			// 5) uint32 - flags
-			// 6) int32 - numChars
-			// 7) char - char
-			// 8) port_id - reply port
+
+			// 6) float - additional "nonspace" delta
+			// 7) float - additional "space" delta
+
+			// 8) int32 - numChars
+			// 9) int32 - numBytes
+			// 10) char - the char buffer with size numBytes
+
+			// 11) port_id - reply port
 			
 			// Returns:
-			// 1) float - escapement
-			// numChars times
+			// 1) float - escapement buffer with numChar entries
 			
 			uint16 famid, styid;
 			uint32 flags;
@@ -1822,21 +1827,51 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<float>(&ptsize);
 			msg.Read<float>(&rotation);
 			msg.Read<uint32>(&flags);
+
+			escapement_delta delta;
+			msg.Read<float>(&delta.nonspace);
+			msg.Read<float>(&delta.space);
 			
 			int32 numChars;
 			msg.Read<int32>(&numChars);
-			
-			char charArray[numChars];			
+
+/*			char charArray[numChars];			
 			for (int32 i = 0; i < numChars; i++) {
 				msg.Read<char>(&charArray[i]);
-			}
-			
+			}*/
+			uint32 numBytes;
+			msg.Read<uint32>(&numBytes);
+
+			char* charArray = new char[numBytes];
+			msg.Read(charArray, numBytes);
+
+			float* escapements = new float[numChars];
+			// figure out escapements
+
 			port_id replyport;
 			msg.Read<port_id>(&replyport);
 			replylink.SetSendPort(replyport);
-			
-			// TODO: Implement AS_GET_ESCAPEMENTS_AS_FLOATS and the float version of ServerFont::GetEscapements()
-			replylink.StartMessage(SERVER_FALSE);
+
+			ServerFont font;
+			bool success = false;
+			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
+				font.SetSize(ptsize);
+				font.SetRotation(rotation);
+				font.SetFlags(flags);
+
+				if (font.GetEscapements(charArray, numChars, escapements, delta)) {
+					replylink.StartMessage(SERVER_TRUE);
+					replylink.Attach(escapements, numChars * sizeof(float));
+					success = true;
+				}
+			}
+
+			delete[] charArray;
+			delete[] escapements;
+
+			if (!success)
+				replylink.StartMessage(SERVER_FALSE);
+
 			replylink.Flush();
 			
 			break;

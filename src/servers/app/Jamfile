@@ -100,7 +100,7 @@ if $(TARGET_PLATFORM) = haiku {
 	# link for Haiku
 
 	LinkSharedOSLibs libappserver.so :
-		libroot.so libbe.so libfreetype.so ;
+		libroot.so libbe.so libfreetype.so libtextencoding.so ;
 
 	LinkSharedOSLibs app_server :
 		libroot.so libtranslation.so libz.so libpng.so libbe.so
@@ -115,7 +115,7 @@ if $(TARGET_PLATFORM) = haiku {
 
 	LinkSharedOSLibs libappserver.so :
 		root be <boot!home!config!lib>libopenbeos.so
-		libfreetype.so ;
+		textencoding libfreetype.so ;
 
 	LinkSharedOSLibs app_server :
 		root be game translation libz.so libpng.so libappserver.so

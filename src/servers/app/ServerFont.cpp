@@ -24,12 +24,19 @@
 //	Description:	Shadow BFont class
 //  
 //------------------------------------------------------------------------------
+#include <ByteOrder.h>
 #include <Shape.h>
-#include "ServerFont.h"
-#include "FontServer.h"
+#include <UTF8.h>
+
 #include "Angle.h"
+#include "FontServer.h"
+#include "moreUTF8.h"
+
 #include FT_FREETYPE_H
 #include FT_OUTLINE_H
+
+#include "ServerFont.h"
+
 
 /*! 
 	\brief Constructor
@@ -45,8 +52,8 @@ ServerFont::ServerFont(FontStyle *style, float size, float rotation, float shear
 {
 	fStyle=style;
 	fSize=size;
-	frotation=rotation;
-	fshear=shear;
+	fRotation=rotation;
+	fShear=shear;
 	fFlags=flags;
 	fSpacing=spacing;
 	fDirection=B_FONT_LEFT_TO_RIGHT;
@@ -65,8 +72,8 @@ ServerFont::ServerFont(void)
 {
 	fStyle=NULL;
 	fSize=0.0;
-	frotation=0.0;
-	fshear=90.0;
+	fRotation=0.0;
+	fShear=90.0;
 	fFlags=0;
 	fSpacing=B_STRING_SPACING;
 	fDirection=B_FONT_LEFT_TO_RIGHT;
@@ -83,8 +90,8 @@ ServerFont::ServerFont(const ServerFont &font)
 {
 	fStyle=font.fStyle;
 	fSize=font.fSize;
-	frotation=font.frotation;
-	fshear=font.fshear;
+	fRotation=font.fRotation;
+	fShear=font.fShear;
 	fFlags=font.fFlags;
 	fSpacing=font.fSpacing;
 	fDirection=font.fDirection;
@@ -112,8 +119,8 @@ ServerFont::~ServerFont(void)
 ServerFont& ServerFont::operator=(const ServerFont& font){
 	fStyle		= font.fStyle;
 	fSize		= font.fSize;
-	frotation	= font.frotation;
-	fshear		= font.fshear;
+	fRotation	= font.fRotation;
+	fShear		= font.fShear;
 	fFlags		= font.fFlags;
 	fSpacing	= font.fSpacing;
 	fDirection	= B_FONT_LEFT_TO_RIGHT;
@@ -247,8 +254,8 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	
 	FT_Set_Char_Size(face, 0, int32(fSize) * 64, 72, 72);
 	
-	Angle rotation(frotation);
-	Angle shear(fshear);
+	Angle rotation(fRotation);
+	Angle shear(fShear);
 	
 	// First, rotate
 	FT_Matrix rmatrix;
@@ -283,9 +290,9 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	return shapes;
 }
 
-BPoint *
+BPoint*
 ServerFont::GetEscapements(const char charArray[], int32 numChars,
-							BPoint offsetArray[]) const
+						   BPoint offsetArray[]) const
 {
 	if (!charArray || numChars <= 0 || !offsetArray)
 		return NULL;
@@ -296,8 +303,8 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	
 	FT_Set_Char_Size(face, 0, int32(fSize) * 64, 72, 72);
 	
-	Angle rotation(frotation);
-	Angle shear(fshear);
+	Angle rotation(fRotation);
+	Angle shear(fShear);
 	
 	// First, rotate
 	FT_Matrix rmatrix;
@@ -319,6 +326,10 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	//FT_Vector pen;
 	//FT_Set_Transform(face, &smatrix, &pen);
 	
+	// TODO: I'm not sure if this the correct interpretation
+	// of the BeBook. Have actual tests been done here?
+
+	// TODO: handle UTF8... see below!!
 	BPoint *escapements = (BPoint *)malloc(sizeof(BPoint) * numChars);
 	for (int i = 0; i < numChars; i++) {
 		FT_Load_Char(face, charArray[i], FT_LOAD_NO_BITMAP);
@@ -328,6 +339,53 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	}
 	
 	return escapements;
+}
+
+bool
+ServerFont::GetEscapements(const char charArray[], int32 numChars,
+						   float widthArray[], escapement_delta delta) const
+{
+	if (!charArray || numChars <= 0)
+		return false;
+	
+	FT_Face face = fStyle->GetFTFace();
+	if (!face)
+		return false;
+
+	FT_Set_Char_Size(face, 0, int32(fSize) * 64, 72, 72);
+
+	// UTF8 handling...this can probably be smarter
+	// Here is what I do in the AGGTextRenderer to handle UTF8...
+	// It is probably highly inefficient, so it should be reviewed.
+	int32 numBytes = UTF8CountBytes(charArray, numChars);
+	int32 convertedLength = numBytes * 2;
+	char* convertedBuffer = new char[convertedLength];
+
+	int32 state = 0;
+	status_t ret;
+	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
+								 charArray, &numBytes,
+								 convertedBuffer, &convertedLength,
+								 &state, B_SUBSTITUTE)) >= B_OK
+		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
+							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
+
+		uint16* glyphIndex = (uint16*)convertedBuffer;
+		// just to be sure
+		numChars = convertedLength / sizeof(uint16);
+
+		for (int i = 0; i < numChars; i++) {
+			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
+			// TODO: It appears that "white spaces" are not handled correctly:
+			// metrics.width will be zero, which is in now way correct!
+			widthArray[i] = float(face->glyph->metrics.width / 64) / fSize;
+			// TODO:
+			// widthArray[i] += is_white_space(glyphIndex[i]) ? delta.space : delta.nonspace;
+		}
+	}
+	delete[] convertedBuffer;
+
+	return ret >= B_OK;
 }
 
 /*!
