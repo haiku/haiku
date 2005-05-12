@@ -5,10 +5,8 @@ UseHeaders [ FDirName os interface ] ;
 
 SimpleTest CopyBits :
 	main.cpp
-# for running natively under R5:
-#	: be ;
 # for running in the Haiku app_server under R5:
-	: libopenbeos.so ;
-# for running on Haiku:
+	: <boot!home!config!lib>libopenbeos.so ;
+# for running natively under R5 or Haiku:
 #	: libbe.so ;
 

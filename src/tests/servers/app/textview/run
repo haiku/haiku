@@ -2,4 +2,6 @@
 
 ../../../../../distro/x86.R1/beos/system/servers/app_server &
 sleep 1s
-../../../../../tests/servers/app/textview/TextView
+../../../../../distro/x86.R1/beos/system/servers/obos_registrar &
+sleep 1s
+../../../../../tests/servers/app/windows/Window
