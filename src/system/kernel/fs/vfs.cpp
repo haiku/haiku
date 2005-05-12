@@ -5043,20 +5043,18 @@ status_t
 _kern_mount(const char *path, const char *device, const char *fs_name,
 	uint32 flags, const char *args)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-	return fs_mount(pathBuffer, device, fs_name, flags, args, true);
+	return fs_mount(pathBuffer.LockBuffer(), device, fs_name, flags, args, true);
 }
 
 
 status_t
 _kern_unmount(const char *path, uint32 flags)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-	return fs_unmount(pathBuffer, flags, true);
+	return fs_unmount(pathBuffer.LockBuffer(), flags, true);
 }
 
 
@@ -5131,13 +5129,12 @@ _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode, 
 int
 _kern_open(int fd, const char *path, int openMode, int perms)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
 	if (openMode & O_CREAT)
-		return file_create(pathBuffer, openMode, perms, true);
+		return file_create(pathBuffer.LockBuffer(), openMode, perms, true);
 
-	return file_open(fd, pathBuffer, openMode, true);
+	return file_open(fd, pathBuffer.LockBuffer(), openMode, true);
 }
 
 
@@ -5184,10 +5181,9 @@ _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
 int
 _kern_open_dir(int fd, const char *path)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-	return dir_open(fd, pathBuffer, true);
+	return dir_open(fd, pathBuffer.LockBuffer(), true);
 }
 
 
@@ -5244,20 +5240,18 @@ _kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perm
 status_t
 _kern_create_dir(int fd, const char *path, int perms)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-	return dir_create(fd, pathBuffer, perms, true);
+	return dir_create(fd, pathBuffer.LockBuffer(), perms, true);
 }
 
 
 status_t
 _kern_remove_dir(const char *path)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-	return dir_remove(pathBuffer, true);
+	return dir_remove(pathBuffer.LockBuffer(), true);
 }
 
 
@@ -5286,10 +5280,10 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 	status_t status;
 
 	if (path) {
-		char pathBuffer[B_PATH_NAME_LENGTH + 1];
-		strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-		return common_read_link(fd, pathBuffer, buffer, _bufferSize, true);
+		return common_read_link(fd, pathBuffer.LockBuffer(), 
+			buffer, _bufferSize, true);
 	}
 
 	return common_read_link(fd, NULL, buffer, _bufferSize, true);
@@ -5299,18 +5293,15 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 status_t
 _kern_write_link(const char *path, const char *toPath)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	char toPathBuffer[B_PATH_NAME_LENGTH + 1];
-	int status;
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	KPath toPathBuffer(toPath, false, B_PATH_NAME_LENGTH + 1);
+	char *toBuffer = toPathBuffer.LockBuffer();
 
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
-	strlcpy(toPathBuffer, toPath, B_PATH_NAME_LENGTH);
-
-	status = check_path(toPathBuffer);
+	status_t status = check_path(toBuffer);
 	if (status < B_OK)
 		return status;
 
-	return common_write_link(pathBuffer, toPathBuffer, true);
+	return common_write_link(pathBuffer.LockBuffer(), toBuffer, true);
 }
 
 
@@ -5332,31 +5323,27 @@ _kern_write_link(const char *path, const char *toPath)
 status_t
 _kern_create_symlink(int fd, const char *path, const char *toPath, int mode)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	char toPathBuffer[B_PATH_NAME_LENGTH + 1];
-	status_t status;
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	KPath toPathBuffer(toPath, false, B_PATH_NAME_LENGTH + 1);
+	char *toBuffer = toPathBuffer.LockBuffer();
 
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
-	strlcpy(toPathBuffer, toPath, B_PATH_NAME_LENGTH);
-
-	status = check_path(toPathBuffer);
+	status_t status = check_path(toBuffer);
 	if (status < B_OK)
 		return status;
 
-	return common_create_symlink(fd, pathBuffer, toPathBuffer, mode, true);
+	return common_create_symlink(fd, pathBuffer.LockBuffer(), 
+		toBuffer, mode, true);
 }
 
 
 status_t
 _kern_create_link(const char *path, const char *toPath)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	char toPathBuffer[B_PATH_NAME_LENGTH + 1];
-	
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
-	strlcpy(toPathBuffer, toPath, B_PATH_NAME_LENGTH);
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	KPath toPathBuffer(toPath, false, B_PATH_NAME_LENGTH + 1);
 
-	return common_create_link(pathBuffer, toPathBuffer, true);
+	return common_create_link(pathBuffer.LockBuffer(), 
+		toPathBuffer.LockBuffer(), true);
 }
 
 
@@ -5377,10 +5364,9 @@ _kern_create_link(const char *path, const char *toPath)
 status_t
 _kern_unlink(int fd, const char *path)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-	return common_unlink(fd, pathBuffer, true);
+	return common_unlink(fd, pathBuffer.LockBuffer(), true);
 }
 
 
@@ -5406,23 +5392,20 @@ _kern_unlink(int fd, const char *path)
 status_t
 _kern_rename(int oldFD, const char *oldPath, int newFD, const char *newPath)
 {
-	char oldPathBuffer[B_PATH_NAME_LENGTH + 1];
-	char newPathBuffer[B_PATH_NAME_LENGTH + 1];
+	KPath oldPathBuffer(oldPath, false, B_PATH_NAME_LENGTH + 1);
+	KPath newPathBuffer(newPath, false, B_PATH_NAME_LENGTH + 1);
 
-	strlcpy(oldPathBuffer, oldPath, B_PATH_NAME_LENGTH);
-	strlcpy(newPathBuffer, newPath, B_PATH_NAME_LENGTH);
-
-	return common_rename(oldFD, oldPathBuffer, newFD, newPathBuffer, true);
+	return common_rename(oldFD, oldPathBuffer.LockBuffer(), 
+		newFD, newPathBuffer.LockBuffer(), true);
 }
 
 
 status_t
 _kern_access(const char *path, int mode)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
-	strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-	return common_access(pathBuffer, mode, true);
+	return common_access(pathBuffer.LockBuffer(), mode, true);
 }
 
 
@@ -5465,11 +5448,10 @@ _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
 
 	if (path) {
 		// path given: get the stat of the node referred to by (fd, path)
-		char pathBuffer[B_PATH_NAME_LENGTH + 1];
-		strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-		status = common_path_read_stat(fd, pathBuffer, traverseLeafLink, stat,
-			true);
+		status = common_path_read_stat(fd, pathBuffer.LockBuffer(), 
+			traverseLeafLink, stat, true);
 	} else {
 		// no path given: get the FD and use the FD operation
 		struct file_descriptor *descriptor
@@ -5534,11 +5516,10 @@ _kern_write_stat(int fd, const char *path, bool traverseLeafLink,
 
 	if (path) {
 		// path given: write the stat of the node referred to by (fd, path)
-		char pathBuffer[B_PATH_NAME_LENGTH + 1];
-		strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 
-		status = common_path_write_stat(fd, pathBuffer, traverseLeafLink,
-			stat, statMask, true);
+		status = common_path_write_stat(fd, pathBuffer.LockBuffer(), 
+			traverseLeafLink, stat, statMask, true);
 	} else {
 		// no path given: get the FD and use the FD operation
 		struct file_descriptor *descriptor
@@ -5561,12 +5542,12 @@ _kern_write_stat(int fd, const char *path, bool traverseLeafLink,
 int
 _kern_open_attr_dir(int fd, const char *path)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 
 	if (path != NULL)
-		strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+		pathBuffer.SetTo(path);
 
-	return attr_dir_open(fd, path ? pathBuffer : NULL, true);
+	return attr_dir_open(fd, path ? pathBuffer.LockBuffer() : NULL, true);
 }
 
 
@@ -5629,32 +5610,22 @@ _kern_remove_index(dev_t device, const char *name)
 status_t
 _kern_getcwd(char *buffer, size_t size)
 {
-	char path[B_PATH_NAME_LENGTH];
-	int status;
-
-	PRINT(("sys_getcwd: buf %p, %ld\n", buffer, size));
+	PRINT(("_kern_getcwd: buf %p, %ld\n", buffer, size));
 
 	// Call vfs to get current working directory
-	status = get_cwd(path, B_PATH_NAME_LENGTH - 1, true);
-	if (status < 0)
-		return status;
-
-	path[B_PATH_NAME_LENGTH - 1] = '\0';
-	strlcpy(buffer, path, size);
-
-	return status;
+	return get_cwd(buffer, size, true);
 }
 
 
 status_t
 _kern_setcwd(int fd, const char *path)
 {
-	char pathBuffer[B_PATH_NAME_LENGTH + 1];
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 
 	if (path != NULL)
-		strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
+		pathBuffer.SetTo(path);
 
-	return set_cwd(fd, path != NULL ? pathBuffer : NULL, true);
+	return set_cwd(fd, path != NULL ? pathBuffer.LockBuffer() : NULL, true);
 }
 
 
@@ -5728,12 +5699,11 @@ _user_mount(const char *userPath, const char *userDevice, const char *userFileSy
 status_t
 _user_unmount(const char *userPath, uint32 flags)
 {
-	char path[B_PATH_NAME_LENGTH + 1];
-	int status;
+	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	char *path = pathBuffer.LockBuffer();
 
-	status = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
-	if (status < 0)
-		return status;
+	if (user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return fs_unmount(path, flags, false);
 }
