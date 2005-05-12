@@ -34,7 +34,7 @@
 #include <string.h>
 
 
-#define TRACE_ID_GENERATOR
+//#define TRACE_ID_GENERATOR
 #ifdef TRACE_ID_GENERATOR
 #	define TRACE(x) dprintf x
 #else
@@ -76,7 +76,7 @@ create_generator(const char *name)
 }
 
 
-/** allocate id */
+/** Allocate id */
 
 static int32
 create_id_internal(id_generator *generator)
@@ -91,7 +91,7 @@ create_id_internal(id_generator *generator)
 	// simple bit search
 	for (id = 0; id < GENERATOR_MAX_ID; ++id) {
 		if ((generator->alloc_map[id / 8] & (1 << (id & 7))) == 0) {
-			TRACE(("id: %lu\n", id));
+			TRACE(("  id: %lu\n", id));
 
 			generator->alloc_map[id / 8] |= 1 << (id & 7);
 			++generator->num_ids;
@@ -142,7 +142,7 @@ release_generator(id_generator *generator)
 	if (--generator->ref_count == 0) {
 		// no one messes with generator
 		if (generator->num_ids == 0) {
-			TRACE(("Destroy %s\n", generator->name));
+			TRACE(("  Destroy %s\n", generator->name));
 			// no IDs is allocated - destroy generator
 			list_remove_link(generator);
 			free(generator->name);
@@ -195,7 +195,7 @@ dm_create_id(const char *name)
 
 	release_generator(generator);
 
-	TRACE(("create_id: name: %s, id: %ld", name, id));
+	TRACE(("dm_create_id: name: %s, id: %ld\n", name, id));
 	return id;
 }
 
@@ -207,7 +207,7 @@ dm_free_id(const char *name, uint32 id)
 {
 	id_generator *generator;
 
-	TRACE(("free_id(name: %s, id: %ld)\n", name, id));
+	TRACE(("dm_free_id(name: %s, id: %ld)\n", name, id));
 
 	// find generator	
 	benaphore_lock(&sGeneratorLock);
@@ -217,7 +217,7 @@ dm_free_id(const char *name, uint32 id)
 	benaphore_unlock(&sGeneratorLock);
 
 	if (generator == NULL) {
-		dprintf("Generator %s doesn't exist\n", name);
+		TRACE(("  Generator %s doesn't exist\n", name));
 		return B_NAME_NOT_FOUND;
 	}
 
@@ -226,7 +226,7 @@ dm_free_id(const char *name, uint32 id)
 	// make sure it's really allocated
 	// (very important to keep <num_ids> in sync
 	if ((generator->alloc_map[id / 8] & (1 << (id & 7))) == 0) {
-		dprintf("id %ld of generator %s wasn't allocated", id, generator->name);
+		dprintf("id %ld of generator %s wasn't allocated\n", id, generator->name);
 
 		release_generator(generator);
 		return B_BAD_VALUE;
