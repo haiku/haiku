@@ -460,7 +460,7 @@ status_t nv_acc_init_dma()
 			/* DMA target node is PCI */
 			ACCW(PR_CTX0_10, 0x00023002);
 			/* point at the DMA buffer via main system memory */
-			ACCW(PR_CTX2_10, (ACCR(PR_CTX2_C) +
+			ACCW(PR_CTX2_10, (ACCR(PR_CTX2_10) +
 				(((uint32)((uint8 *)(si->framebuffer_pci))) & 0xfffff000)));
 		}
 
