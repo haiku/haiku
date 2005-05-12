@@ -86,7 +86,7 @@
 	MIME fSignature.
 */
 ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
-		team_id clientTeamID, int32 handlerID, char *signature)
+					 team_id clientTeamID, int32 handlerID, const char* signature)
 		:
 		fClientAppPort(sendport),
 		fMessagePort(rcvport),
@@ -94,31 +94,22 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 		fSignature(signature),
 		fMonitorThreadID(-1),
 		fClientTeamID(clientTeamID),
-		fMsgReader(NULL),
-		fMsgSender(NULL),
-		fSWindowList(NULL),
-		fBitmapList(NULL),
-		fPictureList(NULL),
+		fMsgReader(new LinkMsgReader(fMessagePort)),
+		fMsgSender(new LinkMsgSender(fClientAppPort)),
+		fSWindowList(new BList()),
+		fBitmapList(new BList()),
+		fPictureList(new BList()),
 		fAppCursor(NULL),
-		fLockSem(-1),
+		fLockSem(create_sem(1, "ServerApp sem")),
 		fCursorHidden(false),
 		fIsActive(false),
 		//fHandlerToken(handlerID),
-		fSharedMem(NULL),
+		fSharedMem(new AreaPool),
 		fQuitting(false)
 {
 	if (fSignature == "")
 		fSignature = "application/x-vnd.NULL-application-signature";
 	
-	fMsgReader = new LinkMsgReader(fMessagePort);
-	fMsgSender = new LinkMsgSender(fClientAppPort);
-
-	fSWindowList = new BList();
-	fBitmapList = new BList();
-	fPictureList = new BList();
-	
-	fSharedMem = new AreaPool;
-
 	// although this isn't pretty, ATM we have only one RootLayer.
 	// there should be a way that this ServerApp be attached to a particular
 	// RootLayer to know which RootLayer's cursor to modify.
@@ -130,7 +121,7 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 		fAppCursor->SetOwningTeam(fClientTeamID);
 	}
 	
-	fLockSem = create_sem(1, "ServerApp sem");
+//	fLockSem = create_sem(1, "ServerApp sem");
 
 	Run();
 
@@ -753,7 +744,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
 			desktop->ActiveRootLayer()->GetDisplayDriver()->ShowCursor();
-			fCursorHidden=false;
+			fCursorHidden = false;
 			break;
 		}
 		case AS_HIDE_CURSOR:
@@ -763,7 +754,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// there should be a way that this ServerApp be attached to a particular
 			// RootLayer to know which RootLayer's cursor to modify.
 			desktop->ActiveRootLayer()->GetDisplayDriver()->HideCursor();
-			fCursorHidden=true;
+			fCursorHidden = true;
 			break;
 		}
 		case AS_OBSCURE_CURSOR:
@@ -803,7 +794,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			if(fAppCursor)
 				desktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(fAppCursor->ID());
 
-			fAppCursor=new ServerCursor(cdata);
+			fAppCursor = new ServerCursor(cdata);
 			fAppCursor->SetOwningTeam(fClientTeamID);
 			fAppCursor->SetAppSignature(fSignature.String());
 			desktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
@@ -1836,10 +1827,8 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&numChars);
 			
 			char charArray[numChars];			
-			BPoint offsetArray[numChars];
 			for (int32 i = 0; i < numChars; i++) {
 				msg.Read<char>(&charArray[i]);
-				msg.Read<BPoint>(&offsetArray[i]);
 			}
 			
 			port_id replyport;

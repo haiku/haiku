@@ -50,7 +50,7 @@ class ServerBitmap;
 class ServerApp {
 public:
 	ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
-		team_id clientTeamID, int32 handlerID, char *signature);
+		team_id clientTeamID, int32 handlerID, const char* signature);
 	virtual	~ServerApp(void);
 	
 	bool Run(void);
