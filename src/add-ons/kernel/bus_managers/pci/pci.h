@@ -13,7 +13,7 @@
 
 #define TRACE_PCI
 #ifndef TRACE_PCI
-#	define TRACE(x) ;
+#	define TRACE(x) 
 #else
 #	define TRACE(x) dprintf x
 #endif

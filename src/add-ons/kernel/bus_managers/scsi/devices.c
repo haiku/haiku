@@ -15,7 +15,7 @@
 
 #include "scsi_internal.h"
 
-#include <blkman.h>
+#include <block_io.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -121,7 +121,7 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 	// find maximum transfer blocks
 	// set default value to max (need something like ULONG_MAX here)
 	orig_max_blocks = ~0;		
-	pnp->get_attr_uint32(bus->node, BLKDEV_MAX_BLOCKS_ITEM, &orig_max_blocks, true);
+	pnp->get_attr_uint32(bus->node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &orig_max_blocks, true);
 
 	max_blocks = min(max_blocks, orig_max_blocks);
 
@@ -155,7 +155,7 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 			// ToDo: mapping is missing
 
 			// extra restriction of maximum number of blocks per transfer
-			{ BLKDEV_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: max_blocks }},
+			{ B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: max_blocks }},
 
 			// atapi emulation
 			{ SCSI_DEVICE_IS_ATAPI_ITEM, B_UINT8_TYPE, { ui8: is_atapi }},
