@@ -5,6 +5,8 @@ UseHeaders [ FDirName os interface ] ;
 
 SimpleTest Window :
 	main.cpp
+# for running in the Haiku app_server under R5:
 	: libopenbeos.so ;
+# for running natively under R5 or Haiku:
 #	: libbe.so ;
 

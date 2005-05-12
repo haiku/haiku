@@ -1,5 +1,7 @@
 #!/bin/sh
 
 ../../../../../distro/x86.R1/beos/system/servers/app_server &
-sleep 3s
+sleep 1s
+../../../../../distro/x86.R1/beos/system/servers/obos_registrar &
+sleep 1s
 ../../../../../tests/servers/app/windows/Window

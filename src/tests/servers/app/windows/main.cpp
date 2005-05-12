@@ -9,6 +9,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <String.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <View.h>
@@ -28,6 +29,16 @@ class HelloView : public BView {
 						rgb_color bg = ui_color(B_PANEL_BACKGROUND_COLOR);
 						SetViewColor(bg);
 						SetLowColor(bg);
+
+						BFont font;
+						GetFont(&font);
+						BString string("ß amM öo\t");
+						int32 charCount = string.CountChars();
+						float* escapements = new float[charCount];
+						font.GetEscapements(string.String(), charCount, NULL, escapements);
+						for (int32 i = 0; i < charCount; i++)
+							printf("escapement: %.3f\n", escapements[i]);
+						delete[] escapements;
 					}
 
 	virtual	void	Draw(BRect updateRect)
@@ -64,8 +75,14 @@ class HelloView : public BView {
 
 						DrawString(message, p);
 
-						SetHighColor(255, 255, 255, 128);
+//						SetDrawingMode(B_OP_OVER);
+SetDrawingMode(B_OP_ALPHA);
+SetPenSize(10.0);
+						SetHighColor(0, 80, 255, 100);
 						StrokeLine(fTrackingStart, fLastMousePos);
+// TODO: this should not be necessary with proper state stack
+// (a new state is pushed before Draw() is called)
+SetDrawingMode(B_OP_COPY);
 					}
 
 	virtual	void	MouseDown(BPoint where)
@@ -109,11 +126,15 @@ show_window(BRect frame, const char* name)
 	BMenuBar* menuBar = new BMenuBar(b, "menu bar");
 	window->AddChild(menuBar);
 
-	BMenu* menu = new BMenu("File");
+	BMenu* menu = new BMenu("Menus");
 	menuBar->AddItem(menu);
 
 	BMenuItem* menuItem = new BMenuItem("Quit", NULL, 'Q');
 	menu->AddItem(menuItem);
+
+	menuBar->AddItem(new BMenu("don't"));
+	menuBar->AddItem(new BMenu("work!"));
+	menuBar->AddItem(new BMenu("(yet)"));
 
 	b = window->Bounds();
 	b.top = menuBar->Bounds().bottom + 1;
@@ -123,7 +144,8 @@ show_window(BRect frame, const char* name)
 
 	b = bg->Bounds();
 	b.InsetBy(5.0, 5.0);
-	BView* view = new HelloView(b, "hello view", B_FOLLOW_ALL, B_WILL_DRAW);
+	BView* view = new HelloView(b, "hello view", B_FOLLOW_ALL,
+								B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 
 	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	bg->AddChild(view);
@@ -140,18 +162,21 @@ show_window(BRect frame, const char* name)
 	b.top = button->Frame().bottom + 5.0;
 	b.bottom = b.top + 35.0;
 	b.right += 50.0;
-//	BTextControl* textControl = new BTextControl(b, "text control", "Text", "<enter text here>", NULL);
-	BRect textRect(b);
-	textRect.OffsetTo(0.0, 0.0);
-	BTextView* textControl = new BTextView(b, "text view", textRect,
-										   B_FOLLOW_ALL, B_WILL_DRAW);
+	BTextControl* textControl = new BTextControl(b, "text control", "Text", "<enter text here>", NULL);
+	textControl->SetDivider(textControl->StringWidth(textControl->Label()) + 10.0);
 	view->AddChild(textControl);
-	textControl->SetText("This is a BTextView.");
-	textControl->MakeFocus(true);
+
+/*	BRect textRect(b);
+	textRect.OffsetTo(0.0, 0.0);
+	BTextView* textView = new BTextView(b, "text view", textRect,
+										B_FOLLOW_ALL, B_WILL_DRAW);
+	view->AddChild(textView);
+	textView->SetText("This is a BTextView.");
+	textView->MakeFocus(true);*/
 
 	// check box
 //	b.OffsetTo(5.0, view->Bounds().bottom - (b.Height() + 5.0));
-	BCheckBox* checkBox = new BCheckBox(b, "check box", "CheckBox", NULL);
+	BCheckBox* checkBox = new BCheckBox(b, "check box", "CheckBox", NULL, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	view->AddChild(checkBox);
 checkBox->MoveTo(5.0, view->Bounds().bottom - (b.Height() + 10.0));
 
@@ -168,8 +193,8 @@ main(int argc, char** argv)
 	BRect frame(50.0, 50.0, 200.0, 250.0);
 	show_window(frame, "Window #1");
 
-	frame.Set(80.0, 100.0, 350.0, 300.0);
-	show_window(frame, "Window #2");
+//	frame.Set(80.0, 100.0, 350.0, 300.0);
+//	show_window(frame, "Window #2");
 
 	app->Run();
 
