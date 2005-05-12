@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	VM helper functions.
@@ -11,7 +11,7 @@
 	list of length one.
 */
 
-#include "KernelExport_ext.h"
+#include "virtual_memory.h"
 #include "wrapper.h"
 
 #include <vm.h>
@@ -116,24 +116,5 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 		(int)*num_entries, (int)*mapped_len );
 
 	return B_OK;
-}
-
-
-/** map main memory into virtual address space */
-
-status_t
-map_mainmemory(addr_t physicalAddress, void **_virtualAddress)
-{
-	return vm_get_physical_page(physicalAddress, (addr_t *)_virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
-		// ToDo: check if CAN_WAIT is correct
-}
-
-
-/** unmap main memory from virtual address space */
-
-status_t
-unmap_mainmemory(void *virtualAddress)
-{
-	return vm_put_physical_page((addr_t)virtualAddress);
 }
 

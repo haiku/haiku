@@ -29,9 +29,8 @@
 */
 
 
-#include "blkman_int.h"
-#include "KernelExport_ext.h"
-#include <thread_types.h>
+#include "block_io_private.h"
+#include "virtual_memory.h"
 
 
 /**	get sg list of iovecs, taking dma boundaries and maximum size of
@@ -40,7 +39,7 @@
  */
 
 static int
-blkman_map_iovecs(iovec *vec, size_t vec_count, size_t vec_offset, size_t len,
+block_io_map_iovecs(iovec *vec, size_t vec_count, size_t vec_offset, size_t len,
 	phys_vecs *map, size_t max_phys_entries, size_t dma_boundary,
 	size_t max_sg_block_size)
 {
@@ -104,7 +103,7 @@ blkman_map_iovecs(iovec *vec, size_t vec_count, size_t vec_offset, size_t len,
  */
 
 static bool
-blkman_check_alignment(struct iovec *vecs, uint num_vecs, 
+block_io_check_alignment(struct iovec *vecs, uint num_vecs, 
 	size_t vec_offset, uint alignment)
 {
 	if (alignment == 0)
@@ -138,7 +137,7 @@ blkman_check_alignment(struct iovec *vecs, uint num_vecs,
  */
 
 static size_t
-blkman_lock_iovecs(struct iovec *vecs, uint num_vecs, 
+block_io_lock_iovecs(struct iovec *vecs, uint num_vecs, 
 	size_t vec_offset, size_t len, int flags)
 {
 	size_t orig_len = len;
@@ -172,7 +171,7 @@ blkman_lock_iovecs(struct iovec *vecs, uint num_vecs,
 /** unlock iovecs */
 
 static void
-blkman_unlock_iovecs(struct iovec *vecs, uint num_vecs, 
+block_io_unlock_iovecs(struct iovec *vecs, uint num_vecs, 
 	size_t vec_offset, size_t len, int flags)
 {
 	SHOW_FLOW(3, "len = %lu", len);
@@ -197,7 +196,7 @@ blkman_unlock_iovecs(struct iovec *vecs, uint num_vecs,
  */
 
 static void
-blkman_copy_buffer(char *buffer, struct iovec *vecs, uint num_vecs, 
+block_io_copy_buffer(char *buffer, struct iovec *vecs, uint num_vecs, 
 	size_t vec_offset, size_t len, bool to_buffer)
 {
 	for (; len > 0 && num_vecs > 0; ++vecs, --num_vecs) {
@@ -219,7 +218,7 @@ blkman_copy_buffer(char *buffer, struct iovec *vecs, uint num_vecs,
 /** determine number of bytes described by iovecs */
 
 static size_t
-blkman_iovec_len(struct iovec *vecs, uint num_vecs, size_t vec_offset)
+block_io_iovec_len(struct iovec *vecs, uint num_vecs, size_t vec_offset)
 {
 	size_t len = 0;
 
@@ -240,10 +239,10 @@ blkman_iovec_len(struct iovec *vecs, uint num_vecs, size_t vec_offset)
  */
 
 static inline status_t
-blkman_readwrite(blkman_handle_info *handle, off_t pos, struct iovec *vec,
+block_io_readwrite(block_io_handle_info *handle, off_t pos, struct iovec *vec,
 	int vec_count, size_t *total_len, bool need_locking, bool write)
 {
-	blkman_device_info *device = handle->device;
+	block_io_device_info *device = handle->device;
 	uint32 block_size, ld_block_size;
 	uint64 capacity;
 	bool need_buffer;
@@ -355,7 +354,7 @@ blkman_readwrite(blkman_handle_info *handle, off_t pos, struct iovec *vec,
 		// you deserve)
 		need_buffer = block_ofs != 0
 			|| len < block_size
-			|| !blkman_check_alignment(vec, vec_count, vec_offset, device->params.alignment);
+			|| !block_io_check_alignment(vec, vec_count, vec_offset, device->params.alignment);
 
 retry:			
 		if (need_buffer) {
@@ -365,7 +364,7 @@ retry:
 			SHOW_FLOW(1, "buffer required: len=%ld, block_ofs=%ld",
 				len, block_ofs);
 
-			acquire_sem(blkman_buffer_lock);
+			acquire_sem(block_io_buffer_lock);
 
 			// nobody helps us if there are too few iovecs, so test
 			// for that explicitely
@@ -373,7 +372,7 @@ retry:
 			//  we would get trouble when we try to round up to next
 			//  block size, which would lead to zero, making trouble
 			//  during lock)
-			tmp_len = blkman_iovec_len(vec, vec_count, vec_offset);
+			tmp_len = block_io_iovec_len(vec, vec_count, vec_offset);
 			tmp_len = min(tmp_len, len);
 
 			SHOW_FLOW(3, "tmp_len: %lu", tmp_len);
@@ -385,7 +384,7 @@ retry:
 
 				SHOW_FLOW0(3, "partial write at beginning: reading content of first block");
 				res = device->interface->read(handle->cookie, 
-					&blkman_buffer_phys_vec, block_pos, 
+					&block_io_buffer_phys_vec, block_pos, 
 					cur_blocks, block_size, &bytes_transferred);
 			} else {
 				// alignment problem or partial block read - find out how many
@@ -395,8 +394,8 @@ retry:
 				SHOW_FLOW(3, "cur_blocks: %ld", cur_blocks);
 
 				// restrict block count to buffer size
-				if (cur_blocks * block_size > blkman_buffer_size)
-					cur_blocks = blkman_buffer_size / block_size;
+				if (cur_blocks * block_size > block_io_buffer_size)
+					cur_blocks = block_io_buffer_size / block_size;
 			}
 
 			// copy data into buffer before write
@@ -404,12 +403,12 @@ retry:
 			if (write) {
 				SHOW_FLOW(3, "copy data to buffer (%ld bytes)",
 					cur_blocks * block_size - block_ofs);
-				blkman_copy_buffer(blkman_buffer + block_ofs, 
+				block_io_copy_buffer(block_io_buffer + block_ofs, 
 					vec, vec_count, vec_offset, cur_blocks * block_size - block_ofs, 
 					true);
 			}
 
-			cur_vecs = blkman_buffer_vec;
+			cur_vecs = block_io_buffer_vec;
 			cur_vec_count = 1;
 			cur_vec_offset = 0;
 		} else {
@@ -449,7 +448,7 @@ retry:
 
 				SHOW_FLOW(3, "trying to lock %lu bytes", cur_len);
 
-				locked_len = blkman_lock_iovecs(cur_vecs, cur_vec_count, 
+				locked_len = block_io_lock_iovecs(cur_vecs, cur_vec_count, 
 					cur_vec_offset, cur_len, B_DMA_IO | (write ? 0 : B_READ_DEVICE));
 
 				if (locked_len == cur_len)
@@ -469,7 +468,7 @@ retry:
 				// got less then one block locked - unlock and retry
 				SHOW_FLOW0(3, "too few bytes locked - trying again with fewer bytes");
 
-				blkman_unlock_iovecs(cur_vecs, cur_vec_count, cur_vec_offset, locked_len,
+				block_io_unlock_iovecs(cur_vecs, cur_vec_count, cur_vec_offset, locked_len,
 					 B_DMA_IO | (write ? 0 : B_READ_DEVICE));
 			}
 
@@ -495,7 +494,7 @@ retry:
 		// time to setup sg list
 		SHOW_FLOW0(3, "Creating SG list");
 
-		res = blkman_map_iovecs(cur_vecs, cur_vec_count, cur_vec_offset, cur_len, 
+		res = block_io_map_iovecs(cur_vecs, cur_vec_count, cur_vec_offset, cur_len, 
 				phys_vecs, device->params.max_sg_blocks, device->params.dma_boundary,
 				device->params.max_sg_block_size);
 
@@ -515,7 +514,7 @@ retry:
 				SHOW_FLOW0(3, "SG too small to handle even one block");
 
 				if (need_locking) {
-					blkman_unlock_iovecs(cur_vecs, cur_vec_count, cur_vec_offset,
+					block_io_unlock_iovecs(cur_vecs, cur_vec_count, cur_vec_offset,
 						cur_len, B_DMA_IO | (write ? 0 : B_READ_DEVICE));
 				}
 
@@ -553,7 +552,7 @@ retry:
 cannot_map:
 		// unlock data
 		if (need_locking) {
-			blkman_unlock_iovecs(cur_vecs, cur_vec_count, cur_vec_offset, 
+			block_io_unlock_iovecs(cur_vecs, cur_vec_count, cur_vec_offset, 
 				cur_len, B_DMA_IO | (write ? 0 : B_READ_DEVICE));
 		}
 
@@ -572,11 +571,11 @@ cannot_map:
 			if (!write) {
 				SHOW_FLOW(3, "copying data back from buffer (%ld bytes)",
 					bytes_transferred);
-				blkman_copy_buffer(blkman_buffer + block_ofs,
+				block_io_copy_buffer(block_io_buffer + block_ofs,
 					vec, vec_count, vec_offset, bytes_transferred, false);
 			}
 
-			release_sem(blkman_buffer_lock);
+			release_sem(block_io_buffer_lock);
 		}
 
 		len -= bytes_transferred;
@@ -592,7 +591,7 @@ cannot_map:
 
 err3:
 	if (need_buffer)
-		release_sem(blkman_buffer_lock);
+		release_sem(block_io_buffer_lock);
 err2:
 	locked_pool->free(device->phys_vecs_pool, phys_vecs);
 err:
@@ -605,18 +604,18 @@ err:
 
 
 static status_t
-blkman_readv_int(blkman_handle_info *handle, off_t pos, struct iovec *vec, 
+block_io_readv_int(block_io_handle_info *handle, off_t pos, struct iovec *vec, 
 	size_t vec_count, size_t *len, bool need_locking)
 {
-	return blkman_readwrite(handle, pos, vec, vec_count, len, need_locking, false);
+	return block_io_readwrite(handle, pos, vec, vec_count, len, need_locking, false);
 }
 
 
 static status_t
-blkman_writev_int(blkman_handle_info *handle, off_t pos, struct iovec *vec, 
+block_io_writev_int(block_io_handle_info *handle, off_t pos, struct iovec *vec, 
 	size_t vec_count, size_t *len, bool need_locking)
 {
-	return blkman_readwrite(handle, pos, vec, vec_count, len, need_locking, true);
+	return block_io_readwrite(handle, pos, vec, vec_count, len, need_locking, true);
 }
 
 
@@ -626,7 +625,7 @@ blkman_writev_int(blkman_handle_info *handle, off_t pos, struct iovec *vec,
  */
 
 static inline status_t
-blkman_readwritev(blkman_handle_info *handle, off_t pos, struct iovec *vec, 
+block_io_readwritev(block_io_handle_info *handle, off_t pos, struct iovec *vec, 
 	size_t vec_count, size_t *len, bool write)
 
 {
@@ -649,9 +648,9 @@ blkman_readwritev(blkman_handle_info *handle, off_t pos, struct iovec *vec,
 	*len = total_len;
 
 	if (write)
-		res = blkman_writev_int(handle, pos, vec, vec_count, len, true);
+		res = block_io_writev_int(handle, pos, vec, vec_count, len, true);
 	else
-		res = blkman_readv_int(handle, pos, vec, vec_count, len, true);
+		res = block_io_readv_int(handle, pos, vec, vec_count, len, true);
 
 	unlock_memory(vec, vec_count * sizeof(vec[0]), 0);
 
@@ -660,7 +659,7 @@ blkman_readwritev(blkman_handle_info *handle, off_t pos, struct iovec *vec,
 
 
 status_t
-blkman_readv(blkman_handle_info *handle, off_t pos, struct iovec *vec, 
+block_io_readv(block_io_handle_info *handle, off_t pos, struct iovec *vec, 
 	size_t vec_count, size_t *len)
 {
 /*	SHOW_FLOW( 4, "len=%d", (int)*len );
@@ -670,12 +669,12 @@ blkman_readv(blkman_handle_info *handle, off_t pos, struct iovec *vec,
 			(int)cur_vec->iov_base, (int)cur_vec->iov_len );
 	}*/
 
-	return blkman_readwritev(handle, pos, vec, vec_count, len, false);
+	return block_io_readwritev(handle, pos, vec, vec_count, len, false);
 }
 
 
 status_t
-blkman_read(blkman_handle_info *handle, off_t pos, void *buf, size_t *len)
+block_io_read(block_io_handle_info *handle, off_t pos, void *buf, size_t *len)
 {
 	iovec vec[1];
 
@@ -685,37 +684,37 @@ blkman_read(blkman_handle_info *handle, off_t pos, void *buf, size_t *len)
 	SHOW_FLOW0( 3, "" );
 
 	// This assumes that the thread stack is not paged,
-	// else you want to use blkman_readv
+	// else you want to use block_io_readv
 	// But this is not a problem, since kernel stacks
 	// are always paged in (since they can be used by
 	// an interrupt at any time)
-	return blkman_readv_int(handle, pos, vec, 1, len, true);
+	return block_io_readv_int(handle, pos, vec, 1, len, true);
 }
 
 
 ssize_t
-blkman_writev(blkman_handle_info *handle, off_t pos, struct iovec *vec, 
+block_io_writev(block_io_handle_info *handle, off_t pos, struct iovec *vec, 
 	size_t vec_count, ssize_t *len)
 {
-	return blkman_readwritev(handle, pos, vec, vec_count, len, true);
+	return block_io_readwritev(handle, pos, vec, vec_count, len, true);
 }
 
 
 ssize_t
-blkman_write(blkman_handle_info *handle, off_t pos, void *buf, size_t *len)
+block_io_write(block_io_handle_info *handle, off_t pos, void *buf, size_t *len)
 {
 	iovec vec[1];
 
 	vec[0].iov_base = buf;
 	vec[0].iov_len = *len;
 
-	// see blkman_read
-	return blkman_writev_int(handle, pos, vec, 1, len, true);
+	// see block_io_read
+	return block_io_writev_int(handle, pos, vec, 1, len, true);
 }
 
 
 void
-blkman_set_media_params(blkman_device_info *device, uint32 block_size,
+block_io_set_media_params(block_io_device_info *device, uint32 block_size,
 	uint32 ld_block_size, uint64 capacity)
 {
 	SHOW_FLOW(3, "block_size = %lu, ld_block_size = %lu, capacity = %Lu\n", block_size,

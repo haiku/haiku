@@ -32,7 +32,7 @@ cd_init_device(device_node_handle node, void *user_cookie, void **cookie)
 
 	memset(device, 0, sizeof(*device));
 
-	device->blkman_device = user_cookie;
+	device->block_io_device = user_cookie;
 	device->node = node;
 
 	res = pnp->get_attr_uint8(node, "removable", 
@@ -119,7 +119,7 @@ cd_device_added(device_node_handle node)
 		goto err;
 		
 	// get block limit of underlying hardware to lower it (if necessary)
-	if( pnp->get_attr_uint32( node, BLKDEV_MAX_BLOCKS_ITEM, 
+	if( pnp->get_attr_uint32( node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, 
 		&max_blocks, true ) != B_OK )
 		max_blocks = INT_MAX;
 
@@ -140,14 +140,14 @@ cd_device_added(device_node_handle node)
 	{
 		device_attr attrs[] = {
 			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_CD_MODULE_NAME }},
-			// we always want blkman on top of us
-			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: BLKMAN_MODULE_NAME }},
-			// tell blkman whether the device is removable
+			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: B_BLOCK_IO_MODULE_NAME }},
+
+			// tell block_io whether the device is removable
 			{ "removable", B_UINT8_TYPE, { ui8: device_inquiry->RMB }},
 			// tell which name we want to have in devfs
 			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
 			// impose own max block restriction
-			{ BLKDEV_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: max_blocks }},
+			{ B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: max_blocks }},
 			{ NULL }
 		};
 		status_t res;

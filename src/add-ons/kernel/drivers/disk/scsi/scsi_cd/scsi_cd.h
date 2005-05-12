@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI CD Driver

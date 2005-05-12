@@ -12,7 +12,7 @@
 #include <device_manager.h>
 #include "scsi_dsk.h"
 #include <bus/scsi/scsi_periph.h>
-#include <blkman.h>
+#include <block_io.h>
 
 #define debug_level_flow 0
 #define debug_level_info 1
@@ -28,7 +28,7 @@ typedef struct das_device_info {
 	scsi_periph_device scsi_periph_device;
 	scsi_device scsi_device;
 	scsi_device_interface *scsi;
-	blkman_device blkman_device;
+	block_io_device block_io_device;
 	
 	uint64 capacity;
 	uint32 block_size;
@@ -44,7 +44,7 @@ typedef struct das_handle_info {
 extern scsi_periph_interface *scsi_periph;
 extern device_manager_info *pnp;
 extern scsi_periph_callbacks callbacks;
-extern blkman_for_driver_interface *blkman;
+extern block_io_for_driver_interface *gBlockIO;
 
 
 // device_mgr.c

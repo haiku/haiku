@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI Peripheral Driver
@@ -12,7 +12,6 @@
 
 #include "scsi_periph_int.h"
 
-#include <blkman.h>
 #include <string.h>
 
 

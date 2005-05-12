@@ -12,11 +12,10 @@
 
 #include "scsi_periph_int.h"
 
-#include <blkman.h>
-
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
+
 
 #define SCSI_PERIPH_STD_TIMEOUT 10
 

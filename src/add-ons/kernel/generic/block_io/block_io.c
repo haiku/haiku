@@ -12,7 +12,7 @@
 */
 
 
-#include "blkman_int.h"
+#include "block_io_private.h"
 #include <stdio.h>
 
 
@@ -24,28 +24,28 @@
 #endif
 
 
-uint blkman_buffer_size;
-sem_id blkman_buffer_lock;
-struct iovec blkman_buffer_vec[1];
-void *blkman_buffer_phys;
-char *blkman_buffer;
-phys_vecs blkman_buffer_phys_vec;
-area_id blkman_buffer_area;
+uint block_io_buffer_size;
+sem_id block_io_buffer_lock;
+struct iovec block_io_buffer_vec[1];
+void *block_io_buffer_phys;
+char *block_io_buffer;
+phys_vecs block_io_buffer_phys_vec;
+static area_id block_io_buffer_area;
 
 locked_pool_interface *locked_pool;
 device_manager_info *pnp;
 
 
 static status_t
-blkman_open(blkman_device_info *device, uint32 flags, 
-	blkman_handle_info **res_handle)
+block_io_open(block_io_device_info *device, uint32 flags, 
+	block_io_handle_info **res_handle)
 {
-	blkman_handle_info *handle;
+	block_io_handle_info *handle;
 	status_t res;
 
-	TRACE(("blkman_open()\n"));
+	TRACE(("block_io_open()\n"));
 
-	handle = (blkman_handle_info *)malloc(sizeof(*handle));
+	handle = (block_io_handle_info *)malloc(sizeof(*handle));
 
 	if (handle == NULL)
 		return B_NO_MEMORY;
@@ -69,11 +69,11 @@ err:
 
 
 static status_t
-blkman_close(blkman_handle_info *handle)
+block_io_close(block_io_handle_info *handle)
 {
-	blkman_device_info *device = handle->device;
+	block_io_device_info *device = handle->device;
 
-	TRACE(("blkman_close()\n"));
+	TRACE(("block_io_close()\n"));
 
 	device->interface->close(handle->cookie);
 	return B_OK;
@@ -81,11 +81,11 @@ blkman_close(blkman_handle_info *handle)
 
 
 static status_t
-blkman_freecookie(blkman_handle_info *handle)
+block_io_freecookie(block_io_handle_info *handle)
 {
-	blkman_device_info *device = handle->device;
+	block_io_device_info *device = handle->device;
 
-	TRACE(("blkman_freecookie()\n"));
+	TRACE(("block_io_freecookie()\n"));
 
 	device->interface->free(handle->cookie);
 	free(handle);
@@ -101,7 +101,7 @@ blkman_freecookie(blkman_handle_info *handle)
  */
 
 static status_t
-verify_checksum(blkman_handle_info *handle, uint64 offset, uint32 len, uint32 chksum)
+verify_checksum(block_io_handle_info *handle, uint64 offset, uint32 len, uint32 chksum)
 {
 	void *buffer;
 	uint32 readlen;
@@ -115,7 +115,7 @@ verify_checksum(blkman_handle_info *handle, uint64 offset, uint32 len, uint32 ch
 
 	readlen = len;
 
-	res = blkman_read(handle, offset, buffer, &readlen);
+	res = block_io_read(handle, offset, buffer, &readlen);
 	if (res < B_OK || readlen < len)
 		goto err;
 
@@ -138,10 +138,10 @@ err:
 /** store BIOS drive id in node's attribute */
 
 static status_t
-store_bios_drive_in_node(blkman_device_info *device)
+store_bios_drive_in_node(block_io_device_info *device)
 {
 	device_attr attribute = {
-		BLKDEV_BIOS_ID, B_UINT8_TYPE, { ui8: 
+		B_BLOCK_DEVICE_BIOS_ID, B_UINT8_TYPE, { ui8: 
 			device->bios_drive != NULL ? device->bios_drive->bios_id : 0 }
 	};
 
@@ -153,15 +153,15 @@ store_bios_drive_in_node(blkman_device_info *device)
  *	this must be called whenever someone wants to access BIOS infos about the drive;
  *	there are two reasons to not call this during probe():
  *	 - perhaps nobody is interested in BIOS info
- *	 - we need a working blkman device to handle lower level driver 
+ *	 - we need a working block_io device to handle lower level driver 
  *	   restrictions, so this method can only be safely called once the 
  *	   node has been loaded
  */
 
 static void
-find_bios_drive_info(blkman_handle_info *handle)
+find_bios_drive_info(block_io_handle_info *handle)
 {
-	blkman_device_info *device = handle->device;
+	block_io_device_info *device = handle->device;
 	bios_drive *drive = NULL; //, *colliding_drive;
 	char name[32];
 	uint8 bios_id;
@@ -174,7 +174,7 @@ find_bios_drive_info(blkman_handle_info *handle)
 
 	// check whether BIOS info was found during one of the previous	
 	// loads
-	if (pnp->get_attr_uint8(device->node, BLKDEV_BIOS_ID, &bios_id, false) == B_OK) {
+	if (pnp->get_attr_uint8(device->node, B_BLOCK_DEVICE_BIOS_ID, &bios_id, false) == B_OK) {
 		TRACE(("use previous BIOS ID 0x%x\n", bios_id));
 
 // ToDo: this assumes private R5 kernel functions to be present
@@ -287,9 +287,9 @@ no_bios_drive:
 
 
 static status_t
-blkman_ioctl(blkman_handle_info *handle, uint32 op, void *buf, size_t len)
+block_io_ioctl(block_io_handle_info *handle, uint32 op, void *buf, size_t len)
 {
-	blkman_device_info *device = handle->device;
+	block_io_device_info *device = handle->device;
 	status_t res;
 
 	if (device->is_bios_drive) {
@@ -340,17 +340,17 @@ blkman_ioctl(blkman_handle_info *handle, uint32 op, void *buf, size_t len)
 
 
 static status_t
-blkman_register_device(device_node_handle parent)
+block_io_register_device(device_node_handle parent)
 {
-	TRACE(("blkman_probe()\n"));
+	TRACE(("block_io_register_device()\n"));
 
 	// ready to register at devfs
 	{
 		device_attr attrs[] = {
-			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: BLKMAN_MODULE_NAME }},
-			// we always want devfs on top of us
+			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: B_BLOCK_IO_MODULE_NAME }},
+			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "block_io" }},
+
 			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
-			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "blkman" }},
 			{ NULL }
 		};
 
@@ -362,13 +362,13 @@ blkman_register_device(device_node_handle parent)
 
 
 static void
-blkman_remove(device_node_handle node, void *cookie)
+block_io_remove(device_node_handle node, void *cookie)
 {
 	uint8 bios_id;
 	//bios_drive *drive;
 
 	// if this drive has a BIOS ID, remove it from BIOS drive list
-	if (pnp->get_attr_uint8(node, BLKDEV_BIOS_ID, &bios_id, false) != B_OK
+	if (pnp->get_attr_uint8(node, B_BLOCK_DEVICE_BIOS_ID, &bios_id, false) != B_OK
 		|| bios_id == 0 )
 		return;
 
@@ -388,26 +388,26 @@ blkman_remove(device_node_handle node, void *cookie)
 
 
 static status_t
-blkman_init_device(device_node_handle node, void *user_cookie, void **cookie)
+block_io_init_device(device_node_handle node, void *user_cookie, void **cookie)
 {
-	blkman_device_info *device;
-	blkdev_params params;
+	block_io_device_info *device;
+	block_device_params params;
 	char *name, *tmp_name;
 	uint8 is_bios_drive;
 	status_t res;
 
-	TRACE(("blkman_init_device()\n"));
+	TRACE(("block_io_init_device()\n"));
 
 	// extract controller/protocoll restrictions from node
-	if (pnp->get_attr_uint32(node, BLKDEV_DMA_ALIGNMENT, &params.alignment, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_DMA_ALIGNMENT, &params.alignment, true) != B_OK)
 		params.alignment = 0;
-	if (pnp->get_attr_uint32(node, BLKDEV_MAX_BLOCKS_ITEM, &params.max_blocks, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &params.max_blocks, true) != B_OK)
 		params.max_blocks = 0xffffffff;
-	if (pnp->get_attr_uint32(node, BLKDEV_DMA_BOUNDARY, &params.dma_boundary, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_DMA_BOUNDARY, &params.dma_boundary, true) != B_OK)
 		params.dma_boundary = ~0;
-	if (pnp->get_attr_uint32(node, BLKDEV_MAX_SG_BLOCK_SIZE, &params.max_sg_block_size, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, &params.max_sg_block_size, true) != B_OK)
 		params.max_sg_block_size = 0xffffffff;
-	if (pnp->get_attr_uint32(node, BLKDEV_MAX_SG_BLOCKS, &params.max_sg_blocks, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_SG_BLOCKS, &params.max_sg_blocks, true) != B_OK)
 		params.max_sg_blocks = ~0;
 
 	// do some sanity check:
@@ -439,7 +439,7 @@ blkman_init_device(device_node_handle node, void *user_cookie, void **cookie)
 	// (they consume 4KB and can describe up to 2MB virtual cont. memory!)
 	params.max_sg_blocks = min(params.max_sg_blocks, 512);
 
-	if (pnp->get_attr_uint8(node, BLKDEV_IS_BIOS_DRIVE, &is_bios_drive, true) != B_OK)
+	if (pnp->get_attr_uint8(node, B_BLOCK_DEVICE_IS_BIOS_DRIVE, &is_bios_drive, true) != B_OK)
 		is_bios_drive = false;
 
 	// we don't really care about /dev name, but if it is 
@@ -449,7 +449,7 @@ blkman_init_device(device_node_handle node, void *user_cookie, void **cookie)
 		return B_ERROR;
 	}
 
-	device = (blkman_device_info *)malloc(sizeof(*device));
+	device = (block_io_device_info *)malloc(sizeof(*device));
 	if (device == NULL) {
 		res = B_NO_MEMORY;
 		goto err1;
@@ -459,7 +459,7 @@ blkman_init_device(device_node_handle node, void *user_cookie, void **cookie)
 
 	device->node = node;
 
-	res = benaphore_init(&device->lock, "blkdev_mutex");
+	res = benaphore_init(&device->lock, "block_device_mutex");
 	if (res < 0)
 		goto err2;
 
@@ -517,7 +517,7 @@ err1:
 
 
 static status_t
-blkman_uninit_device(blkman_device_info *device)
+block_io_uninit_device(block_io_device_info *device)
 {
 	pnp->uninit_driver(pnp->get_parent(device->node));
 
@@ -530,54 +530,54 @@ blkman_uninit_device(blkman_device_info *device)
 
 
 static status_t
-blkman_init_buffer(void)
+block_io_init_buffer(void)
 {
 	physical_entry physicalTable[2];
 	status_t res;
 
-	TRACE(("blkman_init_buffer()\n"));
+	TRACE(("block_io_init_buffer()\n"));
 
-	blkman_buffer_size = 32*1024;
+	block_io_buffer_size = 32*1024;
 
-	blkman_buffer_lock = create_sem(1, "blkman_buffer_mutex");
-	if (blkman_buffer_lock < 0) {
-		res = blkman_buffer_lock;
+	block_io_buffer_lock = create_sem(1, "block_io_buffer_mutex");
+	if (block_io_buffer_lock < 0) {
+		res = block_io_buffer_lock;
 		goto err1;
 	}
 
-	res = blkman_buffer_area = create_area("blkman_buffer", 
-		(void **)&blkman_buffer, B_ANY_KERNEL_ADDRESS, 
-		blkman_buffer_size, B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+	res = block_io_buffer_area = create_area("block_io_buffer", 
+		(void **)&block_io_buffer, B_ANY_KERNEL_ADDRESS, 
+		block_io_buffer_size, B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (res < 0)
 		goto err2;
 
-	res = get_memory_map(blkman_buffer, blkman_buffer_size, physicalTable, 2);
+	res = get_memory_map(block_io_buffer, block_io_buffer_size, physicalTable, 2);
 	if (res < 0)
 		goto err3;
 
-	blkman_buffer_vec[0].iov_base = blkman_buffer;
-	blkman_buffer_vec[0].iov_len = blkman_buffer_size;
+	block_io_buffer_vec[0].iov_base = block_io_buffer;
+	block_io_buffer_vec[0].iov_len = block_io_buffer_size;
 
-	blkman_buffer_phys_vec.num = 1;
-	blkman_buffer_phys_vec.total_len = blkman_buffer_size;
-	blkman_buffer_phys_vec.vec[0] = physicalTable[0];
+	block_io_buffer_phys_vec.num = 1;
+	block_io_buffer_phys_vec.total_len = block_io_buffer_size;
+	block_io_buffer_phys_vec.vec[0] = physicalTable[0];
 
 	return B_OK;
 
 err3:
-	delete_area(blkman_buffer_area);
+	delete_area(block_io_buffer_area);
 err2:
-	delete_sem(blkman_buffer_lock);
+	delete_sem(block_io_buffer_lock);
 err1:
 	return res;
 }
 
 
 static status_t
-blkman_uninit_buffer(void)
+block_io_uninit_buffer(void)
 {
-	delete_area(blkman_buffer_area);	
-	delete_sem(blkman_buffer_lock);
+	delete_area(block_io_buffer_area);	
+	delete_sem(block_io_buffer_lock);
 
 	return B_OK;
 }
@@ -588,9 +588,9 @@ std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			return blkman_init_buffer();
+			return block_io_init_buffer();
 		case B_MODULE_UNINIT:
-			blkman_uninit_buffer();
+			block_io_uninit_buffer();
 			return B_OK;
 
 		default:
@@ -606,38 +606,38 @@ module_dependency module_dependencies[] = {
 };
 
 
-pnp_devfs_driver_info blkman_module = {
+pnp_devfs_driver_info block_io_module = {
 	{
 		{
-			BLKMAN_MODULE_NAME,
+			B_BLOCK_IO_MODULE_NAME,
 			0,
 
 			std_ops
 		},
 
 		NULL,	// supports device		
-		blkman_register_device,
-		blkman_init_device,
-		(status_t (*)( void * )) blkman_uninit_device,
-		blkman_remove,
+		block_io_register_device,
+		block_io_init_device,
+		(status_t (*)( void * )) block_io_uninit_device,
+		block_io_remove,
 		NULL,	// cleanup
 		NULL,	// get paths
 	},
 
-	(status_t (*)(void *, uint32, void **))blkman_open,
-	(status_t (*)(void *))blkman_close,
-	(status_t (*)(void *))blkman_freecookie,
+	(status_t (*)(void *, uint32, void **))block_io_open,
+	(status_t (*)(void *))block_io_close,
+	(status_t (*)(void *))block_io_freecookie,
 
-	(status_t (*)(void *, uint32, void *, size_t))blkman_ioctl,
+	(status_t (*)(void *, uint32, void *, size_t))block_io_ioctl,
 
-	(status_t (*)(void *, off_t, void *, size_t *))blkman_read,
-	(status_t (*)(void *, off_t, const void *, size_t *))blkman_write,
+	(status_t (*)(void *, off_t, void *, size_t *))block_io_read,
+	(status_t (*)(void *, off_t, const void *, size_t *))block_io_write,
 
 	NULL,
 	NULL,
 
-	(status_t (*)(void *, off_t, const iovec *, size_t, size_t *))blkman_readv,
-	(status_t (*)(void *, off_t, const iovec *, size_t, size_t *))blkman_writev
+	(status_t (*)(void *, off_t, const iovec *, size_t, size_t *))block_io_readv,
+	(status_t (*)(void *, off_t, const iovec *, size_t, size_t *))block_io_writev
 };
 
 
@@ -657,19 +657,19 @@ std_ops_for_driver(int32 op, ...)
 }
 
 
-blkman_for_driver_interface blkman_for_driver_module = {
+block_io_for_driver_interface block_io_for_driver_module = {
 	{
-		BLKMAN_FOR_DRIVER_MODULE_NAME,
+		B_BLOCK_IO_FOR_DRIVER_MODULE_NAME,
 		0,
 
 		std_ops_for_driver
 	},
 
-	blkman_set_media_params,
+	block_io_set_media_params,
 };
 
 module_info *modules[] = {
-	&blkman_module.info.info,
-	&blkman_for_driver_module.minfo,
+	&block_io_module.info.info,
+	&block_io_for_driver_module.info,
 	NULL
 };

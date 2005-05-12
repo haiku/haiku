@@ -6,10 +6,12 @@
 #define __SCSI_PERIPH_INT_H__
 
 
-#include <stddef.h>
 #include <bus/scsi/scsi_periph.h>
-#include <blkman.h>
+#include <block_io.h>
 #include <device_manager.h>
+
+#include <stddef.h>
+
 #include "wrapper.h"
 
 

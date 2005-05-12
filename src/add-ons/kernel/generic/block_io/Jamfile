@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel generic blkman ;
+SubDir OBOS_TOP src add-ons kernel generic block_io ;
 
 UsePrivateHeaders kernel ;
 UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
@@ -9,8 +9,8 @@ if $(DEBUG) = 0 {
 	SubDirCcFlags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0  ] ;
 }
 
-KernelAddon blkman : kernel generic :
-	blkman.c
+KernelAddon block_io : kernel generic :
+	block_io.c
 	io.c
 	virtual_memory.c
 	;

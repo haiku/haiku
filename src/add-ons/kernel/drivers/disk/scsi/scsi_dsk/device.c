@@ -32,7 +32,7 @@ das_init_device(device_node_handle node, void *user_cookie, void **cookie)
 
 	memset(device, 0, sizeof(*device));
 
-	device->blkman_device = user_cookie;
+	device->block_io_device = user_cookie;
 	device->node = node;
 
 	res = pnp->get_attr_uint8(node, "removable", 
@@ -92,7 +92,7 @@ das_uninit_device(das_device_info *device)
 
 /**	called whenever a new device was added to system;
  *	if we really support it, we create a new node that gets
- *	server by blkdev
+ *	server by the block_io module
  */
 
 status_t
@@ -116,12 +116,12 @@ das_device_added(device_node_handle node)
 		goto err;
 
 	// get block limit of underlying hardware to lower it (if necessary)
-	if (pnp->get_attr_uint32(node, BLKDEV_MAX_BLOCKS_ITEM, &max_blocks, true) != B_OK)
+	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &max_blocks, true) != B_OK)
 		max_blocks = INT_MAX;
 
 	// using 10 byte commands, at most 0xffff blocks can be transmitted at once
 	// (sadly, we cannot update this value later on if only 6 byte commands
-	//  are supported, but the blkdev can live with that)	
+	//  are supported, but the block_io module can live with that)	
 	max_blocks = min(max_blocks, 0xffff);
 
 	name = scsi_periph->compose_device_name(node, "disk/scsi");
@@ -136,16 +136,15 @@ das_device_added(device_node_handle node)
 	{
 		device_attr attrs[] = {
 			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_DSK_MODULE_NAME }},
-			// we always want blkman on top of us
-			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: BLKMAN_MODULE_NAME }},
-			// tell blkman whether the device is removable
+			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: B_BLOCK_IO_MODULE_NAME }},
+			// tell block_io whether the device is removable
 			{ "removable", B_UINT8_TYPE, { ui8: device_inquiry->RMB }},
 			// tell which name we want to have in devfs
 			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
 			// impose own max block restriction
-			{ BLKDEV_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: max_blocks }},
+			{ B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: max_blocks }},
 			// in general, any disk can be a BIOS drive (even ZIP-disks)
-			{ BLKDEV_IS_BIOS_DRIVE, B_UINT8_TYPE, { ui8: 1 }},
+			{ B_BLOCK_DEVICE_IS_BIOS_DRIVE, B_UINT8_TYPE, { ui8: 1 }},
 			{ NULL }
 		};
 

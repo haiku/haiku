@@ -21,11 +21,11 @@
 #include <stdlib.h>
 
 
-extern blkdev_interface das_interface;
+extern block_device_interface das_interface;
 
 scsi_periph_interface *scsi_periph;
 device_manager_info *pnp;
-blkman_for_driver_interface *blkman;
+block_io_for_driver_interface *gBlockIO;
 
 
 static status_t
@@ -161,7 +161,7 @@ das_set_capacity(das_device_info *device, uint64 capacity,
 	device->capacity = capacity;
 	device->block_size = block_size;
 
-	blkman->set_media_params(device->blkman_device, block_size, 
+	gBlockIO->set_media_params(device->block_io_device, block_size, 
 		ld_block_size, capacity);
 }
 
@@ -271,12 +271,12 @@ std_ops(int32 op, ...)
 
 module_dependency module_dependencies[] = {
 	{ SCSI_PERIPH_MODULE_NAME, (module_info **)&scsi_periph },
-	{ BLKMAN_FOR_DRIVER_MODULE_NAME, (module_info **)&blkman },
+	{ B_BLOCK_IO_FOR_DRIVER_MODULE_NAME, (module_info **)&gBlockIO },
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{}
 };
 
-blkdev_interface scsi_dsk_module = {
+block_device_interface scsi_dsk_module = {
 	{
 		{
 			SCSI_DSK_MODULE_NAME,
@@ -293,16 +293,16 @@ blkdev_interface scsi_dsk_module = {
 		das_get_paths,
 	},
 
-	(status_t (*)(blkdev_device_cookie, blkdev_handle_cookie *)) &das_open,
-	(status_t (*)(blkdev_handle_cookie))						&das_close,
-	(status_t (*)(blkdev_handle_cookie))						&das_free,
+	(status_t (*)(block_device_device_cookie, block_device_handle_cookie *))&das_open,
+	(status_t (*)(block_device_handle_cookie))					&das_close,
+	(status_t (*)(block_device_handle_cookie))					&das_free,
 
-	(status_t (*)(blkdev_handle_cookie, const phys_vecs *,
+	(status_t (*)(block_device_handle_cookie, const phys_vecs *,
 		off_t, size_t, uint32, size_t *))						&das_read,
-	(status_t (*)(blkdev_handle_cookie, const phys_vecs *,
+	(status_t (*)(block_device_handle_cookie, const phys_vecs *,
 		off_t, size_t, uint32, size_t *))						&das_write,
 
-	(status_t (*)(blkdev_handle_cookie, int, void *, size_t))	&das_ioctl,
+	(status_t (*)(block_device_handle_cookie, int, void *, size_t))&das_ioctl,
 };
 
 #if !_BUILDING_kernel && !BOOT
