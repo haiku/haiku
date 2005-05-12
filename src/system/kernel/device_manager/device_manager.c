@@ -26,7 +26,7 @@
 #endif
 
 
-device_node_info *gNodeList;
+device_node_info *gRootNode;
 
 bool disable_useraddons;
 
@@ -35,17 +35,13 @@ sem_id pnp_resource_wait_sem;
 
 io_resource_info *io_mem_list, *io_port_list, *isa_dma_list;
 
-#if 0
-void
-check_settings()
+
+static int
+dump_device_nodes(int argc, char **argv)
 {
-	void *settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
-
-	disable_useraddons = get_driver_boolean_parameter(settings, "disableuseraddons", 0, 1);
-
-	unload_driver_settings(settings);
+	dm_dump_node(gRootNode, 0);
+	return 0;
 }
-#endif	
 
 
 static status_t
@@ -70,7 +66,7 @@ std_ops(int32 op, ...)
 
 device_manager_info gDeviceManagerModule = {
 	{
-		DEVICE_MANAGER_MODULE_NAME,
+		B_DEVICE_MANAGER_MODULE_NAME,
 		0,
 		std_ops
 	},
@@ -78,20 +74,21 @@ device_manager_info gDeviceManagerModule = {
 	pnp_load_driver,
 	pnp_unload_driver,
 
-	pnp_rescan,
+	dm_rescan,
 
-	pnp_register_device,
-	pnp_unregister_device,
+	dm_register_node,
+	dm_unregister_node,
 
-	pnp_acquire_io_resources,
-	pnp_release_io_resources,
+	dm_get_next_child_node,
+	dm_get_parent,
+	dm_put_node,
 
-	pnp_find_device,
+	dm_acquire_io_resources,
+	dm_release_io_resources,
 
-	pnp_create_id,
-	pnp_free_id,
+	dm_create_id,
+	dm_free_id,
 
-	pnp_get_parent,	
 	pnp_get_attr_uint8,
 	pnp_get_attr_uint16,
 	pnp_get_attr_uint32,
@@ -102,7 +99,8 @@ device_manager_info gDeviceManagerModule = {
 	pnp_get_next_attr,
 	pnp_release_attr,
 	pnp_retrieve_attr,
-	pnp_write_attr
+	pnp_write_attr,
+	NULL	// remove_attr
 };
 
 
@@ -119,13 +117,13 @@ device_manager_init(struct kernel_args *args)
 
 	TRACE(("device manager init\n"));
 
-	status = id_generator_init();
+	status = dm_init_id_generator();
 	if (status < B_OK) {
 		panic("could not initialize ID generator\n");
 		return status;
 	}
 
-	status = nodes_init();
+	status = dm_init_nodes();
 	if (status < B_OK) {
 		panic("could not initialize device nodes\n");
 		return status;
@@ -141,14 +139,14 @@ device_manager_init(struct kernel_args *args)
 	io_mem_list = io_port_list = isa_dma_list = NULL;
 	pnp_fs_emulation_nesting = 0;
 
-	pnp_root_init_root();
+	dm_init_root_node();
 
 	{
 		// dump root node
-		device_node_info *node = gNodeList;
+		device_node_info *node = gRootNode;
 		while (node && node->parent != NULL)
 			node = node->parent;
-		dump_device_node_info(node, 0);
+		dm_dump_node(node, 0);
 	}
 
 	// build initial device tree; register all root bus_managers
@@ -164,6 +162,7 @@ device_manager_init(struct kernel_args *args)
 	}
 #endif
 
+	add_debugger_command("dm_tree", &dump_device_nodes, "dump device node tree");
 	return B_OK;
 }
 

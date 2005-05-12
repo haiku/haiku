@@ -1,7 +1,7 @@
 /*
-** Copyright 2002-04, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-04, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI bus manager
@@ -35,12 +35,16 @@ static status_t
 scsi_bus_raw_init_device(device_node_handle node,
 	void *userCookie, void **cookie)
 {
+	device_node_handle parent = pnp->get_parent(node);
 	bus_raw_info *bus;
 	scsi_bus_interface *interface;
 	scsi_bus bus_cookie;
 
-	status_t res = pnp->load_driver(pnp->get_parent(node), NULL, 
+	status_t res = pnp->init_driver(parent, NULL, 
 		(driver_module_info **)&interface, (void **)&bus_cookie);
+
+	pnp->put_device_node(parent);
+
 	if (res != B_OK)
 		return res;
 
@@ -57,11 +61,13 @@ scsi_bus_raw_init_device(device_node_handle node,
 static status_t
 scsi_bus_raw_uninit_device(bus_raw_info *bus)
 {
-	status_t res;
+	device_node_handle parent = pnp->get_parent(bus->node);
+	status_t status = pnp->uninit_driver(parent);
 
-	res = pnp->unload_driver(pnp->get_parent(bus->node));
-	if (res != B_OK)
-		return res;
+	pnp->put_device_node(parent);
+
+	if (status != B_OK)
+		return status;
 
 	free(bus);
 	return B_OK;
@@ -86,13 +92,11 @@ scsi_bus_raw_probe(device_node_handle parent)
 
 	{
 		device_attr attributes[] = {
-			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: SCSI_BUS_RAW_MODULE_NAME }},
-			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_DEVFS_TYPE_NAME }},
-			{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
+			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_BUS_RAW_MODULE_NAME }},
+			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
 
 			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "bus_raw" }},
-			{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "bus_raw" }},
-			
+
 			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
 			{}
 		};
@@ -185,9 +189,10 @@ pnp_devfs_driver_info scsi_bus_raw_module = {
 			std_ops
 		},
 
+		NULL,
+		scsi_bus_raw_probe,
 		scsi_bus_raw_init_device,
 		(status_t (*) (void *))scsi_bus_raw_uninit_device,
-		scsi_bus_raw_probe,
 		NULL,
 		NULL
 	},

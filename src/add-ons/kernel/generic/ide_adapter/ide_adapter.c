@@ -301,17 +301,18 @@ ide_adapter_finish_dma(ide_adapter_channel_info *channel)
 		if (status.active) {
 			SHOW_ERROR0( 2, "DMA transfer aborted" );
 			return B_ERROR;
-		} else {
-			SHOW_ERROR0( 2, "DMA transfer: buffer underrun" );
-			return B_DEV_DATA_UNDERRUN;
 		}
-	} else {
-		if (status.active) {
-			SHOW_ERROR0( 2, "DMA transfer: buffer too large" );
-			return B_DEV_DATA_OVERRUN;
-		} else
-			return B_OK;
+
+		SHOW_ERROR0( 2, "DMA transfer: buffer underrun" );
+		return B_DEV_DATA_UNDERRUN;
 	}
+
+	if (status.active) {
+		SHOW_ERROR0( 2, "DMA transfer: buffer too large" );
+		return B_DEV_DATA_OVERRUN;
+	}
+
+	return B_OK;
 }
 
 
@@ -336,7 +337,7 @@ ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 		|| pnp->get_attr_uint8(node, IDE_ADAPTER_IS_PRIMARY, &is_primary, false) != B_OK)
 		return B_ERROR;
 
-	if (pnp->load_driver(pnp->get_parent(node), NULL, NULL, (void **)&controller) != B_OK)
+	if (pnp->init_driver(pnp->get_parent(node), NULL, NULL, (void **)&controller) != B_OK)
 		return B_ERROR;
 
 	channel = (ide_adapter_channel_info *)malloc(total_data_size);
@@ -389,7 +390,7 @@ ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 err3:
 	delete_area(channel->prd_area);
 err2:
-	pnp->unload_driver(pnp->get_parent(node));
+	pnp->uninit_driver(pnp->get_parent(node));
 err:
 	free(channel);
 
@@ -410,7 +411,7 @@ ide_adapter_uninit_channel(ide_adapter_channel_info *channel)
 
 	remove_io_interrupt_handler(channel->intnum, channel->inthand, channel);
 
-	pnp->unload_driver( pnp->get_parent(channel->node));
+	pnp->uninit_driver( pnp->get_parent(channel->node));
 
 	delete_area(channel->prd_area);
 	free(channel);
@@ -441,14 +442,10 @@ ide_adapter_publish_channel(device_node_handle controller_node,
 {
 	device_attr attrs[] = {
 		// info about ourself and our consumer
-		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: channel_module_name }},
-		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: IDE_BUS_TYPE_NAME }},
-		{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: IDE_FOR_CONTROLLER_MODULE_NAME }},
+		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: channel_module_name }},
+		{ B_DRIVER_PRETTY_NAME, B_STRING_TYPE, { string: "IDE PCI" }},
 		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: name }},
-		{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "IDE PCI" }},
-
-		// disable automatic rescan as we register channels manually
-		{ PNP_DRIVER_NEVER_RESCAN, B_UINT8_TYPE, { ui8 : 1 }},
+		{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: IDE_FOR_CONTROLLER_MODULE_NAME }},
 
 		// private data to identify channel
 		{ IDE_ADAPTER_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { ui16: command_block_base }},
@@ -459,7 +456,7 @@ ide_adapter_publish_channel(device_node_handle controller_node,
 		{ NULL }
 	};
 
-	SHOW_FLOW0( 2, "" );
+	SHOW_FLOW0(2, "");
 
 	return pnp->register_device(controller_node, attrs, resources, node);
 }
@@ -557,7 +554,7 @@ ide_adapter_init_controller(device_node_handle node, void *user_cookie,
 	if (pnp->get_attr_uint16(node, IDE_ADAPTER_BUS_MASTER_BASE, &bus_master_base, false) != B_OK)
 		return B_ERROR;
 
-	if (pnp->load_driver(pnp->get_parent(node), NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
+	if (pnp->init_driver(pnp->get_parent(node), NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
 		return B_ERROR;
 
 	controller = (ide_adapter_controller_info *)malloc(total_data_size);
@@ -579,7 +576,7 @@ ide_adapter_init_controller(device_node_handle node, void *user_cookie,
 static status_t
 ide_adapter_uninit_controller(ide_adapter_controller_info *controller)
 {
-	pnp->unload_driver(pnp->get_parent(controller->node));
+	pnp->uninit_driver(pnp->get_parent(controller->node));
 
 	free(controller);
 
@@ -609,10 +606,7 @@ ide_adapter_publish_controller(device_node_handle parent, uint16 bus_master_base
 {
 	device_attr attrs[] = {
 		// info about ourself and our consumer
-		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: controller_driver }},
-		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: controller_driver_type }},
-		// don't scan if loaded as we own I/O resources
-		{ PNP_DRIVER_NO_LIVE_RESCAN, B_UINT8_TYPE, { ui8: 1 }},
+		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: controller_driver }},
 
 		// properties of this controller for ide bus manager
 		// there are always max. 2 devices 
@@ -699,7 +693,7 @@ ide_adapter_probe_controller(device_node_handle parent, const char *controller_d
 
 	SHOW_FLOW0( 3, "" );
 
-	if (pnp->load_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
+	if (pnp->init_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
 		return B_ERROR;
 
 	command_block_base[0] = pci->read_pci_config(device, PCI_base_registers, 4 );
@@ -726,12 +720,12 @@ ide_adapter_probe_controller(device_node_handle parent, const char *controller_d
 		can_dma, command_block_base[0], control_block_base[0], bus_master_base,
 		intnum, false, "Secondary Channel", &channels[1], supports_compatibility_mode);
 	
-	pnp->unload_driver(parent);
+	pnp->uninit_driver(parent);
 		
 	return B_OK;
 	
 err:
-	pnp->unload_driver(parent);	
+	pnp->uninit_driver(parent);	
 	return res;
 }
 
@@ -752,7 +746,7 @@ std_ops(int32 op, ...)
 
 module_dependency module_dependencies[] = {
 	{ IDE_FOR_CONTROLLER_MODULE_NAME, (module_info **)&ide },
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{}
 };
 
@@ -777,7 +771,6 @@ static ide_adapter_interface adapter_interface = {
 	ide_adapter_start_dma,
 	ide_adapter_finish_dma,
 
-	
 	ide_adapter_inthand,
 	
 	ide_adapter_init_channel,
@@ -797,11 +790,7 @@ static ide_adapter_interface adapter_interface = {
 	ide_adapter_probe_controller
 };
 
-
-#if !_BUILDING_kernel && !BOOT
-_EXPORT 
 module_info *modules[] = {
 	&adapter_interface.info,
 	NULL
 };
-#endif

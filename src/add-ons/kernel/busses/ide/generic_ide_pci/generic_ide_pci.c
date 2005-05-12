@@ -23,7 +23,7 @@
 
 #include "wrapper.h"
 
-#define GENERIC_IDE_PCI_CONTROLLER_MODULE_NAME "busses/ide/generic_ide_pci/" PCI_DEVICE_TYPE_NAME
+#define GENERIC_IDE_PCI_CONTROLLER_MODULE_NAME "busses/ide/generic_ide_pci/device_v1"
 #define GENERIC_IDE_PCI_CHANNEL_MODULE_NAME "busses/ide/generic_ide_pci/channel/v1"
 
 #define IDE_PCI_CONTROLLER_TYPE_NAME "ide pci controller"
@@ -164,6 +164,39 @@ probe_controller(device_node_handle parent)
 }
 
 
+static float
+supports_device(device_node_handle parent, bool *_noConnection)
+{
+	char *bus;
+	uint8 baseClass, subClass;
+
+	// make sure parent is an PCI IDE mass storage host adapter device node
+	if (pnp->get_attr_string(parent, B_DRIVER_BUS, &bus, false) != B_OK
+		|| pnp->get_attr_uint8(parent, PCI_DEVICE_BASE_CLASS_ID_ITEM, &baseClass, false) != B_OK
+		|| pnp->get_attr_uint8(parent, PCI_DEVICE_SUB_CLASS_ID_ITEM, &subClass, false) != B_OK)
+		return B_ERROR;
+
+	if (strcmp(bus, "pci") || baseClass != PCI_mass_storage || subClass != PCI_ide) {
+		free(bus);
+		return 0.0;
+	}
+
+	free(bus);
+	return 0.3;
+}
+
+
+static void
+get_paths(const char ***_bus, const char ***_device)
+{
+	static const char *kBus[] = { "pci", NULL };
+	static const char *kDevice[] = { "drivers/dev/disk/ide", NULL };
+
+	*_bus = kBus;
+	*_device = kDevice;
+}
+
+
 static status_t
 module_std_ops(int32 op, ...)
 {
@@ -180,7 +213,7 @@ module_std_ops(int32 op, ...)
 
 module_dependency module_dependencies[] = {
 	{ IDE_FOR_CONTROLLER_MODULE_NAME, (module_info **)&ide },
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{ IDE_ADAPTER_MODULE_NAME, (module_info **)&ide_adapter },
 	{}
 };
@@ -195,10 +228,13 @@ static ide_controller_interface channel_interface = {
 			module_std_ops
 		},
 
-		(status_t (*)( device_node_handle , void *, void ** ))	init_channel,
-		(status_t (*)( void * ))						uninit_channel,
-		NULL,
-		(void (*)( device_node_handle , void * ))			channel_removed
+		NULL,	// supports device
+		NULL,	// register device
+		(status_t (*)(device_node_handle, void *, void **))init_channel,
+		(status_t (*)(void *))uninit_channel,
+		(void (*)(device_node_handle, void *))channel_removed,
+		NULL,	// cleanup
+		NULL,	// get_paths
 	},
 
 	(status_t (*)(ide_channel_cookie,
@@ -226,17 +262,17 @@ static driver_module_info controller_interface = {
 		module_std_ops
 	},
 
-	(status_t (*)( device_node_handle, void *, void ** ))	init_controller,
-	(status_t (*)( void * ))						uninit_controller,
+	supports_device,
 	probe_controller,
-	(void (*)( device_node_handle, void * ))			controller_removed
+	(status_t (*)(device_node_handle, void *, void **))	init_controller,
+	(status_t (*)(void *))								uninit_controller,
+	(void (*)(device_node_handle, void *))				controller_removed,
+	NULL,	// cleanup
+	get_paths,
 };
 
-#if !_BUILDING_kernel && !BOOT
-_EXPORT 
 module_info *modules[] = {
 	(module_info *)&controller_interface,
 	(module_info *)&channel_interface,
 	NULL
 };
-#endif

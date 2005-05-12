@@ -157,7 +157,7 @@ raw_init_device(device_node_handle node, void *user_cookie, void **cookie)
 	device->node = node;
 
 	// register it everywhere
-	res = pnp->load_driver(pnp->get_parent(node), NULL, 
+	res = pnp->init_driver(pnp->get_parent(node), NULL, 
 			(driver_module_info **)&device->scsi, (void **)&device->scsi_device);
 	if (res != B_OK)
 		goto err;
@@ -176,7 +176,7 @@ err:
 static status_t
 raw_uninit_device(raw_device_info *device)
 {
-	pnp->unload_driver(pnp->get_parent(device->node));
+	pnp->uninit_driver(pnp->get_parent(device->node));
 	free(device);
 
 	return B_OK;
@@ -192,20 +192,8 @@ raw_device_added(device_node_handle node)
 {
 	uint8 path_id, target_id, target_lun;
 	char name[100];
-	char *str;
 
 	SHOW_FLOW0(3, "");
-
-	// make sure we can handle this parent device
-	if (pnp->get_attr_string(node, PNP_DRIVER_TYPE, &str, false) != B_OK)
-		return B_ERROR;
-
-	if (strcmp(str, SCSI_DEVICE_TYPE_NAME) != 0) {
-		free(str);
-		return B_ERROR;
-	}
-
-	free(str);
 
 	// compose name	
 	if (pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &path_id, true) != B_OK
@@ -221,18 +209,16 @@ raw_device_added(device_node_handle node)
 	// ready to register
 	{
 		device_attr attrs[] = {
-			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: SCSI_RAW_MODULE_NAME }},
+			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_RAW_MODULE_NAME }},
 
 			// default connection is used by peripheral drivers, and as we don't
 			// want to kick them out, we use concurrent "raw" connection
 			// (btw: this shows nicely that something goes wrong: one device
 			// and two drivers means begging for trouble)
 			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "raw" }},
-			{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "raw" }},
 
-			// we want devfs on top of us
-			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_DEVFS_TYPE_NAME }},
-			{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
+			// we want devfs on top of us (who wouldn't?)
+			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
 			// tell which name we want to have in devfs
 			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
 			{ NULL }
@@ -258,7 +244,7 @@ std_ops(int32 op, ...)
 
 
 module_dependency module_dependencies[] = {
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{}
 };
 
@@ -270,9 +256,10 @@ pnp_devfs_driver_info scsi_raw_module = {
 			std_ops
 		},
 
+		NULL,
+		raw_device_added,
 		raw_init_device,
 		(status_t (*) (void *))raw_uninit_device,
-		raw_device_added,
 		NULL
 	},
 

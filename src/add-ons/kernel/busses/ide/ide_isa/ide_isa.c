@@ -30,7 +30,7 @@
 #include "wrapper.h"
 
 
-#define IDE_ISA_MODULE_NAME "busses/ide/ide_isa/"ISA_DEVICE_TYPE_NAME
+#define IDE_ISA_MODULE_NAME "busses/ide/ide_isa/device_v1"
 
 // private node item:
 // io address of command block
@@ -223,6 +223,27 @@ finish_dma(void *channel)
 }
 
 
+static float
+supports_device(device_node_handle parent, bool *_noConnection)
+{
+	char *bus;
+
+	// make sure parent is really the ISA bus manager
+	if (pnp->get_attr_string(parent, B_DRIVER_BUS, &bus, false))
+		return B_ERROR;
+
+	if (strcmp(bus, "isa")) {
+		free(bus);
+		return 0.0;
+	}
+
+	// ToDo: check I/O resources for availability?
+
+	free(bus);
+	return 0.6;
+}
+
+
 static status_t
 init_channel(device_node_handle node, ide_channel ide_channel, channel_info **cookie)
 {
@@ -239,7 +260,7 @@ init_channel(device_node_handle node, ide_channel ide_channel, channel_info **co
 		|| pnp->get_attr_uint8(node, IDE_ISA_INTNUM, &irq, false) != B_OK)
 		return B_ERROR;
 
-	if (pnp->load_driver(pnp->get_parent(node), NULL, (driver_module_info **)&isa, &dummy) != B_OK)
+	if (pnp->init_driver(pnp->get_parent(node), NULL, (driver_module_info **)&isa, &dummy) != B_OK)
 		return B_ERROR;
 
 	channel = (channel_info *)malloc(sizeof(channel_info));
@@ -275,7 +296,7 @@ err:
 	free(channel);
 	
 err0:
-	pnp->unload_driver(pnp->get_parent(node));
+	pnp->uninit_driver(pnp->get_parent(node));
 	return res;
 }
 
@@ -293,7 +314,7 @@ uninit_channel(channel_info *channel)
 	
 	remove_io_interrupt_handler(channel->intnum, inthand, channel);
 
-	pnp->unload_driver(pnp->get_parent(channel->node));
+	pnp->uninit_driver(pnp->get_parent(channel->node));
 
 	free(channel);
 
@@ -301,20 +322,18 @@ uninit_channel(channel_info *channel)
 }
 
 
-// publish node of ide channel
+/** publish node of an ide channel */
+
 static status_t
-publish_channel(device_node_handle parent, io_resource_handle *resources, uint16 command_block_base,
-	uint16 control_block_base, uint8 intnum, const char *name)
+publish_channel(device_node_handle parent, io_resource_handle *resources, 
+	uint16 command_block_base, uint16 control_block_base, uint8 intnum, 
+	const char *name)
 {
 	device_attr attrs[] = {
 		// info about ourself and our consumer
-		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: IDE_ISA_MODULE_NAME }},
-		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: IDE_BUS_TYPE_NAME }},
-		{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: IDE_FOR_CONTROLLER_MODULE_NAME }},
+		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: IDE_ISA_MODULE_NAME }},
+		{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: IDE_FOR_CONTROLLER_MODULE_NAME }},
 		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: name }},
-		{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "ide_isa" }},
-		// don't scan if loaded as we own I/O resources
-		{ PNP_DRIVER_NO_LIVE_RESCAN, B_UINT8_TYPE, { ui8: 1 }},
 
 		// properties of this controller for ide bus manager
 		{ IDE_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
@@ -363,16 +382,16 @@ probe_channel(device_node_handle parent,
 
 	// we assume that every modern PC has an IDE controller, so no
 	// further testing is done (well - I don't really know how to detect the
-	// controll, but who cares ;)	
+	// controller, but who cares ;)	
 	return publish_channel(parent, resource_handles, command_block_base,
 		control_block_base, intnum, name);
 }
 
 
 static status_t
-scan_parent(device_node_handle node)
+register_device(device_node_handle node)
 {
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	// our parent device is the isa bus and all device drivers are Universal,
 	// so the pnp_manager tries each ISA driver in turn
@@ -386,13 +405,24 @@ scan_parent(device_node_handle node)
 static void
 channel_removed(device_node_handle node, channel_info *channel)
 {
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	if (channel != NULL)
 		// disable access instantly
 		atomic_or(&channel->lost, 1);
 
 	return;
+}
+
+
+static void
+get_paths(const char ***_bus, const char ***_device)
+{
+	static const char *kBus[] = {"isa", NULL};
+	static const char *kDevice[] = {"drivers/dev/disk/ide", NULL};
+
+	*_bus = kBus;
+	*_device = kDevice;
 }
 
 
@@ -412,7 +442,7 @@ std_ops(int32 op, ...)
 
 module_dependency module_dependencies[] = {
 	{ IDE_FOR_CONTROLLER_MODULE_NAME, (module_info **)&ide },
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{}
 };
 
@@ -425,10 +455,13 @@ ide_controller_interface isa_controller_interface = {
 			std_ops
 		},
 
+		supports_device,
+		register_device,
 		(status_t (*)(device_node_handle, void *, void **))	init_channel,
 		(status_t (*)(void *))								uninit_channel,
-		scan_parent,
-		(void (*)(device_node_handle, void *))				channel_removed
+		(void (*)(device_node_handle, void *))				channel_removed,
+		NULL,		// cleanup
+		get_paths
 	},
 
 	(status_t (*)(ide_channel_cookie,
@@ -448,10 +481,7 @@ ide_controller_interface isa_controller_interface = {
 	(status_t (*)(ide_channel_cookie))						&finish_dma,
 };
 
-#if !_BUILDING_kernel && !BOOT
-_EXPORT 
 module_info *modules[] = {
 	(module_info *)&isa_controller_interface,
 	NULL
 };
-#endif

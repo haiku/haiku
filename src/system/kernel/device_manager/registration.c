@@ -29,22 +29,7 @@
 #endif
 
 
-// decrease ref_count of unregistered nodes, specified by <node_list>
-
-void
-pnp_unref_unregistered_nodes(device_node_info *node_list)
-{
-	device_node_info *node, *next_node;
-
-	for (node = node_list; node; node = next_node) {
-		next_node = node->notify_next;
-
-		pnp_remove_node_ref(node);
-	}
-}
-
-
-// mark node being registered, so it can be accessed via load_driver()
+/** mark node being registered, so it can be accessed via load_driver() */
 
 static status_t
 mark_node_registered(device_node_info *node)
@@ -52,7 +37,7 @@ mark_node_registered(device_node_info *node)
 	status_t res;
 
 	TRACE(("mark_node_registered(%p)\n", node));
-	
+
 	benaphore_lock(&gNodeLock);
 
 	if (node->parent && !node->parent->registered) {
@@ -65,15 +50,15 @@ mark_node_registered(device_node_info *node)
 	}
 
 	benaphore_unlock(&gNodeLock);
-
 	return res;
 }
 
-
-// check whether device is redetected and remove 
-// any device that is on same connection.
-// *redetected is set true if device is already registered;
-// the node must not yet be linked into parent node's children list
+#if 0
+/**	Checks whether the device is redetected and removes any other
+ *	device that is on same connection and has the same device identifier.
+ *	\a redetected is set true if device is already registered;
+ *	the node must not yet be linked into parent node's children list
+ */
 
 static status_t
 is_device_redetected(device_node_info *node, device_node_info *parent, bool *redetected)
@@ -94,7 +79,7 @@ is_device_redetected(device_node_info *node, device_node_info *parent, bool *red
 	}
 
 	// we keep the lock very long, but this is the only way to be sure that
-	// noone else (un)-registers a conflicting note during the tests
+	// no one else (un)-registers a conflicting note during the tests
 	benaphore_lock(&gNodeLock);
 
 	{
@@ -203,10 +188,10 @@ is_device_redetected(device_node_info *node, device_node_info *parent, bool *red
 
 	if (unregister_sibling) {
 		// increase ref_count to make sure node still exists 
-		// when node_lock has been released
+		// when gNodeLock has been released
 		++sibling->ref_count;
 		benaphore_unlock(&gNodeLock);
-	
+
 		pnp_unregister_device(sibling);
 		pnp_remove_node_ref_nolock(sibling);
 	} else
@@ -214,283 +199,184 @@ is_device_redetected(device_node_info *node, device_node_info *parent, bool *red
 
 	return B_OK;
 
-err:	
+err:
 	benaphore_unlock(&gNodeLock);
-
 	return res;
 }
+#endif
 
 
-// postpone searching for consumers if necessary
-// return: true, if postponed
-
-static bool
-pnp_postpone_probing(device_node_info *node)
+static status_t
+push_node_on_stack(struct list *list, device_node_info *node)
 {
-	benaphore_lock(&gNodeLock);
+	struct node_entry *entry = (struct node_entry *)malloc(sizeof(struct node_entry));
+	if (entry == NULL)
+		return B_NO_MEMORY;
 
-	// ask parent(!) if probing is to be postponed
-	if (node->parent == NULL || !node->parent->defer_probing) {
-		benaphore_unlock(&gNodeLock);
-		return false;
-	}
-
-	// yes: this happens if the new node is a child of a bus node whose
-	// rescan has not been finished	
-	TRACE(("postpone probing of node %p\n", node));
-
-	ADD_DL_LIST_HEAD(node, node->parent->unprobed_children, unprobed_ );
-	benaphore_unlock(&gNodeLock);
-
-	return true;
+	dm_get_node_nolock(node);
+	entry->node = node;
+	list_add_item(list, entry);
+	return B_OK;
 }
 
 
-// public: register device node.
-// in terms of I/O resources: if registration fails, they are freed; reason is
-// that they may have been transferred to node before error and back-transferring 
-// them would be complicated
+static device_node_info *
+pop_node_from_stack(struct list *list)
+{
+	device_node_info *node;
+
+	struct node_entry *entry = (struct node_entry *)list_remove_head_item(list);
+	if (entry == NULL)
+		return NULL;
+
+	node = entry->node;
+	free(entry);
+
+	return node;
+}
+
+
+//	#pragma mark -
+//	Public functions part of the module API
+
+
+/** Register device node.
+ *	In terms of I/O resources: if registration fails, they are freed; reason is
+ *	that they may have been transferred to node before error and back-transferring 
+ *	them would be complicated.
+ */
 
 status_t
-pnp_register_device(device_node_handle parent, const device_attr *attrs,
-	const io_resource_handle *io_resources, device_node_handle *node)
+dm_register_node(device_node_handle parent, const device_attr *attrs,
+	const io_resource_handle *ioResources, device_node_handle *_node)
 {
-	device_node_info *node_inf;
-	bool redetected;
-	status_t res = B_OK;
+	device_node_info *newNode;
+	char *driverName = NULL;
+	status_t status = B_OK;
+	struct list stack;
 
-	res = pnp_alloc_node(attrs, io_resources, &node_inf);
-	if (res != B_OK)
-		goto err;
-
-	{
-		char *driver_name, *type;
-
-		if (pnp_get_attr_string(node_inf, PNP_DRIVER_DRIVER, &driver_name, false) != B_OK) {
-			dprintf("Missing driver filename in node\n");
-			res = B_BAD_VALUE;
-			goto err1;
-		}
-
-		if (pnp_get_attr_string(node_inf, PNP_DRIVER_TYPE, &type, false) != B_OK) {
-			dprintf("Missing type in node registered by %s\n", driver_name);
-
-			free(driver_name);
-			res = B_BAD_VALUE;
-			goto err1;
-		}
-
-		TRACE(("driver: %s, type: %s\n", driver_name, type));
-
-		free(driver_name);
-		free(type);
+	status = dm_allocate_node(attrs, ioResources, &newNode);
+	if (status != B_OK) {
+		// always "consume" I/O resources
+		dm_release_io_resources(ioResources);
+		return status;
 	}
 
-	// check whether this device already existed and thus is redetected	
-	res = is_device_redetected(node_inf, parent, &redetected);
-	if (res != B_OK)
-		goto err1;
+	if (pnp_get_attr_string(newNode, B_DRIVER_MODULE, &driverName, false) != B_OK)
+		status = B_BAD_VALUE;
 
-	if (redetected) {
-		// upon redetect, resources are released instead of transferred and
-		// no node is returned
-		*node = NULL;
-		res = B_OK;
-		goto err1;
+	TRACE(("dm_register_node(driver = %s)\n", driverName));
+
+	free(driverName);
+
+	if (status != B_OK) {
+		dprintf("device_manager: Missing driver module name.\n");
+		goto err;
 	}
 
 	// transfer resources to device, unregistering all colliding devices;
 	// this cannot fail - we've already allocated the resource handle array
-	pnp_assign_io_resources(node_inf, io_resources);
-
-	pnp_create_node_links(node_inf, parent);
+	dm_assign_io_resources(newNode, ioResources);
 
 	// make it public
-	res = mark_node_registered(node_inf);
-	if (res != B_OK)
-		goto err2;
+	dm_add_child_node(parent, newNode);
 
-	// from now on, node won't get freed as ref_count has been increased by registration
+	// The following is done to reduce the stack usage of deeply nested
+	// child device nodes.
+	// There is no other need to delay the complete registration process
+	// the way done here. This approach is also slightly different as
+	// the registration might fail later than it used in case of errors.
 
-	// check whether searching for consumers should be deferred
-	if (pnp_postpone_probing(node_inf)) {
-		// return without decrementing ref_count - else node may get
-		// lost before deferred probe
-		*node = node_inf;
-		return B_OK;
+	if (parent == NULL || parent->registered) {
+		// register all device nodes not yet registered - build a list
+		// that contain all of them, and then empty it one by one (during
+		// iteration, there might be new nodes added)
+
+		device_node_info *node = newNode;
+
+		list_init(&stack);
+		push_node_on_stack(&stack, newNode);
+
+		while ((node = pop_node_from_stack(&stack)) != NULL) {
+			device_node_info *child = NULL;
+
+			// register all fixed child device nodes as well
+			status = dm_register_fixed_child_devices(node);
+			if (status != B_OK)
+				goto err2;
+
+			node->registered = true;
+
+			// and now let it register all child devices, if it's a bus
+			status = dm_register_child_devices(node);
+			if (status != B_OK)
+				goto err2;
+
+			// push all new nodes on the stack
+
+			benaphore_lock(&gNodeLock);
+
+			while ((child = (device_node_info *)list_get_next_item(&node->children, child)) != NULL) {
+				if (!child->registered)
+					push_node_on_stack(&stack, child);
+			}
+			benaphore_unlock(&gNodeLock);
+
+			dm_put_node(node);
+		}
 	}
 
-	res = pnp_initial_scan(node_inf);
-	if (res != B_OK)
-		goto err2;
+	if (_node)
+		*_node = newNode;
 
-	pnp_load_driver_automatically(node_inf, false);
-
-	*node = node_inf;
-
-	TRACE(("done: node=%p\n", *node));
-
-	// alloc_node has set ref_count to one for safety, correct this now
-	pnp_remove_node_ref(node_inf);
-	return res;
+	return B_OK;
 
 err2:
-	// use this exit after i/o resources have been transferred to node
-	pnp_remove_node_ref(node_inf);
-	return res;
-
-err1:
-	// alloc_node has set ref_count to one for safety, correct this now
-	pnp_remove_node_ref(node_inf);
+	{
+		// nodes popped from the stack also need their reference count released
+		device_node_info *node;
+		while ((node = pop_node_from_stack(&stack)) != NULL) {
+			dm_put_node(node);
+		}
+	}
 err:
-	// always "consume" i/o resources
-	pnp_release_io_resources(io_resources);
-	return res;
+	// this also releases the I/O resources
+	dm_put_node(newNode);
+	return status;
 }
 
 
-// public: unregister device node
+/** Unregister device node.
+ *	This also makes sure that all children of this node are unregistered.
+ */
 
 status_t
-pnp_unregister_device(device_node_info *node)
+dm_unregister_node(device_node_info *node)
 {
-	device_node_info *dependency_list = NULL;
+	device_node_info *child, *nextChild;
 
 	TRACE(("pnp_unregister_device(%p)\n", node));
 
 	if (node == NULL)
 		return B_OK;
 
-	// unregistered node and all children	
+	// unregistered node and all children
 	benaphore_lock(&gNodeLock);
-	pnp_unregister_node_rec(node, &dependency_list);
+	if (node->parent != NULL)
+		list_remove_item(&node->parent->children, node);
 	benaphore_unlock(&gNodeLock);
 
-	pnp_unload_driver_automatically(node, false);
+	// tell driver about their unregistration
+	dm_notify_unregistration(node);
 
-	// tell drivers about their unregistration
-	pnp_notify_unregistration(dependency_list);
+	// unregister children recursively
+	for (child = list_get_first_item(&node->children); child; child = nextChild) {
+		nextChild = (device_node_info *)child->siblings.next;
+		dm_unregister_node(child);
+	}
 
-	// now, we can safely decrease ref_count of unregistered nodes
-	pnp_unref_unregistered_nodes(dependency_list);
+	dm_put_node(node);
 
 	return B_OK;
-}
-
-
-// remove <registered> flag of node and all children.
-// list of all unregistered nodes is appended to <dependency_list>;
-// (node_lock must be hold)
-
-void
-pnp_unregister_node_rec(device_node_info *node, device_node_info **dependency_list)
-{
-	device_node_info *child, *next_child;
-
-	TRACE(("pnp_unregister_node_rec(%p)\n", node));
-
-	{
-		const char *driver_name, *type;
-
-		if (pnp_get_attr_string_nolock(node, PNP_DRIVER_DRIVER, &driver_name, false) != B_OK) {
-			dprintf("unregister_node: Missing driver filename in node\n");
-			goto err;
-		}
-
-		if (pnp_get_attr_string_nolock(node, PNP_DRIVER_TYPE, &type, false) != B_OK) {
-			dprintf("unregister_node: Missing type in node registered by %s\n", driver_name);
-			goto err;
-		}
-
-		TRACE(("driver: %s, type: %s\n", driver_name, type));
-	}
-
-err:
-	// especially when we go through children, it can happen that they
-	// got unregistered already, so ignore them silently
-	if (!node->registered)
-		return;
-
-	TRACE(("Preparing unregistration\n"));
-
-	node->registered = false;
-	ADD_DL_LIST_HEAD(node, *dependency_list, notify_);
-	
-	// unregister children recursively
-	for (child = node->children; child; child = next_child) {
-		next_child = child->siblings_next;
-		pnp_unregister_node_rec(child, dependency_list);
-	}
-}
-
-
-// defer probing of children.
-// node_lock must be hold
-
-void
-pnp_defer_probing_of_children_nolock(device_node_info *node)
-{
-	++node->defer_probing;
-}
-
-
-// defer probing of children
-
-void
-pnp_defer_probing_of_children(device_node_info *node)
-{
-	benaphore_lock(&gNodeLock);
-
-	pnp_defer_probing_of_children_nolock(node);
-
-	benaphore_unlock(&gNodeLock);
-}
-
-
-// execute deferred probing of children
-// (node_lock must be hold)
-
-void
-pnp_probe_waiting_children_nolock(device_node_info *node)
-{
-	if (--node->defer_probing > 0 && node->unprobed_children != 0)
-		return;
-
-	TRACE(("execute deferred probing of parent %p\n", node));
-
-	while (node->unprobed_children) {
-		device_node_info *child = node->unprobed_children;
-
-		REMOVE_DL_LIST(child, node->unprobed_children, unprobed_);
-
-		// child may have been removed meanwhile
-		if (child->registered) {
-			benaphore_unlock(&gNodeLock);
-
-			if (pnp_initial_scan(child) == B_OK)
-				pnp_load_driver_automatically(node, false);
-
-			benaphore_lock(&gNodeLock);
-		}
-
-		// reference count was increment to keep node alive in wannabe list;
-		// this is not necessary anymore
-		pnp_remove_node_ref(node);
-	}
-
-	TRACE((".. done.\n"));
-}
-
-
-// execute deferred probing of children
-
-void
-pnp_probe_waiting_children(device_node_info *node)
-{
-	benaphore_lock(&gNodeLock);
-
-	pnp_probe_waiting_children_nolock(node);
-
-	benaphore_unlock(&gNodeLock);
 }
 

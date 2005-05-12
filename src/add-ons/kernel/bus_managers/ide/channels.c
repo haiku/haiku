@@ -26,19 +26,14 @@
 static status_t
 ide_channel_added(device_node_handle parent)
 {
-	char *str = NULL, *controller_name = NULL;
+	char *controller_name = NULL;
 	uint32 channel_id;
 
 	SHOW_FLOW0(2, "");
 
-	if (pnp->get_attr_string(parent, PNP_DRIVER_TYPE, &str, false) != B_OK
-		|| strcmp(str, IDE_BUS_TYPE_NAME) != 0)
-		goto err;
-
 	if (pnp->get_attr_string(parent, IDE_CONTROLLER_CONTROLLER_NAME_ITEM, 
 			&controller_name, true) != B_OK) {
-		pnp->get_attr_string(parent, PNP_DRIVER_DRIVER, &str, false);
-		SHOW_ERROR( 0, "Ignored controller managed by %s - controller name missing", str);
+		dprintf("ide: ignored controller - controller name missing\n");
 		goto err;
 	}
 
@@ -52,9 +47,9 @@ ide_channel_added(device_node_handle parent)
 	{
 		device_attr attrs[] =
 		{
-			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: IDE_SIM_MODULE_NAME }},
-			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: SCSI_SIM_TYPE_NAME }},
-			{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: SCSI_FOR_SIM_MODULE_NAME }},
+			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: IDE_SIM_MODULE_NAME }},
+			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: SCSI_FOR_SIM_MODULE_NAME }},
+
 			{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE, 
 				{ string: controller_name }},
 			// maximum number of blocks per transmission:
@@ -81,14 +76,12 @@ ide_channel_added(device_node_handle parent)
 
 		res = pnp->register_device(parent, attrs, NULL, &node);
 
-		free(str);
 		free(controller_name);
 
 		return res;
 	}
 
 err:
-	free(str);
 	free(controller_name);
 
 	return B_NO_MEMORY;
@@ -117,9 +110,10 @@ ide_for_controller_interface ide_for_controller_module = {
 			&std_ops
 		},
 
-		NULL,
-		NULL,
+		NULL,	// supported devices
 		ide_channel_added,
+		NULL,
+		NULL,
 		NULL
 	},
 

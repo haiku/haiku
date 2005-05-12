@@ -81,9 +81,8 @@ fast_log_create_devfs_entry(void)
 {
 	status_t res;
 	device_attr attrs[] = {
-		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: FAST_LOG_DEVFS_MODULE_NAME }},
-		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_DEVFS_TYPE_NAME }},
-		{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
+		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: FAST_LOG_DEVFS_MODULE_NAME }},
+		{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
 		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "fast_log" }},
 
 		{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: FAST_LOG_DEVFS_NAME }},
@@ -136,10 +135,12 @@ pnp_devfs_driver_info fast_log_devfs_module = {
 			fast_log_devfs_std_ops
 		},
 
+		NULL,
+		NULL,
+
 		fast_log_devfs_init_device,
 		fast_log_devfs_uninit_device,
 
-		NULL,
 		NULL,
 		NULL,
 	},

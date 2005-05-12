@@ -159,7 +159,7 @@ release_generator(id_generator *generator)
 
 
 status_t
-id_generator_init(void)
+dm_init_id_generator(void)
 {
 	list_init(&sGenerators);
 	return benaphore_init(&sGeneratorLock, "id generator");
@@ -167,13 +167,13 @@ id_generator_init(void)
 
 
 //	#pragma mark -
-//	Public API
+//	Public module API
 
 
 /** Create automatic ID */
 
 int32
-pnp_create_id(const char *name)
+dm_create_id(const char *name)
 {
 	id_generator *generator;
 	int32 id;
@@ -203,7 +203,7 @@ pnp_create_id(const char *name)
 /**	Free automatically generated ID */
 
 status_t
-pnp_free_id(const char *name, uint32 id)
+dm_free_id(const char *name, uint32 id)
 {
 	id_generator *generator;
 

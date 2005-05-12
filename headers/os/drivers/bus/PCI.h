@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	PCI bus manager
@@ -11,10 +11,9 @@
 #define _PCI2_H
 
 #include <device_manager.h>
-//#include "r5_wrapper.h"
 #include <PCI.h>
 
-// currently, this structure is disables to avoid collision with R5 header
+// currently, this structure is disabled to avoid collision with R5 header
 #if 0
 
 typedef struct pci_info {
@@ -89,26 +88,22 @@ typedef struct pci_device_info *pci_device;
 typedef struct pci_device_module_info {
 	driver_module_info info;
 
-	uint8	(*read_io_8) (pci_device device, int mapped_io_addr);
-	void	(*write_io_8) (pci_device device, int mapped_io_addr, uint8 value);
-	uint16	(*read_io_16) (pci_device device, int mapped_io_addr);
-	void	(*write_io_16) (pci_device device, int mapped_io_addr, uint16 value);
-	uint32	(*read_io_32) (pci_device device, int mapped_io_addr);
-	void	(*write_io_32) (pci_device device, int mapped_io_addr, uint32 value);
+	uint8	(*read_io_8)(pci_device device, int mapped_io_addr);
+	void	(*write_io_8)(pci_device device, int mapped_io_addr, uint8 value);
+	uint16	(*read_io_16)(pci_device device, int mapped_io_addr);
+	void	(*write_io_16)(pci_device device, int mapped_io_addr, uint16 value);
+	uint32	(*read_io_32)(pci_device device, int mapped_io_addr);
+	void	(*write_io_32)(pci_device device, int mapped_io_addr, uint32 value);
 
-	uint32	(*read_pci_config) (
-				pci_device device,
+	uint32	(*read_pci_config)(pci_device device,
 				uchar	offset,		/* offset in configuration space */
-				uchar	size		/* # bytes to read (1, 2 or 4) */
-			);
-	void	(*write_pci_config) (
-				pci_device device, 
+				uchar	size);		/* # bytes to read (1, 2 or 4) */
+	void	(*write_pci_config)(pci_device device, 
 				uchar	offset,		/* offset in configuration space */
 				uchar	size,		/* # bytes to write (1, 2 or 4) */
-				uint32	value		/* value to write */
-			);
+				uint32	value);		/* value to write */
 
-	void *	(*ram_address) (pci_device device, const void *physical_address_in_system_memory);
+	void *(*ram_address)(pci_device device, const void *physical_address_in_system_memory);
 	
 /*	status_t (*allocate_iomem)( void *base, size_t len, const char *name );
 	status_t (*release_iomem)( void *base, size_t len );
@@ -118,8 +113,6 @@ typedef struct pci_device_module_info {
 } pci_device_module_info;
 
 
-// type of PCI device
-#define PCI_DEVICE_TYPE_NAME "pci/device/v1"
 // directory of PCI drivers
 #define PCI_DRIVERS_DIR "pci"
 

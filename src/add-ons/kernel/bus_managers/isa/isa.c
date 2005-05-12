@@ -1,5 +1,7 @@
 /*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -31,7 +33,7 @@
 //	(for example, the Pegasos (PPC based) also has an ISA bus)
 
 
-#define ISA_MODULE_NAME "bus_managers/isa/root"
+#define ISA_MODULE_NAME "bus_managers/isa/root/device_v1"
 
 device_manager_info *pnp;
 
@@ -96,6 +98,7 @@ static long
 make_isa_dma_table(const void *buffer, long buffer_size, ulong num_bits,
 	isa_dma_entry *table, long num_entries)
 {
+	// ToDo: implement this?!
 	return ENOSYS;
 }
 
@@ -104,8 +107,7 @@ static status_t
 start_isa_dma(long channel, void *buf, long transfer_count,
 	uchar mode, uchar e_mode)
 {
-	// TBD
-	// ToDo
+	// ToDo: implement this?!
 	return B_NOT_ALLOWED;
 }
 
@@ -114,6 +116,7 @@ static long
 start_scattered_isa_dma(long channel, const isa_dma_entry *table,
 	uchar mode, uchar emode)
 {
+	// ToDo: implement this?!
 	return ENOSYS;
 }
 
@@ -121,8 +124,7 @@ start_scattered_isa_dma(long channel, const isa_dma_entry *table,
 static status_t
 lock_isa_dma_channel(long channel)
 {
-	// TBD
-	// ToDo
+	// ToDo: implement this?!
 	return B_NOT_ALLOWED;
 }
 
@@ -130,14 +132,13 @@ lock_isa_dma_channel(long channel)
 static status_t
 unlock_isa_dma_channel(long channel)
 {
-	// TBD
-	// ToDo
+	// ToDo: implement this?!
 	return B_ERROR;
 }
 
 
 static status_t
-isa_init_device(device_node_handle node, void *user_cookie, void **cookie)
+isa_init_driver(device_node_handle node, void *user_cookie, void **cookie)
 {
 	*cookie = NULL;
 	return B_OK;
@@ -145,52 +146,61 @@ isa_init_device(device_node_handle node, void *user_cookie, void **cookie)
 
 
 static status_t
-isa_uninit_device(void *cookie)
+isa_uninit_driver(void *cookie)
 {
 	return B_OK;
 }
 
 
+static float
+isa_supports_device(device_node_handle parent, bool *_noConnection)
+{
+	char *bus;
+
+	// make sure parent is really pnp root
+	if (pnp->get_attr_string(parent, B_DRIVER_BUS, &bus, false))
+		return B_ERROR;
+
+	if (strcmp(bus, "root")) {
+		free(bus);
+		return 0.0;
+	}
+
+	free(bus);
+	return 1.0;
+}
+
+
 static status_t
-isa_device_added(device_node_handle parent)
+isa_register_device(device_node_handle parent)
 {
 	static const device_attr attrs[] = {
 		// info about ourself
-		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: ISA_MODULE_NAME }},
-		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: ISA_DEVICE_TYPE_NAME }},
+		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: ISA_MODULE_NAME }},
 		// unique connection
 		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "ISA" }},
-		
+
 		// mark as being a bus
 		{ PNP_BUS_IS_BUS, B_UINT8_TYPE, { ui8: 1 }},
 
-		// tell where to look for consumers
-		// ToDo: temporary hack to get things started!
-		{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: "busses/ide/ide_isa/isa/device/v1" }},
-		{ PNP_DRIVER_DYNAMIC_CONSUMER, B_STRING_TYPE, { string: ISA_DRIVERS_DIR "/" }},
+		// tell where to look for child devices
+		{ B_DRIVER_BUS, B_STRING_TYPE, { string: "isa" }},
+		{ B_DRIVER_FIND_DEVICES_ON_DEMAND, B_UINT8_TYPE, { ui8: 1 }},
+		{ B_DRIVER_EXPLORE_LAST, B_UINT8_TYPE, { ui8: 1 }},
 		{ NULL }
 	};
 
-	device_node_handle node;
-	char *parent_type;
-	status_t res;
+	return pnp->register_device(parent, attrs, NULL, NULL);
+}
 
-	// make sure parent is really pnp root
-	if (pnp->get_attr_string( parent, PNP_DRIVER_TYPE, &parent_type, false))
-		return B_ERROR;
 
-	if (strcmp(parent_type, "pnp/root")) {
-		free(parent_type);
-		return B_ERROR;
-	}
-	
-	free(parent_type);
+static void
+isa_get_paths(const char ***_bus, const char ***_device)
+{
+	static const char *kBus[] = {"root", NULL};
 
-	res = pnp->register_device(parent, attrs, NULL, &node);
-	if (res != B_OK)
-		return res;
-
-	return B_OK;
+	*_bus = kBus;
+	*_device = NULL;
 }
 
 
@@ -209,7 +219,7 @@ std_ops(int32 op, ...)
 
 
 module_dependency module_dependencies[] = {
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{}
 };
 
@@ -245,15 +255,19 @@ static isa2_module_info isa2_module = {
 				std_ops
 			},
 
-			isa_init_device,
-			isa_uninit_device,
-			isa_device_added,
-			NULL
+			isa_supports_device,
+			isa_register_device,
+			isa_init_driver,
+			isa_uninit_driver,
+			NULL,	// removed device
+			NULL,	// cleanup device
+			isa_get_paths,
 		},
 
-		// this rescan(); as ISA relies on device drivers to detect their
-		// devices themselves, we don't have an universal rescan method
-		NULL
+		// as ISA relies on device drivers to detect their devices themselves,
+		// we don't have an universal rescan method
+		NULL,	// register child devices
+		NULL,	// rescan bus
 	},
 
 	isa_read_io_8, isa_write_io_8,
@@ -265,12 +279,8 @@ static isa2_module_info isa2_module = {
 	start_isa_dma,
 };
 
-
-#if !_BUILDING_kernel && !BOOT
-_EXPORT 
 module_info *modules[] = {
 	(module_info *)&isa_module,
 	(module_info *)&isa2_module,
 	NULL
 };
-#endif

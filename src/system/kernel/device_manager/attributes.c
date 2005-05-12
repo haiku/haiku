@@ -168,19 +168,19 @@ pnp_get_attr_string_nolock(device_node_handle node, const char *name,
 
 status_t
 pnp_get_attr_raw(device_node_handle node, const char *name,
-	void **data, size_t *len, bool recursive)
+	void **data, size_t *length, bool recursive)
 {
 	const void *orig_data;
 	status_t status;
 
 	benaphore_lock(&gNodeLock);
 
-	status = pnp_get_attr_raw_nolock( node, name, &orig_data, len, recursive );
+	status = pnp_get_attr_raw_nolock( node, name, &orig_data, length, recursive );
 
 	if (status == B_OK) {
-		void *tmp_data = malloc(*len);
+		void *tmp_data = malloc(*length);
 		if (tmp_data != NULL) {
-			memcpy(tmp_data, orig_data, *len);
+			memcpy(tmp_data, orig_data, *length);
 			*data = tmp_data;
 		} else
 			status = B_NO_MEMORY;
@@ -194,15 +194,58 @@ pnp_get_attr_raw(device_node_handle node, const char *name,
 
 status_t
 pnp_get_attr_raw_nolock(device_node_handle node, const char *name,
-	const void **data, size_t *len, bool recursive)
+	const void **data, size_t *length, bool recursive)
 {
 	device_attr_info *attr = pnp_find_attr_nolock(node, name, recursive, B_RAW_TYPE);
 	if (attr == NULL)
 		return B_NAME_NOT_FOUND;
 
 	*data = attr->attr.value.raw.data;
-	*len = attr->attr.value.raw.len;
+	*length = attr->attr.value.raw.length;
 	return B_OK;
+}
+
+
+/**	Compare two attributes for */
+
+int
+pnp_compare_attrs(const device_attr *attrA, const device_attr *attrB)
+{
+	if (attrA->type != attrB->type)
+		return -1;
+
+	switch (attrA->type) {
+		case B_UINT8_TYPE:
+			return (int)attrA->value.ui8 - (int)attrB->value.ui8;
+
+		case B_UINT16_TYPE:
+			return (int)attrA->value.ui16 - (int)attrB->value.ui16;
+
+		case B_UINT32_TYPE:
+			if (attrA->value.ui32 > attrB->value.ui32)
+				return 1;
+			if (attrA->value.ui32 < attrB->value.ui32)
+				return -1;
+			return 0;
+
+		case B_UINT64_TYPE:
+			if (attrA->value.ui64 > attrB->value.ui64)
+				return 1;
+			if (attrA->value.ui64 < attrB->value.ui64)
+				return -1;
+			return 0;
+
+		case B_STRING_TYPE:
+			return strcmp(attrA->value.string, attrB->value.string);
+
+		case B_RAW_TYPE:
+			if (attrA->value.raw.length != attrB->value.raw.length)
+				return -1;
+
+			return memcmp(attrA->value.raw.data, attrB->value.raw.data, attrA->value.raw.length);
+	}
+
+	return -1;
 }
 
 
@@ -260,15 +303,15 @@ pnp_duplicate_node_attr(const device_attr *src, device_attr_info **dest_out)
 			break;
 
 		case B_RAW_TYPE:
-			dest->attr.value.raw.data = malloc(src->value.raw.len);
+			dest->attr.value.raw.data = malloc(src->value.raw.length);
 			if (dest->attr.value.raw.data == NULL) {
 				res = B_NO_MEMORY;
 				goto err;
 			}
 
-			dest->attr.value.raw.len = src->value.raw.len;
+			dest->attr.value.raw.length = src->value.raw.length;
 			memcpy(dest->attr.value.raw.data, src->value.raw.data, 
-				src->value.raw.len);
+				src->value.raw.length);
 			break;
 
 		default:
@@ -448,10 +491,8 @@ static bool
 is_fixed_attribute(const char *name)
 {
 	static const char *forbidden_list[] = {
-		PNP_DRIVER_DRIVER,			// never change driver
-		PNP_DRIVER_TYPE,			// never change type
+		B_DRIVER_MODULE,			// never change driver
 		PNP_BUS_IS_BUS,				// never switch between bus/not bus mode
-		PNP_DRIVER_ALWAYS_LOADED	// don't confuse us by changing auto-load
 	};
 	uint32 i;
 

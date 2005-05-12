@@ -21,7 +21,9 @@
 #include "device_manager_private.h"
 
 #include <KernelExport.h>
+
 #include <string.h>
+#include <stdlib.h>
 
 
 #define TRACE_SCAN
@@ -31,284 +33,68 @@
 #	define TRACE(x) ;
 #endif
 
+static status_t scan(device_node_info *node, bool rescan);
 
-/** public function: rescan PnP node */
 
-status_t
-pnp_rescan(device_node_info *node, uint32 depth)
+static int32 sRescanning = 0;
+
+
+#if 0
+// execute deferred probing of children
+// (node_lock must be hold)
+
+void
+pnp_probe_waiting_children_nolock(device_node_info *node)
 {
-	return pnp_rescan_int(node, depth, false);
+	TRACE(("execute deferred probing of parent %p\n", node));
+
+	while (node->unprobed_children) {
+		device_node_info *child = node->unprobed_children;
+
+		REMOVE_DL_LIST(child, node->unprobed_children, unprobed_);
+
+		// child may have been removed meanwhile
+		if (child->registered) {
+			benaphore_unlock(&gNodeLock);
+
+			if (pnp_initial_scan(child) == B_OK)
+				pnp_load_driver_automatically(node, false);
+
+			benaphore_lock(&gNodeLock);
+		}
+
+		// reference count was increment to keep node alive in wannabe list;
+		// this is not necessary anymore
+		pnp_remove_node_ref(node);
+	}
+
+	TRACE((".. done.\n"));
 }
 
 
-/** execute registration of fully constructed node */
+// execute deferred probing of children
 
-status_t
-pnp_initial_scan(device_node_info *node)
+void
+pnp_probe_waiting_children(device_node_info *node)
 {
-	pnp_start_hook_call(node);
-
-	node->init_finished = true;
-
-	pnp_finish_hook_call(node);
-
-	return pnp_rescan_int(node, 1, false);
-}	
-
-
-/** check whether rescanning a node makes sense in terms of
- *	double scans.
- *	node_lock must be hold
- */
-
-static bool
-is_rescan_sensible(device_node_info *node)
-{
-	uint depth;
-	device_node_info *child;
-
-	TRACE(("is_rescan_sensible(node: %p)\n", node));
-
-	// if a child is being scanned, abort our rescan to avoid
-	// concurrent scans by the same driver on the same device	
-	for (child = node->children; child != NULL; child = child->siblings_next) {
-		if (child->rescan_depth > 0) {
-			TRACE(("child %p is being scanned\n", child));
-			return false;
-		}
-	}
-
-	TRACE(("check parents\n"));
-
-	// make sure neither this nor parent node is scanned recursively
-	// up to this node as this would lead to unnecessary double-scans
-	// (don't need to check whether parent is unregistered as
-	// all children would have been unregistered immediately)
-	for (depth = 1; node != NULL; node = node->parent, ++depth) {
-		if (node->rescan_depth >= depth) {
-			TRACE(("parent %p is being scanned", node));
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
-/**	mark children of node as being scanned.
- *	children that have their drivers loaded are not 
- *	scanned unless they allow that explicitely.
- *	node_lock must be hold
- */
-
-static void
-mark_children_scanned(device_node_info *node)
-{
-	device_node_info *child, *next_child;
-
-	TRACE(("mark_children_scanned()\n"));
-
-	for (child = node->children; child != NULL; child = next_child) {
-		uint8 never_rescan, no_live_rescan;
-
-		next_child = child->siblings_next;
-
-		// ignore dead children
-		if (!child->registered)
-			continue;
-
-		// check whether device can be rescanned at all
-		if (pnp_get_attr_uint8_nolock(child, PNP_DRIVER_NEVER_RESCAN, 
-				&never_rescan, false) == B_OK && never_rescan) {
-			TRACE(("no rescan allowed on device %p\n", child));
-			continue;
-		}
-
-		if (pnp_get_attr_uint8_nolock(child, PNP_DRIVER_NO_LIVE_RESCAN, 
-				&no_live_rescan, false) != B_OK)
-			no_live_rescan = false;
-
-		if (no_live_rescan) {
-			TRACE(("no life rescan allowed on device %p\n", child));
-
-			if (child->load_count + child->loading > 0) {
-				TRACE(("device %p loaded - skipping it\n", child));
-				continue;
-			}
-
-			child->blocked_by_rescan = true;
-			++child->load_block_count;			
-		}
-
-		child->verifying = true;
-		child->redetected = false;
-
-		// unload driver during rescan if needed
-		// (need to lock next_child temporarily as we release node_lock)
-		if (next_child)
-			++next_child->ref_count;
-
-		benaphore_unlock(&gNodeLock);
-
-		pnp_unload_driver_automatically(child, true);
-
-		benaphore_lock(&gNodeLock);
-
-		if (next_child)
-			pnp_remove_node_ref_nolock(next_child);
-	}
-}
-
-
-/** stop children verification, resetting associated flag and unblocking loads. */
-
-static void
-reset_children_verification(device_node_info *node)
-{
-	device_node_info *child, *next_child;
-
-	TRACE(("reset_children_verification()\n"));
-
 	benaphore_lock(&gNodeLock);
 
-	for (child = node->children; child != NULL; child = next_child) {
-		next_child = child->siblings_next;
-
-		if (!child->verifying)
-			continue;
-
-		child->verifying = false;
-
-		if (child->blocked_by_rescan) {
-			child->blocked_by_rescan = false;
-			pnp_unblock_load(child);
-		}
-
-		if (next_child)
-			++next_child->ref_count;
-
-		benaphore_unlock(&gNodeLock);
-
-		pnp_load_driver_automatically(node, true);
-
-		benaphore_lock(&gNodeLock);
-
-		if (next_child)
-			pnp_remove_node_ref_nolock(next_child);
-	}
+	pnp_probe_waiting_children_nolock(node);
 
 	benaphore_unlock(&gNodeLock);
 }
 
-
-/** unregister child nodes that weren't detected anymore */
-
-static void
-unregister_lost_children(device_node_info *node)
-{
-	device_node_info *child, *dependency_list;
-
-	TRACE(("unregister_lost_children()\n"));
-
-	benaphore_lock(&gNodeLock);
-
-	for (child = node->children, dependency_list = NULL; child != NULL;
-			child = child->siblings_next) {
-		if (child->verifying && !child->redetected) {
-			TRACE(("removing lost device %p\n", child));
-			// child wasn't detected anymore - put it onto remove list
-			pnp_unregister_node_rec(child, &dependency_list);
-		}
-	}
-
-	benaphore_unlock(&gNodeLock);
-
-	// finish verification of children 
-	// (must be done now to unblock them; 
-	//  else we risk deadlocks during notification)
-	reset_children_verification(node);
-
-	// inform all drivers of unregistered nodes
-	pnp_notify_unregistration(dependency_list);
-
-	// now, we can safely decrease ref_count of unregistered nodes
-	pnp_unref_unregistered_nodes(dependency_list);
-}
-
-
-/** recursively scan children of node (using depth-scan).
- *	node_lock must be hold
- */
-
-static status_t
-recursive_scan(device_node_info *node, uint depth)
-{
-	device_node_info *child, *next_child;
-	status_t res;
-
-	TRACE(("recursive_scan(node: %p, depth=%d)\n", node, depth));
-
-	child = node->children;
-
-	// the child we want to access must be locked
-	if (child != NULL)
-		++child->ref_count;
-
-	for (; child != NULL; child = next_child) {
-		next_child = child->siblings_next;
-
-		// lock next child, so its node is still valid after rescan
-		if (next_child != NULL)
-			++next_child->ref_count;
-
-		// during rescan, we must release node_lock to not deadlock
-		benaphore_unlock(&gNodeLock);
-
-		res = pnp_rescan(child, depth - 1);
-
-		benaphore_lock(&gNodeLock);
-
-		// unlock current child as it's not accessed anymore
-		pnp_remove_node_ref_nolock(child);
-
-		// ignore errors because of touching unregistered nodes	
-		if (res != B_OK && res != B_NAME_NOT_FOUND)
-			goto err;
-	}
-
-	// no need unlock last child (don't be loop already)
-	TRACE(("recursive_scan(): done\n"));
-	return B_OK;
-
-err:
-	if (next_child != NULL)
-		pnp_remove_node_ref_nolock(next_child);
-
-	TRACE(("recursive_scan(): failed\n"));
-	return res;
-}
+#endif
 
 
 /** ask bus to (re-)scan for connected devices */
 
 static void
-rescan_bus(device_node_info *node)
+scan_bus(device_node_info *node, bool rescan)
 {
 	// busses can register their children themselves
 	bus_module_info *interface;
 	void *cookie;
-	bool defer_probe;
-	uint8 defer_probe_var;
-
-	// delay children probing if requested
-	defer_probe = pnp_get_attr_uint8(node,
-			PNP_BUS_DEFER_PROBE, &defer_probe_var, false ) == B_OK
-		&& defer_probe_var != 0;
-
-	if (defer_probe) {
-		TRACE(("defer probing for consumers\n"));
-		pnp_defer_probing_of_children(node);
-	}
 
 	// load driver during rescan
 	pnp_load_driver(node, NULL, (driver_module_info **)&interface, &cookie);
@@ -320,127 +106,131 @@ rescan_bus(device_node_info *node)
 	// concurrently has been assured to not happen)
 	pnp_start_hook_call(node);
 
-	if (interface->rescan != NULL)
-		interface->rescan(cookie);
+	if (rescan) {
+		if (interface->rescan_bus != NULL)
+			interface->rescan_bus(cookie);
+	} else {
+		if (interface->register_child_devices != NULL)
+			interface->register_child_devices(cookie);
+	}
 
 	pnp_finish_hook_call(node);
 
 	pnp_unload_driver(node);
 
 	// time to execute delayed probing
-	if (defer_probe)
-		pnp_probe_waiting_children(node);
+//	pnp_probe_waiting_children(node);
 }
 
 
-/** rescan for consumers
- *	ignore_fixed_consumers - true, to leave fixed consumers alone
+/** recursively scan children of node (using depth-scan).
+ *	node_lock must be hold
  */
 
-status_t
-pnp_rescan_int(device_node_info *node, uint32 depth, 
-	bool ignore_fixed_consumers)
+static status_t
+recursive_scan(device_node_info *node)
 {
-	bool is_bus;
+	device_node_info *child = NULL;
+	status_t status;
+
+	TRACE(("recursive_scan(node = %p)\n", node));
+
+	while ((child = list_get_next_item(&node->children, child)) != NULL) {
+		dm_get_node_nolock(child);
+
+		// during rescan, we must release node_lock to not deadlock
+		benaphore_unlock(&gNodeLock);
+
+		status = scan(child, true);
+
+		benaphore_lock(&gNodeLock);
+
+		// unlock current child as it's not accessed anymore
+		dm_put_node_nolock(child);
+
+		// ignore errors because of touching unregistered nodes	
+		if (status != B_OK && status != B_NAME_NOT_FOUND)
+			return status;
+	}
+
+	// no need unlock last child (don't be loop already)
+	TRACE(("recursive_scan(): done\n"));
+	return B_OK;
+}
+
+
+/** (re)scan for child nodes
+ */
+
+static status_t
+scan(device_node_info *node, bool rescan)
+{
+	status_t status = B_OK;
 	uint8 dummy;
-	status_t res = B_OK;
+	bool isBus;
 
-	TRACE(("pnp_rescan_int(node: %p, depth = %ld)\n", node, depth));
+	TRACE(("scan(node = %p, mode: %s)\n", node, rescan ? "rescan" : "register"));
 
-	//pnp_load_boot_links();
-
-	// ignore depth 0 silently
-	if (depth == 0) {
-		res = B_OK;
-		goto err3;
-	}
-
-	is_bus = pnp_get_attr_uint8(node, PNP_BUS_IS_BUS, &dummy, false) == B_OK;
-
-	benaphore_lock(&gNodeLock);
-
-	// don't scan unregistered nodes
-	if (!node->registered) {
-		TRACE(("node not registered"));
-		res = B_NAME_NOT_FOUND;
-		goto err2;
-	}
-
-	if (!is_rescan_sensible(node)) {
-		// somebody else does the rescan, so no need to report error
-		TRACE(("rescan not sensible\n"));
-		res = B_OK;
-		goto err2;
-	}
-
-	// mark old devices
-	// exception: during registration, fixed consumers are
-	// initialized seperately, and we don't want to mark their node
-	// as being old
-	if (!ignore_fixed_consumers || is_bus)
-		mark_children_scanned(node);
-
-	// tell other scans what we are doing to avoid double scans
-	node->rescan_depth = depth;
-
-	// keep node alive
-	++node->ref_count;
-	
-	benaphore_unlock(&gNodeLock);
+	isBus = pnp_get_attr_uint8(node, PNP_BUS_IS_BUS, &dummy, false) == B_OK;
 
 	// do the real thing - scan node
-	if (is_bus)
-		rescan_bus(node);
+	if (!rescan) {
+		bool loadDriversLater = false;
+		char *deviceType = NULL;
+		pnp_get_attr_uint8(node, B_DRIVER_FIND_DEVICES_ON_DEMAND, &loadDriversLater, false);
+		pnp_get_attr_string(node, B_DRIVER_DEVICE_TYPE, &deviceType, false);
 
-	// ask possible consumers to register their nodes
-	if (!ignore_fixed_consumers) {
-		TRACE(("scan fixed consumers\n"));
+		if (isBus)
+			scan_bus(node, false);
 
-		res = pnp_notify_fixed_consumers(node);
-		if (res != B_OK)
-			goto err;
+		// ask possible children to register their nodes
+
+		if (!loadDriversLater && deviceType == NULL) {		
+			status = dm_register_dynamic_child_devices(node);
+			if (status != B_OK)
+				return status;
+		}
+
+		free(deviceType);
 	}
 
-	res = pnp_notify_dynamic_consumers(node);
-	if (res != B_OK)
-		goto err;
-
-	// unregister children that weren't detected anymore
-	unregister_lost_children(node);
-
 	benaphore_lock(&gNodeLock);
-
-	// mark scan as being finished to not block recursive scans
-	node->rescan_depth = 0;
 
 	// scan children recursively;
 	// keep the node_lock to make sure noone removes children meanwhile
-	if (depth > 1)
-		res = recursive_scan(node, depth);
+	if (rescan && isBus)
+		status = recursive_scan(node);
 
-	pnp_remove_node_ref_nolock(node);
 	benaphore_unlock(&gNodeLock);
 
-	//pnp_unload_boot_links();
-
-	TRACE(("pnp_rescan_int(): done (%p) - %s\n", node, strerror(res)));
-	return res;
-
-err:
-	reset_children_verification(node);
-
-	benaphore_lock(&gNodeLock);
-
-	node->rescan_depth = 0;
-	pnp_remove_node_ref_nolock(node);
-
-err2:
-	benaphore_unlock(&gNodeLock);
-
-	TRACE(("pnp_rescan_int(): failed (%p, %s)\n", node, strerror(res)));
-
-err3:
-	//pnp_unload_boot_links();
-
-	return res;	
+	TRACE(("scan(): done (%p) - %s\n", node, strerror(status)));
+	return status;
 }
+
+
+//	#pragma mark -
+
+
+/** Rescan device node (only works if it's a bus) */
+
+status_t
+dm_rescan(device_node_info *node)
+{
+	// only allow a single rescan at a time
+	if (atomic_add(&sRescanning, 1) > 0) {
+		atomic_add(&sRescanning, -1);
+		return B_BUSY;
+	}
+
+	return scan(node, true);
+}
+
+
+/** execute registration of fully constructed node */
+
+status_t
+dm_register_child_devices(device_node_info *node)
+{
+	return scan(node, false);
+}	
+

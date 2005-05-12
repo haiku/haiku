@@ -44,8 +44,16 @@ struct path_entry {
 	char				*path;
 	dev_t				device;
 	ino_t				node;
+	int32				busses;
 };
 
+struct module_entry {
+	struct list_link	link;
+	char				*name;
+	driver_module_info	*driver;
+	float				support;
+	bool				no_connection;
+};
 
 // list of driver registration directories
 const char *pnp_registration_dirs[2] = {
@@ -62,6 +70,8 @@ static const char *kModulePaths[] = {
 	NULL
 };
 
+extern dev_t gBootDevice;
+	// from fs/vfs.cpp
 
 class DirectoryIterator {
 	public:
@@ -207,6 +217,136 @@ DirectoryIterator::AddPath(const char *basePath, const char *subPath)
 //	#pragma mark -
 
 
+struct path_entry *
+new_path_entry(const char *path, dev_t device, ino_t node)
+{
+	path_entry *entry = (path_entry *)malloc(sizeof(path_entry));
+	if (entry == NULL)
+		return NULL;
+
+	entry->path = strdup(path);
+	if (entry->path == NULL) {
+		free(entry);
+		return NULL;
+	}
+
+	entry->device = device;
+	entry->node = node;
+	entry->busses = 0;
+	return entry;
+}
+
+
+struct path_entry *
+copy_path_entry(path_entry *entry)
+{
+	path_entry *newEntry = (path_entry *)malloc(sizeof(struct path_entry));
+	if (newEntry == NULL)
+		return NULL;
+
+	*newEntry = *entry;
+	newEntry->path = strdup(entry->path);
+	if (newEntry->path == NULL) {
+		free(newEntry);
+		return NULL;
+	}
+
+	return newEntry;
+}
+
+
+void
+free_module_entry(module_entry *entry)
+{
+	if (entry->name != NULL && entry->driver != NULL)
+		put_module(entry->name);
+
+	free(entry->name);
+	free(entry);
+}
+
+
+struct module_entry *
+new_module_entry(const char *name, driver_module_info *driver)
+{
+	module_entry *entry = (module_entry *)malloc(sizeof(module_entry));
+	if (entry == NULL)
+		return NULL;
+
+	entry->name = strdup(name);
+	if (entry->name == NULL) {
+		free(entry);
+		return NULL;
+	}
+
+	entry->driver = driver;
+	entry->support = -1.0f;
+	entry->no_connection = false;
+	return entry;
+}
+
+
+static module_entry *
+find_module_entry(struct list *list, const char *name)
+{
+	module_entry *entry = NULL;
+	
+	while ((entry = (module_entry *)list_get_next_item(list, entry)) != NULL) {
+		if (!strcmp(entry->name, name))
+			return entry;
+	}
+
+	return NULL;
+}
+
+
+static status_t
+add_device_node(struct list *list, device_node_info *node)
+{
+	node_entry *entry = (node_entry *)malloc(sizeof(node_entry));
+	if (entry == NULL)
+		return B_NO_MEMORY;
+
+	entry->node = node;
+
+	uint8 exploreLast = false;
+	pnp_get_attr_uint8(node, B_DRIVER_EXPLORE_LAST, &exploreLast, false);
+
+	if (exploreLast)
+		list_add_link_to_tail(list, &entry->link);
+	else
+		list_add_link_to_head(list, &entry->link);
+
+	return B_OK;
+}
+
+
+static status_t
+get_next_device_node(struct list *list, uint32 *_cookie, device_node_info **_node)
+{
+	node_entry *entry = (node_entry *)list_get_next_item(list, (void *)*_cookie);
+	if (entry == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	*_node = entry->node;
+	*_cookie = (uint32)entry;
+
+	return B_OK;
+}
+
+
+static void
+remove_device_nodes(struct list *list)
+{
+	struct node_entry *entry;
+
+	while ((entry = (node_entry *)list_remove_head_item(list)) != NULL) {
+		free(entry);
+	}
+}
+
+
+#if 0
 /** notify a consumer that a device he might handle is added
  *	fileName - file name of consumer
  *	(moved to end of file to avoid inlining)
@@ -271,7 +411,7 @@ notify_probe_by_file(device_node_info *node, const char *fileName)
 	strlcat(module_name, "/", B_PATH_NAME_LENGTH);
 	strlcat(module_name, type, B_PATH_NAME_LENGTH);	
 
-	res = pnp_notify_probe_by_module(node, module_name);
+	res = dm_register_child_device(node, module_name);
 
 err2:
 	free(resolved_path);
@@ -391,14 +531,14 @@ try_drivers(device_node_info *node, char *directory,
 }
 
 
-/**	find normal consumer of node that are stored under <dir>; first, we
+/**	find normal child of node that are stored under <dir>; first, we
  *	look for a specific driver; if none could be found, find a generic
  *	one path, buffer - used as scratch buffer (all of size B_PATH_NAME_LENGTH + 1)
  *	return: B_NAME_NOT_FOUND if no consumer could be found
  */
 
 static status_t
-find_normal_consumer(device_node_info *node, const char *dir,
+find_normal_child(device_node_info *node, const char *dir,
 	const char *filename_pattern, int num_parts,
 	char *path, char *buffer, bool *found_normal_driver)
 {
@@ -465,7 +605,7 @@ find_normal_consumer(device_node_info *node, const char *dir,
 }
 
 
-/**	pre-process dynamic consumer name pattern.
+/**	pre-process dynamic child name pattern.
  *	split into directory and pattern and count split positions;
  *	further, remove quotes from directory
  *	pattern		- pattern of consumer name
@@ -476,7 +616,7 @@ find_normal_consumer(device_node_info *node, const char *dir,
  */
 
 static status_t
-preprocess_consumer_names(const char *pattern, char *buffer,
+preprocess_child_names(const char *pattern, char *buffer,
 	char **filename_pattern, int *const num_parts)
 {
 	char *str, *dest;
@@ -547,7 +687,7 @@ preprocess_consumer_names(const char *pattern, char *buffer,
  */
 
 static status_t
-notify_dynamic_consumer(device_node_info *node, const char *bus,
+register_dynamic_child_device(device_node_info *node, const char *bus,
 	const char *pattern, bool *has_normal_driver)
 {
 	status_t status;
@@ -555,7 +695,7 @@ notify_dynamic_consumer(device_node_info *node, const char *bus,
 	char *filename_pattern;
 	int num_parts;
 
-	TRACE(("notify_dynamic_consumer(bus = %s, pattern = %s, has_normal_driver = %d)\n",
+	TRACE(("register_dynamic_child_device(bus = %s, pattern = %s, has_normal_driver = %d)\n",
 		bus, pattern, *has_normal_driver));
 
 	if (pattern == NULL)
@@ -566,14 +706,14 @@ notify_dynamic_consumer(device_node_info *node, const char *bus,
 	if (buffers == NULL)
 		return B_NO_MEMORY;
 
-	status = preprocess_consumer_names(pattern, buffers + 2 * (B_PATH_NAME_LENGTH + 1), 
+	status = preprocess_child_names(pattern, buffers + 2 * (B_PATH_NAME_LENGTH + 1), 
 			&filename_pattern, &num_parts);
 	if (status < B_OK)
 		goto err;
 
 	if (!*has_normal_driver) {
 		// find specific/generic consumer		
-		status = find_normal_consumer(node, bus, filename_pattern, num_parts, 
+		status = find_normal_child(node, bus, filename_pattern, num_parts, 
 			buffers, buffers + B_PATH_NAME_LENGTH + 1, has_normal_driver);
 		if (status != B_OK && status != B_NAME_NOT_FOUND)
 			// only abort if there was a "real" problem; 
@@ -600,6 +740,7 @@ err:
 	free(buffers);
 	return status;
 }
+#endif
 
 
 static path_entry *
@@ -639,19 +780,22 @@ load_driver(const char *path)
 		name++;
 
 	// For a valid device driver the following exports are required
-	
+
+	uint32 *api_version;
+	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&api_version) != B_OK)
+		dprintf("%s: api_version missing\n", name);
+
 	device_hooks *(*find_device)(const char *);
 	const char **(*publish_devices)(void);
-	uint32 *api_version;
 	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT, (void **)&publish_devices) != B_OK
-		|| get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&api_version) != B_OK
 		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT, (void **)&find_device) != B_OK) {
 		dprintf("%s: mandatory driver symbol(s) missing!\n", name);
 		status = B_BAD_VALUE;
 		goto error1;
 	}
 
-	// test for init_hardware() and call it
+	// Init the driver
+
 	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
 			(void **)&init_hardware) == B_OK
 		&& (status = init_hardware()) != B_OK) {
@@ -660,19 +804,6 @@ load_driver(const char *path)
 		goto error1;
 	}
 
-	/* OK, so we now have what appears to be a valid module that has
-	 * completed init_hardware and thus thinks it should be used.
-	 * ToDo:
-	 *  - this is bogus!
-	 *  - the driver init routines should be called by devfs and 
-	 *       only when the driver is first needed. However, that level
-	 *       level of support is not yet in devfs, so we have a hack
-	 *       here that calls the init_driver function at this point.
-	 *       As a result we will check to see if we actually manage to
-	 *       publish the device, and if we do we will keep the module
-	 *       loaded.
-	 *  - remove this when devfs is fixed!
-	 */
 	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
 			(void **)&init_driver) == B_OK
 		&& (status = init_driver()) != B_OK) {
@@ -681,7 +812,13 @@ load_driver(const char *path)
 		goto error2;
 	}
 
+	// The driver has successfully been initialized, now we can
+	// finally publish its device entries
+
 	// we keep the driver loaded if it exports at least a single interface
+	// ToDo: we could/should always unload drivers until they will be used for real
+	// ToDo: this function is probably better kept in devfs, so that it could remember
+	//	the driver stuff (and even keep it loaded if there is enough memory)
 	devicePaths = publish_devices();
 	if (devicePaths == NULL) {
 		dprintf("%s: publish_devices() returned NULL.\n", name);
@@ -702,7 +839,6 @@ load_driver(const char *path)
 
 	status = B_ERROR;	// whatever...
 
-
 error3:
 	{
 		status_t (*uninit_driver)(void);
@@ -712,12 +848,12 @@ error3:
 	}
 
 error2:
-{
-	status_t (*uninit_hardware)(void);
-	if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
-			(void **)&uninit_hardware) == B_OK)
-		uninit_hardware();
-}
+	{
+		status_t (*uninit_hardware)(void);
+		if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
+				(void **)&uninit_hardware) == B_OK)
+			uninit_hardware();
+	}
 error1:
 	/* If we've gotten here then the driver will be unloaded and an
 	 * error code returned.
@@ -740,11 +876,25 @@ load_driver_symbols(const char *driverName)
 }
 
 
+/**	Iterates over the given list and tries to load all drivers and modules
+ *	in that list.
+ *	The list is emptied and freed during the traversal.
+ *
+ *	ToDo: Old style drivers will be initialized as well, new style driver
+ *	handling is not yet done.
+ */
+
 static status_t
-try_drivers(struct list &list)
+try_drivers(struct list &list, bool tryBusDrivers)
 {
 	path_entry *entry;
 	while ((entry = (path_entry *)list_remove_head_item(&list)) != NULL) {
+		if (!tryBusDrivers && entry->busses) {
+			free(entry->path);
+			free(entry);
+			continue;
+		}
+
 		image_id image = load_kernel_add_on(entry->path);
 		if (image >= 0) {
 			// check if it's a driver module
@@ -771,8 +921,260 @@ try_drivers(struct list &list)
 }
 
 
+static module_entry *
+remove_best_entry(struct list *list)
+{
+	module_entry *bestEntry = NULL;	
+	module_entry *entry = NULL;
+
+	while ((entry = (module_entry *)list_get_next_item(list, entry)) != NULL) {
+		if (entry->no_connection || entry->driver == NULL
+			|| entry->driver->register_device == NULL
+			|| entry->support <= 0.0)
+			continue;
+
+		if (bestEntry == NULL || bestEntry->support < entry->support)
+			bestEntry = entry;
+	}
+
+	if (bestEntry) {
+		list_remove_item(list, bestEntry);
+		return bestEntry;
+	}
+
+	return NULL;
+}
+
+
+static void
+register_supporting_child_devices(device_node_info *node, struct list *list)
+{
+	// See if this node has a connection to offer
+	char *hasConnection = NULL;
+		// this is a bit ugly as we don't access the string
+		// but just test it against NULL
+	if (pnp_get_attr_string(node, PNP_DRIVER_CONNECTION, &hasConnection, false) == B_OK)
+		free(hasConnection);
+	dprintf("has connection? %s\n", hasConnection ? "yes" : "no");
+
+	// first ask each module for level of support
+
+	module_entry *bestEntry = NULL;	
+	module_entry *entry = NULL;
+	while ((entry = (module_entry *)list_get_next_item(list, entry)) != NULL) {
+		if (entry->driver == NULL) {
+			if (get_module(entry->name, (module_info **)&entry->driver) != B_OK)
+				continue;
+		}
+
+		entry->support = entry->driver->supports_device(node, &entry->no_connection);
+		dprintf("module: %s, support: %d\n", entry->name, (int)(entry->support * 1000));
+
+		if (!hasConnection)
+			entry->no_connection = true;
+	}
+
+	// register best module with a connection
+
+	while ((entry = remove_best_entry(list)) != NULL) {
+		status_t status = entry->driver->register_device(node);
+		dprintf("tried best module: %s: %s\n", entry->name, strerror(status));
+		free_module_entry(entry);
+
+		if (status == B_OK)
+			break;
+	}
+
+	// register all modules that don't need a connection
+	// and empty the list
+
+	while ((entry = (module_entry *)list_remove_head_item(list)) != NULL) {
+		if (entry->no_connection && entry->driver != NULL 
+			&& entry->driver->register_device != NULL 
+			&& entry->support > 0.0) {
+			dprintf("register rest: %s\n", entry->name);
+			entry->driver->register_device(node);
+		}
+
+		dprintf("free %s\n", entry->name);
+		free_module_entry(entry);
+	}
+}
+
+
+static bool
+is_driver_module(const char *name, int32 length)
+{
+	if (length == -1)
+		length = strlen(name);
+
+	return !strcmp(name + length - 9, "device_v1");	
+}
+
+
+static status_t
+get_loaded_modules(struct list *modules, const char *bus, const char *device)
+{
+	TRACE(("get_loaded_modules(bus = %s, device = %s)\n", bus, device));
+
+	bool listWasEmpty = list_is_empty(modules);
+
+	char name[B_FILE_NAME_LENGTH];
+	size_t size = sizeof(name);
+	uint32 cookie = 0;
+	while (get_next_loaded_module_name(&cookie, name, &size) == B_OK) {
+		int32 length = size;
+		size = sizeof(name);
+
+		if (!is_driver_module(name, length))
+			continue;
+
+		TRACE(("  \"%s\" is driver module!\n", name));
+
+		driver_module_info *info;
+		if (get_module(name, (module_info **)&info) == B_OK) {
+			if (info->get_supported_paths == NULL)
+				continue;
+
+			const char **busses, **devices;
+			info->get_supported_paths(&busses, &devices);
+
+			bool support = bus == NULL;
+
+			// search for the bus
+
+			if (bus != NULL && busses != NULL) {
+				for (int32 i = 0; busses[i]; i++) {
+					if (!strcmp(bus, busses[i])) {
+						dprintf("\tfound %s!!\n", busses[i]);
+						support = true;
+						break;
+					}
+				}
+			}
+
+			if (support) {
+				// search for the device
+
+				support = device == NULL;
+
+				if (device != NULL && devices != NULL) {
+					for (int32 i = 0; devices[i]; i++) {
+						if (!strncmp(device, devices[i], strlen(device))) {
+							dprintf("\tfound %s!!\n", devices[i]);
+							support = true;
+							break;
+						}
+					}
+				}
+			}
+
+			if (support && !listWasEmpty) {
+				// make sure we don't add the same module twice
+				if (find_module_entry(modules, name) != NULL)
+					support = false;
+			}
+
+			if (support) {
+				module_entry *entry = new_module_entry(name, info);
+				if (entry == NULL) {
+					put_module(name);
+					return B_NO_MEMORY;
+				}
+
+				dprintf("\tadd module %s to list\n", name);
+				list_add_item(modules, entry);
+				continue;
+			}
+
+			put_module(name);
+		}
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+get_nodes_for_device_type(device_node_info *node, struct list *list, const char *type)
+{
+	bool matches = false;
+
+	// see if there is a B_DRIVER_DEVICE_TYPE that matches the query
+
+	char *deviceType = NULL;
+	if (pnp_get_attr_string(node, B_DRIVER_DEVICE_TYPE, &deviceType, false) == B_OK) {
+		if (!strncmp(deviceType, type, strlen(type)))
+			matches = true;
+
+		free(deviceType);
+	}
+
+	if (!matches) {
+		// we also accept any dump busses
+		uint8 onDemand = false;
+		pnp_get_attr_uint8(node, B_DRIVER_FIND_DEVICES_ON_DEMAND, &onDemand, false);
+		
+		if (onDemand)
+			matches = true;
+	}
+
+	if (matches) {
+		dprintf("** NODE MATCHES TYPE %s\n", type);
+		dm_dump_node(node, 0);
+		return add_device_node(list, node);
+	}
+
+	// search child nodes, then
+	device_node_info *child = NULL;
+	while (dm_get_next_child_node(node, &child, NULL) == B_OK) {
+		status_t status = get_nodes_for_device_type(child, list, type);
+		if (status != B_OK) {
+			dm_put_node(child);
+			return status;
+		}
+	}
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 //	device manager private API
+
+
+/** Register the device of a child for the \a node that might accept it.
+ *	childName - module name of child/consumer
+ */
+
+status_t
+dm_register_child_device(device_node_info *node, const char *childName)
+{
+	driver_module_info *child;
+	status_t status;
+
+	TRACE(("dm_register_child_device(node = %p, child = %s)\n", node, childName));
+
+	status = get_module(childName, (module_info **)&child);
+	if (status < B_OK) {
+		dprintf("Cannot load driver module %s (%s)\n", childName, strerror(status));
+		return status;
+	}
+
+	if (child->register_device != NULL) {
+		status = child->register_device(node);
+		if (status != B_OK) {
+			TRACE(("dm_register_child_device(): Driver %s returned: %s\n", 
+				childName, strerror(status)));
+		}
+	} else {
+		dprintf("Driver %s has no register_device() hook\n", childName);
+		status = B_ERROR;
+	}
+
+	put_module(childName);
+	return status;
+}
 
 
 /** find and notify dynamic consumers that device was added
@@ -781,117 +1183,131 @@ try_drivers(struct list &list)
  */
 
 status_t
-pnp_notify_dynamic_consumers(device_node_info *node)
+dm_register_dynamic_child_devices(device_node_info *node)
 {
-#if 0
 	char *buffer;
 	char *bus;
 	status_t status = B_OK;
 	int32 i, found = 0;
 
-	TRACE(("pnp_notify_dynamic_consumers(node = %p)\n", node));
+	TRACE(("dm_register_dynamic_child_devices(node = %p)\n", node));
 
-	if (pnp_get_attr_string(node, PNP_DRIVER_CONSUMER_BUS, &bus, false) != B_OK)
+	if (pnp_get_attr_string(node, B_DRIVER_BUS, &bus, false) != B_OK)
 		return B_OK;
 
 	TRACE(("  Search bus: \"%s\"\n", bus));
 
-	buffer = (char *)malloc(B_PATH_NAME_LENGTH + 1);
-	if (buffer == NULL) {
-		status = B_NO_MEMORY;
-		goto err;
-	}
+	if (gBootDevice < 0) {
+		// there is no boot device yet, we have to scan the already
+		// loaded and built-in modules
+		struct list modules;
+		list_init(&modules);
 
-	// first, append nothing, then "/0", "/1" etc.
-	for (i = -1; ; ++i) {
-		bool noSpecificDriver = false;
-		char *consumer;
+		status = get_loaded_modules(&modules, bus, NULL);
+		if (status != B_OK)
+			return status;
 
-		strcpy(buffer, PNP_DRIVER_CONSUMER_MAPPING);
-		if (i >= 0)
-			sprintf(buffer + strlen( buffer ), "/%ld", i);
+		register_supporting_child_devices(node, &modules);
+		return B_OK;
+	} else {
+		// ToDo: this is completely outdated and must be redone!
+		status = B_ERROR;
+#if 0
+		buffer = (char *)malloc(B_PATH_NAME_LENGTH + 1);
+		if (buffer == NULL) {
+			status = B_NO_MEMORY;
+			goto err;
+		}
 
-		// if no more dynamic consumers, cancel loop silently
-		if (pnp_get_attr_string(node, buffer, &consumer, false) != B_OK) {
-			// starting with .../0 is OK, so ignore error if i = -1
-			if (i == -1)
-				continue;
-			else
+		// first, append nothing, then "/0", "/1" etc.
+		for (i = -1; ; ++i) {
+			bool noSpecificDriver = false;
+			char *consumer;
+
+			strcpy(buffer, B_DRIVER_MAPPING);
+			if (i >= 0)
+				sprintf(buffer + strlen( buffer ), "/%ld", i);
+	
+			// if no more dynamic consumers, cancel loop silently
+			if (pnp_get_attr_string(node, buffer, &consumer, false) != B_OK) {
+				// starting with .../0 is OK, so ignore error if i = -1
+				if (i == -1)
+					continue;
+				else
+					break;
+			}
+	
+			TRACE(("  Consumer pattern %ld: %s\n", i, consumer));
+			status = register_dynamic_child_device(node, bus, consumer, &noSpecificDriver);
+	
+			free(consumer);
+			found++;
+	
+			if (status != B_OK) {
+				// this is only reached if a serious error occured,
+				// see register_dynamic_child_device()
 				break;
+			}
 		}
-
-		TRACE(("  Consumer pattern %ld: %s\n", i, consumer));
-		status = notify_dynamic_consumer(node, bus, consumer, &noSpecificDriver);
-
-		free(consumer);
-		found++;
-
-		if (status != B_OK) {
-			// this is only reached if a serious error occured,
-			// see notify_dynamic_consumer()
-			break;
-		}
+#endif
 	}
-
+#if 0
 	if (found == 0) {
 		// no requirement for a special mapping, so we're just scanning the bus directory
 		bool noSpecificDriver = false;
-		status = notify_dynamic_consumer(node, bus, NULL, &noSpecificDriver);
+		status = register_dynamic_child_device(node, bus, NULL, &noSpecificDriver);
 	}
 
 	// supposed to go through
 	free(buffer);
+#endif
 err:
 	free(bus);
 	return status;
-#else
-	return B_OK;
-#endif
 }
 
 
-/**	Notify fixed consumers that device was added; in contrast to dynamic
- *	consumers, errors reported by fixed consumers are not ignored but
- *	returned.
+/**	Register all fixed child devices of of the given \a node; in contrast
+ *	to dynamic child devices, errors reported by fixed child devices are
+ *	not ignored but returned, and regarded critical.
  */
 
 status_t
-pnp_notify_fixed_consumers(device_node_info *node)
+dm_register_fixed_child_devices(device_node_info *node)
 {
-	int i;
-	char *buffer;
+	TRACE(("dm_register_fixed_child_devices(node = %p)\n", node));
 
-	TRACE(("pnp_notify_fixed_consumers(node = %p)\n", node));
-
-	buffer = (char *)malloc(B_PATH_NAME_LENGTH + 1);
+	char *buffer = (char *)malloc(B_PATH_NAME_LENGTH + 1);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
 	// first, append nothing, then "/0", "/1" etc.
-	for (i = -1; ; ++i) {
-		char *consumer;
+	for (int32 i = -1; ; ++i) {
+		char *childName;
 
-		strcpy(buffer, PNP_DRIVER_FIXED_CONSUMER);
+		strcpy(buffer, B_DRIVER_FIXED_CHILD);
 		if (i >= 0)
-			sprintf(buffer + strlen(buffer), "/%d", i);
+			sprintf(buffer + strlen(buffer), "/%ld", i);
 
 		// if no more fixed consumers, cancel loop silently
-		if (pnp_get_attr_string(node, buffer, &consumer, false) != B_OK)
+		if (pnp_get_attr_string(node, buffer, &childName, false) != B_OK)
 			break;
 
-		TRACE(("Consumer %d: %s\n", i, consumer));
+		TRACE(("Consumer %ld: %s\n", i, childName));
 
-		if (pnp_notify_probe_by_module(node, consumer) != B_OK) {
-			dprintf("Cannot notify fixed consumer %s\n", consumer);
+		if (dm_register_child_device(node, childName) != B_OK) {
+			dprintf("Cannot register fixed child device %s\n", childName);
 
 			// report error if fixed consumers couldn't be loaded
 			// as they are obviously crucial (else they wouldn't be fixed)
-			free(consumer);
+
+			// ToDo: what about the devices we already registered up to this point?
+			free(childName);
 			free(buffer);
 			return B_NAME_NOT_FOUND;
 		}
 
-		free(consumer);
+		free(childName);
 	}
 
 	free(buffer);
@@ -899,49 +1315,65 @@ pnp_notify_fixed_consumers(device_node_info *node)
 }
 
 
-status_t
-probe_for_device_type(const char *type)
+static status_t
+probe_for_driver_modules(const char *type)
 {
+	TRACE(("probe_for_driver_modules(type = %s)\n", type));
+
 	// search a node with an open connection of the specified type
 	// or notify bus managers to get one
 
 	status_t status = B_OK;
-
-	// build list of potential drivers for that type
-
 	struct list drivers;
 	list_init(&drivers);
 
-	char devType[64];
-	snprintf(devType, sizeof(devType), "drivers/dev%s%s", type[0] ? "/" : "", type);
+	if (gBootDevice < 0) {
+		struct list nodes;
+		list_init(&nodes);
 
-	DirectoryIterator iterator(kModulePaths, devType, false);
+		get_nodes_for_device_type(gRootNode, &nodes, type);
+
+		device_node_info *node;
+		uint32 cookie = 0;
+		while (get_next_device_node(&nodes, &cookie, &node) == B_OK) {
+			char *bus;
+			if (pnp_get_attr_string(node, B_DRIVER_BUS, &bus, false) == B_OK) {
+				struct list drivers;
+				list_init(&drivers);
+				get_loaded_modules(&drivers, bus, type);
+
+				register_supporting_child_devices(node, &drivers);
+
+				free(bus);
+			}
+		}
+
+		remove_device_nodes(&nodes);
+		return B_OK;
+	}
+
+	// build list of potential drivers for that type
+
+	DirectoryIterator iterator(kModulePaths, type, false);
 	struct stat stat;
 	KPath path;
 
 	while (iterator.GetNext(path, stat) == B_OK) {
-		path_entry *entry = (path_entry *)malloc(sizeof(path_entry));
-		if (entry == NULL)
-			return B_NO_MEMORY;
-
-		entry->path = strdup(path.Path());
-		if (entry->path == NULL) {
-			free(entry);
-			return B_NO_MEMORY;
-		}
-
 		if (S_ISDIR(stat.st_mode)) {
 			// We need to make sure that drivers in ie. "audio/raw/" can
 			// be found as well - therefore, we must make sure that "audio"
 			// exists on /dev.
-			if (type[0])
-				devfs_publish_directory(type);
+			int32 length = strlen("drivers/dev/");
+			if (!strncmp(type, "drivers/dev/", length))
+				devfs_publish_directory(type + length);
 			continue;
 		}
-		entry->device = stat.st_dev;
-		entry->node = stat.st_ino;
 
-		dprintf("found potential driver: %s\n", path.Path());
+		path_entry *entry = new_path_entry(path.Path(), stat.st_dev, stat.st_ino);
+		if (entry == NULL)
+			return B_NO_MEMORY;
+
+		TRACE(("found potential driver: %s\n", path.Path()));
 		list_add_item(&drivers, entry);
 	}
 
@@ -959,13 +1391,23 @@ probe_for_device_type(const char *type)
 		struct list driversForBus;
 		list_init(&driversForBus);
 
+		dprintf("bus: %s\n", path.Leaf());
+
 		while (busIterator.GetNext(path, stat) == B_OK) {
 			path_entry *entry = find_node_ref_in_list(&drivers, stat.st_dev, stat.st_ino);
 			if (entry == NULL)
 				continue;
 
-			// we found the driver here, so we should check it
-			list_remove_link(&entry->link);
+			entry->busses++;
+				// mark this entry as being used by a bus
+
+			// ToDo: we don't need to remember drivers when there is no bus for them
+			// (ie. no need to store ISA drivers when there is no ISA bus in the system)
+
+			entry = copy_path_entry(entry);
+			if (entry == NULL)
+				continue;
+
 			list_add_item(&driversForBus, entry);
 			dprintf("found driver for bus \"%s\": \"%s\"\n", path.Path(), entry->path);
 		}
@@ -973,11 +1415,22 @@ probe_for_device_type(const char *type)
 		// ToDo: do something with the bus drivers... :)
 		// ToDo: ask bus manager for driver (via mapping)
 		// ToDo: find all nodes where this driver could be attached to
-		try_drivers(driversForBus);
+		try_drivers(driversForBus, true);
 	}
 
 	// ToDo: do something with the remaining drivers... :)
-	try_drivers(drivers);
+	try_drivers(drivers, false);
 	return B_OK;
 }
 
+
+status_t
+probe_for_device_type(const char *type)
+{
+	TRACE(("probe_for_device_type(type = %s)\n", type));
+
+	char deviceType[64];
+	snprintf(deviceType, sizeof(deviceType), "drivers/dev%s%s", type[0] ? "/" : "", type);
+
+	return probe_for_driver_modules(deviceType);
+}

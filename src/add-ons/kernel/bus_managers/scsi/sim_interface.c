@@ -27,33 +27,20 @@
 static status_t
 scsi_controller_added(device_node_handle parent)
 {
+	char *controller_name;
 	int path_id;
-	char *str, *controller_name;
 
 	SHOW_FLOW0(4, "");
 
-	if (pnp->get_attr_string(parent, PNP_DRIVER_TYPE, &str, false) != B_OK)
-		return B_ERROR;
-
-	if (strcmp(str, SCSI_SIM_TYPE_NAME) != 0) {
-		free(str);
-		return B_ERROR;
-	}
-
-	free(str);
-
 	if (pnp->get_attr_string(parent, SCSI_DESCRIPTION_CONTROLLER_NAME, 
 		&controller_name, false) != B_OK) {
-		pnp->get_attr_string(parent, PNP_DRIVER_DRIVER, &str, false);
-		SHOW_ERROR(0, "Ignored controller managed by %s - controller name missing",
-			str);
+		dprintf("scsi: ignored controller - controller name missing\n");
 		return B_ERROR;
 	}
 
 	path_id = pnp->create_id(SCSI_PATHID_GENERATOR);
-
 	if (path_id < 0) {
-		SHOW_ERROR(0, "Cannot register SCSI controller %s - out of path IDs",
+		dprintf("scsi: Cannot register SCSI controller %s - out of path IDs\n",
 			controller_name);
 		free(controller_name);
 		return B_ERROR;
@@ -64,13 +51,10 @@ scsi_controller_added(device_node_handle parent)
 	{
 		device_attr attrs[] = {
 			// general information
-			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: SCSI_BUS_MODULE_NAME }},
-			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: SCSI_BUS_TYPE_NAME }},
+			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_BUS_MODULE_NAME }},
 
 			// we are a bus
 			{ PNP_BUS_IS_BUS, B_UINT8_TYPE, { ui8: 1 }},
-			// search for peripheral drivers after bus is fully scanned
-			{ PNP_BUS_DEFER_PROBE, B_UINT8_TYPE, {ui8: 1 }},
 
 			// remember who we are 
 			// (could use the controller name, but probably some software would choke)
@@ -81,7 +65,7 @@ scsi_controller_added(device_node_handle parent)
 			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: path_id }},
 
 			// tell internal bus raw driver to register bus' device in devfs
-			{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: SCSI_BUS_RAW_MODULE_NAME }},
+			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: SCSI_BUS_RAW_MODULE_NAME }},
 			{ NULL, 0 }
 		};
 
@@ -115,9 +99,10 @@ scsi_for_sim_interface scsi_for_sim_module =
 			std_ops
 		},
 
+		NULL,	// supported devices
+		scsi_controller_added,
 		NULL,
 		NULL,	
-		scsi_controller_added,
 		NULL
 	},
 

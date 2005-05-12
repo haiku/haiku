@@ -69,103 +69,6 @@ pnp_wait_load_block(device_node_info *node)
 }
 
 
-/** load driver automatically after registration/rescan of node. */
-
-void
-pnp_load_driver_automatically(device_node_info *node, bool after_rescan)
-{
-	uint8 always_loaded;
-	status_t res;
-	driver_module_info *interface;
-	void *cookie;
-
-	benaphore_lock(&gNodeLock);
-
-	// ignore dead nodes	
-	if (!node->registered)
-		goto err;
-
-	if (node->automatically_loaded)
-		goto err;
-
-	if (pnp_get_attr_uint8_nolock(node, PNP_DRIVER_ALWAYS_LOADED, 
-			&always_loaded, false ) != B_OK)
-		goto err;
-
-	if (always_loaded < 1 || always_loaded > 2)
-		goto err;
-
-	// this test is probably useless as the driver would be kept loaded
-	// during rescan anyway
-	if (always_loaded == 2 && after_rescan)
-		goto err;
-
-	// alright - time to get the driver loaded
-	benaphore_unlock(&gNodeLock);
-
-	res = pnp_load_driver(node, NULL, &interface, &cookie);
-
-	benaphore_lock(&gNodeLock);
-
-	// if driver cannot be loaded, we don't really care
-	if (res == B_OK )
-		node->automatically_loaded = true;
-	else
-		dprintf("driver could not be automatically loaded\n");
-
-err:
-	benaphore_unlock(&gNodeLock);
-	return;
-}
-
-
-/** unload driver that got loaded automatically. */
-
-void
-pnp_unload_driver_automatically(device_node_info *node, bool before_rescan)
-{
-	uint8 always_loaded;
-	status_t res;
-
-	benaphore_lock(&gNodeLock);
-
-	if (!node->automatically_loaded)
-		goto err;
-
-	if (pnp_get_attr_uint8_nolock(node, PNP_DRIVER_ALWAYS_LOADED, 
-			&always_loaded, false) != B_OK)
-		goto err;
-
-	// this test is probably useless as the driver wouldn't be
-	// loaded anyway
-	if (always_loaded < 1 || always_loaded > 2)
-		goto err;
-
-	if (always_loaded == 2 && before_rescan)
-		goto err;
-
-	// time to unload the driver		
-	benaphore_unlock(&gNodeLock);
-
-	res = pnp_unload_driver(node);
-
-	benaphore_lock(&gNodeLock);
-
-	// don't reset flag if unloading failed;
-	// if this happens during unregistration, this won't help;
-	// but if this happens during rescan, the driver only stays
-	// loaded during rescan, which can be handled
-	if (res == B_OK)
-		node->automatically_loaded = false;
-	else
-		dprintf("driver could not be unloaded during scan\n");
-
-err:
-	benaphore_unlock(&gNodeLock);
-	return;
-}
-
-
 /** load driver for real
  *	(loader_lock must be hold)
  */
@@ -173,49 +76,48 @@ err:
 static status_t
 load_driver_int(device_node_info *node, void *user_cookie)
 {
-	char *module_name;
 	driver_module_info *driver;
+	char *moduleName;
 	void *cookie;
-	status_t res;
+	status_t status;
 
 	TRACE(("load_driver_int()\n"));
 
-	res = pnp_get_attr_string(node, PNP_DRIVER_DRIVER, &module_name, false);
-	if (res != B_OK)
-		return res;
+	status = pnp_get_attr_string(node, B_DRIVER_MODULE, &moduleName, false);
+	if (status != B_OK)
+		return status;
 
-	TRACE(("%s\n", module_name));
+	TRACE(("%s\n", moduleName));
 
-	res = get_module(module_name, (module_info **)&driver);
-	if (res < B_OK) {
-		dprintf("Cannot load module %s\n", module_name);
-		goto err;
+	status = get_module(moduleName, (module_info **)&driver);
+	if (status < B_OK) {
+		dprintf("Cannot load module %s\n", moduleName);
+		goto err1;
 	}
 
-	if (driver->init_device == NULL) {
-		dprintf("Driver %s has no init_device hook\n", module_name);
-		res = B_ERROR;
+	if (driver->init_driver == NULL) {
+		dprintf("Driver %s has no init_driver hook\n", moduleName);
+		status = B_ERROR;
 		goto err2;
 	}
 
-	res = driver->init_device(node, user_cookie, &cookie);
-	if (res < B_OK) {
-		dprintf("init device failed (node %p, %s): %s\n", node, module_name, strerror(res));
+	status = driver->init_driver(node, user_cookie, &cookie);
+	if (status < B_OK) {
+		dprintf("init driver failed (node %p, %s): %s\n", node, moduleName, strerror(status));
 		goto err2;
 	}
 
 	node->driver = driver;
 	node->cookie = cookie;
 
-	free(module_name);
+	free(moduleName);
 	return B_OK;
 
 err2:
-	put_module(module_name);
-	
-err:
-	free(module_name);
-	return res;
+	put_module(moduleName);
+err1:
+	free(moduleName);
+	return status;
 }
 
 
@@ -257,12 +159,6 @@ pnp_load_driver(device_node_handle node, void *user_cookie,
 		// make sure noone else load/unloads/notifies the driver
 		pnp_start_hook_call_nolock(node);
 
-		// during load, driver may register children;
-		// probing them for consumers may be impossible as they 
-		// may try to load driver -> deadlock
-		// so we block probing for consumers of children
-		pnp_defer_probing_of_children_nolock(node);
-
 		if (!node->registered) {
 			// device got lost meanwhile
 			TRACE(("Device got lost during wait\n"));
@@ -296,16 +192,11 @@ pnp_load_driver(device_node_handle node, void *user_cookie,
 		if (res == B_OK) {
 			// everything went fine - increase load counter
 			++node->load_count;
-
-			// now we can safely probe for consumers of children as the
-			// driver is fully loaded
-			pnp_probe_waiting_children_nolock(node);
 		} else {
 			// loading failed or device got removed - restore reference count;
 			// but first (i.e. as long as ref_count is increased) get 
 			// rid of waiting children
-			pnp_probe_waiting_children_nolock(node);
-			pnp_remove_node_ref_nolock(node);
+			dm_put_node_nolock(node);
 		}
 	} else {
 		// driver is already loaded, so increase load_count
@@ -323,7 +214,7 @@ pnp_load_driver(device_node_handle node, void *user_cookie,
 			*cookie = node->cookie;
 
 		TRACE(("load_driver: Success \"%s\"\n",
-			((struct module_info *)(*interface))->name));
+			((struct module_info *)node->driver)->name));
 	} else {
 		TRACE(("load_driver: Failure (%s)\n", strerror(res)));
 	}
@@ -338,26 +229,26 @@ static status_t
 unload_driver_int(device_node_info *node)
 {
 	driver_module_info *driver = node->driver;
-	char *module_name;
-	status_t res;
+	char *moduleName;
+	status_t status;
 
-	res = pnp_get_attr_string(node, PNP_DRIVER_DRIVER, &module_name, false);
-	if (res != B_OK)
-		return res;
+	status = pnp_get_attr_string(node, B_DRIVER_MODULE, &moduleName, false);
+	if (status != B_OK)
+		return status;
 
-	TRACE(("unload_driver_int: %s\n", module_name));
+	TRACE(("unload_driver_int: %s\n", moduleName));
 
-	if (driver->uninit_device == NULL) {
+	if (driver->uninit_driver == NULL) {
 		// it has no uninit - we can't unload it, so it stays in memory forever
-		TRACE(("Driver %s has no uninit_device hook\n", module_name));
-		res = B_ERROR;
-		goto err;
+		TRACE(("Driver %s has no uninit_device hook\n", moduleName));
+		status = B_ERROR;
+		goto out;
 	}
 
-	res = driver->uninit_device(node->cookie);
-	if (res != B_OK) {
-		TRACE(("Failed to uninit driver %s (%s)\n", module_name, strerror(res)));
-		goto err;
+	status = driver->uninit_driver(node->cookie);
+	if (status != B_OK) {
+		TRACE(("Failed to uninit driver %s (%s)\n", moduleName, strerror(status)));
+		goto out;
 	}
 
 	// if it was unregistered a while ago but couldn't get cleaned up
@@ -367,14 +258,11 @@ unload_driver_int(device_node_info *node)
 			driver->device_cleanup(node);
 	}
 
-	put_module(module_name);
+	put_module(moduleName);
 
-	free(module_name);
-	return B_OK;
-
-err:
-	free(module_name);
-	return res;
+out:
+	free(moduleName);
+	return status;
 }
 
 
@@ -428,7 +316,7 @@ pnp_unload_driver(device_node_handle node)
 			// everything is fine, so decrease load_count ...
 			--node->load_count;
 			// ... and reference count
-			pnp_remove_node_ref_nolock(node);
+			dm_put_node_nolock(node);
 		} else {
 			// unloading failed: leave loaded in memory forever
 			// as load_count is not decreased, the driver will never
@@ -443,7 +331,7 @@ pnp_unload_driver(device_node_handle node)
 		// no concurrent load/unload and load_count won't reach zero
 		--node->load_count;
 		// each load increased reference count by one - time to undo that
-		pnp_remove_node_ref_nolock(node);
+		dm_put_node_nolock(node);
 
 		res = B_OK;
 	}

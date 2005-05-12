@@ -1,27 +1,60 @@
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003, Marcus Overhagen. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include <KernelExport.h>
 #include <PCI.h>
+
 #include "util/kernel_cpp.h"
 #include "pci_priv.h"
 #include "pci.h"
 
-static PCI *pcidb;
 
-void
+bool gIrqRouterAvailable = false;
+spinlock gConfigLock = 0;
+
+static PCI *sPCI;
+
+
+status_t
 pci_init(void)
 {
-	pcidb = new PCI;
+	if (pci_io_init() != B_OK) {
+		TRACE(("PCI: pci_io_init failed\n"));
+		return B_ERROR;
+	}
+
+	if (pci_config_init() != B_OK) {
+		TRACE(("PCI: pci_config_init failed\n"));
+		return B_ERROR;
+	}
+
+	if (pci_irq_init() != B_OK)
+		TRACE(("PCI: IRQ router not available\n"));
+	else
+		gIrqRouterAvailable = true;
+
+	sPCI = new PCI;
+
+	return B_OK;
 }
+
 
 void
 pci_uninit(void)
 {
-	delete pcidb;
+	delete sPCI;
 }
+
 
 long
 pci_get_nth_pci_info(long index, pci_info *outInfo)
 {
-	return pcidb->GetNthPciInfo(index, outInfo);
+	return sPCI->GetNthPciInfo(index, outInfo);
 }
 
 

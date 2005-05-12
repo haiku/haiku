@@ -29,154 +29,44 @@
 #endif
 
 
-#define PNP_ROOT_TYPE_NAME "pnp/root"
-	// type of pnp root device
-
-#define PNP_ROOT_DRIVERS_DIR "root"
-	// registration directory of pnp root drivers
-	// (put all drivers under "universal" and use unique connection names)
-
-#define PNP_ROOT_MODULE_NAME "sys/pnp_root/v1"
-
-
-static device_node_handle sRootNode;
+#define PNP_ROOT_MODULE_NAME "system/devices_root/driver_v1"
 
 
 void
-pnp_root_init_root(void)
+dm_init_root_node(void)
 {
 	device_attr attrs[] = {
-		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_ROOT_MODULE_NAME }},
-		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_ROOT_TYPE_NAME }},
+		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: PNP_ROOT_MODULE_NAME }},
+		{ B_DRIVER_PRETTY_NAME, B_STRING_TYPE, { string: "Devices Root" }},
 
-		// well - connection is actually pointless as there is no other root node
-		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "pnp_root" }},
-		{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "pnp_root" }},
-
-		// directory for root drivers
-		// ToDo: temporary hack to get things started!
-		{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: "bus_managers/isa/root" }},
-		{ PNP_DRIVER_DYNAMIC_CONSUMER, B_STRING_TYPE, { string: PNP_ROOT_DRIVERS_DIR "/" }},
-
+		{ B_DRIVER_BUS, B_STRING_TYPE, { string: "root" }},
 		{ NULL }
 	};
 
-	if (pnp_register_device(NULL, attrs, NULL, &sRootNode) != B_OK)
-		dprintf("Cannot register PnP-Root\n");
-	// ToDo: don't panic for now
-	//	panic("Cannot register PnP-Root\n");
-}
-
-
-void
-pnp_root_destroy_root(void)
-{
-	// make sure we are registered
-	if (sRootNode == NULL)
-		return;
-
-	TRACE(("Destroying PnP-root\n"));
-
-	if (pnp_unregister_device(sRootNode) != B_OK)
-		return;
-
-	sRootNode = NULL;
-}
-
-
-void
-pnp_root_rescan_root(void)
-{
-	// make sure we are registered
-	if (sRootNode == NULL)
-		return;
-
-	TRACE(("Rescanning PnP-root\n"));
-
-	// scan _very_ deep
-	pnp_rescan(sRootNode, 30000);
+	if (dm_register_node(NULL, attrs, NULL, &gRootNode) != B_OK) {
+		// ToDo: don't panic for now
+		dprintf("Cannot register Devices Root Node\n");
+	}
 }
 
 
 static status_t
-pnp_root_init_device(device_node_handle node, void *user_cookie, void **cookie)
+root_init_driver(device_node_handle node, void *user_cookie, void **_cookie)
 {
-	*cookie = NULL;
+	*_cookie = NULL;
 	return B_OK;
 }
 
 
 static status_t
-pnp_root_uninit_device(void *cookie)
+root_uninit_driver(void *cookie)
 {
 	return B_OK;
 }
 
-/*
-static status_t pnp_root_device_added( 
-	device_node_handle parent )
-{
-	char *tmp;
-	status_t res;
-	device_node_handle loader_node;
-	
-	// make sure parent is really root
-	if( pnp->get_attr_string( parent, PNP_DRIVER_TYPE, &tmp, false ))
-		return B_ERROR;
-		
-	if( strcmp( tmp, PNP_ROOT_NODE_TYPE_NAME ) != 0 ) {
-		free( tmp );
-		return B_ERROR;
-	}
-	
-	free( tmp );
-
-	// load ISA bus manager
-	// if you don't want ISA, remove this registration
-	{
-		device_attr attrs[] = {
-			// info about ourself
-			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_ROOT_MODULE_NAME }},
-			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: "pnp/isa_loader" }},
-			{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: ISA2_MODULE_NAME }},
-			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "ISA" }},
-			{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "ISA" }},
-			{ NULL }
-		};
-		
-		SHOW_FLOW0( 4, "registering ISA root" );
-
-		res = pnp->register_device( parent, attrs, NULL, &loader_node );
-		if( res != B_OK )
-			return res;
-	}
-
-	// load PCI bus manager
-	{
-		device_attr attrs[] = {
-			// info about ourself
-			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_ROOT_MODULE_NAME }},
-			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: "pnp/pci_loader" }},
-			{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: PCI_ROOT_MODULE_NAME }},
-			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "PCI" }},
-			{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "PCI" }},
-			{ NULL }
-		};
-		
-		SHOW_FLOW0( 4, "registering PCI root" );
-
-		res = pnp->register_device( parent, attrs, NULL, &loader_node );
-		if( res != B_OK )
-			return res;
-	}
-
-	return B_OK;		
-
-}
-*/
 
 static status_t
-std_ops(int32 op, ...)
+root_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
@@ -193,12 +83,13 @@ driver_module_info gDeviceRootModule = {
 	{
 		PNP_ROOT_MODULE_NAME,
 		0,
-		std_ops,
+		root_std_ops,
 	},
 
-	pnp_root_init_device,
-	pnp_root_uninit_device,
-	NULL,
+	NULL,	// supported devices
+	NULL,	// register device
+	root_init_driver,
+	root_uninit_driver,
 	NULL,
 	NULL
 };

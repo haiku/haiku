@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI bus manager
@@ -182,6 +182,7 @@ scsi_destroy_bus(scsi_bus_info *bus)
 static status_t
 scsi_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 {
+	device_node_handle parent;
 	uint8 path_id;
 	scsi_bus_info *bus;
 	status_t res;
@@ -239,8 +240,13 @@ scsi_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 		goto err;
 	}
 
-	res = pnp->load_driver(pnp->get_parent(node), bus, 
+	parent = pnp->get_parent(node);
+
+	res = pnp->init_driver(parent, bus, 
 		(driver_module_info **)&bus->interface, (void **)&bus->sim_cookie);
+
+	pnp->put_device_node(parent);
+
 	if (res != B_OK)
 		goto err;
 
@@ -264,7 +270,10 @@ err:
 static status_t
 scsi_uninit_bus(scsi_bus_info *bus)
 {
-	pnp->unload_driver(pnp->get_parent(bus->node));
+	device_node_handle parent = pnp->get_parent(bus->node);
+	pnp->uninit_driver(parent);
+	pnp->put_device_node(parent);
+
 	scsi_destroy_bus(bus);
 
 	return B_OK;
@@ -331,13 +340,15 @@ scsi_bus_interface scsi_bus_module = {
 				std_ops
 			},
 
+			NULL,	// supported devices
+			NULL,	// register node
 			scsi_init_bus,
-			(status_t (*) (void *))	scsi_uninit_bus,
-			NULL,
+			(status_t (*)(void *))scsi_uninit_bus,
 			NULL
 		},
 
-		(status_t (*) (void *)) scsi_scan_bus
+		(status_t (*)(void *))scsi_scan_bus,
+		NULL
 	},
 
 	scsi_inquiry_path,

@@ -266,37 +266,44 @@ devfs_find_in_dir(struct devfs_vnode *dir, const char *path)
 
 
 static status_t
-devfs_insert_in_dir(struct devfs_vnode *dir, struct devfs_vnode *v)
+devfs_insert_in_dir(struct devfs_vnode *dir, struct devfs_vnode *vnode)
 {
 	if (!S_ISDIR(dir->stream.type))
 		return B_BAD_VALUE;
 
-	v->dir_next = dir->stream.u.dir.dir_head;
-	dir->stream.u.dir.dir_head = v;
+	vnode->dir_next = dir->stream.u.dir.dir_head;
+	dir->stream.u.dir.dir_head = vnode;
 
-	v->parent = dir;
+	vnode->parent = dir;
 	dir->modification_time = time(NULL);
+
+	notify_entry_created(sDeviceFileSystem->id, dir->id, vnode->name, vnode->id);
+	notify_stat_changed(sDeviceFileSystem->id, dir->id, B_STAT_MODIFICATION_TIME);
+
 	return B_OK;
 }
 
 
 static status_t
-devfs_remove_from_dir(struct devfs_vnode *dir, struct devfs_vnode *findit)
+devfs_remove_from_dir(struct devfs_vnode *dir, struct devfs_vnode *removeNode)
 {
-	struct devfs_vnode *v;
-	struct devfs_vnode *last_v;
+	struct devfs_vnode *vnode = dir->stream.u.dir.dir_head;
+	struct devfs_vnode *lastNode = NULL;
 
-	for (v = dir->stream.u.dir.dir_head, last_v = NULL; v; last_v = v, v = v->dir_next) {
-		if (v == findit) {
-			/* make sure all dircookies dont point to this vnode */
-			update_dircookies(dir, v);
+	for (; vnode != NULL; lastNode = vnode, vnode = vnode->dir_next) {
+		if (vnode == removeNode) {
+			// make sure no dircookies point to this vnode
+			update_dircookies(dir, vnode);
 
-			if (last_v)
-				last_v->dir_next = v->dir_next;
+			if (lastNode)
+				lastNode->dir_next = vnode->dir_next;
 			else
-				dir->stream.u.dir.dir_head = v->dir_next;
-			v->dir_next = NULL;
+				dir->stream.u.dir.dir_head = vnode->dir_next;
+			vnode->dir_next = NULL;
 			dir->modification_time = time(NULL);
+
+			notify_entry_removed(sDeviceFileSystem->id, dir->id, vnode->name, vnode->id);
+			notify_stat_changed(sDeviceFileSystem->id, dir->id, B_STAT_MODIFICATION_TIME);
 			return B_OK;
 		}
 	}
@@ -927,7 +934,7 @@ devfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 	TRACE(("devfs_get_vnode: looked it up at %p\n", *_vnode));
 
 	if (*_vnode)
-		return 0;
+		return B_OK;
 
 	return B_ENTRY_NOT_FOUND;
 }
@@ -1535,7 +1542,7 @@ devfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat, uint32
 
 	mutex_unlock(&fs->lock);
 
-	notify_listener(B_STAT_CHANGED, fs->id, 0, 0, vnode->id, NULL);
+	notify_stat_changed(fs->id, vnode->id, statMask);
 	return B_OK;
 }
 
@@ -1626,15 +1633,11 @@ file_system_info gDeviceFileSystem = {
 //	temporary hack to get it to work with the current device manager
 
 
-static device_manager_info *pnp;
+static device_manager_info *sDeviceManager;
 
 
-static const device_attr pnp_devfs_attrs[] =
-{
-	{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
-	{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: "devfs_device_notifier" }},
-	{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "devfs" }},
-	{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "devfs" }},
+static const device_attr pnp_devfs_attrs[] = {
+	{ B_DRIVER_MODULE, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
 	{ NULL }
 };
 
@@ -1644,20 +1647,13 @@ static const device_attr pnp_devfs_attrs[] =
 static status_t
 pnp_devfs_register_device(device_node_handle parent)
 {
-	char *str = NULL, *filename = NULL;
+	char *filename = NULL;
 	device_node_handle node;
 	status_t status;
 
 	TRACE(("pnp_devfs_probe()\n"));
 
-	// make sure we can handle this parent
-	if (pnp->get_attr_string(parent, PNP_DRIVER_TYPE, &str, false) != B_OK
-		|| strcmp(str, PNP_DEVFS_TYPE_NAME) != 0) {
-		status = B_ERROR;
-		goto err1;
-	}
-
-	if (pnp->get_attr_string(parent, PNP_DEVFS_FILENAME, &filename, true) != B_OK) {
+	if (sDeviceManager->get_attr_string(parent, PNP_DEVFS_FILENAME, &filename, true) != B_OK) {
 		dprintf("devfs: Item containing file name is missing\n");
 		status = B_ERROR;
 		goto err1;
@@ -1665,13 +1661,16 @@ pnp_devfs_register_device(device_node_handle parent)
 
 	TRACE(("Adding %s\n", filename));
 
-	pnp_devfs_driver_info *info;
-	status = pnp->load_driver(parent, NULL, (driver_module_info **)&info, NULL);
-	if (status != B_OK)
+	status = sDeviceManager->register_device(parent, pnp_devfs_attrs, NULL, &node);
+	if (status != B_OK || node == NULL)
 		goto err1;
 
-	status = pnp->register_device(parent, pnp_devfs_attrs, NULL, &node);
-	if (status != B_OK || node == NULL)
+	// ToDo: this is a hack to get things working (init_driver() only works for registered nodes)
+	parent->registered = true;
+
+	pnp_devfs_driver_info *info;
+	status = sDeviceManager->init_driver(parent, NULL, (driver_module_info **)&info, NULL);
+	if (status != B_OK)
 		goto err2;
 
 	//add_device(device);
@@ -1683,11 +1682,10 @@ pnp_devfs_register_device(device_node_handle parent)
 	return B_OK;
 
 err3:
-	pnp->unregister_device(node);
+	sDeviceManager->uninit_driver(parent);
 err2:
-	pnp->unload_driver(parent);
+	sDeviceManager->unregister_device(node);
 err1:
-	free(str);
 	free(filename);
 
 	return status;
@@ -1728,9 +1726,9 @@ pnp_devfs_device_removed(device_node_handle node, void *cookie)
 #endif
 	TRACE(("pnp_devfs_device_removed()\n"));
 #if 0
-	parent = pnp->get_parent(node);
+	parent = sDeviceManager->get_parent(node);
 	
-	// don't use cookie - we don't use pnp loading scheme but
+	// don't use cookie - we don't use sDeviceManager loading scheme but
 	// global data and keep care of everything ourself!
 	ACQUIRE_BEN( &device_list_lock );
 	
@@ -1738,9 +1736,9 @@ pnp_devfs_device_removed(device_node_handle node, void *cookie)
 		if( device->parent == parent ) 
 			break;
 	}
-	
+
 	if( device != NULL ) {
-		pnp_devfs_remove_device( device );
+		pnp_devfs_remove_device(device);
 	} else {
 		SHOW_ERROR( 0, "bug: node %p couldn't been found", node );
 		res = B_NAME_NOT_FOUND;
@@ -1758,10 +1756,10 @@ pnp_devfs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			return get_module(DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp);
+			return get_module(B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager);
 
 		case B_MODULE_UNINIT:
-			put_module(DEVICE_MANAGER_MODULE_NAME);
+			put_module(B_DEVICE_MANAGER_MODULE_NAME);
 			return B_OK;
 
 		default:
@@ -1777,10 +1775,13 @@ driver_module_info gDeviceForDriversModule = {
 		pnp_devfs_std_ops
 	},
 
-	NULL,
-	NULL,
+	NULL,	// supports device
 	pnp_devfs_register_device,
-	pnp_devfs_device_removed
+	NULL,	// init driver
+	NULL,	// uninit driver
+	pnp_devfs_device_removed,
+	NULL,	// cleanup
+	NULL,	// get paths
 };
 
 

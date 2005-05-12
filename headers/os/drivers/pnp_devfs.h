@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	PnP devfs driver interface.
@@ -20,9 +20,10 @@
 #ifndef _PNP_DEVFS_H
 #define _PNP_DEVFS_H
 
+
 #include <Drivers.h>
 #include <device_manager.h>
-//#include "r5_wrapper.h"
+
 
 // changed open hook - gets cookie returned by init_device instead of name
 typedef status_t (*pnp_device_open_hook)(void *device_cookie, uint32 flags, 
@@ -49,9 +50,6 @@ typedef struct pnp_devfs_driver_info {
 // name under which the device should be published under /dev (required, string)
 #define PNP_DEVFS_FILENAME		"devfs/filename"
 
-// type of devfs device drivers
-#define PNP_DEVFS_TYPE_NAME		"devfs_device"
-
-#define PNP_DEVFS_MODULE_NAME	"sys/pnp_devfs/v1"
+#define PNP_DEVFS_MODULE_NAME	"system/devfs/device_v1"
 
 #endif

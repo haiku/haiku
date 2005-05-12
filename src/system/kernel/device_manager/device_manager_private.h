@@ -30,17 +30,15 @@
 #define SYSTEM_MODULES_DIR "/boot/beos/add-ons/kernel/"
 #define COMMON_MODULES_DIR "/boot/home/config/add-ons/kernel/"
 
-#define PNP_BOOT_LINKS "pnp_bootlinks"
-
 
 // info about ID generator
 typedef struct id_generator {
 	struct list_link link;
 	struct id_generator *prev, *next;
-	int ref_count;
-	char *name;
-	uint32 num_ids;
-	uint8 alloc_map[(GENERATOR_MAX_ID + 7) / 8];
+	int32		ref_count;
+	char		*name;
+	uint32		num_ids;
+	uint8		alloc_map[(GENERATOR_MAX_ID + 7) / 8];
 } id_generator;
 
 
@@ -60,11 +58,18 @@ typedef struct io_resource_info {
 } io_resource_info;
 
 
+// a structure to put nodes into lists
+struct node_entry {
+	struct list_link	link;
+	device_node_info	*node;
+};
+
+
 // global lock
 // whenever you do something in terms of nodes, grab it
 extern benaphore gNodeLock;
-// list of nodes (includes removed devices!)
-extern device_node_info *gNodeList;
+// root node
+extern device_node_info *gRootNode;
 
 // true, if user addons are disabled via safemode
 extern bool disable_useraddons;
@@ -120,6 +125,8 @@ status_t pnp_get_attr_raw(device_node_handle node, const char *name,
 status_t pnp_get_attr_raw_nolock(device_node_handle node, const char *name, 
 	const void **data, size_t *len, bool recursive);
 void pnp_free_node_attr(device_attr_info *attr);
+status_t pnp_get_next_node_with_attrs(device_node_info **_node, const device_attr *attrs);
+int pnp_compare_attrs(const device_attr *attrA, const device_attr *attrB);
 status_t pnp_duplicate_node_attr(const device_attr *src, device_attr_info **dest_out);
 status_t pnp_get_next_attr(device_node_handle node, device_attr_handle *attr);
 status_t pnp_release_attr(device_node_handle node, device_attr_handle attr);
@@ -129,62 +136,49 @@ void pnp_remove_attr_int(device_node_handle node, device_attr_info *attr);
 status_t pnp_remove_attr(device_node_handle node, const char *name);
 
 
-// boot_hack.c
-#if 0
-void pnp_load_boot_links( void );
-void pnp_unload_boot_links( void );
-char *pnp_boot_safe_realpath( 
-	const char *file_name, char *resolved_path );
-int pnp_boot_safe_lstat( const char *file_name, struct stat *info );
-DIR *pnp_boot_safe_opendir( const char *dirname );
-int pnp_boot_safe_closedir( DIR *dirp );
-struct dirent *pnp_boot_safe_readdir( DIR *dirp );
-#endif
-
 // driver_loader.c
 
 status_t pnp_load_driver(device_node_handle node, void *user_cookie, 
 			driver_module_info **interface, void **cookie);
 status_t pnp_unload_driver(device_node_handle node);
 void pnp_unblock_load(device_node_info *node);
-void pnp_load_driver_automatically(device_node_info *node, bool after_rescan);
-void pnp_unload_driver_automatically(device_node_info *node, bool before_rescan);
 
 
 // id_generator.c
 
-int32 pnp_create_id(const char *name);
-status_t pnp_free_id(const char *name, uint32 id);
-extern status_t id_generator_init(void);
+int32 dm_create_id(const char *name);
+status_t dm_free_id(const char *name, uint32 id);
+extern status_t dm_init_id_generator(void);
 
 
 // io_resources.c
 
-status_t pnp_acquire_io_resources(io_resource *resources, io_resource_handle *handles);
-status_t pnp_release_io_resources(const io_resource_handle *handles);
-void pnp_assign_io_resources(device_node_info *node, const io_resource_handle *handles);
-void pnp_release_node_resources(device_node_info *node);
+status_t dm_acquire_io_resources(io_resource *resources, io_resource_handle *handles);
+status_t dm_release_io_resources(const io_resource_handle *handles);
+void dm_assign_io_resources(device_node_info *node, const io_resource_handle *handles);
+void dm_release_node_resources(device_node_info *node);
 
 
 // nodes.c
 
-status_t pnp_alloc_node(const device_attr *attrs, const io_resource_handle *resources,
+status_t dm_allocate_node(const device_attr *attrs, const io_resource_handle *resources,
 	device_node_info **new_node);
-void pnp_create_node_links(device_node_info *node, device_node_info *parent);
-void pnp_add_node_ref(device_node_info *node);
-void pnp_remove_node_ref(device_node_info *node);
-void pnp_remove_node_ref_nolock(device_node_info *node);
-device_node_handle pnp_find_device(device_node_handle parent, const device_attr *attrs);
-device_node_handle pnp_get_parent(device_node_handle node);
-void dump_device_node_info(device_node_info *node, int32 level);
-extern status_t nodes_init(void);
+void dm_add_child_node(device_node_info *node, device_node_info *parent);
+void dm_get_node_nolock(device_node_info *node);
+void dm_get_node(device_node_info *node);
+void dm_put_node_nolock(device_node_info *node);
+void dm_dump_node(device_node_info *node, int32 level);
+status_t dm_init_nodes(void);
+
+void dm_put_node(device_node_info *node);
+status_t dm_get_next_child_node(device_node_info *parent,
+	device_node_info **_node, const device_attr *attrs);
+device_node_info *dm_get_parent(device_node_info *node);
 
 
 // notifications.c
 
-status_t pnp_notify_probe_by_module(device_node_info *node, 
-	const char *consumer_name);
-void pnp_notify_unregistration(device_node_info *notify_list);
+status_t dm_notify_unregistration(device_node_info *node);
 void pnp_start_hook_call(device_node_info *node);
 void pnp_start_hook_call_nolock(device_node_info *node);
 void pnp_finish_hook_call(device_node_info *node);
@@ -199,35 +193,30 @@ status_t pnp_expand_pattern_attr(device_node_info *node, const char *attr_name,
 	char **expanded);
 
 
-// probe.c
-status_t pnp_notify_fixed_consumers(device_node_handle node);
-status_t pnp_notify_dynamic_consumers(device_node_info *node);
+// probe.cpp
+status_t dm_register_child_device(device_node_info *node, const char *childName);
+status_t dm_register_fixed_child_devices(device_node_info *node);
+status_t dm_register_dynamic_child_devices(device_node_info *node);
 
 
 // registration.c
 
-status_t pnp_register_device(device_node_handle parent, const device_attr *attrs,
-	const io_resource_handle *resources, device_node_handle *node);
-status_t pnp_unregister_device(device_node_handle node);
-void pnp_unregister_node_rec(device_node_info *node, device_node_info **dependency_list);
+status_t dm_register_node(device_node_handle parent, const device_attr *attrs,
+	const io_resource_handle *resources, device_node_handle *_newNode);
+status_t dm_unregister_node(device_node_handle node);
+
 void pnp_unref_unregistered_nodes(device_node_info *node_list);
-void pnp_defer_probing_of_children_nolock(device_node_info *node);
-void pnp_defer_probing_of_children(device_node_info *node);
-void pnp_probe_waiting_children_nolock(device_node_info *node);
-void pnp_probe_waiting_children(device_node_info *node);
+
 
 // root_node.c
 
-extern void pnp_root_init_root(void);
-extern void pnp_root_destroy_root(void);
-extern void pnp_root_rescan_root(void);
+void dm_init_root_node(void);
+
 
 // scan.c
 
-status_t pnp_rescan(device_node_handle node, uint32 depth);
-status_t pnp_rescan_int(device_node_info *node, uint32 depth, 
-	bool ignore_fixed_consumers);
-status_t pnp_initial_scan(device_node_info *node);
+status_t dm_rescan(device_node_handle node);
+status_t dm_register_child_devices(device_node_info *node);
 
 #ifdef __cplusplus
 }

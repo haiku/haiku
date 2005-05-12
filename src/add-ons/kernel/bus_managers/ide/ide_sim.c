@@ -34,6 +34,7 @@ scsi_for_sim_interface *scsi;
 fast_log_info *fast_log;
 
 
+#ifdef USE_FAST_LOG
 static fast_log_event_type ide_events[] =
 {
 	{ ev_ide_send_command, "ev_ide_send_command " },
@@ -64,9 +65,11 @@ static fast_log_event_type ide_events[] =
 	{ ev_ide_scan_device_int_found, "ev_ide_scan_device_int_found" },
 	{}
 };
+#endif
 
-static void disconnect_worker( ide_bus_info *bus, void *arg );
-static void set_check_condition( ide_qrequest *qrequest );
+
+static void disconnect_worker(ide_bus_info *bus, void *arg);
+static void set_check_condition(ide_qrequest *qrequest);
 
 
 /** check whether this request can be within device */
@@ -541,6 +544,7 @@ finish_all_requests(ide_device_info *device, ide_qrequest *ignore,
 static status_t
 ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 {
+	device_node_handle parent;
 	ide_bus_info *bus;
 	int res;
 
@@ -566,11 +570,13 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 		sprintf(bus->name, "ide_bus %d", (int)channel_id);
 	}
 
+#if 0
 	bus->log = fast_log->start_log(bus->name, ide_events);
 	if (bus->log == NULL) {
 		res = B_NO_MEMORY;
 		goto err;
 	}
+#endif
 
 	init_synced_pc(&bus->scan_bus_syncinfo, scan_device_worker);
 	init_synced_pc(&bus->disconnect_syncinfo, disconnect_worker);
@@ -635,9 +641,13 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 		bus->can_CQ = false;
 	}
 
-	res = pnp->load_driver(pnp->get_parent(node), bus, 
+	parent = pnp->get_parent(node);
+
+	res = pnp->init_driver(parent, bus, 
 			(driver_module_info **)&bus->controller, 
 			(void **)&bus->channel);
+
+	pnp->put_device_node(parent);
 	if (res != B_OK)
 		goto err5;
 
@@ -654,16 +664,15 @@ err4:
 	delete_sem(bus->scan_device_sem);
 err3:
 	delete_sem(bus->sync_wait_sem);
-
 err2:	
 	scsi->free_dpc(bus->irq_dpc);
-
 err1:
 	uninit_synced_pc(&bus->scan_bus_syncinfo);
 	uninit_synced_pc(&bus->disconnect_syncinfo);
+#ifdef USE_FAST_LOG
 	fast_log->stop_log(bus->log);
-
 err:
+#endif
 	free(bus);
 
 	return res;
@@ -673,7 +682,10 @@ err:
 static status_t
 ide_sim_uninit_bus(ide_bus_info *bus)
 {
-	pnp->unload_driver(pnp->get_parent(bus->node));
+	device_node_handle parent = pnp->get_parent(bus->node);
+
+	pnp->uninit_driver(parent);
+	pnp->put_device_node(parent);
 
 	DELETE_BEN(&bus->status_report_ben);	
 	delete_sem(bus->scan_device_sem);
@@ -681,7 +693,7 @@ ide_sim_uninit_bus(ide_bus_info *bus)
 	scsi->free_dpc(bus->irq_dpc);
 	uninit_synced_pc(&bus->scan_bus_syncinfo);
 	uninit_synced_pc(&bus->disconnect_syncinfo);
-	fast_log->stop_log(bus->log);
+//	fast_log->stop_log(bus->log);
 
 	free(bus);
 
@@ -769,9 +781,8 @@ std_ops(int32 op, ...)
 
 
 module_dependency module_dependencies[] = {
-	{ FAST_LOG_MODULE_NAME, (module_info **)&fast_log },
 	{ SCSI_FOR_SIM_MODULE_NAME, (module_info **)&scsi },
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{}
 };
 
@@ -783,23 +794,23 @@ scsi_sim_interface ide_sim_module = {
 			0,
 			std_ops,
 		},
-				
+
+		NULL,	// supported devices				
+		NULL,	// register node
 		(status_t (*)(device_node_handle, void *, void **))ide_sim_init_bus,
-		(status_t (*)( void *)) 					ide_sim_uninit_bus,
-		
-		NULL,
+		(status_t (*)(void *)	) 					ide_sim_uninit_bus,
 		(void (*)(device_node_handle, void *))		ide_sim_bus_removed
 	},
 	
-	(void (*)( scsi_sim_cookie, scsi_ccb * ))		sim_scsi_io,
-	(uchar (*)( scsi_sim_cookie, scsi_ccb * ))		sim_abort,
-	(uchar (*)( scsi_sim_cookie, uchar, uchar )) 	sim_reset_device,
-	(uchar (*)( scsi_sim_cookie, scsi_ccb * ))		sim_term_io,
+	(void (*)(scsi_sim_cookie, scsi_ccb *))			sim_scsi_io,
+	(uchar (*)(scsi_sim_cookie, scsi_ccb *))		sim_abort,
+	(uchar (*)(scsi_sim_cookie, uchar, uchar)) 		sim_reset_device,
+	(uchar (*)(scsi_sim_cookie, scsi_ccb *))		sim_term_io,
 
-	(uchar (*)( scsi_sim_cookie, scsi_path_inquiry * ))	sim_path_inquiry,
-	(uchar (*)( scsi_sim_cookie ))					sim_scan_bus,
-	(uchar (*)( scsi_sim_cookie ))					sim_reset_bus,
+	(uchar (*)(scsi_sim_cookie, scsi_path_inquiry *))sim_path_inquiry,
+	(uchar (*)(scsi_sim_cookie))					sim_scan_bus,
+	(uchar (*)(scsi_sim_cookie))					sim_reset_bus,
 	
-	(void (*)( scsi_sim_cookie, uchar, 
+	(void (*)(scsi_sim_cookie, uchar, 
 		bool*, bool *, uint32 *))					ide_sim_get_restrictions
 };

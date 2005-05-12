@@ -9,25 +9,23 @@
 #include <SupportDefs.h>
 #include <device_manager.h>
 
+#include <util/list.h>
+
 
 typedef struct device_node_info device_node_info;
 
 // info about a device node
 struct device_node_info {
-	device_node_info	*prev, *next;
-	device_node_info	*siblings_prev, *siblings_next;
-	device_node_info	*notify_prev, *notify_next;
+	struct list_link	siblings;
 	device_node_info	*parent;
-	device_node_info	*children;
-	int32				ref_count;			// reference count; see registration.c
+	struct list			children;
+	int32				ref_count;
+
 	driver_module_info	*driver;
 	void				*cookie;
+
 	bool				registered;			// true, if device is officially existent
-	bool				init_finished;		// true, if publish_device has been completed
-											// (sync with loader_lock)
 	bool				blocked_by_rescan;	// true, if device is blocked because of rescan
-	bool				verifying;			// true, if driver is being verified by rescan
-	bool				redetected;			// true, if driver was redetected during rescan
 	int32				num_waiting_hooks;	// number of waiting hook calls
 	sem_id				hook_sem;			// sem for waiting hook calls
 	int32				load_block_count;	// load-block nest count
@@ -39,10 +37,7 @@ struct device_node_info {
 	struct device_attr_info *attributes;	// list of attributes
 	uint32				num_io_resources;	// number of I/O resources
 	io_resource_handle	*io_resources;		// array of I/O resource (NULL-terminated)
-	int32				defer_probing; 		// > 0 defer probing for consumers of children
 	bool				automatically_loaded;	// loaded automatically because PNP_DRIVER_ALWAYS_LOADED
-	device_node_info	*unprobed_children; // list of un-probed children
-	device_node_info	*unprobed_prev, *unprobed_next; // link for unprobed_children
 };
 
 

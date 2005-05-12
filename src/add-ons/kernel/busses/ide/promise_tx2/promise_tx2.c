@@ -22,10 +22,8 @@
 
 #include "wrapper.h"
 
-#define PROMISE_TX2_CONTROLLER_MODULE_NAME "busses/ide/promise_tx2/" PCI_DEVICE_TYPE_NAME
+#define PROMISE_TX2_CONTROLLER_MODULE_NAME "busses/ide/promise_tx2/device_v1"
 #define PROMISE_TX2_CHANNEL_MODULE_NAME "busses/ide/promise_tx2/channel/v1"
-
-#define PROMISE_TX2_CONTROLLER_TYPE_NAME "promise tx2 controller"
 
 
 static ide_for_controller_interface *ide;
@@ -190,10 +188,7 @@ publish_controller(device_node_handle parent, uint16 bus_master_base, uint8 intn
 {
 	device_attr attrs[] = {
 		// info about ourself and our consumer
-		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PROMISE_TX2_CONTROLLER_MODULE_NAME }},
-		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PROMISE_TX2_CONTROLLER_TYPE_NAME }},
-		// don't scan if loaded as we own I/O resources
-		{ PNP_DRIVER_NO_LIVE_RESCAN, B_UINT8_TYPE, { ui8: 1 }},
+		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: PROMISE_TX2_CONTROLLER_MODULE_NAME }},
 
 		// properties of this controller for ide bus manager
 		// there are always max. 2 devices
@@ -273,7 +268,7 @@ probe_controller(device_node_handle parent)
 
 	SHOW_FLOW0(3, "");
 
-	if (pnp->load_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
+	if (pnp->init_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
 		return B_ERROR;
 
 	command_block_base[0] = pci->read_pci_config(device, PCI_base_registers, 4);
@@ -297,12 +292,12 @@ probe_controller(device_node_handle parent)
 		command_block_base[1], control_block_base[1], bus_master_base, intnum, false, 
 		"Secondary Channel", &channels[1], false);
 
-	pnp->unload_driver(parent);
+	pnp->uninit_driver(parent);
 
 	return B_OK;
 
 err:
-	pnp->unload_driver(parent);	
+	pnp->uninit_driver(parent);	
 	return res;
 }
 
@@ -323,7 +318,7 @@ std_ops(int32 op, ...)
 
 module_dependency module_dependencies[] = {
 	{ IDE_FOR_CONTROLLER_MODULE_NAME, (module_info **)&ide },
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{ IDE_ADAPTER_MODULE_NAME, (module_info **)&ide_adapter },
 	{}
 };
@@ -338,9 +333,10 @@ static ide_controller_interface channel_interface = {
 			std_ops
 		},
 
+		NULL,	// supported devices
+		NULL,
 		(status_t (*)( device_node_handle , void *, void ** ))	init_channel,
 		(status_t (*)( void * ))						uninit_channel,
-		NULL,
 		(void (*)( device_node_handle , void * ))			channel_removed
 	},
 
@@ -369,17 +365,15 @@ static driver_module_info controller_interface = {
 		std_ops
 	},
 
+	NULL,
+	probe_controller,
 	(status_t (*)(device_node_handle, void *, void **))	init_controller,
 	(status_t (*)(void *))								uninit_controller,
-	probe_controller,
 	(void (*)(device_node_handle, void *))				controller_removed
 };
 
-#if !_BUILDING_kernel && !BOOT
-_EXPORT 
 module_info *modules[] = {
 	(module_info *)&controller_interface,
 	(module_info *)&channel_interface,
 	NULL
 };
-#endif

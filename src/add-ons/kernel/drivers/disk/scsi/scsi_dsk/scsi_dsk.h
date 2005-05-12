@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI Disk Driver
@@ -17,6 +17,6 @@
 
 #include <device_manager.h>
 
-#define SCSI_DSK_MODULE_NAME "drivers/disk/scsi/scsi_dsk/"SCSI_DEVICE_TYPE_NAME
+#define SCSI_DSK_MODULE_NAME "drivers/disk/scsi/scsi_dsk/device_v1"
 
-#endif
+#endif	/* _SCSI_DSK_H */

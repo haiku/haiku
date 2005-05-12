@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI Peripheral Driver
@@ -128,7 +128,7 @@ std_ops(int32 op, ...)
 
 
 module_dependency module_dependencies[] = {
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{}
 };
 
@@ -164,11 +164,7 @@ scsi_periph_interface scsi_periph_module = {
 	periph_get_icon
 };
 
-
-#if !_BUILDING_kernel && !BOOT
-_EXPORT 
 scsi_periph_interface *modules[] = {
 	&scsi_periph_module, 
 	NULL
 };
-#endif

@@ -50,7 +50,7 @@ cd_init_device(device_node_handle node, void *user_cookie, void **cookie)
 	// we don't verify type - in worst case, the device doesn't work
 		
 	// register it everywhere	
-	res = pnp->load_driver(pnp->get_parent(node), NULL, (driver_module_info **)&device->scsi, 
+	res = pnp->init_driver(pnp->get_parent(node), NULL, (driver_module_info **)&device->scsi, 
 		(void **)&device->scsi_device);
 	if (res != B_OK)
 		goto err2;
@@ -71,7 +71,7 @@ cd_init_device(device_node_handle node, void *user_cookie, void **cookie)
 	return B_OK;
 
 err3:
-	pnp->unload_driver(pnp->get_parent(node));
+	pnp->uninit_driver(pnp->get_parent(node));
 err2:
 err1:
 	free(device);
@@ -83,7 +83,7 @@ status_t
 cd_uninit_device(cd_device_info *device)
 {
 	scsi_periph->unregister_device(device->scsi_periph_device);
-	pnp->unload_driver(pnp->get_parent(device->node));
+	pnp->uninit_driver(pnp->get_parent(device->node));
 	free(device);
 
 	return B_OK;
@@ -98,7 +98,6 @@ cd_uninit_device(cd_device_info *device)
 status_t
 cd_device_added(device_node_handle node)
 {
-	char *str = NULL;
 	uint8 device_type;
 	scsi_res_inquiry *device_inquiry = NULL;
 	size_t inquiry_len;
@@ -106,11 +105,6 @@ cd_device_added(device_node_handle node)
 	uint32 max_blocks;
 	
 	SHOW_FLOW0( 3, "" );
-	
-	// make sure we can handle this parent device
-	if( pnp->get_attr_string( node, PNP_DRIVER_TYPE, &str, false ) != B_OK ||
-		strcmp( str, SCSI_DEVICE_TYPE_NAME ) != 0 )
-		goto err;
 	
 	// check whether it's really a CD-ROM or a WORM
 	if( pnp->get_attr_uint8( node, SCSI_DEVICE_TYPE_ITEM, 
@@ -145,11 +139,10 @@ cd_device_added(device_node_handle node)
 	// ready to register
 	{
 		device_attr attrs[] = {
-			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: SCSI_CD_MODULE_NAME }},
-			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: BLKDEV_TYPE_NAME }},
-			// we always want blkdev on top of us
-			{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: BLKMAN_MODULE_NAME }},
-			// tell blkdev whether the device is removable
+			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_CD_MODULE_NAME }},
+			// we always want blkman on top of us
+			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: BLKMAN_MODULE_NAME }},
+			// tell blkman whether the device is removable
 			{ "removable", B_UINT8_TYPE, { ui8: device_inquiry->RMB }},
 			// tell which name we want to have in devfs
 			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
@@ -162,14 +155,12 @@ cd_device_added(device_node_handle node)
 		res = pnp->register_device(node, attrs, NULL, &node);
 
 		free(name);
-		free(str);
 		free(device_inquiry);
 
 		return res;
 	}
 
 err:
-	free(str);
 	free(device_inquiry);
 
 	return B_ERROR;

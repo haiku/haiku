@@ -200,8 +200,10 @@ typedef struct scsi_device_info {
 	benaphore dma_buffer_lock;	// lock between DMA buffer user and clean-up daemon
 	sem_id dma_buffer_owner;	// to be acquired before using DMA buffer
 	dma_buffer dma_buffer;		// DMA buffer
-	
+
+#ifdef USE_FAST_LOG
 	fast_log_handle log;		// fast log connection
+#endif
 	char name[30];				// name for fast log entries
 	
 	// buffer used for emulating SCSI commands

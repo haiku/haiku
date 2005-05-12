@@ -16,7 +16,9 @@
 
 #include "scsi_dsk_int.h"
 #include <scsi.h>
+
 #include <string.h>
+#include <stdlib.h>
 
 
 extern blkdev_interface das_interface;
@@ -222,6 +224,37 @@ das_ioctl(das_handle_info *handle, int op, void *buf, size_t len)
 }
 
 
+static float
+das_supports_device(device_node_handle parent, bool *_noConnection)
+{
+	char *bus;
+
+	// make sure parent is really the SCSI bus manager
+	if (pnp->get_attr_string(parent, B_DRIVER_BUS, &bus, false))
+		return B_ERROR;
+
+	if (strcmp(bus, "scsi")) {
+		free(bus);
+		return 0.0;
+	}
+
+	// ToDo: check SCSI device type! (must be "disk")
+
+	free(bus);
+	return 0.6;
+}
+
+
+static void
+das_get_paths(const char ***_bus, const char ***_device)
+{
+	static const char *kBus[] = { "scsi", NULL };
+
+	*_bus = kBus;
+	*_device = NULL;
+}
+
+
 static status_t
 std_ops(int32 op, ...)
 {
@@ -239,7 +272,7 @@ std_ops(int32 op, ...)
 module_dependency module_dependencies[] = {
 	{ SCSI_PERIPH_MODULE_NAME, (module_info **)&scsi_periph },
 	{ BLKMAN_FOR_DRIVER_MODULE_NAME, (module_info **)&blkman },
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{}
 };
 
@@ -251,10 +284,13 @@ blkdev_interface scsi_dsk_module = {
 			std_ops
 		},
 
+		das_supports_device,
+		das_device_added,
 		das_init_device,
 		(status_t (*) (void *))das_uninit_device,
-		das_device_added,
-		NULL
+		NULL,	// remove device
+		NULL,	// cleanup device
+		das_get_paths,
 	},
 
 	(status_t (*)(blkdev_device_cookie, blkdev_handle_cookie *)) &das_open,

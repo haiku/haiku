@@ -7,6 +7,7 @@ KernelAddon pci : kernel bus_managers :
 	pci.cpp
 	pci_info.cpp
 	pci_module.c
+	pci_device.c
 	kernel_cpp.cpp
 	: pci_arch_bus_manager.a
 	;

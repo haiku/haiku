@@ -67,17 +67,17 @@ validate_io_resource(io_resource *src)
 
 	switch (src->type) {
 		case IO_MEM:
-			if (src->base + src->len < src->base)
+			if (src->base + src->length < src->base)
 				return B_BAD_VALUE;
 			break;
 		case IO_PORT:
 			if ((uint16)src->base != src->base
-				|| (uint16)src->len != src->len
-				|| (uint16)(src->base + src->len) < src->base)
+				|| (uint16)src->length != src->length
+				|| (uint16)(src->base + src->length) < src->base)
 				return B_BAD_VALUE;
 			break;
 		case ISA_DMA_CHANNEL:
-			if (src->base > 8 || src->len != 1)
+			if (src->base > 8 || src->length != 1)
 				return B_BAD_VALUE;
 			break;
 
@@ -107,7 +107,7 @@ alloc_io_resource_info(io_resource *src, io_resource_info **dest_out)
 
 	dest->resource.type = src->type;
 	dest->resource.base = src->base;
-	dest->resource.len = src->len;
+	dest->resource.length = src->length;
 
 	*dest_out = dest;
 	return B_OK;
@@ -123,15 +123,15 @@ acquire_range(io_resource_info **list, io_resource_info *resource)
 {
 	io_resource_info *cur;
 	uint32 base = resource->resource.base;
-	uint32 len = resource->resource.len;
+	uint32 length = resource->resource.length;
 	status_t res = B_OK;
 
-	TRACE(("acquire_range(base %lx, len %lx)\n", base, len));
+	TRACE(("acquire_range(base %lx, length %lx)\n", base, length));
 
 	for (cur = *list; cur != NULL; cur = cur->next) {
-		// we need the "base + len - 1" trick to avoid wrap around at 4 GB
+		// we need the "base + length - 1" trick to avoid wrap around at 4 GB
 		if (cur->resource.base >= base
-			&& cur->resource.base + len - 1 <= base + len - 1) {
+			&& cur->resource.base + length - 1 <= base + length - 1) {
 			device_node_info *owner = cur->owner;
 
 			TRACE(("collision\n"));
@@ -180,18 +180,19 @@ acquire_range(io_resource_info **list, io_resource_info *resource)
 static void
 free_io_resource_info(io_resource_info *resource)
 {
-	TRACE(("free_io_resource_info"));
+	TRACE(("free_io_resource_info()\n"));
 
 	free(resource);
 }
 
 
-// acquire I/O resource
-// a I/O resource info structure is allocated and added to 
-// appropriate resource list (i.e. mem/port/channel) plus
-// all colliding resources (including ours) are marked blocked;
-// returns B_WOULD_BLOCK on collision with temporary allocation;
-// node_lock must be hold
+/**	Acquire I/O resource.
+ *	An I/O resource info structure is allocated and added to 
+ *	appropriate resource list (i.e. mem/port/channel) plus
+ *	all colliding resources (including ours) are marked blocked;
+ *	returns B_WOULD_BLOCK on collision with temporary allocation;
+ *	gNodeLock must be hold.
+ */
 
 static status_t
 acquire_io_resource(io_resource *src, io_resource_handle *dest_out)
@@ -199,7 +200,8 @@ acquire_io_resource(io_resource *src, io_resource_handle *dest_out)
 	io_resource_info *dest;
 	status_t res;
 
-	TRACE(("acquire_io_resource(type=%ld, base=%lx, len=%lx)\n", src->type, src->base, src->len));
+	TRACE(("acquire_io_resource(type = %ld, base = %lx, length = %lx)\n",
+		src->type, src->base, src->length));
 
 	res = validate_io_resource(src);
 	if (res != B_OK)
@@ -273,7 +275,7 @@ release_range(io_resource_info **list, io_resource_info *resource, io_resource_i
 {
 	io_resource_info *cur;
 	uint32 base = resource->resource.base;
-	uint32 len = resource->resource.len;
+	uint32 length = resource->resource.length;
 
 	TRACE(("release_range()\n"));
 
@@ -282,8 +284,8 @@ release_range(io_resource_info **list, io_resource_info *resource, io_resource_i
 			// ignore ourselves
 			continue;
 
-		// we need the "base + len - 1" trick to avoid wrap around at 4 GB
-		if (cur->resource.base >= base && cur->resource.base + len - 1 <= base + len - 1) {
+		// we need the "base + length - 1" trick to avoid wrap around at 4 GB
+		if (cur->resource.base >= base && cur->resource.base + length - 1 <= base + length - 1) {
 			device_node_info *owner = cur->owner;
 
 			TRACE(("unblock\n"));
@@ -391,46 +393,6 @@ status_t acquire_io_resources(io_resource *resources, io_resource_handle *handle
 }
 
 
-// public: acquire I/O resources
-
-status_t
-pnp_acquire_io_resources(io_resource *resources, io_resource_handle *handles)
-{
-	status_t res;
-
-	TRACE(("pnp_acquire_io_resources()\n"));
-
-	benaphore_lock(&gNodeLock);
-	res = acquire_io_resources(resources, handles);
-	benaphore_unlock(&gNodeLock);
-
-	TRACE(("done (%s)", strerror(res)));
-
-	return res;
-}
-
-
-// public: release I/O resources
-
-status_t
-pnp_release_io_resources(const io_resource_handle *handles)
-{
-	io_resource_info *const *resource;
-
-	if (handles == NULL)
-		return B_OK;
-
-	benaphore_lock(&gNodeLock);
-
-	for (resource = handles; *resource != NULL; ++resource)
-		release_io_resource(*resource);
-
-	benaphore_unlock(&gNodeLock);
-
-	return B_OK;
-}
-
-
 // unregister devices that collide with one of our I/O resources
 
 static void
@@ -461,7 +423,7 @@ unregister_colliding_node_range(io_resource_info *list, io_resource_info *resour
 {
 	io_resource_info *cur;
 	uint32 base = resource->resource.base;
-	uint32 len = resource->resource.len;
+	uint32 length = resource->resource.length;
 
 	do {
 		for (cur = list; cur != NULL; cur = cur->next) {
@@ -469,9 +431,9 @@ unregister_colliding_node_range(io_resource_info *list, io_resource_info *resour
 			if (cur == resource)
 				continue;
 
-			// we need the "base + len - 1" trick to avoid wrap around at 4 GB
+			// we need the "base + length - 1" trick to avoid wrap around at 4 GB
 			if (cur->resource.base >= base
-				&& cur->resource.base + len - 1 <= base + len - 1) {
+				&& cur->resource.base + length - 1 <= base + length - 1) {
 				device_node_handle owner = cur->owner;
 
 				if (owner == NULL)
@@ -487,11 +449,11 @@ unregister_colliding_node_range(io_resource_info *list, io_resource_info *resour
 
 				// unregister device node - we own its resources now
 				// (its resources are freed by the next remove_node_ref call)
-				pnp_unregister_device(owner);
+				dm_unregister_node(owner);
 
 				benaphore_lock(&gNodeLock);
 
-				pnp_remove_node_ref_nolock(owner);
+				dm_put_node_nolock(owner);
 				// restart loop as resource list may have changed meanwhile
 				break;
 			}
@@ -500,11 +462,31 @@ unregister_colliding_node_range(io_resource_info *list, io_resource_info *resour
 }
 
 
-// transfer temporary I/O resources to device node;
-// colliding devices are unregistered
+/**	unblock other temporary allocations so they can retry
+ *	gNodeLock must be hold
+ */
+
+static void
+unblock_temporary_allocation(void)
+{
+	if (pnp_resource_wait_count > 0) {
+		TRACE(("unblock concurrent temporary allocation\n"));
+
+		release_sem_etc(pnp_resource_wait_sem, pnp_resource_wait_count, 0);
+		pnp_resource_wait_count = 0;
+	}
+}
+
+
+//	#pragma mark -
+
+
+/**	transfer temporary I/O resources to device node;
+ *	colliding devices are unregistered
+ */
 
 void
-pnp_assign_io_resources(device_node_info *node, const io_resource_handle *resources)
+dm_assign_io_resources(device_node_info *node, const io_resource_handle *resources)
 {
 	io_resource_handle *resource;
 
@@ -531,27 +513,13 @@ pnp_assign_io_resources(device_node_info *node, const io_resource_handle *resour
 }
 
 
-// unblock other temporary allocations so they can retry
-// node_lock must be hold
-
-static void
-unblock_temporary_allocation(void)
-{
-	if (pnp_resource_wait_count > 0) {
-		TRACE(("unblock concurrent temporary allocation\n"));
-
-		release_sem_etc(pnp_resource_wait_sem, pnp_resource_wait_count, 0);
-		pnp_resource_wait_count = 0;
-	}
-}
-
-
-// release I/O resources of a device node and set list to NULL;
-// users previously blocked by our resource alloction are notified;
-// node_lock must be hold
+/**	release I/O resources of a device node and set list to NULL;
+ *	users previously blocked by our resource alloction are notified;
+ *	gNodeLock must be hold
+ */
 
 void
-pnp_release_node_resources(device_node_info *node)
+dm_release_node_resources(device_node_info *node)
 {
 	io_resource_handle *resource;
 
@@ -566,5 +534,49 @@ pnp_release_node_resources(device_node_info *node)
 
 	// make sure we won't release resources twice
 	*node->io_resources = NULL;
+}
+
+
+//	#pragma mark -
+//	Part of the module API
+
+
+/** acquire I/O resources */
+
+status_t
+dm_acquire_io_resources(io_resource *resources, io_resource_handle *handles)
+{
+	status_t res;
+
+	TRACE(("pnp_acquire_io_resources()\n"));
+
+	benaphore_lock(&gNodeLock);
+	res = acquire_io_resources(resources, handles);
+	benaphore_unlock(&gNodeLock);
+
+	TRACE(("done (%s)", strerror(res)));
+
+	return res;
+}
+
+
+/** release I/O resources */
+
+status_t
+dm_release_io_resources(const io_resource_handle *handles)
+{
+	io_resource_info *const *resource;
+
+	if (handles == NULL)
+		return B_OK;
+
+	benaphore_lock(&gNodeLock);
+
+	for (resource = handles; *resource != NULL; ++resource)
+		release_io_resource(*resource);
+
+	benaphore_unlock(&gNodeLock);
+
+	return B_OK;
 }
 

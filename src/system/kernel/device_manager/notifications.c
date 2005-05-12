@@ -28,41 +28,10 @@
 #endif
 
 
-/** notify a consumer that a device he might handle is added
- *	consumer_name - module name (!) of consumer
- */
-
-status_t
-pnp_notify_probe_by_module(device_node_info *node, const char *consumerName)
-{
-	driver_module_info *consumer;
-	status_t status;
-
-	TRACE(("pnp_notify_probe_by_module(node %p, consumer: %s)\n", node, consumerName));
-
-	status = get_module(consumerName, (module_info **)&consumer);
-	if (status < B_OK) {
-		dprintf("Cannot load driver module %s (%s)\n", consumerName, strerror(status));
-		return status;
-	}
-
-	if (consumer->register_device == NULL) {
-		dprintf("Driver %s has no register_device() hook\n", consumerName);
-		status = B_ERROR;
-	} else {
-		status = consumer->register_device(node);
-		TRACE(("Driver %s register_device() returned: %s\n", consumerName, strerror(status)));
-	}
-
-	put_module(consumerName);
-	return status;
-}
-
-
 /** notify driver that it's device got removed */
 
-static status_t
-notify_device_removed(device_node_info *node)
+status_t
+dm_notify_unregistration(device_node_info *node)
 {
 	driver_module_info *driver;
 	bool loaded;
@@ -70,19 +39,21 @@ notify_device_removed(device_node_info *node)
 	void *cookie;
 	status_t res;
 
-	res = pnp_get_attr_string(node, PNP_DRIVER_DRIVER, &module_name, false);
+	res = pnp_get_attr_string(node, B_DRIVER_MODULE, &module_name, false);
 	if (res != B_OK)
 		return res;
 
 	TRACE(("notify_device_removed(node: %p, consumer: %s)\n", node, module_name));
 
-	// block concurrent load/unload calls 
+	// block concurrent load/unload calls
 	pnp_start_hook_call(node);
 
+#if 0
 	// don't notify driver if it doesn't know that the device was
 	// published
 	if (!node->init_finished)
 		goto skip;
+#endif
 
 	// don't take node->loading into account - we want to know
 	// whether driver is loaded, not whether it is about to get loaded	
@@ -129,20 +100,6 @@ skip:
 err:
 	free(module_name);
 	return res;
-}
-
-
-/** notify all drivers in <notify_list> that their node got removed */
-
-void
-pnp_notify_unregistration(device_node_info *notify_list)
-{
-	device_node_info *node;
-
-	TRACE(("pnp_notify_unregistration()\n"));
-
-	for (node = notify_list; node; node = node->notify_next)
-		notify_device_removed(node);
 }
 
 

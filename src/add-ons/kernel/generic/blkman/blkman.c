@@ -340,30 +340,16 @@ blkman_ioctl(blkman_handle_info *handle, uint32 op, void *buf, size_t len)
 
 
 static status_t
-blkman_probe(device_node_handle parent)
+blkman_register_device(device_node_handle parent)
 {
-	char *str;
-
 	TRACE(("blkman_probe()\n"));
-
-	// make sure we can handle this parent device
-	if (pnp->get_attr_string(parent, "type", &str, false) != B_OK)
-		return B_ERROR;
-
-	if (strcmp(str, BLKDEV_TYPE_NAME) != 0) {
-		free(str);
-		return B_ERROR;
-	}
-
-	free(str);
 
 	// ready to register at devfs
 	{
 		device_attr attrs[] = {
-			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: BLKMAN_MODULE_NAME }},
-			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_DEVFS_TYPE_NAME }},
+			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: BLKMAN_MODULE_NAME }},
 			// we always want devfs on top of us
-			{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
+			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
 			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "blkman" }},
 			{ NULL }
 		};
@@ -505,7 +491,7 @@ blkman_init_device(device_node_handle node, void *user_cookie, void **cookie)
 	device->params = params;
 	device->is_bios_drive = is_bios_drive != 0;
 
-	res = pnp->load_driver(pnp->get_parent(node), device,
+	res = pnp->init_driver(pnp->get_parent(node), device,
 			(driver_module_info **)&device->interface, (void **)&device->cookie);
 	if (res != B_OK)
 		goto err4;
@@ -525,7 +511,7 @@ err2:
 	free(device);
 err1:
 	free(name);
-	pnp->unload_driver(pnp->get_parent(node));
+	pnp->uninit_driver(pnp->get_parent(node));
 	return res;
 }
 
@@ -533,7 +519,7 @@ err1:
 static status_t
 blkman_uninit_device(blkman_device_info *device)
 {
-	pnp->unload_driver(pnp->get_parent(device->node));
+	pnp->uninit_driver(pnp->get_parent(device->node));
 
 	locked_pool->destroy(device->phys_vecs_pool);
 	benaphore_destroy(&device->lock);
@@ -614,7 +600,7 @@ std_ops(int32 op, ...)
 
 
 module_dependency module_dependencies[] = {
-	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{ LOCKED_POOL_MODULE_NAME, (module_info **)&locked_pool },
 	{}
 };
@@ -628,11 +614,14 @@ pnp_devfs_driver_info blkman_module = {
 
 			std_ops
 		},
-			
+
+		NULL,	// supports device		
+		blkman_register_device,
 		blkman_init_device,
 		(status_t (*)( void * )) blkman_uninit_device,
-		blkman_probe,
-		blkman_remove
+		blkman_remove,
+		NULL,	// cleanup
+		NULL,	// get paths
 	},
 
 	(status_t (*)(void *, uint32, void **))blkman_open,

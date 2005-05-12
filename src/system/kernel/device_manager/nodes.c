@@ -42,24 +42,50 @@
 benaphore gNodeLock;
 
 
-// increase ref_count of node
-
-void
-pnp_add_node_ref(device_node_info *node)
+static void
+put_level(int32 level)
 {
-	TRACE(("add_node_ref(%p)\n", node));
-
-	if (node == NULL)
-		return;
-
-	benaphore_lock(&gNodeLock);
-	node->ref_count++;
-	benaphore_unlock(&gNodeLock);
+	while (level-- > 0)
+		dprintf("   ");
 }
 
 
-// free attributes of node
-// if an attribute is still in use, it's deletion is postponed
+static void
+dump_attribute(device_attr_info *attr, int32 level)
+{
+	if (attr == NULL)
+		return;
+
+	put_level(level + 2);
+	dprintf("\"%s\" : ", attr->attr.name);
+	switch (attr->attr.type) {
+		case B_STRING_TYPE:
+			dprintf("string : \"%s\"", attr->attr.value.string);
+			break;
+		case B_UINT8_TYPE:
+			dprintf("uint8 : %u (%#x)", attr->attr.value.ui8, attr->attr.value.ui8);
+			break;
+		case B_UINT16_TYPE:
+			dprintf("uint16 : %u (%#x)", attr->attr.value.ui16, attr->attr.value.ui16);
+			break;
+		case B_UINT32_TYPE:
+			dprintf("uint32 : %lu (%#lx)", attr->attr.value.ui32, attr->attr.value.ui32);
+			break;
+		case B_UINT64_TYPE:
+			dprintf("uint64 : %Lu (%#Lx)", attr->attr.value.ui64, attr->attr.value.ui64);
+			break;
+		default:
+			dprintf("raw data");
+	}
+	dprintf("\n");
+
+	dump_attribute(attr->next, level);	
+}
+
+
+/**	free attributes of node
+ *	if an attribute is still in use, it's deletion is postponed
+ */
 
 static void
 free_node_attrs(device_node_info *node)
@@ -93,16 +119,14 @@ free_node_resources(device_node_info *node)
 static void
 free_node(device_node_info *node)
 {
-	const char *generator_name, *driver_name, *type;
+	const char *generator_name, *driver_name;
 	uint32 auto_id;
 
-	if (pnp_get_attr_string_nolock(node, PNP_DRIVER_DRIVER, &driver_name, false) != B_OK) 
+	// ToDo: we lose memory here if the attributes are available!
+	if (pnp_get_attr_string_nolock(node, B_DRIVER_MODULE, &driver_name, false) != B_OK) 
 		driver_name = "?";
 
-	if (pnp_get_attr_string_nolock(node, PNP_DRIVER_TYPE, &type, false) != B_OK)
-		type = "?";
-
-	TRACE(("free_node(node: %p, driver: %s, type: %s)\n", node, driver_name, type));
+	TRACE(("free_node(node: %p, driver: %s)\n", node, driver_name));
 
 	// free associated auto ID, if requested
 	if (pnp_get_attr_string_nolock(node, PNP_MANAGER_ID_GENERATOR,
@@ -110,13 +134,10 @@ free_node(device_node_info *node)
 		if (pnp_get_attr_uint32(node, PNP_MANAGER_AUTO_ID, &auto_id, false) != B_OK) {
 			TRACE(("Cannot find corresponding auto_id of generator %s", generator_name));
 		} else
-			pnp_free_id(generator_name, auto_id);
+			dm_free_id(generator_name, auto_id);
 	}
 
-	pnp_release_node_resources(node);
-
-	//list_remove_link(node);
-	REMOVE_DL_LIST( node, gNodeList, );
+	dm_release_node_resources(node);
 
 	delete_sem(node->hook_sem);
 	delete_sem(node->load_block_sem);
@@ -124,55 +145,6 @@ free_node(device_node_info *node)
 	free_node_attrs(node);
 	free_node_resources(node);
 	free(node);
-}
-
-
-// remove node reference and clean it up if necessary
-// (node_lock must be hold)
-
-void
-pnp_remove_node_ref_nolock(device_node_info *node)
-{
-	do {		
-		device_node_info *parent;
-
-		TRACE(("pnp_remove_node_ref_internal(ref_count of %p: %ld)\n", node, node->ref_count - 1));
-
-		// unregistered devices loose their I/O resources as soon as they
-		// are unloaded
-		if (!node->registered && node->loading == 0 && node->load_count == 0)
-			pnp_release_node_resources(node);
-
-		if (--node->ref_count > 0)
-			return;
-
-		TRACE(("cleaning up %p (parent: %p)\n", node, node->parent));
-
-		// time to clean up
-		parent = node->parent;
-
-		if (parent != NULL)
-//			list_remove_item(&parent->children, node);
-			REMOVE_DL_LIST(node, parent->children, siblings_ );
-
-		free_node(node);
-
-		// unrolled recursive call: decrease ref_count of parent as well		
-		node = parent;
-	} while (node != NULL);
-}
-
-
-// remove node reference and clean it up if necessary
-
-void
-pnp_remove_node_ref(device_node_info *node)
-{
-	TRACE(("pnp_remove_node_ref(%p)\n", node));
-
-	benaphore_lock(&gNodeLock);
-	pnp_remove_node_ref_nolock(node);
-	benaphore_unlock(&gNodeLock);
 }
 
 
@@ -237,17 +209,20 @@ allocate_node_resource_array(device_node_info *node, const io_resource_handle *r
 }
 
 
-// allocate device node info structure;
-// initially, ref_count is one to make sure node won't get destroyed by mistake
+//	#pragma mark -
+//	Device Manager private functions
+
+
+/**	allocate device node info structure;
+ *	initially, ref_count is one to make sure node won't get destroyed by mistake
+ */
 
 status_t
-pnp_alloc_node(const device_attr *attrs, const io_resource_handle *resources,
-	device_node_info **new_node)
+dm_allocate_node(const device_attr *attrs, const io_resource_handle *resources,
+	device_node_info **_node)
 {
 	device_node_info *node;
 	status_t res;
-
-	TRACE(("pnp_alloc_node()\n"));
 
 	node = calloc(1, sizeof(*node));
 	if (node == NULL)
@@ -269,11 +244,16 @@ pnp_alloc_node(const device_attr *attrs, const io_resource_handle *resources,
 	if (res < 0)
 		goto err4;
 
+	list_init(&node->children);
+
 	node->parent = NULL;
 	node->rescan_depth = 0;
+	node->registered = false;
+#if 0
 	node->verifying = false;
 	node->redetected = false;
 	node->init_finished = false;
+#endif
 	node->ref_count = 1;
 	node->load_count = 0;
 	node->blocked_by_rescan = false;
@@ -283,17 +263,10 @@ pnp_alloc_node(const device_attr *attrs, const io_resource_handle *resources,
 	node->num_blocked_loads = 0;
 	node->load_block_count = 0;
 	node->loading = 0;
-	node->defer_probing = 0;
-	node->unprobed_children = NULL;
 
-	// make public (well, almost: it's not officially registered yet)
-	benaphore_lock(&gNodeLock);
+	TRACE(("dm_allocate_node(): new node %p\n", node));
 
-	ADD_DL_LIST_HEAD(node, gNodeList, );
-
-	benaphore_unlock(&gNodeLock);
-
-	*new_node = node;
+	*_node = node;
 
 	return B_OK;
 
@@ -309,45 +282,91 @@ err:
 }
 
 
-// create links to parent node
-
 void
-pnp_create_node_links(device_node_info *node, device_node_info *parent)
+dm_add_child_node(device_node_info *parent, device_node_info *node)
 {
-	TRACE(("pnp_create_node_links(%p, parent=%p)\n", node, parent));
+	TRACE(("dm_add_child_node(parent = %p, child = %p)\n", parent, node));
 
 	if (parent == NULL)
 		return;
 
 	benaphore_lock(&gNodeLock);
 
-	TRACE(("Adding parent link"));
-
-	// parent must not be destroyed	
+	// parent must not be destroyed	as long as it has children
 	parent->ref_count++;
 	node->parent = parent;
 
 	// tell parent about us, so we get unregistered automatically if parent
 	// gets unregistered
-	ADD_DL_LIST_HEAD(node, parent->children, siblings_ );
+	list_add_item(&parent->children, node);
 
 	benaphore_unlock(&gNodeLock);
 }
 
 
-// public: get parent of node
-
-device_node_handle
-pnp_get_parent(device_node_handle node)
+void
+dm_get_node_nolock(device_node_info *node)
 {
-	return node->parent;
+	node->ref_count++;
 }
 
 
+// increase ref_count of node
+
+void
+dm_get_node(device_node_info *node)
+{
+	TRACE(("dm_get_device_node(%p)\n", node));
+
+	if (node == NULL)
+		return;
+
+	benaphore_lock(&gNodeLock);
+	node->ref_count++;
+	benaphore_unlock(&gNodeLock);
+}
+
+
+// remove node reference and clean it up if necessary
+// (node_lock must be hold)
+
+void
+dm_put_node_nolock(device_node_info *node)
+{
+	do {		
+		device_node_info *parent;
+
+		TRACE(("pnp_remove_node_ref_internal(ref_count of %p: %ld)\n", node, node->ref_count - 1));
+
+		// unregistered devices lose their I/O resources as soon as they
+		// are unloaded
+		if (!node->registered && node->loading == 0 && node->load_count == 0)
+			dm_release_node_resources(node);
+
+		if (--node->ref_count > 0)
+			return;
+
+		TRACE(("cleaning up %p (parent: %p)\n", node, node->parent));
+
+		// time to clean up
+		parent = node->parent;
+
+		if (parent != NULL)
+			list_remove_item(&parent->children, node);
+
+		free_node(node);
+
+		// unrolled recursive call: decrease ref_count of parent as well		
+		node = parent;
+	} while (node != NULL);
+}
+
+
+#if 0
 // public: find node with some node attributes given
 
 device_node_info *
-pnp_find_device(device_node_info *parent, const device_attr *attrs)
+dm_find_device(device_node_info *parent, const device_attr *attrs)
 {
 	device_node_info *node, *found_node;
 
@@ -366,58 +385,8 @@ pnp_find_device(device_node_info *parent, const device_attr *attrs)
 			continue;
 
 		for (attr = attrs; attr && attr->name; ++attr) {
-			bool equal = true;
-
-			switch (attr->type) {
-				case B_UINT8_TYPE: {
-					uint8 value;
-
-					equal = pnp_get_attr_uint8_nolock( node, attr->name, &value, false ) == B_OK
-						&& value == attr->value.ui8;
-					break;
-				}
-				case B_UINT16_TYPE: {
-					uint16 value;
-
-					equal = pnp_get_attr_uint16_nolock( node, attr->name, &value, false ) == B_OK
-						&& value == attr->value.ui16;
-					break;
-				}
-				case B_UINT32_TYPE: {
-					uint32 value;
-
-					equal = pnp_get_attr_uint32_nolock( node, attr->name, &value, false ) == B_OK
-						&& value == attr->value.ui32;
-					break;
-				}
-				case B_UINT64_TYPE: {
-					uint64 value;
-
-					equal = pnp_get_attr_uint64_nolock( node, attr->name, &value, false ) == B_OK
-						&& value == attr->value.ui64;
-					break;
-				}
-				case B_STRING_TYPE: {
-					const char *str;
-
-					equal = pnp_get_attr_string_nolock( node, attr->name, &str, false ) == B_OK
-						&& strcmp( str, attr->value.string ) == 0;
-					break;
-				}
-				case B_RAW_TYPE: {
-					const void *data;
-					size_t len;
-
-					equal = pnp_get_attr_raw_nolock( node, attr->name, &data, &len, false ) == B_OK
-						&& len == attr->value.raw.len
-						&& !memcmp(data, attr->value.raw.data, len);
-					break;
-				}
-				default:
-					goto err;
-			}
-
-			if (!equal)
+			device_attr_info *other = pnp_find_attr_nolock(node, attr->name, false, attr->type);
+			if (other == NULL || pnp_compare_attrs(attr, &other->attr))
 				break;
 		}
 
@@ -439,52 +408,14 @@ err:
 
 	return found_node;
 }
-
-
-static void
-put_level(int32 level)
-{
-	while (level-- > 0)
-		dprintf("   ");
-}
-
-
-static void
-dump_attribute(device_attr_info *attr, int32 level)
-{
-	if (attr == NULL)
-		return;
-
-	put_level(level + 2);
-	dprintf("\"%s\" : ", attr->attr.name);
-	switch (attr->attr.type) {
-		case B_STRING_TYPE:
-			dprintf("string : \"%s\"", attr->attr.value.string);
-			break;
-		case B_UINT8_TYPE:
-			dprintf("uint8 : %u (%#x)", attr->attr.value.ui8, attr->attr.value.ui8);
-			break;
-		case B_UINT16_TYPE:
-			dprintf("uint16 : %u (%#x)", attr->attr.value.ui16, attr->attr.value.ui16);
-			break;
-		case B_UINT32_TYPE:
-			dprintf("uint32 : %lu (%#lx)", attr->attr.value.ui32, attr->attr.value.ui32);
-			break;
-		case B_UINT64_TYPE:
-			dprintf("uint64 : %Lu (%#Lx)", attr->attr.value.ui64, attr->attr.value.ui64);
-			break;
-		default:
-			dprintf("raw data");
-	}
-	dprintf("\n");
-
-	dump_attribute(attr->next, level);	
-}
+#endif
 
 
 void
-dump_device_node_info(device_node_info *node, int32 level)
+dm_dump_node(device_node_info *node, int32 level)
 {
+	device_node_info *child = NULL;
+
 	if (node == NULL)
 		return;
 
@@ -492,14 +423,78 @@ dump_device_node_info(device_node_info *node, int32 level)
 	dprintf("(%ld) @%p \"%s\"\n", level, node, node->driver ? node->driver->info.name : "---");
 	dump_attribute(node->attributes, level);
 
-	dump_device_node_info(node->children, level + 1);
-	dump_device_node_info(node->siblings_next, level);
+	while ((child = (device_node_info *)list_get_next_item(&node->children, child)) != NULL) {
+		dm_dump_node(child, level + 1);
+	}
 }
 
 
 status_t
-nodes_init(void)
+dm_init_nodes(void)
 {
 	return benaphore_init(&gNodeLock, "device nodes");
+}
+
+
+//	#pragma mark -
+//	Functions part of the module API
+
+
+/** remove node reference and clean it up if necessary */
+
+void
+dm_put_node(device_node_info *node)
+{
+	TRACE(("dm_put_node(%p)\n", node));
+
+	benaphore_lock(&gNodeLock);
+	dm_put_node_nolock(node);
+	benaphore_unlock(&gNodeLock);
+}
+
+
+device_node_info *
+dm_get_parent(device_node_info *node)
+{
+	dm_get_node(node->parent);
+	return node->parent;
+}
+
+
+status_t
+dm_get_next_child_node(device_node_info *parent, device_node_info **_node,
+	const device_attr *attrs)
+{
+	device_node_info *node = *_node;
+	if (node != NULL)
+		dm_put_node(node);
+
+	benaphore_lock(&gNodeLock);
+
+	while ((node = (device_node_info *)list_get_next_item(&parent->children, node)) != NULL) {
+		const device_attr *attr;
+
+		// list contains removed devices too, so skip them
+		if (!node->registered)
+			continue;
+
+		for (attr = attrs; attr && attr->name; ++attr) {
+			device_attr_info *other = pnp_find_attr_nolock(node, attr->name, false, attr->type);
+			if (other == NULL || pnp_compare_attrs(attr, &other->attr))
+				break;
+		}
+
+		if (attr != NULL && attr->name != NULL)
+			continue;
+
+		// we found a node
+		dm_get_node_nolock(node);
+		*_node = node;
+		benaphore_unlock(&gNodeLock);
+		return B_OK;
+	}
+
+	benaphore_unlock(&gNodeLock);
+	return B_ENTRY_NOT_FOUND;
 }
 
