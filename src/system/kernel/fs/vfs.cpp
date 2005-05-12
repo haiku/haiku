@@ -5044,6 +5044,8 @@ _kern_mount(const char *path, const char *device, const char *fs_name,
 	uint32 flags, const char *args)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	return fs_mount(pathBuffer.LockBuffer(), device, fs_name, flags, args, true);
 }
@@ -5053,6 +5055,8 @@ status_t
 _kern_unmount(const char *path, uint32 flags)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	return fs_unmount(pathBuffer.LockBuffer(), flags, true);
 }
@@ -5130,6 +5134,8 @@ int
 _kern_open(int fd, const char *path, int openMode, int perms)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	if (openMode & O_CREAT)
 		return file_create(pathBuffer.LockBuffer(), openMode, perms, true);
@@ -5182,6 +5188,8 @@ int
 _kern_open_dir(int fd, const char *path)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	return dir_open(fd, pathBuffer.LockBuffer(), true);
 }
@@ -5241,6 +5249,8 @@ status_t
 _kern_create_dir(int fd, const char *path, int perms)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	return dir_create(fd, pathBuffer.LockBuffer(), perms, true);
 }
@@ -5250,6 +5260,8 @@ status_t
 _kern_remove_dir(const char *path)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	return dir_remove(pathBuffer.LockBuffer(), true);
 }
@@ -5281,6 +5293,8 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 
 	if (path) {
 		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+		if (pathBuffer.InitCheck() != B_OK)
+			return B_NO_MEMORY;
 
 		return common_read_link(fd, pathBuffer.LockBuffer(), 
 			buffer, _bufferSize, true);
@@ -5295,6 +5309,9 @@ _kern_write_link(const char *path, const char *toPath)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 	KPath toPathBuffer(toPath, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
 	char *toBuffer = toPathBuffer.LockBuffer();
 
 	status_t status = check_path(toBuffer);
@@ -5325,6 +5342,9 @@ _kern_create_symlink(int fd, const char *path, const char *toPath, int mode)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 	KPath toPathBuffer(toPath, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
 	char *toBuffer = toPathBuffer.LockBuffer();
 
 	status_t status = check_path(toBuffer);
@@ -5341,6 +5361,8 @@ _kern_create_link(const char *path, const char *toPath)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 	KPath toPathBuffer(toPath, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	return common_create_link(pathBuffer.LockBuffer(), 
 		toPathBuffer.LockBuffer(), true);
@@ -5365,6 +5387,8 @@ status_t
 _kern_unlink(int fd, const char *path)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	return common_unlink(fd, pathBuffer.LockBuffer(), true);
 }
@@ -5394,6 +5418,8 @@ _kern_rename(int oldFD, const char *oldPath, int newFD, const char *newPath)
 {
 	KPath oldPathBuffer(oldPath, false, B_PATH_NAME_LENGTH + 1);
 	KPath newPathBuffer(newPath, false, B_PATH_NAME_LENGTH + 1);
+	if (oldPathBuffer.InitCheck() != B_OK || newPathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	return common_rename(oldFD, oldPathBuffer.LockBuffer(), 
 		newFD, newPathBuffer.LockBuffer(), true);
@@ -5404,6 +5430,8 @@ status_t
 _kern_access(const char *path, int mode)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	return common_access(pathBuffer.LockBuffer(), mode, true);
 }
@@ -5449,6 +5477,8 @@ _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
 	if (path) {
 		// path given: get the stat of the node referred to by (fd, path)
 		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+		if (pathBuffer.InitCheck() != B_OK)
+			return B_NO_MEMORY;
 
 		status = common_path_read_stat(fd, pathBuffer.LockBuffer(), 
 			traverseLeafLink, stat, true);
@@ -5512,11 +5542,13 @@ _kern_write_stat(int fd, const char *path, bool traverseLeafLink,
 		stat = &completeStat;
 	}
 
-	int status;
+	status_t status;
 
 	if (path) {
 		// path given: write the stat of the node referred to by (fd, path)
 		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+		if (pathBuffer.InitCheck() != B_OK)
+			return B_NO_MEMORY;
 
 		status = common_path_write_stat(fd, pathBuffer.LockBuffer(), 
 			traverseLeafLink, stat, statMask, true);
@@ -5543,6 +5575,8 @@ int
 _kern_open_attr_dir(int fd, const char *path)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	if (path != NULL)
 		pathBuffer.SetTo(path);
@@ -5621,6 +5655,8 @@ status_t
 _kern_setcwd(int fd, const char *path)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	if (path != NULL)
 		pathBuffer.SetTo(path);
@@ -5700,6 +5736,9 @@ status_t
 _user_unmount(const char *userPath, uint32 flags)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
 	char *path = pathBuffer.LockBuffer();
 
 	if (user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)

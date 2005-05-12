@@ -500,6 +500,9 @@ publish_directory(struct devfs *fs, const char *path)
 
 	// copy the path over to a temp buffer so we can munge it
 	KPath tempPath(path);
+	if (tempPath.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
 	char *temp = tempPath.LockBuffer();
 
 	// create the path leading to the device
@@ -565,6 +568,9 @@ publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node)
 
 	// copy the path over to a temp buffer so we can munge it
 	KPath tempPath(path);
+	if (tempPath.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
 	char *temp = tempPath.LockBuffer();
 
 	// create the path leading to the device
@@ -871,6 +877,11 @@ devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int 
 	if (vnode == NULL) {
 		// scan for drivers in the given directory (that indicates the type of the driver)
 		KPath path;
+		if (path.InitCheck() != B_OK) {
+			err = B_NO_MEMORY;
+			goto err;
+		}
+
 		get_device_name(dir, path.LockBuffer(), path.BufferSize());
 		path.UnlockBuffer();
 		path.Append(name);
