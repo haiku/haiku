@@ -465,9 +465,30 @@ status_t nv_acc_init_dma()
 		}
 
 //dma 3D test:
+/*
+	rud's (temp.) notes:
+	(problem: 3D driver renders in 32bit whatever the frontbuffer space in DMA mode.)
+	- the colorspace dependant info under 'acc engine' also sets the outcome for the
+	  3D add-on. I don't know yet if the 3D render funcs render in the frontbuffer
+	  space and the back-to-front blit isn't set (stays in 32bit!) (likely),
+	  or if the 3D funcs render always in 32bit space and back-to-front blit color-
+	  space converts... I'll try to nail this down asap.
+	- the colorspace dependant info under 'pramin' is probably needed to get the
+	  3D related surface commands up and running (still down). Currently the 3D
+	  add-on has a PIO workaround for these commands only, to get DMA mode up for now.
+*/
 		switch(si->dm.space)
 		{
 		case B_CMAP8:
+			/* acc engine */
+			ACCW(FORMATS, 0x00001010);
+			if (si->ps.card_arch < NV30A)
+				/* set depth 0-5: $1 = Y8 */
+				ACCW(BPIXEL, 0x00111111);
+			else
+				/* set depth 0-1: $1 = Y8, $2 = X1R5G5B5_Z1R5G5B5 */
+				ACCW(BPIXEL, 0x00000021);
+			ACCW(STRD_FMT, 0x03020202);
 			/* PRAMIN */
 			ACCW(PR_CTX1_9, 0x00000302); /* format is X24Y8, LSB mono */
 			ACCW(PR_CTX2_9, 0x00000302); /* dma_instance 0 valid, instance 1 invalid */
@@ -484,6 +505,15 @@ status_t nv_acc_init_dma()
 			}
 			break;
 		case B_RGB15_LITTLE:
+			/* acc engine */
+			ACCW(FORMATS, 0x00002071);
+			if (si->ps.card_arch < NV30A)
+				/* set depth 0-5: $2 = X1R5G5B5_Z1R5G5B5, $6 = Y16 */
+				ACCW(BPIXEL, 0x00226222);
+			else
+				/* set depth 0-1: $2 = X1R5G5B5_Z1R5G5B5, $4 = A1R5G5B5 */
+				ACCW(BPIXEL, 0x00000042);
+			ACCW(STRD_FMT, 0x09080808);
 			/* PRAMIN */
 			ACCW(PR_CTX1_9, 0x00000902); /* format is X17RGB15, LSB mono */
 			ACCW(PR_CTX2_9, 0x00000902); /* dma_instance 0 valid, instance 1 invalid */
@@ -501,6 +531,18 @@ status_t nv_acc_init_dma()
 			ACCW(PR_CTX1_D, 0x00000902); /* format is X17RGB15, LSB mono */
 			break;
 		case B_RGB16_LITTLE:
+			/* acc engine */
+			ACCW(FORMATS, 0x000050C2);
+			if (si->ps.card_arch < NV30A)
+				/* set depth 0-5: $5 = R5G6B5, $6 = Y16 */
+				ACCW(BPIXEL, 0x00556555);
+			else
+				/* set depth 0-1: $5 = R5G6B5, $a = X1A7R8G8B8_O1A7R8G8B8 */
+				ACCW(BPIXEL, 0x000000a5);
+			if (si->ps.card_arch == NV04A)
+				ACCW(STRD_FMT, 0x0c0b0b0b);
+			else
+				ACCW(STRD_FMT, 0x000b0b0c);
 			/* PRAMIN */
 			ACCW(PR_CTX1_9, 0x00000c02); /* format is X16RGB16, LSB mono */
 			ACCW(PR_CTX2_9, 0x00000c02); /* dma_instance 0 valid, instance 1 invalid */
@@ -519,6 +561,15 @@ status_t nv_acc_init_dma()
 			break;
 		case B_RGB32_LITTLE:
 		case B_RGBA32_LITTLE:
+			/* acc engine */
+			ACCW(FORMATS, 0x000070e5);
+			if (si->ps.card_arch < NV30A)
+				/* set depth 0-5: $7 = X8R8G8B8_Z8R8G8B8, $d = Y32 */
+				ACCW(BPIXEL, 0x0077d777);
+			else
+				/* set depth 0-1: $7 = X8R8G8B8_Z8R8G8B8, $e = V8YB8U8YA8 */
+				ACCW(BPIXEL, 0x000000e7);
+			ACCW(STRD_FMT, 0x0e0d0d0d);
 			/* PRAMIN */
 			ACCW(PR_CTX1_9, 0x00000e02); /* format is X8RGB24, LSB mono */
 			ACCW(PR_CTX2_9, 0x00000e02); /* dma_instance 0 valid, instance 1 invalid */
