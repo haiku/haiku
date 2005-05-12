@@ -463,6 +463,76 @@ status_t nv_acc_init_dma()
 			ACCW(PR_CTX2_10, (ACCR(PR_CTX2_C) +
 				(((uint32)((uint8 *)(si->framebuffer_pci))) & 0xfffff000)));
 		}
+
+//dma 3D test:
+		switch(si->dm.space)
+		{
+		case B_CMAP8:
+			/* PRAMIN */
+			ACCW(PR_CTX1_9, 0x00000302); /* format is X24Y8, LSB mono */
+			ACCW(PR_CTX2_9, 0x00000302); /* dma_instance 0 valid, instance 1 invalid */
+			ACCW(PR_CTX1_B, 0x00000000); /* format is invalid */
+			ACCW(PR_CTX1_C, 0x00000000); /* format is invalid */
+			if (si->ps.card_arch == NV04A)
+			{
+				ACCW(PR_CTX1_D, 0x00000302); /* format is X24Y8, LSB mono */
+			}
+			else
+			{
+				ACCW(PR_CTX1_D, 0x00000000); /* format is invalid */
+				ACCW(PR_CTX1_E, 0x00000302); /* format is X24Y8, LSB mono */
+			}
+			break;
+		case B_RGB15_LITTLE:
+			/* PRAMIN */
+			ACCW(PR_CTX1_9, 0x00000902); /* format is X17RGB15, LSB mono */
+			ACCW(PR_CTX2_9, 0x00000902); /* dma_instance 0 valid, instance 1 invalid */
+			if (si->ps.card_arch == NV04A)
+			{
+				ACCW(PR_CTX1_B, 0x00000702); /* format is X1RGB15, LSB mono */
+				ACCW(PR_CTX1_C, 0x00000702); /* format is X1RGB15, LSB mono */
+			}
+			else
+			{
+				ACCW(PR_CTX1_B, 0x00000902); /* format is X17RGB15, LSB mono */
+				ACCW(PR_CTX1_C, 0x00000902); /* format is X17RGB15, LSB mono */
+				ACCW(PR_CTX1_E, 0x00000902); /* format is X17RGB15, LSB mono */
+			}
+			ACCW(PR_CTX1_D, 0x00000902); /* format is X17RGB15, LSB mono */
+			break;
+		case B_RGB16_LITTLE:
+			/* PRAMIN */
+			ACCW(PR_CTX1_9, 0x00000c02); /* format is X16RGB16, LSB mono */
+			ACCW(PR_CTX2_9, 0x00000c02); /* dma_instance 0 valid, instance 1 invalid */
+			if (si->ps.card_arch == NV04A)
+			{
+				ACCW(PR_CTX1_B, 0x00000702); /* format is X1RGB15, LSB mono */
+				ACCW(PR_CTX1_C, 0x00000702); /* format is X1RGB15, LSB mono */
+			}
+			else
+			{
+				ACCW(PR_CTX1_B, 0x00000c02); /* format is X16RGB16, LSB mono */
+				ACCW(PR_CTX1_C, 0x00000c02); /* format is X16RGB16, LSB mono */
+				ACCW(PR_CTX1_E, 0x00000c02); /* format is X16RGB16, LSB mono */
+			}
+			ACCW(PR_CTX1_D, 0x00000c02); /* format is X16RGB16, LSB mono */
+			break;
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			/* PRAMIN */
+			ACCW(PR_CTX1_9, 0x00000e02); /* format is X8RGB24, LSB mono */
+			ACCW(PR_CTX2_9, 0x00000e02); /* dma_instance 0 valid, instance 1 invalid */
+			ACCW(PR_CTX1_B, 0x00000e02); /* format is X8RGB24, LSB mono */
+			ACCW(PR_CTX1_C, 0x00000e02); /* format is X8RGB24, LSB mono */
+			ACCW(PR_CTX1_D, 0x00000e02); /* format is X8RGB24, LSB mono */
+			if (si->ps.card_arch >= NV10A)
+				ACCW(PR_CTX1_E, 0x00000e02); /* format is X8RGB24, LSB mono */
+			break;
+		default:
+			LOG(8,("ACC: init, invalid bit depth\n"));
+			return B_ERROR;
+		}
+//end dma tst.
 	}
 
 	if (si->ps.card_arch == NV04A)
