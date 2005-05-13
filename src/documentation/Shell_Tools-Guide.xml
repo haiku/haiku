@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!--
+	A note to future authors and editors of this document:
+	Thank you a hundred times over for contributing!
+
+	The latest version of this document was editing using
+	the following system configuration:	
+	Textwidth: 74 characters
+	Tabstop: 3 characters
+	In vim (the only editor that matters) that's:
+		:set textwidth=74
+		:set tabstop=3
+
+	Things that need fixing should be marked as such with either "TODO"
+	or "FIXME".
+
+-->
+
+<!-- coreutils -->
+<!ENTITY coreutils SYSTEM "coreutils.xml">
+
+<!-- license -->
+<!ENTITY gfdl SYSTEM "license.xml">
+
+<!-- Text Macros -->
+<!ENTITY haikuorg '<ulink url="http://www.haiku-os.org">Haiku</ulink>'>
+<!ENTITY haiku "Haiku">
+
+]>
+
+<book id="index">
+  <bookinfo>
+    <title>Shell Tools Guide</title>
+    <pubdate>2005-04-20</pubdate>
+    <author>
+      <firstname>Jerome</firstname>
+      <surname>Duval</surname>
+    </author>
+
+    <abstract>
+	 	<para>
+			This guide lists documentation for shell tools provided with &haiku;.
+		</para>
+    </abstract>
+	 
+    <revhistory>
+	 <revision>
+	 <revnumber>1.0</revnumber>
+	 <date>2005-04-20</date>
+	 <authorinitials>kor</authorinitials>
+	 <revremark>Initial version.</revremark>
+	 </revision>
+    </revhistory>
+  </bookinfo>
+
+
+<!-- Chapters
+-->
+&coreutils;
+
+<!-- 
+	The License 
+-->
+&gfdl;
+
+</book>
