@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2003-2004, OpenBeOS
+//	Copyright (c) 2003-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -85,7 +85,7 @@ BRegion::Support::ClearRegion(BRegion *region)
 {
 	CALLED();
 
-	// XXX: What is it used for ?
+	// TODO: What is it used for ?
 	// Could be that a cleared region represents an infinite one ?
 	
 	region->count = 0;
@@ -148,8 +148,8 @@ BRegion::Support::AndRegion(BRegion *first, BRegion *second, BRegion *dest)
 		dest->data[0] = intersection;
 		dest->bound = intersection;
 		dest->count = 1;
-	} 
-	else if (first->count > 1 && second->count == 1)
+	
+	} else if (first->count > 1 && second->count == 1)
 		AndRegion1ToN(second, first, dest);
 	
 	else if (first->count == 1 && second->count > 1)
@@ -715,15 +715,15 @@ BRegion::Support::OrRegionNoX(BRegion *first, BRegion *second, BRegion *dest)
 	
 	long x;
 	
-	if (first->count == 0)
+	if (first->count == 0) {
 		for (x = 0; x < second->count; x++)
 			dest->_AddRect(second->data[x]);
 	
-	else if (second->count == 0)
+	} else if (second->count == 0) {
 		for (x = 0; x < first->count; x++)
 			dest->_AddRect(first->data[x]);
 	
-	else {
+	} else {
 		long f = 0, s = 0;
 
 		while (f < first->count && s < second->count) {
@@ -823,7 +823,8 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 {
 	CALLED();
 	
-	// TODO: review heap management 
+	// TODO: This function is really messy, although it does its work
+	// well enough: try to cleanup, and review especially heap/stack management
 	int32 stackLeftsA[kMaxPoints / 2];
 	int32 stackLeftsB[kMaxPoints / 2];
 	int32 stackRightsA[kMaxPoints / 2];
@@ -846,8 +847,10 @@ BRegion::Support::RSub(long top, long bottom, BRegion *first, BRegion *second, B
 	
 	// allocate arrays on the heap, if the ones one the stack are too small
 	int32 *allocatedBuffer = NULL;
-	int32 maxCountA = first->count - i1;
-	int32 maxCountB = second->count - i2;
+	
+	// The +1 is needed here, see InvertRectangles() 
+	int32 maxCountA = first->count - i1 + 1;
+	int32 maxCountB = second->count - i2 + 1;
 	
 	if (maxCountA + maxCountB > kMaxPoints) {
 		RTRACE(("Stack space isn't sufficient. Allocating %ld bytes on the heap...\n",
