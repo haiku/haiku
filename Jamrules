@@ -2384,3 +2384,36 @@ rule SubIncludeGPL
 		SubInclude $(1) ;
 	} 
 }
+
+rule Man2Doc
+{
+	local source = [ FGristFiles $(2) ] ;
+	local binary = $(1) ;
+
+	SEARCH on $(source) = $(SEARCH_SOURCE) ;
+
+	MakeLocate $(binary) : [ FDirName $(OBOS_DISTRO_TARGET) beos documentation Shell\ Tools ] ;
+
+        Depends $(binary) : $(source) rman ;
+
+	LocalDepends doc_files : $(binary) ;
+        Man2Doc1 $(binary) : rman $(source) ;
+        LocalClean clean : $(binary) ;
+}
+
+actions Man2Doc1
+{
+        $(2[1]) -f XML "$(2[2])" > "$(1)" ;
+}
+
+rule Man2Docs
+{
+        # Man2Docs <sources> ;
+        local source ;
+        for source in [ FGristFiles $(1) ]
+        {
+                local target = $(source:S=.xml) ;
+
+                Man2Doc $(target) : $(source) ;
+        }
+}
