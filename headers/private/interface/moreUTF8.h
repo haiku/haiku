@@ -24,6 +24,19 @@ UTF8NextCharLen(const char *text)
 	return ptr - text;
 }
 
+static inline uint32
+UTF8CountBytes(const char *text, uint32 numChars)
+{
+	const char *ptr = text;
+
+	while (numChars) {
+		ptr += UTF8NextCharLen(ptr);
+		numChars--;
+	}
+
+	return ptr - text;
+}
+
 
 static inline uint32
 UTF8PreviousCharLen(const char *text, const char *limit)
