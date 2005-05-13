@@ -26,6 +26,7 @@
 #include <vm.h>
 #include <vm_cache.h>
 #include <file_cache.h>
+#include <block_cache.h>
 #include <khash.h>
 #include <lock.h>
 #include <fd.h>
@@ -2840,6 +2841,9 @@ vfs_init(kernel_args *args)
 
 	if (mutex_init(&sVnodeMutex, "vfs_vnode_lock") < 0)
 		panic("vfs_init: error allocating vnode lock\n");
+
+	if (block_cache_init() != B_OK)
+		return B_ERROR;
 
 	return file_cache_init();
 }

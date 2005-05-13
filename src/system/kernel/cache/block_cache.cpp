@@ -4,10 +4,12 @@
  */
 
 
+#include "BlockAllocator.h"
+
 #include <KernelExport.h>
 #include <fs_cache.h>
 
-#include <cache.h>
+#include <block_cache.h>
 #include <lock.h>
 #include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
@@ -41,6 +43,7 @@ struct cache_transaction;
 struct cached_block;
 typedef DoublyLinkedListLink<cached_block> block_link;
 
+
 struct cached_block {
 	cached_block	*next;			// next in hash
 	cached_block	*transaction_next;
@@ -66,6 +69,7 @@ struct block_cache {
 	size_t		block_size;
 	int32		next_transaction_id;
 	hash_table	*transaction_hash;
+	BlockAllocator *allocator;
 };
 
 typedef DoublyLinkedList<cached_block,
@@ -132,7 +136,7 @@ class BenaphoreLocker {
 static status_t write_cached_block(block_cache *cache, cached_block *block, bool deleteTransaction = true);
 
 
-//	private transaction functions
+//	#pragma mark - private transaction
 
 
 static int
@@ -173,8 +177,7 @@ lookup_transaction(block_cache *cache, int32 id)
 }
 
 
-//	#pragma mark -
-//	private cached block functions
+//	#pragma mark - private block_cache
 
 
 static int
@@ -201,13 +204,14 @@ cached_block_hash(void *_cacheEntry, const void *_block, uint32 range)
 
 
 static void
-free_cached_block(cached_block *block)
+free_cached_block(block_cache *cache, cached_block *block)
 {
-	free(block->data);
-	free(block->original);
+	cache->allocator->Put(block->data);
+	cache->allocator->Put(block->original);
 #ifdef DEBUG_CHANGED
-	free(block->compare);
+	cache->allocator->Put(block->compare);
 #endif
+
 	free(block);
 }
 
@@ -220,7 +224,7 @@ new_cached_block(block_cache *cache, off_t blockNumber, bool cleared = false)
 		return NULL;
 
 	if (!cleared) {
-		block->data = malloc(cache->block_size);
+		block->data = cache->allocator->Get();
 		if (block->data == NULL) {
 			free(block);
 			return NULL;
@@ -297,7 +301,7 @@ put_cached_block(block_cache *cache, cached_block *block)
 		write_cached_block(cache, block);
 		panic("block_cache: supposed to be clean block was changed!\n");
 
-		free(block->compare);
+		cache->allocator->Put(block->compare);
 		block->compare = NULL;
 	}
 #endif
@@ -332,7 +336,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool cleared = false)
 	
 	if (!allocated && block->data == NULL && !cleared) {
 		// there is no block yet, but we need one
-		block->data = malloc(cache->block_size);
+		block->data = cache->allocator->Get();
 		if (block->data == NULL)
 			return NULL;
 
@@ -343,7 +347,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool cleared = false)
 		int32 blockSize = cache->block_size;
 
 		if (read_pos(cache->fd, blockNumber * blockSize, block->data, blockSize) < blockSize) {
-			free_cached_block(block);
+			free_cached_block(cache, block);
 			return NULL;
 		}
 	}
@@ -368,7 +372,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 	// if there is no transaction support, we just return the current block
 	if (transactionID == -1) {
 		if (cleared && block->data == NULL) {
-			block->data = malloc(cache->block_size);
+			block->data = cache->allocator->Get();
 			if (block->data == NULL) {
 				put_cached_block(cache, block);
 				return NULL;
@@ -414,7 +418,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 
 	if (block->data != NULL && block->original == NULL) {
 		// we already have data, so we need to save it
-		block->original = malloc(cache->block_size);
+		block->original = cache->allocator->Get();
 		if (block->original == NULL) {
 			put_cached_block(cache, block);
 			return NULL;
@@ -425,7 +429,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 
 	if (block->data == NULL && cleared) {
 		// there is no data yet, we need a clean new block
-		block->data = malloc(cache->block_size);
+		block->data = cache->allocator->Get();
 		if (block->data == NULL) {
 			put_cached_block(cache, block);
 			return NULL;
@@ -479,8 +483,14 @@ write_cached_block(block_cache *cache, cached_block *block, bool deleteTransacti
 }
 
 
-//	#pragma mark -
-//	Transactions
+extern "C" status_t
+block_cache_init(void)
+{
+	return init_block_allocator();
+}
+
+
+//	#pragma mark - public transaction
 
 
 extern "C" int32
@@ -567,7 +577,7 @@ cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook
 		}
 
 		if (block->original != NULL) {
-			free(block->original);
+			cache->allocator->Put(block->original);
 			block->original = NULL;
 		}
 
@@ -649,7 +659,7 @@ cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie, off_t *
 }
 
 
-//	#pragma mark -
+//	#pragma mark - public block cache
 //	public interface
 
 
@@ -666,7 +676,7 @@ block_cache_delete(void *_cache, bool allowWrites)
 	uint32 cookie = 0;
 	cached_block *block;
 	while ((block = (cached_block *)hash_remove_first(cache->hash, &cookie)) != NULL) {
-		free_cached_block(block);
+		free_cached_block(cache, block);
 	}
 	
 	// free all transactions (they will all be aborted)	
@@ -679,6 +689,7 @@ block_cache_delete(void *_cache, bool allowWrites)
 
 	hash_uninit(cache->hash);
 	hash_uninit(cache->transaction_hash);
+	BlockAllocator::PutAllocator(cache->allocator);
 	benaphore_destroy(&cache->lock);
 
 	delete cache;
@@ -700,8 +711,12 @@ block_cache_create(int fd, off_t numBlocks, size_t blockSize)
 	if (cache->transaction_hash == NULL)
 		goto err2;
 
-	if (benaphore_init(&cache->lock, "block cache") < B_OK)
+	cache->allocator = BlockAllocator::GetAllocator(blockSize);
+	if (cache->allocator == NULL)
 		goto err3;
+
+	if (benaphore_init(&cache->lock, "block cache") < B_OK)
+		goto err4;
 
 	cache->fd = fd;
 	cache->max_blocks = numBlocks;
@@ -710,6 +725,8 @@ block_cache_create(int fd, off_t numBlocks, size_t blockSize)
 
 	return cache;
 
+err4:
+	BlockAllocator::PutAllocator(cache->allocator);
 err3:
 	hash_uninit(cache->transaction_hash);
 err2:
@@ -801,7 +818,7 @@ block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 
 #ifdef DEBUG_CHANGED
 	if (block->compare == NULL)
-		block->compare = malloc(cache->block_size);
+		block->compare = cache->allocator->Get();
 	if (block->compare != NULL)
 		memcpy(block->compare, block->data, cache->block_size);
 #endif

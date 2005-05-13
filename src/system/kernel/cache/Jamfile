@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src system kernel cache ;
 
 KernelMergeObject kernel_cache.o :
+	BlockAllocator.cpp
 	block_cache.cpp
 	file_cache.cpp
 	vnode_store.cpp
