@@ -5,9 +5,9 @@ is this (when you're in the "current" directory):
 	$ makehdimage /Haiku
 
 Where /Haiku is the (mounted) partition of where you want to install Haiku on.
-If the parameter is omitted, the makehdimage script needs the Userland FS Server
-from Ingo Weinhold (see that script for more information), and will create
-a file named haiku.image that contains a working image of Haiku.
+If the parameter is omitted, the makehdimage currently creates a 60 MB Haiku image in this directory that you can use for Bochs, Qemu and other emulators to boot.
+You need a Jam 2.5 build from our sources, and GCC 2.95.3 to be able to build Haiku successfully.
+
 Go bug us to update this file for real!
 
 
