@@ -1956,6 +1956,14 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 	}
 }
 
+
+int32
+ServerApp::CountBitmaps() const
+{
+	return fBitmapList ? fBitmapList->CountItems() : 0;
+}
+
+
 /*!
 	\brief Looks up a ServerApp's ServerBitmap in its list
 	\param token ID token of the bitmap to find
@@ -1975,6 +1983,27 @@ ServerApp::FindBitmap(int32 token) const
 }
 
 
+int32
+ServerApp::CountPictures() const
+{
+	return fPictureList ? fPictureList->CountItems() : 0;
+}
+
+
+ServerPicture *
+ServerApp::FindPicture(int32 token) const
+{
+	ServerPicture *picture;
+	for (int32 i = 0; i < fPictureList->CountItems(); i++) {
+		picture = static_cast<ServerPicture *>(fPictureList->ItemAt(i));
+		if (picture && picture->GetToken() == token)
+			return picture;
+	}
+	
+	return NULL;
+}
+
+	
 team_id
 ServerApp::ClientTeamID() const
 {

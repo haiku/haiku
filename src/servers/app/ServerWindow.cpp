@@ -1039,25 +1039,10 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			}
 			
 			// search for a picture with the specified token.
-			ServerPicture *sp = NULL;
-			int32 i = 0;
-			while(1)
-			{
-				sp=static_cast<ServerPicture*>(cl->fServerWin->fServerApp->fPictureList->ItemAt(i++));
-				if (!sp)
-					break;
-				
-				if(sp->GetToken() == pictureToken)
-				{
-					//cl->clipToPicture	= sp;
-					
-					// TODO: Increase that picture's reference count.(~ allocate a picture)
-					break;
-				}
-			}
-			
-			// avoid compiler warning
-			i = 0;
+			ServerPicture *sp = cl->fServerWin->fServerApp->FindPicture(pictureToken);
+			// TODO: Increase that picture's reference count.(~ allocate a picture)
+			if (sp == NULL)
+				break;
 			
 			// we have a new picture to clip to, so rebuild our full region
 			if(cl->clipToPicture) 
@@ -1102,26 +1087,11 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<int32>(&pictureToken);
 			link.Read<BPoint>(&where);
 			
-			ServerPicture *sp = NULL;
-			int32 i = 0;
-			
-			while(1)
-			{
-				sp= static_cast<ServerPicture*>(cl->fServerWin->fServerApp->fPictureList->ItemAt(i++));
-				if (!sp)
-					break;
-					
-				if(sp->GetToken() == pictureToken)
-				{
-					//cl->clipToPicture	= sp;
-					
-					// TODO: Increase that picture's reference count.(~ allocate a picture)
-					break;
-				}
-			}
-			// avoid compiler warning
-			i = 0;
-			
+			// TODO: Increase that picture's reference count.(~ allocate a picture)
+			ServerPicture *sp = cl->fServerWin->fServerApp->FindPicture(pictureToken);
+			if (sp == NULL)
+				break;
+							
 			// if a picture has been found...
 			if(cl->clipToPicture) 
 			{
@@ -2023,7 +1993,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			// This is a very special case in the sense that when ServerMemIO is used for this 
 			// purpose, it will be set to NOT automatically free the memory which it had 
 			// requested. This is the server's job once the message has been dispatched.
-			fServerApp->fSharedMem->ReleaseBuffer(msgpointer);
+			fServerApp->AppAreaPool()->ReleaseBuffer(msgpointer);
 			
 			break;
 		}

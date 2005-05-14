@@ -40,6 +40,7 @@ class BList;
 class DisplayDriver;
 class LinkMsgReader;
 class LinkMsgSender;
+class ServerPicture;
 class ServerCursor;
 class ServerBitmap;
 
@@ -74,18 +75,22 @@ public:
 	
 	void SetAppCursor(void);
 	
-	ServerBitmap *FindBitmap(int32 token) const;
-	
 	team_id	ClientTeamID() const;
 	thread_id MonitorThreadID() const;
 	
+	const char *Title() const { return fSignature.String(); }
+	
+	int32 CountBitmaps() const;
+	ServerBitmap *FindBitmap(int32 token) const;
+	
+	int32 CountPictures() const;
+	ServerPicture *FindPicture(int32 token) const;
+
+	AreaPool *AppAreaPool() { return fSharedMem; }
+	
 	FMWList fAppFMWList;
 	
-	const char *Title() const { return fSignature.String(); }
-
 private:
-	friend class ServerWindow;
-	
 	void DispatchMessage(int32 code, LinkMsgReader &link);
 	
 	static int32 MonitorApp(void *data);	
@@ -107,6 +112,9 @@ private:
 	LinkMsgReader *fMsgReader;
 	LinkMsgSender *fMsgSender;
 	
+	// TODO:
+	// - Are really Bitmaps and Pictures stored per application and not globally ?
+	// - As we reference these stuff by token, what about putting them in hash tables ?
 	BList *fSWindowList,
 		  *fBitmapList,
 		  *fPictureList;
