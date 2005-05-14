@@ -442,7 +442,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				region = cl->fParent->ConvertFromParent(&(cl->fFull));
 				dst.OffsetBy(point);
 				
-				cl->fDriver->DrawBitmap(&region, sbmp, src, dst, cl->fLayerData);
+				cl->GetDisplayDriver()->DrawBitmap(&region, sbmp, src, dst, cl->fLayerData);
 			}
 			
 			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
@@ -468,7 +468,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				region = cl->fParent->ConvertFromParent(&(cl->fFull));
 				dst.OffsetBy(point);
 				
-				cl->fDriver->DrawBitmap(&region, sbmp, src, dst, cl->fLayerData);
+				cl->GetDisplayDriver()->DrawBitmap(&region, sbmp, src, dst, cl->fLayerData);
 			}
 			break;
 		}
@@ -491,7 +491,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
 				dstRect.OffsetBy(dst.left, dst.top);
 				
-				cl->fDriver->DrawBitmap(&region, sbmp, srcRect, dstRect, cl->fLayerData);
+				cl->GetDisplayDriver()->DrawBitmap(&region, sbmp, srcRect, dstRect, cl->fLayerData);
 			}
 			
 			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
@@ -516,7 +516,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
 				dstRect.OffsetBy(dst.left, dst.top);
 				
-				cl->fDriver->DrawBitmap(&region, sbmp, srcRect, dstRect, cl->fLayerData);
+				cl->GetDisplayDriver()->DrawBitmap(&region, sbmp, srcRect, dstRect, cl->fLayerData);
 			}
 			break;
 		}
@@ -1039,7 +1039,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			}
 			
 			// search for a picture with the specified token.
-			ServerPicture *sp = cl->fServerWin->fServerApp->FindPicture(pictureToken);
+			ServerPicture *sp = fServerApp->FindPicture(pictureToken);
 			// TODO: Increase that picture's reference count.(~ allocate a picture)
 			if (sp == NULL)
 				break;
@@ -1088,7 +1088,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<BPoint>(&where);
 			
 			// TODO: Increase that picture's reference count.(~ allocate a picture)
-			ServerPicture *sp = cl->fServerWin->fServerApp->FindPicture(pictureToken);
+			ServerPicture *sp = fServerApp->FindPicture(pictureToken);
 			if (sp == NULL)
 				break;
 							
@@ -2169,7 +2169,7 @@ ServerWindow::_CopyBits(RootLayer* rootLayer, Layer* layer,
 	// move the region back for the actual operation
 	copyRegion.OffsetBy(-xOffset, -yOffset);
 
-	layer->fDriver->CopyRegion(&copyRegion, xOffset, yOffset);
+	layer->GetDisplayDriver()->CopyRegion(&copyRegion, xOffset, yOffset);
 
 	// trigger the redraw			
 	rootLayer->GoRedraw(fWinBorder, invalidRegion);
