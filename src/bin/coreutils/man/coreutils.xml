@@ -3,6 +3,8 @@
 <chapter id="st-coreutils">
 <title>Coreutils</title>
 
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="basename.xml" />
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="cat.xml" />
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="date.xml" />
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="cut.xml" />
 

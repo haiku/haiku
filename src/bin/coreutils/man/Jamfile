@@ -91,3 +91,5 @@ who.1
 whoami.1
 yes.1
 ;
+
+Includes [ FGristFiles coreutils.xml ] : [ FGristFiles basename.xml cat.xml date.xml cut.xml ] ;
