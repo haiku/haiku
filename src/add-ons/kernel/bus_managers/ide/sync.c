@@ -119,7 +119,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 		IDE_UNLOCK(bus);
 
 		TRACE(("IRQ though there is no active device\n"));
-		return B_DO_NOT_RESCHEDULE;
+		return B_UNHANDLED_INTERRUPT;
 	}
 
 	if ((status & ide_status_bsy) != 0) {
@@ -128,7 +128,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 		IDE_UNLOCK(bus);
 
 		TRACE(("IRQ though device is busy\n"));
-		return B_DO_NOT_RESCHEDULE;
+		return B_UNHANDLED_INTERRUPT;
 	}
 
 	TRACE(("state: %d\n", bus->state));
@@ -176,14 +176,14 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 			TRACE(("spurious IRQ - there is a command being executed\n"));
 
 			IDE_UNLOCK(bus);
-			return B_DO_NOT_RESCHEDULE;
+			return B_UNHANDLED_INTERRUPT;
 
 		default:
 			dprintf("BUG: unknown state (%d)\n", bus->state);
 
 			IDE_UNLOCK(bus);
 
-			return B_DO_NOT_RESCHEDULE;
+			return B_UNHANDLED_INTERRUPT;
 	}
 }
 
