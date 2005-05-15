@@ -22,7 +22,7 @@
 <!ENTITY coreutils SYSTEM "coreutils.xml">
 
 <!-- license -->
-<!ENTITY gfdl SYSTEM "license.xml">
+<!ENTITY license SYSTEM "license.xml">
 
 <!-- Text Macros -->
 <!ENTITY haikuorg '<ulink url="http://www.haiku-os.org">Haiku</ulink>'>
@@ -63,6 +63,6 @@
 <!-- 
 	The License 
 -->
-&gfdl;
+&license;
 
 </book>
