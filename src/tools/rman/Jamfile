@@ -1,10 +1,6 @@
 SubDir OBOS_TOP src tools rman ;
 
-NotFile doc_files ;
-Depends files : doc_files ;
-
 SubDirCcFlags -w ;
 
 BinCommand rman : rman.c : ;
 
-Man2Docs rman.1 ;

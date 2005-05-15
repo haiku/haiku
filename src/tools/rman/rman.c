@@ -1536,7 +1536,7 @@ HTML(enum command cmd) {
  * code to me so that I may share the wealth in the next release.
  */
 
-const char *DOCBOOKPATH = "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd";
+const char *DOCBOOKPATH = "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd";
 
 void
 XML(enum command cmd) {
@@ -1610,7 +1610,7 @@ XML(enum command cmd) {
 	/* usual operation */
 	switch (cmd) {
 	   case BEGINDOC:
-		printf("\n<!DOCTYPE refentry PUBLIC \"-//OASIS//DTD DocBook XML V4.1.2//EN\"\n");
+		printf("\n<!DOCTYPE refentry PUBLIC \"-//OASIS//DTD DocBook XML V4.2//EN\"\n");
 		printf("  \"%s\">\n", DOCBOOKPATH);
 
 		printf("<!--\n\n\tI am looking for help to finish DocBook XML.\n\n-->\n");
