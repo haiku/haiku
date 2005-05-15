@@ -921,6 +921,9 @@ SMTPProtocol::ReceiveResponse(BString &out)
 	int32 len = 0,r;
 	char buf[SMTP_RESPONSE_SIZE];
 	bigtime_t timeout = 1000000*180; // timeout 180 secs
+	bool gotCode = false;
+	int32 errCode;
+	BString searchStr = "";
 	
 	struct timeval tv;
 	struct fd_set fds; 
@@ -953,10 +956,21 @@ SMTPProtocol::ReceiveResponse(BString &out)
 			r = recv(_fd,buf, SMTP_RESPONSE_SIZE - 1,0);
 			if (r <= 0)
 				break;
+			
+			if (!gotCode)
+			{
+				if (buf[3] == ' ' || buf[3] == '-')
+				{
+					errCode = atol(buf);
+					gotCode = true;
+					searchStr << errCode << ' ';
+				}		
+			}
 
 			len += r;
 			out.Append(buf, r);
-			if (strstr(buf, CRLF))
+			
+			if (strstr(buf, CRLF) && (out.FindFirst(searchStr) != B_ERROR))
 				break;
 		}
 	} else
