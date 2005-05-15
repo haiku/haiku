@@ -4,4 +4,4 @@ AddResources VirtualMemory : VirtualMemory.rdef ;
 
 Preference VirtualMemory : main.cpp Pref_Utils.cpp MainWindow.cpp VMSettings.cpp ;
 
-LinkSharedOSLibs VirtualMemory : be root ;
+LinkSharedOSLibs VirtualMemory : be root libstdc++.r4.so ;

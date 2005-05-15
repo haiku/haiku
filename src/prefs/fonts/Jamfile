@@ -4,10 +4,12 @@ AddResources Fonts : Fonts.rdef ;
 
 Preference Fonts :
 	ButtonView.cpp
+	CacheView.cpp
 	FontSelectionView.cpp
+	FontsSettings.cpp
 	FontView.cpp
 	main.cpp
 	MainWindow.cpp
-	CacheView.cpp ;
+	Pref_Utils.cpp ;
 
 LinkSharedOSLibs Fonts : be ;
