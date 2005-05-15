@@ -1278,7 +1278,7 @@ load_kernel_add_on(const char *path)
 
 	// reserve that space and allocate the areas from that one
 	if (vm_reserve_address_range(vm_get_kernel_aspace_id(), &reservedAddress,
-			B_ANY_KERNEL_ADDRESS, reservedSize) < B_OK)
+			B_ANY_KERNEL_ADDRESS, reservedSize, 0) < B_OK)
 		goto error3;
 
 	start = (addr_t)reservedAddress;

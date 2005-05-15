@@ -117,7 +117,7 @@ vm_get_area(area_id id)
 
 
 static vm_area *
-_vm_create_reserved_region_struct(vm_virtual_map *map)
+_vm_create_reserved_region_struct(vm_virtual_map *map, uint32 flags)
 {
 	vm_area *reserved = malloc(sizeof(vm_area));
 	if (reserved == NULL)
@@ -126,6 +126,7 @@ _vm_create_reserved_region_struct(vm_virtual_map *map)
 	memset(reserved, 0, sizeof(vm_area));
 	reserved->id = RESERVED_AREA_ID;
 		// this marks it as reserved space
+	reserved->protection = flags;
 	reserved->map = map;
 
 	return reserved;
@@ -231,7 +232,7 @@ find_reserved_area(vm_virtual_map *map, addr_t start, addr_t size, vm_area *area
 	} else {
 		// the area splits the reserved range into two separate ones
 		// we need a new reserved area to cover this space
-		vm_area *reserved = _vm_create_reserved_region_struct(map);
+		vm_area *reserved = _vm_create_reserved_region_struct(map, 0);
 		if (reserved == NULL)
 			return B_NO_MEMORY;
 
@@ -261,7 +262,7 @@ find_and_insert_area_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t
 {
 	vm_area *last = NULL;
 	vm_area *next;
-	bool foundspot = false;
+	bool foundSpot = false;
 
 	TRACE(("find_and_insert_region_slot: map %p, start 0x%lx, size %ld, end 0x%lx, addressSpec %ld, area %p\n",
 		map, start, size, end, addressSpec, area));
@@ -294,6 +295,9 @@ second_chance:
 		next = next->aspace_next;
 	}
 
+	// find the right spot depending on the address specification - the area
+	// will be inserted directly after "last" ("next" is not referenced anymore)
+
 	switch (addressSpec) {
 		case B_ANY_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
@@ -302,7 +306,7 @@ second_chance:
 			if (!last) {
 				// see if we can build it at the beginning of the virtual map
 				if (!next || (next->base >= map->base + size)) {
-					foundspot = true;
+					foundSpot = true;
 					area->base = map->base;
 					break;
 				}
@@ -321,9 +325,39 @@ second_chance:
 
 			if ((map->base + (map->size - 1)) >= (last->base + last->size + (size - 1))) {
 				// got a spot
-				foundspot = true;
+				foundSpot = true;
 				area->base = last->base + last->size;
 				break;
+			} else {
+				// we didn't find a free spot - if there were any reserved areas with
+				// the RESERVED_AVOID_BASE flag set, we can now test those for free
+				// space
+				// ToDo: it would make sense to start with the biggest of them
+				next = map->areas;
+				last = NULL;
+				for (last = NULL; next; next = next->aspace_next, last = next) {
+					if (next->size == size) {
+						// the reserved area is entirely covered, and thus, removed
+						if (last)
+							last->aspace_next = next->aspace_next;
+						else
+							map->areas = next->aspace_next;
+
+						foundSpot = true;
+						area->base = next->base;
+						free(next);
+						break;
+					}
+					if (next->size >= size) {
+						// the new area will be placed at the end of the reserved
+						// area, and the reserved area will be resized to make space
+						foundSpot = true;
+						next->size -= size;
+						last = next;
+						area->base = next->base + next->size;
+						break;
+					}
+				}
 			}
 			break;
 
@@ -332,7 +366,7 @@ second_chance:
 			if (!last) {
 				// see if we can build it at the beginning of the specified start
 				if (!next || (next->base >= start + size)) {
-					foundspot = true;
+					foundSpot = true;
 					area->base = start;
 					break;
 				}
@@ -351,7 +385,7 @@ second_chance:
 
 			if ((map->base + (map->size - 1)) >= (last->base + last->size + (size - 1))) {
 				// got a spot
-				foundspot = true;
+				foundSpot = true;
 				if (last->base + last->size <= start)
 					area->base = start;
 				else
@@ -369,20 +403,20 @@ second_chance:
 			// see if we can create it exactly here
 			if (!last) {
 				if (!next || (next->base >= start + size)) {
-					foundspot = true;
+					foundSpot = true;
 					area->base = start;
 					break;
 				}
 			} else {
 				if (next) {
 					if (last->base + last->size <= start && next->base >= start + size) {
-						foundspot = true;
+						foundSpot = true;
 						area->base = start;
 						break;
 					}
 				} else {
 					if ((last->base + (last->size - 1)) <= start - 1) {
-						foundspot = true;
+						foundSpot = true;
 						area->base = start;
 					}
 				}
@@ -392,7 +426,7 @@ second_chance:
 			return B_BAD_VALUE;
 	}
 
-	if (!foundspot)
+	if (!foundSpot)
 		return addressSpec == B_EXACT_ADDRESS ? B_BAD_VALUE : B_NO_MEMORY;
 
 	area->size = size;
@@ -616,7 +650,7 @@ out:
 
 
 status_t
-vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size)
+vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size, uint32 flags)
 {
 	vm_address_space *addressSpace;
 	vm_area *area;
@@ -629,7 +663,7 @@ vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, add
 	if (addressSpace == NULL)
 		return B_BAD_TEAM_ID;
 
-	area = _vm_create_reserved_region_struct(&addressSpace->virtual_map);
+	area = _vm_create_reserved_region_struct(&addressSpace->virtual_map, flags);
 	if (area == NULL) {
 		status = B_NO_MEMORY;
 		goto err1;
@@ -2042,7 +2076,7 @@ reserve_boot_loader_ranges(kernel_args *args)
 	for (i = 0; i < args->num_virtual_allocated_ranges; i++) {
 		void *address = (void *)args->virtual_allocated_range[i].start;
 		status_t status = vm_reserve_address_range(vm_get_kernel_aspace_id(), &address,
-			B_EXACT_ADDRESS, args->virtual_allocated_range[i].size);
+			B_EXACT_ADDRESS, args->virtual_allocated_range[i].size, 0);
 		if (status < B_OK)
 			panic("could not reserve boot loader ranges\n");
 	}
@@ -3091,7 +3125,7 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 
 	sourceAddressSpace = area->aspace;
 
-	reserved = _vm_create_reserved_region_struct(&sourceAddressSpace->virtual_map);
+	reserved = _vm_create_reserved_region_struct(&sourceAddressSpace->virtual_map, 0);
 	if (reserved == NULL) {
 		status = B_NO_MEMORY;
 		goto err2;

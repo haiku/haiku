@@ -43,23 +43,27 @@ void vm_put_aspace(vm_address_space *aspace);
 
 // private kernel only extension (should be moved somewhere else):
 struct team;
-area_id create_area_etc(struct team *team, const char *name, void **address, uint32 addressSpec,
-			uint32 size, uint32 lock, uint32 protection);
+area_id create_area_etc(struct team *team, const char *name, void **address, 
+			uint32 addressSpec, uint32 size, uint32 lock, uint32 protection);
 status_t delete_area_etc(struct team *team, area_id area);
 
 status_t vm_unreserve_address_range(aspace_id aid, void *address, addr_t size);
-status_t vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size);
-area_id vm_create_anonymous_area(aspace_id aid, const char *name, void **address, uint32 addressSpec,
-			addr_t size, uint32 wiring, uint32 protection);
-area_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, uint32 addressSpec,
-			addr_t size, uint32 protection, addr_t phys_addr);
-area_id vm_map_file(aspace_id aid, const char *name, void **address, uint32 addressSpec,
-			addr_t size, uint32 protection, uint32 mapping, const char *path, off_t offset);
-area_id vm_create_null_area(aspace_id aid, const char *name, void **address, uint32 addressSpec, addr_t size);
-area_id vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32 addressSpec,
-			uint32 protection, area_id sourceID);
-area_id vm_clone_area(aspace_id aid, const char *name, void **address, uint32 addressSpec,
-			uint32 protection, uint32 mapping, area_id sourceArea);
+status_t vm_reserve_address_range(aspace_id aid, void **_address, 
+			uint32 addressSpec, addr_t size, uint32 flags);
+area_id vm_create_anonymous_area(aspace_id aid, const char *name, void **address, 
+			uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection);
+area_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, 
+			uint32 addressSpec, addr_t size, uint32 protection, addr_t phys_addr);
+area_id vm_map_file(aspace_id aid, const char *name, void **address, 
+			uint32 addressSpec, addr_t size, uint32 protection, uint32 mapping, 
+			const char *path, off_t offset);
+area_id vm_create_null_area(aspace_id aid, const char *name, void **address, 
+			uint32 addressSpec, addr_t size);
+area_id vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, 
+			uint32 addressSpec, uint32 protection, area_id sourceID);
+area_id vm_clone_area(aspace_id aid, const char *name, void **address, 
+			uint32 addressSpec, uint32 protection, uint32 mapping, 
+			area_id sourceArea);
 status_t vm_delete_area(aspace_id aid, area_id id);
 status_t vm_create_vnode_cache(void *vnode, vm_cache_ref **_cacheRef);
 
@@ -77,7 +81,8 @@ area_id _user_find_area(const char *name);
 status_t _user_get_area_info(area_id area, area_info *info);
 status_t _user_get_next_area_info(team_id team, int32 *cookie, area_info *info);
 status_t _user_resize_area(area_id area, size_t newSize);
-status_t _user_transfer_area(area_id area, void **_address, uint32 addressSpec, team_id target);
+status_t _user_transfer_area(area_id area, void **_address, uint32 addressSpec, 
+			team_id target);
 status_t _user_set_area_protection(area_id area, uint32 newProtection);
 area_id _user_clone_area(const char *name, void **_address, uint32 addressSpec, 
 			uint32 protection, area_id sourceArea);
