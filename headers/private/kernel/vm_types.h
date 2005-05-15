@@ -187,7 +187,13 @@ enum {
 	(B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA \
 	| B_KERNEL_STACK_AREA)
 
+#define B_OVERCOMMITTING_AREA	0x1000
+	// ToDo: this is not really a protection flag, but since the "protection"
+	//	field is the only flag field, we currently use it for this.
+	//	A cleaner approach would be appreciated - maybe just an official generic
+	//	flags region in the protection field.
+
 #define B_USER_AREA_FLAGS		(B_USER_PROTECTION)
-#define B_KERNEL_AREA_FLAGS		(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA)
+#define B_KERNEL_AREA_FLAGS		(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_OVERCOMMITTING_AREA)
 
 #endif	/* _KERNEL_VM_TYPES_H */

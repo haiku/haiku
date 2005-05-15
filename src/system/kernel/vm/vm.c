@@ -674,12 +674,16 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	vm_cache_ref *cache_ref;
 	vm_page *page = NULL;
 	bool isStack = (protection & B_STACK_AREA) != 0;
+	bool canOvercommit = false;
 	status_t err;
 
 	TRACE(("create_anonymous_area %s: size 0x%lx\n", name, size));
 
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
+
+	if (isStack || (protection & B_OVERCOMMITTING_AREA) != 0)
+		canOvercommit = true;
 
 #ifdef DEBUG_KERNEL_STACKS
 	if ((protection & B_KERNEL_STACK_AREA) != 0)
@@ -730,8 +734,9 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	}
 
 	// create an anonymous store object
-	store = vm_store_create_anonymous_noswap(isStack, (protection & B_USER_PROTECTION) != 0 ? 
-		USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES);
+	store = vm_store_create_anonymous_noswap(canOvercommit, isStack ?
+		((protection & B_USER_PROTECTION) != 0 ? 
+			USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0);
 	if (store == NULL)
 		panic("vm_create_anonymous_area: vm_create_store_anonymous_noswap returned NULL");
 	cache = vm_cache_create(store);
@@ -755,8 +760,6 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 			break;
 	}
 
-//	dprintf("create_anonymous_area: calling map_backing store\n");
-
 	vm_cache_acquire_ref(cache_ref, true);
 	err = map_backing_store(aspace, store, address, 0, size, addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name);
 	vm_cache_release_ref(cache_ref);
@@ -778,8 +781,6 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 		return err;
 	}
 
-//	dprintf("create_anonymous_area: done calling map_backing store\n");
-
 	cache_ref = store->cache->ref;
 	switch (wiring) {
 		case B_NO_LOCK:
@@ -788,10 +789,11 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 
 		case B_FULL_LOCK:
 		{
-			// pages aren't mapped at this point, but we just simulate a fault on
+			// Pages aren't mapped at this point, but we just simulate a fault on
 			// every page, which should allocate them
+			// ToDo: at this point, it would probably be cheaper to allocate 
+			// and map the pages directly
 			addr_t va;
-			// XXX remove
 			for (va = area->base; va < area->base + area->size; va += B_PAGE_SIZE) {
 #ifdef DEBUG_KERNEL_STACKS
 #	ifdef STACK_GROWS_DOWNWARDS
@@ -877,7 +879,7 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	}
 	vm_put_aspace(aspace);
 
-//	dprintf("create_anonymous_area: done\n");
+	TRACE(("vm_create_anonymous_area: done\n"));
 
 	if (area == NULL)
 		return B_NO_MEMORY;

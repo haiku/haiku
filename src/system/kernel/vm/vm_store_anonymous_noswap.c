@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -24,11 +24,12 @@
 
 // The stack functionality looks like a good candidate to put into its own
 // store. I have not done this because once we have a swap file backing up
-// the memory, it would probably not a good idea to separate this anymore.
+// the memory, it would probably not be a good idea to separate this 
+// anymore.
 
 typedef struct anonymous_store {
 	vm_store	vm;
-	bool		is_stack;
+	bool		can_overcommit;
 	int32		guarded_size;
 } anonymous_store;
 
@@ -46,8 +47,8 @@ anonymous_commit(struct vm_store *_store, off_t size)
 {
 	anonymous_store *store = (anonymous_store *)_store;
 
-	// if we're a stack, we don't commit here, but in anonymous_fault()
-	if (store->is_stack)
+	// if we can overcommit, we don't commit here, but in anonymous_fault()
+	if (store->can_overcommit)
 		return B_OK;
 
 	// Check to see how much we could commit - we need real memory
@@ -95,21 +96,23 @@ anonymous_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t 
 {
 	anonymous_store *store = (anonymous_store *)_store;
 
-	if (store->is_stack) {
-		uint32 guardOffset;
+	if (store->can_overcommit) {
+		if (store->guarded_size > 0) {
+			uint32 guardOffset;
 
 #ifdef STACK_GROWS_DOWNWARDS
-		guardOffset = 0;
+			guardOffset = 0;
 #elif defined(STACK_GROWS_UPWARDS)
-		guardOffset = store->vm.cache->virtual_size - store->guarded_size;
+			guardOffset = store->vm.cache->virtual_size - store->guarded_size;
 #else
 #	error Stack direction has not been defined in arch_config.h
 #endif
 
-		// report stack fault, guard page hit!
-		if (offset >= guardOffset && offset < guardOffset + store->guarded_size) {
-			TRACE(("stack overflow!\n"));
-			return B_BAD_ADDRESS;
+			// report stack fault, guard page hit!
+			if (offset >= guardOffset && offset < guardOffset + store->guarded_size) {
+				TRACE(("stack overflow!\n"));
+				return B_BAD_ADDRESS;
+			}
 		}
 
 		// try to commit additional memory
@@ -141,19 +144,19 @@ static vm_store_ops anonymous_ops = {
  */
 
 vm_store *
-vm_store_create_anonymous_noswap(bool stack, int32 numGuardPages)
+vm_store_create_anonymous_noswap(bool canOvercommit, int32 numGuardPages)
 {
 	anonymous_store *store = malloc(sizeof(anonymous_store));
 	if (store == NULL)
 		return NULL;
 
-	TRACE(("vm_store_create_anonymous(stack = %s, numGuardPages = %ld) at %p\n",
-		stack ? "true" : "false", numGuardPages, store));
+	TRACE(("vm_store_create_anonymous(canOvercommit = %s, numGuardPages = %ld) at %p\n",
+		canOvercommit ? "yes" : "no", numGuardPages, store));
 
 	store->vm.ops = &anonymous_ops;
 	store->vm.cache = NULL;
 	store->vm.committed_size = 0;
-	store->is_stack = stack;
+	store->can_overcommit = canOvercommit;
 	store->guarded_size = numGuardPages * B_PAGE_SIZE;
 
 	return &store->vm;

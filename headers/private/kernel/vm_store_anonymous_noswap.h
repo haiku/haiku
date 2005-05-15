@@ -1,5 +1,5 @@
-/* 
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -8,8 +8,13 @@
 #ifndef _KERNEL_VM_STORE_ANONYMOUS_H
 #define _KERNEL_VM_STORE_ANONYMOUS_H
 
+
 #include <vm_types.h>
 
-vm_store *vm_store_create_anonymous_noswap(bool stack, int32 numGuardPages);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+vm_store *vm_store_create_anonymous_noswap(bool canOvercommit, int32 numGuardPages);
 
 #endif	/* _KERNEL_VM_STORE_ANONYMOUS_H */
