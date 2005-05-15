@@ -5,6 +5,9 @@ InstallFloppy installfloppy : $(OBOS_FLOPPY) ;
 NotFile alltests ;
 Depends alltests : r5tests obostests ;
 
+NotFile doc_files ;
+Depends files : doc_files ;
+
 # Pseudo-target to build the mail kit only
 NotFile MailKit ;
 Depends MailKit :

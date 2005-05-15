@@ -2392,7 +2392,7 @@ rule Man2Doc
 
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
 
-	MakeLocate $(binary) : [ FDirName $(OBOS_DISTRO_TARGET) beos documentation Shell\ Tools ] ;
+	MakeLocate $(binary) : [ FDirName $(OBOS_OBJECT_TARGET) documentation Shell_Tools ] ;
 
         Depends $(binary) : $(source) rman ;
 
@@ -2417,3 +2417,4 @@ rule Man2Docs
                 Man2Doc $(target) : $(source) ;
         }
 }
+
