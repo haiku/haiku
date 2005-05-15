@@ -54,7 +54,7 @@ scan_pages(vm_address_space *aspace, addr_t free_target)
 	area = firstArea;
 	for (;;) {
 		// ignore reserved ranges
-		while (area != NULL && area->id == RESERVED_REGION_ID)
+		while (area != NULL && area->id == RESERVED_AREA_ID)
 			area = area->aspace_next;
 		if (area == NULL)
 			break;

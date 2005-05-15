@@ -124,7 +124,7 @@ _vm_create_reserved_region_struct(vm_virtual_map *map)
 		return NULL;
 
 	memset(reserved, 0, sizeof(vm_area));
-	reserved->id = RESERVED_REGION_ID;
+	reserved->id = RESERVED_AREA_ID;
 		// this marks it as reserved space
 	reserved->map = map;
 
@@ -187,7 +187,7 @@ find_reserved_area(vm_virtual_map *map, addr_t start, addr_t size, vm_area *area
 	while (next) {
 		if (next->base <= start && next->base + next->size >= start + size) {
 			// this area covers the requested range
-			if (next->id != RESERVED_REGION_ID) {
+			if (next->id != RESERVED_AREA_ID) {
 				// but it's not reserved space, it's a real area
 				return B_BAD_VALUE;
 			}
@@ -590,7 +590,7 @@ vm_unreserve_address_range(aspace_id aid, void *address, addr_t size)
 	area = addressSpace->virtual_map.areas;
 	while (area) {
 		// the area must be completely part of the reserved range
-		if (area->id == RESERVED_REGION_ID && area->base >= (addr_t)address
+		if (area->id == RESERVED_AREA_ID && area->base >= (addr_t)address
 			&& area->base + area->size <= (addr_t)address + size) {
 			// remove reserved range
 			vm_area *reserved = area;
@@ -1245,7 +1245,7 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 	bool removeit = false;
 
 	// we should never get here, but if we do, we can handle it
-	if (area->id == RESERVED_REGION_ID)
+	if (area->id == RESERVED_AREA_ID)
 		return;
 
 	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0, 0);
@@ -1825,7 +1825,7 @@ vm_delete_areas(struct vm_address_space *aspace)
 	for (area = aspace->virtual_map.areas; area; area = next) {
 		next = area->aspace_next;
 
-		if (area->id == RESERVED_REGION_ID) {
+		if (area->id == RESERVED_AREA_ID) {
 			// just remove it
 			free(area);
 			continue;
@@ -1858,7 +1858,7 @@ vm_area_for(aspace_id aid, addr_t address)
 	area = addressSpace->virtual_map.areas;
 	for (; area != NULL; area = area->aspace_next) {
 		// ignore reserved space regions
-		if (area->id == RESERVED_REGION_ID)
+		if (area->id == RESERVED_AREA_ID)
 			continue;
 
 		if (address >= area->base && address < area->base + area->size) {
@@ -1919,7 +1919,7 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 		addr_t areaStart = area->base;
 		addr_t areaEnd = areaStart + area->size;
 
-		if (area->id == RESERVED_REGION_ID)
+		if (area->id == RESERVED_AREA_ID)
 			continue;
 
 		if (areaEnd >= end) {
@@ -2160,7 +2160,7 @@ vm_init_post_sem(kernel_args *args)
 	vm_aspace_init_post_sem();
 
 	for (area = kernel_aspace->virtual_map.areas; area; area = area->aspace_next) {
-		if (area->id == RESERVED_REGION_ID)
+		if (area->id == RESERVED_AREA_ID)
 			continue;
 
 		if (area->cache_ref->lock.sem < 0)
@@ -2592,7 +2592,7 @@ vm_virtual_map_lookup(vm_virtual_map *map, addr_t address)
 		return area;
 
 	for (area = map->areas; area != NULL; area = area->aspace_next) {
-		if (area->id == RESERVED_REGION_ID)
+		if (area->id == RESERVED_AREA_ID)
 			continue;
 
 		if (area->base <= address && (area->base + area->size) > address)
@@ -2874,7 +2874,7 @@ find_area(const char *name)
 	hash_open(sAreaHash, &iterator);
 
 	while ((area = hash_next(sAreaHash, &iterator)) != NULL) {
-		if (area->id == RESERVED_REGION_ID)
+		if (area->id == RESERVED_AREA_ID)
 			continue;
 
 		if (!strcmp(area->name, name)) {
@@ -2948,7 +2948,7 @@ _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 	acquire_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0, 0);
 
 	for (area = addressSpace->virtual_map.areas; area; area = area->aspace_next) {
-		if (area->id == RESERVED_REGION_ID)
+		if (area->id == RESERVED_AREA_ID)
 			continue;
 
 		if (area->base > nextBase)

@@ -29,7 +29,9 @@
 #define WRITE_COUNT 1024
 #define READ_COUNT 1
 
-#define RESERVED_REGION_ID -1
+// reserved area definitions
+#define RESERVED_AREA_ID -1
+#define RESERVED_AVOID_BASE 0x01
 
 // page attributes (in addition to B_READ_AREA etc.)
 #define PAGE_MODIFIED 0x1000
