@@ -54,6 +54,7 @@ AccelerantHWInterface::AccelerantHWInterface()
 		// required hooks
 		fAccAcquireEngine(NULL),
 		fAccReleaseEngine(NULL),
+		fAccSyncToToken(NULL),
 		fAccGetModeCount(NULL),
 		fAccGetModeList(NULL),
 		fAccGetFrameBufferConfig(NULL),
@@ -226,6 +227,7 @@ AccelerantHWInterface::SetupDefaultHooks()
 	// required
 	fAccAcquireEngine = (acquire_engine)fAccelerantHook(B_ACQUIRE_ENGINE, NULL);
 	fAccReleaseEngine = (release_engine)fAccelerantHook(B_RELEASE_ENGINE, NULL);
+	fAccSyncToToken = (sync_to_token)fAccelerantHook(B_SYNC_TO_TOKEN, NULL);
 	fAccGetModeCount = (accelerant_mode_count)fAccelerantHook(B_ACCELERANT_MODE_COUNT, NULL);
 	fAccGetModeList = (get_mode_list)fAccelerantHook(B_GET_MODE_LIST, NULL);
 	fAccGetFrameBufferConfig = (get_frame_buffer_config)fAccelerantHook(B_GET_FRAME_BUFFER_CONFIG, NULL);
@@ -513,12 +515,12 @@ AccelerantHWInterface::AvailableHWAcceleration() const
 {
 	uint32 flags = 0;
 
-/*	if (fAccScreenBlit)
+	if (fAccScreenBlit)
 		flags |= HW_ACC_COPY_REGION;
 	if (fAccFillRect)
 		flags |= HW_ACC_FILL_REGION;
 	if (fAccInvertRect)
-		flags |= HW_ACC_INVERT_REGION;*/
+		flags |= HW_ACC_INVERT_REGION;
 
 	return flags;
 }
@@ -529,8 +531,7 @@ AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 								  uint32 count, int32 xOffset, int32 yOffset)
 {
 	if (fAccScreenBlit && fAccAcquireEngine) {
-//		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, NULL, &fEngineToken) >= B_OK) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
 
 			// convert the rects
 			blit_params* params = new blit_params[count];
@@ -551,8 +552,11 @@ AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 
 			// done
 			if (fAccReleaseEngine)
-//				fAccReleaseEngine(fEngineToken, &fSyncToken);
-				fAccReleaseEngine(fEngineToken, NULL);
+				fAccReleaseEngine(fEngineToken, &fSyncToken);
+
+			// sync
+			if (fAccSyncToToken)
+				fAccSyncToToken(&fSyncToken);
 
 			delete[] params;
 		}
@@ -564,8 +568,7 @@ void
 AccelerantHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color)
 {
 	if (fAccFillRect && fAccAcquireEngine) {
-//		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, NULL, &fEngineToken) >= B_OK) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
 
 			// convert the region
 			uint32 count;
@@ -577,8 +580,11 @@ AccelerantHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& col
 
 			// done
 			if (fAccReleaseEngine)
-				fAccReleaseEngine(fEngineToken, NULL);
-//				fAccReleaseEngine(fEngineToken, &fSyncToken);
+				fAccReleaseEngine(fEngineToken, &fSyncToken);
+
+			// sync
+			if (fAccSyncToToken)
+				fAccSyncToToken(&fSyncToken);
 
 			delete[] fillParams;
 		}
@@ -590,8 +596,7 @@ void
 AccelerantHWInterface::InvertRegion(/*const*/ BRegion& region)
 {
 	if (fAccInvertRect && fAccAcquireEngine) {
-//		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, NULL, &fEngineToken) >= B_OK) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
 
 			// convert the region
 			uint32 count;
@@ -603,8 +608,11 @@ AccelerantHWInterface::InvertRegion(/*const*/ BRegion& region)
 
 			// done
 			if (fAccReleaseEngine)
-//				fAccReleaseEngine(fEngineToken, &fSyncToken);
-				fAccReleaseEngine(fEngineToken, NULL);
+				fAccReleaseEngine(fEngineToken, &fSyncToken);
+
+			// sync
+			if (fAccSyncToToken)
+				fAccSyncToToken(&fSyncToken);
 
 			delete[] fillParams;
 		}

@@ -90,6 +90,7 @@ private:
 		// required hooks - guaranteed to be valid
 		acquire_engine			fAccAcquireEngine;
 		release_engine			fAccReleaseEngine;
+		sync_to_token			fAccSyncToToken;
 		accelerant_mode_count	fAccGetModeCount;
 		get_mode_list			fAccGetModeList;
 		get_frame_buffer_config	fAccGetFrameBufferConfig;

@@ -972,8 +972,15 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&evt.buttons);
 			msg.Read<int32>(&evt.clicks);
 
-			if (fLastMousePossition.x != evt.where.x || fLastMousePossition.y != evt.where.y)
-				debugger("RootLayer: MouseDown position not the same as last mouse position.\n");
+			if (fLastMousePossition != evt.where) {
+				// TODO: a B_MOUSE_MOVED message might have to be generated in order to
+				// correctly trigger entered/exited view transits.
+fprintf(stderr, "mouse position changed in B_MOUSE_DOWN (%.1f, %.1f) from last B_MOUSE_MOVED (%.1f, %.1f)!",
+		evt.where.x, evt.where.y, fLastMousePossition.x, fLastMousePossition.y);
+				// update on screen mouse pos
+				GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
+				fLastMousePossition	= evt.where;
+			}
 			
 			if (fLastMouseMoved == NULL)
 				debugger("RootLayer: fLastMouseMoved is null!\n");
@@ -1067,6 +1074,16 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<float>(&evt.where.x);
 			msg.Read<float>(&evt.where.y);
 			msg.Read<int32>(&evt.modifiers);
+
+			if (fLastMousePossition != evt.where) {
+				// TODO: a B_MOUSE_MOVED message might have to be generated in order to
+				// correctly trigger entered/exited view transits.
+fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_MOUSE_MOVED (%.1f, %.1f)!",
+		evt.where.x, evt.where.y, fLastMousePossition.x, fLastMousePossition.y);
+				// update on screen mouse pos
+				GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
+				fLastMousePossition	= evt.where;
+			}
 
 			// TODO: what if 'fEventMaskLayer' is deleted in the mean time.
 			if (fEventMaskLayer)
