@@ -30,6 +30,7 @@
 
 #include "LayerData.h"
 #include "Painter.h"
+#include "PNGDump.h"
 #include "RenderingBuffer.h"
 
 #ifdef __HAIKU__
@@ -1192,34 +1193,18 @@ DisplayDriverPainter::SetMode(const display_mode &mode)
 bool
 DisplayDriverPainter::DumpToFile(const char *path)
 {
-#if 0
-	// TODO: find out why this does not work
-	SaveToPNG(	path,
-				BRect(0, 0, fDisplayMode.virtual_width - 1, fDisplayMode.virtual_height - 1),
-				(color_space)fDisplayMode.space,
-				mFrameBufferConfig.frame_buffer,
-				fDisplayMode.virtual_height * mFrameBufferConfig.bytes_per_row,
-				mFrameBufferConfig.bytes_per_row);*/
-#else
-	// TODO: remove this when SaveToPNG works properly
-	
-	// this does dump each line at a time to ensure that everything
-	// gets written even if we crash somewhere.
-	// it's a bit overkill, but works for now.
-	FILE *output = fopen(path, "w");
-	if (!output)
-		return false;
-	
-	RenderingBuffer *backBuffer = fGraphicsCard->DrawingBuffer();
-	uint32 row = backBuffer->BytesPerRow() / 4;
-	for (int i = 0; i < fDisplayMode.virtual_height; i++) {
-		fwrite((uint32 *)backBuffer->Bits() + i * row, 4, row, output);
-		sync();
-	}
-	fclose(output);
-	sync();
-#endif
-	
+	if (Lock()) {
+		RenderingBuffer* buffer = fGraphicsCard->DrawingBuffer();
+		if (buffer) {
+			BRect bounds(0.0, 0.0, buffer->Width() - 1, buffer->Height() - 1);
+			// TODO: Don't assume B_RGBA32!!
+			SaveToPNG(path, bounds, B_RGBA32,
+					  buffer->Bits(),
+					  buffer->BitsLength(),
+					  buffer->BytesPerRow());
+		}
+		Unlock();
+	}	
 	return true;
 }
 

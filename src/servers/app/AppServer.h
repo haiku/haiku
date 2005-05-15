@@ -67,7 +67,7 @@ private:
 	
 	BString fDecoratorName;
 	
-	bool fQuittingServer;
+	volatile bool fQuittingServer;
 	
 	BList *fAppList;
 	thread_id fPicassoThreadID;

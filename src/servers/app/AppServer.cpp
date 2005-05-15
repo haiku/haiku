@@ -24,31 +24,34 @@
 //	Description:	main manager object for the app_server
 //  
 //------------------------------------------------------------------------------
-#include <AppDefs.h>
 #include <Accelerant.h>
-#include <Entry.h>
-#include <Path.h>
+#include <AppDefs.h>
 #include <Directory.h>
-#include <PortLink.h>
-
+#include <Entry.h>
 #include <File.h>
 #include <Message.h>
-#include "AppServer.h"
+#include <Path.h>
+#include <PortLink.h>
+#include <StopWatch.h>
+
+#include "BitmapManager.h"
 #include "ColorSet.h"
+#include "CursorManager.h"
+#include "DefaultDecorator.h"
+#include "Desktop.h"
 #include "DisplayDriver.h"
+#include "FontServer.h"
+#include "RegistrarDefs.h"
+#include "RGBColor.h"
+#include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerCursor.h"
 #include "ServerProtocol.h"
 #include "ServerWindow.h"
-#include "DefaultDecorator.h"
-#include "RGBColor.h"
-#include "BitmapManager.h"
-#include "CursorManager.h"
 #include "Utils.h"
-#include "FontServer.h"
-#include "Desktop.h"
-#include "RootLayer.h"
-#include <StopWatch.h>
+
+#include "AppServer.h"
+
 //#define DEBUG_KEYHANDLING
 //#define DEBUG_SERVER
 
@@ -104,7 +107,7 @@ AppServer::AppServer(void) :
 	if (fServerInputPort == B_NO_MORE_PORTS)
 		debugger("app_server could not create input port");
 	
-	fAppList= new BList(0);
+	fAppList= new BList();
 	fQuittingServer= false;
 	make_decorator= NULL;
 	
@@ -282,7 +285,7 @@ AppServer::LaunchInputServer()
 
 	fISThreadID = B_ERROR;
 
-	while (find_thread("_roster_thread_") == B_NAME_NOT_FOUND && !fQuittingServer) {
+	while (find_thread(BPrivate::kRosterThreadName) == B_NAME_NOT_FOUND && !fQuittingServer) {
 		snooze(250000);
 	}
 
@@ -295,7 +298,7 @@ AppServer::LaunchInputServer()
 	if (fCursorArea < B_OK)	
 		fCursorArea = create_area("isCursor", (void**) &fCursorAddr, B_ANY_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (fCursorSem < B_OK)
-        	fCursorSem = create_sem(0, "isSem"); 
+		fCursorSem = create_sem(0, "isSem"); 
 
 	int32 arg_c = 1;
 	char **arg_v = (char **)malloc(sizeof(char *) * (arg_c + 1));
@@ -309,8 +312,8 @@ AppServer::LaunchInputServer()
 	free(arg_v[0]);
 
 	int32 tmpbuf[2] = {fCursorSem, fCursorArea};
-        int32 code = 0;
-        send_data(fISThreadID, code, (void *)tmpbuf, sizeof(tmpbuf));   
+	int32 code = 0;
+	send_data(fISThreadID, code, (void *)tmpbuf, sizeof(tmpbuf));   
 
 	resume_thread(fISThreadID);
 	setpgid(fISThreadID, 0); 
@@ -318,9 +321,9 @@ AppServer::LaunchInputServer()
 	// we receive 
 
 	thread_id sender;
-        code = receive_data(&sender, (void *)tmpbuf, sizeof(tmpbuf));
-        fISASPort = tmpbuf[0];
-        fISPort = tmpbuf[1];  
+	code = receive_data(&sender, (void *)tmpbuf, sizeof(tmpbuf));
+	fISASPort = tmpbuf[0];
+	fISPort = tmpbuf[1];  
 
 	// if at any time, one of these ports is error prone, it might mean input_server is gone
 	// then relaunch input_server
@@ -334,9 +337,9 @@ void
 AppServer::LaunchCursorThread()
 {
 	// Spawn our cursor thread
-        fCursorThreadID = spawn_thread(CursorThread,"CursorThreadOfTheDeath", B_REAL_TIME_DISPLAY_PRIORITY - 1, this);
+	fCursorThreadID = spawn_thread(CursorThread, "CursorThreadOfTheDeath", B_REAL_TIME_DISPLAY_PRIORITY - 1, this);
 	if (fCursorThreadID >= 0)
-                resume_thread(fCursorThreadID);
+		resume_thread(fCursorThreadID);
 
 }
 
@@ -356,7 +359,7 @@ AppServer::CursorThread(void* data)
 
 		while (acquire_sem(app->fCursorSem) == B_OK) {
 
-       			p.y = *app->fCursorAddr & 0x7fff;
+			p.y = *app->fCursorAddr & 0x7fff;
 			p.x = *app->fCursorAddr >> 15 & 0x7fff;
 
 			desktop->GetDisplayDriver()->MoveCursorTo(p.x, p.y);

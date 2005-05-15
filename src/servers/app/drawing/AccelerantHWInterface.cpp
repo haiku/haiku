@@ -513,12 +513,12 @@ AccelerantHWInterface::AvailableHWAcceleration() const
 {
 	uint32 flags = 0;
 
-	if (fAccScreenBlit)
+/*	if (fAccScreenBlit)
 		flags |= HW_ACC_COPY_REGION;
 	if (fAccFillRect)
 		flags |= HW_ACC_FILL_REGION;
 	if (fAccInvertRect)
-		flags |= HW_ACC_INVERT_REGION;
+		flags |= HW_ACC_INVERT_REGION;*/
 
 	return flags;
 }

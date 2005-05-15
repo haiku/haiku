@@ -72,7 +72,7 @@ printf("Couldn't create write struct\n");
 printf("Couldn't create info struct\n");
 #endif
 		fclose(fp);
-		png_destroy_write_struct(&png_ptr,  (png_infopp)NULL);
+		png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
 		return;
 	}
 	
@@ -82,27 +82,30 @@ printf("Couldn't create info struct\n");
 printf("Couldn't set jump\n");
 #endif
 		fclose(fp);
-		png_destroy_write_struct(&png_ptr,  (png_infopp)NULL);
+		png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
 		return;
 	}
 	
 	png_init_io(png_ptr, fp);
 	
-	png_set_compression_level(png_ptr,Z_NO_COMPRESSION);
+//	png_set_compression_level(png_ptr, Z_NO_COMPRESSION);
 	
 	png_set_bgr(png_ptr);
+
+	int32 width = bounds.IntegerWidth() + 1;
+	int32 height = bounds.IntegerHeight() + 1;
 	
-   	png_set_IHDR(png_ptr, info_ptr, bounds.IntegerWidth(), bounds.IntegerHeight(), 8, PNG_COLOR_TYPE_RGB_ALPHA,
-	PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+   	png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA,
+//				 PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+				 PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 	
 	png_write_info(png_ptr, info_ptr);
-	
-	png_byte *row_pointers[bounds.IntegerHeight()];
-	png_byte *index=(png_byte*)bits;
-	for(int32 i=0;i<bounds.IntegerHeight();i++)
-	{
-		row_pointers[i]=index;
-		index+=bytesperrow;
+
+	png_byte* row_pointers[height];
+	png_byte* index = (png_byte*)bits;
+	for (int32 i = 0; i < height; i++) {
+		row_pointers[i] = index;
+		index += bytesperrow;
 	}
 	png_write_image(png_ptr, row_pointers);
 	png_write_end(png_ptr, info_ptr);

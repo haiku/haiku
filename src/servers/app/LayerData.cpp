@@ -265,7 +265,7 @@ DrawData::SetFont(const ServerFont& font, uint32 flags)
 		// face
 		if (flags & B_FONT_FACE)
 			fFont.SetFace(font.Face());
-		// face
+		// flags
 		if (flags & B_FONT_FLAGS)
 			fFont.SetFlags(font.Flags());
 	}
@@ -411,7 +411,7 @@ LayerData::PrintToStream() const
 	printf("\t Flags: %lu\n", fFont.Flags());
 }
 
-// ReadFromLink
+// ReadFontFromLink
 void
 LayerData::ReadFontFromLink(LinkMsgReader& link)
 {
@@ -548,8 +548,7 @@ LayerData::WriteToLink(LinkMsgSender& link) const
 	link.Attach<uint8>((uint8)fAlphaSrcMode);
 	link.Attach<uint8>((uint8)fAlphaFncMode);
 	link.Attach<float>(fScale);
-	// TODO: bool, no?
-	link.Attach<float>(!fFontAntiAliasing);
+	link.Attach<bool>(!fFontAntiAliasing);
 
 	int32 clippingRectCount = fClippingRegion ? fClippingRegion->CountRects() : 0;
 	link.Attach<int32>(clippingRectCount);
