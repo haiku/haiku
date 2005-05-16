@@ -23,5 +23,7 @@ actions Doc2HTML1
 	$(XSLTPROC) -xinclude $(XSLPROCPATHS) -o "$(1)" $(HTMLXSLSHEET) $(2) ;
 }
 
+SEARCH on  <src!documentation>license.xml = [ FDirName $(OBOS_TOP) src documentation ] ;
+
 SubInclude OBOS_TOP src documentation haiku_book ;
 SubInclude OBOS_TOP src documentation shell_tools ;
