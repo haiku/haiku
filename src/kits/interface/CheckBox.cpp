@@ -155,18 +155,17 @@ BCheckBox::Draw(BRect updateRect)
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 			SetPenSize(2);
 // Yes, Haiku is differnt because of the anti-aliasing
-SetLowColor(lightenmax);
+SetDrawingMode(B_OP_OVER);
 			StrokeLine(BPoint(rect.left, rect.top),
 					   BPoint(rect.right, rect.bottom));
 			StrokeLine(BPoint(rect.left, rect.bottom),
 					   BPoint(rect.right, rect.top));
 			SetPenSize(1);
+SetDrawingMode(B_OP_COPY);
 		}
 
 		// Label
 		SetHighColor(darkenmax);
-// reset low color for text
-SetLowColor(no_tint);
 		DrawString(Label(), BPoint((float)ceil(10.0f + fontHeight.ascent),
 			3.0f + (float)ceil(fontHeight.ascent)));
 
@@ -208,20 +207,19 @@ SetLowColor(no_tint);
 
 			SetHighColor(tint_color(ui_color(B_KEYBOARD_NAVIGATION_COLOR),
 				B_DISABLED_MARK_TINT));
-// Yes, Haiku is differnt because of the anti-aliasing
-SetLowColor(lightenmax);
 			SetPenSize(2);
+// Yes, Haiku is differnt because of the anti-aliasing
+SetDrawingMode(B_OP_OVER);
 			StrokeLine(BPoint(rect.left, rect.top),
 					   BPoint(rect.right, rect.bottom));
 			StrokeLine(BPoint(rect.left, rect.bottom),
 					   BPoint(rect.right, rect.top));
 			SetPenSize(1);
+SetDrawingMode(B_OP_COPY);
 		}
 
 		// Label
 		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
-// reset low color for text
-SetLowColor(no_tint);
 		DrawString(Label(), BPoint((float)ceil(10.0f + fontHeight.ascent),
 			3.0f + (float)ceil(fontHeight.ascent)));
 	}
