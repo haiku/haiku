@@ -232,7 +232,7 @@ find_reserved_area(vm_virtual_map *map, addr_t start, addr_t size, vm_area *area
 	} else {
 		// the area splits the reserved range into two separate ones
 		// we need a new reserved area to cover this space
-		vm_area *reserved = _vm_create_reserved_region_struct(map, 0);
+		vm_area *reserved = _vm_create_reserved_region_struct(map, next->protection);
 		if (reserved == NULL)
 			return B_NO_MEMORY;
 
@@ -244,6 +244,7 @@ find_reserved_area(vm_virtual_map *map, addr_t start, addr_t size, vm_area *area
 		reserved->size = next->base + next->size - start - size;
 		next->size = start - next->base;
 		reserved->base = start + size;
+		reserved->cache_offset = next->cache_offset;
 	}
 
 	area->base = start;
@@ -336,6 +337,7 @@ second_chance:
 				next = map->areas;
 				last = NULL;
 				for (last = NULL; next; next = next->aspace_next, last = next) {
+					// ToDo: take free space after the reserved area into account!
 					if (next->size == size) {
 						// the reserved area is entirely covered, and thus, removed
 						if (last)
@@ -674,7 +676,7 @@ vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, add
 	// check to see if this aspace has entered DELETE state
 	if (addressSpace->state == VM_ASPACE_STATE_DELETION) {
 		// okay, someone is trying to delete this aspace now, so we can't
-		// insert the area, so back out
+		// insert the area, let's back out
 		status = B_BAD_TEAM_ID;
 		goto err2;
 	}
@@ -684,6 +686,9 @@ vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, add
 		goto err2;
 
 	// the area is now reserved!
+
+	area->cache_offset = area->base;
+		// we cache the original base address here
 
 	release_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0);
 	return B_OK;
@@ -1330,6 +1335,8 @@ vm_copy_on_write_area(vm_area *area)
 	uint32 protection;
 	status_t status;
 
+	TRACE(("vm_copy_on_write_area(area = %p)\n", area));
+
 	// We need to separate the vm_cache from its vm_cache_ref: the area
 	// and its cache_ref goes into a new layer on top of the old one.
 	// So the old cache gets a new cache_ref and the area a new cache.
@@ -1848,22 +1855,35 @@ status_t
 vm_delete_areas(struct vm_address_space *aspace)
 {
 	vm_area *area;
-	vm_area *next;
+	vm_area *next, *last = NULL;
 
 	TRACE(("vm_delete_areas: called on aspace 0x%lx\n", aspace->id));
 
 	acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
 
-	// delete all the areas in this aspace
-
+	// remove all reserved areas in this address space
+	
 	for (area = aspace->virtual_map.areas; area; area = next) {
 		next = area->aspace_next;
 
 		if (area->id == RESERVED_AREA_ID) {
 			// just remove it
+			if (last)
+				last->aspace_next = area->aspace_next;
+			else
+				aspace->virtual_map.areas = area->aspace_next;
+
 			free(area);
 			continue;
 		}
+
+		last = area;
+	}
+
+	// delete all the areas in this aspace
+
+	for (area = aspace->virtual_map.areas; area; area = next) {
+		next = area->aspace_next;
 
 		// decrement the ref on this area, may actually push the ref < 0, if there
 		// is a concurrent delete_area() on that specific area, but that's ok here
@@ -3041,8 +3061,12 @@ resize_area(area_id areaID, size_t newSize)
 	oldSize = area->size;
 
 	// ToDo: we should only allow to resize anonymous memory areas!
-	if (!cache->cache->temporary)
-		return B_NOT_ALLOWED;
+	if (!cache->cache->temporary) {
+		status = B_NOT_ALLOWED;
+		goto err1;
+	}
+
+	// ToDo: we must lock all address spaces here!
 
 	mutex_lock(&cache->lock);
 
@@ -3051,8 +3075,16 @@ resize_area(area_id areaID, size_t newSize)
 
 		for (current = cache->areas; current; current = current->cache_next) {
 			if (current->aspace_next && current->aspace_next->base <= (current->base + newSize)) {
+				// if the area was created inside a reserved area, it can also be
+				// resized in that area
+				// ToDo: if there is free space after the reserved area, it could be used as well...
+				vm_area *next = current->aspace_next;
+				if (next->id == RESERVED_AREA_ID && next->cache_offset <= current->base
+					&& next->base - 1 + next->size >= current->base - 1 + newSize)
+					continue;
+
 				status = B_ERROR;
-				goto out;
+				goto err2;
 			}
 		}
 	}
@@ -3061,8 +3093,22 @@ resize_area(area_id areaID, size_t newSize)
 
 	for (current = cache->areas; current; current = current->cache_next) {
 		if (current->aspace_next && current->aspace_next->base <= (current->base + newSize)) {
-			status = B_ERROR;
-			break;
+			vm_area *next = current->aspace_next;
+			if (next->id == RESERVED_AREA_ID && next->cache_offset <= current->base
+				&& next->base - 1 + next->size >= current->base - 1 + newSize) {
+				// resize reserved area
+				addr_t offset = current->base + newSize - next->base;
+				if (next->size <= offset) {
+					current->aspace_next = next->aspace_next;
+					free(next);
+				} else {
+					next->size -= offset;
+					next->base += offset;
+				}
+			} else {
+				status = B_ERROR;
+				break;
+			}
 		}
 
 		current->size = newSize;
@@ -3086,8 +3132,10 @@ resize_area(area_id areaID, size_t newSize)
 			current->size = oldSize;
 	}
 
-out:
+err2:
 	mutex_unlock(&cache->lock);
+err1:
+	vm_put_area(area);
 
 	// ToDo: we must honour the lock restrictions of this area
 	return status;
@@ -3266,6 +3314,14 @@ delete_area(area_id area)
 
 
 //	#pragma mark -
+
+
+status_t
+_user_init_heap_address_range(addr_t base, addr_t size)
+{
+	return vm_reserve_address_range(vm_get_current_user_aspace_id(), (void *)&base,
+		B_EXACT_ADDRESS, size, RESERVED_AVOID_BASE);
+}
 
 
 area_id

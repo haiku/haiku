@@ -86,6 +86,7 @@ status_t _user_transfer_area(area_id area, void **_address, uint32 addressSpec,
 status_t _user_set_area_protection(area_id area, uint32 newProtection);
 area_id _user_clone_area(const char *name, void **_address, uint32 addressSpec, 
 			uint32 protection, area_id sourceArea);
+status_t _user_init_heap_address_range(addr_t base, addr_t size);
 
 // to protect code regions with interrupts turned on
 void permit_page_faults(void);

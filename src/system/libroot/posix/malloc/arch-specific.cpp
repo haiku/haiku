@@ -22,6 +22,7 @@
 
 #include <OS.h>
 #include <Debug.h>
+#include <syscalls.h>
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -74,19 +75,20 @@ __init_heap(void)
 {
 	hoardHeap::initNumProcs();
 
-	sHeapAreaSize = kInitialHeapSize;
-	// ToDo: add a VM call that instructs other areas to avoid the space after the heap when possible
-	//	(and if not, create it at the end of that range, so that the heap can grow as much as possible)
-	//	Then, move the heap back to 256 or 512 MB
-	sHeapBase = (void*)0x30000000;
-		// let the heap start at 3*256 MB for now
+	// This will locate the heap base at 384 MB and reserve the next 1152 MB
+	// for it. They may get reclaimed by other areas, though, but the maximum
+	// size of the heap is guaranteed until the space is really needed.
+	sHeapBase = (void *)0x18000000;
+	status_t status = _kern_init_heap_address_range((addr_t)sHeapBase, 0x48000000);
 
-	sHeapArea = create_area("heap", (void **)&sHeapBase, B_BASE_ADDRESS,
-		sHeapAreaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+	sHeapArea = create_area("heap", (void **)&sHeapBase, 
+		status == B_OK ? B_EXACT_ADDRESS : B_BASE_ADDRESS,
+		kInitialHeapSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (sHeapArea < B_OK)
 		return sHeapArea;
 
 	sFreeHeapBase = (addr_t)sHeapBase;
+	sHeapAreaSize = kInitialHeapSize;
 
 	sHeapLock = create_sem(1, "heap");
 	if (sHeapLock < B_OK)

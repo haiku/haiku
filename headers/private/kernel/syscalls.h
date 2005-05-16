@@ -210,6 +210,7 @@ extern status_t		_kern_transfer_area(area_id area, void **_address, uint32 addre
 extern status_t		_kern_set_area_protection(area_id area, uint32 newProtection);
 extern area_id		_kern_clone_area(const char *name, void **_address, uint32 addressSpec, 
 						uint32 protection, area_id sourceArea);
+extern status_t		_kern_init_heap_address_range(addr_t base, addr_t size);
 
 area_id sys_vm_map_file(const char *name, void **address, int addr_type,
 			addr_t size, int lock, int mapping, const char *path, off_t offset);
