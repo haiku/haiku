@@ -949,6 +949,8 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	if (!charArray ||  numChars<1 || !escapementArray)
 		return;
 
+	// NOTE: The R5 implementation crashes if delta == NULL!
+
 	int32 code;
 	BPrivate::BAppServerLink link;
 	
