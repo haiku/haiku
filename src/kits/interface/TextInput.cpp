@@ -83,8 +83,14 @@ _BTextInput_::Archive(BMessage *data, bool deep) const
 void
 _BTextInput_::FrameResized(float width, float height)
 {
+printf("_BTextInput_::FrameResized()\n");
 	BTextView::FrameResized(width, height);
 	AlignTextRect();
+// TODO: just to get something working, it wouldn't be correct for
+// scrolled views
+BRect textRect(Bounds());
+textRect.InsetBy(2.0, 2.0);
+SetTextRect(textRect);
 }
 
 
@@ -154,8 +160,14 @@ _BTextInput_::MakeFocus(bool state)
 	}
 
 	if (Window()) {
-		Draw(Bounds());
-		Flush();
+// TODO: why do we have to invalidate here?
+// I'm leaving this in, but it looks suspicious... :-)
+		Invalidate(Bounds());
+		if (BView* parent = Parent()) {
+			BRect frame = Frame();
+			frame.InsetBy(-1.0, -1.0);
+			parent->Invalidate(frame);
+		}
 	}
 }
 
@@ -163,7 +175,7 @@ _BTextInput_::MakeFocus(bool state)
 void
 _BTextInput_::AlignTextRect()
 {
-	// TODO
+	
 }
 
 

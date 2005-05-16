@@ -348,10 +348,12 @@ BTextControl::AttachedToWindow()
 void
 BTextControl::MakeFocus(bool state)
 {
-	fText->MakeFocus(state);
+	if (state != fText->IsFocus()) {
+		fText->MakeFocus(state);
 
-	if (state)
-		fText->SelectAll();
+		if (state)
+			fText->SelectAll();
+	}
 }
 
 
@@ -399,17 +401,12 @@ BTextControl::SetEnabled(bool state)
 void
 BTextControl::GetPreferredSize(float *width, float *height)
 {
-	BFont font;
-	GetFont(&font);
-	font_height fh;
-	font.GetHeight(&fh);
-
 	if (height)
-		*height = (float)ceil(fh.ascent + fh.descent + fh.leading) + 7.0f;
+		*height = fText->LineHeight(0) + 8.0f;
 
 	// TODO: this one I need to find out
 	if (width)
-		*width = 4.0f + (float)ceil(font.StringWidth(Label()))*2.0f;
+		*width = 4.0f + ceilf(StringWidth(Label())) * 2.0f;
 }
 
 
@@ -538,8 +535,11 @@ BTextControl::FrameResized(float newWidth, float newHeight)
 void
 BTextControl::WindowActivated(bool active)
 {
-	if (fText->IsFocus())
-		Invalidate();
+	if (fText->IsFocus()) {
+		BRect rect(fText->Frame());
+		rect.InsetBy(-1.0, -1.0);
+		Invalidate(rect);
+	}
 }
 
 
@@ -576,13 +576,11 @@ BTextControl::InitData(const char *label, const char *initial_text,
 	BRect bounds(Bounds());
 
 	fText = NULL;
-	//fLabel = NULL;
 	fModificationMessage = NULL;
 	fLabelAlign = B_ALIGN_LEFT;
 	fDivider = 0.0f;
 	fPrevWidth = 0;
 	fPrevHeight = 0;
-	//fClean = true;
 	fSkipSetFlags = false;
 
 	int32 flags = 0;
