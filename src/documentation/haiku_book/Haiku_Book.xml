@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+<!-- 
+	Things that need fixing should be marked as such with either "TODO"
+	or "FIXME".
+
+-->
+
+<!ENTITY appkit SYSTEM "appkit.xml">
+<!ENTITY devicekit SYSTEM "devicekit.xml">
+<!ENTITY gamekit SYSTEM "gamekit.xml">
+<!ENTITY interfacekit SYSTEM "interfacekit.xml">
+<!ENTITY kernelkit SYSTEM "kernelkit.xml">
+<!ENTITY mailkit SYSTEM "mailkit.xml">
+<!ENTITY mediakit SYSTEM "mediakit.xml">
+<!ENTITY midikit SYSTEM "midikit.xml">
+<!ENTITY networkkit SYSTEM "networkkit.xml">
+<!ENTITY openglkit SYSTEM "openglkit.xml">
+<!ENTITY storagekit SYSTEM "storagekit.xml">
+<!ENTITY supportkit SYSTEM "supportkit.xml">
+<!ENTITY translationkit SYSTEM "translationkit.xml">
+
+<!-- license -->
+<!ENTITY license SYSTEM "../license.xml">
+
+<!-- Text Macros -->
+<!ENTITY haikuorg '<ulink url="http://www.haiku-os.org">Haiku</ulink>'>
+<!ENTITY haiku "Haiku">
+
+]>
+
+<book id="index">
+  <bookinfo>
+    <title>Haiku Book</title>
+    <pubdate>2005-05-16</pubdate>
+    <author>
+      <firstname>Jerome</firstname>
+      <surname>Duval</surname>
+    </author>
+
+    <abstract>
+	 	<para>
+			This guide is the documentation for the C and C++ API of &haiku;.
+		</para>
+    </abstract>
+	 
+    <revhistory>
+	 <revision>
+	 <revnumber>1.0</revnumber>
+	 <date>2005-05-16</date>
+	 <authorinitials>kor</authorinitials>
+	 <revremark>Initial version.</revremark>
+	 </revision>
+    </revhistory>
+  </bookinfo>
+
+
+<!-- Chapters
+-->
+&appkit;
+&devicekit;
+&gamekit;
+&interfacekit;
+&kernelkit;
+&mailkit;
+&mediakit;
+&midikit;
+&networkkit;
+&openglkit;
+&storagekit;
+&supportkit;
+&translationkit;
+
+<!-- 
+	The License 
+-->
+&license;
+
+</book>

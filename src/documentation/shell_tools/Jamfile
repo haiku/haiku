@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src documentation shell_tools ;
+
+XSLPATHS = [ FDirName $(OBOS_OBJECT_TARGET) documentation Shell_Tools ] [ FDirName $(OBOS_TOP) src bin coreutils man ] ;
+HTMLXSLSHEET = http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl ;
+DOC_LOCATION = Shell\ Tools ;
+
+Doc2HTML 
+	Shell_Tools-Guide.xml
+	;
+
+Includes [ FGristFiles Shell_Tools-Guide.xml ] : <src!bin!coreutils!man>coreutils.xml <src!documentation>license.xml ;
+SEARCH on <src!bin!coreutils!man>coreutils.xml = [ FDirName $(OBOS_TOP) src bin coreutils man ] ;
+

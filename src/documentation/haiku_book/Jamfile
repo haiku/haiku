@@ -1,0 +1,27 @@
+SubDir OBOS_TOP src documentation haiku_book ;
+
+XSLPATHS = ;
+HTMLXSLSHEET = http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl ;
+DOC_LOCATION = Haiku\ Book ;
+
+Doc2HTML 
+	Haiku_Book.xml
+	;
+
+local chapter_files = appkit.xml
+devicekit.xml
+gamekit.xml
+interfacekit.xml
+kernelkit.xml
+mailkit.xml
+mediakit.xml
+midikit.xml
+networkkit.xml
+openglkit.xml
+storagekit.xml
+supportkit.xml
+translationkit.xml ;
+
+Includes [ FGristFiles Haiku_Book.xml ] 
+	: [ FGristFiles $(chapter_files) ] <src!documentation>license.xml ;
+SEARCH on [ FGristFiles $(chapter_files) ] = [ FDirName $(OBOS_TOP) src documentation haiku_book ] ;
