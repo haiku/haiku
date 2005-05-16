@@ -128,3 +128,18 @@ Now put the OBOS boot image onto you "virtual" floppy and start Bochs:
 Answer three times with RETURN and with some patience you will see OBOS
 booting.
 
+
+
+Docbook documentation
+---------------------
+
+Requirements :
+- Docbook XML DTD (http://www.oasis-open.org/docbook/xml/4.2/docbook-xml-4.2.zip)
+- Docbook Stylesheets (http://prdownloads.sourceforge.net/docbook/docbook-xsl-1.68.1.tar.bz2)
+- libxml2, xmllin (http://libpak.neoni.net/packages/LibPak_libxml2_dev.zip)
+- libxslt, xsltproc (http://libpak.neoni.net/packages/LibPak_libxslt_dev.zip)
+
+XML catalogs must be configured to avoid internet access :
+- in Docbook Stylesheets directory : sh ./INSTALL
+- in your .profile, add something like this :
+	export XML_CATALOG_FILES="/boot/home/docbook-xsl-1.68.1/catalog.xml /boot/home/docbook-xml-4.2/catalog.xml /etc/xml/catalog"
