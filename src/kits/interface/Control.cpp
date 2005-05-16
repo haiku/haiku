@@ -141,7 +141,7 @@ BControl::WindowActivated(bool active)
 	BView::WindowActivated(active);
 
 	if (IsFocus())
-		Invalidate(Bounds());
+		Invalidate();
 }
 
 
