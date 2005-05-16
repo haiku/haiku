@@ -970,6 +970,9 @@ BView::KeyDown(const char* bytes, int32 numBytes)
 {
 	// HOOK function
 	STRACE(("\tHOOK: BView(%s)::KeyDown()\n", Name()));
+	if (numBytes > 0 && bytes[0] == B_TAB) {
+		// TODO: handle tab navigation here instead of in BWindow
+	}
 }
 
 
@@ -1243,13 +1246,16 @@ BView::MakeFocus(bool focusState)
 		// TODO: If this view has focus and focusState==false,
 		// will there really be no other view with focus? No
 		// cycling to the next one?
+		BView *focus = owner->CurrentFocus();
 		if (focusState) {
+			// Unfocus a previous focus view
+			if (focus && focus != this)
+				focus->MakeFocus(false);
 			// if we want to make this view the current focus view
 			owner->fFocus = this;
 			owner->SetPreferredHandler(this);
 		} else {
 			// we want to unfocus this view, but only if it actually has focus
-			BView *focus = owner->CurrentFocus();
 			if (focus == this) {
 				owner->fFocus = NULL;
 				owner->SetPreferredHandler(NULL);
@@ -3326,6 +3332,10 @@ BView::MoveTo(float x, float y)
 
 	originX = x;
 	originY = y;
+// TODO: investigate R5 behaviour for unattached views
+// maybe the message is generated, but postponed until the view is added
+if (!owner && fFlags & B_FRAME_EVENTS)
+	FrameMoved(BPoint(originX, originY));
 }
 
 
@@ -3364,6 +3374,11 @@ BView::ResizeTo(float width, float height)
 
 	fBounds.right	= fBounds.left + width;
 	fBounds.bottom	= fBounds.top + height;
+
+// TODO: investigate R5 behaviour for unattached views
+// maybe the message is generated, but postponed until the view is added
+if (!owner && fFlags & B_FRAME_EVENTS)
+	FrameResized(width, height);
 }
 
 

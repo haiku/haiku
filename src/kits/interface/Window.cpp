@@ -919,6 +919,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		}
 		case B_VIEW_MOVED:
 		{
+			// NOTE: This message only arrives if the
+			// view has flags B_FRAME_EVENTS
 			BPoint			where;
 			int32			token = B_NULL_TOKEN;
 			BView			*view;
@@ -931,7 +933,6 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			if (view)
 			{
 				STRACE(("Calling BView(%s)::FrameMoved( %f, %f )\n", view->Name(), where.x, where.y));
-				// TODO: only if B_FRAME_EVENTS, no?
 				view->FrameMoved( where );
 			}
 			else
@@ -941,6 +942,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		}	
 		case B_VIEW_RESIZED:
 		{
+			// NOTE: This message only arrives if the
+			// view has flags B_FRAME_EVENTS
 			float			newWidth,
 							newHeight;
 			BPoint			where;
@@ -956,7 +959,6 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			view			= findView(top_view, token);
 			if (view){
 				STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", view->Name(), newWidth, newHeight));
-				// TODO: only if B_FRAME_EVENTS, no?
 				view->FrameResized( newWidth, newHeight );
 			}
 			else
@@ -2580,24 +2582,14 @@ void BWindow::setFocus(BView *focusView, bool notifyInputServer)
 	if (previousFocus == focusView)
 		return;
 
-	fFocus			= NULL;
-
-	if (previousFocus != NULL)
-		previousFocus->Invalidate();
-
-	fFocus			= focusView;
-
-	if (focusView != NULL)
-		focusView->Invalidate();
+	if (focusView)
+		focusView->MakeFocus(true);
 
 	// TODO: find out why do we have to notify input server.
 	if (notifyInputServer)
 	{
 		// what am I suppose to do here??
 	}
-	
-	// TODO: find out why R5 does this
-	SetPreferredHandler(fFocus);
 }
 
 //------------------------------------------------------------------------------
@@ -2706,6 +2698,7 @@ bool BWindow::handleKeyDown( const char key, uint32 modifiers){
 	}
 
 	// Keyboard navigation through views!!!!
+	// TODO: Not correct, only Option-Tab should be handled here.
 	if ( key == B_TAB)
 	{
 		BView			*nextFocus;
