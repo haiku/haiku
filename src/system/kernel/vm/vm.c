@@ -70,7 +70,7 @@ static status_t map_backing_store(vm_address_space *aspace, vm_store *store, voi
 	off_t offset, addr_t size, uint32 addressSpec, int wiring, int lock, int mapping, vm_area **_area, const char *area_name);
 static status_t vm_soft_fault(addr_t address, bool is_write, bool is_user);
 static vm_area *vm_virtual_map_lookup(vm_virtual_map *map, addr_t address);
-static void vm_put_area(vm_area *area);
+static bool vm_put_area(vm_area *area);
 
 
 static int
@@ -1277,7 +1277,7 @@ remove_area_from_virtual_map(vm_address_space *addressSpace, vm_area *area, bool
 }
 
 
-static void
+static bool
 _vm_put_area(vm_area *area, bool aspaceLocked)
 {
 	vm_address_space *aspace;
@@ -1285,7 +1285,7 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 
 	// we should never get here, but if we do, we can handle it
 	if (area->id == RESERVED_AREA_ID)
-		return;
+		return false;
 
 	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0, 0);
 	if (atomic_add(&area->ref_count, -1) == 1) {
@@ -1295,7 +1295,7 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 	release_sem_etc(sAreaHashLock, WRITE_COUNT, 0);
 
 	if (!removeit)
-		return;
+		return false;
 
 	aspace = area->aspace;
 
@@ -1314,10 +1314,11 @@ _vm_put_area(vm_area *area, bool aspaceLocked)
 
 	free(area->name);
 	free(area);
+	return true;
 }
 
 
-static void
+static bool
 vm_put_area(vm_area *area)
 {
 	return _vm_put_area(area, false);
@@ -1887,7 +1888,8 @@ vm_delete_areas(struct vm_address_space *aspace)
 
 		// decrement the ref on this area, may actually push the ref < 0, if there
 		// is a concurrent delete_area() on that specific area, but that's ok here
-		_vm_put_area(area, true);
+		if (!_vm_put_area(area, true))
+			dprintf("vm_delete_areas() did not delete area %p\n", area);
 	}
 
 	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
