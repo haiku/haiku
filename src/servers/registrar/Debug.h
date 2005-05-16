@@ -6,7 +6,7 @@
 ** This file may be used under the terms of the OpenBeOS License.
 */
 #ifndef DEBUG
-#	define DEBUG 1
+#	define DEBUG 0
 #endif
 
 #include <stdio.h>
@@ -34,7 +34,7 @@
 //		the statements in D() are only included if DEBUG is defined
 
 #define DEBUG_APP "REG"
-#ifdef DEBUG
+#if DEBUG
 	#define PRINT(x) { __out(DEBUG_APP ": "); __out x; }
 	#define REPORT_ERROR(status) __out(DEBUG_APP ": %s:%d: %s\n",__FUNCTION__,__LINE__,strerror(status));
 	#define RETURN_ERROR(err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); return _status;}
@@ -55,7 +55,7 @@
 	#define FATAL(x) { __out(DEBUG_APP ": "); __out x; }
 	#define ERROR(x) { __out(DEBUG_APP ": "); __out x; }
 	#define WARNING(x) { __out(DEBUG_APP ": "); __out x; }
-	#define INFORM(x) { __out(DEBUG_APP ": "); __out x; }
+	#define INFORM(x) ;
 	#define FUNCTION(x) ;
 	#define FUNCTION_START() ;
 	#define FUNCTION_END() ;
