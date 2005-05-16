@@ -493,21 +493,22 @@ DisplayDriverPainter::FillRect(const BRect& r, const RGBColor& color)
 				 max_c(r.left, r.right),
 				 max_c(r.top, r.bottom));
 		vr = fPainter->ClipRect(vr);
-
-		fGraphicsCard->HideSoftwareCursor(vr);
-
-		// try hardware optimized version first
-		if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
-			BRegion region(vr);
-			region.IntersectWith(fPainter->ClippingRegion());
-			fGraphicsCard->FillRegion(region, color);
-		} else {
-			fPainter->FillRect(vr, color.GetColor32());
+		if (vr.IsValid()) {
+			fGraphicsCard->HideSoftwareCursor(vr);
 	
-			fGraphicsCard->Invalidate(vr);
+			// try hardware optimized version first
+			if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
+				BRegion region(vr);
+				region.IntersectWith(fPainter->ClippingRegion());
+				fGraphicsCard->FillRegion(region, color);
+			} else {
+				fPainter->FillRect(vr, color.GetColor32());
+		
+				fGraphicsCard->Invalidate(vr);
+			}
+	
+			fGraphicsCard->ShowSoftwareCursor();
 		}
-
-		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}
@@ -523,36 +524,37 @@ DisplayDriverPainter::FillRect(const BRect &r, const DrawData *d)
 				 max_c(r.left, r.right),
 				 max_c(r.top, r.bottom));
 		vr = fPainter->ClipRect(vr);
-
-		fGraphicsCard->HideSoftwareCursor(vr);
-
-		bool doInSoftware = true;
-		// try hardware optimized version first
-		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) &&
-			(d->GetDrawingMode() == B_OP_COPY ||
-			 d->GetDrawingMode() == B_OP_OVER)) {
-
-			if (d->GetPattern() == B_SOLID_HIGH) {
-				BRegion region(vr);
-				region.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(region, d->HighColor());
-				doInSoftware = false;
-			} else if (d->GetPattern() == B_SOLID_LOW) {
-				BRegion region(vr);
-				region.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(region, d->LowColor());
-				doInSoftware = false;
-			}
-		}
-		if (doInSoftware) {
-
-			fPainter->SetDrawData(d);
-			BRect touched = fPainter->FillRect(vr);
+		if (vr.IsValid()) {
+			fGraphicsCard->HideSoftwareCursor(vr);
 	
-			fGraphicsCard->Invalidate(touched);
+			bool doInSoftware = true;
+			// try hardware optimized version first
+			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) &&
+				(d->GetDrawingMode() == B_OP_COPY ||
+				 d->GetDrawingMode() == B_OP_OVER)) {
+	
+				if (d->GetPattern() == B_SOLID_HIGH) {
+					BRegion region(vr);
+					region.IntersectWith(fPainter->ClippingRegion());
+					fGraphicsCard->FillRegion(region, d->HighColor());
+					doInSoftware = false;
+				} else if (d->GetPattern() == B_SOLID_LOW) {
+					BRegion region(vr);
+					region.IntersectWith(fPainter->ClippingRegion());
+					fGraphicsCard->FillRegion(region, d->LowColor());
+					doInSoftware = false;
+				}
+			}
+			if (doInSoftware) {
+	
+				fPainter->SetDrawData(d);
+				BRect touched = fPainter->FillRect(vr);
+		
+				fGraphicsCard->Invalidate(touched);
+			}
+	
+			fGraphicsCard->ShowSoftwareCursor();
 		}
-
-		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
 	}

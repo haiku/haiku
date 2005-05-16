@@ -40,7 +40,7 @@ roundf(float v)
 		return (int)floorf(v - 0.5);
 }
 
-#define CHECK_CLIPPING	if (!fValidClipping) return BRect(0,0, -1, -1);
+#define CHECK_CLIPPING	if (!fValidClipping) return BRect(0, 0, -1, -1);
 
 // constructor
 Painter::Painter()
@@ -634,8 +634,6 @@ void
 Painter::FillRect(const BRect& r, const rgb_color& c) const
 {
 	if (fBuffer && fValidClipping) {
-//printf("Painter::FillRect(BRect(%.1f, %.1f, %.1f, %.1f))\n", r.left, r.top, r.right, r.bottom);
-//printf("   rgb_color(%d, %d, %d, %d)\n", c.red, c.green, c.blue, c.alpha);
 		uint8* dst = fBuffer->row(0);
 		uint32 bpr = fBuffer->stride();
 		int32 left = (int32)r.left;
