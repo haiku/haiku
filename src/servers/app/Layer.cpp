@@ -570,8 +570,9 @@ Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOf
 			fFrame.OffsetBy(pt.x, pt.y);
 			fFull.OffsetBy(pt.x, pt.y);
 			
-			// TODO: uncomment later when you'll implement a queue in ServerWindow::SendMessgeToClient()
+			// TODO: investigate combining frame event messages for efficiency
 			//SendViewMovedMsg();
+			AddToViewsWithInvalidCoords();
 
 			newAction	= B_LAYER_SIMPLE_MOVE;
 			break;
@@ -592,8 +593,10 @@ Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOf
 			fFrame.bottom	+= pt.y;
 			RebuildFullRegion();
 			
-			// TODO: uncomment later when you'll implement a queue in ServerWindow::SendMessgeToClient()
+			// TODO: investigate combining frame event messages for efficiency
 			//SendViewResizedMsg();
+			AddToViewsWithInvalidCoords();
+
 			
 			newAction = B_LAYER_MASK_RESIZE;
 			break;
@@ -617,8 +620,9 @@ Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOf
 				fFrame.bottom += rSize.y;
 				RebuildFullRegion();
 				
-				// TODO: uncomment later when you'll implement a queue in ServerWindow::SendMessgeToClient()
+				// TODO: investigate combining frame event messages for efficiency
 				//SendViewResizedMsg();
+				AddToViewsWithInvalidCoords();
 				
 				newAction = B_LAYER_MASK_RESIZE;
 				newPt = rSize;
@@ -1285,7 +1289,6 @@ printf("no parent in Layer::move_layer() (%s)\n", GetName());
 fFrameAction = B_LAYER_ACTION_NONE;
 return;
 }
-
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
 
 	fDriver->CopyRegionList(&fRootLayer->fCopyRegList,
@@ -1294,6 +1297,8 @@ return;
 							&fFullVisible);
 
 	fParent->Redraw(fRootLayer->fRedrawReg, this);
+
+	SendViewCoordUpdateMsg();
 	
 	EmptyGlobals();
 
@@ -1321,6 +1326,8 @@ return;
 	
 	fDriver->CopyRegionList(&fRootLayer->fCopyRegList, &fRootLayer->fCopyList, fRootLayer->fCopyRegList.CountItems(), &fFullVisible);
 	fParent->Redraw(fRootLayer->fRedrawReg, this);
+
+	SendViewCoordUpdateMsg();
 	
 	EmptyGlobals();
 
@@ -1467,6 +1474,29 @@ Layer::SendUpdateMsg(BRegion& reg)
 	fOwner->Window()->SendMessageToClient(&msg);
 }
 
+// AddToViewsWithInvalidCoords
+void
+Layer::AddToViewsWithInvalidCoords() const
+{
+	if (fServerWin) {
+		fServerWin->fClientViewsWithInvalidCoords.AddInt32("_token", fViewToken);
+		fServerWin->fClientViewsWithInvalidCoords.AddPoint("where", fFrame.LeftTop());
+		fServerWin->fClientViewsWithInvalidCoords.AddFloat("width", fFrame.Width());
+		fServerWin->fClientViewsWithInvalidCoords.AddFloat("height", fFrame.Height());
+	}
+}
+
+// SendViewCoordUpdateMsg
+void
+Layer::SendViewCoordUpdateMsg() const
+{
+	if (fServerWin && !fServerWin->fClientViewsWithInvalidCoords.IsEmpty()) {
+		fServerWin->SendMessageToClient(&fServerWin->fClientViewsWithInvalidCoords);
+		fServerWin->fClientViewsWithInvalidCoords.MakeEmpty();
+	}
+}
+
+/*
 //! Sends a B_VIEW_MOVED message to the client BWindow
 void
 Layer::SendViewMovedMsg()
@@ -1502,5 +1532,5 @@ Layer::SendViewResizedMsg()
 		fServerWin->SendMessageToClient(&msg);
 	}
 }
-
+*/
 

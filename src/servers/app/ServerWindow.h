@@ -27,17 +27,18 @@
 #ifndef _SERVERWIN_H_
 #define _SERVERWIN_H_
 
-#include <SupportDefs.h>
 #include <GraphicsDefs.h>
-#include <OS.h>
+#include <LinkMsgReader.h>
+#include <LinkMsgSender.h>
 #include <Locker.h>
+#include <Message.h>
+#include <OS.h>
 #include <Rect.h>
 #include <String.h>
 #include <Window.h>
-#include <LinkMsgReader.h>
-#include <LinkMsgSender.h>
-#include "TokenSpace.h"
+
 #include "FMWList.h"
+#include "TokenSpace.h"
 
 class BString;
 class BMessenger;
@@ -149,6 +150,8 @@ protected:
 	
 			LinkMsgReader*		fMsgReader;
 			LinkMsgSender*		fMsgSender;
+
+			BMessage			fClientViewsWithInvalidCoords;
 
 			BLocker				fLocker;
 

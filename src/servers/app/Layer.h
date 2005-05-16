@@ -246,8 +246,10 @@ class Layer {
 			ServerWindow*		SearchForServerWindow();
 
 			void				SendUpdateMsg(BRegion& reg);
-			void				SendViewMovedMsg();
-			void				SendViewResizedMsg();
+			void				AddToViewsWithInvalidCoords() const;
+			void				SendViewCoordUpdateMsg() const;
+//			void				SendViewMovedMsg();
+//			void				SendViewResizedMsg();
 
 };
 

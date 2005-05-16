@@ -83,7 +83,6 @@ _BTextInput_::Archive(BMessage *data, bool deep) const
 void
 _BTextInput_::FrameResized(float width, float height)
 {
-printf("_BTextInput_::FrameResized()\n");
 	BTextView::FrameResized(width, height);
 	AlignTextRect();
 // TODO: just to get something working, it wouldn't be correct for
