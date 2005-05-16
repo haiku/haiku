@@ -58,7 +58,7 @@ extern vm_address_space *kernel_aspace;
 
 #define REGION_HASH_TABLE_SIZE 1024
 static area_id sNextAreaID;
-static void *sAreaHash;
+static hash_table *sAreaHash;
 static sem_id sAreaHashLock;
 
 static off_t sAvailableMemory;
@@ -74,12 +74,12 @@ static bool vm_put_area(vm_area *area);
 
 
 static int
-area_compare(void *_r, const void *key)
+area_compare(void *_area, const void *key)
 {
-	vm_area *r = _r;
-	const area_id *id = key;
+	vm_area *area = (vm_area *)_area;
+	const area_id *id = (const area_id *)key;
 
-	if (r->id == *id)
+	if (area->id == *id)
 		return 0;
 
 	return -1;
@@ -87,13 +87,13 @@ area_compare(void *_r, const void *key)
 
 
 static uint32
-area_hash(void *_r, const void *key, uint32 range)
+area_hash(void *_area, const void *key, uint32 range)
 {
-	vm_area *r = _r;
-	const area_id *id = key;
+	vm_area *area = (vm_area *)_area;
+	const area_id *id = (const area_id *)key;
 
-	if (r != NULL)
-		return r->id % range;
+	if (area != NULL)
+		return area->id % range;
 
 	return *id % range;
 }
@@ -106,8 +106,8 @@ vm_get_area(area_id id)
 
 	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
 
-	area = hash_lookup(sAreaHash, &id);
-	if (area)
+	area = (vm_area *)hash_lookup(sAreaHash, &id);
+	if (area != NULL)
 		atomic_add(&area->ref_count, 1);
 
 	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
@@ -119,7 +119,7 @@ vm_get_area(area_id id)
 static vm_area *
 _vm_create_reserved_region_struct(vm_virtual_map *map, uint32 flags)
 {
-	vm_area *reserved = malloc(sizeof(vm_area));
+	vm_area *reserved = (vm_area *)malloc(sizeof(vm_area));
 	if (reserved == NULL)
 		return NULL;
 
@@ -652,7 +652,8 @@ out:
 
 
 status_t
-vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size, uint32 flags)
+vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, 
+	addr_t size, uint32 flags)
 {
 	vm_address_space *addressSpace;
 	vm_area *area;
@@ -1633,7 +1634,7 @@ display_mem(int argc, char **argv)
 	}
 
 	dprintf("[0x%lx] '", address);
-	for (j = 0; j < min(display_width, num) * item_size; j++) {
+	for (j = 0; j < min_c(display_width, num) * item_size; j++) {
 		char c = *((char *)address + j);
 		if (!isalnum(c)) {
 			c = '.';
@@ -1644,7 +1645,7 @@ display_mem(int argc, char **argv)
 	for (i = 0; i < num; i++) {
 		if ((i % display_width) == 0 && i != 0) {
 			dprintf("\n[0x%lx] '", address + i * item_size);
-			for (j = 0; j < min(display_width, (num-i)) * item_size; j++) {
+			for (j = 0; j < min_c(display_width, (num-i)) * item_size; j++) {
 				char c = *((char *)address + i * item_size + j);
 				if (!isalnum(c)) {
 					c = '.';
@@ -1760,18 +1761,20 @@ dump_cache(int argc, char **argv)
 	dprintf("store: %p\n", cache->store);
 	// XXX 64-bit
 	dprintf("virtual_size: 0x%Lx\n", cache->virtual_size);
-	dprintf("temporary: %d\n", cache->temporary);
-	dprintf("scan_skip: %d\n", cache->scan_skip);
+	dprintf("temporary: %ld\n", cache->temporary);
+	dprintf("scan_skip: %ld\n", cache->scan_skip);
 	dprintf("page_list:\n");
-	for(page = cache->page_list; page != NULL; page = page->cache_next) {
+	for (page = cache->page_list; page != NULL; page = page->cache_next) {
 		// XXX offset is 64-bit
-		if(page->type == PAGE_TYPE_PHYSICAL)
-			dprintf(" %p ppn 0x%lx offset 0x%Lx type %d state %d (%s) ref_count %ld\n",
-				page, page->ppn, page->offset, page->type, page->state, page_state_to_text(page->state), page->ref_count);
-		else if(page->type == PAGE_TYPE_DUMMY)
-			dprintf(" %p DUMMY PAGE state %d (%s)\n", page, page->state, page_state_to_text(page->state));
-		else
-			dprintf(" %p UNKNOWN PAGE type %d\n", page, page->type);
+		if (page->type == PAGE_TYPE_PHYSICAL) {
+			dprintf(" %p ppn 0x%lx offset 0x%Lx type %ld state %ld (%s) ref_count %ld\n",
+				page, page->ppn, page->offset, page->type, page->state, 
+				page_state_to_text(page->state), page->ref_count);
+		} else if(page->type == PAGE_TYPE_DUMMY) {
+			dprintf(" %p DUMMY PAGE state %ld (%s)\n", 
+				page, page->state, page_state_to_text(page->state));
+		} else
+			dprintf(" %p UNKNOWN PAGE type %ld\n", page, page->type);
 	}
 	return 0;
 }
@@ -1809,10 +1812,10 @@ dump_area(int argc, char **argv)
 
 	// if the argument looks like a hex number, treat it as such
 	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		unsigned long num = strtoul(argv[1], NULL, 16);
+		uint32 num = strtoul(argv[1], NULL, 16);
 		area_id id = num;
 
-		area = hash_lookup(sAreaHash, &id);
+		area = (vm_area *)hash_lookup(sAreaHash, &id);
 		if (area == NULL) {
 			dprintf("invalid area id\n");
 		} else {
@@ -1824,7 +1827,7 @@ dump_area(int argc, char **argv)
 		struct hash_iterator iter;
 
 		hash_open(sAreaHash, &iter);
-		while ((area = hash_next(sAreaHash, &iter)) != NULL) {
+		while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
 			if (area->name != NULL && strcmp(argv[1], area->name) == 0) {
 				_dump_area(area);
 			}
@@ -1843,7 +1846,7 @@ dump_area_list(int argc, char **argv)
 	dprintf("addr\t      id  base\t\tsize\t\tprotect\tlock\tname\n");
 
 	hash_open(sAreaHash, &iter);
-	while ((area = hash_next(sAreaHash, &iter)) != NULL) {
+	while ((area = (vm_area *)hash_next(sAreaHash, &iter)) != NULL) {
 		dprintf("%p %5lx  %p\t%p\t%ld\t%ld\t%s\n", area, area->id, (void *)area->base,
 			(void *)area->size, area->protection, area->wiring, area->name);
 	}
@@ -2863,7 +2866,7 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 	(*addressSpace->translation_map.ops->lock)(&addressSpace->translation_map);
 
 	while (offset < numBytes) {
-		addr_t bytes = min(numBytes - offset, B_PAGE_SIZE);
+		addr_t bytes = min_c(numBytes - offset, B_PAGE_SIZE);
 
 		status = (*addressSpace->translation_map.ops->query)(&addressSpace->translation_map,
 					(addr_t)address + offset, &physicalAddress, &flags);
@@ -2929,7 +2932,7 @@ find_area(const char *name)
 	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
 	hash_open(sAreaHash, &iterator);
 
-	while ((area = hash_next(sAreaHash, &iterator)) != NULL) {
+	while ((area = (vm_area *)hash_next(sAreaHash, &iterator)) != NULL) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
 
@@ -3321,7 +3324,7 @@ delete_area(area_id area)
 status_t
 _user_init_heap_address_range(addr_t base, addr_t size)
 {
-	return vm_reserve_address_range(vm_get_current_user_aspace_id(), (void *)&base,
+	return vm_reserve_address_range(vm_get_current_user_aspace_id(), (void **)&base,
 		B_EXACT_ADDRESS, size, RESERVED_AVOID_BASE);
 }
 

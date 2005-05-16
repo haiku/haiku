@@ -38,6 +38,11 @@
 #define PAGE_ACCESSED 0x2000
 #define PAGE_PRESENT  0x4000
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Should only be used by vm internals
 status_t vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser, addr_t *newip);
 void vm_unreserve_memory(size_t bytes);
@@ -50,6 +55,10 @@ vm_address_space *vm_aspace_walk_next(struct hash_iterator *i);
 
 // allocates memory from the kernel_args structure
 addr_t vm_alloc_from_kernel_args(kernel_args *args, size_t size, uint32 lock);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KERNEL_VM_PRIV_H */
 

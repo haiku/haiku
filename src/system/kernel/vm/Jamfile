@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src system kernel vm ;
 
 KernelMergeObject kernel_vm.o :
-	vm.c
+	vm.cpp
 	vm_address_space.c
 	vm_cache.c
 	vm_daemons.c
