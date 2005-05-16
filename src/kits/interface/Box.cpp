@@ -45,7 +45,7 @@
 //------------------------------------------------------------------------------
 BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 		   border_style border)
-	:	BView(frame, name, resizingMode, flags),
+	:	BView(frame, name, resizingMode, flags | B_FRAME_EVENTS),
 		fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
