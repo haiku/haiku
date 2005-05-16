@@ -333,12 +333,24 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 	BPoint *escapements = (BPoint *)malloc(sizeof(BPoint) * numChars);
 	for (int i = 0; i < numChars; i++) {
 		FT_Load_Char(face, charArray[i], FT_LOAD_NO_BITMAP);
-		escapements[i].x = float(face->glyph->metrics.width / 64) / fSize;
-		escapements[i].y = 0;
+//		escapements[i].x = float(face->glyph->metrics.width / 64) / fSize;
+//		escapements[i].y = 0;
+		escapements[i].x = float(face->glyph->metrics.horiAdvance / 64) / fSize;
+		escapements[i].y = float(face->glyph->metrics.vertAdvance / 64) / fSize;
 		escapements[i] += offsetArray[i];
 	}
 	
 	return escapements;
+}
+
+// is_white_space
+inline bool
+is_white_space(uint16 glyph)
+{
+	// TODO: handle them all!
+	if (glyph == ' ')
+		return true;
+	return false;
 }
 
 bool
@@ -376,11 +388,9 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 
 		for (int i = 0; i < numChars; i++) {
 			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
-			// TODO: It appears that "white spaces" are not handled correctly:
-			// metrics.width will be zero, which is in now way correct!
-			widthArray[i] = float(face->glyph->metrics.width / 64) / fSize;
-			// TODO:
-			// widthArray[i] += is_white_space(glyphIndex[i]) ? delta.space : delta.nonspace;
+//			widthArray[i] = float(face->glyph->metrics.width / 64) / fSize;
+			widthArray[i] = float(face->glyph->metrics.horiAdvance / 64) / fSize;
+			widthArray[i] += is_white_space(glyphIndex[i]) ? delta.space : delta.nonspace;
 		}
 	}
 	delete[] convertedBuffer;
