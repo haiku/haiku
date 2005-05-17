@@ -91,6 +91,11 @@ SimpleTest ScreenTest :
 	: be
 	;
 
+SimpleTest GetMouseTest :
+	GetMouseTest.cpp
+	: be
+	;
+
 SEARCH on [ FGristFiles
 		ScrollView.cpp CheckBox.cpp ChannelSlider.cpp ChannelControl.cpp
 	] = [ FDirName $(OBOS_TOP) src kits interface ] ;
