@@ -2616,7 +2616,7 @@ BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
 {
 	CALLED();
 	int32 size = sizeof(flattened_text_run_array) + (inArray->count - 1) *
-		sizeof(flattened_text_run_array);
+		sizeof(flattened_text_run);
 
 	flattened_text_run_array *array = (flattened_text_run_array *)malloc(size);
 	if (array == NULL) {
