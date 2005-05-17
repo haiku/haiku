@@ -4,4 +4,4 @@
 sleep 1s
 ../../../../../distro/x86.R1/beos/system/servers/obos_registrar &
 sleep 1s
-../../../../../tests/servers/app/windows/Window
+../../../../../tests/servers/app/playground/Playground

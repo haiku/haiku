@@ -1,19 +1,19 @@
-SubDir OBOS_TOP src tests servers app windows ;
+SubDir OBOS_TOP src tests servers app playground ;
 
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
 
-SimpleTest Window :
+SimpleTest Playground :
 	main.cpp
 ;
 
 if ( $(TARGET_PLATFORM) = haiku ) {
 	# for running natively under R5 or Haiku:
-	LinkSharedOSLibs Window :
+	LinkSharedOSLibs Playground :
 		libbe.so ;
 } else {
 	# for running in the Haiku app_server under R5:
-	LinkSharedOSLibs Window :
+	LinkSharedOSLibs Playground :
 		<boot!home!config!lib>libopenbeos.so ;
 #		be ;
 }
