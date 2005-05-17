@@ -5,8 +5,16 @@ UseHeaders [ FDirName os interface ] ;
 
 SimpleTest Window :
 	main.cpp
-# for running in the Haiku app_server under R5:
-	: <boot!home!config!lib>libopenbeos.so ;
-# for running natively under R5 or Haiku:
-#	: libbe.so ;
+;
+
+if ( $(TARGET_PLATFORM) = haiku ) {
+	# for running natively under R5 or Haiku:
+	LinkSharedOSLibs Window :
+		libbe.so ;
+} else {
+	# for running in the Haiku app_server under R5:
+	LinkSharedOSLibs Window :
+		<boot!home!config!lib>libopenbeos.so ;
+#		be ;
+}
 
