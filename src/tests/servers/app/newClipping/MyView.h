@@ -1,5 +1,6 @@
 #include <OS.h>
 #include <View.h>
+#include <Region.h>
 
 class Layer;
 
@@ -9,11 +10,14 @@ public:
 						MyView(BRect frame, const char *name, uint32 resizingMode, uint32 flags);
 	virtual				~MyView();
 
-	virtual	void		Draw(BRect area);			
+	virtual	void		Draw(BRect area);
+
+			void		RequestRedraw();			
 
 			Layer*		FindLayer(Layer *lay, const char *bytes) const;
 
 			Layer		*topLayer;
+			BRegion		fRedrawReg;
 private:
 			void		DrawSubTree(Layer* lay);
 };

@@ -1,10 +1,13 @@
 #include <Message.h>
 #include <Messenger.h>
+#include <Window.h>
 
 #include <stdio.h>
 
 #include "MyView.h"
 #include "Layer.h"
+
+extern BWindow *wind;
 
 MyView::MyView(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
 	: BView(frame, name, resizingMode, flags)
@@ -43,6 +46,14 @@ Layer* MyView::FindLayer(Layer *lay, const char *bytes) const
 		}
 	}
 	return NULL;
+}
+
+void MyView::RequestRedraw()
+{
+	// TODO: implement
+	wind->Lock();
+	Invalidate();
+	wind->Unlock();
 }
 
 void MyView::Draw(BRect area)

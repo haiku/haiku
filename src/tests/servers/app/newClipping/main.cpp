@@ -80,7 +80,7 @@ bool clsMainWindow::QuitRequested()
 void clsMainWindow::test1()
 {
 	Layer		*topLayer = fView->topLayer;
-	Layer		*parent;
+//	Layer		*parent;
 
 	rgb_color	c;
 	BRect		temp;
@@ -110,7 +110,7 @@ void clsMainWindow::test1()
 	wind->Lock();
 	fView->Invalidate();
 	wind->Unlock();
-
+/*
 	snooze(2000000);
 
 	temp	= lay2->Bounds();
@@ -125,6 +125,14 @@ void clsMainWindow::test1()
 	wind->Lock();
 	fView->Invalidate();
 	wind->Unlock();
+*/
+	snooze(2000000);
+
+	lay2->MoveBy(25,35);
+
+	snooze(2000000);
+
+	lay2->ResizeBy(45,55);
 
 }
 

@@ -3,7 +3,7 @@
 #include <Rect.h>
 #include <GraphicsDefs.h>
 
-class BView;
+class MyView;
 
 class Layer
 {
@@ -14,6 +14,14 @@ public:
 			void			AddLayer(Layer* layer);
 			bool			RemLayer(Layer* layer);
 
+			void			MoveBy(float dx, float dy);
+			void			ResizeBy(float dx, float dy);
+			void			ScrollBy(float dx, float dy);
+
+	virtual	void			MovedByHook(float dx, float dy) { }
+	virtual	void			ResizedByHook(float dx, float dy) { }
+	virtual	void			ScrolledByHook(float dx, float dy) { }
+
 			Layer*			VirtualBottomChild() const;
 			Layer*			VirtualTopChild() const;
 			Layer*			VirtualUpperSibling() const;
@@ -22,15 +30,16 @@ public:
 			void			RebuildVisibleRegions(	const BRegion &invalid,
 													const Layer *startFrom);
 			void			ConvertToScreen2(BRect* rect);
-			BView*			GetRootLayer() const;
-			void			SetRootLayer(BView* view) { fView = view; }
+			MyView*			GetRootLayer() const;
+			void			SetRootLayer(MyView* view) { fView = view; }
+			bool			IsVisuallyHidden() const;
 
 			BRegion*		Visible() { return &fVisible; }
 			BRegion*		FullVisible() { return &fFullVisible; }
 
 			BRect			Frame() const { return fFrame; }
 			BRect			Bounds() const { BRect r(fFrame);
-											r.OffsetTo(0,0);
+											r.OffsetTo(fOrigin);
 											return r; }
 			const char*		Name() const { return fName; }
 			Layer*			Parent() const { return fParent; }
@@ -44,13 +53,15 @@ public:
 private:
 			void			set_user_regions(BRegion &reg);
 			void			clear_visible_regions();
+			void			resize_layer_frame_by(float x, float y);
 
 			char			fName[50];
 			BRegion			fVisible;
 			BRegion			fFullVisible;
 
 			BRect			fFrame;
-			uint32			fRM;
+			BPoint			fOrigin;
+			uint32			fResizeMode;
 			rgb_color		fColor;
 
 			Layer*			fBottom;
@@ -59,5 +70,5 @@ private:
 			Layer*			fTop;
 			Layer*			fParent;
 
-			BView*		fView;
+			MyView*		fView;
 };
