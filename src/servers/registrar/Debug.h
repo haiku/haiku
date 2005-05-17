@@ -55,7 +55,7 @@
 	#define FATAL(x) { __out(DEBUG_APP ": "); __out x; }
 	#define ERROR(x) { __out(DEBUG_APP ": "); __out x; }
 	#define WARNING(x) { __out(DEBUG_APP ": "); __out x; }
-	#define INFORM(x) ;
+	#define INFORM(x) { __out(DEBUG_APP ": "); __out x; }
 	#define FUNCTION(x) ;
 	#define FUNCTION_START() ;
 	#define FUNCTION_END() ;
