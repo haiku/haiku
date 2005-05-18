@@ -1172,16 +1172,12 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 {
 	do_owner_check();
 
-	// TODO: This doesn't look correct, and it's probably the
-	// reason for synchronous controls not working well.
-	// 1. We shouldn't return in case we find an _UPDATE_
-	//	message in the queue, as this leaves us without a mouse position.
-	// 2. we should check if we are calling this from the BWindow's thread or not.
-	// 3. We should maybe take care of more things as the window's loop is blocked.
+	// ToDo: We should check if we are calling this from the BWindow's thread or not.
+	//	But why exactly do we have to do this? If the looper is locked, it
+	//	shouldn't do too much harm, besides, who would do this, anyway :) -- axeld.
 
 	if (checkMessageQueue) {
-		BWindow *window = Window();
-		BMessageQueue *queue = window->MessageQueue();
+		BMessageQueue *queue = Window()->MessageQueue();
 		BMessage *msg;
 		int32 i = 0;
 
@@ -1189,22 +1185,36 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 
 		while ((msg = queue->FindMessage(i++)) != NULL) {
 			switch (msg->what) {
-				case _UPDATE_:
-					// TODO: This is probably not correct:
-					// we should not dispatch the message but instead
-					// call the right function to update the views directly ?
-					window->DispatchMessage(msg, window);
-
-					// Fall through
 				case B_MOUSE_UP:
+				case B_MOUSE_DOWN:
 				case B_MOUSE_MOVED:
-					// We need to eat up all these messages
+				{
+					msg->FindPoint("where", location);
+					msg->FindInt32("buttons", (int32 *)buttons);
+
+					// ToDo: if we're intercepting a mouse message for another
+					//	view, the coordinates must be updated to fit
+
 					queue->RemoveMessage(msg);
 					delete msg;
-					break;
 
-				default:
-					break;
+					queue->Unlock();
+					return;
+				}
+
+				case _UPDATE_:
+				{
+					// ToDo: We should even eat *all* _UPDATE_ messages
+					//	in the queue, not only the ones before the current
+					//	mouse message...
+					Window()->BWindow::DispatchMessage(msg, Window());
+						// we need to make sure that no overridden method is called 
+						// here; for BWindow::DispatchMessage() we now exactly what
+						// will happen
+					queue->RemoveMessage(msg);
+					delete msg;
+					i--;
+				}
 			}
 		}
 		queue->Unlock();
@@ -2413,7 +2423,7 @@ BView::StrokePolygon(const BPolygon* aPolygon,bool closed, pattern p)
 void
 BView::StrokePolygon(const BPoint *ptArray, int32 numPts, bool closed, pattern p)
 {
-	BPolygon aPolygon(ptArray,numPts);
+	BPolygon aPolygon(ptArray, numPts);
 	
 	StrokePolygon(aPolygon.fPts, aPolygon.fCount, aPolygon.Frame(), closed, p);
 }
