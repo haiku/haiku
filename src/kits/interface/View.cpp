@@ -765,8 +765,8 @@ BView::SetOrigin(BPoint pt)
 void
 BView::SetOrigin(float x, float y)
 {
-	if (!(fState->flags & B_VIEW_ORIGIN_BIT) &&
-		x == fState->coordSysOrigin.x && y == fState->coordSysOrigin.y)
+	if (!(fState->flags & B_VIEW_ORIGIN_BIT) 
+		&& x == fState->coordSysOrigin.x && y == fState->coordSysOrigin.y)
 		return;
 
 	if (do_owner_check()) {
@@ -1179,11 +1179,27 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	if (checkMessageQueue) {
 		BMessageQueue *queue = Window()->MessageQueue();
 		BMessage *msg;
-		int32 i = 0;
 
 		queue->Lock();
 
-		while ((msg = queue->FindMessage(i++)) != NULL) {
+		// First process and remove all _UPDATE_ messages
+		// ToDo: it would be great to join them together to one big update message!
+
+		for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; ) {
+			if (msg->what == _UPDATE_) {
+				Window()->BWindow::DispatchMessage(msg, Window());
+					// we need to make sure that no overridden method is called 
+					// here; for BWindow::DispatchMessage() we now exactly what
+					// will happen
+				queue->RemoveMessage(msg);
+				delete msg;
+			} else
+				i++;
+		}
+
+		// Then look out for mouse update messages
+
+		for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
 			switch (msg->what) {
 				case B_MOUSE_UP:
 				case B_MOUSE_DOWN:
@@ -1201,27 +1217,14 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 					queue->Unlock();
 					return;
 				}
-
-				case _UPDATE_:
-				{
-					// ToDo: We should even eat *all* _UPDATE_ messages
-					//	in the queue, not only the ones before the current
-					//	mouse message...
-					Window()->BWindow::DispatchMessage(msg, Window());
-						// we need to make sure that no overridden method is called 
-						// here; for BWindow::DispatchMessage() we now exactly what
-						// will happen
-					queue->RemoveMessage(msg);
-					delete msg;
-					i--;
-				}
 			}
 		}
 		queue->Unlock();
 	}
 
-	// If B_MOUSE_UP or B_MOUSE_MOVED has not been found in the message queue,
-	// tell app_server to send us the current mouse coords and buttons.
+	// If no mouse update message has been found in the message queue, 
+	// we get the current mouse location and buttons from the app_server
+
 	owner->fLink->StartMessage(AS_LAYER_GET_MOUSE_COORDS);
 	
 	// This is because BPortLink doesn't automatically attach the reply
@@ -1229,12 +1232,12 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	// TODO: Fix BPortLink synchronous reply code
 	owner->fLink->Attach<port_id>(owner->fLink->GetReplyPort());
 	owner->fLink->Flush();
-	
+
 	int32 rCode = SERVER_FALSE;
 	owner->fLink->GetNextReply(&rCode);
 	if (rCode == SERVER_TRUE) {
 		owner->fLink->Read<BPoint>(location);
-		owner->fLink->Read((int32 *)buttons,sizeof(int32));
+		owner->fLink->Read((int32 *)buttons, sizeof(int32));
 	}
 }
 
