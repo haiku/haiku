@@ -62,12 +62,12 @@ main(int argc, char **argv)
 		double f = (double)i/7.0;
 		double x = sin(f);
 		double y = be_sin(f);
-		fprintf(stdout, "%0.3f\t%0.10f\t%0.10f", f, x, y);
 		if (fabs(x - y) > 0.000001) {
+			fprintf(stdout, "%0.3f\t%0.10f\t%0.10f", f, x, y);
 			fprintf(stdout, " **");
+			fprintf(stdout, "\n");
 			result = B_ERROR;
 		}
-		fprintf(stdout, "\n");
 	}
 	fprintf(stdout, "\n");
 
@@ -77,12 +77,12 @@ main(int argc, char **argv)
 		double f = (double)i/7.0;
 		double x = cos(f);
 		double y = be_cos(f);
-		fprintf(stdout, "%0.3f\t%0.10f\t%0.10f", f, x, y);
 		if (fabs(x - y) > 0.000001) {
+			fprintf(stdout, "%0.3f\t%0.10f\t%0.10f", f, x, y);
 			fprintf(stdout, " **");
+			fprintf(stdout, "\n");
 			result = B_ERROR;
 		}
-		fprintf(stdout, "\n");
 	}
 	fprintf(stdout, "\n");
 
