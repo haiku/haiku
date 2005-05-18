@@ -199,6 +199,10 @@ ObjectWindow::MessageReceived(BMessage* message)
 			if (message->FindInt32("type", &type) >= B_OK) {
 				fObjectView->SetObjectType(type);
 				fFillCB->SetEnabled(type != OBJECT_LINE);
+				if (!fFillCB->IsEnabled())
+					fPenSizeTC->SetEnabled(true);
+				else
+					fPenSizeTC->SetEnabled(fFillCB->Value() == B_CONTROL_OFF);
 			}
 			break;
 		}
@@ -259,7 +263,10 @@ ObjectWindow::_UpdateControls() const
 	// disable penSize if fill is on
 	sprintf(string, "%.1f", fObjectView->StatePenSize());
 	fPenSizeTC->SetText(string);
-	fPenSizeTC->SetEnabled(!fFillCB->IsEnabled());
+	if (!fFillCB->IsEnabled())
+		fPenSizeTC->SetEnabled(true);
+	else
+		fPenSizeTC->SetEnabled(fFillCB->Value() == B_CONTROL_OFF);
 }
 
 // _GetColor
