@@ -2413,7 +2413,9 @@ BView::StrokePolygon(const BPolygon* aPolygon,bool closed, pattern p)
 void
 BView::StrokePolygon(const BPoint *ptArray, int32 numPts, bool closed, pattern p)
 {
-	StrokePolygon(ptArray, numPts, closed, p);
+	BPolygon aPolygon(ptArray,numPts);
+	
+	StrokePolygon(aPolygon.fPts, aPolygon.fCount, aPolygon.Frame(), closed, p);
 }
 
 
