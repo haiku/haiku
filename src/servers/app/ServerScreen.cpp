@@ -42,6 +42,8 @@ Screen::Screen(DisplayDriver *dDriver, BPoint res, uint32 colorspace, const int3
 Screen::~Screen(void)
 {
 //printf("~Screen( %ld )\n", fID);
+	// TODO: Who is supposed to delete the display driver? It's ours, no?
+//	delete fDDriver;
 }
 
 bool Screen::SupportsResolution(BPoint res, uint32 colorspace)

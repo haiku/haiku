@@ -543,8 +543,9 @@ Painter::StrokeRect(const BRect& r) const
 	// support invalid rects
 	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
 	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
-	_Transform(&a);
-	_Transform(&b);
+	bool centerOffset = fPenSize == 1.0;
+	_Transform(&a, centerOffset);
+	_Transform(&b, centerOffset);
 
 	// first, try an optimized version
 	if (fPenSize == 1.0 &&
@@ -674,14 +675,52 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
-	_Transform(&lt);
-	_Transform(&rb);
+	bool centerOffset = fPenSize == 1.0;
+	_Transform(&lt, centerOffset);
+	_Transform(&rb, centerOffset);
 
-	agg::rounded_rect rect;
-	rect.rect(lt.x, lt.y, rb.x, rb.y);
-	rect.radius(xRadius, yRadius);
+	if (fPenSize == 1.0) {
+		agg::rounded_rect rect;
+		rect.rect(lt.x, lt.y, rb.x, rb.y);
+		rect.radius(xRadius, yRadius);
+	
+		return _StrokePath(rect);
+	} else {
+		// NOTE: This implementation might seem a little strange, but it makes
+		// stroked round rects look like on R5. A more correct way would be to use
+		// _StrokePath() as above (independent from fPenSize).
+		// The fact that the bounding box of the round rect is not enlarged
+		// by fPenSize/2 is actually on purpose, though one could argue it is unexpected.
 
-	return _StrokePath(rect);
+		// enclose the right and bottom edge	
+		rb.x++;
+		rb.y++;
+	
+		agg::rounded_rect outer;
+		outer.rect(lt.x, lt.y, rb.x, rb.y);
+		outer.radius(xRadius, yRadius);
+		fRasterizer->add_path(outer);
+
+		// don't add an inner hole if the "size is negative", this avoids some
+		// defects that can be observed on R5 and could be regarded as a bug.
+		if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
+			agg::rounded_rect inner;
+			inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize, rb.y - fPenSize);
+			inner.radius(max_c(0.0, xRadius - fPenSize), max_c(0.0, yRadius - fPenSize));
+		
+			fRasterizer->add_path(inner);
+		}
+	
+		// make the inner rect work as a hole
+		fRasterizer->filling_rule(agg::fill_even_odd);
+	
+		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
+	
+		// reset to default
+		fRasterizer->filling_rule(agg::fill_non_zero);
+	
+		return _Clipped(_BoundingBox(outer));
+	}
 }
 
 // FillRoundRect
@@ -1167,14 +1206,40 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 	// differently, as with Fill-/StrokeRect().
 	_Transform(&center);
 
-	int32 divisions = (int32)max_c(12, ((xRadius + yRadius) * PI) / 2 * (int32)fPenSize);
+	int32 divisions = (int32)max_c(12, (xRadius + yRadius + 2 * fPenSize) * PI / 2);
 
-	agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
+	if (fill) {
+		agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
 
-	if (fill)
 		return _FillPath(path);
-	else
-		return _StrokePath(path);
+	} else {
+		// NOTE: This implementation might seem a little strange, but it makes
+		// stroked ellipses look like on R5. A more correct way would be to use
+		// _StrokePath(), but it currently has its own set of problems with narrow
+		// ellipses (for small xRadii or yRadii).
+		float inset = fPenSize / 2.0;
+		agg::ellipse inner(center.x, center.y,
+						   max_c(0.0, xRadius - inset),
+						   max_c(0.0, yRadius - inset),
+						   divisions);
+		agg::ellipse outer(center.x, center.y,
+						   xRadius + inset,
+						   yRadius + inset,
+						   divisions);
+
+		fRasterizer->add_path(outer);
+		fRasterizer->add_path(inner);
+
+		// make the inner ellipse work as a hole
+		fRasterizer->filling_rule(agg::fill_even_odd);
+
+		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
+
+		// reset to default
+		fRasterizer->filling_rule(agg::fill_non_zero);
+
+		return _Clipped(_BoundingBox(outer));
+	}
 }
 
 // _DrawShape
@@ -1394,7 +1459,9 @@ Painter::_StrokePath(VertexSource& path) const
 #if ALIASED_DRAWING
 	if (fPenSize > 1.0) {
 		agg::conv_stroke<VertexSource> stroke(path);
+		stroke.line_join(agg::round_join);
 		stroke.width(fPenSize);
+//		stroke.approximation_scale(fPenSize / 2);
 
 		fRasterizer->add_path(stroke);
 		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
