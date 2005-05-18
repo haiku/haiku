@@ -134,6 +134,10 @@ void clsMainWindow::test1()
 
 	lay2->ResizeBy(45,55);
 
+	snooze(2000000);
+
+	lay1->ScrollBy(0,50);
+
 }
 
 int main()

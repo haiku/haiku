@@ -46,8 +46,13 @@ void Layer::ConvertToScreen2(BRect* rect)
 	if (view)
 		if (fParent)
 		{
+			rect->Set(	rect->left - fOrigin.x,
+						rect->top - fOrigin.y,
+						rect->right - fOrigin.x,
+						rect->bottom - fOrigin.y);
+
 			rect->Set(	rect->left + fFrame.left,
-						rect->top + fFrame. top,
+						rect->top + fFrame.top,
 						rect->right + fFrame.left,
 						rect->bottom + fFrame.top);
 
@@ -295,12 +300,32 @@ void Layer::ScrollBy(float dx, float dy)
 
 	if (!IsVisuallyHidden() && GetRootLayer())
 	{
+		// set the region to be invalidated.
+		BRegion		invalid(fFullVisible);
+
 		clear_visible_regions();
 
-		RebuildVisibleRegions(fFullVisible, VirtualBottomChild());
+		rebuild_visible_regions(invalid, invalid, VirtualBottomChild());
 
-// TODO: continue
+		// for the moment we say that the whole surface needs to be redraw.
+		BRegion		redrawReg(fFullVisible);
 
+		// offset old region so that we can start comparing.
+		invalid.OffsetBy(dx, dy);
+
+		// no need to redraw common regions. redraw only what's needed.
+		redrawReg.Exclude(&invalid);
+
+		// compute the common region. we'll use HW acc to copy this to the new location.
+		invalid.IntersectWith(&fFullVisible);
+
+		// offset back and instruct the driver to do the actual copying.
+		invalid.OffsetBy(-dx, -dy);
+// TODO: HACK this!
+//		GetDisplayDriver()->CopyRegion(&invalid, dx, dy);
+
+		GetRootLayer()->fRedrawReg.Include(&redrawReg);
+		GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
 	}
 
 	if (dx != 0.0f || dy != 0.0f)
