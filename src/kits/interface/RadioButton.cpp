@@ -1,26 +1,11 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
+//	Distributed under the terms of the MIT license.
 //
 //	File Name:		RadioButton.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
+//	Authors:		Marc Flerackers (mflerackers@androme.be)
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	BRadioButton represents a single on/off button.  All
 //                  sibling BRadioButton objects comprise a single
 //                  "multiple choice" control.
@@ -81,20 +66,38 @@ status_t BRadioButton::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 void BRadioButton::Draw(BRect updateRect)
 {
+	// NOTE: the commented out StrokeLine() calls appearently tweak the
+	// rendering on R5, but they are unnecessary under Haiku
+
 	font_height fh;
 	GetFontHeight(&fh);
 
-	// If the focus is changing, just redraw the focus indicator
-	if (IsFocusChanging())
-	{
-		float h = 8.0f + (float)ceil(fh.ascent / 2.0f) + 2.0f;
+	// layout the rect for the dot
+	BRect rect(Bounds());
 
+	// its size depends on the text height
+	float textHeight = floorf(fh.ascent + fh.descent + 0.5);
+	float inset = -floorf(textHeight / 2 - 2);
+
+	rect.left -= (inset - 1);
+	rect.top = floorf((rect.top + rect.bottom) / 2.0);
+	rect.bottom = rect.top;
+	rect.right = rect.left;
+	rect.InsetBy(inset, inset);
+	
+	BPoint labelPos(rect.right + floorf(textHeight / 2.0),
+					floorf((rect.top + rect.bottom + textHeight) / 2.0 - fh.descent + 0.5) + 1.0);
+
+	// If the focus is changing, just redraw the focus indicator
+	if (IsFocusChanging()) {
 		if (IsFocus())
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 		else
 			SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-		StrokeLine(BPoint(20.0f, h), BPoint(20.0f + StringWidth(Label()), h));
+		BPoint underLine = labelPos;
+		underLine.y += fh.descent;
+		StrokeLine(underLine, underLine + BPoint(StringWidth(Label()), 0.0));
 
 		return;
 	}
@@ -109,13 +112,13 @@ void BRadioButton::Draw(BRect updateRect)
 	//darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 	darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
-	BRect rect(1.0, 3.0, 13.0, 15.0);
+	// NOTE: this improves drawing a lot because of
+	// anti-aliased circles and arcs in Haiku
+	SetDrawingMode(B_OP_OVER);
 
-	if (IsEnabled())
-	{
+	if (IsEnabled()) {
 		// Dot
-		if (Value() == B_CONTROL_ON)
-		{
+		if (Value() == B_CONTROL_ON) {
 			rgb_color kb_color = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 			SetHighColor(tint_color(kb_color, B_DARKEN_3_TINT));
@@ -124,26 +127,23 @@ void BRadioButton::Draw(BRect updateRect)
 			FillEllipse(BRect(rect.left + 3, rect.top + 3, rect.right - 4, rect.bottom - 4));
 			SetHighColor(tint_color(kb_color, B_DARKEN_3_TINT));
 			StrokeLine(BPoint(rect.right - 5, rect.bottom - 4),
-				BPoint(rect.right - 4, rect.bottom - 5));
+					   BPoint(rect.right - 4, rect.bottom - 5));
 			SetHighColor(tint_color(kb_color, B_LIGHTEN_MAX_TINT));
 			StrokeLine(BPoint(rect.left + 4, rect.top + 5),
-				BPoint(rect.left + 5, rect.top + 4));
+					   BPoint(rect.left + 5, rect.top + 4));
 
-		}
-		else
-		{
+		} else {
 			SetHighColor(lightenmax);
 			FillEllipse(rect);
 		}
 
+		rect.InsetBy(-1.0, -1.0);
+
 		// Outer circle
-		if (fOutlined)
-		{
+		if (fOutlined) {
 			SetHighColor(darken3);
 			StrokeEllipse(rect);
-		}
-		else
-		{
+		} else {
 			SetHighColor(darken1);
 			StrokeArc(rect, 45.0f, 180.0f);
 			SetHighColor(lightenmax);
@@ -155,35 +155,34 @@ void BRadioButton::Draw(BRect updateRect)
 		// Inner circle
 		SetHighColor(darken3);
 		StrokeArc(rect, 45.0f, 180.0f);
-		StrokeLine(BPoint(rect.left + 1, rect.top + 1),
-			BPoint(rect.left + 1, rect.top + 1));
+//		StrokeLine(BPoint(rect.left + 1, rect.top + 1),
+//			BPoint(rect.left + 1, rect.top + 1));
 		SetHighColor(no_tint);
 		StrokeArc(rect, 45.0f, -180.0f);
-		StrokeLine(BPoint(rect.left + 1, rect.bottom - 1),
-			BPoint(rect.left + 1, rect.bottom - 1));
-		StrokeLine(BPoint(rect.right - 1, rect.bottom - 1),
-			BPoint(rect.right - 1, rect.bottom - 1));
-		StrokeLine(BPoint(rect.right - 1, rect.top + 1),
-			BPoint(rect.right - 1, rect.top + 1));
+//		StrokeLine(BPoint(rect.left + 1, rect.bottom - 1),
+//			BPoint(rect.left + 1, rect.bottom - 1));
+//		StrokeLine(BPoint(rect.right - 1, rect.bottom - 1),
+//			BPoint(rect.right - 1, rect.bottom - 1));
+//		StrokeLine(BPoint(rect.right - 1, rect.top + 1),
+//			BPoint(rect.right - 1, rect.top + 1));
+
+		// For faster font rendering, we can restore B_OP_COPY
+		SetDrawingMode(B_OP_COPY);
 
 		// Label
 		SetHighColor(darkenmax);
-		DrawString(Label(), BPoint(20.0f, 8.0f + (float)ceil(fh.ascent / 2.0f)));
+		DrawString(Label(), labelPos);
 
 		// Focus
-		if (IsFocus())
-		{
-			float h = 8.0f + (float)ceil(fh.ascent / 2.0f) + 2.0f;
-
+		if (IsFocus()) {
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-			StrokeLine(BPoint(20.0f, h), BPoint(20.0f + StringWidth(Label()), h));
+			BPoint underLine = labelPos;
+			underLine.y += fh.descent;
+			StrokeLine(underLine, underLine + BPoint(StringWidth(Label()), 0.0));
 		}
-	}
-	else
-	{
+	} else {
 		// Dot
-		if (Value() == B_CONTROL_ON)
-		{
+		if (Value() == B_CONTROL_ON) {
 			rgb_color kb_color = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
 			SetHighColor(tint_color(kb_color, B_LIGHTEN_2_TINT));
@@ -194,12 +193,12 @@ void BRadioButton::Draw(BRect updateRect)
 			SetHighColor(tint_color(kb_color, B_DARKEN_3_TINT));
 			StrokeArc(BRect(rect.left + 2, rect.top + 2, rect.right - 2, rect.bottom - 2),
 				45.0f, -180.0f);
-		}
-		else
-		{
+		} else {
 			SetHighColor(lighten1);
 			FillEllipse(rect);
 		}
+
+		rect.InsetBy(-1.0, -1.0);
 
 		// Outer circle
 		SetHighColor(no_tint);
@@ -212,20 +211,20 @@ void BRadioButton::Draw(BRect updateRect)
 		// Inner circle
 		SetHighColor(darken2);
 		StrokeArc(rect, 45.0f, 180.0f);
-		StrokeLine(BPoint(rect.left + 1, rect.top + 1),
-			BPoint(rect.left + 1, rect.top + 1));
+//		StrokeLine(BPoint(rect.left + 1, rect.top + 1),
+//			BPoint(rect.left + 1, rect.top + 1));
 		SetHighColor(no_tint);
 		StrokeArc(rect, 45.0f, -180.0f);
-		StrokeLine(BPoint(rect.left + 1, rect.bottom - 1),
-			BPoint(rect.left + 1, rect.bottom - 1));
-		StrokeLine(BPoint(rect.right - 1, rect.bottom - 1),
-			BPoint(rect.right - 1, rect.bottom - 1));
-		StrokeLine(BPoint(rect.right - 1, rect.top + 1),
-			BPoint(rect.right - 1, rect.top + 1));
+//		StrokeLine(BPoint(rect.left + 1, rect.bottom - 1),
+//			BPoint(rect.left + 1, rect.bottom - 1));
+//		StrokeLine(BPoint(rect.right - 1, rect.bottom - 1),
+//			BPoint(rect.right - 1, rect.bottom - 1));
+//		StrokeLine(BPoint(rect.right - 1, rect.top + 1),
+//			BPoint(rect.right - 1, rect.top + 1));
 
 		// Label
 		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
-		DrawString(Label(), BPoint(20.0f, 8.0f + (float)ceil(fh.ascent / 2.0f)));
+		DrawString(Label(), labelPos);
 	}
 }
 //------------------------------------------------------------------------------
@@ -235,45 +234,39 @@ void BRadioButton::MouseDown(BPoint point)
 		return;
 
 	fOutlined = true;
-	Draw(Bounds());
-	Flush();
 
-	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS)
-	{
+	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
+		Invalidate();
 		SetTracking(true);
 		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-	}
-	else
-	{
+	} else {
+		Draw(Bounds());
+		Flush();
+
 		BRect bounds = Bounds();
 		uint32 buttons;
 
-		do
-		{
+		do {
 			snooze(40000);
 
 			GetMouse(&point, &buttons, true);
 
 			bool inside = bounds.Contains(point);
 
-			if (fOutlined != inside)
-			{
+			if (fOutlined != inside) {
 				fOutlined = inside;
 				Draw(Bounds());
 				Flush();
 			}
 		} while (buttons != 0);
 
-		if (fOutlined)
-		{
+		if (fOutlined) {
 			fOutlined = false;
 			Draw(Bounds());
 			Flush();
 			SetValue(B_CONTROL_ON);
 			Invoke();
-		}
-		else
-		{
+		} else {
 			Draw(Bounds());
 			Flush();
 		}
@@ -404,28 +397,13 @@ void BRadioButton::MouseUp(BPoint point)
 	if (!IsTracking())
 		return;
 
-	bool inside = Bounds().Contains(point);
-
-	if (fOutlined != inside)
-	{
-		fOutlined = inside;
-		Draw(Bounds());
-		Flush();
-	}
-
-	if (fOutlined)
-	{
+	fOutlined = Bounds().Contains(point);
+	if (fOutlined) {
 		fOutlined = false;
-		Draw(Bounds());
-		Flush();
 		SetValue(B_CONTROL_ON);
 		Invoke();
 	}
-	else
-	{
-		Draw(Bounds());
-		Flush();
-	}
+	Invalidate();
 
 	SetTracking(false);
 }
@@ -437,11 +415,9 @@ void BRadioButton::MouseMoved(BPoint point, uint32 transit, const BMessage *mess
 
 	bool inside = Bounds().Contains(point);
 
-	if (fOutlined != inside)
-	{
+	if (fOutlined != inside) {
 		fOutlined = inside;
-		Draw(Bounds());
-		Flush();
+		Invalidate();
 	}
 }
 //------------------------------------------------------------------------------
