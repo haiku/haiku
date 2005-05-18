@@ -18,7 +18,9 @@ ObjectView::ObjectView(BRect frame, const char* name,
 	  fStateList(20),
 	  fColor((rgb_color){ 0, 80, 255, 100 }),
 	  fFill(false),
-	  fPenSize(10.0)
+	  fPenSize(10.0),
+	  fScrolling(false),
+	  fLastMousePos(0.0, 0.0)
 {
 	rgb_color bg = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_1_TINT);
 	SetViewColor(bg);
@@ -41,7 +43,7 @@ ObjectView::Draw(BRect updateRect)
 
 	BRect r(Bounds());
 
-	BeginLineArray(4);
+/*	BeginLineArray(4);
 	AddLine(BPoint(r.left, r.top),
 			BPoint(r.right, r.top), shadow);
 	AddLine(BPoint(r.right, r.top + 1),
@@ -50,7 +52,7 @@ ObjectView::Draw(BRect updateRect)
 			BPoint(r.left, r.bottom), light);
 	AddLine(BPoint(r.left, r.bottom - 1),
 			BPoint(r.left, r.top + 1), shadow);
-	EndLineArray();
+	EndLineArray();*/
 
 	SetHighColor(255, 0, 0, 128);
 
@@ -82,13 +84,21 @@ SetDrawingMode(B_OP_COPY);
 void
 ObjectView::MouseDown(BPoint where)
 {
-	if (!fState)
-		SetState(State::StateFor(fObjectType, fColor, fFill, fPenSize));
+	uint32 buttons;
+	Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
+	fScrolling = buttons & B_SECONDARY_MOUSE_BUTTON;
 
-	if (fState) {
-		Invalidate(fState->Bounds());
-		fState->MouseDown(where);
-		Invalidate(fState->Bounds());
+	if (fScrolling) {
+		fLastMousePos = where;
+	} else {
+		if (!fState)
+			SetState(State::StateFor(fObjectType, fColor, fFill, fPenSize));
+	
+		if (fState) {
+			Invalidate(fState->Bounds());
+			fState->MouseDown(where);
+			Invalidate(fState->Bounds());
+		}
 	}
 }
 
@@ -96,8 +106,12 @@ ObjectView::MouseDown(BPoint where)
 void
 ObjectView::MouseUp(BPoint where)
 {
-	if (fState) {
-		fState->MouseUp(where);
+	if (fScrolling) {
+		fScrolling = false;
+	} else {
+		if (fState) {
+			fState->MouseUp(where);
+		}
 	}
 }
 
@@ -106,14 +120,20 @@ void
 ObjectView::MouseMoved(BPoint where, uint32 transit,
 					   const BMessage* dragMessage)
 {
-	if (fState && fState->IsTracking()) {
-		BRect before = fState->Bounds();
-
-		fState->MouseMoved(where);
-
-		BRect after = fState->Bounds();
-		BRect invalid(before | after);
-		Invalidate(invalid);
+	if (fScrolling) {
+		BPoint offset = fLastMousePos - where;
+		ScrollBy(offset.x, offset.y);
+		fLastMousePos = where + offset;
+	} else {
+		if (fState && fState->IsTracking()) {
+			BRect before = fState->Bounds();
+	
+			fState->MouseMoved(where);
+	
+			BRect after = fState->Bounds();
+			BRect invalid(before | after);
+			Invalidate(invalid);
+		}
 	}
 }
 

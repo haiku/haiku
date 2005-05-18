@@ -59,6 +59,9 @@ class ObjectView : public BView {
 			rgb_color	fColor;
 			bool		fFill;
 			float		fPenSize;
+
+			bool		fScrolling;
+			BPoint		fLastMousePos;
 };
 
 #endif // OBJECT_VIEW_H
