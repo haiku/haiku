@@ -12,6 +12,7 @@ public:
 
 	virtual	void		Draw(BRect area);
 
+			void		CopyRegion(BRegion *reg, float dx, float dy);
 			void		RequestRedraw();			
 
 			Layer*		FindLayer(Layer *lay, const char *bytes) const;

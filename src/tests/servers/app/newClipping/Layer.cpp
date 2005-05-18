@@ -281,8 +281,7 @@ void Layer::MoveBy(float dx, float dy)
 
 		// offset back and instruct the HW to do the actual copying.
 		oldFullVisible.OffsetBy(-dx, -dy);
-// TODO: HACK this!
-//		GetDisplayDriver()->CopyRegion(&oldFullVisible, dx, dy);
+		GetRootLayer()->CopyRegion(&oldFullVisible, dx, dy);
 
 		// add redrawReg to our RootLayer's redraw region.
 		GetRootLayer()->fRedrawReg.Include(&redrawReg);
@@ -313,16 +312,14 @@ void Layer::ScrollBy(float dx, float dy)
 		// offset old region so that we can start comparing.
 		invalid.OffsetBy(dx, dy);
 
-		// no need to redraw common regions. redraw only what's needed.
-		redrawReg.Exclude(&invalid);
-
 		// compute the common region. we'll use HW acc to copy this to the new location.
 		invalid.IntersectWith(&fFullVisible);
+		GetRootLayer()->CopyRegion(&invalid, -dx, -dy);
 
-		// offset back and instruct the driver to do the actual copying.
+		// common region goes back to its original location. then, by excluding
+		// it from curent fullVisible we'll obtain the region that needs to be redrawn.
 		invalid.OffsetBy(-dx, -dy);
-// TODO: HACK this!
-//		GetDisplayDriver()->CopyRegion(&invalid, dx, dy);
+		redrawReg.Exclude(&invalid);
 
 		GetRootLayer()->fRedrawReg.Include(&redrawReg);
 		GetRootLayer()->RequestRedraw(); // TODO: what if we pass (fParent, startFromTHIS, &redrawReg)?
@@ -337,7 +334,6 @@ void Layer::set_user_regions(BRegion &reg)
 // OPT: maybe we should have all these cached in a 'fFull' member
 
 	// 1) set to frame in screen coords
-//	BRect			screenFrame(fFrame);
 	BRect			screenFrame(Bounds());
 	ConvertToScreen2(&screenFrame);
 	reg.Set(screenFrame);

@@ -20,8 +20,8 @@ MyView::MyView(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
 	topLayer = new Layer(Bounds(), "topLayer", B_FOLLOW_ALL, col);
 	topLayer->SetRootLayer(this);
 
-//	topLayer->RebuildVisibleRegions(BRegion(Bounds()), NULL);
 	topLayer->rebuild_visible_regions(BRegion(Bounds()), BRegion(Bounds()), NULL);
+	fRedrawReg.Set(Bounds());
 }
 
 MyView::~MyView()
@@ -48,9 +48,20 @@ Layer* MyView::FindLayer(Layer *lay, const char *bytes) const
 	return NULL;
 }
 
+void MyView::CopyRegion(BRegion *reg, float dx, float dy)
+{
+wind->Lock();
+//	ConstrainClippingRegion(&r);
+//	CopyBits(Bounds(), Bounds().OffsetByCopy(dx, dy));
+	// TODO: properly do that!
+	// LAME, I know!
+	CopyBits(reg->Frame(), reg->Frame().OffsetByCopy(dx, dy));
+//	ConstrainClippingRegion(NULL);
+wind->Unlock();
+}
+
 void MyView::RequestRedraw()
 {
-	// TODO: implement
 	wind->Lock();
 	Invalidate();
 	wind->Unlock();
@@ -58,14 +69,19 @@ void MyView::RequestRedraw()
 
 void MyView::Draw(BRect area)
 {
+	ConstrainClippingRegion(&fRedrawReg);
+	PushState();
 	DrawSubTree(topLayer);
+	PopState();
+	ConstrainClippingRegion(NULL);
+	fRedrawReg.MakeEmpty();
 }
 
 void MyView::DrawSubTree(Layer* lay)
 {
-printf("======== %s =======\n", lay->Name());
-	lay->Visible()->PrintToStream();
-	lay->FullVisible()->PrintToStream();
+//printf("======== %s =======\n", lay->Name());
+//	lay->Visible()->PrintToStream();
+//	lay->FullVisible()->PrintToStream();
 	Layer *child = lay->VirtualBottomChild();
 	while(child)
 	{
