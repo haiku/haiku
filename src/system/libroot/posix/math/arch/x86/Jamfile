@@ -1,10 +1,12 @@
 SubDir OBOS_TOP src system libroot posix math arch x86 ;
 
 KernelMergeObject posix_math_arch_$(OBOS_ARCH).o :
-	<$(SOURCE_GRIST)>fabs.S
-	<$(SOURCE_GRIST)>frexp.c
-	<$(SOURCE_GRIST)>isinf.c
-	<$(SOURCE_GRIST)>ldexp.c
+	cos.S
+	fabs.S
+	frexp.c
+	isinf.c
+	ldexp.c
+	sin.S
 	:
 	-fPIC -DPIC
 	;
