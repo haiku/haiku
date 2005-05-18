@@ -28,6 +28,7 @@
 
 // System Includes -------------------------------------------------------------
 #include <OutlineListView.h>
+#include <stdio.h>
 
 // Project Includes ------------------------------------------------------------
 

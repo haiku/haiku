@@ -26,6 +26,7 @@ INTERFACE_KIT_SOURCE =
 	MenuWindow.cpp
 	OptionControl.cpp
 	OptionPopUp.cpp
+	OutlineListView.cpp
 	Picture.cpp
 	PictureButton.cpp
 	Point.cpp
