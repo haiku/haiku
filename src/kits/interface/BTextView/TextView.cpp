@@ -46,6 +46,7 @@
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Input.h>
+#include <MessageRunner.h>
 #include <PropertyInfo.h>
 #include <Region.h>
 #include <ScrollBar.h>
@@ -525,8 +526,13 @@ BTextView::MouseDown(BPoint where)
 	// TODO: Honor window flags and skip this
 	// implementation even if we don't have an alternative
 	// asynchronous version, yet.
-	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS)
+	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
+		SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,
+				B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+		BMessage pingMessage(_PING_);
+		fClickRunner = new BMessageRunner(this, &pingMessage, 100000);
 		return;
+	}
 
 	// track the mouse while it's down
 	int32 start = 0;
@@ -3866,6 +3872,12 @@ BTextView::StopMouseTracking()
 	CALLED();
 	delete fTrackingMouse;
 	fTrackingMouse = NULL;
+
+	delete fClickRunner;
+	fClickRunner = NULL;
+
+	delete fDragRunner;
+	fDragRunner = NULL;
 }
 
 
@@ -3873,6 +3885,9 @@ bool
 BTextView::PerformMouseUp(BPoint where)
 {
 	CALLED();
+	// TODO: Put here the code for asynchronous mouse tracking
+
+	StopMouseTracking();
 	return false;
 }
 
@@ -3881,6 +3896,7 @@ bool
 BTextView::PerformMouseMoved(BPoint where, uint32 code)
 {
 	CALLED();
+	// TODO: Put here the code for asynchronous mouse tracking
 	return false;
 }
 
@@ -4120,7 +4136,7 @@ BTextView::Activate()
 	
 	BPoint where;
 	ulong buttons;
-	GetMouse(&where, &buttons);
+	GetMouse(&where, &buttons, false);
 	if (Bounds().Contains(where))
 		SetViewCursor(B_CURSOR_I_BEAM);
 }
