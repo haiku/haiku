@@ -78,7 +78,13 @@ TermApp::TermApp (void)
 
   be_roster->GetAppList(TERM_SIGNATURE, &teams); 
   fWindowNumber = teams.CountItems();
-
+  
+  if(fWindowNumber == 0)
+  {
+    be_roster->GetAppList(R5_TERM_SIGNATURE, &teams); 
+    fWindowNumber = teams.CountItems();
+  }
+  
   int i = fWindowNumber / 16;
   int j = fWindowNumber % 16;
   
