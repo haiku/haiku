@@ -148,6 +148,7 @@ BGView::BGView(BRect frame, const char *name, int32 resize, int32 flags)
 	
 	fIconLabelBackground = new BCheckBox(cvrect, "iconLabelBackground", 
 		"Icon label background", new BMessage(ICONLABEL_CHECKBOX));
+	fIconLabelBackground->SetValue(B_CONTROL_ON);
 	rightbox->AddChild(fIconLabelBackground);
 	
 	BMenuItem *menuItem;
@@ -167,7 +168,6 @@ BGView::BGView(BRect frame, const char *name, int32 resize, int32 flags)
 	
 	fImageMenu = new BPopUpMenu("pick one");
 	fImageMenu->AddItem(new BGImageMenuItem("None", -1, new BMessage(NONE_IMAGE)));
-	fImageMenu->AddSeparatorItem();
 	fImageMenu->AddSeparatorItem();
 	fImageMenu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(OTHER_IMAGE)));
 	
@@ -277,8 +277,6 @@ BGView::MessageReceived(BMessage *msg)
 		}
 		case MANUAL_PLACEMENT:
 		{
-			fXPlacementText->SetText("0");
-			fYPlacementText->SetText("0");
 			UpdatePreview();
 			UpdateButtons();
 			break;
@@ -287,8 +285,6 @@ BGView::MessageReceived(BMessage *msg)
 		case SCALE_PLACEMENT:
 		case CENTER_PLACEMENT:
 		{
-			fXPlacementText->SetText("");
-			fYPlacementText->SetText("");
 			UpdatePreview();
 			UpdateButtons();
 			break;
@@ -823,6 +819,17 @@ BGView::UpdatePreview()
 		fXPlacementText->SetEnabled(textEnabled);
 	if(fYPlacementText->IsEnabled()^textEnabled)
 		fYPlacementText->SetEnabled(textEnabled);
+
+	if (textEnabled && (fXPlacementText->TextView()->IsSelectable() != textEnabled))
+	{
+		fXPlacementText->SetText("0");
+		fYPlacementText->SetText("0");
+	}
+	if (!textEnabled)
+	{
+		fXPlacementText->SetText(NULL);
+		fYPlacementText->SetText(NULL);
+	}
 	fXPlacementText->TextView()->MakeSelectable(textEnabled);
 	fYPlacementText->TextView()->MakeSelectable(textEnabled);
 	fXPlacementText->TextView()->MakeEditable(textEnabled);
@@ -1050,6 +1057,10 @@ BGView::AddItem(BGImageMenuItem *item)
 {
 	int32 count = fImageMenu->CountItems() - 2;
 	int32 index=2;
+	if (count < index) {
+		fImageMenu->AddItem(new BSeparatorItem(), 1);
+		count = fImageMenu->CountItems() - 2;
+	}
 	for(; index<count ;index++) {
 		BGImageMenuItem *image = (BGImageMenuItem *)fImageMenu->ItemAt(index);
 		int c = (BString(image->Label()).ICompare(BString(item->Label())));
