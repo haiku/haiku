@@ -1172,19 +1172,20 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 {
 	do_owner_check();
 
-	// ToDo: We should check if we are calling this from the BWindow's thread or not.
-	//	But why exactly do we have to do this? If the looper is locked, it
-	//	shouldn't do too much harm, besides, who would do this, anyway :) -- axeld.
-
 	if (checkMessageQueue) {
-		BMessageQueue *queue = Window()->MessageQueue();
-		BMessage *msg;
+		if (find_thread(NULL) == Window()->Thread()) {
+			// If the event loop is not running right now (we're blocking it),
+			// we need to retrieve all messages that are pending on the port.
+			Window()->DequeueAll();
+		}
 
+		BMessageQueue *queue = Window()->MessageQueue();
 		queue->Lock();
 
 		// First process and remove all _UPDATE_ messages
 		// ToDo: it would be great to join them together to one big update message!
 
+		BMessage *msg;
 		for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; ) {
 			if (msg->what == _UPDATE_) {
 				Window()->BWindow::DispatchMessage(msg, Window());

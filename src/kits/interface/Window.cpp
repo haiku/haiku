@@ -2316,7 +2316,23 @@ void BWindow::InitData(	BRect frame, const char* title, window_look look,
   	BuildTopView();
 }
 
-//------------------------------------------------------------------------------
+
+/**	Reads all pending messages from the window port and put them into the queue.
+ */
+
+void
+BWindow::DequeueAll()
+{
+	//	Get message count from port
+	int32 count = port_count(fMsgPort);
+
+	for (int32 i = 0; i < count; i++) {
+		BMessage *message = MessageFromPort(0);
+		if (message != NULL)
+			fQueue->AddMessage(message);
+	}
+}
+
 
 // TODO: This here is a nearly full code duplication to BLooper::task_loop
 // but with one little difference: It uses the determine_target function
