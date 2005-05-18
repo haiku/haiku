@@ -35,33 +35,33 @@
 
 #include <mathimpl.h>
 
+// Previously, PI and PI2 were defined as macros in math.h
+// however, the values there are inconsistent with those here.
+// Especially PI2 which in <math.h> is pi/2 and here is 2*pi. (ug!)
+#undef PI
+#undef PI2
+
 vc(thresh, 2.6117239648121182150E-1 ,b863,3f85,6ea0,6b02, -1, .85B8636B026EA0)
 vc(PIo4,   7.8539816339744830676E-1 ,0fda,4049,68c2,a221,  0, .C90FDAA22168C2)
 vc(PIo2,   1.5707963267948966135E0  ,0fda,40c9,68c2,a221,  1, .C90FDAA22168C2)
 vc(PI3o4,  2.3561944901923449203E0  ,cbe3,4116,0e92,f999,  2, .96CBE3F9990E92)
-
-// no, we declare PI and PI2 as a macros in <math.h>
-//vc(PI,     3.1415926535897932270E0  ,0fda,4149,68c2,a221,  2, .C90FDAA22168C2)
-//vc(PI2,    6.2831853071795864540E0  ,0fda,41c9,68c2,a221,  3, .C90FDAA22168C2)
+vc(PI,     3.1415926535897932270E0  ,0fda,4149,68c2,a221,  2, .C90FDAA22168C2)
+vc(PI2,    6.2831853071795864540E0  ,0fda,41c9,68c2,a221,  3, .C90FDAA22168C2)
 
 ic(thresh, 2.6117239648121182150E-1 , -2, 1.0B70C6D604DD4)
 ic(PIo4,   7.8539816339744827900E-1 , -1, 1.921FB54442D18)
 ic(PIo2,   1.5707963267948965580E0  ,  0, 1.921FB54442D18)
 ic(PI3o4,  2.3561944901923448370E0  ,  1, 1.2D97C7F3321D2)
-
-// no, we declare PI and PI2 as a macros in <math.h>
-//ic(PI,     3.1415926535897931160E0  ,  1, 1.921FB54442D18)
-//ic(PI2,    6.2831853071795862320E0  ,  2, 1.921FB54442D18)
+ic(PI,     3.1415926535897931160E0  ,  1, 1.921FB54442D18)
+ic(PI2,    6.2831853071795862320E0  ,  2, 1.921FB54442D18)
 
 #ifdef vccast
 #define	thresh	vccast(thresh)
 #define	PIo4	vccast(PIo4)
 #define	PIo2	vccast(PIo2)
 #define	PI3o4	vccast(PI3o4)
-
-// no, we declare PI and PI2 as a macros in <math.h>
-//#define	PI	vccast(PI)
-//#define	PI2	vccast(PI2)
+#define	PI	vccast(PI)
+#define	PI2	vccast(PI2)
 #endif
 
 #ifdef national
