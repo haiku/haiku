@@ -1180,7 +1180,8 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	// 3. We should maybe take care of more things as the window's loop is blocked.
 
 	if (checkMessageQueue) {
-		BMessageQueue *queue = Window()->MessageQueue();
+		BWindow *window = Window();
+		BMessageQueue *queue = window->MessageQueue();
 		BMessage *msg;
 		int32 i = 0;
 
@@ -1188,31 +1189,20 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 
 		while ((msg = queue->FindMessage(i++)) != NULL) {
 			switch (msg->what) {
-				case B_MOUSE_UP:
-				{
-					msg->FindPoint("where", location);
-					msg->FindInt32("buttons", (int32*)buttons);
-					Window()->DispatchMessage(msg, Window());
-					queue->RemoveMessage(msg);
-					delete msg;
-					return;
-				}	
-				case B_MOUSE_MOVED:
-				{
-					msg->FindPoint("where", location);
-					msg->FindInt32("buttons", (int32 *)buttons);
-					Window()->DispatchMessage(msg, Window());
-					queue->RemoveMessage(msg);
-					delete msg;
-					return;
-				}
 				case _UPDATE_:
-				{
-					Window()->DispatchMessage(msg, Window());
+					// TODO: This is probably not correct:
+					// we should not dispatch the message but instead
+					// call the right function to update the views directly ?
+					window->DispatchMessage(msg, window);
+
+					// Fall through
+				case B_MOUSE_UP:
+				case B_MOUSE_MOVED:
+					// We need to eat up all these messages
 					queue->RemoveMessage(msg);
 					delete msg;
-					return;
-				}
+					break;
+
 				default:
 					break;
 			}
