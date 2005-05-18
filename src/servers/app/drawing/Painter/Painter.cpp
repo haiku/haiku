@@ -776,6 +776,7 @@ Painter::StrokeArc(BPoint center, float xRadius, float yRadius,
 						-angleRad, -spanRad);
 
 	agg::conv_curve<agg::bezier_arc> path(arc);
+	path.approximation_scale(2.0);
 
 	return _StrokePath(path);
 }

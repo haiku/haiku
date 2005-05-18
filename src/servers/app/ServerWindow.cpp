@@ -122,8 +122,8 @@ ServerWindow::ServerWindow(	const char *string,
 	// fClientWinPort is the port to which the app awaits messages from the server
 	fClientWinPort(winport),
 	fClientLooperPort(looperPort),
-	fHandlerToken(handlerID),
-	fClientViewsWithInvalidCoords(B_VIEW_RESIZED)
+	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
+	fHandlerToken(handlerID)
 {
 	STRACE(("ServerWindow(%s)::ServerWindow()\n",string? string: "NULL"));
 
