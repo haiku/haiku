@@ -18,3 +18,4 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src system libroot posix ] ;
 
 SubInclude OBOS_TOP src tests kernel libroot posix bonnie ;
+SubInclude OBOS_TOP src tests kernel libroot posix math ;
