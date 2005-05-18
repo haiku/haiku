@@ -3,8 +3,11 @@ SubDir OBOS_TOP src tests servers app playground ;
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
 
-SimpleTest Playground :
+App Playground :
 	main.cpp
+	ObjectView.cpp
+	ObjectWindow.cpp
+	States.cpp
 ;
 
 if ( $(TARGET_PLATFORM) = haiku ) {
