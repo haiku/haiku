@@ -1182,11 +1182,11 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 		BMessageQueue *queue = Window()->MessageQueue();
 		queue->Lock();
 
-		// First process and remove all _UPDATE_ messages
-		// ToDo: it would be great to join them together to one big update message!
+		// First process and remove any _UPDATE_ message in the queue
+		// According to Adi, there can only be one at a time
 
 		BMessage *msg;
-		for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; ) {
+		for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
 			if (msg->what == _UPDATE_) {
 				Window()->BWindow::DispatchMessage(msg, Window());
 					// we need to make sure that no overridden method is called 
@@ -1194,8 +1194,8 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 					// will happen
 				queue->RemoveMessage(msg);
 				delete msg;
-			} else
-				i++;
+				break;
+			}
 		}
 
 		// Then look out for mouse update messages
@@ -1209,8 +1209,9 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 					msg->FindPoint("where", location);
 					msg->FindInt32("buttons", (int32 *)buttons);
 
-					// ToDo: if we're intercepting a mouse message for another
-					//	view, the coordinates must be updated to fit
+					// ToDo: the "where" coordinates are screen coordinates
+					//	unlike R5 - this might break applications!
+					ConvertFromScreen(location);
 
 					queue->RemoveMessage(msg);
 					delete msg;
@@ -1227,7 +1228,7 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	// we get the current mouse location and buttons from the app_server
 
 	owner->fLink->StartMessage(AS_LAYER_GET_MOUSE_COORDS);
-	
+
 	// This is because BPortLink doesn't automatically attach the reply
 	// port to a synchronous message. Bummer.
 	// TODO: Fix BPortLink synchronous reply code
