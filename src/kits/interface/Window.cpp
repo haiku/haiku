@@ -1270,22 +1270,29 @@ BWindow::UpdateIfNeeded()
 	if (find_thread(NULL) != Thread())
 		return;
 
+	// Since we're blocking the event loop, we need to retrieve 
+	// all messages that are pending on the port.
+	DequeueAll();
+
 	BMessageQueue *queue = MessageQueue();
 	queue->Lock();
 
-	// process all _UPDATE_ BMessages in message queue
-	// we lock the queue because we don't want to be stuck in this
-	// function if there is a continuous stream of updates 
-	BMessage *msg;
-	while ((msg = queue->FindMessage(_UPDATE_, 0))) {
-		// ToDo: combine messages if possible
-		Lock();
-		DispatchMessage(msg, this);
-		Unlock();
+	// First process and remove any _UPDATE_ message in the queue
+	// According to Adi, there can only be one at a time
 
-		queue->RemoveMessage(msg);
-		delete msg;
+	BMessage *msg;
+	for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
+		if (msg->what == _UPDATE_) {
+			BWindow::DispatchMessage(msg, this);
+				// we need to make sure that no overridden method is called 
+				// here; for BWindow::DispatchMessage() we now exactly what
+				// will happen
+			queue->RemoveMessage(msg);
+			delete msg;
+			break;
+		}
 	}
+
 	queue->Unlock();
 }
 

@@ -1173,33 +1173,14 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	do_owner_check();
 
 	if (checkMessageQueue) {
-		if (find_thread(NULL) == Window()->Thread()) {
-			// If the event loop is not running right now (we're blocking it),
-			// we need to retrieve all messages that are pending on the port.
-			Window()->DequeueAll();
-		}
-
 		BMessageQueue *queue = Window()->MessageQueue();
 		queue->Lock();
 
-		// First process and remove any _UPDATE_ message in the queue
-		// According to Adi, there can only be one at a time
+		Window()->UpdateIfNeeded();
+
+		// Look out for mouse update messages
 
 		BMessage *msg;
-		for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
-			if (msg->what == _UPDATE_) {
-				Window()->BWindow::DispatchMessage(msg, Window());
-					// we need to make sure that no overridden method is called 
-					// here; for BWindow::DispatchMessage() we now exactly what
-					// will happen
-				queue->RemoveMessage(msg);
-				delete msg;
-				break;
-			}
-		}
-
-		// Then look out for mouse update messages
-
 		for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
 			switch (msg->what) {
 				case B_MOUSE_UP:
