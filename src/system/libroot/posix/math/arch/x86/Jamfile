@@ -7,6 +7,8 @@ KernelMergeObject posix_math_arch_$(OBOS_ARCH).o :
 	isinf.c
 	ldexp.c
 	sin.S
+	sqrt.S
+	sqrtf.S
 	:
 	-fPIC -DPIC
 	;
