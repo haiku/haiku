@@ -315,12 +315,13 @@ BHandler::MessageReceived(BMessage *message)
 		}
 	}
 
-	// ToDo: there is some more work need here (someone in the know should fill in)!
+	// ToDo: there is some more work needed here (someone in the know should fill in)!
 
 	if (fNextHandler) {
-		// aren't filters done per handler?
+		// ToDo: take the handler's message filter into account!
 		fNextHandler->MessageReceived(message);
-	} else if (message->what != B_MESSAGE_NOT_UNDERSTOOD) {
+	} else if (message->what != B_MESSAGE_NOT_UNDERSTOOD
+		&& (message->WasDropped() || message->HasSpecifiers())) {
 		printf("BHandler::MessageReceived(): B_MESSAGE_NOT_UNDERSTOOD");
 		message->PrintToStream();
 		message->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
