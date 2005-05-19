@@ -64,6 +64,8 @@ static mutex keyboard_read_mutex;
 static char keyboard_buf[1024];
 static unsigned int head, tail;
 static isa_module_info *gISA;
+static int32 sOpenCount = 0;
+
 
 // begins with HOME, end with CURSOR_DOWN
 static const char sControlKeys[] = {'@', 'A', 0, 0, 'D', 0, 'C', 0, '[', 'B'};
@@ -111,7 +113,7 @@ wait_for_output(void)
 }
 
 
-static void 
+static void
 set_leds(void)
 {
 	wait_for_output();
@@ -121,7 +123,7 @@ set_leds(void)
 }
 
 
-static void 
+static void
 insert_in_buf(char c)
 {
 	unsigned int temp_tail = tail;
@@ -139,7 +141,7 @@ insert_in_buf(char c)
 }
 
 
-static int32 
+static int32
 handle_keyboard_interrupt(void *data)
 {
 	unsigned char key;
@@ -251,29 +253,64 @@ handle_keyboard_interrupt(void *data)
 //	#pragma mark -
 
 
-static status_t 
+static status_t
 keyboard_open(const char *name, uint32 flags, void **cookie)
 {
+	if (atomic_add(&sOpenCount, 1) != 0) {
+		*cookie = NULL;
+		return B_OK;
+	}
+
+	keyboard_sem = create_sem(0, "keyboard_sem");
+	if (keyboard_sem < 0)
+		panic("could not create keyboard sem!\n");
+
+	if (mutex_init(&keyboard_read_mutex, "keyboard_read_mutex") < 0)
+		panic("could not create keyboard read mutex!\n");
+
+	shift = false;
+	sControl = false;
+	leds = 0;
+
+	// have the scroll lock reflect the state of serial debugging
+#if 0
+	if (dbg_get_serial_debug())
+		leds |= LED_SCROLL;
+#endif
+	set_leds();
+
+	head = tail = 0;
+
+	install_io_interrupt_handler(0x01, &handle_keyboard_interrupt, NULL, 0);
+
 	*cookie = NULL;
-	return 0;
+	return B_OK;
 }
 
 
-static status_t 
+static status_t
 keyboard_close(void *cookie)
 {
-	return 0;
+	if (atomic_add(&sOpenCount, -1) != 1)
+		return B_OK;
+
+	remove_io_interrupt_handler(0x01, &handle_keyboard_interrupt, NULL);
+
+	delete_sem(keyboard_sem);
+	mutex_destroy(&keyboard_read_mutex);
+
+	return B_OK;
 }
 
 
-static status_t 
+static status_t
 keyboard_freecookie(void *cookie)
 {
-	return 0;
+	return B_OK;
 }
 
 
-static status_t 
+static status_t
 keyboard_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 {
 	unsigned int savedTail;
@@ -338,14 +375,14 @@ retry:
 }
 
 
-static status_t 
+static status_t
 keyboard_write(void *cookie, off_t pos, const void *buf,  size_t *len)
 {
 	return EROFS;
 }
 
 
-static status_t 
+static status_t
 keyboard_ioctl(void *cookie, uint32 op, void *buf, size_t len)
 {
 	return EINVAL;
@@ -370,8 +407,8 @@ device_hooks keyboard_hooks = {
 /***** driver hooks *****/
 
 
-status_t 
-init_hardware()
+status_t
+init_hardware(void)
 {
 	return B_OK;
 }
@@ -399,45 +436,18 @@ find_device(const char *name)
 }
 
 
-status_t 
-init_driver()
+status_t
+init_driver(void)
 {
 	if (get_module(B_ISA_MODULE_NAME, (module_info **)&gISA) < B_OK)
-		panic("could not get ISA module\n");
+		return B_ENTRY_NOT_FOUND;
 
-	keyboard_sem = create_sem(0, "keyboard_sem");
-	if (keyboard_sem < 0)
-		panic("could not create keyboard sem!\n");
-
-	if (mutex_init(&keyboard_read_mutex, "keyboard_read_mutex") < 0)
-		panic("could not create keyboard read mutex!\n");
-
-	shift = false;
-	sControl = false;
-	leds = 0;
-
-	// have the scroll lock reflect the state of serial debugging
-#if 0
-	if (dbg_get_serial_debug())
-		leds |= LED_SCROLL;
-#endif
-	set_leds();
-
-	head = tail = 0;
-
-	install_io_interrupt_handler(0x01, &handle_keyboard_interrupt, NULL, 0);
-	
 	return B_OK;
 }
 
 
-void 
-uninit_driver()
+void
+uninit_driver(void)
 {
-	remove_io_interrupt_handler(0x01, &handle_keyboard_interrupt, NULL);
-
-	delete_sem(keyboard_sem);
-	mutex_destroy(&keyboard_read_mutex);
-
 	put_module(B_ISA_MODULE_NAME);
 }
