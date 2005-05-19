@@ -2,7 +2,7 @@ SubDir OBOS_TOP src tests kernel libroot posix math ;
 
 UsePrivateHeaders libroot ;
 SubDirHdrs [ FDirName $(OBOS_TOP) src system libroot posix glibc ] ;
-SubDirC++Flags -mieee-fp ;
+SubDirCcFlags -Dnational ;
 
 MATH_SOURCES = 	
 	acosh.c	asincos.c	asinh.c	atan.c
