@@ -110,6 +110,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	ppp_up gdb tail zip unzip mountvolume"
 
 BEOS_APPS="MiniTerminal"
+BEOS_PREFERENCES="DataTranslations Mouse Keyboard Keymap Menu Sounds Media FileTypes"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 	libtranslation.so libbind.so libnetapi.so libsocket.so libdebug.so \
@@ -145,6 +146,7 @@ jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader \
 	rld.so kernel_fortune consoled \<bin\>route \
 	$BEOS_BIN \
 	$BEOS_APPS \
+	$BEOS_PREFERENCES \
 	$BEOS_SYSTEM_LIB \
 	$BEOS_SYSTEM_SERVERS \
 	$BEOS_NETWORK_CORE \
@@ -210,7 +212,7 @@ $mkindex BEOS:APP_SIG
 $mkdir -p beos/apps
 $mkdir -p beos/bin
 $mkdir -p beos/etc
-$mkdir -p beos/prefs
+$mkdir -p beos/preferences
 $mkdir -p beos/system/add-ons/kernel/boot
 $mkdir -p beos/system/add-ons/kernel/bus_managers
 $mkdir -p beos/system/add-ons/kernel/busses/ide
@@ -336,6 +338,12 @@ cd $sourceDir/distro/${arch}.R1/beos/apps
 $scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/apps
 for f in $BEOS_APPS; do
 	$cp ${sPrefix}$f $targetDir/beos/apps/
+done
+
+cd $sourceDir/distro/${arch}.R1/beos/preferences
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/preferences
+for f in $BEOS_PREFERENCES; do
+	$cp ${sPrefix}$f $targetDir/beos/preferences/
 done
 
 
