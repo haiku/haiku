@@ -5,22 +5,38 @@ XSLTPROC ?= xsltproc ;
 rule Doc2HTML
 {
 	local source = [ FGristFiles $(1) ] ;
-	local target = $(1:S=.html) ;
+	local target = $(2) ;
+	local xslsheet = $(3) ;
+	local basedir = [ FDirName $(OBOS_DISTRO_TARGET) beos documentation $(4) ] ;
+	local paths = $(5) ;
+	local options = $(6) ;
+
+	if ! $(target) {
+		target = $(1:S=.html) ;
+	}
 
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
 
-	MakeLocate $(target) : [ FDirName $(OBOS_DISTRO_TARGET) beos documentation $(DOC_LOCATION) ] ;
+	MakeLocate $(target) : $(basedir) ;
+	if $(2) {
+		XSLBASEDIR on $(target) = "-stringparam base.dir \""$(basedir)"/\"" ; 
+	}
+	XSLSHEET on $(target) = $(xslsheet) ;
+	XSLOPTIONS on $(target) = $(options) ;
+	if ! $(2) {
+		XSLOUTPUT on $(target) = "-o \""$(target)"\"" ;
+	}
 
-        Depends $(target) : $(source) ;
-        LocalDepends doc_files : $(target) ;
-	XSLPROCPATHS on $(target) = "-path \""$(XSLPATHS:J=\ )"\"" ;
+	Depends $(target) : $(source) ;
+	LocalDepends doc_files : $(target) ;
+	XSLPROCPATHS on $(target) = "-path \""$(paths:J=\ )"\"" ;
 	Doc2HTML1 $(target) : $(source) ;
-        LocalClean clean : $(target) ;
+	LocalClean clean : $(target) ;
 }
 
 actions Doc2HTML1
 {
-	$(XSLTPROC) -xinclude $(XSLPROCPATHS) -o "$(1)" $(HTMLXSLSHEET) $(2) ;
+	$(XSLTPROC) -xinclude $(XSLPROCPATHS) $(XSLBASEDIR) $(XSLOPTIONS) $(XSLOUTPUT) $(XSLSHEET) $(2) ;
 }
 
 SEARCH on  <src!documentation>license.xml = [ FDirName $(OBOS_TOP) src documentation ] ;

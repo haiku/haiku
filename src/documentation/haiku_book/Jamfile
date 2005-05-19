@@ -1,11 +1,10 @@
 SubDir OBOS_TOP src documentation haiku_book ;
 
-XSLPATHS = ;
-HTMLXSLSHEET = http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl ;
-DOC_LOCATION = Haiku\ Book ;
-
 Doc2HTML 
 	Haiku_Book.xml
+	: 
+	: http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl
+	: Haiku_Book
 	;
 
 local chapter_files = appkit.xml
