@@ -66,7 +66,9 @@ Painter::Painter()
 	  fDrawingModeFactory(new DrawingModeFactory()),
 	  fPatternHandler(new PatternHandler()),
 	  fTextRenderer(new AGGTextRenderer()),
-	  fLastFamilyAndStyle(0)
+	  fLastFamilyAndStyle(0),
+	  fLastRotation(0.0),
+	  fLastShear(90.0)
 {
 	if (fontserver && fontserver->GetSystemPlain())
 		fFont = *fontserver->GetSystemPlain();
@@ -255,19 +257,6 @@ void
 Painter::SetPenLocation(const BPoint& location)
 {
 	fPenLocation = location;
-}
-
-// SetFont
-void
-Painter::SetFont(const BFont& font)
-{
-	//fFont.SetFamilyAndStyle(font.GetFamily(), font.GetStyle());
-	fFont.SetSpacing(font.Spacing());
-	fFont.SetShear(font.Shear());
-	fFont.SetRotation(font.Rotation());
-	fFont.SetSize(font.Size());
-	
-	_UpdateFont();
 }
 
 // SetFont
@@ -1082,16 +1071,20 @@ Painter::_UpdateFont()
 	if (fFont.InitCheck() < B_OK)
 		return;
 
-	if (fLastFamilyAndStyle != fFont.GetFamilyAndStyle()) {
-		fLastFamilyAndStyle = fFont.GetFamilyAndStyle();
-		
-		bool success = false;
-		success = fTextRenderer->SetFont(fFont);
-		if (!success)
-			fprintf(stderr, "unable to set font\n");
+	if (fLastFamilyAndStyle != fFont.GetFamilyAndStyle()
+		|| fFont.Rotation() != fLastRotation || fFont.Shear() != fLastShear) {
+
+		if (fTextRenderer->SetFont(fFont)) {
+			fLastFamilyAndStyle = fFont.GetFamilyAndStyle();
+			fLastRotation = fFont.Rotation();
+			fLastShear = fFont.Shear();
+		} else {
+			fprintf(stderr, "unable to set font\n");	
+		}
+	} else {
+		// just update the size
+		fTextRenderer->SetPointSize(fFont.Size());
 	}
-	
-	fTextRenderer->SetPointSize(fFont.Size());
 }
 
 // _UpdateLineWidth
@@ -1468,7 +1461,6 @@ Painter::_StrokePath(VertexSource& path) const
 		agg::conv_stroke<VertexSource> stroke(path);
 		stroke.line_join(agg::round_join);
 		stroke.width(fPenSize);
-//		stroke.approximation_scale(fPenSize / 2);
 
 		fRasterizer->add_path(stroke);
 		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
@@ -1480,7 +1472,7 @@ Painter::_StrokePath(VertexSource& path) const
 #endif
 
 	BRect touched = _BoundingBox(path);
-	float penSize = ceilf(fPenSize);
+	float penSize = ceilf(fPenSize / 2.0);
 	touched.InsetBy(-penSize, -penSize);
 
 	return _Clipped(touched);

@@ -569,7 +569,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fName, cl->fName->String()));
 //			SetLayerState(cl);
-			SetLayerState(cl,link);
+			SetLayerState(cl, link);
 			// TODO: should this be moved into SetLayerState?
 			// If it _always_ needs to be done afterwards, then yes!
 			cl->RebuildFullRegion();
@@ -579,7 +579,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fName, cl->fName->String()));
 //			SetLayerFontState(cl);
-			SetLayerFontState(cl,link);
+			SetLayerFontState(cl, link);
 			cl->RebuildFullRegion();
 			break;
 		}

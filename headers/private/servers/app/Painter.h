@@ -74,15 +74,12 @@ class Painter {
 			void				SetPattern(const pattern& p);
 
 			void				SetPenLocation(const BPoint& location);
-			void				SetFont(const BFont& font);
 			void				SetFont(const ServerFont& font);
 
 								// BView API compatibility (for easier testing)
 			void				Sync() {}
 	inline	void				MovePenTo(const BPoint& location)
 									{ SetPenLocation(location); }
-	inline	void				SetFont(const BFont* font)
-									{ if (font) SetFont(*font); }
 
 								// painting functions
 
@@ -310,6 +307,8 @@ class Painter {
 	// by Family and Style
 	AGGTextRenderer*			fTextRenderer;
 	uint32						fLastFamilyAndStyle;
+	float						fLastRotation;
+	float						fLastShear;
 };
 
 // SetHighColor
