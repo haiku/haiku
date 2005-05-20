@@ -120,7 +120,7 @@ class ServerFont {
 											   float widthArray[],
 											   escapement_delta delta) const;
 
-			float				StringWidth(const char* string, int32 numChars) const;
+			float				StringWidth(const char* string, int32 numBytes) const;
 
 			FT_Face				GetFTFace() const
 									{ return fStyle->GetFTFace(); };

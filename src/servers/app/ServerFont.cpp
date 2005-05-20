@@ -402,22 +402,39 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 
 // StringWidth
 float
-ServerFont::StringWidth(const char* string, int32 numChars) const
+ServerFont::StringWidth(const char* string, int32 numBytes) const
 {
-	// TODO: we're lazy for now and reuse the existing
-	// functionality in GetEscapements
-	escapement_delta delta;
-	delta.space = 0.0;
-	delta.nonspace = 0.0;
+	if (!string || numBytes <= 0)
+		return 0.0;
 
-	float* widthArray = new float[numChars];
+	FT_Face face = fStyle->GetFTFace();
+	if (!face)
+		return 0.0;
 
-	GetEscapements(string, numChars, widthArray, delta);
 	float width = 0.0;
-	for (int32 i = 0; i < numChars; i++)
-		width += widthArray[i] * fSize;
 
-	delete[] widthArray;
+	int32 convertedLength = numBytes * 2;
+	char* convertedBuffer = new char[convertedLength];
+
+	int32 state = 0;
+	status_t ret;
+	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
+								 string, &numBytes,
+								 convertedBuffer, &convertedLength,
+								 &state, B_SUBSTITUTE)) >= B_OK
+		&& (ret = swap_data(B_INT16_TYPE, convertedBuffer, convertedLength,
+							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
+
+		uint16* glyphIndex = (uint16*)convertedBuffer;
+		// just to be sure
+		int numChars = convertedLength / sizeof(uint16);
+
+		for (int i = 0; i < numChars; i++) {
+			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
+			width += ((float)face->glyph->metrics.horiAdvance / 64.0) / fSize;
+		}
+	}
+	delete[] convertedBuffer;
 
 	return width;
 }
