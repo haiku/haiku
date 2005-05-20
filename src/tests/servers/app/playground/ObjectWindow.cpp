@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include <Application.h>
+#include <Alert.h>
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
@@ -223,9 +224,12 @@ ObjectWindow::MessageReceived(BMessage* message)
 		case MSG_NEW_OBJECT:
 			fObjectView->SetState(NULL);
 			break;
-		case MSG_CLEAR:
-			fObjectView->MakeEmpty();
+		case MSG_CLEAR: {
+			BAlert *alert = new BAlert("Playground", "Do you really want to clear all drawing objects?", "No", "Yes");
+			if (alert->Go() == 1)
+				fObjectView->MakeEmpty();
 			break;
+		}
 		case MSG_SET_PEN_SIZE:
 			fObjectView->SetStatePenSize(atof(fPenSizeTC->Text()));
 			break;
