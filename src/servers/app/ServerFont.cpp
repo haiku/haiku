@@ -431,7 +431,7 @@ ServerFont::StringWidth(const char* string, int32 numBytes) const
 
 		for (int i = 0; i < numChars; i++) {
 			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
-			width += ((float)face->glyph->metrics.horiAdvance / 64.0) / fSize;
+			width += (float)face->glyph->metrics.horiAdvance / 64.0;
 		}
 	}
 	delete[] convertedBuffer;
