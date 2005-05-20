@@ -213,6 +213,9 @@ class Painter {
 												uint32 length,
 												const BPoint& baseLine) const;
 
+			float				StringWidth(	const char* utf8String,
+												uint32 length) const;
+
 	inline	BRect				ClipRect(const BRect& rect) const
 									{ return _Clipped(rect); }
 

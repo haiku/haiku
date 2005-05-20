@@ -31,9 +31,6 @@ class TextRenderer : public BArchivable {
 	virtual	const char*			Style() const = 0;
 	virtual	const char*			PostScriptName() const = 0;
 
-	virtual	void				SetRotation(float angle);
-	virtual	float				Rotation() const;
-
 	virtual	void				SetPointSize(float size);
 			float				PointSize() const;
 

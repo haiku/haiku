@@ -19,6 +19,4 @@ StaticLibrary painter :
 	font_support/agg_font_freetype.cpp
 	
 	font_support/AGGTextRenderer.cpp
-	font_support/FontManager.cpp
-	font_support/TextRenderer.cpp
 ;

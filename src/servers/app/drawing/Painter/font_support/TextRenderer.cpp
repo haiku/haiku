@@ -189,19 +189,6 @@ TextRenderer::SetFamilyAndStyle(const char* family, const char* style)
 	return false;
 }
 
-// SetRotation
-void
-TextRenderer::SetRotation(float angle)
-{
-}
-
-// Rotation
-float
-TextRenderer::Rotation() const
-{
-	return 0.0;
-}
-
 // SetPointSize
 void
 TextRenderer::SetPointSize(float size)

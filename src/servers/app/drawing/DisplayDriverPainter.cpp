@@ -1005,8 +1005,7 @@ DisplayDriverPainter::StringWidth(const char *string, int32 length,
 	float width = 0.0;
 	if (Lock()) {
 		fPainter->SetDrawData(d);
-		static BPoint dummy(0.0, 0.0);
-		width = fPainter->BoundingBox(string, length, dummy).Width();
+		width = fPainter->StringWidth(string, length);
 		Unlock();
 	}
 	return width;

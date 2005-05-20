@@ -1215,7 +1215,11 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				font.SetSize(size);
 				font.SetSpacing(spacing);
 
-				width = font.StringWidth(string, length);
+				width = desktop->GetDisplayDriver()->StringWidth(string, length, font);
+				// NOTE: The line below will return the exact same thing. However,
+				// the line above uses the AGG rendering backend, for which glyph caching
+				// actually works. It is about 20 times faster!
+				//width = font.StringWidth(string, length);
 
 				replylink.StartMessage(SERVER_TRUE);
 				replylink.Attach<float>(width);

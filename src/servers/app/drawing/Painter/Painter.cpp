@@ -992,6 +992,13 @@ Painter::BoundingBox(const char* utf8String, uint32 length,
 									   transform, dummy, true);
 }
 
+// StringWidth
+float
+Painter::StringWidth(const char* utf8String, uint32 length) const
+{
+	return fTextRenderer->StringWidth(utf8String, length);
+}
+
 // #pragma mark -
 
 // _MakeEmpty

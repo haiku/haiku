@@ -14,25 +14,25 @@
 
 class ServerFont;
 
-class AGGTextRenderer : public TextRenderer {
+class AGGTextRenderer {
  public:
 								AGGTextRenderer();
-								AGGTextRenderer(BMessage* archive);
-								AGGTextRenderer(const AGGTextRenderer& from);
 	virtual						~AGGTextRenderer();
 
-	virtual	void				SetTo(const TextRenderer* other);
+			bool				SetFont(const ServerFont &font);
+			void				Unset();
 
-	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+			void				SetPointSize(float size);
 
-	virtual	bool				SetFont(const ServerFont &font);
-	virtual	void				Unset();
+			void				SetHinting(bool hinting);
+			bool				Hinting() const
+									{ return fHinted; }
 
-	virtual	const char*			Family() const;
-	virtual	const char*			Style() const;
-	virtual	const char*			PostScriptName() const;
+			void				SetAntialiasing(bool antialiasing);
+			bool				Antialiasing() const
+									{ return fAntialias; }
 
-	virtual	BRect				RenderString(const char* utf8String,
+			BRect				RenderString(const char* utf8String,
 											 uint32 length,
 											 font_renderer_solid_type* solidRenderer,
 											 font_renderer_bin_type* binRenderer,
@@ -41,7 +41,14 @@ class AGGTextRenderer : public TextRenderer {
 											 bool dryRun = false,
 											 BPoint* nextCharPos = NULL);
 
+			double				StringWidth(const char* utf8String,
+											uint32 length);
+
  private:
+			status_t			_PrepareUnicodeBuffer(const char* utf8String,
+													  uint32 length,
+													  uint32* glyphCount);
+
 
 	typedef agg::font_engine_freetype_int32				font_engine_type;
 	typedef agg::font_cache_manager<font_engine_type>	font_manager_type;
@@ -61,6 +68,10 @@ class AGGTextRenderer : public TextRenderer {
 
 	char*						fUnicodeBuffer;
 	int32						fUnicodeBufferSize;
+
+	bool						fHinted;		// is glyph hinting active?
+	bool						fAntialias;		// is anti-aliasing active?
+	bool						fKerning;
 };
 
 #endif // AGG_TEXT_RENDERER_H

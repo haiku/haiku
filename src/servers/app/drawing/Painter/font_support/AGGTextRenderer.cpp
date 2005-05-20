@@ -17,18 +17,7 @@
 #include <agg_bounding_rect.h>
 #include <agg_conv_segmentator.h>
 #include <agg_conv_transform.h>
-//#include <agg_rendering_buffer.h>
-//#include <agg_scanline_bin.h>
-//#include <agg_renderer_mclip.h>
-//#include <agg_renderer_scanline.h>
-//#include <agg_renderer_primitives.h>
-//#include <agg_rasterizer_scanline_aa.h>
-//#include <agg_pixfmt_gray8.h>
 #include <agg_trans_affine.h>
-
-//#include "support.h"
-
-#include "FontManager.h"
 
 #include "AGGTextRenderer.h"
 
@@ -49,43 +38,18 @@ rect_to_int(BRect r,
 
 // constructor
 AGGTextRenderer::AGGTextRenderer()
-	: TextRenderer(),
-	  fFontEngine(ftlib),
+	: fFontEngine(ftlib),
 	  fFontManager(fFontEngine),
-	  fCurves(fFontManager.path_adaptor()),
-	  fContour(fCurves),
-	  fUnicodeBuffer((char*)malloc(DEFAULT_UNI_CODE_BUFFER_SIZE)),
-	  fUnicodeBufferSize(DEFAULT_UNI_CODE_BUFFER_SIZE)
-{
-	fCurves.approximation_scale(2.0);
-	fContour.auto_detect_orientation(false);
-	fFontEngine.flip_y(FLIP_Y);
-}
 
-AGGTextRenderer::AGGTextRenderer(BMessage* archive)
-	: TextRenderer(archive),
-	  fFontEngine(ftlib),
-	  fFontManager(fFontEngine),
 	  fCurves(fFontManager.path_adaptor()),
 	  fContour(fCurves),
-	  fUnicodeBuffer((char*)malloc(DEFAULT_UNI_CODE_BUFFER_SIZE)),
-	  fUnicodeBufferSize(DEFAULT_UNI_CODE_BUFFER_SIZE)
-{
-//printf("AGGTextRenderer::AGGTextRenderer(BMessage*)\n");
-	fCurves.approximation_scale(2.0);
-	fContour.auto_detect_orientation(false);
-	fFontEngine.flip_y(FLIP_Y);
-}
 
-// constructor
-AGGTextRenderer::AGGTextRenderer(const AGGTextRenderer& from)
-	: TextRenderer(from),
-	  fFontEngine(ftlib),
-	  fFontManager(fFontEngine),
-	  fCurves(fFontManager.path_adaptor()),
-	  fContour(fCurves),
 	  fUnicodeBuffer((char*)malloc(DEFAULT_UNI_CODE_BUFFER_SIZE)),
-	  fUnicodeBufferSize(DEFAULT_UNI_CODE_BUFFER_SIZE)
+	  fUnicodeBufferSize(DEFAULT_UNI_CODE_BUFFER_SIZE),
+
+	  fHinted(true),
+	  fAntialias(true),
+	  fKerning(true)
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
@@ -99,99 +63,60 @@ AGGTextRenderer::~AGGTextRenderer()
 	free(fUnicodeBuffer);
 }
 
-// SetTo
-void
-AGGTextRenderer::SetTo(const TextRenderer* other)
-{
-	const AGGTextRenderer* casted = dynamic_cast<const AGGTextRenderer*>(other);
-	if (casted) {
-		TextRenderer::SetTo(other);
-	}
-}
-
-// Archive
-status_t
-AGGTextRenderer::Archive(BMessage* into, bool deep) const
-{
-	status_t status = TextRenderer::Archive(into, deep);
-	if (status >= B_OK) {
-		status = into->AddString("class", "AGGTextRenderer");
-	}
-	return status;
-}
-
 // SetFont
 bool
 AGGTextRenderer::SetFont(const ServerFont &font)
 {
-//printf("AGGTextRenderer::SetFont(%s, %s)\n", font.GetFamily(), font.GetStyle());
-	if (fFontEngine.load_font(font, agg::glyph_ren_native_gray8)) {			
-//	if (fFontEngine.load_font(font, agg::glyph_ren_outline)) {
-		return TextRenderer::SetFont(font);
-	} else {
+	bool success = false;
+	if (font.Rotation() == 0.0 && font.Shear() == 90.0)
+		success = fFontEngine.load_font(font, agg::glyph_ren_native_gray8);
+	else
+		success = fFontEngine.load_font(font, agg::glyph_ren_outline);
+
+	if (!success) {
 		fprintf(stderr, "font could not be loaded\n");
+		return false;
 	}
-	return false;
+
+	fFontEngine.hinting(fHinted);
+
+	SetPointSize(font.Size());
+
+	return true;
+}
+
+// SetPointSize
+void
+AGGTextRenderer::SetPointSize(float size)
+{
+	if (size != fFontEngine.height()) {
+		fFontEngine.height(size);
+		fFontEngine.width(size);
+	}
+}
+
+// SetHinting
+void
+AGGTextRenderer::SetHinting(bool hinting)
+{
+	if (fHinted != hinting) {
+		fHinted = hinting;
+		fFontEngine.hinting(fHinted);
+	}
+}
+
+// SetAntialiasing
+void
+AGGTextRenderer::SetAntialiasing(bool antialiasing)
+{
+	fAntialias = antialiasing;
 }
 
 // Unset
 void
 AGGTextRenderer::Unset()
 {
-}
-
-// Family
-const char*
-AGGTextRenderer::Family() const
-{
-	const char* family = NULL;
-	if (fFontFilePath) {
-		entry_ref ref;
-		if (get_ref_for_path(fFontFilePath, &ref) >= B_OK) {
-			FontManager* fm = FontManager::Default();
-			if (fm->Lock()) {
-				family = fm->FamilyFor(&ref);
-				fm->Unlock();
-			}
-		}
-	}
-	return family;
-}
-
-// Style
-const char*
-AGGTextRenderer::Style() const
-{
-	const char* style = NULL;
-	if (fFontFilePath) {
-		entry_ref ref;
-		if (get_ref_for_path(fFontFilePath, &ref) >= B_OK) {
-			FontManager* fm = FontManager::Default();
-			if (fm->Lock()) {
-				style = fm->StyleFor(&ref);
-				fm->Unlock();
-			}
-		}
-	}
-	return style;
-}
-
-// PostScriptName
-const char*
-AGGTextRenderer::PostScriptName() const
-{
-	const char* name = NULL;
-	if (fFontFilePath) {
-		entry_ref ref;
-		if (get_ref_for_path(fFontFilePath, &ref) >= B_OK) {
-			FontManager* fm = FontManager::Default();
-			if (fm->Lock()) {
-				name = fm->PostScriptNameFor(&ref);
-				fm->Unlock();
-			}
-		}
-	}
-	return name;
+	// TODO ? release some kind of reference count on the ServerFont?
 }
 
 // RenderString
@@ -207,36 +132,18 @@ AGGTextRenderer::RenderString(const char* string,
 {
 //printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
 
-	fFontEngine.hinting(fHinted);
-	fFontEngine.height((int32)(fPtSize));
-	fFontEngine.width((int32)(fPtSize));
-
 	BRect bounds(0.0, 0.0, -1.0, -1.0);
 
-	fCurves.approximation_scale(transform.scale());
+	uint32 glyphCount;
+	if (_PrepareUnicodeBuffer(string, length, &glyphCount) >= B_OK) {
 
-	// use a transformation behind the curves
-	// (only if glyph->data_type == agg::glyph_data_outline)
-	// in the pipeline for the rasterizer
-	typedef agg::conv_transform<conv_font_curve_type, agg::trans_affine>	conv_font_trans_type;
-	conv_font_trans_type ftrans(fCurves, transform);
-
-	int32 srcLength = min_c(length, strlen(string));
-	int32 dstLength = srcLength * 4;
-
-	if (dstLength > fUnicodeBufferSize) {
-		fUnicodeBufferSize = dstLength;
-		fUnicodeBuffer = (char*)realloc((void*)fUnicodeBuffer, fUnicodeBufferSize);
-	}
-
-	int32 state = 0;
-	status_t ret;
-	if ((ret = convert_from_utf8(B_UNICODE_CONVERSION, 
-								 string, &srcLength,
-								 fUnicodeBuffer, &dstLength,
-								 &state, B_SUBSTITUTE)) >= B_OK
-		&& (ret = swap_data(B_INT16_TYPE, fUnicodeBuffer, dstLength,
-							B_SWAP_BENDIAN_TO_HOST)) >= B_OK) {
+		fCurves.approximation_scale(transform.scale());
+	
+		// use a transformation behind the curves
+		// (only if glyph->data_type == agg::glyph_data_outline)
+		// in the pipeline for the rasterizer
+		typedef agg::conv_transform<conv_font_curve_type, agg::trans_affine>	conv_font_trans_type;
+		conv_font_trans_type ftrans(fCurves, transform);
 
 		uint16* p = (uint16*)fUnicodeBuffer;
 
@@ -251,7 +158,7 @@ AGGTextRenderer::RenderString(const char* string,
 		BPoint transformOffset(0.0, 0.0);
 		transform.Transform(&transformOffset);
 
-		for (int32 i = 0; i < dstLength / 2; i++) {
+		for (uint32 i = 0; i < glyphCount; i++) {
 
 /*			// line break (not supported by R5)
 			if (*p == '\n') {
@@ -337,6 +244,14 @@ AGGTextRenderer::RenderString(const char* string,
 				}
 				if (glyphBounds.IsValid())
 					bounds = bounds.IsValid() ? bounds | glyphBounds : glyphBounds;
+				else {
+					if (bounds.IsValid()) {
+						bounds.right += glyph->advance_x;
+						bounds.bottom += glyph->advance_y;
+					} else {
+						bounds.Set(0.0, 0.0, glyph->advance_x, glyph->advance_y);
+					}
+				}
 
 				// increment pen position
 				advanceX = glyph->advance_x;
@@ -350,11 +265,69 @@ AGGTextRenderer::RenderString(const char* string,
 			nextCharPos->x = x + advanceX;
 			nextCharPos->y = y + advanceY;
 		}
-	} else {
-		fprintf(stderr, "UTF8 -> Unicode conversion failed: %s\n", strerror(ret));
 	}
 
 //	return transform.TransformBounds(bounds);
 	return bounds;
 }
 
+// StringWidth
+double
+AGGTextRenderer::StringWidth(const char* utf8String, uint32 length)
+{
+	double width = 0.0;
+	uint32 glyphCount;
+	if (_PrepareUnicodeBuffer(utf8String, length, &glyphCount) >= B_OK) {
+
+		uint16* p = (uint16*)fUnicodeBuffer;
+
+		double y  = 0.0;
+		const agg::glyph_cache* glyph;
+
+		for (uint32 i = 0; i < glyphCount; i++) {
+
+			if ((glyph = fFontManager.glyph(*p))) {
+
+				if (i > 0 && fKerning) {
+					fFontManager.add_kerning(&width, &y);
+				}
+
+				width += glyph->advance_x;
+			}
+			++p;
+		}
+	}
+	return width;
+}
+
+// _PrepareUnicodeBuffer
+status_t
+AGGTextRenderer::_PrepareUnicodeBuffer(const char* utf8String,
+									   uint32 length, uint32* glyphCount)
+{
+	int32 srcLength = length;
+	int32 dstLength = srcLength * 4;
+
+	// take care of buffer size
+	if (dstLength > fUnicodeBufferSize) {
+		fUnicodeBufferSize = dstLength;
+		fUnicodeBuffer = (char*)realloc((void*)fUnicodeBuffer, fUnicodeBufferSize);
+	}
+
+	int32 state = 0;
+	status_t ret = convert_from_utf8(B_UNICODE_CONVERSION, 
+									 utf8String, &srcLength,
+									 fUnicodeBuffer, &dstLength,
+									 &state, B_SUBSTITUTE);
+
+	if (ret >= B_OK) {
+		*glyphCount = (uint32)(dstLength / 2);
+		ret = swap_data(B_INT16_TYPE, fUnicodeBuffer, dstLength,
+						B_SWAP_BENDIAN_TO_HOST);
+	} else {
+		*glyphCount = 0;
+		fprintf(stderr, "AGGTextRenderer::_PrepareUnicodeBuffer() - UTF8 -> Unicode conversion failed: %s\n", strerror(ret));
+	}
+
+	return ret;
+}
