@@ -290,6 +290,7 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
 	return shapes;
 }
 
+// GetEscapements
 BPoint*
 ServerFont::GetEscapements(const char charArray[], int32 numChars,
 						   BPoint offsetArray[]) const
@@ -353,6 +354,7 @@ is_white_space(uint16 glyph)
 	return false;
 }
 
+// GetEscapements
 bool
 ServerFont::GetEscapements(const char charArray[], int32 numChars,
 						   float widthArray[], escapement_delta delta) const
@@ -389,13 +391,35 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 		for (int i = 0; i < numChars; i++) {
 			FT_Load_Char(face, glyphIndex[i], FT_LOAD_NO_BITMAP);
 //			widthArray[i] = float(face->glyph->metrics.width / 64) / fSize;
-			widthArray[i] = float(face->glyph->metrics.horiAdvance / 64) / fSize;
+			widthArray[i] = ((float)face->glyph->metrics.horiAdvance / 64.0) / fSize;
 			widthArray[i] += is_white_space(glyphIndex[i]) ? delta.space : delta.nonspace;
 		}
 	}
 	delete[] convertedBuffer;
 
 	return ret >= B_OK;
+}
+
+// StringWidth
+float
+ServerFont::StringWidth(const char* string, int32 numChars) const
+{
+	// TODO: we're lazy for now and reuse the existing
+	// functionality in GetEscapements
+	escapement_delta delta;
+	delta.space = 0.0;
+	delta.nonspace = 0.0;
+
+	float* widthArray = new float[numChars];
+
+	GetEscapements(string, numChars, widthArray, delta);
+	float width = 0.0;
+	for (int32 i = 0; i < numChars; i++)
+		width += widthArray[i] * fSize;
+
+	delete[] widthArray;
+
+	return width;
 }
 
 /*!

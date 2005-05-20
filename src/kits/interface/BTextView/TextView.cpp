@@ -1783,7 +1783,10 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		result.x += modifier;
 	}
 	// convert from text rect coordinates
-	result.x += fTextRect.left - 1.0;
+	// NOTE: I didn't understand why "- 1.0"
+	// and it works only correct without it on Haiku app_server.
+	// Feel free to enlighten me though!
+	result.x += fTextRect.left;// - 1.0;
 
 	// round up
 	result.x = ceil(result.x);

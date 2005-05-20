@@ -1215,8 +1215,8 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				font.SetSize(size);
 				font.SetSpacing(spacing);
 
-				width = desktop->GetDisplayDriver()->StringWidth(string, length, font);
-				
+				width = font.StringWidth(string, length);
+
 				replylink.StartMessage(SERVER_TRUE);
 				replylink.Attach<float>(width);
 				replylink.Flush();
