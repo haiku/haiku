@@ -1205,10 +1205,6 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 		queue->Unlock();
 	}
 
-	// Since we're usually called locked, this is mainly needed
-	// in case we were called from another thread
-	LockLooper();
-
 	// If no mouse update message has been found in the message queue, 
 	// we get the current mouse location and buttons from the app_server
 
@@ -1221,8 +1217,6 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 		owner->fLink->Read<BPoint>(location);
 		owner->fLink->Read((int32 *)buttons, sizeof(int32));
 	}
-
-	UnlockLooper();
 }
 
 
