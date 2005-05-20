@@ -244,14 +244,6 @@ AGGTextRenderer::RenderString(const char* string,
 				}
 				if (glyphBounds.IsValid())
 					bounds = bounds.IsValid() ? bounds | glyphBounds : glyphBounds;
-				else {
-					if (bounds.IsValid()) {
-						bounds.right += glyph->advance_x;
-						bounds.bottom += glyph->advance_y;
-					} else {
-						bounds.Set(0.0, 0.0, glyph->advance_x, glyph->advance_y);
-					}
-				}
 
 				// increment pen position
 				advanceX = glyph->advance_x;

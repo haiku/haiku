@@ -22,7 +22,6 @@
 #include "AGGTextRenderer.h"
 #include "DrawingMode.h"
 #include "DrawingModeFactory.h"
-#include "FontManager.h"
 #include "PatternHandler.h"
 #include "RenderingBuffer.h"
 #include "ShapeConverter.h"

@@ -10,7 +10,7 @@
 #include "agg_font_freetype.h"
 #include "defines.h"
 
-#include "TextRenderer.h"
+#include "Transformable.h"
 
 class ServerFont;
 
