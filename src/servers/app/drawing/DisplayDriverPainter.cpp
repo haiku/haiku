@@ -378,22 +378,18 @@ DisplayDriverPainter::InvertRect(const BRect &r)
 
 // DrawBitmap
 void
-DisplayDriverPainter::DrawBitmap(BRegion *region, ServerBitmap *bitmap,
+DisplayDriverPainter::DrawBitmap(ServerBitmap *bitmap,
 								 const BRect &source, const BRect &dest,
 								 const DrawData *d)
 {
-	// catch PicturePlayer giving us a NULL region
-	if (!region)
-		return;
-
 	if (Lock()) {
-		fGraphicsCard->HideSoftwareCursor();
+		BRect clipped = fPainter->ClipRect(dest);
+		fGraphicsCard->HideSoftwareCursor(clipped);
 
-		fPainter->ConstrainClipping(*region);
 		fPainter->SetDrawData(d);
 		fPainter->DrawBitmap(bitmap, source, dest);
 
-		fGraphicsCard->Invalidate(dest);
+		fGraphicsCard->Invalidate(clipped);
 		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();

@@ -423,104 +423,6 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 	switch(code)
 	{
 		//--------- BView Messages -----------------
-		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT: Layer name: %s\n", fName, cl->fName->String()));
-			int32		bitmapToken;
-			BPoint 		point;
-			
-			link.Read<int32>(&bitmapToken);
-			link.Read<BPoint>(&point);
-			
-			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
-			if(sbmp)
-			{
-				BRect src, dst;
-				BRegion region;
-				
-				src = sbmp->Bounds();
-				dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
-				region = cl->fParent->ConvertFromParent(&(cl->fFull));
-				dst.OffsetBy(point);
-				
-				cl->GetDisplayDriver()->DrawBitmap(&region, sbmp, src, dst, cl->fLayerData);
-			}
-			
-			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
-			break;
-		}
-		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT: Layer name: %s\n", fName, cl->fName->String()));
-			int32		bitmapToken;
-			BPoint 		point;
-			
-			link.Read<int32>(&bitmapToken);
-			link.Read<BPoint>(&point);
-			
-			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
-			if(sbmp)
-			{
-				BRect src, dst;
-				BRegion region;
-				
-				src = sbmp->Bounds();
-				dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
-				region = cl->fParent->ConvertFromParent(&(cl->fFull));
-				dst.OffsetBy(point);
-				
-				cl->GetDisplayDriver()->DrawBitmap(&region, sbmp, src, dst, cl->fLayerData);
-			}
-			break;
-		}
-		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT: Layer name: %s\n", fName, cl->fName->String()));
-			int32 bitmapToken;
-			BRect srcRect, dstRect;
-			
-			link.Read<int32>(&bitmapToken);
-			link.Read<BRect>(&dstRect);
-			link.Read<BRect>(&srcRect);
-			
-			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
-			if(sbmp)
-			{
-				BRegion region;
-				BRect dst;
-				region = cl->fParent->ConvertFromParent(&(cl->fFull));
-				dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
-				dstRect.OffsetBy(dst.left, dst.top);
-				
-				cl->GetDisplayDriver()->DrawBitmap(&region, sbmp, srcRect, dstRect, cl->fLayerData);
-			}
-			
-			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
-			break;
-		}
-		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT: Layer name: %s\n", fName, cl->fName->String()));
-			int32 bitmapToken;
-			BRect srcRect, dstRect;
-			
-			link.Read<int32>(&bitmapToken);
-			link.Read<BRect>(&dstRect);
-			link.Read<BRect>(&srcRect);
-			
-			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
-			if(sbmp)
-			{
-				BRegion region;
-				BRect dst;
-				region = cl->fParent->ConvertFromParent(&(cl->fFull));
-				dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
-				dstRect.OffsetBy(dst.left, dst.top);
-				
-				cl->GetDisplayDriver()->DrawBitmap(&region, sbmp, srcRect, dstRect, cl->fLayerData);
-			}
-			break;
-		}
 		case AS_LAYER_SCROLL:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SCROLL: Layer name: %s\n", fName, cl->fName->String()));
@@ -1454,28 +1356,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			STRACE(("ServerWindow %s: Message Zoom unimplemented\n",fName));
 			break;
 		}
-		default:
-		{
-			DispatchGraphicsMessage(code, link);
-		}
-	}
-}
-		// -------------------- Graphics messages ----------------------------------
-inline
-void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
-{
-	fWinBorder->GetRootLayer()->Lock();
-	BRegion		rreg(cl->fVisible);
-	if (fWinBorder->fInUpdate)
-		rreg.IntersectWith(&fWinBorder->yUpdateReg);
-
-	desktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
-//	rgb_color  rrr = cl->fLayerData->viewcolor.GetColor32();
-//	RGBColor c(rand()%255,rand()%255,rand()%255);
-//	desktop->GetDisplayDriver()->FillRect(BRect(0,0,639,479), c);
-
-	switch (code)
-	{
+		// Some BView drawing messages, but which don't need clipping
 		case AS_LAYER_SET_HIGH_COLOR:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fName, cl->fName->String()));
@@ -1509,6 +1390,149 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			break;
 		}	
+		case AS_MOVEPENTO:
+		{
+			DTRACE(("ServerWindow %s: Message AS_MOVEPENTO\n",fName));
+			
+			float x,y;
+			
+			link.Read<float>(&x);
+			link.Read<float>(&y);
+			if(cl && cl->fLayerData)
+				cl->fLayerData->SetPenLocation(BPoint(x, y));
+			
+			break;
+		}
+		case AS_SETPENSIZE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_SETPENSIZE\n",fName));
+			float size;
+			
+			link.Read<float>(&size);
+			if(cl && cl->fLayerData)
+				cl->fLayerData->SetPenSize(size);
+			
+			break;
+		}
+		case AS_SET_FONT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_SET_FONT\n",fName));
+			// TODO: Implement AS_SET_FONT?
+			// Confusing!! But it works already!
+			break;
+		}
+		case AS_SET_FONT_SIZE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_SET_FONT_SIZE\n",fName));
+			// TODO: Implement AS_SET_FONT_SIZE?
+			break;
+		}
+		case AS_AREA_MESSAGE:
+		{
+			STRACE(("ServerWindow %s: Message AS_AREA_MESSAGE\n",fName));
+			// This occurs in only one kind of case: a message is too big to send over a port. This
+			// is really an edge case, so this shouldn't happen *too* often
+			
+			// Attached Data:
+			// 1) area_id id of an area already owned by the server containing the message
+			// 2) size_t offset of the pointer in the area
+			// 3) size_t size of the message
+			
+			area_id area;
+			size_t offset;
+			size_t msgsize;
+			area_info ai;
+			int8 *msgpointer;
+			
+			link.Read<area_id>(&area);
+			link.Read<size_t>(&offset);
+			link.Read<size_t>(&msgsize);
+			
+			// Part sanity check, part get base pointer :)
+			if(get_area_info(area,&ai)!=B_OK)
+				break;
+			
+			msgpointer=(int8*)ai.address + offset;
+			
+			RAMLinkMsgReader mlink(msgpointer);
+			DispatchMessage(mlink.Code(),mlink);
+			
+			// This is a very special case in the sense that when ServerMemIO is used for this 
+			// purpose, it will be set to NOT automatically free the memory which it had 
+			// requested. This is the server's job once the message has been dispatched.
+			fServerApp->AppAreaPool()->ReleaseBuffer(msgpointer);
+			
+			break;
+		}
+		case AS_SYNC:
+		{
+			// TODO: AS_SYNC is a no-op for now, just to get things working
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Flush();
+			break;
+		}
+		case AS_LAYER_DRAG_IMAGE:
+		{
+			// TODO: Implement AS_LAYER_DRAG_IMAGE
+			STRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fName));
+			break;
+		}
+		case AS_LAYER_DRAG_RECT:
+		{
+			// TODO: Implement AS_LAYER_DRAG_RECT
+			STRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fName));
+			DTRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fName));
+			break;
+		}
+		case AS_LAYER_GET_MOUSE_COORDS:
+		{
+			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS\n",fName));
+			
+			// Attached Data:
+			// 1) port_id reply port
+			
+			// Returns
+			// 1) BPoint mouse location
+			// 2) int32 button state
+			
+			// For now, it's unimplemented, but this is a synchronous call, so to prevent debugging of
+			// applications which make this call, we'll reply with a SERVER_FALSE until it is implemeneted
+			
+			port_id replyport;
+			link.Read<port_id>(&replyport);
+			
+			int32 buttons=desktop->ActiveRootLayer()->Buttons();
+			
+			BPortLink replylink(replyport);
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<BPoint>(desktop->GetDisplayDriver()->GetCursorPosition());
+			replylink.Attach<int32>(buttons);
+			replylink.Flush();
+			break;
+		}
+		default:
+		{
+			DispatchGraphicsMessage(code, link);
+		}
+	}
+}
+		// -------------------- Graphics messages ----------------------------------
+inline
+void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
+{
+	fWinBorder->GetRootLayer()->Lock();
+	BRegion		rreg(cl->fVisible);
+	if (fWinBorder->fInUpdate)
+		rreg.IntersectWith(&fWinBorder->yUpdateReg);
+
+	desktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
+//	rgb_color  rrr = cl->fLayerData->viewcolor.GetColor32();
+//	RGBColor c(rand()%255,rand()%255,rand()%255);
+//	desktop->GetDisplayDriver()->FillRect(BRect(0,0,639,479), c);
+
+	switch (code)
+	{
 		case AS_STROKE_LINE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE\n",fName));
@@ -1572,6 +1596,92 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<BRect>(&rect);
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->FillRect(cl->ConvertToTop(rect),cl->fLayerData);
+			break;
+		}
+		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT: Layer name: %s\n", fName, cl->fName->String()));
+			int32		bitmapToken;
+			BPoint 		point;
+			
+			link.Read<int32>(&bitmapToken);
+			link.Read<BPoint>(&point);
+			
+			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
+			if (sbmp) {
+
+				BRect src = sbmp->Bounds();
+				BRect dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
+				dst.OffsetBy(point);
+
+				cl->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, cl->fLayerData);
+			}
+			
+			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
+			break;
+		}
+		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT: Layer name: %s\n", fName, cl->fName->String()));
+			int32		bitmapToken;
+			BPoint 		point;
+			
+			link.Read<int32>(&bitmapToken);
+			link.Read<BPoint>(&point);
+			
+			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
+			if (sbmp) {
+
+				BRect src = sbmp->Bounds();
+				BRect dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
+				dst.OffsetBy(point);
+
+				cl->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, cl->fLayerData);
+			}
+			break;
+		}
+		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT: Layer name: %s\n", fName, cl->fName->String()));
+			int32 bitmapToken;
+			BRect srcRect, dstRect;
+			
+			link.Read<int32>(&bitmapToken);
+			link.Read<BRect>(&dstRect);
+			link.Read<BRect>(&srcRect);
+			
+			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
+			if (sbmp) {
+				BRect dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
+				dstRect.OffsetBy(dst.left, dst.top);
+// TODO: why is this not working:
+//				cl->ConvertToTop(dstRect);
+
+				cl->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, cl->fLayerData);
+			}
+			
+			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
+			break;
+		}
+		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT: Layer name: %s\n", fName, cl->fName->String()));
+			int32 bitmapToken;
+			BRect srcRect, dstRect;
+			
+			link.Read<int32>(&bitmapToken);
+			link.Read<BRect>(&dstRect);
+			link.Read<BRect>(&srcRect);
+			
+			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
+			if (sbmp) {
+				BRect dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
+				dstRect.OffsetBy(dst.left, dst.top);
+// TODO: why is this not working:
+//				cl->ConvertToTop(dstRect);
+
+				cl->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, cl->fLayerData);
+			}
 			break;
 		}
 		case AS_STROKE_ARC:
@@ -1922,127 +2032,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 						cl->fLayerData);
 			
 			free(string);
-			break;
-		}
-		case AS_MOVEPENTO:
-		{
-			DTRACE(("ServerWindow %s: Message AS_MOVEPENTO\n",fName));
-			
-			float x,y;
-			
-			link.Read<float>(&x);
-			link.Read<float>(&y);
-			if(cl && cl->fLayerData)
-				cl->fLayerData->SetPenLocation(BPoint(x, y));
-			
-			break;
-		}
-		case AS_SETPENSIZE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_SETPENSIZE\n",fName));
-			float size;
-			
-			link.Read<float>(&size);
-			if(cl && cl->fLayerData)
-				cl->fLayerData->SetPenSize(size);
-			
-			break;
-		}
-		case AS_SET_FONT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_SET_FONT\n",fName));
-			// TODO: Implement AS_SET_FONT?
-			// Confusing!! But it works already!
-			break;
-		}
-		case AS_SET_FONT_SIZE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_SET_FONT_SIZE\n",fName));
-			// TODO: Implement AS_SET_FONT_SIZE?
-			break;
-		}
-		case AS_AREA_MESSAGE:
-		{
-			STRACE(("ServerWindow %s: Message AS_AREA_MESSAGE\n",fName));
-			// This occurs in only one kind of case: a message is too big to send over a port. This
-			// is really an edge case, so this shouldn't happen *too* often
-			
-			// Attached Data:
-			// 1) area_id id of an area already owned by the server containing the message
-			// 2) size_t offset of the pointer in the area
-			// 3) size_t size of the message
-			
-			area_id area;
-			size_t offset;
-			size_t msgsize;
-			area_info ai;
-			int8 *msgpointer;
-			
-			link.Read<area_id>(&area);
-			link.Read<size_t>(&offset);
-			link.Read<size_t>(&msgsize);
-			
-			// Part sanity check, part get base pointer :)
-			if(get_area_info(area,&ai)!=B_OK)
-				break;
-			
-			msgpointer=(int8*)ai.address + offset;
-			
-			RAMLinkMsgReader mlink(msgpointer);
-			DispatchMessage(mlink.Code(),mlink);
-			
-			// This is a very special case in the sense that when ServerMemIO is used for this 
-			// purpose, it will be set to NOT automatically free the memory which it had 
-			// requested. This is the server's job once the message has been dispatched.
-			fServerApp->AppAreaPool()->ReleaseBuffer(msgpointer);
-			
-			break;
-		}
-		case AS_SYNC:
-		{
-			// TODO: AS_SYNC is a no-op for now, just to get things working
-			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Flush();
-			break;
-		}
-		case AS_LAYER_DRAG_IMAGE:
-		{
-			// TODO: Implement AS_LAYER_DRAG_IMAGE
-			STRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fName));
-			DTRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fName));
-			break;
-		}
-		case AS_LAYER_DRAG_RECT:
-		{
-			// TODO: Implement AS_LAYER_DRAG_RECT
-			STRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fName));
-			DTRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fName));
-			break;
-		}
-		case AS_LAYER_GET_MOUSE_COORDS:
-		{
-			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS\n",fName));
-			
-			// Attached Data:
-			// 1) port_id reply port
-			
-			// Returns
-			// 1) BPoint mouse location
-			// 2) int32 button state
-			
-			// For now, it's unimplemented, but this is a synchronous call, so to prevent debugging of
-			// applications which make this call, we'll reply with a SERVER_FALSE until it is implemeneted
-			
-			port_id replyport;
-			link.Read<port_id>(&replyport);
-			
-			int32 buttons=desktop->ActiveRootLayer()->Buttons();
-			
-			BPortLink replylink(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<BPoint>(desktop->GetDisplayDriver()->GetCursorPosition());
-			replylink.Attach<int32>(buttons);
-			replylink.Flush();
 			break;
 		}
 		default:
