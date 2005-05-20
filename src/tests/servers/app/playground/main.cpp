@@ -10,7 +10,7 @@ main(int argc, char** argv)
 {
 	BApplication* app = new BApplication("application/x.vnd-Haiku.Objects");
 
-	BRect frame(50.0, 50.0, 450.0, 430.0);
+	BRect frame(50.0, 50.0, 450.0, 450.0);
 	(new ObjectWindow(frame, "Playground"))->Show();
 
 	app->Run();

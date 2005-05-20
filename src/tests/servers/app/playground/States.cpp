@@ -143,7 +143,7 @@ class RoundRectState : public State {
 						if (fValid) {
 							view->SetHighColor(fColor);
 							BRect r = _ValidRect();
-							float radius = min_c(r.Width() / 4.0, r.Height() / 4.0);
+							float radius = min_c(r.Width() / 3.0, r.Height() / 3.0);
 							if (fFill)
 								view->FillRoundRect(r, radius, radius);
 							else {

@@ -17,7 +17,7 @@ if ( $(TARGET_PLATFORM) = haiku ) {
 } else {
 	# for running in the Haiku app_server under R5:
 	LinkSharedOSLibs Playground :
-#		<boot!home!config!lib>libopenbeos.so ;
-		be ;
+		<boot!home!config!lib>libopenbeos.so ;
+#		be ;
 }
 

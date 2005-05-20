@@ -5,16 +5,9 @@
 
 #include <Window.h>
 
-/*
-class Box;
-class Button;
-class CheckBox;
-class Menu;
-class MenuBar;
-class RadioButton;
-class TextView;*/
 class BButton;
 class BCheckBox;
+class BMenuField;
 class BTextControl;
 class ObjectView;
 
@@ -29,12 +22,18 @@ class ObjectWindow : public BWindow {
 
  private:
 			void		_UpdateControls() const;
+			void		_UpdateColorControls() const;
 			rgb_color	_GetColor() const;
 
 	ObjectView*			fObjectView;
 
 	BButton*			fNewB;
 	BButton*			fClearB;
+
+	BButton*			fUndoB;
+	BButton*			fRedoB;
+
+	BMenuField*			fDrawingModeMF;
 
 	BTextControl*		fRedTC;
 	BTextControl*		fGreenTC;

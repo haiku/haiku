@@ -25,6 +25,12 @@ ObjectView::ObjectView(BRect frame, const char* name,
 	rgb_color bg = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_1_TINT);
 	SetViewColor(bg);
 	SetLowColor(bg);
+
+	BFont font;
+	GetFont(&font);
+	font.SetSize(20.0);
+	font.SetRotation(6.0);
+	SetFont(&font, B_FONT_ROTATION | B_FONT_SIZE);
 }
 
 // AttachedToWindow
@@ -66,11 +72,12 @@ ObjectView::Draw(BRect updateRect)
 	message = "to draw an object!";
 	width = StringWidth(message);
 	p.x = r.left + r.Width() / 2.0 - width / 2.0;
-	p.y += 20;
+	p.y += 25;
 
 	DrawString(message, p);
 
 	SetDrawingMode(B_OP_ALPHA);
+//	SetDrawingMode(B_OP_OVER);
 	for (int32 i = 0; State* state = (State*)fStateList.ItemAt(i); i++)
 		state->Draw(this);
 

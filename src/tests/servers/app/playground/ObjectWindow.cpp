@@ -10,7 +10,9 @@
 #include <CheckBox.h>
 #include <Menu.h>
 #include <MenuBar.h>
+#include <MenuField.h>
 #include <MenuItem.h>
+#include <PopUpMenu.h>
 #include <String.h>
 #include <RadioButton.h>
 #include <TextControl.h>
@@ -26,6 +28,7 @@ enum {
 	MSG_SET_FILL_OR_STROKE	= 'stfs',
 	MSG_SET_COLOR			= 'stcl',
 	MSG_SET_PEN_SIZE		= 'stps',
+	MSG_SET_DRAWING_MODE	= 'stdm',
 
 	MSG_NEW_OBJECT			= 'nobj',
 
@@ -123,6 +126,25 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 	radioButton = new BRadioButton(b, "radio 4", "Ellipse", message);
 	controlGroup->AddChild(radioButton);
 
+	// drawing mode
+/*	BPopUpMenu* popupMenu = new BPopUpMenu("<pick>");
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_COPY);
+	popupMenu->AddItem(new BMenuItem("B_OP_COPY", message));
+
+	message = new BMessage(MSG_SET_DRAWING_MODE);
+	message->AddInt32("mode", B_OP_OVER);
+	popupMenu->AddItem(new BMenuItem("B_OP_OVER", message));
+
+	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
+	fDrawingModeMF = new BMenuField(b, "drawing mode field", "Mode",
+									popupMenu);
+
+	controlGroup->AddChild(fDrawingModeMF);
+
+	fDrawingModeMF->SetDivider(fDrawingModeMF->StringWidth(fDrawingModeMF->Label()) + 10.0);
+*/
 	// red text control
 	b.OffsetBy(0, radioButton->Bounds().Height() + 5.0);
 	fRedTC = new BTextControl(b, "red text control", "Red", "",
@@ -217,6 +239,7 @@ ObjectWindow::MessageReceived(BMessage* message)
 		}
 		case MSG_SET_COLOR:
 			fObjectView->SetStateColor(_GetColor());
+			_UpdateColorControls();
 			break;
 		case MSG_OBJECT_COUNT_CHANGED:
 			fClearB->SetEnabled(fObjectView->CountObjects() > 0);
@@ -225,8 +248,8 @@ ObjectWindow::MessageReceived(BMessage* message)
 			fObjectView->SetState(NULL);
 			break;
 		case MSG_CLEAR: {
-			BAlert *alert = new BAlert("Playground", "Do you really want to clear all drawing objects?", "No", "Yes");
-			if (alert->Go() == 1)
+//			BAlert *alert = new BAlert("Playground", "Do you really want to clear all drawing objects?", "No", "Yes");
+//			if (alert->Go() == 1)
 				fObjectView->MakeEmpty();
 			break;
 		}
@@ -241,6 +264,29 @@ ObjectWindow::MessageReceived(BMessage* message)
 // _UpdateControls
 void
 ObjectWindow::_UpdateControls() const
+{
+	_UpdateColorControls();
+
+	// update buttons
+	fClearB->SetEnabled(fObjectView->CountObjects() > 0);
+
+	fFillCB->SetEnabled(fObjectView->ObjectType() != OBJECT_LINE);
+
+	// pen size
+	char string[32];
+	sprintf(string, "%.1f", fObjectView->StatePenSize());
+	fPenSizeTC->SetText(string);
+
+	// disable penSize if fill is on
+	if (!fFillCB->IsEnabled())
+		fPenSizeTC->SetEnabled(true);
+	else
+		fPenSizeTC->SetEnabled(fFillCB->Value() == B_CONTROL_OFF);
+}
+
+// _UpdateColorControls
+void
+ObjectWindow::_UpdateColorControls() const
 {
 	// update color
 	rgb_color c = fObjectView->StateColor();
@@ -257,20 +303,6 @@ ObjectWindow::_UpdateControls() const
 
 	sprintf(string, "%d", c.alpha);
 	fAlphaTC->SetText(string);
-
-
-	// update buttons
-	fClearB->SetEnabled(fObjectView->CountObjects() > 0);
-
-	fFillCB->SetEnabled(fObjectView->ObjectType() != OBJECT_LINE);
-
-	// disable penSize if fill is on
-	sprintf(string, "%.1f", fObjectView->StatePenSize());
-	fPenSizeTC->SetText(string);
-	if (!fFillCB->IsEnabled())
-		fPenSizeTC->SetEnabled(true);
-	else
-		fPenSizeTC->SetEnabled(fFillCB->Value() == B_CONTROL_OFF);
 }
 
 // _GetColor
