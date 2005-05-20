@@ -1487,34 +1487,24 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_GET_MOUSE_COORDS:
 		{
-			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS\n",fName));
-			
-			// Attached Data:
-			// 1) port_id reply port
-			
+			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS\n", fName));
+
+			fMsgSender->StartMessage(SERVER_TRUE);
+
 			// Returns
 			// 1) BPoint mouse location
 			// 2) int32 button state
-			
-			// For now, it's unimplemented, but this is a synchronous call, so to prevent debugging of
-			// applications which make this call, we'll reply with a SERVER_FALSE until it is implemeneted
-			
-			port_id replyport;
-			link.Read<port_id>(&replyport);
-			
-			int32 buttons=desktop->ActiveRootLayer()->Buttons();
-			
-			BPortLink replylink(replyport);
-			replylink.StartMessage(SERVER_TRUE);
-			replylink.Attach<BPoint>(desktop->GetDisplayDriver()->GetCursorPosition());
-			replylink.Attach<int32>(buttons);
-			replylink.Flush();
+
+			fMsgSender->Attach<BPoint>(desktop->GetDisplayDriver()->GetCursorPosition());
+			fMsgSender->Attach<int32>(desktop->ActiveRootLayer()->Buttons());
+
+			fMsgSender->Flush();
 			break;
 		}
+
 		default:
-		{
 			DispatchGraphicsMessage(code, link);
-		}
+			break;
 	}
 }
 		// -------------------- Graphics messages ----------------------------------
