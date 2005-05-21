@@ -32,7 +32,7 @@
 #include <string.h>
 #include <OS.h>
 #include <Window.h>
-#include <ScrollBar.h>
+#include "ScrollBar.h"
 
 //#define TEST_MODE
 
@@ -380,8 +380,10 @@ void BScrollBar::SetTarget(BView *target)
 		fTargetName=new char[strlen(target->Name())+1];
 		strcpy(fTargetName,target->Name());
 		
-		// TODO: theoretically, we should also set the target BView's scrollbar
-		// pointer here
+		if(Orientation() == B_VERTICAL)
+			fTarget->fVerScroller=this;
+		else
+			fTarget->fHorScroller=this;
 	}
 	else
 		fTargetName=NULL;
