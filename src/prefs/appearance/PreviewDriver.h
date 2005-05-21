@@ -80,8 +80,7 @@ class PreviewDriver : public DisplayDriver
 
 	virtual void				InvertRect(		const BRect &r);
 
-	virtual	void				DrawBitmap(		BRegion *region,
-												ServerBitmap *bitmap,
+	virtual	void				DrawBitmap(		ServerBitmap *bitmap,
 												const BRect &source,
 												const BRect &dest,
 												const DrawData *d) {}
