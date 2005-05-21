@@ -211,24 +211,8 @@ status_t nv_acc_init_dma()
 		ACCW(HT_VALUE_12, 0x80011144); /* instance $1144, engine = acc engine, CHID = $00 */
 
 //dma 3D test:
-//fixme: replace with NV4/NV10_CONTEXT_SURFACES_2D
-		ACCW(HT_HANDL_13, (0x80000000 | NV3_SURFACE_0)); /* 32bit handle (3D) */
-		ACCW(HT_VALUE_13, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
-
-//fixme: replace with NV4/NV10_CONTEXT_SURFACES_2D
-		ACCW(HT_HANDL_14, (0x80000000 | NV3_SURFACE_1)); /* 32bit handle (3D) */
-		ACCW(HT_VALUE_14, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
-
-//outdated (pre-NV04):
-		ACCW(HT_HANDL_15, (0x80000000 | NV3_SURFACE_2)); /* 32bit handle (nolonger used) */
-		ACCW(HT_VALUE_15, 0x8001114d); /* instance $114d, engine = acc engine, CHID = $00 */
-
-//outdated (pre-NV04):
-		ACCW(HT_HANDL_16, (0x80000000 | NV3_SURFACE_3)); /* 32bit handle (nolonger used) */
-		ACCW(HT_VALUE_16, 0x8001114e); /* instance $114e, engine = acc engine, CHID = $00 */
-
-		ACCW(HT_HANDL_17, (0x80000000 | NV4_CONTEXT_SURFACES_ARGB_ZS)); /* 32bit handle (3D) */
-		ACCW(HT_VALUE_17, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
+		ACCW(HT_HANDL_13, (0x80000000 | NV4_CONTEXT_SURFACES_ARGB_ZS)); /* 32bit handle (3D) */
+		ACCW(HT_VALUE_13, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
 //end dma test.
 	}
 
@@ -387,26 +371,6 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX1_8, 0x00000d01); /* format is A8RGB24, MSB mono */
 		ACCW(PR_CTX2_8, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
-		/* setup set '9' for cmd NV3_SURFACE_0 */
-		ACCW(PR_CTX0_9, 0x00000058); /* NVclass $058, nv10+: little endian */
-		ACCW(PR_CTX1_9, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_9, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-		ACCW(PR_CTX3_9, 0x00000000); /* method traps disabled */
-		/* setup set 'A' for cmd NV3_SURFACE_1 */
-		ACCW(PR_CTX0_A, 0x00000059); /* NVclass $059, nv10+: little endian */
-		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_A, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-		ACCW(PR_CTX3_A, 0x00000000); /* method traps disabled */
-		/* setup set 'B' for cmd NV3_SURFACE_2 (nolonger used) */
-		ACCW(PR_CTX0_B, 0x0000005a); /* NVclass $05a, nv10+: little endian */
-		ACCW(PR_CTX1_B, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_B, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-		ACCW(PR_CTX3_B, 0x00000000); /* method traps disabled */
-		/* setup set 'C' for cmd NV3_SURFACE_3 (nolonger used) */
-		ACCW(PR_CTX0_C, 0x0000005b); /* NVclass $05b, nv10+: little endian */
-		ACCW(PR_CTX1_C, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_C, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-		ACCW(PR_CTX3_C, 0x00000000); /* method traps disabled */
 		/* setup set 'D' ... */
 		if (si->ps.card_arch != NV04A)
 		{
