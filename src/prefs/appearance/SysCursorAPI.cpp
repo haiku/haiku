@@ -1,10 +1,9 @@
 #include <PortLink.h>
-#include <PortMessage.h>
 #include <ServerProtocol.h>
 #include <OS.h>
 #include "SysCursorAPI.h"
 
-// TODO: tweak the BBitmap and BCursor headers
+// TODO R2: tweak the BBitmap and BCursor headers
 
 void set_syscursor(cursor_which which, const BCursor *cursor)
 {
@@ -39,15 +38,18 @@ cursor_which get_syscursor(void)
 	port_id server=find_port(SERVER_PORT_NAME);
 	if(server!=B_NAME_NOT_FOUND)
 	{
-		PortMessage pmsg;
+		int32 code;
+		BPortLink link(server);
 		
-		PortLink link(server);
-		link.SetOpCode(AS_GET_SYSCURSOR);
-		link.FlushWithReply(&pmsg);
+		link.StartMessage(AS_GET_SYSCURSOR);
+		link.GetNextReply(&code);
 		
-		cursor_which which;
-		pmsg.Read<cursor_which>(&which);
-		return which;
+		if(code==SERVER_TRUE)
+		{
+			cursor_which which;
+			link.Read<cursor_which>(&which);
+			return which;
+		}
 	}
 	return B_CURSOR_INVALID;
 }
@@ -57,8 +59,8 @@ void setcursor(cursor_which which)
 	port_id server=find_port(SERVER_PORT_NAME);
 	if(server!=B_NAME_NOT_FOUND)
 	{
-		PortLink link(server);
-		link.SetOpCode(AS_SET_CURSOR_SYSTEM);
+		BPortLink link(server);
+		link.StartMessage(AS_SET_CURSOR_SYSTEM);
 		link.Flush();
 	}
 }

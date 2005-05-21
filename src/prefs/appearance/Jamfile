@@ -13,7 +13,7 @@ Preference Appearance :
 	FontMenu.cpp
 	MenuView.cpp
 	PreviewDriver.cpp
-#	SysCursorAPI.cpp
+	SysCursorAPI.cpp
 	ColorWell.cpp
 	ColorWhichItem.cpp
 	CursorWhichItem.cpp
