@@ -81,4 +81,4 @@ resource mini_icon array {
 	$"FFFF00000E0F0F0F0F0000FFFFFFFFFF"
 };
 
-resource app_signature "application/x-vnd.obos.scroll-bar";
+resource app_signature "application/x-vnd.haiku-ScrollBar";
