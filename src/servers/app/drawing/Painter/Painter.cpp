@@ -30,6 +30,21 @@
 
 #include "Painter.h"
 
+
+#if ALIASED_DRAWING
+// in this case, we _cannot_ use the outline rasterizer.
+# define USE_OUTLINE_RASTERIZER 0
+#else
+// in this case, we can optionally use the outline rasterizer (faster).
+// NOTE: The outline rasterizer is different from the "general purpose"
+// rasterizer and can speed up the stroking of lines. It has some problems
+// though, for example the butts of the lines are not anti-aliased. So we
+// use the much more powerfull general purpose rasterizer, and live with the
+// performance hit for now. See _StrokePath().
+// NOTE: The outline rasterizer will still be used for lines with 1 pixel width!
+# define USE_OUTLINE_RASTERIZER 0
+#endif
+
 int
 roundf(float v)
 {
@@ -216,7 +231,11 @@ Painter::SetPenSize(float size)
 {
 	if (fPenSize != size) {
 		fPenSize = size;
+#if USE_OUTLINE_RASTERIZER
+// NOTE: _UpdateLineWidth() updates the line profile which is quite a heavy resource!
+// fortunately, we don't need it when using the general purpose rasterizer
 		_UpdateLineWidth();
+#endif
 	}
 }
 
@@ -531,9 +550,8 @@ Painter::StrokeRect(const BRect& r) const
 	// support invalid rects
 	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
 	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
-	bool centerOffset = fPenSize == 1.0;
-	_Transform(&a, centerOffset);
-	_Transform(&b, centerOffset);
+	_Transform(&a, false);
+	_Transform(&b, false);
 
 	// first, try an optimized version
 	if (fPenSize == 1.0 &&
@@ -552,11 +570,24 @@ Painter::StrokeRect(const BRect& r) const
 		}
 	}
 
+	if (fmodf(fPenSize, 2.0) != 0.0) {
+		// shift coords to center of pixels
+		a.x += 0.5;
+		a.y += 0.5;
+		b.x += 0.5;
+		b.y += 0.5;
+	}
+
 	agg::path_storage path;
 	path.move_to(a.x, a.y);
-	path.line_to(b.x, a.y);
-	path.line_to(b.x, b.y);
-	path.line_to(a.x, b.y);
+	if (a.x == b.x || a.y == b.y) {
+		// special case rects with one pixel height or width
+		path.line_to(b.x, b.y);
+	} else {
+		path.line_to(b.x, a.y);
+		path.line_to(b.x, b.y);
+		path.line_to(a.x, b.y);
+	}
 	path.close_polygon();
 
 	return _StrokePath(path);
@@ -664,6 +695,8 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
 	bool centerOffset = fPenSize == 1.0;
+	// TODO: use this when using _StrokePath()
+	// bool centerOffset = fmodf(fPenSize, 2.0) != 0.0;
 	_Transform(&lt, centerOffset);
 	_Transform(&rb, centerOffset);
 
@@ -687,6 +720,8 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 		agg::rounded_rect outer;
 		outer.rect(lt.x, lt.y, rb.x, rb.y);
 		outer.radius(xRadius, yRadius);
+
+		fRasterizer->reset();
 		fRasterizer->add_path(outer);
 
 		// don't add an inner hole if the "size is negative", this avoids some
@@ -1227,6 +1262,7 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 						   yRadius + inset,
 						   divisions);
 
+		fRasterizer->reset();
 		fRasterizer->add_path(outer);
 		fRasterizer->add_path(inner);
 
@@ -1456,19 +1492,25 @@ template<class VertexSource>
 BRect
 Painter::_StrokePath(VertexSource& path) const
 {
-#if ALIASED_DRAWING
-	if (fPenSize > 1.0) {
+#if USE_OUTLINE_RASTERIZER
+	fOutlineRasterizer->add_path(path);
+#else
+//	if (fPenSize > 1.0) {
 		agg::conv_stroke<VertexSource> stroke(path);
-		stroke.line_join(agg::round_join);
+// TODO: Investigate this for shapes. Maybe we are supposed to
+// use the settings from DrawData! Would make some sense!
+//		stroke.line_join(agg::round_join);
+//		stroke.line_cap(agg::butt_cap);
 		stroke.width(fPenSize);
 
+		fRasterizer->reset();
 		fRasterizer->add_path(stroke);
 		agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
-	} else {
-		fOutlineRasterizer->add_path(path);
-	}
-#else
-	fOutlineRasterizer->add_path(path);
+//	} else {
+	// TODO: update to AGG 2.3 to get rid of the remaining problems:
+	// rects which are 2 or 1 pixel high/wide don't render at all.
+//		fOutlineRasterizer->add_path(path);
+//	}
 #endif
 
 	BRect touched = _BoundingBox(path);
@@ -1483,6 +1525,7 @@ template<class VertexSource>
 BRect
 Painter::_FillPath(VertexSource& path) const
 {
+	fRasterizer->reset();
 	fRasterizer->add_path(path);
 	agg::render_scanlines(*fRasterizer, *fScanline, *fRenderer);
 

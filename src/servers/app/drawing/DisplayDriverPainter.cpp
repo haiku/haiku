@@ -838,13 +838,13 @@ void
 DisplayDriverPainter::StrokeRect(const BRect &r, const RGBColor &color)
 {
 	if (Lock()) {
-		fGraphicsCard->HideSoftwareCursor();
-
 		// support invalid rects
 		BRect vr(min_c(r.left, r.right),
 				 min_c(r.top, r.bottom),
 				 max_c(r.left, r.right),
 				 max_c(r.top, r.bottom));
+
+		fGraphicsCard->HideSoftwareCursor(vr);
 
 		fPainter->StrokeRect(vr, color.GetColor32());
 
@@ -868,7 +868,15 @@ void
 DisplayDriverPainter::StrokeRect(const BRect &r, const DrawData *d)
 {
 	if (Lock()) {
-		fGraphicsCard->HideSoftwareCursor();
+		// support invalid rects
+		BRect vr(min_c(r.left, r.right),
+				 min_c(r.top, r.bottom),
+				 max_c(r.left, r.right),
+				 max_c(r.top, r.bottom));
+		float extend = -ceilf(d->PenSize() / 2.0);
+		vr.InsetBy(extend, extend);
+
+		fGraphicsCard->HideSoftwareCursor(vr);
 
 		fPainter->SetDrawData(d);
 		BRect touched = fPainter->StrokeRect(r);
@@ -974,6 +982,7 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 								 const BPoint &pt, DrawData *d)
 {
 	if (Lock()) {
+		fPainter->SetDrawData(d);
 //bigtime_t now = system_time();
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
 // Cursiously, the actual DrawString after it is actually faster!?!
@@ -983,8 +992,6 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 		BRect b = fPainter->BoundingBox(string, length, pt);
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
 		fGraphicsCard->HideSoftwareCursor(b);
-
-		fPainter->SetDrawData(d);
 
 //now = system_time();
 		BRect touched = fPainter->DrawString(string, length, pt);
