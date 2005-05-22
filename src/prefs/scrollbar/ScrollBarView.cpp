@@ -187,12 +187,21 @@ void
 ScrollBarView::SetAllScrollBars(void)
 {
 	fSingle->SetFromScrollBarInfo(gSettings);
+	fSingle->SetDoubleArrows(false);
 	fDouble->SetFromScrollBarInfo(gSettings);
+	fDouble->SetDoubleArrows(true);
+	
 	fProportional->SetFromScrollBarInfo(gSettings);
+	fProportional->SetFixedThumb(false);
 	fFixed->SetFromScrollBarInfo(gSettings);
+	fFixed->SetFixedThumb(true);
+	
 	fFlat->SetFromScrollBarInfo(gSettings);
+	fFlat->SetKnobStyle(THUMB_BLANK);
 	fDots->SetFromScrollBarInfo(gSettings);
+	fDots->SetKnobStyle(THUMB_DOTS);
 	fLines->SetFromScrollBarInfo(gSettings);
+	fLines->SetKnobStyle(THUMB_LINES);
 	
 	fSingle->SetSelected( !gSettings.double_arrows );
 	fDouble->SetSelected( gSettings.double_arrows );

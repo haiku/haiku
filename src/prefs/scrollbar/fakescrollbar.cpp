@@ -25,7 +25,6 @@
 //	Description:	Control to simulate a scrollbar
 //  
 //------------------------------------------------------------------------------
-#include "scrollbar.h"
 #include "fakescrollbar.h"
 #include "messages.h"
 
