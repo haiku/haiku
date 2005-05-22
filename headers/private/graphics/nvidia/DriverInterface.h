@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-4/2005.
+	Rudolf Cornelissen 10/2002-5/2005.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -76,30 +76,24 @@ enum {
 #define NV_ROP5_SOLID					0x00000000 /* 2D */
 #define NV_IMAGE_BLACK_RECTANGLE		0x00000001 /* 2D/3D */
 #define NV_IMAGE_PATTERN				0x00000002 /* 2D */
-#define NV3_SURFACE_0					0x00000003 /* 3D: old cmd */
-#define NV3_SURFACE_1					0x00000004 /* 3D: old cmd */
-#define NV3_SURFACE_2					0x00000005 /* 3D: nolonger used */
-#define NV3_SURFACE_3					0x00000006 /* 3D: nolonger used */
-#define NV4_CONTEXT_SURFACES_ARGB_ZS	0x00000007 /* 3D */
-#define NV10_CONTEXT_SURFACES_ARGB_ZS	0x00000007 /* 3D */
-//fixme: learn the rules of nvidia's hardware hashtable implementation!!!
-//#define NV4_SURFACE						0x00000008 /* 2D */
-//#define NV10_CONTEXT_SURFACES_2D		0x00000008 /* 2D */
+//#define NV3_SURFACE_0					0x00000003 /* 3D: old cmd */
+//#define NV3_SURFACE_1					0x00000004 /* 3D: old cmd */
+//#define NV3_SURFACE_2					0x00000005 /* 3D: nolonger used */
+//#define NV3_SURFACE_3					0x00000006 /* 3D: nolonger used */
 #define NV4_SURFACE						0x00000010 /* 2D */
 #define NV10_CONTEXT_SURFACES_2D		0x00000010 /* 2D */
-#define NV1_IMAGE_FROM_CPU				0x00000010 /* 2D: unused */
+//#define NV1_IMAGE_FROM_CPU				0x00000010 /* 2D: unused */
 #define NV_IMAGE_BLIT					0x00000011 /* 2D */
 /* fixme:
  * never use NV3_GDI_RECTANGLE_TEXT for DMA acceleration:
  * There's a hardware fault in the input->output colorspace conversion here.
  * Besides, in NV40 and up this command nolonger exists. Both 'facts' are confirmed
  * by testing.
- * Note:
- * There's no (big) speed difference between NV3_GDI_RECTANGLE_TEXT and
- * NV4_GDI_RECTANGLE_TEXT (tested with BeRoMeter 1.2.6). */
-#define NV3_GDI_RECTANGLE_TEXT			0x00000012 /* 2D */
+ */
+//#define NV3_GDI_RECTANGLE_TEXT			0x00000012 /* 2D */
 #define NV4_GDI_RECTANGLE_TEXT			0x00000012 /* 2D */
-#define NV_RENDER_D3D0_TRIANGLE_ZETA	0x00000013 /* 3D: nolonger used */
+#define NV4_CONTEXT_SURFACES_ARGB_ZS	0x00000013 /* 3D */
+#define NV10_CONTEXT_SURFACES_ARGB_ZS	0x00000013 /* 3D */
 #define NV4_DX5_TEXTURE_TRIANGLE		0x00000014 /* 3D */
 #define NV10_DX5_TEXTURE_TRIANGLE		0x00000014 /* 3D */
 #define NV4_DX6_MULTI_TEXTURE_TRIANGLE	0x00000015 /* unused (yet?) */
