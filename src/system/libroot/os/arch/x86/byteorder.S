@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #define FUNCTION(x) .global x; .type x,@function; x
@@ -38,5 +38,20 @@ FUNCTION(__swap_int64):
 	ret
 
 /* float __swap_float(float value) */
+FUNCTION(__swap_float):
+	movl	4(%esp), %eax
+	bswap	%eax
+	movl	%eax, 4(%esp)
+	fld		4(%esp)
+	ret
 
 /* double __swap_double(double value) */
+FUNCTION(__swap_double):
+	movl	4(%esp), %edx	/* the 32-bits registers are swapped here */
+	movl	8(%esp), %eax
+	bswap	%eax
+	bswap	%edx
+	movl	%eax, 4(%esp)
+	movl	%edx, 8(%esp)
+	fldl	4(%esp)
+	ret
