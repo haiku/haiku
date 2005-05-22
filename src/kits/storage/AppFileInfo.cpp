@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
 /*!
 	\file AppFileInfo.cpp
@@ -51,6 +51,14 @@ enum {
 	B_LARGE_ICON_TYPE	= 'ICON',
 	B_VERSION_INFO_TYPE	= 'APPV',
 };
+
+// R5 also exports these (Tracker is using them):
+// (maybe we better want to drop them silently and declare 
+// the above in a public Haiku header - and use that one in
+// Tracker when compiled for Haiku)
+extern const uint32 MINI_ICON_TYPE, LARGE_ICON_TYPE;
+const uint32 MINI_ICON_TYPE = 'MICN';
+const uint32 LARGE_ICON_TYPE = 'ICON';
 
 // debugging
 //#define DBG(x) x
