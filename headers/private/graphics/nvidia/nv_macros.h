@@ -446,7 +446,6 @@
 #define NVACC_PR_CTX1_E		0x00711504
 #define NVACC_PR_CTX2_E		0x00711508
 #define NVACC_PR_CTX3_E		0x0071150c
-//dma 3D test:
 #define NVACC_PR_CTX0_F		0x00711510
 #define NVACC_PR_CTX1_F		0x00711514
 #define NVACC_PR_CTX2_F		0x00711518
@@ -455,7 +454,6 @@
 #define NVACC_PR_CTX1_10	0x00711524
 #define NVACC_PR_CTX2_10	0x00711528
 #define NVACC_PR_CTX3_10	0x0071152c
-//end dma test.
 /* used RAMHT registers (hash-table) */
 #define NVACC_HT_HANDL_00	0x00710000
 #define NVACC_HT_VALUE_00	0x00710004
