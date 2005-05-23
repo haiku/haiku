@@ -647,8 +647,14 @@ _fini_interface_kit_()
 	return B_OK;
 }
 
+
+//	#pragma mark -
+
+
 /*!
-	\brief private function used by Tracker to set window decor
+	\brief private function used by Deskbar to set window decor
+	Note, we don't have to be compatible here, and could just change
+	the Deskbar not to use this anymore
 	\param theme The theme to choose
 	
 	- \c 0: BeOS
@@ -665,4 +671,63 @@ __set_window_decor(int32 theme)
 	link.Flush();
 }
 
-#endif // COMPILE_FOR_R5
+
+// These methods were marked with "Danger, will Robinson!" in
+// the OpenTracker source, so we might not want to be compatible
+// here.
+// In any way, we would need to update Deskbar to use our 
+// replacements, so we could as well just implement them...
+//
+// They are defined (also the complete window_info structure) in
+// src/apps/deskbar/WindowMenuItem.h
+
+struct window_info;
+
+void do_window_action(int32 window_id, int32 action, 
+		BRect zoomRect, bool zoom);
+window_info	*get_window_info(int32 a_token);
+int32 *get_token_list(team_id app, int32 *count);
+void do_bring_to_front_team(BRect zoomRect, team_id app, bool zoom);
+void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
+
+menu_info *_menu_info_ptr_ = NULL;
+
+void 
+do_window_action(int32 window_id, int32 action, 
+	BRect zoomRect, bool zoom)
+{
+	// ToDo: implement me, needed for Deskbar!
+}
+
+
+window_info	*
+get_window_info(int32 a_token)
+{
+	// ToDo: implement me, needed for Deskbar!
+	return NULL;
+}
+
+
+int32 *
+get_token_list(team_id app, int32 *count)
+{
+	// ToDo: implement me, needed for Deskbar!
+	return NULL;
+}
+
+
+void
+do_bring_to_front_team(BRect zoomRect, team_id app, bool zoom)
+{
+	// ToDo: implement me, needed for Deskbar!
+}
+
+
+void
+do_minimize_team(BRect zoomRect, team_id team, bool zoom)
+{
+	// ToDo: implement me, needed for Deskbar!
+}
+
+
+#endif // !COMPILE_FOR_R5
