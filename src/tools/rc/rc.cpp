@@ -20,6 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,19 +28,19 @@
 
 #include "rdef.h"
 
-#define TITLE "Haiku Resource Compiler 1.1"
-
-#define DEFAULT_OUT_RSRC  "out.rsrc"
-#define DEFAULT_OUT_RDEF  "out.rdef"
 
 extern const char *__progname;
-static const char *sProgramName = __progname;
 
-static bool quiet = false;
-static bool should_decompile = false;
-static uint32 flags = 0;
+static const char *kTitle = "Haiku Resource Compiler 1.1";
+static const char *kProgramName = __progname;
+
+
+static bool sQuiet = false;
+static bool sDecompile = false;
+static uint32 sFlags = 0;
 
 static char sOutputFile[B_PATH_NAME_LENGTH] = { 0 };
+static char *sFirstInputFile = NULL;
 
 
 void
@@ -47,8 +48,8 @@ warn(const char *format, ...)
 {
 	va_list ap;
 
-	if (!quiet) {
-		fprintf(stderr, "%s: Warning! ", sProgramName);
+	if (!sQuiet) {
+		fprintf(stderr, "%s: Warning! ", kProgramName);
 		va_start(ap, format);
 		vfprintf(stderr, format, ap);
 		va_end(ap);
@@ -62,8 +63,8 @@ error(const char *format, ...)
 {
 	va_list ap;
 
-	if (!quiet) {
-		fprintf(stderr, "%s: Error! ", sProgramName);
+	if (!sQuiet) {
+		fprintf(stderr, "%s: Error! ", kProgramName);
 		va_start(ap, format);
 		vfprintf(stderr, format, ap);
 		va_end(ap);
@@ -91,7 +92,7 @@ usage()
 		"    -o --output          specify output file name, default is out.xxx\n"
 		"    -q --quiet           do not display any error messages\n"
 		"    -V --version         show software version and license\n",
-		TITLE, sProgramName, sProgramName);
+		kTitle, kProgramName, kProgramName);
 
 	exit(EXIT_SUCCESS);
 }
@@ -120,16 +121,53 @@ version()
 		"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\n"
 		"FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER\n"
 		"DEALINGS IN THE SOFTWARE.\n",
-		TITLE);
+		kTitle);
 
 	exit(EXIT_SUCCESS);
 }
 
 
+static bool 
+has_extension(char *name, const char *ext)
+{
+	size_t nameLength = strlen(name);
+	size_t extLength = strlen(ext);
+
+	if (nameLength > extLength)
+		return strcmp(name + nameLength - extLength, ext) == 0;
+
+	return false;
+}
+
+
 static void
-parse_options(int argc, char* argv[])
+cut_extension(char *name, const char *ext)
+{
+	if (!has_extension(name, ext))
+		return;
+
+	name[strlen(name) - strlen(ext)] = '\0';
+}
+
+
+static void
+add_extension(char *name, const char *ext)
+{
+#ifdef __HAIKU__
+	strlcat(name, ext, B_PATH_NAME_LENGTH);
+#else
+	strncat(name, ext, B_PATH_NAME_LENGTH);
+	name[B_PATH_NAME_LENGTH - 1] = '\0';
+#endif
+}
+
+
+static void
+parse_options(int argc, char *argv[])
 {
 	int32 args_left = argc - 1;
+
+	// ToDo: use getopt_long()
 
 	for (int32 i = 1; i < argc; ++i) {
 		if (strcmp(argv[i], "-o") == 0
@@ -154,21 +192,21 @@ parse_options(int argc, char* argv[])
 			++i; args_left -= 2;
 		} else if (strcmp(argv[i], "-d") == 0
 				|| strcmp(argv[i], "--decompile") == 0) {
-			should_decompile = true;
+			sDecompile = true;
 			argv[i] = NULL;
 			--args_left;
 		} else if (strcmp(argv[i], "-m") == 0
 				|| strcmp(argv[i], "--merge") == 0) {
-			flags |= RDEF_MERGE_RESOURCES;
+			sFlags |= RDEF_MERGE_RESOURCES;
 			argv[i] = NULL;
 			--args_left;
 		} else if (strcmp(argv[i], "--auto-names") == 0) {
-			flags |= RDEF_AUTO_NAMES;
+			sFlags |= RDEF_AUTO_NAMES;
 			argv[i] = NULL;
 			--args_left;
 		} else if (strcmp(argv[i], "-q") == 0
 				|| strcmp(argv[i], "--quiet") == 0) {
-			quiet = true;
+			sQuiet = true;
 			argv[i] = NULL;
 			--args_left;
 		} else if (strcmp(argv[i], "-h") == 0
@@ -188,50 +226,45 @@ parse_options(int argc, char* argv[])
 		error("no input files");
 
 	for (int i = 1; i < argc; ++i) {
-		if (argv[i] != NULL)
-			rdef_add_input_file(argv[i]);
+		if (sFirstInputFile == NULL)
+			sFirstInputFile = argv[i];
+
+		rdef_add_input_file(argv[i]);
 	}
-}
 
+	if (sOutputFile[0] == '\0') {
+		// no output file name was given, use the name of the 
+		// first source file as base
+#ifdef __HAIKU__
+		strlcpy(sOutputFile, sFirstInputFile, sizeof(sOutputFile));
+#else
+		strncpy(sOutputFile, sFirstInputFile, sizeof(sOutputFile) - 1);
+		sOutputFile[sizeof(sOutputFile) - 1] = '\0';
+#endif
 
-static bool 
-has_extension(char *str, char *ext)
-{
-	size_t str_len = strlen(str);
-	size_t ext_len = strlen(ext);
-
-	if (str_len > ext_len)
-		return (strcmp(str + str_len - ext_len, ext) == 0);
-
-	return false;
+		cut_extension(sOutputFile, sDecompile ? ".rsrc" : ".rdef");
+		add_extension(sOutputFile, sDecompile ? ".rdef" : ".rsrc");
+	}
 }
 
 
 static void 
 compile()
 {
-	if (sOutputFile[0] == '\0')
-		rdef_compile(DEFAULT_OUT_RSRC);
-	else {
-		if (!has_extension(sOutputFile, ".rsrc"))
-			strcat(sOutputFile, ".rsrc");
+	if (!has_extension(sOutputFile, ".rsrc"))
+		add_extension(sOutputFile, ".rsrc");
 
-		rdef_compile(sOutputFile);
-	}
+	rdef_compile(sOutputFile);
 }
 
 
 static void 
 decompile()
 {
-	if (sOutputFile[0] == '\0')
-		rdef_decompile(DEFAULT_OUT_RDEF);
-	else {
-		if (!has_extension(sOutputFile, ".rdef"))
-			strcat(sOutputFile, ".rdef");
+	if (!has_extension(sOutputFile, ".rdef"))
+		add_extension(sOutputFile, ".rdef");
 
-		rdef_decompile(sOutputFile);
-	}
+	rdef_decompile(sOutputFile);
 }
 
 
@@ -272,9 +305,9 @@ main(int argc, char *argv[])
 {
 	parse_options(argc, argv);
 
-	rdef_set_flags(flags);
+	rdef_set_flags(sFlags);
 
-	if (should_decompile)
+	if (sDecompile)
 		decompile();
 	else
 		compile();
