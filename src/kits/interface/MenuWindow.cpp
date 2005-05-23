@@ -51,17 +51,11 @@ public:
 	{
 		BRect bounds(Bounds());
 		
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_4_TINT));
-		StrokeRect(bounds);
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-		StrokeLine(BPoint(bounds.left + 2, bounds.bottom - 1),
-					BPoint(bounds.right - 1, bounds.bottom - 1));
-		StrokeLine(BPoint(bounds.right - 1, bounds.top + 1),
-					BPoint(bounds.right - 1, bounds.bottom - 1));
-		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
-		StrokeLine(BPoint(bounds.left + 1, bounds.top + 1),
-					BPoint(bounds.right - 2, bounds.top + 1));
-			
+		StrokeLine(BPoint(bounds.right, bounds.top),
+					BPoint(bounds.right, bounds.bottom - 1));
+		StrokeLine(BPoint(bounds.left + 1, bounds.bottom),
+					BPoint(bounds.right, bounds.bottom));
 	};
 	
 };
@@ -70,7 +64,7 @@ public:
 BMenuWindow::BMenuWindow(const char *name)
 	:
 	// The window will be resized by BMenu, so just pass a dummy rect
-	BWindow(BRect(0, 0, 0, 0), name, B_NO_BORDER_WINDOW_LOOK, kMenuWindowFeel,
+	BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
 			B_NOT_ZOOMABLE),
 	fUpperScroller(NULL),
 	fLowerScroller(NULL)

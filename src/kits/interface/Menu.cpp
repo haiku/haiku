@@ -185,7 +185,8 @@ BMenu::~BMenu()
 {
 	RemoveItems(0, CountItems(), true);
 	
-	delete fCachedMenuWindow;
+	DeleteMenuWindow();
+	
 	delete fInitMatrixSize;
 	delete fExtraMenuData;
 }
@@ -892,7 +893,7 @@ BMenu::ScreenLocation()
 	if (superMenu->Layout() == B_ITEMS_IN_COLUMN)
 		point = superItem->Frame().RightTop();
 	else
-		point = superItem->Frame().LeftBottom() + BPoint(0.0f, 1.0f);
+		point = superItem->Frame().LeftBottom() + BPoint(1.0f, 1.0f);
 	
 	superMenu->ConvertToScreen(&point);
 	
@@ -1052,19 +1053,21 @@ BMenu::InitData(BMessage *data)
 bool
 BMenu::_show(bool selectFirstItem)
 {
-	// Menu windows get the BMenu's handler name
-	fCachedMenuWindow = new BMenuWindow(Name());
+	BWindow *menuWindow = MenuWindow();
 	
-	fCachedMenuWindow->ChildAt(0)->AddChild(this);
+	menuWindow->Lock();
+	menuWindow->ChildAt(0)->AddChild(this);
 	
 	// We're doing this here because ConvertToScreen() needs:
 	// 1. The BView to be attached (see the above line).
 	// 2. The looper locked or not running (the Show() call below starts the looper)
 	if (fSuper != NULL)
 		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
-	fCachedMenuWindow->ResizeTo(Bounds().Width() + 4, Bounds().Height() + 4);
-	fCachedMenuWindow->MoveTo(ScreenLocation());
-	fCachedMenuWindow->Show();
+	
+	UpdateWindowViewSize();
+	
+	menuWindow->Unlock();
+	menuWindow->Show();
 	
 	return true;
 }
@@ -1076,8 +1079,8 @@ BMenu::_hide()
 	if (fCachedMenuWindow != NULL) {
 		fCachedMenuWindow->Lock();
 		fCachedMenuWindow->ChildAt(0)->RemoveChild(this);
-		fCachedMenuWindow->Quit();
-		fCachedMenuWindow = NULL;
+		fCachedMenuWindow->Hide();
+		fCachedMenuWindow->Unlock();
 	}
 	
 }
@@ -1236,11 +1239,11 @@ BMenu::LayoutItems(int32 index)
 
 	ResizeTo(width, height);
 	
-	// Move the BMenu to 2, 2, if it's attached to a BMenuWindow,
+	// Move the BMenu to 1, 1, if it's attached to a BMenuWindow,
 	// (that means it's a BMenu, BMenuBars are attached to regular BWindows).
 	// This is needed to be able to draw the frame around the BMenu.
 	if (dynamic_cast<BMenuWindow *>(Window()) != NULL)
-		MoveTo(2, 2);
+		MoveTo(1, 1);
 }
 
 
@@ -1431,6 +1434,12 @@ BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 BMenuWindow	*
 BMenu::MenuWindow()
 {
+	if (fCachedMenuWindow == NULL) {
+		// Menu windows get the BMenu's handler name
+		fCachedMenuWindow = new BMenuWindow(Name());
+		UpdateWindowViewSize();
+	}
+	
 	return fCachedMenuWindow;
 }
 
@@ -1438,8 +1447,11 @@ BMenu::MenuWindow()
 void
 BMenu::DeleteMenuWindow()
 {
-	delete fCachedMenuWindow;
-	fCachedMenuWindow = NULL;
+	if (fCachedMenuWindow != NULL) {
+		fCachedMenuWindow->Lock();
+		fCachedMenuWindow->Quit();
+		fCachedMenuWindow = NULL;
+	}
 }
 
 
@@ -1633,6 +1645,9 @@ BMenu::ChooseTrigger(const char *title, BList *chars)
 void
 BMenu::UpdateWindowViewSize(bool upWind)
 {
+	ASSERT(fCachedMenuWindow != NULL);
+	fCachedMenuWindow->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
+	fCachedMenuWindow->MoveTo(ScreenLocation());
 }
 
 
