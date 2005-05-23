@@ -493,18 +493,63 @@ put_file_system(file_system_module_info *fs)
 }
 
 
+/**	Tries to open the specified file system module.
+ *	Accepts a file system name of the form "bfs" or "file_systems/bfs/v1".
+ *	Returns a pointer to file system module interface, or NULL if it
+ *	could not open the module.
+ */
+
 static file_system_module_info *
 get_file_system(const char *fsName)
 {
-	// construct module name (we currently support only one API)
 	char name[B_FILE_NAME_LENGTH];
-	snprintf(name, sizeof(name), "file_systems/%s/v1", fsName);
+	if (strncmp(fsName, "file_systems/", strlen("file_systems/"))) {
+		// construct module name if we didn't get one
+		// (we currently support only one API)
+		snprintf(name, sizeof(name), "file_systems/%s/v1", fsName);
+		fsName = NULL;
+	}
 
 	file_system_module_info *info;
-	if (get_module(name, (module_info **)&info) != B_OK)
+	if (get_module(fsName ? fsName : name, (module_info **)&info) != B_OK)
 		return NULL;
 
 	return info;
+}
+
+
+/**	Accepts a file system name of the form "bfs" or "file_systems/bfs/v1"
+ *	and returns a compatible fs_info.fsh_name name ("bfs" in both cases).
+ *	The name is allocated for you, and you have to free() it when you're
+ *	done with it.
+ *	Returns NULL if the required memory is no available.
+ */
+
+static char *
+get_file_system_name(const char *fsName)
+{
+	const size_t length = strlen("file_systems/");
+
+	if (strncmp(fsName, "file_systems/", length)) {
+		// the name already seems to be the module's file name
+		return strdup(fsName);
+	}
+
+	fsName += length;
+	const char *end = strchr(fsName, '/');
+	if (end == NULL) {
+		// this doesn't seem to be a valid name, but well...
+		return strdup(fsName);
+	}
+
+	// cut off the trailing /v1
+
+	char *name = (char *)malloc(end + 1 - fsName);
+	if (name == NULL)
+		return NULL;
+
+	strlcpy(name, fsName, end + 1 - fsName);
+	return name;
 }
 
 
@@ -4609,7 +4654,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 
 	list_init_etc(&mount->vnodes, offsetof(struct vnode, mount_link));
 
-	mount->fs_name = strdup(fsName);
+	mount->fs_name = get_file_system_name(fsName);
 	if (mount->fs_name == NULL) {
 		err = B_NO_MEMORY;
 		goto err1;
@@ -5044,14 +5089,14 @@ err:
 
 
 status_t
-_kern_mount(const char *path, const char *device, const char *fs_name,
+_kern_mount(const char *path, const char *device, const char *fsName,
 	uint32 flags, const char *args)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	return fs_mount(pathBuffer.LockBuffer(), device, fs_name, flags, args, true);
+	return fs_mount(pathBuffer.LockBuffer(), device, fsName, flags, args, true);
 }
 
 
