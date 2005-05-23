@@ -66,8 +66,7 @@ extern "C" {
 #define RDEF_AUTO_NAMES  (1 << 1)
 
 /** Error codes returned by the librdef functions. */
-enum
-{
+enum {
 	/** Syntax error or other compiler error. */
 	RDEF_COMPILE_ERR = B_ERRORS_END + 1,
 
@@ -121,7 +120,10 @@ _IMPEXP_RDEF int32 rdef_get_version();
  * Typically, you want to add the current directory to this list.
  * Not used for decompilation.
  */
-_IMPEXP_RDEF status_t rdef_add_include_dir(const char* dir);
+_IMPEXP_RDEF status_t rdef_add_include_dir(const char *dir, bool toEndOfList);
+
+/**	Removes an include directory */
+_IMPEXP_RDEF status_t rdef_remove_include_dir(const char *dir);
 
 /** 
  * Frees the list of include directories. If you call rdef_add_include_dir(),

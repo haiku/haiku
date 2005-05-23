@@ -22,6 +22,7 @@
 
 #include <Entry.h>
 #include <File.h>
+#include <Path.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -52,8 +53,7 @@ static jmp_buf abort_jmp;  // for aborting compilation
 // parser properly frees up objects when it is done with them.
 
 #ifdef DEBUG
-struct mem_t
-{
+struct mem_t {
 	void* ptr;
 	char* file;
 	int32 line;
@@ -67,15 +67,42 @@ static mem_list_t mem_list;
 static ptr_list_t mem_list;
 #endif
 
-//------------------------------------------------------------------------------
 
-void* alloc_mem(size_t size)
+class AddIncludeDir {
+	public:
+		AddIncludeDir(const char *file);
+		~AddIncludeDir();
+
+	private:
+		BPath fPath;
+};
+
+
+AddIncludeDir::AddIncludeDir(const char *file)
+	:
+	fPath(file)
 {
-	void* ptr = malloc(size);  // can be 0
+	if (fPath.GetParent(&fPath) == B_OK)
+		rdef_add_include_dir(fPath.Path(), false);
+}
+
+
+AddIncludeDir::~AddIncludeDir()
+{
+	if (fPath.InitCheck() == B_OK)
+		rdef_remove_include_dir(fPath.Path());
+}
+
+
+//	#pragma mark -
+
+
+void *
+alloc_mem(size_t size)
+{
+	void *ptr = malloc(size);  // can be 0
 	if (ptr == NULL)
-	{
 		abort_compile(B_NO_MEMORY, "out of memory");
-	}
 
 #ifdef DEBUG
 	mem_t mem;
@@ -90,17 +117,14 @@ void* alloc_mem(size_t size)
 	return ptr;
 }
 
-//------------------------------------------------------------------------------
 
-void free_mem(void* ptr)
+void
+free_mem(void *ptr)
 {
-	if (ptr != NULL)
-	{
+	if (ptr != NULL) {
 #ifdef DEBUG
-		for (mem_iter_t i = mem_list.begin(); i != mem_list.end(); ++i)
-		{
-			if (i->ptr == ptr)
-			{
+		for (mem_iter_t i = mem_list.begin(); i != mem_list.end(); ++i) {
+			if (i->ptr == ptr) {
 				free(i->ptr);
 				free(i->file);
 				mem_list.erase(i);
@@ -114,16 +138,15 @@ void free_mem(void* ptr)
 	}
 }
 
-//------------------------------------------------------------------------------
 
-static void clean_up_mem()
+static void
+clean_up_mem()
 {
 #ifdef DEBUG
-	if (mem_list.size() != 0) {
+	if (mem_list.size() != 0)
 		printf("mem_list leaks %ld objects\n", mem_list.size());
-	}
-	for (mem_iter_t i = mem_list.begin(); i != mem_list.end(); )
-	{
+
+	for (mem_iter_t i = mem_list.begin(); i != mem_list.end(); ) {
 		printf("%p allocated at %s:%ld\n", i->ptr, i->file, i->line);	
 		free(i->ptr);
 		free(i->file);
@@ -134,9 +157,9 @@ static void clean_up_mem()
 #endif
 }
 
-//------------------------------------------------------------------------------
 
-void abort_compile(status_t err, const char* format, ...)
+void
+abort_compile(status_t err, const char *format, ...)
 {
 	va_list ap;
 
@@ -151,22 +174,21 @@ void abort_compile(status_t err, const char* format, ...)
 	abort_compile();
 }
 
-//------------------------------------------------------------------------------
 
-void abort_compile()
+void
+abort_compile()
 {
 	longjmp(abort_jmp, 1);
 }
 
-//------------------------------------------------------------------------------
 
-static void compile_file(char* file)
+static void
+compile_file(char *file)
 {
 	strcpy(lexfile, file);
 
 	yyin = fopen(lexfile, "r");
-	if (yyin == NULL)
-	{
+	if (yyin == NULL) {
 		strcpy(rdef_err_file, lexfile);
 		rdef_err = RDEF_FILE_NOT_FOUND;
 		return;
@@ -175,8 +197,7 @@ static void compile_file(char* file)
 	init_lexer();
 	init_parser();
 
-	if (setjmp(abort_jmp) == 0)
-	{
+	if (setjmp(abort_jmp) == 0) {
 		yyparse();
 	}
 
@@ -191,76 +212,66 @@ static void compile_file(char* file)
 	clean_up_mem();
 }
 
-//------------------------------------------------------------------------------
 
-static status_t open_output_file()
+static status_t
+open_output_file()
 {
 	status_t err = entry.SetTo(rsrc_file, true);
-	if (err == B_OK)
-	{
+	if (err == B_OK) {
 		uint32 openMode = B_READ_WRITE | B_CREATE_FILE;
-		bool clobber    = false;
+		bool clobber = false;
 
-		if (!(flags & RDEF_MERGE_RESOURCES))
-		{
+		if (!(flags & RDEF_MERGE_RESOURCES)) {
 			openMode |= B_ERASE_FILE;
 			clobber   = true;
 		}
 
 		err = file.SetTo(&entry, openMode);
 		if (err == B_OK)
-		{
 			err = rsrc.SetTo(&file, clobber);
-		}
 	}
 
 	return err;
 }
 
-//------------------------------------------------------------------------------
 
-static void close_output_file()
+static void
+close_output_file()
 {
-	if ((rdef_err == B_OK) || (flags & RDEF_MERGE_RESOURCES))
-	{
+	if (rdef_err == B_OK || (flags & RDEF_MERGE_RESOURCES) != 0)
 		rsrc.Sync();
-	}
 	else
-	{
 		entry.Remove();  // throw away output file
-	}
 
 	file.Unset();
 	entry.Unset();
 }
 
-//------------------------------------------------------------------------------
 
-status_t rdef_compile(const char* output_file)
+status_t
+rdef_compile(const char *outputFile)
 {
 	clear_error();
 
-	if ((output_file == NULL) || (output_file[0] == '\0'))
-	{
+	if (outputFile == NULL || outputFile[0] == '\0') {
 		rdef_err = B_BAD_VALUE;
 		return rdef_err;
 	}
 
-	rsrc_file = output_file;
+	rsrc_file = outputFile;
 	rdef_err = open_output_file();
 	if (rdef_err != B_OK)
-	{
 		return rdef_err;
-	}
 
 	for (ptr_iter_t i = input_files.begin(); 
-			(i != input_files.end()) && (rdef_err == B_OK); ++i)
-	{
-		compile_file((char*) *i);
+			(i != input_files.end()) && (rdef_err == B_OK); ++i) {
+		char *path = (char *)*i;
+
+		AddIncludeDir add(path);
+		compile_file(path);
 	}
 
 	close_output_file();
 	return rdef_err;
 }
 
-//------------------------------------------------------------------------------
