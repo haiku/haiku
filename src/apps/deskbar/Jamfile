@@ -4,7 +4,7 @@ UsePrivateHeaders shared ;
 UsePrivateHeaders tracker ;
 SubDirHdrs $(OBOS_TOP) src kits tracker ;
 
-AddResources Deskbar : Deskbar.rsrc icon-freelogo.rsrc icons.rdef ;
+AddResources Deskbar : Deskbar.rdef icon-freelogo.rdef icons.rdef ;
 
 SubDirC++Flags -DDB_ADDONS -DOPEN_TRACKER=1
 	-D_INCLUDES_CLASS_DEVICE_MAP=1
