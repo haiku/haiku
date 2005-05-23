@@ -4,7 +4,7 @@ UsePrivateHeaders shared ;
 UsePrivateHeaders tracker ;
 SubDirHdrs $(OBOS_TOP) src kits tracker ;
 
-AddResources Tracker : Tracker.rsrc ;
+AddResources Tracker : Tracker.rdef ;
 
 App Tracker :
 	main.cpp
