@@ -9,5 +9,13 @@ StaticLibrary rdef :
 
 BinCommand rc :
 	rc.cpp
+
+	# these two are needed for R5 only
+	strlcpy.c
+	strlcat.c
 	: librdef.a libstdc++.r4.so libbe.so
 	;
+
+SEARCH on [ FGristFiles
+		strlcat.c strlcpy.c
+	] = [ FDirName $(OBOS_TOP) src system libroot posix string ] ;

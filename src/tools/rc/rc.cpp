@@ -153,12 +153,7 @@ cut_extension(char *name, const char *ext)
 static void
 add_extension(char *name, const char *ext)
 {
-#ifdef __HAIKU__
 	strlcat(name, ext, B_PATH_NAME_LENGTH);
-#else
-	strncat(name, ext, B_PATH_NAME_LENGTH);
-	name[B_PATH_NAME_LENGTH - 1] = '\0';
-#endif
 }
 
 
@@ -235,12 +230,7 @@ parse_options(int argc, char *argv[])
 	if (sOutputFile[0] == '\0') {
 		// no output file name was given, use the name of the 
 		// first source file as base
-#ifdef __HAIKU__
 		strlcpy(sOutputFile, sFirstInputFile, sizeof(sOutputFile));
-#else
-		strncpy(sOutputFile, sFirstInputFile, sizeof(sOutputFile) - 1);
-		sOutputFile[sizeof(sOutputFile) - 1] = '\0';
-#endif
 
 		cut_extension(sOutputFile, sDecompile ? ".rsrc" : ".rdef");
 		add_extension(sOutputFile, sDecompile ? ".rdef" : ".rsrc");
