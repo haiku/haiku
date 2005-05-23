@@ -3899,8 +3899,17 @@ bool
 BTextView::PerformMouseMoved(BPoint where, uint32 code)
 {
 	CALLED();
-	// TODO: Put here the code for asynchronous mouse tracking
-	return false;
+	if (fClickRunner == NULL)
+		return false;
+
+	// TODO: Multiword/Line selection
+	int32 offset = OffsetAt(where);
+	if (offset < fClickOffset)
+		Select(offset, fClickOffset);
+	else
+		Select(fClickOffset, offset);
+	
+	return true;
 }
 
 
