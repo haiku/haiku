@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src apps tracker ;
+
+UsePrivateHeaders shared ;
+UsePrivateHeaders tracker ;
+SubDirHdrs $(OBOS_TOP) src kits tracker ;
+
+AddResources Tracker : Tracker.rsrc ;
+
+App Tracker :
+	main.cpp
+	;
+
+LinkSharedOSLibs Tracker : libbe.so libtracker.so ;

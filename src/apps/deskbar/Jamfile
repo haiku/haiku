@@ -1,0 +1,37 @@
+SubDir OBOS_TOP src apps deskbar ;
+
+UsePrivateHeaders shared ;
+UsePrivateHeaders tracker ;
+SubDirHdrs $(OBOS_TOP) src kits tracker ;
+
+AddResources Deskbar : Deskbar.rsrc icon-freelogo.rsrc icons.rdef ;
+
+SubDirC++Flags -DDB_ADDONS -DOPEN_TRACKER=1
+	-D_INCLUDES_CLASS_DEVICE_MAP=1
+	-D_SUPPORTS_RESOURCES=1
+	-D_SUPPORTS_FEATURE_SCRIPTING=1
+	-D_SHOW_CALENDAR_MENU_ITEM=1 ;
+
+App Deskbar :
+	BarApp.cpp
+	BarMenuBar.cpp
+	BarMenuTitle.cpp
+	BarView.cpp
+	BarWindow.cpp
+	BeMenu.cpp
+	CalendarMenuItem.cpp
+	DeskBarUtils.cpp
+	ExpandoMenuBar.cpp
+	ShowHideMenuItem.cpp
+	StatusView.cpp
+	StatusViewShelf.cpp
+	TeamMenu.cpp
+	TeamMenuItem.cpp
+	TimeView.cpp
+	WindowMenu.cpp
+	WindowMenuItem.cpp
+	ResourceSet.cpp
+	Switcher.cpp
+	;
+
+LinkSharedOSLibs Deskbar : libbe.so libtracker.so ;
