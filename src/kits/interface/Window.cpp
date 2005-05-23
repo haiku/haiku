@@ -122,7 +122,8 @@ static property_info windowPropInfo[] = {
 void 
 _set_menu_sem_(BWindow *window, sem_id sem)
 {
-	window->fMenuSem=sem;
+	if (window != NULL)
+		window->fMenuSem = sem;
 }
 
 
@@ -221,6 +222,10 @@ BWindow::~BWindow()
 	}
 
 	// TODO: release other dynamically-allocated objects
+	
+	// Deleting this semaphore will tell open menus to quit.
+	if (fMenuSem > 0)
+		delete_sem(fMenuSem);
 
 	// disable pulsing
 	SetPulseRate(0);
