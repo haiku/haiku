@@ -114,6 +114,7 @@ SubInclude OBOS_TOP src kits screensaver ;
 SubInclude OBOS_TOP src kits support ;
 SubInclude OBOS_TOP src kits textencoding ;
 SubInclude OBOS_TOP src kits translation ;
+SubInclude OBOS_TOP src kits tracker ;
 SubInclude OBOS_TOP src kits device ;
 SubInclude OBOS_TOP src kits game ;
 SubInclude OBOS_TOP src kits network ;

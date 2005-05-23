@@ -1,0 +1,88 @@
+SubDir OBOS_TOP src kits tracker ;
+
+UsePrivateHeaders shared ;
+UsePrivateHeaders tracker ;
+
+AddResources libtracker.so : TrackerIcons.rdef ;
+
+SubDirC++Flags 
+	-D_BUILDING_tracker=1 -DOPEN_TRACKER=1
+#	-D_INCLUDES_CLASS_DEVICE_MAP=1
+	-D_SUPPORTS_RESOURCES=1
+	-D_SUPPORTS_FEATURE_SCRIPTING=1
+#	-D_SILENTLY_CORRECT_FILE_NAMES=1 
+	;
+
+SharedLibrary tracker :
+	AttributeStream.cpp
+	AutoMounter.cpp
+	AutoMounterSettings.cpp
+	BackgroundImage.cpp
+	Bitmaps.cpp
+	ContainerWindow.cpp
+	CountView.cpp
+	DeskWindow.cpp
+	DesktopPoseView.cpp
+	DialogPane.cpp
+	DirMenu.cpp
+	EntryIterator.cpp
+	FBCPadding.cpp
+	FSClipboard.cpp
+	FSUndoRedo.cpp
+	FSUtils.cpp
+	FavoritesConfig.cpp
+	FavoritesMenu.cpp
+	FilePanel.cpp
+	FilePanelPriv.cpp
+	FilePermissionsView.cpp
+	FindPanel.cpp
+	GroupedMenu.cpp
+	IconCache.cpp
+	IconMenuItem.cpp
+	InfoWindow.cpp
+	MimeTypeList.cpp
+	MiniMenuField.cpp
+	Model.cpp
+	MountMenu.cpp
+	Navigator.cpp
+	NavMenu.cpp
+	NodePreloader.cpp
+	NodeWalker.cpp
+	OpenWithWindow.cpp
+	OverrideAlert.cpp
+	PendingNodeMonitorCache.cpp
+	Pose.cpp
+	PoseList.cpp
+	PoseView.cpp
+	PoseViewScripting.cpp
+	QueryContainerWindow.cpp
+	QueryPoseView.cpp
+	RecentItems.cpp
+	RegExp.cpp
+	SelectionWindow.cpp
+	Settings.cpp
+	SettingsHandler.cpp
+	SettingsViews.cpp
+	SlowContextPopup.cpp
+	SlowMenu.cpp
+	StatusWindow.cpp
+	TaskLoop.cpp
+	TemplatesMenu.cpp
+	Tests.cpp
+	TextWidget.cpp
+	Thread.cpp
+	TitleView.cpp
+	Tracker.cpp
+	TrackerInitialState.cpp
+	TrackerScripting.cpp
+	TrackerSettings.cpp
+	TrackerSettingsWindow.cpp
+	TrackerString.cpp
+	TrashWatcher.cpp
+	Utilities.cpp
+	ViewState.cpp
+	VolumeWindow.cpp
+	WidgetAttributeText.cpp
+	;
+
+LinkSharedOSLibs libtracker.so : libroot.so libbe.so libtranslation.so ;
