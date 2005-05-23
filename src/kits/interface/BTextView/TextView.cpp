@@ -615,7 +615,7 @@ BTextView::MouseDown(BPoint where)
 	the cursor is in the view.
 	\param where The point where the mouse button has been released.
 
-	Doesn't do anything useful at the moment
+	Stops asynchronous mouse tracking
 */
 void
 BTextView::MouseUp(BPoint where)
@@ -3886,10 +3886,14 @@ bool
 BTextView::PerformMouseUp(BPoint where)
 {
 	CALLED();
-	// TODO: Put here the code for asynchronous mouse tracking
-
+	if (fClickRunner == NULL)
+		return false;
+	
 	StopMouseTracking();
-	return false;
+	
+	fClickOffset = OffsetAt(where);
+	
+	return true;
 }
 
 
@@ -3900,12 +3904,34 @@ BTextView::PerformMouseMoved(BPoint where, uint32 code)
 	if (fClickRunner == NULL)
 		return false;
 
-	// TODO: Multiword/Line selection
+	int32 start = 0, end = 0;
 	int32 offset = OffsetAt(where);
-	if (offset < fClickOffset)
-		Select(offset, fClickOffset);
-	else
-		Select(fClickOffset, offset);
+	
+	int32 clickCount = 1;
+
+#if 0
+	Window()->CurrentMessage()->FindInt32("clicks", &clickCount);
+#endif
+
+	switch (clickCount) {
+		case 1:
+			start = min_c(offset, fClickOffset);
+			end = max_c(offset, fClickOffset);
+			break;
+		
+		case 2:
+			FindWord(offset, &start, &end);
+			break;
+		
+		case 3:
+			//TODO: Multiline selection
+			break;
+		
+		default:
+			break;
+	}
+	
+	Select(start, end);
 	
 	return true;
 }
