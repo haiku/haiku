@@ -600,6 +600,20 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			break;
 		}
+		case AS_LAYER_SET_MOUSE_EVENT_MASK:
+		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fName, cl->fName->String()));			
+
+			uint32		mask;
+			uint32		options;
+
+			link.Read<uint32>(&mask);
+			link.Read<uint32>(&options);
+
+			myRootLayer->SetEventMaskLayer(cl, mask, options);
+
+			break;
+		}
 		case AS_LAYER_MOVETO:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer name: %s\n", fName, cl->fName->String()));

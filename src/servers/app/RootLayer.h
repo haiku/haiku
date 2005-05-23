@@ -107,6 +107,8 @@ public:
 			void				SetDragMessage(BMessage *msg);
 			BMessage*			DragMessage(void) const;
 
+			bool				SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options);
+
 	static	int32				WorkingThread(void *data);
 
 			CursorManager&		GetCursorManager() { return fCursorManager; }

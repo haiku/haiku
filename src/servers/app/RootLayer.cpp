@@ -1747,7 +1747,34 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 	}
 }
 
-void RootLayer::SetDragMessage(BMessage* msg)
+bool
+RootLayer::SetEventMaskLayer(Layer *lay, uint32 mask, uint32 options)
+{
+	if (!lay)
+		return false;
+
+	bool	returnValue = true;
+
+	Lock();
+
+	if (fEventMaskLayer && fEventMaskLayer != lay)
+	{
+		fprintf(stderr, "WARNING: fEventMaskLayer already set and different than the required one!\n");
+		returnValue = false;
+	}
+	else
+	{
+		fEventMaskLayer = lay;
+		// TODO: use this mask and options!
+	}
+	
+	Unlock();
+
+	return returnValue;
+}
+
+void
+RootLayer::SetDragMessage(BMessage* msg)
 {
 	if (fDragMessage)
 	{
