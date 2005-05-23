@@ -62,7 +62,6 @@ rdef_add_include_dir(const char *dir, bool toEndOfList)
 {
 	clear_error();
 
-printf("ADD: %s\n", dir);
 	char *path = (char *)malloc(strlen(dir) + 2);
 	if (path == NULL) {
 		rdef_err = B_NO_MEMORY;
