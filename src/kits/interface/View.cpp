@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		View.cpp
-//	Author:			Adrian Oanca <adioanca@myrealbox.com>
+//	Author:			Adrian Oanca <adioanca@cotty.iren.ro>
 //	Description:	A BView object represents a rectangular area within a window.
 //					The object draws within this rectangle and responds to user
 //					events that are directed at the window.
@@ -1334,12 +1334,18 @@ BView::EventMask()
 status_t
 BView::SetMouseEventMask(uint32 mask, uint32 options)
 {
-	fEventMask = (mask << 16) | (fEventMask & 0x0000FFFF);
-	fEventOptions = (options << 16) | (options & 0x0000FFFF);
+//	fEventMask = (mask << 16) | (fEventMask & 0x0000FFFF);
+//	fEventOptions = (options << 16) | (options & 0x0000FFFF);
 	
-	// TODO: Contact app_server
+	if (do_owner_check() && owner->CurrentMessage() && owner->CurrentMessage()->what == B_MOUSE_DOWN)
+	{
+		owner->fLink->StartMessage(AS_LAYER_SET_MOUSE_EVENT_MASK);
+		owner->fLink->Attach<uint32>(mask);
+		owner->fLink->Attach<uint32>(options);
 
-	return B_OK;
+		return B_OK;
+	}
+	return B_ERROR;
 }
 
 
