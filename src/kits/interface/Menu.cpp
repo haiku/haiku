@@ -1053,10 +1053,9 @@ BMenu::InitData(BMessage *data)
 bool
 BMenu::_show(bool selectFirstItem)
 {
-	BWindow *menuWindow = MenuWindow();
-	
-	menuWindow->Lock();
-	menuWindow->ChildAt(0)->AddChild(this);
+	// Menu windows get the BMenu's handler name
+	fCachedMenuWindow = new BMenuWindow(Name());
+	fCachedMenuWindow->ChildAt(0)->AddChild(this);
 	
 	// We're doing this here because ConvertToScreen() needs:
 	// 1. The BView to be attached (see the above line).
@@ -1066,8 +1065,7 @@ BMenu::_show(bool selectFirstItem)
 	
 	UpdateWindowViewSize();
 	
-	menuWindow->Unlock();
-	menuWindow->Show();
+	fCachedMenuWindow->Show();
 	
 	return true;
 }
@@ -1079,8 +1077,8 @@ BMenu::_hide()
 	if (fCachedMenuWindow != NULL) {
 		fCachedMenuWindow->Lock();
 		fCachedMenuWindow->ChildAt(0)->RemoveChild(this);
-		fCachedMenuWindow->Hide();
-		fCachedMenuWindow->Unlock();
+		fCachedMenuWindow->Quit();
+		fCachedMenuWindow = NULL;
 	}
 	
 }
@@ -1434,12 +1432,6 @@ BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 BMenuWindow	*
 BMenu::MenuWindow()
 {
-	if (fCachedMenuWindow == NULL) {
-		// Menu windows get the BMenu's handler name
-		fCachedMenuWindow = new BMenuWindow(Name());
-		UpdateWindowViewSize();
-	}
-	
 	return fCachedMenuWindow;
 }
 
@@ -1646,8 +1638,10 @@ void
 BMenu::UpdateWindowViewSize(bool upWind)
 {
 	ASSERT(fCachedMenuWindow != NULL);
-	fCachedMenuWindow->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
-	fCachedMenuWindow->MoveTo(ScreenLocation());
+	if (fCachedMenuWindow != NULL) {
+		fCachedMenuWindow->ResizeTo(Bounds().Width() + 2, Bounds().Height() + 2);
+		fCachedMenuWindow->MoveTo(ScreenLocation());
+	}
 }
 
 
