@@ -1216,6 +1216,9 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 	if (rCode == SERVER_TRUE) {
 		owner->fLink->Read<BPoint>(location);
 		owner->fLink->Read((int32 *)buttons, sizeof(int32));
+		
+		// TODO: See above comment about coordinates
+		ConvertFromScreen(location);
 	}
 }
 
