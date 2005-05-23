@@ -4,15 +4,18 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <fs_interface.h>
+
 #include "ddm_modules.h"
 #include "KDiskDeviceUtils.h"
 #include "KFileSystem.h"
 #include "KPartition.h"
 
+
 // constructor
 KFileSystem::KFileSystem(const char *name)
 	: KDiskSystem(name),
-	  fModule(NULL)
+	fModule(NULL)
 {
 }
 
@@ -32,7 +35,7 @@ KFileSystem::Init()
 	if (error != B_OK)
 		return error;
 	error = SetPrettyName(fModule->pretty_name);
-	SetFlags(fModule->flags | B_DISK_SYSTEM_IS_FILE_SYSTEM);
+	SetFlags(/*fModule->flags |*/ B_DISK_SYSTEM_IS_FILE_SYSTEM);
 	Unload();
 	return error;
 }
@@ -291,31 +294,32 @@ KFileSystem::SetContentName(KPartition *partition, char *name,
 	return B_ERROR;
 }
 
-// SetContentParameters
+
 status_t
 KFileSystem::SetContentParameters(KPartition *partition,
-								  const char *parameters, KDiskDeviceJob *job)
+	const char *parameters, KDiskDeviceJob *job)
 {
 	// to be implemented
 	return B_ERROR;
 }
 
-// Initialize
+
 status_t
 KFileSystem::Initialize(KPartition *partition, const char *name,
-						const char *parameters, KDiskDeviceJob *job)
+	const char *parameters, KDiskDeviceJob *job)
 {
 	// to be implemented
 	return B_ERROR;
 }
 
-// LoadModule
+
 status_t
 KFileSystem::LoadModule()
 {
 	if (fModule)		// shouldn't happen
 		return B_OK;
-	return get_module(Name(), (module_info**)&fModule);
+
+	return get_module(Name(), (module_info **)&fModule);
 }
 
 // UnloadModule
@@ -323,7 +327,7 @@ void
 KFileSystem::UnloadModule()
 {
 	if (fModule) {
-		put_module(fModule->module.name);
+		put_module(fModule->info.name);
 		fModule = NULL;
 	}
 }

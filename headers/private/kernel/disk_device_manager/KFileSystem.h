@@ -8,7 +8,7 @@
 
 #include "KDiskSystem.h"
 
-struct fs_module_info;
+struct file_system_module_info;
 
 namespace BPrivate {
 namespace DiskDevice {
@@ -76,7 +76,7 @@ protected:
 	virtual void UnloadModule();
 
 private:
-	fs_module_info	*fModule;
+	file_system_module_info	*fModule;
 };
 
 } // namespace DiskDevice

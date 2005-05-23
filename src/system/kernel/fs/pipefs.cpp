@@ -1677,12 +1677,19 @@ pipefs_std_ops(int32 op, ...)
 
 using namespace pipefs;
 
-file_system_info gPipeFileSystem = {
+file_system_module_info gPipeFileSystem = {
 	{
 		"file_systems/pipefs" B_CURRENT_FS_API_VERSION,
 		0,
 		pipefs_std_ops,
 	},
+
+	"Pipe File System",
+
+	NULL,	// identify_partition()
+	NULL,	// scan_partition()
+	NULL,	// free_identify_partition_cookie()
+	NULL,	// free_partition_content_cookie()
 
 	&pipefs_mount,
 	&pipefs_unmount,

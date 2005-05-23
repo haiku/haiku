@@ -33,6 +33,11 @@
 #define BFS_IO_SIZE	65536
 
 
+struct identify_cookie {
+	disk_super_block super_block;
+};
+
+
 extern void fill_stat_buffer(Inode *inode, struct stat &stat);
 
 
@@ -70,6 +75,51 @@ double
 strtod(const char */*start*/, char **/*end*/)
 {
 	return 0;
+}
+
+
+//	#pragma mark - Scanning
+
+
+static float
+bfs_identify_partition(int fd, partition_data *partition, void **_cookie)
+{
+	disk_super_block superBlock;
+	status_t status = Volume::Identify(fd, &superBlock);
+	if (status != B_OK)
+		return status;
+
+	identify_cookie *cookie = new identify_cookie;
+	memcpy(&cookie->super_block, &superBlock, sizeof(disk_super_block));
+
+	*_cookie = cookie;
+	return 0.8f;
+}
+
+
+static status_t
+bfs_scan_partition(int fd, partition_data *partition, void *_cookie)
+{
+	identify_cookie *cookie = (identify_cookie *)_cookie;
+
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_FILE_SYSTEM;
+	partition->content_size = cookie->super_block.NumBlocks() * cookie->super_block.BlockSize();
+	partition->block_size = cookie->super_block.BlockSize();
+	partition->content_name = strdup(cookie->super_block.name);
+	if (partition->content_name == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+static void
+bfs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
+{
+	identify_cookie *cookie = (identify_cookie *)_cookie;
+
+	delete cookie;
 }
 
 
@@ -2002,12 +2052,20 @@ bfs_std_ops(int32 op, ...)
 }
 
 
-static file_system_info sBeFileSystem = {
+static file_system_module_info sBeFileSystem = {
 	{
 		"file_systems/bfs" B_CURRENT_FS_API_VERSION,
 		0,
 		bfs_std_ops,
 	},
+
+	"Be File System",
+
+	// scanning
+	bfs_identify_partition,
+	bfs_scan_partition,
+	bfs_free_identify_partition_cookie,
+	NULL,	// free_partition_content_cookie()
 
 	&bfs_mount,
 	&bfs_unmount,
@@ -2103,10 +2161,7 @@ static file_system_info sBeFileSystem = {
 	&bfs_rewind_query,
 };
 
-extern module_info gDiskDeviceInfo;
-
 module_info *modules[] = {
 	(module_info *)&sBeFileSystem,
-	&gDiskDeviceInfo,
 	NULL,
 };

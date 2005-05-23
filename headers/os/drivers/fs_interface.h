@@ -10,6 +10,7 @@
 #include <OS.h>
 #include <Select.h>
 #include <module.h>
+#include <disk_device_manager.h>
 
 #include <sys/uio.h>
 
@@ -54,11 +55,22 @@ struct file_io_vec {
 extern "C" {
 #endif 
 
-typedef struct file_system_info {
-	struct module_info	module_info;
+typedef struct file_system_module_info {
+	struct module_info	info;
+	const char			*pretty_name;
+
+	/* scanning (the device is write locked) */
+	float (*identify_partition)(int fd, partition_data *partition,
+				void **cookie);
+	status_t (*scan_partition)(int fd, partition_data *partition,
+				void *cookie);
+	void (*free_identify_partition_cookie)(partition_data *partition,
+				void *cookie);
+	void (*free_partition_content_cookie)(partition_data *partition);
 
 	/* general operations */
-	status_t (*mount)(mount_id id, const char *device, uint32 flags, const char *args, fs_volume *_fs, vnode_id *_rootVnodeID);
+	status_t (*mount)(mount_id id, const char *device, uint32 flags, 
+				const char *args, fs_volume *_fs, vnode_id *_rootVnodeID);
 	status_t (*unmount)(fs_volume fs);
 
 	status_t (*read_fs_info)(fs_volume fs, struct fs_info *info);
@@ -154,9 +166,56 @@ typedef struct file_system_info {
 	status_t (*open_query)(fs_volume fs, const char *query, uint32 flags, port_id port, uint32 token, fs_cookie *_cookie);
 	status_t (*close_query)(fs_volume fs, fs_cookie cookie);
 	status_t (*free_query_cookie)(fs_volume fs, fs_cookie cookie);
-	status_t (*read_query)(fs_volume fs, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
+	status_t (*read_query)(fs_volume fs, fs_cookie cookie, 
+				struct dirent *buffer, size_t bufferSize, uint32 *_num);
 	status_t (*rewind_query)(fs_volume fs, fs_cookie cookie);
-} file_system_info;
+
+	/* capability querying (the device is read locked) */
+	// ToDo: this will probably be combined to a single call
+	bool (*supports_defragmenting)(partition_data *partition,
+				bool *whileMounted);
+	bool (*supports_repairing)(partition_data *partition,
+				bool checkOnly, bool *whileMounted);
+	bool (*supports_resizing)(partition_data *partition,
+				bool *whileMounted);
+	bool (*supports_moving)(partition_data *partition, bool *isNoOp);
+	bool (*supports_setting_content_name)(partition_data *partition,
+				bool *whileMounted);
+	bool (*supports_setting_content_parameters)(partition_data *partition, 
+				bool *whileMounted);
+	bool (*supports_initializing)(partition_data *partition);
+
+	bool (*validate_resize)(partition_data *partition, off_t *size);
+	bool (*validate_move)(partition_data *partition, off_t *start);
+	bool (*validate_set_content_name)(partition_data *partition,
+				char *name);
+	bool (*validate_set_content_parameters)(partition_data *partition,
+				const char *parameters);
+	bool (*validate_initialize)(partition_data *partition, char *name,
+				const char *parameters);
+
+	/* shadow partition modification (device is write locked) */
+	status_t (*shadow_changed)(partition_data *partition,
+				uint32 operation);
+
+	/* writing (the device is NOT locked) */
+	status_t (*defragment)(int fd, partition_id partition,
+				disk_job_id job);
+	status_t (*repair)(int fd, partition_id partition, bool checkOnly,
+				disk_job_id job);
+	status_t (*resize)(int fd, partition_id partition, off_t size,
+				disk_job_id job);
+	status_t (*move)(int fd, partition_id partition, off_t offset,
+				disk_job_id job);
+	status_t (*set_content_name)(int fd, partition_id partition,
+				const char *name, disk_job_id job);
+	status_t (*set_content_parameters)(int fd, partition_id partition,
+				const char *parameters, disk_job_id job);
+	status_t (*initialize)(const char *partition, const char *name,
+				const char *parameters, disk_job_id job);
+		// This is pretty close to how the hook in R5 looked. Save the job ID, of
+		// course and that the parameters were given as (void*, size_t) pair.
+} file_system_module_info;
 
 
 /* file system add-ons only prototypes */

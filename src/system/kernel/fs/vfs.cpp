@@ -99,7 +99,7 @@ struct vnode_hash_key {
 
 struct fs_mount {
 	struct fs_mount	*next;
-	file_system_info *fs;
+	file_system_module_info *fs;
 	mount_id		id;
 	void			*cookie;
 	char			*device_name;
@@ -487,20 +487,20 @@ put_mount(struct fs_mount *mount)
 
 
 static status_t
-put_file_system(file_system_info *fs)
+put_file_system(file_system_module_info *fs)
 {
-	return put_module(fs->module_info.name);
+	return put_module(fs->info.name);
 }
 
 
-static file_system_info *
+static file_system_module_info *
 get_file_system(const char *fsName)
 {
 	// construct module name (we currently support only one API)
 	char name[B_FILE_NAME_LENGTH];
 	snprintf(name, sizeof(name), "file_systems/%s/v1", fsName);
 
-	file_system_info *info;
+	file_system_module_info *info;
 	if (get_module(name, (module_info **)&info) != B_OK)
 		return NULL;
 
@@ -2758,7 +2758,7 @@ vfs_mount_boot_file_system(kernel_args *args)
 	} else
 		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
 
-	file_system_info *bootfs;
+	file_system_module_info *bootfs;
 	if ((bootfs = get_file_system("bootfs")) == NULL) {
 		// no bootfs there, yet
 

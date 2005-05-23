@@ -45,7 +45,6 @@ KernelAddon bfs : kernel file_systems :
 	Volume.cpp
 
 	kernel_interface.cpp
-	disk_device_interface.cpp
 	;
 
 SEARCH on [ FGristFiles

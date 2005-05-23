@@ -1030,12 +1030,19 @@ rootfs_std_ops(int32 op, ...)
 }
 
 
-file_system_info gRootFileSystem = {
+file_system_module_info gRootFileSystem = {
 	{
 		"file_systems/rootfs" B_CURRENT_FS_API_VERSION,
 		0,
 		rootfs_std_ops,
 	},
+
+	"Root File System",
+
+	NULL,	// identify_partition()
+	NULL,	// scan_partition()
+	NULL,	// free_identify_partition_cookie()
+	NULL,	// free_partition_content_cookie()
 
 	&rootfs_mount,
 	&rootfs_unmount,

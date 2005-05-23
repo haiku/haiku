@@ -1574,12 +1574,19 @@ devfs_std_ops(int32 op, ...)
 }
 
 
-file_system_info gDeviceFileSystem = {
+file_system_module_info gDeviceFileSystem = {
 	{
 		"file_systems/devfs" B_CURRENT_FS_API_VERSION,
 		0,
 		devfs_std_ops,
 	},
+
+	"Device File System",
+
+	NULL,	// identify_partition()
+	NULL,	// scan_partition()
+	NULL,	// free_identify_partition_cookie()
+	NULL,	// free_partition_content_cookie()
 
 	&devfs_mount,
 	&devfs_unmount,

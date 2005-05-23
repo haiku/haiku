@@ -1,6 +1,6 @@
 // ddm_modules.h
 //
-// Interfaces to be implemented by partition/FS modules.
+// Interface to be implemented by partition modules.
 
 #ifndef _K_DISK_DEVICE_MODULES_H
 #define _K_DISK_DEVICE_MODULES_H
@@ -184,107 +184,5 @@ typedef struct partition_module_info {
 	partition_create_child						create_child;
 	partition_delete_child						delete_child;
 } partition_module_info;
-
-
-// FS module interface
-
-// scanning
-// (the device is write locked)
-typedef float (*fs_identify_partition)(int fd, partition_data *partition,
-	void **cookie);
-typedef status_t (*fs_scan_partition)(int fd, partition_data *partition,
-	void *cookie);
-typedef void (*fs_free_identify_partition_cookie)(partition_data *partition,
-	void *cookie);
-typedef void (*fs_free_partition_content_cookie)(partition_data *partition);
-
-// querying
-// (the device is read locked)
-typedef bool (*fs_supports_defragmenting)(partition_data *partition,
-	bool *whileMounted);
-typedef bool (*fs_supports_repairing)(partition_data *partition,
-	bool checkOnly, bool *whileMounted);
-typedef bool (*fs_supports_resizing)(partition_data *partition,
-	bool *whileMounted);
-typedef bool (*fs_supports_moving)(partition_data *partition, bool *isNoOp);
-typedef bool (*fs_supports_setting_content_name)(partition_data *partition,
-	bool *whileMounted);
-typedef bool (*fs_supports_setting_content_parameters)(
-	partition_data *partition, bool *whileMounted);
-typedef bool (*fs_supports_initializing)(partition_data *partition);
-
-typedef bool (*fs_validate_resize)(partition_data *partition, off_t *size);
-typedef bool (*fs_validate_move)(partition_data *partition, off_t *start);
-typedef bool (*fs_validate_set_content_name)(partition_data *partition,
-	char *name);
-typedef bool (*fs_validate_set_content_parameters)(partition_data *partition,
-	const char *parameters);
-typedef bool (*fs_validate_initialize)(partition_data *partition, char *name,
-	const char *parameters);
-
-// shadow partition modification
-// (device is write locked)
-typedef status_t (*fs_shadow_changed)(partition_data *partition,
-	uint32 operation);
-
-// writing
-// (the device is NOT locked)
-typedef status_t (*fs_defragment)(int fd, partition_id partition,
-	disk_job_id job);
-typedef status_t (*fs_repair)(int fd, partition_id partition, bool checkOnly,
-	disk_job_id job);
-typedef status_t (*fs_resize)(int fd, partition_id partition, off_t size,
-	disk_job_id job);
-typedef status_t (*fs_move)(int fd, partition_id partition, off_t offset,
-	disk_job_id job);
-typedef status_t (*fs_set_content_name)(int fd, partition_id partition,
-	const char *name, disk_job_id job);
-typedef status_t (*fs_set_content_parameters)(int fd, partition_id partition,
-	const char *parameters, disk_job_id job);
-typedef status_t (*fs_initialize)(const char *partition, const char *name,
-	const char *parameters, disk_job_id job);
-	// This is pretty close to how the hook in R5 looked. Save the job ID, of
-	// course and that the parameters were given as (void*, size_t) pair.
-
-typedef struct fs_module_info {
-	module_info									module;
-	const char									*pretty_name;
-	uint32										flags;
-
-	// scanning
-	fs_identify_partition						identify_partition;
-	fs_scan_partition							scan_partition;
-	fs_free_identify_partition_cookie			free_identify_partition_cookie;
-	fs_free_partition_content_cookie			free_partition_content_cookie;
-
-	// querying
-	fs_supports_defragmenting					supports_defragmenting;
-	fs_supports_repairing						supports_repairing;
-	fs_supports_resizing						supports_resizing;
-	fs_supports_moving							supports_moving;
-	fs_supports_setting_content_name			supports_setting_content_name;
-	fs_supports_setting_content_parameters
-			supports_setting_content_parameters;
-	fs_supports_initializing					supports_initializing;
-
-	fs_validate_resize							validate_resize;
-	fs_validate_move							validate_move;
-	fs_validate_set_content_name				validate_set_content_name;
-	fs_validate_set_content_parameters
-			validate_set_content_parameters;
-	fs_validate_initialize						validate_initialize;
-
-	// shadow partition modification
-	fs_shadow_changed							shadow_changed;
-
-	// writing
-	fs_defragment								defragment;
-	fs_repair									repair;
-	fs_resize									resize;
-	fs_move										move;
-	fs_set_content_name							set_content_name;
-	fs_set_content_parameters					set_content_parameters;
-	fs_initialize								initialize;
-} fs_module_info;
 
 #endif	// _K_DISK_DEVICE_MODULES_H

@@ -7,7 +7,7 @@
 
 #include <storage/DiskDeviceDefs.h>
 
-#include <disk_device_manager/disk_device_manager.h>
+#include <disk_device_manager.h>
 
 #ifdef __cplusplus
 extern "C" {

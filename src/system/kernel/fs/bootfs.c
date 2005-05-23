@@ -1,7 +1,7 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <KernelExport.h>
@@ -950,12 +950,19 @@ bootfs_std_ops(int32 op, ...)
 }
 
 
-file_system_info gBootFileSystem = {
+file_system_module_info gBootFileSystem = {
 	{
 		"file_systems/bootfs" B_CURRENT_FS_API_VERSION,
 		0,
 		bootfs_std_ops,
 	},
+
+	"Old Boot File System",
+
+	NULL,	// identify_partition()
+	NULL,	// scan_partition()
+	NULL,	// free_identify_partition_cookie()
+	NULL,	// free_partition_content_cookie()
 
 	&bootfs_mount,
 	&bootfs_unmount,

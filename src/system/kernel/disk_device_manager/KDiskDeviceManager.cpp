@@ -42,7 +42,6 @@
 // directories for partitioning and file system modules
 static const char *kPartitioningSystemPrefix = "partitioning_systems";
 static const char *kFileSystemPrefix = "file_systems";
-static const char *kFileSystemDiskDeviceSuffix = "/disk_device/v1";
 
 
 // singleton instance
@@ -114,23 +113,6 @@ is_active_job_status(uint32 status)
 }
 
 
-static bool
-is_fs_disk_device(const char *module)
-{
-	size_t prefixLength = strlen(kFileSystemPrefix);
-	if (strncmp(module, kFileSystemPrefix, prefixLength))
-		return false;
-
-	size_t suffixLength = strlen(kFileSystemDiskDeviceSuffix);
-	size_t length = strlen(module);
-
-	if (length <= suffixLength + prefixLength)
-		return false;
-
-	return !strcmp(module + length - suffixLength, kFileSystemDiskDeviceSuffix);
-}
-
-
 //	#pragma mark -
 
 
@@ -153,6 +135,7 @@ KDiskDeviceManager::KDiskDeviceManager()
 
 	uint32 cookie = 0;
 	size_t partitioningPrefixLength = strlen(kPartitioningSystemPrefix);
+	size_t filePrefixLength = strlen(kFileSystemPrefix);
 
 	while (true) {
 		KPath name;
@@ -169,7 +152,7 @@ KDiskDeviceManager::KDiskDeviceManager()
 				partitioningPrefixLength)) {
 			DBG(OUT("partitioning system: %s\n", name.Path()));
 			_AddPartitioningSystem(name.Path());
-		} else if (is_fs_disk_device(name.Path())) {
+		} else if (!strncmp(name.Path(), kFileSystemPrefix, filePrefixLength)) {
 			DBG(OUT("file system: %s\n", name.Path()));
 			_AddFileSystem(name.Path());
 		}
