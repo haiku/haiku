@@ -135,7 +135,7 @@ static void copy_str( char *dest, const uint8 *src, size_t len )
 	
 	// copy until 0xa
 	for( i = 0; i < len; ++i ) {
-		if( src[i] == 0xa )
+		if( *src == 0xa )
 			break;
 			
 		*dest++ = *src++;
