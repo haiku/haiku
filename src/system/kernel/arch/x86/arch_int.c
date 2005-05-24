@@ -57,6 +57,10 @@
 #define PIC_INIT3_SLAVE_ID2		0x02
 #define PIC_INIT4_x86_MODE		0x01
 
+#define PIC_CONTROL3			0x08
+#define PIC_CONTROL3_READ_ISR	0x03
+#define PIC_CONTROL3_READ_IRR	0x02
+
 #define PIC_NON_SPECIFIC_EOI	0x20
 
 #define PIC_INT_BASE			0x20
@@ -91,7 +95,7 @@ const char *kInterruptNames[] = {
 typedef struct {
 	uint32 a, b;
 } desc_table;
-static desc_table *idt = NULL;
+static desc_table *sIDT = NULL;
 
 struct iframe_stack gBootFrameStack;
 
@@ -113,22 +117,47 @@ set_gate(desc_table *gate_addr, addr_t addr, int type, int dpl)
 static void
 set_intr_gate(int n, void *addr)
 {
-	set_gate(&idt[n], (addr_t)addr, 14, DPL_KERNEL);
+	set_gate(&sIDT[n], (addr_t)addr, 14, DPL_KERNEL);
 }
 
 
 static void
 set_system_gate(int n, void *addr)
 {
-	set_gate(&idt[n], (unsigned int)addr, 15, DPL_USER);
+	set_gate(&sIDT[n], (unsigned int)addr, 15, DPL_USER);
 }
 
 
 void
 x86_set_task_gate(int32 n, int32 segment)
 {
-	idt[n].a = (segment << 16);
-	idt[n].b = 0x8000 | (0 << 13) | (0x5 << 8); // present, dpl 0, type 5
+	sIDT[n].a = (segment << 16);
+	sIDT[n].b = 0x8000 | (0 << 13) | (0x5 << 8); // present, dpl 0, type 5
+}
+
+
+/**	Tests if the interrupt in-service register of the responsible
+ *	PIC is set for interrupts 7 and 15, and if that's not the case, 
+ *	it must assume it's a spurious interrupt.
+ */
+
+static bool
+pic_is_spurious_interrupt(int32 num)
+{
+	int32 port, isr;
+
+	if (num == 7)
+		port = PIC_MASTER_CONTROL;
+	else if (num == 15)
+		port = PIC_SLAVE_CONTROL;
+	else
+		return false;
+
+	out8(PIC_CONTROL3 | PIC_CONTROL3_READ_ISR, port);
+	isr = in8(port);
+	out8(PIC_CONTROL3 | PIC_CONTROL3_READ_IRR, port);
+
+	return (isr & 0x80) == 0;
 }
 
 
@@ -138,7 +167,7 @@ x86_set_task_gate(int32 n, int32 segment)
  */
 
 static void
-pic_end_of_interrupt(int num)
+pic_end_of_interrupt(int32 num)
 {
 	if (num >= PIC_INT_BASE && num <= PIC_INT_BASE + PIC_NUM_INTS) {
 		// PIC 8259 controlled interrupt
@@ -356,6 +385,12 @@ i386_handle_trap(struct iframe frame)
 		default:
 			if (frame.vector >= ARCH_INTERRUPT_BASE) {
 				pic_end_of_interrupt(frame.vector);
+
+				// This is a workaround for spurious assertions of interrupts 7/15
+				// which seems to be an often seen problem on the PC platform
+				if (pic_is_spurious_interrupt(frame.vector - ARCH_INTERRUPT_BASE))
+					break;
+
 				ret = int_io_interrupt_handler(frame.vector - ARCH_INTERRUPT_BASE);
 			} else {
 				panic("i386_handle_trap: unhandled trap 0x%x (%s) at ip 0x%x, thread 0x%x!\n",
@@ -392,8 +427,8 @@ i386_handle_trap(struct iframe frame)
 status_t
 arch_int_init(kernel_args *args)
 {
-	// set the global idt variable
-	idt = (desc_table *)args->arch_args.vir_idt;
+	// set the global sIDT variable
+	sIDT = (desc_table *)args->arch_args.vir_idt;
 
 	// setup the interrupt controller
 	pic_init();
@@ -452,8 +487,8 @@ arch_int_init_post_vm(kernel_args *args)
 {
 	area_id area;
 
-	idt = (desc_table *)args->arch_args.vir_idt;
-	area = create_area("idt", (void *)&idt, B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
+	sIDT = (desc_table *)args->arch_args.vir_idt;
+	area = create_area("idt", (void *)&sIDT, B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	return area >= B_OK ? B_OK : area;
