@@ -384,12 +384,12 @@ i386_handle_trap(struct iframe frame)
 
 		default:
 			if (frame.vector >= ARCH_INTERRUPT_BASE) {
-				pic_end_of_interrupt(frame.vector);
-
 				// This is a workaround for spurious assertions of interrupts 7/15
 				// which seems to be an often seen problem on the PC platform
 				if (pic_is_spurious_interrupt(frame.vector - ARCH_INTERRUPT_BASE))
 					break;
+
+				pic_end_of_interrupt(frame.vector);
 
 				ret = int_io_interrupt_handler(frame.vector - ARCH_INTERRUPT_BASE);
 			} else {
