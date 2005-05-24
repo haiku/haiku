@@ -17,7 +17,7 @@ MyView::MyView(BRect frame, const char *name, uint32 resizingMode, uint32 flags)
 	col.red		= 49;
 	col.green	= 101;
 	col.blue	= 156;
-	topLayer = new Layer(Bounds(), "topLayer", B_FOLLOW_ALL, col);
+	topLayer = new Layer(Bounds(), "topLayer", B_FOLLOW_ALL, 0, col);
 	topLayer->SetRootLayer(this);
 
 	topLayer->rebuild_visible_regions(BRegion(Bounds()), BRegion(Bounds()), NULL);
@@ -70,6 +70,9 @@ void MyView::RequestRedraw()
 void MyView::Draw(BRect area)
 {
 	ConstrainClippingRegion(&fRedrawReg);
+FillRect(Bounds());
+Flush();
+snooze(1000000);
 	PushState();
 	DrawSubTree(topLayer);
 	PopState();

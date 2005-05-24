@@ -88,19 +88,21 @@ void clsMainWindow::test1()
 	c.red = rand()/256;
 	c.green = rand()/256;
 	c.blue = rand()/256;
-	Layer	*lay1 = new Layer(BRect(20,20,300,220), "lay1", B_FOLLOW_NONE, c);
+	Layer	*lay1 = new Layer(BRect(20,20,300,220), "lay1", B_FOLLOW_NONE, 0, c);
 	topLayer->AddLayer(lay1);
 
 	c.red = rand()/256;
 	c.green = rand()/256;
 	c.blue = rand()/256;
-	Layer	*lay2 = new Layer(BRect(20,20,150,150), "lay2", B_FOLLOW_NONE, c);
+	Layer	*lay2 = new Layer(BRect(20,20,150,150), "lay2",
+			B_FOLLOW_NONE,
+			B_FULL_UPDATE_ON_RESIZE, c);
 	lay1->AddLayer(lay2);
 
 	c.red = rand()/256;
 	c.green = rand()/256;
 	c.blue = rand()/256;
-	Layer	*lay3 = new Layer(BRect(20,20,100,100), "lay3", B_FOLLOW_NONE, c);
+	Layer	*lay3 = new Layer(BRect(20,20,100,100), "lay3", B_FOLLOW_NONE, 0, c);
 	lay2->AddLayer(lay3);
 
 	temp	= lay1->Bounds();
@@ -110,22 +112,8 @@ void clsMainWindow::test1()
 	wind->Lock();
 	fView->Invalidate();
 	wind->Unlock();
-/*
-	snooze(2000000);
 
-	temp	= lay2->Bounds();
-	lay2->ConvertToScreen2(&temp);
-	parent	= lay2->Parent();
-	if (parent)
-	{
-		parent->RemLayer(lay2);
-		parent->RebuildVisibleRegions(BRegion(temp), lay2);
-	}
 
-	wind->Lock();
-	fView->Invalidate();
-	wind->Unlock();
-*/
 	snooze(2000000);
 
 	lay2->MoveBy(25,35);
@@ -137,6 +125,18 @@ void clsMainWindow::test1()
 	snooze(2000000);
 
 	lay1->ScrollBy(0,50);
+
+	snooze(2000000);
+
+	lay2->Hide();
+
+	snooze(2000000);
+
+	lay2->Show();
+
+	snooze(2000000);
+
+	lay1->Invalidate(BRect(0,0,500,500));
 
 }
 

@@ -8,7 +8,7 @@ class MyView;
 class Layer
 {
 public:
-							Layer(BRect frame, const char* name, uint32 rm, rgb_color c);
+							Layer(BRect frame, const char* name, uint32 rm, uint32 flags, rgb_color c);
 	virtual					~Layer();
 
 			void			AddLayer(Layer* layer);
@@ -18,8 +18,12 @@ public:
 			void			ResizeBy(float dx, float dy);
 			void			ScrollBy(float dx, float dy);
 
+			bool			IsVisuallyHidden() const;
+			void			Hide();
+			void			Show();
+
 	virtual	void			MovedByHook(float dx, float dy) { }
-	virtual	void			ResizedByHook(float dx, float dy) { }
+	virtual	void			ResizedByHook(float dx, float dy, bool automatic) { }
 	virtual	void			ScrolledByHook(float dx, float dy) { }
 
 			Layer*			VirtualBottomChild() const;
@@ -27,12 +31,13 @@ public:
 			Layer*			VirtualUpperSibling() const;
 			Layer*			VirtualLowerSibling() const;
 
+			void			Invalidate(	const BRegion &invalid,
+										const Layer *startFrom = NULL);
 			void			RebuildVisibleRegions(	const BRegion &invalid,
 													const Layer *startFrom);
 			void			ConvertToScreen2(BRect* rect);
 			MyView*			GetRootLayer() const;
 			void			SetRootLayer(MyView* view) { fView = view; }
-			bool			IsVisuallyHidden() const;
 
 			BRegion*		Visible() { return &fVisible; }
 			BRegion*		FullVisible() { return &fFullVisible; }
@@ -69,6 +74,9 @@ private:
 			Layer*			fLower;
 			Layer*			fTop;
 			Layer*			fParent;
+
+			uint32			fFlags;
+			bool			fHidden;
 
 			MyView*		fView;
 };
