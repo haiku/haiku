@@ -990,7 +990,8 @@ Inode::CreateAttribute(Transaction &transaction, const char *name, uint32 type, 
 {
 	// do we need to create the attribute directory first?
 	if (Attributes().IsZero()) {
-		status_t status = Inode::Create(transaction, this, NULL, S_ATTR_DIR | 0666, 0, 0, NULL);
+		status_t status = Inode::Create(transaction, this, NULL, 
+			S_ATTR_DIR | S_DIRECTORY | 0666, 0, 0, NULL);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 	}
@@ -1000,7 +1001,8 @@ Inode::CreateAttribute(Transaction &transaction, const char *name, uint32 type, 
 		return B_ERROR;
 
 	// Inode::Create() locks the inode for us
-	return Inode::Create(transaction, attributes, name, S_ATTR | 0666, 0, type, NULL, attribute);
+	return Inode::Create(transaction, attributes, name, 
+		S_ATTR | S_REGULAR | 0666, 0, type, NULL, attribute);
 }
 
 
