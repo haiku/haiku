@@ -142,6 +142,13 @@ AGGTextRenderer::RenderString(const char* string,
 {
 //printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
 
+	// ToDo: this is a temporary fix for some drawing problems
+	// Please remove when the real cause has been found :-)
+	float size = fFontEngine.height();
+	fFontEngine.height(size);
+	fFontEngine.width(size);
+	fFontEngine.hinting(fHinted);
+
 	// "bounds" will track the bounding box arround all glyphs that are actually drawn
 	// it will be calculated in untransformed coordinates within the loop and then
 	// it is transformed to the real location at the exit of the function.
