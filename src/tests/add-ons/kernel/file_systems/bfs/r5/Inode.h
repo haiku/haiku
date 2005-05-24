@@ -1,24 +1,18 @@
+/* Inode - inode access functions
+ *
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef INODE_H
 #define INODE_H
-/* Inode - inode access functions
-**
-** Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the MIT License.
-*/
 
 
 #include <KernelExport.h>
 #ifdef USER
-//#	include "myfs.h"
 #	include <stdio.h>
 #endif
 
-#ifndef _IMPEXP_KERNEL
-#	define _IMPEXP_KERNEL
-#endif
-
-#include <lock.h>
-#include <cache.h>
+#include "cache.h"
 
 #include <string.h>
 #include <unistd.h>

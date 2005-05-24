@@ -1,25 +1,19 @@
+/* Journal - transaction and logging
+ *
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef JOURNAL_H
 #define JOURNAL_H
-/* Journal - transaction and logging
-**
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include <KernelExport.h>
 
 #ifdef USER
-//#	include "myfs.h"
 #	include <stdio.h>
 #endif
 
-#ifndef _IMPEXP_KERNEL
-#	define _IMPEXP_KERNEL
-#endif
-
-#include <lock.h>
-#include <cache.h>
+#include "cache.h"
 
 #include "Volume.h"
 #include "Chain.h"

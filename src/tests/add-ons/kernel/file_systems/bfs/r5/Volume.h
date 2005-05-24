@@ -1,22 +1,16 @@
+/* Volume - BFS super block, mounting, etc.
+ *
+ * Initial version by Axel Dörfler, axeld@pinc-software.de
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef VOLUME_H
 #define VOLUME_H
-/* Volume - BFS super block, mounting, etc.
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include <KernelExport.h>
 #include <fs_interface.h>
 
-extern "C" {
-	#ifndef _IMPEXP_KERNEL
-	#	define _IMPEXP_KERNEL
-	#endif
-	#include "lock.h"
-	#include "cache.h"
-}
+#include "cache.h"
 
 #include "bfs.h"
 #include "BlockAllocator.h"

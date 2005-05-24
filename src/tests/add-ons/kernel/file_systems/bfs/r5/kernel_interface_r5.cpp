@@ -1,8 +1,8 @@
 /* kernel_interface - file system interface to BeOS' vnode layer
-**
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the Haiku License.
-*/
+ *
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+ * This file may be used under the terms of the MIT License.
+ */
 
 
 #define COMPILE_FOR_R5
@@ -26,9 +26,8 @@
 #	define _IMPEXP_KERNEL
 #endif
 
-#include <fsproto.h>
-#include <cache.h>
-#include <lock.h>
+#include "fsproto.h"
+#include "cache.h"
 
 #include <fs_index.h>
 #include <fs_query.h>
