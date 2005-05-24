@@ -2,8 +2,8 @@
 #define INODE_H
 /* Inode - inode access functions
 **
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
+** Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+** This file may be used under the terms of the MIT License.
 */
 
 
@@ -105,6 +105,7 @@ class Inode : public CachedBlock {
 		bool IsIndex() const { return (Mode() & (S_INDEX_DIR | 0777)) == S_INDEX_DIR; }
 			// that's a stupid check, but AFAIK the only possible method...
 
+		bool IsAttributeDirectory() const { return (Mode() & S_ATTR_DIR) != 0; }
 		bool IsAttribute() const { return Mode() & S_ATTR; }
 		bool IsFile() const { return Mode() & S_IFREG; }
 		bool IsRegularNode() const { return (Mode() & (S_ATTR_DIR | S_INDEX_DIR | S_ATTR)) == 0; }

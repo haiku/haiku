@@ -1,7 +1,7 @@
 /* Inode - inode access functions
 **
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the Haiku License.
+** Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+** This file may be used under the terms of the MIT License.
 */
 
 
@@ -1227,8 +1227,13 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 		// blocks we need to allocate may be different from the one we request
 		// from the block allocator
 
-	// should we preallocate some blocks (currently, always 64k)?
-	if (blocksRequested < (65536 >> fVolume->BlockShift()) && fVolume->FreeBlocks() > 128)
+	// Should we preallocate some blocks (currently, always 64k)?
+	// Attributes, attribute directories, and long symlinks usually won't get that big,
+	// and should stay close to the inode - preallocating could be counterproductive.
+	// Also, if free disk space is tight, we probably don't want to do this as well.
+	if (!IsAttribute() && !IsAttributeDirectory() && !IsSymLink()
+		&& blocksRequested < (65536 >> fVolume->BlockShift())
+		&& fVolume->FreeBlocks() > 128)
 		blocksRequested = 65536 >> fVolume->BlockShift();
 
 	while (blocksNeeded > 0) {
