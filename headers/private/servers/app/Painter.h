@@ -193,11 +193,7 @@ class Painter {
 												const escapement_delta* delta = NULL);
 
 								// bitmaps
-			void				DrawBitmap(		const BBitmap* bitmap,
-												BRect bitmapRect,
-												BRect viewRect) const;
-
-			void				DrawBitmap(		const ServerBitmap* bitmap,
+			BRect				DrawBitmap(		const ServerBitmap* bitmap,
 												BRect bitmapRect,
 												BRect viewRect) const;
 
@@ -306,9 +302,6 @@ class Painter {
 	// font file, it uses the FontManager to locate a file
 	// by Family and Style
 	AGGTextRenderer*			fTextRenderer;
-	uint32						fLastFamilyAndStyle;
-	float						fLastRotation;
-	float						fLastShear;
 };
 
 // SetHighColor

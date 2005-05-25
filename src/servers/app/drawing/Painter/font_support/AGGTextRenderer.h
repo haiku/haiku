@@ -22,8 +22,6 @@ class AGGTextRenderer {
 			bool				SetFont(const ServerFont &font);
 			void				Unset();
 
-			void				SetPointSize(float size);
-
 			void				SetHinting(bool hinting);
 			bool				Hinting() const
 									{ return fHinted; }
@@ -32,12 +30,16 @@ class AGGTextRenderer {
 			bool				Antialiasing() const
 									{ return fAntialias; }
 
+			void				SetKerning(bool kerning);
+			bool				Kerning() const
+									{ return fKerning; }
+
 			BRect				RenderString(const char* utf8String,
 											 uint32 length,
 											 font_renderer_solid_type* solidRenderer,
 											 font_renderer_bin_type* binRenderer,
-											 const Transformable& transform,
-											 BRect clippingFrame,
+											 const BPoint& baseLine,
+											 const BRect& clippingFrame,
 											 bool dryRun = false,
 											 BPoint* nextCharPos = NULL);
 
@@ -48,6 +50,8 @@ class AGGTextRenderer {
 			status_t			_PrepareUnicodeBuffer(const char* utf8String,
 													  uint32 length,
 													  uint32* glyphCount);
+			void				_UpdateSizeAndHinting(float size, bool hinted,
+													  bool force = false);
 
 
 	typedef agg::font_engine_freetype_int32				font_engine_type;
@@ -70,8 +74,14 @@ class AGGTextRenderer {
 	int32						fUnicodeBufferSize;
 
 	bool						fHinted;		// is glyph hinting active?
-	bool						fAntialias;		// is anti-aliasing active?
+	bool						fAntialias;
 	bool						fKerning;
+	Transformable				fEmbeddedTransformation;	// rotated or sheared font?
+
+	// caching to avoid loading a font unnecessarily
+	uint32						fLastFamilyAndStyle;
+	float						fLastPointSize;
+	bool						fLastHinted;
 };
 
 #endif // AGG_TEXT_RENDERER_H

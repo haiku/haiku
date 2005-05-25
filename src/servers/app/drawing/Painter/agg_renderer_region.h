@@ -74,7 +74,7 @@ namespace agg
             m_curr_cb = 0;
             if(m_region && m_region->CountRects() > 0)
             {
-                BRect cb = m_region->RectAt(0);
+                clipping_rect cb = m_region->RectAtInt(0);
                 m_ren.clip_box_naked(cb.left, cb.top, cb.right, cb.bottom);
             }
             else
@@ -86,7 +86,7 @@ namespace agg
         { 
             if(m_region && (int)(++m_curr_cb) < m_region->CountRects())
             {
-                BRect cb = m_region->RectAt(m_curr_cb);
+                clipping_rect cb = m_region->RectAtInt(m_curr_cb);
                 m_ren.clip_box_naked(cb.left, cb.top, cb.right, cb.bottom);
                 return true;
             }
@@ -107,16 +107,18 @@ namespace agg
         {
         	m_region = region;
         	if (m_region) {
-	        	BRect r = m_region->Frame();
-	        	if (r.IsValid()) {
-		        	r = r & BRect(0, 0, width() - 1, height() - 1);
-		        	// a BRegion actually keeps integer clipping_rects
-		        	// so just converting to int without rounding is
-		        	// fine
-		        	if(r.left < m_bounds.x1) m_bounds.x1 = (int)r.left;
-		        	if(r.top < m_bounds.y1) m_bounds.y1 = (int)r.top;
-		        	if(r.right > m_bounds.x2) m_bounds.x2 = (int)r.right;
-		        	if(r.bottom > m_bounds.y2) m_bounds.y2 = (int)r.bottom;
+	        	clipping_rect r = m_region->FrameInt();
+	        	if (r.left <= r.right && r.top <= r.bottom) {
+	        		// clip rect to frame buffer bounds
+		        	r.left = max_c(0, r.left);
+		        	r.top = max_c(0, r.top);
+		        	r.right = min_c((int)width() - 1, r.right);
+		        	r.bottom = min_c((int)height() - 1, r.bottom);
+
+		        	if(r.left < m_bounds.x1) m_bounds.x1 = r.left;
+		        	if(r.top < m_bounds.y1) m_bounds.y1 = r.top;
+		        	if(r.right > m_bounds.x2) m_bounds.x2 = r.right;
+		        	if(r.bottom > m_bounds.y2) m_bounds.y2 = r.bottom;
 	        	}
         	}
         }

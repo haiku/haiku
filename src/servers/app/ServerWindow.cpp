@@ -2020,7 +2020,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		case AS_DRAW_STRING:
 		{
 			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING\n",fName));
-			
 			char *string;
 			int32 length;
 			BPoint location;
@@ -2031,9 +2030,10 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
 			
-			if(cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->DrawString(string,length,cl->ConvertToTop(location),
-						cl->fLayerData);
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->DrawString(string, length,
+														cl->ConvertToTop(location),
+														cl->fLayerData);
 			
 			free(string);
 			break;

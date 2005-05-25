@@ -387,9 +387,9 @@ DisplayDriverPainter::DrawBitmap(ServerBitmap *bitmap,
 		fGraphicsCard->HideSoftwareCursor(clipped);
 
 		fPainter->SetDrawData(d);
-		fPainter->DrawBitmap(bitmap, source, dest);
+		BRect touched = fPainter->DrawBitmap(bitmap, source, dest);
 
-		fGraphicsCard->Invalidate(clipped);
+		fGraphicsCard->Invalidate(touched);
 		fGraphicsCard->ShowSoftwareCursor();
 
 		Unlock();
@@ -969,7 +969,8 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 {
 	static DrawData d;
 	d.SetHighColor(color);
-	
+
+	// TODO: Why is escapement_delta a part of the state stack?
 	if (delta)
 		d.SetEscapementDelta(*delta);
 
@@ -985,21 +986,23 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 		fPainter->SetDrawData(d);
 //bigtime_t now = system_time();
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
-// Cursiously, the actual DrawString after it is actually faster!?!
+// Cursiously, the DrawString after it is actually faster!?!
 // TODO: make the availability of the hardware cursor part of the 
 // HW acceleration flags and skip all calculations for HideSoftwareCursor
-// in case we don't need one.
+// in case we don't have one.
 		BRect b = fPainter->BoundingBox(string, length, pt);
+		// stop here if we're supposed to render outside of the clipping
+		if (fPainter->ClippingRegion()->Frame().Intersects(b)) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
-		fGraphicsCard->HideSoftwareCursor(b);
-
+			fGraphicsCard->HideSoftwareCursor(b);
+	
 //now = system_time();
-		BRect touched = fPainter->DrawString(string, length, pt);
+			BRect touched = fPainter->DrawString(string, length, pt);
 //printf("drawing string: %lld µs\n", system_time() - now);
-
-		fGraphicsCard->Invalidate(touched);
-		fGraphicsCard->ShowSoftwareCursor();
-
+	
+			fGraphicsCard->Invalidate(touched);
+			fGraphicsCard->ShowSoftwareCursor();
+		}
 		Unlock();
 	}
 }

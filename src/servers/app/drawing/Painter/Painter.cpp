@@ -80,10 +80,7 @@ Painter::Painter()
 	  fPenLocation(0.0, 0.0),
 	  fDrawingModeFactory(new DrawingModeFactory()),
 	  fPatternHandler(new PatternHandler()),
-	  fTextRenderer(new AGGTextRenderer()),
-	  fLastFamilyAndStyle(0),
-	  fLastRotation(0.0),
-	  fLastShear(90.0)
+	  fTextRenderer(new AGGTextRenderer())
 {
 	if (fontserver && fontserver->GetSystemPlain())
 		fFont = *fontserver->GetSystemPlain();
@@ -883,25 +880,14 @@ Painter::DrawString(const char* utf8String, uint32 length,
 
 	if (fBuffer) {
 
-		Transformable transform;
-// TODO: convert BFont::Shear(), which is in degrees 45°...135° to whatever AGG is using
-//		transform.ShearBy(B_ORIGIN, fFont.Shear(), 0.0);
-		transform.RotateBy(B_ORIGIN, -fFont.Rotation());
-		transform.TranslateBy(baseLine);
-
-		BRect clippingFrame;
-		if (fClippingRegion)
-			clippingFrame = fClippingRegion->Frame();
-
 		bounds = fTextRenderer->RenderString(utf8String,
 											 length,
 											 fFontRendererSolid,
 											 fFontRendererBin,
-											 transform,
-											 clippingFrame,
+											 baseLine,
+											 fClippingRegion->Frame(),
 											 false,
 											 &fPenLocation);
-		transform.Transform(&fPenLocation);
 	}
 	return _Clipped(bounds);
 }
@@ -926,31 +912,15 @@ Painter::DrawString(const char* utf8String, BPoint baseLine,
 // #pragma mark -
 
 // DrawBitmap
-void
-Painter::DrawBitmap(const BBitmap* bitmap,
-					BRect bitmapRect, BRect viewRect) const
-{
-	if (bitmap && bitmap->IsValid()) {
-		// the native bitmap coordinate system
-		// (can have left top corner offset)
-		BRect actualBitmapRect(bitmap->Bounds());
-
-		agg::rendering_buffer srcBuffer;
-		srcBuffer.attach((uint8*)bitmap->Bits(),
-						 (uint32)actualBitmapRect.IntegerWidth() + 1,
-						 (uint32)actualBitmapRect.IntegerHeight() + 1,
-						 bitmap->BytesPerRow());
-
-		_DrawBitmap(srcBuffer, bitmap->ColorSpace(), actualBitmapRect, bitmapRect, viewRect);
-	}
-}
-
-// DrawBitmap
-void
+BRect
 Painter::DrawBitmap(const ServerBitmap* bitmap,
 					BRect bitmapRect, BRect viewRect) const
 {
-	if (bitmap && bitmap->InitCheck()) {
+	CHECK_CLIPPING
+
+	BRect touched = _Clipped(viewRect);
+
+	if (bitmap && bitmap->InitCheck() && touched.IsValid()) {
 		// the native bitmap coordinate system
 		BRect actualBitmapRect(bitmap->Bounds());
 
@@ -962,6 +932,7 @@ Painter::DrawBitmap(const ServerBitmap* bitmap,
 
 		_DrawBitmap(srcBuffer, bitmap->ColorSpace(), actualBitmapRect, bitmapRect, viewRect);
 	}
+	return touched;
 }
 
 // #pragma mark -
@@ -1004,15 +975,12 @@ BRect
 Painter::BoundingBox(const char* utf8String, uint32 length,
 					 const BPoint& baseLine) const
 {
-	Transformable transform;
-	transform.TranslateBy(baseLine);
-
 	static BRect dummy;
 	return fTextRenderer->RenderString(utf8String,
 									   length,
 									   fFontRendererSolid,
 									   fFontRendererBin,
-									   transform, dummy, true);
+									   baseLine, dummy, true);
 }
 
 // StringWidth
@@ -1106,20 +1074,7 @@ Painter::_UpdateFont()
 	if (fFont.InitCheck() < B_OK)
 		return;
 
-	if (fLastFamilyAndStyle != fFont.GetFamilyAndStyle()
-		|| fFont.Rotation() != fLastRotation || fFont.Shear() != fLastShear) {
-
-		if (fTextRenderer->SetFont(fFont)) {
-			fLastFamilyAndStyle = fFont.GetFamilyAndStyle();
-			fLastRotation = fFont.Rotation();
-			fLastShear = fFont.Shear();
-		} else {
-			fprintf(stderr, "unable to set font\n");	
-		}
-	} else {
-		// just update the size
-		fTextRenderer->SetPointSize(fFont.Size());
-	}
+	fTextRenderer->SetFont(fFont);
 }
 
 // _UpdateLineWidth
@@ -1176,7 +1131,6 @@ Painter::_UpdateDrawingMode()
 void
 Painter::_SetRendererColor(const rgb_color& color) const
 {
-
 	if (fOutlineRenderer)
 #if ALIASED_DRAWING
 		fOutlineRenderer->line_color(agg::rgba(color.red / 255.0,
@@ -1340,14 +1294,13 @@ Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 			_DrawBitmap32(srcBuffer, actualBitmapRect, bitmapRect, viewRect);
 			break;
 		default:
-fprintf(stderr, "Painter::_DrawBitmap() - non-native colorspace: %d\n", format);
-#ifdef __HAIKU__
+//printf("Painter::_DrawBitmap() - non-native colorspace: %d\n", format);
 			// TODO: this is only a temporary implementation,
 			// to really handle other colorspaces, one would
 			// rather do the conversion with much less overhead,
 			// for example in the nn filter (hm), or in the
-			// scanline generator
-			BBitmap temp(actualBitmapRect, 0, B_RGB32);
+			// scanline generator (better)
+			BBitmap temp(actualBitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGB32);
 			status_t err = temp.ImportBits(srcBuffer.buf(),
 										   srcBuffer.height() * srcBuffer.stride(),
 										   srcBuffer.stride(),
@@ -1360,9 +1313,8 @@ fprintf(stderr, "Painter::_DrawBitmap() - non-native colorspace: %d\n", format);
 									   temp.BytesPerRow());
 				_DrawBitmap32(convertedBuffer, actualBitmapRect, bitmapRect, viewRect);
 			} else {
-fprintf(stderr, "Painter::_DrawBitmap() - colorspace conversion failed: %s\n", strerror(err));
+printf("Painter::_DrawBitmap() - colorspace conversion failed: %s\n", strerror(err));
 			}
-#endif // __HAIKU__
 			break;
 	}
 }
@@ -1373,10 +1325,17 @@ Painter::_DrawBitmap32(const agg::rendering_buffer& srcBuffer,
 					   BRect actualBitmapRect, BRect bitmapRect, BRect viewRect) const
 {
 typedef agg::span_allocator<agg::rgba8> span_alloc_type;
+
+// pipeline for non-scaled bitmaps
+//typedef agg::span_generator<agg::rgba8, span_alloc_type> span_gen_type;
+//typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_type;
+
+// pipeline for scaled bitmaps
 typedef agg::span_interpolator_linear<> interpolator_type;
 typedef agg::span_image_filter_rgba32_nn<agg::order_bgra32,
-										 interpolator_type> span_gen_type;
-typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_type;
+										 interpolator_type> scaled_span_gen_type;
+typedef agg::renderer_scanline_aa<renderer_base, scaled_span_gen_type> scaled_image_renderer_type;
+
 
 	if (bitmapRect.IsValid() && bitmapRect.Intersects(actualBitmapRect)
 		&& viewRect.IsValid()) {
@@ -1429,10 +1388,6 @@ typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_t
 		span_alloc_type sa;
 		interpolator_type interpolator(imgMatrix);
 
-		span_gen_type sg(sa, srcBuffer, agg::rgba(0, 0, 0, 0), interpolator);
-
-		image_renderer_type ri(*fBaseRenderer, sg);
-
 		agg::rasterizer_scanline_aa<> pf;
 		agg::scanline_u8 sl;
 
@@ -1447,7 +1402,22 @@ typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_t
 		agg::conv_transform<agg::path_storage> tr(path, srcMatrix);
 
 		pf.add_path(tr);
-		agg::render_scanlines(pf, sl, ri);
+
+//		if (xScale != 1.0 || yScale != 1.0) {
+//printf("scaled\n");
+			scaled_span_gen_type sg(sa, srcBuffer, agg::rgba(0, 0, 0, 0), interpolator);
+			scaled_image_renderer_type ri(*fBaseRenderer, sg);
+
+			agg::render_scanlines(pf, sl, ri);
+/*		} else {
+// TODO: Does not even compile, find out how to construct a pipeline without
+// scaling
+printf("non scaled scaled\n");
+			span_gen_type sg(sa);
+			image_renderer_type ri(*fBaseRenderer, sg);
+
+			agg::render_scanlines(pf, sl, ri);
+		}*/
 	}
 }
 

@@ -104,6 +104,8 @@ Desktop::AddDriver(DisplayDriver *driver)
 	if (driver->Initialize()) {
 		// TODO: be careful of screen initialization - monitor may not support 640x480
 		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB32, fScreenList.CountItems()+1);
+
+//		Screen *sc = new Screen(driver, BPoint(1400, 1050), B_RGB32, fScreenList.CountItems()+1);
 //		Screen *sc = new Screen(driver, BPoint(640, 480), B_CMAP8, fScreenList.CountItems()+1);
 //		Screen *sc = new Screen(driver, BPoint(640, 480), B_GRAY8, fScreenList.CountItems()+1);
 //		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB15, fScreenList.CountItems()+1);

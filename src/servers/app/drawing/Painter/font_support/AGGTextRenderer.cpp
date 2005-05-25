@@ -56,7 +56,12 @@ AGGTextRenderer::AGGTextRenderer()
 
 	  fHinted(true),
 	  fAntialias(true),
-	  fKerning(true)
+	  fKerning(true),
+	  fEmbeddedTransformation(),
+
+	  fLastFamilyAndStyle(0),
+	  fLastPointSize(-1.0),
+	  fLastHinted(false)
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
@@ -74,18 +79,30 @@ AGGTextRenderer::~AGGTextRenderer()
 bool
 AGGTextRenderer::SetFont(const ServerFont &font)
 {
-	bool success = false;
-	if (font.Rotation() == 0.0 && font.Shear() == 90.0) {
+	bool success = true;
+	// construct an embedded transformation (rotate & shear)
+	Transformable transform;
+// TODO: convert BFont::Shear(), which is in degrees 45°...135° to whatever AGG is using
+//	transform.ShearBy(B_ORIGIN, fFont.Shear(), 0.0);
+	transform.RotateBy(B_ORIGIN, -font.Rotation());
+
+	bool load = font.GetFamilyAndStyle() != fLastFamilyAndStyle ||
+				transform != fEmbeddedTransformation;	
+
+	if (load) {
+		if (transform.IsIdentity()) {
 //printf("AGGTextRenderer::SetFont() - native\n");
-		success = fFontEngine.load_font(font, agg::glyph_ren_native_gray8);
-		fFontEngine.hinting(fHinted);
-	} else {
+			success = fFontEngine.load_font(font, agg::glyph_ren_native_gray8);
+		} else {
 //printf("AGGTextRenderer::SetFont() - outline\n");
-		success = fFontEngine.load_font(font, agg::glyph_ren_outline);
-		fFontEngine.hinting(false);
+			success = fFontEngine.load_font(font, agg::glyph_ren_outline);
+		}
 	}
 
-	SetPointSize(font.Size());
+	fLastFamilyAndStyle = font.GetFamilyAndStyle();
+	fEmbeddedTransformation = transform;
+
+	_UpdateSizeAndHinting(font.Size(), fEmbeddedTransformation.IsIdentity() && fHinted, load);
 
 	if (!success) {
 		fprintf(stderr, "font could not be loaded\n");
@@ -95,23 +112,13 @@ AGGTextRenderer::SetFont(const ServerFont &font)
 	return true;
 }
 
-// SetPointSize
-void
-AGGTextRenderer::SetPointSize(float size)
-{
-	if (size != fFontEngine.height()) {
-		fFontEngine.height(size);
-		fFontEngine.width(size);
-	}
-}
-
 // SetHinting
 void
 AGGTextRenderer::SetHinting(bool hinting)
 {
 	if (fHinted != hinting) {
 		fHinted = hinting;
-		fFontEngine.hinting(fHinted);
+		_UpdateSizeAndHinting(fLastPointSize, fEmbeddedTransformation.IsIdentity() && fHinted);
 	}
 }
 
@@ -135,26 +142,23 @@ AGGTextRenderer::RenderString(const char* string,
 							  uint32 length,
 							  font_renderer_solid_type* solidRenderer,
 							  font_renderer_bin_type* binRenderer,
-							  const Transformable& transform,
-							  BRect clippingFrame,
+							  const BPoint& baseLine,
+							  const BRect& clippingFrame,
 							  bool dryRun,
 							  BPoint* nextCharPos)
 {
 //printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
-
-	// ToDo: this is a temporary fix for some drawing problems
-	// Please remove when the real cause has been found :-)
-	float size = fFontEngine.height();
-	fFontEngine.height(size);
-	fFontEngine.width(size);
-	fFontEngine.hinting(fHinted);
 
 	// "bounds" will track the bounding box arround all glyphs that are actually drawn
 	// it will be calculated in untransformed coordinates within the loop and then
 	// it is transformed to the real location at the exit of the function.
 	BRect bounds(0.0, 0.0, -1.0, -1.0);
 
+	Transformable transform(fEmbeddedTransformation);
+	transform.TranslateBy(baseLine);
+
 	uint32 glyphCount;
+
 	if (_PrepareUnicodeBuffer(string, length, &glyphCount) >= B_OK) {
 
 		fCurves.approximation_scale(transform.scale());
@@ -194,7 +198,6 @@ AGGTextRenderer::RenderString(const char* string,
 			const agg::glyph_cache* glyph = fFontManager.glyph(*p);
 
 			if (glyph) {
-
 				if (i > 0 && fKerning) {
 					fFontManager.add_kerning(&advanceX, &advanceY);
 				}
@@ -240,7 +243,7 @@ AGGTextRenderer::RenderString(const char* string,
 						glyphBounds = transform.TransformBounds(glyphBounds);
 					}
 	
-					if (clippingFrame.Intersects(glyphBounds)) {
+					if (true /*clippingFrame.Intersects(glyphBounds)*/) {
 						switch (glyph->data_type) {
 							case agg::glyph_data_mono:
 								agg::render_scanlines(fFontManager.mono_adaptor(), 
@@ -297,6 +300,15 @@ AGGTextRenderer::RenderString(const char* string,
 				// increment pen position
 				advanceX = glyph->advance_x;
 				advanceY = glyph->advance_y;
+			} else {
+				if (*p < 128) {
+					char c[2];
+					c[0] = (uint8)*p;
+					c[1] = 0;
+					fprintf(stderr, "failed to load glyph for '%s'\n", c);
+				} else {
+					fprintf(stderr, "failed to load glyph for %d\n", *p);
+				}
 			}
 			++p;
 		}
@@ -305,6 +317,8 @@ AGGTextRenderer::RenderString(const char* string,
 		if (nextCharPos) {
 			nextCharPos->x = x + advanceX;
 			nextCharPos->y = y + advanceY;
+
+			transform.Transform(nextCharPos);
 		}
 	}
 
@@ -371,3 +385,19 @@ AGGTextRenderer::_PrepareUnicodeBuffer(const char* utf8String,
 
 	return ret;
 }
+
+// _UpdateSizeAndHinting
+void
+AGGTextRenderer::_UpdateSizeAndHinting(float size, bool hinted, bool force)
+{
+	if (force || size != fLastPointSize || hinted != fLastHinted) {
+//printf("AGGTextRenderer::_UpdateSizeAndHinting(%.1f, %d, %d)\n", size, hinted, force);
+		fLastPointSize = size;
+		fLastHinted = hinted;
+
+		fFontEngine.height(size);
+		fFontEngine.width(size);
+		fFontEngine.hinting(hinted);
+	}
+}
+
