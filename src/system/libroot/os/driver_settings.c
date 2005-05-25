@@ -636,11 +636,13 @@ driver_settings_init(kernel_args *args)
 			return B_NO_MEMORY;
 
 		if (settings->size != 0) {
-			handle->text = malloc(settings->size);
+			handle->text = malloc(settings->size + 1);
 			if (handle->text == NULL)
 				return B_NO_MEMORY;
 
 			memcpy(handle->text, settings->buffer, settings->size);
+			handle->text[settings->size] = '\0';
+				// null terminate the buffer
 		} else
 			handle->text = NULL;
 
@@ -709,6 +711,7 @@ load_driver_settings(const char *driverName)
 		// we got it, now let's see if it already has been parsed
 		if (handle->magic != SETTINGS_MAGIC) {
 			handle->magic = SETTINGS_MAGIC;
+
 			if (parse_settings(handle) != B_OK) {
 				// no valid settings, let's cut down its memory requirements
 				free(handle->text);
@@ -741,7 +744,7 @@ load_driver_settings(const char *driverName)
 #endif
 
 	// open the settings from the standardized location
-	{
+	if (driverName[0] != '/') {
 		char path[B_FILE_NAME_LENGTH + 64];
 
 		// ToDo: use the kernel's find_directory for this
@@ -749,7 +752,9 @@ load_driver_settings(const char *driverName)
 		strlcat(path, driverName, sizeof(path));
 
 		file = open(path, O_RDONLY);
-	}
+	} else
+		file = open(driverName, O_RDONLY);
+
 	if (file < B_OK) {
 #ifdef _KERNEL_MODE
 		mutex_unlock(&sLock);
