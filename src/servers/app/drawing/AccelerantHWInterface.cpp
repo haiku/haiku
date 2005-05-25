@@ -100,77 +100,31 @@ AccelerantHWInterface::~AccelerantHWInterface()
 	delete fModeList;
 }
 
-// Initialize
+
+/*!
+	\brief Opens the first available graphics device and initializes it
+	\return B_OK on success or an appropriate error message on failure.
+*/
 status_t
 AccelerantHWInterface::Initialize()
 {
-	char path[PATH_MAX];
-	
-	fCardFD = OpenGraphicsDevice(1);
-	if (fCardFD < 0) {
-		ATRACE(("Failed to open graphics device\n"));
-		return B_ERROR;
-	}
-	
-	char signature[1024];
-	if (ioctl(fCardFD, B_GET_ACCELERANT_SIGNATURE, &signature, sizeof(signature)) != B_OK) {
-		close(fCardFD);
-		return B_ERROR;
-	}
-	
-	ATRACE(("accelerant signature is: %s\n", signature));
-	
-	struct stat accelerant_stat;
-	const static directory_which dirs[] = {
-		B_USER_ADDONS_DIRECTORY,
-		B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY
-	};
-	
-	fAccelerantImage = -1;
-	for (int32 i = 0; i < 3; i++) {
-		if (find_directory(dirs[i], -1, false, path, PATH_MAX) != B_OK)
+	for (int32 i = 1; fCardFD != B_ENTRY_NOT_FOUND; i++) {
+		fCardFD = OpenGraphicsDevice(i);
+		if (fCardFD < 0) {
+			ATRACE(("Failed to open graphics device\n"));
 			continue;
-		
-		strcat(path, "/accelerants/");
-		strcat(path, signature);
-		if (stat(path, &accelerant_stat) != 0)
-			continue;
-		
-		fAccelerantImage = load_add_on(path);
-		if (fAccelerantImage >= 0) {
-			if (get_image_symbol(fAccelerantImage, B_ACCELERANT_ENTRY_POINT,
-				B_SYMBOL_TYPE_ANY, (void**)(&fAccelerantHook)) != B_OK ) {
-				ATRACE(("unable to get B_ACCELERANT_ENTRY_POINT\n"));
-				unload_add_on(fAccelerantImage);
-				fAccelerantImage = -1;
-				return B_ERROR;
-			}
-			
-			init_accelerant InitAccelerant;
-			InitAccelerant = (init_accelerant)fAccelerantHook(B_INIT_ACCELERANT, NULL);
-			if (!InitAccelerant || InitAccelerant(fCardFD) != B_OK) {
-				// TODO: continue / go on to the next graphics card?
-				ATRACE(("InitAccelerant unsuccessful\n"));
-				unload_add_on(fAccelerantImage);
-				fAccelerantImage = -1;
-				return B_ERROR;
-			}
-			
-			break;
 		}
+
+		if (OpenAccelerant(fCardFD) == B_OK)
+			break;
+
+		close(fCardFD);
+		// OpenAccelerant() failed, try to open next graphics card
 	}
-	
-	if (fAccelerantImage < 0)
-		return B_ERROR;
-	
-	if (SetupDefaultHooks() != B_OK) {
-		ATRACE(("cannot setup default hooks\n"));
-		return B_ERROR;
-	}
-	
-	return B_OK;
+
+	return fCardFD >= 0 ? B_OK : fCardFD;
 }
+
 
 /*!
 	\brief Opens a graphics device for read-write access
@@ -180,6 +134,8 @@ AccelerantHWInterface::Initialize()
 	The deviceNumber is relative to the number of graphics devices that can be successfully
 	opened.  One represents the first card that can be successfully opened (not necessarily
 	the first one listed in the directory).
+	Graphics drivers must be able to be opened more than once, so we really get
+	the first working entry.
 */
 int
 AccelerantHWInterface::OpenGraphicsDevice(int deviceNumber)
@@ -187,7 +143,7 @@ AccelerantHWInterface::OpenGraphicsDevice(int deviceNumber)
 	DIR *directory = opendir("/dev/graphics");
 	if (!directory)
 		return -1;
-	
+
 	int count = 0;
 	struct dirent *entry;
 	int current_card_fd = -1;
@@ -200,13 +156,13 @@ AccelerantHWInterface::OpenGraphicsDevice(int deviceNumber)
 			close(current_card_fd);
 			current_card_fd = -1;
 		}
-		
+
 		sprintf(path, "/dev/graphics/%s", entry->d_name);
 		current_card_fd = open(path, B_READ_WRITE);
 		if (current_card_fd >= 0)
 			count++;
 	}
-	
+
 	// open stub if we were not able to get a "real" card
 	if (count < deviceNumber) {
 		if (deviceNumber == 1) {
@@ -214,12 +170,84 @@ AccelerantHWInterface::OpenGraphicsDevice(int deviceNumber)
 			current_card_fd = open(path, B_READ_WRITE);
 		} else {
 			close(current_card_fd);
-			current_card_fd = -1;
+			current_card_fd = B_ENTRY_NOT_FOUND;
 		}
 	}
-	
+
 	return current_card_fd;
 }
+
+
+status_t
+AccelerantHWInterface::OpenAccelerant(int device)
+{
+	char signature[1024];
+	if (ioctl(device, B_GET_ACCELERANT_SIGNATURE, 
+			&signature, sizeof(signature)) != B_OK)
+		return B_ERROR;
+
+	ATRACE(("accelerant signature is: %s\n", signature));
+
+	struct stat accelerant_stat;
+	const static directory_which dirs[] = {
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_BEOS_ADDONS_DIRECTORY
+	};
+
+	fAccelerantImage = -1;
+
+	for (int32 i = 0; i < 3; i++) {
+		char path[PATH_MAX];
+		if (find_directory(dirs[i], -1, false, path, PATH_MAX) != B_OK)
+			continue;
+
+		strcat(path, "/accelerants/");
+		strcat(path, signature);
+		if (stat(path, &accelerant_stat) != 0)
+			continue;
+
+		fAccelerantImage = load_add_on(path);
+		if (fAccelerantImage >= 0) {
+			if (get_image_symbol(fAccelerantImage, B_ACCELERANT_ENTRY_POINT,
+				B_SYMBOL_TYPE_ANY, (void**)(&fAccelerantHook)) != B_OK ) {
+				ATRACE(("unable to get B_ACCELERANT_ENTRY_POINT\n"));
+				unload_add_on(fAccelerantImage);
+				fAccelerantImage = -1;
+				return B_ERROR;
+			}
+
+			init_accelerant initAccelerant;
+			initAccelerant = (init_accelerant)fAccelerantHook(B_INIT_ACCELERANT, NULL);
+			if (!initAccelerant || initAccelerant(device) != B_OK) {
+				ATRACE(("InitAccelerant unsuccessful\n"));
+				unload_add_on(fAccelerantImage);
+				fAccelerantImage = -1;
+				return B_ERROR;
+			}
+
+			break;
+		}
+	}
+
+	if (fAccelerantImage < B_OK)
+		return B_ERROR;
+
+	if (SetupDefaultHooks() != B_OK) {
+		ATRACE(("cannot setup default hooks\n"));
+
+		uninit_accelerant uninitAccelerant = (uninit_accelerant)
+			fAccelerantHook(B_UNINIT_ACCELERANT, NULL);
+		if (uninitAccelerant != NULL)
+			uninitAccelerant();
+
+		unload_add_on(fAccelerantImage);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
 
 status_t
 AccelerantHWInterface::SetupDefaultHooks()

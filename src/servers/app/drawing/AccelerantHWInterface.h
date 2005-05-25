@@ -73,6 +73,7 @@ virtual	void					_DrawCursor(BRect area) const;
 
 private:
 		int						OpenGraphicsDevice(int deviceNumber);
+		status_t				OpenAccelerant(int device);
 		status_t				SetupDefaultHooks();
 		status_t				UpdateModeList();
 		status_t				UpdateFrameBufferConfig();
