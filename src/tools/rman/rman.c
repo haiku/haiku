@@ -1657,15 +1657,15 @@ XML(enum command cmd) {
 		break;
 	   case ENDSECTHEAD:
 	   case ENDSUBSECTHEAD:
-		if (sectheadid == NAME) printf("<refname>");
+		if (sectheadid == NAME) printf("--><refname>");
 		else if (sectheadid == SYNOPSIS) {}
 		else { printf("</title>\n<para>"); fPara=1; }
 		break;
 
 	   case BEGINSECTION:
-		if (sectheadid==NAME) printf("<refnamediv>\n");
+		if (sectheadid==NAME) printf("<refnamediv><!--\n");
 			/*printf("<RefEntry>");  -- do lotsa parsing here for RefName, RefPurpose*/
-		else if (sectheadid==SYNOPSIS) printf("<refsynopsisdiv>\n<cmdsynopsis>\n");
+		else if (sectheadid==SYNOPSIS) printf("<refsynopsisdiv>\n<cmdsynopsis><!--\n");
 		else printf("\n<refsect1>\n");
 		break;
 	   case ENDSECTION:
@@ -1731,7 +1731,8 @@ XML(enum command cmd) {
 		break;
 
 	   /* have to make some guess about bold and italics */
-	   case BEGINBOLD:		printf("<command>"); break;
+	   case BEGINBOLD:		if (sectheadid==SYNOPSIS) printf("-->"); 
+					printf("<command>"); break;
 	   case ENDBOLD:		printf("</command>"); break;
 	   case BEGINITALICS:	printf("<emphasis>"); break;	/* could be literal or arg */
 	   case ENDITALICS:		printf("</emphasis>"); break;
@@ -3708,7 +3709,9 @@ source_command(char *p) {
 	   p = q;
 	   if (p!=NULL) {
 		 while (isspace(*p)) p++;
-		 if (*p) { q=strchr(p,' '); if (q!=NULL) *q++='\0'; }
+		 while (*p == '\"') p++;
+		 if (*p) { q=strchr(p,' '); if (*(q-1) == '\"') *(q-1) = '\0';
+			if (q!=NULL) *q++='\0';  }
 	   }
 	   strcpy(manSect, p!=NULL? p: "?");
 	 }
