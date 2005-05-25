@@ -36,6 +36,7 @@
 #include <Region.h>
 #include <View.h>
 
+#include "DebugInfoManager.h"
 #include "DisplayDriver.h"
 #include "LayerData.h"
 #include "PortLink.h"
@@ -118,7 +119,7 @@ Layer::Layer(BRect frame, const char* name, int32 token,
 		fFrame.Set(0, 0, 5, 5);
 
 	if (!fDriver)
-		debugger("You MUST have a valid driver to init a Layer object\n");
+		CRITICAL("You MUST have a valid driver to init a Layer object\n");
 
 	STRACE(("Layer(%s) successfuly created\n", GetName()));
 }
@@ -965,7 +966,7 @@ Layer::MoveBy(float x, float y)
 {
 	STRACE(("Layer(%s)::MoveBy() START\n", GetName()));
 	if (!fParent) {
-		debugger("ERROR: in Layer::MoveBy()! - No parent!\n");
+		CRITICAL("ERROR: in Layer::MoveBy()! - No parent!\n");
 		return;
 	}
 
@@ -1245,7 +1246,7 @@ Layer::UpdateStart()
 		wb->fUpdateReg.MakeEmpty();
 wb->cnt--;
 if (wb->cnt != 0)
-	debugger("Adi2: Not Allowed!");
+	CRITICAL("Layer::UpdateStart(): wb->cnt != 0 -> Not Allowed!");
 	}
 }
 
@@ -1404,7 +1405,7 @@ Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 				fOwner->fUpdateReg = fOwner->zUpdateReg;
 fOwner->cnt++;
 if (fOwner->cnt != 1)
-	debugger("Adi: Not Allowed!");
+	CRITICAL("Layer::RequestDraw(): fOwner->cnt != 1 -> Not Allowed!");
 				fOwner->zUpdateReg.MakeEmpty();
 				SendUpdateMsg(fOwner->fUpdateReg);
 				fOwner->fRequestSent = true;

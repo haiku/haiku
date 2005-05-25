@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -23,6 +23,7 @@
 //	Author:			Gabe Yoder <gyoder@stny.rr.com>
 //					DarkWyrm <bpmagic@columbus.rr.com>
 //					Adi Oanca <adioanca@cotty.iren.ro>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Class used for the top layer of each workspace's Layer tree
 //  
 //------------------------------------------------------------------------------
@@ -58,6 +59,8 @@
 #else
 	#define STRACE(a) /* nothing */
 #endif
+
+static RGBColor kDefaultWorkspaceColor = RGBColor(51, 102, 152);
 
 RootLayer::RootLayer(const char *name, int32 workspaceCount, 
 		Desktop *desktop, DisplayDriver *driver)
@@ -107,7 +110,10 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 
 	// init the first, default workspace
 	fActiveWksIndex		= 0;
-	fWorkspace[fActiveWksIndex] = new Workspace(fActiveWksIndex, 0xFF00FF00, RGBColor());
+	fWorkspace[fActiveWksIndex] = new Workspace(fActiveWksIndex, 0xFF00FF00,
+												kDefaultWorkspaceColor);
+	fLayerData->SetHighColor(RGBColor(255, 255, 255));
+	fLayerData->SetLowColor(fWorkspace[fActiveWksIndex]->BGColor());
 
 	// Spawn our working thread
 //	fThreadID = spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
@@ -118,6 +124,9 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 		fListenPort = -1;
 		return;
 	}
+#if ON_SCREEN_DEBUGGING_INFO
+	DebugInfoManager::Default()->SetRootLayer(this);
+#endif
 }
 
 RootLayer::~RootLayer()
@@ -131,17 +140,10 @@ RootLayer::~RootLayer()
 
 	wait_for_thread(fThreadID, &exitValue);
 
-	if (fDragMessage)
-		delete fDragMessage;
+	delete fDragMessage;
 
 	for (int32 i = 0; i < fWsCount; i++)
-	{
-		if (fWorkspace[i])
-		{
-			delete fWorkspace[i];
-			fWorkspace[i] = NULL;
-		}
-	}
+		delete fWorkspace[i];
 
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
 }
@@ -152,7 +154,7 @@ void RootLayer::RunThread()
 	if (fThreadID > 0)
 		resume_thread(fThreadID);
 	else
-		debugger("Can not create any more threads.\n");
+		CRITICAL("Can not create any more threads.\n");
 }
 
 /*!
@@ -415,7 +417,7 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 {
 	if (!winBorder->IsHidden())
 	{
-		debugger("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
+		CRITICAL("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
 		return;
 	}
 
@@ -453,7 +455,7 @@ void RootLayer::RemoveWinBorder(WinBorder* winBorder)
 
 	if (!winBorder->IsHidden())
 	{
-		debugger("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
+		CRITICAL("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
 		return;
 	}
 
@@ -476,7 +478,7 @@ void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 	// SUBSET windows _must_ have their workspaceIndex set to 0x0
 	if (winBorder->Workspaces() != 0UL)
 	{
-		debugger("SUBSET windows _must_ have their workspaceIndex set to 0x0\n");
+		CRITICAL("SUBSET windows _must_ have their workspaceIndex set to 0x0\n");
 		return;
 	}
 
@@ -552,7 +554,7 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 	if (!fWorkspace[index])
 	{
 		// TODO: we NEED datas from a file!!!
-		fWorkspace[index] = new Workspace(index, 0xFF00FF00, RGBColor());
+		fWorkspace[index] = new Workspace(index, 0xFF00FF00, kDefaultWorkspaceColor);
 
 		// we need to lock the window list here so no other window can be created 
 		desktop->Lock();
@@ -574,6 +576,12 @@ bool RootLayer::SetActiveWorkspace(int32 index)
 
 		desktop->Unlock();
 	}
+	rgb_color bg = fWorkspace[index]->BGColor().GetColor32();
+	if ((bg.red + bg.green + bg.blue) / 3 > 128)
+		fLayerData->SetHighColor(RGBColor(0, 0, 0));
+	else
+		fLayerData->SetHighColor(RGBColor(255, 255, 255));
+	fLayerData->SetLowColor(fWorkspace[index]->BGColor());
 
 	int32		exIndex		= ActiveWorkspaceIndex();
 
@@ -975,15 +983,18 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			if (fLastMousePossition != evt.where) {
 				// TODO: a B_MOUSE_MOVED message might have to be generated in order to
 				// correctly trigger entered/exited view transits.
-fprintf(stderr, "mouse position changed in B_MOUSE_DOWN (%.1f, %.1f) from last B_MOUSE_MOVED (%.1f, %.1f)!",
-		evt.where.x, evt.where.y, fLastMousePossition.x, fLastMousePossition.y);
+// Commented for now, since it is not _that_ critical and happens frequently with the Haiku
+// mouse driver (which is ok, but we need to catch it here).
+//				CRITICAL("mouse position changed in B_MOUSE_DOWN from last B_MOUSE_MOVED\n");
 				// update on screen mouse pos
 				GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
 				fLastMousePossition	= evt.where;
 			}
 			
-			if (fLastMouseMoved == NULL)
-				debugger("RootLayer: fLastMouseMoved is null!\n");
+			if (fLastMouseMoved == NULL) {
+				CRITICAL("RootLayer: fLastMouseMoved is null!\n");
+				break;
+			}
 
 			if (fLastMouseMoved == this)
 				break;
@@ -1159,7 +1170,7 @@ fprintf(stderr, "mouse position changed in B_MOUSE_UP (%.1f, %.1f) from last B_M
 // from within RootLayer's thread!!!
 			Layer		*target = LayerAt(evt.where);
 			if (target == NULL)
-				debugger("RootLayer::MouseEventHandler: 'target' can't be null.\n");
+				CRITICAL("RootLayer::MouseEventHandler: 'target' can't be null.\n");
 			WinBorder	*winBorderUnder = NULL;
 
 			// TODO: I think that windows created without the B_ASYNCHRONOUS_CONTROLS flag
@@ -2047,16 +2058,44 @@ void RootLayer::show_final_scene(WinBorder *exFocus, WinBorder *exActive)
 // NOTE: the following 3 lines are here for safety reasons!
 	fLastMouseMoved = LayerAt(fLastMousePossition);
 	if (fLastMouseMoved == NULL)
-		debugger("RootLayer::KeyboardEventHandler: 'fLastMouseMoved' can't be null.\n");
+		CRITICAL("RootLayer::KeyboardEventHandler: 'fLastMouseMoved' can't be null.\n");
 }
 
 void RootLayer::Draw(const BRect &r)
 {
-	fDriver->FillRect(r, fLayerData->ViewColor());
+	fDriver->FillRect(r, fWorkspace[fActiveWksIndex]->BGColor());
 #ifdef APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
 	char	string[30];
-	sprintf(string, "Workspace %ld", fActiveWksIndex+1);
-	fDriver->DrawString(string, strlen(string), BPoint(5,15),
+	sprintf(string, "Workspace %ld", fActiveWksIndex + 1);
+	fDriver->DrawString(string, strlen(string), BPoint(5, 15),
 						fLayerData);
-#endif
+#endif // APPSERVER_ROOTLAYER_SHOW_WORKSPACE_NUMBER
+#if ON_SCREEN_DEBUGGING_INFO
+	BPoint location(5, 40);
+	float textHeight = 15.0; // be lazy
+	const char* p = fDebugInfo.String();
+	const char* start = p;
+	while (*p) {
+		p++;
+		if (*p == 0 || *p == '\n') {
+			fDriver->DrawString(start, p - start, location,
+								fLayerData);
+			// NOTE: Eventually, this will be below the screen!
+			location.y += textHeight;
+			start = p + 1;
+		}
+	}
+#endif // ON_SCREEN_DEBUGGING_INFO
 }
+
+#if ON_SCREEN_DEBUGGING_INFO
+void
+RootLayer::AddDebugInfo(const char* string)
+{
+	if (Lock()) {
+		fDebugInfo << string;
+		GoRedraw(this, BRegion(fFrame));
+		Unlock();
+	}
+}
+#endif // ON_SCREEN_DEBUGGING_INFO

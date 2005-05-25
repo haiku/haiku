@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -22,6 +22,7 @@
 //	File Name:		RootLayer.h
 //	Author:			Gabe Yoder <gyoder@stny.rr.com>
 //					DarkWyrm <bpmagic@columbus.rr.com>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Class used for the top layer of each workspace's Layer tree
 //  
 //------------------------------------------------------------------------------
@@ -31,6 +32,7 @@
 #include <List.h>
 #include <Locker.h>
 
+#include "DebugInfoManager.h"
 #include "Layer.h"
 #include "FMWList.h"
 #include "CursorManager.h"
@@ -42,6 +44,7 @@ class WinBorder;
 class Desktop;
 class DisplayDriver;
 class BPortLink;
+
 
 /*!
 	\class RootLayer RootLayer.h
@@ -196,6 +199,12 @@ friend class Desktop;
 
 			int32				fScreenShotIndex;
 			bool				fQuiting;
+
+#if ON_SCREEN_DEBUGGING_INFO
+	friend	class DebugInfoManager;
+			void				AddDebugInfo(const char* string);
+			BString				fDebugInfo;
+#endif
 };
 
 #endif

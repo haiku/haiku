@@ -37,6 +37,7 @@
 #include <ViewAux.h>
 #include "AppServer.h"
 #include "BGet++.h"
+#include "DebugInfoManager.h"
 #include "Desktop.h"
 #include "Layer.h"
 #include "RAMLinkMsgReader.h"
@@ -496,7 +497,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			if (current)
 				cl=current;
 			else // hope this NEVER happens! :-)
-				debugger("Server PANIC: window cannot find Layer with ID\n");
+				CRITICAL("Server PANIC: window cannot find Layer with ID\n");
 			break;
 		}
 
@@ -2099,7 +2100,7 @@ int32 ServerWindow::MonitorWin(void *data)
 //				}
 				// ServerWindow's destructor takes care of pulling this object off the desktop.
 				if (!win->fWinBorder->IsHidden())
-					debugger("ServerWindow: a window must be hidden before it's deleted\n");
+					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
 				delete win;
 //				myRootLayer->Unlock();
 
