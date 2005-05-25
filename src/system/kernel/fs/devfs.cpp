@@ -271,8 +271,22 @@ devfs_insert_in_dir(struct devfs_vnode *dir, struct devfs_vnode *vnode)
 	if (!S_ISDIR(dir->stream.type))
 		return B_BAD_VALUE;
 
-	vnode->dir_next = dir->stream.u.dir.dir_head;
-	dir->stream.u.dir.dir_head = vnode;
+	// make sure the directory stays sorted alphabetically
+
+	devfs_vnode *node = dir->stream.u.dir.dir_head, *last = NULL;
+	while (node && strcmp(node->name, vnode->name) < 0) {
+		last = node;
+		node = node->dir_next;
+	}
+	if (last == NULL) {
+		// the new vnode is the first entry in the list
+		vnode->dir_next = dir->stream.u.dir.dir_head;
+		dir->stream.u.dir.dir_head = vnode;
+	} else {
+		// insert after that node
+		vnode->dir_next = last->dir_next;
+		last->dir_next = vnode;
+	}
 
 	vnode->parent = dir;
 	dir->modification_time = time(NULL);
