@@ -1,4 +1,10 @@
-// DrawingModeAlphaCC.h
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * DrawingMode implementing B_OP_ALPHA in "Constant Composite" mode on B_RGBA32.
+ *
+ */
 
 #ifndef DRAWING_MODE_ALPHA_CC_H
 #define DRAWING_MODE_ALPHA_CC_H

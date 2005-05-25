@@ -1,4 +1,13 @@
-// forwarding_pixfmt.h
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+ *
+ * A class implementing the AGG "pixel format" interface which maintains
+ * a PatternHandler and DrawingMode instance, to which it forwards any requests.
+ *
+ */
 
 #ifndef FORWARDING_PIXFMT_H
 #define FORWARDING_PIXFMT_H

@@ -1,4 +1,10 @@
-// DrawingMode.h
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Base class for different drawing modes.
+ *
+ */
 
 #ifndef DRAWING_MODE_H
 #define DRAWING_MODE_H

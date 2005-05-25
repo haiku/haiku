@@ -1,4 +1,11 @@
-// agg_renderer_types.h
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * global definitions for the Painter frame work, mainly types for the
+ * AGG pipelines
+ *
+ */
 
 #ifndef DEFINES_H
 #define DEFINES_H

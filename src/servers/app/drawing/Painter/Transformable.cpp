@@ -1,4 +1,10 @@
-// Transformable.h
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * A handy front-end to agg::trans_affine transformation matrix.
+ *
+ */
 
 #include <stdio.h>
 #include <string.h>

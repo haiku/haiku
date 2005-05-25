@@ -1,4 +1,11 @@
-// DrawingModeFactory.h
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Manages retrieving/instantiating of the correct DrawingMode class for
+ * a given drawing_mode constant.
+ *
+ */
 
 #include <stdio.h>
 

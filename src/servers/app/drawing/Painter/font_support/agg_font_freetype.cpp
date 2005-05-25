@@ -1,4 +1,6 @@
 //----------------------------------------------------------------------------
+// Copyright 2005 Michael Lotz <mmlr@mlotz.ch>
+//
 // Anti-Grain Geometry - Version 2.2
 // Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
 //
@@ -12,7 +14,7 @@
 //          mcseemagg@yahoo.com
 //          http://www.antigrain.com
 //----------------------------------------------------------------------------
-
+// modified to use family and style id as glyph cache lookup
 
 #include <stdio.h>
 #include "agg_font_freetype.h"

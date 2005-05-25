@@ -1,4 +1,10 @@
-// DrawingModeBlend.h
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * DrawingMode implementing B_OP_BLEND on B_RGBA32.
+ *
+ */
 
 #ifndef DRAWING_MODE_BLEND_H
 #define DRAWING_MODE_BLEND_H

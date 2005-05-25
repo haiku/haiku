@@ -1,4 +1,11 @@
-// Painter.cpp
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
+ * rendering pipe-lines for stroke, fills, bitmap and text rendering.
+ *
+ */
 
 #include <stdio.h>
 #include <string.h>

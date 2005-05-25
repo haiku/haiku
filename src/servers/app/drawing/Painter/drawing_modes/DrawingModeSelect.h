@@ -1,4 +1,10 @@
-// DrawingModeSelect.h
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * DrawingMode implementing B_OP_SELECT on B_RGBA32.
+ *
+ */
 
 #ifndef DRAWING_MODE_SELECT_H
 #define DRAWING_MODE_SELECT_H

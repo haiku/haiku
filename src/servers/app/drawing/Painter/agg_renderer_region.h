@@ -1,21 +1,14 @@
-//----------------------------------------------------------------------------
-// Anti-Grain Geometry - Version 2.2
-// Copyright (C) 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
-//
-// Permission to copy, use, modify, sell and distribute this software 
-// is granted provided this copyright notice appears in all copies. 
-// This software is provided "as is" without express or implied
-// warranty, and with no claim as to its suitability for any purpose.
-//
-//----------------------------------------------------------------------------
-// Contact: mcseem@antigrain.com
-//          mcseemagg@yahoo.com
-//          http://www.antigrain.com
-//----------------------------------------------------------------------------
-//
-// class renderer_region
-//
-//----------------------------------------------------------------------------
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
+ *
+ *
+ * class renderer_region, slightly modified renderer_mclip which directly
+ * uses a BRegion for clipping info.
+ *
+ */
 
 #ifndef AGG_RENDERER_REGION_INCLUDED
 #define AGG_RENDERER_REGION_INCLUDED

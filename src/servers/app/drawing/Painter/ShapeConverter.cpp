@@ -1,4 +1,11 @@
-// ShapeConverter.cpp
+/*
+ * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Simple BShape to agg::path_storage converter, implemented as BShapeIterator.
+ *
+ */
+
 
 #include "ShapeConverter.h"
 
