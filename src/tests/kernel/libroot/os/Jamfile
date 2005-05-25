@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src tests kernel libroot os ;
 
+#SubDirCcFlags -fcheck-memory-usage -O0 -D_NO_INLINE_ASM ;
+
 SimpleTest DriverSettingsTest
 	: DriverSettingsTest.cpp driver_settings.c
 	: be

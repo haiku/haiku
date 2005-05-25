@@ -1,12 +1,13 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <driver_settings.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <Path.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -183,6 +184,31 @@ check_settings_string(uint32 num)
 }
 
 
+void
+load_settings(const char *name)
+{
+	void *handle = load_driver_settings(name);
+	if (handle == NULL) {
+		fprintf(stderr, "Could not load settings \"%s\"\n", name);
+		return;
+	}
+
+	const driver_settings *settings = get_driver_settings(handle);
+	if (settings == NULL) {
+		fprintf(stderr, "Could not get settings from loaded file \"%s\"\n", name);
+		goto end;
+	}
+
+	printf("settings \"%s\" loaded successfully\n", name);
+	if (gVerbose)
+		dump_settings(*settings);
+
+end:
+	if (unload_driver_settings(handle) < B_OK)
+		fprintf(stderr, "Could not unload driver settings \"%s\"\n", name);
+}
+
+
 int
 main(int argc, char **argv)
 {
@@ -198,25 +224,20 @@ main(int argc, char **argv)
 
 	entry_ref ref;
 	while (directory.GetNextRef(&ref) == B_OK) {
-		void *handle = load_driver_settings(ref.name);
-		if (handle == NULL) {
-			fprintf(stderr, "Could not load settings \"%s\"\n", ref.name);
+		load_settings(ref.name);
+	}
+
+	// load additional files specified on the command line
+	
+	for (int32 i = 1; i < argc; i++) {
+		const char *name = argv[i];
+		if (name[0] == '-')
 			continue;
-		}
 
-		const driver_settings *settings = get_driver_settings(handle);
-		if (settings == NULL) {
-			fprintf(stderr, "Could not get settings from loaded file \"%s\"\n", ref.name);
-			goto end;
-		}
-
-		printf("settings \"%s\" loaded successfully\n", ref.name);
-		if (gVerbose)
-			dump_settings(*settings);
-
-	end:
-		if (unload_driver_settings(handle) < B_OK)
-			fprintf(stderr, "Could not unload driver settings \"%s\"\n", ref.name);
+		// make path absolute, so that load_driver_settings() 
+		// doesn't search in the standard directory
+		BPath path(name);
+		load_settings(path.Path());
 	}
 
 	// check fixed settings strings
