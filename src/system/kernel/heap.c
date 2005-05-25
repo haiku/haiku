@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -57,10 +57,10 @@
 // ripped mostly from nujeffos
 
 struct heap_page {
-	unsigned short bin_index : 5;
-	unsigned short free_count : 9;
-	unsigned short cleaning : 1;
-	unsigned short in_use : 1;
+	uint16	bin_index : 5;
+	uint16	free_count : 9;
+	uint16	cleaning : 1;
+	uint16	in_use : 1;
 } PACKED;
 
 static struct heap_page *heap_alloc_table;
@@ -69,13 +69,13 @@ static addr_t heap_base;
 static addr_t heap_size;
 
 struct heap_bin {
-	unsigned int element_size;
-	unsigned int grow_size;
-	unsigned int alloc_count;
-	void *free_list;
-	unsigned int free_count;
-	char *raw_list;
-	unsigned int raw_count;
+	uint32	element_size;
+	uint32	grow_size;
+	uint32	alloc_count;
+	void	*free_list;
+	uint32	free_count;
+	char	*raw_list;
+	uint32	raw_count;
 };
 
 static struct heap_bin bins[] = {
@@ -149,7 +149,8 @@ ptrchecklist_remove(void *ptr)
 
 #if USE_WALL
 
-static void
+void check_wall(void *address);
+void
 check_wall(void *address)
 {
 	uint32 *wall = (uint32 *)((uint8 *)address - WALL_SIZE - 8);
@@ -193,7 +194,7 @@ static void dump_bin(int bin_index)
 	struct heap_bin *bin = &bins[bin_index];
 	unsigned int *temp;
 
-	dprintf("%d:\tesize %d\tgrow_size %d\talloc_count %d\tfree_count %d\traw_count %d\traw_list %p\n",
+	dprintf("%d:\tesize %lu\tgrow_size %lu\talloc_count %lu\tfree_count %lu\traw_count %lu\traw_list %p\n",
 		bin_index, bin->element_size, bin->grow_size, bin->alloc_count, bin->free_count, bin->raw_count, bin->raw_list);
 	dprintf("free_list: ");
 	for(temp = bin->free_list; temp != NULL; temp = (unsigned int *)*temp) {
