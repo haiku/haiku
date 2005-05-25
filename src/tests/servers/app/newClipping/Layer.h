@@ -59,6 +59,7 @@ private:
 			void			set_user_regions(BRegion &reg);
 			void			clear_visible_regions();
 			void			resize_layer_frame_by(float x, float y);
+			void			resize_redraw_more_regions(BRegion &redraw);
 
 			char			fName[50];
 			BRegion			fVisible;

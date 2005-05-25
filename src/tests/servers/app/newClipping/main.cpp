@@ -102,7 +102,9 @@ void clsMainWindow::test1()
 	c.red = rand()/256;
 	c.green = rand()/256;
 	c.blue = rand()/256;
-	Layer	*lay3 = new Layer(BRect(20,20,100,100), "lay3", B_FOLLOW_NONE, 0, c);
+	Layer	*lay3 = new Layer(BRect(20,20,100,100), "lay3",
+			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+			0, c);
 	lay2->AddLayer(lay3);
 
 	temp	= lay1->Bounds();
@@ -124,6 +126,11 @@ void clsMainWindow::test1()
 
 	snooze(2000000);
 
+	lay2->ResizeBy(-45, -55);
+
+/*
+	snooze(2000000);
+
 	lay1->ScrollBy(0,50);
 
 	snooze(2000000);
@@ -137,7 +144,7 @@ void clsMainWindow::test1()
 	snooze(2000000);
 
 	lay1->Invalidate(BRect(0,0,500,500));
-
+*/
 }
 
 int main()

@@ -47,15 +47,8 @@ void Layer::ConvertToScreen2(BRect* rect)
 	if (view)
 		if (fParent)
 		{
-			rect->Set(	rect->left - fOrigin.x,
-						rect->top - fOrigin.y,
-						rect->right - fOrigin.x,
-						rect->bottom - fOrigin.y);
-
-			rect->Set(	rect->left + fFrame.left,
-						rect->top + fFrame.top,
-						rect->right + fFrame.left,
-						rect->bottom + fFrame.top);
+			rect->OffsetBy(-fOrigin.x, -fOrigin.y);
+			rect->OffsetBy(fFrame.left, fFrame.top);
 
 			fParent->ConvertToScreen2(rect);
 		}
@@ -214,52 +207,77 @@ Layer::resize_layer_frame_by(float x, float y)
 {
 	uint16		rm = fResizeMode & 0x0000FFFF;
 	BRect		newFrame = fFrame;
-	float		dx, dy;
+
+	if ((rm & 0x0F00U) == _VIEW_LEFT_ << 8)
+		newFrame.left += 0.0f;
+	else if ((rm & 0x0F00U) == _VIEW_RIGHT_ << 8)
+		newFrame.left += x;
+	else if ((rm & 0x0F00U) == _VIEW_CENTER_ << 8)
+		newFrame.left += x/2;
 
 	if ((rm & 0x000FU) == _VIEW_LEFT_)
-	{
-		newFrame.left += 0.0f;
-		newFrame.right += x;
-	}
+		newFrame.right += 0.0f;
 	else if ((rm & 0x000FU) == _VIEW_RIGHT_)
-	{
-		newFrame.left += x;
 		newFrame.right += x;
-	}
 	else if ((rm & 0x000FU) == _VIEW_CENTER_)
-	{
-		newFrame.left += x/2;
 		newFrame.right += x/2;
-	}
 
-	if ((rm & 0x00F0U) == _VIEW_TOP_)
-	{
+	if ((rm & 0xF000U) == _VIEW_TOP_ << 12)
 		newFrame.top += 0.0f;
-		newFrame.bottom += y;
-	}
-	else if ((rm & 0x00F0U) == _VIEW_BOTTOM_)
-	{
+	else if ((rm & 0xF000U) == _VIEW_BOTTOM_ << 12)
 		newFrame.top += y;
-		newFrame.bottom += y;
-	}
-	else if ((rm & 0x00F0U) == _VIEW_CENTER_)
-	{
+	else if ((rm & 0xF000U) == _VIEW_CENTER_ << 12)
 		newFrame.top += y/2;
+
+	if ((rm & 0x00F0U) == _VIEW_TOP_ << 4)
+		newFrame.bottom += 0.0f;
+	else if ((rm & 0x00F0U) == _VIEW_BOTTOM_ << 4)
+		newFrame.bottom += y;
+	else if ((rm & 0x00F0U) == _VIEW_CENTER_ << 4)
 		newFrame.bottom += y/2;
-	}
 
-	dx	= newFrame.Width() - fFrame.Width();
-	dy	= newFrame.Height() - fFrame.Height();
-
-	fFrame	= newFrame;
-
-	// call hook function
-	if (dx != 0.0f || dy != 0.0f)
-		ResizedByHook(dx, dy, true); // automatic
-
-	for (Layer *lay = VirtualBottomChild(); lay ; lay = VirtualUpperSibling())
+	if (newFrame != fFrame)
 	{
-		lay->resize_layer_frame_by(dx, dy);
+		float		dx, dy;
+
+		fFrame	= newFrame;
+
+		dx	= newFrame.Width() - fFrame.Width();
+		dy	= newFrame.Height() - fFrame.Height();
+
+		if (dx != 0.0f || dy != 0.0f)
+		{
+			// call hook function
+			ResizedByHook(dx, dy, true); // automatic
+
+			for (Layer *lay = VirtualBottomChild();
+						lay ; lay = VirtualUpperSibling())
+			{
+				lay->resize_layer_frame_by(dx, dy);
+			}
+		}
+		else
+			MovedByHook(dx, dy);
+	}
+}
+
+void
+Layer::resize_redraw_more_regions(BRegion &redraw)
+{
+	uint16		rm = fResizeMode & 0x0000FFFF;
+
+	if (rm & B_FOLLOW_RIGHT || rm & B_FOLLOW_H_CENTER
+		|| rm & B_FOLLOW_BOTTOM || rm & B_FOLLOW_V_CENTER
+	// TODO: these 2 don't need to be redrawn entirely. but ATM we don't have a choice
+		|| rm & B_FOLLOW_LEFT_RIGHT || rm & B_FOLLOW_TOP_BOTTOM)
+	{
+		redraw.Include(&fFullVisible);
+	}
+	else
+	{
+		for (Layer *lay = VirtualBottomChild();
+					lay; lay = VirtualUpperSibling())
+			lay->resize_redraw_more_regions(redraw);
 	}
 }
 
@@ -270,8 +288,8 @@ void Layer::ResizeBy(float dx, float dy)
 	fFrame.Set(fFrame.left, fFrame.top, fFrame.right+dx, fFrame.bottom+dy);
 
 	// resize children using their resize_mask.
-	for (Layer *lay = fParent->VirtualBottomChild();
-				lay; lay = fParent->VirtualUpperSibling())
+	for (Layer *lay = VirtualBottomChild();
+				lay; lay = VirtualUpperSibling())
 			lay->resize_layer_frame_by(dx, dy);
 
 	if (!IsVisuallyHidden() && GetRootLayer())
@@ -299,6 +317,12 @@ void Layer::ResizeBy(float dx, float dy)
 		redrawReg2.Exclude(&fFullVisible);
 		// 3) combine.
 		redrawReg.Include(&redrawReg2);
+
+		// layers that had their frame modified must be entirely redrawn.
+		for (Layer *lay = VirtualBottomChild();
+					lay; lay = VirtualUpperSibling())
+			lay->resize_redraw_more_regions(redrawReg);
+
 
 		// add redrawReg to our RootLayer's redraw region.
 		GetRootLayer()->fRedrawReg.Include(&redrawReg);

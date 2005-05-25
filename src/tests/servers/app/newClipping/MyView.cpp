@@ -96,5 +96,6 @@ void MyView::DrawSubTree(Layer* lay)
 	BRect	temp = lay->Bounds();
 	lay->ConvertToScreen2(&temp);
 	FillRect(temp);
+	Flush();
 	ConstrainClippingRegion(NULL);
 }
