@@ -1,23 +1,7 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
+//	Distributed under the terms of the MIT license.
 //
 //	File Name:		Bitmap.h
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
@@ -42,7 +26,8 @@ enum {
 	B_BITMAP_IS_CONTIGUOUS				= 0x00000010 | B_BITMAP_IS_LOCKED,
 	B_BITMAP_IS_OFFSCREEN				= 0x00000020,
 	B_BITMAP_WILL_OVERLAY				= 0x00000040 | B_BITMAP_IS_OFFSCREEN,
-	B_BITMAP_RESERVE_OVERLAY_CHANNEL	= 0x00000080
+	B_BITMAP_RESERVE_OVERLAY_CHANNEL	= 0x00000080,
+	B_BITMAP_NO_SERVER_LINK				= 0x00000100
 };
 
 #define B_ANY_BYTES_PER_ROW	-1
@@ -120,6 +105,8 @@ private:
 	int32 get_server_token() const;
 	void InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 					int32 bytesPerRow, screen_id screenID);
+	void CleanUp();
+
 	void AssertPtr();
 
 	void		*fBasePtr;

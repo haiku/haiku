@@ -1,27 +1,12 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
+//	Distributed under the terms of the MIT license.
 //
 //	File Name:		Bitmap.cpp
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
 //					DarkWyrm <bpmagic@columbus.rr.com>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	BBitmap objects represent off-screen windows that
 //					contain bitmap data.
 //------------------------------------------------------------------------------
@@ -825,12 +810,7 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 */
 BBitmap::~BBitmap()
 {
-	// TODO: don't free fBasePtr, as it's owned by the app_server
-	// should probably decrement an associated reference count, though,
-	// so the app_server knows this bitmap isn't used anymore
-#ifdef RUN_WITHOUT_APP_SERVER
-	free(fBasePtr);
-#endif	// RUN_WITHOUT_APP_SERVER
+	CleanUp();
 }
 
 // unarchiving constructor
@@ -2226,40 +2206,21 @@ void
 BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 					int32 bytesPerRow, screen_id screenID)
 {
+//printf("BBitmap::InitObject(bounds: BRect(%.1f, %.1f, %.1f, %.1f), format: %ld, flags: %ld, bpr: %ld\n",
+//	   bounds.left, bounds.top, bounds.right, bounds.bottom, colorSpace, flags, bytesPerRow);
+
+	// TODO: Hanlde setting up the offscreen window if we're such a bitmap!
+
+	// TODO: Should we handle rounding of the "bounds" here? How does R5 behave?
+
 	status_t error = B_OK;
 
-#ifndef RUN_WITHOUT_APP_SERVER
-	BPrivate::BAppServerLink link;
-#endif	// RUN_WITHOUT_APP_SERVER
-
-	// clean up
-	if (fBasePtr) {
 #ifdef RUN_WITHOUT_APP_SERVER
-		free(fBasePtr);
+	flags |= B_BITMAP_NO_SERVER_LINK;
 #endif	// RUN_WITHOUT_APP_SERVER
-		fBasePtr = NULL;
 
-#ifndef RUN_WITHOUT_APP_SERVER
-		// AS_DELETE_BITMAP:
-		// Attached Data: 
-		//	1) int32 server token
-		
-		// Reply Code: SERVER_TRUE if successful, 
-		//				SERVER_FALSE if the buffer was already deleted
-		// Reply Data:
-		//		none
-//		status_t freestat;
-		int32 code = SERVER_FALSE;
-		link.StartMessage(AS_DELETE_BITMAP);
-		link.Attach<int32>(fServerToken);
-		error=link.FlushWithReply(&code);
-		if(code==SERVER_FALSE)
-			error=B_NO_MEMORY;
-		fBasePtr=NULL;
-		fArea=-1;
-		fServerToken=-1;
-#endif	// RUN_WITHOUT_APP_SERVER
-	}
+	CleanUp();
+
 	// check params
 	if (!bounds.IsValid() || !is_supported(colorSpace))
 		error = B_BAD_VALUE;
@@ -2268,91 +2229,142 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		if (bytesPerRow < 0)
 			bytesPerRow = bpr;
 		else if (bytesPerRow < bpr)
+// NOTE: How does R5 behave?
 			error = B_BAD_VALUE;
 	}
 	// allocate the bitmap buffer
 	if (error == B_OK) {
+		// NOTE: Maybe the code would look more robust if the
+		// "size" was not calculated here when we ask the server
+		// to allocate the bitmap. -Stephan
 		int32 size = bytesPerRow * (bounds.IntegerHeight() + 1);
-#ifdef RUN_WITHOUT_APP_SERVER
-		fBasePtr = malloc(size);
-		if (fBasePtr) {
-			fSize = size;
-			fColorSpace = colorSpace;
-			fBounds = bounds;
-			fBytesPerRow = bytesPerRow;
-			fFlags = flags;
-		} else
-			error = B_NO_MEMORY;
-#else
-		// Ask the server (via our owning application) to create a bitmap.
 
-		// Attach Data: 
-		// 1) BRect bounds
-		// 2) color_space space
-		// 3) int32 bitmap_flags
-		// 4) int32 bytes_per_row
-		// 5) int32 screen_id::id
-		link.StartMessage(AS_CREATE_BITMAP);
-		link.Attach<BRect>(bounds);
-		link.Attach<color_space>(colorSpace);
-		link.Attach<int32>((int32)flags);
-		link.Attach<int32>(bytesPerRow);
-		link.Attach<int32>(screenID.id);
-		
-		// Reply Code: SERVER_TRUE
-		// Reply Data:
-		//	1) int32 server token
-		//	2) area_id id of the area in which the bitmap data resides
-		//	3) int32 area pointer offset used to calculate fBasePtr
-		
-		// alternatively, if something went wrong
-		// Reply Code: SERVER_FALSE
-		// Reply Data:
-		//		None
-		int32 code = SERVER_FALSE;
-		error=link.FlushWithReply(&code);
-		
-		// We shouldn't ever have to execute this block, but just in case...
-		if(error!=B_OK)
-			fBasePtr=NULL;
-
-		if(code==SERVER_TRUE)
-		{
-			// Get token
-			area_id bmparea;
-			int32 areaoffset;
+		if (flags & B_BITMAP_NO_SERVER_LINK) {
+			fBasePtr = malloc(size);
+			if (fBasePtr) {
+				fSize = size;
+				fColorSpace = colorSpace;
+				fBounds = bounds;
+				fBytesPerRow = bytesPerRow;
+				fFlags = flags;
+			} else
+				error = B_NO_MEMORY;
+		} else {
+			// Ask the server (via our owning application) to create a bitmap.
+			BPrivate::BAppServerLink link;
+	
+			// Attach Data: 
+			// 1) BRect bounds
+			// 2) color_space space
+			// 3) int32 bitmap_flags
+			// 4) int32 bytes_per_row
+			// 5) int32 screen_id::id
+			link.StartMessage(AS_CREATE_BITMAP);
+			link.Attach<BRect>(bounds);
+			link.Attach<color_space>(colorSpace);
+			link.Attach<int32>((int32)flags);
+			link.Attach<int32>(bytesPerRow);
+			link.Attach<int32>(screenID.id);
 			
-			link.Read<int32>(&fServerToken);
-			link.Read<area_id>(&bmparea);
-			link.Read<int32>(&areaoffset);
+			// Reply Code: SERVER_TRUE
+			// Reply Data:
+			//	1) int32 server token
+			//	2) area_id id of the area in which the bitmap data resides
+			//	3) int32 area pointer offset used to calculate fBasePtr
 			
-			// Get the area in which the data resides
-			fArea=clone_area("shared bitmap area",(void**)&fBasePtr,B_ANY_ADDRESS,
-				B_READ_AREA | B_WRITE_AREA,bmparea);
+			// alternatively, if something went wrong
+			// Reply Code: SERVER_FALSE
+			// Reply Data:
+			//		None
+			int32 code = SERVER_FALSE;
+			error = link.FlushWithReply(&code);
 			
-			// Jump to the location in the area
-			fBasePtr=(int8*)fBasePtr + areaoffset;
-
-			fSize = size;
-			fColorSpace = colorSpace;
-			fBounds = bounds;
-			fBytesPerRow = bytesPerRow;
-			fFlags = flags;
+			if (error >= B_OK) {
+				// *communication* with server successful
+				if (code == SERVER_TRUE) {
+					// server side success
+					// Get token
+					area_id bmparea;
+					int32 areaoffset;
+					
+					link.Read<int32>(&fServerToken);
+					link.Read<area_id>(&bmparea);
+					link.Read<int32>(&areaoffset);
+					
+					// Get the area in which the data resides
+					fArea = clone_area("shared bitmap area",
+									   (void**)&fBasePtr,
+									   B_ANY_ADDRESS,
+									   B_READ_AREA | B_WRITE_AREA,
+									   bmparea);
+					
+					// Jump to the location in the area
+					fBasePtr = (int8*)fBasePtr + areaoffset;
+		
+					fSize = size;
+					fColorSpace = colorSpace;
+					fBounds = bounds;
+					fBytesPerRow = bytesPerRow;
+					fFlags = flags;
+				} else {
+					// server side error, we assume:
+					error = B_NO_MEMORY;
+				}
+			}
+			// NOTE: not "else" to handle B_NO_MEMORY on server side!
+			if (error < B_OK) {
+				fBasePtr = NULL;
+				fServerToken = -1;
+				fArea = -1;
+				// NOTE: why not "0" in case of error?
+				fFlags = flags;
+			}
 		}
-		else
-		{
-			fServerToken = -1;
-			fArea = -1;
-			fFlags = flags;
-			
-			error = B_NO_MEMORY;
-		}
-#endif	// RUN_WITHOUT_APP_SERVER
 		fWindow = NULL;
 		fToken = -1;
 		fOrigArea = -1;
 	}
+
+	// TODO: on success, handle clearing to white if the flags say so. Needs to be
+	// dependent on color space.
+
 	fInitError = error;
+}
+
+// CleanUp
+/*!	\brief Cleans up any memory allocated by the bitmap or
+		   informs the server to do so.
+*/
+void
+BBitmap::CleanUp()
+{
+	if (fBasePtr) {
+		if (fFlags & B_BITMAP_NO_SERVER_LINK) {
+			free(fBasePtr);
+		} else {
+			BPrivate::BAppServerLink link;
+			// AS_DELETE_BITMAP:
+			// Attached Data: 
+			//	1) int32 server token
+			
+			// Reply Code: SERVER_TRUE if successful, 
+			//			   SERVER_FALSE if the buffer was already deleted
+			// Reply Data: none
+//			status_t freestat;
+			int32 code = SERVER_FALSE;
+			link.StartMessage(AS_DELETE_BITMAP);
+			link.Attach<int32>(fServerToken);
+			link.FlushWithReply(&code);
+			if (code == SERVER_FALSE) {
+				// TODO: Find out if "SERVER_FALSE if the buffer
+				// was already deleted" is true. If not, maybe we
+				// need to take additional action.
+			}
+			fArea = -1;
+			fServerToken = -1;
+		}
+		fBasePtr = NULL;
+	}
 }
 
 // AssertPtr
