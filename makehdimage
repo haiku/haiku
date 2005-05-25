@@ -109,10 +109,10 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	strace rmdir error ifconfig ping traceroute arp pppconfig \
 	ppp_up gdb tail zip unzip mountvolume"
 
-BEOS_APPS="MiniTerminal"
-BEOS_PREFERENCES="DataTranslations Mouse Keyboard Keymap Menu Sounds Media FileTypes"
+BEOS_APPS="MiniTerminal People ShowImage Clock"
+BEOS_PREFERENCES="DataTranslations Mouse Keyboard Keymap Menu ScrollBar Sounds Media FileTypes"
 
-BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
+BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so libtracker.so \
 	libtranslation.so libbind.so libnetapi.so libsocket.so libdebug.so \
 	libtextencoding.so libz.so libfreetype.so libpng.so libappserver.so"
 
@@ -126,12 +126,12 @@ BEOS_NETWORK_PROTOCOLS="icmp ipv4 raw route tcp udp"
 
 BEOS_ADD_ONS_ACCELERANTS="radeon.accelerant nv.accelerant mga.accelerant \
 	nm.accelerant vesa.accelerant"
-BEOS_ADD_ONS_TRANSLATORS="STXTTranslator RTF-Translator"
+BEOS_ADD_ONS_TRANSLATORS="STXTTranslator RTF-Translator PNGTranslator"
 BEOS_ADD_ONS_MEDIA="mixer.media_addon legacy.media_addon multi_audio.media_addon"
 BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard <input>mouse"
 BEOS_ADD_ONS_DRIVERS_MISC="keyboard scsi_dsk scsi_cd dprintf null zero random ps2_hid \
 	<driver>tty console <driver>config"
-BEOS_ADD_ONS_DRIVERS_GRAPHICS="radeon.driver nv.driver nm.driver mga.driver"
+BEOS_ADD_ONS_DRIVERS_GRAPHICS="radeon.driver nv.driver nm.driver mga.driver vesa"
 BEOS_ADD_ONS_DRIVERS_NET="ipro1000 rtl8139 rtl8169 sis900 \
 	via-rhine wb840 net_stack_driver"	# bcm440x bcm570x (only available with GPLd add-ons)
 BEOS_ADD_ONS_BUS_MANAGERS="pci isa ide scsi config_manager"
@@ -399,7 +399,8 @@ for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/graphics/nm.driver drivers/dev/net/ipro1000 \
 		drivers/dev/net/rtl8139 drivers/dev/net/rtl8169 \
 		drivers/dev/net/sis900 drivers/dev/net/via-rhine \
-		drivers/dev/net/wb840 drivers/dev/net/net_stack_driver; do
+		drivers/dev/net/wb840 drivers/dev/net/net_stack_driver \
+		drivers/dev/graphics/vesa; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
 	linkName=bin/$(basename $f)
 	while [ $relName != . ]; do
