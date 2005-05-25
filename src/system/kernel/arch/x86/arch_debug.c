@@ -16,7 +16,12 @@
 #include <arch_cpu.h>
 
 
-#define NUM_PREVIOUS_LOCATIONS 16
+struct stack_frame {
+	struct stack_frame	*previous;
+	addr_t				return_address;
+};
+
+#define NUM_PREVIOUS_LOCATIONS 32
 
 extern struct iframe_stack gBootFrameStack;
 
@@ -110,12 +115,12 @@ dbg_stack_trace(int argc, char **argv)
 			dprintf(" vector: 0x%x, error code: 0x%x\n", frame->vector, frame->error_code);
  			ebp = frame->ebp;
 		} else {
-			uint32 eip = *((uint32 *)ebp + 1);
+			addr_t eip = ((struct stack_frame *)ebp)->return_address;
 			const char *symbol, *image;
-			uint32 nextEbp = *(uint32 *)ebp;
+			addr_t nextEbp = (addr_t)((struct stack_frame *)ebp)->previous;
 			addr_t baseAddress;
 			bool exactMatch;
-			uint32 diff = nextEbp - ebp;
+			addr_t diff = nextEbp - ebp;
 
 			if (eip == 0 || ebp == 0)
 				break;
@@ -147,7 +152,23 @@ dbg_stack_trace(int argc, char **argv)
 }
 
 
-int
+//	#pragma mark -
+
+
+void *
+arch_get_caller(void)
+{
+	// It looks like you would get the wrong stack frame here, but
+	// since read_ebp() is an assembler inline macro, GCC seems to 
+	// be smart enough to save its original value.
+	struct stack_frame *frame;
+	read_ebp(frame);
+
+	return (void *)frame->return_address;
+}
+
+
+status_t
 arch_dbg_init(kernel_args *args)
 {
 	// at this stage, the debugger command system is alive
