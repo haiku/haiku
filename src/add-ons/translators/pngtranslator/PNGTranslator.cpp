@@ -819,7 +819,7 @@ PNGTranslator::translate_from_bits_to_png(BPositionIO *inSource,
 			result = B_ERROR;
 			break;
 		}
-		
+
 		png_set_write_fn(ppng, static_cast<void *>(outDestination), 
 			pngcb_write_data, pngcb_flush_data);
 			
@@ -849,6 +849,10 @@ PNGTranslator::translate_from_bits_to_png(BPositionIO *inSource,
 			}
 			if (nalloc < height) {
 				result = B_NO_MEMORY;
+				// clear out rest of the pointers,
+				// so we don't call delete[] with invalid pointers
+				for (; nalloc < height; nalloc++)
+					prows[nalloc] = NULL;
 				break;
 			}
 		}

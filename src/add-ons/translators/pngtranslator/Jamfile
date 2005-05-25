@@ -17,7 +17,13 @@ Translator PNGTranslator :
 	PNGTranslator.cpp
 	PNGView.cpp ;
 
-LinkSharedOSLibs PNGTranslator : be translation libpng.a libz.a ;
+if ( $(TARGET_PLATFORM) = haiku ) {
+	LinkSharedOSLibs PNGTranslator :
+		libbe.so libtranslation.so libpng.so libz.so ;
+} else {
+	LinkSharedOSLibs PNGTranslator :
+		be translation libpng.a libz.a ;
+}
 
 Package haiku-translationkit-cvs :
 	PNGTranslator :
