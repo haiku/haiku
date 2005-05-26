@@ -383,20 +383,24 @@ status_t nv_acc_init_dma()
 									  * DMA class is $002 (b0-11);
 									  * DMA target node is NVM (non-volatile memory?)
 									  * (instead of doing PCI or AGP transfers) */
-		ACCW(PR_CTX1_A, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
+//main mem DMA buf test on pre-NV40:
+//		ACCW(PR_CTX1_A, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
+		ACCW(PR_CTX1_A, 0x000fffff); /* DMA limit: tablesize is 1M bytes */
 		ACCW(PR_CTX2_A, (((si->ps.memory_size - 1) & 0xffff8000) | 0x00000002));
 									 /* DMA access type is READ_AND_WRITE;
 									  * table is located at end of cardRAM (b12-31):
 									  * It's adress needs to be at a 4kb boundary! */
 
 		/* NVM DMA is broken on TNT1, so we use PCI-transfers back to the gfxRAM here */
-		if (si->ps.card_type == NV04)
+//main mem DMA buf test on pre-NV40
+		if (1)//si->ps.card_type == NV04)
 		{
 			/* DMA target node is PCI */
 			ACCW(PR_CTX0_A, 0x00023002);
 			/* point at the DMA buffer via main system memory */
-			ACCW(PR_CTX2_A, (ACCR(PR_CTX2_A) +
-				(((uint32)((uint8 *)(si->framebuffer_pci))) & 0xfffff000)));
+//			ACCW(PR_CTX2_A, (ACCR(PR_CTX2_A) +
+//				(((uint32)((uint8 *)(si->framebuffer_pci))) & 0xfffff000)));
+			ACCW(PR_CTX2_A, ((uint32)((uint8 *)(si->dma_buffer_pci))));
 		}
 
 //3D stuff:
@@ -864,8 +868,11 @@ status_t nv_acc_init_dma()
 	}
 
 	/*** init DMA command buffer info ***/
-	si->dma_buffer = (void *)((char *)si->framebuffer +
-		((si->ps.memory_size - 1) & 0xffff8000));
+	if (si->ps.card_arch >= NV40A) //main mem DMA buf test on pre-NV40
+	{
+		si->dma_buffer = (void *)((char *)si->framebuffer +
+			((si->ps.memory_size - 1) & 0xffff8000));
+	}
 	LOG(4,("ACC_DMA: command buffer is at adress $%08x\n",
 		((uint32)(si->dma_buffer))));
 	/* we have issued no DMA cmd's to the engine yet */
@@ -877,7 +884,9 @@ status_t nv_acc_init_dma()
 	 * one word is reserved at the end of the DMA buffer to be able to instruct the
 	 * engine to do a buffer wrap-around!
 	 * (DMA opcode 'noninc method': issue word $20000000.) */
-	si->engine.dma.max = 8192 - 1;
+//main mem DMA buf test on pre-NV40
+//	si->engine.dma.max = 8192 - 1;
+	si->engine.dma.max = ((1 * 1024 * 1024) >> 2) - 1;
 	/* note the current free space we have left in the DMA buffer */
 	si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
 
@@ -1224,14 +1233,18 @@ static void nv_init_for_3D_dma(void)
 
 static void nv_start_dma(void)
 {
-	uint8 dummy;
+	uint32 dummy;
 
 	if (si->engine.dma.current != si->engine.dma.put)
 	{
 		si->engine.dma.put = si->engine.dma.current;
 		/* dummy read the first adress of the framebuffer: flushes MTRR-WC buffers so
 		 * we know for sure the DMA command buffer received all data. */
-		dummy = *((char *)(si->framebuffer));
+//main mem DMA buf test on pre-NV40
+//		dummy = *((uint32 *)(si->framebuffer));
+		__asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory"); //thomas
+		dummy = ACCR(STATUS);
+
 		/* actually start DMA to execute all commands now in buffer */
 		/* note:
 		 * it doesn't matter which FIFO channel's DMA registers we access, they are in
