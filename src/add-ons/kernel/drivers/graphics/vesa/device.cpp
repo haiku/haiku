@@ -11,8 +11,6 @@
 #include <SupportDefs.h>
 #include <graphic_driver.h>
 #include <image.h>
-#include <boot_item.h>
-#include <frame_buffer_console.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -87,16 +85,10 @@ device_open(const char *name, uint32 flags, void **_cookie)
 	if (info->open_count++ == 0) {
 		// this device has been opened for the first time, so
 		// we allocate needed resources and initialize the structure
-
-		frame_buffer_boot_info *bufferInfo = (frame_buffer_boot_info *)get_boot_item(FRAME_BUFFER_BOOT_INFO);
-		if (bufferInfo != NULL) {
-			info->frame_buffer = (uint8 *)bufferInfo->frame_buffer;
-			info->frame_buffer_area = bufferInfo->area;
-		} 
-
-		info->id = id;
-
-		status = vesa_init(*info);
+		if (status == B_OK)
+			status = vesa_init(*info);
+		if (status == B_OK)
+			info->id = id;
 	}
 
 	release_lock(&gLock);

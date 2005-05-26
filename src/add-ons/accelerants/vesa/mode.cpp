@@ -150,6 +150,9 @@ vesa_set_display_mode(display_mode *_mode)
 	if (vesa_propose_display_mode(&mode, &mode, &mode) != B_OK)
 		return B_BAD_VALUE;
 
+	// ToDo: unless we have a VBE3 device, we can't change the display mode
+	return B_UNSUPPORTED;
+#if 0
 	gInfo->shared_info->current_mode = mode;
 
 	switch (mode.space) {
@@ -164,8 +167,8 @@ vesa_set_display_mode(display_mode *_mode)
 			gInfo->shared_info->bytes_per_row = mode.virtual_width;
 			break;
 	}
-
 	return B_OK;
+#endif
 }
 
 

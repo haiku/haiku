@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -107,7 +107,7 @@ typedef void (DisplayDriver::* SetRectangleFuncType)(int left, int top, int righ
 */
 
 class DisplayDriver {
- public:
+public:
 								DisplayDriver();
 	virtual						~DisplayDriver();
 
@@ -313,11 +313,9 @@ class DisplayDriver {
 	virtual void				Unlock() = 0;
 
 	// display mode access
-	virtual void				SetMode(const display_mode &mode);
-	virtual	void				GetMode(display_mode *mode);
-			const display_mode*	DisplayMode()
-									{ return &fDisplayMode; }
-	
+	virtual status_t			SetMode(const display_mode &mode);
+	virtual	void				GetMode(display_mode &mode);
+
 	virtual bool				DumpToFile(const char *path) = 0;
 	virtual ServerBitmap*		DumpToBitmap() = 0;
 

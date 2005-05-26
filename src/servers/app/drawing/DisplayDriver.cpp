@@ -95,24 +95,24 @@ DisplayDriver::Shutdown()
 	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
 	to update the state variables kept internally by the DisplayDriver class.
 */
-void
+status_t
 DisplayDriver::SetMode(const display_mode &mode)
 {
 	if (Lock()) {
 		fDisplayMode = mode;
 		Unlock();
+		return B_OK;
 	}
+
+	return B_ERROR;
 }
 
 // GetMode
 void
-DisplayDriver::GetMode(display_mode *mode)
+DisplayDriver::GetMode(display_mode &mode)
 {
-	if (!mode)
-		return;
-	
 	if (Lock()) {
-		*mode = fDisplayMode;
+		mode = fDisplayMode;
 		Unlock();
 	}
 }

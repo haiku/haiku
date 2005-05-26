@@ -103,15 +103,10 @@ Desktop::AddDriver(DisplayDriver *driver)
 {
 	if (driver->Initialize()) {
 		// TODO: be careful of screen initialization - monitor may not support 640x480
-		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB32, fScreenList.CountItems()+1);
+		Screen *screen = new Screen(driver, fScreenList.CountItems() + 1);
+		screen->SetMode(640, 480, B_RGB32, 60.f);
 
-//		Screen *sc = new Screen(driver, BPoint(1400, 1050), B_RGB32, fScreenList.CountItems()+1);
-//		Screen *sc = new Screen(driver, BPoint(640, 480), B_CMAP8, fScreenList.CountItems()+1);
-//		Screen *sc = new Screen(driver, BPoint(640, 480), B_GRAY8, fScreenList.CountItems()+1);
-//		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB15, fScreenList.CountItems()+1);
-//		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB16, fScreenList.CountItems()+1);
-//		Screen *sc = new Screen(driver, BPoint(800, 600), B_RGB32, fScreenList.CountItems()+1);
-		fScreenList.AddItem(sc);
+		fScreenList.AddItem(screen);
 	} else {
 		driver->Shutdown();
 		delete driver;
@@ -223,7 +218,7 @@ Desktop::CountRootLayers() const
 inline DisplayDriver *
 Desktop::GetDisplayDriver() const
 {
-	return ScreenAt(0)->DDriver();
+	return ScreenAt(0)->GetDisplayDriver();
 }
 
 

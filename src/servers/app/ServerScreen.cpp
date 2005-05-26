@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -21,23 +21,30 @@
 //
 //	File Name:		ServerScreen.cpp
 //	Author:			Adi Oanca <adioanca@myrealbox.com>
+//					Axel Dörfler, axeld@pinc-software.de
 //	Description:	Handles individual screens
-//  
+//
 //------------------------------------------------------------------------------
+
+
 #include <Accelerant.h>
 #include <Point.h>
 #include <GraphicsDefs.h>
+
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "ServerScreen.h"
 #include "DisplayDriver.h"
 
-Screen::Screen(DisplayDriver *dDriver, BPoint res, uint32 colorspace, const int32 &ID)
+
+Screen::Screen(DisplayDriver *driver, int32 id)
+	:
+	fID(id),
+	fDriver(driver)
 {
-	fID			= ID;
-	fDDriver	= dDriver;
-	SetResolution(res, colorspace);
 }
+
 
 Screen::~Screen(void)
 {
@@ -46,64 +53,73 @@ Screen::~Screen(void)
 //	delete fDDriver;
 }
 
-bool Screen::SupportsResolution(BPoint res, uint32 colorspace)
+
+bool
+Screen::SupportsMode(uint16 width, uint16 height, uint32 colorspace, float frequency)
 {
 	// TODO: remove/improve
 	return true;
-	display_mode	*dm = NULL;
-	uint32			count;
+	display_mode *dm = NULL;
+	uint32 count;
 
-	status_t err = fDDriver->GetModeList(&dm, &count);
+	status_t err = fDriver->GetModeList(&dm, &count);
 	if (err < B_OK) {
 		// We've run into quite a problem here! This is a function which is a requirement
 		// for a graphics module. The best thing that we can hope for is 640x480x8 without
 		// knowing anything else. While even this seems like insanity to assume that we
 		// can support this, the only lower mode supported is 640x400, but we shouldn't even
 		// bother with such a pathetic possibility.
-		if ((uint16)res.x == 640 && (uint16)res.y == 480 && colorspace == B_CMAP8)
+		if (width == 640 && height == 480 && colorspace == B_CMAP8)
 			return true;
-		else
-			return false;
+
+		return false;
 	}
 
-	for (uint32 i=0; i < count; i++)
-	{
-		if (dm[i].virtual_width == (uint16)res.x &&
-			dm[i].virtual_height == (uint16)res.y &&
-			dm[i].space == colorspace)
+	for (uint32 i = 0; i < count; i++) {
+		if (dm[i].virtual_width == width
+			&& dm[i].virtual_height == height
+			&& dm[i].space == colorspace)
 			return true;
 	}
 
-	delete [] dm;
+	free(dm);
 	return false;
 }
 
-bool Screen::SetResolution(BPoint res, uint32 colorspace)
+
+bool
+Screen::SetMode(uint16 width, uint16 height, uint32 colorspace, float frequency)
 {
-	if (!SupportsResolution(res, colorspace))
+	if (!SupportsMode(width, height, colorspace, frequency))
 		return false;
 
-	display_mode		mode;
+	display_mode mode;
+	mode.virtual_width = width;
+	mode.virtual_height = height;
+	mode.space = colorspace;
+	// ToDo: frequency!
+	//	(we need to search the mode list for this)
 
-	mode.virtual_width	= (uint16)res.x;
-	mode.virtual_height	= (uint16)res.y;
-	mode.space			= colorspace;
-
-	fDDriver->SetMode(mode);
-
-	return true;
+	return fDriver->SetMode(mode) >= B_OK;
 }
 
-BPoint Screen::Resolution() const
+
+void
+Screen::GetMode(uint16 &width, uint16 &height, uint32 &colorspace, float &frequency) const
 {
-	display_mode		mode;
+	display_mode mode;
+	fDriver->GetMode(mode);
 
-	fDDriver->GetMode(&mode);
-
-	return BPoint(mode.virtual_width, mode.virtual_height);
+	width = mode.virtual_width;
+	height = mode.virtual_height;
+	colorspace = mode.space;
+	frequency = mode.timing.pixel_clock * 1000.f
+		/ (mode.timing.h_total * mode.timing.v_total);
 }
 
-int32 Screen::ScreenNumber(void) const
+
+int32
+Screen::ScreenNumber(void) const
 {
 	return fID;
 }

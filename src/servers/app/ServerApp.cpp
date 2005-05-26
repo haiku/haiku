@@ -1896,7 +1896,7 @@ ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// We have the screen_id and the workspace number, with these
 			// we need to find the corresponding "driver", and call getmode on it
 			display_mode mode;
-			desktop->GetDisplayDriver()->GetMode(&mode);
+			desktop->GetDisplayDriver()->GetMode(mode);
 			// actually this isn't still enough as different workspaces can
 			// have different display_modes
 			

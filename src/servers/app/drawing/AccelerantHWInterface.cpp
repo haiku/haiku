@@ -50,7 +50,7 @@ AccelerantHWInterface::AccelerantHWInterface()
 		fAccelerantHook(NULL),
 		fEngineToken(NULL),
 		fSyncToken(),
-		
+
 		// required hooks
 		fAccAcquireEngine(NULL),
 		fAccReleaseEngine(NULL),
@@ -59,8 +59,9 @@ AccelerantHWInterface::AccelerantHWInterface()
 		fAccGetModeList(NULL),
 		fAccGetFrameBufferConfig(NULL),
 		fAccSetDisplayMode(NULL),
+		fAccGetDisplayMode(NULL),
 		fAccGetPixelClockLimits(NULL),
-		
+
 		// optional accelerant hooks
 		fAccGetTimingConstraints(NULL),
 		fAccProposeDisplayMode(NULL),
@@ -70,15 +71,15 @@ AccelerantHWInterface::AccelerantHWInterface()
 		fAccSetCursorShape(NULL),
 		fAccMoveCursor(NULL),
 		fAccShowCursor(NULL),
-		
+
 		// dpms hooks
 		fAccDPMSCapabilities(NULL),
 		fAccDPMSMode(NULL),
 		fAccSetDPMSMode(NULL),		
-		
+
 		fModeCount(0),
 		fModeList(NULL),
-		
+
 		fBackBuffer(NULL),
 		fFrontBuffer(new AccelerantBuffer())
 {
@@ -260,31 +261,32 @@ AccelerantHWInterface::SetupDefaultHooks()
 	fAccGetModeList = (get_mode_list)fAccelerantHook(B_GET_MODE_LIST, NULL);
 	fAccGetFrameBufferConfig = (get_frame_buffer_config)fAccelerantHook(B_GET_FRAME_BUFFER_CONFIG, NULL);
 	fAccSetDisplayMode = (set_display_mode)fAccelerantHook(B_SET_DISPLAY_MODE, NULL);
+	fAccGetDisplayMode = (get_display_mode)fAccelerantHook(B_GET_DISPLAY_MODE, NULL);
 	fAccGetPixelClockLimits = (get_pixel_clock_limits)fAccelerantHook(B_GET_PIXEL_CLOCK_LIMITS, NULL);
-	
+
 	if (!fAccAcquireEngine || !fAccReleaseEngine || !fAccGetFrameBufferConfig
 		|| !fAccGetModeCount || !fAccGetModeList || !fAccSetDisplayMode
-		|| !fAccGetPixelClockLimits) {
+		|| !fAccGetDisplayMode || !fAccGetPixelClockLimits) {
 		return B_ERROR;
 	}
-	
+
 	// optional
 	fAccGetTimingConstraints = (get_timing_constraints)fAccelerantHook(B_GET_TIMING_CONSTRAINTS, NULL);
 	fAccProposeDisplayMode = (propose_display_mode)fAccelerantHook(B_PROPOSE_DISPLAY_MODE, NULL);
-	
+
 	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE, NULL);
 	fAccInvertRect = (invert_rectangle)fAccelerantHook(B_INVERT_RECTANGLE, NULL);
 	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(B_SCREEN_TO_SCREEN_BLIT, NULL);
-	
+
 	fAccSetCursorShape = (set_cursor_shape)fAccelerantHook(B_SET_CURSOR_SHAPE, NULL);
 	fAccMoveCursor = (move_cursor)fAccelerantHook(B_MOVE_CURSOR, NULL);
 	fAccShowCursor = (show_cursor)fAccelerantHook(B_SHOW_CURSOR, NULL);
-	
+
 	// dpms
 	fAccDPMSCapabilities = (dpms_capabilities)fAccelerantHook(B_DPMS_CAPABILITIES, NULL);
 	fAccDPMSMode = (dpms_mode)fAccelerantHook(B_DPMS_MODE, NULL);
 	fAccSetDPMSMode = (set_dpms_mode)fAccelerantHook(B_SET_DPMS_MODE, NULL);
-	
+
 	return B_OK;
 }
 
@@ -322,37 +324,40 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		&& fDisplayMode.space == mode.space) {
 		return B_OK;
 	}
-	
+
 	// TODO: check if the mode is valid even (ie complies to the modes we said we would support)
 	// or else ret = B_BAD_VALUE
-	
+
 	if (fModeCount <= 0 || !fModeList) {
 		if (UpdateModeList() != B_OK || fModeCount <= 0) {
 			ATRACE(("unable to update mode list\n"));
 			return B_ERROR;
 		}
 	}
-	
+
 	for (int32 i = 0; i < fModeCount; i++) {
 		if (fModeList[i].virtual_width == mode.virtual_width
 			&& fModeList[i].virtual_height == mode.virtual_height
 			&& fModeList[i].space == mode.space) {
-			
+
 			fDisplayMode = fModeList[i];
 			break;
 		}
 	}
-	
+
 	if (fAccSetDisplayMode(&fDisplayMode) != B_OK) {
 		ATRACE(("setting display mode failed\n"));
-		return B_ERROR;
+		fAccGetDisplayMode(&fDisplayMode);
+			// We just keep the current mode and continue.
+			// Note, on startup, this may be different from
+			// what we think is the current display mode
 	}
-	
+
 	// update frontbuffer
 	fFrontBuffer->SetDisplayMode(fDisplayMode);
 	if (UpdateFrameBufferConfig() != B_OK)
 		return B_ERROR;
-	
+
 	// update backbuffer if neccessary
 	if (!fBackBuffer || fBackBuffer->Width() != fDisplayMode.virtual_width
 		|| fBackBuffer->Height() != fDisplayMode.virtual_height) {
@@ -370,11 +375,11 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		if ((color_space)fDisplayMode.space != B_RGB32 &&
 			(color_space)fDisplayMode.space != B_RGBA32)
 			doubleBuffered = true;
-		
+
 		if (doubleBuffered) {
 			fBackBuffer = new MallocBuffer(fDisplayMode.virtual_width,
 										   fDisplayMode.virtual_height);
-			
+
 			status_t ret = fBackBuffer->InitCheck();
 			if (ret < B_OK) {
 				delete fBackBuffer;
@@ -385,9 +390,10 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 			memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 		}
 	}
-	
+
 	return B_OK;
 }
+
 
 void
 AccelerantHWInterface::GetMode(display_mode *mode)
@@ -396,17 +402,18 @@ AccelerantHWInterface::GetMode(display_mode *mode)
 		*mode = fDisplayMode;
 }
 
+
 status_t
 AccelerantHWInterface::UpdateModeList()
 {
 	fModeCount = fAccGetModeCount();
 	if (fModeCount <= 0)
 		return B_ERROR;
-	
-	fModeList = new display_mode[fModeCount];;
+
+	fModeList = new display_mode[fModeCount];
 	if (!fModeList)
 		return B_NO_MEMORY;
-	
+
 	if (fAccGetModeList(fModeList) != B_OK) {
 		ATRACE(("unable to get mode list\n"));
 		return B_ERROR;
@@ -415,6 +422,7 @@ AccelerantHWInterface::UpdateModeList()
 	return B_OK;
 }
 
+
 status_t
 AccelerantHWInterface::UpdateFrameBufferConfig()
 {
@@ -422,7 +430,7 @@ AccelerantHWInterface::UpdateFrameBufferConfig()
 		ATRACE(("unable to get frame buffer config\n"));
 		return B_ERROR;
 	}
-	
+
 	fFrontBuffer->SetFrameBufferConfig(fFrameBufferConfig);
 	return B_OK;
 }

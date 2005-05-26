@@ -4,6 +4,9 @@
  */
 
 
+#include <boot_item.h>
+#include <frame_buffer_console.h>
+
 #include "vesa_info.h"
 #include "driver.h"
 #include "utility.h"
@@ -64,6 +67,11 @@ PhysicalMemoryMapper::Keep()
 status_t
 vesa_init(vesa_info &info)
 {
+	frame_buffer_boot_info *bufferInfo
+		= (frame_buffer_boot_info *)get_boot_item(FRAME_BUFFER_BOOT_INFO);
+	if (bufferInfo == NULL)
+		return B_ERROR;
+
 	info.shared_area = create_area("vesa shared info", (void **)&info.shared_info, 
 			B_ANY_KERNEL_ADDRESS,
 			ROUND_TO_PAGE_SIZE(sizeof(vesa_shared_info)),
@@ -73,11 +81,35 @@ vesa_init(vesa_info &info)
 
 	memset((void *)info.shared_info, 0, sizeof(vesa_shared_info));
 
-	info.shared_info->frame_buffer_area = info.frame_buffer_area;
-	info.shared_info->frame_buffer = info.frame_buffer;
+	info.shared_info->frame_buffer_area = bufferInfo->area;
+	info.shared_info->frame_buffer = (uint8 *)bufferInfo->frame_buffer;
+
+	info.shared_info->current_mode.virtual_width = bufferInfo->width;
+	info.shared_info->current_mode.virtual_height = bufferInfo->height;
+	switch (bufferInfo->depth) {
+		case 4:
+			// ???
+			break;
+		case 8:
+			info.shared_info->current_mode.space = B_CMAP8;
+			break;
+		case 15:
+			info.shared_info->current_mode.space = B_RGB15;
+			break;
+		case 16:
+			info.shared_info->current_mode.space = B_RGB16;
+			break;
+		case 24:
+			info.shared_info->current_mode.space = B_RGB24;
+			break;
+		case 32:
+			info.shared_info->current_mode.space = B_RGB32;
+			break;
+	}
+	info.shared_info->bytes_per_row = bufferInfo->bytes_per_row;
 
 	physical_entry mapping;
-	get_memory_map((void *)info.frame_buffer, B_PAGE_SIZE, &mapping, 1);
+	get_memory_map((void *)info.shared_info->frame_buffer, B_PAGE_SIZE, &mapping, 1);
 	info.shared_info->physical_frame_buffer = (uint8 *)mapping.address;
 
 	dprintf(DEVICE_NAME "vesa_init() completed successfully!\n");
@@ -90,7 +122,7 @@ vesa_uninit(vesa_info &info)
 {
 	dprintf(DEVICE_NAME": vesa_uninit()\n");
 
-	delete_area(info.frame_buffer_area);
+	delete_area(info.shared_info->frame_buffer_area);
 	delete_area(info.shared_area);
 }
 

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -21,33 +21,35 @@
 //
 //	File Name:		ServerScreen.h
 //	Author:			Adi Oanca <adioanca@myrealbox.com>
+//					Axel Dörfler, axeld@pinc-software.de
 //	Description:	Handles individual screens
-//  
+//
 //------------------------------------------------------------------------------
 #ifndef _SCREEN_H_
 #define _SCREEN_H_
 
+
 #include <Point.h>
+
 class DisplayDriver;
 
-class Screen
-{
+class Screen {
 public:
-	Screen(DisplayDriver *dDriver, BPoint res, uint32 colorspace, const int32 &ID);
-	Screen(){ ; }
+	Screen(DisplayDriver *driver, int32 id);
+	Screen() {}
 	~Screen(void);
-	
-	void				SetID(int32 ID){ fID = ID; }
-	bool				SupportsResolution(BPoint res, uint32 colorspace);
-	bool				SetResolution(BPoint res, uint32 colorspace);
-	BPoint				Resolution() const;
-	
+
+	void				SetID(int32 ID) { fID = ID; }
+	bool				SupportsMode(uint16 width, uint16 height, uint32 colorspace, float frequency);
+	bool				SetMode(uint16 width, uint16 height, uint32 colorspace, float frequency);
+	void				GetMode(uint16 &width, uint16 &height, uint32 &colorspace, float &frequency) const;
+
 	int32				ScreenNumber(void) const;
-	DisplayDriver*		DDriver() const { return fDDriver; }
+	DisplayDriver		*GetDisplayDriver() const { return fDriver; }
 
 private:
 	int32				fID;
-	DisplayDriver		*fDDriver;
+	DisplayDriver		*fDriver;
 };
 
-#endif
+#endif	/* _SCREEN_H_ */

@@ -37,7 +37,7 @@ class HWInterface;
 class Painter;
 
 class DisplayDriverPainter : public DisplayDriver {
- public:
+public:
 								DisplayDriverPainter();
 	virtual						~DisplayDriverPainter();
 
@@ -241,7 +241,8 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual void				Unlock();
 
 	// display mode access
-	virtual void				SetMode(const display_mode &mode);
+	virtual status_t			SetMode(const display_mode &mode);
+	virtual void				GetMode(display_mode &mode);
 
 	virtual bool				DumpToFile(const char *path);
 	virtual ServerBitmap*		DumpToBitmap();

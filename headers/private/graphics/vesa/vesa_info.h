@@ -37,8 +37,6 @@ struct vesa_info {
 	area_id			registers_area;
 	struct vesa_shared_info *shared_info;
 	area_id			shared_area;
-	uint8			*frame_buffer;
-	area_id			frame_buffer_area;
 	uint8			*reloc_io;
 	area_id			reloc_io_area;
 };

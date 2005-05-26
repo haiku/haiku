@@ -63,8 +63,8 @@
 static RGBColor kDefaultWorkspaceColor = RGBColor(51, 102, 152);
 
 RootLayer::RootLayer(const char *name, int32 workspaceCount, 
-		Desktop *desktop, DisplayDriver *driver)
- : Layer(BRect(0,0,0,0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver)
+	Desktop *desktop, DisplayDriver *driver)
+	: Layer(BRect(0,0,0,0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver)
 {
 	fDesktop = desktop;
 
@@ -91,7 +91,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fRows = 0;
 	fColumns = 0;
 
-
 	// easy way to identify this class.
 	fClassID = AS_ROOTLAYER_CLASS;
 	fHidden	= false;
@@ -103,22 +102,22 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	// number to an index in the name, i.e. workspace_settings_1 for screen #1
 //	ReadWorkspaceData(WORKSPACE_DATA_LIST);
 
-	// TODO: read these 3 from a configuration file.
-	fScreenXResolution = 0;
-	fScreenYResolution = 0;
+	// TODO: read these 4 from a configuration file.
+	fScreenWidth = 0;
+	fScreenHeight = 0;
 	fColorSpace = B_RGB32;
+	fFrequency = 60.f;
 
 	// init the first, default workspace
-	fActiveWksIndex		= 0;
+	fActiveWksIndex = 0;
 	fWorkspace[fActiveWksIndex] = new Workspace(fActiveWksIndex, 0xFF00FF00,
 												kDefaultWorkspaceColor);
 	fLayerData->SetHighColor(RGBColor(255, 255, 255));
 	fLayerData->SetLowColor(fWorkspace[fActiveWksIndex]->BGColor());
 
 	// Spawn our working thread
-//	fThreadID = spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
 	fThreadID = spawn_thread(WorkingThread, name, B_DISPLAY_PRIORITY, this);
-	
+
 	fListenPort = find_port(SERVER_INPUT_PORT);
 	if (fListenPort == B_NAME_NOT_FOUND) {
 		fListenPort = -1;
@@ -128,6 +127,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	DebugInfoManager::Default()->SetRootLayer(this);
 #endif
 }
+
 
 RootLayer::~RootLayer()
 {
@@ -148,9 +148,10 @@ RootLayer::~RootLayer()
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
 }
 
-void RootLayer::RunThread()
+
+void
+RootLayer::RunThread()
 {
-	
 	if (fThreadID > 0)
 		resume_thread(fThreadID);
 	else
@@ -881,74 +882,63 @@ WinBorder* RootLayer::WinBorderAt(const BPoint& pt) const{
 	return NULL;
 }
 
-void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns)
+
+void
+RootLayer::SetScreens(Screen *screens[], int32 rows, int32 columns)
 {
 	// NOTE: All screens *must* have the same resolution
 	fScreenPtrList.MakeEmpty();
-	BRect	newFrame(0, 0, 0, 0);
-	for (int32 i=0; i < rows; i++)
-	{
-		if (i==0)
-		{
-			for(int32 j=0; j < columns; j++)
-			{
-				fScreenPtrList.AddItem(screen[i*rows + j]);
-				newFrame.right += screen[i*rows + j]->Resolution().x;
-			}
-		}
-		newFrame.bottom		+= screen[i*rows]->Resolution().y;
-	}
-	
-	newFrame.right	-= 1;
-	newFrame.bottom	-= 1;
-	
-	fFrame = newFrame;
+
+	uint16 width, height;
+	uint32 colorSpace;
+	float frequency;
+	screens[0]->GetMode(width, height, colorSpace, frequency);
+
+	fFrame.Set(0, 0, width * columns - 1, height * rows - 1);
 	fRows = rows;
 	fColumns = columns;
-	fScreenXResolution = (int32)(screen[0]->Resolution().x);
-	fScreenYResolution = (int32)(screen[0]->Resolution().y);
+	fScreenWidth = width;
+	fScreenHeight = height;
 }
 
-Screen **RootLayer::Screens()
+
+Screen **
+RootLayer::Screens()
 {
 	return (Screen**)fScreenPtrList.Items();
 }
 
-bool RootLayer::SetScreenResolution(int32 width, int32 height, uint32 colorspace)
+
+bool
+RootLayer::SetScreenMode(int32 width, int32 height, uint32 colorSpace, float frequency)
 {
-	if (fScreenXResolution == width && fScreenYResolution == height &&
-		fColorSpace == colorspace)
+	if (fScreenWidth == width && fScreenHeight == height
+		&& fColorSpace == colorSpace && frequency == fFrequency)
 		return false;
-	
+
 	bool accepted = true;
-	
-	for (int i=0; i < fScreenPtrList.CountItems(); i++)
-	{
-		Screen *screen;
-		screen = static_cast<Screen*>(fScreenPtrList.ItemAt(i));
-		
-		if ( !(screen->SupportsResolution(BPoint(width, height), colorspace)) )
+
+	for (int i = 0; i < fScreenPtrList.CountItems(); i++) {
+		Screen *screen = static_cast<Screen *>(fScreenPtrList.ItemAt(i));
+
+		if (!(screen->SupportsMode(width, height, colorSpace, frequency)))
 			accepted = false;
 	}
-	
-	if (accepted)
-	{
-		for (int i=0; i < fScreenPtrList.CountItems(); i++)
-		{
-			Screen *screen;
-			screen = static_cast<Screen*>(fScreenPtrList.ItemAt(i));
-			
-			screen->SetResolution(BPoint(width, height), colorspace);
-		}
-		
-		Screen **screens = (Screen**)fScreenPtrList.Items();
-		SetScreens(screens, fRows, fColumns);
-		
-		return true;
+
+	if (!accepted)
+		return false;
+
+	for (int i = 0; i < fScreenPtrList.CountItems(); i++) {
+		Screen *screen = static_cast<Screen *>(fScreenPtrList.ItemAt(i));
+
+		screen->SetMode(width, height, colorSpace, frequency);
 	}
-	
-	return false;
+
+	SetScreens(Screens(), fRows, fColumns);
+
+	return true;
 }
+
 //---------------------------------------------------------------------------
 //				Workspace related methods
 //---------------------------------------------------------------------------
@@ -1797,14 +1787,17 @@ RootLayer::SetDragMessage(BMessage* msg)
 		fDragMessage	= new BMessage(*msg);
 }
 
-BMessage* RootLayer::DragMessage(void) const
+
+BMessage *
+RootLayer::DragMessage(void) const
 {
 	return fDragMessage;
 }
 
 // DEBUG methods
 
-void RootLayer::PrintToStream()
+void
+RootLayer::PrintToStream()
 {
 	printf("\nRootLayer '%s' internals:\n", GetName());
 	printf("Screen list:\n");
@@ -1812,7 +1805,7 @@ void RootLayer::PrintToStream()
 		printf("\t%ld\n", ((Screen*)fScreenPtrList.ItemAt(i))->ScreenNumber());
 
 	printf("Screen rows: %ld\nScreen columns: %ld\n", fRows, fColumns);
-	printf("Resolution for all Screens: %ldx%ldx%ld\n", fScreenXResolution, fScreenYResolution, fColorSpace);
+	printf("Resolution for all Screens: %ldx%ldx%ld\n", fScreenWidth, fScreenHeight, fColorSpace);
 	printf("Workspace list:\n");
 	for(int32 i=0; i<fWsCount; i++)
 	{
@@ -1824,7 +1817,8 @@ void RootLayer::PrintToStream()
 
 // PRIVATE methods
 
-void RootLayer::show_winBorder(WinBorder *winBorder)
+void
+RootLayer::show_winBorder(WinBorder *winBorder)
 {
 	bool		invalidate = false;
 	bool		invalid;

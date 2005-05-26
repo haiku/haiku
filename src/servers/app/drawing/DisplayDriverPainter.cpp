@@ -78,6 +78,7 @@ DisplayDriverPainter::Initialize()
 		fAvailableHWAccleration = fGraphicsCard->AvailableHWAcceleration();
 		return DisplayDriver::Initialize();
 	}
+
 	return false;
 }
 
@@ -1181,19 +1182,24 @@ DisplayDriverPainter::Unlock()
 }
 
 // SetMode
-void
+status_t
 DisplayDriverPainter::SetMode(const display_mode &mode)
 {
+	status_t status = B_ERROR;
+
 	if (Lock()) {
-		if (fGraphicsCard->SetMode(mode) >= B_OK) {
+		status = fGraphicsCard->SetMode(mode);
+		if (status >= B_OK) {
 			fPainter->AttachToBuffer(fGraphicsCard->DrawingBuffer());
-			DisplayDriver::SetMode(mode);
+			status = DisplayDriver::SetMode(mode);
 		} else {
 			fprintf(stderr, "DisplayDriverPainter::SetMode() - unsupported "
 				"mode!\n");
 		}
 		Unlock();
 	}
+
+	return status;
 }
 
 // DumpToFile
@@ -1280,6 +1286,16 @@ DisplayDriverPainter::GetModeList(display_mode **mode_list, uint32 *count)
 		Unlock();
 	}
 	return ret;
+}
+
+// GetMode
+void
+DisplayDriverPainter::GetMode(display_mode &mode)
+{
+	if (Lock()) {
+		fGraphicsCard->GetMode(&mode);
+		Unlock();
+	}
 }
 
 // GetPixelClockLimits

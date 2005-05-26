@@ -87,7 +87,7 @@ private:
 		GetAccelerantHook		fAccelerantHook;
 		engine_token			*fEngineToken;
 		sync_token				fSyncToken;
-		
+
 		// required hooks - guaranteed to be valid
 		acquire_engine			fAccAcquireEngine;
 		release_engine			fAccReleaseEngine;
@@ -96,8 +96,9 @@ private:
 		get_mode_list			fAccGetModeList;
 		get_frame_buffer_config	fAccGetFrameBufferConfig;
 		set_display_mode		fAccSetDisplayMode;
+		get_display_mode		fAccGetDisplayMode;
 		get_pixel_clock_limits	fAccGetPixelClockLimits;
-	
+
 		// optional accelerant hooks
 		get_timing_constraints	fAccGetTimingConstraints;
 		propose_display_mode	fAccProposeDisplayMode;

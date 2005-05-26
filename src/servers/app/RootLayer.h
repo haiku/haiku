@@ -54,8 +54,7 @@ class BPortLink;
 	Layer functions to act accordingly. There is only one for each workspace class.
 	
 */
-class RootLayer : public Layer
-{
+class RootLayer : public Layer {
 public:
 								RootLayer(const char *name,	int32 workspaceCount,
 										Desktop *desktop, DisplayDriver *driver);
@@ -97,7 +96,7 @@ public:
 	
 			void				SetScreens(Screen *screen[], int32 rows, int32 columns);
 			Screen**			Screens(void);
-			bool				SetScreenResolution(int32 width, int32 height, uint32 colorspace);
+			bool				SetScreenMode(int32 width, int32 height, uint32 colorspace, float frequency);
 			int32				ScreenRows(void) const { return fRows; }
 			int32				ScreenColumns(void) const { return fColumns; }
 
@@ -179,9 +178,12 @@ friend class Desktop;
 			BList				fScreenPtrList;
 			int32				fRows;
 			int32				fColumns;
-			int32				fScreenXResolution;
-			int32				fScreenYResolution;
+
+			int32				fScreenWidth;
+			int32				fScreenHeight;
 			uint32				fColorSpace;
+			float				fFrequency;
+
 			int32				fButtons;
 			BPoint				fLastMousePossition;
 			bool				fMovingWindow;
