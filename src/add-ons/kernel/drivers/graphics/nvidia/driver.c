@@ -841,6 +841,8 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	status_t	result = B_OK;
 	vuint32		*regs;
 	char shared_name[B_OS_NAME_LENGTH];
+	physical_entry map[1];
+	size_t net_buf_size;
 
 	/* find the device name in the list of devices */
 	/* we're never passed a name we didn't publish */
@@ -857,11 +859,11 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 		/* mark it open another time */
 		goto mark_as_open;
 	}
-	/* create the shared area */
+	/* create the shared_info area */
 	sprintf(shared_name, DEVICE_FORMAT " shared",
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
-	/* create this area with NO user-space read or write permissions, to prevent accidental dammage */
+	/* create this area with NO user-space read or write permissions, to prevent accidental damage */
 	di->shared_area = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS,
 		((sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK,
 		B_USER_CLONEABLE_AREA);
@@ -873,6 +875,34 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 
 	/* save a few dereferences */
 	si = di->si;
+
+	/* create the DMA command buffer area */
+	//fixme? for R4.5 a workaround for cloning would be needed!
+	/* we want to setup a 1Mb buffer (size must be multiple of B_PAGE_SIZE) */
+	net_buf_size = ((1 * 1024 * 1024) + (B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
+	/* create the area that will hold the DMA command buffer */
+	si->dma_buffer_area =
+		create_area("NV accelerant DMA cmd buffer",
+			(void **)&(si->dma_buffer),
+			B_ANY_KERNEL_ADDRESS,
+			2 * net_buf_size, /* take twice the net size so we can have MTRR-WC even on old systems */
+			B_FULL_LOCK | B_CONTIGUOUS, /* both properties needed: GPU always needs access */
+			B_USER_CLONEABLE_AREA);
+	/* on error, abort */
+	if (si->dma_buffer_area < 0)
+	{
+		/* free the already created shared_info area, and return the error */
+		result = si->dma_buffer_area;
+		goto free_shared;
+	}
+	/* we also need the physical adress our DMA buffer resides in, as this needs to be
+	 * fed into the GPU's engine later on. So get the first page of our assigned buffer */
+	get_memory_map(si->dma_buffer, B_PAGE_SIZE, map, 1);
+	si->dma_buffer_pci = (void*)((uint32)(map[0].address));
+	/* set our net buffer at an aligned adress for MTRR-WC mapping even by older CPU's */
+	/* (using MTRR-WC mapping will speed-up placing commands..) */
+	si->engine.dma.cmdbuffer = (uint32*)
+		((((uint32)(si->dma_buffer_pci)) + net_buf_size - 1) & ~(net_buf_size - 1));
 
 	/* save the vendor and device IDs */
 	si->vendor_id = di->pcii.vendor_id;
@@ -908,7 +938,7 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 
 	/* map the device */
 	result = map_device(di);
-	if (result < 0) goto free_shared;
+	if (result < 0) goto free_shared_and_dma;
 	result = B_OK;
 
 	/* create a semaphore for vertical blank management */
@@ -964,6 +994,12 @@ delete_the_sem:
 
 unmap:
 	unmap_device(di);
+
+free_shared_and_dma:
+	/* clean up our DMA area */
+	delete_area(si->dma_buffer_area);
+	si->dma_buffer_area = -1;
+	si->dma_buffer = si->dma_buffer_pci = si->engine.dma.cmdbuffer = NULL;
 
 free_shared:
 	/* clean up our shared area */
@@ -1037,6 +1073,11 @@ free_hook (void* dev) {
 
 	/* free regs and framebuffer areas */
 	unmap_device(di);
+
+	/* clean up our DMA area */
+	delete_area(si->dma_buffer_area);
+	si->dma_buffer_area = -1;
+	si->dma_buffer = si->dma_buffer_pci = si->engine.dma.cmdbuffer = NULL;
 
 	/* clean up our shared area */
 	delete_area(di->shared_area);
