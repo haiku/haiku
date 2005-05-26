@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 8/2004
+	Rudolf Cornelissen 8/2004-5/2005
 */
 
 #include "nv_std.h"
@@ -12,6 +12,7 @@
 int fd;
 shared_info *si;
 area_id shared_info_area;
+area_id dma_cmd_buf_area;
 vuint32 *regs;
 area_id regs_area;
 display_mode *my_mode_list;

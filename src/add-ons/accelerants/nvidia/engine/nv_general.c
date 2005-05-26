@@ -90,7 +90,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.47 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.48 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;

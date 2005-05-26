@@ -1,6 +1,7 @@
 extern int fd;
 extern shared_info *si;
 extern area_id shared_info_area;
+extern area_id dma_cmd_buf_area;
 extern area_id regs_area;
 extern vuint32 *regs;
 extern display_mode *my_mode_list;
