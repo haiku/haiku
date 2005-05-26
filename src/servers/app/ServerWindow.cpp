@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -23,8 +23,9 @@
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
 //					Adi Oanca <adioanca@mymail.ro>
 //	Description:	Shadow BWindow class
-//  
+//
 //------------------------------------------------------------------------------
+
 #include <AppDefs.h>
 #include <Rect.h>
 #include <string.h>
@@ -126,37 +127,36 @@ ServerWindow::ServerWindow(	const char *string,
 	fClientViewsWithInvalidCoords(B_VIEW_RESIZED),
 	fHandlerToken(handlerID)
 {
-	STRACE(("ServerWindow(%s)::ServerWindow()\n",string? string: "NULL"));
+	STRACE(("ServerWindow(%s)::ServerWindow()\n", string));
 
-	if (string)
-	{
-		int32	length = strlen(string);
-		strncpy(fName, string, (length+1) <= 50? (length+1): 50);
-	}
-	else
+	if (string) {
+		strncpy(fName, string, sizeof(fName) - 1);
+		fName[sizeof(fName) - 1] = '\0';
+	} else
 		strcpy(fName, "Unnamed Window");
-		
-	fClientTeamID	= winapp->ClientTeamID();
-	fWinBorder		= NULL;
-	cl				= NULL;	//current layer
-	
-	// fMessagePort is the port to which the app sends messages for the server
-	fMessagePort	= create_port(30,fName);
 
-	fMsgSender		= new LinkMsgSender(fClientWinPort);
-	fMsgReader		= new LinkMsgReader(fMessagePort);
-	
+	fClientTeamID = winapp->ClientTeamID();
+	fWinBorder = NULL;
+	fCurrentLayer = NULL;
+
+	// fMessagePort is the port to which the app sends messages for the server
+	fMessagePort = create_port(30, fName);
+
+	fMsgSender = new LinkMsgSender(fClientWinPort);
+	fMsgReader = new LinkMsgReader(fMessagePort);
+
 	// Send a reply to our window - it is expecting fMessagePort port.
 	fMsgSender->StartMessage(SERVER_TRUE);
 	fMsgSender->Attach<port_id>(fMessagePort);
 	fMsgSender->Flush();
 
-	STRACE(("ServerWindow %s Created\n",fName));
+	STRACE(("ServerWindow %s Created\n", fName));
 }
-//------------------------------------------------------------------------------
-void ServerWindow::Init(BRect frame,
-						uint32 wlook, uint32 wfeel, uint32 wflags,
-						uint32 wwksindex)
+
+
+void
+ServerWindow::Init(BRect frame, uint32 wlook, 
+	uint32 wfeel, uint32 wflags, uint32 wwksindex)
 {
 	char		newName[60];
 	sprintf(newName, "%ld: %s", fClientTeamID, fName);
@@ -187,7 +187,7 @@ ServerWindow::~ServerWindow(void)
 		fWinBorder = NULL;
 	}
 
-	cl = NULL;
+	fCurrentLayer = NULL;
 
 	if(fMsgSender)
 	{
@@ -413,7 +413,7 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 //------------------------------------------------------------------------------
 void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 {
-	if (cl == NULL && code != AS_LAYER_CREATE_ROOT)
+	if (fCurrentLayer == NULL && code != AS_LAYER_CREATE_ROOT)
 	{
 		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n",fName, code - SERVER_TRUE);
 		return;
@@ -426,7 +426,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		//--------- BView Messages -----------------
 		case AS_LAYER_SCROLL:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SCROLL: Layer name: %s\n", fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SCROLL: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 			float dh;
 			float dv;
 
@@ -436,14 +436,14 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			// scroll visually by using the CopyBits() implementation
 			// this will also take care of invalidating previously invisible
 			// areas (areas scrolled into view)
-			BRect src = cl->Bounds();
+			BRect src = fCurrentLayer->Bounds();
 			BRect dst = src;
 			// NOTE: if we scroll down, the contents are moved *up*
 			dst.OffsetBy(-dh, -dv);
 
 			// TODO: Are origin and scale handled in this conversion?
-			src = cl->ConvertToTop(src);
-			dst = cl->ConvertToTop(dst);
+			src = fCurrentLayer->ConvertToTop(src);
+			dst = fCurrentLayer->ConvertToTop(dst);
 
 			int32 xOffset = (int32)(dst.left - src.left);
 			int32 yOffset = (int32)(dst.top - src.top);
@@ -452,9 +452,9 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			// -> it will invalidate areas previously out of screen
 			dst = dst | src;
 
-			_CopyBits(myRootLayer, cl, src, dst, xOffset, yOffset);
+			_CopyBits(myRootLayer, fCurrentLayer, src, dst, xOffset, yOffset);
 
-			cl->fLayerData->OffsetOrigin(BPoint(dh, dv));
+			fCurrentLayer->fLayerData->OffsetOrigin(BPoint(dh, dv));
 
 			break;
 		}
@@ -467,13 +467,13 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<BRect>(&dst);
 
 			// TODO: Are origin and scale handled in this conversion?
-			src = cl->ConvertToTop(src);
-			dst = cl->ConvertToTop(dst);
+			src = fCurrentLayer->ConvertToTop(src);
+			dst = fCurrentLayer->ConvertToTop(dst);
 		
 			int32 xOffset = (int32)(dst.left - src.left);
 			int32 yOffset = (int32)(dst.top - src.top);
 
-			_CopyBits(myRootLayer, cl, src, dst, xOffset, yOffset);
+			_CopyBits(myRootLayer, fCurrentLayer, src, dst, xOffset, yOffset);
 
 			break;
 		}
@@ -495,7 +495,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			}
 
 			if (current)
-				cl=current;
+				fCurrentLayer=current;
 			else // hope this NEVER happens! :-)
 				CRITICAL("Server PANIC: window cannot find Layer with ID\n");
 			break;
@@ -507,13 +507,13 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			// Start receiving top_view data -- pass NULL as the parent view.
 			// This should be the *only* place where this happens.
-			if (cl != NULL)
+			if (fCurrentLayer != NULL)
 				break;
 			
 //			fWinBorder->fTopLayer = CreateLayerTree(NULL);
 			fWinBorder->fTopLayer = CreateLayerTree(NULL, link);
 			fWinBorder->fTopLayer->SetAsTopLayer(true);
-			cl = fWinBorder->fTopLayer;
+			fCurrentLayer = fWinBorder->fTopLayer;
 
 			// connect decorator and top layer.
 			fWinBorder->AddChild(fWinBorder->fTopLayer, NULL);
@@ -522,15 +522,15 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 		case AS_LAYER_CREATE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: Layer name: %s\n", fName, cl->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 			Layer		*newLayer;
 			
-			if (cl == NULL)
+			if (fCurrentLayer == NULL)
 				break;
 
 //			newLayer	= CreateLayerTree(NULL);
 			newLayer	= CreateLayerTree(NULL, link);
-			cl->AddChild(newLayer, this);
+			fCurrentLayer->AddChild(newLayer, this);
 
 			if (!(newLayer->IsHidden())){
 				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
@@ -547,55 +547,55 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			STRACE(("ServerWindow %s: AS_LAYER_DELETE(self)...\n", fName));			
 			Layer *parent;
-			parent = cl->fParent;
+			parent = fCurrentLayer->fParent;
 			
 			// here we remove current layer from list.
-			cl->RemoveSelf();
-			cl->PruneTree();
+			fCurrentLayer->RemoveSelf();
+			fCurrentLayer->PruneTree();
 			
 			if (parent)
-				myRootLayer->GoInvalidate(parent, BRegion(cl->Frame()));
+				myRootLayer->GoInvalidate(parent, BRegion(fCurrentLayer->Frame()));
 			
 			#ifdef DEBUG_SERVERWINDOW
 			parent->PrintTree();
 			#endif
-			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fName, parent->fName->String(), cl->fName->String()));
+			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fName, parent->fName->String(), fCurrentLayer->fName->String()));
 
-			delete cl;
+			delete fCurrentLayer;
 
-			cl=parent;
+			fCurrentLayer=parent;
 			break;
 		}
 		case AS_LAYER_SET_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fName, cl->fName->String()));
-//			SetLayerState(cl);
-			SetLayerState(cl, link);
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+//			SetLayerState(fCurrentLayer);
+			SetLayerState(fCurrentLayer, link);
 			// TODO: should this be moved into SetLayerState?
 			// If it _always_ needs to be done afterwards, then yes!
-			cl->RebuildFullRegion();
+			fCurrentLayer->RebuildFullRegion();
 			break;
 		}
 		case AS_LAYER_SET_FONT_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fName, cl->fName->String()));
-//			SetLayerFontState(cl);
-			SetLayerFontState(cl, link);
-			cl->RebuildFullRegion();
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
+//			SetLayerFontState(fCurrentLayer);
+			SetLayerFontState(fCurrentLayer, link);
+			fCurrentLayer->RebuildFullRegion();
 			break;
 		}
 		case AS_LAYER_GET_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 
 			fMsgSender->StartMessage(SERVER_TRUE);
 
 			// attach state data
-			cl->fLayerData->WriteToLink(*fMsgSender);
+			fCurrentLayer->fLayerData->WriteToLink(*fMsgSender);
 
-			fMsgSender->Attach<float>(cl->fFrame.left);
-			fMsgSender->Attach<float>(cl->fFrame.top);
-			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->BoundsOrigin()));
+			fMsgSender->Attach<float>(fCurrentLayer->fFrame.left);
+			fMsgSender->Attach<float>(fCurrentLayer->fFrame.top);
+			fMsgSender->Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
 
 			fMsgSender->Flush();
 
@@ -603,7 +603,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_SET_MOUSE_EVENT_MASK:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fName, cl->fName->String()));			
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: Layer name: %s\n", fName, fCurrentLayer->fName->String()));			
 
 			uint32		mask;
 			uint32		options;
@@ -611,86 +611,86 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<uint32>(&mask);
 			link.Read<uint32>(&options);
 
-			myRootLayer->SetEventMaskLayer(cl, mask, options);
+			myRootLayer->SetEventMaskLayer(fCurrentLayer, mask, options);
 
 			break;
 		}
 		case AS_LAYER_MOVETO:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer name: %s\n", fName, cl->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 			float x, y;
 			
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 
-			float offsetX = x - cl->fFrame.left;
-			float offsetY = y - cl->fFrame.top;
+			float offsetX = x - fCurrentLayer->fFrame.left;
+			float offsetY = y - fCurrentLayer->fFrame.top;
 
-			cl->MoveBy(offsetX, offsetY);
+			fCurrentLayer->MoveBy(offsetX, offsetY);
 			
 			break;
 		}
 		case AS_LAYER_RESIZETO:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer name: %s\n", fName, cl->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 			float newWidth, newHeight;
 			
 			link.Read<float>(&newWidth);
 			link.Read<float>(&newHeight);
 			
-			// TODO: If cl is a window, check for minimum size allowed.
+			// TODO: If fCurrentLayer is a window, check for minimum size allowed.
 			// Need WinBorder::GetSizeLimits
-			float deltaWidth = newWidth - cl->fFrame.Width();
-			float deltaHeight = newHeight - cl->fFrame.Height();
+			float deltaWidth = newWidth - fCurrentLayer->fFrame.Width();
+			float deltaHeight = newHeight - fCurrentLayer->fFrame.Height();
 
-			cl->ResizeBy(deltaWidth, deltaHeight);
+			fCurrentLayer->ResizeBy(deltaWidth, deltaHeight);
 			
 			break;
 		}
 		case AS_LAYER_GET_COORD:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fName, cl->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			// our offset in the parent -> will be originX and originY in BView
-			fMsgSender->Attach<float>(cl->fFrame.left);
-			fMsgSender->Attach<float>(cl->fFrame.top);
+			fMsgSender->Attach<float>(fCurrentLayer->fFrame.left);
+			fMsgSender->Attach<float>(fCurrentLayer->fFrame.top);
 			// convert frame to bounds
-			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->BoundsOrigin()));
+			fMsgSender->Attach<BRect>(fCurrentLayer->fFrame.OffsetToCopy(fCurrentLayer->BoundsOrigin()));
 			fMsgSender->Flush();
 
 			break;
 		}
 		case AS_LAYER_SET_ORIGIN:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",fName, cl->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			float x, y;
 			
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 			
-			cl->fLayerData->SetOrigin(BPoint(x, y));
+			fCurrentLayer->fLayerData->SetOrigin(BPoint(x, y));
 
 			break;
 		}
 		case AS_LAYER_GET_ORIGIN:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",fName, cl->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<BPoint>(cl->fLayerData->Origin());
+			fMsgSender->Attach<BPoint>(fCurrentLayer->fLayerData->Origin());
 			fMsgSender->Flush();
 
 			break;
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fName, cl->fName->String()));
-			link.Read<uint32>(&(cl->fResizeMode));
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			link.Read<uint32>(&(fCurrentLayer->fResizeMode));
 			
 			break;
 		}
 		case AS_LAYER_CURSOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s - NOT IMPLEMENTED\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s - NOT IMPLEMENTED\n",fName, fCurrentLayer->fName->String()));
 			int32 token;
 
 			link.Read<int32>(&token);
@@ -702,26 +702,26 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_SET_FLAGS:
 		{
-			link.Read<uint32>(&(cl->fFlags));
+			link.Read<uint32>(&(fCurrentLayer->fFlags));
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",fName, cl->fName->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			break;
 		}
 		case AS_LAYER_HIDE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",fName, cl->fName->String()));
-			cl->Hide();
+			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			fCurrentLayer->Hide();
 			break;
 		}
 		case AS_LAYER_SHOW:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",fName, cl->fName->String()));
-			cl->Show();
+			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			fCurrentLayer->Show();
 			break;
 		}
 		case AS_LAYER_SET_LINE_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			int8 lineCap, lineJoin;
 			float miterLimit;
 
@@ -731,67 +731,67 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			link.Read<int8>(&lineJoin);
 			link.Read<float>(&miterLimit);
 			
-			cl->fLayerData->SetLineCapMode((cap_mode)lineCap);
-			cl->fLayerData->SetLineJoinMode((join_mode)lineJoin);
-			cl->fLayerData->SetMiterLimit(miterLimit);
+			fCurrentLayer->fLayerData->SetLineCapMode((cap_mode)lineCap);
+			fCurrentLayer->fLayerData->SetLineJoinMode((join_mode)lineJoin);
+			fCurrentLayer->fLayerData->SetMiterLimit(miterLimit);
 		
 			break;
 		}
 		case AS_LAYER_GET_LINE_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->LineCapMode()));
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->LineJoinMode()));
-			fMsgSender->Attach<float>(cl->fLayerData->MiterLimit());
+			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->LineCapMode()));
+			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->LineJoinMode()));
+			fMsgSender->Attach<float>(fCurrentLayer->fLayerData->MiterLimit());
 			fMsgSender->Flush();
 		
 			break;
 		}
 		case AS_LAYER_PUSH_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			// TODO: refactor, put this in Layer
 			LayerData *ld = new LayerData();
-			ld->prevState = cl->fLayerData;
-			cl->fLayerData = ld;
+			ld->prevState = fCurrentLayer->fLayerData;
+			fCurrentLayer->fLayerData = ld;
 			
-			cl->RebuildFullRegion();
+			fCurrentLayer->RebuildFullRegion();
 			
 			break;
 		}
 		case AS_LAYER_POP_STATE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fName, cl->fName->String()));
-			if (!(cl->fLayerData->prevState))
+			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
+			if (!(fCurrentLayer->fLayerData->prevState))
 			{
-				DTRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", fName, cl->fName->String()));
+				DTRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", fName, fCurrentLayer->fName->String()));
 				break;
 			}
 			// TODO: refactor, put this in Layer
-			LayerData		*ld = cl->fLayerData;
-			cl->fLayerData	= cl->fLayerData->prevState;
+			LayerData *ld = fCurrentLayer->fLayerData;
+			fCurrentLayer->fLayerData = fCurrentLayer->fLayerData->prevState;
 			ld->prevState = NULL;
 			delete ld;
 			
-			cl->RebuildFullRegion();
+			fCurrentLayer->RebuildFullRegion();
 
 			break;
 		}
 		case AS_LAYER_SET_SCALE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			float scale;
 			link.Read<float>(&scale);
 			// TODO: The BeBook says, if you call SetScale() it will be
 			// multiplied with the scale from all previous states on the stack
-			cl->fLayerData->SetScale(scale);
+			fCurrentLayer->fLayerData->SetScale(scale);
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n",fName, cl->fName->String()));		
-			LayerData		*ld = cl->fLayerData;
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n",fName, fCurrentLayer->fName->String()));		
+			LayerData		*ld = fCurrentLayer->fLayerData;
 
 			// TODO: And here, we're taking that into account, but not above
 			// -> refactor put scale into Layer, or better yet, when the
@@ -810,65 +810,65 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_SET_PEN_LOC:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			float		x, y;
 			
 			link.Read<float>(&x);
 			link.Read<float>(&y);
 
-			cl->fLayerData->SetPenLocation(BPoint(x, y));
+			fCurrentLayer->fLayerData->SetPenLocation(BPoint(x, y));
 
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<BPoint>(cl->fLayerData->PenLocation());
+			fMsgSender->Attach<BPoint>(fCurrentLayer->fLayerData->PenLocation());
 			fMsgSender->Flush();
 		
 			break;
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			float penSize;
 			link.Read<float>(&penSize);
-			cl->fLayerData->SetPenSize(penSize);
+			fCurrentLayer->fLayerData->SetPenSize(penSize);
 		
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<float>(cl->fLayerData->PenSize());
+			fMsgSender->Attach<float>(fCurrentLayer->fLayerData->PenSize());
 			fMsgSender->Flush();
 		
 			break;
 		}
 		case AS_LAYER_SET_VIEW_COLOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
 			
-			cl->fLayerData->SetViewColor(RGBColor(c));
+			fCurrentLayer->fLayerData->SetViewColor(RGBColor(c));
 
 			// TODO: this should not trigger redraw, no?!?
-			myRootLayer->GoRedraw(cl, cl->fVisible);
+			myRootLayer->GoRedraw(fCurrentLayer, fCurrentLayer->fVisible);
 			
 			break;
 		}
 		case AS_LAYER_GET_COLORS:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			rgb_color highColor, lowColor, viewColor;
 			
-			highColor = cl->fLayerData->HighColor().GetColor32();
-			lowColor = cl->fLayerData->LowColor().GetColor32();
-			viewColor = cl->fLayerData->ViewColor().GetColor32();
+			highColor = fCurrentLayer->fLayerData->HighColor().GetColor32();
+			lowColor = fCurrentLayer->fLayerData->LowColor().GetColor32();
+			viewColor = fCurrentLayer->fLayerData->ViewColor().GetColor32();
 			
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach(&highColor, sizeof(rgb_color));
@@ -880,59 +880,59 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_SET_BLEND_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			int8 srcAlpha, alphaFunc;
 			
 			link.Read<int8>(&srcAlpha);
 			link.Read<int8>(&alphaFunc);
 			
-			cl->fLayerData->SetBlendingMode((source_alpha)srcAlpha,
+			fCurrentLayer->fLayerData->SetBlendingMode((source_alpha)srcAlpha,
 											(alpha_function)alphaFunc);
 
 			break;
 		}
 		case AS_LAYER_GET_BLEND_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->AlphaSrcMode()));
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->AlphaFncMode()));
+			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaSrcMode()));
+			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->AlphaFncMode()));
 			fMsgSender->Flush();
 
 			break;
 		}
 		case AS_LAYER_SET_DRAW_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			int8 drawingMode;
 			
 			link.Read<int8>(&drawingMode);
 			
-			cl->fLayerData->SetDrawingMode((drawing_mode)drawingMode);
+			fCurrentLayer->fLayerData->SetDrawingMode((drawing_mode)drawingMode);
 			
 			break;
 		}
 		case AS_LAYER_GET_DRAW_MODE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<int8>((int8)(cl->fLayerData->GetDrawingMode()));
+			fMsgSender->Attach<int8>((int8)(fCurrentLayer->fLayerData->GetDrawingMode()));
 			fMsgSender->Flush();
 		
 			break;
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			bool fontAliasing;
 			link.Read<bool>(&fontAliasing);
-			cl->fLayerData->SetFontAntiAliasing(!fontAliasing);
+			fCurrentLayer->fLayerData->SetFontAntiAliasing(!fontAliasing);
 			
 			break;
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 
 		// TODO: you are not allowed to use Layer regions here!!!
 		// If there is no other way, then first lock RootLayer object first.
@@ -950,9 +950,9 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			
 			// if we had a picture to clip to, include the FULL visible region(if any) in the area to be redrawn
 			// in other words: invalidate what ever is visible for this layer and his children.
-			if (cl->clipToPicture && cl->fFullVisible.CountRects() > 0)
+			if (fCurrentLayer->clipToPicture && fCurrentLayer->fFullVisible.CountRects() > 0)
 			{
-				reg.Include(&cl->fFullVisible);
+				reg.Include(&fCurrentLayer->fFullVisible);
 				redraw		= true;
 			}
 			
@@ -961,42 +961,37 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			// TODO: Increase that picture's reference count.(~ allocate a picture)
 			if (sp == NULL)
 				break;
-			
+
 			// we have a new picture to clip to, so rebuild our full region
-			if(cl->clipToPicture) 
-			{
-				cl->clipToPictureInverse = false;
-				cl->RebuildFullRegion();
+			if (fCurrentLayer->clipToPicture) {
+				fCurrentLayer->clipToPictureInverse = false;
+				fCurrentLayer->RebuildFullRegion();
 			}
-			
+
 			// we need to rebuild the visible region, we may have a valid one.
-			if (cl->fParent && !(cl->fHidden))
-			{
-				//cl->fParent->RebuildChildRegions(cl->fFull.Frame(), cl);
-			}
-			else
-			{
+			if (fCurrentLayer->fParent && !fCurrentLayer->fHidden) {
+				//fCurrentLayer->fParent->RebuildChildRegions(fCurrentLayer->fFull.Frame(), fCurrentLayer);
+			} else {
 				// will this happen? Maybe...
-				//cl->RebuildRegions(cl->fFull.Frame());
+				//fCurrentLayer->RebuildRegions(fCurrentLayer->fFull.Frame());
 			}
 			
 			// include our full visible region in the region to be redrawn
-			if (!(cl->fHidden) && (cl->fFullVisible.CountRects() > 0))
-			{
-				reg.Include(&(cl->fFullVisible));
-				redraw		= true;
+			if (!fCurrentLayer->fHidden && (fCurrentLayer->fFullVisible.CountRects() > 0)) {
+				reg.Include(&(fCurrentLayer->fFullVisible));
+				redraw = true;
 			}
-			
+
 			// redraw if we previously had or if we have acquired a picture to clip to.
 			// TODO: Are you sure about triggering a redraw?
 			if (redraw)
-				myRootLayer->GoRedraw(cl, reg);
+				myRootLayer->GoRedraw(fCurrentLayer, reg);
 
 			break;
 		}
 		case AS_LAYER_CLIP_TO_INVERSE_PICTURE:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			
 			// TODO: Watch out for the coordinate system in AS_LAYER_CLIP_TO_INVERSE_PICTURE
 			int32 pictureToken;
@@ -1011,20 +1006,19 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				break;
 							
 			// if a picture has been found...
-			if(cl->clipToPicture) 
-			{
-				cl->clipToPictureInverse	= true;
-				cl->RebuildFullRegion();
-				//cl->RequestDraw(cl->clipToPicture->Frame());
+			if (fCurrentLayer->clipToPicture)  {
+				fCurrentLayer->clipToPictureInverse = true;
+				fCurrentLayer->RebuildFullRegion();
+				//fCurrentLayer->RequestDraw(fCurrentLayer->clipToPicture->Frame());
 			}
 			break;
 		}
 		case AS_LAYER_GET_CLIP_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			
 			// if this Layer is hidden, it is clear that its visible region is void.
-			if (cl->IsHidden())
+			if (fCurrentLayer->IsHidden())
 			{
 				fMsgSender->StartMessage(SERVER_TRUE);
 				fMsgSender->Attach<int32>(0L);
@@ -1037,8 +1031,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				LayerData *ld;
 				int32 noOfRects;
 			
-				ld = cl->fLayerData;
-				reg = cl->ConvertFromParent(&(cl->fVisible));
+				ld = fCurrentLayer->fLayerData;
+				reg = fCurrentLayer->ConvertFromParent(&(fCurrentLayer->fVisible));
 			
 				if (ld->ClippingRegion())
 					reg.IntersectWith(ld->ClippingRegion());
@@ -1063,7 +1057,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_SET_CLIP_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			
 			// TODO: Watch out for the coordinate system in AS_LAYER_SET_CLIP_REGION
 			int32 noOfRects;
@@ -1077,31 +1071,31 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				link.Read<BRect>(&r);
 				region.Include(r);
 			}
-			cl->fLayerData->SetClippingRegion(region);
+			fCurrentLayer->fLayerData->SetClippingRegion(region);
 
-			cl->RebuildFullRegion();
-			if (!(cl->IsHidden()))
-				myRootLayer->GoInvalidate(cl, cl->fFull);
+			fCurrentLayer->RebuildFullRegion();
+			if (!(fCurrentLayer->IsHidden()))
+				myRootLayer->GoInvalidate(fCurrentLayer, fCurrentLayer->fFull);
 
 			break;
 		}
 		case AS_LAYER_INVAL_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			
 			// TODO: handle transformation (origin and scale) prior to converting to top
 			BRect		invalRect;
 			
 			link.Read<BRect>(&invalRect);
-			BRect converted(cl->ConvertToTop(invalRect.LeftTop()),
-							cl->ConvertToTop(invalRect.RightBottom()));
+			BRect converted(fCurrentLayer->ConvertToTop(invalRect.LeftTop()),
+							fCurrentLayer->ConvertToTop(invalRect.RightBottom()));
 
 			myRootLayer->GoRedraw(fWinBorder, BRegion(converted));
 			break;
 		}
 		case AS_LAYER_INVAL_REGION:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			
 			// TODO: handle transformation (origin and scale) prior to converting to top
 			// TODO: Handle conversion to top
@@ -1117,7 +1111,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				invalReg.Include(rect);
 			}
 			
-			myRootLayer->GoRedraw(cl, invalReg);
+			myRootLayer->GoRedraw(fCurrentLayer, invalReg);
 
 			break;
 		}
@@ -1374,34 +1368,34 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		// Some BView drawing messages, but which don't need clipping
 		case AS_LAYER_SET_HIGH_COLOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
 			
-			cl->fLayerData->SetHighColor(RGBColor(c));
+			fCurrentLayer->fLayerData->SetHighColor(RGBColor(c));
 
 			break;
 		}
 		case AS_LAYER_SET_LOW_COLOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fName, fCurrentLayer->fName->String()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
 			
-			cl->fLayerData->SetLowColor(RGBColor(c));
+			fCurrentLayer->fLayerData->SetLowColor(RGBColor(c));
 			
 			break;
 		}
 		case AS_LAYER_SET_PATTERN:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PATTERN: Layer: %s\n", fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PATTERN: Layer: %s\n", fName, fCurrentLayer->fName->String()));
 			pattern pat;
 			
 			link.Read(&pat, sizeof(pattern));
 			
-			cl->fLayerData->SetPattern(Pattern(pat));
+			fCurrentLayer->fLayerData->SetPattern(Pattern(pat));
 			
 			break;
 		}	
@@ -1413,8 +1407,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			
 			link.Read<float>(&x);
 			link.Read<float>(&y);
-			if(cl && cl->fLayerData)
-				cl->fLayerData->SetPenLocation(BPoint(x, y));
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				fCurrentLayer->fLayerData->SetPenLocation(BPoint(x, y));
 			
 			break;
 		}
@@ -1424,8 +1418,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			float size;
 			
 			link.Read<float>(&size);
-			if(cl && cl->fLayerData)
-				cl->fLayerData->SetPenSize(size);
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				fCurrentLayer->fLayerData->SetPenSize(size);
 			
 			break;
 		}
@@ -1524,38 +1518,37 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 }
 		// -------------------- Graphics messages ----------------------------------
 inline
-void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
+void
+ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 {
 	fWinBorder->GetRootLayer()->Lock();
-	BRegion		rreg(cl->fVisible);
+	BRegion rreg(fCurrentLayer->fVisible);
 	if (fWinBorder->fInUpdate)
 		rreg.IntersectWith(&fWinBorder->yUpdateReg);
 
 	desktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
-//	rgb_color  rrr = cl->fLayerData->viewcolor.GetColor32();
+//	rgb_color  rrr = fCurrentLayer->fLayerData->viewcolor.GetColor32();
 //	RGBColor c(rand()%255,rand()%255,rand()%255);
 //	desktop->GetDisplayDriver()->FillRect(BRect(0,0,639,479), c);
 
-	switch (code)
-	{
+	switch (code) {
 		case AS_STROKE_LINE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE\n",fName));
-			
+
 			float x1, y1, x2, y2;
-			
+
 			link.Read<float>(&x1);
 			link.Read<float>(&y1);
 			link.Read<float>(&x2);
 			link.Read<float>(&y2);
-			
-			if (cl && cl->fLayerData)
-			{
+
+			if (fCurrentLayer && fCurrentLayer->fLayerData) {
 				BPoint p1(x1,y1);
 				BPoint p2(x2,y2);
-				desktop->GetDisplayDriver()->StrokeLine(cl->ConvertToTop(p1),
-														cl->ConvertToTop(p2),
-														cl->fLayerData);
+				desktop->GetDisplayDriver()->StrokeLine(fCurrentLayer->ConvertToTop(p1),
+														fCurrentLayer->ConvertToTop(p2),
+														fCurrentLayer->fLayerData);
 				
 				// We update the pen here because many DisplayDriver calls which do not update the
 				// pen position actually call StrokeLine
@@ -1563,7 +1556,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 				// TODO: Decide where to put this, for example, it cannot be done
 				// for DrawString(), also there needs to be a decision, if penlocation
 				// is in View coordinates (I think it should be) or in screen coordinates.
-				cl->fLayerData->SetPenLocation(p2);
+				fCurrentLayer->fLayerData->SetPenLocation(p2);
 			}
 			break;
 		}
@@ -1574,8 +1567,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			BRect rect;
 			link.Read<BRect>(&rect);
 			
-			if (cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->InvertRect(cl->ConvertToTop(rect));
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				desktop->GetDisplayDriver()->InvertRect(fCurrentLayer->ConvertToTop(rect));
 			break;
 		}
 		case AS_STROKE_RECT:
@@ -1589,8 +1582,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&bottom);
 			BRect rect(left,top,right,bottom);
 			
-			if (cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->StrokeRect(cl->ConvertToTop(rect),cl->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				desktop->GetDisplayDriver()->StrokeRect(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_RECT:
@@ -1599,13 +1592,13 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			if (cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->FillRect(cl->ConvertToTop(rect),cl->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				desktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT: Layer name: %s\n", fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 			int32		bitmapToken;
 			BPoint 		point;
 			
@@ -1616,10 +1609,10 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			if (sbmp) {
 
 				BRect src = sbmp->Bounds();
-				BRect dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
+				BRect dst = fCurrentLayer->fParent->ConvertFromParent(fCurrentLayer->fFull.Frame());
 				dst.OffsetBy(point);
 
-				cl->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, cl->fLayerData);
+				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
 			}
 			
 			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT sync with the client?
@@ -1627,7 +1620,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT: Layer name: %s\n", fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 			int32		bitmapToken;
 			BPoint 		point;
 			
@@ -1638,16 +1631,16 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			if (sbmp) {
 
 				BRect src = sbmp->Bounds();
-				BRect dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
+				BRect dst = fCurrentLayer->fParent->ConvertFromParent(fCurrentLayer->fFull.Frame());
 				dst.OffsetBy(point);
 
-				cl->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, cl->fLayerData);
+				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, src, dst, fCurrentLayer->fLayerData);
 			}
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT: Layer name: %s\n", fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
@@ -1657,12 +1650,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
 			if (sbmp) {
-				BRect dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
+				BRect dst = fCurrentLayer->fParent->ConvertFromParent(fCurrentLayer->fFull.Frame());
 				dstRect.OffsetBy(dst.left, dst.top);
 // TODO: why is this not working:
-//				cl->ConvertToTop(dstRect);
+//				fCurrentLayer->ConvertToTop(dstRect);
 
-				cl->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, cl->fLayerData);
+				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
 			}
 			
 			// TODO: Adi -- shouldn't AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT sync with the client?
@@ -1670,7 +1663,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT: Layer name: %s\n", fName, cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT: Layer name: %s\n", fName, fCurrentLayer->fName->String()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
@@ -1680,12 +1673,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			ServerBitmap* sbmp = fServerApp->FindBitmap(bitmapToken);
 			if (sbmp) {
-				BRect dst = cl->fParent->ConvertFromParent(cl->fFull.Frame());
+				BRect dst = fCurrentLayer->fParent->ConvertFromParent(fCurrentLayer->fFull.Frame());
 				dstRect.OffsetBy(dst.left, dst.top);
 // TODO: why is this not working:
-//				cl->ConvertToTop(dstRect);
+//				fCurrentLayer->ConvertToTop(dstRect);
 
-				cl->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, cl->fLayerData);
+				fCurrentLayer->GetDisplayDriver()->DrawBitmap(sbmp, srcRect, dstRect, fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -1699,8 +1692,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<BRect>(&r);
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
-			if (cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->StrokeArc(cl->ConvertToTop(r),angle,span,cl->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				desktop->GetDisplayDriver()->StrokeArc(fCurrentLayer->ConvertToTop(r),angle,span,fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ARC:
@@ -1713,8 +1706,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<BRect>(&r);
 			link.Read<float>(&angle);
 			link.Read<float>(&span);
-			if (cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->FillArc(cl->ConvertToTop(r),angle,span,cl->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				desktop->GetDisplayDriver()->FillArc(fCurrentLayer->ConvertToTop(r),angle,span,fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_BEZIER:
@@ -1728,12 +1721,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			for (i=0; i<4; i++)
 				link.Read<BPoint>(&(pts[i]));
 			
-			if (cl && cl->fLayerData)
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
 			{
 				for (i=0; i<4; i++)
-					pts[i]=cl->ConvertToTop(pts[i]);
+					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				desktop->GetDisplayDriver()->StrokeBezier(pts,cl->fLayerData);
+				desktop->GetDisplayDriver()->StrokeBezier(pts,fCurrentLayer->fLayerData);
 			}
 			delete [] pts;
 			break;
@@ -1749,12 +1742,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			for (i=0; i<4; i++)
 				link.Read<BPoint>(&(pts[i]));
 			
-			if (cl && cl->fLayerData)
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
 			{
 				for (i=0; i<4; i++)
-					pts[i]=cl->ConvertToTop(pts[i]);
+					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				desktop->GetDisplayDriver()->FillBezier(pts,cl->fLayerData);
+				desktop->GetDisplayDriver()->FillBezier(pts,fCurrentLayer->fLayerData);
 			}
 			delete [] pts;
 			break;
@@ -1765,8 +1758,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			if (cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->StrokeEllipse(cl->ConvertToTop(rect),cl->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				desktop->GetDisplayDriver()->StrokeEllipse(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ELLIPSE:
@@ -1775,8 +1768,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			BRect rect;
 			link.Read<BRect>(&rect);
-			if (cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->FillEllipse(cl->ConvertToTop(rect),cl->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				desktop->GetDisplayDriver()->FillEllipse(fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
@@ -1789,8 +1782,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
 			
-			if (cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->StrokeRoundRect(cl->ConvertToTop(rect),xrad,yrad,cl->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				desktop->GetDisplayDriver()->StrokeRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad,fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_FILL_ROUNDRECT:
@@ -1803,8 +1796,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<float>(&xrad);
 			link.Read<float>(&yrad);
 			
-			if (cl && cl->fLayerData)
-				desktop->GetDisplayDriver()->FillRoundRect(cl->ConvertToTop(rect),xrad,yrad,cl->fLayerData);
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
+				desktop->GetDisplayDriver()->FillRoundRect(fCurrentLayer->ConvertToTop(rect),xrad,yrad,fCurrentLayer->fLayerData);
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
@@ -1819,12 +1812,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			link.Read<BRect>(&rect);
 			
-			if (cl && cl->fLayerData)
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
 			{
 				for(int i=0;i<3;i++)
-					pts[i]=cl->ConvertToTop(pts[i]);
+					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				desktop->GetDisplayDriver()->StrokeTriangle(pts,cl->ConvertToTop(rect),cl->fLayerData);
+				desktop->GetDisplayDriver()->StrokeTriangle(pts,fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -1840,12 +1833,12 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			
 			link.Read<BRect>(&rect);
 			
-			if (cl && cl->fLayerData)
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
 			{
 				for(int i=0;i<3;i++)
-					pts[i]=cl->ConvertToTop(pts[i]);
+					pts[i]=fCurrentLayer->ConvertToTop(pts[i]);
 				
-				desktop->GetDisplayDriver()->FillTriangle(pts,cl->ConvertToTop(rect),cl->fLayerData);
+				desktop->GetDisplayDriver()->FillTriangle(pts,fCurrentLayer->ConvertToTop(rect),fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -1868,10 +1861,10 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read(pointlist, sizeof(BPoint)*pointcount);
 			
 			for(int32 i=0; i<pointcount; i++)
-				pointlist[i]=cl->ConvertToTop(pointlist[i]);
+				pointlist[i]=fCurrentLayer->ConvertToTop(pointlist[i]);
 			
 			desktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,
-					cl->fLayerData,isclosed);
+					fCurrentLayer->fLayerData,isclosed);
 			
 			delete [] pointlist;
 			
@@ -1893,9 +1886,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read(pointlist, sizeof(BPoint)*pointcount);
 			
 			for(int32 i=0; i<pointcount; i++)
-				pointlist[i]=cl->ConvertToTop(pointlist[i]);
+				pointlist[i]=fCurrentLayer->ConvertToTop(pointlist[i]);
 			
-			desktop->GetDisplayDriver()->FillPolygon(pointlist,pointcount,polyframe,cl->fLayerData);
+			desktop->GetDisplayDriver()->FillPolygon(pointlist,pointcount,polyframe,fCurrentLayer->fLayerData);
 			
 			delete [] pointlist;
 			
@@ -1922,9 +1915,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read(ptlist,sizeof(BPoint)*ptcount);
 			
 			for(int32 i=0; i<ptcount; i++)
-				ptlist[i]=cl->ConvertToTop(ptlist[i]);
+				ptlist[i]=fCurrentLayer->ConvertToTop(ptlist[i]);
 			
-			desktop->GetDisplayDriver()->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, cl->fLayerData);
+			desktop->GetDisplayDriver()->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
 			delete oplist;
 			delete ptlist;
 			
@@ -1951,9 +1944,9 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read(ptlist,sizeof(BPoint)*ptcount);
 			
 			for(int32 i=0; i<ptcount; i++)
-				ptlist[i]=cl->ConvertToTop(ptlist[i]);
+				ptlist[i]=fCurrentLayer->ConvertToTop(ptlist[i]);
 			
-			desktop->GetDisplayDriver()->FillShape(shaperect, opcount, oplist, ptcount, ptlist, cl->fLayerData);
+			desktop->GetDisplayDriver()->FillShape(shaperect, opcount, oplist, ptcount, ptlist, fCurrentLayer->fLayerData);
 
 			delete oplist;
 			delete ptlist;
@@ -1977,7 +1970,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			// in repeatedly calling FillRect(), this is definitely in need of optimization. At
 			// least it works for now. :)
 			for(int32 i=0; i<rectcount; i++)
-				desktop->GetDisplayDriver()->FillRect(cl->ConvertToTop(rectlist[i]),cl->fLayerData);
+				desktop->GetDisplayDriver()->FillRect(fCurrentLayer->ConvertToTop(rectlist[i]),fCurrentLayer->fLayerData);
 			
 			delete [] rectlist;
 			
@@ -2011,10 +2004,10 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 					link.Read<float>(&(index->pt2.y));
 					link.Read<rgb_color>(&(index->color));
 					
-					index->pt1=cl->ConvertToTop(index->pt1);
-					index->pt2=cl->ConvertToTop(index->pt2);
+					index->pt1=fCurrentLayer->ConvertToTop(index->pt1);
+					index->pt2=fCurrentLayer->ConvertToTop(index->pt2);
 				}				
-				desktop->GetDisplayDriver()->StrokeLineArray(linecount,linedata,cl->fLayerData);
+				desktop->GetDisplayDriver()->StrokeLineArray(linecount,linedata,fCurrentLayer->fLayerData);
 			}
 			break;
 		}
@@ -2031,10 +2024,10 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 			link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
 			
-			if (cl && cl->fLayerData)
+			if (fCurrentLayer && fCurrentLayer->fLayerData)
 				desktop->GetDisplayDriver()->DrawString(string, length,
-														cl->ConvertToTop(location),
-														cl->fLayerData);
+														fCurrentLayer->ConvertToTop(location),
+														fCurrentLayer->fLayerData);
 			
 			free(string);
 			break;

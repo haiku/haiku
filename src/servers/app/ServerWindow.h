@@ -157,8 +157,7 @@ protected:
 
 			int32				fHandlerToken;
 
-			// cl is short for currentLayer. We'll use it a lot, that's why it's short :-)
-			Layer*				cl;
+			Layer*				fCurrentLayer;
 };
 
 #endif
