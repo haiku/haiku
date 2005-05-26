@@ -75,7 +75,7 @@ vga_enable_bright_background_colors(void)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - vesa
 //	VESA functions
 
 
@@ -379,12 +379,12 @@ get_mode_from_settings(void)
 
 	for (int32 i = 0; i < settings->parameter_count; i++) {
 		driver_parameter &parameter = settings->parameters[i];
-		
+
 		if (!strcmp(parameter.name, "mode") && parameter.value_count > 2) {
 			// parameter found, now get its values
 			int32 width = strtol(parameter.values[0], NULL, 0);
 			int32 height = strtol(parameter.values[1], NULL, 0);
-			int32 depth = 8; //strtol(parameter->values[2], NULL, 0);
+			int32 depth = strtol(parameter.values[2], NULL, 0);
 
 			// search mode that fits
 
