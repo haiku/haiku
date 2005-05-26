@@ -419,6 +419,172 @@ set_text_mode(void)
 }
 
 
+//	#pragma mark - blit
+
+
+static void
+blit32(const uint8 *data, uint16 width, uint16 height,
+	const uint8 *palette, uint16 left, uint16 top)
+{
+	uint32 *start = (uint32 *)sFrameBuffer + gKernelArgs.frame_buffer.width * top + left;
+
+	for (int32 y = 0; y < height; y++) {
+		for (int32 x = 0; x < width; x++) {
+			uint8 color = data[y * width + x] * 3;
+
+			start[x] = (palette[color + 0] << 16) | (palette[color + 1] << 8) | (palette[color + 2]);
+		}
+
+		start += gKernelArgs.frame_buffer.width;
+	}
+}
+
+
+static void
+blit24(const uint8 *data, uint16 width, uint16 height,
+	const uint8 *palette, uint16 left, uint16 top)
+{
+	uint8 *start = (uint8 *)sFrameBuffer + gKernelArgs.frame_buffer.width * 3 * top + 3 * left;
+
+	for (int32 y = 0; y < height; y++) {
+		for (int32 x = 0; x < width; x++) {
+			uint8 color = data[y * width + x] * 3;
+			uint32 index = x * 3;
+
+			start[index + 0] = palette[color + 0] >> 2;
+			start[index + 1] = palette[color + 1] >> 2;
+			start[index + 2] = palette[color + 2] >> 2;
+		}
+
+		start += gKernelArgs.frame_buffer.width * 3;
+	}
+}
+
+
+static void
+blit16(const uint8 *data, uint16 width, uint16 height,
+	const uint8 *palette, uint16 left, uint16 top)
+{
+	uint16 *start = (uint16 *)sFrameBuffer + gKernelArgs.frame_buffer.width * top + left;
+
+	for (int32 y = 0; y < height; y++) {
+		for (int32 x = 0; x < width; x++) {
+			uint8 color = data[y * width + x] * 3;
+
+			start[x] = ((palette[color + 0] >> 3) << 11) | ((palette[color + 1] >> 2) << 5)
+				| ((palette[color + 2] >> 3));
+		}
+
+		start += gKernelArgs.frame_buffer.width;
+	}
+}
+
+
+static void
+blit15(const uint8 *data, uint16 width, uint16 height,
+	const uint8 *palette, uint16 left, uint16 top)
+{
+	uint16 *start = (uint16 *)sFrameBuffer + gKernelArgs.frame_buffer.width * top + left;
+
+	for (int32 y = 0; y < height; y++) {
+		for (int32 x = 0; x < width; x++) {
+			uint8 color = data[y * width + x] * 3;
+
+			start[x] = ((palette[color + 0] >> 3) << 10) | ((palette[color + 1] >> 3) << 5)
+				| ((palette[color + 2] >> 3));
+		}
+
+		start += gKernelArgs.frame_buffer.width;
+	}
+}
+
+
+static void
+blit8(const uint8 *data, uint16 width, uint16 height,
+	const uint8 *palette, uint16 left, uint16 top)
+{
+	if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
+		dprintf("set palette failed!\n");
+
+	addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.width * top + left;
+
+	for (int32 i = 0; i < height; i++) {
+		memcpy((void *)(start + gKernelArgs.frame_buffer.width * i),
+			&data[i * width], width);
+	}
+}
+
+
+static void
+blit4(const uint8 *data, uint16 width, uint16 height,
+	const uint8 *palette, uint16 left, uint16 top)
+{
+	//	vga_set_palette((const uint8 *)kPalette16, 0, 16);
+	// ToDo: no boot logo yet in VGA mode
+#if 1
+// this draws 16 big rectangles in all the available colors
+	uint8 *bits = (uint8 *)sFrameBuffer;
+	uint32 bytesPerRow = 80;
+	for (int32 i = 0; i < 32; i++) {
+		bits[9 * bytesPerRow + i + 2] = 0x55;
+		bits[30 * bytesPerRow + i + 2] = 0xaa;
+	}
+
+	for (int32 y = 10; y < 30; y++) {
+		for (int32 i = 0; i < 16; i++) {
+			out16((15 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+			bits[32 * bytesPerRow + i*2 + 2] = i;
+
+			if (i & 1) {
+				out16((1 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+				bits[y * bytesPerRow + i*2 + 2] = 0xff;
+				bits[y * bytesPerRow + i*2 + 3] = 0xff;
+			}
+			if (i & 2) {
+				out16((2 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+				bits[y * bytesPerRow + i*2 + 2] = 0xff;
+				bits[y * bytesPerRow + i*2 + 3] = 0xff;
+			}
+			if (i & 4) {
+				out16((4 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+				bits[y * bytesPerRow + i*2 + 2] = 0xff;
+				bits[y * bytesPerRow + i*2 + 3] = 0xff;
+			}
+			if (i & 8) {
+				out16((8 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+				bits[y * bytesPerRow + i*2 + 2] = 0xff;
+				bits[y * bytesPerRow + i*2 + 3] = 0xff;
+			}
+		}
+	}
+
+	// enable all planes again
+	out16((15 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+#endif
+}
+
+
+static void
+blit_8bit_image(const uint8 *data, uint16 width, uint16 height,
+	const uint8 *palette, uint16 left, uint16 top)
+{
+	switch (gKernelArgs.frame_buffer.depth) {
+		case 4:
+			return blit4(data, width, height, palette, left, top);
+		case 8:
+			return blit8(data, width, height, palette, left, top);
+		case 15:
+			return blit15(data, width, height, palette, left, top);
+		case 16:
+			return blit16(data, width, height, palette, left, top);
+		case 24:
+			return blit24(data, width, height, palette, left, top);
+		case 32:
+			return blit32(data, width, height, palette, left, top);
+	}
+}
+
+
 //	#pragma mark -
 
 
@@ -487,62 +653,13 @@ fallback:
 	//	at least booting with Qemu looks ugly when this is missing
 	memset((void *)sFrameBuffer, 0, gKernelArgs.frame_buffer.physical_buffer.size);
 
-	if (sMode != NULL) {
-		if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
-			dprintf("set palette failed!\n");
+	// ToDo: the boot image is only a temporary solution - it should be
+	//	provided by the loader itself, as well as the blitting routines.
+	//	The image should be compressed, too.
 
-		// ToDo: this is a temporary hack!
-		addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.width
-			* (gKernelArgs.frame_buffer.height - kHeight - 60)
-			* bytesPerPixel + gKernelArgs.frame_buffer.width - kWidth - 40;
-		for (int32 i = 0; i < kHeight; i++) {
-			memcpy((void *)(start + gKernelArgs.frame_buffer.width * i),
-				&kImageData[i * kWidth], kWidth);
-		}
-	} else {
-		//	vga_set_palette((const uint8 *)kPalette16, 0, 16);
-		// ToDo: no boot logo yet in VGA mode
-#if 1
-// this draws 16 big rectangles in all the available colors
-		uint8 *bits = (uint8 *)sFrameBuffer;
-		uint32 bytesPerRow = 80;
-		for (int32 i = 0; i < 32; i++) {
-			bits[9 * bytesPerRow + i + 2] = 0x55;
-			bits[30 * bytesPerRow + i + 2] = 0xaa;
-		}
-
-		for (int32 y = 10; y < 30; y++) {
-			for (int32 i = 0; i < 16; i++) {
-				out16((15 << 8) | 0x02, VGA_SEQUENCER_INDEX);
-				bits[32 * bytesPerRow + i*2 + 2] = i;
-
-				if (i & 1) {
-					out16((1 << 8) | 0x02, VGA_SEQUENCER_INDEX);
-					bits[y * bytesPerRow + i*2 + 2] = 0xff;
-					bits[y * bytesPerRow + i*2 + 3] = 0xff;
-				}
-				if (i & 2) {
-					out16((2 << 8) | 0x02, VGA_SEQUENCER_INDEX);
-					bits[y * bytesPerRow + i*2 + 2] = 0xff;
-					bits[y * bytesPerRow + i*2 + 3] = 0xff;
-				}
-				if (i & 4) {
-					out16((4 << 8) | 0x02, VGA_SEQUENCER_INDEX);
-					bits[y * bytesPerRow + i*2 + 2] = 0xff;
-					bits[y * bytesPerRow + i*2 + 3] = 0xff;
-				}
-				if (i & 8) {
-					out16((8 << 8) | 0x02, VGA_SEQUENCER_INDEX);
-					bits[y * bytesPerRow + i*2 + 2] = 0xff;
-					bits[y * bytesPerRow + i*2 + 3] = 0xff;
-				}
-			}
-		}
-
-		// enable all planes again
-		out16((15 << 8) | 0x02, VGA_SEQUENCER_INDEX);
-#endif
-	}
+	blit_8bit_image(kImageData, kWidth, kHeight, kPalette,
+		gKernelArgs.frame_buffer.width - kWidth - 40,
+		gKernelArgs.frame_buffer.height - kHeight - 60);
 }
 
 
