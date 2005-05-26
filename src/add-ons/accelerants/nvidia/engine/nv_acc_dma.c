@@ -864,10 +864,10 @@ status_t nv_acc_init_dma()
 	}
 
 	/*** init DMA command buffer info ***/
-	si->engine.dma.cmdbuffer = (uint32 *)((char *)si->framebuffer +
+	si->dma_buffer = (void *)((char *)si->framebuffer +
 		((si->ps.memory_size - 1) & 0xffff8000));
 	LOG(4,("ACC_DMA: command buffer is at adress $%08x\n",
-		((uint32)(si->engine.dma.cmdbuffer))));
+		((uint32)(si->dma_buffer))));
 	/* we have issued no DMA cmd's to the engine yet */
 	si->engine.dma.put = 0;
 	/* the current first free adress in the DMA buffer is at offset 0 */
@@ -939,39 +939,39 @@ status_t nv_acc_init_dma()
 	if (nv_acc_fifofree_dma(5) != B_OK) return B_ERROR;
 	/* now setup 2D surface (writing 5 32bit words) */
 	nv_acc_cmd_dma(NV4_SURFACE, NV4_SURFACE_FORMAT, 4);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = surf_depth; /* Format */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = surf_depth; /* Format */
 	/* setup screen pitch */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 		((si->fbc.bytes_per_row & 0x0000ffff) | (si->fbc.bytes_per_row << 16)); /* Pitch */
 	/* setup screen location */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 		((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* OffsetSource */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 		((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* OffsetDest */
 
 	/* wait for room in fifo for pattern colordepth setup cmd if needed */
 	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* set pattern colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLORFORMAT, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 
 	/* wait for room in fifo for bitmap colordepth setup cmd if needed */
 	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* set bitmap colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_SETCOLORFORMAT, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 
 	/* Load our pattern into the engine: */
 	/* wait for room in fifo for pattern cmd if needed. */
 	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
 	/* now setup pattern (writing 7 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLOR0, 4);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor0 */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xffffffff; /* SetColor0 */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
 
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 	nv_start_dma();
@@ -1286,7 +1286,7 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 			{
 				/* not enough room left, so instruct DMA engine to reset the buffer
 				 * when it's reaching the end of it */
-				si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x20000000;
+				((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x20000000;
 				/* reset our buffer pointer, so new commands will be placed at the
 				 * beginning of the buffer. */
 				si->engine.dma.current = 0;
@@ -1368,7 +1368,7 @@ static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size)
 	/* note also:
 	 * this system uses auto-increments for the FIFO offset adresses. Make sure
 	 * to set a new adress if a gap exists between the previous one and the new one. */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((size << 18) |
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = ((size << 18) |
 		((si->engine.fifo.ch_ptr[cmd] + offset) & 0x0000fffc));
 
 	/* space left after issuing the current command is the cmd AND it's arguments less */
@@ -1378,9 +1378,9 @@ static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size)
 static void nv_acc_set_ch_dma(uint16 ch, uint32 handle)
 {
 	/* issue FIFO channel assign cmd */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((1 << 18) | ch);
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = ((1 << 18) | ch);
 	/* set new assignment */
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = (0x80000000 | handle);
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = (0x80000000 | handle);
 
 	/* space left after issuing the current command is the cmd AND it's arguments less */
 	si->engine.dma.free -= 2;
@@ -1484,7 +1484,7 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 	if (nv_acc_fifofree_dma(2) != B_OK) return;
 	/* now setup ROP (writing 2 32bit words) for GXcopy */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xcc; /* SetRop5 */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xcc; /* SetRop5 */
 
 	/*** do each blit ***/
 	/* Note:
@@ -1504,11 +1504,11 @@ void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count
 		{
 			/* now setup blit (writing 4 32bit words) */
 			nv_acc_cmd_dma(NV_IMAGE_BLIT, NV_IMAGE_BLIT_SOURCEORG, 3);
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				(((list[i].src_top) << 16) | (list[i].src_left)); /* SourceOrg */
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				(((list[i].dest_top) << 16) | (list[i].dest_left)); /* DestOrg */
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				((((list[i].height) + 1) << 16) | ((list[i].width) + 1)); /* HeightWidth */
 
 			i++;
@@ -1532,10 +1532,10 @@ void FILL_RECTANGLE_DMA(engine_token *et, uint32 colorIndex, fill_rect_params *l
 	if (nv_acc_fifofree_dma(4) != B_OK) return;
 	/* now setup ROP (writing 2 32bit words) for GXcopy */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xcc; /* SetRop5 */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xcc; /* SetRop5 */
 	/* now setup fill color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = colorIndex; /* Color1A */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = colorIndex; /* Color1A */
 
 	/*** draw each rectangle ***/
 	while (count)
@@ -1554,9 +1554,9 @@ void FILL_RECTANGLE_DMA(engine_token *et, uint32 colorIndex, fill_rect_params *l
 		/* ... and send multiple rects (engine cmd supports 32 max) */
 		while (subcnt--)
 		{
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				(((list[i].left) << 16) | ((list[i].top) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				(((((list[i].right)+1) - (list[i].left)) << 16) |
 				(((list[i].bottom-list[i].top)+1) & 0x0000ffff)); /* Unclipped Rect 0 WidthHeight */
 
@@ -1581,10 +1581,10 @@ void FILL_SPAN_DMA(engine_token *et, uint32 colorIndex, uint16 *list, uint32 cou
 	if (nv_acc_fifofree_dma(4) != B_OK) return;
 	/* now setup ROP (writing 2 32bit words) for GXcopy */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xcc; /* SetRop5 */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0xcc; /* SetRop5 */
 	/* now setup fill color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = colorIndex; /* Color1A */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = colorIndex; /* Color1A */
 
 	/*** draw each span ***/
 	while (count)
@@ -1603,9 +1603,9 @@ void FILL_SPAN_DMA(engine_token *et, uint32 colorIndex, uint16 *list, uint32 cou
 		/* ... and send multiple rects (spans) (engine cmd supports 32 max) */
 		while (subcnt--)
 		{
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				(((list[i+1]) << 16) | ((list[i]) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				((((list[i+2]+1) - (list[i+1])) << 16) | 0x00000001); /* Unclipped Rect 0 WidthHeight */
 
 			i+=3;
@@ -1629,10 +1629,10 @@ void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count
 	if (nv_acc_fifofree_dma(4) != B_OK) return;
 	/* now setup ROP (writing 2 32bit words) for GXinvert */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x55; /* SetRop5 */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x55; /* SetRop5 */
 	/* now reset fill color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* Color1A */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000000; /* Color1A */
 
 	/*** invert each rectangle ***/
 	while (count)
@@ -1651,9 +1651,9 @@ void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count
 		/* ... and send multiple rects (engine cmd supports 32 max) */
 		while (subcnt--)
 		{
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				(((list[i].left) << 16) | ((list[i].top) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
 				(((((list[i].right)+1) - (list[i].left)) << 16) |
 				(((list[i].bottom-list[i].top)+1) & 0x0000ffff)); /* Unclipped Rect 0 WidthHeight */
 
