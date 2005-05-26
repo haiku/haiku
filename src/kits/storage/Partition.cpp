@@ -302,8 +302,34 @@ BPartition::GetDiskSystem(BDiskSystem *diskSystem) const
 status_t
 BPartition::GetPath(BPath *path) const
 {
-	// not implemented
-	return B_ERROR;
+	// The path is constructed on the fly using our parent
+	if (path == NULL || Parent() == NULL || Index() < 0)
+		return B_BAD_VALUE;
+
+	// get the parent's path
+	status_t error = Parent()->GetPath(path);
+	if (error != B_OK)
+		return error;
+
+	char indexBuffer[24];
+
+	if (Parent()->IsDevice()) {
+		// Our parent is a device, so we replace `raw' by our index.
+		const char *leaf = path->Leaf();
+		if (!leaf || strcmp(leaf, "raw") != B_OK)
+			return B_ERROR;
+
+		snprintf(indexBuffer, sizeof(indexBuffer), "%ld", Index());
+	} else {
+		// Our parent is a normal partition, no device: Append our index.
+		snprintf(indexBuffer, sizeof(indexBuffer), "%s_%ld", path->Leaf(), Index());
+	}
+
+	error = path->GetParent(path);
+	if (error == B_OK)
+		error = path->Append(indexBuffer);
+
+	return error;
 }
 
 // GetVolume
