@@ -27,8 +27,16 @@ typedef struct {
 } console_module_info;
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int con_init(struct kernel_args *args);
 void kprintf(const char *fmt, ...) __PRINTFLIKE(1,2);
 void kprintf_xy(int x, int y, const char *fmt, ...) __PRINTFLIKE(3,4);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KERNEL_CONSOLE_H */
