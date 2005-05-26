@@ -42,16 +42,26 @@
 #define USE_CHECKING_WALL 0
 
 #define WALL_SIZE 8
-	/* must be a multiple of 4 */
+	// must be a multiple of 4 
 
 #if USE_CHECKING_WALL
-	/* Change to allow (struct list_link) + 2 * uint32 + WALL_SIZE */
-#	define WALL_MIN_ALIGN 32
 #	define WALL_CHECK_FREQUENCY	1 /* every tenth second */
-#else
-#	define WALL_MIN_ALIGN 16
 #endif
 
+#if USE_WALL
+struct front_wall {
+#	if USE_CHECKING_WALL
+	struct list_link link;
+#	endif
+	size_t	alignment;
+	size_t	size;
+	uint32	wall[WALL_SIZE / 4];
+};
+
+struct back_wall {
+	uint32	wall[WALL_SIZE / 4];
+};
+#endif	// USE_WALL
 
 // heap stuff
 // ripped mostly from nujeffos
@@ -154,50 +164,75 @@ ptrchecklist_remove(void *ptr)
 
 #if USE_WALL
 
-static uint32 *
-get_wall(void *address, size_t alignment)
+static size_t
+wall_size(size_t alignment)
 {
-	return (uint32 *)((addr_t)address + alignment - WALL_SIZE - 8);
+	if (alignment == 0)
+		return sizeof(struct front_wall) + sizeof(struct back_wall);
+
+	return 2 * alignment;
 }
 
 
 static void *
-set_wall(uint32 *wall, void *address, size_t size, size_t alignment)
+get_base_address_from_wall(struct front_wall *wall)
 {
-#if USE_CHECKING_WALL
-	size -= sizeof(struct list_link);
-#endif
-	size -= 8 + 2*WALL_SIZE + 2*alignment;
+	if (wall->alignment == 0)
+		return (void *)wall;
 
-	wall[0] = alignment;
-	wall[1] = size;
-	wall[2] = 0xabadcafe;
-	wall[3] = 0xabadcafe;
+	return (void *)((addr_t)wall + sizeof(struct front_wall) - wall->alignment);
+}
 
-	address = (uint8 *)wall + 16;
 
-	wall = (uint32 *)((uint8 *)address + size);
-	wall[0] = 0xabadcafe;
-	wall[1] = 0xabadcafe;
+static struct front_wall *
+get_wall(void *address)
+{
+	return (struct front_wall *)((addr_t)address - sizeof(struct front_wall));
+}
 
-	return address;
+
+static void
+set_wall(struct front_wall *wall, size_t size, size_t alignment)
+{
+	struct back_wall *backWall;
+	uint32 i;
+
+	size -= wall_size(alignment);
+
+	wall->alignment = alignment;
+	wall->size = size;
+
+	for (i = 0; i < WALL_SIZE / sizeof(uint32); i++) {
+		wall->wall[i] = 0xabadcafe;
+	}
+
+	backWall = (struct back_wall *)((addr_t)wall + sizeof(struct front_wall) + size);
+	for (i = 0; i < WALL_SIZE / sizeof(uint32); i++) {
+		backWall->wall[i] = 0xabadcafe;
+	}
 }
 
 
 static void *
 add_wall(void *address, size_t size, size_t alignment)
 {
-	uint32 *wall = get_wall(address, alignment);
+	struct front_wall *wall;
+
+	if (alignment == 0)
+		address = (uint8 *)address + sizeof(struct front_wall);
+	else
+		address = (uint8 *)address + alignment;
+
+	wall = get_wall(address);
 
 #if USE_CHECKING_WALL
-	struct list_link *link = (struct list_link *)wall - 1;
-
 	acquire_sem(sWallCheckLock);
-	list_add_link_to_tail(&sWalls, link);
+	list_add_link_to_tail(&sWalls, &wall->link);
 	release_sem(sWallCheckLock);
 #endif
 
-	return set_wall(wall, address, size, alignment);
+	set_wall(wall, size, alignment);
+	return address;
 }
 
 
@@ -205,15 +240,25 @@ void check_wall(void *address);
 void
 check_wall(void *address)
 {
-	uint32 *wall = get_wall(address, 0);
-	uint32 size = wall[1];
+	struct front_wall *frontWall = get_wall(address);
+	struct back_wall *backWall;
+	uint32 i;
 
-	if (wall[2] != 0xabadcafe || wall[3] != 0xabadcafe)
-		panic("free: front wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[1], wall[2]);
+	for (i = 0; i < WALL_SIZE / 4; i++) {
+		if (frontWall->wall[i] != 0xabadcafe) {
+			panic("free: front wall %i was overwritten (allocation at %p, %lu bytes): %08lx\n",
+				i, address, frontWall->size, frontWall->wall[i]);
+		}
+	}
 
-	wall = (uint32 *)((uint8 *)address + size);
-	if (wall[0] != 0xabadcafe || wall[1] != 0xabadcafe)
-		panic("free: back wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[0], wall[1]);
+	backWall = (struct back_wall *)((uint8 *)address + frontWall->size);
+
+	for (i = 0; i < WALL_SIZE / 4; i++) {
+		if (backWall->wall[i] != 0xabadcafe) {
+			panic("free: back wall %i was overwritten (allocation at %p, %lu bytes): %08lx\n",
+				i, address, frontWall->size, backWall->wall[i]);
+		}
+	}
 }
 
 #endif	/* USE_WALL */
@@ -223,14 +268,12 @@ check_wall(void *address)
 static void
 check_wall_daemon(void *arg, int iteration)
 {
-	struct list_link *link = NULL;
-	uint32 *wall;
+	struct front_wall *wall = NULL;
 
 	acquire_sem(sWallCheckLock);
 
-	while ((link = list_get_next_item(&sWalls, link)) != NULL) {
-		wall = (uint32 *)((addr_t)link + sizeof(struct list_link) + WALL_SIZE + 8);
-		check_wall(wall);
+	while ((wall = list_get_next_item(&sWalls, wall)) != NULL) {
+		check_wall((uint8 *)wall + sizeof(struct front_wall));
 	}
 
 	release_sem(sWallCheckLock);
@@ -387,16 +430,13 @@ memalign(size_t alignment, size_t size)
 	mutex_lock(&heap_lock);
 
 #if USE_WALL
-	// The wall uses 4 bytes to store the actual length of the requested
-	// block, 4 bytes for the alignment offset, WALL_SIZE, and eventually
-	// a list_link in case USE_CHECKING_WALL is defined
-	if (alignment < WALL_MIN_ALIGN)
-		alignment = WALL_MIN_ALIGN;
+	if (alignment > 0) {
+		// make the alignment big enough to contain the front wall
+		while (alignment < sizeof(struct front_wall))
+			alignment *= 2;
+	}
 
-#if USE_CHECKING_WALL
-	size += sizeof(struct list_link);
-#endif
-	size += 2*WALL_SIZE + 8 + 2*alignment;
+	size += wall_size(alignment);
 #else
 	// ToDo: that code "aligns" the buffer because the bins are always
 	//	aligned on their bin size
@@ -487,18 +527,15 @@ free(void *address)
 
 #if USE_WALL
 	{
-		uint32 *wall = get_wall(address, 0);
-		uint32 alignOffset = wall[0];
+		struct front_wall *wall = get_wall(address);
 
 #if USE_CHECKING_WALL
-		struct list_link *link = (struct list_link *)wall - 1;
-
 		acquire_sem(sWallCheckLock);
-		list_remove_link(link);
+		list_remove_link(&wall->link);
 		release_sem(sWallCheckLock);
 #endif
 		check_wall(address);
-		address = (uint8 *)address - alignOffset;
+		address = get_base_address_from_wall(wall);
 	}
 #endif
 
@@ -591,6 +628,9 @@ realloc(void *address, size_t newSize)
 
 	if (address != NULL) {
 		struct heap_page *page;
+#if USE_WALL
+		struct front_wall *wall = get_wall(address);
+#endif
 
 		mutex_lock(&heap_lock);
 		page = &heap_alloc_table[((unsigned)address - heap_base) / B_PAGE_SIZE];
@@ -606,27 +646,17 @@ realloc(void *address, size_t newSize)
 		mutex_unlock(&heap_lock);
 
 #if USE_WALL
-		check_wall(address);
-
-		// The wall uses 4 bytes to store the actual length of the requested
-		// block, 4 bytes for the alignment offset, WALL_SIZE, and eventually
-		// a list_link in case USE_CHECKING_WALL is defined
-		newSize += 2*WALL_SIZE + 8 + 2*WALL_MIN_ALIGN;
-
-#	if USE_CHECKING_WALL
-		newSize += sizeof(struct list_link);
-#	endif
-#endif	// USE_WALL
+		newSize += wall_size(wall->alignment);
+#endif
 
 		// does the new allocation simply fit in the bin?
-		if (newSize > minSize && newSize < maxSize) {
+		if (newSize > minSize && newSize <= maxSize) {
 #if USE_WALL
-			// update the wall to the new size
-			uint32 *wall = get_wall(address, 0);
-
 			check_wall(address);
-			address = (uint8 *)address - wall[0];
-			address = set_wall(wall, address, newSize, 0);
+
+			// we need to move the back wall, and honour the
+			// alignment so that the address stays the same
+			set_wall(wall, newSize, wall->alignment);
 #endif
 			return address;
 		}
