@@ -42,9 +42,9 @@
 #include <dirent.h>
 
 /* For the new post-DR8 file attributes */
-#include <kernel/fs_attr.h>
-#include <support/byteorder.h>
-#include <storage/Mime.h>
+#include <fs_attr.h>
+#include <ByteOrder.h>
+#include <Mime.h>
 
 static uch *scanBeOSexfield  OF((const uch *ef_ptr, unsigned ef_len));
 static int  set_file_attrs( const char *, const unsigned char *, const off_t );
