@@ -145,16 +145,14 @@ typedef struct {
 							space. */
 
 	area_id	fb_area;	/* Frame buffer's area_id.  The addresses are shared with all teams. */
-	area_id pseudo_dma_area;	/* Pseudo dma area_id. Shared by all teams. */
-	area_id	dma_buffer_area;	/* Area assigned for dma*/
+	area_id	dma_buffer_area;	/* Area assigned for DMA. It will be cloned into the accelerant's
+									address	space.*/
 
 	void	*framebuffer;		/* As viewed from virtual memory */
 	void	*framebuffer_pci;	/* As viewed from the PCI bus (for DMA) */
 
-	void	*pseudo_dma;		/* As viewed from virtual memory */
-
-	void	*dma_buffer;		/* buffer for dma*/
-	void	*dma_buffer_pci;	/* buffer for dma - from PCI bus*/
+	void	*dma_buffer;		/* As viewed from virtual memory */
+	void	*dma_buffer_pci;	/* As viewed from the PCI bus */
 
   /*screenmode list*/
 	area_id	mode_area;              /* Contains the list of display modes the driver supports */
@@ -200,7 +198,7 @@ typedef struct {
 			uint32	ch_ptr[0x20];	/* cmd handle's ptr to it's assigned FIFO ch (if any) */
 		} fifo;
 		struct {
-			uint32 *cmdbuffer;	/* location of DMA command buffer */
+			uint32 *cmdbuffer;	/* (physical) location of DMA command buffer */
 			uint32 put;			/* last 32-bit-word adress given to engine to exec. to */
 			uint32 current;		/* first free 32-bit-word adress in buffer */
 			uint32 free;		/* nr. of useable free 32-bit words remaining in buffer */
