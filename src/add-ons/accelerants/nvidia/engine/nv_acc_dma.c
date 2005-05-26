@@ -395,9 +395,16 @@ status_t nv_acc_init_dma()
 //main mem DMA buf test on pre-NV40
 		if (1)//si->ps.card_type == NV04)
 		{
-			/* DMA target node is PCI */
-			ACCW(PR_CTX0_A, 0x00023002);
-//			ACCW(PR_CTX0_A, 0x00033002);//AGP
+			if (si->engine.agp_mode)
+			{
+				/* DMA target node is AGP */
+				ACCW(PR_CTX0_A, 0x00033002);
+			}
+			else
+			{
+				/* DMA target node is PCI */
+				ACCW(PR_CTX0_A, 0x00023002);
+			}
 			/* point at the DMA buffer via main system memory */
 //			ACCW(PR_CTX2_A, (ACCR(PR_CTX2_A) +
 //				(((uint32)((uint8 *)(si->framebuffer_pci))) & 0xfffff000)));

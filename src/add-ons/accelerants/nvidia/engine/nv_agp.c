@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 6/2004-9/2004
+   Rudolf Cornelissen 6/2004-5/2005
 */
 
 #define MODULE_BIT 0x00000100
@@ -17,6 +17,9 @@ status_t nv_agp_setup(void)
 	uint8 index;
 	agp_info nv_ai;
 	bool agp = false;
+
+	/* preset we are running in PCI mode: so acc engine may not use AGP transfers */
+	si->engine.agp_mode = false;
 
 	/* first try to enable FW support on our card if user requested this
 	 * ('unsupported' tweak!)
@@ -122,6 +125,8 @@ status_t nv_agp_setup(void)
 		/* ..but we do need to select the right speed scheme fetched from our card */
 		if (nv_ai.interface.agp_stat & AGP_rate_rev) nca.cmd |= AGP_rate_rev;
 		ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
+		/* tell the engine in may use AGP transfers */
+		si->engine.agp_mode = true;
 	}
 
 	/* list mode now activated,
